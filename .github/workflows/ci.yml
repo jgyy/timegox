@@ -39,6 +39,8 @@ jobs:
 
       - name: Bot plays the whole game (must take >= 1h of game time)
         run: |
+          set -o pipefail
+          mkdir -p build
           ~/godot/godot --headless --fixed-fps 30 --path . -- \
             --bot --seed=1234 --min-time=3600 --report=build/bot_report.json | tee build/bot_log.txt
 
