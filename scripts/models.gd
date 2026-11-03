@@ -1227,7 +1227,6 @@ static func monster(shape: String, col: Color, boss: bool = false) -> Node3D:
 			for i in 5:
 				drip.ribbon([Vector3(-0.8 + i * 0.4, 1.3, 0.2), Vector3(-0.8 + i * 0.4, 0.6, 0.2), Vector3(-0.8 + i * 0.4, 0.1, 0.2)], [0.02, 0.015, 0.0], Vector3.RIGHT, Color(col.r, col.g, col.b, 0.6))
 			_mi(root, drip, MB.mat_glow())
-			_aura(root, Vector3(0, 1.5, 0), Vector3(1.4, 1.0, 1.4), col, 0.12)
 		_:
 			b.ball(Vector3(0, 0.8, 0), 0.6, col)
 			root = _node(b, g)
@@ -1241,7 +1240,6 @@ static func monster(shape: String, col: Color, boss: bool = false) -> Node3D:
 
 ## Boss aura (a fresnel halo) and a rotating rune circle on the ground.
 static func _boss_halo(root: Node3D, col: Color) -> void:
-	_aura(root, Vector3(0, 1.1, 0), Vector3(1.55, 1.55, 1.55), col, 0.05)
 	var ring := _pivot(root, Vector3(0, 0.06, 0))
 	var rb := MB.new()
 	rb.arc(Vector3.ZERO, 1.5, 0.06, 0.0, TAU, Color(col.r, col.g, col.b, 0.85), 48)

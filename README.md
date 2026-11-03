@@ -1,41 +1,59 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, with no imported art: every tree, building, character, monster and spell effect is generated in code from primitive meshes.
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to True Immortal, through fourteen regions, 45 bosses and eight Heavenly Tribulations.
+Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Dao Ancestor, through eighteen regions, 61 bosses and nine Heavenly Tribulations.
 
-> **Total gameplay duration: about 3 hours 10 minutes** (3:11:18 of game time for the end-to-end bot run; seeds 7 and 99 give 3:09:27 and 3:10:41). Parts I and II take about 2 hours 10 minutes; **Part III, "The Hollow Heaven", adds another hour**: four new regions, 16 new bosses, 12 new monsters, two new realms (Mahayana, True Immortal), new techniques and a rewritten ending.
+> **Total gameplay duration: about 4 hours 15 minutes** (4:17:46 of game time for the end-to-end bot run; seeds 7 and 99 give 4:16:09 and 4:17:15). Parts I to III take about 3 hours 11 minutes; **Part IV, "The Unwritten Ledger", adds another hour** (1 hour 6 minutes): four new regions, 16 new bosses, 12 new monsters, a new realm (Dao Ancestor), new techniques and a new ending.
 
 | | |
 |---|---|
 | ![title](docs/screenshots/01_title.png) | ![sect](docs/screenshots/world_sect.png) |
-| ![bamboo](docs/screenshots/world_bamboo.png) | ![boss](docs/screenshots/battle_boss_marsh_hag.png) |
-| ![mirror](docs/screenshots/world_mirror.png) | ![origin](docs/screenshots/battle_boss_echo_xumo.png) |
+| ![people](docs/screenshots/gallery_people.png) | ![spirits](docs/screenshots/gallery_spirits.png) |
+| ![garden](docs/screenshots/world_garden.png) | ![ledger](docs/screenshots/battle_boss_jade_ledger.png) |
+| ![frost](docs/screenshots/world_frost.png) | ![titan](docs/screenshots/battle_boss_lava_titan.png) |
 
-More captures (every region and every boss) are in [`docs/screenshots`](docs/screenshots).
+More captures (every region, every boss and model galleries) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
 
 ```mermaid
 flowchart LR
-    subgraph Before[2D release]
-    A1[Top-down tile renderer<br/>_draw calls] --> A2[2D sprites drawn in code]
+    subgraph G[3D graphics rebuild: 1,472 to 4,361 lines]
+    MB[mb.gd<br/>limbs, lathes, ribbons, leaves,<br/>discs, arcs, crystals] --> SH[Toon shader<br/>7 procedural surface textures<br/>+ ink outline pass]
+    MB --> MO[models.gd<br/>articulated people, rigged monsters,<br/>action poses, 22 shapes]
+    MB --> TE[terrain3d.gd<br/>height field, ground shader,<br/>water foam, tufts, horizon]
+    LK[look.gd<br/>sky shader: clouds, stars, aurora<br/>bloom, filmic grade] --> TE
+    FX[fx3d.gd<br/>sprite particles, slashes,<br/>projectiles, lightning, spikes]
     end
-    subgraph Now[3D release]
-    B1[MeshBuilder<br/>primitives to merged meshes] --> B2[Terrain3D<br/>ground, water, landmarks]
-    B1 --> B3[Models<br/>people and 18 monster shapes]
-    B2 --> B4[World screen<br/>chase camera, Q/E orbit]
-    B3 --> B4
-    B3 --> B5[Battle stage<br/>over-the-shoulder camera]
-    B4 --> B6[2D HUD overlay]
-    B5 --> B6
+    subgraph P[Part IV: +1 hour]
+    C1[Sea of Clouds] --> C2[Jade Court] --> C3[Heaven's Forge] --> C4[Peach Garden]
     end
-    Before ==> Now
+    G --> Play((Game))
+    P --> Play
 ```
 
-- **3D third-person**: the hero is followed by a chase camera (`Q`/`E` rotate it in 90 degree steps; movement is camera-relative). Battles take place on a 3D arena with an over-the-shoulder camera, lunging attackers, element-coloured particle bursts and hit flashes. The title, meditation and ending screens are 3D scenes too. Only the HUD, menus and dialogue box remain 2D overlays.
-- **Part III** adds +1 hour (see below).
-- **Narrative plot holes fixed** (see below).
-- Headless runs skip all rendering work, so CI simulates three hours of play in minutes.
+- **3D graphics rebuilt** (see [3D graphics](#3d-graphics)): the five 3D modules grew from 1,472 to 4,361 lines (about 3x), plus richer 3D scenes in the world, battle, title, meditation and ending screens.
+- **Part IV** adds +1 hour (see below), verified by the playthrough bot.
+- **Bugs found and fixed** (see below).
+- Headless runs skip all rendering work, so CI simulates four hours of play in minutes.
+
+## 3D graphics
+
+Everything is still generated in code (no imported meshes or textures). Blender was not needed: a procedural pipeline fits the project's "no imported art" rule and keeps the CI build self-contained.
+
+| Area | Before | Now |
+|---|---|---|
+| Surfaces | flat vertex colours | toon shader with procedural textures per surface class (cloth weave, stone grain and cracks, brushed metal, wood rings, skin subsurface, glinting crystal, wind-swayed foliage, scales, hair highlights) and an ink outline |
+| Characters | capsule body, ball head, rigid limbs | tapered torso and robe, four swinging robe panels, two-segment arms and legs, wide sleeves, hands, faces with anime eyes that blink, five hair styles with a swinging ponytail, capes, armour, crowns, detailed swords and staffs |
+| Animation | leg swing | walk cycle with knee bend, torso twist and head bob; idle breathing; secondary motion of hair, robe, sash and cape; attack, cast, hurt and victory poses in battle |
+| Monsters | 18 static shapes | 22 rigged shapes (new: manta ray, mantis, tortoise, the Jade Ledger tome) with jaws, trotting legs, wagging tails, flapping two-part wings, undulating dragon bodies, scuttling crab and spider legs, pulsing jellyfish, swaying vines |
+| Terrain | flat checkerboard quads | height field with hills, shores and causeways; blended ground colours; ground shader (grass, mud, snow, rock, tiles, sand, ash with glowing cracks, crystal, marble, glass) with cobbled paths; water with ripples, fresnel and shoreline foam; grass tufts; two variants of every landmark; boulders; horizon silhouettes |
+| Sky and light | procedural sky preset | sky shader with sun disc and halo, drifting clouds, stars and aurora; bloom, filmic tonemapping, aerial fog; cool fill light |
+| Effects | coloured balls | soft sprite particles; per-element spells (fire pillars, water rings, leaf spirals, rock spikes, sky lightning, dark vortices, shockwaves), sword-slash arcs, projectiles with trails, camera shake, ambient tribulation lightning, footstep dust, two-layer weather |
+
+| ![people](docs/screenshots/gallery_people.png) | ![beasts](docs/screenshots/gallery_beasts.png) |
+|---|---|
+| ![spirits](docs/screenshots/gallery_spirits.png) | ![giants](docs/screenshots/gallery_giants.png) |
 
 ## Run it (terminal)
 
@@ -67,10 +85,10 @@ Walk into NPCs, enemies, pickups and bosses to interact with them. There is no s
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 25 stages across nine realms (up to True Immortal); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 28 stages across ten realms (up to Dao Ancestor); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Fourteen regions**, each with a travel gate, elites, bosses and a hunt objective. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III (new)**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao.
-- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, **Chrono Severance** and **Genesis Sword**, plus Yue Ling's Starlight Rain and **Dawn Lotus**.
+- **Eighteen regions**, each with a travel gate, elites, bosses and a hunt objective. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV (new)**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches.
+- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, **Ten Thousand Starfall** and **Ledger-Breaking Stroke**, plus Yue Ling's Starlight Rain, Dawn Lotus and **Seal Bloom**.
 - **Economy**: spirit stones buy pills and tempering for your sword.
 
 ```mermaid
@@ -95,7 +113,14 @@ flowchart LR
     Grave -->|Mahayana Tribulation| Time[River of Ten Thousand Years<br/>Tian Xuan]
     Time --> Origin[Origin of the Dao<br/>The Hollow Heaven]
     end
-    Origin ==> End((True Immortal))
+    subgraph P4[Part IV: about 1h06m]
+    Origin ==>|True Immortal, names written in the sky| Sect3[Sect: the Jade Ledger]
+    Sect3 -->|west gate| Clouds[Sea of Clouds<br/>Herald Qian Shu]
+    Clouds --> Court[Ruins of the Jade Court<br/>Registrar Si Ming]
+    Court --> Forge[Heaven's Forge<br/>Forge-Lord Tian Gong]
+    Forge --> Garden[Garden of Immortal Peaches<br/>The Jade Ledger]
+    end
+    Garden ==> End((Dao Ancestor))
 ```
 
 ```mermaid
@@ -124,7 +149,33 @@ After the Jade Emperor falls and Lin Feng merges with the Dao, the Heavenly Lotu
 | Origin of the Dao | 22-23 | Yue Ling's secret and the Hollow Heaven | The Hollow Heaven |
 | *True Immortal tribulation and ending* | | | |
 
-## Narrative plot holes found and fixed
+## Part IV: The Unwritten Ledger
+
+Lin Feng ascends as a True Immortal, but across the golden dawn someone is writing names in jade ink: the nineteen bearers, and his own. The Lotus Seal pulls him home, where everyone who ever survived a tribulation is ageing by the hour. The harvest had a bookkeeper: the Heavenly Court's **Jade Ledger**, still trying to balance its columns by collecting years from the living. Four new regions, 16 bosses, 12 monsters, five quest chains (each with a hunt, a collection and a delivery scene) and a new realm follow:
+
+| Region | Levels | Story beat | Final boss |
+|---|---|---|---|
+| Sea of Clouds Archipelago | 24-25 | The Court's tollgate in the sky; a cloud-step woven from feathers | Herald of the Ledger, Qian Shu |
+| Ruins of the Jade Court | 25 | A runaway scribe, four Jade Seals and the brush that wrote every name | Grand Registrar Si Ming |
+| Heaven's Forge | 25-26 | Where every tribulation bolt was hammered; the brush is reforged to unwrite | Forge-Lord Tian Gong |
+| Garden of Immortal Peaches | 26 | The nineteen bearers wake and remember their names | The Jade Ledger |
+| *Dao Ancestor tribulation and new ending* | | | |
+
+Part III's ending now flows into Part IV (the final ascension sets up the Ledger instead of closing the story), and the ending screen reflects the new finale.
+
+## Bugs found and fixed
+
+| Bug | Fix |
+|---|---|
+| Two identical foes (same species, level and HP) were drawn **on top of each other** in battle: `Array.find()` compares dictionaries by value, so both resolved to the same stage slot | Each foe gets an explicit `slot` (`Data.make_foes`); regression test added |
+| The sect's **east gate** faced the wrong way (rotation only applied to `x > 40`, but the sect is 40 tiles wide) | Orientation is computed from the map edges |
+| Cancelling **Yue Ling's basic attack** target selection opened the Skills menu instead of the main menu | Both basic attacks (`strike`, `needle`) return to the main menu |
+| Using a pill from the pause menu at **full HP or Qi** silently wasted it | The pill is kept and a message is shown |
+| The **techniques list** in the pause menu overflowed the panel once more than 12 techniques were known | Two columns of eight |
+| The **Jade Mantis Matriarch** was drawn as a wolf and the **Eon Tortoise** as a crab | New mantis and tortoise models |
+| The bot's default `--max-time` (4 h) would have cut off a longer game | Raised to 6 h |
+
+## Narrative plot holes found and fixed (previous release)
 
 | Plot hole | Fix |
 |---|---|
@@ -155,25 +206,29 @@ flowchart TD
         T[title / ending / meditate<br/>3D scenes]
         M[menu / shop / dialogue<br/>2D overlays]
     end
-    W --> TER[terrain3d.gd<br/>ground, water shader, landmarks, buildings]
-    W --> MOD[models.gd<br/>people and 18 monster shapes]
+    W --> TER[terrain3d.gd<br/>height field, ground and water shaders,<br/>landmarks, tufts, horizon, buildings]
+    W --> MOD[models.gd<br/>rigged people and 22 monster shapes,<br/>action poses]
     B --> MOD
-    B --> FX[fx3d.gd<br/>weather, element bursts]
+    B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
-    TER --> MB[mb.gd<br/>primitive merge to ArrayMesh]
+    TER --> MB[mb.gd<br/>primitives, limbs, lathes, ribbons<br/>toon + outline + aura shaders]
     MOD --> MB
-    TER --> LK[(look.gd<br/>14 region looks)]
+    FX --> MB
+    TER --> LK[(look.gd<br/>18 region looks, sky shader)]
     W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap]
     B --> UI
 ```
 
-Highlights of the renderer: merged vertex-coloured meshes (a few draw calls per chunk), MultiMesh instancing for landmarks and decorations, an animated water/lava shader, per-region sky, fog, sun and weather particles (snow, rain, petals, embers, bubbles, void stars, sand, drifting light), articulated characters with a walk cycle, 18 monster shapes with boss auras, and a distinct hit effect for each element.
+Highlights of the renderer: merged vertex-coloured meshes (a few draw calls per chunk) whose vertex alpha selects a procedural surface texture in the toon shader, an inverted-hull ink outline (skipped for thin double-sided geometry), MultiMesh instancing for landmarks, boulders, decorations and grass, a height-field terrain with a per-region ground shader, animated water/lava with foam, a sky shader per region, two-layer weather (snow, rain, petals, embers, bubbles, void stars, sand, clouds, lanterns, sparks, plus fireflies, pollen, ash or haze), rigged characters and monsters, and element-specific spell effects.
+
+The screenshot tour also renders model galleries (`--gallery`).
 
 Regenerate screenshots (needs a GL context; use `xvfb-run` on a server):
 
 ```sh
 godot --path . --fixed-fps 30 -- --tour=docs/screenshots              # everything
 godot --path . --fixed-fps 30 -- --tour=out --areas=mirror,grave --no-extras   # some regions
+godot --path . --fixed-fps 30 -- --tour=out --areas=garden --no-extras --gallery  # one region + model galleries
 ```
 
 ## The playthrough bot
@@ -188,25 +243,26 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs; seeds 7 and 99 give 3:09:27 and 3:10:41). Parts I and II alone took 2:10:20, so Part III adds about **1 hour 1 minute**:
+Latest result (seed 1234, identical across runs; seeds 7 and 99 give 4:16:09 and 4:17:15). Parts I to III take 3:11:18, so Part IV adds about **1 hour 6 minutes**:
 
 ```
-game play time  : 3:11:18 (11479 s)
-wall clock      : ~5 min (headless)
-final realm     : Early True Immortal
-battles / kills : 348 / 659   deaths: 0
-time by screen  : battle 5915 s, world 1840 s, meditate 2561 s, dialogue 1116 s
-time by area    : bamboo 867, marsh 655, frost 959, thunder 607, palace 561, sect 534,
+game play time  : 4:17:46 (15466 s)
+wall clock      : ~6 min (headless)
+final realm     : Early Dao Ancestor
+battles / kills : 461 / 881   deaths: 0
+time by screen  : battle 7394 s, world 2386 s, meditate 3923 s, dialogue 1685 s
+time by area    : bamboo 867, marsh 655, frost 959, thunder 607, palace 561, sect 612,
                   dragon 621, volcano 1031, void 704, celestial 1444,
-                  mirror 569, grave 998, time 708, origin 1250
-result          : PASS (needs >= 10800 s)
+                  mirror 569, grave 998, time 708, origin 1245,
+                  cloudsea 797, court 836, forge 886, garden 1395
+result          : PASS (needs >= 14400 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 10800), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 14400), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture).
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, portal symmetry, map reachability and determinism, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than three hours of game time**. The bot report is uploaded as an artifact and shown in the job summary.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, portal symmetry, map reachability and determinism, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than four hours of game time**. The bot report is uploaded as an artifact and shown in the job summary.
 
 ```mermaid
 flowchart LR
@@ -214,7 +270,7 @@ flowchart LR
     DL --> IMP[Import project]
     IMP --> T[Data-integrity tests]
     T --> B[Bot plays whole game<br/>--fixed-fps 30]
-    B --> G{completed and<br/>game time >= 3h?}
+    B --> G{completed and<br/>game time >= 4h?}
     G -- yes --> OK[Pass + report artifact]
     G -- no --> FAIL[Fail]
 ```

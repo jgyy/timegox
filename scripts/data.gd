@@ -5,7 +5,7 @@ extends RefCounted
 const MAX_LEVEL := 27
 const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 135000]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000]
 const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
@@ -695,7 +695,7 @@ const STEPS := [
 	{"id": "s_p4_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Names are being written across the sky: speak to Elder Qing Xuan", "stones": 3500},
 	{"id": "s_cs_intro", "kind": "talk", "npc": "cloud_warden", "area": "cloudsea", "t": "Cross the West Gate into the Sea of Clouds and find its Warden"},
 	{"id": "s_cs_collect", "kind": "collect", "item": "feather_cloud", "n": 4, "area": "cloudsea", "t": "Gather 4 Cloud Feathers to weave a cloud-step"},
-	{"id": "s_cs_hunt", "kind": "hunt", "area": "cloudsea", "n": 40, "t": "Drive the Ledger's tithe-collectors from the islands"},
+	{"id": "s_cs_hunt", "kind": "hunt", "area": "cloudsea", "n": 42, "t": "Drive the Ledger's tithe-collectors from the islands"},
 	{"id": "s_cs_weave", "kind": "talk", "npc": "cloud_warden", "area": "cloudsea", "t": "Bring the Cloud Feathers to Warden Feng Yu"},
 	{"id": "s_cs_manta", "kind": "kill", "boss": "manta_sovereign", "area": "cloudsea", "t": "Ground the Sky Manta Sovereign"},
 	{"id": "s_cs_mantis", "kind": "kill", "boss": "gale_mantis", "area": "cloudsea", "t": "Still the Gale Mantis Empress"},
@@ -703,7 +703,7 @@ const STEPS := [
 	{"id": "s_cs_herald", "kind": "kill", "boss": "herald_qian", "area": "cloudsea", "t": "Stop the Herald of the Ledger, Qian Shu", "stones": 3800},
 	{"id": "s_ct_intro", "kind": "talk", "npc": "court_scribe", "area": "court", "t": "Find the runaway scribe in the Ruins of the Jade Court"},
 	{"id": "s_ct_collect", "kind": "collect", "item": "seal", "n": 4, "area": "court", "t": "Recover 4 Jade Seals of the old Court"},
-	{"id": "s_ct_hunt", "kind": "hunt", "area": "court", "n": 40, "t": "Scatter the clerks still stamping debts"},
+	{"id": "s_ct_hunt", "kind": "hunt", "area": "court", "n": 42, "t": "Scatter the clerks still stamping debts"},
 	{"id": "s_ct_stamp", "kind": "talk", "npc": "court_scribe", "area": "court", "t": "Take the Jade Seals to Scribe Wen Yu"},
 	{"id": "s_ct_lions", "kind": "kill", "boss": "twin_lions", "area": "court", "t": "Pass the Twin Lions of the Jade Gate"},
 	{"id": "s_ct_inkdragon", "kind": "kill", "boss": "ink_dragon", "area": "court", "t": "Wash away the Ink Dragon"},
@@ -711,7 +711,7 @@ const STEPS := [
 	{"id": "s_ct_siming", "kind": "kill", "boss": "registrar_siming", "area": "court", "t": "Confront Grand Registrar Si Ming", "stones": 4200},
 	{"id": "s_fg_intro", "kind": "talk", "npc": "forge_master", "area": "forge", "t": "Seek Forgemaster Ou Lan in Heaven's Forge"},
 	{"id": "s_fg_collect", "kind": "collect", "item": "ingot", "n": 4, "area": "forge", "t": "Gather 4 Star-Iron Ingots for the unwriting brush"},
-	{"id": "s_fg_hunt", "kind": "hunt", "area": "forge", "n": 42, "t": "Quench the forge-spawn still hammering out lightning"},
+	{"id": "s_fg_hunt", "kind": "hunt", "area": "forge", "n": 44, "t": "Quench the forge-spawn still hammering out lightning"},
 	{"id": "s_fg_reforge", "kind": "talk", "npc": "forge_master", "area": "forge", "t": "Bring the Star-Iron and the broken brush to Ou Lan"},
 	{"id": "s_fg_engine", "kind": "kill", "boss": "brass_engine", "area": "forge", "t": "Dismantle the Brass Spider Engine"},
 	{"id": "s_fg_crucible", "kind": "kill", "boss": "crucible_golem", "area": "forge", "t": "Crack the Crucible Golem"},
@@ -719,7 +719,7 @@ const STEPS := [
 	{"id": "s_fg_tiangong", "kind": "kill", "boss": "forge_tiangong", "area": "forge", "t": "Defeat Forge-Lord Tian Gong", "stones": 4600},
 	{"id": "s_gd_intro", "kind": "talk", "npc": "peach_keeper", "area": "garden", "t": "Enter the Garden of Immortal Peaches and greet its Keeper"},
 	{"id": "s_gd_collect", "kind": "collect", "item": "peach", "n": 4, "area": "garden", "t": "Pick 4 Immortal Peaches for the nineteen bearers"},
-	{"id": "s_gd_hunt", "kind": "hunt", "area": "garden", "n": 42, "t": "Weed out the garden's ledger-bound guardians"},
+	{"id": "s_gd_hunt", "kind": "hunt", "area": "garden", "n": 44, "t": "Weed out the garden's ledger-bound guardians"},
 	{"id": "s_gd_offer", "kind": "talk", "npc": "peach_keeper", "area": "garden", "t": "Bring the Immortal Peaches to Keeper Tao Yao"},
 	{"id": "s_gd_tree", "kind": "kill", "boss": "peach_tree", "area": "garden", "t": "Wake the Ten-Thousand-Year Peach Tree"},
 	{"id": "s_gd_crane", "kind": "kill", "boss": "crane_matriarch", "area": "garden", "t": "Win the Jade Crane Matriarch's trust"},

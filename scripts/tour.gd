@@ -36,22 +36,24 @@ func _shot(n: String) -> void:
 
 ## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
 func _gallery(n: String, models: Array, spacing: float) -> void:
+	main.world.hide()
 	var stage := Node3D.new()
 	stage.position = Vector3(0, 400, 0)
 	main.add_child(stage)
 	var cam := Camera3D.new()
 	cam.fov = 40.0
 	cam.environment = Look.environment("garden", 0.2)
+	cam.environment.tonemap_exposure = 0.85
 	stage.add_child(cam)
 	stage.add_child(Look.sun("garden"))
 	stage.add_child(Look.fill("garden"))
 	var key := OmniLight3D.new()
 	key.position = Vector3(0, 4, 7)
 	key.omni_range = 16.0
-	key.light_energy = 0.9
+	key.light_energy = 0.5
 	stage.add_child(key)
 	var fl := MB.new()
-	fl.disc(Vector3.ZERO, 14.0, MB.tag(Color("d8e8d0"), MB.STONE), 48, MB.tag(Color("a8c0a0"), MB.STONE))
+	fl.disc(Vector3.ZERO, 14.0, MB.tag(Color("8a9a88"), MB.STONE), 48, MB.tag(Color("6a7a6a"), MB.STONE))
 	MB.mesh_node(stage, fl.build(MB.mat_plain()))
 	var w := spacing * 2.2
 	for i in models.size():
@@ -75,6 +77,7 @@ func _gallery(n: String, models: Array, spacing: float) -> void:
 		await get_tree().process_frame
 	await _shot(n)
 	stage.queue_free()
+	main.world.show()
 	if main.world.cam != null:
 		main.world.cam.make_current()
 
