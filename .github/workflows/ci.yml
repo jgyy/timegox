@@ -37,6 +37,9 @@ jobs:
       - name: Data-integrity tests
         run: ~/godot/godot --headless --path . --script tests/run_tests.gd
 
+      - name: Manual keyboard input smoke test
+        run: ~/godot/godot --headless --path . --script tests/manual_input_test.gd
+
       - name: Bot plays the whole game (must take >= 1h of game time)
         run: |
           set -o pipefail

@@ -3,6 +3,8 @@
 A xianxia cultivation RPG built in **Godot 4** with no external art: every tile, character and monster is drawn procedurally in code.
 Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation all the way to Deity Transformation, through six regions, 14 bosses and four Heavenly Tribulations.
 
+> **Total gameplay duration: about 1 hour 6 minutes** (1:06:36 of game time for the end-to-end bot run; a human should expect roughly 1 to 1.5 hours depending on reading and menu speed).
+
 | | |
 |---|---|
 | ![title](docs/screenshots/01_title.png) | ![dialogue](docs/screenshots/02_dialogue.png) |
@@ -11,11 +13,26 @@ Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from 
 
 More captures (frost, thunder, palace, tribulation, ending) are in [`docs/screenshots`](docs/screenshots).
 
-## Run it
+## Run it (terminal)
+
+Requires [Godot 4.3+](https://godotengine.org/download) (developed on 4.7.2) available as `godot` on your PATH.
 
 ```sh
-godot --path .          # Godot 4.3+ (developed on 4.7.2)
+git clone https://github.com/jgyy/timegox.git && cd timegox
+godot --path . --import      # first time only: imports the project
+godot --path .               # play it manually in a window
 ```
+
+Other terminal commands:
+
+```sh
+godot --headless --path . --script tests/run_tests.gd           # data-integrity tests
+godot --headless --path . --script tests/manual_input_test.gd   # real keyboard-event smoke test
+godot --headless --fixed-fps 30 --path . -- --bot               # bot plays the whole game, prints play time
+godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-fps for real time) watch the bot
+```
+
+The game is fully playable by hand with the keyboard:
 
 | Key | Action |
 |---|---|
