@@ -88,7 +88,7 @@ func fighter(i: int) -> Dictionary:
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
 		"atk": a, "def": float(Data.defense(level)) * (1.0 if i == 0 else 0.9), "spd": Data.speed(level) + (2 if i == 1 else 0),
 		"elem": "phys", "weak": "none", "col": Color("7ec8ff") if i == 0 else Color("ff9ac0"),
-		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level),
+		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step),
 		"turns": 0, "flash": 0.0, "shake": 0.0, "dead": false, "fade": 1.0,
 	}
 

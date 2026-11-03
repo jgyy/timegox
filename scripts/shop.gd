@@ -1,19 +1,14 @@
-extends Node2D
+extends ScreenBase
 ## Alchemist (pills) and Smith (sword tempering) shops.
 
 const VIEW := Vector2(1280, 720)
 
-var main
-var opaque := false
 var kind := "alchemist"
 var labels: Array = []
 var ids: Array = []
 var enabled: Array = []
 var cursor := 0
 var msg := ""
-
-func setup(m) -> void:
-	main = m
 
 func open(k: String) -> void:
 	kind = k
@@ -73,7 +68,7 @@ func press(act: String) -> void:
 				_build()
 
 func _process(_d: float) -> void:
-	queue_redraw()
+	redraw()
 
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0, 0, 0, 0.5))

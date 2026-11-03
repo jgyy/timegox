@@ -1,12 +1,15 @@
-extends Node2D
-## Top-down tile world: rendering, grid movement, entity interaction.
+extends ScreenBase
+## Third-person 3D world: grid-based movement with a chase camera, entity models and the 2D HUD overlay.
+## The logic (tiles, movement, interaction) is identical to the original top-down game; only the view is 3D.
 
-const TS := 48
+const TS := Terrain3D.T
 const STEP_T := 0.16
 const VIEW := Vector2(1280, 720)
+const CAM_DIST := 8.5
+const CAM_H := 7.0
+const FWD := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
+const RIGHT := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]
 
-var main
-var opaque := false
 var area_id := ""
 var w := 0
 var h := 0
@@ -19,17 +22,53 @@ var target := Vector2i(1, 1)
 var move_t := -1.0
 var facing := Vector2i(1, 0)
 var move_dir := Vector2i.ZERO
-var t := 0.0
-var cam := Vector2.ZERO
-var motes: Array = []
 var banner_t := 0.0
 var cache := {}
 var mini_tex: ImageTexture = null
 
+# 3D state
+var views := {}
+var cur_view := {}
+var player: Node3D
+var comp: Node3D
+var comp_pos := Vector3.ZERO
+var weather: CPUParticles3D
+var sun: DirectionalLight3D
+var hero_light: OmniLight3D
+var cam_q := 0
+var cam_a := 0.0
+var cam_pos := Vector3.ZERO
 
+func _build3d() -> void:
+	opaque = false
+	new_scene3d()
+	new_camera(62.0)
+	sun = Look.sun("sect")
+	scene3d.add_child(sun)
+	player = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "glow": Color(0.4, 0.7, 1.0)})
+	player.add_child(Models.shadow_disc(0.55))
+	scene3d.add_child(player)
+	hero_light = OmniLight3D.new()
+	hero_light.light_color = Color(0.7, 0.85, 1.0)
+	hero_light.light_energy = 0.6
+	hero_light.omni_range = 9.0
+	hero_light.position = Vector3(0, 2.2, 0)
+	player.add_child(hero_light)
+	comp = Models.person(Color("e86a9a"), Color("402030"), {"ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8)})
+	comp.add_child(Models.shadow_disc(0.5))
+	comp.visible = false
+	scene3d.add_child(comp)
+	weather = Fx3D.make_weather()
+	scene3d.add_child(weather)
 
-func setup(m) -> void:
-	main = m
+func clear_cache() -> void:
+	cache.clear()
+	for k in views:
+		views[k].root.queue_free()
+		for n in views[k].nodes:
+			n.queue_free()
+	views.clear()
+	cur_view = {}
 
 func load_area(id: String, at: Vector2i) -> void:
 	area_id = id
@@ -48,23 +87,32 @@ func load_area(id: String, at: Vector2i) -> void:
 	Game.area = id
 	Game.tile = at
 	banner_t = 3.0
-	motes.clear()
-	for i in 46:
-		motes.append({"p": Vector2(randf() * VIEW.x, randf() * VIEW.y), "v": randf_range(8, 30), "s": randf_range(1.5, 3.5)})
-	mini_tex = Gfx.minimap_image(grid, w, h, Gfx.THEMES[theme_name])
-	_snap_cam()
+	if not headless():
+		mini_tex = Gfx.minimap_image(grid, w, h, Look.theme(theme_name))
+		_show_view(id, m)
+		_snap_cam()
 
-func _snap_cam() -> void:
-	cam = _cam_target()
-
-func _cam_target() -> Vector2:
-	var pp := Vector2(ptile) * TS + Vector2(TS, TS) * 0.5
-	if move_t >= 0.0:
-		pp = pp.lerp(Vector2(target) * TS + Vector2(TS, TS) * 0.5, move_t)
-	var c := pp - VIEW * 0.5
-	c.x = clampf(c.x, 0, maxf(0, w * TS - VIEW.x))
-	c.y = clampf(c.y, 0, maxf(0, h * TS - VIEW.y))
-	return c
+func _show_view(id: String, m: Dictionary) -> void:
+	if not cur_view.is_empty():
+		cur_view.root.visible = false
+		for n in cur_view.nodes:
+			n.visible = false
+	if not views.has(id):
+		var root := Terrain3D.build(m.grid, m.w, m.h, m.theme, Data.AREAS[id].seed)
+		scene3d.add_child(root)
+		var nodes: Array = []
+		for e in m.ents:
+			var n := _make_ent(e)
+			scene3d.add_child(n)
+			nodes.append(n)
+		views[id] = {"root": root, "nodes": nodes, "env": Look.environment(m.theme)}
+	cur_view = views[id]
+	cur_view.root.visible = true
+	cam.environment = cur_view.env
+	var th := Look.theme(theme_name)
+	sun.light_color = th.sun
+	sun.light_energy = th.sun_e
+	Fx3D.configure_weather(weather, th.weather)
 
 # ---------------------------------------------------------------- entities
 func ent_visible(e: Dictionary) -> bool:
@@ -112,12 +160,105 @@ func find_ent(id: String):
 			return e
 	return null
 
+# ---------------------------------------------------------------- 3D models for entities
+static func _label(parent: Node3D, text: String, y: float, col: Color, size: int = 34) -> Label3D:
+	var l := Label3D.new()
+	l.text = text
+	l.font_size = size
+	l.pixel_size = 0.0085
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.modulate = col
+	l.outline_size = 12
+	l.outline_modulate = Color(0, 0, 0, 0.85)
+	l.position = Vector3(0, y, 0)
+	l.shaded = false
+	l.no_depth_test = false
+	parent.add_child(l)
+	return l
+
+func _npc_opts(id: String) -> Dictionary:
+	match id:
+		"elder":
+			return {"beard": true, "staff": true}
+		"alchemist":
+			return {"hat": true}
+		"smith":
+			return {"sash": false}
+		"yue_ling":
+			return {"ribbon": Color("ff9ac0")}
+		"sword_ghost":
+			return {"sword": true, "beard": true, "glow": Color(0.6, 0.85, 1.0)}
+		"dragon_envoy", "gate_keeper", "lake_keeper", "grave_keeper", "time_ferryman", "origin_keeper":
+			return {"staff": true, "glow": Color(1.0, 0.95, 0.7)}
+		"fire_sage", "void_hermit":
+			return {"beard": true, "hat": true}
+	return {}
+
+func _make_ent(e: Dictionary) -> Node3D:
+	var n := Node3D.new()
+	n.position = Terrain3D.world_pos(e.pos)
+	n.visible = false
+	match e.kind:
+		"npc":
+			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(e.id))
+			n.add_child(m)
+			n.add_child(Models.shadow_disc(0.6))
+			_label(n, e.n, 2.45, UI.C_GOLD)
+			var mark := _label(n, "!", 3.1, Color("ffdc50"), 72)
+			n.set_meta("model", m)
+			n.set_meta("mark", mark)
+		"enemy":
+			var g: Array = e.group
+			var d: Dictionary = Data.ENEMIES[g[0].id]
+			var m0 := Models.monster(d.shape, d.col)
+			n.add_child(m0)
+			var models := [m0]
+			for k in range(1, mini(g.size(), 3)):
+				var d2: Dictionary = Data.ENEMIES[g[k].id]
+				var mk := Models.monster(d2.shape, d2.col)
+				mk.scale = Vector3.ONE * 0.6
+				mk.position = Vector3(1.0 if k % 2 == 1 else -1.0, 0, -0.6)
+				n.add_child(mk)
+				models.append(mk)
+			n.add_child(Models.shadow_disc(0.8))
+			_label(n, "%s x%d" % [d.n, g.size()], 2.5, UI.C_RED.lightened(0.3), 30)
+			n.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y) * TAU
+			n.set_meta("models", models)
+		"boss":
+			var d3: Dictionary = Data.ENEMIES[e.enemy]
+			var mb := Models.monster(d3.shape, d3.col, true)
+			mb.scale = Vector3.ONE * 1.9
+			n.add_child(mb)
+			n.add_child(Models.shadow_disc(2.0, 0.5))
+			_label(n, d3.n, 5.2, UI.C_GOLD, 44)
+			n.rotation.y = PI
+			n.set_meta("models", [mb])
+		"pickup":
+			var col: Color = Look.PICKUP_COLORS.get(e.item, Color.WHITE)
+			var gm := Models.gem(col)
+			gm.position.y = 1.0
+			n.add_child(gm)
+			_label(n, Data.ITEMS[e.item].n, 2.0, col, 28)
+			n.set_meta("gem", gm)
+		"portal":
+			var open: bool = e.open == "" or Game.done(e.open)
+			var pc := UI.C_JADE if open else Color("8a4a4a")
+			var pm := Models.portal(pc, open)
+			if e.pos.x < 4 or e.pos.x > 40:
+				pm.rotation.y = PI / 2
+			n.add_child(pm)
+			var lbl := _label(n, "", 4.1, pc, 32)
+			n.set_meta("label", lbl)
+			n.set_meta("model", pm)
+		"spring":
+			n.add_child(Models.spring_basin())
+	return n
+
 # ---------------------------------------------------------------- update
 func _process(d: float) -> void:
 	t += d
 	if banner_t > 0.0:
 		banner_t -= d
-	Gfx.step_motes(motes, theme_name, d, t, VIEW)
 	# respawn defeated enemies after a while (only when away from them)
 	for k in Game.defeated.keys():
 		if Game.playtime - Game.defeated[k] > 150.0 and k.begins_with(area_id + ":"):
@@ -125,25 +266,28 @@ func _process(d: float) -> void:
 			if e != null and maxi(absi(e.pos.x - ptile.x), absi(e.pos.y - ptile.y)) > 6:
 				Game.defeated.erase(k)
 	var active: bool = main.top_name() == "world"
-	if not active:
-		cam = cam.lerp(_cam_target(), minf(1.0, d * 8.0))
+	if active:
+		if not main.bot_active:
+			move_dir = _read_keys()
+		_move(minf(d, 0.1))
+	if not headless() and visible:
+		_update_view(d)
 		queue_redraw()
-		return
-	if not main.bot_active:
-		move_dir = _read_keys()
-	_move(minf(d, 0.1))
-	cam = cam.lerp(_cam_target(), minf(1.0, d * 10.0))
-	queue_redraw()
+
+func rotate_cam(dir: int) -> void:
+	cam_q = (cam_q + dir + 4) % 4
 
 func _read_keys() -> Vector2i:
+	var f: Vector2i = FWD[cam_q]
+	var r: Vector2i = RIGHT[cam_q]
 	if Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_A):
-		return Vector2i(-1, 0)
+		return -r
 	if Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D):
-		return Vector2i(1, 0)
+		return r
 	if Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_W):
-		return Vector2i(0, -1)
+		return f
 	if Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_S):
-		return Vector2i(0, 1)
+		return -f
 	return Vector2i.ZERO
 
 func _move(d: float) -> void:
@@ -180,157 +324,115 @@ func _move(d: float) -> void:
 func face_entity():
 	return ent_at(ptile + facing)
 
-# ---------------------------------------------------------------- drawing
-func _hash(x: int, y: int) -> float:
-	return fposmod(sin(x * 12.9898 + y * 78.233) * 43758.5453, 1.0)
+# ---------------------------------------------------------------- 3D view update
+func _player_pos() -> Vector3:
+	var pp := Terrain3D.world_pos(ptile)
+	if move_t >= 0.0:
+		pp = pp.lerp(Terrain3D.world_pos(target), move_t)
+	return pp
 
-func _water_shore(x: int, y: int) -> int:
-	var m := 0
-	if y > 0 and grid[(y - 1) * w + x] != MapGen.WATER:
-		m |= Gfx.N
-	if x < w - 1 and grid[y * w + x + 1] != MapGen.WATER:
-		m |= Gfx.E
-	if y < h - 1 and grid[(y + 1) * w + x] != MapGen.WATER:
-		m |= Gfx.S
-	if x > 0 and grid[y * w + x - 1] != MapGen.WATER:
-		m |= Gfx.W
-	return m
+func _cam_goal(pp: Vector3, a: float) -> Array:
+	var fwd := Vector3(sin(a), 0, -cos(a))
+	return [pp - fwd * CAM_DIST + Vector3(0, CAM_H, 0), pp + Vector3(0, 1.2, 0) + fwd * 1.8]
 
+func _snap_cam() -> void:
+	cam_a = cam_q * PI / 2.0
+	var pp := _player_pos()
+	var g := _cam_goal(pp, cam_a)
+	cam_pos = g[0]
+	cam.position = cam_pos
+	if cam.is_inside_tree():
+		cam.look_at(g[1], Vector3.UP)
+	player.position = pp
+	comp_pos = pp - Vector3(facing.x, 0, facing.y) * 1.5
+	comp.position = comp_pos
+
+func _update_view(d: float) -> void:
+	var pp := _player_pos()
+	player.position = pp
+	var want_yaw := atan2(float(facing.x), float(facing.y))
+	player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
+	var walking := move_t >= 0.0
+	Models.anim_person(player, t, walking)
+	# companion trails the hero
+	comp.visible = Game.companion
+	if Game.companion:
+		var back := pp - Vector3(facing.x, 0, facing.y) * 1.6 + Vector3(-facing.y, 0, facing.x) * 0.5
+		comp_pos = comp_pos.lerp(back, 1.0 - exp(-d * 5.0))
+		comp.position = comp_pos
+		var dv := pp - comp_pos
+		if dv.length() > 0.3:
+			comp.rotation.y = lerp_angle(comp.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 8.0))
+		Models.anim_person(comp, t + 1.0, dv.length() > 0.5)
+	# entities
+	var nodes: Array = cur_view.nodes
+	for i in ents.size():
+		var e: Dictionary = ents[i]
+		var n: Node3D = nodes[i]
+		var vis := ent_visible(e)
+		n.visible = vis
+		if not vis:
+			continue
+		var dist := n.position.distance_to(pp)
+		if dist > 46.0:
+			continue
+		_animate_ent(e, n, pp, dist, d)
+	weather.global_position = Vector3(pp.x, weather_y(), pp.z)
+	# chase camera
+	cam_a = lerp_angle(cam_a, cam_q * PI / 2.0, 1.0 - exp(-d * 7.0))
+	var g := _cam_goal(pp, cam_a)
+	cam_pos = cam_pos.lerp(g[0], 1.0 - exp(-d * 9.0))
+	cam.position = cam_pos
+	cam.look_at(g[1], Vector3.UP)
+
+func weather_y() -> float:
+	match Look.theme(theme_name).weather:
+		"snow", "rain", "petals", "leaves":
+			return 12.0
+		"bubbles", "bubbles_up", "embers":
+			return 0.3
+		_:
+			return 3.5
+
+func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) -> void:
+	match e.kind:
+		"npc":
+			var m: Node3D = n.get_meta("model")
+			Models.anim_person(m, t + e.pos.x, false)
+			if dist < 9.0:
+				var dv := pp - n.position
+				m.rotation.y = lerp_angle(m.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 5.0))
+			var s := Game.cur_step()
+			var mark: Label3D = n.get_meta("mark")
+			var quest: bool = not s.is_empty() and s.kind == "talk" and s.npc == e.id
+			mark.visible = quest
+			if quest:
+				mark.position.y = 3.1 + sin(t * 4.0) * 0.15
+		"enemy", "boss":
+			var ms: Array = n.get_meta("models")
+			for i in ms.size():
+				Models.anim_monster(ms[i], t, i * 1.7 + e.pos.x)
+			if dist < 10.0:
+				var dv2 := pp - n.position
+				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))
+			n.position.y = sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm"] else 0.0)
+		"pickup":
+			var gm: Node3D = n.get_meta("gem")
+			gm.position.y = 1.0 + sin(t * 2.0 + e.pos.y) * 0.18
+			gm.rotation.y = t * 1.5
+		"portal":
+			var open: bool = e.open == "" or Game.done(e.open)
+			var lbl: Label3D = n.get_meta("label")
+			lbl.text = ("To " + Data.AREAS[e.to].n) if open else "Sealed"
+			lbl.modulate = UI.C_JADE if open else Color("c06a6a")
+			var pm: Node3D = n.get_meta("model")
+			(pm.get_meta("ring") as Node3D).rotation.z = t * 0.8
+
+# ---------------------------------------------------------------- 2D HUD overlay
 func _draw() -> void:
 	if grid.is_empty():
 		return
-	var th: Dictionary = Gfx.THEMES[theme_name]
-	draw_rect(Rect2(Vector2.ZERO, VIEW), th.bg)
-	var x0 := maxi(0, int(cam.x / TS))
-	var y0 := maxi(0, int(cam.y / TS))
-	var x1 := mini(w - 1, int((cam.x + VIEW.x) / TS) + 1)
-	var y1 := mini(h - 1, int((cam.y + VIEW.y) / TS) + 1)
-	for y in range(y0, y1 + 1):
-		for x in range(x0, x1 + 1):
-			var tp := Vector2(x, y) * TS - cam
-			var tile := grid[y * w + x]
-			var hv := _hash(x, y)
-			match tile:
-				MapGen.PATH:
-					Gfx.path_tile(self, tp, x, y, th)
-				MapGen.WATER:
-					Gfx.water_tile(self, tp, x, y, th, theme_name, t, _water_shore(x, y))
-				_:
-					Gfx.ground(self, tp, x, y, th, theme_name, t)
-					if tile == MapGen.DECOR:
-						Gfx.decor(self, tp, x, y, hv, th, theme_name, t)
-	# obstacles drawn after ground so tall things overlap properly
-	for y in range(y0, y1 + 2):
-		if y >= h:
-			break
-		for x in range(x0, x1 + 1):
-			var tile := grid[y * w + x]
-			if tile == MapGen.WALL or tile == MapGen.BUILDING:
-				Gfx.obstacle(self, Vector2(x, y) * TS - cam, x, y, tile == MapGen.BUILDING, th, theme_name, t)
-	# entities sorted by y
-	var vis: Array = []
-	for e in ents:
-		if ent_visible(e):
-			var sp := Vector2(e.pos) * TS - cam
-			if sp.x > -TS * 3 and sp.x < VIEW.x + TS * 3 and sp.y > -TS * 3 and sp.y < VIEW.y + TS * 3:
-				vis.append(e)
-	vis.sort_custom(func(a, b): return a.pos.y < b.pos.y)
-	var drawn_player := false
-	var pp := Vector2(ptile) * TS
-	if move_t >= 0.0:
-		pp = pp.lerp(Vector2(target) * TS, move_t)
-	for e in vis:
-		if not drawn_player and e.pos.y >= ptile.y:
-			_draw_player(pp - cam)
-			drawn_player = true
-		_draw_entity(e, Vector2(e.pos) * TS - cam)
-	if not drawn_player:
-		_draw_player(pp - cam)
-	# ambience
-	Gfx.weather(self, theme_name, motes, t, VIEW)
-	Gfx.grade(self, theme_name, VIEW)
 	_draw_hud()
-
-func _npc_opts(id: String) -> Dictionary:
-	match id:
-		"elder":
-			return {"beard": true, "staff": true}
-		"alchemist":
-			return {"hat": true}
-		"smith":
-			return {"sash": false}
-		"yue_ling":
-			return {"ribbon": Color("ff9ac0")}
-		"sword_ghost":
-			return {"sword": true, "beard": true}
-		"dragon_envoy", "gate_keeper":
-			return {"staff": true}
-		"fire_sage", "void_hermit":
-			return {"beard": true, "hat": true}
-	return {}
-
-func _draw_entity(e: Dictionary, sp: Vector2) -> void:
-	var cx := sp + Vector2(TS * 0.5, TS * 0.5)
-	match e.kind:
-		"npc":
-			var o := _npc_opts(e.id)
-			if e.id == "sword_ghost":
-				Gfx.glow(self, cx, 40.0, Color(0.6, 0.85, 1.0, 0.45), 5)
-			UI.human(self, sp + Vector2(TS * 0.5, TS - 6), 1.35, e.col, Color("2a2a3a"), t + e.pos.x, o.get("sword", false), o)
-			UI.panel(self, Rect2(sp + Vector2(-34, -46), Vector2(TS + 68, 22)), Color(0.04, 0.06, 0.13, 0.7), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, 0.6))
-			UI.text(self, sp + Vector2(-34, -30), e.n, 14, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS + 68)
-			var s := Game.cur_step()
-			if not s.is_empty() and s.kind == "talk" and s.npc == e.id:
-				Gfx.glow(self, sp + Vector2(TS * 0.5, -62 + sin(t * 4) * 3), 20.0, Color(1, 0.85, 0.3, 0.5), 4)
-				UI.text(self, sp + Vector2(0, -54 + sin(t * 4) * 3), "!", 32, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS)
-		"enemy":
-			var g: Array = e.group
-			var d: Dictionary = Data.ENEMIES[g[0].id]
-			UI.monster(self, d.shape, cx, 0.8, d.col, t)
-			for k in range(1, mini(g.size(), 3)):
-				var d2: Dictionary = Data.ENEMIES[g[k].id]
-				UI.monster(self, d2.shape, cx + Vector2(k * 14.0 * (1.0 if k % 2 == 1 else -1.0), -k * 3.0), 0.5, d2.col, t + k)
-			UI.panel(self, Rect2(sp + Vector2(-40, -26), Vector2(TS + 80, 20)), Color(0.12, 0.03, 0.04, 0.7), Color(0.9, 0.35, 0.3, 0.6))
-			UI.text(self, sp + Vector2(-40, -11), "%s x%d" % [d.n, g.size()], 13, UI.C_RED.lightened(0.3), HORIZONTAL_ALIGNMENT_CENTER, TS + 80)
-		"boss":
-			var d3: Dictionary = Data.ENEMIES[e.enemy]
-			UI.monster(self, d3.shape, cx + Vector2(0, -6), 1.55, d3.col, t, true)
-			UI.panel(self, Rect2(sp + Vector2(-90, -66), Vector2(TS + 180, 26)), Color(0.16, 0.02, 0.04, 0.8), UI.C_RED)
-			UI.text(self, sp + Vector2(-90, -47), d3.n, 16, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS + 180)
-		"pickup":
-			var col: Color = Gfx.PICKUP_COLORS[e.item]
-			var gl := 0.5 + 0.5 * sin(t * 3.0 + e.pos.x)
-			var fl := Vector2(0, sin(t * 2.0 + e.pos.y) * 3.0)
-			Gfx.shadow(self, cx + Vector2(0, 16), 11.0, 4.0, 0.3)
-			Gfx.glow(self, cx + fl, 26.0 + gl * 6.0, Color(col.r, col.g, col.b, 0.55), 6)
-			Gfx.diamond(self, cx + fl, 13.0, col)
-			Gfx.diamond(self, cx + fl + Vector2(-2, -3), 6.0, Color(1, 1, 1, 0.7))
-			for k in 3:
-				var a := t * 1.5 + k * TAU / 3.0
-				Gfx.star4(self, cx + fl + Vector2(cos(a), sin(a)) * 20.0, 3.0, Color(1, 1, 1, 0.7))
-			UI.text(self, sp + Vector2(-30, -8), Data.ITEMS[e.item].n, 13, col, HORIZONTAL_ALIGNMENT_CENTER, TS + 60)
-		"portal":
-			var open: bool = e.open == "" or Game.done(e.open)
-			var pc := UI.C_JADE if open else Color("8a4a4a")
-			Gfx.glow(self, cx, 40.0, Color(pc.r, pc.g, pc.b, 0.5), 6)
-			for i in 4:
-				var rr := 14.0 + i * 5.0 + sin(t * 3.0 + i) * 2.0
-				draw_arc(cx, rr, t * (1 + i * 0.7), t * (1 + i * 0.7) + PI * 1.4, 20, Color(pc.r, pc.g, pc.b, 1.0 - i * 0.18), 3.0)
-			for k in 6:
-				var a2 := t * 1.2 + k * TAU / 6.0
-				draw_circle(cx + Vector2(cos(a2), sin(a2)) * (26.0 + sin(t * 2 + k) * 4.0), 2.0, Color(1, 1, 1, 0.7))
-			UI.text(self, sp + Vector2(-60, -22), ("To " + Data.AREAS[e.to].n) if open else "Sealed", 14, pc, HORIZONTAL_ALIGNMENT_CENTER, TS + 120)
-		"spring":
-			pass
-
-func _draw_player(sp: Vector2) -> void:
-	var o := {"walk": move_t >= 0.0, "face": 1 if facing.x >= 0 else -1, "ribbon": null}
-	o.erase("ribbon")
-	if Game.companion:
-		var back := sp - Vector2(facing) * 26.0
-		UI.human(self, back + Vector2(TS * 0.5, TS - 4), 1.25, Color("e86a9a"), Color("402030"), t * (2.0 if move_t >= 0.0 else 1.0) + 1.0, false, {"ribbon": Color("ffb0cc"), "walk": move_t >= 0.0, "face": o.face})
-	Gfx.glow(self, sp + Vector2(TS * 0.5, TS * 0.6), 34.0, Color(0.4, 0.7, 1.0, 0.3), 5)
-	UI.human(self, sp + Vector2(TS * 0.5, TS - 4), 1.4, Color("3a8ae8"), Color("1a1a2a"), t, true, o)
 
 func _draw_hud() -> void:
 	UI.panel(self, Rect2(12, 12, 330, 128))
@@ -348,12 +450,16 @@ func _draw_hud() -> void:
 	UI.panel(self, Rect2(VIEW.x - 520, 12, 508, 58))
 	UI.text(self, Vector2(VIEW.x - 506, 34), "Objective", 13, UI.C_DIM)
 	UI.text(self, Vector2(VIEW.x - 506, 56), Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
-	UI.text(self, Vector2(VIEW.x - 140, VIEW.y - 14), "Esc: Menu   Z/Enter: Act", 13, UI.C_DIM)
+	UI.text(self, Vector2(VIEW.x - 330, VIEW.y - 14), "Arrows/WASD move   Q/E camera   Z/Enter act   Esc menu", 13, UI.C_DIM)
 	_draw_minimap()
 	if banner_t > 0.0:
 		var a := clampf(banner_t, 0.0, 1.0)
 		UI.panel(self, Rect2(VIEW.x * 0.5 - 220, 96, 440, 52), Color(0.04, 0.06, 0.13, 0.85 * a), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, a))
 		UI.text(self, Vector2(VIEW.x * 0.5 - 220, 130), area_name, 26, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, 440)
+	# interaction hint
+	var fe = face_entity()
+	if fe != null and move_t < 0.0 and fe.kind in ["npc", "boss"]:
+		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + ("Talk" if fe.kind == "npc" else "Challenge"), 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
 	# toasts
 	var y := 170.0
 	var i := 0

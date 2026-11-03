@@ -1,10 +1,9 @@
-extends Node2D
-## Turn-based combat.  Elemental weaknesses, qi costs, party support, boss heavy attacks.
+extends ScreenBase
+## Turn-based combat on a 3D stage with an over-the-shoulder camera.
+## Elemental weaknesses, qi costs, party support, boss heavy attacks.
 
 const VIEW := Vector2(1280, 720)
 
-var main
-var opaque := true
 var party: Array = []
 var foes: Array = []
 var ctx: Dictionary = {}
@@ -24,16 +23,148 @@ var log_lines: Array = []
 var fx: Array = []
 var outcome := ""
 var result_lines: Array = []
-var t := 0.0
 var theme := "bamboo"
 var level_before := 0
 
-func setup(m) -> void:
-	main = m
+# 3D stage
+var stages := {}
+var stage: Node3D = null
+var sun: DirectionalLight3D
+var ring_cur: MeshInstance3D
+var arrow_tgt: MeshInstance3D
+var flash_mat: StandardMaterial3D
+var cam_base := Vector3(-13.0, 5.4, 5.0)
+var cam_look := Vector3(2.5, 0.6, 0.0)
+
+func _build3d() -> void:
+	opaque = true
+	new_scene3d()
+	new_camera(55.0)
+	sun = Look.sun("bamboo")
+	scene3d.add_child(sun)
+	var rb := MB.new()
+	rb.torus(Vector3.ZERO, 0.9, 0.04, Color(1.0, 0.85, 0.35, 0.95))
+	rb.torus(Vector3.ZERO, 0.7, 0.03, Color(1.0, 0.95, 0.7, 0.6))
+	ring_cur = MB.mesh_node(scene3d, rb.build(MB.mat_glow()))
+	ring_cur.visible = false
+	var ab := MB.new()
+	ab.cone(Vector3.ZERO, 0.3, 0.7, Color(1.0, 0.85, 0.3, 0.95), Vector3(PI, 0, 0), 4)
+	arrow_tgt = MB.mesh_node(scene3d, ab.build(MB.mat_glow()))
+	arrow_tgt.visible = false
+	flash_mat = StandardMaterial3D.new()
+	flash_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	flash_mat.albedo_color = Color(1, 1, 1, 0.65)
+	flash_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+
+func _on_show(v: bool) -> void:
+	if not v:
+		return
+
+func _stage_for(th: String) -> Dictionary:
+	if stages.has(th):
+		return stages[th]
+	var n := Node3D.new()
+	var look := Look.theme(th)
+	var gb := MB.new()
+	gb.cyl(Vector3(0, -0.06, 0), 120.0, 0.1, Color(look.g1).darkened(0.1), Vector3.ZERO, 14)
+	gb.cyl(Vector3(0, 0.0, 0), 15.0, 0.06, Color(look.path).darkened(0.1), Vector3.ZERO, 14)
+	gb.cyl(Vector3(0, 0.02, 0), 14.2, 0.04, Color(look.g2), Vector3.ZERO, 14)
+	var gi := MB.mesh_node(n, gb.build())
+	gi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# arena rune ring
+	var rg := MB.new()
+	rg.torus(Vector3(0, 0.06, 0), 13.5, 0.05, Color(1, 1, 1, 0.22))
+	rg.torus(Vector3(0, 0.06, 0), 9.0, 0.04, Color(1, 1, 1, 0.14))
+	MB.mesh_node(n, rg.build(MB.mat_glow()))
+	# scenery: the region's landmarks form a distant ring
+	var mesh := Terrain3D._proto("wall:" + th, th)
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = true
+	mm.mesh = mesh
+	var cnt := 46
+	mm.instance_count = cnt
+	var rng := RandomNumberGenerator.new()
+	rng.seed = th.hash()
+	for i in cnt:
+		var a := TAU * i / cnt + rng.randf_range(-0.05, 0.05)
+		var r := rng.randf_range(20.0, 42.0)
+		var sc := rng.randf_range(1.4, 3.0)
+		var bs := Basis.from_euler(Vector3(0, rng.randf() * TAU, 0)).scaled(Vector3(sc, sc * rng.randf_range(0.9, 1.5), sc))
+		mm.set_instance_transform(i, Transform3D(bs, Vector3(cos(a) * r, 0, sin(a) * r)))
+		mm.set_instance_color(i, Color.WHITE.darkened(rng.randf() * 0.3))
+	var mi := MultiMeshInstance3D.new()
+	mi.multimesh = mm
+	n.add_child(mi)
+	# a big celestial body on the horizon
+	var orb := MB.new()
+	orb.ball(Vector3(30, 22, -48), 7.0, Color(look.sky_hor).lightened(0.4))
+	var om := MB.mesh_node(n, orb.build(MB.mat_glow()))
+	om.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	n.visible = false
+	scene3d.add_child(n)
+	stages[th] = {"node": n, "env": Look.environment(th, 0.8)}
+	return stages[th]
+
+func _build_fighters() -> void:
+	for f in party + foes:
+		var boss: bool = f.boss
+		var m := Models.monster(f.shape, f.col, boss)
+		var sc := 1.0
+		if f.side == "foe":
+			sc = 2.6 if boss else 1.35
+		m.scale = Vector3.ONE * sc
+		var holder := Node3D.new()
+		holder.add_child(m)
+		holder.add_child(Models.shadow_disc(1.0 * sc if f.side == "foe" else 0.7, 0.45))
+		if f.side == "party":
+			holder.add_child(_lotus())
+		scene3d.add_child(holder)
+		holder.position = pos3(f)
+		holder.rotation.y = PI / 2.0 if f.side == "party" else -PI / 2.0
+		f["node"] = holder
+		f["model"] = m
+		f["base_scale"] = sc
+		f["lunge"] = 0.0
+		f["meshes"] = _collect_meshes(m)
+
+func _lotus() -> Node3D:
+	var l := Models.lotus(Color(0.5, 0.85, 1.0), 0.8)
+	l.position.y = 0.02
+	return l
+
+func _collect_meshes(n: Node) -> Array:
+	var out: Array = []
+	for c in n.get_children():
+		if c is MeshInstance3D:
+			out.append(c)
+		out.append_array(_collect_meshes(c))
+	return out
+
+func _clear_fighters() -> void:
+	for f in party + foes:
+		if f.has("node") and is_instance_valid(f.node):
+			f.node.queue_free()
+
+func pos3(f: Dictionary) -> Vector3:
+	if f.side == "party":
+		return Vector3(-5.5 - f.idx * 1.3, 0, 1.4 - f.idx * 3.6)
+	var i := foes.find(f)
+	var n := foes.size()
+	if f.boss or n == 1:
+		return Vector3(6.0, 0, 0)
+	return Vector3(5.0 + (i % 2) * 2.2, 0, (i - (n - 1) * 0.5) * 3.6)
+
+func head3(f: Dictionary) -> Vector3:
+	var hgt := 2.5
+	if f.side == "foe":
+		hgt = 6.2 if f.boss else 3.2
+	return pos3(f) + Vector3(0, hgt, 0)
 
 func start(foe_list: Array, c: Dictionary) -> void:
 	ctx = c
 	theme = c.get("theme", "bamboo")
+	_clear_fighters()
 	party.clear()
 	foes.clear()
 	for i in Game.party_size():
@@ -49,6 +180,18 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	log_lines.clear()
 	level_before = Game.level
 	Game.battles += 1
+	if not headless():
+		for k in stages:
+			stages[k].node.visible = false
+		var st: Dictionary = _stage_for(theme)
+		st.node.visible = true
+		cam.environment = st.env
+		var th := Look.theme(theme)
+		sun.light_color = th.sun
+		sun.light_energy = th.sun_e
+		_build_fighters()
+		cam.position = cam_base
+		cam.look_at(cam_look, Vector3.UP)
 	if ctx.get("boss", false):
 		say("%s blocks your path!" % foes[0].name)
 	else:
@@ -74,14 +217,15 @@ func _process(d: float) -> void:
 		p.t -= d
 	fx = fx.filter(func(p): return p.t > 0.0)
 	if main.top_name() != "battle":
-		queue_redraw()
 		return
 	match state:
 		"intro", "acting":
 			timer -= d
 			if timer <= 0.0:
 				_next_turn()
-	queue_redraw()
+	if not headless():
+		_update_view(d)
+		queue_redraw()
 
 func _next_turn() -> void:
 	while true:
@@ -138,7 +282,11 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	tgt.shake = 0.3
 	var col: Color = Data.ELEM_COLORS.get(elem, Color.WHITE)
 	var txt := str(dmg) + ("!" if crit else "") + (" weak" if em > 1.0 else "")
-	fx.append({"text": txt, "p": _pos(tgt) + Vector2(randf_range(-10, 10), -50), "t": 1.0, "col": col if tgt.side == "foe" else UI.C_RED.lightened(0.3), "slash": elem})
+	a["lunge"] = 0.5
+	a["lunge_to"] = pos3(tgt)
+	fx.append({"text": txt, "p": head3(tgt) + Vector3(randf_range(-0.4, 0.4), 0, 0), "t": 1.0, "col": col if tgt.side == "foe" else UI.C_RED.lightened(0.3), "slash": elem})
+	if not headless() and tgt.has("node"):
+		Fx3D.hit(scene3d, pos3(tgt) + Vector3(0, 1.4 if not tgt.boss else 2.8, 0), elem)
 	if tgt.hp <= 0.0:
 		tgt.dead = true
 		if not quiet or true:
@@ -148,7 +296,9 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 
 func _heal(tgt: Dictionary, amount: float) -> void:
 	tgt.hp = minf(tgt.maxhp, tgt.hp + amount)
-	fx.append({"text": "+%d" % int(amount), "p": _pos(tgt) + Vector2(0, -50), "t": 1.0, "col": UI.C_JADE, "slash": ""})
+	fx.append({"text": "+%d" % int(amount), "p": head3(tgt), "t": 1.0, "col": UI.C_JADE, "slash": ""})
+	if not headless() and tgt.has("node"):
+		Fx3D.heal(scene3d, pos3(tgt) + Vector3(0, 1.0, 0))
 
 func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 	var s: Dictionary = Data.SKILLS[skill_id]
@@ -171,7 +321,7 @@ func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	else:
 		say("%s restores %s's qi." % [actor.name, tgt.name])
 		tgt.qi = minf(tgt.maxqi, tgt.qi + tgt.maxqi * 0.5)
-		fx.append({"text": "+qi", "p": _pos(tgt) + Vector2(0, -50), "t": 1.0, "col": UI.C_BLUE, "slash": ""})
+		fx.append({"text": "+qi", "p": head3(tgt), "t": 1.0, "col": UI.C_BLUE, "slash": ""})
 	_end_action()
 
 func _end_action() -> void:
@@ -345,70 +495,72 @@ func _select() -> void:
 			else:
 				_perform(cur, pending.skill, [tg])
 
-# ---------------------------------------------------------------- drawing
-func _pos(f: Dictionary) -> Vector2:
-	if f.side == "party":
-		return Vector2(250 + f.idx * 130, 370 + f.idx * 62)
-	var i := foes.find(f)
-	if f.boss:
-		return Vector2(900, 380)
-	var n := foes.size()
-	if n == 1:
-		return Vector2(900, 400)
-	return Vector2(820 + (i % 2) * 150, 285 + i * 78)
-
-func _draw() -> void:
-	var sky: Array = Gfx.SKY.get(theme, Gfx.SKY.bamboo)
-	Gfx.battle_backdrop(self, theme, sky, t, VIEW)
-	# fighters
-	for f in foes:
-		_draw_fighter(f)
-	for f in party:
-		_draw_fighter(f)
-	# target arrow
+# ---------------------------------------------------------------- 3D view
+func _update_view(d: float) -> void:
+	# slow camera drift
+	var sway := Vector3(sin(t * 0.25) * 0.9, sin(t * 0.4) * 0.25, cos(t * 0.25) * 0.5)
+	var focus := cam_look
 	if state == "menu" and menu_kind == "target" and not targets.is_empty():
+		focus = cam_look.lerp(pos3(targets[ids[cursor]]), 0.25)
+	cam.position = cam.position.lerp(cam_base + sway, 1.0 - exp(-d * 4.0))
+	cam.look_at(focus, Vector3.UP)
+	for f in party + foes:
+		if not f.has("node"):
+			continue
+		var node: Node3D = f.node
+		var base := pos3(f)
+		var off := Vector3.ZERO
+		if f.lunge > 0.0:
+			f.lunge = maxf(0.0, f.lunge - d)
+			var k := sin(PI * (1.0 - f.lunge / 0.5))
+			off = (f.lunge_to - base).limit_length(4.0) * 0.55 * k
+		if f.shake > 0.0:
+			off += Vector3(0, 0, sin(t * 80.0) * 0.25)
+		node.position = base + off
+		var fade: float = f.fade
+		node.visible = fade > 0.01
+		node.scale = Vector3.ONE * maxf(0.01, fade)
+		var m: Node3D = f.model
+		Models.anim_monster(m, t, float(f.idx if f.side == "party" else foes.find(f)))
+		m.position.y = sin(t * 2.4 + float(foes.find(f))) * 0.07 if f.side == "foe" else 0.0
+		if f.dead:
+			node.rotation.z = (1.0 - fade) * 1.2
+		# hit flash overlay
+		var ov: Material = flash_mat if f.flash > 0.0 else null
+		for mi in f.meshes:
+			mi.material_overlay = ov
+	# markers
+	ring_cur.visible = state == "menu" and not cur.is_empty() and cur.side == "party" and not cur.dead
+	if ring_cur.visible:
+		ring_cur.position = pos3(cur) + Vector3(0, 0.1, 0)
+		ring_cur.rotation.y = t * 1.5
+	arrow_tgt.visible = state == "menu" and menu_kind == "target" and not targets.is_empty()
+	if arrow_tgt.visible:
 		var tg: Dictionary = targets[ids[cursor]]
-		var p := _pos(tg) + Vector2(0, -90 if not tg.boss else -150)
-		draw_colored_polygon(PackedVector2Array([p, p + Vector2(-12, -18), p + Vector2(12, -18)]), UI.C_GOLD)
-	if state == "menu" or state == "acting":
-		if not cur.is_empty() and cur.side == "party" and not cur.dead and state == "menu":
-			var cp := _pos(cur)
-			draw_arc(cp + Vector2(0, 30), 46, 0, TAU, 28, UI.C_GOLD, 2.0)
+		arrow_tgt.position = pos3(tg) + Vector3(0, (7.2 if tg.boss else 3.9) + sin(t * 6.0) * 0.2, 0)
+		arrow_tgt.rotation.y = t * 2.0
+
+func _screen(p: Vector3) -> Vector2:
+	if cam == null or not cam.is_inside_tree() or cam.is_position_behind(p):
+		return Vector2(-999, -999)
+	return cam.unproject_position(p)
+
+# ---------------------------------------------------------------- 2D overlay
+func _draw() -> void:
+	# overhead bars / names
+	for f in foes + party:
+		if f.dead or f.fade <= 0.5 or not f.has("node"):
+			continue
+		var sp := _screen(pos3(f) + Vector3(0, 0.0, 0))
+		var bw := 100.0 if not f.boss else 190.0
+		var by := sp.y + (14.0 if not f.boss else 22.0)
+		UI.bar(self, Rect2(sp.x - bw / 2, by, bw, 8), f.hp / f.maxhp, UI.C_RED if f.side == "foe" else UI.C_JADE)
+		UI.text(self, Vector2(sp.x - 90, by + 24), f.name, 14, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 180)
 	for p in fx:
 		var a := clampf(p.t, 0.0, 1.0)
-		var pp: Vector2 = p.p + Vector2(0, -(1.0 - p.t) * 40.0)
-		if p.slash != "":
-			GfxActors.hit_fx(self, p.slash, p.p + Vector2(0, 55), 1.0 - p.t, t)
-		elif p.text.begins_with("+"):
-			for k in 6:
-				var ang := t * 3.0 + k * TAU / 6.0
-				Gfx.star4(self, p.p + Vector2(cos(ang) * 30.0, 50.0 + sin(ang) * 14.0 - (1.0 - a) * 30.0), 4.0, Color(0.5, 1, 0.8, a))
-		UI.text(self, pp + Vector2(-100, 0), p.text, 30, Color(p.col.r, p.col.g, p.col.b, a), HORIZONTAL_ALIGNMENT_CENTER, 340)
+		var sp2 := _screen(p.p) + Vector2(0, -(1.0 - p.t) * 40.0)
+		UI.text(self, sp2 + Vector2(-100, 0), p.text, 30, Color(p.col.r, p.col.g, p.col.b, a), HORIZONTAL_ALIGNMENT_CENTER, 340)
 	_draw_ui()
-
-func _draw_fighter(f: Dictionary) -> void:
-	if f.fade <= 0.01:
-		return
-	var p := _pos(f)
-	if f.shake > 0.0:
-		p += Vector2(sin(t * 80.0) * 6.0, 0)
-	var s := 1.5 if not f.boss else 2.6
-	if f.side == "party":
-		s = 1.55
-	var col: Color = f.col
-	if f.flash > 0.0:
-		col = col.lerp(Color.WHITE, 0.7)
-	if f.side == "party" and not f.dead:
-		GfxActors.lotus_seat(self, p + Vector2(0, 52), 0.55, t, Color(0.5, 0.85, 1.0))
-	if f.has("cur") or f == cur:
-		if state == "menu" or state == "acting":
-			Gfx.glow(self, p + Vector2(0, 20), 70.0, Color(1, 0.9, 0.5, 0.3), 5)
-	UI.monster(self, f.shape, p, s * f.fade, col, t, f.boss and not f.dead)
-	if not f.dead:
-		var bw := 100.0 if not f.boss else 180.0
-		var by: float = p.y + (62.0 if not f.boss else 86.0)
-		UI.bar(self, Rect2(p.x - bw / 2, by, bw, 8), f.hp / f.maxhp, UI.C_RED if f.side == "foe" else UI.C_JADE)
-		UI.text(self, Vector2(p.x - 90, by + 24), f.name, 14, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 180)
 
 func _draw_ui() -> void:
 	# log

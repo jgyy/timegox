@@ -314,10 +314,7 @@ func _goto_entity(area: String, id: String) -> void:
 	_walk_to(e.pos, "ent:" + id)
 
 func _travel(dest: String) -> void:
-	var chain: Array = Data.AREA_CHAIN
-	var ci := chain.find(Game.area)
-	var di := chain.find(dest)
-	var nxt: String = chain[ci + signi(di - ci)]
+	var nxt: String = Data.next_hop(Game.area, dest)
 	var p = world.find_ent("p_" + nxt)
 	if p != null:
 		_walk_to(p.pos, "portal:" + nxt)
@@ -500,7 +497,7 @@ func _plan(b) -> Dictionary:
 			low = a
 	var low_r: float = low.hp / low.maxhp
 	# healing
-	var heal_id := "starlight" if me.skills.has("starlight") else "rain"
+	var heal_id := "dawn" if me.skills.has("dawn") else ("starlight" if me.skills.has("starlight") else "rain")
 	var heal_cost: float = Data.SKILLS[heal_id].cost
 	if me.skills.has(heal_id) and me.qi >= heal_cost and low_r < 0.55:
 		return {"top": "skills", "skill": heal_id}

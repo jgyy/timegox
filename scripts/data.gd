@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 18
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging"]
+const MAX_LEVEL := 24
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -27,22 +27,27 @@ const SKILLS := {
 	"frost": {"n": "Frost Lotus Blade", "cost": 14, "mult": 2.1, "elem": "water", "tgt": "one", "lv": 3, "who": 0},
 	"thunder": {"n": "Nine Heavens Thunder", "cost": 22, "mult": 2.8, "elem": "thunder", "tgt": "one", "lv": 6, "who": 0},
 	"quake": {"n": "Mountain Quake", "cost": 26, "mult": 1.7, "elem": "earth", "tgt": "all", "lv": 8, "who": 0},
-	"heaven": {"n": "Heaven-Cleaving Sword", "cost": 45, "mult": 4.2, "elem": "phys", "tgt": "one", "lv": 10, "who": 0},
+	"heaven": {"n": "Heaven-Cleaving Sword", "cost": 45, "mult": 4.2, "elem": "phys", "tgt": "one", "lv": 10, "who": 0, "after": "s_roc"},
 	"abyss": {"n": "Abyssal Tide", "cost": 55, "mult": 2.0, "elem": "water", "tgt": "all", "lv": 12, "who": 0},
 	"meteor": {"n": "Meteor Rain", "cost": 65, "mult": 2.3, "elem": "fire", "tgt": "all", "lv": 14, "who": 0},
 	"voidcut": {"n": "Void Rending Slash", "cost": 70, "mult": 5.4, "elem": "dark", "tgt": "one", "lv": 15, "who": 0},
 	"judgement": {"n": "Celestial Judgement", "cost": 90, "mult": 7.0, "elem": "thunder", "tgt": "one", "lv": 17, "who": 0},
+	"chrono": {"n": "Chrono Severance", "cost": 110, "mult": 8.6, "elem": "dark", "tgt": "one", "lv": 21, "who": 0},
+	"genesis": {"n": "Genesis Sword", "cost": 150, "mult": 11.0, "elem": "thunder", "tgt": "one", "lv": 24, "who": 0},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
 	"starlight": {"n": "Starlight Rain", "cost": 40, "heal": 0.5, "elem": "water", "tgt": "allies", "lv": 13, "who": 1},
+	"dawn": {"n": "Dawn Lotus", "cost": 60, "heal": 0.7, "elem": "water", "tgt": "allies", "lv": 20, "who": 1},
 }
 
-static func known_skills(who: int, level: int) -> Array:
+static func known_skills(who: int, level: int, step: int = 1 << 20) -> Array:
 	var out := []
 	for id in SKILLS:
 		var s = SKILLS[id]
 		if s.who == who and s.lv <= level:
+			if s.has("after") and step <= step_index(s.after):
+				continue
 			out.append(id)
 	return out
 
@@ -122,6 +127,36 @@ const ENEMIES := {
 	"general_blood": {"n": "General Xue Sha", "elem": "dark", "weak": "water", "col": Color("c02840"), "shape": "demon", "boss": true},
 	"general_shadow": {"n": "General Mo Ying", "elem": "dark", "weak": "fire", "col": Color("6a3aa8"), "shape": "demon", "boss": true},
 	"demon_lord": {"n": "Demon Lord Xu Mo", "elem": "dark", "weak": "thunder", "col": Color("e02050"), "shape": "demon", "boss": true},
+	# ---- Part III monsters
+	"mirror_wisp": {"n": "Mirror Wisp", "elem": "phys", "weak": "dark", "col": Color("c8f0ff"), "shape": "wisp"},
+	"glass_sentinel": {"n": "Glass Sentinel", "elem": "thunder", "weak": "earth", "col": Color("9ad0e8"), "shape": "golem"},
+	"echo_shade": {"n": "Echo Shade", "elem": "dark", "weak": "fire", "col": Color("6a8ac8"), "shape": "wraith"},
+	"grave_hound": {"n": "Grave Hound", "elem": "dark", "weak": "fire", "col": Color("8a8a98"), "shape": "beast"},
+	"bone_knight": {"n": "Bone Knight", "elem": "dark", "weak": "thunder", "col": Color("e0dcc8"), "shape": "humanoid"},
+	"ghost_lantern": {"n": "Ghost Lantern", "elem": "dark", "weak": "water", "col": Color("7af0e0"), "shape": "wisp"},
+	"hourglass_wraith": {"n": "Hourglass Wraith", "elem": "earth", "weak": "wood", "col": Color("e8c060"), "shape": "wraith"},
+	"clockwork_guard": {"n": "Clockwork Guard", "elem": "phys", "weak": "water", "col": Color("c8984a"), "shape": "golem"},
+	"dust_moth": {"n": "Dust Moth", "elem": "earth", "weak": "fire", "col": Color("e8d8a0"), "shape": "bird"},
+	"maw_tendril": {"n": "Maw Tendril", "elem": "dark", "weak": "thunder", "col": Color("5a3a78"), "shape": "serpent"},
+	"hollow_acolyte": {"n": "Hollow Acolyte", "elem": "dark", "weak": "fire", "col": Color("b8a8d8"), "shape": "humanoid"},
+	"dao_fragment": {"n": "Dao Fragment", "elem": "thunder", "weak": "dark", "col": Color("fff0c0"), "shape": "jelly"},
+	# ---- Part III bosses
+	"shard_mimic": {"n": "Shard Mimic", "elem": "phys", "weak": "dark", "col": Color("a8e0f8"), "shape": "jelly", "boss": true},
+	"glass_colossus": {"n": "Glass Colossus", "elem": "thunder", "weak": "earth", "col": Color("88c0e0"), "shape": "golem", "boss": true},
+	"drowned_bearer": {"n": "Drowned Bearer Shui Ying", "elem": "water", "weak": "thunder", "col": Color("4a7ac8"), "shape": "wraith", "boss": true},
+	"echo_xumo": {"n": "Echo of Xu Mo", "elem": "dark", "weak": "thunder", "col": Color("c03060"), "shape": "demon", "boss": true},
+	"bone_wyrm": {"n": "Bone Wyrm", "elem": "dark", "weak": "thunder", "col": Color("e0d8c0"), "shape": "dragon", "boss": true},
+	"headless_saint": {"n": "Headless Sword Saint", "elem": "phys", "weak": "dark", "col": Color("9898b0"), "shape": "demon", "boss": true},
+	"grave_empress": {"n": "Empress of Bones", "elem": "dark", "weak": "fire", "col": Color("c8c0d8"), "shape": "wraith", "boss": true},
+	"founder_qing": {"n": "Founder Qing Lian", "elem": "wood", "weak": "fire", "col": Color("7ae0b0"), "shape": "humanoid", "boss": true},
+	"time_tortoise": {"n": "Eon Tortoise", "elem": "earth", "weak": "wood", "col": Color("b8903a"), "shape": "crab", "boss": true},
+	"dusk_reaper": {"n": "Dusk Reaper", "elem": "dark", "weak": "fire", "col": Color("8a4a30"), "shape": "wraith", "boss": true},
+	"dawn_warden": {"n": "Dawn Warden", "elem": "fire", "weak": "water", "col": Color("ffd070"), "shape": "phoenix", "boss": true},
+	"young_tianxuan": {"n": "Tian Xuan, the First Sweeper", "elem": "phys", "weak": "dark", "col": Color("f0e8c8"), "shape": "humanoid", "boss": true},
+	"maw_herald": {"n": "Maw Herald", "elem": "dark", "weak": "thunder", "col": Color("6a3a98"), "shape": "spider", "boss": true},
+	"hollow_dragon": {"n": "Hollow Heaven Dragon", "elem": "thunder", "weak": "dark", "col": Color("d8d0f0"), "shape": "dragon", "boss": true},
+	"harvest_avatar": {"n": "Avatar of the Harvest", "elem": "thunder", "weak": "earth", "col": Color("f8e8ff"), "shape": "storm", "boss": true},
+	"hollow_heaven": {"n": "The Hollow Heaven", "elem": "dark", "weak": "thunder", "col": Color("3a2060"), "shape": "jelly", "boss": true},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -155,7 +190,10 @@ static func enemy_stones(lv: int, boss: bool) -> int:
 const AREAS := {
 	"sect": {
 		"n": "Azure Cloud Sect", "w": 40, "h": 26, "seed": 11, "theme": "sect", "enemies": 0,
-		"portals": [{"to": "bamboo", "pos": Vector2i(38, 13), "dest": Vector2i(4, 22), "open": ""}],
+		"portals": [
+			{"to": "bamboo", "pos": Vector2i(38, 13), "dest": Vector2i(4, 22), "open": ""},
+			{"to": "mirror", "pos": Vector2i(20, 24), "dest": Vector2i(4, 28), "open": "s_p3_home"},
+		],
 		"npcs": [
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 5), "col": Color("e8e8ff")},
 			{"id": "alchemist", "n": "Alchemist Mo", "pos": Vector2i(8, 15), "col": Color("6fc08a")},
@@ -269,7 +307,7 @@ const AREAS := {
 			{"to": "dragon", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
 			{"to": "void", "pos": Vector2i(92, 28), "dest": Vector2i(4, 28), "open": "s_break5"},
 		],
-		"npcs": [{"id": "fire_sage", "n": "Sage Chi Rong", "pos": Vector2i(10, 26), "col": Color("ff9a5a"), "vis": ["s_vo_intro", ""]}],
+		"npcs": [{"id": "fire_sage", "n": "Sage Huo Rong", "pos": Vector2i(10, 26), "col": Color("ff9a5a"), "vis": ["s_vo_intro", ""]}],
 		"bosses": [
 			{"id": "lava_titan", "pos": Vector2i(36, 40), "lv": 13, "req": 13},
 			{"id": "cinder_behemoth", "pos": Vector2i(48, 24), "lv": 13, "req": 13},
@@ -319,9 +357,107 @@ const AREAS := {
 		],
 		"pickup_vis": "s_ce_collect",
 	},
+	"mirror": {
+		"n": "Mirror Lake of Echoes", "w": 92, "h": 56, "seed": 111, "theme": "mirror", "enemies": 18,
+		"pool": [["mirror_wisp", 18, 19], ["glass_sentinel", 18, 19], ["echo_shade", 18, 19]],
+		"portals": [
+			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(20, 22), "open": ""},
+			{"to": "grave", "pos": Vector2i(90, 28), "dest": Vector2i(4, 28), "open": "s_ml_xumo"},
+		],
+		"npcs": [{"id": "lake_keeper", "n": "Keeper Lan Jing", "pos": Vector2i(10, 26), "col": Color("a8e0ff"), "vis": ["s_ml_intro", ""]}],
+		"bosses": [
+			{"id": "shard_mimic", "pos": Vector2i(32, 14), "lv": 18, "req": 18},
+			{"id": "glass_colossus", "pos": Vector2i(44, 30), "lv": 18, "req": 18},
+			{"id": "drowned_bearer", "pos": Vector2i(56, 44), "lv": 19, "req": 19},
+			{"id": "echo_xumo", "pos": Vector2i(80, 26), "lv": 19, "req": 19},
+		],
+		"pickups": [
+			{"id": "echo1", "item": "echo", "pos": Vector2i(22, 44)}, {"id": "echo2", "item": "echo", "pos": Vector2i(40, 10)},
+			{"id": "echo3", "item": "echo", "pos": Vector2i(62, 14)}, {"id": "echo4", "item": "echo", "pos": Vector2i(72, 46)},
+		],
+		"pickup_vis": "s_ml_collect",
+	},
+	"grave": {
+		"n": "Graveyard of Sword Saints", "w": 94, "h": 56, "seed": 121, "theme": "grave", "enemies": 18,
+		"pool": [["grave_hound", 19, 20], ["bone_knight", 19, 20], ["ghost_lantern", 19, 20]],
+		"portals": [
+			{"to": "mirror", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
+			{"to": "time", "pos": Vector2i(92, 28), "dest": Vector2i(4, 28), "open": "s_break7"},
+		],
+		"npcs": [{"id": "grave_keeper", "n": "Gravekeeper Mu Gu", "pos": Vector2i(10, 26), "col": Color("b8b8c8"), "vis": ["s_gv_intro", ""]}],
+		"bosses": [
+			{"id": "bone_wyrm", "pos": Vector2i(34, 40), "lv": 19, "req": 19},
+			{"id": "headless_saint", "pos": Vector2i(48, 22), "lv": 20, "req": 20},
+			{"id": "grave_empress", "pos": Vector2i(60, 12), "lv": 20, "req": 20},
+			{"id": "founder_qing", "pos": Vector2i(82, 30), "lv": 20, "req": 20},
+		],
+		"pickups": [
+			{"id": "relic1", "item": "relic", "pos": Vector2i(20, 12)}, {"id": "relic2", "item": "relic", "pos": Vector2i(42, 46)},
+			{"id": "relic3", "item": "relic", "pos": Vector2i(66, 30)}, {"id": "relic4", "item": "relic", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_gv_collect",
+	},
+	"time": {
+		"n": "River of Ten Thousand Years", "w": 96, "h": 58, "seed": 131, "theme": "time", "enemies": 20,
+		"pool": [["hourglass_wraith", 21, 22], ["clockwork_guard", 21, 22], ["dust_moth", 21, 22]],
+		"portals": [
+			{"to": "grave", "pos": Vector2i(1, 28), "dest": Vector2i(88, 28), "open": ""},
+			{"to": "origin", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_tm_tianxuan"},
+		],
+		"npcs": [{"id": "time_ferryman", "n": "Ferryman Shi Guang", "pos": Vector2i(10, 26), "col": Color("f0d080"), "vis": ["s_tm_intro", ""]}],
+		"bosses": [
+			{"id": "time_tortoise", "pos": Vector2i(30, 14), "lv": 21, "req": 21},
+			{"id": "dusk_reaper", "pos": Vector2i(42, 32), "lv": 22, "req": 22},
+			{"id": "dawn_warden", "pos": Vector2i(54, 44), "lv": 22, "req": 22},
+			{"id": "young_tianxuan", "pos": Vector2i(84, 26), "lv": 22, "req": 22},
+		],
+		"pickups": [
+			{"id": "sand1", "item": "sand", "pos": Vector2i(24, 46)}, {"id": "sand2", "item": "sand", "pos": Vector2i(44, 12)},
+			{"id": "sand3", "item": "sand", "pos": Vector2i(66, 40)}, {"id": "sand4", "item": "sand", "pos": Vector2i(78, 12)},
+		],
+		"pickup_vis": "s_tm_collect",
+	},
+	"origin": {
+		"n": "Origin of the Dao", "w": 98, "h": 58, "seed": 141, "theme": "origin", "enemies": 20,
+		"pool": [["maw_tendril", 22, 23], ["hollow_acolyte", 22, 23], ["dao_fragment", 22, 23]],
+		"portals": [{"to": "time", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""}],
+		"npcs": [{"id": "origin_keeper", "n": "Bai Ze, Keeper of the Origin", "pos": Vector2i(10, 26), "col": Color("fff0b0"), "vis": ["s_or_intro", ""]}],
+		"bosses": [
+			{"id": "maw_herald", "pos": Vector2i(32, 40), "lv": 22, "req": 22},
+			{"id": "hollow_dragon", "pos": Vector2i(46, 28), "lv": 23, "req": 23},
+			{"id": "harvest_avatar", "pos": Vector2i(58, 14), "lv": 23, "req": 23},
+			{"id": "hollow_heaven", "pos": Vector2i(88, 28), "lv": 23, "req": 23},
+		],
+		"pickups": [
+			{"id": "rune1", "item": "rune", "pos": Vector2i(22, 12)}, {"id": "rune2", "item": "rune", "pos": Vector2i(40, 46)},
+			{"id": "rune3", "item": "rune", "pos": Vector2i(64, 40)}, {"id": "rune4", "item": "rune", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_or_collect",
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin"]
+
+## next area to enter when travelling from `from` to `to` (breadth-first over portals)
+static func next_hop(from: String, to: String) -> String:
+	if from == to:
+		return from
+	var prev := {from: ""}
+	var q: Array = [from]
+	var i := 0
+	while i < q.size():
+		var c: String = q[i]
+		i += 1
+		for p in AREAS[c].get("portals", []):
+			if not prev.has(p.to):
+				prev[p.to] = c
+				q.append(p.to)
+	if not prev.has(to):
+		return ""
+	var cur := to
+	while prev[cur] != from:
+		cur = prev[cur]
+	return cur
 
 # ---------------------------------------------------------------- quest chain
 # kind: talk (npc) | level (lv) | collect (item,n) | kill (boss) | breakthrough
@@ -371,7 +507,7 @@ const STEPS := [
 	{"id": "s_dr_hydra", "kind": "kill", "boss": "tide_hydra", "area": "dragon", "t": "Cut down the Many-Headed Tide Hydra"},
 	{"id": "s_dr_siren", "kind": "kill", "boss": "siren_queen", "area": "dragon", "t": "Silence the Siren Queen"},
 	{"id": "s_dr_king", "kind": "kill", "boss": "dragon_king", "area": "dragon", "t": "Free the Azure Dragon King from the rift's grip", "stones": 800},
-	{"id": "s_vo_intro", "kind": "talk", "npc": "fire_sage", "area": "volcano", "t": "Find Sage Chi Rong in the Ashen Volcano"},
+	{"id": "s_vo_intro", "kind": "talk", "npc": "fire_sage", "area": "volcano", "t": "Find Sage Huo Rong in the Ashen Volcano"},
 	{"id": "s_vo_collect", "kind": "collect", "item": "ember", "n": 4, "area": "volcano", "t": "Gather 4 Phoenix Embers"},
 	{"id": "s_vo_hunt", "kind": "hunt", "area": "volcano", "n": 28, "t": "Burn back the fire-spawn of the volcano"},
 	{"id": "s_vo_titan", "kind": "kill", "boss": "lava_titan", "area": "volcano", "t": "Topple the Lava Titan"},
@@ -394,6 +530,38 @@ const STEPS := [
 	{"id": "s_ce_qilin", "kind": "kill", "boss": "azure_qilin", "area": "celestial", "t": "Calm the Azure Qilin"},
 	{"id": "s_ce_emperor", "kind": "kill", "boss": "heavenly_emperor", "area": "celestial", "t": "Confront the Jade Emperor of Ruin"},
 	{"id": "s_break6", "kind": "breakthrough", "to": 18, "t": "Endure the Dao-Merging Tribulation"},
+	# ---- Part III: The Hollow Heaven
+	{"id": "s_p3_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The Lotus Seal has called you home: speak to Elder Qing Xuan", "stones": 1500},
+	{"id": "s_ml_intro", "kind": "talk", "npc": "lake_keeper", "area": "mirror", "t": "Seek the Keeper of the Mirror Lake through the Lotus Gate"},
+	{"id": "s_ml_collect", "kind": "collect", "item": "echo", "n": 4, "area": "mirror", "t": "Gather 4 Echo Shards from the lake"},
+	{"id": "s_ml_hunt", "kind": "hunt", "area": "mirror", "n": 30, "t": "Shatter the reflections prowling the Mirror Lake"},
+	{"id": "s_ml_mimic", "kind": "kill", "boss": "shard_mimic", "area": "mirror", "t": "Break the Shard Mimic"},
+	{"id": "s_ml_colossus", "kind": "kill", "boss": "glass_colossus", "area": "mirror", "t": "Topple the Glass Colossus"},
+	{"id": "s_ml_drowned", "kind": "kill", "boss": "drowned_bearer", "area": "mirror", "t": "Lay the Drowned Bearer to rest"},
+	{"id": "s_ml_xumo", "kind": "kill", "boss": "echo_xumo", "area": "mirror", "t": "Face the Echo of Xu Mo", "stones": 1800},
+	{"id": "s_gv_intro", "kind": "talk", "npc": "grave_keeper", "area": "grave", "t": "Find the Gravekeeper in the Graveyard of Sword Saints"},
+	{"id": "s_gv_collect", "kind": "collect", "item": "relic", "n": 4, "area": "grave", "t": "Recover 4 Saint Relics from the barrows"},
+	{"id": "s_gv_hunt", "kind": "hunt", "area": "grave", "n": 30, "t": "Put the restless dead to sleep"},
+	{"id": "s_gv_wyrm", "kind": "kill", "boss": "bone_wyrm", "area": "grave", "t": "Break the Bone Wyrm"},
+	{"id": "s_gv_saint", "kind": "kill", "boss": "headless_saint", "area": "grave", "t": "Duel the Headless Sword Saint"},
+	{"id": "s_gv_empress", "kind": "kill", "boss": "grave_empress", "area": "grave", "t": "Dethrone the Empress of Bones"},
+	{"id": "s_gv_founder", "kind": "kill", "boss": "founder_qing", "area": "grave", "t": "Earn the blessing of Founder Qing Lian", "stones": 2000},
+	{"id": "s_break7", "kind": "breakthrough", "to": 21, "t": "Break through to Mahayana"},
+	{"id": "s_tm_intro", "kind": "talk", "npc": "time_ferryman", "area": "time", "t": "Board the ferry of the River of Ten Thousand Years"},
+	{"id": "s_tm_collect", "kind": "collect", "item": "sand", "n": 4, "area": "time", "t": "Gather 4 pinches of Time Sand"},
+	{"id": "s_tm_hunt", "kind": "hunt", "area": "time", "n": 32, "t": "Stop the stray moments hunting along the river"},
+	{"id": "s_tm_tortoise", "kind": "kill", "boss": "time_tortoise", "area": "time", "t": "Outlast the Eon Tortoise"},
+	{"id": "s_tm_reaper", "kind": "kill", "boss": "dusk_reaper", "area": "time", "t": "Cut down the Dusk Reaper"},
+	{"id": "s_tm_warden", "kind": "kill", "boss": "dawn_warden", "area": "time", "t": "Quiet the Dawn Warden"},
+	{"id": "s_tm_tianxuan", "kind": "kill", "boss": "young_tianxuan", "area": "time", "t": "Meet the First Sweeper at the river's source", "stones": 2400},
+	{"id": "s_or_intro", "kind": "talk", "npc": "origin_keeper", "area": "origin", "t": "Speak to the Keeper at the Origin of the Dao"},
+	{"id": "s_or_collect", "kind": "collect", "item": "rune", "n": 4, "area": "origin", "t": "Gather 4 Origin Runes"},
+	{"id": "s_or_hunt", "kind": "hunt", "area": "origin", "n": 32, "t": "Cut back the Hollow Heaven's spreading roots"},
+	{"id": "s_or_herald", "kind": "kill", "boss": "maw_herald", "area": "origin", "t": "Silence the Maw Herald"},
+	{"id": "s_or_dragon", "kind": "kill", "boss": "hollow_dragon", "area": "origin", "t": "Slay the Hollow Heaven Dragon"},
+	{"id": "s_or_avatar", "kind": "kill", "boss": "harvest_avatar", "area": "origin", "t": "Overturn the Avatar of the Harvest"},
+	{"id": "s_or_heaven", "kind": "kill", "boss": "hollow_heaven", "area": "origin", "t": "Confront the Hollow Heaven itself", "stones": 3000},
+	{"id": "s_break8", "kind": "breakthrough", "to": 24, "t": "Ascend beyond all tribulation as a True Immortal"},
 ]
 
 static func step_index(id: String) -> int:
@@ -414,8 +582,16 @@ const ITEMS := {
 	"ember": {"n": "Phoenix Ember", "desc": "Quest item"},
 	"star": {"n": "Star Fragment", "desc": "Quest item"},
 	"sigil": {"n": "Heaven Sigil", "desc": "Quest item"},
+	"echo": {"n": "Echo Shard", "desc": "Quest item"},
+	"relic": {"n": "Saint Relic", "desc": "Quest item"},
+	"sand": {"n": "Time Sand", "desc": "Quest item"},
+	"rune": {"n": "Origin Rune", "desc": "Quest item"},
+	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
+	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
+## keepsakes dropped by particular bosses (so later dialogue can point at them)
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -431,6 +607,10 @@ const CHAT := {
 	"fire_sage": ["Fire does not hate. It simply consumes. Be the hand that guides it.", "The embers are warm because they remember the Phoenix."],
 	"void_hermit": ["There is no up or down here. Only forward.", "Do not stare at the stars too long. They stare back."],
 	"gate_keeper": ["The Gate has opened for three. Closed for ten thousand.", "Mind your step. Light is not always kind."],
+	"lake_keeper": ["The lake never forgets a face. Not even the ones you would like it to.", "Do not trust any reflection that smiles first."],
+	"grave_keeper": ["Every saint here swore to guard the Seal. Most kept the oath.", "The dead are patient. Be kind to them."],
+	"time_ferryman": ["I ferry moments, not people. You are the first exception.", "Yesterday and tomorrow share one bank. Mind the current."],
+	"origin_keeper": ["Everything begins here, and so does everything end.", "The Hollow Heaven is not evil. It is only hungry."],
 }
 
 const DIALOGUE := {
@@ -445,12 +625,12 @@ const DIALOGUE := {
 	"s_report1": [
 		["Elder Qing Xuan", "Your qi flows like a mountain stream at last. Splendid."],
 		["Elder Qing Xuan", "Alchemist Mo requires four Spirit Herbs from the Whispering Bamboo Forest, east of the gate."],
-		["Elder Qing Xuan", "Bandits stalk that road. Meditate to recover, buy pills from Mo, and temper your blade with Smith Tie."],
+		["Elder Qing Xuan", "Bandits stalk that road, and a Jade Mantis Matriarch has claimed the herb groves as her own. Meditate to recover, buy pills from Mo, and temper your blade with Smith Tie."],
 		["Lin Feng", "Understood. I will return with the herbs."],
 	],
 	"s_alchemist": [
 		["Alchemist Mo", "Spirit Herbs! Four of them, fresh as dawn. You have the nose of a true cultivator."],
-		["Alchemist Mo", "Take these pills. And hear this: the bandit chief Iron Fang holds a village girl in the deep bamboo."],
+		["Alchemist Mo", "Take this payment. And hear this: the bandit chief Iron Fang holds a village girl in the deep bamboo."],
 		["Lin Feng", "Then I shall free her."],
 	],
 	"pre:jade_mantis": [
@@ -486,7 +666,7 @@ const DIALOGUE := {
 		["Yue Ling", "The path to the generals is open."],
 	],
 	"pre:iron_fang": [
-		["Iron Fang", "Hah! A sweeper boy with a sword. Did the Azure Cloud run out of real disciples?"],
+		["Iron Fang", "Hah! A sect boy with a rusty sword. Did the Azure Cloud run out of real disciples?"],
 		["Lin Feng", "Release the girl, or I will cut you down."],
 	],
 	"post:iron_fang": [
@@ -494,6 +674,7 @@ const DIALOGUE := {
 	],
 	"s_yue": [
 		["Yue Ling", "You came! I am Yue Ling, a wandering healer. Iron Fang bound me when I refused to poison a well."],
+		["Yue Ling", "I remember little before three winters ago, when I woke beside a lotus pond with only my name. Healing is the one thing my hands never forgot."],
 		["Yue Ling", "The bamboo grove is wailing. Something ancient has been twisted by demonic qi."],
 		["Lin Feng", "Then let us calm it together."],
 		["Yue Ling", "Yue Ling joins your party. Her Spring Rain mends the wounded."],
@@ -522,8 +703,8 @@ const DIALOGUE := {
 		["Yue Ling", "Her curses are dark-aspected. Water and fire will cut through her mist."],
 	],
 	"post:marsh_hag": [
-		["Marsh Hag", "The Blood Moon... pays well... for the seal's bearer... you cannot hide..."],
-		["Lin Feng", "The seal's bearer? Is that me?"],
+		["Marsh Hag", "The Blood Moon... pays well... for the bearer of the Nine Heavens root... you cannot hide..."],
+		["Lin Feng", "The root's bearer? Is that me?"],
 		["Yue Ling", "Let us bring the lotuses back first. Answers can wait."],
 	],
 	"s_antidote": [
@@ -539,7 +720,7 @@ const DIALOGUE := {
 	"s_elder3": [
 		["Elder Qing Xuan", "Golden Core! In my youth I needed forty years for what you have done in a season."],
 		["Elder Qing Xuan", "The Frostpeak Caverns hold Frost Jades, the only material capable of reinforcing the Lotus Seal."],
-		["Elder Qing Xuan", "A Frost Wyrm slumbers there. Bring three jades, and slay the beast and its brood if they block your path."],
+		["Elder Qing Xuan", "A Frost Wyrm slumbers there. Bring four jades, and slay the beast and its brood if they block your path."],
 	],
 	"pre:frost_wyrm": [
 		["Frost Wyrm", "Who dares enter my glacier? Your warmth offends me."],
@@ -570,11 +751,12 @@ const DIALOGUE := {
 		["Thunder Roc", "SKREEEE! The storm is mine! Fall, little soul!"],
 	],
 	"post:thunder_roc": [
+		["Narrator", "A single storm-bright feather drifts down from the fallen Roc. Lin Feng tucks it into his sleeve."],
 		["Ancestor Jian Wuchen", "Well fought. Take the Heaven-Cleaving Sword, my final gift. May it cleave even the heavens."],
 		["Lin Feng", "I feel the technique awakening in my bones."],
 	],
 	"s_elder5": [
-		["Elder Qing Xuan", "The Roc's feather! Now the Seal sings again. Yet Xu Mo's army gathers at the Blood Moon Palace, beyond Thunder Valley."],
+		["Elder Qing Xuan", "The Roc's feather, still crackling with thunder! Now the Seal sings again. Yet Xu Mo's army gathers at the Blood Moon Palace, beyond Thunder Valley."],
 		["Elder Qing Xuan", "Go, Lin Feng. Take his generals, then take his head. The sect's fate rests on your blade."],
 		["Yue Ling", "I will be at your side to the end."],
 	],
@@ -593,7 +775,7 @@ const DIALOGUE := {
 		["Lin Feng", "Only the Demon Lord remains."],
 	],
 	"pre:demon_lord": [
-		["Demon Lord Xu Mo", "At last, the bearer of the Nine Heavens root walks into my hall. I have hunted you for three centuries."],
+		["Demon Lord Xu Mo", "At last, the bearer of the Nine Heavens root walks into my hall. I have hunted your root, bearer after bearer, for three centuries."],
 		["Lin Feng", "Your hunt ends here, Xu Mo."],
 		["Demon Lord Xu Mo", "Then let the heavens judge us both!"],
 	],
@@ -641,19 +823,19 @@ const DIALOGUE := {
 		["Lin Feng", "The Emperor again. Whoever he is, he has been whispering to everyone."],
 	],
 	"pre:dragon_king": [
-		["Azure Dragon King", "Who disturbs the tide? Ah... the little cultivator. How you have grown."],
+		["Azure Dragon King", "Who disturbs the tide? Ah... a mortal in my halls. The envoy's prophecy walks on two legs."],
 		["Azure Dragon King", "I am sorry. I cannot hold the sea back any longer. Run, or fight me with everything you have!"],
 	],
 	"post:dragon_king": [
-		["Azure Dragon King", "You freed me. The rift beneath the volcano feeds on the heavens. Go to the Ashen Volcano, find Sage Chi Rong. Take this pearl as proof."],
+		["Azure Dragon King", "You freed me, and the pearls' light has washed the rot from my sea. The rift beneath the volcano feeds on the heavens. Take this scale of mine as proof, and find Sage Huo Rong in the Ashen Volcano."],
 		["Yue Ling", "A dragon king in our debt. Not bad for a sweeper."],
 	],
 	"s_vo_intro": [
-		["Sage Chi Rong", "You smell of salt and thunder. The Dragon King sent you. Good."],
-		["Sage Chi Rong", "This volcano sleeps above a wound in the world. Phoenix Embers can cauterise it, but the Phoenix itself has gone mad."],
-		["Sage Chi Rong", "Gather four Embers. Then deal with the fire-spawn, the Titan, the Phoenix, and the Lord who commands them."],
+		["Sage Huo Rong", "You smell of salt and thunder, and you carry a scale of the Azure Dragon King. Good."],
+		["Sage Huo Rong", "This volcano sleeps above a wound in the world. Phoenix Embers can cauterise it, but the Phoenix itself has gone mad."],
+		["Sage Huo Rong", "Gather four Embers. Then deal with the fire-spawn, the Titan, the Behemoth, the Phoenix, and the Lord who commands them."],
 		["Lin Feng", "A short list."],
-		["Sage Chi Rong", "A long list, if you are careless. Do not be careless."],
+		["Sage Huo Rong", "A long list, if you are careless. Do not be careless."],
 	],
 	"pre:lava_titan": [
 		["Lava Titan", "RRRRUMMMMBLE. Stone. Fire. Break."],
@@ -664,10 +846,10 @@ const DIALOGUE := {
 	],
 	"pre:cinder_behemoth": [
 		["Cinder Behemoth", "...embers... cold... feed me... fire..."],
-		["Sage Chi Rong", "It is a forge-beast, hollowed by despair. Douse it, quickly!"],
+		["Sage Huo Rong", "It is a forge-beast, hollowed by despair. Douse it, quickly!"],
 	],
 	"post:cinder_behemoth": [
-		["Sage Chi Rong", "The ash settles. The Phoenix waits above."],
+		["Sage Huo Rong", "The ash settles. The Phoenix waits above."],
 	],
 	"pre:ash_phoenix": [
 		["Ash Phoenix", "KREEEE! The sky burns! The sky burns and I burn with it!"],
@@ -683,21 +865,21 @@ const DIALOGUE := {
 	],
 	"post:inferno_lord": [
 		["Inferno Lord Chi Yan", "Ahh... cold... the Emperor... will drain you too..."],
-		["Sage Chi Rong", "It is done. The volcano calms. Now, you must break through. The void will not tolerate a Deity as weak as you."],
+		["Sage Huo Rong", "It is done. The embers cauterise the wound, and the volcano calms. Now, you must break through. The void will not tolerate a Deity as weak as you."],
 	],
 	"pre:s_break5": [
 		["Narrator", "Rivers of flame gather overhead and form a spiralling funnel. The Heavens test the Deity who would pass into the Void."],
 	],
 	"post:s_break5": [
 		["Narrator", "The fire fades into cold starlight. Lin Feng stands in Void Refinement, no longer bound by the weight of the earth."],
-		["Sage Chi Rong", "The Void Rift lies beyond the volcano's eastern slope. Find Hermit Wu Ji. He knows the Emperor's name."],
+		["Sage Huo Rong", "The Void Rift lies beyond the volcano's eastern slope. Find Hermit Wu Ji. He knows the Emperor's name."],
 	],
 	"s_vd_intro": [
 		["Hermit Wu Ji", "You came through the fire. Few do. Sit. There is no hurry in the void."],
 		["Hermit Wu Ji", "The Jade Emperor of Ruin was once the first ascended being. He has been consuming the heavens to make himself a god without equals."],
 		["Hermit Wu Ji", "Collect four Star Fragments. Forged together, they can pierce the Gate that he guards."],
 		["Yue Ling", "And the horrors?"],
-		["Hermit Wu Ji", "They are his tears. Cut them down, and cut down the three who shepherd them."],
+		["Hermit Wu Ji", "They are his tears. Cut them down, and cut down the four who shepherd them."],
 	],
 	"pre:rift_weaver": [
 		["Rift Weaver", "Tssss... fresh threads for my loom. Such bright, bright threads..."],
@@ -725,11 +907,11 @@ const DIALOGUE := {
 		["Yue Ling", "It feeds on hesitation. Strike first, Lin Feng!"],
 	],
 	"post:chaos_serpent": [
-		["Hermit Wu Ji", "You have done what I could not in a thousand years. The Celestial Gate lies ahead. Be ready for him."],
+		["Hermit Wu Ji", "You have done what I could not in a thousand years. The Star Fragments will pierce the Celestial Gate for you. Be ready for him."],
 	],
 	"s_ce_intro": [
 		["Gatekeeper Bai Ze", "You have the look of someone who has already won, and lost, and won again. Welcome to the Celestial Gate."],
-		["Gatekeeper Bai Ze", "Beyond this Gate sits the Jade Emperor of Ruin. His generals, his sacred beast, and his throne guard the way."],
+		["Gatekeeper Bai Ze", "Beyond this Gate sits the Jade Emperor of Ruin. His general, his judge, his sacred beast, and his throne guard the way."],
 		["Gatekeeper Bai Ze", "Collect four Heaven Sigils to unseal the Gate, and cleanse its fallen guardians."],
 		["Lin Feng", "And then?"],
 		["Gatekeeper Bai Ze", "Then the heavens decide who deserves them."],
@@ -772,5 +954,200 @@ const DIALOGUE := {
 	],
 	"post:s_break6": [
 		["Narrator", "The final bolt falls and, with it, the last chain between Lin Feng and the Dao. He ascends to Dao Merging, and the heavens open their gates."],
+		["Yue Ling", "Lin Feng, your sword... the lotus at your belt is glowing. It has never done that before."],
+	],
+	"recall": [
+		["Narrator", "The Lotus Seal that has slept in Lin Feng's dantian since the day he swept the sect's steps blazes like a second sun, and the world folds around him."],
+		["Narrator", "When the light fades, he is standing beside the lotus pond of Azure Cloud Sect. Elder Qing Xuan is waiting, grey-faced, with the Seal's chime ringing like a cracked bell."],
+		["Elder Qing Xuan", "You felt it too. Come, Lin Feng. There is a truth I have kept for sixty years, and the Seal will not let me keep it any longer."],
+	],
+	# ---- Part III: The Hollow Heaven
+	"s_p3_home": [
+		["Elder Qing Xuan", "Xu Mo is dead and the Jade Emperor is dead, and still the Seal screams. Sit, Lin Feng. I owe you the whole truth."],
+		["Elder Qing Xuan", "I am a descendant of Qing Lian, who founded this sect. She and the sword ancestor Jian Wuchen forged the Heavenly Lotus Seal. It was never a wall against demons. It hides the Nine Heavens root."],
+		["Elder Qing Xuan", "The root is a seed of the first Dao. It passes to a new bearer each time the old one dies. You are the twentieth. Xu Mo spent three centuries hunting the nineteen before you."],
+		["Lin Feng", "Then the demon lord was only a hunter. Who was the Emperor?"],
+		["Elder Qing Xuan", "Tian Xuan, the first ascended being. He learned that every tribulation is a harvest: the Heavens swallow the Dao of whoever endures them. He tried to starve the thing by hoarding the heavens himself, and he needed your root to finish it."],
+		["Elder Qing Xuan", "By killing him you have woken what he was starving: the Hollow Heaven. The Seal is breaking because it is afraid. The Lotus Gate at the foot of our pond now leads to the Mirror Lake, where every bearer's memory sleeps."],
+		["Yue Ling", "Nineteen bearers before him. Elder, why does the lotus pond feel so familiar to me?"],
+		["Elder Qing Xuan", "Go. Learn what the lake remembers. Then we will see who is ready to hear the rest."],
+	],
+	"s_ml_intro": [
+		["Keeper Lan Jing", "A bearer who walks in the daylight. The lake has not seen one in three hundred years."],
+		["Keeper Lan Jing", "Every ascender who ever crossed this water left an echo in it. The echoes have curdled and grown teeth. Gather four Echo Shards, and the Mirror of Bearers will wake."],
+		["Lin Feng", "And the echoes themselves?"],
+		["Keeper Lan Jing", "Break the hungry ones. Listen to the rest. Some of them are still trying to warn you."],
+	],
+	"pre:shard_mimic": [
+		["Shard Mimic", "I wear your face, little bearer. I wear it better than you do."],
+		["Yue Ling", "It copies whoever strikes it. Hit it with what it cannot imitate: the dark!"],
+	],
+	"post:shard_mimic": [
+		["Lin Feng", "It broke into a hundred of me. None of them were smiling."],
+	],
+	"pre:glass_colossus": [
+		["Glass Colossus", "I was raised to guard the Mirror from the Emperor's hands. I cannot tell friend from foe through all this cracked glass."],
+		["Yue Ling", "Then shatter it gently, Lin Feng. It means no harm."],
+	],
+	"post:glass_colossus": [
+		["Glass Colossus", "Thank you... the Mirror is open... the seventh bearer waits below the surface..."],
+	],
+	"pre:drowned_bearer": [
+		["Drowned Bearer Shui Ying", "Another one. Another one! Xu Mo promised me you were the last."],
+		["Lin Feng", "I am the twentieth. You were the seventh. I am sorry."],
+		["Drowned Bearer Shui Ying", "Then die gently, and I will die with you."],
+	],
+	"post:drowned_bearer": [
+		["Drowned Bearer Shui Ying", "Xu Mo drowned me here so the Emperor could drink my root. He wept the whole time. Remember that, twentieth. The hunter wept."],
+		["Narrator", "Where she sank, an Echo Shard glimmers, and the lake begins to show the face of the one who hunted her."],
+	],
+	"pre:echo_xumo": [
+		["Echo of Xu Mo", "You killed my body, bearer. The lake kept my regret."],
+		["Echo of Xu Mo", "I was the Emperor's first apprentice. He swore that one root, fully ripened, would end the harvest for everyone. I believed him. I fed him nineteen children."],
+		["Lin Feng", "And you meant to feed him a twentieth."],
+		["Echo of Xu Mo", "I meant to. Now do me one kindness: strike me, so I can stop remembering."],
+	],
+	"post:echo_xumo": [
+		["Echo of Xu Mo", "The first bearer lies in the Graveyard of Sword Saints, past the lake's far shore. Qing Lian still holds the Seal's key. She does not know the Emperor is dead."],
+		["Yue Ling", "I never thought I would pity him."],
+		["Lin Feng", "Neither did I. Let us go to the graveyard."],
+	],
+	"s_gv_intro": [
+		["Gravekeeper Mu Gu", "Living feet. It has been a long while. Every sword saint in this ground swore to guard the Seal, and the Seal swore to guard them."],
+		["Gravekeeper Mu Gu", "Four Saint Relics, scattered by the Emperor's grave-robbers, will remake the Seal's key. Bring them, and walk softly. The dead here are not at peace."],
+	],
+	"pre:bone_wyrm": [
+		["Bone Wyrm", "...rrrrrattle... the Emperor's whistle... bring... living... bones..."],
+		["Yue Ling", "It is bound to a summoning. Thunder will break the bonds."],
+	],
+	"post:bone_wyrm": [
+		["Lin Feng", "Its bones are sleeping again. Whoever bound it was cruel."],
+	],
+	"pre:headless_saint": [
+		["Headless Sword Saint", "..."],
+		["Narrator", "The headless saint salutes with his sword, the old formal bow of the Azure Cloud Sect. He has no voice, but his stance is a challenge."],
+		["Lin Feng", "A duel, then. Honour to the Sect."],
+	],
+	"post:headless_saint": [
+		["Narrator", "The saint lowers his blade and places it at Lin Feng's feet. A Saint Relic glows on the hilt."],
+		["Yue Ling", "He refused to serve the Emperor, even after they took his head."],
+	],
+	"pre:grave_empress": [
+		["Empress of Bones", "Every saint I buried was my husband in another life. Come, bearer. Join the family."],
+		["Yue Ling", "She is the Emperor's grief, given a throne. Fire will clear the dust."],
+	],
+	"post:grave_empress": [
+		["Empress of Bones", "Qing Lian waits beyond my gate. Tell her... I kept her bed warm... all these centuries..."],
+	],
+	"pre:founder_qing": [
+		["Founder Qing Lian", "The Seal's key resonates in you, child. Twenty bearers, and not one has reached my grave alive."],
+		["Founder Qing Lian", "I must be certain you are not the Emperor wearing a new face. Draw your sword."],
+		["Lin Feng", "I would rather ask you questions than fight you."],
+		["Founder Qing Lian", "Questions after. Defend yourself!"],
+	],
+	"post:founder_qing": [
+		["Founder Qing Lian", "Your sword is honest. Good. Listen: the Seal was never meant to be a prison. It was a door I locked from the outside, hoping a worthy hand would one day open it."],
+		["Founder Qing Lian", "Tell the girl at your side that her lotus has bloomed beautifully. She has no idea what she is, and that is how I wanted it. Now go. The River of Ten Thousand Years runs under the world. Cross it, and you will find the Emperor's beginning."],
+		["Yue Ling", "What does she mean, 'what I am'?"],
+		["Lin Feng", "We will ask her the next time we meet. First, I must break through."],
+	],
+	"pre:s_break7": [
+		["Narrator", "The graveyard's old sword-light gathers into a pillar. The Heavens, wary now, test the Dao-Merger who dares call the harvest a lie."],
+		["Lin Feng", "Take what you will, Heaven. You will not take this."],
+	],
+	"post:s_break7": [
+		["Narrator", "The last bolt breaks against the Lotus Seal and falls harmlessly away. Lin Feng stands in Mahayana. For the first time the lightning did not feel like a thief."],
+		["Yue Ling", "The Seal protected you. Lin Feng, it was warm against my hand when it did."],
+	],
+	"s_tm_intro": [
+		["Ferryman Shi Guang", "Passengers for the headwaters? There has been no passenger since the world began. Sit, bearer. Mind the sand."],
+		["Ferryman Shi Guang", "Four pinches of Time Sand will tether our boat to the present. Without them, we might arrive before we left."],
+		["Lin Feng", "And the creatures on the banks?"],
+		["Ferryman Shi Guang", "Moments the harvest left behind. They are lonely, and lonely things bite."],
+	],
+	"pre:time_tortoise": [
+		["Eon Tortoise", "I have been walking toward you for nine thousand years. You are quick, for a mortal."],
+		["Yue Ling", "It is slow, but it hits like a mountain. Be patient."],
+	],
+	"post:time_tortoise": [
+		["Eon Tortoise", "At last... a moment I may rest in. The Reaper walks the dusk bank, child."],
+	],
+	"pre:dusk_reaper": [
+		["Dusk Reaper", "Every ending is mine. I merely collect. Yours is overdue."],
+		["Lin Feng", "Then I am glad to be late."],
+	],
+	"post:dusk_reaper": [
+		["Dusk Reaper", "An ending refused... how strange... then I shall take the Emperor's, when it comes..."],
+	],
+	"pre:dawn_warden": [
+		["Dawn Warden", "I sing the first morning of every age. Your blade will not stop the sun, little sweeper."],
+		["Yue Ling", "Quench her fire gently. She is not our enemy."],
+	],
+	"post:dawn_warden": [
+		["Dawn Warden", "He swept this very bank, the boy who became the Emperor. Go on. He is waiting at the source, and he is still a boy."],
+	],
+	"pre:young_tianxuan": [
+		["Tian Xuan, the First Sweeper", "A broom! You carry a broom's soul under that sword. We are alike, you and I."],
+		["Tian Xuan, the First Sweeper", "I swept the first sect's steps for three years before I learned what the tribulations were. A harvest! Every ascender fed to the same mouth. I swore to end it, whatever it cost."],
+		["Lin Feng", "And the cost was nineteen children."],
+		["Tian Xuan, the First Sweeper", "It was always going to be a cost. Show me yours is smaller."],
+	],
+	"post:young_tianxuan": [
+		["Tian Xuan, the First Sweeper", "The river remembers me better than I do. I wanted the harvest to end. I forgot to ask whether anyone else had to pay."],
+		["Tian Xuan, the First Sweeper", "The mouth is at the Origin. It is not a monster, only an appetite. Do not starve it as I did. Teach it to stop."],
+		["Narrator", "The boy smiles and dissolves into the river's light. Upstream, the way to the Origin of the Dao opens."],
+	],
+	"s_or_intro": [
+		["Bai Ze, Keeper of the Origin", "I told you the Gate had opened for three, bearer. I did not say who the third would be."],
+		["Bai Ze, Keeper of the Origin", "The Hollow Heaven is stirring beyond these runes. Four Origin Runes will let you stand before it without being unmade."],
+		["Yue Ling", "You knew we would come."],
+		["Bai Ze, Keeper of the Origin", "I knew you would come, girl of the lotus. I did not know whether you would be ready."],
+	],
+	"pre:maw_herald": [
+		["Maw Herald", "Tssss... new threads for the great loom. The harvest is overdue."],
+		["Yue Ling", "Burn it, Lin Feng. Its webs are woven of stolen Dao!"],
+	],
+	"post:maw_herald": [
+		["Maw Herald", "The Hollow... will not stop... for a sweeper..."],
+	],
+	"pre:hollow_dragon": [
+		["Hollow Heaven Dragon", "I am what remains of every dragon that ever ascended. We are very, very hungry."],
+		["Lin Feng", "I will not let you eat anyone else."],
+	],
+	"post:hollow_dragon": [
+		["Hollow Heaven Dragon", "Thank you for the quiet... take my last breath... it is only thunder..."],
+	],
+	"pre:harvest_avatar": [
+		["Avatar of the Harvest", "I am the Heavens' hand. Each tribulation was my gentle sweeping. You have refused my broom, little bearer."],
+		["Lin Feng", "I have swept enough steps to know a broom when I see one."],
+	],
+	"post:harvest_avatar": [
+		["Avatar of the Harvest", "Then end the appetite yourself. The Hollow waits at the centre. Only the root can quiet it, and the root must be... spent."],
+		["Yue Ling", "Spent? Lin Feng, what does that mean?"],
+	],
+	"pre:hollow_heaven": [
+		["Yue Ling", "Lin Feng, wait. I remember now. Founder Qing Lian wove me from the Seal's lotus so the bearer would never face the end alone. I am not a wandering healer. I am the Seal."],
+		["Yue Ling", "To quiet the Hollow, the root must be given to it, and the Seal must shut the door behind. One of us must be spent. It should be me."],
+		["Lin Feng", "No. I have swept these steps for three years, and you walked them with me for the rest. Nobody is being spent."],
+		["Yue Ling", "Lin Feng..."],
+		["Lin Feng", "The Emperor starved it. The Heavens fed it. Nobody ever tried to teach it to be full. Stand with me, Yue Ling. We try something new."],
+		["The Hollow Heaven", "...hungry..."],
+	],
+	"post:hollow_heaven": [
+		["Narrator", "Lin Feng does not strike the final blow. He opens his dantian, and the Nine Heavens root flows into the Hollow, not as food but as a seed. Yue Ling's lotus blooms around it like a door held open."],
+		["The Hollow Heaven", "...warm... is this... being full?..."],
+		["Yue Ling", "It is learning, Lin Feng. It is learning to stop."],
+		["Narrator", "The Hollow's endless hunger settles into a slow tide, and the dead cloud-sky above the Origin turns, at last, to dawn. One tribulation remains: the Heavens' last, reluctant test."],
+	],
+	"pre:s_break8": [
+		["Narrator", "The sky tears itself open for the final time. Every tribulation ever cast gathers into a single spiral of light, and the Heavens ask whether the bearer will keep the harvest or end it."],
+		["Lin Feng", "I will end it. Not by taking more, but by giving nothing up. Come."],
+	],
+	"post:s_break8": [
+		["Narrator", "The last bolt strikes the Seal, the Seal blooms, and the lightning falls as warm rain. Lin Feng ascends as a True Immortal, and the harvest ends for every cultivator who will ever live."],
+		["Yue Ling", "I am still here. The Seal is a door now, not a lock. Look, Lin Feng. Look at the sky."],
+		["Narrator", "Far below, in the sect where a boy once swept the steps, Elder Qing Xuan watches the clouds turn gold. The Lotus Seal's chime, cracked for a thousand years, rings clear and whole."],
+		["Narrator", "Lin Feng, once a sweeper of steps, rewrites the heavens, and the first true morning in ten thousand years begins."],
 	],
 }
+

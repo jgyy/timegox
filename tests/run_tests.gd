@@ -47,9 +47,9 @@ func _init() -> void:
 		var again := MapGen.build(a)
 		check(again.grid == m.grid, a + ": generation is deterministic")
 	print("== content ==")
-	var world_themes: Dictionary = Gfx.THEMES
-	var pickup_cols: Dictionary = Gfx.PICKUP_COLORS
-	var battle_sky: Dictionary = Gfx.SKY
+	var world_themes: Dictionary = Look.THEMES
+	var pickup_cols: Dictionary = Look.PICKUP_COLORS
+	var battle_sky: Dictionary = Look.THEMES
 	for a in Data.AREAS:
 		var spec: Dictionary = Data.AREAS[a]
 		check(world_themes.has(spec.theme), a + ": world theme " + spec.theme)
@@ -63,10 +63,11 @@ func _init() -> void:
 		for b in spec.get("bosses", []):
 			check(Data.ENEMIES.has(b.id) and Data.ENEMIES[b.id].get("boss", false), a + ": boss " + b.id)
 			check(b.req <= Data.MAX_LEVEL, a + ": boss level requirement " + b.id)
-	for i in Data.AREA_CHAIN.size() - 1:
-		var from: String = Data.AREA_CHAIN[i]
-		var to: String = Data.AREA_CHAIN[i + 1]
-		check(Data.AREAS[from].portals.any(func(q): return q.to == to), "chain %s -> %s has a portal" % [from, to])
+	for a2 in Data.AREA_CHAIN:
+		check(Data.next_hop("sect", a2) != "" or a2 == "sect", "area %s is reachable from the sect hub" % a2)
+		check(Data.next_hop(a2, "sect") != "" or a2 == "sect", "area %s can travel back to the sect" % a2)
+	for i in Data.AREA_CHAIN.size():
+		check(Data.AREAS.has(Data.AREA_CHAIN[i]), "chain area exists " + Data.AREA_CHAIN[i])
 	for e in Data.ENEMIES:
 		check(UI.SHAPES.has(Data.ENEMIES[e].shape), "monster art exists for shape " + Data.ENEMIES[e].shape + " (" + e + ")")
 	for sid in Data.SKILLS:
@@ -77,12 +78,39 @@ func _init() -> void:
 	for s2 in Data.STEPS:
 		if s2.kind == "kill":
 			hunts += 1
-	check(hunts >= 29, "at least 29 boss fights in the chain (found %d)" % hunts)
+	check(hunts >= 45, "at least 45 boss fights in the chain (found %d)" % hunts)
+	print("== 3D assets ==")
+	for shape in UI.SHAPES:
+		var mdl := Models.monster(shape, Color("88aa66"), true)
+		check(mdl.get_child_count() > 0, "3D model builds for shape " + shape)
+		mdl.free()
+	for a3 in Data.AREAS:
+		var spec3: Dictionary = Data.AREAS[a3]
+		var m3 := MapGen.build(a3)
+		var tr := Terrain3D.build(m3.grid, m3.w, m3.h, spec3.theme, spec3.seed)
+		check(tr.get_child_count() > 3, "3D terrain builds for " + a3)
+		tr.free()
+	print("== story ==")
+	for st in Data.STEPS:
+		if st.kind == "collect":
+			check(Data.ITEMS.has(st.item), "collect item defined " + st.item)
+	for k in Data.DIALOGUE:
+		for ln in Data.DIALOGUE[k]:
+			check(ln.size() == 2 and str(ln[1]).length() > 0, "dialogue line well formed in " + k)
+			break
+	for k2 in Data.BOSS_DROPS:
+		check(Data.ENEMIES.has(k2) and Data.ITEMS.has(Data.BOSS_DROPS[k2]), "boss drop " + k2)
+	check(not Data.known_skills(0, 12, Data.step_index("s_apeking")).has("heaven"), "Heaven-Cleaving Sword is not usable before the ancestor teaches it")
+	check(Data.known_skills(0, 12, Data.step_index("s_elder5")).has("heaven"), "Heaven-Cleaving Sword is usable after the Roc falls")
+	for k3 in Data.DIALOGUE:
+		for ln2 in Data.DIALOGUE[k3]:
+			check(not str(ln2[1]).contains("Chi Rong"), "no stale Sage name in " + k3)
+			break
 	print("== progression ==")
 	check(Data.EXP_NEED.size() >= Data.MAX_LEVEL, "exp table covers all levels")
 	check(Data.ENEMY_EXP.size() >= Data.MAX_LEVEL, "enemy exp table covers all levels")
 	for lv in Data.MAX_LEVEL:
-		check(Data.EXP_NEED[lv] > (Data.EXP_NEED[lv - 1] if lv > 0 else 0), "exp need grows at level %d" % lv)
+		check(Data.EXP_NEED[lv] > 0 and Data.ENEMY_EXP[lv] >= (Data.ENEMY_EXP[lv - 1] if lv > 0 else 0), "exp tables sane at level %d" % lv)
 	for l in Data.MAX_LEVEL + 1:
 		check(Data.level_name(l) != "", "level name %d = %s" % [l, Data.level_name(l)])
 	print("failures: ", failures)

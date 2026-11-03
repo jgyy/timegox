@@ -1,20 +1,50 @@
-extends Node2D
+extends ScreenBase
 ## Meditation: converts time into cultivation and restores HP/Qi.
 
 const VIEW := Vector2(1280, 720)
 
-var main
-var opaque := true
-var t := 0.0
 var spring := false
 var gained := 0.0
 var motes: Array = []
 var status := ""
 
-func setup(m) -> void:
-	main = m
-	for i in 70:
-		motes.append({"a": randf() * TAU, "r": randf_range(40, 330), "s": randf_range(0.3, 1.2), "z": randf_range(1.5, 4.0)})
+var hero: Node3D
+var comp: Node3D
+var rings: Array = []
+var orbit: Node3D
+
+func _build3d() -> void:
+	opaque = true
+	new_scene3d()
+	new_camera(55.0)
+	var env := Look.environment("void", 0.5)
+	env.sky.sky_material.sky_top_color = Color("0a0f28")
+	env.sky.sky_material.sky_horizon_color = Color("2a1f48")
+	cam.environment = env
+	var sun := Look.sun("void", false)
+	sun.light_energy = 0.5
+	scene3d.add_child(sun)
+	var lot := Models.lotus(Color(0.6, 0.9, 1.0), 1.3)
+	scene3d.add_child(lot)
+	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"sword": false, "glow": Color(0.5, 0.85, 1.0)})
+	hero.position = Vector3(0, 0.25, 0)
+	scene3d.add_child(hero)
+	comp = Models.person(Color("e86a9a"), Color("402030"), {"ribbon": Color("ffb0cc")})
+	comp.position = Vector3(-2.6, 0.1, 0.6)
+	scene3d.add_child(comp)
+	for r in 2:
+		var rb := MB.new()
+		rb.torus(Vector3.ZERO, 3.0 + r * 0.9, 0.04, Color(0.6, 0.9, 1.0, 0.7))
+		for k in 12:
+			var a := TAU * k / 12.0
+			rb.cone(Vector3(cos(a) * (3.0 + r * 0.9), 0.0, sin(a) * (3.0 + r * 0.9)), 0.12, 0.3, Color(0.8, 1.0, 1.0, 0.9), Vector3.ZERO, 4)
+		var ri := MB.mesh_node(scene3d, rb.build(MB.mat_glow()))
+		ri.position.y = 0.6 + r * 0.5
+		rings.append(ri)
+	var w := Fx3D.make_weather()
+	scene3d.add_child(w)
+	Fx3D.configure_weather(w, "glints")
+	w.position = Vector3(0, 3, 0)
 
 func start() -> void:
 	spring = main.world.near_spring()
@@ -45,34 +75,18 @@ func _process(d: float) -> void:
 		elif Game.can_breakthrough() and full:
 			Game.toast("Your qi is saturated. Seek a breakthrough!")
 			main.pop()
-	queue_redraw()
+	if not headless() and visible:
+		hero.position.y = 0.3 + sin(t * 1.5) * 0.08
+		Models.anim_person(hero, t, false, true)
+		comp.visible = Game.companion
+		Models.anim_person(comp, t + 1.0, false, true)
+		rings[0].rotation.y = t * 0.4
+		rings[1].rotation.y = -t * 0.3
+		cam.position = Vector3(sin(t * 0.2) * 1.2, 2.3, 7.0)
+		cam.look_at(Vector3(0, 1.3, 0), Vector3.UP)
+		queue_redraw()
 
 func _draw() -> void:
-	Gfx.vgrad(self, Rect2(Vector2.ZERO, VIEW), Color("0a0f28"), Color("2a1f48"))
-	Gfx.stars(self, Rect2(0, 0, VIEW.x, 400), t, 80, Color(0.8, 0.9, 1.0))
-	var c := Vector2(640, 330)
-	Gfx.rays(self, c, t, 10, 520.0, Color(0.5, 0.85, 1.0, 0.05), 0.12)
-	for i in 5:
-		draw_circle(c, 150 + i * 28 + sin(t * 2 + i) * 6, Color(0.4, 0.8, 1.0, 0.05))
-	# rotating rune circles
-	for ring in 2:
-		var rr := 190.0 + ring * 44.0
-		draw_arc(c, rr, 0.0, TAU, 60, Color(0.5, 0.85, 1.0, 0.35), 2.0)
-		for k in 12:
-			var a := TAU * k / 12.0 + t * (0.25 if ring == 0 else -0.18)
-			var rp := c + Vector2(cos(a) * rr, sin(a) * rr * 0.5)
-			Gfx.diamond(self, rp, 6.0 + ring * 2.0, Color(0.7, 0.95, 1.0, 0.7))
-	for m in motes:
-		var a: float = m.a + t * m.s * 0.6
-		var r: float = m.r * (0.75 + 0.25 * sin(t + m.a))
-		var p := c + Vector2(cos(a) * r, sin(a) * r * 0.55)
-		draw_circle(p, m.z, Color(0.6, 0.9, 1.0, 0.55))
-		draw_circle(p, m.z * 2.4, Color(0.6, 0.9, 1.0, 0.1))
-	GfxActors.lotus_seat(self, c + Vector2(0, 92), 1.2, t, Color(0.6, 0.9, 1.0))
-	Gfx.glow(self, c + Vector2(0, 20), 90.0, Color(0.5, 0.85, 1.0, 0.45), 6)
-	UI.human(self, c + Vector2(0, 70), 3.4, Color("3a8ae8"), Color("1a1a2a"), t * 0.5)
-	if Game.companion:
-		UI.human(self, c + Vector2(-170, 80), 2.7, Color("e86a9a"), Color("402030"), t * 0.5 + 1.0, false, {"ribbon": Color("ffb0cc")})
 	UI.text(self, Vector2(0, 90), "Meditation", 38, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 126), status, 18, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(340, 520, 600, 150))
