@@ -227,6 +227,8 @@ func use_item_field(id: String) -> String:
 		return "You have none."
 	var i := lowest_member()
 	if id == "hp_pill":
+		if hp[i] >= max_hp(i) - 0.5:
+			return "Everyone is already at full health."
 		inv[id] -= 1
 		hp[i] = minf(float(max_hp(i)), hp[i] + max_hp(i) * 0.4)
 		return "%s recovers health." % member_name(i)
@@ -239,6 +241,9 @@ func use_item_field(id: String) -> String:
 			if r < lowest:
 				lowest = r
 				j = k
+		if qi[j] >= max_qi(j) - 0.5:
+			inv[id] += 1
+			return "Everyone's qi is already full."
 		qi[j] = minf(float(max_qi(j)), qi[j] + max_qi(j) * 0.5)
 		return "%s recovers qi." % member_name(j)
 	return ""

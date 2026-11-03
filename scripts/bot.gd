@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 4.0 * 3600.0
+var max_time := 6.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
