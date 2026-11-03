@@ -1,4 +1,4 @@
-extends Node2D
+extends Node
 ## Orchestrator: screen stack, input routing, story logic.
 
 var screens := {}
@@ -45,13 +45,13 @@ func _ready() -> void:
 		bot.main = self
 		add_child(bot)
 
-func _make(n: String) -> Node2D:
-	var node := Node2D.new()
+func _make(n: String) -> ScreenBase:
+	var node := ScreenBase.new()
 	node.set_script(load("res://scripts/%s.gd" % n))
 	node.setup(self)
 	node.name = n
 	add_child(node)
-	node.visible = false
+	node.show_screen(false)
 	screens[n] = node
 	return node
 
@@ -77,10 +77,14 @@ func _refresh() -> void:
 	for i in stack.size():
 		if screens[stack[i]].opaque:
 			first = i
-	for n in screens:
-		screens[n].visible = false
+	var shown := {}
 	for i in range(first, stack.size()):
-		screens[stack[i]].visible = true
+		shown[stack[i]] = true
+	for n in screens:
+		if not shown.has(n):
+			screens[n].show_screen(false)
+	for i in range(first, stack.size()):
+		screens[stack[i]].show_screen(true)
 
 # ---------------------------------------------------------------- input
 func _unhandled_input(ev: InputEvent) -> void:
@@ -91,6 +95,12 @@ func _unhandled_input(ev: InputEvent) -> void:
 			press("confirm")
 		KEY_ESCAPE, KEY_X:
 			press("cancel")
+		KEY_Q:
+			if top_name() == "world":
+				world.rotate_cam(-1)
+		KEY_E:
+			if top_name() == "world":
+				world.rotate_cam(1)
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -140,7 +150,7 @@ func game_finished_ack() -> void:
 # ---------------------------------------------------------------- flow
 func new_game() -> void:
 	Game.reset()
-	world.cache.clear()
+	world.clear_cache()
 	world.load_area("sect", Game.tile)
 	set_stack(["world"])
 	say([
@@ -229,6 +239,12 @@ func start_breakthrough() -> void:
 		push("battle")
 	)
 
+## After the Dao-Merging tribulation the Lotus Seal pulls Lin Feng home to the sect.
+func recall_to_sect() -> void:
+	world.load_area("sect", Vector2i(20, 9))
+	Game.note("The Lotus Seal recalls Lin Feng to the sect")
+	say(Data.DIALOGUE["recall"])
+
 func battle_done(outcome: String, ctx: Dictionary) -> void:
 	pop() # battle
 	match outcome:
@@ -241,10 +257,16 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					if Game.finished:
 						Game.note("Ending reached")
 						push("ending")
+					elif sid == "s_break6":
+						recall_to_sect()
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity
 				Game.boss_done[ctx.enemy] = true
+				if Data.BOSS_DROPS.has(ctx.enemy):
+					var drop: String = Data.BOSS_DROPS[ctx.enemy]
+					Game.add_item(drop)
+					Game.toast("Obtained %s" % Data.ITEMS[drop].n)
 				Game.note("Defeated " + Data.ENEMIES[ctx.enemy].n)
 				Game.advance()
 				var post: Array = Data.DIALOGUE.get("post:" + ctx.enemy, [])

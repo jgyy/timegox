@@ -6,13 +6,20 @@ extends Node
 var main
 var dir := ""
 
-# area -> [quest step shown in the HUD, player level]
-const STOPS := {
-	"sect": ["s_intro", 0], "bamboo": ["s_herbs", 1], "marsh": ["s_lotus", 3], "frost": ["s_jade", 6],
-	"thunder": ["s_shards", 9], "palace": ["s_hunt5", 11], "dragon": ["s_dr_pearl", 12],
-	"volcano": ["s_vo_collect", 13], "void": ["s_vd_collect", 15], "celestial": ["s_ce_collect", 16],
-}
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder"}
+
+func _stop(id: String) -> Array:
+	## [first quest step set in this area, a sensible player level]
+	var step_id := "s_intro"
+	for st in Data.STEPS:
+		if st.get("area", "") == id:
+			step_id = st.id
+			break
+	var lv := 0
+	var spec: Dictionary = Data.AREAS[id]
+	if spec.has("pool"):
+		lv = spec.pool[0][1]
+	return [step_id, lv]
 
 func _ready() -> void:
 	dir = main.args.tour
@@ -39,8 +46,12 @@ func _nearest_free(pos: Vector2i) -> Vector2i:
 func _run() -> void:
 	await _wait(1.0)
 	await _shot("01_title")
+	var only: PackedStringArray = str(main.args.get("areas", "")).split(",", false)
+	var skip_bosses: bool = main.args.has("no-bosses")
 	for id in Data.AREA_CHAIN:
-		var stop: Array = STOPS[id]
+		if not only.is_empty() and not only.has(id):
+			continue
+		var stop: Array = _stop(id)
 		Game.reset()
 		Game.level = stop[1]
 		Game.exp = Data.EXP_NEED[mini(Game.level, Data.EXP_NEED.size() - 1)] * 0.45
@@ -52,7 +63,7 @@ func _run() -> void:
 		for b in Data.ENEMIES:
 			if Data.ENEMIES[b].get("boss", false):
 				Game.boss_done.erase(b)
-		main.world.cache.clear()
+		main.world.clear_cache()
 		var spec: Dictionary = Data.AREAS[id]
 		var focus: Vector2i = Vector2i(14, 22)
 		if spec.has("bosses"):
@@ -65,6 +76,7 @@ func _run() -> void:
 		main.world.target = main.world.ptile
 		main.world.facing = Vector2i(1, 0)
 		main.world._snap_cam()
+		main.world.cam_q = 0
 		Game.tile = main.world.ptile
 		main.world.banner_t = 0.0
 		await _wait(1.2)
@@ -79,17 +91,23 @@ func _run() -> void:
 		main.battle.start(foes, {"entity": {"id": "x", "group": foes}, "boss": false, "theme": spec.theme})
 		main.push("battle")
 		await _wait(2.6)
-		main.battle.fx.append({"text": "1337! weak", "p": main.battle._pos(main.battle.foes[0]) + Vector2(0, -50), "t": 0.75, "col": Color("f6e85c"), "slash": ELEMS[id]})
+		main.battle.fx.append({"text": "1337! weak", "p": main.battle.head3(main.battle.foes[0]), "t": 0.75, "col": Color("f6e85c"), "slash": ELEMS[id]})
+		Fx3D.hit(main.battle.scene3d, main.battle.pos3(main.battle.foes[0]) + Vector3(0, 1.4, 0), ELEMS[id])
 		await _wait(0.12)
 		await _shot("battle_" + id)
 		main.pop()
 		# every boss of the region, one screenshot each
 		for b in spec.bosses:
+			if skip_bosses and b != spec.bosses[spec.bosses.size() - 1]:
+				continue
 			main.battle.start([{"id": b.id, "lv": b.lv}], {"entity": b, "boss": true, "enemy": b.id, "theme": spec.theme})
 			main.push("battle")
 			await _wait(2.8)
 			await _shot("battle_boss_" + b.id)
 			main.pop()
+	if main.args.has("no-extras"):
+		get_tree().quit(0)
+		return
 	# tribulation, meditation, menu, shop, dialogue, ending
 	Game.reset()
 	Game.level = 14

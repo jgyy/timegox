@@ -1,19 +1,14 @@
-extends Node2D
+extends ScreenBase
 ## Pause menu: meditate, breakthrough, items, status.
 
 const VIEW := Vector2(1280, 720)
 
-var main
-var opaque := false
 var mode := "root"
 var labels: Array = []
 var ids: Array = []
 var enabled: Array = []
 var cursor := 0
 var msg := ""
-
-func setup(m) -> void:
-	main = m
 
 func open() -> void:
 	mode = "root"
@@ -77,7 +72,7 @@ func press(act: String) -> void:
 					_build()
 
 func _process(_d: float) -> void:
-	queue_redraw()
+	redraw()
 
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0, 0, 0, 0.55))
@@ -97,7 +92,7 @@ func _draw() -> void:
 		UI.text(self, Vector2(430, 276), "Yue Ling   HP %d/%d   QI %d/%d" % [Game.hp[1], Game.max_hp(1), Game.qi[1], Game.max_qi(1)], 18, Color("ff9ac0"))
 	UI.text(self, Vector2(430, 320), "Techniques", 20, UI.C_GOLD)
 	var ki := 0
-	for sid in Data.known_skills(0, Game.level):
+	for sid in Data.known_skills(0, Game.level, Game.step):
 		var s: Dictionary = Data.SKILLS[sid]
 		var kp := Vector2(446 + (ki / 6) * 380, 350.0 + (ki % 6) * 24.0)
 		UI.text(self, kp, "%s   (%d qi, %s)" % [s.n, s.cost, s.elem], 16, Data.ELEM_COLORS[s.elem])

@@ -1,19 +1,13 @@
-extends Node2D
+extends ScreenBase
 ## Typewriter dialogue box.
 
 const VIEW := Vector2(1280, 720)
 const CPS := 45.0
 
-var main
-var opaque := false
 var lines: Array = []
 var idx := 0
 var shown := 0.0
 var cb: Callable = Callable()
-var t := 0.0
-
-func setup(m) -> void:
-	main = m
 
 func start(l: Array, callback: Callable = Callable()) -> void:
 	lines = l
@@ -31,7 +25,7 @@ func _process(d: float) -> void:
 	t += d
 	if main.top_name() == "dialogue" and not lines.is_empty():
 		shown += CPS * d
-	queue_redraw()
+	redraw()
 
 func press(act: String) -> void:
 	if act != "confirm" or lines.is_empty():
