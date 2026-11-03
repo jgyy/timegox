@@ -2,11 +2,6 @@ extends Node2D
 ## Turn-based combat.  Elemental weaknesses, qi costs, party support, boss heavy attacks.
 
 const VIEW := Vector2(1280, 720)
-const SKY := {
-	"sect": [Color("1c2a5a"), Color("7a6aa8")], "bamboo": [Color("14301e"), Color("6ab07a")],
-	"marsh": [Color("1e1226"), Color("7a4a5a")], "frost": [Color("12203a"), Color("a8d0f0")],
-	"thunder": [Color("0e0e1e"), Color("5a5a8a")], "palace": [Color("1a0408"), Color("8a2030")],
-}
 
 var main
 var opaque := true
@@ -353,33 +348,18 @@ func _select() -> void:
 # ---------------------------------------------------------------- drawing
 func _pos(f: Dictionary) -> Vector2:
 	if f.side == "party":
-		return Vector2(250 + f.idx * 130, 400 + f.idx * 75)
+		return Vector2(250 + f.idx * 130, 370 + f.idx * 62)
 	var i := foes.find(f)
 	if f.boss:
 		return Vector2(900, 380)
 	var n := foes.size()
 	if n == 1:
 		return Vector2(900, 400)
-	return Vector2(820 + (i % 2) * 150, 300 + i * 85)
+	return Vector2(820 + (i % 2) * 150, 285 + i * 78)
 
 func _draw() -> void:
-	var sky: Array = SKY.get(theme, SKY.bamboo)
-	draw_polygon(PackedVector2Array([Vector2(0, 0), Vector2(VIEW.x, 0), Vector2(VIEW.x, 480), Vector2(0, 480)]), PackedColorArray([sky[0], sky[0], sky[1], sky[1]]))
-	# parallax mountains
-	for layer in 3:
-		var col: Color = sky[1].darkened(0.25 + layer * 0.18)
-		var pts := PackedVector2Array([Vector2(0, 480)])
-		for i in 17:
-			var x := i * 85.0
-			pts.append(Vector2(x, 330 + layer * 40 - absf(sin(i * 1.3 + layer * 2.0)) * (90 - layer * 20)))
-		pts.append(Vector2(VIEW.x, 480))
-		draw_colored_polygon(pts, col)
-	draw_rect(Rect2(0, 470, VIEW.x, 250), sky[0].darkened(0.5))
-	draw_rect(Rect2(0, 470, VIEW.x, 6), Color(1, 1, 1, 0.12))
-	for i in 18:
-		var qx := fposmod(i * 83.0 + t * 12.0, VIEW.x)
-		var qy := 420.0 - fposmod(i * 37.0 + t * 20.0, 330.0)
-		draw_circle(Vector2(qx, qy), 2.0, Color(1, 1, 0.8, 0.3))
+	var sky: Array = Gfx.SKY.get(theme, Gfx.SKY.bamboo)
+	Gfx.battle_backdrop(self, theme, sky, t, VIEW)
 	# fighters
 	for f in foes:
 		_draw_fighter(f)
@@ -398,10 +378,12 @@ func _draw() -> void:
 		var a := clampf(p.t, 0.0, 1.0)
 		var pp: Vector2 = p.p + Vector2(0, -(1.0 - p.t) * 40.0)
 		if p.slash != "":
-			var sc: Color = Data.ELEM_COLORS.get(p.slash, Color.WHITE)
-			draw_line(pp + Vector2(-34, 40) * (1.0 - a * 0.2), pp + Vector2(34, 80), Color(sc.r, sc.g, sc.b, a), 5.0)
-		UI.text(self, pp, p.text, 30, Color(p.col.r, p.col.g, p.col.b, a), HORIZONTAL_ALIGNMENT_CENTER, 140)
-		pass
+			GfxActors.hit_fx(self, p.slash, p.p + Vector2(0, 55), 1.0 - p.t, t)
+		elif p.text.begins_with("+"):
+			for k in 6:
+				var ang := t * 3.0 + k * TAU / 6.0
+				Gfx.star4(self, p.p + Vector2(cos(ang) * 30.0, 50.0 + sin(ang) * 14.0 - (1.0 - a) * 30.0), 4.0, Color(0.5, 1, 0.8, a))
+		UI.text(self, pp + Vector2(-100, 0), p.text, 30, Color(p.col.r, p.col.g, p.col.b, a), HORIZONTAL_ALIGNMENT_CENTER, 340)
 	_draw_ui()
 
 func _draw_fighter(f: Dictionary) -> void:
@@ -416,6 +398,11 @@ func _draw_fighter(f: Dictionary) -> void:
 	var col: Color = f.col
 	if f.flash > 0.0:
 		col = col.lerp(Color.WHITE, 0.7)
+	if f.side == "party" and not f.dead:
+		GfxActors.lotus_seat(self, p + Vector2(0, 52), 0.55, t, Color(0.5, 0.85, 1.0))
+	if f.has("cur") or f == cur:
+		if state == "menu" or state == "acting":
+			Gfx.glow(self, p + Vector2(0, 20), 70.0, Color(1, 0.9, 0.5, 0.3), 5)
 	UI.monster(self, f.shape, p, s * f.fade, col, t, f.boss and not f.dead)
 	if not f.dead:
 		var bw := 100.0 if not f.boss else 180.0
