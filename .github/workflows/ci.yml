@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  GODOT_VERSION: "4.7.2"
+
+jobs:
+  test-and-playthrough:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot binary
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux
+
+      - name: Download Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+      - name: Import project
+        run: ~/godot/godot --headless --path . --import
+
+      - name: Data-integrity tests
+        run: ~/godot/godot --headless --path . --script tests/run_tests.gd
+
+      - name: Bot plays the whole game (must take >= 1h of game time)
+        run: |
+          ~/godot/godot --headless --fixed-fps 30 --path . -- \
+            --bot --seed=1234 --min-time=3600 --report=build/bot_report.json | tee build/bot_log.txt
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "### Bot playthrough"
+            echo '```'
+            sed -n '/BOT REPORT/,$p' build/bot_log.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-report
+          path: build/
