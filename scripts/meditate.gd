@@ -48,19 +48,31 @@ func _process(d: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	draw_polygon(PackedVector2Array([Vector2(0, 0), Vector2(VIEW.x, 0), Vector2(VIEW.x, VIEW.y), Vector2(0, VIEW.y)]), PackedColorArray([Color("0a0f28"), Color("0a0f28"), Color("2a1f48"), Color("2a1f48")]))
+	Gfx.vgrad(self, Rect2(Vector2.ZERO, VIEW), Color("0a0f28"), Color("2a1f48"))
+	Gfx.stars(self, Rect2(0, 0, VIEW.x, 400), t, 80, Color(0.8, 0.9, 1.0))
 	var c := Vector2(640, 330)
+	Gfx.rays(self, c, t, 10, 520.0, Color(0.5, 0.85, 1.0, 0.05), 0.12)
 	for i in 5:
 		draw_circle(c, 150 + i * 28 + sin(t * 2 + i) * 6, Color(0.4, 0.8, 1.0, 0.05))
+	# rotating rune circles
+	for ring in 2:
+		var rr := 190.0 + ring * 44.0
+		draw_arc(c, rr, 0.0, TAU, 60, Color(0.5, 0.85, 1.0, 0.35), 2.0)
+		for k in 12:
+			var a := TAU * k / 12.0 + t * (0.25 if ring == 0 else -0.18)
+			var rp := c + Vector2(cos(a) * rr, sin(a) * rr * 0.5)
+			Gfx.diamond(self, rp, 6.0 + ring * 2.0, Color(0.7, 0.95, 1.0, 0.7))
 	for m in motes:
 		var a: float = m.a + t * m.s * 0.6
 		var r: float = m.r * (0.75 + 0.25 * sin(t + m.a))
 		var p := c + Vector2(cos(a) * r, sin(a) * r * 0.55)
 		draw_circle(p, m.z, Color(0.6, 0.9, 1.0, 0.55))
-	draw_circle(c + Vector2(0, 88), 80, Color(0, 0, 0, 0.3))
-	UI.human(self, c + Vector2(0, 70), 3.2, Color("3a8ae8"), Color("1a1a2a"), t * 0.5)
+		draw_circle(p, m.z * 2.4, Color(0.6, 0.9, 1.0, 0.1))
+	GfxActors.lotus_seat(self, c + Vector2(0, 92), 1.2, t, Color(0.6, 0.9, 1.0))
+	Gfx.glow(self, c + Vector2(0, 20), 90.0, Color(0.5, 0.85, 1.0, 0.45), 6)
+	UI.human(self, c + Vector2(0, 70), 3.4, Color("3a8ae8"), Color("1a1a2a"), t * 0.5)
 	if Game.companion:
-		UI.human(self, c + Vector2(-160, 80), 2.6, Color("e86a9a"), Color("402030"), t * 0.5 + 1.0)
+		UI.human(self, c + Vector2(-170, 80), 2.7, Color("e86a9a"), Color("402030"), t * 0.5 + 1.0, false, {"ribbon": Color("ffb0cc")})
 	UI.text(self, Vector2(0, 90), "Meditation", 38, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 126), status, 18, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(340, 520, 600, 150))

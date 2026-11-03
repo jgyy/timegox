@@ -99,7 +99,7 @@ func heal_full() -> void:
 
 # ---------------------------------------------------------------- cultivation
 func exp_need() -> int:
-	return Data.EXP_NEED[mini(level, 11)]
+	return Data.EXP_NEED[mini(level, Data.EXP_NEED.size() - 1)]
 
 func at_cap() -> bool:
 	return Data.realm_cap(level) or level >= Data.MAX_LEVEL

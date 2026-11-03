@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 12
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation"]
+const MAX_LEVEL := 18
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -28,9 +28,14 @@ const SKILLS := {
 	"thunder": {"n": "Nine Heavens Thunder", "cost": 22, "mult": 2.8, "elem": "thunder", "tgt": "one", "lv": 6, "who": 0},
 	"quake": {"n": "Mountain Quake", "cost": 26, "mult": 1.7, "elem": "earth", "tgt": "all", "lv": 8, "who": 0},
 	"heaven": {"n": "Heaven-Cleaving Sword", "cost": 45, "mult": 4.2, "elem": "phys", "tgt": "one", "lv": 10, "who": 0},
+	"abyss": {"n": "Abyssal Tide", "cost": 55, "mult": 2.0, "elem": "water", "tgt": "all", "lv": 12, "who": 0},
+	"meteor": {"n": "Meteor Rain", "cost": 65, "mult": 2.3, "elem": "fire", "tgt": "all", "lv": 14, "who": 0},
+	"voidcut": {"n": "Void Rending Slash", "cost": 70, "mult": 5.4, "elem": "dark", "tgt": "one", "lv": 15, "who": 0},
+	"judgement": {"n": "Celestial Judgement", "cost": 90, "mult": 7.0, "elem": "thunder", "tgt": "one", "lv": 17, "who": 0},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
+	"starlight": {"n": "Starlight Rain", "cost": 40, "heal": 0.5, "elem": "water", "tgt": "allies", "lv": 13, "who": 1},
 }
 
 static func known_skills(who: int, level: int) -> Array:
@@ -75,7 +80,35 @@ const ENEMIES := {
 	"blood_acolyte": {"n": "Blood Acolyte", "elem": "dark", "weak": "water", "col": Color("b03a4a"), "shape": "humanoid"},
 	"bone_soldier": {"n": "Bone Soldier", "elem": "dark", "weak": "thunder", "col": Color("d8d0b8"), "shape": "humanoid"},
 	"shadow_fiend": {"n": "Shadow Fiend", "elem": "dark", "weak": "fire", "col": Color("5a3a8a"), "shape": "wraith"},
+	"coral_guard": {"n": "Coral Guard", "elem": "water", "weak": "thunder", "col": Color("e8806a"), "shape": "crab"},
+	"kelp_serpent": {"n": "Kelp Serpent", "elem": "wood", "weak": "fire", "col": Color("3f9a6a"), "shape": "serpent"},
+	"abyss_jelly": {"n": "Abyss Jelly", "elem": "water", "weak": "thunder", "col": Color("7ad8ff"), "shape": "jelly"},
+	"magma_slime": {"n": "Magma Slime", "elem": "fire", "weak": "water", "col": Color("ff6a2a"), "shape": "blob"},
+	"ash_salamander": {"n": "Ash Salamander", "elem": "fire", "weak": "water", "col": Color("d2582a"), "shape": "serpent"},
+	"ember_sprite": {"n": "Ember Sprite", "elem": "fire", "weak": "water", "col": Color("ffb040"), "shape": "wisp"},
+	"void_walker": {"n": "Void Walker", "elem": "dark", "weak": "thunder", "col": Color("7a50c8"), "shape": "wraith"},
+	"rift_spider": {"n": "Rift Spider", "elem": "dark", "weak": "fire", "col": Color("5a3a90"), "shape": "spider"},
+	"star_eater": {"n": "Star Eater", "elem": "dark", "weak": "thunder", "col": Color("b080ff"), "shape": "jelly"},
+	"celestial_guard": {"n": "Celestial Guard", "elem": "phys", "weak": "dark", "col": Color("f0e0a0"), "shape": "humanoid"},
+	"thunder_qilin": {"n": "Thunder Qilin", "elem": "thunder", "weak": "earth", "col": Color("ffe8a0"), "shape": "beast"},
+	"light_wisp": {"n": "Dawn Wisp", "elem": "phys", "weak": "dark", "col": Color("fffbe0"), "shape": "wisp"},
 	# bosses
+	"crab_general": {"n": "Armored Crab General", "elem": "water", "weak": "thunder", "col": Color("d0502a"), "shape": "crab", "boss": true},
+	"tide_hydra": {"n": "Many-Headed Tide Hydra", "elem": "water", "weak": "thunder", "col": Color("2a9a8a"), "shape": "serpent", "boss": true},
+	"cinder_behemoth": {"n": "Cinder Behemoth", "elem": "fire", "weak": "water", "col": Color("c04a1a"), "shape": "golem", "boss": true},
+	"star_devourer": {"n": "Star Devourer", "elem": "dark", "weak": "thunder", "col": Color("8a60ff"), "shape": "jelly", "boss": true},
+	"lightning_magistrate": {"n": "Lightning Magistrate", "elem": "thunder", "weak": "earth", "col": Color("d8e8ff"), "shape": "storm", "boss": true},
+	"siren_queen": {"n": "Siren Queen", "elem": "water", "weak": "thunder", "col": Color("4ac0c8"), "shape": "wraith", "boss": true},
+	"dragon_king": {"n": "Azure Dragon King", "elem": "water", "weak": "thunder", "col": Color("3a8ad8"), "shape": "dragon", "boss": true},
+	"lava_titan": {"n": "Lava Titan", "elem": "fire", "weak": "water", "col": Color("e0501a"), "shape": "golem", "boss": true},
+	"ash_phoenix": {"n": "Ash Phoenix", "elem": "fire", "weak": "water", "col": Color("ff8a2a"), "shape": "phoenix", "boss": true},
+	"inferno_lord": {"n": "Inferno Lord Chi Yan", "elem": "fire", "weak": "water", "col": Color("ff3a1a"), "shape": "demon", "boss": true},
+	"rift_weaver": {"n": "Rift Weaver", "elem": "dark", "weak": "fire", "col": Color("6a40b0"), "shape": "spider", "boss": true},
+	"void_sentinel": {"n": "Void Sentinel", "elem": "dark", "weak": "thunder", "col": Color("4a3a78"), "shape": "golem", "boss": true},
+	"chaos_serpent": {"n": "Chaos Serpent", "elem": "dark", "weak": "fire", "col": Color("9a50e0"), "shape": "serpent", "boss": true},
+	"heaven_general": {"n": "Heavenly General Tian Wei", "elem": "phys", "weak": "dark", "col": Color("e8d080"), "shape": "demon", "boss": true},
+	"azure_qilin": {"n": "Azure Qilin", "elem": "thunder", "weak": "earth", "col": Color("80d0ff"), "shape": "beast", "boss": true},
+	"heavenly_emperor": {"n": "Jade Emperor of Ruin", "elem": "thunder", "weak": "dark", "col": Color("fff0a0"), "shape": "phoenix", "boss": true},
 	"iron_fang": {"n": "Iron Fang", "elem": "phys", "weak": "water", "col": Color("c0603a"), "shape": "humanoid", "boss": true},
 	"bamboo_spirit": {"n": "Ancient Bamboo Spirit", "elem": "wood", "weak": "fire", "col": Color("4fc07a"), "shape": "plant", "boss": true},
 	"marsh_hag": {"n": "Marsh Hag", "elem": "dark", "weak": "fire", "col": Color("7a4a8f"), "shape": "wraith", "boss": true},
@@ -110,7 +143,7 @@ static func make_enemy(id: String, lv: int, boss_mult: float = 1.0) -> Dictionar
 	}
 
 static func enemy_exp(lv: int, boss: bool) -> int:
-	var base: int = ENEMY_EXP[mini(lv, 11)]
+	var base: int = ENEMY_EXP[mini(lv, ENEMY_EXP.size() - 1)]
 	return base * (4 if boss else 1)
 
 static func enemy_stones(lv: int, boss: bool) -> int:
@@ -198,7 +231,10 @@ const AREAS := {
 	"palace": {
 		"n": "Blood Moon Palace", "w": 90, "h": 56, "seed": 61, "theme": "palace", "enemies": 16,
 		"pool": [["blood_acolyte", 11, 11], ["bone_soldier", 11, 11], ["shadow_fiend", 11, 11]],
-		"portals": [{"to": "thunder", "pos": Vector2i(1, 28), "dest": Vector2i(84, 25), "open": ""}],
+		"portals": [
+			{"to": "thunder", "pos": Vector2i(1, 28), "dest": Vector2i(84, 25), "open": ""},
+			{"to": "dragon", "pos": Vector2i(88, 28), "dest": Vector2i(4, 28), "open": "s_break4"},
+		],
 		"bosses": [
 			{"id": "blood_hound", "pos": Vector2i(48, 22), "lv": 11, "req": 11},
 			{"id": "general_blood", "pos": Vector2i(32, 12), "lv": 11, "req": 11},
@@ -206,9 +242,86 @@ const AREAS := {
 			{"id": "demon_lord", "pos": Vector2i(80, 28), "lv": 12, "req": 11},
 		],
 	},
+	"dragon": {
+		"n": "Sunken Dragon Palace", "w": 92, "h": 56, "seed": 71, "theme": "abyss", "enemies": 18,
+		"pool": [["coral_guard", 12, 13], ["kelp_serpent", 12, 13], ["abyss_jelly", 12, 13]],
+		"portals": [
+			{"to": "palace", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
+			{"to": "volcano", "pos": Vector2i(90, 28), "dest": Vector2i(4, 28), "open": "s_dr_king"},
+		],
+		"npcs": [{"id": "dragon_envoy", "n": "Envoy Ao Lan", "pos": Vector2i(10, 26), "col": Color("6ae0e8"), "vis": ["s_dr_intro", ""]}],
+		"bosses": [
+			{"id": "crab_general", "pos": Vector2i(34, 14), "lv": 12, "req": 12},
+			{"id": "tide_hydra", "pos": Vector2i(46, 28), "lv": 12, "req": 12},
+			{"id": "siren_queen", "pos": Vector2i(56, 42), "lv": 13, "req": 13},
+			{"id": "dragon_king", "pos": Vector2i(80, 26), "lv": 13, "req": 13},
+		],
+		"pickups": [
+			{"id": "pearl1", "item": "pearl", "pos": Vector2i(22, 44)}, {"id": "pearl2", "item": "pearl", "pos": Vector2i(40, 10)},
+			{"id": "pearl3", "item": "pearl", "pos": Vector2i(60, 14)}, {"id": "pearl4", "item": "pearl", "pos": Vector2i(72, 46)},
+		],
+		"pickup_vis": "s_dr_pearl",
+	},
+	"volcano": {
+		"n": "Ashen Volcano", "w": 94, "h": 56, "seed": 81, "theme": "volcano", "enemies": 18,
+		"pool": [["magma_slime", 13, 14], ["ash_salamander", 13, 14], ["ember_sprite", 13, 14]],
+		"portals": [
+			{"to": "dragon", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
+			{"to": "void", "pos": Vector2i(92, 28), "dest": Vector2i(4, 28), "open": "s_break5"},
+		],
+		"npcs": [{"id": "fire_sage", "n": "Sage Chi Rong", "pos": Vector2i(10, 26), "col": Color("ff9a5a"), "vis": ["s_vo_intro", ""]}],
+		"bosses": [
+			{"id": "lava_titan", "pos": Vector2i(36, 40), "lv": 13, "req": 13},
+			{"id": "cinder_behemoth", "pos": Vector2i(48, 24), "lv": 13, "req": 13},
+			{"id": "ash_phoenix", "pos": Vector2i(58, 12), "lv": 14, "req": 14},
+			{"id": "inferno_lord", "pos": Vector2i(82, 30), "lv": 14, "req": 14},
+		],
+		"pickups": [
+			{"id": "ember1", "item": "ember", "pos": Vector2i(20, 12)}, {"id": "ember2", "item": "ember", "pos": Vector2i(42, 46)},
+			{"id": "ember3", "item": "ember", "pos": Vector2i(64, 28)}, {"id": "ember4", "item": "ember", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_vo_collect",
+	},
+	"void": {
+		"n": "Void Rift Expanse", "w": 96, "h": 58, "seed": 91, "theme": "void", "enemies": 20,
+		"pool": [["void_walker", 15, 16], ["rift_spider", 15, 16], ["star_eater", 15, 16]],
+		"portals": [
+			{"to": "volcano", "pos": Vector2i(1, 28), "dest": Vector2i(88, 28), "open": ""},
+			{"to": "celestial", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_vd_serpent"},
+		],
+		"npcs": [{"id": "void_hermit", "n": "Hermit Wu Ji", "pos": Vector2i(10, 26), "col": Color("c0a0ff"), "vis": ["s_vd_intro", ""]}],
+		"bosses": [
+			{"id": "rift_weaver", "pos": Vector2i(30, 14), "lv": 15, "req": 15},
+			{"id": "star_devourer", "pos": Vector2i(40, 30), "lv": 15, "req": 15},
+			{"id": "void_sentinel", "pos": Vector2i(52, 44), "lv": 16, "req": 16},
+			{"id": "chaos_serpent", "pos": Vector2i(84, 26), "lv": 16, "req": 16},
+		],
+		"pickups": [
+			{"id": "star1", "item": "star", "pos": Vector2i(24, 46)}, {"id": "star2", "item": "star", "pos": Vector2i(44, 12)},
+			{"id": "star3", "item": "star", "pos": Vector2i(66, 40)}, {"id": "star4", "item": "star", "pos": Vector2i(78, 12)},
+		],
+		"pickup_vis": "s_vd_collect",
+	},
+	"celestial": {
+		"n": "Celestial Gate", "w": 98, "h": 58, "seed": 101, "theme": "celestial", "enemies": 20,
+		"pool": [["celestial_guard", 16, 17], ["thunder_qilin", 16, 17], ["light_wisp", 16, 17]],
+		"portals": [{"to": "void", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""}],
+		"npcs": [{"id": "gate_keeper", "n": "Gatekeeper Bai Ze", "pos": Vector2i(10, 26), "col": Color("fff0b0"), "vis": ["s_ce_intro", ""]}],
+		"bosses": [
+			{"id": "heaven_general", "pos": Vector2i(32, 40), "lv": 16, "req": 16},
+			{"id": "lightning_magistrate", "pos": Vector2i(46, 28), "lv": 16, "req": 16},
+			{"id": "azure_qilin", "pos": Vector2i(58, 14), "lv": 17, "req": 17},
+			{"id": "heavenly_emperor", "pos": Vector2i(88, 28), "lv": 17, "req": 17},
+		],
+		"pickups": [
+			{"id": "sigil1", "item": "sigil", "pos": Vector2i(22, 12)}, {"id": "sigil2", "item": "sigil", "pos": Vector2i(40, 46)},
+			{"id": "sigil3", "item": "sigil", "pos": Vector2i(64, 40)}, {"id": "sigil4", "item": "sigil", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_ce_collect",
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial"]
 
 # ---------------------------------------------------------------- quest chain
 # kind: talk (npc) | level (lv) | collect (item,n) | kill (boss) | breakthrough
@@ -249,7 +362,38 @@ const STEPS := [
 	{"id": "s_gen1", "kind": "kill", "boss": "general_blood", "area": "palace", "t": "Defeat General Xue Sha"},
 	{"id": "s_gen2", "kind": "kill", "boss": "general_shadow", "area": "palace", "t": "Defeat General Mo Ying"},
 	{"id": "s_lord", "kind": "kill", "boss": "demon_lord", "area": "palace", "t": "Defeat Demon Lord Xu Mo"},
-	{"id": "s_break4", "kind": "breakthrough", "to": 12, "t": "Endure the Ascension Tribulation"},
+	{"id": "s_break4", "kind": "breakthrough", "to": 12, "t": "Endure the Deity Tribulation"},
+	# ---- Part II: The Shattered Heavens
+	{"id": "s_dr_intro", "kind": "talk", "npc": "dragon_envoy", "area": "dragon", "t": "Seek the Dragon Palace envoy beyond the Blood Moon Palace", "stones": 600},
+	{"id": "s_dr_pearl", "kind": "collect", "item": "pearl", "n": 4, "area": "dragon", "t": "Recover 4 Dragon Pearls from the sunken halls"},
+	{"id": "s_dr_hunt", "kind": "hunt", "area": "dragon", "n": 28, "t": "Drive off the Dragon Palace's corrupted guardians"},
+	{"id": "s_dr_crab", "kind": "kill", "boss": "crab_general", "area": "dragon", "t": "Crack the Armored Crab General"},
+	{"id": "s_dr_hydra", "kind": "kill", "boss": "tide_hydra", "area": "dragon", "t": "Cut down the Many-Headed Tide Hydra"},
+	{"id": "s_dr_siren", "kind": "kill", "boss": "siren_queen", "area": "dragon", "t": "Silence the Siren Queen"},
+	{"id": "s_dr_king", "kind": "kill", "boss": "dragon_king", "area": "dragon", "t": "Free the Azure Dragon King from the rift's grip", "stones": 800},
+	{"id": "s_vo_intro", "kind": "talk", "npc": "fire_sage", "area": "volcano", "t": "Find Sage Chi Rong in the Ashen Volcano"},
+	{"id": "s_vo_collect", "kind": "collect", "item": "ember", "n": 4, "area": "volcano", "t": "Gather 4 Phoenix Embers"},
+	{"id": "s_vo_hunt", "kind": "hunt", "area": "volcano", "n": 28, "t": "Burn back the fire-spawn of the volcano"},
+	{"id": "s_vo_titan", "kind": "kill", "boss": "lava_titan", "area": "volcano", "t": "Topple the Lava Titan"},
+	{"id": "s_vo_behemoth", "kind": "kill", "boss": "cinder_behemoth", "area": "volcano", "t": "Smother the Cinder Behemoth"},
+	{"id": "s_vo_phoenix", "kind": "kill", "boss": "ash_phoenix", "area": "volcano", "t": "Quench the Ash Phoenix"},
+	{"id": "s_vo_lord", "kind": "kill", "boss": "inferno_lord", "area": "volcano", "t": "Defeat Inferno Lord Chi Yan", "stones": 1000},
+	{"id": "s_break5", "kind": "breakthrough", "to": 15, "t": "Break through to Void Refinement"},
+	{"id": "s_vd_intro", "kind": "talk", "npc": "void_hermit", "area": "void", "t": "Speak with the hermit in the Void Rift Expanse"},
+	{"id": "s_vd_collect", "kind": "collect", "item": "star", "n": 4, "area": "void", "t": "Collect 4 Star Fragments adrift in the void"},
+	{"id": "s_vd_hunt", "kind": "hunt", "area": "void", "n": 30, "t": "Cut down the void-born horrors"},
+	{"id": "s_vd_weaver", "kind": "kill", "boss": "rift_weaver", "area": "void", "t": "Sever the Rift Weaver's threads"},
+	{"id": "s_vd_devourer", "kind": "kill", "boss": "star_devourer", "area": "void", "t": "Starve the Star Devourer"},
+	{"id": "s_vd_sentinel", "kind": "kill", "boss": "void_sentinel", "area": "void", "t": "Shatter the Void Sentinel"},
+	{"id": "s_vd_serpent", "kind": "kill", "boss": "chaos_serpent", "area": "void", "t": "Slay the Chaos Serpent", "stones": 1200},
+	{"id": "s_ce_intro", "kind": "talk", "npc": "gate_keeper", "area": "celestial", "t": "Approach the Gatekeeper of the Celestial Gate"},
+	{"id": "s_ce_collect", "kind": "collect", "item": "sigil", "n": 4, "area": "celestial", "t": "Gather 4 Heaven Sigils to unseal the Gate"},
+	{"id": "s_ce_hunt", "kind": "hunt", "area": "celestial", "n": 30, "t": "Cleanse the Celestial Gate of its fallen guardians"},
+	{"id": "s_ce_general", "kind": "kill", "boss": "heaven_general", "area": "celestial", "t": "Defeat Heavenly General Tian Wei"},
+	{"id": "s_ce_magistrate", "kind": "kill", "boss": "lightning_magistrate", "area": "celestial", "t": "Overturn the Lightning Magistrate's verdict"},
+	{"id": "s_ce_qilin", "kind": "kill", "boss": "azure_qilin", "area": "celestial", "t": "Calm the Azure Qilin"},
+	{"id": "s_ce_emperor", "kind": "kill", "boss": "heavenly_emperor", "area": "celestial", "t": "Confront the Jade Emperor of Ruin"},
+	{"id": "s_break6", "kind": "breakthrough", "to": 18, "t": "Endure the Dao-Merging Tribulation"},
 ]
 
 static func step_index(id: String) -> int:
@@ -266,8 +410,12 @@ const ITEMS := {
 	"lotus": {"n": "Blood Lotus", "desc": "Quest item"},
 	"jade": {"n": "Frost Jade", "desc": "Quest item"},
 	"shard": {"n": "Thunder Shard", "desc": "Quest item"},
+	"pearl": {"n": "Dragon Pearl", "desc": "Quest item"},
+	"ember": {"n": "Phoenix Ember", "desc": "Quest item"},
+	"star": {"n": "Star Fragment", "desc": "Quest item"},
+	"sigil": {"n": "Heaven Sigil", "desc": "Quest item"},
 }
-const TEMPER_COST := [250, 700, 1500, 2800, 4500]
+const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -279,6 +427,10 @@ const CHAT := {
 	"smith": ["Steel remembers every blow. Bring me stones and I will temper your sword.", "A sword is only as sharp as its wielder's resolve."],
 	"yue_ling": ["Let us go, Lin Feng.", "I will keep your wounds in check."],
 	"sword_ghost": ["Thunder answers those who do not flinch."],
+	"dragon_envoy": ["The tide remembers every promise. Do not break yours.", "Pearls glow brighter near the king's throne."],
+	"fire_sage": ["Fire does not hate. It simply consumes. Be the hand that guides it.", "The embers are warm because they remember the Phoenix."],
+	"void_hermit": ["There is no up or down here. Only forward.", "Do not stare at the stars too long. They stare back."],
+	"gate_keeper": ["The Gate has opened for three. Closed for ten thousand.", "Mind your step. Light is not always kind."],
 }
 
 const DIALOGUE := {
@@ -455,5 +607,170 @@ const DIALOGUE := {
 	],
 	"post:s_break4": [
 		["Narrator", "The final bolt falls and, with it, the shackles of the mortal realm. Lin Feng ascends to Deity Transformation."],
+		["Yue Ling", "Lin Feng... the sky. It is not healing. Look, the clouds are cracking like glass."],
+		["Narrator", "Beyond the throne of the fallen Demon Lord, a new gate shimmers open: a rift leading down into the sunken halls of the Dragon Palace."],
+		["Lin Feng", "Xu Mo was only a warden. Something older has been draining the heavens. Let us follow the rift."],
+	],
+	"s_dr_intro": [
+		["Envoy Ao Lan", "A mortal who has slain the Demon Lord walks into the Dragon Palace? Then the old prophecy was not a lie."],
+		["Envoy Ao Lan", "The Azure Dragon King holds the tide that keeps the rift sealed. Something has seized his heart and turned his guards against us."],
+		["Envoy Ao Lan", "Recover four Dragon Pearls from the sunken halls. Only their light can break the corruption."],
+		["Lin Feng", "Tell me where to start."],
+		["Envoy Ao Lan", "Everywhere. The sea has teeth tonight."],
+	],
+	"pre:crab_general": [
+		["Armored Crab General", "Halt, surface-dweller! By the king's order, none pass the Coral Gate!"],
+		["Yue Ling", "His shell is thick. Lightning will find the seam."],
+	],
+	"post:crab_general": [
+		["Armored Crab General", "The king... was not... himself... find the Siren..."],
+	],
+	"pre:tide_hydra": [
+		["Many-Headed Tide Hydra", "Nine mouths, nine hungers. Which of you shall feed us first?"],
+		["Yue Ling", "Cut one head and two grow. Strike the body, Lin Feng!"],
+	],
+	"post:tide_hydra": [
+		["Lin Feng", "The tide is calmer. The Siren's song grows louder, though."],
+	],
+	"pre:siren_queen": [
+		["Siren Queen", "Sing with me, little swordsman. Sing until your sword forgets your hand."],
+		["Yue Ling", "Do not listen to the song, Lin Feng! Strike through it!"],
+	],
+	"post:siren_queen": [
+		["Siren Queen", "He promised us the sun... the Emperor promised us the sun..."],
+		["Lin Feng", "The Emperor again. Whoever he is, he has been whispering to everyone."],
+	],
+	"pre:dragon_king": [
+		["Azure Dragon King", "Who disturbs the tide? Ah... the little cultivator. How you have grown."],
+		["Azure Dragon King", "I am sorry. I cannot hold the sea back any longer. Run, or fight me with everything you have!"],
+	],
+	"post:dragon_king": [
+		["Azure Dragon King", "You freed me. The rift beneath the volcano feeds on the heavens. Go to the Ashen Volcano, find Sage Chi Rong. Take this pearl as proof."],
+		["Yue Ling", "A dragon king in our debt. Not bad for a sweeper."],
+	],
+	"s_vo_intro": [
+		["Sage Chi Rong", "You smell of salt and thunder. The Dragon King sent you. Good."],
+		["Sage Chi Rong", "This volcano sleeps above a wound in the world. Phoenix Embers can cauterise it, but the Phoenix itself has gone mad."],
+		["Sage Chi Rong", "Gather four Embers. Then deal with the fire-spawn, the Titan, the Phoenix, and the Lord who commands them."],
+		["Lin Feng", "A short list."],
+		["Sage Chi Rong", "A long list, if you are careless. Do not be careless."],
+	],
+	"pre:lava_titan": [
+		["Lava Titan", "RRRRUMMMMBLE. Stone. Fire. Break."],
+		["Yue Ling", "Water will crack that crust, Lin Feng!"],
+	],
+	"post:lava_titan": [
+		["Lin Feng", "It crumbled like a cooling forge. The path up is open."],
+	],
+	"pre:cinder_behemoth": [
+		["Cinder Behemoth", "...embers... cold... feed me... fire..."],
+		["Sage Chi Rong", "It is a forge-beast, hollowed by despair. Douse it, quickly!"],
+	],
+	"post:cinder_behemoth": [
+		["Sage Chi Rong", "The ash settles. The Phoenix waits above."],
+	],
+	"pre:ash_phoenix": [
+		["Ash Phoenix", "KREEEE! The sky burns! The sky burns and I burn with it!"],
+		["Yue Ling", "It is not malice, it is pain. Put out the fire, Lin Feng!"],
+	],
+	"post:ash_phoenix": [
+		["Ash Phoenix", "Child of the Nine Heavens... the Emperor... pulled the strings... end it..."],
+	],
+	"pre:inferno_lord": [
+		["Inferno Lord Chi Yan", "I am the last flame of the Blood Moon. My master's will burns brighter than your sword."],
+		["Lin Feng", "Your master is dead, Chi Yan."],
+		["Inferno Lord Chi Yan", "My master is the one above him. Now burn!"],
+	],
+	"post:inferno_lord": [
+		["Inferno Lord Chi Yan", "Ahh... cold... the Emperor... will drain you too..."],
+		["Sage Chi Rong", "It is done. The volcano calms. Now, you must break through. The void will not tolerate a Deity as weak as you."],
+	],
+	"pre:s_break5": [
+		["Narrator", "Rivers of flame gather overhead and form a spiralling funnel. The Heavens test the Deity who would pass into the Void."],
+	],
+	"post:s_break5": [
+		["Narrator", "The fire fades into cold starlight. Lin Feng stands in Void Refinement, no longer bound by the weight of the earth."],
+		["Sage Chi Rong", "The Void Rift lies beyond the volcano's eastern slope. Find Hermit Wu Ji. He knows the Emperor's name."],
+	],
+	"s_vd_intro": [
+		["Hermit Wu Ji", "You came through the fire. Few do. Sit. There is no hurry in the void."],
+		["Hermit Wu Ji", "The Jade Emperor of Ruin was once the first ascended being. He has been consuming the heavens to make himself a god without equals."],
+		["Hermit Wu Ji", "Collect four Star Fragments. Forged together, they can pierce the Gate that he guards."],
+		["Yue Ling", "And the horrors?"],
+		["Hermit Wu Ji", "They are his tears. Cut them down, and cut down the three who shepherd them."],
+	],
+	"pre:rift_weaver": [
+		["Rift Weaver", "Tssss... fresh threads for my loom. Such bright, bright threads..."],
+		["Yue Ling", "Fire will burn its silk!"],
+	],
+	"post:rift_weaver": [
+		["Lin Feng", "Its web is gone. The way deeper is clear."],
+	],
+	"pre:star_devourer": [
+		["Star Devourer", "Hungry. Hungry. Your light tastes of dawn."],
+		["Hermit Wu Ji", "It swallowed a dozen constellations. Lightning will tear it open!"],
+	],
+	"post:star_devourer": [
+		["Lin Feng", "The stars it swallowed drift free again. Beautiful."],
+	],
+	"pre:void_sentinel": [
+		["Void Sentinel", "INTRUDER. THE EMPEROR'S DECREE: NONE SHALL PASS."],
+		["Lin Feng", "Then break the decree, or I will."],
+	],
+	"post:void_sentinel": [
+		["Void Sentinel", "DECREE... FULFILLED... THE GATE... STILL STANDS..."],
+	],
+	"pre:chaos_serpent": [
+		["Chaos Serpent", "Ssssso small, so bright. The Emperor will wear your light as a crown."],
+		["Yue Ling", "It feeds on hesitation. Strike first, Lin Feng!"],
+	],
+	"post:chaos_serpent": [
+		["Hermit Wu Ji", "You have done what I could not in a thousand years. The Celestial Gate lies ahead. Be ready for him."],
+	],
+	"s_ce_intro": [
+		["Gatekeeper Bai Ze", "You have the look of someone who has already won, and lost, and won again. Welcome to the Celestial Gate."],
+		["Gatekeeper Bai Ze", "Beyond this Gate sits the Jade Emperor of Ruin. His generals, his sacred beast, and his throne guard the way."],
+		["Gatekeeper Bai Ze", "Collect four Heaven Sigils to unseal the Gate, and cleanse its fallen guardians."],
+		["Lin Feng", "And then?"],
+		["Gatekeeper Bai Ze", "Then the heavens decide who deserves them."],
+	],
+	"pre:heaven_general": [
+		["Heavenly General Tian Wei", "Mortal-born. Unworthy. I shall return you to the dust from which you were raised."],
+		["Yue Ling", "His armor is blessed. The dark will crack it!"],
+	],
+	"post:heaven_general": [
+		["Heavenly General Tian Wei", "I served the Heavens... not him... forgive me..."],
+	],
+	"pre:lightning_magistrate": [
+		["Lightning Magistrate", "The court is in session. The charge: ascending without leave. The sentence: thunder."],
+		["Lin Feng", "I appeal the verdict, with my sword."],
+	],
+	"post:lightning_magistrate": [
+		["Lightning Magistrate", "Case dismissed... the Qilin awaits..."],
+	],
+	"pre:azure_qilin": [
+		["Azure Qilin", "I was a guardian once. Now I only remember the thunder. Forgive me, child."],
+	],
+	"post:azure_qilin": [
+		["Azure Qilin", "Thank you. The Emperor's throne is a mirror. Do not look away."],
+		["Yue Ling", "Lin Feng, this is it."],
+	],
+	"pre:heavenly_emperor": [
+		["Jade Emperor of Ruin", "At last, the Nine Heavens root. I have waited a thousand years for you to ripen."],
+		["Lin Feng", "I am not fruit to be picked."],
+		["Jade Emperor of Ruin", "Every flame I have lit has led you here. Come. Become my crown."],
+		["Yue Ling", "I'm with you, always."],
+	],
+	"post:heavenly_emperor": [
+		["Jade Emperor of Ruin", "Impossible... a sweeper... who sweeps even gods aside..."],
+		["Narrator", "The Emperor's throne shatters. The heavens above ring like a great bell, then fall silent."],
+		["Yue Ling", "It's over. The sky is whole again. Lin Feng, one last trial awaits."],
+	],
+	"pre:s_break6": [
+		["Narrator", "Nine layers of tribulation cloud swallow the sky. The Heavens do not let any being merge with the Dao without trial."],
+		["Lin Feng", "Come, then. I have swept these steps for three years. I fear nothing."],
+	],
+	"post:s_break6": [
+		["Narrator", "The final bolt falls and, with it, the last chain between Lin Feng and the Dao. He ascends to Dao Merging, and the heavens open their gates."],
 	],
 }

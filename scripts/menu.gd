@@ -96,12 +96,13 @@ func _draw() -> void:
 	if Game.companion:
 		UI.text(self, Vector2(430, 276), "Yue Ling   HP %d/%d   QI %d/%d" % [Game.hp[1], Game.max_hp(1), Game.qi[1], Game.max_qi(1)], 18, Color("ff9ac0"))
 	UI.text(self, Vector2(430, 320), "Techniques", 20, UI.C_GOLD)
-	var y := 350.0
+	var ki := 0
 	for sid in Data.known_skills(0, Game.level):
 		var s: Dictionary = Data.SKILLS[sid]
-		UI.text(self, Vector2(446, y), "%s   (%d qi, %s)" % [s.n, s.cost, s.elem], 16, Data.ELEM_COLORS[s.elem])
-		y += 24
-	UI.text(self, Vector2(430, 530), "Spirit stones: %d    Sword tempering: %d/5" % [Game.stones, Game.temper], 17)
+		var kp := Vector2(446 + (ki / 6) * 380, 350.0 + (ki % 6) * 24.0)
+		UI.text(self, kp, "%s   (%d qi, %s)" % [s.n, s.cost, s.elem], 16, Data.ELEM_COLORS[s.elem])
+		ki += 1
+	UI.text(self, Vector2(430, 530), "Spirit stones: %d    Sword tempering: %d/%d" % [Game.stones, Game.temper, Data.TEMPER_COST.size()], 17)
 	UI.text(self, Vector2(430, 560), "Objective: " + Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 770)
 	UI.text(self, Vector2(430, 610), "Play time %s" % Fmt.clock(Game.playtime), 15, UI.C_DIM)
 	if msg != "":
