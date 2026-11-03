@@ -9,7 +9,23 @@ var c := PackedColorArray()
 var idx := PackedInt32Array()
 
 static var _protos := {}
-static var _mat_vc: StandardMaterial3D = null
+static var _mat_vc: ShaderMaterial = null
+## cel-shaded vertex-colour material: stepped diffuse, soft rim light, gentle colour lift
+const TOON := """
+shader_type spatial;
+render_mode diffuse_toon, specular_disabled;
+uniform vec3 rim_col : source_color = vec3(1.0, 0.92, 0.85);
+void fragment() {
+	vec3 c = COLOR.rgb;
+	float l = dot(c, vec3(0.299, 0.587, 0.114));
+	c = mix(vec3(l), c, 1.08);
+	ALBEDO = c * 0.88;
+	ROUGHNESS = 1.0;
+	RIM = 0.55;
+	RIM_TINT = 0.5;
+}
+"""
+
 static var _mat_glow: StandardMaterial3D = null
 static var _mat_glass: StandardMaterial3D = null
 
@@ -174,13 +190,12 @@ func build(mat: Material = null) -> ArrayMesh:
 	return mesh
 
 # ---------------------------------------------------------------- materials
-static func mat_vc() -> StandardMaterial3D:
+static func mat_vc() -> Material:
 	if _mat_vc == null:
-		_mat_vc = StandardMaterial3D.new()
-		_mat_vc.vertex_color_use_as_albedo = true
-		_mat_vc.roughness = 0.85
-		_mat_vc.metallic = 0.0
-		_mat_vc.cull_mode = BaseMaterial3D.CULL_BACK
+		_mat_vc = ShaderMaterial.new()
+		var sh := Shader.new()
+		sh.code = TOON
+		_mat_vc.shader = sh
 	return _mat_vc
 
 ## unshaded additive-looking glow (colour alpha controls intensity)

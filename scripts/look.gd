@@ -41,8 +41,34 @@ const PICKUP_COLORS := {
 	"echo": Color("9ae8ff"), "relic": Color("d8e0f0"), "sand": Color("ffd060"), "rune": Color("ffb0f0"),
 }
 
+static var _anime := {}
+
+## Gacha-anime grade: lift every colour into a bright, clean, saturated pastel range.
+static func _pop(c: Color, s_min: float, s_max: float, v_min: float, v_max: float, s_mul: float = 1.15) -> Color:
+	var h := c.h
+	var sat := clampf(c.s * s_mul + 0.04, s_min, s_max)
+	var val := clampf(c.v * 1.08 + 0.04, v_min, v_max)
+	return Color.from_hsv(h, sat, val, c.a)
+
 static func theme(name: String) -> Dictionary:
-	return THEMES.get(name, THEMES.bamboo)
+	if _anime.has(name):
+		return _anime[name]
+	var th: Dictionary = THEMES.get(name, THEMES.bamboo).duplicate()
+	for k in ["g1", "g2"]:
+		th[k] = _pop(th[k], 0.3, 0.52, 0.48, 0.66)
+	th["path"] = _pop(th.path, 0.2, 0.5, 0.6, 0.82)
+	th["wall"] = _pop(th.wall, 0.4, 0.8, 0.4, 0.78, 1.3)
+	th["water"] = _pop(th.water, 0.5, 0.85, 0.5, 0.85, 1.2)
+	th["sky_top"] = _pop(th.sky_top, 0.5, 0.85, 0.45, 0.85, 1.25)
+	th["sky_hor"] = _pop(th.sky_hor, 0.25, 0.6, 0.78, 0.95, 1.0)
+	th["fog"] = th.sky_hor.lerp(th.g2, 0.25)
+	th["fog_d"] = th.fog_d * 0.7
+	th["amb"] = th.amb.lerp(Color(0.85, 0.9, 1.0), 0.35)
+	th["amb_e"] = clampf(th.amb_e, 0.5, 0.62)
+	th["sun"] = th.sun.lerp(Color(1.0, 0.93, 0.82), 0.4)
+	th["sun_e"] = clampf(th.sun_e, 0.8, 0.9)
+	_anime[name] = th
+	return th
 
 ## Build an Environment for a theme (sky, fog, ambient light).
 static func environment(name: String, fog_scale: float = 1.0) -> Environment:
@@ -65,8 +91,12 @@ static func environment(name: String, fog_scale: float = 1.0) -> Environment:
 	env.fog_enabled = true
 	env.fog_light_color = th.fog
 	env.fog_density = th.fog_d * fog_scale
-	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.tonemap_exposure = 1.0
+	env.adjustment_enabled = true
+	env.adjustment_saturation = 1.1
+	env.adjustment_contrast = 1.06
+	env.adjustment_brightness = 0.95
 	return env
 
 static func sun(name: String, shadows: bool = true) -> DirectionalLight3D:
