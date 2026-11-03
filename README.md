@@ -74,25 +74,6 @@ flowchart TD
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    subgraph Autoload
-        Game[Game<br/>state, quests, play clock]
-    end
-    Main[Main<br/>screen stack, input routing, story]
-    Main --> World[World<br/>tiles, movement, entities]
-    Main --> Battle[Battle<br/>turn engine]
-    Main --> Overlays[Dialogue, Menu, Shop,<br/>Meditate, Title, Ending]
-    World --> MapGen[MapGen<br/>seeded, connectivity-guaranteed]
-    World --> UI[UI<br/>procedural art]
-    Battle --> UI
-    Data[(Data<br/>skills, enemies, areas,<br/>quest chain, dialogue)] --> Main
-    Data --> MapGen
-    Data --> Battle
-    Bot[Bot<br/>same press&#40;&#41; API as a player] --> Main
-    Main --> Game
-```
-
 ## The playthrough bot
 
 `scripts/bot.gd` plays the entire game end to end through the **same input surface a human uses** (`up/down/confirm/cancel` presses on the top screen and a held movement direction). It pathfinds with BFS, grinds and meditates when under-levelled, rests when hurt, shops, picks skills by elemental weakness, heals with pills or Spring Rain, and handles tribulations.
