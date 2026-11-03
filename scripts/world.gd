@@ -24,15 +24,9 @@ var cam := Vector2.ZERO
 var motes: Array = []
 var banner_t := 0.0
 var cache := {}
+var mini_tex: ImageTexture = null
 
-const THEMES := {
-	"sect": {"g1": Color("5f9a6a"), "g2": Color("6aa874"), "path": Color("c9b88a"), "wall": Color("2f6a45"), "water": Color("3a78b8"), "bg": Color("0b1020")},
-	"bamboo": {"g1": Color("4c8a56"), "g2": Color("559560"), "path": Color("b8a878"), "wall": Color("2d7a3a"), "water": Color("3a78b8"), "bg": Color("08140c")},
-	"marsh": {"g1": Color("5a5a3c"), "g2": Color("63623f"), "path": Color("7a6a4a"), "wall": Color("3a2a22"), "water": Color("4a3a5a"), "bg": Color("140c10")},
-	"frost": {"g1": Color("b4cce0"), "g2": Color("c2d6e8"), "path": Color("9ab4cc"), "wall": Color("6a9ac8"), "water": Color("2a4a8a"), "bg": Color("0a1018")},
-	"thunder": {"g1": Color("52505e"), "g2": Color("5c5a6a"), "path": Color("72707e"), "wall": Color("2a2838"), "water": Color("2a3a6a"), "bg": Color("0a0a14")},
-	"palace": {"g1": Color("40202c"), "g2": Color("4a2432"), "path": Color("602838"), "wall": Color("200c18"), "water": Color("6a1020"), "bg": Color("100408")},
-}
+
 
 func setup(m) -> void:
 	main = m
@@ -55,8 +49,9 @@ func load_area(id: String, at: Vector2i) -> void:
 	Game.tile = at
 	banner_t = 3.0
 	motes.clear()
-	for i in 40:
+	for i in 46:
 		motes.append({"p": Vector2(randf() * VIEW.x, randf() * VIEW.y), "v": randf_range(8, 30), "s": randf_range(1.5, 3.5)})
+	mini_tex = Gfx.minimap_image(grid, w, h, Gfx.THEMES[theme_name])
 	_snap_cam()
 
 func _snap_cam() -> void:
@@ -122,11 +117,7 @@ func _process(d: float) -> void:
 	t += d
 	if banner_t > 0.0:
 		banner_t -= d
-	for m in motes:
-		m.p.y -= m.v * d
-		m.p.x += sin(t + m.s) * 6.0 * d
-		if m.p.y < -10:
-			m.p = Vector2(randf() * VIEW.x, VIEW.y + 10)
+	Gfx.step_motes(motes, theme_name, d, t, VIEW)
 	# respawn defeated enemies after a while (only when away from them)
 	for k in Game.defeated.keys():
 		if Game.playtime - Game.defeated[k] > 150.0 and k.begins_with(area_id + ":"):
@@ -193,10 +184,22 @@ func face_entity():
 func _hash(x: int, y: int) -> float:
 	return fposmod(sin(x * 12.9898 + y * 78.233) * 43758.5453, 1.0)
 
+func _water_shore(x: int, y: int) -> int:
+	var m := 0
+	if y > 0 and grid[(y - 1) * w + x] != MapGen.WATER:
+		m |= Gfx.N
+	if x < w - 1 and grid[y * w + x + 1] != MapGen.WATER:
+		m |= Gfx.E
+	if y < h - 1 and grid[(y + 1) * w + x] != MapGen.WATER:
+		m |= Gfx.S
+	if x > 0 and grid[y * w + x - 1] != MapGen.WATER:
+		m |= Gfx.W
+	return m
+
 func _draw() -> void:
 	if grid.is_empty():
 		return
-	var th: Dictionary = THEMES[theme_name]
+	var th: Dictionary = Gfx.THEMES[theme_name]
 	draw_rect(Rect2(Vector2.ZERO, VIEW), th.bg)
 	var x0 := maxi(0, int(cam.x / TS))
 	var y0 := maxi(0, int(cam.y / TS))
@@ -207,19 +210,15 @@ func _draw() -> void:
 			var tp := Vector2(x, y) * TS - cam
 			var tile := grid[y * w + x]
 			var hv := _hash(x, y)
-			var base: Color = th.g1 if hv < 0.5 else th.g2
 			match tile:
 				MapGen.PATH:
-					base = th.path
+					Gfx.path_tile(self, tp, x, y, th)
 				MapGen.WATER:
-					base = th.water
-			draw_rect(Rect2(tp, Vector2(TS + 1, TS + 1)), base)
-			if tile == MapGen.DECOR:
-				_draw_decor(tp, hv, th)
-			elif tile == MapGen.WATER:
-				var sh := sin(t * 2.0 + x * 0.7 + y * 0.5) * 0.5 + 0.5
-				draw_line(tp + Vector2(8, 16 + sh * 6), tp + Vector2(30, 16 + sh * 6), Color(1, 1, 1, 0.18), 2.0)
-				draw_line(tp + Vector2(14, 32 - sh * 5), tp + Vector2(40, 32 - sh * 5), Color(1, 1, 1, 0.12), 2.0)
+					Gfx.water_tile(self, tp, x, y, th, theme_name, t, _water_shore(x, y))
+				_:
+					Gfx.ground(self, tp, x, y, th, theme_name, t)
+					if tile == MapGen.DECOR:
+						Gfx.decor(self, tp, x, y, hv, th, theme_name, t)
 	# obstacles drawn after ground so tall things overlap properly
 	for y in range(y0, y1 + 2):
 		if y >= h:
@@ -227,7 +226,7 @@ func _draw() -> void:
 		for x in range(x0, x1 + 1):
 			var tile := grid[y * w + x]
 			if tile == MapGen.WALL or tile == MapGen.BUILDING:
-				_draw_obstacle(Vector2(x, y) * TS - cam, x, y, tile, th)
+				Gfx.obstacle(self, Vector2(x, y) * TS - cam, x, y, tile == MapGen.BUILDING, th, theme_name, t)
 	# entities sorted by y
 	var vis: Array = []
 	for e in ents:
@@ -248,106 +247,93 @@ func _draw() -> void:
 	if not drawn_player:
 		_draw_player(pp - cam)
 	# ambience
-	for m in motes:
-		draw_circle(m.p, m.s, Color(1, 1, 0.8, 0.28))
-	_draw_vignette()
+	Gfx.weather(self, theme_name, motes, t, VIEW)
+	Gfx.grade(self, theme_name, VIEW)
 	_draw_hud()
 
-func _draw_decor(tp: Vector2, hv: float, th: Dictionary) -> void:
-	var c: Color = th.g1.lightened(0.25) if theme_name != "frost" else Color.WHITE
-	if theme_name == "palace":
-		c = Color("7a2038")
-	for i in 3:
-		var ox := 10.0 + i * 11.0 + hv * 4.0
-		draw_line(tp + Vector2(ox, 36), tp + Vector2(ox + (i - 1) * 3.0, 24 + hv * 6.0), c, 2.0)
-	if theme_name == "sect" or theme_name == "bamboo":
-		draw_circle(tp + Vector2(12 + hv * 24, 14 + hv * 12), 2.5, Color("ffd0e0") if hv > 0.5 else Color("fff0a0"))
-
-func _draw_obstacle(tp: Vector2, x: int, y: int, tile: int, th: Dictionary) -> void:
-	var hv := _hash(x * 3, y * 5)
-	var wall: Color = th.wall
-	if tile == MapGen.BUILDING:
-		draw_rect(Rect2(tp, Vector2(TS + 1, TS + 1)), Color("8a4a3a").darkened(0.1 * hv))
-		draw_rect(Rect2(tp + Vector2(0, TS - 10), Vector2(TS + 1, 10)), Color("5a2a20"))
-		draw_line(tp + Vector2(0, 0), tp + Vector2(TS, 0), Color("c9a85c"), 3.0)
-		if hv > 0.6:
-			draw_rect(Rect2(tp + Vector2(14, 14), Vector2(18, 18)), Color("ffe9a8"))
-		return
-	match theme_name:
-		"bamboo", "sect":
-			for i in 3:
-				var ox := 8.0 + i * 14.0 + hv * 4.0
-				draw_line(tp + Vector2(ox, TS), tp + Vector2(ox, -30 + hv * 12), wall.lightened(0.15 * i), 6.0)
-				for k in 3:
-					draw_line(tp + Vector2(ox - 3, 6 + k * 14), tp + Vector2(ox + 3, 6 + k * 14), wall.darkened(0.4), 2.0)
-				draw_colored_polygon(PackedVector2Array([tp + Vector2(ox, -20 + hv * 12), tp + Vector2(ox + 16, -10), tp + Vector2(ox + 2, -14)]), wall.lightened(0.35))
-		"marsh":
-			draw_line(tp + Vector2(24, TS), tp + Vector2(24, -14), wall, 7.0)
-			draw_line(tp + Vector2(24, 0), tp + Vector2(6, -16), wall, 4.0)
-			draw_line(tp + Vector2(24, -4), tp + Vector2(44, -20), wall, 4.0)
-			draw_circle(tp + Vector2(10, -16), 5, Color("4a6a2a"))
-			draw_circle(tp + Vector2(42, -20), 5, Color("4a6a2a"))
-		"frost":
-			var base := tp + Vector2(24, TS)
-			draw_colored_polygon(PackedVector2Array([base + Vector2(-18, 0), base + Vector2(-6, -52 - hv * 14), base + Vector2(4, -10), base + Vector2(12, -40 - hv * 8), base + Vector2(20, 0)]), wall)
-			draw_colored_polygon(PackedVector2Array([base + Vector2(-6, -52 - hv * 14), base + Vector2(4, -10), base + Vector2(-2, -10)]), wall.lightened(0.45))
-		"thunder":
-			var base2 := tp + Vector2(24, TS)
-			draw_colored_polygon(PackedVector2Array([base2 + Vector2(-22, 0), base2 + Vector2(-14, -34 - hv * 10), base2 + Vector2(8, -40), base2 + Vector2(22, 0)]), wall)
-			draw_polyline(PackedVector2Array([base2 + Vector2(-4, -36), base2 + Vector2(2, -22), base2 + Vector2(-5, -14), base2 + Vector2(3, -2)]), Color("f6e85c") if hv > 0.5 else Color("9a8aff"), 2.0)
-		"palace":
-			draw_rect(Rect2(tp + Vector2(8, -40), Vector2(32, TS + 40)), wall.lightened(0.1))
-			draw_rect(Rect2(tp + Vector2(4, -46), Vector2(40, 8)), Color("902038"))
-			draw_line(tp + Vector2(24, -34), tp + Vector2(24, TS), Color("e03050"), 2.0)
+func _npc_opts(id: String) -> Dictionary:
+	match id:
+		"elder":
+			return {"beard": true, "staff": true}
+		"alchemist":
+			return {"hat": true}
+		"smith":
+			return {"sash": false}
+		"yue_ling":
+			return {"ribbon": Color("ff9ac0")}
+		"sword_ghost":
+			return {"sword": true, "beard": true}
+		"dragon_envoy", "gate_keeper":
+			return {"staff": true}
+		"fire_sage", "void_hermit":
+			return {"beard": true, "hat": true}
+	return {}
 
 func _draw_entity(e: Dictionary, sp: Vector2) -> void:
 	var cx := sp + Vector2(TS * 0.5, TS * 0.5)
 	match e.kind:
 		"npc":
-			UI.human(self, sp + Vector2(TS * 0.5, TS - 6), 1.25, e.col, Color("2a2a3a"), t + e.pos.x)
-			UI.text(self, sp + Vector2(-60, -22), e.n, 15, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS + 120)
+			var o := _npc_opts(e.id)
+			if e.id == "sword_ghost":
+				Gfx.glow(self, cx, 40.0, Color(0.6, 0.85, 1.0, 0.45), 5)
+			UI.human(self, sp + Vector2(TS * 0.5, TS - 6), 1.35, e.col, Color("2a2a3a"), t + e.pos.x, o.get("sword", false), o)
+			UI.panel(self, Rect2(sp + Vector2(-34, -46), Vector2(TS + 68, 22)), Color(0.04, 0.06, 0.13, 0.7), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, 0.6))
+			UI.text(self, sp + Vector2(-34, -30), e.n, 14, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS + 68)
 			var s := Game.cur_step()
 			if not s.is_empty() and s.kind == "talk" and s.npc == e.id:
-				UI.text(self, sp + Vector2(0, -42 + sin(t * 4) * 3), "!", 30, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS)
+				Gfx.glow(self, sp + Vector2(TS * 0.5, -62 + sin(t * 4) * 3), 20.0, Color(1, 0.85, 0.3, 0.5), 4)
+				UI.text(self, sp + Vector2(0, -54 + sin(t * 4) * 3), "!", 32, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS)
 		"enemy":
 			var g: Array = e.group
 			var d: Dictionary = Data.ENEMIES[g[0].id]
 			UI.monster(self, d.shape, cx, 0.8, d.col, t)
-			UI.text(self, sp + Vector2(-40, -14), "%s x%d" % [d.n, g.size()], 13, UI.C_RED.lightened(0.2), HORIZONTAL_ALIGNMENT_CENTER, TS + 80)
+			for k in range(1, mini(g.size(), 3)):
+				var d2: Dictionary = Data.ENEMIES[g[k].id]
+				UI.monster(self, d2.shape, cx + Vector2(k * 14.0 * (1.0 if k % 2 == 1 else -1.0), -k * 3.0), 0.5, d2.col, t + k)
+			UI.panel(self, Rect2(sp + Vector2(-40, -26), Vector2(TS + 80, 20)), Color(0.12, 0.03, 0.04, 0.7), Color(0.9, 0.35, 0.3, 0.6))
+			UI.text(self, sp + Vector2(-40, -11), "%s x%d" % [d.n, g.size()], 13, UI.C_RED.lightened(0.3), HORIZONTAL_ALIGNMENT_CENTER, TS + 80)
 		"boss":
-			var d2: Dictionary = Data.ENEMIES[e.enemy]
-			UI.monster(self, d2.shape, cx + Vector2(0, -6), 1.55, d2.col, t, true)
-			UI.text(self, sp + Vector2(-80, -52), d2.n, 17, UI.C_RED, HORIZONTAL_ALIGNMENT_CENTER, TS + 160)
+			var d3: Dictionary = Data.ENEMIES[e.enemy]
+			UI.monster(self, d3.shape, cx + Vector2(0, -6), 1.55, d3.col, t, true)
+			UI.panel(self, Rect2(sp + Vector2(-90, -66), Vector2(TS + 180, 26)), Color(0.16, 0.02, 0.04, 0.8), UI.C_RED)
+			UI.text(self, sp + Vector2(-90, -47), d3.n, 16, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, TS + 180)
 		"pickup":
-			var col: Color = {"herb": Color("6fe08a"), "lotus": Color("ff7aa8"), "jade": Color("7affe0"), "shard": Color("f6e85c")}[e.item]
+			var col: Color = Gfx.PICKUP_COLORS[e.item]
 			var gl := 0.5 + 0.5 * sin(t * 3.0 + e.pos.x)
-			draw_circle(cx, 14 + gl * 4, Color(col.r, col.g, col.b, 0.25))
-			draw_colored_polygon(PackedVector2Array([cx + Vector2(0, -12), cx + Vector2(9, 0), cx + Vector2(0, 12), cx + Vector2(-9, 0)]), col)
-			UI.text(self, sp + Vector2(-30, -6), Data.ITEMS[e.item].n, 13, col, HORIZONTAL_ALIGNMENT_CENTER, TS + 60)
+			var fl := Vector2(0, sin(t * 2.0 + e.pos.y) * 3.0)
+			Gfx.shadow(self, cx + Vector2(0, 16), 11.0, 4.0, 0.3)
+			Gfx.glow(self, cx + fl, 26.0 + gl * 6.0, Color(col.r, col.g, col.b, 0.55), 6)
+			Gfx.diamond(self, cx + fl, 13.0, col)
+			Gfx.diamond(self, cx + fl + Vector2(-2, -3), 6.0, Color(1, 1, 1, 0.7))
+			for k in 3:
+				var a := t * 1.5 + k * TAU / 3.0
+				Gfx.star4(self, cx + fl + Vector2(cos(a), sin(a)) * 20.0, 3.0, Color(1, 1, 1, 0.7))
+			UI.text(self, sp + Vector2(-30, -8), Data.ITEMS[e.item].n, 13, col, HORIZONTAL_ALIGNMENT_CENTER, TS + 60)
 		"portal":
 			var open: bool = e.open == "" or Game.done(e.open)
 			var pc := UI.C_JADE if open else Color("8a4a4a")
-			for i in 3:
-				var rr := 18.0 + i * 5.0 + sin(t * 3.0 + i) * 2.0
-				draw_arc(cx, rr, t * (1 + i), t * (1 + i) + PI * 1.4, 20, pc, 3.0)
+			Gfx.glow(self, cx, 40.0, Color(pc.r, pc.g, pc.b, 0.5), 6)
+			for i in 4:
+				var rr := 14.0 + i * 5.0 + sin(t * 3.0 + i) * 2.0
+				draw_arc(cx, rr, t * (1 + i * 0.7), t * (1 + i * 0.7) + PI * 1.4, 20, Color(pc.r, pc.g, pc.b, 1.0 - i * 0.18), 3.0)
+			for k in 6:
+				var a2 := t * 1.2 + k * TAU / 6.0
+				draw_circle(cx + Vector2(cos(a2), sin(a2)) * (26.0 + sin(t * 2 + k) * 4.0), 2.0, Color(1, 1, 1, 0.7))
 			UI.text(self, sp + Vector2(-60, -22), ("To " + Data.AREAS[e.to].n) if open else "Sealed", 14, pc, HORIZONTAL_ALIGNMENT_CENTER, TS + 120)
 		"spring":
 			pass
 
 func _draw_player(sp: Vector2) -> void:
-	UI.human(self, sp + Vector2(TS * 0.5, TS - 4), 1.3, Color("3a8ae8"), Color("1a1a2a"), t * (2.0 if move_t >= 0.0 else 1.0), true)
+	var o := {"walk": move_t >= 0.0, "face": 1 if facing.x >= 0 else -1, "ribbon": null}
+	o.erase("ribbon")
 	if Game.companion:
 		var back := sp - Vector2(facing) * 26.0
-		UI.human(self, back + Vector2(TS * 0.5, TS - 4), 1.2, Color("e86a9a"), Color("402030"), t + 1.0)
-
-func _draw_vignette() -> void:
-	for i in 6:
-		var a := 0.07
-		var m := float(i) * 22.0
-		draw_rect(Rect2(m, m, VIEW.x - 2 * m, VIEW.y - 2 * m), Color(0, 0, 0, a), false, 24.0)
+		UI.human(self, back + Vector2(TS * 0.5, TS - 4), 1.25, Color("e86a9a"), Color("402030"), t * (2.0 if move_t >= 0.0 else 1.0) + 1.0, false, {"ribbon": Color("ffb0cc"), "walk": move_t >= 0.0, "face": o.face})
+	Gfx.glow(self, sp + Vector2(TS * 0.5, TS * 0.6), 34.0, Color(0.4, 0.7, 1.0, 0.3), 5)
+	UI.human(self, sp + Vector2(TS * 0.5, TS - 4), 1.4, Color("3a8ae8"), Color("1a1a2a"), t, true, o)
 
 func _draw_hud() -> void:
-	UI.panel(self, Rect2(12, 12, 330, 118))
+	UI.panel(self, Rect2(12, 12, 330, 128))
 	UI.text(self, Vector2(26, 38), "Lin Feng", 20, UI.C_GOLD)
 	UI.text(self, Vector2(26, 58), Data.level_name(Game.level), 15, UI.C_TEXT)
 	var need := Game.exp_need()
@@ -363,6 +349,7 @@ func _draw_hud() -> void:
 	UI.text(self, Vector2(VIEW.x - 506, 34), "Objective", 13, UI.C_DIM)
 	UI.text(self, Vector2(VIEW.x - 506, 56), Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
 	UI.text(self, Vector2(VIEW.x - 140, VIEW.y - 14), "Esc: Menu   Z/Enter: Act", 13, UI.C_DIM)
+	_draw_minimap()
 	if banner_t > 0.0:
 		var a := clampf(banner_t, 0.0, 1.0)
 		UI.panel(self, Rect2(VIEW.x * 0.5 - 220, 96, 440, 52), Color(0.04, 0.06, 0.13, 0.85 * a), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, a))
@@ -373,3 +360,24 @@ func _draw_hud() -> void:
 	for s in main.toast_list:
 		UI.text(self, Vector2(VIEW.x * 0.5 - 300, y + i * 26), s.text, 18, Color(UI.C_JADE.r, UI.C_JADE.g, UI.C_JADE.b, clampf(s.t, 0.0, 1.0)), HORIZONTAL_ALIGNMENT_CENTER, 600)
 		i += 1
+
+func _draw_minimap() -> void:
+	if mini_tex == null:
+		return
+	var mw := 190.0
+	var r := Rect2(VIEW.x - mw - 16, 88, mw, mw * h / float(w))
+	var marks: Array = []
+	for e in ents:
+		if not ent_visible(e):
+			continue
+		match e.kind:
+			"portal":
+				marks.append({"pos": e.pos, "col": UI.C_JADE})
+			"npc":
+				marks.append({"pos": e.pos, "col": UI.C_GOLD})
+			"boss":
+				marks.append({"pos": e.pos, "col": Color("ff3030")})
+			"pickup":
+				marks.append({"pos": e.pos, "col": Color("ffffff")})
+	Gfx.draw_minimap(self, mini_tex, r, w, h, ptile, marks, t)
+	UI.text(self, r.position + Vector2(0, r.size.y + 20), area_name, 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, mw)

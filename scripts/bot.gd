@@ -95,7 +95,11 @@ func _process(d: float) -> void:
 	_shots(top, d)
 	match top:
 		"title":
-			_press("confirm", 1.0)
+			if shots_dir != "" and not shots_taken.has("01_title"):
+				_shot("01_title")
+				cool = 0.6
+			else:
+				_press("confirm", 1.0)
 		"dialogue":
 			_dialogue()
 		"world":
@@ -496,9 +500,11 @@ func _plan(b) -> Dictionary:
 			low = a
 	var low_r: float = low.hp / low.maxhp
 	# healing
-	if me.skills.has("rain") and me.qi >= 16 and low_r < 0.55:
-		return {"top": "skills", "skill": "rain"}
-	if low_r < 0.3 and Game.inv.get("hp_pill", 0) > 0 and not (me.skills.has("rain") and me.qi >= 16):
+	var heal_id := "starlight" if me.skills.has("starlight") else "rain"
+	var heal_cost: float = Data.SKILLS[heal_id].cost
+	if me.skills.has(heal_id) and me.qi >= heal_cost and low_r < 0.55:
+		return {"top": "skills", "skill": heal_id}
+	if low_r < 0.3 and Game.inv.get("hp_pill", 0) > 0 and not (me.skills.has(heal_id) and me.qi >= heal_cost):
 		return {"top": "items", "item": "hp_pill", "target": low}
 	if me.idx == 0 and me.qi < 12 and Game.inv.get("qi_pill", 0) > 0 and b.ctx.get("boss", false):
 		return {"top": "items", "item": "qi_pill", "target": me}

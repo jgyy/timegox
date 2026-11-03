@@ -11,6 +11,7 @@ const C_JADE := Color("5fd6a4")
 const C_RED := Color("e0584f")
 const C_BLUE := Color("5aa9ff")
 const C_GOLD := Color("f0c860")
+const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font
@@ -24,16 +25,10 @@ static func wrapped(ci: CanvasItem, p: Vector2, s: String, size: int, col: Color
 	ci.draw_multiline_string(font(), p, s, HORIZONTAL_ALIGNMENT_LEFT, width, size, -1, col)
 
 static func panel(ci: CanvasItem, r: Rect2, fill: Color = C_PANEL, border: Color = C_BORDER) -> void:
-	ci.draw_rect(r, fill)
-	ci.draw_rect(r, border, false, 2.0)
-	ci.draw_rect(r.grow(-5), Color(border.r, border.g, border.b, 0.35), false, 1.0)
-	for c in [r.position, r.position + Vector2(r.size.x, 0), r.position + Vector2(0, r.size.y), r.end]:
-		ci.draw_circle(c, 4.0, border)
+	Gfx.panel(ci, r, fill, border)
 
 static func bar(ci: CanvasItem, r: Rect2, ratio: float, col: Color, bg: Color = Color(0, 0, 0, 0.55)) -> void:
-	ci.draw_rect(r, bg)
-	ci.draw_rect(Rect2(r.position, Vector2(r.size.x * clampf(ratio, 0.0, 1.0), r.size.y)), col)
-	ci.draw_rect(r, Color(1, 1, 1, 0.35), false, 1.0)
+	Gfx.bar(ci, r, ratio, col, bg)
 
 static func ellipse(ci: CanvasItem, c: Vector2, rx: float, ry: float, col: Color) -> void:
 	var pts := PackedVector2Array()
@@ -49,27 +44,16 @@ static func menu_list(ci: CanvasItem, r: Rect2, labels: Array, cursor: int, enab
 		var on: bool = enabled.is_empty() or enabled[i]
 		var col := C_TEXT if on else C_DIM
 		if i == cursor:
-			ci.draw_rect(Rect2(r.position.x + 8, y - size, r.size.x - 16, size + 8), Color(0.78, 0.66, 0.36, 0.28))
+			Gfx.cursor_glow(ci, Rect2(r.position.x + 8, y - size, r.size.x - 16, size + 8), Time.get_ticks_msec() / 1000.0)
 			text(ci, Vector2(r.position.x + 14, y), "> ", size, C_GOLD)
 		text(ci, Vector2(r.position.x + 38, y), str(labels[i]), size, col)
 		y += size + 10
 
 # ---------------------------------------------------------------- characters
-static func human(ci: CanvasItem, c: Vector2, s: float, robe: Color, hair: Color, t: float, sword: bool = false) -> void:
-	# c = feet position
-	var bob := sin(t * 3.0) * 1.5 * s
-	var base := c + Vector2(0, bob)
-	ci.draw_circle(c + Vector2(0, 2 * s), 11 * s, Color(0, 0, 0, 0.25))
-	var body := PackedVector2Array([base + Vector2(-9, 0) * s, base + Vector2(9, 0) * s, base + Vector2(6, -18) * s, base + Vector2(-6, -18) * s])
-	ci.draw_colored_polygon(body, robe)
-	ci.draw_colored_polygon(PackedVector2Array([base + Vector2(-6, -18) * s, base + Vector2(6, -18) * s, base + Vector2(3, -12) * s, base + Vector2(-3, -12) * s]), robe.lightened(0.35))
-	ci.draw_line(base + Vector2(-8, -8) * s, base + Vector2(8, -8) * s, robe.darkened(0.4), 2.0 * s)
-	ci.draw_circle(base + Vector2(0, -24) * s, 6.5 * s, Color("f2d6b8"))
-	ci.draw_circle(base + Vector2(0, -27) * s, 6.6 * s, hair)
-	ci.draw_rect(Rect2(base + Vector2(-6.5, -27) * s, Vector2(13, 3) * s), Color(0, 0, 0, 0))
-	if sword:
-		ci.draw_line(base + Vector2(10, -4) * s, base + Vector2(16, -30) * s, Color("d8f0ff"), 2.5 * s)
-		ci.draw_line(base + Vector2(8, -8) * s, base + Vector2(13, -7) * s, C_GOLD, 2.5 * s)
+static func human(ci: CanvasItem, c: Vector2, s: float, robe: Color, hair: Color, t: float, sword: bool = false, opts: Dictionary = {}) -> void:
+	var o := opts.duplicate()
+	o["sword"] = sword
+	GfxActors.person(ci, c, s, robe, hair, t, o)
 
 static func monster(ci: CanvasItem, shape: String, c: Vector2, s: float, col: Color, t: float, aura: bool = false) -> void:
 	# c = center point, s = scale (1.0 ~ 44px tall)
@@ -78,9 +62,11 @@ static func monster(ci: CanvasItem, shape: String, c: Vector2, s: float, col: Co
 	var bob := sin(t * 2.4 + c.x * 0.01) * 2.0 * s
 	var p := c + Vector2(0, bob)
 	if aura:
+		Gfx.glow(ci, p, 58.0 * s, Color(col.r, col.g, col.b, 0.28), 6)
 		for i in 3:
-			ci.draw_circle(p, (34 + i * 9 + sin(t * 3.0 + i) * 3) * s, Color(col.r, col.g, col.b, 0.07))
-	ci.draw_circle(c + Vector2(0, 22 * s), 18 * s, Color(0, 0, 0, 0.25))
+			ci.draw_circle(p, (34 + i * 9 + sin(t * 3.0 + i) * 3) * s, Color(col.r, col.g, col.b, 0.06))
+		ci.draw_arc(p, (50 + sin(t * 2.0) * 3) * s, t, t + 4.2, 24, Color(col.r, col.g, col.b, 0.35), 2.0)
+	Gfx.shadow(ci, c + Vector2(0, 24 * s), 20 * s, 6 * s, 0.35)
 	match shape:
 		"beast":
 			ellipse(ci, p + Vector2(-2, 6) * s, 20 * s, 12 * s, col)
@@ -152,4 +138,5 @@ static func monster(ci: CanvasItem, shape: String, c: Vector2, s: float, col: Co
 		"healer":
 			human(ci, p + Vector2(0, 24 * s), 1.9 * s, Color("e86a9a"), Color("402030"), t, false)
 		_:
-			ellipse(ci, p, 16 * s, 16 * s, col)
+			if not GfxActors.monster_ext(ci, shape, p, s, col, t):
+				ellipse(ci, p, 16 * s, 16 * s, col)

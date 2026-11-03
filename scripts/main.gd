@@ -35,6 +35,10 @@ func _ready() -> void:
 	if args.has("timescale"):
 		Engine.time_scale = float(args.timescale)
 	push("title")
+	if args.has("tour"):
+		var tour = load("res://scripts/tour.gd").new()
+		tour.main = self
+		add_child(tour)
 	if args.has("bot"):
 		bot_active = true
 		bot = load("res://scripts/bot.gd").new()

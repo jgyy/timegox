@@ -14,6 +14,7 @@ const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
 const DENSITY := {
 	"bamboo": 0.30, "marsh": 0.22, "frost": 0.30, "thunder": 0.26, "palace": 0.28,
+	"abyss": 0.26, "volcano": 0.30, "void": 0.24, "celestial": 0.22,
 }
 
 static func is_walkable_tile(t: int) -> bool:
