@@ -26,3 +26,7 @@ mono_crash.*.json
 
 # Bot output
 build/
+
+# Python bytecode from the Blender scripts
+__pycache__/
+*.pyc
