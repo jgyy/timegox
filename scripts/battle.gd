@@ -30,6 +30,9 @@ var level_before := 0
 var stages := {}
 var stage: Node3D = null
 var sun: DirectionalLight3D
+var fill: DirectionalLight3D
+var cam_shake := 0.0
+var storm_t := 0.0
 var ring_cur: MeshInstance3D
 var arrow_tgt: MeshInstance3D
 var flash_mat: StandardMaterial3D
@@ -42,6 +45,8 @@ func _build3d() -> void:
 	new_camera(55.0)
 	sun = Look.sun("bamboo")
 	scene3d.add_child(sun)
+	fill = Look.fill("bamboo")
+	scene3d.add_child(fill)
 	var rb := MB.new()
 	rb.torus(Vector3.ZERO, 0.9, 0.04, Color(1.0, 0.85, 0.35, 0.95))
 	rb.torus(Vector3.ZERO, 0.7, 0.03, Color(1.0, 0.95, 0.7, 0.6))
@@ -65,38 +70,104 @@ func _stage_for(th: String) -> Dictionary:
 		return stages[th]
 	var n := Node3D.new()
 	var look := Look.theme(th)
+	# arena floor: textured ground with a cobbled ring path, all drawn by the terrain shader
 	var gb := MB.new()
-	gb.cyl(Vector3(0, -0.06, 0), 120.0, 0.1, Color(look.g1).darkened(0.1), Vector3.ZERO, 14)
-	gb.cyl(Vector3(0, 0.0, 0), 15.0, 0.06, Color(look.path).darkened(0.1), Vector3.ZERO, 14)
-	gb.cyl(Vector3(0, 0.02, 0), 14.2, 0.04, Color(look.g2), Vector3.ZERO, 14)
-	var gi := MB.mesh_node(n, gb.build())
+	var g1: Color = Color(look.g1).darkened(0.05)
+	var g2: Color = Color(look.g2)
+	var pc: Color = Color(look.path)
+	var coords: Array = [-150.0, -100.0, -64.0, -44.0, -32.0, -25.0]
+	for k in 41:
+		coords.append(-20.0 + k)
+	coords.append_array([25.0, 32.0, 44.0, 64.0, 100.0, 150.0])
+	var cols := {}
+	for zi in coords.size():
+		for xi in coords.size():
+			var r: float = Vector2(coords[xi], coords[zi]).length()
+			var c: Color
+			if r < 13.4:
+				c = Color(g2.r, g2.g, g2.b, 1.0)
+			elif r < 16.0:
+				c = Color(pc.r, pc.g, pc.b, 0.0)
+			else:
+				c = Color(g1.r, g1.g, g1.b, 1.0)
+			cols[Vector2i(xi, zi)] = c
+	for zi in coords.size() - 1:
+		for xi in coords.size() - 1:
+			var x0: float = coords[xi]
+			var x1: float = coords[xi + 1]
+			var z0: float = coords[zi]
+			var z1: float = coords[zi + 1]
+			gb.quad_n([Vector3(x0, 0, z0), Vector3(x1, 0, z0), Vector3(x1, 0, z1), Vector3(x0, 0, z1)], [Vector3.UP, Vector3.UP, Vector3.UP, Vector3.UP],
+				[cols[Vector2i(xi, zi)], cols[Vector2i(xi + 1, zi)], cols[Vector2i(xi + 1, zi + 1)], cols[Vector2i(xi, zi + 1)]])
+	var gi := MB.mesh_node(n, gb.build(Terrain3D.ground_mat(th)))
 	gi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	# arena rune ring
+	# a ring of standing stones with braziers around the arena
+	var sb := MB.new()
+	var stone := MB.tag(Color(look.wall).lerp(Color(0.6, 0.6, 0.65), 0.55), MB.STONE)
+	var sg := MB.new()
+	for i in 10:
+		var a := TAU * (i + 0.5) / 10.0
+		var p := Vector3(cos(a) * 17.0, 0, sin(a) * 17.0)
+		if p.x < -6.0 and absf(p.z) < 9.0:
+			continue  # keep the camera's view clear
+		sb.box(p + Vector3(0, 0.2, 0), Vector3(1.2, 0.4, 1.2), stone, Vector3(0, -a, 0))
+		sb.prim("cyl6", MB._xf(p + Vector3(0, 1.8, 0), Vector3(0.8, 2.8, 0.8), Vector3(0, a, 0)), stone)
+		sb.lathe(p + Vector3(0, 3.2, 0), [Vector2(0.2, 0.0), Vector2(0.55, 0.2), Vector2(0.6, 0.35)], MB.tag(Color("3a3038"), MB.METAL), 10)
+		sg.ball(p + Vector3(0, 3.65, 0), 0.5, Color(1.0, 0.6, 0.25, 0.75), true)
+		sg.ball(p + Vector3(0, 3.65, 0), 1.0, Color(1.0, 0.5, 0.2, 0.2), true)
+	MB.mesh_node(n, sb.build())
+	MB.mesh_node(n, sg.build(MB.mat_glow()))
+	# arena rune circle
 	var rg := MB.new()
-	rg.torus(Vector3(0, 0.06, 0), 13.5, 0.05, Color(1, 1, 1, 0.22))
-	rg.torus(Vector3(0, 0.06, 0), 9.0, 0.04, Color(1, 1, 1, 0.14))
+	rg.arc(Vector3(0, 0.06, 0), 13.4, 0.12, 0.0, TAU, Color(1, 1, 1, 0.3), 64)
+	rg.arc(Vector3(0, 0.06, 0), 9.0, 0.08, 0.0, TAU, Color(1, 1, 1, 0.2), 56)
+	for i in 24:
+		var a2 := TAU * i / 24.0
+		rg.box(Vector3(cos(a2) * 11.2, 0.06, sin(a2) * 11.2), Vector3(0.5, 0.01, 0.1), Color(1, 1, 1, 0.22), Vector3(0, -a2, 0))
 	MB.mesh_node(n, rg.build(MB.mat_glow()))
-	# scenery: the region's landmarks form a distant ring
-	var mesh := Terrain3D._proto("wall:" + th, th)
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.use_colors = true
-	mm.mesh = mesh
-	var cnt := 46
-	mm.instance_count = cnt
+	# scenery: the region's landmarks (both variants) and boulders form a distant ring
 	var rng := RandomNumberGenerator.new()
 	rng.seed = th.hash()
-	for i in cnt:
-		var a := TAU * i / cnt + rng.randf_range(-0.05, 0.05)
-		var r := rng.randf_range(20.0, 42.0)
-		var sc := rng.randf_range(1.4, 3.0)
-		var bs := Basis.from_euler(Vector3(0, rng.randf() * TAU, 0)).scaled(Vector3(sc, sc * rng.randf_range(0.9, 1.5), sc))
-		mm.set_instance_transform(i, Transform3D(bs, Vector3(cos(a) * r, 0, sin(a) * r)))
-		mm.set_instance_color(i, Color.WHITE.darkened(rng.randf() * 0.3))
-	var mi := MultiMeshInstance3D.new()
-	mi.multimesh = mm
-	n.add_child(mi)
-	# a big celestial body on the horizon
+	for k in 2:
+		var mesh := Terrain3D._proto(("wall:" if k == 0 else "wall2:") + th, th)
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.use_colors = true
+		mm.mesh = mesh
+		var cnt := 30
+		mm.instance_count = cnt
+		for i in cnt:
+			var a3 := TAU * (i + k * 0.5) / cnt + rng.randf_range(-0.05, 0.05)
+			var r := rng.randf_range(21.0, 44.0)
+			var sc := rng.randf_range(1.4, 3.0)
+			var bs := Basis.from_euler(Vector3(0, rng.randf() * TAU, 0)).scaled(Vector3(sc, sc * rng.randf_range(0.9, 1.5), sc))
+			mm.set_instance_transform(i, Transform3D(bs, Vector3(cos(a3) * r, 0, sin(a3) * r)))
+			mm.set_instance_color(i, Color(Color.WHITE.darkened(rng.randf() * 0.3), 1.0))
+		var mi := MultiMeshInstance3D.new()
+		mi.multimesh = mm
+		n.add_child(mi)
+	# grass tufts scattered inside the arena
+	var tuft := Terrain3D._proto("tuft:" + th, th)
+	var tm := MultiMesh.new()
+	tm.transform_format = MultiMesh.TRANSFORM_3D
+	tm.use_colors = true
+	tm.mesh = tuft
+	tm.instance_count = 260
+	for i in 260:
+		var a4 := rng.randf() * TAU
+		var r2 := rng.randf_range(4.0, 30.0)
+		var ts := rng.randf_range(0.8, 1.6)
+		tm.set_instance_transform(i, Transform3D(Basis.from_euler(Vector3(0, rng.randf() * TAU, 0)).scaled(Vector3(ts, ts, ts)), Vector3(cos(a4) * r2, 0.0, sin(a4) * r2)))
+		tm.set_instance_color(i, Color(1, 1, 1, 1))
+	var ti := MultiMeshInstance3D.new()
+	ti.multimesh = tm
+	ti.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	n.add_child(ti)
+	# far horizon silhouettes and a big celestial body
+	var hz := Node3D.new()
+	hz.position = Vector3(-40.0, 0, -40.0)
+	n.add_child(hz)
+	Terrain3D._horizon(hz, 40, 40, th, th.hash())
 	var orb := MB.new()
 	orb.ball(Vector3(30, 22, -48), 7.0, Color(look.sky_hor).lightened(0.4))
 	var om := MB.mesh_node(n, orb.build(MB.mat_glow()))
@@ -149,11 +220,7 @@ func _clear_fighters() -> void:
 func pos3(f: Dictionary) -> Vector3:
 	if f.side == "party":
 		return Vector3(-5.5 - f.idx * 1.3, 0, 1.4 - f.idx * 3.6)
-	var i := foes.find(f)
-	var n := foes.size()
-	if f.boss or n == 1:
-		return Vector3(6.0, 0, 0)
-	return Vector3(5.0 + (i % 2) * 2.2, 0, (i - (n - 1) * 0.5) * 3.6)
+	return Data.foe_pos(f.get("slot", 0), foes.size(), f.boss)
 
 func head3(f: Dictionary) -> Vector3:
 	var hgt := 2.5
@@ -169,8 +236,7 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	foes.clear()
 	for i in Game.party_size():
 		party.append(Game.fighter(i))
-	for f in foe_list:
-		foes.append(Data.make_enemy(f.id, f.lv, f.get("mult", 1.0)))
+	foes = Data.make_foes(foe_list)
 	state = "intro"
 	timer = 1.4
 	order.clear()
@@ -186,9 +252,7 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		var st: Dictionary = _stage_for(theme)
 		st.node.visible = true
 		cam.environment = st.env
-		var th := Look.theme(theme)
-		sun.light_color = th.sun
-		sun.light_energy = th.sun_e
+		Look.apply_lights(theme, sun, fill)
 		_build_fighters()
 		cam.position = cam_base
 		cam.look_at(cam_look, Vector3.UP)
@@ -286,7 +350,18 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	a["lunge_to"] = pos3(tgt)
 	fx.append({"text": txt, "p": head3(tgt) + Vector3(randf_range(-0.4, 0.4), 0, 0), "t": 1.0, "col": col if tgt.side == "foe" else UI.C_RED.lightened(0.3), "slash": elem})
 	if not headless() and tgt.has("node"):
-		Fx3D.hit(scene3d, pos3(tgt) + Vector3(0, 1.4 if not tgt.boss else 2.8, 0), elem)
+		var big := quiet or mult >= 2.5 or crit
+		var hp3 := pos3(tgt) + Vector3(0, 1.4 if not tgt.boss else 2.8, 0)
+		Fx3D.hit(scene3d, hp3, elem, big)
+		if mult <= 1.0 or elem == "phys":
+			var yaw := atan2(hp3.x - cam.position.x, hp3.z - cam.position.z)
+			Fx3D.slash(scene3d, hp3, col.lerp(Color.WHITE, 0.4), yaw, 3.2 if tgt.boss else 2.2)
+		if a.has("model"):
+			Models.act(a.model, "attack", t)
+		if tgt.has("model"):
+			Models.act(tgt.model, "hurt", t)
+		if big:
+			cam_shake = 0.35
 	if tgt.hp <= 0.0:
 		tgt.dead = true
 		if not quiet or true:
@@ -305,12 +380,20 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 	actor.qi -= s.cost
 	if s.has("heal"):
 		say("%s casts %s." % [actor.name, s.n])
+		if not headless() and actor.has("model"):
+			Models.act(actor.model, "cast", t)
 		for tg in tgts:
 			_heal(tg, tg.maxhp * s.heal)
 	else:
 		say("%s uses %s." % [actor.name, s.n])
+		if not headless() and actor.has("model"):
+			Fx3D.charge(scene3d, pos3(actor) + Vector3(0, 1.2, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
+			for tg in tgts:
+				Fx3D.projectile(scene3d, pos3(actor) + Vector3(0, 1.4, 0), pos3(tg) + Vector3(0, 1.4 if not tg.boss else 2.8, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
 		for tg in tgts:
 			_hit(actor, tg, s.mult, s.elem, false)
+		if not headless() and actor.has("model"):
+			Models.act(actor.model, "cast", t)
 	_end_action()
 
 func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
@@ -355,6 +438,13 @@ func _win() -> void:
 	Game.add_exp(xp)
 	if Game.level > level_before:
 		result_lines.append("Cultivation advanced: %s" % Data.level_name(Game.level))
+	if not headless():
+		for p in alive(party):
+			if p.has("model"):
+				Models.act(p.model, "victory", t)
+				p.model.set_meta("act_t", t + 0.3)
+			if Game.level > level_before:
+				Fx3D.ascend(scene3d, pos3(p))
 
 func _lose() -> void:
 	outcome = "lose"
@@ -438,7 +528,8 @@ func press(act: String) -> void:
 			cursor = (cursor + 1) % labels.size()
 		"cancel":
 			if menu_kind == "target":
-				if pending.skill != "" and pending.skill != "strike":
+				# basic attacks (Lin Feng's strike, Yue Ling's needle) go back to the main menu
+				if pending.skill != "" and not pending.skill in ["strike", "needle"]:
 					_open_skills()
 				elif pending.item != "":
 					_open_items()
@@ -503,7 +594,17 @@ func _update_view(d: float) -> void:
 	if state == "menu" and menu_kind == "target" and not targets.is_empty():
 		focus = cam_look.lerp(pos3(targets[ids[cursor]]), 0.25)
 	cam.position = cam.position.lerp(cam_base + sway, 1.0 - exp(-d * 4.0))
+	if cam_shake > 0.0:
+		cam_shake = maxf(0.0, cam_shake - d)
+		cam.position += Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * cam_shake * 0.6
 	cam.look_at(focus, Vector3.UP)
+	# the heavens rumble during a tribulation
+	if ctx.get("tribulation", false):
+		storm_t -= d
+		if storm_t <= 0.0:
+			storm_t = randf_range(1.2, 3.0)
+			var ang := randf_range(-1.2, 1.2)
+			Fx3D.lightning(scene3d, Vector3(18.0 * cos(ang) + 6.0, 0, 18.0 * sin(ang)), Color(0.75, 0.85, 1.0), 26.0, 0.3)
 	for f in party + foes:
 		if not f.has("node"):
 			continue
@@ -521,8 +622,9 @@ func _update_view(d: float) -> void:
 		node.visible = fade > 0.01
 		node.scale = Vector3.ONE * maxf(0.01, fade)
 		var m: Node3D = f.model
-		Models.anim_monster(m, t, float(f.idx if f.side == "party" else foes.find(f)))
-		m.position.y = sin(t * 2.4 + float(foes.find(f))) * 0.07 if f.side == "foe" else 0.0
+		var slot: float = float(f.idx if f.side == "party" else f.get("slot", 0))
+		Models.anim_monster(m, t, slot)
+		m.position.y = sin(t * 2.4 + slot) * 0.07 if f.side == "foe" else 0.0
 		if f.dead:
 			node.rotation.z = (1.0 - fade) * 1.2
 		# hit flash overlay

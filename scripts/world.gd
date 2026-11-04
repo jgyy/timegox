@@ -9,6 +9,8 @@ const CAM_DIST := 8.5
 const CAM_H := 7.0
 const FWD := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
 const RIGHT := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]
+const HERO_OPTS := {"sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")}
+const YUE_OPTS := {"ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")}
 
 var area_id := ""
 var w := 0
@@ -34,7 +36,11 @@ var comp: Node3D
 var comp_pos := Vector3.ZERO
 var weather: CPUParticles3D
 var sun: DirectionalLight3D
+var fill: DirectionalLight3D
 var hero_light: OmniLight3D
+var hm := PackedFloat32Array()
+var step_side := 0
+var last_step_phase := 0.0
 var cam_q := 0
 var cam_a := 0.0
 var cam_pos := Vector3.ZERO
@@ -45,7 +51,9 @@ func _build3d() -> void:
 	new_camera(62.0)
 	sun = Look.sun("sect")
 	scene3d.add_child(sun)
-	player = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "glow": Color(0.4, 0.7, 1.0)})
+	fill = Look.fill("sect")
+	scene3d.add_child(fill)
+	player = Models.person(Color("3a8ae8"), Color("1a1a2a"), HERO_OPTS)
 	player.add_child(Models.shadow_disc(0.55))
 	scene3d.add_child(player)
 	hero_light = OmniLight3D.new()
@@ -54,7 +62,7 @@ func _build3d() -> void:
 	hero_light.omni_range = 9.0
 	hero_light.position = Vector3(0, 2.2, 0)
 	player.add_child(hero_light)
-	comp = Models.person(Color("e86a9a"), Color("402030"), {"ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8)})
+	comp = Models.person(Color("e86a9a"), Color("402030"), YUE_OPTS)
 	comp.add_child(Models.shadow_disc(0.5))
 	comp.visible = false
 	scene3d.add_child(comp)
@@ -100,18 +108,20 @@ func _show_view(id: String, m: Dictionary) -> void:
 	if not views.has(id):
 		var root := Terrain3D.build(m.grid, m.w, m.h, m.theme, Data.AREAS[id].seed)
 		scene3d.add_child(root)
+		hm = root.get_meta("hm", PackedFloat32Array())
 		var nodes: Array = []
 		for e in m.ents:
 			var n := _make_ent(e)
+			n.position.y = ground_y(n.position)
 			scene3d.add_child(n)
 			nodes.append(n)
 		views[id] = {"root": root, "nodes": nodes, "env": Look.environment(m.theme)}
 	cur_view = views[id]
 	cur_view.root.visible = true
+	hm = cur_view.root.get_meta("hm", PackedFloat32Array())
 	cam.environment = cur_view.env
 	var th := Look.theme(theme_name)
-	sun.light_color = th.sun
-	sun.light_energy = th.sun_e
+	Look.apply_lights(theme_name, sun, fill)
 	Fx3D.configure_weather(weather, th.weather)
 
 # ---------------------------------------------------------------- entities
@@ -179,19 +189,23 @@ static func _label(parent: Node3D, text: String, y: float, col: Color, size: int
 func _npc_opts(id: String) -> Dictionary:
 	match id:
 		"elder":
-			return {"beard": true, "staff": true}
+			return {"beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}
 		"alchemist":
-			return {"hat": true}
+			return {"hat": true, "hair": "bun"}
 		"smith":
-			return {"sash": false}
+			return {"sash": false, "hair": "bun", "armor": true, "metal": Color("8a6a4a")}
 		"yue_ling":
-			return {"ribbon": Color("ff9ac0")}
+			return {"ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080")}
 		"sword_ghost":
-			return {"sword": true, "beard": true, "glow": Color(0.6, 0.85, 1.0)}
-		"dragon_envoy", "gate_keeper", "lake_keeper", "grave_keeper", "time_ferryman", "origin_keeper":
-			return {"staff": true, "glow": Color(1.0, 0.95, 0.7)}
+			return {"sword": true, "beard": true, "glow": Color(0.6, 0.85, 1.0), "hair": "topknot"}
+		"dragon_envoy", "gate_keeper", "lake_keeper", "grave_keeper", "time_ferryman", "origin_keeper", "cloud_warden", "court_scribe":
+			return {"staff": true, "glow": Color(1.0, 0.95, 0.7), "hair": "long" if id in ["lake_keeper", "court_scribe"] else "bun"}
+		"forge_master":
+			return {"sash": false, "hair": "wild", "armor": true, "metal": Color("b07a40"), "beard": true}
+		"peach_keeper":
+			return {"ribbon": Color("ffd0e0"), "hair": "long", "crown": true, "glow": Color(1.0, 0.8, 0.9)}
 		"fire_sage", "void_hermit":
-			return {"beard": true, "hat": true}
+			return {"beard": true, "hat": true, "hair": "bald"}
 	return {}
 
 func _make_ent(e: Dictionary) -> Node3D:
@@ -244,7 +258,8 @@ func _make_ent(e: Dictionary) -> Node3D:
 			var open: bool = e.open == "" or Game.done(e.open)
 			var pc := UI.C_JADE if open else Color("8a4a4a")
 			var pm := Models.portal(pc, open)
-			if e.pos.x < 4 or e.pos.x > 40:
+			# gates on the west/east edge face along x, gates on the north/south edge along z
+			if e.pos.x < 4 or e.pos.x > w - 5:
 				pm.rotation.y = PI / 2
 			n.add_child(pm)
 			var lbl := _label(n, "", 4.1, pc, 32)
@@ -325,15 +340,22 @@ func face_entity():
 	return ent_at(ptile + facing)
 
 # ---------------------------------------------------------------- 3D view update
+func ground_y(p: Vector3) -> float:
+	return Terrain3D.sample(hm, w, h, p.x, p.z)
+
 func _player_pos() -> Vector3:
 	var pp := Terrain3D.world_pos(ptile)
 	if move_t >= 0.0:
 		pp = pp.lerp(Terrain3D.world_pos(target), move_t)
+	pp.y = ground_y(pp)
 	return pp
 
 func _cam_goal(pp: Vector3, a: float) -> Array:
 	var fwd := Vector3(sin(a), 0, -cos(a))
-	return [pp - fwd * CAM_DIST + Vector3(0, CAM_H, 0), pp + Vector3(0, 1.2, 0) + fwd * 1.8]
+	var cp := pp - fwd * CAM_DIST + Vector3(0, CAM_H, 0)
+	# keep the camera above hills behind the hero
+	cp.y = maxf(cp.y, ground_y(cp) + 2.5)
+	return [cp, pp + Vector3(0, 1.2, 0) + fwd * 1.8]
 
 func _snap_cam() -> void:
 	cam_a = cam_q * PI / 2.0
@@ -354,11 +376,17 @@ func _update_view(d: float) -> void:
 	player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
 	var walking := move_t >= 0.0
 	Models.anim_person(player, t, walking)
+	# a puff of dust at each footfall
+	var sp := fmod(t * 9.0 / PI, 2.0)
+	if walking and int(sp) != step_side:
+		step_side = int(sp)
+		Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path))
 	# companion trails the hero
 	comp.visible = Game.companion
 	if Game.companion:
 		var back := pp - Vector3(facing.x, 0, facing.y) * 1.6 + Vector3(-facing.y, 0, facing.x) * 0.5
 		comp_pos = comp_pos.lerp(back, 1.0 - exp(-d * 5.0))
+		comp_pos.y = ground_y(comp_pos)
 		comp.position = comp_pos
 		var dv := pp - comp_pos
 		if dv.length() > 0.3:
@@ -377,7 +405,7 @@ func _update_view(d: float) -> void:
 		if dist > 46.0:
 			continue
 		_animate_ent(e, n, pp, dist, d)
-	weather.global_position = Vector3(pp.x, weather_y(), pp.z)
+	weather.global_position = Vector3(pp.x, pp.y + weather_y(), pp.z)
 	# chase camera
 	cam_a = lerp_angle(cam_a, cam_q * PI / 2.0, 1.0 - exp(-d * 7.0))
 	var g := _cam_goal(pp, cam_a)
@@ -389,8 +417,12 @@ func weather_y() -> float:
 	match Look.theme(theme_name).weather:
 		"snow", "rain", "petals", "leaves":
 			return 12.0
-		"bubbles", "bubbles_up", "embers":
+		"bubbles", "bubbles_up", "embers", "sparks":
 			return 0.3
+		"clouds":
+			return 1.0
+		"lanterns":
+			return 2.0
 		_:
 			return 3.5
 
@@ -415,7 +447,8 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) 
 			if dist < 10.0:
 				var dv2 := pp - n.position
 				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))
-			n.position.y = sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm"] else 0.0)
+			var base_y := ground_y(n.position)
+			n.position.y = base_y + sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0)
 		"pickup":
 			var gm: Node3D = n.get_meta("gem")
 			gm.position.y = 1.0 + sin(t * 2.0 + e.pos.y) * 0.18
@@ -427,6 +460,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) 
 			lbl.modulate = UI.C_JADE if open else Color("c06a6a")
 			var pm: Node3D = n.get_meta("model")
 			(pm.get_meta("ring") as Node3D).rotation.z = t * 0.8
+			(pm.get_meta("swirl") as Node3D).rotation.z = -t * 1.6
 
 # ---------------------------------------------------------------- 2D HUD overlay
 func _draw() -> void:

@@ -1,6 +1,6 @@
 class_name UI
 extends RefCounted
-## Procedural drawing helpers.  The game ships with no external art: everything is drawn in code.
+## Procedural drawing helpers.  All art is generated from scripts: the UI is drawn in code.
 
 const C_BG := Color("0b1020")
 const C_PANEL := Color(0.04, 0.06, 0.13, 0.9)
@@ -11,7 +11,7 @@ const C_JADE := Color("5fd6a4")
 const C_RED := Color("e0584f")
 const C_BLUE := Color("5aa9ff")
 const C_GOLD := Color("f0c860")
-const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix"]
+const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix", "ray", "mantis", "tortoise", "tome"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font

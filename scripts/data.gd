@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 24
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal"]
+const MAX_LEVEL := 27
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -34,11 +34,14 @@ const SKILLS := {
 	"judgement": {"n": "Celestial Judgement", "cost": 90, "mult": 7.0, "elem": "thunder", "tgt": "one", "lv": 17, "who": 0},
 	"chrono": {"n": "Chrono Severance", "cost": 110, "mult": 8.6, "elem": "dark", "tgt": "one", "lv": 21, "who": 0},
 	"genesis": {"n": "Genesis Sword", "cost": 150, "mult": 11.0, "elem": "thunder", "tgt": "one", "lv": 24, "who": 0},
+	"starfall": {"n": "Ten Thousand Starfall", "cost": 130, "mult": 3.4, "elem": "fire", "tgt": "all", "lv": 24, "who": 0},
+	"inkbreak": {"n": "Ledger-Breaking Stroke", "cost": 170, "mult": 13.5, "elem": "dark", "tgt": "one", "lv": 25, "who": 0},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
 	"starlight": {"n": "Starlight Rain", "cost": 40, "heal": 0.5, "elem": "water", "tgt": "allies", "lv": 13, "who": 1},
 	"dawn": {"n": "Dawn Lotus", "cost": 60, "heal": 0.7, "elem": "water", "tgt": "allies", "lv": 20, "who": 1},
+	"seal_bloom": {"n": "Seal Bloom", "cost": 85, "heal": 0.85, "elem": "water", "tgt": "allies", "lv": 26, "who": 1},
 }
 
 static func known_skills(who: int, level: int, step: int = 1 << 20) -> Array:
@@ -119,7 +122,7 @@ const ENEMIES := {
 	"marsh_hag": {"n": "Marsh Hag", "elem": "dark", "weak": "fire", "col": Color("7a4a8f"), "shape": "wraith", "boss": true},
 	"frost_wyrm": {"n": "Frost Wyrm", "elem": "water", "weak": "thunder", "col": Color("8fd0ff"), "shape": "dragon", "boss": true},
 	"thunder_roc": {"n": "Thunder Roc", "elem": "thunder", "weak": "earth", "col": Color("ffe05a"), "shape": "bird", "boss": true},
-	"jade_mantis": {"n": "Jade Mantis Matriarch", "elem": "wood", "weak": "fire", "col": Color("5fd890"), "shape": "beast", "boss": true},
+	"jade_mantis": {"n": "Jade Mantis Matriarch", "elem": "wood", "weak": "fire", "col": Color("5fd890"), "shape": "mantis", "boss": true},
 	"bog_colossus": {"n": "Bog Colossus", "elem": "water", "weak": "fire", "col": Color("6a7a3a"), "shape": "blob", "boss": true},
 	"ice_empress": {"n": "Ice Empress", "elem": "water", "weak": "fire", "col": Color("c8e8ff"), "shape": "wraith", "boss": true},
 	"storm_ape_king": {"n": "Storm Ape King", "elem": "thunder", "weak": "earth", "col": Color("b08aff"), "shape": "beast", "boss": true},
@@ -149,7 +152,7 @@ const ENEMIES := {
 	"headless_saint": {"n": "Headless Sword Saint", "elem": "phys", "weak": "dark", "col": Color("9898b0"), "shape": "demon", "boss": true},
 	"grave_empress": {"n": "Empress of Bones", "elem": "dark", "weak": "fire", "col": Color("c8c0d8"), "shape": "wraith", "boss": true},
 	"founder_qing": {"n": "Founder Qing Lian", "elem": "wood", "weak": "fire", "col": Color("7ae0b0"), "shape": "humanoid", "boss": true},
-	"time_tortoise": {"n": "Eon Tortoise", "elem": "earth", "weak": "wood", "col": Color("b8903a"), "shape": "crab", "boss": true},
+	"time_tortoise": {"n": "Eon Tortoise", "elem": "earth", "weak": "wood", "col": Color("b8903a"), "shape": "tortoise", "boss": true},
 	"dusk_reaper": {"n": "Dusk Reaper", "elem": "dark", "weak": "fire", "col": Color("8a4a30"), "shape": "wraith", "boss": true},
 	"dawn_warden": {"n": "Dawn Warden", "elem": "fire", "weak": "water", "col": Color("ffd070"), "shape": "phoenix", "boss": true},
 	"young_tianxuan": {"n": "Tian Xuan, the First Sweeper", "elem": "phys", "weak": "dark", "col": Color("f0e8c8"), "shape": "humanoid", "boss": true},
@@ -157,6 +160,36 @@ const ENEMIES := {
 	"hollow_dragon": {"n": "Hollow Heaven Dragon", "elem": "thunder", "weak": "dark", "col": Color("d8d0f0"), "shape": "dragon", "boss": true},
 	"harvest_avatar": {"n": "Avatar of the Harvest", "elem": "thunder", "weak": "earth", "col": Color("f8e8ff"), "shape": "storm", "boss": true},
 	"hollow_heaven": {"n": "The Hollow Heaven", "elem": "dark", "weak": "thunder", "col": Color("3a2060"), "shape": "jelly", "boss": true},
+	# ---- Part IV monsters
+	"cloud_ray": {"n": "Cloud Ray", "elem": "water", "weak": "thunder", "col": Color("c8e0ff"), "shape": "ray"},
+	"gale_sprite": {"n": "Gale Sprite", "elem": "wood", "weak": "fire", "col": Color("b8f0d0"), "shape": "wisp"},
+	"sky_mantis": {"n": "Sky Mantis", "elem": "wood", "weak": "fire", "col": Color("90e0a0"), "shape": "mantis"},
+	"ledger_clerk": {"n": "Ledger Clerk", "elem": "dark", "weak": "fire", "col": Color("6a9a88"), "shape": "humanoid"},
+	"jade_lion": {"n": "Jade Guardian Lion", "elem": "earth", "weak": "wood", "col": Color("5ac0a0"), "shape": "beast"},
+	"ink_wraith": {"n": "Ink Wraith", "elem": "dark", "weak": "water", "col": Color("3a3a4a"), "shape": "wraith"},
+	"bronze_sentinel": {"n": "Bronze Sentinel", "elem": "earth", "weak": "water", "col": Color("c08a40"), "shape": "golem"},
+	"slag_slime": {"n": "Slag Slime", "elem": "fire", "weak": "water", "col": Color("ff9040"), "shape": "blob"},
+	"bellows_imp": {"n": "Bellows Imp", "elem": "fire", "weak": "water", "col": Color("ffc060"), "shape": "wisp"},
+	"peach_sprite": {"n": "Peach Blossom Sprite", "elem": "wood", "weak": "fire", "col": Color("ffa0c0"), "shape": "plant"},
+	"garden_crane": {"n": "Garden Crane", "elem": "water", "weak": "thunder", "col": Color("f0f0f8"), "shape": "bird"},
+	"moss_tortoise": {"n": "Moss-Backed Tortoise", "elem": "earth", "weak": "wood", "col": Color("7a9a5a"), "shape": "tortoise"},
+	# ---- Part IV bosses
+	"manta_sovereign": {"n": "Sky Manta Sovereign", "elem": "water", "weak": "thunder", "col": Color("7ab0f0"), "shape": "ray", "boss": true},
+	"gale_mantis": {"n": "Gale Mantis Empress", "elem": "wood", "weak": "fire", "col": Color("60d080"), "shape": "mantis", "boss": true},
+	"rainbow_serpent": {"n": "Rainbow Serpent", "elem": "thunder", "weak": "earth", "col": Color("e080f0"), "shape": "serpent", "boss": true},
+	"herald_qian": {"n": "Herald of the Ledger, Qian Shu", "elem": "dark", "weak": "fire", "col": Color("4a8a78"), "shape": "humanoid", "boss": true},
+	"twin_lions": {"n": "Twin Lions of the Jade Gate", "elem": "earth", "weak": "wood", "col": Color("40b090"), "shape": "beast", "boss": true},
+	"ink_dragon": {"n": "Ink Dragon", "elem": "dark", "weak": "water", "col": Color("2a2a3a"), "shape": "dragon", "boss": true},
+	"debt_magistrate": {"n": "Magistrate of Debts", "elem": "dark", "weak": "fire", "col": Color("6a2a4a"), "shape": "demon", "boss": true},
+	"registrar_siming": {"n": "Grand Registrar Si Ming", "elem": "earth", "weak": "wood", "col": Color("e0d0a0"), "shape": "humanoid", "boss": true},
+	"brass_engine": {"n": "Brass Spider Engine", "elem": "earth", "weak": "water", "col": Color("d0a050"), "shape": "spider", "boss": true},
+	"crucible_golem": {"n": "Crucible Golem", "elem": "fire", "weak": "water", "col": Color("e06020"), "shape": "golem", "boss": true},
+	"bellows_phoenix": {"n": "Phoenix of the Bellows", "elem": "fire", "weak": "water", "col": Color("ffa030"), "shape": "phoenix", "boss": true},
+	"forge_tiangong": {"n": "Forge-Lord Tian Gong", "elem": "thunder", "weak": "earth", "col": Color("e0b060"), "shape": "demon", "boss": true},
+	"peach_tree": {"n": "Ten-Thousand-Year Peach Tree", "elem": "wood", "weak": "fire", "col": Color("ff90b0"), "shape": "plant", "boss": true},
+	"crane_matriarch": {"n": "Jade Crane Matriarch", "elem": "water", "weak": "thunder", "col": Color("d8fff0"), "shape": "bird", "boss": true},
+	"the_nineteen": {"n": "The Nineteen", "elem": "dark", "weak": "thunder", "col": Color("a0b8e0"), "shape": "wraith", "boss": true},
+	"jade_ledger": {"n": "The Jade Ledger", "elem": "dark", "weak": "thunder", "col": Color("40c090"), "shape": "tome", "boss": true},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -177,6 +210,23 @@ static func make_enemy(id: String, lv: int, boss_mult: float = 1.0) -> Dictionar
 		"skills": [], "turns": 0, "flash": 0.0, "shake": 0.0, "dead": false, "fade": 1.0,
 	}
 
+## Build the foe list for a battle.  Each foe gets an explicit stage slot: Array.find() compares
+## dictionaries by value, so two identical foes (same species, level and HP) used to resolve to
+## the same index and were drawn on top of each other.
+static func make_foes(foe_list: Array) -> Array:
+	var out: Array = []
+	for f in foe_list:
+		var fo := make_enemy(f.id, f.lv, f.get("mult", 1.0))
+		fo["slot"] = out.size()
+		out.append(fo)
+	return out
+
+## Stage position of a foe in battle.
+static func foe_pos(slot: int, count: int, boss: bool) -> Vector3:
+	if boss or count == 1:
+		return Vector3(6.0, 0, 0)
+	return Vector3(5.0 + (slot % 2) * 2.2, 0, (slot - (count - 1) * 0.5) * 3.6)
+
 static func enemy_exp(lv: int, boss: bool) -> int:
 	var base: int = ENEMY_EXP[mini(lv, ENEMY_EXP.size() - 1)]
 	return base * (4 if boss else 1)
@@ -193,6 +243,7 @@ const AREAS := {
 		"portals": [
 			{"to": "bamboo", "pos": Vector2i(38, 13), "dest": Vector2i(4, 22), "open": ""},
 			{"to": "mirror", "pos": Vector2i(20, 24), "dest": Vector2i(4, 28), "open": "s_p3_home"},
+			{"to": "cloudsea", "pos": Vector2i(1, 13), "dest": Vector2i(4, 28), "open": "s_p4_home"},
 		],
 		"npcs": [
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 5), "col": Color("e8e8ff")},
@@ -434,9 +485,87 @@ const AREAS := {
 		],
 		"pickup_vis": "s_or_collect",
 	},
+	# ---- Part IV: The Unwritten Ledger
+	"cloudsea": {
+		"n": "Sea of Clouds Archipelago", "w": 94, "h": 56, "seed": 151, "theme": "cloudsea", "enemies": 20,
+		"pool": [["cloud_ray", 24, 25], ["gale_sprite", 24, 25], ["sky_mantis", 24, 25]],
+		"portals": [
+			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(2, 13), "open": ""},
+			{"to": "court", "pos": Vector2i(92, 28), "dest": Vector2i(4, 28), "open": "s_cs_herald"},
+		],
+		"npcs": [{"id": "cloud_warden", "n": "Cloud Warden Feng Yu", "pos": Vector2i(10, 26), "col": Color("e0f0ff"), "vis": ["s_cs_intro", ""]}],
+		"bosses": [
+			{"id": "manta_sovereign", "pos": Vector2i(30, 14), "lv": 24, "req": 24},
+			{"id": "gale_mantis", "pos": Vector2i(44, 34), "lv": 24, "req": 24},
+			{"id": "rainbow_serpent", "pos": Vector2i(58, 44), "lv": 25, "req": 24},
+			{"id": "herald_qian", "pos": Vector2i(84, 26), "lv": 25, "req": 24},
+		],
+		"pickups": [
+			{"id": "cfeather1", "item": "feather_cloud", "pos": Vector2i(22, 44)}, {"id": "cfeather2", "item": "feather_cloud", "pos": Vector2i(40, 10)},
+			{"id": "cfeather3", "item": "feather_cloud", "pos": Vector2i(64, 14)}, {"id": "cfeather4", "item": "feather_cloud", "pos": Vector2i(74, 46)},
+		],
+		"pickup_vis": "s_cs_collect",
+	},
+	"court": {
+		"n": "Ruins of the Jade Court", "w": 96, "h": 58, "seed": 161, "theme": "court", "enemies": 20,
+		"pool": [["ledger_clerk", 25, 25], ["jade_lion", 24, 25], ["ink_wraith", 25, 25]],
+		"portals": [
+			{"to": "cloudsea", "pos": Vector2i(1, 28), "dest": Vector2i(88, 28), "open": ""},
+			{"to": "forge", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_ct_siming"},
+		],
+		"npcs": [{"id": "court_scribe", "n": "Scribe Wen Yu", "pos": Vector2i(10, 26), "col": Color("c8f0e0"), "vis": ["s_ct_intro", ""]}],
+		"bosses": [
+			{"id": "twin_lions", "pos": Vector2i(30, 40), "lv": 25, "req": 25},
+			{"id": "ink_dragon", "pos": Vector2i(46, 16), "lv": 25, "req": 25},
+			{"id": "debt_magistrate", "pos": Vector2i(60, 40), "lv": 25, "req": 25},
+			{"id": "registrar_siming", "pos": Vector2i(86, 28), "lv": 25, "req": 25},
+		],
+		"pickups": [
+			{"id": "jseal1", "item": "seal", "pos": Vector2i(20, 12)}, {"id": "jseal2", "item": "seal", "pos": Vector2i(40, 46)},
+			{"id": "jseal3", "item": "seal", "pos": Vector2i(66, 30)}, {"id": "jseal4", "item": "seal", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_ct_collect",
+	},
+	"forge": {
+		"n": "Heaven's Forge", "w": 96, "h": 58, "seed": 171, "theme": "forge", "enemies": 20,
+		"pool": [["bronze_sentinel", 25, 26], ["slag_slime", 25, 26], ["bellows_imp", 25, 26]],
+		"portals": [
+			{"to": "court", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "garden", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_fg_tiangong"},
+		],
+		"npcs": [{"id": "forge_master", "n": "Forgemaster Ou Lan", "pos": Vector2i(10, 26), "col": Color("d89060"), "vis": ["s_fg_intro", ""]}],
+		"bosses": [
+			{"id": "brass_engine", "pos": Vector2i(32, 14), "lv": 25, "req": 25},
+			{"id": "crucible_golem", "pos": Vector2i(44, 32), "lv": 26, "req": 26},
+			{"id": "bellows_phoenix", "pos": Vector2i(58, 46), "lv": 26, "req": 26},
+			{"id": "forge_tiangong", "pos": Vector2i(86, 26), "lv": 26, "req": 26},
+		],
+		"pickups": [
+			{"id": "ingot1", "item": "ingot", "pos": Vector2i(24, 46)}, {"id": "ingot2", "item": "ingot", "pos": Vector2i(44, 12)},
+			{"id": "ingot3", "item": "ingot", "pos": Vector2i(66, 40)}, {"id": "ingot4", "item": "ingot", "pos": Vector2i(78, 12)},
+		],
+		"pickup_vis": "s_fg_collect",
+	},
+	"garden": {
+		"n": "Garden of Immortal Peaches", "w": 98, "h": 58, "seed": 181, "theme": "garden", "enemies": 20,
+		"pool": [["peach_sprite", 26, 26], ["garden_crane", 26, 26], ["moss_tortoise", 26, 26]],
+		"portals": [{"to": "forge", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""}],
+		"npcs": [{"id": "peach_keeper", "n": "Peach Keeper Tao Yao", "pos": Vector2i(10, 26), "col": Color("ffd0e0"), "vis": ["s_gd_intro", ""]}],
+		"bosses": [
+			{"id": "peach_tree", "pos": Vector2i(32, 40), "lv": 26, "req": 26},
+			{"id": "crane_matriarch", "pos": Vector2i(46, 16), "lv": 26, "req": 26},
+			{"id": "the_nineteen", "pos": Vector2i(60, 40), "lv": 26, "req": 26},
+			{"id": "jade_ledger", "pos": Vector2i(88, 28), "lv": 26, "req": 26},
+		],
+		"pickups": [
+			{"id": "peach1", "item": "peach", "pos": Vector2i(22, 12)}, {"id": "peach2", "item": "peach", "pos": Vector2i(40, 46)},
+			{"id": "peach3", "item": "peach", "pos": Vector2i(64, 30)}, {"id": "peach4", "item": "peach", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_gd_collect",
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden"]
 
 ## next area to enter when travelling from `from` to `to` (breadth-first over portals)
 static func next_hop(from: String, to: String) -> String:
@@ -562,6 +691,41 @@ const STEPS := [
 	{"id": "s_or_avatar", "kind": "kill", "boss": "harvest_avatar", "area": "origin", "t": "Overturn the Avatar of the Harvest"},
 	{"id": "s_or_heaven", "kind": "kill", "boss": "hollow_heaven", "area": "origin", "t": "Confront the Hollow Heaven itself", "stones": 3000},
 	{"id": "s_break8", "kind": "breakthrough", "to": 24, "t": "Ascend beyond all tribulation as a True Immortal"},
+	# ---- Part IV: The Unwritten Ledger
+	{"id": "s_p4_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Names are being written across the sky: speak to Elder Qing Xuan", "stones": 3500},
+	{"id": "s_cs_intro", "kind": "talk", "npc": "cloud_warden", "area": "cloudsea", "t": "Cross the West Gate into the Sea of Clouds and find its Warden"},
+	{"id": "s_cs_collect", "kind": "collect", "item": "feather_cloud", "n": 4, "area": "cloudsea", "t": "Gather 4 Cloud Feathers to weave a cloud-step"},
+	{"id": "s_cs_hunt", "kind": "hunt", "area": "cloudsea", "n": 42, "t": "Drive the Ledger's tithe-collectors from the islands"},
+	{"id": "s_cs_weave", "kind": "talk", "npc": "cloud_warden", "area": "cloudsea", "t": "Bring the Cloud Feathers to Warden Feng Yu"},
+	{"id": "s_cs_manta", "kind": "kill", "boss": "manta_sovereign", "area": "cloudsea", "t": "Ground the Sky Manta Sovereign"},
+	{"id": "s_cs_mantis", "kind": "kill", "boss": "gale_mantis", "area": "cloudsea", "t": "Still the Gale Mantis Empress"},
+	{"id": "s_cs_serpent", "kind": "kill", "boss": "rainbow_serpent", "area": "cloudsea", "t": "Unbind the Rainbow Serpent"},
+	{"id": "s_cs_herald", "kind": "kill", "boss": "herald_qian", "area": "cloudsea", "t": "Stop the Herald of the Ledger, Qian Shu", "stones": 3800},
+	{"id": "s_ct_intro", "kind": "talk", "npc": "court_scribe", "area": "court", "t": "Find the runaway scribe in the Ruins of the Jade Court"},
+	{"id": "s_ct_collect", "kind": "collect", "item": "seal", "n": 4, "area": "court", "t": "Recover 4 Jade Seals of the old Court"},
+	{"id": "s_ct_hunt", "kind": "hunt", "area": "court", "n": 42, "t": "Scatter the clerks still stamping debts"},
+	{"id": "s_ct_stamp", "kind": "talk", "npc": "court_scribe", "area": "court", "t": "Take the Jade Seals to Scribe Wen Yu"},
+	{"id": "s_ct_lions", "kind": "kill", "boss": "twin_lions", "area": "court", "t": "Pass the Twin Lions of the Jade Gate"},
+	{"id": "s_ct_inkdragon", "kind": "kill", "boss": "ink_dragon", "area": "court", "t": "Wash away the Ink Dragon"},
+	{"id": "s_ct_magistrate", "kind": "kill", "boss": "debt_magistrate", "area": "court", "t": "Overrule the Magistrate of Debts"},
+	{"id": "s_ct_siming", "kind": "kill", "boss": "registrar_siming", "area": "court", "t": "Confront Grand Registrar Si Ming", "stones": 4200},
+	{"id": "s_fg_intro", "kind": "talk", "npc": "forge_master", "area": "forge", "t": "Seek Forgemaster Ou Lan in Heaven's Forge"},
+	{"id": "s_fg_collect", "kind": "collect", "item": "ingot", "n": 4, "area": "forge", "t": "Gather 4 Star-Iron Ingots for the unwriting brush"},
+	{"id": "s_fg_hunt", "kind": "hunt", "area": "forge", "n": 44, "t": "Quench the forge-spawn still hammering out lightning"},
+	{"id": "s_fg_reforge", "kind": "talk", "npc": "forge_master", "area": "forge", "t": "Bring the Star-Iron and the broken brush to Ou Lan"},
+	{"id": "s_fg_engine", "kind": "kill", "boss": "brass_engine", "area": "forge", "t": "Dismantle the Brass Spider Engine"},
+	{"id": "s_fg_crucible", "kind": "kill", "boss": "crucible_golem", "area": "forge", "t": "Crack the Crucible Golem"},
+	{"id": "s_fg_bellows", "kind": "kill", "boss": "bellows_phoenix", "area": "forge", "t": "Calm the Phoenix of the Bellows"},
+	{"id": "s_fg_tiangong", "kind": "kill", "boss": "forge_tiangong", "area": "forge", "t": "Defeat Forge-Lord Tian Gong", "stones": 4600},
+	{"id": "s_gd_intro", "kind": "talk", "npc": "peach_keeper", "area": "garden", "t": "Enter the Garden of Immortal Peaches and greet its Keeper"},
+	{"id": "s_gd_collect", "kind": "collect", "item": "peach", "n": 4, "area": "garden", "t": "Pick 4 Immortal Peaches for the nineteen bearers"},
+	{"id": "s_gd_hunt", "kind": "hunt", "area": "garden", "n": 44, "t": "Weed out the garden's ledger-bound guardians"},
+	{"id": "s_gd_offer", "kind": "talk", "npc": "peach_keeper", "area": "garden", "t": "Bring the Immortal Peaches to Keeper Tao Yao"},
+	{"id": "s_gd_tree", "kind": "kill", "boss": "peach_tree", "area": "garden", "t": "Wake the Ten-Thousand-Year Peach Tree"},
+	{"id": "s_gd_crane", "kind": "kill", "boss": "crane_matriarch", "area": "garden", "t": "Win the Jade Crane Matriarch's trust"},
+	{"id": "s_gd_nineteen", "kind": "kill", "boss": "the_nineteen", "area": "garden", "t": "Free the Nineteen from their names"},
+	{"id": "s_gd_ledger", "kind": "kill", "boss": "jade_ledger", "area": "garden", "t": "Close the Jade Ledger forever", "stones": 5000},
+	{"id": "s_break9", "kind": "breakthrough", "to": 27, "t": "Become the first Dao Ancestor who takes nothing"},
 ]
 
 static func step_index(id: String) -> int:
@@ -586,12 +750,17 @@ const ITEMS := {
 	"relic": {"n": "Saint Relic", "desc": "Quest item"},
 	"sand": {"n": "Time Sand", "desc": "Quest item"},
 	"rune": {"n": "Origin Rune", "desc": "Quest item"},
+	"feather_cloud": {"n": "Cloud Feather", "desc": "Quest item"},
+	"seal": {"n": "Jade Seal", "desc": "Quest item"},
+	"ingot": {"n": "Star-Iron Ingot", "desc": "Quest item"},
+	"peach": {"n": "Immortal Peach", "desc": "Quest item"},
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
+	"brush": {"n": "Registrar's Broken Brush", "desc": "The brush that wrote the Ledger, snapped in two"},
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale"}
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -611,6 +780,10 @@ const CHAT := {
 	"grave_keeper": ["Every saint here swore to guard the Seal. Most kept the oath.", "The dead are patient. Be kind to them."],
 	"time_ferryman": ["I ferry moments, not people. You are the first exception.", "Yesterday and tomorrow share one bank. Mind the current."],
 	"origin_keeper": ["Everything begins here, and so does everything end.", "The Hollow Heaven is not evil. It is only hungry."],
+	"cloud_warden": ["Step lightly. The islands remember every footfall.", "The clouds used to carry ascenders up. Now they carry tithes."],
+	"court_scribe": ["I copied ten thousand names before I read one. Then I could not stop reading.", "Ink dries. Debts should too."],
+	"forge_master": ["Lightning is only iron that learned to run.", "Every tribulation you endured was hammered on this anvil. I am sorry."],
+	"peach_keeper": ["A peach of this garden ripens once in three thousand years. Do not waste it.", "The nineteen come here in their dreams. They like the shade."],
 }
 
 const DIALOGUE := {
@@ -1144,10 +1317,226 @@ const DIALOGUE := {
 		["Lin Feng", "I will end it. Not by taking more, but by giving nothing up. Come."],
 	],
 	"post:s_break8": [
-		["Narrator", "The last bolt strikes the Seal, the Seal blooms, and the lightning falls as warm rain. Lin Feng ascends as a True Immortal, and the harvest ends for every cultivator who will ever live."],
+		["Narrator", "The last bolt strikes the Seal, the Seal blooms, and the lightning falls as warm rain. Lin Feng ascends as a True Immortal."],
 		["Yue Ling", "I am still here. The Seal is a door now, not a lock. Look, Lin Feng. Look at the sky."],
-		["Narrator", "Far below, in the sect where a boy once swept the steps, Elder Qing Xuan watches the clouds turn gold. The Lotus Seal's chime, cracked for a thousand years, rings clear and whole."],
-		["Narrator", "Lin Feng, once a sweeper of steps, rewrites the heavens, and the first true morning in ten thousand years begins."],
+		["Narrator", "The dawn spreads gold across the clouds, and across the gold, in a slow and careful hand, someone is writing in jade ink. Nineteen names. A twentieth, still wet."],
+		["Lin Feng", "That is my name."],
+		["Narrator", "Far below, the Lotus Seal's chime rings once, sharp as a summons."],
+	],
+	"recall2": [
+		["Narrator", "The Seal folds the world again. Lin Feng and Yue Ling stand on the sect's steps, where a boy once swept, and the steps are covered in jade-green dust."],
+		["Elder Qing Xuan", "You came. Good. Look at your hands, Lin Feng, and then look at mine."],
+		["Narrator", "The Elder's hair, grey at dawn, is white as salt. Behind him the disciples of Azure Cloud Sect move like old men."],
+		["Elder Qing Xuan", "Since the sky started writing, everyone who ever broke through has been growing old by the hour. Come inside. I know what the writing is."],
+	],
+	# ---- Part IV: The Unwritten Ledger
+	"s_p4_home": [
+		["Elder Qing Xuan", "The harvest had a master, and the master had servants. The Heavenly Court kept a book of every soul the tribulations took: the Jade Ledger."],
+		["Elder Qing Xuan", "Its master is gone and its debtor, the Hollow, is full. But a ledger does not care who reads it. It only wants its columns to balance."],
+		["Lin Feng", "So it is collecting from the living instead."],
+		["Elder Qing Xuan", "A tithe of years from every cultivator who ever breathed past a tribulation. Mine, the disciples', yours. And it is writing the nineteen bearers back into its pages, so it can spend them again."],
+		["Yue Ling", "The nineteen... they were finally at rest."],
+		["Elder Qing Xuan", "The Court's stairway has come down through the Sea of Clouds, just beyond the west gate. I have opened it. The Cloud Warden, Feng Yu, keeps the islands; she was a friend of Qing Lian."],
+		["Elder Qing Xuan", "Find the Ledger, Lin Feng. Not to rule it. To close it."],
+		["Lin Feng", "I swept these steps for three years. I can sweep up one book."],
+	],
+	"s_cs_intro": [
+		["Cloud Warden Feng Yu", "A True Immortal who arrives on foot. Qing Lian said there would be one, someday, and that I would not believe it."],
+		["Cloud Warden Feng Yu", "The Court's clerks have turned my islands into a tollgate. Everything that rises past them pays in years. My rays and sprites have been taught to collect."],
+		["Cloud Warden Feng Yu", "Bring me four Cloud Feathers. I will weave you a cloud-step, so the Herald of the Ledger cannot strand you between islands."],
+		["Yue Ling", "And the creatures?"],
+		["Cloud Warden Feng Yu", "Free the ones you can. The rest have forgotten they ever belonged to the sky."],
+	],
+	"s_cs_weave": [
+		["Cloud Warden Feng Yu", "Four Cloud Feathers, and not one of them taken from a living bird. Qing Lian chose well, even twenty bearers late."],
+		["Narrator", "Feng Yu draws the feathers through her fingers. They unravel into threads of mist, and the threads knot themselves into a pale shawl that settles over Lin Feng's shoulders."],
+		["Cloud Warden Feng Yu", "Your cloud-step. Where you walk, the sky will hold you, even if the Herald cuts every bridge."],
+		["Yue Ling", "The islands are quieter since we drove the collectors off. I can hear the wind again."],
+		["Cloud Warden Feng Yu", "Then listen to it. Four of the Ledger's beasts still guard the stair: the Manta, the Mantis, the Serpent that was once a bridge, and the Herald himself. Free them in that order and the stair will open."],
+	],
+	"pre:manta_sovereign": [
+		["Sky Manta Sovereign", "Toll, little immortal. Every wing that passes owes the Ledger a year."],
+		["Lin Feng", "Then let us see whose wings are faster."],
+	],
+	"post:manta_sovereign": [
+		["Sky Manta Sovereign", "...the toll-chains are gone... I had forgotten how wide the sky is..."],
+	],
+	"pre:gale_mantis": [
+		["Gale Mantis Empress", "My children harvest the wind for the Court. You are standing in my field."],
+		["Yue Ling", "She remembers the Jade Mantis of the bamboo forest, Lin Feng. The Ledger keeps every grudge."],
+	],
+	"post:gale_mantis": [
+		["Gale Mantis Empress", "The wind... is mine again... take a feather, and go..."],
+	],
+	"pre:rainbow_serpent": [
+		["Rainbow Serpent", "I was the bridge the ascenders walked. The Court painted me in seven colours of debt."],
+		["Lin Feng", "Then I will wash the paint off."],
+	],
+	"post:rainbow_serpent": [
+		["Rainbow Serpent", "Walk across me, bearer, one last time. The Herald waits at the stair's foot, counting."],
+	],
+	"pre:herald_qian": [
+		["Herald of the Ledger, Qian Shu", "Lin Feng, twentieth bearer, debtor of the Hollow Heaven. Your account is overdue by three years of sweeping and one ascension."],
+		["Herald of the Ledger, Qian Shu", "Surrender your years and the columns will balance. Nobody else need pay."],
+		["Lin Feng", "You said that to the nineteen, too."],
+		["Herald of the Ledger, Qian Shu", "And they paid. The Ledger does not lie. It only counts."],
+	],
+	"post:herald_qian": [
+		["Herald of the Ledger, Qian Shu", "Impossible... a debtor who will not settle... the Registrar must... re-audit..."],
+		["Cloud Warden Feng Yu", "The stair to the Jade Court is open, and your cloud-step will carry you up it. Go, before the clerks rewrite the islands."],
+		["Yue Ling", "Lin Feng, your hair. There is grey in it."],
+		["Lin Feng", "Then we had better hurry."],
+	],
+	"s_ct_intro": [
+		["Scribe Wen Yu", "Please, do not strike! I am only a scribe. I ran when I read the names I was copying."],
+		["Scribe Wen Yu", "Grand Registrar Si Ming holds the brush that writes the Ledger. But the Ledger itself was taken from the Court long ago, to the Garden of Immortal Peaches, where the ascenders' souls were kept fresh."],
+		["Scribe Wen Yu", "Four Jade Seals of the old Court are scattered in these ruins. With them, the Registrar's stamps will not bind you. Without them, every step you take here is recorded as a debt."],
+		["Lin Feng", "Then I will collect them first. Stay out of sight, Wen Yu."],
+	],
+	"s_ct_stamp": [
+		["Scribe Wen Yu", "You found all four! The Seal of Rain, the Seal of Grain, the Seal of Years and the Seal of Names."],
+		["Scribe Wen Yu", "Hold still. If I stamp them on your sleeve, the Court's clerks will read you as already audited. They cannot add a debt to a closed account."],
+		["Narrator", "Four green stamps bloom on Lin Feng's sleeve, warm as a hand on the shoulder. The grey at his temples stops spreading."],
+		["Lin Feng", "And you, Wen Yu? The clerks will know you helped."],
+		["Scribe Wen Yu", "I copied ten thousand names without reading them. Let them know. Two lions guard the gate, an ink dragon swims the archive, and the Magistrate sits before the Registrar's hall. Go."],
+	],
+	"pre:twin_lions": [
+		["Twin Lions of the Jade Gate", "Who seeks the Court? Name and account, name and account!"],
+		["Lin Feng", "Lin Feng. Account closed."],
+	],
+	"post:twin_lions": [
+		["Twin Lions of the Jade Gate", "...closed... no such entry... the gate... yields..."],
+	],
+	"pre:ink_dragon": [
+		["Ink Dragon", "I am every word the Court ever wrote, poured into one body. Read me, bearer, and drown."],
+		["Yue Ling", "Water dissolves ink. Let me help you wash it away!"],
+	],
+	"post:ink_dragon": [
+		["Narrator", "The dragon runs into the courtyard stones as harmless black rain. Somewhere in the ruins a column of names blurs and becomes unreadable."],
+	],
+	"pre:debt_magistrate": [
+		["Magistrate of Debts", "Order! The defendant Lin Feng is charged with refusing the harvest, unbalancing the Ledger and freeing a Hollow."],
+		["Lin Feng", "Guilty of all three."],
+		["Magistrate of Debts", "Sentence: payment in full!"],
+	],
+	"post:debt_magistrate": [
+		["Magistrate of Debts", "Objection... sustained... the Registrar alone may... amend..."],
+	],
+	"pre:registrar_siming": [
+		["Grand Registrar Si Ming", "I wrote every name the tribulations took, for ten thousand years, in a hand that never shook. Do you know why?"],
+		["Grand Registrar Si Ming", "Because a written debt is a remembered one. If I close the Ledger, the nineteen are forgotten. Nobody will know they ever lived."],
+		["Yue Ling", "We will remember them. That is not your job any more."],
+		["Grand Registrar Si Ming", "Then prove your memory is stronger than my ink."],
+	],
+	"post:registrar_siming": [
+		["Grand Registrar Si Ming", "My brush... broken... Take it, then. A broken brush can still unwrite, if it is reforged with star-iron."],
+		["Grand Registrar Si Ming", "Heaven's Forge lies past the Court's furnaces. Tian Gong forged the lightning of every tribulation there. He will not lend you his anvil."],
+		["Narrator", "Lin Feng takes the Registrar's Broken Brush. In the sect far below, the Elder's white hair stops whitening."],
+	],
+	"s_fg_intro": [
+		["Forgemaster Ou Lan", "A broken Registrar's brush. So it has finally come to this. I am Ou Lan. I tended Tian Gong's bellows for six thousand years."],
+		["Forgemaster Ou Lan", "Every tribulation bolt that ever struck a cultivator was hammered here. I am sorry for each one. Some of them were meant for you."],
+		["Forgemaster Ou Lan", "Bring me four Star-Iron Ingots from the slag fields, and I will reforge the brush into something that can strike a name out, instead of in."],
+		["Yue Ling", "And Tian Gong?"],
+		["Forgemaster Ou Lan", "He will want to test the brush on you. Let him try."],
+	],
+	"s_fg_reforge": [
+		["Forgemaster Ou Lan", "Star-iron, all four ingots, and still humming. And the Registrar's brush. Give it here, gently."],
+		["Narrator", "Ou Lan lays the two halves of the brush in a bed of glowing star-iron and begins to hammer. Each blow rings like a temple bell instead of thunder."],
+		["Forgemaster Ou Lan", "I can shape it, but the last quench needs the heat of Tian Gong's own anvil, and he guards it with everything this forge ever built."],
+		["Yue Ling", "His engine, his golem and his phoenix. We saw them on the way in."],
+		["Forgemaster Ou Lan", "Break the engine, crack the crucible, calm the bellows. Then he will have nothing left to hide behind but himself."],
+	],
+	"pre:brass_engine": [
+		["Brass Spider Engine", "CLICK. CLICK. DEBTOR DETECTED. ASSEMBLING RESTRAINTS."],
+		["Lin Feng", "Water and patience. Gears hate both."],
+	],
+	"post:brass_engine": [
+		["Narrator", "The engine's legs fold with a long sigh of steam. In its heart is a star-iron ingot, still warm."],
+	],
+	"pre:crucible_golem": [
+		["Crucible Golem", "I MELT WHAT REFUSES. I POUR WHAT REMAINS."],
+		["Yue Ling", "Its core is a crucible full of tribulation lightning. Cool it down!"],
+	],
+	"post:crucible_golem": [
+		["Crucible Golem", "...cooling... at last... cool..."],
+	],
+	"pre:bellows_phoenix": [
+		["Phoenix of the Bellows", "I breathe for the forge. Every breath I ever took became lightning for someone's tribulation."],
+		["Lin Feng", "Then take one breath for yourself."],
+	],
+	"post:bellows_phoenix": [
+		["Phoenix of the Bellows", "...my own breath... it is so quiet... Tian Gong waits at the great anvil. He has been waiting a long time for someone to stop."],
+	],
+	"pre:forge_tiangong": [
+		["Forge-Lord Tian Gong", "So the sweeper boy comes to my anvil with a broken brush and borrowed iron."],
+		["Forge-Lord Tian Gong", "Every tribulation was mine. Every bolt measured to the hair, so that only the ripest roots survived to be harvested. I was proud of my craft."],
+		["Lin Feng", "Your craft was very good. It was used for something very bad."],
+		["Forge-Lord Tian Gong", "Then let the anvil judge which of us is sharper!"],
+	],
+	"post:forge_tiangong": [
+		["Forge-Lord Tian Gong", "Strike true, and the iron forgives. Ou Lan, take my anvil and finish his brush. Finish it the way I should have finished everything: gently."],
+		["Forgemaster Ou Lan", "The last quench, on Tian Gong's own anvil. It is done: a brush of star-iron that writes nothing and unwrites everything. The Ledger is in the Garden of Immortal Peaches, beyond the forge's last gate."],
+		["Yue Ling", "The nineteen are there, Lin Feng. I can feel the Seal pulling toward them."],
+	],
+	"s_gd_intro": [
+		["Peach Keeper Tao Yao", "Visitors in my garden, and one of them still mortal-shaped at heart. How delightful."],
+		["Peach Keeper Tao Yao", "The Court brought the Ledger here because the peaches keep souls fresh. Nineteen souls, kept fresh for a very long time. They sleep under the oldest tree."],
+		["Peach Keeper Tao Yao", "Pick four Immortal Peaches. Give one to each soul that wakes, and they will remember who they were, instead of what they owe."],
+		["Lin Feng", "And the Ledger itself?"],
+		["Peach Keeper Tao Yao", "It is at the heart of the garden, reading itself aloud. It has been very lonely."],
+	],
+	"s_gd_offer": [
+		["Peach Keeper Tao Yao", "Four Immortal Peaches, picked whole, and not one bitten. You have more patience than any Dao Ancestor I ever fed."],
+		["Narrator", "Tao Yao breathes on each peach in turn. Their skins blush gold, and each one takes on the faint scent of a different home: river mud, bamboo smoke, temple incense, snow."],
+		["Peach Keeper Tao Yao", "Now they remember what home tasted like. When the nineteen wake, they will know these are for them."],
+		["Yue Ling", "The old tree is holding them so tightly. Will it let them go?"],
+		["Peach Keeper Tao Yao", "Not without a fight, and not without the crane's blessing. And the Ledger will not let go at all. That part is yours."],
+	],
+	"pre:peach_tree": [
+		["Ten-Thousand-Year Peach Tree", "Ssssh. They are sleeping. Every root of mine is wrapped around a name."],
+		["Yue Ling", "We are not here to wake them roughly. Only to let them go."],
+	],
+	"post:peach_tree": [
+		["Ten-Thousand-Year Peach Tree", "...then go gently... the crane remembers their faces better than I do..."],
+	],
+	"pre:crane_matriarch": [
+		["Jade Crane Matriarch", "I carried the nineteen here on my back, one by one, as they fell. I will not let anyone take them again."],
+		["Lin Feng", "I am not taking them. I am bringing them home."],
+	],
+	"post:crane_matriarch": [
+		["Jade Crane Matriarch", "Your words are true. I can hear it in your wings. Go to them, twentieth. They are restless tonight."],
+	],
+	"pre:the_nineteen": [
+		["The Nineteen", "...twentieth... you are late... the Ledger says we owe... we owe... we owe..."],
+		["Narrator", "Nineteen pale figures rise from the roots, each holding a page with their own name on it. Among them is Shui Ying, the drowned bearer, still wet from the Mirror Lake."],
+		["Yue Ling", "Lin Feng, they are bound to the pages. Free them from the words, not from themselves!"],
+	],
+	"post:the_nineteen": [
+		["Narrator", "One by one the pages tear. Yue Ling sets an Immortal Peach in each pair of empty hands, and one by one the nineteen remember their own names."],
+		["Shui Ying, the Drowned Bearer", "We do not owe anything, do we. We never did."],
+		["Lin Feng", "No. You never did. Rest. I will close the book."],
+	],
+	"pre:jade_ledger": [
+		["The Jade Ledger", "Debit: nineteen. Credit: one Hollow, now full. Balance: unresolved. Unresolved. Unresolved."],
+		["The Jade Ledger", "Debtor twenty, Lin Feng. Present your years."],
+		["Lin Feng", "I brought a brush instead."],
+		["Yue Ling", "And a seal to close it with. Together, Lin Feng!"],
+	],
+	"post:jade_ledger": [
+		["Narrator", "The star-iron brush draws a single stroke across every page. The names do not vanish. They lift off the jade like birds and settle in the peach branches, free."],
+		["The Jade Ledger", "...balance... zero...? is that... allowed...?"],
+		["Yue Ling", "It is allowed. Sleep now."],
+		["Narrator", "The Ledger closes, and the Seal blooms over it like a lotus over still water. In the sect far below, the disciples' hair darkens again. One tribulation remains: the Heavens' very last, and very polite, request."],
+	],
+	"pre:s_break9": [
+		["Narrator", "The sky above the garden gathers, not into a storm but into a question. Every Dao Ancestor before Lin Feng took something to ascend. The Heavens ask what he will take."],
+		["Lin Feng", "Nothing. I will take nothing, and I will owe nothing. Test me if you must."],
+	],
+	"post:s_break9": [
+		["Narrator", "The last tribulation breaks into falling peach blossoms. Lin Feng becomes a Dao Ancestor, the first in ten thousand years whose ascension cost no one anything."],
+		["Yue Ling", "The Ledger is closed, the Hollow is full, and the nineteen are resting in the peach trees. What now, Dao Ancestor?"],
+		["Lin Feng", "Now? Now I think I will go home and sweep the steps. Somebody should."],
+		["Narrator", "Far below, Elder Qing Xuan watches the clouds turn gold. The Lotus Seal's chime, cracked for a thousand years, rings clear and whole, and the first true morning in ten thousand years begins."],
 	],
 }
-

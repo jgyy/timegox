@@ -16,6 +16,7 @@ const DENSITY := {
 	"bamboo": 0.30, "marsh": 0.22, "frost": 0.30, "thunder": 0.26, "palace": 0.28,
 	"abyss": 0.26, "volcano": 0.30, "void": 0.24, "celestial": 0.22,
 	"mirror": 0.24, "grave": 0.28, "time": 0.26, "origin": 0.22,
+	"cloudsea": 0.24, "court": 0.26, "forge": 0.28, "garden": 0.24,
 }
 
 static func is_walkable_tile(t: int) -> bool:
@@ -194,6 +195,8 @@ static func _wild(grid: PackedByteArray, w: int, h: int, spec: Dictionary, rng: 
 				t = WALL
 			elif spec.theme == "marsh" and noise2.get_noise_2d(x, y) < -0.22:
 				t = WATER
+			elif spec.theme == "garden" and noise2.get_noise_2d(x, y) < -0.4:
+				t = WATER  # lotus ponds between the orchards
 			elif rng.randf() < 0.045:
 				t = WALL
 			elif rng.randf() < 0.12:

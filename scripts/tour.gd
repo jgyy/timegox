@@ -6,7 +6,7 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire"}
 
 func _stop(id: String) -> Array:
 	## [first quest step set in this area, a sensible player level]
@@ -33,6 +33,53 @@ func _shot(n: String) -> void:
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png("%s/%s.png" % [dir, n])
 	print("[tour] ", n)
+
+## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
+func _gallery(n: String, models: Array, spacing: float) -> void:
+	main.world.hide()
+	var stage := Node3D.new()
+	stage.position = Vector3(0, 400, 0)
+	main.add_child(stage)
+	var cam := Camera3D.new()
+	cam.fov = 40.0
+	cam.environment = Look.environment("garden", 0.2)
+	cam.environment.tonemap_exposure = 0.85
+	stage.add_child(cam)
+	stage.add_child(Look.sun("garden"))
+	stage.add_child(Look.fill("garden"))
+	var key := OmniLight3D.new()
+	key.position = Vector3(0, 4, 7)
+	key.omni_range = 16.0
+	key.light_energy = 0.5
+	stage.add_child(key)
+	var fl := MB.new()
+	fl.disc(Vector3.ZERO, 14.0, MB.tag(Color("8a9a88"), MB.STONE), 48, MB.tag(Color("6a7a6a"), MB.STONE))
+	MB.mesh_node(stage, fl.build(MB.mat_plain()))
+	var w := spacing * 2.2
+	for i in models.size():
+		var m: Node3D = models[i]
+		m.position = Vector3((i - (models.size() - 1) * 0.5) * w, 0.0, 0.0)
+		m.rotation.y = 0.35 * (1 if i % 2 == 0 else -1)
+		stage.add_child(m)
+		m.add_child(Models.shadow_disc(0.8))
+	var span := models.size() * w
+	cam.position = Vector3(0, 1.6 + spacing * 0.6, span * 0.95)
+	cam.look_at(stage.global_position + Vector3(0, 1.0 + spacing * 0.25, 0), Vector3.UP)
+	cam.make_current()
+	var t0 := 0.0
+	for k in 40:
+		t0 += 1.0 / 30.0
+		for m2 in models:
+			if m2.get_meta("kind", "") == "person":
+				Models.anim_person(m2, t0 + 3.0, false)
+			else:
+				Models.anim_monster(m2, t0 + 3.0, 0.0)
+		await get_tree().process_frame
+	await _shot(n)
+	stage.queue_free()
+	main.world.show()
+	if main.world.cam != null:
+		main.world.cam.make_current()
 
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for r in 20:
@@ -105,6 +152,26 @@ func _run() -> void:
 			await _wait(2.8)
 			await _shot("battle_boss_" + b.id)
 			main.pop()
+	if main.args.has("gallery") or not main.args.has("no-extras"):
+		await _gallery("gallery_people", [
+			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
+			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
+			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
+			Models.person(Color("ffd0e0"), Color("2a2a3a"), {"ribbon": Color("ffd0e0"), "hair": "long", "crown": true}),
+			Models.monster("demon", Color("e02050"), false),
+		], 1.0)
+		await _gallery("gallery_beasts", [
+			Models.monster("beast", Color("7aa860")), Models.monster("mantis", Color("5fd890")), Models.monster("tortoise", Color("b8903a")),
+			Models.monster("crab", Color("d0502a")), Models.monster("spider", Color("5a3a90")),
+		], 1.5)
+		await _gallery("gallery_spirits", [
+			Models.monster("phoenix", Color("ff8a2a")), Models.monster("ray", Color("7ab0f0")), Models.monster("jelly", Color("7ad8ff")),
+			Models.monster("wraith", Color("6a5a8a")), Models.monster("tome", Color("40c090"), true),
+		], 1.6)
+		await _gallery("gallery_giants", [
+			Models.monster("dragon", Color("3a8ad8")), Models.monster("golem", Color("e0501a")), Models.monster("serpent", Color("2a9a8a")),
+			Models.monster("plant", Color("4fc07a")), Models.monster("storm", Color("c8d8ff")),
+		], 1.7)
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return
