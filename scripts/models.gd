@@ -37,6 +37,8 @@ static func _aura(parent: Node3D, pos: Vector3, radii: Vector3, col: Color, stre
 ## robe/hair colours + options: sword, staff, beard, hat, ribbon(Color), horns, scale, glow(Color),
 ## hair ("topknot" | "long" | "bun" | "bald" | "wild"), armor, cape(Color), crown, eyes(Color), trim(Color), sash
 static func person(robe: Color, hair: Color, o: Dictionary = {}) -> Node3D:
+	if o.has("asset") and Assets.PEOPLE.has(o.asset) and Assets.has(Assets.PEOPLE[o.asset]):
+		return _glb_person(o)
 	var root := Node3D.new()
 	var parts := {}
 	var trim: Color = o.get("trim", robe.lightened(0.45))
@@ -280,6 +282,20 @@ static func person(robe: Color, hair: Color, o: Dictionary = {}) -> Node3D:
 	root.scale = Vector3(sc, sc, sc)
 	return root
 
+## A Blender-built character (art/characters/*.py) with the same glow pool as procedural people.
+static func _glb_person(o: Dictionary) -> Node3D:
+	var root := Assets.person(o.asset)
+	if o.has("glow"):
+		var gc: Color = o.glow
+		var gd := MB.new()
+		gd.disc(Vector3(0, 0.05, 0), 0.75, Color(gc.r, gc.g, gc.b, 0.35), 24, Color(gc.r, gc.g, gc.b, 0.0))
+		gd.arc(Vector3(0, 0.055, 0), 0.62, 0.025, 0.0, TAU, Color(gc.r, gc.g, gc.b, 0.5), 32)
+		var gm := _mi(root, gd, MB.mat_glow())
+		gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var sc: float = o.get("scale", 1.0)
+	root.scale = Vector3(sc, sc, sc)
+	return root
+
 ## hair cap, bangs and side locks
 static func _hair(hb: MB, hc: Color, o: Dictionary) -> void:
 	var style: String = o.get("hair", "topknot")
@@ -333,6 +349,9 @@ static func _act_k(n: Node3D, t: float, dur: float = 0.55) -> Array:
 	return [kind, e / dur]
 
 static func anim_person(n: Node3D, t: float, walking: bool, sit: bool = false) -> void:
+	if n.has_meta("glb"):
+		Assets.animate(n, t, "sit" if sit else ("walk" if walking else "idle"), t)
+		return
 	var p: Dictionary = n.get_meta("p")
 	var ph := t * 9.0
 	var body: Node3D = p["body"]
@@ -617,7 +636,16 @@ static func _eyes(g: MB, b: MB, pos: Vector3, spread: float, r: float, col: Colo
 			b.box(p + Vector3(0, 0, r * 1.05), Vector3(r * 0.25, r * 1.4, r * 0.1), MB.tag(Color.BLACK, MB.SKIN))
 		g.ball(p + Vector3(r * 0.3, r * 0.3, r * 0.9), r * 0.25, Color(1, 1, 1, 1), true)
 
+## Procedural stand-ins for the Blender-only shapes (used if their .glb is missing).
+const FALLBACK := {"scorpion": "crab", "mushroom": "plant", "mammoth": "beast", "moth": "bird", "hundun": "jelly"}
+
 static func monster(shape: String, col: Color, boss: bool = false) -> Node3D:
+	if Assets.has_monster(shape):
+		var gm := Assets.monster(shape, col)
+		if boss:
+			_boss_halo(gm, col)
+		return gm
+	shape = FALLBACK.get(shape, shape)
 	match shape:
 		"humanoid", "hero", "healer", "demon":
 			return _humanoid_monster(shape, col, boss)
@@ -1268,6 +1296,11 @@ static func anim_monster(n: Node3D, t: float, phase: float = 0.0) -> void:
 		if n.has_meta("ring"):
 			n.get_meta("ring").rotation.y = t * 0.9
 		return
+	if n.has_meta("glb"):
+		Assets.animate(n, t, "idle", phase * 0.37)
+		if n.has_meta("ring"):
+			n.get_meta("ring").rotation.y = t * 0.9
+		return
 	var ws: Array = n.get_meta("wings", [])
 	var tt := t + phase
 	var a := _act_k(n, t)
@@ -1402,9 +1435,9 @@ static func _humanoid_monster(shape: String, col: Color, boss: bool) -> Node3D:
 	var n: Node3D
 	match shape:
 		"hero":
-			n = person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff")})
+			n = person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff")})
 		"healer":
-			n = person(Color("e86a9a"), Color("402030"), {"ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")})
+			n = person(Color("e86a9a"), Color("402030"), {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")})
 		"demon":
 			n = person(col.darkened(0.45), Color("200010"), {"horns": true, "red_eyes": true, "sword": true, "glow": col, "scale": 1.35, "hair": "wild", "armor": true, "metal": Color("4a3a48"), "cape": col.darkened(0.2)})
 		_:

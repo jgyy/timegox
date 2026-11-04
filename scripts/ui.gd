@@ -11,7 +11,7 @@ const C_JADE := Color("5fd6a4")
 const C_RED := Color("e0584f")
 const C_BLUE := Color("5aa9ff")
 const C_GOLD := Color("f0c860")
-const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix", "ray", "mantis", "tortoise", "tome"]
+const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix", "ray", "mantis", "tortoise", "tome", "scorpion", "mushroom", "mammoth", "moth", "hundun"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font

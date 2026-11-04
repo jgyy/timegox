@@ -9,8 +9,8 @@ const CAM_DIST := 8.5
 const CAM_H := 7.0
 const FWD := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
 const RIGHT := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]
-const HERO_OPTS := {"sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")}
-const YUE_OPTS := {"ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")}
+const HERO_OPTS := {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")}
+const YUE_OPTS := {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")}
 
 var area_id := ""
 var w := 0
@@ -189,13 +189,13 @@ static func _label(parent: Node3D, text: String, y: float, col: Color, size: int
 func _npc_opts(id: String) -> Dictionary:
 	match id:
 		"elder":
-			return {"beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}
+			return {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}
 		"alchemist":
 			return {"hat": true, "hair": "bun"}
 		"smith":
 			return {"sash": false, "hair": "bun", "armor": true, "metal": Color("8a6a4a")}
 		"yue_ling":
-			return {"ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080")}
+			return {"asset": "yue_ling", "ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080")}
 		"sword_ghost":
 			return {"sword": true, "beard": true, "glow": Color(0.6, 0.85, 1.0), "hair": "topknot"}
 		"dragon_envoy", "gate_keeper", "lake_keeper", "grave_keeper", "time_ferryman", "origin_keeper", "cloud_warden", "court_scribe":
