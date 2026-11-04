@@ -2,6 +2,15 @@ extends SceneTree
 ## Data-integrity tests.  Run: godot --headless --path . --script tests/run_tests.gd
 
 var failures := 0
+var finished := false
+
+## Watchdog: a script error aborts _init() before quit() and the runner used to hang until CI's
+## timeout.  If the first frame arrives and the tests did not finish, fail fast instead.
+func _process(_d: float) -> bool:
+	if not finished:
+		printerr("  FAIL tests aborted by a script error (see above)")
+		quit(1)
+	return false
 
 func check(cond: bool, msg: String) -> void:
 	if cond:
@@ -84,6 +93,79 @@ func _init() -> void:
 		var mdl := Models.monster(shape, Color("88aa66"), true)
 		check(mdl.get_child_count() > 0, "3D model builds for shape " + shape)
 		mdl.free()
+	print("== Blender assets ==")
+	for id in Assets.PEOPLE:
+		var rel: String = Assets.PEOPLE[id]
+		check(Assets.has(rel), "character asset exported: " + rel)
+		if not Assets.has(rel):
+			continue
+		var pm := Assets.person(id)
+		var ap: AnimationPlayer = pm.get_meta("ap", null)
+		check(ap != null, rel + ": has an AnimationPlayer")
+		if ap != null:
+			for clip in ["idle", "walk", "sit", "attack", "cast", "hurt", "victory"]:
+				check(ap.has_animation(clip), "%s: clip %s" % [rel, clip])
+			check(ap.get_animation("walk").loop_mode == Animation.LOOP_LINEAR, rel + ": walk loops")
+			check(ap.get_animation("attack").loop_mode == Animation.LOOP_NONE, rel + ": attack plays once")
+		var skels: Array = []
+		Assets._walk(pm, skels, "Skeleton3D")
+		check(not skels.is_empty() and skels[0].find_bone("hand.R") >= 0 and skels[0].find_bone("eyes") >= 0, rel + ": rig has hands and an eyelid bone")
+		var tris := 0
+		for mi in pm.get_meta("meshes"):
+			for si in mi.mesh.get_surface_count():
+				tris += mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_INDEX].size() / 3
+				var mat: Material = mi.mesh.surface_get_material(si)
+				check(mat == MB.mat_vc() or mat == MB.mat_plain() or mat == MB.mat_glow(), "%s: surface %d uses a game shader" % [rel, si])
+		check(tris > 5000 and tris < 40000, "%s: sensible triangle count (%d)" % [rel, tris])
+		pm.free()
+	for shape in Assets.MONSTERS:
+		var mrel: String = Assets.MONSTERS[shape]
+		check(Assets.has(mrel), "monster asset exported for " + shape)
+		if not Assets.has(mrel):
+			continue
+		var mm := Assets.monster(shape, Color("ff0000"))
+		var map: AnimationPlayer = mm.get_meta("ap", null)
+		check(map != null and map.has_animation("idle") and map.has_animation("attack") and map.has_animation("hurt"), shape + ": idle, attack and hurt clips")
+		# tint: red asked for, so tinted vertices lose their green and blue
+		var tinted := 0
+		var arr: Array = mm.get_meta("meshes")[0].mesh.surface_get_arrays(0)
+		var cols: PackedColorArray = arr[Mesh.ARRAY_COLOR]
+		var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
+		for i in cols.size():
+			if uvs[i].x > 0.99 and cols[i].g < 0.02 and cols[i].r > 0.02:
+				tinted += 1
+		check(tinted > cols.size() / 10, "%s: tint recolours the body (%d of %d vertices)" % [shape, tinted, cols.size()])
+		mm.free()
+	# the same shape in two colours shares nothing but the source mesh
+	var ma := Assets.monster("beast", Color("ff0000"))
+	var mb2 := Assets.monster("beast", Color("0000ff"))
+	check(ma.get_meta("meshes")[0].mesh != mb2.get_meta("meshes")[0].mesh, "recoloured monsters get their own meshes")
+	var mc := Assets.monster("beast", Color("ff0000"))
+	check(ma.get_meta("meshes")[0].mesh == mc.get_meta("meshes")[0].mesh, "same colour reuses the cached mesh")
+	ma.free()
+	mb2.free()
+	mc.free()
+	# action clips: an attack interrupts idle and then returns to it
+	var hero := Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng"})
+	Models.anim_person(hero, 0.0, false)
+	var hap: AnimationPlayer = hero.get_meta("ap")
+	Models.act(hero, "attack", 0.1)
+	Models.anim_person(hero, 0.2, false)
+	check(hap.assigned_animation == "attack", "act() plays the attack clip")
+	Models.anim_person(hero, 1.5, false)
+	check(hap.assigned_animation == "idle", "attack returns to idle when it ends")
+	Models.anim_person(hero, 1.6, true)
+	check(hap.assigned_animation == "walk", "walking plays the walk clip")
+	hero.free()
+	Assets.disabled = true
+	for shape2 in ["scorpion", "mushroom", "mammoth", "moth", "hundun", "beast"]:
+		var pm2 := Models.monster(shape2, Color("88aa66"), false)
+		check(pm2.get_child_count() > 0 and not pm2.has_meta("glb"), "procedural fallback builds for " + shape2)
+		pm2.free()
+	var pp := Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng"})
+	check(pp.has_meta("p") and not pp.has_meta("glb"), "procedural person fallback without assets")
+	pp.free()
+	Assets.disabled = false
 	for a3 in Data.AREAS:
 		var spec3: Dictionary = Data.AREAS[a3]
 		var m3 := MapGen.build(a3)
@@ -163,4 +245,5 @@ func _init() -> void:
 		tdist = maxf(tdist, absf(Terrain3D.sample(hm4, m4.w, m4.h, (x4 + 0.5) * Terrain3D.T, 13.5 * Terrain3D.T)))
 	check(tdist < 0.5, "the sect's main road stays nearly flat (max %.2f)" % tdist)
 	print("failures: ", failures)
+	finished = true
 	quit(1 if failures > 0 else 0)

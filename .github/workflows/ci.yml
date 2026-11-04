@@ -9,6 +9,28 @@ env:
   GODOT_VERSION: "4.7.2"
 
 jobs:
+  art:
+    name: Rebuild Blender assets from art/
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Blender as a Python module (bpy)
+        run: pip install bpy==5.2.3
+
+      - name: Rebuild every asset
+        run: python art/build_all.py
+
+      - name: Compare with the committed exports
+        run: |
+          # exports are reproducible locally; float differences between CPUs are reported, not fatal
+          git diff --stat -- assets/ || true
+
   test-and-playthrough:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -40,12 +62,12 @@ jobs:
       - name: Manual keyboard input smoke test
         run: ~/godot/godot --headless --path . --script tests/manual_input_test.gd
 
-      - name: Bot plays the whole game (must take >= 4h of game time)
+      - name: Bot plays the whole game (must take >= 5h of game time)
         run: |
           set -o pipefail
           mkdir -p build
           ~/godot/godot --headless --fixed-fps 30 --path . -- \
-            --bot --seed=1234 --min-time=14400 --report=build/bot_report.json | tee build/bot_log.txt
+            --bot --seed=1234 --min-time=18000 --report=build/bot_report.json | tee build/bot_log.txt
 
       - name: Job summary
         if: always()

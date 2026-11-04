@@ -17,7 +17,11 @@ const DENSITY := {
 	"abyss": 0.26, "volcano": 0.30, "void": 0.24, "celestial": 0.22,
 	"mirror": 0.24, "grave": 0.28, "time": 0.26, "origin": 0.22,
 	"cloudsea": 0.24, "court": 0.26, "forge": 0.28, "garden": 0.24,
+	"dunes": 0.22, "fungal": 0.28, "aurora": 0.24, "chaos": 0.24,
 }
+
+## themes with scattered water (noise threshold: lower = rarer)
+const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4}
 
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR
@@ -197,6 +201,8 @@ static func _wild(grid: PackedByteArray, w: int, h: int, spec: Dictionary, rng: 
 				t = WATER
 			elif spec.theme == "garden" and noise2.get_noise_2d(x, y) < -0.4:
 				t = WATER  # lotus ponds between the orchards
+			elif spec.theme in POOLS and noise2.get_noise_2d(x, y) < POOLS[spec.theme]:
+				t = WATER  # oases, glowing spore pools, frozen lakes, the formless sea
 			elif rng.randf() < 0.045:
 				t = WALL
 			elif rng.randf() < 0.12:
@@ -224,6 +230,7 @@ static func _town(grid: PackedByteArray, w: int, h: int) -> void:
 	_rect(grid, w, 28, 9, 34, 12, BUILDING)   # smithy
 	_rect(grid, w, 16, 17, 24, 21, WATER)     # lotus pond
 	_rect(grid, w, 20, 17, 20, 21, PATH)
+	_rect(grid, w, 21, 22, w - 2, 22, PATH)   # south-east road (Part V)
 	for i in 36:
 		var x := rng.randi_range(2, w - 3)
 		var y := rng.randi_range(2, h - 3)

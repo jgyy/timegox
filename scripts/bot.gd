@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 6.0 * 3600.0
+var max_time := 8.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -45,6 +45,7 @@ var time_by_area := {}
 var gave_up := ""
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+const HEALS := ["mending", "seal_bloom", "dawn", "starlight", "rain"]
 
 func _ready() -> void:
 	world = main.world
@@ -323,10 +324,12 @@ func _travel(dest: String) -> void:
 func _blocked_set(avoid_enemies: bool, goal: Vector2i) -> Dictionary:
 	var b := {}
 	for e in world.ents:
-		if e.kind == "portal" or e.kind == "spring" or not world.ent_visible(e):
+		if e.kind == "spring" or not world.ent_visible(e):
 			continue
 		if e.pos == goal:
 			continue
+		# stepping on any other gate teleports: route around it (the south-east road in the
+		# sect passes right by the east gate)
 		if e.kind == "enemy" and not avoid_enemies:
 			continue
 		b[e.pos] = true
@@ -497,7 +500,12 @@ func _plan(b) -> Dictionary:
 			low = a
 	var low_r: float = low.hp / low.maxhp
 	# healing
-	var heal_id := "dawn" if me.skills.has("dawn") else ("starlight" if me.skills.has("starlight") else "rain")
+	# strongest heal Yue Ling knows (Seal Bloom and Nuwa's Mending used to be skipped)
+	var heal_id := "rain"
+	for hid in HEALS:
+		if me.skills.has(hid):
+			heal_id = hid
+			break
 	var heal_cost: float = Data.SKILLS[heal_id].cost
 	if me.skills.has(heal_id) and me.qi >= heal_cost and low_r < 0.55:
 		return {"top": "skills", "skill": heal_id}

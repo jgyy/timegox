@@ -36,6 +36,7 @@ var storm_t := 0.0
 var ring_cur: MeshInstance3D
 var arrow_tgt: MeshInstance3D
 var flash_mat: StandardMaterial3D
+const INTRO_BOSS := 2.2
 var cam_base := Vector3(-13.0, 5.4, 5.0)
 var cam_look := Vector3(2.5, 0.6, 0.0)
 
@@ -238,7 +239,7 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		party.append(Game.fighter(i))
 	foes = Data.make_foes(foe_list)
 	state = "intro"
-	timer = 1.4
+	timer = INTRO_BOSS if c.get("boss", false) else 1.4
 	order.clear()
 	round_no = 0
 	outcome = ""
@@ -253,6 +254,7 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		st.node.visible = true
 		cam.environment = st.env
 		Look.apply_lights(theme, sun, fill)
+		main.fx_theme(theme)
 		_build_fighters()
 		cam.position = cam_base
 		cam.look_at(cam_look, Vector3.UP)
@@ -362,6 +364,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 			Models.act(tgt.model, "hurt", t)
 		if big:
 			cam_shake = 0.35
+			main.fx_flash(col.lerp(Color.WHITE, 0.5), 0.22 if tgt.side == "foe" else 0.3)
 	if tgt.hp <= 0.0:
 		tgt.dead = true
 		if not quiet or true:
@@ -382,6 +385,7 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 		say("%s casts %s." % [actor.name, s.n])
 		if not headless() and actor.has("model"):
 			Models.act(actor.model, "cast", t)
+			Fx3D.technique(scene3d, skill_id, pos3(actor), tgts.map(func(f): return pos3(f)))
 		for tg in tgts:
 			_heal(tg, tg.maxhp * s.heal)
 	else:
@@ -390,6 +394,7 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 			Fx3D.charge(scene3d, pos3(actor) + Vector3(0, 1.2, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
 			for tg in tgts:
 				Fx3D.projectile(scene3d, pos3(actor) + Vector3(0, 1.4, 0), pos3(tg) + Vector3(0, 1.4 if not tg.boss else 2.8, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
+			Fx3D.technique(scene3d, skill_id, pos3(actor), tgts.map(func(f): return pos3(f)), atan2(cam_look.x - cam.position.x, cam_look.z - cam.position.z))
 		for tg in tgts:
 			_hit(actor, tg, s.mult, s.elem, false)
 		if not headless() and actor.has("model"):
@@ -593,7 +598,16 @@ func _update_view(d: float) -> void:
 	var focus := cam_look
 	if state == "menu" and menu_kind == "target" and not targets.is_empty():
 		focus = cam_look.lerp(pos3(targets[ids[cursor]]), 0.25)
-	cam.position = cam.position.lerp(cam_base + sway, 1.0 - exp(-d * 4.0))
+	if state == "intro" and ctx.get("boss", false) and not foes.is_empty():
+		# boss intro: start on a low close-up of the boss and sweep back to the battle view
+		var k := clampf(1.0 - timer / INTRO_BOSS, 0.0, 1.0)
+		var e := k * k * (3.0 - 2.0 * k)
+		var bp := pos3(foes[0]) + Vector3(0, 3.4, 0)
+		var close := bp + Vector3(-7.5, -1.6, -4.0 + 8.0 * e)
+		cam.position = close.lerp(cam_base + sway, e)
+		focus = bp.lerp(cam_look, e)
+	else:
+		cam.position = cam.position.lerp(cam_base + sway, 1.0 - exp(-d * 4.0))
 	if cam_shake > 0.0:
 		cam_shake = maxf(0.0, cam_shake - d)
 		cam.position += Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * cam_shake * 0.6
@@ -605,6 +619,7 @@ func _update_view(d: float) -> void:
 			storm_t = randf_range(1.2, 3.0)
 			var ang := randf_range(-1.2, 1.2)
 			Fx3D.lightning(scene3d, Vector3(18.0 * cos(ang) + 6.0, 0, 18.0 * sin(ang)), Color(0.75, 0.85, 1.0), 26.0, 0.3)
+			main.fx_flash(Color(0.8, 0.85, 1.0), 0.35)
 	for f in party + foes:
 		if not f.has("node"):
 			continue
@@ -650,14 +665,16 @@ func _screen(p: Vector3) -> Vector2:
 # ---------------------------------------------------------------- 2D overlay
 func _draw() -> void:
 	# overhead bars / names
-	for f in foes + party:
+	# foes only: the party stands under the command panels and has its own status panel
+	for f in foes:
 		if f.dead or f.fade <= 0.5 or not f.has("node"):
 			continue
 		var sp := _screen(pos3(f) + Vector3(0, 0.0, 0))
 		var bw := 100.0 if not f.boss else 190.0
 		var by := sp.y + (14.0 if not f.boss else 22.0)
-		UI.bar(self, Rect2(sp.x - bw / 2, by, bw, 8), f.hp / f.maxhp, UI.C_RED if f.side == "foe" else UI.C_JADE)
-		UI.text(self, Vector2(sp.x - 90, by + 24), f.name, 14, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 180)
+		UI.bar(self, Rect2(sp.x - bw / 2, by, bw, 8), f.hp / f.maxhp, UI.C_RED)
+		var nw := 360.0 if f.boss else 200.0
+		UI.text(self, Vector2(sp.x - nw / 2, by + 24), f.name, 14, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, nw)
 	for p in fx:
 		var a := clampf(p.t, 0.0, 1.0)
 		var sp2 := _screen(p.p) + Vector2(0, -(1.0 - p.t) * 40.0)
@@ -681,6 +698,15 @@ func _draw_ui() -> void:
 		UI.bar(self, Rect2(900, yy + 4, 340, 12), p.hp / p.maxhp, UI.C_RED)
 		UI.text(self, Vector2(802, yy + 54), "QI %d/%d" % [p.qi, p.maxqi], 13)
 		UI.bar(self, Rect2(900, yy + 42, 340, 10), p.qi / p.maxqi, UI.C_BLUE)
+	# boss title card during the intro sweep
+	if state == "intro" and ctx.get("boss", false) and not foes.is_empty():
+		var f0: Dictionary = foes[0]
+		var a := clampf(minf(INTRO_BOSS - timer, timer) * 2.5, 0.0, 1.0)
+		var ec: Color = Data.ELEM_COLORS.get(f0.elem, Color.WHITE)
+		UI.panel(self, Rect2(VIEW.x * 0.5 - 330, 70, 660, 92), Color(0.03, 0.03, 0.08, 0.8 * a), Color(ec.r, ec.g, ec.b, a))
+		UI.text(self, Vector2(VIEW.x * 0.5 - 330, 116), f0.name, 34, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, 660)
+		var sub := "Heavenly Tribulation" if ctx.get("tribulation", false) else "%s  -  weak to %s" % [str(f0.elem).capitalize(), str(f0.weak).capitalize()]
+		UI.text(self, Vector2(VIEW.x * 0.5 - 330, 146), sub, 16, Color(ec.r, ec.g, ec.b, a), HORIZONTAL_ALIGNMENT_CENTER, 660)
 	# command menu
 	if state == "menu":
 		UI.menu_list(self, Rect2(16, 556, 270, 150), labels, cursor, enabled, 20 if labels.size() < 5 else 16)

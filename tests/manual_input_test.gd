@@ -28,6 +28,9 @@ func _initialize() -> void:
 
 func _process(_d: float) -> bool:
 	frame += 1
+	if frame > 600:
+		printerr("  FAIL smoke test did not finish (script error?)")
+		quit(1)
 	match frame:
 		5:
 			expect(main.top_name() == "title", "starts on title")
