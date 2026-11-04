@@ -1,7 +1,7 @@
 class_name Models
 extends RefCounted
 ## Procedural 3D character and monster models.  Everything faces +Z; one unit is roughly one metre.
-## No imported assets: every model is merged from primitives by MB.
+## All art is generated from scripts: every model here is merged from primitives by MB.
 ##
 ## Characters are articulated: two-segment arms and legs, hanging robe panels, a head with anime
 ## eyes that blink, hair with a swinging ponytail or long tresses, and held weapons.  Monsters have

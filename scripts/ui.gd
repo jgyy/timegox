@@ -1,6 +1,6 @@
 class_name UI
 extends RefCounted
-## Procedural drawing helpers.  The game ships with no external art: everything is drawn in code.
+## Procedural drawing helpers.  All art is generated from scripts: the UI is drawn in code.
 
 const C_BG := Color("0b1020")
 const C_PANEL := Color(0.04, 0.06, 0.13, 0.9)
