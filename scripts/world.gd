@@ -9,8 +9,8 @@ const CAM_DIST := 8.5
 const CAM_H := 7.0
 const FWD := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
 const RIGHT := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]
-const HERO_OPTS := {"sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")}
-const YUE_OPTS := {"ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")}
+const HERO_OPTS := {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")}
+const YUE_OPTS := {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")}
 
 var area_id := ""
 var w := 0
@@ -121,6 +121,7 @@ func _show_view(id: String, m: Dictionary) -> void:
 	hm = cur_view.root.get_meta("hm", PackedFloat32Array())
 	cam.environment = cur_view.env
 	var th := Look.theme(theme_name)
+	main.fx_theme(theme_name)
 	Look.apply_lights(theme_name, sun, fill)
 	Fx3D.configure_weather(weather, th.weather)
 
@@ -189,13 +190,13 @@ static func _label(parent: Node3D, text: String, y: float, col: Color, size: int
 func _npc_opts(id: String) -> Dictionary:
 	match id:
 		"elder":
-			return {"beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}
+			return {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}
 		"alchemist":
-			return {"hat": true, "hair": "bun"}
+			return {"asset": "alchemist", "hat": true, "hair": "bun"}
 		"smith":
-			return {"sash": false, "hair": "bun", "armor": true, "metal": Color("8a6a4a")}
+			return {"asset": "smith", "sash": false, "hair": "bun", "armor": true, "metal": Color("8a6a4a")}
 		"yue_ling":
-			return {"ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080")}
+			return {"asset": "yue_ling", "ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080")}
 		"sword_ghost":
 			return {"sword": true, "beard": true, "glow": Color(0.6, 0.85, 1.0), "hair": "topknot"}
 		"dragon_envoy", "gate_keeper", "lake_keeper", "grave_keeper", "time_ferryman", "origin_keeper", "cloud_warden", "court_scribe":
@@ -204,6 +205,8 @@ func _npc_opts(id: String) -> Dictionary:
 			return {"sash": false, "hair": "wild", "armor": true, "metal": Color("b07a40"), "beard": true}
 		"peach_keeper":
 			return {"ribbon": Color("ffd0e0"), "hair": "long", "crown": true, "glow": Color(1.0, 0.8, 0.9)}
+		"nomad", "spore_witch", "steppe_shaman", "nuwa_echo":
+			return {"asset": id, "staff": true, "hair": "long", "glow": Color(1.0, 0.95, 0.8)}
 		"fire_sage", "void_hermit":
 			return {"beard": true, "hat": true, "hair": "bald"}
 	return {}
@@ -415,10 +418,12 @@ func _update_view(d: float) -> void:
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:
-		"snow", "rain", "petals", "leaves":
+		"snow", "rain", "petals", "leaves", "aurora_snow":
 			return 12.0
-		"bubbles", "bubbles_up", "embers", "sparks":
+		"bubbles", "bubbles_up", "embers", "sparks", "spores":
 			return 0.3
+		"sandstorm":
+			return 1.5
 		"clouds":
 			return 1.0
 		"lanterns":
@@ -475,10 +480,11 @@ func _draw_hud() -> void:
 	var need := Game.exp_need()
 	if Game.level < Data.MAX_LEVEL:
 		UI.bar(self, Rect2(26, 66, 300, 8), Game.exp / float(need), UI.C_GOLD)
+	# the numbers get four digits late in the game: keep the bars clear of them
 	UI.text(self, Vector2(26, 92), "HP %d/%d" % [Game.hp[0], Game.max_hp(0)], 14)
-	UI.bar(self, Rect2(100, 80, 226, 10), Game.hp[0] / float(Game.max_hp(0)), UI.C_RED)
+	UI.bar(self, Rect2(140, 80, 186, 10), Game.hp[0] / float(Game.max_hp(0)), UI.C_RED)
 	UI.text(self, Vector2(26, 112), "QI %d/%d" % [Game.qi[0], Game.max_qi(0)], 14)
-	UI.bar(self, Rect2(100, 100, 226, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
+	UI.bar(self, Rect2(140, 100, 186, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
 	UI.text(self, Vector2(26, 126), "Stones: %d" % Game.stones, 13, UI.C_DIM)
 	# objective
 	UI.panel(self, Rect2(VIEW.x - 520, 12, 508, 58))

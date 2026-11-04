@@ -8,6 +8,10 @@ var enabled := [true, true]
 var cursor := 0
 var hero: Node3D
 
+func _on_show(v: bool) -> void:
+	if v:
+		main.fx_theme("sect")
+
 func _build3d() -> void:
 	opaque = true
 	new_scene3d()
@@ -70,7 +74,7 @@ func _build3d() -> void:
 	var moon := MB.new()
 	moon.sph_hi(Vector3.ZERO, Vector3(10.0, 10.0, 10.0), Color(1, 0.9, 0.7, 0.6))
 	MB.mesh_node(scene3d, moon.build(MB.mat_aura()), Vector3(14, 12, -40))
-	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")})
+	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")})
 	hero.position = Vector3(0, 0.1, 0)
 	scene3d.add_child(hero)
 	var w := Fx3D.make_weather()

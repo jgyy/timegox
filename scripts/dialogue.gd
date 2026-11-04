@@ -48,9 +48,11 @@ func _draw() -> void:
 	var r := Rect2(60, 520, VIEW.x - 120, 170)
 	UI.panel(self, r)
 	var who: String = l[0]
-	var tag := Rect2(84, 496, 280, 36)
+	# the name tag grows for long titles ("Xuan Wu, Black Tortoise of the North")
+	var tw := maxf(280.0, UI.font().get_string_size(who, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x + 48.0)
+	var tag := Rect2(84, 496, tw, 36)
 	UI.panel(self, tag, Color(0.12, 0.09, 0.04, 0.95))
-	UI.text(self, Vector2(84, 521), who, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 280)
+	UI.text(self, Vector2(84, 521), who, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, tw)
 	var txt: String = l[1]
 	var n := mini(int(shown), txt.length())
 	UI.wrapped(self, Vector2(88, 572), txt.substr(0, n), 22, UI.C_TEXT, VIEW.x - 180)

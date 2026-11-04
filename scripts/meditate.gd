@@ -13,6 +13,10 @@ var comp: Node3D
 var rings: Array = []
 var orbit: Node3D
 
+func _on_show(v: bool) -> void:
+	if v:
+		main.fx_theme("void")
+
 func _build3d() -> void:
 	opaque = true
 	new_scene3d()
@@ -39,10 +43,10 @@ func _build3d() -> void:
 	MB.mesh_node(scene3d, pond.build(MB.mat_plain()))
 	var lot := Models.lotus(Color(0.6, 0.9, 1.0), 1.3)
 	scene3d.add_child(lot)
-	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"sword": false, "glow": Color(0.5, 0.85, 1.0), "hair": "topknot", "trim": Color("e8f0ff")})
+	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": false, "glow": Color(0.5, 0.85, 1.0), "hair": "topknot", "trim": Color("e8f0ff")})
 	hero.position = Vector3(0, 0.25, 0)
 	scene3d.add_child(hero)
-	comp = Models.person(Color("e86a9a"), Color("402030"), {"ribbon": Color("ffb0cc"), "hair": "long", "eyes": Color("c04080")})
+	comp = Models.person(Color("e86a9a"), Color("402030"), {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "hair": "long", "eyes": Color("c04080")})
 	comp.position = Vector3(-2.6, 0.1, 0.6)
 	scene3d.add_child(comp)
 	for r in 3:
@@ -128,7 +132,7 @@ func _draw() -> void:
 		UI.bar(self, Rect2(360, 562, 560, 12), Game.exp / float(Game.exp_need()), UI.C_GOLD)
 		UI.text(self, Vector2(360, 596), "Cultivation %d / %d   (+%.0f this session)" % [Game.exp, Game.exp_need(), gained], 15)
 	UI.text(self, Vector2(360, 626), "HP %d/%d" % [Game.hp[0], Game.max_hp(0)], 15)
-	UI.bar(self, Rect2(450, 614, 200, 10), Game.hp[0] / float(Game.max_hp(0)), UI.C_RED)
+	UI.bar(self, Rect2(475, 614, 175, 10), Game.hp[0] / float(Game.max_hp(0)), UI.C_RED)
 	UI.text(self, Vector2(670, 626), "QI %d/%d" % [Game.qi[0], Game.max_qi(0)], 15)
-	UI.bar(self, Rect2(760, 614, 160, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
+	UI.bar(self, Rect2(770, 614, 150, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
 	UI.text(self, Vector2(360, 656), "Esc / Enter: stop meditating", 13, UI.C_DIM)

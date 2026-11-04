@@ -16,6 +16,7 @@ var bot_active := false
 var args := {}
 var toast_list: Array = []
 var chat_idx := {}
+var post: PostFX = null
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(UI.C_BG)
@@ -30,6 +31,11 @@ func _ready() -> void:
 	dialogue = _make("dialogue")
 	menu = _make("menu")
 	shop = _make("shop")
+	if DisplayServer.get_name() != "headless" and not args.has("no-post"):
+		post = PostFX.new()
+		post.name = "post"
+		add_child(post)
+	Game.level_changed.connect(func(): fx_pulse())
 	if args.has("bot"):
 		seed(int(args.get("seed", "1234")))
 	if args.has("timescale"):
@@ -85,6 +91,23 @@ func _refresh() -> void:
 			screens[n].show_screen(false)
 	for i in range(first, stack.size()):
 		screens[stack[i]].show_screen(true)
+	if post != null:
+		# cinematic bars while a conversation plays over the 3D world
+		post.letterbox_target = 0.075 if top_name() == "dialogue" and stack.size() > 1 and stack[stack.size() - 2] == "world" else 0.0
+		post.enabled = not screens[stack[first]].scene3d == null if not stack.is_empty() else false
+
+# ---------------------------------------------------------------- post-processing helpers (no-ops headless)
+func fx_theme(name: String) -> void:
+	if post != null:
+		post.set_theme(name)
+
+func fx_flash(col: Color = Color.WHITE, strength: float = 0.5) -> void:
+	if post != null:
+		post.do_flash(col, strength)
+
+func fx_pulse() -> void:
+	if post != null:
+		post.do_pulse()
 
 # ---------------------------------------------------------------- input
 func _unhandled_input(ev: InputEvent) -> void:
@@ -132,6 +155,11 @@ func _process(d: float) -> void:
 		toast_list.pop_front()
 
 func say(lines: Array, cb: Callable = Callable()) -> void:
+	# an empty conversation used to push an empty dialogue box that Enter could never close
+	if lines.is_empty():
+		if cb.is_valid():
+			cb.call()
+		return
 	dialogue.start(lines, cb)
 	push("dialogue")
 
@@ -150,6 +178,9 @@ func game_finished_ack() -> void:
 # ---------------------------------------------------------------- flow
 func new_game() -> void:
 	Game.reset()
+	# a second run from the title must not inherit the last run's toasts or chat rotation
+	toast_list.clear()
+	chat_idx.clear()
 	world.clear_cache()
 	world.load_area("sect", Game.tile)
 	set_stack(["world"])
@@ -239,8 +270,8 @@ func start_breakthrough() -> void:
 		push("battle")
 	)
 
-## After the Dao-Merging tribulation (Part III) and the True Immortal ascension (Part IV)
-## the Lotus Seal pulls Lin Feng home to the sect.
+## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
+## Dao Ancestor ascension (Part V) the story brings Lin Feng home to the sect.
 func recall_to_sect(key: String = "recall") -> void:
 	world.load_area("sect", Vector2i(20, 9))
 	Game.note("The Lotus Seal recalls Lin Feng to the sect")
@@ -262,6 +293,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 						recall_to_sect()
 					elif sid == "s_break8":
 						recall_to_sect("recall2")
+					elif sid == "s_break9":
+						recall_to_sect("recall3")
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity

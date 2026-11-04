@@ -1,5 +1,7 @@
 extends ScreenBase
-## Ending / results screen: the hero floats on a lotus in a golden sky.
+## Ending / results screen: the hero floats on a lotus in a golden sky.  Part V's finale adds the
+## four mended pillars holding up the horizon, Hundun asleep around the centre of the world and
+## rings of Nuwa's five colours turning overhead.
 
 const VIEW := Vector2(1280, 720)
 
@@ -7,6 +9,12 @@ var done := false
 var hero: Node3D
 var comp: Node3D
 var lot: Node3D
+var hundun: Node3D
+var rings: Array = []
+
+func _on_show(v: bool) -> void:
+	if v:
+		main.fx_theme("garden")
 
 func _build3d() -> void:
 	opaque = true
@@ -18,10 +26,10 @@ func _build3d() -> void:
 	scene3d.add_child(Look.fill("garden"))
 	lot = Models.lotus(Color(1.0, 0.9, 0.5), 1.4)
 	scene3d.add_child(lot)
-	hero = Models.person(Color("f0f8ff"), Color("1a1a2a"), {"sword": true, "glow": Color(1, 0.95, 0.7), "hair": "topknot", "crown": true, "trim": Color("f0c850"), "cape": Color("f8e8c0")})
+	hero = Models.person(Color("f0f8ff"), Color("1a1a2a"), {"asset": "lin_feng", "sword": true, "glow": Color(1, 0.95, 0.7), "hair": "topknot", "crown": true, "trim": Color("f0c850"), "cape": Color("f8e8c0")})
 	hero.position = Vector3(0, 0.25, 0)
 	scene3d.add_child(hero)
-	comp = Models.person(Color("ffd0e0"), Color("402030"), {"ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080"), "glow": Color(1.0, 0.7, 0.85)})
+	comp = Models.person(Color("ffd0e0"), Color("402030"), {"asset": "yue_ling", "ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080"), "glow": Color(1.0, 0.7, 0.85)})
 	comp.position = Vector3(1.6, 0.3, -0.6)
 	scene3d.add_child(comp)
 	var b := MB.new()
@@ -48,6 +56,30 @@ func _build3d() -> void:
 	scene3d.add_child(w)
 	Fx3D.configure_weather(w, "petals")
 	w.position = Vector3(0, 6, 0)
+	# the four pillars, mended, holding up the sky at the edge of the world
+	var pb := MB.new()
+	var pg := MB.new()
+	Terrain3D._sky_pillars(pb, pg, 0.0, -10.0, 70.0, "garden")
+	var pm := MB.mesh_node(scene3d, pb.build(MB.mat_plain()))
+	pm.position.y = -30.0
+	pm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var pgm := MB.mesh_node(scene3d, pg.build(MB.mat_glow()))
+	pgm.position.y = -30.0
+	# Hundun, given a face at last, asleep far below with his wings folded around the world's centre
+	hundun = Models.monster("hundun", Color("e05030"), false)
+	hundun.position = Vector3(-7.0, -5.5, -16.0)
+	hundun.scale = Vector3.ONE * 2.6
+	hundun.rotation.y = 0.5
+	scene3d.add_child(hundun)
+	# five-coloured rings turning slowly in the sky
+	for k in 5:
+		var rb := MB.new()
+		var c: Color = Fx3D.FIVE[k]
+		rb.arc(Vector3.ZERO, 9.0 + k * 1.6, 0.18, 0.0, TAU, Color(c.r, c.g, c.b, 0.45), 96)
+		var rm := MB.mesh_node(scene3d, rb.build(MB.mat_glow()), Vector3(0, 9.0 + k * 0.4, -14.0))
+		rm.rotation = Vector3(1.25 + k * 0.05, k * 0.6, 0.0)
+		rm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		rings.append(rm)
 
 func press(act: String) -> void:
 	if act == "confirm":
@@ -64,13 +96,17 @@ func _process(d: float) -> void:
 		comp.rotation.y = t * 0.3 - 0.6
 		Models.anim_person(comp, t + 2.0, false, false)
 		lot.rotation.y = -t * 0.2
+		Models.anim_monster(hundun, t * 0.5, 0.0)
+		for k in rings.size():
+			rings[k].rotation.y = k * 0.6 + t * (0.05 + k * 0.012) * (1 if k % 2 == 0 else -1)
 		cam.position = Vector3(sin(t * 0.15) * 1.5, 1.8, 6.5)
 		cam.look_at(Vector3(0, 1.4, 0), Vector3.UP)
 		queue_redraw()
 
 func _draw() -> void:
 	Gfx.title_text(self, Vector2(0, 110), "ASCENSION", 64, VIEW.x, t)
-	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, closes the Jade Ledger and becomes a Dao Ancestor who takes nothing.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, mends the falling sky and holds it up by choice.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 190), "A Primordial Sovereign who took nothing, owes nothing, and asks for help when the sky is heavy.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
 	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
 	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)
