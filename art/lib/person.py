@@ -277,6 +277,22 @@ def build(o):
         for s in (1, -1):
             b.ribbon([V(0.08 * s, 1.84, -0.12), V(0.14 * s, 1.72, -0.2), V(0.16 * s, 1.55, -0.24)], [0.03, 0.025, 0.01], (1, 0, 0), rc, bones=["head", {"head": 0.5, "hair_tail": 0.5}, "hair_tail"], col_end=lighten(rc, 0.3))
             b.ellipsoid(V(0.07 * s, 1.85, -0.11), (0.04, 0.03, 0.02), rc, bone="head", seg=10, rings=6, rot=(0, 0, 0.5 * s))
+    hat = o.get("hat")
+    if hat == "straw":
+        # wide conical straw hat (douli) with a chin cord
+        b.lathe(V(0, 1.86, -0.02), [(0.42, 0.0), (0.38, 0.03), (0.2, 0.12), (0.04, 0.2), (0.001, 0.22)], o.get("hat_col", "d8c080"), cls=WOOD, bone="head", seg=20, cap_bottom=True)
+        for side in (1, -1):
+            b.tube([V(0.16 * side, 1.84, 0.0), V(0.12 * side, 1.66, 0.08), V(0.0, 1.56, 0.13)], [0.005] * 3, "6a4a2a", cls=CLOTH, bone="head", seg=4)
+    elif hat == "scholar":
+        # black gauze scholar's cap with stiff side wings
+        b.lathe(V(0, 1.84, -0.03), [(0.17, 0.0), (0.18, 0.08), (0.14, 0.16), (0.001, 0.18)], "1a1a22", cls=CLOTH, bone="head", seg=16)
+        for side in (1, -1):
+            b.superquad(V(0.26 * side, 1.92, -0.06), (0.1, 0.02, 0.006), "1a1a22", e=0.3, cls=CLOTH, bone="head")
+    elif hat == "hood":
+        b.ellipsoid(V(0, 1.74, -0.04), (0.22, 0.23, 0.23), o.get("hat_col", "6a5a8a"), cls=CLOTH, bone="head", seg=18, rings=10, squash_top=1.1)
+        b.tube([V(0, 1.9, -0.18), V(0, 1.7, -0.3), V(0, 1.45, -0.28)], [0.12, 0.1, 0.05], o.get("hat_col", "6a5a8a"), cls=CLOTH, bones=["head", {"head": 0.5, "hair_tail": 0.5}, "hair_tail"], seg=10)
+    elif hat == "fur":
+        b.lathe(V(0, 1.8, -0.02), [(0.21, 0.0), (0.23, 0.05), (0.22, 0.14), (0.15, 0.2), (0.001, 0.22)], o.get("hat_col", "c8b8a0"), cls=HAIR, bone="head", seg=18)
     if o.get("horns", False):
         hcol = o.get("horn_col", "2a1a20")
         for side in (1, -1):

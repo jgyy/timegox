@@ -20,7 +20,11 @@ const MONSTERS := {
 	"mushroom": "monsters/mushroom", "mammoth": "monsters/mammoth", "moth": "monsters/moth", "hundun": "monsters/hundun",
 	"humanoid": "monsters/humanoid", "demon": "monsters/demon",
 }
-const PEOPLE := {"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing"}
+const PEOPLE := {
+	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
+	"alchemist": "characters/alchemist", "smith": "characters/smith", "nomad": "characters/nomad",
+	"spore_witch": "characters/spore_witch", "steppe_shaman": "characters/steppe_shaman", "nuwa_echo": "characters/nuwa_echo",
+}
 
 static var _scenes := {}
 static var _meshes := {}

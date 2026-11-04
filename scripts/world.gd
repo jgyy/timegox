@@ -192,9 +192,9 @@ func _npc_opts(id: String) -> Dictionary:
 		"elder":
 			return {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}
 		"alchemist":
-			return {"hat": true, "hair": "bun"}
+			return {"asset": "alchemist", "hat": true, "hair": "bun"}
 		"smith":
-			return {"sash": false, "hair": "bun", "armor": true, "metal": Color("8a6a4a")}
+			return {"asset": "smith", "sash": false, "hair": "bun", "armor": true, "metal": Color("8a6a4a")}
 		"yue_ling":
 			return {"asset": "yue_ling", "ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080")}
 		"sword_ghost":
@@ -205,6 +205,8 @@ func _npc_opts(id: String) -> Dictionary:
 			return {"sash": false, "hair": "wild", "armor": true, "metal": Color("b07a40"), "beard": true}
 		"peach_keeper":
 			return {"ribbon": Color("ffd0e0"), "hair": "long", "crown": true, "glow": Color(1.0, 0.8, 0.9)}
+		"nomad", "spore_witch", "steppe_shaman", "nuwa_echo":
+			return {"asset": id, "staff": true, "hair": "long", "glow": Color(1.0, 0.95, 0.8)}
 		"fire_sage", "void_hermit":
 			return {"beard": true, "hat": true, "hair": "bald"}
 	return {}

@@ -156,10 +156,27 @@ func _run() -> void:
 		await _gallery("gallery_people", [
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
 			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
-			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
-			Models.person(Color("ffd0e0"), Color("2a2a3a"), {"ribbon": Color("ffd0e0"), "hair": "long", "crown": true}),
+			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
+			Models.monster("humanoid", Color("c0603a"), false),
 			Models.monster("demon", Color("e02050"), false),
 		], 1.0)
+		# Blender-built NPCs (art/characters)
+		await _gallery("gallery_npcs", [
+			Assets.person("alchemist"), Assets.person("smith"), Assets.person("nomad"),
+			Assets.person("spore_witch"), Assets.person("steppe_shaman"), Assets.person("nuwa_echo"),
+		], 0.8)
+		# Part V creatures (art/monsters)
+		await _gallery("gallery_part5", [
+			Models.monster("scorpion", Color("e8d8a0")), Models.monster("mushroom", Color("c070e0")), Models.monster("mammoth", Color("a0b8d0")),
+			Models.monster("moth", Color("ffb040")), Models.monster("hundun", Color("e05030")),
+		], 1.7)
+		# Blender landmarks (art/props)
+		var props: Array = []
+		for pr in ["pine", "bamboo", "peach", "meteor", "glowcap", "icespire", "chaosrock"]:
+			var holder := Node3D.new()
+			MB.mesh_node(holder, Assets.static_mesh("props/" + pr))
+			props.append(holder)
+		await _gallery("gallery_props", props, 1.3)
 		await _gallery("gallery_beasts", [
 			Models.monster("beast", Color("7aa860")), Models.monster("mantis", Color("5fd890")), Models.monster("tortoise", Color("b8903a")),
 			Models.monster("crab", Color("d0502a")), Models.monster("spider", Color("5a3a90")),

@@ -155,6 +155,11 @@ func _process(d: float) -> void:
 		toast_list.pop_front()
 
 func say(lines: Array, cb: Callable = Callable()) -> void:
+	# an empty conversation used to push an empty dialogue box that Enter could never close
+	if lines.is_empty():
+		if cb.is_valid():
+			cb.call()
+		return
 	dialogue.start(lines, cb)
 	push("dialogue")
 
@@ -173,6 +178,9 @@ func game_finished_ack() -> void:
 # ---------------------------------------------------------------- flow
 func new_game() -> void:
 	Game.reset()
+	# a second run from the title must not inherit the last run's toasts or chat rotation
+	toast_list.clear()
+	chat_idx.clear()
 	world.clear_cache()
 	world.load_area("sect", Game.tile)
 	set_stack(["world"])
