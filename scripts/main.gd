@@ -239,11 +239,12 @@ func start_breakthrough() -> void:
 		push("battle")
 	)
 
-## After the Dao-Merging tribulation the Lotus Seal pulls Lin Feng home to the sect.
-func recall_to_sect() -> void:
+## After the Dao-Merging tribulation (Part III) and the True Immortal ascension (Part IV)
+## the Lotus Seal pulls Lin Feng home to the sect.
+func recall_to_sect(key: String = "recall") -> void:
 	world.load_area("sect", Vector2i(20, 9))
 	Game.note("The Lotus Seal recalls Lin Feng to the sect")
-	say(Data.DIALOGUE["recall"])
+	say(Data.DIALOGUE[key])
 
 func battle_done(outcome: String, ctx: Dictionary) -> void:
 	pop() # battle
@@ -259,6 +260,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 						push("ending")
 					elif sid == "s_break6":
 						recall_to_sect()
+					elif sid == "s_break8":
+						recall_to_sect("recall2")
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity

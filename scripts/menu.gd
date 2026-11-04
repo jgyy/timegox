@@ -94,8 +94,9 @@ func _draw() -> void:
 	var ki := 0
 	for sid in Data.known_skills(0, Game.level, Game.step):
 		var s: Dictionary = Data.SKILLS[sid]
-		var kp := Vector2(446 + (ki / 6) * 380, 350.0 + (ki % 6) * 24.0)
-		UI.text(self, kp, "%s   (%d qi, %s)" % [s.n, s.cost, s.elem], 16, Data.ELEM_COLORS[s.elem])
+		# two columns of eight so even the full late-game list stays inside the panel
+		var kp := Vector2(446 + (ki / 8) * 384, 348.0 + (ki % 8) * 21.0)
+		UI.text(self, kp, "%s  (%d qi, %s)" % [s.n, s.cost, s.elem], 15, Data.ELEM_COLORS[s.elem], HORIZONTAL_ALIGNMENT_LEFT, 376)
 		ki += 1
 	UI.text(self, Vector2(430, 530), "Spirit stones: %d    Sword tempering: %d/%d" % [Game.stones, Game.temper, Data.TEMPER_COST.size()], 17)
 	UI.text(self, Vector2(430, 560), "Objective: " + Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 770)

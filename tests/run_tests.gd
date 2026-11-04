@@ -113,5 +113,54 @@ func _init() -> void:
 		check(Data.EXP_NEED[lv] > 0 and Data.ENEMY_EXP[lv] >= (Data.ENEMY_EXP[lv - 1] if lv > 0 else 0), "exp tables sane at level %d" % lv)
 	for l in Data.MAX_LEVEL + 1:
 		check(Data.level_name(l) != "", "level name %d = %s" % [l, Data.level_name(l)])
+	print("== part IV ==")
+	check(Data.REALMS.size() * 3 >= Data.MAX_LEVEL + 1, "every level up to the max has a realm name")
+	check(Data.DIALOGUE.has("recall2"), "Part IV recall dialogue exists")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "cloudsea" and p.open == "s_p4_home"), "sect west gate opens after the Part IV briefing")
+	check(Data.step_index("s_break8") < Data.step_index("s_p4_home"), "Part IV starts after the True Immortal ascension")
+	for a5 in ["cloudsea", "court", "forge", "garden"]:
+		check(Look.THEMES.has(a5) and Look.EXTRA.has(a5), "theme and terrain extras for " + a5)
+	check(Data.known_skills(0, 25).has("inkbreak") and Data.known_skills(1, 26).has("seal_bloom"), "Part IV techniques are learnable")
+	print("== battle ==")
+	var twins: Array = Data.make_foes([{"id": "bamboo_wolf", "lv": 1}, {"id": "bamboo_wolf", "lv": 1}, {"id": "bamboo_wolf", "lv": 1}])
+	var raw := [Data.make_enemy("bamboo_wolf", 1), Data.make_enemy("bamboo_wolf", 1)]
+	check(raw.find(raw[1]) == 0, "root cause: Array.find() matches identical foes by value")
+	check(twins[0].slot != twins[1].slot, "make_foes gives identical foes their own slots")
+	var spots := {}
+	for f in twins:
+		spots[Data.foe_pos(f.slot, twins.size(), false)] = true
+	check(spots.size() == 3, "identical foes stand on distinct stage positions")
+	print("== 3D builder ==")
+	var mbt := MB.new()
+	mbt.limb(Vector3.ZERO, Vector3(0, 1, 0), 0.2, 0.2, Color.WHITE, 8)
+	var tri_ok := true
+	for i in range(0, 8 * 6, 3):
+		var p0: Vector3 = mbt.v[mbt.idx[i]]
+		var p1: Vector3 = mbt.v[mbt.idx[i + 1]]
+		var p2: Vector3 = mbt.v[mbt.idx[i + 2]]
+		var cen := (p0 + p1 + p2) / 3.0
+		var out := Vector3(cen.x, 0, cen.z)
+		# Godot treats clockwise triangles as front faces: (p1-p0)x(p2-p0) points away from the viewer
+		if (p1 - p0).cross(p2 - p0).dot(out) > 0.0:
+			tri_ok = false
+	check(tri_ok, "limb() side faces wind outward (no inside-out limbs)")
+	var mbl := MB.new()
+	mbl.lathe(Vector3.ZERO, [Vector2(0.5, 0.0), Vector2(0.5, 1.0)], Color.WHITE, 8)
+	var lat_ok := true
+	for i in range(0, mbl.idx.size(), 3):
+		var q0: Vector3 = mbl.v[mbl.idx[i]]
+		var q1: Vector3 = mbl.v[mbl.idx[i + 1]]
+		var q2: Vector3 = mbl.v[mbl.idx[i + 2]]
+		var c2 := (q0 + q1 + q2) / 3.0
+		if (q1 - q0).cross(q2 - q0).dot(Vector3(c2.x, 0, c2.z)) > 0.0:
+			lat_ok = false
+	check(lat_ok, "lathe() faces wind outward (no inside-out robes)")
+	var tdist := 0.0
+	var m4 := MapGen.build("sect")
+	var hm4 := Terrain3D.heightmap(m4.grid, m4.w, m4.h, "sect", Data.AREAS.sect.seed)
+	check(hm4.size() == (m4.w + 1) * (m4.h + 1), "height field covers every tile corner")
+	for x4 in m4.w:
+		tdist = maxf(tdist, absf(Terrain3D.sample(hm4, m4.w, m4.h, (x4 + 0.5) * Terrain3D.T, 13.5 * Terrain3D.T)))
+	check(tdist < 0.5, "the sect's main road stays nearly flat (max %.2f)" % tdist)
 	print("failures: ", failures)
 	quit(1 if failures > 0 else 0)

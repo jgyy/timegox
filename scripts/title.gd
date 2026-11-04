@@ -13,34 +13,64 @@ func _build3d() -> void:
 	new_scene3d()
 	new_camera(55.0)
 	var env := Look.environment("sect", 0.6)
-	env.sky.sky_material.sky_top_color = Color("0b1030")
-	env.sky.sky_material.sky_horizon_color = Color("c88a6a")
+	Look.tint_sky(env, Color("0b1030"), Color("c88a6a"), Color("a07a8a"), 0.9)
 	env.ambient_light_color = Color("7080b0")
-	env.fog_light_color = Color("a07a8a")
 	cam.environment = env
 	var sun := Look.sun("sect")
 	sun.light_color = Color("ffe8c0")
-	sun.light_energy = 0.9
+	sun.light_energy = 1.0
+	sun.rotation_degrees = Vector3(-32, -25, 0)
 	scene3d.add_child(sun)
+	scene3d.add_child(Look.fill("sect"))
 	var b := MB.new()
-	b.cyl(Vector3(0, -1.0, 0), 5.0, 2.0, Color("4a4a60"), Vector3.ZERO, 14)
-	b.cyl(Vector3(0, 0.05, 0), 4.6, 0.1, Color("5a8a60"), Vector3.ZERO, 14)
+	var rock := MB.tag(Color("4a4a60"), MB.STONE)
+	# the cliff top the hero stands on, with a rocky skirt falling away into the clouds
+	b.lathe(Vector3(0, -6.0, 0), [Vector2(3.0, 0.0), Vector2(4.4, 2.5), Vector2(5.2, 4.8), Vector2(5.0, 5.9), Vector2(4.6, 6.05), Vector2(0.0, 6.1)], rock, 10, MB.tag(Color("5a5a72"), MB.STONE))
+	b.disc(Vector3(0, 0.11, 0), 4.6, MB.tag(Color("6a9a70"), MB.FOLIAGE), 20, MB.tag(Color("5a8a62"), MB.FOLIAGE))
+	for i in 9:
+		var a := TAU * i / 9.0 + 0.3
+		b.sph(Vector3(cos(a) * 4.7, -0.2, sin(a) * 4.7), Vector3(0.9, 0.6, 0.8), MB.tag(Color("54546c"), MB.STONE), Vector3(0, a, 0.2))
+	# distant spires of the sect's mountain range
 	for i in 26:
-		var a := TAU * i / 26.0
+		var a2 := TAU * i / 26.0
 		var r := 22.0 + (i % 5) * 7.0
 		var hh := 6.0 + (i * 7 % 9) * 2.2
-		b.cone(Vector3(cos(a) * r, hh * 0.5 - 2.0, sin(a) * r - 6.0), 5.0 + (i % 3) * 2.0, hh, Color("2a2a48").lerp(Color("5a4a6a"), (i % 4) / 6.0), Vector3.ZERO, 8)
-	# pagoda
-	for k in 4:
-		b.box(Vector3(-9, 1.0 + k * 1.6, -14), Vector3(3.2 - k * 0.5, 1.2, 3.2 - k * 0.5), Color("e8dcc0"))
-		b.prim("cone4", Transform3D(Basis.from_euler(Vector3(0, PI / 4, 0)).scaled(Vector3(5.6 - k * 0.7, 0.9, 5.6 - k * 0.7)), Vector3(-9, 1.9 + k * 1.6, -14)), Color("3a5a8a"))
-	MB.mesh_node(scene3d, b.build())
+		var c := Vector3(cos(a2) * r, hh * 0.5 - 2.0, sin(a2) * r - 6.0)
+		b.cone(c, 5.0 + (i % 3) * 2.0, hh, MB.tag(Color("2a2a48").lerp(Color("5a4a6a"), (i % 4) / 6.0), MB.STONE), Vector3(0, a2, 0), 8)
+		b.cone(c + Vector3(0, hh * 0.38, 0), 1.6, hh * 0.26, MB.tag(Color("8a90b0"), MB.STONE), Vector3(0, a2, 0), 8)
+	# pagoda on a far peak, with lit windows
 	var g := MB.new()
+	for k in 4:
+		b.box(Vector3(-9, 1.0 + k * 1.6, -14), Vector3(3.2 - k * 0.5, 1.2, 3.2 - k * 0.5), MB.tag(Color("e8dcc0"), MB.CLOTH))
+		b.prim("cone4", Transform3D(Basis.from_euler(Vector3(0, PI / 4, 0)).scaled(Vector3(5.6 - k * 0.7, 0.9, 5.6 - k * 0.7)), Vector3(-9, 1.9 + k * 1.6, -14)), MB.tag(Color("3a5a8a"), MB.STONE))
+		g.box(Vector3(-9, 1.0 + k * 1.6, -14 + (1.6 - k * 0.25) + 0.01), Vector3(0.5, 0.5, 0.02), Color(1.0, 0.8, 0.45, 0.85))
+	MB.mesh_node(scene3d, b.build())
+	# two windswept pines on the cliff edge
+	var pine := Terrain3D._proto("wall2:sect", "sect")
+	for pp in [Vector3(-3.6, 0.05, -3.4), Vector3(3.3, 0.05, -3.8)]:
+		var pm := MB.mesh_node(scene3d, pine, pp)
+		pm.scale = Vector3.ONE * 1.1
+		pm.rotation.y = pp.x
+	# a sea of clouds below
+	var cb := MB.new()
+	for i in 60:
+		var a3 := i * 2.399
+		var r2 := 7.0 + (i % 9) * 3.5
+		cb.sph(Vector3(cos(a3) * r2, -4.5 + (i % 4) * 0.4, sin(a3) * r2 - 4.0), Vector3(3.2, 1.0, 2.4), MB.tag(Color(0.86, 0.84, 0.95), MB.CLOTH))
+	MB.mesh_node(scene3d, cb.build(MB.mat_plain()))
 	g.ball(Vector3(14, 12, -40), 6.0, Color(1, 0.95, 0.8, 1.0))
-	g.ball(Vector3(14, 12, -40), 11.0, Color(1, 0.9, 0.7, 0.2))
 	g.ball(Vector3(-9, 9.5, -14), 0.5, Color(1, 0.8, 0.5, 0.6))
 	MB.mesh_node(scene3d, g.build(MB.mat_glow()))
-	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "glow": Color(0.4, 0.7, 1.0)})
+	var key := OmniLight3D.new()
+	key.light_color = Color(0.85, 0.85, 1.0)
+	key.light_energy = 1.2
+	key.omni_range = 14.0
+	key.position = Vector3(-2.0, 4.0, 6.0)
+	scene3d.add_child(key)
+	var moon := MB.new()
+	moon.sph_hi(Vector3.ZERO, Vector3(10.0, 10.0, 10.0), Color(1, 0.9, 0.7, 0.6))
+	MB.mesh_node(scene3d, moon.build(MB.mat_aura()), Vector3(14, 12, -40))
+	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")})
 	hero.position = Vector3(0, 0.1, 0)
 	scene3d.add_child(hero)
 	var w := Fx3D.make_weather()
