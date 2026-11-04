@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 27
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor"]
+const MAX_LEVEL := 30
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 250000, 300000, 400000, 450000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -36,12 +36,17 @@ const SKILLS := {
 	"genesis": {"n": "Genesis Sword", "cost": 150, "mult": 11.0, "elem": "thunder", "tgt": "one", "lv": 24, "who": 0},
 	"starfall": {"n": "Ten Thousand Starfall", "cost": 130, "mult": 3.4, "elem": "fire", "tgt": "all", "lv": 24, "who": 0},
 	"inkbreak": {"n": "Ledger-Breaking Stroke", "cost": 170, "mult": 13.5, "elem": "dark", "tgt": "one", "lv": 25, "who": 0},
+	"skymend": {"n": "Sky-Mending Sword", "cost": 190, "mult": 15.5, "elem": "earth", "tgt": "one", "lv": 27, "who": 0},
+	"fivecolour": {"n": "Five-Colour Stone Rain", "cost": 170, "mult": 4.3, "elem": "wood", "tgt": "all", "lv": 28, "who": 0},
+	"pillar": {"n": "Pillar of Heaven Strike", "cost": 210, "mult": 17.5, "elem": "thunder", "tgt": "one", "lv": 29, "who": 0, "after": "s_au_tortoise"},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
 	"starlight": {"n": "Starlight Rain", "cost": 40, "heal": 0.5, "elem": "water", "tgt": "allies", "lv": 13, "who": 1},
 	"dawn": {"n": "Dawn Lotus", "cost": 60, "heal": 0.7, "elem": "water", "tgt": "allies", "lv": 20, "who": 1},
 	"seal_bloom": {"n": "Seal Bloom", "cost": 85, "heal": 0.85, "elem": "water", "tgt": "allies", "lv": 26, "who": 1},
+	"mending": {"n": "Nuwa's Mending", "cost": 110, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 28, "who": 1},
+	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
 static func known_skills(who: int, level: int, step: int = 1 << 20) -> Array:
@@ -190,6 +195,36 @@ const ENEMIES := {
 	"crane_matriarch": {"n": "Jade Crane Matriarch", "elem": "water", "weak": "thunder", "col": Color("d8fff0"), "shape": "bird", "boss": true},
 	"the_nineteen": {"n": "The Nineteen", "elem": "dark", "weak": "thunder", "col": Color("a0b8e0"), "shape": "wraith", "boss": true},
 	"jade_ledger": {"n": "The Jade Ledger", "elem": "dark", "weak": "thunder", "col": Color("40c090"), "shape": "tome", "boss": true},
+	# ---- Part V monsters
+	"dune_scorpion": {"n": "Dune Scorpion", "elem": "earth", "weak": "wood", "col": Color("d8b070"), "shape": "scorpion"},
+	"sand_wraith": {"n": "Sand Wraith", "elem": "earth", "weak": "water", "col": Color("e0c890"), "shape": "wraith"},
+	"meteor_golem": {"n": "Meteorite Golem", "elem": "fire", "weak": "water", "col": Color("7a6ac0"), "shape": "golem"},
+	"spore_puff": {"n": "Spore Puff", "elem": "wood", "weak": "fire", "col": Color("e080c0"), "shape": "mushroom"},
+	"glow_moth": {"n": "Glow Moth", "elem": "fire", "weak": "water", "col": Color("ffd080"), "shape": "moth"},
+	"root_crawler": {"n": "Root Crawler", "elem": "earth", "weak": "wood", "col": Color("8a6a40"), "shape": "spider"},
+	"frost_yak": {"n": "Frost Yak", "elem": "water", "weak": "fire", "col": Color("b0c8e0"), "shape": "mammoth"},
+	"aurora_wisp": {"n": "Aurora Wisp", "elem": "thunder", "weak": "earth", "col": Color("80ffd0"), "shape": "wisp"},
+	"ice_lynx": {"n": "Ice Lynx", "elem": "water", "weak": "thunder", "col": Color("c8e0f8"), "shape": "beast"},
+	"chaos_eel": {"n": "Chaos Eel", "elem": "dark", "weak": "thunder", "col": Color("8040c0"), "shape": "serpent"},
+	"primal_jelly": {"n": "Primal Jelly", "elem": "dark", "weak": "fire", "col": Color("c060ff"), "shape": "jelly"},
+	"faceless_spawn": {"n": "Faceless Spawn", "elem": "dark", "weak": "fire", "col": Color("c04030"), "shape": "hundun"},
+	# ---- Part V bosses
+	"glass_scorpion": {"n": "Glass Scorpion King", "elem": "earth", "weak": "wood", "col": Color("e8d8a0"), "shape": "scorpion", "boss": true},
+	"dune_leviathan": {"n": "Dune Leviathan", "elem": "earth", "weak": "wood", "col": Color("c8a060"), "shape": "dragon", "boss": true},
+	"star_colossus": {"n": "Star-Iron Colossus", "elem": "fire", "weak": "water", "col": Color("8a7ae0"), "shape": "golem", "boss": true},
+	"white_tiger": {"n": "Bai Hu, White Tiger of the West", "elem": "earth", "weak": "fire", "col": Color("f4f4ff"), "shape": "beast", "boss": true},
+	"spore_mother": {"n": "Mother of Spores", "elem": "wood", "weak": "fire", "col": Color("c070e0"), "shape": "mushroom", "boss": true},
+	"moth_queen": {"n": "Lantern Moth Queen", "elem": "fire", "weak": "water", "col": Color("ffb040"), "shape": "moth", "boss": true},
+	"rot_hydra": {"n": "Rot-Root Hydra", "elem": "wood", "weak": "fire", "col": Color("6a8a40"), "shape": "serpent", "boss": true},
+	"vermilion_bird": {"n": "Zhu Que, Vermilion Bird of the South", "elem": "fire", "weak": "water", "col": Color("ff4030"), "shape": "phoenix", "boss": true},
+	"mammoth_ancestor": {"n": "Mammoth Ancestor", "elem": "water", "weak": "fire", "col": Color("a0b8d0"), "shape": "mammoth", "boss": true},
+	"aurora_serpent": {"n": "Aurora Serpent", "elem": "thunder", "weak": "earth", "col": Color("60f0c0"), "shape": "dragon", "boss": true},
+	"lynx_matriarch": {"n": "Frost Lynx Matriarch", "elem": "water", "weak": "thunder", "col": Color("d0e8ff"), "shape": "beast", "boss": true},
+	"black_tortoise": {"n": "Xuan Wu, Black Tortoise of the North", "elem": "water", "weak": "earth", "col": Color("3a4a6a"), "shape": "tortoise", "boss": true},
+	"first_lightning": {"n": "The First Lightning", "elem": "thunder", "weak": "earth", "col": Color("f0f0ff"), "shape": "storm", "boss": true},
+	"pangu_shadow": {"n": "Shadow of Pangu", "elem": "earth", "weak": "wood", "col": Color("6a5040"), "shape": "demon", "boss": true},
+	"ancestor_took": {"n": "The Ancestor Who Took", "elem": "dark", "weak": "thunder", "col": Color("402050"), "shape": "humanoid", "boss": true},
+	"hundun": {"n": "Hundun, the Faceless Chaos", "elem": "dark", "weak": "thunder", "col": Color("e05030"), "shape": "hundun", "boss": true},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -244,6 +279,7 @@ const AREAS := {
 			{"to": "bamboo", "pos": Vector2i(38, 13), "dest": Vector2i(4, 22), "open": ""},
 			{"to": "mirror", "pos": Vector2i(20, 24), "dest": Vector2i(4, 28), "open": "s_p3_home"},
 			{"to": "cloudsea", "pos": Vector2i(1, 13), "dest": Vector2i(4, 28), "open": "s_p4_home"},
+			{"to": "dunes", "pos": Vector2i(38, 22), "dest": Vector2i(4, 28), "open": "s_p5_home"},
 		],
 		"npcs": [
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 5), "col": Color("e8e8ff")},
@@ -563,9 +599,89 @@ const AREAS := {
 		],
 		"pickup_vis": "s_gd_collect",
 	},
+	# ---- Part V: The Falling Sky
+	"dunes": {
+		"n": "Desert of Fallen Stars", "w": 96, "h": 58, "seed": 191, "theme": "dunes", "enemies": 20,
+		"pool": [["dune_scorpion", 27, 27], ["sand_wraith", 27, 27], ["meteor_golem", 27, 27]],
+		"portals": [
+			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(36, 22), "open": ""},
+			{"to": "fungal", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_du_tiger"},
+		],
+		"npcs": [{"id": "nomad", "n": "Nomad Matriarch Ba Yin", "pos": Vector2i(10, 26), "col": Color("e8c890"), "vis": ["s_du_intro", ""]}],
+		"bosses": [
+			{"id": "glass_scorpion", "pos": Vector2i(30, 40), "lv": 27, "req": 27},
+			{"id": "dune_leviathan", "pos": Vector2i(46, 16), "lv": 27, "req": 27},
+			{"id": "star_colossus", "pos": Vector2i(60, 40), "lv": 27, "req": 27},
+			{"id": "white_tiger", "pos": Vector2i(86, 28), "lv": 27, "req": 27},
+		],
+		"pickups": [
+			{"id": "fstar1", "item": "fallen_star", "pos": Vector2i(22, 12)}, {"id": "fstar2", "item": "fallen_star", "pos": Vector2i(40, 46)},
+			{"id": "fstar3", "item": "fallen_star", "pos": Vector2i(64, 30)}, {"id": "fstar4", "item": "fallen_star", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_du_collect",
+	},
+	"fungal": {
+		"n": "Glowcap Vale", "w": 96, "h": 58, "seed": 201, "theme": "fungal", "enemies": 20,
+		"pool": [["spore_puff", 27, 28], ["glow_moth", 27, 28], ["root_crawler", 27, 28]],
+		"portals": [
+			{"to": "dunes", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "aurora", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_fu_bird"},
+		],
+		"npcs": [{"id": "spore_witch", "n": "Spore-Witch Mo Gu", "pos": Vector2i(10, 26), "col": Color("c8a0e0"), "vis": ["s_fu_intro", ""]}],
+		"bosses": [
+			{"id": "spore_mother", "pos": Vector2i(32, 14), "lv": 27, "req": 27},
+			{"id": "moth_queen", "pos": Vector2i(44, 34), "lv": 28, "req": 28},
+			{"id": "rot_hydra", "pos": Vector2i(58, 46), "lv": 28, "req": 28},
+			{"id": "vermilion_bird", "pos": Vector2i(86, 26), "lv": 28, "req": 28},
+		],
+		"pickups": [
+			{"id": "gcap1", "item": "glowcap", "pos": Vector2i(22, 12)}, {"id": "gcap2", "item": "glowcap", "pos": Vector2i(40, 46)},
+			{"id": "gcap3", "item": "glowcap", "pos": Vector2i(64, 30)}, {"id": "gcap4", "item": "glowcap", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_fu_collect",
+	},
+	"aurora": {
+		"n": "Aurora Steppe", "w": 96, "h": 58, "seed": 211, "theme": "aurora", "enemies": 20,
+		"pool": [["frost_yak", 28, 28], ["aurora_wisp", 28, 28], ["ice_lynx", 28, 29]],
+		"portals": [
+			{"to": "fungal", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "chaos", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_au_tortoise"},
+		],
+		"npcs": [{"id": "steppe_shaman", "n": "Steppe Shaman A Lan", "pos": Vector2i(10, 26), "col": Color("d0f0ff"), "vis": ["s_au_intro", ""]}],
+		"bosses": [
+			{"id": "mammoth_ancestor", "pos": Vector2i(30, 40), "lv": 28, "req": 28},
+			{"id": "aurora_serpent", "pos": Vector2i(46, 16), "lv": 28, "req": 28},
+			{"id": "lynx_matriarch", "pos": Vector2i(60, 40), "lv": 29, "req": 29},
+			{"id": "black_tortoise", "pos": Vector2i(86, 28), "lv": 29, "req": 29},
+		],
+		"pickups": [
+			{"id": "ashard1", "item": "aurora_shard", "pos": Vector2i(22, 12)}, {"id": "ashard2", "item": "aurora_shard", "pos": Vector2i(40, 46)},
+			{"id": "ashard3", "item": "aurora_shard", "pos": Vector2i(64, 30)}, {"id": "ashard4", "item": "aurora_shard", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_au_collect",
+	},
+	"chaos": {
+		"n": "Primordial Chaos", "w": 98, "h": 58, "seed": 221, "theme": "chaos", "enemies": 20,
+		"pool": [["chaos_eel", 29, 29], ["primal_jelly", 29, 29], ["faceless_spawn", 29, 29]],
+		"portals": [
+			{"to": "aurora", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+		],
+		"npcs": [{"id": "nuwa_echo", "n": "Echo of Nuwa", "pos": Vector2i(10, 26), "col": Color("fff0d8"), "vis": ["s_ch_intro", ""]}],
+		"bosses": [
+			{"id": "first_lightning", "pos": Vector2i(32, 40), "lv": 29, "req": 29},
+			{"id": "pangu_shadow", "pos": Vector2i(46, 16), "lv": 29, "req": 29},
+			{"id": "ancestor_took", "pos": Vector2i(60, 40), "lv": 29, "req": 29},
+			{"id": "hundun", "pos": Vector2i(88, 28), "lv": 29, "req": 29},
+		],
+		"pickups": [
+			{"id": "fivest1", "item": "five_stone", "pos": Vector2i(22, 12)}, {"id": "fivest2", "item": "five_stone", "pos": Vector2i(40, 46)},
+			{"id": "fivest3", "item": "five_stone", "pos": Vector2i(64, 30)}, {"id": "fivest4", "item": "five_stone", "pos": Vector2i(76, 10)},
+		],
+		"pickup_vis": "s_ch_collect",
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos"]
 
 ## next area to enter when travelling from `from` to `to` (breadth-first over portals)
 static func next_hop(from: String, to: String) -> String:
@@ -726,6 +842,41 @@ const STEPS := [
 	{"id": "s_gd_nineteen", "kind": "kill", "boss": "the_nineteen", "area": "garden", "t": "Free the Nineteen from their names"},
 	{"id": "s_gd_ledger", "kind": "kill", "boss": "jade_ledger", "area": "garden", "t": "Close the Jade Ledger forever", "stones": 5000},
 	{"id": "s_break9", "kind": "breakthrough", "to": 27, "t": "Become the first Dao Ancestor who takes nothing"},
+	# ---- Part V: The Falling Sky
+	{"id": "s_p5_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Stars are falling in daylight: speak to Elder Qing Xuan", "stones": 5500},
+	{"id": "s_du_intro", "kind": "talk", "npc": "nomad", "area": "dunes", "t": "Take the south-east road into the Desert of Fallen Stars and find the nomads"},
+	{"id": "s_du_collect", "kind": "collect", "item": "fallen_star", "n": 4, "area": "dunes", "t": "Gather 4 Fallen Star Fragments from the craters"},
+	{"id": "s_du_hunt", "kind": "hunt", "area": "dunes", "n": 46, "t": "Drive back the star-mad creatures of the dunes"},
+	{"id": "s_du_return", "kind": "talk", "npc": "nomad", "area": "dunes", "t": "Bring the star fragments to Matriarch Ba Yin"},
+	{"id": "s_du_scorpion", "kind": "kill", "boss": "glass_scorpion", "area": "dunes", "t": "Shatter the Glass Scorpion King"},
+	{"id": "s_du_leviathan", "kind": "kill", "boss": "dune_leviathan", "area": "dunes", "t": "Bring down the Dune Leviathan"},
+	{"id": "s_du_colossus", "kind": "kill", "boss": "star_colossus", "area": "dunes", "t": "Topple the Star-Iron Colossus"},
+	{"id": "s_du_tiger", "kind": "kill", "boss": "white_tiger", "area": "dunes", "t": "Face Bai Hu at the foot of the Western Pillar", "stones": 5800},
+	{"id": "s_fu_intro", "kind": "talk", "npc": "spore_witch", "area": "fungal", "t": "Enter Glowcap Vale and seek the Spore-Witch"},
+	{"id": "s_fu_collect", "kind": "collect", "item": "glowcap", "n": 4, "area": "fungal", "t": "Pick 4 Ember Glowcaps"},
+	{"id": "s_fu_hunt", "kind": "hunt", "area": "fungal", "n": 46, "t": "Clear the spore-choked paths of the vale"},
+	{"id": "s_fu_return", "kind": "talk", "npc": "spore_witch", "area": "fungal", "t": "Bring the glowcaps to Mo Gu"},
+	{"id": "s_fu_mother", "kind": "kill", "boss": "spore_mother", "area": "fungal", "t": "Calm the Mother of Spores"},
+	{"id": "s_fu_moth", "kind": "kill", "boss": "moth_queen", "area": "fungal", "t": "Dim the Lantern Moth Queen"},
+	{"id": "s_fu_hydra", "kind": "kill", "boss": "rot_hydra", "area": "fungal", "t": "Uproot the Rot-Root Hydra"},
+	{"id": "s_fu_bird", "kind": "kill", "boss": "vermilion_bird", "area": "fungal", "t": "Rekindle Zhu Que at the Southern Pillar", "stones": 6200},
+	{"id": "s_au_intro", "kind": "talk", "npc": "steppe_shaman", "area": "aurora", "t": "Cross onto the Aurora Steppe and find its shaman"},
+	{"id": "s_au_collect", "kind": "collect", "item": "aurora_shard", "n": 4, "area": "aurora", "t": "Catch 4 Aurora Shards where the lights touch the snow"},
+	{"id": "s_au_hunt", "kind": "hunt", "area": "aurora", "n": 46, "t": "Turn back the frozen herds stampeding south"},
+	{"id": "s_au_return", "kind": "talk", "npc": "steppe_shaman", "area": "aurora", "t": "Bring the aurora shards to Shaman A Lan"},
+	{"id": "s_au_mammoth", "kind": "kill", "boss": "mammoth_ancestor", "area": "aurora", "t": "Wake the Mammoth Ancestor"},
+	{"id": "s_au_serpent", "kind": "kill", "boss": "aurora_serpent", "area": "aurora", "t": "Ground the Aurora Serpent"},
+	{"id": "s_au_lynx", "kind": "kill", "boss": "lynx_matriarch", "area": "aurora", "t": "Outrun the Frost Lynx Matriarch"},
+	{"id": "s_au_tortoise", "kind": "kill", "boss": "black_tortoise", "area": "aurora", "t": "Lift Xuan Wu back beneath the Northern Pillar", "stones": 6600},
+	{"id": "s_ch_intro", "kind": "talk", "npc": "nuwa_echo", "area": "chaos", "t": "Step into the Primordial Chaos and follow the voice"},
+	{"id": "s_ch_collect", "kind": "collect", "item": "five_stone", "n": 4, "area": "chaos", "t": "Gather 4 Five-Coloured Stones from the formless sea"},
+	{"id": "s_ch_hunt", "kind": "hunt", "area": "chaos", "n": 48, "t": "Hold back the formless things gnawing at the sky's root"},
+	{"id": "s_ch_return", "kind": "talk", "npc": "nuwa_echo", "area": "chaos", "t": "Bring the Five-Coloured Stones to the Echo of Nuwa"},
+	{"id": "s_ch_lightning", "kind": "kill", "boss": "first_lightning", "area": "chaos", "t": "Answer the First Lightning"},
+	{"id": "s_ch_pangu", "kind": "kill", "boss": "pangu_shadow", "area": "chaos", "t": "Lay the Shadow of Pangu to rest"},
+	{"id": "s_ch_took", "kind": "kill", "boss": "ancestor_took", "area": "chaos", "t": "Refuse the Ancestor Who Took"},
+	{"id": "s_ch_hundun", "kind": "kill", "boss": "hundun", "area": "chaos", "t": "Give a face to Hundun, the Faceless Chaos", "stones": 7000},
+	{"id": "s_break10", "kind": "breakthrough", "to": 30, "t": "Hold up the sky by choice: become a Primordial Sovereign"},
 ]
 
 static func step_index(id: String) -> int:
@@ -754,6 +905,10 @@ const ITEMS := {
 	"seal": {"n": "Jade Seal", "desc": "Quest item"},
 	"ingot": {"n": "Star-Iron Ingot", "desc": "Quest item"},
 	"peach": {"n": "Immortal Peach", "desc": "Quest item"},
+	"fallen_star": {"n": "Fallen Star Fragment", "desc": "Quest item"},
+	"glowcap": {"n": "Ember Glowcap", "desc": "Quest item"},
+	"aurora_shard": {"n": "Aurora Shard", "desc": "Quest item"},
+	"five_stone": {"n": "Five-Coloured Stone", "desc": "Quest item"},
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
 	"brush": {"n": "Registrar's Broken Brush", "desc": "The brush that wrote the Ledger, snapped in two"},
@@ -783,6 +938,10 @@ const CHAT := {
 	"cloud_warden": ["Step lightly. The islands remember every footfall.", "The clouds used to carry ascenders up. Now they carry tithes."],
 	"court_scribe": ["I copied ten thousand names before I read one. Then I could not stop reading.", "Ink dries. Debts should too."],
 	"forge_master": ["Lightning is only iron that learned to run.", "Every tribulation you endured was hammered on this anvil. I am sorry."],
+	"nomad": ["The sand remembers every star that fell. Tonight it remembers too many.", "Water first, questions after. That is the desert's only law."],
+	"spore_witch": ["Do not breathe too deeply, little immortal. The vale dreams through its spores.", "Everything that rots feeds something that glows."],
+	"steppe_shaman": ["The lights are the sky's breath. Lately it is breathing too fast.", "Walk where the herds walk. They know which ice will hold."],
+	"nuwa_echo": ["I am only what is left of a promise. Be kinder to it than I was.", "Before the world there was no up and no down. Do not let the sky forget which is which."],
 	"peach_keeper": ["A peach of this garden ripens once in three thousand years. Do not waste it.", "The nineteen come here in their dreams. They like the shade."],
 }
 
@@ -1538,5 +1697,182 @@ const DIALOGUE := {
 		["Yue Ling", "The Ledger is closed, the Hollow is full, and the nineteen are resting in the peach trees. What now, Dao Ancestor?"],
 		["Lin Feng", "Now? Now I think I will go home and sweep the steps. Somebody should."],
 		["Narrator", "Far below, Elder Qing Xuan watches the clouds turn gold. The Lotus Seal's chime, cracked for a thousand years, rings clear and whole, and the first true morning in ten thousand years begins."],
+	],
+	# ---- Part V: The Falling Sky
+	"recall3": [
+		["Narrator", "Lin Feng keeps his word. For nine quiet days the first Dao Ancestor in ten thousand years sweeps the steps of Azure Cloud Sect, and nobody quite dares to stop him."],
+		["Narrator", "On the tenth day a star falls at noon. Then another. Then a slow rain of them, white and silent, hissing out in the lotus pond."],
+		["Yue Ling", "Lin Feng... the sky is lower than it was this morning. I can see the seams in it."],
+		["Elder Qing Xuan", "Put the broom down, disciple. Come to the hall. I have been reading very old books since the Ledger closed, and I do not like how they end."],
+	],
+	"s_p5_home": [
+		["Elder Qing Xuan", "The Heavenly Court did not only harvest souls. It spent them. Every tribulation it fed on went to hold the sky above the world."],
+		["Elder Qing Xuan", "The oldest scrolls say Nuwa once mended a broken sky with stones of five colours and set four pillars beneath it, one at each corner of the world. The Court let the pillars starve and propped the sky up with stolen years instead."],
+		["Lin Feng", "And I closed the Ledger. So now nothing is holding it."],
+		["Elder Qing Xuan", "Not nothing. The eastern pillar still stands. The Azure Dragon King holds it up with his own back, out of gratitude to a boy who freed him."],
+		["Lin Feng", "His scale still hangs at my belt. He said the tide remembers every promise."],
+		["Elder Qing Xuan", "The other three wardens were not so lucky. Bai Hu in the western desert, Zhu Que in the southern vale, Xuan Wu on the northern steppe. Starved for an age, they have gone wild, and their pillars are crumbling."],
+		["Elder Qing Xuan", "And at the centre, where the pillars meet, something older than the sky is waking up because the sky is thinning. The books call it Hundun. It has no face, and it does not know it is hungry."],
+		["Yue Ling", "Then we feed the pillars ourselves. Not with stolen years. With qi that is given."],
+		["Elder Qing Xuan", "That is the only way it can be done now. I have opened the old south-east road. It leads to the Desert of Fallen Stars. The nomads there have watched the western pillar for a thousand years."],
+		["Lin Feng", "Then I will go and hold up a corner of the sky. Somebody should."],
+	],
+	"s_du_intro": [
+		["Nomad Matriarch Ba Yin", "An immortal who walks into the desert on purpose. Either you are very brave or the sky sent you, and the sky has not sent us anything good in a long time."],
+		["Lin Feng", "I came to mend the western pillar."],
+		["Nomad Matriarch Ba Yin", "Then you will need what fell from it. The craters are full of star fragments, and the creatures of the dunes have gone mad from their light. Bring me four, and I will show you how my grandmothers sang them back into place."],
+	],
+	"s_du_return": [
+		["Nomad Matriarch Ba Yin", "Four, and none of them cracked. Good hands. Hold them to the sun, both of you, and breathe into them."],
+		["Narrator", "Lin Feng and Yue Ling pour their qi into the fragments. The shards warm, then hum, then rise into the air and drift west like homing birds."],
+		["Nomad Matriarch Ba Yin", "They know the way home. Follow them past the Glass King and the Leviathan's dune. The White Tiger sleeps at the foot of the pillar, and he has not slept well in a very long time."],
+	],
+	"pre:glass_scorpion": [
+		["Narrator", "The dune ahead shatters like a window. A scorpion of fused desert glass rises out of it, every fallen star it ever ate burning inside its tail."],
+		["Yue Ling", "It is drunk on starlight. Break the glass and the light will go back to the sky!"],
+	],
+	"post:glass_scorpion": [["Narrator", "The Glass King cracks into a thousand pieces, and a thousand tiny lights float upward, back to where they belong."]],
+	"pre:dune_leviathan": [
+		["Narrator", "The sand drains away beneath Lin Feng's feet. A dragon of stone and sand coils up out of the sinkhole, older than the nomads' oldest song."],
+		["Lin Feng", "Lie down, old one. The desert will hold you without swallowing anyone."],
+	],
+	"post:dune_leviathan": [["Narrator", "The Leviathan sinks back into the sand with a sound like a long sigh, and the dunes settle around it like a blanket."]],
+	"pre:star_colossus": [
+		["Narrator", "Fallen star-iron has gathered itself into the shape of a giant, piece by piece, as if it remembers being part of the sky and is trying to climb back up."],
+		["Yue Ling", "It is not angry. It is homesick."],
+	],
+	"post:star_colossus": [["Narrator", "The Colossus comes apart gently, and its star-iron settles in a ring around the base of the western pillar, as if it had only wanted to be close to it."]],
+	"pre:white_tiger": [
+		["Bai Hu, White Tiger of the West", "Another cultivator. Another mouth. The Court sent ten thousand of you to feed me lies and take my strength. Go, before I take yours."],
+		["Lin Feng", "I am not here to take. I brought your pillar its stars back."],
+		["Bai Hu, White Tiger of the West", "Then prove your hands are empty."],
+	],
+	"post:white_tiger": [
+		["Bai Hu, White Tiger of the West", "...empty hands. Open ones. I had forgotten what they looked like."],
+		["Narrator", "The White Tiger sets his shoulder beneath the western pillar, and Lin Feng and Yue Ling give it their qi. The pillar drinks, straightens, and the western sky lifts by the width of a hand."],
+		["Bai Hu, White Tiger of the West", "My sister Zhu Que burns in the southern vale. She will not listen to words. Bring her light, not fire."],
+	],
+	"s_fu_intro": [
+		["Spore-Witch Mo Gu", "Ah, visitors who are not spores. How refreshing. Mind the caps, they bite when they are frightened, and they are frightened of everything lately."],
+		["Spore-Witch Mo Gu", "Zhu Que's fire has gone cold and sick. Her pillar is rotting at the root. The vale tries to help in its own way: it grows glowcaps where her embers fell."],
+		["Spore-Witch Mo Gu", "Pick me four Ember Glowcaps. Gently. They still remember being fire."],
+	],
+	"s_fu_return": [
+		["Spore-Witch Mo Gu", "Lovely. Warm as a hearth. Now breathe on them, both of you, the way you would blow on coals."],
+		["Narrator", "The glowcaps brighten until they glow like lanterns, and their spores drift south in slow, burning spirals."],
+		["Spore-Witch Mo Gu", "The Mother, the Moth Queen and the Hydra guard the way. None of them are wicked, only unwell. Be firm and be kind. They are the same thing, done properly."],
+	],
+	"pre:spore_mother": [
+		["Narrator", "A mushroom the size of a pagoda shuffles into the path and shakes its cap. The air fills with sleepy, glittering spores."],
+		["Yue Ling", "Do not breathe it in! She wants us to sleep forever under her cap, like her children."],
+	],
+	"post:spore_mother": [["Narrator", "The Mother of Spores settles down with a soft thump and goes back to sleep, and this time her dreams are only dreams."]],
+	"pre:moth_queen": [
+		["Narrator", "Wings like stained-glass lanterns open across the canopy. The Lantern Moth Queen has been circling Zhu Que's dying fire for a hundred years."],
+		["Lin Feng", "You cannot warm yourself on a fire that has gone out. Let us light it again."],
+	],
+	"post:moth_queen": [["Narrator", "The Moth Queen folds her wings and drifts aside, and her lanterns turn to point the way south."]],
+	"pre:rot_hydra": [
+		["Narrator", "The roots of the southern pillar have grown heads. Seven of them, green with rot, each one gnawing at the stone it was meant to hold."],
+		["Yue Ling", "It is eating the pillar to stay alive. Cut the rot, not the root!"],
+	],
+	"post:rot_hydra": [["Narrator", "The rotten heads fall away. What is left of the roots curls back around the base of the pillar and holds on, healthy and pale."]],
+	"pre:vermilion_bird": [
+		["Zhu Que, Vermilion Bird of the South", "Do not come closer. My fire has gone wrong. It burns cold and it burns everything it touches."],
+		["Lin Feng", "Then let it touch me. I have stood in nine tribulations. I can stand in a little cold fire."],
+	],
+	"post:vermilion_bird": [
+		["Narrator", "The cold fire gutters, and Yue Ling's glowcaps catch in Zhu Que's feathers like embers in kindling. The Vermilion Bird blazes up warm and red, and the southern pillar glows like a lantern."],
+		["Zhu Que, Vermilion Bird of the South", "Warm. I am warm. Go north, little sun. Xuan Wu has been holding his breath under the ice since the Court left, and he is very nearly out of it."],
+	],
+	"s_au_intro": [
+		["Steppe Shaman A Lan", "The lights told me you were coming. They also told me the sky is falling, which I had noticed. The herds are running south and the ice is groaning."],
+		["Steppe Shaman A Lan", "Xuan Wu sleeps beneath the northern pillar, frozen in the lake he once carried on his back. To wake him you need the sky's own breath."],
+		["Steppe Shaman A Lan", "Catch four Aurora Shards where the lights touch the snow. Move slowly. They startle."],
+	],
+	"s_au_return": [
+		["Steppe Shaman A Lan", "Four. And you did not freeze your fingers off. Now sing to them. No? Then just breathe, and mean it."],
+		["Narrator", "The shards ripple green and violet in their hands and stream north across the snow in long, silent ribbons."],
+		["Steppe Shaman A Lan", "Follow the lights. The Ancestor of the herds, the Aurora Serpent and the Lynx Matriarch will try to stop you, because they are afraid. So am I. Go anyway."],
+	],
+	"pre:mammoth_ancestor": [
+		["Narrator", "A mountain of shaggy fur blocks the pass. The Mammoth Ancestor has stood guard over the herds since before the steppe had a name."],
+		["Yue Ling", "It thinks we are the ones making the sky fall. Show it we are holding it up!"],
+	],
+	"post:mammoth_ancestor": [["Narrator", "The Ancestor lowers its tusks, trumpets once at the sinking sky, and turns to lead its herd north instead of south."]],
+	"pre:aurora_serpent": [
+		["Narrator", "The northern lights come down out of the sky and coil into a dragon, crackling green and violet, hungry for the qi in the aurora shards."],
+		["Lin Feng", "You were the sky's breath. Go back up and breathe."],
+	],
+	"post:aurora_serpent": [["Narrator", "The Aurora Serpent unravels into ribbons of light and rises, and the sky above the steppe brightens from bruised grey to a deep, clean blue."]],
+	"pre:lynx_matriarch": [
+		["Narrator", "Something white and very fast circles them in the snow. The Frost Lynx Matriarch has hunted every cultivator who ever came north for the Court."],
+		["Lin Feng", "The Court is gone. I am only here to lift something heavy."],
+	],
+	"post:lynx_matriarch": [["Narrator", "The Matriarch sits down in the snow, licks a paw, and pointedly ignores them, which on the Aurora Steppe is a blessing."]],
+	"pre:black_tortoise": [
+		["Narrator", "The lake beneath the northern pillar cracks open. Xuan Wu rises through the ice, a black tortoise as large as a hill, a living mountain with snakes of frost coiled around his shell."],
+		["Xuan Wu, Black Tortoise of the North", "I carried this pillar for ten thousand years. Then they stopped feeding me, and I carried it anyway, until I could not. Do not ask me to do it again."],
+		["Lin Feng", "I will not ask. I will carry it with you."],
+	],
+	"post:black_tortoise": [
+		["Narrator", "Xuan Wu sets his shell beneath the northern pillar, and Lin Feng sets his back beside it. The aurora pours down into the stone, and the whole northern sky lifts, groaning, back into place."],
+		["Xuan Wu, Black Tortoise of the North", "Three corners, and the Dragon King's makes four. But a sky needs a centre, little ancestor. Go to where the pillars meet. And do not look Hundun in the face. He does not have one, and he will want yours."],
+		["Narrator", "A new technique settles into Lin Feng's bones, heavy and patient as a mountain: the Pillar of Heaven Strike."],
+	],
+	"s_ch_intro": [
+		["Narrator", "Beyond the northern pillar there is no ground, only colour: a slow ocean of every colour at once, with islands of stone drifting through it like thoughts."],
+		["Echo of Nuwa", "You came. Good. I am what is left of Nuwa's promise to keep the sky up. There is not much of me. There is not much of anything, here."],
+		["Echo of Nuwa", "I mended the sky once with five-coloured stones. They are still here, scattered in the chaos. Gather four, and I will show you how to set the last one."],
+		["Yue Ling", "Four stones. And the fifth?"],
+		["Echo of Nuwa", "The fifth is always the one who sets them."],
+	],
+	"s_ch_return": [
+		["Echo of Nuwa", "Red, yellow, blue and white. The black one is missing, as it always was. That one was me."],
+		["Echo of Nuwa", "When the time comes, set them in the sky with your own qi. But first, the chaos will test you. It always tests the ones who try to give it a shape."],
+		["Lin Feng", "Let it."],
+	],
+	"pre:first_lightning": [
+		["Narrator", "A bolt of lightning hangs in the chaos, not falling, simply existing: the very first one, older than any tribulation, the one all the others copied."],
+		["Yue Ling", "Every tribulation you ever passed was an echo of this. Answer it!"],
+	],
+	"post:first_lightning": [["Narrator", "The First Lightning strikes Lin Feng, and Lin Feng does not flinch, and the lightning, satisfied at last, comes to rest as a thin bright line along the base of the sky."]],
+	"pre:pangu_shadow": [
+		["Narrator", "A giant shadow with an axe stands where the chaos is thickest, frozen mid-swing: the shape of Pangu, who split heaven from earth and held them apart until he died of it."],
+		["Lin Feng", "You held them apart alone. You should not have had to."],
+	],
+	"post:pangu_shadow": [["Narrator", "The Shadow of Pangu lowers its axe, and for a moment, before it fades, it looks at Lin Feng the way a tired man looks at someone come to take the other end of a heavy load."]],
+	"pre:ancestor_took": [
+		["Narrator", "A man steps out of the chaos wearing Lin Feng's face, a Dao Ancestor robed in stolen years, nineteen names stitched into his sleeves."],
+		["The Ancestor Who Took", "This is who you would have been if you had taken. Look how strong I am. The sky would never fall on me. I would simply take more."],
+		["Lin Feng", "I know. That is why I did not."],
+	],
+	"post:ancestor_took": [
+		["The Ancestor Who Took", "...you would really rather hold it up... than own it...?"],
+		["Lin Feng", "Every time."],
+		["Narrator", "The other Lin Feng comes apart like smoke, and the nineteen names on his sleeves fly free and settle among the drifting stones like stars."],
+	],
+	"pre:hundun": [
+		["Narrator", "At the centre of everything, where the four pillars point, Hundun waits: a vast cinnabar shape with six legs and four wings and, where its face should be, nothing at all."],
+		["Echo of Nuwa", "Long ago, two kind gods tried to give Hundun a face. They bored seven holes in him, one each day, and on the seventh day he died, and the world was born from him."],
+		["Yue Ling", "So the world itself is built on a kindness that went wrong."],
+		["Lin Feng", "Then let us do the kindness right. Not holes. Just a face, if he wants one. Hundun! Wake up gently. We will not take anything."],
+	],
+	"post:hundun": [
+		["Narrator", "Hundun stops. For the first time since before time, something has asked it what it wants. The whirl where its face should be slows, and settles, and shows the faint, surprised outline of a smile."],
+		["Echo of Nuwa", "He chose one. He chose it himself. Oh, Lin Feng. That is all I ever wanted for him."],
+		["Narrator", "Hundun folds his four wings around the centre of the world and goes to sleep there, holding the four pillars together the way a child holds a toy. The sky stops falling."],
+	],
+	"pre:s_break10": [
+		["Narrator", "The last tribulation does not come from the sky. It comes from all four corners at once, and from the centre, and from inside Lin Feng: five colours of lightning asking the same quiet question."],
+		["Echo of Nuwa", "Will you hold it up? Not for an age. Not as a prisoner, like the Court made them. Only as long as you choose to, and set it down when you are tired?"],
+		["Lin Feng", "I will hold it as long as I want to. And when I am tired, I will ask for help. That is the only sky worth holding up."],
+	],
+	"post:s_break10": [
+		["Narrator", "Five colours of lightning settle into the seams of the sky like mortar between stones. Lin Feng becomes a Primordial Sovereign, and for the first time the sky is held up by people who are glad to do it."],
+		["Yue Ling", "Red, yellow, blue, white. And the black stone?"],
+		["Echo of Nuwa", "Look up."],
+		["Narrator", "The night sky over the world is black again, clean and deep and scattered with stars that stay where they are. The fifth stone was never a stone. It was the night itself, given back."],
+		["Narrator", "In the Azure Cloud Sect, Elder Qing Xuan sets down his books, walks out onto the steps, and finds a broom leaning against the gate. He smiles, and starts to sweep."],
 	],
 }

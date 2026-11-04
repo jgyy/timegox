@@ -46,6 +46,15 @@ const THEMES := {
 		"sky_top": Color("1a1008"), "sky_hor": Color("d08a3a"), "fog": Color("7a5a30"), "fog_d": 0.022, "sun": Color("ffd0a0"), "sun_e": 1.0, "amb": Color("a88060"), "amb_e": 0.8, "weather": "sparks", "tree": "furnace", "decor": "ingot"},
 	"garden": {"g1": Color("6a9a5a"), "g2": Color("78a866"), "path": Color("e8d8b8"), "wall": Color("c86a8a"), "water": Color("6ab0d8"), "bg": Color("201018"),
 		"sky_top": Color("6a5ab0"), "sky_hor": Color("ffd8e0"), "fog": Color("f0d0dc"), "fog_d": 0.012, "sun": Color("fff0e0"), "sun_e": 1.1, "amb": Color("c8b0c8"), "amb_e": 0.85, "weather": "petals", "tree": "peach", "decor": "flower"},
+	# ---- Part V
+	"dunes": {"g1": Color("d0a868"), "g2": Color("dcb474"), "path": Color("f0dcb0"), "wall": Color("b07a48"), "water": Color("4ab8c8"), "bg": Color("201408"),
+		"sky_top": Color("2a4a90"), "sky_hor": Color("ffd8a0"), "fog": Color("f0c890"), "fog_d": 0.014, "sun": Color("fff0c8"), "sun_e": 1.2, "amb": Color("d0b090"), "amb_e": 0.85, "weather": "sandstorm", "tree": "meteor", "decor": "starglass"},
+	"fungal": {"g1": Color("3a3a5a"), "g2": Color("44446a"), "path": Color("8a7aa8"), "wall": Color("c070e0"), "water": Color("40e0c0"), "bg": Color("0a0814"),
+		"sky_top": Color("100a28"), "sky_hor": Color("6a4aa0"), "fog": Color("4a3a78"), "fog_d": 0.022, "sun": Color("c8b0ff"), "sun_e": 0.7, "amb": Color("8070c0"), "amb_e": 0.8, "weather": "spores", "tree": "glowcap", "decor": "sporecap"},
+	"aurora": {"g1": Color("c8d8ec"), "g2": Color("d4e2f2"), "path": Color("a8bcd8"), "wall": Color("5a8ac0"), "water": Color("1a3a6a"), "bg": Color("040a18"),
+		"sky_top": Color("061030"), "sky_hor": Color("3a5a98"), "fog": Color("6a88b8"), "fog_d": 0.014, "sun": Color("d0e8ff"), "sun_e": 0.8, "amb": Color("8aa8d8"), "amb_e": 0.9, "weather": "aurora_snow", "tree": "icespire", "decor": "snowrock"},
+	"chaos": {"g1": Color("4a3a6a"), "g2": Color("54447a"), "path": Color("e8d8a0"), "wall": Color("e05030"), "water": Color("ff80c0"), "bg": Color("0a0410"),
+		"sky_top": Color("1a0830"), "sky_hor": Color("c06090"), "fog": Color("6a3a7a"), "fog_d": 0.016, "sun": Color("fff0e0"), "sun_e": 0.9, "amb": Color("a080c0"), "amb_e": 0.8, "weather": "chaos", "tree": "chaosrock", "decor": "fivestone"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -69,6 +78,10 @@ const EXTRA := {
 	"court": {"hill": 0.2, "tex": "tile", "tuft": "grass", "horizon": "palace", "clouds": 0.5, "stars": 0.7},
 	"forge": {"hill": 0.6, "tex": "rock", "tuft": "ash", "horizon": "volcano", "clouds": 0.6},
 	"garden": {"hill": 0.45, "tex": "grass", "tuft": "flowers", "horizon": "peaks", "clouds": 0.5},
+	"dunes": {"hill": 0.95, "tex": "sand", "tuft": "dunegrass", "horizon": "pillars", "clouds": 0.15, "haze": 0.8, "rays": 0.6},
+	"fungal": {"hill": 0.45, "tex": "moss", "tuft": "moss", "horizon": "mushrooms", "clouds": 0.3, "stars": 0.9, "moon": 0.8, "haze": 0.5},
+	"aurora": {"hill": 0.6, "tex": "permafrost", "tuft": "snow", "horizon": "pillars", "clouds": 0.2, "stars": 1.0, "aurora": 1.6, "moon": 1.0},
+	"chaos": {"hill": 0.5, "tex": "nebula", "tuft": "crystal", "horizon": "pillars", "clouds": 0.0, "stars": 1.0, "aurora": 0.6, "nebula": 1.0},
 }
 
 const PICKUP_COLORS := {
@@ -76,6 +89,7 @@ const PICKUP_COLORS := {
 	"ember": Color("ff8a3a"), "star": Color("c8a0ff"), "sigil": Color("ffe890"),
 	"echo": Color("9ae8ff"), "relic": Color("d8e0f0"), "sand": Color("ffd060"), "rune": Color("ffb0f0"),
 	"feather_cloud": Color("f0f8ff"), "seal": Color("60f0b0"), "ingot": Color("ffc860"), "peach": Color("ffa0b0"),
+	"fallen_star": Color("fff4b0"), "glowcap": Color("ff9a50"), "aurora_shard": Color("70ffc8"), "five_stone": Color("ff70d0"),
 }
 
 static var _anime := {}
@@ -111,7 +125,7 @@ static func theme(name: String) -> Dictionary:
 	var ex: Dictionary = EXTRA.get(name, EXTRA.bamboo)
 	for k in ex:
 		th[k] = ex[k]
-	for k2 in ["stars", "aurora"]:
+	for k2 in ["stars", "aurora", "nebula", "moon", "haze", "rays"]:
 		if not th.has(k2):
 			th[k2] = 0.0
 	_anime[name] = th
@@ -128,6 +142,10 @@ uniform float clouds = 0.5;
 uniform float stars = 0.0;
 uniform float aurora = 0.0;
 uniform float sun_size = 0.035;
+uniform float nebula = 0.0;
+uniform float moon = 0.0;
+uniform float haze = 0.0;
+uniform float rays = 0.0;
 
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float n2(vec2 p) {
@@ -163,6 +181,33 @@ void sky() {
 	float disc = smoothstep(1.0 - sun_size * 0.03, 1.0 - sun_size * 0.02, sdot);
 	float halo = pow(max(sdot, 0.0), 180.0) * 0.6 + pow(max(sdot, 0.0), 12.0) * 0.18;
 	col += sun_col * (disc * 2.5 + halo) * LIGHT0_ENERGY;
+	// god rays: soft radial streaks fanning out from the sun
+	if (rays > 0.0) {
+		vec3 rx = normalize(cross(sd, vec3(0.0, 1.0, 0.0)));
+		vec3 ry = cross(rx, sd);
+		float ang = atan(dot(d, ry), dot(d, rx));
+		float streak = 0.5 + 0.5 * sin(ang * 23.0 + sin(ang * 7.0 + TIME * 0.1) * 2.0);
+		col += sun_col * pow(max(sdot, 0.0), 6.0) * streak * rays * 0.35 * LIGHT0_ENERGY;
+	}
+	// nebula: slow swirls of every colour (the Primordial Chaos)
+	if (nebula > 0.0) {
+		vec2 np = d.xz / (abs(y) + 0.3) * 0.9;
+		float sw = fbm(np + vec2(fbm(np * 1.3 + TIME * 0.01), fbm(np * 1.7 - TIME * 0.012)) * 2.5);
+		vec3 ncol = 0.5 + 0.5 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + sw * 1.6 + TIME * 0.01));
+		float nm = smoothstep(0.35, 0.85, sw) * (0.55 + 0.45 * smoothstep(-0.2, 0.6, y));
+		col = mix(col, col * 0.4 + ncol * 0.75, nm * nebula * 0.8);
+		col += ncol * pow(fbm(np * 4.0), 6.0) * nebula * 0.6;
+	}
+	// a pale moon opposite the sun, with soft maria
+	if (moon > 0.0) {
+		vec3 md = normalize(vec3(-sd.x, abs(sd.y) * 0.6 + 0.35, -sd.z));
+		float mdot = dot(d, md);
+		float mdisc = smoothstep(0.9991, 0.9994, mdot);
+		vec2 mp = (d - md).xz * 60.0;
+		float maria = 0.75 + 0.25 * n2(mp * 1.5);
+		col = mix(col, vec3(0.95, 0.96, 1.0) * maria, mdisc * moon);
+		col += vec3(0.6, 0.7, 1.0) * pow(max(mdot, 0.0), 300.0) * 0.5 * moon;
+	}
 	// stars (only on the upper dome, faded by cloud cover)
 	if (stars > 0.0 && y > 0.0) {
 		vec2 sp = d.xz / (y + 0.35) * 160.0;
@@ -189,6 +234,11 @@ void sky() {
 		vec3 ccol = mix(hor * 0.75 + vec3(0.06), mix(vec3(1.0), sun_col, 0.35) * 1.05, lit);
 		col = mix(col, ccol, cov * smoothstep(0.0, 0.18, y) * 0.92);
 	}
+	// low haze band hugging the horizon (desert dust, spore mist)
+	if (haze > 0.0) {
+		float hb = exp(-abs(y - 0.02) * 14.0) * (0.75 + 0.25 * fbm(d.xz * 3.0 + TIME * 0.02));
+		col = mix(col, hor * 1.05, hb * haze * 0.6);
+	}
 	COLOR = col;
 }
 """
@@ -207,6 +257,10 @@ static func sky_material(name: String) -> ShaderMaterial:
 	m.set_shader_parameter("clouds", th.clouds)
 	m.set_shader_parameter("stars", th.stars)
 	m.set_shader_parameter("aurora", th.aurora)
+	m.set_shader_parameter("nebula", th.nebula)
+	m.set_shader_parameter("moon", th.moon)
+	m.set_shader_parameter("haze", th.haze)
+	m.set_shader_parameter("rays", th.rays)
 	return m
 
 ## Build an Environment for a theme (sky, fog, ambient light, bloom, grade).

@@ -121,6 +121,13 @@ static func _fade_ramp(peak: float = 1.0) -> Gradient:
 	g.add_point(0.75, Color(1, 1, 1, peak * 0.8))
 	return g
 
+## a colour ramp that cycles through the five colours of Nuwa's stones and fades out
+static func _rainbow_ramp() -> Gradient:
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.15, 0.35, 0.55, 0.75, 1.0])
+	g.colors = PackedColorArray([Color(1, 0.4, 0.4, 0.0), Color(1, 0.4, 0.4, 1), Color(1, 0.85, 0.3, 1), Color(0.4, 0.7, 1, 1), Color(0.95, 0.95, 1, 0.8), Color(0.7, 0.5, 1, 0.0)])
+	return g
+
 static func _shrink_curve() -> Curve:
 	var c := Curve.new()
 	c.add_point(Vector2(0, 0.4))
@@ -256,6 +263,64 @@ static func configure_weather(p: CPUParticles3D, kind: String) -> void:
 			p.scale_amount_max = 1.8
 			p.color = Color(1, 1, 1, 0.35)
 			mote_kind = "pollen"
+		"sandstorm":
+			# streaks of sand racing sideways with dust banks rolling behind them
+			p.position = Vector3(0, 1.5, 0)
+			p.emission_box_extents = Vector3(20, 1.5, 20)
+			p.mesh = quad("streak", 0.32)
+			p.amount = 260
+			p.lifetime = 2.5
+			p.preprocess = 2.5
+			p.direction = Vector3(1, 0.05, 0.25)
+			p.spread = 8.0
+			p.initial_velocity_min = 7.0
+			p.initial_velocity_max = 11.0
+			p.particle_flag_align_y = false
+			p.color = Color(1.0, 0.85, 0.55, 0.55)
+			mote_kind = "dust_bank"
+		"spores":
+			# slow glowing spores drifting up from the moss in lazy spirals
+			p.position = Vector3(0, 0.4, 0)
+			p.emission_box_extents = Vector3(18, 0.4, 18)
+			p.mesh = quad("glow", 0.2)
+			p.amount = 220
+			p.lifetime = 9.0
+			p.preprocess = 9.0
+			p.direction = Vector3(0, 1, 0)
+			p.spread = 25.0
+			p.initial_velocity_min = 0.25
+			p.initial_velocity_max = 0.7
+			p.gravity = Vector3(0.15, 0.05, 0.05)
+			p.angular_velocity_min = -40.0
+			p.angular_velocity_max = 40.0
+			p.color = Color(0.45, 1.0, 0.85, 0.9)
+			mote_kind = "glowspores"
+		"aurora_snow":
+			p.mesh = quad("flake", 0.2, false)
+			p.amount = 220
+			p.lifetime = 8.0
+			p.preprocess = 8.0
+			p.initial_velocity_min = 0.7
+			p.initial_velocity_max = 1.4
+			p.spread = 25.0
+			p.gravity = Vector3(0.25, 0, 0.1)
+			p.color = Color(0.85, 0.95, 1.0, 0.95)
+			mote_kind = "aurora_glints"
+		"chaos":
+			# motes of every colour orbiting slowly upward
+			p.position = Vector3(0, 3.0, 0)
+			p.emission_box_extents = Vector3(18, 3.0, 18)
+			p.mesh = quad("star", 0.3)
+			p.amount = 200
+			p.lifetime = 7.0
+			p.preprocess = 7.0
+			p.direction = Vector3(0, 1, 0)
+			p.spread = 180.0
+			p.initial_velocity_min = 0.2
+			p.initial_velocity_max = 0.9
+			p.color = Color(1, 1, 1, 0.95)
+			p.color_ramp = _rainbow_ramp()
+			mote_kind = "void_dust"
 		"lanterns":
 			p.position = Vector3(0, 2.0, 0)
 			p.emission_box_extents = Vector3(18, 2, 18)
@@ -349,6 +414,25 @@ static func _configure_motes(m: CPUParticles3D, kind: String, parent_y: float) -
 			m.mesh = quad("smoke", 2.5, false)
 			m.amount = 18
 			m.color = Color(0.55, 0.6, 0.8, 0.25)
+		"dust_bank":
+			m.mesh = quad("smoke", 4.0, false)
+			m.amount = 26
+			m.lifetime = 6.0
+			m.preprocess = 6.0
+			m.position.y = 0.8 - parent_y
+			m.direction = Vector3(1, 0, 0.2)
+			m.spread = 10.0
+			m.initial_velocity_min = 2.5
+			m.initial_velocity_max = 4.0
+			m.color = Color(0.95, 0.78, 0.5, 0.18)
+		"glowspores":
+			m.mesh = quad("glow", 0.4)
+			m.amount = 30
+			m.color = Color(0.7, 0.5, 1.0, 0.8)
+		"aurora_glints":
+			m.mesh = quad("star", 0.2)
+			m.amount = 50
+			m.color = Color(0.5, 1.0, 0.75, 0.85)
 		"fog":
 			m.mesh = quad("smoke", 3.0, false)
 			m.amount = 22
@@ -710,3 +794,112 @@ static func charge(parent: Node3D, pos: Vector3, col: Color, life: float = 0.4) 
 	p.radial_accel_min = -9.0
 	p.radial_accel_max = -6.0
 	_flash(parent, pos, col, 1.4, life)
+
+# ---------------------------------------------------------------- signature techniques
+const FIVE := [Color("ff5050"), Color("ffd040"), Color("50a0ff"), Color("f0f0ff"), Color("b070ff")]
+
+## A meteor that falls from the sky onto `pos` trailing sparks, then bursts.
+static func meteor(parent: Node3D, pos: Vector3, col: Color, delay: float = 0.0, size: float = 1.0) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var start := pos + Vector3(-6.0 + randf() * 3.0, 16.0, randf_range(-3.0, 3.0))
+	var go := func():
+		projectile(parent, start, pos + Vector3(0, 0.3, 0), col, 0.45, func():
+			_flash(parent, pos + Vector3(0, 0.6, 0), col.lerp(Color.WHITE, 0.5), 4.0 * size, 0.3)
+			shockwave(parent, pos, col, 5.0 * size, 0.5)
+			_burst(parent, pos + Vector3(0, 0.3, 0), col, 26, 6.0, 0.7, quad("star", 0.3), Vector3(0, -9.0, 0), Vector3(0, 1, 0), 70.0, 0.4))
+	if delay <= 0.0:
+		go.call()
+	else:
+		parent.get_tree().create_timer(delay).timeout.connect(go)
+
+## Five glowing rings in Nuwa's colours spiralling upward around a point (mending / threads).
+static func five_rings(parent: Node3D, pos: Vector3, life: float = 1.2, radius: float = 1.2) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var holder := Node3D.new()
+	holder.position = pos
+	parent.add_child(holder)
+	for k in 5:
+		var b := MB.new()
+		var c: Color = FIVE[k]
+		b.arc(Vector3.ZERO, radius * (1.0 - k * 0.1), 0.07, 0.0, TAU * 0.8, Color(c.r, c.g, c.b, 0.9), 28)
+		var mi := MB.mesh_node(holder, b.build(MB.mat_glow()))
+		mi.position.y = 0.1
+		mi.rotation = Vector3(0.25 * sin(k * 1.3), k * 1.256, 0.25 * cos(k * 1.3))
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var tw := mi.create_tween()
+		tw.set_parallel(true)
+		tw.tween_property(mi, "position:y", 1.2 + k * 0.45, life).set_delay(k * 0.06).set_ease(Tween.EASE_OUT)
+		tw.tween_property(mi, "rotation:y", mi.rotation.y + TAU, life)
+		tw.tween_property(mi, "scale", Vector3.ONE * 0.2, life).set_ease(Tween.EASE_IN)
+	_burst(parent, pos + Vector3(0, 0.6, 0), Color(1, 1, 1), 30, 2.0, life, quad("star", 0.25), Vector3(0, 2.0, 0), Vector3(0, 1, 0), 60.0, radius)
+	parent.get_tree().create_timer(life + 0.3).timeout.connect(holder.queue_free)
+
+## A stone pillar wrapped in five-coloured bands that drops out of the sky onto the target.
+static func sky_pillar(parent: Node3D, pos: Vector3, col: Color, life: float = 1.1, radius: float = 1.0) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var b := MB.new()
+	var stone := MB.tag(Color("d8d0c0"), MB.STONE)
+	b.cyl(Vector3(0, 4.0, 0), radius, 8.0, stone, Vector3.ZERO, 14)
+	b.cyl(Vector3(0, 0.25, 0), radius * 1.35, 0.5, stone, Vector3.ZERO, 14)
+	var g := MB.new()
+	for k in 5:
+		var c: Color = FIVE[k]
+		b.cyl(Vector3(0, 1.2 + k * 1.4, 0), radius * 1.06, 0.3, MB.tag(c, MB.CRYSTAL), Vector3.ZERO, 14)
+		g.cyl(Vector3(0, 1.2 + k * 1.4, 0), radius * 1.12, 0.12, Color(c.r, c.g, c.b, 0.8), Vector3.ZERO, 14)
+	var mesh := b.build(MB.mat_vc())
+	g.add_to(mesh, MB.mat_glow())
+	var mi := MB.mesh_node(parent, mesh, pos + Vector3(0, 18.0, 0))
+	var tw := mi.create_tween()
+	tw.tween_property(mi, "position:y", pos.y - 0.2, life * 0.25).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+	tw.tween_callback(func():
+		shockwave(parent, pos, col, 9.0 * radius, 0.6)
+		shockwave(parent, pos, Color.WHITE, 6.0 * radius, 0.4)
+		spikes(parent, pos, col, 9, 0.8)
+		_burst(parent, pos + Vector3(0, 0.4, 0), Color(0.85, 0.8, 0.7), 40, 7.0, 0.9, quad("smoke", 0.9, false), Vector3(0, -4.0, 0), Vector3(0, 1, 0), 80.0, 1.2))
+	tw.tween_interval(life * 0.45)
+	tw.tween_property(mi, "scale", Vector3(1.0, 0.01, 1.0), life * 0.3).set_ease(Tween.EASE_IN)
+	tw.tween_callback(mi.queue_free)
+
+## Ink-black crescent slashes crossing over the target (Ledger-Breaking Stroke and its kin).
+static func cross_slash(parent: Node3D, pos: Vector3, col: Color, yaw: float) -> void:
+	slash(parent, pos, col, yaw, 3.6, 0.2)
+	slash(parent, pos + Vector3(0, 0.2, 0), col.lerp(Color.WHITE, 0.4), yaw + PI * 0.5, 3.2, 1.0)
+	vortex(parent, pos + Vector3(0, -1.2, 0), col, 2.0, 0.7)
+
+## Extra flourish for the late-game techniques, on top of the usual projectile and hit effects.
+## `from` is the caster, `targets` the struck positions.
+static func technique(parent: Node3D, id: String, from: Vector3, targets: Array, cam_yaw: float = 0.0) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	match id:
+		"skymend":
+			for t in targets:
+				sky_pillar(parent, t, Color("ffd890"), 1.1, 1.0)
+		"pillar":
+			for t in targets:
+				sky_pillar(parent, t, Color("c8e0ff"), 1.3, 1.5)
+				lightning(parent, t, Color(0.85, 0.9, 1.0), 22.0, 0.4)
+		"fivecolour":
+			for i in targets.size():
+				for k in 3:
+					meteor(parent, targets[i] + Vector3(randf_range(-0.8, 0.8), 0, randf_range(-0.8, 0.8)), FIVE[(i + k) % 5], 0.12 * k + 0.05 * i, 0.7)
+		"starfall", "meteor":
+			for i in targets.size():
+				meteor(parent, targets[i], Color("ffa040") if id == "meteor" else Color("ffe080"), 0.1 * i, 1.0)
+		"genesis", "judgement", "heaven":
+			for t in targets:
+				lightning(parent, t, Color(1.0, 0.95, 0.7), 20.0, 0.35)
+				pillar(parent, t, Color(1.0, 0.9, 0.5), 9.0, 1.2, 0.8)
+		"inkbreak", "voidcut", "chrono":
+			for t in targets:
+				cross_slash(parent, t + Vector3(0, 1.4, 0), Color("6040a0") if id != "inkbreak" else Color("203040"), cam_yaw)
+		"mending", "seal_bloom", "dawn":
+			for t in targets:
+				five_rings(parent, t, 1.2, 1.1)
+		"thread":
+			for t in targets:
+				five_rings(parent, t, 0.9, 1.4)
+				spikes(parent, t, Color("d0a060"), 5, 0.6)

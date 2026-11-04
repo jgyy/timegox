@@ -13,6 +13,10 @@ var comp: Node3D
 var rings: Array = []
 var orbit: Node3D
 
+func _on_show(v: bool) -> void:
+	if v:
+		main.fx_theme("void")
+
 func _build3d() -> void:
 	opaque = true
 	new_scene3d()

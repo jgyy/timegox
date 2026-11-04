@@ -8,6 +8,10 @@ var enabled := [true, true]
 var cursor := 0
 var hero: Node3D
 
+func _on_show(v: bool) -> void:
+	if v:
+		main.fx_theme("sect")
+
 func _build3d() -> void:
 	opaque = true
 	new_scene3d()

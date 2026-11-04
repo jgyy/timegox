@@ -18,6 +18,7 @@ const MONSTERS := {
 	"beast": "monsters/beast", "dragon": "monsters/dragon", "phoenix": "monsters/phoenix", "bird": "monsters/phoenix",
 	"golem": "monsters/golem", "tortoise": "monsters/tortoise", "scorpion": "monsters/scorpion",
 	"mushroom": "monsters/mushroom", "mammoth": "monsters/mammoth", "moth": "monsters/moth", "hundun": "monsters/hundun",
+	"humanoid": "monsters/humanoid", "demon": "monsters/demon",
 }
 const PEOPLE := {"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing"}
 
@@ -105,6 +106,18 @@ static func instance(rel: String, tint: Color = Color(0, 0, 0, 0)) -> Node3D:
 	root.set_meta("glb", rel)
 	root.set_meta("meshes", meshes)
 	return root
+
+## The (first) mesh of a static prop, with the game's materials, for MultiMesh instancing.
+static func static_mesh(rel: String) -> Mesh:
+	var key := rel + "|static"
+	if _meshes.has(key):
+		return _meshes[key]
+	var inst: Node = _scene(rel).instantiate()
+	var meshes: Array = []
+	_walk(inst, meshes, "MeshInstance3D")
+	var out: Mesh = prepare_mesh((meshes[0] as MeshInstance3D).mesh, Color(0, 0, 0, 0), key)
+	inst.free()
+	return out
 
 static func person(id: String) -> Node3D:
 	var n := instance(PEOPLE[id])

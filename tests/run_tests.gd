@@ -2,6 +2,15 @@ extends SceneTree
 ## Data-integrity tests.  Run: godot --headless --path . --script tests/run_tests.gd
 
 var failures := 0
+var finished := false
+
+## Watchdog: a script error aborts _init() before quit() and the runner used to hang until CI's
+## timeout.  If the first frame arrives and the tests did not finish, fail fast instead.
+func _process(_d: float) -> bool:
+	if not finished:
+		printerr("  FAIL tests aborted by a script error (see above)")
+		quit(1)
+	return false
 
 func check(cond: bool, msg: String) -> void:
 	if cond:
@@ -236,4 +245,5 @@ func _init() -> void:
 		tdist = maxf(tdist, absf(Terrain3D.sample(hm4, m4.w, m4.h, (x4 + 0.5) * Terrain3D.T, 13.5 * Terrain3D.T)))
 	check(tdist < 0.5, "the sect's main road stays nearly flat (max %.2f)" % tdist)
 	print("failures: ", failures)
+	finished = true
 	quit(1 if failures > 0 else 0)

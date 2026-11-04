@@ -768,13 +768,45 @@ def export(path, objs, animations=True):
     print("[art] wrote", os.path.relpath(path, ROOT))
 
 
-def finish_static(b, rel, ao=True, **ao_kw):
-    """Bake AO and export a static prop (no rig)."""
+def decimate(ob, target_tris):
+    """Reduce a mesh to roughly `target_tris` triangles with Blender's Decimate (collapse)
+    modifier; colours and the tint UV are interpolated across collapsed edges."""
+    me = ob.data
+    me.calc_loop_triangles()
+    tris = len(me.loop_triangles)
+    if tris <= target_tris:
+        return tris
+    mod = ob.modifiers.new("decimate", "DECIMATE")
+    mod.decimate_type = "COLLAPSE"
+    mod.ratio = target_tris / tris
+    mod.use_collapse_triangulate = True
+    bpy.context.view_layer.objects.active = ob
+    ob.select_set(True)
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    me.calc_loop_triangles()
+    print("[art] decimated %s: %d -> %d triangles" % (ob.name, tris, len(me.loop_triangles)))
+    return len(me.loop_triangles)
+
+
+def finish_static(b, rel, ao=True, target_tris=0, **ao_kw):
+    """Bake AO and export a static prop (no rig), optionally decimated to a triangle budget
+    (landmarks are instanced hundreds of times per map)."""
     if ao:
         b.bake_ao(**ao_kw)
     ob = b.to_object()
+    if target_tris > 0:
+        decimate(ob, target_tris)
     export(out_path(rel), [ob], animations=False)
     return ob
+
+
+def scale_asset(b, rig, f):
+    """Uniformly scale a built mesh and its (not yet created) rig about the origin."""
+    for v in b.bm.verts:
+        v.co *= f
+    for nm in list(rig.bones):
+        h, t, p = rig.bones[nm]
+        rig.bones[nm] = (h * f, t * f, p)
 
 
 def finish_rigged(b, rig, rel, clips, ao=True, **ao_kw):

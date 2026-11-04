@@ -125,5 +125,7 @@ def cast(t):
     return p
 
 
+# the moth reads small next to the other foes: scale it up (clips are rotations, so they still fit)
+kit.scale_asset(b, r, 1.45)
 print("[art] moth: %d triangles" % b.tri_count())
 kit.finish_rigged(b, r, "monsters/moth.glb", {"idle": (FLAP * 4, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=10, dist=0.2, strength=0.4)

@@ -121,6 +121,7 @@ func _show_view(id: String, m: Dictionary) -> void:
 	hm = cur_view.root.get_meta("hm", PackedFloat32Array())
 	cam.environment = cur_view.env
 	var th := Look.theme(theme_name)
+	main.fx_theme(theme_name)
 	Look.apply_lights(theme_name, sun, fill)
 	Fx3D.configure_weather(weather, th.weather)
 
@@ -415,10 +416,12 @@ func _update_view(d: float) -> void:
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:
-		"snow", "rain", "petals", "leaves":
+		"snow", "rain", "petals", "leaves", "aurora_snow":
 			return 12.0
-		"bubbles", "bubbles_up", "embers", "sparks":
+		"bubbles", "bubbles_up", "embers", "sparks", "spores":
 			return 0.3
+		"sandstorm":
+			return 1.5
 		"clouds":
 			return 1.0
 		"lanterns":
@@ -475,10 +478,11 @@ func _draw_hud() -> void:
 	var need := Game.exp_need()
 	if Game.level < Data.MAX_LEVEL:
 		UI.bar(self, Rect2(26, 66, 300, 8), Game.exp / float(need), UI.C_GOLD)
+	# the numbers get four digits late in the game: keep the bars clear of them
 	UI.text(self, Vector2(26, 92), "HP %d/%d" % [Game.hp[0], Game.max_hp(0)], 14)
-	UI.bar(self, Rect2(100, 80, 226, 10), Game.hp[0] / float(Game.max_hp(0)), UI.C_RED)
+	UI.bar(self, Rect2(140, 80, 186, 10), Game.hp[0] / float(Game.max_hp(0)), UI.C_RED)
 	UI.text(self, Vector2(26, 112), "QI %d/%d" % [Game.qi[0], Game.max_qi(0)], 14)
-	UI.bar(self, Rect2(100, 100, 226, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
+	UI.bar(self, Rect2(140, 100, 186, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
 	UI.text(self, Vector2(26, 126), "Stones: %d" % Game.stones, 13, UI.C_DIM)
 	# objective
 	UI.panel(self, Rect2(VIEW.x - 520, 12, 508, 58))

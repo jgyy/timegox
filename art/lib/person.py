@@ -202,7 +202,7 @@ def build(o):
     # eyes on their own bone (it scales to blink)
     eyes = o.get("eyes", "3a6ad8")
     for s in (1, -1):
-        b.eye(V(0.068 * s, 1.678, 0.155), 0.042, eyes, side=s, bone="eyes", rot_y=0.32, h=1.35)
+        b.eye(V(0.068 * s, 1.678, 0.155), 0.042, eyes, side=s, bone="eyes", rot_y=0.32, h=1.35, glow=o.get("glow_eyes", False), slit=o.get("slit_eyes", False))
         # eyelash line and brow
         lash = [V(0.068 * s + 0.045 * s * (i / 4 - 0.5) * 2, 1.722 - 0.012 * (i / 4 - 0.5) ** 2 * 4 + 0.004 * s * (i / 4 - 0.5), 0.172 - 0.01 * abs(i / 4 - 0.5)) for i in range(5)]
         b.tube(lash, [0.006, 0.008, 0.008, 0.007, 0.004], "1a1420", cls=HAIR, bone="eyes", seg=6, mat=MAT_PLAIN)
@@ -277,6 +277,16 @@ def build(o):
         for s in (1, -1):
             b.ribbon([V(0.08 * s, 1.84, -0.12), V(0.14 * s, 1.72, -0.2), V(0.16 * s, 1.55, -0.24)], [0.03, 0.025, 0.01], (1, 0, 0), rc, bones=["head", {"head": 0.5, "hair_tail": 0.5}, "hair_tail"], col_end=lighten(rc, 0.3))
             b.ellipsoid(V(0.07 * s, 1.85, -0.11), (0.04, 0.03, 0.02), rc, bone="head", seg=10, rings=6, rot=(0, 0, 0.5 * s))
+    if o.get("horns", False):
+        hcol = o.get("horn_col", "2a1a20")
+        for side in (1, -1):
+            pts = [V(0.1 * side, 1.84, 0.02), V(0.16 * side, 1.95, -0.02), V(0.22 * side, 2.04, -0.1), V(0.2 * side, 2.12, -0.2)]
+            b.tube(pts, [0.04, 0.032, 0.02, 0.004], hcol, cls=STONE, bone="head", seg=8)
+    if o.get("tint_cloth", False):
+        # a recolourable enemy: every cloth surface takes the colour the game asks for
+        for v in b.bm.verts:
+            if v[b.cl][3] > 0.94:
+                v[b.tl] = 1.0
     sc = o.get("scale", 1.0)
     if sc != 1.0:
         for v in b.bm.verts:
