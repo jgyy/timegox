@@ -45,7 +45,7 @@ var time_by_area := {}
 var gave_up := ""
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-const HEALS := ["mending", "seal_bloom", "dawn", "starlight", "rain"]
+const HEALS := ["rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
 
 func _ready() -> void:
 	world = main.world
@@ -59,11 +59,49 @@ func _ready() -> void:
 	if main.args.has("max-time"):
 		max_time = float(main.args["max-time"])
 
+## Developer shortcut: --bot-start=<step id> drops a fresh game straight at that quest step with
+## the level, companion, techniques and boss kills a player would have by then (the reported play
+## time then covers only the rest of the game).  Used to iterate on late chapters quickly.
+var start_applied := false
+
+func _apply_start() -> void:
+	start_applied = true
+	if not main.args.has("bot-start"):
+		return
+	var idx := Data.step_index(str(main.args["bot-start"]))
+	if idx < 0:
+		return
+	var lv := 0
+	for i in idx:
+		var st: Dictionary = Data.STEPS[i]
+		match st.kind:
+			"breakthrough":
+				lv = st.to
+			"level":
+				lv = maxi(lv, st.lv)
+			"kill":
+				Game.boss_done[st.boss] = true
+				for a in Data.AREAS:
+					for b in Data.AREAS[a].get("bosses", []):
+						if b.id == st.boss:
+							lv = maxi(lv, b.req)
+	Game.level = lv
+	Game.exp = 0.0
+	Game.companion = true
+	Game.step = idx
+	Game.stones = 20000
+	Game.inv["hp_pill"] = 6
+	Game.inv["qi_pill"] = 4
+	Game.heal_full()
+	Game.note("bot-start: jumped to step %d (%s) at %s" % [idx, Data.STEPS[idx].id, Data.level_name(lv)])
+
 # ---------------------------------------------------------------- main loop
 func _process(d: float) -> void:
 	if finished:
 		return
 	var top: String = main.top_name()
+	if Game.started and not start_applied:
+		_apply_start()
 	if Game.started:
 		time_by_screen[top] = time_by_screen.get(top, 0.0) + d
 		time_by_area[Game.area] = time_by_area.get(Game.area, 0.0) + d
@@ -93,6 +131,8 @@ func _process(d: float) -> void:
 	cool -= d
 	if cool > 0.0:
 		return
+	if main.args.has("bot-trace") and Game.playtime >= float(main.args["bot-trace"]):
+		print("[trace] %.2f top=%s area=%s step=%s tile=%s path=%d" % [Game.playtime, top, Game.area, Game.cur_step().get("id", "-"), world.ptile, path.size()])
 	_shots(top, d)
 	match top:
 		"title":
@@ -270,10 +310,16 @@ func _grind() -> void:
 			return
 	_start_meditate("grind")
 
+## Nearest reachable enemy group the party can handle.  The current target is kept unless another
+## group is clearly closer: without that hysteresis two groups at almost the same distance swapped
+## places as "nearest" with every step and the bot walked back and forth between two tiles forever.
 func _nearest_enemy():
 	var dist := _bfs_dist(world.ptile, false)
 	var best = null
 	var bd := 9999
+	var cur_id := path_key.trim_prefix("enemy:") if path_key.begins_with("enemy:") else ""
+	var cur = null
+	var cur_d := 9999
 	for e in world.ents:
 		if e.kind != "enemy" or not world.ent_visible(e):
 			continue
@@ -282,11 +328,19 @@ func _nearest_enemy():
 			mx = maxi(mx, g.lv)
 		if mx > Game.level + 2:
 			continue
+		var ed := 9999
 		for dd in DIRS:
 			var n: Vector2i = e.pos + dd
-			if dist.has(n) and dist[n] < bd:
-				bd = dist[n]
-				best = e
+			if dist.has(n):
+				ed = mini(ed, dist[n])
+		if ed < bd:
+			bd = ed
+			best = e
+		if e.id == cur_id:
+			cur = e
+			cur_d = ed
+	if cur != null and cur_d <= bd + 4 and cur_d <= 60:
+		return cur
 	if bd > 60:
 		return null
 	return best

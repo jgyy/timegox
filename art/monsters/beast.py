@@ -29,7 +29,7 @@ spine = [((0, 0.9, -0.62), 0.16), ((0, 0.88, -0.36), (0.27, 0.29)), ((0, 0.88, -
 chains = [(spine, None)]
 for nm, att in (("f", 3), ("h", 1)):
     for sd in ("L", "R"):
-        rad = (0.11, 0.055, 0.036, 0.045) if nm == "f" else (0.14, 0.065, 0.036, 0.045)
+        rad = (0.13, 0.07, 0.045, 0.052) if nm == "f" else (0.17, 0.085, 0.045, 0.052)
         chains.append((leg_nodes(r, nm, sd, rad), att))
 nodes, edges = skin_graph(chains)
 b.skin(nodes, edges, shade, cls=CLOTH, subdiv=2, tint_fn=lambda p: 1.0)
@@ -59,6 +59,26 @@ for i in range(10):
     z = 0.55 - i * 0.12
     y = spine_y(V(0, 0, z)) + 0.2 - i * 0.012
     b.leaf(V(0, y, z), V(0, y + 0.13, z - 0.2), 0.07, (0.45, 0.45, 0.45), side=(1, 0, 0), cls=HAIR, tint=1.0, col_tip=(0.6, 0.6, 0.6))
+# shaggy coat: overlapping fur locks down the flanks and over the shoulders and haunches, darker
+# at the roots and lighter at the tips, so the body reads as fur rather than a smooth skin
+for side in (1, -1):
+    for i in range(9):
+        z = 0.42 - i * 0.11
+        for row in range(2):
+            y = spine_y(V(0, 0, z)) - 0.02 - row * 0.13
+            rx = 0.26 + row * 0.03 - (0.05 if z < -0.3 else 0.0)
+            root = V(side * rx, y, z)
+            tip = root + V(side * 0.08, -0.15, -0.12)
+            b.leaf(root, tip, 0.075, (0.5, 0.5, 0.5), side=(0, 0, 1), cls=HAIR, tint=1.0, col_tip=(0.78, 0.78, 0.78), curl=0.25)
+# chest ruff and cheek tufts
+for i in range(9):
+    a = (i / 8 - 0.5) * 2.6
+    root = V(math.sin(a) * 0.17, 0.98, 0.58 + math.cos(a) * 0.05)
+    b.leaf(root, root + V(math.sin(a) * 0.06, -0.2, 0.06), 0.07, (0.85, 0.85, 0.85), side=(math.cos(a), 0, -math.sin(a)), cls=HAIR, tint=1.0, col_tip=(1.0, 1.0, 1.0))
+for s2 in (1, -1):
+    for k in range(3):
+        root = V(0.1 * s2, 1.12 - k * 0.03, 0.9 - k * 0.03)
+        b.leaf(root, root + V(0.13 * s2, -0.05, -0.08), 0.045, (0.7, 0.7, 0.7), side=(0, 1, 0), cls=HAIR, bone="head", tint=1.0, col_tip=(0.95, 0.95, 0.95))
 # tail: tapered with a tuft
 tp = [r.head("tail0"), r.head("tail1"), r.head("tail2"), r.head("tail3"), r.tail("tail3")]
 b.tube(tp, [0.07, 0.065, 0.055, 0.045, 0.03], (0.7, 0.7, 0.7), bones=["tail0", "tail1", "tail2", "tail3", "tail3"], tint=1.0, seg=10)

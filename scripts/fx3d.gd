@@ -49,6 +49,17 @@ static func sprite(kind: String) -> ImageTexture:
 					a = maxf(cross, pow(clampf(1.0 - r * 1.6, 0.0, 1.0), 3.0))
 				"ring":
 					a = pow(clampf(1.0 - absf(r - 0.72) * 6.0, 0.0, 1.0), 1.5)
+				"maple":
+					# a five-lobed maple leaf with a short stem
+					var ang2 := atan2(v, u) + PI * 0.5
+					var rr := 0.55 + 0.4 * pow(absf(cos(ang2 * 2.5)), 0.7)
+					a = smoothstep(0.0, 0.08, rr * 0.85 - r)
+					a = maxf(a, pow(clampf(1.0 - absf(u) * 14.0, 0.0, 1.0), 2.0) * (1.0 if v >= 0.0 and v <= 0.95 else 0.0))
+				"flame":
+					# a soft teardrop flame (ghost-fire)
+					var fv := (v + 1.0) * 0.5
+					var fw := 0.55 * sqrt(clampf(fv, 0.0, 1.0)) * (1.0 - fv * 0.55)
+					a = smoothstep(0.0, 0.25, fw - absf(u) * 0.5) * smoothstep(0.0, 0.2, 1.0 - fv)
 				"smoke":
 					var nz := 0.5 + 0.25 * sin(u * 7.0 + v * 3.0) * cos(v * 6.0 - u * 2.0)
 					a = pow(clampf(1.0 - r, 0.0, 1.0), 1.4) * nz * 1.3
@@ -110,6 +121,25 @@ static func _leaves() -> Mesh:
 		s.material = m
 		_leaf_mesh = s
 	return _leaf_mesh
+
+## autumn leaves: crimson, orange and gold, fading at both ends of their life
+static func _autumn_ramp() -> Gradient:
+	var g := Gradient.new()
+	g.set_color(0, Color(0.9, 0.25, 0.1, 0.0))
+	g.set_color(1, Color(1.0, 0.8, 0.3, 0.0))
+	g.add_point(0.12, Color(0.92, 0.3, 0.12, 1.0))
+	g.add_point(0.5, Color(1.0, 0.55, 0.15, 1.0))
+	g.add_point(0.85, Color(1.0, 0.78, 0.3, 1.0))
+	return g
+
+## ghost-fire: white-blue core cooling to deep blue, then gone
+static func _ghost_ramp() -> Gradient:
+	var g := Gradient.new()
+	g.set_color(0, Color(0.8, 0.95, 1.0, 0.0))
+	g.set_color(1, Color(0.1, 0.25, 0.9, 0.0))
+	g.add_point(0.15, Color(0.75, 0.92, 1.0, 1.0))
+	g.add_point(0.6, Color(0.3, 0.6, 1.0, 0.8))
+	return g
 
 static func _fade_ramp(peak: float = 1.0) -> Gradient:
 	var g := Gradient.new()
@@ -212,6 +242,65 @@ static func configure_weather(p: CPUParticles3D, kind: String) -> void:
 			p.angular_velocity_max = 120.0
 			p.color = Color(1.0, 0.72, 0.84, 0.95) if kind == "petals" else Color(0.62, 0.9, 0.4, 0.95)
 			mote_kind = "fireflies" if kind == "leaves" else "pollen"
+		# ---- Part VI
+		"maple_leaves":
+			# maple leaves tumbling down through the gorge, every one a different autumn colour
+			p.mesh = quad("maple", 0.34, false)
+			p.amount = 170
+			p.lifetime = 9.0
+			p.preprocess = 9.0
+			p.spread = 45.0
+			p.initial_velocity_min = 0.5
+			p.initial_velocity_max = 1.2
+			p.gravity = Vector3(0.7, -0.05, 0.3)
+			p.angular_velocity_min = -160.0
+			p.angular_velocity_max = 160.0
+			p.color = Color(1, 1, 1, 1)
+			p.color_ramp = _autumn_ramp()
+			mote_kind = "pollen"
+		"river_mist":
+			# a fine drizzle over the river, with banks of mist rolling between the stone towers
+			p.amount = 160
+			p.lifetime = 1.4
+			p.preprocess = 1.4
+			p.mesh = _bolts()
+			p.direction = Vector3(0.05, -1, 0)
+			p.spread = 3.0
+			p.particle_flag_align_y = true
+			p.initial_velocity_min = 14.0
+			p.initial_velocity_max = 17.0
+			p.color = Color(0.85, 0.92, 1.0, 0.22)
+			p.color_ramp = null
+			mote_kind = "mist_bank"
+		"lily_souls":
+			# soul lights drifting up out of the spider lilies towards the bridge
+			p.position = Vector3(0, 1.0, 0)
+			p.emission_box_extents = Vector3(18, 1.0, 18)
+			p.mesh = quad("glow", 0.45)
+			p.amount = 70
+			p.lifetime = 9.0
+			p.preprocess = 9.0
+			p.direction = Vector3(0.2, 1, 0)
+			p.spread = 20.0
+			p.initial_velocity_min = 0.3
+			p.initial_velocity_max = 0.7
+			p.color = Color(1.0, 0.85, 0.55, 0.85)
+			mote_kind = "red_petals"
+		"ghostfire":
+			# cold blue flames rising from the floor of the Ten Courts
+			p.position = Vector3(0, 0.3, 0)
+			p.emission_box_extents = Vector3(18, 0.3, 18)
+			p.mesh = quad("flame", 0.6)
+			p.amount = 90
+			p.lifetime = 3.0
+			p.preprocess = 3.0
+			p.direction = Vector3(0, 1, 0)
+			p.spread = 6.0
+			p.initial_velocity_min = 0.6
+			p.initial_velocity_max = 1.4
+			p.color = Color(1, 1, 1, 1)
+			p.color_ramp = _ghost_ramp()
+			mote_kind = "void_dust"
 		"bubbles", "bubbles_up":
 			p.position = Vector3(0, 0.2, 0)
 			p.mesh = quad("ring", 0.3)
@@ -433,6 +522,29 @@ static func _configure_motes(m: CPUParticles3D, kind: String, parent_y: float) -
 			m.mesh = quad("star", 0.2)
 			m.amount = 50
 			m.color = Color(0.5, 1.0, 0.75, 0.85)
+		"mist_bank":
+			m.mesh = quad("smoke", 5.0, false)
+			m.amount = 24
+			m.lifetime = 12.0
+			m.preprocess = 12.0
+			m.position.y = 0.9 - parent_y
+			m.direction = Vector3(1, 0, 0.3)
+			m.spread = 25.0
+			m.initial_velocity_min = 0.4
+			m.initial_velocity_max = 0.9
+			m.color = Color(0.92, 0.96, 1.0, 0.2)
+		"red_petals":
+			m.mesh = quad("petal", 0.22, false)
+			m.amount = 60
+			m.lifetime = 7.0
+			m.preprocess = 7.0
+			m.position.y = 3.0 - parent_y
+			m.direction = Vector3(0.3, -1, 0.1)
+			m.spread = 40.0
+			m.gravity = Vector3(0.4, -0.1, 0.1)
+			m.angular_velocity_min = -120.0
+			m.angular_velocity_max = 120.0
+			m.color = Color(0.95, 0.15, 0.1, 0.95)
 		"fog":
 			m.mesh = quad("smoke", 3.0, false)
 			m.amount = 22
@@ -869,6 +981,82 @@ static func cross_slash(parent: Node3D, pos: Vector3, col: Color, yaw: float) ->
 	slash(parent, pos + Vector3(0, 0.2, 0), col.lerp(Color.WHITE, 0.4), yaw + PI * 0.5, 3.2, 1.0)
 	vortex(parent, pos + Vector3(0, -1.2, 0), col, 2.0, 0.7)
 
+## the six paths of rebirth: gods, men, titans, beasts, hungry ghosts and hells
+const SIX := [Color("fff0b0"), Color("a0e0ff"), Color("ff7050"), Color("90e070"), Color("c0a0ff"), Color("ff4080")]
+
+## A spoked wheel of light that spins up in front of the target and shatters into six beams.
+static func samsara_wheel(parent: Node3D, pos: Vector3, col: Color, yaw: float, radius: float = 1.6, life: float = 0.9) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var b := MB.new()
+	b.arc(Vector3.ZERO, radius, 0.14, 0.0, TAU, Color(col.r, col.g, col.b, 0.95), 40, Vector3(PI * 0.5, 0, 0))
+	b.arc(Vector3.ZERO, radius * 0.35, 0.1, 0.0, TAU, Color(1, 1, 1, 0.9), 20, Vector3(PI * 0.5, 0, 0))
+	for k in 6:
+		var a := TAU * k / 6.0
+		var c: Color = SIX[k]
+		b.box(Vector3(cos(a), sin(a), 0) * radius * 0.67, Vector3(radius * 0.62, 0.07, 0.02), Color(c.r, c.g, c.b, 0.9), Vector3(0, 0, a))
+		b.ball(Vector3(cos(a), sin(a), 0) * radius, 0.16, Color(c.r, c.g, c.b, 0.95), true)
+	var mi := MB.mesh_node(parent, b.build(MB.mat_glow()), pos)
+	mi.rotation.y = yaw + PI * 0.5
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.scale = Vector3.ONE * 0.2
+	var tw := mi.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(mi, "scale", Vector3.ONE, life * 0.35).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tw.tween_property(mi, "rotation:z", TAU * 1.5, life).set_ease(Tween.EASE_IN)
+	tw.chain().tween_property(mi, "scale", Vector3.ONE * 1.6, life * 0.25)
+	tw.chain().tween_callback(func():
+		shockwave(parent, pos - Vector3(0, pos.y - 0.1, 0) + Vector3(0, 0.0, 0), col, 6.0, 0.5)
+		_burst(parent, pos, col, 40, 6.0, 0.7, quad("star", 0.3), Vector3.ZERO, Vector3(0, 0, 1), 180.0, radius)
+		mi.queue_free())
+
+## Paper soul-lanterns drift down onto the target and burst into fox-fire.
+static func lantern_rain(parent: Node3D, pos: Vector3, delay: float = 0.0, count: int = 7) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	for k in count:
+		var lb := MB.new()
+		lb.lathe(Vector3.ZERO, [Vector2(0.12, -0.18), Vector2(0.2, -0.05), Vector2(0.2, 0.08), Vector2(0.12, 0.2)], MB.tag(Color("fff0c8"), MB.CLOTH), 10)
+		lb.cyl(Vector3(0, -0.2, 0), 0.13, 0.04, MB.tag(Color("c03020"), MB.WOOD), Vector3.ZERO, 10)
+		lb.cyl(Vector3(0, 0.22, 0), 0.13, 0.04, MB.tag(Color("c03020"), MB.WOOD), Vector3.ZERO, 10)
+		var mesh := lb.build(MB.mat_plain())
+		var gb := MB.new()
+		gb.ball(Vector3.ZERO, 0.3, Color(1.0, 0.65, 0.3, 0.6), true)
+		gb.add_to(mesh, MB.mat_glow())
+		var start := pos + Vector3(randf_range(-2.0, 2.0), randf_range(6.0, 9.0), randf_range(-2.0, 2.0))
+		var mi := MB.mesh_node(parent, mesh, start)
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var tw := mi.create_tween()
+		tw.tween_interval(delay + k * 0.06)
+		tw.set_parallel(true)
+		tw.tween_property(mi, "position", pos + Vector3(randf_range(-0.8, 0.8), 1.2, randf_range(-0.8, 0.8)), 0.55).set_ease(Tween.EASE_IN)
+		tw.tween_property(mi, "rotation:y", randf_range(-3.0, 3.0), 0.55)
+		tw.chain().tween_callback(func():
+			_flash(parent, mi.position, Color(1.0, 0.6, 0.25), 1.6, 0.3)
+			_burst(parent, mi.position, Color(1.0, 0.7, 0.3), 12, 3.0, 0.6, _sparks(), Vector3(0, -2.0, 0))
+			mi.queue_free())
+
+## A golden lotus opens under each ally and lifts them in a column of petals (Lotus of Rebirth).
+static func rebirth_lotus(parent: Node3D, pos: Vector3) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var b := MB.new()
+	for layer in 2:
+		for k in 8:
+			var a := TAU * (k + layer * 0.5) / 8.0
+			var r := 0.9 - layer * 0.3
+			b.leaf(Vector3(0, 0.05, 0), Vector3(cos(a) * r, 0.35 + layer * 0.25, sin(a) * r), 0.22 - layer * 0.05, Color(1.0, 0.85 - layer * 0.1, 0.6, 0.85), Vector3(-sin(a), 0, cos(a)), Color(1.0, 0.95, 0.85, 0.6))
+	var mi := MB.mesh_node(parent, b.build(MB.mat_glow()), pos + Vector3(0, 0.05, 0))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.scale = Vector3(0.1, 0.1, 0.1)
+	var tw := mi.create_tween()
+	tw.tween_property(mi, "scale", Vector3.ONE, 0.45).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tw.parallel().tween_property(mi, "rotation:y", PI, 1.2)
+	tw.tween_property(mi, "scale", Vector3(1.4, 0.01, 1.4), 0.4)
+	tw.tween_callback(mi.queue_free)
+	pillar(parent, pos, Color(1.0, 0.85, 0.5), 5.0, 0.8, 1.0)
+	_burst(parent, pos + Vector3(0, 0.3, 0), Color(1.0, 0.8, 0.9), 30, 2.5, 1.2, _leaves(), Vector3(0, 1.5, 0), Vector3(0, 1, 0), 40.0, 0.8)
+
 ## Extra flourish for the late-game techniques, on top of the usual projectile and hit effects.
 ## `from` is the caster, `targets` the struck positions.
 static func technique(parent: Node3D, id: String, from: Vector3, targets: Array, cam_yaw: float = 0.0) -> void:
@@ -903,3 +1091,21 @@ static func technique(parent: Node3D, id: String, from: Vector3, targets: Array,
 			for t in targets:
 				five_rings(parent, t, 0.9, 1.4)
 				spikes(parent, t, Color("d0a060"), 5, 0.6)
+		# ---- Part VI
+		"wheelcut":
+			for t in targets:
+				samsara_wheel(parent, t + Vector3(0, 1.4, 0), Color("8060ff"), cam_yaw, 1.6, 0.8)
+				cross_slash(parent, t + Vector3(0, 1.4, 0), Color("4030a0"), cam_yaw)
+		"samsara":
+			for t in targets:
+				samsara_wheel(parent, t + Vector3(0, 2.2, 0), Color("ffe0a0"), cam_yaw, 2.6, 1.2)
+				for k in 6:
+					var a := TAU * k / 6.0
+					pillar(parent, t + Vector3(cos(a) * 1.6, 0, sin(a) * 1.6), SIX[k], 6.0, 0.35, 0.9)
+				lightning(parent, t, Color(1.0, 0.95, 0.8), 20.0, 0.35)
+		"lanternrain", "lantern_ward":
+			for i in targets.size():
+				lantern_rain(parent, targets[i], 0.08 * i, 9 if id == "lanternrain" else 5)
+		"rebirth":
+			for t in targets:
+				rebirth_lotus(parent, t)

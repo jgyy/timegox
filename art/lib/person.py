@@ -17,7 +17,7 @@ attack, cast, hurt (0.55 s) and victory (1.2 s).  The numbers mirror ``Models.an
 
 import math
 
-from kit import (CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SKIN, STONE, WOOD, Builder, Rig, V, darken, env, finish_rigged, lighten, mix)
+from kit import (CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SKIN, STONE, WOOD, Builder, Rig, V, darken, env, finish_rigged, lighten, mix, rgb)
 
 SKIN_COL = "f4cfaa"
 HIP_Y = 0.92
@@ -106,6 +106,7 @@ def build(o):
     boots = o.get("boots", "2a2430")
     pants = o.get("pants", darken(robe, 0.6))
     metal = o.get("metal", "b8bcc8")
+    skin = o.get("skin", SKIN_COL)
 
     # ---------------- legs: trousers and boots
     for s, sd in ((1, "L"), (-1, "R")):
@@ -118,9 +119,11 @@ def build(o):
         b.tube([kn.lerp(an, 0.3) + V(0, 0.015, 0), kn.lerp(an, 0.3) - V(0, 0.015, 0)], [0.07, 0.07], trim, bone="shin." + sd, seg=12)
         b.ellipsoid(V(ANK.x * s, 0.05, 0.05), (0.06, 0.05, 0.12), boots, bone="foot." + sd, seg=14, rings=8, col2=darken(boots, 0.4))
         b.ellipsoid(V(ANK.x * s, 0.018, 0.04), (0.062, 0.018, 0.13), darken(boots, 0.5), bone="foot." + sd, seg=12, rings=6)
+        # cloud-shoe toe: a small upturned tip in the trim colour
+        b.tube([V(ANK.x * s, 0.04, 0.15), V(ANK.x * s, 0.06, 0.185), V(ANK.x * s, 0.09, 0.19)], [0.028, 0.018, 0.004], trim, bone="foot." + sd, seg=8)
 
     # ---------------- torso: inner robe and outer robe
-    b.lathe(V(0, 0, 0), [(0.15, 0.9), (0.165, 1.02), (0.19, 1.18), (0.215, 1.32), (0.22, 1.4), (0.19, 1.47), (0.11, 1.52), (0.06, 1.545)], robe, seg=20, squash=(1.0, 0.74), col_top=lighten(robe, 0.08), bone_fn=torso_w)
+    b.lathe(V(0, 0, 0), [(0.15, 0.9), (0.165, 1.02), (0.19, 1.18), (0.215, 1.32), (0.22, 1.4), (0.19, 1.47), (0.11, 1.52), (0.06, 1.545)], robe, seg=28, squash=(1.0, 0.74), col_top=lighten(robe, 0.08), bone_fn=torso_w, folds=(9, 0.035, 1.1))
     # crossed collar, left over right ("y" shape): the inner white collar shows at the neck and
     # the trimmed outer lapel sweeps from the neck down to the right hip; a band circles the nape
     b.auto = torso_w
@@ -131,7 +134,16 @@ def build(o):
     b.tube(nape + [V(-0.055, 1.52, 0.08)], [0.02] * 9, trim, seg=8, flat=0.5, up=(0, 1, 0))
     b.tube([V(-0.055, 1.52, 0.08), V(-0.02, 1.47, 0.14), V(0.03, 1.4, 0.172)], [0.02, 0.02, 0.012], inner, seg=8, flat=0.45, up=(0, 0, 1))
     lap = [V(0.055, 1.52, 0.08), V(0.035, 1.47, 0.145), V(-0.02, 1.38, 0.178), V(-0.09, 1.24, 0.172), V(-0.14, 1.09, 0.15), V(-0.15, 1.03, 0.14)]
-    b.tube(lap, [0.024] * 6, trim, seg=8, flat=0.42, up=(0, 0, 1))
+    mid_band = o.get("collar2", mix(sash, robe, 0.3))
+    b.tube([q + V(0.012, 0.004, -0.004) for q in lap[:4]], [0.03] * 4, mid_band, seg=8, flat=0.4, up=(0, 0, 1))
+    # the trimmed lapel carries embroidered dots along its length
+    lap_fine = []
+    for i in range(len(lap) - 1):
+        for k in range(3):
+            lap_fine.append(lap[i].lerp(lap[i + 1], k / 3))
+    lap_fine.append(lap[-1])
+    gold = o.get("embroidery", "f0c860")
+    b.tube(lap_fine, [0.024] * len(lap_fine), trim, seg=8, flat=0.42, up=(0, 0, 1), cols=[mix(trim, gold, 0.7) if i % 3 == 1 else rgb(trim) for i in range(len(lap_fine))])
     b.auto = torso_w
     b.ellipsoid(V(0, 1.46, 0.105), (0.07, 0.045, 0.03), inner, seg=12, rings=6)
     # shoulders
@@ -141,6 +153,11 @@ def build(o):
     # sash / belt with a knot and hanging tails
     b.lathe(V(0, 0, 0), [(0.172, 0.94), (0.178, 0.97), (0.178, 1.03), (0.172, 1.06)], sash, seg=20, squash=(1.0, 0.76), bone="hips", cap_bottom=False, cap_top=False)
     b.ellipsoid(V(0.04, 1.0, 0.14), (0.05, 0.04, 0.03), lighten(sash, 0.15), bone="hips", seg=12, rings=6)
+    # a gold belt plaque with a jade inlay, and a woven pattern band across the sash
+    b.superquad(V(-0.06, 1.0, 0.142), (0.032, 0.026, 0.008), o.get("embroidery", "f0c860"), e=0.35, cls=METAL, bone="hips")
+    b.ellipsoid(V(-0.06, 1.0, 0.151), (0.012, 0.012, 0.004), o.get("jade", "6af0b0"), cls=CRYSTAL, bone="hips", seg=8, rings=5)
+    band = b.lathe(V(0, 0, 0), [(0.18, 0.985), (0.181, 1.015)], sash, seg=40, squash=(1.0, 0.76), bone="hips", cap_bottom=False, cap_top=False)
+    b.recolor(band, lambda p: lighten(sash, 0.35) if math.sin(math.atan2(p.x, p.z) * 20.0) > 0.4 else None)
     for k, x in enumerate((0.02, 0.07)):
         b.ribbon([V(x, 0.99, 0.15), V(x + 0.01, 0.82, 0.17), V(x + 0.02, 0.62, 0.18)], [0.022, 0.02, 0.016], (1, 0, 0), sash, bones=[{"hips": 1}, {"hips": 0.5, "robe_f": 0.5}, {"robe_f": 1}], col_end=lighten(sash, 0.2))
     # jade pendant on a cord
@@ -148,9 +165,15 @@ def build(o):
     b.ellipsoid(V(-0.085, 0.84, 0.155), (0.025, 0.03, 0.01), o.get("jade", "6af0b0"), cls=CRYSTAL, bone="robe_f", seg=10, rings=6)
     # skirt: long outer robe split at the front
     prof = [(0.18, 1.0), (0.2, 0.86), (0.23, 0.68), (0.26, 0.5), (0.29, 0.34), (0.31, 0.22)]
-    b.lathe(V(0, 0, 0), prof, robe, seg=24, squash=(1.0, 0.82), cols=[robe, robe, robe, darken(robe, 0.05), darken(robe, 0.1), darken(robe, 0.15)], bone_fn=skirt_w, open_angle=0.55)
-    # hem trim band
-    b.lathe(V(0, 0, 0), [(0.312, 0.235), (0.318, 0.2)], trim, seg=24, squash=(1.0, 0.82), bone_fn=skirt_w, open_angle=0.55)
+    folds = (o.get("folds", 14), 0.045, 0.4)
+    b.lathe(V(0, 0, 0), prof, robe, seg=42, squash=(1.0, 0.82), cols=[robe, robe, robe, darken(robe, 0.05), darken(robe, 0.1), darken(robe, 0.15)], bone_fn=skirt_w, open_angle=0.55, folds=folds)
+    # hem trim band, following the folds, embroidered with a repeating cloud scallop
+    hem = b.lathe(V(0, 0, 0), [(0.312, 0.235), (0.318, 0.2)], trim, seg=42, squash=(1.0, 0.82), bone_fn=skirt_w, open_angle=0.55, folds=(folds[0], 0.045 * 0.95, folds[2]))
+    def scallop(p):
+        a = math.atan2(p.x, p.z)
+        k = math.sin(a * 18.0) * 0.5 + 0.5
+        return mix(trim, gold, 0.75) if (k > 0.72 and p.y > 0.212) or (p.y < 0.207 and k < 0.2) else None
+    b.recolor(hem, scallop)
     # inner skirt (lighter layer seen through the slit)
     b.lathe(V(0, 0, 0), [(0.165, 0.97), (0.2, 0.7), (0.24, 0.4), (0.25, 0.27)], inner, seg=18, squash=(1.0, 0.8), bone_fn=skirt_w, cap_bottom=False, cap_top=False)
     # trim down both front edges of the slit
@@ -173,42 +196,54 @@ def build(o):
         # wide hanfu sleeve, flaring towards the wrist and hanging lower at the back
         pts = [el, el.lerp(wr, 0.35), el.lerp(wr, 0.7), wr + V(0, -0.03, -0.02)]
         b.tube(pts, [(0.07, 0.07), (0.09, 0.11), (0.115, 0.15), (0.13, 0.17)], sleeve, bones=[{ua: 0.4, fa: 0.6}, fa, fa, fa], seg=14, cap1=False)
+        for k, t in enumerate((0.3, 0.55)):
+            q = el.lerp(wr, t)
+            b.tube([q + V(0, 0.008, 0), q - V(0, 0.008, 0)], [(0.085 + 0.035 * t, 0.1 + 0.06 * t)] * 2, darken(sleeve, 0.12), bone=fa, seg=14, cap0=False, cap1=False)
         b.tube([wr + V(0, -0.02, -0.02), wr + V(0, -0.045, -0.02)], [(0.132, 0.172), (0.132, 0.172)], trim, bone=fa, seg=14, cap0=False, cap1=False)
         # inner cuff and hand
         b.tube([el.lerp(wr, 0.6), wr + V(0, -0.02, 0)], [0.04, 0.038], inner, bone=fa, seg=10)
-        hc = wr + V(0.005 * s, -0.07, 0.01)
-        b.ellipsoid(hc, (0.032, 0.05, 0.042), SKIN_COL, cls=SKIN, bone="hand." + sd, seg=12, rings=8)
-        b.tube([hc + V(0, -0.02, 0.0), hc + V(0, -0.075, 0.015)], [0.03, 0.022], SKIN_COL, cls=SKIN, bone="hand." + sd, seg=10, flat=0.7)
-        b.tube([hc + V(-0.02 * s, 0.0, 0.03), hc + V(-0.025 * s, -0.04, 0.055)], [0.011, 0.009], SKIN_COL, cls=SKIN, bone="hand." + sd, seg=7)
+        hc = wr + V(0.005 * s, -0.065, 0.01)
+        b.ellipsoid(hc, (0.026, 0.042, 0.04), skin, cls=SKIN, bone="hand." + sd, seg=12, rings=8)
+        # four fingers, gently curled, and a thumb on the front edge of the palm
+        for k, (fz, fl) in enumerate(((0.024, 0.044), (0.008, 0.05), (-0.008, 0.048), (-0.023, 0.04))):
+            f0 = hc + V(0.002 * s, -0.035, fz)
+            f1 = f0 + V(-0.004 * s, -fl * 0.55, 0.004)
+            f2 = f1 + V(-0.008 * s, -fl * 0.45, 0.012)
+            b.tube([f0, f1, f2], [0.0095, 0.0085, 0.006], skin, cls=SKIN, bone="hand." + sd, seg=7)
+        b.tube([hc + V(-0.012 * s, -0.005, 0.032), hc + V(-0.02 * s, -0.03, 0.05), hc + V(-0.022 * s, -0.05, 0.056)], [0.011, 0.009, 0.007], skin, cls=SKIN, bone="hand." + sd, seg=7)
 
     # ---------------- head
-    b.tube([V(0, 1.47, 0.0), V(0, 1.58, 0.01)], [0.048, 0.044], SKIN_COL, cls=SKIN, bones=[{"neck": 0.6, "chest": 0.4}, {"neck": 0.5, "head": 0.5}], seg=12)
-    b.ellipsoid(V(0, 1.7, 0.0), (0.175, 0.195, 0.185), SKIN_COL, cls=SKIN, bone="head", seg=22, rings=14)
-    # soft anime jaw and chin
-    b.ellipsoid(V(0, 1.625, 0.045), (0.135, 0.105, 0.13), SKIN_COL, cls=SKIN, bone="head", seg=18, rings=10)
-    b.ellipsoid(V(0, 1.585, 0.1), (0.05, 0.035, 0.05), SKIN_COL, cls=SKIN, bone="head", seg=12, rings=6)
-    # ears
-    for s in (1, -1):
-        b.ellipsoid(V(0.172 * s, 1.68, -0.01), (0.022, 0.04, 0.03), SKIN_COL, cls=SKIN, bone="head", seg=10, rings=6, rot=(0, 0.3 * s, 0))
-    # cheeks blush, nose, mouth
-    for s in (1, -1):
-        b.ellipsoid(V(0.088 * s, 1.63, 0.152), (0.02, 0.008, 0.008), "f8b0a8", cls=SKIN, bone="head", seg=10, rings=5, rot=(0, 0.45 * s, 0), mat=MAT_PLAIN)
-    b.ellipsoid(V(0, 1.645, 0.183), (0.012, 0.018, 0.012), mix(SKIN_COL, "d89070", 0.3), cls=SKIN, bone="head", seg=8, rings=5, mat=MAT_PLAIN)
-    mouth = []
-    for i in range(5):
-        t = i / 4 - 0.5
-        mouth.append(V(t * 0.05, 1.598 + t * t * 0.03, 0.172 - abs(t) * 0.02))
-    b.tube(mouth, [0.0045] * 5, "a04050", cls=SKIN, bone="head", seg=6, mat=MAT_PLAIN)
-    # eyes on their own bone (it scales to blink)
-    eyes = o.get("eyes", "3a6ad8")
-    for s in (1, -1):
-        b.eye(V(0.068 * s, 1.678, 0.155), 0.042, eyes, side=s, bone="eyes", rot_y=0.32, h=1.35, glow=o.get("glow_eyes", False), slit=o.get("slit_eyes", False))
-        # eyelash line and brow
-        lash = [V(0.068 * s + 0.045 * s * (i / 4 - 0.5) * 2, 1.722 - 0.012 * (i / 4 - 0.5) ** 2 * 4 + 0.004 * s * (i / 4 - 0.5), 0.172 - 0.01 * abs(i / 4 - 0.5)) for i in range(5)]
-        b.tube(lash, [0.006, 0.008, 0.008, 0.007, 0.004], "1a1420", cls=HAIR, bone="eyes", seg=6, mat=MAT_PLAIN)
-        brow = [V(0.068 * s + 0.04 * s * (i / 3 - 0.5) * 2, 1.765 + 0.008 * (1 - abs(i / 3 - 0.5) * 2) - (0.01 * s * (i / 3 - 0.5) if o.get("stern", False) else 0), 0.168) for i in range(4)]
-        b.tube(brow, [0.006, 0.008, 0.007, 0.004], darken(hair, 0.2), cls=HAIR, bone="head", seg=6, mat=MAT_PLAIN)
-    hair_style(b, o.get("hair_style", "topknot"), hair, o)
+    if o.get("beast_head") is not None:
+        b.tube([V(0, 1.47, 0.0), V(0, 1.58, 0.01)], [0.06, 0.055], o.get("head_col", "6a4a3a"), cls=CLOTH, bones=[{"neck": 0.6, "chest": 0.4}, {"neck": 0.5, "head": 0.5}], seg=12)
+        beast_head(b, o)
+    else:
+        b.tube([V(0, 1.47, 0.0), V(0, 1.58, 0.01)], [0.048, 0.044], skin, cls=SKIN, bones=[{"neck": 0.6, "chest": 0.4}, {"neck": 0.5, "head": 0.5}], seg=12)
+        b.ellipsoid(V(0, 1.7, 0.0), (0.175, 0.195, 0.185), skin, cls=SKIN, bone="head", seg=22, rings=14)
+        # soft anime jaw and chin
+        b.ellipsoid(V(0, 1.625, 0.045), (0.135, 0.105, 0.13), skin, cls=SKIN, bone="head", seg=18, rings=10)
+        b.ellipsoid(V(0, 1.585, 0.1), (0.05, 0.035, 0.05), skin, cls=SKIN, bone="head", seg=12, rings=6)
+        # ears
+        for s in (1, -1):
+            b.ellipsoid(V(0.172 * s, 1.68, -0.01), (0.022, 0.04, 0.03), skin, cls=SKIN, bone="head", seg=10, rings=6, rot=(0, 0.3 * s, 0))
+        # cheeks blush, nose, mouth
+        for s in (1, -1):
+            b.ellipsoid(V(0.088 * s, 1.63, 0.152), (0.02, 0.008, 0.008), "f8b0a8", cls=SKIN, bone="head", seg=10, rings=5, rot=(0, 0.45 * s, 0), mat=MAT_PLAIN)
+        b.ellipsoid(V(0, 1.645, 0.183), (0.012, 0.018, 0.012), mix(skin, "d89070", 0.3), cls=SKIN, bone="head", seg=8, rings=5, mat=MAT_PLAIN)
+        mouth = []
+        for i in range(5):
+            t = i / 4 - 0.5
+            mouth.append(V(t * 0.05, 1.598 + t * t * 0.03, 0.172 - abs(t) * 0.02))
+        b.tube(mouth, [0.0045] * 5, "a04050", cls=SKIN, bone="head", seg=6, mat=MAT_PLAIN)
+        # eyes on their own bone (it scales to blink)
+        eyes = o.get("eyes", "3a6ad8")
+        for s in (1, -1):
+            b.eye(V(0.068 * s, 1.678, 0.155), 0.042, eyes, side=s, bone="eyes", rot_y=0.32, h=1.35, glow=o.get("glow_eyes", False), slit=o.get("slit_eyes", False))
+            # eyelash line and brow
+            lash = [V(0.068 * s + 0.045 * s * (i / 4 - 0.5) * 2, 1.722 - 0.012 * (i / 4 - 0.5) ** 2 * 4 + 0.004 * s * (i / 4 - 0.5), 0.172 - 0.01 * abs(i / 4 - 0.5)) for i in range(5)]
+            b.tube(lash, [0.006, 0.008, 0.008, 0.007, 0.004], "1a1420", cls=HAIR, bone="eyes", seg=6, mat=MAT_PLAIN)
+            brow = [V(0.068 * s + 0.04 * s * (i / 3 - 0.5) * 2, 1.765 + 0.008 * (1 - abs(i / 3 - 0.5) * 2) - (0.01 * s * (i / 3 - 0.5) if o.get("stern", False) else 0), 0.168) for i in range(4)]
+            b.tube(brow, [0.006, 0.008, 0.007, 0.004], darken(hair, 0.2), cls=HAIR, bone="head", seg=6, mat=MAT_PLAIN)
+        hair_style(b, o.get("hair_style", "topknot"), hair, o)
     if o.get("beard", False):
         bc = o.get("beard_col", "e8e8f0")
         for i in range(7):
@@ -293,6 +328,23 @@ def build(o):
         b.tube([V(0, 1.9, -0.18), V(0, 1.7, -0.3), V(0, 1.45, -0.28)], [0.12, 0.1, 0.05], o.get("hat_col", "6a5a8a"), cls=CLOTH, bones=["head", {"head": 0.5, "hair_tail": 0.5}, "hair_tail"], seg=10)
     elif hat == "fur":
         b.lathe(V(0, 1.8, -0.02), [(0.21, 0.0), (0.23, 0.05), (0.22, 0.14), (0.15, 0.2), (0.001, 0.22)], o.get("hat_col", "c8b8a0"), cls=HAIR, bone="head", seg=18)
+    elif hat == "qing":
+        # Qing-dynasty official's hat: a turned-up brim, a domed crown, a red silk fringe and a bead
+        b.lathe(V(0, 1.82, -0.02), [(0.25, 0.0), (0.24, 0.035), (0.17, 0.05), (0.16, 0.12), (0.1, 0.17), (0.001, 0.18)], o.get("hat_col", "2a2a30"), cls=CLOTH, bone="head", seg=20)
+        b.lathe(V(0, 1.86, -0.02), [(0.15, 0.0), (0.12, 0.1), (0.001, 0.14)], "c02a20", cls=HAIR, bone="head", seg=18, folds=(16, 0.12, 0.0))
+        b.ball(V(0, 2.01, -0.02), 0.03, "e8c050", cls=METAL, bone="head", seg=10, rings=6)
+        b.tube([V(0, 1.99, -0.05), V(0, 1.95, -0.2), V(0, 1.8, -0.3)], [0.02, 0.03, 0.006], "3a8a7a", cls=HAIR, bone="head", seg=6, flat=0.4)
+    if o.get("talisman", False):
+        # a yellow paper talisman pasted to the forehead, brushed with red script
+        tal = b.ribbon([V(0, 1.84, 0.17), V(0, 1.72, 0.2), V(0.01, 1.56, 0.19)], [0.045, 0.045, 0.042], (1, 0, 0), "f0d860", bone="head", col_end="e8c850")
+        b.recolor(tal, lambda p: "c02018" if abs(p.x) < 0.012 and int(p.y * 60) % 3 != 0 else None)
+    if o.get("halberd", False):
+        hc2 = WRI * V(-1, 1, 1) + V(0, -0.07, 0.02)
+        b.tube([hc2 + V(0, -0.9, 0), hc2 + V(0, 0.95, 0)], [0.022, 0.02], "4a3020", cls=WOOD, bone="hand.R", seg=8)
+        top2 = hc2 + V(0, 0.95, 0)
+        b.cone(top2 + V(0, 0.18, 0), 0.04, 0.36, "c8ccd8", cls=METAL, bone="hand.R", seg=6)
+        b.tube([top2 + V(0, 0.02, 0), top2 + V(0.06, 0.06, 0.18), top2 + V(0.0, -0.08, 0.3)], [(0.03, 0.006), (0.06, 0.008), (0.01, 0.004)], "c8ccd8", cls=METAL, bone="hand.R", seg=6, up=(1, 0, 0))
+        b.ribbon([top2 + V(0, -0.04, 0), top2 + V(0.02, -0.18, -0.05), top2 + V(0.03, -0.34, -0.06)], [0.03, 0.035, 0.01], (1, 0, 0), "c02a20", bone="hand.R", col_end="ff6040")
     if o.get("horns", False):
         hcol = o.get("horn_col", "2a1a20")
         for side in (1, -1):
@@ -303,6 +355,15 @@ def build(o):
         for v in b.bm.verts:
             if v[b.cl][3] > 0.94:
                 v[b.tl] = 1.0
+    hk = o.get("head_scale", 0.9)
+    if hk != 1.0:
+        pivot = V(0, 1.58, 0.0)
+        b.scale_where(lambda w: w.get("head", 0.0) + w.get("eyes", 0.0) + w.get("hair_tail", 0.0) >= 0.5, pivot, hk)
+        for nm in ("eyes", "hair_tail"):
+            h0, t0, par = rig.bones[nm]
+            rig.bones[nm] = (pivot + (V(h0) - pivot) * hk, pivot + (V(t0) - pivot) * hk, par)
+        h0, t0, par = rig.bones["head"]
+        rig.bones["head"] = (h0, pivot + (V(t0) - pivot) * hk, par)
     sc = o.get("scale", 1.0)
     if sc != 1.0:
         for v in b.bm.verts:
@@ -311,6 +372,44 @@ def build(o):
             h, t, p = rig.bones[nm]
             rig.bones[nm] = (h * sc, t * sc, p)
     return b, rig
+
+
+def beast_head(b, o):
+    """Animal heads for the runners of the underworld: 'ox' (Ox-Head) and 'horse' (Horse-Face)."""
+    kind = o["beast_head"]
+    hc = o.get("head_col", "6a4a3a")
+    muz = o.get("muzzle_col", lighten(hc, 0.25))
+    eye = o.get("eyes", "ff4020")
+    if kind == "ox":
+        b.ellipsoid(V(0, 1.74, 0.0), (0.18, 0.16, 0.18), hc, cls=CLOTH, bone="head", seg=20, rings=12)
+        b.ellipsoid(V(0, 1.63, 0.16), (0.13, 0.1, 0.13), muz, cls=SKIN, bone="head", seg=18, rings=10)
+        for s in (1, -1):
+            b.ellipsoid(V(0.045 * s, 1.63, 0.285), (0.022, 0.016, 0.01), "1a1010", cls=SKIN, bone="head", seg=8, rings=5)
+            # sweeping horns, pale at the tips
+            b.tube([V(0.13 * s, 1.84, 0.0), V(0.27 * s, 1.88, -0.02), V(0.36 * s, 1.96, 0.04), V(0.36 * s, 2.08, 0.12)], [0.05, 0.04, 0.026, 0.004], "e8dcc0", cls=STONE, bone="head", seg=10, cols=["8a7a60", "c8b898", "e8dcc0", "f8f0e0"])
+            b.ellipsoid(V(0.19 * s, 1.74, -0.02), (0.07, 0.03, 0.045), hc, cls=CLOTH, bone="head", seg=10, rings=6, rot=(0, 0, 0.4 * s))
+            b.tube([V(0.07 * s, 1.81, 0.15), V(0.12 * s, 1.8, 0.13)], [0.022, 0.016], darken(hc, 0.3), bone="head", seg=6)
+        ring = []
+        for i in range(13):
+            a = 2 * math.pi * i / 12
+            ring.append(V(math.sin(a) * 0.04, 1.585 + math.cos(a) * 0.035, 0.28))
+        b.tube(ring, [0.007] * 13, "e8c050", cls=METAL, bone="head", seg=6)
+        for s in (1, -1):
+            b.eye(V(0.09 * s, 1.76, 0.155), 0.03, eye, side=s, bone="eyes", rot_y=0.4, h=0.9, glow=True, slit=False)
+    else:
+        b.ellipsoid(V(0, 1.76, -0.01), (0.13, 0.15, 0.16), hc, cls=CLOTH, bone="head", seg=20, rings=12)
+        b.tube([V(0, 1.76, 0.06), V(0, 1.68, 0.22), V(0, 1.58, 0.38)], [(0.1, 0.12), (0.085, 0.1), (0.075, 0.07)], hc, bone="head", seg=14)
+        b.ellipsoid(V(0, 1.565, 0.4), (0.075, 0.065, 0.07), muz, cls=SKIN, bone="head", seg=14, rings=8)
+        b.tube([V(0, 1.82, 0.04), V(0, 1.72, 0.24), V(0, 1.62, 0.36)], [0.025, 0.03, 0.02], lighten(hc, 0.5), bone="head", seg=6)
+        for s in (1, -1):
+            b.ellipsoid(V(0.035 * s, 1.585, 0.46), (0.016, 0.022, 0.01), "1a1010", cls=SKIN, bone="head", seg=8, rings=5)
+            b.cone(V(0.07 * s, 1.93, -0.03), 0.026, 0.11, hc, cls=CLOTH, bone="head", seg=8, rot=(-0.3, 0, -0.2 * s))
+            b.eye(V(0.12 * s, 1.78, 0.09), 0.032, eye, side=s, bone="eyes", rot_y=1.0, h=0.95, glow=True, slit=False)
+        mane = o.get("hair", "1a1010")
+        for i in range(10):
+            y = 1.93 - i * 0.045
+            z = -0.05 - i * 0.012
+            b.leaf(V(0, y, z), V(0.0, y - 0.04, z - 0.2), 0.06, mane, side=(1, 0, 0), cls=HAIR, bone="head" if i < 6 else "neck", col_tip=lighten(mane, 0.2))
 
 
 def sword(b, bone, grip, blade, hilt):
@@ -341,16 +440,32 @@ def hair_style(b, style, hc, o):
             b.tube([root, root + V(math.sin(a) * 0.03, -0.08, math.cos(a) * 0.02)], [0.03, 0.01], o.get("beard_col", "e8e8f0"), cls=HAIR, bone="head", seg=6)
         return
     b.ellipsoid(V(0, 1.735, -0.03), (0.19, 0.19, 0.2), hc, cls=HAIR, bone="head", seg=22, rings=14, squash_top=1.05)
-    # bangs: a fan of tapered locks over the forehead
-    for i in range(9):
-        u = i / 8 - 0.5
-        root = V(u * 0.22, 1.86, 0.06)
-        tip = V(u * 0.34, 1.7 + abs(u) * 0.12 + (0.02 if i % 2 else 0.0), 0.19 - abs(u) * 0.06)
-        mid = root.lerp(tip, 0.5) + V(0, 0.01, 0.05)
-        b.tube([root, mid, tip], [0.035, 0.028, 0.004], hc if i % 3 else dk, cls=HAIR, bone="head", seg=7, flat=0.55, up=(0, 0, 1))
+    lt = lighten(hc, 0.12)
+    # layered locks sweep from the crown over the cap, so the hair has volume and a ragged,
+    # strand-by-strand silhouette instead of reading as a smooth helmet
+    crown = V(0, 1.935, -0.04)
+    n_locks = 18
+    for i in range(n_locks):
+        a = math.pi * 0.28 + (i / (n_locks - 1)) * math.pi * 1.44
+        ca, sa = math.cos(a), math.sin(a)
+        rim = V(sa * 0.205, 1.7 - 0.05 * (1 + math.cos(a)) * 0.5, ca * 0.21 - 0.03)
+        mid = crown.lerp(rim, 0.55) + V(sa * 0.06, 0.03, ca * 0.05)
+        tip = rim + V(sa * 0.03, -0.08 - 0.06 * (i % 3) / 2, ca * 0.025)
+        b.tube([crown + V(sa * 0.03, 0, ca * 0.03), mid, rim, tip], [0.05, 0.055, 0.04, 0.004], (dk, hc, lt)[i % 3], cls=HAIR, bone="head", seg=7, flat=0.45, up=(0, 1, 0))
+    # bangs: tapered locks over the forehead, clumped in twos and threes
+    for i in range(11):
+        u = i / 10 - 0.5
+        clump = (-0.012, 0.0, 0.012)[i % 3]
+        root = V(u * 0.24, 1.865, 0.05)
+        tip = V(u * 0.36 + clump, 1.69 + abs(u) * 0.12 + (0.025 if i % 2 else 0.0), 0.195 - abs(u) * 0.07)
+        mid = root.lerp(tip, 0.5) + V(0, 0.012, 0.055)
+        b.tube([root, mid, tip], [0.034, 0.028, 0.003], (hc, dk, lt)[i % 3] if i % 4 else dk, cls=HAIR, bone="head", seg=7, flat=0.5, up=(0, 0, 1))
+    if o.get("ahoge", False):
+        b.tube([V(0, 1.93, 0.0), V(0.03, 2.02, 0.03), V(0.07, 2.03, 0.08), V(0.08, 1.99, 0.1)], [0.012, 0.01, 0.007, 0.002], hc, cls=HAIR, bone="head", seg=6, flat=0.5)
     # side locks
     for s in (1, -1):
         b.tube([V(0.155 * s, 1.78, 0.07), V(0.18 * s, 1.64, 0.1), V(0.17 * s, 1.5, 0.08)], [0.03, 0.03, 0.004], hc, cls=HAIR, bones=["head", "head", {"head": 0.7, "neck": 0.3}], seg=7, flat=0.5, up=(0, 0, 1))
+        b.tube([V(0.17 * s, 1.76, 0.03), V(0.2 * s, 1.62, 0.04), V(0.19 * s, 1.46, 0.02)], [0.028, 0.026, 0.003], dk, cls=HAIR, bones=["head", "head", {"head": 0.6, "neck": 0.4}], seg=7, flat=0.5, up=(0, 0, 1))
     if style == "topknot":
         b.ball(V(0, 1.93, -0.05), 0.075, hc, cls=HAIR, bone="head", seg=14, rings=10)
         b.lathe(V(0, 1.89, -0.05), [(0.075, 0.0), (0.078, 0.025), (0.07, 0.04)], "f0c850", cls=METAL, bone="head", seg=14)
@@ -543,7 +658,7 @@ CLIPS = {
 }
 
 
-def export_person(rel, opts):
+def export_person(rel, opts, clips=None):
     b, rig = build(opts)
     print("[art] %s: %d triangles" % (rel, b.tri_count()))
-    return finish_rigged(b, rig, rel, CLIPS, samples=16, dist=0.25, strength=0.5, floor_y=0.0, floor_k=0.2)
+    return finish_rigged(b, rig, rel, clips or CLIPS, samples=16, dist=0.25, strength=0.5, floor_y=0.0, floor_k=0.2)

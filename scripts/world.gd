@@ -42,6 +42,8 @@ var hm := PackedFloat32Array()
 var step_side := 0
 var last_step_phase := 0.0
 var cam_q := 0
+## screenshot tour: a fixed wide establishing shot replaces the chase camera while set
+var cam_override: Variant = null
 var cam_a := 0.0
 var cam_pos := Vector3.ZERO
 
@@ -198,17 +200,17 @@ func _npc_opts(id: String) -> Dictionary:
 		"yue_ling":
 			return {"asset": "yue_ling", "ribbon": Color("ff9ac0"), "hair": "long", "eyes": Color("c04080")}
 		"sword_ghost":
-			return {"sword": true, "beard": true, "glow": Color(0.6, 0.85, 1.0), "hair": "topknot"}
+			return {"asset": id, "sword": true, "beard": true, "glow": Color(0.6, 0.85, 1.0), "hair": "topknot"}
 		"dragon_envoy", "gate_keeper", "lake_keeper", "grave_keeper", "time_ferryman", "origin_keeper", "cloud_warden", "court_scribe":
-			return {"staff": true, "glow": Color(1.0, 0.95, 0.7), "hair": "long" if id in ["lake_keeper", "court_scribe"] else "bun"}
+			return {"asset": id, "staff": true, "glow": Color(1.0, 0.95, 0.7), "hair": "long" if id in ["lake_keeper", "court_scribe"] else "bun"}
 		"forge_master":
-			return {"sash": false, "hair": "wild", "armor": true, "metal": Color("b07a40"), "beard": true}
+			return {"asset": id, "sash": false, "hair": "wild", "armor": true, "metal": Color("b07a40"), "beard": true}
 		"peach_keeper":
-			return {"ribbon": Color("ffd0e0"), "hair": "long", "crown": true, "glow": Color(1.0, 0.8, 0.9)}
-		"nomad", "spore_witch", "steppe_shaman", "nuwa_echo":
+			return {"asset": id, "ribbon": Color("ffd0e0"), "hair": "long", "crown": true, "glow": Color(1.0, 0.8, 0.9)}
+		"nomad", "spore_witch", "steppe_shaman", "nuwa_echo", "lantern_monk", "fisher", "meng_po", "judge_cui":
 			return {"asset": id, "staff": true, "hair": "long", "glow": Color(1.0, 0.95, 0.8)}
 		"fire_sage", "void_hermit":
-			return {"beard": true, "hat": true, "hair": "bald"}
+			return {"asset": id, "beard": true, "hat": true, "hair": "bald"}
 	return {}
 
 func _make_ent(e: Dictionary) -> Node3D:
@@ -415,6 +417,8 @@ func _update_view(d: float) -> void:
 	cam_pos = cam_pos.lerp(g[0], 1.0 - exp(-d * 9.0))
 	cam.position = cam_pos
 	cam.look_at(g[1], Vector3.UP)
+	if cam_override != null:
+		cam.global_transform = cam_override
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:

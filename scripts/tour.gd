@@ -6,7 +6,7 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder"}
 
 func _stop(id: String) -> Array:
 	## [first quest step set in this area, a sensible player level]
@@ -81,6 +81,46 @@ func _gallery(n: String, models: Array, spacing: float) -> void:
 	if main.world.cam != null:
 		main.world.cam.make_current()
 
+## Close-up portraits (head and shoulders): the faces, hair and costume details the chase
+## camera is too far away to show.
+func _portraits(n: String, models: Array, spacing: float = 0.95, height: float = 1.5, dist: float = 2.6) -> void:
+	main.world.hide()
+	var stage := Node3D.new()
+	stage.position = Vector3(0, 420, 0)
+	main.add_child(stage)
+	var cam := Camera3D.new()
+	cam.fov = 30.0
+	cam.environment = Look.environment("garden", 0.1)
+	cam.environment.tonemap_exposure = 0.75
+	stage.add_child(cam)
+	stage.add_child(Look.sun("garden"))
+	stage.add_child(Look.fill("garden"))
+	var key := OmniLight3D.new()
+	key.position = Vector3(1.5, 2.2, 3.0)
+	key.omni_range = 8.0
+	key.light_energy = 0.25
+	stage.add_child(key)
+	for i in models.size():
+		var m: Node3D = models[i]
+		m.position = Vector3((i - (models.size() - 1) * 0.5) * spacing, 0.0, 0.0)
+		m.rotation.y = 0.25 * (1 if i % 2 == 0 else -1)
+		stage.add_child(m)
+	cam.position = Vector3(0, height + 0.08, dist)
+	cam.look_at(stage.global_position + Vector3(0, height - 0.12, 0), Vector3.UP)
+	cam.make_current()
+	var t0 := 0.0
+	for k in 30:
+		t0 += 1.0 / 30.0
+		for m2 in models:
+			if m2.get_meta("kind", "") == "person":
+				Models.anim_person(m2, t0 + 0.5, false)
+			else:
+				Models.anim_monster(m2, t0 + 0.5, 0.0)
+		await get_tree().process_frame
+	await _shot(n)
+	stage.queue_free()
+	main.world.show()
+
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for r in 20:
 		for dx in range(-r, r + 1):
@@ -128,7 +168,16 @@ func _run() -> void:
 		main.world.banner_t = 0.0
 		await _wait(1.2)
 		await _shot("world_" + id)
-		if id == "sect":
+		if main.args.has("vista"):
+			# a wide, high establishing shot over the region's landscape
+			var pp: Vector3 = main.world._player_pos()
+			var eye := pp + Vector3(-14.0, 11.0, 16.0)
+			eye.y = maxf(eye.y, main.world.ground_y(eye) + 9.0)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(pp + Vector3(10.0, 0.0, -10.0), Vector3.UP)
+			await _wait(0.6)
+			await _shot("vista_" + id)
+			main.world.cam_override = null
+		if id == "sect" or main.args.has("world-only"):
 			continue
 		# a regular battle with this region's monster pool
 		var foes: Array = []
@@ -152,6 +201,10 @@ func _run() -> void:
 			await _wait(2.8)
 			await _shot("battle_boss_" + b.id)
 			main.pop()
+	# galleries are shot from the world screen (the title menu would cover them)
+	main.set_stack(["world"])
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.world.banner_t = 0.0
 	if main.args.has("gallery") or not main.args.has("no-extras"):
 		await _gallery("gallery_people", [
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
@@ -170,9 +223,24 @@ func _run() -> void:
 			Models.monster("scorpion", Color("e8d8a0")), Models.monster("mushroom", Color("c070e0")), Models.monster("mammoth", Color("a0b8d0")),
 			Models.monster("moth", Color("ffb040")), Models.monster("hundun", Color("e05030")),
 		], 1.7)
+		# Part VI people (art/characters)
+		await _gallery("gallery_npcs_part6", [
+			Assets.person("lantern_monk"), Assets.person("fisher"), Assets.person("meng_po"),
+			Assets.person("judge_cui"), Assets.person("lin_shan"), Assets.person("su_wan"),
+		], 0.8)
+		# earlier NPCs, now Blender-built
+		await _gallery("gallery_npcs_keepers", [
+			Assets.person("sword_ghost"), Assets.person("dragon_envoy"), Assets.person("fire_sage"), Assets.person("lake_keeper"),
+			Assets.person("cloud_warden"), Assets.person("forge_master"), Assets.person("peach_keeper"),
+		], 0.7)
+		# Part VI creatures (art/monsters)
+		await _gallery("gallery_part6", [
+			Models.monster("fox", Color("ff6a30")), Models.monster("carp", Color("ffb060")), Models.monster("oxhead", Color("6a3a2a")),
+			Models.monster("horseface", Color("8a4a3a")), Models.monster("jiangshi", Color("3a5a4a")),
+		], 1.7)
 		# Blender landmarks (art/props)
 		var props: Array = []
-		for pr in ["pine", "bamboo", "peach", "meteor", "glowcap", "icespire", "chaosrock"]:
+		for pr in ["pine", "bamboo", "peach", "meteor", "glowcap", "icespire", "chaosrock", "stonelantern", "ghostpagoda"]:
 			var holder := Node3D.new()
 			MB.mesh_node(holder, Assets.static_mesh("props/" + pr))
 			props.append(holder)
@@ -189,6 +257,12 @@ func _run() -> void:
 			Models.monster("dragon", Color("3a8ad8")), Models.monster("golem", Color("e0501a")), Models.monster("serpent", Color("2a9a8a")),
 			Models.monster("plant", Color("4fc07a")), Models.monster("storm", Color("c8d8ff")),
 		], 1.7)
+	if main.args.has("portraits") or not main.args.has("no-extras"):
+		await _portraits("portrait_heroes", [
+			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
+			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
+			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
+		], 0.9, 1.5, 3.2)
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return

@@ -12,7 +12,7 @@ static var _water_mats := {}
 static var _ground_mats := {}
 static var _protos := {}
 
-const STYLE := {"grass": 0, "mud": 1, "snow": 2, "rock": 3, "tile": 4, "sand": 5, "ash": 6, "crystal": 7, "marble": 8, "glass": 9, "moss": 10, "permafrost": 11, "nebula": 12}
+const STYLE := {"grass": 0, "mud": 1, "snow": 2, "rock": 3, "tile": 4, "sand": 5, "ash": 6, "crystal": 7, "marble": 8, "glass": 9, "moss": 10, "permafrost": 11, "nebula": 12, "leaves": 13, "lilyfield": 14, "underworld": 15}
 
 static func world_pos(tile: Vector2i) -> Vector3:
 	return Vector3((tile.x + 0.5) * T, 0.0, (tile.y + 0.5) * T)
@@ -30,6 +30,7 @@ uniform vec3 path_dark : source_color = vec3(0.4, 0.35, 0.3);
 uniform vec3 accent : source_color = vec3(1.0, 0.9, 0.6);
 uniform float cloud_shadow = 0.0;
 varying vec3 wp;
+varying vec3 wn;
 varying float kind;
 
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -69,6 +70,7 @@ vec2 cells(vec2 p) {
 
 void vertex() {
 	wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	wn = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
 	kind = COLOR.a;
 }
 
@@ -170,6 +172,65 @@ void fragment() {
 		g += vec3(smoothstep(0.025, 0.0, c7.y) * 0.1);
 		rough = 0.2;
 	}
+	if (style == 13) {
+		// autumn forest floor: two overlapping layers of fallen leaves, each leaf a pointed oval
+		// with its own angle, size and colour (crimson, orange, gold, and brown where they have dried)
+		float cover_k = smoothstep(0.25, 0.6, mid + 0.15);
+		for (int L = 0; L < 2; L++) {
+			float sc = L == 0 ? 2.1 : 3.4;
+			vec2 q = uv * sc + float(L) * 17.3;
+			vec2 id = floor(q);
+			for (int yy = -1; yy <= 1; yy++) {
+				for (int xx = -1; xx <= 1; xx++) {
+					vec2 cid = id + vec2(float(xx), float(yy));
+					vec2 rnd = h22(cid);
+					if (h21(cid + 5.1) > 0.35 + 0.5 * (1.0 - cover_k)) { continue; }
+					vec2 cen = cid + 0.2 + rnd * 0.6;
+					float ang = h21(cid + 9.7) * 6.2831;
+					vec2 d = q - cen;
+					vec2 lp = vec2(cos(ang) * d.x + sin(ang) * d.y, -sin(ang) * d.x + cos(ang) * d.y);
+					float len = 0.28 + 0.12 * rnd.x;
+					float wid = 0.13 * (1.0 - abs(lp.x / len)) + 0.02;
+					float inside = step(abs(lp.x), len) * smoothstep(wid, wid * 0.7, abs(lp.y));
+					if (inside > 0.01) {
+						float pk = h21(cid + 3.3);
+						vec3 lc = pk < 0.3 ? vec3(0.78, 0.2, 0.08) : (pk < 0.6 ? vec3(0.92, 0.48, 0.12) : (pk < 0.85 ? vec3(0.9, 0.72, 0.22) : vec3(0.48, 0.3, 0.16)));
+						lc *= 0.8 + 0.25 * rnd.y - 0.15 * smoothstep(0.02, 0.0, abs(lp.y));
+						g = mix(g, lc, inside * 0.92);
+					}
+				}
+			}
+		}
+		g = mix(g, g * vec3(0.8, 0.7, 0.6), smoothstep(0.6, 0.8, big) * 0.4);
+	} else if (style == 14) {
+		// fields of the Yellow Springs: dusky grass, fallen red petals, golden glints of spring water
+		float petal = step(0.965, h21(floor(uv * 7.0) + 3.0)) * smoothstep(0.3, 0.0, length(fract(uv * 7.0) - 0.5));
+		g = mix(g, vec3(0.85, 0.12, 0.08), petal * 0.85);
+		float glint = smoothstep(0.62, 0.78, fbm(uv * 0.3 + TIME * 0.02)) * smoothstep(0.5, 0.7, mid);
+		emit += vec3(1.0, 0.7, 0.25) * glint * 0.25;
+	} else if (style == 15) {
+		// underworld basalt: dark hexagonal flagstones split by cold blue ghost-fire
+		vec2 c8 = cells(uv * 0.75);
+		float seam = smoothstep(0.05, 0.0, c8.y);
+		g *= 0.75 + 0.3 * h21(floor(uv * 0.75 + c8.x * 5.0)) + 0.1 * fine;
+		g -= vec3(0.08) * seam;
+		emit += accent * seam * smoothstep(0.4, 0.65, big) * (0.6 + 0.4 * sin(TIME * 2.0 + uv.y * 0.5));
+		rough = 0.55;
+	}
+	// steep slopes shed their soil: bare, cracked rock shows through on hillsides
+	float steep = smoothstep(0.93, 0.8, wn.y + (mid - 0.5) * 0.08);
+	if (steep > 0.001 && style != 4 && style != 8) {
+		vec2 cr = cells(uv * 1.3);
+		vec3 rockc = mix(base, vec3(dot(base, vec3(0.33))), 0.6) * (0.78 + 0.3 * fine) - vec3(0.12) * smoothstep(0.05, 0.0, cr.y);
+		g = mix(g, rockc, steep * 0.85);
+		rough = mix(rough, 0.9, steep);
+	}
+	// fine relief: a noise gradient bends the normal so light catches clods, ripples and pebbles
+	float e = 0.15;
+	float hx = fbm(uv * 1.7 + vec2(e, 0.0)) - fbm(uv * 1.7 - vec2(e, 0.0));
+	float hz = fbm(uv * 1.7 + vec2(0.0, e)) - fbm(uv * 1.7 - vec2(0.0, e));
+	vec3 bump = vec3(-hx, 0.0, -hz) * (style == 9 || style == 12 ? 0.15 : 0.9);
+	NORMAL = normalize(NORMAL + (VIEW_MATRIX * vec4(bump, 0.0)).xyz);
 	// paths: worn cobblestones blended in by vertex alpha with a ragged edge
 	float pathk = smoothstep(0.55, 0.25, kind + (mid - 0.5) * 0.35);
 	if (pathk > 0.001) {
@@ -197,6 +258,8 @@ shader_type spatial;
 render_mode blend_mix, cull_disabled, diffuse_burley, specular_schlick_ggx, depth_draw_always;
 uniform vec4 col : source_color = vec4(0.2, 0.4, 0.8, 0.8);
 uniform vec3 deep : source_color = vec3(0.05, 0.1, 0.25);
+uniform vec3 sky_top : source_color = vec3(0.3, 0.45, 0.8);
+uniform vec3 sky_hor : source_color = vec3(0.8, 0.85, 0.95);
 uniform float glow = 0.0;
 varying vec3 wp;
 varying float shore;
@@ -208,6 +271,10 @@ float n2(vec2 p) {
 	f = f * f * (3.0 - 2.0 * f);
 	return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y);
 }
+// height of the water surface pattern: two scrolling noise layers crossing each other
+float wave_h(vec2 p) {
+	return n2(p * 1.4 + vec2(TIME * 0.32, TIME * 0.18)) * 0.6 + n2(p * 3.1 - vec2(TIME * 0.21, -TIME * 0.37)) * 0.4;
+}
 
 void vertex() {
 	wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -217,28 +284,36 @@ void vertex() {
 
 void fragment() {
 	vec2 uv = wp.xz;
-	float w1 = sin(uv.x * 2.3 + TIME * 1.4) * sin(uv.y * 2.1 + TIME * 1.1);
-	float w2 = n2(uv * 1.5 + vec2(TIME * 0.3, TIME * 0.2)) - 0.5;
-	float w3 = n2(uv * 3.7 - vec2(TIME * 0.25, -TIME * 0.35)) - 0.5;
-	// ripple normals
-	NORMAL = normalize(NORMAL + (VIEW_MATRIX * vec4(w2 * 0.35 + w1 * 0.1, 0.0, w3 * 0.35, 0.0)).xyz);
-	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
-	vec3 c = mix(deep, col.rgb, 0.55 + 0.25 * w1 + 0.3 * fres);
-	// caustic sparkle and shoreline foam
-	float sparkle = smoothstep(0.42, 0.5, w2 + w3) * 0.6;
-	float foam = smoothstep(0.35, 0.95, shore + w3 * 0.6) * (0.6 + 0.4 * sin(TIME * 2.0 + uv.x * 3.0));
-	c = mix(c, vec3(1.0), clamp(foam * 0.8 + sparkle * 0.3, 0.0, 1.0));
+	float e = 0.08;
+	float hc = wave_h(uv);
+	float hx = wave_h(uv + vec2(e, 0.0)) - hc;
+	float hz = wave_h(uv + vec2(0.0, e)) - hc;
+	vec3 wn = normalize(vec3(-hx * 5.0, 1.0, -hz * 5.0));
+	NORMAL = normalize((VIEW_MATRIX * vec4(wn, 0.0)).xyz);
+	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 4.0);
+	// deeper water away from the shore, shallower and more see-through near it
+	vec3 body = mix(deep, col.rgb, 0.45 + 0.4 * shore + 0.2 * hc);
+	// reflected sky: horizon colour at grazing angles, zenith colour looking down
+	vec3 refl = mix(sky_top, sky_hor, clamp(fres * 1.6, 0.0, 1.0));
+	vec3 c = mix(body, refl, clamp(0.18 + fres * 0.8, 0.0, 0.85));
+	// waves lapping at the shore: bands of foam running in towards the land
+	float lap = sin(shore * 9.0 - TIME * 2.2 + n2(uv * 2.0) * 3.0);
+	float foam = smoothstep(0.55, 0.95, shore) * smoothstep(0.2, 0.9, lap) * (0.6 + 0.4 * n2(uv * 6.0 + TIME));
+	foam += smoothstep(0.88, 1.0, shore) * 0.5;
+	// caustic glints where crests meet
+	float glint = smoothstep(0.86, 0.95, hc + n2(uv * 7.0 + TIME * 0.6) * 0.25);
+	c = mix(c, vec3(1.0), clamp(foam * 0.75, 0.0, 1.0));
 	ALBEDO = c;
-	ALPHA = clamp(col.a + fres * 0.25 + foam * 0.3, 0.0, 1.0);
-	ROUGHNESS = 0.06;
-	METALLIC = 0.2;
-	SPECULAR = 0.9;
-	EMISSION = col.rgb * glow * (0.7 + 0.3 * w1) + vec3(sparkle * 0.15);
+	ALPHA = clamp(col.a * (0.75 + 0.25 * (1.0 - shore)) + fres * 0.3 + foam * 0.3, 0.0, 1.0);
+	ROUGHNESS = 0.04 + 0.1 * foam;
+	METALLIC = 0.15;
+	SPECULAR = 0.95;
+	EMISSION = col.rgb * glow * (0.7 + 0.3 * hc) + vec3(glint * 0.35);
 }
 """
 
-static func _water_mat(col: Color, glow: float) -> ShaderMaterial:
-	var key := "%s_%f" % [col.to_html(), glow]
+static func _water_mat(col: Color, glow: float, sky: Array = []) -> ShaderMaterial:
+	var key := "%s_%f_%s" % [col.to_html(), glow, str(sky)]
 	if _water_mats.has(key):
 		return _water_mats[key]
 	var sh := Shader.new()
@@ -248,6 +323,9 @@ static func _water_mat(col: Color, glow: float) -> ShaderMaterial:
 	m.set_shader_parameter("col", Color(col.r, col.g, col.b, 0.8))
 	m.set_shader_parameter("deep", col.darkened(0.7))
 	m.set_shader_parameter("glow", glow)
+	if sky.size() == 2:
+		m.set_shader_parameter("sky_top", sky[0])
+		m.set_shader_parameter("sky_hor", sky[1])
 	_water_mats[key] = m
 	return m
 
@@ -275,6 +353,12 @@ static func ground_mat(theme_name: String) -> ShaderMaterial:
 			acc = Color("a0e8ff")
 		"nebula":
 			acc = Color("ff90e0")
+		"leaves":
+			acc = Color("e8602a")
+		"lilyfield":
+			acc = Color("ff3020")
+		"underworld":
+			acc = Color("40b0ff")
 	m.set_shader_parameter("accent", acc)
 	# cloud shadows only where there are clouds and a sun to cast them
 	m.set_shader_parameter("cloud_shadow", clampf(float(th.clouds) * 1.2, 0.0, 1.0) if float(th.sun_e) > 0.8 else 0.0)
@@ -291,6 +375,15 @@ static func heightmap(grid: PackedByteArray, w: int, h: int, theme_name: String,
 	noise.seed = seed_ * 7 + 3
 	noise.frequency = 0.045
 	noise.fractal_octaves = 3
+	# domain-warped broad swells: hills that meander instead of repeating on a grid
+	var warp := FastNoiseLite.new()
+	warp.seed = seed_ * 13 + 5
+	warp.frequency = 0.03
+	var broad := FastNoiseLite.new()
+	broad.seed = seed_ * 3 + 11
+	broad.frequency = 0.02
+	broad.fractal_octaves = 2
+	var swell := 0.0 if theme_name == "sect" else amp * 0.8
 	var hm := PackedFloat32Array()
 	hm.resize((w + 1) * (h + 1))
 	for cz in h + 1:
@@ -312,7 +405,9 @@ static func heightmap(grid: PackedByteArray, w: int, h: int, theme_name: String,
 						water += 1
 					MapGen.PATH, MapGen.BUILDING:
 						paths += 1
-			var hv := noise.get_noise_2d(cx, cz) * amp
+			var wx := cx + warp.get_noise_2d(cx, cz) * 6.0
+			var wz := cz + warp.get_noise_2d(cz + 57.0, cx - 31.0) * 6.0
+			var hv := noise.get_noise_2d(wx, wz) * amp + broad.get_noise_2d(cx, cz) * swell
 			if paths > 0:
 				hv *= 0.35
 			hv += walls * 0.12 * (1.0 + amp)
@@ -364,16 +459,37 @@ static func _tile_col(tile: int, tx: int, ty: int, th: Dictionary) -> Color:
 	var gc: Color = Color(th.g1).lerp(Color(th.g2), patch).darkened(hv * 0.05)
 	return Color(gc.r, gc.g, gc.b, 1.0)
 
+## Corner colour: the average of the four touching tiles, then shaded by what is nearby.  Ground
+## under a forest edge turns to darker, browner forest floor (leaf litter and shade); ground beside
+## water is darker and richer (wet soil).
 static func _corner_col(grid: PackedByteArray, w: int, h: int, cx: int, cz: int, th: Dictionary) -> Color:
 	var acc := Color(0, 0, 0, 0)
 	var n := 0
+	var walls := 0
+	var water := 0
+	var paths := 0
 	for d in [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0)]:
 		var tx: int = clampi(cx + d.x, 0, w - 1)
 		var ty: int = clampi(cz + d.y, 0, h - 1)
-		var c := _tile_col(grid[ty * w + tx], tx, ty, th)
-		acc += c
+		var t := grid[ty * w + tx]
+		acc += _tile_col(t, tx, ty, th)
 		n += 1
-	return acc / float(n)
+		if t == MapGen.WALL:
+			walls += 1
+		elif t == MapGen.WATER:
+			water += 1
+		elif t == MapGen.PATH or t == MapGen.BUILDING:
+			paths += 1
+	var c := acc / float(n)
+	var a := c.a
+	if paths == 0:
+		if walls > 0:
+			var floor_col := Color(th.g1).darkened(0.32).lerp(Color("5a4630"), 0.25)
+			c = c.lerp(floor_col, 0.16 * walls)
+		if water > 0 and water < 4:
+			c = c.darkened(0.12).lerp(Color(th.water).darkened(0.5), 0.12)
+	c.a = a
+	return c
 
 # ---------------------------------------------------------------- main entry
 static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, seed_: int) -> Node3D:
@@ -386,16 +502,8 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 	root.set_meta("h", h)
 	var cw := int(ceil(w / float(CH)))
 	var chh := int(ceil(h / float(CH)))
-	var wall_proto := _proto("wall:" + theme_name, theme_name)
-	var wall_proto2 := _proto("wall2:" + theme_name, theme_name)
-	var decor_proto := _proto("decor:" + theme_name, theme_name)
-	var tuft_proto := _proto("tuft:" + theme_name, theme_name)
-	var rock_proto := _proto("rock:" + theme_name, theme_name)
-	var lily_proto: Mesh = null
-	if theme_name in ["sect", "garden", "marsh"]:
-		lily_proto = _proto("lily:" + theme_name, theme_name)
-	var water_glow := 1.1 if theme_name in ["volcano", "time", "void", "origin", "abyss", "forge", "fungal", "chaos"] else 0.0
-	var wmat := _water_mat(th.water, water_glow)
+	var water_glow := 1.1 if theme_name in ["volcano", "time", "void", "origin", "abyss", "forge", "fungal", "chaos", "lilies", "diyu"] else 0.0
+	var wmat := _water_mat(th.water, water_glow, [th.sky_top, th.sky_hor])
 	var gmat := ground_mat(theme_name)
 	var rw := w + 1
 	# corner colours and normals are shared by the chunks
@@ -411,24 +519,11 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 		for cx in cw:
 			var ground := MB.new()
 			var water := MB.new()
-			var wall_x: Array = []
-			var wall_c: Array = []
-			var wall2_x: Array = []
-			var wall2_c: Array = []
-			var dec_x: Array = []
-			var dec_c: Array = []
-			var tuft_x: Array = []
-			var tuft_c: Array = []
-			var rock_x: Array = []
-			var rock_c: Array = []
-			var lily_x: Array = []
-			var lily_c: Array = []
 			for ty in range(cy * CH, mini(h, (cy + 1) * CH)):
 				for tx in range(cx * CH, mini(w, (cx + 1) * CH)):
 					var tile := grid[ty * w + tx]
 					var x0 := tx * T
 					var z0 := ty * T
-					var hv := hash2(tx, ty)
 					var i00 := ty * rw + tx
 					var i10 := i00 + 1
 					var i01 := i00 + rw
@@ -437,69 +532,20 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 						[Vector3(x0, hm[i00], z0), Vector3(x0 + T, hm[i10], z0), Vector3(x0 + T, hm[i11], z0 + T), Vector3(x0, hm[i01], z0 + T)],
 						[cnrm[i00], cnrm[i10], cnrm[i11], cnrm[i01]],
 						[ccol[i00], ccol[i10], ccol[i11], ccol[i01]])
-					var cxw := x0 + T * 0.5
-					var czw := z0 + T * 0.5
-					var gy := (hm[i00] + hm[i10] + hm[i01] + hm[i11]) * 0.25
-					match tile:
-						MapGen.WATER:
-							var sh := _shore(grid, w, h, tx, ty)
-							water.quad4(Vector3(x0, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0 + T), Vector3(x0, WATER_Y, z0 + T),
-								Color(1, 1, 1, sh[0]), Color(1, 1, 1, sh[1]), Color(1, 1, 1, sh[2]), Color(1, 1, 1, sh[3]))
-							if lily_proto != null and hv > 0.7:
-								lily_x.append(Transform3D(Basis.from_euler(Vector3(0, hv * TAU, 0)), Vector3(cxw + (hash2(tx, ty, 3.0) - 0.5), WATER_Y + 0.02, czw + (hash2(tx, ty, 4.0) - 0.5))))
-								lily_c.append(Color.WHITE)
-						MapGen.DECOR:
-							if decor_proto != null:
-								var ox := (hash2(tx, ty, 1.0) - 0.5) * 1.2
-								var oz := (hash2(tx, ty, 2.0) - 0.5) * 1.2
-								var s := 0.8 + hash2(tx, ty, 3.0) * 0.6
-								dec_x.append(Transform3D(Basis.from_euler(Vector3(0, hv * TAU, 0)).scaled(Vector3(s, s, s)), Vector3(cxw + ox, gy, czw + oz)))
-								dec_c.append(Color(Color.WHITE.darkened(hash2(tx, ty, 4.0) * 0.25), 1.0))
-						MapGen.WALL:
-							var s2 := 0.85 + hash2(tx, ty, 5.0) * 0.55
-							var sy := s2 * (0.9 + hash2(tx, ty, 6.0) * 0.4)
-							var b2 := Basis.from_euler(Vector3((hash2(tx, ty, 7.0) - 0.5) * 0.12, hv * TAU, (hash2(tx, ty, 8.0) - 0.5) * 0.12)).scaled(Vector3(s2, sy, s2))
-							var xf := Transform3D(b2, Vector3(cxw + (hash2(tx, ty, 9.0) - 0.5) * 0.5, gy - 0.05, czw + (hash2(tx, ty, 10.0) - 0.5) * 0.5))
-							var wcol := Color(Color.WHITE.darkened(hash2(tx, ty, 11.0) * 0.3), 1.0)
-							if hash2(tx, ty, 12.0) < 0.35:
-								wall2_x.append(xf)
-								wall2_c.append(wcol)
-							else:
-								wall_x.append(xf)
-								wall_c.append(wcol)
-							# boulders at the foot of the landmark
-							if hash2(tx, ty, 13.0) > 0.55 and rock_proto != null:
-								var rs := 0.5 + hash2(tx, ty, 14.0) * 0.7
-								rock_x.append(Transform3D(Basis.from_euler(Vector3(0, hash2(tx, ty, 15.0) * TAU, 0)).scaled(Vector3(rs, rs * 0.8, rs)), Vector3(x0 + hash2(tx, ty, 16.0) * T, gy, z0 + hash2(tx, ty, 17.0) * T)))
-								rock_c.append(Color.WHITE)
-						MapGen.FLOOR:
-							if tuft_proto != null:
-								var nt := 1 + int(hash2(tx, ty, 20.0) * 2.4)
-								for k in nt:
-									if hash2(tx, ty, 21.0 + k) < 0.7:
-										var px := x0 + 0.2 + hash2(tx, ty, 22.0 + k) * (T - 0.4)
-										var pz := z0 + 0.2 + hash2(tx, ty, 25.0 + k) * (T - 0.4)
-										var ts := 0.7 + hash2(tx, ty, 28.0 + k) * 0.7
-										tuft_x.append(Transform3D(Basis.from_euler(Vector3(0, hash2(tx, ty, 31.0 + k) * TAU, 0)).scaled(Vector3(ts, ts, ts)), Vector3(px, sample(hm, w, h, px, pz), pz)))
-										tuft_c.append(Color(Color.WHITE.darkened(hash2(tx, ty, 34.0 + k) * 0.2), 1.0))
+					if tile == MapGen.WATER:
+						var sh := _shore(grid, w, h, tx, ty)
+						water.quad4(Vector3(x0, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0 + T), Vector3(x0, WATER_Y, z0 + T),
+							Color(1, 1, 1, sh[0]), Color(1, 1, 1, sh[1]), Color(1, 1, 1, sh[2]), Color(1, 1, 1, sh[3]))
 			if not ground.is_empty():
 				var gi := MB.mesh_node(root, ground.build(gmat))
 				gi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			if not water.is_empty():
 				var wi := MB.mesh_node(root, water.build(wmat))
 				wi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			if not wall_x.is_empty():
-				_add_mm(root, wall_proto, wall_x, wall_c, true, 95.0)
-			if not wall2_x.is_empty():
-				_add_mm(root, wall_proto2, wall2_x, wall2_c, true, 95.0)
-			if not rock_x.is_empty():
-				_add_mm(root, rock_proto, rock_x, rock_c, true, 60.0)
-			if not dec_x.is_empty():
-				_add_mm(root, decor_proto, dec_x, dec_c, false, 50.0)
-			if not tuft_x.is_empty():
-				_add_mm(root, tuft_proto, tuft_x, tuft_c, false, 38.0)
-			if not lily_x.is_empty():
-				_add_mm(root, lily_proto, lily_x, lily_c, false, 60.0)
+	# trees, undergrowth, grass, rocks, landmarks: natural placement (see scatter.gd)
+	Scatter.populate(root, grid, w, h, hm, theme_name, seed_)
+	# birds, butterflies, dragonflies, fish... (see fauna.gd)
+	Fauna.populate(root, grid, w, h, hm, theme_name, seed_)
 	_skirt(root, w, h, theme_name, seed_)
 	_horizon(root, w, h, theme_name, seed_)
 	if theme_name == "sect":
@@ -644,8 +690,48 @@ static func _horizon(root: Node3D, w: int, h: int, theme_name: String, seed_: in
 				b.cyl(p + Vector3(0, mh * 0.5 - 2.0, 0), mh * 0.08, mh, col, Vector3.ZERO, 8)
 				b.prim("hemi", MB._xf(p + Vector3(0, mh - 2.5, 0), Vector3(mr * 2.0, mr * 0.9, mr * 2.0), Vector3.ZERO), MB.tag(Color(th.wall).lerp(far, 0.55), MB.CLOTH))
 				g.disc(p + Vector3(0, mh - 2.6, 0), mr * 0.8, Color(0.4, 1.0, 0.8, 0.25), 12, Color(0.4, 1.0, 0.8, 0.0))
+			# ---- Part VI
+			"maples":
+				# wooded ridges in autumn colours, crowns lit red and gold above the haze
+				b.sph(p + Vector3(0, -3.0, 0), Vector3(18.0, rng.randf_range(7.0, 14.0), 13.0) * s, col, Vector3(0, a, 0))
+				for k in 5:
+					var ta := a + rng.randf_range(-0.5, 0.5)
+					var tp := p + Vector3(cos(ta) * rng.randf_range(-10, 10), rng.randf_range(2.0, 7.0) * s, sin(ta) * rng.randf_range(-8, 8))
+					var ac: Color = [Color("d8582a"), Color("e89a38"), Color("c8402a"), Color("b8a040")][(i + k) % 4]
+					b.sph(tp, Vector3(3.0, 2.4, 3.0) * rng.randf_range(0.7, 1.3), MB.tag(ac.lerp(far, 0.45), MB.FOLIAGE), Vector3.ZERO, true)
+				if i % 9 == 0:
+					g.box(p + Vector3(0, 6.0, -2.0), Vector3(1.6, 18.0, 0.2), Color(0.85, 0.95, 1.0, 0.35), Vector3(0, a, 0))
+			"karst":
+				# towers of limestone standing in the mist like a forest of stone
+				var kh := rng.randf_range(16.0, 46.0) * s
+				var kr := kh * rng.randf_range(0.14, 0.22)
+				var lime := MB.tag(far.lerp(Color("c8c8c0"), 0.25).darkened(rng.randf() * 0.1), MB.STONE)
+				b.lathe(p + Vector3(0, -3.0, 0), [Vector2(kr * 1.3, 0.0), Vector2(kr, kh * 0.25), Vector2(kr * 0.95, kh * 0.6), Vector2(kr * 0.75, kh * 0.88), Vector2(kr * 0.35, kh), Vector2(0.01, kh * 1.02)], lime, 8)
+				b.sph(p + Vector3(0, kh - 3.2, 0), Vector3(kr * 0.6, kr * 0.25, kr * 0.6), MB.tag(Color("5a8a5a").lerp(far, 0.5), MB.FOLIAGE), Vector3.ZERO, true)
+				if i % 2 == 0:
+					var p2 := p + Vector3(rng.randf_range(-14, 14), 0, rng.randf_range(-14, 14))
+					var kh2 := kh * rng.randf_range(0.4, 0.7)
+					b.lathe(p2 + Vector3(0, -3.0, 0), [Vector2(kr, 0.0), Vector2(kr * 0.8, kh2 * 0.7), Vector2(kr * 0.3, kh2), Vector2(0.01, kh2 * 1.02)], lime, 7)
+			"bridge":
+				# low dusk hills under a lantern-lit sky; the Naihe Bridge is added after the ring
+				b.sph(p + Vector3(0, -2.5, 0), Vector3(16.0, rng.randf_range(4.0, 9.0), 12.0) * s, col, Vector3(0, a, 0))
+				if i % 5 == 0:
+					g.ball(p + Vector3(0, rng.randf_range(6.0, 14.0), 0), 0.9, Color(1.0, 0.6, 0.3, 0.6), true)
+			"wheel":
+				# pagodas and judgement towers of the Ten Courts, lit by ghost-fire
+				var ph := rng.randf_range(12.0, 26.0) * s
+				for k in 4:
+					var pw := (4.0 - k * 0.7) * s
+					b.box(p + Vector3(0, -2.0 + ph * (k + 0.5) / 4.0, 0), Vector3(pw, ph / 4.0 * 0.8, pw), col, Vector3(0, a, 0))
+					b.prim("cone4", MB._xf(p + Vector3(0, -2.0 + ph * (k + 1) / 4.0, 0), Vector3(pw * 2.2, 1.4, pw * 2.2), Vector3(0, a + PI / 4, 0)), col.darkened(0.15))
+				if i % 3 == 0:
+					g.ball(p + Vector3(0, ph * 0.7, 0), 1.2, Color(0.3, 0.7, 1.0, 0.6), true)
 			_:
 				b.sph(p + Vector3(0, -2.0, 0), Vector3(14.0, 8.0, 10.0) * s, col)
+	if kind == "bridge":
+		_naihe_bridge(b, g, cx, cz, base_r + 30.0, far)
+	if kind == "wheel":
+		_great_wheel(b, g, cx, cz, base_r + 80.0, far)
 	if kind == "pillars":
 		_sky_pillars(b, g, cx, cz, base_r + 90.0, theme_name)
 	var mi := MB.mesh_node(root, b.build(MB.mat_plain()))
@@ -669,6 +755,45 @@ static func _sky_pillars(b: MB, g: MB, cx: float, cz: float, r: float, theme_nam
 			var c: Color = five[(k + i) % 5]
 			b.cyl(p + Vector3(0, y, 0), rad * 1.06, 2.0, MB.tag(stone.darkened(0.2), MB.STONE), Vector3.ZERO, 12)
 			g.cyl(p + Vector3(0, y, 0), rad * 1.09, 0.6, Color(c.r, c.g, c.b, 0.55), Vector3.ZERO, 12)
+
+## Part VI: the Naihe Bridge, a long humped stone bridge over the golden spring, lanterns on its rail.
+static func _naihe_bridge(b: MB, g: MB, cx: float, cz: float, r: float, far: Color) -> void:
+	var c := Vector3(cx + r * 0.7, 0, cz - r * 0.7)
+	var axis := Vector3(1, 0, 1).normalized()
+	var stone := MB.tag(far.lerp(Color("8a7a70"), 0.35), MB.STONE)
+	var n := 24
+	for i in n + 1:
+		var t := i / float(n) * 2.0 - 1.0
+		var p := c + axis * t * 42.0 + Vector3(0, 9.0 * (1.0 - t * t) + 1.0, 0)
+		b.box(p, Vector3(4.2, 1.2, 6.0), stone, Vector3(0, -PI / 4, 0))
+		if i % 4 == 0:
+			g.ball(p + Vector3(0, 2.2, 0), 0.7, Color(1.0, 0.55, 0.25, 0.75), true)
+	for k in 5:
+		var t2 := (k / 4.0) * 1.6 - 0.8
+		var pp := c + axis * t2 * 42.0
+		b.box(pp + Vector3(0, 0.5, 0), Vector3(2.4, 8.0 * (1.0 - t2 * t2) + 1.5, 2.4), stone.darkened(0.1), Vector3(0, -PI / 4, 0))
+
+## Part VI: the Wheel of the Six Paths, standing on the horizon taller than the clouds.
+static func _great_wheel(b: MB, g: MB, cx: float, cz: float, r: float, far: Color) -> void:
+	var c := Vector3(cx - r * 0.6, 0, cz - r * 0.8)
+	var rad := 70.0
+	var yaw := atan2(cx - c.x, cz - c.z)
+	var bs := Basis(Vector3.UP, yaw)
+	var stone := MB.tag(far.lerp(Color("4a4a60"), 0.35), MB.STONE)
+	var hub := c + Vector3(0, rad + 4.0, 0)
+	var segs := 36
+	for i in segs:
+		var a0 := TAU * i / segs
+		var a1 := TAU * (i + 1) / segs
+		var p0 := hub + bs * Vector3(cos(a0) * rad, sin(a0) * rad, 0)
+		var p1 := hub + bs * Vector3(cos(a1) * rad, sin(a1) * rad, 0)
+		b.limb(p0, p1, 3.2, 3.2, stone, 6)
+	for k in 6:
+		var ak := TAU * k / 6.0
+		b.limb(hub, hub + bs * Vector3(cos(ak) * rad, sin(ak) * rad, 0), 2.2, 1.6, stone, 6)
+		g.ball(hub + bs * Vector3(cos(ak) * rad, sin(ak) * rad, 0), 4.0, Color(0.35, 0.65, 1.0, 0.55), true)
+	b.cyl(hub, 7.0, 6.0, stone.darkened(0.15), bs.get_euler() + Vector3(PI / 2, 0, 0), 12)
+	g.ball(hub, 9.0, Color(0.4, 0.75, 1.0, 0.35), true)
 
 static func _add_mm(root: Node3D, mesh: Mesh, xf: Array, cols: Array, shadow: bool, vis_end: float) -> void:
 	var mm := MultiMesh.new()
@@ -1097,6 +1222,67 @@ static func _build_landmark(b: MB, g: MB, kind: String, wc: Color, th: Dictionar
 					g.box(Vector3(0, 0.66 + k * 0.62, 0), Vector3(0.8 - k * 0.08, 0.03, 0.8 - k * 0.08), Color(cols5[k].r, cols5[k].g, cols5[k].b, 0.7), Vector3(0, k * 0.3, 0))
 				b.cone(Vector3(0, 3.5, 0), 0.3, 0.6, MB.tag(Color("fff0d0"), MB.CRYSTAL), Vector3(0, 0, 0), 4)
 				g.ball(Vector3(0, 3.65, 0), 0.25, Color(1.0, 0.9, 0.8, 0.22), true)
+		# ---- Part VI
+		"maple":
+			# a moss-grown grave stupa of the sect's dead, with a paper lantern on its step
+			var st2 := MB.tag(Color("a8a098"), MB.STONE)
+			b.box(Vector3(0, 0.2, 0), Vector3(1.3, 0.4, 1.3), st2, Vector3(0, 0.1, 0))
+			b.lathe(Vector3(0, 0.4, 0), [Vector2(0.5, 0.0), Vector2(0.55, 0.5), Vector2(0.42, 0.95), Vector2(0.2, 1.1)], st2, 10)
+			for k in 3:
+				b.cyl(Vector3(0, 1.25 + k * 0.32, 0), 0.38 - k * 0.09, 0.08, MB.tag(Color("8a8278"), MB.STONE), Vector3.ZERO, 8)
+			b.cone(Vector3(0, 2.3, 0), 0.08, 0.5, MB.tag(Color("6a6258"), MB.STONE), Vector3.ZERO, 6)
+			b.sph(Vector3(0.2, 0.42, 0.3), Vector3(0.45, 0.08, 0.4), MB.tag(Color("6a8a3a"), MB.FOLIAGE), Vector3.ZERO, true)
+			if v == 1:
+				b.cyl(Vector3(0.75, 0.6, 0.55), 0.12, 0.3, MB.tag(Color("f0e0b0"), MB.CLOTH), Vector3.ZERO, 8)
+				g.ball(Vector3(0.75, 0.6, 0.55), 0.3, Color(1.0, 0.75, 0.35, 0.45), true)
+		"karstpeak":
+			var lime := MB.tag(Color("b8b8b0"), MB.STONE)
+			for k in 4:
+				var rr := 0.75 - k * 0.15
+				b.prim("cone8", MB._xf(Vector3(0.05 * k, 0.6 + k * 0.85, -0.04 * k), Vector3(rr * 2.0, 1.4, rr * 2.0), Vector3(0.05, k * 0.7, -0.04)), lime if k % 2 == 0 else MB.tag(Color("a0a098"), MB.STONE))
+			b.sph(Vector3(0, 3.4, 0), Vector3(0.4, 0.25, 0.35), MB.tag(Color("4a8a4a"), MB.FOLIAGE), Vector3.ZERO, true)
+			b.sph(Vector3(0.45, 1.6, 0.2), Vector3(0.3, 0.18, 0.25), MB.tag(Color("5a9a50"), MB.FOLIAGE), Vector3.ZERO, true)
+		"stonelantern":
+			var gs := MB.tag(Color("8a8070"), MB.STONE)
+			if v == 0:
+				# a tall stone lantern (ishidoro-like) with a warm flame in its window
+				b.cyl(Vector3(0, 0.12, 0), 0.5, 0.24, gs, Vector3.ZERO, 6)
+				b.cyl(Vector3(0, 0.9, 0), 0.14, 1.3, gs, Vector3.ZERO, 8)
+				b.box(Vector3(0, 1.65, 0), Vector3(0.62, 0.12, 0.62), gs)
+				b.box(Vector3(0, 1.95, 0), Vector3(0.44, 0.5, 0.44), MB.tag(Color("6a6050"), MB.STONE))
+				b.prim("cone4", MB._xf(Vector3(0, 2.45, 0), Vector3(1.1, 0.5, 1.1), Vector3(0, PI / 4, 0)), gs)
+				b.ball(Vector3(0, 2.75, 0), 0.08, gs, true)
+				g.box(Vector3(0, 1.95, 0), Vector3(0.46, 0.3, 0.3), Color(1.0, 0.6, 0.25, 0.8))
+				g.ball(Vector3(0, 1.95, 0), 0.55, Color(1.0, 0.55, 0.25, 0.25), true)
+			else:
+				# a weathered memorial gate (pailou) over the funeral road
+				var red := MB.tag(Color("a83028"), MB.WOOD)
+				for sx in [-0.9, 0.9]:
+					b.cyl(Vector3(sx, 1.4, 0), 0.12, 2.8, red, Vector3.ZERO, 8)
+					b.cyl(Vector3(sx, 0.15, 0), 0.22, 0.3, gs, Vector3.ZERO, 8)
+				b.box(Vector3(0, 2.45, 0), Vector3(2.3, 0.18, 0.24), red)
+				b.box(Vector3(0, 2.85, 0), Vector3(2.7, 0.14, 0.5), MB.tag(Color("3a3038"), MB.STONE))
+				b.box(Vector3(0, 2.62, 0.13), Vector3(0.6, 0.3, 0.04), MB.tag(Color("e8c060"), MB.METAL))
+		"ghostpagoda":
+			var dk := MB.tag(Color("2a2a3a"), MB.STONE)
+			if v == 0:
+				# a narrow pagoda of the Ten Courts, blue ghost-fire hanging from every eave
+				for k in 4:
+					var wd := 1.1 - k * 0.18
+					b.box(Vector3(0, 0.45 + k * 0.85, 0), Vector3(wd * 0.75, 0.7, wd * 0.75), dk, Vector3(0, k * 0.0, 0))
+					b.prim("cone4", MB._xf(Vector3(0, 0.88 + k * 0.85, 0), Vector3(wd * 1.6, 0.28, wd * 1.6), Vector3(0, PI / 4, 0)), MB.tag(Color("1a1a28"), MB.STONE))
+					for c4 in 4:
+						var ca := TAU * c4 / 4.0 + PI / 4
+						g.ball(Vector3(cos(ca) * wd * 0.75, 0.72 + k * 0.85, sin(ca) * wd * 0.75), 0.08, Color(0.4, 0.8, 1.0, 0.9), true)
+				b.cone(Vector3(0, 4.3, 0), 0.06, 0.8, MB.tag(Color("c8a850"), MB.METAL), Vector3.ZERO, 6)
+			else:
+				# a judgement pillar wrapped in chains, ghost-fire burning in its brazier
+				b.cyl(Vector3(0, 1.5, 0), 0.32, 3.0, dk, Vector3.ZERO, 8)
+				for k in 5:
+					b.torus(Vector3(0, 0.5 + k * 0.55, 0), 0.36, 0.004, MB.tag(Color("6a6a78"), MB.METAL), Vector3(0.25 * sin(k), 0, 0.2 * cos(k)))
+				b.lathe(Vector3(0, 3.0, 0), [Vector2(0.15, 0.0), Vector2(0.5, 0.25), Vector2(0.55, 0.4)], MB.tag(Color("3a3a48"), MB.METAL), 10)
+				g.cone(Vector3(0, 3.65, 0), 0.4, 1.0, Color(0.3, 0.7, 1.0, 0.7), Vector3.ZERO, 8)
+				g.ball(Vector3(0, 3.6, 0), 0.8, Color(0.3, 0.6, 1.0, 0.2), true)
 		_:
 			b.sph(Vector3(0, 0.9, 0), Vector3(0.8, 0.9, 0.8), MB.tag(wc, MB.STONE))
 
@@ -1207,6 +1393,32 @@ static func _build_decor(b: MB, g: MB, kind: String, th: Dictionary) -> void:
 				var af := TAU * i / 5.0
 				b.sph(Vector3(cos(af) * 0.2, 0.06, sin(af) * 0.2), Vector3(0.09, 0.07, 0.08), MB.tag(five2[i], MB.CRYSTAL), Vector3(0, af, 0), true)
 				g.ball(Vector3(cos(af) * 0.2, 0.1, sin(af) * 0.2), 0.08, Color(five2[i].r, five2[i].g, five2[i].b, 0.35), true)
+		"leafpile":
+			for i in 14:
+				var al := i * 2.39
+				var rl := 0.08 + (i % 5) * 0.07
+				var lc2: Color = [Color("e0582a"), Color("f0a030"), Color("c83a20"), Color("e8c040")][i % 4]
+				b.leaf(Vector3(cos(al) * rl, 0.03 + (i % 3) * 0.02, sin(al) * rl), Vector3(cos(al) * (rl + 0.14), 0.05, sin(al) * (rl + 0.14)), 0.06, MB.tag(lc2, MB.FOLIAGE), Vector3(-sin(al), 0.2, cos(al)))
+			b.sph(Vector3(0, 0.03, 0), Vector3(0.3, 0.05, 0.28), MB.tag(Color("a04a20"), MB.FOLIAGE), Vector3.ZERO, true)
+		"spiderlily":
+			for i in 4:
+				var a5 := i * 1.57 + 0.3
+				var base5 := Vector3(cos(a5) * 0.15, 0, sin(a5) * 0.15)
+				var top5 := base5 + Vector3(0.02, 0.42 + (i % 2) * 0.1, 0)
+				b.limb(base5, top5, 0.01, 0.008, MB.tag(Color("4a8040"), MB.FOLIAGE), 4)
+				for k in 6:
+					var pa := TAU * k / 6.0
+					var tip5 := top5 + Vector3(cos(pa) * 0.11, 0.05, sin(pa) * 0.11)
+					b.leaf(top5, tip5, 0.02, MB.tag(Color("e02018"), MB.CLOTH), Vector3(-sin(pa), 0, cos(pa)), MB.tag(Color("ff5040"), MB.CLOTH))
+					b.limb(top5, top5 + Vector3(cos(pa + 0.5) * 0.13, 0.1, sin(pa + 0.5) * 0.13), 0.003, 0.002, MB.tag(Color("ff3020"), MB.CLOTH), 3)
+		"ghostcandle":
+			for i in 3:
+				var a6 := i * 2.1
+				var cp := Vector3(cos(a6) * 0.18, 0, sin(a6) * 0.18)
+				var chh := 0.18 + i * 0.07
+				b.cyl(cp + Vector3(0, chh * 0.5, 0), 0.04, chh, MB.tag(Color("e8e4d8"), MB.CLOTH), Vector3.ZERO, 8)
+				g.cone(cp + Vector3(0, chh + 0.06, 0), 0.03, 0.12, Color(0.4, 0.8, 1.0, 0.9), Vector3.ZERO, 6)
+				g.ball(cp + Vector3(0, chh + 0.06, 0), 0.12, Color(0.3, 0.6, 1.0, 0.25), true)
 		_:
 			b.sph(Vector3(0, 0.1, 0), Vector3(0.25, 0.15, 0.25), MB.tag(gc, MB.FOLIAGE), Vector3.ZERO, true)
 

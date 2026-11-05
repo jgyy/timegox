@@ -181,7 +181,10 @@ void vertex() {
 	// thin double-sided geometry (ribbons, leaves, wings) has its class alpha nudged off the
 	// 0.1 grid; an inverted hull cannot outline it, so it is skipped
 	thin = step(0.15, abs(fract(COLOR.a * 10.0 + 0.5) - 0.5));
-	VERTEX += NORMAL * width * (1.0 - thin);
+	// keep the ink line a similar thickness on screen: thinner in close-ups, a little bolder far away
+	float depth = -(MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).z;
+	float k = clamp(depth / 9.0, 0.32, 1.35);
+	VERTEX += NORMAL * width * k * (1.0 - thin);
 }
 void fragment() {
 	if (thin > 0.5) {
