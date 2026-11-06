@@ -254,6 +254,13 @@ func _run() -> void:
 			MB.mesh_node(holder, Assets.static_mesh("props/" + pr))
 			props.append(holder)
 		await _gallery("gallery_props", props, 1.3)
+		# Blender landmarks of the built regions
+		var built: Array = []
+		for pr2 in ["obelisk", "jadepillar", "column", "furnace", "gear", "monolith", "floatisle", "shard"]:
+			var holder2 := Node3D.new()
+			MB.mesh_node(holder2, Assets.static_mesh("props/" + pr2))
+			built.append(holder2)
+		await _gallery("gallery_landmarks", built, 1.1)
 		await _gallery("gallery_beasts", [
 			Models.monster("beast", Color("7aa860")), Models.monster("mantis", Color("5fd890")), Models.monster("tortoise", Color("b8903a")),
 			Models.monster("crab", Color("d0502a")), Models.monster("spider", Color("5a3a90")),
