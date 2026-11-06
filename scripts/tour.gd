@@ -197,6 +197,14 @@ func _run() -> void:
 				main.world._snap_cam()
 				await _wait(0.8)
 				await _shot(inn[0])
+		if id == "village":
+			# Granny Wen at home: the roof lifts away while the hero is inside
+			main.world.teleport(Atlas.to_world("village", Vector2i(10, 23)))
+			main.world.facing = Vector2i(0, -1)
+			main.world.cam_q = 0
+			main.world._snap_cam()
+			await _wait(0.8)
+			await _shot("interior_village")
 		if id == "sect" or main.args.has("world-only"):
 			continue
 		# a regular battle with this region's monster pool
@@ -290,6 +298,14 @@ func _run() -> void:
 			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
 			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
 		], 0.9, 1.5, 3.2)
+	if main.args.has("map"):
+		main.world.load_area("dunes", Vector2i(10, 28))
+		main.open_menu()
+		main.menu.mode = "map"
+		main.menu._build()
+		await _wait(0.5)
+		await _shot("world_map")
+		main.pop()
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return

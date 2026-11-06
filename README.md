@@ -3,7 +3,7 @@
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
 Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to the Boundless Heart, across **one open world** of 30 regions around Azure Cloud Mountain, with 109 bosses, twelve Heavenly Tribulations and buildings you can walk into.
 
-> **Total gameplay duration: about {{TOTAL_H}}** ({{TOTAL}} of game time for the end-to-end bot run, seed 1234). Parts I to VI take {{P16}} in the new open world; **Part VII, "The Unbroken Land", adds another hour** ({{P7}}): four new regions (a mortal village, tea terraces, silk woods and the Loom of Borders), 16 new bosses, 12 new monsters, a new realm (Boundless Heart), five new techniques, seven new Blender-built characters and a new ending. **The whole game is now one continuous open world**: no more separate maps and teleporting gates.
+> **Total gameplay duration: about 7 hours 47 minutes** (7:46:52 of game time for the end-to-end bot run, seed 1234). Parts I to VI take 6:39:25 in the new open world; **Part VII, "The Unbroken Land", adds another hour** (1 hour 7 minutes): four new regions (a mortal village, tea terraces, silk woods and the Loom of Borders), 16 new bosses, 12 new monsters, a new realm (Boundless Heart), five new techniques, seven new Blender-built characters and a new ending. **The whole game is now one continuous open world**: no more separate maps and teleporting gates.
 
 | | |
 |---|---|
@@ -179,7 +179,7 @@ Other terminal commands:
 ```sh
 godot --headless --path . --script tests/run_tests.gd           # data-integrity and 3D-asset tests
 godot --headless --path . --script tests/manual_input_test.gd   # real keyboard-event smoke test
-godot --headless --fixed-fps 30 --path . -- --bot --min-time=21600   # bot plays the whole game, prints play time
+godot --headless --fixed-fps 30 --path . -- --bot --min-time=25200   # bot plays the whole game, prints play time
 godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-fps for real time) watch the bot
 ```
 
@@ -190,7 +190,7 @@ godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-
 | Enter / Z / Space | confirm, interact, advance dialogue |
 | Esc / X | menu (Meditate, Breakthrough, Items), cancel |
 
-Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes about six and a half hours.
+Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes nearly eight hours. Esc > World Map shows the whole land.
 
 ## Gameplay
 
@@ -243,7 +243,7 @@ flowchart LR
     Karst --> Springs[Yellow Springs<br/>The Thousand Unforgotten]
     Springs --> Wheel[Wheel of the Six Paths<br/>King Yama]
     end
-    subgraph P7[Part VII: about {{P7S}}]
+    subgraph P7[Part VII: about 1h07m]
     Wheel ==>|Samsara Transcendence, threads across the roads| Sect6[Sect: the Weaver's seams]
     Sect6 -->|south road| Village[Qingshi Village<br/>Needle General Zhen]
     Village --> Terraces[Cloud-Tea Terraces<br/>Thread Matron]
@@ -551,24 +551,26 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs; seeds 7 and 99 give 6:31:30 and 6:35:36). Parts I to V take 5:26:07, so Part VI adds about **1 hour 7 minutes**:
+Latest result (seed 1234, identical across runs). Parts I to VI take 6:39:25 in the open world, so Part VII adds about **1 hour 7 minutes**:
 
 ```
-game play time  : 6:33:43 (23623 s)
-wall clock      : ~7 min (headless)
-final realm     : Early Samsara Transcendence
-battles / kills : 734 / 1376   deaths: 0
-time by screen  : battle 10607 s, world 3597 s, meditate 6166 s, dialogue 3130 s
-time by area    : bamboo 870, marsh 656, frost 961, thunder 608, palace 565, sect 829,
-                  dragon 624, volcano 1034, void 727, celestial 1451,
-                  mirror 566, grave 989, time 708, origin 1235,
-                  cloudsea 812, court 825, forge 909, garden 1371,
-                  dunes 826, fungal 803, aurora 867, chaos 1491,
-                  maple 957, karst 970, springs 921, wheel 1083
-result          : PASS (needs >= 21600 s)
+game play time  : 7:46:52 (28012 s)
+wall clock      : ~7.5 min (headless)
+final realm     : Early Boundless Heart
+battles / kills : 874 / 1642   deaths: 0
+time by screen  : battle 12080 s, meditate 7355 s, world 4589 s, dialogue 3839 s
+time by area    : sect 919, mountain 156,
+                  bamboo 880, marsh 655, frost 1073, thunder 514, palace 556,
+                  dragon 638, volcano 1039, void 719, celestial 1447,
+                  mirror 568, grave 986, time 706, origin 1246,
+                  cloudsea 815, court 808, forge 915, garden 1390,
+                  dunes 853, fungal 795, aurora 879, chaos 1517,
+                  maple 985, karst 967, springs 971, wheel 1133,
+                  village 850, terraces 975, silk 937, loom 1159
+result          : PASS (needs >= 25200 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 21600), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 25200), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
 
 ## CI
 
