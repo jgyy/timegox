@@ -71,7 +71,7 @@ const THEMES := {
 const EXTRA := {
 	"sect": {"hill": 0.35, "tex": "grass", "tuft": "grass", "horizon": "peaks", "clouds": 0.55},
 	"bamboo": {"hill": 0.55, "tex": "grass", "tuft": "grass", "horizon": "peaks", "clouds": 0.4},
-	"marsh": {"hill": 0.3, "tex": "mud", "tuft": "reed", "horizon": "hills", "clouds": 0.8, "mist": 0.2},
+	"marsh": {"hill": 0.3, "tex": "mud", "tuft": "reed", "horizon": "hills", "clouds": 0.8},
 	"frost": {"hill": 0.7, "tex": "snow", "tuft": "snow", "horizon": "glacier", "clouds": 0.5, "aurora": 1.0},
 	"thunder": {"hill": 0.8, "tex": "rock", "tuft": "pebble", "horizon": "crags", "clouds": 0.95},
 	"palace": {"hill": 0.4, "tex": "tile", "tuft": "none", "horizon": "towers", "clouds": 0.7, "stars": 0.6},
@@ -80,7 +80,7 @@ const EXTRA := {
 	"void": {"hill": 0.6, "tex": "crystal", "tuft": "crystal", "horizon": "islands", "clouds": 0.1, "stars": 1.0, "aurora": 0.6},
 	"celestial": {"hill": 0.2, "tex": "marble", "tuft": "none", "horizon": "palace", "clouds": 0.7},
 	"mirror": {"hill": 0.25, "tex": "glass", "tuft": "grass", "horizon": "peaks", "clouds": 0.4, "stars": 0.3},
-	"grave": {"hill": 0.45, "tex": "mud", "tuft": "deadgrass", "horizon": "hills", "clouds": 0.85, "stars": 0.5, "mist": 0.15},
+	"grave": {"hill": 0.45, "tex": "mud", "tuft": "deadgrass", "horizon": "hills", "clouds": 0.85, "stars": 0.5},
 	"time": {"hill": 0.6, "tex": "sand", "tuft": "deadgrass", "horizon": "dunes", "clouds": 0.3},
 	"origin": {"hill": 0.3, "tex": "marble", "tuft": "crystal", "horizon": "islands", "clouds": 0.6, "stars": 0.4, "aurora": 0.5},
 	"cloudsea": {"hill": 0.5, "tex": "grass", "tuft": "grass", "horizon": "islands", "clouds": 0.9},
@@ -91,9 +91,9 @@ const EXTRA := {
 	"fungal": {"hill": 0.45, "tex": "moss", "tuft": "moss", "horizon": "mushrooms", "clouds": 0.3, "stars": 0.9, "moon": 0.8, "haze": 0.5},
 	"aurora": {"hill": 0.6, "tex": "permafrost", "tuft": "snow", "horizon": "pillars", "clouds": 0.2, "stars": 1.0, "aurora": 1.6, "moon": 1.0},
 	"chaos": {"hill": 0.5, "tex": "nebula", "tuft": "crystal", "horizon": "pillars", "clouds": 0.0, "stars": 1.0, "aurora": 0.6, "nebula": 1.0},
-	"maple": {"hill": 0.9, "tex": "leaves", "tuft": "grass", "horizon": "maples", "clouds": 0.5, "rays": 0.5, "haze": 0.4, "mist": 0.08},
-	"karst": {"hill": 0.55, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.7, "haze": 0.35, "mist": 0.18},
-	"lilies": {"hill": 0.35, "tex": "lilyfield", "tuft": "grass", "horizon": "bridge", "clouds": 0.4, "stars": 0.5, "moon": 0.7, "haze": 0.6, "rays": 0.4, "mist": 0.12},
+	"maple": {"hill": 0.9, "tex": "leaves", "tuft": "grass", "horizon": "maples", "clouds": 0.5, "rays": 0.5, "haze": 0.4},
+	"karst": {"hill": 0.55, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.7, "haze": 0.35},
+	"lilies": {"hill": 0.35, "tex": "lilyfield", "tuft": "grass", "horizon": "bridge", "clouds": 0.4, "stars": 0.5, "moon": 0.7, "haze": 0.6, "rays": 0.4},
 	"diyu": {"hill": 0.4, "tex": "underworld", "tuft": "crystal", "horizon": "wheel", "clouds": 0.0, "stars": 0.4, "haze": 0.5},
 }
 
@@ -130,7 +130,8 @@ static func theme(name: String) -> Dictionary:
 	th["sky_top"] = _pop(th.sky_top, 0.45, 0.8, 0.4, 0.82, 1.2)
 	th["sky_hor"] = _pop(th.sky_hor, 0.2, 0.55, 0.78, 0.95, 1.0)
 	th["fog"] = th.sky_hor.lerp(th.g2, 0.25)
-	th["fog_d"] = th.fog_d * 0.7
+	# clear air: fog only hints at distance instead of veiling the whole view
+	th["fog_d"] = th.fog_d * 0.3
 	th["amb"] = th.amb.lerp(Color(0.85, 0.9, 1.0), 0.35)
 	th["amb_e"] = clampf(th.amb_e, 0.5, 0.62)
 	th["sun"] = th.sun.lerp(Color(1.0, 0.93, 0.82), 0.4)
@@ -263,7 +264,7 @@ void sky() {
 	// low haze band hugging the horizon (desert dust, spore mist)
 	if (haze > 0.0) {
 		float hb = exp(-abs(y - 0.02) * 14.0) * (0.75 + 0.25 * fbm(d.xz * 3.0 + TIME * 0.02));
-		col = mix(col, hor * 1.05, hb * haze * 0.6);
+		col = mix(col, hor * 1.05, hb * haze * 0.3);
 	}
 	COLOR = col;
 }
@@ -304,29 +305,31 @@ static func environment(name: String, fog_scale: float = 1.0) -> Environment:
 	env.fog_enabled = true
 	env.fog_light_color = th.fog
 	env.fog_density = th.fog_d * fog_scale
-	env.fog_sky_affect = 0.25
-	env.fog_aerial_perspective = 0.35
+	env.fog_sky_affect = 0.1
+	env.fog_aerial_perspective = 0.0
 	# low valley mist: fog that thickens below a height and thins above it (river gorges, marsh)
 	if float(th.get("mist", 0.0)) > 0.0:
-		env.fog_height = 1.2
+		env.fog_height = 0.6
 		env.fog_height_density = float(th.mist) * fog_scale
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 1.05
 	env.tonemap_white = 6.0
+	# glow only on genuinely bright things (spells, lanterns, the sun), never as a veil over the
+	# whole frame: a high threshold, additive blend and no wide blur levels
 	env.glow_enabled = true
-	env.glow_intensity = 0.55
-	env.glow_strength = 0.9
-	env.glow_bloom = 0.04
-	env.glow_hdr_threshold = 0.95
-	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	env.glow_intensity = 0.4
+	env.glow_strength = 0.8
+	env.glow_bloom = 0.0
+	env.glow_hdr_threshold = 1.15
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
 	env.set_glow_level(0, 0.0)
-	env.set_glow_level(1, 0.6)
-	env.set_glow_level(2, 1.0)
-	env.set_glow_level(3, 0.6)
-	env.set_glow_level(4, 0.3)
+	env.set_glow_level(1, 0.5)
+	env.set_glow_level(2, 0.6)
+	env.set_glow_level(3, 0.0)
+	env.set_glow_level(4, 0.0)
 	env.adjustment_enabled = true
-	env.adjustment_saturation = 1.04
-	env.adjustment_contrast = 1.08
+	env.adjustment_saturation = 1.08
+	env.adjustment_contrast = 1.12
 	env.adjustment_brightness = 1.0
 	return env
 

@@ -595,6 +595,11 @@ static func _skirt(root: Node3D, w: int, h: int, theme_name: String, seed_: int)
 			var dz := maxf(maxf(-z, z - h * T), 0.0)
 			var out := sqrt(dx * dx + dz * dz)
 			var y := -0.05 - 0.4 * minf(out / 10.0, 1.0)
+			# inside the playable rectangle the skirt drops well below the deepest pond bed: it used
+			# to lie flat at -0.05 across the whole map, above the water (-0.12), hiding every pond,
+			# lake and river under a sheet of grass
+			if out <= 0.0:
+				y = -2.0
 			if not cloud:
 				y += maxf(0.0, out - 12.0) * 0.06 * (1.0 + noise.get_noise_2d(x, z)) * (th.hill + 0.3)
 			else:
@@ -648,11 +653,20 @@ static func _horizon(root: Node3D, w: int, h: int, theme_name: String, seed_: in
 		var col := MB.tag(far.darkened(rng.randf() * 0.15), MB.STONE)
 		match kind:
 			"peaks", "glacier", "crags":
+				# a massif: a main peak with a lathe profile (concave flanks, sharp summit), a forest
+				# band on its lower slopes, a snow cap and two shoulder peaks
 				var hh := rng.randf_range(18.0, 40.0) * s
-				b.cone(p + Vector3(0, hh * 0.5 - 2.0, 0), hh * 0.6, hh, col, Vector3(0, rng.randf() * TAU, 0), 6)
+				var rr := hh * rng.randf_range(0.5, 0.7)
+				var rock := MB.tag(far.lerp(Color(th.wall).darkened(0.3), 0.25).lerp(Color("7a7880"), 0.3).darkened(rng.randf() * 0.12), MB.STONE)
+				b.lathe(p + Vector3(0, -2.0, 0), [Vector2(rr, 0.0), Vector2(rr * 0.62, hh * 0.25), Vector2(rr * 0.38, hh * 0.55), Vector2(rr * 0.16, hh * 0.85), Vector2(0.01, hh)], rock, 9)
 				if kind != "crags":
-					b.cone(p + Vector3(0, hh * 0.86 - 2.0, 0), hh * 0.18, hh * 0.3, MB.tag(Color(0.96, 0.97, 1.0), MB.STONE), Vector3(0, rng.randf() * TAU, 0), 6)
-				b.cone(p + Vector3(rng.randf_range(-8, 8), hh * 0.3 - 2.0, rng.randf_range(-8, 8)), hh * 0.4, hh * 0.6, col.darkened(0.05), Vector3.ZERO, 6)
+					b.lathe(p + Vector3(0, -2.0 + hh * 0.66, 0), [Vector2(rr * 0.29, 0.0), Vector2(rr * 0.17, hh * 0.18), Vector2(0.01, hh * 0.345)], MB.tag(Color(0.96, 0.97, 1.0), MB.STONE), 9)
+				if kind == "peaks":
+					b.lathe(p + Vector3(0, -2.0, 0), [Vector2(rr * 1.03, 0.0), Vector2(rr * 0.75, hh * 0.15), Vector2(rr * 0.6, hh * 0.24)], MB.tag(Color(th.g1).darkened(0.35).lerp(far, 0.45), MB.FOLIAGE), 9)
+				for k in 2:
+					var off := Vector3(rng.randf_range(-1, 1), 0, rng.randf_range(-1, 1)).normalized() * rr * rng.randf_range(0.6, 0.9)
+					var h2 := hh * rng.randf_range(0.45, 0.7)
+					b.lathe(p + off + Vector3(0, -2.0, 0), [Vector2(h2 * 0.55, 0.0), Vector2(h2 * 0.3, h2 * 0.45), Vector2(h2 * 0.12, h2 * 0.85), Vector2(0.01, h2)], rock.darkened(0.06), 8)
 			"hills", "dunes", "reef":
 				b.sph(p + Vector3(0, -2.0, 0), Vector3(16.0, rng.randf_range(5.0, 12.0), 12.0) * s, col, Vector3(0, a, 0))
 			"volcano":
@@ -834,7 +848,13 @@ static func _proto(key: String, theme_name: String) -> Mesh:
 		"wall":
 			_build_landmark(b, glow, th.tree, wc, th, 0)
 		"wall2":
-			_build_landmark(b, glow, th.tree, wc, th, 1)
+			# built regions alternate their landmark with a roofed pavilion (see architecture.gd)
+			var pav := {"court": ["2a8a6a", "2a6a5a"], "celestial": ["e8c860", "c83a2a"], "garden": ["c86a8a", "8a3a2a"], "lilies": ["5a3a3a", "8a2a20"]}
+			if pav.has(theme_name):
+				Arch.pavilion(b, glow, pav[theme_name][0], pav[theme_name][1], 1.15)
+				mat = MB.mat_vc()
+			else:
+				_build_landmark(b, glow, th.tree, wc, th, 1)
 		"decor":
 			_build_decor(b, glow, th.decor, th)
 			mat = MB.mat_plain()
@@ -1496,99 +1516,25 @@ static func _sect_buildings(root: Node3D, grid: PackedByteArray, w: int, h: int,
 			_building(root, r, sample(hm, w, h, r.get_center().x, r.get_center().y))
 
 static func _building(root: Node3D, r: Rect2, gy: float) -> void:
+	# which sect building this is: the Elder's hall at the top, the alchemist west, the smithy east
+	var style := "hall"
+	if r.position.y > 4.0 * T:
+		style = "alchemist" if r.get_center().x < 20.0 * T else "smithy"
 	var b := MB.new()
 	var g := MB.new()
-	var cx := r.position.x + r.size.x * 0.5
-	var cz := r.position.y + r.size.y * 0.5
-	var wall_h := 2.6
-	var stone := MB.tag(Color("a8a4b0"), MB.STONE)
-	var plaster := MB.tag(Color("efe4c8"), MB.CLOTH)
-	var lacquer := MB.tag(Color("b83a2a"), MB.WOOD)
-	var roof_c := MB.tag(Color("3a6a8a"), MB.STONE)
-	var gold := MB.tag(Color("e8c860"), MB.METAL)
-	# terrace with steps
-	b.box(Vector3(cx, 0.25, cz), Vector3(r.size.x + 0.8, 0.5, r.size.y + 0.8), stone)
-	b.box(Vector3(cx, 0.52, cz), Vector3(r.size.x + 0.6, 0.06, r.size.y + 0.6), MB.tag(Color("c8c4d0"), MB.STONE))
-	for k in 3:
-		b.box(Vector3(cx, 0.08 + k * 0.16, r.end.y + 0.95 - k * 0.22), Vector3(1.8, 0.16, 0.25), stone)
-	# walls with timber framing and lattice windows
-	b.box(Vector3(cx, 0.5 + wall_h * 0.5, cz), Vector3(r.size.x - 0.2, wall_h, r.size.y - 0.2), plaster)
-	b.box(Vector3(cx, 0.6, cz), Vector3(r.size.x - 0.15, 0.2, r.size.y - 0.15), lacquer)
-	b.box(Vector3(cx, 0.5 + wall_h - 0.12, cz), Vector3(r.size.x - 0.15, 0.24, r.size.y - 0.15), lacquer)
-	# pillars on every side
-	var step := 2.0
-	var nx := int(r.size.x / step)
-	for i in range(nx + 1):
-		var px := r.position.x + 0.1 + (r.size.x - 0.2) * i / float(maxi(nx, 1))
-		for zz in [r.end.y - 0.05, r.position.y + 0.05]:
-			b.cyl(Vector3(px, 0.5 + wall_h * 0.5, zz), 0.13, wall_h, lacquer, Vector3.ZERO, 8)
-			b.box(Vector3(px, 0.58, zz), Vector3(0.34, 0.12, 0.34), stone)
-			b.box(Vector3(px, 0.5 + wall_h - 0.05, zz), Vector3(0.36, 0.1, 0.36), gold)
-	var nz := int(r.size.y / step)
-	for i in range(nz + 1):
-		var pz := r.position.y + 0.1 + (r.size.y - 0.2) * i / float(maxi(nz, 1))
-		for xx in [r.position.x + 0.05, r.end.x - 0.05]:
-			b.cyl(Vector3(xx, 0.5 + wall_h * 0.5, pz), 0.13, wall_h, lacquer, Vector3.ZERO, 8)
-	# door with studs and a name plaque
-	b.box(Vector3(cx, 1.45, r.end.y - 0.08), Vector3(1.2, 1.9, 0.1), MB.tag(Color("6a2a1a"), MB.WOOD))
-	for k in 3:
-		for s in [-1, 1]:
-			b.ball(Vector3(cx + 0.3 * s, 1.0 + k * 0.4, r.end.y - 0.02), 0.035, gold, true)
-	b.box(Vector3(cx, 2.65, r.end.y + 0.02), Vector3(1.0, 0.36, 0.06), MB.tag(Color("1a2a4a"), MB.WOOD))
-	b.box(Vector3(cx, 2.65, r.end.y + 0.05), Vector3(0.85, 0.24, 0.02), gold)
-	for s in [-1, 1]:
-		var wx: float = cx + 1.6 * s
-		b.box(Vector3(wx, 1.9, r.end.y - 0.07), Vector3(0.8, 0.8, 0.06), lacquer)
-		for k in 3:
-			b.box(Vector3(wx, 1.65 + k * 0.25, r.end.y - 0.03), Vector3(0.7, 0.03, 0.03), lacquer)
-			b.box(Vector3(wx - 0.25 + k * 0.25, 1.9, r.end.y - 0.03), Vector3(0.03, 0.7, 0.03), lacquer)
-		g.box(Vector3(wx, 1.9, r.end.y - 0.05), Vector3(0.7, 0.7, 0.02), Color(1.0, 0.85, 0.5, 0.75))
-	# tiered roof: hip roof + upturned corner eaves + ridge ornaments
-	var roof_y := 0.5 + wall_h
-	b.box(Vector3(cx, roof_y + 0.1, cz), Vector3(r.size.x + 1.0, 0.2, r.size.y + 1.0), MB.tag(Color("5a2a22"), MB.WOOD))
-	var tiers := 2 if r.size.y > 6.0 else 1
-	for t in tiers:
-		var sx := (r.size.x + 1.6) * (1.0 - t * 0.35)
-		var sz := (r.size.y + 1.6) * (1.0 - t * 0.35)
-		var hh := 1.4 if t == 0 else 1.0
-		var yy := roof_y + 0.2 + hh * 0.5 + t * 1.25
-		b.prim("cone4", Transform3D(Basis.from_euler(Vector3(0, PI / 4, 0)).scaled(Vector3(sx * 1.4142, hh, sz * 1.4142)), Vector3(cx, yy, cz)), MB.tag(Color("3a6a8a").lerp(Color("2a4a6a"), t * 0.5), MB.STONE))
-		# roof tile rows
-		for k in 4:
-			var f := (k + 1) / 5.0
-			b.box(Vector3(cx, yy - hh * 0.5 + hh * f * 0.95, cz + sz * 0.5 * (1.0 - f) + 0.02), Vector3(sx * (1.0 - f) + 0.1, 0.05, 0.06), MB.tag(Color("2a5070"), MB.STONE))
-		# eave trim and upturned corners
-		b.box(Vector3(cx, yy - hh * 0.5, cz + sz * 0.5), Vector3(sx, 0.1, 0.12), gold)
-		b.box(Vector3(cx, yy - hh * 0.5, cz - sz * 0.5), Vector3(sx, 0.1, 0.12), gold)
-		for ex in [-1, 1]:
-			for ez in [-1, 1]:
-				var cp := Vector3(cx + sx * 0.5 * ex, yy - hh * 0.5, cz + sz * 0.5 * ez)
-				b.limb(cp, cp + Vector3(0.45 * ex, 0.5, 0.45 * ez), 0.1, 0.04, roof_c, 6)
-				b.ball(cp + Vector3(0.45 * ex, 0.55, 0.45 * ez), 0.07, gold, true)
-				# hanging wind chime
-				g.ball(cp + Vector3(0.1 * ex, -0.35, 0.1 * ez), 0.06, Color(1.0, 0.85, 0.4, 0.7), true)
-	var top_y := roof_y + 0.2 + 1.4 + (tiers - 1) * 1.25
-	b.cyl(Vector3(cx, top_y + 0.15, cz), 0.06, 0.4, gold, Vector3.ZERO, 8)
-	b.ball(Vector3(cx, top_y + 0.4, cz), 0.16, gold, true)
-	for s in [-1, 1]:
-		b.limb(Vector3(cx + 0.3 * s, top_y - 0.05, cz), Vector3(cx + 0.55 * s, top_y + 0.35, cz), 0.06, 0.02, gold, 6)
-	# lanterns
-	for sx2 in [r.position.x + 0.2, r.end.x - 0.2]:
-		b.lathe(Vector3(sx2, 2.05, r.end.y + 0.15), [Vector2(0.06, 0.0), Vector2(0.2, 0.1), Vector2(0.22, 0.25), Vector2(0.17, 0.4), Vector2(0.06, 0.46)], MB.tag(Color("e04a3a"), MB.CLOTH), 12)
-		b.ribbon([Vector3(sx2, 2.05, r.end.y + 0.15), Vector3(sx2, 1.8, r.end.y + 0.15)], [0.03, 0.01], Vector3.RIGHT, MB.tag(Color("f0c850"), MB.CLOTH))
-		g.ball(Vector3(sx2, 2.28, r.end.y + 0.15), 0.42, Color(1.0, 0.45, 0.2, 0.3), true)
+	var lights := Arch.hall(b, g, r, style, int(r.position.x * 7.0 + r.position.y))
 	var mi := MB.mesh_node(root, b.build())
 	mi.position.y = gy
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	var gi := MB.mesh_node(root, g.build(MB.mat_glow()))
 	gi.position.y = gy
 	if DisplayServer.get_name() != "headless":
-		for sx3 in [r.position.x + 0.2, r.end.x - 0.2]:
+		for lt in lights:
 			var l := OmniLight3D.new()
-			l.light_color = Color(1.0, 0.6, 0.3)
+			l.light_color = lt[1]
 			l.light_energy = 0.8
 			l.omni_range = 5.0
-			l.position = Vector3(sx3, gy + 2.3, r.end.y + 0.4)
+			l.position = (lt[0] as Vector3) + Vector3(0, gy, 0)
 			root.add_child(l)
 
 ## a causeway with railings across the lotus pond and a pagoda tower beyond the east wall
@@ -1615,22 +1561,45 @@ static func _sect_props(root: Node3D, grid: PackedByteArray, w: int, h: int, hm:
 				b.box(Vector3(ex, gy + 0.62, (y + 0.5) * T), Vector3(0.07, 0.07, T), wood)
 				b.box(Vector3(ex, gy + 0.3, (y + 0.5) * T), Vector3(0.05, 0.05, T), wood)
 	# five-storey pagoda beyond the east wall
-	var pp := Vector3((w + 3.5) * T, -0.3, 5.0 * T)
-	for k in 5:
-		var s2 := 2.6 - k * 0.38
-		b.box(pp + Vector3(0, 0.6 + k * 1.3, 0), Vector3(s2, 1.0, s2), MB.tag(Color("efe4c8"), MB.CLOTH))
-		b.box(pp + Vector3(0, 0.25 + k * 1.3, 0), Vector3(s2 + 0.1, 0.15, s2 + 0.1), wood)
-		b.prim("cone4", Transform3D(Basis.from_euler(Vector3(0, PI / 4, 0)).scaled(Vector3((s2 + 1.2) * 1.4142, 0.6, (s2 + 1.2) * 1.4142)), pp + Vector3(0, 1.35 + k * 1.3, 0)), MB.tag(Color("2a4a6a"), MB.STONE))
-		for ex2 in [-1, 1]:
-			for ez in [-1, 1]:
-				var c := pp + Vector3((s2 + 1.2) * 0.5 * ex2, 1.05 + k * 1.3, (s2 + 1.2) * 0.5 * ez)
-				b.limb(c, c + Vector3(0.25 * ex2, 0.3, 0.25 * ez), 0.06, 0.02, MB.tag(Color("2a4a6a"), MB.STONE), 4)
-				g.ball(c + Vector3(0, -0.2, 0), 0.07, Color(1.0, 0.8, 0.4, 0.8), true)
-		for s3 in [-1, 1]:
-			g.box(pp + Vector3(-s2 * 0.5 - 0.01, 0.6 + k * 1.3, 0.4 * s3), Vector3(0.02, 0.5, 0.3), Color(1.0, 0.85, 0.5, 0.8))
-	b.cyl(pp + Vector3(0, 7.6, 0), 0.05, 1.4, gold, Vector3.ZERO, 6)
-	for k in 4:
-		b.torus(pp + Vector3(0, 7.2 + k * 0.25, 0), 0.16 - k * 0.025, 0.012, gold)
+	Arch.pagoda(b, g, Vector3((w + 3.5) * T, -0.3, 5.0 * T), 5)
+	# a whitewashed courtyard wall around the sect, open where the roads leave, and a memorial
+	# archway over each road just inside its gate
+	var gates: Array = []
+	for pt in Data.AREAS.sect.portals:
+		gates.append(pt.pos)
+	var x0 := 0.15 * T
+	var x1 := (w - 0.15) * T
+	var z0 := 0.15 * T
+	var z1 := (h - 0.15) * T
+	var sides := [[Vector3(x0, 0, z0), Vector3(x1, 0, z0), "z", 0], [Vector3(x0, 0, z1), Vector3(x1, 0, z1), "z", h - 1], [Vector3(x0, 0, z0), Vector3(x0, 0, z1), "x", 0], [Vector3(x1, 0, z0), Vector3(x1, 0, z1), "x", w - 1]]
+	for sd in sides:
+		var a: Vector3 = sd[0]
+		var e: Vector3 = sd[1]
+		var cuts: Array = []
+		for gp in gates:
+			var gv: Vector2i = gp
+			# portals sit one tile inside the border
+			if sd[2] == "x" and absi(gv.x - int(sd[3])) <= 1:
+				cuts.append((gv.y + 0.5) * T)
+			elif sd[2] == "z" and absi(gv.y - int(sd[3])) <= 1:
+				cuts.append((gv.x + 0.5) * T)
+		cuts.sort()
+		var along_x: bool = sd[2] == "z"
+		var cur := a
+		for cpos in cuts:
+			var stop := Vector3(cpos - 2.2, 0, a.z) if along_x else Vector3(a.x, 0, cpos - 2.2)
+			Arch.wall_run(b, g, cur, stop)
+			cur = Vector3(cpos + 2.2, 0, a.z) if along_x else Vector3(a.x, 0, cpos + 2.2)
+		Arch.wall_run(b, g, cur, e)
+	for gp2 in gates:
+		var gt: Vector2i = gp2
+		var gpos := Vector3((gt.x + 0.5) * T, 0, (gt.y + 0.5) * T)
+		var side_gate := gt.x <= 1 or gt.x >= w - 2
+		var yaw := PI * 0.5 if side_gate else 0.0
+		var inward := Vector3(1.0 if gt.x <= 1 else -1.0, 0, 0) if side_gate else Vector3(0, 0, -1.0 if gt.y >= h - 2 else 1.0)
+		gpos += inward * 1.2 * T
+		gpos.y = sample(hm, w, h, gpos.x, gpos.z) - 0.05
+		Arch.pailou(b, g, gpos, yaw, 3.0)
 	var mi := MB.mesh_node(root, b.build())
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	MB.mesh_node(root, g.build(MB.mat_glow()))
