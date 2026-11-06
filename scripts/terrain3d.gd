@@ -292,10 +292,10 @@ void fragment() {
 	NORMAL = normalize((VIEW_MATRIX * vec4(wn, 0.0)).xyz);
 	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 4.0);
 	// deeper water away from the shore, shallower and more see-through near it
-	vec3 body = mix(deep, col.rgb, 0.45 + 0.4 * shore + 0.2 * hc);
+	vec3 body = mix(deep, col.rgb, 0.3 + 0.35 * shore + 0.15 * hc);
 	// reflected sky: horizon colour at grazing angles, zenith colour looking down
 	vec3 refl = mix(sky_top, sky_hor, clamp(fres * 1.6, 0.0, 1.0));
-	vec3 c = mix(body, refl, clamp(0.18 + fres * 0.8, 0.0, 0.85));
+	vec3 c = mix(body, refl, clamp(0.06 + fres * 0.55, 0.0, 0.6));
 	// waves lapping at the shore: bands of foam running in towards the land
 	float lap = sin(shore * 9.0 - TIME * 2.2 + n2(uv * 2.0) * 3.0);
 	float foam = smoothstep(0.55, 0.95, shore) * smoothstep(0.2, 0.9, lap) * (0.6 + 0.4 * n2(uv * 6.0 + TIME));
@@ -544,6 +544,8 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 				wi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# trees, undergrowth, grass, rocks, landmarks: natural placement (see scatter.gd)
 	Scatter.populate(root, grid, w, h, hm, theme_name, seed_)
+	# stone bridges wherever a road crosses water
+	_bridges(root, grid, w, h, hm)
 	# birds, butterflies, dragonflies, fish... (see fauna.gd)
 	Fauna.populate(root, grid, w, h, hm, theme_name, seed_)
 	_skirt(root, w, h, theme_name, seed_)
@@ -848,13 +850,7 @@ static func _proto(key: String, theme_name: String) -> Mesh:
 		"wall":
 			_build_landmark(b, glow, th.tree, wc, th, 0)
 		"wall2":
-			# built regions alternate their landmark with a roofed pavilion (see architecture.gd)
-			var pav := {"court": ["2a8a6a", "2a6a5a"], "celestial": ["e8c860", "c83a2a"], "garden": ["c86a8a", "8a3a2a"], "lilies": ["5a3a3a", "8a2a20"]}
-			if pav.has(theme_name):
-				Arch.pavilion(b, glow, pav[theme_name][0], pav[theme_name][1], 1.15)
-				mat = MB.mat_vc()
-			else:
-				_build_landmark(b, glow, th.tree, wc, th, 1)
+			_build_landmark(b, glow, th.tree, wc, th, 1)
 		"decor":
 			_build_decor(b, glow, th.decor, th)
 			mat = MB.mat_plain()
@@ -1537,6 +1533,48 @@ static func _building(root: Node3D, r: Rect2, gy: float) -> void:
 			l.position = (lt[0] as Vector3) + Vector3(0, gy, 0)
 			root.add_child(l)
 
+## Find every run of road tiles with water on both sides and span it with a humped stone bridge.
+static func _bridges(root: Node3D, grid: PackedByteArray, w: int, h: int, hm: PackedFloat32Array) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var is_w := func(x: int, y: int) -> bool:
+		return x >= 0 and y >= 0 and x < w and y < h and grid[y * w + x] == MapGen.WATER
+	var done := {}
+	for y in h:
+		for x in w:
+			if grid[y * w + x] != MapGen.PATH or done.has(Vector2i(x, y)):
+				continue
+			for horiz in [true, false]:
+				# water on both sides across the road's direction
+				var side_ok := func(px: int, py: int) -> bool:
+					return (is_w.call(px, py - 1) and is_w.call(px, py + 1)) if horiz else (is_w.call(px - 1, py) and is_w.call(px + 1, py))
+				if not side_ok.call(x, y):
+					continue
+				var x1 := x
+				var y1 := y
+				while true:
+					var nx := x1 + (1 if horiz else 0)
+					var ny := y1 + (0 if horiz else 1)
+					if nx >= w or ny >= h or grid[ny * w + nx] != MapGen.PATH or not side_ok.call(nx, ny):
+						break
+					x1 = nx
+					y1 = ny
+				for yy in range(y, y1 + 1):
+					for xx in range(x, x1 + 1):
+						done[Vector2i(xx, yy)] = true
+				var a := Vector3((x + 0.5) * T, 0, (y + 0.5) * T) - (Vector3(T, 0, 0) if horiz else Vector3(0, 0, T))
+				var e := Vector3((x1 + 0.5) * T, 0, (y1 + 0.5) * T) + (Vector3(T, 0, 0) if horiz else Vector3(0, 0, T))
+				a.y = sample(hm, w, h, a.x, a.z)
+				e.y = sample(hm, w, h, e.x, e.z)
+				Arch.bridge(b, g, a, e, T * 0.95)
+				break
+	if b.is_empty():
+		return
+	var mi := MB.mesh_node(root, b.build())
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	if not g.is_empty():
+		MB.mesh_node(root, g.build(MB.mat_glow()))
+
 ## a causeway with railings across the lotus pond and a pagoda tower beyond the east wall
 ## (props stay on tile edges or outside the map so the hero never walks through them)
 static func _sect_props(root: Node3D, grid: PackedByteArray, w: int, h: int, hm: PackedFloat32Array) -> void:
@@ -1544,22 +1582,6 @@ static func _sect_props(root: Node3D, grid: PackedByteArray, w: int, h: int, hm:
 	var g := MB.new()
 	var wood := MB.tag(Color("a84a32"), MB.WOOD)
 	var gold := MB.tag(Color("e8c860"), MB.METAL)
-	# railings along every path tile that crosses water
-	for y in h:
-		for x in w:
-			if grid[y * w + x] != MapGen.PATH:
-				continue
-			for s in [-1, 1]:
-				var nx: int = x + s
-				if nx < 0 or nx >= w or grid[y * w + nx] != MapGen.WATER:
-					continue
-				var ex: float = (x + 0.5 + 0.48 * s) * T
-				var gy := sample(hm, w, h, (x + 0.5) * T, (y + 0.5) * T)
-				for k in 2:
-					b.cyl(Vector3(ex, gy + 0.35, (y + k) * T), 0.06, 0.7, wood, Vector3.ZERO, 6)
-					b.ball(Vector3(ex, gy + 0.74, (y + k) * T), 0.07, gold, true)
-				b.box(Vector3(ex, gy + 0.62, (y + 0.5) * T), Vector3(0.07, 0.07, T), wood)
-				b.box(Vector3(ex, gy + 0.3, (y + 0.5) * T), Vector3(0.05, 0.05, T), wood)
 	# five-storey pagoda beyond the east wall
 	Arch.pagoda(b, g, Vector3((w + 3.5) * T, -0.3, 5.0 * T), 5)
 	# a whitewashed courtyard wall around the sect, open where the roads leave, and a memorial

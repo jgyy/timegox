@@ -459,3 +459,215 @@ static func pavilion(b: MB, g: MB, roof_hex: String, column_hex: String, size: f
 	var top := Vector3(0, 0.34 + hgt + 0.3 + 1.25 * size, 0)
 	b.lathe(top, [Vector2(0.16, 0.0), Vector2(0.08, 0.15), Vector2(0.12, 0.3), Vector2(0.01, 0.55)], MB.tag(Color("e8c860"), MB.METAL), 10)
 	g.ball(Vector3(0, 0.34 + hgt - 0.35, 0), 0.25, Color(1.0, 0.7, 0.35, 0.5), true)
+
+# ---------------------------------------------------------------- bridges and settlements
+## A humped stone bridge from `a` to `e` over water: an arched deck of dressed stones, parapets
+## with posts, and lotus-capped posts at the ends.  Used wherever a road crosses water.
+static func bridge(b: MB, g: MB, a: Vector3, e: Vector3, width: float = 1.8) -> void:
+	var d := e - a
+	var ln := d.length()
+	if ln < 0.5:
+		return
+	var dir := d / ln
+	var side := Vector3(-dir.z, 0, dir.x)
+	var stone := MB.tag(Color("a8a4a0"), MB.STONE)
+	var stone_d := MB.tag(Color("8a8680"), MB.STONE)
+	var n := maxi(6, int(ln / 0.45))
+	var hump := minf(0.9, ln * 0.12)
+	var prev_l := Vector3.ZERO
+	var prev_r := Vector3.ZERO
+	for i in n + 1:
+		var t := i / float(n)
+		var c := a.lerp(e, t) + Vector3(0, sin(t * PI) * hump + 0.05, 0)
+		# deck stones, alternating shades
+		if i < n:
+			var c2 := a.lerp(e, (i + 1) / float(n)) + Vector3(0, sin((i + 1) / float(n) * PI) * hump + 0.05, 0)
+			var mid := (c + c2) * 0.5
+			var along_x := absf(dir.x) > absf(dir.z)
+			var seg_len := (c2 - c).length() + 0.02
+			var size := Vector3(seg_len, 0.22, width) if along_x else Vector3(width, 0.22, seg_len)
+			b.box(mid, size, stone if i % 2 == 0 else stone_d)
+		var l := c + side * width * 0.5 + Vector3(0, 0.12, 0)
+		var r := c - side * width * 0.5 + Vector3(0, 0.12, 0)
+		if i > 0:
+			b.limb(prev_l + Vector3(0, 0.45, 0), l + Vector3(0, 0.45, 0), 0.06, 0.06, stone, 5)
+			b.limb(prev_r + Vector3(0, 0.45, 0), r + Vector3(0, 0.45, 0), 0.06, 0.06, stone, 5)
+		if i % 2 == 0:
+			for q in [l, r]:
+				b.box((q as Vector3) + Vector3(0, 0.25, 0), Vector3(0.14, 0.5, 0.14), stone)
+				b.ball((q as Vector3) + Vector3(0, 0.55, 0), 0.08, stone, true)
+		prev_l = l
+		prev_r = r
+	# the arch underneath, seen from the banks
+	for s: float in [-1.0, 1.0]:
+		var prev := a + side * width * 0.5 * s
+		for i in range(1, 9):
+			var t2 := i / 8.0
+			var q2 := a.lerp(e, t2) + side * width * 0.5 * s + Vector3(0, sin(t2 * PI) * (hump - 0.25) - 0.2, 0)
+			b.limb(prev, q2, 0.12, 0.12, stone_d, 5)
+			prev = q2
+
+## A small dwelling: rammed-earth or timber walls, a gabled roof of grey tiles or thatch, a door,
+## a window with a warm light, firewood stacked by the wall.  `kind`: house, stilt (marsh and
+## river huts on piles), shrine (a roadside shrine with an altar), tower (a watchtower).
+static func dwelling(b: MB, g: MB, kind: String, seed_: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var wall := MB.tag(Color("d8c8a8").darkened(rng.randf() * 0.12), MB.CLOTH)
+	var timber := MB.tag(Color("6a4430"), MB.WOOD)
+	var roof := MB.tag(Color("5a5e66") if rng.randf() < 0.6 else Color("b89a58"), MB.STONE)
+	var st: Dictionary = {"roof": roof.to_html(false), "roof2": roof.darkened(0.25).to_html(false), "column": "7a3a2a", "wall": "e0d4b8", "beam": "4a6a5a", "trim": "c8a050", "double": false}
+	match kind:
+		"stilt":
+			for cx: float in [-1.0, 1.0]:
+				for cz: float in [-1.0, 1.0]:
+					b.limb(Vector3(cx * 0.9, -0.6, cz * 0.75), Vector3(cx * 0.9, 1.0, cz * 0.75), 0.08, 0.07, timber, 6)
+			b.box(Vector3(0, 1.0, 0), Vector3(2.3, 0.12, 1.9), timber)
+			b.box(Vector3(0, 1.75, 0), Vector3(1.9, 1.4, 1.5), MB.tag(Color("9a7a50"), MB.WOOD))
+			b.box(Vector3(0, 1.6, 0.76), Vector3(0.5, 1.0, 0.04), MB.tag(Color("3a2418"), MB.WOOD))
+			g.box(Vector3(0.6, 1.9, 0.76), Vector3(0.36, 0.3, 0.02), Color(1.0, 0.75, 0.4, 0.7))
+			_gable(b, Vector3(0, 2.45, 0), 1.25, 1.05, 0.9, MB.tag(Color("b89a58"), MB.FOLIAGE), true)
+			for k in 4:
+				b.box(Vector3(1.0 + k * 0.0, 0.5 - k * 0.25, 0.3), Vector3(0.4, 0.06, 0.5), timber)
+		"shrine":
+			b.box(Vector3(0, 0.2, 0), Vector3(1.4, 0.4, 1.2), MB.tag(Color("a8a4a0"), MB.STONE))
+			for cx2: float in [-1.0, 1.0]:
+				b.cyl(Vector3(cx2 * 0.5, 0.95, 0.35), 0.06, 1.1, MB.tag(Color("b83a2a"), MB.WOOD), Vector3.ZERO, 8)
+			b.box(Vector3(0, 0.95, -0.2), Vector3(1.1, 1.1, 0.5), MB.tag(Color("efe4c8"), MB.CLOTH))
+			b.box(Vector3(0, 0.62, 0.3), Vector3(0.6, 0.22, 0.3), MB.tag(Color("6a4430"), MB.WOOD))
+			for k in 3:
+				b.limb(Vector3(-0.1 + k * 0.1, 0.73, 0.3), Vector3(-0.1 + k * 0.1, 0.95, 0.3), 0.008, 0.008, MB.tag(Color("c84030"), MB.WOOD), 4)
+				g.ball(Vector3(-0.1 + k * 0.1, 0.97, 0.3), 0.03, Color(1.0, 0.6, 0.3, 0.9), true)
+			hip_roof(b, g, Vector3(0, 1.55, 0.05), 0.6, 0.55, 0.35, 0.55, st, false)
+		"tower":
+			b.box(Vector3(0, 1.0, 0), Vector3(1.6, 2.0, 1.6), MB.tag(Color("9a968e"), MB.STONE))
+			b.box(Vector3(0, 2.75, 0), Vector3(1.5, 1.5, 1.5), wall)
+			for cx3: float in [-1.0, 1.0]:
+				for cz3: float in [-1.0, 1.0]:
+					b.cyl(Vector3(cx3 * 0.72, 2.75, cz3 * 0.72), 0.07, 1.5, timber, Vector3.ZERO, 6)
+			b.box(Vector3(0, 3.55, 0), Vector3(2.0, 0.1, 2.0), timber)
+			g.box(Vector3(0, 2.9, 0.76), Vector3(0.5, 0.4, 0.02), Color(1.0, 0.75, 0.4, 0.7))
+			hip_roof(b, g, Vector3(0, 3.65, 0), 0.85, 0.85, 0.45, 0.95, st, false)
+			b.lathe(Vector3(0.7, 3.62, 0.7), [Vector2(0.05, 0.0), Vector2(0.14, -0.1), Vector2(0.14, -0.3), Vector2(0.05, -0.38)], MB.tag(Color("e04a3a"), MB.CLOTH), 8)
+		_:
+			# house
+			b.box(Vector3(0, 0.12, 0), Vector3(2.8, 0.24, 2.2), MB.tag(Color("8e8a94"), MB.STONE))
+			b.box(Vector3(0, 0.95, 0), Vector3(2.5, 1.5, 1.9), wall)
+			for cx4: float in [-1.0, 1.0]:
+				b.box(Vector3(cx4 * 1.22, 0.95, 0.93), Vector3(0.1, 1.5, 0.1), timber)
+				b.box(Vector3(cx4 * 1.22, 0.95, -0.93), Vector3(0.1, 1.5, 0.1), timber)
+			b.box(Vector3(0, 1.65, 0.96), Vector3(2.5, 0.1, 0.06), timber)
+			b.box(Vector3(-0.4, 0.82, 0.96), Vector3(0.6, 1.2, 0.05), MB.tag(Color("4a2a18"), MB.WOOD))
+			b.box(Vector3(0.6, 1.1, 0.96), Vector3(0.5, 0.42, 0.04), timber)
+			g.box(Vector3(0.6, 1.1, 0.98), Vector3(0.42, 0.34, 0.01), Color(1.0, 0.78, 0.45, 0.65))
+			_gable(b, Vector3(0, 1.7, 0), 1.65, 1.35, 1.0, roof, false)
+			# a stack of firewood and a water jar
+			for k in 3:
+				for j in 3 - k:
+					var lz := -0.6 + j * 0.15 + k * 0.07
+					b.limb(Vector3(-1.75, 0.12 + k * 0.14, lz), Vector3(-1.35, 0.12 + k * 0.14, lz), 0.065, 0.065, timber, 6)
+			b.lathe(Vector3(1.55, 0.0, 0.7), [Vector2(0.12, 0.0), Vector2(0.22, 0.2), Vector2(0.18, 0.4), Vector2(0.12, 0.45)], MB.tag(Color("7a4a30"), MB.STONE), 10)
+
+## A gabled roof: two sloping planes meeting at a ridge along x, with overhanging eaves, gable
+## boards and (for thatch) a thick, ragged edge.
+static func _gable(b: MB, top: Vector3, hx: float, hz: float, rise: float, col: Color, thatch: bool) -> void:
+	for s: float in [-1.0, 1.0]:
+		var e0 := top + Vector3(-hx, 0, hz * s)
+		var e1 := top + Vector3(hx, 0, hz * s)
+		var r0 := top + Vector3(-hx, rise, 0)
+		var r1 := top + Vector3(hx, rise, 0)
+		var n := (e1 - e0).cross(r0 - e0).normalized()
+		if n.y < 0:
+			n = -n
+		var quad := [e0, e1, r1, r0]
+		Arch._quad(b, quad, [n, n, n, n], col, n)
+		Arch._quad(b, [e0 - Vector3(0, 0.05, 0), e1 - Vector3(0, 0.05, 0), r1 - Vector3(0, 0.05, 0), r0 - Vector3(0, 0.05, 0)], [-n, -n, -n, -n], col.darkened(0.35), -n)
+		if thatch:
+			b.limb(e0 + Vector3(0, -0.05, 0), e1 + Vector3(0, -0.05, 0), 0.09, 0.09, col.darkened(0.15), 6)
+		else:
+			for k in int(hx * 2.0 / 0.3):
+				var x := -hx + 0.15 + k * 0.3
+				b.limb(top + Vector3(x, 0.04, hz * s), top + Vector3(x, rise + 0.04, 0), 0.035, 0.035, col.darkened(0.2), 4)
+	b.limb(top + Vector3(-hx - 0.1, rise + 0.05, 0), top + Vector3(hx + 0.1, rise + 0.05, 0), 0.08, 0.08, col.darkened(0.3), 6)
+	for sx: float in [-1.0, 1.0]:
+		b.ball(top + Vector3(sx * (hx + 0.12), rise + 0.12, 0), 0.08, col.darkened(0.3), true)
+
+## A nomad tent / steppe yurt: a felt drum with a domed roof, a coloured band and a smoke hole.
+static func tent(b: MB, g: MB, seed_: int, yurt: bool) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var felt := MB.tag(Color("e8dcc0").darkened(rng.randf() * 0.1), MB.CLOTH)
+	var band := MB.tag(Color("b83a2a") if rng.randf() < 0.5 else Color("2a5a8a"), MB.CLOTH)
+	if yurt:
+		b.lathe(Vector3.ZERO, [Vector2(1.4, 0.0), Vector2(1.42, 0.9), Vector2(1.25, 1.2), Vector2(0.6, 1.75), Vector2(0.25, 1.9)], felt, 16)
+		b.lathe(Vector3.ZERO, [Vector2(1.43, 0.55), Vector2(1.43, 0.75)], band, 16)
+		b.lathe(Vector3(0, 1.88, 0), [Vector2(0.27, 0.0), Vector2(0.27, 0.12)], MB.tag(Color("6a4430"), MB.WOOD), 10)
+		b.box(Vector3(0, 0.5, 1.4), Vector3(0.6, 1.0, 0.08), band)
+		g.ball(Vector3(0, 2.2, 0), 0.3, Color(0.85, 0.85, 0.9, 0.2), true)
+	else:
+		# a long desert tent: a ridge pole and two sloping awnings of striped cloth, open at the front
+		for s: float in [-1.0, 1.0]:
+			b.limb(Vector3(s * 1.2, 0, 0), Vector3(s * 1.2, 1.6, 0), 0.05, 0.05, MB.tag(Color("6a4430"), MB.WOOD), 6)
+		Arch._gable(b, Vector3(0, 0.3, 0), 1.3, 1.1, 1.3, felt, true)
+		for k in 3:
+			b.box(Vector3(-0.8 + k * 0.8, 1.0, 0.02), Vector3(0.2, 0.04, 2.0), band)
+		b.box(Vector3(0, 0.03, 1.6), Vector3(1.6, 0.04, 1.0), MB.tag(Color("a83a30"), MB.CLOTH))
+		b.lathe(Vector3(0.8, 0.0, 1.9), [Vector2(0.18, 0.0), Vector2(0.25, 0.25), Vector2(0.15, 0.5)], MB.tag(Color("a07040"), MB.STONE), 10)
+
+## A ruined hall: a cracked platform, broken columns of different heights, a fallen beam, rubble
+## and a corner of the old roof still standing.
+static func ruin(b: MB, g: MB, seed_: int, stone_hex: String) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var stone := MB.tag(Color(stone_hex), MB.STONE)
+	b.box(Vector3(0, 0.2, 0), Vector3(3.4, 0.4, 2.6), stone.darkened(0.15))
+	for k in 6:
+		var a := TAU * k / 6.0
+		var p := Vector3(cos(a) * 1.3, 0.4, sin(a) * 1.0)
+		var hgt := rng.randf_range(0.3, 2.6)
+		b.cyl(p + Vector3(0, hgt * 0.5, 0), 0.16, hgt, stone, Vector3(rng.randf_range(-0.08, 0.08), 0, rng.randf_range(-0.08, 0.08)), 8)
+		b.cyl(p + Vector3(0, 0.08, 0), 0.24, 0.16, stone.darkened(0.1), Vector3.ZERO, 8)
+		if hgt > 2.0:
+			b.box(p + Vector3(0, hgt + 0.08, 0), Vector3(0.4, 0.16, 0.4), stone.lightened(0.05))
+	b.limb(Vector3(-1.4, 0.55, 0.9), Vector3(1.2, 0.5, 1.3), 0.14, 0.14, MB.tag(Color("5a4030"), MB.WOOD), 6)
+	for k in 9:
+		b.box(Vector3(rng.randf_range(-1.8, 1.8), 0.45, rng.randf_range(-1.4, 1.4)), Vector3(0.3, 0.2, 0.25) * rng.randf_range(0.6, 1.4), stone.darkened(rng.randf() * 0.2), Vector3(rng.randf(), rng.randf() * TAU, rng.randf()))
+	var st: Dictionary = {"roof": "4a5a5a", "roof2": "3a4848", "column": "7a3a2a", "wall": "e0d4b8", "beam": "3a5a50", "trim": "a89060", "double": false}
+	hip_roof(b, g, Vector3(-0.9, 2.6, -0.6), 0.6, 0.5, 0.35, 0.5, st, false)
+
+# ---------------------------------------------------------------- settlement meshes (cached)
+## building kinds that appear at the edges of each region's wilds
+const SETTLE := {
+	"bamboo": ["house", "shrine", "pavilion"], "marsh": ["stilt", "stilt", "shrine"], "frost": ["tower"], "thunder": ["tower", "ruin"],
+	"dunes": ["tent", "tent", "ruin"], "aurora": ["yurt", "yurt", "tower"], "maple": ["shrine", "house", "house"],
+	"karst": ["stilt", "house", "shrine"], "lilies": ["shrine", "ruin", "pavilion"], "grave": ["ruin", "shrine"], "garden": ["pavilion", "house", "shrine"],
+	"cloudsea": ["shrine", "tower", "pavilion"], "court": ["ruin", "pavilion"], "celestial": ["pavilion"], "time": ["ruin"], "abyss": ["ruin"], "volcano": ["ruin", "tower"],
+	"forge": ["tower", "ruin"], "mirror": ["shrine", "stilt"], "palace": ["tower", "ruin"],
+}
+static var _mesh_cache := {}
+
+static func settlement_mesh(kind: String, variant: int, theme_name: String) -> ArrayMesh:
+	var key := "%s#%d#%s" % [kind, variant, theme_name]
+	if _mesh_cache.has(key):
+		return _mesh_cache[key]
+	var b := MB.new()
+	var g := MB.new()
+	var seed_ := hash(key)
+	match kind:
+		"tent":
+			tent(b, g, seed_, false)
+		"yurt":
+			tent(b, g, seed_, true)
+		"pavilion":
+			var pav := {"court": ["2a8a6a", "2a6a5a"], "celestial": ["e8c860", "c83a2a"], "garden": ["c86a8a", "8a3a2a"], "lilies": ["5a3a3a", "8a2a20"]}
+			var pc: Array = pav.get(theme_name, ["2f6a7a", "b83a2a"])
+			pavilion(b, g, pc[0], pc[1], 1.1)
+		"ruin":
+			var th := Look.theme(theme_name)
+			ruin(b, g, seed_, Color(th.wall).lerp(Color("a8a4a0"), 0.6).to_html(false))
+		_:
+			dwelling(b, g, kind, seed_)
+	var m := b.build(MB.mat_vc())
+	g.add_to(m, MB.mat_glow())
+	_mesh_cache[key] = m
+	return m

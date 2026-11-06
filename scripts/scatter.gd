@@ -206,6 +206,15 @@ static func populate(root: Node3D, grid: PackedByteArray, w: int, hh: int, hm: P
 	var tuft_kind: String = str(th.get("tuft", "grass"))
 	var real_grass := tuft_kind in ["grass", "deadgrass", "dunegrass", "snow", "moss", "flowers", "reed"] and grass_k > 0.0
 	var lily_ok := theme_name in ["sect", "garden", "marsh", "mirror", "lilies", "karst"]
+	_settled = []
+	# direction from a forest-edge tile towards the open ground beside it
+	_open_dir = func(tx: int, ty: int) -> Vector2i:
+		for o in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+			var nx: int = tx + o.x
+			var ny: int = ty + o.y
+			if nx >= 0 and ny >= 0 and nx < w and ny < hh and grid[ny * w + nx] in [MapGen.FLOOR, MapGen.DECOR, MapGen.PATH]:
+				return o
+		return Vector2i(0, 1)
 	var cw := int(ceil(w / float(CH)))
 	var chh := int(ceil(hh / float(CH)))
 	for cy in chh:
@@ -270,6 +279,18 @@ static func _tree(layers: Dictionary, sp: String, tx: int, ty: int, salt: float,
 
 static func _wall_tile(layers: Dictionary, tx: int, ty: int, depth: int, gx: Callable, theme_name: String, canopy: Array, under: Array, rocks: Array, groves: Array, land: float, karst: float, rocky: FastNoiseLite) -> void:
 	var r0 := h(tx, ty, 40.0)
+	# now and then a dwelling stands at the forest edge, facing the open ground (see architecture.gd)
+	if depth == 1 and Arch.SETTLE.has(theme_name) and h(tx, ty, 200.0) < 0.03 and _settle_ok(tx, ty):
+		var kinds: Array = Arch.SETTLE[theme_name]
+		var kind: String = kinds[int(h(tx, ty, 201.0) * kinds.size()) % kinds.size()]
+		var v := int(h(tx, ty, 202.0) * 3.0)
+		var face: Vector2i = _open_dir.call(tx, ty) if _open_dir.is_valid() else Vector2i(0, 1)
+		var yaw := atan2(float(face.x), float(face.y))
+		var pos: Vector3 = gx.call(0.5, 0.5)
+		pos.y -= 0.08
+		_add(layers, "bld:%s#%d" % [kind, v], func(): return Arch.settlement_mesh(kind, v, theme_name), Transform3D(Basis(Vector3.UP, yaw), pos), Color.WHITE, true, 130.0)
+		_settled.append(Vector2i(tx, ty))
+		return
 	# built landmarks (the region's identity) at the chosen share
 	if r0 < land:
 		var key := "wall:" if h(tx, ty, 12.0) >= 0.35 else "wall2:"
@@ -314,6 +335,16 @@ static func _wall_tile(layers: Dictionary, tx: int, ty: int, depth: int, gx: Cal
 			rk = "boulder"
 		var rv := int(h(tx, ty, 75.0) * Rocks.VARIANTS)
 		_add(layers, "rock:%s#%d" % [rk, rv], func(): return Rocks.mesh(rk, rv, theme_name), _xf(gx.call(h(tx, ty, 76.0), h(tx, ty, 77.0)), h(tx, ty, 78.0) * TAU, 0.8 + h(tx, ty, 79.0) * 0.9), _tint(tx, ty, 80.0, 0.15), true, 80.0)
+
+static var _settled: Array = []
+static var _open_dir := Callable()
+
+## keep dwellings apart: at most one within 9 tiles of another
+static func _settle_ok(tx: int, ty: int) -> bool:
+	for p in _settled:
+		if absi((p as Vector2i).x - tx) + absi((p as Vector2i).y - ty) < 9:
+			return false
+	return true
 
 static func _floor_tile(layers: Dictionary, tx: int, ty: int, to_wall: int, to_water: int, to_path: int, gx: Callable, theme_name: String, under: Array, ground: Array, rocks: Array, groves: Array, meadow: FastNoiseLite, rocky: FastNoiseLite, grass_k: float, cover: float, rock_p: float, logs: float, real_grass: bool, tuft_kind: String) -> void:
 	var mv := meadow.get_noise_2d(tx, ty) * 0.5 + 0.5

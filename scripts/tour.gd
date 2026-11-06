@@ -177,6 +177,15 @@ func _run() -> void:
 			await _wait(0.6)
 			await _shot("vista_" + id)
 			main.world.cam_override = null
+		if id == "sect":
+			# the sect's architecture from above: halls, pagoda, walls, gate archways, the pond bridge
+			main.world.cam_override = Transform3D(Basis.IDENTITY, Vector3(41, 26, 70)).looking_at(Vector3(41, 0, 28), Vector3.UP)
+			await _wait(0.6)
+			await _shot("architecture_sect")
+			main.world.cam_override = Transform3D(Basis.IDENTITY, Vector3(30, 9, 22)).looking_at(Vector3(41, 3, 8), Vector3.UP)
+			await _wait(0.4)
+			await _shot("architecture_hall")
+			main.world.cam_override = null
 		if id == "sect" or main.args.has("world-only"):
 			continue
 		# a regular battle with this region's monster pool
