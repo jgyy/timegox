@@ -1,0 +1,118 @@
+"""Tome: the Jade Ledger and the Court's living record-books.  A great jade-bound book floating
+open, its pages fanning and flapping on their own bones, an eye set into the clasp of its cover,
+bookmarks of red silk trailing beneath, brass corner guards, chains hanging from its spine and
+glowing script hovering over the open pages.  Tinted by the game per enemy; pages, script and the
+eye keep their colours.
+Run: blender --background --python art/monsters/tome.py  ->  assets/monsters/tome.glb"""
+import math
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+import kit  # noqa: E402
+from creature import chain_rig, wave_chain, zero_pose  # noqa: E402
+from kit import CLOTH, MAT_GLOW, METAL, STONE, V, Builder, Rig, env  # noqa: E402
+
+kit.reset()
+Y = 1.6
+r = Rig("rig")
+r.bone("root", (0, 0, 0), (0, 0.3, 0))
+r.bone("spine", (0, Y - 0.1, -0.05), (0, Y + 0.1, -0.05), "root")
+for s, sd in ((1, "L"), (-1, "R")):
+    r.bone("cover." + sd, (0.0, Y, -0.05), (0.55 * s, Y + 0.12, 0.05), "spine")
+for k in range(5):
+    a = (k - 2) * 0.25
+    r.bone("page%d" % k, (0, Y + 0.02, -0.05), (math.sin(a) * 0.5, Y + 0.15 + math.cos(a) * 0.05, 0.0), "spine")
+marks = chain_rig(r, "mark", [V(0, Y - 0.05, 0.0), V(0.02, Y - 0.35, 0.05), V(0.0, Y - 0.65, 0.08)], "spine")
+b = Builder("tome")
+
+
+def slab(sd, s):
+    """One cover board: a thick superquad with brass corner guards and a jade inlay."""
+    c = V(0.28 * s, Y + 0.06, 0.0)
+    b.superquad(c, (0.28, 0.035, 0.38), (0.75, 0.75, 0.75), e=0.25, cls=STONE, bone="cover." + sd, tint=1.0, rot=(0, 0, -0.22 * s), seg=16, rings=8)
+    for zz in (-1, 1):
+        b.superquad(c + V(0.24 * s, 0.0, 0.33 * zz), (0.05, 0.045, 0.06), "d8b050", e=0.3, cls=METAL, bone="cover." + sd, rot=(0, 0, -0.22 * s))
+    b.superquad(c + V(0, -0.035, 0), (0.14, 0.012, 0.2), (1.0, 1.0, 1.0), e=0.3, cls=STONE, bone="cover." + sd, tint=1.0, rot=(0, 0, -0.22 * s))
+
+
+for s, sd in ((1, "L"), (-1, "R")):
+    slab(sd, s)
+    # the block of pages resting on the cover
+    b.superquad(V(0.25 * s, Y + 0.1, 0.0), (0.24, 0.04, 0.35), "f4ecd8", e=0.3, cls=CLOTH, bone="cover." + sd, rot=(0, 0, -0.22 * s), seg=12, rings=6)
+b.tube([V(0, Y - 0.04, -0.4), V(0, Y - 0.06, 0.4)], [0.06, 0.06], (0.6, 0.6, 0.6), cls=STONE, bone="spine", tint=1.0, seg=10)
+# loose pages fanning in the middle
+for k in range(5):
+    a = (k - 2) * 0.25
+    root = V(0, Y + 0.12, -0.05)
+    tip = V(math.sin(a) * 0.45, Y + 0.18 + math.cos(a) * 0.05, -0.05)
+    rows = [[root + V(0, 0, -0.32), root + V(0, 0, 0.32)], [root.lerp(tip, 0.5) + V(0, 0.06, -0.32), root.lerp(tip, 0.5) + V(0, 0.06, 0.32)], [tip + V(0, 0, -0.32), tip + V(0, 0, 0.32)]]
+    b.sheet(rows, "fbf4e0", cls=CLOTH, bone="page%d" % k, cols=["fbf4e0", "f4ead0", "ece0c0"])
+# the eye in the clasp
+b.ellipsoid(V(0, Y - 0.02, 0.42), (0.1, 0.1, 0.05), "d8b050", cls=METAL, bone="spine", seg=14, rings=8)
+b.eye(V(0, Y - 0.02, 0.46), 0.07, "40ffb0", side=1, bone="spine", rot_y=0.0, h=1.0, glow=True, slit=True)
+# glowing script hovering above the pages
+for k in range(14):
+    a = (k / 13 - 0.5) * 1.6
+    c = V(math.sin(a) * 0.38, Y + 0.38 + 0.08 * math.cos(k * 1.7), math.cos(a) * 0.08 - 0.05)
+    b.superquad(c, (0.03, 0.05, 0.005) if k % 2 else (0.05, 0.02, 0.005), "80ffd0", e=0.3, cls=CLOTH, bone="spine", mat=MAT_GLOW)
+# red silk bookmarks and hanging chains
+pts = [r.head(n) for n in marks] + [r.tail(marks[-1])]
+for dx in (-0.06, 0.06):
+    b.ribbon([p + V(dx, 0, 0) for p in pts], [0.03, 0.03, 0.02, 0.01], (1, 0, 0), "c02a2a", bones=[marks[0], marks[0], marks[1], marks[1]], col_end="ff6050")
+for s in (1, -1):
+    for k in range(6):
+        c = V(0.12 * s, Y - 0.12 - k * 0.08, -0.38)
+        b.lathe(c, [(0.025, -0.022), (0.035, 0.0), (0.025, 0.022)], "6a6a78", cls=METAL, bone="spine", seg=8, rot=(0, 0, (k % 2) * 1.57), cap_bottom=False, cap_top=False)
+
+T_IDLE = 2.8
+
+
+def idle(t):
+    w = 2 * math.pi / T_IDLE
+    p = zero_pose(r)
+    p["spine"] = ((math.sin(t * w) * 0.1, math.sin(t * w * 0.5) * 0.25, 0), (0, math.sin(t * w) * 0.1, 0))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["cover." + sd] = ((0, 0, (0.05 + 0.08 * math.sin(t * w * 2)) * s), (0, 0, 0))
+    for k in range(5):
+        p["page%d" % k] = ((0, 0, math.sin(t * w * 3 + k) * 0.25), (0, 0, 0))
+    wave_chain(p, marks, t, w * 2, 0.15, axis=0)
+    return p
+
+
+def attack(t):
+    k = t / 0.6
+    e = env(k)
+    slam = math.sin(min(1.0, k * 1.6) * math.pi)
+    p = idle(0.0)
+    p["root"] = ((0, 0, 0), (0, 0.1 * slam, 0.5 * slam))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["cover." + sd] = ((0, 0, (0.4 * e - 1.2 * slam) * s), (0, 0, 0))
+    for kk in range(5):
+        p["page%d" % kk] = ((0, 0, math.sin(t * 30 + kk) * 0.6 * e), (0, 0, 0))
+    return p
+
+
+def hurt(t):
+    e = env(t / 0.55)
+    p = idle(0.0)
+    p["spine"] = ((-0.4 * e, 0, 0.3 * e), (0, 0, -0.15 * e))
+    for kk in range(5):
+        p["page%d" % kk] = ((0, 0, math.sin(t * 40 + kk) * 0.8 * e), (0, 0, 0))
+    return p
+
+
+def cast(t):
+    e = env(t / 0.6)
+    p = idle(0.0)
+    p["spine"] = ((-0.3 * e, t * 4.0, 0), (0, 0.3 * e, 0))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["cover." + sd] = ((0, 0, 0.6 * e * s), (0, 0, 0))
+    for kk in range(5):
+        p["page%d" % kk] = ((0, 0, (kk - 2) * 0.5 * e), (0, 0, 0))
+    return p
+
+
+kit.scale_asset(b, r, 1.6)
+print("[art] tome: %d triangles" % b.tri_count())
+kit.finish_rigged(b, r, "monsters/tome.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.45)

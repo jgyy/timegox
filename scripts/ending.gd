@@ -1,7 +1,8 @@
 extends ScreenBase
 ## Ending / results screen: the hero floats on a lotus in a golden sky.  Part V's finale adds the
 ## four mended pillars holding up the horizon, Hundun asleep around the centre of the world and
-## rings of Nuwa's five colours turning overhead.
+## rings of Nuwa's five colours turning overhead.  Part VI adds the Wheel of the Six Paths turning
+## again behind them, soul lanterns rising past it, and Lin Feng's parents walking on to rebirth.
 
 const VIEW := Vector2(1280, 720)
 
@@ -11,6 +12,9 @@ var comp: Node3D
 var lot: Node3D
 var hundun: Node3D
 var rings: Array = []
+var wheel: Node3D
+var parents: Array = []
+var lanterns: CPUParticles3D
 
 func _on_show(v: bool) -> void:
 	if v:
@@ -80,6 +84,46 @@ func _build3d() -> void:
 		rm.rotation = Vector3(1.25 + k * 0.05, k * 0.6, 0.0)
 		rm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		rings.append(rm)
+	# the Wheel of the Six Paths, turning again on the horizon
+	wheel = Node3D.new()
+	wheel.position = Vector3(10.0, 10.0, -42.0)
+	scene3d.add_child(wheel)
+	var wb := MB.new()
+	var wg := MB.new()
+	var stone := MB.tag(Color("d8d0e8"), MB.STONE)
+	for i in 36:
+		var a0 := TAU * i / 36.0
+		var a1 := TAU * (i + 1) / 36.0
+		wb.limb(Vector3(cos(a0), sin(a0), 0) * 12.0, Vector3(cos(a1), sin(a1), 0) * 12.0, 0.6, 0.6, stone, 6)
+	for k in 6:
+		var ak := TAU * k / 6.0
+		var c6: Color = Fx3D.SIX[k]
+		wb.limb(Vector3.ZERO, Vector3(cos(ak), sin(ak), 0) * 12.0, 0.4, 0.3, stone, 6)
+		wg.ball(Vector3(cos(ak), sin(ak), 0) * 12.0, 1.1, Color(c6.r, c6.g, c6.b, 0.6), true)
+	wb.cyl(Vector3.ZERO, 1.6, 1.4, stone, Vector3(PI * 0.5, 0, 0), 12)
+	wg.ball(Vector3.ZERO, 2.4, Color(1.0, 0.95, 0.8, 0.4), true)
+	var wm := MB.mesh_node(wheel, wb.build(MB.mat_plain()))
+	wm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	MB.mesh_node(wheel, wg.build(MB.mat_glow()))
+	# soul lanterns drifting up past the wheel
+	lanterns = Fx3D.make_weather()
+	scene3d.add_child(lanterns)
+	Fx3D.configure_weather(lanterns, "lily_souls")
+	lanterns.position = Vector3(4.0, -6.0, -24.0)
+	# Lin Shan and Su Wan, hand in hand, walking up a path of light towards the wheel
+	for k in 2:
+		var pid := "lin_shan" if k == 0 else "su_wan"
+		var pm2 := Models.person(Color("7a7a70") if k == 0 else Color("6aa88a"), Color("1a1a2a"), {"asset": pid, "glow": Color(1.0, 0.9, 0.7)})
+		pm2.position = Vector3(5.0 + k * 0.7, 2.0, -12.0)
+		pm2.rotation.y = PI + 0.5
+		pm2.scale = Vector3.ONE * 0.8
+		scene3d.add_child(pm2)
+		parents.append(pm2)
+	var road := MB.new()
+	for i in 24:
+		var tt := i / 23.0
+		road.box(Vector3(5.3, 1.9, -12.0).lerp(Vector3(9.0, 9.0, -40.0), tt), Vector3(1.4, 0.05, 1.4), Color(1.0, 0.9, 0.6, 0.35 * (1.0 - tt)), Vector3(0, 0.5, 0))
+	MB.mesh_node(scene3d, road.build(MB.mat_glow()))
 
 func press(act: String) -> void:
 	if act == "confirm":
@@ -99,14 +143,21 @@ func _process(d: float) -> void:
 		Models.anim_monster(hundun, t * 0.5, 0.0)
 		for k in rings.size():
 			rings[k].rotation.y = k * 0.6 + t * (0.05 + k * 0.012) * (1 if k % 2 == 0 else -1)
+		wheel.rotation.z = t * 0.12
+		for k in parents.size():
+			var pp: Node3D = parents[k]
+			var walk := fmod(t * 0.04, 1.0)
+			pp.position = Vector3(5.0 + k * 0.7, 2.0, -12.0).lerp(Vector3(9.0 + k * 0.7, 8.8, -38.0), walk)
+			pp.visible = walk < 0.92
+			Models.anim_person(pp, t + k, true)
 		cam.position = Vector3(sin(t * 0.15) * 1.5, 1.8, 6.5)
 		cam.look_at(Vector3(0, 1.4, 0), Vector3.UP)
 		queue_redraw()
 
 func _draw() -> void:
 	Gfx.title_text(self, Vector2(0, 110), "ASCENSION", 64, VIEW.x, t)
-	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, mends the falling sky and holds it up by choice.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
-	UI.text(self, Vector2(0, 190), "A Primordial Sovereign who took nothing, owes nothing, and asks for help when the sky is heavy.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, holds up the sky by choice and turns the Wheel gladly.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 190), "His parents walk on to rebirth, each keeping one thing. Somewhere, a baby girl already knows his face.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
 	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
 	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)

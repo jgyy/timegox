@@ -154,3 +154,45 @@ def chain_weights(prefix, f, n):
             w = {"%s%d" % (prefix, a - 1): 0.3 - t, "%s%d" % (prefix, a): 0.7 + t}
         return w
     return {"%s%d" % (prefix, a): 1.0 - (t - 0.5), "%s%d" % (prefix, b2): t - 0.5}
+
+
+# ---------------------------------------------------------------- helpers for the invertebrates,
+# spirits and other non-quadrupeds (serpent, crab, spider, mantis, jelly, ray, wisp, wraith, plant,
+# slime, storm, tome)
+def chain_rig(r, prefix, pts, parent):
+    """Add a bone chain prefix0..prefixN-1 through `pts` under `parent`; returns the bone names."""
+    names = []
+    prev = parent
+    for i in range(len(pts) - 1):
+        nm = "%s%d" % (prefix, i)
+        r.bone(nm, pts[i], pts[i + 1], prev)
+        names.append(nm)
+        prev = nm
+    return names
+
+
+def leg_chain(r, nm, root, knee, foot, parent):
+    """Two-bone insect/crustacean leg: nm_a (root->knee) and nm_b (knee->foot)."""
+    r.bone(nm + "_a", root, knee, parent)
+    r.bone(nm + "_b", knee, foot, nm + "_a")
+    return [nm + "_a", nm + "_b"]
+
+
+def wave_chain(p, names, t, speed, amp, axis=1, lag=0.7, grow=0.2, base=(0.0, 0.0, 0.0)):
+    """Travelling wave down a bone chain (swimming, slithering, tentacles, tails)."""
+    for i, nm in enumerate(names):
+        rot = list(base)
+        rot[axis] += math.sin(t * speed - i * lag) * amp * (1 + i * grow)
+        p[nm] = (tuple(rot), (0, 0, 0))
+
+
+def scuttle(p, legs, t, speed, amp_up, amp_swing):
+    """Alternating tripod gait for many-legged walkers: legs = [(name_a, name_b, phase), ...]."""
+    for a, b, ph in legs:
+        s = math.sin(t * speed + ph)
+        p[a] = ((-max(0.0, s) * amp_up, s * amp_swing, 0), (0, 0, 0))
+        p[b] = ((max(0.0, s) * amp_up * 0.8, 0, 0), (0, 0, 0))
+
+
+def bob(p, t, speed, amp, bone="root"):
+    p[bone] = ((0, 0, 0), (0, math.sin(t * speed) * amp, 0))

@@ -13,15 +13,15 @@ extends CanvasLayer
 const SHADER := """
 shader_type canvas_item;
 uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap, repeat_disable;
-uniform float vignette = 0.32;
+uniform float vignette = 0.18;
 uniform vec3 shadow_tint : source_color = vec3(0.92, 0.96, 1.08);
 uniform vec3 high_tint : source_color = vec3(1.05, 1.0, 0.94);
 uniform float saturation = 1.06;
-uniform float grain = 0.018;
-uniform float bloom = 0.32;
-uniform float bloom_threshold = 0.62;
-uniform float aberration = 0.0025;
-uniform float sharpen = 0.3;
+uniform float grain = 0.0;
+uniform float bloom = 0.1;
+uniform float bloom_threshold = 0.9;
+uniform float aberration = 0.0;
+uniform float sharpen = 0.22;
 uniform float flash = 0.0;
 uniform vec3 flash_col : source_color = vec3(1.0);
 uniform float letterbox = 0.0;
@@ -51,9 +51,9 @@ void fragment() {
 		+ texture(screen_tex, uv + vec2(0.0, px.y)).rgb + texture(screen_tex, uv - vec2(0.0, px.y)).rgb;
 	c += (c - nb * 0.25) * sharpen;
 	// soft bloom from blurred mip levels (only what is brighter than the threshold)
-	vec3 b1 = textureLod(screen_tex, uv, 2.5).rgb;
-	vec3 b2 = textureLod(screen_tex, uv, 4.5).rgb;
-	vec3 bsrc = b1 * 0.55 + b2 * 0.45;
+	vec3 b1 = textureLod(screen_tex, uv, 1.5).rgb;
+	vec3 b2 = textureLod(screen_tex, uv, 3.0).rgb;
+	vec3 bsrc = b1 * 0.7 + b2 * 0.3;
 	c += max(bsrc - bloom_threshold, vec3(0.0)) * bloom * 1.6;
 	// saturation and split toning
 	float l = dot(c, vec3(0.299, 0.587, 0.114));
@@ -108,9 +108,9 @@ func set_theme(name: String) -> void:
 	mat.set_shader_parameter("shadow_tint", st)
 	mat.set_shader_parameter("high_tint", ht)
 	var dark: bool = Color(th.sky_top).v < 0.35
-	mat.set_shader_parameter("bloom", 0.45 if dark else 0.3)
-	mat.set_shader_parameter("bloom_threshold", 0.5 if dark else 0.64)
-	mat.set_shader_parameter("vignette", 0.4 if dark else 0.3)
+	mat.set_shader_parameter("bloom", 0.16 if dark else 0.08)
+	mat.set_shader_parameter("bloom_threshold", 0.8 if dark else 0.92)
+	mat.set_shader_parameter("vignette", 0.24 if dark else 0.16)
 
 func do_flash(col: Color = Color.WHITE, strength: float = 0.6) -> void:
 	flash = maxf(flash, strength)

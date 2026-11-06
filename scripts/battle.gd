@@ -126,35 +126,21 @@ func _stage_for(th: String) -> Dictionary:
 		var a2 := TAU * i / 24.0
 		rg.box(Vector3(cos(a2) * 11.2, 0.06, sin(a2) * 11.2), Vector3(0.5, 0.01, 0.1), Color(1, 1, 1, 0.22), Vector3(0, -a2, 0))
 	MB.mesh_node(n, rg.build(MB.mat_glow()))
-	# scenery: the region's landmarks (both variants) and boulders form a distant ring
+	# scenery: two rings of the region's own vegetation, rocks and landmarks (see Scatter)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = th.hash()
-	for k in 2:
-		var mesh := Terrain3D._proto(("wall:" if k == 0 else "wall2:") + th, th)
-		var mm := MultiMesh.new()
-		mm.transform_format = MultiMesh.TRANSFORM_3D
-		mm.use_colors = true
-		mm.mesh = mesh
-		var cnt := 30
-		mm.instance_count = cnt
-		for i in cnt:
-			var a3 := TAU * (i + k * 0.5) / cnt + rng.randf_range(-0.05, 0.05)
-			var r := rng.randf_range(21.0, 44.0)
-			var sc := rng.randf_range(1.4, 3.0)
-			var bs := Basis.from_euler(Vector3(0, rng.randf() * TAU, 0)).scaled(Vector3(sc, sc * rng.randf_range(0.9, 1.5), sc))
-			mm.set_instance_transform(i, Transform3D(bs, Vector3(cos(a3) * r, 0, sin(a3) * r)))
-			mm.set_instance_color(i, Color(Color.WHITE.darkened(rng.randf() * 0.3), 1.0))
-		var mi := MultiMeshInstance3D.new()
-		mi.multimesh = mm
-		n.add_child(mi)
+	Scatter.arena_ring(n, th, 22.0, 24, th.hash() & 0xffff)
+	Scatter.arena_ring(n, th, 33.0, 34, (th.hash() >> 8) & 0xffff)
 	# grass tufts scattered inside the arena
 	var tuft := Terrain3D._proto("tuft:" + th, th)
+	var grassy := float(Scatter.eco(th).grass) > 0.0 and str(look.get("tuft", "grass")) in ["grass", "deadgrass", "dunegrass", "snow", "moss", "flowers", "reed"]
 	var tm := MultiMesh.new()
 	tm.transform_format = MultiMesh.TRANSFORM_3D
 	tm.use_colors = true
-	tm.mesh = tuft
-	tm.instance_count = 260
-	for i in 260:
+	tm.mesh = Scatter.grass_mesh(th, 0) if grassy else tuft
+	var n_tufts := 900 if grassy else 260
+	tm.instance_count = n_tufts
+	for i in n_tufts:
 		var a4 := rng.randf() * TAU
 		var r2 := rng.randf_range(4.0, 30.0)
 		var ts := rng.randf_range(0.8, 1.6)

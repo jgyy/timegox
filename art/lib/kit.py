@@ -379,9 +379,11 @@ class Builder:
             bones = [{b0: 1.0 - t, b1: t} if b0 != b1 else b0 for t in [i / (n - 1) for i in range(n)]]
         return self.tube(pts, radii, col, cls=cls, bone=bone, bones=bones, seg=seg, **kw)
 
-    def lathe(self, c, prof, col, cls=CLOTH, bone=None, seg=16, rot=(0, 0, 0), squash=(1.0, 1.0), col_top=None, tint=0.0, mat=MAT_TOON, cap_bottom=True, cap_top=True, smooth=True, bone_fn=None, open_angle=0.0, cols=None):
+    def lathe(self, c, prof, col, cls=CLOTH, bone=None, seg=16, rot=(0, 0, 0), squash=(1.0, 1.0), col_top=None, tint=0.0, mat=MAT_TOON, cap_bottom=True, cap_top=True, smooth=True, bone_fn=None, open_angle=0.0, cols=None, folds=None):
         """Surface of revolution around local +Y.  prof = [(radius, y), ...] bottom to top.
-        `open_angle` leaves a slit at the front (robes open at the legs)."""
+        `open_angle` leaves a slit at the front (robes open at the legs).  `folds` = (count,
+        depth, phase) ripples the radius into vertical pleats that deepen towards the bottom, so
+        cloth hangs in folds instead of as a smooth cone."""
         c = V(c)
         R = euler_g(rot)
         verts = []
@@ -397,9 +399,17 @@ class Builder:
                     a = 2 * math.pi * i / seg
                 else:
                     a = open_angle * 0.5 + (2 * math.pi - open_angle) * i / seg
-                p = Vector((math.sin(a) * r * squash[0], y, math.cos(a) * r * squash[1]))
+                rr = r
+                if folds is not None:
+                    rr = r * (1.0 + folds[1] * math.sin(folds[0] * a + folds[2]) * (1.0 - t) ** 0.7)
+                p = Vector((math.sin(a) * rr * squash[0], y, math.cos(a) * rr * squash[1]))
                 verts.append(c + R @ p)
-                vcols.append(lin(cc, cls))
+                fc = cc
+                if folds is not None:
+                    # fold valleys a little darker, ridges a little lighter
+                    k = math.sin(folds[0] * a + folds[2]) * (1.0 - t) ** 0.7
+                    fc = lighten(cc, 0.06 * k) if k > 0 else darken(cc, -0.12 * k)
+                vcols.append(lin(fc, cls))
         faces = []
         for j in range(n - 1):
             for i in range(cnt if full else cnt - 1):
@@ -469,9 +479,10 @@ class Builder:
         front = [p + nrm[k] * thickness * 0.5 for k, p in enumerate(pts)]
         back = [p - nrm[k] * thickness * 0.5 for k, p in enumerate(pts)]
         c2 = lin(col, cls + THIN)
-        self.add(front, faces, c2, cls, bone, tint, mat, True, cols=vcols, bones=vb, closed=False)
+        out = self.add(front, faces, c2, cls, bone, tint, mat, True, cols=vcols, bones=vb, closed=False)
         dark = [(x[0] * 0.75, x[1] * 0.75, x[2] * 0.75, x[3]) for x in vcols] if vcols is not None else None
-        self.add(back, [tuple(reversed(f)) for f in faces], (c2[0] * 0.75, c2[1] * 0.75, c2[2] * 0.75, c2[3]), cls, bone, tint, mat, True, cols=dark, bones=vb, closed=False)
+        out = out + self.add(back, [tuple(reversed(f)) for f in faces], (c2[0] * 0.75, c2[1] * 0.75, c2[2] * 0.75, c2[3]), cls, bone, tint, mat, True, cols=dark, bones=vb, closed=False)
+        return out
 
     def leaf(self, root, tip, width, col, side=None, cls=FOLIAGE, bone=None, tint=0.0, col_tip=None, curl=0.15, n=5, mat=MAT_TOON):
         """A curved pointed blade (leaf, feather, hair lock, flame tongue, petal)."""
@@ -501,7 +512,7 @@ class Builder:
             rows.append([p - side * widths[i], p + side * widths[i]])
             t = i / max(1, len(pts) - 1)
             cols.append(mix(col, col_end, t) if col_end is not None else rgb(col))
-        self.sheet(rows, col, cls, bone, bones, tint, mat, cols=cols)
+        return self.sheet(rows, col, cls, bone, bones, tint, mat, cols=cols)
 
     def disc(self, c, r, col, cls=CLOTH, bone=None, seg=20, rot=(0, 0, 0), tint=0.0, mat=MAT_TOON, col_rim=None, thick=0.01):
         c = V(c)
@@ -546,13 +557,16 @@ class Builder:
         return out
 
     def eye(self, c, r, iris, side=1, look=(0.0, 0.0), bone=None, slit=False, glow=False, rot_y=0.0, h=1.25, mat=MAT_PLAIN):
-        """Anime eye pressed onto a surface facing +Z: white, iris, pupil and two highlights."""
+        """Anime eye pressed onto a surface facing +Z: white, a dark limbal ring, an iris that is
+        darker under the lid and lighter at the bottom, pupil, two highlights and a lower glint."""
         c = V(c)
         ry = rot_y * side
         R = euler_g((0, ry, 0))
-        self.ellipsoid(c, (r, r * h, r * 0.45), "f8f8ff", cls=SKIN, bone=bone, rot=(0, ry, 0), seg=14, rings=8, mat=mat)
+        self.ellipsoid(c, (r, r * h, r * 0.45), "f8f8ff", cls=SKIN, bone=bone, rot=(0, ry, 0), seg=16, rings=10, mat=mat, col2="d8dcf0")
         ic = c + R @ Vector((look[0] * r, look[1] * r, r * 0.3))
-        self.ellipsoid(ic, (r * 0.7, r * 0.95 * h * 0.8, r * 0.28), iris, cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=14, rings=8, mat=MAT_GLOW if glow else mat)
+        self.ellipsoid(ic - R @ Vector((0, 0, r * 0.02)), (r * 0.76, r * h * 0.82, r * 0.27), darken(iris, 0.6), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=16, rings=8, mat=mat)
+        self.ellipsoid(ic, (r * 0.7, r * 0.95 * h * 0.8, r * 0.28), lighten(iris, 0.18), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=16, rings=10, mat=MAT_GLOW if glow else mat, col2=darken(iris, 0.45))
+        self.ellipsoid(ic + R @ Vector((0, -r * 0.35, r * 0.05)), (r * 0.42, r * 0.22, r * 0.2), lighten(iris, 0.45), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=10, rings=6, mat=mat)
         pc = ic + R @ Vector((0, 0, r * 0.12))
         if slit:
             self.ellipsoid(pc, (r * 0.14, r * 0.7, r * 0.2), "100810", cls=SKIN, bone=bone, rot=(0, ry, 0), seg=10, rings=6, mat=mat)
@@ -562,6 +576,26 @@ class Builder:
         self.ellipsoid(hl, (r * 0.18, r * 0.2, r * 0.1), "ffffff", cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=8, rings=5, mat=MAT_GLOW)
         hl2 = pc + R @ Vector((-r * 0.2 * side, -r * 0.3, r * 0.1))
         self.ellipsoid(hl2, (r * 0.09, r * 0.09, r * 0.05), "ffffff", cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=6, rings=4, mat=MAT_GLOW)
+
+    def recolor(self, verts, fn, cls=CLOTH):
+        """Repaint vertices with fn(godot_pos, old_srgb_guess) -> sRGB colour (embroidery, stripes,
+        markings).  Keeps the surface class."""
+        for v in verts:
+            p = b2g(v.co)
+            col = fn(p)
+            if col is not None:
+                c = lin(col, cls)
+                # keep the vertex's own class alpha (thin sheets carry an offset the outline needs)
+                v[self.cl] = (c[0], c[1], c[2], v[self.cl][3])
+
+    def scale_where(self, pred, pivot, k):
+        """Scale every vertex for which pred(vertex weights {bone: w}) is true about `pivot`."""
+        inv = {i: n for n, i in self.gidx.items()}
+        pv = g2b(V(pivot))
+        for v in self.bm.verts:
+            w = {inv[g]: x for g, x in v[self.dl].items()}
+            if pred(w):
+                v.co = pv + (v.co - pv) * k
 
     # ---- finishing
     def bake_ao(self, samples=20, dist=0.35, strength=0.55, floor_y=None, floor_k=0.25):
