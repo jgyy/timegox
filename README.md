@@ -1,70 +1,99 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Primordial Sovereign, through 22 regions, 77 bosses and ten Heavenly Tribulations.
+Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Samsara Transcendence, through 26 regions, 93 bosses and eleven Heavenly Tribulations.
 
-> **Total gameplay duration: about 5 hours 25 minutes** (5:26:07 of game time for the end-to-end bot run; seeds 7 and 99 give 5:25:23 and 5:27:36). Parts I to IV take 4:18:35; **Part V, "The Falling Sky", adds another hour** (1 hour 8 minutes): four new regions, 16 new bosses, 12 new monsters (five of them new Blender-built creature types), a new realm (Primordial Sovereign), new techniques and a new ending.
+> **Total gameplay duration: about 6 hours 33 minutes** (6:33:43 of game time for the end-to-end bot run; seeds 7 and 99 give 6:31:30 and 6:35:36). Parts I to V take 5:26:07; **Part VI, "The Turning Wheel", adds another hour** (1 hour 7 minutes): four new regions, 16 new bosses, 12 new monsters (five new Blender-built creature types), a new realm (Samsara Transcendence), new techniques, six new characters and a new ending that finally answers who Lin Feng's parents were.
 
 | | |
 |---|---|
-| ![title](docs/screenshots/01_title.png) | ![sect](docs/screenshots/world_sect.png) |
-| ![people](docs/screenshots/gallery_people.png) | ![part5](docs/screenshots/gallery_part5.png) |
-| ![dunes](docs/screenshots/world_dunes.png) | ![chaos](docs/screenshots/world_chaos.png) |
-| ![fungal](docs/screenshots/world_fungal.png) | ![hundun](docs/screenshots/battle_boss_hundun.png) |
+| ![sect](docs/screenshots/architecture_sect.png) | ![maple](docs/screenshots/vista_maple.png) |
+| ![hall](docs/screenshots/architecture_hall.png) | ![fungal](docs/screenshots/vista_fungal.png) |
+| ![portraits](docs/screenshots/portrait_heroes.png) | ![part6](docs/screenshots/gallery_part6.png) |
+| ![springs](docs/screenshots/vista_springs.png) | ![fox](docs/screenshots/battle_boss_nine_tail_fox.png) |
 
-More captures (every region, every boss and model galleries) are in [`docs/screenshots`](docs/screenshots).
+More captures (every region from the ground and from above, every boss, model galleries and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
 
 ```mermaid
 flowchart LR
-    subgraph A[Blender pipeline: art/ to assets/]
-    KIT[art/lib/kit.py<br/>Godot-space builder, skin modifier,<br/>baked AO, decimate, rigs, clips] --> PER[person.py<br/>9 characters + 2 tinted enemy shapes]
-    KIT --> CRE[creature.py<br/>10 rigged monsters]
-    KIT --> PRO[11 landmark props]
-    PER --> GLB[(32 .glb files)]
-    CRE --> GLB
-    PRO --> GLB
+    subgraph N[Natural landscapes]
+    NA[nature.gd<br/>painted leaf textures,<br/>foliage-card and grass shaders] --> FL[flora.gd<br/>43 species, grown<br/>recursively in variants]
+    RK[rocks.gd<br/>noise-displaced rocks,<br/>karst towers] --> SC
+    FL --> SC[scatter.gd<br/>distance fields, grove noise,<br/>forest edges, meadows, shores]
+    FA[fauna.gd<br/>birds, cranes, butterflies,<br/>dragonflies, fish, moths, bats]
     end
-    subgraph G[Godot graphics]
-    GLB --> AS[assets.gd<br/>toon/outline/glow materials,<br/>per-enemy tint, clip driver]
-    PF[post.gd<br/>bloom, grading, vignette,<br/>letterbox, flashes]
-    TH[4 new region looks<br/>sky nebula, moon, haze, rays,<br/>3 ground styles, cloud shadows]
-    FX[technique effects<br/>sky pillars, meteors, rings]
+    subgraph A[Architecture]
+    AR[architecture.gd<br/>halls, curved roofs, dougong,<br/>walls, archways, pagoda,<br/>bridges, dwellings, ruins]
     end
-    subgraph P[Part V: +1 hour]
-    D1[Desert of Fallen Stars] --> D2[Glowcap Vale] --> D3[Aurora Steppe] --> D4[Primordial Chaos]
+    subgraph B[Blender art]
+    PE[person.py<br/>layered hair, eyes, fingers,<br/>folds, embroidery, animal heads] --> CH[28 characters<br/>19 new]
+    CR[creature.py chain rigs] --> MO[29 monsters<br/>17 new: every shape<br/>is now Blender-built]
+    PR[21 props<br/>10 new landmarks]
     end
-    A --> Play((Game))
-    G --> Play
+    subgraph I[Image]
+    IM[4x MSAA, highlight-only glow,<br/>light fog, no grain or fringing,<br/>visible water, new sky and water]
+    end
+    subgraph P[Part VI: +1 hour]
+    D1[Maple Gorge] --> D2[Stone Forest] --> D3[Yellow Springs] --> D4[Wheel of Six Paths]
+    end
+    N --> Play((Game))
+    A --> Play
+    B --> Play
+    I --> Play
     P --> Play
 ```
 
-- **Blender Python art pipeline** (see [Art pipeline](#art-pipeline)): the hero, Yue Ling, the Elder, six NPCs, ten monster types, the humanoid and demon enemy shapes and eleven landmarks are now Blender models with skinned rigs, baked ambient occlusion and baked animation clips.
-- **Graphics code doubled**: from 4,361 to about 8,800 lines (5,154 lines of GDScript graphics modules, 3,513 lines of Blender Python and new screen effects). See [3D graphics](#3d-graphics).
-- **Part V** adds +1 hour (see below), verified by the playthrough bot; CI now requires **5 hours**.
-- **Bugs found and fixed** (see below).
+- **Natural landscapes instead of stamped copies.** Trees are grown by code from 43 species recipes, each in several seeded variants, with leaf-card canopies lit as one soft volume that glow when back-lit and move in rolling gusts. An ecology layer places them: dense tall forest inside blocked areas, young trees and shrubs at the edges, species gathering in natural stands, ferns, logs and stumps along forest borders, reeds and lotus at the water, flowers in meadows, rocks where the ground is rocky, and thick wind-blown grass. Wildlife moves through it.
+- **Architecture.** The sect's halls are rebuilt the traditional way (platform, balustrade, lions, columns with bracket sets, lattice doors, painted beams, curved double-eaved roofs), with a courtyard wall, gate archways and a pagoda. Every road that crosses water gets a stone bridge; huts, shrines, watchtowers, tents, yurts, pavilions and ruins dot the wilds; the built regions get 10 new Blender landmarks.
+- **Characters and monsters.** The character builder gained layered hair, richer eyes, fingers, cloth folds, embroidery and animal heads; 19 new characters (every NPC is now a Blender model) and 17 new monsters, so no enemy shape uses the old primitive models any more.
+- **A clearer image.** The "slightly blurry lens" look is gone. The frame had no anti-aliasing and was softened by a low-threshold bloom over everything, a soft-light glow, heavy fog with aerial perspective, film grain and chromatic aberration. Now: 4x MSAA, glow only on genuinely bright highlights, light fog, and no grain or fringing.
+- **Third-person follow camera.** The camera sits low behind Lin Feng and swings round behind him whenever he walks, so you see his back rather than his side; a held direction key keeps its heading while the camera turns. Trees, rocks, landmarks and buildings standing between the camera and the hero dissolve in an ordered dither, and Yue Ling walks at his shoulder instead of in the camera's way.
+- **Part VI** adds +1 hour (see below), verified by the playthrough bot; CI now requires **6 hours**.
+- **Graphics code grew from 8,667 to 15,036 lines** (+73%: 8,862 lines of GDScript graphics modules, 6,174 lines of Blender Python).
+- **Bugs and plot holes found and fixed** (see below), including one that hid every pond, lake and river in the game.
 
 ## 3D graphics
 
 | Area | Before | Now |
 |---|---|---|
-| Characters | procedural people merged from primitives, rigid pivots | **Blender models**: swept-tube limbs that bend smoothly at the joints, a hanfu with crossed collar, slit skirt and bell sleeves, anime eyes on a blinking eyelid bone, five hair styles plus hats, capes, armour, weapons; 13-30k triangle budgets; baked AO |
-| Animation | sine-driven pivots | 7 baked clips per character (idle, walk, sit, attack, cast, hurt, victory), 4 per monster, driven from the game clock with cross-fades |
-| Monsters | 22 procedural shapes | beast, dragon, phoenix/bird, golem, tortoise, humanoid and demon converted to Blender; **5 new shapes** for Part V (scorpion, mushroom, mammoth, moth, Hundun); one mesh per shape recoloured per enemy through a tint channel |
-| Landmarks | procedural | 11 Blender props (pine, bamboo, peach, mangrove, coral, tomb, crag, fallen star, glowcap, ice spire, chaos rock) instanced by MultiMesh, decimated to a triangle budget |
-| Sky | gradient, sun, clouds, stars, aurora | plus nebula swirls, a moon with maria, horizon haze and god rays |
-| Ground | 10 styles | plus glowing moss, permafrost with aurora sheen, nebula glass; drifting cloud shadows in every region |
-| Horizon | silhouettes | plus the four pillars that hold up the sky and giant mushrooms |
-| Weather | 12 kinds | plus sandstorm with dust banks, rising glow spores, aurora snow, rainbow chaos motes |
-| Screen | glow + filmic grade | post-processing pass: unsharp mask, mip bloom, split toning per region, vignette, grain, edge aberration, hit flashes, breakthrough ripple, cinematic letterbox in dialogue |
-| Combat | per-element hits | signature effects for the late techniques (falling sky pillars, five-colour meteor rain, cross slashes, rings of Nuwa's colours), boss intro camera sweep with a title card |
-| Ending | golden sky | the four mended pillars, Hundun asleep below, five-colour rings overhead |
+| Trees | 1-2 meshes per region, one per blocked tile | 43 procedurally grown species in 5 variants each, leaf-card canopies with spherized normals, translucency, gusting wind; per-instance hue, size, lean and yaw |
+| Placement | a landmark on every blocked tile, a tuft on every open tile | ecology: distance fields to forest edge, water and road; grove noise; forest-edge undergrowth; meadows, shore plants, logs, rock outcrops; a dwelling per neighbourhood |
+| Ground cover | one tuft mesh | curved grass blades with root-to-tip colour, dry and lush patches and gusts; ferns, flowers, lotus, spider lilies, glowshrooms, agave, kelp |
+| Rocks | one sphere-like boulder | noise-displaced icospheres: boulders, slabs, spires, scree, pebbles, limestone towers; moss, snow or sand on top |
+| Buildings | boxes with a pyramid roof | curved hip roofs with swept corners, tile ribs, ridge ornaments; bracket sets, lattice doors, platforms, lions; walls, archways, pagoda, bridges, 8 kinds of dwelling |
+| Landmarks | primitive obelisks, columns, gears | 10 new Blender landmarks (obelisk, jade pillar, column, furnace, gear, monolith, floating island, shard, stone lantern, ghost pagoda) |
+| Wildlife | none | flocks, crane formations, butterflies, dragonflies, fish that leap, moths, bats |
+| Water | flat, hidden under the ground skirt | visible; sky reflection, sun glints, waves lapping at the shore |
+| Mountains | grey six-sided cones | massifs with forested foothills, snow caps and shoulder peaks |
+| Characters | 9 Blender people | 28: layered hair and fringes, iris gradients, fingers, folds, embroidered hems and lapels, animal heads |
+| Monsters | 12 Blender shapes, 15 primitive | all 29 shapes Blender-built (serpent, crab, spider, mantis, jelly, manta, wisp, wraith, plant, slime, storm, tome, fox, koi, Ox-Head, Horse-Face, hopping corpse, ...) |
+| Image | soft, misty | 4x MSAA, highlight-only bloom, light fog, distance-scaled ink outline |
 
-| ![people](docs/screenshots/gallery_people.png) | ![npcs](docs/screenshots/gallery_npcs.png) |
+| ![landmarks](docs/screenshots/gallery_landmarks.png) | ![spirits](docs/screenshots/gallery_spirits.png) |
 |---|---|
-| ![part5](docs/screenshots/gallery_part5.png) | ![props](docs/screenshots/gallery_props.png) |
+| ![npcs6](docs/screenshots/gallery_npcs_part6.png) | ![keepers](docs/screenshots/gallery_npcs_keepers.png) |
 | ![beasts](docs/screenshots/gallery_beasts.png) | ![giants](docs/screenshots/gallery_giants.png) |
+
+```mermaid
+flowchart TD
+    G[tile grid from mapgen] --> DF[distance fields<br/>to forest, water, road]
+    DF --> WT{blocked tile}
+    DF --> FT{open tile}
+    WT -- edge --> E[shrubs, saplings,<br/>dwelling facing out]
+    WT -- interior --> I[tall trees,<br/>sometimes two]
+    WT -- built region --> L[Blender landmark]
+    FT --> GR[grass by meadow noise]
+    FT -- by forest --> FE[ferns, logs, stumps]
+    FT -- by water --> SH[reeds, lilies]
+    FT -- meadow --> FW[flowers]
+    GV[grove noise per species] --> I
+    GV --> E
+    I --> MM[(MultiMesh per chunk:<br/>variant, hue, size, lean)]
+    E --> MM
+    GR --> MM
+```
 
 ## Art pipeline
 
@@ -84,7 +113,7 @@ flowchart LR
 
 ```sh
 pip install bpy==5.2.3                        # Blender as a Python module (or use a Blender install)
-python art/build_all.py                       # rebuild all 32 assets (about 30 s)
+python art/build_all.py                       # rebuild all 78 assets (about 2.5 min)
 blender --background --python art/monsters/hundun.py   # or one asset with Blender itself
 godot --headless --path . --import            # re-import into Godot
 ```
@@ -113,25 +142,25 @@ Other terminal commands:
 ```sh
 godot --headless --path . --script tests/run_tests.gd           # data-integrity and 3D-asset tests
 godot --headless --path . --script tests/manual_input_test.gd   # real keyboard-event smoke test
-godot --headless --fixed-fps 30 --path . -- --bot --min-time=10800   # bot plays the whole game, prints play time
+godot --headless --fixed-fps 30 --path . -- --bot --min-time=21600   # bot plays the whole game, prints play time
 godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-fps for real time) watch the bot
 ```
 
 | Key | Action |
 |---|---|
-| Arrows / WASD | move (relative to the camera), navigate menus |
-| Q / E | rotate the camera |
+| Arrows / WASD | move (relative to the camera; a held key keeps its direction while the camera turns), navigate menus |
+| Q / E | rotate the camera (it swings back behind Lin Feng as soon as he walks) |
 | Enter / Z / Space | confirm, interact, advance dialogue |
 | Esc / X | menu (Meditate, Breakthrough, Items), cancel |
 
-Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes about five and a half hours.
+Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes about six and a half hours.
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 31 stages across eleven realms (up to Primordial Sovereign); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 34 stages across twelve realms (up to Samsara Transcendence); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Twenty-two regions**, each with a travel gate, elites, bosses and a hunt objective. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV (new)**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V (new)**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos.
-- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, **Sky-Mending Sword**, **Five-Colour Stone Rain** and **Pillar of Heaven Strike**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, **Five-Colour Thread** and **Nuwa's Mending**.
+- **Twenty-six regions**, each with a travel gate, elites, bosses and a hunt objective. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI (new)**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths.
+- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, **Six Paths Wheel Slash**, **Ten Thousand Lantern Rain** and **Samsara Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, **Spirit Lantern Ward** and **Lotus of Rebirth**.
 - **Economy**: spirit stones buy pills and tempering for your sword.
 
 ```mermaid
@@ -170,7 +199,14 @@ flowchart LR
     Fungal --> Aurora[Aurora Steppe<br/>Xuan Wu, Black Tortoise]
     Aurora --> Chaos[Primordial Chaos<br/>Hundun, the Faceless]
     end
-    Chaos ==> End((Primordial Sovereign))
+    subgraph P6[Part VI: about 1h07m]
+    Chaos ==>|Primordial Sovereign, the dead stop moving on| Sect5[Sect: the queue at the gate]
+    Sect5 -->|south-west funeral road| Maple[Maple Gorge<br/>Ox-Head]
+    Maple --> Karst[Stone Forest<br/>Horse-Face]
+    Karst --> Springs[Yellow Springs<br/>The Thousand Unforgotten]
+    Springs --> Wheel[Wheel of the Six Paths<br/>King Yama]
+    end
+    Wheel ==> End((Samsara Transcendence))
 ```
 
 ```mermaid
@@ -227,7 +263,51 @@ Lin Feng keeps his word and sweeps the steps, until stars start falling at noon.
 
 New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth, lantern moth and Hundun (four wings, six legs, no face).
 
+## Part VI: The Turning Wheel
+
+The sky holds, but on the night of the Ghost Festival the lanterns on the lotus pond gather at the sect's south-west gate, and the dead stand among them in a queue that no longer moves. The Heavenly Court did not only prop up the sky with stolen years; it also turned the Wheel of Rebirth, letting souls back up only when the Ledger allowed. With the Court gone the Wheel has stopped, and the overflow of the dead is walking back up the old funeral road. The Elder finally tells Lin Feng where he found him: under a maple in that gorge, beside two nameless graves.
+
+| Region | Levels | Story beat | Final boss |
+|---|---|---|---|
+| Maple Gorge of Returning Souls | 30 | A lantern monk, lost soul lanterns, and the nameless graves | Ox-Head, Runner of the Ten Courts |
+| Stone Forest of the Nine Bends | 30-31 | A cormorant fisher dives for dropped memories; one is a lullaby Lin Feng thought he invented | Horse-Face, Runner of the Ten Courts |
+| Yellow Springs of Red Lilies | 31 | Meng Po brews a gentler soup that lets each soul keep one thing; Lin Feng meets his parents | The Thousand Unforgotten |
+| Wheel of the Six Paths | 31-32 | Judge Cui mends the spokes; King Yama stopped the Wheel to spare souls a cruel world | King Yama, Lord of the Wheel |
+| *Samsara Transcendence tribulation and new ending* | | | |
+
+```mermaid
+sequenceDiagram
+    participant E as Elder Qing Xuan
+    participant L as Lin Feng
+    participant M as Meng Po
+    participant P as Lin Shan and Su Wan
+    participant Y as King Yama
+    E->>L: I found you in the Maple Gorge, beside two graves
+    L->>M: Herbs of Forgetting for a gentler soup
+    M->>P: Drink, and keep one thing
+    P->>L: You have his nose. Walk with us to the Wheel
+    L->>Y: The world above is kind now
+    P->>Y: He swept the steps for three years and never stopped being kind
+    Y-->>L: The Wheel turns
+    L->>L: Turns it gladly: Samsara Transcendence
+```
+
+New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, Horse-Face and the hopping corpse (jiangshi). New characters: Lantern Monk Jing Kong, Cormorant Fisher Old Yu, Meng Po, Judge Cui Jue, and Lin Feng's parents Lin Shan and Su Wan. New region looks: autumn leaf-litter ground and falling maple leaves, limestone towers above the river, fields of spider lilies under a golden spring, and the blue ghost-fire flagstones of the Ten Courts, with the Naihe Bridge and the great Wheel on the horizon.
+
 ## Bugs found and fixed
+
+| Bug | Fix |
+|---|---|
+| **Every pond, lake and river was invisible.** The far-ground "skirt" that extends the land to the horizon also lay flat across the whole map at y = -0.05, above the water surface (-0.12), covering it with a sheet of grass | Inside the map the skirt now drops below the deepest pond bed |
+| **The image looked misty and slightly blurred**: no anti-aliasing; a bloom with a 0.62 threshold added a blurred copy of most of the frame; a soft-light glow; heavy fog with aerial perspective; film grain and chromatic aberration | 4x MSAA; bloom and glow only on bright highlights; fog at 30% density without aerial perspective; grain and fringing removed |
+| The bot could **walk back and forth forever** between two tiles when two monster groups were about equally far away (the "nearest" target swapped with every step); the 45-minute stuck detector would have failed CI | The current target is kept unless another is clearly closer |
+| Large trees beside the road could **hide the hero** from the chase camera | Foliage within a few metres of the camera dissolves in a dither pattern |
+| Rotated boxes in the mesh builder are scaled along world axes, so rotated walls stretched off the map | Architecture uses axis-aligned extents (documented in `architecture.gd`) |
+| The toon ink outline had a fixed model-space width: **thick in close-ups**, thin far away | Outline width scales with view depth |
+| `ribbon`/`sheet` in the Blender kit returned nothing, and `recolor` erased the outline-skip flag of thin sheets | Both return their vertices; recolouring keeps the surface flag |
+
+### Bugs fixed in the Part V release
+
 
 | Bug | Fix |
 |---|---|
@@ -242,7 +322,7 @@ New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth
 | Starting a **second game** from the title kept the previous run's toasts and NPC chat rotation | Reset in `new_game()` |
 | A script error made `tests/run_tests.gd` **hang until CI's 40-minute timeout** instead of failing | A watchdog fails the run on the first frame; the smoke test has a frame limit |
 
-### Bugs fixed in the previous release
+### Bugs fixed in earlier releases
 
 | Bug | Fix |
 |---|---|
@@ -254,7 +334,17 @@ New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth
 | The **Jade Mantis Matriarch** was drawn as a wolf and the **Eon Tortoise** as a crab | New mantis and tortoise models |
 | The bot's default `--max-time` (4 h) would have cut off a longer game | Raised to 6 h |
 
-## Narrative plot holes found and fixed (previous release)
+## Narrative plot holes found and fixed
+
+| Plot hole | Fix |
+|---|---|
+| Lin Feng is "an orphaned sect sweeper", but **his parents were never mentioned again** in five parts | Part VI: the Elder found him as a baby beside two nameless graves; his parents, Lin Shan and Su Wan, hid him from Xu Mo's hunters, refused Meng Po's soup for sixteen years to wait for him, and walk on to rebirth in the finale |
+| If the Elder found him as a baby, why has he only **swept the steps for three years**? | The Elder left him with the village midwife below the mountain, where no hunter would look for a bearer; he climbed the steps at thirteen |
+| Yue Ling "woke beside a lotus pond **three winters ago**", the same winter Lin Feng arrived, with no reason given | The Seal woke her when the bearer came up the mountain |
+| The Court's harvest held up the sky (Part V), but **death and rebirth**, which every soul passes through, were never addressed | Part VI: the Court also turned the Wheel of Rebirth; with the Ledger closed it stopped |
+
+### Plot holes fixed in earlier releases
+
 
 | Plot hole | Fix |
 |---|---|
@@ -285,16 +375,21 @@ flowchart TD
         T[title / ending / meditate<br/>3D scenes]
         M[menu / shop / dialogue<br/>2D overlays]
     end
-    W --> TER[terrain3d.gd<br/>height field, ground and water shaders,<br/>landmarks, tufts, horizon, buildings]
+    W --> TER[terrain3d.gd<br/>height field, ground and water shaders,<br/>horizon, bridges]
+    TER --> SC[scatter.gd<br/>ecology placement]
+    SC --> FL[flora.gd + nature.gd<br/>grown plants, leaf cards, grass]
+    SC --> RK[rocks.gd]
+    TER --> ARC[architecture.gd<br/>halls, walls, dwellings]
+    TER --> FA[fauna.gd<br/>wildlife]
     W --> MOD[models.gd<br/>procedural people and monsters,<br/>action poses]
-    MOD --> AS[assets.gd<br/>Blender GLBs: 9 people,<br/>12 monsters, 11 props]
+    MOD --> AS[assets.gd<br/>Blender GLBs: 28 people,<br/>29 monsters, 21 props]
     B --> MOD
     B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
     TER --> MB[mb.gd<br/>primitives, limbs, lathes, ribbons<br/>toon + outline + aura shaders]
     MOD --> MB
     FX --> MB
-    TER --> LK[(look.gd<br/>22 region looks, sky shader)]
+    TER --> LK[(look.gd<br/>26 region looks, sky shader)]
     TER --> AS
     W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap]
     B --> UI
@@ -310,6 +405,8 @@ Regenerate screenshots (needs a GL context; use `xvfb-run` on a server):
 godot --path . --fixed-fps 30 -- --tour=docs/screenshots              # everything
 godot --path . --fixed-fps 30 -- --tour=out --areas=mirror,grave --no-extras   # some regions
 godot --path . --fixed-fps 30 -- --tour=out --areas=garden --no-extras --gallery  # one region + model galleries
+godot --path . --fixed-fps 30 -- --tour=out --areas=maple --no-extras --world-only --vista  # ground and aerial views
+godot --path . --fixed-fps 30 -- --tour=out --areas=none --no-extras --portraits  # character close-ups
 ```
 
 ## The playthrough bot
@@ -324,27 +421,28 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs; seeds 7 and 99 give 5:25:23 and 5:27:36). Parts I to IV take 4:18:35, so Part V adds about **1 hour 8 minutes**:
+Latest result (seed 1234, identical across runs; seeds 7 and 99 give 6:31:30 and 6:35:36). Parts I to V take 5:26:07, so Part VI adds about **1 hour 7 minutes**:
 
 ```
-game play time  : 5:26:07 (19568 s)
-wall clock      : ~6 min (headless)
-final realm     : Early Primordial Sovereign
-battles / kills : 601 / 1120   deaths: 0
-time by screen  : battle 9023 s, world 3001 s, meditate 5128 s, dialogue 2314 s
-time by area    : bamboo 870, marsh 656, frost 961, thunder 608, palace 565, sect 708,
-                  dragon 624, volcano 1034, void 707, celestial 1447,
-                  mirror 572, grave 1001, time 711, origin 1248,
-                  cloudsea 799, court 839, forge 889, garden 1398,
-                  dunes 840, fungal 776, aurora 857, chaos 1489
-result          : PASS (needs >= 18000 s)
+game play time  : 6:33:43 (23623 s)
+wall clock      : ~7 min (headless)
+final realm     : Early Samsara Transcendence
+battles / kills : 734 / 1376   deaths: 0
+time by screen  : battle 10607 s, world 3597 s, meditate 6166 s, dialogue 3130 s
+time by area    : bamboo 870, marsh 656, frost 961, thunder 608, palace 565, sect 829,
+                  dragon 624, volcano 1034, void 727, celestial 1451,
+                  mirror 566, grave 989, time 708, origin 1235,
+                  cloudsea 812, court 825, forge 909, garden 1371,
+                  dunes 826, fungal 803, aurora 867, chaos 1491,
+                  maple 957, karst 970, springs 921, wheel 1083
+result          : PASS (needs >= 21600 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 18000), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 21600), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, portal symmetry, map reachability and determinism, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than five hours of game time**. A second job installs Blender as a Python module and rebuilds every asset in `art/` from its script. The bot report is uploaded as an artifact and shown in the job summary.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, portal symmetry, map reachability and determinism, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than six hours of game time**. A second job installs Blender as a Python module and rebuilds every asset in `art/` from its script. The bot report is uploaded as an artifact and shown in the job summary.
 
 ```mermaid
 flowchart LR
@@ -352,7 +450,7 @@ flowchart LR
     DL --> IMP[Import project]
     IMP --> T[Data-integrity tests]
     T --> B[Bot plays whole game<br/>--fixed-fps 30]
-    B --> G{completed and<br/>game time >= 5h?}
+    B --> G{completed and<br/>game time >= 6h?}
     PR --> ART[pip install bpy<br/>art/build_all.py]
     G -- yes --> OK[Pass + report artifact]
     G -- no --> FAIL[Fail]
@@ -369,6 +467,12 @@ scripts/look.gd      per-region look (sky, fog, light, weather)
 scripts/fx3d.gd      weather, combat particles and technique effects
 scripts/assets.gd    loader for the Blender assets (materials, tint, animation clips)
 scripts/post.gd      screen-space post-processing pass
+scripts/nature.gd    painted leaf textures, foliage-card and grass shaders
+scripts/flora.gd     procedural plant species grown in variants
+scripts/scatter.gd   ecology: where every plant, rock and dwelling goes
+scripts/rocks.gd     procedural rocks and limestone towers
+scripts/fauna.gd     ambient wildlife
+scripts/architecture.gd  halls, roofs, walls, archways, bridges, dwellings
 art/lib/kit.py       Blender (bpy) toolkit: geometry, skinning, AO, rigs, clips, export
 art/lib/person.py    character builder shared by every person asset
 art/characters, art/monsters, art/props   one Blender script per asset

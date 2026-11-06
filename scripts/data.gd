@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 30
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign"]
+const MAX_LEVEL := 33
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 320000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -39,6 +39,10 @@ const SKILLS := {
 	"skymend": {"n": "Sky-Mending Sword", "cost": 190, "mult": 15.5, "elem": "earth", "tgt": "one", "lv": 27, "who": 0},
 	"fivecolour": {"n": "Five-Colour Stone Rain", "cost": 170, "mult": 4.3, "elem": "wood", "tgt": "all", "lv": 28, "who": 0},
 	"pillar": {"n": "Pillar of Heaven Strike", "cost": 210, "mult": 17.5, "elem": "thunder", "tgt": "one", "lv": 29, "who": 0, "after": "s_au_tortoise"},
+	# ---- Part VI
+	"wheelcut": {"n": "Six Paths Wheel Slash", "cost": 230, "mult": 19.5, "elem": "dark", "tgt": "one", "lv": 30, "who": 0},
+	"lanternrain": {"n": "Ten Thousand Lantern Rain", "cost": 200, "mult": 5.0, "elem": "fire", "tgt": "all", "lv": 31, "who": 0},
+	"samsara": {"n": "Samsara Sword", "cost": 260, "mult": 22.5, "elem": "thunder", "tgt": "one", "lv": 32, "who": 0, "after": "s_sp_unforgotten"},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
@@ -46,6 +50,8 @@ const SKILLS := {
 	"dawn": {"n": "Dawn Lotus", "cost": 60, "heal": 0.7, "elem": "water", "tgt": "allies", "lv": 20, "who": 1},
 	"seal_bloom": {"n": "Seal Bloom", "cost": 85, "heal": 0.85, "elem": "water", "tgt": "allies", "lv": 26, "who": 1},
 	"mending": {"n": "Nuwa's Mending", "cost": 110, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 28, "who": 1},
+	"lantern_ward": {"n": "Spirit Lantern Ward", "cost": 75, "mult": 3.9, "elem": "fire", "tgt": "all", "lv": 30, "who": 1},
+	"rebirth": {"n": "Lotus of Rebirth", "cost": 95, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 31, "who": 1},
 	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
@@ -225,6 +231,36 @@ const ENEMIES := {
 	"pangu_shadow": {"n": "Shadow of Pangu", "elem": "earth", "weak": "wood", "col": Color("6a5040"), "shape": "demon", "boss": true},
 	"ancestor_took": {"n": "The Ancestor Who Took", "elem": "dark", "weak": "thunder", "col": Color("402050"), "shape": "humanoid", "boss": true},
 	"hundun": {"n": "Hundun, the Faceless Chaos", "elem": "dark", "weak": "thunder", "col": Color("e05030"), "shape": "hundun", "boss": true},
+	# ---- Part VI monsters
+	"maple_fox": {"n": "Maple Fox Spirit", "elem": "fire", "weak": "water", "col": Color("e8783a"), "shape": "fox"},
+	"lost_lantern": {"n": "Lost Soul Lantern", "elem": "dark", "weak": "thunder", "col": Color("ffc860"), "shape": "wisp"},
+	"mossback_boar": {"n": "Mossback Boar", "elem": "earth", "weak": "wood", "col": Color("7a6a4a"), "shape": "beast"},
+	"river_carp": {"n": "Nine-Bend Carp", "elem": "water", "weak": "thunder", "col": Color("ff9050"), "shape": "carp"},
+	"stone_macaque": {"n": "Stone Macaque", "elem": "earth", "weak": "wood", "col": Color("a8a090"), "shape": "beast"},
+	"mist_heron": {"n": "Mist Heron", "elem": "wood", "weak": "fire", "col": Color("d8e0e8"), "shape": "bird"},
+	"hopping_corpse": {"n": "Hopping Corpse", "elem": "dark", "weak": "fire", "col": Color("5a7a6a"), "shape": "jiangshi"},
+	"hungry_ghost": {"n": "Hungry Ghost", "elem": "dark", "weak": "thunder", "col": Color("8a9ab0"), "shape": "wraith"},
+	"lily_moth": {"n": "Spider-Lily Moth", "elem": "fire", "weak": "water", "col": Color("e83a3a"), "shape": "moth"},
+	"ghost_clerk": {"n": "Clerk of the Dead", "elem": "dark", "weak": "fire", "col": Color("3a4a6a"), "shape": "humanoid"},
+	"pool_crab": {"n": "Blood-Pool Crab", "elem": "water", "weak": "thunder", "col": Color("a02a2a"), "shape": "crab"},
+	"court_hound": {"n": "Hound of the Ten Courts", "elem": "fire", "weak": "water", "col": Color("4a3040"), "shape": "fox"},
+	# ---- Part VI bosses
+	"nine_tail_fox": {"n": "Nine-Tailed Fox of the Gorge", "elem": "fire", "weak": "water", "col": Color("ff6a30"), "shape": "fox", "boss": true},
+	"waterfall_koi": {"n": "Koi King of the Hanging Falls", "elem": "water", "weak": "thunder", "col": Color("ffb060"), "shape": "carp", "boss": true},
+	"willow_widow": {"n": "The Willow Widow", "elem": "wood", "weak": "fire", "col": Color("8ab0a0"), "shape": "wraith", "boss": true},
+	"ox_head": {"n": "Ox-Head, Runner of the Ten Courts", "elem": "earth", "weak": "wood", "col": Color("6a3a2a"), "shape": "oxhead", "boss": true},
+	"cormorant_king": {"n": "Cormorant Tyrant", "elem": "thunder", "weak": "earth", "col": Color("2a2a30"), "shape": "bird", "boss": true},
+	"karst_jiao": {"n": "Jiao of the Nine Bends", "elem": "water", "weak": "thunder", "col": Color("4a9a8a"), "shape": "dragon", "boss": true},
+	"stone_sentinel": {"n": "Sentinel of the Stone Forest", "elem": "earth", "weak": "wood", "col": Color("b0aca0"), "shape": "golem", "boss": true},
+	"horse_face": {"n": "Horse-Face, Runner of the Ten Courts", "elem": "fire", "weak": "water", "col": Color("8a4a3a"), "shape": "horseface", "boss": true},
+	"corpse_patriarch": {"n": "Corpse Patriarch Jiang", "elem": "dark", "weak": "fire", "col": Color("3a5a4a"), "shape": "jiangshi", "boss": true},
+	"bridge_serpent": {"n": "Serpent Beneath the Naihe Bridge", "elem": "dark", "weak": "thunder", "col": Color("c04040"), "shape": "serpent", "boss": true},
+	"lily_empress": {"n": "Empress of the Red Lilies", "elem": "wood", "weak": "fire", "col": Color("e02a2a"), "shape": "plant", "boss": true},
+	"the_unforgotten": {"n": "The Thousand Unforgotten", "elem": "dark", "weak": "thunder", "col": Color("c0c8e0"), "shape": "wraith", "boss": true},
+	"karma_mirror": {"n": "Mirror of Karma", "elem": "thunder", "weak": "earth", "col": Color("c8b880"), "shape": "golem", "boss": true},
+	"burning_judge": {"n": "Judge of the Burning Court", "elem": "fire", "weak": "water", "col": Color("c03020"), "shape": "demon", "boss": true},
+	"wheel_guardian": {"n": "Guardian of the Six Paths", "elem": "earth", "weak": "wood", "col": Color("6a6a7a"), "shape": "tortoise", "boss": true},
+	"king_yama": {"n": "King Yama, Lord of the Wheel", "elem": "dark", "weak": "thunder", "col": Color("2a2a4a"), "shape": "humanoid", "boss": true},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -280,6 +316,7 @@ const AREAS := {
 			{"to": "mirror", "pos": Vector2i(20, 24), "dest": Vector2i(4, 28), "open": "s_p3_home"},
 			{"to": "cloudsea", "pos": Vector2i(1, 13), "dest": Vector2i(4, 28), "open": "s_p4_home"},
 			{"to": "dunes", "pos": Vector2i(38, 22), "dest": Vector2i(4, 28), "open": "s_p5_home"},
+			{"to": "maple", "pos": Vector2i(1, 22), "dest": Vector2i(4, 28), "open": "s_p6_home"},
 		],
 		"npcs": [
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 5), "col": Color("e8e8ff")},
@@ -679,9 +716,77 @@ const AREAS := {
 		],
 		"pickup_vis": "s_ch_collect",
 	},
+	# ---- Part VI: The Turning Wheel
+	"maple": {
+		"n": "Maple Gorge of Returning Souls", "w": 96, "h": 58, "seed": 231, "theme": "maple", "enemies": 20,
+		"pool": [["maple_fox", 30, 30], ["lost_lantern", 30, 30], ["mossback_boar", 30, 30]],
+		"portals": [
+			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(3, 22), "open": ""},
+			{"to": "karst", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_mp_ox"},
+		],
+		"npcs": [{"id": "lantern_monk", "n": "Lantern Monk Jing Kong", "pos": Vector2i(10, 26), "col": Color("e8c070"), "vis": ["s_mp_intro", ""]}],
+		"bosses": [
+			{"id": "nine_tail_fox", "pos": Vector2i(30, 40), "lv": 30, "req": 30},
+			{"id": "waterfall_koi", "pos": Vector2i(46, 16), "lv": 30, "req": 30},
+			{"id": "willow_widow", "pos": Vector2i(60, 40), "lv": 30, "req": 30},
+			{"id": "ox_head", "pos": Vector2i(86, 28), "lv": 30, "req": 30},
+		],
+		"pickups": [{"id": "slant1", "item": "soul_lantern", "pos": Vector2i(22, 12)}, {"id": "slant2", "item": "soul_lantern", "pos": Vector2i(40, 46)}, {"id": "slant3", "item": "soul_lantern", "pos": Vector2i(64, 30)}, {"id": "slant4", "item": "soul_lantern", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_mp_collect",
+	},
+	"karst": {
+		"n": "Stone Forest of the Nine Bends", "w": 96, "h": 58, "seed": 241, "theme": "karst", "enemies": 20,
+		"pool": [["river_carp", 30, 31], ["stone_macaque", 30, 31], ["mist_heron", 30, 31]],
+		"portals": [
+			{"to": "maple", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "springs", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_kr_horse"},
+		],
+		"npcs": [{"id": "fisher", "n": "Cormorant Fisher Old Yu", "pos": Vector2i(10, 26), "col": Color("a0b0a0"), "vis": ["s_kr_intro", ""]}],
+		"bosses": [
+			{"id": "cormorant_king", "pos": Vector2i(30, 40), "lv": 30, "req": 30},
+			{"id": "karst_jiao", "pos": Vector2i(46, 16), "lv": 31, "req": 31},
+			{"id": "stone_sentinel", "pos": Vector2i(60, 40), "lv": 31, "req": 31},
+			{"id": "horse_face", "pos": Vector2i(86, 28), "lv": 31, "req": 31},
+		],
+		"pickups": [{"id": "mpearl1", "item": "memory_pearl", "pos": Vector2i(22, 12)}, {"id": "mpearl2", "item": "memory_pearl", "pos": Vector2i(40, 46)}, {"id": "mpearl3", "item": "memory_pearl", "pos": Vector2i(64, 30)}, {"id": "mpearl4", "item": "memory_pearl", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_kr_collect",
+	},
+	"springs": {
+		"n": "Yellow Springs of Red Lilies", "w": 96, "h": 58, "seed": 251, "theme": "lilies", "enemies": 20,
+		"pool": [["hopping_corpse", 31, 31], ["hungry_ghost", 31, 31], ["lily_moth", 31, 31]],
+		"portals": [
+			{"to": "karst", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "wheel", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_sp_unforgotten"},
+		],
+		"npcs": [{"id": "meng_po", "n": "Meng Po of the Naihe Bridge", "pos": Vector2i(10, 26), "col": Color("e0d0c0"), "vis": ["s_sp_intro", ""]}],
+		"bosses": [
+			{"id": "corpse_patriarch", "pos": Vector2i(30, 40), "lv": 31, "req": 31},
+			{"id": "bridge_serpent", "pos": Vector2i(46, 16), "lv": 31, "req": 31},
+			{"id": "lily_empress", "pos": Vector2i(60, 40), "lv": 31, "req": 31},
+			{"id": "the_unforgotten", "pos": Vector2i(86, 28), "lv": 31, "req": 31},
+		],
+		"pickups": [{"id": "fherb1", "item": "forget_herb", "pos": Vector2i(22, 12)}, {"id": "fherb2", "item": "forget_herb", "pos": Vector2i(40, 46)}, {"id": "fherb3", "item": "forget_herb", "pos": Vector2i(64, 30)}, {"id": "fherb4", "item": "forget_herb", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_sp_collect",
+	},
+	"wheel": {
+		"n": "Wheel of the Six Paths", "w": 96, "h": 58, "seed": 261, "theme": "diyu", "enemies": 20,
+		"pool": [["ghost_clerk", 31, 32], ["pool_crab", 31, 32], ["court_hound", 31, 32]],
+		"portals": [
+			{"to": "springs", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+		],
+		"npcs": [{"id": "judge_cui", "n": "Judge Cui Jue", "pos": Vector2i(10, 26), "col": Color("c8d0e8"), "vis": ["s_wh_intro", ""]}],
+		"bosses": [
+			{"id": "karma_mirror", "pos": Vector2i(30, 40), "lv": 32, "req": 32},
+			{"id": "burning_judge", "pos": Vector2i(46, 16), "lv": 32, "req": 32},
+			{"id": "wheel_guardian", "pos": Vector2i(60, 40), "lv": 32, "req": 32},
+			{"id": "king_yama", "pos": Vector2i(86, 28), "lv": 32, "req": 32},
+		],
+		"pickups": [{"id": "spoke1", "item": "wheel_spoke", "pos": Vector2i(22, 12)}, {"id": "spoke2", "item": "wheel_spoke", "pos": Vector2i(40, 46)}, {"id": "spoke3", "item": "wheel_spoke", "pos": Vector2i(64, 30)}, {"id": "spoke4", "item": "wheel_spoke", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_wh_collect",
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel"]
 
 ## next area to enter when travelling from `from` to `to` (breadth-first over portals)
 static func next_hop(from: String, to: String) -> String:
@@ -877,6 +982,41 @@ const STEPS := [
 	{"id": "s_ch_took", "kind": "kill", "boss": "ancestor_took", "area": "chaos", "t": "Refuse the Ancestor Who Took"},
 	{"id": "s_ch_hundun", "kind": "kill", "boss": "hundun", "area": "chaos", "t": "Give a face to Hundun, the Faceless Chaos", "stones": 7000},
 	{"id": "s_break10", "kind": "breakthrough", "to": 30, "t": "Hold up the sky by choice: become a Primordial Sovereign"},
+	# ---- Part VI: The Turning Wheel
+	{"id": "s_p6_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The dead are queueing at the gate: speak to Elder Qing Xuan", "stones": 7200},
+	{"id": "s_mp_intro", "kind": "talk", "npc": "lantern_monk", "area": "maple", "t": "Take the south-west funeral road into the Maple Gorge and find the lantern monk"},
+	{"id": "s_mp_collect", "kind": "collect", "item": "soul_lantern", "n": 4, "area": "maple", "t": "Gather 4 Soul Lanterns that drifted from the graves"},
+	{"id": "s_mp_hunt", "kind": "hunt", "area": "maple", "n": 58, "t": "Calm the restless things haunting the gorge"},
+	{"id": "s_mp_return", "kind": "talk", "npc": "lantern_monk", "area": "maple", "t": "Bring the Soul Lanterns to Monk Jing Kong"},
+	{"id": "s_mp_fox", "kind": "kill", "boss": "nine_tail_fox", "area": "maple", "t": "Outwit the Nine-Tailed Fox of the Gorge"},
+	{"id": "s_mp_koi", "kind": "kill", "boss": "waterfall_koi", "area": "maple", "t": "Climb the falls to the Koi King"},
+	{"id": "s_mp_willow", "kind": "kill", "boss": "willow_widow", "area": "maple", "t": "Free the Willow Widow from her vigil"},
+	{"id": "s_mp_ox", "kind": "kill", "boss": "ox_head", "area": "maple", "t": "Stop Ox-Head from dragging the dead back down", "stones": 7600},
+	{"id": "s_kr_intro", "kind": "talk", "npc": "fisher", "area": "karst", "t": "Follow the river into the Stone Forest and find the cormorant fisher"},
+	{"id": "s_kr_collect", "kind": "collect", "item": "memory_pearl", "n": 4, "area": "karst", "t": "Dive for 4 River Pearls of Memory"},
+	{"id": "s_kr_hunt", "kind": "hunt", "area": "karst", "n": 58, "t": "Clear the river bends of creatures drunk on memories"},
+	{"id": "s_kr_return", "kind": "talk", "npc": "fisher", "area": "karst", "t": "Bring the River Pearls to Old Yu"},
+	{"id": "s_kr_cormorant", "kind": "kill", "boss": "cormorant_king", "area": "karst", "t": "Ground the Cormorant Tyrant"},
+	{"id": "s_kr_jiao", "kind": "kill", "boss": "karst_jiao", "area": "karst", "t": "Calm the Jiao of the Nine Bends"},
+	{"id": "s_kr_sentinel", "kind": "kill", "boss": "stone_sentinel", "area": "karst", "t": "Wake the Sentinel of the Stone Forest"},
+	{"id": "s_kr_horse", "kind": "kill", "boss": "horse_face", "area": "karst", "t": "Turn back Horse-Face at the river's mouth", "stones": 8000},
+	{"id": "s_sp_intro", "kind": "talk", "npc": "meng_po", "area": "springs", "t": "Cross into the Yellow Springs and find Meng Po at the Naihe Bridge"},
+	{"id": "s_sp_collect", "kind": "collect", "item": "forget_herb", "n": 4, "area": "springs", "t": "Pick 4 Herbs of Forgetting among the red lilies"},
+	{"id": "s_sp_hunt", "kind": "hunt", "area": "springs", "n": 60, "t": "Settle the hungry dead crowding the bridge"},
+	{"id": "s_sp_return", "kind": "talk", "npc": "meng_po", "area": "springs", "t": "Bring the Herbs of Forgetting to Meng Po"},
+	{"id": "s_sp_patriarch", "kind": "kill", "boss": "corpse_patriarch", "area": "springs", "t": "Lay Corpse Patriarch Jiang to rest"},
+	{"id": "s_sp_serpent", "kind": "kill", "boss": "bridge_serpent", "area": "springs", "t": "Drive off the Serpent Beneath the Naihe Bridge"},
+	{"id": "s_sp_empress", "kind": "kill", "boss": "lily_empress", "area": "springs", "t": "Bow to the Empress of the Red Lilies"},
+	{"id": "s_sp_unforgotten", "kind": "kill", "boss": "the_unforgotten", "area": "springs", "t": "Hear out the Thousand Unforgotten", "stones": 8400},
+	{"id": "s_wh_intro", "kind": "talk", "npc": "judge_cui", "area": "wheel", "t": "Descend to the Wheel of the Six Paths and find Judge Cui"},
+	{"id": "s_wh_collect", "kind": "collect", "item": "wheel_spoke", "n": 4, "area": "wheel", "t": "Recover 4 broken Spokes of the Wheel"},
+	{"id": "s_wh_hunt", "kind": "hunt", "area": "wheel", "n": 60, "t": "Quiet the courts of the dead"},
+	{"id": "s_wh_return", "kind": "talk", "npc": "judge_cui", "area": "wheel", "t": "Bring the Spokes to Judge Cui"},
+	{"id": "s_wh_mirror", "kind": "kill", "boss": "karma_mirror", "area": "wheel", "t": "Look into the Mirror of Karma"},
+	{"id": "s_wh_judge", "kind": "kill", "boss": "burning_judge", "area": "wheel", "t": "Overturn the Judge of the Burning Court"},
+	{"id": "s_wh_guardian", "kind": "kill", "boss": "wheel_guardian", "area": "wheel", "t": "Pass the Guardian of the Six Paths"},
+	{"id": "s_wh_yama", "kind": "kill", "boss": "king_yama", "area": "wheel", "t": "Ask King Yama why the Wheel stopped", "stones": 9000},
+	{"id": "s_break11", "kind": "breakthrough", "to": 33, "t": "Turn the Wheel with your own hands: transcend samsara"},
 ]
 
 static func step_index(id: String) -> int:
@@ -909,13 +1049,18 @@ const ITEMS := {
 	"glowcap": {"n": "Ember Glowcap", "desc": "Quest item"},
 	"aurora_shard": {"n": "Aurora Shard", "desc": "Quest item"},
 	"five_stone": {"n": "Five-Coloured Stone", "desc": "Quest item"},
+	"soul_lantern": {"n": "Soul Lantern", "desc": "Quest item"},
+	"memory_pearl": {"n": "River Pearl of Memory", "desc": "Quest item"},
+	"forget_herb": {"n": "Herb of Forgetting", "desc": "Quest item"},
+	"wheel_spoke": {"n": "Spoke of the Wheel", "desc": "Quest item"},
+	"bell": {"n": "Ox-Head's Iron Bell", "desc": "It once rang every soul down the funeral road"},
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
 	"brush": {"n": "Registrar's Broken Brush", "desc": "The brush that wrote the Ledger, snapped in two"},
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush"}
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -942,6 +1087,10 @@ const CHAT := {
 	"spore_witch": ["Do not breathe too deeply, little immortal. The vale dreams through its spores.", "Everything that rots feeds something that glows."],
 	"steppe_shaman": ["The lights are the sky's breath. Lately it is breathing too fast.", "Walk where the herds walk. They know which ice will hold."],
 	"nuwa_echo": ["I am only what is left of a promise. Be kinder to it than I was.", "Before the world there was no up and no down. Do not let the sky forget which is which."],
+	"lantern_monk": ["A lantern is only a question: where are you going? The dead have forgotten the answer.", "Walk softly in the gorge. Every maple here was planted over someone."],
+	"fisher": ["My birds fish for memories now. The river is thick with them, since the Wheel stopped.", "Nine bends, and every one of them remembers a different drowning. Mind your footing."],
+	"meng_po": ["Soup? No? Wise. Not yet, little Sovereign. Not yet.", "Forgetting is not the cruel part. Being made to forget by someone who profits from it, that is the cruel part."],
+	"judge_cui": ["Every soul in the six paths has a page. I wrote most of them. I am trying to write them kindly now.", "The Wheel is not a punishment. It is a door. Doors are meant to open."],
 	"peach_keeper": ["A peach of this garden ripens once in three thousand years. Do not waste it.", "The nineteen come here in their dreams. They like the shade."],
 }
 
@@ -1697,6 +1846,206 @@ const DIALOGUE := {
 		["Yue Ling", "The Ledger is closed, the Hollow is full, and the nineteen are resting in the peach trees. What now, Dao Ancestor?"],
 		["Lin Feng", "Now? Now I think I will go home and sweep the steps. Somebody should."],
 		["Narrator", "Far below, Elder Qing Xuan watches the clouds turn gold. The Lotus Seal's chime, cracked for a thousand years, rings clear and whole, and the first true morning in ten thousand years begins."],
+	],
+	# ---- Part VI: The Turning Wheel
+	"recall4": [
+		["Narrator", "For a whole season the mended sky holds. Then comes the night of the Ghost Festival, when the disciples set paper lanterns on the lotus pond to light the dead home."],
+		["Narrator", "This year the lanterns do not drift away. They gather at the south-west gate, bobbing on the dark, as if waiting for someone to tell them where to go."],
+		["Yue Ling", "Lin Feng... there are people standing among the lanterns. Old disciples, in robes I have only seen in the memorial hall."],
+		["Elder Qing Xuan", "My own master is among them. He died forty years ago. He should have been born again long since."],
+		["Narrator", "The dead are not haunting the mountain. They are standing in a queue that no longer moves."],
+	],
+	"s_p6_home": [
+		["Elder Qing Xuan", "The Heavenly Court did not only prop up the sky with stolen years. It also turned the Wheel of Rebirth beneath the world. Every soul that went down to the Yellow Springs was weighed, taxed, and sent back up only when the Ledger allowed it."],
+		["Lin Feng", "And we closed the Ledger. So the Wheel has stopped."],
+		["Elder Qing Xuan", "Stopped, or been stopped. The dead are piling up at the Naihe Bridge, and the overflow is walking back up the old funeral road to the places where they were buried."],
+		["Elder Qing Xuan", "That road begins at our own south-west gate. It runs through the Maple Gorge, where this sect has buried its dead for a thousand years, then down the river through the Stone Forest, to the fields of red lilies and the Wheel itself."],
+		["Elder Qing Xuan", "And there is something I should have told you when you were small. I did not find you on our steps, Lin Feng. I found you in that gorge, wrapped in a sweeper's cloak, under a maple beside two fresh graves with no names on them."],
+		["Lin Feng", "...My parents."],
+		["Elder Qing Xuan", "I believe so. Xu Mo's hunters were already searching for the root's twentieth bearer. Whoever those two were, they hid you, and then they led the hunters away. I buried them where I found them."],
+		["Elder Qing Xuan", "I left you with the village midwife below the mountain, where no hunter would look for a bearer. When a boy of thirteen climbed our steps three winters ago and asked for a broom, I knew you at once. So, it seems, did the Seal: that was the winter Yue Ling woke beside the pond."],
+		["Yue Ling", "If the Wheel has stopped, then they never went on. They might still be waiting somewhere on that road."],
+		["Lin Feng", "Then I am going to walk it. If they are standing in that line, I want to see their faces once before they go."],
+		["Elder Qing Xuan", "I have unbarred the south-west gate. Take the funeral road, and find the Lantern Monk in the gorge. He has guided the dead down that road since before I was born."],
+	],
+	"s_mp_intro": [
+		["Lantern Monk Jing Kong", "Two living cultivators on the funeral road, walking the wrong way. Amitabha. You must be the boy the Elder found under the maples."],
+		["Lantern Monk Jing Kong", "Every soul that leaves this gorge carries a lantern, so it can see the road down. Since the Wheel stopped, the lanterns have been coming back up without them, lost and frightened, and the creatures of the gorge snap at them."],
+		["Lantern Monk Jing Kong", "Gather four Soul Lanterns that have drifted from the graves. Bring them to me, and I will show you how to read where they were going."],
+	],
+	"s_mp_return": [
+		["Lantern Monk Jing Kong", "Four lanterns, and none of them blown out. Hold them up, both of you. Look at the flames."],
+		["Narrator", "Every flame leans the same way: downhill, towards the river, like grass in a current."],
+		["Lantern Monk Jing Kong", "They all want to go down, and something keeps sending them back. The Fox, the Koi King and the Widow have grown fat on lost lanterns. And Ox-Head, the runner of the Ten Courts, stands at the bottom of the gorge with his iron bell."],
+		["Lantern Monk Jing Kong", "One more thing. The two nameless graves the Elder told you of are under the oldest maple, past the falls. I tend them. Their lanterns never came back up. I do not know whether that is good news."],
+	],
+	"pre:nine_tail_fox": [
+		["Narrator", "Nine tails of autumn fire fan out between the maple trunks. A fox the size of a pavilion smiles with far too many teeth."],
+		["Nine-Tailed Fox of the Gorge", "Lanterns are so sweet, little Sovereign. Each one tastes of a whole life. Do you know how hungry the gorge has been since the Court stopped feeding it?"],
+		["Yue Ling", "She is eating the way home. Do not let her charm you, Lin Feng!"],
+	],
+	"post:nine_tail_fox": [["Narrator", "The Fox's nine tails gutter out one by one, and nine stolen lantern flames float free and drift downhill, towards the river."]],
+	"pre:waterfall_koi": [
+		["Narrator", "Above the hanging falls a golden carp as long as a dragon boat hangs in the spray, swallowing every lantern that tries to tumble down."],
+		["Lin Feng", "Every koi that climbs the falls becomes a dragon. You are trying to climb it on other people's lights."],
+	],
+	"post:waterfall_koi": [["Narrator", "The Koi King slides back into the pool with a sulky flick of his tail, and the lanterns pour down the falls like a river of stars."]],
+	"pre:willow_widow": [
+		["Narrator", "Under a weeping willow a woman in grey mourning silk sits combing hair that has grown into the branches. Lanterns hang tangled in it like fruit."],
+		["The Willow Widow", "He said he would come back up the road. I am keeping the lights for him. If I let them go, he will not find his way."],
+		["Yue Ling", "If you keep them, nobody will find their way. Not even him."],
+	],
+	"post:willow_widow": [
+		["The Willow Widow", "...Then I will go down and look for him myself. Will you untangle me?"],
+		["Narrator", "The lanterns slip out of the willow one by one, and the Widow walks after them down the road, lighter with every step."],
+	],
+	"pre:ox_head": [
+		["Narrator", "At the foot of the gorge a giant with the head of an ox blocks the road, an iron bell in one fist and a chain in the other. Every time the bell rings, the dead below turn round and start back up."],
+		["Ox-Head, Runner of the Ten Courts", "Back! Back up the road! The Wheel is closed by order of the King. No soul goes down until the King says so!"],
+		["Lin Feng", "Then you are the reason the lanterns keep coming back. Put the bell down."],
+	],
+	"post:ox_head": [
+		["Ox-Head, Runner of the Ten Courts", "Hoo... you hit like a falling pillar. Fine. Take the bell. I never liked ringing it. But the King will not open the Wheel because I lost a bell."],
+		["Ox-Head, Runner of the Ten Courts", "My brother Horse-Face guards the river mouth. He is stubborner than I am. And he can count."],
+		["Narrator", "Lin Feng takes Ox-Head's iron bell. Below the gorge the river bends nine times through a forest of stone, and the lanterns float down it in a long, slow line."],
+	],
+	"s_kr_intro": [
+		["Cormorant Fisher Old Yu", "Mind the cormorants, they peck at qi. Ha. Look at that, they like you."],
+		["Cormorant Fisher Old Yu", "The Nine-Bend River runs from the gorge down to the Yellow Springs. It used to carry the dead and nothing else. Now it is thick with memories. The dead are so tired of waiting that they have started dropping them."],
+		["Cormorant Fisher Old Yu", "My birds bring them up as pearls. Dive me four River Pearls of Memory, and we will see whose they are."],
+	],
+	"s_kr_return": [
+		["Cormorant Fisher Old Yu", "Four pearls. Hold one to your ear, boy. Go on."],
+		["Narrator", "In the pearl a woman is singing a lullaby, and a man is laughing at how badly she sings it. A baby is crying. Somewhere, far off, a bell rings, and hunters are shouting."],
+		["Lin Feng", "...I know that song. I have always known it. I thought I made it up."],
+		["Cormorant Fisher Old Yu", "Then it is yours, and they dropped it here on purpose, for you to find. The river remembers who it is carrying. Follow it past the Tyrant, the Jiao and the Sentinel. Horse-Face waits where the river meets the springs."],
+	],
+	"pre:cormorant_king": [
+		["Narrator", "A black cormorant with a crown of river-reeds rises from a stone pillar, a bright ring of fishing cord tight around its throat. It has swallowed so many memories it cannot fly straight."],
+		["Yue Ling", "Someone collared it and never let it go. Loosen the ring, Lin Feng!"],
+	],
+	"post:cormorant_king": [["Narrator", "The cord snaps. The Tyrant coughs up a stream of glittering memories into the river and flies off, light and crooked and free."]],
+	"pre:karst_jiao": [
+		["Narrator", "The river coils into a whirlpool between two towers of stone, and a horned water-dragon rises in the middle of it, eyes white with confusion."],
+		["Jiao of the Nine Bends", "So many voices in the water. Whose are they? Are any of them mine?"],
+		["Lin Feng", "None of them are yours. Let them pass, and you will hear your own again."],
+	],
+	"post:karst_jiao": [["Narrator", "The Jiao sinks into the deep pool and goes quiet, listening, and the whirlpool smooths into a long, patient current."]],
+	"pre:stone_sentinel": [
+		["Narrator", "One of the limestone towers stands up. It has been waiting for ten thousand years for anyone to ask it a question."],
+		["Sentinel of the Stone Forest", "Who goes down the river while living?"],
+		["Lin Feng", "A son, looking for his parents."],
+		["Sentinel of the Stone Forest", "Then prove you can carry them. The dead are heavier than stone."],
+	],
+	"post:stone_sentinel": [["Narrator", "The Sentinel sits back down with a sound like an avalanche settling, and the river runs a little faster past it, as if a stone had been lifted off its chest."]],
+	"pre:horse_face": [
+		["Narrator", "Where the river spills into the golden water of the Yellow Springs, a giant with a horse's head stands knee-deep in the current, tallying every passing lantern on an abacus of human teeth."],
+		["Horse-Face, Runner of the Ten Courts", "Ten thousand and one, ten thousand and two... I know you. The living one with my brother's bell. The King has not opened the books for rebirth. Every soul is counted and kept."],
+		["Lin Feng", "Kept for what?"],
+		["Horse-Face, Runner of the Ten Courts", "Ask the King. I only count. Now go back, or be counted."],
+	],
+	"post:horse_face": [
+		["Horse-Face, Runner of the Ten Courts", "Ten thousand and... no. I have lost count. For the first time in ten thousand years, I have lost count. How strange. How restful."],
+		["Narrator", "Horse-Face sits down in the river and lets the lanterns float past him uncounted, out across the golden water, towards a field of red flowers and a bridge."],
+	],
+	"s_sp_intro": [
+		["Meng Po of the Naihe Bridge", "Soup, travellers? One bowl, and you forget everything: every grudge, every debt, every face. No? Ah, you are still alive. Sit anyway. The queue is very long."],
+		["Meng Po of the Naihe Bridge", "Every soul crosses my bridge, drinks my soup and goes on to the Wheel empty and clean. That was the Court's rule. Empty souls are easier to tax."],
+		["Meng Po of the Naihe Bridge", "But your Ledger gave everyone their names back, and now nobody will drink. They would rather wait forever than forget again. I do not blame them."],
+		["Meng Po of the Naihe Bridge", "Pick me four Herbs of Forgetting from among the lilies. I want to try a new recipe. A gentler one."],
+	],
+	"s_sp_return": [
+		["Meng Po of the Naihe Bridge", "Good, good. Into the pot. And now the secret: a little of your qi, both of you. Living qi. The Court never let me use any."],
+		["Narrator", "The soup turns from grey to gold. It smells of rice and rain and something half-remembered."],
+		["Meng Po of the Naihe Bridge", "This bowl lets a soul forget the pain and keep one thing. One face. One song. Whatever it loves most. The Court would have hated it."],
+		["Meng Po of the Naihe Bridge", "Two of my guests have refused every bowl for sixteen years. A man and a woman. They said they were waiting for their son to grow up. They are by the bridge. But the Patriarch, the Serpent and the Empress will not let anyone near it."],
+	],
+	"pre:corpse_patriarch": [
+		["Narrator", "A stiff old man in Qing-dynasty robes hops out of the lilies, a yellow talisman fluttering on his forehead, and a hundred hopping corpses hop after him in perfect step."],
+		["Corpse Patriarch Jiang", "Discipline! Order! The dead must stand in line! If they will not drink, they will march!"],
+		["Yue Ling", "Pull the talisman off, Lin Feng. He has been sealed into that body so long he thinks the seal is him."],
+	],
+	"post:corpse_patriarch": [["Narrator", "The talisman tears. The old Patriarch sighs, folds up like a dropped robe, and his soul walks off towards Meng Po's pot, rubbing a stiff neck."]],
+	"pre:bridge_serpent": [
+		["Narrator", "The Naihe Bridge shudders. A red serpent has wound itself around the pillars, and every time a soul steps onto the bridge it shakes them off into the golden water."],
+		["Lin Feng", "You are guarding a bridge nobody is allowed to cross. What is the point of that?"],
+	],
+	"post:bridge_serpent": [["Narrator", "The Serpent uncoils and slides away beneath the lilies, and the bridge stands still and open for the first time in sixteen years."]],
+	"pre:lily_empress": [
+		["Narrator", "The whole field of spider lilies turns to face Lin Feng at once. Their roots run down to every grave in the world, and they are all of them one flower: the Empress of the Red Lilies."],
+		["Empress of the Red Lilies", "Flowers and leaves never meet on my stems. That is the rule of the lily. The dead and the living never meet either. Why are you here, living one?"],
+		["Lin Feng", "Because the rule was written by the Court, and the Court is gone."],
+	],
+	"post:lily_empress": [["Empress of the Red Lilies", "...Then go and meet them. Just this once, the flower and the leaf. I will look away."]],
+	"pre:the_unforgotten": [
+		["Narrator", "Beside the bridge the dead have gathered into one great shape: a thousand faces in a cloak of memories, every one of them refusing to forget."],
+		["The Thousand Unforgotten", "WE WILL NOT DRINK. WE WILL NOT FORGET. THEY TOOK OUR YEARS, THEY TOOK OUR NAMES. WE WILL NOT LET THEM TAKE OUR FACES."],
+		["Yue Ling", "Nobody is taking anything any more. Lin Feng, we have to let them be heard before they can be calm."],
+	],
+	"post:the_unforgotten": [
+		["Narrator", "The great shape breaks apart into a thousand tired people, and one by one they come to Meng Po's pot and drink the golden soup, and each of them keeps one thing."],
+		["Narrator", "The last two in the line are a man in a sweeper's patched robe and a woman with a jade pin in her hair. They look at Lin Feng for a long time."],
+		["Su Wan", "...You have his nose. And my terrible singing voice, I expect."],
+		["Lin Shan", "We were told to drink and go on. We said we would wait until we knew you had grown up safe. It has been a very long queue."],
+		["Lin Feng", "I grew up. I swept the steps. I held up the sky. I... I do not know what to say to you."],
+		["Su Wan", "Then do not say anything yet. Walk with us to the Wheel. We will talk on the way."],
+		["Narrator", "Something new settles into Lin Feng's sword-hand, as patient as a parent's grip: the Samsara Sword, which cuts nothing that wants to stay and frees everything that wants to go."],
+	],
+	"s_wh_intro": [
+		["Narrator", "Below the Yellow Springs the Wheel of the Six Paths stands still in a hall without walls: a stone wheel as tall as a mountain, its six spokes cracked, its rim choked with ten thousand waiting souls."],
+		["Judge Cui Jue", "A living Sovereign, at the Wheel. I wrote in my book that this would never happen. I have been crossing out a great many things in my book lately."],
+		["Judge Cui Jue", "Four spokes of the Wheel were broken when the Court fell, and the pieces were scattered through the Ten Courts. Without them the Wheel cannot turn, even if the King allowed it."],
+		["Judge Cui Jue", "Find me the four broken Spokes. I will mend them. Whether the King lets them turn is another question."],
+	],
+	"s_wh_return": [
+		["Judge Cui Jue", "Four spokes. Hold them in place while I write. The Wheel answers to what is written about it."],
+		["Narrator", "Judge Cui writes with a brush of white ink, and the cracks in the spokes close like healing skin. The Wheel creaks, and for one moment, every waiting soul looks up."],
+		["Judge Cui Jue", "The Mirror, the Burning Judge and the Guardian will try to stop you. They are the King's last instruments. Behind them, the King is waiting. He is not cruel. That is what makes him so hard to argue with."],
+	],
+	"pre:karma_mirror": [
+		["Narrator", "A bronze mirror the size of a gate shows Lin Feng every life he has touched: the sect, the forest, the sky, the Ledger, the Wheel. In the mirror, every one of them is a debt."],
+		["Mirror of Karma", "Look at the weight of it. Every good deed binds someone to you. Every rescue is a chain."],
+		["Lin Feng", "Then let me show you how to look at it the other way round."],
+	],
+	"post:karma_mirror": [["Narrator", "The Mirror cracks straight down the middle, and in the crack the debts turn into what they always were: people who are glad to know each other."]],
+	"pre:burning_judge": [
+		["Narrator", "In the Burning Court a judge with a face of red lacquer sits on a throne of coals, sentencing the dead to burn away whatever the Court once said they owed."],
+		["Judge of the Burning Court", "A debt unpaid is a fire unlit! I burn what is owed, so that nothing is owed!"],
+		["Yue Ling", "Nobody owes anything any more. Let the fire go out."],
+	],
+	"post:burning_judge": [["Narrator", "The coals go grey. The Judge takes off his lacquer face, and underneath it he is a very old, very tired clerk who has not slept since the first dynasty."]],
+	"pre:wheel_guardian": [
+		["Narrator", "A great tortoise with the Wheel's six paths carved into its shell plants itself in front of the axle: gods, men, titans, beasts, hungry ghosts and hells."],
+		["Guardian of the Six Paths", "Which path will you send them down, living one? Who decides? The Court decided. The King decided. Will you decide now?"],
+		["Lin Feng", "No. I am only going to make sure the door opens. They decide where they go."],
+	],
+	"post:wheel_guardian": [["Narrator", "The Guardian lowers its head and steps aside, and the six paths carved on its shell begin, very faintly, to glow."]],
+	"pre:king_yama": [
+		["Narrator", "At the axle of the Wheel a king in black and gold sits with his hand on the brake, the King of the dead, Yama, who has judged every soul since the first one died."],
+		["King Yama, Lord of the Wheel", "I stopped it. Yes. Do you know what the Wheel sent them back into, for ten thousand years? A world that harvested them. Every soul I sent up was born to be taxed, tribulated and eaten. I would not do it one more time."],
+		["Lin Feng", "The Court is gone. The Ledger is closed. The sky is held up by people who chose to hold it. The world they would be born into is a kind one now."],
+		["King Yama, Lord of the Wheel", "So you say. Every cultivator who ever came down here said the world above was kind. Prove it, Sovereign. Prove to me that your world is worth being born into."],
+		["Su Wan", "He is our son. He swept the steps for three years without a single grain of qi, and he never once stopped being kind. That is the world he made. Let us go back to it."],
+	],
+	"post:king_yama": [
+		["King Yama, Lord of the Wheel", "...The mother speaks for the world better than the son does. Very well. I take my hand off the brake."],
+		["Narrator", "The Wheel of the Six Paths groans, shudders, and begins to turn. Ten thousand lanterns lift from its rim and flow upward like sparks from a fire, each soul keeping one thing it loves."],
+		["Lin Shan", "We will be born again soon, somewhere. We will not remember you. But Meng Po's soup lets us keep one thing."],
+		["Su Wan", "I am keeping your face. Look for a child who stares at you as if she has known you all her life. That will be me."],
+		["Narrator", "Lin Feng's parents step onto the turning Wheel together, holding hands, and are gone in a rush of golden light."],
+	],
+	"pre:s_break11": [
+		["Narrator", "The Wheel is turning, but it turns stiffly, like a mill that has rusted. It needs one more push, and the push must come from someone who could step off the Wheel forever and chooses to stay beside it."],
+		["King Yama, Lord of the Wheel", "Turn it, Sovereign. Not as its master. The Court tried that. Turn it as one more soul who is glad it moves."],
+		["Lin Feng", "Yue Ling. Will you push with me?"],
+		["Yue Ling", "Always. The Founder wove me so that the bearer would never have to push alone."],
+	],
+	"post:s_break11": [
+		["Narrator", "Lin Feng and Yue Ling set their hands to the rim of the Wheel and push. The last tribulation is not lightning: it is every life Lin Feng has touched, turning with him, all at once."],
+		["Narrator", "He transcends samsara, not by escaping the Wheel, but by turning it gladly. The Wheel spins freely now, and the queue at the Naihe Bridge is gone."],
+		["Judge Cui Jue", "I have written it down. 'The Wheel turns because someone wanted it to.' First true sentence in this book in ten thousand years."],
+		["Narrator", "Back on the mountain, on the first morning of spring, a woman from the village below brings her newborn daughter to the sect to be blessed. The baby looks up at Lin Feng with an old, surprised, delighted stare."],
+		["Lin Feng", "...Hello again."],
 	],
 	# ---- Part V: The Falling Sky
 	"recall3": [

@@ -55,6 +55,15 @@ const THEMES := {
 		"sky_top": Color("061030"), "sky_hor": Color("3a5a98"), "fog": Color("6a88b8"), "fog_d": 0.014, "sun": Color("d0e8ff"), "sun_e": 0.8, "amb": Color("8aa8d8"), "amb_e": 0.9, "weather": "aurora_snow", "tree": "icespire", "decor": "snowrock"},
 	"chaos": {"g1": Color("4a3a6a"), "g2": Color("54447a"), "path": Color("e8d8a0"), "wall": Color("e05030"), "water": Color("ff80c0"), "bg": Color("0a0410"),
 		"sky_top": Color("1a0830"), "sky_hor": Color("c06090"), "fog": Color("6a3a7a"), "fog_d": 0.016, "sun": Color("fff0e0"), "sun_e": 0.9, "amb": Color("a080c0"), "amb_e": 0.8, "weather": "chaos", "tree": "chaosrock", "decor": "fivestone"},
+	# ---- Part VI
+	"maple": {"g1": Color("8a8a48"), "g2": Color("9a9450"), "path": Color("c8a878"), "wall": Color("d8582a"), "water": Color("3a88a8"), "bg": Color("1a0c06"),
+		"sky_top": Color("3a6ab0"), "sky_hor": Color("ffd8a8"), "fog": Color("e8b890"), "fog_d": 0.012, "sun": Color("ffe0b0"), "sun_e": 1.15, "amb": Color("c8a890"), "amb_e": 0.85, "weather": "maple_leaves", "tree": "maple", "decor": "leafpile"},
+	"karst": {"g1": Color("5a9a5a"), "g2": Color("64a864"), "path": Color("d0c8a8"), "wall": Color("a8a8a0"), "water": Color("40a8a0"), "bg": Color("061410"),
+		"sky_top": Color("4a7aa0"), "sky_hor": Color("e0ecec"), "fog": Color("c8dcdc"), "fog_d": 0.012, "sun": Color("f8f8e8"), "sun_e": 1.0, "amb": Color("a0c0c0"), "amb_e": 0.85, "weather": "river_mist", "tree": "karstpeak", "decor": "pebble"},
+	"lilies": {"g1": Color("6a6a3a"), "g2": Color("78703e"), "path": Color("d8b870"), "wall": Color("d02a20"), "water": Color("e8b840"), "bg": Color("140804"),
+		"sky_top": Color("3a1a48"), "sky_hor": Color("f0a060"), "fog": Color("c87a5a"), "fog_d": 0.018, "sun": Color("ffb878"), "sun_e": 0.95, "amb": Color("b08070"), "amb_e": 0.8, "weather": "lily_souls", "tree": "stonelantern", "decor": "spiderlily"},
+	"diyu": {"g1": Color("2a2a3a"), "g2": Color("323244"), "path": Color("7a7890"), "wall": Color("3a3a58"), "water": Color("40c0ff"), "bg": Color("04040a"),
+		"sky_top": Color("06060e"), "sky_hor": Color("2a3a5a"), "fog": Color("1a2238"), "fog_d": 0.022, "sun": Color("90b0ff"), "sun_e": 0.75, "amb": Color("6878a8"), "amb_e": 0.8, "weather": "ghostfire", "tree": "ghostpagoda", "decor": "ghostcandle"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -82,6 +91,10 @@ const EXTRA := {
 	"fungal": {"hill": 0.45, "tex": "moss", "tuft": "moss", "horizon": "mushrooms", "clouds": 0.3, "stars": 0.9, "moon": 0.8, "haze": 0.5},
 	"aurora": {"hill": 0.6, "tex": "permafrost", "tuft": "snow", "horizon": "pillars", "clouds": 0.2, "stars": 1.0, "aurora": 1.6, "moon": 1.0},
 	"chaos": {"hill": 0.5, "tex": "nebula", "tuft": "crystal", "horizon": "pillars", "clouds": 0.0, "stars": 1.0, "aurora": 0.6, "nebula": 1.0},
+	"maple": {"hill": 0.9, "tex": "leaves", "tuft": "grass", "horizon": "maples", "clouds": 0.5, "rays": 0.5, "haze": 0.4},
+	"karst": {"hill": 0.55, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.7, "haze": 0.35},
+	"lilies": {"hill": 0.35, "tex": "lilyfield", "tuft": "grass", "horizon": "bridge", "clouds": 0.4, "stars": 0.5, "moon": 0.7, "haze": 0.6, "rays": 0.4},
+	"diyu": {"hill": 0.4, "tex": "underworld", "tuft": "crystal", "horizon": "wheel", "clouds": 0.0, "stars": 0.4, "haze": 0.5},
 }
 
 const PICKUP_COLORS := {
@@ -90,6 +103,7 @@ const PICKUP_COLORS := {
 	"echo": Color("9ae8ff"), "relic": Color("d8e0f0"), "sand": Color("ffd060"), "rune": Color("ffb0f0"),
 	"feather_cloud": Color("f0f8ff"), "seal": Color("60f0b0"), "ingot": Color("ffc860"), "peach": Color("ffa0b0"),
 	"fallen_star": Color("fff4b0"), "glowcap": Color("ff9a50"), "aurora_shard": Color("70ffc8"), "five_stone": Color("ff70d0"),
+	"soul_lantern": Color("ffc860"), "memory_pearl": Color("c0f0ff"), "forget_herb": Color("e8d090"), "wheel_spoke": Color("b0b8ff"),
 }
 
 static var _anime := {}
@@ -116,7 +130,8 @@ static func theme(name: String) -> Dictionary:
 	th["sky_top"] = _pop(th.sky_top, 0.45, 0.8, 0.4, 0.82, 1.2)
 	th["sky_hor"] = _pop(th.sky_hor, 0.2, 0.55, 0.78, 0.95, 1.0)
 	th["fog"] = th.sky_hor.lerp(th.g2, 0.25)
-	th["fog_d"] = th.fog_d * 0.7
+	# clear air: fog only hints at distance instead of veiling the whole view
+	th["fog_d"] = th.fog_d * 0.3
 	th["amb"] = th.amb.lerp(Color(0.85, 0.9, 1.0), 0.35)
 	th["amb_e"] = clampf(th.amb_e, 0.5, 0.62)
 	th["sun"] = th.sun.lerp(Color(1.0, 0.93, 0.82), 0.4)
@@ -234,10 +249,22 @@ void sky() {
 		vec3 ccol = mix(hor * 0.75 + vec3(0.06), mix(vec3(1.0), sun_col, 0.35) * 1.05, lit);
 		col = mix(col, ccol, cov * smoothstep(0.0, 0.18, y) * 0.92);
 	}
+	// a high, thin layer of cirrus streaks above the cumulus, sheared by the wind
+	if (clouds > 0.0 && y > 0.05) {
+		vec2 hp = d.xz / (y + 0.05) * vec2(0.35, 1.6) + vec2(TIME * 0.02, 0.0);
+		float ci = fbm(hp + vec2(fbm(hp * 0.5) * 2.0, 0.0));
+		float cir = smoothstep(0.55, 0.85, ci) * smoothstep(0.05, 0.3, y) * clouds * 0.35;
+		col = mix(col, mix(vec3(1.0), sun_col, 0.5), cir);
+	}
+	// sunset rim light: cloud edges facing a low sun glow warm
+	if (clouds > 0.0 && y > 0.0 && sd.y < 0.35) {
+		float low = smoothstep(0.35, 0.05, sd.y);
+		col += sun_col * pow(max(sdot, 0.0), 4.0) * low * clouds * 0.25 * smoothstep(0.0, 0.2, y);
+	}
 	// low haze band hugging the horizon (desert dust, spore mist)
 	if (haze > 0.0) {
 		float hb = exp(-abs(y - 0.02) * 14.0) * (0.75 + 0.25 * fbm(d.xz * 3.0 + TIME * 0.02));
-		col = mix(col, hor * 1.05, hb * haze * 0.6);
+		col = mix(col, hor * 1.05, hb * haze * 0.3);
 	}
 	COLOR = col;
 }
@@ -278,25 +305,31 @@ static func environment(name: String, fog_scale: float = 1.0) -> Environment:
 	env.fog_enabled = true
 	env.fog_light_color = th.fog
 	env.fog_density = th.fog_d * fog_scale
-	env.fog_sky_affect = 0.25
-	env.fog_aerial_perspective = 0.35
+	env.fog_sky_affect = 0.1
+	env.fog_aerial_perspective = 0.0
+	# low valley mist: fog that thickens below a height and thins above it (river gorges, marsh)
+	if float(th.get("mist", 0.0)) > 0.0:
+		env.fog_height = 0.6
+		env.fog_height_density = float(th.mist) * fog_scale
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 1.05
 	env.tonemap_white = 6.0
+	# glow only on genuinely bright things (spells, lanterns, the sun), never as a veil over the
+	# whole frame: a high threshold, additive blend and no wide blur levels
 	env.glow_enabled = true
-	env.glow_intensity = 0.55
-	env.glow_strength = 0.9
-	env.glow_bloom = 0.04
-	env.glow_hdr_threshold = 0.95
-	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	env.glow_intensity = 0.4
+	env.glow_strength = 0.8
+	env.glow_bloom = 0.0
+	env.glow_hdr_threshold = 1.15
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
 	env.set_glow_level(0, 0.0)
-	env.set_glow_level(1, 0.6)
-	env.set_glow_level(2, 1.0)
-	env.set_glow_level(3, 0.6)
-	env.set_glow_level(4, 0.3)
+	env.set_glow_level(1, 0.5)
+	env.set_glow_level(2, 0.6)
+	env.set_glow_level(3, 0.0)
+	env.set_glow_level(4, 0.0)
 	env.adjustment_enabled = true
-	env.adjustment_saturation = 1.04
-	env.adjustment_contrast = 1.08
+	env.adjustment_saturation = 1.08
+	env.adjustment_contrast = 1.12
 	env.adjustment_brightness = 1.0
 	return env
 

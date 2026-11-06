@@ -203,6 +203,58 @@ func _init() -> void:
 	for a5 in ["cloudsea", "court", "forge", "garden"]:
 		check(Look.THEMES.has(a5) and Look.EXTRA.has(a5), "theme and terrain extras for " + a5)
 	check(Data.known_skills(0, 25).has("inkbreak") and Data.known_skills(1, 26).has("seal_bloom"), "Part IV techniques are learnable")
+	print("== part VI ==")
+	check(Data.DIALOGUE.has("recall4"), "Part VI recall dialogue exists")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "maple" and p.open == "s_p6_home"), "sect south-west gate opens after the Part VI briefing")
+	check(Data.step_index("s_break10") < Data.step_index("s_p6_home"), "Part VI starts after the Primordial Sovereign ascension")
+	for a6 in ["maple", "karst", "lilies", "diyu"]:
+		check(Look.THEMES.has(a6) and Look.EXTRA.has(a6) and Scatter.ECO.has(a6), "theme, terrain extras and ecology for " + a6)
+	check(Data.known_skills(0, 30).has("wheelcut") and Data.known_skills(1, 31).has("rebirth"), "Part VI techniques are learnable")
+	check(not Data.known_skills(0, 32, Data.step_index("s_sp_unforgotten")).has("samsara"), "Samsara Sword waits for the Thousand Unforgotten")
+	check(Data.known_skills(0, 32, Data.step_index("s_wh_intro")).has("samsara"), "Samsara Sword is learned at the Naihe Bridge")
+	check(Data.BOSS_DROPS.get("ox_head", "") == "bell", "Ox-Head drops the bell that later dialogue mentions")
+	print("== nature ==")
+	var species: Dictionary = Flora.SPECIES
+	var rock_kinds := ["boulder", "slab", "spire", "scree", "karst", "crystal", "pebbles"]
+	for th in Scatter.ECO:
+		var eco: Dictionary = Scatter.ECO[th]
+		for layer in ["canopy", "under", "ground"]:
+			for pair in eco[layer]:
+				check(species.has(pair[0]), "%s: %s species %s exists" % [th, layer, pair[0]])
+		for rk in eco.rocks:
+			check(rk in rock_kinds, "%s: rock recipe %s exists" % [th, rk])
+		check(Look.THEMES.has(th), "ecology %s belongs to a theme" % th)
+	for th2 in Look.THEMES:
+		check(Scatter.ECO.has(th2), "theme %s has an ecology" % th2)
+	# variants are genuinely different individuals, not copies
+	for sp in ["oak", "pine", "maple", "bamboo", "willow", "bush"]:
+		var m0: ArrayMesh = Flora.mesh(sp, 0)
+		var m1: ArrayMesh = Flora.mesh(sp, 1)
+		var v0: int = m0.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size()
+		var v1: int = m1.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size()
+		var a0: AABB = m0.get_aabb()
+		var a1: AABB = m1.get_aabb()
+		check(v0 != v1 or not a0.size.is_equal_approx(a1.size), "%s variants 0 and 1 differ (%d vs %d vertices)" % [sp, v0, v1])
+		check(m0.get_surface_count() >= 1 and a0.size.y > 0.2, "%s grows to a visible size (%.1f m)" % [sp, a0.size.y])
+	# rocks: faces wind outward like every other mesh (Godot front faces are clockwise)
+	var rk_mesh: ArrayMesh = Rocks.mesh("boulder", 0, "bamboo")
+	var ra: Array = rk_mesh.surface_get_arrays(0)
+	var rv: PackedVector3Array = ra[Mesh.ARRAY_VERTEX]
+	var ri: PackedInt32Array = ra[Mesh.ARRAY_INDEX]
+	var centre := rk_mesh.get_aabb().get_center()
+	var outward := 0
+	for i in range(0, ri.size(), 3):
+		var q0: Vector3 = rv[ri[i]]
+		var q1: Vector3 = rv[ri[i + 1]]
+		var q2: Vector3 = rv[ri[i + 2]]
+		if (q1 - q0).cross(q2 - q0).dot((q0 + q1 + q2) / 3.0 - centre) < 0.0:
+			outward += 1
+	check(outward > ri.size() / 3 * 0.9, "rock faces wind outward (%d of %d)" % [outward, ri.size() / 3])
+	# distance field: a 5x1 strip with one wall at the left end
+	var strip := PackedByteArray([MapGen.WALL, MapGen.FLOOR, MapGen.FLOOR, MapGen.FLOOR, MapGen.FLOOR])
+	var df := Scatter.distance_field(strip, 5, 1, [MapGen.WALL], 9)
+	check(df[0] == 0 and df[1] == 1 and df[4] == 4, "distance field counts tiles from the forest edge")
+	check(Scatter.grass_mesh("sect", 0).get_surface_count() == 1, "grass clumps build")
 	print("== battle ==")
 	var twins: Array = Data.make_foes([{"id": "bamboo_wolf", "lv": 1}, {"id": "bamboo_wolf", "lv": 1}, {"id": "bamboo_wolf", "lv": 1}])
 	var raw := [Data.make_enemy("bamboo_wolf", 1), Data.make_enemy("bamboo_wolf", 1)]

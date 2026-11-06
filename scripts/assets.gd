@@ -19,11 +19,25 @@ const MONSTERS := {
 	"golem": "monsters/golem", "tortoise": "monsters/tortoise", "scorpion": "monsters/scorpion",
 	"mushroom": "monsters/mushroom", "mammoth": "monsters/mammoth", "moth": "monsters/moth", "hundun": "monsters/hundun",
 	"humanoid": "monsters/humanoid", "demon": "monsters/demon",
+	"fox": "monsters/fox", "carp": "monsters/carp", "oxhead": "monsters/oxhead", "horseface": "monsters/horseface", "jiangshi": "monsters/jiangshi",
+	# formerly procedural-only shapes, now Blender-built
+	"serpent": "monsters/serpent", "crab": "monsters/crab", "spider": "monsters/spider", "mantis": "monsters/mantis",
+	"jelly": "monsters/jelly", "ray": "monsters/ray", "wisp": "monsters/wisp", "wraith": "monsters/wraith",
+	"plant": "monsters/plant", "blob": "monsters/blob", "storm": "monsters/storm", "tome": "monsters/tome",
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
 	"alchemist": "characters/alchemist", "smith": "characters/smith", "nomad": "characters/nomad",
 	"spore_witch": "characters/spore_witch", "steppe_shaman": "characters/steppe_shaman", "nuwa_echo": "characters/nuwa_echo",
+	# earlier NPCs, now Blender-built too
+	"sword_ghost": "characters/sword_ghost", "dragon_envoy": "characters/dragon_envoy", "fire_sage": "characters/fire_sage",
+	"void_hermit": "characters/void_hermit", "gate_keeper": "characters/gate_keeper", "lake_keeper": "characters/lake_keeper",
+	"grave_keeper": "characters/grave_keeper", "time_ferryman": "characters/time_ferryman", "origin_keeper": "characters/origin_keeper",
+	"cloud_warden": "characters/cloud_warden", "court_scribe": "characters/court_scribe", "forge_master": "characters/forge_master",
+	"peach_keeper": "characters/peach_keeper",
+	# Part VI
+	"lantern_monk": "characters/lantern_monk", "fisher": "characters/fisher", "meng_po": "characters/meng_po",
+	"judge_cui": "characters/judge_cui", "lin_shan": "characters/lin_shan", "su_wan": "characters/su_wan",
 }
 
 static var _scenes := {}
