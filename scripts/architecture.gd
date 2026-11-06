@@ -20,6 +20,10 @@ const STYLES := {
 	"hall": {"roof": "2f6a7a", "roof2": "245563", "column": "b83a2a", "wall": "efe4c8", "beam": "2a7a6a", "trim": "e8c860", "double": true},
 	"alchemist": {"roof": "3a7a4a", "roof2": "2a5a38", "column": "8a3a2a", "wall": "eae0c4", "beam": "3a6a8a", "trim": "d8b850", "double": false},
 	"smithy": {"roof": "5a5a64", "roof2": "44444c", "column": "6a3424", "wall": "d8ccb4", "beam": "8a4a2a", "trim": "c89840", "double": false},
+	"library": {"roof": "3a4a7a", "roof2": "2a3860", "column": "7a2a2a", "wall": "efe8d4", "beam": "3a5a8a", "trim": "e0c060", "double": false},
+	"house": {"roof": "5a4a3a", "roof2": "463a2e", "column": "6a4a30", "wall": "e8dcc0", "beam": "6a5a40", "trim": "b89850", "double": false},
+	"inn": {"roof": "7a3a2a", "roof2": "5a2a20", "column": "8a3020", "wall": "f0e4c8", "beam": "4a6a5a", "trim": "e0b850", "double": false},
+	"shrine": {"roof": "6a2a2a", "roof2": "4a1e1e", "column": "b83a2a", "wall": "f0e0c0", "beam": "2a6a5a", "trim": "f0c850", "double": true},
 }
 
 static func _c(hex: String) -> Color:
@@ -643,6 +647,7 @@ const SETTLE := {
 	"karst": ["stilt", "house", "shrine"], "lilies": ["shrine", "ruin", "pavilion"], "grave": ["ruin", "shrine"], "garden": ["pavilion", "house", "shrine"],
 	"cloudsea": ["shrine", "tower", "pavilion"], "court": ["ruin", "pavilion"], "celestial": ["pavilion"], "time": ["ruin"], "abyss": ["ruin"], "volcano": ["ruin", "tower"],
 	"forge": ["tower", "ruin"], "mirror": ["shrine", "stilt"], "palace": ["tower", "ruin"],
+	"village": ["house", "house", "shrine"], "tea": ["pavilion", "house"], "silk": ["house", "shrine"], "loom": ["pavilion", "ruin"],
 }
 static var _mesh_cache := {}
 
@@ -671,3 +676,309 @@ static func settlement_mesh(kind: String, variant: int, theme_name: String) -> A
 	g.add_to(m, MB.mat_glow())
 	_mesh_cache[key] = m
 	return m
+
+
+# ---------------------------------------------------------------- enterable buildings
+## A building the hero can walk into.  `r` is the whole footprint in world XZ including its ring
+## of wall tiles; the walls stand on the middle of that ring, so the inner tiles are the floor.
+## The body (platform, floor, walls with a door gap, furniture, lanterns) goes into `b`/`g`; the
+## roof goes into `roof`/`roof_g` so the world can lift it away while the hero is inside.
+## `props` are [kind, tile centre]; returns lights [[pos, colour], ...].
+static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, style: String, props: Array, seed_: int) -> Array:
+	var st: Dictionary = STYLES.get(style, STYLES.house)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var T := Terrain3D.T
+	var lights: Array = []
+	var cx := r.get_center().x
+	var cz := r.get_center().y
+	var x0 := r.position.x + T * 0.5
+	var x1 := r.end.x - T * 0.5
+	var z0 := r.position.y + T * 0.5
+	var z1 := r.end.y - T * 0.5
+	var stone := MB.tag(Color("a8a4ac"), MB.STONE)
+	var stone_d := MB.tag(Color("848088"), MB.STONE)
+	var column := MB.tag(_c(st.column), MB.WOOD)
+	var wall := MB.tag(_c(st.wall), MB.CLOTH)
+	var beam := MB.tag(_c(st.beam), MB.WOOD)
+	var trim := MB.tag(_c(st.trim), MB.METAL)
+	var plank := MB.tag(Color("9a6a42"), MB.WOOD)
+	var plank_d := MB.tag(Color("7a5034"), MB.WOOD)
+	var ph := 0.3
+	var wall_h := 2.6
+	var th := 0.32
+	# platform and plank floor (planks run along the long side)
+	b.box(Vector3(cx, ph * 0.5 - 0.15, cz), Vector3(r.size.x + 0.4, ph + 0.3, r.size.y + 0.4), stone_d)
+	b.box(Vector3(cx, ph - 0.02, cz), Vector3(x1 - x0, 0.06, z1 - z0), plank)
+	var along_x := r.size.x >= r.size.y
+	var n_pl := int((z1 - z0) / 0.5) if along_x else int((x1 - x0) / 0.5)
+	for i in n_pl:
+		if along_x:
+			b.box(Vector3(cx, ph + 0.012, z0 + (i + 0.5) * (z1 - z0) / n_pl), Vector3(x1 - x0, 0.01, 0.03), plank_d)
+		else:
+			b.box(Vector3(x0 + (i + 0.5) * (x1 - x0) / n_pl, ph + 0.012, cz), Vector3(0.03, 0.01, z1 - z0), plank_d)
+	# a rug down the middle from the door
+	var rug := MB.tag(Color("9a2a2a") if style in ["hall", "shrine", "inn"] else Color("4a5a7a"), MB.CLOTH)
+	b.box(Vector3((door.x + cx) * 0.5, ph + 0.02, (door.z + cz) * 0.5), Vector3(maxf(absf(door.x - cx), 1.2) if absf(door.x - cx) > 0.5 else 1.2, 0.01, maxf(absf(door.z - cz), 1.2) if absf(door.z - cz) > 0.5 else 1.2), rug)
+	# walls: four runs on the centre line of the wall ring, one with a doorway
+	var sides := [[Vector3(x0, 0, z0), Vector3(x1, 0, z0)], [Vector3(x0, 0, z1), Vector3(x1, 0, z1)], [Vector3(x0, 0, z0), Vector3(x0, 0, z1)], [Vector3(x1, 0, z0), Vector3(x1, 0, z1)]]
+	for sd in sides:
+		var a: Vector3 = sd[0]
+		var e: Vector3 = sd[1]
+		var horiz := absf(a.z - e.z) < 0.01
+		var on_door := (horiz and absf(door.z - a.z) < T * 0.6) or (not horiz and absf(door.x - a.x) < T * 0.6)
+		var cuts: Array = []
+		if on_door:
+			var dc := door.x if horiz else door.z
+			cuts = [[minf(a.x, e.x) if horiz else minf(a.z, e.z), dc - 0.85], [dc + 0.85, maxf(a.x, e.x) if horiz else maxf(a.z, e.z)]]
+		else:
+			cuts = [[minf(a.x, e.x) if horiz else minf(a.z, e.z), maxf(a.x, e.x) if horiz else maxf(a.z, e.z)]]
+		for c in cuts:
+			var lo: float = c[0] - th * 0.5
+			var hi: float = c[1] + th * 0.5
+			var mid := (lo + hi) * 0.5
+			var ln := hi - lo
+			var pc := Vector3(mid, 0, a.z) if horiz else Vector3(a.x, 0, mid)
+			var sz := Vector3(ln, wall_h, th) if horiz else Vector3(th, wall_h, ln)
+			b.box(pc + Vector3(0, ph + wall_h * 0.5, 0), sz, wall)
+			# stone plinth and a timber rail at waist and eave height
+			b.box(pc + Vector3(0, ph + 0.22, 0), sz * Vector3(1, 0, 1) + Vector3(0.06 if not horiz else 0.0, 0.44, 0.06 if horiz else 0.0), stone)
+			b.box(pc + Vector3(0, ph + 1.05, 0), sz * Vector3(1, 0, 1) + Vector3(0.05 if not horiz else 0.0, 0.08, 0.05 if horiz else 0.0), column)
+			b.box(pc + Vector3(0, ph + wall_h - 0.1, 0), sz * Vector3(1, 0, 1) + Vector3(0.08 if not horiz else 0.0, 0.2, 0.08 if horiz else 0.0), beam)
+			# lattice windows on longer stretches, glowing faintly from inside
+			var nwin := int(ln / 2.6)
+			for k in nwin:
+				var wpos := lo + (k + 0.5) * ln / nwin
+				var wc := Vector3(wpos, ph + 1.75, a.z) if horiz else Vector3(a.x, ph + 1.75, wpos)
+				var wsz := Vector3(0.9, 0.7, th + 0.04) if horiz else Vector3(th + 0.04, 0.7, 0.9)
+				b.box(wc, wsz + Vector3(0.1 if horiz else 0.0, 0.1, 0.0 if horiz else 0.1), column)
+				g.box(wc, wsz * Vector3(0.85 if horiz else 1.02, 0.8, 1.02 if horiz else 0.85), Color(1.0, 0.85, 0.55, 0.35))
+				for q in 3:
+					var off := (q - 1) * 0.25
+					b.box(wc + (Vector3(off, 0, 0) if horiz else Vector3(0, 0, off)), Vector3(0.04 if horiz else th + 0.06, 0.7, th + 0.06 if horiz else 0.04), column)
+		# columns at the ends of each run
+		for pnt in [a, e]:
+			b.cyl(pnt + Vector3(0, ph + wall_h * 0.5, 0), 0.2, wall_h + 0.1, column, Vector3.ZERO, 10)
+		if on_door:
+			# door frame, lintel with a name board, and two leaves swung open into the room
+			var dc2 := door.x if horiz else door.z
+			var inward := (1.0 if cz > a.z else -1.0) if horiz else (1.0 if cx > a.x else -1.0)
+			for s2: float in [-1.0, 1.0]:
+				var post := Vector3(dc2 + s2 * 0.85, 0, a.z) if horiz else Vector3(a.x, 0, dc2 + s2 * 0.85)
+				b.cyl(post + Vector3(0, ph + wall_h * 0.5, 0), 0.14, wall_h, column, Vector3.ZERO, 8)
+				var leaf_c := post + (Vector3(-s2 * 0.08, 0, inward * 0.42) if horiz else Vector3(inward * 0.42, 0, -s2 * 0.08))
+				b.box(leaf_c + Vector3(0, ph + 1.05, 0), Vector3(0.06, 2.0, 0.8) if horiz else Vector3(0.8, 2.0, 0.06), MB.tag(Color("a8342a"), MB.WOOD))
+				for q2 in 3:
+					b.ball(leaf_c + Vector3(0, ph + 0.6 + q2 * 0.45, 0) + (Vector3(0.04, 0, 0) if horiz else Vector3(0, 0, 0.04)), 0.035, trim, true)
+			var lint := Vector3(dc2, ph + wall_h - 0.35, a.z) if horiz else Vector3(a.x, ph + wall_h - 0.35, dc2)
+			b.box(lint, Vector3(1.9, 0.22, th + 0.1) if horiz else Vector3(th + 0.1, 0.22, 1.9), beam)
+			var plaque := lint + Vector3(0, 0.0, -inward * (th * 0.5 + 0.06)) if horiz else lint + Vector3(-inward * (th * 0.5 + 0.06), 0, 0)
+			b.box(plaque + Vector3(0, 0.45, 0), Vector3(1.1, 0.4, 0.05) if horiz else Vector3(0.05, 0.4, 1.1), MB.tag(Color("1a2a4a"), MB.WOOD))
+			b.box(plaque + Vector3(0, 0.45, 0), Vector3(0.9, 0.26, 0.07) if horiz else Vector3(0.07, 0.26, 0.9), trim)
+			# a threshold step and a pair of lanterns outside
+			var outside := Vector3(0, 0, -inward) if horiz else Vector3(-inward, 0, 0)
+			b.box(Vector3(door.x, ph * 0.4, door.z) + outside * 1.1, Vector3(1.8, ph * 0.8, 0.6) if horiz else Vector3(0.6, ph * 0.8, 1.8), stone)
+			for s3: float in [-1.0, 1.0]:
+				var lp := Vector3(door.x, ph + 2.1, door.z) + outside * 0.45 + (Vector3(s3 * 1.15, 0, 0) if horiz else Vector3(0, 0, s3 * 1.15))
+				_lantern(b, g, lp, trim)
+				lights.append([lp + outside * 0.4, Color(1.0, 0.6, 0.3)])
+	# ceiling beams and hanging lanterns inside (seen once the roof lifts away)
+	var top := ph + wall_h
+	var nbeam := maxi(1, int((x1 - x0) / 2.4))
+	for i in nbeam:
+		var bx := x0 + (i + 0.5) * (x1 - x0) / nbeam
+		b.box(Vector3(bx, top - 0.05, cz), Vector3(0.2, 0.22, z1 - z0), beam)
+	var nl := maxi(1, int((x1 - x0) / 4.5))
+	for i in nl:
+		var lpos := Vector3(x0 + (i + 0.5) * (x1 - x0) / nl, top - 0.75, cz)
+		b.limb(lpos + Vector3(0, 0.45, 0), lpos + Vector3(0, 0.7, 0), 0.012, 0.012, trim, 4)
+		_lantern(b, g, lpos, trim)
+		lights.append([lpos, Color(1.0, 0.72, 0.45)])
+	# furniture
+	for pr in props:
+		_furnish(b, g, str(pr[0]), pr[1] + Vector3(0, ph, 0), Rect2(x0, z0, x1 - x0, z1 - z0), st, rng, lights)
+	# ---- the roof: eave beams, bracket sets at the corners and a curved hip roof
+	var ry := top + 0.25
+	for s4: float in [-1.0, 1.0]:
+		roof.box(Vector3(cx, top + 0.08, cz + s4 * (z1 - z0) * 0.5), Vector3(x1 - x0 + 0.6, 0.3, 0.24), beam)
+		roof.box(Vector3(cx + s4 * (x1 - x0) * 0.5, top + 0.08, cz), Vector3(0.24, 0.3, z1 - z0 + 0.6), beam)
+		roof.box(Vector3(cx, top - 0.1, cz + s4 * ((z1 - z0) * 0.5 + 0.13)), Vector3(x1 - x0 + 0.6, 0.05, 0.04), trim)
+	for c2 in [Vector3(x0, 0, z0), Vector3(x1, 0, z0), Vector3(x0, 0, z1), Vector3(x1, 0, z1)]:
+		_dougong(roof, (c2 as Vector3) + Vector3(0, top + 0.2, 0), trim, beam, column)
+	var hx := (x1 - x0) * 0.5
+	var hz := (z1 - z0) * 0.5
+	if st.double:
+		hip_roof(roof, roof_g, Vector3(cx, ry + 0.2, cz), hx + 0.45, hz + 0.5, 0.9, 0.55, st, false)
+		roof.box(Vector3(cx, ry + 0.75, cz), Vector3(x1 - x0 - 0.8, 0.9, z1 - z0 - 0.6), wall)
+		hip_roof(roof, roof_g, Vector3(cx, ry + 1.25, cz), hx - 0.2, hz - 0.1, 0.95, 1.8, st)
+	else:
+		hip_roof(roof, roof_g, Vector3(cx, ry + 0.1, cz), hx + 0.4, hz + 0.45, 0.95, 1.6 + minf(hx, hz) * 0.15, st)
+	return lights
+
+static func _lantern(b: MB, g: MB, lp: Vector3, trim: Color) -> void:
+	b.lathe(lp, [Vector2(0.06, 0.0), Vector2(0.2, 0.1), Vector2(0.22, 0.25), Vector2(0.17, 0.4), Vector2(0.06, 0.46)], MB.tag(Color("e04a3a"), MB.CLOTH), 10)
+	b.ribbon([lp, lp + Vector3(0, -0.25, 0)], [0.03, 0.01], Vector3.RIGHT, MB.tag(Color("f0c850"), MB.CLOTH))
+	g.ball(lp + Vector3(0, 0.23, 0), 0.36, Color(1.0, 0.5, 0.25, 0.3), true)
+
+## Furniture: `p` is a floor tile centre; wall pieces back onto the nearest wall of `inner`.
+static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: Dictionary, rng: RandomNumberGenerator, lights: Array) -> void:
+	var wood := MB.tag(Color("7a4a2e"), MB.WOOD)
+	var wood_l := MB.tag(Color("a87a4a"), MB.WOOD)
+	var lacquer := MB.tag(Color("8a2a22"), MB.WOOD)
+	var bronze := MB.tag(Color("7a6a3a"), MB.METAL)
+	var iron := MB.tag(Color("44444c"), MB.METAL)
+	var paper := MB.tag(Color("efe6d0"), MB.CLOTH)
+	var trim := MB.tag(_c(st.trim), MB.METAL)
+	# direction to the nearest wall, and the yaw that turns a piece to face away from it
+	var dl := p.x - inner.position.x
+	var dr := inner.end.x - p.x
+	var du := p.z - inner.position.y
+	var dd := inner.end.y - p.z
+	var m := minf(minf(dl, dr), minf(du, dd))
+	var back := Vector3(-1, 0, 0) if m == dl else (Vector3(1, 0, 0) if m == dr else (Vector3(0, 0, -1) if m == du else Vector3(0, 0, 1)))
+	var side := Vector3(back.z, 0, -back.x)
+	var wallp := p + back * (m - 0.25)
+	var ax := absf(back.x) > 0.5
+	match kind:
+		"altar":
+			b.box(p + Vector3(0, 0.45, 0), Vector3(1.9, 0.08, 0.9), lacquer)
+			for s: float in [-1.0, 1.0]:
+				for s2: float in [-1.0, 1.0]:
+					b.box(p + Vector3(s * 0.85, 0.22, s2 * 0.38), Vector3(0.1, 0.44, 0.1), lacquer)
+			b.box(p + Vector3(0, 0.5, 0), Vector3(1.95, 0.04, 0.95), MB.tag(Color("e8c860"), MB.CLOTH))
+			b.lathe(p + Vector3(0, 0.52, 0), [Vector2(0.18, 0.0), Vector2(0.22, 0.1), Vector2(0.2, 0.22), Vector2(0.24, 0.26)], bronze, 10)
+			for k in 3:
+				b.limb(p + Vector3(-0.05 + k * 0.05, 0.75, 0), p + Vector3(-0.05 + k * 0.05, 1.05, 0), 0.008, 0.008, MB.tag(Color("c84a2a"), MB.WOOD), 3)
+				g.ball(p + Vector3(-0.05 + k * 0.05, 1.07, 0), 0.03, Color(1.0, 0.5, 0.2, 0.9), true)
+			for s3: float in [-1.0, 1.0]:
+				b.lathe(p + Vector3(s3 * 0.7, 0.52, 0), [Vector2(0.06, 0.0), Vector2(0.05, 0.25), Vector2(0.09, 0.3)], bronze, 8)
+				g.ball(p + Vector3(s3 * 0.7, 0.86, 0), 0.06, Color(1.0, 0.8, 0.4, 0.9), true)
+			lights.append([p + Vector3(0, 1.4, 0), Color(1.0, 0.75, 0.45)])
+		"statue":
+			# the sect founder, seated in meditation on a lotus pedestal against the back wall
+			var sp := wallp + Vector3(0, 0, 0)
+			b.lathe(sp, [Vector2(0.75, 0.0), Vector2(0.7, 0.35), Vector2(0.55, 0.45), Vector2(0.8, 0.6)], MB.tag(Color("c8b070"), MB.METAL), 14)
+			b.sph(sp + Vector3(0, 1.0, 0), Vector3(0.55, 0.5, 0.42), MB.tag(Color("d8b860"), MB.METAL))
+			b.sph(sp + Vector3(0, 1.55, 0), Vector3(0.3, 0.45, 0.25), MB.tag(Color("d8b860"), MB.METAL))
+			b.ball(sp + Vector3(0, 2.15, 0), 0.22, MB.tag(Color("e0c070"), MB.METAL))
+			g.disc(sp + Vector3(0, 2.2, 0) + back * 0.25, 0.55, Color(1.0, 0.85, 0.4, 0.35), 20, Color(1.0, 0.85, 0.4, 0.0), Vector3(PI * 0.5, 0, 0) if not ax else Vector3(0, 0, PI * 0.5))
+		"cushion":
+			b.sph(p + Vector3(0, 0.08, 0), Vector3(0.35, 0.08, 0.35), MB.tag(Color("c8a040"), MB.CLOTH))
+		"scroll":
+			# a hanging calligraphy scroll on the wall
+			var sc := wallp + Vector3(0, 1.6, 0) - back * 0.05
+			b.box(sc, Vector3(0.04, 1.3, 0.55) if ax else Vector3(0.55, 1.3, 0.04), paper)
+			for k2 in 4:
+				b.box(sc + Vector3(0, 0.35 - k2 * 0.22, 0) - back * 0.02, Vector3(0.02, 0.1, 0.12) if ax else Vector3(0.12, 0.1, 0.02), MB.tag(Color("1a1a1a"), MB.CLOTH))
+			b.cyl(sc + Vector3(0, -0.7, 0), 0.04, 0.7, wood, Vector3(PI * 0.5, 0, 0) if ax else Vector3(0, 0, PI * 0.5), 6)
+		"shelf", "bookshelf":
+			var shp := wallp - back * 0.1
+			var w2 := Vector3(0.4, 0, 1.7) if ax else Vector3(1.7, 0, 0.4)
+			for lv in 5:
+				b.box(shp + Vector3(0, 0.05 + lv * 0.48, 0), w2 + Vector3(0, 0.05, 0), wood)
+			for s4: float in [-1.0, 1.0]:
+				b.box(shp + side * s4 * 0.85 + Vector3(0, 1.0, 0), Vector3(0.06 if not ax else 0.4, 2.0, 0.4 if not ax else 0.06), wood)
+			for lv2 in 4:
+				var n := 6 + rng.randi() % 4
+				for k3 in n:
+					var o := -0.75 + (k3 + 0.5) * 1.5 / n
+					var it := shp + side * o + Vector3(0, 0.1 + lv2 * 0.48, 0)
+					if kind == "bookshelf":
+						var bc: Color = [Color("6a2a2a"), Color("2a4a6a"), Color("e8dcc0"), Color("4a5a2a")][rng.randi() % 4]
+						b.box(it + Vector3(0, 0.17, 0), Vector3(0.28, 0.34, 0.12) if ax else Vector3(0.12, 0.34, 0.28), MB.tag(bc, MB.CLOTH))
+					else:
+						var jc: Color = [Color("6a8a5a"), Color("c8b8a0"), Color("4a6a8a"), Color("a86a3a")][rng.randi() % 4]
+						b.lathe(it, [Vector2(0.06, 0.0), Vector2(0.09, 0.08), Vector2(0.08, 0.2), Vector2(0.04, 0.24), Vector2(0.05, 0.28)], MB.tag(jc, MB.STONE), 8)
+		"counter", "desk", "table":
+			var tw := 1.6 if kind != "table" else 1.2
+			b.box(p + Vector3(0, 0.78 if kind == "counter" else 0.62, 0), Vector3(tw, 0.08, 0.7), wood_l)
+			if kind == "counter":
+				b.box(p + Vector3(0, 0.38, 0), Vector3(tw - 0.1, 0.76, 0.6), wood)
+				b.box(p + Vector3(0.4, 0.86, 0), Vector3(0.3, 0.08, 0.2), MB.tag(Color("3a3a3a"), MB.WOOD))  # abacus
+				for k4 in 5:
+					b.ball(p + Vector3(0.3 + k4 * 0.05, 0.92, 0), 0.025, MB.tag(Color("c84a2a"), MB.WOOD), true)
+			else:
+				for s5: float in [-1.0, 1.0]:
+					for s6: float in [-1.0, 1.0]:
+						b.box(p + Vector3(s5 * (tw * 0.5 - 0.08), 0.3, s6 * 0.27), Vector3(0.07, 0.6, 0.07), wood)
+				if kind == "desk":
+					b.box(p + Vector3(-0.3, 0.68, 0), Vector3(0.5, 0.02, 0.35), paper)
+					b.cyl(p + Vector3(0.3, 0.72, 0.1), 0.05, 0.1, MB.tag(Color("2a2a2a"), MB.STONE))
+					b.limb(p + Vector3(0.1, 0.67, -0.1), p + Vector3(0.35, 0.67, -0.12), 0.01, 0.006, wood, 4)
+				else:
+					b.lathe(p + Vector3(0, 0.66, 0), [Vector2(0.08, 0.0), Vector2(0.11, 0.08), Vector2(0.06, 0.16), Vector2(0.03, 0.2)], MB.tag(Color("e8e8f0"), MB.STONE), 10)
+					for s7: float in [-1.0, 1.0]:
+						b.cyl(p + Vector3(s7 * 0.35, 0.68, 0.12), 0.05, 0.06, MB.tag(Color("e8e8f0"), MB.STONE))
+		"stool":
+			b.cyl(p + Vector3(0, 0.25, 0), 0.22, 0.5, wood_l, Vector3.ZERO, 10)
+		"cauldron":
+			b.lathe(p + Vector3(0, 0.15, 0), [Vector2(0.2, 0.0), Vector2(0.6, 0.15), Vector2(0.65, 0.5), Vector2(0.55, 0.7), Vector2(0.62, 0.74)], iron, 14)
+			for k5 in 3:
+				var a := TAU * k5 / 3.0
+				b.limb(p + Vector3(cos(a) * 0.4, 0.2, sin(a) * 0.4), p + Vector3(cos(a) * 0.55, 0.0, sin(a) * 0.55), 0.06, 0.05, iron, 6)
+			g.disc(p + Vector3(0, 0.84, 0), 0.5, Color(0.4, 1.0, 0.6, 0.7), 14, Color(0.4, 1.0, 0.6, 0.2))
+			g.ball(p + Vector3(0, 0.1, 0), 0.35, Color(1.0, 0.5, 0.2, 0.55), true)
+			for k6 in 3:
+				g.ball(p + Vector3(0, 1.1 + k6 * 0.35, 0), 0.15 + k6 * 0.06, Color(0.6, 1.0, 0.7, 0.12), true)
+			lights.append([p + Vector3(0, 1.0, 0), Color(0.5, 1.0, 0.6)])
+		"herbs":
+			var hp := wallp - back * 0.15
+			for s8: float in [-1.0, 1.0]:
+				b.cyl(hp + side * s8 * 0.6 + Vector3(0, 0.9, 0), 0.04, 1.8, wood, Vector3.ZERO, 6)
+			b.limb(hp - side * 0.6 + Vector3(0, 1.7, 0), hp + side * 0.6 + Vector3(0, 1.7, 0), 0.03, 0.03, wood, 6)
+			for k7 in 5:
+				var bp := hp + side * (-0.45 + k7 * 0.22) + Vector3(0, 1.5, 0)
+				b.cone(bp, 0.08, 0.36, MB.tag(Color("6a8a3a").lerp(Color("a8a050"), rng.randf()), MB.FOLIAGE), Vector3(PI, 0, 0), 6)
+		"hearth":
+			var fp := wallp - back * 0.2
+			b.box(fp + Vector3(0, 0.55, 0), Vector3(1.3, 1.1, 1.0) if not ax else Vector3(1.0, 1.1, 1.3), MB.tag(Color("8a5a4a"), MB.STONE))
+			b.box(fp + Vector3(0, 2.0, 0) + back * 0.15, Vector3(0.7, 1.9, 0.7), MB.tag(Color("7a4a3a"), MB.STONE))
+			g.box(fp + Vector3(0, 0.75, 0) - back * 0.5, Vector3(0.8, 0.4, 0.05) if not ax else Vector3(0.05, 0.4, 0.8), Color(1.0, 0.45, 0.15, 0.9))
+			g.ball(fp + Vector3(0, 1.0, 0), 0.5, Color(1.0, 0.4, 0.1, 0.35), true)
+			lights.append([fp + Vector3(0, 1.0, 0) - back * 0.8, Color(1.0, 0.5, 0.2)])
+		"anvil":
+			b.box(p + Vector3(0, 0.3, 0), Vector3(0.35, 0.6, 0.3), wood)
+			b.box(p + Vector3(0, 0.68, 0), Vector3(0.75, 0.16, 0.28), iron)
+			b.cone(p + Vector3(0.48, 0.68, 0), 0.08, 0.3, iron, Vector3(0, 0, -PI * 0.5), 6)
+			b.limb(p + Vector3(-0.1, 0.78, 0.05), p + Vector3(0.2, 0.8, 0.25), 0.02, 0.02, wood, 4)
+			b.box(p + Vector3(0.22, 0.82, 0.27), Vector3(0.14, 0.08, 0.08), iron)
+		"rack":
+			var rp := wallp - back * 0.1
+			b.box(rp + Vector3(0, 0.9, 0), Vector3(0.12, 0.1, 1.6) if ax else Vector3(1.6, 0.1, 0.12), wood)
+			b.box(rp + Vector3(0, 0.15, 0), Vector3(0.3, 0.1, 1.6) if ax else Vector3(1.6, 0.1, 0.3), wood)
+			for k8 in 5:
+				var bl := rp + side * (-0.6 + k8 * 0.3)
+				b.box(bl + Vector3(0, 0.75, 0), Vector3(0.03, 1.3, 0.06) if not ax else Vector3(0.06, 1.3, 0.03), MB.tag(Color("c8ccd8"), MB.METAL))
+				b.box(bl + Vector3(0, 0.12, 0), Vector3(0.12, 0.05, 0.05), trim)
+		"barrel":
+			b.lathe(p, [Vector2(0.3, 0.0), Vector2(0.36, 0.35), Vector2(0.3, 0.7)], wood, 12)
+			b.torus(p + Vector3(0, 0.15, 0), 0.33, 0.02, iron)
+			b.torus(p + Vector3(0, 0.55, 0), 0.33, 0.02, iron)
+			b.disc(p + Vector3(0, 0.71, 0), 0.28, MB.tag(Color("3a5a7a"), MB.STONE), 12)
+		"bed":
+			var bp2 := wallp - back * 0.5
+			b.box(bp2 + Vector3(0, 0.3, 0), Vector3(1.0, 0.25, 1.9) if not ax else Vector3(1.9, 0.25, 1.0), wood)
+			b.box(bp2 + Vector3(0, 0.48, 0), Vector3(0.9, 0.12, 1.8) if not ax else Vector3(1.8, 0.12, 0.9), MB.tag(Color("c86a5a"), MB.CLOTH))
+			b.box(bp2 + Vector3(0, 0.55, 0) + (Vector3(0, 0, -0.7) if not ax else Vector3(-0.7, 0, 0)), Vector3(0.6, 0.1, 0.3) if not ax else Vector3(0.3, 0.1, 0.6), paper)
+		"stove":
+			var sv := wallp - back * 0.2
+			b.box(sv + Vector3(0, 0.4, 0), Vector3(1.2, 0.8, 0.8) if not ax else Vector3(0.8, 0.8, 1.2), MB.tag(Color("b8a890"), MB.STONE))
+			b.lathe(sv + Vector3(0, 0.8, 0), [Vector2(0.3, 0.0), Vector2(0.35, 0.15), Vector2(0.2, 0.25)], iron, 12)
+			g.box(sv + Vector3(0, 0.25, 0) - back * 0.41, Vector3(0.4, 0.25, 0.04) if not ax else Vector3(0.04, 0.25, 0.4), Color(1.0, 0.45, 0.15, 0.8))
+			lights.append([sv + Vector3(0, 0.6, 0) - back * 0.8, Color(1.0, 0.55, 0.25)])
+		"cabinet":
+			var cb := wallp - back * 0.15
+			b.box(cb + Vector3(0, 0.75, 0), Vector3(0.45, 1.5, 1.1) if ax else Vector3(1.1, 1.5, 0.45), lacquer)
+			b.box(cb + Vector3(0, 0.75, 0) - back * 0.23, Vector3(0.02, 1.3, 0.02) if ax else Vector3(0.02, 1.3, 0.02), trim)
+		"loom":
+			var lm := p
+			for s9: float in [-1.0, 1.0]:
+				b.box(lm + side * s9 * 0.7 + Vector3(0, 0.8, 0), Vector3(0.1, 1.6, 0.1), wood)
+			b.limb(lm - side * 0.7 + Vector3(0, 1.5, 0), lm + side * 0.7 + Vector3(0, 1.5, 0), 0.05, 0.05, wood, 6)
+			b.limb(lm - side * 0.7 + Vector3(0, 0.5, 0), lm + side * 0.7 + Vector3(0, 0.5, 0), 0.05, 0.05, wood, 6)
+			b.box(lm + Vector3(0, 1.0, 0), (Vector3(0.02, 0.95, 1.3) if ax else Vector3(1.3, 0.95, 0.02)), MB.tag(Color("d0a0c8"), MB.CLOTH))
+		"lantern":
+			_lantern(b, g, p + Vector3(0, 1.4, 0), trim)
+			lights.append([p + Vector3(0, 1.6, 0), Color(1.0, 0.65, 0.35)])
+		_:
+			b.box(p + Vector3(0, 0.3, 0), Vector3(0.6, 0.6, 0.6), wood)

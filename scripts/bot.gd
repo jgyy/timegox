@@ -45,7 +45,7 @@ var time_by_area := {}
 var gave_up := ""
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-const HEALS := ["rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
+const HEALS := ["homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
 
 func _ready() -> void:
 	world = main.world
@@ -205,7 +205,7 @@ func _cult_target() -> Dictionary:
 		"level":
 			return {"lv": s.lv, "full": false}
 		"kill":
-			for b in Data.AREAS[s.area].bosses:
+			for b in Data.AREAS[s.area].get("bosses", []):
 				if b.id == s.boss:
 					return {"lv": b.req, "full": false}
 		"breakthrough":
@@ -274,7 +274,7 @@ func _world(d: float) -> void:
 			elif _hp_ratio() < 0.6:
 				_start_meditate("rest")
 			else:
-				var e = _nearest_enemy()
+				var e = _nearest_enemy(s.area)
 				if e != null:
 					_walk_to(e.pos, "enemy:" + e.id)
 				else:
@@ -304,7 +304,7 @@ func _start_meditate(goal: String) -> void:
 func _grind() -> void:
 	# fight a nearby enemy if one is safe, otherwise meditate
 	if Game.area != "sect" and _hp_ratio() > 0.55:
-		var e = _nearest_enemy()
+		var e = _nearest_enemy("")
 		if e != null:
 			_walk_to(e.pos, "enemy:" + e.id)
 			return
@@ -313,8 +313,8 @@ func _grind() -> void:
 ## Nearest reachable enemy group the party can handle.  The current target is kept unless another
 ## group is clearly closer: without that hysteresis two groups at almost the same distance swapped
 ## places as "nearest" with every step and the bot walked back and forth between two tiles forever.
-func _nearest_enemy():
-	var dist := _bfs_dist(world.ptile, false)
+func _nearest_enemy(area: String):
+	var dist := _bfs_dist(world.ptile, 64)
 	var best = null
 	var bd := 9999
 	var cur_id := path_key.trim_prefix("enemy:") if path_key.begins_with("enemy:") else ""
@@ -322,6 +322,10 @@ func _nearest_enemy():
 	var cur_d := 9999
 	for e in world.ents:
 		if e.kind != "enemy" or not world.ent_visible(e):
+			continue
+		if area != "" and e.area != area:
+			continue
+		if absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y) > 70:
 			continue
 		var mx := 0
 		for g in e.group:
@@ -346,92 +350,110 @@ func _nearest_enemy():
 	return best
 
 func _goto_nearest(kind: String, item: String) -> void:
-	var dist := _bfs_dist(world.ptile, true)
 	var best = null
-	var bd := 9999
+	var bd := 1 << 30
 	for e in world.ents:
 		if e.kind == kind and e.get("item", "") == item and world.ent_visible(e):
-			for dd in DIRS:
-				var n: Vector2i = e.pos + dd
-				if dist.has(n) and dist[n] < bd:
-					bd = dist[n]
-					best = e
+			var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+			if dd < bd:
+				bd = dd
+				best = e
 	if best != null:
 		_walk_to(best.pos, "pickup:" + best.id)
 
 func _goto_entity(area: String, id: String) -> void:
-	if Game.area != area:
-		_travel(area)
-		return
 	var e = world.find_ent(id)
 	if e == null:
+		_travel(area)
 		return
 	_walk_to(e.pos, "ent:" + id)
 
+## Walk to where travellers arrive in region `dest` (the open world has no gates to step through).
 func _travel(dest: String) -> void:
-	var nxt: String = Data.next_hop(Game.area, dest)
-	var p = world.find_ent("p_" + nxt)
-	if p != null:
-		_walk_to(p.pos, "portal:" + nxt)
+	var goal := Atlas.to_world("sect", Vector2i(20, 8))
+	if dest != "sect":
+		var arr: Array = MapGen.arrival_tiles(dest)
+		if not arr.is_empty():
+			goal = Atlas.to_world(dest, arr[0])
+	_walk_to(goal, "travel:" + dest)
 
 # ---------------------------------------------------------------- pathing
-func _blocked_set(avoid_enemies: bool, goal: Vector2i) -> Dictionary:
-	var b := {}
+var astar: AStarGrid2D = null
+
+func _astar() -> AStarGrid2D:
+	if astar != null:
+		return astar
+	astar = AStarGrid2D.new()
+	astar.region = Rect2i(0, 0, world.w, world.h)
+	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	astar.update()
+	for y in world.h:
+		for x in world.w:
+			if not MapGen.is_walkable_tile(world.grid[y * world.w + x]):
+				astar.set_point_solid(Vector2i(x, y), true)
+	return astar
+
+## tiles an entity stands on (closed seals always; enemies only when avoiding fights)
+func _blocked_list(avoid_enemies: bool, goal: Vector2i) -> Array:
+	var out: Array = []
 	for e in world.ents:
 		if e.kind == "spring" or not world.ent_visible(e):
 			continue
+		if e.kind == "seal":
+			if not world.seal_open(e):
+				out += e.tiles
+			continue
 		if e.pos == goal:
 			continue
-		# stepping on any other gate teleports: route around it (the south-east road in the
-		# sect passes right by the east gate)
 		if e.kind == "enemy" and not avoid_enemies:
 			continue
-		b[e.pos] = true
-	return b
+		out.append(e.pos)
+	return out
 
-func _bfs_dist(start: Vector2i, avoid_enemies: bool) -> Dictionary:
-	var blocked := _blocked_set(true, Vector2i(-9, -9)) if avoid_enemies or true else {}
+func _blocked_tile(n: Vector2i) -> bool:
+	var e = world.tile_ents.get(n)
+	if e == null or not world.ent_visible(e):
+		return false
+	return not (e.kind == "seal" and world.seal_open(e))
+
+## breadth-first distances from `start`, up to `cap` steps
+func _bfs_dist(start: Vector2i, cap: int = 64) -> Dictionary:
 	var dist := {start: 0}
 	var q: Array = [start]
 	var i := 0
 	while i < q.size():
 		var c: Vector2i = q[i]
 		i += 1
+		if dist[c] >= cap:
+			continue
 		for dd in DIRS:
 			var n: Vector2i = c + dd
-			if dist.has(n) or not world.tile_free(n) or blocked.has(n):
+			if dist.has(n) or not world.tile_free(n) or _blocked_tile(n):
 				continue
 			dist[n] = dist[c] + 1
 			q.append(n)
 	return dist
 
 func _bfs_path(start: Vector2i, goal: Vector2i, avoid_enemies: bool) -> Array:
-	var blocked := _blocked_set(avoid_enemies, goal)
-	var prev := {start: start}
-	var q: Array = [start]
-	var i := 0
-	while i < q.size():
-		var c: Vector2i = q[i]
-		i += 1
-		if c == goal:
-			break
-		for dd in DIRS:
-			var n: Vector2i = c + dd
-			if prev.has(n):
-				continue
-			if n != goal and (not world.tile_free(n) or blocked.has(n)):
-				continue
-			if n == goal and world.ent_at(n) == null and not world.tile_free(n):
-				continue
-			prev[n] = c
-			q.append(n)
-	if not prev.has(goal):
+	var a := _astar()
+	if not a.is_in_boundsv(goal) or not a.is_in_boundsv(start):
 		return []
-	var out: Array = [goal]
-	var cur: Vector2i = goal
-	while cur != start:
-		cur = prev[cur]
-		out.push_front(cur)
+	var blocked := _blocked_list(avoid_enemies, goal)
+	var toggled: Array = []
+	for b in blocked:
+		if b != start and b != goal and not a.is_point_solid(b):
+			a.set_point_solid(b, true)
+			toggled.append(b)
+	var goal_solid := a.is_point_solid(goal)
+	if goal_solid:
+		a.set_point_solid(goal, false)
+	var out: Array = Array(a.get_id_path(start, goal))
+	for b2 in toggled:
+		a.set_point_solid(b2, false)
+	if goal_solid:
+		a.set_point_solid(goal, true)
 	return out
 
 func _walk_to(goal: Vector2i, key: String) -> void:
@@ -503,7 +525,7 @@ func _meditate() -> void:
 		"grind":
 			done = _cult_met() and _hp_ratio() > 0.6
 		"respawn":
-			done = _nearest_enemy() != null
+			done = _nearest_enemy(Game.cur_step().get("area", "")) != null
 	if done:
 		_press("cancel", 0.4)
 	else:

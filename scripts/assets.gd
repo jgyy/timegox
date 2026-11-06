@@ -38,6 +38,10 @@ const PEOPLE := {
 	# Part VI
 	"lantern_monk": "characters/lantern_monk", "fisher": "characters/fisher", "meng_po": "characters/meng_po",
 	"judge_cui": "characters/judge_cui", "lin_shan": "characters/lin_shan", "su_wan": "characters/su_wan",
+	# Part VII
+	"granny_wen": "characters/granny_wen", "innkeeper": "characters/innkeeper", "weaver_liu": "characters/weaver_liu",
+	"tea_master": "characters/tea_master", "can_niang": "characters/can_niang", "apprentice_zhi": "characters/apprentice_zhi",
+	"archivist": "characters/archivist",
 }
 
 static var _scenes := {}

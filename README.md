@@ -1,12 +1,15 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Samsara Transcendence, through 26 regions, 93 bosses and eleven Heavenly Tribulations.
+Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to the Boundless Heart, across **one open world** of 30 regions around Azure Cloud Mountain, with 109 bosses, twelve Heavenly Tribulations and buildings you can walk into.
 
-> **Total gameplay duration: about 6 hours 33 minutes** (6:33:43 of game time for the end-to-end bot run; seeds 7 and 99 give 6:31:30 and 6:35:36). Parts I to V take 5:26:07; **Part VI, "The Turning Wheel", adds another hour** (1 hour 7 minutes): four new regions, 16 new bosses, 12 new monsters (five new Blender-built creature types), a new realm (Samsara Transcendence), new techniques, six new characters and a new ending that finally answers who Lin Feng's parents were.
+> **Total gameplay duration: about {{TOTAL_H}}** ({{TOTAL}} of game time for the end-to-end bot run, seed 1234). Parts I to VI take {{P16}} in the new open world; **Part VII, "The Unbroken Land", adds another hour** ({{P7}}): four new regions (a mortal village, tea terraces, silk woods and the Loom of Borders), 16 new bosses, 12 new monsters, a new realm (Boundless Heart), five new techniques, seven new Blender-built characters and a new ending. **The whole game is now one continuous open world**: no more separate maps and teleporting gates.
 
 | | |
 |---|---|
+| ![open world](docs/screenshots/openworld_sect.png) | ![village](docs/screenshots/vista_village.png) |
+| ![inside the hall](docs/screenshots/interior_hall.png) | ![world map](docs/screenshots/world_map.png) |
+| ![pharmacy](docs/screenshots/interior_pharmacy.png) | ![loom](docs/screenshots/vista_loom.png) |
 | ![sect](docs/screenshots/architecture_sect.png) | ![maple](docs/screenshots/vista_maple.png) |
 | ![hall](docs/screenshots/architecture_hall.png) | ![fungal](docs/screenshots/vista_fungal.png) |
 | ![portraits](docs/screenshots/portrait_heroes.png) | ![part6](docs/screenshots/gallery_part6.png) |
@@ -15,6 +18,40 @@ Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from 
 More captures (every region from the ground and from above, every boss, model galleries and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph O[One open world]
+    AT[atlas.gd<br/>every region on one tile grid] --> RD[roads between gates,<br/>Lotus Seals instead of teleports]
+    AT --> SM[noise-warped borders,<br/>forest belts between regions]
+    AT --> ST[world.gd streams regions in<br/>and out around the player]
+    AT --> MAP[world map in the pause menu,<br/>scrolling minimap]
+    end
+    subgraph S[Less squarish land]
+    W1[wandering trails instead of<br/>L-shaped corridors] --> LAND((terrain))
+    W2[shorelines follow the ground,<br/>oval sect pond] --> LAND
+    W3[hilliness blends across<br/>region borders] --> LAND
+    end
+    subgraph B[Buildings you can enter]
+    H[architecture.gd house():<br/>walls, door, plank floor,<br/>furniture, lanterns] --> RF[roof lifts away<br/>while you are inside]
+    H --> NPC[Elder, Alchemist, Smith,<br/>Archivist and villagers indoors]
+    end
+    subgraph P[Part VII: +1 hour]
+    V[Qingshi Village] --> TE[Cloud-Tea Terraces] --> SK[Mulberry Silk Woods] --> LM[Loom of Borders]
+    end
+    O --> G((Game))
+    S --> G
+    B --> G
+    P --> G
+```
+
+- **One open world.** All 30 regions and the sect now lie on one continuous map (492 x 448 tiles, about 1 x 0.9 km). Azure Cloud Mountain with the sect on its slope runs down the west side; each chapter's chain of regions runs east from it as a band of land, and Part II's chain snakes back west beneath Part I's. You walk from region to region along roads: there are no loading gates or teleports any more. A region the story has not opened yet is closed by a **Lotus Seal** barrier across its road, which dissolves into an open archway when the Elder (or the boss before it) lets you through. The 3D view streams regions in as you approach them and drops the far ones; the minimap scrolls with you, and **Esc > World Map** shows the whole land.
+- **Less squarish terrain.** Region borders are no longer straight walls: the land between two regions is a forest-and-rock belt whose edges wander with noise, and the change of ground, trees and sky follows the same wavy line. Connecting trails wander on the diagonal instead of running in L-shaped corridors, the mountain roads meander, the water plane runs on under the banks so shorelines follow the shape of the ground, the sect's lotus pond is an oval, and hilliness blends smoothly from one region to the next.
+- **Buildings you can enter.** The sect's Hall of Azure Clouds, the Alchemist's Pharmacy, the Smithy and a new Scripture Library are hollow buildings with a door, plank floors, lattice windows, lanterns and furniture (altar and founder statue, cauldron and herb racks, hearth, anvil and weapon rack, bookshelves). Qingshi Village has five more (Granny Wen's house, an inn, a shrine, a weaver's workshop and an abandoned house) and the tea terraces and silk woods one each. Walk in through the door and the roof lifts away; the Elder, Alchemist Mo, Smith Tie and the villagers wait inside.
+- **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
+- **Bugs found and fixed** (see below).
+
+### Previous release: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -113,7 +150,7 @@ flowchart TD
 
 ```sh
 pip install bpy==5.2.3                        # Blender as a Python module (or use a Blender install)
-python art/build_all.py                       # rebuild all 78 assets (about 2.5 min)
+python art/build_all.py                       # rebuild all 85 assets (about 3 min)
 blender --background --python art/monsters/hundun.py   # or one asset with Blender itself
 godot --headless --path . --import            # re-import into Godot
 ```
@@ -157,10 +194,10 @@ Walk into NPCs, enemies, pickups and bosses to interact with them. There is no s
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 34 stages across twelve realms (up to Samsara Transcendence); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 37 stages across thirteen realms (up to the Boundless Heart); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Twenty-six regions**, each with a travel gate, elites, bosses and a hunt objective. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI (new)**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths.
-- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, **Six Paths Wheel Slash**, **Ten Thousand Lantern Rain** and **Samsara Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, **Spirit Lantern Ward** and **Lotus of Rebirth**.
+- **Thirty regions in one open world**, each with elites, bosses and a hunt objective, joined by roads. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII (new)**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders.
+- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, **Seam-Cutting Sword**, **Thousand-Thread Rain** and **Boundless Heart Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, **Silver Silk Snare** and **Homeward Lantern**.
 - **Economy**: spirit stones buy pills and tempering for your sword.
 
 ```mermaid
@@ -206,7 +243,14 @@ flowchart LR
     Karst --> Springs[Yellow Springs<br/>The Thousand Unforgotten]
     Springs --> Wheel[Wheel of the Six Paths<br/>King Yama]
     end
-    Wheel ==> End((Samsara Transcendence))
+    subgraph P7[Part VII: about {{P7S}}]
+    Wheel ==>|Samsara Transcendence, threads across the roads| Sect6[Sect: the Weaver's seams]
+    Sect6 -->|south road| Village[Qingshi Village<br/>Needle General Zhen]
+    Village --> Terraces[Cloud-Tea Terraces<br/>Thread Matron]
+    Terraces --> Silk[Mulberry Silk Woods<br/>Thousand Hands]
+    Silk --> Loom[Loom of Borders<br/>Madam Qianxian]
+    end
+    Loom ==> End((Boundless Heart))
 ```
 
 ```mermaid
@@ -263,6 +307,70 @@ Lin Feng keeps his word and sweeps the steps, until stars start falling at noon.
 
 New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth, lantern moth and Hundun (four wings, six legs, no face).
 
+## The open world
+
+```mermaid
+flowchart TD
+    D[(data.gd: 31 areas,<br/>gates, NPCs, bosses,<br/>buildings)] --> MG[mapgen.gd<br/>each region's own map]
+    MG --> AT[atlas.gd]
+    L[layout: mountain column in the west,<br/>a band of regions per chapter] --> AT
+    AT --> G[one world grid 492 x 448]
+    AT --> OW[ownership: the cell under a<br/>noise-warped point]
+    OW --> BE[forest belt where two<br/>regions meet]
+    AT --> RO[roads gate to gate,<br/>on to the arrival tile]
+    RO --> SE[Lotus Seals where a<br/>chapter is not open yet]
+    AT --> CO[reconnect anything a belt cut off]
+    G --> BOT[bot: AStarGrid2D over the world]
+    G --> W[world.gd]
+    W --> STR[stream regions within 46 tiles:<br/>slice + shared heights + Terrain3D.build]
+    STR --> IN[houses: roof lifts while inside]
+```
+
+| Band (north to south) | Regions (west to east) | Entered from |
+|---|---|---|
+| Part IV | Sea of Clouds, Jade Court, Heaven's Forge, Peach Garden | the sect's west gate, up the mountain |
+| Part I | Bamboo Forest, Crimson Marsh, Frostpeak, Thunder Valley, Blood Moon Palace | the sect's east gate |
+| Part II (runs west) | Celestial Gate, Void Rift, Ashen Volcano, Sunken Dragon Palace | the road round the east edge from the Blood Moon Palace |
+| Part III | Mirror Lake, Sword Graveyard, River of Ten Thousand Years, Origin of the Dao | the sect's south gate |
+| Part V | Desert of Fallen Stars, Glowcap Vale, Aurora Steppe, Primordial Chaos | the south-east road |
+| Part VI | Maple Gorge, Stone Forest, Yellow Springs, Wheel of the Six Paths | the south-west funeral road |
+| Part VII | Qingshi Village, Cloud-Tea Terraces, Mulberry Silk Woods, Loom of Borders | the village road at the foot of the mountain |
+
+Each region is still generated from its own seed by `mapgen.gd` (so every boss, NPC and herb keeps its place) and then stamped into the world grid by `atlas.gd`. Ownership of each tile is decided by looking up the region cell under a noise-warped point, so borders wander; where two regions meet the tiles become a forest-and-rock belt (it only ever adds trees, never opens a way through a region's own edge). Roads are carved from gate to gate and on through the belt to each region's arrival point; where a chapter is not open yet, a Lotus Seal entity covers the road where it crosses the region's edge. Finally anything a belt cut off is reconnected by a trail inside its own region. Tests check that every entity can be walked to, that with all seals shut only the sect, the mountain and the bamboo forest can be reached, and that the world is deterministic.
+
+The 3D view builds a region when the player comes within 46 tiles of it: its tiles are cut out of the world grid (other regions' tiles blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. Far regions are hidden and the furthest dropped. One skirt of hills and a ring of mountains surround the whole world.
+
+## Part VII: The Unbroken Land
+
+Spring comes, and silver threads appear across the mountain roads overnight. The Elder explains why the world was ever cut into separate realms joined by gates: the Heavenly Court's Weaver, **Madam Qianxian, Lady of a Thousand Threads**, sewed it into a quilt so that each realm could be harvested alone. When Lin Feng turned the Wheel her stitches came undone and the land grew back into one (the open world). Now she is sewing the mortal lands shut again, and spinning the newly reborn into thread, Little Wan among them.
+
+| Region | Levels | Story beat | Final boss |
+|---|---|---|---|
+| Qingshi Village Below the Mountain | 33 | Granny Wen, the midwife who raised Lin Feng, reads the stolen threads in her own house | Needle General Zhen |
+| Cloud-Tea Terraces | 33-34 | Tea Master Lu Yu brews tea that wakes thread-sleepers, and Yue Ling finds she was being sewn too | Thread Matron of the Hills |
+| Mulberry Silk Woods | 34 | Can Niang unwinds soul-cocoons and frees four children's souls | Thousand Hands of the Spinning Hall |
+| Loom of Borders | 35 | Zhi, the last weaver-girl, helps take the shuttles out of the Loom | Madam Qianxian, Lady of a Thousand Threads |
+| *Boundless Heart tribulation and new ending* | | | |
+
+```mermaid
+sequenceDiagram
+    participant E as Elder Qing Xuan
+    participant L as Lin Feng
+    participant W as Granny Wen
+    participant C as Can Niang
+    participant Q as Madam Qianxian
+    E->>L: The gates were her seams, and she wants them back
+    L->>W: Who is missing?
+    W-->>L: Three newborns. One of them is Little Wan
+    L->>C: Four soul-cocoons from the mulberries
+    C-->>L: Four children go home. Little Wan's went on to the Loom
+    L->>Q: A wall keeps the wind out. A door makes it a home
+    Q-->>L: I never thought to sew a door
+    L->>L: Opens the door to the last tribulation: Boundless Heart
+```
+
+New characters (Blender scripts in `art/characters`): Granny Wen, Innkeeper Fu, Weaver Liu, Tea Master Lu Yu, Can Niang, Zhi and Archivist Lan of the sect's new library. New region looks: rice paddies and village lanes, steep green tea terraces in river mist, sunlit mulberry woods and the lilac marble floor of the Loom under a gold-and-violet sky.
+
 ## Part VI: The Turning Wheel
 
 The sky holds, but on the night of the Ghost Festival the lanterns on the lotus pond gather at the sect's south-west gate, and the dead stand among them in a queue that no longer moves. The Heavenly Court did not only prop up the sky with stolen years; it also turned the Wheel of Rebirth, letting souls back up only when the Ledger allowed. With the Court gone the Wheel has stopped, and the overflow of the dead is walking back up the old funeral road. The Elder finally tells Lin Feng where he found him: under a maple in that gorge, beside two nameless graves.
@@ -295,6 +403,18 @@ sequenceDiagram
 New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, Horse-Face and the hopping corpse (jiangshi). New characters: Lantern Monk Jing Kong, Cormorant Fisher Old Yu, Meng Po, Judge Cui Jue, and Lin Feng's parents Lin Shan and Su Wan. New region looks: autumn leaf-litter ground and falling maple leaves, limestone towers above the river, fields of spider lilies under a golden spring, and the blue ghost-fire flagstones of the Ten Courts, with the Naihe Bridge and the great Wheel on the horizon.
 
 ## Bugs found and fixed
+
+| Bug | Fix |
+|---|---|
+| The pause-menu **techniques list ran off the right of the panel** once Lin Feng knew more than 21 techniques (three columns of seven) | Four narrower columns of seven |
+| The sect's **pagoda stood outside the map** past the east wall, on land the hero could walk across in an open world | It stands on its own blocked footprint on the mountain |
+| Map **connection trails were straight L-shaped corridors** cut through forests, the most "squarish" thing in every region | Trails wander on the diagonal (`MapGen._carve`) |
+| **Monster groups could spawn inside buildings**, and a trail carved to an indoor NPC could break through a wall | Spawns skip floors under a roof; trails to anything indoors go to the doorstep; clearing round NPCs never removes a wall |
+| **Hunt kills were credited to the region the player stood in**, not the one the monsters came from, so a fight just across a border would not count | Kills are credited to the monsters' own region; enemy ids carry their region |
+| The water surface stopped at the **square edge of each water tile** | The water plane runs on under the bank, so the shoreline follows the ground |
+| The bot's **breadth-first search** would have been far too slow over a whole world | `AStarGrid2D` for routes, a capped search for nearby monsters |
+
+### Bugs fixed in the previous release
 
 | Bug | Fix |
 |---|---|
@@ -338,6 +458,14 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 | Plot hole | Fix |
 |---|---|
+| Why did every forest, marsh and desert have **a gate in it**, and why does the world now run on without them? | Part VII: the gates were the Court Weaver's seams; when the Wheel turned they came undone and the land grew back into one |
+| The **village midwife** who raised Lin Feng (Part VI) was never seen | Granny Wen is Part VII's first guide, in her own house |
+| The finale's **baby girl who knows Lin Feng's face** was left unexplained | Part VII: she is Little Wan, Su Wan reborn; the story turns on bringing her home |
+
+### Plot holes fixed in the previous release
+
+| Plot hole | Fix |
+|---|---|
 | Lin Feng is "an orphaned sect sweeper", but **his parents were never mentioned again** in five parts | Part VI: the Elder found him as a baby beside two nameless graves; his parents, Lin Shan and Su Wan, hid him from Xu Mo's hunters, refused Meng Po's soup for sixteen years to wait for him, and walk on to rebirth in the finale |
 | If the Elder found him as a baby, why has he only **swept the steps for three years**? | The Elder left him with the village midwife below the mountain, where no hunter would look for a bearer; he climbed the steps at thirteen |
 | Yue Ling "woke beside a lotus pond **three winters ago**", the same winter Lin Feng arrived, with no reason given | The Seal woke her when the bearer came up the mountain |
@@ -370,26 +498,28 @@ Game logic (`game.gd`, `data.gd`, `mapgen.gd`, the battle rules and the bot) is 
 ```mermaid
 flowchart TD
     subgraph Screens
-        W[world.gd<br/>3D area, chase camera, HUD]
+        W[world.gd<br/>open world streaming, chase camera, HUD]
         B[battle.gd<br/>3D arena, shoulder camera]
         T[title / ending / meditate<br/>3D scenes]
         M[menu / shop / dialogue<br/>2D overlays]
     end
+    W --> ATL[atlas.gd<br/>one world grid, roads, seals]
+    ATL --> MG2[mapgen.gd<br/>regions, buildings]
     W --> TER[terrain3d.gd<br/>height field, ground and water shaders,<br/>horizon, bridges]
     TER --> SC[scatter.gd<br/>ecology placement]
     SC --> FL[flora.gd + nature.gd<br/>grown plants, leaf cards, grass]
     SC --> RK[rocks.gd]
-    TER --> ARC[architecture.gd<br/>halls, walls, dwellings]
+    TER --> ARC[architecture.gd<br/>halls, enterable houses, walls, dwellings]
     TER --> FA[fauna.gd<br/>wildlife]
     W --> MOD[models.gd<br/>procedural people and monsters,<br/>action poses]
-    MOD --> AS[assets.gd<br/>Blender GLBs: 28 people,<br/>29 monsters, 21 props]
+    MOD --> AS[assets.gd<br/>Blender GLBs: 35 people,<br/>29 monsters, 21 props]
     B --> MOD
     B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
     TER --> MB[mb.gd<br/>primitives, limbs, lathes, ribbons<br/>toon + outline + aura shaders]
     MOD --> MB
     FX --> MB
-    TER --> LK[(look.gd<br/>26 region looks, sky shader)]
+    TER --> LK[(look.gd<br/>30 region looks, sky shader)]
     TER --> AS
     W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap]
     B --> UI
@@ -411,7 +541,7 @@ godot --path . --fixed-fps 30 -- --tour=out --areas=none --no-extras --portraits
 
 ## The playthrough bot
 
-`scripts/bot.gd` plays the entire game end to end through the **same input surface a human uses** (`up/down/confirm/cancel` presses on the top screen and a held movement direction). It pathfinds with BFS, grinds and meditates when under-levelled, rests when hurt, shops, picks skills by elemental weakness, heals with pills or Spring Rain, and handles tribulations.
+`scripts/bot.gd` plays the entire game end to end through the **same input surface a human uses** (`up/down/confirm/cancel` presses on the top screen and a held movement direction). It pathfinds across the open world with `AStarGrid2D` (seals still closed and other monsters count as blocked), grinds and meditates when under-levelled, rests when hurt, shops, picks skills by elemental weakness, heals with pills or Spring Rain, and handles tribulations.
 
 To make its clock a fair estimate of a person's playtime it uses human-scale pacing: 0.2 to 0.4 s per key press, and each dialogue line is "read" for about `length / 40` seconds after it finishes typing.
 
@@ -442,7 +572,7 @@ Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, portal symmetry, map reachability and determinism, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than six hours of game time**. A second job installs Blender as a Python module and rebuilds every asset in `art/` from its script. The bot report is uploaded as an artifact and shown in the job summary.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than seven hours of game time**. A second job installs Blender as a Python module and rebuilds every asset in `art/` from its script. The bot report is uploaded as an artifact and shown in the job summary.
 
 ```mermaid
 flowchart LR
@@ -450,7 +580,7 @@ flowchart LR
     DL --> IMP[Import project]
     IMP --> T[Data-integrity tests]
     T --> B[Bot plays whole game<br/>--fixed-fps 30]
-    B --> G{completed and<br/>game time >= 6h?}
+    B --> G{completed and<br/>game time >= 7h?}
     PR --> ART[pip install bpy<br/>art/build_all.py]
     G -- yes --> OK[Pass + report artifact]
     G -- no --> FAIL[Fail]
@@ -483,7 +613,8 @@ scripts/gfx.gd       2D UI ornaments, panels, minimap
 scripts/tour.gd      screenshot tour (developer tool)
 scripts/game.gd      autoload: state, progression, quest engine, play clock
 scripts/main.gd      screen stack, input, story flow
-scripts/world.gd     3D third-person world, movement, HUD
+scripts/world.gd     3D third-person open world: streaming, movement, interiors, HUD
+scripts/atlas.gd     the open world: layout, ownership, borders, roads, seals
 scripts/mapgen.gd    seeded map generator with reachability guarantee
 scripts/battle.gd    turn-based combat on a 3D stage
 scripts/bot.gd       end-to-end playthrough bot
