@@ -163,7 +163,7 @@ static func mesh(sp: String, variant: int) -> ArrayMesh:
 	var m: ArrayMesh
 	if b.is_empty():
 		b.ball(Vector3(0, -20, 0), 0.01, MB.tag(Color.BLACK, MB.STONE), true)
-	m = b.build(MB.mat_plain() if is_small(sp) else MB.mat_vc())
+	m = b.build(MB.mat_plain() if is_small(sp) else MB.mat_scenery())
 	var leaf: String = str(d.get("leaf", ""))
 	if not cards.is_empty() and leaf != "":
 		var lg := 0.0

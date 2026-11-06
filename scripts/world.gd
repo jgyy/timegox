@@ -5,8 +5,9 @@ extends ScreenBase
 const TS := Terrain3D.T
 const STEP_T := 0.16
 const VIEW := Vector2(1280, 720)
-const CAM_DIST := 8.5
-const CAM_H := 7.0
+## follow camera: behind and a little above the hero, looking past him down the road
+const CAM_DIST := 6.8
+const CAM_H := 4.3
 const FWD := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
 const RIGHT := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]
 const HERO_OPTS := {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")}
@@ -42,6 +43,11 @@ var hm := PackedFloat32Array()
 var step_side := 0
 var last_step_phase := 0.0
 var cam_q := 0
+## the movement key being held and the world direction it was given when first pressed: the
+## direction stays fixed while the key is held, so the camera can swing round behind the hero
+## without turning the walk with it
+var held_key := -1
+var held_dir := Vector2i.ZERO
 ## screenshot tour: a fixed wide establishing shot replaces the chase camera while set
 var cam_override: Variant = null
 var cam_a := 0.0
@@ -293,22 +299,37 @@ func _process(d: float) -> void:
 	if not headless() and visible:
 		_update_view(d)
 		queue_redraw()
+	# scenery between the camera and the hero turns see-through (shader global, see mb.gd);
+	# parked far away whenever the world is not the screen being shown
+	if not headless():
+		var hp := Vector3(0, -1000, 0)
+		if active and visible and cam_override == null:
+			hp = _player_pos() + Vector3(0, 1.0, 0)
+		RenderingServer.global_shader_parameter_set("hero_pos", hp)
 
 func rotate_cam(dir: int) -> void:
 	cam_q = (cam_q + dir + 4) % 4
 
 func _read_keys() -> Vector2i:
-	var f: Vector2i = FWD[cam_q]
-	var r: Vector2i = RIGHT[cam_q]
+	var k := -1
 	if Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_A):
-		return -r
-	if Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D):
-		return r
-	if Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_W):
-		return f
-	if Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_S):
-		return -f
-	return Vector2i.ZERO
+		k = 0
+	elif Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D):
+		k = 1
+	elif Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_W):
+		k = 2
+	elif Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_S):
+		k = 3
+	if k < 0:
+		held_key = -1
+		return Vector2i.ZERO
+	if k != held_key:
+		# a new press is read relative to where the camera looks now
+		var f: Vector2i = FWD[cam_q]
+		var r: Vector2i = RIGHT[cam_q]
+		held_key = k
+		held_dir = [-r, r, f, -f][k]
+	return held_dir
 
 func _move(d: float) -> void:
 	var budget := d
@@ -327,6 +348,10 @@ func _move(d: float) -> void:
 				return
 			target = nt
 			move_t = 0.0
+			# third-person follow: the camera swings round behind the direction of travel
+			var q := FWD.find(facing)
+			if q >= 0:
+				cam_q = q
 		var need := (1.0 - move_t) * STEP_T
 		if budget >= need:
 			budget -= need
@@ -360,7 +385,7 @@ func _cam_goal(pp: Vector3, a: float) -> Array:
 	var cp := pp - fwd * CAM_DIST + Vector3(0, CAM_H, 0)
 	# keep the camera above hills behind the hero
 	cp.y = maxf(cp.y, ground_y(cp) + 2.5)
-	return [cp, pp + Vector3(0, 1.2, 0) + fwd * 1.8]
+	return [cp, pp + Vector3(0, 1.4, 0) + fwd * 2.6]
 
 func _snap_cam() -> void:
 	cam_a = cam_q * PI / 2.0
@@ -371,7 +396,7 @@ func _snap_cam() -> void:
 	if cam.is_inside_tree():
 		cam.look_at(g[1], Vector3.UP)
 	player.position = pp
-	comp_pos = pp - Vector3(facing.x, 0, facing.y) * 1.5
+	comp_pos = pp - Vector3(facing.x, 0, facing.y) * 0.7 + Vector3(-facing.y, 0, facing.x) * 1.4
 	comp.position = comp_pos
 
 func _update_view(d: float) -> void:
@@ -389,7 +414,9 @@ func _update_view(d: float) -> void:
 	# companion trails the hero
 	comp.visible = Game.companion
 	if Game.companion:
-		var back := pp - Vector3(facing.x, 0, facing.y) * 1.6 + Vector3(-facing.y, 0, facing.x) * 0.5
+		# off the hero's shoulder rather than straight behind, so she never stands between the
+		# follow camera and him
+		var back := pp - Vector3(facing.x, 0, facing.y) * 0.7 + Vector3(-facing.y, 0, facing.x) * 1.4
 		comp_pos = comp_pos.lerp(back, 1.0 - exp(-d * 5.0))
 		comp_pos.y = ground_y(comp_pos)
 		comp.position = comp_pos
@@ -412,7 +439,7 @@ func _update_view(d: float) -> void:
 		_animate_ent(e, n, pp, dist, d)
 	weather.global_position = Vector3(pp.x, pp.y + weather_y(), pp.z)
 	# chase camera
-	cam_a = lerp_angle(cam_a, cam_q * PI / 2.0, 1.0 - exp(-d * 7.0))
+	cam_a = lerp_angle(cam_a, cam_q * PI / 2.0, 1.0 - exp(-d * 4.5))
 	var g := _cam_goal(pp, cam_a)
 	cam_pos = cam_pos.lerp(g[0], 1.0 - exp(-d * 9.0))
 	cam.position = cam_pos

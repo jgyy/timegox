@@ -843,7 +843,7 @@ static func _proto(key: String, theme_name: String) -> Mesh:
 	var mat: Material = null
 	# a Blender-built landmark (art/props) replaces the first procedural variant when present
 	if parts[0] == "wall" and Assets.has("props/" + str(th.tree)):
-		var pm := Assets.static_mesh("props/" + str(th.tree))
+		var pm := MB.as_scenery(Assets.static_mesh("props/" + str(th.tree)))
 		_protos[key] = pm
 		return pm
 	match parts[0]:
@@ -870,7 +870,7 @@ static func _proto(key: String, theme_name: String) -> Mesh:
 			mat = MB.mat_plain()
 	if b.is_empty():
 		b.ball(Vector3(0, -10, 0), 0.01, Color(0, 0, 0))
-	var mesh := b.build(mat)
+	var mesh := b.build(mat if mat != null else MB.mat_scenery())
 	glow.add_to(mesh, MB.mat_glow())
 	_protos[key] = mesh
 	return mesh
@@ -1519,7 +1519,7 @@ static func _building(root: Node3D, r: Rect2, gy: float) -> void:
 	var b := MB.new()
 	var g := MB.new()
 	var lights := Arch.hall(b, g, r, style, int(r.position.x * 7.0 + r.position.y))
-	var mi := MB.mesh_node(root, b.build())
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
 	mi.position.y = gy
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	var gi := MB.mesh_node(root, g.build(MB.mat_glow()))

@@ -162,8 +162,8 @@ func _run() -> void:
 		main.world.ptile = _nearest_free(focus)
 		main.world.target = main.world.ptile
 		main.world.facing = Vector2i(1, 0)
+		main.world.cam_q = 1  # behind the hero, who faces east
 		main.world._snap_cam()
-		main.world.cam_q = 0
 		Game.tile = main.world.ptile
 		main.world.banner_t = 0.0
 		await _wait(1.2)

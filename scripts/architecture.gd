@@ -667,7 +667,7 @@ static func settlement_mesh(kind: String, variant: int, theme_name: String) -> A
 			ruin(b, g, seed_, Color(th.wall).lerp(Color("a8a4a0"), 0.6).to_html(false))
 		_:
 			dwelling(b, g, kind, seed_)
-	var m := b.build(MB.mat_vc())
+	var m := b.build(MB.mat_scenery())
 	g.add_to(m, MB.mat_glow())
 	_mesh_cache[key] = m
 	return m

@@ -33,6 +33,7 @@ uniform float cut = 0.42;
 uniform float glow = 0.0;
 uniform float bright = 1.75;
 uniform float near_fade = 5.5;
+global uniform vec3 hero_pos;
 uniform vec3 sun_tint : source_color = vec3(1.0, 0.96, 0.85);
 varying vec3 wp;
 varying float sway;
@@ -56,7 +57,21 @@ void fragment() {
 	// road never blots out the hero
 	float cam_d = -VERTEX.z;
 	float keep = smoothstep(near_fade, near_fade + 2.5, cam_d);
-	float dth = fract(sin(dot(floor(FRAGCOORD.xy), vec2(12.9898, 78.233))) * 43758.5453);
+	// ordered (Bayer) dither: an even screen-door pattern instead of noisy static
+	int bx = int(mod(FRAGCOORD.x, 4.0));
+	int by = int(mod(FRAGCOORD.y, 4.0));
+	const float bay[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+	float dth = (bay[bx + by * 4] + 0.5) / 16.0;
+	// and so does any leaf between the follow camera and the hero
+	vec3 w = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 cam = (INV_VIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+	vec3 seg = hero_pos - cam;
+	float l2 = max(dot(seg, seg), 0.001);
+	float tt = dot(w - cam, seg) / l2;
+	if (tt > 0.0 && tt < 0.97) {
+		float dd = length(w - (cam + seg * tt));
+		keep = min(keep, max(smoothstep(1.2, 2.6, dd), 1.0 - smoothstep(0.6, 1.4, (1.0 - tt) * sqrt(l2))));
+	}
 	if (keep < 0.999 && dth > keep) {
 		discard;
 	}

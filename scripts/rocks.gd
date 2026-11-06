@@ -101,7 +101,7 @@ static func mesh(kind: String, variant: int, theme_name: String) -> ArrayMesh:
 				var sub := MB.new()
 				_rock(sub, rng, Vector3(0.12, 0.07, 0.1) * rng.randf_range(0.6, 1.5), 0.3, pal, 1, 0.0)
 				b.merge(sub, Transform3D(Basis.from_euler(Vector3(0, rng.randf() * TAU, 0)), Vector3(cos(a), 0, sin(a)) * sqrt(rng.randf()) * 0.6))
-	var m := b.build(MB.mat_vc() if kind in ["boulder", "spire", "karst", "slab", "crystal"] else MB.mat_plain())
+	var m := b.build(MB.mat_scenery() if kind in ["boulder", "spire", "karst", "slab", "crystal"] else MB.mat_plain())
 	_cache[key] = m
 	return m
 

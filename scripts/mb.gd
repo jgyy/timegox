@@ -32,6 +32,8 @@ static var _protos := {}
 static var _mat_vc: ShaderMaterial = null
 static var _mat_vc_plain: ShaderMaterial = null
 static var _mat_outline: ShaderMaterial = null
+static var _mat_scenery: ShaderMaterial = null
+static var _mat_scenery_plain: ShaderMaterial = null
 
 ## Cel-shaded vertex-colour material with procedural per-class surface textures, wind sway for
 ## foliage, rim light and a soft colour lift.  Used for every solid model in the game.
@@ -68,6 +70,38 @@ float fbm(vec3 p) {
 }
 bool is_cls(float a, float target) { return abs(a - target) < 0.05; }
 
+// see-through: scenery standing between the follow camera and the hero dissolves in a dither
+global uniform vec3 hero_pos;
+uniform float occlude = 0.0;
+float occ_keep(vec3 vview, vec2 fc, mat4 inv_view) {
+	vec3 w = (inv_view * vec4(vview, 1.0)).xyz;
+	vec3 cam = (inv_view * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+	vec3 seg = hero_pos - cam;
+	float l2 = max(dot(seg, seg), 0.001);
+	float t = dot(w - cam, seg) / l2;
+	if (t <= 0.0 || t >= 0.97) {
+		return 1.0;
+	}
+	float d = length(w - (cam + seg * t));
+	float short_of_hero = (1.0 - t) * sqrt(l2);
+	float k = smoothstep(1.0, 2.2, d);
+	k = max(k, 1.0 - smoothstep(0.6, 1.4, short_of_hero));
+	return k;
+}
+float bayer4(vec2 fc) {
+	int x = int(mod(fc.x, 4.0));
+	int y = int(mod(fc.y, 4.0));
+	const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+	return (m[x + y * 4] + 0.5) / 16.0;
+}
+bool occ_discard(vec3 vview, vec2 fc, mat4 inv_view) {
+	if (occlude <= 0.0) {
+		return false;
+	}
+	float keep = occ_keep(vview, fc, inv_view);
+	return keep < 0.999 && bayer4(fc) > keep;
+}
+
 void vertex() {
 	cls = COLOR.a;
 	opos = VERTEX;
@@ -84,6 +118,9 @@ void vertex() {
 }
 
 void fragment() {
+	if (occ_discard(VERTEX, FRAGCOORD.xy, INV_VIEW_MATRIX)) {
+		discard;
+	}
 	vec3 col = COLOR.rgb;
 	float l = dot(col, vec3(0.299, 0.587, 0.114));
 	col = mix(vec3(l), col, 1.06);
@@ -177,6 +214,38 @@ render_mode unshaded, cull_front, depth_draw_opaque;
 uniform float width = 0.018;
 uniform vec4 ink : source_color = vec4(0.07, 0.05, 0.1, 1.0);
 varying float thin;
+// see-through: scenery standing between the follow camera and the hero dissolves in a dither
+global uniform vec3 hero_pos;
+uniform float occlude = 0.0;
+float occ_keep(vec3 vview, vec2 fc, mat4 inv_view) {
+	vec3 w = (inv_view * vec4(vview, 1.0)).xyz;
+	vec3 cam = (inv_view * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+	vec3 seg = hero_pos - cam;
+	float l2 = max(dot(seg, seg), 0.001);
+	float t = dot(w - cam, seg) / l2;
+	if (t <= 0.0 || t >= 0.97) {
+		return 1.0;
+	}
+	float d = length(w - (cam + seg * t));
+	float short_of_hero = (1.0 - t) * sqrt(l2);
+	float k = smoothstep(1.0, 2.2, d);
+	k = max(k, 1.0 - smoothstep(0.6, 1.4, short_of_hero));
+	return k;
+}
+float bayer4(vec2 fc) {
+	int x = int(mod(fc.x, 4.0));
+	int y = int(mod(fc.y, 4.0));
+	const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+	return (m[x + y * 4] + 0.5) / 16.0;
+}
+bool occ_discard(vec3 vview, vec2 fc, mat4 inv_view) {
+	if (occlude <= 0.0) {
+		return false;
+	}
+	float keep = occ_keep(vview, fc, inv_view);
+	return keep < 0.999 && bayer4(fc) > keep;
+}
+
 void vertex() {
 	// thin double-sided geometry (ribbons, leaves, wings) has its class alpha nudged off the
 	// 0.1 grid; an inverted hull cannot outline it, so it is skipped
@@ -187,7 +256,7 @@ void vertex() {
 	VERTEX += NORMAL * width * k * (1.0 - thin);
 }
 void fragment() {
-	if (thin > 0.5) {
+	if (thin > 0.5 || occ_discard(VERTEX, FRAGCOORD.xy, INV_VIEW_MATRIX)) {
 		discard;
 	}
 	ALBEDO = mix(ink.rgb, COLOR.rgb * 0.22, 0.45);
@@ -672,6 +741,38 @@ static func mat_plain() -> Material:
 		_mat_vc_plain = ShaderMaterial.new()
 		_mat_vc_plain.shader = mat_vc().shader
 	return _mat_vc_plain
+
+## toon + outline for scenery (trees, rocks, landmarks, buildings): dissolves where it stands
+## between the follow camera and the hero
+static func mat_scenery() -> Material:
+	if _mat_scenery == null:
+		_mat_scenery = ShaderMaterial.new()
+		_mat_scenery.shader = mat_vc().shader
+		_mat_scenery.set_shader_parameter("occlude", 1.0)
+		var ol := ShaderMaterial.new()
+		ol.shader = mat_outline().shader
+		ol.render_priority = -1
+		ol.set_shader_parameter("occlude", 1.0)
+		_mat_scenery.next_pass = ol
+	return _mat_scenery
+
+static func mat_scenery_plain() -> Material:
+	if _mat_scenery_plain == null:
+		_mat_scenery_plain = ShaderMaterial.new()
+		_mat_scenery_plain.shader = mat_vc().shader
+		_mat_scenery_plain.set_shader_parameter("occlude", 1.0)
+	return _mat_scenery_plain
+
+## the same mesh with its toon surfaces swapped for the see-through scenery materials
+static func as_scenery(m: Mesh) -> Mesh:
+	var out: Mesh = m.duplicate()
+	for i in out.get_surface_count():
+		var mat := out.surface_get_material(i)
+		if mat == mat_vc():
+			out.surface_set_material(i, mat_scenery())
+		elif mat == mat_plain():
+			out.surface_set_material(i, mat_scenery_plain())
+	return out
 
 static func mat_outline() -> ShaderMaterial:
 	if _mat_outline == null:

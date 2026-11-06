@@ -49,6 +49,7 @@ flowchart LR
 - **Architecture.** The sect's halls are rebuilt the traditional way (platform, balustrade, lions, columns with bracket sets, lattice doors, painted beams, curved double-eaved roofs), with a courtyard wall, gate archways and a pagoda. Every road that crosses water gets a stone bridge; huts, shrines, watchtowers, tents, yurts, pavilions and ruins dot the wilds; the built regions get 10 new Blender landmarks.
 - **Characters and monsters.** The character builder gained layered hair, richer eyes, fingers, cloth folds, embroidery and animal heads; 19 new characters (every NPC is now a Blender model) and 17 new monsters, so no enemy shape uses the old primitive models any more.
 - **A clearer image.** The "slightly blurry lens" look is gone. The frame had no anti-aliasing and was softened by a low-threshold bloom over everything, a soft-light glow, heavy fog with aerial perspective, film grain and chromatic aberration. Now: 4x MSAA, glow only on genuinely bright highlights, light fog, and no grain or fringing.
+- **Third-person follow camera.** The camera sits low behind Lin Feng and swings round behind him whenever he walks, so you see his back rather than his side; a held direction key keeps its heading while the camera turns. Trees, rocks, landmarks and buildings standing between the camera and the hero dissolve in an ordered dither, and Yue Ling walks at his shoulder instead of in the camera's way.
 - **Part VI** adds +1 hour (see below), verified by the playthrough bot; CI now requires **6 hours**.
 - **Graphics code grew from 8,667 to 15,036 lines** (+73%: 8,862 lines of GDScript graphics modules, 6,174 lines of Blender Python).
 - **Bugs and plot holes found and fixed** (see below), including one that hid every pond, lake and river in the game.
@@ -147,8 +148,8 @@ godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-
 
 | Key | Action |
 |---|---|
-| Arrows / WASD | move (relative to the camera), navigate menus |
-| Q / E | rotate the camera |
+| Arrows / WASD | move (relative to the camera; a held key keeps its direction while the camera turns), navigate menus |
+| Q / E | rotate the camera (it swings back behind Lin Feng as soon as he walks) |
 | Enter / Z / Space | confirm, interact, advance dialogue |
 | Esc / X | menu (Meditate, Breakthrough, Items), cancel |
 
