@@ -9,6 +9,10 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/forge_master.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "age": 0.4, "build": 1.16, "beard_len": 0.7, "brow": 1.3,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["hammer"],
     "robe": "5a3a2a", "trim": "d08a40", "inner": "a88a70", "sash": "2a1a10", "hair": "3a2018", "hair_style": "wild", "eyes": "f0a040",
     "armor": True, "metal": "b07a40", "beard": True, "beard_col": "4a2a18", "stern": True, "embroidery": "d08a40",
 })

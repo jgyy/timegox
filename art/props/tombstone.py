@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CRYSTAL, FOLIAGE, MAT_GLOW, METAL, STONE, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+
+from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, METAL, SKIN, STONE, V, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(61)
@@ -33,5 +35,21 @@ b.lathe(V(-0.4, 0.3, -0.2), [(0.1, 0.0), (0.14, 0.06), (0.12, 0.1)], "6a5040", c
 for k in range(3):
     b.tube([V(-0.42 + k * 0.03, 0.38, -0.2), V(-0.42 + k * 0.03, 0.6, -0.2)], [0.006, 0.006], "c84030", cls=STONE, seg=4)
 b.ellipsoid(V(0, 2.0, -0.55), (0.12, 0.2, 0.12), "7af0e0", cls=CRYSTAL, seg=8, rings=6, mat=MAT_GLOW)
+# detail: offerings at the stele - a plate of peaches, burnt paper money, a cup of wine - grass on
+# the mound, and hewn kerb stones round it
+for k in range(9):
+    a = k / 9 * 2 * math.pi
+    A.hewn_stone(b, V(math.cos(a) * 1.0, 0.04, math.sin(a) * 0.8), (0.24, 0.1, 0.16), None, seed=k + 61, shade=0.5, e=0.45, tint=0.0, rot=(0, a, 0), seg=8, rings=6)
+b.lathe(V(0.25, 0.32, -0.3), [(0.12, 0.0), (0.14, 0.02)], "d8d0c0", cls=STONE, seg=12)
+for k in range(3):
+    b.ball(V(0.25 + 0.05 * math.cos(k * 2.1), 0.37 + 0.02 * k, -0.3 + 0.05 * math.sin(k * 2.1)), 0.04, "ff9a80", cls=SKIN, seg=8, rings=6)
+b.lathe(V(-0.2, 0.32, -0.3), [(0.03, 0.0), (0.04, 0.05)], "e8e0d0", cls=STONE, seg=8)
+for k in range(5):
+    b.superquad(V(-0.1 + 0.08 * k, 0.33, -0.15), (0.05, 0.003, 0.03), "e0c860" if k % 2 else "c8a040", e=0.3, cls=CLOTH, rot=(0, k * 0.7, 0))
+for k in range(16):
+    a = rnd.uniform(0, 2 * math.pi)
+    rr = rnd.uniform(0.3, 0.85)
+    root = V(math.cos(a) * rr, 0.45 - rr * 0.35, math.sin(a) * rr * 0.8)
+    b.leaf(root, root + V(rnd.uniform(-0.05, 0.05), 0.2, rnd.uniform(-0.05, 0.05)), 0.02, "5a7a3a", cls=FOLIAGE, col_tip="9ab060")
 print("[art] tombstone: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/tombstone.glb", target_tris=2000, samples=12, dist=0.6, strength=0.5)
+kit.finish_static(b, "props/tombstone.glb", target_tris=3200, samples=12, dist=0.6, strength=0.5)

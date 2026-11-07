@@ -24,10 +24,11 @@ const DENSITY := {
 	"dunes": 0.22, "fungal": 0.28, "aurora": 0.24, "chaos": 0.24,
 	"maple": 0.3, "karst": 0.26, "lilies": 0.22, "diyu": 0.26,
 	"village": 0.2, "tea": 0.24, "silk": 0.3, "loom": 0.22,
+	"starferry": 0.2, "magpie": 0.26, "starpalace": 0.22, "jasper": 0.24,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
-const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4}
+const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38}
 
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR

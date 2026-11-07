@@ -7,7 +7,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, METAL, STONE, WOOD, V, Builder  # noqa: E402
+from sculpt import strand  # noqa: E402
+from kit import CRYSTAL, MAT_GLOW, METAL, STONE, V, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(82)
@@ -33,5 +34,19 @@ for s in (1, -1):
 b.superquad(V(0, 2.95, 0), (0.48, 0.12, 0.48), "e8c060", e=0.3, cls=METAL)
 b.superquad(V(0.05, 3.15, 0.0), (0.4, 0.1, 0.36), "d8d0c0", e=0.3, cls=STONE, rot=(0, 0, 0.08))
 b.ribbon([V(0.32, 2.85, 0.0), V(0.36, 2.2, 0.05), V(0.33, 1.5, 0.08)], [0.14, 0.13, 0.11], (0, 0, 1), "c8302a", col_end="e05040")
+# detail: a dragon carved round the pillar - a scaled body spiralling up it, a head at the top with
+# horns and whiskers - and a ring of cloud scrolls at its base
+coil = [V(math.cos(t) * 0.36, 0.5 + t * 0.2, math.sin(t) * 0.36) for t in [i * 0.4 for i in range(28)]]
+b.tube(coil, [0.06 - 0.03 * i / 28 for i in range(28)], "4ac090", cls=CRYSTAL, seg=8, cols=[("4ac090" if i % 2 else "3aa078") for i in range(28)])
+hd = coil[0] + V(0.0, -0.05, 0.08)
+b.ellipsoid(hd, (0.08, 0.07, 0.12), "5ad0a0", cls=CRYSTAL, seg=10, rings=6)
+for s in (1, -1):
+    b.tube([hd + V(0.04 * s, 0.05, -0.05), hd + V(0.08 * s, 0.15, -0.12)], [0.012, 0.004], "e8e0c0", cls=STONE, seg=5)
+    strand(b, [hd + V(0.03 * s, -0.02, 0.1), hd + V(0.1 * s, -0.06, 0.12), hd + V(0.16 * s, -0.14, 0.08)], 0.006, 0.002, "e8e0c0", cls=STONE, seg=4, per=3)
+for k in range(10):
+    a = k / 10 * 2 * math.pi
+    c = V(math.cos(a) * 0.55, 0.3, math.sin(a) * 0.55)
+    scroll = [c + V(math.cos(a) * 0.08 * math.cos(t), 0.06 * math.sin(t), math.sin(a) * 0.08 * math.cos(t)) for t in [i * 0.7 for i in range(9)]]
+    b.tube(scroll, [0.025] * 9, "e8f8f0", cls=STONE, seg=5)
 print("[art] jadepillar: %d triangles" % b.tri_count())
 kit.finish_static(b, "props/jadepillar.glb", target_tris=2600, samples=12, dist=0.6, strength=0.5)

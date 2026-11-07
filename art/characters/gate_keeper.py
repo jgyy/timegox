@@ -9,6 +9,12 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/gate_keeper.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "age": 0.4, "build": 1.08,
+    # woven brocade over the robe (garment.MOTIFS)
+    "brocade": "cloud", "brocade_col": "f0c850",
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": [("ledger", {"cover": "c89830"})], "pose": "hold_l",
     "robe": "f0ece0", "trim": "e0b040", "inner": "ffffff", "sash": "c89830", "hair": "2a2a3a", "hair_style": "topknot", "eyes": "e0a030",
     "crown": True, "staff": True, "staff_gem": "fff0a0", "beard": True, "beard_col": "3a3a48", "embroidery": "f0c850", "stern": True,
 })

@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import FOLIAGE, WOOD, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+from sculpt import catmull, strand  # noqa: E402
+from kit import FOLIAGE, STONE, V, WOOD, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(53)
@@ -28,5 +30,17 @@ for k in range(5):
         root = c + V(rnd.uniform(-0.4, 0.4), -0.35, rnd.uniform(-0.4, 0.4))
         b.ribbon([root, root + V(0, -0.35, 0), root + V(0.03, -0.75, 0)], [0.04, 0.03, 0.005], (1, 0, 0), "6a7a4a", cls=FOLIAGE)
 b.ellipsoid(V(0, 3.15, 0), (0.75, 0.45, 0.75), "4a6a32", cls=FOLIAGE, seg=10, rings=7)
+# detail: arching prop roots ploughed with bark ridges, hanging moss from the branches, and
+# barnacled roots at the waterline
+for k in range(7):
+    a = k / 7 * 2 * math.pi + 0.2
+    root = catmull([V(math.cos(a) * 0.1, 0.9, math.sin(a) * 0.1), V(math.cos(a) * 0.5, 0.7, math.sin(a) * 0.5), V(math.cos(a) * 0.85, 0.25, math.sin(a) * 0.85), V(math.cos(a) * 0.95, -0.1, math.sin(a) * 0.95)], 2)
+    A.bark_limb(b, root, [0.07 - 0.04 * i / (len(root) - 1) for i in range(len(root))], "4a3a2a", None, seed=k, ridges=5, twist=2.0, tint=0.0, n=8)
+    b.ball(root[-2], 0.03, "c8c0b0", cls=STONE, seg=6, rings=4)
+for k in range(12):
+    a = rnd.uniform(0, 2 * math.pi)
+    rr = rnd.uniform(0.4, 1.0)
+    top = V(math.cos(a) * rr, rnd.uniform(1.6, 2.2), math.sin(a) * rr)
+    strand(b, [top, top + V(0.02, -0.25, 0.0), top + V(-0.02, -0.5, 0.03)], 0.025, 0.004, "6a7a50", cls=FOLIAGE, seg=4, per=3, flat=0.4)
 print("[art] mangrove: %d triangles" % b.tri_count())
 kit.finish_static(b, "props/mangrove.glb", samples=12, dist=0.6, strength=0.5)

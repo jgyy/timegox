@@ -7,7 +7,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, METAL, STONE, WOOD, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+
+from kit import CRYSTAL, MAT_GLOW, METAL, STONE, V, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(85)
@@ -35,5 +37,16 @@ for k in range(2):
 # hourglass
 b.lathe(V(-0.3, 1.5, 0.15), [(0.14, -0.28), (0.13, -0.15), (0.03, 0.0), (0.13, 0.15), (0.14, 0.28)], "e0f0ff", cls=CRYSTAL, seg=12)
 b.lathe(V(-0.3, 1.5, 0.15), [(0.1, -0.25), (0.06, -0.1), (0.01, -0.02)], "ffd060", cls=CRYSTAL, seg=10, mat=MAT_GLOW)
+# detail: rivets round the hub and the rim, a drive chain hanging off the teeth, and rust bleeding
+# from every joint
+for k in range(12):
+    a = k / 12 * 2 * math.pi
+    for rr in (0.25, 0.85):
+        b.ball(V(math.cos(a) * rr, 1.1 + math.sin(a) * rr, 0.13), 0.025, "d8b060", cls=METAL, seg=6, rings=4)
+A.chain(b, V(0.95, 1.0, 0.0), V(0.02, -0.075, 0.01), 6, None, col="6a5a48", r=0.03)
+for k in range(8):
+    a = k / 8 * 2 * math.pi
+    c = V(math.cos(a) * 0.55, 1.1 + math.sin(a) * 0.55, 0.12)
+    b.tube([c, c + V(0, -0.15, 0.002)], [0.015, 0.004], "8a4a20", cls=METAL, seg=4)
 print("[art] gear: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/gear.glb", target_tris=2400, samples=12, dist=0.6, strength=0.5)
+kit.finish_static(b, "props/gear.glb", target_tris=3800, samples=12, dist=0.6, strength=0.5)

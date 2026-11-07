@@ -9,6 +9,10 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/tea_master.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "age": 0.65, "beard_len": 0.9,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["teapot"], "pose": "hold_both", "staff": False,
     "robe": "4a7a3a", "trim": "e8e0b8", "inner": "f0ecd8", "sash": "2a4a20", "hair": "e8e4e0", "hair_style": "bun",
-    "eyes": "3a2a1a", "beard": True, "beard_col": "f0ece8", "hat": "straw", "hat_col": "c8a868", "staff": True, "staff_gem": "a0e080", "embroidery": "c8e0a0",
+    "eyes": "3a2a1a", "beard": True, "beard_col": "f0ece8", "hat": "straw", "hat_col": "c8a868", "staff_gem": "a0e080", "embroidery": "c8e0a0",
 })

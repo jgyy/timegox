@@ -9,6 +9,10 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/court_scribe.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": False, "age": 0.3, "build": 0.95,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["brush", "ledger"], "pose": "hold_l",
     "robe": "3a8a6a", "trim": "e8e0c0", "inner": "f0ece0", "sash": "1a4a3a", "hair": "1a1a24", "hair_style": "long", "eyes": "3a7a5a",
     "hat": "scholar", "sleeve": "2a6a50", "embroidery": "e8d890",
 })

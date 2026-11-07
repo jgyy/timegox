@@ -9,6 +9,10 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/apprentice_zhi.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "eye_size": 1.38, "jaw": 0.82, "build": 0.92,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": [("shuttle", {"col": "f0d0e8"})],
     "robe": "e0d0f0", "trim": "f0a0c8", "inner": "fff8ff", "sash": "a06090", "hair": "f0e8f8", "hair_style": "long",
     "pin": "f0c8e8", "eyes": "a060c0", "ribbon": "ffd0f0", "crown": True, "embroidery": "ffe0f8", "glow_eyes": False,
 })

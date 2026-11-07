@@ -9,6 +9,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import anatomy as A  # noqa: E402
+
 from kit import CRYSTAL, FOLIAGE, MAT_GLOW, STONE, V, Builder  # noqa: E402
 
 kit.reset()
@@ -41,5 +43,13 @@ for k in range(7):
 for k in range(8):
     a = k / 8 * 2 * math.pi
     b.superquad(V(math.cos(a) * 1.55, Y + 0.3 * math.sin(k * 1.7), math.sin(a) * 1.55), (0.12, 0.09, 0.1), "5a4a6a", e=0.7, cls=STONE, rot=(k, k * 0.7, 0), seg=8, rings=5)
+# detail: hewn chunks torn loose and hanging in the air round it, chaos-light leaking from the
+# cracks
+for k in range(7):
+    a = k / 7 * 2 * math.pi
+    A.hewn_stone(b, V(math.cos(a) * 1.2, 1.2 + math.sin(a * 2) * 0.5, math.sin(a) * 1.0), (0.22, 0.18, 0.2), None, seed=k + 101, shade=0.4, e=0.4, tint=0.0, rot=(a, a * 0.5, 0), seg=10, rings=6)
+for k in range(5):
+    a = k / 5 * 2 * math.pi + 0.3
+    A.glow_seam(b, [V(math.cos(a) * 0.2, 0.3, math.sin(a) * 0.2), V(math.cos(a) * 0.45, 0.9, math.sin(a) * 0.4), V(math.cos(a + 0.3) * 0.3, 1.5, math.sin(a + 0.3) * 0.3)], 0.014, "ff60e0", None, tint=0.0)
 print("[art] chaosrock: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/chaosrock.glb", target_tris=1800, samples=12, dist=0.5, strength=0.5)
+kit.finish_static(b, "props/chaosrock.glb", target_tris=3000, samples=12, dist=0.5, strength=0.5)

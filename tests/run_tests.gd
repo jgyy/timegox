@@ -117,7 +117,8 @@ func _init() -> void:
 				tris += mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_INDEX].size() / 3
 				var mat: Material = mi.mesh.surface_get_material(si)
 				check(mat == MB.mat_vc() or mat == MB.mat_plain() or mat == MB.mat_glow(), "%s: surface %d uses a game shader" % [rel, si])
-		check(tris > 5000 and tris < 40000, "%s: sensible triangle count (%d)" % [rel, tris])
+		# sculpted faces, strand hair and layered hanfu: a hero-asset budget, still well under 50k
+		check(tris > 5000 and tris < 50000, "%s: sensible triangle count (%d)" % [rel, tris])
 		pm.free()
 	for shape in Assets.MONSTERS:
 		var mrel: String = Assets.MONSTERS[shape]
@@ -127,16 +128,34 @@ func _init() -> void:
 		var mm := Assets.monster(shape, Color("ff0000"))
 		var map: AnimationPlayer = mm.get_meta("ap", null)
 		check(map != null and map.has_animation("idle") and map.has_animation("attack") and map.has_animation("hurt"), shape + ": idle, attack and hurt clips")
-		# tint: red asked for, so tinted vertices lose their green and blue
+		# tint: red asked for, so tinted vertices come out red-dominant (the palette shades them from
+		# a deep red to a warm light red; secondary and accent parts are a minority)
 		var tinted := 0
 		var arr: Array = mm.get_meta("meshes")[0].mesh.surface_get_arrays(0)
 		var cols: PackedColorArray = arr[Mesh.ARRAY_COLOR]
 		var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
 		for i in cols.size():
-			if uvs[i].x > 0.99 and cols[i].g < 0.02 and cols[i].r > 0.02:
+			if uvs[i].x > 0.99 and cols[i].r > 0.02 and cols[i].r > cols[i].g * 2.0 and cols[i].r > cols[i].b * 2.0:
 				tinted += 1
 		check(tinted > cols.size() / 10, "%s: tint recolours the body (%d of %d vertices)" % [shape, tinted, cols.size()])
 		mm.free()
+	# the palette: one enemy colour gives a distinct secondary and a contrasting accent
+	var pal: Array = Assets.palette(Color("c03020"))
+	check(absf((pal[3] as Color).h - (pal[0] as Color).h) > 0.05 and absf((pal[4] as Color).h - (pal[0] as Color).h) > 0.3, "palette: analogous secondary and contrasting accent")
+	var grey_pal: Array = Assets.palette(Color("e8e8f0"))
+	check((grey_pal[4] as Color).s > 0.3, "palette: a near-grey enemy still gets a coloured accent")
+	var dragon := Assets.monster("dragon", Color("c03020"))
+	var huesets := {}
+	for mi2 in dragon.get_meta("meshes"):
+		for si2 in mi2.mesh.get_surface_count():
+			var a2: Array = mi2.mesh.surface_get_arrays(si2)
+			var c2: PackedColorArray = a2[Mesh.ARRAY_COLOR]
+			var u2: PackedVector2Array = a2[Mesh.ARRAY_TEX_UV]
+			for i2 in range(0, c2.size(), 7):
+				if u2[i2].x > 0.99 and c2[i2].v > 0.05:
+					huesets[int(c2[i2].h * 12.0)] = true
+	check(huesets.size() >= 3, "palette: a tinted dragon shows several hues (%d)" % huesets.size())
+	dragon.free()
 	# the same shape in two colours shares nothing but the source mesh
 	var ma := Assets.monster("beast", Color("ff0000"))
 	var mb2 := Assets.monster("beast", Color("0000ff"))
@@ -250,12 +269,27 @@ func _init() -> void:
 				ne = e3
 		check(ne != null and wd.grid[ne.pos.y * wd.w + ne.pos.x] == MapGen.INTERIOR, npc + " waits indoors")
 	print("== part VII ==")
-	check(Data.REALMS[Data.REALMS.size() - 1] == "Boundless Heart" and Data.MAX_LEVEL == 36, "Part VII adds the Boundless Heart realm")
+	check(Data.REALMS.has("Boundless Heart") and Data.level_name(36).ends_with("Boundless Heart"), "Part VII adds the Boundless Heart realm")
 	check(Data.DIALOGUE.has("recall5") and Data.step_index("s_break11") < Data.step_index("s_p7_home"), "Part VII starts after the Samsara breakthrough")
 	for a7 in ["village", "tea", "silk", "loom"]:
 		check(Look.THEMES.has(a7) and Look.EXTRA.has(a7) and Scatter.ECO.has(a7) and Fauna.KINDS.has(a7), "theme, terrain extras, ecology and wildlife for " + a7)
 	check(Data.known_skills(0, 34).has("threadfall") and Data.known_skills(1, 34).has("homeward"), "Part VII techniques are learnable")
 	check(not Data.known_skills(0, 35, Data.step_index("s_sk_return")).has("boundless"), "Boundless Heart Sword waits for Can Niang's cocoons")
+	print("== part VIII ==")
+	check(Data.REALMS[Data.REALMS.size() - 1] == "Star River Crossing" and Data.MAX_LEVEL == 39, "Part VIII adds the Star River Crossing realm")
+	check(Data.DIALOGUE.has("recall6") and Data.step_index("s_break12") < Data.step_index("s_p8_home"), "Part VIII starts after the Boundless Heart breakthrough")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "starferry" and p.open == "s_p8_home"), "the sect's south road to the Starfall Ferry opens after the Part VIII briefing")
+	for a8 in ["starferry", "magpie", "starpalace", "jasper"]:
+		check(Look.THEMES.has(a8) and Look.EXTRA.has(a8) and Scatter.ECO.has(a8) and Fauna.KINDS.has(a8) and MapGen.DENSITY.has(a8), "theme, terrain extras, ecology, wildlife and density for " + a8)
+	for sh in ["qilin", "ape"]:
+		check(Assets.has_monster(sh) and UI.SHAPES.has(sh), "Part VIII monster shape %s is Blender-built" % sh)
+	for np8 in ["niu_lang", "que_lao", "zhi_nu", "dong_shuang"]:
+		check(Assets.PEOPLE.has(np8) and Assets.has(Assets.PEOPLE[np8]), "Part VIII character %s is Blender-built" % np8)
+	check(Data.known_skills(0, 37).has("starriver") and Data.known_skills(1, 37).has("magpie_wing") and Data.known_skills(1, 36).has("starweave"), "Part VIII techniques are learnable")
+	check(not Data.known_skills(0, 38, Data.step_index("s_wv_return")).has("reunion"), "Reunion Sword waits for the Weaver Star's threads")
+	check(Data.known_skills(0, 38, Data.step_index("s_wv_moth")).has("reunion"), "Reunion Sword is learned from Zhi Nu")
+	check(Data.BOSS_DROPS.get("crow_marshal", "") == "magpie_badge", "the Crow Marshal gives up his badge")
+	check(Data.SKILLS.rebirth.get("revive", false) and Data.SKILLS.homeward.get("revive", false), "the Lotus of Rebirth and the Homeward Lantern raise fallen allies")
 	print("== story ==")
 	for st in Data.STEPS:
 		if st.kind == "collect":

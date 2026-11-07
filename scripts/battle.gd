@@ -353,8 +353,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 			main.fx_flash(col.lerp(Color.WHITE, 0.5), 0.22 if tgt.side == "foe" else 0.3)
 	if tgt.hp <= 0.0:
 		tgt.dead = true
-		if not quiet or true:
-			say("%s is defeated." % tgt.name if tgt.side == "foe" else "%s collapses!" % tgt.name)
+		say("%s is defeated." % tgt.name if tgt.side == "foe" else "%s collapses!" % tgt.name)
 		if tgt.side == "foe":
 			Game.kills += 1
 
@@ -373,6 +372,10 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 			Models.act(actor.model, "cast", t)
 			Fx3D.technique(scene3d, skill_id, pos3(actor), tgts.map(func(f): return pos3(f)))
 		for tg in tgts:
+			if tg.dead and s.get("revive", false):
+				tg.dead = false
+				tg.fade = 1.0
+				say("%s is raised by %s!" % [tg.name, s.n])
 			_heal(tg, tg.maxhp * s.heal)
 	else:
 		say("%s uses %s." % [actor.name, s.n])
@@ -564,7 +567,8 @@ func _select() -> void:
 				"all":
 					_perform(cur, sid, alive(foes))
 				"allies":
-					_perform(cur, sid, alive(party))
+					# a reviving heal reaches the fallen too (the Lotus of Rebirth used to skip them)
+					_perform(cur, sid, party if s.get("revive", false) else alive(party))
 				"ally":
 					_open_targets(party)
 		"items":

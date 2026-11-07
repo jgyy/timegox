@@ -1,5 +1,8 @@
-"""Scorpion (new in Part V): plated body, eight jointed legs, two great pincers that snap, and a
-five-segment tail arching overhead to a glowing stinger (Glass Scorpion King, Dune Stalker).
+"""Scorpion (new in Part V): the Glass Scorpion King and the Dune Stalker.  A flat prosoma with a
+median eye tubercle and lateral eyes, seven keeled tergites over the mesosoma, chelicerae and
+comb-like pectines underneath, a metasoma of five keeled tail segments arching overhead to the
+bulbous telson and its curved aculeus, pedipalps ending in swollen chelae with toothed fingers,
+and eight segmented legs with spurs.
 Run: blender --background --python art/monsters/scorpion.py  ->  assets/monsters/scorpion.glb"""
 import math
 import os
@@ -7,8 +10,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import anatomy as A  # noqa: E402
 from creature import eyes, zero_pose  # noqa: E402
-from kit import CRYSTAL, MAT_GLOW, SCALE, V, Builder, Rig, env  # noqa: E402
+from sculpt import morph_sphere, smooth, strand  # noqa: E402
+from kit import CRYSTAL, MAT_GLOW, SCALE, STONE, V, Builder, Rig, env  # noqa: E402
 
 kit.reset()
 r = Rig("rig")
@@ -34,42 +39,61 @@ for s, sd in ((1, "L"), (-1, "R")):
         r.bone("shin%d.%s" % (k, sd), knee, foot, "leg%d.%s" % (k, sd))
 
 b = Builder("scorpion")
-# cephalothorax and abdominal plates
-b.superquad(V(0, 0.45, 0.2), (0.28, 0.12, 0.25), (0.9, 0.9, 0.9), e=0.5, cls=SCALE, bone="body", tint=1.0, col2=(0.55, 0.55, 0.55))
-for k in range(5):
-    z = -0.05 - k * 0.12
-    w = 0.3 - k * 0.025
-    b.superquad(V(0, 0.44 + 0.01 * k, z), (w, 0.1, 0.08), (0.8 + 0.04 * (k % 2), 0.8 + 0.04 * (k % 2), 0.8 + 0.04 * (k % 2)), e=0.5, cls=SCALE, bone="body", tint=1.0, col2=(0.5, 0.5, 0.5))
-eyes(b, V(0, 0.56, 0.38), 0.06, 0.025, iris="ff4030", bone="body", slit=False, glow=True, rot_y=0.4, h=0.9)
+# prosoma: a flat carapace with a median eye tubercle and lateral eyes at the front corners
+PC = V(0, 0.45, 0.2)
+morph_sphere(b, PC, lambda d: V(d.x * 0.28, d.y * (0.12 if d.y > 0 else 0.07), d.z * 0.26) * (1.0 + 0.05 * smooth(0.6, 1.0, d.y) * smooth(-0.2, 0.4, d.z)),
+             lambda p, d: (0.85 + 0.1 * d.y - 0.2 * smooth(0.97, 1.0, abs(math.cos(math.atan2(p.x, p.z) * 3.0))) * smooth(0.3, 0.8, d.y),) * 3,
+             cls=SCALE, bone="body", seg=24, rings=12, tint_fn=lambda p, d: 1.0)
+b.ellipsoid(V(0, 0.565, 0.28), (0.04, 0.025, 0.04), (0.6, 0.6, 0.6), cls=SCALE, bone="body", tint=1.0, seg=10, rings=6)
+eyes(b, V(0, 0.585, 0.29), 0.035, 0.018, iris="ff4030", bone="body", slit=False, glow=True, rot_y=0.4, h=0.9)
 for s in (1, -1):
-    b.ball(V(0.15 * s, 0.53, 0.4), 0.018, "ff6040", cls=CRYSTAL, bone="body", mat=MAT_GLOW, seg=8, rings=5)
-# mandibles
+    for k in range(3):
+        b.ball(V((0.17 + 0.025 * k) * s, 0.5, 0.42 - 0.02 * k), 0.012, "ff6040", cls=CRYSTAL, bone="body", mat=MAT_GLOW, seg=6, rings=4)
+# mesosoma: seven tergites with a central keel, each overlapping the next
+meso = [V(0, 0.44, 0.0)] + [V(0, 0.445 + 0.006 * k, -0.06 - k * 0.075) for k in range(1, 8)]
+A.plate_segments(b, meso, [(0.27 - 0.008 * k, 0.1) for k in range(8)], (0.8, 0.8, 0.8), lambda p: "body", n=16, col2=(0.6, 0.6, 0.6), ridge=0.25, cls=SCALE)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+# chelicerae and pectines underneath
 for s in (1, -1):
-    b.cone(V(0.05 * s, 0.4, 0.47), 0.03, 0.12, (0.5, 0.5, 0.5), cls=SCALE, bone="body", tint=1.0, rot=(math.pi / 2, 0, 0), seg=6)
-# tail segments with a glowing venom bulb and stinger
+    b.ellipsoid(V(0.04 * s, 0.42, 0.46), (0.035, 0.03, 0.05), (0.55, 0.55, 0.55), cls=SCALE, bone="body", tint=1.0, seg=10, rings=6)
+    b.cone(V(0.035 * s, 0.4, 0.52), 0.015, 0.05, "201010", cls=STONE, bone="body", rot=(math.pi / 2 + 0.3, 0, 0), seg=6)
+    for k in range(8):
+        b.tube([V(0.03 * s, 0.35, -0.05 - k * 0.02), V(0.12 * s, 0.33, -0.08 - k * 0.022)], [0.008, 0.003], (0.9, 0.9, 0.9), cls=SCALE, bone="body", tint=0.6, seg=4)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+# metasoma: five keeled tail segments, the joints dark, then the bulbous telson with its aculeus
 for i in range(5):
     a = TAIL[i]
-    c = TAIL[i].lerp(TAIL[i + 1], 0.5)
-    d = TAIL[i + 1] - a
-    rx = math.atan2(-d.y, d.z) if d.length > 0 else 0.0
-    w = 0.13 - i * 0.012
-    b.superquad(c, (w, w * 0.85, d.length * 0.62), (0.85, 0.85, 0.85), e=0.55, cls=SCALE, bone="tail%d" % i, rot=(rx, 0, 0), tint=1.0, col2=(0.6, 0.6, 0.6))
+    c2 = TAIL[i + 1]
+    w = 0.12 - i * 0.01
+    A.plate_segments(b, [a, a.lerp(c2, 0.5), c2], [(w, w * 0.9), (w * 1.05, w * 0.95), (w * 0.95, w * 0.85)], (0.85, 0.85, 0.85), lambda p, i=i: "tail%d" % i, n=12, col2=(0.6, 0.6, 0.6), ridge=0.3, cls=SCALE)
+    b.ellipsoid(a, (w * 0.8, w * 0.8, w * 0.5), (0.4, 0.4, 0.4), cls=SCALE, bone="tail%d" % i, tint=1.0, seg=10, rings=6)
 bulb = TAIL[5] + V(0, -0.02, 0.08)
-b.ellipsoid(bulb, (0.1, 0.09, 0.13), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="tail4", tint=1.0, mat=MAT_GLOW, seg=12, rings=8)
-b.cone(bulb + V(0, -0.1, 0.13), 0.035, 0.22, "201010", cls=SCALE, bone="tail4", rot=(math.pi * 0.75, 0, 0), seg=8)
-# pincers
+b.ellipsoid(bulb, (0.1, 0.09, 0.13), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="tail4", tint=1.0, mat=MAT_GLOW, seg=14, rings=10)
+b.ellipsoid(bulb + V(0, 0.02, 0), (0.105, 0.06, 0.12), (0.7, 0.7, 0.7), cls=SCALE, bone="tail4", tint=1.0, seg=14, rings=8)
+sting = [bulb + V(0, -0.05, 0.1), bulb + V(0, -0.12, 0.18), bulb + V(0, -0.22, 0.16), bulb + V(0, -0.27, 0.08)]
+strand(b, sting, 0.035, 0.002, "3a2020", col_tip="100808", cls=STONE, bone="tail4", seg=8, per=3)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+# pedipalps: femur and patella, then the chela - a swollen hand with fixed and movable fingers
+# lined with denticles - and the walking legs, segmented with spurs
 for s, sd in ((1, "L"), (-1, "R")):
     a, fo, c = "arm.%s" % sd, "fore.%s" % sd, "claw.%s" % sd
-    b.tube([r.head(a), r.tail(a)], [0.06, 0.055], (0.8, 0.8, 0.8), cls=SCALE, bone=a, tint=1.0, seg=10)
-    b.tube([r.head(fo), r.tail(fo)], [0.06, 0.07], (0.85, 0.85, 0.85), cls=SCALE, bone=fo, tint=1.0, seg=10)
+    A.plate_segments(b, [r.head(a), r.head(a).lerp(r.tail(a), 0.5), r.tail(a)], [(0.055, 0.05), (0.06, 0.05), (0.055, 0.05)], (0.8, 0.8, 0.8), lambda p, a=a: a, n=10, ridge=0.2, cls=SCALE)
+    A.plate_segments(b, [r.head(fo), r.head(fo).lerp(r.tail(fo), 0.5), r.tail(fo)], [(0.06, 0.055), (0.07, 0.06), (0.065, 0.06)], (0.85, 0.85, 0.85), lambda p, fo=fo: fo, n=10, ridge=0.2, cls=SCALE)
     wr = r.tail(fo)
-    b.ellipsoid(wr + V(0.03 * s, 0, 0.12), (0.11, 0.08, 0.16), (0.95, 0.95, 0.95), cls=SCALE, bone=c, tint=1.0, seg=14, rings=8)
-    b.cone(wr + V(0.04 * s, 0, 0.33), 0.05, 0.2, (0.6, 0.6, 0.6), cls=SCALE, bone=c, tint=1.0, rot=(math.pi / 2, 0, 0.1 * s), seg=8)
-    b.cone(wr + V(-0.06 * s, 0, 0.17), 0.035, 0.24, (0.6, 0.6, 0.6), cls=SCALE, bone="pinch.%s" % sd, tint=1.0, rot=(math.pi / 2, 0, -0.15 * s), seg=8)
+    hf = A.HeadFrame(wr + V(0.03 * s, 0, 0.12), V(0.05 * s, 0, 1))
+    morph_sphere(b, hf.c, lambda d: V(d.x * 0.11, d.y * 0.08, d.z * 0.16) * (1.0 + 0.1 * max(0.0, d.x * s)), lambda p, d: (0.92 + 0.06 * d.y,) * 3, cls=SCALE, bone=c, seg=18, rings=12, tint_fn=lambda p, d: 1.0, rot=hf.M)
+    fixed = [wr + V(0.04 * s, 0, 0.24), wr + V(0.045 * s, 0, 0.36), wr + V(0.03 * s, 0, 0.46)]
+    strand(b, fixed, 0.04, 0.006, (0.75, 0.75, 0.75), col_tip=(0.3, 0.3, 0.3), cls=SCALE, bone=c, flat=0.7, seg=8, per=3, tint=1.0, up=(0, 1, 0))
+    pin = [r.head("pinch.%s" % sd), r.head("pinch.%s" % sd).lerp(r.tail("pinch.%s" % sd), 0.5) + V(-0.02 * s, 0, 0), r.tail("pinch.%s" % sd)]
+    strand(b, pin, 0.035, 0.006, (0.75, 0.75, 0.75), col_tip=(0.3, 0.3, 0.3), cls=SCALE, bone="pinch.%s" % sd, flat=0.7, seg=8, per=3, tint=1.0, up=(0, 1, 0))
+    for q in range(4):
+        b.cone(wr + V(0.0, 0, 0.26 + q * 0.05), 0.008, 0.025, "f0e8d8", cls=STONE, bone=c, seg=5, rot=(0, 0, math.pi / 2 * s))
     for k in range(4):
         lg, sn = "leg%d.%s" % (k, sd), "shin%d.%s" % (k, sd)
-        b.tube([r.head(lg), r.tail(lg)], [0.035, 0.03], (0.75, 0.75, 0.75), cls=SCALE, bone=lg, tint=1.0, seg=8)
+        A.plate_segments(b, [r.head(lg), r.head(lg).lerp(r.tail(lg), 0.5) + V(0, 0.02, 0), r.tail(lg)], [0.035, 0.034, 0.03], (0.75, 0.75, 0.75), lambda p, lg=lg: lg, n=8, cls=SCALE)
         b.tube([r.head(sn), r.head(sn).lerp(r.tail(sn), 0.6), r.tail(sn)], [0.03, 0.022, 0.006], (0.6, 0.6, 0.6), cls=SCALE, bones=[{lg: 0.4, sn: 0.6}, sn, sn], tint=1.0, seg=8)
+        q = r.head(sn).lerp(r.tail(sn), 0.6)
+        b.cone(q + V(0.015 * s, 0, 0), 0.006, 0.03, "201010", cls=STONE, bone=sn, seg=5, rot=(0, 0, -1.2 * s))
 
 T = 2.0
 

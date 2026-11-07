@@ -9,6 +9,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
 import person  # noqa: E402
+from kit import HAIR, V  # noqa: E402
+from sculpt import strand  # noqa: E402
 from kit import env  # noqa: E402
 
 
@@ -62,7 +64,26 @@ def cast(t):
 
 
 kit.reset()
+def queue(b, rig, o, tor):
+    """The Qing queue: a long braid hanging from under the hat down the back, tied with red cord."""
+    top = V(0, 1.72, -0.12)
+    pts = [top + V(0, -0.02 * k - 0.07 * k, -0.03 - 0.012 * k) for k in range(9)]
+    bones = [{"head": 1.0}] * 2 + [{"head": 0.5, "hair_tail": 0.5}] * 2 + [{"hair_tail": 1.0}] * 5
+    for strand_k in range(3):
+        off = []
+        for k, p in enumerate(pts):
+            a = k * 2.1 + strand_k * 2.09
+            off.append(p + V(math.cos(a) * 0.012, 0, math.sin(a) * 0.008))
+        strand(b, off, 0.014, 0.008, "1a1a20", cls=HAIR, bones=bones, seg=6, per=3, flat=0.8)
+    b.tube([pts[-1] + V(0, 0.01, 0), pts[-1] - V(0, 0.02, 0)], [0.014, 0.014], "c02020", cls=HAIR, bone="hair_tail", seg=6)
+    strand(b, [pts[-1] - V(0, 0.02, 0), pts[-1] - V(0, 0.12, 0.01)], 0.012, 0.004, "c02020", cls=HAIR, bone="hair_tail", seg=5)
+
+
 person.export_person("monsters/jiangshi.glb", {
+    # a long-dead official: grey-green wrinkled skin, sunken eyes, long nails, fangs, a court
+    # necklace and a rank badge on the chest, the braided queue
+    "age": 0.9, "claws": True, "claw_col": "3a3a30", "claw_len": 0.08, "fangs": True,
+    "beads": True, "badge": True, "extra": queue, "eye_size": 0.9,
     "robe": "b8b8b8", "trim": "e8e8e8", "inner": "8a8a8a", "sash": "5a5a5a", "pants": "4a4a4a", "boots": "1a1a1a",
     "sleeve": "a8a8a8", "hair": "101014", "hair_style": "bun", "eyes": "e8f0e0", "skin": "b8c8b0", "hat": "qing",
     "talisman": True, "tint_cloth": True, "embroidery": "d0b050", "folds": 12, "collar2": "6a2a2a",

@@ -7,7 +7,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, METAL, STONE, WOOD, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+
+from kit import CLOTH, CRYSTAL, MAT_GLOW, METAL, STONE, V, WOOD, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(84)
@@ -29,5 +31,16 @@ b.superquad(V(0.95, 0.3, 0.4), (0.15, 0.3, 0.12), "5a4a3a", e=0.4, cls=WOOD)
 b.superquad(V(0.95, 0.65, 0.4), (0.3, 0.07, 0.13), "4a4a54", e=0.3, cls=METAL)
 for k in range(3):
     b.superquad(V(-0.4 + k * 0.25, 0.08, 0.95), (0.1, 0.05, 0.06), "ffc860", e=0.4, cls=CRYSTAL, mat=MAT_GLOW)
+# detail: the furnace's brick courses hewn and soot-stained, a heap of coal glowing at the stoke
+# hole, bellows on its stand, and sparks rising from the flue
+for k in range(10):
+    a = k / 10 * 2 * math.pi
+    A.hewn_stone(b, V(math.cos(a) * 0.72, 0.1, math.sin(a) * 0.72), (0.28, 0.2, 0.18), None, seed=k + 81, shade=0.4, e=0.35, tint=0.0, rot=(0, -a, 0), seg=8, rings=6)
+for k in range(9):
+    b.ellipsoid(V(0.55 + rnd.uniform(-0.15, 0.15), 0.05 + rnd.uniform(0, 0.08), 0.5 + rnd.uniform(-0.15, 0.15)), (0.06, 0.05, 0.06), "2a2020" if k % 3 else "ff7020", cls=STONE, seg=6, rings=4, mat=MAT_GLOW if k % 3 == 0 else 0)
+b.superquad(V(-0.8, 0.35, 0.3), (0.2, 0.08, 0.14), "6a4a30", e=0.5, cls=CLOTH, rot=(0, 0.5, 0.2))
+b.tube([V(-0.65, 0.35, 0.38), V(-0.45, 0.32, 0.45)], [0.03, 0.02], "5a5a60", cls=METAL, seg=6)
+for k in range(8):
+    b.ball(V(rnd.uniform(-0.15, 0.15), 2.8 + k * 0.18, rnd.uniform(-0.15, 0.15)), 0.025, "ffb040", cls=CRYSTAL, seg=5, rings=3, mat=MAT_GLOW)
 print("[art] furnace: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/furnace.glb", target_tris=2600, samples=12, dist=0.6, strength=0.5)
+kit.finish_static(b, "props/furnace.glb", target_tris=3800, samples=12, dist=0.6, strength=0.5)

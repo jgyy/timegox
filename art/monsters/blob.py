@@ -1,7 +1,7 @@
-"""Blob: the slimes and oozes (Marsh Slime, Ember Ooze, Ink Slime ...).  A glossy, wobbling drop of
-jelly with a darker core and a few swallowed trinkets floating inside, drips around its base, a
-tiny crown of bubbles, and a big-eyed, open-mouthed face.  It squashes and stretches on a
-two-bone rig (body plus a top bulb that lags behind it).  Tinted by the game per enemy.
+"""Blob: the slimes, oozes and formless spawn.  A slumped drop of slime that sags outwards
+under its own weight with a wobbling surface and a wet highlight, puddle lobes and hanging strands
+with droplets round its base, a murky core full of swallowed things (coins, a skull, a pebble, a
+sword hilt) and rising bubbles, glossy eyes and a gaping mouth.  Tinted by the game per enemy.
 Run: blender --background --python art/monsters/blob.py  ->  assets/monsters/blob.glb"""
 import math
 import os
@@ -9,8 +9,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import anatomy as A  # noqa: E402
 from creature import zero_pose  # noqa: E402
-from kit import CRYSTAL, METAL, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
+from kit import CRYSTAL, MAT_GLOW, METAL, SKIN, STONE, WOOD, V, Builder, Rig, env  # noqa: E402
+from sculpt import fbm3, morph_sphere, smooth, strand  # noqa: E402
 
 kit.reset()
 r = Rig("rig")
@@ -25,28 +27,52 @@ def bw(p):
     return {"body": 1.0 - k, "top": k}
 
 
-b.lathe(V(0, 0, 0), [(0.62, 0.02), (0.68, 0.12), (0.62, 0.35), (0.5, 0.58), (0.32, 0.8), (0.12, 0.93), (0.001, 0.96)], (0.85, 0.85, 0.85), cls=CRYSTAL, seg=28, tint=1.0, col_top=(1.0, 1.0, 1.0), bone_fn=bw, folds=(5, 0.03, 0.0))
-# drips and puddle lobes around the base
-for k in range(9):
-    a = 2 * math.pi * k / 9 + 0.2
-    b.ellipsoid(V(math.cos(a) * 0.66, 0.05, math.sin(a) * 0.66), (0.14, 0.06, 0.12), (0.9, 0.9, 0.9), cls=CRYSTAL, bone="body", tint=1.0, seg=10, rings=6, rot=(0, -a, 0))
-for k in range(4):
-    a = 2 * math.pi * k / 4 + 0.7
-    b.ellipsoid(V(math.cos(a) * 0.58, 0.32 - k * 0.04, math.sin(a) * 0.58), (0.05, 0.12, 0.05), (0.95, 0.95, 0.95), cls=CRYSTAL, bone="body", tint=1.0, seg=8, rings=6)
-# a darker core and swallowed trinkets (a coin, a bone, a pebble)
-b.ellipsoid(V(0, 0.38, -0.05), (0.3, 0.26, 0.28), (0.55, 0.55, 0.55), cls=CRYSTAL, bone=bw(V(0, 0.38, 0)), tint=1.0, seg=14, rings=8)
-b.lathe(V(0.15, 0.25, -0.1), [(0.07, -0.01), (0.07, 0.01)], "e8c050", cls=METAL, bone="body", seg=12, rot=(1.2, 0, 0.3))
-b.tube([V(-0.2, 0.3, -0.05), V(-0.05, 0.36, -0.12)], [0.025, 0.02], "ece4d0", cls=STONE, bone="body", seg=6)
-b.ball(V(0.05, 0.5, -0.15), 0.05, "6a6a70", cls=STONE, bone=bw(V(0, 0.5, 0)), seg=8, rings=5)
-# bubbles
+# body: a slumped drop of slime, sagging outwards at the bottom under its own weight, its surface
+# wobbling with noise, clearer at the top and murkier below
+def blob_shape(d):
+    p = V(d.x * 0.64, d.y * 0.48, d.z * 0.62)
+    sag = smooth(0.4, -0.9, d.y)
+    p.x *= 1.0 + 0.16 * sag
+    p.z *= 1.0 + 0.16 * sag
+    p = p * (1.0 + 0.06 * (fbm3((d.x * 2.5, d.y * 2.5, d.z * 2.5), 2, 6) - 0.5))
+    if d.y < -0.6:
+        p.y = -0.46 + (p.y + 0.46) * 0.3
+    return p
+
+
+morph_sphere(b, V(0, 0.47, 0), blob_shape, lambda p, d: (0.75 + 0.25 * smooth(-0.6, 0.8, d.y),) * 3, cls=CRYSTAL, seg=32, rings=20, bone_fn=bw, tint_fn=lambda p, d: 1.0)
+# a wet highlight across the top
+b.ellipsoid(V(-0.18, 0.86, 0.22), (0.12, 0.04, 0.08), "ffffff", cls=CRYSTAL, bone="top", seg=10, rings=5, rot=(0.6, 0.4, 0.3), mat=MAT_GLOW, tint=0.2)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+# drips and puddle lobes around the base, with a few hanging strands and droplets
+for k in range(11):
+    a = 2 * math.pi * k / 11 + 0.2
+    b.ellipsoid(V(math.cos(a) * 0.7, 0.04, math.sin(a) * 0.7), (0.15, 0.05, 0.12), (0.9, 0.9, 0.9), cls=CRYSTAL, bone="body", tint=1.0, seg=10, rings=6, rot=(0, -a, 0))
 for k in range(5):
+    a = 2 * math.pi * k / 5 + 0.7
+    top = V(math.cos(a) * 0.62, 0.42 - k * 0.04, math.sin(a) * 0.62)
+    strand(b, [top, top + V(math.cos(a) * 0.04, -0.12, math.sin(a) * 0.04), top + V(math.cos(a) * 0.05, -0.25, math.sin(a) * 0.05)], 0.05, 0.02, (0.95, 0.95, 0.95), cls=CRYSTAL, bone="body", seg=8, per=3, tint=1.0)
+    b.ball(top + V(math.cos(a) * 0.05, -0.3, math.sin(a) * 0.05), 0.035, (0.95, 0.95, 0.95), cls=CRYSTAL, bone="body", tint=1.0, seg=8, rings=6)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+# a darker core and swallowed trinkets (coins, a skull, a pebble, a sword hilt)
+b.ellipsoid(V(0, 0.38, -0.05), (0.3, 0.26, 0.28), (0.55, 0.55, 0.55), cls=CRYSTAL, bone=bw(V(0, 0.38, 0)), tint=1.0, seg=14, rings=8)
+for k, (x, y, z, rx) in enumerate(((0.15, 0.25, -0.1, 1.2), (0.22, 0.3, 0.05, 0.4), (0.1, 0.2, 0.15, 2.0))):
+    b.lathe(V(x, y, z), [(0.06, -0.008), (0.06, 0.008)], "e8c050", cls=METAL, bone="body", seg=14, rot=(rx, 0, 0.3 * k))
+A.skull(b, V(-0.18, 0.36, -0.06), 0.9, "body", col="e8e0cc", fwd=V(0.4, 0.2, 1.0))
+b.ball(V(0.05, 0.5, -0.15), 0.05, "6a6a70", cls=STONE, bone=bw(V(0, 0.5, 0)), seg=8, rings=5)
+b.tube([V(0.25, 0.55, -0.2), V(0.35, 0.72, -0.25)], [0.02, 0.018], "4a3020", cls=WOOD, bone=bw(V(0, 0.6, 0)), seg=6)
+b.ellipsoid(V(0.25, 0.55, -0.2), (0.07, 0.015, 0.02), "d8b050", cls=METAL, bone="body", seg=8, rings=4, rot=(0, 0, 0.6))
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+# bubbles rising inside
+for k in range(9):
     a = k * 2.2
-    b.ball(V(math.cos(a) * 0.12, 0.92 + 0.04 * (k % 2), math.sin(a) * 0.1), 0.04 + 0.015 * (k % 3), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="top", tint=1.0, seg=8, rings=5)
-# face
+    b.ball(V(math.cos(a) * (0.08 + 0.03 * k), 0.5 + 0.05 * k, math.sin(a) * 0.12), 0.025 + 0.012 * (k % 3), (1.0, 1.0, 1.0), cls=CRYSTAL, bone=bw(V(0, 0.5 + 0.05 * k, 0)), tint=1.0, seg=8, rings=5)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+# face: big glossy eyes and a gaping mouth with a tongue
 for s in (1, -1):
-    b.eye(V(0.17 * s, 0.6, 0.47), 0.085, "1a2030", side=s, bone=bw(V(0, 0.6, 0)), rot_y=0.25, h=1.25)
-b.ellipsoid(V(0, 0.42, 0.56), (0.1, 0.07, 0.04), "401828", cls=SKIN, bone="body", seg=12, rings=6)
-b.ellipsoid(V(0, 0.4, 0.58), (0.05, 0.03, 0.02), "e05068", cls=SKIN, bone="body", seg=10, rings=5)
+    b.eye(V(0.17 * s, 0.62, 0.5), 0.085, "1a2030", side=s, bone=bw(V(0, 0.6, 0)), rot_y=0.25, h=1.25)
+b.ellipsoid(V(0, 0.42, 0.58), (0.11, 0.075, 0.04), "401828", cls=SKIN, bone="body", seg=12, rings=6)
+b.ellipsoid(V(0, 0.4, 0.6), (0.055, 0.03, 0.02), "e05068", cls=SKIN, bone="body", seg=10, rings=5)
 
 T_IDLE = 1.6
 

@@ -637,7 +637,7 @@ static func _eyes(g: MB, b: MB, pos: Vector3, spread: float, r: float, col: Colo
 		g.ball(p + Vector3(r * 0.3, r * 0.3, r * 0.9), r * 0.25, Color(1, 1, 1, 1), true)
 
 ## Procedural stand-ins for the Blender-only shapes (used if their .glb is missing).
-const FALLBACK := {"scorpion": "crab", "mushroom": "plant", "mammoth": "beast", "moth": "bird", "hundun": "jelly", "fox": "beast", "carp": "serpent", "oxhead": "demon", "horseface": "demon", "jiangshi": "humanoid"}
+const FALLBACK := {"scorpion": "crab", "mushroom": "plant", "mammoth": "beast", "moth": "bird", "hundun": "jelly", "fox": "beast", "carp": "serpent", "oxhead": "demon", "horseface": "demon", "jiangshi": "humanoid", "qilin": "beast", "ape": "beast", "tiger": "beast", "queen": "humanoid", "warden": "humanoid", "crowmarshal": "humanoid", "kaiming": "beast", "magpie": "bird"}
 
 static func monster(shape: String, col: Color, boss: bool = false) -> Node3D:
 	if Assets.has_monster(shape):

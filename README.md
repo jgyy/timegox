@@ -1,23 +1,75 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to the Boundless Heart, across **one open world** of 30 regions around Azure Cloud Mountain, with 109 bosses, twelve Heavenly Tribulations and buildings you can walk into.
+Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to the Star River Crossing, across **one open world** of 34 regions around Azure Cloud Mountain, with 125 bosses, thirteen Heavenly Tribulations and buildings you can walk into.
 
-> **Total gameplay duration: about 7 hours 47 minutes** (7:46:52 of game time for the end-to-end bot run, seed 1234). Parts I to VI take 6:39:25 in the new open world; **Part VII, "The Unbroken Land", adds another hour** (1 hour 7 minutes): four new regions (a mortal village, tea terraces, silk woods and the Loom of Borders), 16 new bosses, 12 new monsters, a new realm (Boundless Heart), five new techniques, seven new Blender-built characters and a new ending. **The whole game is now one continuous open world**: no more separate maps and teleporting gates.
+> **Total gameplay duration: about 8 hours 58 minutes** (8:57:35 of game time for the end-to-end bot run, seed 1234). Parts I to VII take 7:46:52; **Part VIII, "The River of Heaven", adds another hour** (1 hour 11 minutes): four new regions on the Silver River and Mount Kunlun, 16 new bosses, 12 new monsters, a new realm (Star River Crossing), five new techniques, four new Blender-built characters and the magpie bridge in the ending. **Every character and monster model was rebuilt** from new anatomy, face, hair, garment and palette libraries, which doubled the Blender Python art code (6,272 to 12,549 lines).
 
 | | |
 |---|---|
-| ![open world](docs/screenshots/openworld_sect.png) | ![village](docs/screenshots/vista_village.png) |
-| ![inside the hall](docs/screenshots/interior_hall.png) | ![world map](docs/screenshots/world_map.png) |
-| ![pharmacy](docs/screenshots/interior_pharmacy.png) | ![loom](docs/screenshots/vista_loom.png) |
-| ![sect](docs/screenshots/architecture_sect.png) | ![maple](docs/screenshots/vista_maple.png) |
-| ![hall](docs/screenshots/architecture_hall.png) | ![fungal](docs/screenshots/vista_fungal.png) |
-| ![portraits](docs/screenshots/portrait_heroes.png) | ![part6](docs/screenshots/gallery_part6.png) |
-| ![springs](docs/screenshots/vista_springs.png) | ![fox](docs/screenshots/battle_boss_nine_tail_fox.png) |
+| ![part 8 people](docs/screenshots/gallery_npcs_part8.png) | ![part 8 creatures](docs/screenshots/gallery_part8.png) |
+| ![portraits](docs/screenshots/portrait_heroes.png) | ![ending](docs/screenshots/ending.png) |
+| ![part 8 bosses](docs/screenshots/gallery_part8_bosses.png) | ![palettes](docs/screenshots/gallery_palettes.png) |
+| ![magpie bridge heights](docs/screenshots/vista_magpie.png) | ![jasper pool](docs/screenshots/vista_jasper.png) |
+| ![queen mother](docs/screenshots/battle_boss_xiwangmu.png) | ![star ferry](docs/screenshots/world_starferry.png) |
+| ![beasts](docs/screenshots/gallery_beasts.png) | ![giants](docs/screenshots/gallery_giants.png) |
+| ![open world](docs/screenshots/openworld_sect.png) | ![inside the hall](docs/screenshots/interior_hall.png) |
 
 More captures (every region from the ground and from above, every boss, model galleries and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph R[References studied]
+    REF1[anime / Genshin-style<br/>proportions, faces, shading]
+    REF2[dog, horse and big-cat<br/>anatomy: digitigrade legs]
+    REF3[Chinese dragon:<br/>nine resemblances]
+    end
+    subgraph L[New Blender libraries: art/lib]
+    SC[sculpt.py<br/>lofts, profiles, noise, strands]
+    FA[face.py<br/>skull, nose, lips, lidded eyes,<br/>ears, ageing, beards]
+    HA[hair.py<br/>scalp, locks, bangs,<br/>8 styles, sheen]
+    GA[garment.py<br/>layered hanfu, sleeves, armour,<br/>hats, brocade, weapons]
+    AC[accessory.py<br/>29 hand props + poses]
+    AN[anatomy.py<br/>quadruped bodies, legs, paws,<br/>heads, fur, feathers, scales]
+    FE[feline.py + bird.py]
+    end
+    subgraph C[Colour]
+    PAL[palette slots in the UVs:<br/>primary / secondary / accent]
+    HAR[harmonised costumes,<br/>hair sheen]
+    end
+    subgraph P[Part VIII: +1 hour]
+    SF[Starfall Ferry] --> MG[Magpie Bridge Heights] --> SP[Weaver Star Palace] --> JP[Jasper Pool of Kunlun]
+    end
+    R --> L
+    L --> ASSETS[39 people, 37 monsters,<br/>26 props rebuilt]
+    C --> ASSETS
+    ASSETS --> G((Game))
+    P --> G
+    CHK[check_assets.py<br/>GLB validator in CI] --> ASSETS
+```
+
+- **Characters look like people.** Every character is built by `art/lib/person.py` from new libraries. **Faces** (`face.py`) are sculpted on a skull: brow ridge, cheekbones, jaw and chin, a nose with alar wings, lips with a philtrum, eyes set into sockets under lids with a crease and lashes, ears with a helix, laugh lines and crow's feet for the old, and beards that grow from the face. **Hair** (`hair.py`) grows from a scalp with a real hairline as tapered locks, with fringes, side locks, a crown whorl and eight styles (topknot, long, bun, twin buns, braid, short, wild, bald), and dark hair gets a lighter sheen. **Clothes** (`garment.py`) are layered hanfu lofted around the body: inner robe, crossed collar, sash, hanging sleeves with a lining, a skirt that drapes, and armour of lamellar plates, pauldrons and tassets; hats, crowns, weapons, brocade motifs (cloud scrolls, waves, cranes, plum blossom), scars and freckles. Builds (slight to burly), age (the old stoop), femininity, and anime-leaning proportions (about 7 heads tall, larger eyes) follow the references. **Props and poses** (`accessory.py`): 29 hand-held items (gourds, fans, scrolls, lanterns, oars, fishing rods, abacus, flute, a cormorant...) with matching holding poses, so every NPC carries their trade.
+- **Natural motion.** Idle with contrapposto and breathing, a walk with heel strike and counter-swinging arms, sitting, attacking, casting, hurt and victory clips; held props keep their pose while walking.
+- **Monsters have anatomy.** `anatomy.py` builds quadrupeds the way the animals are built: a keel-shaped ribcage and tucked waist, withers and croup, muscled shoulders and haunches, **digitigrade legs** with the stifle forward and the hock back, paws with toe pads and claws, canine and feline skulls with a stop and a separate jaw, groomed fur clumps, feathers with a rachis, scale rows, plates, compound eyes, bristles, bark-covered limbs and veined leaves. The dragon follows the **nine resemblances** (camel head, deer antlers, rabbit eyes, cow ears, snake neck, clam belly, carp scales, eagle claws, tiger palms). All 29 old shapes were rebuilt and 8 new ones added: **qilin, ape, tiger, Queen Mother, River Warden, Crow Marshal, nine-faced Kaiming and magpie**, so lions, tigers, apes and qilin are no longer drawn as wolves.
+- **Much richer colour palettes.** The art pipeline now stores a **palette slot** per vertex (primary, secondary, accent) next to the tint weight. In game, `Assets.palette()` turns one enemy colour into a scheme: a shade and a light of the primary blended by the surface's own value, an analogous secondary and a complementary accent (gold or blue for grey creatures). Quadrupeds get pale bellies and darker lower legs, manes, crests, fins and horns take the secondary, eyes, claws and glows the accent. Characters' costumes are **harmonised** from their robe colour: a pastel inner robe, deeper trousers, a contrasting sash and collar, light trim.
+- **Landmarks** (all 26 props) gained sculpted detail within their triangle budgets, and four new ones mark Part VIII: the ferry post, the magpie pine, the star pillar and the jade peach tree.
+- **Part VIII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **8 hours**. The ending gains the **magpie bridge** (`art/props/magpiebridge.py`) with the Cowherd and the Weaver meeting on it.
+- **Asset validation in CI.** `art/check_assets.py` reads every exported GLB without Blender and checks the script-to-file pairing, the three material slots, vertex colours and tint UVs, triangle budgets, the bones the game drives and the animation clips.
+- **Blender Python art code doubled**: 6,272 to 12,549 lines (`art/lib` 5,389, characters 770, monsters 4,704, props 1,489, tools 198).
+- **Bugs found and fixed** (see below).
+
+### References
+
+The models were rebuilt after studying how stylised and anatomical 3D characters are made:
+
+- Anime proportions and faces: [how to draw anime characters with correct proportions](https://www.alibaba.com/product-insights/how-to-draw-anime-characters-with-correct-proportions-step-by-step.html), [3D character body](https://tinakuang.myblog.arts.ac.uk/2024/03/26/3d-character-body/), [making a stylised face](https://www.hitem3d.ai/de/ai-faq/how-to-make-a-face-3d-model-look-stylized).
+- Toon shading and model evolution in Genshin Impact: [Adrian Mendez's shading breakdown](https://adrianmendez.artstation.com/projects/wJZ4Gg), [B. J. Ayers' blog](https://bjayers.artstation.com/blog/category/5), [character model evolution 1.0 to 7.0](https://topuplist.com/blogs/detail/genshin-impact-character-model-evolution-version-1-0-to-7-0), [Natlan model changes](https://thenerdstash.com/genshin-impact-fans-discover-a-small-yet-welcome-change-in-the-new-natlan-character-models).
+- Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
+- The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
+
+### Previous release: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -51,7 +103,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Previous release: natural landscapes and Part VI
+### Release before that: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -142,23 +194,28 @@ flowchart TD
 | **Blender Python** (`bpy`, Blender 5.2) | hero assets: characters, monsters, rigs and animations, landmarks | `art/` |
 
 - `art/lib/kit.py`: the toolkit. Coordinates are written in Godot space; primitives (ellipsoids, superquadrics, swept tubes with per-point bone weights, lathes, double-sided sheets, leaves, eyes), organic bodies from Blender's **Skin + Subdivision modifiers**, **ray-cast ambient occlusion** baked into vertex colours, the **Decimate** modifier for landmark triangle budgets, armatures, clips baked from Python functions and GLB export.
-- `art/lib/person.py` builds every character from options (robe, hair style, hat, weapon, beard, horns, tinting); `art/lib/creature.py` holds the monster helpers.
+- `art/lib/person.py` builds every character from options (robe, hair style, hat, weapon, beard, horns, build, age, props, pose, brocade, tinting) with `face.py`, `hair.py`, `garment.py` and `accessory.py`; `sculpt.py` holds the shared modelling tools (lofts through cross-section profiles, noise, splines, strands).
+- `art/lib/anatomy.py` builds animal bodies (quadruped torso and legs, paws, skulls, fur, feathers, scales, plates, bark, leaves); `feline.py` and `bird.py` build the cat and bird families; `art/lib/creature.py` holds the rigs and clip helpers.
 - `art/characters/*.py`, `art/monsters/*.py`, `art/props/*.py`: one script per asset, each writing `assets/<group>/<name>.glb`.
-- Vertex colour alpha carries the toon shader's surface class, UV.x a tint weight, and the material slot (`toon`, `plain`, `glow`) chooses the game shader; `scripts/assets.gd` swaps the materials in at load time, so Blender and procedural models share one look.
+- Vertex colour alpha carries the toon shader's surface class, UV.x a tint weight, UV.y a **palette slot** (0 primary, 0.5 secondary, 1 accent), and the material slot (`toon`, `plain`, `glow`) chooses the game shader; `scripts/assets.gd` swaps the materials in at load time and turns the enemy's colour into a palette, so Blender and procedural models share one look.
+- `python art/check_assets.py` validates every export (pairing with its script, materials, colours and UVs, triangle budgets, bones, clips); CI runs it after the rebuild.
 - Builds are deterministic: rebuilding produces byte-identical files on the same machine. CI rebuilds every asset from its script.
 - Every art change is checked visually with the screenshot tour (`--tour`, `--gallery`).
 
 ```sh
 pip install bpy==5.2.3                        # Blender as a Python module (or use a Blender install)
-python art/build_all.py                       # rebuild all 85 assets (about 3 min)
+python art/build_all.py                       # rebuild all 102 assets (about 6 min)
+python art/check_assets.py                     # validate the exports
 blender --background --python art/monsters/hundun.py   # or one asset with Blender itself
 godot --headless --path . --import            # re-import into Godot
 ```
 
 ```mermaid
 flowchart LR
+    LIB[art/lib<br/>kit, sculpt, face, hair, garment,<br/>accessory, anatomy, feline, bird] --> BS
     BS[art/*/*.py<br/>Blender Python] -->|bpy / blender --background| GLB[assets/*.glb]
-    GLB --> AS[assets.gd<br/>game shaders, tint, clips]
+    GLB --> CK[check_assets.py]
+    GLB --> AS[assets.gd<br/>game shaders, tint, palette, clips]
     GD[scripts/*.gd<br/>GDScript + shaders] --> GAME((Game))
     AS --> GAME
     GAME -->|--tour --gallery| SHOT[docs/screenshots<br/>visual check]
@@ -179,7 +236,7 @@ Other terminal commands:
 ```sh
 godot --headless --path . --script tests/run_tests.gd           # data-integrity and 3D-asset tests
 godot --headless --path . --script tests/manual_input_test.gd   # real keyboard-event smoke test
-godot --headless --fixed-fps 30 --path . -- --bot --min-time=25200   # bot plays the whole game, prints play time
+godot --headless --fixed-fps 30 --path . -- --bot --min-time=28800   # bot plays the whole game, prints play time
 godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-fps for real time) watch the bot
 ```
 
@@ -190,14 +247,14 @@ godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-
 | Enter / Z / Space | confirm, interact, advance dialogue |
 | Esc / X | menu (Meditate, Breakthrough, Items), cancel |
 
-Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes nearly eight hours. Esc > World Map shows the whole land.
+Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes about nine hours. Esc > World Map shows the whole land.
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 37 stages across thirteen realms (up to the Boundless Heart); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 40 stages across fourteen realms (up to the Star River Crossing); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Thirty regions in one open world**, each with elites, bosses and a hunt objective, joined by roads. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII (new)**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders.
-- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, **Seam-Cutting Sword**, **Thousand-Thread Rain** and **Boundless Heart Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, **Silver Silk Snare** and **Homeward Lantern**.
+- **Thirty-four regions in one open world**, each with elites, bosses and a hunt objective, joined by roads. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII (new)**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun.
+- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, **Magpie Bridge Sword**, **Silver River Torrent** and **Seventh-Night Reunion Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, **Starweave Net** and **Magpie Wing Ward** (the last three heals also raise a fallen ally).
 - **Economy**: spirit stones buy pills and tempering for your sword.
 
 ```mermaid
@@ -250,7 +307,14 @@ flowchart LR
     Terraces --> Silk[Mulberry Silk Woods<br/>Thousand Hands]
     Silk --> Loom[Loom of Borders<br/>Madam Qianxian]
     end
-    Loom ==> End((Boundless Heart))
+    subgraph P8[Part VIII: about 1h11m]
+    Loom ==>|Boundless Heart, the Silver River floods| Sect7[Sect: drowned stars in the pond]
+    Sect7 -->|south road, the old Sky Road| Ferry[Starfall Ferry<br/>Qilin of the Rising Tide]
+    Ferry --> Magpie[Magpie Bridge Heights<br/>Crow Marshal]
+    Magpie --> Star[Weaver Star Palace<br/>Heavenly Warden of the River]
+    Star --> Jasper[Jasper Pool of Kunlun<br/>Xiwangmu, Queen Mother of the West]
+    end
+    Jasper ==> End((Star River Crossing))
 ```
 
 ```mermaid
@@ -340,6 +404,41 @@ Each region is still generated from its own seed by `mapgen.gd` (so every boss, 
 
 The 3D view builds a region when the player comes within 46 tiles of it: its tiles are cut out of the world grid (other regions' tiles blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. Far regions are hidden and the furthest dropped. One skirt of hills and a ring of mountains surround the whole world.
 
+## Part VIII: The River of Heaven
+
+On the seventh night of the seventh month the whole sect climbs onto the hall roof to watch the magpies gather in the sky, as they have every year. No magpies come. Instead the Silver River across the sky spills over and stars rain into the lotus pond. The Elder tells the old story: the Weaver Star fell in love with a cowherd, and the Queen Mother of the West drew her golden hairpin across the sky to part them. That line became the River of Heaven, the oldest border there is. Qianxian bound its banks with her thread for ten thousand years, and now that she is unpicking her borders the river is pouring down the old Sky Road into the world.
+
+| Region | Levels | Story beat | Final boss |
+|---|---|---|---|
+| Starfall Ferry on the Silver River | 36 | Niu Lang the Cowherd fishes drowned stars out of the flooded rice fields and reads where they fell | Qilin of the Rising Tide |
+| Heights of the Magpie Bridge | 36-37 | Que Lao, the Old Magpie, calls the scattered flock home with the plumes the storm tore away | Crow Marshal of the Broken Bridge |
+| Palace of the Weaver Star | 37-38 | Zhi Nu stopped weaving the river's banks to make it go away; it went down instead | Heavenly Warden of the River |
+| Jasper Pool of Kunlun | 38 | Dong Shuang brings Lin Feng before the Queen Mother with four peaches of Kunlun | Xiwangmu, Queen Mother of the West |
+| *Star River Crossing tribulation and the magpie bridge in the ending* | | | |
+
+```mermaid
+sequenceDiagram
+    participant E as Elder Qing Xuan
+    participant L as Lin Feng
+    participant N as Niu Lang
+    participant M as Que Lao and the Crow Marshal
+    participant Z as Zhi Nu
+    participant X as Xiwangmu
+    E->>L: The river is a border, and its banks are coming undone
+    L->>N: Four drowned stars from the fields
+    N-->>L: They fell where the bridge always stood
+    L->>M: The Court fell two years ago. You have no orders
+    M-->>L: The magpies come back, enough to carry you across
+    L->>Z: Four threads of starlight
+    Z-->>L: Banks this time, not a wall. And a ford every night
+    L->>X: Prove the world can stand without your lines
+    X-->>L: Nobody said I could only draw rivers
+    X->>X: Draws a bridge of light across the river
+    L->>L: Holds the bridge through the last tribulation: Star River Crossing
+```
+
+New Blender characters: Niu Lang the Cowherd (straw hat, flute, ox tether), Zhi Nu the Weaver Star (star crown, shuttle), Que Lao the Old Magpie (feather cloak) and Dong Shuang, maid of the Jasper Pool (peach branch). New creatures: the qilin, the ape, the great cat (tiger, lion, lynx), the magpie, and dedicated models for the Queen Mother, the River Warden, the Crow Marshal and nine-faced Kaiming. New region looks: flooded paddies under a sky of falling stars, wind-bent cliff pines full of magpie nests, the silver-and-lilac palace among star pillars, and the jade peach orchards around the green Jasper Pool.
+
 ## Part VII: The Unbroken Land
 
 Spring comes, and silver threads appear across the mountain roads overnight. The Elder explains why the world was ever cut into separate realms joined by gates: the Heavenly Court's Weaver, **Madam Qianxian, Lady of a Thousand Threads**, sewed it into a quilt so that each realm could be harvested alone. When Lin Feng turned the Wheel her stitches came undone and the land grew back into one (the open world). Now she is sewing the mortal lands shut again, and spinning the newly reborn into thread, Little Wan among them.
@@ -406,6 +505,20 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 | Bug | Fix |
 |---|---|
+| **The ending screen was hidden behind a giant tree trunk.** The six floating islands were spread round a full circle (`i * 1.1 + 0.4`), which put one peach-tree island at z = 5, between the camera and the hero | The islands sit on the far half of the sky only |
+| **Lotus of Rebirth and Homeward Lantern could not raise the fallen**: the heal only targeted living allies, so a knocked-out Lin Feng stayed down; the bot never tried | Reviving heals (`"revive": true`) reach the fallen and raise them; the bot uses them when an ally is down; regression test |
+| Lions, tigers, lynxes, apes, macaques and qilin (**11 enemies**, including the White Tiger boss) were drawn with the **wolf** model | New tiger, ape and qilin models; enemies remapped |
+| **Character heads were almost half a metre tall** (two stacked ellipsoids, under five heads to the body) with eyes stuck onto the surface | Sculpted heads at about seven heads to the body, eyes set into sockets |
+| Hanging sleeves were **inside out** (black) when a loft's cross-sections ran clockwise | `loft()` detects the winding and flips faces so normals point out; linings are built inside on purpose |
+| The post-processing rect set a `size` on top of full-rect anchors, printing a warning on every launch | The anchors size it |
+| A defeat message was guarded by `if not quiet or true` (always true) | Removed the dead condition |
+| `plate_segments` crashed on per-axis radii; `bake_ao` created an unused random generator | Componentwise radii; removed |
+| Exported assets were only checked by playing the game | `art/check_assets.py` validates every GLB in CI |
+
+### Bugs fixed in the open-world release
+
+| Bug | Fix |
+|---|---|
 | The pause-menu **techniques list ran off the right of the panel** once Lin Feng knew more than 21 techniques (three columns of seven) | Four narrower columns of seven |
 | The sect's **pagoda stood outside the map** past the east wall, on land the hero could walk across in an open world | It stands on its own blocked footprint on the mountain |
 | Map **connection trails were straight L-shaped corridors** cut through forests, the most "squarish" thing in every region | Trails wander on the diagonal (`MapGen._carve`) |
@@ -414,7 +527,7 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 | The water surface stopped at the **square edge of each water tile** | The water plane runs on under the bank, so the shoreline follows the ground |
 | The bot's **breadth-first search** would have been far too slow over a whole world | `AStarGrid2D` for routes, a capped search for nearby monsters |
 
-### Bugs fixed in the previous release
+### Bugs fixed in the landscapes release
 
 | Bug | Fix |
 |---|---|
@@ -512,14 +625,14 @@ flowchart TD
     TER --> ARC[architecture.gd<br/>halls, enterable houses, walls, dwellings]
     TER --> FA[fauna.gd<br/>wildlife]
     W --> MOD[models.gd<br/>procedural people and monsters,<br/>action poses]
-    MOD --> AS[assets.gd<br/>Blender GLBs: 35 people,<br/>29 monsters, 21 props]
+    MOD --> AS[assets.gd<br/>Blender GLBs: 39 people,<br/>37 monsters, 26 props;<br/>palettes from one tint]
     B --> MOD
     B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
     TER --> MB[mb.gd<br/>primitives, limbs, lathes, ribbons<br/>toon + outline + aura shaders]
     MOD --> MB
     FX --> MB
-    TER --> LK[(look.gd<br/>30 region looks, sky shader)]
+    TER --> LK[(look.gd<br/>34 region looks, sky shader)]
     TER --> AS
     W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap]
     B --> UI
@@ -551,30 +664,31 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs). Parts I to VI take 6:39:25 in the open world, so Part VII adds about **1 hour 7 minutes**:
+Latest result (seed 1234, identical across runs). Parts I to VII take 7:46:52, so Part VIII adds about **1 hour 11 minutes**:
 
 ```
-game play time  : 7:46:52 (28012 s)
-wall clock      : ~7.5 min (headless)
-final realm     : Early Boundless Heart
-battles / kills : 874 / 1642   deaths: 0
-time by screen  : battle 12080 s, meditate 7355 s, world 4589 s, dialogue 3839 s
-time by area    : sect 919, mountain 156,
+game play time  : 8:57:35 (32255 s)
+wall clock      : ~7 min (headless)
+final realm     : Early Star River Crossing
+battles / kills : 1019 / 1915   deaths: 0
+time by screen  : battle 13596 s, meditate 8564 s, world 5327 s, dialogue 4591 s
+time by area    : sect 1008, mountain 218,
                   bamboo 880, marsh 655, frost 1073, thunder 514, palace 556,
                   dragon 638, volcano 1039, void 719, celestial 1447,
                   mirror 568, grave 986, time 706, origin 1246,
                   cloudsea 815, court 808, forge 915, garden 1390,
                   dunes 853, fungal 795, aurora 879, chaos 1517,
                   maple 985, karst 967, springs 971, wheel 1133,
-                  village 850, terraces 975, silk 937, loom 1159
-result          : PASS (needs >= 25200 s)
+                  village 850, terraces 975, silk 937, loom 1159,
+                  starferry 952, magpie 954, starpalace 945, jasper 1243
+result          : PASS (needs >= 28800 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 25200), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 28800), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than seven hours of game time**. A second job installs Blender as a Python module and rebuilds every asset in `art/` from its script. The bot report is uploaded as an artifact and shown in the job summary.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than eight hours of game time**. A second job installs Blender as a Python module, rebuilds every asset in `art/` from its script and validates the exports with `art/check_assets.py`. The bot report is uploaded as an artifact and shown in the job summary.
 
 ```mermaid
 flowchart LR
@@ -582,8 +696,8 @@ flowchart LR
     DL --> IMP[Import project]
     IMP --> T[Data-integrity tests]
     T --> B[Bot plays whole game<br/>--fixed-fps 30]
-    B --> G{completed and<br/>game time >= 7h?}
-    PR --> ART[pip install bpy<br/>art/build_all.py]
+    B --> G{completed and<br/>game time >= 8h?}
+    PR --> ART[pip install bpy<br/>art/build_all.py] --> CHK[check_assets.py]
     G -- yes --> OK[Pass + report artifact]
     G -- no --> FAIL[Fail]
 ```
@@ -607,6 +721,10 @@ scripts/fauna.gd     ambient wildlife
 scripts/architecture.gd  halls, roofs, walls, archways, bridges, dwellings
 art/lib/kit.py       Blender (bpy) toolkit: geometry, skinning, AO, rigs, clips, export
 art/lib/person.py    character builder shared by every person asset
+art/lib/face.py, hair.py, garment.py, accessory.py   heads, hair, clothes, hand props
+art/lib/sculpt.py    lofts, profiles, noise, splines, strands
+art/lib/anatomy.py   animal bodies, legs, heads, fur, feathers, scales; feline.py, bird.py
+art/check_assets.py  validator for the exported GLBs
 art/characters, art/monsters, art/props   one Blender script per asset
 art/build_all.py     rebuild every asset
 assets/              generated .glb files (never edited by hand)

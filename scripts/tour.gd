@@ -6,7 +6,7 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood"}
 
 func _stop(id: String) -> Array:
 	## [first quest step set in this area, a sensible player level]
@@ -35,7 +35,7 @@ func _shot(n: String) -> void:
 	print("[tour] ", n)
 
 ## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
-func _gallery(n: String, models: Array, spacing: float) -> void:
+func _gallery(n: String, models: Array, spacing: float, yaw: float = 0.35) -> void:
 	main.world.hide()
 	var stage := Node3D.new()
 	stage.position = Vector3(0, 400, 0)
@@ -59,7 +59,7 @@ func _gallery(n: String, models: Array, spacing: float) -> void:
 	for i in models.size():
 		var m: Node3D = models[i]
 		m.position = Vector3((i - (models.size() - 1) * 0.5) * w, 0.0, 0.0)
-		m.rotation.y = 0.35 * (1 if i % 2 == 0 else -1)
+		m.rotation.y = yaw * (1 if i % 2 == 0 else -1)
 		stage.add_child(m)
 		m.add_child(Models.shadow_disc(0.8))
 	var span := models.size() * w
@@ -233,6 +233,26 @@ func _run() -> void:
 	main.set_stack(["world"])
 	main.world.load_area("sect", Vector2i(20, 9))
 	main.world.banner_t = 0.0
+	if main.args.has("show"):
+		# a quick look at chosen models (developer tool): --show=beast,fox,yue_ling
+		var cols := [Color("7aa860"), Color("d0602a"), Color("3a8ad8"), Color("c8a040"), Color("9a6ad0"), Color("40b0a0")]
+		var picks: PackedStringArray = str(main.args.show).split(",", false)
+		for pass_i in 2:
+			var ms: Array = []
+			for i in picks.size():
+				var id: String = picks[i]
+				if Assets.PEOPLE.has(id):
+					ms.append(Assets.person(id))
+				elif not Assets.has_monster(id) and Assets.has("props/" + id):
+					var ph := Node3D.new()
+					MB.mesh_node(ph, Assets.static_mesh("props/" + id))
+					ms.append(ph)
+				else:
+					ms.append(Models.monster(id, cols[i % cols.size()]))
+			if pass_i == 0:
+				await _gallery("show", ms, 1.3, 1.25)
+			else:
+				await _portraits("show_close", ms, 1.9, 1.0, 4.6)
 	if main.args.has("gallery") or not main.args.has("no-extras"):
 		await _gallery("gallery_people", [
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
@@ -266,6 +286,27 @@ func _run() -> void:
 			Models.monster("fox", Color("ff6a30")), Models.monster("carp", Color("ffb060")), Models.monster("oxhead", Color("6a3a2a")),
 			Models.monster("horseface", Color("8a4a3a")), Models.monster("jiangshi", Color("3a5a4a")),
 		], 1.7)
+		# Part VII and VIII people (art/characters)
+		await _gallery("gallery_npcs_part7", [
+			Assets.person("granny_wen"), Assets.person("innkeeper"), Assets.person("weaver_liu"),
+			Assets.person("tea_master"), Assets.person("can_niang"), Assets.person("apprentice_zhi"), Assets.person("archivist"),
+		], 0.7)
+		await _gallery("gallery_npcs_part8", [
+			Assets.person("niu_lang"), Assets.person("zhi_nu"), Assets.person("que_lao"), Assets.person("dong_shuang"),
+		], 0.9)
+		# Part VIII creatures (art/monsters)
+		await _gallery("gallery_part8", [
+			Models.monster("qilin", Color("e05a3a")), Models.monster("tiger", Color("e8e0d0")), Models.monster("ape", Color("6a5a8a")),
+			Models.monster("magpie", Color("2a3a6a")), Models.monster("kaiming", Color("d8a040")),
+		], 1.7)
+		await _gallery("gallery_part8_bosses", [
+			Models.monster("queen", Color("f0d8a0")), Models.monster("warden", Color("3a7ab0")), Models.monster("crowmarshal", Color("3a3040")),
+		], 1.5)
+		# one shape, three enemies: the palette (Assets.palette) turns a single tint into a scheme
+		await _gallery("gallery_palettes", [
+			Models.monster("beast", Color("3a9a5a")), Models.monster("beast", Color("d04a2a")), Models.monster("beast", Color("8a8aa0")),
+			Models.monster("dragon", Color("3a8ad8")), Models.monster("dragon", Color("e0a020")),
+		], 1.7)
 		# Blender landmarks (art/props)
 		var props: Array = []
 		for pr in ["pine", "bamboo", "peach", "meteor", "glowcap", "icespire", "chaosrock", "stonelantern", "ghostpagoda"]:
@@ -280,6 +321,12 @@ func _run() -> void:
 			MB.mesh_node(holder2, Assets.static_mesh("props/" + pr2))
 			built.append(holder2)
 		await _gallery("gallery_landmarks", built, 1.1)
+		var built8: Array = []
+		for pr3 in ["ferrypost", "magpienest", "starpillar", "jadepeach"]:
+			var holder3 := Node3D.new()
+			MB.mesh_node(holder3, Assets.static_mesh("props/" + pr3))
+			built8.append(holder3)
+		await _gallery("gallery_landmarks_part8", built8, 1.4)
 		await _gallery("gallery_beasts", [
 			Models.monster("beast", Color("7aa860")), Models.monster("mantis", Color("5fd890")), Models.monster("tortoise", Color("b8903a")),
 			Models.monster("crab", Color("d0502a")), Models.monster("spider", Color("5a3a90")),
@@ -306,6 +353,11 @@ func _run() -> void:
 		await _wait(0.5)
 		await _shot("world_map")
 		main.pop()
+	if main.args.has("ending"):
+		# the results screen on its own (--ending): the finale set pieces of every part
+		main.push("ending")
+		await _wait(14.0)
+		await _shot("ending")
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return

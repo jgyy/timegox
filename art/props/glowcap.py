@@ -8,6 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+
 from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, SKIN, V, Builder, darken, lighten  # noqa: E402
 
 kit.reset()
@@ -49,5 +50,19 @@ for i in range(8):
     tip = p + V(0, rnd.uniform(0.12, 0.3), 0)
     b.tube([p, tip], [0.015, 0.01], "c8e0e0", cls=FOLIAGE, seg=5)
     b.ball(tip, 0.035, "60ffd0", cls=CRYSTAL, seg=8, rings=5, mat=MAT_GLOW)
+# detail: fine radial gills under the great cap, a ring on the stem, spores drifting up in glowing
+# motes and a cluster of tiny caps at the foot
+for k in range(36):
+    a = k / 36 * 2 * math.pi
+    b.leaf(V(math.cos(a) * 0.2, 1.62, math.sin(a) * 0.2), V(math.cos(a) * 0.9, 1.72, math.sin(a) * 0.9), 0.02, "f0c8a0", cls=FOLIAGE, side=(math.sin(a), 0, -math.cos(a)), n=3, curl=0.0)
+ring = [V(math.cos(t) * 0.24, 1.3, math.sin(t) * 0.24) for t in [i / 16 * 2 * math.pi for i in range(17)]]
+b.tube(ring, [0.02] * 17, "f8e0c0", cls=SKIN, seg=4, cap0=False, cap1=False)
+for k in range(10):
+    b.ball(V(rnd.uniform(-0.8, 0.8), rnd.uniform(1.9, 3.0), rnd.uniform(-0.8, 0.8)), 0.025, "ffb060", cls=CRYSTAL, seg=5, rings=3, mat=MAT_GLOW)
+for k in range(6):
+    a = rnd.uniform(0, 2 * math.pi)
+    c = V(math.cos(a) * 0.55, 0.0, math.sin(a) * 0.55)
+    b.tube([c, c + V(0, 0.12, 0)], [0.02, 0.018], "f0e0c8", cls=SKIN, seg=6)
+    b.ellipsoid(c + V(0, 0.14, 0), (0.06, 0.03, 0.06), "ff9a50", cls=CRYSTAL, seg=8, rings=5, mat=MAT_GLOW)
 print("[art] glowcap: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/glowcap.glb", samples=14, dist=0.5, strength=0.5)
+kit.finish_static(b, "props/glowcap.glb", samples=14, dist=0.5, strength=0.5, target_tris=3200)
