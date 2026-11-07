@@ -432,10 +432,12 @@ def plate_segments(b, path, radii, col, bone_fn, n=14, col2=None, tint=1.0, ridg
         rings = []
         for k, t in enumerate((0.0, 0.35, 0.8, 1.05)):
             q = a.lerp(c, min(1.0, t)) + d * max(0.0, t - 1.0) * (c - a).length
-            rr = r0 + (r1 - r0) * min(1.0, t)
+            a0 = r0 if isinstance(r0, tuple) else (r0, r0)
+            a1 = r1 if isinstance(r1, tuple) else (r1, r1)
+            tt = min(1.0, t)
             flare = 1.0 + 0.12 * smooth(0.5, 1.05, t)
-            rw = (rr[0] if isinstance(rr, tuple) else rr) * flare
-            rh = (rr[1] if isinstance(rr, tuple) else rr) * flare
+            rw = (a0[0] + (a1[0] - a0[0]) * tt) * flare
+            rh = (a0[1] + (a1[1] - a0[1]) * tt) * flare
 
             def prof(ang, rw=rw, rh=rh):
                 base = 1.0 / math.sqrt((math.cos(ang) / rh) ** 2 + (math.sin(ang) / rw) ** 2)
