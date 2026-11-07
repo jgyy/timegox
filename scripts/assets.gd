@@ -31,6 +31,9 @@ const MONSTERS := {
 	"qilin": "monsters/qilin", "ape": "monsters/ape", "tiger": "monsters/tiger",
 	"queen": "monsters/queen", "warden": "monsters/warden", "crowmarshal": "monsters/crowmarshal", "kaiming": "monsters/kaiming",
 	"magpie": "monsters/magpie",
+	"sun_crow": "monsters/sun_crow",
+	"jade_rabbit": "monsters/jade_rabbit",
+	"bifang": "monsters/bifang",
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",

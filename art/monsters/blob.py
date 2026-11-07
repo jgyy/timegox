@@ -9,12 +9,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import zero_pose  # noqa: E402
 from kit import CRYSTAL, MAT_GLOW, METAL, SKIN, STONE, WOOD, V, Builder, Rig, env  # noqa: E402
 from sculpt import fbm3, morph_sphere, smooth, strand  # noqa: E402
+from creature import add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
 r.bone("body", (0, 0.0, 0), (0, 0.55, 0), "root")
@@ -43,7 +46,7 @@ def blob_shape(d):
 morph_sphere(b, V(0, 0.47, 0), blob_shape, lambda p, d: (0.75 + 0.25 * smooth(-0.6, 0.8, d.y),) * 3, cls=CRYSTAL, seg=32, rings=20, bone_fn=bw, tint_fn=lambda p, d: 1.0)
 # a wet highlight across the top
 b.ellipsoid(V(-0.18, 0.86, 0.22), (0.12, 0.04, 0.08), "ffffff", cls=CRYSTAL, bone="top", seg=10, rings=5, rot=(0.6, 0.4, 0.3), mat=MAT_GLOW, tint=0.2)
-b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # drips and puddle lobes around the base, with a few hanging strands and droplets
 for k in range(11):
     a = 2 * math.pi * k / 11 + 0.2
@@ -90,7 +93,7 @@ def idle(t):
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     hop = math.sin(min(1.0, k * 1.5) * math.pi)
     p = zero_pose(r)
@@ -115,5 +118,33 @@ def cast(t):
     return p
 
 
+T_WALK = 0.9
+
+
+def walk(t):
+    """Hops: squashes down, stretches up into the air, lands and splats."""
+    k = (t / T_WALK) % 1.0
+    p = zero_pose(r)
+    air = math.sin(math.pi * smooth(0.25, 0.75, k))
+    squash = math.exp(-((k - 0.12) / 0.1) ** 2) + math.exp(-((k - 0.9) / 0.08) ** 2)
+    stretch = math.sin(math.pi * smooth(0.22, 0.5, k)) * (1.0 - smooth(0.5, 0.7, k))
+    sy = 1.0 - 0.22 * squash + 0.18 * stretch
+    sx = 1.0 + 0.16 * squash - 0.1 * stretch
+    add(p, "root", (0.12 * stretch - 0.08 * squash, 0, 0), (0, 0.32 * air, 0))
+    p["body"] = ((0, 0, 0), (0, 0, 0), (sx, sy, sx))
+    p["top"] = ((-0.15 * stretch + 0.1 * squash, 0, 0), (0, 0, 0), (1.0 - 0.05 * stretch, 1.0 + 0.08 * stretch, 1.0 - 0.05 * stretch))
+    return p
+
+
+def die(t):
+    """Quivers, then melts into a flat puddle."""
+    k = min(1.0, t / 1.2)
+    f = smooth(0.15, 0.85, k)
+    q = math.sin(k * 30.0) * 0.08 * (1.0 - f)
+    p = zero_pose(r)
+    p["body"] = ((0, 0, 0), (0, 0, 0), (1.0 + 0.7 * f + q, 1.0 - 0.8 * f - q, 1.0 + 0.7 * f + q))
+    p["top"] = ((0.2 * f, 0, 0.1 * f), (0, -0.15 * f, 0), (1.0 + 0.3 * f, 1.0 - 0.6 * f, 1.0 + 0.3 * f))
+    return p
+
 print("[art] blob: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/blob.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.35, floor_y=0.0)
+kit.finish_rigged(b, r, "monsters/blob.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.35, floor_y=0.0)

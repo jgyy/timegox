@@ -12,12 +12,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import zero_pose  # noqa: E402
 from sculpt import fbm3, morph_sphere, smooth, strand  # noqa: E402
 from kit import CLOTH, CRYSTAL, MAT_GLOW, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
+from creature import Walker, add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 rnd = random.Random(13)
 C = V(0, 1.55, 0)
 r = Rig("rig")
@@ -84,12 +87,15 @@ for s, sd in ((1, "L"), (-1, "R")):
         wb = "wing%d.%s" % (k, sd)
         h, tl = r.head(wb), r.tail(wb)
         b.tube([h, h.lerp(tl, 0.5) + V(0, 0.04, 0), tl], [0.06, 0.045, 0.02], (0.75, 0.75, 0.75), bone=wb, tint=1.0, seg=8)
-        for row, (n, ln, shd) in enumerate(((10, 0.75, 0.55), (10, 0.45, 0.75), (8, 0.25, 0.9))):
+        span = (tl - h).normalized()
+        # solid feathers whose vanes lie in the plane of the wing (spanwise), overlapping like
+        # shingles: long dark flight feathers, then two rows of paler coverts over their roots
+        for row, (n, ln, shd) in enumerate(((15, 0.75, 0.62), (13, 0.45, 0.78), (10, 0.25, 0.9))):
             for f in range(n):
                 u = f / (n - 1)
-                base = h.lerp(tl, 0.1 + u * 0.85) + V(0, 0.015 * row, 0)
-                tip = base + (tl - h).normalized() * 0.2 * u + V(0, -ln * (0.5 + 0.5 * u), -ln * 0.6)
-                A.feather(b, base, tip, 0.08 - 0.015 * row, (shd, shd, shd), col_tip=(1.0, 0.9, 0.7), side=(0, 1, 0), bone=wb, tint=1.0, curl=0.1, barbs=row == 0)
+                base = h.lerp(tl, 0.1 + u * 0.85) + V(0, 0.015 * row, 0.012 * row)
+                tip = base + span * 0.2 * u + V(0, -ln * (0.5 + 0.5 * u), -ln * 0.6)
+                A.blade(b, base, tip, 0.1 - 0.015 * row, (shd, shd, shd), col_tip=(min(1.0, shd + 0.25),) * 3, side=span, bone=wb, curl=0.06, thick=0.1, tint=1.0, steps=5, seg=6, point=0.15)
     b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # six legs: thick thighs, knobbly knees, scaled shins and three-clawed feet
     for k in range(3):
@@ -119,7 +125,7 @@ def idle(t):
     pulse = 1.0 + 0.03 * math.sin(t * w)
     p = zero_pose(r)
     p["root"] = ((0, 0, 0), (0, math.sin(t * w) * 0.12, 0))
-    p["body"] = ((math.sin(t * w) * 0.05, math.sin(t * w * 0.5) * 0.12, 0), (0, 0, 0), (pulse, 2.0 - pulse, pulse))
+    p["body"] = ((math.sin(t * w) * 0.05, math.sin(t * w + 0.8) * 0.12, 0), (0, 0, 0), (pulse, 2.0 - pulse, pulse))
     p["swirl"] = ((0, 0, t * w), (0, 0, 0))
     for sd, s in (("L", 1), ("R", -1)):
         for k in range(2):
@@ -132,7 +138,7 @@ def idle(t):
 
 
 def attack(t):
-    e = env(t / 0.7)
+    e = env(t / 0.55)
     p = idle(t)
     p["root"] = ((0, 0, 0), (0, -0.25 * e, 0.6 * e))
     p["body"] = ((0.4 * e, 0, 0), (0, 0, 0), (1.0 + 0.1 * e, 1.0 - 0.1 * e, 1.0 + 0.15 * e))
@@ -161,5 +167,39 @@ def cast(t):
     return p
 
 
+T_WALK = 1.4
+PAIRS = [("leg%d.%s" % (k, sd), "shin%d.%s" % (k, sd)) for sd in ("L", "R") for k in range(3)]
+WALK = Walker(r, PAIRS, [0.5 * ((k + (0 if sd == "L" else 1)) % 2) for sd in ("L", "R") for k in range(3)], duty=0.55)
+
+
+def walk(t):
+    """Six legs in alternating tripods carry the sack; the wings beat, the hide sways."""
+    ph = (t / T_WALK) % 1.0
+    w = 2 * math.pi
+    p = zero_pose(r)
+    add(p, "body", (0.04 * math.sin(w * ph * 2), 0.08 * math.sin(w * ph), 0.05 * math.sin(w * ph)), (0, 0.03 * abs(math.sin(w * ph * 2)), 0))
+    add(p, "swirl", (0, 0, 2 * math.pi * t / T_WALK))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        for k in range(2):
+            add(p, "wing%d.%s" % (k, sd), (0, 0, -s_ * 0.35 * math.sin(w * ph * 2 - k * 0.6)))
+    return WALK.step(p, ph, 0.3, 0.12)
+
+
+def die(t):
+    """The sack sags and slumps to the ground, its legs splaying, its wings falling open."""
+    k = min(1.0, t / 1.2)
+    f = smooth(0.15, 0.75, k)
+    p = zero_pose(r)
+    sq = 1.0 - 0.25 * f
+    add(p, "root", (0, 0, 0), (0, -0.95 * f + 0.04 * math.sin(math.pi * smooth(0.7, 0.9, k)), 0))
+    add(p, "body", (0.15 * f, 0, 0.1 * f), (0, 0, 0), (1.0 + 0.15 * f, sq, 1.0 + 0.15 * f))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        for k2 in range(3):
+            add(p, "leg%d.%s" % (k2, sd), (0.0, 0.0, 1.0 * s_ * f))
+            add(p, "shin%d.%s" % (k2, sd), (0.0, 0.0, -0.4 * s_ * f))
+        for k2 in range(2):
+            add(p, "wing%d.%s" % (k2, sd), (0.0, 0.0, -s_ * 0.6 * f))
+    return p
+
 print("[art] hundun: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/hundun.glb", {"idle": (T, idle), "attack": (0.7, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.35, strength=0.5)
+kit.finish_rigged(b, r, "monsters/hundun.glb", {"idle": (T, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.35, strength=0.5)

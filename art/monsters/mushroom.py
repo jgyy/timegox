@@ -10,11 +10,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 from creature import eyes, zero_pose  # noqa: E402
 from sculpt import fbm3, morph_sphere, scatter, smooth, strand  # noqa: E402
 from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, MAT_PLAIN, SKIN, V, Builder, Rig, env  # noqa: E402
+from creature import add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 rnd = random.Random(3)
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -108,7 +111,7 @@ def idle(t):
     bounce = abs(math.sin(t * w))
     p = zero_pose(r)
     p["root"] = ((0, 0, 0), (0, bounce * 0.06, 0))
-    p["body"] = ((0, math.sin(t * w * 0.5) * 0.1, math.sin(t * w) * 0.06), (0, 0, 0), (1.0 + 0.04 * (1 - bounce), 1.0 - 0.05 * (1 - bounce), 1.0 + 0.04 * (1 - bounce)))
+    p["body"] = ((0, math.sin(t * w + 0.9) * 0.1, math.sin(t * w) * 0.06), (0, 0, 0), (1.0 + 0.04 * (1 - bounce), 1.0 - 0.05 * (1 - bounce), 1.0 + 0.04 * (1 - bounce)))
     p["cap"] = ((math.sin(t * w + 1) * 0.06, 0, math.sin(t * w + 0.5) * 0.08), (0, 0, 0))
     for sd, s in (("L", 1), ("R", -1)):
         p["arm.%s" % sd] = ((math.sin(t * w + s) * 0.3, 0, s * 0.2 * math.sin(t * w)), (0, 0, 0))
@@ -117,7 +120,7 @@ def idle(t):
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     butt = math.sin(min(1.0, k * 1.5) * math.pi)
     p = idle(0.0)
@@ -147,5 +150,42 @@ def cast(t):
     return p
 
 
+T_WALK = 0.9
+
+
+def walk(t):
+    """A waddle: the stem rocks from foot to foot, each round foot lifting in turn."""
+    ph = (t / T_WALK) % 1.0
+    w = 2 * math.pi
+    p = zero_pose(r)
+    sw = math.sin(w * ph)
+    add(p, "root", (0, 0.08 * sw, 0), (0.03 * sw, 0.04 * abs(math.sin(w * ph * 2 + 1.57)), 0))
+    add(p, "body", (0.06, 0, 0.12 * sw))
+    add(p, "cap", (0.04 * math.sin(w * ph * 2), 0, -0.08 * math.sin(w * ph - 0.5)))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        lift = max(0.0, -s_ * sw)
+        add(p, "foot.%s" % sd, (-0.35 * lift + 0.15 * s_ * math.cos(w * ph), 0, 0), (0, 0.08 * lift, 0.05 * s_ * math.cos(w * ph)))
+        add(p, "arm.%s" % sd, (0.4 * s_ * sw, 0, 0.2 * s_))
+    return p
+
+
+def die(t):
+    """Totters, then falls over backwards; the cap rolls a little and settles."""
+    k = min(1.0, t / 1.2)
+    f = smooth(0.25, 0.75, k)
+    p = zero_pose(r)
+    a = -1.45 * f
+    from creature import euler_g
+    q = V(0, 0, -0.32)
+    R = euler_g((a, 0.0, 0.25 * f))
+    off = q - R @ q
+    add(p, "root", (a, 0.0, 0.25 * f), (off.x, off.y, off.z))
+    add(p, "body", (0.0, 0.0, 0.1 * math.sin(k * 12.0) * (1.0 - f)))
+    add(p, "cap", (-0.2 * f, 0, 0.2 * f))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "arm.%s" % sd, (-0.6 * f, 0, s_ * 0.8 * f))
+        add(p, "foot.%s" % sd, (-0.5 * f, 0, 0))
+    return p
+
 print("[art] mushroom: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/mushroom.glb", {"idle": (T, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.5, floor_y=0.0)
+kit.finish_rigged(b, r, "monsters/mushroom.glb", {"idle": (T, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.5, floor_y=0.0)

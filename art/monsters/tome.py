@@ -13,12 +13,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import chain_rig, wave_chain, zero_pose  # noqa: E402
 from mathutils import Matrix  # noqa: E402
 from kit import CLOTH, MAT_GLOW, MAT_PLAIN, METAL, STONE, V, Builder, Rig, env  # noqa: E402
+from creature import add, smooth  # noqa: E402
 
 kit.reset()
+creature.realtime()
 Y = 1.6
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -116,7 +119,7 @@ T_IDLE = 2.8
 def idle(t):
     w = 2 * math.pi / T_IDLE
     p = zero_pose(r)
-    p["spine"] = ((math.sin(t * w) * 0.1, math.sin(t * w * 0.5) * 0.25, 0), (0, math.sin(t * w) * 0.1, 0))
+    p["spine"] = ((math.sin(t * w) * 0.1, math.sin(t * w + 0.8) * 0.25, 0), (0, math.sin(t * w) * 0.1, 0))
     for sd, s in (("L", 1), ("R", -1)):
         p["cover." + sd] = ((0, 0, (0.05 + 0.08 * math.sin(t * w * 2)) * s), (0, 0, 0))
     for k in range(5):
@@ -126,7 +129,7 @@ def idle(t):
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     slam = math.sin(min(1.0, k * 1.6) * math.pi)
     p = idle(0.0)
@@ -143,7 +146,7 @@ def hurt(t):
     p = idle(0.0)
     p["spine"] = ((-0.4 * e, 0, 0.3 * e), (0, 0, -0.15 * e))
     for kk in range(5):
-        p["page%d" % kk] = ((0, 0, math.sin(t * 40 + kk) * 0.8 * e), (0, 0, 0))
+        p["page%d" % kk] = ((0, 0, math.sin(t * 26 + kk) * 0.8 * e), (0, 0, 0))
     return p
 
 
@@ -158,6 +161,32 @@ def cast(t):
     return p
 
 
+T_WALK = 1.0
+
+
+def walk(t):
+    """Flies on its covers like wings, pages riffling, leaning into the flight."""
+    w = 2 * math.pi / T_WALK
+    p = idle(t * T_IDLE / T_WALK)
+    add(p, "spine", (0.25, 0, 0), (0, 0.06 * math.sin(t * w * 2), 0))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "cover." + sd, (0, 0, s_ * (0.15 + 0.35 * math.sin(t * w * 2))))
+    return p
+
+
+def die(t):
+    """Snaps shut and drops to the ground, landing flat."""
+    k = min(1.0, t / 1.2)
+    shut = smooth(0.0, 0.25, k)
+    f = smooth(0.2, 0.75, k) ** 1.5
+    p = idle(0.0)
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "cover." + sd, (0, 0, s_ * 1.25 * shut))
+    for kk in range(5):
+        add(p, "page%d" % kk, (0, 0, (kk - 2) * 0.1 * shut))
+    add(p, "spine", (0.0, 0.6 * f, 1.4 * f), (0, -2.4 * f + 0.05 * math.sin(math.pi * smooth(0.72, 0.9, k)), 0))
+    return p
+
 kit.scale_asset(b, r, 1.6)
 print("[art] tome: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/tome.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.45)
+kit.finish_rigged(b, r, "monsters/tome.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.45)

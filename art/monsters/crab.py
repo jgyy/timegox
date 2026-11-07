@@ -12,12 +12,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
-from creature import leg_chain, scuttle, zero_pose  # noqa: E402
-from kit import CRYSTAL, HAIR, MAT_PLAIN, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
-from sculpt import blob3, fbm3, morph_sphere, smooth, strand  # noqa: E402
+from creature import Gait, Walker, add, flip_die, foot_path, leg_chain, smooth, zero_pose  # noqa: E402
+from kit import CRYSTAL, HAIR, MAT_PLAIN, SCALE, SKIN, STONE, V, Builder, Rig  # noqa: E402
+from sculpt import blob3, fbm3, morph_sphere, strand  # noqa: E402
 
 kit.reset()
+creature.realtime()
 BY = 0.62
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -67,7 +69,7 @@ def cara_col(p, d):
 
 
 morph_sphere(b, CC, cara_shape, cara_col, cls=SCALE, bone="body", seg=40, rings=22, tint_fn=lambda p, d: 1.0)
-b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # anterolateral teeth along the front edges, frontal teeth between the eyes
 for s in (1, -1):
     for k in range(6):
@@ -79,7 +81,7 @@ for s in (1, -1):
 for k in range(4):
     x = (k - 1.5) * 0.045
     b.cone(CC + V(x, 0.06, 0.48), 0.018, 0.05, (0.6, 0.6, 0.6), cls=STONE, bone="body", seg=6, tint=1.0, rot=(math.pi / 2, 0, 0))
-b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # legs: merus, carpus, propodus and dactyl as overlapping armoured segments, hairs on the
 # propodus, a dark pointed dactyl
 for s, sd in ((1, "L"), (-1, "R")):
@@ -96,7 +98,7 @@ for s, sd in ((1, "L"), (-1, "R")):
         for h in range(4):
             q = a1.lerp(mid, 0.3 + h * 0.2)
             b.tube([q, q + V(0.02 * s, 0.035, -0.01)], [0.004, 0.001], (0.45, 0.45, 0.45), cls=HAIR, bone=bb, tint=1.0, seg=3)
-    b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+    b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # cheliped: merus and carpus, then the chela - an inflated palm, the fixed finger and the
     # movable finger (pincer), both toothed along the cutting edge, tips dark
     ua = r.bones["arm." + sd]
@@ -134,52 +136,89 @@ for k in range(6):
     b.ball(V(math.sin(k * 2.1) * 0.06, BY - 0.07 + 0.02 * math.cos(k), 0.46), 0.012 + 0.006 * (k % 2), "f0f8ff", cls=CRYSTAL, bone="body", seg=6, rings=4, mat=MAT_PLAIN)
 
 T_IDLE = 2.0
+T_WALK = 0.9
+WALK = Walker(r, [(a_, b_) for a_, b_, _ in legs], [0.5 * ((i % 4 + (0 if i < 4 else 1)) % 2) for i in range(8)], duty=0.55)
+
+
+def claws(p, t, T_, amp=1.0):
+    w = 2 * math.pi / T_
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "arm." + sd, (-0.1 + math.sin(t * w + s_) * 0.1 * amp, 0, 0))
+        add(p, "pincer." + sd, (-0.15 - 0.15 * max(0.0, math.sin(t * w * 2 + s_)) * amp, 0, 0))
+        add(p, "stalk." + sd, (math.sin(t * w * 2 + s_) * 0.2, math.sin(t * w + s_) * 0.3, 0))
 
 
 def idle(t):
-    w = 2 * math.pi / T_IDLE
     p = zero_pose(r)
-    scuttle(p, legs, t, w, 0.06, 0.04)
-    p["body"] = ((0, math.sin(t * w * 0.5) * 0.06, 0), (math.sin(t * w * 0.5) * 0.04, abs(math.sin(t * w)) * 0.02, 0))
-    for sd, s in (("L", 1), ("R", -1)):
-        p["arm." + sd] = ((-0.1 + math.sin(t * w + s) * 0.1, 0, 0), (0, 0, 0))
-        p["pincer." + sd] = ((-0.15 - 0.15 * max(0.0, math.sin(t * w * 2 + s)), 0, 0), (0, 0, 0))
-        p["stalk." + sd] = ((math.sin(t * w * 1.3 + s) * 0.2, math.sin(t * w * 0.7 + s) * 0.3, 0), (0, 0, 0))
-    return p
+    w = 2 * math.pi / T_IDLE
+    add(p, "body", (0, math.sin(t * w) * 0.05, 0), (math.sin(t * w) * 0.03, abs(math.sin(t * w)) * 0.015, 0))
+    claws(p, t, T_IDLE)
+    return WALK.step(p)
+
+
+def walk(t):
+    """Crabs scuttle sideways: the feet step out to the side in alternate groups."""
+    p = zero_pose(r)
+    ph = (t / T_WALK) % 1.0
+    add(p, "body", (0, 0, 0.04 * math.sin(2 * math.pi * ph)), (0.015 * math.sin(2 * math.pi * ph), 0.012 * abs(math.sin(2 * math.pi * ph * 2)), 0))
+    claws(p, t, T_WALK, 0.5)
+    D = []
+    for i in range(8):
+        on, s_ = Gait(WALK.phases[i], WALK.duty).at(ph)
+        dz, dy = foot_path(on, s_, 0.16, 0.08)
+        D.append((dz * 0.8, dy, dz * 0.35))
+    return WALK.step(p, offsets=D)
 
 
 def attack(t):
-    k = t / 0.6
-    e = env(k)
-    snap = math.sin(min(1.0, k * 1.6) * math.pi)
-    p = idle(0.0)
-    p["root"] = ((0, 0, 0), (0, 0, 0.35 * snap))
+    k = t / 0.55
+    raise_ = smooth(0.0, 0.3, k) * (1.0 - smooth(0.32, 0.42, k))
+    snap = smooth(0.32, 0.42, k) * (1.0 - smooth(0.6, 1.0, k))
+    p = zero_pose(r)
+    add(p, "root", (0, 0, 0), (0, 0, 0.3 * snap))
     for sd in ("L", "R"):
-        p["arm." + sd] = ((-0.7 * e + 0.5 * snap, 0, 0), (0, 0, 0))
-        p["pincer." + sd] = ((-0.5 * e + 0.5 * snap, 0, 0), (0, 0, 0))
-    return p
+        add(p, "arm." + sd, (-0.7 * raise_ + 0.5 * snap, 0, 0))
+        add(p, "pincer." + sd, (-0.5 * raise_ + 0.5 * snap, 0, 0))
+    return WALK.step(p, offsets=[(0.0, 0.0, 0.3 * snap)] * 8)
 
 
 def hurt(t):
-    e = env(t / 0.55)
-    p = idle(0.0)
-    p["body"] = ((-0.2 * e, 0, 0.15 * e), (0, 0, -0.1 * e))
+    k = t / 0.55
+    e = math.sin(math.pi * min(1.0, k * 1.15)) if k < 0.87 else 0.0
+    p = zero_pose(r)
+    add(p, "body", (-0.2 * e, 0, 0.15 * e), (0, 0, -0.1 * e))
     for sd in ("L", "R"):
-        p["stalk." + sd] = ((0.6 * e, 0, 0), (0, 0, 0))
-    scuttle(p, legs, t, 30.0, 0.15 * e, 0.1 * e)
+        add(p, "stalk." + sd, (0.6 * e, 0, 0))
+    return WALK.step(p, offsets=[(0.0, 0.0, -0.1 * e)] * 8)
+
+
+def die(t):
+    k = min(1.0, t / 1.2)
+    p = zero_pose(r)
+    p = WALK.step(p)
+    curl = []
+    for a_, b_, _ in legs:
+        sg = 1 if ".L_" in a_ else -1
+        curl.append((a_, (0.0, 0.0, -0.9 * sg)))
+        curl.append((b_, (0.0, 0.0, -1.3 * sg)))
+    for sd in ("L", "R"):
+        add(p, "arm." + sd, (0.4 * smooth(0.3, 0.9, k), 0, 0))
+        add(p, "stalk." + sd, (0.9 * smooth(0.2, 0.6, k), 0, 0))
+    flip_die(p, t, 1.2, BY, side=1, curl_legs=curl, rest=0.14)
     return p
 
 
 def cast(t):
-    e = env(t / 0.6)
-    p = idle(0.0)
-    p["body"] = ((-0.25 * e, 0, 0), (0, 0.1 * e, 0))
-    for sd, s in (("L", 1), ("R", -1)):
-        p["arm." + sd] = ((-1.0 * e, 0, -0.4 * e * s), (0, 0, 0))
-        p["pincer." + sd] = ((-0.6 * e, 0, 0), (0, 0, 0))
-    return p
+    e = math.sin(math.pi * min(1.0, t / 0.6))
+    p = zero_pose(r)
+    add(p, "body", (-0.25 * e, 0, 0), (0, 0.1 * e, 0))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "arm." + sd, (-1.0 * e, 0, -0.4 * e * s_))
+        add(p, "pincer." + sd, (-0.6 * e, 0, 0))
+    return WALK.step(p)
 
 
 kit.scale_asset(b, r, 1.15)
 print("[art] crab: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/crab.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=16, dist=0.3, strength=0.5, floor_y=0.0)
+kit.finish_rigged(b, r, "monsters/crab.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)},
+                  samples=16, dist=0.3, strength=0.5, floor_y=0.0)

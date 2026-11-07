@@ -11,12 +11,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import chain_rig, glow_ball, wave_chain, zero_pose  # noqa: E402
 from kit import CLOTH, MAT_GLOW, METAL, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
 from sculpt import fbm3, smooth  # noqa: E402
+from creature import add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 Y = 1.2
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -136,16 +139,16 @@ def idle(t):
     w = 2 * math.pi / T_IDLE
     p = zero_pose(r)
     drift(p, t, w * 2, 0.15)
-    p["body"] = ((math.sin(t * w) * 0.05, math.sin(t * w * 0.5) * 0.1, 0), (0, 0.1 * math.sin(t * w), 0))
-    p["head"] = ((math.sin(t * w * 2) * 0.06, math.sin(t * w) * 0.2, math.sin(t * w * 0.5) * 0.1), (0, 0, 0))
+    p["body"] = ((math.sin(t * w) * 0.05, math.sin(t * w + 0.8) * 0.1, 0), (0, 0.1 * math.sin(t * w), 0))
+    p["head"] = ((math.sin(t * w * 2) * 0.06, math.sin(t * w) * 0.2, math.sin(t * w + 1.1) * 0.1), (0, 0, 0))
     for sd, s in (("L", 1), ("R", -1)):
         p["arm." + sd] = ((math.sin(t * w + s) * 0.15, 0, 0), (0, 0, 0))
-        p["fore." + sd] = ((math.sin(t * w * 1.3 + s) * 0.15, 0, 0), (0, 0, 0))
+        p["fore." + sd] = ((math.sin(t * w * 2 + s) * 0.15, 0, 0), (0, 0, 0))
     return p
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     lunge = math.sin(min(1.0, k * 1.6) * math.pi)
     p = idle(0.0)
@@ -177,5 +180,37 @@ def cast(t):
     return p
 
 
+T_WALK = 1.6
+
+
+def walk(t):
+    """Glides forward: leaning in, the hem and the strips streaming back, the arms trailing."""
+    w = 2 * math.pi / T_WALK
+    p = idle(t * T_IDLE / T_WALK)
+    drift(p, t, w * 2, 0.22)
+    for k, (names, _, a_) in enumerate(strips):
+        for j, nm in enumerate(names):
+            add(p, nm, (0.25 + 0.05 * j, 0, 0))
+    add(p, "body", (0.25, 0, 0), (0, 0.05 * math.sin(t * w * 2), 0))
+    add(p, "head", (-0.15, 0, 0))
+    for sd in ("L", "R"):
+        add(p, "arm." + sd, (0.5, 0, 0))
+    return p
+
+
+def die(t):
+    """A last reach; the robe empties and collapses onto the ground; the skull rolls."""
+    k = min(1.0, t / 1.2)
+    reach = math.sin(math.pi * smooth(0.0, 0.35, k))
+    f = smooth(0.25, 0.85, k) ** 1.3
+    p = idle(0.0)
+    drift(p, t, 6.0, 0.25 * (1.0 - f))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "arm." + sd, (-0.9 * reach + 0.8 * f, 0, s_ * 0.5 * f))
+        add(p, "fore." + sd, (0.4 * f, 0, 0))
+    add(p, "head", (0.3 * f - 0.4 * reach, 0.5 * f, 0.3 * f))
+    p["body"] = ((0.25 * f, 0, 0), (0, -1.0 * f, -0.1 * f), (1.0 + 0.15 * f, 1.0 - 0.5 * f, 1.0 + 0.15 * f))
+    return p
+
 print("[art] wraith: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/wraith.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.45)
+kit.finish_rigged(b, r, "monsters/wraith.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.45)

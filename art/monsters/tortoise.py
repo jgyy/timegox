@@ -9,11 +9,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from creature import claws, eyes, zero_pose  # noqa: E402
+import creature  # noqa: E402
+import anatomy as A  # noqa: E402
+from creature import eyes, zero_pose  # noqa: E402
 from sculpt import morph_sphere, smooth, strand  # noqa: E402
 from kit import CRYSTAL, FOLIAGE, SCALE, STONE, V, Builder, Rig, env  # noqa: E402
+from creature import Walker, add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 rnd = random.Random(9)
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -134,7 +138,9 @@ for nm in ("f", "h"):
             out = V(math.sin(a) * s2 * 0.4 + 0.6 * s2, 0, math.cos(a)).normalized()
             b.superquad(q + out * 0.13, (0.05, 0.04, 0.012), (0.62, 0.62, 0.62), e=0.5, cls=SCALE, bone=lo, tint=0.8, rot=(0, math.atan2(out.x, out.z), 0), seg=8, rings=5)
         b.ellipsoid(r.tail(lo) + V(0, 0.0, 0.0), (0.16, 0.06, 0.17), (0.6, 0.6, 0.6), cls=SCALE, bone=lo, tint=0.8, seg=14, rings=6)
-        claws(b, r.tail(lo) + V(0, 0.02, 0.12), True, lo, n=4, spread=0.05, length=0.06)
+        for k in range(4):
+            u = (k / 3 - 0.5) * 2
+            A.claw(b, r.tail(lo) + V(u * 0.06, 0.03, 0.13 - abs(u) * 0.03), V(u * 0.25, -0.2, 1.0), 0.06, 0.016, lo, hook=0.6, col0="3a3028", col1="d8ccb0")
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # tail: a short cone ringed with scales
 tb = [V(0, 0.48, -0.78), V(0, 0.44, -0.86), V(0, 0.38, -0.96)]
@@ -149,16 +155,16 @@ T = 4.0
 def idle(t):
     w = 2 * math.pi / T
     p = zero_pose(r)
-    p["shell"] = ((math.sin(t * w) * 0.015, 0, math.sin(t * w * 0.5) * 0.01), (0, math.sin(t * w * 2) * 0.008, 0))
-    p["neck"] = ((math.sin(t * w) * 0.08, math.sin(t * w * 0.5) * 0.25, 0), (0, 0, 0))
-    p["head"] = ((math.sin(t * w + 1) * 0.06, math.sin(t * w * 0.5 + 0.4) * 0.15, 0), (0, 0, 0))
+    p["shell"] = ((math.sin(t * w) * 0.015, 0, math.sin(t * w + 0.9) * 0.01), (0, math.sin(t * w * 2) * 0.008, 0))
+    p["neck"] = ((math.sin(t * w) * 0.08, math.sin(t * w + 0.5) * 0.25, 0), (0, 0, 0))
+    p["head"] = ((math.sin(t * w + 1) * 0.06, math.sin(t * w + 0.9) * 0.15, 0), (0, 0, 0))
     p["jaw"] = ((0.05 + 0.05 * abs(math.sin(t * w)), 0, 0), (0, 0, 0))
     p["tail"] = ((0, math.sin(t * w * 2) * 0.2, 0), (0, 0, 0))
     return p
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     snap = math.sin(min(1.0, k * 1.6) * math.pi)
     p = idle(0.0)
@@ -189,5 +195,39 @@ def cast(t):
     return p
 
 
+T_WALK = 2.0
+LEGS4 = [("f_up.L", "f_lo.L"), ("h_up.L", "h_lo.L"), ("f_up.R", "f_lo.R"), ("h_up.R", "h_lo.R")]
+WALK = Walker(r, LEGS4, [0.25, 0.0, 0.75, 0.5], duty=0.75)
+
+
+def walk(t):
+    """A slow four-beat walk: the shell rocks over each planted foot, the neck nods."""
+    ph = (t / T_WALK) % 1.0
+    w = 2 * math.pi
+    p = zero_pose(r)
+    add(p, "shell", (0.02 * math.sin(w * ph * 2), 0.04 * math.sin(w * ph), 0.03 * math.sin(w * ph - 0.6)), (0.015 * math.sin(w * ph), 0.012 * abs(math.sin(w * ph * 2)), 0))
+    add(p, "neck", (0.06 * math.sin(w * ph * 2), -0.08 * math.sin(w * ph), 0), (0, 0, 0.03 * math.sin(w * ph * 2)))
+    add(p, "head", (-0.04 * math.sin(w * ph * 2), 0.05 * math.sin(w * ph), 0))
+    add(p, "tail", (0, 0.2 * math.sin(w * ph), 0))
+    return WALK.step(p, ph, 0.2, 0.08)
+
+
+def die(t):
+    """Head and legs draw into the shell; the shell drops onto its plastron and tips."""
+    k = min(1.0, t / 1.2)
+    w = smooth(0.0, 0.5, k)
+    f = smooth(0.3, 0.8, k)
+    p = zero_pose(r)
+    add(p, "neck", (0.3 * w, 0, 0), (0, -0.1 * w, -0.32 * w))
+    add(p, "head", (0.4 * w, 0, 0.3 * f))
+    add(p, "jaw", (0.2 * f, 0, 0))
+    add(p, "shell", (0.08 * f, 0, 0.12 * f), (0, -0.3 * f + 0.03 * math.sin(math.pi * smooth(0.7, 0.88, k)), 0))
+    for nm, s_ in (("L", 1), ("R", -1)):
+        for fr in ("f", "h"):
+            add(p, "%s_up.%s" % (fr, nm), (0.0, 0.0, 0.9 * s_ * w))
+            add(p, "%s_lo.%s" % (fr, nm), (0.0, 0.0, -1.3 * s_ * w))
+    add(p, "tail", (0.4 * w, 0, 0))
+    return p
+
 print("[art] tortoise: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/tortoise.glb", {"idle": (T, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=14, dist=0.3, strength=0.5, floor_y=0.0)
+kit.finish_rigged(b, r, "monsters/tortoise.glb", {"idle": (T, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=14, dist=0.3, strength=0.5, floor_y=0.0)

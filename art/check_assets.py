@@ -12,7 +12,8 @@ Checks
 * triangle budgets: characters 5k-50k, monsters 3k-90k, props under 5k (they are instanced) except one-off set pieces;
 * characters have a skin with the bones the game drives (hips, chest, head, eyes, hands, feet)
   and all seven clips (idle, walk, sit, attack, cast, hurt, victory);
-* monsters have a skin and at least idle, attack and hurt.
+* monsters have a skin and at least the five clips the game plays: idle and walk (loops), attack,
+  hurt and die.
 
 Exits non-zero and lists every problem if anything fails.
 """
@@ -29,7 +30,7 @@ BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "props": (200,
 SET_PIECES = {"props/magpiebridge": (2000, 24000)}
 PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "hand.L", "hand.R", "foot.L", "foot.R")
 PERSON_CLIPS = ("idle", "walk", "sit", "attack", "cast", "hurt", "victory")
-MONSTER_CLIPS = ("idle", "attack", "hurt")
+MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
 MATERIALS = {"toon", "plain", "glow"}
 
 

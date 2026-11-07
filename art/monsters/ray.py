@@ -11,11 +11,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 from creature import chain_rig, wave_chain, zero_pose  # noqa: E402
 from sculpt import fbm3, smooth  # noqa: E402
 from kit import CRYSTAL, MAT_GLOW, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
+from creature import add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 Y = 1.4
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -137,12 +140,12 @@ def idle(t):
     w = 2 * math.pi / T_IDLE
     p = zero_pose(r)
     flap(p, t, w, 0.35)
-    p["body"] = ((math.sin(t * w) * 0.05, 0, math.sin(t * w * 0.5) * 0.05), (0, math.sin(t * w + 1.2) * 0.12, 0))
+    p["body"] = ((math.sin(t * w) * 0.05, 0, math.sin(t * w + 1.4) * 0.05), (0, math.sin(t * w + 1.2) * 0.12, 0))
     return p
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     dive = math.sin(min(1.0, k * 1.5) * math.pi)
     p = zero_pose(r)
@@ -167,6 +170,29 @@ def cast(t):
     return p
 
 
+T_WALK = 1.3
+
+
+def walk(t):
+    """Glides forward on deeper wingbeats, banking a little with each stroke."""
+    w = 2 * math.pi / T_WALK
+    p = zero_pose(r)
+    flap(p, t, w, 0.45)
+    add(p, "body", (0.12 + 0.05 * math.sin(t * w), 0, 0.08 * math.sin(t * w)), (0, 0.08 * math.sin(t * w + 1.2), 0))
+    return p
+
+
+def die(t):
+    """Stalls, side-slips and settles flat on the ground, the wing tips curling."""
+    k = min(1.0, t / 1.2)
+    f = smooth(0.1, 0.75, k) ** 1.4
+    p = zero_pose(r)
+    flap(p, t, 6.0 * (1.0 - f) + 0.5, 0.3 * (1.0 - f))
+    add(p, "body", (0.3 * f * (1.0 - f) * 2.0, 0, 0.4 * f * (1.0 - smooth(0.6, 0.88, k))), (0, -1.95 * f + 0.04 * math.sin(math.pi * smooth(0.72, 0.88, k)), 0))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "wing2." + sd, (0, 0, s_ * 0.25 * f))
+    return p
+
 kit.scale_asset(b, r, 1.45)
 print("[art] ray: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/ray.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.3, strength=0.4)
+kit.finish_rigged(b, r, "monsters/ray.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.3, strength=0.4)

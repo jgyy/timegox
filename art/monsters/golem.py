@@ -10,11 +10,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import zero_pose  # noqa: E402
 from kit import CRYSTAL, MAT_GLOW, V, Builder, Rig, env  # noqa: E402
+from creature import Walker, add, smooth  # noqa: E402
 
 kit.reset()
+creature.realtime()
 rnd = random.Random(5)
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -115,7 +118,7 @@ def idle(t):
 
 
 def attack(t):
-    k = t / 0.7
+    k = t / 0.55
     e = env(k)
     up = math.sin(min(1.0, k / 0.45) * math.pi / 2)
     slam = max(0.0, min(1.0, (k - 0.45) / 0.2))
@@ -150,5 +153,44 @@ def cast(t):
     return p
 
 
+T_WALK = 1.6
+WALK = Walker(r, [("thigh.L", "shin.L"), ("thigh.R", "shin.R")], [0.0, 0.5], duty=0.62, sagittal=True)
+
+
+def walk(t):
+    """A heavy biped stride: the hips shift over the planted foot and drop on each step, the
+    chest counter-turns and the arms swing like pendulums."""
+    ph = (t / T_WALK) % 1.0
+    w = 2 * math.pi
+    p = zero_pose(r)
+    add(p, "hips", (0.04, 0.08 * math.sin(w * ph), 0.05 * math.sin(w * ph)), (0.05 * math.sin(w * ph), -0.04 * abs(math.cos(w * ph)), 0))
+    add(p, "chest", (0.04, -0.12 * math.sin(w * ph), -0.03 * math.sin(w * ph)))
+    add(p, "head", (0, 0.06 * math.sin(w * ph), 0))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "arm.%s" % sd, (0.35 * s_ * math.sin(w * ph), 0, 0.05 * s_))
+        add(p, "fore.%s" % sd, (-0.25 - 0.15 * max(0.0, s_ * math.sin(w * ph)), 0, 0))
+    return WALK.step(p, ph, 0.5, 0.14)
+
+
+def die(t):
+    """The knees give, the construct pitches forward onto its face and its blocks settle."""
+    k = min(1.0, t / 1.2)
+    buckle = smooth(0.0, 0.35, k)
+    f = smooth(0.3, 0.8, k)
+    p = zero_pose(r)
+    a = 1.45 * f
+    q = V(0, 0, 0.3)
+    from creature import euler_g
+    R = euler_g((a, 0.0, 0.0))
+    off = q - R @ q
+    add(p, "root", (a, 0.0, 0.0), (off.x, off.y - 0.35 * buckle * (1.0 - f) + 0.25 * f, off.z))
+    add(p, "chest", (0.15 * buckle, 0.1 * f, 0.08 * f))
+    add(p, "head", (0.3 * buckle, 0.4 * f, 0))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "thigh.%s" % sd, (-0.8 * buckle * (1.0 - 0.6 * f), 0, 0))
+        add(p, "shin.%s" % sd, (1.2 * buckle * (1.0 - 0.6 * f), 0, 0))
+        add(p, "arm.%s" % sd, (-1.0 * f, 0, s_ * 0.4 * f))
+    return p
+
 print("[art] golem: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/golem.glb", {"idle": (T, idle), "attack": (0.7, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=14, dist=0.3, strength=0.55, floor_y=0.0)
+kit.finish_rigged(b, r, "monsters/golem.glb", {"idle": (T, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=14, dist=0.3, strength=0.55, floor_y=0.0)

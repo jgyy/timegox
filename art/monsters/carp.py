@@ -12,11 +12,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 from creature import chain_weights, eyes, zero_pose  # noqa: E402
 from sculpt import smooth  # noqa: E402
 from kit import CLOTH, CRYSTAL, MAT_GLOW, MAT_PLAIN, SCALE, SKIN, V, Builder, Rig, env  # noqa: E402
+from creature import add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 Y = 1.05
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -142,25 +145,26 @@ for k in range(5):
 T_IDLE = 2.4
 
 
-def swim(p, t, speed, amp, hover=0.05):
+def swim(p, t, speed, amp, hover=0.05, fin=1.3, pelv=1.1, bob=0.5, fin_amp=1.0):
+    """Travelling wave down the body.  Loops pass fin/pelv/bob ratios that give whole cycles."""
     for i in range(5):
         p["body%d" % i] = ((0, math.sin(t * speed - i * 0.9) * amp * (0.4 + i * 0.25), 0), (0, 0, 0))
     p["tailfin"] = ((0, math.sin(t * speed - 5 * 0.9) * amp * 1.8, 0), (0, 0, 0))
-    p["root"] = ((math.sin(t * speed * 0.5) * 0.04, 0, 0), (0, math.sin(t * speed * 0.5) * hover, 0))
+    p["root"] = ((math.sin(t * speed * bob) * 0.04, 0, 0), (0, math.sin(t * speed * bob) * hover, 0))
     for sd, s in (("L", 1), ("R", -1)):
-        p["pec." + sd] = ((math.sin(t * speed * 1.3) * 0.3, 0, math.sin(t * speed * 1.3 + 0.5) * 0.25 * s), (0, 0, 0))
-        p["pelv." + sd] = ((math.sin(t * speed * 1.1 + 1.0) * 0.2, 0, 0), (0, 0, 0))
+        p["pec." + sd] = ((math.sin(t * speed * fin) * 0.3 * fin_amp, 0, math.sin(t * speed * fin + 0.5) * 0.25 * s * fin_amp), (0, 0, 0))
+        p["pelv." + sd] = ((math.sin(t * speed * pelv + 1.0) * 0.2 * fin_amp, 0, 0), (0, 0, 0))
 
 
 def idle(t):
     p = zero_pose(r)
-    swim(p, t, 2 * math.pi / T_IDLE * 2, 0.14)
+    swim(p, t, 2 * math.pi / T_IDLE * 2, 0.14, fin=1.5, pelv=1.0, bob=0.5)
     p["jaw"] = ((0.1 + 0.1 * max(0.0, math.sin(t * 2 * math.pi / T_IDLE * 3)), 0, 0), (0, 0, 0))
     return p
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     lunge = math.sin(min(1.0, k * 1.5) * math.pi)
     p = zero_pose(r)
@@ -190,5 +194,28 @@ def cast(t):
     return p
 
 
+T_WALK = 1.2
+
+
+def walk(t):
+    """Swims through the air: a stronger travelling wave and beating pectoral fins."""
+    p = zero_pose(r)
+    swim(p, t, 2 * math.pi / T_WALK, 0.2, hover=0.04, fin=2.0, pelv=1.0, bob=1.0)
+    add(p, "root", (0.06, 0, 0))
+    return p
+
+
+def die(t):
+    """Thrashes, rolls belly-up and sinks to the ground."""
+    k = min(1.0, t / 1.2)
+    f = smooth(0.15, 0.8, k) ** 1.3
+    roll = smooth(0.1, 0.6, k)
+    p = zero_pose(r)
+    swim(p, t, 20.0 * (1.0 - f) + 0.5, 0.25 * (1.0 - f), hover=0.05 * (1.0 - f), fin_amp=1.0 - f)
+    add(p, "root", (0, 0, math.pi * roll), (0, -0.82 * f, 0))
+    for i in range(5):
+        add(p, "body%d" % i, (0.05 * f, 0, 0))
+    return p
+
 print("[art] carp: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/carp.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=16, dist=0.3, strength=0.45)
+kit.finish_rigged(b, r, "monsters/carp.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=16, dist=0.3, strength=0.45)
