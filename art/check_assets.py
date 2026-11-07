@@ -9,7 +9,7 @@ Checks
 * the file is a valid glTF 2.0 binary with a JSON and a BIN chunk;
 * materials are only the game's three slots: toon, plain, glow;
 * meshes carry vertex colours (COLOR_0, the surface class lives in alpha) and the tint UV (TEXCOORD_0);
-* triangle budgets: characters 5k-50k, monsters 3k-90k, props under 4k (they are instanced);
+* triangle budgets: characters 5k-50k, monsters 3k-90k, props under 5k (they are instanced) except one-off set pieces;
 * characters have a skin with the bones the game drives (hips, chest, head, eyes, hands, feet)
   and all seven clips (idle, walk, sit, attack, cast, hurt, victory);
 * monsters have a skin and at least idle, attack and hurt.
@@ -25,6 +25,8 @@ ART = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(ART)
 GROUPS = ("characters", "monsters", "props")
 BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "props": (200, 5000)}
+# one-off set pieces shown once (ending screen), not scattered across maps
+SET_PIECES = {"props/magpiebridge": (2000, 24000)}
 PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "hand.L", "hand.R", "foot.L", "foot.R")
 PERSON_CLIPS = ("idle", "walk", "sit", "attack", "cast", "hurt", "victory")
 MONSTER_CLIPS = ("idle", "attack", "hurt")
@@ -91,7 +93,7 @@ def check_asset(group, name, path):
                 problems.append("%s: a mesh has no vertex colours" % tag)
             if "TEXCOORD_0" not in attrs:
                 problems.append("%s: a mesh has no tint UV" % tag)
-    lo, hi = BUDGET[group]
+    lo, hi = SET_PIECES.get(tag, BUDGET[group])
     tris = triangles(js)
     if not lo <= tris <= hi:
         problems.append("%s: %d triangles, budget %d-%d" % (tag, tris, lo, hi))

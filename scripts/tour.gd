@@ -241,7 +241,14 @@ func _run() -> void:
 			var ms: Array = []
 			for i in picks.size():
 				var id: String = picks[i]
-				ms.append(Assets.person(id) if Assets.PEOPLE.has(id) else Models.monster(id, cols[i % cols.size()]))
+				if Assets.PEOPLE.has(id):
+					ms.append(Assets.person(id))
+				elif not Assets.has_monster(id) and Assets.has("props/" + id):
+					var ph := Node3D.new()
+					MB.mesh_node(ph, Assets.static_mesh("props/" + id))
+					ms.append(ph)
+				else:
+					ms.append(Models.monster(id, cols[i % cols.size()]))
 			if pass_i == 0:
 				await _gallery("show", ms, 1.3, 1.25)
 			else:
@@ -319,6 +326,11 @@ func _run() -> void:
 		await _wait(0.5)
 		await _shot("world_map")
 		main.pop()
+	if main.args.has("ending"):
+		# the results screen on its own (--ending): the finale set pieces of every part
+		main.push("ending")
+		await _wait(14.0)
+		await _shot("ending")
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return
