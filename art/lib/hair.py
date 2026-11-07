@@ -17,7 +17,7 @@ import math
 from mathutils import Vector
 
 from face import HC, RY, EYE_Y
-from kit import CRYSTAL, HAIR, METAL, V, darken, lighten, mix, rgb
+from kit import CLOTH, CRYSTAL, HAIR, METAL, V, darken, lighten, mix, rgb
 from sculpt import bump, clamp, fbm3, morph_sphere, smooth, strand
 
 LIFT = 0.115  # how far the hair stands off the skull at the crown (fraction of the radius)
@@ -293,7 +293,76 @@ def style_bald(b, s, o):
                 strand(b, [root, root.lerp(below, 0.5) + out * 0.008, below + out * 0.004], 0.014, 0.002, fr if (i + row) % 2 else darken(fr, 0.12), col_tip=lighten(fr, 0.1), cls=HAIR, bone="head", flat=0.4, seg=6, per=3, up=out)
 
 
-STYLES = {"topknot": style_topknot, "long": style_long, "bun": style_bun, "wild": style_wild, "bald": style_bald}
+def style_twin_buns(b, s, o):
+    """A maid's double buns: the hair parted in the middle and combed up into two coiled buns on
+    the crown, each wrapped with a ribbon and pierced by a pin, short tails hanging below them."""
+    for sd in (1, -1):
+        bun = V(0.075 * sd, HC.y + 0.12, -0.03)
+        tdir = (bun - HC).normalized()
+        for i in range(11):
+            a = (i / 10) * math.pi * 0.9 * sd + (math.pi * 0.05 * sd)
+            d0 = dvec(math.sin(a), s.line(dvec(math.sin(a), 0, math.cos(a))) + 0.1, math.cos(a))
+            lock(b, s, d0, tdir, 0.022, (s.hc, s.dk, s.lt)[i % 3], steps=7, extra=0.003)
+        pts = []
+        for k in range(30):
+            t = k / 29
+            a = t * 4.0 * math.pi * sd
+            r = 0.04 * (1.0 - 0.55 * t)
+            pts.append(bun + V(math.cos(a) * r, 0.01 + 0.03 * t, math.sin(a) * r))
+        strand(b, pts, 0.016, 0.006, s.hc, col_tip=s.lt, cls=HAIR, bone="head", flat=0.7, seg=6, per=1)
+        b.ellipsoid(bun, (0.042, 0.032, 0.042), s.dk, cls=HAIR, bone="head", seg=12, rings=8)
+        rc = o.get("ribbon", o.get("pin", "e04060"))
+        ring = [bun + V(math.cos(t) * 0.044, -0.018, math.sin(t) * 0.044) for t in [i / 14 * 2 * math.pi for i in range(15)]]
+        b.tube(ring, [0.006] * 15, rc, cls=CLOTH, bone="head", seg=4, cap0=False, cap1=False)
+        b.tube([bun + V(-0.06 * sd, 0.03, 0.0), bun + V(0.06 * sd, -0.01, 0.0)], [0.003, 0.003], o.get("pin", "6af0b0"), cls=CRYSTAL, bone="head", seg=5)
+        tw = back_weight(HC.y + 0.08, HC.y - 0.2)
+        for k in range(3):
+            root = bun + V(0.02 * (k - 1), -0.03, -0.02)
+            pts2 = [root, root + V(0.01 * sd, -0.1, -0.02), root + V(0.02 * sd, -0.2, -0.01)]
+            strand(b, pts2, 0.012, 0.002, s.hc, cls=HAIR, bones=[tw(q) for q in pts2], flat=0.5, seg=5, per=3)
+    bangs(b, s, n=7, part=0.0, length=0.7, spread=0.8)
+    side_locks(b, s, length=0.18, n=1, width=0.014)
+
+
+def style_braid(b, s, o):
+    """Hair drawn back into one long three-strand braid down the back, tied with a cord."""
+    crown_whorl(b, s, n=16, rows=2, skip_front=0.5)
+    nape = V(0, HC.y - 0.07, -0.11)
+    tdir = (nape - HC).normalized()
+    for i in range(9):
+        a = math.pi * 0.6 + i / 8 * math.pi * 0.8
+        lock(b, s, dvec(math.sin(a), 0.4, math.cos(a)), tdir, 0.024, (s.hc, s.dk)[i % 2], steps=6, extra=0.003)
+    n = 16
+    bw = back_weight(HC.y - 0.05, HC.y - 0.35)
+    length = o.get("hair_len", 0.55)
+    for k in range(3):
+        pts = []
+        for j in range(n):
+            t = j / (n - 1)
+            a = t * 9.0 * math.pi + k * 2.0 * math.pi / 3
+            pts.append(nape + V(math.sin(a) * 0.016 * (1 - 0.4 * t), -length * t, -0.02 - 0.02 * t + math.cos(a) * 0.01))
+        strand(b, pts, 0.02 * (1.0 - 0.1 * k), 0.008, (s.hc, s.dk, s.lt)[k], cls=HAIR, bones=[bw(q) for q in pts], flat=0.8, seg=6, per=1)
+    end = nape + V(0, -length, -0.04)
+    b.tube([end + V(0, 0.012, 0), end - V(0, 0.012, 0)], [0.02, 0.02], o.get("pin", "c02020"), cls=CLOTH, bone="hair_tail", seg=6)
+    strand(b, [end - V(0, 0.012, 0), end + V(0.01, -0.07, 0.0), end + V(0.0, -0.12, 0.01)], 0.016, 0.003, s.lt, cls=HAIR, bone="hair_tail", flat=0.5, seg=5, per=3)
+    bangs(b, s, n=8, part=0.2, swept=0.2, length=0.8)
+    side_locks(b, s, length=0.22, n=1, width=0.015)
+
+
+def style_short(b, s, o):
+    """Short cropped hair, a little tousled, for working folk and young men."""
+    s.lift = 0.06
+    crown_whorl(b, s, n=18, rows=2, length=0.85, skip_front=0.4)
+    for i in range(12):
+        a = math.pi * 0.5 + i / 11 * math.pi
+        d0 = dvec(math.sin(a) * 0.6, 0.5, math.cos(a) * 0.6)
+        d1 = dvec(math.sin(a), -0.2, math.cos(a))
+        lock(b, s, d0, d1, 0.022, (s.hc, s.dk, s.lt)[i % 3], steps=5, extra=0.004)
+    bangs(b, s, n=9, part=0.35, swept=-0.4, length=0.55)
+
+
+STYLES = {"topknot": style_topknot, "long": style_long, "bun": style_bun, "wild": style_wild, "bald": style_bald,
+          "twin_buns": style_twin_buns, "braid": style_braid, "short": style_short}
 
 
 def build(b, f, style, hair_col, o):

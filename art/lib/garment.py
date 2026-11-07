@@ -813,3 +813,70 @@ def demon_tail(b, col, tip_col="ff4020"):
     strand(b, pts, 0.04, 0.012, col, cls=SKIN, bones=bones, seg=8, per=4)
     tip = pts[-1]
     b.lathe(tip + V(0.02, 0.02, 0.06), [(0.0001, -0.05), (0.05, -0.01), (0.03, 0.04), (0.0001, 0.07)], tip_col, cls=STONE, bone="robe_b", seg=6, squash=(1.0, 0.3), rot=(math.pi / 2, 0, 0))
+
+
+def helmet(b, top, metal="c8ccd8", plume="c02a20"):
+    """A Tang-style general's helmet: a domed bowl with a raised ridge, flared cheek guards, a
+    neck guard of lames and a tall plume rising from a finial."""
+    mt = rgb(metal)
+    base = top - 0.09
+    b.lathe(V(0, base, -0.01), [(0.125, 0.0), (0.128, 0.04), (0.118, 0.09), (0.08, 0.135), (0.001, 0.15)], mt, cls=METAL, bone="head", seg=24, col_top=lighten(mt, 0.15))
+    ridge = [V(0, base + 0.15, -0.01 + 0.11 * math.cos(t)) + V(0, 0.11 * math.sin(t) - 0.11, 0) for t in [math.pi * (0.1 + 0.8 * i / 8) for i in range(9)]]
+    b.tube(ridge, [0.008] * 9, "e0c060", cls=METAL, bone="head", seg=5)
+    for s in (1, -1):
+        rows = []
+        for j in range(4):
+            t = j / 3
+            y = base + 0.02 - t * 0.11
+            rows.append([V(0.115 * s + 0.02 * s * t, y, 0.06 - k * 0.06) for k in range(3)])
+        b.sheet(rows, mt, cls=METAL, bone="head", cols=[mt, mt, darken(mt, 0.15), darken(mt, 0.3)], thickness=0.01)
+    for k in range(3):
+        y = base - 0.01 - k * 0.035
+        arc = [V(math.sin(a) * (0.13 + 0.02 * k), y, math.cos(a) * (0.12 + 0.02 * k) - 0.01) for a in [math.pi * (0.55 + 0.9 * i / 10) for i in range(11)]]
+        b.tube(arc, [(0.02, 0.006)] * 11, darken(mt, 0.1 * k), cls=METAL, bone="head", seg=5, up=(0, 1, 0))
+    fin = V(0, base + 0.15, -0.01)
+    b.ball(fin + V(0, 0.02, 0), 0.016, "e0c060", cls=METAL, bone="head", seg=8, rings=5)
+    for k in range(9):
+        a = (k / 8 - 0.5) * 1.2
+        strand(b, [fin + V(0, 0.03, 0), fin + V(math.sin(a) * 0.04, 0.14, -0.03), fin + V(math.sin(a) * 0.08, 0.2, -0.14)], 0.012, 0.003, plume, col_tip=lighten(plume, 0.3), cls=HAIR, bone="head", flat=0.5, seg=4, per=3)
+
+
+def twin_spears(b, shaft="4a3020", head="d8dce8", tassel="c02a20"):
+    """A spear in each hand, held upright, red horsehair tassels under the blades."""
+    for hand, sd in ((WRI * V(-1, 1, 1), "R"), (WRI, "L")):
+        h = hand + V(0, -0.075, 0.02)
+        hb = "hand." + sd
+        b.tube([h + V(0, -0.8, 0), h + V(0, 1.0, 0)], [0.018, 0.016], shaft, cls=WOOD, bone=hb, seg=8)
+        tip = h + V(0, 1.0, 0)
+        b.lathe(tip, [(0.02, 0.0), (0.035, 0.05), (0.02, 0.2), (0.0001, 0.26)], head, cls=METAL, bone=hb, seg=6, squash=(1.0, 0.35))
+        for k in range(8):
+            a = k / 8 * 2 * math.pi
+            strand(b, [tip + V(0, -0.01, 0), tip + V(math.cos(a) * 0.04, -0.08, math.sin(a) * 0.04), tip + V(math.cos(a) * 0.05, -0.16, math.sin(a) * 0.05)], 0.01, 0.003, tassel, cls=HAIR, bone=hb, seg=4, per=3)
+
+
+def crow_mask(b, f_hc, col="1a1a22", beak="2a2a30"):
+    """A lacquered crow mask over the upper face: brow plate, eye holes, a long hooked beak."""
+    c = f_hc + V(0, 0.02, 0.08)
+    b.ellipsoid(c, (0.1, 0.06, 0.04), col, cls=METAL, bone="head", seg=14, rings=8)
+    for s in (1, -1):
+        b.ellipsoid(c + V(0.04 * s, 0.0, 0.03), (0.018, 0.014, 0.01), "c02020", cls=CRYSTAL, bone="head", seg=8, rings=5, mat=MAT_GLOW)
+    strand(b, [c + V(0, -0.02, 0.03), c + V(0, -0.05, 0.12), c + V(0, -0.09, 0.17), c + V(0, -0.13, 0.15)], 0.03, 0.004, beak, cls=METAL, bone="head", flat=0.7, seg=8, per=3, up=(1, 0, 0))
+    for k in range(7):
+        a = (k / 6 - 0.5) * 2.4
+        root = c + V(math.sin(a) * 0.09, 0.05, -0.02)
+        b.leaf(root, root + V(math.sin(a) * 0.08, 0.14, -0.1), 0.03, col, cls=HAIR, bone="head", col_tip=lighten(col, 0.2))
+
+
+def sheng_crown(b, top, col="e8c050", jade="6af0b0"):
+    """The Queen Mother's sheng headdress: a horizontal bar across the crown ending in two
+    disc-shaped weights, a high gold coronet and pendant strings of jade beads."""
+    y = top - 0.02
+    b.tube([V(-0.22, y, -0.02), V(0.22, y, -0.02)], [0.012, 0.012], col, cls=METAL, bone="head", seg=8)
+    for s in (1, -1):
+        c = V(0.24 * s, y, -0.02)
+        b.lathe(c, [(0.0001, -0.012), (0.05, -0.008), (0.05, 0.008), (0.0001, 0.012)], col, cls=METAL, bone="head", seg=16, rot=(0, 0, math.pi / 2))
+        b.ball(c + V(0.012 * s, 0, 0), 0.016, jade, cls=CRYSTAL, bone="head", seg=8, rings=5)
+        for k in range(6):
+            b.ball(c + V(0, -0.03 - k * 0.022, 0.0), 0.008, jade if k % 2 else "f0f0e0", cls=CRYSTAL, bone="head", seg=6, rings=4)
+    b.lathe(V(0, y, -0.03), [(0.07, 0.0), (0.075, 0.05), (0.06, 0.1), (0.075, 0.13)], col, cls=METAL, bone="head", seg=20, cap_bottom=False, folds=(9, 0.06, 0.0))
+    b.ball(V(0, y + 0.12, 0.035), 0.018, "ff4050", cls=CRYSTAL, bone="head", seg=8, rings=5, mat=MAT_GLOW)
