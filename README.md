@@ -71,9 +71,9 @@ flowchart LR
   - **No more rectangular clearings**: the forest reaches into every region from its edge by a depth that varies with noise, keeping clearings round every gate, arrival, person, boss, pickup, building and monster pack, and reconnecting anything it cuts off with trails that go round buildings.
   - Regions sit off the grid inside their bands.
 - **More town buildings and people.** New building styles: **Huizhou houses** with white walls, black tiles and stepped horse-head fire walls, **thatched farmhouses**, a **two-storey teahouse** with a gallery, **shops** with awnings and signboards, **dormitories** and a **kitchen** with a smoking chimney. The sect gains a kitchen, a hall of martial practice and the disciples' dormitory; Qingshi Village a teahouse, a tofu shop, a carpentry, a farmhouse, a scholar's study and a granary. **Twelve new people** with their own Blender models and chat: Senior Brother Han, Junior Sister Mei, Auntie Zhou the cook, Little Bai (who sweeps the steps with Lin Feng's old broom), Gate Disciple Wu, Old Shen the bell-ringer, Farmer Lao, Little Hua, Tofu Seller Sun, Scholar Wang, Carpenter Gu and Xiao Lan the herb-picker.
-- **Monsters sculpted, painted and animated** (`art/lib/clay.py`, `anatomy.py`, `canine.py`, `feline.py`, `bird.py`, `creature.py`): bodies are modelled from metaballs (balls, ellipsoids and capsule chains, each carrying smooth bone weights) instead of hundreds of outlined fur cards, with fur as shingled clumps that belong to the silhouette. Heads are built per species (the tiger's broad skull and cheek ruffs, the wolf's long muzzle and stop, the qilin's dragon head with one ridged horn and cloven hooves, the dragon's nine resemblances on an S-curved serpent body), and coats are painted in the grey values so a recolour still reads as an animal: tiger stripes and the king mark, the wolf's dark saddle and mask, the fox's white bib and black stockings, scales and belly plates. Horns, claws and fangs taper and shade from base to tip. Rigs gained spine, neck, jaw, ear, toe and long tail chains; every monster has **idle, walk, attack, hurt and die**, quadrupeds walk in the four-beat lateral sequence with the hips and chest bouncing out of step and the tail following through, insects and crabs walk on IK legs in an alternating tripod. Three new creatures: the **sun crow**, the **jade rabbit** and **Bifang**.
+- **Monsters sculpted, painted and animated** (`art/lib/clay.py`, `anatomy.py`, `canine.py`, `feline.py`, `bird.py`, `creature.py`): bodies are modelled from metaballs (balls, ellipsoids and capsule chains, each carrying smooth bone weights) instead of hundreds of outlined fur cards, with fur as shingled clumps that belong to the silhouette. Heads are built per species (the tiger's broad skull and cheek ruffs, the wolf's long muzzle and stop, the qilin's dragon head with one ridged horn and cloven hooves, the dragon's nine resemblances on an S-curved serpent body), and coats are painted in the grey values so a recolour still reads as an animal: tiger stripes and the king mark, the wolf's dark saddle and mask, the fox's white bib and black stockings, scales and belly plates. Horns, claws and fangs taper and shade from base to tip. Rigs gained spine, neck, jaw, ear, toe and long tail chains; every monster has **idle, walk, attack, hurt and die**, quadrupeds walk in the four-beat lateral sequence with the hips and chest bouncing out of step and the tail following through, insects and crabs walk on IK legs in an alternating tripod. Three new creatures: the **sun crow**, the **jade rabbit** and **Bifang**. The simpler shapes were restyled too: a **golem** of split, lichen-spotted boulders over a core that glows through the seams, a real **tortoise** (a high shell of raised scutes with growth rings over a plated underside, neck folds, a hooked beak and thick scaly legs), **scorpion, crab, spider and mantis** built from keeled exoskeleton segments (`anatomy.sclerite`) with proper chelae, an uneven crusher claw and raptorial forelegs, a **slime** that sags into a puddle with drips and half-swallowed things, a **jellyfish** with frilled oral arms and trailing tentacles, **mushroom folk** whose stems are their bodies, a **koi** with painted scales, barbels and trailing fins, a lofted **manta**, a scowling **thundercloud**, solid wisp flames and a tattered wraith. The person-shaped monsters (Ox-Head, Horse-Face, the hopping corpse, the Queen Mother and the rest) are built with the new character library.
 - **Part IX, "The Tenth Sun"** adds +1 hour (see [below](#part-ix-the-tenth-sun)), verified by the playthrough bot; CI now requires **9 hours**.
-- **Art code** grew from 12,550 to about 17,000 lines of Blender Python, the game's GDScript from 17,359 to about 19,000 lines; 129 assets are rebuilt from their scripts in about seven minutes on four cores (the build now runs in parallel).
+- **Art code** grew from 12,550 to 17,344 lines of Blender Python (+38%) and the game's GDScript from 17,359 to 18,979 lines; all 129 assets (63 people, 40 monsters, 26 props) rebuild from their scripts in about three minutes on four cores (the build now runs in parallel).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
 ### References
@@ -802,24 +802,25 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs). Parts I to VII take 7:46:52, so Part VIII adds about **1 hour 11 minutes**:
+Latest result (seed 1234, identical across runs). The same bot without Part IX takes 8:58:59, so Part IX adds about **1 hour 19 minutes**:
 
 ```
-game play time  : 8:57:35 (32255 s)
-wall clock      : ~7 min (headless)
-final realm     : Early Star River Crossing
-battles / kills : 1019 / 1915   deaths: 0
-time by screen  : battle 13596 s, meditate 8564 s, world 5327 s, dialogue 4591 s
-time by area    : sect 1008, mountain 218,
-                  bamboo 880, marsh 655, frost 1073, thunder 514, palace 556,
-                  dragon 638, volcano 1039, void 719, celestial 1447,
-                  mirror 568, grave 986, time 706, origin 1246,
-                  cloudsea 815, court 808, forge 915, garden 1390,
-                  dunes 853, fungal 795, aurora 879, chaos 1517,
-                  maple 985, karst 967, springs 971, wheel 1133,
-                  village 850, terraces 975, silk 937, loom 1159,
-                  starferry 952, magpie 954, starpalace 945, jasper 1243
-result          : PASS (needs >= 28800 s)
+game play time  : 10:17:41 (37062 s)
+wall clock      : ~11 min (headless)
+final realm     : Early Sun-Moon Harmony
+battles / kills : 1168 / 2188   deaths: 0
+time by screen  : battle 15066 s, meditate 9770 s, world 6216 s, dialogue 5817 s
+time by area    : sect 1157, mountain 292,
+                  bamboo 883, marsh 653, frost 1076, thunder 511, palace 559,
+                  dragon 640, volcano 1032, void 721, celestial 1466,
+                  mirror 594, grave 990, time 709, origin 1230,
+                  cloudsea 821, court 810, forge 899, garden 1397,
+                  dunes 832, fungal 807, aurora 863, chaos 1503,
+                  maple 976, karst 926, springs 963, wheel 1142,
+                  village 937, terraces 964, silk 895, loom 1220,
+                  starferry 984, magpie 946, starpalace 981, jasper 1217,
+                  yanggu 1039, millet 1129, fusang 1190, guanghan 1161
+result          : PASS (needs >= 32400 s)
 ```
 
 Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 32400), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
