@@ -293,6 +293,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 						recall_to_sect("recall4")
 					elif sid == "s_break11":
 						recall_to_sect("recall5")
+					elif sid == "s_break12":
+						recall_to_sect("recall6")
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity

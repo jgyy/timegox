@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 36
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart"]
+const MAX_LEVEL := 39
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -47,6 +47,10 @@ const SKILLS := {
 	"seamcut": {"n": "Seam-Cutting Sword", "cost": 280, "mult": 25.0, "elem": "dark", "tgt": "one", "lv": 33, "who": 0},
 	"threadfall": {"n": "Thousand-Thread Rain", "cost": 240, "mult": 5.8, "elem": "wood", "tgt": "all", "lv": 34, "who": 0},
 	"boundless": {"n": "Boundless Heart Sword", "cost": 300, "mult": 28.5, "elem": "earth", "tgt": "one", "lv": 35, "who": 0, "after": "s_sk_return"},
+	# ---- Part VIII
+	"magpiebridge": {"n": "Magpie Bridge Sword", "cost": 320, "mult": 31.5, "elem": "wood", "tgt": "one", "lv": 36, "who": 0},
+	"starriver": {"n": "Silver River Torrent", "cost": 280, "mult": 6.6, "elem": "water", "tgt": "all", "lv": 37, "who": 0},
+	"reunion": {"n": "Seventh-Night Reunion Sword", "cost": 350, "mult": 35.0, "elem": "thunder", "tgt": "one", "lv": 38, "who": 0, "after": "s_wv_return"},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
@@ -58,6 +62,8 @@ const SKILLS := {
 	"rebirth": {"n": "Lotus of Rebirth", "cost": 95, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 31, "who": 1},
 	"silk_snare": {"n": "Silver Silk Snare", "cost": 85, "mult": 4.6, "elem": "wood", "tgt": "all", "lv": 33, "who": 1},
 	"homeward": {"n": "Homeward Lantern", "cost": 105, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 34, "who": 1},
+	"starweave": {"n": "Starweave Net", "cost": 95, "mult": 5.3, "elem": "wood", "tgt": "all", "lv": 36, "who": 1},
+	"magpie_wing": {"n": "Magpie Wing Ward", "cost": 115, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 37, "who": 1},
 	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
@@ -100,7 +106,7 @@ const ENEMIES := {
 	"ice_golem": {"n": "Ice Golem", "elem": "water", "weak": "thunder", "col": Color("7fb8e8"), "shape": "blob"},
 	"snow_wraith": {"n": "Snow Wraith", "elem": "water", "weak": "fire", "col": Color("d8ecff"), "shape": "wraith"},
 	"storm_hawk": {"n": "Storm Hawk", "elem": "thunder", "weak": "earth", "col": Color("e8d85a"), "shape": "bird"},
-	"thunder_ape": {"n": "Thunder Ape", "elem": "thunder", "weak": "earth", "col": Color("9a7ad8"), "shape": "beast"},
+	"thunder_ape": {"n": "Thunder Ape", "elem": "thunder", "weak": "earth", "col": Color("9a7ad8"), "shape": "ape"},
 	"spark_wisp": {"n": "Spark Wisp", "elem": "thunder", "weak": "water", "col": Color("fff08a"), "shape": "wisp"},
 	"blood_acolyte": {"n": "Blood Acolyte", "elem": "dark", "weak": "water", "col": Color("b03a4a"), "shape": "humanoid"},
 	"bone_soldier": {"n": "Bone Soldier", "elem": "dark", "weak": "thunder", "col": Color("d8d0b8"), "shape": "humanoid"},
@@ -115,7 +121,7 @@ const ENEMIES := {
 	"rift_spider": {"n": "Rift Spider", "elem": "dark", "weak": "fire", "col": Color("5a3a90"), "shape": "spider"},
 	"star_eater": {"n": "Star Eater", "elem": "dark", "weak": "thunder", "col": Color("b080ff"), "shape": "jelly"},
 	"celestial_guard": {"n": "Celestial Guard", "elem": "phys", "weak": "dark", "col": Color("f0e0a0"), "shape": "humanoid"},
-	"thunder_qilin": {"n": "Thunder Qilin", "elem": "thunder", "weak": "earth", "col": Color("ffe8a0"), "shape": "beast"},
+	"thunder_qilin": {"n": "Thunder Qilin", "elem": "thunder", "weak": "earth", "col": Color("ffe8a0"), "shape": "qilin"},
 	"light_wisp": {"n": "Dawn Wisp", "elem": "phys", "weak": "dark", "col": Color("fffbe0"), "shape": "wisp"},
 	# bosses
 	"crab_general": {"n": "Armored Crab General", "elem": "water", "weak": "thunder", "col": Color("d0502a"), "shape": "crab", "boss": true},
@@ -132,7 +138,7 @@ const ENEMIES := {
 	"void_sentinel": {"n": "Void Sentinel", "elem": "dark", "weak": "thunder", "col": Color("4a3a78"), "shape": "golem", "boss": true},
 	"chaos_serpent": {"n": "Chaos Serpent", "elem": "dark", "weak": "fire", "col": Color("9a50e0"), "shape": "serpent", "boss": true},
 	"heaven_general": {"n": "Heavenly General Tian Wei", "elem": "phys", "weak": "dark", "col": Color("e8d080"), "shape": "demon", "boss": true},
-	"azure_qilin": {"n": "Azure Qilin", "elem": "thunder", "weak": "earth", "col": Color("80d0ff"), "shape": "beast", "boss": true},
+	"azure_qilin": {"n": "Azure Qilin", "elem": "thunder", "weak": "earth", "col": Color("80d0ff"), "shape": "qilin", "boss": true},
 	"heavenly_emperor": {"n": "Jade Emperor of Ruin", "elem": "thunder", "weak": "dark", "col": Color("fff0a0"), "shape": "phoenix", "boss": true},
 	"iron_fang": {"n": "Iron Fang", "elem": "phys", "weak": "water", "col": Color("c0603a"), "shape": "humanoid", "boss": true},
 	"bamboo_spirit": {"n": "Ancient Bamboo Spirit", "elem": "wood", "weak": "fire", "col": Color("4fc07a"), "shape": "plant", "boss": true},
@@ -142,7 +148,7 @@ const ENEMIES := {
 	"jade_mantis": {"n": "Jade Mantis Matriarch", "elem": "wood", "weak": "fire", "col": Color("5fd890"), "shape": "mantis", "boss": true},
 	"bog_colossus": {"n": "Bog Colossus", "elem": "water", "weak": "fire", "col": Color("6a7a3a"), "shape": "blob", "boss": true},
 	"ice_empress": {"n": "Ice Empress", "elem": "water", "weak": "fire", "col": Color("c8e8ff"), "shape": "wraith", "boss": true},
-	"storm_ape_king": {"n": "Storm Ape King", "elem": "thunder", "weak": "earth", "col": Color("b08aff"), "shape": "beast", "boss": true},
+	"storm_ape_king": {"n": "Storm Ape King", "elem": "thunder", "weak": "earth", "col": Color("b08aff"), "shape": "ape", "boss": true},
 	"blood_hound": {"n": "Crimson Hellhound", "elem": "dark", "weak": "water", "col": Color("d03040"), "shape": "beast", "boss": true},
 	"general_blood": {"n": "General Xue Sha", "elem": "dark", "weak": "water", "col": Color("c02840"), "shape": "demon", "boss": true},
 	"general_shadow": {"n": "General Mo Ying", "elem": "dark", "weak": "fire", "col": Color("6a3aa8"), "shape": "demon", "boss": true},
@@ -182,7 +188,7 @@ const ENEMIES := {
 	"gale_sprite": {"n": "Gale Sprite", "elem": "wood", "weak": "fire", "col": Color("b8f0d0"), "shape": "wisp"},
 	"sky_mantis": {"n": "Sky Mantis", "elem": "wood", "weak": "fire", "col": Color("90e0a0"), "shape": "mantis"},
 	"ledger_clerk": {"n": "Ledger Clerk", "elem": "dark", "weak": "fire", "col": Color("6a9a88"), "shape": "humanoid"},
-	"jade_lion": {"n": "Jade Guardian Lion", "elem": "earth", "weak": "wood", "col": Color("5ac0a0"), "shape": "beast"},
+	"jade_lion": {"n": "Jade Guardian Lion", "elem": "earth", "weak": "wood", "col": Color("5ac0a0"), "shape": "tiger"},
 	"ink_wraith": {"n": "Ink Wraith", "elem": "dark", "weak": "water", "col": Color("3a3a4a"), "shape": "wraith"},
 	"bronze_sentinel": {"n": "Bronze Sentinel", "elem": "earth", "weak": "water", "col": Color("c08a40"), "shape": "golem"},
 	"slag_slime": {"n": "Slag Slime", "elem": "fire", "weak": "water", "col": Color("ff9040"), "shape": "blob"},
@@ -195,7 +201,7 @@ const ENEMIES := {
 	"gale_mantis": {"n": "Gale Mantis Empress", "elem": "wood", "weak": "fire", "col": Color("60d080"), "shape": "mantis", "boss": true},
 	"rainbow_serpent": {"n": "Rainbow Serpent", "elem": "thunder", "weak": "earth", "col": Color("e080f0"), "shape": "serpent", "boss": true},
 	"herald_qian": {"n": "Herald of the Ledger, Qian Shu", "elem": "dark", "weak": "fire", "col": Color("4a8a78"), "shape": "humanoid", "boss": true},
-	"twin_lions": {"n": "Twin Lions of the Jade Gate", "elem": "earth", "weak": "wood", "col": Color("40b090"), "shape": "beast", "boss": true},
+	"twin_lions": {"n": "Twin Lions of the Jade Gate", "elem": "earth", "weak": "wood", "col": Color("40b090"), "shape": "tiger", "boss": true},
 	"ink_dragon": {"n": "Ink Dragon", "elem": "dark", "weak": "water", "col": Color("2a2a3a"), "shape": "dragon", "boss": true},
 	"debt_magistrate": {"n": "Magistrate of Debts", "elem": "dark", "weak": "fire", "col": Color("6a2a4a"), "shape": "demon", "boss": true},
 	"registrar_siming": {"n": "Grand Registrar Si Ming", "elem": "earth", "weak": "wood", "col": Color("e0d0a0"), "shape": "humanoid", "boss": true},
@@ -216,7 +222,7 @@ const ENEMIES := {
 	"root_crawler": {"n": "Root Crawler", "elem": "earth", "weak": "wood", "col": Color("8a6a40"), "shape": "spider"},
 	"frost_yak": {"n": "Frost Yak", "elem": "water", "weak": "fire", "col": Color("b0c8e0"), "shape": "mammoth"},
 	"aurora_wisp": {"n": "Aurora Wisp", "elem": "thunder", "weak": "earth", "col": Color("80ffd0"), "shape": "wisp"},
-	"ice_lynx": {"n": "Ice Lynx", "elem": "water", "weak": "thunder", "col": Color("c8e0f8"), "shape": "beast"},
+	"ice_lynx": {"n": "Ice Lynx", "elem": "water", "weak": "thunder", "col": Color("c8e0f8"), "shape": "tiger"},
 	"chaos_eel": {"n": "Chaos Eel", "elem": "dark", "weak": "thunder", "col": Color("8040c0"), "shape": "serpent"},
 	"primal_jelly": {"n": "Primal Jelly", "elem": "dark", "weak": "fire", "col": Color("c060ff"), "shape": "jelly"},
 	"faceless_spawn": {"n": "Faceless Spawn", "elem": "dark", "weak": "fire", "col": Color("c04030"), "shape": "hundun"},
@@ -224,14 +230,14 @@ const ENEMIES := {
 	"glass_scorpion": {"n": "Glass Scorpion King", "elem": "earth", "weak": "wood", "col": Color("e8d8a0"), "shape": "scorpion", "boss": true},
 	"dune_leviathan": {"n": "Dune Leviathan", "elem": "earth", "weak": "wood", "col": Color("c8a060"), "shape": "dragon", "boss": true},
 	"star_colossus": {"n": "Star-Iron Colossus", "elem": "fire", "weak": "water", "col": Color("8a7ae0"), "shape": "golem", "boss": true},
-	"white_tiger": {"n": "Bai Hu, White Tiger of the West", "elem": "earth", "weak": "fire", "col": Color("f4f4ff"), "shape": "beast", "boss": true},
+	"white_tiger": {"n": "Bai Hu, White Tiger of the West", "elem": "earth", "weak": "fire", "col": Color("f4f4ff"), "shape": "tiger", "boss": true},
 	"spore_mother": {"n": "Mother of Spores", "elem": "wood", "weak": "fire", "col": Color("c070e0"), "shape": "mushroom", "boss": true},
 	"moth_queen": {"n": "Lantern Moth Queen", "elem": "fire", "weak": "water", "col": Color("ffb040"), "shape": "moth", "boss": true},
 	"rot_hydra": {"n": "Rot-Root Hydra", "elem": "wood", "weak": "fire", "col": Color("6a8a40"), "shape": "serpent", "boss": true},
 	"vermilion_bird": {"n": "Zhu Que, Vermilion Bird of the South", "elem": "fire", "weak": "water", "col": Color("ff4030"), "shape": "phoenix", "boss": true},
 	"mammoth_ancestor": {"n": "Mammoth Ancestor", "elem": "water", "weak": "fire", "col": Color("a0b8d0"), "shape": "mammoth", "boss": true},
 	"aurora_serpent": {"n": "Aurora Serpent", "elem": "thunder", "weak": "earth", "col": Color("60f0c0"), "shape": "dragon", "boss": true},
-	"lynx_matriarch": {"n": "Frost Lynx Matriarch", "elem": "water", "weak": "thunder", "col": Color("d0e8ff"), "shape": "beast", "boss": true},
+	"lynx_matriarch": {"n": "Frost Lynx Matriarch", "elem": "water", "weak": "thunder", "col": Color("d0e8ff"), "shape": "tiger", "boss": true},
 	"black_tortoise": {"n": "Xuan Wu, Black Tortoise of the North", "elem": "water", "weak": "earth", "col": Color("3a4a6a"), "shape": "tortoise", "boss": true},
 	"first_lightning": {"n": "The First Lightning", "elem": "thunder", "weak": "earth", "col": Color("f0f0ff"), "shape": "storm", "boss": true},
 	"pangu_shadow": {"n": "Shadow of Pangu", "elem": "earth", "weak": "wood", "col": Color("6a5040"), "shape": "demon", "boss": true},
@@ -242,7 +248,7 @@ const ENEMIES := {
 	"lost_lantern": {"n": "Lost Soul Lantern", "elem": "dark", "weak": "thunder", "col": Color("ffc860"), "shape": "wisp"},
 	"mossback_boar": {"n": "Mossback Boar", "elem": "earth", "weak": "wood", "col": Color("7a6a4a"), "shape": "beast"},
 	"river_carp": {"n": "Nine-Bend Carp", "elem": "water", "weak": "thunder", "col": Color("ff9050"), "shape": "carp"},
-	"stone_macaque": {"n": "Stone Macaque", "elem": "earth", "weak": "wood", "col": Color("a8a090"), "shape": "beast"},
+	"stone_macaque": {"n": "Stone Macaque", "elem": "earth", "weak": "wood", "col": Color("a8a090"), "shape": "ape"},
 	"mist_heron": {"n": "Mist Heron", "elem": "wood", "weak": "fire", "col": Color("d8e0e8"), "shape": "bird"},
 	"hopping_corpse": {"n": "Hopping Corpse", "elem": "dark", "weak": "fire", "col": Color("5a7a6a"), "shape": "jiangshi"},
 	"hungry_ghost": {"n": "Hungry Ghost", "elem": "dark", "weak": "thunder", "col": Color("8a9ab0"), "shape": "wraith"},
@@ -280,7 +286,7 @@ const ENEMIES := {
 	"spindle_imp": {"n": "Spindle Imp", "elem": "earth", "weak": "wood", "col": Color("c0904a"), "shape": "demon"},
 	"warp_wraith": {"n": "Warp-Thread Wraith", "elem": "dark", "weak": "thunder", "col": Color("b080e0"), "shape": "wraith"},
 	"shuttle_hawk": {"n": "Shuttle Hawk", "elem": "thunder", "weak": "earth", "col": Color("e0c060"), "shape": "bird"},
-	"paper_tiger": {"n": "The Paper Tiger of Qingshi", "elem": "fire", "weak": "water", "col": Color("f0a040"), "shape": "beast", "boss": true},
+	"paper_tiger": {"n": "The Paper Tiger of Qingshi", "elem": "fire", "weak": "water", "col": Color("f0a040"), "shape": "tiger", "boss": true},
 	"scarecrow_king": {"n": "Scarecrow King of the Paddies", "elem": "wood", "weak": "fire", "col": Color("c8a050"), "shape": "plant", "boss": true},
 	"well_spider": {"n": "Spider in the Village Well", "elem": "dark", "weak": "fire", "col": Color("6a6a8a"), "shape": "spider", "boss": true},
 	"needle_general": {"n": "Needle General Zhen", "elem": "phys", "weak": "thunder", "col": Color("b8c0d8"), "shape": "humanoid", "boss": true},
@@ -296,6 +302,35 @@ const ENEMIES := {
 	"spindle_golem": {"n": "Spindle Golem", "elem": "earth", "weak": "wood", "col": Color("c09a5a"), "shape": "golem", "boss": true},
 	"shuttle_dragon": {"n": "Shuttle Dragon", "elem": "thunder", "weak": "earth", "col": Color("e8d070"), "shape": "dragon", "boss": true},
 	"qianxian": {"n": "Madam Qianxian, Lady of a Thousand Threads", "elem": "wood", "weak": "fire", "col": Color("e0d0ff"), "shape": "spider", "boss": true},
+	# ---- Part VIII: The River of Heaven
+	"flood_carp": {"n": "Star-Flood Carp", "elem": "water", "weak": "earth", "col": Color("a0c0ff"), "shape": "carp"},
+	"reed_wisp": {"n": "Reed-Ford Wisp", "elem": "water", "weak": "earth", "col": Color("c8e8ff"), "shape": "wisp"},
+	"ferry_crab": {"n": "Ferry-Post Crab", "elem": "earth", "weak": "wood", "col": Color("6a7aa8"), "shape": "crab"},
+	"cloud_ape": {"n": "Cloud-Cliff Ape", "elem": "earth", "weak": "wood", "col": Color("b8b0a8"), "shape": "ape"},
+	"bridge_magpie": {"n": "Lost Bridge Magpie", "elem": "wood", "weak": "fire", "col": Color("3a4a7a"), "shape": "bird"},
+	"gale_wolf": {"n": "Gale Wolf of the Heights", "elem": "thunder", "weak": "earth", "col": Color("a8b8d0"), "shape": "beast"},
+	"star_moth": {"n": "Seven-Star Moth", "elem": "fire", "weak": "water", "col": Color("e0d0ff"), "shape": "moth"},
+	"loom_wraith": {"n": "Wraith of the Unwoven Sky", "elem": "dark", "weak": "thunder", "col": Color("8090c8"), "shape": "wraith"},
+	"star_qilin": {"n": "Star-Mane Qilin", "elem": "thunder", "weak": "earth", "col": Color("c0c8ff"), "shape": "qilin"},
+	"kunlun_tiger": {"n": "Kunlun Snow Tiger", "elem": "water", "weak": "earth", "col": Color("e8e8f0"), "shape": "tiger"},
+	"jade_qilin": {"n": "Jade Qilin", "elem": "wood", "weak": "fire", "col": Color("6ad0a0"), "shape": "qilin"},
+	"kunlun_peach_sprite": {"n": "Kunlun Peach-Grove Sprite", "elem": "wood", "weak": "fire", "col": Color("ffb0c0"), "shape": "plant"},
+	"silt_jiao": {"n": "Jiao of the Silted Ford", "elem": "water", "weak": "earth", "col": Color("5a7ab0"), "shape": "serpent", "boss": true},
+	"reed_widow": {"n": "Widow of the Reed Ford", "elem": "dark", "weak": "thunder", "col": Color("a0a8c8"), "shape": "wraith", "boss": true},
+	"carp_sage": {"n": "Old Carp Who Would Not Leap", "elem": "water", "weak": "earth", "col": Color("ffc070"), "shape": "carp", "boss": true},
+	"tide_qilin": {"n": "Qilin of the Rising Tide", "elem": "water", "weak": "earth", "col": Color("70a0ff"), "shape": "qilin", "boss": true},
+	"cloud_ape_king": {"n": "King of the Cloud Apes", "elem": "earth", "weak": "wood", "col": Color("d8d0c8"), "shape": "ape", "boss": true},
+	"storm_magpie": {"n": "Storm-Crowned Magpie", "elem": "thunder", "weak": "earth", "col": Color("3a3a5a"), "shape": "bird", "boss": true},
+	"pier_golem": {"n": "Golem of the Fallen Bridge-Pier", "elem": "earth", "weak": "wood", "col": Color("a8a0a0"), "shape": "golem", "boss": true},
+	"crow_marshal": {"n": "Crow Marshal of the Broken Bridge", "elem": "dark", "weak": "thunder", "col": Color("2a2a3a"), "shape": "humanoid", "boss": true},
+	"seven_star_moth": {"n": "Moth of the Seven Stars", "elem": "fire", "weak": "water", "col": Color("f0e0ff"), "shape": "moth", "boss": true},
+	"weaving_frame": {"n": "The Celestial Weaving-Frame", "elem": "earth", "weak": "wood", "col": Color("c8b8f0"), "shape": "golem", "boss": true},
+	"hall_qilin": {"n": "Qilin of the Weaving Hall", "elem": "thunder", "weak": "earth", "col": Color("d0d8ff"), "shape": "qilin", "boss": true},
+	"river_warden": {"n": "Heavenly Warden of the River", "elem": "phys", "weak": "thunder", "col": Color("c8d0f0"), "shape": "humanoid", "boss": true},
+	"kaiming_beast": {"n": "Kaiming, Beast of the Nine Gates", "elem": "fire", "weak": "water", "col": Color("e8a050"), "shape": "tiger", "boss": true},
+	"blue_birds": {"n": "The Three Blue Birds", "elem": "wood", "weak": "fire", "col": Color("40a0e0"), "shape": "phoenix", "boss": true},
+	"white_ape": {"n": "White Ape of Kunlun", "elem": "earth", "weak": "wood", "col": Color("f4f4f8"), "shape": "ape", "boss": true},
+	"xiwangmu": {"n": "Xiwangmu, Queen Mother of the West", "elem": "earth", "weak": "wood", "col": Color("e8d8a0"), "shape": "demon", "boss": true},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -353,6 +388,7 @@ const AREAS := {
 			{"to": "dunes", "pos": Vector2i(34, 24), "dest": Vector2i(4, 28), "open": "s_p5_home"},
 			{"to": "maple", "pos": Vector2i(1, 22), "dest": Vector2i(4, 28), "open": "s_p6_home"},
 			{"to": "village", "pos": Vector2i(6, 24), "dest": Vector2i(4, 28), "open": "s_p7_home"},
+			{"to": "starferry", "pos": Vector2i(13, 24), "dest": Vector2i(4, 28), "open": "s_p8_home"},
 		],
 		"npcs": [
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 4), "col": Color("e8e8ff")},
@@ -931,9 +967,86 @@ const AREAS := {
 		"pickups": [{"id": "shuttle1", "item": "shuttle", "pos": Vector2i(22, 12)}, {"id": "shuttle2", "item": "shuttle", "pos": Vector2i(40, 46)}, {"id": "shuttle3", "item": "shuttle", "pos": Vector2i(64, 30)}, {"id": "shuttle4", "item": "shuttle", "pos": Vector2i(76, 10)}],
 		"pickup_vis": "s_lm_collect",
 	},
+	# ---- Part VIII: The River of Heaven
+	"starferry": {
+		"n": "Starfall Ferry on the Silver River", "w": 96, "h": 58, "seed": 311, "theme": "starferry", "enemies": 20,
+		"pool": [["flood_carp", 36, 36], ["reed_wisp", 36, 36], ["ferry_crab", 36, 36]],
+		"portals": [
+			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(13, 21), "open": ""},
+			{"to": "magpie", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_sf_qilin"},
+		],
+		"npcs": [{"id": "niu_lang", "n": "Niu Lang the Cowherd", "pos": Vector2i(9, 25), "col": Color("c8b890"), "vis": ["s_sf_intro", ""]}],
+		"bosses": [
+			{"id": "silt_jiao", "pos": Vector2i(30, 40), "lv": 36, "req": 36},
+			{"id": "reed_widow", "pos": Vector2i(46, 16), "lv": 36, "req": 36},
+			{"id": "carp_sage", "pos": Vector2i(60, 40), "lv": 36, "req": 36},
+			{"id": "tide_qilin", "pos": Vector2i(86, 28), "lv": 36, "req": 36},
+		],
+		"pickups": [{"id": "rstar1", "item": "river_star", "pos": Vector2i(22, 12)}, {"id": "rstar2", "item": "river_star", "pos": Vector2i(40, 46)}, {"id": "rstar3", "item": "river_star", "pos": Vector2i(64, 30)}, {"id": "rstar4", "item": "river_star", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_sf_collect",
+		"buildings": [
+			{"id": "ferry_house", "n": "The Cowherd's Ferry House", "style": "house", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
+				"props": [["bed", Vector2i(7, 23), true], ["stove", Vector2i(12, 23), true], ["table", Vector2i(8, 27), true], ["lantern", Vector2i(12, 27), false]]},
+		],
+	},
+	"magpie": {
+		"n": "Heights of the Magpie Bridge", "w": 96, "h": 58, "seed": 321, "theme": "magpie", "enemies": 20,
+		"pool": [["cloud_ape", 36, 37], ["bridge_magpie", 36, 37], ["gale_wolf", 36, 37]],
+		"portals": [
+			{"to": "starferry", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "starpalace", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_mg_marshal"},
+		],
+		"npcs": [{"id": "que_lao", "n": "Que Lao, the Old Magpie", "pos": Vector2i(10, 26), "col": Color("3a4a7a"), "vis": ["s_mg_intro", ""]}],
+		"bosses": [
+			{"id": "cloud_ape_king", "pos": Vector2i(30, 40), "lv": 36, "req": 36},
+			{"id": "storm_magpie", "pos": Vector2i(46, 16), "lv": 37, "req": 37},
+			{"id": "pier_golem", "pos": Vector2i(60, 40), "lv": 37, "req": 37},
+			{"id": "crow_marshal", "pos": Vector2i(86, 28), "lv": 37, "req": 37},
+		],
+		"pickups": [{"id": "plume1", "item": "magpie_plume", "pos": Vector2i(22, 12)}, {"id": "plume2", "item": "magpie_plume", "pos": Vector2i(40, 46)}, {"id": "plume3", "item": "magpie_plume", "pos": Vector2i(64, 30)}, {"id": "plume4", "item": "magpie_plume", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_mg_collect",
+	},
+	"starpalace": {
+		"n": "Palace of the Weaver Star", "w": 96, "h": 58, "seed": 331, "theme": "starpalace", "enemies": 20,
+		"pool": [["star_moth", 37, 37], ["loom_wraith", 37, 37], ["star_qilin", 37, 37]],
+		"portals": [
+			{"to": "magpie", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "jasper", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_wv_warden"},
+		],
+		"npcs": [{"id": "zhi_nu", "n": "Zhi Nu, the Weaver Star", "pos": Vector2i(9, 25), "col": Color("c8d0ff"), "vis": ["s_wv_intro", ""]}],
+		"bosses": [
+			{"id": "seven_star_moth", "pos": Vector2i(30, 40), "lv": 37, "req": 37},
+			{"id": "weaving_frame", "pos": Vector2i(46, 16), "lv": 37, "req": 37},
+			{"id": "hall_qilin", "pos": Vector2i(60, 40), "lv": 37, "req": 37},
+			{"id": "river_warden", "pos": Vector2i(86, 28), "lv": 38, "req": 38},
+		],
+		"pickups": [{"id": "sthr1", "item": "star_thread", "pos": Vector2i(22, 12)}, {"id": "sthr2", "item": "star_thread", "pos": Vector2i(40, 46)}, {"id": "sthr3", "item": "star_thread", "pos": Vector2i(64, 30)}, {"id": "sthr4", "item": "star_thread", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_wv_collect",
+		"buildings": [
+			{"id": "weaving_hall", "n": "Hall of the Cloud Loom", "style": "house", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
+				"props": [["loom", Vector2i(7, 23), true], ["loom", Vector2i(7, 27), true], ["shelf", Vector2i(12, 23), true], ["lantern", Vector2i(12, 27), false]]},
+		],
+	},
+	"jasper": {
+		"n": "The Jasper Pool of Kunlun", "w": 96, "h": 58, "seed": 341, "theme": "jasper", "enemies": 20,
+		"pool": [["kunlun_tiger", 38, 38], ["jade_qilin", 38, 38], ["kunlun_peach_sprite", 38, 38]],
+		"portals": [
+			{"to": "starpalace", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+		],
+		"npcs": [{"id": "dong_shuang", "n": "Dong Shuang, Maid of the Jasper Pool", "pos": Vector2i(10, 26), "col": Color("6ad0a0"), "vis": ["s_jp_intro", ""]}],
+		"bosses": [
+			{"id": "kaiming_beast", "pos": Vector2i(30, 40), "lv": 38, "req": 38},
+			{"id": "blue_birds", "pos": Vector2i(46, 16), "lv": 38, "req": 38},
+			{"id": "white_ape", "pos": Vector2i(60, 40), "lv": 38, "req": 38},
+			{"id": "xiwangmu", "pos": Vector2i(86, 28), "lv": 38, "req": 38},
+		],
+		"pickups": [{"id": "kpeach1", "item": "kunlun_peach", "pos": Vector2i(22, 12)}, {"id": "kpeach2", "item": "kunlun_peach", "pos": Vector2i(40, 46)}, {"id": "kpeach3", "item": "kunlun_peach", "pos": Vector2i(64, 30)}, {"id": "kpeach4", "item": "kunlun_peach", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_jp_collect",
+		"springs": [Vector2i(48, 30)],
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper"]
 
 ## next area to enter when travelling from `from` to `to` (breadth-first over portals)
 static func next_hop(from: String, to: String) -> String:
@@ -1199,6 +1312,41 @@ const STEPS := [
 	{"id": "s_lm_dragon", "kind": "kill", "boss": "shuttle_dragon", "area": "loom", "t": "Catch the Shuttle Dragon"},
 	{"id": "s_lm_qianxian", "kind": "kill", "boss": "qianxian", "area": "loom", "t": "Face Madam Qianxian at the heart of the Loom", "stones": 11000},
 	{"id": "s_break12", "kind": "breakthrough", "to": 36, "t": "Sew nothing shut: open your heart to the Boundless"},
+	# ---- Part VIII: The River of Heaven
+	{"id": "s_p8_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Stars in the lotus pond: speak to Elder Qing Xuan", "stones": 11400},
+	{"id": "s_sf_intro", "kind": "talk", "npc": "niu_lang", "area": "starferry", "t": "Follow the falling stars down to the Starfall Ferry and find the Cowherd"},
+	{"id": "s_sf_collect", "kind": "collect", "item": "river_star", "n": 4, "area": "starferry", "t": "Fish 4 Drowned Stars out of the flooded fields"},
+	{"id": "s_sf_hunt", "kind": "hunt", "area": "starferry", "n": 58, "t": "Turn back the creatures riding the star-flood"},
+	{"id": "s_sf_return", "kind": "talk", "npc": "niu_lang", "area": "starferry", "t": "Bring the Drowned Stars to Niu Lang"},
+	{"id": "s_sf_jiao", "kind": "kill", "boss": "silt_jiao", "area": "starferry", "t": "Drive the Jiao out of the silted ford"},
+	{"id": "s_sf_widow", "kind": "kill", "boss": "reed_widow", "area": "starferry", "t": "Hear out the Widow of the Reed Ford"},
+	{"id": "s_sf_carp", "kind": "kill", "boss": "carp_sage", "area": "starferry", "t": "Make the Old Carp leap at last"},
+	{"id": "s_sf_qilin", "kind": "kill", "boss": "tide_qilin", "area": "starferry", "t": "Calm the Qilin of the Rising Tide", "stones": 11800},
+	{"id": "s_mg_intro", "kind": "talk", "npc": "que_lao", "area": "magpie", "t": "Climb the cloud cliffs to the Heights of the Magpie Bridge and find the Old Magpie"},
+	{"id": "s_mg_collect", "kind": "collect", "item": "magpie_plume", "n": 4, "area": "magpie", "t": "Gather 4 Bridge Plumes scattered by the storm"},
+	{"id": "s_mg_hunt", "kind": "hunt", "area": "magpie", "n": 58, "t": "Clear the heights for the magpies to come home"},
+	{"id": "s_mg_return", "kind": "talk", "npc": "que_lao", "area": "magpie", "t": "Bring the Bridge Plumes to Que Lao"},
+	{"id": "s_mg_ape", "kind": "kill", "boss": "cloud_ape_king", "area": "magpie", "t": "Wrestle the King of the Cloud Apes off the nests"},
+	{"id": "s_mg_storm", "kind": "kill", "boss": "storm_magpie", "area": "magpie", "t": "Bring down the Storm-Crowned Magpie"},
+	{"id": "s_mg_golem", "kind": "kill", "boss": "pier_golem", "area": "magpie", "t": "Set the fallen Bridge-Pier back on its feet"},
+	{"id": "s_mg_marshal", "kind": "kill", "boss": "crow_marshal", "area": "magpie", "t": "Break the Crow Marshal's blockade of the broken bridge", "stones": 12200},
+	{"id": "s_wv_intro", "kind": "talk", "npc": "zhi_nu", "area": "starpalace", "t": "Cross the sky to the Palace of the Weaver Star and find Zhi Nu at her loom"},
+	{"id": "s_wv_collect", "kind": "collect", "item": "star_thread", "n": 4, "area": "starpalace", "t": "Catch 4 Threads of Starlight blowing loose from the palace"},
+	{"id": "s_wv_hunt", "kind": "hunt", "area": "starpalace", "n": 60, "t": "Drive the unwoven things out of the palace gardens"},
+	{"id": "s_wv_return", "kind": "talk", "npc": "zhi_nu", "area": "starpalace", "t": "Bring the Threads of Starlight to Zhi Nu"},
+	{"id": "s_wv_moth", "kind": "kill", "boss": "seven_star_moth", "area": "starpalace", "t": "Put out the Moth of the Seven Stars"},
+	{"id": "s_wv_frame", "kind": "kill", "boss": "weaving_frame", "area": "starpalace", "t": "Stop the Celestial Weaving-Frame weaving walls"},
+	{"id": "s_wv_qilin", "kind": "kill", "boss": "hall_qilin", "area": "starpalace", "t": "Win over the Qilin of the Weaving Hall"},
+	{"id": "s_wv_warden", "kind": "kill", "boss": "river_warden", "area": "starpalace", "t": "Pass the Heavenly Warden of the River", "stones": 12600},
+	{"id": "s_jp_intro", "kind": "talk", "npc": "dong_shuang", "area": "jasper", "t": "Climb Kunlun to the Jasper Pool and find the Queen Mother's maid"},
+	{"id": "s_jp_collect", "kind": "collect", "item": "kunlun_peach", "n": 4, "area": "jasper", "t": "Pick 4 Peaches of Kunlun from the high orchard"},
+	{"id": "s_jp_hunt", "kind": "hunt", "area": "jasper", "n": 60, "t": "Quiet the beasts guarding the orchard of immortality"},
+	{"id": "s_jp_return", "kind": "talk", "npc": "dong_shuang", "area": "jasper", "t": "Bring the Peaches of Kunlun to Dong Shuang"},
+	{"id": "s_jp_kaiming", "kind": "kill", "boss": "kaiming_beast", "area": "jasper", "t": "Open the Nine Gates past Kaiming"},
+	{"id": "s_jp_birds", "kind": "kill", "boss": "blue_birds", "area": "jasper", "t": "Answer the Three Blue Birds"},
+	{"id": "s_jp_ape", "kind": "kill", "boss": "white_ape", "area": "jasper", "t": "Out-wit the White Ape of Kunlun"},
+	{"id": "s_jp_queen", "kind": "kill", "boss": "xiwangmu", "area": "jasper", "t": "Ask the Queen Mother of the West to lay down her hairpin", "stones": 13000},
+	{"id": "s_break13", "kind": "breakthrough", "to": 39, "t": "Cross the River of Heaven: become a bridge yourself"},
 ]
 
 static func step_index(id: String) -> int:
@@ -1240,6 +1388,11 @@ const ITEMS := {
 	"tea_bud": {"n": "Dragon-Well Tea Bud", "desc": "Quest item"},
 	"cocoon": {"n": "Soul-Cocoon", "desc": "Quest item"},
 	"shuttle": {"n": "Shuttle of the Loom", "desc": "Quest item"},
+	"river_star": {"n": "Drowned Star", "desc": "Quest item"},
+	"magpie_plume": {"n": "Bridge Plume", "desc": "Quest item"},
+	"star_thread": {"n": "Thread of Starlight", "desc": "Quest item"},
+	"kunlun_peach": {"n": "Peach of Kunlun", "desc": "Quest item"},
+	"magpie_badge": {"n": "Magpie Marshal's Badge", "desc": "The Crow Marshal's badge, given back to the magpies"},
 	"bell": {"n": "Ox-Head's Iron Bell", "desc": "It once rang every soul down the funeral road"},
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
@@ -1247,7 +1400,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle"}
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -1258,6 +1411,10 @@ const CHAT := {
 	"alchemist": ["Pills are only borrowed time. Use them wisely.", "Hehe, my furnace never lies."],
 	"smith": ["Steel remembers every blow. Bring me stones and I will temper your sword.", "A sword is only as sharp as its wielder's resolve."],
 	"archivist": ["The old maps drew every realm as its own island, stitched to the next by a gate. Look out of the window now: the roads simply run on.", "Mind the scrolls. Half of them are older than the Elder, and the other half are older than the sect.", "The Lotus Seal's barriers still stand at the borders of lands you have not earned yet. The road goes right up to them."],
+	"niu_lang": ["Every seventh night of the seventh month the magpies came. This year the sky was empty, and then the river came down instead.", "The ox is gone now, but I still talk to him. He never minded.", "She weaves the sunsets, you know. That is why they have been grey."],
+	"que_lao": ["Ten thousand magpies, wing to wing, and the Weaver walks across our backs. My back remembers every step.", "A bridge is only birds holding on to each other. Never forget that.", "Mind the cliff edge. Cloud is softer than it looks, but not that soft."],
+	"zhi_nu": ["I have woven the dawn every morning for three thousand years. I would like, just once, to watch someone else's.", "A thread is a road for a needle. A road is a thread for a traveller.", "He plays the flute badly. I can hear it from here. I have always been able to."],
+	"dong_shuang": ["The peaches ripen once in three thousand years. Do not touch the ones that are humming.", "My lady drew the river with her hairpin because she was afraid. She has been afraid for a very long time.", "Kunlun is the pillar of the west. Everything up here is older than it looks, especially the tigers."],
 	"granny_wen": ["You still sit like you did at six, all elbows. Eat something.", "I delivered half this valley. I know every one of them by their first cry, and three of them have gone quiet.", "A house is four walls and a door, child. The door is the important part."],
 	"innkeeper": ["Rooms are free for anyone who cuts a thread off my roof. Nobody has taken me up on it yet.", "The tea comes down from the terraces. Or it did, before the hills were sewn up."],
 	"weaver_liu": ["I weave for a living, and I tell you: whoever is sewing those threads is the best weaver who ever lived. And the angriest.", "Warp holds still, weft goes through. A cloth needs both. So does a village."],
@@ -2418,6 +2575,195 @@ const DIALOGUE := {
 		["Narrator", "In Qingshi Village, three mothers wake to three babies yawning in their cradles. Granny Wen counts them twice and then sits down on her step and cries, very quietly, because she would never let anyone see."],
 		["Madam Qianxian, Lady of a Thousand Threads", "First row unpicked. Nine thousand nine hundred and ninety-nine to go. Zhi, fetch the tea."],
 		["Narrator", "And on Azure Cloud Mountain, on the first warm evening of summer, Lin Feng sweeps the steps of the sect while Little Wan watches from the Elder's arms, and every road down the mountain runs on, open, to the edge of the world."],
+	],
+	# ---- Part VIII: The River of Heaven
+	"recall6": [
+		["Narrator", "Summer turns. Qingshi Village has three new names in its register, and Little Wan has learned to say 'broom'."],
+		["Narrator", "On the seventh night of the seventh month the whole sect climbs the roof of the hall to watch the magpies gather in the sky, the way they have every year since before there was a sect. No magpies come."],
+		["Narrator", "Instead, an hour before midnight, the Silver River across the sky spills over. Stars come down like rain. They hiss in the lotus pond, and in the morning the pond is full of drowned stars, still faintly shining."],
+		["Yue Ling", "Lin Feng... the river in the sky. It is lower than it was. It is coming down the south road."],
+		["Elder Qing Xuan", "To the hall. Both of you. I was afraid of this when Qianxian began unpicking her Loom."],
+	],
+	"s_p8_home": [
+		["Elder Qing Xuan", "Every child in the valley knows the story. The Weaver Star, granddaughter of the Jade Emperor, fell in love with a cowherd. The Queen Mother of the West drew her golden hairpin across the sky to part them, and the line she drew became the Silver River."],
+		["Elder Qing Xuan", "Once a year, on the seventh night, the magpies of the world fly up and make a bridge of themselves so the lovers can meet. That is the story. What the story does not say is that the river is a border. The oldest border there is."],
+		["Lin Feng", "And Qianxian is unpicking every border she ever stitched."],
+		["Elder Qing Xuan", "She did not draw this one, but she bound its banks with her thread for ten thousand years. Now the thread is coming out, and the river does not know where to go. It is pouring down the old Sky Road into the world, and the magpies have been scattered by the flood."],
+		["Yue Ling", "And the Cowherd? In the story he waits by the river every night."],
+		["Elder Qing Xuan", "He still does. There is a ferry on the south road where the Sky Road comes down to earth, and an old herdsman who keeps it. I have opened the road. Go down to the Starfall Ferry and find Niu Lang."],
+	],
+	"s_sf_intro": [
+		["Niu Lang the Cowherd", "Mind the stars, they are still hot. I have been fishing them out of the fields all week. The rice is ruined, and the river is still rising."],
+		["Lin Feng", "The Elder says you are the Cowherd. From the story."],
+		["Niu Lang the Cowherd", "I am a cowherd, and there is a story. I keep the ferry because this is where the Sky Road touches the ground. Every seventh night I would cross on the magpies' backs. This year there were no magpies, only water."],
+		["Niu Lang the Cowherd", "The drowned stars are what is left of the Weaver's sky. If you can fish out four of them I can read them. She always said I read stars better than letters. Then we will know how far up the river has broken."],
+	],
+	"s_sf_return": [
+		["Niu Lang the Cowherd", "Four stars, and they all fell from the same place: the bend of the river under the Magpie Heights. That is where the bridge always stood."],
+		["Niu Lang the Cowherd", "The flood has brought things down with it. A jiao has silted up the ford, the reed widow walks the bank again, and the old carp at the weir is too frightened to leap. And something with a horn of light keeps the tide rising at the east end of the fields."],
+		["Yue Ling", "We will clear the ford. Will you come with us?"],
+		["Niu Lang the Cowherd", "I would only slow you down. Clear the road, and I will follow it. I have been following that road my whole life."],
+	],
+	"pre:silt_jiao": [
+		["Narrator", "In the ford a jiao, a dragon that never finished becoming a dragon, lies coiled in starlit silt, damming the river so the water spreads over the fields."],
+		["Jiao of the Silted Ford", "A thousand years I have waited to climb the river into the sky. Now the river has come down to me, and I will not let it leave."],
+		["Lin Feng", "Then climb it with us. It is going back up."],
+	],
+	"post:silt_jiao": [["Narrator", "The Jiao uncoils, and the ford runs clear. As the water drains from the fields it carries the young dragon with it, upstream, towards the sky."]],
+	"pre:reed_widow": [
+		["Narrator", "In the reeds a woman in a wet white robe stands up to her waist in the flood, calling a name over and over."],
+		["Widow of the Reed Ford", "He went to the river to fetch water, and the river took him across. I have waited on this side for so long. Why should anyone be allowed to cross?"],
+		["Yue Ling", "Because the river is not supposed to keep anyone. Not him, and not you."],
+	],
+	"post:reed_widow": [["Narrator", "The Widow lets out a long breath and walks into the water. On the far bank, faint as a reflection, a man is waiting with a bucket. She does not look back."]],
+	"pre:carp_sage": [
+		["Narrator", "Under the weir an enormous golden carp hangs in the water, whiskers grey with age, glaring at the falls above it."],
+		["Old Carp Who Would Not Leap", "Every carp who leaps the Dragon Gate becomes a dragon. Every carp who fails is laughed at by the whole river. For four hundred years I have chosen not to be laughed at."],
+		["Lin Feng", "And for four hundred years you have stayed a carp. Shall we see what you can do?"],
+	],
+	"post:carp_sage": [["Narrator", "Stung, the Old Carp leaps, and clears the weir by a full body-length, and keeps going, up the waterfall of falling stars, and is gone. Somewhere far above, something roars with delight."]],
+	"pre:tide_qilin": [
+		["Narrator", "At the east end of the fields a qilin made of moonlit water paces the bank, and wherever its hooves fall the tide rises."],
+		["Qilin of the Rising Tide", "The river was walled for ten thousand years. Now it is free. I am only helping it go where it likes."],
+		["Lin Feng", "A river that goes where it likes is a flood. A river needs banks. Banks are not the same as walls."],
+	],
+	"post:tide_qilin": [
+		["Narrator", "The Qilin bows its head, and the tide goes out with it. Where the water draws back, a road of wet starlit stone climbs towards the clouds."],
+		["Niu Lang the Cowherd", "The Sky Road. I have not seen it dry in a year. Go on. The magpies nest on the heights at the top. If any of them are left, Que Lao will know."],
+	],
+	"s_mg_intro": [
+		["Que Lao, the Old Magpie", "Kak! A Sovereign on my cliff, and not a single nest left standing to receive him. Forgive the mess."],
+		["Lin Feng", "You are the magpies who make the bridge."],
+		["Que Lao, the Old Magpie", "Ten thousand of us, wing to wing, every seventh night since there was a sky. This year the river burst while we were gathering, and the storm threw us to the four winds. The apes took the nests, and something wearing a crow's crown has set itself on the broken bridge."],
+		["Que Lao, the Old Magpie", "Gather the bridge plumes the storm tore from us. Four of them. A magpie can find her way home by her own feather."],
+	],
+	"s_mg_return": [
+		["Que Lao, the Old Magpie", "Four plumes. Listen. Can you hear? They are calling to the others. The flock is coming back, one bird at a time."],
+		["Que Lao, the Old Magpie", "But we cannot build while the heights are held against us. The Ape King sits in our nests. A magpie that ate the storm wears its lightning for a crown. The great pier of the bridge has fallen and walks about in a temper. And on the bridge itself the Crow Marshal says no bird may cross without leave of the Court."],
+		["Yue Ling", "There is no Court any more."],
+		["Que Lao, the Old Magpie", "Crows are the last to hear any news. Go and tell him."],
+	],
+	"pre:cloud_ape_king": [
+		["Narrator", "In the ruined nests on the cliff a great ape with a silver back sits on a heap of stolen eggs, cracking walnuts on its knee."],
+		["King of the Cloud Apes", "Hoo! The birds built, the birds left, the apes moved in. That is the law of the mountain."],
+		["Lin Feng", "The birds were blown away. That is not the same as leaving."],
+	],
+	"post:cloud_ape_king": [["Narrator", "The Ape King sits back, nursing a bruised pride, and very carefully rolls the eggs back into the nests one by one. Apes, it turns out, can be very gentle when they are embarrassed."]],
+	"pre:storm_magpie": [
+		["Narrator", "Above the heights a magpie as big as a house rides the thunderheads, a crown of lightning crackling on its head."],
+		["Storm-Crowned Magpie", "Kak! I swallowed the storm that scattered us. Now I am the storm. Why would I want to be a bridge again?"],
+		["Yue Ling", "Because a bridge is where everyone you love walks across your back. A storm never gets to be that close to anyone."],
+	],
+	"post:storm_magpie": [["Narrator", "The lightning crown flickers out. The great magpie shrinks with every beat of its wings, until it is an ordinary bird, a little singed, landing on Que Lao's staff."]],
+	"pre:pier_golem": [
+		["Narrator", "The great stone pier that held up one end of the Magpie Bridge has pulled itself out of the cliff and stomps up and down the heights."],
+		["Golem of the Fallen Bridge-Pier", "TEN THOUSAND YEARS I HELD. NOBODY THANKED ME. NOW I WALK WHERE I LIKE."],
+		["Lin Feng", "Thank you. Truly. Now will you hold it once more?"],
+	],
+	"post:pier_golem": [["Narrator", "The Pier stops. Nobody, it seems, has ever said thank you before. It walks back to the cliff edge and sets itself into the rock, very straight, very proud."]],
+	"pre:crow_marshal": [
+		["Narrator", "On the broken end of the bridge stands a marshal in black lacquered armour with a crow's mask, a halberd across the way, a hundred crows on the rails behind him."],
+		["Crow Marshal of the Broken Bridge", "By order of the Heavenly Court, no bird, beast, mortal or star may cross the River of Heaven without leave. Present your leave."],
+		["Lin Feng", "The Court fell two years ago. I was there. I can show you where the Ledger used to be."],
+		["Crow Marshal of the Broken Bridge", "Then I have no orders. Then I am nobody. Then I will hold this bridge until someone gives me new ones."],
+	],
+	"post:crow_marshal": [
+		["Narrator", "The Crow Marshal lowers his halberd and takes off his badge. Behind him the crows fly up, and among them, wing by wing, come the magpies, more and more, until the sky is black and white with them."],
+		["Que Lao, the Old Magpie", "Kak! Kak! Look at them! Not enough for the whole bridge, not yet, but enough to carry you across. Go to the Weaver. She has been alone on the far bank a very long time."],
+	],
+	"s_wv_intro": [
+		["Zhi Nu, the Weaver Star", "You crossed on the magpies. I felt every one of their steps on my loom. Sit, please. Mind the warp; that thread is tomorrow's sunrise."],
+		["Lin Feng", "The river is flooding the world below. The Elder says it is because the borders are coming undone."],
+		["Zhi Nu, the Weaver Star", "The river is flooding because I stopped weaving its banks. I wove them every night for three thousand years, and on the seventh night of the seventh month I would stop, and cross, and see him. This year I thought: if I stop weaving altogether, perhaps the river will simply go away."],
+		["Zhi Nu, the Weaver Star", "It did not go away. It went down. I have done a foolish thing, Sovereign. Help me catch the threads that have blown loose from my loom, four threads of starlight, and I will begin to mend it."],
+	],
+	"s_wv_return": [
+		["Zhi Nu, the Weaver Star", "Four threads. Enough to weave banks for the river, but only banks this time. Not a wall. I will leave a ford, every seventh night and every other night too."],
+		["Zhi Nu, the Weaver Star", "But the palace is still full of things I wove in despair. A moth of my seven stars that eats the light. The weaving-frame my grandfather gave me, weaving walls on its own. The qilin of the hall, who thinks I need protecting. And the Warden of the River, who was set at the palace gate to keep me in."],
+		["Zhi Nu, the Weaver Star", "Take this sword-form. I wove it from the night he and I first met. My grandfather never knew I had kept it."],
+		["Narrator", "Lin Feng learns the Seventh-Night Reunion Sword."],
+	],
+	"pre:seven_star_moth": [
+		["Narrator", "Above the palace garden a moth with seven stars on its wings drinks the light out of the lanterns one by one."],
+		["Yue Ling", "It is eating the stars. All seven of the Weaver's stars."],
+		["Lin Feng", "Then let us give them back to her."],
+	],
+	"post:seven_star_moth": [["Narrator", "The moth bursts into seven sparks, and they rise, and settle back into the sky in the shape of a weaver's shuttle, where they have always been."]],
+	"pre:weaving_frame": [
+		["Narrator", "In the great hall a loom of white jade and gold weaves on its own, shuttle flying, and everything it weaves is a wall."],
+		["The Celestial Weaving-Frame", "CLACK. CLACK. THE GRANDDAUGHTER MUST BE KEPT SAFE. CLACK. SAFE IS INSIDE. INSIDE IS WALLS."],
+		["Lin Feng", "She can keep herself safe. Stop."],
+	],
+	"post:weaving_frame": [["Narrator", "The Weaving-Frame's shuttle drops. Its last row of wall unravels and falls in a heap of light, and Zhi Nu runs her hand along the old frame like a horse she used to ride."]],
+	"pre:hall_qilin": [
+		["Narrator", "Before the inner hall a qilin of starlight lowers its horn."],
+		["Qilin of the Weaving Hall", "I have guarded her since she was a child. A cowherd. A mortal. He will grow old, and she will weep for ten thousand years."],
+		["Yue Ling", "Then let her weep. That is hers to choose, not yours."],
+	],
+	"post:hall_qilin": [["Narrator", "The Qilin lowers its horn and steps aside, and lays its head for a moment on Zhi Nu's shoulder, and goes out into the garden to lie in the sun."]],
+	"pre:river_warden": [
+		["Narrator", "At the palace gate, where the Sky Road leaves for Kunlun, stands a Heavenly Warden in silver armour, a spear in each hand."],
+		["Heavenly Warden of the River", "The Queen Mother set me here on the night she drew the river. The Weaver Star does not leave. The Cowherd does not enter. Those are my orders."],
+		["Lin Feng", "Then we will ask the Queen Mother to change them. Let us pass."],
+		["Heavenly Warden of the River", "Nobody asks the Queen Mother anything."],
+	],
+	"post:river_warden": [
+		["Narrator", "The Warden plants both spears in the ground and kneels beside them."],
+		["Heavenly Warden of the River", "Go to Kunlun, then. Ask her. If she answers you, you will be the first in ten thousand years. Her maid tends the peach orchard by the Jasper Pool; she alone can bring you before the throne."],
+	],
+	"s_jp_intro": [
+		["Dong Shuang, Maid of the Jasper Pool", "You are the Sovereign who turned the Wheel. My lady has been expecting you since the day the river broke. She has not said so. She has been pacing."],
+		["Lin Feng", "We have come to ask her to take back the river."],
+		["Dong Shuang, Maid of the Jasper Pool", "She cannot take it back. A line drawn with that hairpin stays drawn. But she could draw something else across it, if she wanted to."],
+		["Dong Shuang, Maid of the Jasper Pool", "Nobody comes before her empty-handed. Pick four peaches of Kunlun from the high orchard, the ones that ripen once in three thousand years. Not the humming ones."],
+	],
+	"s_jp_return": [
+		["Dong Shuang, Maid of the Jasper Pool", "Four peaches, and not one of them humming. You listen well. My lady will see you."],
+		["Dong Shuang, Maid of the Jasper Pool", "But Kunlun keeps its own counsel. Kaiming guards the nine gates with his nine heads. The three blue birds carry her messages and will not let you past until you answer theirs. And the white ape who stole the sword manual of heaven lives in the orchard and thinks every visitor has come to steal it back."],
+		["Yue Ling", "And then the Queen Mother herself."],
+		["Dong Shuang, Maid of the Jasper Pool", "She will fight you. She fights everyone. She has the teeth of a tiger and the tail of a leopard, and a very long memory. Go gently."],
+	],
+	"pre:kaiming_beast": [
+		["Narrator", "Before the nine gates of Kunlun crouches a tiger the size of a temple, with nine human faces, each one watching a gate."],
+		["Kaiming, Beast of the Nine Gates", "Nine gates. Nine questions. Why have you come? Who sent you? What do you carry? What do you want?..."],
+		["Lin Feng", "To ask for a bridge. Nobody. Peaches. To go home, eventually."],
+		["Kaiming, Beast of the Nine Gates", "...those were four. Answer the other five with your sword."],
+	],
+	"post:kaiming_beast": [["Narrator", "One by one Kaiming's nine faces close their eyes, satisfied, and the nine gates of Kunlun swing open together."]],
+	"pre:blue_birds": [
+		["Narrator", "Three blue birds as big as cranes wheel above the Jasper Pool, carrying the Queen Mother's messages in their beaks."],
+		["The Three Blue Birds", "We carry her word to the world. What word should we carry back to her?"],
+		["Yue Ling", "Tell her we came to ask, not to take."],
+	],
+	"post:blue_birds": [["Narrator", "The blue birds dip their wings and fly up to the jade palace on the peak, carrying Yue Ling's words. Far above, a gate opens."]],
+	"pre:white_ape": [
+		["Narrator", "In the orchard a white ape with a scroll stuffed down its belt swings from branch to branch, pelting the travellers with peach stones."],
+		["White Ape of Kunlun", "Ha! Another thief come for the Sword Manual of Heaven! It is mine, mine, I stole it fair and square!"],
+		["Lin Feng", "Keep it. I have my own swords now. Mostly I sweep with them."],
+	],
+	"post:white_ape": [["Narrator", "The White Ape is so astonished that anybody would not want the Manual that it sits down in a peach tree and reads it for the first time, and finds it is mostly about patience."]],
+	"pre:xiwangmu": [
+		["Narrator", "Beside the Jasper Pool, on a throne of white jade, sits the Queen Mother of the West: a woman with a tiger's teeth and a leopard's tail, a golden hairpin in her grey hair."],
+		["Xiwangmu, Queen Mother of the West", "I know why you have come. You want me to unsay the river. I drew it to keep my granddaughter in the sky where she belongs, and the cowherd on the earth where he belongs. Everyone where they belong. That is what keeps the world from falling apart."],
+		["Lin Feng", "Qianxian said that too, about her borders. She is unpicking them now, one row at a time. The world has not fallen apart."],
+		["Xiwangmu, Queen Mother of the West", "Then prove it is strong enough to stand without my lines. Come."],
+	],
+	"post:xiwangmu": [
+		["Narrator", "The Queen Mother sits back on her throne. For a long time she looks at the golden hairpin in her hand."],
+		["Xiwangmu, Queen Mother of the West", "A line drawn with this stays drawn. But I suppose nobody ever said I could only draw rivers."],
+		["Narrator", "She draws the hairpin across the sky, once, gently, from the Weaver's palace to the Cowherd's ferry. Where it passes, a bridge of light hangs over the river, and the magpies land on it in their thousands, and stay."],
+	],
+	"pre:s_break13": [
+		["Narrator", "On the new bridge over the River of Heaven, with the Cowherd climbing up one end and the Weaver running down the other, the Heavens ask Lin Feng their last question: what will you hold together?"],
+		["Lin Feng", "Whatever reaches for each other. That is all a bridge is."],
+		["Yue Ling", "Magpies holding on to each other."],
+		["Lin Feng", "And people. Mostly people."],
+	],
+	"post:s_break13": [
+		["Narrator", "The tribulation falls on the bridge, and the bridge holds. Lin Feng becomes the first cultivator of the Star River Crossing: a realm that is not a wall or a door, but a way across."],
+		["Narrator", "In the middle of the bridge Niu Lang and Zhi Nu meet, and say nothing at all for a long while. Then he plays his flute, badly, and she laughs, and the sunset that evening is the best anyone has seen in a year."],
+		["Xiwangmu, Queen Mother of the West", "Every night, then. Not just the seventh. I suppose it will be very noisy."],
+		["Narrator", "And on Azure Cloud Mountain the drowned stars rise out of the lotus pond one by one and float home, and Little Wan claps at each of them, and Lin Feng sweeps the steps, and the River of Heaven runs on above it all, full to its banks and no higher, with a bridge across it for anyone who wants to cross."],
 	],
 	# ---- Part V: The Falling Sky
 	"recall3": [

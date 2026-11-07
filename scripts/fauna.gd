@@ -42,6 +42,10 @@ const KINDS := {
 	"tea": [["birds", 2], ["cranes", 2], ["butterflies", 2]],
 	"silk": [["moths", 3], ["butterflies", 3], ["birds", 1]],
 	"loom": [["butterflies", 3], ["cranes", 1]],
+	"starferry": [["fish", 3], ["dragonflies", 2], ["moths", 2]],
+	"magpie": [["birds", 4], ["cranes", 2]],
+	"starpalace": [["butterflies", 2], ["moths", 3]],
+	"jasper": [["cranes", 3], ["butterflies", 3], ["birds", 1]],
 }
 
 const FLAP := """

@@ -25,7 +25,7 @@ const MONSTERS := {
 	"jelly": "monsters/jelly", "ray": "monsters/ray", "wisp": "monsters/wisp", "wraith": "monsters/wraith",
 	"plant": "monsters/plant", "blob": "monsters/blob", "storm": "monsters/storm", "tome": "monsters/tome",
 	# Part VIII
-	"qilin": "monsters/qilin", "ape": "monsters/ape",
+	"qilin": "monsters/qilin", "ape": "monsters/ape", "tiger": "monsters/tiger",
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",

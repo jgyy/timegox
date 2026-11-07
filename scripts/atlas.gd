@@ -26,6 +26,7 @@ const ROWS := [
 	{"ids": ["dunes", "fungal", "aurora", "chaos"], "flip": false},
 	{"ids": ["maple", "karst", "springs", "wheel"], "flip": false},
 	{"ids": ["village", "terraces", "silk", "loom"], "flip": false},
+	{"ids": ["starferry", "magpie", "starpalace", "jasper"], "flip": false},
 ]
 
 static var _layout := {}

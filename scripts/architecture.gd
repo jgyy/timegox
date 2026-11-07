@@ -648,6 +648,7 @@ const SETTLE := {
 	"cloudsea": ["shrine", "tower", "pavilion"], "court": ["ruin", "pavilion"], "celestial": ["pavilion"], "time": ["ruin"], "abyss": ["ruin"], "volcano": ["ruin", "tower"],
 	"forge": ["tower", "ruin"], "mirror": ["shrine", "stilt"], "palace": ["tower", "ruin"],
 	"village": ["house", "house", "shrine"], "tea": ["pavilion", "house"], "silk": ["house", "shrine"], "loom": ["pavilion", "ruin"],
+	"starferry": ["stilt", "house", "shrine"], "magpie": ["tower", "pavilion"], "starpalace": ["pavilion", "pavilion", "ruin"], "jasper": ["pavilion", "shrine"],
 }
 static var _mesh_cache := {}
 

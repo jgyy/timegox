@@ -89,6 +89,15 @@ const ECO := {
 		"ground": [["fern", 1.5], ["flowers", 1]], "land": 0.0, "rocks": ["boulder", "scree"], "rock_p": 0.03, "grass": 1.0, "cover": 0.1, "logs": 0.03},
 	"loom": {"canopy": [["wisteria", 3], ["blossom", 2], ["crystal_tree", 1]], "under": [["flowerbush", 3], ["round_bush", 1]],
 		"ground": [["flowers", 2]], "land": 0.35, "rocks": ["slab", "crystal"], "rock_p": 0.02, "grass": 0.5, "cover": 0.06},
+	# ---- Part VIII
+	"starferry": {"canopy": [["willow", 3], ["pine", 1], ["birch", 1]], "under": [["reeds", 4], ["bush", 2], ["sapling", 1]],
+		"ground": [["fern", 1], ["flowers", 0.8]], "land": 0.04, "rocks": ["boulder", "pebbles"], "rock_p": 0.03, "grass": 1.1, "cover": 0.08, "logs": 0.02},
+	"magpie": {"canopy": [["pine", 4], ["bonsai", 2], ["fir", 1]], "under": [["round_bush", 3], ["bush", 2]],
+		"ground": [["fern", 1], ["flowers", 0.5]], "land": 0.1, "rocks": ["karst", "spire", "slab"], "rock_p": 0.07, "grass": 0.8, "cover": 0.1},
+	"starpalace": {"canopy": [["crystal_tree", 2], ["wisteria", 2], ["blossom", 1]], "under": [["flowerbush", 3], ["round_bush", 2]],
+		"ground": [["flowers", 2]], "land": 0.35, "rocks": ["crystal", "slab"], "rock_p": 0.03, "grass": 0.5, "cover": 0.06},
+	"jasper": {"canopy": [["peach", 4], ["blossom", 2], ["pine", 1], ["ginkgo", 1]], "under": [["flowerbush", 3], ["bush", 1]],
+		"ground": [["flowers", 2.5], ["fern", 0.5]], "land": 0.05, "rocks": ["boulder", "slab", "crystal"], "rock_p": 0.04, "grass": 1.0, "cover": 0.08},
 }
 
 static var _grass := {}
