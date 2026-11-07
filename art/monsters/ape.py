@@ -1,13 +1,15 @@
 """Ape (new in Part VIII): the great apes of the cloud cliffs (Cloud Ape, Magpie-Bridge Gibbon King,
-the White Ape Who Stole the Sword Manual).
+the White Ape Who Stole the Sword Manual, the Thunder and Storm Ape Kings).
 
-Great-ape anatomy rather than a man in fur: it stands hunched with its weight forward on its
-knuckles, the arms longer than the legs, a barrel chest and a belly, short bowed legs on flat
-hand-like feet with an opposable big toe.  The head carries a sagittal crest and a heavy brow
-ridge over deep-set eyes, a flat nose with flared nostrils, a long prognathous muzzle and a jaw
-with canines; the face, palms and soles are bare skin, the rest a groomed coat of fur that is
-longer on the forearms and shoulders, with a silver saddle on the back.
-Tinted by the game per enemy; the bare skin keeps its own colour.
+Great-ape anatomy rather than a man in fur, sculpted in clay (art/lib/clay.py): it stands with its
+weight forward on its knuckles, the arms much longer than the legs; a barrel chest and a round
+belly, massive shoulders with the trapezius rising into a short neck; short bowed legs on flat,
+hand-like feet with the big toe set apart.  The head carries a sagittal crest and a heavy brow
+ridge over small deep-set eyes, a broad flat nose and a protruding muzzle; the face, chest, palms
+and soles are bare dark skin (keeping their colour), the coat takes the enemy's colour with a
+silver saddle across the back and long hair hanging from the forearms and shoulders.
+Clips: idle (breathing, looking about), walk (a diagonal-sequence knuckle-walk), attack (rears
+up and hammers both fists down), hurt, die and cast (rises and beats its chest).
 Run: blender --background --python art/monsters/ape.py  ->  assets/monsters/ape.glb"""
 import math
 import os
@@ -15,191 +17,229 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
-from creature import eyes, fangs, zero_pose  # noqa: E402
-from kit import CLOTH, MAT_PLAIN, SKIN, V, Builder, Rig, auto_weights, env, mix, rgb  # noqa: E402
-from sculpt import blob3, loft, morph_sphere, prof_egg, section, smooth  # noqa: E402
+from clay import Clay, limb_weights  # noqa: E402
+from creature import QuadMotion, add, quad_rig2, quad_skel, smooth  # noqa: E402
+from kit import CLOTH, HAIR, MAT_PLAIN, SKIN, V, Builder, mix  # noqa: E402
+from sculpt import fbm3  # noqa: E402
 
 kit.reset()
-SKINC = "4a3a34"
-r = Rig("rig")
-r.bone("root", (0, 0, 0), (0, 0.3, 0))
-r.bone("pelvis", (0, 0.78, -0.12), (0, 0.98, -0.02), "root")
-r.bone("spine", (0, 0.98, -0.02), (0, 1.22, 0.14), "pelvis")
-r.bone("chest", (0, 1.22, 0.14), (0, 1.42, 0.32), "spine")
-r.bone("neck", (0, 1.42, 0.32), (0, 1.5, 0.44), "chest")
-r.bone("head", (0, 1.5, 0.44), (0, 1.62, 0.66), "neck")
-r.bone("jaw", (0, 1.44, 0.5), (0, 1.38, 0.7), "head")
-for s, sd in ((1, "L"), (-1, "R")):
-    sh = V(0.34 * s, 1.36, 0.28)
-    el = V(0.46 * s, 0.92, 0.36)
-    wr = V(0.44 * s, 0.32, 0.48)
-    r.bone("upper_arm." + sd, sh, el, "chest")
-    r.bone("forearm." + sd, el, wr, "upper_arm." + sd)
-    r.bone("hand." + sd, wr, wr + V(0.0, -0.26, 0.06), "forearm." + sd)
-    hip = V(0.17 * s, 0.8, -0.12)
-    kn = V(0.26 * s, 0.46, 0.04)
-    an = V(0.24 * s, 0.1, -0.08)
-    r.bone("thigh." + sd, hip, kn, "pelvis")
-    r.bone("shin." + sd, kn, an, "thigh." + sd)
-    r.bone("foot." + sd, an, an + V(0.02 * s, -0.06, 0.2), "shin." + sd)
+creature.realtime()
+SKINC = (0.34, 0.28, 0.26)
+sk = quad_skel(H=1.1, hip_z=-0.12, sh_z=0.28, hip_w=0.17, sh_w=0.34, foot="plant", tail=[])
+for sd, s in (("L", 1), ("R", -1)):
+    sk["hip." + sd] = V(0.17 * s, 0.82, -0.12)
+    sk["kn." + sd] = V(0.25 * s, 0.48, 0.05)
+    sk["hk." + sd] = V(0.23 * s, 0.12, -0.08)
+    sk["hb." + sd] = V(0.23 * s, 0.035, 0.1)
+    sk["ht." + sd] = V(0.23 * s, 0.02, 0.19)
+    sk["sc." + sd] = V(0.17 * s, 1.36, 0.26)
+    sk["sh." + sd] = V(0.36 * s, 1.24, 0.4)
+    sk["el." + sd] = V(0.45 * s, 0.78, 0.44)
+    sk["wr." + sd] = V(0.45 * s, 0.28, 0.56)
+    sk["fb." + sd] = V(0.45 * s, 0.05, 0.6)
+    sk["ft." + sd] = V(0.45 * s, 0.03, 0.52)
+sk["body"] = V(0, 1.06, 0.08)
+sk["loin"] = V(0, 0.96, -0.04)
+sk["pelvis"] = V(0, 0.86, -0.12)
+sk["chest"] = V(0, 1.25, 0.28)
+sk["neck0"] = V(0, 1.36, 0.42)
+sk["neck1"] = V(0, 1.41, 0.5)
+sk["head"] = V(0, 1.44, 0.56)
+sk["snout"] = V(0, 1.4, 0.84)
+HC = V(0, 1.47, 0.64)
+hf = A.HeadFrame(HC, V(0, -0.15, 1.0))
+K = 1.0
+
+
+def hp(x, y, z):
+    return hf.at(x * K, y * K, z * K)
+
+
+ears = [(hp(0.12, 0.0, -0.03), hp(0.14, 0.04, -0.04)), (hp(-0.12, 0.0, -0.03), hp(-0.14, 0.04, -0.04))]
+r, legs = quad_rig2(sk, ears=ears)
+r.bones["jaw"] = (hp(0, -0.06, 0.0), hp(0, -0.11, 0.15), "head")
+# primates walk in a diagonal sequence: hind left, fore right, hind right, fore left
+for leg in legs:
+    leg.td = {(True, 1): 0.75, (False, 1): 0.0, (True, -1): 0.25, (False, -1): 0.5}[(leg.front, leg.side)]
 b = Builder("ape")
-weights = auto_weights(r, [n for n in r.bones if n not in ("root", "jaw")], sharp=3.0, k=3)
 
-# torso: a loft from the pelvis up the hunched spine - broad hips, a round belly, a barrel chest,
-# massive shoulders and the hump of the trapezius into the neck
-spine_pts = [V(0, 0.74, -0.16), V(0, 0.86, -0.12), V(0, 1.0, -0.04), V(0, 1.12, 0.06), V(0, 1.24, 0.15), V(0, 1.34, 0.24), V(0, 1.42, 0.31), V(0, 1.48, 0.38)]
-dims = [(0.2, 0.12, 0.16), (0.24, 0.14, 0.22), (0.26, 0.16, 0.28), (0.29, 0.18, 0.3), (0.33, 0.2, 0.28), (0.35, 0.2, 0.24), (0.28, 0.16, 0.18), (0.14, 0.11, 0.12)]
-rings = []
-for k, c in enumerate(spine_pts):
-    d = (spine_pts[min(len(spine_pts) - 1, k + 1)] - spine_pts[max(0, k - 1)]).normalized()
-    w, up, dn = dims[k]
-    rings.append(section(c, d, prof_egg(w, up, dn, flat=0.1), 22, up=V(0, 0.3, -1)))
+# ---------------------------------------------------------------- body
+c = Clay(0.02, "ape_body")
+c.ellipsoid(V(0, 0.9, -0.1), (0.23, 0.18, 0.18), bones={"pelvis": 1.0}, tag="body")
+c.ellipsoid(V(0, 0.98, 0.06), (0.27, 0.23, 0.24), bones={"loin": 0.5, "body": 0.5}, tag="belly")
+c.ellipsoid(V(0, 1.16, 0.26), (0.35, 0.26, 0.28), rot=(-0.7, 0, 0), bones={"chest": 0.7, "body": 0.3}, tag="chest")
+c.ellipsoid(V(0, 1.33, 0.28), (0.3, 0.15, 0.22), rot=(-0.3, 0, 0), bones={"chest": 1.0}, tag="body")
+c.chain([V(0, 1.32, 0.38), V(0, 1.39, 0.5), HC + V(0, -0.02, -0.04)], [0.17, 0.14, 0.1], bones=lambda p, t: {"chest": 1.0 - t * 0.5, "neck0": t * 0.5} if t < 1.0 else {"neck0": 2.0 - t, "neck1": t - 1.0}, tag="body", t0=0.0, t1=2.0)
+for sd, s in (("L", 1), ("R", -1)):
+    sb = "shoulder." + sd
+    up, lo, mt, tb = "f_up." + sd, "f_lo." + sd, "f_meta." + sd, "f_toe." + sd
+    sh, el, wr, fb, ft = (sk[k + "." + sd] for k in ("sh", "el", "wr", "fb", "ft"))
+    # deltoid and the long, heavy arm: biceps and triceps, a forearm thick below the elbow
+    c.ball(sh + V(0.02 * s, 0.03, 0.0), 0.16, bones={sb: 0.5, up: 0.5}, tag="body")
+    c.ellipsoid(sh.lerp(el, 0.45) + V(0, 0, -0.03), (0.13, 0.2, 0.13), rot=(0.1, 0, 0), bones={up: 1.0}, tag="arm")
+    c.chain([sh, el, wr], [0.125, 0.1, 0.08], bones=limb_weights([up, lo]), tag="arm", t0=0.0, t1=2.0)
+    c.ellipsoid(el.lerp(wr, 0.28) + V(0.01 * s, 0, 0.0), (0.12, 0.19, 0.115), rot=(0.18, 0, 0), bones={lo: 1.0}, tag="arm", t=1.3)
+    # the hand on its knuckles: the hairy back of the hand down to the knuckles, the bare black
+    # fingers folded under it and showing in front
+    c.ellipsoid(wr.lerp(fb, 0.45), (0.075, 0.11, 0.068), rot=(0.1, 0, 0), bones={mt: 1.0}, tag="arm", t=2.5)
+    c.ellipsoid(fb + V(0, 0.035, 0.035), (0.072, 0.04, 0.045), bones={tb: 1.0}, tag="hand")
+    for k in range(4):
+        u = (k / 3 - 0.5) * 2
+        c.ellipsoid(fb + V(u * 0.03, 0.03, 0.045), (0.022, 0.028, 0.035), bones={tb: 1.0}, tag="hand")
+    hip, kn, hk, hb, ht = (sk[k + "." + sd] for k in ("hip", "kn", "hk", "hb", "ht"))
+    up, lo, mt, tb = "h_up." + sd, "h_lo." + sd, "h_meta." + sd, "h_toe." + sd
+    # short, bowed legs and a flat, hand-like foot with the big toe apart
+    c.ellipsoid(hip.lerp(kn, 0.45) + V(0.03 * s, 0, -0.02), (0.11, 0.17, 0.12), rot=(-0.6, 0, 0.15 * s), bones={up: 0.8, "pelvis": 0.2}, tag="leg")
+    c.chain([hip, kn, hk], [0.12, 0.095, 0.07], bones=limb_weights([up, lo]), tag="leg", t0=0.0, t1=2.0)
+    c.ellipsoid(kn.lerp(hk, 0.35) + V(0, 0, -0.03), (0.07, 0.12, 0.07), bones={lo: 1.0}, tag="leg")
+    c.ellipsoid(hk.lerp(hb, 0.5) + V(0, -0.04, 0), (0.07, 0.04, 0.13), bones={mt: 1.0}, tag="foot")
+    for k in range(4):
+        u = (k / 3 - 0.5) * 2
+        c.ellipsoid(hb.lerp(ht, 0.6) + V(u * 0.03, 0.0, -abs(u) * 0.01), (0.017, 0.016, 0.045), bones={tb: 1.0}, tag="foot")
+    c.ellipsoid(hk.lerp(hb, 0.6) + V(-0.07 * s, -0.04, 0.0), (0.02, 0.018, 0.05), rot=(0, -0.7 * s, 0), bones={mt: 1.0}, tag="foot")
+# the head: a sagittal crest, a heavy brow ridge, cheek pads, a protruding muzzle
+A.head_clay(c, hf, K, [
+    ("ell", (0, 0.02, -0.02), (0.11, 0.11, 0.11), "head", False, False),
+    ("ell", (0, 0.12, -0.04), (0.03, 0.07, 0.09), "crest", False, False),
+    ("ell", (0, 0.05, 0.08), (0.1, 0.035, 0.045), "face", False, False),
+    ("ell", (0, -0.04, 0.1), (0.075, 0.06, 0.07), "face", False, False),
+    ("ell", (0.08, -0.03, 0.04), (0.04, 0.05, 0.05), "face", True, False),
+    ("ell", (0.042, 0.022, 0.11), (0.022, 0.018, 0.02), "face", True, True),
+    ("ell", (0, -0.0, 0.15), (0.045, 0.03, 0.03), "face", False, False),
+])
 
 
-def coat(p, j, i):
-    v = 0.62 + 0.1 * smooth(0.9, 1.3, p.y)
+def col(p, info):
+    tag = info.tag
+    n = info.n
+    g = fbm3((p.x * 6.0, p.y * 6.0, p.z * 6.0), 2, 3)
+    if tag in ("face", "hand", "foot"):
+        return SKINC
+    if tag == "chest" and n.z > 0.25 and n.y < 0.6:
+        return mix(SKINC, (0.7, 0.7, 0.7), smooth(0.45, 0.25, n.z))
+    if tag == "crest":
+        return (0.92, 0.92, 0.92)  # painted light: the crest takes the accent colour (see pal)
     # the silver saddle across the lower back
-    if p.z < 0.1 and abs(p.x) < 0.25 and 0.9 < p.y < 1.25:
-        v = 0.95
+    saddle = smooth(0.3, 0.7, n.y) * smooth(1.25, 1.1, p.y) * smooth(-0.3, -0.1, p.z) * (1.0 - smooth(0.15, 0.3, p.z))
+    v = 0.7 + 0.08 * (g - 0.5) - 0.1 * smooth(0.6, 1.0, n.y) * (1.0 - saddle)
+    # countershading: a dark mantle over the shoulders and the back of the arms, a paler belly,
+    # inner arms and inner legs (the coat pass turns them into markings and underside colours)
+    if tag in ("body", "arm", "belly", "leg"):
+        mantle = smooth(0.35, 0.85, n.y) * (1.0 - saddle) * (1.0 if tag in ("body", "arm") else 0.4)
+        pale = smooth(-0.15, -0.7, n.y) if tag in ("body", "belly") else smooth(0.1, -0.6, n.x * (1.0 if p.x > 0 else -1.0)) * 0.8
+        v = v * (1.0 - 0.5 * mantle)
+        v = v * (1.0 - pale) + 0.93 * pale
+    v = v * (1.0 - saddle) + 0.96 * saddle
     return (v, v, v)
 
 
-torso = loft(b, rings, (0.62, 0.62, 0.62), col_fn=coat, bone_fn=weights, tint_fn=lambda p: 1.0, cap0=True, cap1=True, cap_push=0.5)
-# bare chest skin and nipples on the pectorals
-b.ellipsoid(V(0, 1.2, 0.32), (0.2, 0.16, 0.06), SKINC, cls=SKIN, bone={"spine": 0.4, "chest": 0.6}, seg=16, rings=8)
-# arms: muscled lofts, long; legs short and bowed
-limbs = []
-for s, sd in ((1, "L"), (-1, "R")):
-    ua, fa, hd = "upper_arm." + sd, "forearm." + sd, "hand." + sd
-    sh, el, wr = r.head(ua), r.tail(ua), r.tail(fa)
-    pts = [sh + V(-0.06 * s, 0.04, -0.02), sh, sh.lerp(el, 0.4), el, el.lerp(wr, 0.35), el.lerp(wr, 0.75), wr]
-    rad = [0.13, 0.13, 0.12, 0.085, 0.1, 0.08, 0.06]
-    bones = [{"chest": 0.6, ua: 0.4}, ua, ua, {ua: 0.5, fa: 0.5}, fa, fa, {fa: 0.6, hd: 0.4}]
-    limbs.append((b.tube(pts, rad, (0.6, 0.6, 0.6), cls=CLOTH, bones=bones, seg=14, tint=1.0), ua))
-    # knuckle-walking hand: a bare palm folded under, four thick knuckles on the ground, a thumb
-    hc = r.tail(hd)
-    b.ellipsoid(wr.lerp(hc, 0.5), (0.065, 0.11, 0.06), (0.6, 0.6, 0.6), cls=CLOTH, bone=hd, seg=12, rings=8, tint=1.0)
-    for k in range(4):
-        z = (k - 1.5) * 0.03
-        knuck = hc + V(0.0, 0.03, z + 0.03)
-        b.ellipsoid(knuck, (0.03, 0.03, 0.025), SKINC, cls=SKIN, bone=hd, seg=8, rings=6)
-        b.tube([knuck + V(0, 0.02, -0.02), knuck + V(0, 0.05, -0.05)], [0.022, 0.018], SKINC, cls=SKIN, bone=hd, seg=6)
-    b.tube([wr + V(-0.03 * s, -0.08, 0.04), hc + V(-0.04 * s, 0.06, 0.06)], [0.022, 0.016], SKINC, cls=SKIN, bone=hd, seg=6)
-    th, sn, ft = "thigh." + sd, "shin." + sd, "foot." + sd
-    hip, kn, an = r.head(th), r.tail(th), r.tail(sn)
-    lp = [hip + V(0, 0.04, 0), hip.lerp(kn, 0.5) + V(0.02 * s, 0, 0), kn, kn.lerp(an, 0.5), an]
-    limbs.append((b.tube(lp, [0.14, 0.12, 0.09, 0.085, 0.07], (0.6, 0.6, 0.6), cls=CLOTH, bones=[{"pelvis": 0.5, th: 0.5}, th, {th: 0.5, sn: 0.5}, sn, {sn: 0.5, ft: 0.5}], seg=12, tint=1.0), th))
-    # a flat, hand-like foot with long toes and the big toe set apart
-    fc = an + V(0.0, -0.06, 0.08)
-    b.ellipsoid(fc, (0.07, 0.035, 0.13), SKINC, cls=SKIN, bone=ft, seg=12, rings=6)
-    for k in range(4):
-        x = (k - 1.5) * 0.028 * s
-        b.tube([fc + V(x, 0.0, 0.1), fc + V(x * 1.2, -0.01, 0.17)], [0.016, 0.012], SKINC, cls=SKIN, bone=ft, seg=6)
-    b.tube([fc + V(-0.06 * s, 0.0, 0.02), fc + V(-0.12 * s, -0.01, 0.07)], [0.02, 0.015], SKINC, cls=SKIN, bone=ft, seg=6)
-
-b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# head: crest and brow ridge, deep-set eyes, flat nose, prognathous muzzle and jaw
-HC = V(0, 1.56, 0.52)
-hf = A.HeadFrame(HC, V(0, -0.15, 1.0))
+def pal(p, info):
+    # the sagittal crest is the ape's focal flash of colour (a mandrill's face, a thunder crest)
+    return 1.0 if info.tag == "crest" else 0.0
 
 
-def skull(d):
-    p = V(d.x * 0.13, d.y * 0.13, d.z * 0.13)
-    q = p.copy()
-    off = 0.0
-    off += 0.04 * blob3(q, (0, 0.13, -0.02), (0.02, 0.04, 0.08))                       # sagittal crest
-    off += 0.03 * blob3(q, (0, 0.04, 0.12), (0.1, 0.02, 0.03))                          # brow ridge
-    off += 0.06 * blob3(q, (0, -0.06, 0.12), (0.07, 0.05, 0.05))                        # muzzle
-    for s2 in (1, -1):
-        off -= 0.02 * blob3(q, (0.045 * s2, 0.015, 0.12), (0.025, 0.02, 0.03))          # eye sockets
-        off += 0.02 * blob3(q, (0.11 * s2, -0.04, 0.03), (0.03, 0.05, 0.05))            # cheek pads
-    return p + p.normalized() * off
+def tint(p, info):
+    if info.tag in ("face", "hand", "foot"):
+        return 0.0
+    if info.tag == "chest" and info.n.z > 0.25 and info.n.y < 0.6:
+        return 1.0 - smooth(0.25, 0.45, info.n.z)
+    return 1.0
 
 
-def face_col(p, d):
-    """Bare dark skin over the face and muzzle, fur everywhere else."""
-    bare = smooth(0.2, 0.6, d.z) * (1.0 - smooth(0.35, 0.6, d.y))
-    return mix((0.6, 0.6, 0.6), rgb(SKINC), bare)
+def shag(p, info):
+    """The coat hangs in shingled clumps (none on the bare face, chest, hands and feet)."""
+    if info.tag in ("face", "hand", "foot", "crest") or (info.tag == "chest" and info.n.z > 0.2 and info.n.y < 0.6):
+        return None
+    nn = info.n
+    w = fbm3((p.x * 8.0, p.y * 8.0, p.z * 8.0), 2, 5)
+    u = p.y * 13.0 + 0.5 * math.sin(math.atan2(nn.x, nn.z) * 6.0) + 1.1 * w
+    k = u - math.floor(u)
+    return nn * (0.02 * k ** 1.5)
 
 
-morph_sphere(b, hf.c, skull, face_col, cls=CLOTH, bone="head", seg=26, rings=18, tint_fn=lambda p, d: 1.0 - smooth(0.2, 0.6, d.z) * (1.0 - smooth(0.35, 0.6, d.y)), rot=hf.M)
-b.ellipsoid(hf.at(0, -0.01, 0.17), (0.04, 0.025, 0.02), "2a2020", cls=SKIN, bone="head", seg=10, rings=6)
+body = c.build(b, col, cls=CLOTH, tint_fn=tint, post=shag, pal_fn=pal)
+# a separate lower jaw with a dark lip
+j = Clay(0.012, "ape_jaw")
+j.ellipsoid(hp(0, -0.1, 0.1), (0.065, 0.035, 0.06), rot=hf.M, bones={"jaw": 1.0}, tag="jaw")
+j.build(b, lambda p, info: mix(SKINC, (0.45, 0.15, 0.18), smooth(0.2, 0.5, info.n.dot(hf.u))), cls=SKIN)
+b.ellipsoid(hp(0, -0.075, 0.09), (0.05, 0.015, 0.05), "2a1014", cls=SKIN, bone="head", rot=A.euler_of(hf.M), seg=12, rings=6, mat=MAT_PLAIN)
 for s in (1, -1):
-    b.ellipsoid(hf.at(0.018 * s, -0.018, 0.182), (0.01, 0.007, 0.006), "100808", cls=SKIN, bone="head", seg=6, rings=4, mat=MAT_PLAIN)
-    b.ellipsoid(hf.at(0.13 * s, 0.0, -0.01), (0.015, 0.035, 0.03), SKINC, cls=SKIN, bone="head", seg=8, rings=6)
-b.ellipsoid(hf.at(0, -0.1, 0.1), (0.075, 0.035, 0.07), SKINC, cls=SKIN, bone="jaw", seg=12, rings=6)
-b.ellipsoid(hf.at(0, -0.08, 0.1), (0.06, 0.01, 0.06), "8a3040", cls=SKIN, bone="jaw", seg=10, rings=4)
-eyes(b, hf.at(0, 0.02, 0.135), 0.09, 0.02, iris="c08020", bone="head", slit=False, glow=False, rot_y=0.4, h=0.85)
-fangs(b, [hf.at(0.03, -0.06, 0.16), hf.at(-0.03, -0.06, 0.16)], 0.045, "head")
-fangs(b, [hf.at(0.028, -0.08, 0.15), hf.at(-0.028, -0.08, 0.15)], 0.03, "jaw", down=False)
+    A.fang(b, hp(0.032 * s, -0.07, 0.135), -hf.u, 0.035, 0.008, "head", back=-hf.f, curve=0.15)
+    A.fang(b, hp(0.03 * s, -0.08, 0.125), hf.u, 0.024, 0.007, "jaw", back=-hf.f, curve=0.1)
+    A.animal_eye(b, hp(0.042 * s, 0.022, 0.115), hf.f + hf.r * (0.2 * s), 0.014, "7a4a20", "head", pupil="round", almond=0.8, side=s, lid="100808")
+    # wide nostrils on the flat nose
+    b.ellipsoid(hp(0.018 * s, -0.005, 0.18), (0.012, 0.008, 0.006), "0a0606", cls=SKIN, bone="head", rot=A.euler_of(hf.M), seg=8, rings=4, mat=MAT_PLAIN)
+for s, sd in ((1, "L"), (-1, "R")):
+    A.ear(b, hp(0.11 * s, 0.0, -0.03), hf.r * s + hf.f * 0.3, 0.05, 0.04, 0.02, SKINC, (0.32, 0.24, 0.22), "ear." + sd, up=hf.u, point=0.0, cup=0.4, tint=0.0, tint_in=0.0, side=s)
 
-b.cur_pal = 0.3  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# the coat: groomed down the back and arms, longer over the shoulders and forearms
-A.fur(b, torso, 300, 0.07, 0.03, seed=31, bone_fn=weights, min_dist=0.04, col_root=(0.5, 0.5, 0.5), col_tip=(0.8, 0.8, 0.8),
-      groom=lambda p, n: (V(0, -1, -0.4) - n * V(0, -1, -0.4).dot(n)).normalized(), pred=lambda p, n: n.z < 0.6 or p.y > 1.3)
-for verts, bone in limbs:
-    A.fur(b, verts, 60, 0.08, 0.028, seed=len(bone) + ord(bone[-1]), bone_fn=lambda p, bone=bone: {bone: 1.0}, min_dist=0.04,
-          col_root=(0.5, 0.5, 0.5), col_tip=(0.8, 0.8, 0.8), groom=lambda p, n: (V(0, -1, 0) - n * n.y * -1).normalized() if abs(n.y) < 0.95 else V(0, 0, 1))
+# ---------------------------------------------------------------- long hair: forearms, shoulders, a mop on the crest
+hit = A.surface(b)
+for sd, s in (("L", 1), ("R", -1)):
+    el, wr = sk["el." + sd], sk["wr." + sd]
+    for k in range(2):
+        q = el + V(0.02 * s, 0.02 - 0.06 * k, -0.06)
+        A.lock(b, q, V(0.2 * s, -1.0, -0.4).normalized(), V(s * 0.4, 0, -1), 0.14, 0.07, (0.68,) * 3, (0.78,) * 3, bone={"f_lo." + sd: 0.5, "f_up." + sd: 0.5}, lift=0.2, rise=0.12, thick=0.45, cls=HAIR)
+    sh = sk["sh." + sd]
+    for k in range(3):
+        q = sh + V(0.04 * s, 0.05 - 0.07 * k, -0.04 + 0.02 * k)
+        A.lock(b, q, V(0.4 * s, -1.0, -0.2).normalized(), V(s, 0.2, 0), 0.18, 0.07, (0.66,) * 3, (0.76,) * 3, bone={"shoulder." + sd: 0.4, "f_up." + sd: 0.6}, lift=0.2, rise=0.15, thick=0.45, cls=HAIR)
 
-T_IDLE = 3.2
-
-
-def idle(t):
-    w = 2 * math.pi / T_IDLE
-    p = zero_pose(r)
-    br = math.sin(t * w * 2)
-    p["pelvis"] = ((0, math.sin(t * w) * 0.04, 0), (0, br * 0.01, 0))
-    p["chest"] = ((br * 0.03, 0, 0), (0, br * 0.006, 0))
-    p["neck"] = ((0, math.sin(t * w) * 0.2, 0), (0, 0, 0))
-    p["head"] = ((math.sin(t * w * 2) * 0.05, math.sin(t * w + 0.5) * 0.15, 0), (0, 0, 0))
-    p["jaw"] = ((0.03 + 0.05 * max(0.0, math.sin(t * w * 1.3)), 0, 0), (0, 0, 0))
-    shift = math.sin(t * w)
-    p["upper_arm.L"] = ((0.05 * shift, 0, 0), (0, 0, 0))
-    p["upper_arm.R"] = ((-0.05 * shift, 0, 0), (0, 0, 0))
-    return p
+# ---------------------------------------------------------------- motion
+qm = QuadMotion(r, legs, T_walk=1.6, stride=0.4, lift=0.1, duty=0.62, bob=0.02, crouch=0.05, roll=0.06, yaw=0.08, head_nod=0.04, head_low=0.0,
+                tail_amp=0.0, pounce="bite", T_idle=4.0, front_flex=0.5, hind_flex=0.4, rest_h=0.26, lunge=0.3, ear_flick=0.0)
 
 
 def attack(t):
-    """Rear up and bring both fists down."""
-    k = t / 0.6
-    e = env(k)
-    up = smooth(0.0, 0.35, k) * (1.0 - smooth(0.4, 0.55, k))
-    slam = smooth(0.4, 0.55, k) * (1.0 - smooth(0.75, 1.0, k))
-    p = idle(0.0)
-    p["pelvis"] = ((-0.45 * up + 0.2 * slam, 0, 0), (0, 0.1 * up, 0.15 * slam))
-    p["chest"] = ((-0.2 * up + 0.2 * slam, 0, 0), (0, 0, 0))
-    for sd in ("L", "R"):
-        p["upper_arm." + sd] = ((-2.4 * up + 0.3 * slam, 0, 0), (0, 0, 0))
-        p["forearm." + sd] = ((-0.6 * up, 0, 0), (0, 0, 0))
-    p["jaw"] = ((0.6 * e, 0, 0), (0, 0, 0))
-    return p
-
-
-def hurt(t):
-    e = env(t / 0.55)
-    p = idle(0.0)
-    p["root"] = ((0, 0, 0), (0, 0, -0.15 * e))
-    p["chest"] = ((-0.3 * e, 0.2 * e, 0), (0, 0, 0))
-    p["head"] = ((-0.3 * e, -0.3 * e, 0), (0, 0, 0))
-    p["jaw"] = ((0.4 * e, 0, 0), (0, 0, 0))
+    """Rear up on the hind legs, both fists raised overhead, and hammer them down."""
+    k = t / 0.55
+    up = smooth(0.0, 0.35, k) * (1.0 - smooth(0.36, 0.56, k))
+    slam = smooth(0.38, 0.56, k) * (1.0 - smooth(0.75, 1.0, k))
+    p = qm.zero()
+    add(p, "root", (0, 0, 0), (0, 0.04 * up, 0.07 * slam))
+    add(p, "body", (-0.5 * up + 0.25 * slam, 0, 0))
+    add(p, "chest", (-0.2 * up + 0.2 * slam, 0, 0))
+    add(p, "neck0", (0.4 * up - 0.2 * slam, 0, 0))
+    add(p, "jaw", (0.6 * (up + slam), 0, 0))
+    for sd, s in (("L", 1), ("R", -1)):
+        add(p, "f_up." + sd, (-2.5 * up + 0.4 * slam, 0, -0.25 * s * up))
+        add(p, "f_lo." + sd, (-0.6 * up - 0.2 * slam, 0, 0))
+        add(p, "f_meta." + sd, (0.6 * up, 0, 0))
+    offs = []
+    for leg in legs:
+        offs.append((0.12 * slam if leg.front else 0.05 * slam, 0.0) if not leg.front else None)
+    D_hind = [(0.07 * slam, 0.0) if not leg.front else (0.0, 0.0) for leg in legs]
+    p2 = qm.plant(dict(p), D_hind)
+    for leg in legs:
+        if not leg.front:
+            for nm in leg.chain:
+                p[nm] = p2[nm]
     return p
 
 
 def cast(t):
     """Rise up and beat the chest, roaring."""
     k = t / 0.6
-    e = env(k)
+    e = math.sin(math.pi * min(1.0, k))
     beat = math.sin(k * math.pi * 6.0)
-    p = idle(0.0)
-    p["pelvis"] = ((-0.5 * e, 0, 0), (0, 0.12 * e, 0))
-    p["neck"] = ((-0.3 * e, 0, 0), (0, 0, 0))
-    p["jaw"] = ((0.8 * e, 0, 0), (0, 0, 0))
+    p = qm.zero()
+    add(p, "body", (-0.55 * e, 0, 0))
+    add(p, "neck0", (-0.2 * e, 0, 0))
+    add(p, "head", (-0.2 * e, 0, 0))
+    add(p, "jaw", (0.8 * e, 0, 0))
     for sd, s in (("L", 1), ("R", -1)):
-        p["upper_arm." + sd] = ((-1.2 * e, 0, (0.7 + 0.2 * beat * s) * s * e), (0, 0, 0))
-        p["forearm." + sd] = ((-1.4 * e, 0, 0), (0, 0, 0))
+        add(p, "f_up." + sd, (-1.3 * e, 0, (0.5 + 0.2 * beat * s) * s * e))
+        add(p, "f_lo." + sd, (-1.5 * e, 0, 0))
+    D_hind = [(0.0, 0.0) for leg in legs]
+    p2 = qm.plant(dict(p), D_hind)
+    for leg in legs:
+        if not leg.front:
+            for nm in leg.chain:
+                p[nm] = p2[nm]
     return p
 
 
+clips = qm.clips({"attack": (0.55, attack), "cast": (0.6, cast)})
 print("[art] ape: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/ape.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=16, dist=0.3, strength=0.5, floor_y=0.0)
+kit.finish_rigged(b, r, "monsters/ape.glb", clips, samples=16, dist=0.3, strength=0.5, floor_y=0.0)

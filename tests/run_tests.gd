@@ -104,19 +104,24 @@ func _init() -> void:
 		var ap: AnimationPlayer = pm.get_meta("ap", null)
 		check(ap != null, rel + ": has an AnimationPlayer")
 		if ap != null:
-			for clip in ["idle", "walk", "sit", "attack", "cast", "hurt", "victory"]:
+			for clip in ["idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die"]:
 				check(ap.has_animation(clip), "%s: clip %s" % [rel, clip])
-			check(ap.get_animation("walk").loop_mode == Animation.LOOP_LINEAR, rel + ": walk loops")
-			check(ap.get_animation("attack").loop_mode == Animation.LOOP_NONE, rel + ": attack plays once")
+			for loop_clip in ["walk", "run", "talk"]:
+				check(ap.get_animation(loop_clip).loop_mode == Animation.LOOP_LINEAR, "%s: %s loops" % [rel, loop_clip])
+			for once in ["attack", "bow", "die"]:
+				check(ap.get_animation(once).loop_mode == Animation.LOOP_NONE, "%s: %s plays once" % [rel, once])
 		var skels: Array = []
 		Assets._walk(pm, skels, "Skeleton3D")
 		check(not skels.is_empty() and skels[0].find_bone("hand.R") >= 0 and skels[0].find_bone("eyes") >= 0, rel + ": rig has hands and an eyelid bone")
+		# the richer rig: sleeve pockets, fingers, thumbs, toes, a mouth and the longer hair and cape chains
+		for bone in ["sleeve.L", "sleeve.R", "fingers.L", "thumb.R", "toe.L", "mouth", "hair_tail2", "cape3"]:
+			check(not skels.is_empty() and skels[0].find_bone(bone) >= 0, "%s: rig has %s" % [rel, bone])
 		var tris := 0
 		for mi in pm.get_meta("meshes"):
 			for si in mi.mesh.get_surface_count():
 				tris += mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_INDEX].size() / 3
 				var mat: Material = mi.mesh.surface_get_material(si)
-				check(mat == MB.mat_vc() or mat == MB.mat_plain() or mat == MB.mat_glow(), "%s: surface %d uses a game shader" % [rel, si])
+				check(mat == MB.mat_actor() or mat == MB.mat_actor_plain() or mat == MB.mat_glow(), "%s: surface %d uses the actor shading" % [rel, si])
 		# sculpted faces, strand hair and layered hanfu: a hero-asset budget, still well under 50k
 		check(tris > 5000 and tris < 50000, "%s: sensible triangle count (%d)" % [rel, tris])
 		pm.free()
@@ -144,6 +149,96 @@ func _init() -> void:
 	check(absf((pal[3] as Color).h - (pal[0] as Color).h) > 0.05 and absf((pal[4] as Color).h - (pal[0] as Color).h) > 0.3, "palette: analogous secondary and contrasting accent")
 	var grey_pal: Array = Assets.palette(Color("e8e8f0"))
 	check((grey_pal[4] as Color).s > 0.3, "palette: a near-grey enemy still gets a coloured accent")
+	# monster colour: a pale countershaded underside, markings that contrast in value, a secondary
+	# set apart in hue and value, and a saturated accent away from the body's hue
+	var wolf_pal: Array = Assets.palette(Color("7aa860"), "wood")
+	var wb: Color = wolf_pal[0]
+	check((wolf_pal[5] as Color).v > wb.v + 0.15 and (wolf_pal[5] as Color).s < wb.s, "palette: the underside is paler and less saturated than the body")
+	check(absf((wolf_pal[6] as Color).v - wb.v) > 0.35, "palette: markings contrast in value with the body")
+	check(Assets.hue_gap((wolf_pal[3] as Color).h, wb.h) > 0.08 and absf((wolf_pal[3] as Color).v - wb.v) > 0.1, "palette: the secondary differs from the body in hue and in value")
+	check(Assets.hue_gap((wolf_pal[4] as Color).h, wb.h) >= 0.07 and (wolf_pal[4] as Color).s > 0.5, "palette: a saturated accent well away from the body's hue")
+	var dark_pal: Array = Assets.palette(Color("2a2a38"), "dark")
+	check((dark_pal[6] as Color).v > 0.7, "palette: a dark coat gets pale markings")
+	var fire_pal: Array = Assets.palette(Color("3a6ad8"), "fire")
+	check(Assets.hue_gap((fire_pal[4] as Color).h, Color("ffc21a").h) < 0.01, "palette: the element sets the accent (fire: gold)")
+	var gold_fire: Array = Assets.palette(Color("f0b020"), "fire")
+	check(Assets.hue_gap((gold_fire[4] as Color).h, Color("f0b020").h) >= 0.07, "palette: a golden fire beast gets the element's alternate accent")
+	var bf: Dictionary = Data.ENEMIES.bifang
+	var bf_pal: Array = Assets.palette(bf.col, bf.elem, bf.pal)
+	check((bf_pal[6] as Color).is_equal_approx(Color("e0302a")), "palette: Bifang's red markings on a blue-green body are pinned")
+	for eid in Data.ENEMIES:
+		var pin: Dictionary = Data.ENEMIES[eid].get("pal", {})
+		for key in pin:
+			check(key in ["sec", "acc", "under", "mark"] and pin[key] is Color, "%s: pinned palette role %s" % [eid, key])
+	# palette slots decode to the roles, blending from the body into underside and markings
+	var lin_pal: Array = []
+	for pc in wolf_pal:
+		lin_pal.append((pc as Color).srgb_to_linear())
+	var grey9 := Color(0.9, 0.9, 0.9)
+	check(Assets._tint_for(lin_pal, grey9, 0.2).is_equal_approx(lin_pal[5]) and Assets._tint_for(lin_pal, grey9, 0.8).is_equal_approx(lin_pal[6]), "slots: 0.2 is the underside, 0.8 the markings")
+	check(Assets._tint_for(lin_pal, grey9, 0.5).is_equal_approx(lin_pal[3]) and Assets._tint_for(lin_pal, grey9, 1.0).is_equal_approx(lin_pal[4]), "slots: 0.5 is the secondary, 1 the accent")
+	var half: Color = Assets._tint_for(lin_pal, grey9, 0.1)
+	check(half.is_equal_approx(Assets._tint_for(lin_pal, grey9, 0.0).lerp(lin_pal[5], 0.5)), "slots: 0.1 blends halfway into the underside")
+	# every monster model is painted in several palette roles, not one flat colour
+	var multi := 0
+	var with_accent := 0
+	for shape2 in Assets.MONSTERS:
+		if shape2 == "bird" or not Assets.has_monster(shape2):
+			continue
+		var m2 := Assets.instance(Assets.MONSTERS[shape2])
+		var share := [0, 0, 0, 0, 0]
+		var n_t := 0
+		for mi3 in m2.get_meta("meshes"):
+			for si3 in mi3.mesh.get_surface_count():
+				var a3: Array = mi3.mesh.surface_get_arrays(si3)
+				var u3 = a3[Mesh.ARRAY_TEX_UV]
+				if u3 == null:
+					continue
+				for uv in u3:
+					if uv.x < 0.05:
+						continue
+					var sl: float = 1.0 - uv.y
+					var role: int = 0 if sl < 0.005 else (1 if sl <= 0.21 else (2 if sl < 0.56 else (3 if sl <= 0.81 else 4)))
+					share[role] += 1
+					n_t += 1
+		var roles := 0
+		for r2 in 5:
+			if n_t > 0 and share[r2] >= n_t * 0.02:
+				roles += 1
+		if roles >= 3:
+			multi += 1
+		if share[4] > 0:
+			with_accent += 1
+		m2.free()
+	check(multi >= 34, "palette roles: %d of 40 monsters use three or more of dominant, underside, secondary, markings and accent" % multi)
+	check(with_accent >= 38, "palette roles: %d of 40 monsters carry an accent (eyes, crests, horns, glow)" % with_accent)
+	# Yue Ling follows facing the way she runs (not sideways towards the hero), and stops running
+	# once she has caught up
+	var cpos := Vector3.ZERO
+	var hero_p := Vector3.ZERO
+	var c_run := false
+	var c_yaw := 0.0
+	var ran := false
+	var worst := 0.0
+	for f in 60:
+		hero_p.x += 12.5 / 30.0
+		var cs: Array = Models.companion_step(cpos, hero_p, Vector2i(1, 0), PI / 2, c_run, false, 1.0 / 30.0)
+		cpos = cs[0]
+		c_yaw = cs[1]
+		c_run = cs[2]
+		if f > 20:
+			ran = ran or c_run
+			worst = maxf(worst, absf(angle_difference(c_yaw, PI / 2)))
+	check(ran and worst < 0.35, "companion: runs facing the way she goes (worst %.2f rad off)" % worst)
+	for f in 60:
+		var cs2: Array = Models.companion_step(cpos, hero_p, Vector2i(1, 0), PI / 2, c_run, false, 1.0 / 30.0)
+		cpos = cs2[0]
+		c_yaw = cs2[1]
+		c_run = cs2[2]
+	check(not c_run and absf(angle_difference(c_yaw, PI / 2)) < 0.01, "companion: stops running and looks where the hero looks once she has caught up")
+	var cs3: Array = Models.companion_step(cpos, hero_p, Vector2i(1, 0), PI / 2, false, true, 1.0 / 30.0)
+	var to_hero := hero_p - (cs3[0] as Vector3)
+	check(absf(angle_difference(cs3[1], atan2(to_hero.x, to_hero.z))) < 0.01, "companion: turns to the hero in a conversation")
 	var dragon := Assets.monster("dragon", Color("c03020"))
 	var huesets := {}
 	for mi2 in dragon.get_meta("meshes"):
@@ -262,7 +357,7 @@ func _init() -> void:
 		Arch.house(b0, gb, rb, rg, Rect2(r.position.x * 2.0, r.position.y * 2.0, r.size.x * 2.0, r.size.y * 2.0), Vector3((bd.door.x + 0.5) * 2.0, 0, (bd.door.y + 0.5) * 2.0), bd.style, [], 1)
 		check(not b0.is_empty() and not rb.is_empty(), "%s: builds walls and a separate roof" % bd.n)
 	check(n_bld >= 10, "at least 10 enterable buildings (%d)" % n_bld)
-	for npc in ["elder", "alchemist", "smith", "granny_wen"]:
+	for npc in ["elder", "alchemist", "smith", "granny_wen", "ah_mei", "innkeeper_bao", "tea_seller_pan", "dyer_su", "monk_huiming", "granny_gu", "chang_e"]:
 		var ne = null
 		for e3 in wd.ents:
 			if e3.get("id", "") == npc:
@@ -276,7 +371,7 @@ func _init() -> void:
 	check(Data.known_skills(0, 34).has("threadfall") and Data.known_skills(1, 34).has("homeward"), "Part VII techniques are learnable")
 	check(not Data.known_skills(0, 35, Data.step_index("s_sk_return")).has("boundless"), "Boundless Heart Sword waits for Can Niang's cocoons")
 	print("== part VIII ==")
-	check(Data.REALMS[Data.REALMS.size() - 1] == "Star River Crossing" and Data.MAX_LEVEL == 39, "Part VIII adds the Star River Crossing realm")
+	check(Data.REALMS.has("Star River Crossing") and Data.level_name(39).ends_with("Star River Crossing"), "Part VIII adds the Star River Crossing realm")
 	check(Data.DIALOGUE.has("recall6") and Data.step_index("s_break12") < Data.step_index("s_p8_home"), "Part VIII starts after the Boundless Heart breakthrough")
 	check(Data.AREAS.sect.portals.any(func(p): return p.to == "starferry" and p.open == "s_p8_home"), "the sect's south road to the Starfall Ferry opens after the Part VIII briefing")
 	for a8 in ["starferry", "magpie", "starpalace", "jasper"]:
@@ -290,6 +385,47 @@ func _init() -> void:
 	check(Data.known_skills(0, 38, Data.step_index("s_wv_moth")).has("reunion"), "Reunion Sword is learned from Zhi Nu")
 	check(Data.BOSS_DROPS.get("crow_marshal", "") == "magpie_badge", "the Crow Marshal gives up his badge")
 	check(Data.SKILLS.rebirth.get("revive", false) and Data.SKILLS.homeward.get("revive", false), "the Lotus of Rebirth and the Homeward Lantern raise fallen allies")
+	print("== part IX ==")
+	var p9 := ["yanggu", "millet", "fusang", "guanghan"]
+	check(Data.REALMS[Data.REALMS.size() - 1] == "Sun-Moon Harmony" and Data.MAX_LEVEL == 42, "Part IX adds the Sun-Moon Harmony realm")
+	check(Data.DIALOGUE.has("recall7") and Data.step_index("s_break13") < Data.step_index("s_p9_home"), "Part IX starts after the Star River Crossing")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break14", "the Star River Crossing no longer ends the game: Sun-Moon Harmony does")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "yanggu" and p.open == "s_p9_home" and p.pos == Vector2i(27, 24)), "the sect's new south gate to the Dawn Market opens after the Part IX briefing")
+	var sect9 := MapGen.build("sect")
+	check(sect9.grid[23 * sect9.w + 27] == MapGen.PATH and sect9.grid[22 * sect9.w + 27] == MapGen.PATH, "a road runs from the south-east road to the Dawn Market gate")
+	var lay9 := Atlas.layout()
+	var sizes9 := {}
+	var guides9 := {}
+	for a9 in p9:
+		check(Look.THEMES.has(a9) and Look.EXTRA.has(a9) and Scatter.ECO.has(a9) and Fauna.KINDS.has(a9) and MapGen.DENSITY.has(a9) and Arch.SETTLE.has(a9), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a9)
+		check(lay9.has(a9) and int(lay9[a9].row) == int(lay9.starferry.row) + 1, a9 + " lies in its own band south of the River of Heaven")
+		sizes9[Vector2i(Data.AREAS[a9].w, Data.AREAS[a9].h)] = true
+		guides9[Data.AREAS[a9].npcs[0].pos] = true
+		var bpos9 := {}
+		for b9 in Data.AREAS[a9].bosses:
+			bpos9[b9.pos] = true
+		check(not bpos9.has(Vector2i(30, 40)) and not bpos9.has(Vector2i(86, 28)), a9 + ": bosses do not stand where every Part VIII boss stood")
+	check(sizes9.size() == 4 and guides9.size() == 4, "the four Part IX regions each have their own size and guide position")
+	check(Data.AREAS.yanggu.get("buildings", []).size() >= 6 and not Data.AREAS.yanggu.get("lanes", []).is_empty(), "Yanggu is a market town: lanes and at least six enterable buildings")
+	var folk9 := 0
+	for n9 in Data.AREAS.yanggu.npcs:
+		check(Data.CHAT.has(n9.id) and Data.CHAT[n9.id].size() >= 3, "%s has at least three things to say" % n9.id)
+		check(n9.get("vis", ["", ""])[0] == "s_yg_intro" and n9.get("vis", ["", ""])[1] == "", "%s stays in the market for the rest of the game once its road opens" % n9.id)
+		if n9.id != "ah_mei":
+			folk9 += 1
+	check(folk9 >= 6 and folk9 <= 8, "six to eight townsfolk in the Dawn Market (%d)" % folk9)
+	for sh9 in ["sun_crow", "jade_rabbit", "bifang"]:
+		check(UI.SHAPES.has(sh9) and Models.FALLBACK.has(sh9), "Part IX shape %s has a procedural stand-in until its Blender model is exported" % sh9)
+		var m9 := Models.monster(sh9, Color("ffc030"), true)
+		check(m9.get_child_count() > 0, "a %s builds (Blender or stand-in)" % sh9)
+		m9.free()
+	for np9 in ["ah_mei", "farmer_tian", "feng_meng", "chang_e"]:
+		check(Assets.PEOPLE.has(np9) and Assets.has(Assets.PEOPLE[np9]), "Part IX character %s is Blender-built" % np9)
+	check(Data.known_skills(0, 39).has("noonsplit") and Data.known_skills(0, 40).has("ninesuns") and Data.known_skills(1, 39).has("osmanthus_rain") and Data.known_skills(1, 40).has("moon_dew"), "Part IX techniques are learnable")
+	check(not Data.known_skills(0, 41, Data.step_index("s_fs_return")).has("tentharrow"), "Tenth Arrow Sword waits for Feng Meng's feathers")
+	check(Data.known_skills(0, 41, Data.step_index("s_fs_crab")).has("tentharrow"), "Tenth Arrow Sword is learned from Feng Meng")
+	check(Data.SKILLS.moon_dew.get("revive", false), "the Moon-Dew Ward raises fallen allies")
+	check(Data.BOSS_DROPS.get("jinwu", "") == "tenth_arrow", "the Sun Crow gives back the tenth arrow that Lin Feng later shows Xihe")
 	print("== story ==")
 	for st in Data.STEPS:
 		if st.kind == "collect":

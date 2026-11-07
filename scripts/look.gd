@@ -82,6 +82,16 @@ const THEMES := {
 		"sky_top": Color("0a0a30"), "sky_hor": Color("6a5aa8"), "fog": Color("7a78b8"), "fog_d": 0.012, "sun": Color("e8e8ff"), "sun_e": 0.95, "amb": Color("9a98d0"), "amb_e": 0.85, "weather": "glints", "tree": "starpillar", "decor": "cloudpuff"},
 	"jasper": {"g1": Color("5aa080"), "g2": Color("68b08c"), "path": Color("f0ecd8"), "wall": Color("3a7a5a"), "water": Color("70e0c0"), "bg": Color("061410"),
 		"sky_top": Color("3a78c0"), "sky_hor": Color("fff0e0"), "fog": Color("e0f0e8"), "fog_d": 0.012, "sun": Color("fff8e8"), "sun_e": 1.1, "amb": Color("b0d0c0"), "amb_e": 0.85, "weather": "petals", "tree": "jadepeach", "decor": "flower"},
+	# ---- Part IX: a market town under a white-hot noon, cracked drought fields, the steaming valley
+	# of the Fusang under a blazing dawn, and the frost and osmanthus of the moon's silver night
+	"yanggu": {"g1": Color("b0a068"), "g2": Color("bcac74"), "path": Color("ece0c4"), "wall": Color("8a8a4a"), "water": Color("78c0c8"), "bg": Color("1a1408"),
+		"sky_top": Color("8ab4e8"), "sky_hor": Color("fffaec"), "fog": Color("f8f0dc"), "fog_d": 0.012, "sun": Color("fffcf0"), "sun_e": 1.3, "amb": Color("e0d4b8"), "amb_e": 0.95, "weather": "heat_haze", "tree": "stonelantern", "decor": "lantern"},
+	"millet": {"g1": Color("c8a858"), "g2": Color("d4b468"), "path": Color("ecd8a8"), "wall": Color("8a6a3a"), "water": Color("8ab8b0"), "bg": Color("201408"),
+		"sky_top": Color("6a98d8"), "sky_hor": Color("fff2d0"), "fog": Color("f0dcb0"), "fog_d": 0.014, "sun": Color("fff0d0"), "sun_e": 1.25, "amb": Color("d8c090"), "amb_e": 0.9, "weather": "heat_haze", "tree": "crag", "decor": "grass"},
+	"fusang": {"g1": Color("5a9a48"), "g2": Color("6aa852"), "path": Color("e8cc90"), "wall": Color("3a6a2a"), "water": Color("70d8c8"), "bg": Color("0a1408"),
+		"sky_top": Color("e89848"), "sky_hor": Color("ffe4a8"), "fog": Color("f0d8a8"), "fog_d": 0.016, "sun": Color("ffd890"), "sun_e": 1.25, "amb": Color("d0c098"), "amb_e": 0.9, "weather": "steam", "tree": "pine", "decor": "flower"},
+	"guanghan": {"g1": Color("a8b8d0"), "g2": Color("b8c8e0"), "path": Color("eef4ff"), "wall": Color("6a7aa8"), "water": Color("c0d8ff"), "bg": Color("060a18"),
+		"sky_top": Color("0a1030"), "sky_hor": Color("4a5a98"), "fog": Color("6a78a8"), "fog_d": 0.012, "sun": Color("d0dcff"), "sun_e": 0.85, "amb": Color("98a8d8"), "amb_e": 0.9, "weather": "osmanthus", "tree": "column", "decor": "snowrock"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -121,6 +131,12 @@ const EXTRA := {
 	"magpie": {"hill": 1.4, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.9, "haze": 0.4, "rays": 0.4},
 	"starpalace": {"hill": 0.4, "tex": "marble", "tuft": "flowers", "horizon": "palace", "clouds": 0.3, "stars": 1.0, "aurora": 0.4, "nebula": 0.5},
 	"jasper": {"hill": 0.9, "tex": "grass", "tuft": "flowers", "horizon": "peaks", "clouds": 0.6, "rays": 0.6, "haze": 0.3},
+	# sun_pitch / sun_yaw: where the light comes from (default -46, -35).  In the east the sun hangs
+	# high over the Fusang; on the moon the light is low silver moonlight from the west
+	"yanggu": {"hill": 0.25, "tex": "sand", "tuft": "deadgrass", "horizon": "hills", "clouds": 0.08, "rays": 0.9, "haze": 0.6, "sun_pitch": -64.0, "sun_yaw": 75.0},
+	"millet": {"hill": 0.2, "tex": "cracked", "tuft": "deadgrass", "horizon": "dunes", "clouds": 0.05, "rays": 0.6, "haze": 0.95, "sun_pitch": -62.0, "sun_yaw": 80.0},
+	"fusang": {"hill": 1.5, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.35, "rays": 1.0, "haze": 0.55, "sun_pitch": -38.0, "sun_yaw": 90.0},
+	"guanghan": {"hill": 0.5, "tex": "permafrost", "tuft": "snow", "horizon": "palace", "clouds": 0.15, "stars": 1.0, "moon": 1.0, "haze": 0.3, "sun_pitch": -32.0, "sun_yaw": -100.0},
 }
 
 const PICKUP_COLORS := {
@@ -131,6 +147,7 @@ const PICKUP_COLORS := {
 	"fallen_star": Color("fff4b0"), "glowcap": Color("ff9a50"), "aurora_shard": Color("70ffc8"), "five_stone": Color("ff70d0"),
 	"soul_lantern": Color("ffc860"), "memory_pearl": Color("c0f0ff"), "forget_herb": Color("e8d090"), "wheel_spoke": Color("b0b8ff"), "silver_thread": Color("e8e8ff"), "tea_bud": Color("8ae060"), "cocoon": Color("fff4d8"), "shuttle": Color("e8c860"), "needle": Color("c8d0e0"),
 	"river_star": Color("fff4c0"), "magpie_plume": Color("e8f0ff"), "star_thread": Color("c8d0ff"), "kunlun_peach": Color("ffa8b8"), "magpie_badge": Color("2a2a3a"),
+	"noon_ember": Color("ff9a30"), "rain_stone": Color("8ab8e8"), "sun_feather": Color("ffd040"), "osmanthus": Color("ffd070"), "tenth_arrow": Color("c8a878"),
 }
 
 static var _anime := {}
@@ -377,7 +394,7 @@ static func sun(name: String, shadows: bool = true) -> DirectionalLight3D:
 	var l := DirectionalLight3D.new()
 	l.light_color = th.sun
 	l.light_energy = th.sun_e
-	l.rotation_degrees = Vector3(-46, -35, 0)
+	l.rotation_degrees = sun_angles(name)
 	l.shadow_enabled = shadows and DisplayServer.get_name() != "headless"
 	l.directional_shadow_max_distance = 55.0
 	l.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
@@ -397,10 +414,17 @@ static func fill(name: String) -> DirectionalLight3D:
 	l.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
 	return l
 
+## Where a theme's light comes from (degrees): most regions share one afternoon sun; Part IX's
+## eastern regions have it standing high over the Fusang and the moon has low light from the west.
+static func sun_angles(name: String) -> Vector3:
+	var ex: Dictionary = EXTRA.get(name, {})
+	return Vector3(float(ex.get("sun_pitch", -46.0)), float(ex.get("sun_yaw", -35.0)), 0.0)
+
 ## Apply a theme's colours to an existing sun + fill pair.
 static func apply_lights(name: String, s: DirectionalLight3D, f: DirectionalLight3D = null) -> void:
 	var th := theme(name)
 	s.light_color = th.sun
 	s.light_energy = th.sun_e
+	s.rotation_degrees = sun_angles(name)
 	if f != null:
 		f.light_color = Color(th.sky_top).lerp(Color(0.7, 0.8, 1.0), 0.5)

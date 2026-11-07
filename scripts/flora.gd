@@ -46,6 +46,12 @@ const SPECIES := {
 		"leaf": "broad", "clump": [1.0, 1.3], "fruit": "ffa090", "bark": "5a4034", "c1": "5a9a48", "c2": "8ab858"},
 	"ginkgo": {"form": "broad", "h": [5.4, 7.4], "r": [0.16, 0.22], "levels": 3, "kids": [2, 3], "angle": [0.35, 0.7], "ratio": 0.6, "gnarl": 0.14, "up": 0.55,
 		"leaf": "ginkgo", "clump": [0.95, 1.25], "bark": "5a4a3a", "c1": "f0c840", "c2": "f8e070"},
+	# Part IX: the mulberries of the Fusang valley (dark fruit) and the moon's osmanthus, silver-green
+	# with clusters of tiny golden flowers
+	"mulberry": {"form": "broad", "h": [4.8, 6.6], "r": [0.2, 0.3], "levels": 3, "kids": [3, 4], "angle": [0.6, 1.0], "ratio": 0.62, "gnarl": 0.3, "up": 0.3,
+		"leaf": "broad", "clump": [1.15, 1.5], "fruit": "5a2a4a", "bark": "6a5040", "c1": "3f8a3a", "c2": "7ab048"},
+	"osmanthus": {"form": "broad", "h": [3.6, 5.0], "r": [0.15, 0.22], "levels": 3, "kids": [3, 4], "angle": [0.55, 0.95], "ratio": 0.6, "gnarl": 0.22, "up": 0.35,
+		"leaf": "round", "clump": [1.0, 1.35], "fruit": "f8c048", "bark": "6a6a78", "c1": "5a7a70", "c2": "a8c0b0"},
 	"wisteria": {"form": "wisteria", "h": [3.2, 4.2], "r": [0.16, 0.24], "leaf": "round", "bark": "5a4a40", "c1": "5a8a44", "c2": "7aa050"},
 	# ---- conifers
 	"pine": {"form": "conifer", "h": [6.0, 8.6], "r": [0.15, 0.22], "whorls": [7, 10], "spread": [1.7, 2.3], "leaf": "needle", "bark": "5a4030", "c1": "2c6644", "c2": "4a8a5a"},

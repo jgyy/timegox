@@ -167,7 +167,7 @@ func _stage_for(th: String) -> Dictionary:
 func _build_fighters() -> void:
 	for f in party + foes:
 		var boss: bool = f.boss
-		var m := Models.monster(f.shape, f.col, boss)
+		var m := Models.monster(f.shape, f.col, boss, f.get("id", "") if f.side == "foe" else "")
 		var sc := 1.0
 		if f.side == "foe":
 			sc = 2.6 if boss else 1.35
@@ -264,7 +264,11 @@ func _process(d: float) -> void:
 		f.flash = maxf(0.0, f.flash - d)
 		f.shake = maxf(0.0, f.shake - d)
 		if f.dead:
-			f.fade = maxf(0.0, f.fade - d * 2.0)
+			# a model with a death clip collapses first and then fades; a fallen ally stays on the
+			# field, lying where they fell, until revived
+			var dies: bool = f.has("model") and Assets.has_clip(f.model, "die")
+			if not (dies and f.side == "party"):
+				f.fade = maxf(0.0, f.fade - d * (0.6 if dies else 2.0))
 	for p in fx:
 		p.t -= d
 	fx = fx.filter(func(p): return p.t > 0.0)
@@ -353,6 +357,8 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 			main.fx_flash(col.lerp(Color.WHITE, 0.5), 0.22 if tgt.side == "foe" else 0.3)
 	if tgt.hp <= 0.0:
 		tgt.dead = true
+		if tgt.has("model"):
+			Models.act(tgt.model, "die", t)
 		say("%s is defeated." % tgt.name if tgt.side == "foe" else "%s collapses!" % tgt.name)
 		if tgt.side == "foe":
 			Game.kills += 1
@@ -375,6 +381,8 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 			if tg.dead and s.get("revive", false):
 				tg.dead = false
 				tg.fade = 1.0
+				if tg.has("model"):
+					Models.act(tg.model, "", t)
 				say("%s is raised by %s!" % [tg.name, s.n])
 			_heal(tg, tg.maxhp * s.heal)
 	else:
@@ -624,14 +632,17 @@ func _update_view(d: float) -> void:
 			off += Vector3(0, 0, sin(t * 80.0) * 0.25)
 		node.position = base + off
 		var fade: float = f.fade
+		var dies2: bool = Assets.has_clip(f.model, "die") if f.has("model") else false
 		node.visible = fade > 0.01
-		node.scale = Vector3.ONE * maxf(0.01, fade)
+		node.scale = Vector3.ONE * (maxf(0.01, fade / 0.35) if dies2 and fade < 0.35 else (1.0 if dies2 else maxf(0.01, fade)))
 		var m: Node3D = f.model
 		var slot: float = float(f.idx if f.side == "party" else f.get("slot", 0))
 		Models.anim_monster(m, t, slot)
 		m.position.y = sin(t * 2.4 + slot) * 0.07 if f.side == "foe" else 0.0
-		if f.dead:
+		if f.dead and not Assets.has_clip(m, "die"):
 			node.rotation.z = (1.0 - fade) * 1.2
+		elif not f.dead:
+			node.rotation.z = 0.0
 		# hit flash overlay
 		var ov: Material = flash_mat if f.flash > 0.0 else null
 		for mi in f.meshes:

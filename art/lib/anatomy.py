@@ -1,21 +1,27 @@
-"""Animal anatomy for the monster scripts: quadruped bodies, legs and paws, canine and feline
-heads, groomed fur, overlapping scales, feathers and insect exoskeletons.
+"""Animal anatomy for the monster scripts: sculpted quadruped bodies, legs, paws and hooves, heads,
+fur locks, animal eyes, ears, horns, claws and teeth, feathers, scales and exoskeletons.
 
-Reference points (animal anatomy for artists):
+Reference points (animal anatomy for artists, stylised-creature workflows):
 
-* The ribcage is deep and narrow, keel-shaped, reaching down to the elbows; behind it the belly
-  *tucks up* to a slim waist before the haunches.  Seen from the side the body is not a tube.
-* The back rises at the withers (the tops of the shoulder blades) and at the croup.
+* Build the silhouette first, as forms: the ribcage is deep and narrow, keel-shaped, reaching
+  down to the elbows; behind it the belly *tucks up* to a slim waist before the haunches; the
+  back rises at the withers (the tops of the shoulder blades) and at the croup.  The bodies are
+  sculpted from overlapping masses in clay (art/lib/clay.py) so they read as one skin.
 * Digitigrade animals walk on their toes.  In the hind leg the *stifle* (knee) points forward and
   the *hock* (heel) backwards and high; in the front leg the elbow sits behind, at the bottom of
-  the chest, and the wrist low.  Thighs and shoulders carry the muscle; cannon bones are slender.
-* Paws: four toes in an arc in front of a heart-shaped pad, claws on the toes.
+  the chest, and the wrist low.  Shoulders, triceps, thighs and gaskins carry the muscle; the
+  cannons are slender.  Paws: four toes in an arc before the pad, hooked claws on the toes.
 * Canine heads: a domed skull, a "stop" in front of the eyes, a long wedge muzzle with a nose pad
   and a separate lower jaw.  Feline heads: round skull, short muzzle, whisker pads, a small chin.
+* Stylised fur is a few larger sculpted clumps that belong to the silhouette (ruffs, cheeks,
+  manes, elbows, tail tips) - ``lock`` and shingled displacement of the clay - never a pelt of
+  tiny cards.
+* Markings are authored in the grey values (countershading, stripes that follow the form, darker
+  points, pale muzzles) so the game's tint recolours an animal that still reads as itself.
 
-The quadruped helpers read a ``creature.quad_rig`` rig (pelvis, chest, neck, head, jaw, tail and
-three-bone legs ``f_up/f_lo/f_paw`` and ``h_up/h_lo/h_paw``) so the existing clips keep working.
-Everything is greyscale with tint weight 1 unless a colour is passed, so the game can recolour it.
+The quadruped helpers (``clay_torso``, ``clay_foreleg``, ``clay_hindleg``, ``clay_tail``) read a
+``creature.quad_skel`` layout and weight to a ``creature.quad_rig2`` rig.  Everything is
+greyscale with tint weight 1 unless a colour is passed, so the game can recolour it.
 """
 
 import math
@@ -24,209 +30,14 @@ import random
 from mathutils import Matrix
 
 from kit import b2g, g2b
-from kit import CLOTH, CRYSTAL, FOLIAGE, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SCALE, SKIN, STONE, WOOD, V, darken, lighten, mix, rgb
-from sculpt import blob3, catmull, clamp, fbm3, loft, morph_sphere, prof_egg, scatter, section, smooth, strand
+from kit import CRYSTAL, FOLIAGE, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SCALE, SKIN, STONE, WOOD, V, darken, lighten, mix, rgb
+from sculpt import blob3, catmull, fbm3, loft, morph_sphere, section, smooth
 
 GREY = (0.82, 0.82, 0.82)
 
 
 def grey(v):
     return (v, v, v)
-
-
-# ---------------------------------------------------------------- quadruped body
-class QuadSpec:
-    """Body proportions.  Lengths in metres; the rig gives the overall layout."""
-
-    def __init__(self, **kw):
-        self.hip_w = kw.get("hip_w", 0.2)        # half width at the haunches
-        self.chest_w = kw.get("chest_w", 0.19)   # half width of the ribcage
-        self.chest_d = kw.get("chest_d", 0.34)   # depth below the spine at the chest (keel)
-        self.waist_d = kw.get("waist_d", 0.2)    # depth at the tucked waist
-        self.waist_w = kw.get("waist_w", 0.15)
-        self.back_h = kw.get("back_h", 0.12)     # spine to top of the back
-        self.withers = kw.get("withers", 0.05)   # rise of the withers
-        self.neck_r = kw.get("neck_r", 0.15)
-        self.head_r = kw.get("head_r", 0.12)
-        self.belly = kw.get("belly", 0.0)        # >0 for heavy animals: belly hangs instead of tucking
-        self.shade = kw.get("shade", (0.55, 1.05))  # back and belly grey levels
-        self.stripes = kw.get("stripes", 0.0)
-        self.seed = kw.get("seed", 3)
-
-
-def _rig_pts(r):
-    pel = r.head("pelvis")
-    chest = r.tail("chest")
-    neck_top = r.tail("neck")
-    head = r.tail("head")
-    return pel, chest, neck_top, head
-
-
-def body_colour(spine_y, sp, spots=0.0):
-    """Countershaded grey: dark back, pale belly, a little noise and optional stripes."""
-    back, belly = sp.shade
-
-    def fn(p, *_):
-        dy = p.y - spine_y(p.z)
-        k = 0.5 + 0.5 * math.tanh(dy * 6.0 + 0.6)
-        v = belly + (back - belly) * k
-        v *= 0.93 + 0.14 * fbm3((p.x * 6, p.y * 6, p.z * 6), 3, sp.seed)
-        if sp.stripes > 0.0:
-            s = math.sin(p.z * sp.stripes + 1.5 * math.sin(p.y * 7.0))
-            v *= 1.0 - 0.22 * smooth(0.3, 0.8, s) * k
-        if spots > 0.0:
-            v *= 1.0 - 0.2 * smooth(0.62, 0.7, fbm3((p.x * 14, p.y * 14, p.z * 14), 2, sp.seed + 5)) * spots
-        return grey(v)
-
-    return fn
-
-
-def quad_body(b, r, sp, weights):
-    """Torso and neck as one loft from the rump to behind the head.  Returns (verts, spine_y)."""
-    pel, chest, neck_top, head = _rig_pts(r)
-    hz = pel.z
-    fz = chest.z
-    by = pel.y
-    length = fz - hz
-    # spine line: croup, dip behind the withers, withers, then up the neck
-    keys = [
-        (hz - 0.2 * length, by - 0.03),
-        (hz, by + 0.02),
-        (hz + 0.35 * length, by - 0.01),
-        (hz + 0.7 * length, by + 0.02),
-        (fz, by + 0.06 + sp.withers),
-    ]
-
-    def spine_y(z):
-        if z <= keys[0][0]:
-            return keys[0][1]
-        for i in range(len(keys) - 1):
-            a, c = keys[i], keys[i + 1]
-            if a[0] <= z <= c[0]:
-                t = (z - a[0]) / (c[0] - a[0])
-                t = t * t * (3 - 2 * t)
-                return a[1] + (c[1] - a[1]) * t
-        # neck: interpolate towards the neck top
-        t = clamp((z - fz) / max(1e-4, neck_top.z - fz))
-        return keys[-1][1] + (neck_top.y - keys[-1][1]) * t
-
-    rings = []
-    zs = [hz - 0.24 * length, hz - 0.14 * length, hz - 0.04 * length, hz + 0.1 * length, hz + 0.28 * length, hz + 0.46 * length,
-          hz + 0.62 * length, hz + 0.78 * length, hz + 0.92 * length, fz + 0.04 * length]
-    n = 24
-    for k, z in enumerate(zs):
-        t = (z - hz) / length
-        y = spine_y(z)
-        # half width, height above the spine and depth below it along the body
-        if t < 0.0:
-            w = sp.hip_w * (0.6 + 0.4 * smooth(-0.25, 0.0, t))
-            up = sp.back_h * (0.7 + 0.3 * smooth(-0.25, 0.0, t))
-            dn = (sp.waist_d + 0.05) * (0.55 + 0.45 * smooth(-0.25, 0.0, t))
-        elif t < 0.45:
-            u = t / 0.45
-            w = sp.hip_w + (sp.waist_w - sp.hip_w) * smooth(0.0, 1.0, u)
-            up = sp.back_h
-            dn = (sp.waist_d + 0.06) + (sp.waist_d - (sp.waist_d + 0.06)) * smooth(0.0, 1.0, u)
-        else:
-            u = (t - 0.45) / 0.55
-            w = sp.waist_w + (sp.chest_w - sp.waist_w) * smooth(0.0, 0.7, u)
-            up = sp.back_h + sp.withers * smooth(0.6, 1.0, u)
-            dn = sp.waist_d + (sp.chest_d - sp.waist_d) * smooth(0.0, 0.75, u)
-        dn += sp.belly * math.sin(math.pi * clamp(t + 0.1))
-        prof = prof_egg(w, up, dn, flat=0.15)
-        rings.append(section(V(0, y, z), V(0, 0, 1), prof, n, up=V(0, 1, 0)))
-    # neck: from the withers up to just behind the head, narrowing, deeper than wide
-    nb = V(0, spine_y(fz) - sp.chest_d * 0.35, fz + 0.04 * length)
-    nt = neck_top + (head - neck_top) * 0.25
-    for k in range(1, 6):
-        t = k / 5
-        c = nb.lerp(nt, t) + V(0, 0.04 * math.sin(math.pi * t), 0)
-        d = (nt - nb).normalized()
-        rw = sp.neck_r * (1.15 - 0.35 * t)
-        rh = sp.neck_r * (1.5 - 0.6 * t)
-        prof = prof_egg(rw, rh * 0.8, rh * 1.1)
-        rings.append(section(c, d, prof, n, up=V(0, 1, 0)))
-    cf = body_colour(spine_y, sp)
-    verts = loft(b, rings, GREY, cls=CLOTH, col_fn=lambda p, j, i: cf(p), bone_fn=weights, tint=1.0, cap0=True, cap1=True, cap_push=0.5)
-    # palette: the back keeps the primary colour, the flanks shade towards the secondary and the
-    # belly and throat take it fully (kit.py palette slots)
-    for v in verts:
-        p = b2g(v.co)
-        v[b.pl] = 0.5 * smooth(0.02, -0.28, p.y - spine_y(p.z))
-    return verts, spine_y
-
-
-def quad_leg(b, r, nm, sd, sp, spine_y, thick=1.0, col=None, paw=True, hoof=False, toes=4, claw_col="ece6d6"):
-    """A muscled leg on bones nm_up/nm_lo/nm_paw.  Front legs carry the shoulder and forearm mass,
-    hind legs the thigh and gaskin; both taper to slender cannons and end in a paw (or hoof)."""
-    up = "%s_up.%s" % (nm, sd)
-    lo = "%s_lo.%s" % (nm, sd)
-    pw = "%s_paw.%s" % (nm, sd)
-    top, knee = r.head(up), r.tail(up)
-    ank = r.tail(lo)
-    tip = r.tail(pw)
-    s = 1 if sd == "L" else -1
-    hind = nm == "h"
-    col = col or GREY
-    # start inside the body so the leg grows out of it
-    root = V(top.x * 0.7, spine_y(top.z) - 0.02, top.z + (0.04 if hind else -0.02))
-    mid_up = top.lerp(knee, 0.5) + V(0, 0, (0.06 if hind else -0.02))
-    ctrl = [root, top, mid_up, knee, knee.lerp(ank, 0.5), ank, ank.lerp(tip, 0.4)]
-    pts = catmull(ctrl, 4)
-    radii = []
-    big = (sp.hip_w * 0.75 if hind else sp.chest_w * 0.62) * thick
-    m = len(pts)
-    for i in range(m):
-        t = i / (m - 1)
-        # muscle mass high up, slim cannon, knobbly joints
-        rr = big * (1.0 - smooth(0.12, 0.55, t) * 0.72)
-        rr += 0.012 * thick * math.exp(-((t - 0.5) / 0.05) ** 2)       # knee / elbow
-        rr += 0.01 * thick * math.exp(-((t - 0.83) / 0.04) ** 2)       # hock / wrist
-        rr = max(rr, 0.028 * thick)
-        # flatter side to side over the thigh, rounder below
-        radii.append((rr * (0.78 if t < 0.45 else 0.95), rr * (1.15 if t < 0.45 else 1.0)))
-    bones = []
-    for i in range(m):
-        t = i / (m - 1)
-        if t < 0.08:
-            bones.append({("pelvis" if hind else "chest"): 0.6, up: 0.4})
-        elif t < 0.46:
-            bones.append({up: 1.0})
-        elif t < 0.54:
-            bones.append({up: 0.5, lo: 0.5})
-        elif t < 0.8:
-            bones.append({lo: 1.0})
-        elif t < 0.9:
-            bones.append({lo: 0.5, pw: 0.5})
-        else:
-            bones.append({pw: 1.0})
-    cols = [mix(col, darken(col, 0.3), smooth(0.4, 1.0, i / (m - 1))) for i in range(m)]
-    verts = b.tube(pts, radii, col, cls=CLOTH, bones=bones, seg=12, cap0=True, cap1=False, cols=cols, tint=1.0, up=(1, 0, 0))
-    # stockings: the lower leg shades into the secondary colour
-    for v in verts:
-        v[b.pl] = 0.45 * smooth(top.y * 0.55, top.y * 0.2, b2g(v.co).y)
-    if hoof:
-        hc = pts[-1]
-        b.lathe(V(hc.x, 0.0, hc.z + 0.02), [(0.055 * thick, 0.0), (0.06 * thick, 0.02), (0.05 * thick, 0.07), (0.038 * thick, 0.1)], "3a3028", cls=STONE, bone=pw, seg=14)
-        b.lathe(V(hc.x, 0.09, hc.z + 0.02), [(0.045 * thick, 0.0), (0.055 * thick, 0.03), (0.04 * thick, 0.08)], darken(col, 0.4), cls=HAIR, bone=pw, seg=14, folds=(11, 0.15, 0.0), tint=1.0)
-    elif paw:
-        make_paw(b, pts[-1], tip, pw, s, thick, col, toes, claw_col)
-    return verts
-
-
-def make_paw(b, base, tip, bone, s, k, col, toes=4, claw_col="ece6d6"):
-    """A paw: a rounded pad mass, toes in an arc, claws, and dark pads underneath."""
-    c = V(base.x, 0.04 * k, max(base.z, tip.z - 0.04 * k))
-    b.ellipsoid(c, (0.055 * k, 0.04 * k, 0.07 * k), col, cls=CLOTH, bone=bone, seg=14, rings=8, tint=1.0, col2=darken(col, 0.3))
-    b.ellipsoid(c + V(0, -0.03 * k, -0.01 * k), (0.035 * k, 0.012 * k, 0.035 * k), "302428", cls=SKIN, bone=bone, seg=10, rings=5)
-    for i in range(toes):
-        u = (i / max(1, toes - 1) - 0.5) * 2.0
-        tc = c + V(u * 0.038 * k, -0.008 * k, 0.055 * k - abs(u) * 0.016 * k)
-        b.ellipsoid(tc, (0.02 * k, 0.024 * k, 0.026 * k), col, cls=CLOTH, bone=bone, seg=10, rings=6, tint=1.0)
-        b.ellipsoid(tc + V(0, -0.02 * k, 0.0), (0.012 * k, 0.006 * k, 0.012 * k), "302428", cls=SKIN, bone=bone, seg=8, rings=4)
-        claw = [tc + V(0, 0.004 * k, 0.018 * k), tc + V(0, -0.002 * k, 0.04 * k), tc + V(0, -0.02 * k, 0.05 * k)]
-        b.tube(claw, [0.007 * k, 0.005 * k, 0.001], claw_col, cls=STONE, bone=bone, seg=6)
-    return c
 
 
 # ---------------------------------------------------------------- heads
@@ -246,163 +57,7 @@ class HeadFrame:
         return self.c + self.M @ V(x, y, z)
 
 
-def canine_head(b, hf, k, bone="head", jaw="jaw", eye_col="ffd040", ear_bones=("ear.L", "ear.R"), long=1.0, ruff=True, ear_len=1.0):
-    """Wolf / fox / lion-dog head: skull with a stop, wedge muzzle, black nose, lips, separate jaw,
-    fangs, slanted eyes under a brow, tall ears with a pale inside, cheek ruffs."""
-    def skull(d):
-        p = V(d.x * 0.1, d.y * 0.09, d.z * 0.11) * k
-        q = p.copy()
-        off = 0.0
-        for s in (1, -1):
-            off += 0.012 * k * blob3(q, (0.075 * s * k, -0.02 * k, 0.02 * k), (0.03 * k, 0.04 * k, 0.04 * k))  # cheek muscle
-            off -= 0.008 * k * blob3(q, (0.045 * s * k, 0.025 * k, 0.085 * k), (0.02 * k, 0.015 * k, 0.02 * k))  # eye socket
-        off += 0.01 * k * blob3(q, (0, 0.06 * k, 0.04 * k), (0.03 * k, 0.03 * k, 0.06 * k))  # sagittal crest
-        return p + p.normalized() * off
-
-    rot = hf.M
-    morph_sphere(b, hf.c, skull, lambda p, d: grey(0.7 + 0.25 * d.y * 0.5 - 0.15 * max(0.0, -d.y)), cls=CLOTH, bone=bone, seg=24, rings=16, tint_fn=lambda p, d: 1.0, rot=rot)
-    # muzzle: from the stop forward, a rounded wedge narrowing to the nose
-    L = 0.17 * k * long
-    rings = []
-    for i in range(6):
-        t = i / 5
-        c = hf.at(0, -0.02 * k - 0.025 * k * t, 0.06 * k + L * t)
-        w = (0.06 - 0.03 * t) * k
-        hgt_t = (0.045 - 0.018 * t) * k
-        hgt_b = (0.035 - 0.015 * t) * k
-        rings.append(section(c, hf.f, prof_egg(w, hgt_t, hgt_b, flat=0.3), 16, up=hf.u))
-    loft(b, rings, GREY, cls=CLOTH, cols=[grey(0.75), grey(0.8), grey(0.85), grey(0.9), grey(0.92), grey(0.95)], bone=bone, tint=1.0, cap0=False, cap1=True, cap_push=0.5)
-    nose = hf.at(0, -0.026 * k, 0.065 * k + L)
-    b.ellipsoid(nose, (0.022 * k, 0.016 * k, 0.014 * k), "1a1418", cls=SKIN, bone=bone, seg=12, rings=8)
-    for s in (1, -1):
-        b.ellipsoid(nose + hf.M @ V(0.009 * s * k, -0.004 * k, 0.01 * k), (0.004 * k, 0.003 * k, 0.003 * k), "000000", cls=SKIN, bone=bone, seg=6, rings=4, mat=MAT_PLAIN)
-    # lips: a dark line along the side of the muzzle
-    for s in (1, -1):
-        lip = [hf.at(0.04 * s * k, -0.055 * k, 0.07 * k), hf.at(0.032 * s * k, -0.058 * k, 0.07 * k + L * 0.5), hf.at(0.015 * s * k, -0.055 * k, 0.06 * k + L)]
-        b.tube(lip, [0.004 * k, 0.004 * k, 0.003 * k], "2a2028", cls=SKIN, bone=bone, seg=5, mat=MAT_PLAIN)
-    # lower jaw on its own bone, with a tongue and fangs
-    jr = []
-    for i in range(5):
-        t = i / 4
-        c = hf.at(0, -0.065 * k - 0.006 * k * t, 0.03 * k + L * 0.92 * t)
-        jr.append(section(c, hf.f, prof_egg((0.045 - 0.02 * t) * k, 0.012 * k, (0.024 - 0.01 * t) * k), 12, up=hf.u))
-    loft(b, jr, grey(0.95), cls=CLOTH, bone=jaw, tint=1.0, cap0=True, cap1=True, cap_push=0.4)
-    b.ellipsoid(hf.at(0, -0.058 * k, 0.05 * k + L * 0.5), (0.022 * k, 0.005 * k, L * 0.4), "c04a58", cls=SKIN, bone=jaw, seg=10, rings=4)
-    for s in (1, -1):
-        b.cone(hf.at(0.022 * s * k, -0.07 * k, 0.05 * k + L * 0.85), 0.007 * k, 0.03 * k, "f6f0e0", cls=STONE, bone=bone, seg=6, rot=(math.pi, 0, 0))
-        b.cone(hf.at(0.02 * s * k, -0.062 * k, 0.04 * k + L * 0.75), 0.006 * k, 0.022 * k, "f6f0e0", cls=STONE, bone=jaw, seg=6)
-    # eyes under a heavy brow, angled along the skull
-    for s in (1, -1):
-        b.eye(hf.at(0.048 * s * k, 0.018 * k, 0.088 * k), 0.022 * k, eye_col, side=s, bone=bone, slit=False, glow=True, rot_y=0.55, h=0.75, mat=MAT_PLAIN)
-        brow = [hf.at(0.02 * s * k, 0.04 * k, 0.1 * k), hf.at(0.05 * s * k, 0.045 * k, 0.095 * k), hf.at(0.075 * s * k, 0.036 * k, 0.075 * k)]
-        b.tube(brow, [0.012 * k, 0.014 * k, 0.008 * k], grey(0.55), cls=CLOTH, bone=bone, seg=7, tint=1.0)
-    # ears: tall, pointed, hollow at the front
-    for s, eb in ((1, ear_bones[0]), (-1, ear_bones[1])):
-        base = hf.at(0.06 * s * k, 0.07 * k, 0.0)
-        tip = hf.at(0.085 * s * k, (0.07 + 0.14 * ear_len) * k, -0.01 * k)
-        rows = []
-        cols = []
-        for j in range(6):
-            t = j / 5
-            c = base.lerp(tip, t)
-            w = 0.04 * k * (1.0 - t) ** 0.8 + 0.002
-            side = hf.r
-            back = -hf.f * (0.02 * k * (1.0 - t))
-            rows.append([c - side * w + back, c + hf.f * 0.008 * k, c + side * w + back])
-            cols.append(mix(grey(0.55), grey(0.35), t))
-        b.sheet(rows, GREY, bone=eb, cols=cols, thickness=0.012 * k, tint=1.0)
-        inner = [base.lerp(tip, t) + hf.f * 0.008 * k for t in (0.05, 0.4, 0.75)]
-        b.tube(inner, [0.022 * k, 0.014 * k, 0.003 * k], "e8b0a8", cls=SKIN, bone=eb, seg=6, flat=0.4, up=tuple(hf.f))
-    if ruff:
-        for s in (1, -1):
-            for j in range(4):
-                root = hf.at(0.08 * s * k, -0.02 * k - j * 0.018 * k, 0.03 * k - j * 0.02 * k)
-                strand(b, [root, root + hf.M @ V(0.05 * s * k, -0.02 * k, -0.03 * k), root + hf.M @ V(0.07 * s * k, -0.05 * k, -0.07 * k)], 0.022 * k, 0.002, grey(0.75), col_tip=grey(0.95), cls=HAIR, bone=bone, flat=0.4, seg=5, per=3, tint=1.0)
-
-
-def feline_head(b, hf, k, bone="head", jaw="jaw", eye_col="ffd040", ear_bones=("ear.L", "ear.R")):
-    """Lion-dog / tiger head: round skull, short broad muzzle with whisker pads, a broad nose."""
-    def skull(d):
-        p = V(d.x * 0.12, d.y * 0.105, d.z * 0.11) * k
-        q = p.copy()
-        off = 0.0
-        for s in (1, -1):
-            off += 0.016 * k * blob3(q, (0.08 * s * k, -0.04 * k, 0.04 * k), (0.035 * k, 0.04 * k, 0.04 * k))
-            off -= 0.01 * k * blob3(q, (0.05 * s * k, 0.025 * k, 0.09 * k), (0.022 * k, 0.018 * k, 0.02 * k))
-        return p + p.normalized() * off
-
-    morph_sphere(b, hf.c, skull, lambda p, d: grey(0.72 + 0.2 * d.y * 0.5), cls=CLOTH, bone=bone, seg=24, rings=16, tint_fn=lambda p, d: 1.0, rot=hf.M)
-    for s in (1, -1):
-        b.ellipsoid(hf.at(0.03 * s * k, -0.045 * k, 0.11 * k), (0.035 * k, 0.03 * k, 0.03 * k), grey(0.95), cls=CLOTH, bone=bone, seg=12, rings=8, tint=1.0)
-        for j in range(3):
-            root = hf.at(0.045 * s * k, -0.04 * k - j * 0.008 * k, 0.12 * k)
-            strand(b, [root, root + hf.M @ V(0.06 * s * k, 0.004 * k - j * 0.01 * k, 0.0), root + hf.M @ V(0.14 * s * k, -0.01 * k - j * 0.02 * k, -0.03 * k)], 0.0016, 0.0005, "f8f4ec", cls=HAIR, bone=bone, seg=4, per=3)
-        b.eye(hf.at(0.05 * s * k, 0.02 * k, 0.09 * k), 0.025 * k, eye_col, side=s, bone=bone, slit=True, glow=True, rot_y=0.4, h=0.8, mat=MAT_PLAIN)
-        ear = [hf.at(0.07 * s * k, 0.08 * k, -0.01 * k), hf.at(0.09 * s * k, 0.13 * k, -0.02 * k), hf.at(0.095 * s * k, 0.155 * k, -0.025 * k)]
-        b.tube(ear, [(0.035 * k, 0.012 * k), (0.022 * k, 0.01 * k), (0.002, 0.002)], grey(0.5), cls=CLOTH, bone=ear_bones[0 if s > 0 else 1], seg=8, up=tuple(hf.f), tint=1.0)
-    b.ellipsoid(hf.at(0, -0.015 * k, 0.13 * k), (0.03 * k, 0.02 * k, 0.018 * k), "2a1a20", cls=SKIN, bone=bone, seg=12, rings=6)
-    b.ellipsoid(hf.at(0, -0.08 * k, 0.09 * k), (0.04 * k, 0.025 * k, 0.04 * k), grey(0.95), cls=CLOTH, bone=jaw, seg=12, rings=6, tint=1.0)
-    for s in (1, -1):
-        b.cone(hf.at(0.022 * s * k, -0.07 * k, 0.115 * k), 0.008 * k, 0.035 * k, "f6f0e0", cls=STONE, bone=bone, seg=6, rot=(math.pi, 0, 0))
-
-
-# ---------------------------------------------------------------- fur, scales, feathers
-def groom_back(p, n):
-    """Default fur direction: backwards along the body and down the flanks."""
-    g = V(0, -0.35, -1.0)
-    g = g - n * g.dot(n)
-    return g.normalized() if g.length > 1e-6 else V(0, -1, 0)
-
-
-def fur(b, verts, count, length, width, col_root=grey(0.62), col_tip=grey(0.92), groom=groom_back, seed=7, pred=None, bone_fn=None, tint=1.0, lift=0.35, min_dist=0.0, len_fn=None, mat=MAT_PLAIN):
-    """Plant `count` fur clumps on a built surface: each a short flattened lock leaning along the
-    groom direction, darker at the root, lifting slightly off the skin so the silhouette breaks."""
-    pts = scatter(b, verts, count, seed=seed, pred=pred, min_dist=min_dist)
-    for k, (p, n) in enumerate(pts):
-        g = groom(p, n)
-        ln = length * (0.75 + 0.5 * fbm3((p.x * 9, p.y * 9, p.z * 9), 2, seed))
-        if len_fn is not None:
-            ln *= len_fn(p)
-        root = p - n * 0.006
-        mid = p + g * ln * 0.5 + n * ln * lift * 0.6
-        tip = p + g * ln + n * ln * lift * 0.4
-        bone = bone_fn(p) if bone_fn is not None else None
-        strand(b, [root, mid, tip], width, width * 0.15, col_root, col_tip=col_tip, cls=HAIR, bone=bone, flat=0.4, seg=5, per=2, up=tuple(n), tint=tint, mat=mat)
-    return len(pts)
-
-
-def scale_rows(b, path, radius_fn, rows, per_row, col, bone_fn, size=0.05, tint=1.0, col2=None, belly_gap=0.0, up=V(0, 1, 0)):
-    """Overlapping scales along a body path: each a rounded plate leaning back over the next.
-    `belly_gap` (radians) leaves the underside bare for belly plates."""
-    path = [V(p) for p in path]
-    n = len(path)
-    for j in range(rows):
-        t = j / max(1, rows - 1)
-        f = t * (n - 1)
-        i = min(n - 2, int(f))
-        u = f - i
-        c = path[i].lerp(path[i + 1], u)
-        d = (path[i + 1] - path[i]).normalized()
-        side = d.cross(up).normalized()
-        upv = side.cross(d).normalized()
-        rad = radius_fn(t)
-        for k in range(per_row):
-            a = (k + 0.5 * (j % 2)) / per_row * 2 * math.pi
-            if belly_gap > 0.0 and abs(((a + math.pi) % (2 * math.pi)) - math.pi) > math.pi - belly_gap * 0.5:
-                continue
-            nrm = upv * math.cos(a) + side * math.sin(a)
-            pc = c + nrm * rad * 1.0
-            sz = size * (0.6 + 0.4 * rad / max(1e-4, radius_fn(0.3)))
-            # plate frame: x along the ring, y along the normal, z back along the body
-            R = Matrix((nrm.cross(d).normalized(), nrm, -d)).transposed()
-            verts = b.superquad(pc - d * sz * 0.3, (sz * 0.7, sz * 0.18, sz * 0.8), col, e=0.55, cls=SCALE, bone=bone_fn(pc), seg=8, rings=5, tint=tint, col2=col2)
-            # orient the plate: rotate its verts from the default frame into R, tilted outwards
-            tilt = Matrix.Rotation(-0.35, 3, "X")
-            for v in verts:
-                lp = b2g(v.co) - (pc - d * sz * 0.3)
-                v.co = g2b((pc - d * sz * 0.3) + R @ (tilt @ lp))
-
-
+# ---------------------------------------------------------------- feathers, scales, exoskeletons
 def feather(b, root, tip, width, col, col_tip=None, side=None, bone=None, tint=0.0, barbs=True, curl=0.12, mat=0):
     """A contour or flight feather: a vane with a notched edge and a pale rachis."""
     root = V(root)
@@ -456,9 +111,17 @@ def plate_segments(b, path, radii, col, bone_fn, n=14, col2=None, tint=1.0, ridg
         loft(b, rings, col, cls=cls, cols=cc, bone_fn=bone_fn, tint=tint, cap0=True, cap1=True, cap_push=0.3)
 
 
-def compound_eye(b, c, r, col, bone, facets=True):
-    """A bulging insect eye with a sheen and a grid of facet glints."""
-    b.ellipsoid(c, (r, r * 1.1, r), darken(col, 0.3), cls=CRYSTAL, bone=bone, seg=14, rings=10, mat=MAT_PLAIN, col2=darken(col, 0.6))
+def compound_eye(b, c, r, col, bone, facets=True, accent=False):
+    """A bulging insect eye with a sheen and a grid of facet glints; with `accent` the eye takes
+    the enemy's accent colour (a focal point)."""
+    tint = 0.0
+    old = b.cur_pal
+    if accent:
+        col = "e0e0e0"
+        tint = 1.0
+        b.cur_pal = 1.0
+    b.ellipsoid(c, (r, r * 1.1, r), darken(col, 0.3), cls=CRYSTAL, bone=bone, seg=14, rings=10, mat=MAT_PLAIN, col2=darken(col, 0.6), tint=tint)
+    b.cur_pal = old
     b.ellipsoid(c + V(0, r * 0.3, r * 0.4), (r * 0.5, r * 0.35, r * 0.4), lighten(col, 0.4), cls=CRYSTAL, bone=bone, seg=8, rings=5, mat=MAT_GLOW)
     if facets:
         for i in range(6):
@@ -498,7 +161,13 @@ def skull(b, c, k, bone, col="e8e0cc", eye_glow=None, jaw_bone=None, fwd=V(0, 0,
     morph_sphere(b, hf.c, shape, lambda p, d: mix(bone_col, darken(bone_col, 0.35), smooth(0.4, -0.8, d.y) * 0.4 + max(0.0, -d.z) * 0.2), cls=STONE, bone=bone, seg=22, rings=16, rot=hf.M)
     for s in (1, -1):
         b.ellipsoid(hf.at(0.03 * s * k, 0.0, 0.07 * k), (0.018 * k, 0.017 * k, 0.012 * k), "120a10", cls=SKIN, bone=bone, seg=10, rings=6, mat=MAT_PLAIN)
-        if eye_glow is not None:
+        if eye_glow == "accent":
+            # the eye-lights burn in the enemy's accent colour
+            old = b.cur_pal
+            b.cur_pal = 1.0
+            b.ellipsoid(hf.at(0.03 * s * k, 0.0, 0.078 * k), (0.008 * k, 0.007 * k, 0.004 * k), "f0f0f0", cls=CRYSTAL, bone=bone, seg=8, rings=5, mat=MAT_GLOW, tint=1.0)
+            b.cur_pal = old
+        elif eye_glow is not None:
             b.ellipsoid(hf.at(0.03 * s * k, 0.0, 0.078 * k), (0.008 * k, 0.007 * k, 0.004 * k), eye_glow, cls=CRYSTAL, bone=bone, seg=8, rings=5, mat=MAT_GLOW)
     b.ellipsoid(hf.at(0, -0.036 * k, 0.085 * k), (0.008 * k, 0.012 * k, 0.006 * k), "120a10", cls=SKIN, bone=bone, seg=8, rings=4, mat=MAT_PLAIN)
     jb = jaw_bone or bone
@@ -703,3 +372,541 @@ def thorns(b, pts, bone_fn, size=0.04, col="d8c8a0", every=1, seed=3):
         base = pts[i] + side * size * 0.6
         tip = base + side * size + d * size * 0.6
         b.tube([base, tip], [size * 0.25, 0.001], col, cls=STONE, bone=bone_fn(pts[i]), seg=5)
+
+
+# ================================================================ sculpted creatures
+# The helpers below build animals as sculpted forms (art/lib/clay.py) with a few broad fur locks,
+# animal (not anime) eyes set under lids, cupped ears, keratin horns, claws and teeth that taper
+# and darken toward the base, and markings authored in the grey values so a recolour still reads
+# as the animal: countershading, stripes that follow the form, rosettes, darker points.
+
+def frame_m(fwd, up=(0.0, 1.0, 0.0)):
+    """Columns (side, up, fwd): side is the creature's left when fwd is +Z."""
+    f = V(fwd).normalized()
+    s = f.cross(V(up))
+    if s.length < 1e-6:
+        s = f.cross(V(1, 0, 0))
+    s = -s.normalized()
+    u = f.cross(s).normalized()
+    if u.dot(V(up)) < 0:
+        u = -u
+    return Matrix((s, u, f)).transposed()
+
+
+def sclerite(b, a, c, w, h, bone, col=0.85, keels=0, phase=0.0, taper=0.0, tint=1.0, up=(0.0, 1.0, 0.0), seg=18, rings=10, blunt=0.6,
+             cls=SCALE, belly=0.0, mat=0, joint=0.35, ridge=0.12, flare=0.0):
+    """One plate of an exoskeleton between joints a and c (arthropod body segments, leg segments,
+    a crab's carapace or a mantis's thorax): a barrel `w` wide and `h` deep with blunt ends
+    (`blunt` near 0 makes it slab-like), optional keels (carinae) running along it (`keels`
+    ridges round it, rotated by `phase`; 0 is the back), paler on the back and dark where it
+    meets the next plate.  `belly` flattens the underside, `taper` narrows it towards c, `flare`
+    widens its rear rim.  A deformed sphere turned onto the a -> c axis with `up` as its back."""
+    a, c = V(a), V(c)
+    L = (c - a).length
+    M = frame_m(c - a, up)
+
+    def cross(d):
+        u = d.y
+        s = math.sqrt(max(0.0, 1.0 - u * u))
+        if s < 1e-6:
+            return u, 0.0, 1.0, 0.0
+        return u, d.x / s, d.z / s, s
+
+    def keel(cx, cy):
+        if not keels:
+            return 0.0
+        return max(0.0, math.cos((math.atan2(cx, cy) - phase) * keels)) ** 10
+
+    def shape(d):
+        u, cx, cy, s = cross(d)
+        rad = (s ** blunt) * (1.0 + ridge * keel(cx, cy)) * (1.0 - taper * (0.5 + 0.5 * u)) * (1.0 + flare * smooth(-0.3, -0.9, u))
+        yy = cy * h * rad
+        if belly and cy < 0.0:
+            yy *= 1.0 - belly
+        return V(cx * w * rad, yy, math.copysign(abs(u) ** 0.75, u) * L * 0.5)
+
+    def colf(lp, d):
+        u, cx, cy, s = cross(d)
+        v = col * (0.78 + 0.22 * smooth(-0.6, 0.8, cy)) + 0.08 * keel(cx, cy)
+        v *= 1.0 - joint * smooth(0.72, 0.97, abs(u))
+        return (v, v, v)
+
+    return morph_sphere(b, (a + c) * 0.5, shape, colf, cls=cls, bone=bone, seg=seg, rings=rings, tint_fn=lambda lp, d: tint, rot=M, mat=mat)
+
+
+def euler_of(M):
+    from creature import euler_yxz
+    return euler_yxz(M)
+
+
+def lock(b, root, groom, nrm, length, width, col, col_tip=None, bone=None, lift=0.2, rise=0.12, thick=0.4, tint=1.0,
+         cls=HAIR, mat=0, steps=6, seg=8, bury=0.35, bend=0.0, twist=0.0, droop=0.0, cols=None):
+    """A sculpted clump of fur: a curved, tapered, flattened lock growing from `root` (buried a
+    little) along the `groom` direction, its flat side facing `nrm` (the skin normal), arching
+    away from the skin by `lift` and ending `rise` x length off it, pointed at the tip.  Broad clumps like this belong to the
+    silhouette (ruffs, cheeks, manes, elbows, tail tips) instead of a pelt of tiny cards."""
+    root = V(root)
+    d = V(groom).normalized()
+    n = V(nrm)
+    n = n - d * n.dot(d)
+    if n.length < 1e-6:
+        n = d.orthogonal()
+    n.normalize()
+    sv = d.cross(n).normalized()
+    start = root - n * (width * bury) - d * (width * bury)
+    pts = []
+    for j in range(steps + 1):
+        t = j / steps
+        off = n * (length * (lift * math.sin(math.pi * t) * 0.5 + rise * t)) + sv * (length * bend * t * t) + V(0, -1, 0) * (length * droop * t * t)
+        pts.append(start + d * (length * t) + off)
+    rings = []
+    rcols = []
+    for j, c in enumerate(pts):
+        t = j / steps
+        tan = (pts[min(steps, j + 1)] - pts[max(0, j - 1)]).normalized()
+        w = width * (1.0 - t) ** 0.8 * (0.8 + 0.8 * t * (1.0 - t)) + 0.0006
+        h = max(0.0005, w * thick)
+        up = n - tan * n.dot(tan)
+        if twist:
+            up = Matrix.Rotation(twist * t, 3, tan) @ up
+        rings.append(section(c, tan, prof_ellipse_fn(w, h), seg, up=up))
+        if cols is not None:
+            rcols.append(cols[min(len(cols) - 1, j)])
+        else:
+            rcols.append(mix(col, col_tip, t ** 1.2) if col_tip is not None else rgb(col))
+    return loft(b, rings, col, cls=cls, cols=rcols, bone=bone, tint=tint, mat=mat, cap0=True, cap1=True, cap_push=0.25)
+
+
+def prof_ellipse_fn(rw, rh):
+    def f(a):
+        c, s = math.cos(a), math.sin(a)
+        return 1.0 / math.sqrt((c / rh) ** 2 + (s / rw) ** 2)
+    return f
+
+
+def tuft(b, root, groom, nrm, length, width, n, col, col_tip=None, bone=None, spread=0.5, seed=1, **kw):
+    """A fan of `n` locks from one root region (cheek ruffs, elbow tufts, tail tips)."""
+    rnd = random.Random(seed)
+    root = V(root)
+    nv = V(nrm).normalized()
+    g = V(groom).normalized()
+    sv = g.cross(nv).normalized()
+    out = []
+    for k in range(n):
+        u = (k / max(1, n - 1) - 0.5) * 2.0 if n > 1 else 0.0
+        dd = (g + sv * (u * spread) + V(rnd.uniform(-0.1, 0.1), rnd.uniform(-0.1, 0.1), rnd.uniform(-0.1, 0.1))).normalized()
+        r0 = root + sv * (u * width * 0.9)
+        ln = length * (1.0 - 0.25 * abs(u)) * rnd.uniform(0.85, 1.1)
+        out += lock(b, r0, dd, nv, ln, width * rnd.uniform(0.85, 1.1), col, col_tip, bone=bone, **kw)
+    return out
+
+
+def animal_eye(b, c, fwd, r, iris, bone, pupil="round", up=(0.0, 1.0, 0.0), almond=0.72, lid="1a1210", slant=0.0, side=1,
+               glow=False, mat=MAT_PLAIN, lid_w=0.13, tear=None, ring=None, accent=True):
+    """An animal eye set under its lids: a dark-rimmed eyeball almost filled by the iris (lighter
+    at the bottom, shadowed under the upper lid), a round, slit or bar pupil, one small catchlight
+    and an almond rim of dark lid skin - no anime sclera or brows.  `tear` = (length, direction)
+    draws a feline tear line from the inner corner.  With `accent` (the default) the iris is
+    painted in greys on the palette's accent slot, so each enemy looks out with its element's
+    colour (the eyes are a creature's first focal point); `iris` then only matters untinted."""
+    c = V(c)
+    M = frame_m(fwd, up) @ Matrix.Rotation(slant * side, 3, "Z")
+    rot = euler_of(M)
+    old_pal = b.cur_pal
+    tint = 0.0
+    if accent:
+        iris = "e8e8e8"
+        tint = 1.0
+        b.cur_pal = 1.0
+    b.ellipsoid(c, (r, r * almond, r * 0.6), darken(iris, 0.75), cls=CRYSTAL, bone=bone, rot=rot, seg=16, rings=10, mat=mat, tint=tint)
+    ic = c + M @ V(0, 0, r * 0.28)
+    b.ellipsoid(ic, (r * 0.88, r * almond * 0.9, r * 0.36), darken(iris, 0.3), cls=CRYSTAL, bone=bone, rot=rot, seg=16, rings=10,
+                mat=MAT_GLOW if glow else mat, col2=lighten(iris, 0.3), tint=tint)
+    b.cur_pal = old_pal
+    pc = c + M @ V(0, 0, r * 0.46)
+    if pupil == "slit":
+        pr = (r * 0.11, r * almond * 0.82, r * 0.2)
+    elif pupil == "bar":
+        pr = (r * 0.5, r * 0.13, r * 0.2)
+    else:
+        pr = (r * 0.38, min(r * 0.38, r * almond * 0.7), r * 0.2)
+    b.ellipsoid(pc, pr, "0a0608", cls=SKIN, bone=bone, rot=rot, seg=12, rings=6, mat=mat)
+    b.ellipsoid(c + M @ V(-r * 0.28 * side, r * almond * 0.38, r * 0.56), (r * 0.13, r * 0.11, r * 0.06), "ffffff", cls=CRYSTAL, bone=bone, rot=rot, seg=8, rings=5, mat=MAT_GLOW)
+    # the lid rim: heavier along the top
+    pts = []
+    radii = []
+    for i in range(17):
+        a = i / 16 * 2 * math.pi
+        x = math.cos(a)
+        y = math.sin(a)
+        pts.append(c + M @ V(x * r * 1.04, y * r * almond * 1.08, r * 0.3 * (1.0 - 0.35 * x * x)))
+        radii.append(r * lid_w * (1.25 if y > 0 else 0.8))
+    b.tube(pts, radii, lid, cls=SKIN, bone=bone, seg=6, cap0=False, cap1=False, mat=MAT_PLAIN)
+    if ring is not None:
+        b.tube([c + M @ V(math.cos(a) * r * 1.25, math.sin(a) * r * almond * 1.3, r * 0.15) for a in [i / 16 * 2 * math.pi for i in range(17)]],
+               [r * 0.12] * 17, ring, cls=SKIN, bone=bone, seg=5, cap0=False, cap1=False, mat=MAT_PLAIN)
+    if tear is not None:
+        ln, dv = tear
+        p0 = c + M @ V(r * 0.95 * side * -1.0, -r * almond * 0.3, r * 0.25)
+        b.tube([p0, p0 + V(dv) * (ln * 0.5), p0 + V(dv) * ln], [r * 0.1, r * 0.08, r * 0.03], lid, cls=SKIN, bone=bone, seg=5, mat=MAT_PLAIN)
+    return M
+
+
+def ear(b, base, fwd, h, w, d, col_back, col_in, bone, up=(0.0, 1.0, 0.0), point=0.7, cup=0.55, tint=1.0, tint_in=0.35, tip_col=None,
+        tip=0.25, rim_col=None, seg=14, rings=12, lean=0.0, side=1, spot=None):
+    """A cupped ear standing on `base`: a lens-shaped shell narrowing to a rounded or pointed tip
+    (`point`), its opening facing `fwd` and hollowed by `cup`, dark on the back (optionally with a
+    pale spot), pale inside, darker at the tip."""
+    M = frame_m(fwd, up) @ Matrix.Rotation(lean * side, 3, "Z")
+
+    def shape(dd):
+        v = (dd.y + 1.0) * 0.5
+        px = dd.x * w * 0.5 * (1.0 - point * v ** 1.6)
+        py = v * h
+        pz = dd.z * d * 0.5 * (1.0 - 0.5 * v)
+        if dd.z > 0.0:
+            pz -= cup * d * (1.0 - dd.x * dd.x) * math.sin(math.pi * min(1.0, v * 1.1)) * dd.z
+        return M @ V(px, py, pz)
+
+    def col(p, dd):
+        v = (dd.y + 1.0) * 0.5
+        inner = smooth(0.15, 0.55, dd.z) * (1.0 - smooth(0.65, 0.95, abs(dd.x))) * smooth(0.05, 0.25, v)
+        cc = mix(col_back, col_in, inner)
+        if rim_col is not None and dd.z > -0.2:
+            cc = mix(cc, rim_col, smooth(0.75, 0.95, abs(dd.x)) * (1.0 - inner))
+        if spot is not None and dd.z < -0.3:
+            cc = mix(cc, spot, smooth(0.45, 0.3, math.hypot(dd.x * 1.1, v - 0.45)))
+        if tip_col is not None:
+            cc = mix(cc, tip_col, smooth(1.0 - tip - 0.05, 1.0 - tip + 0.05, v))
+        return cc
+
+    def tf(p, dd):
+        inner = smooth(0.15, 0.55, dd.z) * (1.0 - smooth(0.65, 0.95, abs(dd.x)))
+        return tint * (1.0 - inner) + tint_in * inner
+
+    return morph_sphere(b, V(base), shape, col, cls=HAIR, bone=bone, seg=seg, rings=rings, tint_fn=tf)
+
+
+def horn(b, pts, r0, col0, col1, bone, r1=0.002, rings=0, ring_k=0.25, cls=STONE, seg=10, per=4, mat=0, tint=0.0, flat=1.0, up=None, power=1.0, ridge=0.0):
+    """A keratin horn, tusk or antler tine through control points: tapering from r0, its colour
+    running from the base (col0) to the tip (col1), with optional growth rings."""
+    cp = catmull(pts, per)
+    n = len(cp)
+    radii = []
+    cols = []
+    for i in range(n):
+        t = i / (n - 1)
+        rr = r0 + (r1 - r0) * t ** power
+        cc = mix(col0, col1, t ** 0.8)
+        if rings:
+            k = 0.5 + 0.5 * math.cos(t * rings * 2 * math.pi)
+            rr *= 1.0 + ridge * k * (1.0 - t)
+            cc = darken(cc, ring_k * k * (1.0 - t * 0.7))
+        radii.append((rr, rr * flat))
+        cols.append(cc)
+    return b.tube(cp, radii, col0, cls=cls, bone=bone, seg=seg, cols=cols, up=up, mat=mat, tint=tint)
+
+
+def claw(b, base, fwd, length, width, bone, col0="3a302a", col1="efe6d4", down=(0.0, -1.0, 0.0), hook=0.7, mat=MAT_PLAIN, cls=STONE, seg=6):
+    """A hooked claw, flattened side to side, dark at the root and pale at the tip."""
+    f = V(fwd).normalized()
+    dn = V(down)
+    dn = (dn - f * dn.dot(f))
+    dn = dn.normalized() if dn.length > 1e-6 else V(0, -1, 0)
+    base = V(base)
+    pts = [base - f * width * 0.4, base + f * length * 0.45 - dn * length * 0.05, base + f * length * 0.85 + dn * length * 0.25 * hook,
+           base + f * length * 1.0 + dn * length * 0.7 * hook]
+    radii = [(width * 0.5, width), (width * 0.42, width * 0.8), (width * 0.24, width * 0.45), (0.0008, 0.0008)]
+    cols = [col0, mix(col0, col1, 0.5), col1, col1]
+    return b.tube(pts, radii, col0, cls=cls, bone=bone, seg=seg, cols=cols, up=tuple(dn), mat=mat, cap0=True, cap1=True)
+
+
+def fang(b, root, down, length, width, bone, back=(0.0, 0.0, -1.0), curve=0.25, col0="e0d0a8", col1="fbf6e8", mat=MAT_PLAIN, seg=6):
+    """A curved canine tooth: ivory, a touch yellow at the gum, curving back toward its tip."""
+    dv = V(down).normalized()
+    bk = V(back)
+    bk = (bk - dv * bk.dot(dv))
+    bk = bk.normalized() if bk.length > 1e-6 else V(0, 0, -1)
+    r0 = V(root)
+    pts = [r0 - dv * width * 0.5, r0 + dv * length * 0.5 + bk * length * curve * 0.2, r0 + dv * length + bk * length * curve]
+    return b.tube(pts, [width, width * 0.7, 0.0008], col0, cls=STONE, bone=bone, seg=seg, cols=[col0, mix(col0, col1, 0.6), col1], mat=mat)
+
+
+def nose_pad(b, c, fwd, w, h, col, bone, kind="cat", up=(0.0, 1.0, 0.0), nostril="0c0608", mat=0):
+    """Nose leather: a cat's inverted triangle with comma nostrils or a dog's rounded pad with a
+    central groove."""
+    M = frame_m(fwd, up)
+
+    def shape(dd):
+        x, y, z = dd.x, dd.y, dd.z
+        if kind == "cat":
+            px = x * w * 0.5 * (1.0 - 0.55 * smooth(0.2, -1.0, y))
+            py = y * h * 0.5
+        else:
+            px = x * w * 0.5
+            py = y * h * 0.5 * (1.0 - 0.15 * abs(x))
+        pz = z * w * 0.3
+        if z > 0 and kind != "cat":
+            pz -= 0.06 * w * math.exp(-(x * 8.0) ** 2) * (1.0 - y)
+        return M @ V(px, py, pz)
+
+    morph_sphere(b, V(c), shape, lambda p, dd: mix(col, lighten(col, 0.25), smooth(0.3, 0.9, dd.y)), cls=SKIN, bone=bone, seg=14, rings=10, mat=mat)
+    for s in (1, -1):
+        q = V(c) + M @ V(s * w * 0.22, -h * 0.08, w * 0.27)
+        b.ellipsoid(q, (w * 0.1, h * 0.12, w * 0.05), nostril, cls=SKIN, bone=bone, rot=euler_of(M @ Matrix.Rotation(0.5 * s, 3, "Z")), seg=8, rings=5, mat=MAT_PLAIN)
+
+
+def hoof(b, c, fwd, r, h, col, bone, cloven=True, col_top=None, mat=0):
+    """A hoof: a truncated cone of horn, glossy and dark, split in two digits when cloven."""
+    f = V(fwd).normalized()
+    side = f.cross(V(0, 1, 0)).normalized()
+    parts = ((-1, 0.5), (1, 0.5)) if cloven else ((0, 1.0),)
+    for s, wk in parts:
+        cc = V(c) + side * (s * r * 0.5)
+        rr = r * wk * (1.12 if cloven else 1.0)
+
+        def shape(dd, rr=rr, s=s):
+            y = (dd.y + 1.0) * 0.5
+            k = 1.0 - 0.28 * y
+            px = dd.x * rr * k
+            pz = dd.z * rr * 1.15 * k + rr * 0.25 * y * (1.0 if dd.z > 0 else 0.3)
+            if cloven and dd.x * s < 0:
+                px *= 0.55
+            return V(px, y * h, pz)
+
+        morph_sphere(b, cc, shape, lambda p, dd: mix(col, col_top or lighten(col, 0.12), (dd.y + 1.0) * 0.5), cls=STONE, bone=bone, seg=14, rings=8, mat=mat)
+
+
+# ---------------------------------------------------------------- clay quadrupeds
+# Sculpting a four-legged body on a creature.QuadSkel: the torso as overlapping masses (haunch,
+# loin, belly, a deep keel of ribs, the brisket and the withers), a neck, and legs with their
+# muscle bellies - shoulder blade and triceps, the forearm thick at the elbow; the thigh and the
+# gaskin - tapering to slender cannons and ending in paws, hooves or flat feet.  Sizes are given
+# relative to the height of the back H so one set of numbers fits a fox or a mammoth.
+
+def _lw(names, zone=0.18):
+    from clay import limb_weights
+    return limb_weights(names, zone)
+
+
+def clay_torso(c, sk, w=0.25, d=0.275, haunch=(0.22, 0.2, 0.21), tuck=0.0, belly=0.0, withers=0.1, neck=(0.19, 0.175, 0.15),
+               throat=0.14, ribs_z=0.75, chest_y=0.775, loin_y=0.885, neck_pts=None):
+    """Torso and neck masses.  w, d: half width and half depth of the ribcage; haunch: radii of the
+    hindquarters; tuck lifts the belly (a greyhound's waist), belly lowers it (a heavy animal's
+    paunch); all as fractions of H except where noted."""
+    H = sk.H
+    hz = sk["hip.L"].z
+    fz = sk["sh.L"].z
+    L = fz - hz
+    c.ellipsoid(V(0, 0.85 * H, hz), (haunch[0] * H, haunch[1] * H, haunch[2] * H), bones={"pelvis": 1.0}, tag="body")
+    c.ellipsoid(V(0, (loin_y - tuck * 0.3) * H, hz + 0.22 * L), (w * 0.8 * H, (0.16 - tuck * 0.2) * H, 0.24 * L), bones={"loin": 0.7, "pelvis": 0.3}, tag="body")
+    c.ellipsoid(V(0, (0.8 + tuck - belly * 0.5) * H, hz + 0.47 * L), (w * 0.85 * H, (d * 0.77 - tuck + belly) * H, 0.24 * L), bones={"body": 0.7, "loin": 0.3}, tag="body")
+    c.ellipsoid(V(0, chest_y * H, hz + ribs_z * L), (w * H, d * H, 0.28 * L), bones={"chest": 0.7, "body": 0.3}, tag="body")
+    c.ellipsoid(V(0, 0.69 * H, fz - 0.025 * H), (w * 0.8 * H, d * 0.77 * H, 0.16 * L), bones={"chest": 1.0}, tag="body")
+    c.ellipsoid(V(0, 0.99 * H, fz - 0.125 * H), (w * 0.7 * H, withers * H, 0.2 * L), bones={"chest": 1.0}, tag="body")
+    pts = neck_pts or [V(0, H, fz), sk["neck1"].lerp(sk["neck0"], 0.3), sk["head"] + (sk["neck1"] - sk["head"]) * 0.15]
+    c.chain(pts, [neck[0] * H, neck[1] * H, neck[2] * H],
+            bones=lambda p, t: {"chest": 1.0 - t, "neck0": t} if t < 1.0 else {"neck0": 2.0 - t, "neck1": t - 1.0}, tag="neck", t0=0.0, t1=2.0)
+    if throat:
+        c.ellipsoid(pts[0].lerp(pts[1], 0.7) + V(0, -0.075 * H, 0), (throat * 0.8 * H, throat * H, throat * H), bones={"neck0": 0.6, "chest": 0.4}, tag="neck")
+
+
+def clay_foreleg(c, sk, sd, g=1.0, foot="paw", paw=1.0, toes=4, scap=1.0):
+    """A foreleg: the shoulder blade over the ribs, the triceps behind the upper arm, a forearm
+    thick at the elbow tapering to the wrist, the metacarpus, and the foot."""
+    H = sk.H
+    s = 1 if sd == "L" else -1
+    sc, sh, el, wr, fb, ft = (sk[k + "." + sd] for k in ("sc", "sh", "el", "wr", "fb", "ft"))
+    sb = "shoulder." + sd
+    up, lo, mt, tb = "f_up." + sd, "f_lo." + sd, "f_meta." + sd, "f_toe." + sd
+    c.ellipsoid(sc.lerp(sh, 0.45) + V(0.044 * H * s, 0, 0), (0.0625 * H * g * scap, 0.19 * H * scap, 0.11 * H * g * scap), rot=(0.35, 0, 0), bones={sb: 0.8, "chest": 0.2}, tag="leg")
+    c.ellipsoid(sh.lerp(el, 0.5) + V(0.0, 0.0, -0.05 * H), (0.1 * H * g, 0.16 * H, 0.12 * H * g), rot=(-0.3, 0, 0), bones={up: 0.75, sb: 0.25}, tag="leg")
+    if foot == "hoof":
+        radii = [0.09 * H * g, 0.08 * H * g, 0.042 * H * g, 0.045 * H * g]
+    elif foot == "pillar":
+        radii = [0.11 * H * g, 0.1 * H * g, 0.095 * H * g, 0.1 * H * g]
+    else:
+        radii = [0.094 * H * g, 0.09 * H * g, 0.06 * H * g, 0.0625 * H * g]
+    c.chain([sh, el, wr, fb], radii, bones=_lw([up, lo, mt]), tag="fleg", t0=0.0, t1=3.0)
+    c.ellipsoid(el.lerp(wr, 0.25) + V(0.015 * H * s, 0.0, 0.025 * H), (0.075 * H * g, 0.125 * H, 0.075 * H * g), rot=(0.15, 0, 0), bones={lo: 1.0}, tag="fleg", t=1.3)
+    _foot(c, fb, ft, mt, tb, H, foot, paw, toes, s)
+
+
+def clay_hindleg(c, sk, sd, g=1.0, foot="paw", paw=1.0, toes=4):
+    """A hind leg: the big thigh (biceps femoris and quadriceps), the gaskin behind the shin,
+    the long metatarsus from the hock, and the foot."""
+    H = sk.H
+    s = 1 if sd == "L" else -1
+    hip, kn, hk, hb, ht = (sk[k + "." + sd] for k in ("hip", "kn", "hk", "hb", "ht"))
+    up, lo, mt, tb = "h_up." + sd, "h_lo." + sd, "h_meta." + sd, "h_toe." + sd
+    c.ellipsoid(hip.lerp(kn, 0.4) + V(0.025 * H * s, 0.0, -0.0375 * H), (0.106 * H * g, 0.2 * H, 0.175 * H * g), rot=(-0.3, 0, 0), bones={up: 0.75, "pelvis": 0.25}, tag="leg")
+    if foot == "hoof":
+        radii = [0.1 * H * g, 0.08 * H * g, 0.042 * H * g, 0.045 * H * g]
+    elif foot == "pillar":
+        radii = [0.12 * H * g, 0.105 * H * g, 0.095 * H * g, 0.1 * H * g]
+    else:
+        radii = [0.1 * H * g, 0.0875 * H * g, 0.0525 * H * g, 0.056 * H * g]
+    c.chain([hip, kn, hk, hb], radii, bones=_lw([up, lo, mt]), tag="hleg", t0=0.0, t1=3.0)
+    c.ellipsoid(kn.lerp(hk, 0.3) + V(0, 0.0125 * H, -0.044 * H), (0.0625 * H * g, 0.1125 * H, 0.069 * H * g), rot=(-0.5, 0, 0), bones={lo: 1.0}, tag="hleg", t=1.3)
+    _foot(c, hb, ht, mt, tb, H, foot, paw * 0.92, toes, s)
+
+
+def _foot(c, fb, ft, mt, tb, H, foot, paw, toes, s):
+    if foot == "paw":
+        c.ellipsoid(fb.lerp(ft, 0.35) + V(0, 0.015 * H, 0), (0.081 * H * paw, 0.05 * H * paw, 0.0875 * H * paw), bones={tb: 0.6, mt: 0.4}, tag="paw")
+        for k in range(toes):
+            u = (k / max(1, toes - 1) - 0.5) * 2
+            c.ball(fb.lerp(ft, 0.75) + V(u * 0.0475 * H * paw, 0.005 * H, -abs(u) * 0.0225 * H * paw), 0.0325 * H * paw, bones={tb: 1.0}, tag="paw")
+    elif foot == "hoof":
+        # fetlock and pastern; the hoof itself is horn (see hoof())
+        c.ball(fb + V(0, 0.01 * H, 0), 0.05 * H * paw, bones={mt: 0.5, tb: 0.5}, tag="fetlock")
+        c.chain([fb, fb.lerp(ft, 0.6)], [0.042 * H * paw, 0.04 * H * paw], bones={tb: 1.0}, tag="fetlock")
+    elif foot == "pillar":
+        c.ellipsoid(fb + V(0, 0.03 * H, 0.02 * H), (0.12 * H * paw, 0.07 * H * paw, 0.12 * H * paw), bones={tb: 0.5, mt: 0.5}, tag="paw")
+    elif foot == "plant":
+        c.ellipsoid(fb.lerp(ft, 0.3) + V(0, 0.02 * H, -0.04 * H), (0.06 * H * paw, 0.04 * H * paw, 0.14 * H * paw), bones={mt: 0.6, tb: 0.4}, tag="paw")
+        for k in range(toes):
+            u = (k / max(1, toes - 1) - 0.5) * 2
+            c.ball(fb.lerp(ft, 0.8) + V(u * 0.04 * H * paw, 0.008 * H, -abs(u) * 0.02 * H), 0.025 * H * paw, bones={tb: 1.0}, tag="paw")
+
+
+def clay_tail(c, sk, radii, tag="tail"):
+    tail = sk.tail
+    names = ["tail%d" % i for i in range(len(tail) - 1)]
+    return c.chain(tail, radii, bones=_lw(names), tag=tag, t0=0.0, t1=len(tail) - 1.0)
+
+
+def toe_claws(b, sk, sd, length, width, hind=False, toes=4, col0="3a302a", col1="efe6d4", spread=0.0475, paw=1.0):
+    H = sk.H
+    fb = sk[("hb." if hind else "fb.") + sd]
+    ft = sk[("ht." if hind else "ft.") + sd]
+    bone = ("h_toe." if hind else "f_toe.") + sd
+    for k in range(toes):
+        u = (k / max(1, toes - 1) - 0.5) * 2
+        base = fb.lerp(ft, 0.95) + V(u * spread * H * paw, 0.02 * H, -abs(u) * 0.02 * H * paw)
+        claw(b, base, V(0, -0.25, 1.0), length, width, bone, col0=col0, col1=col1, hook=0.9)
+
+
+def head_clay(c, hf, K, parts, bone="head"):
+    """Add head masses given in the head frame (x side, y up, z along the muzzle) scaled by K:
+    parts = [(kind, (x, y, z), radii or r, tag, mirror, neg)]."""
+    for kind, pos, rad, tag, mirror, neg in parts:
+        for s in ((1, -1) if mirror else (1,)):
+            x, y, z = pos
+            p = hf.at(x * K * s, y * K, z * K)
+            if kind == "ball":
+                c.ball(p, rad * K, bones={bone: 1.0}, tag=tag, neg=neg)
+            else:
+                c.ellipsoid(p, (rad[0] * K, rad[1] * K, rad[2] * K), rot=hf.M, bones={bone: 1.0}, tag=tag, neg=neg)
+
+
+def surface(b):
+    """Ray-cast against everything built so far in Builder b: returns hit(origin, direction) ->
+    (point, normal) in Godot space or None.  Used to plant locks, horns and plates exactly on a
+    sculpted (clay) surface."""
+    from mathutils.bvhtree import BVHTree
+    b.bm.normal_update()
+    tree = BVHTree.FromBMesh(b.bm)
+
+    def hit(origin, direction, dist=10.0):
+        loc, nrm, _, _ = tree.ray_cast(g2b(V(origin)), g2b(V(direction)).normalized(), dist)
+        if loc is None:
+            return None
+        return b2g(loc), b2g(nrm).normalized()
+
+    return hit
+
+
+class Spline:
+    """A smooth curve through control points with rotation-minimising frames, for serpentine
+    bodies: ``at(u)`` (u = 0..1 along the arc) returns (point, tangent, up, side)."""
+
+    def __init__(self, pts, per=8, up=(0.0, 1.0, 0.0)):
+        cp = catmull(pts, per)
+        self.pts = cp
+        n = len(cp)
+        self.tan = [(cp[min(n - 1, i + 1)] - cp[max(0, i - 1)]).normalized() for i in range(n)]
+        self.len = [0.0]
+        for i in range(1, n):
+            self.len.append(self.len[-1] + (cp[i] - cp[i - 1]).length)
+        self.L = self.len[-1]
+        ups = []
+        u = V(up)
+        u = (u - self.tan[0] * u.dot(self.tan[0])).normalized()
+        for i in range(n):
+            if i:
+                q = self.tan[i - 1].rotation_difference(self.tan[i])
+                u = (q @ u)
+                # lean back towards world up so the belly stays underneath
+                wu = V(up) - self.tan[i] * V(up).dot(self.tan[i])
+                if wu.length > 1e-4:
+                    u = u.lerp(wu.normalized(), 0.35)
+                u = (u - self.tan[i] * u.dot(self.tan[i])).normalized()
+            ups.append(u)
+        self.up = ups
+        self.side = [self.tan[i].cross(self.up[i]).normalized() for i in range(n)]
+
+    def _idx(self, u):
+        s = max(0.0, min(1.0, u)) * self.L
+        lo, hi = 0, len(self.len) - 1
+        while hi - lo > 1:
+            m = (lo + hi) // 2
+            if self.len[m] <= s:
+                lo = m
+            else:
+                hi = m
+        seg = self.len[hi] - self.len[lo]
+        f = 0.0 if seg < 1e-9 else (s - self.len[lo]) / seg
+        return lo, hi, f
+
+    def at(self, u):
+        lo, hi, f = self._idx(u)
+        p = self.pts[lo].lerp(self.pts[hi], f)
+        t = self.tan[lo].lerp(self.tan[hi], f).normalized()
+        up = self.up[lo].lerp(self.up[hi], f)
+        up = (up - t * up.dot(t)).normalized()
+        return p, t, up, t.cross(up).normalized()
+
+    def local(self, p, u):
+        """(angle round the body from the top, distance from the axis) of a point near u."""
+        c, t, up, side = self.at(u)
+        d = p - c
+        d = d - t * d.dot(t)
+        return math.atan2(d.dot(side), d.dot(up)), d.length
+
+
+def blade(b, root, tip, width, col, col_tip=None, side=None, bone=None, curl=0.08, thick=0.14, tint=1.0, cls=HAIR, mat=0, steps=6, seg=8,
+          point=0.5, cols=None, twist=0.0):
+    """A solid flight or tail feather: a flattened, gently curved blade, narrow at the quill,
+    broad through the vane and rounded or pointed at the tip (`point`), shading from the root
+    colour to the tip colour.  Solid (not a card) so it keeps a clean ink outline."""
+    root = V(root)
+    tip = V(tip)
+    d = tip - root
+    L = d.length
+    dn = d.normalized()
+    if side is None:
+        side = dn.cross(V(0, 1, 0))
+        if side.length < 1e-4:
+            side = V(1, 0, 0)
+    side = V(side)
+    side = (side - dn * side.dot(dn)).normalized()
+    nrm = dn.cross(side).normalized()
+    rings = []
+    rcols = []
+    for j in range(steps + 1):
+        t = j / steps
+        c = root + d * t + nrm * (math.sin(math.pi * t) * curl * L)
+        tan = (d + nrm * (math.cos(math.pi * t) * math.pi * curl * L)).normalized()
+        w = width * (0.25 + 0.75 * math.sin(math.pi * min(1.0, 0.12 + t * 0.95)) ** 0.6) * (1.0 - point * smooth(0.6, 1.0, t))
+        w = max(w, 0.0008)
+        h = max(0.0006, min(w * thick, width * thick))
+        up = nrm - tan * nrm.dot(tan)
+        if twist:
+            up = Matrix.Rotation(twist * t, 3, tan) @ up
+        rings.append(section(c, tan, prof_ellipse_fn(w, h), seg, up=up))
+        if cols is not None:
+            rcols.append(cols[min(len(cols) - 1, j)])
+        else:
+            rcols.append(mix(col, col_tip, t ** 1.3) if col_tip is not None else rgb(col))
+    return loft(b, rings, col, cls=cls, cols=rcols, bone=bone, tint=tint, mat=mat, cap0=True, cap1=True, cap_push=0.3)

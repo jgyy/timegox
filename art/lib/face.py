@@ -185,7 +185,8 @@ def mouth(b, f, o, bone):
         line.append(HC + sp + Vector((0, 0.0005 + 0.0015 * (2 * t) ** 2 * (1 if o.get("smile", True) else -1), 0.0045)))
     b.tube(upper, [r * (1.0 if f.fem else 0.7) for r in (0.0012, 0.0018, 0.0024, 0.0027, 0.0025, 0.0027, 0.0024, 0.0018, 0.0012)], mix(lip, f.skin, 0.3), cls=SKIN, bone=bone, seg=7, flat=0.55, up=(0, 0, 1), mat=MAT_PLAIN)
     b.tube(lower, [r * (1.0 if f.fem else 0.7) for r in (0.0012, 0.0022, 0.003, 0.0036, 0.0038, 0.0036, 0.003, 0.0022, 0.0012)], lip if f.fem else mix(lip, f.skin, 0.3), cls=SKIN, bone=bone, seg=7, flat=0.6, up=(0, 0, 1), mat=MAT_PLAIN)
-    b.tube(line, [0.0012] * 9, darken(lip, 0.55), cls=SKIN, bone=bone, seg=5, mat=MAT_PLAIN)
+    # the parting line rides on the mouth bone: scaling it tall opens the mouth when speaking
+    b.tube(line, [0.0012] * 9, darken(lip, 0.62), cls=SKIN, bone="mouth" if bone == "head" else bone, seg=5, mat=MAT_PLAIN)
 
 
 def ears(b, f, bone):
@@ -301,8 +302,8 @@ def wrinkles(b, f, bone):
 def neck(b, f, o, bones):
     """Neck with the sternocleidomastoid slope into the collarbones (only the top shows)."""
     sk = f.skin
-    pts = [V(0, 1.46, -0.004), V(0, 1.53, 0.0), V(0, 1.6, -0.006), V(0, 1.64, -0.01)]
-    radii = [(0.056, 0.052), (0.049, 0.048), (0.048, 0.05), (0.048, 0.052)]
+    pts = [V(0, 1.45, -0.006), V(0, 1.52, -0.002), V(0, 1.59, -0.008), V(0, 1.64, -0.012)]
+    radii = [(0.062, 0.058), (0.054, 0.052), (0.051, 0.052), (0.05, 0.053)] if not f.fem else [(0.056, 0.052), (0.047, 0.046), (0.045, 0.046), (0.045, 0.048)]
     b.tube(pts, radii, sk, cls=SKIN, bones=bones, seg=16, cols=[darken(sk, 0.12), sk, darken(sk, 0.1), sk])
     # Adam's apple on men
     if not f.fem:

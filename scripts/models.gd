@@ -348,9 +348,34 @@ static func _act_k(n: Node3D, t: float, dur: float = 0.55) -> Array:
 		return ["", 0.0]
 	return [kind, e / dur]
 
-static func anim_person(n: Node3D, t: float, walking: bool, sit: bool = false) -> void:
+## `mode` picks another looping clip of a Blender character when it has one: "run" on the road,
+## "talk" while the character is the one speaking in a dialogue.
+## One step of Yue Ling following the hero: she eases towards her place off his shoulder and
+## returns [her new position, the yaw to turn to, whether she is running].  She faces the way she
+## is actually going: turning her towards him (as before) had her run sideways, since her place is
+## beside him, and judging "moving" by her distance to him (always 1.6 m there) kept her running
+## on the spot.  Her speed decides, with hysteresis so she does not flicker between clips while she
+## slows down; once she has caught up she looks where he looks, and in a conversation turns to him.
+static func companion_step(cpos: Vector3, pp: Vector3, fc: Vector2i, hero_yaw: float, running: bool, talking: bool, d: float) -> Array:
+	var back := pp - Vector3(fc.x, 0, fc.y) * 0.7 + Vector3(-fc.y, 0, fc.x) * 1.4
+	var np := cpos.lerp(back, 1.0 - exp(-d * 5.0))
+	var step := Vector3(np.x - cpos.x, 0.0, np.z - cpos.z)
+	var speed := step.length() / maxf(d, 0.0001)
+	var run := speed > (1.0 if running else 2.2)
+	var want := hero_yaw
+	if run:
+		want = atan2(step.x, step.z)
+	elif talking:
+		var dv := pp - np
+		want = atan2(dv.x, dv.z)
+	return [np, want, run]
+
+static func anim_person(n: Node3D, t: float, walking: bool, sit: bool = false, mode: String = "") -> void:
 	if n.has_meta("glb"):
-		Assets.animate(n, t, "sit" if sit else ("walk" if walking else "idle"), t)
+		var base := "sit" if sit else ("walk" if walking else "idle")
+		if mode != "" and not sit:
+			base = mode
+		Assets.animate(n, t, base, t)
 		return
 	var p: Dictionary = n.get_meta("p")
 	var ph := t * 9.0
@@ -637,11 +662,11 @@ static func _eyes(g: MB, b: MB, pos: Vector3, spread: float, r: float, col: Colo
 		g.ball(p + Vector3(r * 0.3, r * 0.3, r * 0.9), r * 0.25, Color(1, 1, 1, 1), true)
 
 ## Procedural stand-ins for the Blender-only shapes (used if their .glb is missing).
-const FALLBACK := {"scorpion": "crab", "mushroom": "plant", "mammoth": "beast", "moth": "bird", "hundun": "jelly", "fox": "beast", "carp": "serpent", "oxhead": "demon", "horseface": "demon", "jiangshi": "humanoid", "qilin": "beast", "ape": "beast", "tiger": "beast", "queen": "humanoid", "warden": "humanoid", "crowmarshal": "humanoid", "kaiming": "beast", "magpie": "bird"}
+const FALLBACK := {"scorpion": "crab", "mushroom": "plant", "mammoth": "beast", "moth": "bird", "hundun": "jelly", "fox": "beast", "carp": "serpent", "oxhead": "demon", "horseface": "demon", "jiangshi": "humanoid", "qilin": "beast", "ape": "beast", "tiger": "beast", "queen": "humanoid", "warden": "humanoid", "crowmarshal": "humanoid", "kaiming": "beast", "magpie": "bird", "sun_crow": "bird", "jade_rabbit": "beast", "bifang": "bird"}
 
-static func monster(shape: String, col: Color, boss: bool = false) -> Node3D:
+static func monster(shape: String, col: Color, boss: bool = false, enemy: String = "") -> Node3D:
 	if Assets.has_monster(shape):
-		var gm := Assets.monster(shape, col)
+		var gm := Assets.monster(shape, col, enemy)
 		if boss:
 			_boss_halo(gm, col)
 		return gm
@@ -1290,14 +1315,14 @@ static func _boss_halo(root: Node3D, col: Color) -> void:
 	_mi(ring, rb, MB.mat_glow())
 	root.set_meta("ring", ring)
 
-static func anim_monster(n: Node3D, t: float, phase: float = 0.0) -> void:
+static func anim_monster(n: Node3D, t: float, phase: float = 0.0, base: String = "idle") -> void:
 	if n.get_meta("kind", "") == "person":
-		anim_person(n, t + phase, false)
+		anim_person(n, t + phase, base == "walk")
 		if n.has_meta("ring"):
 			n.get_meta("ring").rotation.y = t * 0.9
 		return
 	if n.has_meta("glb"):
-		Assets.animate(n, t, "idle", phase * 0.37)
+		Assets.animate(n, t, base, phase * 0.37)
 		if n.has_meta("ring"):
 			n.get_meta("ring").rotation.y = t * 0.9
 		return

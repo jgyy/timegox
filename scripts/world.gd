@@ -45,6 +45,7 @@ var mini_rect := Rect2i()
 var player: Node3D
 var comp: Node3D
 var comp_pos := Vector3.ZERO
+var comp_run := false  # is Yue Ling running to keep up (rather than standing beside the hero)?
 var weather: CPUParticles3D
 var sun: DirectionalLight3D
 var fill: DirectionalLight3D
@@ -207,7 +208,8 @@ func _stream(all_now: bool) -> void:
 func _build_view(id: String) -> void:
 	var sl := Atlas.slice(wd, id)
 	var r: Rect2i = sl.rect
-	var shm := Terrain3D.world_heights(wd, r)
+	var shore := {}
+	var shm := Terrain3D.world_heights(wd, r, shore)
 	var bl: Array = []
 	for bd in wd.buildings:
 		if bd.area == id:
@@ -220,7 +222,7 @@ func _build_view(id: String) -> void:
 			lb.props = props
 			bl.append(lb)
 	var spec: Dictionary = Data.AREAS[id]
-	var root := Terrain3D.build(sl.grid, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "open": true, "buildings": bl, "area": id})
+	var root := Terrain3D.build(sl.grid, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
 	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS)
 	scene3d.add_child(root)
 	var nodes := {}
@@ -236,6 +238,10 @@ func _build_view(id: String) -> void:
 		var pg := Atlas.to_world("sect", Vector2i(-5, 3))
 		var pp := Terrain3D.world_pos(pg)
 		Terrain3D.pagoda(root, Vector3(pp.x, ground_y(pp) - 0.3, pp.z) - root.position)
+	if spec.has("landmark") and spec.landmark.kind == "fusang":
+		# Part IX: the colossal Fusang mulberry in the middle of the Valley of Sunrise
+		var fp := Terrain3D.world_pos(Atlas.to_world(id, spec.landmark.pos))
+		Terrain3D.fusang_tree(root, Vector3(fp.x, ground_y(fp) - 0.6, fp.z) - root.position)
 	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {})}
 
 # ---------------------------------------------------------------- entities
@@ -340,6 +346,16 @@ func _npc_opts(id: String) -> Dictionary:
 			return {"asset": id, "hair": "long", "crown": true, "glow": Color(1.0, 0.85, 0.95)}
 		"fire_sage", "void_hermit":
 			return {"asset": id, "beard": true, "hat": true, "hair": "bald"}
+		# Part VIII's people had no entry here, so the world drew them with the procedural stand-in
+		"niu_lang", "que_lao", "zhi_nu", "dong_shuang":
+			return {"asset": id, "hair": "long" if id in ["zhi_nu", "dong_shuang"] else "bun", "beard": id == "que_lao", "staff": id == "que_lao", "hat": id == "niu_lang"}
+		# ---- Part IX
+		"ah_mei", "chang_e":
+			return {"asset": id, "hair": "long", "ribbon": Color("ffd0a0") if id == "ah_mei" else Color("e8f0ff"), "glow": Color(0.85, 0.9, 1.0) if id == "chang_e" else Color(1.0, 0.75, 0.4)}
+		"farmer_tian", "feng_meng":
+			return {"asset": id, "beard": true, "hat": id == "farmer_tian", "hair": "bun"}
+	if Assets.PEOPLE.has(id):
+		return {"asset": id}
 	return {}
 
 func _make_ent(e: Dictionary) -> Node3D:
@@ -358,12 +374,12 @@ func _make_ent(e: Dictionary) -> Node3D:
 		"enemy":
 			var g: Array = e.group
 			var d: Dictionary = Data.ENEMIES[g[0].id]
-			var m0 := Models.monster(d.shape, d.col)
+			var m0 := Models.monster(d.shape, d.col, false, g[0].id)
 			n.add_child(m0)
 			var models := [m0]
 			for k in range(1, mini(g.size(), 3)):
 				var d2: Dictionary = Data.ENEMIES[g[k].id]
-				var mk := Models.monster(d2.shape, d2.col)
+				var mk := Models.monster(d2.shape, d2.col, false, g[k].id)
 				mk.scale = Vector3.ONE * 0.6
 				mk.position = Vector3(1.0 if k % 2 == 1 else -1.0, 0, -0.6)
 				n.add_child(mk)
@@ -374,7 +390,7 @@ func _make_ent(e: Dictionary) -> Node3D:
 			n.set_meta("models", models)
 		"boss":
 			var d3: Dictionary = Data.ENEMIES[e.enemy]
-			var mb := Models.monster(d3.shape, d3.col, true)
+			var mb := Models.monster(d3.shape, d3.col, true, e.enemy)
 			mb.scale = Vector3.ONE * 1.9
 			n.add_child(mb)
 			n.add_child(Models.shadow_disc(2.0, 0.5))
@@ -533,6 +549,8 @@ func _snap_cam() -> void:
 	player.position = pp
 	comp_pos = pp - Vector3(facing.x, 0, facing.y) * 0.7 + Vector3(-facing.y, 0, facing.x) * 1.4
 	comp.position = comp_pos
+	comp.rotation.y = atan2(float(facing.x), float(facing.y))
+	comp_run = false
 
 func _update_view(d: float) -> void:
 	var pp := _player_pos()
@@ -540,7 +558,9 @@ func _update_view(d: float) -> void:
 	var want_yaw := atan2(float(facing.x), float(facing.y))
 	player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
 	var walking := move_t >= 0.0
-	Models.anim_person(player, t, walking)
+	# on the road the hero runs (the light-body dash; the old walk cycle slid along at 12 m/s); in a
+	# conversation whoever is speaking talks with their hands and mouth
+	Models.anim_person(player, t, walking, false, "run" if walking else ("talk" if speaker() == "Lin Feng" else ""))
 	# a puff of dust at each footfall
 	var sp := fmod(t * 9.0 / PI, 2.0)
 	if walking and int(sp) != step_side:
@@ -551,14 +571,13 @@ func _update_view(d: float) -> void:
 	if Game.companion:
 		# off the hero's shoulder rather than straight behind, so she never stands between the
 		# follow camera and him
-		var back := pp - Vector3(facing.x, 0, facing.y) * 0.7 + Vector3(-facing.y, 0, facing.x) * 1.4
-		comp_pos = comp_pos.lerp(back, 1.0 - exp(-d * 5.0))
+		var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
+		comp_pos = cs[0]
 		comp_pos.y = ground_y(comp_pos)
 		comp.position = comp_pos
-		var dv := pp - comp_pos
-		if dv.length() > 0.3:
-			comp.rotation.y = lerp_angle(comp.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 8.0))
-		Models.anim_person(comp, t + 1.0, dv.length() > 0.5)
+		comp_run = cs[2]
+		comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
+		Models.anim_person(comp, t + 1.0, comp_run, false, "run" if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
 	# entities of the regions on show
 	for k in views:
 		var v: Dictionary = views[k]
@@ -597,9 +616,9 @@ func _update_view(d: float) -> void:
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:
-		"snow", "rain", "petals", "leaves", "aurora_snow":
+		"snow", "rain", "petals", "leaves", "aurora_snow", "osmanthus":
 			return 12.0
-		"bubbles", "bubbles_up", "embers", "sparks", "spores":
+		"bubbles", "bubbles_up", "embers", "sparks", "spores", "steam", "heat_haze":
 			return 0.3
 		"sandstorm":
 			return 1.5
@@ -610,11 +629,56 @@ func weather_y() -> float:
 		_:
 			return 3.5
 
+## The name of whoever is speaking in the dialogue box, or "".
+func speaker() -> String:
+	if main == null or main.top_name() != "dialogue":
+		return ""
+	var dl = main.dialogue
+	if dl.lines.is_empty() or dl.idx >= dl.lines.size():
+		return ""
+	return str(dl.lines[dl.idx][0])
+
+## Monsters amble about their spot in a slow figure of eight, pausing now and then, and stop to
+## face the hero when he comes close.  Purely visual: the encounter itself never moves.
+func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void:
+	var seed_ := Terrain3D.hash2(e.pos.x, e.pos.y, 3.0) * 17.0
+	var cyc := fmod(t * 0.11 + seed_, 1.0)
+	var walking := dist > 9.0 and cyc < 0.62
+	for i in ms.size():
+		var mk: Node3D = ms[i]
+		if not mk.has_meta("home"):
+			mk.set_meta("home", mk.position)
+			mk.set_meta("prog", seed_ + i * 1.3)
+		var prog: float = mk.get_meta("prog")
+		var shape: String = mk.get_meta("shape", "")
+		var r := 1.6 if i == 0 else 1.0
+		if walking:
+			prog += d * 0.32 / r
+			mk.set_meta("prog", prog)
+		var home: Vector3 = mk.get_meta("home")
+		var off := Vector3(sin(prog) * r, 0.0, sin(prog * 2.0) * r * 0.45)
+		var vel := Vector3(cos(prog), 0.0, cos(prog * 2.0) * 0.9)
+		mk.position = home + off
+		if walking:
+			mk.rotation.y = lerp_angle(mk.rotation.y, atan2(vel.x, vel.z), 1.0 - exp(-d * 4.0))
+		else:
+			mk.rotation.y = lerp_angle(mk.rotation.y, 0.0, 1.0 - exp(-d * 3.0))
+		Models.anim_monster(mk, t, i * 1.7 + e.pos.x, "walk" if walking and Assets.has_clip(mk, "walk") else "idle")
+		if shape in ["wisp", "jelly", "storm", "ray"]:
+			mk.position.y = home.y + 0.15 * sin(t * 1.6 + i)
+
 func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) -> void:
 	match e.kind:
 		"npc":
 			var m: Node3D = n.get_meta("model")
-			Models.anim_person(m, t + e.pos.x, false)
+			var talking: bool = speaker() == e.n
+			# a courteous bow (the cupped-fist salute) when the hero walks up
+			var near: bool = dist < 5.0
+			if near and not n.get_meta("near", false) and t - float(n.get_meta("bowed", -99.0)) > 25.0 and Assets.has_clip(m, "bow") and not talking:
+				Models.act(m, "bow", t)
+				n.set_meta("bowed", t)
+			n.set_meta("near", near)
+			Models.anim_person(m, t + e.pos.x, false, false, "talk" if talking else "")
 			if dist < 9.0:
 				var dv := pp - n.position
 				m.rotation.y = lerp_angle(m.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 5.0))
@@ -626,8 +690,11 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) 
 				mark.position.y = 3.1 + sin(t * 4.0) * 0.15
 		"enemy", "boss":
 			var ms: Array = n.get_meta("models")
-			for i in ms.size():
-				Models.anim_monster(ms[i], t, i * 1.7 + e.pos.x)
+			if e.kind == "enemy":
+				_wander(ms, e, n, dist, d)
+			else:
+				for i in ms.size():
+					Models.anim_monster(ms[i], t, i * 1.7 + e.pos.x)
 			if dist < 10.0:
 				var dv2 := pp - n.position
 				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))
