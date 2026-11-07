@@ -8,6 +8,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import anatomy as A  # noqa: E402
+
 from kit import CRYSTAL, MAT_GLOW, STONE, V, Builder  # noqa: E402
 
 kit.reset()
@@ -32,5 +34,19 @@ for k in range(3):
 for k in range(10):
     a = rnd.uniform(0, 2 * math.pi)
     b.cone(V(math.cos(a) * 1.0, 0.18, math.sin(a) * 0.85), 0.04, 0.2, "d8f0ff", cls=CRYSTAL, rot=(math.pi, 0, 0), seg=5)
+# detail: frost feathers growing on the spire, icicles hanging from every ledge, and a crust of
+# snow and broken ice round the base
+for k in range(16):
+    a = rnd.uniform(0, 2 * math.pi)
+    y = rnd.uniform(0.4, 2.6)
+    c = V(math.cos(a) * 0.3 * (1.0 - y / 3.5), y, math.sin(a) * 0.3 * (1.0 - y / 3.5))
+    b.leaf(c, c + V(math.cos(a) * 0.12, 0.08, math.sin(a) * 0.12), 0.04, "e8f8ff", cls=CRYSTAL, col_tip="ffffff")
+for k in range(12):
+    a = k / 12 * 2 * math.pi
+    top = V(math.cos(a) * 0.55, 0.55 + 0.1 * math.sin(k), math.sin(a) * 0.55)
+    b.cone(top - V(0, 0.12, 0), 0.025, 0.25, "c8e8ff", cls=CRYSTAL, seg=5, rot=(math.pi, 0, 0))
+for k in range(8):
+    a = k / 8 * 2 * math.pi + 0.2
+    A.hewn_stone(b, V(math.cos(a) * 0.8, 0.05, math.sin(a) * 0.8), (0.25, 0.1, 0.2), None, seed=k + 91, shade=0.95, e=0.4, tint=0.0, seg=8, rings=6)
 print("[art] icespire: %d triangles" % b.tri_count())
 kit.finish_static(b, "props/icespire.glb", target_tris=1800, samples=12, dist=0.5, strength=0.45)

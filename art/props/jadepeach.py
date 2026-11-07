@@ -47,4 +47,4 @@ for k, e in enumerate(ends + [trunk[-1] + V(0, 0.7, 0)]):
         b.ellipsoid(q + V(0.02, 0.0, 0.07), (0.01, 0.07, 0.01), "ff6a5a", cls=SKIN, seg=6, rings=4)
         b.leaf(q + V(0, 0.08, 0), q + V(0.1, 0.14, 0.03), 0.035, "4a8a3a", cls=FOLIAGE, col_tip="7ab05a")
 print("[art] jadepeach: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/jadepeach.glb", samples=12, dist=0.6, strength=0.5, target_tris=3000)
+kit.finish_static(b, "props/jadepeach.glb", samples=12, dist=0.6, strength=0.5, target_tris=3600)

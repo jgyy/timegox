@@ -7,7 +7,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, METAL, STONE, WOOD, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+
+from kit import CRYSTAL, MAT_GLOW, STONE, V, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(86)
@@ -25,5 +27,18 @@ for k in range(8):
     a = 2 * math.pi * k / 8
     b.superquad(V(math.cos(a) * 0.9, 1.8 + math.sin(a * 2) * 0.4, math.sin(a) * 0.9), (0.08, 0.07, 0.07), "c8bcd8", e=0.5, cls=STONE, rot=(a, a, 0))
 b.lathe(V(0, 0.4, 0), [(0.62, -0.01), (0.66, 0.0), (0.62, 0.01)], "e0d0ff", cls=CRYSTAL, seg=24, mat=MAT_GLOW, cap_bottom=False, cap_top=False)
+# detail: the slab is weathered - a chipped hewn base course, carved rune strokes down both faces,
+# a crack running through it, and the orbiting stones hewn rather than smooth
+A.hewn_stone(b, V(0, 0.42, 0), (1.15, 0.12, 0.7), None, seed=31, shade=0.72, e=0.3, tint=0.0, seg=16, rings=8)
+for k in range(9):
+    y = 0.85 + k * 0.28
+    for face in (1, -1):
+        x0 = rnd.uniform(-0.35, 0.1)
+        b.tube([V(x0, y, 0.282 * face), V(x0 + rnd.uniform(0.1, 0.25), y + rnd.uniform(-0.05, 0.05), 0.282 * face)], [0.012, 0.012], "8a80a0", cls=STONE, seg=4)
+crack = [V(0.3, 3.4, 0.29), V(0.18, 3.0, 0.29), V(0.25, 2.6, 0.29), V(0.12, 2.2, 0.29)]
+b.tube(crack, [0.01, 0.008, 0.007, 0.002], "4a4058", cls=STONE, seg=4)
+for k in range(6):
+    a = 2 * math.pi * k / 6 + 0.4
+    A.hewn_stone(b, V(math.cos(a) * 1.1, 2.4 + math.sin(a * 3) * 0.3, math.sin(a) * 1.1), (0.16, 0.12, 0.14), None, seed=40 + k, shade=0.75, e=0.45, tint=0.0, seg=10, rings=6)
 print("[art] monolith: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/monolith.glb", target_tris=2000, samples=12, dist=0.6, strength=0.45)
+kit.finish_static(b, "props/monolith.glb", target_tris=3800, samples=12, dist=0.6, strength=0.45)

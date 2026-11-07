@@ -8,6 +8,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import anatomy as A  # noqa: E402
+
 from kit import CRYSTAL, MAT_GLOW, STONE, V, Builder  # noqa: E402
 
 kit.reset()
@@ -41,5 +43,17 @@ for k in range(9):
     b.crystal(base, rnd.uniform(0.08, 0.15), h, "fff2c8" if k % 3 else "ffd890", rot=tilt, sides=5)
 # a halo of heat shimmer at the core
 b.ball(V(0, 0.95, 0), 0.22, "fff0b0", cls=CRYSTAL, seg=12, rings=8, mat=MAT_GLOW)
+# detail: the crater rim heaped with hewn ejecta, glowing cracks still cooling in the star-iron,
+# and glassy droplets fused into the sand
+for k in range(12):
+    a = k / 12 * 2 * math.pi
+    A.hewn_stone(b, V(math.cos(a) * 1.25, 0.08, math.sin(a) * 1.15), (0.3, 0.16, 0.24), None, seed=k + 111, shade=0.55, e=0.5, tint=0.0, rot=(0, -a, 0.2), seg=8, rings=6)
+for k in range(5):
+    a = k / 5 * 2 * math.pi
+    A.glow_seam(b, [V(math.cos(a) * 0.15, 0.7, math.sin(a) * 0.15), V(math.cos(a) * 0.4, 0.5, math.sin(a) * 0.35), V(math.cos(a) * 0.6, 0.25, math.sin(a) * 0.55)], 0.016, "ffb050", None, tint=0.0)
+for k in range(10):
+    a = rnd.uniform(0, 2 * math.pi)
+    rr = rnd.uniform(0.8, 1.6)
+    b.ball(V(math.cos(a) * rr, 0.03, math.sin(a) * rr), rnd.uniform(0.02, 0.05), "a0f0ff", cls=CRYSTAL, seg=6, rings=4)
 print("[art] meteor: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/meteor.glb", target_tris=1800, samples=14, dist=0.5, strength=0.55)
+kit.finish_static(b, "props/meteor.glb", target_tris=3200, samples=14, dist=0.5, strength=0.55)
