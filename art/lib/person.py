@@ -155,6 +155,24 @@ def build(o):
     if o.get("halberd", False):
         G.halberd(b, hand_r)
 
+    # ornaments and monstrous extras
+    if o.get("beads"):
+        G.court_beads(b, tor, *([o["beads"]] if isinstance(o["beads"], str) else []))
+    if o.get("badge"):
+        G.rank_badge(b, tor, *([o["badge"]] if isinstance(o["badge"], str) else []))
+    for s2 in (1, -1):
+        if o.get("claws"):
+            G.claw_nails(b, s2, o.get("claw_col", "1a1418"), o.get("claw_len", 0.05))
+        if o.get("bracers"):
+            G.bracers(b, s2, rgb(o["bracers"]))
+    if o.get("tail"):
+        G.demon_tail(b, rgb(o["tail"]), o.get("tail_tip", "ff4020"))
+    if o.get("fangs") and o.get("beast_head") is None:
+        for s2 in (1, -1):
+            tip = facelib.HC + V(0.012 * s2, facelib.MOUTH_Y - 0.004, facelib.RZF * 0.86)
+            b.cone(tip, 0.0035, 0.012, "f8f4e8", cls=STONE, bone="head", seg=5, rot=(math.pi, 0, 0))
+    if o.get("extra") is not None:
+        o["extra"](b, rig, o, tor)
     if o.get("tint_cloth", False):
         # a recolourable enemy: every cloth surface takes the colour the game asks for
         for v in b.bm.verts:

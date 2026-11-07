@@ -2,6 +2,8 @@
 its shoals) and the abyss.  A broad diamond body with two great wings that ripple from root to
 tip, curled cephalic fins framing the mouth, a pale belly with gill slits, a dorsal ridge and a
 long whip tail.  Tinted by the game per enemy; the belly and eyes keep their colours.
+The back is mottled with pale rosettes and a dark margin; spiracles sit behind raised eye
+bulges, tubercles run down the spine, a serrated barb rides the tail and the wing edges glow.
 Run: blender --background --python art/monsters/ray.py  ->  assets/monsters/ray.glb"""
 import math
 import os
@@ -10,7 +12,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
 from creature import chain_rig, wave_chain, zero_pose  # noqa: E402
-from kit import CLOTH, SCALE, SKIN, V, Builder, Rig, env  # noqa: E402
+from sculpt import fbm3, smooth  # noqa: E402
+from kit import CRYSTAL, MAT_GLOW, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
 
 kit.reset()
 Y = 1.4
@@ -77,6 +80,44 @@ b.ellipsoid(V(0, Y - 0.02, 0.6), (0.14, 0.03, 0.03), "302028", cls=SKIN, bone="b
 # whip tail with a sting
 tp = [r.head(n) for n in tail] + [r.tail(tail[-1])]
 b.tube(tp, [0.05, 0.035, 0.02, 0.006], (0.7, 0.7, 0.7), cls=SCALE, bones=[tail[0], tail[0], tail[1], tail[2]], tint=1.0, seg=7)
+# markings: a scatter of pale rosettes on the back and a dark margin round the disc
+for v in b.bm.verts:
+    p = kit.b2g(v.co)
+    c = v[b.cl]
+    if p.y < Y + 0.005 or c[3] < 0.2:
+        continue
+    spot = fbm3((p.x * 7.0, 0.0, p.z * 7.0), 2, 5)
+    k = 1.0
+    if spot > 0.62:
+        k = 1.35
+    elif 0.57 < spot <= 0.62:
+        k = 0.7
+    edge = math.hypot(p.x / 1.3, (p.z - 0.0) / 0.7)
+    k *= 1.0 - 0.3 * smooth(0.82, 0.98, edge)
+    v[b.cl] = (min(1.0, c[0] * k), min(1.0, c[1] * k), min(1.0, c[2] * k), c[3])
+# spiracles behind the eyes, a row of tubercles down the back, and a serrated barb on the tail
+for s in (1, -1):
+    b.ellipsoid(V(0.2 * s, Y + 0.07, 0.25), (0.03, 0.012, 0.04), "302028", cls=SKIN, bone="body", seg=8, rings=4)
+    b.ellipsoid(V(0.22 * s, Y + 0.06, 0.4), (0.06, 0.05, 0.06), (0.75, 0.75, 0.75), cls=SCALE, bone="body", tint=1.0, seg=10, rings=6)
+for k in range(7):
+    b.cone(V(0, Y + 0.2 - k * 0.01, 0.2 - k * 0.1), 0.02, 0.05, (0.85, 0.85, 0.85), cls=STONE, bone="body", tint=1.0, seg=6, rot=(-0.4, 0, 0))
+barb = tp[1].lerp(tp[2], 0.3)
+d = (tp[2] - tp[1]).normalized()
+b.tube([barb, barb + d * 0.18 + V(0, 0.03, 0)], [0.015, 0.002], "e8e0d0", cls=STONE, bone=tail[1], seg=6)
+for k in range(5):
+    q = barb + d * (0.03 + k * 0.03) + V(0, 0.01 + 0.004 * k, 0)
+    for s in (1, -1):
+        b.cone(q + V(0.012 * s, 0, 0), 0.004, 0.02, "e8e0d0", cls=STONE, bone=tail[1], seg=4, rot=(0, 0, -1.4 * s))
+# a faint bioluminescent rim along the wing edges
+for s in (1, -1):
+    edge = []
+    for j in range(9):
+        t = j / 8
+        z = 0.5 - t * 1.0
+        half = 1.25 * math.sin(math.pi * min(1.0, (0.62 - z) / 1.1 * 1.05 + 0.02)) ** 0.8 * (1.0 - 0.25 * (0.62 - z))
+        edge.append(V(half * s * 0.98, Y + 0.02, z - 0.18 * 0.96))
+    b.tube(edge, [0.008] * 9, "a0f0ff", cls=CRYSTAL, bones=[wing_w(p) for p in edge], seg=4, mat=MAT_GLOW)
+
 
 T_IDLE = 2.6
 
@@ -102,7 +143,7 @@ def attack(t):
     e = env(k)
     dive = math.sin(min(1.0, k * 1.5) * math.pi)
     p = zero_pose(r)
-    flap(p, t, 16.0, 0.5)
+    flap(p, t, 16.0, 0.2 + 0.3 * e)
     p["body"] = ((0.4 * dive, 0, 0), (0, -0.3 * dive, 0.6 * dive))
     return p
 

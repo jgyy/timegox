@@ -15,7 +15,7 @@ import math
 
 from mathutils import Vector
 
-from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, METAL, SKIN, WOOD, V, darken, lighten, lin, mix, rgb
+from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, METAL, SKIN, STONE, WOOD, V, darken, lighten, lin, mix, rgb
 from sculpt import bump, catmull, clamp, fbm3, loft, section, smooth, strand
 
 HIP_Y = 0.92
@@ -562,29 +562,54 @@ def cape(b, o, cc):
 
 
 def armour(b, o, tor, metal):
-    """Lamellar armour: rows of small overlapping plates on the shoulders, a chest plate with
+    """Lamellar armour: rows of small overlapping plates on the shoulders, a lamellar cuirass with
     round 'mirror' guards and rivets, and plated tassets over the hips."""
     mt = rgb(metal)
     dk = darken(mt, 0.35)
+    # pauldrons: three curved shells overlapping down the upper arm, each covering its outer half
     for s, sd in ((1, "L"), (-1, "R")):
+        sh = V(SHO.x * s, SHO.y, SHO.z)
+        el = V(ELB.x * s, ELB.y, ELB.z)
+        axis = (el - sh).normalized()
         for row in range(3):
-            for k in range(6):
-                a = (k / 5 - 0.5) * 2.3
-                rad = 0.085 + row * 0.02
-                c = V(0.19 * s, 1.43, 0) + V(s * (0.02 + 0.03 * row), 0.035 - row * 0.05, math.sin(a) * rad)
-                b.superquad(c, (0.03, 0.03, 0.006), mt if (row + k) % 2 == 0 else lighten(mt, 0.08), e=0.4, cls=METAL, bone={"chest": 0.35, "upper_arm." + sd: 0.65}, rot=(0, math.pi / 2 * s + a, -0.5 * s), seg=8, rings=5)
-    # chest plate and mirrors
-    rings = []
-    for y in (1.16, 1.22, 1.29, 1.36):
-        rings.append([tor.point(y, -0.95 + 1.9 * i / 12, 0.02) for i in range(13)])
-    rows = rings
-    b.sheet(rows, mt, bones=[{"spine": 0.5, "chest": 0.5}] * len(rows), cols=[mt, lighten(mt, 0.1), mt, dk], thickness=0.012)
+            c = sh + axis * (0.01 + 0.055 * row) + V(0.0, 0.03 - 0.01 * row, 0)
+            rr = 0.095 - 0.008 * row
+            rows = []
+            for j in range(4):
+                t = j / 3
+                cc = c + axis * (0.06 * t)
+                ring = []
+                for i in range(9):
+                    a = -1.9 + 3.8 * i / 8
+                    out = V(s * math.cos(a) * 0.9 + 0.1 * s, math.sin(a) * 0.0 + 0.45 * math.cos(a), math.sin(a))
+                    out = (out - axis * out.dot(axis)).normalized()
+                    ring.append(cc + out * (rr + 0.012 * t))
+                rows.append(ring)
+            w = {"chest": 0.3, "upper_arm." + sd: 0.7} if row == 0 else {"upper_arm." + sd: 1.0}
+            b.sheet(rows, mt, cls=METAL, bones=[w] * 4, cols=[lighten(mt, 0.15), mt, mt, dk], thickness=0.012)
+            edge = rows[-1]
+            b.tube(edge, [0.006] * len(edge), "c8a040", cls=METAL, bones=[w] * len(edge), seg=4)
+    # cuirass: lamellae laced in horizontal rows round the chest and back, hugging the robe, with
+    # a small round plaque over the sternum and leather straps over the shoulders
+    ys = [1.15, 1.18, 1.21, 1.24, 1.27, 1.3, 1.33, 1.36, 1.39]
+    n = 40
+    rings = [[tor.point(y, 2 * math.pi * i / n, 0.014) for i in range(n)] for y in ys]
+
+    def lam(p, j, i):
+        c = mt if j % 2 == 0 else mix(mt, dk, 0.5)
+        if i % 4 == 0:
+            c = darken(c, 0.2)
+        return c
+
+    loft(b, rings, mt, cls=METAL, col_fn=lam, bone_fn=torso_w, cap0=False, cap1=False)
+    for y in (ys[0], ys[-1]):
+        ring = [tor.point(y, 2 * math.pi * i / 30, 0.02) for i in range(31)]
+        b.tube(ring, [0.007] * 31, "4a3020", cls=CLOTH, bones=[torso_w(p) for p in ring], seg=5, cap0=False, cap1=False)
     for s in (1, -1):
-        c = tor.point(1.3, 0.38 * s, 0.03)
-        b.lathe(c, [(0.0001, -0.006), (0.045, -0.004), (0.048, 0.002), (0.03, 0.007), (0.0001, 0.009)], lighten(mt, 0.15), cls=METAL, bone="chest", seg=18, rot=(math.pi / 2, 0.38 * s, 0))
-        for k in range(6):
-            a = k / 6 * 2 * math.pi
-            b.ball(c + V(math.cos(a) * 0.04, math.sin(a) * 0.04, 0.008), 0.004, "f0c850", cls=METAL, bone="chest", seg=6, rings=4)
+        strap = [tor.point(1.39, 0.5 * s, 0.018), tor.point(1.46, 0.75 * s, 0.012), tor.point(1.47, math.pi - 0.75 * s, 0.012), tor.point(1.39, math.pi - 0.5 * s, 0.018)]
+        b.tube(strap, [(0.016, 0.004)] * 4, "4a3020", cls=CLOTH, bones=[torso_w(p) for p in strap], seg=6, up=(0, 1, 0))
+    c = tor.point(1.28, 0.0, 0.02)
+    b.lathe(c, [(0.0001, -0.004), (0.032, -0.003), (0.034, 0.002), (0.02, 0.005), (0.0001, 0.006)], lighten(mt, 0.3), cls=METAL, bone="chest", seg=16, rot=(math.pi / 2, 0, 0))
     # tassets
     for k in range(9):
         a = (k / 8 - 0.5) * 3.6
@@ -725,3 +750,66 @@ def talisman(b, f_hc):
     tal = b.ribbon(pts, [0.026, 0.026, 0.025, 0.024], (1, 0, 0), "f0d860", bone="head", col_end="e8c850")
     b.recolor(tal, lambda p: "c02018" if abs(p.x) < 0.008 and int(p.y * 80) % 3 != 0 else ("c02018" if abs(abs(p.x) - 0.018) < 0.003 else None))
 
+
+
+# ---------------------------------------------------------------- ornaments and monstrous extras
+def court_beads(b, tor, col="8a4a2a", marker="3aa070"):
+    """A Qing court necklace (chaozhu): a long loop of beads with larger marker beads every
+    quarter and a counterweight tassel down the back."""
+    n = 54
+    for i in range(n):
+        t = i / n
+        a = 2 * math.pi * t
+        y = 1.5 - 0.32 * (0.5 + 0.5 * math.cos(a)) ** 1.5
+        p = tor.point(y, math.pi * 0.9 * math.sin(a), 0.02)
+        big = i % (n // 4) == 0
+        b.ball(p, 0.014 if big else 0.009, marker if big else col, cls=CRYSTAL if big else WOOD, bone=torso_w(p), seg=8, rings=5)
+    back = tor.point(1.36, math.pi, 0.03)
+    b.ellipsoid(back, (0.025, 0.04, 0.01), marker, cls=CRYSTAL, bone="chest", seg=8, rings=5)
+    b.ribbon([back, back + V(0, -0.1, -0.01), back + V(0, -0.18, -0.02)], [0.012, 0.012, 0.004], (1, 0, 0), "c8a040", bone="chest")
+
+
+def rank_badge(b, tor, col="2a2a4a", bird="f0c050"):
+    """A mandarin square on the chest: a dark embroidered panel with a gold border and a bird."""
+    c = tor.point(1.28, 0.0, 0.025)
+    n = tor.normal(1.28, 0.0)
+    b.superquad(c, (0.085, 0.085, 0.006), col, e=0.15, cls=CLOTH, bone={"chest": 0.6, "spine": 0.4}, rot=(math.atan2(-n.y, n.z), 0, 0), seg=12, rings=6)
+    for i in range(4):
+        a0 = i * math.pi / 2 + math.pi / 4
+        p0 = c + V(math.cos(a0) * 0.11, math.sin(a0) * 0.11, 0.008)
+        p1 = c + V(math.cos(a0 + math.pi / 2) * 0.11, math.sin(a0 + math.pi / 2) * 0.11, 0.008)
+        b.tube([p0, p1], [0.005, 0.005], "e0b040", cls=METAL, bone="chest", seg=4)
+    b.ellipsoid(c + V(0, 0.01, 0.01), (0.03, 0.02, 0.004), bird, cls=METAL, bone="chest", seg=8, rings=4)
+    b.leaf(c + V(-0.02, 0.0, 0.012), c + V(-0.06, -0.05, 0.012), 0.012, bird, side=(0, 0, 1), cls=METAL, bone="chest")
+    b.leaf(c + V(0.02, 0.02, 0.012), c + V(0.05, 0.05, 0.012), 0.01, bird, side=(0, 0, 1), cls=METAL, bone="chest")
+
+
+def claw_nails(b, s, col="1a1418", length=0.05):
+    """Long hooked nails on every finger (demons, corpses)."""
+    sd = "L" if s > 0 else "R"
+    wr = V(WRI.x * s, WRI.y, WRI.z) + V(0.004 * s, -0.018, 0.004)
+    knuck = wr + V(0.002 * s, -0.085, 0.006)
+    for z, ln in ((0.025, 0.074), (0.0085, 0.082), (-0.008, 0.077), (-0.023, 0.062)):
+        tip = knuck + V(-0.02 * s, -ln * 0.95, z * 1.05 + 0.006)
+        b.tube([tip, tip + V(-0.006 * s, -length * 0.6, 0.004), tip + V(-0.02 * s, -length, 0.0)], [0.006, 0.004, 0.0008], col, cls=STONE, bone="hand." + sd, seg=5)
+
+
+def bracers(b, s, col, studs="c8a040"):
+    """Leather bracers laced over the forearm under the sleeve."""
+    sd = "L" if s > 0 else "R"
+    el = V(ELB.x * s, ELB.y, ELB.z)
+    wr = V(WRI.x * s, WRI.y, WRI.z)
+    pts = [el.lerp(wr, 0.55), el.lerp(wr, 0.8), wr + V(0, -0.005, 0)]
+    b.tube(pts, [0.046, 0.044, 0.042], col, cls=CLOTH, bone="forearm." + sd, seg=12)
+    for k in range(4):
+        q = pts[0].lerp(pts[2], 0.15 + 0.23 * k)
+        b.ball(q + V(0.04 * s, 0, 0.018), 0.007, studs, cls=METAL, bone="forearm." + sd, seg=6, rings=4)
+
+
+def demon_tail(b, col, tip_col="ff4020"):
+    """A long whip tail from under the robe at the back, ending in a barbed spade."""
+    pts = [V(0, 0.95, -0.14), V(0, 0.75, -0.3), V(0.08, 0.5, -0.45), V(0.18, 0.32, -0.42), V(0.22, 0.22, -0.28)]
+    bones = [{"hips": 1.0}, {"hips": 0.5, "robe_b": 0.5}, {"robe_b": 1.0}, {"robe_b": 1.0}, {"robe_b": 1.0}]
+    strand(b, pts, 0.04, 0.012, col, cls=SKIN, bones=bones, seg=8, per=4)
+    tip = pts[-1]
+    b.lathe(tip + V(0.02, 0.02, 0.06), [(0.0001, -0.05), (0.05, -0.01), (0.03, 0.04), (0.0001, 0.07)], tip_col, cls=STONE, bone="robe_b", seg=6, squash=(1.0, 0.3), rot=(math.pi / 2, 0, 0))

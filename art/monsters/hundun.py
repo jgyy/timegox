@@ -1,6 +1,9 @@
 """Hundun, the Faceless Chaos (new in Part V, final boss): a vast cinnabar sack with six legs and
 four wings and no face, only a slow whirl of light where a face should be.  Glowing seams pulse
 across its hide (after the Classic of Mountains and Seas).
+The hide is one lumpy, sagging sack with deep folds, veins and mottling; the four wings carry
+flight feathers and two rows of coverts; the six legs have knobbly knees, plated shins and
+three-clawed feet; folds of hide are drawn into the hollow where a face should be.
 Run: blender --background --python art/monsters/hundun.py  ->  assets/monsters/hundun.glb"""
 import math
 import os
@@ -9,8 +12,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import anatomy as A  # noqa: E402
 from creature import zero_pose  # noqa: E402
-from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, SKIN, V, Builder, Rig, env  # noqa: E402
+from sculpt import fbm3, morph_sphere, smooth, strand  # noqa: E402
+from kit import CLOTH, CRYSTAL, MAT_GLOW, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
 
 kit.reset()
 rnd = random.Random(13)
@@ -32,15 +37,24 @@ for s, sd in ((1, "L"), (-1, "R")):
         r.bone("shin%d.%s" % (k, sd), knee, foot, "leg%d.%s" % (k, sd))
 
 b = Builder("hundun")
-# the sack: a big lumpy ellipsoid with folds
-b.ellipsoid(C, (0.68, 0.72, 0.75), (0.85, 0.85, 0.85), cls=CLOTH, bone="body", tint=1.0, seg=28, rings=18, col2=(0.5, 0.5, 0.5))
-for k in range(9):
-    a = rnd.uniform(0, 2 * math.pi)
-    y = rnd.uniform(-0.4, 0.5)
-    rr = math.sqrt(max(0.05, 1.0 - (y / 0.72) ** 2)) * 0.66
-    c = C + V(math.sin(a) * rr, y, math.cos(a) * rr)
-    sz = rnd.uniform(0.18, 0.3)
-    b.ellipsoid(c, (sz, sz * 0.8, sz), (0.8, 0.8, 0.8), cls=CLOTH, bone="body", tint=1.0, seg=12, rings=8)
+# the sack: one lumpy, sagging hide with deep folds and creases, mottled and veined
+def sack(d):
+    p = V(d.x * 0.7, d.y * 0.72, d.z * 0.76)
+    p = p * (1.0 + 0.16 * (fbm3((d.x * 2.2, d.y * 2.2, d.z * 2.2), 3, 9) - 0.5))
+    p.y -= 0.06 * smooth(0.0, -0.9, d.y)                                    # sags at the bottom
+    fold = abs(math.sin(math.atan2(d.x, d.z) * 4.0 + d.y * 2.5))
+    return p * (1.0 - 0.035 * smooth(0.12, 0.0, fold))
+
+
+def hide(p, d):
+    v = 0.62 + 0.25 * smooth(-0.8, 0.6, d.y)
+    vein = smooth(0.03, 0.0, abs(fbm3((d.x * 5, d.y * 5, d.z * 5), 2, 13) - 0.5))
+    v *= 1.0 - 0.25 * vein
+    v *= 0.92 + 0.16 * fbm3((d.x * 12, d.y * 12, d.z * 12), 1, 2)
+    return (v, v, v)
+
+
+body_v = morph_sphere(b, C, sack, hide, cls=CLOTH, bone="body", seg=40, rings=26, tint_fn=lambda p, d: 1.0)
 # glowing seams wandering over the hide
 for k in range(7):
     a0 = rnd.uniform(0, 2 * math.pi)
@@ -60,22 +74,36 @@ for k in range(5):
         rr = 0.03 + i * 0.019
         pts.append(C + V(math.cos(a) * rr, 0.1 + math.sin(a) * rr, 0.75 + 0.002 * i))
     b.tube(pts, [0.012 - i * 0.0006 for i in range(14)], (1.0, 1.0, 0.8), cls=CRYSTAL, bone="swirl", mat=MAT_GLOW, seg=5)
-# wings: layered feathers fanning from four roots
+# wings: four feathered wings, each a covered arm with long flight feathers and two rows of
+# coverts over them
 for s, sd in ((1, "L"), (-1, "R")):
     for k in range(2):
         wb = "wing%d.%s" % (k, sd)
         h, tl = r.head(wb), r.tail(wb)
-        for f in range(9):
-            u = f / 8
-            base = h.lerp(tl, u * 0.7)
-            tip = base + (tl - h) * 0.45 + V(0, -0.25 - u * 0.4, -0.35 - u * 0.2)
-            sh = 0.55 + 0.4 * u
-            b.leaf(base, tip, 0.1, (sh, sh, sh), side=(0, 1, 0), cls=HAIR, bone=wb, tint=1.0, col_tip=(1.0, 0.9, 0.7), curl=0.1)
+        b.tube([h, h.lerp(tl, 0.5) + V(0, 0.04, 0), tl], [0.06, 0.045, 0.02], (0.75, 0.75, 0.75), bone=wb, tint=1.0, seg=8)
+        for row, (n, ln, shd) in enumerate(((10, 0.75, 0.55), (10, 0.45, 0.75), (8, 0.25, 0.9))):
+            for f in range(n):
+                u = f / (n - 1)
+                base = h.lerp(tl, 0.1 + u * 0.85) + V(0, 0.015 * row, 0)
+                tip = base + (tl - h).normalized() * 0.2 * u + V(0, -ln * (0.5 + 0.5 * u), -ln * 0.6)
+                A.feather(b, base, tip, 0.08 - 0.015 * row, (shd, shd, shd), col_tip=(1.0, 0.9, 0.7), side=(0, 1, 0), bone=wb, tint=1.0, curl=0.1, barbs=row == 0)
+    # six legs: thick thighs, knobbly knees, scaled shins and three-clawed feet
     for k in range(3):
         lg, sn = "leg%d.%s" % (k, sd), "shin%d.%s" % (k, sd)
-        b.tube([r.head(lg), r.tail(lg)], [0.09, 0.07], (0.7, 0.7, 0.7), bone=lg, tint=1.0, seg=10)
-        b.tube([r.head(sn), r.head(sn).lerp(r.tail(sn), 0.7), r.tail(sn)], [0.07, 0.05, 0.035], (0.6, 0.6, 0.6), bones=[{lg: 0.4, sn: 0.6}, sn, sn], tint=1.0, seg=10)
-        b.ellipsoid(r.tail(sn) + V(0, 0.02, 0.05), (0.08, 0.04, 0.12), "302018", cls=SKIN, bone=sn, seg=10, rings=5)
+        b.tube([r.head(lg), r.head(lg).lerp(r.tail(lg), 0.5) + V(0, 0.02, 0), r.tail(lg)], [0.1, 0.095, 0.07], (0.7, 0.7, 0.7), bone=lg, tint=1.0, seg=12)
+        b.ball(r.tail(lg), 0.075, (0.6, 0.6, 0.6), bone=sn, tint=1.0, seg=10, rings=6)
+        A.plate_segments(b, [r.head(sn), r.head(sn).lerp(r.tail(sn), 0.5), r.tail(sn)], [0.065, 0.055, 0.04], (0.6, 0.6, 0.6), lambda p, sn=sn: sn, n=10, cls=SCALE)
+        foot = r.tail(sn)
+        b.ellipsoid(foot + V(0, 0.02, 0.03), (0.07, 0.035, 0.09), "302018", cls=SKIN, bone=sn, seg=10, rings=5)
+        for c in range(3):
+            a = (c - 1) * 0.5
+            d = V(math.sin(a), 0, math.cos(a))
+            strand(b, [foot + d * 0.05, foot + d * 0.1 + V(0, 0.01, 0), foot + d * 0.13 - V(0, 0.02, 0)], 0.016, 0.002, "e8dcc0", cls=STONE, bone=sn, seg=5, per=3)
+# the hollow where a face should be is ringed by folds of hide drawn into it
+for k in range(4):
+    rr = 0.32 + k * 0.06
+    ring = [C + V(math.cos(a) * rr, 0.1 + math.sin(a) * rr, 0.71 - 0.03 * k) for a in [i / 24 * 2 * math.pi for i in range(25)]]
+    b.tube(ring, [0.03 - 0.005 * k] * 25, (0.55 + 0.08 * k,) * 3, cls=CLOTH, bone="body", tint=1.0, seg=6, cap0=False, cap1=False)
 
 T = 3.0
 

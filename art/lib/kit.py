@@ -604,7 +604,6 @@ class Builder:
         bm = self.bm
         bm.normal_update()
         tree = BVHTree.FromBMesh(bm)
-        rnd = random.Random(11)
         dirs = []
         for k in range(samples):
             u = (k + 0.5) / samples

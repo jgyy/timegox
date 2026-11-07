@@ -3,6 +3,9 @@ open, its pages fanning and flapping on their own bones, an eye set into the cla
 bookmarks of red silk trailing beneath, brass corner guards, chains hanging from its spine and
 glowing script hovering over the open pages.  Tinted by the game per enemy; pages, script and the
 eye keep their colours.
+The boards are carved with a raised border and a gilt cloud-scroll, the spine is banded with
+raised cords, the page edges are ruled and gilt, leather straps hold the clasp, the chains are
+interlocking links, and every loose page carries lines of script.
 Run: blender --background --python art/monsters/tome.py  ->  assets/monsters/tome.glb"""
 import math
 import os
@@ -10,8 +13,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import anatomy as A  # noqa: E402
 from creature import chain_rig, wave_chain, zero_pose  # noqa: E402
-from kit import CLOTH, MAT_GLOW, METAL, STONE, V, Builder, Rig, env  # noqa: E402
+from mathutils import Matrix  # noqa: E402
+from kit import CLOTH, MAT_GLOW, MAT_PLAIN, METAL, STONE, V, Builder, Rig, env  # noqa: E402
 
 kit.reset()
 Y = 1.6
@@ -64,6 +69,45 @@ for s in (1, -1):
     for k in range(6):
         c = V(0.12 * s, Y - 0.12 - k * 0.08, -0.38)
         b.lathe(c, [(0.025, -0.022), (0.035, 0.0), (0.025, 0.022)], "6a6a78", cls=METAL, bone="spine", seg=8, rot=(0, 0, (k % 2) * 1.57), cap_bottom=False, cap_top=False)
+# the cover is carved: a raised border and a cloud-scroll medallion on each board, the spine
+# banded with raised cords, the page block's edges ruled in fine lines and gilt
+for s, sd in ((1, "L"), (-1, "R")):
+    rot = Matrix.Rotation(-0.22 * s, 3, "Z")
+    c = V(0.28 * s, Y + 0.06, 0.0)
+    border = []
+    for i in range(21):
+        t = i / 20 * 4
+        side = int(t) % 4
+        u = t - int(t)
+        corners = [V(-0.24, 0, -0.34), V(0.24, 0, -0.34), V(0.24, 0, 0.34), V(-0.24, 0, 0.34), V(-0.24, 0, -0.34)]
+        q = corners[side].lerp(corners[side + 1], u)
+        border.append(c + rot @ (q + V(0, -0.036, 0)))
+    b.tube(border, [0.01] * 21, (0.9, 0.9, 0.9), cls=STONE, bone="cover." + sd, tint=1.0, seg=5, cap0=False, cap1=False)
+    scroll = []
+    for i in range(30):
+        a = i / 29 * 4 * math.pi
+        rr = 0.02 + 0.08 * i / 29
+        scroll.append(c + rot @ V(math.cos(a) * rr, -0.04, math.sin(a) * rr * 1.2))
+    b.tube(scroll, [0.008] * 30, "d8b050", cls=METAL, bone="cover." + sd, seg=5)
+    for k in range(8):
+        y = Y + 0.065 + k * 0.009
+        b.tube([V(0.48 * s, y - 0.02 + 0.0, -0.33), V(0.48 * s, y - 0.02, 0.33)], [0.002, 0.002], "c8a060" if k % 3 == 0 else "b8a888", cls=CLOTH, bone="cover." + sd, seg=3, mat=MAT_PLAIN)
+for k in range(4):
+    z = -0.3 + k * 0.2
+    b.tube([V(0, Y - 0.05, z - 0.012), V(0, Y - 0.05, z + 0.012)], [0.07, 0.07], "d8b050", cls=METAL, bone="spine", seg=12, cap0=False, cap1=False)
+# leather clasp straps holding the eye, and proper interlocking chains from the spine
+for s in (1, -1):
+    b.ribbon([V(0.08 * s, Y - 0.02, 0.4), V(0.22 * s, Y + 0.02, 0.38), V(0.4 * s, Y + 0.06, 0.34)], [0.03, 0.03, 0.028], (0, 1, 0), "6a3a20", bone="spine", col_end="5a3018")
+    A.chain(b, V(0.12 * s, Y - 0.12, -0.38), V(0.0, -0.075, -0.01), 7, "spine", col="6a6a78", r=0.026)
+# runes on every loose page
+for k in range(5):
+    a = (k - 2) * 0.25
+    root = V(0, Y + 0.12, -0.05)
+    tip = V(math.sin(a) * 0.45, Y + 0.18 + math.cos(a) * 0.05, -0.05)
+    for j in range(3):
+        q = root.lerp(tip, 0.35 + 0.2 * j) + V(0, 0.05, -0.15 + 0.15 * j)
+        b.tube([q + V(0, 0, -0.04), q + V(0, 0.0, 0.04)], [0.005, 0.005], "2a2018", cls=CLOTH, bone="page%d" % k, seg=3, mat=MAT_PLAIN)
+
 
 T_IDLE = 2.8
 
