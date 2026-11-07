@@ -13,7 +13,8 @@ import kit  # noqa: E402
 import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import Walker, add, flip_die, leg_chain, smooth, zero_pose  # noqa: E402
-from kit import HAIR, MAT_GLOW, SCALE, SKIN, STONE, V, Builder, Rig  # noqa: E402
+from kit import CLOTH, HAIR, MAT_GLOW, SCALE, SKIN, STONE, V, Builder, Rig  # noqa: E402
+from clay import Clay  # noqa: E402
 from sculpt import blob3, fbm3, morph_sphere, strand  # noqa: E402
 
 kit.reset()
@@ -43,14 +44,6 @@ b = Builder("spider")
 AC = V(0, BY + 0.2, -0.55)
 
 
-def abd_shape(d):
-    p = V(d.x * 0.36, d.y * 0.32, d.z * 0.46)
-    if d.z < 0:
-        p.x *= 1.0 - 0.25 * smooth(0.3, 1.0, -d.z)
-        p.y *= 1.0 - 0.2 * smooth(0.3, 1.0, -d.z)
-    return p
-
-
 def abd_col(p, d):
     v = 0.72 + 0.26 * smooth(0.2, -0.8, d.y)
     if d.y > -0.1:
@@ -62,7 +55,20 @@ def abd_col(p, d):
     return (v, v, v)
 
 
-abd = morph_sphere(b, AC, abd_shape, abd_col, cls=SCALE, bone="abdomen", seg=28, rings=18, tint_fn=lambda p, d: 1.0)
+ab = Clay(0.016, "spider_abdomen")
+ab.ellipsoid(AC + V(0, 0.0, 0.04), (0.36, 0.31, 0.4), bones={"abdomen": 1.0}, tag="abd")
+ab.ellipsoid(AC + V(0, -0.03, -0.3), (0.24, 0.21, 0.2), bones={"abdomen": 1.0}, tag="abd")
+
+
+def abd_fur(p, info):
+    nn = info.n
+    w = fbm3((p.x * 10.0, p.y * 10.0, p.z * 10.0), 2, 11)
+    u = -p.z * 16.0 + 0.6 * math.sin(math.atan2(nn.x, nn.y) * 9.0) + 1.3 * w
+    k = u - math.floor(u)
+    return nn * (0.016 * k ** 1.6)
+
+
+ab.build(b, lambda p, info: abd_col(p - AC, (p - AC).normalized()), cls=CLOTH, tint_fn=lambda p, info: 1.0, post=abd_fur)
 for s in (1, -1):
     b.cone(AC + V(0.03 * s, -0.12, -0.46), 0.025, 0.07, (0.5, 0.5, 0.5), cls=SCALE, bone="abdomen", tint=1.0, seg=8, rot=(-1.9, 0, 0.2 * s))
 b.cone(AC + V(0, -0.1, -0.47), 0.03, 0.08, (0.45, 0.45, 0.45), cls=SCALE, bone="abdomen", tint=1.0, seg=8, rot=(-1.9, 0, 0))
@@ -116,13 +122,15 @@ for s, sd in ((1, "L"), (-1, "R")):
         a0, a1 = V(r.bones[nm + "_a"][0]), V(r.bones[nm + "_a"][1])
         f1 = V(r.bones[nm + "_b"][1])
         ba, bb = nm + "_a", nm + "_b"
-        femur = [a0, a0.lerp(a1, 0.35) + V(0, 0.06, 0), a0.lerp(a1, 0.75) + V(0, 0.03, 0), a1]
-        b.tube(femur, [0.04, 0.047, 0.042, 0.035], (0.7, 0.7, 0.7), cls=SCALE, bones=[ba, ba, ba, {ba: 0.5, bb: 0.5}], tint=1.0, seg=10)
-        knee_mid = a1.lerp(f1, 0.55) + V(0.04 * s, 0.03, 0)
-        lower = [a1, a1.lerp(knee_mid, 0.5), knee_mid, knee_mid.lerp(f1, 0.6), f1]
-        b.tube(lower, [0.034, 0.03, 0.025, 0.017, 0.007], (0.78, 0.78, 0.78), cls=SCALE, bones=[{ba: 0.5, bb: 0.5}, bb, bb, bb, bb], tint=1.0, seg=8)
-        for q, rr in ((a0.lerp(a1, 0.12), 0.046), (a1, 0.038), (knee_mid, 0.028), (knee_mid.lerp(f1, 0.6), 0.02)):
-            b.ellipsoid(q, (rr, rr * 0.7, rr), (0.45, 0.45, 0.45), cls=SCALE, bone=bb if q != a0.lerp(a1, 0.12) else ba, tint=1.0, seg=8, rings=5)
+        knee_mid = a1.lerp(f1, 0.5) + V(0.04 * s, 0.04, 0)
+        meta = knee_mid.lerp(f1, 0.62)
+        # coxa and a thick, keeled femur; patella and tibia; metatarsus; a thin tarsus
+        A.sclerite(b, a0 - (a1 - a0) * 0.04, a0.lerp(a1, 0.16), 0.05, 0.045, ba, col=0.7, seg=12, rings=6)
+        A.sclerite(b, a0.lerp(a1, 0.13), a1, 0.05, 0.046, ba, col=0.76, keels=2, phase=math.pi / 2, ridge=0.1, seg=14, rings=10, blunt=0.5)
+        A.sclerite(b, a1 - (knee_mid - a1) * 0.06, a1.lerp(knee_mid, 0.3), 0.042, 0.04, bb, col=0.66, seg=12, rings=6)
+        A.sclerite(b, a1.lerp(knee_mid, 0.28), knee_mid, 0.036, 0.034, bb, col=0.78, seg=12, rings=8, blunt=0.5)
+        A.sclerite(b, knee_mid - (meta - knee_mid) * 0.04, meta, 0.026, 0.025, bb, col=0.8, seg=10, rings=8, blunt=0.5)
+        A.sclerite(b, meta, f1 + (f1 - meta) * 0.03, 0.018, 0.017, bb, col=0.72, seg=8, rings=6, taper=0.4)
         A.bristles(b, [a0.lerp(a1, t) + V(0, 0.05, 0) for t in (0.3, 0.5, 0.7)] + [a1.lerp(f1, t) + V(0.02 * s, 0.03, 0) for t in (0.2, 0.35, 0.5, 0.65, 0.8)], 0.05, (0.4, 0.4, 0.4), lambda p, ba=ba, bb=bb, a1=a1: ba if p.y > a1.y - 0.02 and (p - a1).length > 0.15 and p.y > BY else bb, seed=k * 2 + (s > 0))
         for c in (-1, 1):
             b.tube([f1, f1 + V(0.01 * c, -0.01, 0.015), f1 + V(0.015 * c, -0.025, 0.005)], [0.005, 0.003, 0.001], "201418", cls=STONE, bone=bb, seg=4)

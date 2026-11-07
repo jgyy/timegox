@@ -45,14 +45,17 @@ abd = [V(0, BY + 0.03, -0.1)]
 for k in range(1, 8):
     t = k / 7
     abd.append(V(0, BY + 0.03 + t * 0.12 + 0.03 * math.sin(t * math.pi), -0.1 - t * 0.8))
-A.plate_segments(b, abd, [(0.12 * (1 - 0.45 * k / 7) * (1.0 + 0.25 * math.sin(math.pi * k / 7)), 0.1 * (1 - 0.4 * k / 7)) for k in range(8)], (0.8, 0.8, 0.8), lambda p: "abdomen", n=14, col2=(0.95, 0.95, 0.95), ridge=0.1, cls=SCALE)
+for k in range(7):
+    wk = 0.13 * (1 - 0.45 * k / 7) * (1.0 + 0.3 * math.sin(math.pi * (k + 0.5) / 7))
+    A.sclerite(b, abd[k] + (abd[k] - abd[k + 1]) * 0.12, abd[k + 1], wk, wk * 0.62, "abdomen", col=0.84, keels=1, ridge=0.18, belly=0.2, blunt=0.4, flare=0.12, seg=18, rings=8)
 for s in (1, -1):
     b.tube([abd[-1], abd[-1] + V(0.03 * s, 0.03, -0.08)], [0.012, 0.002], (0.6, 0.6, 0.6), cls=SCALE, bone="abdomen", tint=1.0, seg=5)
 b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # mesothorax and the long prothorax (the "neck") with a ridged pronotum shield
-b.ellipsoid(V(0, BY + 0.03, 0.02), (0.1, 0.09, 0.16), (0.75, 0.75, 0.75), cls=SCALE, bone="thorax", tint=1.0, seg=16, rings=10)
+A.sclerite(b, V(0, BY + 0.02, -0.14), V(0, BY + 0.05, 0.16), 0.105, 0.09, "thorax", col=0.8, keels=1, ridge=0.15, seg=18, rings=10, blunt=0.5)
 pro = [V(0, BY + 0.06, 0.12), V(0, BY + 0.22, 0.17), V(0, BY + 0.4, 0.24), V(0, BY + 0.6, 0.31)]
-A.plate_segments(b, pro, [(0.06, 0.05), (0.05, 0.045), (0.05, 0.045), (0.055, 0.05)], (0.8, 0.8, 0.8), lambda p: "thorax" if p.y < BY + 0.12 else "neck", n=12, ridge=0.35, cls=SCALE)
+A.sclerite(b, pro[0], pro[1] + (pro[1] - pro[0]) * 0.1, 0.06, 0.05, "thorax", col=0.82, keels=1, ridge=0.3, seg=14, rings=8, blunt=0.5)
+A.sclerite(b, pro[1], pro[3] + (pro[3] - pro[2]) * 0.15, 0.058, 0.05, "neck", col=0.86, keels=1, ridge=0.35, seg=16, rings=12, blunt=0.55, up=(0, 0.3, -1))
 for s in (1, -1):
     b.ribbon([pro[1] + V(0.04 * s, 0, 0), pro[2] + V(0.06 * s, 0, 0.01), pro[3] + V(0.04 * s, 0, 0)], [0.025, 0.035, 0.02], (0, 0, 1), (0.7, 0.7, 0.7), bone="neck", tint=1.0, col_end=(0.9, 0.9, 0.9))
 # head: an inverted triangle with huge compound eyes at the upper corners, three ocelli,
@@ -61,8 +64,8 @@ hc = V(0, BY + 0.68, 0.38)
 
 
 def head_shape(d):
-    p = V(d.x * 0.12, d.y * 0.085, d.z * 0.06)
-    p.x *= 1.0 - 0.6 * smooth(0.0, -1.0, d.y)
+    p = V(d.x * 0.14, d.y * 0.1, d.z * 0.065)
+    p.x *= 1.0 - 0.62 * smooth(0.0, -1.0, d.y)
     return p
 
 
@@ -80,23 +83,22 @@ for s, sd in ((1, "L"), (-1, "R")):
         nm = "leg%d.%s" % (k, sd)
         a0, a1 = V(r.bones[nm + "_a"][0]), V(r.bones[nm + "_a"][1])
         f1 = V(r.bones[nm + "_b"][1])
-        b.tube([a0, a0.lerp(a1, 0.5) + V(0, 0.03, 0), a1], [0.03, 0.028, 0.022], (0.75, 0.75, 0.75), cls=SCALE, bones=[nm + "_a", nm + "_a", {nm + "_a": 0.5, nm + "_b": 0.5}], tint=1.0, seg=8)
-        b.tube([a1, a1.lerp(f1, 0.85), f1 + V(0, 0, 0.04 * (1 if k == 0 else -1))], [0.02, 0.012, 0.006], (0.85, 0.85, 0.85), cls=SCALE, bones=[{nm + "_a": 0.5, nm + "_b": 0.5}, nm + "_b", nm + "_b"], tint=1.0, seg=7)
-        b.ball(a1, 0.026, (0.6, 0.6, 0.6), cls=SCALE, bone=nm + "_b", seg=8, rings=5, tint=1.0)
+        A.sclerite(b, a0, a1, 0.03, 0.028, nm + "_a", col=0.78, keels=2, phase=math.pi / 2, seg=12, rings=8, blunt=0.5)
+        A.sclerite(b, a1 - (f1 - a1) * 0.04, a1.lerp(f1, 0.8), 0.021, 0.02, nm + "_b", col=0.84, seg=10, rings=8, blunt=0.5)
+        A.sclerite(b, a1.lerp(f1, 0.78), f1 + V(0, 0, 0.04 * (1 if k == 0 else -1)), 0.012, 0.012, nm + "_b", col=0.74, seg=8, rings=6, taper=0.4)
     b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # raptorial foreleg: a coxa, a thick spined femur with a groove the tibia folds into, the
     # spined tibia ending in a hook
     ra, rb, rc = r.bones["rap.%s_a" % sd], r.bones["rap.%s_b" % sd], r.bones["rap.%s_c" % sd]
-    b.tube([ra[0], V(ra[0]).lerp(V(ra[1]), 0.5), ra[1]], [0.04, 0.042, 0.038], (0.8, 0.8, 0.8), cls=SCALE, bone="rap.%s_a" % sd, tint=1.0, seg=10)
-    fem = [V(rb[0]), V(rb[0]).lerp(V(rb[1]), 0.3), V(rb[0]).lerp(V(rb[1]), 0.65), V(rb[1])]
-    b.tube(fem, [(0.04, 0.05), (0.05, 0.075), (0.045, 0.065), (0.028, 0.035)], (0.85, 0.85, 0.85), cls=SCALE, bone="rap.%s_b" % sd, tint=1.0, seg=10, up=(1, 0, 0))
+    A.sclerite(b, V(ra[0]), V(ra[1]), 0.042, 0.045, "rap.%s_a" % sd, col=0.82, keels=1, ridge=0.2, seg=14, rings=8, blunt=0.5)
+    A.sclerite(b, V(rb[0]) - (V(rb[1]) - V(rb[0])) * 0.04, V(rb[1]), 0.045, 0.072, "rap.%s_b" % sd, col=0.88, keels=2, ridge=0.18, seg=18, rings=12, blunt=0.55, taper=0.35, up=(1, 0, 0))
     b.ellipsoid(V(rb[0]).lerp(V(rb[1]), 0.45) + V(0.03 * s, 0, 0.0), (0.012, 0.05, 0.03), "f0f0d0", cls=SKIN, bone="rap.%s_b" % sd, seg=8, rings=5)
     for q in range(7):
         p0 = V(rb[0]).lerp(V(rb[1]), 0.1 + q * 0.12)
         ln = 0.05 if q % 2 else 0.035
         b.cone(p0 + V(0, 0, 0.04), 0.009, ln, "f8f0d8", cls=STONE, bone="rap.%s_b" % sd, seg=5, rot=(1.4, 0, 0))
-    tib = [V(rc[0]), V(rc[0]).lerp(V(rc[1]), 0.6), V(rc[1]), V(rc[1]) + V(0, -0.03, 0.04)]
-    b.tube(tib, [(0.025, 0.035), (0.02, 0.026), (0.012, 0.014), (0.003, 0.003)], (0.85, 0.85, 0.85), cls=SCALE, bone="rap.%s_c" % sd, tint=1.0, seg=8)
+    A.sclerite(b, V(rc[0]), V(rc[0]).lerp(V(rc[1]), 0.9), 0.024, 0.034, "rap.%s_c" % sd, col=0.88, keels=2, ridge=0.15, seg=14, rings=10, blunt=0.55, taper=0.4, up=(1, 0, 0))
+    A.horn(b, [V(rc[0]).lerp(V(rc[1]), 0.85), V(rc[1]), V(rc[1]) + V(0, -0.03, 0.04)], 0.013, (0.8, 0.8, 0.8), "3a3020", "rap.%s_c" % sd, r1=0.002, cls=STONE, seg=8, tint=0.7)
     for q in range(5):
         p0 = V(rc[0]).lerp(V(rc[1]), 0.15 + q * 0.17)
         b.cone(p0 + V(0, 0, 0.025), 0.007, 0.03, "f8f0d8", cls=STONE, bone="rap.%s_c" % sd, seg=5, rot=(1.6, 0, 0))

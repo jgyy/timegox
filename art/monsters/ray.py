@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import kit  # noqa: E402
 import creature  # noqa: E402
 from creature import chain_rig, wave_chain, zero_pose  # noqa: E402
-from sculpt import fbm3, smooth  # noqa: E402
+from sculpt import loft, fbm3, smooth  # noqa: E402
 from kit import CRYSTAL, MAT_GLOW, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
 from creature import add  # noqa: E402
 
@@ -43,43 +43,69 @@ def wing_w(p):
     return {"wing1." + sd: 1.0 - k, "wing2." + sd: k}
 
 
-# the body: a grid sheet shaped into a diamond with a domed centre (top tinted, belly pale)
-NX, NZ = 17, 11
-top = []
-bot = []
-for j in range(NZ):
-    z = 0.62 - j * 1.1 / (NZ - 1)
-    half = 1.3 * math.sin(math.pi * min(1.0, (0.62 - z) / 1.1 * 1.05 + 0.02)) ** 0.8 * (1.0 - 0.25 * (0.62 - z))
-    rt = []
-    rb = []
-    for i in range(NX):
-        u = i / (NX - 1) * 2 - 1
-        x = u * half
-        dome = 0.16 * (1 - abs(u)) ** 1.5 * math.sin(math.pi * (j + 0.5) / NZ)
-        sweep = -0.18 * abs(u) ** 2
-        rt.append(V(x, Y + dome + 0.01, z + sweep))
-        rb.append(V(x, Y - dome * 0.5 - 0.01, z + sweep))
-    top.append(rt)
-    bot.append(rb)
-b.sheet(top, (0.75, 0.75, 0.75), cls=SCALE, bone="body", tint=1.0, thickness=0.02)
-b.sheet(bot, "f0f0f0", cls=SCALE, bone="body", thickness=0.01)
-# the sheets were bound to the body; re-bind every vertex across body and wing bones by its span
-for v in b.bm.verts:
-    w = wing_w(kit.b2g(v.co))
-    v[b.dl].clear()
-    for nm, wt in w.items():
-        if wt > 1e-4:
-            v[b.dl][b.gi(nm)] = wt
+# the body: one solid lofted through spanwise sections - a thick, domed disc in the middle
+# thinning out into two great triangular wings with a curved leading edge and pointed, swept-back
+# tips.  The back takes the enemy's colour, darker towards the wing tips with pale shoulder
+# chevrons; the belly is white
+SPAN = 1.34
+
+
+def station(x):
+    """(chord, thickness, leading-edge z, centre-line y) of the wing section at span x."""
+    u = min(1.0, abs(x) / SPAN)
+    chord = 1.12 * (1.0 - u) ** 0.85 + 0.03
+    thick = 0.2 * (1.0 - u) ** 2.2 + 0.014
+    lead = 0.66 - 0.5 * u ** 1.6
+    yc = Y + 0.04 * (1.0 - u) - 0.05 * u ** 2
+    return chord, thick, lead, yc
+
+
+def back_col(q, j, i):
+    if q.y < station(q.x)[3]:
+        return (0.98, 0.98, 0.98)
+    u = min(1.0, abs(q.x) / SPAN)
+    v = 0.8 - 0.22 * u ** 1.5
+    # pale shoulder chevrons either side of the head
+    chev = smooth(0.08, 0.0, abs(abs(q.x) - 0.32 - 0.5 * (0.45 - q.z))) * smooth(0.0, 0.1, q.z) * smooth(0.55, 0.35, q.z)
+    return (min(1.0, v + 0.25 * chev),) * 3
+
+
+def surf_y(x, z, top=True):
+    """Height of the back (or the belly) of the lofted body at (x, z)."""
+    chord, thick, lead, yc = station(x)
+    zc = lead - chord * 0.5
+    ca = max(-1.0, min(1.0, (z - zc) / (chord * 0.5)))
+    sa = math.sqrt(max(0.0, 1.0 - ca * ca))
+    return yc + (1 if top else -1) * sa * thick * 0.5 * (1.0 + 0.25 * ca)
+
+
+rings = []
+NS = 25
+for k in range(NS):
+    x = -SPAN + 2 * SPAN * k / (NS - 1)
+    chord, thick, lead, yc = station(x)
+    zc = lead - chord * 0.5
+    ring = []
+    for i in range(16):
+        a = 2 * math.pi * i / 16
+        # a cambered section, its fullest point a third back from the leading edge
+        zz = math.cos(a) * chord * 0.5
+        yy = math.sin(a) * thick * 0.5 * (1.0 + 0.25 * math.cos(a))
+        ring.append(V(x, yc + yy, zc + zz))
+    rings.append(ring)
+loft(b, rings, (0.8, 0.8, 0.8), cls=SCALE, col_fn=back_col, bone_fn=wing_w, tint_fn=lambda q: 0.0 if q.y < station(q.x)[3] else 1.0, cap0=True, cap1=True, cap_push=0.2)
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # dorsal ridge and gill slits
-b.tube([V(0, Y + 0.17, 0.3), V(0, Y + 0.19, 0.0), V(0, Y + 0.12, -0.45)], [0.05, 0.06, 0.03], (0.6, 0.6, 0.6), cls=SCALE, bone="body", tint=1.0, seg=8)
+b.tube([V(0, surf_y(0, z) - 0.02, z) for z in (0.3, 0.0, -0.3)], [0.04, 0.05, 0.025], (0.6, 0.6, 0.6), cls=SCALE, bone="body", tint=1.0, seg=8)
 for s in (1, -1):
     for k in range(4):
-        b.tube([V((0.12 + k * 0.03) * s, Y - 0.04, 0.3 - k * 0.05), V((0.16 + k * 0.03) * s, Y - 0.04, 0.26 - k * 0.05)], [0.006, 0.006], "6a6a7a", cls=SKIN, bone="body", seg=4)
+        gx, gz = (0.14 + k * 0.03) * s, 0.3 - k * 0.05
+        b.tube([V(gx, surf_y(gx, gz, False) - 0.002, gz), V(gx + 0.04 * s, surf_y(gx + 0.04 * s, gz - 0.04, False) - 0.002, gz - 0.04)], [0.006, 0.006], "6a6a7a", cls=SKIN, bone="body", seg=4)
     sd = "L" if s > 0 else "R"
     cp = r.bones["ceph." + sd]
     b.tube([cp[0], V(cp[0]).lerp(V(cp[1]), 0.5) + V(0.03 * s, 0.03, 0), cp[1]], [(0.05, 0.02), (0.045, 0.018), (0.01, 0.008)], (0.7, 0.7, 0.7), cls=SCALE, bone="ceph." + sd, tint=1.0, seg=8)
-    b.eye(V(0.22 * s, Y + 0.05, 0.4), 0.04, "a0f0ff", side=s, bone="body", rot_y=1.2, h=1.0, glow=True)
+    ex, ez = 0.27 * s, 0.5
+    b.eye(V(ex, station(ex)[3] + 0.02, ez), 0.04, "a0f0ff", side=s, bone="body", rot_y=1.2, h=1.0, glow=True)
 b.ellipsoid(V(0, Y - 0.02, 0.6), (0.14, 0.03, 0.03), "302028", cls=SKIN, bone="body", seg=10, rings=4)
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # whip tail with a sting
@@ -89,7 +115,7 @@ b.tube(tp, [0.05, 0.035, 0.02, 0.006], (0.7, 0.7, 0.7), cls=SCALE, bones=[tail[0
 for v in b.bm.verts:
     p = kit.b2g(v.co)
     c = v[b.cl]
-    if p.y < Y + 0.005 or c[3] < 0.2:
+    if p.y < station(p.x)[3] or c[3] < 0.2:
         continue
     spot = fbm3((p.x * 7.0, 0.0, p.z * 7.0), 2, 5)
     k = 1.0
@@ -97,16 +123,15 @@ for v in b.bm.verts:
         k = 1.35
     elif 0.57 < spot <= 0.62:
         k = 0.7
-    edge = math.hypot(p.x / 1.3, (p.z - 0.0) / 0.7)
-    k *= 1.0 - 0.3 * smooth(0.82, 0.98, edge)
+    k *= 1.0 - 0.25 * smooth(0.6, 0.95, abs(p.x) / SPAN)
     v[b.cl] = (min(1.0, c[0] * k), min(1.0, c[1] * k), min(1.0, c[2] * k), c[3])
 b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # spiracles behind the eyes, a row of tubercles down the back, and a serrated barb on the tail
 for s in (1, -1):
-    b.ellipsoid(V(0.2 * s, Y + 0.07, 0.25), (0.03, 0.012, 0.04), "302028", cls=SKIN, bone="body", seg=8, rings=4)
-    b.ellipsoid(V(0.22 * s, Y + 0.06, 0.4), (0.06, 0.05, 0.06), (0.75, 0.75, 0.75), cls=SCALE, bone="body", tint=1.0, seg=10, rings=6)
+    b.ellipsoid(V(0.2 * s, surf_y(0.2 * s, 0.3), 0.3), (0.03, 0.012, 0.04), "302028", cls=SKIN, bone="body", seg=8, rings=4)
+    b.ellipsoid(V(0.25 * s, station(0.25 * s)[3] + 0.02, 0.5), (0.06, 0.05, 0.06), (0.75, 0.75, 0.75), cls=SCALE, bone="body", tint=1.0, seg=10, rings=6)
 for k in range(7):
-    b.cone(V(0, Y + 0.2 - k * 0.01, 0.2 - k * 0.1), 0.02, 0.05, (0.85, 0.85, 0.85), cls=STONE, bone="body", tint=1.0, seg=6, rot=(-0.4, 0, 0))
+    b.cone(V(0, surf_y(0, 0.2 - k * 0.1) + 0.02, 0.2 - k * 0.1), 0.02, 0.05, (0.85, 0.85, 0.85), cls=STONE, bone="body", tint=1.0, seg=6, rot=(-0.4, 0, 0))
 barb = tp[1].lerp(tp[2], 0.3)
 d = (tp[2] - tp[1]).normalized()
 b.tube([barb, barb + d * 0.18 + V(0, 0.03, 0)], [0.015, 0.002], "e8e0d0", cls=STONE, bone=tail[1], seg=6)
@@ -114,15 +139,14 @@ for k in range(5):
     q = barb + d * (0.03 + k * 0.03) + V(0, 0.01 + 0.004 * k, 0)
     for s in (1, -1):
         b.cone(q + V(0.012 * s, 0, 0), 0.004, 0.02, "e8e0d0", cls=STONE, bone=tail[1], seg=4, rot=(0, 0, -1.4 * s))
-# a faint bioluminescent rim along the wing edges
-for s in (1, -1):
+# a faint bioluminescent rim along the leading edges of the wings
+for s_ in (1, -1):
     edge = []
     for j in range(9):
-        t = j / 8
-        z = 0.5 - t * 1.0
-        half = 1.25 * math.sin(math.pi * min(1.0, (0.62 - z) / 1.1 * 1.05 + 0.02)) ** 0.8 * (1.0 - 0.25 * (0.62 - z))
-        edge.append(V(half * s * 0.98, Y + 0.02, z - 0.18 * 0.96))
-    b.tube(edge, [0.008] * 9, "a0f0ff", cls=CRYSTAL, bones=[wing_w(p) for p in edge], seg=4, mat=MAT_GLOW)
+        x = s_ * (0.3 + 0.98 * j / 8) * SPAN
+        chord, thick, lead, yc = station(x)
+        edge.append(V(x * 0.995, yc + 0.004, lead - 0.004))
+    b.tube(edge, [0.008] * 9, "a0f0ff", cls=CRYSTAL, bones=[wing_w(q) for q in edge], seg=4, mat=MAT_GLOW)
 
 
 T_IDLE = 2.6
