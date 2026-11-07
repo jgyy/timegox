@@ -152,7 +152,7 @@ static func palette(c: Color, elem: String = "", over: Dictionary = {}) -> Array
 	# countershading: paler and less saturated, drifting a third of the way towards cream
 	var to_cream := fposmod(0.11 - h + 0.5, 1.0) - 0.5
 	var under := Color.from_hsv(fposmod(h + to_cream * 0.33, 1.0), s * 0.3, clampf(maxf(v, 0.4) * 0.3 + 0.64, 0.0, 0.97))
-	var mark := Color.from_hsv(fposmod(h + 0.02, 1.0), clampf(s * 0.5 + 0.25, 0.0, 0.85), clampf(v * 0.25, 0.05, 0.26))
+	var mark := Color.from_hsv(fposmod(h + 0.02, 1.0), clampf(s * 0.55 + 0.22, 0.0, 0.85), clampf(v * 0.33, 0.07, 0.3))
 	if v < 0.42:
 		mark = Color.from_hsv(fposmod(h - 0.06, 1.0), s * 0.35, 0.86)
 	var acc := Color("e0b040") if v > 0.45 else Color("70a0ff")

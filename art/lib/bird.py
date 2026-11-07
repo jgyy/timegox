@@ -136,11 +136,17 @@ def build(name="phoenix", style="phoenix"):
             v = 0.86 + 0.06 * (1.0 - scal) - 0.08 * smooth(0.3, 0.9, n.y) + 0.06 * under
             return (v, v, v)
         if style == "bifang":
-            # blue-green, a pale breast and red bars down the neck
+            # blue-green with a pale breast and red markings (the Shan Hai Jing: "red patterns on a
+            # blue-green ground"): bars down the neck and chevrons over the back, painted dark so
+            # the coat pass gives them the palette's markings colour (red, pinned for Bifang)
             v = 0.78 - 0.08 * scal
+            bar = 0.0
             if tag == "neck":
-                bar = smooth(0.7, 0.85, 0.5 + 0.5 * math.cos(info.t * 9.0)) * smooth(0.3, 0.6, n.dot(V(0, 0, 1)) * -1.0 + 0.5)
-                return mix((v, v, v), (0.85, 0.15, 0.1), bar * 0.0)
+                bar = smooth(0.62, 0.8, 0.5 + 0.5 * math.cos(info.t * 9.0))
+            elif tag in ("back", "breast") and n.y > -0.2:
+                ph = (p.z + abs(p.x) * 0.7) * 16.0 / S
+                bar = smooth(0.68, 0.85, 0.5 + 0.5 * math.cos(ph)) * smooth(-0.2, 0.3, n.y)
+            v = v * (1.0 - bar) + 0.3 * bar
             return (v * (1.0 - under) + 0.96 * under,) * 3
         return (v * (1.0 - under) + 0.97 * under,) * 3
 

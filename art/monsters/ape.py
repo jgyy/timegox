@@ -124,6 +124,13 @@ def col(p, info):
     # the silver saddle across the lower back
     saddle = smooth(0.3, 0.7, n.y) * smooth(1.25, 1.1, p.y) * smooth(-0.3, -0.1, p.z) * (1.0 - smooth(0.15, 0.3, p.z))
     v = 0.7 + 0.08 * (g - 0.5) - 0.1 * smooth(0.6, 1.0, n.y) * (1.0 - saddle)
+    # countershading: a dark mantle over the shoulders and the back of the arms, a paler belly,
+    # inner arms and inner legs (the coat pass turns them into markings and underside colours)
+    if tag in ("body", "arm", "belly", "leg"):
+        mantle = smooth(0.35, 0.85, n.y) * (1.0 - saddle) * (1.0 if tag in ("body", "arm") else 0.4)
+        pale = smooth(-0.15, -0.7, n.y) if tag in ("body", "belly") else smooth(0.1, -0.6, n.x * (1.0 if p.x > 0 else -1.0)) * 0.8
+        v = v * (1.0 - 0.5 * mantle)
+        v = v * (1.0 - pale) + 0.93 * pale
     v = v * (1.0 - saddle) + 0.96 * saddle
     return (v, v, v)
 
