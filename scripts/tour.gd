@@ -429,11 +429,23 @@ func _run() -> void:
 		await _gallery("gallery_part8_bosses", [
 			Models.monster("queen", Color("f0d8a0")), Models.monster("warden", Color("3a7ab0")), Models.monster("crowmarshal", Color("3a3040")),
 		], 1.5)
-		# Part IX people (art/characters) and creatures (the sun crow, jade rabbit and Bifang fall back
-		# to procedural stand-ins until their Blender models are exported)
+		# Part IX people and creatures (art/characters, art/monsters)
 		await _gallery("gallery_npcs_part9", [
 			Assets.person("ah_mei"), Assets.person("farmer_tian"), Assets.person("feng_meng"), Assets.person("chang_e"),
 		], 0.9)
+		# the townsfolk: the sect's own people, Qingshi Village and the Dawn Market at Yanggu
+		await _gallery("gallery_townsfolk_sect", [
+			Assets.person("disciple_han"), Assets.person("disciple_mei"), Assets.person("cook_zhou"),
+			Assets.person("sweeper_bai"), Assets.person("gate_wu"), Assets.person("bell_shen"),
+		], 0.8)
+		await _gallery("gallery_townsfolk_village", [
+			Assets.person("farmer_lao"), Assets.person("child_hua"), Assets.person("tofu_sun"),
+			Assets.person("scholar_wang"), Assets.person("carpenter_gu"), Assets.person("herb_lan"),
+		], 0.8)
+		await _gallery("gallery_townsfolk_market", [
+			Assets.person("watchman_zhou"), Assets.person("innkeeper_bao"), Assets.person("tea_seller_pan"), Assets.person("dyer_su"),
+			Assets.person("monk_huiming"), Assets.person("granny_gu"), Assets.person("porter_niu"), Assets.person("little_dou"),
+		], 0.7)
 		await _gallery("gallery_part9", [
 			Models.monster("sun_crow", Color("ff9a20")), Models.monster("jade_rabbit", Color("f4f8f0")), Models.monster("bifang", Color("3a9a8a")),
 			Models.monster("jiangshi", Color("8a9a6a")), Models.monster("phoenix", Color("ff7040")),

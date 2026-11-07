@@ -1,23 +1,98 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to the Star River Crossing, across **one open world** of 34 regions around Azure Cloud Mountain, with 125 bosses, thirteen Heavenly Tribulations and buildings you can walk into.
+Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Sun-Moon Harmony, across **one open world** of 38 regions around Azure Cloud Mountain, with 141 bosses, fourteen Heavenly Tribulations, three towns full of people and buildings you can walk into.
 
-> **Total gameplay duration: about 8 hours 58 minutes** (8:57:35 of game time for the end-to-end bot run, seed 1234). Parts I to VII take 7:46:52; **Part VIII, "The River of Heaven", adds another hour** (1 hour 11 minutes): four new regions on the Silver River and Mount Kunlun, 16 new bosses, 12 new monsters, a new realm (Star River Crossing), five new techniques, four new Blender-built characters and the magpie bridge in the ending. **Every character and monster model was rebuilt** from new anatomy, face, hair, garment and palette libraries, which doubled the Blender Python art code (6,272 to 12,549 lines).
+> **Total gameplay duration: about 10 hours 18 minutes** (10:17:41 of game time for the end-to-end bot run, seed 1234). Parts I to VIII take 8:58:59; **Part IX, "The Tenth Sun", adds another hour** (1 hour 19 minutes): four new regions in the scorched east and on the moon, 16 new bosses, 12 new monsters, a new realm (Sun-Moon Harmony), five new techniques, a market town with eight townsfolk and four new Blender-built leads. **Every character and monster was rebuilt again** (hanfu cut the way it is really cut, cel shading with tinted shadows, richer rigs, eleven character clips and five per monster, monsters sculpted from metaballs with painted coats), **the land lost its rectangles** (curved shorelines, meandering borders, irregular forest edges), and **the towns filled up** (nine new buildings in new styles and twenty new people).
 
 | | |
 |---|---|
-| ![part 8 people](docs/screenshots/gallery_npcs_part8.png) | ![part 8 creatures](docs/screenshots/gallery_part8.png) |
-| ![portraits](docs/screenshots/portrait_heroes.png) | ![ending](docs/screenshots/ending.png) |
-| ![part 8 bosses](docs/screenshots/gallery_part8_bosses.png) | ![palettes](docs/screenshots/gallery_palettes.png) |
-| ![magpie bridge heights](docs/screenshots/vista_magpie.png) | ![jasper pool](docs/screenshots/vista_jasper.png) |
-| ![queen mother](docs/screenshots/battle_boss_xiwangmu.png) | ![star ferry](docs/screenshots/world_starferry.png) |
-| ![beasts](docs/screenshots/gallery_beasts.png) | ![giants](docs/screenshots/gallery_giants.png) |
-| ![open world](docs/screenshots/openworld_sect.png) | ![inside the hall](docs/screenshots/interior_hall.png) |
+| ![Lin Feng turnaround](docs/screenshots/turnaround_lin_feng.png) | ![Yue Ling turnaround](docs/screenshots/turnaround_yue_ling.png) |
+| ![portraits](docs/screenshots/portrait_heroes.png) | ![the run](docs/screenshots/anim_lin_feng_run.png) |
+| ![part 9 creatures](docs/screenshots/gallery_part9.png) | ![beasts](docs/screenshots/gallery_part8.png) |
+| ![sect](docs/screenshots/architecture_sect.png) | ![the marsh](docs/screenshots/vista_marsh.png) |
+| ![townsfolk of the sect](docs/screenshots/gallery_townsfolk_sect.png) | ![townsfolk of the market](docs/screenshots/gallery_townsfolk_market.png) |
+| ![dawn market](docs/screenshots/market_yanggu.png) | ![Fusang tree](docs/screenshots/fusang_tree.png) |
+| ![world map](docs/screenshots/world_map.png) | ![ending](docs/screenshots/ending.png) |
 
-More captures (every region from the ground and from above, every boss, model galleries and portraits) are in [`docs/screenshots`](docs/screenshots).
+More captures (every region from the ground and from above, every boss, model galleries, turnarounds, animation strips and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph R[References studied]
+    RC[anime proportions, Genshin and<br/>Guilty Gear shading, hanfu cut,<br/>hair clumps]
+    RA[walk, run and idle key poses,<br/>quadruped gaits, game rigs]
+    RW[Voronoi and domain-warped maps,<br/>toon water, Hui-style villages]
+    end
+    subgraph CH[Characters]
+    GA[garment.py: sloping shoulders,<br/>pipa sleeves, V-neck,<br/>wrap-around skirt]
+    HA[hair.py: clumps,<br/>curtains of long hair]
+    SH[mat_actor: soft cel ramp,<br/>tinted shadows, coloured ink]
+    RG[37-bone rig, 11 clips:<br/>run, talk, bow, die ...]
+    end
+    subgraph MO[Monsters]
+    CL[clay.py metaball sculpting,<br/>canine, feline, bird]
+    PT[painted coats: stripes,<br/>saddles, masks, scales]
+    IK[IK gaits, 5 clips each,<br/>3 new creatures]
+    end
+    subgraph WO[The land]
+    SHO[curved shorelines,<br/>recessed water]
+    BO[meandering borders,<br/>irregular forest edges]
+    TO[9 new buildings,<br/>20 new townsfolk]
+    end
+    subgraph P[Part IX: +1 hour]
+    YG[Yanggu Dawn Market] --> MF[Scorched Millet Plains] --> FS[Fusang Valley] --> GH[Moon Palace]
+    end
+    RC --> CH
+    RA --> CH
+    RA --> MO
+    RW --> WO
+    CH --> G((Game))
+    MO --> G
+    WO --> G
+    P --> G
+    G --> BOT[bot: 10:17:41,<br/>CI needs 9 h]
+```
+
+- **Characters, rebuilt again: they now look like people in hanfu.** The old figures had square, horizontal shoulders with the sleeves set on like shoulder pads, wide trapezoid "bell" sleeves with black insides, a white stripe of inner robe running from collar to hem like an apron, a turtleneck collar, thin strands of hair round a helmet and neon costumes. Now (`art/lib/garment.py`, `hair.py`, `person.py`):
+  - **The cut of the robe**: narrower, sloping shoulders that run on into the sleeve with no seam (hanfu sleeves are cut in one with the bodice), arms that hang close to the body, a **V at the throat** where the crossed collars meet, and a **wrap-around skirt**, left over right, whose overlap edge carries the collar line down to the hem as one trimmed line.
+  - **Sleeves** swept from the shoulder to the cuff as one surface: narrow seen from the front, deep seen from the side, the **pipa-shaped pocket** (mei) sagging behind the hand and gathered into a trimmed cuff (qu), on its own bone so it swings a beat behind the arm.
+  - **Hair** in big clumps instead of thin strands: long hair falls as one continuous mass cut into pointed clumps at the ends, ponytails are full tails, side locks and fringes are wider; a highlight ring runs across dark hair.
+  - **Proportions** of about 6.6 heads (a slightly larger head reads better at game distance), a thicker neck, softened plant-dye colours, a cape gathered over the shoulders on three bones.
+- **Cel shading for characters and monsters** (`MB.mat_actor`): a soft two-tone ramp on the key light with **tinted shadows** (warm rose on skin, cool lavender on cloth and fur) instead of Godot's hard toon terminator, the ambient light that used to double every colour into neon cut back, a thin rim only on the lit side, toon highlights on metal, crystal and scales, and **coloured ink lines** (dark rose under skin, deep blue under a blue robe) drawn thinner than the scenery's.
+- **Rigs**: every character gains a pocket bone per sleeve, finger and thumb bones, toe bones, a mouth bone for speech, a second hair bone and a third cape bone (26 to 37 bones).
+- **Animation**: eleven clips instead of seven.  **Walk** rebuilt on contact, down, passing and up poses (the arms used to swing *with* the leg on the same side), a **qinggong run** with a flight phase and the cape, sleeves and hair streaming back (the hero crosses a 2 m tile every 0.16 s, so the old walk slid along the ground), **talk** (gestures, nods and a moving mouth), **bow** (the cupped-fist salute), **die** (a collapse that stays down), and idle, sit, attack, cast, hurt and victory redone with anticipation, follow-through and overlapping cloth.
+- **Life in the world**: the hero and Yue Ling run on the road; whoever is speaking in a conversation gestures and moves their mouth; people bow as you walk up; **monster packs amble about their ground** with walk cycles and stop to face you when you come close; a fallen fighter collapses and stays down (party members until they are raised).
+- **The world is no longer made of rectangles.**
+  - **Shorelines** follow a smooth water field (the share of water round each corner, blurred and warped by noise, rounded towards the middle of every water tile) instead of tile corners; shore tiles are subdivided so the waterline curves, lone water tiles become round pools, banks slope down to a recessed waterline, and the foam follows the real depth instead of outlining every square tile in white. Water has teal shallows, deeper blue middles and a quieter sky reflection.
+  - **Region borders meander**: ownership uses a two-scale domain warp, so borders wander like coasts and ridges on the world map and on the ground.
+  - **No more rectangular clearings**: the forest reaches into every region from its edge by a depth that varies with noise, keeping clearings round every gate, arrival, person, boss, pickup, building and monster pack, and reconnecting anything it cuts off with trails that go round buildings.
+  - Regions sit off the grid inside their bands.
+- **More town buildings and people.** New building styles: **Huizhou houses** with white walls, black tiles and stepped horse-head fire walls, **thatched farmhouses**, a **two-storey teahouse** with a gallery, **shops** with awnings and signboards, **dormitories** and a **kitchen** with a smoking chimney. The sect gains a kitchen, a hall of martial practice and the disciples' dormitory; Qingshi Village a teahouse, a tofu shop, a carpentry, a farmhouse, a scholar's study and a granary. **Twelve new people** with their own Blender models and chat: Senior Brother Han, Junior Sister Mei, Auntie Zhou the cook, Little Bai (who sweeps the steps with Lin Feng's old broom), Gate Disciple Wu, Old Shen the bell-ringer, Farmer Lao, Little Hua, Tofu Seller Sun, Scholar Wang, Carpenter Gu and Xiao Lan the herb-picker.
+- **Monsters sculpted, painted and animated** (`art/lib/clay.py`, `anatomy.py`, `canine.py`, `feline.py`, `bird.py`, `creature.py`): bodies are modelled from metaballs (balls, ellipsoids and capsule chains, each carrying smooth bone weights) instead of hundreds of outlined fur cards, with fur as shingled clumps that belong to the silhouette. Heads are built per species (the tiger's broad skull and cheek ruffs, the wolf's long muzzle and stop, the qilin's dragon head with one ridged horn and cloven hooves, the dragon's nine resemblances on an S-curved serpent body), and coats are painted in the grey values so a recolour still reads as an animal: tiger stripes and the king mark, the wolf's dark saddle and mask, the fox's white bib and black stockings, scales and belly plates. Horns, claws and fangs taper and shade from base to tip. Rigs gained spine, neck, jaw, ear, toe and long tail chains; every monster has **idle, walk, attack, hurt and die**, quadrupeds walk in the four-beat lateral sequence with the hips and chest bouncing out of step and the tail following through, insects and crabs walk on IK legs in an alternating tripod. Three new creatures: the **sun crow**, the **jade rabbit** and **Bifang**.
+- **Part IX, "The Tenth Sun"** adds +1 hour (see [below](#part-ix-the-tenth-sun)), verified by the playthrough bot; CI now requires **9 hours**.
+- **Art code** grew from 12,550 to about 17,000 lines of Blender Python, the game's GDScript from 17,359 to about 19,000 lines; 129 assets are rebuilt from their scripts in about seven minutes on four cores (the build now runs in parallel).
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+
+### References
+
+Researched for this release (characters, creatures, rigs, animation, landscape and towns):
+
+- **Stylised characters and faces**: [PoseMyArt anime head guide](https://posemy.art/blog/anime-head-drawing-guide/), [anime proportions step by step](https://www.alibaba.com/product-insights/how-to-draw-anime-characters-with-correct-proportions-step-by-step.html), [80.lv: capturing anime art style in 3D](https://80.lv/articles/cg-jolyne-cujoh-here-s-how-to-capture-anime-art-style-in-3d), [Blender Studio stylised character workflow](https://studio.blender.org/training/stylized-character-workflow/5e70a631db0e8bc0c8b226f2), [3D character body](https://tinakuang.myblog.arts.ac.uk/?p=656).
+- **Toon shading**: [Adrian Mendez, Genshin shading breakdown](https://adrianmendez.artstation.com/projects/wJZ4Gg), [B. J. Ayers, recreating the Genshin shader](https://bjayers.artstation.com/blog/category/5), [URP Simple Genshin Shaders](https://github.com/NoiRC256/URPSimpleGenshinShaders), [80.lv Genshin shader for EEVEE](https://80.lv/articles/genshin-impact-character-shader-for-eevee), [GDC 2015: Guilty Gear Xrd's art style](https://gdcvault.com/play/1022031/GuiltyGearXrd-s-Art-Style-The) ([handout](https://www.ggxrd.com/Motomura_Junya_GuiltyGearXrd.pdf)).
+- **Hanfu**: [Ru (upper garment)](https://en.wikipedia.org/wiki/Ru_(upper_garment)), [newhanfu: basic features and forms](https://www.newhanfu.com/73124.html), [hanfu garment types](https://culturechina.com/blog/what-is-zhiduo-and-other-hanfu-garment-types-explained.html).
+- **Hair**: [BlenderNation: flat-modelling anime hair](https://www.blendernation.com/2020/02/01/flat-modeling-anime-hair/), [80.lv: hairstyle modelling for an anime-like character](https://80.lv/articles/a-closer-look-at-hairstyle-modeling-for-an-anime-like-3d-character), [CG Cookie: modelling hair](https://cgcookie.com/posts/how-to-model-hair-in-blender).
+- **Walks, runs and idles**: [Walk cycle](https://en.wikipedia.org/wiki/Walk_cycle), [UW CSE 459 walk cycle notes](https://courses.cs.washington.edu/courses/cse459/19au/assignments/assignment_5/index.html), [SIGGRAPH walking exercise](https://education.siggraph.org/static/HyperGraph/animation/character_animation/walking/walking_excercise.htm), [AnimSchool: breathing life into idle animations](https://blog.animschool.edu/2024/06/14/breathing-life-into-idle-animations), [idle animation for games](https://mocaponline.com/blogs/mocap-news/idle-animation-design-guide).
+- **Rigs**: [skeleton hierarchy guide](https://mocaponline.com/blogs/mocap-news/skeleton-hierarchy-animation-guide), [demystifying character rigging for games](https://gamedev.net/blogs/entry/2277565-demystifying-character-rigging-for-games/), [CRYENGINE jiggle bones](https://www.cryengine.com/docs/static/engines/cryengine-5/categories/23756816/pages/44959301).
+- **Creatures**: [creating a furry 3D character](https://www.creativebloq.com/how-to/create-a-furry-3d-character-from-scratch), [80.lv: stylised characters for games](https://80.lv/articles/building-stylized-characters-for-games-tips-and-tricks), [digitigrade legs](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [how to draw a tiger](https://chriswilsonstudio.com/how-to-draw-a-tiger/), [Chinese dragon (Loong)](https://www.wikiwand.com/en/articles/Loong), [A Chinese Bestiary (Strassberg)](https://abookofcreatures.com/category/china).
+- **Quadruped gaits**: [Animation Mentor quadruped walk](https://www.animationmentor.com/?p=46186), [animating four-legged beasts](https://gamedeveloper.com/art/animating-four-legged-beasts), [animating dogs: gaits](https://animuppetry.blogspot.com/2013/01/animating-dogs-part-ii-more-gaits-and.html).
+- **Landscape**: [Red Blob Games: polygon map generation](https://www.redblobgames.com/maps/polygon-map-generation/), [Frozen Fractal: continents and domain warping](https://frozenfractal.com/blog/2023/11/2/around-the-world-1-continents/), [stylised water with depth fade](https://godotshaders.com/shader/stylized-water-with-depthfade/), [toon water](https://godotshaders.com/shader/toon-water/).
+- **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
+
+### Previous release: rebuilt models and Part VIII
+
 
 ```mermaid
 flowchart LR
@@ -60,7 +135,7 @@ flowchart LR
 - **Blender Python art code doubled**: 6,272 to 12,549 lines (`art/lib` 5,389, characters 770, monsters 4,704, props 1,489, tools 198).
 - **Bugs found and fixed** (see below).
 
-### References
+#### References for that release
 
 The models were rebuilt after studying how stylised and anatomical 3D characters are made:
 
@@ -69,7 +144,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Previous release: one open world and Part VII
+### Two releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -103,7 +178,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Release before that: natural landscapes and Part VI
+### Three releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -195,7 +270,7 @@ flowchart TD
 
 - `art/lib/kit.py`: the toolkit. Coordinates are written in Godot space; primitives (ellipsoids, superquadrics, swept tubes with per-point bone weights, lathes, double-sided sheets, leaves, eyes), organic bodies from Blender's **Skin + Subdivision modifiers**, **ray-cast ambient occlusion** baked into vertex colours, the **Decimate** modifier for landmark triangle budgets, armatures, clips baked from Python functions and GLB export.
 - `art/lib/person.py` builds every character from options (robe, hair style, hat, weapon, beard, horns, build, age, props, pose, brocade, tinting) with `face.py`, `hair.py`, `garment.py` and `accessory.py`; `sculpt.py` holds the shared modelling tools (lofts through cross-section profiles, noise, splines, strands).
-- `art/lib/anatomy.py` builds animal bodies (quadruped torso and legs, paws, skulls, fur, feathers, scales, plates, bark, leaves); `feline.py` and `bird.py` build the cat and bird families; `art/lib/creature.py` holds the rigs and clip helpers.
+- `art/lib/clay.py` sculpts creature bodies from metaballs (balls, ellipsoids, capsule chains) that carry smooth bone weights and paint tags; `anatomy.py` builds species heads, torsos, legs, paws, hooves, tails, fur clumps, eyes, ears, horns, claws and fangs; `canine.py`, `feline.py` and `bird.py` build the dog, cat and bird families; `art/lib/creature.py` holds the rigs, IK for legs, gait timing, the shared four-legged motion set and the clip helpers.
 - `art/characters/*.py`, `art/monsters/*.py`, `art/props/*.py`: one script per asset, each writing `assets/<group>/<name>.glb`.
 - Vertex colour alpha carries the toon shader's surface class, UV.x a tint weight, UV.y a **palette slot** (0 primary, 0.5 secondary, 1 accent), and the material slot (`toon`, `plain`, `glow`) chooses the game shader; `scripts/assets.gd` swaps the materials in at load time and turns the enemy's colour into a palette, so Blender and procedural models share one look.
 - `python art/check_assets.py` validates every export (pairing with its script, materials, colours and UVs, triangle budgets, bones, clips); CI runs it after the rebuild.
@@ -204,7 +279,7 @@ flowchart TD
 
 ```sh
 pip install bpy==5.2.3                        # Blender as a Python module (or use a Blender install)
-python art/build_all.py                       # rebuild all 102 assets (about 6 min)
+python art/build_all.py                       # rebuild all 129 assets in parallel (about 7 min on 4 cores; ART_JOBS=N)
 python art/check_assets.py                     # validate the exports
 blender --background --python art/monsters/hundun.py   # or one asset with Blender itself
 godot --headless --path . --import            # re-import into Godot
@@ -236,7 +311,7 @@ Other terminal commands:
 ```sh
 godot --headless --path . --script tests/run_tests.gd           # data-integrity and 3D-asset tests
 godot --headless --path . --script tests/manual_input_test.gd   # real keyboard-event smoke test
-godot --headless --fixed-fps 30 --path . -- --bot --min-time=28800   # bot plays the whole game, prints play time
+godot --headless --fixed-fps 30 --path . -- --bot --min-time=32400   # bot plays the whole game, prints play time
 godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-fps for real time) watch the bot
 ```
 
@@ -251,10 +326,10 @@ Walk into NPCs, enemies, pickups and bosses to interact with them. There is no s
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 40 stages across fourteen realms (up to the Star River Crossing); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 43 stages across fifteen realms (up to Sun-Moon Harmony); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Thirty-four regions in one open world**, each with elites, bosses and a hunt objective, joined by roads. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII (new)**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun.
-- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, **Magpie Bridge Sword**, **Silver River Torrent** and **Seventh-Night Reunion Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, **Starweave Net** and **Magpie Wing Ward** (the last three heals also raise a fallen ally).
+- **Thirty-eight regions in one open world**, each with elites, bosses and a hunt objective, joined by roads. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX (new)**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon.
+- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, Magpie Bridge Sword, Silver River Torrent, Seventh-Night Reunion Sword, **Noon-Splitting Sword**, **Fall of the Nine Suns** and **Tenth Arrow Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, Starweave Net, Magpie Wing Ward, **Osmanthus Moon Rain** and **Moon-Dew Ward** (the reviving heals also raise a fallen ally).
 - **Economy**: spirit stones buy pills and tempering for your sword.
 
 ```mermaid
@@ -314,7 +389,15 @@ flowchart LR
     Magpie --> Star[Weaver Star Palace<br/>Heavenly Warden of the River]
     Star --> Jasper[Jasper Pool of Kunlun<br/>Xiwangmu, Queen Mother of the West]
     end
-    Jasper ==> End((Star River Crossing))
+    end
+    subgraph P9[Part IX: about 1h19m]
+    Jasper ==>|Star River Crossing, the sun will not set| Sect8[Sect: noon for nine days]
+    Sect8 -->|the new south road| Yanggu[Yanggu Dawn Market<br/>Hanba, the Drought Fiend]
+    Yanggu --> Millet[Scorched Millet Plains<br/>Bifang, the Fire Crane]
+    Millet --> Fusang[Fusang Valley of Sunrise<br/>Jinwu, the Sun Crow]
+    Fusang --> Guanghan[Guanghan, Palace of the Moon<br/>Xihe, Mother of Suns]
+    end
+    Guanghan ==> End((Sun-Moon Harmony))
 ```
 
 ```mermaid
@@ -375,7 +458,7 @@ New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth
 
 ```mermaid
 flowchart TD
-    D[(data.gd: 31 areas,<br/>gates, NPCs, bosses,<br/>buildings)] --> MG[mapgen.gd<br/>each region's own map]
+    D[(data.gd: 40 areas,<br/>gates, NPCs, bosses,<br/>buildings)] --> MG[mapgen.gd<br/>each region's own map]
     MG --> AT[atlas.gd]
     L[layout: mountain column in the west,<br/>a band of regions per chapter] --> AT
     AT --> G[one world grid 492 x 448]
@@ -399,8 +482,10 @@ flowchart TD
 | Part V | Desert of Fallen Stars, Glowcap Vale, Aurora Steppe, Primordial Chaos | the south-east road |
 | Part VI | Maple Gorge, Stone Forest, Yellow Springs, Wheel of the Six Paths | the south-west funeral road |
 | Part VII | Qingshi Village, Cloud-Tea Terraces, Mulberry Silk Woods, Loom of Borders | the village road at the foot of the mountain |
+| Part VIII | Starfall Ferry, Magpie Bridge Heights, Weaver Star Palace, Jasper Pool of Kunlun | the old Sky Road from the sect's south gate |
+| Part IX | Yanggu Dawn Market, Scorched Millet Plains, Fusang Valley, Guanghan Moon Palace | the new south road |
 
-Each region is still generated from its own seed by `mapgen.gd` (so every boss, NPC and herb keeps its place) and then stamped into the world grid by `atlas.gd`. Ownership of each tile is decided by looking up the region cell under a noise-warped point, so borders wander; where two regions meet the tiles become a forest-and-rock belt (it only ever adds trees, never opens a way through a region's own edge). Roads are carved from gate to gate and on through the belt to each region's arrival point; where a chapter is not open yet, a Lotus Seal entity covers the road where it crosses the region's edge. Finally anything a belt cut off is reconnected by a trail inside its own region. Tests check that every entity can be walked to, that with all seals shut only the sect, the mountain and the bamboo forest can be reached, and that the world is deterministic.
+Each region is still generated from its own seed by `mapgen.gd` (so every boss, NPC and herb keeps its place) and then stamped into the world grid by `atlas.gd`, a little higher or lower in its band so the regions do not sit on a grid. The forest then reaches in from each region's edge by a depth that varies with noise (1.5 to 8.5 tiles), keeping clearings round every gate, arrival, person, boss, pickup, building and monster pack, and anything it cuts off is reconnected by a trail that goes round buildings, so the land you can walk on is no longer a rectangle. Ownership of each tile is decided by looking up the region cell under a point warped at two scales (a few tiles of ripple on meanders of up to eight tiles, fading out at the mountain so its roads stay on it), so borders wander like coasts and ridges, and the land round what matters in a region always belongs to that region; where two regions meet the tiles become a forest-and-rock belt (it only ever adds trees, never opens a way through a region's own edge). Roads are carved from gate to gate and on through the belt to each region's arrival point; where a chapter is not open yet, a Lotus Seal entity covers the road where it crosses the region's edge. Finally anything a belt cut off is reconnected by a trail inside its own region. Tests check that every entity can be walked to, that with all seals shut only the sect, the mountain and the bamboo forest can be reached, and that the world is deterministic.
 
 The 3D view builds a region when the player comes within 46 tiles of it: its tiles are cut out of the world grid (other regions' tiles blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. Far regions are hidden and the furthest dropped. One skirt of hills and a ring of mountains surround the whole world.
 
@@ -440,7 +525,7 @@ sequenceDiagram
     L->>L: Holds the dawn and the dusk at once: Sun-Moon Harmony
 ```
 
-New Blender characters: Ah Mei the lantern-maker (a lit lantern and a carrying pole of unsold ones), Old Farmer Tian (straw hat, hoe, gourd and a sheaf of withered millet), Feng Meng (horn bow and quiver) and Chang'e (cloud brocade, osmanthus sprig, the Jade Rabbit in her arms). The Dawn Market's eight townsfolk borrow earlier models until their own are built. New creature shapes `sun_crow`, `jade_rabbit` and `bifang` fall back to procedural birds and beasts until their Blender models are exported. New region looks: a market town under a white-hot noon with the sun high in the east, cracked yellow drought fields in heat haze (a new cracked-earth ground), a steaming green-gold valley under a blazing dawn round the colossal Fusang tree, and the silver-blue frost and osmanthus of the moon under a western moonlight. The ending adds the sun and the moon in the sky together, taking turns, with Xihe, Chang'e and the nine new stars of the Dipper.
+New Blender characters: Ah Mei the lantern-maker (a lit lantern and a carrying pole of unsold ones), Old Farmer Tian (straw hat, hoe, gourd and a sheaf of withered millet), Feng Meng (horn bow and quiver) and Chang'e (cloud brocade, osmanthus sprig, the Jade Rabbit in her arms). The Dawn Market's eight townsfolk have their own Blender models too (Watchman Zhou with his gong and unlit lantern, Innkeeper Bao, Tea Seller Pan, Dyer Su, Monk Huiming, Granny Gu of the granary, Porter Niu and Little Dou with his drum), and the market's buildings are shop fronts with awnings, a two-storey teahouse, a Huizhou inn and a thatched granary. New Blender creatures: `sun_crow` (Jinwu, three-legged, ringed with sun-fire), `jade_rabbit` (an upright hare with mortar and pestle) and `bifang` (the one-legged fire crane). New region looks: a market town under a white-hot noon with the sun high in the east, cracked yellow drought fields in heat haze (a new cracked-earth ground), a steaming green-gold valley under a blazing dawn round the colossal Fusang tree, and the silver-blue frost and osmanthus of the moon under a western moonlight. The ending adds the sun and the moon in the sky together, taking turns, with Xihe, Chang'e and the nine new stars of the Dipper.
 
 ## Part VIII: The River of Heaven
 
@@ -540,6 +625,21 @@ sequenceDiagram
 New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, Horse-Face and the hopping corpse (jiangshi). New characters: Lantern Monk Jing Kong, Cormorant Fisher Old Yu, Meng Po, Judge Cui Jue, and Lin Feng's parents Lin Shan and Su Wan. New region looks: autumn leaf-litter ground and falling maple leaves, limestone towers above the river, fields of spider lilies under a golden spring, and the blue ghost-fire flagstones of the Ten Courts, with the Naihe Bridge and the great Wheel on the horizon.
 
 ## Bugs found and fixed
+
+| Bug | Fix |
+|---|---|
+| **Every exported clip ran a quarter too slow.** `kit.bake_action` keys a pose every 1/30 s on consecutive frames, but Blender's factory scene runs at 24 frames per second, so a 0.55 s attack lasted 0.69 s and every walk dragged | The scene runs at 30 fps and clips start at 0 s (`kit.reset`, `kit.export`), so loops meet their first frame |
+| **Characters walked like pacing camels**: in the walk clip `thigh.L` and `upper_arm.L` were driven by the same `sin(phase)` with the same sign, so each arm swung forward with the leg on its own side | Arms counter-swing, a few frames behind the legs |
+| **The hero slid along the road**: he crosses a 2 m tile every 0.16 s (12.5 m/s) on a walk cycle of 0.7 s per stride | A run clip with a flight phase for the hero and Yue Ling |
+| **Monsters never moved** in the world: only `idle` was ever played | Packs amble round their spot on walk cycles and turn to face the hero |
+| **Fallen fighters shrank away in half a second** | A death clip that holds its last frame; fallen allies stay on the field until raised |
+| **Every pond was a set of white-rimmed squares**: corners touching water were forced under the surface and the foam marked every corner that touched land, so shorelines were staircases outlined in white | A smooth water field for shore heights, subdivided shore tiles, foam by real depth |
+| **Costumes glowed neon**: ambient light (0.85) plus the sun (1.1) plus a fill light lit every surface at about twice its colour | Actor shading with a reduced ambient term and a key light that keeps a lit surface near its painted colour |
+| A white stripe of inner robe ran **from the collar to the hem like an apron**, and the collar stood up the neck like a turtleneck | A wrap-around skirt with a trimmed overlap edge; a V at the throat |
+| **Part VIII's four guides were drawn as procedural stand-ins**: `_npc_opts` had no entry for them | Each uses its Blender model; any NPC with a Blender model uses it |
+| The bot's ten-hour `max_time` would have stopped a ten-hour game before its end | Twelve hours |
+
+### Bugs fixed in the Part VIII release
 
 | Bug | Fix |
 |---|---|
@@ -663,7 +763,7 @@ flowchart TD
     TER --> ARC[architecture.gd<br/>halls, enterable houses, walls, dwellings]
     TER --> FA[fauna.gd<br/>wildlife]
     W --> MOD[models.gd<br/>procedural people and monsters,<br/>action poses]
-    MOD --> AS[assets.gd<br/>Blender GLBs: 39 people,<br/>37 monsters, 26 props;<br/>palettes from one tint]
+    MOD --> AS[assets.gd<br/>Blender GLBs: 63 people,<br/>40 monsters, 26 props;<br/>palettes from one tint]
     B --> MOD
     B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
@@ -761,7 +861,9 @@ art/lib/kit.py       Blender (bpy) toolkit: geometry, skinning, AO, rigs, clips,
 art/lib/person.py    character builder shared by every person asset
 art/lib/face.py, hair.py, garment.py, accessory.py   heads, hair, clothes, hand props
 art/lib/sculpt.py    lofts, profiles, noise, splines, strands
-art/lib/anatomy.py   animal bodies, legs, heads, fur, feathers, scales; feline.py, bird.py
+art/lib/clay.py      metaball sculpting with bone weights (creature bodies)
+art/lib/anatomy.py   animal heads, bodies, legs, fur, feathers, scales; canine.py, feline.py, bird.py
+art/lib/creature.py  monster rigs, leg IK, gaits and the shared motion clips
 art/check_assets.py  validator for the exported GLBs
 art/characters, art/monsters, art/props   one Blender script per asset
 art/build_all.py     rebuild every asset
