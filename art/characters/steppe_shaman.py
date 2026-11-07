@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/steppe_shaman.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": True, "age": 0.2,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["drum"],
     "robe": "a0c0e0",
     "trim": "f0f8ff",
     "hair": "1a1a2a",

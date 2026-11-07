@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/time_ferryman.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "age": 0.6,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["oar"], "pose": "hold_r", "staff": False,
     "robe": "c8902a", "trim": "f0d890", "inner": "f4e8c8", "sash": "6a4a18", "hair": "3a2a1a", "hair_style": "bun", "eyes": "e0a040",
-    "hat": "straw", "hat_col": "b89a58", "staff": True, "staff_gem": "ffd060", "beard": True, "beard_col": "c8c0b0", "embroidery": "f0d890",
+    "hat": "straw", "hat_col": "b89a58", "staff_gem": "ffd060", "beard": True, "beard_col": "c8c0b0", "embroidery": "f0d890",
 })

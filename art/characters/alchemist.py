@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/alchemist.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "age": 0.5, "beard_len": 0.7,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": [("gourd", {"side": -1}), ("basket", {"fill": "6aaa4a"})], "pose": "hold_l",
     "robe": "6fc08a",
     "trim": "e8f8e0",
     "hair": "2a2a3a",

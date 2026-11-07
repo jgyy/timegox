@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/grave_keeper.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "age": 0.65,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": [("lantern", {"col": "e8e8d0", "glow": "c0ffe0"})], "pose": "hold_l",
     "robe": "5a5a60", "trim": "c8c8c0", "inner": "e8e4dc", "sash": "2a2a30", "hair": "8a8a90", "hair_style": "bun", "eyes": "8a9ab0",
     "hat": "hood", "hat_col": "3a3a42", "staff": True, "staff_gem": "a0f0e0", "beard": True, "beard_col": "a8a8b0", "embroidery": "c8c8c0",
 })

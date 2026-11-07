@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/nomad.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": True, "age": 0.5, "build": 1.02,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": [("gourd", {"col": "8a5a30", "side": 1})],
     "robe": "e8c890",
     "trim": "b05a30",
     "hair": "4a3020",

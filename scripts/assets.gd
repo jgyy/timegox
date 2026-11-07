@@ -44,6 +44,9 @@ const PEOPLE := {
 	"granny_wen": "characters/granny_wen", "innkeeper": "characters/innkeeper", "weaver_liu": "characters/weaver_liu",
 	"tea_master": "characters/tea_master", "can_niang": "characters/can_niang", "apprentice_zhi": "characters/apprentice_zhi",
 	"archivist": "characters/archivist",
+	# Part VIII
+	"niu_lang": "characters/niu_lang", "que_lao": "characters/que_lao", "zhi_nu": "characters/zhi_nu",
+	"dong_shuang": "characters/dong_shuang",
 }
 
 static var _scenes := {}

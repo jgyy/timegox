@@ -19,11 +19,14 @@ hair_style (topknot, long, bun, wild, bald), eyes, fem, age, build, jaw, cheek, 
 lash, glow_eyes, slit_eyes, stern, smile, beard, beard_col, beard_len, cape, ribbon, crown, armor,
 sword, blade, hilt, scabbard, staff, staff_gem, halberd, hat (straw, scholar, hood, fur, qing),
 hat_col, talisman, horns, horn_col, beast_head (ox, horse), head_col, muzzle_col, embroidery,
-jade, pin, collar2, folds, flare, sleeve_w, ahoge, hair_len, tint_cloth, head_scale, scale.
+jade, pin, collar2, folds, flare, sleeve_w, ahoge, hair_len, tint_cloth, head_scale, scale,
+claws, claw_col, claw_len, fangs, tail, beads, badge, bracers, props (accessory.py names), pose
+(hold_l, hold_both, flute, hold_r) and extra (a callable adding custom geometry).
 """
 
 import math
 
+import accessory as acc
 import face as facelib
 import garment as G
 import hair as hairlib
@@ -83,6 +86,10 @@ def build(o):
     sleeve_col = rgb(o.get("sleeve", robe))
     o = dict(o)
     o.setdefault("skin", skin)
+    if o.get("pose") in ("hold_l", "hold_both", "flute"):
+        # a raised forearm turns a wide hanfu sleeve's mouth to the viewer: hold things in
+        # narrower sleeves
+        o.setdefault("sleeve_w", 0.78)
     if "fem" not in o:
         # long hair and no beard reads as a woman unless the script says otherwise
         o["fem"] = o.get("hair_style") == "long" and not o.get("beard", False) and not o.get("stern", False)
@@ -171,6 +178,12 @@ def build(o):
         for s2 in (1, -1):
             tip = facelib.HC + V(0.012 * s2, facelib.MOUTH_Y - 0.004, facelib.RZF * 0.86)
             b.cone(tip, 0.0035, 0.012, "f8f4e8", cls=STONE, bone="head", seg=5, rot=(math.pi, 0, 0))
+    # signature props (art/lib/accessory.py): names, or (name, {kwargs}) pairs
+    for pr in o.get("props", []):
+        name, kw = (pr, {}) if isinstance(pr, str) else pr
+        if name == "star_crown":
+            kw = dict(kw, top=top)
+        getattr(acc, name)(b, **kw)
     if o.get("extra") is not None:
         o["extra"](b, rig, o, tor)
     if o.get("tint_cloth", False):
@@ -509,11 +522,40 @@ def _with_posture(fn, age):
     return clip
 
 
+# holding poses, added on top of every clip so a prop stays in hand (see accessory.py)
+POSES = {
+    # left forearm raised in front of the body: a lantern, a basket, a ledger, a pearl
+    "hold_l": {"upper_arm.L": (-0.35, 0.0, -0.2), "forearm.L": (-1.2, 0.0, 0.0), "hand.L": (0.25, 0.0, 0.0)},
+    # both hands together in front of the chest: a bowl, a teapot
+    "hold_both": {"upper_arm.L": (-0.45, 0.0, -0.32), "forearm.L": (-1.25, 0.0, 0.0), "upper_arm.R": (-0.45, 0.0, 0.32), "forearm.R": (-1.25, 0.0, 0.0)},
+    # a flute at the lips
+    "flute": {"upper_arm.L": (-0.75, 0.0, -0.45), "forearm.L": (-1.9, 0.0, 0.0), "upper_arm.R": (-0.6, 0.0, 0.05), "forearm.R": (-1.75, 0.0, 0.0), "head": (0.06, 0.0, -0.1)},
+    # something tall held upright in the right hand (an oar, a rod over the shoulder)
+    "hold_r": {"upper_arm.R": (-0.2, 0.0, 0.0), "forearm.R": (-0.55, 0.0, 0.0)},
+}
+
+
+def _with_pose(fn, pose):
+    def clip(t):
+        p = fn(t)
+        for nm, (x, y, z) in pose.items():
+            val = p.get(nm, ((0, 0, 0), (0, 0, 0)))
+            rot, loc = val[0], val[1]
+            p[nm] = ((rot[0] + x, rot[1] + y, rot[2] + z), loc) + tuple(val[2:])
+        return p
+
+    return clip
+
+
 def export_person(rel, opts, clips=None):
     b, rig = build(opts)
     clips = clips or CLIPS
     if opts.get("age", 0.0) > 0.5:
         clips = {nm: (secs, _with_posture(fn, opts["age"])) for nm, (secs, fn) in clips.items()}
+    if opts.get("pose") in POSES:
+        pose = POSES[opts["pose"]]
+        # actions free the arms: the pose holds in idle, walk and sit
+        clips = {nm: (secs, _with_pose(fn, pose) if nm in ("idle", "walk", "sit") else fn) for nm, (secs, fn) in clips.items()}
     print("[art] %s: %d triangles" % (rel, b.tri_count()))
     return finish_rigged(b, rig, rel, clips, samples=16, dist=0.22, strength=0.5, floor_y=0.0, floor_k=0.2)
 
