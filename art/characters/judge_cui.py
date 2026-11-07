@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/judge_cui.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "age": 0.45, "build": 1.06, "brow": 1.3,
+    # woven brocade over the robe (garment.MOTIFS)
+    "brocade": "waves", "brocade_col": "b02a2a",
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
     "props": ["brush", ("ledger", {"cover": "6a1a1a"})], "pose": "hold_l",
     "robe": "1e2030", "trim": "b02a2a", "inner": "e8e0d0", "sash": "6a1a1a", "hair": "1a1a20", "hair_style": "bun",

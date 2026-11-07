@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/elder_qing.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": False, "age": 0.85, "beard_len": 1.35, "brow": 1.2, "cheek": 0.8,
+    # woven brocade over the robe (garment.MOTIFS)
+    "brocade": "cranes", "brocade_col": "d8c890",
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
     "props": [("fly_whisk", {"side": 1})],
     "robe": "e8e8ff", "trim": "c8a850", "inner": "fffaf0", "hair": "e8e8f0", "hair_style": "bald",

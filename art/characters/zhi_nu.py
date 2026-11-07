@@ -13,6 +13,8 @@ kit.reset()
 person.export_person("characters/zhi_nu.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": True, "eye_size": 1.36, "jaw": 0.86, "lip": "e07a90", "hair_len": 0.72,
+    # woven brocade over the robe (garment.MOTIFS)
+    "brocade": "cloud", "brocade_col": "c8d0ff",
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
     "props": [("shuttle", {"col": "e8e8ff"}), "star_crown"],
     "robe": "3a4a9a", "trim": "e8ecff", "inner": "f4f6ff", "sash": "c8d0ff", "hair": "14142a", "hair_style": "long",

@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/su_wan.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": True, "eye_size": 1.32,
+    # woven brocade over the robe (garment.MOTIFS)
+    "brocade": "plum", "brocade_col": "f4f0e8",
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
     "props": [("lantern", {"col": "f0f0e0", "glow": "fff0c0"})], "pose": "hold_l",
     "robe": "6aa88a", "trim": "f0f0e0", "inner": "f8f4ec", "sash": "3a6a5a", "hair": "201a24", "hair_style": "long",

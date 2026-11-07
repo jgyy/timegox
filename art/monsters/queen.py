@@ -38,7 +38,7 @@ def leopard(b, rig, o, tor):
 
 person.export_person("monsters/queen.glb", {
     # face and build: an ageless, terrible queen
-    "fem": True, "age": 0.55, "build": 1.05, "brow": 1.2, "eye_size": 1.1, "lip": "a04050", "slit_eyes": True, "glow_eyes": True,
+    "brocade": "waves", "brocade_col": "f0f0f0", "fem": True, "age": 0.55, "build": 1.05, "brow": 1.2, "eye_size": 1.1, "lip": "a04050", "slit_eyes": True, "glow_eyes": True,
     "fangs": True, "claws": True, "claw_col": "e8d8b0", "claw_len": 0.06, "extra": leopard, "props": [("peach_branch", {"wood": "5a3020"})], "pose": "hold_l",
     "robe": "d8d8d8", "trim": "f0e0a0", "inner": "f4f0e8", "sash": "a0a0a0", "pants": "8a8a8a", "boots": "3a3a3a", "sleeve": "c8c8c8",
     "hair": "a8a4b0", "hair_style": "long", "hair_len": 0.7, "eyes": "f0b020", "cape": "c0c0c0", "staff": True, "staff_gem": "ff90b0",

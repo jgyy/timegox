@@ -11,6 +11,8 @@ kit.reset()
 person.export_person("characters/peach_keeper.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": True, "eye_size": 1.34,
+    # woven brocade over the robe (garment.MOTIFS)
+    "brocade": "plum", "brocade_col": "fff0f4",
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
     "props": ["peach_branch"], "pose": "hold_l",
     "robe": "f0a8c0", "trim": "fff0f4", "inner": "fff8fa", "sash": "c05a80", "hair": "3a2028", "hair_style": "long", "pin": "ff90b0",

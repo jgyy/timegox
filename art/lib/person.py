@@ -97,9 +97,18 @@ def build(o):
     tor = G.Torso(o)
     # ---------------- lower body, robe, sash
     G.legs(b, o, pants, boots, trim)
+    robe_start = len(b.bm.verts)
     G.body(b, o, tor, robe, trim, inner, gold)
     lapel_end = G.collar(b, o, tor, robe, trim, inner, gold)
     G.skirt(b, o, tor, robe, trim, inner, gold, lapel_end)
+    if o.get("brocade"):
+        # woven motifs over the robe: "cloud", "waves" (along the hem), "cranes" or "plum"
+        b.bm.verts.ensure_lookup_table()
+        robe_verts = [b.bm.verts[i] for i in range(robe_start, len(b.bm.verts))]
+        motif = o["brocade"]
+        bcol = o.get("brocade_col", lighten(robe, 0.35))
+        G.brocade(b, robe_verts, motif, bcol, base_y=0.17, strength=0.65,
+                  where=(lambda p: p.y < 0.75) if motif == "waves" else None)
     G.sash(b, o, tor, sash_col, gold)
 
     # ---------------- arms

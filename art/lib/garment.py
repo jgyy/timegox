@@ -15,7 +15,7 @@ import math
 
 from mathutils import Vector
 
-from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SKIN, STONE, WOOD, V, darken, lighten, lin, mix, rgb
+from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SKIN, STONE, WOOD, V, b2g, darken, lighten, lin, mix, rgb
 from sculpt import bump, catmull, clamp, fbm3, loft, section, smooth, strand
 
 HIP_Y = 0.92
@@ -949,3 +949,75 @@ def scars(b, f, hc, kind):
             x = (k % 7 - 3) * 0.012 + (0.004 if k >= 7 else 0.0)
             y = NOSE_Y + 0.012 + (k // 7) * 0.008 + 0.004 * math.sin(k * 2.3)
             b.ellipsoid(hc + f.surface(x * 1.4, y) + V(0, 0, 0.001), (0.0018, 0.0016, 0.0008), mix(sk, "a06040", 0.4), cls=SKIN, bone="head", seg=5, rings=3, mat=MAT_PLAIN)
+
+
+# ---------------------------------------------------------------- brocade motifs
+def _motif_cloud(u, v):
+    """Ruyi cloud scrolls: rows of interlocking spirals."""
+    cx = u % 0.18 - 0.09
+    cy = v % 0.16 - 0.08
+    r = math.hypot(cx, cy * 1.3)
+    a = math.atan2(cy, cx)
+    spiral = abs(math.sin(a * 1.0 + r * 70.0))
+    return r < 0.065 and spiral < 0.32
+
+
+def _motif_waves(u, v, top=0.42):
+    """Haishui: the striped 'standing water' band along the hem, with rolling wave crests above
+    it.  `v` is height above the hem."""
+    if v < top * 0.55:
+        return math.sin(u * 120.0 + v * 30.0) > 0.35
+    if v < top:
+        crest = math.sin(u * 22.0) * 0.04 + top * 0.78
+        return abs(v - crest) < 0.012 or abs(v - crest - 0.04 * math.sin(u * 44.0)) < 0.008
+    return False
+
+
+def _motif_cranes(u, v):
+    """Crane roundels: a ring with a crane's spread wings inside, scattered in a lattice."""
+    cx = (u + 0.13 * (int(v / 0.26) % 2)) % 0.26 - 0.13
+    cy = v % 0.26 - 0.13
+    r = math.hypot(cx, cy)
+    ring = abs(r - 0.08) < 0.006
+    wing = r < 0.07 and abs(cy - 0.025 * math.cos(cx * 40.0)) < 0.008
+    body = r < 0.02
+    return ring or wing or body
+
+
+def _motif_plum(u, v):
+    """Plum blossoms: five-petalled flowers dotted over the cloth."""
+    cx = (u + 0.06 * (int(v / 0.12) % 2)) % 0.12 - 0.06
+    cy = v % 0.12 - 0.06
+    r = math.hypot(cx, cy)
+    a = math.atan2(cy, cx)
+    petal = 0.018 + 0.01 * math.cos(a * 5.0)
+    return r < petal
+
+
+MOTIFS = {"cloud": _motif_cloud, "waves": _motif_waves, "cranes": _motif_cranes, "plum": _motif_plum}
+
+
+def brocade(b, verts, motif, col, base_y=0.17, strength=0.7, where=None):
+    """Paint a woven motif in `col` over cloth vertices (u around the body, v up from base_y).
+    Only cloth that the motif covers changes; tint weights are untouched."""
+    fn = MOTIFS[motif]
+    target = rgb(col)
+
+    def paint(p):
+        if where is not None and not where(p):
+            return None
+        # the robe's vertices are a few centimetres apart: motifs are drawn at twice their
+        # nominal size so they survive being sampled per vertex
+        u = (math.atan2(p.x, p.z) + math.pi) * 0.15
+        v = (p.y - base_y) * 0.5
+        if fn(u, v):
+            return target
+        return None
+
+    for vtx in verts:
+        p = b2g(vtx.co)
+        c = paint(p)
+        if c is not None:
+            old = vtx[b.cl]
+            lc = lin(c, CLOTH)
+            vtx[b.cl] = (old[0] + (lc[0] - old[0]) * strength, old[1] + (lc[1] - old[1]) * strength, old[2] + (lc[2] - old[2]) * strength, old[3])
