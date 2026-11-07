@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 39
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing"]
+const MAX_LEVEL := 42
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -51,6 +51,10 @@ const SKILLS := {
 	"magpiebridge": {"n": "Magpie Bridge Sword", "cost": 320, "mult": 31.5, "elem": "wood", "tgt": "one", "lv": 36, "who": 0},
 	"starriver": {"n": "Silver River Torrent", "cost": 280, "mult": 6.6, "elem": "water", "tgt": "all", "lv": 37, "who": 0},
 	"reunion": {"n": "Seventh-Night Reunion Sword", "cost": 350, "mult": 35.0, "elem": "thunder", "tgt": "one", "lv": 38, "who": 0, "after": "s_wv_return"},
+	# ---- Part IX
+	"noonsplit": {"n": "Noon-Splitting Sword", "cost": 370, "mult": 38.5, "elem": "fire", "tgt": "one", "lv": 39, "who": 0},
+	"ninesuns": {"n": "Fall of the Nine Suns", "cost": 310, "mult": 7.4, "elem": "earth", "tgt": "all", "lv": 40, "who": 0},
+	"tentharrow": {"n": "Tenth Arrow Sword", "cost": 400, "mult": 42.5, "elem": "water", "tgt": "one", "lv": 41, "who": 0, "after": "s_fs_return"},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
@@ -64,6 +68,8 @@ const SKILLS := {
 	"homeward": {"n": "Homeward Lantern", "cost": 105, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 34, "who": 1, "revive": true},
 	"starweave": {"n": "Starweave Net", "cost": 95, "mult": 5.3, "elem": "wood", "tgt": "all", "lv": 36, "who": 1},
 	"magpie_wing": {"n": "Magpie Wing Ward", "cost": 115, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 37, "who": 1, "revive": true},
+	"osmanthus_rain": {"n": "Osmanthus Moon Rain", "cost": 105, "mult": 6.0, "elem": "wood", "tgt": "all", "lv": 39, "who": 1},
+	"moon_dew": {"n": "Moon-Dew Ward", "cost": 125, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 40, "who": 1, "revive": true},
 	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
@@ -331,6 +337,35 @@ const ENEMIES := {
 	"blue_birds": {"n": "The Three Blue Birds", "elem": "wood", "weak": "fire", "col": Color("40a0e0"), "shape": "phoenix", "boss": true},
 	"white_ape": {"n": "White Ape of Kunlun", "elem": "earth", "weak": "wood", "col": Color("f4f4f8"), "shape": "ape", "boss": true},
 	"xiwangmu": {"n": "Xiwangmu, Queen Mother of the West", "elem": "earth", "weak": "wood", "col": Color("e8d8a0"), "shape": "queen", "boss": true},
+	# ---- Part IX: The Tenth Sun (sun_crow, jade_rabbit and bifang are Blender shapes of their own)
+	"noon_cur": {"n": "Noon-Mad Cur", "elem": "fire", "weak": "water", "col": Color("c87a3a"), "shape": "beast"},
+	"noon_cicada": {"n": "Long-Noon Cicada", "elem": "wood", "weak": "fire", "col": Color("7a8a3a"), "shape": "moth"},
+	"clay_toad": {"n": "Sunbaked Clay Toad", "elem": "earth", "weak": "wood", "col": Color("b8865a"), "shape": "blob"},
+	"plague_locust": {"n": "Plague Locust", "elem": "wood", "weak": "fire", "col": Color("a8a040"), "shape": "mantis"},
+	"drought_scorpion": {"n": "Cracked-Earth Scorpion", "elem": "earth", "weak": "wood", "col": Color("c8a060"), "shape": "scorpion"},
+	"haze_wisp": {"n": "Heat-Haze Wisp", "elem": "fire", "weak": "water", "col": Color("fff0c0"), "shape": "wisp"},
+	"spring_macaque": {"n": "Hot-Spring Macaque", "elem": "water", "weak": "thunder", "col": Color("c8a090"), "shape": "ape"},
+	"sun_fledgling": {"n": "Sun-Crow Fledgling", "elem": "fire", "weak": "water", "col": Color("f0a028"), "shape": "sun_crow"},
+	"fusang_sprite": {"n": "Fusang Leaf-Sprite", "elem": "wood", "weak": "fire", "col": Color("7ab848"), "shape": "plant"},
+	"frost_hare": {"n": "Frost Hare of the Moon", "elem": "water", "weak": "thunder", "col": Color("e0e8f8"), "shape": "jade_rabbit"},
+	"moon_toad": {"n": "Three-Legged Moon Toad", "elem": "dark", "weak": "fire", "col": Color("8890b0"), "shape": "blob"},
+	"silver_crane": {"n": "Silver Crane of the Long Night", "elem": "thunder", "weak": "earth", "col": Color("d0d8e8"), "shape": "bird"},
+	"mirage_fox": {"n": "Mirage Fox of the Dry Well", "elem": "dark", "weak": "thunder", "col": Color("f0b050"), "shape": "fox", "boss": true},
+	"sundial_golem": {"n": "Golem of the Stopped Sundial", "elem": "earth", "weak": "wood", "col": Color("c8963a"), "shape": "golem", "boss": true},
+	"lantern_dragon": {"n": "The Lantern Dragon Nobody Danced", "elem": "wood", "weak": "fire", "col": Color("e04838"), "shape": "dragon", "boss": true},
+	"hanba": {"n": "Hanba, the Drought Fiend", "elem": "fire", "weak": "water", "col": Color("8a9a6a"), "shape": "jiangshi", "boss": true},
+	"locust_marquis": {"n": "The Locust Marquis", "elem": "wood", "weak": "fire", "col": Color("b0a030"), "shape": "mantis", "boss": true},
+	"dust_devil": {"n": "Dust-Devil of the Dry River", "elem": "earth", "weak": "wood", "col": Color("c08050"), "shape": "storm", "boss": true},
+	"well_tortoise": {"n": "Old Tortoise of the Village Well", "elem": "water", "weak": "earth", "col": Color("6a7a5a"), "shape": "tortoise", "boss": true},
+	"bifang": {"n": "Bifang, the One-Legged Fire Crane", "elem": "fire", "weak": "water", "col": Color("3a9a8a"), "shape": "bifang", "boss": true},
+	"boiled_crab": {"n": "The Crab Who Bathes in Boiling Springs", "elem": "water", "weak": "thunder", "col": Color("e04a2a"), "shape": "crab", "boss": true},
+	"ninth_ember": {"n": "Ember of the Ninth Fallen Sun", "elem": "earth", "weak": "wood", "col": Color("ff8a30"), "shape": "wisp", "boss": true},
+	"sun_moth": {"n": "The Moth Who Flew at the Sun", "elem": "thunder", "weak": "earth", "col": Color("f0d070"), "shape": "moth", "boss": true},
+	"jinwu": {"n": "Jinwu, the Three-Legged Sun Crow", "elem": "fire", "weak": "water", "col": Color("ff9a20"), "shape": "sun_crow", "boss": true},
+	"wu_gang": {"n": "Wu Gang, Woodcutter of the Moon", "elem": "phys", "weak": "thunder", "col": Color("7a8aa8"), "shape": "humanoid", "boss": true},
+	"tiangou": {"n": "Tiangou, the Dog Who Eats the Moon", "elem": "dark", "weak": "fire", "col": Color("2a2a38"), "shape": "beast", "boss": true},
+	"mortar_rabbit": {"n": "The Jade Rabbit of the Mortar", "elem": "earth", "weak": "wood", "col": Color("f4f8f0"), "shape": "jade_rabbit", "boss": true},
+	"xihe": {"n": "Xihe, Mother of the Ten Suns", "elem": "fire", "weak": "water", "col": Color("ff7040"), "shape": "phoenix", "boss": true},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -389,6 +424,7 @@ const AREAS := {
 			{"to": "maple", "pos": Vector2i(1, 22), "dest": Vector2i(4, 28), "open": "s_p6_home"},
 			{"to": "village", "pos": Vector2i(6, 24), "dest": Vector2i(4, 28), "open": "s_p7_home"},
 			{"to": "starferry", "pos": Vector2i(13, 24), "dest": Vector2i(4, 28), "open": "s_p8_home"},
+			{"to": "yanggu", "pos": Vector2i(27, 24), "dest": Vector2i(4, 30), "open": "s_p9_home"},
 		],
 		"npcs": [
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 4), "col": Color("e8e8ff")},
@@ -1044,9 +1080,137 @@ const AREAS := {
 		"pickup_vis": "s_jp_collect",
 		"springs": [Vector2i(48, 30)],
 	},
+	# ---- Part IX: The Tenth Sun
+	# The last market town on the pilgrims' road to the Valley of Sunrise, where it has been noon for nine days.
+	# "lanes" are paved strips laid over the ground before the buildings go up (see MapGen.build);
+	# the townsfolk are visible for the rest of the game from the moment the road to Yanggu opens.
+	"yanggu": {
+		"n": "Yanggu, the Dawn Market", "w": 104, "h": 60, "seed": 351, "theme": "yanggu", "enemies": 22,
+		"pool": [["noon_cur", 39, 39], ["noon_cicada", 39, 39], ["clay_toad", 39, 39]],
+		"portals": [
+			{"to": "sect", "pos": Vector2i(1, 30), "dest": Vector2i(28, 21), "open": ""},
+			{"to": "millet", "pos": Vector2i(102, 25), "dest": Vector2i(4, 24), "open": "s_yg_hanba"},
+		],
+		"npcs": [
+			{"id": "ah_mei", "n": "Ah Mei the Lantern-Maker", "pos": Vector2i(12, 35), "col": Color("e05a4a"), "vis": ["s_yg_intro", ""]},
+			{"id": "watchman_zhou", "n": "Night-Watchman Lao Zhou", "pos": Vector2i(36, 27), "col": Color("5a6a8a"), "vis": ["s_yg_intro", ""]},
+			{"id": "innkeeper_bao", "n": "Innkeeper Bao of the Sleepless Inn", "pos": Vector2i(12, 24), "col": Color("b07a4a"), "vis": ["s_yg_intro", ""]},
+			{"id": "tea_seller_pan", "n": "Old Pan the Tea Seller", "pos": Vector2i(25, 35), "col": Color("5a8a5a"), "vis": ["s_yg_intro", ""]},
+			{"id": "dyer_su", "n": "Madam Su the Dyer", "pos": Vector2i(41, 35), "col": Color("a05a9a"), "vis": ["s_yg_intro", ""]},
+			{"id": "monk_huiming", "n": "Monk Hui Ming of the Sun Shrine", "pos": Vector2i(41, 19), "col": Color("e0a040"), "vis": ["s_yg_intro", ""]},
+			{"id": "granny_gu", "n": "Granny Gu, Keeper of the Granary", "pos": Vector2i(57, 18), "col": Color("8a7a6a"), "vis": ["s_yg_intro", ""]},
+			{"id": "porter_niu", "n": "Big Niu the Porter", "pos": Vector2i(54, 22), "col": Color("8a6a4a"), "vis": ["s_yg_intro", ""]},
+			{"id": "little_dou", "n": "Little Dou", "pos": Vector2i(55, 34), "col": Color("f0a060"), "vis": ["s_yg_intro", ""]},
+		],
+		"bosses": [
+			{"id": "mirage_fox", "pos": Vector2i(61, 49), "lv": 39, "req": 39},
+			{"id": "sundial_golem", "pos": Vector2i(59, 30), "lv": 39, "req": 39},
+			{"id": "lantern_dragon", "pos": Vector2i(12, 47), "lv": 39, "req": 39},
+			{"id": "hanba", "pos": Vector2i(92, 22), "lv": 39, "req": 39},
+		],
+		"pickups": [{"id": "nember1", "item": "noon_ember", "pos": Vector2i(24, 9)}, {"id": "nember2", "item": "noon_ember", "pos": Vector2i(30, 52)}, {"id": "nember3", "item": "noon_ember", "pos": Vector2i(76, 42)}, {"id": "nember4", "item": "noon_ember", "pos": Vector2i(80, 11)}],
+		"pickup_vis": "s_yg_collect",
+		# the main street, the crossroads lane, the market square, the east road and three alleys
+		"lanes": [Rect2i(2, 29, 64, 2), Rect2i(33, 9, 2, 42), Rect2i(52, 24, 14, 13), Rect2i(66, 25, 36, 2), Rect2i(60, 37, 2, 10), Rect2i(41, 24, 2, 5), Rect2i(57, 22, 2, 2)],
+		"buildings": [
+			{"id": "sleepless_inn", "n": "The Sleepless Inn", "style": "inn", "rect": Rect2i(5, 20, 12, 9), "door": Vector2i(10, 28),
+				"props": [["table", Vector2i(8, 23), true], ["stool", Vector2i(7, 23), false], ["table", Vector2i(8, 26), true], ["stool", Vector2i(7, 26), false], ["counter", Vector2i(13, 22), true], ["barrel", Vector2i(15, 21), true], ["barrel", Vector2i(15, 26), false], ["lantern", Vector2i(11, 21), false]]},
+			{"id": "archery_hall", "n": "Hall of the Archer Yi", "style": "hall", "rect": Rect2i(18, 18, 13, 11), "door": Vector2i(24, 28),
+				"props": [["altar", Vector2i(23, 19), true], ["altar", Vector2i(24, 19), true], ["altar", Vector2i(25, 19), true], ["statue", Vector2i(24, 19), false], ["rack", Vector2i(19, 20), true], ["rack", Vector2i(19, 23), true], ["rack", Vector2i(29, 20), true], ["rack", Vector2i(29, 23), true], ["cushion", Vector2i(24, 22), false], ["barrel", Vector2i(20, 26), true], ["barrel", Vector2i(28, 26), true]]},
+			{"id": "sun_shrine", "n": "Shrine of the Morning Sun", "style": "shrine", "rect": Rect2i(36, 15, 11, 9), "door": Vector2i(41, 23),
+				"props": [["altar", Vector2i(40, 16), true], ["altar", Vector2i(41, 16), true], ["altar", Vector2i(42, 16), true], ["statue", Vector2i(41, 16), false], ["cushion", Vector2i(39, 19), false], ["cushion", Vector2i(43, 19), false], ["scroll", Vector2i(37, 18), false], ["scroll", Vector2i(45, 18), false]]},
+			{"id": "granary", "n": "Yanggu Granary", "style": "smithy", "rect": Rect2i(52, 14, 11, 8), "door": Vector2i(57, 21),
+				"props": [["barrel", Vector2i(53, 15), true], ["barrel", Vector2i(55, 15), true], ["barrel", Vector2i(59, 15), true], ["barrel", Vector2i(61, 15), true], ["shelf", Vector2i(53, 19), true], ["cabinet", Vector2i(61, 19), false]]},
+			{"id": "lantern_shop", "n": "Ah Mei's Lantern Shop", "style": "house", "rect": Rect2i(7, 32, 10, 8), "door": Vector2i(12, 32),
+				"props": [["shelf", Vector2i(8, 33), true], ["shelf", Vector2i(8, 36), true], ["counter", Vector2i(14, 34), true], ["lantern", Vector2i(10, 37), false], ["lantern", Vector2i(13, 37), false], ["table", Vector2i(15, 37), true]]},
+			{"id": "crossroads_tea", "n": "Tea House at the Crossroads", "style": "alchemist", "rect": Rect2i(20, 32, 10, 7), "door": Vector2i(25, 32),
+				"props": [["table", Vector2i(22, 34), true], ["stool", Vector2i(21, 34), false], ["table", Vector2i(22, 36), true], ["stool", Vector2i(21, 36), false], ["stove", Vector2i(28, 33), true], ["shelf", Vector2i(28, 36), true], ["lantern", Vector2i(26, 37), false]]},
+			{"id": "dye_shop", "n": "Madam Su's Cloth and Dye Shop", "style": "house", "rect": Rect2i(37, 32, 10, 8), "door": Vector2i(41, 32),
+				"props": [["loom", Vector2i(38, 33), true], ["loom", Vector2i(38, 36), true], ["shelf", Vector2i(45, 33), true], ["cabinet", Vector2i(45, 37), false], ["counter", Vector2i(43, 35), true]]},
+		],
+	},
+	# cracked drought farmland and withered millet along a dry river, a wayside shrine of Hou Ji
+	"millet": {
+		"n": "The Scorched Millet Plains", "w": 100, "h": 52, "seed": 361, "theme": "millet", "enemies": 20,
+		"pool": [["plague_locust", 39, 40], ["drought_scorpion", 39, 40], ["haze_wisp", 39, 40]],
+		"portals": [
+			{"to": "yanggu", "pos": Vector2i(1, 24), "dest": Vector2i(98, 25), "open": ""},
+			{"to": "fusang", "pos": Vector2i(98, 30), "dest": Vector2i(4, 34), "open": "s_mf_bifang"},
+		],
+		"npcs": [{"id": "farmer_tian", "n": "Old Farmer Tian", "pos": Vector2i(15, 21), "col": Color("8a7a4a"), "vis": ["s_mf_intro", ""]}],
+		"bosses": [
+			{"id": "locust_marquis", "pos": Vector2i(34, 10), "lv": 39, "req": 39},
+			{"id": "dust_devil", "pos": Vector2i(46, 43), "lv": 40, "req": 40},
+			{"id": "well_tortoise", "pos": Vector2i(70, 15), "lv": 40, "req": 40},
+			{"id": "bifang", "pos": Vector2i(88, 33), "lv": 40, "req": 40},
+		],
+		"pickups": [{"id": "rstone1", "item": "rain_stone", "pos": Vector2i(20, 42)}, {"id": "rstone2", "item": "rain_stone", "pos": Vector2i(50, 22)}, {"id": "rstone3", "item": "rain_stone", "pos": Vector2i(66, 44)}, {"id": "rstone4", "item": "rain_stone", "pos": Vector2i(84, 8)}],
+		"pickup_vis": "s_mf_collect",
+		# the farm track from the west gate past the shrine, and the dyke road east
+		"lanes": [Rect2i(2, 24, 22, 2), Rect2i(12, 19, 2, 5), Rect2i(56, 30, 42, 2)],
+		"buildings": [
+			{"id": "houji_shrine", "n": "Wayside Shrine of Hou Ji", "style": "shrine", "rect": Rect2i(8, 12, 9, 7), "door": Vector2i(12, 18),
+				"props": [["altar", Vector2i(11, 13), true], ["altar", Vector2i(12, 13), true], ["altar", Vector2i(13, 13), true], ["statue", Vector2i(12, 13), false], ["cushion", Vector2i(12, 15), false], ["herbs", Vector2i(9, 14), false], ["herbs", Vector2i(15, 14), false]]},
+			{"id": "tian_farmhouse", "n": "Old Tian's Farmhouse", "style": "house", "rect": Rect2i(22, 30, 9, 6), "door": Vector2i(26, 30),
+				"props": [["bed", Vector2i(23, 31), true], ["stove", Vector2i(29, 31), true], ["table", Vector2i(25, 33), true], ["barrel", Vector2i(29, 34), false], ["herbs", Vector2i(23, 34), false]]},
+		],
+	},
+	# hot springs and steaming cliffs round the colossal Fusang mulberry, where the sun-crows roost
+	"fusang": {
+		"n": "Fusang, the Valley of Sunrise", "w": 88, "h": 64, "seed": 371, "theme": "fusang", "enemies": 20,
+		"pool": [["spring_macaque", 40, 40], ["sun_fledgling", 40, 40], ["fusang_sprite", 40, 40]],
+		"portals": [
+			{"to": "millet", "pos": Vector2i(1, 34), "dest": Vector2i(94, 30), "open": ""},
+			{"to": "guanghan", "pos": Vector2i(86, 30), "dest": Vector2i(4, 28), "open": "s_fs_jinwu"},
+		],
+		"npcs": [{"id": "feng_meng", "n": "Feng Meng, the Last Apprentice", "pos": Vector2i(15, 30), "col": Color("7a6a5a"), "vis": ["s_fs_intro", ""]}],
+		"bosses": [
+			{"id": "boiled_crab", "pos": Vector2i(36, 16), "lv": 40, "req": 40},
+			{"id": "ninth_ember", "pos": Vector2i(52, 6), "lv": 40, "req": 40},
+			{"id": "sun_moth", "pos": Vector2i(63, 50), "lv": 40, "req": 40},
+			{"id": "jinwu", "pos": Vector2i(59, 36), "lv": 41, "req": 41},
+		],
+		"pickups": [{"id": "sfeather1", "item": "sun_feather", "pos": Vector2i(22, 14)}, {"id": "sfeather2", "item": "sun_feather", "pos": Vector2i(40, 40)}, {"id": "sfeather3", "item": "sun_feather", "pos": Vector2i(58, 26)}, {"id": "sfeather4", "item": "sun_feather", "pos": Vector2i(72, 56)}],
+		"pickup_vis": "s_fs_collect",
+		"springs": [Vector2i(44, 30)],
+		# the pilgrims' path in from the plains
+		"lanes": [Rect2i(2, 34, 16, 2)],
+		# the colossal Fusang mulberry towers over the middle of the valley (Terrain3D.fusang_tree);
+		# "blocks" keeps the ground under its trunk solid
+		"blocks": [Rect2i(49, 38, 7, 6)],
+		"landmark": {"kind": "fusang", "pos": Vector2i(52, 41)},
+		"buildings": [
+			{"id": "archer_hut", "n": "Feng Meng's Hut", "style": "house", "rect": Rect2i(9, 38, 8, 6), "door": Vector2i(13, 38),
+				"props": [["bed", Vector2i(10, 42), true], ["rack", Vector2i(15, 39), true], ["rack", Vector2i(15, 42), true], ["table", Vector2i(10, 39), true], ["lantern", Vector2i(13, 42), false]]},
+		],
+	},
+	# a silver night of frost and osmanthus on the moon, the Palace of Vast Cold at its far end
+	"guanghan": {
+		"n": "Guanghan, the Palace of the Moon", "w": 92, "h": 56, "seed": 381, "theme": "guanghan", "enemies": 20,
+		"pool": [["frost_hare", 41, 41], ["moon_toad", 41, 41], ["silver_crane", 41, 41]],
+		"portals": [
+			{"to": "fusang", "pos": Vector2i(1, 28), "dest": Vector2i(82, 30), "open": ""},
+		],
+		"npcs": [{"id": "chang_e", "n": "Chang'e of the Moon Palace", "pos": Vector2i(13, 23), "col": Color("e8eeff"), "vis": ["s_gh_intro", ""]}],
+		"bosses": [
+			{"id": "wu_gang", "pos": Vector2i(30, 12), "lv": 41, "req": 41},
+			{"id": "tiangou", "pos": Vector2i(42, 46), "lv": 41, "req": 41},
+			{"id": "mortar_rabbit", "pos": Vector2i(64, 20), "lv": 41, "req": 41},
+			{"id": "xihe", "pos": Vector2i(84, 30), "lv": 41, "req": 41},
+		],
+		"pickups": [{"id": "osman1", "item": "osmanthus", "pos": Vector2i(18, 44)}, {"id": "osman2", "item": "osmanthus", "pos": Vector2i(38, 30)}, {"id": "osman3", "item": "osmanthus", "pos": Vector2i(54, 8)}, {"id": "osman4", "item": "osmanthus", "pos": Vector2i(72, 44)}],
+		"pickup_vis": "s_gh_collect",
+		"springs": [Vector2i(50, 32)],
+		# the moonstone causeway up to the palace hall
+		"lanes": [Rect2i(66, 29, 16, 2)],
+		"buildings": [
+			{"id": "change_pavilion", "n": "Pavilion of Vast Cold", "style": "library", "rect": Rect2i(9, 19, 9, 8), "door": Vector2i(13, 26),
+				"props": [["shelf", Vector2i(10, 20), true], ["table", Vector2i(16, 20), true], ["cushion", Vector2i(13, 21), false], ["herbs", Vector2i(10, 24), false], ["lantern", Vector2i(16, 24), false]]},
+		],
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan"]
 
 ## next area to enter when travelling from `from` to `to` (breadth-first over portals)
 static func next_hop(from: String, to: String) -> String:
@@ -1347,6 +1511,41 @@ const STEPS := [
 	{"id": "s_jp_ape", "kind": "kill", "boss": "white_ape", "area": "jasper", "t": "Out-wit the White Ape of Kunlun"},
 	{"id": "s_jp_queen", "kind": "kill", "boss": "xiwangmu", "area": "jasper", "t": "Ask the Queen Mother of the West to lay down her hairpin", "stones": 13000},
 	{"id": "s_break13", "kind": "breakthrough", "to": 39, "t": "Cross the River of Heaven: become a bridge yourself"},
+	# ---- Part IX: The Tenth Sun
+	{"id": "s_p9_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The sun will not set: speak to Elder Qing Xuan", "stones": 13400},
+	{"id": "s_yg_intro", "kind": "talk", "npc": "ah_mei", "area": "yanggu", "t": "Take the new south road down to the Dawn Market at Yanggu and find Ah Mei in her lantern shop"},
+	{"id": "s_yg_collect", "kind": "collect", "item": "noon_ember", "n": 4, "area": "yanggu", "t": "Gather 4 Noon Embers smouldering in and around the market"},
+	{"id": "s_yg_hunt", "kind": "hunt", "area": "yanggu", "n": 64, "t": "Drive the heat-maddened creatures out of the market lanes"},
+	{"id": "s_yg_return", "kind": "talk", "npc": "ah_mei", "area": "yanggu", "t": "Bring the Noon Embers to Ah Mei"},
+	{"id": "s_yg_fox", "kind": "kill", "boss": "mirage_fox", "area": "yanggu", "t": "Shut the Mirage Fox's water stall at the dry well"},
+	{"id": "s_yg_sundial", "kind": "kill", "boss": "sundial_golem", "area": "yanggu", "t": "Calm the Golem of the Stopped Sundial"},
+	{"id": "s_yg_dragon", "kind": "kill", "boss": "lantern_dragon", "area": "yanggu", "t": "Dance the Lantern Dragon nobody danced"},
+	{"id": "s_yg_hanba", "kind": "kill", "boss": "hanba", "area": "yanggu", "t": "Face Hanba, the Drought Fiend, at the east gate", "stones": 13800},
+	{"id": "s_mf_intro", "kind": "talk", "npc": "farmer_tian", "area": "millet", "t": "Follow the east road onto the Scorched Millet Plains and find Old Farmer Tian at the shrine of Hou Ji"},
+	{"id": "s_mf_collect", "kind": "collect", "item": "rain_stone", "n": 4, "area": "millet", "t": "Find 4 Rain-Stones the dust devil scattered across the plain"},
+	{"id": "s_mf_hunt", "kind": "hunt", "area": "millet", "n": 64, "t": "Drive the locusts and drought-beasts off the millet"},
+	{"id": "s_mf_return", "kind": "talk", "npc": "farmer_tian", "area": "millet", "t": "Bring the Rain-Stones to Old Farmer Tian"},
+	{"id": "s_mf_locust", "kind": "kill", "boss": "locust_marquis", "area": "millet", "t": "Scatter the Locust Marquis"},
+	{"id": "s_mf_devil", "kind": "kill", "boss": "dust_devil", "area": "millet", "t": "Stop the Dust-Devil spinning in the dry river"},
+	{"id": "s_mf_tortoise", "kind": "kill", "boss": "well_tortoise", "area": "millet", "t": "Talk the Old Tortoise out of the village well"},
+	{"id": "s_mf_bifang", "kind": "kill", "boss": "bifang", "area": "millet", "t": "Ground Bifang, the One-Legged Fire Crane, on the dyke road", "stones": 14200},
+	{"id": "s_fs_intro", "kind": "talk", "npc": "feng_meng", "area": "fusang", "t": "Climb into Fusang, the Valley of Sunrise, and find the old archer"},
+	{"id": "s_fs_collect", "kind": "collect", "item": "sun_feather", "n": 4, "area": "fusang", "t": "Gather 4 Sun-Feathers fallen from the Fusang tree"},
+	{"id": "s_fs_hunt", "kind": "hunt", "area": "fusang", "n": 62, "t": "Clear the steaming valley of the sun's hangers-on"},
+	{"id": "s_fs_return", "kind": "talk", "npc": "feng_meng", "area": "fusang", "t": "Bring the Sun-Feathers to Feng Meng"},
+	{"id": "s_fs_crab", "kind": "kill", "boss": "boiled_crab", "area": "fusang", "t": "Haul the Crab out of the bathing springs"},
+	{"id": "s_fs_ember", "kind": "kill", "boss": "ninth_ember", "area": "fusang", "t": "Put the Ember of the Ninth Sun back to sleep"},
+	{"id": "s_fs_moth", "kind": "kill", "boss": "sun_moth", "area": "fusang", "t": "Turn back the Moth Who Flew at the Sun"},
+	{"id": "s_fs_jinwu", "kind": "kill", "boss": "jinwu", "area": "fusang", "t": "Climb the Fusang and coax down Jinwu, the Sun Crow", "stones": 14600},
+	{"id": "s_gh_intro", "kind": "talk", "npc": "chang_e", "area": "guanghan", "t": "Walk the sun's road into the night to the Moon Palace and find Chang'e"},
+	{"id": "s_gh_collect", "kind": "collect", "item": "osmanthus", "n": 4, "area": "guanghan", "t": "Gather 4 Moon-Osmanthus blossoms from the frost"},
+	{"id": "s_gh_hunt", "kind": "hunt", "area": "guanghan", "n": 52, "t": "Drive the long night's restless things from the Moon Palace"},
+	{"id": "s_gh_return", "kind": "talk", "npc": "chang_e", "area": "guanghan", "t": "Bring the osmanthus to Chang'e"},
+	{"id": "s_gh_wugang", "kind": "kill", "boss": "wu_gang", "area": "guanghan", "t": "Make Wu Gang put down his axe"},
+	{"id": "s_gh_tiangou", "kind": "kill", "boss": "tiangou", "area": "guanghan", "t": "Chase Tiangou away from the tired moon"},
+	{"id": "s_gh_rabbit", "kind": "kill", "boss": "mortar_rabbit", "area": "guanghan", "t": "Get past the Jade Rabbit and its mortar"},
+	{"id": "s_gh_xihe", "kind": "kill", "boss": "xihe", "area": "guanghan", "t": "Face Xihe, Mother of the Ten Suns, on the Moon's throne", "stones": 15000},
+	{"id": "s_break14", "kind": "breakthrough", "to": 42, "t": "Stand where the sun's road meets the moon's: Sun-Moon Harmony"},
 ]
 
 static func step_index(id: String) -> int:
@@ -1393,6 +1592,11 @@ const ITEMS := {
 	"star_thread": {"n": "Thread of Starlight", "desc": "Quest item"},
 	"kunlun_peach": {"n": "Peach of Kunlun", "desc": "Quest item"},
 	"magpie_badge": {"n": "Magpie Marshal's Badge", "desc": "The Crow Marshal's badge, given back to the magpies"},
+	"noon_ember": {"n": "Noon Ember", "desc": "Quest item"},
+	"rain_stone": {"n": "Rain-Stone", "desc": "Quest item"},
+	"sun_feather": {"n": "Sun-Feather", "desc": "Quest item"},
+	"osmanthus": {"n": "Moon-Osmanthus Blossom", "desc": "Quest item"},
+	"tenth_arrow": {"n": "The Tenth Arrow", "desc": "Taken from Hou Yi's quiver so that one sun would live. Never shot"},
 	"bell": {"n": "Ox-Head's Iron Bell", "desc": "It once rang every soul down the funeral road"},
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
@@ -1400,7 +1604,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge"}
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -1415,6 +1619,19 @@ const CHAT := {
 	"que_lao": ["Ten thousand magpies, wing to wing, and the Weaver walks across our backs. My back remembers every step.", "A bridge is only birds holding on to each other. Never forget that.", "Mind the cliff edge. Cloud is softer than it looks, but not that soft."],
 	"zhi_nu": ["I have woven the dawn every morning for three thousand years. I would like, just once, to watch someone else's.", "A thread is a road for a needle. A road is a thread for a traveller.", "He plays the flute badly. I can hear it from here. I have always been able to."],
 	"dong_shuang": ["The peaches ripen once in three thousand years. Do not touch the ones that are humming.", "My lady drew the river with her hairpin because she was afraid. She has been afraid for a very long time.", "Kunlun is the pillar of the west. Everything up here is older than it looks, especially the tigers."],
+	# ---- Part IX: the Dawn Market and the road to the moon
+	"ah_mei": ["A lantern is a little piece of night you can carry about with you. My mother said that. She never said what to do when there is no night to carry it in.", "The pilgrims used to set out from here at dusk to climb the valley in the dark and watch the sun come up out of the Fusang. From the market you could see their lanterns going away across the plain like a river of little moons.", "Paper, bamboo, a candle and patience. Mostly patience. The candles are melting in their boxes."],
+	"watchman_zhou": ["Third watch, and all is... noon. Still noon. I beat the hours anyway. Somebody has to keep count.", "Forty years I have walked these lanes with my gong and my lantern. Nine days now I have walked them in a straw hat. A watchman without a night is just a man with a gong.", "Dry weather, mind your fires! ...That one, at least, I can still shout with a clear conscience."],
+	"innkeeper_bao": ["Rooms by the night, two strings of cash. Nobody has paid for a night in nine days, on account of there not being one. I charge by the nap now.", "We used to be the Riverside Inn. I had the sign repainted on the fourth day. It seemed more honest.", "Everyone sleeps with a bowl over their face now. I sell the bowls. Business is business."],
+	"tea_seller_pan": ["Hot tea? No? Iced tea, then. I have not got any ice. Hot tea.", "The ice-house keeper came by yesterday and wept into my teapot. Best cup I ever brewed. Bitter, with a long finish.", "In hot weather you drink hot tea, so you sweat, so you cool down. My grandfather swore by it. My grandfather never saw nine days of noon."],
+	"dyer_su": ["Everything I dye fades by the afternoon, and it is always the afternoon. This was crimson on the first day. Now I am calling it sunset pink, for the customers.", "Indigo wants a cool vat and a dark cellar. My cellar is full of the innkeeper's guests.", "Sun-bleached silk, very fashionable this season. The whole season has been one very long day."],
+	"monk_huiming": ["I chant the morning sutra at dawn and the evening sutra at dusk. For nine days I have chanted only the noon sutra. I am getting very good at it.", "The shrine bell rings by itself whenever the sun moves a hand's breadth. It has been silent for nine days. I listen to it anyway.", "Our shrine honours the Morning Sun, the youngest of Xihe's ten children, the one who was spared. The pilgrims say he was always the shy one."],
+	"granny_gu": ["Grain keeps best in the cool and the dark. My granary is the last cool, dark place in Yanggu, and half the market is asleep in it. I charge them in millet.", "Sixty harvests I have kept this granary, and I never once wished for less sun. Be careful what you never once wish for.", "There is a statue of Hou Yi in the Archer's Hall with his bow drawn. The boys climb it, and the girls tell them to get down. That is how Yanggu has always kept time."],
+	"porter_niu": ["I carry the pilgrims' baggage across the plain to the valley road, so they are fresh for the night climb. No nights, no pilgrims. I have been carrying my shadow about for practice. It is very light these days.", "I can carry two sacks of millet on each shoulder. I cannot carry the sun. I did ask.", "The farmers from the plains bring what grain is left to Granny Gu. It is a long walk with a very light load."],
+	"little_dou": ["Mama says I can play until it gets dark. I have been playing for nine days.", "Want to see my shadow? It is under my feet. It lives there now.", "When I grow up I am going to be an archer like Hou Yi and shoot the sun! ...Only a little bit. Just enough so that it goes to bed."],
+	"farmer_tian": ["Plants do not grow in the sun, child. They eat in the sun. They grow in the dark, when nobody is watching. Same as children.", "Every morning I say the same prayer to the Lord of Millet: a little night, please, and a little rain if you have it. Hou Ji was a farmer before he was a god. He knows what I mean.", "Sixty harvests on this plain. Some years too wet, some years too dry. This is the first year it has been too much day."],
+	"feng_meng": ["My master could split a hair at a hundred paces. I could split it at ninety-nine. You would not believe how much that one pace weighed.", "An archer's first lesson is to look where you are shooting. The last lesson is to look at what you are shooting. I only ever learned the first one.", "Do not stand under the Fusang with your mouth open. The sun-crows are messy eaters, and everything they drop is hot."],
+	"chang_e": ["I swallowed the elixir so that a thief would not have it. Everyone tells the story as though I wanted to fly away. Nobody ever asks whether I wanted to come down.", "The rabbit pounds the elixir, Wu Gang chops the tree, and I walk the moon. We have all been doing the same thing for so long that we forgot it was a choice.", "From up here the world looks very small and very lit. I like to find the lanterns. Every lantern is somebody who is not asleep yet."],
 	"granny_wen": ["You still sit like you did at six, all elbows. Eat something.", "I delivered half this valley. I know every one of them by their first cry, and three of them have gone quiet.", "A house is four walls and a door, child. The door is the important part."],
 	"innkeeper": ["Rooms are free for anyone who cuts a thread off my roof. Nobody has taken me up on it yet.", "The tea comes down from the terraces. Or it did, before the hills were sewn up."],
 	"weaver_liu": ["I weave for a living, and I tell you: whoever is sewing those threads is the best weaver who ever lived. And the angriest.", "Warp holds still, weft goes through. A cloth needs both. So does a village."],
@@ -2764,6 +2981,244 @@ const DIALOGUE := {
 		["Narrator", "In the middle of the bridge Niu Lang and Zhi Nu meet, and say nothing at all for a long while. Then he plays his flute, badly, and she laughs, and the sunset that evening is the best anyone has seen in a year."],
 		["Xiwangmu, Queen Mother of the West", "Every night, then. Not just the seventh. I suppose it will be very noisy."],
 		["Narrator", "And on Azure Cloud Mountain the drowned stars rise out of the lotus pond one by one and float home, and Little Wan claps at each of them, and Lin Feng sweeps the steps, and the River of Heaven runs on above it all, full to its banks and no higher, with a bridge across it for anyone who wants to cross."],
+	],
+	# ---- Part IX: The Tenth Sun
+	"recall7": [
+		["Narrator", "The bridge holds. All night the magpies sit on it in their thousands, and all night the sect sits on the roof of the hall to watch them, until Little Wan falls asleep in the Elder's beard. It was, as it turned out, the last sunset for nine days."],
+		["Narrator", "In the morning the sun comes up over the eastern ridges, as it has every morning since there was a mountain. It climbs to the top of the sky. And there it stops."],
+		["Narrator", "On the first day everyone enjoys the long golden afternoon. On the third day nobody can sleep. By the ninth day the lotus pond is steaming, the bamboo has gone yellow at the tips, and the sect's roosters have given up crowing altogether."],
+		["Yue Ling", "Lin Feng, look at the sundial in the courtyard. The shadow has not moved since the morning after the bridge. Nine days, and it has not moved at all."],
+		["Elder Qing Xuan", "To the hall, both of you, and close the shutters behind you. I have been dreading a morning like this for sixty years. I had rather hoped it would wait until I was dead."],
+	],
+	"s_p9_home": [
+		["Elder Qing Xuan", "When the world was young there were ten suns, and they were children. Their mother was Xihe. Every morning she bathed one of them in the hot springs of the Valley of Sunrise, set him in her chariot at the foot of the Fusang tree, and drove him across the sky, singing all the way."],
+		["Elder Qing Xuan", "One child a day, ten days to a week: that is why the old calendars count in tens. Then one morning all ten rose together, to see what would happen. The rivers boiled. The millet burned in the fields."],
+		["Elder Qing Xuan", "The archer Hou Yi climbed a mountain and shot nine of them out of the sky. He would have shot the tenth as well, but someone had taken the tenth arrow out of his quiver while he slept, so one sun was left. After that the Heavenly Court took the reins from Xihe. A clerk of the Court drove the last sun along its road, and another wrote every day down in the Ledger."],
+		["Lin Feng", "And there is no Court any more."],
+		["Elder Qing Xuan", "There has been no Court for two years. Since then the sun has kept to its road out of habit, the way an old cart-horse walks the road home after the carter has died. Nine days ago something frightened it. It climbed as high as it could over the east, and there it has stayed. The east is baking. The west has not seen a dawn in nine days."],
+		["Elder Qing Xuan", "And there is worse. Where the nine suns fell there are embers in the ground, and they are waking. If they rise, it will be the age of ten suns again, and there is no Hou Yi now."],
+		["Lin Feng", "Good. I was not going to shoot anything out of the sky."],
+		["Yue Ling", "And the moon? Who walks the moon, if the Court is gone?"],
+		["Elder Qing Xuan", "The moon has a keeper of its own: Chang'e, who has lived alone in the Moon Palace since before the Court was built. She is walking it round the night side of the world by herself. She will be very tired by now."],
+		["Elder Qing Xuan", "Go east, to the Dawn Market at Yanggu, the last town on the pilgrims' road to the Valley of Sunrise. They live closest to the sun, and they will know first if anything changes. I have opened a new gate on the south road. Take water. Take a hat."],
+	],
+	"s_yg_intro": [
+		["Ah Mei the Lantern-Maker", "Lanterns! Lanterns for the night climb, two coppers, three for five! ...Sorry. Habit. Nobody has bought a lantern in nine days. You cannot sell a lantern at noon."],
+		["Lin Feng", "We have come about the sun."],
+		["Ah Mei the Lantern-Maker", "Everyone in Yanggu has come about the sun. The pilgrims used to buy my lanterns here on their way east, and climb the Valley of Sunrise by night to watch it come up out of the Fusang tree. Now it never comes up, because it never went down."],
+		["Ah Mei the Lantern-Maker", "And now little lumps of fire are turning up all over the market: in the wells, in the cellars, in the middle of the street. Noon Embers, the watchman calls them. They never burn out, and they never set anything else alight. They just lie there glowing, as if they were waiting for something."],
+		["Ah Mei the Lantern-Maker", "Bring me four, and I will hang them in my best paper lanterns where we can look at them properly. Something about them is wrong, and I want to know what."],
+	],
+	"s_yg_return": [
+		["Ah Mei the Lantern-Maker", "Look at them. Four lanterns, four embers, and every one of them leans the same way, like a flame in a draught, and there is no draught in here. East. Up the valley, towards the Fusang tree."],
+		["Ah Mei the Lantern-Maker", "My grandmother said that when the archer shot down the nine suns, they fell all over the east, and the ground kept them warm. I always thought that was why our wells run hot. I never thought they would wake up."],
+		["Yue Ling", "Something is calling them."],
+		["Ah Mei the Lantern-Maker", "Then go and find out what. But mind the market on your way out; it has gone strange in the heat. A fox has opened a stall at the dry well, selling water that is not there. The sundial in the square has torn itself off its plinth. And my festival dragon has come alive in the yard behind the shop, because nobody ever came to dance it."],
+		["Ah Mei the Lantern-Maker", "And at the east gate there is a woman in a green robe, and wherever she stands the wells sink out of sight. The watchman says she is Hanba, the Drought Fiend. I think she looks lonely."],
+	],
+	"pre:mirage_fox": [
+		["Narrator", "By the dry well a fox in a merchant's cap has set up a stall of glittering water jars, and the queue of thirsty townsfolk reaches halfway back to the square. Every jar is full of nothing."],
+		["Mirage Fox of the Dry Well", "Cool water! Clear water! One string of cash a dipper! ...It is hardly my fault if it evaporates on the way to your mouth. It is very hot."],
+		["Lin Feng", "You are selling water that is not there. In a drought."],
+		["Mirage Fox of the Dry Well", "I am selling hope. Hope is the only thing that keeps in this heat."],
+	],
+	"post:mirage_fox": [["Narrator", "The jars shimmer and vanish, and so does the stall, and so, rather to its own surprise, does half of the fox's tail. It sits in the dust looking sheepish and pays everybody back. The coins, at least, were real."]],
+	"pre:sundial_golem": [
+		["Narrator", "In the middle of the market square the great bronze sundial has torn itself off its plinth and stamps round and round, trying to drag its own shadow along by force."],
+		["Golem of the Stopped Sundial", "NOON. NOON. NOON. FOR NINE DAYS IT HAS BEEN NOON. I AM A SUNDIAL. DO YOU KNOW WHAT THAT DOES TO A SUNDIAL?"],
+		["Yue Ling", "It is only trying to do its job."],
+		["Lin Feng", "So are we. Put yourself back on your plinth, and we will go and make your shadow move. I promise."],
+	],
+	"post:sundial_golem": [["Narrator", "The Sundial stops stamping, walks back to its plinth and sets itself down very carefully, facing true north. Its shadow still points straight down at its feet. It waits, the way the whole market is waiting."]],
+	"pre:lantern_dragon": [
+		["Narrator", "In the yard behind Ah Mei's shop the festival dragon, forty paces of red paper on bamboo ribs, has come alive and thrashes among the drying racks, every scale an unlit lantern."],
+		["The Lantern Dragon Nobody Danced", "I WAS MADE FOR THE LANTERN FESTIVAL! A hundred dancers under my belly! Drums! Firecrackers! Children on their fathers' shoulders! ...WHERE IS THE NIGHT? I was promised a night!"],
+		["Lin Feng", "Then we will just have to dance you in the daylight."],
+	],
+	"post:lantern_dragon": [
+		["Narrator", "The Lantern Dragon sags into a heap of paper and ribs, puffing smoke from its nostrils. Ah Mei comes out of the shop and pats its great painted head."],
+		["Ah Mei the Lantern-Maker", "When the night comes back you will go first down the main street, with every candle lit. I built you, and I promise."],
+	],
+	"pre:hanba": [
+		["Narrator", "At the east gate stands a stiff, dry figure in a dust-green robe and a tasselled hat, arms held out before her as if to keep the world at a distance. A faded paper talisman flutters on her brow, and the ground round her feet has cracked into tiles."],
+		["Hanba, the Drought Fiend", "Do not come any closer. Everybody says that to me, so I say it first. I was a daughter of the Yellow Emperor once. When the Rain Master drowned my father's army, I dried the storm out of the sky and won his war for him. After that I could never go home. Wherever I walk, the rain stops."],
+		["Hanba, the Drought Fiend", "For five thousand years they have beaten drums at me and pinned talismans on me and cried 'Go north, Goddess, go north!' Then the sun stopped, and the heat called me here the way a hearth calls a cat. For the first time in five thousand years I am not the worst thing in the sky."],
+		["Lin Feng", "You are drying up the market's wells."],
+		["Hanba, the Drought Fiend", "I know. I cannot help it. Can you?"],
+	],
+	"post:hanba": [
+		["Narrator", "Hanba sinks down against the gatepost, and for a moment the air around her is only warm. Lin Feng unhooks his water gourd and holds it out. She looks at it for a long time before she takes it."],
+		["Hanba, the Drought Fiend", "Nobody has ever given me water. They usually throw it."],
+		["Ah Mei the Lantern-Maker", "She can sit in my shop until it gets dark. Paper does not mind the dry. Go on, Sovereign: the east road crosses the millet plains, and the plains have been burning longest."],
+	],
+	"s_mf_intro": [
+		["Old Farmer Tian", "If you have come to buy millet, you are nine days late and a harvest early. Sit, sit, there is a little shade on the shrine step. I have nearly finished praying."],
+		["Old Farmer Tian", "Every morning I ask the Lord of Millet for the same thing. Hou Ji taught the first farmer which end of the seed goes in the ground; he knows what a field needs. A little night, please, Lord. And a little rain, if you have any to spare."],
+		["Lin Feng", "Night? Not rain first?"],
+		["Old Farmer Tian", "Plants do not grow in the sun, child. They eat in the sun. They grow in the dark. Dew comes at night. Rain clouds gather in the cool of the evening. No night, no dew; no dew, no rain; no rain, no growing. And look at it all."],
+		["Old Farmer Tian", "In the old shrine of the Rain Master by the river there used to be four rain-stones. Set them at the four corners of a field and the clouds come. A dust devil got into the riverbed and scattered them all over the plain. Find me four, and we will see what a little cloud can do."],
+	],
+	"s_mf_return": [
+		["Old Farmer Tian", "Four stones. One at each corner of the field: there, and there, and there, and... there. Now look up. Look! A cloud. A real cloud, the first in nine days."],
+		["Narrator", "A small grey cloud gathers over Old Tian's field, hangs there for a while, thinks about it, and gives up. Not one drop falls."],
+		["Old Farmer Tian", "Ah. The air is too hot to let go of its water. Rain wants an evening, the way I said. The stones were never the trouble. The sky is."],
+		["Old Farmer Tian", "And you will not get east while the plain is like this. The locusts have crowned themselves a Marquis. The dust devil is still spinning in the dry river like a dog chasing its tail. The old tortoise in the village well has dug in and snaps at every bucket. And on the dyke road..."],
+		["Yue Ling", "Something with one leg?"],
+		["Old Farmer Tian", "Bifang. The fire crane. Wherever it puts its one foot down, a fire starts. When Bifang appears, the old books say, there will be fires in the towns. Well. It is a little late for an omen."],
+	],
+	"pre:locust_marquis": [
+		["Narrator", "Over the withered millet a swarm of locusts hangs in the air in the shape of a man on a throne. At its heart sits a locust the size of a horse, wearing a crown of chewed stalks."],
+		["The Locust Marquis", "We are the Marquis of Ten Thousand Mouths. The millet withered, and we came. That is not cruelty, Sovereign. That is lunch."],
+		["Lin Feng", "Then lunch is over."],
+	],
+	"post:locust_marquis": [["Narrator", "The Marquis comes apart into ten thousand ordinary locusts, which seem embarrassed to be seen together and fly off in ten thousand different directions."]],
+	"pre:dust_devil": [
+		["Narrator", "In the cracked bed of what used to be the river, a whirlwind of red dust spins and spins and never moves on, sucking up everything it touches."],
+		["Dust-Devil of the Dry River", "Round and round and round! The river left! It left without me! I was the wind that rippled it every evening, and it dried up and left me spinning in its bed!"],
+		["Yue Ling", "It misses the water."],
+		["Lin Feng", "Then hold still for a moment, and we will go and bring the water back."],
+	],
+	"post:dust_devil": [["Narrator", "The Dust-Devil falls with a long, soft sigh, and the red dust settles along the riverbed in the exact shape of the river that used to run there, every bend and every eddy, waiting."]],
+	"pre:well_tortoise": [
+		["Narrator", "At the bottom of the village well, where the last of the water has turned to warm mud, an old tortoise with moss on its shell has dug itself in and snaps at every bucket that comes down."],
+		["Old Tortoise of the Village Well", "Mine. The last mud on the whole plain. I was in this well before there was a village, and I will be in it after the village is gone, if they would only stop taking my mud."],
+		["Lin Feng", "If you dig down instead of in, grandfather, I think you will find a good deal more than mud."],
+		["Old Tortoise of the Village Well", "Down? ...Nobody ever said down."],
+	],
+	"post:well_tortoise": [["Narrator", "Grumbling, the Old Tortoise begins to dig down, and down, and down. There is a long silence. Then the well coughs, gurgles and fills to the brim with cold, clear water from somewhere very deep, and the village cheers so loudly that a locust falls out of the sky."]],
+	"pre:bifang": [
+		["Narrator", "On the dyke road a great crane with blue-green plumage, red markings and a white beak hops from field to field on a single leg. Wherever its foot comes down, the millet bursts into flame."],
+		["Bifang, the One-Legged Fire Crane", "Kraa! I am the omen of fire! Wherever I appear, fire follows! ...It used to be very impressive. Now there is fire everywhere already, and nobody even looks up."],
+		["Lin Feng", "You are making it worse."],
+		["Bifang, the One-Legged Fire Crane", "An omen does not make anything. An omen announces it. ...All right. I make it a little worse."],
+	],
+	"post:bifang": [
+		["Narrator", "Bifang lands on its one leg, wobbles, and for the first time in a thousand years stands on bare earth without setting it alight. It stares down at its foot in astonishment."],
+		["Old Farmer Tian", "There, you see? Even an omen can rest. East now, child. The dyke road climbs into the Valley of Sunrise. If there is a reason for all this, it is up there with the tree."],
+	],
+	"s_fs_intro": [
+		["Feng Meng, the Last Apprentice", "Stop there. Hands where I can see them. ...A sword, not a bow. Good. I have seen enough bows pointed at that tree."],
+		["Lin Feng", "You are an archer."],
+		["Feng Meng, the Last Apprentice", "I was the second-best archer under heaven. The best was my master, Hou Yi, who stood on that ridge and shot nine suns out of the sky. I was there. I carried his quiver. I counted the arrows."],
+		["Feng Meng, the Last Apprentice", "That is the Fusang behind me: a mulberry so tall that the sun used to rest in its crown before it set out each morning. The sun-crows still roost in it, the little ones that ride the sun, and their feathers have been falling all week, hot enough to light the grass."],
+		["Feng Meng, the Last Apprentice", "Gather four of them for me. A fallen feather tells an archer which way a bird means to fly."],
+	],
+	"s_fs_return": [
+		["Feng Meng, the Last Apprentice", "Four feathers, and not one of them points west. The sun is not stuck. It is afraid. The last time it flew with its brothers, an archer shot nine of them down in front of it. Now it waits at the top of the sky, where no arrow can reach."],
+		["Feng Meng, the Last Apprentice", "I know that kind of waiting. You will have heard what I did. When the whole world is grateful to a man, it is very hard to be his second-best. One evening I took a club of peach wood, and I made sure I never would be again. Four thousand years I have carried that, and it has not got any lighter."],
+		["Yue Ling", "Why are you telling us?"],
+		["Feng Meng, the Last Apprentice", "Because you are going up that tree, and everyone who climbs it carries a bow. Take this instead: the tenth arrow, the one Emperor Yao took from my master's quiver in the night so that one sun would be left. I stole it from Yao's tomb. I thought that one day I would finish what my master began. I am done thinking that."],
+		["Feng Meng, the Last Apprentice", "And take the one thing my master tried to teach me that I never had the patience for. You draw the sword like a bow. You hold it like a promise. You never loose it in anger."],
+		["Narrator", "Lin Feng learns the Tenth Arrow Sword."],
+	],
+	"pre:boiled_crab": [
+		["Narrator", "In the hottest of the bathing springs, where Xihe once washed her children before their journeys, an enormous crab sits up to its eyestalks in boiling water. It is bright red, and perfectly content."],
+		["The Crab Who Bathes in Boiling Springs", "Ahhh. Nine days of the finest bath of my life. Join me? No? Then go away. You are standing in my sun."],
+		["Yue Ling", "Lin Feng... I think it has been cooked."],
+		["Lin Feng", "I think it likes it. Come out of there, friend. The pilgrims need these springs."],
+	],
+	"post:boiled_crab": [["Narrator", "Hauled out at last, the Crab sits steaming on the rocks and very slowly turns from red back to its ordinary green. It does not look at anyone. It is a little ashamed of how much it enjoyed itself."]],
+	"pre:ninth_ember": [
+		["Narrator", "On the cliff above the springs the ground has split open, and something is climbing out of it: a coal the size of a house, white-hot at the heart, the ember of one of the nine suns that Hou Yi shot down."],
+		["Ember of the Ninth Fallen Sun", "Mother is singing. Can you hear her? Nine of us asleep in the ground all these years, and now she is singing us up into the sky again."],
+		["Lin Feng", "If all ten of you rise, the rivers will boil."],
+		["Ember of the Ninth Fallen Sun", "We did not mind, the first time."],
+	],
+	"post:ninth_ember": [["Narrator", "The Ember dims from white to orange to a sleepy red, sinks back into its crack in the cliff, and the rock closes over it like a blanket. Far underground, eight other fires are still muttering in their sleep."]],
+	"pre:sun_moth": [
+		["Narrator", "Round the lower branches of the Fusang a moth with wings as wide as a temple roof beats itself against the light, scorched and glittering, trying to fly up to the sun."],
+		["The Moth Who Flew at the Sun", "So bright! It has been so bright for so long! For nine days I have flown at it, and it never comes any closer, and it never goes away!"],
+		["Yue Ling", "Lin Feng, its wings are burning. It cannot stop."],
+		["Lin Feng", "Then we will stop it for a while. Long enough for it to see that there are other lights."],
+	],
+	"post:sun_moth": [["Narrator", "The great Moth folds its singed wings and settles on a root in the shade of the Fusang, and for the first time in nine days it looks at something that is not the sun: a hot spring, glittering, with the steam rising off it in the light. It seems to find that very interesting indeed."]],
+	"pre:jinwu": [
+		["Narrator", "At the crown of the Fusang the topmost branch touches the top of the sky, and there the sun hangs, caught in the leaves like a kite in a tree. On the branch beside it clings a crow with three legs and feathers of beaten gold, too bright to look at."],
+		["Jinwu, the Three-Legged Sun Crow", "Kaa! Another one! Another one from the archer's valley! I will not come down, and I will not go west. West is where they fall!"],
+		["Narrator", "Lin Feng lays the tenth arrow on the branch between them, and steps back from it."],
+		["Jinwu, the Three-Legged Sun Crow", "...That is the tenth arrow. That arrow was meant for me."],
+		["Lin Feng", "It was never shot. Nobody is going to shoot it."],
+		["Jinwu, the Three-Legged Sun Crow", "Then why are you holding a sword?"],
+		["Lin Feng", "Habit. Come on, then. Let us shake the fear out of you first, and then we can talk."],
+	],
+	"post:jinwu": [
+		["Narrator", "The Sun Crow tumbles onto the branch, panting sparks, and dwindles until it is no bigger than a rooster. A very bright rooster. With one of its three feet it pushes the tenth arrow back across the branch to Lin Feng."],
+		["Jinwu, the Three-Legged Sun Crow", "Keep it. It is the only arrow in the world that ever spared anybody. ...When the Court fell I kept to the road by myself, the way they taught me. Then, nine days ago, I heard my mother singing for the first time in four thousand years. She was not singing to me. She was singing my brothers up out of the ground."],
+		["Jinwu, the Three-Legged Sun Crow", "If all ten of us are in the sky, the archer comes back. Everybody knows that. So I flew as high as I could, where no arrow reaches, and I have been waiting for somebody to tell me it is safe. She is in the west, in the night. She has gone to the Moon Palace to ask the moon-lady for the dark, so that there will be room in the sky for all ten of us again."],
+		["Narrator", "From far below, at the foot of the tree, an old voice calls up."],
+		["Feng Meng, the Last Apprentice", "Then the west is where you are needed, Sovereign. Walk the sun's road across the top of the sky; the moon's road begins where it ends. And if you see her, the lady of the moon... tell her Feng Meng is sorry. Tell her I should never have come for the elixir."],
+	],
+	"s_gh_intro": [
+		["Chang'e of the Moon Palace", "Please do not shout. Sound carries terribly up here, and the rabbit has only just fallen asleep."],
+		["Lin Feng", "You are Chang'e."],
+		["Chang'e of the Moon Palace", "I am. And you have walked the sun's road across the top of the sky into the night. Nobody has done that since... well. Since Xihe came, nine days ago."],
+		["Chang'e of the Moon Palace", "She is in my palace now, on my throne. She wants the night. She says that if I stop walking the moon round the sky there will be room for all ten of her children again, and she will never again have to watch one of them fall. I have told her no nine times, once each night, and each night it is harder to walk."],
+		["Chang'e of the Moon Palace", "I have walked the moon round by myself for four thousand years. Now I can barely lift it. The osmanthus up here blooms with a dew that gives back strength, but Wu Gang has been felling the trees in a temper and the blossoms lie scattered over the frost. Gather four for me, and I can walk one more night."],
+	],
+	"s_gh_return": [
+		["Chang'e of the Moon Palace", "Moon-dew, from all four. Thank you. I can feel my feet again."],
+		["Lin Feng", "Before we go on: Feng Meng asked me to tell you something. He is sorry. He says he should never have come for the elixir."],
+		["Chang'e of the Moon Palace", "...Four thousand years. I used to lie awake up here imagining him climbing the sky with that club, and imagining what I would say to him."],
+		["Chang'e of the Moon Palace", "Tell him... no. I will tell him myself, some night when the moon hangs low over the valley. Tell him to look up."],
+		["Chang'e of the Moon Palace", "Now. Xihe is not wicked, Sovereign. She is a mother who watched nine of her children fall out of the sky in a single morning. I would have done anything too. But she cannot have the night."],
+		["Chang'e of the Moon Palace", "Before you reach her: Wu Gang has stopped chopping the tree and started chopping everything else. Tiangou, the Heavenly Dog, has smelt how tired the moon is and keeps trying to swallow it. And my rabbit has been pounding elixir for nine days without sleep to keep me on my feet. He will think you have come to steal it. Everyone from the archer's valley has, once."],
+	],
+	"pre:wu_gang": [
+		["Narrator", "Among the stumps of the osmanthus grove a woodcutter with a great axe is hacking at everything in reach: the trees, the frost, the palace railings, the silver stones of the moon itself."],
+		["Wu Gang, Woodcutter of the Moon", "Three thousand years! Every cut I made in that tree healed over before I could lift the axe again! The Court said: chop until it falls. It never fell. Now the Court is gone and nobody says stop, so I cannot stop!"],
+		["Lin Feng", "I sweep the steps of my sect every morning. They never stay clean. I do not sweep them because they will stay clean."],
+		["Wu Gang, Woodcutter of the Moon", "Then why?"],
+		["Lin Feng", "Because I like the sound the broom makes. Put the axe down, and I will show you what I mean."],
+	],
+	"post:wu_gang": [["Narrator", "The axe drops into the frost. Wu Gang sits down on a stump and looks at his hands, which have not been empty in three thousand years. After a while he picks up a fallen branch, snaps it in two for kindling, and stops. It seems to surprise him very much."]],
+	"pre:tiangou": [
+		["Narrator", "A black dog the size of a hill pads across the frost with its eyes on the moon. Every few steps it opens its jaws and takes a bite out of the sky, and the moonlight dims."],
+		["Tiangou, the Dog Who Eats the Moon", "Woof. The moon is tired. Tired things are easy to catch. Every dog knows that."],
+		["Yue Ling", "Bad dog."],
+		["Lin Feng", "Very bad dog."],
+	],
+	"post:tiangou": [["Narrator", "Far below, in a thousand villages, people are banging pots and pans to frighten the Heavenly Dog off the moon, the way they always have. Up here, Tiangou rolls onto its back in the frost, lets Yue Ling scratch its belly, and burps up a mouthful of moonlight. The moon brightens a little. The dog looks extremely pleased with itself."]],
+	"pre:mortar_rabbit": [
+		["Narrator", "Under the last standing osmanthus a white rabbit stands on its hind legs over a mortar of green jade, pounding so fast that the pestle is a blur. Its eyes are very red, and not only because it is a rabbit."],
+		["The Jade Rabbit of the Mortar", "THIEF! You came up from the archer's valley, I can smell the bowstring on you! The last one who came from there wanted the elixir too!"],
+		["Lin Feng", "We only want to help her."],
+		["The Jade Rabbit of the Mortar", "That is exactly what he said! Nine days I have pounded! Nine days! I will pound you too!"],
+	],
+	"post:mortar_rabbit": [
+		["Narrator", "The Jade Rabbit sits down in the frost with the pestle still in its paws, blinks twice, and falls asleep sitting up. Chang'e lifts it into her arms."],
+		["Chang'e of the Moon Palace", "Nine days, you silly thing. Nobody asked you to. ...Thank you."],
+	],
+	"pre:xihe": [
+		["Narrator", "In the hall of the Moon Palace, where the frost lies thickest, a woman in robes the colour of dawn sits on Chang'e's throne. Her hair is white-gold, her eyes are red from weeping, and the hall is so hot that the frost runs down the pillars like tears."],
+		["Xihe, Mother of the Ten Suns", "I know who you are. You are the one who goes about the world asking everybody to let go of things. I let go of nine children in a single morning. Do you know what it is to hear them fall?"],
+		["Lin Feng", "No."],
+		["Xihe, Mother of the Ten Suns", "No. And now I can have them back. Their embers are waking. Give me the night, and all ten of my children will be in the sky together again, and I will never have to count them."],
+		["Narrator", "Lin Feng holds up the tenth arrow."],
+		["Lin Feng", "This was meant for your youngest. Somebody took it out of the quiver so that he would live. He is at the top of the sky now, too frightened to move, waiting for his mother to come and fetch him."],
+		["Xihe, Mother of the Ten Suns", "...Then I will fetch him when the whole sky is mine. Out of my way, Sovereign."],
+		["Narrator", "Xihe rises from the throne and spreads her sleeves, and the light of ten suns pours out of them as wings. The Mother of the Ten Suns is herself the first sun-crow, from whom all the others hatched."],
+	],
+	"post:xihe": [
+		["Narrator", "Xihe folds her burning wings and is a woman again, sitting on the steps of the throne. The heat goes out of the hall in one long breath. When she speaks, it is very quietly."],
+		["Xihe, Mother of the Ten Suns", "He is waiting for me?"],
+		["Chang'e of the Moon Palace", "He has been waiting for nine days. So have I. There is room in the sky for both of us, Xihe. There always was. We only ever needed to take turns."],
+		["Xihe, Mother of the Ten Suns", "And my nine?"],
+		["Yue Ling", "The old books say the Dipper has seven stars that anyone can see and two that nobody can, as if the sky had been keeping places for somebody. Let your nine rise at night, where they cannot burn anything: nine stars turning round the pole."],
+		["Lin Feng", "And let them count the days, since the Court will not. Every night they will turn a little further round the sky, and everyone below will know what season it is. And you will be able to see them every single night."],
+		["Xihe, Mother of the Ten Suns", "...Nine stars, counting the days. They were always very good at counting. They used to count the clouds the whole way across the sky."],
+		["Chang'e of the Moon Palace", "Then it is agreed. Not decreed this time: agreed. The sun by day, the moon by night, and nine stars to count them both."],
+	],
+	"pre:s_break14": [
+		["Narrator", "At the edge of the Moon Palace, where the sun's road meets the moon's, the last tribulation gathers. It is not a storm this time but a dawn and a dusk at once: gold on one side of the sky, silver on the other, and Lin Feng standing where they meet."],
+		["Lin Feng", "Yue Ling. Which way do I face?"],
+		["Yue Ling", "Both. I think that is the whole point."],
+	],
+	"post:s_break14": [
+		["Narrator", "The tribulation falls as light from both sides at once, and Lin Feng holds it, the way a day holds a morning and an evening. He becomes the first cultivator of Sun-Moon Harmony: a realm in which nothing has to win."],
+		["Narrator", "In the east Xihe climbs into her chariot at the foot of the Fusang, her youngest son clambers in beside her, and she sings to him the whole way across the sky. That evening, for the first time in nine days, the sun goes down."],
+		["Chang'e of the Moon Palace", "My turn."],
+		["Narrator", "The moon rises full over the world, and round the pole nine new stars rise in the shape of a ladle and begin, very carefully, to count. In Yanggu Ah Mei sells every lantern she owns, and the Lantern Dragon goes first down the main street. On the ridge above the Fusang, Feng Meng looks up at the moon for a long time, and the moon looks back."],
+		["Narrator", "And on Azure Cloud Mountain the sundial's shadow moves again, the lotus pond stops steaming, Little Wan falls asleep at a reasonable hour for the first time in nine days, and Lin Feng sweeps the steps in the cool of the evening, and stops when they are clean enough."],
 	],
 	# ---- Part V: The Falling Sky
 	"recall3": [

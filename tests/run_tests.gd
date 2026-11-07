@@ -262,7 +262,7 @@ func _init() -> void:
 		Arch.house(b0, gb, rb, rg, Rect2(r.position.x * 2.0, r.position.y * 2.0, r.size.x * 2.0, r.size.y * 2.0), Vector3((bd.door.x + 0.5) * 2.0, 0, (bd.door.y + 0.5) * 2.0), bd.style, [], 1)
 		check(not b0.is_empty() and not rb.is_empty(), "%s: builds walls and a separate roof" % bd.n)
 	check(n_bld >= 10, "at least 10 enterable buildings (%d)" % n_bld)
-	for npc in ["elder", "alchemist", "smith", "granny_wen"]:
+	for npc in ["elder", "alchemist", "smith", "granny_wen", "ah_mei", "innkeeper_bao", "tea_seller_pan", "dyer_su", "monk_huiming", "granny_gu", "chang_e"]:
 		var ne = null
 		for e3 in wd.ents:
 			if e3.get("id", "") == npc:
@@ -276,7 +276,7 @@ func _init() -> void:
 	check(Data.known_skills(0, 34).has("threadfall") and Data.known_skills(1, 34).has("homeward"), "Part VII techniques are learnable")
 	check(not Data.known_skills(0, 35, Data.step_index("s_sk_return")).has("boundless"), "Boundless Heart Sword waits for Can Niang's cocoons")
 	print("== part VIII ==")
-	check(Data.REALMS[Data.REALMS.size() - 1] == "Star River Crossing" and Data.MAX_LEVEL == 39, "Part VIII adds the Star River Crossing realm")
+	check(Data.REALMS.has("Star River Crossing") and Data.level_name(39).ends_with("Star River Crossing"), "Part VIII adds the Star River Crossing realm")
 	check(Data.DIALOGUE.has("recall6") and Data.step_index("s_break12") < Data.step_index("s_p8_home"), "Part VIII starts after the Boundless Heart breakthrough")
 	check(Data.AREAS.sect.portals.any(func(p): return p.to == "starferry" and p.open == "s_p8_home"), "the sect's south road to the Starfall Ferry opens after the Part VIII briefing")
 	for a8 in ["starferry", "magpie", "starpalace", "jasper"]:
@@ -290,6 +290,47 @@ func _init() -> void:
 	check(Data.known_skills(0, 38, Data.step_index("s_wv_moth")).has("reunion"), "Reunion Sword is learned from Zhi Nu")
 	check(Data.BOSS_DROPS.get("crow_marshal", "") == "magpie_badge", "the Crow Marshal gives up his badge")
 	check(Data.SKILLS.rebirth.get("revive", false) and Data.SKILLS.homeward.get("revive", false), "the Lotus of Rebirth and the Homeward Lantern raise fallen allies")
+	print("== part IX ==")
+	var p9 := ["yanggu", "millet", "fusang", "guanghan"]
+	check(Data.REALMS[Data.REALMS.size() - 1] == "Sun-Moon Harmony" and Data.MAX_LEVEL == 42, "Part IX adds the Sun-Moon Harmony realm")
+	check(Data.DIALOGUE.has("recall7") and Data.step_index("s_break13") < Data.step_index("s_p9_home"), "Part IX starts after the Star River Crossing")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break14", "the Star River Crossing no longer ends the game: Sun-Moon Harmony does")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "yanggu" and p.open == "s_p9_home" and p.pos == Vector2i(27, 24)), "the sect's new south gate to the Dawn Market opens after the Part IX briefing")
+	var sect9 := MapGen.build("sect")
+	check(sect9.grid[23 * sect9.w + 27] == MapGen.PATH and sect9.grid[22 * sect9.w + 27] == MapGen.PATH, "a road runs from the south-east road to the Dawn Market gate")
+	var lay9 := Atlas.layout()
+	var sizes9 := {}
+	var guides9 := {}
+	for a9 in p9:
+		check(Look.THEMES.has(a9) and Look.EXTRA.has(a9) and Scatter.ECO.has(a9) and Fauna.KINDS.has(a9) and MapGen.DENSITY.has(a9) and Arch.SETTLE.has(a9), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a9)
+		check(lay9.has(a9) and int(lay9[a9].row) == int(lay9.starferry.row) + 1, a9 + " lies in its own band south of the River of Heaven")
+		sizes9[Vector2i(Data.AREAS[a9].w, Data.AREAS[a9].h)] = true
+		guides9[Data.AREAS[a9].npcs[0].pos] = true
+		var bpos9 := {}
+		for b9 in Data.AREAS[a9].bosses:
+			bpos9[b9.pos] = true
+		check(not bpos9.has(Vector2i(30, 40)) and not bpos9.has(Vector2i(86, 28)), a9 + ": bosses do not stand where every Part VIII boss stood")
+	check(sizes9.size() == 4 and guides9.size() == 4, "the four Part IX regions each have their own size and guide position")
+	check(Data.AREAS.yanggu.get("buildings", []).size() >= 6 and not Data.AREAS.yanggu.get("lanes", []).is_empty(), "Yanggu is a market town: lanes and at least six enterable buildings")
+	var folk9 := 0
+	for n9 in Data.AREAS.yanggu.npcs:
+		check(Data.CHAT.has(n9.id) and Data.CHAT[n9.id].size() >= 3, "%s has at least three things to say" % n9.id)
+		check(n9.get("vis", ["", ""])[0] == "s_yg_intro" and n9.get("vis", ["", ""])[1] == "", "%s stays in the market for the rest of the game once its road opens" % n9.id)
+		if n9.id != "ah_mei":
+			folk9 += 1
+	check(folk9 >= 6 and folk9 <= 8, "six to eight townsfolk in the Dawn Market (%d)" % folk9)
+	for sh9 in ["sun_crow", "jade_rabbit", "bifang"]:
+		check(UI.SHAPES.has(sh9) and Models.FALLBACK.has(sh9), "Part IX shape %s has a procedural stand-in until its Blender model is exported" % sh9)
+		var m9 := Models.monster(sh9, Color("ffc030"), true)
+		check(m9.get_child_count() > 0, "a %s builds (Blender or stand-in)" % sh9)
+		m9.free()
+	for np9 in ["ah_mei", "farmer_tian", "feng_meng", "chang_e"]:
+		check(Assets.PEOPLE.has(np9) and Assets.has(Assets.PEOPLE[np9]), "Part IX character %s is Blender-built" % np9)
+	check(Data.known_skills(0, 39).has("noonsplit") and Data.known_skills(0, 40).has("ninesuns") and Data.known_skills(1, 39).has("osmanthus_rain") and Data.known_skills(1, 40).has("moon_dew"), "Part IX techniques are learnable")
+	check(not Data.known_skills(0, 41, Data.step_index("s_fs_return")).has("tentharrow"), "Tenth Arrow Sword waits for Feng Meng's feathers")
+	check(Data.known_skills(0, 41, Data.step_index("s_fs_crab")).has("tentharrow"), "Tenth Arrow Sword is learned from Feng Meng")
+	check(Data.SKILLS.moon_dew.get("revive", false), "the Moon-Dew Ward raises fallen allies")
+	check(Data.BOSS_DROPS.get("jinwu", "") == "tenth_arrow", "the Sun Crow gives back the tenth arrow that Lin Feng later shows Xihe")
 	print("== story ==")
 	for st in Data.STEPS:
 		if st.kind == "collect":

@@ -52,6 +52,9 @@ const PEOPLE := {
 	# Part VIII
 	"niu_lang": "characters/niu_lang", "que_lao": "characters/que_lao", "zhi_nu": "characters/zhi_nu",
 	"dong_shuang": "characters/dong_shuang",
+	# Part IX
+	"ah_mei": "characters/ah_mei", "farmer_tian": "characters/farmer_tian", "feng_meng": "characters/feng_meng",
+	"chang_e": "characters/chang_e",
 }
 
 static var _scenes := {}

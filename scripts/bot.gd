@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 10.0 * 3600.0
+var max_time := 12.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -45,7 +45,7 @@ var time_by_area := {}
 var gave_up := ""
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-const HEALS := ["magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
+const HEALS := ["moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
 
 func _ready() -> void:
 	world = main.world

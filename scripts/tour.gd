@@ -6,7 +6,7 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder"}
 
 func _stop(id: String) -> Array:
 	## [first quest step set in this area, a sensible player level]
@@ -205,6 +205,28 @@ func _run() -> void:
 			main.world._snap_cam()
 			await _wait(0.8)
 			await _shot("interior_village")
+		if id == "yanggu":
+			# the Dawn Market from above its main street, and Ah Mei among her lanterns indoors
+			var mo := Atlas.to_world("yanggu", Vector2i(30, 30))
+			var mp := Terrain3D.world_pos(mo)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, mp + Vector3(-6.0, 22.0, 26.0)).looking_at(mp + Vector3(14.0, 0.0, -6.0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("market_yanggu")
+			main.world.cam_override = null
+			main.world.teleport(Atlas.to_world("yanggu", Vector2i(12, 37)))
+			main.world.facing = Vector2i(0, -1)
+			main.world.cam_q = 0
+			main.world._snap_cam()
+			await _wait(0.8)
+			await _shot("interior_yanggu")
+		if id == "fusang":
+			# the colossal Fusang across the valley, the stuck sun glowing in its crown
+			var fo := Terrain3D.world_pos(Atlas.to_world("fusang", Data.AREAS.fusang.landmark.pos))
+			fo.y = main.world.ground_y(fo)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, fo + Vector3(-58.0, 16.0, 40.0)).looking_at(fo + Vector3(0.0, 32.0, 0.0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("fusang_tree")
+			main.world.cam_override = null
 		if id == "sect" or main.args.has("world-only"):
 			continue
 		# a regular battle with this region's monster pool
@@ -302,6 +324,15 @@ func _run() -> void:
 		await _gallery("gallery_part8_bosses", [
 			Models.monster("queen", Color("f0d8a0")), Models.monster("warden", Color("3a7ab0")), Models.monster("crowmarshal", Color("3a3040")),
 		], 1.5)
+		# Part IX people (art/characters) and creatures (the sun crow, jade rabbit and Bifang fall back
+		# to procedural stand-ins until their Blender models are exported)
+		await _gallery("gallery_npcs_part9", [
+			Assets.person("ah_mei"), Assets.person("farmer_tian"), Assets.person("feng_meng"), Assets.person("chang_e"),
+		], 0.9)
+		await _gallery("gallery_part9", [
+			Models.monster("sun_crow", Color("ff9a20")), Models.monster("jade_rabbit", Color("f4f8f0")), Models.monster("bifang", Color("3a9a8a")),
+			Models.monster("jiangshi", Color("8a9a6a")), Models.monster("phoenix", Color("ff7040")),
+		], 1.7)
 		# one shape, three enemies: the palette (Assets.palette) turns a single tint into a scheme
 		await _gallery("gallery_palettes", [
 			Models.monster("beast", Color("3a9a5a")), Models.monster("beast", Color("d04a2a")), Models.monster("beast", Color("8a8aa0")),

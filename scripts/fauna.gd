@@ -46,6 +46,10 @@ const KINDS := {
 	"magpie": [["birds", 4], ["cranes", 2]],
 	"starpalace": [["butterflies", 2], ["moths", 3]],
 	"jasper": [["cranes", 3], ["butterflies", 3], ["birds", 1]],
+	"yanggu": [["birds", 2], ["dragonflies", 1]],
+	"millet": [["birds", 1], ["butterflies", 1]],
+	"fusang": [["birds", 4], ["cranes", 1], ["fish", 2], ["dragonflies", 2]],
+	"guanghan": [["moths", 3], ["cranes", 1]],
 }
 
 const FLAP := """
