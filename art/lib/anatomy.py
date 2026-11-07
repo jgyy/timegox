@@ -24,7 +24,7 @@ import random
 from mathutils import Matrix
 
 from kit import b2g, g2b
-from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SCALE, SKIN, STONE, V, darken, lighten, mix, rgb
+from kit import CLOTH, CRYSTAL, FOLIAGE, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SCALE, SKIN, STONE, WOOD, V, darken, lighten, mix, rgb
 from sculpt import blob3, catmull, clamp, fbm3, loft, morph_sphere, prof_egg, scatter, section, smooth, strand
 
 GREY = (0.82, 0.82, 0.82)
@@ -619,3 +619,79 @@ def glow_seam(b, pts, r, col, bone, tint=1.0):
             out.append(q)
     out.append(pts[-1])
     b.tube(out, [r] * len(out), col, cls=CRYSTAL, bone=bone, seg=5, mat=MAT_GLOW, tint=tint)
+
+
+# ---------------------------------------------------------------- plants
+def bark_limb(b, pts, radii, col, bone_fn, seed=1, ridges=9, twist=1.2, tint=1.0, n=16):
+    """A woody limb: a loft whose surface is ploughed into fibrous ridges that twist around it,
+    with dark fissures between them and lighter, worn ridge tops."""
+    pts = [V(p) for p in pts]
+    m = len(pts)
+    rings = []
+    along = 0.0
+    alongs = []
+    for i in range(m):
+        if i:
+            along += (pts[i] - pts[i - 1]).length
+        alongs.append(along)
+        d = (pts[min(m - 1, i + 1)] - pts[max(0, i - 1)]).normalized()
+        rr = radii[i]
+        tw = twist * along
+
+        def prof(a, rr=rr, tw=tw, i=i):
+            ridge = 0.5 + 0.5 * math.sin(a * ridges + tw)
+            k = fbm3((math.cos(a) * 2 + seed, i * 0.7, math.sin(a) * 2), 2, seed)
+            return rr * (1.0 + 0.09 * ridge + 0.06 * (k - 0.5))
+
+        rings.append(section(pts[i], d, prof, n, up=V(0, 0, 1)))
+
+    def colf(p, j, i):
+        a = 2 * math.pi * i / n
+        ridge = 0.5 + 0.5 * math.sin(a * ridges + twist * alongs[j])
+        v = (0.45 + 0.35 * ridge) * (0.9 + 0.2 * fbm3((p.x * 8, p.y * 8, p.z * 8), 2, seed + 4))
+        return mix(col, darken(col, 0.6), 1.0 - v)
+
+    return loft(b, rings, col, cls=WOOD, col_fn=colf, bone_fn=bone_fn, tint=tint, cap0=True, cap1=True, cap_push=0.4)
+
+
+def veined_leaf(b, root, tip, width, col, bone, side=None, tint=1.0, serrate=0.0, curl=0.15, col_tip=None, vein_col=None):
+    """A broad leaf with a pale midrib and paired side veins, optionally serrated."""
+    root = V(root)
+    tip = V(tip)
+    d = tip - root
+    if side is None:
+        side = d.cross(V(0, 1, 0))
+        side = side.normalized() if side.length > 1e-4 else V(1, 0, 0)
+    side = V(side).normalized()
+    nrm = d.cross(side).normalized()
+    rows = []
+    cols = []
+    n = 8
+    for j in range(n):
+        t = j / (n - 1)
+        w = width * math.sin(math.pi * min(1.0, t * 1.08 + 0.03)) * (1.0 - 0.35 * t)
+        if serrate > 0.0 and 0 < j < n - 1:
+            w *= 1.0 + serrate * (1 if j % 2 else -1)
+        cen = root + d * t + nrm * (math.sin(math.pi * t) * curl * d.length)
+        rows.append([cen - side * w + nrm * w * 0.15, cen, cen + side * w + nrm * w * 0.15])
+        cols.append(mix(col, col_tip, t) if col_tip is not None else rgb(col))
+    b.sheet(rows, col, cls=FOLIAGE, bone=bone, cols=cols, tint=tint)
+    vc = vein_col or lighten(col, 0.35)
+    b.tube([root, root + d * 0.5 + nrm * curl * d.length * 0.9, tip], [width * 0.06, width * 0.04, 0.001], vc, cls=FOLIAGE, bone=bone, seg=4, tint=tint, mat=MAT_PLAIN)
+    for k in range(1, 4):
+        t = k / 4
+        c = root + d * t + nrm * (math.sin(math.pi * t) * curl * d.length + 0.003)
+        w = width * math.sin(math.pi * t) * (1.0 - 0.35 * t) * 0.75
+        for sgn in (-1, 1):
+            b.tube([c, c + side * w * sgn + d * 0.12], [width * 0.025, 0.0008], vc, cls=FOLIAGE, bone=bone, seg=3, tint=tint, mat=MAT_PLAIN)
+
+
+def thorns(b, pts, bone_fn, size=0.04, col="d8c8a0", every=1, seed=3):
+    rnd = random.Random(seed)
+    pts = [V(p) for p in pts]
+    for i in range(1, len(pts) - 1, every):
+        d = (pts[i + 1] - pts[i - 1]).normalized()
+        side = d.cross(V(rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1))).normalized()
+        base = pts[i] + side * size * 0.6
+        tip = base + side * size + d * size * 0.6
+        b.tube([base, tip], [size * 0.25, 0.001], col, cls=STONE, bone=bone_fn(pts[i]), seg=5)

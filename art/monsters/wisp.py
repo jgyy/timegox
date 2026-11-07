@@ -1,7 +1,7 @@
-"""Wisp: will-o'-the-wisps, leaf sprites, lost soul lanterns and the Aurora Wisps.  A floating
-spirit flame: a bright core inside a translucent shell, a crown of flame tongues licking upward,
-a trailing wisp-tail, two tiny arms of light and a pair of big, friendly glowing eyes.  The flame
-tongues are bone chains that flicker.  Tinted by the game per enemy; the core stays white-hot.
+"""Wisp: will-o'-the-wisps, ghost lights and fire sprites.  A teardrop of soft light whose
+surface flickers with noise around a bright core, crowned with crossed flame tongues in two layers
+on bone chains, trailing a tail of light that thins into embers, orbited by sparks, with little
+arms ending in fingers of flame and a face with big eyes and blushing cheeks.  Tinted per enemy.
 Run: blender --background --python art/monsters/wisp.py  ->  assets/monsters/wisp.glb"""
 import math
 import os
@@ -10,7 +10,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
 from creature import chain_rig, glow_ball, wave_chain, zero_pose  # noqa: E402
-from kit import CLOTH, CRYSTAL, MAT_GLOW, V, Builder, Rig, env  # noqa: E402
+from kit import CLOTH, CRYSTAL, MAT_GLOW, MAT_PLAIN, SKIN, V, Builder, Rig, env  # noqa: E402
+from sculpt import fbm3, morph_sphere, smooth  # noqa: E402
 
 kit.reset()
 Y = 1.25
@@ -28,22 +29,46 @@ for s, sd in ((1, "L"), (-1, "R")):
     r.bone("arm." + sd, (0.2 * s, Y, 0.05), (0.38 * s, Y - 0.1, 0.12), "body")
 b = Builder("wisp")
 
-# the shell: a teardrop of soft light, tinted
-b.lathe(V(0, Y, 0), [(0.001, -0.3), (0.16, -0.24), (0.25, -0.08), (0.27, 0.06), (0.22, 0.2), (0.12, 0.32), (0.001, 0.38)], (0.9, 0.9, 0.9), cls=CRYSTAL, bone="body", seg=20, tint=1.0, col_top=(1.0, 1.0, 1.0))
+# the shell: a teardrop of soft light that flickers (noise on its surface), brighter at the core
+def shell(d):
+    p = V(d.x * 0.26, d.y * (0.36 if d.y > 0 else 0.3), d.z * 0.26)
+    if d.y > 0:
+        p.x *= 1.0 - 0.55 * smooth(0.2, 1.0, d.y)
+        p.z *= 1.0 - 0.55 * smooth(0.2, 1.0, d.y)
+    return p * (1.0 + 0.08 * (fbm3((d.x * 3, d.y * 3, d.z * 3), 2, 2) - 0.5))
+
+
+morph_sphere(b, V(0, Y, 0), shell, lambda p, d: (0.85 + 0.15 * smooth(-0.5, 0.8, d.y),) * 3, cls=CRYSTAL, bone="body", seg=24, rings=16, tint_fn=lambda p, d: 1.0)
 glow_ball(b, V(0, Y, 0.02), 0.14, "fffaf0", "body")
-# flame tongues
+b.ellipsoid(V(0, Y - 0.02, 0.02), (0.2, 0.22, 0.2), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="body", seg=14, rings=10, mat=MAT_GLOW, tint=0.6)
+# flame tongues: an outer dim layer and an inner bright one, crossed so they read from any side
 for names, pts in flames:
     for j in range(len(pts) - 1):
-        b.leaf(pts[j], pts[j + 1] + V(0, 0.04, 0), 0.07 - 0.015 * j, (0.95, 0.95, 0.95), side=(1, 0, 0), cls=CLOTH, bone=names[j], tint=1.0, col_tip=(1.0, 1.0, 1.0), curl=0.1, mat=MAT_GLOW)
-        b.leaf(pts[j], pts[j + 1] + V(0, 0.04, 0), 0.07 - 0.015 * j, (0.95, 0.95, 0.95), side=(0, 0, 1), cls=CLOTH, bone=names[j], tint=1.0, col_tip=(1.0, 1.0, 1.0), curl=0.1, mat=MAT_GLOW)
-# tail of trailing light
+        for side in ((1, 0, 0), (0, 0, 1)):
+            b.leaf(pts[j], pts[j + 1] + V(0, 0.04, 0), 0.07 - 0.015 * j, (0.95, 0.95, 0.95), side=side, cls=CLOTH, bone=names[j], tint=1.0, col_tip=(1.0, 1.0, 1.0), curl=0.1, mat=MAT_GLOW)
+        b.leaf(pts[j] + V(0, 0.02, 0), pts[j + 1] + V(0, 0.0, 0), 0.035, "fffff0", side=(1, 0, 1), cls=CLOTH, bone=names[j], tint=0.3, curl=0.15, mat=MAT_GLOW)
+# tail of trailing light, thinning into embers
 tp = [r.head(n) for n in tail] + [r.tail(tail[-1])]
 b.tube(tp, [0.15, 0.1, 0.06, 0.005], (0.85, 0.85, 0.85), cls=CRYSTAL, bones=[tail[0], tail[0], tail[1], tail[2]], tint=1.0, seg=10)
-# little arms and a face
+for k in range(7):
+    t = 0.3 + k * 0.1
+    i = min(len(tp) - 2, int(t * (len(tp) - 1)))
+    q = tp[i].lerp(tp[i + 1], t * (len(tp) - 1) - i) + V(0.06 * math.sin(k * 2.3), 0.04 * math.cos(k * 1.7), 0.05 * math.sin(k))
+    glow_ball(b, q, 0.012 + 0.008 * (k % 2), "fff0c0", tail[min(len(tail) - 1, i)])
+# sparks orbiting the body
+for k in range(6):
+    a = k / 6 * 2 * math.pi
+    glow_ball(b, V(math.cos(a) * 0.38, Y + 0.12 * math.sin(a * 2), math.sin(a) * 0.38), 0.016, "fff8d0", "body")
+# little arms with three fingers of flame, and a face: big eyes, blushing cheeks, a small mouth
 for s, sd in ((1, "L"), (-1, "R")):
     ar = r.bones["arm." + sd]
     b.tube([ar[0], ar[1]], [0.045, 0.02], (0.9, 0.9, 0.9), cls=CRYSTAL, bone="arm." + sd, tint=1.0, seg=8)
+    for f in range(3):
+        a = (f - 1) * 0.5
+        tip = V(ar[1]) + V(math.sin(a) * 0.04 * s, 0.02 + 0.03 * math.cos(a), 0.03)
+        b.leaf(V(ar[1]), tip, 0.012, (1.0, 1.0, 1.0), cls=CLOTH, bone="arm." + sd, tint=1.0, mat=MAT_GLOW, n=3)
     b.eye(V(0.09 * s, Y + 0.04, 0.22), 0.055, "203040", side=s, bone="body", rot_y=0.3, h=1.3)
+    b.ellipsoid(V(0.15 * s, Y - 0.05, 0.2), (0.035, 0.018, 0.01), "ffa0a0", cls=SKIN, bone="body", seg=8, rings=4, rot=(0, 0.6 * s, 0), mat=MAT_PLAIN)
 b.tube([V(-0.04, Y - 0.08, 0.25), V(0, Y - 0.1, 0.26), V(0.04, Y - 0.08, 0.25)], [0.008, 0.008, 0.008], "302030", cls=CLOTH, bone="body", seg=5)
 
 T_IDLE = 2.0
