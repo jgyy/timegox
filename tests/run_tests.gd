@@ -104,19 +104,24 @@ func _init() -> void:
 		var ap: AnimationPlayer = pm.get_meta("ap", null)
 		check(ap != null, rel + ": has an AnimationPlayer")
 		if ap != null:
-			for clip in ["idle", "walk", "sit", "attack", "cast", "hurt", "victory"]:
+			for clip in ["idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die"]:
 				check(ap.has_animation(clip), "%s: clip %s" % [rel, clip])
-			check(ap.get_animation("walk").loop_mode == Animation.LOOP_LINEAR, rel + ": walk loops")
-			check(ap.get_animation("attack").loop_mode == Animation.LOOP_NONE, rel + ": attack plays once")
+			for loop_clip in ["walk", "run", "talk"]:
+				check(ap.get_animation(loop_clip).loop_mode == Animation.LOOP_LINEAR, "%s: %s loops" % [rel, loop_clip])
+			for once in ["attack", "bow", "die"]:
+				check(ap.get_animation(once).loop_mode == Animation.LOOP_NONE, "%s: %s plays once" % [rel, once])
 		var skels: Array = []
 		Assets._walk(pm, skels, "Skeleton3D")
 		check(not skels.is_empty() and skels[0].find_bone("hand.R") >= 0 and skels[0].find_bone("eyes") >= 0, rel + ": rig has hands and an eyelid bone")
+		# the richer rig: sleeve pockets, fingers, thumbs, toes, a mouth and the longer hair and cape chains
+		for bone in ["sleeve.L", "sleeve.R", "fingers.L", "thumb.R", "toe.L", "mouth", "hair_tail2", "cape3"]:
+			check(not skels.is_empty() and skels[0].find_bone(bone) >= 0, "%s: rig has %s" % [rel, bone])
 		var tris := 0
 		for mi in pm.get_meta("meshes"):
 			for si in mi.mesh.get_surface_count():
 				tris += mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_INDEX].size() / 3
 				var mat: Material = mi.mesh.surface_get_material(si)
-				check(mat == MB.mat_vc() or mat == MB.mat_plain() or mat == MB.mat_glow(), "%s: surface %d uses a game shader" % [rel, si])
+				check(mat == MB.mat_actor() or mat == MB.mat_actor_plain() or mat == MB.mat_glow(), "%s: surface %d uses the actor shading" % [rel, si])
 		# sculpted faces, strand hair and layered hanfu: a hero-asset budget, still well under 50k
 		check(tris > 5000 and tris < 50000, "%s: sensible triangle count (%d)" % [rel, tris])
 		pm.free()

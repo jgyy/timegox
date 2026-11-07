@@ -16,12 +16,16 @@ import math
 from mathutils import Vector
 
 from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SKIN, STONE, WOOD, V, b2g, darken, lighten, lin, mix, rgb
-from sculpt import bump, catmull, clamp, fbm3, loft, section, smooth, strand
+from sculpt import bump, catmull, clamp, fbm3, loft, morph_sphere, section, smooth, strand
 
 HIP_Y = 0.92
-SHO = V(0.19, 1.44, 0.0)
-ELB = V(0.24, 1.17, -0.01)
-WRI = V(0.27, 0.93, 0.03)
+# shoulder, elbow and wrist of the left arm.  The shoulders are narrower and lower than a western
+# suit's: hanfu is cut with the sleeve in one piece with the bodice, so the line runs from the neck
+# down to the arm without a square shoulder point (references: Ru (upper garment), newhanfu.com
+# "Learn Hanfu's basic features"), and the arms hang close to the body.
+SHO = V(0.166, 1.405, -0.006)
+ELB = V(0.208, 1.148, -0.022)
+WRI = V(0.232, 0.9, 0.02)
 KNEE = V(0.105, 0.5, 0.02)
 ANK = V(0.105, 0.1, -0.01)
 
@@ -33,18 +37,19 @@ class Torso:
 
     # y, half width, half depth, front shift, squareness exponent
     TABLE = [
-        (0.9, 0.168, 0.126, 0.0, 2.2),
-        (0.98, 0.16, 0.12, 0.004, 2.2),
-        (1.06, 0.158, 0.118, 0.006, 2.3),
-        (1.16, 0.17, 0.124, 0.008, 2.5),
-        (1.26, 0.186, 0.13, 0.01, 2.7),
-        (1.34, 0.19, 0.126, 0.008, 2.5),
-        (1.4, 0.184, 0.116, 0.004, 2.45),
-        (1.445, 0.152, 0.096, 0.0, 2.3),
-        (1.475, 0.118, 0.08, 0.0, 2.2),
-        (1.505, 0.074, 0.064, 0.0, 2.1),
-        (1.525, 0.06, 0.058, 0.0, 2.0),
-        (1.548, 0.056, 0.055, 0.003, 2.0),
+        (0.9, 0.158, 0.122, 0.0, 2.2),
+        (0.98, 0.148, 0.115, 0.004, 2.2),
+        (1.06, 0.14, 0.11, 0.006, 2.25),
+        (1.16, 0.15, 0.115, 0.008, 2.35),
+        (1.26, 0.162, 0.121, 0.01, 2.45),
+        (1.33, 0.165, 0.119, 0.008, 2.4),
+        (1.375, 0.163, 0.112, 0.004, 2.3),
+        (1.41, 0.157, 0.104, 0.0, 2.25),
+        (1.44, 0.143, 0.095, 0.0, 2.2),
+        (1.465, 0.12, 0.084, 0.0, 2.1),
+        (1.49, 0.094, 0.073, 0.0, 2.05),
+        (1.51, 0.072, 0.064, 0.0, 2.0),
+        (1.53, 0.06, 0.058, 0.002, 2.0),
     ]
 
     def __init__(self, o):
@@ -108,14 +113,14 @@ def torso_w(p):
     ws = max(0.0, 1.0 - wh - wc)
     w = {"hips": wh, "spine": ws, "chest": wc}
     ax = abs(p.x)
-    k = clamp((ax - 0.13) / 0.07) * clamp((y - 1.3) / 0.1)
+    k = clamp((ax - 0.115) / 0.06) * clamp((y - 1.3) / 0.1)
     if k > 0:
         side = "L" if p.x > 0 else "R"
         for nm in list(w):
             w[nm] *= 1.0 - k * 0.65
         w["upper_arm." + side] = k * 0.65
-    if y > 1.48:
-        t = clamp((y - 1.48) / 0.06)
+    if y > 1.47:
+        t = clamp((y - 1.47) / 0.06)
         w = {"chest": 1.0 - 0.5 * t, "neck": 0.5 * t}
     return w
 
@@ -151,7 +156,13 @@ def body(b, o, tor, robe, trim, inner, gold):
         for i in range(n):
             a = 2 * math.pi * i / n
             fold = drape(a, y, 1.3, 6, 14, 0.5) if y < 1.3 else 0.0
-            ring.append(tor.point(y, a, fold))
+            # the neckline opens in a V at the throat, where the crossed collars meet (it used to
+            # close round the neck like a turtleneck)
+            yy = y
+            if y > V_Y:
+                aa = math.atan2(math.sin(a), math.cos(a))
+                yy = V_Y + (y - V_Y) * (1.0 - smooth(0.66, 0.12, abs(aa + 0.05)))
+            ring.append(tor.point(yy, a, fold))
         rings.append(ring)
     hi = lighten(robe, 0.07)
 
@@ -165,6 +176,9 @@ def body(b, o, tor, robe, trim, inner, gold):
         return c
 
     loft(b, rings, robe, cls=CLOTH, col_fn=col, bone_fn=torso_w, cap0=False, cap1=False)
+
+
+V_Y = 1.425   # bottom of the V at the throat
 
 
 def band(b, pts, normals, width, thick, col, cols=None, bone_fn=None, bone=None, n=8, cls=CLOTH, tint=0.0):
@@ -201,18 +215,20 @@ def collar(b, o, tor, robe, trim, inner, gold):
             ns.append(tor.normal(y, a))
         return ps, ns
 
-    # inner (white) collar: around the back of the neck and down to a V at the throat
-    ps, ns = path(math.pi * 0.98, 1.542, -math.pi * 0.98, 1.542, 26)
-    band(b, ps, ns, 0.018, 0.007, inner, bone_fn=torso_w)
-    ps, ns = path(-0.6, 1.535, 0.42, 1.36, 10, 0.4)
-    band(b, ps, ns, 0.017, 0.006, inner, bone_fn=torso_w)
-    # outer collar: back of the neck round to the left front, then diagonally to the right hip
-    ps1, ns1 = path(math.pi * 0.98, 1.53, 0.55, 1.522, 12)
-    ps2, ns2 = path(0.55, 1.522, -1.0, 1.0, 22, 0.15)
+    # inner (white) collar: lying round the base of the neck and down to a V at the throat (it
+    # used to stand up the neck like a turtleneck)
+    ps, ns = path(0.62, 1.5, 2 * math.pi - 0.66, 1.5, 26)
+    band(b, ps, ns, 0.016, 0.0065, inner, bone_fn=torso_w)
+    ps, ns = path(-0.66, 1.5, 0.42, 1.34, 10, 0.4)
+    band(b, ps, ns, 0.016, 0.006, inner, bone_fn=torso_w)
+    # outer collar: back of the neck round to the left front, then diagonally across the chest to
+    # the right front, where the overlap edge of the skirt carries the line on down to the hem
+    ps1, ns1 = path(math.pi * 0.98, 1.505, 0.62, 1.49, 12)
+    ps2, ns2 = path(0.62, 1.49, -0.6, 0.995, 22, 0.15)
     ps = ps1 + ps2[1:]
     ns = ns1 + ns2[1:]
     cols = [mix(trim, gold, 0.55) if (k % 4 == 1 and k > 10) else rgb(trim) for k in range(len(ps))]
-    band(b, ps, ns, 0.028, 0.008, trim, cols=cols, bone_fn=torso_w)
+    band(b, ps, ns, 0.03, 0.007, trim, cols=cols, bone_fn=torso_w)
     # a narrow band of the middle layer just inside the outer lapel
     ps3 = [p + n * -0.002 + (ps2[min(len(ps2) - 1, k + 1)] - ps2[max(0, k - 1)]).normalized().cross(n) * 0.03 for k, (p, n) in enumerate(zip(ps2[:14], ns2[:14]))]
     band(b, ps3, ns2[:14], 0.01, 0.006, mid, bone_fn=torso_w)
@@ -274,71 +290,78 @@ def sash(b, o, tor, sash_col, gold):
 
 
 def skirt(b, o, tor, robe, trim, inner, gold, lapel_end):
-    """Pleated lower robe from the sash to the ankles; the front edge continues the collar line at
-    the right front, with an inner skirt showing through, a trimmed and embroidered hem."""
-    n = 52
+    """Lower robe from the sash to the ankles, wrapped round the body the Han way, left over right:
+    the left front panel crosses over the right one, so the overlap edge runs down from the end of
+    the collar at the right front to the hem as one trimmed line.  (The old skirt was open there and
+    showed a wide stripe of white inner robe from waist to hem, like an apron.)  Pleats deepen
+    towards the hem, which is trimmed, embroidered and shows a finger's breadth of the inner robe."""
+    n = 56
     ys = [1.0, 0.92, 0.84, 0.76, 0.66, 0.56, 0.46, 0.36, 0.28, 0.21, 0.17]
     if o.get("robe_len") == "short":
         # a working man's short robe: the hem stops above the knee so the legs can move
         ys = [1.0 - (1.0 - y) * 0.52 for y in ys]
-    open_c = -0.62          # the overlap opening sits at the right front
-    open_w = 0.42
+    edge_a = -0.6           # the overlap edge sits at the right front
     flare = o.get("flare", 1.0)
 
     def r_at(y, a):
         base = tor.radius(min(max(y, 0.9), 1.0), a) + 0.012
         k = clamp((1.0 - y) / 0.85)
-        return base * (1.0 + (0.42 * flare) * k ** 1.15) + drape(a, y, 1.0, 8, 23, 1.3, 0.4)
+        return base * (1.0 + (0.4 * flare) * k ** 1.15) + drape(a, y, 1.0, 8, 23, 1.3, 0.4)
+
+    def over(a):
+        # how far the top panel stands proud of the one beneath (a ridge along the edge)
+        d = (a - edge_a) % (2 * math.pi)
+        return 0.006 * smooth(0.0, 0.06, d) * (1.0 - smooth(0.5, 1.6, d)) if d < math.pi else 0.0
 
     def ang(i):
-        return open_c + open_w * 0.5 + (2 * math.pi - open_w) * i / n
+        # start the ring at the edge so there is a column of vertices exactly on it
+        return edge_a + 2 * math.pi * i / n
 
     rings = []
     for y in ys:
         ring = []
-        for i in range(n + 1):
+        for i in range(n):
             a = ang(i)
             z = tor.params(min(max(y, 0.9), 1.0))[2]
-            r = r_at(y, a)
+            r = r_at(y, a) + over(a) * clamp((1.0 - y) / 0.2)
             # the hem lifts a little at the front so the shoes show
             yy = y + (0.02 * max(0.0, math.cos(a)) if y < 0.25 else 0.0)
             ring.append(V(math.sin(a) * r, yy, math.cos(a) * r * 0.86 + z))
         rings.append(ring)
-    verts_rows = rings
 
     def col(p, j, i):
         a = ang(i)
         y = ys[j]
         d = drape(a, y, 1.0, 8, 23, 1.3, 0.4)
         c = mix(robe, darken(robe, 0.16), clamp((1.0 - y) / 0.85))
+        # the panel tucked under the edge sits in shadow
+        e = (a - edge_a) % (2 * math.pi)
+        if e > 2 * math.pi - 0.18:
+            c = darken(c, 0.12)
         return lighten(c, d * 2.2) if d > 0 else darken(c, -d * 5.0)
 
-    # open sheet with an inside face: build as a loft that is not closed around (n+1 columns)
-    _open_loft(b, verts_rows, col, inner_col=darken(robe, 0.35))
+    loft(b, rings, robe, cls=CLOTH, col_fn=col, bone_fn=skirt_w, cap0=False, cap1=False)
+    # the inner robe peeking out under the hem
+    hem = rings[-1]
+    low = [p + V(0, -0.022, 0) for p in hem]
+    b.add([q for q in hem] + [q + (q - V(0, q.y, 0)).normalized() * -0.004 for q in low],
+          [(i, n + i, n + (i + 1) % n, (i + 1) % n) for i in range(n)], inner, CLOTH, None, 0.0, 0, True,
+          bones=[skirt_w(q) for q in hem] * 2, closed=False)
     # hem trim with a cloud scallop of embroidery
-    hp = [p + V(0, 0.012, 0) for p in verts_rows[-1]]
+    hp = [p + V(0, 0.012, 0) for p in hem] + [hem[0] + V(0, 0.012, 0)]
     hn = []
-    for i, p in enumerate(hp):
+    for p in hp:
         q = p - V(0, p.y, 0)
         hn.append(q.normalized() if q.length > 1e-6 else V(0, 0, 1))
     hcols = [mix(trim, gold, 0.7) if (math.sin(ang(i) * 22.0) > 0.55) else rgb(trim) for i in range(len(hp))]
     band(b, hp, hn, 0.016, 0.006, trim, cols=hcols, bone_fn=skirt_w)
-    # trim down both edges of the opening
-    for side in (0, n):
-        pts = [row[side] for row in verts_rows]
-        pts = [lapel_end] + pts if side == 0 else pts
-        nr = []
-        for p in pts:
-            q = V(p.x, 0, p.z)
-            nr.append(q.normalized() if q.length > 1e-6 else V(0, 0, 1))
-        band(b, pts, nr, 0.016, 0.006, trim, bone_fn=skirt_w)
-    # inner skirt seen through the opening
-    prof = []
-    for y in ys[:-1]:
-        prof.append((r_at(y, open_c) * 0.93, y))
-    if o.get("robe_len") == "short":
-        return
-    b.lathe(V(0, 0, 0.004), [(rr, y) for rr, y in reversed(prof)], inner, seg=24, squash=(1.0, 0.82), bone_fn=skirt_w, cap_bottom=False, cap_top=False, folds=(11, 0.03, 0.2))
+    # trim down the overlap edge, continuing the collar
+    pts = [lapel_end] + [row[0] + (row[0] - V(0, row[0].y, 0)).normalized() * 0.004 for row in rings]
+    nr = []
+    for p in pts:
+        q = V(p.x, 0, p.z)
+        nr.append(q.normalized() if q.length > 1e-6 else V(0, 0, 1))
+    band(b, pts, nr, 0.016, 0.006, trim, bone_fn=skirt_w)
 
 
 def _open_loft(b, rows, col_fn, inner_col):
@@ -372,68 +395,106 @@ def _open_loft(b, rows, col_fn, inner_col):
 
 # ---------------------------------------------------------------- arms
 def sleeve(b, o, s, sleeve_col, trim, inner, gold):
-    """Upper sleeve, then the wide hanfu sleeve hanging in a rounded pocket below the wrist, its
-    opening lined and trimmed."""
+    """Hanfu sleeve, cut in one with the bodice: it leaves the sloping shoulder without a seam,
+    hangs loosely round the upper arm and below the elbow becomes the hanging pocket (mei) whose
+    rounded bottom swings behind the hand like the body of a pipa (the "pipa sleeve"), gathered
+    into a trimmed cuff (qu) round the wrist (references: Ru (upper garment); newhanfu.com).  The
+    old sleeve flared sideways into a stiff trapezoid; this one is narrow seen from the front and
+    deep seen from the side.  The pocket is weighted to its own `sleeve` bone so it can swing a
+    beat behind the arm."""
     sd = "L" if s > 0 else "R"
     ua = "upper_arm." + sd
     fa = "forearm." + sd
+    sb = "sleeve." + sd
     sh = V(SHO.x * s, SHO.y, SHO.z)
     el = V(ELB.x * s, ELB.y, ELB.z)
     wr = V(WRI.x * s, WRI.y, WRI.z)
     width = o.get("sleeve_w", 1.0)
-    # upper sleeve: soft, slightly baggy, folds at the inside of the elbow
-    up_pts = [sh + V(-0.05 * s, -0.012, 0.0), sh + V(-0.005 * s, -0.04, 0.0), sh.lerp(el, 0.5), el + V(0, -0.03, 0)]
-    up_r = [(0.056, 0.054), (0.062, 0.06), (0.066, 0.065), (0.07, 0.07)]
-    b.tube(up_pts, up_r, sleeve_col, cls=CLOTH, bones=[{"chest": 0.5, ua: 0.5}, {"chest": 0.2, ua: 0.8}, ua, {ua: 0.6, fa: 0.4}], seg=16, cap0=False, cap1=False, cols=[lighten(sleeve_col, 0.05), sleeve_col, sleeve_col, darken(sleeve_col, 0.05)])
-    # the big sleeve
-    axis = (wr - el).normalized()
-    ts = [-0.12, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.12, 1.22]
-    rings = []
-    bones = []
-    hang = 0.2 * width
-    cols = []
-    for k, t in enumerate(ts):
-        c = el.lerp(wr, min(t, 1.0)) + axis * max(0.0, t - 1.0) * 0.24
-        tt = max(0.0, t)
-        rw = (0.072 + 0.07 * min(1.0, tt) ** 0.9) * width
-        rb = (0.072 + 0.17 * min(1.0, tt) ** 1.2) * width   # towards the back the pocket deepens
-        rf = (0.072 + 0.04 * min(1.0, tt)) * width
+    dk = darken(sleeve_col, 0.14)
+    # ---- one surface swept down the arm from the shoulder to the cuff: snug at the shoulder,
+    # flaring all the way down, the back deepening into the pocket that sags behind the hand
+    A_f = (wr - el).normalized()
+    top = sh + V(-0.04 * s, 0.028, 0.0)
+    path = catmull([top, sh + V(0.01 * s, -0.01, 0.0), el, wr + A_f * 0.036], 10)
+    cum = [0.0]
+    for i in range(1, len(path)):
+        cum.append(cum[-1] + (path[i] - path[i - 1]).length)
+    total = cum[-1]
+    u_el = cum[min(range(len(path)), key=lambda i: (path[i] - el).length)] / total
 
-        def prof(a, rw=rw, rb=rb, rf=rf):
-            c2, s2 = math.cos(a), math.sin(a)
-            rh = rf if c2 >= 0 else rb
-            return 1.0 / math.sqrt((c2 / rh) ** 2 + (s2 / rw) ** 2)
+    def frame(u):
+        dist = clamp(u) * total
+        i = 1
+        while i < len(path) - 1 and cum[i] < dist:
+            i += 1
+        k = (dist - cum[i - 1]) / max(1e-9, cum[i] - cum[i - 1])
+        P = path[i - 1].lerp(path[i], k)
+        A = (path[min(len(path) - 1, i + 1)] - path[max(0, i - 2)]).normalized()
+        F = (V(0, 0, 1) - A * A.z).normalized()
+        O = (V(s, 0, 0) - A * (A.x * s) - F * (F.x * s)).normalized()
+        return P, A, F, O
 
-        ring = section(c, axis, prof, 18, up=V(0, 0, 1))
-        # the back of the pocket hangs lower, the front stops at the wrist
-        out = []
-        for p in ring:
-            rel = p - c
-            back = clamp(-rel.z / max(rb, 1e-4))
-            extra = hang * smooth(0.5, 1.2, t) * back ** 1.6
-            fold = 0.006 * math.sin(math.atan2(rel.x, rel.z) * 7.0 + t * 2.0) * t
-            out.append(p + axis * extra + rel.normalized() * fold)
-        rings.append(out)
-        bones.append({ua: 0.7, fa: 0.3} if t < 0 else ({ua: 0.4, fa: 0.6} if t == 0.0 else fa))
-        cols.append(mix(sleeve_col, darken(sleeve_col, 0.12), t / 1.22))
-    loft(b, rings, sleeve_col, cls=CLOTH, bones=bones, cols=cols, cap0=False, cap1=False)
-    # lining just inside the opening
-    lin_rings = []
-    for ring in rings[-3:]:
-        c = sum(ring, Vector()) / len(ring)
-        lin_rings.append([c + (p - c) * 0.95 for p in ring])
-    loft(b, lin_rings, darken(inner, 0.15), cls=CLOTH, bone=fa, cap0=False, cap1=False, inside=True)
-    # trim at the opening
-    end = rings[-1]
-    c = sum(end, Vector()) / len(end)
-    tp = [p + (p - c).normalized() * 0.004 - axis * 0.01 for p in end] + [end[0] + (end[0] - c).normalized() * 0.004 - axis * 0.01]
-    tn = [axis] * len(tp)
-    tcols = [mix(trim, gold, 0.6) if k % 3 == 0 else rgb(trim) for k in range(len(tp))]
-    band(b, tp, [(p - c).normalized() for p in tp], 0.014, 0.005, trim, cols=tcols, bone=fa)
-    # inner robe cuff around the wrist
-    b.tube([el.lerp(wr, 0.55), wr + V(0, -0.012, 0)], [0.038, 0.036], inner, cls=CLOTH, bone=fa, seg=12)
-    b.tube([wr + V(0, -0.004, 0), wr + V(0, -0.02, 0)], [0.039, 0.039], mix(inner, trim, 0.4), cls=CLOTH, bone=fa, seg=12, cap0=False, cap1=False)
-    return tn
+    bag = 0.12 * width
+
+    def shape(d):
+        y = d.y
+        u = (1.0 - y) * 0.5                          # 0 at the shoulder .. 1 at the cuff
+        m = math.hypot(d.x, d.z)
+        cx, cz = (d.x / m, d.z / m) if m > 1e-6 else (0.0, 1.0)
+        P, A, F, O = frame(u)
+        flare = smooth(0.0, 0.88, u)
+        ro = width * (0.054 + 0.04 * flare)
+        rf = width * (0.056 + 0.022 * smooth(0.1, 0.9, u))
+        rb = width * (0.058 + 0.15 * smooth(0.28, 0.92, u))
+        q = m ** (0.22 if y > 0.0 else 0.5)          # blunt top inside the shoulder, rounded bottom
+        ox = cx * ro * q
+        f = cz * (rf if cz >= 0.0 else rb) * q
+        back = max(0.0, -cz)
+        along = bag * back ** 1.4 * smooth(0.45, 1.0, u) * q
+        # soft folds running down the sleeve, deeper towards the hem
+        ang = math.atan2(cx, cz)
+        fold = 0.006 * math.sin(ang * 7.0 + 0.6 + u * 3.0) * smooth(0.2, 1.0, u) * q
+        ox += cx * fold
+        f += cz * fold
+        return P + O * ox + A * along + F * f
+
+    def col(lp, d):
+        t = clamp((-d.y + 1.0) * 0.5)
+        c = mix(lighten(sleeve_col, 0.04), dk, smooth(0.3, 1.0, t) * 0.8)
+        ang = math.atan2(d.x, d.z)
+        k = math.sin(ang * 7.0 + 0.6 + t * 3.0) * smooth(0.2, 1.0, t)
+        return lighten(c, 0.05 * k) if k > 0 else darken(c, -0.09 * k)
+
+    def wfn(p):
+        # nearest point of the arm path decides the bone; the back of the pocket rides its own bone
+        i = min(range(len(path)), key=lambda j: (path[j] - p).length)
+        u = cum[i] / total
+        if u < 0.1:
+            return {"chest": 0.5 - u * 4.0, ua: 0.5 + u * 4.0}
+        if u < u_el - 0.05:
+            return {ua: 1.0}
+        if u < u_el + 0.07:
+            k = (u - (u_el - 0.05)) / 0.12
+            return {ua: 1.0 - k, fa: k}
+        P, A, F, O = frame(u)
+        backk = clamp(-(p - P).dot(F) / 0.12) * smooth(u_el + 0.1, 0.92, u)
+        return {fa: 1.0 - backk, sb: backk} if backk > 0.01 else {fa: 1.0}
+
+    morph_sphere(b, V(0, 0, 0), lambda d: shape(d), col, cls=CLOTH, bone_fn=wfn, seg=26, rings=30)
+    A = A_f
+    F = (V(0, 0, 1) - A * A.z).normalized()
+    O = (V(s, 0, 0) - A * (A.x * s) - F * (F.x * s)).normalized()
+    cuff_r = 0.047
+    # ---- cuff: the white inner sleeve peeking out, then a trimmed band
+    cc = wr - A * 0.012
+    ring = []
+    for i in range(21):
+        a = 2 * math.pi * i / 20
+        ring.append(cc + (O * math.cos(a) + F * math.sin(a)) * (cuff_r + 0.002))
+    tcols = [mix(trim, gold, 0.6) if k % 3 == 0 else rgb(trim) for k in range(len(ring))]
+    b.tube(ring, [0.0075] * len(ring), trim, cls=CLOTH, bone=fa, seg=7, cap0=False, cap1=False, cols=tcols)
+    b.tube([wr - A * 0.02, wr + A * 0.012], [0.038, 0.037], inner, cls=CLOTH, bone=fa, seg=14, cap0=False, cap1=True)
+    return [A] * 3
 
 
 def hand(b, o, s, skin):
@@ -479,17 +540,19 @@ def hand(b, o, s, skin):
             p = p + d * sl
             pts.append(p)
         radii = [r, r * 0.95, r * 0.86, r * 0.72]
-        b.tube(pts, radii, sk, cls=SKIN, bone=hb, seg=6)
+        fb = "fingers." + sd
+        b.tube(pts, radii, sk, cls=SKIN, bones=[{hb: 0.6, fb: 0.4}, fb, fb, fb], seg=6)
         # knuckle bumps and the nail
         b.ellipsoid(base + V(0.004 * s, 0.0, 0.0), (r * 0.9, r * 0.8, r * 1.05), sk, cls=SKIN, bone=hb, seg=8, rings=5)
         tip = pts[-1]
-        b.ellipsoid(tip + V(0.0035 * s, 0.006, 0), (0.0018, r * 0.85, r * 0.75), nail, cls=SKIN, bone=hb, seg=8, rings=5)
+        b.ellipsoid(tip + V(0.0035 * s, 0.006, 0), (0.0018, r * 0.85, r * 0.75), nail, cls=SKIN, bone=fb, seg=8, rings=5)
     # thumb: from the base of the palm forward and down, with the fleshy pad
     tb = wr + V(-0.002 * s, -0.025 * k, 0.024 * k)
     b.ellipsoid(tb + V(-0.004 * s, -0.008, -0.004), (0.012 * k, 0.022 * k, 0.014 * k), sk, cls=SKIN, bone=hb, seg=10, rings=6)
     tp = [tb, tb + V(-0.008 * s, -0.026 * k, 0.016 * k), tb + V(-0.012 * s, -0.048 * k, 0.022 * k), tb + V(-0.014 * s, -0.064 * k, 0.02 * k)]
-    b.tube(tp, [0.0105 * k, 0.0095 * k, 0.0085 * k, 0.0072 * k], sk, cls=SKIN, bone=hb, seg=8)
-    b.ellipsoid(tp[-1] + V(-0.002 * s, 0.005, 0.004), (0.006, 0.007, 0.0018), nail, cls=SKIN, bone=hb, seg=8, rings=5, rot=(0, 0.6 * s, 0))
+    tbn = "thumb." + sd
+    b.tube(tp, [0.0105 * k, 0.0095 * k, 0.0085 * k, 0.0072 * k], sk, cls=SKIN, bones=[{hb: 0.7, tbn: 0.3}, tbn, tbn, tbn], seg=8)
+    b.ellipsoid(tp[-1] + V(-0.002 * s, 0.005, 0.004), (0.006, 0.007, 0.0018), nail, cls=SKIN, bone=tbn, seg=8, rings=5, rot=(0, 0.6 * s, 0))
     return wr + V(0, -L * 0.6, 0.01)
 
 
@@ -501,6 +564,7 @@ def legs(b, o, pants, boots, trim):
         kn = V(KNEE.x * s, KNEE.y, KNEE.z)
         an = V(ANK.x * s, ANK.y, ANK.z)
         th, sh, ft = "thigh." + sd, "shin." + sd, "foot." + sd
+        tb = "toe." + sd
         b.tube([hip, hip.lerp(kn, 0.5), kn, kn.lerp(an, 0.35)], [0.088, 0.078, 0.063, 0.059], pants, cls=CLOTH, bones=[th, th, {th: 0.5, sh: 0.5}, sh], seg=14)
         if o.get("shoes") == "sandals":
             # trousers run on to the ankle above bare feet
@@ -544,54 +608,69 @@ def legs(b, o, pants, boots, trim):
             c = V(ANK.x * s, 0.022 + hh * 0.5, zz)
             fc.append(c)
             rows.append([c + V(math.sin(2 * math.pi * i / 14) * ww, math.cos(2 * math.pi * i / 14) * hh * 0.5, 0) for i in range(14)])
-        loft(b, rows, boots, cls=CLOTH, bones=[{sh: 0.3, ft: 0.7}, ft, ft, ft, ft, ft], cols=[darken(boots, 0.12), boots, boots, lighten(boots, 0.04), boots, boots])
+        loft(b, rows, boots, cls=CLOTH, bones=[{sh: 0.3, ft: 0.7}, ft, ft, {ft: 0.6, tb: 0.4}, tb, tb], cols=[darken(boots, 0.12), boots, boots, lighten(boots, 0.04), boots, boots])
         # sole
         sole = []
         for t in range(7):
             z = -0.075 + t * 0.045
             w = 0.044 if t < 5 else 0.03
             sole.append((V(ANK.x * s, 0.012, z), w))
-        b.tube([q for q, _ in sole], [(w, 0.012) for _, w in sole], "e8e0d0" if o.get("white_sole", True) else darken(boots, 0.5), cls=CLOTH, bone=ft, seg=10, up=(0, 1, 0))
+        b.tube([q for q, _ in sole], [(w, 0.012) for _, w in sole], "e8e0d0" if o.get("white_sole", True) else darken(boots, 0.5), cls=CLOTH,
+               bones=[ft if q.z < 0.08 else ({ft: 0.5, tb: 0.5} if q.z < 0.13 else tb) for q, _ in sole], seg=10, up=(0, 1, 0))
         # cloud toe curling up
         toe = [V(ANK.x * s, 0.03, 0.17), V(ANK.x * s, 0.055, 0.205), V(ANK.x * s, 0.085, 0.205), V(ANK.x * s, 0.09, 0.185)]
-        b.tube(toe, [0.02, 0.016, 0.01, 0.004], trim, cls=CLOTH, bone=ft, seg=8)
+        b.tube(toe, [0.02, 0.016, 0.01, 0.004], trim, cls=CLOTH, bone=tb, seg=8)
 
 
 # ---------------------------------------------------------------- cape, armour
 def cape(b, o, cc):
-    """A cape hanging from the shoulders in folds, its hem curving round."""
+    """A cape gathered over the sloping shoulders behind the neck and flaring into soft folds that
+    deepen towards a curved hem, its lining a shade darker.  Three bones (cape, cape2, cape3) let
+    it billow and trail when running.  (It used to hang as a flat board from square shoulders.)"""
     rows = []
     bones = []
     cols = []
-    n = 10
-    m = 13
+    n = 12
+    m = 15
     for j in range(n):
         t = j / (n - 1)
-        y = 1.47 - t * 1.04
-        half = 0.19 + t * 0.15
-        z = -0.13 - t * 0.17
+        y = 1.47 - t * 1.03
+        half = 0.165 + t * 0.17
         row = []
         for i in range(m):
-            u = i / (m - 1) - 0.5
-            fold = 0.025 * t * math.sin(u * math.pi * 6.0 + 0.5) + 0.01 * t * math.sin(u * math.pi * 13.0)
-            row.append(V(u * 2 * half, y + abs(u) * 0.04 * (1 + t) - (0.03 * (1 - (2 * u) ** 2) if j == n - 1 else 0.0), z - (1 - (u * 2) ** 2) * 0.04 + fold))
+            u = i / (m - 1) - 0.5                       # -0.5 .. 0.5 across
+            # the top edge wraps round the back of the neck onto the shoulders
+            wrap = (1.0 - t) ** 3
+            x = u * 2 * half
+            z = -0.115 - t * 0.1 - (1 - (u * 2) ** 2) * (0.03 + 0.02 * t) + wrap * abs(u * 2) ** 1.5 * 0.09
+            yy = y - wrap * abs(u * 2) ** 1.6 * 0.05
+            # folds: a few broad ones and finer ones, growing towards the hem
+            fold = t ** 0.8 * (0.03 * math.sin(u * math.pi * 5.0 + 0.4) + 0.011 * math.sin(u * math.pi * 11.0 + 1.3))
+            # the hem curves up at the sides and dips in the middle
+            if j == n - 1:
+                yy += 0.05 * (u * 2) ** 2 - 0.01
+            row.append(V(x, yy, z + fold))
         rows.append(row)
-        if t < 0.12:
+        if t < 0.1:
             bones.append({"chest": 1.0})
-        elif t < 0.5:
-            k = (t - 0.12) / 0.38
+        elif t < 0.4:
+            k = (t - 0.1) / 0.3
             bones.append({"chest": 1 - k, "cape": k})
-        else:
-            k = (t - 0.5) / 0.5
+        elif t < 0.7:
+            k = (t - 0.4) / 0.3
             bones.append({"cape": 1 - k, "cape2": k})
-        cols.append(mix(cc, darken(cc, 0.32), t))
+        else:
+            k = (t - 0.7) / 0.3
+            bones.append({"cape2": 1 - k, "cape3": k})
+        cols.append(mix(lighten(cc, 0.04), darken(cc, 0.3), t))
     b.sheet(rows, cc, bones=bones, cols=cols, thickness=0.014)
     trim = o.get("trim", "f0e0c0")
     hem = rows[-1]
     b.tube([p + V(0, 0.004, 0) for p in hem], [0.008] * len(hem), trim, cls=CLOTH, bones=[bones[-1]] * len(hem), seg=6, cap0=True, cap1=True)
     for s in (1, -1):
-        b.lathe(V(0.11 * s, 1.455, -0.085), [(0.0001, -0.008), (0.026, -0.004), (0.026, 0.004), (0.0001, 0.009)], "f0c850", cls=METAL, bone="chest", seg=14, rot=(math.pi / 2, 0, 0))
-        b.ball(V(0.11 * s, 1.455, -0.075), 0.008, o.get("jade", "6af0b0"), cls=CRYSTAL, bone="chest", seg=8, rings=5)
+        clasp = V(0.13 * s, 1.43, -0.045)
+        b.lathe(clasp, [(0.0001, -0.008), (0.024, -0.004), (0.024, 0.004), (0.0001, 0.009)], "f0c850", cls=METAL, bone="chest", seg=14, rot=(math.pi / 2, 0, 0))
+        b.ball(clasp + V(0, 0, 0.01), 0.008, o.get("jade", "6af0b0"), cls=CRYSTAL, bone="chest", seg=8, rings=5)
 
 
 def armour(b, o, tor, metal):
@@ -747,7 +826,8 @@ def sword(b, bone, grip, blade, hilt, tassel="e04050"):
     """A jian held in the hand: wrapped grip, pommel, guard, long double-edged blade with a ridge,
     a faint glowing edge and a tassel."""
     g = V(grip)
-    d = V(0, -0.25, 1.0).normalized()
+    # a relaxed grip: the blade points forward and well down, not straight out at the viewer
+    d = V(0, -0.75, 0.66).normalized()
     up = V(1, 0, 0)
     grip_pts = [g - d * 0.09 + d * (k / 6) * 0.15 for k in range(7)]
     b.tube(grip_pts, [0.016, 0.017, 0.016, 0.017, 0.016, 0.017, 0.016], hilt, cls=WOOD, bone=bone, seg=8, cols=[hilt if k % 2 else darken(hilt, 0.3) for k in range(7)])

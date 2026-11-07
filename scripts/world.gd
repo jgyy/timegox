@@ -540,7 +540,9 @@ func _update_view(d: float) -> void:
 	var want_yaw := atan2(float(facing.x), float(facing.y))
 	player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
 	var walking := move_t >= 0.0
-	Models.anim_person(player, t, walking)
+	# on the road the hero runs (the light-body dash; the old walk cycle slid along at 12 m/s); in a
+	# conversation whoever is speaking talks with their hands and mouth
+	Models.anim_person(player, t, walking, false, "run" if walking else ("talk" if speaker() == "Lin Feng" else ""))
 	# a puff of dust at each footfall
 	var sp := fmod(t * 9.0 / PI, 2.0)
 	if walking and int(sp) != step_side:
@@ -558,7 +560,8 @@ func _update_view(d: float) -> void:
 		var dv := pp - comp_pos
 		if dv.length() > 0.3:
 			comp.rotation.y = lerp_angle(comp.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 8.0))
-		Models.anim_person(comp, t + 1.0, dv.length() > 0.5)
+		var comp_moving := dv.length() > 0.5
+		Models.anim_person(comp, t + 1.0, comp_moving, false, "run" if comp_moving else ("talk" if speaker() == "Yue Ling" else ""))
 	# entities of the regions on show
 	for k in views:
 		var v: Dictionary = views[k]
@@ -610,11 +613,56 @@ func weather_y() -> float:
 		_:
 			return 3.5
 
+## The name of whoever is speaking in the dialogue box, or "".
+func speaker() -> String:
+	if main == null or main.top_name() != "dialogue":
+		return ""
+	var dl = main.dialogue
+	if dl.lines.is_empty() or dl.idx >= dl.lines.size():
+		return ""
+	return str(dl.lines[dl.idx][0])
+
+## Monsters amble about their spot in a slow figure of eight, pausing now and then, and stop to
+## face the hero when he comes close.  Purely visual: the encounter itself never moves.
+func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void:
+	var seed_ := Terrain3D.hash2(e.pos.x, e.pos.y, 3.0) * 17.0
+	var cyc := fmod(t * 0.11 + seed_, 1.0)
+	var walking := dist > 9.0 and cyc < 0.62
+	for i in ms.size():
+		var mk: Node3D = ms[i]
+		if not mk.has_meta("home"):
+			mk.set_meta("home", mk.position)
+			mk.set_meta("prog", seed_ + i * 1.3)
+		var prog: float = mk.get_meta("prog")
+		var shape: String = mk.get_meta("shape", "")
+		var r := 1.6 if i == 0 else 1.0
+		if walking:
+			prog += d * 0.32 / r
+			mk.set_meta("prog", prog)
+		var home: Vector3 = mk.get_meta("home")
+		var off := Vector3(sin(prog) * r, 0.0, sin(prog * 2.0) * r * 0.45)
+		var vel := Vector3(cos(prog), 0.0, cos(prog * 2.0) * 0.9)
+		mk.position = home + off
+		if walking:
+			mk.rotation.y = lerp_angle(mk.rotation.y, atan2(vel.x, vel.z), 1.0 - exp(-d * 4.0))
+		else:
+			mk.rotation.y = lerp_angle(mk.rotation.y, 0.0, 1.0 - exp(-d * 3.0))
+		Models.anim_monster(mk, t, i * 1.7 + e.pos.x, "walk" if walking and Assets.has_clip(mk, "walk") else "idle")
+		if shape in ["wisp", "jelly", "storm", "ray"]:
+			mk.position.y = home.y + 0.15 * sin(t * 1.6 + i)
+
 func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) -> void:
 	match e.kind:
 		"npc":
 			var m: Node3D = n.get_meta("model")
-			Models.anim_person(m, t + e.pos.x, false)
+			var talking: bool = speaker() == e.n
+			# a courteous bow (the cupped-fist salute) when the hero walks up
+			var near: bool = dist < 5.0
+			if near and not n.get_meta("near", false) and t - float(n.get_meta("bowed", -99.0)) > 25.0 and Assets.has_clip(m, "bow") and not talking:
+				Models.act(m, "bow", t)
+				n.set_meta("bowed", t)
+			n.set_meta("near", near)
+			Models.anim_person(m, t + e.pos.x, false, false, "talk" if talking else "")
 			if dist < 9.0:
 				var dv := pp - n.position
 				m.rotation.y = lerp_angle(m.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 5.0))
@@ -626,8 +674,11 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) 
 				mark.position.y = 3.1 + sin(t * 4.0) * 0.15
 		"enemy", "boss":
 			var ms: Array = n.get_meta("models")
-			for i in ms.size():
-				Models.anim_monster(ms[i], t, i * 1.7 + e.pos.x)
+			if e.kind == "enemy":
+				_wander(ms, e, n, dist, d)
+			else:
+				for i in ms.size():
+					Models.anim_monster(ms[i], t, i * 1.7 + e.pos.x)
 			if dist < 10.0:
 				var dv2 := pp - n.position
 				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))

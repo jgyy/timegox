@@ -121,6 +121,46 @@ func _portraits(n: String, models: Array, spacing: float = 0.95, height: float =
 	stage.queue_free()
 	main.world.show()
 
+## Turnaround of one model (developer tool, --inspect=a,b,c): front, three-quarter, side and back
+## views of the whole figure and a close-up of the head, so faces, hands and costume details can be
+## checked from every side.  Writes inspect_<id>_<view>.png.
+func _inspect(id: String, m: Node3D, height: float) -> void:
+	main.world.hide()
+	var stage := Node3D.new()
+	stage.position = Vector3(0, 440, 0)
+	main.add_child(stage)
+	var cam := Camera3D.new()
+	cam.fov = 30.0
+	cam.environment = Look.environment("garden", 0.1)
+	stage.add_child(cam)
+	stage.add_child(Look.sun("garden"))
+	stage.add_child(Look.fill("garden"))
+	var fl := MB.new()
+	fl.disc(Vector3.ZERO, 6.0, MB.tag(Color("8a9a88"), MB.STONE), 40, MB.tag(Color("6a7a6a"), MB.STONE))
+	MB.mesh_node(stage, fl.build(MB.mat_plain()))
+	stage.add_child(m)
+	m.add_child(Models.shadow_disc(0.8))
+	var t0 := 0.0
+	var views := [["front", 0.0, false], ["three", 0.65, false], ["side", PI * 0.5, false], ["back", PI, false], ["face", 0.3, true]]
+	for v in views:
+		m.rotation.y = v[1]
+		var close: bool = v[2]
+		var aim := Vector3(0, height * (0.9 if close else 0.5), 0)
+		var dist := height * (0.75 if close else 2.6)
+		cam.position = aim + Vector3(0, height * (0.02 if close else 0.12), dist)
+		cam.look_at(stage.global_position + aim, Vector3.UP)
+		cam.make_current()
+		for k in 20:
+			t0 += 1.0 / 30.0
+			if m.get_meta("kind", "") == "person":
+				Models.anim_person(m, t0 + 0.5, false)
+			else:
+				Models.anim_monster(m, t0 + 0.5, 0.0)
+			await get_tree().process_frame
+		await _shot("inspect_%s_%s" % [id, v[0]])
+	stage.queue_free()
+	main.world.show()
+
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for r in 20:
 		for dx in range(-r, r + 1):
@@ -233,6 +273,20 @@ func _run() -> void:
 	main.set_stack(["world"])
 	main.world.load_area("sect", Vector2i(20, 9))
 	main.world.banner_t = 0.0
+	if main.args.has("inspect"):
+		var tint := Color(main.args.get("tint", "c8a070"))
+		for id2 in str(main.args.inspect).split(",", false):
+			var mm: Node3D
+			var hgt := 1.8
+			if Assets.PEOPLE.has(id2):
+				mm = Assets.person(id2)
+			else:
+				mm = Models.monster(id2, tint)
+				var ab := AABB()
+				for mi in mm.get_meta("meshes", []):
+					ab = ab.merge((mi as MeshInstance3D).get_aabb())
+				hgt = maxf(ab.size.y, ab.size.x * 0.6)
+			await _inspect(id2, mm, hgt)
 	if main.args.has("show"):
 		# a quick look at chosen models (developer tool): --show=beast,fox,yue_ling
 		var cols := [Color("7aa860"), Color("d0602a"), Color("3a8ad8"), Color("c8a040"), Color("9a6ad0"), Color("40b0a0")]

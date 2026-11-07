@@ -15,7 +15,7 @@ extends RefCounted
 ## the procedural models use, so screenshots and the bot stay deterministic.
 
 const DIR := "res://assets/"
-const LOOPS := ["idle", "walk", "sit", "fly", "swim"]
+const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim"]
 ## shape -> asset path for monsters that have a Blender model
 const MONSTERS := {
 	"beast": "monsters/beast", "dragon": "monsters/dragon", "phoenix": "monsters/phoenix", "bird": "monsters/phoenix",
@@ -77,13 +77,17 @@ static func _scene(rel: String) -> PackedScene:
 		_scenes[rel] = load(path(rel))
 	return _scenes[rel]
 
-static func _material_for(src: Material) -> Material:
+static func _material_for(src: Material, actor: bool = false) -> Material:
 	var nm := src.resource_name if src != null else "toon"
 	if nm.begins_with("glow"):
 		return MB.mat_glow()
 	if nm.begins_with("plain"):
-		return MB.mat_plain()
-	return MB.mat_vc()
+		return MB.mat_actor_plain() if actor else MB.mat_plain()
+	return MB.mat_actor() if actor else MB.mat_vc()
+
+## characters and monsters (rigged assets) use the actor shading; props keep the scenery toon
+static func is_actor(rel: String) -> bool:
+	return rel.begins_with("characters/") or rel.begins_with("monsters/")
 
 ## The palette one enemy colour expands into (sRGB): [primary, shadow, highlight, secondary, accent].
 ## The shadow leans a little further round the colour wheel and deepens, the highlight warms and
@@ -103,7 +107,7 @@ static func palette(c: Color) -> Array:
 	return [c, shade, light, sec, acc]
 
 ## Rebuild a mesh with the game's materials, tinting vertices by their UV.x weight and palette slot.
-static func prepare_mesh(src: Mesh, tint: Color, key: String) -> Mesh:
+static func prepare_mesh(src: Mesh, tint: Color, key: String, actor: bool = false) -> Mesh:
 	if _meshes.has(key):
 		return _meshes[key]
 	var out := ArrayMesh.new()
@@ -113,7 +117,7 @@ static func prepare_mesh(src: Mesh, tint: Color, key: String) -> Mesh:
 		lin.append((pc as Color).srgb_to_linear())
 	for s in src.get_surface_count():
 		var arr: Array = src.surface_get_arrays(s)
-		var mat: Material = _material_for(src.surface_get_material(s))
+		var mat: Material = _material_for(src.surface_get_material(s), actor)
 		if tint.a > 0.0 and arr[Mesh.ARRAY_TEX_UV] != null and arr[Mesh.ARRAY_COLOR] != null:
 			var cols: PackedColorArray = arr[Mesh.ARRAY_COLOR]
 			var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
@@ -156,7 +160,7 @@ static func instance(rel: String, tint: Color = Color(0, 0, 0, 0)) -> Node3D:
 	_walk(inst, meshes, "MeshInstance3D")
 	for mi in meshes:
 		var m: MeshInstance3D = mi
-		m.mesh = prepare_mesh(m.mesh, tint, "%s|%s|%s" % [rel, m.name, tint.to_html() if tint.a > 0.0 else "-"])
+		m.mesh = prepare_mesh(m.mesh, tint, "%s|%s|%s" % [rel, m.name, tint.to_html() if tint.a > 0.0 else "-"], is_actor(rel))
 	var aps: Array = []
 	_walk(inst, aps, "AnimationPlayer")
 	var root := Node3D.new()
@@ -196,6 +200,10 @@ static func monster(shape: String, col: Color) -> Node3D:
 	n.set_meta("shape", shape)
 	return n
 
+static func has_clip(n: Node3D, clip: String) -> bool:
+	var ap: AnimationPlayer = n.get_meta("ap", null) if n != null else null
+	return ap != null and ap.has_animation(clip)
+
 ## Drive a model's AnimationPlayer: `base` is the looping clip, an action set by Models.act()
 ## overrides it until it finishes.  `t` is the caller's clock (deltas are taken from it).
 static func animate(n: Node3D, t: float, base: String, phase: float = 0.0) -> void:
@@ -207,12 +215,13 @@ static func animate(n: Node3D, t: float, base: String, phase: float = 0.0) -> vo
 	n.set_meta("anim_t", t)
 	var act: String = n.get_meta("act", "")
 	if act != "":
-		var clip := act if ap.has_animation(act) else ("attack" if ap.has_animation("attack") else "")
+		var clip := act if ap.has_animation(act) else ("attack" if ap.has_animation("attack") and act != "die" and act != "bow" else "")
 		var act_t: float = n.get_meta("act_t", 0.0)
 		var e := t - act_t
 		if clip != "" and e >= 0.0:
 			var len_: float = ap.get_animation(clip).length
-			if e <= len_ + (0.8 if act == "victory" else 0.05):
+			# a fallen fighter stays down: "die" holds its last frame until another action
+			if act == "die" or e <= len_ + (0.8 if act == "victory" else 0.05):
 				if n.get_meta("act_seen", -INF) != act_t or ap.assigned_animation != clip:
 					n.set_meta("act_seen", act_t)
 					ap.play(clip, 0.08)

@@ -348,9 +348,14 @@ static func _act_k(n: Node3D, t: float, dur: float = 0.55) -> Array:
 		return ["", 0.0]
 	return [kind, e / dur]
 
-static func anim_person(n: Node3D, t: float, walking: bool, sit: bool = false) -> void:
+## `mode` picks another looping clip of a Blender character when it has one: "run" on the road,
+## "talk" while the character is the one speaking in a dialogue.
+static func anim_person(n: Node3D, t: float, walking: bool, sit: bool = false, mode: String = "") -> void:
 	if n.has_meta("glb"):
-		Assets.animate(n, t, "sit" if sit else ("walk" if walking else "idle"), t)
+		var base := "sit" if sit else ("walk" if walking else "idle")
+		if mode != "" and not sit:
+			base = mode
+		Assets.animate(n, t, base, t)
 		return
 	var p: Dictionary = n.get_meta("p")
 	var ph := t * 9.0
@@ -1290,14 +1295,14 @@ static func _boss_halo(root: Node3D, col: Color) -> void:
 	_mi(ring, rb, MB.mat_glow())
 	root.set_meta("ring", ring)
 
-static func anim_monster(n: Node3D, t: float, phase: float = 0.0) -> void:
+static func anim_monster(n: Node3D, t: float, phase: float = 0.0, base: String = "idle") -> void:
 	if n.get_meta("kind", "") == "person":
-		anim_person(n, t + phase, false)
+		anim_person(n, t + phase, base == "walk")
 		if n.has_meta("ring"):
 			n.get_meta("ring").rotation.y = t * 0.9
 		return
 	if n.has_meta("glb"):
-		Assets.animate(n, t, "idle", phase * 0.37)
+		Assets.animate(n, t, base, phase * 0.37)
 		if n.has_meta("ring"):
 			n.get_meta("ring").rotation.y = t * 0.9
 		return
