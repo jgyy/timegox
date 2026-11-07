@@ -11,11 +11,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 from creature import zero_pose  # noqa: E402
 from kit import CLOTH, CRYSTAL, MAT_GLOW, MAT_PLAIN, SKIN, V, Builder, Rig, env  # noqa: E402
 from sculpt import fbm3, morph_sphere, smooth  # noqa: E402
+from creature import add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 rnd = random.Random(7)
 Y = 2.0
 r = Rig("rig")
@@ -106,19 +109,28 @@ for k in range(24):
 T_IDLE = 3.0
 
 
+def halo_rot(spin, tilt=0.15):
+    """The halo leans in the body's frame and spins about its own leaning axis."""
+    cx, sx, cy, sy = math.cos(tilt), math.sin(tilt), math.cos(spin), math.sin(spin)
+    rx = ((1, 0, 0), (0, cx, -sx), (0, sx, cx))
+    ry = ((cy, 0, sy), (0, 1, 0), (-sy, 0, cy))
+    return creature.euler_yxz([[sum(rx[i][k] * ry[k][j] for k in range(3)) for j in range(3)] for i in range(3)])
+
+
 def idle(t):
     w = 2 * math.pi / T_IDLE
     p = zero_pose(r)
-    p["body"] = ((0, math.sin(t * w * 0.5) * 0.08, 0), (0, math.sin(t * w) * 0.1, 0), (1.0 + 0.03 * math.sin(t * w * 2), 1.0 + 0.03 * math.sin(t * w * 2 + 1.0), 1.0))
-    p["halo"] = ((0.15, t * w * 0.5, 0), (0, 0, 0))
-    p["bolts"] = ((0, 0, 0), (0, 0, 0), (1.0, 0.6 + 0.4 * abs(math.sin(t * w * 4.7)), 1.0))
+    p["body"] = ((0, math.sin(t * w + 0.5) * 0.08, 0), (0, math.sin(t * w) * 0.1, 0), (1.0 + 0.03 * math.sin(t * w * 2), 1.0 + 0.03 * math.sin(t * w * 2 + 1.0), 1.0))
+    # the 24 runes repeat every 45 degrees: a quarter turn per loop keeps the loop seamless
+    p["halo"] = (halo_rot(0.5 * math.pi * t / T_IDLE), (0, 0, 0))
+    p["bolts"] = ((0, 0, 0), (0, 0, 0), (1.0, 0.6 + 0.4 * abs(math.sin(t * w * 5)), 1.0))
     for sd, s in (("L", 1), ("R", -1)):
-        p["arm." + sd] = ((math.sin(t * w + s) * 0.15, 0, math.sin(t * w * 0.7) * 0.15 * s), (0, 0, 0))
+        p["arm." + sd] = ((math.sin(t * w + s) * 0.15, 0, math.sin(t * w + 0.7) * 0.15 * s), (0, 0, 0))
     return p
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     p = idle(0.0)
     p["body"] = ((0.25 * e, 0, 0), (0, 0, 0.3 * math.sin(min(1.0, k * 1.6) * math.pi)), (1.0 + 0.15 * e, 1.0 + 0.15 * e, 1.0 + 0.15 * e))
@@ -143,5 +155,31 @@ def cast(t):
     return p
 
 
+T_WALK = 2.0
+
+
+def walk(t):
+    """Rolls forward like weather: the mass leans and churns, the rain slants."""
+    w = 2 * math.pi / T_WALK
+    p = idle(t * T_IDLE / T_WALK)
+    add(p, "body", (0.15, 0.05 * math.sin(t * w), 0.06 * math.sin(t * w)), (0, 0.05 * math.sin(t * w * 2), 0))
+    add(p, "bolts", (-0.25, 0, 0))
+    return p
+
+
+def die(t):
+    """Breaks up: the cloud swells, thins and sinks away, the lightning gone."""
+    k = min(1.0, t / 1.2)
+    swell = math.sin(math.pi * smooth(0.0, 0.3, k))
+    f = smooth(0.2, 0.86, k)
+    p = idle(0.0)
+    s_ = (1.0 + 0.15 * swell) * (1.0 - 0.85 * f) + 0.02
+    p["body"] = ((0, 0, 0), (0, -1.6 * f, 0), (s_ * (1.0 + 0.3 * f), s_ * (1.0 - 0.4 * f), s_ * (1.0 + 0.3 * f)))
+    p["bolts"] = ((0, 0, 0), (0, 0, 0), (max(0.01, 1.0 - 1.5 * k), max(0.01, 1.0 - 1.5 * k), max(0.01, 1.0 - 1.5 * k)))
+    # the halo's spin runs down and stops as the cloud dies
+    u = min(1.0, k / 0.85)
+    p["halo"] = ((0.15, 6.12 * (u - 0.5 * u * u), 0), (0, -0.2 * f, 0), (1.0 - 0.9 * f, 1.0, 1.0 - 0.9 * f))
+    return p
+
 print("[art] storm: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/storm.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=10, dist=0.35, strength=0.45)
+kit.finish_rigged(b, r, "monsters/storm.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=10, dist=0.35, strength=0.45)

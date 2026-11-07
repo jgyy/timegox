@@ -192,6 +192,11 @@ def seg_dist(p, a, b):
 def reset():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     random.seed(7)
+    # bake_action keys a pose every 1/FPS s on consecutive frames, so the scene must run at FPS:
+    # Blender's factory scene runs at 24 fps, which stretched every exported clip by a quarter (a
+    # 0.55 s attack lasted 0.69 s, the walk slowed down)
+    bpy.context.scene.render.fps = FPS
+    bpy.context.scene.render.fps_base = 1.0
 
 
 def out_path(rel):
@@ -868,8 +873,13 @@ def export(path, objs, animations=True):
     )
     if animations:
         kw["export_animation_mode"] = "ACTIONS"
+        # clips are keyed from frame 1: start them at 0 s so a loop's last frame meets its first
+        kw["export_anim_slide_to_zero"] = True
     bpy.ops.export_scene.gltf(**kw)
     print("[art] wrote", os.path.relpath(path, ROOT))
+
+
+export.slides_to_zero = True  # creature.realtime() checks this and leaves the export alone
 
 
 def decimate(ob, target_tris):

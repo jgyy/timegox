@@ -10,11 +10,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 from creature import chain_rig, glow_ball, wave_chain, zero_pose  # noqa: E402
 from sculpt import catmull, strand  # noqa: E402
 from kit import CRYSTAL, MAT_GLOW, MAT_PLAIN, V, Builder, Rig, env  # noqa: E402
+from creature import add, smooth  # noqa: E402
 
 kit.reset()
+creature.realtime()
 Y = 1.55
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -102,11 +105,11 @@ def pulse_pose(t, speed, amp):
     ph = t * speed
     pul = math.sin(ph)
     p["bell"] = ((0, 0, 0), (0, 0.06 * math.sin(ph - 0.6), 0), (1.0 + 0.06 * pul, 1.0 - 0.08 * pul, 1.0 + 0.06 * pul))
-    p["root"] = ((0, 0, 0), (0, 0.08 * math.sin(ph * 0.5), 0))
+    p["root"] = ((0, 0, 0), (0, 0.05 * math.sin(ph - 2.0), 0))
     for k, (names, _) in enumerate(tent):
         wave_chain(p, names, t + k * 0.13, speed, amp, axis=0, lag=0.9, grow=0.3)
     for k, (names, _) in enumerate(arms):
-        wave_chain(p, names, t + k * 0.3, speed * 0.7, amp * 0.8, axis=2, lag=0.7)
+        wave_chain(p, names, t + k * 0.3, speed, amp * 0.8, axis=2, lag=0.7)
     return p
 
 
@@ -115,7 +118,7 @@ def idle(t):
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     p = pulse_pose(t, 14.0, 0.3 * e + 0.1)
     p["root"] = ((0.4 * e, 0, 0), (0, 0.1 * e, 0.45 * math.sin(min(1.0, k * 1.6) * math.pi)))
@@ -136,5 +139,31 @@ def cast(t):
     return p
 
 
+T_WALK = 1.2
+
+
+def walk(t):
+    """Swims: quicker pulses of the bell, leaning into the stroke, tentacles trailing."""
+    p = pulse_pose(t, 2 * math.pi / T_WALK, 0.16)
+    add(p, "root", (0.25, 0, 0), (0, 0.05 * math.sin(2 * math.pi * t / T_WALK), 0))
+    return p
+
+
+def die(t):
+    """The light gutters; the bell sinks to the ground and spreads like a dropped cloth."""
+    k = min(1.0, t / 1.2)
+    f = smooth(0.1, 0.8, k) ** 1.3
+    p = pulse_pose(t * (1.0 - 0.8 * f), 2 * math.pi / T_IDLE, 0.1 * (1.0 - f))
+    # the pulse's bob dies away with it, so the bell ends at rest
+    for nm in ("root", "bell"):
+        p[nm] = (p[nm][0], tuple(x * (1.0 - f) for x in p[nm][1])) + tuple(p[nm][2:])
+    add(p, "root", (0.1 * f, 0, 0.15 * f), (0, -1.38 * f + 0.04 * math.sin(math.pi * smooth(0.7, 0.86, k)), 0))
+    p["bell"] = (p["bell"][0], p["bell"][1], (1.0 + 0.35 * f, 1.0 - 0.55 * f, 1.0 + 0.35 * f))
+    for k2, (names, _) in enumerate(tent):
+        a = 2 * math.pi * k2 / N_T
+        for j, nm in enumerate(names):
+            add(p, nm, (-math.sin(a) * 1.2 * f / (j + 1), 0.0, math.cos(a) * 1.2 * f / (j + 1)))
+    return p
+
 print("[art] jelly: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/jelly.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.35)
+kit.finish_rigged(b, r, "monsters/jelly.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.35)

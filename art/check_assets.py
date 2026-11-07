@@ -13,7 +13,8 @@ Checks
 * characters have a skin with the bones the game drives (hips, chest, head, eyes, mouth, hands,
   fingers, thumbs, sleeve pockets, feet, toes, the hair and cape chains) and all eleven clips
   (idle, walk, run, sit, talk, bow, attack, cast, hurt, victory, die);
-* monsters have a skin and at least idle, attack and hurt.
+* monsters have a skin and at least the five clips the game plays: idle and walk (loops), attack,
+  hurt and die.
 
 Exits non-zero and lists every problem if anything fails.
 """
@@ -31,7 +32,7 @@ SET_PIECES = {"props/magpiebridge": (2000, 24000)}
 PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "hand.R", "fingers.L", "fingers.R",
                 "thumb.L", "thumb.R", "sleeve.L", "sleeve.R", "foot.L", "foot.R", "toe.L", "toe.R", "hair_tail2", "cape3")
 PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die")
-MONSTER_CLIPS = ("idle", "attack", "hurt")
+MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
 MATERIALS = {"toon", "plain", "glow"}
 
 

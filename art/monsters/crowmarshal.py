@@ -8,12 +8,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import accessory as acc  # noqa: E402
 import face as facelib  # noqa: E402
 import garment as G  # noqa: E402
 import person  # noqa: E402
+from creature import person_die  # noqa: E402
 
 kit.reset()
+creature.realtime()
 
 
 def crow(b, rig, o, tor):
@@ -26,4 +29,4 @@ person.export_person("monsters/crowmarshal.glb", {
     "bracers": "1a1a20", "extra": crow, "claws": True, "claw_col": "1a1a1a",
     "robe": "b0b0b0", "trim": "d8d8d8", "inner": "8a8a8a", "sash": "4a4a4a", "pants": "4a4a4a", "boots": "1a1a1a", "sleeve": "a0a0a0",
     "hair": "0a0a10", "hair_style": "wild", "eyes": "c02020", "embroidery": "8a8a9a", "tint_cloth": True, "scale": 1.3,
-})
+}, clips=dict(person.CLIPS, die=(1.2, person_die(person.clip_idle))))

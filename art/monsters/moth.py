@@ -10,12 +10,16 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import zero_pose  # noqa: E402
 from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, SKIN, V, Builder, Rig, env  # noqa: E402
-from sculpt import strand  # noqa: E402
+from clay import Clay  # noqa: E402
+from sculpt import fbm3  # noqa: E402
+from creature import add, smooth  # noqa: E402
 
 kit.reset()
+creature.realtime()
 C = V(0, 1.5, 0)
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -28,25 +32,38 @@ for s, sd in ((1, "L"), (-1, "R")):
     r.bone("ant.%s" % sd, C + V(0.04 * s, 0.1, 0.33), C + V(0.22 * s, 0.4, 0.6), "head")
 
 b = Builder("moth")
-# thorax: a ball of dense fur; abdomen of furred segments; a small head
-thor = b.ellipsoid(C + V(0, 0.02, 0.05), (0.13, 0.13, 0.18), (0.9, 0.9, 0.9), cls=HAIR, bone="body", tint=0.6, seg=18, rings=12)
-A.fur(b, thor, 90, 0.06, 0.02, seed=3, bone_fn=lambda p: "body", min_dist=0.025, col_root=(0.75, 0.75, 0.75), col_tip=(1.0, 1.0, 1.0), tint=0.5, lift=0.8,
-      groom=lambda p, n: (V(0, 0, -1) + n * n.z).normalized() if abs(n.z) < 0.95 else V(0, 1, 0))
+# thorax and abdomen sculpted in one: a thick, fluffy thorax (the fur shingled into soft clumps,
+# not a pelt of strands), a tapering abdomen of furred rings, a small head and a collar ruff
+cl = Clay(0.012, "moth_body")
+cl.ellipsoid(C + V(0, 0.02, 0.05), (0.14, 0.14, 0.19), bones={"body": 1.0}, tag="thorax")
+cl.ellipsoid(C + V(0, 0.04, 0.16), (0.15, 0.13, 0.08), bones={"body": 0.7, "head": 0.3}, tag="ruff")
 abd = [C + V(0, -0.0, -0.1)] + [C + V(0, -0.03 - k / 6 * 0.12, -0.15 - k / 6 * 0.38) for k in range(1, 7)]
-A.plate_segments(b, abd, [(0.12 - k / 6 * 0.05, 0.11 - k / 6 * 0.04) for k in range(7)], (0.78, 0.78, 0.78), lambda p: "abdomen", n=14, col2=(0.95, 0.95, 0.95), tint=0.6, cls=HAIR)
-for k in range(1, 7):
-    q = abd[k]
-    for j in range(6):
-        a = j / 6 * 2 * math.pi
-        out = V(math.cos(a), math.sin(a), 0)
-        b.tube([q + out * 0.08 * (1 - k / 9), q + out * 0.11 * (1 - k / 9) + V(0, 0, -0.03)], [0.012, 0.002], (0.9, 0.9, 0.9), cls=HAIR, bone="abdomen", tint=0.5, seg=4, mat=MAT_PLAIN)
-b.ellipsoid(C + V(0, 0.04, 0.27), (0.09, 0.085, 0.08), (0.85, 0.85, 0.85), cls=HAIR, bone="head", tint=0.6, seg=14, rings=8)
-b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# fluffy ruff around the neck
-for k in range(18):
-    a = k / 18 * 2 * math.pi
-    root = C + V(math.cos(a) * 0.1, 0.03 + math.sin(a) * 0.1, 0.17)
-    strand(b, [root, root + V(math.cos(a) * 0.06, math.sin(a) * 0.06, 0.03), root + V(math.cos(a) * 0.12, math.sin(a) * 0.1, 0.02)], 0.022, 0.003, (1.0, 1.0, 1.0), cls=HAIR, bone="body", flat=0.4, seg=5, per=3, tint=0.4, mat=MAT_PLAIN)
+for k in range(7):
+    cl.ellipsoid(abd[k], ((0.12 - k / 6 * 0.05), (0.11 - k / 6 * 0.04), 0.07), rot=A.frame_m(abd[min(6, k + 1)] - abd[max(0, k - 1)]), bones={"abdomen": min(1.0, 0.3 + k * 0.2), "body": max(0.0, 0.7 - k * 0.2)}, tag="abd", t=k)
+cl.ellipsoid(C + V(0, 0.04, 0.27), (0.09, 0.085, 0.08), bones={"head": 1.0}, tag="head")
+
+
+def moth_col(p, info):
+    if info.tag == "abd":
+        # pale bands between the rings of the abdomen
+        return (0.82 + 0.15 * (0.5 + 0.5 * math.cos(info.t * 2 * math.pi)),) * 3
+    if info.tag == "ruff":
+        return (0.98, 0.98, 0.98)
+    return (0.88, 0.88, 0.88)
+
+
+def moth_fluff(p, info):
+    if info.tag == "head":
+        return None
+    nn = info.n
+    w = fbm3((p.x * 14.0, p.y * 14.0, p.z * 14.0), 2, 4)
+    u = -p.z * 22.0 + 0.5 * math.sin(math.atan2(nn.x, nn.y) * 7.0) + 1.2 * w
+    k = u - math.floor(u)
+    return nn * ((0.016 if info.tag in ("thorax", "ruff") else 0.008) * k ** 1.5)
+
+
+cl.build(b, moth_col, cls=CLOTH, tint_fn=lambda p, info: 0.7 if info.tag == "ruff" else 1.0, post=moth_fluff)
+b.cur_pal = 0.0
 # big compound eyes, a coiled proboscis and two palps
 for s in (1, -1):
     A.compound_eye(b, C + V(0.07 * s, 0.06, 0.31), 0.05, "302040", "head")
@@ -150,7 +167,7 @@ def idle(t, amp=1.0):
 
 
 def attack(t):
-    e = env(t / 0.6)
+    e = env(t / 0.55)
     p = idle(t * 1.5, 1.2)
     p["root"] = ((0, 0, 0), (0, -0.2 * e, 0.45 * e))
     p["body"] = ((0.35 * e, 0, 0), (0, 0, 0))
@@ -176,6 +193,31 @@ def cast(t):
 
 
 # the moth reads small next to the other foes: scale it up (clips are rotations, so they still fit)
+T_WALK = 1.6
+
+
+def walk(t):
+    """Flutters forward: quicker beats, the body pitched into the flight, bobbing."""
+    p = idle(t * FLAP * 4 / T_WALK, 1.15)
+    add(p, "body", (0.25, 0, 0))
+    add(p, "abdomen", (-0.1, 0, 0))
+    add(p, "root", (0, 0, 0), (0, 0.04 * math.sin(2 * math.pi * t / T_WALK), 0))
+    return p
+
+
+def die(t):
+    """The wings fold; the moth tumbles to the ground and lies with its wings spread flat."""
+    k = min(1.0, t / 1.2)
+    f = smooth(0.1, 0.7, k) ** 1.5
+    p = idle(t * (1.0 - f), 1.0 - f)
+    add(p, "root", (0.0, 0.0, 0.5 * f), (0, -1.85 * f + 0.05 * math.sin(math.pi * smooth(0.7, 0.85, k)), 0))
+    add(p, "body", (0.2 * f, 0, 0))
+    for sd, s_ in (("L", 1), ("R", -1)):
+        add(p, "fw.%s" % sd, (0, 0, s_ * 0.2 * f))
+        add(p, "hw.%s" % sd, (0, 0, s_ * 0.15 * f))
+        add(p, "ant.%s" % sd, (0.5 * f, 0, 0))
+    return p
+
 kit.scale_asset(b, r, 1.45)
 print("[art] moth: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/moth.glb", {"idle": (FLAP * 4, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=10, dist=0.2, strength=0.4)
+kit.finish_rigged(b, r, "monsters/moth.glb", {"idle": (FLAP * 4, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=10, dist=0.2, strength=0.4)

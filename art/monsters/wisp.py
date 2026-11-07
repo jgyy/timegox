@@ -9,11 +9,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 from creature import chain_rig, glow_ball, wave_chain, zero_pose  # noqa: E402
 from kit import CLOTH, CRYSTAL, MAT_GLOW, MAT_PLAIN, SKIN, V, Builder, Rig, env  # noqa: E402
 from sculpt import fbm3, morph_sphere, smooth  # noqa: E402
+from creature import add  # noqa: E402
 
 kit.reset()
+creature.realtime()
 Y = 1.25
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
@@ -79,22 +82,23 @@ T_IDLE = 2.0
 
 def flicker(p, t, speed, amp):
     for k, (names, _) in enumerate(flames):
-        wave_chain(p, names, t + k * 0.37, speed * (1.0 + 0.13 * k), amp, axis=2 if k % 2 else 0, lag=0.9, grow=0.4)
-    wave_chain(p, tail, t, speed * 0.6, amp * 0.8, axis=1, lag=0.8)
+        # whole multiples of the clip's base speed so the loops close
+        wave_chain(p, names, t + k * 0.37, speed * (1.0 + 0.5 * (k % 3)), amp, axis=2 if k % 2 else 0, lag=0.9, grow=0.4)
+    wave_chain(p, tail, t, speed * 0.5, amp * 0.8, axis=1, lag=0.8)
 
 
 def idle(t):
     w = 2 * math.pi / T_IDLE
     p = zero_pose(r)
     flicker(p, t, w * 2, 0.18)
-    p["body"] = ((0, math.sin(t * w * 0.5) * 0.2, 0), (0, math.sin(t * w) * 0.08, 0), (1.0 + 0.04 * math.sin(t * w * 2), 1.0 - 0.04 * math.sin(t * w * 2), 1.0))
+    p["body"] = ((0, math.sin(t * w + 0.7) * 0.2, 0), (0, math.sin(t * w) * 0.08, 0), (1.0 + 0.04 * math.sin(t * w * 2), 1.0 - 0.04 * math.sin(t * w * 2), 1.0))
     for sd, s in (("L", 1), ("R", -1)):
         p["arm." + sd] = ((math.sin(t * w + s) * 0.3, 0, math.sin(t * w * 2) * 0.2 * s), (0, 0, 0))
     return p
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     p = idle(0.0)
     flicker(p, t, 18.0, 0.35)
@@ -121,5 +125,30 @@ def cast(t):
     return p
 
 
+T_WALK = 1.0
+
+
+def walk(t):
+    """Drifts forward, leaning into the motion, its flames and tail streaming behind."""
+    w = 2 * math.pi / T_WALK
+    p = idle(t * T_IDLE / T_WALK)
+    flicker(p, t, w * 2, 0.22)
+    add(p, "body", (0.3, 0, 0.08 * math.sin(t * w)), (0, 0.05 * math.sin(t * w * 2), 0))
+    for nm in tail:
+        add(p, nm, (0.2, 0, 0))
+    return p
+
+
+def die(t):
+    """Gutters out: flares once, shrinks to a spark and drops."""
+    k = min(1.0, t / 1.2)
+    flare = math.sin(math.pi * smooth(0.0, 0.25, k))
+    f = smooth(0.2, 0.9, k)
+    p = idle(t * (1.0 - f))
+    flicker(p, t, 30.0, 0.4 * (1.0 - f))
+    s_ = max(0.02, (1.0 + 0.3 * flare) * (1.0 - 0.95 * f))
+    p["body"] = ((0, 0, 0), (0, -1.1 * f, 0), (s_, s_, s_))
+    return p
+
 print("[art] wisp: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/wisp.glb", {"idle": (T_IDLE, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast)}, samples=10, dist=0.2, strength=0.25)
+kit.finish_rigged(b, r, "monsters/wisp.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=10, dist=0.2, strength=0.25)
