@@ -423,6 +423,54 @@ static func configure_weather(p: CPUParticles3D, kind: String) -> void:
 			p.initial_velocity_max = 0.6
 			p.color = Color(1.0, 0.6, 0.3, 0.9)
 			mote_kind = "fireflies"
+		# ---- Part IX
+		"heat_haze":
+			# the air itself shimmering over baked ground: faint veils of warm light rising slowly,
+			# with fine dust drifting in the sunlight
+			p.position = Vector3(0, 0.3, 0)
+			p.emission_box_extents = Vector3(18, 0.6, 18)
+			p.mesh = quad("smoke", 2.2, false)
+			p.amount = 60
+			p.lifetime = 5.0
+			p.preprocess = 5.0
+			p.direction = Vector3(0, 1, 0)
+			p.spread = 8.0
+			p.initial_velocity_min = 0.5
+			p.initial_velocity_max = 1.1
+			p.scale_amount_min = 0.8
+			p.scale_amount_max = 1.6
+			p.color = Color(1.0, 0.96, 0.85, 0.12)
+			mote_kind = "pollen"
+		"steam":
+			# steam lifting off the hot springs and drifting up the valley, gold motes in the dawn
+			p.position = Vector3(0, 0.3, 0)
+			p.emission_box_extents = Vector3(18, 0.3, 18)
+			p.mesh = quad("smoke", 3.0, false)
+			p.amount = 70
+			p.lifetime = 7.0
+			p.preprocess = 7.0
+			p.direction = Vector3(0.15, 1, 0.05)
+			p.spread = 12.0
+			p.initial_velocity_min = 0.6
+			p.initial_velocity_max = 1.3
+			p.scale_amount_min = 0.8
+			p.scale_amount_max = 2.0
+			p.color = Color(1.0, 0.98, 0.94, 0.22)
+			mote_kind = "pollen"
+		"osmanthus":
+			# tiny golden osmanthus flowers drifting down through the moonlight over glittering frost
+			p.mesh = quad("petal", 0.12, false)
+			p.amount = 160
+			p.lifetime = 8.0
+			p.preprocess = 8.0
+			p.spread = 35.0
+			p.initial_velocity_min = 0.4
+			p.initial_velocity_max = 1.0
+			p.gravity = Vector3(0.3, -0.05, 0.15)
+			p.angular_velocity_min = -90.0
+			p.angular_velocity_max = 90.0
+			p.color = Color(1.0, 0.8, 0.3, 0.95)
+			mote_kind = "frost"
 		"stars", "glints", "light", "wisps", "sand":
 			p.position = Vector3(0, 3.5, 0)
 			p.emission_box_extents = Vector3(18, 3.5, 18)

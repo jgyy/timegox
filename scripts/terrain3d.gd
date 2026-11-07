@@ -14,7 +14,7 @@ static var _water_mats := {}
 static var _ground_mats := {}
 static var _protos := {}
 
-const STYLE := {"grass": 0, "mud": 1, "snow": 2, "rock": 3, "tile": 4, "sand": 5, "ash": 6, "crystal": 7, "marble": 8, "glass": 9, "moss": 10, "permafrost": 11, "nebula": 12, "leaves": 13, "lilyfield": 14, "underworld": 15}
+const STYLE := {"grass": 0, "mud": 1, "snow": 2, "rock": 3, "tile": 4, "sand": 5, "ash": 6, "crystal": 7, "marble": 8, "glass": 9, "moss": 10, "permafrost": 11, "nebula": 12, "leaves": 13, "lilyfield": 14, "underworld": 15, "cracked": 16}
 
 static func world_pos(tile: Vector2i) -> Vector3:
 	return Vector3((tile.x + 0.5) * T, 0.0, (tile.y + 0.5) * T)
@@ -282,6 +282,19 @@ void fragment() {
 		g -= vec3(0.08) * seam;
 		emit += accent * seam * smoothstep(0.4, 0.65, big) * (0.6 + 0.4 * sin(TIME * 2.0 + uv.y * 0.5));
 		rough = 0.55;
+	} else if (style == 16) {
+		// drought: sun-baked clay split into curling plates by deep dark cracks, with pale dusty
+		// rims where the plates lift, finer hairline cracks inside them and patches of bleached dust
+		vec2 c9 = cells(uv * 0.85);
+		float crack = smoothstep(0.065, 0.0, c9.y);
+		float rim = smoothstep(0.16, 0.06, c9.y) * (1.0 - crack);
+		g *= 0.88 + 0.18 * h21(floor(uv * 0.85 + c9.x * 4.0)) + 0.06 * fine;
+		g = mix(g, g * 1.15 + vec3(0.05, 0.04, 0.02), rim * 0.55);
+		vec2 c10 = cells(uv * 3.1 + 7.0);
+		g *= 1.0 - 0.16 * smoothstep(0.035, 0.0, c10.y) * (1.0 - crack);
+		g = mix(g, g * vec3(0.3, 0.26, 0.22), crack * 0.9);
+		g = mix(g, vec3(dot(g, vec3(0.33))) * 1.15, smoothstep(0.6, 0.85, big) * 0.35);
+		rough = 0.98;
 	}
 	// steep slopes shed their soil: bare, cracked rock shows through on hillsides
 	float steep = smoothstep(0.93, 0.8, wn.y + (mid - 0.5) * 0.08);
@@ -426,6 +439,8 @@ static func ground_mat(theme_name: String) -> ShaderMaterial:
 			acc = Color("ff3020")
 		"underworld":
 			acc = Color("40b0ff")
+		"cracked":
+			acc = Color("f0d8a0")
 	m.set_shader_parameter("accent", acc)
 	# cloud shadows only where there are clouds and a sun to cast them
 	m.set_shader_parameter("cloud_shadow", clampf(float(th.clouds) * 1.2, 0.0, 1.0) if float(th.sun_e) > 0.8 else 0.0)
@@ -856,6 +871,50 @@ static func pagoda(root: Node3D, pos: Vector3) -> void:
 	var mi := MB.mesh_node(root, b.build())
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	MB.mesh_node(root, g.build(MB.mat_glow()))
+
+## Part IX: the Fusang, the mulberry of the Valley of Sunrise, so tall that the sun used to rest in
+## its crown before setting out each morning.  A trunk that flares into buttress roots snaking over
+## the ground, great limbs reaching out over the valley under clouds of mulberry leaves, sun-crows
+## roosting on them like coals, and the stuck sun glowing in the topmost branches.  Scenery
+## material, so the trunk dissolves when it stands between the camera and the hero.
+static func fusang_tree(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var bark := MB.tag(Color("6a4a32"), MB.WOOD)
+	var bark_d := MB.tag(Color("4a3424"), MB.WOOD)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 9001
+	var top := 64.0
+	b.lathe(pos + Vector3(0, -1.0, 0), [Vector2(7.5, 0.0), Vector2(5.2, 2.0), Vector2(4.0, 6.0), Vector2(3.5, 18.0), Vector2(3.0, 36.0), Vector2(2.2, 52.0), Vector2(1.2, top)], bark, 18)
+	for k in 7:
+		var a := TAU * k / 7.0 + rng.randf_range(-0.2, 0.2)
+		var dir := Vector3(cos(a), 0, sin(a))
+		b.limb(pos + dir * 2.4 + Vector3(0, 3.5, 0), pos + dir * rng.randf_range(7.5, 10.0) + Vector3(0, -0.5, 0), 1.5, 0.3, bark_d, 7)
+	for k in 9:
+		var a2 := TAU * k / 9.0 + rng.randf_range(-0.25, 0.25)
+		var y0 := 20.0 + k * 4.2 + rng.randf_range(-2.0, 2.0)
+		var reach := rng.randf_range(14.0, 22.0) * (1.0 - k / 15.0)
+		var d2 := Vector3(cos(a2), 0, sin(a2))
+		var base := pos + Vector3(0, y0, 0) + d2 * 2.2
+		var mid := base + d2 * reach * 0.55 + Vector3(0, reach * 0.3, 0)
+		var tip := base + d2 * reach + Vector3(0, reach * 0.45, 0)
+		b.limb(base, mid, 1.2, 0.75, bark, 7)
+		b.limb(mid, tip, 0.75, 0.3, bark, 6)
+		for c in 4:
+			var cp := tip + Vector3(rng.randf_range(-4.0, 4.0), rng.randf_range(-1.5, 2.5), rng.randf_range(-4.0, 4.0))
+			b.sph(cp, Vector3(6.0, 3.6, 6.0) * rng.randf_range(0.7, 1.2), MB.tag(Color("3f8a3a").lerp(Color("8ab84a"), rng.randf()), MB.FOLIAGE), Vector3(0, rng.randf() * TAU, 0), true)
+		if k % 2 == 0:
+			# a sun-crow roosting on the limb, glowing like a coal
+			g.ball(mid + Vector3(0, 1.0, 0), 0.7, Color(1.0, 0.75, 0.25, 0.9), true)
+	for c2 in 6:
+		var cp2 := pos + Vector3(rng.randf_range(-7.0, 7.0), top + rng.randf_range(-6.0, 2.0), rng.randf_range(-7.0, 7.0))
+		b.sph(cp2, Vector3(7.0, 4.2, 7.0) * rng.randf_range(0.7, 1.1), MB.tag(Color("4a9a40").lerp(Color("c8c050"), 0.3 * rng.randf()), MB.FOLIAGE), Vector3.ZERO, true)
+	g.ball(pos + Vector3(0, top + 9.0, 0), 5.5, Color(1.0, 0.95, 0.75, 0.95), true)
+	g.ball(pos + Vector3(0, top + 9.0, 0), 10.0, Color(1.0, 0.8, 0.4, 0.25), true)
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	var gm := MB.mesh_node(root, g.build(MB.mat_glow()))
+	gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 ## An enterable building: walls, door, floor and furniture as one mesh, the roof as another
 ## (returned, so the world can lift it away while the hero is inside).

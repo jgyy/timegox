@@ -57,6 +57,13 @@ const PEOPLE := {
 	"sweeper_bai": "characters/sweeper_bai", "gate_wu": "characters/gate_wu", "bell_shen": "characters/bell_shen",
 	"farmer_lao": "characters/farmer_lao", "child_hua": "characters/child_hua", "tofu_sun": "characters/tofu_sun",
 	"scholar_wang": "characters/scholar_wang", "carpenter_gu": "characters/carpenter_gu", "herb_lan": "characters/herb_lan",
+	# Part IX
+	"ah_mei": "characters/ah_mei", "farmer_tian": "characters/farmer_tian", "feng_meng": "characters/feng_meng",
+	"chang_e": "characters/chang_e",
+	# the Dawn Market's townsfolk
+	"watchman_zhou": "characters/watchman_zhou", "innkeeper_bao": "characters/innkeeper_bao", "tea_seller_pan": "characters/tea_seller_pan",
+	"dyer_su": "characters/dyer_su", "monk_huiming": "characters/monk_huiming", "granny_gu": "characters/granny_gu",
+	"porter_niu": "characters/porter_niu", "little_dou": "characters/little_dou",
 }
 
 static var _scenes := {}

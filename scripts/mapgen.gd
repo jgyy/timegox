@@ -25,10 +25,11 @@ const DENSITY := {
 	"maple": 0.3, "karst": 0.26, "lilies": 0.22, "diyu": 0.26,
 	"village": 0.2, "tea": 0.24, "silk": 0.3, "loom": 0.22,
 	"starferry": 0.2, "magpie": 0.26, "starpalace": 0.22, "jasper": 0.24,
+	"yanggu": 0.17, "millet": 0.2, "fusang": 0.27, "guanghan": 0.23,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
-const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38}
+const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38, "fusang": -0.36, "guanghan": -0.44}
 
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR
@@ -45,6 +46,15 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		_town(grid, w, h)
 	else:
 		_wild(grid, w, h, spec, rng)
+	# lanes: paved strips (market streets, farm tracks, causeways) laid over the ground before the
+	# buildings go up; a Rect2i each, in the region's own tiles
+	for ln in spec.get("lanes", []):
+		var lr: Rect2i = ln
+		_rect(grid, w, lr.position.x, lr.position.y, lr.end.x - 1, lr.end.y - 1, PATH)
+	# blocks: ground kept solid under a great landmark (the Fusang's trunk)
+	for bk in spec.get("blocks", []):
+		var br: Rect2i = bk
+		_rect(grid, w, br.position.x, br.position.y, br.end.x - 1, br.end.y - 1, WALL)
 	# solid border
 	for x in w:
 		grid[x] = WALL
@@ -305,6 +315,7 @@ static func _town(grid: PackedByteArray, w: int, h: int) -> void:
 	_rect(grid, w, 1, 22, 19, 22, PATH)        # south-west funeral road (Part VI)
 	_rect(grid, w, 34, 22, 34, h - 2, PATH)    # to the desert gate
 	_rect(grid, w, 6, 22, 6, h - 2, PATH)      # down to the village (Part VII)
+	_rect(grid, w, 27, 22, 27, h - 2, PATH)    # down to the Dawn Market at Yanggu (Part IX)
 	for i in 36:
 		var x := rng.randi_range(2, w - 3)
 		var y := rng.randi_range(2, h - 3)

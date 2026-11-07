@@ -237,6 +237,10 @@ func _build_view(id: String) -> void:
 		var pg := Atlas.to_world("sect", Vector2i(-5, 3))
 		var pp := Terrain3D.world_pos(pg)
 		Terrain3D.pagoda(root, Vector3(pp.x, ground_y(pp) - 0.3, pp.z) - root.position)
+	if spec.has("landmark") and spec.landmark.kind == "fusang":
+		# Part IX: the colossal Fusang mulberry in the middle of the Valley of Sunrise
+		var fp := Terrain3D.world_pos(Atlas.to_world(id, spec.landmark.pos))
+		Terrain3D.fusang_tree(root, Vector3(fp.x, ground_y(fp) - 0.6, fp.z) - root.position)
 	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {})}
 
 # ---------------------------------------------------------------- entities
@@ -341,6 +345,14 @@ func _npc_opts(id: String) -> Dictionary:
 			return {"asset": id, "hair": "long", "crown": true, "glow": Color(1.0, 0.85, 0.95)}
 		"fire_sage", "void_hermit":
 			return {"asset": id, "beard": true, "hat": true, "hair": "bald"}
+		# Part VIII's people had no entry here, so the world drew them with the procedural stand-in
+		"niu_lang", "que_lao", "zhi_nu", "dong_shuang":
+			return {"asset": id, "hair": "long" if id in ["zhi_nu", "dong_shuang"] else "bun", "beard": id == "que_lao", "staff": id == "que_lao", "hat": id == "niu_lang"}
+		# ---- Part IX
+		"ah_mei", "chang_e":
+			return {"asset": id, "hair": "long", "ribbon": Color("ffd0a0") if id == "ah_mei" else Color("e8f0ff"), "glow": Color(0.85, 0.9, 1.0) if id == "chang_e" else Color(1.0, 0.75, 0.4)}
+		"farmer_tian", "feng_meng":
+			return {"asset": id, "beard": true, "hat": id == "farmer_tian", "hair": "bun"}
 	if Assets.PEOPLE.has(id):
 		return {"asset": id}
 	return {}
@@ -603,9 +615,9 @@ func _update_view(d: float) -> void:
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:
-		"snow", "rain", "petals", "leaves", "aurora_snow":
+		"snow", "rain", "petals", "leaves", "aurora_snow", "osmanthus":
 			return 12.0
-		"bubbles", "bubbles_up", "embers", "sparks", "spores":
+		"bubbles", "bubbles_up", "embers", "sparks", "spores", "steam", "heat_haze":
 			return 0.3
 		"sandstorm":
 			return 1.5

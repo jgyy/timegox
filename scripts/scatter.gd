@@ -98,6 +98,16 @@ const ECO := {
 		"ground": [["flowers", 2]], "land": 0.35, "rocks": ["crystal", "slab"], "rock_p": 0.03, "grass": 0.5, "cover": 0.06},
 	"jasper": {"canopy": [["peach", 4], ["blossom", 2], ["pine", 1], ["ginkgo", 1]], "under": [["flowerbush", 3], ["bush", 1]],
 		"ground": [["flowers", 2.5], ["fern", 0.5]], "land": 0.05, "rocks": ["boulder", "slab", "crystal"], "rock_p": 0.04, "grass": 1.0, "cover": 0.08},
+	# ---- Part IX: scorched riverside willows in the market, withered millet and dead trees on the
+	# plain, mulberries round the Fusang, silver osmanthus groves on the moon
+	"yanggu": {"canopy": [["willow", 2], ["acacia", 2], ["ginkgo", 1], ["dead", 0.6]], "under": [["deadbush", 2], ["bush", 1], ["agave", 1]],
+		"ground": [["deadbush", 1], ["agave", 0.5]], "land": 0.12, "rocks": ["boulder", "slab"], "rock_p": 0.03, "grass": 0.45, "cover": 0.05},
+	"millet": {"canopy": [["dead", 4], ["acacia", 0.7], ["autumn_oak", 0.6]], "under": [["deadbush", 3], ["agave", 1]],
+		"ground": [["deadbush", 1.5], ["agave", 0.4]], "land": 0.0, "rocks": ["slab", "boulder", "scree"], "rock_p": 0.05, "grass": 0.7, "cover": 0.1, "logs": 0.02},
+	"fusang": {"canopy": [["mulberry", 4], ["pine", 1], ["bonsai", 1], ["ginkgo", 0.6]], "under": [["fern", 3], ["bush", 2], ["round_bush", 1]],
+		"ground": [["fern", 1.5], ["flowers", 1]], "land": 0.05, "rocks": ["boulder", "slab", "karst"], "rock_p": 0.06, "grass": 1.1, "cover": 0.1, "logs": 0.02},
+	"guanghan": {"canopy": [["osmanthus", 4], ["snowpine", 1], ["crystal_tree", 0.6]], "under": [["snowbush", 2], ["round_bush", 1]],
+		"ground": [["snowbush", 0.6], ["flowers", 0.4]], "land": 0.2, "rocks": ["crystal", "slab", "boulder"], "rock_p": 0.04, "grass": 0.45, "cover": 0.05},
 }
 
 static var _grass := {}
