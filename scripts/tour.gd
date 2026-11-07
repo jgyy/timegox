@@ -286,6 +286,27 @@ func _run() -> void:
 			Models.monster("fox", Color("ff6a30")), Models.monster("carp", Color("ffb060")), Models.monster("oxhead", Color("6a3a2a")),
 			Models.monster("horseface", Color("8a4a3a")), Models.monster("jiangshi", Color("3a5a4a")),
 		], 1.7)
+		# Part VII and VIII people (art/characters)
+		await _gallery("gallery_npcs_part7", [
+			Assets.person("granny_wen"), Assets.person("innkeeper"), Assets.person("weaver_liu"),
+			Assets.person("tea_master"), Assets.person("can_niang"), Assets.person("apprentice_zhi"), Assets.person("archivist"),
+		], 0.7)
+		await _gallery("gallery_npcs_part8", [
+			Assets.person("niu_lang"), Assets.person("zhi_nu"), Assets.person("que_lao"), Assets.person("dong_shuang"),
+		], 0.9)
+		# Part VIII creatures (art/monsters)
+		await _gallery("gallery_part8", [
+			Models.monster("qilin", Color("e05a3a")), Models.monster("tiger", Color("e8e0d0")), Models.monster("ape", Color("6a5a8a")),
+			Models.monster("magpie", Color("2a3a6a")), Models.monster("kaiming", Color("d8a040")),
+		], 1.7)
+		await _gallery("gallery_part8_bosses", [
+			Models.monster("queen", Color("f0d8a0")), Models.monster("warden", Color("3a7ab0")), Models.monster("crowmarshal", Color("3a3040")),
+		], 1.5)
+		# one shape, three enemies: the palette (Assets.palette) turns a single tint into a scheme
+		await _gallery("gallery_palettes", [
+			Models.monster("beast", Color("3a9a5a")), Models.monster("beast", Color("d04a2a")), Models.monster("beast", Color("8a8aa0")),
+			Models.monster("dragon", Color("3a8ad8")), Models.monster("dragon", Color("e0a020")),
+		], 1.7)
 		# Blender landmarks (art/props)
 		var props: Array = []
 		for pr in ["pine", "bamboo", "peach", "meteor", "glowcap", "icespire", "chaosrock", "stonelantern", "ghostpagoda"]:
@@ -300,6 +321,12 @@ func _run() -> void:
 			MB.mesh_node(holder2, Assets.static_mesh("props/" + pr2))
 			built.append(holder2)
 		await _gallery("gallery_landmarks", built, 1.1)
+		var built8: Array = []
+		for pr3 in ["ferrypost", "magpienest", "starpillar", "jadepeach"]:
+			var holder3 := Node3D.new()
+			MB.mesh_node(holder3, Assets.static_mesh("props/" + pr3))
+			built8.append(holder3)
+		await _gallery("gallery_landmarks_part8", built8, 1.4)
 		await _gallery("gallery_beasts", [
 			Models.monster("beast", Color("7aa860")), Models.monster("mantis", Color("5fd890")), Models.monster("tortoise", Color("b8903a")),
 			Models.monster("crab", Color("d0502a")), Models.monster("spider", Color("5a3a90")),
