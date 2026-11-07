@@ -363,14 +363,15 @@ void fragment() {
 		q.x += mod(floor(q.y), 2.0) * 0.5;
 		float sc = length(fract(q) - vec2(0.5, 0.2));
 		col *= 0.84 + 0.22 * smoothstep(0.6, 0.2, sc);
-		spec_k = 0.45;
-		shin = 26.0;
+		spec_k = 0.22;
+		shin = 60.0;
 	} else if (is_cls(cls, 0.9)) {
 		// horn, bone, claw, stone
 		float g = fbm(opos * 5.0 * detail);
 		col *= 0.88 + 0.2 * g;
 		shade_tint = vec3(0.58, 0.55, 0.66);
-		spec_k = 0.25;
+		// matte: a hard toon highlight on horn, bone and stone read as plastic
+		spec_k = 0.0;
 	} else if (is_cls(cls, 0.7)) {
 		// wood: long grain
 		float grain = vnoise(vec3(opos.x * 12.0, opos.y * 1.5, opos.z * 12.0));
