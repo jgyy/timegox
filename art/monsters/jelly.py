@@ -13,7 +13,7 @@ import kit  # noqa: E402
 import creature  # noqa: E402
 from creature import chain_rig, glow_ball, wave_chain, zero_pose  # noqa: E402
 from sculpt import catmull, strand  # noqa: E402
-from kit import CRYSTAL, MAT_GLOW, MAT_PLAIN, V, Builder, Rig, env  # noqa: E402
+from kit import CRYSTAL, MAT_GLOW, MAT_PLAIN, SKIN, V, Builder, Rig, env  # noqa: E402
 from creature import add, smooth  # noqa: E402
 
 kit.reset()
@@ -40,11 +40,12 @@ b = Builder("jelly")
 # the bell: an outer dome with a gentle flare and a scalloped rim of lappets, a darker inner
 # bell (the subumbrella) under it, glowing radial canals and four horseshoe gonads seen through it
 prof = [(0.56, -0.12), (0.6, -0.05), (0.58, 0.08), (0.5, 0.22), (0.36, 0.33), (0.18, 0.39), (0.001, 0.41)]
-b.lathe(V(0, Y, 0), prof, (0.85, 0.85, 0.85), cls=CRYSTAL, bone="bell", seg=32, col_top=(1.0, 1.0, 1.0), tint=1.0, folds=(16, 0.04, 0.0))
-b.lathe(V(0, Y, 0), [(0.5, -0.1), (0.48, 0.02), (0.38, 0.17), (0.2, 0.27), (0.001, 0.3)], (0.6, 0.6, 0.6), cls=CRYSTAL, bone="bell", seg=28, tint=1.0, cap_bottom=False)
+prof = [(0.56, -0.12), (0.6, -0.06), (0.6, 0.02), (0.57, 0.1), (0.5, 0.21), (0.4, 0.3), (0.27, 0.37), (0.13, 0.405), (0.001, 0.415)]
+b.lathe(V(0, Y, 0), prof, (0.9, 0.9, 0.9), cls=SKIN, bone="bell", seg=48, col_top=(0.72, 0.72, 0.72), tint=1.0, folds=(16, 0.035, 0.0))
+b.lathe(V(0, Y, 0), [(0.5, -0.1), (0.5, -0.02), (0.46, 0.08), (0.38, 0.17), (0.2, 0.27), (0.001, 0.3)], (0.62, 0.62, 0.62), cls=SKIN, bone="bell", seg=40, tint=1.0, cap_bottom=False)
 for k in range(16):
     a = 2 * math.pi * k / 16
-    b.ellipsoid(V(math.cos(a) * 0.58, Y - 0.13, math.sin(a) * 0.58), (0.07, 0.035, 0.05), (0.95, 0.95, 0.95), cls=CRYSTAL, bone="bell", tint=1.0, seg=8, rings=5, rot=(0, -a, 0))
+    b.ellipsoid(V(math.cos(a) * 0.58, Y - 0.13, math.sin(a) * 0.58), (0.075, 0.032, 0.05), (1.0, 1.0, 1.0), cls=SKIN, bone="bell", tint=1.0, seg=10, rings=6, rot=(0, -a, 0))
     # sense organ (rhopalium) in each notch between lappets
     a2 = a + math.pi / 16
     b.ball(V(math.cos(a2) * 0.57, Y - 0.1, math.sin(a2) * 0.57), 0.013, "fff8a0", cls=CRYSTAL, bone="bell", seg=6, rings=4, mat=MAT_GLOW)
@@ -73,24 +74,33 @@ b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 for names, pts in arms:
     fine = catmull(pts, 3)
     bones = [names[min(len(names) - 1, int(i / (len(fine) - 1) * len(names)))] for i in range(len(fine))]
-    for side in ((1, 0, 0), (0, 0, 1)):
-        sv = V(side)
+    for c3 in range(3):
         rows = []
         for i, q in enumerate(fine):
             t = i / (len(fine) - 1)
-            w = 0.09 * (1.0 - 0.5 * t)
-            ruffle = 0.025 * math.sin(i * 2.2) * (0.4 + t)
-            rows.append([q - sv * w + V(0, 0, ruffle), q, q + sv * w - V(0, 0, ruffle)])
-        b.sheet(rows, (0.9, 0.9, 0.9), bones=bones, cols=[(0.85 + 0.15 * (i / (len(fine) - 1)),) * 3 for i in range(len(fine))], tint=1.0, thickness=0.006)
+            ang = c3 * math.pi / 3 + t * 1.3
+            sv = V(math.cos(ang), 0, math.sin(ang))
+            nv = V(-math.sin(ang), 0, math.cos(ang))
+            w = 0.11 * (1.0 - 0.45 * t)
+            # the outer edge of each curtain is longer than its spine, so it ruffles
+            ruffle = 0.035 * math.sin(i * 2.6 + c3) * (0.5 + t)
+            rows.append([q - sv * w + nv * ruffle, q - sv * w * 0.5 - nv * ruffle * 0.4, q, q + sv * w * 0.5 + nv * ruffle * 0.4, q + sv * w - nv * ruffle])
+        b.sheet(rows, (0.9, 0.9, 0.9), bones=bones, cols=[(0.8 + 0.2 * (i / (len(fine) - 1)),) * 3 for i in range(len(fine))], tint=1.0, thickness=0.006)
     for i in range(1, len(fine), 3):
         b.ball(fine[i] + V(0.05, 0, 0.02), 0.012, "ffd0ff", cls=CRYSTAL, bone=bones[i], seg=5, rings=3, mat=MAT_GLOW)
-b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+b.cur_pal = 0.0  # the tentacles share the bell's colour, paler
 # trailing tentacles: thin tubes with glowing beads, and a fringe of fine rim tentacles
 for names, pts in tent:
     bones = [names[0]] + [names[min(j, len(names) - 1)] for j in range(len(pts) - 1)]
-    b.tube(pts, [0.022, 0.018, 0.014, 0.01, 0.003], (0.9, 0.9, 0.9), cls=CRYSTAL, bones=bones, tint=1.0, seg=6)
+    out = V(pts[0].x, 0, pts[0].z).normalized()
+    side_v = V(-out.z, 0, out.x)
+    for o3 in (-1, 0, 1):
+        off = side_v * (0.035 * o3) + out * (0.01 * abs(o3))
+        tp = [q + off * (1.0 + 0.6 * j) for j, q in enumerate(pts)]
+        tp[-1] = tp[-1] + V(0, -0.12 - 0.06 * abs(o3), 0)
+        b.tube(tp, [0.012, 0.009, 0.007, 0.005, 0.0015], (0.95, 0.95, 0.95), cls=SKIN, bones=bones, tint=0.7, seg=5)
     for j in (1, 2, 3):
-        b.ball(pts[j], 0.02, "ffd0ff", cls=CRYSTAL, bone=names[min(j, len(names) - 1)], seg=6, rings=4, mat=MAT_GLOW)
+        b.ball(pts[j], 0.011, "ffd0ff", cls=CRYSTAL, bone=names[min(j, len(names) - 1)], seg=6, rings=4, mat=MAT_GLOW)
 for k in range(32):
     a = 2 * math.pi * k / 32 + 0.05
     root = V(math.cos(a) * 0.59, Y - 0.14, math.sin(a) * 0.59)

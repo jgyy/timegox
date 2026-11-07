@@ -1,6 +1,6 @@
 """Wisp: will-o'-the-wisps, ghost lights and fire sprites.  A teardrop of soft light whose
-surface flickers with noise around a bright core, crowned with crossed flame tongues in two layers
-on bone chains, trailing a tail of light that thins into embers, orbited by sparks, with little
+surface flickers with noise around a bright core, crowned with solid tongues of flame, broad at
+the root and licking to points, in two layers on bone chains, trailing a tail of light that thins into embers, orbited by sparks, with little
 arms ending in fingers of flame and a face with big eyes and blushing cheeks.  Tinted per enemy.
 Run: blender --background --python art/monsters/wisp.py  ->  assets/monsters/wisp.glb"""
 import math
@@ -10,6 +10,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
 import creature  # noqa: E402
+import anatomy as A  # noqa: E402
 from creature import chain_rig, glow_ball, wave_chain, zero_pose  # noqa: E402
 from kit import CLOTH, CRYSTAL, MAT_GLOW, MAT_PLAIN, SKIN, V, Builder, Rig, env  # noqa: E402
 from sculpt import fbm3, morph_sphere, smooth  # noqa: E402
@@ -41,20 +42,25 @@ def shell(d):
     return p * (1.0 + 0.08 * (fbm3((d.x * 3, d.y * 3, d.z * 3), 2, 2) - 0.5))
 
 
-morph_sphere(b, V(0, Y, 0), shell, lambda p, d: (0.85 + 0.15 * smooth(-0.5, 0.8, d.y),) * 3, cls=CRYSTAL, bone="body", seg=24, rings=16, tint_fn=lambda p, d: 1.0)
+morph_sphere(b, V(0, Y, 0), shell, lambda p, d: (0.86 + 0.14 * smooth(-0.5, 0.8, d.y),) * 3, cls=SKIN, bone="body", seg=40, rings=26, tint_fn=lambda p, d: 1.0)
 glow_ball(b, V(0, Y, 0.02), 0.14, "fffaf0", "body")
 b.ellipsoid(V(0, Y - 0.02, 0.02), (0.2, 0.22, 0.2), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="body", seg=14, rings=10, mat=MAT_GLOW, tint=0.6)
 b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # flame tongues: an outer dim layer and an inner bright one, crossed so they read from any side
-for names, pts in flames:
+for k, (names, pts) in enumerate(flames):
+    out = V(pts[0].x, 0, pts[0].z).normalized()
+    side = V(-out.z, 0, out.x)
     for j in range(len(pts) - 1):
-        for side in ((1, 0, 0), (0, 0, 1)):
-            b.leaf(pts[j], pts[j + 1] + V(0, 0.04, 0), 0.07 - 0.015 * j, (0.95, 0.95, 0.95), side=side, cls=CLOTH, bone=names[j], tint=1.0, col_tip=(1.0, 1.0, 1.0), curl=0.1, mat=MAT_GLOW)
-        b.leaf(pts[j] + V(0, 0.02, 0), pts[j + 1] + V(0, 0.0, 0), 0.035, "fffff0", side=(1, 0, 1), cls=CLOTH, bone=names[j], tint=0.3, curl=0.15, mat=MAT_GLOW)
+        # solid tongues of flame, broad at the root and licking to a point, overlapping up the chain
+        root = pts[j] - (pts[j + 1] - pts[j]) * 0.15
+        A.blade(b, root, pts[j + 1] + V(0, 0.05, 0), 0.065 - 0.016 * j, (0.95, 0.95, 0.95), (1.0, 1.0, 1.0), side=side, bone=names[j], curl=0.12,
+                thick=0.35, tint=1.0, cls=CLOTH, mat=MAT_GLOW, steps=5, seg=8, point=0.9, twist=0.4 * (1 if k % 2 else -1))
+        A.blade(b, root + V(0, 0.02, 0) + out * 0.01, pts[j + 1], 0.03, "fffff0", "ffffff", side=side, bone=names[j], curl=0.18, thick=0.4, tint=0.3, cls=CLOTH,
+                mat=MAT_GLOW, steps=4, seg=6, point=0.9)
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # tail of trailing light, thinning into embers
 tp = [r.head(n) for n in tail] + [r.tail(tail[-1])]
-b.tube(tp, [0.15, 0.1, 0.06, 0.005], (0.85, 0.85, 0.85), cls=CRYSTAL, bones=[tail[0], tail[0], tail[1], tail[2]], tint=1.0, seg=10)
+b.tube(tp, [0.15, 0.1, 0.06, 0.005], (0.88, 0.88, 0.88), cls=SKIN, bones=[tail[0], tail[0], tail[1], tail[2]], tint=1.0, seg=14)
 for k in range(7):
     t = 0.3 + k * 0.1
     i = min(len(tp) - 2, int(t * (len(tp) - 1)))
@@ -68,7 +74,7 @@ b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # little arms with three fingers of flame, and a face: big eyes, blushing cheeks, a small mouth
 for s, sd in ((1, "L"), (-1, "R")):
     ar = r.bones["arm." + sd]
-    b.tube([ar[0], ar[1]], [0.045, 0.02], (0.9, 0.9, 0.9), cls=CRYSTAL, bone="arm." + sd, tint=1.0, seg=8)
+    b.tube([ar[0], V(ar[0]).lerp(V(ar[1]), 0.5) + V(0, -0.02, 0), ar[1]], [0.05, 0.035, 0.022], (0.92, 0.92, 0.92), cls=SKIN, bone="arm." + sd, tint=1.0, seg=10)
     for f in range(3):
         a = (f - 1) * 0.5
         tip = V(ar[1]) + V(math.sin(a) * 0.04 * s, 0.02 + 0.03 * math.cos(a), 0.03)

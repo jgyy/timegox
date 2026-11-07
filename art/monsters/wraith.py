@@ -53,16 +53,30 @@ for layer, (rk, col, top, low) in enumerate(((1.0, 0.7, Y + 0.46, Y - 0.62), (0.
         row = []
         for i in range(n + 1):
             a = 2 * math.pi * i / n
-            rr = (0.17 + 0.18 * t ** 0.8 + 0.03 * math.sin(a * 9 + t * 4) * t) * rk
+            # heavy cloth falling in deep pleats that open out towards the hem
+            rr = (0.17 + 0.2 * t ** 0.8 + 0.05 * math.sin(a * 7 + t * 3) * t ** 0.7 + 0.015 * math.sin(a * 17) * t) * rk
             yy = y
-            if j == 9:
+            if j >= 8:
                 # ragged hem: long torn points and short tears
                 rag = fbm3((math.cos(a) * 3, math.sin(a) * 3, layer * 5.0), 3, 4)
-                yy = y - 0.28 * smooth(0.45, 0.8, rag) + 0.08 * math.sin(a * 13)
+                yy = y - (0.42 if j == 9 else 0.12) * smooth(0.42, 0.8, rag) + (0.1 if j == 9 else 0.03) * math.sin(a * 13)
             row.append(V(math.sin(a) * rr, yy, math.cos(a) * rr * 0.92))
         rows.append(row)
         cols.append((col * (1.0 - 0.25 * t),) * 3)
     b.sheet(rows, (col,) * 3, bones=[body_w(V(0, y, 0)) for y in ys], cols=cols, tint=1.0, thickness=0.02)
+# a tattered capelet over the shoulders, its edge torn into tongues
+rows = []
+for j in range(6):
+    t = j / 5
+    row = []
+    for i in range(41):
+        a = 2 * math.pi * i / 40
+        rag = fbm3((math.cos(a) * 4, math.sin(a) * 4, 9.0), 2, 7)
+        drop = 0.32 * t + (0.16 * smooth(0.45, 0.75, rag) * t ** 2 if j > 2 else 0.0)
+        rr = 0.18 + 0.2 * t + 0.03 * math.sin(a * 6) * t
+        row.append(V(math.sin(a) * rr, Y + 0.5 - drop, math.cos(a) * rr * 0.92 - 0.01))
+    rows.append(row)
+b.sheet(rows, (0.55, 0.55, 0.55), bones=[{"body": 0.6, "head": 0.4}] * 2 + ["body"] * 4, cols=[(0.55 + 0.04 * j,) * 3 for j in range(6)], tint=1.0, thickness=0.02)
 # a rope belt with a hanging talisman knot
 belt = [V(math.sin(2 * math.pi * i / 24) * 0.24, Y + 0.05 + 0.02 * math.sin(i), math.cos(2 * math.pi * i / 24) * 0.23) for i in range(25)]
 b.tube(belt, [0.014] * 25, "4a3a2a", cls=CLOTH, bone="body", seg=6, cap0=False, cap1=False)
@@ -113,12 +127,12 @@ for s, sd in ((1, "L"), (-1, "R")):
 cw = V(r.bones["fore.L"][1])
 b.lathe(cw + V(0, 0, -0.04), [(0.05, -0.025), (0.055, 0.0), (0.05, 0.025)], "4a4a58", cls=METAL, bone="fore.L", seg=12, rot=(math.pi / 2, 0, 0), cap_bottom=False, cap_top=False)
 A.chain(b, cw + V(0.02, -0.07, -0.04), V(0.0, -0.075, -0.015), 6, "fore.L", col="5a5a68", r=0.028)
-b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
+b.cur_pal = 0.0  # the tatters are the robe's own cloth
 # tattered strips streaming from the hem, each torn into two tongues at the end
 for names, pts, a in strips:
     side = V(math.cos(a), 0, -math.sin(a))
     bones = [names[0]] + [names[min(j, len(names) - 1)] for j in range(len(pts) - 1)]
-    b.ribbon(pts, [0.09, 0.08, 0.06, 0.04, 0.005], side, (0.65, 0.65, 0.65), cls=CLOTH, bones=bones, tint=1.0, col_end=(0.9, 0.9, 0.9))
+    b.ribbon(pts, [0.1, 0.09, 0.07, 0.045, 0.005], side, (0.6, 0.6, 0.6), cls=CLOTH, bones=bones, tint=1.0, col_end=(0.82, 0.82, 0.82))
     end = pts[-2]
     for k in (-1, 1):
         b.ribbon([end, end + side * 0.03 * k + V(0, -0.12, -0.04), end + side * 0.05 * k + V(0, -0.22, -0.06)], [0.02, 0.015, 0.002], side, (0.8, 0.8, 0.8), cls=CLOTH, bone=names[-1], tint=1.0)

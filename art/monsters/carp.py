@@ -13,8 +13,10 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
 import creature  # noqa: E402
-from creature import chain_weights, eyes, zero_pose  # noqa: E402
-from sculpt import smooth  # noqa: E402
+from creature import chain_weights, zero_pose  # noqa: E402
+from sculpt import fbm3, smooth  # noqa: E402
+from clay import Clay  # noqa: E402
+import anatomy as A  # noqa: E402
 from kit import CLOTH, CRYSTAL, MAT_GLOW, MAT_PLAIN, SCALE, SKIN, V, Builder, Rig, env  # noqa: E402
 from creature import add  # noqa: E402
 
@@ -47,96 +49,114 @@ def body_bone(z):
     return chain_weights("body", f, 5)
 
 
-def koi(p):
-    """Grey body (tinted) with white koi patches (untinted)."""
-    n = math.sin(p.z * 5.5 + p.x * 9.0) * math.cos(p.z * 3.1 - p.y * 7.0)
-    if n > 0.35 and p.y > Y - 0.05:
+def koi_patch(p):
+    """Where the white koi markings fall (they keep their colour)."""
+    n = math.sin(p.z * 5.5 + p.x * 9.0) * math.cos(p.z * 3.1 - p.y * 7.0) + 0.25 * (fbm3((p.x * 4, p.y * 4, p.z * 4), 2, 21) - 0.5)
+    return n > 0.38 and p.y > Y - 0.02
+
+
+# body: one sculpted piece - a deep, round-backed koi with a blunt head, a soft belly and a slim
+# tail stalk - painted with rows of overlapping cycloid scales, the lateral line, a darker back
+# and a silvery belly, and white koi patches
+cl = Clay(0.016, "koi_body")
+# laterally compressed: each cross-section is taller than it is wide
+for z, dy, ry in ((0.84, 0.0, 0.09), (0.66, 0.02, 0.18), (0.42, 0.04, 0.24), (0.14, 0.04, 0.26), (-0.16, 0.03, 0.24),
+                  (-0.44, 0.02, 0.19), (-0.7, 0.0, 0.12), (-0.9, 0.0, 0.07), (-1.03, 0.0, 0.05)):
+    cl.ellipsoid(V(0, Y + dy, z), (ry * 0.74, ry, 0.2), bones=lambda p, t: body_bone(p.z), tag="head" if z > 0.55 else "body")
+cl.ellipsoid(V(0, Y - 0.06, 0.15), (0.17, 0.17, 0.4), bones=lambda p, t: body_bone(p.z), tag="belly")
+cl.ellipsoid(V(0, Y - 0.05, 0.86), (0.07, 0.05, 0.06), bones={"jaw": 1.0}, tag="lips")
+
+
+def body_col(p, info):
+    if info.tag == "lips":
+        return (0.8, 0.8, 0.8)
+    if koi_patch(p):
         return (1.0, 1.0, 1.0)
-    v = 0.85 if p.y > Y else 1.05
-    return (v, v, v)
-
-
-# body: a lathe along z, deep in the middle, with a smooth taper into the tail stalk
-prof = [(0.03, -1.05), (0.07, -0.9), (0.12, -0.7), (0.2, -0.4), (0.26, -0.05), (0.27, 0.25), (0.23, 0.5), (0.16, 0.7), (0.09, 0.82), (0.03, 0.88)]
-verts = b.lathe(V(0, Y, 0), [(rr, z) for rr, z in prof], (0.9, 0.9, 0.9), cls=SCALE, seg=22, rot=(math.pi / 2, 0, 0), squash=(0.72, 1.0), tint=1.0, bone_fn=lambda p: body_bone(p.z))
-b.recolor(verts, lambda p: (1.0, 1.0, 1.0) if math.sin(p.z * 5.5 + p.x * 9.0) * math.cos(p.z * 3.1 - p.y * 7.0) > 0.4 and p.y > Y + 0.05 else None, cls=SCALE)
-for v in verts:
-    c = v[b.cl]
-    if c[0] > 0.95:
-        v[b.tl] = 0.0
-b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# lips, mouth and barbels
-b.ellipsoid(V(0, Y - 0.04, 0.86), (0.07, 0.05, 0.06), (0.8, 0.8, 0.8), cls=SKIN, bone="jaw", tint=1.0, seg=12, rings=6)
-b.ellipsoid(V(0, Y - 0.05, 0.9), (0.04, 0.025, 0.02), "301018", cls=SKIN, bone="jaw", seg=10, rings=5)
-for s in (1, -1):
-    b.tube([V(0.05 * s, Y - 0.05, 0.86), V(0.14 * s, Y - 0.12, 0.88), V(0.22 * s, Y - 0.24, 0.84), V(0.26 * s, Y - 0.38, 0.8)], [0.01, 0.008, 0.006, 0.002], "e8d0a0", cls=SKIN, bones=["jaw", "jaw", "body0", "body0"], seg=5)
-eyes(b, V(0, Y + 0.05, 0.66), 0.16, 0.045, iris="f0d060", slit=False, glow=False, bone="body0", rot_y=1.25, h=1.0)
-b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# gill plate
-for s in (1, -1):
-    b.tube([V(0.17 * s, Y + 0.12, 0.5), V(0.21 * s, Y, 0.47), V(0.18 * s, Y - 0.12, 0.5)], [0.012, 0.014, 0.01], (0.7, 0.7, 0.7), bone="body0", tint=1.0, seg=6)
-
-
-def fin(pts_root, pts_tip, col, bones, tint=1.0, rows=5):
-    """A fin as a sheet between a root line and a tip line, with ray stripes."""
-    grid = []
-    for j in range(rows):
-        t = j / (rows - 1)
-        grid.append([V(pts_root[i]).lerp(V(pts_tip[i]), t) for i in range(len(pts_root))])
-    vs = b.sheet(grid, col, cls=CLOTH, bones=[bones] * rows, tint=tint)
-    return vs
-
-
-b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# dorsal fin along the back
-root = [V(0, Y + 0.24, 0.35), V(0, Y + 0.27, 0.1), V(0, Y + 0.25, -0.15), V(0, Y + 0.18, -0.4)]
-tip = [V(0, Y + 0.32, 0.36), V(0, Y + 0.52, 0.02), V(0, Y + 0.5, -0.28), V(0, Y + 0.3, -0.5)]
-fin(root, tip, (0.8, 0.8, 0.8), {"body1": 0.5, "body2": 0.5})
-b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# flowing tail: three long ribbons per lobe
-for s in (1, -1):
-    for k in range(3):
-        sp = 0.15 + 0.12 * k
-        b.ribbon([V(0, Y, -1.0), V(0, Y + s * sp, -1.22), V(0.02 * k, Y + s * (sp + 0.1), -1.48), V(0.04 * k, Y + s * (sp + 0.06), -1.72)], [0.06, 0.1, 0.09, 0.03], (0, 0, 1) if False else (1, 0, 0), (0.85, 0.85, 0.85), cls=CLOTH, bones=["body4", "tailfin", "tailfin", "tailfin"], tint=1.0, col_end=(1.0, 1.0, 1.0))
-b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# long pectoral and pelvic fins
-for s, sd in ((1, "L"), (-1, "R")):
-    b.ribbon([V(0.18 * s, Y - 0.12, 0.42), V(0.32 * s, Y - 0.22, 0.32), V(0.44 * s, Y - 0.34, 0.16), V(0.5 * s, Y - 0.46, 0.0)], [0.04, 0.09, 0.08, 0.02], (0, 0, 1), (0.85, 0.85, 0.85), bones=["body0", "pec." + sd, "pec." + sd, "pec." + sd], tint=1.0, col_end=(1.0, 1.0, 1.0))
-    b.ribbon([V(0.12 * s, Y - 0.2, -0.15), V(0.2 * s, Y - 0.32, -0.25), V(0.26 * s, Y - 0.44, -0.4)], [0.03, 0.06, 0.02], (0, 0, 1), (0.85, 0.85, 0.85), bones=["body2", "pelv." + sd, "pelv." + sd], tint=1.0, col_end=(1.0, 1.0, 1.0))
-b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# scales: rows of overlapping cycloid scales painted over the body, each rim a shade darker, the
-# lateral line running down the flank, darker along the back, silvery underneath
-for v in verts:
-    p = kit.b2g(v.co)
-    c = v[b.cl]
     sx = (0.9 - p.z) * 9.0
     ang = math.atan2(p.y - Y, abs(p.x) + 1e-4)
     sy = ang * 3.2 + 0.5 * (math.floor(sx) % 2)
     fx, fy = sx - math.floor(sx), sy - math.floor(sy)
     rim = 1.0 - 0.22 * smooth(0.28, 0.48, math.hypot(fx - 0.3, fy - 0.5))
     lateral = 1.0 - 0.3 * smooth(0.015, 0.0, abs(p.y - Y - 0.02 - 0.03 * math.sin(p.z * 2.0)))
-    back = 1.0 - 0.18 * smooth(Y + 0.1, Y + 0.25, p.y)
-    k = rim * lateral * back * (1.0 if p.z < 0.62 else 1.08)
-    v[b.cl] = (c[0] * k, c[1] * k, c[2] * k, c[3])
-# the head: a smooth operculum (gill cover) with its edge, nostrils, and a glint of gold on the brow
-for s in (1, -1):
-    op = [V(0.2 * s, Y + 0.16, 0.56), V(0.25 * s, Y + 0.06, 0.52), V(0.25 * s, Y - 0.06, 0.52), V(0.2 * s, Y - 0.16, 0.56)]
-    b.tube(op, [0.012, 0.016, 0.016, 0.01], (0.65, 0.65, 0.65), bone="body0", tint=1.0, seg=6)
-    b.ellipsoid(V(0.07 * s, Y + 0.08, 0.8), (0.015, 0.01, 0.01), "201018", cls=SKIN, bone="body0", seg=6, rings=4, mat=MAT_PLAIN)
-b.ellipsoid(V(0, Y + 0.18, 0.62), (0.08, 0.03, 0.1), "f0c050", cls=SCALE, bone="body0", seg=12, rings=6)
+    v = (0.86 if p.y > Y else 1.0) * (1.0 - 0.18 * smooth(Y + 0.1, Y + 0.25, p.y))
+    if p.z > 0.6:
+        rim = 1.0
+    gill = 1.0 - 0.3 * smooth(0.02, 0.0, abs(p.z - 0.5 + 0.12 * ((p.y - Y) / 0.2) ** 2)) * smooth(0.05, 0.12, abs(p.x))
+    v *= rim * lateral * gill
+    return (v, v, v)
+
+
+def body_tint(p, info):
+    if info.tag == "lips":
+        return 0.6
+    return 0.0 if koi_patch(p) else 1.0
+
+
+cl.build(b, body_col, cls=SCALE, tint_fn=body_tint)
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# fin rays across the dorsal fin, and fine rays in every tail ribbon
-for k in range(9):
-    t = k / 8
-    i = min(2, int(t * 3))
-    u = t * 3 - i
-    r0 = root[i].lerp(root[i + 1], u)
-    t0 = tip[i].lerp(tip[i + 1], u)
-    b.tube([r0, t0], [0.006, 0.002], (0.55, 0.55, 0.55), cls=CLOTH, bone={"body1": 0.5, "body2": 0.5}, tint=1.0, seg=4, mat=MAT_PLAIN)
+# mouth and two pairs of barbels, the upper pair long and drooping
+b.ellipsoid(V(0, Y - 0.05, 0.915), (0.04, 0.025, 0.02), "301018", cls=SKIN, bone="jaw", seg=10, rings=5)
 for s in (1, -1):
-    for k in range(5):
-        sp = 0.12 + 0.07 * k
-        b.tube([V(0, Y, -1.02), V(0.01 * k, Y + s * sp, -1.3), V(0.02 * k, Y + s * (sp + 0.06), -1.62)], [0.006, 0.004, 0.002], (0.6, 0.6, 0.6), cls=CLOTH, bones=["body4", "tailfin", "tailfin"], tint=1.0, seg=4, mat=MAT_PLAIN)
+    A.horn(b, [V(0.05 * s, Y - 0.04, 0.87), V(0.13 * s, Y - 0.1, 0.9), V(0.22 * s, Y - 0.22, 0.86), V(0.27 * s, Y - 0.38, 0.8)], 0.013, "e8d0a0", "f8f0d8", "jaw", r1=0.002, cls=SKIN, seg=6)
+    A.horn(b, [V(0.04 * s, Y - 0.07, 0.86), V(0.08 * s, Y - 0.12, 0.86), V(0.11 * s, Y - 0.17, 0.83)], 0.009, "e8d0a0", "f8f0d8", "jaw", r1=0.002, cls=SKIN, seg=6)
+    A.animal_eye(b, V(0.128 * s, Y + 0.06, 0.68), V(0.9 * s, 0.05, 0.4), 0.04, "f0d060", "body0", pupil="round", almond=0.95, side=s, lid="303030", lid_w=0.08)
+    # gill cover edge and nostrils
+    b.ellipsoid(V(0.055 * s, Y + 0.07, 0.82), (0.013, 0.009, 0.009), "201018", cls=SKIN, bone="body0", seg=6, rings=4, mat=MAT_PLAIN)
+b.ellipsoid(V(0, Y + 0.185, 0.58), (0.07, 0.025, 0.1), "f0c050", cls=SCALE, bone="body0", seg=12, rings=6)
+
+
+def fin_sheet(rows_pts, bones, col0=0.9, col1=1.0, rays=True, bone_of=None):
+    """A soft fin: a grid of points (rows from root to edge), paler towards the edge, with fine
+    dark rays along it."""
+    nr = len(rows_pts)
+    cols = [(col0 + (col1 - col0) * (j / (nr - 1)),) * 3 for j in range(nr)]
+    b.sheet(rows_pts, (col0,) * 3, cls=CLOTH, bones=bones, cols=cols, tint=1.0, thickness=0.006)
+    if rays:
+        for i in range(0, len(rows_pts[0]), 2):
+            ray = [rows_pts[j][i] for j in range(nr)]
+            bb = bone_of(i) if bone_of else bones[0]
+            b.tube(ray, [0.005] + [0.003] * (nr - 2) + [0.001], (0.6, 0.6, 0.6), cls=CLOTH, bone=bb, tint=1.0, seg=4, mat=MAT_PLAIN)
+
+
+# long, flowing fins in the secondary colour - a butterfly koi's: a dorsal fin running down the
+# back, a broad twin-lobed tail trailing far behind, long pectoral and pelvic fins
+dors = []
+for j in range(5):
+    t = j / 4
+    row = []
+    for i in range(8):
+        u = i / 7
+        z = 0.38 - u * 0.85 - t * 0.18 * (0.3 + u)
+        h = 0.06 + t * (0.3 * math.sin(math.pi * min(1.0, u * 1.15 + 0.05)) + 0.04)
+        row.append(V(0.02 * t * math.sin(u * 9.0), Y + 0.25 - 0.06 * u + h, z))
+    dors.append(row)
+fin_sheet(dors, [{"body1": 0.5, "body2": 0.5}] * 5)
+def fan(root, axis_a, axis_b, length_fn, u0, u1, bones, nrm, n_rows=6, n_cols=11, wave=0.035):
+    """A fin as a fan of rays from its root: columns sweep from angle u0 to u1 in the plane of
+    axis_a/axis_b, each ray length_fn(u) long, the membrane rippling off the plane towards its
+    edge."""
+    axis_a, axis_b, nrm = V(axis_a).normalized(), V(axis_b).normalized(), V(nrm).normalized()
+    rows = []
+    for j in range(n_rows):
+        t = j / (n_rows - 1)
+        row = []
+        for i in range(n_cols):
+            u = u0 + (u1 - u0) * i / (n_cols - 1)
+            d = axis_a * math.cos(u) + axis_b * math.sin(u)
+            row.append(V(root) + d * (length_fn(u) * t) + nrm * (wave * math.sin(i * 1.9 + t * 3.0) * t))
+        rows.append(row)
+    fin_sheet(rows, bones)
+
+
+# the tail: a deep fork, its two lobes long and trailing
+fan(V(0, Y, -1.0), (0, 0, -1), (0, 1, 0), lambda u: 0.42 + 0.42 * abs(u) ** 1.3, -1.05, 1.05, ["body4"] + ["tailfin"] * 5, (1, 0, 0), n_cols=13)
+for s, sd in ((1, "L"), (-1, "R")):
+    # long pectorals drooping like sleeves, short pelvics
+    fan(V(0.15 * s, Y - 0.13, 0.44), (0.55 * s, -0.45, -0.35), (0.0, -0.2, -1.0), lambda u: 0.42 - 0.12 * abs(u - 0.55), 0.0, 1.1, ["body0"] + ["pec." + sd] * 5, (s, 0.3, 0))
+    fan(V(0.1 * s, Y - 0.2, -0.14), (0.4 * s, -0.6, -0.3), (0.0, -0.2, -1.0), lambda u: 0.26 - 0.08 * abs(u - 0.5), 0.0, 1.0, ["body2"] + ["pelv." + sd] * 5, (s, 0.2, 0), n_rows=5, n_cols=8)
+b.cur_pal = 0.0
+
+
 # a sparkle of pearl bubbles trailing from the mouth
 for k in range(5):
     b.ball(V(0.02 * math.sin(k * 2.0), Y + 0.06 + k * 0.09, 0.95 + 0.02 * k), 0.018 + 0.006 * (k % 2), "f0f8ff", cls=CRYSTAL, bone="jaw", seg=6, rings=4, mat=MAT_GLOW)

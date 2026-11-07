@@ -1,5 +1,7 @@
 """Tome: the Jade Ledger and the Court's living record-books.  A great jade-bound book floating
-open, its pages fanning and flapping on their own bones, an eye set into the clasp of its cover,
+open, the top leaves of each page block curling up and riffling apart, a row of paper teeth
+along each fore-edge so the boards bite when they slam shut, its pages fanning and flapping on
+their own bones, an eye set into the clasp of its cover,
 bookmarks of red silk trailing beneath, brass corner guards, chains hanging from its spine and
 glowing script hovering over the open pages.  Tinted by the game per enemy; pages, script and the
 eye keep their colours.
@@ -46,8 +48,24 @@ def slab(sd, s):
 
 for s, sd in ((1, "L"), (-1, "R")):
     slab(sd, s)
-    # the block of pages resting on the cover
+    # the block of pages resting on the cover, and the top leaves of it curving up from the
+    # spine and riffling apart towards the fore-edge
     b.superquad(V(0.25 * s, Y + 0.1, 0.0), (0.24, 0.04, 0.35), "f4ecd8", e=0.3, cls=CLOTH, bone="cover." + sd, rot=(0, 0, -0.22 * s), seg=12, rings=6)
+    rotc = Matrix.Rotation(-0.22 * s, 3, "Z")
+    for k in range(5):
+        lift = 0.03 + 0.012 * k
+        rows = []
+        for j in range(6):
+            u = j / 5
+            x = (0.02 + 0.45 * u) * s
+            y = lift * math.sin(math.pi * 0.5 * u) + 0.012 * k * u * u
+            rows.append([V(0.03 * s, Y + 0.075, 0) + rotc @ V(x, y, zz * (0.335 - 0.004 * k)) for zz in (-1.0, 0.0, 1.0)])
+        b.sheet(rows, "faf2e0", cls=CLOTH, bone="cover." + sd, cols=["f6eedc"] * 5 + ["d8c8a0"], thickness=0.003)
+    # paper teeth along the fore-edge: when the boards slam shut they bite
+    for k in range(9):
+        zz = -0.3 + k * 0.075
+        q = V(0.03 * s, Y + 0.075, 0) + rotc @ V(0.46 * s, 0.07, zz)
+        b.cone(q, 0.022, 0.07 + 0.02 * (k % 2), "f8f0dc", cls=CLOTH, bone="cover." + sd, seg=5, rot=(0, 0, 0.3 * s))
 b.tube([V(0, Y - 0.04, -0.4), V(0, Y - 0.06, 0.4)], [0.06, 0.06], (0.6, 0.6, 0.6), cls=STONE, bone="spine", tint=1.0, seg=10)
 # loose pages fanning in the middle
 for k in range(5):

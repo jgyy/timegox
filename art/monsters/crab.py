@@ -1,9 +1,10 @@
 """Crab: the armoured crustaceans of the coasts and the Blood Pool (Coral Crab, Crab General,
 Blood-Pool Crab ...).  A trapezoid carapace sculpted with the H-shaped groove between its
 gastric, cardiac and branchial regions, tubercles and serrated anterolateral and frontal teeth;
-eight walking legs of overlapping armoured segments with hairy propodi and dark dactyls; chelae with
-an inflated palm, toothed fixed and movable fingers with dark tips; eye stalks rising from their
-orbits; and frothing mouthparts.
+a broad, low body on eight sprawling walking legs, each a flattened merus, carpus and bristled
+propodus ending in a dark pointed dactyl; asymmetric chelipeds - a great crusher on the left and
+a slimmer cutter on the right - each an inflated keeled palm with toothed fixed and hinged
+fingers with dark tips; eye stalks rising from their orbits; and frothing mouthparts.
 Tinted by the game per enemy; eyes, tips and the claw's inner edge keep their colours.
 Run: blender --background --python art/monsters/crab.py  ->  assets/monsters/crab.glb"""
 import math
@@ -16,11 +17,11 @@ import creature  # noqa: E402
 import anatomy as A  # noqa: E402
 from creature import Gait, Walker, add, flip_die, foot_path, leg_chain, smooth, zero_pose  # noqa: E402
 from kit import CRYSTAL, HAIR, MAT_PLAIN, SCALE, SKIN, STONE, V, Builder, Rig  # noqa: E402
-from sculpt import blob3, fbm3, morph_sphere, strand  # noqa: E402
+from sculpt import blob3, fbm3, morph_sphere  # noqa: E402
 
 kit.reset()
 creature.realtime()
-BY = 0.62
+BY = 0.5
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
 r.bone("body", (0, BY, -0.1), (0, BY, 0.3), "root")
@@ -29,8 +30,8 @@ for s, sd in ((1, "L"), (-1, "R")):
     for k in range(4):
         z = 0.18 - k * 0.17
         root = V(0.38 * s, BY - 0.02, z)
-        knee = V(0.66 * s, BY + 0.2, z - 0.05 * k)
-        foot = V(0.84 * s, 0.02, z - 0.12 * k)
+        knee = V(0.68 * s, BY + 0.16, z - 0.05 * k)
+        foot = V(0.92 * s, 0.02, z - 0.12 * k)
         nm = "leg%d.%s" % (k, sd)
         leg_chain(r, nm, root, knee, foot, "body")
         legs.append((nm + "_a", nm + "_b", k * 1.6 + (0 if s > 0 else math.pi)))
@@ -45,8 +46,8 @@ CC = V(0, BY + 0.02, 0.02)
 
 def cara_shape(d):
     # wider at the front than the back (a swimming crab's trapezoid), domed, flat underneath
-    p = V(d.x * 0.6, d.y * (0.24 if d.y > 0 else 0.12), d.z * 0.46)
-    p.x *= 1.0 + 0.12 * d.z
+    p = V(d.x * 0.7, d.y * (0.27 if d.y > 0 else 0.12), d.z * 0.5)
+    p.x *= 1.0 + 0.14 * d.z
     q = p.copy()
     off = 0.0
     # the H-shaped groove separating the gastric, cardiac and branchial regions
@@ -74,7 +75,7 @@ b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 for s in (1, -1):
     for k in range(6):
         a = 0.25 + k * 0.17
-        base = CC + V(math.sin(a) * 0.62 * s * (1.0 + 0.12 * math.cos(a)), 0.04, math.cos(a) * 0.45)
+        base = CC + V(math.sin(a) * 0.72 * s * (1.0 + 0.14 * math.cos(a)), 0.04, math.cos(a) * 0.47)
         out = V(math.sin(a) * s, 0.1, math.cos(a) * 0.6).normalized()
         ln = 0.06 + (0.08 if k == 5 else 0.0)
         b.cone(base + out * ln * 0.5, 0.025, ln, (0.6, 0.6, 0.6), cls=STONE, bone="body", seg=6, tint=1.0, rot=(math.atan2(out.z, out.y) - 0.0, 0, -math.atan2(out.x, out.y)))
@@ -82,8 +83,8 @@ for k in range(4):
     x = (k - 1.5) * 0.045
     b.cone(CC + V(x, 0.06, 0.48), 0.018, 0.05, (0.6, 0.6, 0.6), cls=STONE, bone="body", seg=6, tint=1.0, rot=(math.pi / 2, 0, 0))
 b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-# legs: merus, carpus, propodus and dactyl as overlapping armoured segments, hairs on the
-# propodus, a dark pointed dactyl
+# legs: a flattened merus, a short carpus, the propodus fringed with bristles and a pointed dark
+# dactyl, each its own armoured plate
 for s, sd in ((1, "L"), (-1, "R")):
     for k in range(4):
         nm = "leg%d.%s" % (k, sd)
@@ -91,35 +92,40 @@ for s, sd in ((1, "L"), (-1, "R")):
         f1 = V(r.bones[nm + "_b"][1])
         ba, bb = nm + "_a", nm + "_b"
         mid = a1.lerp(f1, 0.55) + V(0.03 * s, 0.02, 0)
-        A.plate_segments(b, [a0, a0.lerp(a1, 0.5) + V(0, 0.04, 0), a1], [(0.055, 0.04), (0.052, 0.04), (0.042, 0.034)], (0.75, 0.75, 0.75), lambda p, ba=ba, bb=bb, a1=a1: ba if (p - a1).length > 0.05 else {ba: 0.5, bb: 0.5}, n=10, col2=(0.95, 0.95, 0.95), ridge=0.15)
-        A.plate_segments(b, [a1, mid, f1 + (mid - f1) * 0.3], [(0.04, 0.032), (0.032, 0.026), (0.022, 0.018)], (0.82, 0.82, 0.82), lambda p, bb=bb: bb, n=10, col2=(0.95, 0.95, 0.95))
-        tip = f1 + (mid - f1) * 0.3
-        b.tube([tip, f1], [0.018, 0.003], "3a2a28", cls=STONE, bone=bb, seg=6)
-        for h in range(4):
-            q = a1.lerp(mid, 0.3 + h * 0.2)
-            b.tube([q, q + V(0.02 * s, 0.035, -0.01)], [0.004, 0.001], (0.45, 0.45, 0.45), cls=HAIR, bone=bb, tint=1.0, seg=3)
-    b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
-    # cheliped: merus and carpus, then the chela - an inflated palm, the fixed finger and the
-    # movable finger (pincer), both toothed along the cutting edge, tips dark
+        A.sclerite(b, a0 - (a1 - a0) * 0.08, a1, 0.078, 0.05, ba, col=0.8, keels=2, phase=math.pi / 2, ridge=0.15, seg=14, rings=8, blunt=0.45)
+        A.sclerite(b, a1 - (mid - a1) * 0.05, a1.lerp(mid, 0.4), 0.058, 0.045, bb, col=0.84, seg=12, rings=6)
+        A.sclerite(b, a1.lerp(mid, 0.38), mid, 0.055, 0.04, bb, col=0.86, keels=2, phase=math.pi / 2, seg=12, rings=8, blunt=0.5)
+        A.horn(b, [mid, mid.lerp(f1, 0.5) + V(0.01 * s, 0.01, 0), f1], 0.03, (0.75, 0.75, 0.75), "2a1a18", bb, r1=0.003, cls=STONE, seg=8, flat=0.7, up=(1, 0, 0), tint=0.6)
+        for h in range(5):
+            q = a1.lerp(mid, 0.25 + h * 0.15)
+            b.tube([q, q + V(0.02 * s, 0.04, -0.012)], [0.004, 0.001], (0.45, 0.45, 0.45), cls=HAIR, bone=bb, tint=1.0, seg=3)
+    # chelipeds: merus and carpus, then the chela - an inflated, keeled palm with the fixed finger
+    # and the hinged dactyl, both toothed along the cutting edge with dark tips.  The left is the
+    # great crusher, the right a slimmer cutter, as in a real crab
+    big = 1.0 if s > 0 else 0.72
     ua = r.bones["arm." + sd]
-    A.plate_segments(b, [V(ua[0]), V(ua[0]).lerp(V(ua[1]), 0.5) + V(0, 0.03, 0), V(ua[1])], [(0.07, 0.06), (0.08, 0.065), (0.075, 0.065)], (0.75, 0.75, 0.75), lambda p, sd=sd: "arm." + sd, n=12, col2=(0.95, 0.95, 0.95), ridge=0.25)
+    u0, u1 = V(ua[0]), V(ua[1])
+    A.sclerite(b, u0 - (u1 - u0) * 0.05, u0.lerp(u1, 0.55), 0.075 * big, 0.06 * big, "arm." + sd, col=0.82, keels=3, ridge=0.18, seg=16, rings=8, blunt=0.5)
+    A.sclerite(b, u0.lerp(u1, 0.5), u1 + (u1 - u0) * 0.05, 0.085 * big, 0.07 * big, "arm." + sd, col=0.86, keels=3, ridge=0.18, seg=16, rings=8, blunt=0.5)
     cb = r.bones["claw." + sd]
     c0, c1 = V(cb[0]), V(cb[1])
-    palm_c = c0.lerp(c1, 0.35)
     fwd = (c1 - c0).normalized()
-    hf = A.HeadFrame(palm_c, fwd)
-    morph_sphere(b, palm_c, lambda d: V(d.x * 0.13, d.y * 0.14, d.z * 0.22) * (1.0 + 0.08 * max(0.0, d.y)), lambda p, d: (0.82 + 0.15 * d.y - 0.1 * smooth(0.85, 0.9, fbm3((p.x * 18, p.y * 18, p.z * 18), 1, 2)),) * 3,
-                 cls=SCALE, bone="claw." + sd, seg=20, rings=14, tint_fn=lambda p, d: 1.0, rot=hf.M)
-    fixed = [hf.at(0, -0.05, 0.16), hf.at(0, -0.06, 0.28), hf.at(0, -0.04, 0.38), hf.at(0, -0.01, 0.42)]
-    strand(b, fixed, 0.06, 0.008, (0.82, 0.82, 0.82), col_tip=(0.3, 0.3, 0.3), cls=SCALE, bone="claw." + sd, flat=0.6, seg=10, per=3, up=tuple(hf.r), tint=1.0)
+    hf = A.HeadFrame(c0.lerp(c1, 0.35), fwd)
+    A.sclerite(b, c0 - fwd * 0.04, c0 + fwd * (0.3 * big + 0.05), 0.14 * big, 0.15 * big, "claw." + sd, col=0.9, keels=4, phase=math.pi / 4, ridge=0.08, seg=24, rings=14, blunt=0.42, joint=0.2,
+               up=tuple(hf.u))
+    tip0 = c0 + fwd * (0.3 * big + 0.02)
+    fixed = [tip0 + hf.u * (-0.06 * big), tip0 + fwd * 0.12 * big - hf.u * 0.07 * big, tip0 + fwd * 0.24 * big - hf.u * 0.05 * big, tip0 + fwd * 0.3 * big - hf.u * 0.01]
+    A.horn(b, fixed, 0.06 * big, (0.86, 0.86, 0.86), (0.15, 0.12, 0.12), "claw." + sd, r1=0.006, cls=SCALE, seg=10, flat=0.6, up=tuple(hf.r), tint=1.0)
     pc = r.bones["pincer." + sd]
     p0, p1 = V(pc[0]), V(pc[1])
-    mov = [p0, p0.lerp(p1, 0.45) + V(0, 0.035, 0), p0.lerp(p1, 0.85) + V(0, 0.01, 0), p1 + V(0, -0.03, 0)]
-    strand(b, mov, 0.055, 0.008, (0.9, 0.9, 0.9), col_tip=(0.3, 0.3, 0.3), cls=SCALE, bone="pincer." + sd, flat=0.6, seg=10, per=3, up=tuple(hf.r), tint=1.0)
+    pf = (p1 - p0).normalized()
+    mov = [p0, p0 + pf * 0.12 * big + hf.u * 0.035 * big, p0 + pf * 0.24 * big + hf.u * 0.01, p0 + pf * 0.3 * big - hf.u * 0.04 * big]
+    A.horn(b, mov, 0.055 * big, (0.9, 0.9, 0.9), (0.15, 0.12, 0.12), "pincer." + sd, r1=0.006, cls=SCALE, seg=10, flat=0.6, up=tuple(hf.r), tint=1.0)
     for q in range(5):
-        t = 0.25 + q * 0.14
-        b.cone(p0.lerp(p1, t) + V(0, -0.02, 0), 0.01, 0.03, "f0e8d8", cls=STONE, bone="pincer." + sd, seg=5, rot=(math.pi, 0, 0))
-        b.cone(hf.at(0, -0.03, 0.18 + q * 0.045), 0.01, 0.028, "f0e8d8", cls=STONE, bone="claw." + sd, seg=5)
+        t = 0.2 + q * 0.15
+        b.cone(p0 + pf * (0.3 * big * t) - hf.u * 0.03 * big, 0.011 * big, 0.03 * big, "f0e8d8", cls=STONE, bone="pincer." + sd, seg=5, rot=(math.pi, 0, 0))
+        b.cone(tip0 + fwd * (0.3 * big * t) - hf.u * 0.035 * big, 0.011 * big, 0.03 * big, "f0e8d8", cls=STONE, bone="claw." + sd, seg=5)
+for s, sd in ((1, "L"), (-1, "R")):
     b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # eye stalks rising out of the orbits
     st = r.bones["stalk." + sd]

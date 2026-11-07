@@ -30,7 +30,7 @@ import random
 from mathutils import Matrix
 
 from kit import b2g, g2b
-from kit import CRYSTAL, FOLIAGE, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SKIN, STONE, WOOD, V, darken, lighten, mix, rgb
+from kit import CRYSTAL, FOLIAGE, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SCALE, SKIN, STONE, WOOD, V, darken, lighten, mix, rgb
 from sculpt import blob3, catmull, fbm3, loft, morph_sphere, section, smooth
 
 GREY = (0.82, 0.82, 0.82)
@@ -377,6 +377,47 @@ def frame_m(fwd, up=(0.0, 1.0, 0.0)):
     if u.dot(V(up)) < 0:
         u = -u
     return Matrix((s, u, f)).transposed()
+
+
+def sclerite(b, a, c, w, h, bone, col=0.85, keels=0, phase=0.0, taper=0.0, tint=1.0, up=(0.0, 1.0, 0.0), seg=18, rings=10, blunt=0.6,
+             cls=SCALE, belly=0.0, mat=0, joint=0.35, ridge=0.12, flare=0.0):
+    """One plate of an exoskeleton between joints a and c (arthropod body segments, leg segments,
+    a crab's carapace or a mantis's thorax): a barrel `w` wide and `h` deep with blunt ends
+    (`blunt` near 0 makes it slab-like), optional keels (carinae) running along it (`keels`
+    ridges round it, rotated by `phase`; 0 is the back), paler on the back and dark where it
+    meets the next plate.  `belly` flattens the underside, `taper` narrows it towards c, `flare`
+    widens its rear rim.  A deformed sphere turned onto the a -> c axis with `up` as its back."""
+    a, c = V(a), V(c)
+    L = (c - a).length
+    M = frame_m(c - a, up)
+
+    def cross(d):
+        u = d.y
+        s = math.sqrt(max(0.0, 1.0 - u * u))
+        if s < 1e-6:
+            return u, 0.0, 1.0, 0.0
+        return u, d.x / s, d.z / s, s
+
+    def keel(cx, cy):
+        if not keels:
+            return 0.0
+        return max(0.0, math.cos((math.atan2(cx, cy) - phase) * keels)) ** 10
+
+    def shape(d):
+        u, cx, cy, s = cross(d)
+        rad = (s ** blunt) * (1.0 + ridge * keel(cx, cy)) * (1.0 - taper * (0.5 + 0.5 * u)) * (1.0 + flare * smooth(-0.3, -0.9, u))
+        yy = cy * h * rad
+        if belly and cy < 0.0:
+            yy *= 1.0 - belly
+        return V(cx * w * rad, yy, math.copysign(abs(u) ** 0.75, u) * L * 0.5)
+
+    def colf(lp, d):
+        u, cx, cy, s = cross(d)
+        v = col * (0.78 + 0.22 * smooth(-0.6, 0.8, cy)) + 0.08 * keel(cx, cy)
+        v *= 1.0 - joint * smooth(0.72, 0.97, abs(u))
+        return (v, v, v)
+
+    return morph_sphere(b, (a + c) * 0.5, shape, colf, cls=cls, bone=bone, seg=seg, rings=rings, tint_fn=lambda lp, d: tint, rot=M, mat=mat)
 
 
 def euler_of(M):
