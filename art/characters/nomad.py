@@ -17,7 +17,7 @@ person.export_person("characters/nomad.glb", {
     "trim": "b05a30",
     "hair": "4a3020",
     "hair_style": "long",
-    "hat": "straw",
+    "hat": "weimao", "veil": "f0e8d8",
     "eyes": "6a4a2a",
     "sash": "b05a30",
     "staff": True,

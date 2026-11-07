@@ -15,7 +15,7 @@ import math
 
 from mathutils import Vector
 
-from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, METAL, SKIN, STONE, WOOD, V, darken, lighten, lin, mix, rgb
+from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SKIN, STONE, WOOD, V, darken, lighten, lin, mix, rgb
 from sculpt import bump, catmull, clamp, fbm3, loft, section, smooth, strand
 
 HIP_Y = 0.92
@@ -278,6 +278,9 @@ def skirt(b, o, tor, robe, trim, inner, gold, lapel_end):
     the right front, with an inner skirt showing through, a trimmed and embroidered hem."""
     n = 52
     ys = [1.0, 0.92, 0.84, 0.76, 0.66, 0.56, 0.46, 0.36, 0.28, 0.21, 0.17]
+    if o.get("robe_len") == "short":
+        # a working man's short robe: the hem stops above the knee so the legs can move
+        ys = [1.0 - (1.0 - y) * 0.52 for y in ys]
     open_c = -0.62          # the overlap opening sits at the right front
     open_w = 0.42
     flare = o.get("flare", 1.0)
@@ -333,6 +336,8 @@ def skirt(b, o, tor, robe, trim, inner, gold, lapel_end):
     prof = []
     for y in ys[:-1]:
         prof.append((r_at(y, open_c) * 0.93, y))
+    if o.get("robe_len") == "short":
+        return
     b.lathe(V(0, 0, 0.004), [(rr, y) for rr, y in reversed(prof)], inner, seg=24, squash=(1.0, 0.82), bone_fn=skirt_w, cap_bottom=False, cap_top=False, folds=(11, 0.03, 0.2))
 
 
@@ -497,13 +502,41 @@ def legs(b, o, pants, boots, trim):
         an = V(ANK.x * s, ANK.y, ANK.z)
         th, sh, ft = "thigh." + sd, "shin." + sd, "foot." + sd
         b.tube([hip, hip.lerp(kn, 0.5), kn, kn.lerp(an, 0.35)], [0.088, 0.078, 0.063, 0.059], pants, cls=CLOTH, bones=[th, th, {th: 0.5, sh: 0.5}, sh], seg=14)
-        # boot shaft, slightly flared at the top, creased at the ankle
-        top = kn.lerp(an, 0.32)
-        b.tube([top, kn.lerp(an, 0.6), kn.lerp(an, 0.85), an + V(0, -0.02, 0.005)], [0.066, 0.058, 0.054, 0.056], boots, cls=CLOTH, bones=[sh, sh, sh, {sh: 0.5, ft: 0.5}], seg=14, cols=[lighten(boots, 0.05), boots, darken(boots, 0.08), boots])
-        b.tube([top + V(0, 0.016, 0), top - V(0, 0.016, 0)], [0.07, 0.07], trim, cls=CLOTH, bone=sh, seg=14, cap0=False, cap1=False)
-        for k in range(3):
-            q = kn.lerp(an, 0.8 + k * 0.05)
-            b.tube([q + V(0.0, 0.002, 0.0), q - V(0, 0.002, 0)], [0.057, 0.057], darken(boots, 0.18), cls=CLOTH, bone=sh, seg=12, cap0=False, cap1=False)
+        if o.get("shoes") == "sandals":
+            # trousers run on to the ankle above bare feet
+            b.tube([kn.lerp(an, 0.3), kn.lerp(an, 0.75), an + V(0, 0.01, 0)], [0.059, 0.055, 0.052], pants, cls=CLOTH, bones=[sh, sh, {sh: 0.6, ft: 0.4}], seg=14)
+        else:
+            # boot shaft, slightly flared at the top, creased at the ankle
+            top = kn.lerp(an, 0.32)
+            b.tube([top, kn.lerp(an, 0.6), kn.lerp(an, 0.85), an + V(0, -0.02, 0.005)], [0.066, 0.058, 0.054, 0.056], boots, cls=CLOTH, bones=[sh, sh, sh, {sh: 0.5, ft: 0.5}], seg=14, cols=[lighten(boots, 0.05), boots, darken(boots, 0.08), boots])
+            b.tube([top + V(0, 0.016, 0), top - V(0, 0.016, 0)], [0.07, 0.07], trim, cls=CLOTH, bone=sh, seg=14, cap0=False, cap1=False)
+            for k in range(3):
+                q = kn.lerp(an, 0.8 + k * 0.05)
+                b.tube([q + V(0.0, 0.002, 0.0), q - V(0, 0.002, 0)], [0.057, 0.057], darken(boots, 0.18), cls=CLOTH, bone=sh, seg=12, cap0=False, cap1=False)
+        if o.get("wraps"):
+            # cloth wrappings bound round the shin, criss-crossed with cord
+            for k in range(7):
+                q = kn.lerp(an, 0.05 + k * 0.13)
+                b.tube([q + V(0, 0.018, 0), q - V(0, 0.018, 0)], [0.066 - 0.002 * k] * 2, rgb(o["wraps"]) if k % 2 else darken(o["wraps"], 0.1), cls=CLOTH, bone=sh, seg=12, cap0=False, cap1=False)
+            for k in range(6):
+                q0 = kn.lerp(an, 0.1 + k * 0.14)
+                q1 = kn.lerp(an, 0.17 + k * 0.14)
+                b.tube([q0 + V(0.067 * s, 0, 0.02), q1 + V(-0.03 * s, 0, 0.065)], [0.004, 0.004], "6a4a2a", cls=CLOTH, bone=sh, seg=4)
+        if o.get("shoes") == "sandals":
+            # straw sandals on bare feet: a woven sole, a toe thong and ankle ties
+            sk = rgb(o.get("skin", "f5d6c2"))
+            rows2 = []
+            for t, (zz, hh, ww) in enumerate(((-0.06, 0.05, 0.038), (-0.01, 0.055, 0.042), (0.05, 0.04, 0.044), (0.11, 0.028, 0.042), (0.16, 0.02, 0.036))):
+                c = V(ANK.x * s, 0.024 + hh * 0.5, zz)
+                rows2.append([c + V(math.sin(2 * math.pi * i / 12) * ww, math.cos(2 * math.pi * i / 12) * hh * 0.5, 0) for i in range(12)])
+            loft(b, rows2, sk, cls=SKIN, bones=[{sh: 0.3, ft: 0.7}, ft, ft, ft, ft])
+            for i in range(5):
+                b.ellipsoid(V(ANK.x * s + (i - 2) * 0.015 * s, 0.022, 0.17 - abs(i - 2) * 0.008), (0.008, 0.008, 0.012), sk, cls=SKIN, bone=ft, seg=6, rings=4)
+            sole = b.superquad(V(ANK.x * s, 0.008, 0.05), (0.05, 0.008, 0.13), "c8b070", e=0.6, cls=WOOD, bone=ft, seg=12, rings=5)
+            b.recolor(sole, lambda p: "a89050" if math.sin(p.z * 120.0) > 0.4 else None, cls=WOOD)
+            for side2 in (1, -1):
+                b.tube([V(ANK.x * s, 0.02, 0.14), V(ANK.x * s + 0.04 * side2, 0.05, 0.04), V(ANK.x * s + 0.05 * side2, 0.1, -0.02)], [0.005] * 3, "8a6a3a", cls=CLOTH, bone=ft, seg=4)
+            continue
         # foot: a loft from heel to toe, low and narrow at the toe
         fc = []
         rows = []
@@ -667,6 +700,27 @@ def hat(b, o, kind, top):
         verts = b.lathe(V(0, base, -0.015), [(0.13, 0.0), (0.145, 0.03), (0.14, 0.09), (0.11, 0.13), (0.001, 0.15)], col, cls=HAIR, bone="head", seg=28, folds=(19, 0.05, 0.0))
         b.recolor(verts, lambda p: lighten(col, 0.15) if fbm3((p.x * 60, p.y * 30, p.z * 60), 2, 3) > 0.55 else None, cls=HAIR)
         b.lathe(V(0, base - 0.012, -0.015), [(0.15, 0.0), (0.155, 0.02), (0.15, 0.045), (0.13, 0.05)], lighten(col, 0.1), cls=HAIR, bone="head", seg=28, folds=(31, 0.06, 0.3), cap_bottom=False)
+    elif kind == "weimao":
+        # a traveller's weimao: a wide straw brim with a gauze veil hanging all round to the
+        # shoulders, slit at the front so the face shows through
+        col = rgb(hc or "c8a868")
+        base = top - 0.05
+        b.lathe(V(0, base, -0.01), [(0.3, 0.0), (0.28, 0.02), (0.14, 0.06), (0.1, 0.12), (0.001, 0.13)], col, cls=WOOD, bone="head", seg=32)
+        veil = rgb(o.get("veil", "f0f0f8"))
+        rows = []
+        for j in range(6):
+            t = j / 5
+            row = []
+            for i in range(25):
+                a = math.pi * 0.3 + (i / 24) * math.pi * 1.4
+                rr = 0.29 + 0.03 * t + 0.008 * math.sin(i * 1.7) * t
+                row.append(V(math.sin(a) * rr, base - 0.01 - t * 0.26, math.cos(a) * rr - 0.01))
+            rows.append(row)
+        bones = [{"head": 1.0}] * 3 + [{"head": 0.7, "neck": 0.3}] * 3
+        b.sheet(rows, veil, cls=CLOTH, bones=bones, cols=[veil, lighten(veil, 0.04), veil, darken(veil, 0.04), veil, darken(veil, 0.08)], thickness=0.004, mat=MAT_GLOW if o.get("veil_glow") else 0)
+        for k in range(8):
+            a = math.pi * 0.3 + k / 7 * math.pi * 1.4
+            b.ball(V(math.sin(a) * 0.32, base - 0.28, math.cos(a) * 0.32 - 0.01), 0.008, "c02a20", cls=CRYSTAL, bone="neck", seg=6, rings=4)
     elif kind == "qing":
         col = rgb(hc or "2a2a30")
         base = top - 0.06
@@ -880,3 +934,18 @@ def sheng_crown(b, top, col="e8c050", jade="6af0b0"):
             b.ball(c + V(0, -0.03 - k * 0.022, 0.0), 0.008, jade if k % 2 else "f0f0e0", cls=CRYSTAL, bone="head", seg=6, rings=4)
     b.lathe(V(0, y, -0.03), [(0.07, 0.0), (0.075, 0.05), (0.06, 0.1), (0.075, 0.13)], col, cls=METAL, bone="head", seg=20, cap_bottom=False, folds=(9, 0.06, 0.0))
     b.ball(V(0, y + 0.12, 0.035), 0.018, "ff4050", cls=CRYSTAL, bone="head", seg=8, rings=5, mat=MAT_GLOW)
+
+
+def scars(b, f, hc, kind):
+    """Marks on a face: "scar" - an old sword cut across the brow and cheek; "freckles" - a dusting
+    across the nose and cheeks."""
+    from face import EYE_X, EYE_Y, NOSE_Y
+    sk = f.skin
+    if kind == "scar":
+        pts = [hc + f.surface(EYE_X * 1.6, EYE_Y + 0.05) + V(0, 0, 0.0015), hc + f.surface(EYE_X * 1.1, EYE_Y + 0.0) + V(0, 0, 0.0015), hc + f.surface(EYE_X * 0.9, EYE_Y - 0.04) + V(0, 0, 0.0015)]
+        b.tube(pts, [0.0012, 0.0018, 0.001], mix(sk, "a04040", 0.45), cls=SKIN, bone="head", seg=4, mat=MAT_PLAIN)
+    elif kind == "freckles":
+        for k in range(14):
+            x = (k % 7 - 3) * 0.012 + (0.004 if k >= 7 else 0.0)
+            y = NOSE_Y + 0.012 + (k // 7) * 0.008 + 0.004 * math.sin(k * 2.3)
+            b.ellipsoid(hc + f.surface(x * 1.4, y) + V(0, 0, 0.001), (0.0018, 0.0016, 0.0008), mix(sk, "a06040", 0.4), cls=SKIN, bone="head", seg=5, rings=3, mat=MAT_PLAIN)

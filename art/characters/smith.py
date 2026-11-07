@@ -12,7 +12,7 @@ person.export_person("characters/smith.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "age": 0.35, "build": 1.14, "beard_len": 0.6, "brow": 1.3,
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
-    "props": ["apron", "hammer"], "armor": False,
+    "props": ["apron", "hammer"], "robe_len": "short", "wraps": "6a5a48", "marks": "scar", "armor": False,
     "robe": "d08a5a",
     "trim": "f0d0b0",
     "hair": "3a2a20",

@@ -14,7 +14,8 @@ person.export_person("characters/niu_lang.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": False, "age": 0.25, "build": 1.06, "jaw": 1.02, "skin": "e8c0a0",
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
-    "props": ["straw_cape", "flute"], "pose": "flute",
+    "props": ["straw_cape", "flute"], "pose": "flute", "marks": "freckles",
+    "robe_len": "short", "wraps": "e8dcc0", "shoes": "sandals",
     "robe": "8a7a5a", "trim": "c8b890", "inner": "e8dcc0", "sash": "4a3a2a", "hair": "1a1410", "hair_style": "short",
     "eyes": "5a3a20", "pants": "5a4a30", "boots": "3a2a1a", "hat": "straw", "hat_col": "c8a868", "embroidery": "c8b890",
     "collar2": "6a5a3a", "white_sole": False,

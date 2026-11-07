@@ -120,6 +120,8 @@ def build(o):
         top = hairlib.top_y(s)
         if o.get("beard", False):
             facelib.beard(b, f, o)
+        if o.get("marks"):
+            G.scars(b, f, facelib.HC, o["marks"])
     if o.get("crown", False):
         G.crown(b, o, top)
     if o.get("hat"):
@@ -530,6 +532,8 @@ POSES = {
     "hold_both": {"upper_arm.L": (-0.45, 0.0, -0.32), "forearm.L": (-1.25, 0.0, 0.0), "upper_arm.R": (-0.45, 0.0, 0.32), "forearm.R": (-1.25, 0.0, 0.0)},
     # a flute at the lips
     "flute": {"upper_arm.L": (-0.75, 0.0, -0.45), "forearm.L": (-1.9, 0.0, 0.0), "upper_arm.R": (-0.6, 0.0, 0.05), "forearm.R": (-1.75, 0.0, 0.0), "head": (0.06, 0.0, -0.1)},
+    # a scholar's courtesy: hands joined and hidden inside the sleeves before the chest
+    "sleeves": {"upper_arm.L": (-0.5, 0.0, -0.3), "forearm.L": (-1.2, 0.0, 0.0), "upper_arm.R": (-0.5, 0.0, 0.3), "forearm.R": (-1.2, 0.0, 0.0)},
     # something tall held upright in the right hand (an oar, a rod over the shoulder)
     "hold_r": {"upper_arm.R": (-0.2, 0.0, 0.0), "forearm.R": (-0.55, 0.0, 0.0)},
 }

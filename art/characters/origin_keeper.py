@@ -12,7 +12,7 @@ person.export_person("characters/origin_keeper.glb", {
     # face and build (see art/lib/face.py, garment.py)
     "fem": False, "age": 0.2, "jaw": 0.9,
     # signature props and how they are held (art/lib/accessory.py, person.POSES)
-    "props": [("fly_whisk", {"side": 1})],
+    "pose": "sleeves",
     "robe": "a08ad0", "trim": "f8e0a0", "inner": "fff8f0", "sash": "6a4aa0", "hair": "f4f0f8", "hair_style": "long", "pin": "ffe080",
     "eyes": "c0a0ff", "glow_eyes": True, "staff": True, "staff_gem": "fff0d0", "embroidery": "f8e0a0",
 })
