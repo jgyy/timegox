@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/yue_ling.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "age": 0.0, "lip": "e07a88", "eye_size": 1.34, "hair_len": 0.62,
     "robe": "e86a9a", "trim": "ffe0ec", "inner": "fff4f8", "hair": "402030", "hair_style": "long",
     "eyes": "c04080", "sash": "a03060", "ribbon": "ffb0cc", "boots": "6a3048", "pants": "8a3a5a",
     "jade": "8af0c8", "pin": "8af0c8",

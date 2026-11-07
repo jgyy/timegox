@@ -73,6 +73,15 @@ const THEMES := {
 		"sky_top": Color("5a6ab0"), "sky_hor": Color("ffe8c8"), "fog": Color("f0dcc0"), "fog_d": 0.013, "sun": Color("fff0d0"), "sun_e": 1.1, "amb": Color("c8b898"), "amb_e": 0.85, "weather": "light", "tree": "peach", "decor": "flower"},
 	"loom": {"g1": Color("a890c0"), "g2": Color("b8a0cc"), "path": Color("f0e0f4"), "wall": Color("7a5aa8"), "water": Color("e0b0ff"), "bg": Color("0c0614"),
 		"sky_top": Color("2a1a58"), "sky_hor": Color("ffd8a0"), "fog": Color("d8b8e0"), "fog_d": 0.014, "sun": Color("fff0d8"), "sun_e": 1.0, "amb": Color("b8a0d0"), "amb_e": 0.85, "weather": "glints", "tree": "column", "decor": "cloudpuff"},
+	# ---- Part VIII: a starlit river ford, cloud cliffs, the Weaver's night palace, Kunlun's jade pool
+	"starferry": {"g1": Color("4a7a68"), "g2": Color("568a72"), "path": Color("c8c0a0"), "wall": Color("2e5a4a"), "water": Color("a8c8ff"), "bg": Color("060a14"),
+		"sky_top": Color("10183a"), "sky_hor": Color("8a7ab8"), "fog": Color("5a6a98"), "fog_d": 0.014, "sun": Color("d8e0ff"), "sun_e": 0.9, "amb": Color("8898c8"), "amb_e": 0.85, "weather": "glints", "tree": "ferrypost", "decor": "grass"},
+	"magpie": {"g1": Color("7a9a88"), "g2": Color("88a894"), "path": Color("e0dcd0"), "wall": Color("5a7a6a"), "water": Color("c0d8f0"), "bg": Color("0a1018"),
+		"sky_top": Color("3a5aa0"), "sky_hor": Color("f0e8f0"), "fog": Color("e0e4f0"), "fog_d": 0.016, "sun": Color("fff8f0"), "sun_e": 1.05, "amb": Color("b8c4d8"), "amb_e": 0.85, "weather": "river_mist", "tree": "magpienest", "decor": "cloudpuff"},
+	"starpalace": {"g1": Color("6a70b0"), "g2": Color("7a80c0"), "path": Color("e8ecff"), "wall": Color("4a4a8a"), "water": Color("c8d0ff"), "bg": Color("06061a"),
+		"sky_top": Color("0a0a30"), "sky_hor": Color("6a5aa8"), "fog": Color("7a78b8"), "fog_d": 0.012, "sun": Color("e8e8ff"), "sun_e": 0.95, "amb": Color("9a98d0"), "amb_e": 0.85, "weather": "glints", "tree": "starpillar", "decor": "cloudpuff"},
+	"jasper": {"g1": Color("5aa080"), "g2": Color("68b08c"), "path": Color("f0ecd8"), "wall": Color("3a7a5a"), "water": Color("70e0c0"), "bg": Color("061410"),
+		"sky_top": Color("3a78c0"), "sky_hor": Color("fff0e0"), "fog": Color("e0f0e8"), "fog_d": 0.012, "sun": Color("fff8e8"), "sun_e": 1.1, "amb": Color("b0d0c0"), "amb_e": 0.85, "weather": "petals", "tree": "jadepeach", "decor": "flower"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -108,6 +117,10 @@ const EXTRA := {
 	"tea": {"hill": 1.3, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.6, "haze": 0.45},
 	"silk": {"hill": 0.6, "tex": "leaves", "tuft": "grass", "horizon": "hills", "clouds": 0.4, "rays": 0.6, "haze": 0.3},
 	"loom": {"hill": 0.4, "tex": "marble", "tuft": "flowers", "horizon": "palace", "clouds": 0.5, "stars": 0.6, "aurora": 0.5},
+	"starferry": {"hill": 0.3, "tex": "grass", "tuft": "grass", "horizon": "hills", "clouds": 0.3, "stars": 1.0, "moon": 0.9, "haze": 0.5},
+	"magpie": {"hill": 1.4, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.9, "haze": 0.4, "rays": 0.4},
+	"starpalace": {"hill": 0.4, "tex": "marble", "tuft": "flowers", "horizon": "palace", "clouds": 0.3, "stars": 1.0, "aurora": 0.4, "nebula": 0.5},
+	"jasper": {"hill": 0.9, "tex": "grass", "tuft": "flowers", "horizon": "peaks", "clouds": 0.6, "rays": 0.6, "haze": 0.3},
 }
 
 const PICKUP_COLORS := {
@@ -117,6 +130,7 @@ const PICKUP_COLORS := {
 	"feather_cloud": Color("f0f8ff"), "seal": Color("60f0b0"), "ingot": Color("ffc860"), "peach": Color("ffa0b0"),
 	"fallen_star": Color("fff4b0"), "glowcap": Color("ff9a50"), "aurora_shard": Color("70ffc8"), "five_stone": Color("ff70d0"),
 	"soul_lantern": Color("ffc860"), "memory_pearl": Color("c0f0ff"), "forget_herb": Color("e8d090"), "wheel_spoke": Color("b0b8ff"), "silver_thread": Color("e8e8ff"), "tea_bud": Color("8ae060"), "cocoon": Color("fff4d8"), "shuttle": Color("e8c860"), "needle": Color("c8d0e0"),
+	"river_star": Color("fff4c0"), "magpie_plume": Color("e8f0ff"), "star_thread": Color("c8d0ff"), "kunlun_peach": Color("ffa8b8"), "magpie_badge": Color("2a2a3a"),
 }
 
 static var _anime := {}

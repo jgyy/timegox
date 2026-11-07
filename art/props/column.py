@@ -7,7 +7,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, METAL, STONE, WOOD, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+
+from kit import CRYSTAL, MAT_GLOW, METAL, STONE, V, WOOD, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(83)
@@ -30,5 +32,16 @@ for s in (1, -1):
     b.leaf(V(0.08 * s, 3.58, 0), V(0.38 * s, 3.8, -0.1), 0.12, "8af0d0", cls=CRYSTAL)
 b.tube([V(0, 3.5, -0.12), V(0, 3.45, -0.4), V(0, 3.6, -0.6)], [0.05, 0.04, 0.01], "8af0d0", cls=CRYSTAL, seg=6)
 b.lathe(V(0, 2.95, 0), [(0.55, -0.01), (0.6, 0.0), (0.55, 0.01)], "fff0b0", cls=CRYSTAL, seg=24, mat=MAT_GLOW, cap_bottom=False, cap_top=False)
+# detail: ivy climbing the shaft in veined leaves, a broken fragment of an older column lying at
+# its foot, cracks in the plinth
+ivy = [V(math.cos(t) * 0.31, 0.4 + t * 0.2, math.sin(t) * 0.31) for t in [i * 0.45 for i in range(14)]]
+b.tube(ivy, [0.012] * len(ivy), "4a5a2a", cls=WOOD, seg=4)
+for k in range(1, len(ivy), 2):
+    out = V(ivy[k].x, 0, ivy[k].z).normalized()
+    A.veined_leaf(b, ivy[k], ivy[k] + out * 0.12 + V(0, 0.04, 0), 0.05, "4a8a3a", None, tint=0.0, col_tip="6aaa4a")
+A.hewn_stone(b, V(0.8, 0.18, 0.4), (0.5, 0.32, 0.32), None, seed=51, shade=0.92, e=0.35, tint=0.0, moss=0.6, rot=(0, 0.6, 1.4), seg=12, rings=8)
+for k in range(3):
+    a = k * 2.0
+    b.tube([V(math.cos(a) * 0.6, 0.3, math.sin(a) * 0.6), V(math.cos(a + 0.2) * 0.45, 0.15, math.sin(a + 0.2) * 0.45)], [0.008, 0.003], "9a96a8", cls=STONE, seg=4)
 print("[art] column: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/column.glb", target_tris=2600, samples=12, dist=0.6, strength=0.45)
+kit.finish_static(b, "props/column.glb", target_tris=3600, samples=12, dist=0.6, strength=0.45)

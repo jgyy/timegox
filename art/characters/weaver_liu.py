@@ -9,6 +9,10 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/weaver_liu.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "age": 0.3,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["shuttle"],
     "robe": "8a6ab0", "trim": "f0e0f8", "inner": "f4f0f8", "sash": "4a3a6a", "hair": "1a1420", "hair_style": "long",
     "pin": "e8c860", "eyes": "5a3a6a", "ribbon": "e0c0f0", "embroidery": "f0d8ff",
 })

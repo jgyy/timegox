@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CRYSTAL, MAT_GLOW, STONE, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+
+from kit import CRYSTAL, FOLIAGE, MAT_GLOW, STONE, V, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(67)
@@ -29,5 +31,18 @@ for k in range(4):
 # fused-glass lightning rod
 b.crystal(V(0, 3.2, 0), 0.08, 0.9, "c8d8ff", rot=(0.1, 0, 0.05), sides=5)
 b.ball(V(0, 3.95, 0.05), 0.08, "f6f0a0", cls=CRYSTAL, seg=8, rings=5, mat=MAT_GLOW)
+# detail: weathered column tops, a skirt of scree and fallen column drums at the foot, lichen on the
+# north faces
+for k in range(6):
+    a = k / 6 * 2 * math.pi + 0.25
+    rr = rnd.uniform(0.6, 0.95)
+    A.hewn_stone(b, V(math.cos(a) * rr, 0.08, math.sin(a) * rr), (rnd.uniform(0.15, 0.3), rnd.uniform(0.1, 0.18), rnd.uniform(0.15, 0.28)), None, seed=k + 21, shade=0.32, e=0.6, tint=0.0, seg=10, rings=6)
+for k in range(2):
+    a = 1.2 + k * 2.4
+    b.lathe(V(math.cos(a) * 0.9, 0.15, math.sin(a) * 0.9), [(0.26, -0.15), (0.26, 0.15)], (0.3, 0.3, 0.35), cls=STONE, seg=6, smooth=False, rot=(math.pi / 2, a, 0))
+for k in range(10):
+    a = rnd.uniform(-0.8, 0.8)
+    y = rnd.uniform(0.4, 2.0)
+    b.ellipsoid(V(math.sin(a) * 0.33, y, -0.3 - 0.05 * math.cos(a)), (0.08, 0.05, 0.02), "7a9a6a", cls=FOLIAGE, seg=8, rings=4)
 print("[art] crag: %d triangles" % b.tri_count())
 kit.finish_static(b, "props/crag.glb", samples=12, dist=0.6, strength=0.5)

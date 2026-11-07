@@ -9,6 +9,10 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/meng_po.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "age": 0.85, "eye_size": 1.12,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["bowl"], "pose": "hold_both", "staff": False,
     "robe": "6a3a5a", "trim": "e0b860", "inner": "f0e0d0", "sash": "3a1a30", "hair": "d8d4dc", "hair_style": "bun",
-    "pin": "e0b860", "eyes": "6a5a4a", "staff": True, "staff_gem": "ffd890", "collar2": "a05070", "embroidery": "f0d080",
+    "pin": "e0b860", "eyes": "6a5a4a", "staff_gem": "ffd890", "collar2": "a05070", "embroidery": "f0d080",
 })

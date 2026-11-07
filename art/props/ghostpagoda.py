@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CLOTH, MAT_GLOW, METAL, STONE, WOOD, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+from sculpt import bezier  # noqa: E402
+from kit import CLOTH, CRYSTAL, MAT_GLOW, METAL, STONE, V, WOOD, Builder  # noqa: E402
 
 kit.reset()
 b = Builder("ghostpagoda")
@@ -52,5 +54,20 @@ b.tube([V(0, y, 0), V(0, y + 0.9, 0)], [0.04, 0.025], "b09040", cls=METAL, seg=8
 for k in range(5):
     b.lathe(V(0, y + 0.15 + k * 0.13, 0), [(0.1 - k * 0.012, -0.02), (0.12 - k * 0.012, 0.0), (0.1 - k * 0.012, 0.02)], "c8a050", cls=METAL, seg=12)
 b.ball(V(0, y + 0.98, 0), 0.09, "c0f0ff", cls=CLOTH, seg=10, rings=6, mat=MAT_GLOW)
+# detail: paper charms fluttering from every eave, a string of soul lanterns, and a crooked spirit
+# gate of weathered posts in front
+for k in range(12):
+    a = k / 12 * 2 * math.pi
+    for tier in range(2):
+        top = V(math.cos(a) * (0.75 - 0.18 * tier), 1.0 + tier * 0.9, math.sin(a) * (0.75 - 0.18 * tier))
+        b.ribbon([top, top + V(0.0, -0.14, 0.02), top + V(0.01, -0.28, 0.0)], [0.025, 0.025, 0.02], (math.cos(a + 1.57), 0, math.sin(a + 1.57)), "f0d860", col_end="e8c850")
+line = bezier(V(-1.0, 1.4, 0.9), V(-0.4, 1.0, 1.0), V(0.4, 1.0, 1.0), V(1.0, 1.4, 0.9), 8)
+b.tube(line, [0.006] * len(line), "3a3028", cls=CLOTH, seg=4)
+for k in range(1, len(line) - 1, 2):
+    b.lathe(line[k] + V(0, -0.12, 0), [(0.02, -0.06), (0.06, -0.03), (0.06, 0.03), (0.02, 0.06)], "c8f0e0", cls=CLOTH, seg=8)
+    b.ball(line[k] + V(0, -0.12, 0), 0.035, "a0ffe0", cls=CRYSTAL, seg=6, rings=4, mat=MAT_GLOW)
+for s in (1, -1):
+    A.bark_limb(b, [V(0.9 * s, -0.05, 1.4), V(0.88 * s, 0.8, 1.42), V(0.9 * s, 1.6, 1.4)], [0.07, 0.065, 0.06], "4a3a30", None, seed=7 + s, ridges=5, twist=0.4, tint=0.0, n=8)
+b.tube([V(-1.1, 1.55, 1.4), V(1.1, 1.62, 1.4)], [0.06, 0.06], "4a3a30", cls=WOOD, seg=6)
 print("[art] ghostpagoda: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/ghostpagoda.glb", target_tris=3000, samples=12, dist=0.6, strength=0.5)
+kit.finish_static(b, "props/ghostpagoda.glb", target_tris=4200, samples=12, dist=0.6, strength=0.5)

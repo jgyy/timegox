@@ -9,12 +9,15 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/smith.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "age": 0.35, "build": 1.14, "beard_len": 0.6, "brow": 1.3,
+    # signature props and how they are held (art/lib/accessory.py, person.POSES)
+    "props": ["apron", "hammer"], "robe_len": "short", "wraps": "6a5a48", "marks": "scar", "armor": False,
     "robe": "d08a5a",
     "trim": "f0d0b0",
     "hair": "3a2a20",
     "hair_style": "wild",
-    "armor": True,
-    "metal": "8a6a4a",
+        "metal": "8a6a4a",
     "beard": True,
     "beard_col": "4a3020",
     "eyes": "5a3a2a",

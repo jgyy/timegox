@@ -9,7 +9,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from kit import CLOTH, FOLIAGE, MAT_GLOW, STONE, V, Builder  # noqa: E402
+import anatomy as A  # noqa: E402
+
+from kit import CLOTH, CRYSTAL, FOLIAGE, MAT_GLOW, SKIN, STONE, V, Builder  # noqa: E402
 
 kit.reset()
 rnd = random.Random(73)
@@ -57,5 +59,15 @@ for k in range(5):
     for q in range(6):
         pa = 2 * math.pi * q / 6
         b.leaf(top, top + V(math.cos(pa) * 0.1, 0.05, math.sin(pa) * 0.1), 0.02, "e02018", side=(-math.sin(pa), 0, math.cos(pa)), cls=CLOTH, col_tip="ff5040")
+# detail: moss on the cap and the base course, lichen spots, a candle burning in the fire box and
+# hewn stepping stones leading up to it
+for k in range(4):
+    A.hewn_stone(b, V(0.0, 0.03, 0.9 + k * 0.45), (0.38, 0.08, 0.3), None, seed=k + 121, shade=0.6, e=0.35, tint=0.0, moss=0.7, rot=(0, k * 0.4, 0), seg=10, rings=6)
+for k in range(10):
+    a = rnd.uniform(0, 2 * math.pi)
+    y = rnd.uniform(0.2, 1.6)
+    b.ellipsoid(V(math.cos(a) * 0.22, y, math.sin(a) * 0.22), (0.05, 0.03, 0.01), "7a9a5a" if k % 2 else "c8c890", cls=FOLIAGE, seg=6, rings=4)
+b.tube([V(0, 1.12, 0), V(0, 1.22, 0)], [0.025, 0.022], "f8f0e0", cls=SKIN, seg=6)
+b.ellipsoid(V(0, 1.27, 0), (0.025, 0.05, 0.025), "ffd070", cls=CRYSTAL, seg=6, rings=4, mat=MAT_GLOW)
 print("[art] stonelantern: %d triangles" % b.tri_count())
-kit.finish_static(b, "props/stonelantern.glb", target_tris=2400, samples=12, dist=0.5, strength=0.5)
+kit.finish_static(b, "props/stonelantern.glb", target_tris=3200, samples=12, dist=0.5, strength=0.5)

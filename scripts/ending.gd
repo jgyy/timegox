@@ -3,6 +3,7 @@ extends ScreenBase
 ## four mended pillars holding up the horizon, Hundun asleep around the centre of the world and
 ## rings of Nuwa's five colours turning overhead.  Part VI adds the Wheel of the Six Paths turning
 ## again behind them, soul lanterns rising past it, and Lin Feng's parents walking on to rebirth.
+## Part VIII hangs the magpie bridge across the sky, with the Cowherd and the Weaver meeting on it.
 
 const VIEW := Vector2(1280, 720)
 
@@ -45,7 +46,9 @@ func _build3d() -> void:
 	var isle := Terrain3D._proto("wall:cloudsea", "cloudsea")
 	var peach := Terrain3D._proto("wall:garden", "garden")
 	for i in 6:
-		var a2 := i * 1.1 + 0.4
+		# spread over the far half of the sky only: the old i * 1.1 + 0.4 put one peach island at
+		# z = 5, between the camera and the hero, hiding the scene behind a giant trunk
+		var a2 := PI * 1.1 + i * PI * 0.16
 		var mi := MB.mesh_node(scene3d, isle if i % 2 == 0 else peach, Vector3(cos(a2) * 13.0, -1.0 + (i % 3) * 1.5, sin(a2) * 13.0 - 8.0))
 		mi.scale = Vector3.ONE * (1.6 + (i % 3) * 0.4)
 	var pal := MB.new()
@@ -152,6 +155,28 @@ func _part7() -> void:
 		var n := MB.mesh_node(scene3d, sl.build(MB.mat_glow()), Vector3(2.4 + k * 0.5, 1.6, -0.2 - k * 0.4))
 		souls.append(n)
 
+## Part VIII: the magpie bridge (art/props/magpiebridge.py) arching over the Star River, with
+## Niu Lang and Zhi Nu walking towards each other and meeting at its crown
+var bridge: Node3D
+var lovers: Array = []
+
+func _part8() -> void:
+	bridge = Node3D.new()
+	bridge.position = Vector3(-3.0, 0.3, -10.0)
+	bridge.rotation.y = 0.05
+	bridge.scale = Vector3.ONE * 2.2
+	scene3d.add_child(bridge)
+	if Assets.has("props/magpiebridge"):
+		var bm := MB.mesh_node(bridge, Assets.static_mesh("props/magpiebridge"))
+		bm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for k in 2:
+		var pid := "niu_lang" if k == 0 else "zhi_nu"
+		var lv := Models.person(Color("5a7a9a") if k == 0 else Color("e8d8f8"), Color("1a1a2a"), {"asset": pid, "glow": Color(1.0, 0.9, 0.8)})
+		lv.scale = Vector3.ONE * 0.42
+		lv.rotation.y = PI * 0.5 if k == 0 else -PI * 0.5
+		bridge.add_child(lv)
+		lovers.append(lv)
+
 func press(act: String) -> void:
 	if act == "confirm":
 		done = true
@@ -182,6 +207,16 @@ func _process(d: float) -> void:
 		threads.position.y = -fmod(t * 0.6, 6.0)
 		for k in souls.size():
 			(souls[k] as Node3D).position.y = 1.6 + sin(t * 1.3 + k * 2.1) * 0.25
+		if bridge == null:
+			_part8()
+		# the lovers walk up from either end, meet at the crown and stay there together
+		var meet := clampf(t * 0.08, 0.0, 1.0)
+		for k in lovers.size():
+			var lv: Node3D = lovers[k]
+			var s := -1.0 if k == 0 else 1.0
+			var x := s * lerpf(3.6, 0.22, meet)
+			lv.position = Vector3(x, 1.5 * (1.0 - pow(absf(x) / 4.2, 1.7)) + 0.08, 0.0)
+			Models.anim_person(lv, t + k, meet < 1.0)
 		cam.position = Vector3(sin(t * 0.15) * 1.5, 1.8, 6.5)
 		cam.look_at(Vector3(0, 1.4, 0), Vector3.UP)
 		queue_redraw()
@@ -189,7 +224,7 @@ func _process(d: float) -> void:
 func _draw() -> void:
 	Gfx.title_text(self, Vector2(0, 110), "ASCENSION", 64, VIEW.x, t)
 	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, holds up the sky by choice, turns the Wheel gladly, and keeps every door open.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
-	UI.text(self, Vector2(0, 190), "The land is one land now. Little Wan is home, and every road down the mountain runs on to the edge of the world.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 190), "The land is one land now. Little Wan is home, and on the seventh night the magpies still build their bridge.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
 	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
 	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)
