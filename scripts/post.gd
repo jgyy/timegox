@@ -86,8 +86,8 @@ func _ready() -> void:
 	layer = -1
 	rect = ColorRect.new()
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# full-rect anchors size it to the viewport; setting a size as well only drew a warning
 	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
-	rect.size = Vector2(1280, 720)
 	mat = ShaderMaterial.new()
 	var sh := Shader.new()
 	sh.code = SHADER

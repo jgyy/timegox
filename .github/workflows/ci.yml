@@ -26,6 +26,9 @@ jobs:
       - name: Rebuild every asset
         run: python art/build_all.py
 
+      - name: Validate the exports (budgets, rigs, clips, materials)
+        run: python art/check_assets.py
+
       - name: Compare with the committed exports
         run: |
           # exports are reproducible locally; float differences between CPUs are reported, not fatal
@@ -62,12 +65,12 @@ jobs:
       - name: Manual keyboard input smoke test
         run: ~/godot/godot --headless --path . --script tests/manual_input_test.gd
 
-      - name: Bot plays the whole game (must take >= 7h of game time)
+      - name: Bot plays the whole game (must take >= 8h of game time)
         run: |
           set -o pipefail
           mkdir -p build
           ~/godot/godot --headless --fixed-fps 30 --path . -- \
-            --bot --seed=1234 --min-time=25200 --report=build/bot_report.json | tee build/bot_log.txt
+            --bot --seed=1234 --min-time=28800 --report=build/bot_report.json | tee build/bot_log.txt
 
       - name: Job summary
         if: always()

@@ -583,6 +583,9 @@ func _plan(b) -> Dictionary:
 			heal_id = hid
 			break
 	var heal_cost: float = Data.SKILLS[heal_id].cost
+	# an ally has fallen: raise them if a reviving heal is known
+	if allies.size() < b.party.size() and me.skills.has(heal_id) and me.qi >= heal_cost and Data.SKILLS[heal_id].get("revive", false):
+		return {"top": "skills", "skill": heal_id}
 	if me.skills.has(heal_id) and me.qi >= heal_cost and low_r < 0.55:
 		return {"top": "skills", "skill": heal_id}
 	if low_r < 0.3 and Game.inv.get("hp_pill", 0) > 0 and not (me.skills.has(heal_id) and me.qi >= heal_cost):

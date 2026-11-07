@@ -19,7 +19,7 @@ static func realm_cap(l: int) -> bool:
 	return l % 3 == 2 and l < MAX_LEVEL
 
 # ---------------------------------------------------------------- skills
-# tgt: one | all | ally | allies
+# tgt: one | all | ally | allies.  "revive": the heal also raises fallen allies (Lotus of Rebirth and later)
 const SKILLS := {
 	"strike": {"n": "Sword Strike", "cost": 0, "mult": 1.0, "elem": "phys", "tgt": "one", "lv": 0, "who": 0},
 	"azure": {"n": "Azure Wind Slash", "cost": 7, "mult": 1.6, "elem": "wood", "tgt": "one", "lv": 0, "who": 0},
@@ -59,11 +59,11 @@ const SKILLS := {
 	"seal_bloom": {"n": "Seal Bloom", "cost": 85, "heal": 0.85, "elem": "water", "tgt": "allies", "lv": 26, "who": 1},
 	"mending": {"n": "Nuwa's Mending", "cost": 110, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 28, "who": 1},
 	"lantern_ward": {"n": "Spirit Lantern Ward", "cost": 75, "mult": 3.9, "elem": "fire", "tgt": "all", "lv": 30, "who": 1},
-	"rebirth": {"n": "Lotus of Rebirth", "cost": 95, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 31, "who": 1},
+	"rebirth": {"n": "Lotus of Rebirth", "cost": 95, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 31, "who": 1, "revive": true},
 	"silk_snare": {"n": "Silver Silk Snare", "cost": 85, "mult": 4.6, "elem": "wood", "tgt": "all", "lv": 33, "who": 1},
-	"homeward": {"n": "Homeward Lantern", "cost": 105, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 34, "who": 1},
+	"homeward": {"n": "Homeward Lantern", "cost": 105, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 34, "who": 1, "revive": true},
 	"starweave": {"n": "Starweave Net", "cost": 95, "mult": 5.3, "elem": "wood", "tgt": "all", "lv": 36, "who": 1},
-	"magpie_wing": {"n": "Magpie Wing Ward", "cost": 115, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 37, "who": 1},
+	"magpie_wing": {"n": "Magpie Wing Ward", "cost": 115, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 37, "who": 1, "revive": true},
 	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
