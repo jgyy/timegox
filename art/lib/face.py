@@ -140,7 +140,7 @@ class Face:
 def head(b, o, bone="head", eye_bone="eyes"):
     """Build the head, neck excluded.  Returns the Face (for hair and hats to fit onto)."""
     f = Face(o)
-    morph_sphere(b, HC, f.shape, f.colour, cls=SKIN, bone=bone, seg=36, rings=28)
+    morph_sphere(b, HC, f.shape, f.colour, cls=SKIN, bone=bone, seg=34, rings=26)
     nose(b, f, bone)
     mouth(b, f, o, bone)
     ears(b, f, bone)

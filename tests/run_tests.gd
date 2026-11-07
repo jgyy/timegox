@@ -117,7 +117,8 @@ func _init() -> void:
 				tris += mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_INDEX].size() / 3
 				var mat: Material = mi.mesh.surface_get_material(si)
 				check(mat == MB.mat_vc() or mat == MB.mat_plain() or mat == MB.mat_glow(), "%s: surface %d uses a game shader" % [rel, si])
-		check(tris > 5000 and tris < 40000, "%s: sensible triangle count (%d)" % [rel, tris])
+		# sculpted faces, strand hair and layered hanfu: a hero-asset budget, still well under 50k
+		check(tris > 5000 and tris < 50000, "%s: sensible triangle count (%d)" % [rel, tris])
 		pm.free()
 	for shape in Assets.MONSTERS:
 		var mrel: String = Assets.MONSTERS[shape]

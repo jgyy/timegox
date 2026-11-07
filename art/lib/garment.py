@@ -145,7 +145,7 @@ def body(b, o, tor, robe, trim, inner, gold):
     """The upper robe on the torso, with draped folds below the chest."""
     rings = []
     ys = [0.9, 0.94, 0.98, 1.02, 1.06, 1.1, 1.15, 1.2, 1.25, 1.3, 1.34, 1.38, 1.41, 1.435, 1.455, 1.475, 1.49, 1.505, 1.518, 1.53, 1.54, 1.548]
-    n = 40
+    n = 34
     for y in ys:
         ring = []
         for i in range(n):
@@ -276,7 +276,7 @@ def sash(b, o, tor, sash_col, gold):
 def skirt(b, o, tor, robe, trim, inner, gold, lapel_end):
     """Pleated lower robe from the sash to the ankles; the front edge continues the collar line at
     the right front, with an inner skirt showing through, a trimmed and embroidered hem."""
-    n = 64
+    n = 52
     ys = [1.0, 0.92, 0.84, 0.76, 0.66, 0.56, 0.46, 0.36, 0.28, 0.21, 0.17]
     open_c = -0.62          # the overlap opening sits at the right front
     open_w = 0.42
@@ -399,7 +399,7 @@ def sleeve(b, o, s, sleeve_col, trim, inner, gold):
             rh = rf if c2 >= 0 else rb
             return 1.0 / math.sqrt((c2 / rh) ** 2 + (s2 / rw) ** 2)
 
-        ring = section(c, axis, prof, 22, up=V(0, 0, 1))
+        ring = section(c, axis, prof, 18, up=V(0, 0, 1))
         # the back of the pocket hangs lower, the front stops at the wrist
         out = []
         for p in ring:
@@ -474,7 +474,7 @@ def hand(b, o, s, skin):
             p = p + d * sl
             pts.append(p)
         radii = [r, r * 0.95, r * 0.86, r * 0.72]
-        b.tube(pts, radii, sk, cls=SKIN, bone=hb, seg=8)
+        b.tube(pts, radii, sk, cls=SKIN, bone=hb, seg=6)
         # knuckle bumps and the nail
         b.ellipsoid(base + V(0.004 * s, 0.0, 0.0), (r * 0.9, r * 0.8, r * 1.05), sk, cls=SKIN, bone=hb, seg=8, rings=5)
         tip = pts[-1]

@@ -80,7 +80,7 @@ class Scalp:
 
 
 def cap(b, s, bone="head"):
-    morph_sphere(b, HC, lambda d: s.pt(d) - HC, s.colour, cls=HAIR, bone=bone, seg=36, rings=26)
+    morph_sphere(b, HC, lambda d: s.pt(d) - HC, s.colour, cls=HAIR, bone=bone, seg=32, rings=22)
 
 
 def lock(b, s, d0, d1, width, col=None, steps=6, drop=0.0, flare=0.0, curl=0.0, extra=0.006, bones=None, bone="head", flat=0.32, tip=None, sway=None):
@@ -111,7 +111,7 @@ def lock(b, s, d0, d1, width, col=None, steps=6, drop=0.0, flare=0.0, curl=0.0, 
     if bones is not None:
         bl = [bones(p) for p in pts]
     up = (pts[0] - HC).normalized()
-    return strand(b, pts, width, width * 0.12, col, col_tip=lighten(col, 0.12), cls=HAIR, bone=None if bl else bone, bones=bl, flat=flat, seg=6, per=3, up=up, power=1.6)
+    return strand(b, pts, width, width * 0.12, col, col_tip=lighten(col, 0.12), cls=HAIR, bone=None if bl else bone, bones=bl, flat=flat, seg=5, per=2, up=up, power=1.6)
 
 
 def back_weight(y_top=1.62, y_bot=1.36):

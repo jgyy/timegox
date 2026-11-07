@@ -36,7 +36,7 @@ def rock(c, size, bone, shade=0.8, e=0.3, rot=None, moss=0.0, glow=False):
     jitter = rot or (rnd.uniform(-0.12, 0.12), rnd.uniform(-0.3, 0.3), rnd.uniform(-0.12, 0.12))
     SEED[0] += 1
     big = max(size) > 0.35
-    A.hewn_stone(b, c, size, bone, seed=SEED[0], shade=shade * rnd.uniform(0.9, 1.08), e=e, rot=jitter, tint=0.55, moss=moss,
+    A.hewn_stone(b, c, size, bone, seed=SEED[0], shade=shade * rnd.uniform(0.9, 1.08), e=e, rot=jitter, tint=1.0, moss=moss,
                  crack_glow=(1.0, 1.0, 1.0) if glow else None, seg=22 if big else 14, rings=16 if big else 10)
 
 
