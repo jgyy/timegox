@@ -29,9 +29,32 @@ func _ready() -> void:
 func _wait(sec: float) -> void:
 	await get_tree().create_timer(sec).timeout
 
-func _shot(n: String) -> void:
+var last_img: Image = null
+
+func _shot(n: String, save: bool = true) -> void:
 	await RenderingServer.frame_post_draw
-	get_viewport().get_texture().get_image().save_png("%s/%s.png" % [dir, n])
+	last_img = get_viewport().get_texture().get_image()
+	if save:
+		last_img.save_png("%s/%s.png" % [dir, n])
+		print("[tour] ", n)
+
+## Compose a row of captured frames into one image: the middle `keep` of each frame's width,
+## scaled so the row fits `max_w` pixels.
+func _sheet(n: String, frames: Array, keep: float = 0.36) -> void:
+	if frames.is_empty():
+		return
+	var fw: int = frames[0].get_width()
+	var fh: int = frames[0].get_height()
+	var cw := int(fw * keep)
+	var out := Image.create(cw * frames.size(), fh, false, Image.FORMAT_RGB8)
+	for i in frames.size():
+		var im: Image = frames[i]
+		im.convert(Image.FORMAT_RGB8)
+		out.blit_rect(im, Rect2i((fw - cw) / 2, 0, cw, fh), Vector2i(i * cw, 0))
+	var max_w := 1920
+	if out.get_width() > max_w:
+		out.resize(max_w, int(fh * float(max_w) / out.get_width()), Image.INTERPOLATE_LANCZOS)
+	out.save_png("%s/%s.png" % [dir, n])
 	print("[tour] ", n)
 
 ## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
@@ -154,15 +177,19 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 			cam.look_at(stage.global_position + aim2, Vector3.UP)
 			cam.make_current()
 			ap.play(clip)
+			var strip: Array = []
 			for f in frames:
 				ap.seek(ln * f / float(frames), true)
 				await get_tree().process_frame
 				await get_tree().process_frame
-				await _shot("clip_%s_%s_%d" % [id, clip, f])
+				await _shot("clip_%s_%s_%d" % [id, clip, f], false)
+				strip.append(last_img)
+			await _sheet("anim_%s_%s" % [id, clip], strip, 0.3)
 		stage.queue_free()
 		main.world.show()
 		return
 	var views := [["front", 0.0, false], ["three", 0.65, false], ["side", PI * 0.5, false], ["back", PI, false], ["face", 0.3, true]]
+	var body: Array = []
 	for v in views:
 		m.rotation.y = v[1]
 		var close: bool = v[2]
@@ -178,7 +205,10 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 			else:
 				Models.anim_monster(m, t0 + 0.5, 0.0)
 			await get_tree().process_frame
-		await _shot("inspect_%s_%s" % [id, v[0]])
+		await _shot("inspect_%s_%s" % [id, v[0]], not main.args.has("sheet"))
+		body.append(last_img)
+	if main.args.has("sheet"):
+		await _sheet("turnaround_" + id, body, 0.3)
 	stage.queue_free()
 	main.world.show()
 

@@ -581,7 +581,7 @@ def legs(b, o, pants, boots, trim):
             # cloth wrappings bound round the shin, criss-crossed with cord
             for k in range(7):
                 q = kn.lerp(an, 0.05 + k * 0.13)
-                b.tube([q + V(0, 0.018, 0), q - V(0, 0.018, 0)], [0.066 - 0.002 * k] * 2, rgb(o["wraps"]) if k % 2 else darken(o["wraps"], 0.1), cls=CLOTH, bone=sh, seg=12, cap0=False, cap1=False)
+                b.tube([q + V(0, 0.018, 0), q - V(0, 0.018, 0)], [0.066 - 0.002 * k] * 2, rgb(o["wraps"]) if k % 2 else darken(o["wraps"], 0.05), cls=CLOTH, bone=sh, seg=12, cap0=False, cap1=False)
             for k in range(6):
                 q0 = kn.lerp(an, 0.1 + k * 0.14)
                 q1 = kn.lerp(an, 0.17 + k * 0.14)

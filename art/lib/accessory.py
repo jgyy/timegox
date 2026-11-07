@@ -162,12 +162,12 @@ def broom(b, col="a08a50", twigs="c8a868"):
     """A bamboo broom held upright: a long handle and a fan of bound twigs (Lin Feng swept the sect's
     steps with one for three years; now someone else does)."""
     h = HAND_R
-    b.tube([h + V(0, 0.55, 0.02), h + V(0, -0.72, 0.06)], [0.014, 0.015], col, cls=WOOD, bone="hand.R", seg=8)
-    base = h + V(0, -0.72, 0.06)
+    b.tube([h + V(0, 0.5, 0.0), h + V(0, -0.58, 0.07)], [0.014, 0.015], col, cls=WOOD, bone="hand.R", seg=8)
+    base = h + V(0, -0.58, 0.07)
     b.tube([base + V(0, 0.03, 0), base - V(0, 0.04, 0)], [0.024, 0.024], darken(col, 0.3), cls=WOOD, bone="hand.R", seg=8)
     for k in range(13):
         a = (k / 12 - 0.5) * 1.3
-        tip = base + V(math.sin(a) * 0.17, -0.3 + abs(a) * 0.05, math.cos(a) * 0.04 + 0.03)
+        tip = base + V(math.sin(a) * 0.17, -0.22 + abs(a) * 0.04, math.cos(a) * 0.04 + 0.03)
         b.tube([base, base.lerp(tip, 0.5) + V(0, 0, 0.01), tip], [0.008, 0.006, 0.002], twigs if k % 2 else darken(twigs, 0.15), cls=WOOD, bone="hand.R", seg=4)
 
 
