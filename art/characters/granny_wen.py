@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/granny_wen.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "age": 0.9, "build": 0.95, "eye_size": 1.1,
     "robe": "3a4a7a", "trim": "e8e4d8", "inner": "f0ece0", "sash": "e8e4d8", "hair": "b8b4b8", "hair_style": "bun",
     "pin": "8a6a3a", "eyes": "4a3a2a", "staff": True, "staff_gem": "e8d8a0", "collar2": "5a6a9a", "embroidery": "c8d0e8",
 })

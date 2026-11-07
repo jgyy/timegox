@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/nuwa_echo.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "eye_size": 1.36, "hair_len": 0.7,
     "robe": "fff0d8",
     "trim": "f0c850",
     "hair": "2a1a30",

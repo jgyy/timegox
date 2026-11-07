@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/elder_qing.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": False, "age": 0.85, "beard_len": 1.35, "brow": 1.2, "cheek": 0.8,
     "robe": "e8e8ff", "trim": "c8a850", "inner": "fffaf0", "hair": "e8e8f0", "hair_style": "bald",
     "eyes": "5a6a8a", "sash": "8a7040", "beard": True, "staff": True, "boots": "4a4048", "pants": "8a8aa0",
     "stern": True,

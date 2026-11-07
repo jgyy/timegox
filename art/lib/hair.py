@@ -1,0 +1,313 @@
+"""Hair for the characters: a scalp cap cut along a natural hairline, then locks routed over the
+skull and hanging under gravity.
+
+Reference points (stylised game characters): hair has *volume* above the skull, the bangs are
+separate locks with gaps so the eyes and brows read through them, side locks frame the face, and
+long hair falls in a few large clumps made of smaller strands rather than as one sheet.  The old
+hair was an ellipsoid helmet with spikes pushed into it.
+
+A lock is described by directions from the head centre (unit vectors, Godot space).  It starts on
+the cap, follows the skull towards its target direction, and may then hang (``drop``) with a
+little outward flare and a curl at the tip.  Locks are flattened ribbons-with-thickness whose
+flat side lies on the head.
+"""
+
+import math
+
+from mathutils import Vector
+
+from face import HC, RY, EYE_Y
+from kit import CRYSTAL, HAIR, METAL, V, darken, lighten, mix, rgb
+from sculpt import bump, clamp, fbm3, morph_sphere, smooth, strand
+
+LIFT = 0.115  # how far the hair stands off the skull at the crown (fraction of the radius)
+
+
+def dvec(x, y, z):
+    return Vector((x, y, z)).normalized()
+
+
+def slerp(a, b, t):
+    v = a * (1.0 - t) + b * t
+    if v.length < 1e-6:
+        v = a
+    return v.normalized()
+
+
+class Scalp:
+    def __init__(self, f, hc, style, o):
+        self.f = f
+        self.hc = rgb(hc)
+        self.dk = darken(hc, 0.3)
+        self.lt = lighten(hc, 0.16)
+        self.style = style
+        self.o = o
+        # gathered styles sit closer to the head (combed back tight)
+        self.lift = {"topknot": 0.075, "bun": 0.06, "long": 0.1, "wild": 0.14}.get(style, LIFT)
+
+    # ---- the hairline: how far down the hair reaches in each horizontal direction
+    def line(self, d):
+        h = math.hypot(d.x, d.z)
+        fz = d.z / h if h > 1e-6 else 0.0
+        if fz >= 0.0:
+            t = 0.08 + 0.5 * fz ** 1.6
+        else:
+            t = 0.08 - 0.72 * (-fz) ** 0.85
+        # sideburns dip down in front of the ears
+        t -= 0.22 * bump(fz, 0.22, 0.18)
+        return t
+
+    def cov(self, d):
+        t = self.line(d)
+        return smooth(t - 0.04, t + 0.08, d.y)
+
+    def pt(self, d, extra=0.0):
+        """A point on the hair surface in direction d (extra lifts it further)."""
+        k = self.cov(d)
+        p = self.f.shape(d)
+        crown = smooth(-0.3, 0.9, d.y)
+        thick = (self.lift * (0.45 + 0.55 * crown)) * k - 0.04 * (1.0 - k)
+        return HC + p * (1.0 + thick) + p.normalized() * extra
+
+    def colour(self, p, d):
+        # strands: noise stretched along the direction hair runs (from the crown down)
+        q = (d.x * 14.0, d.y * 3.0, d.z * 14.0)
+        n = fbm3(q, 3, 5)
+        c = mix(self.dk, self.lt, n)
+        # darker roots near the hairline and underneath
+        c = mix(c, self.dk, (1.0 - smooth(-0.6, 0.5, d.y)) * 0.35)
+        return mix(self.hc, c, 0.75)
+
+
+def cap(b, s, bone="head"):
+    morph_sphere(b, HC, lambda d: s.pt(d) - HC, s.colour, cls=HAIR, bone=bone, seg=36, rings=26)
+
+
+def lock(b, s, d0, d1, width, col=None, steps=6, drop=0.0, flare=0.0, curl=0.0, extra=0.006, bones=None, bone="head", flat=0.32, tip=None, sway=None):
+    """One lock from direction d0 over the head to d1, then hanging `drop` metres."""
+    col = col if col is not None else s.hc
+    pts = []
+    for k in range(steps + 1):
+        t = k / steps
+        d = slerp(d0, d1, t)
+        pts.append(s.pt(d, extra * (0.4 + 0.6 * math.sin(math.pi * min(1.0, t * 1.2)))))
+    if drop > 0.0:
+        end = pts[-1]
+        out = (end - HC)
+        out.y = 0.0
+        out = out.normalized() if out.length > 1e-6 else Vector((0, 0, -1))
+        n = max(3, int(drop / 0.07))
+        for k in range(1, n + 1):
+            t = k / n
+            p = end + Vector((0, -drop * t, 0)) + out * (flare * math.sin(t * math.pi * 0.6) + 0.012 * t)
+            if sway is not None:
+                p = p + Vector(sway) * t * t
+            if curl and t > 0.8:
+                p = p + out * (-curl * (t - 0.8) * 5.0) + Vector((0, curl * (t - 0.8) * 2.0, 0))
+            pts.append(p)
+    if tip is not None:
+        pts.append(pts[-1] + Vector(tip))
+    bl = None
+    if bones is not None:
+        bl = [bones(p) for p in pts]
+    up = (pts[0] - HC).normalized()
+    return strand(b, pts, width, width * 0.12, col, col_tip=lighten(col, 0.12), cls=HAIR, bone=None if bl else bone, bones=bl, flat=flat, seg=6, per=3, up=up, power=1.6)
+
+
+def back_weight(y_top=1.62, y_bot=1.36):
+    """Head near the skull, the hair_tail bone lower down so long hair swings."""
+
+    def fn(p):
+        k = clamp((y_top - p.y) / (y_top - y_bot))
+        if k <= 0.0:
+            return {"head": 1.0}
+        return {"head": 1.0 - k, "hair_tail": k}
+
+    return fn
+
+
+# ---------------------------------------------------------------- parts shared by the styles
+def bangs(b, s, n=9, length=1.0, part=0.0, swept=0.0, spread=1.0):
+    """Forelocks: separate tapered locks over the forehead with gaps between them.  `part` moves
+    the parting (-1..1), `swept` sweeps the tips sideways."""
+    f = s.f
+    for i in range(n):
+        u = i / (n - 1) - 0.5                       # -0.5 .. 0.5 across the forehead
+        x0 = (u * 0.9 + part * 0.2) * spread
+        root = dvec(x0 * 0.55, 0.9, 0.45)
+        # the locks fall away from the parting and end just above the brows
+        side = math.copysign(1.0, u - part * 0.2) if abs(u - part * 0.2) > 0.04 else 0.0
+        tip_x = (u * 1.05 + swept * 0.25 + side * 0.08) * spread * 0.098
+        tip_y = EYE_Y + 0.028 + (0.016 + 0.01 * abs(u)) * (1.0 / max(0.4, length)) - (0.01 if i % 3 == 1 else 0.0)
+        surf = f.surface(tip_x, tip_y)
+        tip = HC + surf + Vector((0, 0, 0.012 + 0.008 * (1.0 - abs(u) * 2)))
+        mid_d = dvec(tip_x * 0.8, 0.5, 0.85)
+        p0 = s.pt(root, 0.004)
+        p1 = s.pt(mid_d, 0.012 + 0.006 * math.cos(u * 3))
+        pts = [p0, p0.lerp(p1, 0.55) + Vector((0, 0.008, 0.012)), p1, tip.lerp(p1, 0.35) + Vector((0, 0, 0.006)), tip]
+        col = (s.hc, s.dk, s.lt)[i % 3] if i % 4 else s.hc
+        w = (0.017 + 0.005 * math.cos(i * 1.7)) * (1.15 if abs(u) < 0.2 else 1.0)
+        strand(b, pts, w, 0.0015, col, col_tip=lighten(col, 0.12), cls=HAIR, bone="head", flat=0.3, seg=6, per=3, up=(0, 0.3, 1), power=1.4)
+
+
+def side_locks(b, s, length=0.2, n=2, fwd=0.0, width=0.016):
+    """Locks framing the face from the temples, in front of the ears."""
+    for sd in (1, -1):
+        for k in range(n):
+            root = dvec(0.62 * sd, 0.55 - k * 0.12, 0.55 - k * 0.15)
+            over = dvec(0.95 * sd, 0.1 - k * 0.05, 0.42 - k * 0.12)
+            p0 = s.pt(root, 0.004)
+            p1 = s.pt(over, 0.012)
+            ln = length * (1.0 - 0.25 * k)
+            pts = [p0, p1, p1 + Vector((0.004 * sd, -ln * 0.4, 0.012 + fwd * 0.3)), p1 + Vector((-0.004 * sd, -ln * 0.8, 0.02 + fwd)), p1 + Vector((-0.012 * sd, -ln, 0.016 + fwd))]
+            bones = [{"head": 1.0}] * 3 + [{"head": 0.7, "neck": 0.3}, {"head": 0.55, "neck": 0.45}]
+            col = s.hc if k == 0 else s.dk
+            strand(b, pts, width * (1.0 - 0.15 * k), 0.0015, col, col_tip=lighten(col, 0.1), cls=HAIR, bones=bones, flat=0.35, seg=6, per=3, up=(sd, 0, 0.3), power=1.3)
+
+
+def crown_whorl(b, s, n=16, toward=None, length=1.0, rows=2, skip_front=0.0):
+    """Top and side locks radiating from the crown (or towards a gathering point).  Locks
+    within `skip_front` (cosine) of straight ahead are left to the bangs."""
+    for r in range(rows):
+        for i in range(n):
+            a = (i + 0.5 * r) / n * 2 * math.pi
+            if skip_front > 0.0 and math.cos(a) > 1.0 - skip_front:
+                continue
+            d0 = dvec(math.sin(a) * (0.18 + 0.12 * r), 1.0, math.cos(a) * (0.18 + 0.12 * r) - 0.08)
+            ylow = s.line(dvec(math.sin(a), 0.0, math.cos(a))) + 0.12 + 0.06 * r
+            d1 = dvec(math.sin(a), ylow, math.cos(a))
+            if toward is not None:
+                d0, d1 = d1, toward
+            col = (s.hc, s.dk, s.lt)[(i + r) % 3]
+            lock(b, s, d0, d1, (0.026 - 0.004 * r) * length, col, steps=6, extra=0.004 + 0.004 * r)
+
+
+# ---------------------------------------------------------------- styles
+def style_topknot(b, s, o):
+    """Hair combed up into a knot on the crown, held by a small metal crown (guan) and a pin, with
+    a high tail hanging from it, parted forelocks and long face-framing locks."""
+    knot = V(0, HC.y + RY + 0.045, -0.03)
+    tdir = (knot - HC).normalized()
+    crown_whorl(b, s, n=18, toward=tdir, rows=2)
+    # back of the head: locks swept up from the nape
+    for i in range(10):
+        a = math.pi * 0.62 + i / 9 * math.pi * 0.76
+        d0 = dvec(math.sin(a) * 0.9, -0.35, math.cos(a))
+        lock(b, s, d0, tdir, 0.024, (s.hc, s.dk)[i % 2], steps=7, extra=0.004)
+    b.ellipsoid(knot, (0.042, 0.034, 0.045), s.hc, cls=HAIR, bone="head", seg=16, rings=10)
+    for k in range(5):
+        a = k / 5 * 2 * math.pi
+        strand(b, [knot + V(math.sin(a) * 0.04, -0.02, math.cos(a) * 0.04), knot + V(math.sin(a + 1) * 0.03, 0.03, math.cos(a + 1) * 0.03), knot + V(math.sin(a + 2) * 0.012, 0.035, math.cos(a + 2) * 0.012)], 0.013, 0.004, s.dk, cls=HAIR, bone="head", flat=0.4, seg=6, per=3)
+    metal = o.get("guan", "e8c050")
+    b.lathe(knot + V(0, -0.012, 0), [(0.03, 0.0), (0.034, 0.012), (0.036, 0.03), (0.026, 0.05), (0.008, 0.058)], metal, cls=METAL, bone="head", seg=16, squash=(1.0, 1.15), folds=(8, 0.08, 0.0))
+    b.tube([knot + V(-0.085, 0.022, 0.005), knot + V(0.085, 0.03, 0.005)], [0.0045, 0.0035], o.get("pin", "c8a050"), cls=METAL, bone="head", seg=6)
+    b.ball(knot + V(-0.088, 0.022, 0.005), 0.009, o.get("jade", "6af0b0"), cls=CRYSTAL, bone="head", seg=8, rings=6)
+    # the high tail
+    tw = back_weight(knot.y - 0.02, knot.y - 0.3)
+    for k in range(7):
+        off = V((k - 3) * 0.011, 0, (k % 2) * 0.008)
+        pts = [knot + V(0, -0.005, -0.03) + off * 0.6, knot + V(0, -0.06, -0.09) + off, knot + V(0, -0.2, -0.13) + off * 1.4, knot + V(0, -0.36, -0.13) + off * 1.7, knot + V(0.01 * (k - 3), -0.5, -0.11) + off * 1.9]
+        strand(b, pts, 0.019, 0.0015, (s.hc, s.dk, s.lt)[k % 3], col_tip=s.lt, cls=HAIR, bones=[tw(p) for p in pts], flat=0.55, seg=6, per=3, power=1.2)
+    bangs(b, s, n=7, part=0.0, length=0.8, spread=0.85)
+    side_locks(b, s, length=0.2, n=2)
+
+
+def style_long(b, s, o):
+    """Long flowing hair, half up: crown locks back into a small bun, the rest falling to the
+    waist in clumps, forelocks and long side locks over the shoulders."""
+    crown_whorl(b, s, n=18, rows=2, skip_front=0.6)
+    bw = back_weight()
+    n = 15
+    for i in range(n):
+        u = i / (n - 1)
+        a = math.pi * 0.55 + u * math.pi * 0.9
+        d0 = dvec(math.sin(a) * 0.5, 0.75, math.cos(a) * 0.6)
+        d1 = dvec(math.sin(a), -0.15, math.cos(a))
+        drop = o.get("hair_len", 0.58) * (0.82 + 0.18 * math.sin(i * 2.3)) * (1.0 - 0.35 * abs(u - 0.5))
+        col = (s.hc, s.dk, s.lt)[i % 3]
+        lock(b, s, d0, d1, 0.03, col, steps=5, drop=drop, flare=0.035, curl=0.01, bones=bw, extra=0.006, flat=0.35, sway=(math.sin(a) * 0.04, 0, -0.02))
+    bun = V(0, HC.y + 0.06, -0.12)
+    b.ellipsoid(bun, (0.036, 0.03, 0.026), s.dk, cls=HAIR, bone="head", seg=12, rings=8)
+    b.tube([bun + V(-0.07, 0.03, 0.0), bun + V(0.08, -0.02, -0.01)], [0.0035, 0.003], o.get("pin", "6af0b0"), cls=CRYSTAL, bone="head", seg=6)
+    b.ball(bun + V(0.082, -0.022, -0.01), 0.008, o.get("pin", "6af0b0"), cls=CRYSTAL, bone="head", seg=8, rings=6)
+    bangs(b, s, n=9, part=-0.25, swept=0.3, length=0.9)
+    side_locks(b, s, length=0.32, n=2, fwd=0.03, width=0.018)
+
+
+def style_bun(b, s, o):
+    """Combed back tight into a low coiled bun with a hairpin (elders, women of the village)."""
+    bun = V(0, HC.y + 0.035, -0.135)
+    tdir = (bun - HC).normalized()
+    for i in range(22):
+        a = i / 22 * 2 * math.pi
+        if math.cos(a) < -0.85:
+            continue
+        d0 = dvec(math.sin(a), s.line(dvec(math.sin(a), 0, math.cos(a))) + 0.1, math.cos(a))
+        lock(b, s, d0, tdir, 0.024, (s.hc, s.dk, s.lt)[i % 3], steps=7, extra=0.003)
+    # the coil: a spiral of strands
+    pts = []
+    for k in range(40):
+        t = k / 39
+        a = t * 4.5 * math.pi
+        r = 0.05 * (1.0 - 0.6 * t)
+        pts.append(bun + V(math.cos(a) * r, math.sin(a) * r * 0.85, -0.012 - 0.03 * t))
+    strand(b, pts, 0.017, 0.006, s.hc, col_tip=s.lt, cls=HAIR, bone="head", flat=0.7, seg=7, per=1)
+    b.ellipsoid(bun + V(0, 0, 0.005), (0.048, 0.042, 0.03), s.dk, cls=HAIR, bone="head", seg=14, rings=8)
+    pin = o.get("pin", "6af0b0")
+    b.tube([bun + V(-0.09, 0.03, -0.02), bun + V(0.09, -0.02, -0.03)], [0.004, 0.003], pin, cls=CRYSTAL, bone="head", seg=6)
+    b.ball(bun + V(-0.094, 0.032, -0.02), 0.01, pin, cls=CRYSTAL, bone="head", seg=8, rings=6)
+    # a few loose wisps at the temples soften the line
+    for sd in (1, -1):
+        root = s.pt(dvec(0.8 * sd, 0.35, 0.45), 0.002)
+        strand(b, [root, root + V(0.006 * sd, -0.05, 0.015), root + V(0.0, -0.1, 0.02)], 0.008, 0.001, s.hc, cls=HAIR, bone="head", flat=0.4, seg=5, per=3)
+    if not o.get("no_bangs", False):
+        bangs(b, s, n=5, part=0.0, length=0.55, spread=0.7)
+
+
+def style_wild(b, s, o):
+    """Untamed, chunky locks standing out and back (smiths, nomads, beasts of men)."""
+    crown_whorl(b, s, n=14, rows=1, skip_front=0.5)
+    for i in range(16):
+        a = math.pi * 0.35 + i / 15 * math.pi * 1.3
+        d0 = dvec(math.sin(a) * 0.4, 0.8, math.cos(a) * 0.4)
+        p0 = s.pt(d0, 0.01)
+        out = V(math.sin(a), 0.0, math.cos(a))
+        ln = 0.1 + 0.05 * math.sin(i * 1.9)
+        tip = p0 + out * ln + V(0, -0.02 - 0.06 * (1 - abs(math.cos(a))), -0.04)
+        strand(b, [p0, p0.lerp(tip, 0.5) + V(0, 0.03, 0), tip], 0.03, 0.002, (s.hc, s.dk, s.lt)[i % 3], col_tip=s.lt, cls=HAIR, bone="head", flat=0.4, seg=6, per=3)
+    bangs(b, s, n=7, part=0.3, swept=-0.5, length=0.75)
+    side_locks(b, s, length=0.12, n=1, width=0.02)
+
+
+def style_bald(b, s, o):
+    """A shaved crown; elders keep a white fringe around the back and sides."""
+    if o.get("beard", False) or o.get("age", 0.0) > 0.4:
+        fr = rgb(o.get("beard_col", o.get("hair", "e8e8f0")))
+        for row in range(2):
+            for i in range(19):
+                a = math.pi * 0.34 + (i + 0.5 * row) / 18 * math.pi * 1.32
+                d = dvec(math.sin(a), 0.12 - row * 0.16, math.cos(a))
+                root = HC + s.f.shape(d) * 1.015
+                out = V(math.sin(a), 0, math.cos(a))
+                below = HC + s.f.shape(dvec(math.sin(a), -0.25 - row * 0.2, math.cos(a) * 1.1)) * 1.04
+                strand(b, [root, root.lerp(below, 0.5) + out * 0.008, below + out * 0.004], 0.014, 0.002, fr if (i + row) % 2 else darken(fr, 0.12), col_tip=lighten(fr, 0.1), cls=HAIR, bone="head", flat=0.4, seg=6, per=3, up=out)
+
+
+STYLES = {"topknot": style_topknot, "long": style_long, "bun": style_bun, "wild": style_wild, "bald": style_bald}
+
+
+def build(b, f, style, hair_col, o):
+    """Hair in `style` for face `f`.  Returns the Scalp (hats use it to sit on the hair)."""
+    s = Scalp(f, hair_col, style, o)
+    if style != "bald":
+        cap(b, s)
+    STYLES.get(style, style_topknot)(b, s, o)
+    if o.get("ahoge", False) and style != "bald":
+        root = s.pt(dvec(0.05, 1.0, 0.1), 0.0)
+        strand(b, [root, root + V(0.01, 0.05, 0.02), root + V(0.04, 0.07, 0.06), root + V(0.06, 0.04, 0.08)], 0.009, 0.001, s.hc, cls=HAIR, bone="head", flat=0.45, seg=6, per=4)
+    return s
+
+
+def top_y(s):
+    """Height of the top of the hair (where a hat sits)."""
+    return s.pt(Vector((0, 1, 0))).y

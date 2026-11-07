@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/fire_sage.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "age": 0.7, "brow": 1.3,
     "robe": "b03a20", "trim": "f0a040", "inner": "f0d8b0", "sash": "4a1a10", "hair": "e8e0d8", "hair_style": "bald", "eyes": "e08020",
     "beard": True, "beard_col": "f0e8e0", "hat": "straw", "hat_col": "8a6a40", "staff": True, "staff_gem": "ff8030", "embroidery": "f0a040",
 })

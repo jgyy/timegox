@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/spore_witch.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "age": 0.35,
     "robe": "8a6ab0",
     "trim": "c8a0e0",
     "hair": "e0d8f0",

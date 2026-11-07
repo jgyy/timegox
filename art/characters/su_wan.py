@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/su_wan.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "eye_size": 1.32,
     "robe": "6aa88a", "trim": "f0f0e0", "inner": "f8f4ec", "sash": "3a6a5a", "hair": "201a24", "hair_style": "long",
     "pin": "6af0b0", "eyes": "3a7ae8", "ribbon": "e8f0e0", "collar2": "a8d0b8", "embroidery": "f0e8c0",
 })

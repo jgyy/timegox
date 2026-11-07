@@ -9,6 +9,8 @@ import person  # noqa: E402
 
 kit.reset()
 person.export_person("characters/can_niang.glb", {
+    # face and build (see art/lib/face.py, garment.py)
+    "fem": True, "age": 0.2,
     "robe": "e8dcb8", "trim": "7a3a5a", "inner": "f8f4e8", "sash": "7a3a5a", "hair": "2a1a14", "hair_style": "long",
     "eyes": "4a2a1a", "hat": "hood", "hat_col": "8a4a6a", "ribbon": "f0d0e0", "embroidery": "b05080",
 })
