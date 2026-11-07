@@ -383,6 +383,28 @@ func _run() -> void:
 			await _wait(2.8)
 			await _shot("battle_boss_" + b.id)
 			main.pop()
+	# chosen bosses, each on its own region's battle stage (--boss-shots=id,id: bosses that are not
+	# the last of their region, which --no-bosses leaves out)
+	if main.args.has("boss-shots"):
+		main.world.open_world()
+	for bid in str(main.args.get("boss-shots", "")).split(",", false):
+		for aid in Data.AREA_CHAIN:
+			var aspec: Dictionary = Data.AREAS[aid]
+			for bb in aspec.get("bosses", []):
+				if bb.id != bid:
+					continue
+				var bstop: Array = _stop(aid)
+				Game.reset()
+				Game.level = bstop[1]
+				Game.companion = true
+				Game.heal_full()
+				Game.step = Data.step_index(bstop[0])
+				main.set_stack(["world"])
+				main.battle.start([{"id": bb.id, "lv": bb.lv}], {"entity": bb, "boss": true, "enemy": bb.id, "theme": aspec.theme})
+				main.push("battle")
+				await _wait(2.8)
+				await _shot("battle_boss_" + bb.id)
+				main.pop()
 	# galleries are shot from the world screen (the title menu would cover them)
 	main.set_stack(["world"])
 	main.world.load_area("sect", Vector2i(20, 9))
