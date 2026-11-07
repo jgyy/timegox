@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 33
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence"]
+const MAX_LEVEL := 36
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -43,6 +43,10 @@ const SKILLS := {
 	"wheelcut": {"n": "Six Paths Wheel Slash", "cost": 230, "mult": 19.5, "elem": "dark", "tgt": "one", "lv": 30, "who": 0},
 	"lanternrain": {"n": "Ten Thousand Lantern Rain", "cost": 200, "mult": 5.0, "elem": "fire", "tgt": "all", "lv": 31, "who": 0},
 	"samsara": {"n": "Samsara Sword", "cost": 260, "mult": 22.5, "elem": "thunder", "tgt": "one", "lv": 32, "who": 0, "after": "s_sp_unforgotten"},
+	# ---- Part VII
+	"seamcut": {"n": "Seam-Cutting Sword", "cost": 280, "mult": 25.0, "elem": "dark", "tgt": "one", "lv": 33, "who": 0},
+	"threadfall": {"n": "Thousand-Thread Rain", "cost": 240, "mult": 5.8, "elem": "wood", "tgt": "all", "lv": 34, "who": 0},
+	"boundless": {"n": "Boundless Heart Sword", "cost": 300, "mult": 28.5, "elem": "earth", "tgt": "one", "lv": 35, "who": 0, "after": "s_sk_return"},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
@@ -52,6 +56,8 @@ const SKILLS := {
 	"mending": {"n": "Nuwa's Mending", "cost": 110, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 28, "who": 1},
 	"lantern_ward": {"n": "Spirit Lantern Ward", "cost": 75, "mult": 3.9, "elem": "fire", "tgt": "all", "lv": 30, "who": 1},
 	"rebirth": {"n": "Lotus of Rebirth", "cost": 95, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 31, "who": 1},
+	"silk_snare": {"n": "Silver Silk Snare", "cost": 85, "mult": 4.6, "elem": "wood", "tgt": "all", "lv": 33, "who": 1},
+	"homeward": {"n": "Homeward Lantern", "cost": 105, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 34, "who": 1},
 	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
@@ -261,6 +267,35 @@ const ENEMIES := {
 	"burning_judge": {"n": "Judge of the Burning Court", "elem": "fire", "weak": "water", "col": Color("c03020"), "shape": "demon", "boss": true},
 	"wheel_guardian": {"n": "Guardian of the Six Paths", "elem": "earth", "weak": "wood", "col": Color("6a6a7a"), "shape": "tortoise", "boss": true},
 	"king_yama": {"n": "King Yama, Lord of the Wheel", "elem": "dark", "weak": "thunder", "col": Color("2a2a4a"), "shape": "humanoid", "boss": true},
+	# ---- Part VII: The Unbroken Land
+	"thread_moth": {"n": "Silver-Thread Moth", "elem": "wood", "weak": "fire", "col": Color("d8d8f0"), "shape": "moth"},
+	"paper_crow": {"n": "Paper Crow", "elem": "phys", "weak": "fire", "col": Color("f0ece0"), "shape": "bird"},
+	"silk_bandit": {"n": "Silk-Masked Bandit", "elem": "phys", "weak": "thunder", "col": Color("8a6ab0"), "shape": "humanoid"},
+	"tea_beetle": {"n": "Jade Tea Beetle", "elem": "earth", "weak": "fire", "col": Color("4a9a5a"), "shape": "crab"},
+	"terrace_serpent": {"n": "Terrace Serpent", "elem": "water", "weak": "earth", "col": Color("5ab0a0"), "shape": "serpent"},
+	"hill_sprite": {"n": "Mist-Hill Sprite", "elem": "water", "weak": "thunder", "col": Color("c8f0e8"), "shape": "wisp"},
+	"silkworm": {"n": "Ravenous Silkworm", "elem": "wood", "weak": "fire", "col": Color("f0f0e0"), "shape": "blob"},
+	"silk_moth": {"n": "Mulberry Moth", "elem": "wood", "weak": "fire", "col": Color("e8d8b0"), "shape": "moth"},
+	"cocoon_wraith": {"n": "Cocoon Wraith", "elem": "dark", "weak": "thunder", "col": Color("d0c8e0"), "shape": "wraith"},
+	"spindle_imp": {"n": "Spindle Imp", "elem": "earth", "weak": "wood", "col": Color("c0904a"), "shape": "demon"},
+	"warp_wraith": {"n": "Warp-Thread Wraith", "elem": "dark", "weak": "thunder", "col": Color("b080e0"), "shape": "wraith"},
+	"shuttle_hawk": {"n": "Shuttle Hawk", "elem": "thunder", "weak": "earth", "col": Color("e0c060"), "shape": "bird"},
+	"paper_tiger": {"n": "The Paper Tiger of Qingshi", "elem": "fire", "weak": "water", "col": Color("f0a040"), "shape": "beast", "boss": true},
+	"scarecrow_king": {"n": "Scarecrow King of the Paddies", "elem": "wood", "weak": "fire", "col": Color("c8a050"), "shape": "plant", "boss": true},
+	"well_spider": {"n": "Spider in the Village Well", "elem": "dark", "weak": "fire", "col": Color("6a6a8a"), "shape": "spider", "boss": true},
+	"needle_general": {"n": "Needle General Zhen", "elem": "phys", "weak": "thunder", "col": Color("b8c0d8"), "shape": "humanoid", "boss": true},
+	"wind_kite": {"n": "The Great Wind Kite", "elem": "thunder", "weak": "earth", "col": Color("e05040"), "shape": "ray", "boss": true},
+	"terrace_dragon": {"n": "Dragon of the Nine Terraces", "elem": "water", "weak": "earth", "col": Color("4ac08a"), "shape": "dragon", "boss": true},
+	"hill_golem": {"n": "Tea-Hill Golem", "elem": "earth", "weak": "wood", "col": Color("8a7a5a"), "shape": "golem", "boss": true},
+	"thread_matron": {"n": "Thread Matron of the Hills", "elem": "wood", "weak": "fire", "col": Color("c0a0e0"), "shape": "spider", "boss": true},
+	"silkworm_queen": {"n": "Silkworm Queen", "elem": "wood", "weak": "fire", "col": Color("f8f0d8"), "shape": "serpent", "boss": true},
+	"moth_empress": {"n": "Moth Empress of the Mulberries", "elem": "wood", "weak": "fire", "col": Color("e8c890"), "shape": "moth", "boss": true},
+	"mulberry_ent": {"n": "The Old Mulberry", "elem": "wood", "weak": "fire", "col": Color("5a7a3a"), "shape": "plant", "boss": true},
+	"thousand_hands": {"n": "Thousand Hands of the Spinning Hall", "elem": "dark", "weak": "thunder", "col": Color("9a6ac0"), "shape": "demon", "boss": true},
+	"warp_beast": {"n": "Beast of the Tangled Warp", "elem": "dark", "weak": "thunder", "col": Color("7a5aa8"), "shape": "hundun", "boss": true},
+	"spindle_golem": {"n": "Spindle Golem", "elem": "earth", "weak": "wood", "col": Color("c09a5a"), "shape": "golem", "boss": true},
+	"shuttle_dragon": {"n": "Shuttle Dragon", "elem": "thunder", "weak": "earth", "col": Color("e8d070"), "shape": "dragon", "boss": true},
+	"qianxian": {"n": "Madam Qianxian, Lady of a Thousand Threads", "elem": "wood", "weak": "fire", "col": Color("e0d0ff"), "shape": "spider", "boss": true},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -315,15 +350,34 @@ const AREAS := {
 			{"to": "bamboo", "pos": Vector2i(38, 13), "dest": Vector2i(4, 22), "open": ""},
 			{"to": "mirror", "pos": Vector2i(20, 24), "dest": Vector2i(4, 28), "open": "s_p3_home"},
 			{"to": "cloudsea", "pos": Vector2i(1, 13), "dest": Vector2i(4, 28), "open": "s_p4_home"},
-			{"to": "dunes", "pos": Vector2i(38, 22), "dest": Vector2i(4, 28), "open": "s_p5_home"},
+			{"to": "dunes", "pos": Vector2i(34, 24), "dest": Vector2i(4, 28), "open": "s_p5_home"},
 			{"to": "maple", "pos": Vector2i(1, 22), "dest": Vector2i(4, 28), "open": "s_p6_home"},
+			{"to": "village", "pos": Vector2i(6, 24), "dest": Vector2i(4, 28), "open": "s_p7_home"},
 		],
 		"npcs": [
-			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 5), "col": Color("e8e8ff")},
-			{"id": "alchemist", "n": "Alchemist Mo", "pos": Vector2i(8, 15), "col": Color("6fc08a")},
-			{"id": "smith", "n": "Smith Tie", "pos": Vector2i(31, 15), "col": Color("d08a5a")},
+			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 4), "col": Color("e8e8ff")},
+			{"id": "alchemist", "n": "Alchemist Mo", "pos": Vector2i(7, 8), "col": Color("6fc08a")},
+			{"id": "smith", "n": "Smith Tie", "pos": Vector2i(32, 8), "col": Color("d08a5a")},
+			{"id": "archivist", "n": "Archivist Lan", "pos": Vector2i(33, 18), "col": Color("a8b8e0")},
 		],
 		"springs": [Vector2i(20, 13)],
+		## enterable buildings: rect includes the walls; props are [kind, tile, blocks]
+		"buildings": [
+			{"id": "hall", "n": "Hall of Azure Clouds", "style": "hall", "rect": Rect2i(14, 1, 13, 7), "door": Vector2i(20, 7),
+				"props": [["altar", Vector2i(19, 2), true], ["altar", Vector2i(20, 2), true], ["altar", Vector2i(21, 2), true], ["statue", Vector2i(20, 2), false], ["cushion", Vector2i(17, 5), false], ["cushion", Vector2i(23, 5), false], ["scroll", Vector2i(15, 3), false], ["scroll", Vector2i(25, 3), false]]},
+			{"id": "pharmacy", "n": "Alchemist's Pharmacy", "style": "alchemist", "rect": Rect2i(3, 7, 9, 5), "door": Vector2i(7, 11),
+				"props": [["cauldron", Vector2i(10, 9), true], ["shelf", Vector2i(4, 8), true], ["counter", Vector2i(8, 9), false], ["herbs", Vector2i(4, 10), false]]},
+			{"id": "forge", "n": "Smithy", "style": "smithy", "rect": Rect2i(28, 7, 9, 5), "door": Vector2i(32, 11),
+				"props": [["hearth", Vector2i(35, 8), true], ["anvil", Vector2i(34, 10), true], ["rack", Vector2i(29, 8), true], ["barrel", Vector2i(29, 10), false]]},
+			{"id": "library", "n": "Scripture Library", "style": "library", "rect": Rect2i(27, 15, 10, 6), "door": Vector2i(31, 15),
+				"props": [["bookshelf", Vector2i(28, 19), true], ["bookshelf", Vector2i(29, 19), true], ["bookshelf", Vector2i(35, 16), true], ["desk", Vector2i(34, 18), true], ["scroll", Vector2i(28, 16), false]]},
+		],
+	},
+	# the mountain around the sect: forests, terraces and the roads to every region (open world hub)
+	"mountain": {
+		"n": "Azure Cloud Mountain", "w": 60, "h": 400, "seed": 7, "theme": "sect", "enemies": 0, "hill": 2.2,
+		"portals": [],
+		"springs": [Vector2i(30, 60), Vector2i(30, 330)],
 	},
 	"bamboo": {
 		"n": "Whispering Bamboo Forest", "w": 70, "h": 44, "seed": 21, "theme": "bamboo", "enemies": 13,
@@ -784,9 +838,102 @@ const AREAS := {
 		"pickups": [{"id": "spoke1", "item": "wheel_spoke", "pos": Vector2i(22, 12)}, {"id": "spoke2", "item": "wheel_spoke", "pos": Vector2i(40, 46)}, {"id": "spoke3", "item": "wheel_spoke", "pos": Vector2i(64, 30)}, {"id": "spoke4", "item": "wheel_spoke", "pos": Vector2i(76, 10)}],
 		"pickup_vis": "s_wh_collect",
 	},
+	# ---- Part VII: The Unbroken Land
+	"village": {
+		"n": "Qingshi Village Below the Mountain", "w": 96, "h": 58, "seed": 271, "theme": "village", "enemies": 18,
+		"pool": [["thread_moth", 33, 33], ["paper_crow", 33, 33], ["silk_bandit", 33, 33]],
+		"portals": [
+			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(6, 21), "open": ""},
+			{"to": "terraces", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_vl_needle"},
+		],
+		"npcs": [
+			{"id": "granny_wen", "n": "Granny Wen the Midwife", "pos": Vector2i(10, 21), "col": Color("c8b8a0")},
+			{"id": "innkeeper", "n": "Innkeeper Fu", "pos": Vector2i(21, 33), "col": Color("d09a5a")},
+			{"id": "weaver_liu", "n": "Weaver Liu", "pos": Vector2i(56, 21), "col": Color("b08ad0")},
+		],
+		"bosses": [
+			{"id": "paper_tiger", "pos": Vector2i(30, 40), "lv": 33, "req": 33},
+			{"id": "scarecrow_king", "pos": Vector2i(46, 16), "lv": 33, "req": 33},
+			{"id": "well_spider", "pos": Vector2i(60, 40), "lv": 33, "req": 33},
+			{"id": "needle_general", "pos": Vector2i(86, 28), "lv": 33, "req": 33},
+		],
+		"pickups": [{"id": "sthread1", "item": "silver_thread", "pos": Vector2i(22, 12)}, {"id": "sthread2", "item": "silver_thread", "pos": Vector2i(40, 46)}, {"id": "sthread3", "item": "silver_thread", "pos": Vector2i(64, 30)}, {"id": "sthread4", "item": "silver_thread", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_vl_collect",
+		"springs": [Vector2i(30, 22)],
+		"buildings": [
+			{"id": "wen_house", "n": "Granny Wen's House", "style": "house", "rect": Rect2i(6, 19, 9, 6), "door": Vector2i(10, 24),
+				"props": [["bed", Vector2i(7, 20), true], ["stove", Vector2i(13, 20), true], ["table", Vector2i(12, 22), true], ["cabinet", Vector2i(7, 23), false], ["lantern", Vector2i(13, 23), false]]},
+			{"id": "inn", "n": "The Green Stone Inn", "style": "inn", "rect": Rect2i(16, 30, 11, 6), "door": Vector2i(21, 30),
+				"props": [["table", Vector2i(18, 32), true], ["stool", Vector2i(17, 32), false], ["table", Vector2i(18, 34), true], ["counter", Vector2i(24, 33), true], ["barrel", Vector2i(25, 31), true], ["barrel", Vector2i(25, 34), false], ["lantern", Vector2i(23, 31), false]]},
+			{"id": "village_shrine", "n": "Shrine of the Earth God", "style": "shrine", "rect": Rect2i(34, 5, 9, 7), "door": Vector2i(38, 11),
+				"props": [["altar", Vector2i(37, 6), true], ["altar", Vector2i(38, 6), true], ["altar", Vector2i(39, 6), true], ["statue", Vector2i(38, 6), false], ["cushion", Vector2i(38, 8), false], ["scroll", Vector2i(35, 8), false], ["scroll", Vector2i(41, 8), false]]},
+			{"id": "weaver_house", "n": "Weaver Liu's Workshop", "style": "house", "rect": Rect2i(52, 19, 9, 6), "door": Vector2i(56, 24),
+				"props": [["loom", Vector2i(53, 20), true], ["loom", Vector2i(59, 20), true], ["cabinet", Vector2i(59, 23), false], ["stool", Vector2i(54, 22), false]]},
+			{"id": "empty_house", "n": "An Abandoned House", "style": "house", "rect": Rect2i(68, 40, 8, 6), "door": Vector2i(71, 40),
+				"props": [["bed", Vector2i(69, 44), true], ["table", Vector2i(73, 43), true], ["stove", Vector2i(74, 44), true], ["shelf", Vector2i(74, 41), false]]},
+		],
+	},
+	"terraces": {
+		"n": "Cloud-Tea Terraces", "w": 96, "h": 58, "seed": 281, "theme": "tea", "enemies": 20,
+		"pool": [["tea_beetle", 33, 34], ["terrace_serpent", 33, 34], ["hill_sprite", 33, 34]],
+		"portals": [
+			{"to": "village", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "silk", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_te_matron"},
+		],
+		"npcs": [{"id": "tea_master", "n": "Tea Master Lu Yu", "pos": Vector2i(9, 25), "col": Color("6ab07a"), "vis": ["s_te_intro", ""]}],
+		"bosses": [
+			{"id": "wind_kite", "pos": Vector2i(30, 40), "lv": 33, "req": 33},
+			{"id": "terrace_dragon", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
+			{"id": "hill_golem", "pos": Vector2i(60, 40), "lv": 34, "req": 34},
+			{"id": "thread_matron", "pos": Vector2i(86, 28), "lv": 34, "req": 34},
+		],
+		"pickups": [{"id": "teabud1", "item": "tea_bud", "pos": Vector2i(22, 12)}, {"id": "teabud2", "item": "tea_bud", "pos": Vector2i(40, 46)}, {"id": "teabud3", "item": "tea_bud", "pos": Vector2i(64, 30)}, {"id": "teabud4", "item": "tea_bud", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_te_collect",
+		"buildings": [
+			{"id": "tea_house", "n": "Tea House of the Nine Terraces", "style": "inn", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
+				"props": [["stove", Vector2i(7, 23), true], ["shelf", Vector2i(12, 23), true], ["table", Vector2i(8, 27), true], ["stool", Vector2i(10, 27), false], ["lantern", Vector2i(12, 27), false]]},
+		],
+	},
+	"silk": {
+		"n": "Mulberry Silk Woods", "w": 96, "h": 58, "seed": 291, "theme": "silk", "enemies": 20,
+		"pool": [["silkworm", 34, 34], ["silk_moth", 34, 34], ["cocoon_wraith", 34, 34]],
+		"portals": [
+			{"to": "terraces", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+			{"to": "loom", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_sk_hands"},
+		],
+		"npcs": [{"id": "can_niang", "n": "Silk Farmer Can Niang", "pos": Vector2i(9, 25), "col": Color("e8d8b0"), "vis": ["s_sk_intro", ""]}],
+		"bosses": [
+			{"id": "silkworm_queen", "pos": Vector2i(30, 40), "lv": 34, "req": 34},
+			{"id": "moth_empress", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
+			{"id": "mulberry_ent", "pos": Vector2i(60, 40), "lv": 34, "req": 34},
+			{"id": "thousand_hands", "pos": Vector2i(86, 28), "lv": 34, "req": 34},
+		],
+		"pickups": [{"id": "cocoon1", "item": "cocoon", "pos": Vector2i(22, 12)}, {"id": "cocoon2", "item": "cocoon", "pos": Vector2i(40, 46)}, {"id": "cocoon3", "item": "cocoon", "pos": Vector2i(64, 30)}, {"id": "cocoon4", "item": "cocoon", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_sk_collect",
+		"buildings": [
+			{"id": "silk_house", "n": "Silkworm House", "style": "house", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
+				"props": [["shelf", Vector2i(7, 23), true], ["shelf", Vector2i(7, 27), true], ["loom", Vector2i(12, 23), true], ["herbs", Vector2i(12, 27), false]]},
+		],
+	},
+	"loom": {
+		"n": "The Loom of Borders", "w": 96, "h": 58, "seed": 301, "theme": "loom", "enemies": 20,
+		"pool": [["spindle_imp", 35, 35], ["warp_wraith", 35, 35], ["shuttle_hawk", 35, 35]],
+		"portals": [
+			{"to": "silk", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
+		],
+		"npcs": [{"id": "apprentice_zhi", "n": "Zhi, the Last Weaver-Girl", "pos": Vector2i(10, 26), "col": Color("f0c8e8"), "vis": ["s_lm_intro", ""]}],
+		"bosses": [
+			{"id": "warp_beast", "pos": Vector2i(30, 40), "lv": 35, "req": 35},
+			{"id": "spindle_golem", "pos": Vector2i(46, 16), "lv": 35, "req": 35},
+			{"id": "shuttle_dragon", "pos": Vector2i(60, 40), "lv": 35, "req": 35},
+			{"id": "qianxian", "pos": Vector2i(86, 28), "lv": 35, "req": 35},
+		],
+		"pickups": [{"id": "shuttle1", "item": "shuttle", "pos": Vector2i(22, 12)}, {"id": "shuttle2", "item": "shuttle", "pos": Vector2i(40, 46)}, {"id": "shuttle3", "item": "shuttle", "pos": Vector2i(64, 30)}, {"id": "shuttle4", "item": "shuttle", "pos": Vector2i(76, 10)}],
+		"pickup_vis": "s_lm_collect",
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom"]
 
 ## next area to enter when travelling from `from` to `to` (breadth-first over portals)
 static func next_hop(from: String, to: String) -> String:
@@ -1017,6 +1164,41 @@ const STEPS := [
 	{"id": "s_wh_guardian", "kind": "kill", "boss": "wheel_guardian", "area": "wheel", "t": "Pass the Guardian of the Six Paths"},
 	{"id": "s_wh_yama", "kind": "kill", "boss": "king_yama", "area": "wheel", "t": "Ask King Yama why the Wheel stopped", "stones": 9000},
 	{"id": "s_break11", "kind": "breakthrough", "to": 33, "t": "Turn the Wheel with your own hands: transcend samsara"},
+	# ---- Part VII: The Unbroken Land
+	{"id": "s_p7_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Silver threads across the roads: speak to Elder Qing Xuan", "stones": 9600},
+	{"id": "s_vl_intro", "kind": "talk", "npc": "granny_wen", "area": "village", "t": "Take the south road down to Qingshi Village and find Granny Wen in her house"},
+	{"id": "s_vl_collect", "kind": "collect", "item": "silver_thread", "n": 4, "area": "village", "t": "Cut 4 Silver Threads stitched across the village"},
+	{"id": "s_vl_hunt", "kind": "hunt", "area": "village", "n": 56, "t": "Drive the thread-creatures out of the paddies"},
+	{"id": "s_vl_return", "kind": "talk", "npc": "granny_wen", "area": "village", "t": "Bring the Silver Threads to Granny Wen"},
+	{"id": "s_vl_tiger", "kind": "kill", "boss": "paper_tiger", "area": "village", "t": "Tear down the Paper Tiger"},
+	{"id": "s_vl_scarecrow", "kind": "kill", "boss": "scarecrow_king", "area": "village", "t": "Unstuff the Scarecrow King of the Paddies"},
+	{"id": "s_vl_spider", "kind": "kill", "boss": "well_spider", "area": "village", "t": "Clear the spider out of the village well"},
+	{"id": "s_vl_needle", "kind": "kill", "boss": "needle_general", "area": "village", "t": "Break Needle General Zhen's blockade", "stones": 9800},
+	{"id": "s_te_intro", "kind": "talk", "npc": "tea_master", "area": "terraces", "t": "Climb to the Cloud-Tea Terraces and find the tea master in his tea house"},
+	{"id": "s_te_collect", "kind": "collect", "item": "tea_bud", "n": 4, "area": "terraces", "t": "Pick 4 Dragon-Well Tea Buds from the high terraces"},
+	{"id": "s_te_hunt", "kind": "hunt", "area": "terraces", "n": 58, "t": "Chase the thread-sick creatures off the terraces"},
+	{"id": "s_te_return", "kind": "talk", "npc": "tea_master", "area": "terraces", "t": "Bring the Tea Buds to Lu Yu"},
+	{"id": "s_te_kite", "kind": "kill", "boss": "wind_kite", "area": "terraces", "t": "Cut the string of the Great Wind Kite"},
+	{"id": "s_te_dragon", "kind": "kill", "boss": "terrace_dragon", "area": "terraces", "t": "Wake the Dragon of the Nine Terraces"},
+	{"id": "s_te_golem", "kind": "kill", "boss": "hill_golem", "area": "terraces", "t": "Unstitch the Tea-Hill Golem"},
+	{"id": "s_te_matron", "kind": "kill", "boss": "thread_matron", "area": "terraces", "t": "Stop the Thread Matron sewing the hills shut", "stones": 10200},
+	{"id": "s_sk_intro", "kind": "talk", "npc": "can_niang", "area": "silk", "t": "Enter the Mulberry Silk Woods and find Can Niang at the silkworm house"},
+	{"id": "s_sk_collect", "kind": "collect", "item": "cocoon", "n": 4, "area": "silk", "t": "Rescue 4 Soul-Cocoons from the mulberries"},
+	{"id": "s_sk_hunt", "kind": "hunt", "area": "silk", "n": 58, "t": "Thin the swarms spinning in the woods"},
+	{"id": "s_sk_return", "kind": "talk", "npc": "can_niang", "area": "silk", "t": "Bring the Soul-Cocoons to Can Niang"},
+	{"id": "s_sk_queen", "kind": "kill", "boss": "silkworm_queen", "area": "silk", "t": "Starve the Silkworm Queen of stolen souls"},
+	{"id": "s_sk_moth", "kind": "kill", "boss": "moth_empress", "area": "silk", "t": "Ground the Moth Empress"},
+	{"id": "s_sk_ent", "kind": "kill", "boss": "mulberry_ent", "area": "silk", "t": "Ask the Old Mulberry to let go"},
+	{"id": "s_sk_hands", "kind": "kill", "boss": "thousand_hands", "area": "silk", "t": "Still the Thousand Hands of the Spinning Hall", "stones": 10600},
+	{"id": "s_lm_intro", "kind": "talk", "npc": "apprentice_zhi", "area": "loom", "t": "Step onto the Loom of Borders and find the last weaver-girl"},
+	{"id": "s_lm_collect", "kind": "collect", "item": "shuttle", "n": 4, "area": "loom", "t": "Take 4 Shuttles out of the Loom"},
+	{"id": "s_lm_hunt", "kind": "hunt", "area": "loom", "n": 60, "t": "Unravel the Loom's guardians"},
+	{"id": "s_lm_return", "kind": "talk", "npc": "apprentice_zhi", "area": "loom", "t": "Bring the Shuttles to Zhi"},
+	{"id": "s_lm_beast", "kind": "kill", "boss": "warp_beast", "area": "loom", "t": "Untangle the Beast of the Tangled Warp"},
+	{"id": "s_lm_golem", "kind": "kill", "boss": "spindle_golem", "area": "loom", "t": "Topple the Spindle Golem"},
+	{"id": "s_lm_dragon", "kind": "kill", "boss": "shuttle_dragon", "area": "loom", "t": "Catch the Shuttle Dragon"},
+	{"id": "s_lm_qianxian", "kind": "kill", "boss": "qianxian", "area": "loom", "t": "Face Madam Qianxian at the heart of the Loom", "stones": 11000},
+	{"id": "s_break12", "kind": "breakthrough", "to": 36, "t": "Sew nothing shut: open your heart to the Boundless"},
 ]
 
 static func step_index(id: String) -> int:
@@ -1053,6 +1235,11 @@ const ITEMS := {
 	"memory_pearl": {"n": "River Pearl of Memory", "desc": "Quest item"},
 	"forget_herb": {"n": "Herb of Forgetting", "desc": "Quest item"},
 	"wheel_spoke": {"n": "Spoke of the Wheel", "desc": "Quest item"},
+	"silver_thread": {"n": "Silver Thread", "desc": "Quest item"},
+	"needle": {"n": "Needle General's Needle", "desc": "Keepsake"},
+	"tea_bud": {"n": "Dragon-Well Tea Bud", "desc": "Quest item"},
+	"cocoon": {"n": "Soul-Cocoon", "desc": "Quest item"},
+	"shuttle": {"n": "Shuttle of the Loom", "desc": "Quest item"},
 	"bell": {"n": "Ox-Head's Iron Bell", "desc": "It once rang every soul down the funeral road"},
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
@@ -1060,7 +1247,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell"}
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -1070,6 +1257,13 @@ const CHAT := {
 	"elder": ["The mountain wind carries the scent of blood. Stay vigilant.", "Cultivation is a marathon, disciple, not a sprint."],
 	"alchemist": ["Pills are only borrowed time. Use them wisely.", "Hehe, my furnace never lies."],
 	"smith": ["Steel remembers every blow. Bring me stones and I will temper your sword.", "A sword is only as sharp as its wielder's resolve."],
+	"archivist": ["The old maps drew every realm as its own island, stitched to the next by a gate. Look out of the window now: the roads simply run on.", "Mind the scrolls. Half of them are older than the Elder, and the other half are older than the sect.", "The Lotus Seal's barriers still stand at the borders of lands you have not earned yet. The road goes right up to them."],
+	"granny_wen": ["You still sit like you did at six, all elbows. Eat something.", "I delivered half this valley. I know every one of them by their first cry, and three of them have gone quiet.", "A house is four walls and a door, child. The door is the important part."],
+	"innkeeper": ["Rooms are free for anyone who cuts a thread off my roof. Nobody has taken me up on it yet.", "The tea comes down from the terraces. Or it did, before the hills were sewn up."],
+	"weaver_liu": ["I weave for a living, and I tell you: whoever is sewing those threads is the best weaver who ever lived. And the angriest.", "Warp holds still, weft goes through. A cloth needs both. So does a village."],
+	"tea_master": ["The first cup is for the guest, the second for the friend, the third for the road.", "Tea grows best on land that has been worked by many hands. So do people."],
+	"can_niang": ["Silkworms eat for a month and spin for three days. Then they sleep in what they made. I always thought that was sad.", "Mind the cocoons. Some of them are breathing."],
+	"apprentice_zhi": ["I swept the Loom for two hundred years. I think I know how you felt, sweeping your steps.", "Every border she ever sewed is written on this Loom. Most of them were kind, once."],
 	"yue_ling": ["Let us go, Lin Feng.", "I will keep your wounds in check."],
 	"sword_ghost": ["Thunder answers those who do not flinch."],
 	"dragon_envoy": ["The tide remembers every promise. Do not break yours.", "Pearls glow brighter near the king's throne."],
@@ -2046,6 +2240,184 @@ const DIALOGUE := {
 		["Judge Cui Jue", "I have written it down. 'The Wheel turns because someone wanted it to.' First true sentence in this book in ten thousand years."],
 		["Narrator", "Back on the mountain, on the first morning of spring, a woman from the village below brings her newborn daughter to the sect to be blessed. The baby looks up at Lin Feng with an old, surprised, delighted stare."],
 		["Lin Feng", "...Hello again."],
+	],
+	# ---- Part VII: The Unbroken Land
+	"recall5": [
+		["Narrator", "Spring comes to Azure Cloud Mountain. The baby with the old, surprised stare is named Little Wan, and the whole sect quarrels over whose turn it is to hold her."],
+		["Narrator", "Then, one night, the threads appear: fine silver threads strung across the mountain roads at ankle height, humming like plucked strings. By morning the south road to the village has been sewn shut."],
+		["Yue Ling", "Lin Feng... the village below the mountain. Granny Wen is down there. And Little Wan's mother took her home yesterday."],
+		["Elder Qing Xuan", "Come to the hall, both of you. I know whose needlework this is."],
+	],
+	"s_p7_home": [
+		["Elder Qing Xuan", "Under the Court the world was never one land. It was a quilt: every realm cut apart and stitched to the next by a gate, so that each could be harvested alone. The gates you walked through as a boy were her seams."],
+		["Elder Qing Xuan", "Her name is Qianxian, the Lady of a Thousand Threads, the Court's Weaver. When you turned the Wheel her stitches came undone and the land grew back together. Walk east from our gate now and the bamboo simply runs on into the marsh, and the marsh into the snows."],
+		["Lin Feng", "I wondered why a forest ever needed a gate."],
+		["Elder Qing Xuan", "She wants her quilt back. She is starting with the mortal lands, where nobody can fight her: the village, the tea terraces, the mulberry woods. And she is spinning new thread from the newly reborn, because a soul just come round the Wheel is the strongest thread there is."],
+		["Yue Ling", "Little Wan."],
+		["Elder Qing Xuan", "I have cut the threads across our south road. Go down to Qingshi Village and find Granny Wen. She raised you after I left you with her. If any child is missing, she will know which."],
+	],
+	"s_vl_intro": [
+		["Granny Wen the Midwife", "Shut the door, the threads come in on the draught. Let me look at you. Taller. Still all elbows. A Sovereign, they say, and you still wipe your feet on my step."],
+		["Lin Feng", "Granny. The Elder says children are being taken."],
+		["Granny Wen the Midwife", "Three of them, all born this spring, all born looking at their mothers like they knew them already. The threads came down the chimneys at night and wrapped them up like cocoons, and in the morning they were gone. One of them was Little Wan."],
+		["Granny Wen the Midwife", "The threads are still strung all over the village. Cut four of them and bring them to me. A midwife knows how to read a cord: I will tell you where they lead."],
+	],
+	"s_vl_return": [
+		["Granny Wen the Midwife", "Four threads, and all four twisted the same way, sunwise. Uphill. They run up to the tea terraces and on into the mulberry woods."],
+		["Granny Wen the Midwife", "And look at the stitching on this one: a needle as thick as a spear went through here. That will be the General who has been standing at the east end of the village since the threads came, letting nobody out."],
+		["Yue Ling", "And the paper tiger in the lanes, and the scarecrow that walks at night, and the thing in the well..."],
+		["Granny Wen the Midwife", "Paper and straw and a hungry spider, all stitched together and told to keep us in. Go on, then. I did not raise you to leave a mess in my village."],
+	],
+	"pre:paper_tiger": [
+		["Narrator", "A tiger of oiled paper and bamboo prowls the village lanes, painted with a hundred angry eyes. Every eye is a stitched-on thread that pulls it along."],
+		["Yue Ling", "It is only paper, Lin Feng. Somebody made it to frighten people."],
+		["Lin Feng", "Then it is doing its job very well. Let us unmake it gently."],
+	],
+	"post:paper_tiger": [["Narrator", "The Paper Tiger folds in on itself like a letter. Inside, written in a child's careful hand, is a single word: 'home'."]],
+	"pre:scarecrow_king": [
+		["Narrator", "In the flooded paddies a scarecrow in a crown of rice straw rises out of the water, its arms stitched wide, its hat full of silver thread."],
+		["Scarecrow King of the Paddies", "I keep the crows off. I keep the people in. I keep everything exactly where it was put. That is what I was made for."],
+		["Lin Feng", "You were made to guard the rice, old friend. Not to fence the farmers."],
+	],
+	"post:scarecrow_king": [["Narrator", "The Scarecrow King's stitches pull loose, and it slumps back into a plain scarecrow, arms spread wide over the paddies, keeping off nothing but birds."]],
+	"pre:well_spider": [
+		["Narrator", "The village well hums. Something with eight long legs has strung a web from rim to rim, and the bucket hangs wrapped in silk halfway down."],
+		["Well Spider", "Water and thread. Thread and water. Everyone comes to the well. Everyone stays."],
+		["Yue Ling", "Not this morning, they don't."],
+	],
+	"post:well_spider": [["Narrator", "The web parts. The bucket drops with a splash, and somewhere in the village a woman laughs for the first time in a week, because she can draw water again."]],
+	"pre:needle_general": [
+		["Narrator", "At the east end of the village a general in armour of a thousand sewing needles plants a spear the size of a weaver's beam across the road."],
+		["Needle General Zhen", "By order of the Lady, this village is finished. Finished cloth does not move. Turn back, Sovereign, or be hemmed in with them."],
+		["Lin Feng", "A finished cloth is just a cloth nobody is using any more. These people are not finished."],
+	],
+	"post:needle_general": [
+		["Needle General Zhen", "...The Lady said every stitch I held was a war kept out of a field. I held this road for a thousand years. Was I wrong all that time?"],
+		["Lin Feng", "Maybe not, once. But the war is over. Let them walk."],
+		["Narrator", "The General lays down his great needle and walks away up the terraces, a free man with nothing to hold. Lin Feng keeps the needle."],
+	],
+	"s_te_intro": [
+		["Tea Master Lu Yu", "Sit, sit. Nobody climbs nine terraces without a cup at the top. This is the last of last year's crop, and it will be the last of any crop if those threads stay on my hills."],
+		["Tea Master Lu Yu", "She has sewn the terraces up like a quilt. The bushes cannot breathe, the pickers cannot climb, and anyone who drinks tea grown under her threads falls asleep and dreams of being stitched into a border."],
+		["Tea Master Lu Yu", "But the Dragon-Well buds on the high terraces grow above the threads. Bring me four, and I will brew something that wakes thread-sleepers."],
+	],
+	"s_te_return": [
+		["Tea Master Lu Yu", "Four buds, and not one of them bruised. You pick like a mortal, Sovereign. I mean that kindly."],
+		["Narrator", "The tea is bright green and smells of rain on hot stone. When Yue Ling drinks it, the faint silver lines on her wrists, which neither of them had noticed, fade away."],
+		["Yue Ling", "...I was being sewn too. Slowly. The Founder wove me from the Seal, and the Lady can pull on anything woven."],
+		["Tea Master Lu Yu", "Then drink a cup every morning until this is over. Now: a kite, a dragon, a golem and the Matron who sews for the Lady. They hold the terraces. Go and take them back."],
+	],
+	"pre:wind_kite": [
+		["Narrator", "Above the third terrace a kite the size of a sail rides the wind, painted like a centipede, its string a silver thread running all the way up into the clouds."],
+		["Yue Ling", "It is pulling the threads tight across the whole hillside. Cut the string and they will all go slack!"],
+	],
+	"post:wind_kite": [["Narrator", "The string parts with a sound like a zither breaking. The Great Wind Kite sails off over the mountains, free, and the threads across the terraces sag to the ground."]],
+	"pre:terrace_dragon": [
+		["Narrator", "In the spring at the top of the terraces a green dragon lies coiled asleep, wound round and round with silver thread like a bundle of tea."],
+		["Lin Feng", "It is not attacking. It has been sewn asleep."],
+		["Yue Ling", "Then it will not be happy when it wakes. Be ready."],
+	],
+	"post:terrace_dragon": [["Narrator", "The Dragon of the Nine Terraces shakes off the last threads, drinks deeply from its spring, and sends a cool rain sweeping down over every terrace on the hill."]],
+	"pre:hill_golem": [
+		["Narrator", "A golem of terraced earth stands up out of the hillside, tea bushes growing on its shoulders, silver stitches holding its seams together."],
+		["Tea-Hill Golem", "THE HILL. MUST. NOT. MOVE."],
+	],
+	"post:hill_golem": [["Narrator", "The Golem's seams give way, and it lies back down into the hillside as nine neat terraces, a little steeper than before."]],
+	"pre:thread_matron": [
+		["Narrator", "At the crest of the terraces a spider-woman as big as a house sits on a web strung between the hills, sewing with all eight hands at once."],
+		["Thread Matron of the Hills", "The Lady's apprentice, at your service. Every border between here and the sea, I have hemmed. Would you like to see the pattern? It is beautiful. Nobody ever crosses it."],
+		["Lin Feng", "That is exactly what is wrong with it."],
+	],
+	"post:thread_matron": [
+		["Thread Matron of the Hills", "Go on into the mulberries, then. The Lady is waiting at the Loom, and she has the children. Three new souls make a very strong warp."],
+		["Narrator", "The Matron's web falls apart across the hills, and for the first time since spring, the road up the far side of the terraces is open."],
+	],
+	"s_sk_intro": [
+		["Silk Farmer Can Niang", "Mind your feet, the silkworms have been coming out of the woods all week. Not my silkworms. Hers. They eat mulberry leaves and spin souls."],
+		["Silk Farmer Can Niang", "Every newborn the threads took was carried through these woods and wrapped in a cocoon to cure, like silk. Most of the cocoons went on to the Loom. Some were dropped among the mulberries when the swarms fought over them."],
+		["Silk Farmer Can Niang", "Find four of the dropped ones. If they are still warm, I can unwind them without hurting what is inside."],
+	],
+	"s_sk_return": [
+		["Silk Farmer Can Niang", "Warm. All four. Give me room."],
+		["Narrator", "Can Niang unwinds the cocoons in a bowl of hot water, as gently as any silk. Inside are not babies, but tiny lanterns, each with a newborn soul asleep in its flame. They are the souls of children all over the land who went to sleep this spring and did not wake."],
+		["Silk Farmer Can Niang", "The bodies are still in their cradles at home. The souls were taken for thread. These four can go home now. Little Wan's is not among them. Hers went on to the Loom."],
+		["Yue Ling", "Then that is where we are going."],
+		["Narrator", "Something settles into Lin Feng's sword-hand that is as wide as the land itself: the Boundless Heart Sword, which cuts no border and leaves every door open."],
+	],
+	"pre:silkworm_queen": [
+		["Narrator", "Under the oldest mulberry a silkworm as long as a river barge lifts its pale head, its jaws still green with leaves and its belly glowing with swallowed souls."],
+		["Yue Ling", "It is digesting them, Lin Feng. We have to be quick."],
+	],
+	"post:silkworm_queen": [["Narrator", "The Silkworm Queen curls up and is still, and from her belly a stream of little soul-lanterns floats up and away towards every village in the land."]],
+	"pre:moth_empress": [
+		["Narrator", "Wings like painted screens open over the canopy. The Moth Empress hangs from the moon, dusting the woods with a powder that makes every path look like a wall."],
+		["Moth Empress of the Mulberries", "Why would anyone want to go anywhere? Stay. Stay in the dark, where it is soft."],
+	],
+	"post:moth_empress": [["Narrator", "The Moth Empress flutters down into the leaves and folds her wings. The powder settles, and the paths through the woods are only paths again."]],
+	"pre:mulberry_ent": [
+		["Narrator", "The Old Mulberry has grown its roots right through a hundred cocoons and will not let them go. Its bark creaks like an old woman's voice."],
+		["The Old Mulberry", "I fed them. I fed every worm in these woods for a thousand years. What I feed, I keep."],
+		["Lin Feng", "You fed them so they could become something else. That was always the point of you."],
+	],
+	"post:mulberry_ent": [["Narrator", "The Old Mulberry's roots loosen, one by one, and a hundred cocoons roll free into the moss. When Lin Feng looks back, the tree is already budding."]],
+	"pre:thousand_hands": [
+		["Narrator", "In the Spinning Hall at the edge of the woods a figure with a thousand arms works a thousand spinning wheels at once, every wheel turning a soul into thread."],
+		["Thousand Hands of the Spinning Hall", "Spin and spin and spin. The Lady needs a warp strong enough to hold the whole world apart. Only the newborn are strong enough."],
+		["Yue Ling", "Then you are going to have to manage without."],
+	],
+	"post:thousand_hands": [["Narrator", "The spinning wheels stop, all thousand at once, in a silence so sudden it rings. Beyond the Hall, the road climbs into a sky striped like cloth on a loom."]],
+	"s_lm_intro": [
+		["Narrator", "The Loom of Borders fills the sky: a frame as big as a mountain range, its warp threads running down to every corner of the world, its cloth the map of every border the Court ever sewed."],
+		["Zhi, the Last Weaver-Girl", "You came up the warp. Nobody comes up the warp. I am Zhi. I swept this Loom for two hundred years, until the Lady made me an apprentice so that I would stop asking why."],
+		["Zhi, the Last Weaver-Girl", "She has the three children in the heddle at the top. If she finishes the new warp with them, every border comes back at once: every gate, every seam, every village shut away from every other."],
+		["Zhi, the Last Weaver-Girl", "Take four shuttles out of the Loom. Without its shuttles the Loom cannot weave a single new row, and she will have to come down and talk to you."],
+	],
+	"s_lm_return": [
+		["Zhi, the Last Weaver-Girl", "Four shuttles. She can feel it, you know. The whole Loom just went quiet."],
+		["Zhi, the Last Weaver-Girl", "She is not cruel. That is the hard part. She sewed the first borders round fields, so that the wars of the immortals would stay out of them. The Court took her borders and made them into pens."],
+		["Lin Feng", "Then I will not cut her down. I will ask her to put the needle away."],
+		["Zhi, the Last Weaver-Girl", "Her guardians will not let you ask: the Beast in the Warp, the Spindle Golem, the Shuttle Dragon. And then her."],
+	],
+	"pre:warp_beast": [
+		["Narrator", "Where the warp threads cross they have knotted into a beast with no face, only a tangle that grows tighter the harder it struggles."],
+		["Yue Ling", "It is the borders themselves, all knotted together. It does not even know what it is."],
+	],
+	"post:warp_beast": [["Narrator", "Strand by strand the Beast unknots, until there is nothing left but straight threads hanging loose, swinging gently in a wind that blows across the whole world."]],
+	"pre:spindle_golem": [
+		["Narrator", "A golem built of a thousand spindles rolls out of the Loom's shadow, winding everything it touches round and round its body."],
+		["Spindle Golem", "WIND. WIND. WIND IT ALL UP."],
+	],
+	"post:spindle_golem": [["Narrator", "The Spindle Golem unspools across the floor of the Loom in a hundred bright colours, and everything it had wound up rolls free."]],
+	"pre:shuttle_dragon": [
+		["Narrator", "A golden dragon shaped like a weaver's shuttle shoots back and forth across the Loom, faster than the eye, trailing a new row of borders behind it."],
+		["Lin Feng", "If it never stops, we have to be where it is going."],
+	],
+	"post:shuttle_dragon": [["Narrator", "Lin Feng catches the Shuttle Dragon mid-flight, and it stops, and blinks, and curls up on the Loom's frame like a cat in a sunny window."]],
+	"pre:qianxian": [
+		["Narrator", "At the top of the Loom, in a heddle of light, three newborn souls sleep in their lanterns. Above them the Lady of a Thousand Threads lowers herself on a single strand: a woman to the waist, a great silver spider below, every one of her eight hands holding a needle."],
+		["Madam Qianxian, Lady of a Thousand Threads", "Do you know what the world looked like before my borders, little sweeper? The immortals fought across it like children kicking through a sand garden. Every war rolled over every field."],
+		["Madam Qianxian, Lady of a Thousand Threads", "I sewed fences round the fields. The Court took my fences and called them pens. You cut them all down, and you think the world is free. It is only open. Open to anything."],
+		["Lin Feng", "Then let people build their own fences. Walls and a door, like Granny Wen's house. A wall keeps the wind out. A door is what makes it a home and not a prison. You only ever sewed walls."],
+		["Madam Qianxian, Lady of a Thousand Threads", "Pretty words. Weave something with them, if you can."],
+	],
+	"post:qianxian": [
+		["Narrator", "The Lady's eight needles fall, one after another, and stick quivering in the Loom. She sits for a long time looking at the three sleeping lanterns."],
+		["Madam Qianxian, Lady of a Thousand Threads", "Walls and a door. I suppose I never thought to sew a door. Take them home, Sovereign. Their mothers are waiting."],
+		["Narrator", "Yue Ling lifts the three lanterns out of the heddle. The one in the middle burns with an old, surprised, delighted flame."],
+		["Zhi, the Last Weaver-Girl", "And the Loom? It holds every border in the world."],
+		["Madam Qianxian, Lady of a Thousand Threads", "Leave it to me. I will unpick it. Slowly. It took me ten thousand years to sew; it will take a while to make a world with doors in it."],
+	],
+	"pre:s_break12": [
+		["Narrator", "On the floor of the unravelling Loom, with the whole land spread out below like a cloth with no seams, the Heavens ask Lin Feng one last question: what will you keep out?"],
+		["Lin Feng", "Nothing. And I will keep a door open for anyone who knocks."],
+		["Yue Ling", "That is not a cultivation method, Lin Feng. That is just being kind."],
+		["Lin Feng", "It has always worked so far."],
+	],
+	"post:s_break12": [
+		["Narrator", "The last tribulation does not strike. It knocks, and Lin Feng opens the door. He becomes the first cultivator of the Boundless Heart: a realm with no border, no gate, and no wall but the ones people choose for themselves."],
+		["Narrator", "In Qingshi Village, three mothers wake to three babies yawning in their cradles. Granny Wen counts them twice and then sits down on her step and cries, very quietly, because she would never let anyone see."],
+		["Madam Qianxian, Lady of a Thousand Threads", "First row unpicked. Nine thousand nine hundred and ninety-nine to go. Zhi, fetch the tea."],
+		["Narrator", "And on Azure Cloud Mountain, on the first warm evening of summer, Lin Feng sweeps the steps of the sect while Little Wan watches from the Elder's arms, and every road down the mountain runs on, open, to the edge of the world."],
 	],
 	# ---- Part V: The Falling Sky
 	"recall3": [

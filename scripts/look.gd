@@ -64,6 +64,15 @@ const THEMES := {
 		"sky_top": Color("3a1a48"), "sky_hor": Color("f0a060"), "fog": Color("c87a5a"), "fog_d": 0.018, "sun": Color("ffb878"), "sun_e": 0.95, "amb": Color("b08070"), "amb_e": 0.8, "weather": "lily_souls", "tree": "stonelantern", "decor": "spiderlily"},
 	"diyu": {"g1": Color("2a2a3a"), "g2": Color("323244"), "path": Color("7a7890"), "wall": Color("3a3a58"), "water": Color("40c0ff"), "bg": Color("04040a"),
 		"sky_top": Color("06060e"), "sky_hor": Color("2a3a5a"), "fog": Color("1a2238"), "fog_d": 0.022, "sun": Color("90b0ff"), "sun_e": 0.75, "amb": Color("6878a8"), "amb_e": 0.8, "weather": "ghostfire", "tree": "ghostpagoda", "decor": "ghostcandle"},
+	# ---- Part VII
+	"village": {"g1": Color("6a9a48"), "g2": Color("7aa850"), "path": Color("c8b088"), "wall": Color("4a7a3a"), "water": Color("6ab0c0"), "bg": Color("0c1408"),
+		"sky_top": Color("3a6ac0"), "sky_hor": Color("e8f0d8"), "fog": Color("d0e0c8"), "fog_d": 0.011, "sun": Color("fff4dc"), "sun_e": 1.15, "amb": Color("b0c8a8"), "amb_e": 0.85, "weather": "petals", "tree": "pine", "decor": "flower"},
+	"tea": {"g1": Color("4a9a40"), "g2": Color("5aaa48"), "path": Color("d0b890"), "wall": Color("2e6a2a"), "water": Color("5ab0a8"), "bg": Color("061008"),
+		"sky_top": Color("4a7ab8"), "sky_hor": Color("e8f4f0"), "fog": Color("d8ece4"), "fog_d": 0.014, "sun": Color("fffae8"), "sun_e": 1.05, "amb": Color("a8c8b8"), "amb_e": 0.85, "weather": "river_mist", "tree": "pine", "decor": "grass"},
+	"silk": {"g1": Color("7a8a40"), "g2": Color("88984a"), "path": Color("d8c49a"), "wall": Color("4a6a2a"), "water": Color("5a9a90"), "bg": Color("0e1006"),
+		"sky_top": Color("5a6ab0"), "sky_hor": Color("ffe8c8"), "fog": Color("f0dcc0"), "fog_d": 0.013, "sun": Color("fff0d0"), "sun_e": 1.1, "amb": Color("c8b898"), "amb_e": 0.85, "weather": "light", "tree": "peach", "decor": "flower"},
+	"loom": {"g1": Color("a890c0"), "g2": Color("b8a0cc"), "path": Color("f0e0f4"), "wall": Color("7a5aa8"), "water": Color("e0b0ff"), "bg": Color("0c0614"),
+		"sky_top": Color("2a1a58"), "sky_hor": Color("ffd8a0"), "fog": Color("d8b8e0"), "fog_d": 0.014, "sun": Color("fff0d8"), "sun_e": 1.0, "amb": Color("b8a0d0"), "amb_e": 0.85, "weather": "glints", "tree": "column", "decor": "cloudpuff"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -95,6 +104,10 @@ const EXTRA := {
 	"karst": {"hill": 0.55, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.7, "haze": 0.35},
 	"lilies": {"hill": 0.35, "tex": "lilyfield", "tuft": "grass", "horizon": "bridge", "clouds": 0.4, "stars": 0.5, "moon": 0.7, "haze": 0.6, "rays": 0.4},
 	"diyu": {"hill": 0.4, "tex": "underworld", "tuft": "crystal", "horizon": "wheel", "clouds": 0.0, "stars": 0.4, "haze": 0.5},
+	"village": {"hill": 0.35, "tex": "grass", "tuft": "grass", "horizon": "peaks", "clouds": 0.55, "rays": 0.4},
+	"tea": {"hill": 1.3, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.6, "haze": 0.45},
+	"silk": {"hill": 0.6, "tex": "leaves", "tuft": "grass", "horizon": "hills", "clouds": 0.4, "rays": 0.6, "haze": 0.3},
+	"loom": {"hill": 0.4, "tex": "marble", "tuft": "flowers", "horizon": "palace", "clouds": 0.5, "stars": 0.6, "aurora": 0.5},
 }
 
 const PICKUP_COLORS := {
@@ -103,7 +116,7 @@ const PICKUP_COLORS := {
 	"echo": Color("9ae8ff"), "relic": Color("d8e0f0"), "sand": Color("ffd060"), "rune": Color("ffb0f0"),
 	"feather_cloud": Color("f0f8ff"), "seal": Color("60f0b0"), "ingot": Color("ffc860"), "peach": Color("ffa0b0"),
 	"fallen_star": Color("fff4b0"), "glowcap": Color("ff9a50"), "aurora_shard": Color("70ffc8"), "five_stone": Color("ff70d0"),
-	"soul_lantern": Color("ffc860"), "memory_pearl": Color("c0f0ff"), "forget_herb": Color("e8d090"), "wheel_spoke": Color("b0b8ff"),
+	"soul_lantern": Color("ffc860"), "memory_pearl": Color("c0f0ff"), "forget_herb": Color("e8d090"), "wheel_spoke": Color("b0b8ff"), "silver_thread": Color("e8e8ff"), "tea_bud": Color("8ae060"), "cocoon": Color("fff4d8"), "shuttle": Color("e8c860"), "needle": Color("c8d0e0"),
 }
 
 static var _anime := {}

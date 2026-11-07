@@ -6,7 +6,7 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire"}
 
 func _stop(id: String) -> Array:
 	## [first quest step set in this area, a sensible player level]
@@ -158,13 +158,11 @@ func _run() -> void:
 		elif spec.has("npcs"):
 			focus = spec.npcs[0].pos + Vector2i(0, 3)
 		main.set_stack(["world"])
-		main.world.load_area(id, Vector2i(2, 2))
-		main.world.ptile = _nearest_free(focus)
-		main.world.target = main.world.ptile
+		main.world.open_world()
+		main.world.teleport(_nearest_free(Atlas.to_world(id, focus)))
 		main.world.facing = Vector2i(1, 0)
 		main.world.cam_q = 1  # behind the hero, who faces east
 		main.world._snap_cam()
-		Game.tile = main.world.ptile
 		main.world.banner_t = 0.0
 		await _wait(1.2)
 		await _shot("world_" + id)
@@ -179,13 +177,34 @@ func _run() -> void:
 			main.world.cam_override = null
 		if id == "sect":
 			# the sect's architecture from above: halls, pagoda, walls, gate archways, the pond bridge
-			main.world.cam_override = Transform3D(Basis.IDENTITY, Vector3(41, 26, 70)).looking_at(Vector3(41, 0, 28), Vector3.UP)
+			var so := Vector3(Atlas.to_world("sect", Vector2i.ZERO).x, 0, Atlas.to_world("sect", Vector2i.ZERO).y) * Terrain3D.T
+			main.world.cam_override = Transform3D(Basis.IDENTITY, so + Vector3(41, 26, 70)).looking_at(so + Vector3(41, 0, 28), Vector3.UP)
 			await _wait(0.6)
 			await _shot("architecture_sect")
-			main.world.cam_override = Transform3D(Basis.IDENTITY, Vector3(30, 9, 22)).looking_at(Vector3(41, 3, 8), Vector3.UP)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, so + Vector3(30, 9, 30)).looking_at(so + Vector3(41, 3, 8), Vector3.UP)
 			await _wait(0.4)
 			await _shot("architecture_hall")
+			# the open world from high above the sect: the mountain, its roads and the bamboo forest beyond
+			main.world.cam_override = Transform3D(Basis.IDENTITY, so + Vector3(-30, 90, 120)).looking_at(so + Vector3(90, 0, 10), Vector3.UP)
+			await _wait(0.8)
+			await _shot("openworld_sect")
 			main.world.cam_override = null
+			# inside the buildings: the roof lifts away while the hero is indoors
+			for inn in [["interior_hall", Vector2i(20, 6), Vector2i(0, -1)], ["interior_pharmacy", Vector2i(7, 10), Vector2i(0, -1)], ["interior_smithy", Vector2i(32, 10), Vector2i(0, -1)], ["interior_library", Vector2i(31, 17), Vector2i(1, 0)]]:
+				main.world.teleport(Atlas.to_world("sect", inn[1]))
+				main.world.facing = inn[2]
+				main.world.cam_q = main.world.FWD.find(inn[2])
+				main.world._snap_cam()
+				await _wait(0.8)
+				await _shot(inn[0])
+		if id == "village":
+			# Granny Wen at home: the roof lifts away while the hero is inside
+			main.world.teleport(Atlas.to_world("village", Vector2i(10, 23)))
+			main.world.facing = Vector2i(0, -1)
+			main.world.cam_q = 0
+			main.world._snap_cam()
+			await _wait(0.8)
+			await _shot("interior_village")
 		if id == "sect" or main.args.has("world-only"):
 			continue
 		# a regular battle with this region's monster pool
@@ -279,6 +298,14 @@ func _run() -> void:
 			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
 			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
 		], 0.9, 1.5, 3.2)
+	if main.args.has("map"):
+		main.world.load_area("dunes", Vector2i(10, 28))
+		main.open_menu()
+		main.menu.mode = "map"
+		main.menu._build()
+		await _wait(0.5)
+		await _shot("world_map")
+		main.pop()
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return
@@ -303,6 +330,10 @@ func _run() -> void:
 	main.open_menu()
 	await _wait(0.3)
 	await _shot("menu")
+	main.menu.mode = "map"
+	main.menu._build()
+	await _wait(0.3)
+	await _shot("world_map")
 	main.pop()
 	main.shop.open("alchemist")
 	main.push("shop")

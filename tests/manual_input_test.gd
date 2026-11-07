@@ -5,6 +5,7 @@ extends SceneTree
 var main
 var frame := 0
 var fails := 0
+var start_y := 0
 
 func key(code: int, down: bool) -> void:
 	var e := InputEventKey.new()
@@ -41,10 +42,11 @@ func _process(_d: float) -> bool:
 				tap(KEY_ENTER)
 		20:
 			expect(main.top_name() == "world", "dialogue dismissed with Enter")
+			start_y = main.world.ptile.y
 			key(KEY_DOWN, true)
 		50:
 			key(KEY_DOWN, false)
-			expect(main.world.ptile.y > 8, "held Down key walks the player (y=%d)" % main.world.ptile.y)
+			expect(main.world.ptile.y > start_y, "held Down key walks the player (y %d -> %d)" % [start_y, main.world.ptile.y])
 			tap(KEY_ESCAPE)
 		55:
 			expect(main.top_name() == "menu", "Esc opens menu")

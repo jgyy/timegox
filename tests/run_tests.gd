@@ -63,8 +63,8 @@ func _init() -> void:
 		var spec: Dictionary = Data.AREAS[a]
 		check(world_themes.has(spec.theme), a + ": world theme " + spec.theme)
 		check(battle_sky.has(spec.theme), a + ": battle sky " + spec.theme)
-		check(a == "sect" or MapGen.DENSITY.has(spec.theme), a + ": map density " + spec.theme)
-		check(Data.AREA_CHAIN.has(a), a + ": is in the area chain")
+		check(spec.theme == "sect" or MapGen.DENSITY.has(spec.theme), a + ": map density " + spec.theme)
+		check(Data.AREA_CHAIN.has(a) or a == Atlas.HUB, a + ": is in the area chain")
 		for pe in spec.get("pool", []):
 			check(Data.ENEMIES.has(pe[0]) and not Data.ENEMIES[pe[0]].get("boss", false), a + ": pool enemy " + pe[0])
 		for pk in spec.get("pickups", []):
@@ -74,6 +74,7 @@ func _init() -> void:
 			check(b.req <= Data.MAX_LEVEL, a + ": boss level requirement " + b.id)
 	for a2 in Data.AREA_CHAIN:
 		check(Data.next_hop("sect", a2) != "" or a2 == "sect", "area %s is reachable from the sect hub" % a2)
+		check(Atlas.layout().has(a2), "area %s has a place in the open world" % a2)
 		check(Data.next_hop(a2, "sect") != "" or a2 == "sect", "area %s can travel back to the sect" % a2)
 	for i in Data.AREA_CHAIN.size():
 		check(Data.AREAS.has(Data.AREA_CHAIN[i]), "chain area exists " + Data.AREA_CHAIN[i])
@@ -169,9 +170,92 @@ func _init() -> void:
 	for a3 in Data.AREAS:
 		var spec3: Dictionary = Data.AREAS[a3]
 		var m3 := MapGen.build(a3)
-		var tr := Terrain3D.build(m3.grid, m3.w, m3.h, spec3.theme, spec3.seed)
+		var tr := Terrain3D.build(m3.grid, m3.w, m3.h, spec3.theme, spec3.seed, {"buildings": m3.buildings, "area": a3})
 		check(tr.get_child_count() > 3, "3D terrain builds for " + a3)
 		tr.free()
+	print("== open world ==")
+	var wd := Atlas.world()
+	var reach_all := MapGen.flood(wd.grid, wd.w, wd.h, wd.start)
+	var cut := 0
+	for e in wd.ents:
+		if e.kind != "spring" and e.kind != "seal" and not reach_all.has(e.pos):
+			cut += 1
+	check(cut == 0, "open world: every NPC, boss, pickup and monster can be walked to from the sect (%d cut off)" % cut)
+	for id in Atlas.region_ids():
+		check(Atlas.owner_id(wd, Atlas.to_world(id, Data.AREAS[id].get("npcs", [{"pos": Vector2i(Data.AREAS[id].w / 2, Data.AREAS[id].h / 2)}])[0].pos)) == id or id == Atlas.HUB, "open world: %s owns its own land" % id)
+	# with every seal shut, only the sect, its mountain and the first forest can be reached
+	var shut: PackedByteArray = wd.grid.duplicate()
+	var seals := 0
+	for e2 in wd.ents:
+		if e2.kind == "seal":
+			seals += 1
+			check(not e2.tiles.is_empty() and Data.step_index(e2.open) >= 0, "seal %s blocks a road and opens at a real quest step" % e2.id)
+			for t in e2.tiles:
+				shut[t.y * wd.w + t.x] = MapGen.WALL
+	var early := MapGen.flood(shut, wd.w, wd.h, wd.start)
+	var big := {}
+	for pt in early:
+		var o := Atlas.owner_id(wd, pt)
+		big[o] = big.get(o, 0) + 1
+	var leaks := []
+	for k in big:
+		if big[k] > 40 and not k in ["sect", Atlas.HUB, "bamboo"]:
+			leaks.append(k)
+	check(leaks.is_empty(), "open world: Lotus Seals close every region the story has not opened yet (leaks: %s)" % str(leaks))
+	check(seals >= 25, "open world: a seal on every gated road (%d)" % seals)
+	var again_w := Atlas._build()
+	check(again_w.grid == wd.grid, "open world: generation is deterministic")
+	check(Atlas.owner_id(wd, wd.start) == "sect", "open world: the journey starts in the sect")
+	var sl := Atlas.slice(wd, "bamboo")
+	var voids := 0
+	for v in sl.grid:
+		if v == MapGen.VOID:
+			voids += 1
+	check(voids > 0 and voids < sl.grid.size() / 3, "region slices blank out their neighbours' land (%d tiles)" % voids)
+	print("== buildings ==")
+	var n_bld := 0
+	for bd in wd.buildings:
+		n_bld += 1
+		var inner := MapGen.inner_rect(bd)
+		var inside := inner.get_center()
+		var ok_in := false
+		for yy in range(inner.position.y, inner.end.y):
+			for xx in range(inner.position.x, inner.end.x):
+				if reach_all.has(Vector2i(xx, yy)):
+					ok_in = true
+		check(ok_in, "%s: the inside can be walked into through the door" % bd.n)
+		check(wd.grid[bd.door.y * wd.w + bd.door.x] == MapGen.INTERIOR, "%s: has a door" % bd.n)
+		var edge_closed := true
+		var r: Rect2i = bd.rect
+		for xx in range(r.position.x, r.end.x):
+			for yy in [r.position.y, r.end.y - 1]:
+				if Vector2i(xx, yy) != bd.door and MapGen.is_walkable_tile(wd.grid[yy * wd.w + xx]):
+					edge_closed = false
+		for yy in range(r.position.y, r.end.y):
+			for xx in [r.position.x, r.end.x - 1]:
+				if Vector2i(xx, yy) != bd.door and MapGen.is_walkable_tile(wd.grid[yy * wd.w + xx]):
+					edge_closed = false
+		check(edge_closed, "%s: walls all round except the door" % bd.n)
+		var b0 := MB.new()
+		var gb := MB.new()
+		var rb := MB.new()
+		var rg := MB.new()
+		Arch.house(b0, gb, rb, rg, Rect2(r.position.x * 2.0, r.position.y * 2.0, r.size.x * 2.0, r.size.y * 2.0), Vector3((bd.door.x + 0.5) * 2.0, 0, (bd.door.y + 0.5) * 2.0), bd.style, [], 1)
+		check(not b0.is_empty() and not rb.is_empty(), "%s: builds walls and a separate roof" % bd.n)
+	check(n_bld >= 10, "at least 10 enterable buildings (%d)" % n_bld)
+	for npc in ["elder", "alchemist", "smith", "granny_wen"]:
+		var ne = null
+		for e3 in wd.ents:
+			if e3.get("id", "") == npc:
+				ne = e3
+		check(ne != null and wd.grid[ne.pos.y * wd.w + ne.pos.x] == MapGen.INTERIOR, npc + " waits indoors")
+	print("== part VII ==")
+	check(Data.REALMS[Data.REALMS.size() - 1] == "Boundless Heart" and Data.MAX_LEVEL == 36, "Part VII adds the Boundless Heart realm")
+	check(Data.DIALOGUE.has("recall5") and Data.step_index("s_break11") < Data.step_index("s_p7_home"), "Part VII starts after the Samsara breakthrough")
+	for a7 in ["village", "tea", "silk", "loom"]:
+		check(Look.THEMES.has(a7) and Look.EXTRA.has(a7) and Scatter.ECO.has(a7) and Fauna.KINDS.has(a7), "theme, terrain extras, ecology and wildlife for " + a7)
+	check(Data.known_skills(0, 34).has("threadfall") and Data.known_skills(1, 34).has("homeward"), "Part VII techniques are learnable")
+	check(not Data.known_skills(0, 35, Data.step_index("s_sk_return")).has("boundless"), "Boundless Heart Sword waits for Can Niang's cocoons")
 	print("== story ==")
 	for st in Data.STEPS:
 		if st.kind == "collect":

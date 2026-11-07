@@ -125,6 +125,33 @@ func _build3d() -> void:
 		road.box(Vector3(5.3, 1.9, -12.0).lerp(Vector3(9.0, 9.0, -40.0), tt), Vector3(1.4, 0.05, 1.4), Color(1.0, 0.9, 0.6, 0.35 * (1.0 - tt)), Vector3(0, 0.5, 0))
 	MB.mesh_node(scene3d, road.build(MB.mat_glow()))
 
+## Part VII: loose silver threads drifting down from the unpicked Loom, and three newborn souls'
+## lanterns floating beside Yue Ling
+var threads: Node3D
+var souls: Array = []
+
+func _part7() -> void:
+	threads = Node3D.new()
+	scene3d.add_child(threads)
+	var tb := MB.new()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 77
+	for i in 26:
+		var base := Vector3(rng.randf_range(-22, 22), rng.randf_range(8, 18), rng.randf_range(-40, -10))
+		var pts: Array = []
+		var wid: Array = []
+		for k in 8:
+			pts.append(base + Vector3(sin(k * 0.8 + i) * 0.6, -k * 1.4, cos(k * 0.6 + i) * 0.3))
+			wid.append(0.05 * (1.0 - k / 8.0) + 0.01)
+		tb.ribbon(pts, wid, Vector3.RIGHT, Color(0.92, 0.92, 1.0, 0.55), Color(0.9, 0.8, 1.0, 0.0))
+	MB.mesh_node(threads, tb.build(MB.mat_glow()))
+	for k in 3:
+		var sl := MB.new()
+		sl.ball(Vector3.ZERO, 0.22, Color(1.0, 0.85, 0.5, 0.9), true)
+		sl.ball(Vector3.ZERO, 0.5, Color(1.0, 0.7, 0.4, 0.25), true)
+		var n := MB.mesh_node(scene3d, sl.build(MB.mat_glow()), Vector3(2.4 + k * 0.5, 1.6, -0.2 - k * 0.4))
+		souls.append(n)
+
 func press(act: String) -> void:
 	if act == "confirm":
 		done = true
@@ -150,14 +177,19 @@ func _process(d: float) -> void:
 			pp.position = Vector3(5.0 + k * 0.7, 2.0, -12.0).lerp(Vector3(9.0 + k * 0.7, 8.8, -38.0), walk)
 			pp.visible = walk < 0.92
 			Models.anim_person(pp, t + k, true)
+		if threads == null:
+			_part7()
+		threads.position.y = -fmod(t * 0.6, 6.0)
+		for k in souls.size():
+			(souls[k] as Node3D).position.y = 1.6 + sin(t * 1.3 + k * 2.1) * 0.25
 		cam.position = Vector3(sin(t * 0.15) * 1.5, 1.8, 6.5)
 		cam.look_at(Vector3(0, 1.4, 0), Vector3.UP)
 		queue_redraw()
 
 func _draw() -> void:
 	Gfx.title_text(self, Vector2(0, 110), "ASCENSION", 64, VIEW.x, t)
-	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, holds up the sky by choice and turns the Wheel gladly.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
-	UI.text(self, Vector2(0, 190), "His parents walk on to rebirth, each keeping one thing. Somewhere, a baby girl already knows his face.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, holds up the sky by choice, turns the Wheel gladly, and keeps every door open.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 190), "The land is one land now. Little Wan is home, and every road down the mountain runs on to the edge of the world.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
 	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
 	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)

@@ -1,6 +1,8 @@
 extends ScreenBase
 ## Third-person 3D world: grid-based movement with a chase camera, entity models and the 2D HUD overlay.
-## The logic (tiles, movement, interaction) is identical to the original top-down game; only the view is 3D.
+## The whole game is one open world (see atlas.gd): the player walks from region to region along
+## roads, and the 3D view streams each region's terrain in as the player nears it and drops it
+## again far behind.  Buildings with doors can be walked into; the roof lifts away inside.
 
 const TS := Terrain3D.T
 const STEP_T := 0.16
@@ -14,6 +16,9 @@ const HERO_OPTS := {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 
 const YUE_OPTS := {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")}
 
 var area_id := ""
+var wd := {}
+var tile_ents := {}
+var ent_by_id := {}
 var w := 0
 var h := 0
 var grid := PackedByteArray()
@@ -29,9 +34,14 @@ var banner_t := 0.0
 var cache := {}
 var mini_tex: ImageTexture = null
 
-# 3D state
+# 3D state: one view per streamed region
 var views := {}
 var cur_view := {}
+var stream_t := 0.0
+var world_root: Node3D = null
+var envs := {}
+var inside := ""
+var mini_rect := Rect2i()
 var player: Node3D
 var comp: Node3D
 var comp_pos := Vector3.ZERO
@@ -78,68 +88,162 @@ func _build3d() -> void:
 	scene3d.add_child(weather)
 
 func clear_cache() -> void:
-	cache.clear()
 	for k in views:
-		views[k].root.queue_free()
-		for n in views[k].nodes:
-			n.queue_free()
+		_free_view(k)
 	views.clear()
 	cur_view = {}
+	area_id = ""
+	inside = ""
 
+func _free_view(k: String) -> void:
+	var v: Dictionary = views[k]
+	v.root.queue_free()
+	for i in v.nodes:
+		v.nodes[i].queue_free()
+
+## (Re)load the open world, if needed, and place the player on world tile `at`.
+func open_world() -> void:
+	if not wd.is_empty():
+		return
+	wd = Atlas.world()
+	w = wd.w
+	h = wd.h
+	grid = wd.grid
+	ents = wd.ents
+	tile_ents.clear()
+	ent_by_id.clear()
+	for e in ents:
+		ent_by_id[e.id] = e
+		if e.kind == "seal":
+			for t2 in e.tiles:
+				tile_ents[t2] = e
+		elif e.kind != "spring":
+			tile_ents[e.pos] = e
+	if not headless():
+		hm = PackedFloat32Array()
+		hm.resize((w + 1) * (h + 1))
+		wd["hm"] = hm
+		mini_tex = Gfx.world_minimap(wd)
+		world_root = Node3D.new()
+		world_root.name = "world_edge"
+		Terrain3D.world_edge(world_root, w, h)
+		scene3d.add_child(world_root)
+
+## Teleport to a region-local tile (as written in Data.AREAS).
 func load_area(id: String, at: Vector2i) -> void:
-	area_id = id
-	if not cache.has(id):
-		cache[id] = MapGen.build(id)
-	var m: Dictionary = cache[id]
-	w = m.w
-	h = m.h
-	grid = m.grid
-	ents = m.ents
-	theme_name = m.theme
-	area_name = m.name
+	teleport(Atlas.to_world(id, at))
+
+func teleport(at: Vector2i) -> void:
+	open_world()
 	ptile = at
 	target = at
 	move_t = -1.0
-	Game.area = id
 	Game.tile = at
-	banner_t = 3.0
+	_enter_region(Atlas.owner_id(wd, at), true)
 	if not headless():
-		mini_tex = Gfx.minimap_image(grid, w, h, Look.theme(theme_name))
-		_show_view(id, m)
+		_stream(true)
 		_snap_cam()
 
-func _show_view(id: String, m: Dictionary) -> void:
-	if not cur_view.is_empty():
-		cur_view.root.visible = false
-		for n in cur_view.nodes:
-			n.visible = false
-	if not views.has(id):
-		var root := Terrain3D.build(m.grid, m.w, m.h, m.theme, Data.AREAS[id].seed)
-		scene3d.add_child(root)
-		hm = root.get_meta("hm", PackedFloat32Array())
-		var nodes: Array = []
-		for e in m.ents:
-			var n := _make_ent(e)
-			n.position.y = ground_y(n.position)
-			scene3d.add_child(n)
-			nodes.append(n)
-		views[id] = {"root": root, "nodes": nodes, "env": Look.environment(m.theme)}
-	cur_view = views[id]
-	cur_view.root.visible = true
-	hm = cur_view.root.get_meta("hm", PackedFloat32Array())
-	cam.environment = cur_view.env
+func _enter_region(id: String, quiet: bool = false) -> void:
+	if id == area_id:
+		return
+	area_id = id
+	var spec: Dictionary = Data.AREAS[id]
+	theme_name = spec.theme
+	area_name = spec.n
+	Game.area = id
+	banner_t = 3.0
+	if not quiet:
+		Game.note("Entered " + area_name)
+	if headless():
+		return
+	if not envs.has(theme_name):
+		envs[theme_name] = Look.environment(theme_name)
+	cam.environment = envs[theme_name]
 	var th := Look.theme(theme_name)
 	main.fx_theme(theme_name)
 	Look.apply_lights(theme_name, sun, fill)
 	Fx3D.configure_weather(weather, th.weather)
 
+## Build the regions near the player and hide (eventually free) the ones far behind.
+func _stream(all_now: bool) -> void:
+	var near: Array = []
+	for id in wd.ids:
+		var c: Rect2i = wd.layout[id].cell
+		var dx := maxi(maxi(c.position.x - ptile.x, ptile.x - c.end.x), 0)
+		var dy := maxi(maxi(c.position.y - ptile.y, ptile.y - c.end.y), 0)
+		var dd := maxi(dx, dy)
+		if dd <= 46:
+			near.append([dd, id])
+		elif views.has(id):
+			views[id].root.visible = false
+			for i in views[id].nodes:
+				views[id].nodes[i].visible = false
+			views[id].shown = false
+	near.sort()
+	var built := 0
+	for pr in near:
+		var id: String = pr[1]
+		if not views.has(id):
+			if built > 0 and not all_now:
+				continue
+			_build_view(id)
+			built += 1
+		views[id].root.visible = true
+		views[id].shown = true
+	# keep memory bounded: drop the hidden regions furthest away
+	if views.size() > 9:
+		var far: Array = []
+		for k in views:
+			if not views[k].shown:
+				var c2: Rect2i = wd.layout[k].cell
+				far.append([-absf(c2.get_center().x - ptile.x) - absf(c2.get_center().y - ptile.y), k])
+		far.sort()
+		while views.size() > 9 and not far.is_empty():
+			var k2: String = far.pop_front()[1]
+			_free_view(k2)
+			views.erase(k2)
+
+func _build_view(id: String) -> void:
+	var sl := Atlas.slice(wd, id)
+	var r: Rect2i = sl.rect
+	var shm := Terrain3D.world_heights(wd, r)
+	var bl: Array = []
+	for bd in wd.buildings:
+		if bd.area == id:
+			var lb: Dictionary = bd.duplicate(true)
+			lb.rect = Rect2i(bd.rect.position - r.position, bd.rect.size)
+			lb.door = bd.door - r.position
+			var props: Array = []
+			for pr in bd.props:
+				props.append([pr[0], pr[1] - r.position, pr[2]])
+			lb.props = props
+			bl.append(lb)
+	var spec: Dictionary = Data.AREAS[id]
+	var root := Terrain3D.build(sl.grid, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "open": true, "buildings": bl, "area": id})
+	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS)
+	scene3d.add_child(root)
+	var nodes := {}
+	for i in ents.size():
+		var e: Dictionary = ents[i]
+		if e.area != id:
+			continue
+		var n := _make_ent(e)
+		n.position.y = ground_y(n.position)
+		scene3d.add_child(n)
+		nodes[i] = n
+	if id == "sect":
+		var pg := Atlas.to_world("sect", Vector2i(-5, 3))
+		var pp := Terrain3D.world_pos(pg)
+		Terrain3D.pagoda(root, Vector3(pp.x, ground_y(pp) - 0.3, pp.z) - root.position)
+	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {})}
+
 # ---------------------------------------------------------------- entities
 func ent_visible(e: Dictionary) -> bool:
 	match e.kind:
 		"enemy":
-			var k: String = area_id + ":" + e.id
-			if Game.defeated.has(k):
-				return false
+			return not Game.defeated.has(e.id)
+		"seal":
 			return true
 		"boss":
 			return not Game.boss_done.has(e.enemy)
@@ -156,28 +260,39 @@ func ent_visible(e: Dictionary) -> bool:
 	return true
 
 func ent_at(tile: Vector2i):
-	for e in ents:
-		if e.pos == tile and e.kind != "spring" and ent_visible(e):
-			return e
-	return null
+	var e = tile_ents.get(tile)
+	if e == null or not ent_visible(e):
+		return null
+	if e.kind == "seal" and seal_open(e):
+		return null
+	return e
+
+func seal_open(e: Dictionary) -> bool:
+	return Game.done(e.open)
 
 func tile_free(tile: Vector2i) -> bool:
 	if tile.x < 0 or tile.y < 0 or tile.x >= w or tile.y >= h:
 		return false
 	return MapGen.is_walkable_tile(grid[tile.y * w + tile.x])
 
+## the building whose floor this tile is on ("" outdoors)
+func building_at(tile: Vector2i) -> Dictionary:
+	if grid.is_empty() or grid[tile.y * w + tile.x] != MapGen.INTERIOR:
+		return {}
+	for bd in wd.buildings:
+		if bd.rect.has_point(tile):
+			return bd
+	return {}
+
 func near_spring() -> bool:
 	for e in ents:
-		if e.kind == "spring":
+		if e.kind == "spring" and e.area == area_id:
 			if maxi(absi(e.pos.x - ptile.x), absi(e.pos.y - ptile.y)) <= 3:
 				return true
 	return false
 
 func find_ent(id: String):
-	for e in ents:
-		if e.id == id:
-			return e
-	return null
+	return ent_by_id.get(id)
 
 # ---------------------------------------------------------------- 3D models for entities
 static func _label(parent: Node3D, text: String, y: float, col: Color, size: int = 34) -> Label3D:
@@ -215,6 +330,14 @@ func _npc_opts(id: String) -> Dictionary:
 			return {"asset": id, "ribbon": Color("ffd0e0"), "hair": "long", "crown": true, "glow": Color(1.0, 0.8, 0.9)}
 		"nomad", "spore_witch", "steppe_shaman", "nuwa_echo", "lantern_monk", "fisher", "meng_po", "judge_cui":
 			return {"asset": id, "staff": true, "hair": "long", "glow": Color(1.0, 0.95, 0.8)}
+		"archivist", "innkeeper":
+			return {"asset": id, "beard": true, "hat": true, "hair": "bun"}
+		"granny_wen", "weaver_liu", "can_niang":
+			return {"asset": id, "hair": "long" if id != "granny_wen" else "bun", "staff": id == "granny_wen"}
+		"tea_master":
+			return {"asset": id, "beard": true, "hat": true, "staff": true, "hair": "bun"}
+		"apprentice_zhi":
+			return {"asset": id, "hair": "long", "crown": true, "glow": Color(1.0, 0.85, 0.95)}
 		"fire_sage", "void_hermit":
 			return {"asset": id, "beard": true, "hat": true, "hair": "bald"}
 	return {}
@@ -265,13 +388,22 @@ func _make_ent(e: Dictionary) -> Node3D:
 			n.add_child(gm)
 			_label(n, Data.ITEMS[e.item].n, 2.0, col, 28)
 			n.set_meta("gem", gm)
-		"portal":
-			var open: bool = e.open == "" or Game.done(e.open)
+		"seal":
+			var open: bool = seal_open(e)
 			var pc := UI.C_JADE if open else Color("8a4a4a")
 			var pm := Models.portal(pc, open)
-			# gates on the west/east edge face along x, gates on the north/south edge along z
-			if e.pos.x < 4 or e.pos.x > w - 5:
+			# a barrier across a north-south road faces along x
+			var ts: Array = e.tiles
+			if ts.size() > 1 and ts[0].x == ts[1].x:
 				pm.rotation.y = PI / 2
+			if not ts.is_empty():
+				var mid := Vector3.ZERO
+				for tt in ts:
+					mid += Terrain3D.world_pos(tt)
+				mid /= float(ts.size())
+				n.position = Vector3(mid.x, 0, mid.z)
+				pm.scale = Vector3(1.0, 1.0, 1.0) * maxf(1.0, ts.size() * 0.55)
+			n.set_meta("open", open)
 			n.add_child(pm)
 			var lbl := _label(n, "", 4.1, pc, 32)
 			n.set_meta("label", lbl)
@@ -287,16 +419,20 @@ func _process(d: float) -> void:
 		banner_t -= d
 	# respawn defeated enemies after a while (only when away from them)
 	for k in Game.defeated.keys():
-		if Game.playtime - Game.defeated[k] > 150.0 and k.begins_with(area_id + ":"):
-			var e = find_ent(k.get_slice(":", 1))
-			if e != null and maxi(absi(e.pos.x - ptile.x), absi(e.pos.y - ptile.y)) > 6:
+		if Game.playtime - Game.defeated[k] > 150.0:
+			var e = find_ent(k)
+			if e == null or maxi(absi(e.pos.x - ptile.x), absi(e.pos.y - ptile.y)) > 6:
 				Game.defeated.erase(k)
 	var active: bool = main.top_name() == "world"
 	if active:
 		if not main.bot_active:
 			move_dir = _read_keys()
 		_move(minf(d, 0.1))
-	if not headless() and visible:
+	if not headless() and visible and not wd.is_empty():
+		stream_t -= d
+		if stream_t <= 0.0:
+			stream_t = 0.35
+			_stream(false)
 		_update_view(d)
 		queue_redraw()
 	# scenery between the camera and the hero turns see-through (shader global, see mb.gd);
@@ -340,7 +476,7 @@ func _move(d: float) -> void:
 			facing = move_dir
 			var nt := ptile + move_dir
 			var e = ent_at(nt)
-			if e != null and e.kind != "portal":
+			if e != null:
 				move_dir = Vector2i.ZERO
 				main.interact(e)
 				return
@@ -358,10 +494,9 @@ func _move(d: float) -> void:
 			ptile = target
 			move_t = -1.0
 			Game.tile = ptile
-			var pe = ent_at(ptile)
-			if pe != null and pe.kind == "portal":
-				main.use_portal(pe)
-				return
+			var rid := Atlas.owner_id(wd, ptile)
+			if rid != area_id:
+				_enter_region(rid)
 		else:
 			move_t += budget / STEP_T
 			budget = 0.0
@@ -424,19 +559,32 @@ func _update_view(d: float) -> void:
 		if dv.length() > 0.3:
 			comp.rotation.y = lerp_angle(comp.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 8.0))
 		Models.anim_person(comp, t + 1.0, dv.length() > 0.5)
-	# entities
-	var nodes: Array = cur_view.nodes
-	for i in ents.size():
-		var e: Dictionary = ents[i]
-		var n: Node3D = nodes[i]
-		var vis := ent_visible(e)
-		n.visible = vis
-		if not vis:
+	# entities of the regions on show
+	for k in views:
+		var v: Dictionary = views[k]
+		if not v.shown:
 			continue
-		var dist := n.position.distance_to(pp)
-		if dist > 46.0:
-			continue
-		_animate_ent(e, n, pp, dist, d)
+		for i in v.nodes:
+			var e: Dictionary = ents[i]
+			var n: Node3D = v.nodes[i]
+			var vis := ent_visible(e)
+			n.visible = vis
+			if not vis:
+				continue
+			var dist := n.position.distance_to(pp)
+			if dist > 46.0:
+				continue
+			_animate_ent(e, n, pp, dist, d)
+	# inside a building the roof lifts away so the follow camera can look in
+	var bd := building_at(ptile if move_t < 0.0 or move_t > 0.5 else target)
+	var now_in: String = bd.get("id", "") if not bd.is_empty() else ""
+	if now_in != inside:
+		for k2 in views:
+			var roofs: Dictionary = views[k2].roofs
+			for rid in roofs:
+				for rn in roofs[rid]:
+					(rn as Node3D).visible = rid != now_in
+		inside = now_in
 	weather.global_position = Vector3(pp.x, pp.y + weather_y(), pp.z)
 	# chase camera
 	cam_a = lerp_angle(cam_a, cam_q * PI / 2.0, 1.0 - exp(-d * 4.5))
@@ -489,11 +637,20 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) 
 			var gm: Node3D = n.get_meta("gem")
 			gm.position.y = 1.0 + sin(t * 2.0 + e.pos.y) * 0.18
 			gm.rotation.y = t * 1.5
-		"portal":
-			var open: bool = e.open == "" or Game.done(e.open)
+		"seal":
+			var open: bool = seal_open(e)
 			var lbl: Label3D = n.get_meta("label")
-			lbl.text = ("To " + Data.AREAS[e.to].n) if open else "Sealed"
+			lbl.text = Data.AREAS[e.to].n if open else "Lotus Seal"
 			lbl.modulate = UI.C_JADE if open else Color("c06a6a")
+			if open != n.get_meta("open"):
+				# the barrier dissolves into an open gateway once the story opens the road
+				var old: Node3D = n.get_meta("model")
+				var pm2 := Models.portal(UI.C_JADE if open else Color("8a4a4a"), open)
+				pm2.transform = old.transform
+				old.queue_free()
+				n.add_child(pm2)
+				n.set_meta("model", pm2)
+				n.set_meta("open", open)
 			var pm: Node3D = n.get_meta("model")
 			(pm.get_meta("ring") as Node3D).rotation.z = t * 0.8
 			(pm.get_meta("swirl") as Node3D).rotation.z = -t * 1.6
@@ -542,19 +699,37 @@ func _draw_minimap() -> void:
 	if mini_tex == null:
 		return
 	var mw := 190.0
-	var r := Rect2(VIEW.x - mw - 16, 88, mw, mw * h / float(w))
-	var marks: Array = []
+	var mh := 120.0
+	var r := Rect2(VIEW.x - mw - 16, 88, mw, mh)
+	# a window of the world map centred on the player
+	var span := Vector2(96, 96 * mh / mw)
+	var o := Vector2(ptile) - span * 0.5
+	o.x = clampf(o.x, 0.0, w - span.x)
+	o.y = clampf(o.y, 0.0, h - span.y)
+	var src := Rect2(o, span)
+	draw_rect(r.grow(4), Color(0.02, 0.03, 0.08, 0.85))
+	draw_rect(r.grow(4), UI.C_BORDER, false, 2.0)
+	draw_texture_rect_region(mini_tex, r, src, Color(1, 1, 1, 0.92))
+	var sc := r.size / span
 	for e in ents:
-		if not ent_visible(e):
+		if not src.has_point(Vector2(e.pos)) or not ent_visible(e):
 			continue
+		var col := Color.TRANSPARENT
 		match e.kind:
-			"portal":
-				marks.append({"pos": e.pos, "col": UI.C_JADE})
+			"seal":
+				col = UI.C_JADE if seal_open(e) else Color("ff6060")
 			"npc":
-				marks.append({"pos": e.pos, "col": UI.C_GOLD})
+				col = UI.C_GOLD
 			"boss":
-				marks.append({"pos": e.pos, "col": Color("ff3030")})
+				col = Color("ff3030")
 			"pickup":
-				marks.append({"pos": e.pos, "col": Color("ffffff")})
-	Gfx.draw_minimap(self, mini_tex, r, w, h, ptile, marks, t)
-	UI.text(self, r.position + Vector2(0, r.size.y + 20), area_name, 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, mw)
+				col = Color("ffffff")
+		if col.a > 0.0:
+			draw_circle(r.position + (Vector2(e.pos) - o + Vector2(0.5, 0.5)) * sc, 2.4, col)
+	var pp := r.position + (Vector2(ptile) - o + Vector2(0.5, 0.5)) * sc
+	draw_circle(pp, 4.5 + sin(t * 5.0), Color(1, 1, 1, 0.35))
+	draw_circle(pp, 2.6, Color("5aa9ff"))
+	var here := area_name
+	if inside != "":
+		here = building_at(ptile).get("n", area_name)
+	UI.text(self, r.position + Vector2(0, r.size.y + 20), here, 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, mw)
