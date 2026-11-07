@@ -98,6 +98,7 @@ for s, sd in ((1, "L"), (-1, "R")):
         b.tube([fc + V(x, 0.0, 0.1), fc + V(x * 1.2, -0.01, 0.17)], [0.016, 0.012], SKINC, cls=SKIN, bone=ft, seg=6)
     b.tube([fc + V(-0.06 * s, 0.0, 0.02), fc + V(-0.12 * s, -0.01, 0.07)], [0.02, 0.015], SKINC, cls=SKIN, bone=ft, seg=6)
 
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # head: crest and brow ridge, deep-set eyes, flat nose, prognathous muzzle and jaw
 HC = V(0, 1.56, 0.52)
 hf = A.HeadFrame(HC, V(0, -0.15, 1.0))
@@ -133,6 +134,7 @@ eyes(b, hf.at(0, 0.02, 0.135), 0.09, 0.02, iris="c08020", bone="head", slit=Fals
 fangs(b, [hf.at(0.03, -0.06, 0.16), hf.at(-0.03, -0.06, 0.16)], 0.045, "head")
 fangs(b, [hf.at(0.028, -0.08, 0.15), hf.at(-0.028, -0.08, 0.15)], 0.03, "jaw", down=False)
 
+b.cur_pal = 0.3  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # the coat: groomed down the back and arms, longer over the shoulders and forearms
 A.fur(b, torso, 300, 0.07, 0.03, seed=31, bone_fn=weights, min_dist=0.04, col_root=(0.5, 0.5, 0.5), col_tip=(0.8, 0.8, 0.8),
       groom=lambda p, n: (V(0, -1, -0.4) - n * V(0, -1, -0.4).dot(n)).normalized(), pred=lambda p, n: n.z < 0.6 or p.y > 1.3)

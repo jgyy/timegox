@@ -72,6 +72,7 @@ for k in range(4):
     rib = [V(math.sin(a) * 0.13, y - 0.03 * abs(math.sin(a)), math.cos(a) * 0.1 + 0.08) for a in [(-0.9 + 1.8 * i / 6) for i in range(7)]]
     b.tube(rib, [0.008] * 7, "d8d0bc", cls=STONE, bone="body", seg=5)
 b.tube([V(0, Y + 0.34, 0.16), V(0, Y + 0.1, 0.17)], [0.012, 0.01], "d8d0bc", cls=STONE, bone="body", seg=6)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # cowl: a deep hood of heavy cloth with a peak, the shadowed opening, a skull inside
 hood_rows = []
 for j in range(10):
@@ -90,6 +91,7 @@ b.ellipsoid(V(0, Y + 0.6, 0.06), (0.16, 0.2, 0.1), "050308", cls=SKIN, bone="hea
 A.skull(b, V(0, Y + 0.6, 0.06), 1.15, "head", col="b8b4a8", eye_glow="a0f0ff")
 for s in (1, -1):
     b.ellipsoid(V(0.035 * s, Y + 0.6, 0.15), (0.05, 0.035, 0.015), "306080", cls=SKIN, bone="head", seg=10, rings=5, mat=MAT_GLOW)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # sleeves hanging in tatters from the reaching arms, bony hands and forearm bones
 for s, sd in ((1, "L"), (-1, "R")):
     ar = r.bones["arm." + sd]
@@ -108,6 +110,7 @@ for s, sd in ((1, "L"), (-1, "R")):
 cw = V(r.bones["fore.L"][1])
 b.lathe(cw + V(0, 0, -0.04), [(0.05, -0.025), (0.055, 0.0), (0.05, 0.025)], "4a4a58", cls=METAL, bone="fore.L", seg=12, rot=(math.pi / 2, 0, 0), cap_bottom=False, cap_top=False)
 A.chain(b, cw + V(0.02, -0.07, -0.04), V(0.0, -0.075, -0.015), 6, "fore.L", col="5a5a68", r=0.028)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # tattered strips streaming from the hem, each torn into two tongues at the end
 for names, pts, a in strips:
     side = V(math.cos(a), 0, -math.sin(a))

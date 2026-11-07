@@ -43,6 +43,7 @@ def blob_shape(d):
 morph_sphere(b, V(0, 0.47, 0), blob_shape, lambda p, d: (0.75 + 0.25 * smooth(-0.6, 0.8, d.y),) * 3, cls=CRYSTAL, seg=32, rings=20, bone_fn=bw, tint_fn=lambda p, d: 1.0)
 # a wet highlight across the top
 b.ellipsoid(V(-0.18, 0.86, 0.22), (0.12, 0.04, 0.08), "ffffff", cls=CRYSTAL, bone="top", seg=10, rings=5, rot=(0.6, 0.4, 0.3), mat=MAT_GLOW, tint=0.2)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # drips and puddle lobes around the base, with a few hanging strands and droplets
 for k in range(11):
     a = 2 * math.pi * k / 11 + 0.2
@@ -52,6 +53,7 @@ for k in range(5):
     top = V(math.cos(a) * 0.62, 0.42 - k * 0.04, math.sin(a) * 0.62)
     strand(b, [top, top + V(math.cos(a) * 0.04, -0.12, math.sin(a) * 0.04), top + V(math.cos(a) * 0.05, -0.25, math.sin(a) * 0.05)], 0.05, 0.02, (0.95, 0.95, 0.95), cls=CRYSTAL, bone="body", seg=8, per=3, tint=1.0)
     b.ball(top + V(math.cos(a) * 0.05, -0.3, math.sin(a) * 0.05), 0.035, (0.95, 0.95, 0.95), cls=CRYSTAL, bone="body", tint=1.0, seg=8, rings=6)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # a darker core and swallowed trinkets (coins, a skull, a pebble, a sword hilt)
 b.ellipsoid(V(0, 0.38, -0.05), (0.3, 0.26, 0.28), (0.55, 0.55, 0.55), cls=CRYSTAL, bone=bw(V(0, 0.38, 0)), tint=1.0, seg=14, rings=8)
 for k, (x, y, z, rx) in enumerate(((0.15, 0.25, -0.1, 1.2), (0.22, 0.3, 0.05, 0.4), (0.1, 0.2, 0.15, 2.0))):
@@ -60,10 +62,12 @@ A.skull(b, V(-0.18, 0.36, -0.06), 0.9, "body", col="e8e0cc", fwd=V(0.4, 0.2, 1.0
 b.ball(V(0.05, 0.5, -0.15), 0.05, "6a6a70", cls=STONE, bone=bw(V(0, 0.5, 0)), seg=8, rings=5)
 b.tube([V(0.25, 0.55, -0.2), V(0.35, 0.72, -0.25)], [0.02, 0.018], "4a3020", cls=WOOD, bone=bw(V(0, 0.6, 0)), seg=6)
 b.ellipsoid(V(0.25, 0.55, -0.2), (0.07, 0.015, 0.02), "d8b050", cls=METAL, bone="body", seg=8, rings=4, rot=(0, 0, 0.6))
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # bubbles rising inside
 for k in range(9):
     a = k * 2.2
     b.ball(V(math.cos(a) * (0.08 + 0.03 * k), 0.5 + 0.05 * k, math.sin(a) * 0.12), 0.025 + 0.012 * (k % 3), (1.0, 1.0, 1.0), cls=CRYSTAL, bone=bw(V(0, 0.5 + 0.05 * k, 0)), tint=1.0, seg=8, rings=5)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # face: big glossy eyes and a gaping mouth with a tongue
 for s in (1, -1):
     b.eye(V(0.17 * s, 0.62, 0.5), 0.085, "1a2030", side=s, bone=bw(V(0, 0.6, 0)), rot_y=0.25, h=1.25)

@@ -63,10 +63,12 @@ for s in (1, -1):
     b.tube(tp, [0.075 - 0.065 * (k / (len(tp) - 1)) for k in range(len(tp))], "f6eed8", cls=STONE, bone="head", seg=12, cols=[("f6eed8" if k % 3 else "e0d4b8") for k in range(len(tp))])
     b.ellipsoid(V(0.16 * s, 1.37, 1.24), (0.11, 0.1, 0.1), (0.55, 0.55, 0.55), cls=SKIN, bone="head", seg=12, rings=8, tint=1.0)
 eyes(b, V(0, 1.7, 1.26), 0.21, 0.03, iris="402010", bone="head", slit=False, glow=False, rot_y=1.0, h=0.8)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # small fur-covered ears (cold-adapted), with a fringe
 for s, sd in ((1, "L"), (-1, "R")):
     e = "ear.%s" % sd
     b.ellipsoid(V(0.36 * s, 1.62, 0.92), (0.06, 0.18, 0.14), (0.5, 0.5, 0.5), bone=e, tint=1.0, seg=12, rings=8, rot=(0, 0, 0.3 * s))
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # shaggy coat: a dense undercoat of short clumps over the body, then long guard hairs hanging
 # from the back, flanks and shoulders in a skirt nearly to the knees
 A.fur(b, torso, 340, 0.12, 0.05, seed=13, bone_fn=weights, min_dist=0.07, col_root=(0.42, 0.42, 0.42), col_tip=(0.7, 0.7, 0.7),
@@ -80,6 +82,7 @@ for k in range(150):
     tip = root + V(math.sin(a) * 0.12, -length, rnd.uniform(-0.08, 0.04))
     sh = rnd.uniform(0.45, 0.72)
     strand(b, [root, root.lerp(tip, 0.4) + V(math.sin(a) * 0.08, 0, 0), tip], 0.045, 0.006, (sh, sh, sh), col_tip=(sh * 0.8,) * 3, cls=HAIR, bone=weights(root), flat=0.45, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # a mop of hair on the crown
 for k in range(16):
     a = k / 16 * 2 * math.pi

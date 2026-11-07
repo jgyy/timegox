@@ -51,6 +51,7 @@ def build(name="phoenix", style="phoenix"):
         g = (g - nrm * g.dot(nrm)).normalized()
         white = style == "magpie" and (nrm.y < -0.15 or (pos.y < BODY.y - 0.02 and pos.z > -0.1))
         A.feather(b, pos - nrm * 0.005, pos + g * 0.11 + nrm * 0.02, 0.04, (0.96, 0.96, 0.98) if white else (0.72, 0.72, 0.72), col_tip=(1.0, 1.0, 1.0) if white else (0.98, 0.98, 0.98), side=g.cross(nrm), bone="body", tint=0.0 if white else 1.0, barbs=False, curl=0.15, mat=MAT_PLAIN)
+    b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # neck: a loft ruffed with hackle feathers
     neck_pts = [BODY + V(0, 0.05, 0.2), BODY + V(0, 0.22, 0.3), BODY + V(0, 0.36, 0.38)]
     b.tube(neck_pts, [0.12, 0.09, 0.085], (0.85, 0.85, 0.85), bones=[{"body": 0.5, "neck": 0.5}, "neck", {"neck": 0.4, "head": 0.6}], tint=1.0, seg=14)
@@ -60,6 +61,7 @@ def build(name="phoenix", style="phoenix"):
             a = k / 10 * 2 * math.pi
             out = V(math.sin(a), 0.2, math.cos(a) * 0.8).normalized()
             A.feather(b, c + out * 0.08, c + out * 0.13 + V(0, -0.12, -0.05), 0.035, (0.78, 0.78, 0.78), col_tip=(1, 1, 1), bone="neck", tint=1.0, barbs=False, curl=0.1, mat=MAT_PLAIN)
+    b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # head: round skull, a hooked two-part beak with a cere, a bare eye ring and a plumed crest
     H = BODY + V(0, 0.4, 0.42)
     morph_sphere(b, H, lambda d: V(d.x * 0.095, d.y * 0.1, d.z * 0.125) + V(0, 0, 0.012 * max(0.0, d.z)), lambda p, d: (0.88 + 0.1 * d.y,) * 3, cls=CLOTH, bone="head", seg=18, rings=12, tint_fn=lambda p, d: 1.0)
@@ -78,6 +80,7 @@ def build(name="phoenix", style="phoenix"):
         tip = root + V(math.sin(a) * 0.16, 0.28 - abs(k - 3) * 0.035, -0.3)
         A.feather(b, root, tip, 0.03, (0.7, 0.7, 0.7), col_tip=(1, 1, 1), side=(1, 0, 0), bone="head", tint=1.0, curl=0.2)
         b.ball(tip, 0.02, "fff0a0", cls=CRYSTAL, bone="head", seg=8, rings=5, mat=MAT_GLOW)
+    b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # wings: a covered arm, then rows of feathers - long primaries off the hand, secondaries along
     # the forearm, shorter coverts overlapping them - fanned like a real wing
     for s, sd in ((1, "L"), (-1, "R")):
@@ -125,6 +128,7 @@ def build(name="phoenix", style="phoenix"):
             t2 = t1 + d * 0.035 + V(0, -0.01, 0)
             b.tube([ank, t1, t2], [0.014, 0.011, 0.009], "c89030", cls=SCALE, bone=lg, seg=6)
             strand(b, [t2, t2 + d * 0.02 + V(0, 0.006, 0), t2 + d * 0.035 - V(0, 0.025, 0)], 0.008, 0.001, "403020", cls=STONE, bone=lg, seg=5, per=3)
+    b.cur_pal = 1.0  # tail in the accent colour
     if style == "magpie":
         # a magpie's long graduated tail: stiff feathers, the middle pair longest, with a
         # metallic blue-green sheen

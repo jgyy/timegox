@@ -95,6 +95,7 @@ for k in range(5):
     a = k * 1.7
     d = V(math.sin(a) * 0.35, 1.0, math.cos(a) * 0.35 - 0.1).normalized()
     b.crystal(SC + shell_shape(d) - d * 0.03, 0.05 + 0.01 * (k % 2), 0.26 + 0.06 * (k % 3), "a0f0ff", cls=CRYSTAL, bone="shell", rot=(0.4 * d.z, 0, -0.4 * d.x))
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # neck: soft skin in folds pulled out from under the shell; the head with a horny hooked beak,
 # plated crown, heavy-lidded eyes
 neck = [V(0, 0.52, 0.5), V(0, 0.6, 0.66), V(0, 0.7, 0.84)]
@@ -117,6 +118,7 @@ for s in (1, -1):
     b.tube([V(0.07 * s, 0.835, 1.06), V(0.11 * s, 0.84, 1.03), V(0.135 * s, 0.825, 0.98)], [0.012, 0.016, 0.01], (0.6, 0.6, 0.6), bone="head", tint=0.8, seg=6)
     for k in range(3):
         b.superquad(HC + V(0.04 * s + 0.0, 0.11 - k * 0.02, 0.05 - k * 0.06), (0.04, 0.012, 0.035), (0.7, 0.7, 0.7), e=0.5, cls=SCALE, bone="head", tint=0.8, seg=8, rings=5)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # legs: elephantine columns armoured with big scales, blunt claws
 for nm in ("f", "h"):
     for sd in ("L", "R"):
@@ -133,6 +135,7 @@ for nm in ("f", "h"):
             b.superquad(q + out * 0.13, (0.05, 0.04, 0.012), (0.62, 0.62, 0.62), e=0.5, cls=SCALE, bone=lo, tint=0.8, rot=(0, math.atan2(out.x, out.z), 0), seg=8, rings=5)
         b.ellipsoid(r.tail(lo) + V(0, 0.0, 0.0), (0.16, 0.06, 0.17), (0.6, 0.6, 0.6), cls=SCALE, bone=lo, tint=0.8, seg=14, rings=6)
         claws(b, r.tail(lo) + V(0, 0.02, 0.12), True, lo, n=4, spread=0.05, length=0.06)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # tail: a short cone ringed with scales
 tb = [V(0, 0.48, -0.78), V(0, 0.44, -0.86), V(0, 0.38, -0.96)]
 b.tube(tb, [0.07, 0.05, 0.01], (0.7, 0.7, 0.7), cls=SCALE, bone="tail", tint=0.8, seg=8)

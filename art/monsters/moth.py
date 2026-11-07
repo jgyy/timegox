@@ -41,6 +41,7 @@ for k in range(1, 7):
         out = V(math.cos(a), math.sin(a), 0)
         b.tube([q + out * 0.08 * (1 - k / 9), q + out * 0.11 * (1 - k / 9) + V(0, 0, -0.03)], [0.012, 0.002], (0.9, 0.9, 0.9), cls=HAIR, bone="abdomen", tint=0.5, seg=4, mat=MAT_PLAIN)
 b.ellipsoid(C + V(0, 0.04, 0.27), (0.09, 0.085, 0.08), (0.85, 0.85, 0.85), cls=HAIR, bone="head", tint=0.6, seg=14, rings=8)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # fluffy ruff around the neck
 for k in range(18):
     a = k / 18 * 2 * math.pi
@@ -56,6 +57,7 @@ for k in range(16):
     rr = 0.04 * (1.0 - k / 20)
     coil.append(C + V(0, -0.06 - math.sin(a) * rr, 0.34 + math.cos(a) * rr * 0.6))
 b.tube(coil, [0.006] * 16, "c8a060", cls=SKIN, bone="head", seg=5)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # six legs folded under the thorax, banded and spurred
 for s in (1, -1):
     for k in range(3):
@@ -65,6 +67,7 @@ for s in (1, -1):
         b.tube([root, knee, foot], [0.014, 0.012, 0.006], (0.6, 0.6, 0.6), cls=HAIR, bone="body", tint=0.6, seg=6)
         b.ball(knee, 0.016, (0.85, 0.85, 0.85), cls=HAIR, bone="body", tint=0.6, seg=6, rings=4)
         b.tube([knee.lerp(foot, 0.4), knee.lerp(foot, 0.4) + V(0.03 * s, 0.02, 0)], [0.004, 0.001], (0.9, 0.9, 0.9), cls=HAIR, bone="body", tint=0.6, seg=3)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # feathered (pectinate) antennae: a shaft with paired comb branches
 for s, sd in ((1, "L"), (-1, "R")):
     a = "ant.%s" % sd

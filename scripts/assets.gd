@@ -8,7 +8,10 @@ extends RefCounted
 ##   surface "plain" -> MB.mat_plain()
 ##   surface "glow"  -> MB.mat_glow() (additive)
 ## UV.x is a tint weight: tinted vertices are multiplied by the colour the game asks for, so one
-## mesh serves every recolour of a monster.  Animations are advanced manually from the same clock
+## mesh serves every recolour of a monster.  UV.y (stored flipped by glTF) is a palette slot: from
+## the one enemy colour a three-colour palette is derived (see `palette()`), the primary shading
+## from warm highlights to cool shadows, an analogous secondary for manes, bellies and robes'
+## sashes, and a contrasting accent for horns, crests, fins and trims.  Animations are advanced manually from the same clock
 ## the procedural models use, so screenshots and the bot stay deterministic.
 
 const DIR := "res://assets/"
@@ -82,12 +85,32 @@ static func _material_for(src: Material) -> Material:
 		return MB.mat_plain()
 	return MB.mat_vc()
 
-## Rebuild a mesh with the game's materials, tinting vertices by their UV.x weight.
+## The palette one enemy colour expands into (sRGB): [primary, shadow, highlight, secondary, accent].
+## The shadow leans a little further round the colour wheel and deepens, the highlight warms and
+## lifts; the secondary is an analogous neighbour; the accent sits across the wheel.  Near-greys
+## (bone, snow, ash) get a gold or a sky-blue accent instead of a colourless one.
+static func palette(c: Color) -> Array:
+	var h := c.h
+	var s := c.s
+	var v := c.v
+	var shade := Color.from_hsv(fposmod(h + 0.045, 1.0), minf(1.0, s * 1.2 + 0.05), v * 0.72)
+	var light := Color.from_hsv(fposmod(h - 0.035, 1.0), s * 0.75, minf(1.0, v * 1.1 + 0.06))
+	var sec := Color.from_hsv(fposmod(h + 0.11, 1.0), minf(1.0, s * 1.1 + 0.08), clampf(v * 0.88, 0.25, 1.0))
+	var acc := Color.from_hsv(fposmod(h + 0.5, 1.0), clampf(s * 0.9, 0.4, 0.95), clampf(v * 1.1, 0.6, 1.0))
+	if s < 0.12:
+		sec = Color.from_hsv(0.6, 0.18, clampf(v * 0.8, 0.3, 1.0))
+		acc = Color("e0b040") if v > 0.45 else Color("70a0ff")
+	return [c, shade, light, sec, acc]
+
+## Rebuild a mesh with the game's materials, tinting vertices by their UV.x weight and palette slot.
 static func prepare_mesh(src: Mesh, tint: Color, key: String) -> Mesh:
 	if _meshes.has(key):
 		return _meshes[key]
 	var out := ArrayMesh.new()
-	var tl := tint.srgb_to_linear()
+	var pal: Array = palette(tint)
+	var lin: Array = []
+	for pc in pal:
+		lin.append((pc as Color).srgb_to_linear())
 	for s in src.get_surface_count():
 		var arr: Array = src.surface_get_arrays(s)
 		var mat: Material = _material_for(src.surface_get_material(s))
@@ -98,6 +121,7 @@ static func prepare_mesh(src: Mesh, tint: Color, key: String) -> Mesh:
 				var k: float = uvs[i].x
 				if k > 0.001:
 					var c := cols[i]
+					var tl := _tint_for(lin, c, clampf(1.0 - uvs[i].y, 0.0, 1.0))
 					cols[i] = Color(lerpf(c.r, c.r * tl.r, k), lerpf(c.g, c.g * tl.g, k), lerpf(c.b, c.b * tl.b, k), c.a)
 			arr[Mesh.ARRAY_COLOR] = cols
 		var flags: int = src.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
@@ -105,6 +129,19 @@ static func prepare_mesh(src: Mesh, tint: Color, key: String) -> Mesh:
 		out.surface_set_material(out.get_surface_count() - 1, mat)
 	_meshes[key] = out
 	return out
+
+## Linear tint for one vertex: the primary runs from the cool shadow (dark authored greys) through
+## the base colour to the warm highlight (pale greys); slot 0.5 is the secondary, 1 the accent.
+static func _tint_for(lin: Array, c: Color, slot: float) -> Color:
+	var lum := sqrt(clampf(c.r * 0.3 + c.g * 0.55 + c.b * 0.15, 0.0, 1.0))
+	var prim: Color = lin[0]
+	prim = prim.lerp(lin[1], smoothstep(0.62, 0.3, lum) * 0.8)
+	prim = prim.lerp(lin[2], smoothstep(0.78, 1.0, lum) * 0.6)
+	if slot < 0.02:
+		return prim
+	if slot <= 0.5:
+		return prim.lerp(lin[3], slot * 2.0)
+	return (lin[3] as Color).lerp(lin[4], (slot - 0.5) * 2.0)
 
 static func _walk(n: Node, out: Array, cls: String) -> void:
 	if n.is_class(cls):

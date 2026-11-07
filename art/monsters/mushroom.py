@@ -39,6 +39,7 @@ for k in range(10):
     root = V(math.sin(a) * 0.3, 0.79, math.cos(a) * 0.3)
     b.leaf(root, root + V(math.sin(a) * 0.04, -0.08 - 0.03 * (k % 3), math.cos(a) * 0.04), 0.035, "f8f0e0", cls=SKIN, bone="body", side=(math.cos(a), 0, -math.sin(a)), n=3, curl=0.05)
 b.lathe(V(0, 0, 0), [(0.34, 0.03), (0.36, 0.1), (0.33, 0.2)], "d8ccb0", cls=SKIN, seg=20, bone="root", cap_bottom=False, cap_top=False, folds=(9, 0.08, 0.0))
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # cap: a lumpy dome (no two the same), darker in its centre, studded with warts and glowing spots
 def cap_shape(d):
     if d.y < -0.05:
@@ -93,6 +94,7 @@ for s, sd in ((1, "L"), (-1, "R")):
 for k in range(9):
     a = 2 * math.pi * k / 9
     strand(b, [V(math.sin(a) * 0.3, 0.05, math.cos(a) * 0.3), V(math.sin(a + 0.2) * 0.45, 0.02, math.cos(a + 0.2) * 0.45), V(math.sin(a - 0.1) * 0.6, 0.01, math.cos(a - 0.1) * 0.6)], 0.008, 0.002, "f8f4e8", cls=SKIN, bone="root", seg=4, per=3, mat=MAT_PLAIN)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # spore motes floating around the cap
 for k in range(10):
     a = k * 0.8

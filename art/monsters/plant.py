@@ -58,6 +58,7 @@ for k in range(7):
 for k in range(9):
     x = (k - 4) * 0.045
     strand(b, [V(x, 1.0, 0.27), V(x * 1.1, 0.88, 0.3), V(x * 1.25, 0.72, 0.29)], 0.022, 0.003, "5a7a3a", col_tip="9ab860", cls=FOLIAGE, bone="trunk", flat=0.4, seg=5, per=3, mat=MAT_PLAIN)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # vine arms: woody, thorned, sprouting veined leaves, ending in leafy talons
 for sd, names in arms.items():
     s = 1 if sd == "L" else -1
@@ -82,6 +83,7 @@ for names in roots:
     for k in range(4):
         a = k * 1.6
         b.tube([end, end + V(math.cos(a) * 0.08, -0.02, math.sin(a) * 0.08)], [0.008, 0.001], (0.5, 0.5, 0.5), cls=WOOD, bone=names[-1], tint=1.0, seg=4)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # leafy crown: arching fronds of big serrated veined leaves layered round the top
 for names, a in fronds:
     pts = [r.head(n) for n in names] + [r.tail(names[-1])]
@@ -91,6 +93,7 @@ for names, a in fronds:
         q = V(pts[1]).lerp(V(pts[2]), j / 3)
         out = V(math.cos(a), 0, math.sin(a))
         A.veined_leaf(b, q, q + out * 0.28 + side * 0.1 * (j - 1) + V(0, -0.06 * j, 0), 0.1, (0.72, 0.72, 0.72), names[1], side=side, col_tip=(1.0, 1.0, 1.0), serrate=0.25, curl=0.2)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # the great flower on top (heart untinted): two whorls of cupped petals, stamens with glowing anthers
 for k in range(8):
     a = 2 * math.pi * k / 8

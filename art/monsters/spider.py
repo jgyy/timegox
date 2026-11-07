@@ -66,8 +66,10 @@ A.fur(b, abd, 160, 0.05, 0.012, seed=6, bone_fn=lambda p: "abdomen", min_dist=0.
 for s in (1, -1):
     b.cone(AC + V(0.03 * s, -0.12, -0.46), 0.025, 0.07, (0.5, 0.5, 0.5), cls=SCALE, bone="abdomen", tint=1.0, seg=8, rot=(-1.9, 0, 0.2 * s))
 b.cone(AC + V(0, -0.1, -0.47), 0.03, 0.08, (0.45, 0.45, 0.45), cls=SCALE, bone="abdomen", tint=1.0, seg=8, rot=(-1.9, 0, 0))
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # pedicel joining the two halves
 b.tube([V(0, BY + 0.04, -0.02), V(0, BY + 0.08, -0.14)], [0.06, 0.07], (0.6, 0.6, 0.6), cls=SCALE, bones=["thorax", "abdomen"], tint=1.0, seg=10)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # cephalothorax: a shield with a central fovea and radial grooves, a raised eye mound in front
 TC = V(0, BY + 0.04, 0.16)
 
@@ -96,6 +98,7 @@ for k, (x, y, rr) in enumerate(((0.035, 0.16, 0.034), (-0.035, 0.16, 0.034), (0.
     b.ball(c, rr, "200810", cls=SKIN, bone="thorax", seg=10, rings=6)
     b.ball(c + V(0, 0, rr * 0.45), rr * 0.6, "ff3040", cls=SKIN, bone="thorax", seg=8, rings=5, mat=MAT_GLOW)
     b.ball(c + V(rr * 0.3, rr * 0.35, rr * 0.75), rr * 0.18, "ffffff", cls=SKIN, bone="thorax", seg=5, rings=3, mat=MAT_GLOW)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # chelicerae: two bulky bases, hairy in front, with curved black fangs folded under
 for s in (1, -1):
     base = V(0.05 * s, BY + 0.02, 0.38)
@@ -104,6 +107,7 @@ for s in (1, -1):
     for k in range(5):
         root = base + V(0.01 * s * k, -0.03 - 0.02 * k, 0.07)
         b.tube([root, root + V(0.02 * s, 0.01, 0.04)], [0.004, 0.001], (0.4, 0.4, 0.4), cls=HAIR, bone="fangs", tint=1.0, seg=3)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # legs: coxa, femur, patella, tibia, metatarsus and tarsus marked by joint bands, the femur
 # thick, bristles along the outside, a pair of tarsal claws at the tip
 for s, sd in ((1, "L"), (-1, "R")):

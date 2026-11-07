@@ -65,6 +65,7 @@ glow_ball(b, V(0, Y + 0.05, 0), 0.1, "ffe8ff", "bell")
 # a pair of eyes so the spirit has a face
 for s in (1, -1):
     b.eye(V(0.16 * s, Y + 0.12, 0.52), 0.05, "40e0ff", side=s, bone="bell", rot_y=0.35, h=1.2, glow=True)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # oral arms: long frilled curtains - each a pair of crossed ribbons whose edges ruffle
 for names, pts in arms:
     fine = catmull(pts, 3)
@@ -80,6 +81,7 @@ for names, pts in arms:
         b.sheet(rows, (0.9, 0.9, 0.9), bones=bones, cols=[(0.85 + 0.15 * (i / (len(fine) - 1)),) * 3 for i in range(len(fine))], tint=1.0, thickness=0.006)
     for i in range(1, len(fine), 3):
         b.ball(fine[i] + V(0.05, 0, 0.02), 0.012, "ffd0ff", cls=CRYSTAL, bone=bones[i], seg=5, rings=3, mat=MAT_GLOW)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # trailing tentacles: thin tubes with glowing beads, and a fringe of fine rim tentacles
 for names, pts in tent:
     bones = [names[0]] + [names[min(j, len(names) - 1)] for j in range(len(pts) - 1)]

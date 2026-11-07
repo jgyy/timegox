@@ -37,6 +37,7 @@ for s, sd in ((1, "L"), (-1, "R")):
     r.bone("wing.%s" % sd, (0.05 * s, BY + 0.12, 0.0), (0.12 * s, BY + 0.2, -0.75), "thorax")
 b = Builder("mantis")
 
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # abdomen: overlapping tergites tapering to the tip, each flaring at its rear edge
 abd = [V(0, BY + 0.03, -0.1)]
 for k in range(1, 8):
@@ -45,6 +46,7 @@ for k in range(1, 8):
 A.plate_segments(b, abd, [(0.12 * (1 - 0.45 * k / 7) * (1.0 + 0.25 * math.sin(math.pi * k / 7)), 0.1 * (1 - 0.4 * k / 7)) for k in range(8)], (0.8, 0.8, 0.8), lambda p: "abdomen", n=14, col2=(0.95, 0.95, 0.95), ridge=0.1, cls=SCALE)
 for s in (1, -1):
     b.tube([abd[-1], abd[-1] + V(0.03 * s, 0.03, -0.08)], [0.012, 0.002], (0.6, 0.6, 0.6), cls=SCALE, bone="abdomen", tint=1.0, seg=5)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # mesothorax and the long prothorax (the "neck") with a ridged pronotum shield
 b.ellipsoid(V(0, BY + 0.03, 0.02), (0.1, 0.09, 0.16), (0.75, 0.75, 0.75), cls=SCALE, bone="thorax", tint=1.0, seg=16, rings=10)
 pro = [V(0, BY + 0.06, 0.12), V(0, BY + 0.22, 0.17), V(0, BY + 0.4, 0.24), V(0, BY + 0.6, 0.31)]
@@ -79,6 +81,7 @@ for s, sd in ((1, "L"), (-1, "R")):
         b.tube([a0, a0.lerp(a1, 0.5) + V(0, 0.03, 0), a1], [0.03, 0.028, 0.022], (0.75, 0.75, 0.75), cls=SCALE, bones=[nm + "_a", nm + "_a", {nm + "_a": 0.5, nm + "_b": 0.5}], tint=1.0, seg=8)
         b.tube([a1, a1.lerp(f1, 0.85), f1 + V(0, 0, 0.04 * (1 if k == 0 else -1))], [0.02, 0.012, 0.006], (0.85, 0.85, 0.85), cls=SCALE, bones=[{nm + "_a": 0.5, nm + "_b": 0.5}, nm + "_b", nm + "_b"], tint=1.0, seg=7)
         b.ball(a1, 0.026, (0.6, 0.6, 0.6), cls=SCALE, bone=nm + "_b", seg=8, rings=5, tint=1.0)
+    b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # raptorial foreleg: a coxa, a thick spined femur with a groove the tibia folds into, the
     # spined tibia ending in a hook
     ra, rb, rc = r.bones["rap.%s_a" % sd], r.bones["rap.%s_b" % sd], r.bones["rap.%s_c" % sd]
@@ -95,6 +98,7 @@ for s, sd in ((1, "L"), (-1, "R")):
     for q in range(5):
         p0 = V(rc[0]).lerp(V(rc[1]), 0.15 + q * 0.17)
         b.cone(p0 + V(0, 0, 0.025), 0.007, 0.03, "f8f0d8", cls=STONE, bone="rap.%s_c" % sd, seg=5, rot=(1.6, 0, 0))
+    b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # wings: the leathery tegmen with a network of veins, over the fan of the hind wing
     wg = r.bones["wing.%s" % sd]
     root = V(wg[0])

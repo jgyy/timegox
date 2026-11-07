@@ -73,6 +73,7 @@ def carp_scales(p, j, i):
 
 rings = [section(pts[i], frames[i][0], prof_d(radii[i] * 1.05, radii[i], 0.5), 18, up=frames[i][2]) for i in range(n)]
 loft(b, rings, (0.75, 0.75, 0.75), cls=SCALE, col_fn=carp_scales, bones=bw, tint=1.0, cap0=False, cap1=True, cap_push=0.6)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # belly: segmented plates like a clam's ridges, pale and only partly tinted
 for i in range(1, n - 1):
     if i % 2:
@@ -81,6 +82,7 @@ for i in range(1, n - 1):
     rr = radii[i]
     band = [pts[i] - up * rr * 0.66 + side * rr * 0.85 * math.sin(a) - up * rr * 0.28 * math.cos(a) for a in [(-1.3 + 2.6 * k / 8) for k in range(9)]]
     b.tube(band, [(rr * 0.1, rr * 0.035)] * 9, "f0e0b0", cls=SCALE, bone=bw[i], tint=0.35, seg=6, up=tuple(tan))
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # dorsal crest: serrated spines along the back, a flowing mane of hair over the neck
 for k in range(2, n - 2):
     tan, side, up = frames[k]
@@ -93,6 +95,7 @@ for k in range(2, n - 2):
         for j in (-1, 1):
             root = pts[k] + up * radii[k] * 0.7 + side * radii[k] * 0.45 * j
             strand(b, [root, root + side * 0.06 * j + up * 0.05 - tan * 0.08, root + side * 0.14 * j - up * 0.06 - tan * 0.22], 0.03, 0.003, (0.5, 0.5, 0.5), col_tip=(0.9, 0.9, 0.9), cls=HAIR, bone=bw[k], flat=0.4, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # tail: a fan of flame-like tufts
 tip = pts[-1]
 tan = frames[-1][0]
@@ -100,6 +103,7 @@ for k in range(9):
     a = k / 9 * 2 * math.pi
     out = frames[-1][1] * math.cos(a) + frames[-1][2] * math.sin(a)
     strand(b, [tip, tip + out * 0.08 + tan * 0.12, tip + out * 0.16 + tan * 0.32 + V(0, 0.04, 0)], 0.04, 0.003, (0.5, 0.5, 0.5), col_tip=(0.95, 0.95, 0.95), cls=HAIR, bone="seg%d" % (N - 1), flat=0.35, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # head: a long horse-like face with a heavy brow, flared nostrils on a raised nose, cheek
 # spikes, ox ears, deer antlers, long whiskers and a beard
 hb = "head"
@@ -125,10 +129,12 @@ def skull(d):
 morph_sphere(b, hf.c, skull, lambda p, d: (0.78 + 0.12 * d.y,) * 3, cls=SCALE, bone=hb, seg=28, rings=18, tint_fn=lambda p, d: 1.0, rot=hf.M)
 for s in (1, -1):
     b.ellipsoid(hf.at(0.05 * s, 0.06, 0.47), (0.02, 0.018, 0.012), "200810", cls=SKIN, bone=hb, seg=8, rings=5, mat=MAT_PLAIN)
+    b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # cheek spikes swept back
     for k in range(3):
         root = hf.at(0.16 * s, -0.02 - k * 0.04, 0.02 - k * 0.03)
         b.cone(root + hf.M @ V(0.05 * s, 0, -0.08), 0.02, 0.16 - k * 0.03, (0.6, 0.6, 0.6), cls=STONE, bone=hb, seg=6, rot=(-1.3, 0.5 * s, 0), tint=1.0)
+    b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # ox ears
     ear = [hf.at(0.15 * s, 0.1, -0.06), hf.at(0.24 * s, 0.12, -0.1), hf.at(0.3 * s, 0.1, -0.14)]
     b.tube(ear, [(0.045, 0.012), (0.04, 0.01), (0.004, 0.003)], (0.6, 0.6, 0.6), cls=SCALE, bone=hb, seg=8, up=(0, 1, 0), tint=1.0)
@@ -142,10 +148,12 @@ for s in (1, -1):
     # long drooping whiskers from the upper lip
     w0 = hf.at(0.08 * s, 0.0, 0.44)
     strand(b, [w0, w0 + V(0.18 * s, -0.02, 0.05), w0 + V(0.36 * s, -0.2, -0.05), w0 + V(0.46 * s, -0.48, -0.2), w0 + V(0.5 * s, -0.62, -0.32)], 0.012, 0.002, "f0e0a0", cls=HAIR, bone=hb, seg=6, per=4)
+    b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # cheek mane
     for k in range(5):
         root = hf.at(0.16 * s, 0.02 - k * 0.035, -0.02 - k * 0.04)
         strand(b, [root, root + V(0.12 * s, -0.04, -0.1), root + V(0.22 * s, -0.12 - k * 0.03, -0.28)], 0.035, 0.003, (0.45, 0.45, 0.45), col_tip=(0.85, 0.85, 0.85), cls=HAIR, bone=hb, flat=0.4, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # beard under the chin
 for k in range(7):
     u = (k / 6 - 0.5)
@@ -162,6 +170,7 @@ for k in range(6):
 # lower jaw with a tongue
 b.ellipsoid(hf.at(0, -0.12, 0.26), (0.1, 0.04, 0.22), (0.95, 0.95, 0.95), cls=SCALE, bone="jaw", tint=1.0, seg=14, rings=6)
 b.ellipsoid(hf.at(0, -0.095, 0.25), (0.07, 0.012, 0.18), "c03040", cls=SKIN, bone="jaw", seg=10, rings=4)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # legs: muscled upper limbs, scaled forearms, flame tufts at the elbows and eagle talons
 for li in (0, 1):
     for s, sd in ((1, "L"), (-1, "R")):

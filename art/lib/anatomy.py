@@ -148,6 +148,11 @@ def quad_body(b, r, sp, weights):
         rings.append(section(c, d, prof, n, up=V(0, 1, 0)))
     cf = body_colour(spine_y, sp)
     verts = loft(b, rings, GREY, cls=CLOTH, col_fn=lambda p, j, i: cf(p), bone_fn=weights, tint=1.0, cap0=True, cap1=True, cap_push=0.5)
+    # palette: the back keeps the primary colour, the flanks shade towards the secondary and the
+    # belly and throat take it fully (kit.py palette slots)
+    for v in verts:
+        p = b2g(v.co)
+        v[b.pl] = 0.5 * smooth(0.02, -0.28, p.y - spine_y(p.z))
     return verts, spine_y
 
 
@@ -197,6 +202,9 @@ def quad_leg(b, r, nm, sd, sp, spine_y, thick=1.0, col=None, paw=True, hoof=Fals
             bones.append({pw: 1.0})
     cols = [mix(col, darken(col, 0.3), smooth(0.4, 1.0, i / (m - 1))) for i in range(m)]
     verts = b.tube(pts, radii, col, cls=CLOTH, bones=bones, seg=12, cap0=True, cap1=False, cols=cols, tint=1.0, up=(1, 0, 0))
+    # stockings: the lower leg shades into the secondary colour
+    for v in verts:
+        v[b.pl] = 0.45 * smooth(top.y * 0.55, top.y * 0.2, b2g(v.co).y)
     if hoof:
         hc = pts[-1]
         b.lathe(V(hc.x, 0.0, hc.z + 0.02), [(0.055 * thick, 0.0), (0.06 * thick, 0.02), (0.05 * thick, 0.07), (0.038 * thick, 0.1)], "3a3028", cls=STONE, bone=pw, seg=14)

@@ -50,6 +50,7 @@ for key, verts in legs.items():
     A.fur(b, verts, 40, 0.06, 0.026, seed=20 + len(key) + ord(key[1]), bone_fn=lambda p, up=up: {up: 1.0},
           pred=lambda p, n: p.y > BY * 0.5, min_dist=0.03, col_root=(0.5, 0.5, 0.5), col_tip=(0.85, 0.85, 0.85),
           groom=lambda p, n: (V(0, -1, -0.2) - n * V(0, -1, -0.2).dot(n)).normalized())
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # mane: a ruff of long locks round the neck and over the withers
 for ring in range(3):
     for i in range(16):
@@ -60,12 +61,14 @@ for ring in range(3):
         tip = root + out * (0.1 - 0.02 * ring) + V(0, -0.06, -0.16)
         w = weights(root)
         strand(b, [root, root.lerp(tip, 0.5) + out * 0.03, tip], 0.04, 0.004, (0.5, 0.5, 0.5), col_tip=(0.9, 0.9, 0.9), cls=HAIR, bone=w, flat=0.45, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # chest bib of pale fur
 for i in range(10):
     a = (i / 9 - 0.5) * 2.2
     root = V(math.sin(a) * 0.12, BY - 0.02 - abs(a) * 0.02, 0.5 + math.cos(a) * 0.04)
     strand(b, [root, root + V(math.sin(a) * 0.03, -0.1, 0.05), root + V(math.sin(a) * 0.05, -0.2, 0.03)], 0.03, 0.003, (0.85, 0.85, 0.85), col_tip=(1, 1, 1), cls=HAIR, bone="chest", flat=0.4, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
 
+b.cur_pal = 0.2  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # tail: a tapering core wrapped in long fur, a darker tip
 tp = [r.head("tail0"), r.head("tail1"), r.head("tail2"), r.head("tail3"), r.tail("tail3")]
 core = catmull(tp, 3)

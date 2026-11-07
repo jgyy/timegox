@@ -17,7 +17,7 @@ import math
 from mathutils import Vector
 
 from face import HC, RY, EYE_Y
-from kit import CLOTH, CRYSTAL, HAIR, METAL, V, darken, lighten, mix, rgb
+from kit import CLOTH, CRYSTAL, HAIR, METAL, V, darken, hsv, lighten, mix, rgb, to_hsv
 from sculpt import bump, clamp, fbm3, morph_sphere, smooth, strand
 
 LIFT = 0.115  # how far the hair stands off the skull at the crown (fraction of the radius)
@@ -40,6 +40,10 @@ class Scalp:
         self.hc = rgb(hc)
         self.dk = darken(hc, 0.3)
         self.lt = lighten(hc, 0.16)
+        # dark hair catches a coloured sheen (blue-black, plum-black, chestnut) instead of grey
+        hh, hs, hv = to_hsv(hc)
+        if hv < 0.35:
+            self.lt = mix(self.lt, o.get("sheen", hsv(hh, 0.55, 0.45) if hs > 0.15 else (0.25, 0.3, 0.5)), 0.6)
         self.style = style
         self.o = o
         # gathered styles sit closer to the head (combed back tight)

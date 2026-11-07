@@ -50,11 +50,13 @@ for k in range(5):
     rock(V(a * 0.7, 1.32 + abs(a) * 0.1, 0.27), (0.18, 0.22, 0.12), "chest", 0.9)
 b.crystal(V(0, 1.55, 0.29), 0.11, 0.24, (1.0, 1.0, 1.0), cls=CRYSTAL, bone="chest", tint=1.0, mat=MAT_GLOW, rot=(math.pi / 2, 0, 0))
 b.ball(V(0, 1.55, 0.3), 0.2, (0.6, 0.6, 0.6), cls=CRYSTAL, bone="chest", tint=1.0, mat=MAT_GLOW, seg=12, rings=8)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # rune seams
 for k in range(6):
     y = 1.3 + k * 0.1
     b.tube([V(-0.46, y, 0.31), V(-0.3, y + 0.03, 0.315)], [0.012, 0.012], (1, 1, 1), cls=CRYSTAL, bone="chest", tint=1.0, mat=MAT_GLOW, seg=5)
     b.tube([V(0.3, y + 0.03, 0.315), V(0.46, y, 0.31)], [0.012, 0.012], (1, 1, 1), cls=CRYSTAL, bone="chest", tint=1.0, mat=MAT_GLOW, seg=5)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # glowing fault lines run out from the core across the chest and down the arms
 for k in range(7):
     a = k / 7 * 2 * math.pi
@@ -62,6 +64,7 @@ for k in range(7):
     for j in range(1, 4):
         pts.append(V(0, 1.55, 0.3) + V(math.cos(a + 0.15 * j) * (0.12 + 0.1 * j), math.sin(a + 0.15 * j) * (0.12 + 0.07 * j), -0.012 * j * j))
     A.glow_seam(b, pts, 0.009, (1.0, 1.0, 1.0), "chest")
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # pebbles orbiting the core, held by its pull
 for k in range(8):
     a = k / 8 * 2 * math.pi
@@ -71,11 +74,13 @@ for k in range(10):
     x = (k / 9 - 0.5) * 1.0
     root = V(x, 1.94 + 0.02 * math.sin(k * 3.1), -0.05 + 0.1 * math.cos(k * 1.7))
     b.leaf(root, root + V(0.03 * math.sin(k), 0.1 + 0.04 * (k % 3), 0.03), 0.018, "5a8a3a", bone="chest", col_tip="9ac060", tint=0.0)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # head: a small craggy block with a visor of light
 rock(V(0, 2.0, 0.12), (0.36, 0.3, 0.34), "head", 0.85)
 b.superquad(V(0, 2.02, 0.29), (0.13, 0.03, 0.02), (1, 1, 1), e=0.2, cls=CRYSTAL, bone="head", tint=1.0, mat=MAT_GLOW)
 for s in (1, -1):
     b.crystal(V(0.12 * s, 2.18, 0.08), 0.05, 0.22, (0.9, 0.9, 0.9), bone="head", tint=1.0, rot=(0, 0, -0.4 * s))
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # shoulders with crystal growths, arms of stacked stones, huge fists
 for s, sd in ((1, "L"), (-1, "R")):
     rock(V(0.6 * s, 1.82, 0), (0.42, 0.36, 0.44), {"chest": 0.5, "arm.%s" % sd: 0.5}, 0.78, moss=0.7)

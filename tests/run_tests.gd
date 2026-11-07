@@ -128,16 +128,34 @@ func _init() -> void:
 		var mm := Assets.monster(shape, Color("ff0000"))
 		var map: AnimationPlayer = mm.get_meta("ap", null)
 		check(map != null and map.has_animation("idle") and map.has_animation("attack") and map.has_animation("hurt"), shape + ": idle, attack and hurt clips")
-		# tint: red asked for, so tinted vertices lose their green and blue
+		# tint: red asked for, so tinted vertices come out red-dominant (the palette shades them from
+		# a deep red to a warm light red; secondary and accent parts are a minority)
 		var tinted := 0
 		var arr: Array = mm.get_meta("meshes")[0].mesh.surface_get_arrays(0)
 		var cols: PackedColorArray = arr[Mesh.ARRAY_COLOR]
 		var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
 		for i in cols.size():
-			if uvs[i].x > 0.99 and cols[i].g < 0.02 and cols[i].r > 0.02:
+			if uvs[i].x > 0.99 and cols[i].r > 0.02 and cols[i].r > cols[i].g * 2.0 and cols[i].r > cols[i].b * 2.0:
 				tinted += 1
 		check(tinted > cols.size() / 10, "%s: tint recolours the body (%d of %d vertices)" % [shape, tinted, cols.size()])
 		mm.free()
+	# the palette: one enemy colour gives a distinct secondary and a contrasting accent
+	var pal: Array = Assets.palette(Color("c03020"))
+	check(absf((pal[3] as Color).h - (pal[0] as Color).h) > 0.05 and absf((pal[4] as Color).h - (pal[0] as Color).h) > 0.3, "palette: analogous secondary and contrasting accent")
+	var grey_pal: Array = Assets.palette(Color("e8e8f0"))
+	check((grey_pal[4] as Color).s > 0.3, "palette: a near-grey enemy still gets a coloured accent")
+	var dragon := Assets.monster("dragon", Color("c03020"))
+	var huesets := {}
+	for mi2 in dragon.get_meta("meshes"):
+		for si2 in mi2.mesh.get_surface_count():
+			var a2: Array = mi2.mesh.surface_get_arrays(si2)
+			var c2: PackedColorArray = a2[Mesh.ARRAY_COLOR]
+			var u2: PackedVector2Array = a2[Mesh.ARRAY_TEX_UV]
+			for i2 in range(0, c2.size(), 7):
+				if u2[i2].x > 0.99 and c2[i2].v > 0.05:
+					huesets[int(c2[i2].h * 12.0)] = true
+	check(huesets.size() >= 3, "palette: a tinted dragon shows several hues (%d)" % huesets.size())
+	dragon.free()
 	# the same shape in two colours shares nothing but the source mesh
 	var ma := Assets.monster("beast", Color("ff0000"))
 	var mb2 := Assets.monster("beast", Color("0000ff"))

@@ -13,7 +13,11 @@ Conventions
   foliage, scales, hair), exactly like ``MB.tag`` in ``scripts/mb.gd``.  Thin double-sided
   geometry has the class nudged by -0.025 so the ink outline pass skips it.
 * UV channel 0 carries a *tint* weight in U: 0 keeps the authored colour, 1 multiplies it with the
-  colour the game passes in (so one monster mesh can be a jade lion or a frost wolf).
+  colour the game passes in (so one monster mesh can be a jade lion or a frost wolf).  V carries the
+  *palette slot* of tinted parts: 0 the primary colour, 0.5 the secondary, 1 the accent.  The game
+  derives a harmonious secondary and a contrasting accent from the one enemy colour (assets.gd),
+  so a mane, a belly, horns or fins come out in their own colours instead of one flat tone.  Set
+  ``Builder.cur_pal`` before building a part (or call ``palette``/``palette_where`` afterwards).
 * Material slots: ``toon`` (outlined), ``plain`` (no outline) and ``glow`` (additive, unshaded).
 * Rotations for animation are Godot Euler angles (order YXZ) in the parent's frame, the same
   numbers you would put on a ``Node3D.rotation``.
@@ -109,6 +113,54 @@ def grey(v):
     return (v, v, v)
 
 
+def to_hsv(c):
+    import colorsys
+    return colorsys.rgb_to_hsv(*rgb(c))
+
+
+def hsv(h, s, v):
+    """sRGB tuple from hue (wraps), saturation and value (clamped)."""
+    import colorsys
+    return colorsys.hsv_to_rgb(h % 1.0, max(0.0, min(1.0, s)), max(0.0, min(1.0, v)))
+
+
+def harmonise(o):
+    """A fuller palette for a costume.  Unless ``o["monotone"]`` is set, every part the script did
+    not colour gets a harmonious one, and parts that are only a darker or lighter copy of the robe
+    are turned round the colour wheel: the inner robe becomes a pastel of an analogous hue, the
+    trousers a deep analogous tone, the sash and the middle collar band a complement of the robe,
+    the trim a light warm tint.  Returns a new options dict."""
+    o = dict(o)
+    if o.get("monotone") or o.get("tint_cloth"):
+        # recolourable enemies keep neutral cloth: the game paints them from its own palette
+        return o
+    rh, rs, rv = to_hsv(o.get("robe", "3a8ae8"))
+    grey_robe = rs < 0.12
+
+    def close(c):
+        h, s, v = to_hsv(c)
+        dh = min(abs(h - rh), 1.0 - abs(h - rh))
+        return s < 0.1 or grey_robe or dh < 0.06
+
+    comp = (rh + 0.5) % 1.0 if not grey_robe else 0.08
+    if "inner" not in o or (to_hsv(o["inner"])[1] < 0.08 and to_hsv(o["inner"])[2] > 0.85):
+        base = rgb(o.get("inner", "f8f4ec"))
+        o["inner"] = mix(base, hsv(rh - 0.08, 0.45, 1.0), 0.3)
+    if "pants" not in o or close(o["pants"]):
+        pv = to_hsv(o["pants"])[2] if "pants" in o else rv * 0.45
+        o["pants"] = hsv(rh - 0.12, max(rs * 0.7, 0.3), max(0.18, min(0.5, pv * 1.1)))
+    if "sash" not in o or close(o["sash"]):
+        sv = to_hsv(o["sash"])[2] if "sash" in o else 0.5
+        o["sash"] = hsv(comp, 0.55, max(0.3, min(0.85, sv * 1.2 + 0.1)))
+    if "collar2" not in o or close(o["collar2"]):
+        o["collar2"] = hsv(comp + 0.06, 0.45, 0.75)
+    if "trim" not in o:
+        o["trim"] = hsv(rh + 0.06, 0.18, 0.97)
+    if "boots" not in o:
+        o["boots"] = hsv(rh - 0.12, 0.35, 0.2)
+    return o
+
+
 # ---------------------------------------------------------------- Euler / pose maths
 def euler_g(rot):
     """Godot Basis.from_euler(rot) (order YXZ) as a 3x3 matrix in Godot space."""
@@ -157,6 +209,8 @@ class Builder:
         self.bm = bmesh.new()
         self.cl = self.bm.verts.layers.float_color.new("Col")
         self.tl = self.bm.verts.layers.float.new("tint")
+        self.pl = self.bm.verts.layers.float.new("pal")
+        self.cur_pal = 0.0  # palette slot given to everything added until it is changed
         self.dl = self.bm.verts.layers.deform.verify()
         self.groups = []
         self.gidx = {}
@@ -191,6 +245,7 @@ class Builder:
             else:
                 v[self.cl] = lin(c, cls)
             v[self.tl] = tints[i] if tints is not None else tint
+            v[self.pl] = self.cur_pal
             w = self._weights(bones[i] if bones is not None else bone, Vector(p))
             tot = sum(w.values())
             for bn, wt in w.items():
@@ -577,6 +632,17 @@ class Builder:
         hl2 = pc + R @ Vector((-r * 0.2 * side, -r * 0.3, r * 0.1))
         self.ellipsoid(hl2, (r * 0.09, r * 0.09, r * 0.05), "ffffff", cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=6, rings=4, mat=MAT_GLOW)
 
+    def palette(self, verts, slot):
+        """Put already-built vertices in a palette slot (0 primary, 0.5 secondary, 1 accent)."""
+        for v in verts:
+            v[self.pl] = slot
+
+    def palette_where(self, pred, slot):
+        """Palette slot for every vertex where pred(godot_pos, linear_rgba) holds."""
+        for v in self.bm.verts:
+            if pred(b2g(v.co), v[self.cl]):
+                v[self.pl] = slot
+
     def recolor(self, verts, fn, cls=CLOTH):
         """Repaint vertices with fn(godot_pos, old_srgb_guess) -> sRGB colour (embroidery, stripes,
         markings).  Keeps the surface class."""
@@ -648,12 +714,17 @@ class Builder:
         # tint weight -> UV channel 0 (U)
         uv = me.uv_layers.new(name="tint")
         ta = me.attributes.get("tint")
+        pa = me.attributes.get("pal")
         if ta is not None:
             vals = [d.value for d in ta.data]
+            pals = [d.value for d in pa.data] if pa is not None else [0.0] * len(vals)
             for poly in me.polygons:
                 for li in poly.loop_indices:
-                    uv.data[li].uv = (vals[me.loops[li].vertex_index], 0.0)
+                    vi = me.loops[li].vertex_index
+                    uv.data[li].uv = (vals[vi], pals[vi])
             me.attributes.remove(ta)
+        if pa is not None:
+            me.attributes.remove(pa)
         for nm in MAT_NAMES:
             m = bpy.data.materials.get(nm) or bpy.data.materials.new(nm)
             me.materials.append(m)

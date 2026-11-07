@@ -69,6 +69,7 @@ for s in (1, -1):
     for k in range(6):
         c = V(0.12 * s, Y - 0.12 - k * 0.08, -0.38)
         b.lathe(c, [(0.025, -0.022), (0.035, 0.0), (0.025, 0.022)], "6a6a78", cls=METAL, bone="spine", seg=8, rot=(0, 0, (k % 2) * 1.57), cap_bottom=False, cap_top=False)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # the cover is carved: a raised border and a cloud-scroll medallion on each board, the spine
 # banded with raised cords, the page block's edges ruled in fine lines and gilt
 for s, sd in ((1, "L"), (-1, "R")):

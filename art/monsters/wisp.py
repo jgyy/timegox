@@ -41,12 +41,14 @@ def shell(d):
 morph_sphere(b, V(0, Y, 0), shell, lambda p, d: (0.85 + 0.15 * smooth(-0.5, 0.8, d.y),) * 3, cls=CRYSTAL, bone="body", seg=24, rings=16, tint_fn=lambda p, d: 1.0)
 glow_ball(b, V(0, Y, 0.02), 0.14, "fffaf0", "body")
 b.ellipsoid(V(0, Y - 0.02, 0.02), (0.2, 0.22, 0.2), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="body", seg=14, rings=10, mat=MAT_GLOW, tint=0.6)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # flame tongues: an outer dim layer and an inner bright one, crossed so they read from any side
 for names, pts in flames:
     for j in range(len(pts) - 1):
         for side in ((1, 0, 0), (0, 0, 1)):
             b.leaf(pts[j], pts[j + 1] + V(0, 0.04, 0), 0.07 - 0.015 * j, (0.95, 0.95, 0.95), side=side, cls=CLOTH, bone=names[j], tint=1.0, col_tip=(1.0, 1.0, 1.0), curl=0.1, mat=MAT_GLOW)
         b.leaf(pts[j] + V(0, 0.02, 0), pts[j + 1] + V(0, 0.0, 0), 0.035, "fffff0", side=(1, 0, 1), cls=CLOTH, bone=names[j], tint=0.3, curl=0.15, mat=MAT_GLOW)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # tail of trailing light, thinning into embers
 tp = [r.head(n) for n in tail] + [r.tail(tail[-1])]
 b.tube(tp, [0.15, 0.1, 0.06, 0.005], (0.85, 0.85, 0.85), cls=CRYSTAL, bones=[tail[0], tail[0], tail[1], tail[2]], tint=1.0, seg=10)
@@ -59,6 +61,7 @@ for k in range(7):
 for k in range(6):
     a = k / 6 * 2 * math.pi
     glow_ball(b, V(math.cos(a) * 0.38, Y + 0.12 * math.sin(a * 2), math.sin(a) * 0.38), 0.016, "fff8d0", "body")
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # little arms with three fingers of flame, and a face: big eyes, blushing cheeks, a small mouth
 for s, sd in ((1, "L"), (-1, "R")):
     ar = r.bones["arm." + sd]

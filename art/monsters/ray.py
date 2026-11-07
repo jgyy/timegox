@@ -67,6 +67,7 @@ for v in b.bm.verts:
     for nm, wt in w.items():
         if wt > 1e-4:
             v[b.dl][b.gi(nm)] = wt
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # dorsal ridge and gill slits
 b.tube([V(0, Y + 0.17, 0.3), V(0, Y + 0.19, 0.0), V(0, Y + 0.12, -0.45)], [0.05, 0.06, 0.03], (0.6, 0.6, 0.6), cls=SCALE, bone="body", tint=1.0, seg=8)
 for s in (1, -1):
@@ -77,6 +78,7 @@ for s in (1, -1):
     b.tube([cp[0], V(cp[0]).lerp(V(cp[1]), 0.5) + V(0.03 * s, 0.03, 0), cp[1]], [(0.05, 0.02), (0.045, 0.018), (0.01, 0.008)], (0.7, 0.7, 0.7), cls=SCALE, bone="ceph." + sd, tint=1.0, seg=8)
     b.eye(V(0.22 * s, Y + 0.05, 0.4), 0.04, "a0f0ff", side=s, bone="body", rot_y=1.2, h=1.0, glow=True)
 b.ellipsoid(V(0, Y - 0.02, 0.6), (0.14, 0.03, 0.03), "302028", cls=SKIN, bone="body", seg=10, rings=4)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # whip tail with a sting
 tp = [r.head(n) for n in tail] + [r.tail(tail[-1])]
 b.tube(tp, [0.05, 0.035, 0.02, 0.006], (0.7, 0.7, 0.7), cls=SCALE, bones=[tail[0], tail[0], tail[1], tail[2]], tint=1.0, seg=7)
@@ -95,6 +97,7 @@ for v in b.bm.verts:
     edge = math.hypot(p.x / 1.3, (p.z - 0.0) / 0.7)
     k *= 1.0 - 0.3 * smooth(0.82, 0.98, edge)
     v[b.cl] = (min(1.0, c[0] * k), min(1.0, c[1] * k), min(1.0, c[2] * k), c[3])
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # spiracles behind the eyes, a row of tubercles down the back, and a serrated barb on the tail
 for s in (1, -1):
     b.ellipsoid(V(0.2 * s, Y + 0.07, 0.25), (0.03, 0.012, 0.04), "302028", cls=SKIN, bone="body", seg=8, rings=4)

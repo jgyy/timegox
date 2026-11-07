@@ -67,6 +67,7 @@ def cara_col(p, d):
 
 
 morph_sphere(b, CC, cara_shape, cara_col, cls=SCALE, bone="body", seg=40, rings=22, tint_fn=lambda p, d: 1.0)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # anterolateral teeth along the front edges, frontal teeth between the eyes
 for s in (1, -1):
     for k in range(6):
@@ -78,6 +79,7 @@ for s in (1, -1):
 for k in range(4):
     x = (k - 1.5) * 0.045
     b.cone(CC + V(x, 0.06, 0.48), 0.018, 0.05, (0.6, 0.6, 0.6), cls=STONE, bone="body", seg=6, tint=1.0, rot=(math.pi / 2, 0, 0))
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # legs: merus, carpus, propodus and dactyl as overlapping armoured segments, hairs on the
 # propodus, a dark pointed dactyl
 for s, sd in ((1, "L"), (-1, "R")):
@@ -94,6 +96,7 @@ for s, sd in ((1, "L"), (-1, "R")):
         for h in range(4):
             q = a1.lerp(mid, 0.3 + h * 0.2)
             b.tube([q, q + V(0.02 * s, 0.035, -0.01)], [0.004, 0.001], (0.45, 0.45, 0.45), cls=HAIR, bone=bb, tint=1.0, seg=3)
+    b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # cheliped: merus and carpus, then the chela - an inflated palm, the fixed finger and the
     # movable finger (pincer), both toothed along the cutting edge, tips dark
     ua = r.bones["arm." + sd]
@@ -115,6 +118,7 @@ for s, sd in ((1, "L"), (-1, "R")):
         t = 0.25 + q * 0.14
         b.cone(p0.lerp(p1, t) + V(0, -0.02, 0), 0.01, 0.03, "f0e8d8", cls=STONE, bone="pincer." + sd, seg=5, rot=(math.pi, 0, 0))
         b.cone(hf.at(0, -0.03, 0.18 + q * 0.045), 0.01, 0.028, "f0e8d8", cls=STONE, bone="claw." + sd, seg=5)
+    b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # eye stalks rising out of the orbits
     st = r.bones["stalk." + sd]
     s0, s1 = V(st[0]), V(st[1])
@@ -122,6 +126,7 @@ for s, sd in ((1, "L"), (-1, "R")):
     b.tube([s0, s0.lerp(s1, 0.5) + V(0.01 * s, 0, 0.01), s1], [0.025, 0.022, 0.02], (0.7, 0.7, 0.7), cls=SCALE, bone="stalk." + sd, tint=1.0, seg=8)
     b.ball(s1 + V(0, 0.03, 0), 0.045, "101018", cls=SKIN, bone="stalk." + sd, seg=12, rings=8)
     b.ball(s1 + V(0.015 * s, 0.05, 0.03), 0.014, "ffffff", cls=SKIN, bone="stalk." + sd, seg=6, rings=4, mat=kit.MAT_GLOW)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # mouthparts: layered maxillipeds frothing with bubbles
 for k in range(3):
     b.ellipsoid(V((k - 1) * 0.05, BY - 0.02, 0.43), (0.03, 0.05, 0.02), (0.6, 0.6, 0.6), cls=SCALE, bone="body", tint=1.0, seg=8, rings=5)

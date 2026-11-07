@@ -30,7 +30,7 @@ import accessory as acc
 import face as facelib
 import garment as G
 import hair as hairlib
-from kit import CLOTH, HAIR, METAL, SKIN, STONE, Builder, Rig, V, darken, env, finish_rigged, lighten, mix, rgb
+from kit import CLOTH, HAIR, METAL, SKIN, STONE, Builder, Rig, V, darken, env, finish_rigged, harmonise, lighten, mix, rgb
 from sculpt import blob3, clamp, fbm3, morph_sphere, smooth, strand
 
 SKIN_COL = "f5d6c2"
@@ -73,6 +73,7 @@ def make_rig():
 def build(o):
     rig = make_rig()
     b = Builder("body")
+    o = harmonise(o)
     robe = rgb(o.get("robe", "3a8ae8"))
     trim = rgb(o.get("trim", lighten(robe, 0.5)))
     inner = rgb(o.get("inner", "f4f0e8"))
@@ -95,11 +96,17 @@ def build(o):
         o["fem"] = o.get("hair_style") == "long" and not o.get("beard", False) and not o.get("stern", False)
 
     tor = G.Torso(o)
+    # palette slots (used when the cloth is tinted, i.e. recolourable enemies): trousers, sash and
+    # cape in the secondary colour, the collar and trims in the accent, the robe in the primary
     # ---------------- lower body, robe, sash
+    b.cur_pal = 0.5
     G.legs(b, o, pants, boots, trim)
+    b.cur_pal = 0.0
     robe_start = len(b.bm.verts)
     G.body(b, o, tor, robe, trim, inner, gold)
+    b.cur_pal = 1.0
     lapel_end = G.collar(b, o, tor, robe, trim, inner, gold)
+    b.cur_pal = 0.0
     G.skirt(b, o, tor, robe, trim, inner, gold, lapel_end)
     if o.get("brocade"):
         # woven motifs over the robe: "cloud", "waves" (along the hem), "cranes" or "plum"
@@ -109,7 +116,9 @@ def build(o):
         bcol = o.get("brocade_col", lighten(robe, 0.35))
         G.brocade(b, robe_verts, motif, bcol, base_y=0.17, strength=0.65,
                   where=(lambda p: p.y < 0.75) if motif == "waves" else None)
+    b.cur_pal = 0.5
     G.sash(b, o, tor, sash_col, gold)
+    b.cur_pal = 0.0
 
     # ---------------- arms
     for s in (1, -1):
@@ -161,7 +170,9 @@ def build(o):
 
     # ---------------- cape, armour, weapons
     if o.get("cape") is not None:
+        b.cur_pal = 0.5
         G.cape(b, o, rgb(o["cape"]))
+        b.cur_pal = 0.0
     if o.get("armor", False):
         G.armour(b, o, tor, metal)
     hand_r = WRI * V(-1, 1, 1) + V(-0.004, -0.075, 0.02)

@@ -55,6 +55,7 @@ def hide(p, d):
 
 
 body_v = morph_sphere(b, C, sack, hide, cls=CLOTH, bone="body", seg=40, rings=26, tint_fn=lambda p, d: 1.0)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # glowing seams wandering over the hide
 for k in range(7):
     a0 = rnd.uniform(0, 2 * math.pi)
@@ -65,6 +66,7 @@ for k in range(7):
         rr = math.sqrt(max(0.02, 1.0 - (y / 0.73) ** 2)) * 0.7
         pts.append(C + V(math.sin(a) * rr, y, math.cos(a) * rr))
     b.tube(pts, [0.018] * 9, (1.0, 0.95, 0.6), cls=CRYSTAL, bone="body", mat=MAT_GLOW, seg=5)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # the missing face: a whirl of light on a dark hollow
 b.disc(C + V(0, 0.1, 0.735), 0.3, "120818", cls=SKIN, bone="body", seg=24, rot=(math.pi / 2, 0, 0), thick=0.02)
 for k in range(5):
@@ -74,6 +76,7 @@ for k in range(5):
         rr = 0.03 + i * 0.019
         pts.append(C + V(math.cos(a) * rr, 0.1 + math.sin(a) * rr, 0.75 + 0.002 * i))
     b.tube(pts, [0.012 - i * 0.0006 for i in range(14)], (1.0, 1.0, 0.8), cls=CRYSTAL, bone="swirl", mat=MAT_GLOW, seg=5)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # wings: four feathered wings, each a covered arm with long flight feathers and two rows of
 # coverts over them
 for s, sd in ((1, "L"), (-1, "R")):
@@ -87,6 +90,7 @@ for s, sd in ((1, "L"), (-1, "R")):
                 base = h.lerp(tl, 0.1 + u * 0.85) + V(0, 0.015 * row, 0)
                 tip = base + (tl - h).normalized() * 0.2 * u + V(0, -ln * (0.5 + 0.5 * u), -ln * 0.6)
                 A.feather(b, base, tip, 0.08 - 0.015 * row, (shd, shd, shd), col_tip=(1.0, 0.9, 0.7), side=(0, 1, 0), bone=wb, tint=1.0, curl=0.1, barbs=row == 0)
+    b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # six legs: thick thighs, knobbly knees, scaled shins and three-clawed feet
     for k in range(3):
         lg, sn = "leg%d.%s" % (k, sd), "shin%d.%s" % (k, sd)
@@ -99,6 +103,7 @@ for s, sd in ((1, "L"), (-1, "R")):
             a = (c - 1) * 0.5
             d = V(math.sin(a), 0, math.cos(a))
             strand(b, [foot + d * 0.05, foot + d * 0.1 + V(0, 0.01, 0), foot + d * 0.13 - V(0, 0.02, 0)], 0.016, 0.002, "e8dcc0", cls=STONE, bone=sn, seg=5, per=3)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # the hollow where a face should be is ringed by folds of hide drawn into it
 for k in range(4):
     rr = 0.32 + k * 0.06

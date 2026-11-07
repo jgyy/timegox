@@ -75,6 +75,7 @@ for s in (1, -1):
     # black ear tips
     tip = hf.at(0.085 * s, 0.07 + 0.14 * 1.35, -0.01)
     b.ellipsoid(tip + V(0, -0.02, 0), (0.018, 0.04, 0.008), "1a1418", cls=HAIR, bone="ear." + ("L" if s > 0 else "R"), seg=8, rings=5)
+b.cur_pal = 0.3  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # nine bushy tails: a core per tail wrapped in spiralling fur, the colour fading to a white tip,
 # a wisp of fox-fire at the end
 for k, pts in enumerate(tails):

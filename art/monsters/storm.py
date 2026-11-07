@@ -48,18 +48,21 @@ for k in range(26):
 for k in range(8):
     a = k / 8 * 2 * math.pi
     lobe(V(math.cos(a) * 1.15, Y + 1.0, math.sin(a) * 0.85), 0.32, 1.0)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # rain falling from the base in streaks
 for k in range(40):
     x = rnd.uniform(-0.8, 0.8)
     z = rnd.uniform(-0.5, 0.5)
     y0 = Y - 0.55 - rnd.uniform(0.0, 0.2)
     b.tube([V(x, y0, z), V(x - 0.04, y0 - 0.35, z)], [0.006, 0.002], (0.85, 0.9, 1.0), cls=CRYSTAL, bone="bolts", seg=3, tint=0.5, mat=MAT_PLAIN)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # face: a frowning brow of cloud and two glowing eyes
 b.tube([V(-0.4, Y + 0.35, 0.72), V(-0.1, Y + 0.25, 0.82), V(0.1, Y + 0.25, 0.82), V(0.4, Y + 0.35, 0.72)], [0.12, 0.14, 0.14, 0.12], (0.6, 0.6, 0.6), cls=CLOTH, bone="body", tint=1.0, seg=10)
 for s in (1, -1):
     b.ellipsoid(V(0.2 * s, Y + 0.12, 0.84), (0.11, 0.06, 0.04), "fffce0", cls=SKIN, bone="body", seg=12, rings=6, mat=MAT_GLOW)
     b.ellipsoid(V(0.2 * s, Y + 0.12, 0.82), (0.2, 0.12, 0.05), "a0c0ff", cls=SKIN, bone="body", seg=12, rings=6, mat=MAT_GLOW)
 b.ellipsoid(V(0, Y - 0.12, 0.84), (0.16, 0.05, 0.04), "1a1830", cls=SKIN, bone="body", seg=12, rings=6)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # cloud arms
 for s, sd in ((1, "L"), (-1, "R")):
     ar = r.bones["arm." + sd]

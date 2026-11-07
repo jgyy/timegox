@@ -100,6 +100,7 @@ for k in range(5):
     q = horn[0].lerp(horn[2], 0.15 + k * 0.17)
     b.tube([q + V(0, 0.004, 0), q - V(0, 0.004, 0)], [0.034 - k * 0.004] * 2, "c8b888", cls=STONE, bone="head", seg=10, cap0=False, cap1=False)
 b.ball(hf.at(0, 0.1, 0.06), 0.018, "80f0d0", cls=CRYSTAL, bone="head", seg=8, rings=6, mat=MAT_GLOW)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # mane: long locks from the crown down the crest of the neck to the withers
 for i in range(16):
     t = i / 15
@@ -107,11 +108,13 @@ for i in range(16):
     for sgn in (-1, 1):
         tip = root + V(0.1 * sgn, -0.12 - 0.06 * math.sin(t * math.pi), -0.12)
         strand(b, [root, root.lerp(tip, 0.5) + V(0.03 * sgn, 0.04, 0), tip], 0.03, 0.003, (0.5, 0.5, 0.5), col_tip=(0.95, 0.95, 0.95), cls=HAIR, bone=weights(root) if t > 0.2 else "head", flat=0.4, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # a beard of fine hair under the jaw
 for k in range(5):
     u = (k / 4 - 0.5)
     root = hf.at(u * 0.06, -0.09, 0.1)
     strand(b, [root, root + V(0, -0.06, 0.01), root + V(u * 0.03, -0.12, -0.01)], 0.012, 0.002, (0.85, 0.85, 0.85), cls=HAIR, bone="jaw", flat=0.4, seg=4, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # an ox's tail: a slender core ending in a long plume
 tp = [V(p) for p in TAIL]
 core = catmull(tp, 3)
@@ -122,6 +125,7 @@ for k in range(10):
     a = k / 10 * 2 * math.pi
     out = V(math.cos(a), 0, math.sin(a))
     strand(b, [end + V(0, 0.12, 0) + out * 0.02, end + out * 0.06, end + out * 0.05 + V(0, -0.18, 0)], 0.025, 0.003, (0.5, 0.5, 0.5), col_tip=(0.95, 0.95, 0.95), cls=HAIR, bone="tail3", flat=0.4, seg=5, per=3, tint=1.0, mat=MAT_PLAIN)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # an aura of auspicious cloud wisps curling round the hooves
 for k in range(6):
     a = k / 6 * 2 * math.pi

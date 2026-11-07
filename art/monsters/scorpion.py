@@ -52,12 +52,14 @@ for s in (1, -1):
 # mesosoma: seven tergites with a central keel, each overlapping the next
 meso = [V(0, 0.44, 0.0)] + [V(0, 0.445 + 0.006 * k, -0.06 - k * 0.075) for k in range(1, 8)]
 A.plate_segments(b, meso, [(0.27 - 0.008 * k, 0.1) for k in range(8)], (0.8, 0.8, 0.8), lambda p: "body", n=16, col2=(0.6, 0.6, 0.6), ridge=0.25, cls=SCALE)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # chelicerae and pectines underneath
 for s in (1, -1):
     b.ellipsoid(V(0.04 * s, 0.42, 0.46), (0.035, 0.03, 0.05), (0.55, 0.55, 0.55), cls=SCALE, bone="body", tint=1.0, seg=10, rings=6)
     b.cone(V(0.035 * s, 0.4, 0.52), 0.015, 0.05, "201010", cls=STONE, bone="body", rot=(math.pi / 2 + 0.3, 0, 0), seg=6)
     for k in range(8):
         b.tube([V(0.03 * s, 0.35, -0.05 - k * 0.02), V(0.12 * s, 0.33, -0.08 - k * 0.022)], [0.008, 0.003], (0.9, 0.9, 0.9), cls=SCALE, bone="body", tint=0.6, seg=4)
+b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # metasoma: five keeled tail segments, the joints dark, then the bulbous telson with its aculeus
 for i in range(5):
     a = TAIL[i]
@@ -70,6 +72,7 @@ b.ellipsoid(bulb, (0.1, 0.09, 0.13), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="tail4",
 b.ellipsoid(bulb + V(0, 0.02, 0), (0.105, 0.06, 0.12), (0.7, 0.7, 0.7), cls=SCALE, bone="tail4", tint=1.0, seg=14, rings=8)
 sting = [bulb + V(0, -0.05, 0.1), bulb + V(0, -0.12, 0.18), bulb + V(0, -0.22, 0.16), bulb + V(0, -0.27, 0.08)]
 strand(b, sting, 0.035, 0.002, "3a2020", col_tip="100808", cls=STONE, bone="tail4", seg=8, per=3)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # pedipalps: femur and patella, then the chela - a swollen hand with fixed and movable fingers
 # lined with denticles - and the walking legs, segmented with spurs
 for s, sd in ((1, "L"), (-1, "R")):

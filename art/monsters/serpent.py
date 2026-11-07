@@ -70,6 +70,7 @@ def scale_col(p, j, i):
 
 
 loft(b, rings, (0.8, 0.8, 0.8), cls=SCALE, col_fn=scale_col, bones=bones, tint=1.0, cap0=True, cap1=False, cap_push=0.8)
+b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # ventral scutes: wide pale bands across the belly, and a dorsal fin of membrane between spines
 prev_tip = None
 for i in range(2, n - 2):
@@ -87,6 +88,7 @@ for i in range(2, n - 2):
             r0, t0 = prev_tip
             b.sheet([[r0, t0], [root, tip]], (0.5, 0.5, 0.5), bones=[bones[i - 3], bones[i]], cols=[(0.55, 0.55, 0.55), (0.45, 0.45, 0.45)], tint=1.0, thickness=0.008)
         prev_tip = (root, tip)
+b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # head: a viper's wedge, broad behind the jaws, with brow scales over the eyes, nostrils, heat
 # pits, a lipline of scales and a forked tongue
 hc = PTS[-1]
@@ -121,6 +123,7 @@ fangs(b, [hf.at(0.045, -0.06, 0.2), hf.at(-0.045, -0.06, 0.2)], 0.09, "head")
 eyes(b, hf.at(0, 0.035, 0.1), 0.085, 0.032, iris="ffe040", slit=True, glow=True, bone="head", rot_y=0.95, h=0.9)
 for s in (1, -1):
     b.tube([hc + V(0.08 * s, 0.14, 0.05), hc + V(0.16 * s, 0.22, -0.12), hc + V(0.18 * s, 0.24, -0.32)], [0.035, 0.022, 0.004], "e8dcc0", cls=STONE, bone="head", seg=8)
+    b.cur_pal = 1.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
     # frill: ribbed membranes fanned behind the jaw
     for k in range(5):
         a = 0.25 + k * 0.3
