@@ -1,6 +1,8 @@
 """Phoenix / great bird (Ash Phoenix, Thunder Roc, Garden Crane, Jade Emperor of Ruin ...).
-A hovering bird with two-bone wings of layered feathers, a crest, a hooked beak, tucked talons and
-long trailing tail plumes on a three-bone chain.
+A hovering bird with a teardrop body under a coat of contour feathers, two-bone wings fanned with
+primaries, secondaries and two rows of coverts, a hackled neck, a hooked two-part beak with a
+cere, a bare eye ring and a plumed crest, scaled legs with jointed toes and hooked talons, and long
+eyed tail plumes on a three-bone chain.
 Run: blender --background --python art/monsters/phoenix.py  ->  assets/monsters/phoenix.glb"""
 import math
 import os
@@ -8,8 +10,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from creature import catmull, chain_weights, claws, eyes, zero_pose  # noqa: E402
-from kit import CLOTH, HAIR, METAL, V, Builder, Rig, env  # noqa: E402
+import anatomy as A  # noqa: E402
+from creature import catmull, chain_weights, eyes, zero_pose  # noqa: E402
+from kit import CLOTH, CRYSTAL, HAIR, MAT_GLOW, MAT_PLAIN, METAL, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
+from sculpt import morph_sphere, scatter, smooth, strand  # noqa: E402
 
 kit.reset()
 BODY = V(0, 1.45, 0)
@@ -30,49 +34,102 @@ for i in range(3):
     r.bone("tail%d" % i, TAIL[i], TAIL[i + 1], "body" if i == 0 else "tail%d" % (i - 1))
 
 b = Builder("phoenix")
-# body and breast
-b.ellipsoid(BODY, (0.22, 0.24, 0.36), (0.8, 0.8, 0.8), cls=CLOTH, bone="body", tint=1.0, seg=18, rings=12, col2=(1.0, 1.0, 1.0))
-b.ellipsoid(BODY + V(0, 0.02, 0.18), (0.17, 0.2, 0.18), (1.0, 1.0, 1.0), cls=CLOTH, bone={"body": 0.6, "neck": 0.4}, tint=0.75, seg=14, rings=8)
-# neck and head
-b.tube([BODY + V(0, 0.05, 0.2), BODY + V(0, 0.22, 0.3), BODY + V(0, 0.36, 0.38)], [0.12, 0.09, 0.085], (0.85, 0.85, 0.85), bones=[{"body": 0.5, "neck": 0.5}, "neck", {"neck": 0.4, "head": 0.6}], tint=1.0, seg=12)
+# body: a teardrop (full breast, tapering to the tail), paler underneath, then a coat of small
+# contour feathers laid back over it
+def body_shape(d):
+    p = V(d.x * 0.2, d.y * 0.22, d.z * 0.34)
+    if d.z < 0:
+        p.x *= 1.0 - 0.45 * smooth(0.0, 1.0, -d.z)
+        p.y *= 1.0 - 0.35 * smooth(0.0, 1.0, -d.z)
+    p.y += 0.05 * smooth(0.2, 1.0, d.z) * (1.0 if d.y < 0 else 0.3)   # deep keel of the breast
+    return p
+
+
+body_v = morph_sphere(b, BODY, body_shape, lambda p, d: (0.7 + 0.3 * smooth(0.3, -0.7, d.y),) * 3, cls=CLOTH, bone="body", seg=24, rings=16, tint_fn=lambda p, d: 1.0)
+for pos, nrm in scatter(b, body_v, 110, seed=4, min_dist=0.05):
+    g = V(0, -0.15, -1.0)
+    g = (g - nrm * g.dot(nrm)).normalized()
+    A.feather(b, pos - nrm * 0.005, pos + g * 0.11 + nrm * 0.02, 0.04, (0.72, 0.72, 0.72), col_tip=(0.98, 0.98, 0.98), side=g.cross(nrm), bone="body", tint=1.0, barbs=False, curl=0.15, mat=MAT_PLAIN)
+# neck: a loft ruffed with hackle feathers
+neck_pts = [BODY + V(0, 0.05, 0.2), BODY + V(0, 0.22, 0.3), BODY + V(0, 0.36, 0.38)]
+b.tube(neck_pts, [0.12, 0.09, 0.085], (0.85, 0.85, 0.85), bones=[{"body": 0.5, "neck": 0.5}, "neck", {"neck": 0.4, "head": 0.6}], tint=1.0, seg=14)
+for j in range(3):
+    c = neck_pts[0].lerp(neck_pts[2], 0.15 + j * 0.3)
+    for k in range(10):
+        a = k / 10 * 2 * math.pi
+        out = V(math.sin(a), 0.2, math.cos(a) * 0.8).normalized()
+        A.feather(b, c + out * 0.08, c + out * 0.13 + V(0, -0.12, -0.05), 0.035, (0.78, 0.78, 0.78), col_tip=(1, 1, 1), bone="neck", tint=1.0, barbs=False, curl=0.1, mat=MAT_PLAIN)
+# head: round skull, a hooked two-part beak with a cere, a bare eye ring and a plumed crest
 H = BODY + V(0, 0.4, 0.42)
-b.ellipsoid(H, (0.1, 0.1, 0.13), (0.9, 0.9, 0.9), bone="head", tint=1.0, seg=14, rings=10)
-b.cone(H + V(0, -0.01, 0.17), 0.045, 0.16, "f0c040", cls=METAL, bone="head", seg=10, rot=(math.pi / 2 + 0.2, 0, 0))
-b.cone(H + V(0, -0.035, 0.14), 0.03, 0.1, "d8a030", cls=METAL, bone="head", seg=8, rot=(math.pi / 2 + 0.5, 0, 0))
+morph_sphere(b, H, lambda d: V(d.x * 0.095, d.y * 0.1, d.z * 0.125) + V(0, 0, 0.012 * max(0.0, d.z)), lambda p, d: (0.88 + 0.1 * d.y,) * 3, cls=CLOTH, bone="head", seg=18, rings=12, tint_fn=lambda p, d: 1.0)
+b.ellipsoid(H + V(0, 0.005, 0.105), (0.045, 0.035, 0.03), "e8c060", cls=SKIN, bone="head", seg=10, rings=6)
+upper = [H + V(0, 0.01, 0.11), H + V(0, 0.0, 0.2), H + V(0, -0.03, 0.26), H + V(0, -0.075, 0.27)]
+strand(b, upper, 0.042, 0.004, "f0c040", col_tip="c08020", cls=METAL, bone="head", flat=0.8, seg=10, per=4, up=(1, 0, 0))
+lower = [H + V(0, -0.035, 0.1), H + V(0, -0.045, 0.18), H + V(0, -0.05, 0.22)]
+strand(b, lower, 0.03, 0.004, "d8a030", cls=METAL, bone="head", flat=0.6, seg=8, per=3, up=(1, 0, 0))
+for s in (1, -1):
+    b.ellipsoid(H + V(0.06 * s, 0.03, 0.06), (0.03, 0.03, 0.02), "e05030", cls=SKIN, bone="head", seg=10, rings=6, rot=(0, 0.9 * s, 0))
+    b.ellipsoid(H + V(0.022 * s, 0.015, 0.2), (0.006, 0.004, 0.008), "201008", cls=SKIN, bone="head", seg=6, rings=4, mat=MAT_PLAIN)
 eyes(b, H + V(0, 0.03, 0.07), 0.065, 0.026, iris="ff6020", bone="head", slit=False, glow=True, rot_y=0.9, h=0.9)
-# crest plumes sweeping back
-for k in range(5):
-    a = (k - 2) * 0.18
+for k in range(7):
+    a = (k - 3) * 0.16
     root = H + V(math.sin(a) * 0.05, 0.08, -0.02)
-    b.leaf(root, root + V(math.sin(a) * 0.15, 0.25 - abs(k - 2) * 0.04, -0.3), 0.045, (0.7, 0.7, 0.7), side=(1, 0, 0), cls=HAIR, bone="head", tint=1.0, col_tip=(1.0, 1.0, 1.0))
-    b.ball(root + V(math.sin(a) * 0.15, 0.25 - abs(k - 2) * 0.04, -0.3), 0.022, "fff0a0", cls=0.5, bone="head", seg=8, rings=5, mat=kit.MAT_GLOW)
-# wings: three rows of feathers along the two wing bones
+    tip = root + V(math.sin(a) * 0.16, 0.28 - abs(k - 3) * 0.035, -0.3)
+    A.feather(b, root, tip, 0.03, (0.7, 0.7, 0.7), col_tip=(1, 1, 1), side=(1, 0, 0), bone="head", tint=1.0, curl=0.2)
+    b.ball(tip, 0.02, "fff0a0", cls=CRYSTAL, bone="head", seg=8, rings=5, mat=MAT_GLOW)
+# wings: a covered arm, then rows of feathers - long primaries off the hand, secondaries along
+# the forearm, shorter coverts overlapping them - fanned like a real wing
 for s, sd in ((1, "L"), (-1, "R")):
     w1 = "wing.%s" % sd
     w2 = "wing2.%s" % sd
     sh, el, tp = r.head(w1), r.tail(w1), r.tail(w2)
-    b.tube([sh, el, tp], [0.07, 0.045, 0.015], (0.8, 0.8, 0.8), bones=[{"body": 0.3, w1: 0.7}, {w1: 0.5, w2: 0.5}, w2], tint=1.0, seg=8)
-    for row, (ln, shd) in enumerate(((0.55, 0.55), (0.42, 0.75), (0.28, 0.95))):
-        n = 12
+    b.tube([sh, sh.lerp(el, 0.5) + V(0, 0.02, 0), el, el.lerp(tp, 0.5), tp], [0.08, 0.065, 0.05, 0.035, 0.015], (0.8, 0.8, 0.8), bones=[{"body": 0.3, w1: 0.7}, w1, {w1: 0.5, w2: 0.5}, w2, w2], tint=1.0, seg=10)
+    rows = (("primary", 10, 0.75, 0.62, 0.0), ("secondary", 12, 0.48, 0.72, 0.02), ("covert", 14, 0.28, 0.88, 0.035), ("lesser", 14, 0.15, 0.95, 0.05))
+    for name, n, ln, shd, lift in rows:
         for k in range(n):
             u = k / (n - 1)
-            base = sh.lerp(el, u * 2) if u < 0.5 else el.lerp(tp, (u - 0.5) * 2)
-            bone = w1 if u < 0.42 else (w2 if u > 0.58 else {w1: 0.5, w2: 0.5})
-            length = ln * (0.7 + 0.6 * u) * (1.0 - 0.25 * row)
-            tipp = base + V(0.12 * s * u, -0.04 - row * 0.02, -length)
-            b.leaf(base + V(0, 0.01 * row, -0.02 * row), tipp, 0.06 + 0.02 * u, (shd * 0.75, shd * 0.75, shd * 0.75), side=(1, 0, 0), cls=HAIR, bone=bone, tint=1.0, col_tip=(1.0, 1.0, 1.0) if row == 0 else (shd, shd, shd), curl=0.06)
-    # talons
+            if name == "primary":
+                base = el.lerp(tp, 0.2 + 0.8 * u)
+                bone = w2
+                d = V(0.55 * s * u + 0.05 * s, -0.08, -1.0 + 0.6 * u).normalized()
+                length = ln * (0.8 + 0.4 * u)
+            else:
+                base = sh.lerp(el, u) if u < 0.75 else el.lerp(tp, (u - 0.75) * 1.6)
+                bone = w1 if u < 0.7 else {w1: 0.5, w2: 0.5}
+                d = V(0.15 * s * u, -0.06, -1.0).normalized()
+                length = ln * (0.75 + 0.35 * u)
+            tipp = base + d * length + V(0, lift, 0)
+            col = (shd * 0.8,) * 3
+            A.feather(b, base + V(0, lift, 0), tipp, (0.06 if name != "lesser" else 0.04) + 0.015 * u, col, col_tip=(1.0, 1.0, 1.0) if name == "primary" else (shd,) * 3, side=V(1, 0, 0), bone=bone, tint=1.0, curl=0.06, barbs=name == "primary")
+    # legs: feathered thighs, scaled shanks, three toes forward and one back, hooked talons
     lg = "leg.%s" % sd
-    b.tube([r.head(lg), r.tail(lg)], [0.04, 0.02], "c89030", cls=METAL, bone=lg, seg=8)
-    claws(b, r.tail(lg) + V(0, -0.02, 0.03), True, lg, n=3, spread=0.03, length=0.08, col="403020")
-# tail plumes: long ribbons with glowing eye spots at their tips
+    top, ank = r.head(lg), r.tail(lg)
+    for k in range(5):
+        a = k / 5 * 2 * math.pi
+        out = V(math.sin(a), 0, math.cos(a))
+        A.feather(b, top + out * 0.04, top + out * 0.06 + V(0, -0.14, -0.02), 0.03, (0.8, 0.8, 0.8), col_tip=(1, 1, 1), bone=lg, tint=1.0, barbs=False, mat=MAT_PLAIN)
+    shank = [top.lerp(ank, t) for t in (0.4, 0.7, 1.0)]
+    b.tube(shank, [0.022, 0.02, 0.018], "c89030", cls=SCALE, bone=lg, seg=8)
+    for k in range(4):
+        q = top.lerp(ank, 0.45 + k * 0.15)
+        b.tube([q + V(0, 0.004, 0), q - V(0, 0.004, 0)], [0.024, 0.024], "a87020", cls=SCALE, bone=lg, seg=8, cap0=False, cap1=False)
+    for k in range(4):
+        a = (k - 1) * 0.45 if k < 3 else math.pi
+        d = V(math.sin(a), -0.3, math.cos(a)).normalized()
+        t1 = ank + d * 0.05
+        t2 = t1 + d * 0.035 + V(0, -0.01, 0)
+        b.tube([ank, t1, t2], [0.014, 0.011, 0.009], "c89030", cls=SCALE, bone=lg, seg=6)
+        strand(b, [t2, t2 + d * 0.02 + V(0, 0.006, 0), t2 + d * 0.035 - V(0, 0.025, 0)], 0.008, 0.001, "403020", cls=STONE, bone=lg, seg=5, per=3)
+# tail plumes: long feathers on the tail chain, each ending in a glowing eye spot
 pts, idx = catmull(TAIL, per=4)
-for k in range(7):
-    a = (k - 3) * 0.16
-    pp = [p + V(math.sin(a) * (0.05 + 0.4 * f / 3), 0.02 * abs(k - 3), 0) for p, f in zip(pts, idx)]
-    ws = [0.03 + 0.05 * (f / 3) for f in idx]
+for k in range(9):
+    a = (k - 4) * 0.13
+    pp = [p + V(math.sin(a) * (0.05 + 0.45 * f / 3), 0.02 * abs(k - 4), 0) for p, f in zip(pts, idx)]
+    ws = [0.025 + 0.045 * (f / 3) for f in idx]
     b.ribbon(pp, ws, (1, 0, 0) if abs(a) < 0.2 else (math.cos(a), 0, -math.sin(a) * 0.3), (0.8, 0.8, 0.8), cls=HAIR, bones=[chain_weights("tail", f, 3) for f in idx], tint=1.0, col_end=(1.0, 1.0, 1.0))
-    b.ellipsoid(pp[-1] + V(0, 0.01, 0.05), (0.05, 0.015, 0.06), "fff4b0", cls=0.5, bone="tail2", seg=10, rings=5, mat=kit.MAT_GLOW)
+    b.tube(pp, [0.006] * len(pp), (0.95, 0.95, 0.95), cls=HAIR, bones=[chain_weights("tail", f, 3) for f in idx], tint=0.5, seg=4)
+    b.ellipsoid(pp[-1] + V(0, 0.01, 0.05), (0.055, 0.014, 0.065), "fff4b0", cls=CRYSTAL, bone="tail2", seg=10, rings=5, mat=MAT_GLOW)
+    b.ellipsoid(pp[-1] + V(0, 0.016, 0.05), (0.025, 0.01, 0.03), "ff6030", cls=CRYSTAL, bone="tail2", seg=8, rings=4, mat=MAT_GLOW)
 
 FLAP = 1.0
 

@@ -1,6 +1,6 @@
 """Fox: the nine-tailed fox spirit of the Maple Gorge (Part VI) and the Hounds of the Ten Courts.
-A slender skin-modifier body on long legs, a narrow muzzle, tall ears, cheek ruffs and a white
-bib, and nine bushy tails fanned behind it, each tipped in white with a wisp of fox-fire.  Every
+A slender body from art/lib/anatomy.py on long dark-stockinged legs, a long narrow muzzle, tall
+black-tipped ears, white cheek ruffs and bib, a groomed coat, and nine bushy tails fanned behind it, each tipped in white with a wisp of fox-fire.  Every
 tail is its own three-bone chain, so the fan ripples like flames.  Tinted by the game per enemy;
 the white tips, bib and fox-fire keep their own colours.
 Run: blender --background --python art/monsters/fox.py  ->  assets/monsters/fox.glb"""
@@ -10,8 +10,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
-from creature import claws, eyes, fangs, glow_ball, leg_nodes, quad_rig, shade_fn, skin_graph, weights_for, zero_pose  # noqa: E402
-from kit import CLOTH, HAIR, SKIN, V, Builder, Rig, env  # noqa: E402
+import anatomy as A  # noqa: E402
+from creature import glow_ball, quad_rig, weights_for, zero_pose  # noqa: E402
+from kit import HAIR, MAT_PLAIN, V, Builder, env  # noqa: E402
+from sculpt import catmull, smooth, strand  # noqa: E402
 
 kit.reset()
 BY = 0.78
@@ -37,65 +39,64 @@ for k in range(N_TAILS):
     extra.append(("ft%d_0" % k, base, p1, "pelvis"))
     extra.append(("ft%d_1" % k, p1, p2, "ft%d_0" % k))
     extra.append(("ft%d_2" % k, p2, p3, "ft%d_1" % k))
-r = quad_rig(BY, 0.38, -0.42, 0.15, (0, 1.06, 0.62), (0, 1.1, 0.98), [(0, 0.86, -0.5), (0, 0.9, -0.6)], extra=extra)
+r = quad_rig(BY, 0.36, -0.4, 0.1, (0, 1.04, 0.58), (0, 1.04, 0.96), [(0, 0.86, -0.5), (0, 0.9, -0.6)], extra=extra)
 b = Builder("fox")
-b.auto = weights_for(r, [n for n in r.bones if not n.startswith("ear") and not n.startswith("ft") and n not in ("jaw", "root", "tail0")])
+body_bones = [n for n in r.bones if not n.startswith("ear") and not n.startswith("ft") and n not in ("jaw", "root", "tail0") and "_paw" not in n and "_lo" not in n]
+weights = weights_for(r, body_bones, sharp=3.0, k=3)
 
-
-def spine_y(p):
-    return BY + 0.05 + 0.22 * max(0.0, p.z - 0.4)
-
-
-shade = shade_fn(spine_y, back=0.62, side=0.8, belly=1.08)
-spine = [((0, 0.84, -0.5), 0.12), ((0, 0.82, -0.3), (0.2, 0.21)), ((0, 0.82, -0.05), (0.2, 0.2)), ((0, 0.88, 0.25), (0.24, 0.26)), ((0, 0.96, 0.46), (0.2, 0.21)), ((0, 1.06, 0.64), (0.13, 0.14)), ((0, 1.1, 0.8), (0.13, 0.12)), ((0, 1.05, 0.98), (0.07, 0.065)), ((0, 1.02, 1.1), (0.04, 0.035))]
-chains = [(spine, None)]
-for nm, att in (("f", 3), ("h", 1)):
-    for sd in ("L", "R"):
-        rad = (0.085, 0.045, 0.028, 0.035) if nm == "f" else (0.11, 0.05, 0.028, 0.035)
-        chains.append((leg_nodes(r, nm, sd, rad), att))
-nodes, edges = skin_graph(chains)
-b.skin(nodes, edges, shade, cls=CLOTH, subdiv=2, tint_fn=lambda p: 1.0)
-
-# white bib on the chest and throat, white cheeks
-b.ellipsoid(V(0, 0.98, 0.52), (0.13, 0.17, 0.1), "f4f0ea", cls=HAIR, bone="chest", seg=14, rings=8)
-for i in range(8):
-    a = (i / 7 - 0.5) * 2.2
-    root = V(math.sin(a) * 0.1, 0.92 - abs(a) * 0.02, 0.55)
-    b.leaf(root, root + V(math.sin(a) * 0.05, -0.16, 0.06), 0.05, "f4f0ea", side=(math.cos(a), 0, -math.sin(a)), cls=HAIR, col_tip="ffffff")
-# narrow muzzle, black nose, jaw
-b.tube([V(0, 1.08, 0.88), V(0, 1.05, 1.02), V(0, 1.02, 1.14)], [(0.07, 0.06), (0.05, 0.045), (0.025, 0.022)], (0.95, 0.95, 0.95), bone="head", tint=1.0, seg=12)
-b.ellipsoid(V(0, 1.03, 1.15), (0.022, 0.018, 0.018), "141014", cls=SKIN, bone="head", seg=10, rings=6)
-b.ellipsoid(V(0, 0.99, 1.0), (0.045, 0.022, 0.1), "f4f0ea", cls=HAIR, bone="jaw", seg=10, rings=6)
-fangs(b, [V(0.025, 1.0, 1.08), V(-0.025, 1.0, 1.08)], 0.04, "head")
-eyes(b, V(0, 1.14, 0.92), 0.06, 0.03, iris="ffb020", slit=True, glow=True, rot_y=0.6, h=0.8)
-# cheek ruffs
-for s in (1, -1):
-    for k in range(4):
-        root = V(0.09 * s, 1.07 - k * 0.025, 0.86 - k * 0.02)
-        b.leaf(root, root + V(0.12 * s, -0.04 - k * 0.02, -0.06), 0.045, (0.85, 0.85, 0.85), side=(0, 1, 0), cls=HAIR, tint=1.0, col_tip="ffffff")
-    # tall ears with dark backs and pale insides
-    b.cone(V(0.11 * s, 1.3, 0.8), 0.07, 0.26, (0.6, 0.6, 0.6), bone="ear." + ("L" if s > 0 else "R"), tint=1.0, seg=8, rot=(-0.1, 0, -0.18 * s))
-    b.cone(V(0.11 * s, 1.29, 0.815), 0.045, 0.19, "f8e0d8", cls=SKIN, bone="ear." + ("L" if s > 0 else "R"), seg=8, rot=(-0.1, 0, -0.18 * s))
-    b.cone(V(0.11 * s, 1.41, 0.795), 0.03, 0.06, "1a1418", cls=HAIR, bone="ear." + ("L" if s > 0 else "R"), seg=6, rot=(-0.1, 0, -0.18 * s))
-# dark socks on the legs
+# a slender, light-boned body: shallow tuck, long legs, narrow chest
+sp = A.QuadSpec(hip_w=0.15, chest_w=0.14, chest_d=0.26, waist_d=0.14, waist_w=0.11, back_h=0.1, withers=0.03, neck_r=0.1, shade=(0.6, 1.05), seed=5)
+torso, spine_y = A.quad_body(b, r, sp, weights)
+legs = {}
 for nm in ("f", "h"):
     for sd in ("L", "R"):
-        lo = r.bones["%s_lo.%s" % (nm, sd)]
-        pw = r.bones["%s_paw.%s" % (nm, sd)]
-        b.tube([V(lo[0]).lerp(V(lo[1]), 0.4), V(lo[1]), V(pw[1])], [0.033, 0.032, 0.036], "2a2024", cls=HAIR, bones=["%s_lo.%s" % (nm, sd), "%s_lo.%s" % (nm, sd), "%s_paw.%s" % (nm, sd)], seg=8)
-        claws(b, V(pw[1]) + V(0, 0.0, 0.02), True, "%s_paw.%s" % (nm, sd), length=0.04)
-# nine bushy tails: a fat tube per tail with fur locks along it, a white tip and a wisp of fox-fire
+        # dark "stockings" on the lower legs keep their own colour
+        legs[nm + sd] = A.quad_leg(b, r, nm, sd, sp, spine_y, thick=0.8 if nm == "f" else 0.9)
+for v in b.bm.verts:
+    p = kit.b2g(v.co)
+    if p.y < 0.36 and abs(p.x) > 0.04:
+        k = smooth(0.36, 0.22, p.y)
+        c = v[b.cl]
+        v[b.cl] = (c[0] * (1 - 0.85 * k) + 0.02 * k, c[1] * (1 - 0.85 * k) + 0.015 * k, c[2] * (1 - 0.85 * k) + 0.02 * k, c[3])
+        v[b.tl] = v[b.tl] * (1.0 - k)
+hv = (V(0, 1.04, 0.96) - V(0, 1.04, 0.58)).normalized()
+hf = A.HeadFrame(V(0, 1.06, 0.66), hv + V(0, -0.1, 0))
+A.canine_head(b, hf, 1.0, eye_col="ffb020", long=1.25, ear_len=1.35, ruff=False)
+A.fur(b, torso, 280, 0.06, 0.024, seed=9, bone_fn=weights, min_dist=0.03, col_root=(0.6, 0.6, 0.6), col_tip=(0.92, 0.92, 0.92))
+# white bib on the chest and throat and white cheek ruffs (untinted)
+for i in range(14):
+    a = (i / 13 - 0.5) * 2.4
+    root = V(math.sin(a) * 0.09, 0.98 - abs(a) * 0.03, 0.5 + math.cos(a) * 0.04)
+    strand(b, [root, root + V(math.sin(a) * 0.03, -0.08, 0.04), root + V(math.sin(a) * 0.04, -0.17, 0.02)], 0.03, 0.003, "f4f0ea", col_tip="ffffff", cls=HAIR, bone="chest", flat=0.4, seg=5, per=3, mat=MAT_PLAIN)
+for s in (1, -1):
+    for k in range(5):
+        root = hf.at(0.07 * s, -0.03 - k * 0.012, 0.02 - k * 0.015)
+        strand(b, [root, root + hf.M @ V(0.06 * s, -0.015, -0.03), root + hf.M @ V(0.1 * s, -0.04 - k * 0.01, -0.06)], 0.022, 0.002, "f4f0ea", col_tip="ffffff", cls=HAIR, bone="head", flat=0.4, seg=5, per=3, mat=MAT_PLAIN)
+    # black ear tips
+    tip = hf.at(0.085 * s, 0.07 + 0.14 * 1.35, -0.01)
+    b.ellipsoid(tip + V(0, -0.02, 0), (0.018, 0.04, 0.008), "1a1418", cls=HAIR, bone="ear." + ("L" if s > 0 else "R"), seg=8, rings=5)
+# nine bushy tails: a core per tail wrapped in spiralling fur, the colour fading to a white tip,
+# a wisp of fox-fire at the end
 for k, pts in enumerate(tails):
-    bones = ["ft%d_0" % k, "ft%d_1" % k, "ft%d_1" % k, "ft%d_2" % k, "ft%d_2" % k]
-    path = [pts[0], pts[1], pts[1].lerp(pts[2], 0.5), pts[2], pts[3]]
-    # body colour fading into a white tip along the tube (the tip is not tinted)
-    b.tube(path, [0.06, 0.13, 0.16, 0.13, 0.05], (0.8, 0.8, 0.8), bones=bones, tint=1.0, seg=12, cls=HAIR,
-           cols=[(0.75, 0.75, 0.75), (0.8, 0.8, 0.8), (0.85, 0.85, 0.85), (0.96, 0.95, 0.93), (1.0, 0.99, 0.97)], tints=[1.0, 1.0, 1.0, 0.25, 0.0])
-    for j in range(5):
-        t = 0.2 + j * 0.16
-        q = pts[1].lerp(pts[2], t) if t < 1 else pts[2]
-        side = (pts[2] - pts[1]).cross(V(0, 1, 0)).normalized()
-        b.leaf(q, q + (pts[2] - pts[1]).normalized() * 0.22 + side * 0.1, 0.09, (0.75, 0.75, 0.75), side=side, cls=HAIR, bone="ft%d_1" % k, tint=1.0, col_tip=(0.95, 0.95, 0.95))
+    core = catmull(pts, 3)
+    m = len(core)
+    tb = ["ft%d_%d" % (k, min(2, int(i / (m - 1) * 2.999))) for i in range(m)]
+    radii = [0.04 + 0.08 * math.sin(math.pi * min(1.0, i / (m - 1) * 1.15)) for i in range(m)]
+    white = [smooth(0.62, 0.9, i / (m - 1)) for i in range(m)]
+    b.tube(core, radii, (0.8, 0.8, 0.8), bones=tb, seg=12, cls=HAIR, cols=[(0.8 + 0.2 * w,) * 3 for w in white], tints=[1.0 - w for w in white])
+    for i in range(1, m - 1):
+        d = (core[i + 1] - core[i - 1]).normalized()
+        side = d.cross(V(0, 1, 0))
+        side = side.normalized() if side.length > 1e-4 else V(1, 0, 0)
+        up = side.cross(d).normalized()
+        for j in range(5):
+            a = j / 5 * 2 * math.pi + i * 0.9 + k
+            out = side * math.cos(a) + up * math.sin(a)
+            root = core[i] + out * radii[i] * 0.8
+            ln = 0.09 + 0.05 * math.sin(math.pi * i / m)
+            w = white[i]
+            c = (0.7 + 0.3 * w,) * 3
+            strand(b, [root, root + out * ln * 0.45 + d * ln * 0.5, root + out * ln * 0.3 + d * ln * 1.1], 0.03, 0.003, c, col_tip=(0.95,) * 3, cls=HAIR, bone=tb[i], flat=0.4, seg=5, per=2, tint=1.0 - w, mat=MAT_PLAIN)
     glow_ball(b, pts[3] + (pts[3] - pts[2]).normalized() * 0.08, 0.045, "ffb860", "ft%d_2" % k)
 
 T_IDLE = 3.0

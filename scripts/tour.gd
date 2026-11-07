@@ -35,7 +35,7 @@ func _shot(n: String) -> void:
 	print("[tour] ", n)
 
 ## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
-func _gallery(n: String, models: Array, spacing: float) -> void:
+func _gallery(n: String, models: Array, spacing: float, yaw: float = 0.35) -> void:
 	main.world.hide()
 	var stage := Node3D.new()
 	stage.position = Vector3(0, 400, 0)
@@ -59,7 +59,7 @@ func _gallery(n: String, models: Array, spacing: float) -> void:
 	for i in models.size():
 		var m: Node3D = models[i]
 		m.position = Vector3((i - (models.size() - 1) * 0.5) * w, 0.0, 0.0)
-		m.rotation.y = 0.35 * (1 if i % 2 == 0 else -1)
+		m.rotation.y = yaw * (1 if i % 2 == 0 else -1)
 		stage.add_child(m)
 		m.add_child(Models.shadow_disc(0.8))
 	var span := models.size() * w
@@ -233,6 +233,19 @@ func _run() -> void:
 	main.set_stack(["world"])
 	main.world.load_area("sect", Vector2i(20, 9))
 	main.world.banner_t = 0.0
+	if main.args.has("show"):
+		# a quick look at chosen models (developer tool): --show=beast,fox,yue_ling
+		var cols := [Color("7aa860"), Color("d0602a"), Color("3a8ad8"), Color("c8a040"), Color("9a6ad0"), Color("40b0a0")]
+		var picks: PackedStringArray = str(main.args.show).split(",", false)
+		for pass_i in 2:
+			var ms: Array = []
+			for i in picks.size():
+				var id: String = picks[i]
+				ms.append(Assets.person(id) if Assets.PEOPLE.has(id) else Models.monster(id, cols[i % cols.size()]))
+			if pass_i == 0:
+				await _gallery("show", ms, 1.3, 1.25)
+			else:
+				await _portraits("show_close", ms, 1.9, 1.0, 4.6)
 	if main.args.has("gallery") or not main.args.has("no-extras"):
 		await _gallery("gallery_people", [
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
