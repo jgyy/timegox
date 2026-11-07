@@ -289,6 +289,11 @@ static func _town(grid: PackedByteArray, w: int, h: int) -> void:
 	_rect(grid, w, 7, 12, 7, 13, PATH)         # alchemist's door
 	_rect(grid, w, 32, 12, 32, 13, PATH)       # smithy door
 	_rect(grid, w, 31, 14, 31, 14, PATH)       # library door
+	_rect(grid, w, 1, 6, 7, 6, PATH)           # kitchen door, round the pharmacy to the west road
+	_rect(grid, w, 1, 6, 1, 13, PATH)
+	_rect(grid, w, 33, 6, 38, 6, PATH)         # training hall door, round the smithy to the east road
+	_rect(grid, w, 38, 6, 38, 13, PATH)
+	_rect(grid, w, 7, 14, 7, 14, PATH)         # dormitory door
 	for py in range(16, 23):                   # lotus pond (an oval, not a box)
 		for px in range(14, 27):
 			var ex := (px - 20.0) / 5.6

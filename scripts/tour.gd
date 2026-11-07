@@ -141,6 +141,27 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 	stage.add_child(m)
 	m.add_child(Models.shadow_disc(0.8))
 	var t0 := 0.0
+	if main.args.has("clip"):
+		# a strip of frames through one clip, seen from the side (--clip=run [--frames=6])
+		var clip := str(main.args.clip)
+		var ap: AnimationPlayer = m.get_meta("ap", null)
+		var frames := int(main.args.get("frames", "6"))
+		if ap != null and ap.has_animation(clip):
+			var ln: float = ap.get_animation(clip).length
+			m.rotation.y = float(main.args.get("yaw", str(PI * 0.5)))
+			var aim2 := Vector3(0, height * 0.5, 0)
+			cam.position = aim2 + Vector3(0, height * 0.1, height * 2.4)
+			cam.look_at(stage.global_position + aim2, Vector3.UP)
+			cam.make_current()
+			ap.play(clip)
+			for f in frames:
+				ap.seek(ln * f / float(frames), true)
+				await get_tree().process_frame
+				await get_tree().process_frame
+				await _shot("clip_%s_%s_%d" % [id, clip, f])
+		stage.queue_free()
+		main.world.show()
+		return
 	var views := [["front", 0.0, false], ["three", 0.65, false], ["side", PI * 0.5, false], ["back", PI, false], ["face", 0.3, true]]
 	for v in views:
 		m.rotation.y = v[1]

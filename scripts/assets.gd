@@ -52,6 +52,11 @@ const PEOPLE := {
 	# Part VIII
 	"niu_lang": "characters/niu_lang", "que_lao": "characters/que_lao", "zhi_nu": "characters/zhi_nu",
 	"dong_shuang": "characters/dong_shuang",
+	# townsfolk of the sect and Qingshi Village
+	"disciple_han": "characters/disciple_han", "disciple_mei": "characters/disciple_mei", "cook_zhou": "characters/cook_zhou",
+	"sweeper_bai": "characters/sweeper_bai", "gate_wu": "characters/gate_wu", "bell_shen": "characters/bell_shen",
+	"farmer_lao": "characters/farmer_lao", "child_hua": "characters/child_hua", "tofu_sun": "characters/tofu_sun",
+	"scholar_wang": "characters/scholar_wang", "carpenter_gu": "characters/carpenter_gu", "herb_lan": "characters/herb_lan",
 }
 
 static var _scenes := {}

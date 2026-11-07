@@ -24,6 +24,14 @@ const STYLES := {
 	"house": {"roof": "5a4a3a", "roof2": "463a2e", "column": "6a4a30", "wall": "e8dcc0", "beam": "6a5a40", "trim": "b89850", "double": false},
 	"inn": {"roof": "7a3a2a", "roof2": "5a2a20", "column": "8a3020", "wall": "f0e4c8", "beam": "4a6a5a", "trim": "e0b850", "double": false},
 	"shrine": {"roof": "6a2a2a", "roof2": "4a1e1e", "column": "b83a2a", "wall": "f0e0c0", "beam": "2a6a5a", "trim": "f0c850", "double": true},
+	# town buildings (references: Hui-style architecture of Xidi and Hongcun, white walls and black
+	# tiles with stepped "horse-head" fire walls; Jiangnan water-town shop-houses; thatched farms)
+	"huizhou": {"roof": "3a3c44", "roof2": "2a2c34", "column": "3a2e28", "wall": "f4f2ec", "beam": "4a4a50", "trim": "c8c0b0", "double": false, "kind": "gable", "horsehead": true},
+	"farmhouse": {"roof": "b89a58", "roof2": "9a7e40", "column": "6a4a2e", "wall": "cdb48a", "beam": "6a4a30", "trim": "a88a50", "double": false, "kind": "thatch"},
+	"teahouse": {"roof": "3a5a4a", "roof2": "2a4436", "column": "9a3a2a", "wall": "f0e6cc", "beam": "3a6a5a", "trim": "e0b850", "double": true, "balcony": true},
+	"shop": {"roof": "6a4a3a", "roof2": "4a3428", "column": "7a3a24", "wall": "eadcc0", "beam": "5a4a3a", "trim": "d8a840", "double": false, "kind": "gable", "awning": "c8402a"},
+	"dorm": {"roof": "4a4a54", "roof2": "3a3a44", "column": "7a3a2a", "wall": "ece4d0", "beam": "3a5a7a", "trim": "c8a850", "double": false, "kind": "gable"},
+	"kitchen": {"roof": "5a5048", "roof2": "463e38", "column": "6a3a28", "wall": "e4d8bc", "beam": "6a5040", "trim": "c09048", "double": false, "kind": "gable", "chimney": true},
 }
 
 static func _c(hex: String) -> Color:
@@ -808,12 +816,74 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		_dougong(roof, (c2 as Vector3) + Vector3(0, top + 0.2, 0), trim, beam, column)
 	var hx := (x1 - x0) * 0.5
 	var hz := (z1 - z0) * 0.5
-	if st.double:
+	var kind: String = st.get("kind", "hip")
+	if kind == "gable" or kind == "thatch":
+		# a gabled roof with its ridge along the long side
+		var along := hx >= hz
+		var rise := 1.3 + minf(hx, hz) * 0.22
+		var rc := MB.tag(_c(st.roof), MB.WOOD if kind == "thatch" else MB.STONE)
+		var tmp := MB.new()
+		_gable(tmp, Vector3.ZERO, (hx if along else hz) + 0.5, (hz if along else hx) + 0.55, rise, rc, kind == "thatch")
+		var xf := Transform3D(Basis.IDENTITY if along else Basis(Vector3.UP, PI * 0.5), Vector3(cx, ry, cz))
+		roof.merge(tmp, xf)
+		# gable ends filled with wall
+		for s5: float in [-1.0, 1.0]:
+			var gt := MB.new()
+			for k in 6:
+				var f := (k + 0.5) / 6.0
+				var wv := (hz if along else hx) * (1.0 - f)
+				gt.box(Vector3(0, rise * f * 0.98 - rise / 12.0, 0), Vector3(0.24, rise / 6.0 + 0.02, wv * 2.0), wall)
+			roof.merge(gt, Transform3D(Basis.IDENTITY if along else Basis(Vector3.UP, PI * 0.5), Vector3(cx, ry, cz) + (Vector3(s5 * hx, 0, 0) if along else Vector3(0, 0, s5 * hz))))
+		if st.get("horsehead", false):
+			# stepped fire walls rising above the roof at both gable ends, capped with tiles and
+			# ending in upturned "horse heads"
+			var cap := MB.tag(_c(st.roof2), MB.STONE)
+			for s6: float in [-1.0, 1.0]:
+				var hw := MB.new()
+				var half := (hz if along else hx) + 0.55
+				for tier in 3:
+					var w2 := half * (1.0 - tier / 3.0)
+					var y_top := rise * (0.45 + 0.32 * tier) + 0.55
+					for sd: float in [-1.0, 1.0]:
+						var z_in := w2 - half / 3.0
+						var mid := sd * (z_in + w2) * 0.5
+						var len_ := w2 - z_in
+						hw.box(Vector3(0, y_top * 0.5, mid), Vector3(0.36, y_top, len_ + 0.02), wall)
+						hw.box(Vector3(0, y_top + 0.06, mid), Vector3(0.5, 0.12, len_ + 0.18), cap)
+						hw.box(Vector3(0, y_top + 0.16, sd * (w2 + 0.04)), Vector3(0.42, 0.14, 0.2), cap)
+				roof.merge(hw, Transform3D(Basis.IDENTITY if along else Basis(Vector3.UP, PI * 0.5), Vector3(cx, ry - 0.1, cz) + (Vector3(s6 * (hx + 0.32), 0, 0) if along else Vector3(0, 0, s6 * (hz + 0.32)))))
+		if st.get("chimney", false):
+			var chp := Vector3(cx + (hx * 0.55 if along else 0.0), ry, cz + (0.0 if along else hz * 0.55))
+			roof.box(chp + Vector3(0, rise * 0.6, 0), Vector3(0.6, rise * 1.2 + 0.6, 0.6), MB.tag(Color("8a7a6a"), MB.STONE))
+			roof_g.ball(chp + Vector3(0, rise * 1.25 + 0.4, 0), 0.3, Color(0.85, 0.85, 0.9, 0.18), true)
+	elif st.double:
 		hip_roof(roof, roof_g, Vector3(cx, ry + 0.2, cz), hx + 0.45, hz + 0.5, 0.9, 0.55, st, false)
 		roof.box(Vector3(cx, ry + 0.75, cz), Vector3(x1 - x0 - 0.8, 0.9, z1 - z0 - 0.6), wall)
 		hip_roof(roof, roof_g, Vector3(cx, ry + 1.25, cz), hx - 0.2, hz - 0.1, 0.95, 1.8, st)
+		if st.get("balcony", false):
+			# a gallery round the upper storey: a rail on posts just inside the lower eave
+			for s7: float in [-1.0, 1.0]:
+				roof.box(Vector3(cx, ry + 0.95, cz + s7 * (hz - 0.05)), Vector3(x1 - x0 - 0.5, 0.06, 0.06), column)
+				roof.box(Vector3(cx + s7 * (hx - 0.05), ry + 0.95, cz), Vector3(0.06, 0.06, z1 - z0 - 0.5), column)
+				for k2 in int((x1 - x0) / 0.6):
+					roof.box(Vector3(x0 + 0.3 + k2 * 0.6, ry + 0.75, cz + s7 * (hz - 0.05)), Vector3(0.04, 0.4, 0.04), column)
 	else:
 		hip_roof(roof, roof_g, Vector3(cx, ry + 0.1, cz), hx + 0.4, hz + 0.45, 0.95, 1.6 + minf(hx, hz) * 0.15, st)
+	if st.has("awning"):
+		# a cloth awning over the shop front and a tall signboard by the door
+		var horiz2 := absf(door.z - z0) < T * 0.6 or absf(door.z - z1) < T * 0.6
+		var out_v := (Vector3(0, 0, -1) if absf(door.z - z0) < T * 0.6 else Vector3(0, 0, 1)) if horiz2 else (Vector3(-1, 0, 0) if absf(door.x - x0) < T * 0.6 else Vector3(1, 0, 0))
+		var aw := MB.tag(_c(st.awning), MB.CLOTH)
+		var ac := Vector3(door.x, ph + 2.25, door.z) + out_v * 0.75
+		b.box(ac, Vector3(3.2, 0.06, 1.4) if horiz2 else Vector3(1.4, 0.06, 3.2), aw)
+		for k3 in 5:
+			var off2 := (k3 - 2) * 0.7
+			b.box(ac + out_v * 0.72 + (Vector3(off2, -0.12, 0) if horiz2 else Vector3(0, -0.12, off2)), Vector3(0.62, 0.22, 0.04) if horiz2 else Vector3(0.04, 0.22, 0.62), MB.tag(_c(st.awning).lightened(0.25 if k3 % 2 else 0.0), MB.CLOTH))
+		var sp := Vector3(door.x, 0, door.z) + out_v * 1.45 + (Vector3(1.9, 0, 0) if horiz2 else Vector3(0, 0, 1.9))
+		b.cyl(sp + Vector3(0, 1.7, 0), 0.06, 3.4, column, Vector3.ZERO, 8)
+		b.box(sp + Vector3(0, 2.3, 0) + (Vector3(0.0, 0, 0)), Vector3(0.5, 1.6, 0.06) if horiz2 else Vector3(0.06, 1.6, 0.5), MB.tag(Color("f0e2c0"), MB.CLOTH))
+		for k4 in 4:
+			b.box(sp + Vector3(0, 2.85 - k4 * 0.36, 0) + out_v * 0.04, Vector3(0.26, 0.2, 0.05) if horiz2 else Vector3(0.05, 0.2, 0.26), MB.tag(Color("2a1a1a"), MB.CLOTH))
 	return lights
 
 static func _lantern(b: MB, g: MB, lp: Vector3, trim: Color) -> void:

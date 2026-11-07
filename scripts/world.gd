@@ -207,7 +207,8 @@ func _stream(all_now: bool) -> void:
 func _build_view(id: String) -> void:
 	var sl := Atlas.slice(wd, id)
 	var r: Rect2i = sl.rect
-	var shm := Terrain3D.world_heights(wd, r)
+	var shore := {}
+	var shm := Terrain3D.world_heights(wd, r, shore)
 	var bl: Array = []
 	for bd in wd.buildings:
 		if bd.area == id:
@@ -220,7 +221,7 @@ func _build_view(id: String) -> void:
 			lb.props = props
 			bl.append(lb)
 	var spec: Dictionary = Data.AREAS[id]
-	var root := Terrain3D.build(sl.grid, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "open": true, "buildings": bl, "area": id})
+	var root := Terrain3D.build(sl.grid, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
 	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS)
 	scene3d.add_child(root)
 	var nodes := {}
@@ -340,6 +341,8 @@ func _npc_opts(id: String) -> Dictionary:
 			return {"asset": id, "hair": "long", "crown": true, "glow": Color(1.0, 0.85, 0.95)}
 		"fire_sage", "void_hermit":
 			return {"asset": id, "beard": true, "hat": true, "hair": "bald"}
+	if Assets.PEOPLE.has(id):
+		return {"asset": id}
 	return {}
 
 func _make_ent(e: Dictionary) -> Node3D:

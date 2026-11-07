@@ -537,8 +537,8 @@ def clip_run(t):
     p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1, 1))
     lag = math.sin(ph - 0.9)
     # everything loose streams back in the wind of the run
-    p["robe_f"] = ((-0.55 - 0.3 * max(0.0, -min(legs)), 0, 0), (0, 0, 0))
-    p["robe_b"] = ((0.85 + 0.12 * abs(lag), 0, 0), (0, 0, 0))
+    p["robe_f"] = ((-0.38 - 0.22 * max(0.0, -min(legs)), 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.55 + 0.1 * abs(lag), 0, 0), (0, 0, 0))
     p["robe_l"] = ((-abs(legs[0]) * 0.4 + 0.2, 0, -0.08), (0, 0, 0))
     p["robe_r"] = ((-abs(legs[1]) * 0.4 + 0.2, 0, 0.08), (0, 0, 0))
     p["cape"] = ((1.05 + 0.12 * math.sin(2 * ph - 0.8), 0.04 * lag, 0), (0, 0, 0))

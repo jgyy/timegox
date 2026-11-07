@@ -6,7 +6,9 @@ extends RefCounted
 
 const T := 2.0          # world units per tile
 const CH := 12          # tiles per render chunk
-const WATER_Y := -0.12
+const WATER_Y := -0.3   # the waterline sits well below the banks, so ponds lie in the land
+const BED := -0.95      # depth of a pond bed
+const SUB := 3          # shore tiles are cut into SUB x SUB quads so the shoreline can curve
 
 static var _water_mats := {}
 static var _ground_mats := {}
@@ -19,6 +21,70 @@ static func world_pos(tile: Vector2i) -> Vector3:
 
 static func hash2(x: int, y: int, salt: float = 0.0) -> float:
 	return fposmod(sin(x * 12.9898 + y * 78.233 + salt * 37.719) * 43758.5453, 1.0)
+
+
+# ---------------------------------------------------------------- shorelines
+## Ponds, rivers and lakes used to be drawn tile by tile: every corner touching water was pushed
+## under the surface, so each shoreline was a staircase of right angles with a white rim of foam
+## round every square tile.  Now the shore follows a smooth field instead: the share of water round
+## each tile corner, blurred, warped by noise and, inside each water tile, rounded towards its
+## centre (so a lone water tile is a round pool, not a square).  Shore tiles are subdivided so the
+## waterline can curve through them, and the foam follows the real depth of the water.
+static var _shore_noise: FastNoiseLite = null
+
+static func _snoise() -> FastNoiseLite:
+	if _shore_noise == null:
+		_shore_noise = FastNoiseLite.new()
+		_shore_noise.seed = 5150
+		_shore_noise.frequency = 0.45
+		_shore_noise.fractal_octaves = 2
+	return _shore_noise
+
+## 0 = dry land .. 1 = under water, from the water share `wf` at a point (world tile units)
+static func wet(wf: float, wx: float, wz: float) -> float:
+	return smoothstep(0.3, 0.7, wf + _snoise().get_noise_2d(wx * 1.0, wz * 1.0) * 0.16)
+
+## Blurred share of water round every corner of rect `r` of a tile grid (gw x gh), as a corner
+## grid of (r.size.x + 1) x (r.size.y + 1).
+static func water_field(grid: PackedByteArray, gw: int, gh: int, r: Rect2i) -> PackedFloat32Array:
+	var cw := r.size.x + 1
+	var chh := r.size.y + 1
+	var mw := cw + 2
+	var mh := chh + 2
+	var raw := PackedFloat32Array()
+	raw.resize(mw * mh)
+	for j in mh:
+		for i in mw:
+			var cx := r.position.x + i - 1
+			var cz := r.position.y + j - 1
+			var wat := 0
+			var cnt := 0
+			for d in [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0)]:
+				var tx: int = cx + d.x
+				var ty: int = cz + d.y
+				if tx < 0 or ty < 0 or tx >= gw or ty >= gh:
+					continue
+				cnt += 1
+				if grid[ty * gw + tx] == MapGen.WATER:
+					wat += 1
+			raw[j * mw + i] = float(wat) / float(maxi(cnt, 1))
+	var out := PackedFloat32Array()
+	out.resize(cw * chh)
+	for j in chh:
+		for i in cw:
+			var acc := raw[(j + 1) * mw + i + 1] * 4.0
+			acc += raw[j * mw + i + 1] + raw[(j + 2) * mw + i + 1] + raw[(j + 1) * mw + i] + raw[(j + 1) * mw + i + 2]
+			acc += (raw[j * mw + i] + raw[j * mw + i + 2] + raw[(j + 2) * mw + i] + raw[(j + 2) * mw + i + 2]) * 0.5
+			out[j * cw + i] = acc / 10.0
+	return out
+
+## Lower the land towards the water's edge so banks slope down to the waterline.
+static func bank(land: float, wf: float) -> float:
+	return lerpf(land, minf(land, 0.06), smoothstep(0.0, 0.3, wf))
+
+## Height of the ground at a corner from its land height and water share.
+static func shore_h(land: float, wf: float, wx: float, wz: float) -> float:
+	return lerpf(land, BED, wet(wf, wx, wz))
 
 # ---------------------------------------------------------------- shaders
 const GROUND := """
@@ -291,23 +357,24 @@ void fragment() {
 	vec3 wn = normalize(vec3(-hx * 5.0, 1.0, -hz * 5.0));
 	NORMAL = normalize((VIEW_MATRIX * vec4(wn, 0.0)).xyz);
 	float fres = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 4.0);
-	// deeper water away from the shore, shallower and more see-through near it
-	vec3 body = mix(deep, col.rgb, 0.3 + 0.35 * shore + 0.15 * hc);
-	// reflected sky: horizon colour at grazing angles, zenith colour looking down
+	// shallows are a clear teal over the bed, deeper water a darker, cooler blue
+	vec3 shallow_c = mix(col.rgb, vec3(0.42, 0.62, 0.5), 0.35) * 1.05;
+	vec3 body = mix(deep, shallow_c, smoothstep(0.0, 0.85, shore) * 0.8 + 0.12 * hc);
+	// a quiet sky reflection: horizon colour at grazing angles, a little zenith looking down
 	vec3 refl = mix(sky_top, sky_hor, clamp(fres * 1.6, 0.0, 1.0));
-	vec3 c = mix(body, refl, clamp(0.06 + fres * 0.55, 0.0, 0.6));
-	// waves lapping at the shore: bands of foam running in towards the land
-	float lap = sin(shore * 9.0 - TIME * 2.2 + n2(uv * 2.0) * 3.0);
-	float foam = smoothstep(0.55, 0.95, shore) * smoothstep(0.2, 0.9, lap) * (0.6 + 0.4 * n2(uv * 6.0 + TIME));
-	foam += smoothstep(0.88, 1.0, shore) * 0.5;
+	vec3 c = mix(body, refl, clamp(0.03 + fres * 0.4, 0.0, 0.45));
+	// a thin line of foam where the water meets the land, and faint ripples lapping in
+	float lap = sin(shore * 14.0 - TIME * 2.0 + n2(uv * 2.0) * 3.0);
+	float foam = smoothstep(0.9, 0.99, shore) * (0.55 + 0.45 * n2(uv * 5.0 + TIME * 0.5));
+	foam += smoothstep(0.7, 0.92, shore) * smoothstep(0.75, 0.98, lap) * 0.35;
 	// caustic glints where crests meet
-	float glint = smoothstep(0.86, 0.95, hc + n2(uv * 7.0 + TIME * 0.6) * 0.25);
-	c = mix(c, vec3(1.0), clamp(foam * 0.75, 0.0, 1.0));
+	float glint = smoothstep(0.88, 0.96, hc + n2(uv * 7.0 + TIME * 0.6) * 0.25);
+	c = mix(c, vec3(0.95, 0.98, 1.0), clamp(foam * 0.8, 0.0, 1.0));
 	ALBEDO = c;
-	ALPHA = clamp(col.a * (0.75 + 0.25 * (1.0 - shore)) + fres * 0.3 + foam * 0.3, 0.0, 1.0);
-	ROUGHNESS = 0.04 + 0.1 * foam;
-	METALLIC = 0.15;
-	SPECULAR = 0.95;
+	ALPHA = clamp(col.a * (0.62 + 0.38 * (1.0 - shore)) + fres * 0.2 + foam * 0.4, 0.0, 1.0);
+	ROUGHNESS = 0.06 + 0.1 * foam;
+	METALLIC = 0.1;
+	SPECULAR = 0.7;
 	EMISSION = col.rgb * glow * (0.7 + 0.3 * hc) + vec3(glint * 0.35);
 }
 """
@@ -368,7 +435,7 @@ static func ground_mat(theme_name: String) -> ShaderMaterial:
 # ---------------------------------------------------------------- height field
 ## Heights at tile corners: (w+1) x (h+1).  Gentle hills from noise, mounds under landmarks,
 ## shores that slope down into the water and flattened paths.
-static func heightmap(grid: PackedByteArray, w: int, h: int, theme_name: String, seed_: int) -> PackedFloat32Array:
+static func heightmap(grid: PackedByteArray, w: int, h: int, theme_name: String, seed_: int, aux: Dictionary = {}) -> PackedFloat32Array:
 	var th := Look.theme(theme_name)
 	var amp: float = th.hill
 	var noise := FastNoiseLite.new()
@@ -384,8 +451,11 @@ static func heightmap(grid: PackedByteArray, w: int, h: int, theme_name: String,
 	broad.frequency = 0.02
 	broad.fractal_octaves = 2
 	var swell := 0.0 if theme_name == "sect" else amp * 0.8
+	var wfield := water_field(grid, w, h, Rect2i(0, 0, w, h))
 	var hm := PackedFloat32Array()
 	hm.resize((w + 1) * (h + 1))
+	var land_a := PackedFloat32Array()
+	land_a.resize((w + 1) * (h + 1))
 	for cz in h + 1:
 		for cx in w + 1:
 			var walls := 0
@@ -411,11 +481,19 @@ static func heightmap(grid: PackedByteArray, w: int, h: int, theme_name: String,
 			if paths > 0:
 				hv *= 0.35
 			hv += walls * 0.12 * (1.0 + amp)
-			if water > 0:
-				hv = -0.62 if water == cnt else minf(hv, -0.2)
-				if paths >= 2:
-					hv = 0.02  # a dry causeway where a path crosses water
-			hm[cz * (w + 1) + cx] = hv
+			var i := cz * (w + 1) + cx
+			var wf := wfield[i]
+			if water > 0 and paths >= 2:
+				# a dry causeway where a path crosses water
+				wfield[i] = 0.0
+				wf = 0.0
+				hv = 0.02
+			var land := bank(hv, wf)
+			land_a[i] = land
+			hm[i] = shore_h(land, wf, cx, cz)
+	aux["land"] = land_a
+	aux["wf"] = wfield
+	aux["origin"] = Vector2i.ZERO
 	return hm
 
 ## bilinear height at a world position
@@ -498,7 +576,8 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 	var th := Look.theme(theme_name)
 	var root := Node3D.new()
 	root.name = "terrain_" + str(opts.get("area", theme_name))
-	var hm: PackedFloat32Array = opts.hm if opts.has("hm") else heightmap(grid, w, h, theme_name, seed_)
+	var aux: Dictionary = opts.get("shore", {})
+	var hm: PackedFloat32Array = opts.hm if opts.has("hm") else heightmap(grid, w, h, theme_name, seed_, aux)
 	root.set_meta("hm", hm)
 	root.set_meta("w", w)
 	root.set_meta("h", h)
@@ -517,6 +596,17 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 		for cx in w + 1:
 			ccol[cz * rw + cx] = _corner_col(grid, w, h, cx, cz, th)
 			cnrm[cz * rw + cx] = _corner_normal(hm, w, h, cx, cz)
+	# shore tiles (water and its banks) are subdivided so the waterline can curve through them
+	var sh := {}
+	var fine := aux.has("land") and aux.has("wf")
+	var sub := PackedByteArray()
+	sub.resize(w * h)
+	if fine:
+		sh = {"land": aux.land, "wf": aux.wf, "origin": aux.get("origin", Vector2i.ZERO), "grid": grid, "w": w, "h": h, "hm": hm}
+		for ty in h:
+			for tx in w:
+				if grid[ty * w + tx] != MapGen.VOID and _by_water(grid, w, h, tx, ty):
+					sub[ty * w + tx] = 1
 	for cy in chh:
 		for cx in cw:
 			var ground := MB.new()
@@ -532,17 +622,19 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 					var i10 := i00 + 1
 					var i01 := i00 + rw
 					var i11 := i01 + 1
+					if fine and sub[ty * w + tx] == 1:
+						_shore_tile(ground, water, sh, sub, tx, ty, ccol, cnrm)
+						continue
 					ground.quad_n(
 						[Vector3(x0, hm[i00], z0), Vector3(x0 + T, hm[i10], z0), Vector3(x0 + T, hm[i11], z0 + T), Vector3(x0, hm[i01], z0 + T)],
 						[cnrm[i00], cnrm[i10], cnrm[i11], cnrm[i01]],
 						[ccol[i00], ccol[i10], ccol[i11], ccol[i01]])
 					if tile == MapGen.WATER:
-						var sh := _shore(grid, w, h, tx, ty)
+						var shr := _shore(grid, w, h, tx, ty)
 						water.quad4(Vector3(x0, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0 + T), Vector3(x0, WATER_Y, z0 + T),
-							Color(1, 1, 1, sh[0]), Color(1, 1, 1, sh[1]), Color(1, 1, 1, sh[2]), Color(1, 1, 1, sh[3]))
+							Color(1, 1, 1, shr[0]), Color(1, 1, 1, shr[1]), Color(1, 1, 1, shr[2]), Color(1, 1, 1, shr[3]))
 					elif _by_water(grid, w, h, tx, ty):
-						# the water plane runs on under the bank, so the shoreline is where the sloping
-						# ground meets the water: a curve, not the edge of a square tile
+						# the water plane runs on under the bank
 						var fc := Color(1, 1, 1, 1)
 						water.quad4(Vector3(x0, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0 + T), Vector3(x0, WATER_Y, z0 + T), fc, fc, fc, fc)
 			if not ground.is_empty():
@@ -568,6 +660,91 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 		_sect_props(root, grid, w, h, hm)
 	return root
 
+## Ground height at a point inside the region (tile units) near water: land and water share are
+## interpolated from the corners, the inside of every water tile is rounded towards its centre and
+## the shoreline is warped by noise (world coordinates, so neighbouring regions agree).
+static func fine_h(sh: Dictionary, fx: float, fz: float) -> float:
+	var w: int = sh.w
+	var h: int = sh.h
+	var rw := w + 1
+	var ix := clampi(int(floor(fx)), 0, w - 1)
+	var iz := clampi(int(floor(fz)), 0, h - 1)
+	var ax := clampf(fx - ix, 0.0, 1.0)
+	var az := clampf(fz - iz, 0.0, 1.0)
+	var la: PackedFloat32Array = sh.land
+	var wa: PackedFloat32Array = sh.wf
+	var i00 := iz * rw + ix
+	var land := lerpf(lerpf(la[i00], la[i00 + 1], ax), lerpf(la[i00 + rw], la[i00 + rw + 1], ax), az)
+	var wf := lerpf(lerpf(wa[i00], wa[i00 + 1], ax), lerpf(wa[i00 + rw], wa[i00 + rw + 1], ax), az)
+	var grid: PackedByteArray = sh.grid
+	if grid[iz * w + ix] == MapGen.WATER:
+		wf = maxf(wf, 1.0 - smoothstep(0.08, 0.5, Vector2(ax - 0.5, az - 0.5).length()))
+	var o: Vector2i = sh.origin
+	return lerpf(land, BED, wet(wf, o.x + fx, o.y + fz))
+
+## A shore tile cut into SUB x SUB quads: the ground follows fine_h(), except along an edge shared
+## with a tile that is not subdivided, which stays straight between its corners so the two meet
+## without a crack; the water above it fades from deep to a foaming edge with the real depth.
+static func _shore_tile(ground: MB, water: MB, sh: Dictionary, sub: PackedByteArray, tx: int, ty: int, ccol: Array, cnrm: Array) -> void:
+	var w: int = sh.w
+	var h: int = sh.h
+	var rw := w + 1
+	var hm: PackedFloat32Array = sh.hm
+	var i00 := ty * rw + tx
+	var hc := [hm[i00], hm[i00 + 1], hm[i00 + rw], hm[i00 + rw + 1]]
+	var cc := [ccol[i00], ccol[i00 + 1], ccol[i00 + rw], ccol[i00 + rw + 1]]
+	var cn := [cnrm[i00], cnrm[i00 + 1], cnrm[i00 + rw], cnrm[i00 + rw + 1]]
+	# which edges are shared with tiles that are not subdivided (left, right, top, bottom)
+	var lin_l := tx == 0 or sub[ty * w + tx - 1] == 0
+	var lin_r := tx == w - 1 or sub[ty * w + tx + 1] == 0
+	var lin_t := ty == 0 or sub[(ty - 1) * w + tx] == 0
+	var lin_b := ty == h - 1 or sub[(ty + 1) * w + tx] == 0
+	var n := SUB + 1
+	var pts: Array = []
+	var nrm: Array = []
+	var cols: Array = []
+	var wa: Array = []
+	var e := 0.18
+	for j in n:
+		for i in n:
+			var u := float(i) / SUB
+			var v := float(j) / SUB
+			var fx := tx + u
+			var fz := ty + v
+			var on_lin := (i == 0 and lin_l) or (i == SUB and lin_r) or (j == 0 and lin_t) or (j == SUB and lin_b)
+			var bil := lerpf(lerpf(hc[0], hc[1], u), lerpf(hc[2], hc[3], u), v)
+			var hv := bil if on_lin else fine_h(sh, fx, fz)
+			if (i == 0 or i == SUB) and (j == 0 or j == SUB):
+				hv = bil
+			pts.append(Vector3(fx * T, hv, fz * T))
+			var c: Color = (cc[0] as Color).lerp(cc[1], u).lerp((cc[2] as Color).lerp(cc[3], u), v)
+			var nn: Vector3
+			if on_lin:
+				nn = ((cn[0] as Vector3).lerp(cn[1], u).lerp((cn[2] as Vector3).lerp(cn[3], u), v)).normalized()
+			else:
+				nn = Vector3(fine_h(sh, fx - e, fz) - fine_h(sh, fx + e, fz), 2.0 * e * T, fine_h(sh, fx, fz - e) - fine_h(sh, fx, fz + e)).normalized()
+				# a band of darker wet soil just above the waterline
+				var wet_k := smoothstep(0.32, -0.02, hv - WATER_Y)
+				var a := c.a
+				c = c.darkened(0.16 * wet_k)
+				c.a = a
+			nrm.append(nn)
+			cols.append(c)
+			# foam and shallows follow the real depth of the water
+			wa.append(1.0 - smoothstep(0.0, 0.5, WATER_Y - hv))
+	for j in SUB:
+		for i in SUB:
+			var a0 := j * n + i
+			var q := [a0, a0 + 1, a0 + n + 1, a0 + n]
+			ground.quad_n([pts[q[0]], pts[q[1]], pts[q[2]], pts[q[3]]], [nrm[q[0]], nrm[q[1]], nrm[q[2]], nrm[q[3]]], [cols[q[0]], cols[q[1]], cols[q[2]], cols[q[3]]])
+			var wp: Array = []
+			var wc: Array = []
+			for k in 4:
+				var pp: Vector3 = pts[q[k]]
+				wp.append(Vector3(pp.x, WATER_Y, pp.z))
+				wc.append(Color(1, 1, 1, wa[q[k]]))
+			water.quad4(wp[0], wp[1], wp[2], wp[3], wc[0], wc[1], wc[2], wc[3])
+
 static func _by_water(grid: PackedByteArray, w: int, h: int, tx: int, ty: int) -> bool:
 	for dy in range(-1, 2):
 		for dx in range(-1, 2):
@@ -581,7 +758,7 @@ static func _by_water(grid: PackedByteArray, w: int, h: int, tx: int, ty: int) -
 ## Corner heights for world rectangle `r`, written into the world's shared height field (so that
 ## neighbouring regions meet without a crack) and returned as the region's own (w+1)x(h+1) array.
 ## Hilliness blends smoothly between regions instead of stepping at the border.
-static func world_heights(wd: Dictionary, r: Rect2i) -> PackedFloat32Array:
+static func world_heights(wd: Dictionary, r: Rect2i, aux: Dictionary = {}) -> PackedFloat32Array:
 	var W: int = wd.w
 	var H: int = wd.h
 	var grid: PackedByteArray = wd.grid
@@ -606,6 +783,9 @@ static func world_heights(wd: Dictionary, r: Rect2i) -> PackedFloat32Array:
 	broad.fractal_octaves = 2
 	var out := PackedFloat32Array()
 	out.resize((r.size.x + 1) * (r.size.y + 1))
+	var wfield := water_field(grid, W, H, r)
+	var land_a := PackedFloat32Array()
+	land_a.resize(out.size())
 	var ghm: PackedFloat32Array = wd.get("hm", PackedFloat32Array())
 	for j in r.size.y + 1:
 		for i in r.size.x + 1:
@@ -645,13 +825,22 @@ static func world_heights(wd: Dictionary, r: Rect2i) -> PackedFloat32Array:
 			if paths > 0:
 				hv *= 0.35
 			hv += walls * 0.12 * (1.0 + amp)
-			if water > 0:
-				hv = -0.62 if water == cnt else minf(hv, -0.2)
-				if paths >= 2:
-					hv = 0.02
-			out[j * (r.size.x + 1) + i] = hv
+			var ii := j * (r.size.x + 1) + i
+			var wf := wfield[ii]
+			if water > 0 and paths >= 2:
+				# a dry causeway where a road crosses water
+				wfield[ii] = 0.0
+				wf = 0.0
+				hv = 0.02
+			var land := bank(hv, wf)
+			land_a[ii] = land
+			hv = shore_h(land, wf, cx, cz)
+			out[ii] = hv
 			if not ghm.is_empty():
 				ghm[cz * (W + 1) + cx] = hv
+	aux["land"] = land_a
+	aux["wf"] = wfield
+	aux["origin"] = r.position
 	return out
 
 ## Rolling hills beyond the edge of the world and distant mountains on the horizon.
