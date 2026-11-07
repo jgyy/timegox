@@ -182,22 +182,12 @@ func new_game() -> void:
 	toast_list.clear()
 	chat_idx.clear()
 	world.clear_cache()
-	world.load_area("sect", Game.tile)
+	world.load_area("sect", Vector2i(20, 8))
 	set_stack(["world"])
 	say([
 		["Narrator", "Azure Cloud Sect, perched above the sea of clouds. For three years the orphan Lin Feng has swept its steps."],
 		["Narrator", "Today, the old Elder summons him. Walk to the Elder with the arrow keys and press Enter to speak."],
 	])
-
-func use_portal(p: Dictionary) -> void:
-	if p.open != "" and not Game.done(p.open):
-		Game.toast("The Lotus Seal's barrier blocks the way. Finish your tasks first.")
-		world.ptile = world.ptile - world.facing
-		world.target = world.ptile
-		Game.tile = world.ptile
-		return
-	world.load_area(p.to, p.dest)
-	Game.note("Entered " + world.area_name)
 
 func interact(e: Dictionary) -> void:
 	match e.kind:
@@ -207,6 +197,9 @@ func interact(e: Dictionary) -> void:
 			start_encounter(e)
 		"boss":
 			boss_interact(e)
+		"seal":
+			var need: Dictionary = Data.STEPS[Data.step_index(e.open)]
+			Game.toast("A Lotus Seal bars the road to %s. (%s)" % [Data.AREAS[e.to].n, need.t])
 		"pickup":
 			Game.add_item(e.item)
 			Game.taken[e.id] = true
@@ -215,7 +208,7 @@ func interact(e: Dictionary) -> void:
 
 func talk_npc(e: Dictionary) -> void:
 	var s := Game.cur_step()
-	if not s.is_empty() and s.kind == "talk" and s.npc == e.id and s.area == Game.area:
+	if not s.is_empty() and s.kind == "talk" and s.npc == e.id and s.area == e.get("area", Game.area):
 		var sid: String = s.id
 		say(Data.DIALOGUE[sid], func():
 			Game.advance()
@@ -298,6 +291,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 						recall_to_sect("recall3")
 					elif sid == "s_break10":
 						recall_to_sect("recall4")
+					elif sid == "s_break11":
+						recall_to_sect("recall5")
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity
@@ -313,11 +308,11 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					say(post)
 			else:
 				var e2: Dictionary = ctx.entity
-				Game.defeated[Game.area + ":" + e2.id] = Game.playtime
-				Game.record_kills(Game.area, e2.group.size())
+				Game.defeated[e2.id] = Game.playtime
+				Game.record_kills(e2.get("area", Game.area), e2.group.size())
 		"lose":
 			Game.respawn()
-			world.load_area("sect", Game.tile)
+			world.load_area("sect", Vector2i(20, 8))
 			say([["Narrator", "You wake in the sect infirmary. Elder Qing Xuan watches over you. Some spirit stones were lost to the healers."]])
 		_:
 			pass

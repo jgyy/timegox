@@ -9,6 +9,10 @@ const WATER := 2
 const PATH := 3
 const DECOR := 4
 const BUILDING := 5
+## floor inside a building (walkable; rendered as planks under a roof that lifts away)
+const INTERIOR := 6
+## a tile owned by another region (only in a region's render slice; never in the world grid)
+const VOID := 7
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
@@ -19,18 +23,19 @@ const DENSITY := {
 	"cloudsea": 0.24, "court": 0.26, "forge": 0.28, "garden": 0.24,
 	"dunes": 0.22, "fungal": 0.28, "aurora": 0.24, "chaos": 0.24,
 	"maple": 0.3, "karst": 0.26, "lilies": 0.22, "diyu": 0.26,
+	"village": 0.2, "tea": 0.24, "silk": 0.3, "loom": 0.22,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
-const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45}
+const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4}
 
 static func is_walkable_tile(t: int) -> bool:
-	return t == FLOOR or t == PATH or t == DECOR
+	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR
 
-static func build(id: String) -> Dictionary:
+static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 	var spec: Dictionary = Data.AREAS[id]
-	var w: int = spec.w
-	var h: int = spec.h
+	var w: int = spec.w if size == Vector2i.ZERO else size.x
+	var h: int = spec.h if size == Vector2i.ZERO else size.y
 	var rng := RandomNumberGenerator.new()
 	rng.seed = spec.seed
 	var grid := PackedByteArray()
@@ -46,6 +51,10 @@ static func build(id: String) -> Dictionary:
 	for y in h:
 		grid[y * w] = WALL
 		grid[y * w + w - 1] = WALL
+	# enterable buildings: walls round the edge, a door, planks inside, furniture that blocks
+	var buildings: Array = []
+	for bd in spec.get("buildings", []):
+		buildings.append(stamp_building(grid, w, bd))
 
 	var ents: Array = []
 	var fixed: Array = []
@@ -63,6 +72,12 @@ static func build(id: String) -> Dictionary:
 		fixed.append(pk.pos)
 	for sp in spec.get("springs", []):
 		ents.append({"kind": "spring", "id": "spring", "pos": sp})
+	# every door opens onto walkable ground that the rest of the map can reach
+	for bd in buildings:
+		var o := _outside(bd.rect.position + Vector2i(1, 1), buildings)
+		if not is_walkable_tile(grid[o.y * w + o.x]):
+			grid[o.y * w + o.x] = PATH
+		fixed.append(o)
 
 	# arrival tiles (where other areas drop the player)
 	var arrivals: Array = arrival_tiles(id)
@@ -76,14 +91,18 @@ static func build(id: String) -> Dictionary:
 	for p in spec.get("portals", []):
 		_clear(grid, w, h, p.pos + Vector2i(1, 0), 1)
 	# connectivity
-	var start: Vector2i = arrivals[0] if not arrivals.is_empty() else spec.portals[0].pos + Vector2i(2, 0)
+	var start: Vector2i = Vector2i(w / 2, h / 2)
+	if not arrivals.is_empty():
+		start = arrivals[0]
+	elif not spec.get("portals", []).is_empty():
+		start = spec.portals[0].pos + Vector2i(2, 0)
 	_clear(grid, w, h, start, 1)
 	for _i in 40:
 		var reach := flood(grid, w, h, start)
 		var fixed_missing := false
 		for f in fixed:
 			if not reach.has(f):
-				_carve(grid, w, f, start)
+				_carve(grid, w, _outside(f, buildings), start, spec.seed + _i)
 				fixed_missing = true
 				break
 		if not fixed_missing:
@@ -95,7 +114,7 @@ static func build(id: String) -> Dictionary:
 	if count > 0:
 		var cands: Array = []
 		for pos in reach2:
-			if pos.x < 9 or pos.x > w - 6:
+			if pos.x < 9 or pos.x > w - 6 or grid[pos.y * w + pos.x] == INTERIOR:
 				continue
 			if _free_neighbors(grid, w, pos) < 7:
 				continue
@@ -126,7 +145,39 @@ static func build(id: String) -> Dictionary:
 				var pe: Array = pool[rng.randi() % pool.size()]
 				group.append({"id": pe[0], "lv": rng.randi_range(pe[1], pe[2])})
 			ents.append({"kind": "enemy", "id": "e%d" % placed.size(), "pos": c, "group": group})
-	return {"w": w, "h": h, "grid": grid, "ents": ents, "theme": spec.theme, "name": spec.n, "start": start}
+	return {"w": w, "h": h, "grid": grid, "ents": ents, "theme": spec.theme, "name": spec.n, "start": start, "buildings": buildings}
+
+## Walls on the rectangle's edge, a door gap, a plank floor inside and furniture tiles that block.
+static func stamp_building(grid: PackedByteArray, w: int, bd: Dictionary) -> Dictionary:
+	var r: Rect2i = bd.rect
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			var edge := x == r.position.x or y == r.position.y or x == r.end.x - 1 or y == r.end.y - 1
+			grid[y * w + x] = BUILDING if edge else INTERIOR
+	var door: Vector2i = bd.door
+	grid[door.y * w + door.x] = INTERIOR
+	for pr in bd.get("props", []):
+		var pt: Vector2i = pr[1]
+		if pr.size() > 2 and pr[2]:
+			grid[pt.y * w + pt.x] = BUILDING
+	var out := bd.duplicate(true)
+	return out
+
+## A point inside a building is reached through its door: trails are carved to the doorstep.
+static func _outside(p: Vector2i, buildings: Array) -> Vector2i:
+	for bd in buildings:
+		var r: Rect2i = bd.rect
+		if r.has_point(p):
+			var d: Vector2i = bd.door
+			var c := r.get_center()
+			var out := Vector2i(signi(d.x - c.x) if (d.x == r.position.x or d.x == r.end.x - 1) else 0, signi(d.y - c.y) if (d.y == r.position.y or d.y == r.end.y - 1) else 0)
+			return d + out
+	return p
+
+## the inside of a building (walkable tiles under the roof)
+static func inner_rect(bd: Dictionary) -> Rect2i:
+	var r: Rect2i = bd.rect
+	return Rect2i(r.position + Vector2i(1, 1), r.size - Vector2i(2, 2))
 
 static func arrival_tiles(id: String) -> Array:
 	var out: Array = []
@@ -170,17 +221,25 @@ static func _clear(grid: PackedByteArray, w: int, h: int, c: Vector2i, r: int) -
 			var y := c.y + dy
 			if x > 0 and y > 0 and x < w - 1 and y < h - 1:
 				var t := grid[y * w + x]
-				if not is_walkable_tile(t):
+				if not is_walkable_tile(t) and t != BUILDING:
 					grid[y * w + x] = FLOOR
 
-static func _carve(grid: PackedByteArray, w: int, from: Vector2i, to: Vector2i) -> void:
+## A trail from `from` to `to` that wanders like a deer track: each step goes along x or y at
+## random, weighted by how far there is still to go on each axis, so trails run on the diagonal
+## in ragged steps instead of the old straight L-shaped corridors.
+static func _carve(grid: PackedByteArray, w: int, from: Vector2i, to: Vector2i, salt: int = 0) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(Vector3i(from.x * 31 + to.x, from.y * 17 + to.y, salt))
 	var c := from
-	while c.x != to.x:
-		c.x += signi(to.x - c.x)
-		if not is_walkable_tile(grid[c.y * w + c.x]):
-			grid[c.y * w + c.x] = PATH
-	while c.y != to.y:
-		c.y += signi(to.y - c.y)
+	var guard := 0
+	while c != to and guard < 4000:
+		guard += 1
+		var dx := absi(to.x - c.x)
+		var dy := absi(to.y - c.y)
+		if rng.randf() * float(dx + dy) < float(dx):
+			c.x += signi(to.x - c.x)
+		else:
+			c.y += signi(to.y - c.y)
 		if not is_walkable_tile(grid[c.y * w + c.x]):
 			grid[c.y * w + c.x] = PATH
 
@@ -225,16 +284,23 @@ static func _town(grid: PackedByteArray, w: int, h: int) -> void:
 		var y := rng.randi_range(1, h - 2)
 		grid[y * w + x] = DECOR
 	_rect(grid, w, 1, 13, w - 2, 13, PATH)
-	_rect(grid, w, 20, 4, 20, h - 2, PATH)
-	_rect(grid, w, 15, 1, 25, 3, BUILDING)   # elder hall
-	_rect(grid, w, 5, 9, 11, 12, BUILDING)    # alchemist hut
-	_rect(grid, w, 28, 9, 34, 12, BUILDING)   # smithy
-	_rect(grid, w, 16, 17, 24, 21, WATER)     # lotus pond
+	_rect(grid, w, 20, 8, 20, h - 2, PATH)     # from the hall door to the south gate
+	_rect(grid, w, 7, 12, 7, 13, PATH)         # alchemist's door
+	_rect(grid, w, 32, 12, 32, 13, PATH)       # smithy door
+	_rect(grid, w, 31, 14, 31, 14, PATH)       # library door
+	for py in range(16, 23):                   # lotus pond (an oval, not a box)
+		for px in range(14, 27):
+			var ex := (px - 20.0) / 5.6
+			var ey := (py - 19.0) / 2.9
+			if ex * ex + ey * ey <= 1.0:
+				grid[py * w + px] = WATER
 	_rect(grid, w, 20, 17, 20, 21, PATH)
-	_rect(grid, w, 21, 22, w - 2, 22, PATH)   # south-east road (Part V)
-	_rect(grid, w, 1, 22, 19, 22, PATH)       # south-west funeral road (Part VI)
+	_rect(grid, w, 21, 22, w - 2, 22, PATH)    # south-east road (Part V)
+	_rect(grid, w, 1, 22, 19, 22, PATH)        # south-west funeral road (Part VI)
+	_rect(grid, w, 34, 22, 34, h - 2, PATH)    # to the desert gate
+	_rect(grid, w, 6, 22, 6, h - 2, PATH)      # down to the village (Part VII)
 	for i in 36:
 		var x := rng.randi_range(2, w - 3)
 		var y := rng.randi_range(2, h - 3)
-		if grid[y * w + x] == FLOOR and absi(y - 13) > 1 and absi(x - 20) > 1:
+		if grid[y * w + x] == FLOOR and absi(y - 13) > 1 and absi(x - 20) > 1 and y > 12:
 			grid[y * w + x] = WALL

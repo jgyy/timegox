@@ -41,6 +41,37 @@ static func minimap_image(grid: PackedByteArray, w: int, h_: int, th: Dictionary
 			img.set_pixel(xx, yy, c)
 	return ImageTexture.create_from_image(img)
 
+## The whole open world as one picture, each region in its own colours.
+static func world_minimap(wd: Dictionary) -> ImageTexture:
+	var W: int = wd.w
+	var H: int = wd.h
+	var pal: Array = []
+	for id in wd.ids:
+		var th := Look.theme(Data.AREAS[id].theme)
+		pal.append([Color(th.g1).darkened(0.3), Color(th.wall).lightened(0.05), Color(th.water), Color(th.path)])
+	var data := PackedByteArray()
+	data.resize(W * H * 3)
+	var grid: PackedByteArray = wd.grid
+	var owner: PackedByteArray = wd.owner
+	for i in W * H:
+		var p: Array = pal[owner[i]]
+		var c: Color = p[0]
+		match grid[i]:
+			MapGen.WALL:
+				c = p[1]
+			MapGen.WATER:
+				c = p[2]
+			MapGen.PATH:
+				c = p[3]
+			MapGen.BUILDING:
+				c = Color("8a4a3a")
+			MapGen.INTERIOR:
+				c = Color("c09060")
+		data[i * 3] = int(c.r8)
+		data[i * 3 + 1] = int(c.g8)
+		data[i * 3 + 2] = int(c.b8)
+	return ImageTexture.create_from_image(Image.create_from_data(W, H, false, Image.FORMAT_RGB8, data))
+
 static func draw_minimap(ci: CanvasItem, tex: ImageTexture, r: Rect2, w: int, h_: int, ptile: Vector2i, marks: Array, t: float) -> void:
 	ci.draw_rect(r.grow(4), Color(0.02, 0.03, 0.08, 0.85))
 	ci.draw_rect(r.grow(4), UI.C_BORDER, false, 2.0)

@@ -492,11 +492,13 @@ static func _corner_col(grid: PackedByteArray, w: int, h: int, cx: int, cz: int,
 	return c
 
 # ---------------------------------------------------------------- main entry
-static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, seed_: int) -> Node3D:
+## opts: "hm" (corner heights to use instead of this map's own), "open" (part of the open world:
+## no skirt or horizon of its own), "buildings" (enterable buildings in local tiles), "area"
+static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, seed_: int, opts: Dictionary = {}) -> Node3D:
 	var th := Look.theme(theme_name)
 	var root := Node3D.new()
-	root.name = "terrain_" + theme_name
-	var hm := heightmap(grid, w, h, theme_name, seed_)
+	root.name = "terrain_" + str(opts.get("area", theme_name))
+	var hm: PackedFloat32Array = opts.hm if opts.has("hm") else heightmap(grid, w, h, theme_name, seed_)
 	root.set_meta("hm", hm)
 	root.set_meta("w", w)
 	root.set_meta("h", h)
@@ -522,6 +524,8 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 			for ty in range(cy * CH, mini(h, (cy + 1) * CH)):
 				for tx in range(cx * CH, mini(w, (cx + 1) * CH)):
 					var tile := grid[ty * w + tx]
+					if tile == MapGen.VOID:
+						continue
 					var x0 := tx * T
 					var z0 := ty * T
 					var i00 := ty * rw + tx
@@ -536,6 +540,11 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 						var sh := _shore(grid, w, h, tx, ty)
 						water.quad4(Vector3(x0, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0 + T), Vector3(x0, WATER_Y, z0 + T),
 							Color(1, 1, 1, sh[0]), Color(1, 1, 1, sh[1]), Color(1, 1, 1, sh[2]), Color(1, 1, 1, sh[3]))
+					elif _by_water(grid, w, h, tx, ty):
+						# the water plane runs on under the bank, so the shoreline is where the sloping
+						# ground meets the water: a curve, not the edge of a square tile
+						var fc := Color(1, 1, 1, 1)
+						water.quad4(Vector3(x0, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0), Vector3(x0 + T, WATER_Y, z0 + T), Vector3(x0, WATER_Y, z0 + T), fc, fc, fc, fc)
 			if not ground.is_empty():
 				var gi := MB.mesh_node(root, ground.build(gmat))
 				gi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -548,12 +557,156 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 	_bridges(root, grid, w, h, hm)
 	# birds, butterflies, dragonflies, fish... (see fauna.gd)
 	Fauna.populate(root, grid, w, h, hm, theme_name, seed_)
-	_skirt(root, w, h, theme_name, seed_)
-	_horizon(root, w, h, theme_name, seed_)
-	if theme_name == "sect":
-		_sect_buildings(root, grid, w, h, th, hm)
+	if not opts.get("open", false):
+		_skirt(root, w, h, theme_name, seed_)
+		_horizon(root, w, h, theme_name, seed_)
+	var roofs := {}
+	for bd in opts.get("buildings", []):
+		roofs[bd.id] = _house(root, bd, hm, w, h)
+	root.set_meta("roofs", roofs)
+	if str(opts.get("area", theme_name)) == "sect":
 		_sect_props(root, grid, w, h, hm)
 	return root
+
+static func _by_water(grid: PackedByteArray, w: int, h: int, tx: int, ty: int) -> bool:
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var nx := tx + dx
+			var ny := ty + dy
+			if nx >= 0 and ny >= 0 and nx < w and ny < h and grid[ny * w + nx] == MapGen.WATER:
+				return true
+	return false
+
+# ---------------------------------------------------------------- the open world
+## Corner heights for world rectangle `r`, written into the world's shared height field (so that
+## neighbouring regions meet without a crack) and returned as the region's own (w+1)x(h+1) array.
+## Hilliness blends smoothly between regions instead of stepping at the border.
+static func world_heights(wd: Dictionary, r: Rect2i) -> PackedFloat32Array:
+	var W: int = wd.w
+	var H: int = wd.h
+	var grid: PackedByteArray = wd.grid
+	var owner: PackedByteArray = wd.owner
+	var amp_of: Array = []
+	var swell_of: Array = []
+	for id in wd.ids:
+		var spec: Dictionary = Data.AREAS[id]
+		var a: float = float(spec.get("hill", Look.theme(spec.theme).hill))
+		amp_of.append(a)
+		swell_of.append(0.0 if id == "sect" else a * 0.8)
+	var noise := FastNoiseLite.new()
+	noise.seed = 77
+	noise.frequency = 0.045
+	noise.fractal_octaves = 3
+	var warp := FastNoiseLite.new()
+	warp.seed = 135
+	warp.frequency = 0.03
+	var broad := FastNoiseLite.new()
+	broad.seed = 244
+	broad.frequency = 0.02
+	broad.fractal_octaves = 2
+	var out := PackedFloat32Array()
+	out.resize((r.size.x + 1) * (r.size.y + 1))
+	var ghm: PackedFloat32Array = wd.get("hm", PackedFloat32Array())
+	for j in r.size.y + 1:
+		for i in r.size.x + 1:
+			var cx := r.position.x + i
+			var cz := r.position.y + j
+			var walls := 0
+			var water := 0
+			var paths := 0
+			var cnt := 0
+			for d in [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0)]:
+				var tx: int = cx + d.x
+				var ty: int = cz + d.y
+				if tx < 0 or ty < 0 or tx >= W or ty >= H:
+					continue
+				cnt += 1
+				match grid[ty * W + tx]:
+					MapGen.WALL:
+						walls += 1
+					MapGen.WATER:
+						water += 1
+					MapGen.PATH, MapGen.BUILDING, MapGen.INTERIOR:
+						paths += 1
+			var amp := 0.0
+			var swell := 0.0
+			for sy in [-5, 0, 5]:
+				for sx in [-5, 0, 5]:
+					var ox := clampi(cx + sx, 0, W - 1)
+					var oy := clampi(cz + sy, 0, H - 1)
+					var o := owner[oy * W + ox]
+					amp += amp_of[o]
+					swell += swell_of[o]
+			amp /= 9.0
+			swell /= 9.0
+			var wx := cx + warp.get_noise_2d(cx, cz) * 6.0
+			var wz := cz + warp.get_noise_2d(cz + 57.0, cx - 31.0) * 6.0
+			var hv := noise.get_noise_2d(wx, wz) * amp + broad.get_noise_2d(cx, cz) * swell
+			if paths > 0:
+				hv *= 0.35
+			hv += walls * 0.12 * (1.0 + amp)
+			if water > 0:
+				hv = -0.62 if water == cnt else minf(hv, -0.2)
+				if paths >= 2:
+					hv = 0.02
+			out[j * (r.size.x + 1) + i] = hv
+			if not ghm.is_empty():
+				ghm[cz * (W + 1) + cx] = hv
+	return out
+
+## Rolling hills beyond the edge of the world and distant mountains on the horizon.
+static func world_edge(root: Node3D, w: int, h: int) -> void:
+	_skirt(root, w, h, "sect", 7)
+	_horizon(root, w, h, "sect", 7)
+
+## the sect's five-storey pagoda (stands on the mountain outside the courtyard wall)
+static func pagoda(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	Arch.pagoda(b, g, pos, 5)
+	var mi := MB.mesh_node(root, b.build())
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	MB.mesh_node(root, g.build(MB.mat_glow()))
+
+## An enterable building: walls, door, floor and furniture as one mesh, the roof as another
+## (returned, so the world can lift it away while the hero is inside).
+static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int, h: int) -> Array:
+	var r: Rect2i = bd.rect
+	var rr := Rect2(r.position.x * T, r.position.y * T, r.size.x * T, r.size.y * T)
+	var gy := sample(hm, w, h, rr.get_center().x, rr.get_center().y)
+	var b := MB.new()
+	var g := MB.new()
+	var roof := MB.new()
+	var roof_g := MB.new()
+	var door := Vector3((bd.door.x + 0.5) * T, 0, (bd.door.y + 0.5) * T)
+	var props: Array = []
+	for pr in bd.get("props", []):
+		props.append([pr[0], Vector3((pr[1].x + 0.5) * T, 0, (pr[1].y + 0.5) * T)])
+	var lights := Arch.house(b, g, roof, roof_g, rr, door, str(bd.get("style", "house")), props, int(r.position.x * 7 + r.position.y))
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.position.y = gy
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	if not g.is_empty():
+		var gi := MB.mesh_node(root, g.build(MB.mat_glow()))
+		gi.position.y = gy
+	var out: Array = []
+	var ri := MB.mesh_node(root, roof.build(MB.mat_scenery()))
+	ri.position.y = gy
+	ri.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	out.append(ri)
+	if not roof_g.is_empty():
+		var rg := MB.mesh_node(root, roof_g.build(MB.mat_glow()))
+		rg.position.y = gy
+		out.append(rg)
+	if DisplayServer.get_name() != "headless":
+		for lt in lights:
+			var l := OmniLight3D.new()
+			l.light_color = lt[1]
+			l.light_energy = 0.9
+			l.omni_range = 6.0
+			l.position = (lt[0] as Vector3) + Vector3(0, gy, 0)
+			root.add_child(l)
+	return out
 
 ## foam factor at each corner of a water tile (1 = touches land)
 static func _shore(grid: PackedByteArray, w: int, h: int, tx: int, ty: int) -> Array:
@@ -1493,46 +1646,6 @@ static func _build_rock(b: MB, th: Dictionary) -> void:
 	b.sph(Vector3(-0.05, 0.3, -0.05), Vector3(0.2, 0.08, 0.18), MB.tag(Color(th.g2).darkened(0.1), MB.FOLIAGE))
 
 # ---------------------------------------------------------------- sect buildings
-static func _sect_buildings(root: Node3D, grid: PackedByteArray, w: int, h: int, th: Dictionary, hm: PackedFloat32Array) -> void:
-	var seen := {}
-	for y in h:
-		for x in w:
-			if grid[y * w + x] != MapGen.BUILDING or seen.has(Vector2i(x, y)):
-				continue
-			var x1 := x
-			while x1 + 1 < w and grid[y * w + x1 + 1] == MapGen.BUILDING:
-				x1 += 1
-			var y1 := y
-			while y1 + 1 < h and grid[(y1 + 1) * w + x] == MapGen.BUILDING:
-				y1 += 1
-			for yy in range(y, y1 + 1):
-				for xx in range(x, x1 + 1):
-					seen[Vector2i(xx, yy)] = true
-			var r := Rect2(x * T, y * T, (x1 - x + 1) * T, (y1 - y + 1) * T)
-			_building(root, r, sample(hm, w, h, r.get_center().x, r.get_center().y))
-
-static func _building(root: Node3D, r: Rect2, gy: float) -> void:
-	# which sect building this is: the Elder's hall at the top, the alchemist west, the smithy east
-	var style := "hall"
-	if r.position.y > 4.0 * T:
-		style = "alchemist" if r.get_center().x < 20.0 * T else "smithy"
-	var b := MB.new()
-	var g := MB.new()
-	var lights := Arch.hall(b, g, r, style, int(r.position.x * 7.0 + r.position.y))
-	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
-	mi.position.y = gy
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	var gi := MB.mesh_node(root, g.build(MB.mat_glow()))
-	gi.position.y = gy
-	if DisplayServer.get_name() != "headless":
-		for lt in lights:
-			var l := OmniLight3D.new()
-			l.light_color = lt[1]
-			l.light_energy = 0.8
-			l.omni_range = 5.0
-			l.position = (lt[0] as Vector3) + Vector3(0, gy, 0)
-			root.add_child(l)
-
 ## Find every run of road tiles with water on both sides and span it with a humped stone bridge.
 static func _bridges(root: Node3D, grid: PackedByteArray, w: int, h: int, hm: PackedFloat32Array) -> void:
 	var b := MB.new()
@@ -1582,8 +1695,6 @@ static func _sect_props(root: Node3D, grid: PackedByteArray, w: int, h: int, hm:
 	var g := MB.new()
 	var wood := MB.tag(Color("a84a32"), MB.WOOD)
 	var gold := MB.tag(Color("e8c860"), MB.METAL)
-	# five-storey pagoda beyond the east wall
-	Arch.pagoda(b, g, Vector3((w + 3.5) * T, -0.3, 5.0 * T), 5)
 	# a whitewashed courtyard wall around the sect, open where the roads leave, and a memorial
 	# archway over each road just inside its gate
 	var gates: Array = []

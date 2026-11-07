@@ -38,6 +38,10 @@ const KINDS := {
 	"karst": [["cranes", 2], ["birds", 2], ["fish", 3], ["dragonflies", 2]],
 	"lilies": [["butterflies", 4], ["moths", 2]],
 	"diyu": [["bats", 2], ["moths", 2]],
+	"village": [["birds", 2], ["butterflies", 2], ["dragonflies", 3], ["fish", 2]],
+	"tea": [["birds", 2], ["cranes", 2], ["butterflies", 2]],
+	"silk": [["moths", 3], ["butterflies", 3], ["birds", 1]],
+	"loom": [["butterflies", 3], ["cranes", 1]],
 }
 
 const FLAP := """
