@@ -58,6 +58,11 @@ func _sheet(n: String, frames: Array, keep: float = 0.36) -> void:
 	print("[tour] ", n)
 
 ## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
+## An enemy's model as the game builds it: its shape in its own palette.
+func _foe(id: String, boss: bool = false) -> Node3D:
+	var d: Dictionary = Data.ENEMIES[id]
+	return Models.monster(d.shape, d.col, boss, id)
+
 func _gallery(n: String, models: Array, spacing: float, yaw: float = 0.35) -> void:
 	main.world.hide()
 	var stage := Node3D.new()
@@ -212,6 +217,40 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 	stage.queue_free()
 	main.world.show()
 
+## The hero runs down the longest free line of tiles with Yue Ling at his shoulder, then stops; a
+## camera on her side tracks them (--follow writes follow_<id>.png).  Both should face the way they
+## run, and she should stop running once she has caught up.
+func _follow(id: String) -> void:
+	var wo = main.world
+	var dir := Vector2i(1, 0)
+	var best := -1
+	for dv in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		var n := 0
+		while n < 10 and wo.tile_free(wo.ptile + dv * (n + 1)) and wo.ent_at(wo.ptile + dv * (n + 1)) == null:
+			n += 1
+		if n > best:
+			best = n
+			dir = dv
+	var fwd := Vector3(dir.x, 0.0, dir.y)
+	var side := Vector3(-dir.y, 0.0, dir.x)  # Yue Ling's side of the hero
+	main.bot_active = true  # hold the direction: the keyboard is not read while the bot flag is up
+	wo.move_dir = dir
+	var strip: Array = []
+	for k in 7:
+		if k == 4:
+			wo.move_dir = Vector2i.ZERO
+		for f in (5 if k < 4 else 9):
+			var hp: Vector3 = wo._player_pos()
+			var eye := hp + side * 8.0 - fwd * 1.0 + Vector3(0.0, 2.0, 0.0)
+			wo.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(hp + side * 0.8 + Vector3(0.0, 0.9, 0.0), Vector3.UP)
+			await get_tree().process_frame
+		await _shot("follow_%s_%d" % [id, k], false)
+		strip.append(last_img)
+	wo.move_dir = Vector2i.ZERO
+	main.bot_active = false
+	wo.cam_override = null
+	await _sheet("follow_" + id, strip, 0.4)
+
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for r in 20:
 		for dx in range(-r, r + 1):
@@ -257,6 +296,8 @@ func _run() -> void:
 		main.world.banner_t = 0.0
 		await _wait(1.2)
 		await _shot("world_" + id)
+		if main.args.has("follow"):
+			await _follow(id)
 		if main.args.has("vista"):
 			# a wide, high establishing shot over the region's landscape
 			var pp: Vector3 = main.world._player_pos()
@@ -354,7 +395,7 @@ func _run() -> void:
 			if Assets.PEOPLE.has(id2):
 				mm = Assets.person(id2)
 			else:
-				mm = Models.monster(id2, tint)
+				mm = _foe(id2) if Data.ENEMIES.has(id2) else Models.monster(id2, tint)
 				var ab := AABB()
 				for mi in mm.get_meta("meshes", []):
 					ab = ab.merge((mi as MeshInstance3D).get_aabb())
@@ -370,6 +411,9 @@ func _run() -> void:
 				var id: String = picks[i]
 				if Assets.PEOPLE.has(id):
 					ms.append(Assets.person(id))
+				elif Data.ENEMIES.has(id):
+					# an enemy by id: its shape in its own palette (element accent, pinned colours)
+					ms.append(_foe(id))
 				elif not Assets.has_monster(id) and Assets.has("props/" + id):
 					var ph := Node3D.new()
 					MB.mesh_node(ph, Assets.static_mesh("props/" + id))
@@ -385,8 +429,8 @@ func _run() -> void:
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
 			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
 			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
-			Models.monster("humanoid", Color("c0603a"), false),
-			Models.monster("demon", Color("e02050"), false),
+			_foe("iron_fang"),
+			_foe("demon_lord"),
 		], 1.0)
 		# Blender-built NPCs (art/characters)
 		await _gallery("gallery_npcs", [
@@ -395,8 +439,8 @@ func _run() -> void:
 		], 0.8)
 		# Part V creatures (art/monsters)
 		await _gallery("gallery_part5", [
-			Models.monster("scorpion", Color("e8d8a0")), Models.monster("mushroom", Color("c070e0")), Models.monster("mammoth", Color("a0b8d0")),
-			Models.monster("moth", Color("ffb040")), Models.monster("hundun", Color("e05030")),
+			_foe("glass_scorpion"), _foe("spore_mother"), _foe("mammoth_ancestor"),
+			_foe("moth_queen"), _foe("hundun"),
 		], 1.7)
 		# Part VI people (art/characters)
 		await _gallery("gallery_npcs_part6", [
@@ -410,8 +454,8 @@ func _run() -> void:
 		], 0.7)
 		# Part VI creatures (art/monsters)
 		await _gallery("gallery_part6", [
-			Models.monster("fox", Color("ff6a30")), Models.monster("carp", Color("ffb060")), Models.monster("oxhead", Color("6a3a2a")),
-			Models.monster("horseface", Color("8a4a3a")), Models.monster("jiangshi", Color("3a5a4a")),
+			_foe("nine_tail_fox"), _foe("waterfall_koi"), _foe("ox_head"),
+			_foe("horse_face"), _foe("corpse_patriarch"),
 		], 1.7)
 		# Part VII and VIII people (art/characters)
 		await _gallery("gallery_npcs_part7", [
@@ -423,11 +467,11 @@ func _run() -> void:
 		], 0.9)
 		# Part VIII creatures (art/monsters)
 		await _gallery("gallery_part8", [
-			Models.monster("qilin", Color("e05a3a")), Models.monster("tiger", Color("e8e0d0")), Models.monster("ape", Color("6a5a8a")),
-			Models.monster("magpie", Color("2a3a6a")), Models.monster("kaiming", Color("d8a040")),
+			_foe("jade_qilin"), _foe("white_tiger"), _foe("thunder_ape"),
+			_foe("bridge_magpie"), _foe("kaiming_beast"),
 		], 1.7)
 		await _gallery("gallery_part8_bosses", [
-			Models.monster("queen", Color("f0d8a0")), Models.monster("warden", Color("3a7ab0")), Models.monster("crowmarshal", Color("3a3040")),
+			_foe("xiwangmu"), _foe("river_warden"), _foe("crow_marshal"),
 		], 1.5)
 		# Part IX people and creatures (art/characters, art/monsters)
 		await _gallery("gallery_npcs_part9", [
@@ -447,14 +491,19 @@ func _run() -> void:
 			Assets.person("monk_huiming"), Assets.person("granny_gu"), Assets.person("porter_niu"), Assets.person("little_dou"),
 		], 0.7)
 		await _gallery("gallery_part9", [
-			Models.monster("sun_crow", Color("ff9a20")), Models.monster("jade_rabbit", Color("f4f8f0")), Models.monster("bifang", Color("3a9a8a")),
-			Models.monster("jiangshi", Color("8a9a6a")), Models.monster("phoenix", Color("ff7040")),
+			_foe("jinwu"), _foe("mortar_rabbit"), _foe("bifang"),
+			_foe("hanba"), _foe("xihe"),
 		], 1.7)
 		# one shape, three enemies: the palette (Assets.palette) turns a single tint into a scheme
 		await _gallery("gallery_palettes", [
-			Models.monster("beast", Color("3a9a5a")), Models.monster("beast", Color("d04a2a")), Models.monster("beast", Color("8a8aa0")),
-			Models.monster("dragon", Color("3a8ad8")), Models.monster("dragon", Color("e0a020")),
+			_foe("bamboo_wolf"), _foe("frost_wolf"), _foe("blood_hound"),
+			_foe("dragon_king"), _foe("dune_leviathan"),
 		], 1.7)
+		# one enemy per element: the accent (eyes, crests, glow) follows the element
+		await _gallery("gallery_elements", [
+			_foe("leaf_sprite"), _foe("magma_slime"), _foe("tide_qilin"),
+			_foe("jade_lion"), _foe("thunder_ape"), _foe("void_sentinel"),
+		], 1.5)
 		# Blender landmarks (art/props)
 		var props: Array = []
 		for pr in ["pine", "bamboo", "peach", "meteor", "glowcap", "icespire", "chaosrock", "stonelantern", "ghostpagoda"]:
@@ -476,16 +525,16 @@ func _run() -> void:
 			built8.append(holder3)
 		await _gallery("gallery_landmarks_part8", built8, 1.4)
 		await _gallery("gallery_beasts", [
-			Models.monster("beast", Color("7aa860")), Models.monster("mantis", Color("5fd890")), Models.monster("tortoise", Color("b8903a")),
-			Models.monster("crab", Color("d0502a")), Models.monster("spider", Color("5a3a90")),
+			_foe("bamboo_wolf"), _foe("jade_mantis"), _foe("time_tortoise"),
+			_foe("crab_general"), _foe("rift_spider"),
 		], 1.5)
 		await _gallery("gallery_spirits", [
-			Models.monster("phoenix", Color("ff8a2a")), Models.monster("ray", Color("7ab0f0")), Models.monster("jelly", Color("7ad8ff")),
-			Models.monster("wraith", Color("6a5a8a")), Models.monster("tome", Color("40c090"), true),
+			_foe("ash_phoenix"), _foe("manta_sovereign"), _foe("abyss_jelly"),
+			_foe("bog_wraith"), _foe("jade_ledger", true),
 		], 1.6)
 		await _gallery("gallery_giants", [
-			Models.monster("dragon", Color("3a8ad8")), Models.monster("golem", Color("e0501a")), Models.monster("serpent", Color("2a9a8a")),
-			Models.monster("plant", Color("4fc07a")), Models.monster("storm", Color("c8d8ff")),
+			_foe("dragon_king"), _foe("lava_titan"), _foe("tide_hydra"),
+			_foe("bamboo_spirit"), _foe("tribulation"),
 		], 1.7)
 	if main.args.has("portraits") or not main.args.has("no-extras"):
 		await _portraits("portrait_heroes", [

@@ -68,7 +68,7 @@ for k in range(7):
         y = -0.5 + i * 0.13 + 0.1 * math.sin(i + k)
         rr = math.sqrt(max(0.02, 1.0 - (y / 0.73) ** 2)) * 0.7
         pts.append(C + V(math.sin(a) * rr, y, math.cos(a) * rr))
-    b.tube(pts, [0.018] * 9, (1.0, 0.95, 0.6), cls=CRYSTAL, bone="body", mat=MAT_GLOW, seg=5)
+    b.tube(pts, [0.018] * 9, (1.0, 1.0, 1.0), cls=CRYSTAL, bone="body", mat=MAT_GLOW, seg=5, tint=1.0)
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # the missing face: a whirl of light on a dark hollow
 b.disc(C + V(0, 0.1, 0.735), 0.3, "120818", cls=SKIN, bone="body", seg=24, rot=(math.pi / 2, 0, 0), thick=0.02)

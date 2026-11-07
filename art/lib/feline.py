@@ -110,6 +110,17 @@ def build(name="tiger", res=0.0145):
         band = 0.5 + 0.5 * math.cos(2 * math.pi * (t * freq + 0.8 * (w - 0.5)))
         return smooth(0.74, 0.8, band)
 
+    def king_w(q):
+        # the king mark: three bars across the brow and a stroke down the middle (the character
+        # wang), painted in the palette's accent colour as the tiger's focal point
+        k = 0.0
+        if q.y > 0.055 and q.z > -0.06:
+            for i in range(3):
+                yy = 0.075 + 0.022 * i
+                k = max(k, smooth(0.008, 0.002, abs(q.y - yy - 0.01 * q.z)) * smooth(0.045 - 0.006 * i, 0.03 - 0.006 * i, abs(q.x)))
+            k = max(k, smooth(0.008, 0.002, abs(q.x)) * smooth(0.06, 0.08, q.y) * smooth(-0.04, 0.0, q.z))
+        return k
+
     def head_col(p, info):
         q = head_local(p) / K
         under = smooth(-0.02, -0.07, q.y + 0.03 * (q.z > 0.08)) if q.z > -0.02 else 0.0
@@ -122,12 +133,6 @@ def build(name="tiger", res=0.0145):
             white = max(white, smooth(0.028, 0.012, math.hypot(q.x - 0.045 * s, q.y - 0.075)) * smooth(0.04, 0.08, q.z))
             white = max(white, smooth(0.05, 0.03, math.hypot(q.x - 0.085 * s, (q.y + 0.04) * 1.2)) * smooth(-0.04, 0.02, q.z))
         dark = 0.0
-        # the king mark: bars across the brow and a stroke down the middle
-        if q.y > 0.055 and q.z > -0.06:
-            for k in range(3):
-                yy = 0.075 + 0.022 * k
-                dark = max(dark, smooth(0.008, 0.002, abs(q.y - yy - 0.01 * q.z)) * smooth(0.045 - 0.006 * k, 0.03 - 0.006 * k, abs(q.x)))
-            dark = max(dark, smooth(0.008, 0.002, abs(q.x)) * smooth(0.06, 0.08, q.y) * smooth(-0.04, 0.0, q.z))
         # cheek stripes sweeping back below the eyes
         for s in (1, -1):
             if q.x * s > 0.055 and q.z < 0.08:
@@ -140,7 +145,14 @@ def build(name="tiger", res=0.0145):
         dark = max(dark, 0.5 * stripes_body(p, 0.0) * top)
         v = 0.8 * (1.0 - dark) + 0.12 * dark
         v = v * (1.0 - white) + 1.0 * white
+        kw = king_w(q)
+        v = v * (1.0 - kw) + 0.95 * kw
         return (v, v, v)
+
+    def pal(p, info):
+        if info.tag in ("head", "muzzle", "ruff") and king_w(head_local(p) / K) > 0.45:
+            return 1.0
+        return 0.0
 
     def col(p, info):
         tag = info.tag
@@ -182,10 +194,12 @@ def build(name="tiger", res=0.0145):
 
     def tint(p, info):
         # the pale coat keeps most of its own colour; orange and stripes take the enemy's
+        if pal(p, info) > 0.5:
+            return 1.0
         cc = col(p, info)[0]
         return 1.0 - 0.75 * smooth(0.88, 0.97, cc)
 
-    body = c.build(b, col, cls=PELT, tint_fn=tint, smooth=1)
+    body = c.build(b, col, cls=PELT, tint_fn=tint, smooth=1, pal_fn=pal)
 
     # ---------------------------------------------------------------- lower jaw (its own part)
     j = Clay(res * 0.8, name + "_jaw")

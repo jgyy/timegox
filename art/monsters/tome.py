@@ -76,7 +76,7 @@ for k in range(5):
     b.sheet(rows, "fbf4e0", cls=CLOTH, bone="page%d" % k, cols=["fbf4e0", "f4ead0", "ece0c0"])
 # the eye in the clasp
 b.ellipsoid(V(0, Y - 0.02, 0.42), (0.1, 0.1, 0.05), "d8b050", cls=METAL, bone="spine", seg=14, rings=8)
-b.eye(V(0, Y - 0.02, 0.46), 0.07, "40ffb0", side=1, bone="spine", rot_y=0.0, h=1.0, glow=True, slit=True)
+b.eye(V(0, Y - 0.02, 0.46), 0.07, "40ffb0", side=1, bone="spine", rot_y=0.0, h=1.0, glow=True, slit=True, accent=True)
 # glowing script hovering above the pages
 for k in range(14):
     a = (k / 13 - 0.5) * 1.6
@@ -207,4 +207,5 @@ def die(t):
 
 kit.scale_asset(b, r, 1.6)
 print("[art] tome: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/tome.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.45)
+# a book has a binding, not a coat: its leather keeps its own tooling (no coat split)
+kit.finish_rigged(b, r, "monsters/tome.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, coat=False, samples=12, dist=0.25, strength=0.45)

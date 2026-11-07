@@ -115,12 +115,15 @@ for s, sd in ((1, "L"), (-1, "R")):
                up=tuple(hf.u))
     tip0 = c0 + fwd * (0.3 * big + 0.02)
     fixed = [tip0 + hf.u * (-0.06 * big), tip0 + fwd * 0.12 * big - hf.u * 0.07 * big, tip0 + fwd * 0.24 * big - hf.u * 0.05 * big, tip0 + fwd * 0.3 * big - hf.u * 0.01]
-    A.horn(b, fixed, 0.06 * big, (0.86, 0.86, 0.86), (0.15, 0.12, 0.12), "claw." + sd, r1=0.006, cls=SCALE, seg=10, flat=0.6, up=tuple(hf.r), tint=1.0)
+    # the fingers in the accent colour fading to dark tips, like a fiddler crab's claw
+    b.cur_pal = 1.0
+    A.horn(b, fixed, 0.06 * big, (0.92, 0.92, 0.92), (0.15, 0.12, 0.12), "claw." + sd, r1=0.006, cls=SCALE, seg=10, flat=0.6, up=tuple(hf.r), tint=1.0)
     pc = r.bones["pincer." + sd]
     p0, p1 = V(pc[0]), V(pc[1])
     pf = (p1 - p0).normalized()
     mov = [p0, p0 + pf * 0.12 * big + hf.u * 0.035 * big, p0 + pf * 0.24 * big + hf.u * 0.01, p0 + pf * 0.3 * big - hf.u * 0.04 * big]
-    A.horn(b, mov, 0.055 * big, (0.9, 0.9, 0.9), (0.15, 0.12, 0.12), "pincer." + sd, r1=0.006, cls=SCALE, seg=10, flat=0.6, up=tuple(hf.r), tint=1.0)
+    A.horn(b, mov, 0.055 * big, (0.92, 0.92, 0.92), (0.15, 0.12, 0.12), "pincer." + sd, r1=0.006, cls=SCALE, seg=10, flat=0.6, up=tuple(hf.r), tint=1.0)
+    b.cur_pal = 0.0
     for q in range(5):
         t = 0.2 + q * 0.15
         b.cone(p0 + pf * (0.3 * big * t) - hf.u * 0.03 * big, 0.011 * big, 0.03 * big, "f0e8d8", cls=STONE, bone="pincer." + sd, seg=5, rot=(math.pi, 0, 0))

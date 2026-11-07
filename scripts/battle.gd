@@ -167,7 +167,7 @@ func _stage_for(th: String) -> Dictionary:
 func _build_fighters() -> void:
 	for f in party + foes:
 		var boss: bool = f.boss
-		var m := Models.monster(f.shape, f.col, boss)
+		var m := Models.monster(f.shape, f.col, boss, f.get("id", "") if f.side == "foe" else "")
 		var sc := 1.0
 		if f.side == "foe":
 			sc = 2.6 if boss else 1.35

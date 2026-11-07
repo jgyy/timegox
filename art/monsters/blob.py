@@ -91,7 +91,7 @@ for k in range(12):
 b.cur_pal = 0.0
 # face: big glossy eyes and a gaping mouth with a tongue
 for s in (1, -1):
-    b.eye(V(0.17 * s, 0.62, 0.5), 0.085, "1a2030", side=s, bone=bw(V(0, 0.6, 0)), rot_y=0.25, h=1.25)
+    b.eye(V(0.17 * s, 0.62, 0.5), 0.085, "1a2030", side=s, bone=bw(V(0, 0.6, 0)), rot_y=0.25, h=1.25, accent=True)
 b.ellipsoid(V(0, 0.42, 0.58), (0.11, 0.075, 0.04), "401828", cls=SKIN, bone="body", seg=12, rings=6)
 b.ellipsoid(V(0, 0.4, 0.6), (0.055, 0.03, 0.02), "e05068", cls=SKIN, bone="body", seg=10, rings=5)
 

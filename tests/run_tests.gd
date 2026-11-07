@@ -149,6 +149,96 @@ func _init() -> void:
 	check(absf((pal[3] as Color).h - (pal[0] as Color).h) > 0.05 and absf((pal[4] as Color).h - (pal[0] as Color).h) > 0.3, "palette: analogous secondary and contrasting accent")
 	var grey_pal: Array = Assets.palette(Color("e8e8f0"))
 	check((grey_pal[4] as Color).s > 0.3, "palette: a near-grey enemy still gets a coloured accent")
+	# monster colour: a pale countershaded underside, markings that contrast in value, a secondary
+	# set apart in hue and value, and a saturated accent away from the body's hue
+	var wolf_pal: Array = Assets.palette(Color("7aa860"), "wood")
+	var wb: Color = wolf_pal[0]
+	check((wolf_pal[5] as Color).v > wb.v + 0.15 and (wolf_pal[5] as Color).s < wb.s, "palette: the underside is paler and less saturated than the body")
+	check(absf((wolf_pal[6] as Color).v - wb.v) > 0.35, "palette: markings contrast in value with the body")
+	check(Assets.hue_gap((wolf_pal[3] as Color).h, wb.h) > 0.08 and absf((wolf_pal[3] as Color).v - wb.v) > 0.1, "palette: the secondary differs from the body in hue and in value")
+	check(Assets.hue_gap((wolf_pal[4] as Color).h, wb.h) >= 0.07 and (wolf_pal[4] as Color).s > 0.5, "palette: a saturated accent well away from the body's hue")
+	var dark_pal: Array = Assets.palette(Color("2a2a38"), "dark")
+	check((dark_pal[6] as Color).v > 0.7, "palette: a dark coat gets pale markings")
+	var fire_pal: Array = Assets.palette(Color("3a6ad8"), "fire")
+	check(Assets.hue_gap((fire_pal[4] as Color).h, Color("ffc21a").h) < 0.01, "palette: the element sets the accent (fire: gold)")
+	var gold_fire: Array = Assets.palette(Color("f0b020"), "fire")
+	check(Assets.hue_gap((gold_fire[4] as Color).h, Color("f0b020").h) >= 0.07, "palette: a golden fire beast gets the element's alternate accent")
+	var bf: Dictionary = Data.ENEMIES.bifang
+	var bf_pal: Array = Assets.palette(bf.col, bf.elem, bf.pal)
+	check((bf_pal[6] as Color).is_equal_approx(Color("e0302a")), "palette: Bifang's red markings on a blue-green body are pinned")
+	for eid in Data.ENEMIES:
+		var pin: Dictionary = Data.ENEMIES[eid].get("pal", {})
+		for key in pin:
+			check(key in ["sec", "acc", "under", "mark"] and pin[key] is Color, "%s: pinned palette role %s" % [eid, key])
+	# palette slots decode to the roles, blending from the body into underside and markings
+	var lin_pal: Array = []
+	for pc in wolf_pal:
+		lin_pal.append((pc as Color).srgb_to_linear())
+	var grey9 := Color(0.9, 0.9, 0.9)
+	check(Assets._tint_for(lin_pal, grey9, 0.2).is_equal_approx(lin_pal[5]) and Assets._tint_for(lin_pal, grey9, 0.8).is_equal_approx(lin_pal[6]), "slots: 0.2 is the underside, 0.8 the markings")
+	check(Assets._tint_for(lin_pal, grey9, 0.5).is_equal_approx(lin_pal[3]) and Assets._tint_for(lin_pal, grey9, 1.0).is_equal_approx(lin_pal[4]), "slots: 0.5 is the secondary, 1 the accent")
+	var half: Color = Assets._tint_for(lin_pal, grey9, 0.1)
+	check(half.is_equal_approx(Assets._tint_for(lin_pal, grey9, 0.0).lerp(lin_pal[5], 0.5)), "slots: 0.1 blends halfway into the underside")
+	# every monster model is painted in several palette roles, not one flat colour
+	var multi := 0
+	var with_accent := 0
+	for shape2 in Assets.MONSTERS:
+		if shape2 == "bird" or not Assets.has_monster(shape2):
+			continue
+		var m2 := Assets.instance(Assets.MONSTERS[shape2])
+		var share := [0, 0, 0, 0, 0]
+		var n_t := 0
+		for mi3 in m2.get_meta("meshes"):
+			for si3 in mi3.mesh.get_surface_count():
+				var a3: Array = mi3.mesh.surface_get_arrays(si3)
+				var u3 = a3[Mesh.ARRAY_TEX_UV]
+				if u3 == null:
+					continue
+				for uv in u3:
+					if uv.x < 0.05:
+						continue
+					var sl: float = 1.0 - uv.y
+					var role: int = 0 if sl < 0.005 else (1 if sl <= 0.21 else (2 if sl < 0.56 else (3 if sl <= 0.81 else 4)))
+					share[role] += 1
+					n_t += 1
+		var roles := 0
+		for r2 in 5:
+			if n_t > 0 and share[r2] >= n_t * 0.02:
+				roles += 1
+		if roles >= 3:
+			multi += 1
+		if share[4] > 0:
+			with_accent += 1
+		m2.free()
+	check(multi >= 34, "palette roles: %d of 40 monsters use three or more of dominant, underside, secondary, markings and accent" % multi)
+	check(with_accent >= 38, "palette roles: %d of 40 monsters carry an accent (eyes, crests, horns, glow)" % with_accent)
+	# Yue Ling follows facing the way she runs (not sideways towards the hero), and stops running
+	# once she has caught up
+	var cpos := Vector3.ZERO
+	var hero_p := Vector3.ZERO
+	var c_run := false
+	var c_yaw := 0.0
+	var ran := false
+	var worst := 0.0
+	for f in 60:
+		hero_p.x += 12.5 / 30.0
+		var cs: Array = Models.companion_step(cpos, hero_p, Vector2i(1, 0), PI / 2, c_run, false, 1.0 / 30.0)
+		cpos = cs[0]
+		c_yaw = cs[1]
+		c_run = cs[2]
+		if f > 20:
+			ran = ran or c_run
+			worst = maxf(worst, absf(angle_difference(c_yaw, PI / 2)))
+	check(ran and worst < 0.35, "companion: runs facing the way she goes (worst %.2f rad off)" % worst)
+	for f in 60:
+		var cs2: Array = Models.companion_step(cpos, hero_p, Vector2i(1, 0), PI / 2, c_run, false, 1.0 / 30.0)
+		cpos = cs2[0]
+		c_yaw = cs2[1]
+		c_run = cs2[2]
+	check(not c_run and absf(angle_difference(c_yaw, PI / 2)) < 0.01, "companion: stops running and looks where the hero looks once she has caught up")
+	var cs3: Array = Models.companion_step(cpos, hero_p, Vector2i(1, 0), PI / 2, false, true, 1.0 / 30.0)
+	var to_hero := hero_p - (cs3[0] as Vector3)
+	check(absf(angle_difference(cs3[1], atan2(to_hero.x, to_hero.z))) < 0.01, "companion: turns to the hero in a conversation")
 	var dragon := Assets.monster("dragon", Color("c03020"))
 	var huesets := {}
 	for mi2 in dragon.get_meta("meshes"):

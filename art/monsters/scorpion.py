@@ -68,7 +68,9 @@ for i in range(5):
     A.sclerite(b, a - (c2 - a) * 0.06, c2 + (c2 - a) * 0.04, w, w * 0.92, "tail%d" % i, col=0.88, keels=4, phase=math.pi / 4, ridge=0.16, seg=18, rings=10, joint=0.45,
             up=(c2 - a).normalized().cross(V(1, 0, 0)))
 bulb = TAIL[5] + V(0, -0.02, 0.09)
+b.cur_pal = 1.0  # the venom gland glows through in the accent colour: a warning
 b.ellipsoid(bulb, (0.1, 0.09, 0.13), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="tail4", tint=1.0, mat=MAT_GLOW, seg=14, rings=10)
+b.cur_pal = 0.0
 A.sclerite(b, bulb - V(0, -0.03, 0.12), bulb + V(0, -0.02, 0.12), 0.105, 0.075, "tail4", col=0.82, keels=0, belly=0.6, blunt=0.5, seg=18, rings=10, joint=0.2)
 A.horn(b, [bulb + V(0, -0.04, 0.1), bulb + V(0, -0.1, 0.19), bulb + V(0, -0.2, 0.2), bulb + V(0, -0.27, 0.13)], 0.034, "5a2020", "0a0606", "tail4", r1=0.002, cls=STONE, seg=10)
 # pedipalps: femur and patella, then the chela - a big swollen hand with a fixed finger and a

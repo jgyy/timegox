@@ -178,7 +178,7 @@ def build(name="phoenix", style="phoenix"):
         A.animal_eye(b, hp(0.058 * s, 0.025, 0.035), hf.r * s + hf.f * 0.35, 0.022 * S, iris, "head", pupil="round", almond=0.9, side=s,
                      glow=style in ("phoenix", "sun_crow"), ring="e05030" if style == "phoenix" else None)
     if cf["crest"]:
-        b.cur_pal = 0.5
+        b.cur_pal = 1.0  # the crest crowns the head, the first focal point: the accent colour
         n_c = 7 if style == "phoenix" else 4
         for k in range(n_c):
             a = (k - (n_c - 1) / 2) * 0.16
@@ -211,7 +211,7 @@ def build(name="phoenix", style="phoenix"):
         b.tube(arm, [0.05 * S, 0.042 * S, 0.032 * S, 0.024 * S, 0.01 * S], (0.8, 0.8, 0.8), cls=HAIR, tint=1.0, seg=10,
                bones=[{"body": 0.5, w1: 0.5}, w1, {w1: 0.5, w2: 0.5}, {w2: 0.5, w3: 0.5}, w3],
                cols=[(0.22,) * 3] * 5 if style == "magpie" else None)
-        b.cur_pal = 0.0
+        b.cur_pal = 0.5  # the flight feathers and coverts: the secondary colour, the wing's own
         # primaries: long feathers off the hand, fanning from the tip inwards
         for k in range(8):
             u = k / 7
@@ -250,13 +250,15 @@ def build(name="phoenix", style="phoenix"):
                         curl=0.08, thick=0.15, tint=tn, point=0.1)
         b.cur_pal = 0.0
         if style in ("sun_crow", "bifang"):
-            # tongues of fire along the trailing edge of the wing
+            # tongues of fire along the trailing edge of the wing, in the accent colour
+            b.cur_pal = 1.0
             for k in range(7):
                 u = k / 6
                 base = el.lerp(tp, u) + V(0, 0.01, -0.3 * S * (1.0 - 0.4 * u))
                 d = V(0.3 * s * u, 0.35, -1.0).normalized()
-                A.lock(b, base, d, V(0, 1, 0), (0.24 - 0.08 * u) * S, 0.05 * S, "ff6018", "fff0a0", bone=w2 if u < 0.5 else w3, lift=0.4, rise=0.3,
-                       cls=HAIR, mat=MAT_GLOW, tint=0.0, bend=0.3 * s)
+                A.lock(b, base, d, V(0, 1, 0), (0.24 - 0.08 * u) * S, 0.05 * S, "d0d0d0", "ffffff", bone=w2 if u < 0.5 else w3, lift=0.4, rise=0.3,
+                       cls=HAIR, mat=MAT_GLOW, tint=1.0, bend=0.3 * s)
+            b.cur_pal = 0.0
 
     # ---------------------------------------------------------------- tail
     tb = [{"tail0": 1.0}, {"tail1": 1.0}, {"tail2": 1.0}]
@@ -268,7 +270,9 @@ def build(name="phoenix", style="phoenix"):
             for i in range(3):
                 A.blade(b, pts[i], pts[i + 1], (0.05 + 0.025 * i) * S, (0.75,) * 3, (0.95,) * 3, side=V(1, 0, 0), bone=tb[i], curl=0.03, thick=0.15, point=0.0 if i < 2 else 0.3)
             b.ellipsoid(pts[3] + V(0, 0.012, 0.04) * S, (0.06 * S, 0.012 * S, 0.075 * S), "fff4b0", cls=CRYSTAL, bone="tail2", seg=10, rings=5, mat=MAT_GLOW)
-            b.ellipsoid(pts[3] + V(0, 0.02, 0.04) * S, (0.03 * S, 0.01 * S, 0.035 * S), "ff6030", cls=CRYSTAL, bone="tail2", seg=8, rings=4, mat=MAT_GLOW)
+            b.cur_pal = 1.0  # the eye of each plume in the accent colour
+            b.ellipsoid(pts[3] + V(0, 0.02, 0.04) * S, (0.03 * S, 0.01 * S, 0.035 * S), "e8e8e8", cls=CRYSTAL, bone="tail2", seg=8, rings=4, mat=MAT_GLOW, tint=1.0)
+            b.cur_pal = 0.5
         b.cur_pal = 0.0
     elif cf["tail"] == "long":
         for k in range(8):
@@ -290,8 +294,10 @@ def build(name="phoenix", style="phoenix"):
             A.blade(b, root, tip, 0.08 * S, c0, (0.62,) * 3 if style == "sun_crow" else (0.5,) * 3, side=V(math.cos(a), 0, math.sin(a)), bone={"tail0": 0.4, "tail1": 0.6},
                     curl=0.04, thick=0.12, point=0.15)
             if style in ("sun_crow", "bifang"):
-                A.lock(b, tip - V(0, 0, -0.02), (tip - root).normalized() + V(0, 0.3, 0), V(0, 1, 0), 0.16 * S, 0.04 * S, "ff6018", "fff0a0", bone="tail2", lift=0.4, rise=0.3,
-                       cls=HAIR, mat=MAT_GLOW, tint=0.0)
+                b.cur_pal = 1.0
+                A.lock(b, tip - V(0, 0, -0.02), (tip - root).normalized() + V(0, 0.3, 0), V(0, 1, 0), 0.16 * S, 0.04 * S, "d0d0d0", "ffffff", bone="tail2", lift=0.4, rise=0.3,
+                       cls=HAIR, mat=MAT_GLOW, tint=1.0)
+                b.cur_pal = 0.0
 
     # ---------------------------------------------------------------- legs: scaled shanks, toes, talons
     leg_col = {"phoenix": "c89030", "magpie": "2a2a30", "sun_crow": "c08a20", "bifang": "3a3a40"}[style]

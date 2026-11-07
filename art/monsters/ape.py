@@ -120,12 +120,17 @@ def col(p, info):
     if tag == "chest" and n.z > 0.25 and n.y < 0.6:
         return mix(SKINC, (0.7, 0.7, 0.7), smooth(0.45, 0.25, n.z))
     if tag == "crest":
-        return (0.6, 0.6, 0.6)
+        return (0.92, 0.92, 0.92)  # painted light: the crest takes the accent colour (see pal)
     # the silver saddle across the lower back
     saddle = smooth(0.3, 0.7, n.y) * smooth(1.25, 1.1, p.y) * smooth(-0.3, -0.1, p.z) * (1.0 - smooth(0.15, 0.3, p.z))
     v = 0.7 + 0.08 * (g - 0.5) - 0.1 * smooth(0.6, 1.0, n.y) * (1.0 - saddle)
     v = v * (1.0 - saddle) + 0.96 * saddle
     return (v, v, v)
+
+
+def pal(p, info):
+    # the sagittal crest is the ape's focal flash of colour (a mandrill's face, a thunder crest)
+    return 1.0 if info.tag == "crest" else 0.0
 
 
 def tint(p, info):
@@ -147,7 +152,7 @@ def shag(p, info):
     return nn * (0.02 * k ** 1.5)
 
 
-body = c.build(b, col, cls=CLOTH, tint_fn=tint, post=shag)
+body = c.build(b, col, cls=CLOTH, tint_fn=tint, post=shag, pal_fn=pal)
 # a separate lower jaw with a dark lip
 j = Clay(0.012, "ape_jaw")
 j.ellipsoid(hp(0, -0.1, 0.1), (0.065, 0.035, 0.06), rot=hf.M, bones={"jaw": 1.0}, tag="jaw")

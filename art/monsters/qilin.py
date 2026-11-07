@@ -140,7 +140,9 @@ for s, sd in ((1, "L"), (-1, "R")):
 b.cur_pal = 0.0
 # the single horn: ridged keratin swept back over the crown, pale at the tip
 horn = [hp(0, 0.065, 0.03), hp(0, 0.115, 0.0), hp(0, 0.15, -0.07), hp(0, 0.16, -0.15), hp(0, 0.145, -0.21)]
-A.horn(b, horn, 0.022 * K, "b8a070", "fff4d8", "head", r1=0.003, rings=6, ring_k=0.18, ridge=0.08, seg=12)
+b.cur_pal = 1.0  # the horn is the qilin's focal point: the accent colour, pale at the tip
+A.horn(b, horn, 0.022 * K, "b0b0b0", "ffffff", "head", r1=0.003, rings=6, ring_k=0.18, ridge=0.08, seg=12, tint=1.0)
+b.cur_pal = 0.0
 b.ball(hp(0, 0.06, 0.05), 0.014 * K, "80f0d0", cls=CRYSTAL, bone="head", seg=8, rings=6, mat=MAT_GLOW)
 
 # ---------------------------------------------------------------- mane, beard, whiskers, plume (secondary colour)
@@ -184,12 +186,14 @@ for sd, s in (("L", 1), ("R", -1)):
         p0 = sk[fb + "." + sd]
         p1 = sk[ft + "." + sd]
         A.hoof(b, V(p1.x, 0.0, p1.z - 0.03), V(0, 0, 1), 0.05, 0.075, "2a2420", pre + "_toe." + sd, cloven=True, col_top="4a3a30")
-    # flames curling at the elbow and the hock (they keep their own golden colour)
+    # flames curling at the elbow and the hock, in the accent colour
     for jn, bone in ((sk["el." + sd], "f_lo." + sd), (sk["hk." + sd], "h_meta." + sd)):
         for k in range(3):
             root = jn + V(0.03 * s, 0.03 * k - 0.02, -0.03)
-            A.lock(b, root, V(0.3 * s, 0.45 + 0.2 * k, -1.0).normalized(), V(s, 0, 0), 0.11 - 0.02 * k, 0.03, "ffa030", "fff0a0", bone=bone,
-                   lift=0.4, rise=0.2, cls=HAIR, mat=MAT_GLOW, tint=0.0, bend=0.3 * s)
+            b.cur_pal = 1.0
+            A.lock(b, root, V(0.3 * s, 0.45 + 0.2 * k, -1.0).normalized(), V(s, 0, 0), 0.11 - 0.02 * k, 0.03, "d8d8d8", "ffffff", bone=bone,
+                   lift=0.4, rise=0.2, cls=HAIR, mat=MAT_GLOW, tint=1.0, bend=0.3 * s)
+            b.cur_pal = 0.0
 # auspicious cloud wisps curling round the hooves
 for k in range(6):
     a = k / 6 * 2 * math.pi

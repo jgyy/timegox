@@ -241,7 +241,8 @@ for sd, pts in WHISK.items():
     bones = [{"wh%s%d" % (sd, min(2, int(i / (m - 1) * 2.999))): 1.0} for i in range(m)]
     b.tube(cp, [0.013 * (1.0 - 0.9 * i / (m - 1)) + 0.0015 for i in range(m)], (0.9, 0.9, 0.9), cls=HAIR, bones=bones, seg=7, tint=1.0,
            cols=[mix((0.85, 0.85, 0.85), (1.0, 1.0, 1.0), i / (m - 1)) for i in range(m)])
-# the tail ends in a flame-like tuft
+# the tail ends in a flame-like tuft (accent colour)
+b.cur_pal = 1.0
 p, t, up, side = SP.at(0.97)
 for k in range(9):
     a = k / 9 * 2 * math.pi
@@ -258,12 +259,17 @@ for i in range(26):
         continue
     root, nrm = h
     ln = 0.12 * (1.0 - 0.6 * (u - 0.25) / 0.7)
-    A.horn(b, [root - nrm * 0.01, root + nrm * ln * 0.6 + t * ln * 0.3, root + nrm * ln + t * ln * 0.75], ln * 0.22, (0.45, 0.45, 0.45), (0.75, 0.75, 0.75), spine_w(u),
+    # the dorsal spines carry the accent colour down the back (a focal line, not the body's hue)
+    b.cur_pal = 1.0
+    A.horn(b, [root - nrm * 0.01, root + nrm * ln * 0.6 + t * ln * 0.3, root + nrm * ln + t * ln * 0.75], ln * 0.22, (0.62, 0.62, 0.62), (0.95, 0.95, 0.95), spine_w(u),
            r1=0.002, cls=SCALE, seg=6, per=2, tint=1.0, flat=0.45, up=tuple(side))
+    b.cur_pal = 0.0
 for li, sd, s, sh, el, wr, ft, up, t, sv in LEGS:
     for k in range(3):
-        A.lock(b, el + up * 0.02 * k, (-t * 1.0 + up * 0.5 + sv * 0.3).normalized(), sv, 0.14 - 0.02 * k, 0.03, "ff9a30", "fff0a0", bone="fore%d.%s" % (li, sd),
-               lift=0.4, rise=0.2, cls=HAIR, mat=MAT_GLOW, tint=0.0)
+        b.cur_pal = 1.0  # elbow flames burn in the accent colour
+        A.lock(b, el + up * 0.02 * k, (-t * 1.0 + up * 0.5 + sv * 0.3).normalized(), sv, 0.14 - 0.02 * k, 0.03, "d8d8d8", "ffffff", bone="fore%d.%s" % (li, sd),
+               lift=0.4, rise=0.2, cls=HAIR, mat=MAT_GLOW, tint=1.0)
+        b.cur_pal = 0.0
     # eagle's talons: three forward, one back, hooked and dark at the root
     fb = "foot%d.%s" % (li, sd)
     for k in range(4):

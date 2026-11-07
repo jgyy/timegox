@@ -72,11 +72,13 @@ def head_shape(d):
 morph_sphere(b, hc, head_shape, lambda p, d: (0.82 + 0.1 * d.y,) * 3, cls=SCALE, bone="head", seg=18, rings=12, tint_fn=lambda p, d: 1.0)
 b.ellipsoid(hc + V(0, -0.075, 0.035), (0.04, 0.035, 0.03), (0.9, 0.9, 0.9), cls=SCALE, bone="head", tint=1.0, seg=10, rings=6)
 for s in (1, -1):
-    A.compound_eye(b, hc + V(0.115 * s, 0.035, 0.005), 0.058, "a0f0a0", "head")
+    A.compound_eye(b, hc + V(0.115 * s, 0.035, 0.005), 0.058, "a0f0a0", "head", accent=True)
     b.cone(hc + V(0.022 * s, -0.115, 0.045), 0.014, 0.05, "f0e8d0", cls=STONE, bone="head", seg=5, rot=(math.pi, 0, 0.3 * s))
     strand(b, [hc + V(0.03 * s, 0.07, 0.03), hc + V(0.08 * s, 0.2, 0.1), hc + V(0.16 * s, 0.34, 0.08), hc + V(0.24 * s, 0.4, -0.02)], 0.006, 0.0015, (0.6, 0.6, 0.6), cls=SCALE, bone="head", seg=4, per=3, tint=1.0)
+b.cur_pal = 1.0  # the three ocelli glow in the accent colour
 for k in range(3):
-    b.ball(hc + V((k - 1) * 0.02, 0.07 - abs(k - 1) * 0.008, 0.05), 0.008, "e0ffa0", cls=CRYSTAL, bone="head", seg=6, rings=4, mat=MAT_GLOW)
+    b.ball(hc + V((k - 1) * 0.02, 0.07 - abs(k - 1) * 0.008, 0.05), 0.008, "f0f0f0", cls=CRYSTAL, bone="head", seg=6, rings=4, mat=MAT_GLOW, tint=1.0)
+b.cur_pal = 0.0
 # walking legs: femur, tibia, a jointed tarsus
 for s, sd in ((1, "L"), (-1, "R")):
     for k in range(2):

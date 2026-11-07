@@ -806,7 +806,7 @@ def shade_fn(spine_y, back=0.62, side=0.85, belly=1.18, stripes=0.0, stripe_axis
 
 def eyes(b, c, spread, r, iris="ffd040", bone="head", slit=True, glow=True, rot_y=0.5, h=1.0):
     for s in (1, -1):
-        b.eye(V(c) + V(spread * s, 0, 0), r, iris, side=s, bone=bone, slit=slit, glow=glow, rot_y=rot_y, h=h, mat=MAT_PLAIN)
+        b.eye(V(c) + V(spread * s, 0, 0), r, iris, side=s, bone=bone, slit=slit, glow=glow, rot_y=rot_y, h=h, mat=MAT_PLAIN, accent=True)
 
 
 def fangs(b, pts, length, bone, col="f6f0e0", down=True):
@@ -821,7 +821,14 @@ def claws(b, base, fwd, bone, n=3, spread=0.04, length=0.06, col="ece6d6"):
         b.cone(base + V(x, 0, 0), length * 0.25, length, col, cls=STONE, bone=bone, seg=5, rot=(math.pi / 2 if fwd else 0.0, 0, 0))
 
 
-def glow_ball(b, c, r, col, bone):
+def glow_ball(b, c, r, col, bone, accent=False):
+    """A glowing ball; with `accent` it burns in the enemy's accent colour (ghost-fire, sparks)."""
+    if accent:
+        old = b.cur_pal
+        b.cur_pal = 1.0
+        b.ball(c, r, "f0f0f0", cls=CRYSTAL, bone=bone, seg=12, rings=8, mat=MAT_GLOW, tint=1.0)
+        b.cur_pal = old
+        return
     b.ball(c, r, col, cls=CRYSTAL, bone=bone, seg=12, rings=8, mat=MAT_GLOW)
 
 

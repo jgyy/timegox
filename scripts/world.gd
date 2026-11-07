@@ -45,6 +45,7 @@ var mini_rect := Rect2i()
 var player: Node3D
 var comp: Node3D
 var comp_pos := Vector3.ZERO
+var comp_run := false  # is Yue Ling running to keep up (rather than standing beside the hero)?
 var weather: CPUParticles3D
 var sun: DirectionalLight3D
 var fill: DirectionalLight3D
@@ -373,12 +374,12 @@ func _make_ent(e: Dictionary) -> Node3D:
 		"enemy":
 			var g: Array = e.group
 			var d: Dictionary = Data.ENEMIES[g[0].id]
-			var m0 := Models.monster(d.shape, d.col)
+			var m0 := Models.monster(d.shape, d.col, false, g[0].id)
 			n.add_child(m0)
 			var models := [m0]
 			for k in range(1, mini(g.size(), 3)):
 				var d2: Dictionary = Data.ENEMIES[g[k].id]
-				var mk := Models.monster(d2.shape, d2.col)
+				var mk := Models.monster(d2.shape, d2.col, false, g[k].id)
 				mk.scale = Vector3.ONE * 0.6
 				mk.position = Vector3(1.0 if k % 2 == 1 else -1.0, 0, -0.6)
 				n.add_child(mk)
@@ -389,7 +390,7 @@ func _make_ent(e: Dictionary) -> Node3D:
 			n.set_meta("models", models)
 		"boss":
 			var d3: Dictionary = Data.ENEMIES[e.enemy]
-			var mb := Models.monster(d3.shape, d3.col, true)
+			var mb := Models.monster(d3.shape, d3.col, true, e.enemy)
 			mb.scale = Vector3.ONE * 1.9
 			n.add_child(mb)
 			n.add_child(Models.shadow_disc(2.0, 0.5))
@@ -548,6 +549,8 @@ func _snap_cam() -> void:
 	player.position = pp
 	comp_pos = pp - Vector3(facing.x, 0, facing.y) * 0.7 + Vector3(-facing.y, 0, facing.x) * 1.4
 	comp.position = comp_pos
+	comp.rotation.y = atan2(float(facing.x), float(facing.y))
+	comp_run = false
 
 func _update_view(d: float) -> void:
 	var pp := _player_pos()
@@ -568,15 +571,13 @@ func _update_view(d: float) -> void:
 	if Game.companion:
 		# off the hero's shoulder rather than straight behind, so she never stands between the
 		# follow camera and him
-		var back := pp - Vector3(facing.x, 0, facing.y) * 0.7 + Vector3(-facing.y, 0, facing.x) * 1.4
-		comp_pos = comp_pos.lerp(back, 1.0 - exp(-d * 5.0))
+		var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
+		comp_pos = cs[0]
 		comp_pos.y = ground_y(comp_pos)
 		comp.position = comp_pos
-		var dv := pp - comp_pos
-		if dv.length() > 0.3:
-			comp.rotation.y = lerp_angle(comp.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 8.0))
-		var comp_moving := dv.length() > 0.5
-		Models.anim_person(comp, t + 1.0, comp_moving, false, "run" if comp_moving else ("talk" if speaker() == "Yue Ling" else ""))
+		comp_run = cs[2]
+		comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
+		Models.anim_person(comp, t + 1.0, comp_run, false, "run" if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
 	# entities of the regions on show
 	for k in views:
 		var v: Dictionary = views[k]

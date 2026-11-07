@@ -149,12 +149,26 @@ def build(name="beast", style="wolf", n_tails=1, res=0.0145):
         v = 0.72 + 0.1 * smooth(0.06, -0.02, q.y)
         pale = max(smooth(0.0, -0.025, q.y) * smooth(0.05, 0.08, q.z), smooth(0.05, 0.075, abs(q.x)) * smooth(0.0, -0.03, q.y))
         pale = max(pale, smooth(-0.035, -0.06, q.y))
-        for s in (1, -1):
-            pale = max(pale, smooth(0.018, 0.008, math.hypot(q.x - 0.042 * s, q.y - 0.058)) * smooth(0.04, 0.07, q.z))
         top = smooth(0.0, 0.03, q.y) * smooth(0.08, 0.14, q.z)
         v = v * (1.0 - 0.35 * top)
         v = v * (1.0 - pale) + 0.95 * pale
+        bw = brow_w(q)
+        v = v * (1.0 - bw) + 0.95 * bw
         return (v, v, v)
+
+    def brow_w(q):
+        # the wolf's eyebrow spots, the focal marks over its eyes: in the palette's accent colour
+        if fox:
+            return 0.0
+        w = 0.0
+        for s in (1, -1):
+            w = max(w, smooth(0.018, 0.008, math.hypot(q.x - 0.042 * s, q.y - 0.058)) * smooth(0.04, 0.07, q.z))
+        return w
+
+    def pal(p, info):
+        if info.tag in ("head", "muzzle", "ruff") and brow_w(head_local(p)) > 0.4:
+            return 1.0
+        return 0.0
 
     def col(p, info):
         tag = info.tag
@@ -207,6 +221,8 @@ def build(name="beast", style="wolf", n_tails=1, res=0.0145):
         return (v * (1.0 - under) + 0.94 * under,) * 3
 
     def tint(p, info):
+        if pal(p, info) > 0.5:
+            return 1.0
         cc = col(p, info)[0]
         return 1.0 - 0.7 * smooth(0.86, 0.97, cc)
 
@@ -226,7 +242,7 @@ def build(name="beast", style="wolf", n_tails=1, res=0.0145):
             return nn * (0.03 * saw * smooth(0.3, 0.7, k))
         return None
 
-    c.build(b, col, cls=PELT, tint_fn=tint, post=post)
+    c.build(b, col, cls=PELT, tint_fn=tint, post=post, pal_fn=pal)
     for ct in tail_clays:
         ct.build(b, col, cls=PELT, tint_fn=tint, post=post)
 
@@ -320,8 +336,10 @@ def build(name="beast", style="wolf", n_tails=1, res=0.0145):
     if n_tails > 1:
         for k, pts in enumerate(tails):
             tip = pts[-1] + (pts[-1] - pts[-2]).normalized() * 0.06
-            b.ball(tip, 0.045, "ffd080", cls=CRYSTAL, bone="ft%d_3" % k, seg=12, rings=8, mat=MAT_GLOW)
-            b.ball(tip, 0.07, "ff8040", cls=CRYSTAL, bone="ft%d_3" % k, seg=12, rings=8, mat=MAT_GLOW, tint=0.4)
+            b.cur_pal = 1.0  # fox-fire burns in the accent colour (a nine-tailed fox's blue flames)
+            b.ball(tip, 0.045, "ffffff", cls=CRYSTAL, bone="ft%d_3" % k, seg=12, rings=8, mat=MAT_GLOW, tint=0.5)
+            b.ball(tip, 0.07, "e0e0e0", cls=CRYSTAL, bone="ft%d_3" % k, seg=12, rings=8, mat=MAT_GLOW, tint=1.0)
+            b.cur_pal = 0.0
 
     # ---------------------------------------------------------------- motion
     qm = QuadMotion(r, legs, T_walk=1.2 if fox else 1.3, stride=0.28 if fox else 0.36, lift=0.07, duty=0.6, bob=0.012, roll=0.03, yaw=0.05, crouch=0.02,

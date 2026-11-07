@@ -145,7 +145,9 @@ for s in (1, -1):
     b.ellipsoid(hp(0.05 * s, -0.005, 0.15), (0.008, 0.008, 0.006), "100810", cls=SKIN, bone="head", rot=A.euler_of(hf.M), seg=6, rings=4, mat=MAT_PLAIN)
     b.ellipsoid(hp(0.022 * s, 0.01, 0.235), (0.007, 0.005, 0.004), "100810", cls=SKIN, bone="head", rot=A.euler_of(hf.M), seg=6, rings=4, mat=MAT_PLAIN)
     # two short horns over the brow
-    A.horn(b, [hp(0.06 * s, 0.065, 0.0), hp(0.085 * s, 0.11, -0.06), hp(0.09 * s, 0.13, -0.15)], 0.028, "8a7858", "f0e8d0", "head", r1=0.003, rings=4, seg=8)
+    b.cur_pal = 1.0  # accent horns
+    A.horn(b, [hp(0.06 * s, 0.065, 0.0), hp(0.085 * s, 0.11, -0.06), hp(0.09 * s, 0.13, -0.15)], 0.028, "b0b0b0", "ffffff", "head", r1=0.003, rings=4, seg=8, tint=1.0)
+    b.cur_pal = 0.0
 # webbed fins of membrane between spines down the back of the neck (secondary colour)
 b.cur_pal = 0.5
 hit = A.surface(b)
@@ -158,7 +160,9 @@ for i in range(11):
         continue
     root, nrm = h
     tip = root + nrm * (0.14 + 0.05 * math.sin(i * 1.3)) - t * 0.06
-    A.horn(b, [root - nrm * 0.01, root.lerp(tip, 0.5), tip], 0.012, (0.6, 0.6, 0.6), (0.85, 0.85, 0.85), spine_w(u), r1=0.002, cls=STONE, seg=6, per=2, tint=1.0)
+    b.cur_pal = 1.0  # the fin rays in the accent colour, the membrane between them secondary
+    A.horn(b, [root - nrm * 0.01, root.lerp(tip, 0.5), tip], 0.012, (0.75, 0.75, 0.75), (0.95, 0.95, 0.95), spine_w(u), r1=0.002, cls=STONE, seg=6, per=2, tint=1.0)
+    b.cur_pal = 0.5
     if prev is not None:
         r0, t0, u0 = prev
         rows = [[r0 + (t0 - r0) * 0.05, t0], [root + (tip - root) * 0.05, tip]]

@@ -120,7 +120,8 @@ def fluff(p, info):
     return nn * (amp * k ** 1.6)
 
 
-c.build(b, col, cls=CLOTH, tint_fn=lambda p, info: 1.0, post=fluff)
+# the fluffy chest takes the secondary colour (pale jade on the Jade Rabbit, frost on a hare)
+c.build(b, col, cls=CLOTH, tint_fn=lambda p, info: 1.0, post=fluff, pal_fn=lambda p, info: 0.5 if info.tags.get("chestfur", 0.0) > 0.5 else 0.0)
 
 # ---------------------------------------------------------------- face: eyes, nose, whisker spots, teeth
 for s in (1, -1):
@@ -186,7 +187,9 @@ mort = V(0.02, 0.72, 0.2)
 b.lathe(mort, [(0.07, -0.07), (0.1, -0.05), (0.11, 0.02), (0.1, 0.06), (0.085, 0.07), (0.07, 0.03), (0.0001, 0.0)], JADE, cls=STONE, seg=20,
         bone="forearm.L", col_top="c8f0d8", cap_bottom=True, cap_top=False)
 b.lathe(mort + V(0, 0.055, 0), [(0.07, 0.0), (0.075, 0.008)], "3a5a48", cls=STONE, seg=20, bone="forearm.L", cap_bottom=False, cap_top=True, mat=MAT_PLAIN)
-b.ball(mort + V(0, 0.07, 0), 0.03, "f8fff0", cls=CRYSTAL, bone="forearm.L", seg=10, rings=6, mat=MAT_GLOW)
+b.cur_pal = 1.0  # the elixir glowing in the mortar: the accent colour
+b.ball(mort + V(0, 0.07, 0), 0.03, "f8f8f8", cls=CRYSTAL, bone="forearm.L", seg=10, rings=6, mat=MAT_GLOW, tint=1.0)
+b.cur_pal = 0.0
 for k in range(4):
     a = k / 4 * 2 * math.pi
     b.tube([mort + V(math.cos(a) * 0.105, -0.02, math.sin(a) * 0.105), mort + V(math.cos(a + 0.4) * 0.11, 0.04, math.sin(a + 0.4) * 0.11)], [0.006, 0.006], "e0c060",

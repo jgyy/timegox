@@ -838,5 +838,6 @@ def export_person(rel, opts, clips=None):
         # actions free the arms: the pose holds in idle, walk and sit
         clips = {nm: (secs, _with_pose(fn, pose) if nm in ("idle", "walk", "sit", "talk") else fn) for nm, (secs, fn) in clips.items()}
     print("[art] %s: %d triangles" % (rel, b.tri_count()))
-    return finish_rigged(b, rig, rel, clips, samples=16, dist=0.22, strength=0.5, floor_y=0.0, floor_k=0.2)
+    # robes are not coats: person-shaped monsters keep their dominant/secondary/accent cut
+    return finish_rigged(b, rig, rel, clips, coat=False, samples=16, dist=0.22, strength=0.5, floor_y=0.0, floor_k=0.2)
 

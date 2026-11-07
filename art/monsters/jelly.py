@@ -48,7 +48,9 @@ for k in range(16):
     b.ellipsoid(V(math.cos(a) * 0.58, Y - 0.13, math.sin(a) * 0.58), (0.075, 0.032, 0.05), (1.0, 1.0, 1.0), cls=SKIN, bone="bell", tint=1.0, seg=10, rings=6, rot=(0, -a, 0))
     # sense organ (rhopalium) in each notch between lappets
     a2 = a + math.pi / 16
-    b.ball(V(math.cos(a2) * 0.57, Y - 0.1, math.sin(a2) * 0.57), 0.013, "fff8a0", cls=CRYSTAL, bone="bell", seg=6, rings=4, mat=MAT_GLOW)
+    b.cur_pal = 1.0  # the sense organs in the rim notches glow in the accent colour
+    b.ball(V(math.cos(a2) * 0.57, Y - 0.1, math.sin(a2) * 0.57), 0.013, "f4f4f4", cls=CRYSTAL, bone="bell", seg=6, rings=4, mat=MAT_GLOW, tint=1.0)
+    b.cur_pal = 0.0
 for k in range(8):
     a = 2 * math.pi * k / 8 + 0.2
     canal = []
@@ -64,11 +66,13 @@ for k in range(4):
     for j in range(9):
         t = j / 8 * math.pi
         shoe.append(V(math.cos(a) * 0.17 + math.cos(a + math.pi / 2) * math.cos(t) * 0.08, Y + 0.12 + 0.02 * math.sin(t), math.sin(a) * 0.17 + math.sin(a + math.pi / 2) * math.cos(t) * 0.08) + V(math.cos(a), 0, math.sin(a)) * math.sin(t) * 0.07)
-    b.tube(shoe, [0.022] * 9, "fff0ff", cls=CRYSTAL, bone="bell", seg=6, mat=MAT_GLOW)
+    b.cur_pal = 1.0  # the four horseshoe gonads glow through the bell in the accent colour
+    b.tube(shoe, [0.022] * 9, "f4f4f4", cls=CRYSTAL, bone="bell", seg=6, mat=MAT_GLOW, tint=1.0)
+    b.cur_pal = 0.0
 glow_ball(b, V(0, Y + 0.05, 0), 0.1, "ffe8ff", "bell")
 # a pair of eyes so the spirit has a face
 for s in (1, -1):
-    b.eye(V(0.16 * s, Y + 0.12, 0.52), 0.05, "40e0ff", side=s, bone="bell", rot_y=0.35, h=1.2, glow=True)
+    b.eye(V(0.16 * s, Y + 0.12, 0.52), 0.05, "40e0ff", side=s, bone="bell", rot_y=0.35, h=1.2, glow=True, accent=True)
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # oral arms: long frilled curtains - each a pair of crossed ribbons whose edges ruffle
 for names, pts in arms:

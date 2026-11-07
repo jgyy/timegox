@@ -105,7 +105,7 @@ for s in (1, -1):
     cp = r.bones["ceph." + sd]
     b.tube([cp[0], V(cp[0]).lerp(V(cp[1]), 0.5) + V(0.03 * s, 0.03, 0), cp[1]], [(0.05, 0.02), (0.045, 0.018), (0.01, 0.008)], (0.7, 0.7, 0.7), cls=SCALE, bone="ceph." + sd, tint=1.0, seg=8)
     ex, ez = 0.27 * s, 0.5
-    b.eye(V(ex, station(ex)[3] + 0.02, ez), 0.04, "a0f0ff", side=s, bone="body", rot_y=1.2, h=1.0, glow=True)
+    b.eye(V(ex, station(ex)[3] + 0.02, ez), 0.04, "a0f0ff", side=s, bone="body", rot_y=1.2, h=1.0, glow=True, accent=True)
 b.ellipsoid(V(0, Y - 0.02, 0.6), (0.14, 0.03, 0.03), "302028", cls=SKIN, bone="body", seg=10, rings=4)
 b.cur_pal = 0.5  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # whip tail with a sting

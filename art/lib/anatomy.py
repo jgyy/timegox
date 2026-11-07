@@ -111,9 +111,17 @@ def plate_segments(b, path, radii, col, bone_fn, n=14, col2=None, tint=1.0, ridg
         loft(b, rings, col, cls=cls, cols=cc, bone_fn=bone_fn, tint=tint, cap0=True, cap1=True, cap_push=0.3)
 
 
-def compound_eye(b, c, r, col, bone, facets=True):
-    """A bulging insect eye with a sheen and a grid of facet glints."""
-    b.ellipsoid(c, (r, r * 1.1, r), darken(col, 0.3), cls=CRYSTAL, bone=bone, seg=14, rings=10, mat=MAT_PLAIN, col2=darken(col, 0.6))
+def compound_eye(b, c, r, col, bone, facets=True, accent=False):
+    """A bulging insect eye with a sheen and a grid of facet glints; with `accent` the eye takes
+    the enemy's accent colour (a focal point)."""
+    tint = 0.0
+    old = b.cur_pal
+    if accent:
+        col = "e0e0e0"
+        tint = 1.0
+        b.cur_pal = 1.0
+    b.ellipsoid(c, (r, r * 1.1, r), darken(col, 0.3), cls=CRYSTAL, bone=bone, seg=14, rings=10, mat=MAT_PLAIN, col2=darken(col, 0.6), tint=tint)
+    b.cur_pal = old
     b.ellipsoid(c + V(0, r * 0.3, r * 0.4), (r * 0.5, r * 0.35, r * 0.4), lighten(col, 0.4), cls=CRYSTAL, bone=bone, seg=8, rings=5, mat=MAT_GLOW)
     if facets:
         for i in range(6):
@@ -153,7 +161,13 @@ def skull(b, c, k, bone, col="e8e0cc", eye_glow=None, jaw_bone=None, fwd=V(0, 0,
     morph_sphere(b, hf.c, shape, lambda p, d: mix(bone_col, darken(bone_col, 0.35), smooth(0.4, -0.8, d.y) * 0.4 + max(0.0, -d.z) * 0.2), cls=STONE, bone=bone, seg=22, rings=16, rot=hf.M)
     for s in (1, -1):
         b.ellipsoid(hf.at(0.03 * s * k, 0.0, 0.07 * k), (0.018 * k, 0.017 * k, 0.012 * k), "120a10", cls=SKIN, bone=bone, seg=10, rings=6, mat=MAT_PLAIN)
-        if eye_glow is not None:
+        if eye_glow == "accent":
+            # the eye-lights burn in the enemy's accent colour
+            old = b.cur_pal
+            b.cur_pal = 1.0
+            b.ellipsoid(hf.at(0.03 * s * k, 0.0, 0.078 * k), (0.008 * k, 0.007 * k, 0.004 * k), "f0f0f0", cls=CRYSTAL, bone=bone, seg=8, rings=5, mat=MAT_GLOW, tint=1.0)
+            b.cur_pal = old
+        elif eye_glow is not None:
             b.ellipsoid(hf.at(0.03 * s * k, 0.0, 0.078 * k), (0.008 * k, 0.007 * k, 0.004 * k), eye_glow, cls=CRYSTAL, bone=bone, seg=8, rings=5, mat=MAT_GLOW)
     b.ellipsoid(hf.at(0, -0.036 * k, 0.085 * k), (0.008 * k, 0.012 * k, 0.006 * k), "120a10", cls=SKIN, bone=bone, seg=8, rings=4, mat=MAT_PLAIN)
     jb = jaw_bone or bone
@@ -488,18 +502,27 @@ def tuft(b, root, groom, nrm, length, width, n, col, col_tip=None, bone=None, sp
 
 
 def animal_eye(b, c, fwd, r, iris, bone, pupil="round", up=(0.0, 1.0, 0.0), almond=0.72, lid="1a1210", slant=0.0, side=1,
-               glow=False, mat=MAT_PLAIN, lid_w=0.13, tear=None, ring=None):
+               glow=False, mat=MAT_PLAIN, lid_w=0.13, tear=None, ring=None, accent=True):
     """An animal eye set under its lids: a dark-rimmed eyeball almost filled by the iris (lighter
     at the bottom, shadowed under the upper lid), a round, slit or bar pupil, one small catchlight
     and an almond rim of dark lid skin - no anime sclera or brows.  `tear` = (length, direction)
-    draws a feline tear line from the inner corner."""
+    draws a feline tear line from the inner corner.  With `accent` (the default) the iris is
+    painted in greys on the palette's accent slot, so each enemy looks out with its element's
+    colour (the eyes are a creature's first focal point); `iris` then only matters untinted."""
     c = V(c)
     M = frame_m(fwd, up) @ Matrix.Rotation(slant * side, 3, "Z")
     rot = euler_of(M)
-    b.ellipsoid(c, (r, r * almond, r * 0.6), darken(iris, 0.75), cls=CRYSTAL, bone=bone, rot=rot, seg=16, rings=10, mat=mat)
+    old_pal = b.cur_pal
+    tint = 0.0
+    if accent:
+        iris = "e8e8e8"
+        tint = 1.0
+        b.cur_pal = 1.0
+    b.ellipsoid(c, (r, r * almond, r * 0.6), darken(iris, 0.75), cls=CRYSTAL, bone=bone, rot=rot, seg=16, rings=10, mat=mat, tint=tint)
     ic = c + M @ V(0, 0, r * 0.28)
     b.ellipsoid(ic, (r * 0.88, r * almond * 0.9, r * 0.36), darken(iris, 0.3), cls=CRYSTAL, bone=bone, rot=rot, seg=16, rings=10,
-                mat=MAT_GLOW if glow else mat, col2=lighten(iris, 0.3))
+                mat=MAT_GLOW if glow else mat, col2=lighten(iris, 0.3), tint=tint)
+    b.cur_pal = old_pal
     pc = c + M @ V(0, 0, r * 0.46)
     if pupil == "slit":
         pr = (r * 0.11, r * almond * 0.82, r * 0.2)

@@ -137,7 +137,10 @@ def wing(bone, root, span, chord, sweep, s, shade_in, shade_out, spot):
         b.tube([root, root.lerp(end, 0.45) + V(0, 0.012, 0), end], [0.005, 0.004, 0.002], (0.35, 0.35, 0.35), cls=CLOTH, bone=bone, tint=1.0, seg=4, mat=MAT_PLAIN)
     b.tube([root + V(s * span * 0.4, 0.016, sweep * 0.4 - chord * 0.25), root + V(s * span * 0.42, 0.016, sweep * 0.42 + chord * 0.25)], [0.004, 0.004], (0.35, 0.35, 0.35), cls=CLOTH, bone=bone, tint=1.0, seg=4, mat=MAT_PLAIN)
     sp = root + V(s * span * spot[0], 0.03 * spot[0] + 0.012, sweep * spot[0] + spot[1])
-    b.disc(sp, chord * 0.22, (1.0, 0.9, 0.5), cls=CRYSTAL, bone=bone, seg=16, mat=MAT_GLOW, col_rim=(0.6, 0.3, 0.1), thick=0.02)
+    old = b.cur_pal
+    b.cur_pal = 1.0  # the eye spot glows in the accent colour
+    b.disc(sp, chord * 0.22, (1.0, 1.0, 1.0), cls=CRYSTAL, bone=bone, seg=16, mat=MAT_GLOW, col_rim=(0.5, 0.5, 0.5), thick=0.02, tint=1.0)
+    b.cur_pal = old
     b.disc(sp + V(0, 0.006, 0), chord * 0.09, "201020", cls=CRYSTAL, bone=bone, seg=12, thick=0.024)
     b.disc(sp + V(chord * 0.03 * s, 0.009, chord * 0.03), chord * 0.03, "ffffff", cls=CRYSTAL, bone=bone, seg=8, mat=MAT_GLOW, thick=0.026)
 

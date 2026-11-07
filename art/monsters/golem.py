@@ -99,7 +99,7 @@ def crack(surf, dirs, bone, r=0.012):
         for k in range(3):
             pts.append(surf(a.lerp(e, k / 3)))
     pts.append(surf(dirs[-1]))
-    b.cur_pal = 0.5
+    b.cur_pal = 1.0  # the faults glow in the accent colour (the element's fire, frost, lightning ...)
     A.glow_seam(b, pts, r, (1.0, 1.0, 1.0), bone)
     b.cur_pal = 0.0
 
@@ -116,7 +116,7 @@ for s, sd in ((1, "L"), (-1, "R")):
                bones=limb_weights(["arm." + sd, "fore." + sd]), t0=0.0, t1=2.0)
     core.chain([V(0.25 * s, 0.98, 0.0), V(0.28 * s, 0.5, 0.02), V(0.28 * s, 0.1, 0.02)], [0.1, 0.085, 0.08],
                bones=limb_weights(["thigh." + sd, "shin." + sd]), t0=0.0, t1=2.0)
-b.cur_pal = 0.5  # palette slot (kit.py): the glow takes the analogous secondary colour (red stone, orange fire)
+b.cur_pal = 1.0  # palette slot (kit.py): the molten heart glows in the accent colour against the stone
 core.build(b, lambda p, info: (1.0, 1.0, 1.0), cls=CRYSTAL, tint_fn=lambda p, info: 1.0, mat=MAT_GLOW)
 b.cur_pal = 0.0
 
@@ -144,7 +144,7 @@ for s in (1, -1):
 boulder(V(0, 1.99, 0.15), (0.16, 0.15, 0.16), "head", nxt(), 0.82, facets=5)
 boulder(V(0, 2.07, 0.25), (0.15, 0.055, 0.07), "head", nxt(), 0.7, facets=2, rough=0.1)
 boulder(V(0, 1.92, 0.24), (0.11, 0.05, 0.07), "head", nxt(), 0.76, facets=2, rough=0.1)
-b.cur_pal = 0.5
+b.cur_pal = 1.0  # the eye slits: the first focal point, in the accent colour
 for s in (1, -1):
     b.ellipsoid(V(0.065 * s, 2.015, 0.305), (0.04, 0.014, 0.012), (1.0, 1.0, 1.0), cls=CRYSTAL, bone="head", tint=1.0, mat=MAT_GLOW, seg=10, rings=5, rot=(0, 0, 0.18 * s))
 b.cur_pal = 0.0
@@ -155,7 +155,9 @@ for s, sd in ((1, "L"), (-1, "R")):
     sh = boulder(V(0.63 * s, 1.84, 0.0), (0.26, 0.24, 0.27), {"chest": 0.4, arm: 0.6}, nxt(), 0.78, moss=1.0)
     for k in range(3):
         root = sh((0.3 * s, 1.0, -0.2 + 0.25 * k))
+        b.cur_pal = 0.5  # crystals in the secondary colour
         b.crystal(root - V(0, 0.03, 0), 0.045, 0.22 - k * 0.04, (0.95, 0.95, 0.95), bone=arm, tint=1.0, rot=(0.3 - 0.25 * k, 0, -0.45 * s))
+        b.cur_pal = 0.0
     for k in range(6):
         root = sh((0.5 * s * math.cos(k), 1.0, 0.5 * math.sin(k * 1.7)))
         b.leaf(root, root + V(0.02 * math.sin(k), 0.09 + 0.03 * (k % 3), 0.02), 0.016, "5a8a3a", bone=arm, col_tip="9ac060", tint=0.0)

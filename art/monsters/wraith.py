@@ -105,7 +105,7 @@ for j in range(10):
 b.sheet(hood_rows, (0.6, 0.6, 0.6), bones=["head"] * 7 + [{"head": 0.5, "body": 0.5}] * 3, cols=[(0.62 - 0.2 * j / 9,) * 3 for j in range(10)], tint=1.0, thickness=0.022)
 b.tube([V(0, Y + 0.86, -0.08), V(0, Y + 0.95, -0.2), V(0, Y + 0.86, -0.36), V(0, Y + 0.7, -0.42)], [0.06, 0.05, 0.025, 0.005], (0.55, 0.55, 0.55), cls=CLOTH, bone="head", tint=1.0, seg=10)
 b.ellipsoid(V(0, Y + 0.6, 0.06), (0.16, 0.2, 0.1), "050308", cls=SKIN, bone="head", seg=14, rings=8)
-A.skull(b, V(0, Y + 0.6, 0.06), 1.15, "head", col="b8b4a8", eye_glow="a0f0ff")
+A.skull(b, V(0, Y + 0.6, 0.06), 1.15, "head", col="b8b4a8", eye_glow="accent")
 for s in (1, -1):
     b.ellipsoid(V(0.035 * s, Y + 0.6, 0.15), (0.05, 0.035, 0.015), "306080", cls=SKIN, bone="head", seg=10, rings=5, mat=MAT_GLOW)
 b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
@@ -139,7 +139,7 @@ for names, pts, a in strips:
 # ghost-fire wisps drifting round the hem
 for k in range(5):
     a = k / 5 * 2 * math.pi
-    glow_ball(b, V(math.sin(a) * 0.36, Y - 0.45 + 0.08 * math.sin(k * 2.0), math.cos(a) * 0.33), 0.028, "80d8ff", "body")
+    glow_ball(b, V(math.sin(a) * 0.36, Y - 0.45 + 0.08 * math.sin(k * 2.0), math.cos(a) * 0.33), 0.028, "80d8ff", "body", accent=True)
 
 T_IDLE = 3.0
 

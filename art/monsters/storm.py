@@ -146,7 +146,9 @@ for k in range(24):
     a = 2 * math.pi * k / 24
     c = V(math.cos(a) * 1.5, Y + 0.3, math.sin(a) * 1.5)
     rot = (0, -a + math.pi / 2, 0)
-    b.superquad(c, (0.07, 0.07, 0.015) if k % 3 else (0.05, 0.11, 0.015), "ffe890", e=0.3, cls=CLOTH, bone="halo", rot=rot, mat=MAT_GLOW)
+    b.cur_pal = 1.0  # the rune tablets glow in the accent colour round the storm's head
+    b.superquad(c, (0.07, 0.07, 0.015) if k % 3 else (0.05, 0.11, 0.015), "f4f4f4", e=0.3, cls=CLOTH, bone="halo", rot=rot, mat=MAT_GLOW, tint=1.0)
+    b.cur_pal = 0.0
     tang = V(-math.sin(a), 0, math.cos(a))
     for st in range(2):
         q = c + V(math.cos(a), 0, math.sin(a)) * 0.02 + tang * (0.025 * (st - 0.5))

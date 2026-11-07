@@ -102,7 +102,9 @@ morph_sphere(b, TC, ceph_shape, ceph_col, cls=SCALE, bone="thorax", seg=24, ring
 for k, (x, y, rr) in enumerate(((0.035, 0.16, 0.034), (-0.035, 0.16, 0.034), (0.09, 0.15, 0.022), (-0.09, 0.15, 0.022), (0.04, 0.205, 0.02), (-0.04, 0.205, 0.02), (0.11, 0.19, 0.016), (-0.11, 0.19, 0.016))):
     c = V(x, BY + y, 0.39 - abs(x) * 0.5 - (0.03 if y > 0.2 else 0.0))
     b.ball(c, rr, "200810", cls=SKIN, bone="thorax", seg=10, rings=6)
-    b.ball(c + V(0, 0, rr * 0.45), rr * 0.6, "ff3040", cls=SKIN, bone="thorax", seg=8, rings=5, mat=MAT_GLOW)
+    b.cur_pal = 1.0  # the eight eyes glow in the accent colour
+    b.ball(c + V(0, 0, rr * 0.45), rr * 0.6, "f0f0f0", cls=SKIN, bone="thorax", seg=8, rings=5, mat=MAT_GLOW, tint=1.0)
+    b.cur_pal = 0.0
     b.ball(c + V(rr * 0.3, rr * 0.35, rr * 0.75), rr * 0.18, "ffffff", cls=SKIN, bone="thorax", seg=5, rings=3, mat=MAT_GLOW)
 b.cur_pal = 0.0  # palette slot (kit.py): 0 primary, 0.5 secondary, 1 accent
 # chelicerae: two bulky bases, hairy in front, with curved black fangs folded under

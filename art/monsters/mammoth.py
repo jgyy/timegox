@@ -119,7 +119,9 @@ def shingle(p, info):
     return nn * (0.014 * math.sin(math.pi * k) ** 2)
 
 
-c.build(b, col, cls=CLOTH, tint_fn=lambda p, info: 1.0 if info.tag not in ("paw",) else 0.6, post=shingle)
+# the skirt of guard hair takes the secondary colour
+c.build(b, col, cls=CLOTH, tint_fn=lambda p, info: 1.0 if info.tag not in ("paw",) else 0.6, post=shingle,
+        pal_fn=lambda p, info: 0.5 if info.share("skirt") > 0.5 else 0.0)
 
 # ---------------------------------------------------------------- face: eyes, mouth, tusks, ears, toenails
 for s in (1, -1):
