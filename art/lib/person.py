@@ -662,7 +662,9 @@ def clip_attack(t):
     p["shin.R"] = ((0.3 * step, 0, 0), (0, 0, 0))
     p["foot.R"] = ((0.35 * step, 0, 0), (0, 0, 0))
     p["toe.R"] = ((-0.4 * step, 0, 0), (0, 0, 0))
-    _secondary(p, t, False, False, (-0.65 * step, 0.42 * step), e, (0.5 * cut * (1 - rec), 0.3 * e))
+    # the sleeve pocket falls back towards the ground while the arm is up, instead of pointing at the sky
+    up = smooth(-0.6, -2.2, arm_x)
+    _secondary(p, t, False, False, (-0.65 * step, 0.42 * step), e, (0.3 * e, 0.5 * cut * (1 - rec) + 1.25 * up))
     return p
 
 
@@ -735,7 +737,7 @@ def clip_victory(t):
     p["chest"] = ((-0.08 * e - settle, 0, 0), (0, 0, 0))
     p["hips"] = ((0, 0, 0), (0, settle * 0.3, 0))
     p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 1.2 * e, 1))
-    p["sleeve.R"] = ((-0.6 * e, 0, 0), (0, 0, 0))
+    p["sleeve.R"] = ((1.2 * e, 0, 0), (0, 0, 0))
     p["sleeve.L"] = ((0.2 * e, 0, 0), (0, 0, 0))
     return p
 

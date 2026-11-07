@@ -493,6 +493,10 @@ func _run() -> void:
 			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
 			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
 		], 0.9, 1.5, 3.2)
+		# Part IX's leads close up: Ah Mei, Farmer Tian, Feng Meng and Chang'e
+		await _portraits("portrait_part9", [
+			Assets.person("ah_mei"), Assets.person("farmer_tian"), Assets.person("feng_meng"), Assets.person("chang_e"),
+		], 0.85, 1.5, 3.6)
 	if main.args.has("map"):
 		main.world.load_area("dunes", Vector2i(10, 28))
 		main.open_menu()
