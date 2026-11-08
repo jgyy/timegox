@@ -13,9 +13,12 @@ const MARGIN := 8          # wild border round the whole world
 const EAST := 14           # room on the east edge for the road that links one band to the next
 const HUB := "mountain"
 const HUB_W := 60          # the mountain column west of the bands
-const ROW_PAD := 4
-const WARP := 3.0          # how far region borders wander (tiles)
+const ROW_PAD := 8
+const WARP := 3.0          # how far region borders wander at the small scale (tiles)
+const WARP_BIG := 12.0     # ... and at the large scale, so borders meander like coasts and ridges
 const BAND := 2.2          # half-thickness of the forest belt between regions (tiles)
+const JITTER := 4          # regions sit a little up or down in their band, off the grid
+const EDGE := 7.0          # how deep the forest reaches in from a region's edge (tiles, varies)
 
 ## bands of regions, north to south; a flipped band runs west (its regions are mirrored)
 const ROWS := [
@@ -27,6 +30,7 @@ const ROWS := [
 	{"ids": ["maple", "karst", "springs", "wheel"], "flip": false},
 	{"ids": ["village", "terraces", "silk", "loom"], "flip": false},
 	{"ids": ["starferry", "magpie", "starpalace", "jasper"], "flip": false},
+	{"ids": ["yanggu", "millet", "fusang", "guanghan"], "flip": false},
 ]
 
 static var _layout := {}
@@ -70,7 +74,9 @@ static func layout() -> Dictionary:
 			var sh: int = Data.AREAS[id].h
 			if row.flip:
 				x -= sw
-			var origin := Vector2i(x, y + (int(row.h) - sh) / 2)
+			# off the grid: each region sits a little higher or lower in its band
+			var jit := int(round((Terrain3D.hash2(k * 7 + 3, ri * 11 + 5, 9.0) - 0.5) * 2.0 * JITTER))
+			var origin := Vector2i(x, y + (int(row.h) - sh) / 2 + jit)
 			var cl := x
 			var cr := x + sw
 			if not row.flip:
@@ -156,6 +162,11 @@ static func _build() -> Dictionary:
 			for xx in mw:
 				var p := to_world(id, Vector2i(xx, yy))
 				grid[p.y * W + p.x] = m.grid[yy * mw + xx]
+	# ---- forest margins: each region's own map used to end in a straight wall, so the land you can
+	# walk on was a rectangle.  The forest now reaches in from the edge by a depth that varies with
+	# noise, leaving clearings round everything that matters (gates, arrivals, people, bosses,
+	# pickups, buildings and monster packs).
+	_erode_edges(grid, W, H, ids, maps)
 	# ---- ownership: the cell under a noise-warped point, so region borders wander
 	var cells: Array = []
 	var cell_ids: Array = []
@@ -170,19 +181,52 @@ static func _build() -> Dictionary:
 	var ny := FastNoiseLite.new()
 	ny.seed = 9191
 	ny.frequency = 0.06
+	var bx := FastNoiseLite.new()
+	bx.seed = 1717
+	bx.frequency = 0.017
+	bx.fractal_octaves = 2
+	var by := FastNoiseLite.new()
+	by.seed = 2828
+	by.frequency = 0.017
+	by.fractal_octaves = 2
 	var owner := PackedByteArray()
 	owner.resize(W * H)
 	var sect_r: Rect2i = L.sect.cell
+	# the land round what matters in a region always belongs to that region, however far the
+	# border wanders (its look, its name on the screen, its kills)
+	var pinned := {}
+	for id in ids:
+		if id == HUB or id == "sect":
+			continue
+		var pts: Array = []
+		for e in maps[id].ents:
+			pts.append(e.pos)
+		for a in MapGen.arrival_tiles(id):
+			pts.append(a)
+		for pp in Data.AREAS[id].get("portals", []):
+			pts.append(pp.pos)
+		for lp in pts:
+			var c: Vector2i = to_world(id, lp)
+			for dy in range(-4, 5):
+				for dx in range(-4, 5):
+					var q := c + Vector2i(dx, dy)
+					if q.x >= 0 and q.y >= 0 and q.x < W and q.y < H and not pinned.has(q):
+						pinned[q] = idx[id]
 	for y in H:
 		for x in W:
 			var i := y * W + x
 			if sect_r.has_point(Vector2i(x, y)):
 				owner[i] = idx.sect
 				continue
-			var wx := clampf(x + 0.5 + nx.get_noise_2d(x, y) * WARP, 0.0, W - 0.01)
-			var wy := clampf(y + 0.5 + ny.get_noise_2d(x, y) * WARP, 0.0, H - 0.01)
+			# the big meanders fade out towards the mountain, whose roads stay on the mountain
+			var big := WARP_BIG * clampf((x - x0) / 16.0, 0.0, 1.0)
+			var wx := clampf(x + 0.5 + nx.get_noise_2d(x, y) * WARP + bx.get_noise_2d(x, y) * big, 0.0, W - 0.01)
+			var wy := clampf(y + 0.5 + ny.get_noise_2d(x, y) * WARP + by.get_noise_2d(x, y) * big, 0.0, H - 0.01)
 			var ci := _cell_index(cells, wx, wy)
 			owner[i] = cell_ids[ci]
+			if pinned.has(Vector2i(x, y)):
+				owner[i] = pinned[Vector2i(x, y)]
+				continue
 			# the forest belt between regions (never opens anything; only adds trees and rock)
 			var c: Rect2i = cells[ci]
 			var dist := minf(minf(wx - c.position.x, c.end.x - wx), minf(wy - c.position.y, c.end.y - wy))
@@ -259,6 +303,112 @@ static func _build() -> Dictionary:
 	_connect(grid, W, H, owner, idx, ents, start)
 	return {"w": W, "h": H, "grid": grid, "owner": owner, "ids": ids, "idx": idx, "ents": ents, "buildings": buildings,
 		"start": start, "layout": L, "maps": maps}
+
+static func _erode_edges(grid: PackedByteArray, W: int, H: int, ids: Array, maps: Dictionary) -> void:
+	var L := layout()
+	var en := FastNoiseLite.new()
+	en.seed = 6060
+	en.frequency = 0.07
+	en.fractal_octaves = 3
+	for id in ids:
+		if id == HUB or id == "sect":
+			continue
+		var m: Dictionary = maps[id]
+		var mw: int = m.w
+		var mh: int = m.h
+		# protected clearings, in the region's own coordinates
+		var keep := {}
+		var spots: Array = []
+		for e in m.ents:
+			spots.append([e.pos, 2 if e.kind == "enemy" else 4])
+		for a in MapGen.arrival_tiles(id):
+			spots.append([a, 4])
+		for p in Data.AREAS[id].get("portals", []):
+			spots.append([p.pos, 4])
+			spots.append([p.dest, 3])
+		for bd in m.buildings:
+			var rr: Rect2i = bd.rect
+			for yy in range(rr.position.y - 2, rr.end.y + 2):
+				for xx in range(rr.position.x - 2, rr.end.x + 2):
+					keep[Vector2i(xx, yy)] = true
+		for sp in spots:
+			var c: Vector2i = sp[0]
+			var r: int = sp[1]
+			for dy in range(-r, r + 1):
+				for dx in range(-r, r + 1):
+					if dx * dx + dy * dy <= r * r + 1:
+						keep[c + Vector2i(dx, dy)] = true
+		var local := PackedByteArray()
+		local.resize(mw * mh)
+		for yy in mh:
+			for xx in mw:
+				var p := Vector2i(xx, yy)
+				var wp := to_world(id, p)
+				var gi := wp.y * W + wp.x
+				var t := grid[gi]
+				if not keep.has(p):
+					var d := float(mini(mini(xx, mw - 1 - xx), mini(yy, mh - 1 - yy)))
+					var depth := 1.5 + (en.get_noise_2d(wp.x, wp.y) * 0.5 + 0.5) * EDGE
+					if d < depth and (t == MapGen.FLOOR or t == MapGen.DECOR):
+						t = MapGen.WALL
+				local[yy * mw + xx] = t
+		# the forest must not cut anything off: reconnect inside the region's own map, the way
+		# MapGen does (trails wander like deer tracks)
+		var arr: Array = MapGen.arrival_tiles(id)
+		var start: Vector2i = arr[0] if not arr.is_empty() else m.start
+		var need: Array = []
+		for e in m.ents:
+			need.append(MapGen._outside(e.pos, m.buildings))
+		for a in arr:
+			need.append(a)
+		for p in Data.AREAS[id].get("portals", []):
+			need.append(p.pos)
+		for _pass in 30:
+			var reach := MapGen.flood(local, mw, mh, start)
+			var miss := false
+			for q in need:
+				if not reach.has(q):
+					_carve_around(local, mw, mh, q, reach)
+					miss = true
+					break
+			if not miss:
+				break
+		for yy in mh:
+			for xx in mw:
+				var wp2 := to_world(id, Vector2i(xx, yy))
+				grid[wp2.y * W + wp2.x] = local[yy * mw + xx]
+
+## Carve the shortest trail from `from` to the nearest tile in `reach`, going round buildings (a
+## trail must never break through a wall; the door is the way in).
+static func _carve_around(grid: PackedByteArray, w: int, h: int, from: Vector2i, reach: Dictionary) -> void:
+	var prev := {from: from}
+	var q: Array = [from]
+	var i := 0
+	var hit := Vector2i(-1, -1)
+	while i < q.size():
+		var c: Vector2i = q[i]
+		i += 1
+		if reach.has(c):
+			hit = c
+			break
+		for d in MapGen.DIRS:
+			var n: Vector2i = c + d
+			if n.x < 1 or n.y < 1 or n.x >= w - 1 or n.y >= h - 1 or prev.has(n):
+				continue
+			var t := grid[n.y * w + n.x]
+			if (t == MapGen.BUILDING or t == MapGen.INTERIOR) and not reach.has(n):
+				continue
+			prev[n] = c
+			q.append(n)
+	if hit.x < 0:
+		return
+	var cur := hit
+	while cur != from:
+		if not MapGen.is_walkable_tile(grid[cur.y * w + cur.x]):
+			grid[cur.y * w + cur.x] = MapGen.PATH
+		cur = prev[cur]
+	if not MapGen.is_walkable_tile(grid[from.y * w + from.x]):
+		grid[from.y * w + from.x] = MapGen.PATH
 
 ## which way a gate faces out of its region (in world directions)
 static func _gate_dir(id: String, pos: Vector2i) -> Vector2i:
@@ -375,8 +525,12 @@ static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArr
 			if reach.has(e.pos):
 				continue
 			fixed += 1
-			# breadth-first through anything in the same region to the nearest reachable tile
+			# breadth-first through anything in the same region to the nearest reachable tile, never
+			# leaving the region's own map (a trail round the outside could bypass a Lotus Seal)
 			var own := owner[e.pos.y * W + e.pos.x]
+			var box := Rect2i(0, 0, W, H)
+			if e.has("area") and layout().has(e.area) and e.area != HUB:
+				box = Rect2i(layout()[e.area].origin, layout()[e.area].size).grow(-1)
 			var prev := {e.pos: e.pos}
 			var q: Array = [e.pos]
 			var i := 0
@@ -391,7 +545,7 @@ static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArr
 					var n: Vector2i = c + d
 					if n.x < 1 or n.y < 1 or n.x >= W - 1 or n.y >= H - 1 or prev.has(n):
 						continue
-					if owner[n.y * W + n.x] != own:
+					if owner[n.y * W + n.x] != own or not box.has_point(n):
 						continue
 					var tn := grid[n.y * W + n.x]
 					if tn == MapGen.BUILDING:
@@ -425,7 +579,7 @@ static func slice(wd: Dictionary, id: String) -> Dictionary:
 	var x_hi := -1
 	var y_hi := -1
 	var c: Rect2i = wd.layout[id].cell
-	var probe := c.grow(int(WARP) + 2).intersection(Rect2i(0, 0, W, wd.h))
+	var probe := c.grow(int(WARP + WARP_BIG) + 3).intersection(Rect2i(0, 0, W, wd.h))
 	for y in range(probe.position.y, probe.end.y):
 		for x in range(probe.position.x, probe.end.x):
 			if wd.owner[y * W + x] == me:

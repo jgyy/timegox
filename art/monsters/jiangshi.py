@@ -8,7 +8,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import person  # noqa: E402
+from creature import person_die  # noqa: E402
 from kit import HAIR, V  # noqa: E402
 from sculpt import strand  # noqa: E402
 from kit import env  # noqa: E402
@@ -38,7 +40,7 @@ def idle(t):
 
 
 def attack(t):
-    k = t / 0.6
+    k = t / 0.55
     e = env(k)
     p = stiff(person.clip_idle(0.0), math.sin(min(1.0, k * 1.4) * math.pi))
     p["root"] = ((0, 0, 0), (0, 0, 0.5 * e))
@@ -64,6 +66,7 @@ def cast(t):
 
 
 kit.reset()
+creature.realtime()
 def queue(b, rig, o, tor):
     """The Qing queue: a long braid hanging from under the hat down the back, tied with red cord."""
     top = V(0, 1.72, -0.12)
@@ -87,4 +90,4 @@ person.export_person("monsters/jiangshi.glb", {
     "robe": "b8b8b8", "trim": "e8e8e8", "inner": "8a8a8a", "sash": "5a5a5a", "pants": "4a4a4a", "boots": "1a1a1a",
     "sleeve": "a8a8a8", "hair": "101014", "hair_style": "bun", "eyes": "e8f0e0", "skin": "b8c8b0", "hat": "qing",
     "talisman": True, "tint_cloth": True, "embroidery": "d0b050", "folds": 12, "collar2": "6a2a2a",
-}, clips={"idle": (1.2, idle), "walk": (1.2, idle), "attack": (0.6, attack), "hurt": (0.55, hurt), "cast": (0.6, cast), "victory": (1.2, idle)})
+}, clips={"idle": (1.2, idle), "walk": (1.2, idle), "attack": (0.55, attack), "hurt": (0.55, hurt), "cast": (0.6, cast), "victory": (1.2, idle), "die": (1.2, person_die(idle))})

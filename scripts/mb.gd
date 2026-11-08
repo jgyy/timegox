@@ -263,6 +263,205 @@ void fragment() {
 }
 """
 
+## Characters and monsters (the rigged Blender assets) get their own shading, after the anime
+## look of games such as Genshin Impact and Guilty Gear Xrd (see README, References):
+## * a soft two-tone cel ramp of the key light on a half-Lambert term, with the received shadow
+##   folded into the same ramp, instead of Godot's hard toon terminator;
+## * shadows that are *tinted* rather than grey: warm rose for skin, cool lavender for cloth and
+##   fur, so a shadowed face never looks dirty;
+## * the ambient light toned down (it used to double every colour into neon) and a key light that
+##   keeps a lit surface close to its painted colour;
+## * a thin rim only on the side facing the light, toon specular bands on metal, crystal and
+##   wet scales, and an "angel ring" highlight across hair;
+## * ink lines coloured from the surface under them (dark rose under skin, deep blue under a blue
+##   robe) and drawn thinner, like coloured line art (ACTOR_OUTLINE).
+const ACTOR := """
+shader_type spatial;
+render_mode cull_back;
+uniform float key = 0.82;
+uniform float amb = 0.55;
+uniform float detail = 1.0;
+varying float cls;
+varying vec3 opos;
+varying vec3 onrm;
+varying vec3 shade_tint;
+varying float spec_k;
+varying float shin;
+varying float rim_k;
+varying float ring;
+
+float h31(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
+float vnoise(vec3 p) {
+	vec3 i = floor(p);
+	vec3 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	float a = mix(mix(h31(i), h31(i + vec3(1, 0, 0)), f.x), mix(h31(i + vec3(0, 1, 0)), h31(i + vec3(1, 1, 0)), f.x), f.y);
+	float b = mix(mix(h31(i + vec3(0, 0, 1)), h31(i + vec3(1, 0, 1)), f.x), mix(h31(i + vec3(0, 1, 1)), h31(i + vec3(1, 1, 1)), f.x), f.y);
+	return mix(a, b, f.z);
+}
+float fbm(vec3 p) {
+	float s = 0.0;
+	float a = 0.5;
+	for (int k = 0; k < 3; k++) {
+		s += vnoise(p) * a;
+		p *= 2.03;
+		a *= 0.5;
+	}
+	return s;
+}
+bool is_cls(float a, float target) { return abs(a - target) < 0.05; }
+
+void vertex() {
+	cls = COLOR.a;
+	opos = VERTEX;
+	onrm = NORMAL;
+}
+
+void fragment() {
+	vec3 col = COLOR.rgb;
+	// the filmic tonemapper works per channel and pushes saturated dyes further: ease them first
+	col = mix(vec3(dot(col, vec3(0.3, 0.59, 0.11))), col, 0.84);
+	shade_tint = vec3(0.6, 0.58, 0.78);
+	spec_k = 0.0;
+	shin = 30.0;
+	rim_k = 0.32;
+	ring = 0.0;
+	if (is_cls(cls, 1.0)) {
+		// cloth: a faint weave and soft tonal variation, never a pattern you notice first
+		float weave = sin(opos.x * 160.0) * sin(opos.y * 160.0 + opos.z * 160.0);
+		float folds = fbm(vec3(opos.x * 3.0, opos.y * 8.0, opos.z * 3.0) * detail);
+		col *= 0.95 + 0.02 * weave + 0.08 * folds;
+	} else if (is_cls(cls, 0.6)) {
+		// skin: smooth, warm rose shadows
+		shade_tint = vec3(0.98, 0.66, 0.64);
+		rim_k = 0.45;
+	} else if (is_cls(cls, 0.2)) {
+		// hair and fur: fine strands, a cool deep shadow and the anime highlight ring
+		float strand = vnoise(vec3(opos.x * 90.0, opos.y * 5.0, opos.z * 90.0));
+		col *= 0.9 + 0.16 * strand;
+		shade_tint = vec3(0.52, 0.52, 0.72);
+		ring = smoothstep(0.08, 0.0, abs(onrm.y - 0.42 + 0.05 * sin(atan(onrm.x, onrm.z) * 14.0))) * step(0.0, onrm.z + 0.35);
+		rim_k = 0.28;
+	} else if (is_cls(cls, 0.8)) {
+		// metal: brushed, with a sharp specular band
+		float br = vnoise(vec3(opos.x * 2.0, opos.y * 80.0, opos.z * 2.0));
+		col *= 0.85 + 0.25 * br;
+		shade_tint = vec3(0.42, 0.42, 0.55);
+		spec_k = 1.1;
+		shin = 48.0;
+		rim_k = 0.5;
+	} else if (is_cls(cls, 0.5)) {
+		// crystal (eyes, gems): bright facets that glow a little from inside
+		float fac = h31(floor(opos * 10.0));
+		col *= 0.92 + 0.2 * fac;
+		spec_k = 1.0;
+		shin = 70.0;
+		EMISSION = col * 0.18;
+	} else if (is_cls(cls, 0.3)) {
+		// scales: overlapping plates, a wet sheen
+		vec2 q = vec2(opos.x + opos.z, opos.y) * 18.0;
+		q.x += mod(floor(q.y), 2.0) * 0.5;
+		float sc = length(fract(q) - vec2(0.5, 0.2));
+		col *= 0.84 + 0.22 * smoothstep(0.6, 0.2, sc);
+		spec_k = 0.22;
+		shin = 60.0;
+	} else if (is_cls(cls, 0.9)) {
+		// horn, bone, claw, stone
+		float g = fbm(opos * 5.0 * detail);
+		col *= 0.88 + 0.2 * g;
+		shade_tint = vec3(0.58, 0.55, 0.66);
+		// matte: a hard toon highlight on horn, bone and stone read as plastic
+		spec_k = 0.0;
+	} else if (is_cls(cls, 0.7)) {
+		// wood: long grain
+		float grain = vnoise(vec3(opos.x * 12.0, opos.y * 1.5, opos.z * 12.0));
+		col *= 0.86 + 0.18 * grain;
+		shade_tint = vec3(0.62, 0.55, 0.62);
+	} else if (is_cls(cls, 0.4)) {
+		float leaf = fbm(opos * 8.0);
+		col *= 0.82 + 0.3 * leaf;
+		shade_tint = vec3(0.55, 0.65, 0.7);
+	}
+	ALBEDO = col;
+	// the ambient term is what turned lit robes neon: keep only part of it
+	AO = amb;
+	AO_LIGHT_AFFECT = 0.0;
+	ROUGHNESS = 0.8;
+	SPECULAR = 0.0;
+}
+
+void light() {
+	float ndl = dot(NORMAL, LIGHT);
+	vec3 lc = LIGHT_COLOR / PI;
+	if (LIGHT_IS_DIRECTIONAL) {
+		// soft two-tone ramp: the terminator sits a little past the half-Lambert midpoint and the
+		// received shadow joins the same ramp, so cast shadows read as part of the cel shading
+		float h = ndl * 0.5 + 0.5;
+		float lit = smoothstep(0.44, 0.52, h) * smoothstep(0.15, 0.65, ATTENUATION);
+		vec3 ramp = mix(shade_tint * 0.52, vec3(1.0), lit);
+		DIFFUSE_LIGHT += lc * ramp * key;
+		// a thin rim of light on the lit side only
+		float fr = 1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0);
+		float rim = smoothstep(0.6, 0.68, fr) * smoothstep(0.05, 0.45, ndl) * lit;
+		SPECULAR_LIGHT += lc * ALBEDO * rim * rim_k;
+		// toon specular band (metal, crystal, scales) and the hair highlight ring
+		vec3 hv = normalize(VIEW + LIGHT);
+		float sp = pow(max(dot(NORMAL, hv), 0.0), shin);
+		SPECULAR_LIGHT += lc * smoothstep(0.42, 0.5, sp) * spec_k * lit * 0.6;
+		SPECULAR_LIGHT += lc * ALBEDO * ring * (0.35 + 0.45 * lit) * 0.6;
+	} else {
+		// lanterns and spell lights: a soft wrapped Lambert
+		float l = clamp(ndl * 0.6 + 0.4, 0.0, 1.0);
+		DIFFUSE_LIGHT += lc * l * ATTENUATION;
+	}
+}
+"""
+
+## Coloured ink lines for characters and monsters: the line takes the hue of the surface under it,
+## darkened and a little more saturated, and is thinner than the scenery's outline.
+const ACTOR_OUTLINE := """
+shader_type spatial;
+render_mode unshaded, cull_front, depth_draw_opaque;
+uniform float width = 0.0105;
+varying float thin;
+void vertex() {
+	thin = step(0.15, abs(fract(COLOR.a * 10.0 + 0.5) - 0.5));
+	float depth = -(MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).z;
+	float k = clamp(depth / 7.0, 0.3, 1.5);
+	VERTEX += NORMAL * width * k * (1.0 - thin);
+}
+void fragment() {
+	if (thin > 0.5) {
+		discard;
+	}
+	vec3 c = COLOR.rgb;
+	float l = dot(c, vec3(0.3, 0.59, 0.11));
+	vec3 sat = clamp(mix(vec3(l), c, 1.4), 0.0, 1.0);
+	ALBEDO = mix(vec3(0.05, 0.035, 0.07), sat * 0.3, 0.7);
+}
+"""
+
+static var _mat_actor: ShaderMaterial = null
+static var _mat_actor_plain: ShaderMaterial = null
+
+## cel material for characters and monsters, with coloured ink lines
+static func mat_actor() -> Material:
+	if _mat_actor == null:
+		_mat_actor = ShaderMaterial.new()
+		_mat_actor.shader = _shader(ACTOR)
+		var ol := ShaderMaterial.new()
+		ol.shader = _shader(ACTOR_OUTLINE)
+		ol.render_priority = -1
+		_mat_actor.next_pass = ol
+	return _mat_actor
+
+## the same without lines (eyes, thin cloth, fine detail)
+static func mat_actor_plain() -> Material:
+	if _mat_actor_plain == null:
+		_mat_actor_plain = ShaderMaterial.new()
+		_mat_actor_plain.shader = mat_actor().shader
+	return _mat_actor_plain
+
 static var _mat_glow: StandardMaterial3D = null
 static var _mat_glass: StandardMaterial3D = null
 static var _mat_aura: ShaderMaterial = null

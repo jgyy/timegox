@@ -7,11 +7,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import person  # noqa: E402
+from creature import person_die  # noqa: E402
 import anatomy as A  # noqa: E402
 from kit import METAL, V  # noqa: E402
 
 kit.reset()
+creature.realtime()
 def shackles(b, rig, o, tor):
     """Iron shackles on the wrists with broken chains - the runners drag the dead in chains."""
     for s in (1, -1):
@@ -28,4 +31,4 @@ person.export_person("monsters/oxhead.glb", {
     "sleeve": "909090", "beast_head": "ox", "head_col": "4a3028", "muzzle_col": "8a6a58", "eyes": "ff3818",
     "armor": True, "metal": "3a3440", "halberd": True, "cape": "8a8a8a", "tint_cloth": True, "scale": 1.4, "head_scale": 1.0,
     "embroidery": "c8a040", "folds": 10,
-})
+}, clips=dict(person.CLIPS, die=(1.2, person_die(person.clip_idle))))

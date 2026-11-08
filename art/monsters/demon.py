@@ -8,10 +8,13 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import person  # noqa: E402
+from creature import person_die  # noqa: E402
 from kit import CLOTH, CRYSTAL, MAT_GLOW, STONE, V  # noqa: E402
 
 kit.reset()
+creature.realtime()
 
 
 def demon_extra(b, rig, o, tor):
@@ -40,4 +43,4 @@ person.export_person("monsters/demon.glb", {
     "sleeve": "8a8a8a", "hair": "200010", "hair_style": "wild", "eyes": "ff3020", "glow_eyes": True, "slit_eyes": True,
     "horns": True, "sword": True, "armor": True, "metal": "4a3a48", "cape": "b0b0b0", "stern": True, "tint_cloth": True,
     "blade": "e0a0a0", "scale": 1.35,
-})
+}, clips=dict(person.CLIPS, die=(1.2, person_die(person.clip_idle))))

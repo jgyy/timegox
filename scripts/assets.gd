@@ -7,15 +7,19 @@ extends RefCounted
 ##   surface "toon"  -> MB.mat_vc()   (cel shading + ink outline)
 ##   surface "plain" -> MB.mat_plain()
 ##   surface "glow"  -> MB.mat_glow() (additive)
-## UV.x is a tint weight: tinted vertices are multiplied by the colour the game asks for, so one
-## mesh serves every recolour of a monster.  UV.y (stored flipped by glTF) is a palette slot: from
-## the one enemy colour a three-colour palette is derived (see `palette()`), the primary shading
-## from warm highlights to cool shadows, an analogous secondary for manes, bellies and robes'
-## sashes, and a contrasting accent for horns, crests, fins and trims.  Animations are advanced manually from the same clock
-## the procedural models use, so screenshots and the bot stay deterministic.
+## UV.x is a tint weight: tinted vertices are multiplied by a colour from the enemy's palette, so one
+## mesh serves every recolour of a monster.  UV.y (stored flipped by glTF) is a palette slot, laid
+## out so a creature reads in several colours with a clear hierarchy (see `palette()`):
+##   0           the dominant colour, shaded from cool shadows to warm highlights
+##   0 .. 0.2    blending into the underside (countershading: belly, throat, bib, inner legs)
+##   0.5         the secondary (manes, wings, shells, fins, robes)
+##   0.6 .. 0.8  blending into the markings (stripes, saddles, masks, bands, spots)
+##   1           the accent (eyes, horns, crests, spines, tail tips): small, saturated, elemental
+## Animations are advanced manually from the same clock the procedural models use, so screenshots
+## and the bot stay deterministic.
 
 const DIR := "res://assets/"
-const LOOPS := ["idle", "walk", "sit", "fly", "swim"]
+const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim"]
 ## shape -> asset path for monsters that have a Blender model
 const MONSTERS := {
 	"beast": "monsters/beast", "dragon": "monsters/dragon", "phoenix": "monsters/phoenix", "bird": "monsters/phoenix",
@@ -31,6 +35,9 @@ const MONSTERS := {
 	"qilin": "monsters/qilin", "ape": "monsters/ape", "tiger": "monsters/tiger",
 	"queen": "monsters/queen", "warden": "monsters/warden", "crowmarshal": "monsters/crowmarshal", "kaiming": "monsters/kaiming",
 	"magpie": "monsters/magpie",
+	"sun_crow": "monsters/sun_crow",
+	"jade_rabbit": "monsters/jade_rabbit",
+	"bifang": "monsters/bifang",
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
@@ -52,6 +59,18 @@ const PEOPLE := {
 	# Part VIII
 	"niu_lang": "characters/niu_lang", "que_lao": "characters/que_lao", "zhi_nu": "characters/zhi_nu",
 	"dong_shuang": "characters/dong_shuang",
+	# townsfolk of the sect and Qingshi Village
+	"disciple_han": "characters/disciple_han", "disciple_mei": "characters/disciple_mei", "cook_zhou": "characters/cook_zhou",
+	"sweeper_bai": "characters/sweeper_bai", "gate_wu": "characters/gate_wu", "bell_shen": "characters/bell_shen",
+	"farmer_lao": "characters/farmer_lao", "child_hua": "characters/child_hua", "tofu_sun": "characters/tofu_sun",
+	"scholar_wang": "characters/scholar_wang", "carpenter_gu": "characters/carpenter_gu", "herb_lan": "characters/herb_lan",
+	# Part IX
+	"ah_mei": "characters/ah_mei", "farmer_tian": "characters/farmer_tian", "feng_meng": "characters/feng_meng",
+	"chang_e": "characters/chang_e",
+	# the Dawn Market's townsfolk
+	"watchman_zhou": "characters/watchman_zhou", "innkeeper_bao": "characters/innkeeper_bao", "tea_seller_pan": "characters/tea_seller_pan",
+	"dyer_su": "characters/dyer_su", "monk_huiming": "characters/monk_huiming", "granny_gu": "characters/granny_gu",
+	"porter_niu": "characters/porter_niu", "little_dou": "characters/little_dou",
 }
 
 static var _scenes := {}
@@ -77,44 +96,92 @@ static func _scene(rel: String) -> PackedScene:
 		_scenes[rel] = load(path(rel))
 	return _scenes[rel]
 
-static func _material_for(src: Material) -> Material:
+static func _material_for(src: Material, actor: bool = false) -> Material:
 	var nm := src.resource_name if src != null else "toon"
 	if nm.begins_with("glow"):
 		return MB.mat_glow()
 	if nm.begins_with("plain"):
-		return MB.mat_plain()
-	return MB.mat_vc()
+		return MB.mat_actor_plain() if actor else MB.mat_plain()
+	return MB.mat_actor() if actor else MB.mat_vc()
 
-## The palette one enemy colour expands into (sRGB): [primary, shadow, highlight, secondary, accent].
-## The shadow leans a little further round the colour wheel and deepens, the highlight warms and
-## lifts; the secondary is an analogous neighbour; the accent sits across the wheel.  Near-greys
-## (bone, snow, ash) get a gold or a sky-blue accent instead of a colourless one.
-static func palette(c: Color) -> Array:
+## characters and monsters (rigged assets) use the actor shading; props keep the scenery toon
+static func is_actor(rel: String) -> bool:
+	return rel.begins_with("characters/") or rel.begins_with("monsters/")
+
+## Accent colours by element: small, saturated focal colours (a fire beast's eyes, crest and spines
+## glow gold, a water beast's cyan ...), each with an alternate for bodies already of that hue.
+const ELEM_ACCENT := {
+	"fire": [Color("ffc21a"), Color("ff3a22")],  # gold; red on a golden body
+	"water": [Color("2ad4ff"), Color("ffb03a")],  # cyan; warm gold on a blue body
+	"wood": [Color("a6f03c"), Color("ff7ab8")],  # spring green; blossom pink on a green body
+	"earth": [Color("ff9a2a"), Color("3ad8b0")],  # amber; turquoise on a brown body
+	"thunder": [Color("b47cff"), Color("ffe83a")],  # violet; electric yellow on a violet body
+	"dark": [Color("ff3c8c"), Color("3af0e0")],  # magenta; spectral cyan on a red-violet body
+	"phys": [Color("ff4a3a"), Color("ffd23a")],  # red; gold on a red body
+}
+
+## distance between two hues round the colour wheel (0 .. 0.5)
+static func hue_gap(a: float, b: float) -> float:
+	var d := fposmod(a - b, 1.0)
+	return minf(d, 1.0 - d)
+
+## The palette one enemy expands into (sRGB): [dominant, shadow, highlight, secondary, accent,
+## underside, markings].  It follows the usual rules for creature colour: one dominant hue over
+## most of the body; a secondary set clearly apart from it in hue *and* value (greens and blues
+## lean to warmer golds and teals, reds to gold, oranges to a deeper red-brown); a pale,
+## cream-leaning underside (countershading); markings that contrast in value (dark on a light
+## coat, pale on a dark one); and one small saturated accent for the focal points, the element's
+## colour (its alternate, or else the complement, when it sits too close to the body's hue to
+## pop).  `over` may pin any of "sec", "acc", "under", "mark" (the classic creatures).
+static func palette(c: Color, elem: String = "", over: Dictionary = {}) -> Array:
 	var h := c.h
 	var s := c.s
 	var v := c.v
+	var grey := s < 0.14
 	var shade := Color.from_hsv(fposmod(h + 0.045, 1.0), minf(1.0, s * 1.2 + 0.05), v * 0.72)
 	var light := Color.from_hsv(fposmod(h - 0.035, 1.0), s * 0.75, minf(1.0, v * 1.1 + 0.06))
-	var sec := Color.from_hsv(fposmod(h + 0.11, 1.0), minf(1.0, s * 1.1 + 0.08), clampf(v * 0.88, 0.25, 1.0))
-	var acc := Color.from_hsv(fposmod(h + 0.5, 1.0), clampf(s * 0.9, 0.4, 0.95), clampf(v * 1.1, 0.6, 1.0))
-	if s < 0.12:
-		sec = Color.from_hsv(0.6, 0.18, clampf(v * 0.8, 0.3, 1.0))
-		acc = Color("e0b040") if v > 0.45 else Color("70a0ff")
-	return [c, shade, light, sec, acc]
+	var step := 0.13
+	if h >= 0.2 and h < 0.66:
+		step = -0.13
+	elif h >= 0.04 and h < 0.17:
+		step = -0.07
+	var sv := v * 0.68 if v > 0.55 else minf(1.0, v * 1.35 + 0.14)
+	var sec := Color.from_hsv(fposmod(h + step, 1.0), clampf(s * 0.95 + 0.05, 0.0, 0.9), sv)
+	if grey:
+		sec = Color.from_hsv(0.6 if v > 0.5 else 0.07, 0.24, clampf(v * 0.7, 0.24, 0.9))
+	# countershading: paler and less saturated, drifting a third of the way towards cream
+	var to_cream := fposmod(0.11 - h + 0.5, 1.0) - 0.5
+	var under := Color.from_hsv(fposmod(h + to_cream * 0.33, 1.0), s * 0.3, clampf(maxf(v, 0.4) * 0.3 + 0.64, 0.0, 0.97))
+	var mark := Color.from_hsv(fposmod(h + 0.02, 1.0), clampf(s * 0.55 + 0.22, 0.0, 0.85), clampf(v * 0.33, 0.07, 0.3))
+	if v < 0.42:
+		mark = Color.from_hsv(fposmod(h - 0.06, 1.0), s * 0.35, 0.86)
+	var acc := Color("e0b040") if v > 0.45 else Color("70a0ff")
+	if ELEM_ACCENT.has(elem):
+		var pair: Array = ELEM_ACCENT[elem]
+		acc = pair[0]
+		if not grey and hue_gap(acc.h, h) < 0.07:
+			acc = pair[1]
+	if not grey and (not ELEM_ACCENT.has(elem) or hue_gap(acc.h, h) < 0.07):
+		acc = Color.from_hsv(fposmod(h + 0.5, 1.0), clampf(s + 0.3, 0.6, 0.95), 1.0)
+	sec = over.get("sec", sec)
+	acc = over.get("acc", acc)
+	under = over.get("under", under)
+	mark = over.get("mark", mark)
+	return [c, shade, light, sec, acc, under, mark]
 
-## Rebuild a mesh with the game's materials, tinting vertices by their UV.x weight and palette slot.
-static func prepare_mesh(src: Mesh, tint: Color, key: String) -> Mesh:
+## Rebuild a mesh with the game's materials, tinting vertices by their UV.x weight and palette slot
+## (`pal` from `palette()`; empty keeps the authored colours).
+static func prepare_mesh(src: Mesh, pal: Array, key: String, actor: bool = false) -> Mesh:
 	if _meshes.has(key):
 		return _meshes[key]
 	var out := ArrayMesh.new()
-	var pal: Array = palette(tint)
 	var lin: Array = []
 	for pc in pal:
 		lin.append((pc as Color).srgb_to_linear())
 	for s in src.get_surface_count():
 		var arr: Array = src.surface_get_arrays(s)
-		var mat: Material = _material_for(src.surface_get_material(s))
-		if tint.a > 0.0 and arr[Mesh.ARRAY_TEX_UV] != null and arr[Mesh.ARRAY_COLOR] != null:
+		var mat: Material = _material_for(src.surface_get_material(s), actor)
+		if not pal.is_empty() and arr[Mesh.ARRAY_TEX_UV] != null and arr[Mesh.ARRAY_COLOR] != null:
 			var cols: PackedColorArray = arr[Mesh.ARRAY_COLOR]
 			var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
 			for i in cols.size():
@@ -130,18 +197,23 @@ static func prepare_mesh(src: Mesh, tint: Color, key: String) -> Mesh:
 	_meshes[key] = out
 	return out
 
-## Linear tint for one vertex: the primary runs from the cool shadow (dark authored greys) through
-## the base colour to the warm highlight (pale greys); slot 0.5 is the secondary, 1 the accent.
+## Linear tint for one vertex: the dominant runs from the cool shadow (dark authored greys) through
+## the base colour to the warm highlight (pale greys); 0..0.2 blends it into the underside, 0.5 is
+## the secondary, 0.6..0.8 blends it into the markings, 1 is the accent.
 static func _tint_for(lin: Array, c: Color, slot: float) -> Color:
 	var lum := sqrt(clampf(c.r * 0.3 + c.g * 0.55 + c.b * 0.15, 0.0, 1.0))
 	var prim: Color = lin[0]
 	prim = prim.lerp(lin[1], smoothstep(0.62, 0.3, lum) * 0.8)
 	prim = prim.lerp(lin[2], smoothstep(0.78, 1.0, lum) * 0.6)
-	if slot < 0.02:
+	if slot < 0.005:
 		return prim
-	if slot <= 0.5:
-		return prim.lerp(lin[3], slot * 2.0)
-	return (lin[3] as Color).lerp(lin[4], (slot - 0.5) * 2.0)
+	if slot <= 0.21:
+		return prim.lerp(lin[5], clampf(slot / 0.2, 0.0, 1.0))
+	if slot < 0.56:
+		return lin[3]
+	if slot <= 0.81:
+		return prim.lerp(lin[6], clampf((slot - 0.6) / 0.2, 0.0, 1.0))
+	return lin[4]
 
 static func _walk(n: Node, out: Array, cls: String) -> void:
 	if n.is_class(cls):
@@ -149,14 +221,22 @@ static func _walk(n: Node, out: Array, cls: String) -> void:
 	for c in n.get_children():
 		_walk(c, out, cls)
 
-## Instance an asset.  tint.a == 0 keeps the authored colours.
-static func instance(rel: String, tint: Color = Color(0, 0, 0, 0)) -> Node3D:
+## Instance an asset.  tint.a == 0 keeps the authored colours; `pal` (from `palette()`) overrides
+## the palette derived from the tint alone.
+static func instance(rel: String, tint: Color = Color(0, 0, 0, 0), pal: Array = []) -> Node3D:
 	var inst: Node3D = _scene(rel).instantiate()
 	var meshes: Array = []
 	_walk(inst, meshes, "MeshInstance3D")
+	if pal.is_empty() and tint.a > 0.0:
+		pal = palette(tint)
+	var sig := "-"
+	if not pal.is_empty():
+		sig = ""
+		for pc in pal:
+			sig += (pc as Color).to_html(false)
 	for mi in meshes:
 		var m: MeshInstance3D = mi
-		m.mesh = prepare_mesh(m.mesh, tint, "%s|%s|%s" % [rel, m.name, tint.to_html() if tint.a > 0.0 else "-"])
+		m.mesh = prepare_mesh(m.mesh, pal, "%s|%s|%s" % [rel, m.name, sig], is_actor(rel))
 	var aps: Array = []
 	_walk(inst, aps, "AnimationPlayer")
 	var root := Node3D.new()
@@ -181,7 +261,7 @@ static func static_mesh(rel: String) -> Mesh:
 	var inst: Node = _scene(rel).instantiate()
 	var meshes: Array = []
 	_walk(inst, meshes, "MeshInstance3D")
-	var out: Mesh = prepare_mesh((meshes[0] as MeshInstance3D).mesh, Color(0, 0, 0, 0), key)
+	var out: Mesh = prepare_mesh((meshes[0] as MeshInstance3D).mesh, [], key)
 	inst.free()
 	return out
 
@@ -190,11 +270,18 @@ static func person(id: String) -> Node3D:
 	n.set_meta("kind", "person")
 	return n
 
-static func monster(shape: String, col: Color) -> Node3D:
-	var n := instance(MONSTERS[shape], col)
+## A monster in an enemy's colours: `enemy` (an id in Data.ENEMIES) brings its element's accent
+## and any palette it pins; without one the palette comes from the colour alone.
+static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
+	var d: Dictionary = Data.ENEMIES.get(enemy, {})
+	var n := instance(MONSTERS[shape], col, palette(col, d.get("elem", ""), d.get("pal", {})))
 	n.set_meta("kind", "monster")
 	n.set_meta("shape", shape)
 	return n
+
+static func has_clip(n: Node3D, clip: String) -> bool:
+	var ap: AnimationPlayer = n.get_meta("ap", null) if n != null else null
+	return ap != null and ap.has_animation(clip)
 
 ## Drive a model's AnimationPlayer: `base` is the looping clip, an action set by Models.act()
 ## overrides it until it finishes.  `t` is the caller's clock (deltas are taken from it).
@@ -207,12 +294,13 @@ static func animate(n: Node3D, t: float, base: String, phase: float = 0.0) -> vo
 	n.set_meta("anim_t", t)
 	var act: String = n.get_meta("act", "")
 	if act != "":
-		var clip := act if ap.has_animation(act) else ("attack" if ap.has_animation("attack") else "")
+		var clip := act if ap.has_animation(act) else ("attack" if ap.has_animation("attack") and act != "die" and act != "bow" else "")
 		var act_t: float = n.get_meta("act_t", 0.0)
 		var e := t - act_t
 		if clip != "" and e >= 0.0:
 			var len_: float = ap.get_animation(clip).length
-			if e <= len_ + (0.8 if act == "victory" else 0.05):
+			# a fallen fighter stays down: "die" holds its last frame until another action
+			if act == "die" or e <= len_ + (0.8 if act == "victory" else 0.05):
 				if n.get_meta("act_seen", -INF) != act_t or ap.assigned_animation != clip:
 					n.set_meta("act_seen", act_t)
 					ap.play(clip, 0.08)
