@@ -8,7 +8,11 @@
 - `art/lib/kit.py` is the shared toolkit (Godot-space coordinates, tint UV, toon/plain/glow material slots, baked AO, rigs, clips); `art/lib/person.py` and `art/lib/creature.py` build characters and monsters. `python art/build_all.py` (with `pip install bpy`) rebuilds everything; run `godot --headless --path . --import` afterwards.
 - After any art change, render and look at screenshots: `godot --path . --fixed-fps 30 -- --tour=<dir> --areas=<id> --no-extras --gallery` (use `xvfb-run` on a server).
 
+## Trials (many roads)
+- The bosses that carry the main story forward are guarded by **trials** in `scripts/trials.gd`: each has three or four ways through (might, craft, wealth, respect, Dao, friendship, relic), and only a met way can be taken. A new chapter's lords should get trials too, with recipes whose essences can be hunted on the way and quest items found before them (`tests/run_tests.gd` checks this).
+- Give every new trial a planned way in the bot's `TRIAL_PLAN` (`scripts/bot.gd`) that it can actually work towards, and keep respect thresholds above the renown the bosses and trials alone give.
+
 ## Checks before pushing
 - `godot --headless --path . --script tests/run_tests.gd`
 - `godot --headless --path . --script tests/manual_input_test.gd`
-- `godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --min-time=46800` (CI requires the full game to complete in at least 13 hours of game time)
+- `godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --min-time=54000` (CI requires the full game to complete in at least 15 hours of game time)

@@ -351,8 +351,8 @@ static func _wall_tile(layers: Dictionary, tx: int, ty: int, depth: int, gx: Cal
 		_add(layers, "bld:%s#%d" % [kind, v], func(): return Arch.settlement_mesh(kind, v, theme_name), Transform3D(Basis(Vector3.UP, yaw), pos), Color.WHITE, true, 130.0)
 		_settled.append(Vector2i(tx, ty))
 		return
-	# built landmarks (the region's identity) at the chosen share
-	if r0 < land:
+	# built landmarks (the region's identity) at the chosen share, but none crowding a thing to do
+	if r0 < land and not _by_clearing(tx, ty, 1):
 		var key := "wall:" if h(tx, ty, 12.0) >= 0.35 else "wall2:"
 		var lp := Terrain3D._proto(key + theme_name, theme_name)
 		var s2 := 0.85 + h(tx, ty, 5.0) * 0.55
@@ -404,7 +404,21 @@ static func _settle_ok(tx: int, ty: int) -> bool:
 	for p in _settled:
 		if absi((p as Vector2i).x - tx) + absi((p as Vector2i).y - ty) < 9:
 			return false
-	return true
+	# not right beside a thing to do, facing its clearing
+	return not _by_clearing(tx, ty, 2)
+
+## The forest-edge tiles the things to do stand on (props.gd), in the grid being populated: world.gd
+## sets them for a region's view and clears them after, and nothing built crowds them.
+static var clearings: Dictionary = {}
+
+static func _by_clearing(tx: int, ty: int, r: int) -> bool:
+	if clearings.is_empty():
+		return false
+	for dy in range(-r, r + 1):
+		for dx in range(-r, r + 1):
+			if clearings.has(Vector2i(tx + dx, ty + dy)):
+				return true
+	return false
 
 static func _floor_tile(layers: Dictionary, tx: int, ty: int, to_wall: int, to_water: int, to_path: int, gx: Callable, theme_name: String, under: Array, ground: Array, rocks: Array, groves: Array, meadow: FastNoiseLite, rocky: FastNoiseLite, grass_k: float, cover: float, rock_p: float, logs: float, real_grass: bool, tuft_kind: String) -> void:
 	var mv := meadow.get_noise_2d(tx, ty) * 0.5 + 0.5

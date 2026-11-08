@@ -28,15 +28,15 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Dao & Peoples", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "dao", "map", "annals", "resume"]
-		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, Game.dao != "" or not Game.met.is_empty(), main.world.mini_tex != null, true, true]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Dao & Peoples", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "dao", "map", "annals", "resume"]
+		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, Game.dao != "" or not Game.met.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "cultivation":
 		# Part XII: the realm and the branches of the root; an awakening not yet spent can be spent here
 		labels = ["Wake a branch (%d)" % Game.talent_pts, "Back"]
 		ids = ["wake", "back"]
 		enabled = [Game.talent_pts > 0, true]
-	elif mode == "map" or mode == "dao":
+	elif mode == "map" or mode == "dao" or mode == "journal":
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
@@ -77,7 +77,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode == "items" or mode == "map" or mode == "annals" or mode == "dao" or mode == "cultivation":
+			if mode == "items" or mode == "map" or mode == "annals" or mode == "dao" or mode == "cultivation" or mode == "journal":
 				mode = "root"
 				cursor = 0
 				_build()
@@ -113,6 +113,10 @@ func press(act: String) -> void:
 					_build()
 				"cultivation":
 					mode = "cultivation"
+					cursor = 0
+					_build()
+				"journal":
+					mode = "journal"
 					cursor = 0
 					_build()
 				"wake":
@@ -379,6 +383,121 @@ func _draw_cultivation() -> void:
 		y2 += 30.0
 	UI.text(self, Vector2(r.end.x - 200, r.end.y - 16), "Enter / Esc: back", 13, UI.C_DIM)
 
+## The Journal (many roads, trials.gd): Lin Feng's renown, the essences and treasures he carries and
+## what townsfolk have asked of him on the left; on the right the trial ahead, every way through it
+## and what each needs (ticked or not), or the Eight Gates, and the trials already passed.
+func _draw_journal() -> void:
+	var r := Rect2(30, 20, 1220, 680)
+	UI.panel(self, r)
+	var x0 := r.position.x + 24
+	UI.text(self, Vector2(x0, r.position.y + 36), "Renown", 22, UI.C_GOLD)
+	var nxt := 0
+	var prev := 0
+	for rt in Trials.RENOWN_TITLES:
+		if Game.renown >= int(rt[0]):
+			prev = int(rt[0])
+		elif nxt == 0:
+			nxt = int(rt[0])
+	UI.text(self, Vector2(x0, r.position.y + 64), "%d   %s" % [Game.renown, Game.renown_title()], 18, Trials.KINDS.respect.col)
+	if nxt > 0:
+		UI.bar(self, Rect2(x0 + 200, r.position.y + 52, 200, 10), float(Game.renown - prev) / float(maxi(1, nxt - prev)), Trials.KINDS.respect.col)
+	UI.text(self, Vector2(x0, r.position.y + 86), "Bosses, trials, gifts and deeds for townsfolk raise it.", 12, UI.C_DIM)
+	var y := r.position.y + 118.0
+	UI.text(self, Vector2(x0, y), "Essences", 18, UI.C_GOLD)
+	y += 24.0
+	var k := 0
+	for ek in Trials.ESSENCE_ORDER:
+		var n: int = int(Game.inv.get(ek, 0))
+		var col: Color = Data.ELEM_COLORS.get(Trials.elem_of(ek), UI.C_TEXT)
+		UI.text(self, Vector2(x0 + (k % 4) * 140, y + (k / 4) * 20), "%s %d" % [Data.ITEMS[ek].n, n], 14, col if n > 0 else UI.C_DIM)
+		k += 1
+	y += 52.0
+	UI.text(self, Vector2(x0, y), "Treasures", 18, UI.C_GOLD)
+	y += 22.0
+	var tre: Array = []
+	for rid in Trials.RECIPES:
+		if int(Game.inv.get(rid, 0)) > 0:
+			tre.append(str(Data.ITEMS[rid].n))
+	for rc in Data.RACE_ORDER:
+		var gift: String = str(Data.RACES[rc].gift)
+		if gift != "" and int(Game.inv.get(gift, 0)) > 0:
+			tre.append("%s x%d" % [Data.ITEMS[gift].n, int(Game.inv[gift])])
+	y += _wrap_at(Vector2(x0, y), ", ".join(tre) if not tre.is_empty() else "Nothing crafted or kept yet. Alchemist Mo and Smith Tie craft from essences.", 13, UI.C_TEXT if not tre.is_empty() else UI.C_DIM, 560) + 12.0
+	UI.text(self, Vector2(x0, y), "Requests", 18, UI.C_GOLD)
+	y += 22.0
+	var shown := 0
+	for did in Trials.DEEDS:
+		var dd: Dictionary = Trials.DEEDS[did]
+		if Game.deeds.has(did) or not Game.reached(str(dd.after)):
+			continue
+		if shown >= 7:
+			break
+		shown += 1
+		var who := Trials.npc_name(str(dd.npc))
+		var ready := Trials.deed_ready(did, Game)
+		var line := "%s (%s): %s%s" % [who, MAP_NAMES.get(str(dd.area), Data.AREAS[str(dd.area)].n) if dd.area != "sect" else "the sect", Trials.want_text(did, Game), "  - ready" if ready else ""]
+		y += _wrap_at(Vector2(x0, y), line, 12, UI.C_JADE if ready else UI.C_DIM.lightened(0.25), 560) + 4.0
+	if shown == 0:
+		UI.text(self, Vector2(x0, y + 4), "Nobody is asking for anything just now.", 13, UI.C_DIM)
+	UI.text(self, Vector2(x0, r.end.y - 18), "Deeds done: %d of %d" % [Game.deeds.size(), Trials.DEEDS.size()], 13, UI.C_DIM)
+	# the way ahead
+	var x1 := r.position.x + 620
+	var w1 := r.end.x - x1 - 24
+	UI.text(self, Vector2(x1, r.position.y + 36), "The way ahead", 22, UI.C_GOLD)
+	var y2 := r.position.y + 64.0
+	var s := Game.cur_step()
+	var tid := Trials.trial_of_step(s)
+	if tid != "":
+		var tr: Dictionary = Trials.TRIALS[tid]
+		UI.text(self, Vector2(x1, y2), Data.ENEMIES[tid].n, 17, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, w1)
+		y2 += 22.0
+		y2 += _wrap_at(Vector2(x1, y2), str(tr.why), 12, UI.C_DIM.lightened(0.2), w1) + 10.0
+		for p in tr.paths:
+			var ok := Trials.path_met(tid, p, Game)
+			var kc: Color = Trials.KINDS[p.kind].col
+			UI.text(self, Vector2(x1, y2), "%s  %s%s" % [str(Trials.KINDS[p.kind].n), str(p.n), "  (ready)" if ok else ""], 14, kc if ok else kc.darkened(0.25), HORIZONTAL_ALIGNMENT_LEFT, w1)
+			y2 += 18.0
+			var paid: bool = str(Game.paid.get(tid, "")) == str(p.id)
+			for n in p.needs:
+				var met := Trials.need_met(n, Game, paid)
+				y2 += _wrap_at(Vector2(x1 + 14, y2), ("[x] " if met else "[ ] ") + Trials.need_text(n, Game), 12, UI.C_JADE if met else UI.C_DIM.lightened(0.2), w1 - 14) + 2.0
+			y2 += 8.0
+	elif s.get("kind", "") == "gates":
+		y2 += _wrap_at(Vector2(x1, y2), "Open any %d of the Eight Gates, in any order; every gate opened beyond that weakens the heart. Each gate is a trial of its own." % Trials.GATES_NEEDED, 13, UI.C_DIM.lightened(0.2), w1) + 10.0
+		for gid in Trials.GATES:
+			var open: bool = Game.gates_open.has(gid)
+			var area := Trials.boss_area(gid)
+			var kinds: Array = []
+			var any_ok := false
+			for p2 in Trials.TRIALS[gid].paths:
+				kinds.append(str(Trials.KINDS[p2.kind].n).trim_prefix("By "))
+				any_ok = any_ok or Trials.path_met(gid, p2, Game)
+			var gn: String = str(Trials.GATE_NAMES[gid])
+			var st := "open" if open else ("a way is ready" if any_ok else ", ".join(kinds))
+			UI.text(self, Vector2(x1, y2), "%s%s, %s" % [gn.substr(0, 1).to_upper(), gn.substr(1), MAP_NAMES.get(area, area)], 14, UI.C_JADE if open else (UI.C_GOLD if any_ok else UI.C_TEXT), HORIZONTAL_ALIGNMENT_LEFT, w1)
+			y2 += 17.0
+			UI.text(self, Vector2(x1 + 14, y2), "%s: %s" % [Data.ENEMIES[gid].n, st], 12, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, w1 - 14)
+			y2 += 22.0
+	else:
+		var nx := ""
+		for i in range(Game.step, Data.STEPS.size()):
+			var t2 := Trials.trial_of_step(Data.STEPS[i])
+			if t2 != "":
+				nx = "%s, in %s" % [Data.ENEMIES[t2].n, Data.AREAS[Data.STEPS[i].area].n]
+				break
+		y2 += _wrap_at(Vector2(x1, y2), "No trial stands in your way just now." + ("\n\nThe next: %s. Its ways will show here when you reach it." % nx if nx != "" else ""), 14, UI.C_DIM.lightened(0.2), w1) + 12.0
+	# the trials passed, newest last
+	var passed: Array = Game.trials.keys()
+	UI.text(self, Vector2(x1, maxf(y2 + 10.0, r.end.y - 150.0)), "Trials passed: %d" % passed.size(), 17, UI.C_GOLD)
+	var y3 := maxf(y2 + 32.0, r.end.y - 128.0)
+	for tid2 in passed.slice(maxi(0, passed.size() - 5)):
+		var p3 := Trials.path(str(tid2), str(Game.trials[tid2]))
+		if p3.is_empty():
+			continue
+		UI.text(self, Vector2(x1, y3), "%s: %s" % [Data.ENEMIES[tid2].n, str(p3.n)], 12, Trials.KINDS[p3.kind].col, HORIZONTAL_ALIGNMENT_LEFT, w1)
+		y3 += 18.0
+	UI.text(self, Vector2(r.end.x - 200, r.end.y - 16), "Enter / Esc: back", 13, UI.C_DIM)
+
 static func _thousands(n: int) -> String:
 	var s := str(n)
 	var out := ""
@@ -401,7 +520,10 @@ func _draw() -> void:
 	if mode == "annals":
 		_draw_annals()
 		return
-	UI.menu_list(self, Rect2(60, 80, 300, 260), labels, cursor, enabled, 24)
+	if mode == "journal":
+		_draw_journal()
+		return
+	UI.menu_list(self, Rect2(60, 80, 300, 330), labels, cursor, enabled, 24)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
 	# status panel
 	var r := Rect2(400, 80, 820, 560)
@@ -435,4 +557,4 @@ func _draw() -> void:
 	UI.text(self, Vector2(430, 560), "Objective: " + Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 770)
 	UI.text(self, Vector2(430, 610), "Play time %s" % Fmt.clock(Game.playtime), 15, UI.C_DIM)
 	if msg != "":
-		UI.text(self, Vector2(60, 372), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)
+		UI.text(self, Vector2(60, 440), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)
