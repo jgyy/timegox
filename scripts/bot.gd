@@ -1016,7 +1016,8 @@ func _astar() -> AStarGrid2D:
 func _blocked_list(avoid_enemies: bool, goal: Vector2i) -> Array:
 	var out: Array = []
 	for e in world.ents:
-		if e.kind == "spring" or not world.ent_visible(e):
+		# (a thing to do on a floor anyone walks over stands in nobody's way: props.gd)
+		if e.kind == "spring" or e.get("walk", false) or not world.ent_visible(e):
 			continue
 		if e.kind == "seal":
 			if not world.seal_open(e):

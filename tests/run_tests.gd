@@ -52,6 +52,17 @@ func main_recalls_s_break16() -> bool:
 	var src := FileAccess.get_file_as_string("res://scripts/main.gd")
 	return src.contains("\"s_break16\": \"recall10\"") and Data.DIALOGUE.has("recall10")
 
+## Whether entity `e` can be got at from the tiles in `reach`: its own tile, or for a thing to do
+## (props.gd), which stands on a tile nobody walks over, a tile beside it to use it from.
+func reached(e: Dictionary, reach: Dictionary) -> bool:
+	if reach.has(e.pos):
+		return true
+	if e.kind == "prop":
+		for d in MapGen.DIRS:
+			if reach.has(e.pos + d):
+				return true
+	return false
+
 func check(cond: bool, msg: String) -> void:
 	if cond:
 		print("  ok   ", msg)
@@ -334,7 +345,7 @@ func _init() -> void:
 	var reach_all := MapGen.flood(wd.grid, wd.w, wd.h, wd.start)
 	var cut := 0
 	for e in wd.ents:
-		if e.kind != "spring" and e.kind != "seal" and not reach_all.has(e.pos):
+		if e.kind != "spring" and e.kind != "seal" and not reached(e, reach_all):
 			cut += 1
 	check(cut == 0, "open world: every NPC, boss, pickup and monster can be walked to from the sect (%d cut off)" % cut)
 	for id in Atlas.region_ids():
@@ -589,7 +600,7 @@ func _init() -> void:
 		var lcut := 0
 		var to_surface := false
 		for e11 in lw.ents:
-			if e11.kind != "spring" and e11.kind != "seal" and not lreach.has(e11.pos):
+			if e11.kind != "spring" and e11.kind != "seal" and not reached(e11, lreach):
 				lcut += 1
 			if e11.kind == "ladder" and e11.to_layer == "surface":
 				to_surface = true
@@ -643,7 +654,7 @@ func _init() -> void:
 			var fcut := 0
 			var back := false
 			for fe in fw.ents:
-				if not freach.has(fe.pos):
+				if not reached(fe, freach):
 					fcut += 1
 				if fe.kind == "ladder" and fe.to_layer == lid2:
 					back = true
@@ -773,7 +784,7 @@ func _init() -> void:
 	var sea_cut := 0
 	var boat_end := false
 	for e12 in sea_w.ents:
-		if e12.kind != "spring" and not sea_reach.has(e12.pos):
+		if e12.kind != "spring" and not reached(e12, sea_reach):
 			sea_cut += 1
 		if e12.kind == "ladder" and str(e12.get("style", "")) == "sail":
 			boat_end = true
@@ -1256,5 +1267,113 @@ func _init() -> void:
 	for x4 in m4.w:
 		tdist = maxf(tdist, absf(Terrain3D.sample(hm4, m4.w, m4.h, (x4 + 0.5) * Terrain3D.T, 13.5 * Terrain3D.T)))
 	check(tdist < 0.5, "the sect's main road stays nearly flat (max %.2f)" % tdist)
+	print("== things to do ==")
+	# what each thing is (props.gd): a name and a hint, time to do it, where it is done, what comes of
+	# it, three things to say of it, something that can be held; a clip for Lin Feng and for Yue Ling
+	var party := [Assets.person("lin_feng"), Assets.person("yue_ling")]
+	var pap0: AnimationPlayer = party[0].get_meta("ap")
+	var pap1: AnimationPlayer = party[1].get_meta("ap")
+	for pk in Props.KINDS:
+		var kd: Dictionary = Props.KINDS[pk]
+		check(str(kd.get("n", "")) != "" and str(kd.get("verb", "")) != "" and float(kd.get("dur", 0.0)) >= 1.5, "thing %s: a name, a hint and time to do it" % pk)
+		check(str(kd.get("at", "face")) in ["face", "seat", "before", "on"] and Props.EFFECTS.has(str(kd.get("effect", ""))), "thing %s: where it is done and what comes of it" % pk)
+		check((kd.get("lines", []) as Array).size() >= 3, "thing %s: three things to say of it" % pk)
+		check(str(kd.get("hold", "")) == "" or Props.HELD.has(str(kd.hold)), "thing %s: what is held can be held" % pk)
+		check(pap0.has_animation(str(kd.clip)), "Lin Feng can %s (%s)" % [str(kd.verb).to_lower(), kd.clip])
+		var pcc := str(kd.get("comp", "watch"))
+		check(pcc == "watch" or pap1.has_animation(pcc), "Yue Ling joins in at the %s (%s)" % [pk, pcc])
+	for pk2 in Props.THEMES:
+		for kk in Props.THEMES[pk2]:
+			check(Props.KINDS.has(kk) and not Props.KINDS[kk].has("furn"), "the %s look for things that exist (%s)" % [pk2, kk])
+	for p0 in party:
+		p0.free()
+	# every kind of furniture in the buildings can be used
+	var fkinds := {}
+	for fa in Data.AREAS:
+		for fbd in Data.AREAS[fa].get("buildings", []):
+			for fl0 in [fbd, fbd.get("upper", {}), fbd.get("cellar", {})]:
+				for fpr in fl0.get("props", []):
+					fkinds[str(fpr[0])] = true
+	for fk in fkinds:
+		check(Props.FURNITURE.has(fk) and Props.KINDS.has(str(Props.FURNITURE[fk])), "the %s in the buildings can be used" % fk)
+	# where the things stand: outdoors on a closed forest-edge or shore tile of their own region beside
+	# open ground, apart from each other and from everybody; furniture on the tile it fills, or (on a
+	# floor anyone walks over) flagged so; so no tile anybody walks on is taken
+	var n_out := 0
+	var n_furn := 0
+	for plid in ["surface", "heaven", "under", "sea"]:
+		var plw := Atlas.world_of(plid)
+		var bad_tile := 0
+		var bad_near := 0
+		var bad_apart := 0
+		var outs: Array = []
+		var others: Array = []
+		for pe in plw.ents:
+			if pe.kind != "prop":
+				others.append(pe.pos)
+		for pe2 in plw.ents:
+			if pe2.kind != "prop":
+				continue
+			var tv: int = plw.grid[pe2.pos.y * plw.w + pe2.pos.x]
+			if pe2.has("furn"):
+				n_furn += 1
+				if bool(pe2.get("walk", false)) != MapGen.is_walkable_tile(tv):
+					bad_tile += 1
+				continue
+			n_out += 1
+			var fn: Vector2i = pe2.pos + pe2.face
+			if not (tv == MapGen.WALL or tv == MapGen.WATER) or not MapGen.is_walkable_tile(plw.grid[fn.y * plw.w + fn.x]) or Atlas.owner_id(plw, pe2.pos) != str(pe2.area):
+				bad_tile += 1
+			for op in others:
+				if absi(op.x - pe2.pos.x) <= 2 and absi(op.y - pe2.pos.y) <= 2:
+					bad_near += 1
+			for q2 in outs:
+				if q2[0] == pe2.area and (q2[1] as Vector2i).distance_squared_to(pe2.pos) < 64:
+					bad_apart += 1
+			outs.append([pe2.area, pe2.pos])
+		check(bad_tile == 0, "%s: every thing to do stands where nobody walks (%d astray)" % [plid, bad_tile])
+		check(bad_near == 0, "%s: outdoor things stand clear of everybody and everything (%d too close)" % [plid, bad_near])
+		check(bad_apart == 0, "%s: a region's outdoor things stand well apart (%d too close)" % [plid, bad_apart])
+		for fid2 in plw.floors:
+			for fe2 in plw.floors[fid2].ents:
+				if fe2.kind == "prop":
+					n_furn += 1
+	check(n_out >= 250, "a lot of things to do outdoors (%d)" % n_out)
+	check(n_furn >= 500, "and the furniture of every building (%d)" % n_furn)
+	# what comes of doing them (a game state of its own)
+	var PG = load("res://scripts/game.gd").new()
+	PG.reset()
+	PG.level = 20
+	PG.companion = true
+	PG.heal_full()
+	PG.hp[0] = 10.0
+	var pbench := {"kind": "prop", "id": "test:bench", "prop": "bench", "pos": Vector2i.ZERO}
+	var pr0: int = PG.renown
+	var pl0: Array = Props.use(pbench, PG)
+	check(PG.hp[0] > 10.0 and PG.pastimes.has("bench") and PG.renown == pr0 + 1 and pl0.size() >= 2, "a rest on a bench: health back, a new pastime, a little renown")
+	Props.use(pbench, PG)
+	check(PG.renown == pr0 + 1 and Props.line_for(pbench, 0) != Props.line_for(pbench, 1), "a pastime is news only once; something new is said each time")
+	var plion := {"kind": "prop", "id": "test:lion", "prop": "lion", "pos": Vector2i.ZERO}
+	var pst0: int = PG.stones
+	Props.use(plion, PG)
+	var pst1: int = PG.stones
+	Props.use(plion, PG)
+	check(pst1 > pst0 and PG.stones == pst1, "a find is found only once")
+	var pherb := {"kind": "prop", "id": "test:herb", "prop": "herb_patch", "pos": Vector2i.ZERO}
+	Props.use(pherb, PG)
+	Props.use(pherb, PG)
+	var ph1 := int(PG.inv.get("ess_wood", 0))
+	PG.playtime += 601.0
+	Props.use(pherb, PG)
+	check(ph1 == 1 and int(PG.inv.get("ess_wood", 0)) == 2, "herbs grow back with time")
+	PG.level = 3
+	PG.exp = 0.0
+	Props.use({"kind": "prop", "id": "test:stones", "prop": "stones", "pos": Vector2i.ZERO}, PG)
+	check(PG.exp > 0.0, "the training stones are a little cultivation")
+	PG.hp[0] = 1.0
+	PG.qi[1] = 0.0
+	Props.use({"kind": "prop", "id": "test:bed", "prop": "bed", "pos": Vector2i.ZERO}, PG)
+	check(PG.hp[0] == float(PG.max_hp(0)) and PG.qi[1] == float(PG.max_qi(1)), "a sleep in a bed restores everybody")
+	PG.free()
 	# the rest (every script compiles) runs on the first frame, see _process
 	finished = true

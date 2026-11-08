@@ -139,6 +139,10 @@ func _unhandled_input(ev: InputEvent) -> void:
 
 func press(act: String) -> void:
 	var top := top_name()
+	if top == "world" and not world.using.is_empty():
+		# doing something (props.gd): Enter or Esc finishes it
+		world.press_use(act)
+		return
 	if top == "world":
 		if act == "cancel":
 			open_menu()
@@ -315,6 +319,9 @@ func interact(e: Dictionary) -> void:
 			open_dao_choice("stele")
 		"abode":
 			open_abode(e)
+		"prop":
+			# a thing to do (props.gd): Lin Feng steps up to it and does it
+			world.start_use(e)
 
 func talk_npc(e: Dictionary) -> void:
 	var s := Game.cur_step()

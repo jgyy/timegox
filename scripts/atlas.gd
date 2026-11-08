@@ -525,6 +525,11 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# and below)
 	var reach_e := MapGen.flood(grid, W, H, start)
 	ents = ents.filter(func(e): return e.kind != "enemy" or reach_e.has(e.pos))
+	# ---- things to do (props.gd): a few in every region on the forest edge and the shore, and the
+	# furniture of every building; added once the ground is final, on tiles nobody walks over
+	ents.append_array(Props.place(grid, W, H, owner, sea, ids, ents, layer))
+	for bd3 in buildings:
+		ents.append_array(Props.furniture(bd3.props, bd3.area, layer, "furn:%s:%s" % [bd3.area, bd3.id], grid, W))
 	# ---- each region's cell: the bounding box of the land it owns
 	var lo: Array = []
 	var hi: Array = []
@@ -591,6 +596,9 @@ static func _floor(layer: String, bd: Dictionary, lv: int, grid: PackedByteArray
 	var lprops: Array = []
 	for pr in fl.get("props", []):
 		lprops.append([pr[0], pr[1] - r.position, pr[2]])
+	# its furniture can be used too (props.gd), all but anything standing where the stairs come up
+	var st_l: Vector2i = stairs - r.position
+	fents.append_array(Props.furniture(lprops.filter(func(pr): return pr[1] != st_l), area, fid, "furn:%s:%s:%d" % [area, bd.id, lv], g, r.size.x))
 	return {"layer": fid, "kind": "floor", "parent": layer, "bld": bd.id, "bld_n": bd.n, "floor_n": fname, "level": lv, "area": area,
 		"w": r.size.x, "h": r.size.y, "origin": r.position, "grid": g, "owner": owner, "sea": PackedByteArray(), "ids": [area], "idx": {area: 0},
 		"ents": fents, "buildings": [], "start": arrive, "floors": {}, "y": 0.0, "props": lprops, "stairs": stairs - r.position, "style": str(bd.get("style", "house"))}

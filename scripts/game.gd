@@ -59,6 +59,13 @@ var deeds := {}
 var gates_open := {}
 ## the leaders Lin Feng has carried the Conclave's invitations to (Part XIII)
 var visited := {}
+## things done in the world (props.gd): the kinds of thing he has done at least once (his pastimes),
+## how often he has used each thing, the things that gave up a find, and when each last gave
+## something that comes back with time (herbs, training)
+var pastimes := {}
+var prop_uses := {}
+var prop_found := {}
+var prop_t := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -107,6 +114,10 @@ func reset() -> void:
 	deeds = {}
 	gates_open = {}
 	visited = {}
+	pastimes = {}
+	prop_uses = {}
+	prop_found = {}
+	prop_t = {}
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
 	note("Journey begins")

@@ -215,11 +215,14 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 	m.add_child(Models.shadow_disc(0.8))
 	var t0 := 0.0
 	if main.args.has("clip"):
-		# a strip of frames through one clip, seen from the side (--clip=run [--frames=6])
-		var clip := str(main.args.clip)
+		# a strip of frames through a clip, seen from the side (--clip=run [--frames=6]); several clips
+		# at once with a comma between them (--clip=sit_bench,drink)
 		var ap: AnimationPlayer = m.get_meta("ap", null)
 		var frames := int(main.args.get("frames", "6"))
-		if ap != null and ap.has_animation(clip):
+		for clip in str(main.args.clip).split(",", false):
+			if ap == null or not ap.has_animation(clip):
+				print("[tour] no clip ", clip)
+				continue
 			var ln: float = ap.get_animation(clip).length
 			m.rotation.y = float(main.args.get("yaw", str(PI * 0.5)))
 			var aim2 := Vector3(0, height * 0.5, 0)
@@ -548,6 +551,115 @@ func _part13_shots() -> void:
 	# the ending: a frame of every shot of its film, and the results
 	_ending_state()
 	await _ending_shots()
+
+## Things to do (--props, props.gd): for each kind of thing (or those named, --props=bench,well), the
+## first one of it in the land, Lin Feng beside it with Yue Ling, Enter, and a frame from the side while
+## he does it (prop_<kind>.png), and all of them on sheets (props_sheet_<n>.png).
+const PROP_SHOTS := ["bench", "well", "shrine", "bell", "qin", "fishing", "swing", "wish_tree", "campfire", "stones", "broom", "koi",
+	"tea", "drum", "herb_patch", "stele", "altar", "bookshelf", "bed", "cauldron", "anvil", "loom", "cushion", "stove", "barrel", "rack"]
+
+func _props_shots() -> void:
+	Game.reset()
+	Game.level = 30
+	Game.companion = true
+	Game.heal_full()
+	Game.hp[0] = Game.max_hp(0) * 0.6
+	Game.step = Data.step_index("s_p11_home")
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.open_world()
+	var want: Array = PROP_SHOTS
+	if Props.KINDS.has(str(main.args.props).split(",", false)[0] if str(main.args.props) != "" else ""):
+		want = str(main.args.props).split(",", false)
+	var frames: Array = []
+	for kind in want:
+		var found = null
+		var lid_f := ""
+		for lid in ["surface", "heaven", "under", "sea"]:
+			var lw := Atlas.world_of(lid)
+			for e in lw.ents:
+				if e.kind == "prop" and str(e.prop) == kind and _prop_spot(lw, e) != Vector2i(-1, -1):
+					found = e
+					lid_f = lid
+					break
+			if found != null:
+				break
+			# furniture upstairs and in cellars
+			for fid in lw.floors:
+				for fe in lw.floors[fid].ents:
+					if fe.kind == "prop" and str(fe.prop) == kind and _prop_spot(lw.floors[fid], fe) != Vector2i(-1, -1):
+						found = fe
+						lid_f = fid
+						break
+				if found != null:
+					break
+			if found != null:
+				break
+		if found == null:
+			print("[tour] no ", kind)
+			continue
+		var e2: Dictionary = found
+		print("[tour] %s at %s in %s" % [kind, str(e2.pos), lid_f])
+		var lw2 := Atlas.world_of(lid_f)
+		var spot := _prop_spot(lw2, e2)
+		main.world.enter_layer(lid_f)
+		main.world.teleport(spot, lid_f)
+		main.world.facing = e2.pos - spot
+		main.world.cam_q = maxi(0, main.world.FWD.find(main.world.facing))
+		main.world._snap_cam()
+		main.world.banner_t = 0.0
+		Game.toasts.clear()
+		main.toast_list.clear()
+		await _wait(0.2)
+		print("[tour] using ", kind)
+		main.world.start_use(e2)
+		var k := Props.kind_of(e2)
+		var once: bool = Props.ONCE.has(str(k.clip))
+		var into := minf(float(k.dur) * 0.55, 2.4) if not once else float(main.world.FX_AT.get(str(k.clip), 0.6)) + 0.1
+		# (rendering the world is slow here: jump straight to him at it, and a one-shot to its moment)
+		main.world.using.t0 = main.world.t - main.world.USE_STEP - maxf(0.0, into - 0.25)
+		await _wait(0.07)
+		if once:
+			main.world.player.set_meta("act_t", main.world.t - into + 0.1)
+		# a camera off to the side, looking across the hero at the thing
+		var hp: Vector3 = main.world.player.position
+		var c: Vector3 = main.world.ent_pos(e2)
+		var dir := Vector3(c.x - hp.x, 0, c.z - hp.z).normalized()
+		var side := Vector3(dir.z, 0, -dir.x)
+		var mid := hp.lerp(Vector3(c.x, hp.y, c.z), 0.45) + Vector3(0, 0.9, 0)
+		var eye := mid + side * 4.2 - dir * 2.2 + Vector3(0, 1.4, 0)
+		if e2.has("furn"):
+			eye = mid + side * 3.0 - dir * 1.6 + Vector3(0, 2.2, 0)
+		main.world.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(mid, Vector3.UP)
+		await _wait(0.2)
+		await _shot("prop_" + kind)
+		frames.append(last_img.duplicate())
+		# done: on to the next
+		main.world.using.t0 = main.world.t - 100.0
+		await _wait(0.07)
+		main.world.cam_override = null
+	for sh in range(0, frames.size(), 6):
+		_grid("props_sheet_%d" % (sh / 6), frames.slice(sh, sh + 6), 2)
+
+## A free tile beside thing `e` in world `lw` to use it from (-1,-1 if none).
+func _prop_spot(lw: Dictionary, e: Dictionary) -> Vector2i:
+	var g: PackedByteArray = lw.grid
+	var W: int = lw.w
+	var fd: Vector2i = e.get("face", Vector2i.ZERO)
+	var dirs: Array = ([fd] if fd != Vector2i.ZERO else []) + MapGen.DIRS
+	for d in dirs:
+		var n: Vector2i = e.pos + d
+		if n.x < 0 or n.y < 0 or n.x >= W or n.y >= int(lw.h):
+			continue
+		if MapGen.is_walkable_tile(g[n.y * W + n.x]):
+			var busy := false
+			for o in lw.ents:
+				if o.pos == n and o.kind != "prop":
+					busy = true
+					break
+			if not busy:
+				return n
+	return Vector2i(-1, -1)
 
 ## The state the bot's run (seed 1234) reaches the ending in: every trial passed the way its plan
 ## takes it, the heart by the Road of the Many Peoples, and the run's numbers (the clock stopped).
@@ -1042,6 +1154,8 @@ func _run() -> void:
 		await _part13_shots()
 	if main.args.has("gallery12"):
 		await _part12_galleries()
+	if main.args.has("props"):
+		await _props_shots()
 	if main.args.has("ending"):
 		# the ending on its own (--ending): its film and the results
 		_ending_state()

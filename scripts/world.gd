@@ -26,6 +26,16 @@ var area_id := ""
 var wd := {}
 var tile_ents := {}
 var ent_by_id := {}
+## the things to do that stand where anyone may walk (props.gd: a cushion, a stool, a hanging scroll),
+## by tile: used by facing them, never in anyone's way
+var walk_props := {}
+## the thing Lin Feng is using (props.gd) while he steps up to it, does it and steps back: the thing
+## and its kind ("e", "k"), when it began and how long he does it ("t0", "dur"), where he stands and
+## faces ("from", "to", "yaw", "yaw0", "c", "dir", "side"), how far along it is ("started", "ended",
+## "fx_n"), what he holds and sits on ("held", "stool") and Yue Ling's part ("comp_sit", "comp_from")
+var using := {}
+## the 3D node of each entity on show, by id (the bell that swings, the lantern that is lit)
+var ent_nodes := {}
 var w := 0
 var h := 0
 var grid := PackedByteArray()
@@ -120,6 +130,8 @@ func clear_cache() -> void:
 	area_id = ""
 	inside = ""
 	trip = {}
+	using = {}
+	ent_nodes.clear()
 
 func _free_view(k: String) -> void:
 	var v: Dictionary = views[k]
@@ -142,12 +154,15 @@ func _bundle(lid: String) -> Dictionary:
 	if bundles.has(lid):
 		return bundles[lid]
 	var lw: Dictionary = Atlas.world_of(lid)
-	var b := {"wd": lw, "tile_ents": {}, "ent_by_id": {}, "off": Vector3.ZERO, "hm": PackedFloat32Array(), "mini": null, "root": null, "placed": false}
+	var b := {"wd": lw, "tile_ents": {}, "walk_props": {}, "ent_by_id": {}, "off": Vector3.ZERO, "hm": PackedFloat32Array(), "mini": null, "root": null, "placed": false}
 	for e in lw.ents:
 		b.ent_by_id[e.id] = e
 		if e.kind == "seal":
 			for t2 in e.tiles:
 				b.tile_ents[t2] = e
+		elif e.kind == "prop" and e.get("walk", false):
+			# a cushion, a stool, a hanging scroll: used by facing it, walked over freely
+			b.walk_props[e.pos] = e
 		elif e.kind != "spring":
 			b.tile_ents[e.pos] = e
 	var floor: bool = lw.get("kind", "") == "floor"
@@ -193,6 +208,7 @@ func _use(lid: String) -> void:
 	grid = wd.grid
 	ents = wd.ents
 	tile_ents = b.tile_ents
+	walk_props = b.walk_props
 	ent_by_id = b.ent_by_id
 	hm = b.hm
 	off = b.off
@@ -506,7 +522,15 @@ func _build_view(id: String) -> void:
 			lb.props = props
 			bl.append(lb)
 	var spec: Dictionary = Data.AREAS[id]
-	var root := Terrain3D.build(sl.grid, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
+	# the things to do on the forest edge stand in little clearings of their own (only the look of the
+	# ground changes: the tile is as closed as ever)
+	var vg: PackedByteArray = sl.grid
+	for e0 in lw.ents:
+		if e0.kind == "prop" and e0.area == id and not e0.has("furn"):
+			var lt: Vector2i = e0.pos - r.position
+			if lt.x >= 0 and lt.y >= 0 and lt.x < r.size.x and lt.y < r.size.y and vg[lt.y * r.size.x + lt.x] == MapGen.WALL:
+				vg[lt.y * r.size.x + lt.x] = MapGen.FLOOR
+	var root := Terrain3D.build(vg, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
 	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS) + bb.off
 	scene3d.add_child(root)
 	var nodes := {}
@@ -516,6 +540,8 @@ func _build_view(id: String) -> void:
 			continue
 		var n := _make_ent(e, bb.off)
 		n.position.y = _stand_y(bb, n.position)
+		if e.kind == "prop" and Props.WATER_KINDS.has(str(e.prop)):
+			n.position.y = bb.off.y
 		scene3d.add_child(n)
 		nodes[i] = n
 	if id == "sect":
@@ -688,7 +714,20 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 	var n := Node3D.new()
 	n.position = Terrain3D.world_pos(e.pos) + at
 	n.visible = false
+	ent_nodes[e.id] = n
 	match e.kind:
+		"prop":
+			# a thing to do (props.gd): outdoors its own model, turned to face the open ground it is
+			# used from; furniture is drawn by its building, and the node only carries what it does
+			if not e.has("furn"):
+				var pm := Props.model(str(e.prop), str(Data.AREAS[e.area].theme))
+				var fd: Vector2i = e.get("face", Vector2i(0, 1))
+				pm.rotation.y = atan2(float(fd.x), float(fd.y))
+				n.add_child(pm)
+				n.set_meta("model", pm)
+				var pl := _label(n, str(Props.kind_of(e).get("n", "")), 2.5, Color("f0e6c8"), 24)
+				pl.visible = false
+				n.set_meta("label", pl)
 		"npc":
 			# (someone who appears in two places shares one model: "asset")
 			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(str(e.get("asset", e.id))))
@@ -781,6 +820,305 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			cm.rotation.y = atan2(float(to_sect.x), float(to_sect.y))
 	return n
 
+# ---------------------------------------------------------------- doing things (props.gd)
+## seconds to step up to a thing (and back from it afterwards)
+const USE_STEP := 0.45
+## when a thing answers, seconds into the clip (by clip), and how often a long one answers again (by
+## what it does)
+const FX_AT := {"strike": 0.95, "toss": 0.62, "drink": 0.9, "gather": 1.0, "lift": 1.45, "touch": 0.8, "bow": 0.6, "attack": 0.3, "hammer": 0.82}
+const FX_EVERY := {"notes": 1.1, "steam": 1.3, "smoke": 1.5, "sparks": 1.2, "ripple": 1.7, "leaves": 1.8, "qi": 1.6, "chime": 1.4, "koi": 1.5, "zzz": 2.0}
+## Yue Ling's part, by what she does: the ones she keeps doing for as long as he does
+const COMP_LOOP := ["pray", "warm", "read", "meditate", "sit_bench", "gather"]
+
+## Lin Feng uses thing `e`: he steps up to it (or onto it, to sit), does it, and steps back; what comes
+## of it is shown when he is done.
+func start_use(e: Dictionary) -> void:
+	if not using.is_empty() or not trip.is_empty():
+		return
+	var k := Props.kind_of(e)
+	if k.is_empty():
+		return
+	var from := _player_pos()
+	var nd = ent_nodes.get(e.id)
+	var c := ent_pos(e)
+	var dir := Vector3(c.x - from.x, 0.0, c.z - from.z)
+	if dir.length() < 0.05:
+		dir = Vector3(facing.x, 0.0, facing.y)
+	dir = dir.normalized()
+	var side := Vector3(dir.z, 0.0, -dir.x)
+	var at := str(k.get("at", "face"))
+	var to := from + dir * 0.55
+	var yaw := atan2(dir.x, dir.z)
+	var comp_sit: bool = Game.companion and str(k.get("comp", "")) == "sit_bench" and at == "seat"
+	match at:
+		"seat":
+			to = c - dir * float(k.get("off", 0.0))
+			yaw = atan2(-dir.x, -dir.z)
+			if comp_sit:
+				# room for two: he takes one end of the bench and she the other
+				to -= side * 0.4
+		"before":
+			to = c - dir * float(k.get("off", 0.0))
+		"on":
+			to = c
+	# on the thing's own ground outdoors (a bench on the forest edge stands a little higher), on the
+	# floorboards he stands on indoors
+	var base_y: float = from.y
+	if at != "face" and not e.has("furn") and nd != null and is_instance_valid(nd):
+		base_y = (nd as Node3D).position.y
+	using = {"e": e, "k": k, "t0": t, "dur": float(k.dur), "from": from, "to": Vector3(to.x, base_y, to.z), "yaw": yaw, "yaw0": player.rotation.y,
+		"c": c, "dir": dir, "side": side, "started": false, "ended": false, "fx_n": 0, "held": null, "stool": null, "comp_sit": comp_sit,
+		"comp_from": comp_pos}
+	move_dir = Vector2i.ZERO
+	if nd != null and is_instance_valid(nd):
+		(nd as Node3D).set_meta("used_t", t + USE_STEP)
+
+## Enter or Esc while doing something long: finish now (what comes of it still comes).
+func press_use(_act: String) -> void:
+	if using.is_empty() or not bool(using.started) or bool(using.ended):
+		return
+	if Props.ONCE.has(str(using.k.clip)):
+		return
+	using.dur = maxf(0.6, t - float(using.t0) - USE_STEP)
+
+## The clock of doing something (also when headless): begin, finish, step back.
+func _use_step() -> void:
+	var el := t - float(using.t0)
+	var dur := float(using.dur)
+	if not bool(using.started) and el >= USE_STEP:
+		using.started = true
+		_use_begin()
+	if bool(using.started) and not bool(using.ended) and el >= USE_STEP + dur:
+		using.ended = true
+		_use_finish()
+	if el >= USE_STEP * 2.0 + dur:
+		_use_clear()
+
+func _use_begin() -> void:
+	var k: Dictionary = using.k
+	var clip := str(k.clip)
+	if Props.ONCE.has(clip):
+		Models.act(player, clip, t)
+	if headless():
+		return
+	# what he holds for it, in his right hand
+	var hold := str(k.get("hold", ""))
+	if hold != "":
+		var hn := _hold_in_hand(player, hold)
+		if hn != null:
+			using.held = hn
+	# a stool for a loom that has none
+	if str(using.e.get("furn", "")) == "loom":
+		var sb := MB.new()
+		sb.cyl(Vector3(0, 0.2, 0), 0.2, 0.4, MB.tag(Props.WOOD, MB.WOOD), Vector3.ZERO, 10)
+		var sn := MB.mesh_node(scene3d, sb.build(MB.mat_plain()), Vector3(using.to.x, float(using.to.y), using.to.z) - Vector3(using.dir.x, 0, using.dir.z) * 0.1)
+		using.stool = sn
+	# Yue Ling joins in or reacts
+	if Game.companion:
+		var cc := str(k.get("comp", "watch"))
+		if cc != "watch" and not COMP_LOOP.has(cc):
+			Models.act(comp, cc, t + 1.0)
+
+func _use_finish() -> void:
+	var lines := Props.use(using.e, Game)
+	for ln in lines:
+		Game.toast(str(ln))
+	var hn = using.held
+	if hn != null and is_instance_valid(hn):
+		(hn as Node).queue_free()
+	using.held = null
+
+func _use_clear() -> void:
+	var sn = using.get("stool")
+	if sn != null and is_instance_valid(sn):
+		(sn as Node).queue_free()
+	comp_pos = player.position if not Game.companion else comp.position
+	player.rotation.x = 0.0
+	using = {}
+
+## The thing in the hero's hand (Props.held), on his right hand bone; null if the model has no
+## skeleton to hold it.
+func _hold_in_hand(m: Node3D, what: String) -> Node3D:
+	var sks := m.find_children("*", "Skeleton3D", true, false)
+	if sks.is_empty():
+		return null
+	var sk := sks[0] as Skeleton3D
+	if sk.find_bone("hand.R") < 0:
+		return null
+	var ba := BoneAttachment3D.new()
+	ba.bone_name = "hand.R"
+	sk.add_child(ba)
+	ba.add_child(Props.held(what))
+	return ba
+
+## Where the hero and Yue Ling are and what they do while he does something.
+func _use_pose(d: float) -> void:
+	var el := t - float(using.t0)
+	var dur := float(using.dur)
+	var k: Dictionary = using.k
+	var in_k := smoothstep(0.0, USE_STEP, el)
+	var out_k := smoothstep(USE_STEP + dur, USE_STEP * 2.0 + dur, el)
+	var at_k := in_k * (1.0 - out_k)
+	var from: Vector3 = using.from
+	var to: Vector3 = using.to
+	var pos := from.lerp(to, at_k)
+	var doing: bool = bool(using.started) and not bool(using.ended)
+	var yaw := lerp_angle(float(using.yaw0), float(using.yaw), smoothstep(0.0, USE_STEP * 0.8, el))
+	if el > USE_STEP + dur:
+		yaw = lerp_angle(float(using.yaw), atan2(float(facing.x), float(facing.y)), smoothstep(USE_STEP + dur, USE_STEP * 2.0 + dur, el))
+	var tilt := 0.0
+	if str(k.get("fx", "")) == "swing":
+		# the swing goes, with him on it: higher and higher, then dying away
+		var nd = ent_nodes.get(using.e.id)
+		var sw := 0.0
+		if doing:
+			var ph := el - USE_STEP
+			sw = sin(ph * 2.2) * 0.42 * smoothstep(0.0, 1.5, ph) * (1.0 - smoothstep(dur - 1.2, dur, ph))
+		if nd != null and is_instance_valid(nd) and (nd as Node3D).has_meta("model"):
+			var pmod := (nd as Node3D).get_meta("model") as Node3D
+			if pmod.has_meta("mover"):
+				(pmod.get_meta("mover") as Node3D).rotation.x = sw
+		var r := 2.12
+		var dz := -r * sin(sw)
+		var dy := r * (1.0 - cos(sw))
+		# (the seat swings about the beam: back and up on one side of the arc, forward and up on the other)
+		pos += Vector3(-using.dir.x, 0, -using.dir.z) * dz + Vector3(0, dy, 0)
+		tilt = sw
+	player.position = pos
+	player.rotation = Vector3(tilt, yaw, 0.0)
+	var clip := str(k.clip)
+	if not doing:
+		Models.anim_person(player, t, at_k > 0.02 and at_k < 0.98, false, "")
+	elif Props.ONCE.has(clip):
+		Models.anim_person(player, t, false, false, "")
+	else:
+		Models.anim_person(player, t, false, false, clip)
+	if doing:
+		_use_fx_tick(el - USE_STEP)
+	comp.visible = Game.companion
+	if Game.companion:
+		_comp_use(d, el, doing)
+
+func _comp_use(d: float, el: float, doing: bool) -> void:
+	var k: Dictionary = using.k
+	var cc := str(k.get("comp", "watch"))
+	var c: Vector3 = using.c
+	if bool(using.comp_sit):
+		# beside him on the bench
+		var seat: Vector3 = using.to + using.side * 0.8
+		var dur := float(using.dur)
+		var a := smoothstep(0.0, USE_STEP, el) * (1.0 - smoothstep(USE_STEP + dur, USE_STEP * 2.0 + dur, el))
+		var cf: Vector3 = using.comp_from
+		comp.position = cf.lerp(seat, a)
+		comp.rotation.y = lerp_angle(comp.rotation.y, float(using.yaw), 1.0 - exp(-d * 8.0))
+		Models.anim_person(comp, t + 1.0, a > 0.02 and a < 0.98 and not doing, false, "sit_bench" if doing else "")
+		return
+	comp.position = comp_pos
+	var want := atan2(c.x - comp_pos.x, c.z - comp_pos.z)
+	comp.rotation.y = lerp_angle(comp.rotation.y, want, 1.0 - exp(-d * 6.0))
+	Models.anim_person(comp, t + 1.0, false, false, cc if doing and COMP_LOOP.has(cc) else "")
+
+func _use_fx_tick(el: float) -> void:
+	var k: Dictionary = using.k
+	var fx := str(k.get("fx", ""))
+	if fx == "" or fx == "swing":
+		return
+	var at0: float = float(FX_AT.get(str(k.clip), 0.35))
+	var every: float = float(FX_EVERY.get(fx, 0.0))
+	var n := int(using.fx_n)
+	if n > 0 and every <= 0.0:
+		return
+	if el >= at0 + n * every:
+		using.fx_n = n + 1
+		_prop_fx(fx, using.e)
+
+## How a thing answers being used (the effects are the battle's, made small).
+func _prop_fx(fx: String, e: Dictionary) -> void:
+	var nd = ent_nodes.get(e.id)
+	var c: Vector3 = (nd as Node3D).position if nd != null and is_instance_valid(nd) else ent_pos(e)
+	var hand: Vector3 = player.position + Vector3(using.dir.x, 0, using.dir.z) * 0.45 + Vector3(0, 1.1, 0)
+	match fx:
+		"splash":
+			Fx3D.splash(scene3d, hand, Color(0.6, 0.82, 1.0), 0.6)
+		"smoke":
+			Fx3D.ascend(scene3d, c + Vector3(0, 0.6, 0) - Vector3(using.dir.x, 0, using.dir.z) * 0.4, Color(0.92, 0.9, 0.95))
+		"ring":
+			Fx3D.shockwave(scene3d, c + Vector3(0, 1.8, 0), Color(1.0, 0.88, 0.55), 9.0, 1.4)
+			Fx3D.shockwave(scene3d, c + Vector3(0, 1.8, 0), Color(1.0, 0.95, 0.8), 5.0, 1.0)
+		"boom":
+			Fx3D.shockwave(scene3d, c + Vector3(0, 1.1, 0), Color(1.0, 0.7, 0.5), 6.0, 0.9)
+		"notes":
+			Fx3D.ascend(scene3d, c + Vector3(0, 0.45, 0), Color(1.0, 0.88, 0.5))
+		"ripple":
+			Fx3D.shockwave(scene3d, Vector3(c.x, c.y + Terrain3D.WATER_Y + 0.05, c.z) + Vector3(using.dir.x, 0, using.dir.z) * 1.2, Color(0.8, 0.92, 1.0), 2.2, 1.2)
+		"ribbon":
+			Fx3D.leaf_spiral(scene3d, c + Vector3(0, 1.6, 0), Color(0.9, 0.12, 0.15), 1.4)
+		"glow":
+			Fx3D.heal(scene3d, c + Vector3(0, 0.6, 0))
+		"sparkle":
+			Fx3D.heal(scene3d, c + Vector3(0, 0.2, 0))
+		"sparks":
+			Fx3D.hit(scene3d, c + Vector3(0, 0.9, 0) - Vector3(using.dir.x, 0, using.dir.z) * 0.3, "fire")
+		"dust":
+			Fx3D.dust(scene3d, player.position, Color(0.75, 0.68, 0.55))
+		"leaves":
+			Fx3D.leaf_spiral(scene3d, player.position + Vector3(using.dir.x, 0, using.dir.z) * 0.8, Color(0.85, 0.45, 0.2), 1.2)
+		"steam":
+			Fx3D.ascend(scene3d, c + Vector3(0, 0.9, 0), Color(0.96, 0.96, 1.0))
+		"chime":
+			Fx3D.shockwave(scene3d, c + Vector3(0, 2.0, 0), Color(0.95, 0.9, 0.7), 2.5, 0.9)
+		"light":
+			Fx3D.heal(scene3d, c + Vector3(0, 1.4, 0))
+		"koi":
+			Fx3D.splash(scene3d, Vector3(c.x, c.y + Terrain3D.WATER_Y + 0.1, c.z), Color(1.0, 0.75, 0.4), 0.7)
+		"qi":
+			Fx3D.ascend(scene3d, player.position + Vector3(0, 0.3, 0), Color(0.6, 0.9, 1.0))
+		"zzz":
+			Fx3D.ascend(scene3d, player.position + Vector3(0, 1.0, 0), Color(0.75, 0.8, 1.0))
+
+## What the things do on their own, and when they have just been used: the bell swings, the drum
+## shivers, the bucket comes up, the fire flickers, the chimes and the swing sway, the float bobs, the
+## fish circle (and rush up when fed), a lantern once lit stays lit; the name shows close by.
+func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
+	if n.has_meta("label"):
+		(n.get_meta("label") as Label3D).visible = dist < 7.0 and using.is_empty()
+	if not n.has_meta("model"):
+		return
+	var m := n.get_meta("model") as Node3D
+	if not m.has_meta("mover"):
+		return
+	var mo := m.get_meta("mover") as Node3D
+	var since := t - float(n.get_meta("used_t", -1e9))
+	match str(e.prop):
+		"bell":
+			var hit := since - 0.95
+			mo.rotation.x = 0.0 if hit < 0.0 or hit > 12.0 else sin(hit * 4.5) * 0.14 * exp(-hit * 0.5)
+		"drum":
+			var hit2 := since - 0.95
+			var pulse := 0.0 if hit2 < 0.0 or hit2 > 2.0 else exp(-hit2 * 7.0) * 0.07
+			mo.scale = Vector3(1.0 + pulse, 1.0 + pulse, 1.0 - pulse)
+		"campfire":
+			mo.scale = Vector3(1.0, 1.0 + 0.15 * sin(t * 9.0 + e.pos.x) + 0.08 * sin(t * 13.0), 1.0)
+		"chimes":
+			var amp := 0.04 + (0.0 if since < 0.8 or since > 8.0 else 0.3 * exp(-(since - 0.8) * 0.6))
+			mo.rotation.x = sin(t * 3.0 + e.pos.x) * amp
+			mo.rotation.z = sin(t * 2.3) * amp * 0.5
+		"fishing":
+			var cyc := fmod(t, 3.2)
+			var tug := 0.05 if since > 0.0 and since < 7.0 and cyc > 2.3 and cyc < 2.6 else 0.0
+			mo.position.y = Terrain3D.WATER_Y + 0.02 + sin(t * 2.0 + e.pos.y) * 0.02 - tug
+		"koi":
+			mo.rotation.y = t * (0.3 + (1.4 if since > 0.0 and since < 4.0 else 0.0))
+			mo.position.y = Terrain3D.WATER_Y - 0.12 + (0.08 if since > 0.0 and since < 4.0 else 0.0)
+		"well":
+			var lift := 0.0 if since < 0.0 or since > 3.0 else sin(clampf(since / 2.4, 0.0, 1.0) * PI)
+			mo.position.y = 0.55 + 0.45 * lift
+		"swing":
+			if using.is_empty() or str(using.e.id) != str(e.id):
+				mo.rotation.x = sin(t * 1.1 + e.pos.x) * 0.03
+		"lantern_st":
+			mo.visible = Game.prop_uses.has(e.id) or (since > 0.8 and since < 60.0)
+
 # ---------------------------------------------------------------- update
 func _process(d: float) -> void:
 	t += d
@@ -796,6 +1134,9 @@ func _process(d: float) -> void:
 	if not trip.is_empty():
 		# on a ladder or the stairs: no walking until the trip is over
 		_trip_step(d)
+	elif active and not using.is_empty():
+		# doing something (props.gd): no walking until it is done
+		_use_step()
 	elif active:
 		if not main.bot_active:
 			move_dir = _read_keys()
@@ -874,7 +1215,10 @@ func _move(d: float) -> void:
 			budget = 0.0
 
 func face_entity():
-	return ent_at(ptile + facing)
+	var e = ent_at(ptile + facing)
+	if e == null:
+		e = walk_props.get(ptile + facing)
+	return e
 
 # ---------------------------------------------------------------- 3D view update
 func ground_y(p: Vector3) -> float:
@@ -915,30 +1259,34 @@ func _snap_cam() -> void:
 
 func _update_view(d: float) -> void:
 	var pp := _player_pos()
-	player.position = pp
-	var want_yaw := atan2(float(facing.x), float(facing.y))
-	player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
-	var walking := move_t >= 0.0
-	# on the road the hero runs (the light-body dash; the old walk cycle slid along at 12 m/s); in a
-	# conversation whoever is speaking talks with their hands and mouth
-	Models.anim_person(player, t, walking, false, "run" if walking else ("talk" if speaker() == "Lin Feng" else ""))
-	# a puff of dust at each footfall
-	var sp := fmod(t * 9.0 / PI, 2.0)
-	if walking and int(sp) != step_side:
-		step_side = int(sp)
-		Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path))
-	# companion trails the hero
-	comp.visible = Game.companion
-	if Game.companion:
-		# off the hero's shoulder rather than straight behind, so she never stands between the
-		# follow camera and him
-		var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
-		comp_pos = cs[0]
-		comp_pos.y = _stand_y(bundles[layer], comp_pos)
-		comp.position = comp_pos
-		comp_run = cs[2]
-		comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
-		Models.anim_person(comp, t + 1.0, comp_run, false, "run" if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
+	if not using.is_empty():
+		# doing something (props.gd): the hero and Yue Ling are placed and moved by it
+		_use_pose(d)
+	else:
+		player.position = pp
+		var want_yaw := atan2(float(facing.x), float(facing.y))
+		player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
+		var walking := move_t >= 0.0
+		# on the road the hero runs (the light-body dash; the old walk cycle slid along at 12 m/s); in a
+		# conversation whoever is speaking talks with their hands and mouth
+		Models.anim_person(player, t, walking, false, "run" if walking else ("talk" if speaker() == "Lin Feng" else ""))
+		# a puff of dust at each footfall
+		var sp := fmod(t * 9.0 / PI, 2.0)
+		if walking and int(sp) != step_side:
+			step_side = int(sp)
+			Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path))
+		# companion trails the hero
+		comp.visible = Game.companion
+		if Game.companion:
+			# off the hero's shoulder rather than straight behind, so she never stands between the
+			# follow camera and him
+			var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
+			comp_pos = cs[0]
+			comp_pos.y = _stand_y(bundles[layer], comp_pos)
+			comp.position = comp_pos
+			comp_run = cs[2]
+			comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
+			Models.anim_person(comp, t + 1.0, comp_run, false, "run" if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
 	# entities of the regions on show
 	for k in views:
 		var v: Dictionary = views[k]
@@ -1143,6 +1491,8 @@ func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void
 
 func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, vb: Dictionary = {}) -> void:
 	match e.kind:
+		"prop":
+			_animate_prop(e, n, dist)
 		"npc":
 			var m: Node3D = n.get_meta("model")
 			var talking: bool = speaker() == e.n
@@ -1264,9 +1614,11 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode"]:
+	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop"]:
 		var hint := "Talk"
 		match fe.kind:
+			"prop":
+				hint = str(Props.kind_of(fe).get("verb", "Look"))
 			"boss":
 				hint = "Challenge"
 			"ladder":
