@@ -45,12 +45,13 @@ SHO, ELB, WRI, KNEE, ANK = G.SHO, G.ELB, G.WRI, G.KNEE, G.ANK
 EYE_Y = facelib.HC.y + facelib.EYE_Y
 
 
-def make_rig():
+def make_rig(o=None):
     """The skeleton (see the module docstring).  Beyond the core chain it carries the bones a game
     rig adds for secondary motion and expression (references: mocaponline skeleton hierarchy
     guide, gamedev.net "Demystifying character rigging"): a pocket bone per hanfu sleeve, finger and
     thumb bones per hand, toe bones for the roll of the foot, a mouth bone for speech, a two-bone
-    hair tail and a three-bone cape."""
+    hair tail and a three-bone cape; and for a swordsman a sword bone in the right hand, so a clip
+    that needs both hands free (the interactions) can put the blade away."""
     r = Rig("rig")
     r.bone("root", (0, 0, 0), (0, 0.25, 0))
     r.bone("hips", (0, HIP_Y, 0), (0, 1.05, 0), "root")
@@ -88,11 +89,14 @@ def make_rig():
     r.bone("cape", (0, 1.45, -0.14), (0, 1.1, -0.22), "chest")
     r.bone("cape2", (0, 1.1, -0.22), (0, 0.75, -0.3), "cape")
     r.bone("cape3", (0, 0.75, -0.3), (0, 0.42, -0.36), "cape2")
+    if o is not None and o.get("sword", False):
+        grip = WRI * V(-1, 1, 1) + V(-0.004, -0.075, 0.02)
+        r.bone("sword", grip, grip + V(0, -0.06, 0.05), "hand.R")
     return r
 
 
 def build(o):
-    rig = make_rig()
+    rig = make_rig(o)
     b = Builder("body")
     o = harmonise(o)
     robe = rgb(o.get("robe", "3a8ae8"))
@@ -209,7 +213,7 @@ def build(o):
         G.armour(b, o, tor, metal)
     hand_r = WRI * V(-1, 1, 1) + V(-0.004, -0.075, 0.02)
     if o.get("sword", False):
-        G.sword(b, "hand.R", hand_r, rgb(o.get("blade", "dce8ff")), rgb(o.get("hilt", "3a3048")))
+        G.sword(b, "sword", hand_r, rgb(o.get("blade", "dce8ff")), rgb(o.get("hilt", "3a3048")))
         G.scabbard(b, rgb(o.get("scabbard", "2a2a40")))
     if o.get("staff", False):
         G.staff(b, hand_r + V(0.004, 0.0, 0.0), rgb(o.get("staff_gem", "8af0ff")))
@@ -1038,6 +1042,535 @@ CLIPS = {
     "offer": (OFFER_T, clip_offer),
     "shock": (SHOCK_T, clip_shock),
 }
+
+
+# ---------------------------------------------------------------- interactions
+# What Lin Feng and Yue Ling do with the things of the world (scripts/props.gd in the game): sit on
+# a bench, drink from a well, strike a bell, read, play the qin, fish, pray, gather herbs, warm their
+# hands, stir a cauldron, work an anvil, sweep, weave, lift the training stones, toss a coin, lay a
+# hand on a stone, doze.  Loops hold a pose and breathe; one-shots start and end in the idle pose.
+# Clips that sit or crouch lower the hips themselves: the game stands the model where the feet go.
+
+def _stow(p):
+    """Hands busy: a swordsman's blade is put away (its bone shrinks to nothing; the empty scabbard
+    stays on the hip) for as long as the interaction lasts."""
+    p["sword"] = ((0, 0, 0), (0, 0, 0), (0.001, 0.001, 0.001))
+    return p
+
+
+def _seated(p, t, w, drop=0.44, spread=0.1):
+    """Sitting on a seat at knee height: the hips `drop` lower and a little back, thighs level,
+    shins hanging and feet flat, the back upright and breathing.  Returns the breath."""
+    br = math.sin(t * w * 2)
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, -drop + br * 0.004, -0.08))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.5, 0.0, spread * s), (0, 0, 0))
+        p["shin." + sd] = ((1.45, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((0.05, 0.0, -0.04 * s), (0, 0, 0))
+    p["spine"] = ((-0.03 + br * 0.01, 0.0, 0.0), (0, 0, 0))
+    p["chest"] = ((-br * 0.02, 0.0, 0.0), (0, 0.003 * br, 0))
+    p["neck"] = ((0.03, 0.0, 0.0), (0, 0, 0))
+    return br
+
+
+def _cross_legged(p, t, w, drop=0.8):
+    """Sitting cross-legged on the ground or a cushion (the meditation legs, with the hips lowered
+    onto the seat).  Returns the breath."""
+    br = math.sin(t * w * 2)
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, -drop + br * 0.004, 0.0))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.45, 0, 0.55 * s), (0, 0, 0))
+        p["shin." + sd] = ((2.5, 0, 0), (0, 0, 0))
+        p["foot." + sd] = ((0.3, 0, 0), (0, 0, 0))
+    p["spine"] = ((-0.02 + br * 0.01, 0.0, 0.0), (0, 0, 0))
+    p["chest"] = ((-br * 0.02, 0.0, 0.0), (0, 0.003 * br, 0))
+    return br
+
+
+def _crouch(p, e, knee_r=True):
+    """Down on one knee (the right, or the left): blended in by `e`."""
+    a, b = ("R", "L") if knee_r else ("L", "R")
+    p["hips"] = ((0.12 * e, 0.0, 0.0), (0.0, -0.42 * e, -0.06 * e))
+    p["thigh." + b] = ((-1.45 * e, 0.0, 0.08 * e * (1 if b == "L" else -1)), (0, 0, 0))
+    p["shin." + b] = ((1.5 * e, 0.0, 0.0), (0, 0, 0))
+    p["foot." + b] = ((-0.05 * e, 0.0, 0.0), (0, 0, 0))
+    p["thigh." + a] = ((0.05 * e, 0.0, -0.06 * e * (1 if a == "L" else -1)), (0, 0, 0))
+    p["shin." + a] = ((1.55 * e, 0.0, 0.0), (0, 0, 0))
+    p["foot." + a] = ((0.6 * e, 0.0, 0.0), (0, 0, 0))
+    p["toe." + a] = ((-0.9 * e, 0.0, 0.0), (0, 0, 0))
+
+
+SITB_T = 4.0
+
+
+def clip_sit_bench(t):
+    """Sitting on a bench, a stool or a swing: thighs level, shins hanging, the hands resting on the
+    knees, slow breaths and a look about."""
+    w = 2 * math.pi / SITB_T
+    p = clip_idle(0.0)
+    br = _seated(p, t, w)
+    look = math.sin(t * w + 0.6)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.42 - br * 0.01, 0.0, 0.12 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.7, 0.25 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.3, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.35, 0.35)
+    p["head"] = ((0.02 + 0.03 * math.sin(t * w * 2 + 1.0), 0.25 * look, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, _blink(t, (1.1, 3.0)), 1))
+    _secondary(p, t, False, False, (-1.5, -1.5), br, (0.4, 0.4))
+    return p
+
+
+DOZE_T = 4.0
+
+
+def clip_doze(t):
+    """Nodding off sitting on the edge of a bed: the hands in the lap, the head sinking slowly to
+    the chest and jerking up again, the eyes shut, deep slow breaths."""
+    w = 2 * math.pi / DOZE_T
+    p = clip_idle(0.0)
+    br = _seated(p, t, w * 0.5, drop=0.36)
+    k = (t % DOZE_T) / DOZE_T
+    sink = smooth(0.0, 0.8, k) * (1.0 - smooth(0.86, 0.92, k))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.3, 0.1 * s, 0.05 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.95, 0.5 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.1, 0.0, 0.25 * s), (0, 0, 0))
+    _hands(p, 0.5, 0.5)
+    _add(p, "spine", 0.08 + 0.05 * sink)
+    _add(p, "chest", 0.06 + 0.06 * sink)
+    p["head"] = ((0.15 + 0.4 * sink, 0.0, 0.12 * sink), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.08 + 0.5 * smooth(0.86, 0.9, k) * (1.0 - smooth(0.92, 1.0, k)), 1))
+    _secondary(p, t, False, False, (-1.5, -1.5), br, (0.4, 0.4))
+    return p
+
+
+DRINK_T = 2.4
+
+
+def clip_drink(t):
+    """Drinking: the right hand brings the dipper (or the cup) up to the lips, the left hand steadying
+    it beneath, the head tips back for the sip, the eyes close, and the hands come down again."""
+    k = t / DRINK_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.25, 0.78, 1.0)
+    sip = _hold(k, 0.3, 0.42, 0.62, 0.74)
+    p["upper_arm.R"] = ((-0.7 * e, 0.0, -0.3 * e), (0, 0, 0))
+    p["forearm.R"] = ((-2.05 * e - 0.24 * (1 - e), 0.35 * e, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.25 * e - 0.45 * sip, 0.0, 0.1 * e), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.5 * e, 0.0, 0.3 * e), (0, 0, 0))
+    p["forearm.L"] = ((-1.75 * e - 0.2 * (1 - e), -0.45 * e, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.2 * e, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38 + 0.1 * e, 0.38 + 0.45 * e)
+    _add(p, "head", -0.28 * sip, 0.0, 0.0)
+    _add(p, "chest", -0.06 * sip, 0.0, 0.0)
+    _add(p, "sleeve.R", 0.9 * e, 0.0, 0.0)
+    _add(p, "sleeve.L", 0.5 * e, 0.0, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.85 * sip, 1))
+    return p
+
+
+STRIKE_T = 1.8
+
+
+def clip_strike(t):
+    """Striking a temple bell (or a drum): both hands take the hanging beam, draw it back with the
+    weight on the back foot, swing it forward into the bell with a step and a turn of the hips, and
+    let it swing back."""
+    k = t / STRIKE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.15, 0.85, 1.0)
+    wind = smooth(0.12, 0.42, k) * (1.0 - smooth(0.45, 0.55, k))
+    hit = smooth(0.45, 0.56, k) * (1.0 - smooth(0.72, 0.95, k))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-1.25 * e + 0.55 * wind - 0.3 * hit, 0.0, -0.12 * s * e), (0, 0, 0))
+        p["forearm." + sd] = ((-0.55 * e - 0.45 * wind, 0.15 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.1 * e, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.8 * e, 0.0, 0.0)
+    _hands(p, 0.38 + 0.75 * e, 0.38 + 0.75 * e)
+    p["hips"] = ((0.06 * e, 0.0, 0.0), (0.0, -0.04 * wind - 0.02 * hit, -0.1 * wind + 0.1 * hit))
+    _add(p, "spine", -0.12 * wind + 0.12 * hit)
+    _add(p, "chest", -0.1 * wind + 0.16 * hit)
+    _add(p, "head", 0.05 * wind - 0.08 * hit)
+    p["thigh.L"] = ((-0.5 * hit + 0.1 * wind, 0.0, 0.04), (0, 0, 0))
+    p["shin.L"] = ((0.4 * hit + 0.15 * wind, 0.0, 0.0), (0, 0, 0))
+    p["thigh.R"] = ((0.3 * hit + 0.25 * wind, 0.0, -0.04), (0, 0, 0))
+    p["shin.R"] = ((0.25 * hit + 0.35 * wind, 0.0, 0.0), (0, 0, 0))
+    p["foot.R"] = ((0.3 * hit, 0.0, 0.0), (0, 0, 0))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.8 * hit, 1))
+    return p
+
+
+READ_T = 3.6
+
+
+def clip_read(t):
+    """Reading: both hands hold a scroll (a book, a notice) open before the chest, the head bowed
+    over it and the eyes running along the lines, a nod at the end of a passage."""
+    w = 2 * math.pi / READ_T
+    p = clip_idle(t * IDLE_T / READ_T)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.5, 0.0, 0.22 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-1.45, -0.3 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.35, 0.0, 0.35 * s), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.6, 0.0, 0.0)
+    _hands(p, 0.55, 0.55, 0.3)
+    scan = math.sin(t * w * 3.0)
+    p["neck"] = ((0.12, 0, 0), (0, 0, 0))
+    p["head"] = ((0.3 + 0.04 * max(0.0, math.sin(t * w)), 0.1 * scan, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.75 * _blink(t, (2.2,)), 1))
+    return p
+
+
+QIN_T = 2.4
+
+
+def clip_play_qin(t):
+    """Playing the qin: sitting cross-legged behind the low table, the hands over the strings, the
+    right plucking, the left pressing and sliding along them, the head inclined, listening."""
+    w = 2 * math.pi / QIN_T
+    p = clip_idle(0.0)
+    br = _cross_legged(p, t, w)
+    pluck = math.sin(t * w * 4.0)
+    slide = math.sin(t * w + 0.8)
+    p["upper_arm.R"] = ((-0.75 + 0.05 * pluck, 0.0, -0.18), (0, 0, 0))
+    p["forearm.R"] = ((-0.75 - 0.1 * pluck, 0.4, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.35 + 0.15 * pluck, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.7, 0.0, 0.28 + 0.12 * slide), (0, 0, 0))
+    p["forearm.L"] = ((-0.8, -0.4, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.3, 0.0, -0.1 * slide), (0, 0, 0))
+    _hands(p, 0.3, 0.25 + 0.25 * max(0.0, pluck), 0.2)
+    _add(p, "spine", 0.06)
+    _add(p, "chest", 0.08)
+    p["head"] = ((0.2, 0.06 * slide, -0.1), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.6 * _blink(t, (1.6,)), 1))
+    _secondary(p, t, False, True, (-1.45, -1.45), br, (0.5, 0.5))
+    return p
+
+
+MEDITATE_T = 4.0
+
+
+def clip_meditate(t):
+    """Meditation on a cushion: cross-legged with the hips down on the seat, the hands resting in the
+    lap in a mudra, the eyes closed, long slow breaths rising through the chest."""
+    w = 2 * math.pi / MEDITATE_T
+    p = clip_idle(0.0)
+    br = _cross_legged(p, t, w * 0.5)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.42 - br * 0.02, 0.0, 0.22 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.95, -0.35 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.25, 0.0, 0.2 * s), (0, 0, 0))
+    _hands(p, 0.25, 0.25, 0.35)
+    p["head"] = ((0.14 + br * 0.02, 0.0, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.12, 1))
+    _secondary(p, t, False, True, (-1.45, -1.45), br, (0.5, 0.5))
+    return p
+
+
+FISH_T = 3.2
+
+
+def clip_fish(t):
+    """Fishing: standing on the bank with the rod held out over the water in both hands, the tip
+    bobbing as the line drifts, and now and then a little flick to lift it."""
+    w = 2 * math.pi / FISH_T
+    k = (t % FISH_T) / FISH_T
+    p = clip_idle(t * IDLE_T / FISH_T)
+    bob = 0.03 * math.sin(t * w * 3.0)
+    flick = _hold(k, 0.7, 0.76, 0.8, 0.9)
+    p["upper_arm.R"] = ((-0.55 + bob - 0.25 * flick, 0.0, -0.12), (0, 0, 0))
+    p["forearm.R"] = ((-1.05 - 0.2 * flick, 0.35, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.2 - 0.3 * flick, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-1.0 + bob - 0.15 * flick, 0.0, 0.12), (0, 0, 0))
+    p["forearm.L"] = ((-0.45, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((-0.1, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.0, 1.0)
+    _add(p, "sleeve.R", 0.6, 0.0, 0.0)
+    _add(p, "sleeve.L", 0.9, 0.0, 0.0)
+    _add(p, "head", 0.18, 0.0, 0.0)
+    return p
+
+
+PRAY_T = 3.0
+
+
+def clip_pray(t):
+    """Prayer: the palms pressed together before the chest, the head bowed over them, the eyes shut,
+    breathing slowly; a deeper bow once in a while."""
+    w = 2 * math.pi / PRAY_T
+    k = (t % (PRAY_T * 2.0)) / (PRAY_T * 2.0)
+    p = clip_idle(0.0)
+    br = math.sin(t * w)
+    bow = _hold(k, 0.55, 0.68, 0.78, 0.92)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.32 - 0.02 * br, 0.12 * s, -0.36 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-1.62, -0.6 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.35, 0.0, 0.45 * s), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.6, 0.0, 0.0)
+    _hands(p, 0.05, 0.05, 0.05)
+    _add(p, "chest", 0.05 + 0.25 * bow + 0.01 * br, 0.0, 0.0)
+    _add(p, "spine", 0.1 * bow, 0.0, 0.0)
+    p["head"] = ((0.3 + 0.15 * bow, 0.0, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.06, 1))
+    return p
+
+
+GATHER_T = 2.6
+
+
+def clip_gather(t):
+    """Gathering: down on one knee, the right hand reaches to the ground and picks, then up again,
+    looking at what it found in the palm."""
+    k = t / GATHER_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.25, 0.62, 0.8)
+    reach = _hold(k, 0.2, 0.32, 0.42, 0.55)
+    look = _hold(k, 0.55, 0.68, 0.88, 1.0)
+    _crouch(p, e)
+    p["upper_arm.R"] = ((-0.75 * reach - 0.9 * look, 0.0, -0.15 * reach), (0, 0, 0))
+    p["forearm.R"] = ((-0.25 * reach - 1.3 * look - 0.2 * (1 - reach - look), 0.6 * look, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.3 * reach - 0.3 * look, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.3 * e, 0.0, 0.15 * e), (0, 0, 0))
+    p["forearm.L"] = ((-0.9 * e - 0.2, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38, 0.2 + 0.8 * smooth(0.36, 0.44, k) - 0.5 * look)
+    _add(p, "spine", 0.25 * reach)
+    _add(p, "chest", 0.25 * reach)
+    _add(p, "head", 0.3 * reach + 0.35 * look, 0.0, 0.0)
+    _add(p, "sleeve.R", 0.4 * look, 0.0, 0.0)
+    return p
+
+
+WARM_T = 2.4
+
+
+def clip_warm(t):
+    """Warming the hands at a fire: leaning in a little with both hands held out to it, palms to the
+    heat, rubbing them together now and then."""
+    w = 2 * math.pi / WARM_T
+    k = (t % WARM_T) / WARM_T
+    p = clip_idle(t * IDLE_T / WARM_T)
+    rub = _hold(k, 0.55, 0.62, 0.85, 0.95)
+    wob = math.sin(t * w * 6.0) * rub
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.85 + 0.1 * rub, 0.0, (0.1 - 0.12 * rub) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.35 - 0.5 * rub, 0.5 * s * (1 - rub) + 0.1 * wob * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.6 * (1 - rub), 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.7, 0.0, 0.0)
+    _hands(p, 0.15, 0.15)
+    _add(p, "spine", 0.08)
+    _add(p, "chest", 0.08)
+    _add(p, "head", 0.05)
+    p["hips"] = ((0.04, 0.0, 0.0), (0.0, -0.04, -0.03))
+    for sd in ("L", "R"):
+        _add(p, "thigh." + sd, -0.08)
+        _add(p, "shin." + sd, 0.16)
+        _add(p, "foot." + sd, -0.08)
+    return p
+
+
+STIR_T = 2.0
+
+
+def clip_stir(t):
+    """Stirring a cauldron (or a pot on the stove): both hands on the long ladle, going round in slow
+    circles, the shoulders and the chest turning with them."""
+    w = 2 * math.pi / STIR_T
+    c = math.cos(t * w)
+    s1 = math.sin(t * w)
+    p = clip_idle(t * IDLE_T / STIR_T)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.75 + 0.18 * s1, 0.0, (0.05 + 0.12 * c * s) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-1.0 - 0.15 * s1, 0.3 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.2, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.6, 0.0, 0.0)
+    _hands(p, 0.9, 0.9)
+    _add(p, "chest", 0.1, 0.12 * c, 0.0)
+    _add(p, "spine", 0.06, 0.06 * c, 0.0)
+    _add(p, "head", 0.22, -0.05 * c, 0.0)
+    return p
+
+
+HAMMER_T = 1.2
+
+
+def clip_hammer(t):
+    """Working at the anvil: the left hand holds the tongs on the iron, the right lifts the hammer
+    high behind the head and brings it down on the blow, and lifts again."""
+    k = (t % HAMMER_T) / HAMMER_T
+    p = clip_idle(0.0)
+    up = smooth(0.05, 0.5, k) * (1.0 - smooth(0.62, 0.72, k))
+    blow = smooth(0.62, 0.72, k) * (1.0 - smooth(0.8, 1.0, k))
+    p["upper_arm.R"] = ((-0.7 - 1.9 * up + 0.2 * blow, 0.0, -0.3 - 0.1 * up), (0, 0, 0))
+    p["forearm.R"] = ((-0.6 - 1.2 * up, 0.2, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.3 - 0.5 * up + 0.4 * blow, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.75, 0.0, 0.15), (0, 0, 0))
+    p["forearm.L"] = ((-0.55, -0.3, 0.0), (0, 0, 0))
+    _hands(p, 1.0, 1.1)
+    p["hips"] = ((0.08, 0.0, 0.0), (0.0, -0.06 - 0.02 * blow, 0.0))
+    _add(p, "spine", 0.08 - 0.06 * up + 0.08 * blow)
+    _add(p, "chest", 0.1 - 0.08 * up + 0.1 * blow)
+    _add(p, "head", 0.25)
+    _add(p, "sleeve.R", 0.5 + 0.8 * up, 0.0, 0.0)
+    for sd in ("L", "R"):
+        _add(p, "thigh." + sd, -0.15)
+        _add(p, "shin." + sd, 0.3)
+        _add(p, "foot." + sd, -0.15)
+    return p
+
+
+SWEEP_T = 1.8
+
+
+def clip_sweep(t):
+    """Sweeping (what Lin Feng did for three years on the sect's steps): the broom held low, the left
+    hand high on the handle and the right low, swept from side to side with a turn of the body."""
+    w = 2 * math.pi / SWEEP_T
+    sw = math.sin(t * w)
+    p = clip_idle(t * IDLE_T / SWEEP_T)
+    p["upper_arm.L"] = ((-0.65 + 0.05 * sw, 0.0, 0.05 + 0.15 * sw), (0, 0, 0))
+    p["forearm.L"] = ((-1.15, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.1, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.35 + 0.05 * sw, 0.0, -0.25 + 0.2 * sw), (0, 0, 0))
+    p["forearm.R"] = ((-0.35, 0.3, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.2, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.0, 1.0)
+    p["hips"] = ((0.06, 0.12 * sw, 0.0), (0.0, -0.04, 0.0))
+    _add(p, "spine", 0.12, 0.12 * sw, 0.0)
+    _add(p, "chest", 0.12, 0.18 * sw, 0.0)
+    _add(p, "head", 0.3, -0.12 * sw, 0.0)
+    for sd in ("L", "R"):
+        _add(p, "thigh." + sd, -0.12)
+        _add(p, "shin." + sd, 0.24)
+        _add(p, "foot." + sd, -0.12)
+    return p
+
+
+WEAVE_T = 1.4
+
+
+def clip_weave(t):
+    """Weaving: seated at the loom, the hands pass the shuttle through the shed one way and the
+    other, then pull the beater in with both hands, and the treadles change."""
+    w = 2 * math.pi / WEAVE_T
+    k = (t % WEAVE_T) / WEAVE_T
+    p = clip_idle(0.0)
+    br = _seated(p, t, w * 0.25)
+    shuttle = math.sin(t * w)
+    beat = _hold(k, 0.42, 0.5, 0.58, 0.7)
+    p["upper_arm.L"] = ((-0.95 + 0.25 * beat, 0.0, 0.18 + 0.15 * max(0.0, shuttle)), (0, 0, 0))
+    p["forearm.L"] = ((-0.75 - 0.3 * beat, -0.3, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.95 + 0.25 * beat, 0.0, -0.18 - 0.15 * max(0.0, -shuttle)), (0, 0, 0))
+    p["forearm.R"] = ((-0.75 - 0.3 * beat, 0.3, 0.0), (0, 0, 0))
+    _hands(p, 0.7, 0.7)
+    _add(p, "chest", 0.06 + 0.06 * beat, 0.08 * shuttle, 0.0)
+    _add(p, "head", 0.15, 0.1 * shuttle, 0.0)
+    _add(p, "thigh.L", -0.08 * max(0.0, shuttle))
+    _add(p, "thigh.R", -0.08 * max(0.0, -shuttle))
+    _secondary(p, t, False, False, (-1.5, -1.5), br, (0.6, 0.6))
+    return p
+
+
+LIFT_T = 2.8
+
+
+def clip_lift(t):
+    """Lifting a training stone: squat, both hands on the stone's grip, drive up through the legs and
+    press it overhead, hold it there a breath, and set it down again."""
+    k = t / LIFT_T
+    p = clip_idle(0.0)
+    squat = _hold(k, 0.0, 0.18, 0.3, 0.45) + _hold(k, 0.78, 0.9, 1.0, 1.01)
+    press = _hold(k, 0.38, 0.55, 0.72, 0.86)
+    held = smooth(0.12, 0.2, k) * (1.0 - smooth(0.92, 1.0, k))
+    p["hips"] = ((0.3 * squat, 0.0, 0.0), (0.0, -0.38 * squat, -0.12 * squat))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.25 * squat, 0.0, 0.14 * s), (0, 0, 0))
+        p["shin." + sd] = ((1.5 * squat, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.25 * squat, 0.0, 0.0), (0, 0, 0))
+        arm = -0.55 * squat * (1 - press) - 2.85 * press
+        p["upper_arm." + sd] = ((arm, 0.0, (0.12 + 0.18 * press) * s * held), (0, 0, 0))
+        p["forearm." + sd] = ((-0.15 * held - 0.3 * press, 0.2 * s * press, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.2 * held, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.3 + 1.2 * press, 0.0, 0.0)
+    _hands(p, 0.38 + 0.7 * held, 0.38 + 0.7 * held)
+    _add(p, "spine", 0.3 * squat - 0.05 * press)
+    _add(p, "chest", 0.15 * squat - 0.08 * press)
+    _add(p, "head", -0.1 * squat - 0.15 * press)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.6 * press, 1))
+    return p
+
+
+TOSS_T = 1.4
+
+
+def clip_toss(t):
+    """Tossing a coin into a well (or crumbs to the fish): the right hand swings back and lobs it
+    forward and up, the fingers opening at the top, and the eyes follow it down."""
+    k = t / TOSS_T
+    p = clip_idle(0.0)
+    back = _hold(k, 0.05, 0.25, 0.3, 0.38)
+    lob = _hold(k, 0.3, 0.45, 0.6, 0.85)
+    p["upper_arm.R"] = ((0.45 * back - 1.25 * lob, 0.0, -0.1), (0, 0, 0))
+    p["forearm.R"] = ((-0.4 * back - 0.25 * lob - 0.24, 0.3 * lob, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.3 * back - 0.35 * lob, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38, 0.38 + 0.5 * back * (1 - lob) - 0.3 * lob)
+    _add(p, "chest", 0.05 * back - 0.05 * lob, 0.1 * back - 0.08 * lob, 0.0)
+    _add(p, "head", -0.12 * lob + 0.2 * smooth(0.6, 0.85, k) * (1 - smooth(0.9, 1.0, k)), 0.0, 0.0)
+    _add(p, "sleeve.R", 0.8 * lob, 0.0, 0.0)
+    return p
+
+
+TOUCH_T = 2.2
+
+
+def clip_touch(t):
+    """Laying a hand on something (a stele, a great tree, a stone lion's head, a nest): the right hand
+    reaches out and rests flat on it, the eyes close a moment, and the hand comes back."""
+    k = t / TOUCH_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.28, 0.72, 1.0)
+    rest = _hold(k, 0.3, 0.38, 0.62, 0.7)
+    p["upper_arm.R"] = ((-1.25 * e, 0.0, -0.08 * e), (0, 0, 0))
+    p["forearm.R"] = ((-0.25 * e - 0.24 * (1 - e), 0.25 * e, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.7 * e, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38, 0.38 - 0.33 * e, 0.05)
+    _add(p, "chest", 0.06 * e, 0.0, 0.0)
+    _add(p, "head", 0.1 * e + 0.08 * rest, 0.0, 0.0)
+    _add(p, "sleeve.R", 1.0 * e, 0.0, 0.0)
+    _add(p, "hips", 0.0, 0.0, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.9 * rest, 1))
+    return p
+
+
+def _stowing(fn):
+    return lambda t: _stow(fn(t))
+
+
+## what the hero and his companion do with the world's things, on top of the twenty-one clips
+INTERACT = {
+    "sit_bench": (SITB_T, clip_sit_bench),
+    "doze": (DOZE_T, clip_doze),
+    "drink": (DRINK_T, clip_drink),
+    "strike": (STRIKE_T, clip_strike),
+    "read": (READ_T, clip_read),
+    "play_qin": (QIN_T, clip_play_qin),
+    "meditate": (MEDITATE_T, clip_meditate),
+    "fish": (FISH_T, clip_fish),
+    "pray": (PRAY_T, clip_pray),
+    "gather": (GATHER_T, clip_gather),
+    "warm": (WARM_T, clip_warm),
+    "stir": (STIR_T, clip_stir),
+    "hammer": (HAMMER_T, clip_hammer),
+    "sweep": (SWEEP_T, clip_sweep),
+    "weave": (WEAVE_T, clip_weave),
+    "lift": (LIFT_T, clip_lift),
+    "toss": (TOSS_T, clip_toss),
+    "touch": (TOUCH_T, clip_touch),
+}
+INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
+HERO_CLIPS = dict(CLIPS, **INTERACT)
 
 
 def _with_posture(fn, age):

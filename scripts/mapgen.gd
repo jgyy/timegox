@@ -107,7 +107,11 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		ents.append(ne)
 		fixed.append(n.pos)
 	for b in spec.get("bosses", []):
-		ents.append({"kind": "boss", "id": "boss_" + b.id, "enemy": b.id, "pos": b.pos, "lv": b.lv, "req": b.req})
+		var be := {"kind": "boss", "id": "boss_" + b.id, "enemy": b.id, "pos": b.pos, "lv": b.lv, "req": b.req}
+		# a boss who appears later in the story (Part XIII's Gate Generals and Chiyou)
+		if b.has("vis"):
+			be["vis"] = b.vis
+		ents.append(be)
 		fixed.append(b.pos)
 	for pk in spec.get("pickups", []):
 		var pe := {"kind": "pickup", "id": pk.id, "item": pk.item, "pos": pk.pos, "vis": ["" if pk.get("always", false) else spec.get("pickup_vis", ""), ""]}
@@ -216,6 +220,35 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 				var pe: Array = pool[rng.randi() % pool.size()]
 				group.append({"id": pe[0], "lv": rng.randi_range(pe[1], pe[2])})
 			ents.append({"kind": "enemy", "id": "e%d" % placed.size(), "pos": c, "group": group})
+		# Part XIII: the war-bands of the Eight Gates, placed after the region's own packs (so those do
+		# not move) and marching only once the formation wakes (`vis`)
+		var band: Dictionary = spec.get("warband", {})
+		if not band.is_empty():
+			var bpool: Array = band.pool
+			var bplaced := 0
+			tries = 0
+			while bplaced < int(band.n) and tries < 4000:
+				tries += 1
+				var c2: Vector2i = cands[rng.randi() % cands.size()]
+				var ok2 := true
+				for f in fixed:
+					if maxi(absi(f.x - c2.x), absi(f.y - c2.y)) < 5:
+						ok2 = false
+						break
+				if ok2:
+					for q in placed:
+						if maxi(absi(q.x - c2.x), absi(q.y - c2.y)) < 4:
+							ok2 = false
+							break
+				if not ok2:
+					continue
+				placed.append(c2)
+				bplaced += 1
+				var group2: Array = []
+				for _k in rng.randi_range(2, 3):
+					var pe2: Array = bpool[rng.randi() % bpool.size()]
+					group2.append({"id": pe2[0], "lv": rng.randi_range(pe2[1], pe2[2])})
+				ents.append({"kind": "enemy", "id": "w%d" % bplaced, "pos": c2, "group": group2, "vis": [str(band.vis), ""]})
 	return {"w": w, "h": h, "grid": grid, "ents": ents, "theme": spec.theme, "name": spec.n, "start": start, "buildings": buildings, "floor_ents": floor_ents}
 
 ## The ladders (Data.LADDERS) with an end in region `id`: [[tile, out, ladder, end ("a" or "b")], ...]

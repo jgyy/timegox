@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 17.0 * 3600.0
+var max_time := 19.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -59,6 +59,21 @@ const TALENT_PLAN := ["sword_bone", "thunder_root", "vajra", "sword_bone", "thun
 	"thunder_root", "vajra", "fortune", "five_phase", "yin_root", "qi_sea", "spirit_sense", "vajra", "five_phase", "qi_sea",
 	"fortune", "yin_root", "spirit_sense", "fortune", "yin_root", "spirit_sense", "insight", "insight", "insight"]
 var last_layer := ""
+## Many roads (trials.gd): the path the bot takes through each trial, chosen so that one run walks
+## every kind of road (a player would take whatever suited them); where a planned path cannot be
+## taken, the cheapest one that can.  The Eight Gates it opens in Part XIII, in order (any four do),
+## and the road it takes into the heart of them (--route=sword|peoples|cauldron).
+const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord": "respect", "inferno_lord": "might", "heavenly_emperor": "wealth",
+	"founder_qing": "respect", "hollow_heaven": "craft", "registrar_siming": "craft", "jade_ledger": "might", "vermilion_bird": "wealth",
+	"hundun": "respect", "horse_face": "craft", "king_yama": "craft", "thread_matron": "respect", "qianxian": "wealth",
+	"crow_marshal": "craft", "xiwangmu": "respect", "bifang": "might", "xihe": "craft", "gun": "craft", "gonggong": "might",
+	"chong": "dao", "li": "dao", "tianwu": "wealth", "xu_fu": "dao",
+	"fetter_maple": "relic", "kui_drum": "might", "liang": "dao", "xingtian": "wealth"}
+const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
+var route := "peoples"
+## the trial ahead (cached for the frame: it is asked for many times a frame)
+var tt_cache := {}
+var tt_frame := -1
 
 func _ready() -> void:
 	world = main.world
@@ -71,6 +86,8 @@ func _ready() -> void:
 		min_time = float(main.args["min-time"])
 	if main.args.has("max-time"):
 		max_time = float(main.args["max-time"])
+	if main.args.has("route"):
+		route = str(main.args.route)
 
 ## Developer shortcut: --bot-start=<step id> drops a fresh game straight at that quest step with
 ## the level, companion, techniques and boss kills a player would have by then (the reported play
@@ -102,9 +119,32 @@ func _apply_start() -> void:
 	Game.exp = 0.0
 	Game.companion = true
 	Game.step = idx
-	Game.stones = 20000
+	# about what a player would have saved by then (quest rewards and half as much again from battles)
+	var saved := 0
+	for i2 in idx:
+		saved += int(Data.STEPS[i2].get("stones", 0))
+	Game.stones = maxi(20000, int(saved * 1.5))
 	Game.inv["hp_pill"] = 6
 	Game.inv["qi_pill"] = 4
+	# (and the essences, renown, standing and Dao mastery a player would have gathered by then)
+	for ek in Trials.ESSENCE_ORDER:
+		Game.inv[ek] = int(idx / 12)
+	Game.renown = int(idx * 1.15)
+	if idx > Data.step_index("s_p11_home"):
+		Game.dao = "heart"
+		Game.dao_xp = {"sword": 40, "heart": 40}
+		for rc in ["yumin", "dragon", "tianhu", "jiaoren", "deathless", "shade"] + (["qianzi", "xian"] if idx > Data.step_index("s_p12_home") else []):
+			Game.standing[rc] = 60
+			Game.met[rc] = true
+	# the Founder's caves its realm has opened
+	for ab in Data.AREAS.mountain.get("abodes", []):
+		if lv >= int(ab.req):
+			Game.abodes[ab.id] = true
+	for st2 in Data.STEPS.slice(0, idx):
+		if st2.kind == "collect":
+			Game.inv[st2.item] = maxi(int(Game.inv.get(st2.item, 0)), st2.n)
+		if st2.kind == "kill" and Trials.TRIALS.has(st2.boss):
+			Game.trials[st2.boss] = str(TRIAL_PLAN.get(st2.boss, "might"))
 	Game.heal_full()
 	Game.note("bot-start: jumped to step %d (%s) at %s" % [idx, Data.STEPS[idx].id, Data.level_name(lv)])
 
@@ -153,7 +193,7 @@ func _process(d: float) -> void:
 	if cool > 0.0:
 		return
 	if main.args.has("bot-trace") and Game.playtime >= float(main.args["bot-trace"]):
-		print("[trace] %.2f top=%s area=%s step=%s tile=%s path=%d" % [Game.playtime, top, Game.area, Game.cur_step().get("id", "-"), world.ptile, path.size()])
+		print("[trace] %.2f top=%s area=%s step=%s tile=%s path=%d goal=%s trial=%s" % [Game.playtime, top, Game.area, Game.cur_step().get("id", "-"), world.ptile, path.size(), path_key, str(_trial_target())])
 	_shots(top, d)
 	match top:
 		"title":
@@ -224,16 +264,32 @@ func _cult_target() -> Dictionary:
 	var s := Game.cur_step()
 	if s.is_empty():
 		return {}
+	var tg := {}
 	match s.kind:
 		"level":
 			return {"lv": s.lv, "full": false}
 		"kill":
 			for b in Data.AREAS[s.area].get("bosses", []):
 				if b.id == s.boss:
-					return {"lv": b.req, "full": false}
+					tg = {"lv": b.req, "full": false}
+		"gates":
+			var ng := _next_gate()
+			for b2 in Data.AREAS.get(Trials.boss_area(ng), {}).get("bosses", []):
+				if b2.id == ng:
+					tg = {"lv": b2.req, "full": false}
 		"breakthrough":
 			return {"lv": s.to - 1, "full": true}
-	return {}
+	if tg.is_empty():
+		return {}
+	# a trial's path may ask for more: a level, or cultivation full at the peak of a realm
+	var tt := _trial_target()
+	if not tt.is_empty():
+		for n in Trials.path(tt.tid, str(tt.pid)).needs:
+			if str(n[0]) == "lv" and int(n[1]) > int(tg.lv):
+				tg = {"lv": int(n[1]), "full": false}
+			elif str(n[0]) == "peak" and int(n[1]) >= int(tg.lv):
+				tg = {"lv": int(n[1]), "full": true}
+	return tg
 
 func _cult_met() -> bool:
 	var tg := _cult_target()
@@ -288,13 +344,17 @@ func _world(d: float) -> void:
 	if ab != null:
 		_walk_to(ab.pos, "abode:" + str(ab.id))
 		return
-	# 2b) Part XI: change roads at a Dao Stele when the plan says so
+	# 2b) Part XI: change roads at a Dao Stele when the plan (or a trial's path) says so
 	var want_dao := _planned_dao()
 	if want_dao != "" and Game.dao != "" and Game.dao != want_dao:
 		var st = _nearest_stele()
 		if st != null:
 			_walk_to(st.pos, "stele:" + str(st.id))
 			return
+	# 2c) many roads: prepare for the trial ahead along the path the plan chose (make it, earn it,
+	# be asked for it, find it); levels are the quest's own grinding below
+	if _prepare_trial():
+		return
 	# 3) quest objective
 	match s.kind:
 		"talk":
@@ -314,11 +374,13 @@ func _world(d: float) -> void:
 			elif _hp_ratio() < 0.6:
 				_start_meditate("rest")
 			else:
-				var e = _nearest_enemy(s.area)
+				# (a hunt for particular foes, Part XIII's war-band, goes after those alone)
+				var of: Array = s.get("of", [])
+				var e = _nearest_enemy(s.area, false, of)
 				if e == null:
 					# nothing within a short walk: borders now lie well outside a region's open ground,
 					# so head for the nearest pack anywhere in the region before waiting for respawns
-					e = _any_enemy(s.area)
+					e = _any_enemy(s.area, false, of)
 				if e != null:
 					_walk_to(e.pos, "enemy:" + e.id)
 				else:
@@ -338,6 +400,22 @@ func _world(d: float) -> void:
 			else:
 				menu_goal = "breakthrough"
 				_press("cancel", 0.4)
+		"visits":
+			# Part XIII: the nearest of the people still to visit (any of them, in any order)
+			var vt := _visit_target()
+			if vt != "":
+				_goto_entity(Trials.npc_area(vt), vt)
+		"gates":
+			# Part XIII: the next of the Eight Gates (any four, in any order)
+			var g := _next_gate()
+			if g == "":
+				return
+			if not _cult_met():
+				_grind()
+			elif _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity(Trials.boss_area(g), "boss_" + g)
 
 func _start_meditate(goal: String) -> void:
 	med_goal = goal
@@ -353,18 +431,50 @@ func _grind() -> void:
 		if world.is_floor():
 			_travel(Game.area)
 			return
-		var e = _nearest_enemy("")
+		# (only packs that will stand and fight: a pack that scatters before Lin Feng's aura teaches
+		# nothing, Part XII)
+		var e = _nearest_enemy("", true)
 		if e == null:
-			e = _any_enemy(Game.area)
+			e = _any_enemy(Game.area, true)
 		if e != null:
 			_walk_to(e.pos, "enemy:" + e.id)
 			return
+	# nothing here will fight (the sect, the mountain, a region whose beasts all scatter): go to where
+	# the quest or the trial ahead is, if anything there will, rather than meditate for hours (back at
+	# the sect to craft for a trial, the bot sat meditating towards Chiyou's realm, Part XIII)
+	if Game.area == "sect" or Game.area == Atlas.HUB or world.is_floor():
+		var tt := _trial_target()
+		var qa: String = str(tt.get("area", Game.cur_step().get("area", "")))
+		if qa == "" or not _fights_in(qa):
+			# a breakthrough has no region of its own: the latest one back along the quest with
+			# something to fight (after the Conclave the last tribulation wants cultivation full)
+			qa = ""
+			for i in range(Game.step - 1, maxi(-1, Game.step - 12), -1):
+				var pa: String = str(Data.STEPS[i].get("area", ""))
+				if pa != "" and pa != "sect" and pa != Atlas.HUB and _fights_in(pa):
+					qa = pa
+					break
+		if qa != "" and qa != Game.area and _hp_ratio() > 0.55:
+			_travel(qa)
+			return
 	_start_meditate("grind")
+
+## Whether region `area` has a pack that will stand and fight Lin Feng now.
+func _fights_in(area: String) -> bool:
+	for e in Atlas.world_of(Data.layer_of(area)).ents:
+		if e.kind != "enemy" or str(e.get("area", "")) != area or not world.ent_visible(e) or Game.scatters(e.group):
+			continue
+		var mx := 0
+		for g in e.group:
+			mx = maxi(mx, g.lv)
+		if mx <= Game.level + 2:
+			return true
+	return false
 
 ## Nearest reachable enemy group the party can handle.  The current target is kept unless another
 ## group is clearly closer: without that hysteresis two groups at almost the same distance swapped
 ## places as "nearest" with every step and the bot walked back and forth between two tiles forever.
-func _nearest_enemy(area: String):
+func _nearest_enemy(area: String, fights: bool = false, of: Array = []):
 	var dist := _bfs_dist(world.ptile, 64)
 	var best = null
 	var bd := 9999
@@ -381,7 +491,7 @@ func _nearest_enemy(area: String):
 		var mx := 0
 		for g in e.group:
 			mx = maxi(mx, g.lv)
-		if mx > Game.level + 2:
+		if mx > Game.level + 2 or (fights and Game.scatters(e.group)) or (not of.is_empty() and not e.group.any(func(g): return of.has(g.id))):
 			continue
 		var ed := 9999
 		for dd in DIRS:
@@ -401,7 +511,7 @@ func _nearest_enemy(area: String):
 	return best
 
 ## The nearest pack of region `area` the party can handle, however far (straight-line distance).
-func _any_enemy(area: String):
+func _any_enemy(area: String, fights: bool = false, of: Array = []):
 	var best = null
 	var bd := 1 << 30
 	for e in world.ents:
@@ -410,7 +520,7 @@ func _any_enemy(area: String):
 		var mx := 0
 		for g in e.group:
 			mx = maxi(mx, g.lv)
-		if mx > Game.level + 2:
+		if mx > Game.level + 2 or (fights and Game.scatters(e.group)) or (not of.is_empty() and not e.group.any(func(g): return of.has(g.id))):
 			continue
 		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
 		if dd < bd:
@@ -503,6 +613,12 @@ func _planned_dao() -> String:
 	for pl in DAO_PLAN:
 		if Game.reached(pl[0]):
 			want = pl[1]
+	# a trial's path that asks for a Dao: walk it until the trial is passed
+	var tt := _trial_target()
+	if want != "" and not tt.is_empty():
+		for n in Trials.path(tt.tid, str(tt.pid)).needs:
+			if str(n[0]) == "dao" and str(n[1]) != "":
+				want = str(n[1])
 	return want
 
 func _nearest_stele():
@@ -544,15 +660,335 @@ func _choice() -> void:
 	var c = main.choice
 	var ids: Array = c.ids()
 	var want := -1
+	var tt := _trial_target()
+	if str(c.title).ends_with("how will you face it?"):
+		# a trial: the path the plan chose (cancel if it cannot be taken after all)
+		want = ids.find(str(tt.get("pid", ""))) if not tt.is_empty() else -1
+		if want >= 0 and not c.options[want].get("enabled", true):
+			want = -1
+		_nav(ids.size(), c.cursor, want)
+		return
 	if Data.TALENTS.has(str(ids[0]) if not ids.is_empty() else ""):
 		want = ids.find(_planned_talent(ids))
 	elif ids.has("sword"):
 		want = ids.find(_planned_dao() if _planned_dao() != "" else "sword")
+	elif ids.has("help"):
+		# a townsperson's request: help when it can be done
+		want = ids.find("help") if c.options[ids.find("help")].get("enabled", true) else ids.find("later")
 	elif ids.has("keep"):
 		want = ids.find("keep")
 	if want < 0:
 		want = 0
 	_nav(ids.size(), c.cursor, want)
+
+# ---------------------------------------------------------------- many roads (trials.gd)
+## The trial ahead: {"tid" (the boss), "pid" (the path the bot takes), "area"} or {}.
+func _trial_target() -> Dictionary:
+	var fr := Engine.get_process_frames()
+	if fr == tt_frame:
+		return tt_cache
+	tt_frame = fr
+	tt_cache = {}
+	var s := Game.cur_step()
+	if s.is_empty():
+		return tt_cache
+	var tid := ""
+	if s.kind == "kill" and Trials.TRIALS.has(str(s.boss)):
+		tid = str(s.boss)
+	elif s.kind == "gates":
+		tid = _next_gate()
+	if tid == "":
+		return tt_cache
+	tt_cache = {"tid": tid, "pid": _path_for(tid), "area": Trials.boss_area(tid)}
+	return tt_cache
+
+## The next of the Eight Gates: the planned ones in order, then any a way is open through.
+func _next_gate() -> String:
+	for g in GATE_PLAN:
+		if not Game.gates_open.has(g) and _feasible(g, Trials.path(g, str(TRIAL_PLAN.get(g, "")))):
+			return g
+	for g2 in Trials.GATES:
+		if not Game.gates_open.has(g2) and not Trials.open_paths(g2, Game).is_empty():
+			return g2
+	for g3 in GATE_PLAN:
+		if not Game.gates_open.has(g3):
+			return g3
+	return ""
+
+## The path through trial `tid`: the planned one if it can be taken, else the one with fewest needs
+## still unmet among those the bot can work towards.
+func _path_for(tid: String) -> String:
+	var want: String = route if tid == "chiyou" else str(TRIAL_PLAN.get(tid, ""))
+	var p := Trials.path(tid, want)
+	if not p.is_empty() and _feasible(tid, p):
+		return want
+	var best := ""
+	var bn := 99
+	for q in Trials.TRIALS[tid].paths:
+		if not _feasible(tid, q):
+			continue
+		var paid: bool = str(Game.paid.get(tid, "")) == str(q.id)
+		var unmet := 0
+		for n in q.needs:
+			if not Trials.need_met(n, Game, paid):
+				unmet += 1
+		if unmet < bn:
+			bn = unmet
+			best = str(q.id)
+	return best if best != "" else want
+
+## Can the bot work its way to every need of path `p`?  (Levels by fighting, stones by fighting,
+## things made from essences it can hunt, things it can pick up, renown from deeds it can do, a Dao
+## it has already walked far enough.)
+func _feasible(tid: String, p: Dictionary) -> bool:
+	if p.is_empty():
+		return false
+	var paid: bool = str(Game.paid.get(tid, "")) == str(p.id)
+	for n in p.needs:
+		if Trials.need_met(n, Game, paid):
+			continue
+		match str(n[0]):
+			"lv", "peak", "temper":
+				pass
+			"stones":
+				if Game.stones < int(n[1]) * 0.6:
+					return false
+			"item", "give":
+				var id: String = str(n[1])
+				if Trials.RECIPES.has(id):
+					var r: Dictionary = Trials.RECIPES[id]
+					if not Game.reached(str(r.after)):
+						return false
+					for k in r.in:
+						# (a keepsake in a recipe can be picked up where one lies)
+						if not str(k).begins_with("ess_") and int(Game.inv.get(k, 0)) + _pickups_of(str(k)) < int(r.in[k]):
+							return false
+				elif _pickups_of(id) < int(n[2]) - int(Game.inv.get(id, 0)):
+					return false
+			"renown":
+				if Game.renown + _deed_renown() < int(n[1]):
+					return false
+			"dao":
+				var did: String = str(n[1]) if str(n[1]) != "" else Game.dao
+				if did == "" or Game.dao == "" or Game.dao_tier(did) < int(n[2]):
+					return false
+			_:
+				return false
+	return true
+
+## Work towards the next unmet need of the path chosen through the trial ahead.  Returns whether it
+## did something this frame.
+func _prepare_trial() -> bool:
+	var tt := _trial_target()
+	if tt.is_empty() or str(tt.pid) == "":
+		return false
+	var tid: String = tt.tid
+	var p := Trials.path(tid, str(tt.pid))
+	if p.is_empty() or not _feasible(tid, p):
+		return false
+	var paid: bool = str(Game.paid.get(tid, "")) == str(p.id)
+	for n in p.needs:
+		if Trials.need_met(n, Game, paid):
+			continue
+		match str(n[0]):
+			"temper":
+				if Game.stones >= Data.TEMPER_COST[mini(Game.temper, Data.TEMPER_COST.size() - 1)]:
+					_goto_entity("sect", "smith")
+				else:
+					_earn(tt)
+				return true
+			"stones":
+				_earn(tt)
+				return true
+			"item", "give":
+				var id: String = str(n[1])
+				if Trials.RECIPES.has(id):
+					return _craft_step(id, tt)
+				return _fetch(id)
+			"renown":
+				return _deed_step(tt)
+			_:
+				# levels: the quest's own grinding (_cult_target); a Dao: the stele (_planned_dao)
+				return false
+	return false
+
+## Make something for a trial: hunt the essences it needs, earn the stones, then take it all to the
+## alchemist or the smith (the shop crafts it, _shop).
+func _craft_step(id: String, tt: Dictionary) -> bool:
+	var r: Dictionary = Trials.RECIPES[id]
+	for k in r.in:
+		if int(Game.inv.get(k, 0)) < int(r.in[k]):
+			if str(k).begins_with("ess_"):
+				return _farm(str(k), tt)
+			return _fetch(str(k))
+	if Game.stones < int(r.get("stones", 0)):
+		_earn(tt)
+		return true
+	_goto_entity("sect", str(r.at))
+	return true
+
+## Hunt packs that leave essence `ek`: the nearest in this realm that will stand and fight.
+func _farm(ek: String, tt: Dictionary) -> bool:
+	if _hp_ratio() < 0.55:
+		_start_meditate("rest")
+		return true
+	var el := Trials.elem_of(ek)
+	var best = null
+	var bd := 1 << 30
+	if not world.is_floor():
+		for e in world.ents:
+			if e.kind != "enemy" or not world.ent_visible(e) or Game.scatters(e.group):
+				continue
+			var mx := 0
+			var has := false
+			for g in e.group:
+				mx = maxi(mx, g.lv)
+				has = has or str(Data.ENEMIES[g.id].elem) == el
+			if not has or mx > Game.level + 2:
+				continue
+			var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+			if dd < bd:
+				bd = dd
+				best = e
+	if best != null:
+		_walk_to(best.pos, "enemy:" + best.id)
+		return true
+	if world.is_floor() or world.layer != Data.layer_of(str(tt.area)):
+		_travel(str(tt.area))
+	else:
+		_start_meditate("respawn_any")
+	return true
+
+## Earn spirit stones by fighting: here if anything will fight, else in the trial's own region.
+func _earn(tt: Dictionary) -> void:
+	if _hp_ratio() < 0.55:
+		_start_meditate("rest")
+		return
+	var e = null if world.is_floor() else _any_enemy(Game.area, true)
+	if e != null:
+		_walk_to(e.pos, "enemy:" + e.id)
+	elif Game.area != str(tt.area) or world.is_floor():
+		_travel(str(tt.area))
+	else:
+		_start_meditate("respawn_any")
+
+## The next person a "visits" step still wants seen: once chosen, that one until visited (the nearest by
+## realm first: this realm or its floors, then the others).
+var visit_id := ""
+
+func _visit_target() -> String:
+	var s := Game.cur_step()
+	var want: Array = s.get("npcs", [])
+	if visit_id != "" and want.has(visit_id) and not Game.visited.has(visit_id):
+		return visit_id
+	var here: String = str(world.layer) if not world.is_floor() else str(world.wd.parent)
+	var best := ""
+	var bd := 1 << 30
+	for k in want.size():
+		var id: String = str(want[k])
+		if Game.visited.has(id):
+			continue
+		var cost := k + (0 if Data.layer_of(Trials.npc_area(id)) == here else 1000)
+		var e = world.find_ent(id)
+		if e != null:
+			cost = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y) - 2000
+		if cost < bd:
+			bd = cost
+			best = id
+	visit_id = best
+	return best
+
+## Renown the bot can still earn from deeds the story has reached.
+func _deed_renown() -> int:
+	var n := 0
+	for did in Trials.DEEDS:
+		var d: Dictionary = Trials.DEEDS[did]
+		if not Game.deeds.has(did) and Game.reached(str(d.after)):
+			n += int(d.renown)
+	return n
+
+## Do a deed for renown: the nearest one whose wants are in hand; failing that, hunt the essence the
+## cheapest one still needs.
+func _deed_step(tt: Dictionary) -> bool:
+	var best := ""
+	var bd := 1 << 30
+	var short_ek := ""
+	var short_n := 1 << 30
+	for did in Trials.DEEDS:
+		var d: Dictionary = Trials.DEEDS[did]
+		if Game.deeds.has(did) or not Game.reached(str(d.after)):
+			continue
+		if Trials.deed_ready(did, Game):
+			var dd := _deed_dist(d)
+			if dd < bd:
+				bd = dd
+				best = did
+		else:
+			for k in d.want:
+				var miss: int = int(d.want[k]) - int(Game.inv.get(k, 0))
+				if miss > 0 and str(k).begins_with("ess_") and miss < short_n:
+					short_n = miss
+					short_ek = str(k)
+	if best != "":
+		_goto_entity(str(Trials.DEEDS[best].area), str(Trials.DEEDS[best].npc))
+		return true
+	if short_ek != "":
+		return _farm(short_ek, tt)
+	return false
+
+## How far the bot is from doing deed `d`: in this realm, the walk; in another, a long way.
+func _deed_dist(d: Dictionary) -> int:
+	var e = world.find_ent(str(d.npc))
+	if e != null:
+		return absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+	return 5000 + (0 if Data.layer_of(str(d.area)) == Data.layer_of(Game.area) else 5000)
+
+## How many of `item` can still be picked up somewhere (keepsakes on the floors of buildings).
+func _pickups_of(item: String) -> int:
+	var n := 0
+	for lid in ["surface", "heaven", "under", "sea"]:
+		var lw: Dictionary = Atlas.world_of(lid)
+		var groups: Array = [lw.ents]
+		for fid in lw.floors:
+			groups.append(lw.floors[fid].ents)
+		for grp in groups:
+			for e in grp:
+				if e.kind == "pickup" and str(e.get("item", "")) == item and world.ent_visible(e):
+					n += 1
+	return n
+
+## Go and pick up one `item`: the nearest that can be reached (this realm first), and once chosen,
+## that one until it is in hand (an upper storey's tiles are its own: measured from the floor's tiles
+## the nearest used to flip between two buildings, and the bot went up and down the stairs forever).
+var fetch_id := ""
+
+func _fetch(item: String) -> bool:
+	var here: String = str(world.layer) if not world.is_floor() else str(world.wd.parent)
+	var me: Vector2i = world.ptile + (Vector2i(world.wd.origin) if world.is_floor() else Vector2i.ZERO)
+	var best = null
+	var bd := 1 << 30
+	for lid in ["surface", "heaven", "under", "sea"]:
+		var lw: Dictionary = Atlas.world_of(lid)
+		var groups: Array = [[lw.ents, Vector2i.ZERO]]
+		for fid in lw.floors:
+			groups.append([lw.floors[fid].ents, Vector2i(lw.floors[fid].origin)])
+		for grp in groups:
+			for e in grp[0]:
+				if e.kind != "pickup" or str(e.get("item", "")) != item or not world.ent_visible(e):
+					continue
+				var at: Vector2i = e.pos + grp[1]
+				var dd: int = absi(at.x - me.x) + absi(at.y - me.y) + (0 if lid == here else 10000)
+				if str(e.id) == fetch_id:
+					dd = -1
+				if dd < bd:
+					bd = dd
+					best = e
+	if best == null:
+		fetch_id = ""
+		return false
+	fetch_id = str(best.id)
+	_goto_entity(str(best.get("area", "")), str(best.id))
+	return true
 
 # ---------------------------------------------------------------- pathing
 var astar: AStarGrid2D = null
@@ -580,7 +1016,8 @@ func _astar() -> AStarGrid2D:
 func _blocked_list(avoid_enemies: bool, goal: Vector2i) -> Array:
 	var out: Array = []
 	for e in world.ents:
-		if e.kind == "spring" or not world.ent_visible(e):
+		# (a thing to do on a floor anyone walks over stands in nobody's way: props.gd)
+		if e.kind == "spring" or e.get("walk", false) or not world.ent_visible(e):
 			continue
 		if e.kind == "seal":
 			if not world.seal_open(e):
@@ -686,6 +1123,15 @@ func _menu() -> void:
 func _shop() -> void:
 	var s = main.shop
 	var want := "leave"
+	# many roads: what the trial ahead needs made at this station
+	var tt := _trial_target()
+	if not tt.is_empty():
+		for n in Trials.path(tt.tid, str(tt.pid)).needs:
+			var rid: String = ("craft:" + str(n[1])) if n.size() > 2 else ""
+			var k: int = s.ids.find(rid)
+			if rid != "" and k >= 0 and s.enabled[k] and int(Game.inv.get(str(n[1]), 0)) < int(n[2]):
+				_nav(s.labels.size(), s.cursor, k)
+				return
 	if s.kind == "smith":
 		if s.ids.has("temper") and s.enabled[s.ids.find("temper")]:
 			want = "temper"
@@ -705,9 +1151,12 @@ func _meditate() -> void:
 			done = _hp_ratio() > 0.97 and _qi_ratio() > 0.9
 		"grind":
 			# back to the fight as soon as the party is fit and a pack has come back
-			done = (_cult_met() and _hp_ratio() > 0.6) or (Game.area != "sect" and Game.area != Atlas.HUB and _hp_ratio() > 0.9 and _qi_ratio() > 0.6 and _any_enemy(Game.area) != null)
+			done = (_cult_met() and _hp_ratio() > 0.6) or (Game.area != "sect" and Game.area != Atlas.HUB and _hp_ratio() > 0.9 and _qi_ratio() > 0.6 and _any_enemy(Game.area, true) != null)
 		"respawn":
-			done = _any_enemy(Game.cur_step().get("area", "")) != null
+			done = _any_enemy(Game.cur_step().get("area", ""), false, Game.cur_step().get("of", [])) != null
+		"respawn_any":
+			# waiting for packs to come back to fight (essences, spirit stones for a trial)
+			done = _any_enemy(Game.area, true) != null
 	if done:
 		_press("cancel", 0.4)
 	else:
@@ -875,6 +1324,10 @@ func _finish(reason: String) -> void:
 		"deaths": Game.deaths,
 		"spirit_stones": Game.stones,
 		"sword_tempering": Game.temper,
+		"renown": Game.renown,
+		"deeds": Game.deeds.size(),
+		"trials": Game.trials,
+		"gates": Game.gates_open.keys(),
 		"time_by_screen_seconds": breakdown,
 		"time_by_area_seconds": areas,
 		"meditation_by_purpose_seconds": time_by_med,
@@ -898,6 +1351,8 @@ func _finish(reason: String) -> void:
 	print("time by screen  : %s" % JSON.stringify(breakdown))
 	print("time by area    : %s" % JSON.stringify(areas))
 	print("meditation for  : %s" % JSON.stringify(time_by_med))
+	print("trials passed   : %d   renown: %d   deeds: %d   gates: %d" % [Game.trials.size(), Game.renown, Game.deeds.size(), Game.gates_open.size()])
+	print("paths taken     : %s" % JSON.stringify(Game.trials))
 	if reason != "":
 		print("FAILED          : %s" % reason)
 	print("result          : %s (needs >= %.0f s)" % ["PASS" if ok else "FAIL", min_time])

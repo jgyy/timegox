@@ -35,6 +35,10 @@ PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "han
 PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die",
                 "nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock")
 MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
+# the party does things with the world's props and furniture (art/lib/person.py INTERACT)
+PARTY = ("lin_feng", "yue_ling")
+PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir",
+               "hammer", "sweep", "weave", "lift", "toss", "touch")
 MATERIALS = {"toon", "plain", "glow"}
 
 
@@ -114,7 +118,7 @@ def check_asset(group, name, path):
         missing = [b for b in PERSON_BONES if b not in names]
         if missing:
             problems.append("%s: rig lacks bones %s" % (tag, missing))
-        need = PERSON_CLIPS
+        need = PERSON_CLIPS + (PARTY_CLIPS if tag.split("/")[-1] in PARTY else ())
     else:
         need = MONSTER_CLIPS
     miss_clips = [c for c in need if c not in clips]

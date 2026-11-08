@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 51
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return"]
+const MAX_LEVEL := 54
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -58,6 +58,7 @@ const REALM_INFO := [
 	{"life": 0, "title": "Sage", "note": "The land keeps its own shape inside you, mountains and rivers, and you do not tell it what that shape should be."},
 	{"life": 0, "title": "Sage of the Ladder", "note": "Heaven above, earth below and the middle world in your hands, held the way a ladder is held for somebody else."},
 	{"life": 0, "title": "Sage of the Ladder", "note": "Every water in the world comes home through you: the rain, the rivers, the sea and the Silver River. Nothing returns empty."},
+	{"life": 0, "title": "Sage of Many Roads", "note": "Every road you have walked runs through you at once, and you never have to choose between them. Nobody does. That was the secret all along."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -609,6 +610,22 @@ const ENEMIES := {
 	"guixu_stopper": {"n": "The Bronze Stopper of Guixu", "elem": "earth", "weak": "wood", "col": Color("8a6a3a"), "shape": "warden", "boss": true, "pal": {"acc": Color("40ffd0")}},
 	"hai_ruo": {"n": "Ruo of the Northern Sea, the Sea Itself", "elem": "water", "weak": "earth", "col": Color("2a6aa8"), "shape": "storm", "boss": true, "pal": {"acc": Color("e8ffff")}},
 	"xu_fu": {"n": "Xu Fu, Who Sought the Elixir", "elem": "dark", "weak": "fire", "col": Color("5a4a7a"), "shape": "humanoid", "boss": true, "pal": {"sec": Color("d8c890"), "acc": Color("90ffb0")}},
+	# ---- Part XIII: the war-bands of the Eight Gates, woken with the formation round Chiyou
+	"jiuli_warrior": {"n": "Warrior of the Nine Li", "elem": "phys", "weak": "fire", "col": Color("b08850"), "shape": "humanoid"},
+	"zhuolu_fog": {"n": "Fog of Zhuolu", "elem": "water", "weak": "thunder", "col": Color("a8b4bc"), "shape": "wraith"},
+	"bronze_brow": {"n": "Bronze-Browed Brother", "elem": "earth", "weak": "wood", "col": Color("a8783a"), "shape": "humanoid"},
+	"fetter_sapling": {"n": "Fetter-Maple Sapling", "elem": "wood", "weak": "fire", "col": Color("c8402a"), "shape": "plant"},
+	"banner_ember": {"n": "Ember of Chiyou's Banner", "elem": "fire", "weak": "water", "col": Color("e8402a"), "shape": "wisp"},
+	# ---- Part XIII bosses: the Generals of the Eight Gates, and the war god at the heart of them
+	"xingtian": {"n": "Xingtian, Who Dances Without a Head", "elem": "phys", "weak": "fire", "col": Color("9a6a3a"), "shape": "golem", "boss": true, "pal": {"acc": Color("ffd060")}},
+	"yu_shi": {"n": "Yu Shi, the Rain Master of Zhuolu", "elem": "water", "weak": "earth", "col": Color("5a7a9a"), "shape": "storm", "boss": true, "pal": {"acc": Color("a0e0ff")}},
+	"liang": {"n": "Liang, Goblin of the Black Springs", "elem": "water", "weak": "thunder", "col": Color("2a4a5a"), "shape": "jelly", "boss": true, "pal": {"acc": Color("60ffd0")}},
+	"bronze_brothers": {"n": "The Bronze-Headed Brothers of Chiyou", "elem": "earth", "weak": "wood", "col": Color("a87a3a"), "shape": "humanoid", "boss": true, "pal": {"acc": Color("ff6a30")}},
+	"red_banner": {"n": "Chiyou's Banner, the Red Comet", "elem": "fire", "weak": "water", "col": Color("d8302a"), "shape": "phoenix", "boss": true, "pal": {"acc": Color("ffe080")}},
+	"mast_goblin": {"n": "Mei, Goblin of the Old Mast", "elem": "wood", "weak": "fire", "col": Color("7a5a3a"), "shape": "plant", "boss": true, "pal": {"acc": Color("90ffb0")}},
+	"fetter_maple": {"n": "The Fetter-Maple of Chiyou", "elem": "wood", "weak": "fire", "col": Color("b8302a"), "shape": "plant", "boss": true, "pal": {"sec": Color("5a3a2a"), "acc": Color("ffd040")}},
+	"kui_drum": {"n": "The Drum of Kui's Hide", "elem": "thunder", "weak": "earth", "col": Color("6a5a7a"), "shape": "golem", "boss": true, "pal": {"acc": Color("c8e0ff")}},
+	"chiyou": {"n": "Chiyou, War God of the Nine Li", "elem": "phys", "weak": "fire", "col": Color("8a6a3a"), "shape": "oxhead", "boss": true, "pal": {"sec": Color("3a3a42"), "acc": Color("ff4a2a")}},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -628,7 +645,7 @@ const ROOT_ATK := 0.025
 ## and a Heavenly Tribulation tests a woken root harder: +1.5% to its strength for every rank awake
 const TRIB_JEALOUSY := 0.015
 
-static func make_enemy(id: String, lv: int, boss_mult: float = 1.0) -> Dictionary:
+static func make_enemy(id: String, lv: int, boss_mult: float = 1.0, atk_mult: float = 1.0) -> Dictionary:
 	var d: Dictionary = ENEMIES[id]
 	var boss: bool = d.get("boss", false)
 	var er := expected_ranks(lv)
@@ -637,7 +654,8 @@ static func make_enemy(id: String, lv: int, boss_mult: float = 1.0) -> Dictionar
 	var df := 2.0 + 2.6 * lv
 	if boss:
 		hp = int(hp * 6.0 * boss_mult)
-		a *= 1.3
+		# (a trial's boss hits harder too: trials.gd `might`)
+		a *= 1.3 * atk_mult
 		df *= 1.1
 	return {
 		"id": id, "name": d.n, "side": "foe", "lv": lv, "boss": boss,
@@ -652,7 +670,7 @@ static func make_enemy(id: String, lv: int, boss_mult: float = 1.0) -> Dictionar
 static func make_foes(foe_list: Array) -> Array:
 	var out: Array = []
 	for f in foe_list:
-		var fo := make_enemy(f.id, f.lv, f.get("mult", 1.0))
+		var fo := make_enemy(f.id, f.lv, f.get("mult", 1.0), f.get("atk", 1.0))
 		fo["slot"] = out.size()
 		out.append(fo)
 	return out
@@ -1222,7 +1240,13 @@ const AREAS := {
 			{"id": "waterfall_koi", "pos": Vector2i(46, 16), "lv": 30, "req": 30},
 			{"id": "willow_widow", "pos": Vector2i(60, 40), "lv": 30, "req": 30},
 			{"id": "ox_head", "pos": Vector2i(86, 28), "lv": 30, "req": 30},
+			# Part XIII: a General of the Eight Gates
+			{"id": "fetter_maple", "pos": Vector2i(74, 17), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
+			# Part XIII: the heart of the Eight Gates, where Chiyou waits
+			{"id": "chiyou", "pos": Vector2i(50, 30), "lv": 53, "req": 53, "vis": ["s_p13_chiyou", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["fetter_sapling", 51, 53], ["jiuli_warrior", 51, 53], ["banner_ember", 51, 53], ["bronze_brow", 51, 53], ["zhuolu_fog", 51, 53]], "n": 8, "vis": "s_p13_home"},
 		"pickups": [{"id": "slant1", "item": "soul_lantern", "pos": Vector2i(22, 12)}, {"id": "slant2", "item": "soul_lantern", "pos": Vector2i(40, 46)}, {"id": "slant3", "item": "soul_lantern", "pos": Vector2i(64, 30)}, {"id": "slant4", "item": "soul_lantern", "pos": Vector2i(76, 10)}],
 		"pickup_vis": "s_mp_collect",
 	},
@@ -1751,7 +1775,11 @@ const AREAS := {
 			{"id": "xiangliu", "pos": Vector2i(62, 44), "lv": 44, "req": 44},
 			{"id": "kuafu", "pos": Vector2i(58, 8), "lv": 44, "req": 44},
 			{"id": "gonggong", "pos": Vector2i(86, 29), "lv": 44, "req": 44},
+			# Part XIII: a General of the Eight Gates
+			{"id": "kui_drum", "pos": Vector2i(51, 39), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["bronze_brow", 51, 52], ["jiuli_warrior", 51, 52], ["fetter_sapling", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "bstone1", "item": "pillar_stone", "pos": Vector2i(22, 12)}, {"id": "bstone2", "item": "pillar_stone", "pos": Vector2i(38, 34)}, {"id": "bstone3", "item": "pillar_stone", "pos": Vector2i(56, 20)}, {"id": "bstone4", "item": "pillar_stone", "pos": Vector2i(76, 48)}],
 		"pickup_vis": "s_bz_collect",
 		"springs": [Vector2i(48, 30)],
@@ -1791,7 +1819,11 @@ const AREAS := {
 			{"id": "kui", "pos": Vector2i(78, 46), "lv": 45, "req": 45},
 			{"id": "jiufeng", "pos": Vector2i(84, 15), "lv": 46, "req": 46},
 			{"id": "leigong", "pos": Vector2i(90, 32), "lv": 46, "req": 46},
+			# Part XIII: a General of the Eight Gates
+			{"id": "yu_shi", "pos": Vector2i(62, 40), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["zhuolu_fog", 51, 52], ["jiuli_warrior", 51, 52], ["banner_ember", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "wbell1", "item": "wind_bell", "pos": Vector2i(22, 14)}, {"id": "wbell2", "item": "wind_bell", "pos": Vector2i(48, 52)}, {"id": "wbell3", "item": "wind_bell", "pos": Vector2i(70, 30)}, {"id": "wbell4", "item": "wind_bell", "pos": Vector2i(86, 51)},
 			{"id": "cur_wutong1", "item": "wutong_seed", "pos": Vector2i(50, 22), "floor": ["fletcher_loft", 1], "always": true},
 			{"id": "cur_pearl1", "item": "night_pearl", "pos": Vector2i(72, 18), "floor": ["rain_ministry", -1], "always": true},
@@ -1837,7 +1869,11 @@ const AREAS := {
 			{"id": "shentu", "pos": Vector2i(66, 22), "lv": 46, "req": 46},
 			{"id": "yulei", "pos": Vector2i(66, 40), "lv": 46, "req": 46},
 			{"id": "chong", "pos": Vector2i(77, 30), "lv": 46, "req": 46},
+			# Part XIII: a General of the Eight Gates
+			{"id": "xingtian", "pos": Vector2i(59, 17), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["jiuli_warrior", 51, 52], ["bronze_brow", 51, 52], ["zhuolu_fog", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "gkey1", "item": "gate_key", "pos": Vector2i(12, 13)}, {"id": "gkey2", "item": "gate_key", "pos": Vector2i(40, 48)}, {"id": "gkey3", "item": "gate_key", "pos": Vector2i(60, 30)}, {"id": "gkey4", "item": "gate_key", "pos": Vector2i(72, 50)},
 			{"id": "cur_wine1", "item": "peach_wine", "pos": Vector2i(39, 20), "floor": ["moonwine_shop", 1], "always": true},
 			{"id": "cache_cg1", "item": "stones", "n": 2800, "pos": Vector2i(55, 40), "floor": ["gatehouse", -1], "always": true}],
@@ -1882,7 +1918,11 @@ const AREAS := {
 			{"id": "pearl_mother", "pos": Vector2i(70, 27), "lv": 46, "req": 46},
 			{"id": "wangxiang", "pos": Vector2i(78, 50), "lv": 47, "req": 47},
 			{"id": "zhulong", "pos": Vector2i(88, 30), "lv": 47, "req": 47},
+			# Part XIII: a General of the Eight Gates
+			{"id": "liang", "pos": Vector2i(69, 16), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["zhuolu_fog", 51, 52], ["fetter_sapling", 51, 52], ["bronze_brow", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "svial1", "item": "spring_water", "pos": Vector2i(16, 14)}, {"id": "svial2", "item": "spring_water", "pos": Vector2i(44, 54)}, {"id": "svial3", "item": "spring_water", "pos": Vector2i(80, 14)}, {"id": "svial4", "item": "spring_water", "pos": Vector2i(84, 46)},
 			{"id": "cur_pearl2", "item": "night_pearl", "pos": Vector2i(38, 17), "floor": ["pearl_hall", -1], "always": true},
 			{"id": "cur_lotus2", "item": "moon_lotus", "pos": Vector2i(46, 20), "floor": ["tide_house", 1], "always": true},
@@ -1928,7 +1968,11 @@ const AREAS := {
 			{"id": "hei_wuchang", "pos": Vector2i(62, 54), "lv": 47, "req": 47},
 			{"id": "tubo", "pos": Vector2i(70, 32), "lv": 47, "req": 47},
 			{"id": "li", "pos": Vector2i(90, 32), "lv": 47, "req": 47},
+			# Part XIII: a General of the Eight Gates
+			{"id": "bronze_brothers", "pos": Vector2i(55, 53), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["bronze_brow", 51, 52], ["jiuli_warrior", 51, 52], ["banner_ember", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "stally1", "item": "soul_tally", "pos": Vector2i(14, 12)}, {"id": "stally2", "item": "soul_tally", "pos": Vector2i(20, 54)}, {"id": "stally3", "item": "soul_tally", "pos": Vector2i(64, 22)}, {"id": "stally4", "item": "soul_tally", "pos": Vector2i(86, 50)},
 			{"id": "cur_incense2", "item": "ancestor_incense", "pos": Vector2i(40, 21), "floor": ["paper_shop", -1], "always": true},
 			{"id": "cur_leaf2", "item": "autumn_leaf", "pos": Vector2i(58, 40), "floor": ["ghost_inn", 1], "always": true},
@@ -2076,7 +2120,11 @@ const AREAS := {
 			{"id": "shen", "pos": Vector2i(70, 27), "lv": 50, "req": 50},
 			{"id": "great_ao", "pos": Vector2i(78, 50), "lv": 50, "req": 50},
 			{"id": "yu_qiang", "pos": Vector2i(88, 31), "lv": 50, "req": 50},
+			# Part XIII: a General of the Eight Gates
+			{"id": "red_banner", "pos": Vector2i(71, 14), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["banner_ember", 51, 52], ["zhuolu_fog", 51, 52], ["jiuli_warrior", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "jstone1", "item": "jingwei_stone", "pos": Vector2i(16, 14)}, {"id": "jstone2", "item": "jingwei_stone", "pos": Vector2i(44, 54)}, {"id": "jstone3", "item": "jingwei_stone", "pos": Vector2i(80, 14)}, {"id": "jstone4", "item": "jingwei_stone", "pos": Vector2i(84, 44)},
 			{"id": "cur_tea2", "item": "cloud_tea", "pos": Vector2i(45, 24), "floor": ["turtle_shrine", 1], "always": true},
 			{"id": "sense_yz1", "item": "stones", "n": 2800, "pos": Vector2i(10, 52), "always": true, "sense": true}],
@@ -2108,7 +2156,11 @@ const AREAS := {
 			{"id": "guixu_stopper", "pos": Vector2i(62, 54), "lv": 50, "req": 50},
 			{"id": "hai_ruo", "pos": Vector2i(70, 32), "lv": 50, "req": 50},
 			{"id": "xu_fu", "pos": Vector2i(86, 32), "lv": 50, "req": 50},
+			# Part XIII: a General of the Eight Gates
+			{"id": "mast_goblin", "pos": Vector2i(44, 17), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 		],
+		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
+		"warband": {"pool": [["fetter_sapling", 51, 52], ["zhuolu_fog", 51, 52], ["bronze_brow", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "xlog1", "item": "xufu_log", "pos": Vector2i(14, 12)}, {"id": "xlog2", "item": "xufu_log", "pos": Vector2i(20, 54)}, {"id": "xlog3", "item": "xufu_log", "pos": Vector2i(64, 22)}, {"id": "xlog4", "item": "xufu_log", "pos": Vector2i(80, 50)},
 			{"id": "cache_gx1", "item": "stones", "n": 3800, "pos": Vector2i(30, 20), "floor": ["wreck_house", 1], "always": true},
 			{"id": "sense_gx1", "item": "stones", "n": 3000, "pos": Vector2i(52, 58), "always": true, "sense": true}],
@@ -2704,6 +2756,18 @@ const STEPS := [
 	{"id": "s_gx_xufu", "kind": "kill", "boss": "xu_fu", "area": "guixu", "t": "Face Xu Fu at the lip of the Returning Ruins", "stones": 21000},
 	{"id": "s_p12_end", "kind": "talk", "npc": "xu_qian", "area": "penglai", "t": "Sail back to Landfall with Xu Fu and bring him home to the Thousand Children"},
 	{"id": "s_break17", "kind": "breakthrough", "to": 51, "t": "Let every water come home: Ten Thousand Waters Return"},
+	# ---- Part XIII: The Eight Gates.  Open any four of eight, in any order; then one of three roads to the end
+	{"id": "s_p13_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Bars of gold light stand in all four realms: speak to Elder Qing Xuan", "stones": 21400},
+	{"id": "s_p13_archive", "kind": "talk", "npc": "archivist", "area": "sect", "t": "Ask Archivist Lan what the Court built at Zhuolu, and what it locked away"},
+	{"id": "s_p13_yinglong", "kind": "talk", "npc": "yinglong", "area": "buzhou", "t": "Go north to Mount Buzhou and ask Yinglong, who fought at Zhuolu, what the war god was"},
+	{"id": "s_p13_monk", "kind": "talk", "npc": "lantern_monk", "area": "maple", "t": "Go down the funeral road to the Maple Gorge, where the oldest maples were Chiyou's fetters, and ask the lantern monk"},
+	{"id": "s_p13_hunt", "kind": "hunt", "area": "maple", "n": 18, "of": ["jiuli_warrior", "zhuolu_fog", "bronze_brow", "fetter_sapling", "banner_ember"], "t": "Drive Chiyou's war-band back off the funeral road in the Maple Gorge"},
+	{"id": "s_p13_gates", "kind": "gates", "n": 4, "area": "maple", "t": "Open any four of the Eight Gates, in the four realms, in any order"},
+	{"id": "s_p13_heart", "kind": "talk", "npc": "lantern_monk", "area": "maple", "t": "The lock is broken: go back to the lantern monk in the Maple Gorge"},
+	{"id": "s_p13_envoys", "kind": "visits", "npcs": ["yu_hua", "ao_run", "hu_qingyi", "shui_lian", "bu_si", "ming_yi", "xu_qian", "he_xiangu"], "n": 4, "area": "maple", "t": "Before you walk into Zhuolu, carry the Elder's invitations to the leaders of any four of the peoples, in any order"},
+	{"id": "s_p13_chiyou", "kind": "kill", "boss": "chiyou", "area": "maple", "t": "Walk into the field of Zhuolu by the road you choose, and face Chiyou", "stones": 21800},
+	{"id": "s_p13_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Go home: the Conclave of the Realms meets at last under the Jianmu"},
+	{"id": "s_break18", "kind": "breakthrough", "to": 54, "t": "Walk every road at once: Myriad Daos as One"},
 ]
 
 static func step_index(id: String) -> int:
@@ -2790,6 +2854,44 @@ const ITEMS := {
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
 	"brush": {"n": "Registrar's Broken Brush", "desc": "The brush that wrote the Ledger, snapped in two"},
+	# ---- many roads (trials.gd): the essences monsters leave behind, worked at the cauldron and the forge
+	"ess_wood": {"n": "Wood Essence", "desc": "Green qi wrung from a fallen beast of wood. Alchemists, smiths and gardeners want it"},
+	"ess_fire": {"n": "Fire Essence", "desc": "A spark that will not go out, left by a beast of fire. Stoves and furnaces love it"},
+	"ess_water": {"n": "Water Essence", "desc": "Cold, clear qi left by a beast of water. It sweetens wells and wakes still pools"},
+	"ess_earth": {"n": "Earth Essence", "desc": "A heavy grain of qi left by a beast of earth. It knits stone and feeds soil"},
+	"ess_thunder": {"n": "Thunder Essence", "desc": "It crackles in the hand. Left by a beast of thunder"},
+	"ess_dark": {"n": "Yin Essence", "desc": "Cool, quiet qi left by a creature of the dark. The dead can smell it"},
+	"ess_metal": {"n": "Metal Essence", "desc": "Hard bright qi left by a fighter of iron and bone. It remembers its shape"},
+	# ... and what they make: the keys to the trials
+	"smoke_pellet": {"n": "Smoke-Pellets", "desc": "Spirit herb rolled in wood essence. Crack one and a hillside disappears in green smoke"},
+	"grounding_rod": {"n": "Grounding Rod of Frost Jade", "desc": "Two Frost Jades in a rod of thunder essence. Lightning goes into it instead of you"},
+	"thunder_seal": {"n": "Thunder-Seal Talisman", "desc": "Thunder Shards sealed in a paper talisman. A demon cannot feed on its palace while it burns"},
+	"tide_ward": {"n": "Tide-Pearl Ward", "desc": "Two Dragon Pearls in water essence. It carries a little of the sea wherever you go"},
+	"bearer_incense": {"n": "Incense of the Twenty Bearers", "desc": "Saint Relics burned with Yin essence. In its smoke the dead see your own face"},
+	"court_seal": {"n": "Counter-Seal of the Jade Court", "desc": "Two Jade Seals cut backwards. Every stamp it touches lifts off the page"},
+	"glowcap_lantern": {"n": "Ember-Cap Lantern", "desc": "Ember Glowcaps in fire essence: a warm flame, the way fire used to be"},
+	"memory_abacus": {"n": "Abacus of River Pearls", "desc": "Pearls of Memory on an abacus. Everything it counts, it remembers by name"},
+	"tea_smoke": {"n": "Smoke of Dragon-Well Tea", "desc": "Tea buds roasted over water essence. Silk will not hold while it lasts"},
+	"marshal_orders": {"n": "Orders Sealed in Plumes", "desc": "A commander's seal of magpie plumes. A soldier with no orders cannot refuse new ones"},
+	"rain_charm": {"n": "Charm of the Rain-Stones", "desc": "Rain-Stones in wood and earth essence. Wherever it rests, the ground stays damp"},
+	"yu_plan": {"n": "Yu's Plan of the Channels", "desc": "The channels Yu dug, drawn in swelling earth and flood-water. A father can read it"},
+	"heaven_prop": {"n": "Prop of the Gate's Keys", "desc": "Two Keys of the Gate of Heaven forged into a prop strong enough to hold up the sky for a while"},
+	"dew_flask": {"n": "Flask of Pearl-Tree Dew", "desc": "Dew of the pearl trees in wood essence. One sip calms a head"},
+	"unmaking_sigil": {"n": "Counter-Sigil of the Gate", "desc": "Two Heaven Sigils beaten backwards on the anvil. It unseals what the Court sealed"},
+	"rune_lantern": {"n": "Rune-Lantern of the Origin", "desc": "Its light cannot be swallowed, and in it a hunger shows its seams"},
+	"forget_ink": {"n": "Ink of the Unwritten", "desc": "Immortal Peach steeped in water essence. Whatever it touches comes up blank"},
+	"five_lens": {"n": "Five-Coloured Lens", "desc": "Ground from two of Nuwa's stones. Through it even a faceless thing has a weakness"},
+	"mercy_lotus": {"n": "Paper Lotus of Mercy", "desc": "Folded from Spokes of the Wheel. It carries a plea where no living voice can go"},
+	"loom_scissors": {"n": "Silver Scissors of the Loom", "desc": "They cut a thread without cutting what it is sewn to"},
+	"peach_talisman": {"n": "Peach-Pit Talisman", "desc": "The pit of a Kunlun peach in wood essence. Plague-stars shy away from it"},
+	"moon_mirror": {"n": "Osmanthus Moon-Mirror", "desc": "Silver and moon-osmanthus. It shows a sun her own face, cooled"},
+	"dyke_charm": {"n": "Charm of Swelling Earth", "desc": "Two Stones of Mount Buzhou in a charm. Thrown, it raises a dyke across anything"},
+	"root_lantern": {"n": "Root-Lantern of the Dark Capital", "desc": "Soul-Tallies burning in fire and Yin. It lights the underside of the world"},
+	"fleet_compass": {"n": "Compass of the Lost Fleet", "desc": "Bound from two pages of Xu Fu's log. Its needle points home"},
+	"drought_fan": {"n": "Fan of Nuba's Drought", "desc": "Noon Embers in a fan of fire essence. One sweep turns a storm to steam"},
+	"clear_mirror": {"n": "Mirror of Clear Sight", "desc": "Polished from Jingwei's stones. It shows only what is really there"},
+	"kui_drumstick": {"n": "Drumstick of the Thunder-Beast", "desc": "Whoever holds it decides when the drum of Kui's hide is struck"},
+	"homing_elixir": {"n": "Elixir of Coming Home", "desc": "Five essences and an autumn leaf, refined for a fortune. It smells of fields a war god has not seen in five thousand years"},
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
@@ -3107,7 +3209,10 @@ const CHAT_LATER := {
 	"disciple_mei": [["s_p8_home", "The koi have been very spoiled since the stars fell in the pond. I think one of them ate a star."], ["s_p6_home", "Senior Brother Lin! Everyone says you saved the sky. Twice. Is it heavy?"]],
 	"cook_zhou": [["s_p4_home", "Immortals still get hungry. I fed four of them this week and every one asked for seconds."]],
 	"gate_wu": [["s_p3_home", "Twenty years on this gate. Three demon lords, one Jade Emperor and a great deal of fog."]],
-	"bell_shen": [["s_p5_home", "Lately the sky has needed reminding what time it is, too. I ring a little louder."]],
+	"bell_shen": [["s_p5_home", "Lately the sky has needed reminding what time it is, too. I ring a little louder."], ["s_p13_home", "Eight bars of gold across the sky, and a dragon in the kitchen. I have rung this bell for forty years and never had such a week."]],
+	# Part XIII: the gold bars in the sky, the gates and the Conclave
+	"storyteller_wu": [["s_p13_home", "Eight gates and a war god! I have told the tale of Zhuolu for thirty years and always made the fog too short. A hundred days, the Elder says. A HUNDRED."]],
+	"noodle_he": [["s_p13_home", "A dragon, a fox and a dead man came to my stall this morning for noodles. Nobody paid. The Conclave, they said. I said the Conclave can pay."]],
 }
 
 const CHAT_DEEP := {
@@ -5484,6 +5589,157 @@ const DIALOGUE := {
 		["Jingwei, the Flame Emperor's Daughter", "Jingwei. Jingwei. It means: I am still here."],
 		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect and the first hundred steps of the Standing Tree, and then goes down to the spring to fill the water jars, because somebody should, and the water comes up out of the ground to meet him."],
 	],
+	# ---- Part XIII: The Eight Gates
+	"recall11": [
+		["Narrator", "The tide comes back to Fusang and stays. For a whole autumn nothing goes away that does not come back: the boats, the rain, the swallows, Ling Yu after every race, and the Archivist's library books."],
+		["Narrator", "So the peoples of the four realms agree to come to Azure Cloud Mountain and sit down together under the Jianmu: the first Conclave of the Realms, with no Court at the head of the table, because there is no head of the table."],
+		["Narrator", "On the eve of it, while the Feathered Folk are landing on the sect's roofs and the dragon-kin are arguing with the cook, eight pillars of gold light go up at once, far away, in all four realms."],
+		["Old Shen the Bell-Ringer", "Elder! The sky has bars on it. Gold ones, eight of them. The foxes say there is one at the Gate of Heaven, and the Pearl-Weepers have sent word of one in the Springs.", "shock"],
+		["Elder Qing Xuan", "Eight. Of course it is eight. Lin Feng, to the hall. And somebody ask the Feathered Folk to get off my roof."],
+	],
+	"s_p13_home": [
+		["Elder Qing Xuan", "When the Yellow Emperor fought Chiyou at Zhuolu, the war god of the Nine Li filled the field with a fog that lasted a hundred days, and the Emperor's army could not find its own feet."],
+		["Elder Qing Xuan", "So the Mysterious Lady of the Nine Heavens came down and taught the Emperor the art of the Eight Gates: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death. A formation in which every gate is a different road, and only some of them lead out."],
+		["Lin Feng", "And with it he won."],
+		["Elder Qing Xuan", "With it, and a drum made from a thunder-ox, and a daughter who dried up the rain. Chiyou died, and the Court, which was not yet the Court, buried him under a lock of eight gates so that his war would never wake. The lock answered to the Court. The Court is gone."],
+		["Elder Qing Xuan", "Every water comes home through you now, disciple. It seems the dead would like to as well. Ask the Archivist what the Court wrote about Zhuolu. Then I would like you to stop a war that ended five thousand years ago.", "point"],
+	],
+	"s_p13_archive": [
+		["Archivist Lan", "Zhuolu. The Court's file runs to forty boxes and is marked 'victory'. Sit. It says the Eight Gates were set round Chiyou's grave and then scattered over the world, two to a realm, so that nobody could ever stand at all eight at once."],
+		["Archivist Lan", "Each gate has a general, or a guardian, or a thing that used to be one, and each answers to something different. The Gate of Opening to a blade, or to gold. The Gate of Rest to a heart that will not sleep. The Gate of Death to a formation, or to a name even the dead respect. Eight pages of very small writing."],
+		["Lin Feng", "Then I have to open all eight?", "think"],
+		["Archivist Lan", "No. That is the clever part, and the Court never wrote it down: I found it in the Lady's own war-book, which the Court used to prop up a table. A lock of eight gates breaks when half of them stand open. Any half. Open the four whose locks you can answer, in whatever order you like."],
+		["Archivist Lan", "And then, says the book, there are three roads into the heart: the road of the sword, the road of the many, and the road of the cauldron. I do not know what that means. The lantern monk in the Maple Gorge might. The oldest maples there were Chiyou's fetters once."],
+	],
+	"s_p13_yinglong": [
+		["Narrator", "Below the broken pillar of Buzhou, Yinglong lies coiled round a spring he dug himself, his great wings folded. He opens one eye when Lin Feng says the name Zhuolu, and does not close it again."],
+		["Yinglong, Who Dug the Rivers", "I was there. The Emperor sent me against Chiyou when the fog would not lift. I stored up the waters and dug channels for them, so the fog had somewhere to go. And then I killed him. Nobody ever asks me about that part."],
+		["Lin Feng", "What was he?", "think"],
+		["Yinglong, Who Dug the Rivers", "A smith. The first. He found the copper in the hills and made ploughs of it before he ever made an axe. His people were starving and the Emperor's people had the river. That is what the war was about. The histories say it was about virtue."],
+		["Yinglong, Who Dug the Rivers", "After it I could never fly back up to heaven; the weight of it, they say. I went south and made rain for farmers instead. If he wakes, little cultivator, tell him the rivers I dug water the Nine Li's old fields now. He would want to know.", "grieve"],
+	],
+	"s_p13_monk": [
+		["Lantern Monk Jing Kong", "You came down the funeral road with your eyes open. Good. Look at the old maples: they are red in spring now, and red in summer. They were red when they were iron, too."],
+		["Lantern Monk Jing Kong", "When Chiyou died they struck the fetters off him and threw them down here, and the fetters grew into the first maples, red with his blood. Every autumn since, something has walked under them in the fog. It used to walk like a soldier. Lately it walks like a man looking for the way home."],
+		["Lin Feng", "The Archivist says there are three roads into the heart of the lock."],
+		["Lantern Monk Jing Kong", "Every lock has three keys: the hand that forces it, the friend who is let in, and the smith who makes the key. Open four of the eight gates first, wherever they stand. Then come back, and I will light you the way down."],
+		["Lantern Monk Jing Kong", "But first, the funeral road. His war-band has come up out of the fog onto it, and the dead cannot get past them to the Wheel. Drive them back, please. Gently, if you can; they think it is still the war."],
+		["Yue Ling", "Four gates in four realms. We have walked further for less.", "laugh"],
+	],
+	"s_p13_heart": [
+		["Narrator", "The fourth gate falls, and far away in the Maple Gorge the fog lifts all at once, like a cloth pulled off a table. Under the oldest maples lies a field that was not there before, trampled and silent, with five thousand years of autumn leaves on it."],
+		["Lantern Monk Jing Kong", "Zhuolu. They buried the battlefield with him. The lock is broken, and the heart is open."],
+		["Lantern Monk Jing Kong", "Choose your road before you walk down there. Go alone, with only the road you have walked, as the Yellow Emperor did. Or go with every people you have helped at your back. Or go with something made by hand that he has wanted for five thousand years. He will know which before you say a word."],
+		["Lin Feng", "And whichever road I take, he is waiting at the end of it.", "nod"],
+		["Lantern Monk Jing Kong", "Every road ends somewhere. That is what makes it a road."],
+		["Yue Ling", "Whatever road we take, the Conclave should be called first. If a war god is going to stop fighting after five thousand years, the peoples ought to be there to see it."],
+		["Lantern Monk Jing Kong", "Then take the Elder's invitations round. He has written one for every people, and he has written them very politely, which for him is a great effort."],
+	],
+	# Part XIII: the invitations to the Conclave, any four of the eight leaders, in any order
+	"visit:yu_hua": [
+		["Feather-Mother Yu Hua", "An invitation? To sit down? The Yumin do not sit, Lin Feng, we perch. ...We will perch at your Conclave. All of us. Warn the cook.", "laugh"],
+		["Feather-Mother Yu Hua", "Our oldest songs remember Chiyou's fog: a hundred days when no Yumin could see to fly. If you are going to talk to him, ask him to keep it to himself."],
+	],
+	"visit:ao_run": [
+		["Rain-Minister Ao Run", "The Ministry has a file on Yu Shi, the Rain Master who drowned an emperor's army. It is very thick and every page of it is wet. We will come, and we will bring the file."],
+		["Rain-Minister Ao Run", "The dragon-kin fought for the Yellow Emperor at Zhuolu; Yinglong dug the channels that drained the fog. It will be interesting, to sit across a table from the other side at last."],
+	],
+	"visit:hu_qingyi": [
+		["Hu Qingyi, the Ninth-Tail Matron", "A Conclave with no head of the table. How deliciously confusing. The foxes accept, on condition that nobody asks us to sit still.", "laugh"],
+		["Hu Qingyi, the Ninth-Tail Matron", "My grandmother's grandmother saw Chiyou once, from a long way off. She said he laughed like a bell cracking and that he was kind to animals. Nobody remembers that part."],
+	],
+	"visit:shui_lian": [
+		["Pearl-Weaver Shui Lian", "We will come up out of the dark for it. We have never seen a council held in daylight. Will there be weeping? We are very good at weeping."],
+		["Pearl-Weaver Shui Lian", "The old songs say the Nine Li were river people, like us. When they lost, the water took their names. We still sing some of them; we could sing them to him."],
+	],
+	"visit:bu_si": [
+		["Elder Bu Si of the Deathless", "We do not die, so we are always the last to arrive anywhere. We will try to be early. It will be a novelty."],
+		["Elder Bu Si of the Deathless", "Chiyou is dead and does not know it. We are alive and cannot stop. Perhaps the two of us should sit together at your Conclave and compare notes.", "think"],
+	],
+	"visit:ming_yi": [
+		["Lantern-Magistrate Ming Yi", "The shades accept. We will bring our own lanterns and our own minutes, which will be more accurate than the Archivist's. Tell her I said so."],
+		["Lantern-Magistrate Ming Yi", "Chiyou's soul never came down to Youdu to be registered. Five thousand years outstanding. I have a form for him, if he would like to fill it in at last."],
+	],
+	"visit:xu_qian": [
+		["Headwoman Xu Qian of Landfall", "Landfall, at a council of the realms. Two thousand years ago we were three thousand children nobody wanted. Of course we will come. Master Xu wants to come too; he likes meetings now."],
+		["Headwoman Xu Qian of Landfall", "Teacher Qin says the Nine Li were the first people the Court ever wrote out of history. We know how that feels. Tell the war god we kept our names."],
+	],
+	"visit:he_xiangu": [
+		["He Xiangu of the Lotus", "The immortals of the isles at a council with farmers, fishermen and shades. Two thousand years ago we would have been offended. We will come, and we will be quiet, which will be good for us."],
+		["He Xiangu of the Lotus", "Lu Dongbin met Chiyou's Banner once, in the sky over the sea. He says it was the saddest light he ever saw. Bring the war god something kind, if you can."],
+	],
+	"pre:chiyou": [
+		["Narrator", "In the middle of the field of Zhuolu, under a sky that has not been blue in five thousand years, stands a giant in bronze with the horns of an ox, iron brows and an axe in each of four hands. His eyes are open. They have been open the whole time."],
+		["Chiyou, War God of the Nine Li", "Another army of the Yellow Emperor. Another hundred days of fog. I have dreamed this battle every night since I died. In the dream I never win, and I never stop."],
+		["Lin Feng", "The Yellow Emperor is gone, and so is his Court. I came to ask what you want."],
+		["Chiyou, War God of the Nine Li", "WANT? I want my people. I want the Nine Li. I want to go home. But first I want to fight, because I do not remember how to do anything else."],
+	],
+	"post:chiyou": [["Narrator", "The war god goes down on one knee in the trampled field, and the axes fall out of his hands into five thousand years of leaves."]],
+	"pre:xingtian": [
+		["Narrator", "Before the Gate of Opening, under a sky gone gold, dances a giant with no head: eyes in his chest, a mouth in his belly, a shield in one hand and an axe in the other."],
+		["Xingtian, Who Dances Without a Head", "The Emperor took my head and I kept fighting. I will keep fighting until the sky falls. It nearly did, I hear. Pity."],
+	],
+	"post:xingtian": [
+		["Narrator", "Xingtian stops dancing. Very slowly he sets down his shield and his axe, and the Gate of Opening swings wide behind him."],
+		["Xingtian, Who Dances Without a Head", "...Five thousand years. My feet hurt."],
+	],
+	"pre:yu_shi": [
+		["Narrator", "Rain falls at the Gate of Alarm so hard that every drop is a drumbeat. In the middle of it stands an old man with a bowl, tipping out a storm."],
+		["Yu Shi, the Rain Master of Zhuolu", "I drowned an emperor's army once, for a friend. Nobody has asked me to stop since. Have you come to ask?"],
+	],
+	"post:yu_shi": [["Narrator", "The Rain Master tips his bowl upright, and the rain stops, and over the Gate of Alarm there is a rainbow, which seems to embarrass him."]],
+	"pre:liang": [
+		["Narrator", "At the Gate of Rest the black water lies perfectly still, and a soft voice sings from under it, a lullaby so gentle that Yue Ling yawns."],
+		["Liang, Goblin of the Black Springs", "Sleep. Everyone sleeps here. Nobody wakes. It is very restful. Sleep..."],
+	],
+	"post:liang": [["Narrator", "The goblin's song breaks off in a gurgle, and the black water at the Gate of Rest begins, for the first time in five thousand years, to flow."]],
+	"pre:bronze_brothers": [
+		["Narrator", "Across the Gate of Death stands a wall of bronze heads and iron brows: the last of Chiyou's eighty-one brothers, shoulder to shoulder, chewing gravel."],
+		["The Bronze-Headed Brothers of Chiyou", "WE HOLD. WE HOLD THE GATE. WE HAVE HELD IT SINCE ZHUOLU. WHAT DAY IS IT?"],
+	],
+	"post:bronze_brothers": [
+		["Narrator", "One by one the brothers sit down in the road. The Gate of Death stands open behind them, and it turns out to lead only to a quiet field where the grass is long."],
+		["The Bronze-Headed Brothers of Chiyou", "...Is he down there? Our brother? Tell him we held."],
+	],
+	"pre:red_banner": [
+		["Narrator", "Over the Gate of Sight a red comet hangs low enough to touch, and in its light Lin Feng sees the war he fears most: Azure Cloud Mountain burning, and Yue Ling not there."],
+		["Chiyou's Banner, the Red Comet", "Look. LOOK. This is what a war is. Every war. Look at it and tell me you will still walk in."],
+	],
+	"post:red_banner": [["Narrator", "The Red Comet dims to an ember and the vision goes out with it. Yue Ling is standing right there, frowning at him. The Gate of Sight opens on a perfectly ordinary sunset."]],
+	"pre:mast_goblin": [
+		["Narrator", "Beside the wreck of the Penglai-Seeker the old mainmast has grown a face, and arms, and a very bad temper, and the Gate of Closing hangs from its yard like a sail."],
+		["Mei, Goblin of the Old Mast", "CLOSED. Closed, closed, closed. I held up a sail for two thousand years and nobody ever said thank you. Everything is closed."],
+	],
+	"post:mast_goblin": [["Narrator", "The old mast creaks, and something in the wood that has been clenched for two thousand years lets go. The Gate of Closing opens with the sound of a sail filling."]],
+	"pre:fetter_maple": [
+		["Narrator", "High in the gorge stands the oldest maple of all, its trunk still shaped like a shackle and red as the day it was forged. Its branches close across the Gate of Life like fingers."],
+		["The Fetter-Maple of Chiyou", "I held him. I was made to hold him. If I let go, what am I?"],
+	],
+	"post:fetter_maple": [["Narrator", "The fetter-maple's branches open, and its leaves begin to fall, red and gold, for the first time in five thousand years. Beyond it the Gate of Life stands open, and smells of spring."]],
+	"pre:kui_drum": [
+		["Narrator", "On the slope below the broken pillar a great drum of grey hide beats by itself, and every beat is a thunderclap. The ground jumps. Yue Ling's hair stands on end."],
+		["Narrator", "It was made to break an army's heart. It does not know how to do anything else."],
+	],
+	"post:kui_drum": [["Narrator", "The drum gives one last soft beat, like a heart settling, and goes quiet. The Gate of Harm opens behind it on the long road north."]],
+	"s_p13_end": [
+		["Narrator", "The gold bars fade from the sky one by one, and the Conclave of the Realms meets at last, under the Jianmu, on the sect's practice ground, because it is the only place flat enough for a dragon to sit down."],
+		["Elder Qing Xuan", "Nobody sits at the head of the table, because there is no head. Nobody keeps a ledger, because there is no ledger. Somebody will have to keep the minutes, though. Archivist?"],
+		["Archivist Lan", "I have kept minutes since the Court burned its own. Pass me the brush. Rain-Minister, you are dripping on the treaty."],
+		["Rain-Minister Ao Run", "It is a treaty about rain. It ought to be wet."],
+		["Hu Qingyi, the Ninth-Tail Matron", "The foxes propose that the Conclave meet every autumn, and that it never decide anything important, so that everybody keeps coming back to argue."],
+		["Lantern-Magistrate Ming Yi", "The shades second it. We have all the time in the world, and nothing at all to do with it."],
+	],
+	"pre:s_break18": [
+		["Narrator", "Lin Feng stands at the foot of the Jianmu with every road he has walked behind him: the steps of the sect, the bamboo forest, the Ladder of Heaven, the bare sea floor, the field of Zhuolu. The tribulation that gathers is all of them at once, every road asking which one he will choose."],
+		["Yue Ling", "Which one?"],
+		["Lin Feng", "I don't have to choose. That was the secret all along.", "laugh"],
+	],
+	"post:s_break18": [
+		["Narrator", "Every road Lin Feng has walked runs through him at once, and none of them is the only right one, and the tribulation, finding nothing in him to divide, thins out into a clear autumn sky."],
+		["Narrator", "He becomes the first cultivator of Myriad Daos as One: a realm in which every road leads somewhere worth going."],
+		["Narrator", "The Conclave of the Realms meets every autumn after that, under the Jianmu, and argues happily about everything. Nobody is in charge of it. Auntie Zhou feeds everybody."],
+		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect, which are the first steps of every road, because somebody should."],
+	],
 	# ---- Part V: The Falling Sky
 	"recall3": [
 		["Narrator", "Lin Feng keeps his word. For nine quiet days the first Dao Ancestor in ten thousand years sweeps the steps of Azure Cloud Sect, and nobody quite dares to stop him."],
@@ -5662,6 +5918,40 @@ const DIALOGUE := {
 		["Narrator", "The night sky over the world is black again, clean and deep and scattered with stars that stay where they are. The fifth stone was never a stone. It was the night itself, given back."],
 		["Narrator", "In the Azure Cloud Sect, Elder Qing Xuan sets down his books, walks out onto the steps, and finds a broom leaning against the gate. He smiles, and starts to sweep."],
 	],
+}
+
+## How the end is told for the road Lin Feng took into the heart of the Eight Gates (Part XIII): the
+## Road of the Sword, of the Many Peoples or of the Cauldron (trials.gd TRIALS.chiyou).  Main.dao_dialogue
+## adds these to the conversation they are keyed by.
+const ROUTE_LINES := {
+	"post:chiyou": {
+		"sword": [
+			["Chiyou, War God of the Nine Li", "...You did not bring an army. The Emperor brought an army, and a drum, and a goddess. You brought a sword and a road. That was a better fight than I ever had at Zhuolu."],
+			["Lin Feng", "It is over. It was over five thousand years ago. You can stop now."],
+			["Narrator", "Chiyou laughs, a sound like a bell cracking, and lies down in the field, and for the first time since he died he closes his eyes. The fog does not come back."],
+		],
+		"peoples": [
+			["Narrator", "Behind Lin Feng the envoys of the four realms are still arguing: the dragon-kin with the foxes, the shades with the Deathless, the Feathered Folk with everybody. Not one of them has drawn a weapon on any of the others."],
+			["Chiyou, War God of the Nine Li", "...They quarrel, and nobody dies. Nobody gives the orders, and still they came. The Nine Li were like this, before the Emperor: nine tribes and no king, arguing round one fire."],
+			["Hu Qingyi, the Ninth-Tail Matron", "There is room at the fire, war god. We are holding a Conclave, and nobody is in charge of it. You would fit in perfectly."],
+			["Narrator", "Chiyou looks at the quarrelling peoples for a long time. Then he picks up one of his axes, very carefully, and holds it out to Lin Feng handle first."],
+		],
+		"cauldron": [
+			["Narrator", "Lin Feng holds out the elixir of coming home. It smells of millet fields and river mud and the smoke of nine villages' cooking fires, five thousand years gone."],
+			["Chiyou, War God of the Nine Li", "...That is the Nine Li. That is home. Nobody has let me smell it since the fog."],
+			["Narrator", "He drinks it and grows lighter, and the bronze of him turns to autumn leaves from the feet up, red and gold, and blows away east towards the plains where the Nine Li lived. The last thing to go is his smile."],
+		],
+	},
+	"s_p13_end": {
+		"sword": [["Narrator", "Chiyou's axes hang in the Hall of Azure Clouds beside the Founder's broken sword. Every disciple who passes them stops fighting, for a moment, whatever they were fighting about."]],
+		"peoples": [["Chiyou, War God of the Nine Li", "The Nine Li second it. Also, I would like some of that soup.", "laugh"], ["Narrator", "The war god of the Nine Li sits at the Conclave as the envoy of a people who have been gone five thousand years, and argues with everybody, and is very happy."]],
+		"cauldron": [["Narrator", "In the Maple Gorge the oldest maples turn gold for the first time, not red. The lantern monk says something walked out of the gorge at dawn, east, without looking back."]],
+	},
+	"post:s_break18": {
+		"sword": [["Narrator", "In the field of Zhuolu the grass grows back over the old war, and a sword-stroke is cut in the rock there that nobody else has ever been able to match."]],
+		"peoples": [["Narrator", "In the field of Zhuolu the peoples of the four realms plant a maple for every one of them, and the war god of the Nine Li waters them himself."]],
+		"cauldron": [["Narrator", "Out on the eastern plains, where the Nine Li lived, the millet comes up thicker every year, and nobody knows why but Alchemist Mo, who will not say."]],
+	},
 }
 
 ## Lines the Dao Lin Feng walks adds to a conversation (Part XI): the Elder's answer when he chooses,

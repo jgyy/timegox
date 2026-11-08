@@ -5,6 +5,8 @@ extends Node
 
 var main
 var dir := ""
+## the playthrough bot's plan through the trials (the screenshots show a game that took those roads)
+const BOT := preload("res://scripts/bot.gd")
 
 const ELEMS := {"penglai": "earth", "fangzhang": "water", "yingzhou": "thunder", "guixu": "fire", "juntian": "thunder", "changhe": "wood", "ninesprings": "thunder", "youdu": "fire", "sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder", "longmen": "earth", "drowned": "earth", "tushan": "water", "buzhou": "earth"}
 
@@ -213,11 +215,14 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 	m.add_child(Models.shadow_disc(0.8))
 	var t0 := 0.0
 	if main.args.has("clip"):
-		# a strip of frames through one clip, seen from the side (--clip=run [--frames=6])
-		var clip := str(main.args.clip)
+		# a strip of frames through a clip, seen from the side (--clip=run [--frames=6]); several clips
+		# at once with a comma between them (--clip=sit_bench,drink)
 		var ap: AnimationPlayer = m.get_meta("ap", null)
 		var frames := int(main.args.get("frames", "6"))
-		if ap != null and ap.has_animation(clip):
+		for clip in str(main.args.clip).split(",", false):
+			if ap == null or not ap.has_animation(clip):
+				print("[tour] no clip ", clip)
+				continue
 			var ln: float = ap.get_animation(clip).length
 			m.rotation.y = float(main.args.get("yaw", str(PI * 0.5)))
 			var aim2 := Vector3(0, height * 0.5, 0)
@@ -427,6 +432,338 @@ func _part12_shots() -> void:
 	await _wait(0.5)
 	await _shot("world_map_sea")
 	main.pop()
+
+## Many roads and Part XIII (--part13): a trial's paths on the choice screen, the alchemist's
+## crafting, the Journal, a townsperson's request, two Gate Generals in their regions, the Journal
+## during the Eight Gates, a trial battle with allies striking, Chiyou, and the ending.
+func _part13_shots() -> void:
+	Game.reset()
+	Game.level = 11
+	Game.exp = float(Game.exp_need())
+	Game.companion = true
+	Game.temper = 3
+	Game.stones = 2650
+	Game.renown = 38
+	Game.deeds = {"deed_cook": true, "deed_gate": true}
+	Game.trials = {"iron_fang": "craft", "thunder_roc": "craft"}
+	Game.inv = {"hp_pill": 6, "qi_pill": 3, "ess_wood": 4, "ess_fire": 1, "ess_water": 7, "ess_earth": 2, "ess_thunder": 5, "ess_dark": 9, "ess_metal": 3, "shard": 4, "herb": 3, "jade": 2, "feather": 1}
+	Game.heal_full()
+	Game.step = Data.step_index("s_lord")
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.world.banner_t = 0.0
+	# the Demon Lord's trial: four ways, one of them open
+	main.open_trial({"enemy": "demon_lord", "lv": 12, "req": 11, "id": "boss_demon_lord", "pos": Vector2i.ZERO})
+	main.choice.cursor = 2
+	await _wait(0.6)
+	await _shot("trial_choice")
+	main.pop()
+	# Alchemist Mo's cauldron: one more Thunder Essence and the talisman can be made
+	main.shop.open("alchemist")
+	main.push("shop")
+	main.shop.cursor = main.shop.ids.find("craft:thunder_seal")
+	await _wait(0.5)
+	await _shot("crafting")
+	main.pop()
+	# the Journal: renown, essences, requests, the trial ahead
+	main.open_menu()
+	main.menu.mode = "journal"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("journal")
+	main.pop()
+	# a request: Old Shen's cracked bell
+	main.offer_deed({"id": "bell_shen", "n": "Old Shen the Bell-Ringer"}, "deed_bell")
+	await _wait(0.5)
+	await _shot("deed_request")
+	main.pop()
+	# Part XIII: two of the Eight Gates, standing in their regions in gold light
+	Game.level = 52
+	Game.exp = 0.0
+	Game.temper = 8
+	Game.stones = 420000
+	Game.renown = 470
+	Game.dao = "heart"
+	Game.dao_xp = {"sword": 44, "heart": 41}
+	for rc in Data.RACE_ORDER:
+		if rc != "human":
+			Game.standing[rc] = 64
+			Game.met[rc] = true
+	Game.standing["xian"] = 100
+	Game.step = Data.step_index("s_p13_gates")
+	Game.gates_open = {"liang": true, "red_banner": true}
+	Game.heal_full()
+	Game.deeds = {}
+	for did in Trials.DEEDS.keys().slice(0, 11):
+		Game.deeds[did] = true
+	Game.trials = {}
+	for tid in BOT.TRIAL_PLAN:
+		if not Trials.is_gate(tid):
+			Game.trials[tid] = BOT.TRIAL_PLAN[tid]
+	# the two gates standing open, and how they were passed
+	Game.trials["liang"] = "dao"
+	Game.trials["red_banner"] = "craft"
+	Game.inv = {"hp_pill": 8, "qi_pill": 4, "ess_wood": 23, "ess_fire": 31, "ess_water": 40, "ess_earth": 27, "ess_thunder": 18, "ess_dark": 35, "ess_metal": 12, "autumn_leaf": 1, "spring_water": 4, "noon_ember": 4, "jingwei_stone": 4, "wind_bell": 4, "shift_horn": 1}
+	for gs in [["gate_kui_drum", "kui_drum", Vector3(-12.0, 7.0, 13.0)], ["gate_fetter_maple", "fetter_maple", Vector3(-9.0, 13.0, 15.0)]]:
+		var ga := Trials.boss_area(str(gs[1]))
+		var gpos: Vector2i = Vector2i.ZERO
+		for b in Data.AREAS[ga].bosses:
+			if b.id == gs[1]:
+				gpos = b.pos
+		var lid := Data.layer_of(ga)
+		main.world.open_world()
+		main.world.enter_layer(lid)
+		main.world.teleport(_nearest_free(Atlas.to_world(ga, gpos + Vector2i(-5, 3))), lid)
+		main.world.facing = Vector2i(1, 0)
+		main.world.cam_q = 1
+		main.world._snap_cam()
+		var bp: Vector3 = main.world.wpos(Atlas.to_world(ga, gpos))
+		bp.y = main.world.ground_y(bp)
+		main.world.cam_override = Transform3D(Basis.IDENTITY, bp + gs[2]).looking_at(bp + Vector3(0, 3.0, 0), Vector3.UP)
+		await _wait(1.4)
+		await _shot(str(gs[0]))
+		main.world.cam_override = null
+	main.world.enter_layer("surface")
+	main.world.teleport(Atlas.to_world("sect", Vector2i(20, 9)), "surface")
+	main.open_menu()
+	main.menu.mode = "journal"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("journal_gates")
+	main.pop()
+	# a Gate General's trial battle, by the friendship of the foxes: allies strike every round (the first strike at once)
+	main.battle.start([{"id": "xingtian", "lv": 52, "mult": 1.3, "atk": 1.1}], {"entity": {"id": "boss_xingtian"}, "boss": true, "enemy": "xingtian", "theme": "changhe",
+		"trial": "xingtian", "path": "peoples", "boon": Trials.path("xingtian", "peoples").boon, "path_n": "Kin of the celestial foxes", "path_kind": "By friendship"})
+	main.push("battle")
+	await _wait(3.1)
+	await _shot("battle_boss_xingtian")
+	main.pop()
+	# Chiyou at the heart, on the Road of the Many Peoples
+	Game.step = Data.step_index("s_p13_chiyou")
+	Game.level = 53
+	main.battle.start([{"id": "chiyou", "lv": 53, "mult": 2.0, "atk": 1.25}], {"entity": {"id": "boss_chiyou"}, "boss": true, "enemy": "chiyou", "theme": "maple",
+		"trial": "chiyou", "path": "peoples", "boon": Trials.path("chiyou", "peoples").boon, "path_n": "The Road of the Many Peoples", "path_kind": "By friendship"})
+	main.push("battle")
+	await _wait(2.9)
+	await _shot("battle_boss_chiyou")
+	main.pop()
+	# the ending: a frame of every shot of its film, and the results
+	_ending_state()
+	await _ending_shots()
+
+## Things to do (--props, props.gd): for each kind of thing (or those named, --props=bench,well), the
+## first one of it in the land, Lin Feng beside it with Yue Ling, Enter, and a frame from the side while
+## he does it (prop_<kind>.png), and all of them on sheets (props_sheet_<n>.png).
+const PROP_SHOTS := ["bench", "well", "shrine", "bell", "qin", "fishing", "swing", "wish_tree", "campfire", "stones", "broom", "koi",
+	"altar", "bookshelf", "bed", "cauldron", "anvil", "loom", "tea", "drum", "herb_patch", "stele", "cushion", "stove", "barrel", "rack"]
+
+func _props_shots() -> void:
+	Game.reset()
+	Game.level = 30
+	Game.companion = true
+	Game.heal_full()
+	Game.hp[0] = Game.max_hp(0) * 0.6
+	Game.step = Data.step_index("s_p11_home")
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.open_world()
+	var want: Array = PROP_SHOTS
+	if Props.KINDS.has(str(main.args.props).split(",", false)[0] if str(main.args.props) != "" else ""):
+		want = str(main.args.props).split(",", false)
+	var frames: Array = []
+	for kind in want:
+		var found = null
+		var lid_f := ""
+		for lid in ["surface", "heaven", "under", "sea"]:
+			var lw := Atlas.world_of(lid)
+			for e in lw.ents:
+				if e.kind == "prop" and str(e.prop) == kind and _prop_spot(lw, e) != Vector2i(-1, -1):
+					found = e
+					lid_f = lid
+					break
+			if found != null:
+				break
+			# furniture upstairs and in cellars
+			for fid in lw.floors:
+				for fe in lw.floors[fid].ents:
+					if fe.kind == "prop" and str(fe.prop) == kind and _prop_spot(lw.floors[fid], fe) != Vector2i(-1, -1):
+						found = fe
+						lid_f = fid
+						break
+				if found != null:
+					break
+			if found != null:
+				break
+		if found == null:
+			print("[tour] no ", kind)
+			continue
+		var e2: Dictionary = found
+		print("[tour] %s at %s in %s" % [kind, str(e2.pos), lid_f])
+		var lw2 := Atlas.world_of(lid_f)
+		var spot := _prop_spot(lw2, e2)
+		main.world.enter_layer(lid_f)
+		main.world.teleport(spot, lid_f)
+		main.world.facing = e2.pos - spot
+		main.world.cam_q = maxi(0, main.world.FWD.find(main.world.facing))
+		main.world._snap_cam()
+		main.world.banner_t = 0.0
+		Game.toasts.clear()
+		main.toast_list.clear()
+		await _wait(0.2)
+		print("[tour] using ", kind)
+		main.world.start_use(e2)
+		var k := Props.kind_of(e2)
+		var once: bool = Props.ONCE.has(str(k.clip))
+		var into := minf(float(k.dur) * 0.55, 2.4) if not once else float(main.world.FX_AT.get(str(k.clip), 0.6)) + 0.1
+		# (rendering the world is slow here: jump straight to him at it, and a one-shot to its moment)
+		main.world.using.t0 = main.world.t - main.world.USE_STEP - maxf(0.0, into - 0.25)
+		await _wait(0.07)
+		if once:
+			main.world.player.set_meta("act_t", main.world.t - into + 0.1)
+		# and Yue Ling's answer to it, when it is a gesture (she laughs a second after), well begun
+		var cc := str(k.get("comp", "watch"))
+		if Game.companion and cc != "watch" and not main.world.COMP_LOOP.has(cc):
+			main.world.comp.set_meta("act_t", main.world.t - 0.7)
+		# a camera off to the side, looking across the hero at the thing
+		var hp: Vector3 = main.world.player.position
+		var c: Vector3 = main.world.ent_pos(e2)
+		var dir := Vector3(c.x - hp.x, 0, c.z - hp.z)
+		if dir.length() < 0.3:
+			# (on it, a cushion: the way he came onto it)
+			dir = Vector3(main.world.using.dir.x, 0, main.world.using.dir.z)
+		dir = dir.normalized()
+		var side := Vector3(dir.z, 0, -dir.x)
+		var mid := hp.lerp(Vector3(c.x, hp.y, c.z), 0.45) + Vector3(0, 0.9, 0)
+		var eye := _prop_eye(lw2, mid, dir, e2.has("furn"))
+		main.world.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(mid, Vector3.UP)
+		await _wait(0.2)
+		await _shot("prop_" + kind)
+		frames.append(last_img.duplicate())
+		# done: on to the next
+		main.world.using.t0 = main.world.t - 100.0
+		await _wait(0.07)
+		main.world.cam_override = null
+	for sh in range(0, frames.size(), 6):
+		_grid("props_sheet_%d" % (sh / 6), frames.slice(sh, sh + 6), 2)
+
+## Where to put the side camera on a thing (looking at `mid`, the thing along `dir` from the hero): off to
+## one side and a little back, over open ground (not inside the trees beside it) and above the ground
+## there; indoors, low in the room itself (over its floorboards, under the eaves). The first place with
+## a clear view, else the clearest.
+func _prop_eye(lw: Dictionary, mid: Vector3, dir: Vector3, furn: bool) -> Vector3:
+	var wo = main.world
+	var g: PackedByteArray = lw.grid
+	var W: int = lw.w
+	var H: int = lw.h
+	var side := Vector3(dir.z, 0, -dir.x)
+	# [to the side, back, up]
+	var tries: Array = [[2.2, 1.0, 1.2], [1.4, 1.8, 1.3], [2.4, 0.2, 1.3], [0.5, 2.2, 1.4], [1.2, 0.9, 1.5]] if furn else \
+		[[4.2, 2.2, 1.4], [3.2, 3.2, 1.6], [1.8, 4.0, 1.9], [2.8, 1.2, 2.8], [1.0, 2.6, 3.4]]
+	var best := Vector3.ZERO
+	var best_n := -1
+	for t in tries:
+		for s in [1.0, -1.0]:
+			var eye: Vector3 = mid + side * (float(t[0]) * s) - dir * float(t[1]) + Vector3(0, float(t[2]), 0)
+			var n := 0
+			for i in 8:
+				var p: Vector3 = eye.lerp(mid, i / 10.0)
+				var tx := floori((p.x - wo.off.x) / Terrain3D.T)
+				var ty := floori((p.z - wo.off.z) / Terrain3D.T)
+				if tx >= 0 and ty >= 0 and tx < W and ty < H:
+					var tile: int = g[ty * W + tx]
+					if (tile == MapGen.INTERIOR) if furn else (MapGen.is_walkable_tile(tile) or tile == MapGen.WATER):
+						n += 1
+			if n > best_n:
+				best_n = n
+				best = eye
+			if n == 8:
+				break
+		if best_n == 8:
+			break
+	best.y = maxf(best.y, wo.ground_y(best) + 1.2)
+	return best
+
+## A free tile beside thing `e` in world `lw` to use it from (-1,-1 if none).
+func _prop_spot(lw: Dictionary, e: Dictionary) -> Vector2i:
+	var g: PackedByteArray = lw.grid
+	var W: int = lw.w
+	var fd: Vector2i = e.get("face", Vector2i.ZERO)
+	var dirs: Array = ([fd] if fd != Vector2i.ZERO else []) + MapGen.DIRS
+	for d in dirs:
+		var n: Vector2i = e.pos + d
+		if n.x < 0 or n.y < 0 or n.x >= W or n.y >= int(lw.h):
+			continue
+		if MapGen.is_walkable_tile(g[n.y * W + n.x]):
+			var busy := false
+			for o in lw.ents:
+				if o.pos == n and o.kind != "prop":
+					busy = true
+					break
+			if not busy:
+				return n
+	return Vector2i(-1, -1)
+
+## The state the bot's run (seed 1234) reaches the ending in: every trial passed the way its plan
+## takes it, the heart by the Road of the Many Peoples, and the run's numbers (the clock stopped).
+func _ending_state() -> void:
+	Game.level = 54
+	Game.dao = "heart"
+	Game.trials = BOT.TRIAL_PLAN.duplicate()
+	Game.trials["chiyou"] = "peoples"
+	Game.gates_open = {}
+	for gid in ["fetter_maple", "kui_drum", "liang", "xingtian"]:
+		Game.gates_open[gid] = true
+	Game.renown = 612
+	Game.deeds = {}
+	for did in Trials.DEEDS.keys().slice(0, 8):
+		Game.deeds[did] = true
+	Game.playtime = 57771.0
+	Game.finished = true
+	Game.kills = 3150
+	Game.battles = 1696
+	Game.deaths = 0
+	Game.meditated = 12460.0
+	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 3, "qi_sea": 3, "five_phase": 3, "fortune": 3, "yin_root": 3, "spirit_sense": 3, "insight": 3}
+
+## The ending: a frame from the middle of every shot of the film (ending_<shot>.png, and all of them
+## on one sheet, ending_film.png) and the results once the film is over (ending.png).
+func _ending_shots() -> void:
+	main.push("ending")
+	await _wait(1.0)
+	var e = main.ending
+	var frames: Array = []
+	var t0 := 0.0
+	for s in e.FILM:
+		e.t = t0 + float(s.dur) * 0.55
+		await _wait(0.5)
+		await _shot("ending_%s" % s.id)
+		frames.append(last_img.duplicate())
+		t0 += float(s.dur)
+	# the six wonders on one sheet (the last shot, on the lotus, is the results without them)
+	_grid("ending_film", frames.slice(0, 6), 2)
+	# Enter in the middle of the film skips to the results, as a player would
+	e.t = 4.0
+	main.press("confirm")
+	await _wait(3.5)
+	await _shot("ending")
+	main.pop()
+
+## Frames laid out on a grid at half size, `cols` to a row.
+func _grid(n: String, frames: Array, cols: int) -> void:
+	if frames.is_empty():
+		return
+	var fw: int = frames[0].get_width() / 2
+	var fh: int = frames[0].get_height() / 2
+	var rows := int(ceil(frames.size() / float(cols)))
+	var out := Image.create(fw * cols, fh * rows, false, Image.FORMAT_RGB8)
+	for i in frames.size():
+		var im: Image = frames[i]
+		im.convert(Image.FORMAT_RGB8)
+		im.resize(fw, fh, Image.INTERPOLATE_LANCZOS)
+		out.blit_rect(im, Rect2i(0, 0, fw, fh), Vector2i((i % cols) * fw, (i / cols) * fh))
+	out.save_png("%s/%s.png" % [dir, n])
+	print("[tour] ", n)
 
 func _run() -> void:
 	await _wait(1.0)
@@ -856,13 +1193,16 @@ func _run() -> void:
 		main.pop()
 	if main.args.has("part12"):
 		await _part12_shots()
+	if main.args.has("part13"):
+		await _part13_shots()
 	if main.args.has("gallery12"):
 		await _part12_galleries()
+	if main.args.has("props"):
+		await _props_shots()
 	if main.args.has("ending"):
-		# the results screen on its own (--ending): the finale set pieces of every part
-		main.push("ending")
-		await _wait(14.0)
-		await _shot("ending")
+		# the ending on its own (--ending): its film and the results
+		_ending_state()
+		await _ending_shots()
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return
@@ -903,7 +1243,6 @@ func _run() -> void:
 	await _wait(3.5)
 	await _shot("02_dialogue")
 	main.pop()
-	main.push("ending")
-	await _wait(1.5)
-	await _shot("ending")
+	_ending_state()
+	await _ending_shots()
 	get_tree().quit(0)
