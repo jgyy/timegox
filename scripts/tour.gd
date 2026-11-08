@@ -644,8 +644,9 @@ func _props_shots() -> void:
 		_grid("props_sheet_%d" % (sh / 6), frames.slice(sh, sh + 6), 2)
 
 ## Where to put the side camera on a thing (looking at `mid`, the thing along `dir` from the hero): off to
-## one side and a little back, over open ground (not inside the trees beside it, or a wall indoors) and
-## above the ground there. The first place with a clear view, else the clearest.
+## one side and a little back, over open ground (not inside the trees beside it) and above the ground
+## there; indoors, low in the room itself (over its floorboards, under the eaves). The first place with
+## a clear view, else the clearest.
 func _prop_eye(lw: Dictionary, mid: Vector3, dir: Vector3, furn: bool) -> Vector3:
 	var wo = main.world
 	var g: PackedByteArray = lw.grid
@@ -653,7 +654,7 @@ func _prop_eye(lw: Dictionary, mid: Vector3, dir: Vector3, furn: bool) -> Vector
 	var H: int = lw.h
 	var side := Vector3(dir.z, 0, -dir.x)
 	# [to the side, back, up]
-	var tries: Array = [[3.0, 1.6, 2.2], [1.8, 2.6, 2.4], [0.6, 3.0, 2.6]] if furn else \
+	var tries: Array = [[2.2, 1.0, 1.2], [1.4, 1.8, 1.3], [2.4, 0.2, 1.3], [0.5, 2.2, 1.4], [1.2, 0.9, 1.5]] if furn else \
 		[[4.2, 2.2, 1.4], [3.2, 3.2, 1.6], [1.8, 4.0, 1.9], [2.8, 1.2, 2.8], [1.0, 2.6, 3.4]]
 	var best := Vector3.ZERO
 	var best_n := -1
@@ -667,7 +668,7 @@ func _prop_eye(lw: Dictionary, mid: Vector3, dir: Vector3, furn: bool) -> Vector
 				var ty := floori((p.z - wo.off.z) / Terrain3D.T)
 				if tx >= 0 and ty >= 0 and tx < W and ty < H:
 					var tile: int = g[ty * W + tx]
-					if MapGen.is_walkable_tile(tile) or tile == MapGen.WATER:
+					if (tile == MapGen.INTERIOR) if furn else (MapGen.is_walkable_tile(tile) or tile == MapGen.WATER):
 						n += 1
 			if n > best_n:
 				best_n = n

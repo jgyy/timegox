@@ -957,6 +957,7 @@ static func ascend(parent: Node3D, pos: Vector3, col: Color = Color(1.0, 0.85, 0
 
 ## A few small things drifting up from a point and fading: notes off a qin, steam off a pot, incense
 ## smoke, embers off a fire, qi gathering about a sitter, a sleeper's z's. Quiet, nothing like `ascend`.
+## (Pale smoke and steam are soft glows added on: the mixed particle quads come out dark in the middle.)
 static func drift(parent: Node3D, pos: Vector3, col: Color, kind: String = "glow", amount: int = 4, size: float = 0.25,
 		rise: float = 0.5, life: float = 2.0, radius: float = 0.15, additive: bool = true) -> void:
 	if headless() or parent == null or not parent.is_inside_tree():

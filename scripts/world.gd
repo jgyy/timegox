@@ -1053,7 +1053,7 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 			Fx3D.splash(scene3d, c + Vector3(0, 0.55, 0), Color(0.6, 0.82, 1.0), 0.5, 0.3)
 		"smoke":
 			# incense, from the censer on the near side
-			Fx3D.drift(scene3d, c + Vector3(0, 0.75, 0) + to_hero * 0.4, Color(0.9, 0.88, 0.95, 0.45), "smoke", 3, 0.45, 0.4, 2.6, 0.05, false)
+			Fx3D.drift(scene3d, c + Vector3(0, 0.75, 0) + to_hero * 0.4, Color(0.92, 0.9, 0.95, 0.22), "glow", 4, 0.5, 0.35, 2.6, 0.06)
 		"ring":
 			Fx3D.shockwave(scene3d, c + Vector3(0, 1.8, 0), Color(1.0, 0.88, 0.55), 9.0, 1.4)
 			Fx3D.shockwave(scene3d, c + Vector3(0, 1.8, 0), Color(1.0, 0.95, 0.8), 5.0, 1.0)
@@ -1078,7 +1078,7 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 		"leaves":
 			Fx3D.leaf_spiral(scene3d, player.position - to_hero * 0.8, Color(0.85, 0.45, 0.2), 1.2)
 		"steam":
-			Fx3D.drift(scene3d, c + Vector3(0, 0.9, 0), Color(0.96, 0.96, 1.0, 0.4), "smoke", 3, 0.5, 0.5, 2.2, 0.15, false)
+			Fx3D.drift(scene3d, c + Vector3(0, 0.9, 0), Color(0.95, 0.95, 1.0, 0.2), "glow", 4, 0.8, 0.45, 2.2, 0.15)
 		"chime":
 			Fx3D.shockwave(scene3d, c + Vector3(0, 2.0, 0), Color(0.95, 0.9, 0.7), 2.5, 0.9)
 		"light":
