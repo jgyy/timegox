@@ -192,6 +192,11 @@ def seg_dist(p, a, b):
 def reset():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     random.seed(7)
+    # bake_action keys a pose every 1/FPS s on consecutive frames, so the scene must run at FPS:
+    # Blender's factory scene runs at 24 fps, which stretched every exported clip by a quarter (a
+    # 0.55 s attack lasted 0.69 s, the walk slowed down)
+    bpy.context.scene.render.fps = FPS
+    bpy.context.scene.render.fps_base = 1.0
 
 
 def out_path(rel):
@@ -611,17 +616,26 @@ class Builder:
         bpy.data.meshes.remove(me)
         return out
 
-    def eye(self, c, r, iris, side=1, look=(0.0, 0.0), bone=None, slit=False, glow=False, rot_y=0.0, h=1.25, mat=MAT_PLAIN):
+    def eye(self, c, r, iris, side=1, look=(0.0, 0.0), bone=None, slit=False, glow=False, rot_y=0.0, h=1.25, mat=MAT_PLAIN, accent=False):
         """Anime eye pressed onto a surface facing +Z: white, a dark limbal ring, an iris that is
-        darker under the lid and lighter at the bottom, pupil, two highlights and a lower glint."""
+        darker under the lid and lighter at the bottom, pupil, two highlights and a lower glint.
+        `accent` paints the iris in greys on the palette's accent slot (monsters: the enemy's
+        element colour looks out of it)."""
         c = V(c)
         ry = rot_y * side
         R = euler_g((0, ry, 0))
         self.ellipsoid(c, (r, r * h, r * 0.45), "f8f8ff", cls=SKIN, bone=bone, rot=(0, ry, 0), seg=16, rings=10, mat=mat, col2="d8dcf0")
         ic = c + R @ Vector((look[0] * r, look[1] * r, r * 0.3))
-        self.ellipsoid(ic - R @ Vector((0, 0, r * 0.02)), (r * 0.76, r * h * 0.82, r * 0.27), darken(iris, 0.6), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=16, rings=8, mat=mat)
-        self.ellipsoid(ic, (r * 0.7, r * 0.95 * h * 0.8, r * 0.28), lighten(iris, 0.18), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=16, rings=10, mat=MAT_GLOW if glow else mat, col2=darken(iris, 0.45))
-        self.ellipsoid(ic + R @ Vector((0, -r * 0.35, r * 0.05)), (r * 0.42, r * 0.22, r * 0.2), lighten(iris, 0.45), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=10, rings=6, mat=mat)
+        old_pal = self.cur_pal
+        tint = 0.0
+        if accent:
+            iris = "e8e8e8"
+            tint = 1.0
+            self.cur_pal = 1.0
+        self.ellipsoid(ic - R @ Vector((0, 0, r * 0.02)), (r * 0.76, r * h * 0.82, r * 0.27), darken(iris, 0.6), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=16, rings=8, mat=mat, tint=tint)
+        self.ellipsoid(ic, (r * 0.7, r * 0.95 * h * 0.8, r * 0.28), lighten(iris, 0.18), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=16, rings=10, mat=MAT_GLOW if glow else mat, col2=darken(iris, 0.45), tint=tint)
+        self.ellipsoid(ic + R @ Vector((0, -r * 0.35, r * 0.05)), (r * 0.42, r * 0.22, r * 0.2), lighten(iris, 0.45), cls=CRYSTAL, bone=bone, rot=(0, ry, 0), seg=10, rings=6, mat=mat, tint=tint)
+        self.cur_pal = old_pal
         pc = ic + R @ Vector((0, 0, r * 0.12))
         if slit:
             self.ellipsoid(pc, (r * 0.14, r * 0.7, r * 0.2), "100810", cls=SKIN, bone=bone, rot=(0, ry, 0), seg=10, rings=6, mat=mat)
@@ -642,6 +656,67 @@ class Builder:
         for v in self.bm.verts:
             if pred(b2g(v.co), v[self.cl]):
                 v[self.pl] = slot
+
+    def coat_slots(self, rise=(0.05, 0.2), fall=(0.07, 0.24), under_grey=0.94, mark_grey=0.9):
+        """Countershading and markings for the game's palette (see assets.gd).
+
+        Coats are painted in grey values: a pale belly, bib, throat and cheeks, dark stripes,
+        saddles, masks and tail tips, all on the one *dominant* slot, so in game they came out as
+        one hue in light and dark.  Here every tinted dominant vertex noticeably paler than the
+        coat's median grey blends into the *underside* slot (0..0.2) and every one noticeably
+        darker into the *markings* slot (0.6..0.8), weighted by how far it is from the median
+        (`rise`/`fall` are the ramps), with its grey lifted towards a neutral so the palette's own
+        colour shows (the AO baked afterwards still darkens the creases).  The median is taken by
+        surface area, so finely modelled small parts (legs, joints, teeth) cannot outvote the
+        broad coat, and the ramps widen so that neither role claims much more than 40% of it: the
+        dominant colour stays dominant.  Run before bake_ao."""
+        coat = []
+        for v in self.bm.verts:
+            if v[self.tl] > 0.05 and v[self.pl] < 0.02:
+                c = v[self.cl]
+                area = sum(f.calc_area() / len(f.verts) for f in v.link_faces)
+                coat.append((v, (0.3 * c[0] + 0.55 * c[1] + 0.15 * c[2]) ** (1.0 / 2.2), area))
+        if len(coat) < 8:
+            return 0, 0
+        by_l = sorted(coat, key=lambda e: e[1])
+        total = sum(e[2] for e in coat) or 1.0
+
+        def quantile(q):
+            acc = 0.0
+            for _, L, ar in by_l:
+                acc += ar
+                if acc >= q * total:
+                    return L
+            return by_l[-1][1]
+
+        med = quantile(0.5)
+        hi = quantile(0.6) - med
+        lo = med - quantile(0.4)
+        rise = (max(rise[0], hi), max(rise[1], hi + 0.12))
+        fall = (max(fall[0], lo), max(fall[1], lo + 0.14))
+
+        def ramp(a, b, x):
+            t = min(1.0, max(0.0, (x - a) / (b - a)))
+            return t * t * (3.0 - 2.0 * t)
+
+        ug = (under_grey ** 2.2,) * 3
+        mg = (mark_grey ** 2.2,) * 3
+        n_u = n_m = 0
+        for v, L, _ in coat:
+            wu = ramp(med + rise[0], med + rise[1], L)
+            wm = ramp(med - fall[0], med - fall[1], L)
+            c = v[self.cl]
+            if wu > 0.02:
+                v[self.pl] = 0.2 * wu
+                v[self.cl] = (c[0] + (ug[0] - c[0]) * wu, c[1] + (ug[1] - c[1]) * wu, c[2] + (ug[2] - c[2]) * wu, c[3])
+                v[self.tl] = v[self.tl] + (1.0 - v[self.tl]) * wu
+                n_u += 1
+            elif wm > 0.02:
+                v[self.pl] = 0.6 + 0.2 * wm
+                v[self.cl] = (c[0] + (mg[0] - c[0]) * wm, c[1] + (mg[1] - c[1]) * wm, c[2] + (mg[2] - c[2]) * wm, c[3])
+                v[self.tl] = v[self.tl] + (1.0 - v[self.tl]) * wm
+                n_m += 1
+        return n_u, n_m
 
     def recolor(self, verts, fn, cls=CLOTH):
         """Repaint vertices with fn(godot_pos, old_srgb_guess) -> sRGB colour (embroidery, stripes,
@@ -868,8 +943,13 @@ def export(path, objs, animations=True):
     )
     if animations:
         kw["export_animation_mode"] = "ACTIONS"
+        # clips are keyed from frame 1: start them at 0 s so a loop's last frame meets its first
+        kw["export_anim_slide_to_zero"] = True
     bpy.ops.export_scene.gltf(**kw)
     print("[art] wrote", os.path.relpath(path, ROOT))
+
+
+export.slides_to_zero = True  # creature.realtime() checks this and leaves the export alone
 
 
 def decimate(ob, target_tris):
@@ -913,8 +993,15 @@ def scale_asset(b, rig, f):
         rig.bones[nm] = (h * f, t * f, p)
 
 
-def finish_rigged(b, rig, rel, clips, ao=True, **ao_kw):
-    """Bake AO, bind the mesh to the rig, bake every clip and export."""
+def finish_rigged(b, rig, rel, clips, ao=True, coat=None, **ao_kw):
+    """Bake AO, bind the mesh to the rig, bake every clip and export.  Monsters first get their
+    painted coats split into the palette's underside and markings slots (`Builder.coat_slots`);
+    `coat` is False to skip that, or a dict of its keyword arguments."""
+    if coat is None:
+        coat = rel.startswith("monsters/")
+    if coat:
+        n_u, n_m = b.coat_slots(**(coat if isinstance(coat, dict) else {}))
+        print("[art] coat %s: %d underside, %d markings vertices" % (rel, n_u, n_m))
     if ao:
         b.bake_ao(**ao_kw)
     arm = rig.build()

@@ -10,9 +10,11 @@ Checks
 * materials are only the game's three slots: toon, plain, glow;
 * meshes carry vertex colours (COLOR_0, the surface class lives in alpha) and the tint UV (TEXCOORD_0);
 * triangle budgets: characters 5k-50k, monsters 3k-90k, props under 5k (they are instanced) except one-off set pieces;
-* characters have a skin with the bones the game drives (hips, chest, head, eyes, hands, feet)
-  and all seven clips (idle, walk, sit, attack, cast, hurt, victory);
-* monsters have a skin and at least idle, attack and hurt.
+* characters have a skin with the bones the game drives (hips, chest, head, eyes, mouth, hands,
+  fingers, thumbs, sleeve pockets, feet, toes, the hair and cape chains) and all eleven clips
+  (idle, walk, run, sit, talk, bow, attack, cast, hurt, victory, die);
+* monsters have a skin and at least the five clips the game plays: idle and walk (loops), attack,
+  hurt and die.
 
 Exits non-zero and lists every problem if anything fails.
 """
@@ -27,9 +29,10 @@ GROUPS = ("characters", "monsters", "props")
 BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "props": (200, 5000)}
 # one-off set pieces shown once (ending screen), not scattered across maps
 SET_PIECES = {"props/magpiebridge": (2000, 24000)}
-PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "hand.L", "hand.R", "foot.L", "foot.R")
-PERSON_CLIPS = ("idle", "walk", "sit", "attack", "cast", "hurt", "victory")
-MONSTER_CLIPS = ("idle", "attack", "hurt")
+PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "hand.R", "fingers.L", "fingers.R",
+                "thumb.L", "thumb.R", "sleeve.L", "sleeve.R", "foot.L", "foot.R", "toe.L", "toe.R", "hair_tail2", "cape3")
+PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die")
+MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
 MATERIALS = {"toon", "plain", "glow"}
 
 

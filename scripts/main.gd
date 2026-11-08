@@ -265,7 +265,7 @@ func start_breakthrough() -> void:
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story
-## brings Lin Feng home to the sect.
+## brings Lin Feng home to the sect; so do the breakthroughs that close Parts VI to VIII.
 func recall_to_sect(key: String = "recall") -> void:
 	world.load_area("sect", Vector2i(20, 9))
 	Game.note("The Lotus Seal recalls Lin Feng to the sect")
@@ -295,6 +295,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 						recall_to_sect("recall5")
 					elif sid == "s_break12":
 						recall_to_sect("recall6")
+					elif sid == "s_break13":
+						recall_to_sect("recall7")
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity

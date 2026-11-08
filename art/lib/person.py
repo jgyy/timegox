@@ -1,18 +1,19 @@
 """Articulated xianxia cultivator built with the kit: rig, sculpted head (face.py), hair (hair.py),
-layered hanfu (garment.py), weapons and seven baked animation clips.  The character scripts in
+layered hanfu (garment.py), weapons and eleven baked animation clips.  The character scripts in
 ``art/characters`` only pick colours and options.
 
 Rig (Godot space, the model faces +Z, +X is the character's left):
 
-    root - hips - spine - chest - neck - head - (eyes, hair_tail)
-                              \\- upper_arm.L/R - forearm.L/R - hand.L/R
-                              \\- cape - cape2
-         hips - thigh.L/R - shin.L/R - foot.L/R
+    root - hips - spine - chest - neck - head - (eyes, mouth, hair_tail - hair_tail2)
+                              \\- upper_arm.L/R - forearm.L/R - (hand.L/R - fingers, thumb), sleeve.L/R
+                              \\- cape - cape2 - cape3
+         hips - thigh.L/R - shin.L/R - foot.L/R - toe.L/R
          hips - robe_f, robe_b, robe_l, robe_r   (skirt panels that swing with the legs)
 
-Clips: idle (4 s loop), walk (2.1 s loop, three strides), sit (4 s loop, lotus meditation),
-attack, cast, hurt (0.55 s) and victory (1.2 s).  The clip names and lengths match
-``Models.anim_person`` in ``scripts/models.gd`` so procedural and Blender characters move alike.
+Clips: idle (4 s loop), walk (2.2 s loop, four steps), run (1.12 s loop, the qinggong dash the
+hero uses on the road), sit (4 s loop, lotus meditation), talk (3 s loop, gestures and speech),
+bow (1.6 s, the cupped-fist salute), attack, cast, hurt (0.55 s), victory (1.2 s) and die (1.4 s,
+held at the end).  ``Assets.animate`` in ``scripts/assets.gd`` plays them.
 
 Options (all optional): robe, trim, inner, sash, pants, boots, sleeve, metal, skin, hair,
 hair_style (topknot, long, bun, wild, bald), eyes, fem, age, build, jaw, cheek, brow, chin, lip,
@@ -31,6 +32,8 @@ import face as facelib
 import garment as G
 import hair as hairlib
 from kit import CLOTH, HAIR, METAL, SKIN, STONE, Builder, Rig, V, darken, env, finish_rigged, harmonise, lighten, mix, rgb
+from kit import hsv as kit_hsv
+from kit import to_hsv as kit_to_hsv
 from sculpt import blob3, clamp, fbm3, morph_sphere, smooth, strand
 
 SKIN_COL = "f5d6c2"
@@ -40,6 +43,11 @@ EYE_Y = facelib.HC.y + facelib.EYE_Y
 
 
 def make_rig():
+    """The skeleton (see the module docstring).  Beyond the core chain it carries the bones a game
+    rig adds for secondary motion and expression (references: mocaponline skeleton hierarchy
+    guide, gamedev.net "Demystifying character rigging"): a pocket bone per hanfu sleeve, finger and
+    thumb bones per hand, toe bones for the roll of the foot, a mouth bone for speech, a two-bone
+    hair tail and a three-bone cape."""
     r = Rig("rig")
     r.bone("root", (0, 0, 0), (0, 0.25, 0))
     r.bone("hips", (0, HIP_Y, 0), (0, 1.05, 0), "root")
@@ -48,25 +56,35 @@ def make_rig():
     r.bone("neck", (0, 1.47, 0.0), (0, 1.56, 0.01), "chest")
     r.bone("head", (0, 1.56, 0.01), (0, 1.88, 0.0), "neck")
     r.bone("eyes", (0, EYE_Y, 0.08), (0, EYE_Y + 0.05, 0.08), "head")
+    mouth_y = facelib.HC.y + facelib.MOUTH_Y
+    r.bone("mouth", (0, mouth_y + 0.001, 0.09), (0, mouth_y + 0.03, 0.09), "head")
     r.bone("hair_tail", (0, 1.78, -0.1), (0, 1.4, -0.18), "head")
+    r.bone("hair_tail2", (0, 1.4, -0.18), (0, 1.05, -0.2), "hair_tail")
     for s, sd in ((1, "L"), (-1, "R")):
         sh = V(SHO.x * s, SHO.y, SHO.z)
         el = V(ELB.x * s, ELB.y, ELB.z)
         wr = V(WRI.x * s, WRI.y, WRI.z)
         r.bone("upper_arm." + sd, sh, el, "chest")
         r.bone("forearm." + sd, el, wr, "upper_arm." + sd)
+        r.bone("sleeve." + sd, el.lerp(wr, 0.35) + V(0, 0, -0.04), wr + V(0, -0.12, -0.1), "forearm." + sd)
         r.bone("hand." + sd, wr, wr + V(0.01 * s, -0.1, 0.01), "forearm." + sd)
-        kn = V(KNEE.x * s, KNEE.y, KNEE.z)
+        kn = wr + V(0.003 * s, -0.087, 0.008)
+        r.bone("fingers." + sd, kn, kn + V(0.0, -0.07, 0.0), "hand." + sd)
+        tb = wr + V(-0.002 * s, -0.025, 0.024)
+        r.bone("thumb." + sd, tb, tb + V(-0.012 * s, -0.05, 0.02), "hand." + sd)
+        kn2 = V(KNEE.x * s, KNEE.y, KNEE.z)
         an = V(ANK.x * s, ANK.y, ANK.z)
-        r.bone("thigh." + sd, V(0.1 * s, HIP_Y, 0), kn, "hips")
-        r.bone("shin." + sd, kn, an, "thigh." + sd)
-        r.bone("foot." + sd, an, V(ANK.x * s, 0.03, 0.15), "shin." + sd)
+        r.bone("thigh." + sd, V(0.1 * s, HIP_Y, 0), kn2, "hips")
+        r.bone("shin." + sd, kn2, an, "thigh." + sd)
+        r.bone("foot." + sd, an, V(ANK.x * s, 0.03, 0.12), "shin." + sd)
+        r.bone("toe." + sd, V(ANK.x * s, 0.03, 0.12), V(ANK.x * s, 0.03, 0.2), "foot." + sd)
     r.bone("robe_f", (0, 0.98, 0.13), (0, 0.3, 0.2), "hips")
     r.bone("robe_b", (0, 0.98, -0.13), (0, 0.3, -0.22), "hips")
     r.bone("robe_l", (0.17, 0.98, 0), (0.27, 0.3, 0), "hips")
     r.bone("robe_r", (-0.17, 0.98, 0), (-0.27, 0.3, 0), "hips")
-    r.bone("cape", (0, 1.45, -0.14), (0, 1.0, -0.24), "chest")
-    r.bone("cape2", (0, 1.0, -0.24), (0, 0.45, -0.34), "cape")
+    r.bone("cape", (0, 1.45, -0.14), (0, 1.1, -0.22), "chest")
+    r.bone("cape2", (0, 1.1, -0.22), (0, 0.75, -0.3), "cape")
+    r.bone("cape3", (0, 0.75, -0.3), (0, 0.42, -0.36), "cape2")
     return r
 
 
@@ -96,6 +114,8 @@ def build(o):
         o["fem"] = o.get("hair_style") == "long" and not o.get("beard", False) and not o.get("stern", False)
 
     tor = G.Torso(o)
+    # costumes painted at full saturation read as neon under the cel shading: calm them a little
+    robe, sleeve_col, sash_col = soften(robe), soften(sleeve_col), soften(sash_col, 0.42, 0.88)
     # palette slots (used when the cloth is tinted, i.e. recolourable enemies): trousers, sash and
     # cape in the secondary colour, the collar and trims in the accent, the robe in the primary
     # ---------------- lower body, robe, sash
@@ -171,7 +191,7 @@ def build(o):
     # ---------------- cape, armour, weapons
     if o.get("cape") is not None:
         b.cur_pal = 0.5
-        G.cape(b, o, rgb(o["cape"]))
+        G.cape(b, o, soften(o["cape"]))
         b.cur_pal = 0.0
     if o.get("armor", False):
         G.armour(b, o, tor, metal)
@@ -213,11 +233,13 @@ def build(o):
         for v in b.bm.verts:
             if v[b.cl][3] > 0.94:
                 v[b.tl] = 1.0
-    hk = o.get("head_scale", 1.0)
+    # a slightly larger head than life (about 6.6 heads tall) reads better at game distance, the
+    # usual stylised proportion (references: anime proportion guides; Genshin model evolution)
+    hk = o.get("head_scale", 1.0 if o.get("beast_head") is not None else 1.08)
     if hk != 1.0:
         pivot = V(0, 1.58, 0.0)
-        b.scale_where(lambda w: w.get("head", 0.0) + w.get("eyes", 0.0) + w.get("hair_tail", 0.0) >= 0.5, pivot, hk)
-        for nm in ("eyes", "hair_tail"):
+        b.scale_where(lambda w: w.get("head", 0.0) + w.get("eyes", 0.0) + w.get("mouth", 0.0) + w.get("hair_tail", 0.0) >= 0.5, pivot, hk)
+        for nm in ("eyes", "mouth", "hair_tail"):
             h0, t0, par = rig.bones[nm]
             rig.bones[nm] = (pivot + (V(h0) - pivot) * hk, pivot + (V(t0) - pivot) * hk, par)
         h0, t0, par = rig.bones["head"]
@@ -230,6 +252,14 @@ def build(o):
             h, t, p = rig.bones[nm]
             rig.bones[nm] = (h * sc, t * sc, p)
     return b, rig
+
+
+def soften(c, s_knee=0.36, v_max=0.84):
+    """Ease a very saturated or very bright cloth colour back: plant dyes, not paint."""
+    h, sat, v = kit_to_hsv(c)
+    if sat > s_knee:
+        sat = s_knee + (sat - s_knee) * 0.55
+    return kit_hsv(h, sat, min(v, v_max)) if sat > 0.08 else rgb(c)
 
 
 # ---------------------------------------------------------------- animal heads
@@ -318,6 +348,19 @@ def beast_head(b, o):
 
 
 # ---------------------------------------------------------------- animation
+# Clips follow the usual key poses and principles (references: Richard Williams' contact method,
+# Animation Mentor walk and idle tutorials, UW CSE 459 walk cycle notes, AnimSchool "Breathing life
+# into idle animations"): a walk is built from contact, down, passing and up poses with the arms
+# counter-swinging a few frames behind the legs (drag); idles breathe, shift the weight from leg to
+# leg and let the eyes and head lead; actions have anticipation, a fast strike, follow-through and
+# recovery; cloth, sleeves and hair overlap a beat behind the body.
+#
+# Sign conventions (Godot Euler angles in the parent's frame): for a bone hanging down, x < 0
+# swings it forward (thigh, upper arm), x > 0 back; the shin's x > 0 bends the knee, the forearm's
+# x < 0 bends the elbow; foot x < 0 lifts the toes; spine/chest/head x > 0 lean or nod forward;
+# y turns towards the character's left; for the left arm z > 0 lifts it away from the body.
+
+
 def _blink(t, at):
     for a in at:
         if a <= t < a + 0.13:
@@ -326,88 +369,195 @@ def _blink(t, at):
     return 1.0
 
 
-def _secondary(p, t, walking, sit, legs_x, lag):
-    """Robe panels, cape and hair follow the legs and the stride, a beat behind."""
+def _set(p, nm, x=0.0, y=0.0, z=0.0, loc=(0.0, 0.0, 0.0), scl=None):
+    p[nm] = ((x, y, z), loc) if scl is None else ((x, y, z), loc, scl)
+
+
+def _add(p, nm, x=0.0, y=0.0, z=0.0):
+    val = p.get(nm, ((0, 0, 0), (0, 0, 0)))
+    rot, loc = val[0], val[1]
+    p[nm] = ((rot[0] + x, rot[1] + y, rot[2] + z), loc) + tuple(val[2:])
+
+
+def _hands(p, curl_l=0.35, curl_r=0.35, thumb=0.15):
+    """Finger curl (0 open hand .. 1.2 fist) for both hands."""
+    _set(p, "fingers.L", 0.0, 0.0, -curl_l)
+    _set(p, "fingers.R", 0.0, 0.0, curl_r)
+    _set(p, "thumb.L", -thumb * 0.5, 0.0, -thumb)
+    _set(p, "thumb.R", -thumb * 0.5, 0.0, thumb)
+
+
+def _secondary(p, t, walking, sit, legs_x, lag, sleeve=(0.0, 0.0)):
+    """Robe panels, cape, sleeves and hair follow the legs and the stride, a beat behind."""
     fwd = max(-legs_x[0], -legs_x[1]) if not sit else 1.2
     back = max(legs_x[0], legs_x[1])
     p["robe_f"] = ((-max(0.0, fwd) * 0.8 - (0.12 if walking else 0.0), 0, 0), (0, 0, 0))
     p["robe_b"] = ((max(0.0, back) * 0.6 + (0.28 if walking else 0.03), 0, 0), (0, 0, 0))
     p["robe_l"] = ((-abs(legs_x[0]) * 0.35 - (0.6 if sit else 0.0), 0, -0.05 if not sit else -0.5), (0, 0, 0))
     p["robe_r"] = ((-abs(legs_x[1]) * 0.35 - (0.6 if sit else 0.0), 0, 0.05 if not sit else 0.5), (0, 0, 0))
-    p["cape"] = ((0.1 + (0.42 + 0.12 * lag if walking else 0.04 * math.sin(t * 2 * math.pi / 4)), 0.03 * lag, 0), (0, 0, 0))
-    p["cape2"] = ((0.08 + (0.22 * abs(lag) if walking else 0.03 * math.sin(t * 2 * math.pi / 2)), 0, 0.04 * lag), (0, 0, 0))
+    calm = 0.025 * math.sin(t * 2 * math.pi / 4)
+    p["cape"] = (((0.3 + 0.1 * lag if walking else 0.02 + calm), 0.03 * lag, 0), (0, 0, 0))
+    p["cape2"] = (((0.14 * abs(lag) + 0.04 if walking else 0.02 * math.sin(t * 2 * math.pi / 2)), 0, 0.04 * lag), (0, 0, 0))
+    p["cape3"] = (((0.12 * abs(lag) + 0.03 if walking else 0.015 * math.sin(t * 2 * math.pi / 2 + 1.0)), 0, 0.05 * lag), (0, 0, 0))
     p["hair_tail"] = ((0.12 + (0.3 if walking else 0.05) * abs(lag), 0, lag * (0.22 if walking else 0.06)), (0, 0, 0))
+    p["hair_tail2"] = ((0.06 + (0.16 if walking else 0.03) * abs(lag), 0, lag * (0.16 if walking else 0.05)), (0, 0, 0))
+    p["sleeve.L"] = ((sleeve[0], 0, 0), (0, 0, 0))
+    p["sleeve.R"] = ((sleeve[1], 0, 0), (0, 0, 0))
+
+
+IDLE_T = 4.0
 
 
 def clip_idle(t):
-    """Standing at ease: weight resting on one leg (contrapposto) and slowly shifting, breathing in
-    the chest, relaxed arms, the head looking about."""
-    w = 2 * math.pi / 4.0
+    """Standing at ease: weight resting on one leg (contrapposto) and slowly shifting to the other,
+    breathing in the chest, relaxed arms and hands, the head looking about and blinking."""
+    w = 2 * math.pi / IDLE_T
     br = math.sin(t * w * 2)
-    shift = math.sin(t * w)               # weight shift from leg to leg over the loop
+    shift = math.sin(t * w)               # weight from leg to leg over the loop
+    turn = math.sin(t * w + 0.4)
     p = {}
     p["root"] = ((0, 0, 0), (0.012 * shift, 0, 0))
-    p["hips"] = ((0.02, math.sin(t * w) * 0.05, -0.035 * shift), (0, br * 0.006 - 0.006 * abs(shift), 0))
-    p["spine"] = ((br * 0.012, -0.02 * shift, 0.02 * shift), (0, 0, 0))
-    p["chest"] = ((-br * 0.018, -0.02 * shift, 0.018 * shift), (0, 0, 0))
-    p["neck"] = ((0.03, 0, 0), (0, 0, 0))
-    p["head"] = ((math.sin(t * w) * 0.04 - 0.02, math.sin(t * w + 0.6) * 0.18, -0.03 * shift + math.sin(t * w * 2) * 0.02), (0, 0, 0))
-    p["upper_arm.L"] = ((0.03 + math.sin(t * w * 2) * 0.035, 0, -0.07 - br * 0.02), (0, 0, 0))
-    p["upper_arm.R"] = ((0.03 - math.sin(t * w * 2) * 0.035, 0, 0.07 + br * 0.02), (0, 0, 0))
-    p["forearm.L"] = ((-0.22, 0.1, 0), (0, 0, 0))
-    p["forearm.R"] = ((-0.26, -0.1, 0), (0, 0, 0))
-    p["hand.L"] = ((0.06, 0.15, 0), (0, 0, 0))
-    p["hand.R"] = ((0.06, -0.15, 0), (0, 0, 0))
-    # the leg carrying less weight bends a little at the knee
-    p["thigh.L"] = ((-0.04 * max(0.0, -shift), 0, 0.03 * shift), (0, 0, 0))
-    p["thigh.R"] = ((-0.04 * max(0.0, shift), 0, 0.03 * shift), (0, 0, 0))
-    p["shin.L"] = ((0.03 + 0.09 * max(0.0, -shift), 0, 0), (0, 0, 0))
-    p["shin.R"] = ((0.03 + 0.09 * max(0.0, shift), 0, 0), (0, 0, 0))
+    p["hips"] = ((0.02, 0.05 * turn, -0.04 * shift), (0, br * 0.005 - 0.007 * abs(shift), 0))
+    p["spine"] = ((br * 0.014, -0.025 * turn, 0.024 * shift), (0, 0, 0))
+    p["chest"] = ((-br * 0.022, -0.02 * turn, 0.018 * shift), (0, 0.003 * br, 0))
+    p["neck"] = ((0.035, 0, 0), (0, 0, 0))
+    # the eyes lead and the head follows: a slow look to one side and back
+    p["head"] = ((-0.02 + 0.03 * math.sin(t * w * 2 + 1.0), 0.17 * math.sin(t * w + 0.6), -0.035 * shift), (0, 0, 0))
+    p["upper_arm.L"] = ((0.03 + br * 0.025, 0, 0.035 - br * 0.012), (0, 0, 0))
+    p["upper_arm.R"] = ((0.03 - br * 0.025, 0, -0.035 + br * 0.012), (0, 0, 0))
+    p["forearm.L"] = ((-0.2 - 0.03 * br, 0.12, 0), (0, 0, 0))
+    p["forearm.R"] = ((-0.24 + 0.03 * br, -0.12, 0), (0, 0, 0))
+    p["hand.L"] = ((0.05, 0.2, 0), (0, 0, 0))
+    p["hand.R"] = ((0.05, -0.2, 0), (0, 0, 0))
+    _hands(p, 0.38 + 0.04 * br, 0.4 - 0.04 * br)
+    # the leg carrying less weight bends a little at the knee; feet stay flat on the ground
+    for sd, k in (("L", max(0.0, -shift)), ("R", max(0.0, shift))):
+        th = -0.05 * k
+        sh = 0.03 + 0.11 * k
+        p["thigh." + sd] = ((th, 0, 0.035 * shift), (0, 0, 0))
+        p["shin." + sd] = ((sh, 0, 0), (0, 0, 0))
+        p["foot." + sd] = ((-(th + sh) * 0.9, 0, -0.03 * shift), (0, 0, 0))
     p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, _blink(t, (1.3, 3.4)), 1))
-    _secondary(p, t, False, False, (0.0, 0.0), math.sin(t * w * 2))
+    _secondary(p, t, False, False, (0.0, 0.0), math.sin(t * w * 2), (0.05 * br, -0.05 * br))
     return p
 
 
-WALK_T = 2.1
+WALK_T = 2.2           # two full cycles (four steps) of 0.55 s: an unhurried walk
+WALK_CYCLE = 1.1
 
 
 def clip_walk(t):
-    """Three strides: heel strike and toe-off, a double bob of the hips per stride, hips and
-    shoulders counter-rotating, arms swinging against the legs, a slight forward lean."""
-    ph = t * 2 * math.pi * 3 / WALK_T
-    sw = math.sin(ph)
-    cw = math.cos(ph)
+    """Contact, down, passing and up: heel strike with the toes lifted, the knee taking the weight,
+    the hips at their lowest just after contact and highest as the free leg passes, toe-off with
+    the toes bending; hips turn towards the forward leg and drop on the free side while the
+    shoulders counter-rotate; the arms swing against the legs, a few frames late, and the
+    sleeves, robe and hair follow later still."""
+    ph = t * 2 * math.pi / WALK_CYCLE
+    s = math.sin(ph)
+    c = math.cos(ph)
     p = {}
-    legs = (sw * 0.55, -sw * 0.55)
-    p["thigh.L"] = ((legs[0] - 0.05, 0, 0.02), (0, 0, 0))
-    p["thigh.R"] = ((legs[1] - 0.05, 0, -0.02), (0, 0, 0))
-    # the knee bends most as the leg swings through (after toe-off)
-    p["shin.L"] = ((0.12 + max(0.0, -cw) * 0.95 + 0.1 * max(0.0, sw), 0, 0), (0, 0, 0))
-    p["shin.R"] = ((0.12 + max(0.0, cw) * 0.95 + 0.1 * max(0.0, -sw), 0, 0), (0, 0, 0))
-    # heel strike (toe up) when the leg is forward, toe-off (heel up) when it trails
-    p["foot.L"] = ((-0.28 * max(0.0, -sw) + 0.3 * max(0.0, sw) * max(0.0, -cw), 0, 0), (0, 0, 0))
-    p["foot.R"] = ((-0.28 * max(0.0, sw) + 0.3 * max(0.0, -sw) * max(0.0, cw), 0, 0), (0, 0, 0))
-    p["upper_arm.L"] = ((sw * 0.42 + 0.05, 0, -0.1), (0, 0, 0))
-    p["upper_arm.R"] = ((-sw * 0.36 + 0.05, 0, 0.1), (0, 0, 0))
-    p["forearm.L"] = ((-0.3 - max(0.0, -sw) * 0.35, 0.1, 0), (0, 0, 0))
-    p["forearm.R"] = ((-0.3 - max(0.0, sw) * 0.35, -0.1, 0), (0, 0, 0))
-    p["hand.L"] = ((0.1, 0.15, 0), (0, 0, 0))
-    p["hand.R"] = ((0.1, -0.15, 0), (0, 0, 0))
-    bob = abs(math.sin(ph))
-    p["hips"] = ((0.06, sw * 0.13, -0.04 * cw), (0, 0.035 * bob - 0.012, 0))
-    p["spine"] = ((0.03, -sw * 0.06, 0.02 * cw), (0, 0, 0))
-    p["chest"] = ((0.02 - 0.015 * bob, -sw * 0.1, 0), (0, 0, 0))
-    p["neck"] = ((0.0, sw * 0.04, 0), (0, 0, 0))
-    p["head"] = ((-0.06 + 0.02 * bob, sw * 0.05, 0.015 * cw), (0, 0, 0))
+    legs = []
+    for sd, phase in (("L", ph), ("R", ph + math.pi)):
+        sl = math.sin(phase)
+        cl = math.cos(phase)
+        th = -0.5 * sl + 0.04                      # sl > 0: this leg forward
+        swing = max(0.0, cl)                         # moving forward through the air
+        absorb = math.exp(-((phase % (2 * math.pi)) - (math.pi * 0.5 + 0.35)) ** 2 / 0.08)
+        sh = 0.07 + 0.95 * swing ** 1.4 + 0.16 * absorb
+        heel = 0.24 * max(0.0, sl) ** 2 * (1.0 - swing * 0.5)
+        push = max(0.0, -sl) * max(0.0, cl) * 1.6
+        ft = -heel + 0.34 * push - (th + sh) * 0.15
+        p["thigh." + sd] = ((th, 0, 0.02 if sd == "L" else -0.02), (0, 0, 0))
+        p["shin." + sd] = ((sh, 0, 0), (0, 0, 0))
+        p["foot." + sd] = ((ft, 0, 0), (0, 0, 0))
+        p["toe." + sd] = ((-0.55 * push, 0, 0), (0, 0, 0))
+        legs.append(th)
+    bob = math.cos(2 * (ph - 0.3))                   # +1 passing/up, -1 down
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.05, -0.12 * s, -0.04 * c), (0, 0.022 * bob - 0.012, 0))
+    p["spine"] = ((0.035, 0.05 * s, 0.02 * c), (0, 0, 0))
+    p["chest"] = ((0.02 - 0.012 * bob, 0.13 * s, 0.01 * c), (0, 0, 0))
+    p["neck"] = ((0.02, 0.0, 0), (0, 0, 0))
+    p["head"] = ((-0.05 + 0.015 * bob, -0.06 * s, -0.012 * c), (0, 0, 0))
+    # arms against the legs, with drag
+    sd_ = math.sin(ph - 0.3)
+    p["upper_arm.L"] = ((0.36 * sd_ + 0.04, 0, 0.06), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.36 * sd_ + 0.04, 0, -0.06), (0, 0, 0))
+    p["forearm.L"] = ((-0.28 - 0.32 * max(0.0, -sd_), 0.1, 0), (0, 0, 0))
+    p["forearm.R"] = ((-0.28 - 0.32 * max(0.0, sd_), -0.1, 0), (0, 0, 0))
+    p["hand.L"] = ((0.08 + 0.1 * math.sin(ph - 0.9), 0.15, 0), (0, 0, 0))
+    p["hand.R"] = ((0.08 - 0.1 * math.sin(ph - 0.9), -0.15, 0), (0, 0, 0))
+    _hands(p, 0.42, 0.42)
     p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, _blink(t, (0.9,)), 1))
     lag = math.sin(ph - 0.8)
-    _secondary(p, t, True, False, legs, lag)
+    sw = math.sin(ph - 1.2)
+    _secondary(p, t, True, False, legs, lag, (0.12 + 0.22 * sw, 0.12 - 0.22 * sw))
     return p
 
 
+RUN_T = 1.12            # two cycles of 0.56 s: the light-body run of a cultivator
+
+
+def clip_run(t):
+    """A qinggong dash: the body leans into the run, long strides with a flight phase between the
+    steps, the heel folding up behind on the recovery, arms pumping with bent elbows against the
+    legs, and the cape, sleeves, robe and hair streaming back."""
+    ph = t * 2 * math.pi / (RUN_T / 2)
+    s = math.sin(ph)
+    c = math.cos(ph)
+    p = {}
+    legs = []
+    for sd, phase in (("L", ph), ("R", ph + math.pi)):
+        sl = math.sin(phase)
+        cl = math.cos(phase)
+        th = -0.82 * sl - 0.22
+        fold = max(0.0, math.cos(phase + 0.35)) ** 1.2
+        sh = 0.22 + 1.45 * fold
+        ft = 0.42 * max(0.0, -sl) - 0.22 * max(0.0, sl) * (1.0 - fold)
+        p["thigh." + sd] = ((th, 0, 0.03 if sd == "L" else -0.03), (0, 0, 0))
+        p["shin." + sd] = ((sh, 0, 0), (0, 0, 0))
+        p["foot." + sd] = ((ft, 0, 0), (0, 0, 0))
+        p["toe." + sd] = ((-0.4 * max(0.0, -sl) * max(0.0, cl), 0, 0), (0, 0, 0))
+        legs.append(th)
+    up = abs(s) ** 1.5                                # flight between the steps, low at mid-stance
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.22, -0.15 * s, -0.03 * c), (0, -0.05 + 0.065 * up, 0.03))
+    p["spine"] = ((0.08, 0.08 * s, 0.0), (0, 0, 0))
+    p["chest"] = ((0.06 - 0.03 * up, 0.24 * s, 0.0), (0, 0, 0))
+    p["neck"] = ((-0.06, -0.08 * s, 0), (0, 0, 0))
+    p["head"] = ((-0.16 + 0.03 * up, -0.08 * s, 0), (0, 0, 0))
+    sd_ = math.sin(ph - 0.25)
+    p["upper_arm.L"] = ((0.72 * sd_ + 0.1, 0, 0.1), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.72 * sd_ + 0.1, 0, -0.1), (0, 0, 0))
+    p["forearm.L"] = ((-1.25 - 0.3 * max(0.0, -sd_), 0.25, 0), (0, 0, 0))
+    p["forearm.R"] = ((-1.25 - 0.3 * max(0.0, sd_), -0.25, 0), (0, 0, 0))
+    p["hand.L"] = ((0.15, 0.2, 0), (0, 0, 0))
+    p["hand.R"] = ((0.15, -0.2, 0), (0, 0, 0))
+    _hands(p, 0.95, 0.95, 0.4)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1, 1))
+    lag = math.sin(ph - 0.9)
+    # everything loose streams back in the wind of the run
+    p["robe_f"] = ((-0.38 - 0.22 * max(0.0, -min(legs)), 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.55 + 0.1 * abs(lag), 0, 0), (0, 0, 0))
+    p["robe_l"] = ((-abs(legs[0]) * 0.4 + 0.2, 0, -0.08), (0, 0, 0))
+    p["robe_r"] = ((-abs(legs[1]) * 0.4 + 0.2, 0, 0.08), (0, 0, 0))
+    p["cape"] = ((1.05 + 0.12 * math.sin(2 * ph - 0.8), 0.04 * lag, 0), (0, 0, 0))
+    p["cape2"] = ((0.32 + 0.15 * math.sin(2 * ph - 1.6), 0, 0.06 * lag), (0, 0, 0))
+    p["cape3"] = ((0.2 + 0.12 * math.sin(2 * ph - 2.4), 0, 0.08 * lag), (0, 0, 0))
+    p["hair_tail"] = ((0.75 + 0.1 * math.sin(2 * ph - 0.8), 0, 0.1 * lag), (0, 0, 0))
+    p["hair_tail2"] = ((0.35 + 0.14 * math.sin(2 * ph - 1.7), 0, 0.12 * lag), (0, 0, 0))
+    p["sleeve.L"] = ((0.75 + 0.25 * math.sin(ph - 1.3), 0, 0), (0, 0, 0))
+    p["sleeve.R"] = ((0.75 - 0.25 * math.sin(ph - 1.3), 0, 0), (0, 0, 0))
+    return p
+
+
+SIT_T = 4.0
+
+
 def clip_sit(t):
-    """Lotus meditation: crossed legs, hands resting in the lap, slow deep breaths, eyes closed."""
-    w = 2 * math.pi / 4.0
+    """Lotus meditation: crossed legs, hands resting in the lap in a mudra, slow deep breaths, eyes
+    closed, the sleeves pooling on the knees."""
+    w = 2 * math.pi / SIT_T
     br = math.sin(t * w)
     p = {}
     for i, sd in enumerate(("L", "R")):
@@ -418,12 +568,60 @@ def clip_sit(t):
         p["upper_arm." + sd] = ((-0.5 - br * 0.02, 0, 0.25 * s), (0, 0, 0))
         p["forearm." + sd] = ((-0.95, 0, -0.35 * s), (0, 0, 0))
         p["hand." + sd] = ((0.25, 0, 0.2 * s), (0, 0, 0))
+    _hands(p, 0.25, 0.25, 0.35)
     p["hips"] = ((0, 0, 0), (0, br * 0.006, 0))
     p["spine"] = ((-0.03, 0, 0), (0, 0, 0))
     p["chest"] = ((-br * 0.025, 0, 0), (0, br * 0.004, 0))
     p["head"] = ((0.14 + br * 0.02, 0, 0), (0, 0, 0))
     p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.12, 1))
-    _secondary(p, t, False, True, (-1.45, -1.45), br)
+    _secondary(p, t, False, True, (-1.45, -1.45), br, (-0.5, -0.5))
+    return p
+
+
+TALK_T = 3.0
+
+
+def clip_talk(t):
+    """Talking: the weight on one leg, the right hand opening and turning with the phrases, the head
+    nodding on the stresses and the mouth opening and closing on the syllables."""
+    w = 2 * math.pi / TALK_T
+    p = clip_idle(t * IDLE_T / TALK_T)
+    gest = 0.5 + 0.5 * math.sin(t * w * 2 - 0.5)
+    _add(p, "upper_arm.R", -0.32 - 0.22 * gest, 0.0, 0.12)
+    p["forearm.R"] = ((-1.0 - 0.35 * gest, -0.25 + 0.3 * math.sin(t * w * 2), 0), (0, 0, 0))
+    p["hand.R"] = ((-0.15 * gest, 0.35 * math.sin(t * w * 2 + 1.0), 0.15), (0, 0, 0))
+    p["fingers.R"] = ((0, 0, 0.12 + 0.25 * (1.0 - gest)), (0, 0, 0))
+    _add(p, "upper_arm.L", -0.06, 0.0, 0.0)
+    _add(p, "head", 0.035 * math.sin(t * w * 4), 0.06 * math.sin(t * w), 0.0)
+    _add(p, "chest", 0.0, -0.05 * gest, 0.0)
+    syl = max(0.0, math.sin(t * w * 10.0)) * (0.55 + 0.45 * math.sin(t * w * 2.0))
+    pause = smooth(0.0, 0.15, (t % TALK_T) / TALK_T) * (1.0 - smooth(0.82, 0.95, (t % TALK_T) / TALK_T))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 2.6 * syl * pause, 1))
+    _add(p, "sleeve.R", 0.25 * gest, 0.0, 0.0)
+    return p
+
+
+BOW_T = 1.6
+
+
+def clip_bow(t):
+    """The cultivator's salute (baoquan li): the right fist pressed into the left palm before the
+    chest, a bow from the hips, held, then back up."""
+    k = t / BOW_T
+    raise_ = smooth(0.0, 0.25, k) * (1.0 - smooth(0.82, 1.0, k))
+    bow = smooth(0.22, 0.45, k) * (1.0 - smooth(0.62, 0.88, k))
+    p = clip_idle(0.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.62 * raise_, 0.15 * s * raise_, -0.42 * s * raise_), (0, 0, 0))
+        p["forearm." + sd] = ((-1.55 * raise_ - 0.2, -0.35 * s * raise_, 0), (0, 0, 0))
+        p["hand." + sd] = ((0.2 * raise_, 0.0, 0.25 * s * raise_), (0, 0, 0))
+    _hands(p, 0.05 + 0.3 * (1 - raise_), 0.4 + 0.8 * raise_)
+    p["hips"] = ((0.12 * bow, 0, 0), (0, -0.01 * bow, -0.02 * bow))
+    p["spine"] = ((0.16 * bow, 0, 0), (0, 0, 0))
+    p["chest"] = ((0.14 * bow, 0, 0), (0, 0, 0))
+    p["head"] = ((0.16 * bow, 0, 0), (0, 0, 0))
+    p["sleeve.L"] = ((0.3 * raise_, 0, 0), (0, 0, 0))
+    p["sleeve.R"] = ((0.3 * raise_, 0, 0), (0, 0, 0))
     return p
 
 
@@ -435,48 +633,68 @@ def _base_for_act():
 
 
 def clip_attack(t):
-    """Wind-up with the sword behind the head, step in on the left foot, a fast diagonal cut,
-    follow-through and recovery."""
+    """Anticipation: the weight goes back and the sword is drawn up behind the head; the strike: a
+    step in on the left foot with a fast diagonal cut and a twist of the hips; follow-through with
+    the blade past the body; recovery."""
     k = t / ACT_T
     e = env(k)
-    wind = smooth(0.0, 0.3, k) * (1.0 - smooth(0.3, 0.45, k))
-    cut = smooth(0.3, 0.62, k)
+    wind = smooth(0.0, 0.28, k) * (1.0 - smooth(0.28, 0.42, k))
+    cut = smooth(0.3, 0.58, k)
     rec = smooth(0.7, 1.0, k)
+    step = smooth(0.25, 0.45, k) * (1.0 - rec)
     p = _base_for_act()
-    p["upper_arm.R"] = ((-2.4 * wind + (-2.4 + 3.1 * cut) * (1 - wind) * (1 - rec) * smooth(0.25, 0.32, k), 0, -(0.45 - 0.9 * cut) * (1 - rec)), (0, 0, 0))
-    p["forearm.R"] = ((-0.9 * wind - 0.15 * cut * (1 - rec), 0, 0), (0, 0, 0))
-    p["hand.R"] = ((0.3 * cut * (1 - rec), 0, 0), (0, 0, 0))
-    p["upper_arm.L"] = ((-0.5 * e, 0, -0.55 * e), (0, 0, 0))
-    p["forearm.L"] = ((-0.6 * e, 0, 0), (0, 0, 0))
-    turn = (0.45 * wind - 0.6 * cut) * (1 - rec)
-    p["hips"] = ((0.1 * e, turn * 0.5, 0), (0, -0.03 * e, 0.09 * e))
-    p["spine"] = ((0.06 * e, turn * 0.3, 0), (0, 0, 0))
-    p["chest"] = ((0.12 * e, turn * 0.5, 0), (0, 0, 0))
-    p["head"] = ((0.05 * e, -turn * 0.4, 0), (0, 0, 0))
-    p["thigh.L"] = ((-0.6 * e, 0, 0.05), (0, 0, 0))
-    p["shin.L"] = ((0.5 * e, 0, 0), (0, 0, 0))
-    p["thigh.R"] = ((0.4 * e, 0, -0.05), (0, 0, 0))
-    p["shin.R"] = ((0.25 * e, 0, 0), (0, 0, 0))
-    p["foot.R"] = ((0.3 * e, 0, 0), (0, 0, 0))
-    _secondary(p, t, False, False, (-0.6 * e, 0.4 * e), e)
+    arm_x = -2.5 * wind + (-2.5 + 3.2 * cut) * (1 - wind) * (1 - rec) * smooth(0.22, 0.3, k)
+    p["upper_arm.R"] = ((arm_x, 0, -(0.5 - 0.95 * cut) * (1 - rec)), (0, 0, 0))
+    p["forearm.R"] = ((-0.95 * wind - 0.2 * cut * (1 - rec), 0, 0), (0, 0, 0))
+    p["hand.R"] = ((0.35 * cut * (1 - rec), 0, 0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.55 * e, 0, 0.6 * e), (0, 0, 0))
+    p["forearm.L"] = ((-0.7 * e, 0, 0), (0, 0, 0))
+    _hands(p, 0.1 + 0.2 * (1 - e), 1.15)
+    turn = (0.5 * wind - 0.65 * cut) * (1 - rec)
+    p["hips"] = ((0.12 * e, turn * 0.5, 0), (0, -0.04 * step, 0.12 * step - 0.04 * wind))
+    p["spine"] = ((0.06 * e - 0.05 * wind, turn * 0.3, 0), (0, 0, 0))
+    p["chest"] = ((0.14 * e - 0.08 * wind, turn * 0.5, 0), (0, 0, 0))
+    p["head"] = ((0.05 * e, -turn * 0.45, 0), (0, 0, 0))
+    p["thigh.L"] = ((-0.65 * step, 0, 0.05), (0, 0, 0))
+    p["shin.L"] = ((0.55 * step, 0, 0), (0, 0, 0))
+    p["foot.L"] = ((0.1 * step, 0, 0), (0, 0, 0))
+    p["thigh.R"] = ((0.42 * step, 0, -0.05), (0, 0, 0))
+    p["shin.R"] = ((0.3 * step, 0, 0), (0, 0, 0))
+    p["foot.R"] = ((0.35 * step, 0, 0), (0, 0, 0))
+    p["toe.R"] = ((-0.4 * step, 0, 0), (0, 0, 0))
+    # the sleeve pocket falls back towards the ground while the arm is up, instead of pointing at the sky
+    up = smooth(-0.6, -2.2, arm_x)
+    _secondary(p, t, False, False, (-0.65 * step, 0.42 * step), e, (0.3 * e, 0.5 * cut * (1 - rec) + 1.25 * up))
     return p
 
 
 def clip_cast(t):
-    """Both hands raised forward forming a seal, sleeves and cape lifting with the qi."""
-    e = env(t / ACT_T)
+    """A hand seal: the right hand comes up before the face with two fingers raised (the sword
+    finger), the left hand flat beneath it, then both thrust forward as the qi leaves them; the
+    sleeves, cape and hair lift on the surge."""
+    k = t / ACT_T
+    e = env(k)
+    seal = smooth(0.0, 0.35, k) * (1.0 - smooth(0.5, 0.75, k))
+    thrust = smooth(0.4, 0.62, k) * (1.0 - smooth(0.8, 1.0, k))
     p = _base_for_act()
-    for sd, s in (("L", 1), ("R", -1)):
-        p["upper_arm." + sd] = ((-1.45 * e, 0.2 * s * e, -(0.12 + 0.45 * e) * s), (0, 0, 0))
-        p["forearm." + sd] = ((-0.7 * e, -0.3 * s * e, 0), (0, 0, 0))
-        p["hand." + sd] = ((-0.5 * e, 0, 0.2 * s * e), (0, 0, 0))
-    p["head"] = ((-0.22 * e, 0, 0), (0, 0, 0))
-    p["chest"] = ((-0.12 * e, 0, 0), (0, 0, 0))
-    p["hips"] = ((0, 0, 0), (0, 0.04 * e, 0))
+    p["upper_arm.R"] = ((-0.75 * seal - 1.45 * thrust, 0.2 * seal, -(0.35 * seal + 0.2 * thrust)), (0, 0, 0))
+    p["forearm.R"] = ((-1.75 * seal - 0.25 * thrust, -0.4 * seal, 0), (0, 0, 0))
+    p["hand.R"] = ((-0.4 * thrust, 0, 0.2 * seal), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.55 * seal - 1.35 * thrust, -0.1 * seal, 0.35 * seal + 0.25 * thrust), (0, 0, 0))
+    p["forearm.L"] = ((-1.3 * seal - 0.35 * thrust, 0.3 * seal, 0), (0, 0, 0))
+    p["hand.L"] = ((-0.3 * thrust, 0, -0.2 * seal), (0, 0, 0))
+    _hands(p, 0.05, 0.35 + 0.4 * seal, 0.5 * seal)
+    p["head"] = ((-0.08 * seal - 0.18 * thrust, 0, 0), (0, 0, 0))
+    p["chest"] = ((-0.08 * e, 0, 0), (0, 0, 0))
+    p["hips"] = ((0, 0, 0), (0, 0.04 * e, 0.03 * thrust))
     p["cape"] = ((0.45 * e, 0, 0), (0, 0, 0))
     p["cape2"] = ((0.25 * e, 0, 0), (0, 0, 0))
+    p["cape3"] = ((0.2 * e, 0, 0), (0, 0, 0))
     p["hair_tail"] = ((0.4 * e, 0, 0), (0, 0, 0))
-    p["robe_b"] = ((0.2 * e, 0, 0), (0, 0, 0))
+    p["hair_tail2"] = ((0.25 * e, 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.22 * e, 0, 0), (0, 0, 0))
+    p["sleeve.L"] = ((0.55 * thrust + 0.2 * seal, 0, 0), (0, 0, 0))
+    p["sleeve.R"] = ((0.55 * thrust + 0.2 * seal, 0, 0), (0, 0, 0))
     return p
 
 
@@ -491,18 +709,20 @@ def clip_hurt(t):
     p["neck"] = ((-0.1 * snap, 0, 0), (0, 0, 0))
     p["head"] = ((-0.28 * e, 0.2 * e, 0.05 * snap), (0, 0, 0))
     for sd, s in (("L", 1), ("R", -1)):
-        p["upper_arm." + sd] = ((0.45 * e, 0, -0.25 * s * e), (0, 0, 0))
+        p["upper_arm." + sd] = ((0.45 * e, 0, 0.25 * s * e), (0, 0, 0))
         p["forearm." + sd] = ((-0.5 * e, 0, 0), (0, 0, 0))
+    _hands(p, 0.05, 0.9)
     p["hips"] = ((-0.05 * e, 0, 0), (0, -0.02 * e, -0.09 * e))
     p["thigh.R"] = ((0.3 * e, 0, 0), (0, 0, 0))
     p["shin.R"] = ((0.3 * e, 0, 0), (0, 0, 0))
     p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.85 * e, 1))
-    _secondary(p, t, False, False, (0.0, 0.3 * e), -e)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 2.0 * snap, 1))
+    _secondary(p, t, False, False, (0.0, 0.3 * e), -e, (-0.4 * snap, -0.4 * snap))
     return p
 
 
 def clip_victory(t):
-    """Sword raised to the sky, the free hand on the hip, chest out, a settling bounce."""
+    """The sword swept up to the sky, the free hand on the hip, chest out, a settling bounce."""
     k = min(1.0, t / 0.35)
     e = math.sin(k * math.pi / 2)
     settle = 0.04 * math.sin(clamp((t - 0.35) / 0.6) * math.pi) if t > 0.35 else 0.0
@@ -510,22 +730,59 @@ def clip_victory(t):
     p["upper_arm.R"] = ((-2.8 * e, 0, -0.18), (0, 0, 0))
     p["forearm.R"] = ((-0.2, 0, 0), (0, 0, 0))
     p["hand.R"] = ((-0.2 * e, 0, 0), (0, 0, 0))
-    p["upper_arm.L"] = ((0.12, 0, -0.45 * e), (0, 0, 0))
+    p["upper_arm.L"] = ((0.12, 0, 0.45 * e), (0, 0, 0))
     p["forearm.L"] = ((-1.3 * e, 0.4 * e, 0), (0, 0, 0))
+    _hands(p, 0.7, 1.15)
     p["head"] = ((-0.16 * e, 0, 0), (0, 0, 0))
     p["chest"] = ((-0.08 * e - settle, 0, 0), (0, 0, 0))
     p["hips"] = ((0, 0, 0), (0, settle * 0.3, 0))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 1.2 * e, 1))
+    p["sleeve.R"] = ((1.2 * e, 0, 0), (0, 0, 0))
+    p["sleeve.L"] = ((0.2 * e, 0, 0), (0, 0, 0))
+    return p
+
+
+DIE_T = 1.4
+
+
+def clip_die(t):
+    """Collapse: a stagger back, the knees buckle, the body folds and falls onto its side, and lies
+    still (the clip holds its last frame)."""
+    k = t / DIE_T
+    stag = math.sin(math.pi * clamp(k / 0.3)) if k < 0.3 else 0.0
+    buckle = smooth(0.12, 0.5, k)
+    fall = smooth(0.32, 0.86, k)
+    land = smooth(0.8, 1.0, k)
+    p = _base_for_act()
+    p["root"] = ((0, 0, 1.42 * fall), (0, 0.11 * fall, -0.06 * stag))
+    p["hips"] = ((0.35 * buckle - 0.15 * stag, 0, 0), (0, -0.22 * buckle * (1 - fall), 0))
+    p["spine"] = ((0.18 * buckle - 0.1 * stag, 0, 0.1 * fall), (0, 0, 0))
+    p["chest"] = ((0.15 * buckle - 0.15 * stag, 0.1 * fall, 0), (0, 0, 0))
+    p["head"] = ((0.25 * buckle - 0.2 * stag, 0.3 * fall, 0.25 * land), (0, 0, 0))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-0.75 * buckle, 0, 0.1 * s * buckle), (0, 0, 0))
+        p["shin." + sd] = ((1.3 * buckle, 0, 0), (0, 0, 0))
+        p["foot." + sd] = ((0.4 * buckle, 0, 0), (0, 0, 0))
+        p["upper_arm." + sd] = ((0.4 * stag - 0.5 * fall, 0, (0.35 * stag + 0.6 * fall) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.3 - 0.4 * fall, 0, 0), (0, 0, 0))
+    _hands(p, 0.5, 0.5)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.9 * fall, 1))
+    _secondary(p, t, False, False, (-0.75 * buckle, -0.75 * buckle), -stag, (0.3 * fall, 0.3 * fall))
     return p
 
 
 CLIPS = {
-    "idle": (4.0, clip_idle),
+    "idle": (IDLE_T, clip_idle),
     "walk": (WALK_T, clip_walk),
-    "sit": (4.0, clip_sit),
+    "run": (RUN_T, clip_run),
+    "sit": (SIT_T, clip_sit),
+    "talk": (TALK_T, clip_talk),
+    "bow": (BOW_T, clip_bow),
     "attack": (ACT_T, clip_attack),
     "cast": (ACT_T, clip_cast),
     "hurt": (ACT_T, clip_hurt),
     "victory": (1.2, clip_victory),
+    "die": (DIE_T, clip_die),
 }
 
 
@@ -579,7 +836,8 @@ def export_person(rel, opts, clips=None):
     if opts.get("pose") in POSES:
         pose = POSES[opts["pose"]]
         # actions free the arms: the pose holds in idle, walk and sit
-        clips = {nm: (secs, _with_pose(fn, pose) if nm in ("idle", "walk", "sit") else fn) for nm, (secs, fn) in clips.items()}
+        clips = {nm: (secs, _with_pose(fn, pose) if nm in ("idle", "walk", "sit", "talk") else fn) for nm, (secs, fn) in clips.items()}
     print("[art] %s: %d triangles" % (rel, b.tri_count()))
-    return finish_rigged(b, rig, rel, clips, samples=16, dist=0.22, strength=0.5, floor_y=0.0, floor_k=0.2)
+    # robes are not coats: person-shaped monsters keep their dominant/secondary/accent cut
+    return finish_rigged(b, rig, rel, clips, coat=False, samples=16, dist=0.22, strength=0.5, floor_y=0.0, floor_k=0.2)
 

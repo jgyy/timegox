@@ -11,12 +11,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 import kit  # noqa: E402
+import creature  # noqa: E402
 import garment as G  # noqa: E402
 import person  # noqa: E402
+from creature import person_die  # noqa: E402
 from kit import SKIN, V  # noqa: E402
 from sculpt import catmull  # noqa: E402
 
 kit.reset()
+creature.realtime()
 
 
 def leopard(b, rig, o, tor):
@@ -43,4 +46,4 @@ person.export_person("monsters/queen.glb", {
     "robe": "d8d8d8", "trim": "f0e0a0", "inner": "f4f0e8", "sash": "a0a0a0", "pants": "8a8a8a", "boots": "3a3a3a", "sleeve": "c8c8c8",
     "hair": "a8a4b0", "hair_style": "long", "hair_len": 0.7, "eyes": "f0b020", "cape": "c0c0c0", "staff": True, "staff_gem": "ff90b0",
     "embroidery": "f0d070", "collar2": "b0b0b0", "tint_cloth": True, "scale": 1.3, "flare": 1.2,
-})
+}, clips=dict(person.CLIPS, die=(1.2, person_die(person.clip_idle))))

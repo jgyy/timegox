@@ -20,7 +20,9 @@ from face import HC, RY, EYE_Y
 from kit import CLOTH, CRYSTAL, HAIR, METAL, V, darken, hsv, lighten, mix, rgb, to_hsv
 from sculpt import bump, clamp, fbm3, morph_sphere, smooth, strand
 
-LIFT = 0.115  # how far the hair stands off the skull at the crown (fraction of the radius)
+LIFT = 0.13   # how far the hair stands off the skull at the crown (fraction of the radius)
+CLUMP = 1.32  # stylised hair is a few big clumps, not many thin strands (references: CG Cookie
+              # "big, medium and small forms"; BlenderNation "flat-modeling anime hair")
 
 
 def dvec(x, y, z):
@@ -47,7 +49,7 @@ class Scalp:
         self.style = style
         self.o = o
         # gathered styles sit closer to the head (combed back tight)
-        self.lift = {"topknot": 0.075, "bun": 0.06, "long": 0.1, "wild": 0.14}.get(style, LIFT)
+        self.lift = {"topknot": 0.095, "bun": 0.075, "long": 0.125, "wild": 0.16}.get(style, LIFT)
 
     # ---- the hairline: how far down the hair reaches in each horizontal direction
     def line(self, d):
@@ -115,16 +117,20 @@ def lock(b, s, d0, d1, width, col=None, steps=6, drop=0.0, flare=0.0, curl=0.0, 
     if bones is not None:
         bl = [bones(p) for p in pts]
     up = (pts[0] - HC).normalized()
-    return strand(b, pts, width, width * 0.12, col, col_tip=lighten(col, 0.12), cls=HAIR, bone=None if bl else bone, bones=bl, flat=flat, seg=5, per=2, up=up, power=1.6)
+    return strand(b, pts, width * CLUMP, width * 0.1, col, col_tip=lighten(col, 0.12), cls=HAIR, bone=None if bl else bone, bones=bl, flat=flat, seg=6, per=2, up=up, power=1.5)
 
 
 def back_weight(y_top=1.62, y_bot=1.36):
-    """Head near the skull, the hair_tail bone lower down so long hair swings."""
+    """Head near the skull, the hair_tail bone lower down and hair_tail2 below the shoulders, so long
+    hair swings and its ends follow a beat later."""
 
     def fn(p):
         k = clamp((y_top - p.y) / (y_top - y_bot))
         if k <= 0.0:
             return {"head": 1.0}
+        k2 = clamp((y_bot - 0.02 - p.y) / 0.22)
+        if k2 > 0.0:
+            return {"hair_tail": 1.0 - k2, "hair_tail2": k2}
         return {"head": 1.0 - k, "hair_tail": k}
 
     return fn
@@ -150,11 +156,11 @@ def bangs(b, s, n=9, length=1.0, part=0.0, swept=0.0, spread=1.0):
         p1 = s.pt(mid_d, 0.012 + 0.006 * math.cos(u * 3))
         pts = [p0, p0.lerp(p1, 0.55) + Vector((0, 0.008, 0.012)), p1, tip.lerp(p1, 0.35) + Vector((0, 0, 0.006)), tip]
         col = (s.hc, s.dk, s.lt)[i % 3] if i % 4 else s.hc
-        w = (0.017 + 0.005 * math.cos(i * 1.7)) * (1.15 if abs(u) < 0.2 else 1.0)
-        strand(b, pts, w, 0.0015, col, col_tip=lighten(col, 0.12), cls=HAIR, bone="head", flat=0.3, seg=6, per=3, up=(0, 0.3, 1), power=1.4)
+        w = (0.017 + 0.005 * math.cos(i * 1.7)) * (1.15 if abs(u) < 0.2 else 1.0) * CLUMP
+        strand(b, pts, w, 0.0012, col, col_tip=lighten(col, 0.12), cls=HAIR, bone="head", flat=0.32, seg=6, per=3, up=(0, 0.3, 1), power=1.3)
 
 
-def side_locks(b, s, length=0.2, n=2, fwd=0.0, width=0.016):
+def side_locks(b, s, length=0.2, n=2, fwd=0.0, width=0.021):
     """Locks framing the face from the temples, in front of the ears."""
     for sd in (1, -1):
         for k in range(n):
@@ -186,6 +192,58 @@ def crown_whorl(b, s, n=16, toward=None, length=1.0, rows=2, skip_front=0.0):
             lock(b, s, d0, d1, (0.026 - 0.004 * r) * length, col, steps=6, extra=0.004 + 0.004 * r)
 
 
+def curtain(b, s, length, span=1.75, n=25, rows=10, flare=0.045, clumps=8, y0=0.18, bone_fn=None, col_tip=None):
+    """The mass of long hair falling down the back: one continuous sheet from round the back of the
+    head, falling under gravity over the nape and shoulders, its ends cut into pointed clumps.  Big
+    forms first, then the separate locks laid on top for detail (references: CG Cookie hair
+    modelling, "big, medium and small forms"; 80.lv "hairstyle modelling for an anime-like
+    character").  It replaces the old look of long hair as a row of separate dreadlocks."""
+    bw = bone_fn or back_weight()
+    tip_c = col_tip or s.lt
+    grid = []
+    lens = []
+    for i in range(n):
+        u = i / (n - 1)
+        # pointed clumps along the bottom edge, the middle of the back longest
+        k = (u * clumps) % 1.0
+        tooth = 1.0 - abs(k - 0.5) * 2.0
+        lens.append(length * (0.8 + 0.2 * tooth ** 1.5) * (1.0 - 0.28 * abs(u - 0.5) ** 1.6 * 4.0 * 0.5))
+    for j in range(rows):
+        t = j / (rows - 1)
+        row = []
+        for i in range(n):
+            u = i / (n - 1)
+            az = math.pi + (u - 0.5) * 2.0 * span
+            d = dvec(math.sin(az), y0, math.cos(az))
+            top = s.pt(d, 0.004)
+            out = V(math.sin(az), 0.0, math.cos(az))
+            p = top + V(0.0, -lens[i] * t, 0.0) + out * (flare * math.sin(min(1.0, t * 1.4) * math.pi * 0.5) + 0.02 * t)
+            # rest on the back and shoulders instead of passing through them
+            if p.y < 1.56:
+                back_z = -0.135 - 0.01 * smooth(1.5, 1.2, p.y)
+                if p.z > back_z and math.cos(az) < 0.0:
+                    p = V(p.x, p.y, back_z + (p.z - back_z) * 0.15)
+                sx = 0.11 + 0.06 * smooth(1.56, 1.45, p.y)
+                if abs(p.x) < sx and abs(math.sin(az)) > 0.6:
+                    p = V(math.copysign(sx, p.x), p.y, p.z)
+            row.append(p)
+        grid.append(row)
+    cols = []
+    for j in range(rows):
+        t = j / (rows - 1)
+        rc = []
+        for i in range(n):
+            base = mix(s.dk, s.hc, smooth(0.0, 0.25, t))
+            base = mix(base, tip_c, smooth(0.55, 1.0, t) * 0.55)
+            # each clump a little lighter down its middle, darker at its parting
+            k = (i / (n - 1) * 8) % 1.0
+            base = lighten(base, 0.06 * (1.0 - abs(k - 0.5) * 2.0)) if (i // 3) % 2 else darken(base, 0.05)
+            rc.append(base)
+        cols.append(rc)
+    bones = [bw(sum(row, Vector()) / len(row)) for row in grid]
+    b.sheet(grid, s.hc, cls=HAIR, bones=bones, cols=cols, thickness=0.016)
+
+
 # ---------------------------------------------------------------- styles
 def style_topknot(b, s, o):
     """Hair combed up into a knot on the crown, held by a small metal crown (guan) and a pin, with
@@ -206,14 +264,18 @@ def style_topknot(b, s, o):
     b.lathe(knot + V(0, -0.012, 0), [(0.03, 0.0), (0.034, 0.012), (0.036, 0.03), (0.026, 0.05), (0.008, 0.058)], metal, cls=METAL, bone="head", seg=16, squash=(1.0, 1.15), folds=(8, 0.08, 0.0))
     b.tube([knot + V(-0.085, 0.022, 0.005), knot + V(0.085, 0.03, 0.005)], [0.0045, 0.0035], o.get("pin", "c8a050"), cls=METAL, bone="head", seg=6)
     b.ball(knot + V(-0.088, 0.022, 0.005), 0.009, o.get("jade", "6af0b0"), cls=CRYSTAL, bone="head", seg=8, rings=6)
-    # the high tail
+    # the high tail: one full tail falling from the knot, with a few loose locks round it
     tw = back_weight(knot.y - 0.02, knot.y - 0.3)
-    for k in range(7):
-        off = V((k - 3) * 0.011, 0, (k % 2) * 0.008)
-        pts = [knot + V(0, -0.005, -0.03) + off * 0.6, knot + V(0, -0.06, -0.09) + off, knot + V(0, -0.2, -0.13) + off * 1.4, knot + V(0, -0.36, -0.13) + off * 1.7, knot + V(0.01 * (k - 3), -0.5, -0.11) + off * 1.9]
-        strand(b, pts, 0.019, 0.0015, (s.hc, s.dk, s.lt)[k % 3], col_tip=s.lt, cls=HAIR, bones=[tw(p) for p in pts], flat=0.55, seg=6, per=3, power=1.2)
+    core = [knot + V(0, -0.005, -0.035), knot + V(0, -0.07, -0.1), knot + V(0, -0.21, -0.14), knot + V(0, -0.37, -0.14), knot + V(0.0, -0.53, -0.12)]
+    strand(b, core, 0.036, 0.004, s.hc, col_tip=s.lt, cls=HAIR, bones=[tw(p) for p in core], flat=0.7, seg=10, per=3, power=0.9)
+    for k in range(6):
+        a = k / 6 * 2 * math.pi
+        off = V(math.sin(a) * 0.022, 0, math.cos(a) * 0.014)
+        pts = [q + off * (0.4 + 0.6 * i / 4) for i, q in enumerate(core)]
+        pts[-1] = pts[-1] + V(math.sin(a) * 0.012, 0.03 * (k % 2), 0)
+        strand(b, pts, 0.017, 0.0015, (s.hc, s.dk, s.lt)[k % 3], col_tip=s.lt, cls=HAIR, bones=[tw(p) for p in pts], flat=0.55, seg=6, per=3, power=1.2)
     bangs(b, s, n=7, part=0.0, length=0.8, spread=0.85)
-    side_locks(b, s, length=0.2, n=2)
+    side_locks(b, s, length=0.17, n=2, width=0.027)
 
 
 def style_long(b, s, o):
@@ -221,7 +283,8 @@ def style_long(b, s, o):
     waist in clumps, forelocks and long side locks over the shoulders."""
     crown_whorl(b, s, n=18, rows=2, skip_front=0.6)
     bw = back_weight()
-    n = 15
+    curtain(b, s, o.get("hair_len", 0.58) * 1.02 + 0.06, bone_fn=bw)
+    n = 11
     for i in range(n):
         u = i / (n - 1)
         a = math.pi * 0.55 + u * math.pi * 0.9

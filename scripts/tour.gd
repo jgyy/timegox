@@ -6,7 +6,7 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder"}
 
 func _stop(id: String) -> Array:
 	## [first quest step set in this area, a sensible player level]
@@ -29,12 +29,40 @@ func _ready() -> void:
 func _wait(sec: float) -> void:
 	await get_tree().create_timer(sec).timeout
 
-func _shot(n: String) -> void:
+var last_img: Image = null
+
+func _shot(n: String, save: bool = true) -> void:
 	await RenderingServer.frame_post_draw
-	get_viewport().get_texture().get_image().save_png("%s/%s.png" % [dir, n])
+	last_img = get_viewport().get_texture().get_image()
+	if save:
+		last_img.save_png("%s/%s.png" % [dir, n])
+		print("[tour] ", n)
+
+## Compose a row of captured frames into one image: the middle `keep` of each frame's width,
+## scaled so the row fits `max_w` pixels.
+func _sheet(n: String, frames: Array, keep: float = 0.36) -> void:
+	if frames.is_empty():
+		return
+	var fw: int = frames[0].get_width()
+	var fh: int = frames[0].get_height()
+	var cw := int(fw * keep)
+	var out := Image.create(cw * frames.size(), fh, false, Image.FORMAT_RGB8)
+	for i in frames.size():
+		var im: Image = frames[i]
+		im.convert(Image.FORMAT_RGB8)
+		out.blit_rect(im, Rect2i((fw - cw) / 2, 0, cw, fh), Vector2i(i * cw, 0))
+	var max_w := 1920
+	if out.get_width() > max_w:
+		out.resize(max_w, int(fh * float(max_w) / out.get_width()), Image.INTERPOLATE_LANCZOS)
+	out.save_png("%s/%s.png" % [dir, n])
 	print("[tour] ", n)
 
 ## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
+## An enemy's model as the game builds it: its shape in its own palette.
+func _foe(id: String, boss: bool = false) -> Node3D:
+	var d: Dictionary = Data.ENEMIES[id]
+	return Models.monster(d.shape, d.col, boss, id)
+
 func _gallery(n: String, models: Array, spacing: float, yaw: float = 0.35) -> void:
 	main.world.hide()
 	var stage := Node3D.new()
@@ -121,6 +149,108 @@ func _portraits(n: String, models: Array, spacing: float = 0.95, height: float =
 	stage.queue_free()
 	main.world.show()
 
+## Turnaround of one model (developer tool, --inspect=a,b,c): front, three-quarter, side and back
+## views of the whole figure and a close-up of the head, so faces, hands and costume details can be
+## checked from every side.  Writes inspect_<id>_<view>.png.
+func _inspect(id: String, m: Node3D, height: float) -> void:
+	main.world.hide()
+	var stage := Node3D.new()
+	stage.position = Vector3(0, 440, 0)
+	main.add_child(stage)
+	var cam := Camera3D.new()
+	cam.fov = 30.0
+	cam.environment = Look.environment("garden", 0.1)
+	stage.add_child(cam)
+	stage.add_child(Look.sun("garden"))
+	stage.add_child(Look.fill("garden"))
+	var fl := MB.new()
+	fl.disc(Vector3.ZERO, 6.0, MB.tag(Color("8a9a88"), MB.STONE), 40, MB.tag(Color("6a7a6a"), MB.STONE))
+	MB.mesh_node(stage, fl.build(MB.mat_plain()))
+	stage.add_child(m)
+	m.add_child(Models.shadow_disc(0.8))
+	var t0 := 0.0
+	if main.args.has("clip"):
+		# a strip of frames through one clip, seen from the side (--clip=run [--frames=6])
+		var clip := str(main.args.clip)
+		var ap: AnimationPlayer = m.get_meta("ap", null)
+		var frames := int(main.args.get("frames", "6"))
+		if ap != null and ap.has_animation(clip):
+			var ln: float = ap.get_animation(clip).length
+			m.rotation.y = float(main.args.get("yaw", str(PI * 0.5)))
+			var aim2 := Vector3(0, height * 0.5, 0)
+			cam.position = aim2 + Vector3(0, height * 0.1, height * 2.4)
+			cam.look_at(stage.global_position + aim2, Vector3.UP)
+			cam.make_current()
+			ap.play(clip)
+			var strip: Array = []
+			for f in frames:
+				ap.seek(ln * f / float(frames), true)
+				await get_tree().process_frame
+				await get_tree().process_frame
+				await _shot("clip_%s_%s_%d" % [id, clip, f], false)
+				strip.append(last_img)
+			await _sheet("anim_%s_%s" % [id, clip], strip, 0.3)
+		stage.queue_free()
+		main.world.show()
+		return
+	var views := [["front", 0.0, false], ["three", 0.65, false], ["side", PI * 0.5, false], ["back", PI, false], ["face", 0.3, true]]
+	var body: Array = []
+	for v in views:
+		m.rotation.y = v[1]
+		var close: bool = v[2]
+		var aim := Vector3(0, height * (0.9 if close else 0.5), 0)
+		var dist := height * (0.75 if close else 2.6)
+		cam.position = aim + Vector3(0, height * (0.02 if close else 0.12), dist)
+		cam.look_at(stage.global_position + aim, Vector3.UP)
+		cam.make_current()
+		for k in 20:
+			t0 += 1.0 / 30.0
+			if m.get_meta("kind", "") == "person":
+				Models.anim_person(m, t0 + 0.5, false)
+			else:
+				Models.anim_monster(m, t0 + 0.5, 0.0)
+			await get_tree().process_frame
+		await _shot("inspect_%s_%s" % [id, v[0]], not main.args.has("sheet"))
+		body.append(last_img)
+	if main.args.has("sheet"):
+		await _sheet("turnaround_" + id, body, 0.3)
+	stage.queue_free()
+	main.world.show()
+
+## The hero runs down the longest free line of tiles with Yue Ling at his shoulder, then stops; a
+## camera on her side tracks them (--follow writes follow_<id>.png).  Both should face the way they
+## run, and she should stop running once she has caught up.
+func _follow(id: String) -> void:
+	var wo = main.world
+	var dir := Vector2i(1, 0)
+	var best := -1
+	for dv in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		var n := 0
+		while n < 10 and wo.tile_free(wo.ptile + dv * (n + 1)) and wo.ent_at(wo.ptile + dv * (n + 1)) == null:
+			n += 1
+		if n > best:
+			best = n
+			dir = dv
+	var fwd := Vector3(dir.x, 0.0, dir.y)
+	var side := Vector3(-dir.y, 0.0, dir.x)  # Yue Ling's side of the hero
+	main.bot_active = true  # hold the direction: the keyboard is not read while the bot flag is up
+	wo.move_dir = dir
+	var strip: Array = []
+	for k in 7:
+		if k == 4:
+			wo.move_dir = Vector2i.ZERO
+		for f in (5 if k < 4 else 9):
+			var hp: Vector3 = wo._player_pos()
+			var eye := hp + side * 8.0 - fwd * 1.0 + Vector3(0.0, 2.0, 0.0)
+			wo.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(hp + side * 0.8 + Vector3(0.0, 0.9, 0.0), Vector3.UP)
+			await get_tree().process_frame
+		await _shot("follow_%s_%d" % [id, k], false)
+		strip.append(last_img)
+	wo.move_dir = Vector2i.ZERO
+	main.bot_active = false
+	wo.cam_override = null
+	await _sheet("follow_" + id, strip, 0.4)
+
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for r in 20:
 		for dx in range(-r, r + 1):
@@ -166,6 +296,8 @@ func _run() -> void:
 		main.world.banner_t = 0.0
 		await _wait(1.2)
 		await _shot("world_" + id)
+		if main.args.has("follow"):
+			await _follow(id)
 		if main.args.has("vista"):
 			# a wide, high establishing shot over the region's landscape
 			var pp: Vector3 = main.world._player_pos()
@@ -205,6 +337,28 @@ func _run() -> void:
 			main.world._snap_cam()
 			await _wait(0.8)
 			await _shot("interior_village")
+		if id == "yanggu":
+			# the Dawn Market from above its main street, and Ah Mei among her lanterns indoors
+			var mo := Atlas.to_world("yanggu", Vector2i(30, 30))
+			var mp := Terrain3D.world_pos(mo)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, mp + Vector3(-6.0, 22.0, 26.0)).looking_at(mp + Vector3(14.0, 0.0, -6.0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("market_yanggu")
+			main.world.cam_override = null
+			main.world.teleport(Atlas.to_world("yanggu", Vector2i(12, 37)))
+			main.world.facing = Vector2i(0, -1)
+			main.world.cam_q = 0
+			main.world._snap_cam()
+			await _wait(0.8)
+			await _shot("interior_yanggu")
+		if id == "fusang":
+			# the colossal Fusang across the valley, the stuck sun glowing in its crown
+			var fo := Terrain3D.world_pos(Atlas.to_world("fusang", Data.AREAS.fusang.landmark.pos))
+			fo.y = main.world.ground_y(fo)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, fo + Vector3(-58.0, 16.0, 40.0)).looking_at(fo + Vector3(0.0, 32.0, 0.0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("fusang_tree")
+			main.world.cam_override = null
 		if id == "sect" or main.args.has("world-only"):
 			continue
 		# a regular battle with this region's monster pool
@@ -229,10 +383,46 @@ func _run() -> void:
 			await _wait(2.8)
 			await _shot("battle_boss_" + b.id)
 			main.pop()
+	# chosen bosses, each on its own region's battle stage (--boss-shots=id,id: bosses that are not
+	# the last of their region, which --no-bosses leaves out)
+	if main.args.has("boss-shots"):
+		main.world.open_world()
+	for bid in str(main.args.get("boss-shots", "")).split(",", false):
+		for aid in Data.AREA_CHAIN:
+			var aspec: Dictionary = Data.AREAS[aid]
+			for bb in aspec.get("bosses", []):
+				if bb.id != bid:
+					continue
+				var bstop: Array = _stop(aid)
+				Game.reset()
+				Game.level = bstop[1]
+				Game.companion = true
+				Game.heal_full()
+				Game.step = Data.step_index(bstop[0])
+				main.set_stack(["world"])
+				main.battle.start([{"id": bb.id, "lv": bb.lv}], {"entity": bb, "boss": true, "enemy": bb.id, "theme": aspec.theme})
+				main.push("battle")
+				await _wait(2.8)
+				await _shot("battle_boss_" + bb.id)
+				main.pop()
 	# galleries are shot from the world screen (the title menu would cover them)
 	main.set_stack(["world"])
 	main.world.load_area("sect", Vector2i(20, 9))
 	main.world.banner_t = 0.0
+	if main.args.has("inspect"):
+		var tint := Color(main.args.get("tint", "c8a070"))
+		for id2 in str(main.args.inspect).split(",", false):
+			var mm: Node3D
+			var hgt := 1.8
+			if Assets.PEOPLE.has(id2):
+				mm = Assets.person(id2)
+			else:
+				mm = _foe(id2) if Data.ENEMIES.has(id2) else Models.monster(id2, tint)
+				var ab := AABB()
+				for mi in mm.get_meta("meshes", []):
+					ab = ab.merge((mi as MeshInstance3D).get_aabb())
+				hgt = maxf(ab.size.y, ab.size.x * 0.6)
+			await _inspect(id2, mm, hgt)
 	if main.args.has("show"):
 		# a quick look at chosen models (developer tool): --show=beast,fox,yue_ling
 		var cols := [Color("7aa860"), Color("d0602a"), Color("3a8ad8"), Color("c8a040"), Color("9a6ad0"), Color("40b0a0")]
@@ -243,6 +433,9 @@ func _run() -> void:
 				var id: String = picks[i]
 				if Assets.PEOPLE.has(id):
 					ms.append(Assets.person(id))
+				elif Data.ENEMIES.has(id):
+					# an enemy by id: its shape in its own palette (element accent, pinned colours)
+					ms.append(_foe(id))
 				elif not Assets.has_monster(id) and Assets.has("props/" + id):
 					var ph := Node3D.new()
 					MB.mesh_node(ph, Assets.static_mesh("props/" + id))
@@ -258,8 +451,8 @@ func _run() -> void:
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
 			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
 			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
-			Models.monster("humanoid", Color("c0603a"), false),
-			Models.monster("demon", Color("e02050"), false),
+			_foe("iron_fang"),
+			_foe("demon_lord"),
 		], 1.0)
 		# Blender-built NPCs (art/characters)
 		await _gallery("gallery_npcs", [
@@ -268,8 +461,8 @@ func _run() -> void:
 		], 0.8)
 		# Part V creatures (art/monsters)
 		await _gallery("gallery_part5", [
-			Models.monster("scorpion", Color("e8d8a0")), Models.monster("mushroom", Color("c070e0")), Models.monster("mammoth", Color("a0b8d0")),
-			Models.monster("moth", Color("ffb040")), Models.monster("hundun", Color("e05030")),
+			_foe("glass_scorpion"), _foe("spore_mother"), _foe("mammoth_ancestor"),
+			_foe("moth_queen"), _foe("hundun"),
 		], 1.7)
 		# Part VI people (art/characters)
 		await _gallery("gallery_npcs_part6", [
@@ -283,8 +476,8 @@ func _run() -> void:
 		], 0.7)
 		# Part VI creatures (art/monsters)
 		await _gallery("gallery_part6", [
-			Models.monster("fox", Color("ff6a30")), Models.monster("carp", Color("ffb060")), Models.monster("oxhead", Color("6a3a2a")),
-			Models.monster("horseface", Color("8a4a3a")), Models.monster("jiangshi", Color("3a5a4a")),
+			_foe("nine_tail_fox"), _foe("waterfall_koi"), _foe("ox_head"),
+			_foe("horse_face"), _foe("corpse_patriarch"),
 		], 1.7)
 		# Part VII and VIII people (art/characters)
 		await _gallery("gallery_npcs_part7", [
@@ -296,17 +489,43 @@ func _run() -> void:
 		], 0.9)
 		# Part VIII creatures (art/monsters)
 		await _gallery("gallery_part8", [
-			Models.monster("qilin", Color("e05a3a")), Models.monster("tiger", Color("e8e0d0")), Models.monster("ape", Color("6a5a8a")),
-			Models.monster("magpie", Color("2a3a6a")), Models.monster("kaiming", Color("d8a040")),
+			_foe("jade_qilin"), _foe("white_tiger"), _foe("thunder_ape"),
+			_foe("bridge_magpie"), _foe("kaiming_beast"),
 		], 1.7)
 		await _gallery("gallery_part8_bosses", [
-			Models.monster("queen", Color("f0d8a0")), Models.monster("warden", Color("3a7ab0")), Models.monster("crowmarshal", Color("3a3040")),
+			_foe("xiwangmu"), _foe("river_warden"), _foe("crow_marshal"),
 		], 1.5)
+		# Part IX people and creatures (art/characters, art/monsters)
+		await _gallery("gallery_npcs_part9", [
+			Assets.person("ah_mei"), Assets.person("farmer_tian"), Assets.person("feng_meng"), Assets.person("chang_e"),
+		], 0.9)
+		# the townsfolk: the sect's own people, Qingshi Village and the Dawn Market at Yanggu
+		await _gallery("gallery_townsfolk_sect", [
+			Assets.person("disciple_han"), Assets.person("disciple_mei"), Assets.person("cook_zhou"),
+			Assets.person("sweeper_bai"), Assets.person("gate_wu"), Assets.person("bell_shen"),
+		], 0.8)
+		await _gallery("gallery_townsfolk_village", [
+			Assets.person("farmer_lao"), Assets.person("child_hua"), Assets.person("tofu_sun"),
+			Assets.person("scholar_wang"), Assets.person("carpenter_gu"), Assets.person("herb_lan"),
+		], 0.8)
+		await _gallery("gallery_townsfolk_market", [
+			Assets.person("watchman_zhou"), Assets.person("innkeeper_bao"), Assets.person("tea_seller_pan"), Assets.person("dyer_su"),
+			Assets.person("monk_huiming"), Assets.person("granny_gu"), Assets.person("porter_niu"), Assets.person("little_dou"),
+		], 0.7)
+		await _gallery("gallery_part9", [
+			_foe("jinwu"), _foe("mortar_rabbit"), _foe("bifang"),
+			_foe("hanba"), _foe("xihe"),
+		], 1.7)
 		# one shape, three enemies: the palette (Assets.palette) turns a single tint into a scheme
 		await _gallery("gallery_palettes", [
-			Models.monster("beast", Color("3a9a5a")), Models.monster("beast", Color("d04a2a")), Models.monster("beast", Color("8a8aa0")),
-			Models.monster("dragon", Color("3a8ad8")), Models.monster("dragon", Color("e0a020")),
+			_foe("bamboo_wolf"), _foe("frost_wolf"), _foe("blood_hound"),
+			_foe("dragon_king"), _foe("dune_leviathan"),
 		], 1.7)
+		# one enemy per element: the accent (eyes, crests, glow) follows the element
+		await _gallery("gallery_elements", [
+			_foe("leaf_sprite"), _foe("magma_slime"), _foe("tide_qilin"),
+			_foe("jade_lion"), _foe("thunder_ape"), _foe("void_sentinel"),
+		], 1.5)
 		# Blender landmarks (art/props)
 		var props: Array = []
 		for pr in ["pine", "bamboo", "peach", "meteor", "glowcap", "icespire", "chaosrock", "stonelantern", "ghostpagoda"]:
@@ -328,16 +547,16 @@ func _run() -> void:
 			built8.append(holder3)
 		await _gallery("gallery_landmarks_part8", built8, 1.4)
 		await _gallery("gallery_beasts", [
-			Models.monster("beast", Color("7aa860")), Models.monster("mantis", Color("5fd890")), Models.monster("tortoise", Color("b8903a")),
-			Models.monster("crab", Color("d0502a")), Models.monster("spider", Color("5a3a90")),
+			_foe("bamboo_wolf"), _foe("jade_mantis"), _foe("time_tortoise"),
+			_foe("crab_general"), _foe("rift_spider"),
 		], 1.5)
 		await _gallery("gallery_spirits", [
-			Models.monster("phoenix", Color("ff8a2a")), Models.monster("ray", Color("7ab0f0")), Models.monster("jelly", Color("7ad8ff")),
-			Models.monster("wraith", Color("6a5a8a")), Models.monster("tome", Color("40c090"), true),
+			_foe("ash_phoenix"), _foe("manta_sovereign"), _foe("abyss_jelly"),
+			_foe("bog_wraith"), _foe("jade_ledger", true),
 		], 1.6)
 		await _gallery("gallery_giants", [
-			Models.monster("dragon", Color("3a8ad8")), Models.monster("golem", Color("e0501a")), Models.monster("serpent", Color("2a9a8a")),
-			Models.monster("plant", Color("4fc07a")), Models.monster("storm", Color("c8d8ff")),
+			_foe("dragon_king"), _foe("lava_titan"), _foe("tide_hydra"),
+			_foe("bamboo_spirit"), _foe("tribulation"),
 		], 1.7)
 	if main.args.has("portraits") or not main.args.has("no-extras"):
 		await _portraits("portrait_heroes", [
@@ -345,6 +564,10 @@ func _run() -> void:
 			Models.person(Color("e86a9a"), Color("402030"), main.world.YUE_OPTS),
 			Models.person(Color("e8e8ff"), Color("2a2a3a"), {"asset": "elder_qing", "beard": true, "staff": true, "hair": "bald", "trim": Color("c8a850")}),
 		], 0.9, 1.5, 3.2)
+		# Part IX's leads close up: Ah Mei, Farmer Tian, Feng Meng and Chang'e
+		await _portraits("portrait_part9", [
+			Assets.person("ah_mei"), Assets.person("farmer_tian"), Assets.person("feng_meng"), Assets.person("chang_e"),
+		], 0.85, 1.5, 3.6)
 	if main.args.has("map"):
 		main.world.load_area("dunes", Vector2i(10, 28))
 		main.open_menu()
