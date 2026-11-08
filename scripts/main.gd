@@ -11,6 +11,7 @@ var shop
 var meditate
 var title
 var ending
+var choice
 var bot = null
 var bot_active := false
 var args := {}
@@ -31,6 +32,7 @@ func _ready() -> void:
 	dialogue = _make("dialogue")
 	menu = _make("menu")
 	shop = _make("shop")
+	choice = _make("choice")
 	if DisplayServer.get_name() != "headless" and not args.has("no-post"):
 		post = PostFX.new()
 		post.name = "post"
@@ -167,6 +169,59 @@ func open_menu() -> void:
 	menu.open()
 	push("menu")
 
+## A choice over the world (Part XI): `cb` gets the chosen option's id ("" if cancelled).
+func choose(title_text: String, options: Array, cb: Callable, cancel_ok: bool = true) -> void:
+	if options.is_empty():
+		cb.call("")
+		return
+	choice.start(title_text, options, cb, cancel_ok)
+	push("choice")
+
+## Choose the Dao Lin Feng walks: the first time from the Elder (no way out of that one), later at any
+## Dao Stele.  Each option shows the Dao's motto, what it does and how far he has walked it.
+func open_dao_choice(from: String) -> void:
+	var opts: Array = []
+	for id in Data.DAO_ORDER:
+		var d: Dictionary = Data.DAOS[id]
+		var tier := Game.dao_tier(id)
+		var rank := "" if not Game.dao_xp.has(id) else str(Data.DAO_RANKS[tier])
+		var desc: String = str(d.desc) + "\n\nIts technique, from Adept on: %s." % Data.SKILLS[d.skill].n
+		var hon: Array = []
+		for r in Data.RACE_ORDER:
+			if r != "human" and Data.RACES[r].dao == id:
+				hon.append(str(Data.RACES[r].n))
+		if not hon.is_empty():
+			desc += "\nHonoured by the %s." % ", ".join(hon)
+		if id == Game.dao:
+			desc += "\n\nThe road you walk now."
+		opts.append({"id": id, "label": d.n, "sub": d.motto, "desc": desc, "note": rank, "col": d.col, "current": id == Game.dao})
+	var first := Game.dao == ""
+	choose("Which road will you walk?" if first else "The Dao Stele: walk another road?", opts, func(id: String):
+		if id == "" or id == Game.dao:
+			return
+		Game.choose_dao(id)
+		if first:
+			say(Data.DAO_LINES.get("dao_chosen", {}).get(id, []))
+		else:
+			say([["Dao Stele", str(Data.DAOS[id].motto)]])
+	, not first)
+
+## A conversation with the lines the Dao Lin Feng walks adds to it (Part XI): the Elder's answer,
+## what Chong and Li make of it, the ending; and when one of the peoples of the realms first speaks to
+## him in a quest scene, what their people think of his Dao.
+func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
+	var lines: Array = Data.DIALOGUE.get(key, []).duplicate()
+	if Game.dao == "":
+		return lines
+	var extra: Array = Data.DAO_LINES.get(key, {}).get(Game.dao, [])
+	lines.append_array(extra)
+	var race: String = str(npc.get("race", ""))
+	if race != "" and extra.is_empty() and key in Data.DAO_GREETS:
+		var rl: String = str(Data.RACES[race].dao_lines.get(Game.dao, ""))
+		if rl != "":
+			lines.append([str(npc.get("n", "")), rl])
+	return lines
+
 func start_meditation() -> void:
 	meditate.start()
 	push("meditate")
@@ -201,16 +256,33 @@ func interact(e: Dictionary) -> void:
 			var need: Dictionary = Data.STEPS[Data.step_index(e.open)]
 			Game.toast("A Lotus Seal bars the road to %s. (%s)" % [Data.AREAS[e.to].n, need.t])
 		"pickup":
-			Game.add_item(e.item)
 			Game.taken[e.id] = true
-			Game.toast("Obtained %s" % Data.ITEMS[e.item].n)
+			if e.item == "stones":
+				# a cache of spirit stones somebody hid upstairs or in a cellar
+				Game.stones += int(e.get("n", 0))
+				Game.toast("Found a cache of %d spirit stones" % int(e.get("n", 0)))
+			else:
+				Game.add_item(e.item)
+				Game.toast("Obtained %s" % Data.ITEMS[e.item].n)
 			Game.poll_steps()
+		"ladder":
+			# the Jianmu between the realms (Part XI), or a flight of stairs in a building
+			if world.ladder_open(e):
+				world.use_ladder(e)
+			else:
+				var need2: Dictionary = Data.STEPS[Data.step_index(str(e.open))]
+				Game.toast("The way is closed for now. (%s)" % need2.t)
+		"stele":
+			open_dao_choice("stele")
 
 func talk_npc(e: Dictionary) -> void:
 	var s := Game.cur_step()
+	var race: String = str(e.get("race", ""))
+	if race != "":
+		Game.met[race] = true
 	if not s.is_empty() and s.kind == "talk" and s.npc == e.id and s.area == e.get("area", Game.area):
 		var sid: String = s.id
-		say(Data.DIALOGUE[sid], func():
+		say(dao_dialogue(sid, e), func():
 			Game.advance()
 			if sid == "s_yue":
 				Game.companion = true
@@ -218,11 +290,17 @@ func talk_npc(e: Dictionary) -> void:
 				Game.qi[1] = float(Game.max_qi(1))
 				Game.toast("Yue Ling joins your party!")
 				Game.note("Yue Ling joined")
-			if sid == "s_swordghost":
-				pass
+			if sid == "s_p11_home":
+				# the Jianmu has grown back: every road is open now, and Lin Feng must choose his
+				open_dao_choice("elder")
 		)
 		return
-	var chats: Array = Data.CHAT.get(e.id, ["..."])
+	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
+	# the peoples of the realms speak to the Dao Lin Feng walks, now and then
+	if race != "" and Game.dao != "":
+		var rl: String = str(Data.RACES[race].dao_lines.get(Game.dao, ""))
+		if rl != "":
+			chats.append(rl)
 	var i: int = chat_idx.get(e.id, 0)
 	chat_idx[e.id] = i + 1
 	var lines := [[e.n, chats[i % chats.size()]]]
@@ -233,7 +311,23 @@ func talk_npc(e: Dictionary) -> void:
 		after = func(): shop.open("alchemist"); push("shop")
 	elif e.id == "smith":
 		after = func(): shop.open("smith"); push("shop")
+	elif race != "" and Game.inv.get(str(Data.RACES[race].gift), 0) > 0:
+		# carrying a keepsake their people love: offer it
+		after = func(): offer_gift(e)
 	say(lines, after)
+
+## Offer one of the peoples of the realms the keepsake they love (Part XI).
+func offer_gift(e: Dictionary) -> void:
+	var race: String = str(e.race)
+	var item: String = str(Data.RACES[race].gift)
+	var have: int = Game.inv.get(item, 0)
+	choose("A gift for %s?" % e.n, [
+		{"id": "give", "label": "Give the %s" % Data.ITEMS[item].n, "note": "you have %d" % have, "desc": str(Data.ITEMS[item].desc) + "\n\nThe %s call you %s." % [Data.RACES[race].n, Game.race_title(race)], "col": Look.PICKUP_COLORS.get(item, UI.C_GOLD)},
+		{"id": "keep", "label": "Not now", "desc": "Keep it for now.", "col": UI.C_DIM},
+	], func(id: String):
+		if id == "give" and Game.give_gift(race):
+			say([[str(e.n), str(Data.RACES[race].thanks)]])
+	)
 
 func start_encounter(e: Dictionary) -> void:
 	battle.start(e.group, {"entity": e, "boss": false, "theme": world.theme_name})
@@ -279,7 +373,7 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				var sid: String = ctx.step
 				Game.do_breakthrough()
 				Game.advance()
-				say(Data.DIALOGUE.get("post:" + sid, []), func():
+				say(dao_dialogue("post:" + sid), func():
 					if Game.finished:
 						Game.note("Ending reached")
 						push("ending")
@@ -299,6 +393,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 						recall_to_sect("recall7")
 					elif sid == "s_break14":
 						recall_to_sect("recall8")
+					elif sid == "s_break15":
+						recall_to_sect("recall9")
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity
@@ -309,7 +405,7 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					Game.toast("Obtained %s" % Data.ITEMS[drop].n)
 				Game.note("Defeated " + Data.ENEMIES[ctx.enemy].n)
 				Game.advance()
-				var post: Array = Data.DIALOGUE.get("post:" + ctx.enemy, [])
+				var post: Array = dao_dialogue("post:" + ctx.enemy)
 				if not post.is_empty():
 					say(post)
 			else:

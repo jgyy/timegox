@@ -13,7 +13,10 @@ var stones := 60
 var inv := {"hp_pill": 3, "qi_pill": 1}
 var step := 0
 var area := "sect"
-var tile := Vector2i(-1, -1)  # world tile (see atlas.gd)
+var tile := Vector2i(-1, -1)  # world tile (see atlas.gd), in the tiles of `layer`
+## the realm Lin Feng is in: "surface" (the Unbroken Land), "heaven", "under", or the floor of a
+## building ("f:...", see Atlas.floor_id)
+var layer := "surface"
 var companion := false
 var temper := 0
 var hp := [80.0, 0.0]
@@ -30,6 +33,14 @@ var timeline: Array = []
 var toasts: Array = []
 ## regions Lin Feng has set foot in (their histories go into the Annals)
 var seen := {}
+## Part XI: the Dao Lin Feng walks ("" until the Jianmu grows back), the mastery points he has in
+## each, how often he has changed roads; his standing with each people of the realms and the peoples
+## he has met
+var dao := ""
+var dao_xp := {}
+var dao_switches := 0
+var standing := {}
+var met := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -48,6 +59,7 @@ func reset() -> void:
 	# a world tile: the sect's courtyard in front of the hall (Vector2i(20, 8) is the sect's own
 	# tile, which used to be stored here as if it were a world tile)
 	tile = Atlas.to_world("sect", Vector2i(20, 8))
+	layer = "surface"
 	companion = false
 	temper = 0
 	boss_done = {}
@@ -61,6 +73,11 @@ func reset() -> void:
 	timeline = []
 	toasts = []
 	seen = {"sect": true}
+	dao = ""
+	dao_xp = {}
+	dao_switches = 0
+	standing = {}
+	met = {}
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
 	note("Journey begins")
@@ -79,23 +96,140 @@ func member_name(i: int) -> String:
 	return "Lin Feng" if i == 0 else "Yue Ling"
 
 func max_hp(i: int) -> int:
-	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85))
+	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0))
 
 func max_qi(i: int) -> int:
 	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1))
 
 func fighter(i: int) -> Dictionary:
-	var a := float(Data.atk(level)) * (1.0 + 0.12 * temper)
+	var a := float(Data.atk(level)) * (1.0 + 0.12 * temper) * boon("atk", 1.0)
 	if i == 1:
 		a = float(Data.atk(level)) * 0.75
+	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
+	var spd: int = Data.speed(level) + (2 if i == 1 else 0)
+	if i == 0:
+		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0))
 	return {
 		"id": "pc%d" % i, "name": member_name(i), "side": "party", "idx": i, "lv": level, "boss": false,
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
-		"atk": a, "def": float(Data.defense(level)) * (1.0 if i == 0 else 0.9), "spd": Data.speed(level) + (2 if i == 1 else 0),
+		"atk": a, "def": float(Data.defense(level)) * (1.0 if i == 0 else 0.9), "spd": spd,
 		"elem": "phys", "weak": "none", "col": Color("7ec8ff") if i == 0 else Color("ff9ac0"),
-		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step),
+		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step) + dao_skills(i),
 		"turns": 0, "flash": 0.0, "shake": 0.0, "dead": false, "fade": 1.0,
 	}
+
+# ---------------------------------------------------------------- daos (Part XI)
+## Lin Feng's rank in a Dao (0 Novice, 1 Adept, 2 Master), the one he walks by default.
+func dao_tier(id: String = "") -> int:
+	if id == "":
+		id = dao
+	if id == "":
+		return 0
+	var xp: int = int(dao_xp.get(id, 0))
+	var tier := 0
+	for k in Data.DAO_TIERS.size():
+		if xp >= Data.DAO_TIERS[k]:
+			tier = k
+	return tier
+
+## A passive of the Dao Lin Feng walks at his rank in it, or `fallback` if it has none.
+func dao_mod(key: String, fallback: float) -> float:
+	if dao == "" or not Data.DAO_MODS.has(dao):
+		return fallback
+	var m: Dictionary = Data.DAO_MODS[dao]
+	if not m.has(key):
+		return fallback
+	return float(m[key][dao_tier()])
+
+## Start (or change) the road Lin Feng walks; each Dao keeps its own mastery.
+func choose_dao(id: String) -> void:
+	if not Data.DAOS.has(id) or id == dao:
+		return
+	if dao != "":
+		dao_switches += 1
+	dao = id
+	dao_xp[id] = int(dao_xp.get(id, 0))
+	toast("You walk the %s" % Data.DAOS[id].n)
+	note("Walks the %s" % Data.DAOS[id].n)
+
+## A battle won while walking a Dao deepens it (a boss four times as much); reaching a rank is news.
+func dao_battle_won(boss: bool) -> void:
+	if dao == "":
+		return
+	var before := dao_tier()
+	dao_xp[dao] = int(dao_xp.get(dao, 0)) + (4 if boss else 1)
+	var after := dao_tier()
+	if after > before:
+		toast("%s of the %s" % [Data.DAO_RANKS[after], Data.DAOS[dao].n])
+		note("Became %s of the %s" % [Data.DAO_RANKS[after], Data.DAOS[dao].n])
+		if after == 1:
+			toast("New technique: %s" % Data.SKILLS[Data.DAOS[dao].skill].n)
+
+## The Dao's own technique, for Lin Feng, once he is an Adept of the Dao he walks.
+func dao_skills(i: int) -> Array:
+	if i != 0 or dao == "" or dao_tier() < 1:
+		return []
+	return [Data.DAOS[dao].skill]
+
+## What a technique costs to use (the Cauldron's Dao makes them cheaper).
+func skill_cost(id: String) -> float:
+	return float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0)
+
+# ---------------------------------------------------------------- the peoples of the realms (Part XI)
+func race_tier(race: String) -> int:
+	var st: int = int(standing.get(race, 0))
+	return 2 if st >= Data.KIN else (1 if st >= Data.FRIEND else 0)
+
+func race_title(race: String) -> String:
+	return ["Stranger", "Friend", "Kin"][race_tier(race)]
+
+## Standing grows with help given; walking the Dao a people honours makes it grow half as fast again.
+func race_gain(race: String, n: int) -> void:
+	if not Data.RACES.has(race) or race == "human":
+		return
+	met[race] = true
+	var before := race_tier(race)
+	if dao != "" and Data.RACES[race].dao == dao:
+		n = int(ceil(n * 1.5))
+	standing[race] = mini(int(standing.get(race, 0)) + n, Data.KIN)
+	var after := race_tier(race)
+	if after > before:
+		toast("The %s call you %s" % [Data.RACES[race].n, race_title(race)])
+		note("The %s call Lin Feng %s" % [Data.RACES[race].n, race_title(race)])
+		if after == 1 and str(Data.RACES[race].boon_n) != "":
+			toast("Boon: %s" % Data.RACES[race].boon_n)
+
+## Give a people the keepsake they love (one from the inventory): standing grows. Returns whether
+## anything was given.
+func give_gift(race: String) -> bool:
+	var item: String = str(Data.RACES.get(race, {}).get("gift", ""))
+	if item == "" or inv.get(item, 0) <= 0:
+		return false
+	inv[item] -= 1
+	race_gain(race, 12)
+	return true
+
+## The boons of the peoples who call Lin Feng friend: spd (speed), atk, miss, heal, hp and taken
+## multipliers or additions; `fallback` when no friendly people grants it.
+func boon(key: String, fallback: float) -> float:
+	var v := fallback
+	for race in standing:
+		if race_tier(race) < 1 or str(Data.RACES[race].boon) != key:
+			continue
+		match key:
+			"spd":
+				v += 3.0
+			"atk":
+				v *= 1.06
+			"miss":
+				v += 0.05
+			"heal":
+				v *= 1.1
+			"hp":
+				v *= 1.08
+			"taken":
+				v *= 0.94
+	return v
 
 func heal_full() -> void:
 	for i in party_size():
@@ -171,6 +305,9 @@ func advance() -> void:
 		toast("+%d spirit stones" % s.stones)
 	toast("Quest complete: %s" % s.t)
 	note("Quest complete: %s" % s.t)
+	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
+	for race in Data.AREAS.get(str(s.get("area", "")), {}).get("races", []):
+		race_gain(race, 8 if s.kind == "kill" else 5)
 	step += 1
 	hunt = 0
 	if step >= Data.STEPS.size():
@@ -235,7 +372,7 @@ func use_item_field(id: String) -> String:
 		if hp[i] >= max_hp(i) - 0.5:
 			return "Everyone is already at full health."
 		inv[id] -= 1
-		hp[i] = minf(float(max_hp(i)), hp[i] + max_hp(i) * 0.4)
+		hp[i] = minf(float(max_hp(i)), hp[i] + max_hp(i) * 0.4 * dao_mod("pill", 1.0))
 		return "%s recovers health." % member_name(i)
 	if id == "qi_pill":
 		inv[id] -= 1
@@ -249,7 +386,7 @@ func use_item_field(id: String) -> String:
 		if qi[j] >= max_qi(j) - 0.5:
 			inv[id] += 1
 			return "Everyone's qi is already full."
-		qi[j] = minf(float(max_qi(j)), qi[j] + max_qi(j) * 0.5)
+		qi[j] = minf(float(max_qi(j)), qi[j] + max_qi(j) * 0.5 * dao_mod("pill", 1.0))
 		return "%s recovers qi." % member_name(j)
 	return ""
 
@@ -260,5 +397,6 @@ func respawn() -> void:
 	# a world tile: the sect's courtyard in front of the hall (Vector2i(20, 8) is the sect's own
 	# tile, which used to be stored here as if it were a world tile)
 	tile = Atlas.to_world("sect", Vector2i(20, 8))
+	layer = "surface"
 	heal_full()
 	note("Defeated and carried back to the sect")

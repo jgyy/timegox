@@ -7,6 +7,9 @@ extends ScreenBase
 ## Part IX puts the sun and the moon in the sky together, taking turns, with Xihe, Chang'e and the
 ## nine new stars of the Dipper.  Part X sets the Nine Cauldrons, recast at Tushan with the land as
 ## it really is on their bellies, in an arc on the clouds below, a river winding between them.
+## Part XI raises the Jianmu behind everything: the Standing Tree going up through the clouds into
+## the Nine Heavens and down through them into the Nine Springs, feathered folk circling its crown,
+## pearl-lights and shade-lanterns rising up its roots, and the six colours of the Daos round it.
 
 const VIEW := Vector2(1280, 720)
 
@@ -279,6 +282,46 @@ func _part10() -> void:
 	rv.ribbon(pts, ws, Vector3.RIGHT, Color(0.55, 0.8, 1.0, 0.55))
 	MB.mesh_node(scene3d, rv.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
+## Part XI: the Jianmu, far behind, from the clouds below to the top of the sky, with its crown and
+## its roots both in view, things of every realm climbing it, and a slow ring of the six Daos' colours
+var jianmu11: Node3D = null
+var climbers11: Array = []
+
+func _part11() -> void:
+	jianmu11 = Node3D.new()
+	jianmu11.position = Vector3(-14.0, -14.0, -46.0)
+	scene3d.add_child(jianmu11)
+	var b := MB.new()
+	var g := MB.new()
+	var bark := MB.tag(Color("6a5034"), MB.WOOD)
+	b.lathe(Vector3.ZERO, [Vector2(3.4, 0.0), Vector2(2.6, 4.0), Vector2(2.3, 20.0), Vector2(2.0, 40.0), Vector2(1.2, 46.0)], bark, 16)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 1111
+	for k in 9:
+		var a := TAU * k / 9.0
+		var d := Vector3(cos(a), 0, sin(a))
+		var base := Vector3(0, 30.0 + k * 1.6, 0) + d * 1.5
+		var tip := base + d * rng.randf_range(7.0, 11.0) + Vector3(0, rng.randf_range(3.0, 7.0), 0)
+		b.limb(base, tip, 0.7, 0.2, bark, 6)
+		b.sph(tip, Vector3(3.6, 2.0, 3.6), MB.tag(Color("4a9a6a").lerp(Color("d8c860"), rng.randf() * 0.5), MB.FOLIAGE), Vector3.ZERO, true)
+		g.ball(tip + Vector3(0, -1.2, 0), 0.25, Color(1.0, 0.85, 0.4, 0.9), true)
+		var root_tip := Vector3(0, 0.0, 0) + d * rng.randf_range(6.0, 10.0) + Vector3(0, -rng.randf_range(4.0, 9.0), 0)
+		b.limb(d * 2.0 + Vector3(0, 1.5, 0), root_tip, 0.9, 0.15, bark, 6)
+	for k2 in Data.DAO_ORDER.size():
+		var c: Color = Data.DAOS[Data.DAO_ORDER[k2]].col
+		var a2 := TAU * k2 / float(Data.DAO_ORDER.size())
+		g.torus(Vector3(0, 12.0 + k2 * 3.0, 0), 4.2 + 0.3 * k2, 0.05, Color(c.r, c.g, c.b, 0.55), Vector3(0.2 * sin(a2), 0, 0.2 * cos(a2)))
+	MB.mesh_node(jianmu11, b.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	MB.mesh_node(jianmu11, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# lights climbing the tree: feathers of the Yumin up the crown, pearls and lanterns up the roots
+	for k3 in 12:
+		var m := MB.new()
+		var col: Color = [Color(0.9, 0.95, 1.0, 0.9), Color(0.6, 1.0, 0.95, 0.9), Color(0.75, 0.8, 1.0, 0.9)][k3 % 3]
+		m.ball(Vector3.ZERO, 0.22, col, true)
+		var n := MB.mesh_node(jianmu11, m.build(MB.mat_glow()))
+		n.set_meta("phase", k3 / 12.0)
+		climbers11.append(n)
+
 func press(act: String) -> void:
 	if act == "confirm":
 		done = true
@@ -338,6 +381,14 @@ func _process(d: float) -> void:
 		for k in cauldrons.size():
 			(cauldrons[k] as Node3D).rotation.y = t * 0.2 + k
 			(cauldrons[k] as Node3D).position.y += sin(t * 1.1 + k) * 0.002
+		if jianmu11 == null:
+			_part11()
+		# up and down the ladder: lights of every realm climbing the Standing Tree
+		for k in climbers11.size():
+			var cn: Node3D = climbers11[k]
+			var f := fmod(t * 0.05 + float(cn.get_meta("phase")), 1.0)
+			var ca := f * TAU * 3.0 + k
+			cn.position = Vector3(cos(ca) * 2.8, -4.0 + f * 46.0, sin(ca) * 2.8)
 		cam.position = Vector3(sin(t * 0.15) * 1.5, 1.8, 6.5)
 		cam.look_at(Vector3(0, 1.4, 0), Vector3.UP)
 		queue_redraw()
@@ -347,6 +398,9 @@ func _draw() -> void:
 	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, holds up the sky by choice, turns the Wheel gladly, and keeps every door open.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 190), "The land is one land now. The magpies build their bridge, and the sun and the moon take turns.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 216), "Every river runs where it will, and the Nine Cauldrons hold the land as it really is.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 242), "The Jianmu stands again between heaven, earth and the Nine Springs, and every road climbs it.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	if Game.dao != "":
+		UI.text(self, Vector2(0, 268), "Walker of the %s" % Data.DAOS[Game.dao].n, 17, Data.DAOS[Game.dao].col, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
 	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
 	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)

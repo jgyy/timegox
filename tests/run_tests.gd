@@ -3,13 +3,28 @@ extends SceneTree
 
 var failures := 0
 var finished := false
+var compiled := false
 
 ## Watchdog: a script error aborts _init() before quit() and the runner used to hang until CI's
 ## timeout.  If the first frame arrives and the tests did not finish, fail fast instead.
+## On that first frame the autoloads are up, so every script is compiled too: the screens that use
+## `Game` cannot be compiled from _init(), and a parse error in one of them (ending.gd once) used to
+## pass every test and only break the game when that screen was made.
 func _process(_d: float) -> bool:
 	if not finished:
 		printerr("  FAIL tests aborted by a script error (see above)")
 		quit(1)
+		return false
+	if not compiled:
+		compiled = true
+		print("== every script compiles ==")
+		for d in ["res://scripts", "res://tests"]:
+			for f in DirAccess.get_files_at(d):
+				if f.ends_with(".gd"):
+					var sc = load(d + "/" + f)
+					check(sc != null and (sc as GDScript).can_instantiate(), "%s/%s compiles" % [d.trim_prefix("res://"), f])
+		print("failures: ", failures)
+		quit(1 if failures > 0 else 0)
 	return false
 
 func check(cond: bool, msg: String) -> void:
@@ -375,12 +390,18 @@ func _init() -> void:
 			squarish.append(rid)
 	check(squarish.is_empty(), "every region's open ground is an organic outline, its map's corners mostly forest (squarish: %s)" % str(squarish))
 	var unlinked: Array = []
+	var realm_reach := {"surface": reach_all}
 	for i2 in Data.AREA_CHAIN.size():
 		var ra: String = Data.AREA_CHAIN[i2]
+		# (each realm's roads run over its own land: Part XI)
+		var rl := Data.layer_of(ra)
+		if not realm_reach.has(rl):
+			var rw := Atlas.world_of(rl)
+			realm_reach[rl] = MapGen.flood(rw.grid, rw.w, rw.h, rw.start)
 		for gp in Data.AREAS[ra].portals:
 			var ga := Atlas.to_world(ra, gp.pos)
 			var gb := Atlas.to_world(gp.to, Data.AREAS[gp.to].portals.filter(func(q): return q.to == ra)[0].pos)
-			if not reach_all.has(ga) or not reach_all.has(gb):
+			if not realm_reach[rl].has(ga) or not realm_reach[rl].has(gb):
 				unlinked.append(ra + "-" + gp.to)
 	check(unlinked.is_empty(), "every road joins its two gates over land (%s)" % str(unlinked))
 	print("== buildings ==")
@@ -485,15 +506,16 @@ func _init() -> void:
 	check(Data.BOSS_DROPS.get("jinwu", "") == "tenth_arrow", "the Sun Crow gives back the tenth arrow that Lin Feng later shows Xihe")
 	print("== part X ==")
 	var p10 := ["longmen", "drowned", "tushan", "buzhou"]
-	check(Data.REALMS[Data.REALMS.size() - 1] == "Mountain-River Oneness" and Data.MAX_LEVEL == 45, "Part X adds the Mountain-River Oneness realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break15", "Sun-Moon Harmony no longer ends the game: Mountain-River Oneness does")
+	check(Data.REALMS.has("Mountain-River Oneness") and Data.level_name(45).ends_with("Mountain-River Oneness"), "Part X adds the Mountain-River Oneness realm")
+	check(Data.step_index("s_break15") > Data.step_index("s_break14") and Data.STEPS[Data.step_index("s_break15")].to == 45, "Sun-Moon Harmony no longer ends the game: Mountain-River Oneness comes after it")
 	check(Data.DIALOGUE.has("recall8") and Data.step_index("s_break14") < Data.step_index("s_p10_home"), "Part X starts after the Sun-Moon Harmony breakthrough")
 	check(Data.AREAS.sect.portals.any(func(p): return p.to == "longmen" and p.open == "s_p10_road" and p.pos == Vector2i(12, 1)), "the sect's new north gate opens on the river road once Cartographer Pei has drawn it")
 	var sect10 := MapGen.build("sect")
 	check(sect10.grid[1 * sect10.w + 12] == MapGen.PATH and sect10.grid[12 * sect10.w + 12] == MapGen.PATH, "a path runs from the courtyard up to the north gate")
 	for a10 in p10:
 		check(Look.THEMES.has(a10) and Look.EXTRA.has(a10) and Scatter.ECO.has(a10) and Fauna.KINDS.has(a10) and MapGen.DENSITY.has(a10) and Arch.SETTLE.has(a10), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a10)
-		check(Data.AREAS[a10].bosses.size() == 5 and Data.AREAS[a10].pickups.size() == 4, a10 + ": five bosses and four things to find")
+		# (the keepsakes and caches upstairs and in cellars, Part XI, are not what the quest asks for)
+		check(Data.AREAS[a10].bosses.size() == 5 and Data.AREAS[a10].pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a10 + ": five bosses and four things to find")
 		var lm10: Dictionary = Atlas.layout()[a10]
 		check(int(lm10.site.y) < int(Atlas.layout()[Atlas.HUB].site.y), a10 + " lies north of the mountain, up the river road")
 	for st10 in ["s_p10_archive", "s_p10_road", "s_dg_intro", "s_df_intro", "s_ts_intro", "s_bz_intro"]:
@@ -517,6 +539,193 @@ func _init() -> void:
 		if t10 == MapGen.WATER:
 			river_tiles += 1
 	check(river_tiles > 120, "a river runs through Longmen (%d water tiles)" % river_tiles)
+	print("== part XI: the realms ==")
+	var p11 := ["juntian", "changhe", "ninesprings", "youdu"]
+	check(Data.REALMS[Data.REALMS.size() - 1] == "Three Realms Concord" and Data.MAX_LEVEL == 48 and Data.level_name(48).ends_with("Three Realms Concord"), "Part XI adds the Three Realms Concord realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break16", "Mountain-River Oneness no longer ends the game: Three Realms Concord does")
+	check(Data.DIALOGUE.has("recall9") and Data.step_index("s_break15") < Data.step_index("s_p11_home"), "Part XI starts after the Mountain-River Oneness breakthrough")
+	for a11 in p11:
+		var sp11: Dictionary = Data.AREAS[a11]
+		check(Look.THEMES.has(sp11.theme) and Look.EXTRA.has(sp11.theme) and Scatter.ECO.has(sp11.theme) and Fauna.KINDS.has(sp11.theme) and MapGen.DENSITY.has(sp11.theme) and Arch.SETTLE.has(sp11.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a11)
+		check(sp11.bosses.size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a11 + ": four bosses and four things to find")
+		check(Data.layer_of(a11) in ["heaven", "under"], a11 + " lies in a realm above or below the land")
+		for n11 in sp11.npcs:
+			check(Data.CHAT.has(str(n11.get("asset", n11.id))) and Data.CHAT[str(n11.get("asset", n11.id))].size() >= 3, "%s has at least three things to say" % n11.id)
+			check(n11.id == "houtu" or Data.RACES.has(str(n11.get("race", ""))), "%s belongs to one of the peoples of the realms" % n11.id)
+	check(Data.layer_of("juntian") == "heaven" and Data.layer_of("changhe") == "heaven" and Data.layer_of("ninesprings") == "under" and Data.layer_of("youdu") == "under", "two regions float in the Nine Heavens and two lie in the Nine Springs")
+	check(Atlas.layer_y("heaven") > 60.0 and Atlas.layer_y("under") < -40.0, "the Nine Heavens are drawn high above the land and the Nine Springs deep below it")
+	var ladders_seen := {}
+	for lid in ["heaven", "under"]:
+		var lw := Atlas.world_of(lid)
+		var lreach := MapGen.flood(lw.grid, lw.w, lw.h, lw.start)
+		var lcut := 0
+		var to_surface := false
+		for e11 in lw.ents:
+			if e11.kind != "spring" and e11.kind != "seal" and not lreach.has(e11.pos):
+				lcut += 1
+			if e11.kind == "ladder" and e11.to_layer == "surface":
+				to_surface = true
+				ladders_seen[str(e11.id)] = true
+				var sw := Atlas.world()
+				check(MapGen.is_walkable_tile(sw.grid[e11.to_tile.y * sw.w + e11.to_tile.x]), "%s comes out on open ground in the land" % e11.id)
+		check(lcut == 0, "%s: everyone and everything can be walked to from where the Jianmu comes in (%d cut off)" % [lid, lcut])
+		check(to_surface, "%s: a ladder leads back down (or up) to the land" % lid)
+		var edge_void := true
+		for x11 in lw.w:
+			edge_void = edge_void and lw.sea[x11] == 1 and lw.sea[(lw.h - 1) * lw.w + x11] == 1
+		check(edge_void, "%s: its land floats in open sky (or over the abyss) on every side" % lid)
+		for rid11 in Atlas.region_ids(lid):
+			check(Atlas.owner_id(lw, Atlas.to_world(rid11, Data.AREAS[rid11].npcs[0].pos if not Data.AREAS[rid11].npcs[0].has("floor") else Data.AREAS[rid11].bosses[0].pos)) == rid11, "%s owns its own land" % rid11)
+		check(Atlas._build(lid).grid == lw.grid, "%s: generation is deterministic" % lid)
+		for bd11 in lw.buildings:
+			var r11: Rect2i = bd11.rect
+			var closed := true
+			for xx in range(r11.position.x, r11.end.x):
+				for yy in [r11.position.y, r11.end.y - 1]:
+					if Vector2i(xx, yy) != bd11.door and MapGen.is_walkable_tile(lw.grid[yy * lw.w + xx]):
+						closed = false
+			check(closed and lw.grid[bd11.door.y * lw.w + bd11.door.x] == MapGen.INTERIOR, "%s: walls all round and a door" % bd11.n)
+	var sw2 := Atlas.world()
+	for e12 in sw2.ents:
+		if e12.kind == "ladder" and str(e12.get("style", "")) == "climb":
+			ladders_seen[str(e12.id)] = true
+			var dw := Atlas.world_of(e12.to_layer)
+			check(MapGen.is_walkable_tile(dw.grid[e12.to_tile.y * dw.w + e12.to_tile.x]), "%s comes out on open ground in %s" % [e12.id, e12.to_layer])
+			check(Data.step_index(str(e12.open)) >= 0, "%s opens at a real quest step" % e12.id)
+	check(ladders_seen.size() == Data.LADDERS.size() * 2, "both ends of every ladder between the realms stand in their regions (%d)" % ladders_seen.size())
+	var ho := Atlas.layer_origin("heaven")
+	var up_a := Atlas.to_world("mountain", Data.LADDERS[0].a[1])
+	var up_b := Atlas.to_world("juntian", Data.LADDERS[0].b[1]) + ho
+	check(up_a == up_b, "the crown of the Jianmu in the Nine Heavens is straight above its trunk on the mountain")
+	check(Data.next_hop("sect", "youdu") != "" and Data.next_hop("youdu", "sect") != "", "the Dark Capital can be reached from the sect and left again, by the Jianmu")
+	print("== part XI: storeys and cellars ==")
+	var n_floors := 0
+	var n_up := 0
+	var n_down := 0
+	for lid2 in ["surface", "heaven", "under"]:
+		var fw0 := Atlas.world_of(lid2)
+		for fid in fw0.floors:
+			var fw: Dictionary = fw0.floors[fid]
+			n_floors += 1
+			if int(fw.level) > 0:
+				n_up += 1
+			else:
+				n_down += 1
+			var freach := MapGen.flood(fw.grid, fw.w, fw.h, fw.start)
+			var fcut := 0
+			var back := false
+			for fe in fw.ents:
+				if not freach.has(fe.pos):
+					fcut += 1
+				if fe.kind == "ladder" and fe.to_layer == lid2:
+					back = true
+					check(MapGen.is_walkable_tile(fw0.grid[fe.to_tile.y * fw0.w + fe.to_tile.x]), "%s: the stairs come out on the floor below (or above)" % fid)
+			check(fcut == 0 and back, "%s: stairs back, and everyone and everything on it can be reached (%d cut off)" % [fid, fcut])
+			var walls := true
+			for xx2 in fw.w:
+				walls = walls and fw.grid[xx2] == MapGen.BUILDING and fw.grid[(fw.h - 1) * fw.w + xx2] == MapGen.BUILDING
+			check(walls, "%s: walls all round" % fid)
+			check(Atlas.world_of(fid) == fw, "%s can be looked up by its id" % fid)
+		# the stairs up and down stand on floor the door can reach
+		var r0 := MapGen.flood(fw0.grid, fw0.w, fw0.h, fw0.start)
+		for e13 in fw0.ents:
+			if e13.kind == "ladder" and str(e13.get("style", "")) == "stairs":
+				check(r0.has(e13.pos), "%s: the stairs can be walked to" % e13.id)
+	check(n_floors >= 20 and n_up >= 10 and n_down >= 8, "upper storeys and cellars to explore (%d floors: %d up, %d down)" % [n_floors, n_up, n_down])
+	var b1 := MB.new()
+	var g1 := MB.new()
+	var r1 := MB.new()
+	var rg1 := MB.new()
+	var u1 := MB.new()
+	var ug1 := MB.new()
+	Arch.house(b1, g1, r1, rg1, Rect2(0, 0, 22, 18), Vector3(11, 0, 17), "aerie", [["stairs_up", Vector3(5, 0, 5)]], 1, u1, ug1, [["nest", Vector3(15, 0, 5)]], Vector3(5, 0, 5))
+	check(not u1.is_empty() and not b1.is_empty() and not r1.is_empty(), "a building with an upper storey builds the storey separately from its ground floor and roof")
+	var cb := MB.new()
+	var cg := MB.new()
+	Arch.cellar(cb, cg, Rect2(0, 0, 20, 14), [["barrel", Vector3(3, 0, 3)]], Vector3(17, 0, 11), 1)
+	check(not cb.is_empty(), "a cellar builds")
+	for lk11 in ["jianmu", "jianmu_crown", "jianmu_roots", "changhe_gate", "youdu_gate"]:
+		var lroot11 := Node3D.new()
+		Terrain3D.landmark(lroot11, lk11, Vector3.ZERO, Vector3(1, 0, 0))
+		check(lroot11.get_child_count() >= 2, "Part XI landmark %s builds" % lk11)
+		lroot11.free()
+	var sky := Node3D.new()
+	Terrain3D.sky_world(sky, Atlas.world_of("heaven"))
+	check(sky.get_child_count() >= 3, "the sea of clouds and the islands' undersides build")
+	sky.free()
+	var deep := Node3D.new()
+	Terrain3D.deep_world(deep, Atlas.world_of("under"))
+	check(deep.get_child_count() >= 4, "the abyss and the cavern roof build")
+	deep.free()
+	print("== part XI: daos and peoples ==")
+	check(Data.DAO_ORDER.size() == 6 and Data.DAOS.size() == 6, "six Daos to choose from")
+	for did in Data.DAO_ORDER:
+		var dd: Dictionary = Data.DAOS[did]
+		check(Data.SKILLS.has(dd.skill) and Data.SKILLS[dd.skill].get("dao", "") == did, "%s teaches %s" % [did, dd.skill])
+		check(Data.DAO_MODS.has(did) and str(dd.motto).length() > 10, "%s has a passive and a motto" % did)
+		check(Data.DAO_LINES.dao_chosen.has(did) and Data.DAO_LINES["post:chong"].has(did) and Data.DAO_LINES["post:li"].has(did) and Data.DAO_LINES["post:s_break16"].has(did), "the story answers the %s" % did)
+		for mk in Data.DAO_MODS[did]:
+			check(Data.DAO_MODS[did][mk].size() == Data.DAO_RANKS.size(), "%s: %s grows with every rank" % [did, mk])
+		var honours := 0
+		for rc0 in Data.RACES:
+			if Data.RACES[rc0].dao == did:
+				honours += 1
+		check(honours >= 1, "some people of the realms honours the %s" % did)
+	for rc in Data.RACE_ORDER:
+		check(Data.RACES.has(rc) and Data.DAOS.has(Data.RACES[rc].dao), "%s honour a Dao that exists" % rc)
+		if rc == "human":
+			continue
+		check(Data.ITEMS.has(Data.RACES[rc].gift) and Look.PICKUP_COLORS.has(Data.RACES[rc].gift), "%s love a keepsake that exists" % rc)
+		check(Data.RACES[rc].dao_lines.size() == 6, "%s have something to say about every Dao" % rc)
+		var npcs := 0
+		for a12 in Data.AREAS:
+			for n12 in Data.AREAS[a12].get("npcs", []):
+				if n12.get("race", "") == rc:
+					npcs += 1
+		check(npcs >= 2, "%s: at least two of them to meet (%d)" % [rc, npcs])
+		var found := 0
+		for a13 in Data.AREAS:
+			for pk13 in Data.AREAS[a13].get("pickups", []):
+				if pk13.item == Data.RACES[rc].gift:
+					found += 1
+		check(found >= 2, "%s: their keepsake can be found in at least two places (%d)" % [rc, found])
+	# choosing, mastering and changing roads; standing, gifts and boons
+	# (a game state of its own: the autoload is not loaded for a test script)
+	var G = load("res://scripts/game.gd").new()
+	G.reset()
+	G.level = 45
+	check(G.dao == "" and G.dao_skills(0).is_empty() and G.dao_mod("one", 1.0) == 1.0, "no Dao before Part XI: no passives, no Dao technique")
+	G.choose_dao("sword")
+	check(G.dao == "sword" and G.dao_tier() == 0 and G.dao_mod("one", 1.0) > 1.0 and G.dao_skills(0).is_empty(), "a Novice of the Sword hits harder but has no Dao technique yet")
+	for k14 in Data.DAO_TIERS[1]:
+		G.dao_battle_won(false)
+	check(G.dao_tier() == 1 and G.dao_skills(0) == ["myriad_swords"] and G.fighter(0).skills.has("myriad_swords"), "an Adept of the Sword learns Ten Thousand Swords Return to One")
+	G.choose_dao("formation")
+	check(G.dao == "formation" and G.dao_switches == 1 and G.dao_tier() == 0 and G.dao_tier("sword") == 1 and G.dao_mod("taken", 1.0) < 1.0 and G.dao_mod("one", 1.0) == 1.0, "changing roads keeps each Dao's mastery; the passive follows the Dao walked")
+	G.choose_dao("alchemy")
+	check(G.skill_cost("standing_tree") < Data.SKILLS.standing_tree.cost, "the Cauldron's Dao makes techniques cheaper")
+	G.choose_dao("wander")
+	check(G.fighter(0).spd > Data.speed(G.level), "Free Wandering makes Lin Feng quicker")
+	G.standing = {}
+	G.dao = "wander"
+	G.race_gain("yumin", 10)
+	G.race_gain("tianhu", 10)
+	check(G.standing.yumin == 15 and G.standing.tianhu == 10, "standing grows half as fast again with the people whose Dao Lin Feng walks")
+	check(G.boon("spd", 0.0) == 0.0, "no boon before friendship")
+	G.standing.yumin = Data.FRIEND - 1
+	G.inv["wutong_seed"] = 1
+	check(G.give_gift("yumin") and G.inv.wutong_seed == 0 and G.race_tier("yumin") >= 1, "a gift the Feathered Folk love makes them friends")
+	check(G.boon("spd", 0.0) == 3.0 and not G.give_gift("yumin"), "their friendship is a boon; nothing left to give")
+	G.reset()
+	check(G.dao == "" and G.standing.is_empty() and G.layer == "surface", "a new game starts with no Dao, no standing, on the land")
+	G.free()
+	for st11 in ["s_p11_archive", "s_p11_tree", "s_jt_intro", "s_cg_intro", "s_ns_intro", "s_yd_intro", "s_p11_end"]:
+		check(Data.step_index(st11) > Data.step_index("s_p11_home"), "Part XI step %s follows the briefing" % st11)
+	check(Data.known_skills(0, 46).has("springs_torrent") and Data.known_skills(1, 46).has("jianmu_ward") and Data.known_skills(0, 45).has("standing_tree"), "Part XI techniques are learnable")
+	check(not Data.known_skills(0, 47, Data.step_index("s_yd_houtu")).has("concord") and Data.known_skills(0, 47, Data.step_index("s_yd_bai")).has("concord"), "the Three Realms Concord Sword is learned from Houtu")
+	check(not Data.known_skills(0, 48).has("myriad_swords"), "Dao techniques come only from walking the Dao")
+	check(Data.SKILLS.jianmu_ward.get("revive", false), "the Ward of the Standing Tree raises fallen allies")
+	check(Data.BOSS_DROPS.get("chong", "") == "heaven_tablet" and Data.BOSS_DROPS.get("li", "") == "earth_weight", "Chong gives up his tablet and Li his weight, which go back to the tree")
 	print("== towns and world-building ==")
 	var town_ids := {}
 	for tw in Data.TOWNS:
@@ -530,7 +739,7 @@ func _init() -> void:
 		for n10 in Data.AREAS[tn[0]].get("npcs", []):
 			check(Data.CHAT.has(n10.id) and Data.CHAT[n10.id].size() >= 3, "%s has at least three things to say" % n10.id)
 			check(Assets.PEOPLE.has(n10.id) and Assets.has(Assets.PEOPLE[n10.id]), "%s is Blender-built" % n10.id)
-	for rid2 in Atlas.region_ids():
+	for rid2 in Atlas.all_region_ids():
 		check(str(Data.REGION_LORE.get(rid2, "")).length() > 80, "the land remembers the history of " + rid2)
 	print("== story ==")
 	# every line of dialogue and chat fits the dialogue box (four lines of 22 px text, 1100 px wide)
@@ -551,6 +760,23 @@ func _init() -> void:
 			if par2.get_line_count() > 4:
 				too_long.append(ck)
 	check(too_long.is_empty(), "every line of dialogue fits the dialogue box (too long: %s)" % str(too_long))
+	# every foe's name fits its label in battle (200 px, a boss 360 px, shrunk to 11 px at most) and
+	# every boss's name its banner (660 px, down to 24 px); a battle message wraps onto more rows of
+	# the 440 px log, so none is cut off
+	var long_names: Array = []
+	for en in Data.ENEMIES:
+		var ed: Dictionary = Data.ENEMIES[en]
+		var lw := 360.0 if ed.get("boss", false) else 200.0
+		if dfont.get_string_size(str(ed.n), HORIZONTAL_ALIGNMENT_LEFT, -1, UI.fit(str(ed.n), 14, lw, 11)).x > lw:
+			long_names.append(en)
+		if ed.get("boss", false) and dfont.get_string_size(str(ed.n), HORIZONTAL_ALIGNMENT_LEFT, -1, UI.fit(str(ed.n), 34, 660, 24)).x > 660:
+			long_names.append(en + " (banner)")
+	check(long_names.is_empty(), "every foe's name fits its battle label (too long: %s)" % str(long_names))
+	var cut_rows := 0
+	for row in UI.wrap_lines("Enemies appear!  Frost Hare of the Moon, Three-Legged Moon Toad, Silver Crane of the Long Night", 16, 440):
+		if dfont.get_string_size(row, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x > 440:
+			cut_rows += 1
+	check(cut_rows == 0 and UI.wrap_lines("Enemies appear!  Frost Hare of the Moon, Three-Legged Moon Toad, Silver Crane of the Long Night", 16, 440).size() == 2, "a long battle message wraps onto two rows of the log")
 	for st in Data.STEPS:
 		if st.kind == "collect":
 			check(Data.ITEMS.has(st.item), "collect item defined " + st.item)
@@ -674,6 +900,5 @@ func _init() -> void:
 	for x4 in m4.w:
 		tdist = maxf(tdist, absf(Terrain3D.sample(hm4, m4.w, m4.h, (x4 + 0.5) * Terrain3D.T, 13.5 * Terrain3D.T)))
 	check(tdist < 0.5, "the sect's main road stays nearly flat (max %.2f)" % tdist)
-	print("failures: ", failures)
+	# the rest (every script compiles) runs on the first frame, see _process
 	finished = true
-	quit(1 if failures > 0 else 0)

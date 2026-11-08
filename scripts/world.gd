@@ -3,6 +3,13 @@ extends ScreenBase
 ## The whole game is one open world (see atlas.gd): the player walks from region to region along
 ## roads, and the 3D view streams each region's terrain in as the player nears it and drops it
 ## again far behind.  Buildings with doors can be walked into; the roof lifts away inside.
+##
+## Part XI stacks realms on the land: the Nine Heavens float 96 m above it and the Nine Springs lie
+## 64 m below it, each a world of its own (Atlas.world_of) laid at its own offset (`off`), joined to
+## the land by the Jianmu; upper storeys and cellars are small worlds too, joined by stairs.  The
+## hero is always in exactly one of them (`layer`): `wd`, `grid`, `ents` and the rest point at its
+## data (`bundles`), the 3D view shows its regions (or, upstairs, the land round the building; in a
+## cellar, only the cellar), and a ladder or a flight of stairs is a short trip between two of them.
 
 const TS := Terrain3D.T
 const STEP_T := 0.16
@@ -63,6 +70,14 @@ var held_dir := Vector2i.ZERO
 var cam_override: Variant = null
 var cam_a := 0.0
 var cam_pos := Vector3.ZERO
+## the realm (or floor) the hero is in, every realm's data and 3D offset, and a trip between two of
+## them while one is under way ({t, dur, to_layer, to_tile, dir, climb, swapped})
+var layer := "surface"
+var bundles := {}
+var off := Vector3.ZERO
+var trip := {}
+var banner_text := ""
+var cellar_env: Environment = null
 
 func _build3d() -> void:
 	opaque = false
@@ -95,6 +110,7 @@ func clear_cache() -> void:
 	cur_view = {}
 	area_id = ""
 	inside = ""
+	trip = {}
 
 func _free_view(k: String) -> void:
 	var v: Dictionary = views[k]
@@ -102,48 +118,203 @@ func _free_view(k: String) -> void:
 	for i in v.nodes:
 		v.nodes[i].queue_free()
 
-## (Re)load the open world, if needed, and place the player on world tile `at`.
+## (Re)load the open world, if needed (the land first; the realms above and below and the floors of
+## buildings are built the first time they are needed).
 func open_world() -> void:
 	if not wd.is_empty():
 		return
-	wd = Atlas.world()
+	_use("surface")
+
+## A realm's data, built the first time it is asked for: its world, its entities by tile and by id,
+## where it is drawn, its height field and its minimap, and the dressing that goes round it (the sea
+## round the land, the sea of clouds under the Nine Heavens, the abyss and the cavern roof of the
+## Nine Springs).
+func _bundle(lid: String) -> Dictionary:
+	if bundles.has(lid):
+		return bundles[lid]
+	var lw: Dictionary = Atlas.world_of(lid)
+	var b := {"wd": lw, "tile_ents": {}, "ent_by_id": {}, "off": Vector3.ZERO, "hm": PackedFloat32Array(), "mini": null, "root": null, "placed": false}
+	for e in lw.ents:
+		b.ent_by_id[e.id] = e
+		if e.kind == "seal":
+			for t2 in e.tiles:
+				b.tile_ents[t2] = e
+		elif e.kind != "spring":
+			b.tile_ents[e.pos] = e
+	var floor: bool = lw.get("kind", "") == "floor"
+	if floor:
+		var pb := _bundle(str(lw.parent))
+		b.off = pb.off + Vector3(lw.origin.x * TS, 0.0, lw.origin.y * TS)
+	else:
+		var o: Vector2i = lw.get("origin", Vector2i.ZERO)
+		b.off = Vector3(o.x * TS, float(lw.get("y", 0.0)), o.y * TS)
+	bundles[lid] = b
+	if not headless():
+		b.hm.resize((lw.w + 1) * (lw.h + 1))
+		if not floor:
+			lw["hm"] = b.hm
+			b.mini = Gfx.world_minimap(lw)
+			var root := Node3D.new()
+			root.name = "realm_" + lid
+			root.position = b.off
+			match lid:
+				"surface":
+					Terrain3D.world_sea(root, lw)
+				"heaven":
+					Terrain3D.sky_world(root, lw)
+				"under":
+					Terrain3D.deep_world(root, lw)
+			root.visible = false
+			scene3d.add_child(root)
+			b.root = root
+			if lid == "surface":
+				world_root = root
+	return b
+
+## Make realm `lid` the one the hero is in.
+func _use(lid: String) -> void:
+	var b := _bundle(lid)
+	layer = lid
+	wd = b.wd
 	w = wd.w
 	h = wd.h
 	grid = wd.grid
 	ents = wd.ents
-	tile_ents.clear()
-	ent_by_id.clear()
-	for e in ents:
-		ent_by_id[e.id] = e
-		if e.kind == "seal":
-			for t2 in e.tiles:
-				tile_ents[t2] = e
-		elif e.kind != "spring":
-			tile_ents[e.pos] = e
-	if not headless():
-		hm = PackedFloat32Array()
-		hm.resize((w + 1) * (h + 1))
-		wd["hm"] = hm
-		mini_tex = Gfx.world_minimap(wd)
-		world_root = Node3D.new()
-		world_root.name = "world_sea"
-		Terrain3D.world_sea(world_root, wd)
-		scene3d.add_child(world_root)
+	tile_ents = b.tile_ents
+	ent_by_id = b.ent_by_id
+	hm = b.hm
+	off = b.off
+	mini_tex = b.mini
+	if is_floor():
+		mini_tex = _bundle(str(wd.parent)).mini
+		_place_floor(b)
+	Game.layer = lid
 
-## Teleport to a region-local tile (as written in Data.AREAS).
-func load_area(id: String, at: Vector2i) -> void:
-	teleport(Atlas.to_world(id, at))
+func is_floor() -> bool:
+	return wd.get("kind", "") == "floor"
 
-func teleport(at: Vector2i) -> void:
+## Switch to realm (or floor) `lid` without moving the hero (the screenshot tour looks for a free tile
+## in it before teleporting there).
+func enter_layer(lid: String) -> void:
 	open_world()
+	_use(lid)
+
+## The minimap of a realm (built the first time it is asked for; null when headless).
+func realm_minimap(lid: String) -> Texture2D:
+	return _bundle(lid).mini
+
+## An upper storey stands on the building's walls, a cellar lies under its floor: set the floor's
+## height from the ground under the building (once the land round it has been built).
+func _place_floor(b: Dictionary) -> void:
+	var fw: Dictionary = b.wd
+	var pb := _bundle(str(fw.parent))
+	var po: Vector3 = pb.off
+	var c := po + Vector3((fw.origin.x + fw.w * 0.5) * TS, 0.0, (fw.origin.y + fw.h * 0.5) * TS)
+	var gy := _ground(pb, c)
+	b.off.y = gy + (Arch.STOREY_Y if int(fw.level) > 0 else Arch.CELLAR_Y)
+	off = b.off
+	b.placed = true
+
+## The realm whose regions the 3D view shows: upstairs, the land round the building; in a cellar,
+## none (only the cellar itself).
+func _view_layer() -> String:
+	if is_floor():
+		return str(wd.parent) if int(wd.level) > 0 else ""
+	return layer
+
+## The hero's tile in the tiles of the realm whose regions are on show.
+func view_tile() -> Vector2i:
+	if is_floor():
+		return wd.origin + ptile
+	return ptile
+
+## The realm a region lies in, and whether a ladder or flight of stairs can be used yet.
+func ladder_open(e: Dictionary) -> bool:
+	return Game.done(str(e.get("open", "")))
+
+## Teleport to a region-local tile (as written in Data.AREAS), in whichever realm the region lies.
+func load_area(id: String, at: Vector2i) -> void:
+	teleport(Atlas.to_world(id, at), Data.layer_of(id))
+
+func teleport(at: Vector2i, lid: String = "") -> void:
+	open_world()
+	if lid == "":
+		lid = layer
+	_use(lid)
 	ptile = at
 	target = at
 	move_t = -1.0
 	Game.tile = at
 	_enter_region(Atlas.owner_id(wd, at), true)
 	if not headless():
+		_show_layer()
 		_stream(true)
 		_snap_cam()
+
+## Take a ladder or a flight of stairs: a short trip (the hero rises or sinks out of view, the screen
+## fades, and he comes down into the other realm or floor).
+func use_ladder(e: Dictionary) -> void:
+	if not trip.is_empty():
+		return
+	var climb: bool = str(e.get("style", "")) == "climb"
+	trip = {"t": 0.0, "dur": 2.6 if climb else 0.7, "to_layer": str(e.to_layer), "to_tile": e.to_tile, "dir": int(e.get("dir", 1)), "climb": climb, "swapped": false}
+	move_dir = Vector2i.ZERO
+	if climb:
+		var verb := "Climbed the Jianmu into " if int(e.get("dir", 1)) > 0 else "Went down the Jianmu into "
+		Game.note(verb + str(Atlas.LAYER_NAMES.get(str(e.to_layer), str(e.to_layer))).replace("The ", "the "))
+
+func traveling() -> bool:
+	return not trip.is_empty()
+
+func _trip_step(d: float) -> void:
+	trip.t += d
+	if not trip.swapped and trip.t >= trip.dur * 0.5:
+		trip.swapped = true
+		var fc := facing
+		teleport(trip.to_tile, trip.to_layer)
+		facing = fc
+		if is_floor():
+			banner_text = "%s: %s" % [wd.bld_n, wd.floor_n] if str(wd.floor_n) != "" else str(wd.bld_n)
+			banner_t = 2.5
+		elif trip.climb:
+			banner_text = "%s - %s" % [Atlas.LAYER_NAMES.get(layer, ""), area_name]
+			banner_t = 3.0
+	if trip.t >= trip.dur:
+		trip = {}
+
+## How far the hero has risen (or sunk) on a trip: away from the floor he left in the first half, then
+## down onto the new one from above in the second.
+func _trip_lift() -> float:
+	if trip.is_empty():
+		return 0.0
+	var k: float = trip.t / trip.dur
+	var amp := 26.0 if trip.climb else 1.2
+	if k < 0.5:
+		return float(trip.dir) * amp * smoothstep(0.0, 0.5, k)
+	return amp * (1.0 - smoothstep(0.5, 1.0, k))
+
+## How much of the screen the trip's fade covers (it peaks as the realms change over).
+func trip_fade() -> float:
+	if trip.is_empty():
+		return 0.0
+	var k: float = trip.t / trip.dur
+	return pow(clampf(1.0 - absf(k - 0.5) * 2.2, 0.0, 1.0), 0.6)
+
+## An entity by id in any realm or floor (building the realm if need be): [layer, entity] or [].
+func locate_ent(id: String) -> Array:
+	var e = ent_by_id.get(id)
+	if e != null:
+		return [layer, e]
+	for lid in ["surface", "heaven", "under"]:
+		var lw: Dictionary = Atlas.world_of(lid)
+		for e2 in lw.ents:
+			if e2.id == id:
+				return [lid, e2]
+		for fid in lw.floors:
+			for e3 in lw.floors[fid].ents:
+				if e3.id == id:
+					return [fid, e3]
+	return []
 
 func _enter_region(id: String, quiet: bool = false) -> void:
 	if id == area_id:
@@ -159,21 +330,65 @@ func _enter_region(id: String, quiet: bool = false) -> void:
 		Game.note("Entered " + area_name)
 	if headless():
 		return
+	_apply_look()
+
+## The region's sky, fog, light and weather (a cellar has its own dark air, see _show_layer).
+func _apply_look() -> void:
+	if headless():
+		return
+	if is_floor() and int(wd.level) < 0:
+		if cellar_env == null:
+			cellar_env = Look.cellar_environment()
+		cam.environment = cellar_env
+		Fx3D.configure_weather(weather, "none")
+		return
 	if not envs.has(theme_name):
 		envs[theme_name] = Look.environment(theme_name)
 	cam.environment = envs[theme_name]
 	var th := Look.theme(theme_name)
 	main.fx_theme(theme_name)
 	Look.apply_lights(theme_name, sun, fill)
-	Fx3D.configure_weather(weather, th.weather)
+	# upstairs is indoors: no rain, snow or drifting cloud in the room
+	Fx3D.configure_weather(weather, "none" if is_floor() else th.weather)
 
-## Build the regions near the player and hide (eventually free) the ones far behind.
+## Show the realm the hero is in and hide the others; build the floor's own view when on a floor.
+func _show_layer() -> void:
+	var vl := _view_layer()
+	for lid in bundles:
+		var bb: Dictionary = bundles[lid]
+		if bb.root != null:
+			(bb.root as Node3D).visible = lid == vl
+	if is_floor() and not views.has(layer):
+		_floor_view(layer)
+	for k in views:
+		var v: Dictionary = views[k]
+		var on: bool = v.layer == vl or k == layer
+		(v.root as Node3D).visible = on
+		v.shown = on
+		if not on:
+			for i in v.nodes:
+				v.nodes[i].visible = false
+	_apply_look()
+
+## Build the regions near the player and hide (eventually free) the ones far behind.  Only the regions
+## of the realm on show are streamed; a floor's own view is built when it is entered.
 func _stream(all_now: bool) -> void:
 	var near: Array = []
-	for id in wd.ids:
-		var c: Rect2i = wd.layout[id].cell
-		var dx := maxi(maxi(c.position.x - ptile.x, ptile.x - c.end.x), 0)
-		var dy := maxi(maxi(c.position.y - ptile.y, ptile.y - c.end.y), 0)
+	var vl := _view_layer()
+	var vt := view_tile()
+	var ids: Array = []
+	if vl != "":
+		ids = _bundle(vl).wd.ids
+	for k0 in views:
+		if views[k0].layer != vl and k0 != layer and views[k0].shown:
+			views[k0].root.visible = false
+			for i0 in views[k0].nodes:
+				views[k0].nodes[i0].visible = false
+			views[k0].shown = false
+	for id in ids:
+		var c: Rect2i = Atlas.layout()[id].cell
+		var dx := maxi(maxi(c.position.x - vt.x, vt.x - c.end.x), 0)
+		var dy := maxi(maxi(c.position.y - vt.y, vt.y - c.end.y), 0)
 		var dd := maxi(dx, dy)
 		if dd <= 46:
 			near.append([dd, id])
@@ -194,25 +409,63 @@ func _stream(all_now: bool) -> void:
 		views[id].root.visible = true
 		views[id].shown = true
 	# keep memory bounded: drop the hidden regions furthest away
-	if views.size() > 9:
+	if views.size() > 10:
 		var far: Array = []
 		for k in views:
-			if not views[k].shown:
-				var c2: Rect2i = wd.layout[k].cell
-				far.append([-absf(c2.get_center().x - ptile.x) - absf(c2.get_center().y - ptile.y), k])
+			if not views[k].shown and not str(k).begins_with("f:"):
+				var c2: Rect2i = Atlas.layout()[k].cell
+				far.append([-absf(c2.get_center().x - vt.x) - absf(c2.get_center().y - vt.y), k])
+			elif not views[k].shown:
+				far.append([-1e9, k])
 		far.sort()
-		while views.size() > 9 and not far.is_empty():
+		while views.size() > 10 and not far.is_empty():
 			var k2: String = far.pop_front()[1]
 			_free_view(k2)
 			views.erase(k2)
 
+## Ground height at a point of realm bundle `bb` (world coordinates).
+func _ground(bb: Dictionary, p: Vector3) -> float:
+	var bw: Dictionary = bb.wd
+	return Terrain3D.sample(bb.hm, bw.w, bw.h, p.x - bb.off.x, p.z - bb.off.z) + bb.off.y
+
+## The height of the floorboards under a tile inside a building of realm bundle `bb` (or -INF if the
+## tile is not indoors).  A building's floor is a plank platform on the ground under its middle
+## (Arch.house): everyone indoors stands on the planks, not on the ground under them (they used to
+## stand 0.3 m deep in the floor).
+func _indoor_y(tile: Vector2i, bb: Dictionary) -> float:
+	var bw: Dictionary = bb.wd
+	if bw.get("kind", "") == "floor" or tile.x < 0 or tile.y < 0 or tile.x >= bw.w or tile.y >= bw.h:
+		return -INF
+	if bw.grid[tile.y * bw.w + tile.x] != MapGen.INTERIOR:
+		return -INF
+	for bd in bw.buildings:
+		var r: Rect2i = bd.rect
+		if r.has_point(tile):
+			var o: Vector3 = bb.off
+			var c := o + Vector3((r.position.x + r.size.x * 0.5) * TS, 0.0, (r.position.y + r.size.y * 0.5) * TS)
+			return _ground(bb, c) + Arch.FLOOR_Y
+	return -INF
+
+## Where someone stands at a point of realm bundle `bb`: on the floorboards indoors, else the ground.
+func _stand_y(bb: Dictionary, p: Vector3) -> float:
+	var o: Vector3 = bb.off
+	var iy := _indoor_y(Vector2i(int(floor((p.x - o.x) / TS)), int(floor((p.z - o.z) / TS))), bb)
+	return iy if iy > -INF else _ground(bb, p)
+
+## The centre of a tile of the realm the hero is in, in the 3D world.
+func wpos(tile: Vector2i) -> Vector3:
+	return Terrain3D.world_pos(tile) + off
+
 func _build_view(id: String) -> void:
-	var sl := Atlas.slice(wd, id)
+	var lid := Data.layer_of(id)
+	var bb := _bundle(lid)
+	var lw: Dictionary = bb.wd
+	var sl := Atlas.slice(lw, id)
 	var r: Rect2i = sl.rect
 	var shore := {}
-	var shm := Terrain3D.world_heights(wd, r, shore)
+	var shm := Terrain3D.world_heights(lw, r, shore)
 	var bl: Array = []
-	for bd in wd.buildings:
+	for bd in lw.buildings:
 		if bd.area == id:
 			var lb: Dictionary = bd.duplicate(true)
 			lb.rect = Rect2i(bd.rect.position - r.position, bd.rect.size)
@@ -220,39 +473,72 @@ func _build_view(id: String) -> void:
 			var props: Array = []
 			for pr in bd.props:
 				props.append([pr[0], pr[1] - r.position, pr[2]])
+			# the stairs up and down are drawn with the building
+			if bd.has("up"):
+				lb.up = bd.up - r.position
+				props.append(["stairs_up", lb.up, false])
+				var uprops: Array = []
+				for pr2 in bd.upper.props:
+					uprops.append([pr2[0], pr2[1] - r.position, pr2[2]])
+				uprops.append(["stairs_hole", lb.up, false])
+				lb.upper = {"n": bd.upper.n, "props": uprops}
+			if bd.has("down"):
+				lb.down = bd.down - r.position
+				props.append(["stairs_down", lb.down, false])
 			lb.props = props
 			bl.append(lb)
 	var spec: Dictionary = Data.AREAS[id]
 	var root := Terrain3D.build(sl.grid, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
-	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS)
+	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS) + bb.off
 	scene3d.add_child(root)
 	var nodes := {}
-	for i in ents.size():
-		var e: Dictionary = ents[i]
+	for i in lw.ents.size():
+		var e: Dictionary = lw.ents[i]
 		if e.area != id:
 			continue
-		var n := _make_ent(e)
-		n.position.y = ground_y(n.position)
+		var n := _make_ent(e, bb.off)
+		n.position.y = _stand_y(bb, n.position)
 		scene3d.add_child(n)
 		nodes[i] = n
 	if id == "sect":
 		var pg := Atlas.to_world("sect", Vector2i(-5, 3))
 		var pp := Terrain3D.world_pos(pg)
-		Terrain3D.pagoda(root, Vector3(pp.x, ground_y(pp) - 0.3, pp.z) - root.position)
+		Terrain3D.pagoda(root, Vector3(pp.x, _ground(bb, pp) - 0.3, pp.z) - root.position)
 	if spec.has("landmark"):
 		# the Fusang mulberry (Part IX); the Dragon Gate, the great cauldron and the broken pillar of
-		# Buzhou (Part X)
-		var fp := Terrain3D.world_pos(Atlas.to_world(id, spec.landmark.pos))
+		# Buzhou (Part X); the Jianmu, its crown and its roots, the Gate of Heaven and the gate of
+		# Youdu (Part XI)
+		var boff: Vector3 = bb.off
+		var fp := Terrain3D.world_pos(Atlas.to_world(id, spec.landmark.pos)) + boff
 		var ax := Atlas.dir_to_world(id, Vector2i(1, 0))
-		Terrain3D.landmark(root, spec.landmark.kind, Vector3(fp.x, ground_y(fp), fp.z) - root.position, Vector3(ax.x, 0, ax.y))
-	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {})}
+		Terrain3D.landmark(root, spec.landmark.kind, Vector3(fp.x, _ground(bb, fp), fp.z) - root.position, Vector3(ax.x, 0, ax.y))
+	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {}), "uppers": root.get_meta("uppers", {}), "layer": lid, "ents": lw.ents, "bundle": lid}
+
+## A floor's own view: its people and things (an upper storey is drawn with its building; a cellar
+## is built here, under the building).
+func _floor_view(fid: String) -> void:
+	var bb := _bundle(fid)
+	var fw: Dictionary = bb.wd
+	var root := Node3D.new()
+	root.name = "floor_" + fid
+	root.position = bb.off
+	scene3d.add_child(root)
+	if int(fw.level) < 0:
+		Terrain3D.cellar(root, fw)
+	var nodes := {}
+	for i in fw.ents.size():
+		var n := _make_ent(fw.ents[i], bb.off)
+		n.position.y = bb.off.y
+		scene3d.add_child(n)
+		nodes[i] = n
+	views[fid] = {"root": root, "nodes": nodes, "shown": true, "roofs": {}, "uppers": {}, "layer": fid, "ents": fw.ents, "bundle": fid}
 
 # ---------------------------------------------------------------- entities
 func ent_visible(e: Dictionary) -> bool:
 	match e.kind:
 		"enemy":
 			return not Game.defeated.has(e.id)
-		"seal":
+		"seal", "ladder":
 			return true
 		"boss":
 			return not Game.boss_done.has(e.enemy)
@@ -265,6 +551,10 @@ func ent_visible(e: Dictionary) -> bool:
 	if v[0] != "" and not Game.reached(v[0]):
 		return false
 	if v[1] != "" and Game.done(v[1]):
+		return false
+	# someone who is away for a while (Archivist Lan, down in the Sealed Archive)
+	var hd = e.get("hide", [])
+	if not hd.is_empty() and Game.reached(hd[0]) and not Game.done(hd[1]):
 		return false
 	return true
 
@@ -302,6 +592,10 @@ func near_spring() -> bool:
 
 func find_ent(id: String):
 	return ent_by_id.get(id)
+
+## The tile a pickup, ladder or anyone else stands on, as a 3D position in its own realm.
+func ent_pos(e: Dictionary) -> Vector3:
+	return Terrain3D.world_pos(e.pos) + off
 
 # ---------------------------------------------------------------- 3D models for entities
 static func _label(parent: Node3D, text: String, y: float, col: Color, size: int = 34) -> Label3D:
@@ -361,13 +655,14 @@ func _npc_opts(id: String) -> Dictionary:
 		return {"asset": id}
 	return {}
 
-func _make_ent(e: Dictionary) -> Node3D:
+func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 	var n := Node3D.new()
-	n.position = Terrain3D.world_pos(e.pos)
+	n.position = Terrain3D.world_pos(e.pos) + at
 	n.visible = false
 	match e.kind:
 		"npc":
-			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(e.id))
+			# (someone who appears in two places shares one model: "asset")
+			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(str(e.get("asset", e.id))))
 			n.add_child(m)
 			n.add_child(Models.shadow_disc(0.6))
 			_label(n, e.n, 2.45, UI.C_GOLD)
@@ -421,7 +716,7 @@ func _make_ent(e: Dictionary) -> Node3D:
 				for tt in ts:
 					mid += Terrain3D.world_pos(tt)
 				mid /= float(ts.size())
-				n.position = Vector3(mid.x, 0, mid.z)
+				n.position = Vector3(mid.x, 0, mid.z) + at
 				pm.scale = Vector3(1.6, 1.6, 1.6)
 			n.set_meta("open", open)
 			n.add_child(pm)
@@ -430,6 +725,20 @@ func _make_ent(e: Dictionary) -> Node3D:
 			n.set_meta("model", pm)
 		"spring":
 			n.add_child(Models.spring_basin())
+		"ladder":
+			# the way up or down the Jianmu, or a flight of stairs (the building draws the stairs; a
+			# glowing mark on the floor shows where they are)
+			var lm := Models.ladder(str(e.get("style", "")), int(e.get("dir", 1)))
+			n.add_child(lm)
+			n.set_meta("model", lm)
+			var ll := _label(n, str(e.get("n", "")), 2.6 if str(e.get("style", "")) == "climb" else 1.6, Color("a8e0ff") if int(e.get("dir", 1)) < 0 else UI.C_GOLD, 30 if str(e.get("style", "")) == "climb" else 24)
+			n.set_meta("label", ll)
+		"stele":
+			var sm := Models.dao_stele()
+			n.add_child(sm)
+			n.add_child(Models.shadow_disc(0.7))
+			_label(n, "Dao Stele", 3.0, UI.C_JADE, 30)
+			n.set_meta("model", sm)
 	return n
 
 # ---------------------------------------------------------------- update
@@ -444,7 +753,10 @@ func _process(d: float) -> void:
 			if e == null or maxi(absi(e.pos.x - ptile.x), absi(e.pos.y - ptile.y)) > 6:
 				Game.defeated.erase(k)
 	var active: bool = main.top_name() == "world"
-	if active:
+	if not trip.is_empty():
+		# on a ladder or the stairs: no walking until the trip is over
+		_trip_step(d)
+	elif active:
 		if not main.bot_active:
 			move_dir = _read_keys()
 		_move(minf(d, 0.1))
@@ -526,13 +838,18 @@ func face_entity():
 
 # ---------------------------------------------------------------- 3D view update
 func ground_y(p: Vector3) -> float:
-	return Terrain3D.sample(hm, w, h, p.x, p.z)
+	return Terrain3D.sample(hm, w, h, p.x - off.x, p.z - off.z) + off.y
 
 func _player_pos() -> Vector3:
-	var pp := Terrain3D.world_pos(ptile)
+	var pp := wpos(ptile)
 	if move_t >= 0.0:
-		pp = pp.lerp(Terrain3D.world_pos(target), move_t)
-	pp.y = ground_y(pp)
+		pp = pp.lerp(wpos(target), move_t)
+	# indoors on the floorboards (a step up over the threshold), else on the ground
+	var bb: Dictionary = bundles[layer]
+	var iy0 := _indoor_y(ptile, bb)
+	var iy1 := _indoor_y(target, bb) if move_t >= 0.0 else iy0
+	var gy := ground_y(pp)
+	pp.y = lerpf(maxf(iy0, gy) if iy0 > -INF else gy, maxf(iy1, gy) if iy1 > -INF else gy, clampf(move_t, 0.0, 1.0)) + _trip_lift()
 	return pp
 
 func _cam_goal(pp: Vector3, a: float) -> Array:
@@ -577,7 +894,7 @@ func _update_view(d: float) -> void:
 		# follow camera and him
 		var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
 		comp_pos = cs[0]
-		comp_pos.y = ground_y(comp_pos)
+		comp_pos.y = _stand_y(bundles[layer], comp_pos)
 		comp.position = comp_pos
 		comp_run = cs[2]
 		comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
@@ -587,8 +904,9 @@ func _update_view(d: float) -> void:
 		var v: Dictionary = views[k]
 		if not v.shown:
 			continue
+		var vb: Dictionary = bundles[v.bundle]
 		for i in v.nodes:
-			var e: Dictionary = ents[i]
+			var e: Dictionary = v.ents[i]
 			var n: Node3D = v.nodes[i]
 			var vis := ent_visible(e)
 			n.visible = vis
@@ -597,17 +915,28 @@ func _update_view(d: float) -> void:
 			var dist := n.position.distance_to(pp)
 			if dist > 46.0:
 				continue
-			_animate_ent(e, n, pp, dist, d)
-	# inside a building the roof lifts away so the follow camera can look in
-	var bd := building_at(ptile if move_t < 0.0 or move_t > 0.5 else target)
-	var now_in: String = bd.get("id", "") if not bd.is_empty() else ""
-	if now_in != inside:
+			_animate_ent(e, n, pp, dist, d, vb)
+	# inside a building the roof lifts away so the follow camera can look in; on the ground floor of a
+	# building with an upper storey the storey lifts away too, and upstairs only the roof does
+	var key := ""
+	if is_floor():
+		key = "%s#%d" % [wd.bld, int(wd.level)]
+	else:
+		var bd := building_at(ptile if move_t < 0.0 or move_t > 0.5 else target)
+		key = (str(bd.id) + "#0") if not bd.is_empty() else ""
+	if key != inside:
+		var bid := key.get_slice("#", 0)
+		var lv := int(key.get_slice("#", 1)) if key != "" else 0
 		for k2 in views:
 			var roofs: Dictionary = views[k2].roofs
 			for rid in roofs:
 				for rn in roofs[rid]:
-					(rn as Node3D).visible = rid != now_in
-		inside = now_in
+					(rn as Node3D).visible = rid != bid
+			var ups: Dictionary = views[k2].get("uppers", {})
+			for uid in ups:
+				for un in ups[uid]:
+					(un as Node3D).visible = not (uid == bid and lv == 0)
+		inside = key
 	weather.global_position = Vector3(pp.x, pp.y + weather_y(), pp.z)
 	# chase camera
 	cam_a = lerp_angle(cam_a, cam_q * PI / 2.0, 1.0 - exp(-d * 4.5))
@@ -671,7 +1000,7 @@ func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void
 		if shape in ["wisp", "jelly", "storm", "ray"]:
 			mk.position.y = home.y + 0.15 * sin(t * 1.6 + i)
 
-func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) -> void:
+func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, vb: Dictionary = {}) -> void:
 	match e.kind:
 		"npc":
 			var m: Node3D = n.get_meta("model")
@@ -702,7 +1031,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) 
 			if dist < 10.0:
 				var dv2 := pp - n.position
 				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))
-			var base_y := ground_y(n.position)
+			var base_y := _ground(vb, n.position) if not vb.is_empty() else ground_y(n.position)
 			n.position.y = base_y + sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0)
 		"pickup":
 			var gm: Node3D = n.get_meta("gem")
@@ -725,6 +1054,20 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float) 
 			var pm: Node3D = n.get_meta("model")
 			(pm.get_meta("ring") as Node3D).rotation.z = t * 0.8
 			(pm.get_meta("swirl") as Node3D).rotation.z = -t * 1.6
+		"ladder":
+			var lm: Node3D = n.get_meta("model")
+			var lopen := ladder_open(e)
+			var lbl2: Label3D = n.get_meta("label")
+			lbl2.text = str(e.get("n", "")) if lopen else "The way is closed"
+			lbl2.visible = dist < 14.0
+			if lm.has_meta("spin"):
+				(lm.get_meta("spin") as Node3D).rotation.y = t * (0.6 if int(e.get("dir", 1)) > 0 else -0.6)
+			if lm.has_meta("glow"):
+				(lm.get_meta("glow") as Node3D).visible = lopen
+		"stele":
+			var smd: Node3D = n.get_meta("model")
+			if smd.has_meta("spin"):
+				(smd.get_meta("spin") as Node3D).rotation.y = t * 0.4
 
 # ---------------------------------------------------------------- 2D HUD overlay
 func _draw() -> void:
@@ -758,12 +1101,29 @@ func _draw_hud() -> void:
 	_draw_minimap()
 	if banner_t > 0.0:
 		var a := clampf(banner_t, 0.0, 1.0)
-		UI.panel(self, Rect2(VIEW.x * 0.5 - 220, 96, 440, 52), Color(0.04, 0.06, 0.13, 0.85 * a), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, a))
-		UI.text(self, Vector2(VIEW.x * 0.5 - 220, 130), area_name, 26, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, 440)
+		var btxt := banner_text if banner_text != "" else area_name
+		var bw := maxf(440.0, UI.font().get_string_size(btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 26).x + 60.0)
+		UI.panel(self, Rect2(VIEW.x * 0.5 - bw * 0.5, 96, bw, 52), Color(0.04, 0.06, 0.13, 0.85 * a), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, a))
+		UI.text(self, Vector2(VIEW.x * 0.5 - bw * 0.5, 130), btxt, 26, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, bw)
+	elif banner_text != "":
+		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and fe.kind in ["npc", "boss"]:
-		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + ("Talk" if fe.kind == "npc" else "Challenge"), 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
+	if fe != null and move_t < 0.0 and trip.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele"]:
+		var hint := "Talk"
+		match fe.kind:
+			"boss":
+				hint = "Challenge"
+			"ladder":
+				hint = ("Climb" if str(fe.get("style", "")) == "climb" else "Take the stairs") if ladder_open(fe) else "Look"
+			"stele":
+				hint = "Choose your Dao"
+		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + hint, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
+	# a trip up or down the Jianmu (or the stairs) fades through white going up, dark going down
+	var fade := trip_fade()
+	if fade > 0.0:
+		var fc := Color(0.96, 0.97, 1.0) if int(trip.dir) > 0 and trip.climb else Color(0.02, 0.02, 0.05)
+		draw_rect(Rect2(Vector2.ZERO, VIEW), Color(fc.r, fc.g, fc.b, fade * (1.0 if trip.climb else 0.85)))
 	# toasts
 	var y := 170.0
 	var i := 0
@@ -777,17 +1137,22 @@ func _draw_minimap() -> void:
 	var mw := 190.0
 	var mh := 120.0
 	var r := Rect2(VIEW.x - mw - 16, 88, mw, mh)
-	# a window of the world map centred on the player
+	# a window of the world map centred on the player (upstairs or in a cellar: the map of the realm
+	# outside, centred on the building)
+	var vb: Dictionary = bundles[_view_layer() if _view_layer() != "" else str(wd.get("parent", layer))]
+	var mw_t: int = vb.wd.w
+	var mh_t: int = vb.wd.h
+	var vt := view_tile()
 	var span := Vector2(96, 96 * mh / mw)
-	var o := Vector2(ptile) - span * 0.5
-	o.x = clampf(o.x, 0.0, w - span.x)
-	o.y = clampf(o.y, 0.0, h - span.y)
+	var o := Vector2(vt) - span * 0.5
+	o.x = clampf(o.x, 0.0, mw_t - span.x)
+	o.y = clampf(o.y, 0.0, mh_t - span.y)
 	var src := Rect2(o, span)
 	draw_rect(r.grow(4), Color(0.02, 0.03, 0.08, 0.85))
 	draw_rect(r.grow(4), UI.C_BORDER, false, 2.0)
 	draw_texture_rect_region(mini_tex, r, src, Color(1, 1, 1, 0.92))
 	var sc := r.size / span
-	for e in ents:
+	for e in vb.wd.ents:
 		if not src.has_point(Vector2(e.pos)) or not ent_visible(e):
 			continue
 		var col := Color.TRANSPARENT
@@ -800,12 +1165,22 @@ func _draw_minimap() -> void:
 				col = Color("ff3030")
 			"pickup":
 				col = Color("ffffff")
+			"ladder":
+				col = Color("a8e0ff") if str(e.get("style", "")) == "climb" else Color(0, 0, 0, 0)
+			"stele":
+				col = UI.C_JADE
 		if col.a > 0.0:
 			draw_circle(r.position + (Vector2(e.pos) - o + Vector2(0.5, 0.5)) * sc, 2.4, col)
-	var pp := r.position + (Vector2(ptile) - o + Vector2(0.5, 0.5)) * sc
+	var pp := r.position + (Vector2(vt) - o + Vector2(0.5, 0.5)) * sc
 	draw_circle(pp, 4.5 + sin(t * 5.0), Color(1, 1, 1, 0.35))
 	draw_circle(pp, 2.6, Color("5aa9ff"))
 	var here := area_name
-	if inside != "":
+	if is_floor():
+		here = "%s, %s" % [wd.bld_n, "upstairs" if int(wd.level) > 0 else "below"]
+	elif inside != "":
 		here = building_at(ptile).get("n", area_name)
 	UI.text(self, r.position + Vector2(0, r.size.y + 20), here, 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, mw)
+	if layer != "surface":
+		var realm: String = Atlas.LAYER_NAMES.get(str(wd.get("parent", layer)) if is_floor() else layer, "")
+		if realm != "" and realm != Atlas.LAYER_NAMES.surface:
+			UI.text(self, r.position + Vector2(0, r.size.y + 36), realm, 12, Color("a8d0ff"), HORIZONTAL_ALIGNMENT_RIGHT, mw)

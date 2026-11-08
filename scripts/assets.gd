@@ -82,6 +82,17 @@ const PEOPLE := {
 	"charcoal_tan": "characters/charcoal_tan", "innkeeper_lou": "characters/innkeeper_lou", "little_qi": "characters/little_qi",
 	"well_keeper_zhaya": "characters/well_keeper_zhaya", "cook_aysha": "characters/cook_aysha", "star_reader_kumar": "characters/star_reader_kumar",
 	"camel_boy_temur": "characters/camel_boy_temur",
+	# ---- Part XI: the peoples of the Nine Heavens and the Nine Springs
+	# (the Yumin, the dragon-kin of the Rain Ministry, the celestial foxes, the Jiaoren, the
+	# Deathless and the shades of Youdu, with race features from art/lib/race.py; and Houtu)
+	"ling_yu": "characters/ling_yu", "yu_hua": "characters/yu_hua", "yu_jian": "characters/yu_jian",
+	"egg_warden_luan": "characters/egg_warden_luan", "que_er": "characters/que_er",
+	"ao_run": "characters/ao_run", "ao_qing": "characters/ao_qing",
+	"hu_qingyi": "characters/hu_qingyi", "hu_meier": "characters/hu_meier", "gate_fox_hu": "characters/gate_fox_hu",
+	"shui_lian": "characters/shui_lian", "hai_ge": "characters/hai_ge", "little_bei": "characters/little_bei",
+	"bu_si": "characters/bu_si", "chang_sheng": "characters/chang_sheng",
+	"ming_yi": "characters/ming_yi", "zhi_ma": "characters/zhi_ma", "shade_lan": "characters/shade_lan",
+	"houtu": "characters/houtu",
 }
 
 static var _scenes := {}

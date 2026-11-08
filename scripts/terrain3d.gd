@@ -598,7 +598,7 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 	root.set_meta("h", h)
 	var cw := int(ceil(w / float(CH)))
 	var chh := int(ceil(h / float(CH)))
-	var water_glow := 1.1 if theme_name in ["volcano", "time", "void", "origin", "abyss", "forge", "fungal", "chaos", "lilies", "diyu", "tushan"] else 0.0
+	var water_glow := 1.1 if theme_name in ["volcano", "time", "void", "origin", "abyss", "forge", "fungal", "chaos", "lilies", "diyu", "tushan", "ninesprings", "youdu"] else 0.0
 	var wmat := _water_mat(th.water, water_glow, [th.sky_top, th.sky_hor])
 	var gmat := ground_mat(theme_name)
 	var rw := w + 1
@@ -668,9 +668,14 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 		_skirt(root, w, h, theme_name, seed_)
 		_horizon(root, w, h, theme_name, seed_)
 	var roofs := {}
+	var uppers := {}
 	for bd in opts.get("buildings", []):
-		roofs[bd.id] = _house(root, bd, hm, w, h)
+		var hs: Dictionary = _house(root, bd, hm, w, h)
+		roofs[bd.id] = hs.roof
+		if not hs.upper.is_empty():
+			uppers[bd.id] = hs.upper
 	root.set_meta("roofs", roofs)
+	root.set_meta("uppers", uppers)
 	if str(opts.get("area", theme_name)) == "sect":
 		_sect_props(root, grid, w, h, hm)
 	return root
@@ -1021,6 +1026,16 @@ static func landmark(root: Node3D, kind: String, pos: Vector3, along: Vector3) -
 			great_cauldron(root, pos)
 		"buzhou":
 			buzhou_pillar(root, pos)
+		"jianmu":
+			jianmu(root, pos)
+		"jianmu_crown":
+			jianmu_crown(root, pos)
+		"jianmu_roots":
+			jianmu_roots(root, pos)
+		"changhe_gate":
+			sky_gate(root, pos, along, false)
+		"youdu_gate":
+			sky_gate(root, pos, along, true)
 
 ## Part X: the Dragon Gate at Longmen, where the river comes down out of the gorge: two cliffs of
 ## banded rock with pines clinging to them, a carved stone gate across the gap high above the water,
@@ -1157,9 +1172,432 @@ static func buzhou_pillar(root: Node3D, pos: Vector3) -> void:
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
+# ---------------------------------------------------------------- Part XI: the Jianmu and the realms
+## The Jianmu on Azure Cloud Mountain: the Standing Tree, the ladder between heaven, earth and the
+## underworld.  A trunk of bronze-dark bark nine metres across at the foot, ribbed and very slightly
+## twisted, with not one branch for a hundred and fifty metres; buttress roots over the hillside; a
+## stair of planks on brackets winding up round it from the south face, with lanterns; the mouth of a
+## root-cave on the east face glowing blue (the way down to the Nine Springs); a ring of cloud high up.
+## The old books say it casts no shadow at noon, and it does not: no shadow at all.
+static func jianmu(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var bark := MB.tag(JIANMU_BARK, MB.WOOD)
+	var bark_d := MB.tag(JIANMU_BARK.darkened(0.3), MB.WOOD)
+	var plank := MB.tag(Color("a8804e"), MB.WOOD)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3131
+	var top := 150.0
+	var prof := [Vector2(9.0, 0.0), Vector2(7.4, 2.5), Vector2(6.5, 7.0), Vector2(6.1, 20.0), Vector2(5.7, 50.0), Vector2(5.3, 90.0), Vector2(4.9, 125.0), Vector2(4.5, top)]
+	b.lathe(pos + Vector3(0, -1.5, 0), prof, bark, 22)
+	var rad := func(y: float) -> float:
+		for k in prof.size() - 1:
+			if y <= prof[k + 1].y:
+				return lerpf(prof[k].x, prof[k + 1].x, (y - prof[k].y) / (prof[k + 1].y - prof[k].y))
+		return 4.5
+	# ribs of darker bark winding slowly up the trunk
+	for k in 16:
+		var a0 := TAU * k / 16.0
+		var prev := Vector3.ZERO
+		for j in 12:
+			var y := 1.0 + j * 12.0
+			var a := a0 + j * 0.05
+			var rr: float = rad.call(y) + 0.15
+			var pt := pos + Vector3(cos(a) * rr, y, sin(a) * rr)
+			if j > 0:
+				b.limb(prev, pt, 0.42, 0.42, bark_d, 5)
+			prev = pt
+	# buttress roots over the ground, leaving the stair (south) and the root-cave (east) clear
+	for k in 10:
+		var a2 := TAU * (k + 0.5) / 10.0 + rng.randf_range(-0.15, 0.15)
+		if absf(angle_difference(a2, PI * 0.5)) < 0.45 or absf(angle_difference(a2, 0.0)) < 0.45:
+			continue
+		var d2 := Vector3(cos(a2), 0, sin(a2))
+		var mid := pos + d2 * rng.randf_range(9.0, 11.0) + Vector3(0, 0.4, 0)
+		b.limb(pos + d2 * 6.0 + Vector3(0, 4.0, 0), mid, 2.4, 1.3, bark, 8)
+		b.limb(mid, pos + d2 * rng.randf_range(14.0, 18.0) + Vector3(0, -0.6, 0), 1.3, 0.4, bark, 7)
+	# the stair: planks on brackets winding up from the south face, a lantern every so often
+	for k in 180:
+		var f := k / 179.0
+		var a3 := PI * 0.5 + f * TAU * 2.5
+		var y3 := 0.5 + f * 70.0
+		var rr3: float = rad.call(y3) + 1.1
+		var c3 := pos + Vector3(cos(a3) * rr3, y3, sin(a3) * rr3)
+		b.box(c3, Vector3(1.0, 0.16, 2.0), plank, Vector3(0, -a3, 0))
+		if k % 3 == 0:
+			b.limb(pos + Vector3(cos(a3) * (rr3 - 1.0), y3 - 0.9, sin(a3) * (rr3 - 1.0)), c3 + Vector3(0, -0.1, 0), 0.08, 0.06, bark_d, 4)
+		if k % 15 == 7:
+			g.ball(c3 + Vector3(cos(a3) * 1.0, 1.2, sin(a3) * 1.0), 0.35, Color(1.0, 0.75, 0.4, 0.9), true)
+	# the mouth of the root-cave on the east face: an arch of roots, darkness and a blue glow inside
+	var cave := pos + Vector3(rad.call(1.0) - 0.3, 0, 0)
+	for s: float in [-1.0, 1.0]:
+		b.limb(cave + Vector3(0.6, -0.3, s * 1.8), cave + Vector3(0.9, 3.2, s * 0.9), 0.6, 0.45, bark_d, 6)
+	b.limb(cave + Vector3(0.9, 3.2, -1.0), cave + Vector3(0.9, 3.2, 1.0), 0.5, 0.5, bark_d, 6)
+	b.box(cave + Vector3(0.35, 1.4, 0), Vector3(0.3, 2.8, 3.0), MB.tag(Color("0a0c12"), MB.STONE))
+	g.disc(cave + Vector3(0.55, 1.4, 0), 1.3, Color(0.35, 0.75, 1.0, 0.65), 16, Color(0.35, 0.75, 1.0, 0.0), Vector3(0, 0, PI * 0.5))
+	g.ball(cave + Vector3(1.6, 0.8, 0), 1.6, Color(0.4, 0.8, 1.0, 0.18), true)
+	# a ring of cloud round the trunk high above, and the first leaves of the crown above that
+	for k in 14:
+		var a4 := TAU * k / 14.0 + rng.randf() * 0.3
+		var r4 := rng.randf_range(9.0, 16.0)
+		g.ball(pos + Vector3(cos(a4) * r4, rng.randf_range(72.0, 86.0), sin(a4) * r4), rng.randf_range(6.0, 10.0), Color(1.0, 1.0, 1.0, 0.13), true)
+	var crown: Array = []
+	for k in 7:
+		var a5 := TAU * k / 7.0
+		crown.append([pos + Vector3(cos(a5) * 9.0, top + rng.randf_range(-6.0, 4.0), sin(a5) * 9.0), 9.0])
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_leaf_cloud(root, crown, 3131)
+
+## "Green leaves, purple stems, black flowers, yellow fruit" (the Classic of Mountains and Seas on the
+## Jianmu): bark with a purple cast, and leaves of the forest's own painted cards
+const JIANMU_BARK := Color("6a4a56")
+
+## Clouds of leaves round the given [centre, radius] spheres, made of the painted leaf cards the
+## forests use (Flora._clump: lit as one soft volume, translucent against the light, moving in the
+## wind), green shading to gold, with yellow fruit glowing among them and a few dark flowers.
+static func _leaf_cloud(root: Node3D, clusters: Array, seed_: int) -> void:
+	var cards := Nature.Cards.new()
+	var g := MB.new()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	for cl in clusters:
+		var c: Vector3 = cl[0]
+		var r: float = cl[1]
+		var n := int(r * r * 0.55) + 10
+		for k in n:
+			var d := Vector3(rng.randf_range(-1.0, 1.0), rng.randf_range(-0.55, 0.7), rng.randf_range(-1.0, 1.0))
+			if d.length() > 1.0:
+				d = d.normalized() * rng.randf()
+			var p := c + Vector3(d.x * r, d.y * r * 0.6, d.z * r)
+			var col := Color("3f8a4a").lerp(Color("8ab858"), rng.randf()).lerp(Color("d8c860"), 0.25 * maxf(d.y, 0.0))
+			Flora._clump(cards, rng, p, rng.randf_range(1.5, 2.3), [c, r], col, 0.6, 1.0, 3)
+			if k % 9 == 0:
+				g.ball(p + Vector3(0, -0.8, 0), 0.32, Color(1.0, 0.86, 0.3, 0.9), true)
+			elif k % 13 == 0:
+				g.ball(p + Vector3(0, -0.4, 0), 0.22, Color(0.16, 0.1, 0.2, 0.9), true)
+	var m := ArrayMesh.new()
+	cards.add_to(m, Nature.leaf_mat("broad"))
+	if m.get_surface_count() > 0:
+		var mi := MeshInstance3D.new()
+		mi.mesh = m
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		root.add_child(mi)
+	if not g.is_empty():
+		MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## The crown of the Jianmu in the Nine Heavens: the trunk rising out of the sea of cloud past the west
+## end of the islands, nine great twisting branches reaching out over Featherfall with clouds of
+## jade-and-gold leaves, golden fruit glowing among them, and a deck of planks at its east foot
+## where the stair from the land comes out.
+static func jianmu_crown(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var bark := MB.tag(JIANMU_BARK, MB.WOOD)
+	var bark_d := MB.tag(JIANMU_BARK.darkened(0.3), MB.WOOD)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3232
+	b.lathe(pos + Vector3(0, -70.0, 0), [Vector2(5.6, 0.0), Vector2(5.2, 40.0), Vector2(4.8, 70.0), Vector2(4.4, 95.0), Vector2(2.5, 125.0), Vector2(0.4, 134.0)], bark, 18)
+	# ribs of darker bark winding up the trunk out of the clouds
+	for k0 in 14:
+		var a0 := TAU * k0 / 14.0
+		var prev := Vector3.ZERO
+		for j in 11:
+			var y := -60.0 + j * 10.0
+			var rr := lerpf(5.4, 4.5, (y + 70.0) / 95.0) + 0.12
+			var pt := pos + Vector3(cos(a0 + j * 0.05) * rr, y, sin(a0 + j * 0.05) * rr)
+			if j > 0:
+				b.limb(prev, pt, 0.36, 0.36, bark_d, 5)
+			prev = pt
+	var leaves: Array = []
+	for k in 9:
+		var a := TAU * k / 9.0 + rng.randf_range(-0.2, 0.2)
+		var d := Vector3(cos(a), 0, sin(a))
+		var y0 := 6.0 + k * 3.6
+		var base := pos + Vector3(0, y0, 0) + d * 3.5
+		var reach := rng.randf_range(20.0, 32.0)
+		var mid := base + d * reach * 0.5 + Vector3(0, reach * 0.25, 0) + Vector3(-d.z, 0, d.x) * rng.randf_range(-4.0, 4.0)
+		var tip := base + d * reach + Vector3(0, reach * 0.42, 0)
+		b.limb(base, mid, 1.5, 0.95, bark, 7)
+		b.limb(mid, tip, 0.95, 0.35, bark, 6)
+		# side branches carrying the leaves out along the limb
+		for c in 3:
+			var cp := tip.lerp(mid, c * 0.35) + Vector3(rng.randf_range(-3.0, 3.0), rng.randf_range(1.0, 4.0), rng.randf_range(-3.0, 3.0))
+			b.limb(tip.lerp(mid, c * 0.35), cp, 0.45, 0.12, bark, 5)
+			leaves.append([cp, rng.randf_range(5.0, 7.0)])
+	# the leader: the top of the trunk lost in leaf-clouds of its own, no bare pole above the crown
+	for k4 in 6:
+		var a4 := TAU * k4 / 6.0 + 0.3
+		var lp := pos + Vector3(cos(a4) * 4.5, 0, sin(a4) * 4.5) + Vector3(0, rng.randf_range(44.0, 56.0), 0)
+		b.limb(pos + Vector3(0, lp.y - pos.y - 6.0, 0), lp, 0.7, 0.2, bark, 5)
+		leaves.append([lp, rng.randf_range(6.0, 7.5)])
+	leaves.append([pos + Vector3(0, 61.0, 0), 7.5])
+	# the landing at the east foot, and the last turns of the stair coming up out of the clouds
+	var plank := MB.tag(Color("a8804e"), MB.WOOD)
+	b.box(pos + Vector3(6.4, -0.15, 0), Vector3(4.4, 0.3, 6.0), plank)
+	for k2 in 40:
+		var f := k2 / 39.0
+		var a2 := f * TAU * 1.2
+		b.box(pos + Vector3(cos(a2) * 6.5, -30.0 + f * 29.6, sin(a2) * 6.5), Vector3(1.0, 0.16, 2.0), plank, Vector3(0, -a2, 0))
+	for k3 in 10:
+		var a3 := TAU * k3 / 10.0
+		g.ball(pos + Vector3(cos(a3) * 11.0, rng.randf_range(-16.0, -6.0), sin(a3) * 11.0), rng.randf_range(5.0, 8.0), Color(1.0, 1.0, 1.0, 0.16), true)
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_leaf_cloud(root, leaves, 3232)
+
+## The roots of the Jianmu in the Nine Springs: a column of root as thick as a tower coming down out of
+## the cavern roof, splitting over the cavern floor and along the roof into roots that run away into the
+## dark, veins of blue-green light in the bark, and the stair from the land winding down it.
+static func jianmu_roots(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var bark := MB.tag(JIANMU_BARK.darkened(0.15), MB.WOOD)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3333
+	b.lathe(pos + Vector3(0, -1.0, 0), [Vector2(7.5, 0.0), Vector2(5.2, 3.0), Vector2(4.4, 12.0), Vector2(4.6, 28.0), Vector2(7.0, DEEP_ROOF)], bark, 18)
+	for k in 12:
+		var a := TAU * k / 12.0 + rng.randf_range(-0.2, 0.2)
+		if absf(angle_difference(a, 0.0)) < 0.4:
+			continue  # the stair comes out on the east side
+		var d := Vector3(cos(a), 0, sin(a))
+		var mid := pos + d * rng.randf_range(10.0, 14.0) + Vector3(0, 0.3, 0)
+		b.limb(pos + d * 4.5 + Vector3(0, 2.0, 0), mid, 2.0, 1.2, bark, 7)
+		b.limb(mid, pos + d * rng.randf_range(20.0, 28.0) + Vector3(0, -0.5, 0), 1.2, 0.3, bark, 6)
+		g.limb(pos + d * 4.6 + Vector3(0, 2.3, 0), mid + Vector3(0, 0.9, 0), 0.08, 0.06, Color(0.4, 1.0, 0.85, 0.7), 4)
+	for k2 in 10:
+		var a2 := TAU * k2 / 10.0 + rng.randf_range(-0.3, 0.3)
+		var d2 := Vector3(cos(a2), 0, sin(a2))
+		b.limb(pos + d2 * 6.0 + Vector3(0, DEEP_ROOF - 2.0, 0), pos + d2 * rng.randf_range(24.0, 40.0) + Vector3(0, DEEP_ROOF - rng.randf_range(0.0, 3.0), 0), 1.8, 0.4, bark, 6)
+		var hang := pos + d2 * rng.randf_range(8.0, 18.0) + Vector3(0, DEEP_ROOF - 1.0, 0)
+		b.limb(hang, hang + Vector3(rng.randf_range(-1.0, 1.0), -rng.randf_range(6.0, 16.0), rng.randf_range(-1.0, 1.0)), 0.5, 0.08, bark, 5)
+	var plank := MB.tag(Color("8a6a40"), MB.WOOD)
+	for k3 in 60:
+		var f := k3 / 59.0
+		var a3 := f * TAU * 1.6
+		b.box(pos + Vector3(cos(a3) * 5.8, 0.4 + f * 24.0, sin(a3) * 5.8), Vector3(1.0, 0.16, 2.0), plank, Vector3(0, -a3, 0))
+		if k3 % 12 == 5:
+			g.ball(pos + Vector3(cos(a3) * 6.8, 1.6 + f * 24.0, sin(a3) * 6.8), 0.3, Color(0.5, 0.95, 1.0, 0.9), true)
+	for k4 in 24:
+		g.ball(pos + Vector3(rng.randf_range(-14.0, 14.0), rng.randf_range(2.0, 26.0), rng.randf_range(-14.0, 14.0)), rng.randf_range(0.08, 0.18), Color(0.5, 1.0, 0.85, 0.9), true)
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## A great gate between two towers across a region's road: Changhe, the Gate of Heaven, red lacquer
+## and gold on cloud (its two leaves swung open now), or the inner gate of Youdu, black stone and iron
+## with ghost-fire lanterns and a red glow from the deep beyond it (`dark`).  `along` is the way the
+## road runs through.
+static func sky_gate(root: Node3D, pos: Vector3, along: Vector3, dark: bool) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var ax := along.normalized()
+	var fw := Vector3(-ax.z, 0, ax.x)
+	var st: Dictionary = Arch.STYLES.shrine if not dark else {"roof": "22242c", "roof2": "18181e", "column": "3a3a44", "wall": "4a4a54", "beam": "2a2a34", "trim": "8aa0ff", "double": true}
+	var stone := MB.tag(Color("d8d0c0") if not dark else Color("44444e"), MB.STONE)
+	var body := MB.tag(Color("b83a2a") if not dark else Color("2e2e38"), MB.WOOD)
+	var gold := MB.tag(Color("e8c060") if not dark else Color("6a7aa8"), MB.METAL)
+	var ang := atan2(-ax.z, ax.x)
+	var turned := func(sz: Vector3, at: Vector3) -> Transform3D:
+		return Transform3D(Basis(Vector3.UP, ang) * Basis.from_scale(sz), at)
+	for s: float in [-1.0, 1.0]:
+		var c := pos + fw * (s * 14.0)
+		b.prim("box", turned.call(Vector3(9.0, 10.0, 11.0), c + Vector3(0, 5.0, 0)), stone)
+		b.prim("box", turned.call(Vector3(7.0, 9.0, 9.0), c + Vector3(0, 14.5, 0)), body)
+		for k in 4:
+			b.cyl(c + ax * ((k % 2) * 6.0 - 3.0) + fw * ((k / 2) * 6.0 - 3.0) + Vector3(0, 14.5, 0), 0.45, 9.0, MB.tag(Color(st.column), MB.WOOD), Vector3.ZERO, 10)
+		Arch.hip_roof(b, g, c + Vector3(0, 19.2, 0), 5.0, 5.8, 1.2, 2.0, st, false)
+		Arch.hip_roof(b, g, c + Vector3(0, 23.0, 0), 3.4, 4.0, 1.0, 3.0, st)
+		if dark:
+			for k2 in 2:
+				var lp := c + ax * (k2 * 9.0 - 4.5) + Vector3(0, 9.0, 0)
+				g.ball(lp, 0.6, Color(0.45, 0.6, 1.0, 0.95), true)
+				g.ball(lp, 1.6, Color(0.45, 0.6, 1.0, 0.2), true)
+		else:
+			for k3 in 5:
+				g.ball(c + ax * randf_range(-5.0, 5.0) + fw * randf_range(-6.0, 6.0) + Vector3(0, 0.6, 0), 2.6, Color(1.0, 1.0, 1.0, 0.18), true)
+	# the arch across the road: a great beam and roof, a plaque, and the two leaves swung open
+	var top := pos + Vector3(0, 21.0, 0)
+	b.prim("box", turned.call(Vector3(3.0, 2.2, 21.0), top), body)
+	b.prim("box", turned.call(Vector3(1.0, 1.6, 4.0), top + ax * 1.6 + Vector3(0, -0.4, 0)), gold)
+	Arch.hip_roof(b, g, top + Vector3(0, 1.4, 0), 2.4, 11.5, 1.0, 2.2, st)
+	for s2: float in [-1.0, 1.0]:
+		var hinge := pos + fw * (s2 * 9.0)
+		var leaf_c := hinge - ax * 2.6 + fw * (-s2 * 0.4) + Vector3(0, 9.0, 0)
+		b.prim("box", turned.call(Vector3(5.0, 18.0, 0.6), leaf_c), MB.tag(Color("a8342a") if not dark else Color("26262e"), MB.WOOD))
+		for r in 4:
+			for q in 3:
+				b.ball(leaf_c + Vector3(0, -6.0 + r * 4.0, 0) + ax * (q - 1) * 1.4 + fw * (-s2 * 0.35), 0.22, gold, true)
+	if dark:
+		g.disc(pos + ax * 10.0 + Vector3(0, 0.08, 0), 9.0, Color(1.0, 0.35, 0.15, 0.35), 24, Color(1.0, 0.35, 0.15, 0.0))
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+const SKY_SEA_Y := -24.0
+const DEEP_FLOOR_Y := -44.0
+const DEEP_ROOF := 34.0
+const CLOUD_SEA := """
+shader_type spatial;
+render_mode unshaded, cull_disabled;
+uniform vec4 lit : source_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform vec4 mid : source_color = vec4(0.84, 0.9, 1.0, 1.0);
+uniform vec4 deep : source_color = vec4(0.55, 0.66, 0.86, 1.0);
+uniform float glow = 0.0;
+varying vec3 wp;
+float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float n2(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p) {
+	float s = 0.0;
+	float a = 0.5;
+	for (int k = 0; k < 5; k++) {
+		s += n2(p) * a;
+		p = p * 2.03 + vec2(3.1, 7.7);
+		a *= 0.5;
+	}
+	return s;
+}
+void vertex() {
+	wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+}
+void fragment() {
+	vec2 p = wp.xz * 0.011 + vec2(TIME * 0.006, TIME * 0.0025);
+	float c = fbm(p) * 0.7 + fbm(p * 3.3 + vec2(5.0, 1.0) - vec2(TIME * 0.01, 0.0)) * 0.3;
+	vec3 col = mix(deep.rgb, mid.rgb, smoothstep(0.28, 0.58, c));
+	col = mix(col, lit.rgb, smoothstep(0.55, 0.82, c));
+	ALBEDO = col;
+	EMISSION = col * glow * smoothstep(0.5, 0.9, c);
+}
+"""
+
+## The Nine Heavens round their islands (Part XI): a sea of cloud far below them, running on to the
+## horizon; rocky undersides hanging under every coast (the islands float); far islands on the horizon.
+static func sky_world(root: Node3D, wd: Dictionary) -> void:
+	var W: int = wd.w
+	var H: int = wd.h
+	var cm := ShaderMaterial.new()
+	cm.shader = MB._shader(CLOUD_SEA)
+	var far := 900.0
+	var cb := MB.new()
+	var up := Vector3.UP
+	var white := Color(1, 1, 1, 1)
+	cb.quad_n([Vector3(-far, SKY_SEA_Y, -far), Vector3(W * T + far, SKY_SEA_Y, -far), Vector3(W * T + far, SKY_SEA_Y, H * T + far), Vector3(-far, SKY_SEA_Y, H * T + far)], [up, up, up, up], [white, white, white, white])
+	MB.mesh_node(root, cb.build(cm)).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_undersides(root, wd, 4.0, 16.0, Color("8a8274"), false)
+	_horizon(root, W, H, "juntian", 9)
+
+## The Nine Springs (Part XI): a faintly glowing abyss far below the cavern country, the rock falling
+## away under every edge of it, and the cavern roof overhead with stalactites and glowing crystals.
+static func deep_world(root: Node3D, wd: Dictionary) -> void:
+	var W: int = wd.w
+	var H: int = wd.h
+	var am := ShaderMaterial.new()
+	am.shader = MB._shader(CLOUD_SEA)
+	am.set_shader_parameter("lit", Color(0.2, 0.45, 0.5))
+	am.set_shader_parameter("mid", Color(0.05, 0.12, 0.16))
+	am.set_shader_parameter("deep", Color(0.01, 0.015, 0.03))
+	am.set_shader_parameter("glow", 1.4)
+	var far := 900.0
+	var ab := MB.new()
+	var up := Vector3.UP
+	var white := Color(1, 1, 1, 1)
+	ab.quad_n([Vector3(-far, DEEP_FLOOR_Y, -far), Vector3(W * T + far, DEEP_FLOOR_Y, -far), Vector3(W * T + far, DEEP_FLOOR_Y, H * T + far), Vector3(-far, DEEP_FLOOR_Y, H * T + far)], [up, up, up, up], [white, white, white, white])
+	MB.mesh_node(root, ab.build(am)).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_undersides(root, wd, 12.0, 40.0, Color("4a4844"), true)
+	# the cavern roof: a rough sheet of rock overhead, facing down, with stalactites and crystals
+	var n := FastNoiseLite.new()
+	n.seed = 818
+	n.frequency = 0.012
+	var cell := 14.0
+	var x_lo := -160.0
+	var z_lo := -160.0
+	var nx := int((W * T + 320.0) / cell)
+	var nz := int((H * T + 320.0) / cell)
+	var rock := Color("2a2a30")
+	for zr in range(0, nz, 20):
+		var rb := MB.new()
+		for zi in range(zr, mini(nz, zr + 20)):
+			for xi in nx:
+				var pts: Array = []
+				var cols: Array = []
+				for c in [Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(1, 0)]:
+					var px: float = x_lo + (xi + c.x) * cell
+					var pz: float = z_lo + (zi + c.y) * cell
+					var hv := n.get_noise_2d(px, pz)
+					pts.append(Vector3(px, DEEP_ROOF + 4.0 + hv * 7.0, pz))
+					cols.append(MB.tag(rock.lightened(0.08 * (hv + 1.0)), MB.STONE))
+				var dn := Vector3.DOWN
+				rb.quad_n(pts, [dn, dn, dn, dn], cols)
+		MB.mesh_node(root, rb.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var sb := MB.new()
+	var sg := MB.new()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 919
+	for k in 420:
+		var px2 := rng.randf_range(-40.0, W * T + 40.0)
+		var pz2 := rng.randf_range(-40.0, H * T + 40.0)
+		var ln := rng.randf_range(4.0, 18.0)
+		var yb := DEEP_ROOF + 4.0 + n.get_noise_2d(px2, pz2) * 7.0
+		sb.cone(Vector3(px2, yb - ln * 0.5, pz2), rng.randf_range(0.8, 2.6), ln, MB.tag(rock.lightened(0.15), MB.STONE), Vector3(PI, rng.randf() * TAU, 0), 6)
+		if k % 3 == 0:
+			sg.ball(Vector3(px2, yb - ln - 0.3, pz2), rng.randf_range(0.25, 0.6), Color(0.45, 1.0, 0.9, 0.85) if k % 2 == 0 else Color(0.7, 0.55, 1.0, 0.85), true)
+	MB.mesh_node(root, sb.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	MB.mesh_node(root, sg.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## Rock faces under every edge of a realm's land, from just under the ground down `d_min`..`d_max`
+## metres (more with noise), drawn in towards the island as they go down, and rocks hanging under the
+## land near the edges: the islands of the Nine Heavens float, the cavern country of the Nine Springs
+## stands over the abyss.
+static func _undersides(root: Node3D, wd: Dictionary, d_min: float, d_max: float, col: Color, deep: bool) -> void:
+	var W: int = wd.w
+	var H: int = wd.h
+	var sea: PackedByteArray = wd.sea
+	var n := FastNoiseLite.new()
+	n.seed = 515 if not deep else 616
+	n.frequency = 0.06
+	var rock := MB.tag(col, MB.STONE)
+	var rock_d := MB.tag(col.darkened(0.25), MB.STONE)
+	for y0 in range(0, H, 40):
+		var b := MB.new()
+		for y in range(y0, mini(H, y0 + 40)):
+			for x in W:
+				if sea[y * W + x] == 1:
+					continue
+				for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var nx: int = x + d.x
+					var ny: int = y + d.y
+					if nx >= 0 and ny >= 0 and nx < W and ny < H and sea[ny * W + nx] == 0:
+						continue
+					# the edge shared with the open sky (or the abyss)
+					var a := Vector3((x + (1 if d.x > 0 else 0)) * T, -0.9, (y + (1 if d.y > 0 else 0)) * T)
+					var e := a + (Vector3(0, 0, T) if d.x != 0 else Vector3(T, 0, 0))
+					var da := d_min + (n.get_noise_2d(a.x, a.z) * 0.5 + 0.5) * (d_max - d_min)
+					var de := d_min + (n.get_noise_2d(e.x, e.z) * 0.5 + 0.5) * (d_max - d_min)
+					var inw := Vector3(-d.x, 0, -d.y)
+					var ab := a + inw * da * 0.35 + Vector3(0, -da, 0)
+					var eb := e + inw * de * 0.35 + Vector3(0, -de, 0)
+					var out := Vector3(d.x, 0, d.y)
+					var nr := (out + Vector3(0, -0.35, 0)).normalized()
+					Arch._quad(b, [a, e, eb, ab], [nr, nr, nr, nr], rock if (x + y) % 3 else rock_d, out)
+					# now and then a rock hangs under the edge
+					var hh := hash2(x, y, 31.0)
+					if hh < 0.07:
+						var ln := d_max * (0.6 + hh * 8.0)
+						b.cone((a + e) * 0.5 + inw * (2.0 + hh * 20.0) + Vector3(0, -da * 0.6 - ln * 0.5, 0), 1.6 + hh * 20.0, ln, rock_d, Vector3(PI, hh * 40.0, 0), 6)
+		if not b.is_empty():
+			MB.mesh_node(root, b.build()).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
 ## An enterable building: walls, door, floor and furniture as one mesh, the roof as another
-## (returned, so the world can lift it away while the hero is inside).
-static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int, h: int) -> Array:
+## (returned, so the world can lift it away while the hero is inside), and an upper storey as a
+## third (Part XI: lifted away while the hero is on the ground floor).  Returns {roof, upper}.
+static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int, h: int) -> Dictionary:
 	var r: Rect2i = bd.rect
 	var rr := Rect2(r.position.x * T, r.position.y * T, r.size.x * T, r.size.y * T)
 	var gy := sample(hm, w, h, rr.get_center().x, rr.get_center().y)
@@ -1171,7 +1609,17 @@ static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int,
 	var props: Array = []
 	for pr in bd.get("props", []):
 		props.append([pr[0], Vector3((pr[1].x + 0.5) * T, 0, (pr[1].y + 0.5) * T)])
-	var lights := Arch.house(b, g, roof, roof_g, rr, door, str(bd.get("style", "house")), props, int(r.position.x * 7 + r.position.y))
+	var up: MB = null
+	var up_g: MB = null
+	var uprops: Array = []
+	var hole := Vector3(-9999, 0, -9999)
+	if bd.has("upper"):
+		up = MB.new()
+		up_g = MB.new()
+		for pr2 in bd.upper.get("props", []):
+			uprops.append([pr2[0], Vector3((pr2[1].x + 0.5) * T, 0, (pr2[1].y + 0.5) * T)])
+		hole = Vector3((bd.up.x + 0.5) * T, 0, (bd.up.y + 0.5) * T)
+	var lights := Arch.house(b, g, roof, roof_g, rr, door, str(bd.get("style", "house")), props, int(r.position.x * 7 + r.position.y), up, up_g, uprops, hole)
 	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
 	mi.position.y = gy
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
@@ -1187,6 +1635,16 @@ static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int,
 		var rg := MB.mesh_node(root, roof_g.build(MB.mat_glow()))
 		rg.position.y = gy
 		out.append(rg)
+	var upper: Array = []
+	if up != null and not up.is_empty():
+		var ui := MB.mesh_node(root, up.build(MB.mat_scenery()))
+		ui.position.y = gy
+		ui.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+		upper.append(ui)
+		if not up_g.is_empty():
+			var ug := MB.mesh_node(root, up_g.build(MB.mat_glow()))
+			ug.position.y = gy
+			upper.append(ug)
 	if DisplayServer.get_name() != "headless":
 		for lt in lights:
 			var l := OmniLight3D.new()
@@ -1195,7 +1653,30 @@ static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int,
 			l.omni_range = 6.0
 			l.position = (lt[0] as Vector3) + Vector3(0, gy, 0)
 			root.add_child(l)
-	return out
+	return {"roof": out, "upper": upper}
+
+## A cellar under a building (Part XI), as the floor's own view: `fw` is the floor's world (see
+## Atlas._floor); the room is built in its own tiles, from the corner of the building.
+static func cellar(root: Node3D, fw: Dictionary) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var props: Array = []
+	for pr in fw.get("props", []):
+		props.append([pr[0], Vector3((pr[1].x + 0.5) * T, 0, (pr[1].y + 0.5) * T)])
+	var st: Vector2i = fw.get("stairs", Vector2i(1, 1))
+	var lights := Arch.cellar(b, g, Rect2(0, 0, fw.w * T, fw.h * T), props, Vector3((st.x + 0.5) * T, 0, (st.y + 0.5) * T), int(fw.origin.x * 7 + fw.origin.y))
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	if not g.is_empty():
+		MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if DisplayServer.get_name() != "headless":
+		for lt in lights:
+			var l := OmniLight3D.new()
+			l.light_color = lt[1]
+			l.light_energy = 1.1
+			l.omni_range = 7.0
+			l.position = lt[0]
+			root.add_child(l)
 
 ## foam factor at each corner of a water tile (1 = touches land)
 static func _shore(grid: PackedByteArray, w: int, h: int, tx: int, ty: int) -> Array:
