@@ -628,7 +628,11 @@ func _props_shots() -> void:
 		# a camera off to the side, looking across the hero at the thing
 		var hp: Vector3 = main.world.player.position
 		var c: Vector3 = main.world.ent_pos(e2)
-		var dir := Vector3(c.x - hp.x, 0, c.z - hp.z).normalized()
+		var dir := Vector3(c.x - hp.x, 0, c.z - hp.z)
+		if dir.length() < 0.3:
+			# (on it, a cushion: the way he came onto it)
+			dir = Vector3(main.world.using.dir.x, 0, main.world.using.dir.z)
+		dir = dir.normalized()
 		var side := Vector3(dir.z, 0, -dir.x)
 		var mid := hp.lerp(Vector3(c.x, hp.y, c.z), 0.45) + Vector3(0, 0.9, 0)
 		var eye := _prop_eye(lw2, mid, dir, e2.has("furn"))
