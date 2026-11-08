@@ -11,8 +11,9 @@ Checks
 * meshes carry vertex colours (COLOR_0, the surface class lives in alpha) and the tint UV (TEXCOORD_0);
 * triangle budgets: characters 5k-50k, monsters 3k-90k, props under 5k (they are instanced) except one-off set pieces;
 * characters have a skin with the bones the game drives (hips, chest, head, eyes, mouth, hands,
-  fingers, thumbs, sleeve pockets, feet, toes, the hair and cape chains) and all eleven clips
-  (idle, walk, run, sit, talk, bow, attack, cast, hurt, victory, die);
+  fingers, thumbs, sleeve pockets, feet, toes, the hair and cape chains) and all twenty-one clips
+  (idle, walk, run, sit, talk, bow, attack, cast, hurt, victory, die, and the ten cutscene gestures
+  nod, shake, point, wave, laugh, grieve, think, kneel, offer and shock);
 * monsters have a skin and at least the five clips the game plays: idle and walk (loops), attack,
   hurt and die.
 
@@ -31,7 +32,8 @@ BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "props": (200,
 SET_PIECES = {"props/magpiebridge": (2000, 24000)}
 PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "hand.R", "fingers.L", "fingers.R",
                 "thumb.L", "thumb.R", "sleeve.L", "sleeve.R", "foot.L", "foot.R", "toe.L", "toe.R", "hair_tail2", "cape3")
-PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die")
+PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die",
+                "nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock")
 MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
 MATERIALS = {"toon", "plain", "glow"}
 

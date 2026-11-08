@@ -10,6 +10,9 @@ extends ScreenBase
 ## Part XI raises the Jianmu behind everything: the Standing Tree going up through the clouds into
 ## the Nine Heavens and down through them into the Nine Springs, feathered folk circling its crown,
 ## pearl-lights and shade-lanterns rising up its roots, and the six colours of the Daos round it.
+## Part XII sets the Isles of the Eastern Sea on the shells of their sleeping turtles below, with
+## Mazu's lantern-boat drifting between them and Jingwei flying a pebble over the sea, and Yue Ling
+## waves, bows and laughs from the lotus.
 
 const VIEW := Vector2(1280, 720)
 
@@ -322,6 +325,58 @@ func _part11() -> void:
 		n.set_meta("phase", k3 / 12.0)
 		climbers11.append(n)
 
+## Part XII: the Isles of the Eastern Sea come up out of the cloud below, each on the shell of a
+## sleeping turtle with Jingwei's reef of pebbles under it; Mazu's boat drifts between them with its
+## red lantern lit, Jingwei flies a pebble over them, and the people on the lotus take turns to wave.
+var isles12: Array = []
+var boat12: Node3D = null
+var bird12: Node3D = null
+var mazu12: Node3D = null
+
+func _part12() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 1212
+	for k in 3:
+		var root := Node3D.new()
+		root.position = Vector3(9.0 + k * 7.0, -5.5 - k * 0.6, -16.0 - k * 9.0)
+		scene3d.add_child(root)
+		var b := MB.new()
+		var g := MB.new()
+		var shell := MB.tag(Color("5a6a4a"), MB.SCALE)
+		b.sph(Vector3(0, 0, 0), Vector3(3.4, 1.1, 4.0), shell)
+		b.ball(Vector3(0, -0.2, 4.0), 0.9, MB.tag(Color("7a8a5a"), MB.SKIN))
+		for s: float in [-1.0, 1.0]:
+			b.sph(Vector3(s * 3.0, -0.6, 2.0), Vector3(1.4, 0.3, 0.7), MB.tag(Color("7a8a5a"), MB.SKIN), Vector3(0, s * 0.5, 0))
+		# the reef of Jingwei's pebbles beside the turtle, and the isle on its back
+		for q in 14:
+			b.ball(Vector3(rng.randf_range(-3.8, 3.8), -0.9 + rng.randf() * 0.3, rng.randf_range(-3.0, 3.0)), rng.randf_range(0.3, 0.6), MB.tag([Color("d8c8b0"), Color("c87a5a"), Color("8a8a8a")][q % 3], MB.STONE))
+		b.cone(Vector3(0, 1.0, -0.4), 2.6, 3.4, MB.tag(Color("e0dcd0"), MB.STONE), Vector3.ZERO, 9)
+		b.sph(Vector3(0, 2.6, -0.4), Vector3(1.8, 0.8, 1.6), MB.tag(Color("5a9a5a"), MB.FOLIAGE))
+		b.cyl(Vector3(0, 3.5, -0.4), 0.5, 1.0, MB.tag(Color("b8382a"), MB.WOOD), Vector3.ZERO, 8)
+		b.cone(Vector3(0, 4.3, -0.4), 0.9, 0.7, MB.tag(Color("2f5a7a"), MB.STONE), Vector3.ZERO, 8)
+		g.ball(Vector3(0, 3.6, 0.2), 0.12, Color(1.0, 0.6, 0.3, 0.9), true)
+		MB.mesh_node(root, b.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		isles12.append(root)
+	boat12 = Models.mazu_boat()
+	boat12.scale = Vector3.ONE * 0.7
+	scene3d.add_child(boat12)
+	if Assets.PEOPLE.has("mazu") and Assets.has(Assets.PEOPLE["mazu"]):
+		mazu12 = Assets.person("mazu")
+		mazu12.scale = Vector3.ONE * 0.7
+		boat12.add_child(mazu12)
+		mazu12.position = Vector3(2.0, 0.65, -0.6) / 0.7 * 0.7
+	var bb := MB.new()
+	bb.sph(Vector3.ZERO, Vector3(0.18, 0.14, 0.32), MB.tag(Color("5a504a"), MB.CLOTH))
+	bb.ball(Vector3(0, 0.08, 0.3), 0.1, MB.tag(Color("f0ece4"), MB.CLOTH))
+	bb.cone(Vector3(0, 0.08, 0.44), 0.04, 0.12, MB.tag(Color("f0f0e8"), MB.STONE), Vector3(PI / 2, 0, 0), 6)
+	for s2: float in [-1.0, 1.0]:
+		bb.leaf(Vector3(s2 * 0.1, 0.05, 0.0), Vector3(s2 * 0.75, 0.25, -0.1), 0.22, MB.tag(Color("6a5a52"), MB.CLOTH))
+	bb.ball(Vector3(0, -0.18, 0.2), 0.07, MB.tag(Color("c87a5a"), MB.STONE))
+	bird12 = Node3D.new()
+	MB.mesh_node(bird12, bb.build(MB.mat_plain()))
+	scene3d.add_child(bird12)
+
 func press(act: String) -> void:
 	if act == "confirm":
 		done = true
@@ -383,6 +438,27 @@ func _process(d: float) -> void:
 			(cauldrons[k] as Node3D).position.y += sin(t * 1.1 + k) * 0.002
 		if jianmu11 == null:
 			_part11()
+		if isles12.is_empty():
+			_part12()
+		# the turtles breathe in their sleep; Mazu's boat drifts between the isles and Jingwei flies over
+		for k in isles12.size():
+			(isles12[k] as Node3D).position.y = -5.5 - k * 0.6 + sin(t * 0.4 + k * 1.7) * 0.15
+		var bt := t * 0.05
+		boat12.position = Vector3(12.0 + sin(bt) * 6.0, -5.6, -24.0 + cos(bt) * 5.0)
+		boat12.rotation.y = -bt + PI * 0.5
+		if mazu12 != null:
+			Models.anim_person(mazu12, t + 4.0, false)
+			if fmod(t, 9.0) < 0.05:
+				Models.act(mazu12, "wave", t + 4.0)
+		var ba := t * 0.35
+		bird12.position = Vector3(8.0 + cos(ba) * 9.0, 3.0 + sin(t * 1.3) * 0.6, -20.0 + sin(ba) * 7.0)
+		bird12.rotation.y = -ba
+		# on the lotus, Yue Ling takes her turn to wave, bow and laugh at everyone below
+		var gk := int(t / 5.0)
+		if gk != int(comp.get_meta("gk", -1)):
+			comp.set_meta("gk", gk)
+			if gk > 0:
+				Models.act(comp, ["wave", "bow", "laugh", "offer"][gk % 4], t + 2.0)
 		# up and down the ladder: lights of every realm climbing the Standing Tree
 		for k in climbers11.size():
 			var cn: Node3D = climbers11[k]
@@ -399,8 +475,9 @@ func _draw() -> void:
 	UI.text(self, Vector2(0, 190), "The land is one land now. The magpies build their bridge, and the sun and the moon take turns.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 216), "Every river runs where it will, and the Nine Cauldrons hold the land as it really is.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 242), "The Jianmu stands again between heaven, earth and the Nine Springs, and every road climbs it.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 268), "Every water comes home through the Returning Ruins; the turtles take turns, and an old magician grows old.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	if Game.dao != "":
-		UI.text(self, Vector2(0, 268), "Walker of the %s" % Data.DAOS[Game.dao].n, 17, Data.DAOS[Game.dao].col, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+		UI.text(self, Vector2(0, 294), "Walker of the %s, the Nine Heavens root %d ranks awake" % [Data.DAOS[Game.dao].n, Game.talent_ranks()], 17, Data.DAOS[Game.dao].col, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
 	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
 	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)

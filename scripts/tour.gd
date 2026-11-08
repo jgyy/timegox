@@ -6,7 +6,7 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"juntian": "thunder", "changhe": "wood", "ninesprings": "thunder", "youdu": "fire", "sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder", "longmen": "earth", "drowned": "earth", "tushan": "water", "buzhou": "earth"}
+const ELEMS := {"penglai": "earth", "fangzhang": "water", "yingzhou": "thunder", "guixu": "fire", "juntian": "thunder", "changhe": "wood", "ninesprings": "thunder", "youdu": "fire", "sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder", "longmen": "earth", "drowned": "earth", "tushan": "water", "buzhou": "earth"}
 
 ## [shot name, area, a tile of that area's own map to look at, eye offset, look-at offset]
 const TOWN_SHOTS := {
@@ -30,6 +30,14 @@ const TOWN_SHOTS := {
 		["realm_under", "ninesprings", Vector2i(44, 32), Vector3(-80.0, 26.0, 90.0), Vector3(30.0, -6.0, -30.0)]],
 	"youdu": [["town_youdu", "youdu", Vector2i(40, 30), Vector3(-30.0, 26.0, 32.0), Vector3(2.0, 0.0, -2.0)],
 		["youdu_gate", "youdu", Vector2i(72, 32), Vector3(-40.0, 12.0, 30.0), Vector3(6.0, 10.0, 0.0)]],
+	# Part XII: the Isles of the Eastern Sea, Landfall, the Pavilion of Penglai and the Returning Ruins
+	"penglai": [["town_landfall", "penglai", Vector2i(40, 30), Vector3(-30.0, 28.0, 32.0), Vector3(2.0, 0.0, -4.0)],
+		["penglai_pavilion", "penglai", Vector2i(8, 26), Vector3(-22.0, 12.0, 26.0), Vector3(2.0, 7.0, 0.0)],
+		["realm_sea", "penglai", Vector2i(60, 32), Vector3(-80.0, 60.0, 110.0), Vector3(40.0, -10.0, -30.0)]],
+	"fangzhang": [["isle_fangzhang", "fangzhang", Vector2i(36, 26), Vector3(-30.0, 26.0, 30.0), Vector3(2.0, 0.0, -2.0)]],
+	"yingzhou": [["isle_yingzhou", "yingzhou", Vector2i(46, 28), Vector3(-30.0, 24.0, 30.0), Vector3(2.0, 0.0, -2.0)]],
+	"guixu": [["guixu_whirl", "guixu", Vector2i(86, 32), Vector3(-34.0, 24.0, 30.0), Vector3(12.0, -4.0, 0.0)]],
+	"fusang": [["mazu_boat", "fusang", Vector2i(70, 48), Vector3(-9.0, 6.0, 11.0), Vector3(0.0, 1.0, 0.0)]],
 }
 ## Part XI: upstairs and down in the buildings: [shot name, floor id]
 const FLOOR_SHOTS := {
@@ -39,6 +47,8 @@ const FLOOR_SHOTS := {
 	"ninesprings": [["cellar_pearl_vault", "f:ninesprings:pearl_hall:-1"], ["upper_root_loft", "f:ninesprings:root_house:1"]],
 	"youdu": [["upper_ward_office", "f:youdu:ward_office:1"], ["cellar_deep_hall", "f:youdu:earth_palace:-1"]],
 	"longmen": [["upper_guest_rooms", "f:longmen:carp_inn:1"]],
+	"penglai": [["upper_drinking_room", "f:penglai:drunk_immortal:1"], ["upper_names_gallery", "f:penglai:names_hall:1"]],
+	"guixu": [["upper_steersman_cabin", "f:guixu:wreck_house:1"]],
 }
 
 func _stop(id: String) -> Array:
@@ -309,6 +319,114 @@ func _by_water(p: Vector2i) -> bool:
 			if q.x >= 0 and q.y >= 0 and q.x < gw and q.y < gh and g[q.y * gw + q.x] == MapGen.WATER:
 				return true
 	return false
+
+## Part XII: the people of Landfall and the isles, the new townsfolk of every town, and the bosses of
+## the Returning Ruins (--gallery12).
+func _part12_galleries() -> void:
+	await _gallery("gallery_landfall", [
+		Assets.person("xu_qian"), Assets.person("teacher_qin"), Assets.person("shipwright_ban"), Assets.person("ah_shui"),
+		Assets.person("little_haibao"), Assets.person("pilot_zheng"), Assets.person("diver_yulan"), Assets.person("mazu"),
+	], 0.72)
+	await _gallery("gallery_immortals", [
+		Assets.person("lu_dongbin"), Assets.person("li_tieguai"), Assets.person("lan_caihe"), Assets.person("han_xiangzi"),
+		Assets.person("he_xiangu"), Assets.person("zhang_guolao"), Assets.person("zhongli_quan"), Assets.person("cao_guojiu"),
+	], 0.72)
+	await _gallery("gallery_isles", [
+		Assets.person("jingwei"), Assets.person("gui_lao"), Assets.person("mist_fisher"), Assets.person("furnace_boy"),
+		Assets.person("steersman_hong"), Assets.person("ship_boy_ah_fu"), Assets.person("xu_fu_home"),
+	], 0.76)
+	await _gallery("gallery_townsfolk_new", [
+		Assets.person("xiao_qing"), Assets.person("gardener_ruan"), Assets.person("clerk_wei"), Assets.person("noodle_he"),
+		Assets.person("courier_ma"), Assets.person("ox_herd_niu"), Assets.person("teacher_ren"), Assets.person("lantern_xi"),
+		Assets.person("archer_kong"), Assets.person("farida"), Assets.person("navid"),
+	], 0.62)
+	await _gallery("gallery_townsfolk_new2", [
+		Assets.person("examiner_fan"), Assets.person("xia_cormorant"), Assets.person("bell_tuner_gong"), Assets.person("auntie_rong"),
+		Assets.person("ling_fei"), Assets.person("ao_xun"), Assets.person("hu_xiao"), Assets.person("yao_silk"),
+		Assets.person("bu_lin"), Assets.person("roll_clerk_ning"), Assets.person("lamplighter_bo"),
+	], 0.62)
+	await _gallery("gallery_part12", [
+		_foe("longbo_giant", true), _foe("tianwu", true), _foe("shen", true), _foe("great_ao", true),
+		_foe("yu_qiang", true), _foe("hai_ruo", true), _foe("xu_fu", true),
+	], 1.4)
+	await _gallery("gallery_part12_monsters", [
+		_foe("stranded_shark"), _foe("sand_crab"), _foe("cinnabar_toad"), _foe("elixir_crane"), _foe("bore_horse"),
+		_foe("shell_soldier"), _foe("drowned_sailor"), _foe("abyss_eel"), _foe("ruin_sentinel"),
+	], 0.9)
+
+## Part XII screens (--part12): the Cultivation page and a branch of the root waking, a cutscene with
+## its gestures and two-shot camera, one of the Founder's sealed caves and the map of the Eastern Sea.
+func _part12_shots() -> void:
+	Game.reset()
+	Game.level = 33
+	Game.companion = true
+	Game.heal_full()
+	Game.step = Data.step_index("s_p8_home")
+	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 2, "qi_sea": 1, "five_phase": 1, "fortune": 1}
+	Game.awakenings = 12
+	Game.abodes = {"cave_core": true, "cave_soul": true, "cave_deity": true, "cave_void": true, "cave_merging": true, "cave_mahayana": true, "cave_immortal": true}
+	Game.scattered = 41
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.open_menu()
+	main.menu.mode = "cultivation"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("cultivation")
+	main.pop()
+	Game.talent_pts = 1
+	main.open_talent_choice()
+	main.choice.cursor = 4
+	await _wait(0.5)
+	await _shot("talent_choice")
+	main.pop()
+	Game.talent_pts = 0
+	# a Founder's cave on the mountain, sealed for a realm Lin Feng has not reached (its door faces the
+	# sect, to the north-east)
+	main.world.load_area("mountain", Vector2i(113, 72))
+	main.world.facing = Vector2i(1, 0)
+	main.world.cam_q = 1
+	main.world._snap_cam()
+	var cave_t: Vector2i = Atlas.to_world("mountain", Vector2i(116, 72))
+	var cp: Vector3 = main.world.wpos(cave_t)
+	cp.y = main.world.ground_y(cp)
+	var to_sect: Vector2i = Atlas.to_world("sect", Vector2i(20, 13)) - cave_t
+	var dir := Vector3(to_sect.x, 0, to_sect.y).normalized()
+	main.world.cam_override = Transform3D(Basis.IDENTITY, cp + dir * 9.0 + Vector3(dir.z, 0, -dir.x) * 3.0 + Vector3(0, 5.5, 0)).looking_at(cp + Vector3(0, 1.2, 0), Vector3.UP)
+	await _wait(1.2)
+	await _shot("founder_cave")
+	main.world.cam_override = null
+	if main.args.has("cave-only"):
+		return
+	# a cutscene: Mazu gives Yue Ling her lantern at the pool of the suns (gestures and the two-shot)
+	Game.step = Data.step_index("s_p12_shore")
+	main.world.load_area("fusang", Vector2i(69, 49))
+	main.world.facing = Vector2i(0, -1)
+	main.world.cam_q = 0
+	main.world._snap_cam()
+	await _wait(1.0)
+	main.say(Data.DIALOGUE.s_p12_shore)
+	await _wait(2.6)
+	await _shot("cutscene_mazu")
+	main.dialogue.press("confirm")
+	main.dialogue.press("confirm")
+	await _wait(2.4)
+	await _shot("cutscene_mazu2")
+	while main.top_name() == "dialogue":
+		main.dialogue.press("confirm")
+		main.dialogue.press("confirm")
+	# the map of the Eastern Sea
+	for rid3 in Atlas.all_region_ids():
+		Game.seen[rid3] = true
+	main.world.load_area("penglai", Vector2i(40, 30))
+	main.open_menu()
+	main.menu.mode = "map"
+	main.menu.map_layer = "sea"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("world_map_sea")
+	main.pop()
 
 func _run() -> void:
 	await _wait(1.0)
@@ -736,6 +854,10 @@ func _run() -> void:
 			await _wait(0.4)
 			await _shot("world_map" if ml == "surface" else "world_map_" + ml)
 		main.pop()
+	if main.args.has("part12"):
+		await _part12_shots()
+	if main.args.has("gallery12"):
+		await _part12_galleries()
 	if main.args.has("ending"):
 		# the results screen on its own (--ending): the finale set pieces of every part
 		main.push("ending")

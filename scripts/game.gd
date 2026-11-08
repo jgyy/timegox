@@ -41,6 +41,14 @@ var dao_xp := {}
 var dao_switches := 0
 var standing := {}
 var met := {}
+## Part XII: the branches of the Nine Heavens root Lin Feng has woken (talent id -> rank 1..3), the
+## awakenings he has not yet spent, the Founder's sealed caves he has opened, and how many packs have
+## scattered before his aura
+var talents := {}
+var talent_pts := 0
+var awakenings := 0
+var abodes := {}
+var scattered := 0
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -78,6 +86,11 @@ func reset() -> void:
 	dao_switches = 0
 	standing = {}
 	met = {}
+	talents = {}
+	talent_pts = 0
+	awakenings = 0
+	abodes = {}
+	scattered = 0
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
 	note("Journey begins")
@@ -96,10 +109,10 @@ func member_name(i: int) -> String:
 	return "Lin Feng" if i == 0 else "Yue Ling"
 
 func max_hp(i: int) -> int:
-	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0))
+	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * (1.0 + talent_mod("hp") if i == 0 else 1.0))
 
 func max_qi(i: int) -> int:
-	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1))
+	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * (1.0 + talent_mod("qi") if i == 0 else 1.0))
 
 func fighter(i: int) -> Dictionary:
 	var a := float(Data.atk(level)) * (1.0 + 0.12 * temper) * boon("atk", 1.0)
@@ -108,7 +121,7 @@ func fighter(i: int) -> Dictionary:
 	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
 	var spd: int = Data.speed(level) + (2 if i == 1 else 0)
 	if i == 0:
-		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0))
+		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd"))
 	return {
 		"id": "pc%d" % i, "name": member_name(i), "side": "party", "idx": i, "lv": level, "boss": false,
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
@@ -173,7 +186,82 @@ func dao_skills(i: int) -> Array:
 
 ## What a technique costs to use (the Cauldron's Dao makes them cheaper).
 func skill_cost(id: String) -> float:
-	return float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0)
+	var c := float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0) * (1.0 - talent_mod("cost"))
+	# the crown of the Five-Phase Root: techniques that strike every foe cost a fifth less
+	if talent_crown("five_phase") and str(Data.SKILLS[id].tgt) == "all":
+		c *= 0.8
+	return c
+
+# ---------------------------------------------------------------- the Nine Heavens root (Part XII)
+func talent(id: String) -> int:
+	return int(talents.get(id, 0))
+
+func talent_crown(id: String) -> bool:
+	return talent(id) >= Data.TALENT_MAX
+
+## What the woken branches add up to for one effect key (see Data.TALENTS fx): the sum over every
+## branch of its per-rank amount times its rank.
+func talent_mod(key: String) -> float:
+	var v := 0.0
+	for id in talents:
+		var fx: Dictionary = Data.TALENTS[id].fx
+		if fx.has(key):
+			v += float(fx[key]) * int(talents[id])
+	return v
+
+## How much harder a technique of Lin Feng's lands for the branches he has woken: its element's root,
+## and the Sword Bone for the plain strike, physical techniques and single-target techniques.
+func talent_power(skill_id: String) -> float:
+	var s: Dictionary = Data.SKILLS[skill_id]
+	var m := 1.0 + talent_mod(str(s.elem))
+	if skill_id == "strike":
+		m += talent_mod("strike") - (talent_mod("phys") if str(s.elem) == "phys" else 0.0)
+	if str(s.get("tgt", "")) == "one":
+		m += talent_mod("one")
+	return m
+
+## A branch wakes (the first stirring of qi, a tribulation, a Founder's cave): one more rank to spend.
+func awaken(why: String) -> void:
+	talent_pts += 1
+	awakenings += 1
+	toast("A branch of the Nine Heavens root stirs")
+	note("The root stirred: " + why)
+
+## Spend an awakening on branch `id`.  Returns whether it took.
+func wake_talent(id: String) -> bool:
+	if talent_pts <= 0 or not Data.TALENTS.has(id) or talent(id) >= Data.TALENT_MAX:
+		return false
+	talent_pts -= 1
+	talents[id] = talent(id) + 1
+	var rank := talent(id)
+	toast("%s: %s" % [Data.TALENTS[id].n, Data.TALENT_RANKS[rank]])
+	note("Woke the %s (%s)" % [Data.TALENTS[id].n, Data.TALENT_RANKS[rank]])
+	# the branches that grow the body and the dantian fill what they grow
+	hp[0] = minf(float(max_hp(0)), hp[0] + Data.max_hp(level) * float(Data.TALENTS[id].fx.get("hp", 0.0)))
+	qi[0] = minf(float(max_qi(0)), qi[0] + Data.max_qi(level) * float(Data.TALENTS[id].fx.get("qi", 0.0)))
+	return true
+
+## Total ranks woken.
+func talent_ranks() -> int:
+	var n := 0
+	for id in talents:
+		n += int(talents[id])
+	return n
+
+# ---------------------------------------------------------------- realms (Part XII)
+func realm() -> int:
+	return Data.realm_of(level)
+
+## How the world addresses Lin Feng at his realm.
+func address() -> String:
+	return str(Data.REALM_INFO[mini(realm(), Data.REALM_INFO.size() - 1)].title)
+
+## A pack this far below Lin Feng scatters before his aura rather than fight (Main.interact).
+func scatters(group: Array) -> bool:
+	var top := 0
+	for g in group:
+		top = maxi(top, int(g.lv))
+	return realm() - Data.realm_of(top) >= Data.AURA_FLEE
 
 # ---------------------------------------------------------------- the peoples of the realms (Part XI)
 func race_tier(race: String) -> int:
@@ -229,6 +317,11 @@ func boon(key: String, fallback: float) -> float:
 				v *= 1.08
 			"taken":
 				v *= 0.94
+			# Part XII: the Thousand Children's thrift and the immortals' teaching
+			"stones":
+				v *= 1.1
+			"exp":
+				v *= 1.06
 	return v
 
 func heal_full() -> void:
@@ -282,7 +375,8 @@ func do_breakthrough() -> void:
 	poll_steps()
 
 func med_rate(near_spring: bool) -> float:
-	return (3.0 + 1.2 * level) * (3.0 if near_spring else 1.0)
+	# an Enlightened Mind goes deeper into every meditation
+	return (3.0 + 1.2 * level) * (3.0 if near_spring else 1.0) * (1.0 + talent_mod("med"))
 
 # ---------------------------------------------------------------- quests
 func cur_step() -> Dictionary:

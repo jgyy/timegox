@@ -1,9 +1,103 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Three Realms Concord, across **one open world in three realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it and the **Nine Springs** under it, joined by the Jianmu, the world tree. It has 177 bosses, sixteen Heavenly Tribulations, ten towns full of people and 74 buildings you can walk into, with 12 upper storeys and 11 cellars among them. Choose your road among **six Daos** and earn the trust of **six peoples** of the realms.
+Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Ten Thousand Waters Return, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 193 bosses, seventeen Heavenly Tribulations, eleven towns full of people and 84 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos** and earn the trust of **eight peoples** of the realms.
 
-> **Total gameplay duration: about 12 hours 46 minutes** (12:46:15 of game time for the end-to-end bot run, seed 1234), **1 hour 18 minutes more than the last release** (11:27:54). **The world grew upwards and downwards**: the Nine Heavens, islands in the sky over a sea of cloud, float 96 m above the land, and the Nine Springs, a cavern country over a glowing abyss, lie 64 m below it. Each is a world of its own, and the **Jianmu**, a world tree that grew overnight west of the sect, joins them to the land: a stair winds up its trunk and another down its roots. **Buildings have floors**: 12 upper storeys and 11 cellars to explore by their stairs, with people, quest scenes and keepsakes in them. **Six Daos to walk** (the Sword, Free Wandering, the Compassionate Heart, Formations, the Cauldron and the Mirror), each with its own mastery, passive powers and technique, changed at any Dao Stele and answered in the dialogue. **Six peoples to meet** (the Feathered Folk, the dragon-kin, the celestial foxes, the Pearl-Weepers, the Deathless and the shades of Youdu), with 19 new Blender-built characters with wings, crests, fox ears, nine tails, fin ears and scales; your standing with each grows with help and gifts and makes them friends who grant a boon. **Part XI, "The Ladder of Heaven", adds 1 hour 18 minutes of play**: four new regions, 16 bosses, 12 monsters and a new realm, Three Realms Concord. **Bugs found and fixed** along the way are listed [below](#bugs-found-and-fixed).
+> **Total gameplay duration: about 14 hours 7 minutes** (14:06:51 of game time for the end-to-end bot run, seed 1234), **1 hour 21 minutes more than the last release** (12:46:15). **Cultivation means something now**: a whole realm between two fighters is felt in every blow (*realm suppression*), beasts two realms below Lin Feng scatter rather than fight, nine caves the Founder sealed on the mountain open only to a cultivator of the realm carved on each door, and the world speaks to the realm he has reached, from how townsfolk greet him to the history they only tell a Mahayana cultivator. **Talents matter**: the Nine Heavens root has **nine branches** (the Sword Bone, the Thunder, Five-Phase and Yin Roots, the Vajra Body, the Sea of Qi, the Enlightened Mind, Heaven's Favour and Spirit Sense), woken one rank at a time when his qi first stirs, at every tribulation and in every cave, each with a crown at full leaf; the world grows with the root, so the branches a player wakes decide how he keeps up. **Cutscenes act**: every one of the 153 Blender characters has **ten new gestures** (nod, shake, point, wave, laugh, grieve, think, kneel, offer, shock) that conversations play as they go, with a **two-shot conversation camera**. **More people**: 45 new characters, 22 of them new townsfolk in every old town. **Part XII, "The Returning Ruins", adds 1 hour 23 minutes of play**: a fourth realm, four regions, 16 bosses, 12 monsters, two new peoples and a new realm, Ten Thousand Waters Return. **Nineteen narrative plot holes** were found and fixed, and the bugs found along the way are listed [below](#bugs-found-and-fixed).
+
+| | |
+|---|---|
+| ![Landfall, the town of the Thousand Children on Penglai](docs/screenshots/town_landfall.png) | ![the lip of Guixu, the Returning Ruins](docs/screenshots/guixu_whirl.png) |
+| ![the Cultivation page: realm, lifespan, suppression and the nine branches of the root](docs/screenshots/cultivation.png) | ![a branch of the Nine Heavens root wakes](docs/screenshots/talent_choice.png) |
+| ![a cutscene: Mazu gives Yue Ling her red lantern](docs/screenshots/cutscene_mazu.png) | ![one of the Founder's sealed caves on the mountain](docs/screenshots/founder_cave.png) |
+| ![the Eight Immortals of the isles](docs/screenshots/gallery_immortals.png) | ![the people of Landfall and Mazu](docs/screenshots/gallery_landfall.png) |
+| ![new townsfolk for the old towns](docs/screenshots/gallery_townsfolk_new.png) | ![more new townsfolk](docs/screenshots/gallery_townsfolk_new2.png) |
+| ![Part XII bosses: the Giant of Longbo, Tianwu, Shen, the Great Ao, Yu Qiang, Ruo of the Northern Sea and Xu Fu](docs/screenshots/gallery_part12.png) | ![the map of the Eastern Sea](docs/screenshots/world_map_sea.png) |
+| ![Lin Feng kneels](docs/screenshots/anim_lin_feng_kneel.png) | ![Yue Ling waves](docs/screenshots/anim_yue_ling_wave.png) |
+
+More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
+
+## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph RM[Realms that matter]
+    LV[Lin Feng's realm] -->|a whole realm apart| SU[realm suppression:<br/>x1.2 per realm, up to three]
+    LV -->|two realms below| SC[packs scatter,<br/>counting for hunts]
+    LV -->|the realm on the door| CV[nine Founder's caves<br/>on the mountain]
+    LV --> TW[townsfolk greet it;<br/>deeper lore at higher realms]
+    end
+    subgraph TA[Talents: the nine branches]
+    AW[an awakening:<br/>first qi, every tribulation,<br/>every cave] --> CH{wake which branch?}
+    CH --> BR[Sword Bone, Thunder, Five-Phase<br/>and Yin Roots, Vajra Body, Sea of Qi,<br/>Enlightened Mind, Heaven's Favour,<br/>Spirit Sense: 3 ranks and a crown]
+    BR --> PW[battle, meditation,<br/>stones, hidden caches]
+    PW --> WG[the world grows with the root;<br/>tribulations test a woken root harder]
+    end
+    subgraph CU[Cutscenes]
+    LN[a line of dialogue] --> EM[gesture: named in the line<br/>or read from its words]
+    EM --> PL[the speaker plays it,<br/>the listener answers]
+    LN --> CAM[two-shot conversation camera]
+    end
+    subgraph P[Part XII: +1 hour 23 minutes]
+    SE[Sect: the tide went out] --> FS[Fusang: Mazu's boat] --> PG[Penglai] --> FZ[Fangzhang] --> YZ[Yingzhou] --> GX[Guixu]
+    end
+    CV --> AW
+    RM --> GAME((Game))
+    TA --> GAME
+    CU --> GAME
+    P --> GAME
+    GAME --> BOT[bot: 14:06:51,<br/>CI needs 12 h]
+```
+
+- **Cultivation levels matter a lot more** (`data.gd` `REALM_INFO`, `suppression`, `game.gd`, `battle.gd`, `main.gd`):
+  - **Realm suppression**: a fighter a whole major realm above another strikes **20% harder** and is struck 20% softer, up to three realms (x1.6); it is announced as the battle opens ("Realm suppression: your Golden Core weighs on them"). It works both ways, so rushing a region under-cultivated hurts. Heavenly Tribulations are heaven itself and press on every realm alike.
+  - **Aura**: a pack whose strongest beast is **two realms below** Lin Feng scatters as he walks into it rather than fight; it still counts as driven off for a hunt.
+  - **The Founder's nine sealed caves**: Founder Qing Lian sealed a cave on Azure Cloud Mountain for each realm from Golden Core to Primordial Sovereign; a stone door opens only to a cultivator of the realm carved on it. Inside are her letters to the bearers who would come after her, the scratched notes of two bearers Xu Mo caught before they reached the next door, a gift of spirit stones and an **awakening of the root**. The Annals keep what is written in them.
+  - **What a realm is**: the new **Cultivation** page (Esc > Cultivation) shows Lin Feng's realm, his lifespan (120 years at Qi Condensation, 100,000 as a True Immortal, then beyond counting), how the world addresses him (young friend, Daoist friend, senior, elder, Immortal, Sovereign, Venerable, Sage...) and what the realm is like from the inside.
+  - **The world notices**: the first time a townsperson sees him after a breakthrough they say so, in six bands of awe; and **realm-gated lore**: fifteen people (the Elder, the Archivist, Old Wu, Granny Wen, the immortals...) tell a high enough cultivator things they tell nobody else (`Data.CHAT_DEEP`).
+- **Cultivation talents matter a lot too: the nine branches of the Nine Heavens root** (`Data.TALENTS`, `Game.talent_*`):
+
+  | Branch | Each rank (of three) | Crown (rank three) |
+  |---|---|---|
+  | **Sword Bone** | Sword Strike and physical techniques +22%, single-target techniques +6% | the first blow of every battle lands as a critical strike |
+  | **Thunder Root** | thunder techniques +18% | a thunder technique on a weakness strikes again for half |
+  | **Five-Phase Root** | fire, water, wood and earth techniques +12% | techniques that strike every foe cost a fifth less |
+  | **Yin Root** | dark techniques +18% | a dark technique heals Lin Feng for a tenth of its harm |
+  | **Vajra Body** | health +10%, harm taken -5% | once a battle, a fatal blow leaves him one breath |
+  | **Sea of Qi** | qi +10%, +1% qi a turn, techniques 3% cheaper | once a battle, a third of his qi floods back when it runs low |
+  | **Enlightened Mind** | meditation +12%, cultivation from battle +6% | every battle teaches the Dao he walks twice over |
+  | **Heaven's Favour** | spirit stones +15%, critical strikes +3%, pills found +8% | a boss always leaves a third healing pill |
+  | **Spirit Sense** | speed +2, slips 3% of blows; feels hidden caches | he moves first in every battle; foes miss more |
+
+  - A branch wakes one rank at each **awakening**: when his qi first stirs (the Elder explains the root's nine branches), at **every tribulation** he survives and in **every Founder's cave** he opens, and he chooses which on a new choice screen; an unspent awakening waits on the Cultivation page.
+  - **The world grows with the root**: every foe is a little tougher for each rank a cultivator of its level would be expected to have woken (`Data.expected_ranks`), so the branches a player wakes (and the caves they open) decide whether they keep pace; and a **Heavenly Tribulation tests a woken root harder** (+1.5% per rank awake, heaven's jealousy).
+  - **Spirit Sense** reveals four caches hidden on the isles; the ending names the ranks awake.
+- **Custom animations in the cutscenes**: every person in the game (153 Blender characters) has **ten new gesture clips** baked in `art/lib/person.py` (nod, shake, point, wave, laugh, grieve, think, kneel, offer, shock). A line of dialogue can name its gesture (`["Speaker", "text", "kneel"]`), a narrator's line can direct somebody present (`"Mazu, Who Brings the Boats Home:offer"`), and otherwise one is read from the words (`Data.emote_for`: thanks bow, refusals shake their heads, welcomes wave, directions point, questions think); the listener answers (a bow for a gift, a wave for a wave, a nod for grief). A **conversation camera** eases from the chase camera into a two-shot from the side at head height (higher indoors), drifts during narration and eases back. The ending screen has Yue Ling waving, bowing and laughing and Mazu waving from her boat.
+  | | |
+  |---|---|
+  | ![Lin Feng kneels with the cultivator's salute](docs/screenshots/anim_lin_feng_kneel.png) | ![Yue Ling waves](docs/screenshots/anim_yue_ling_wave.png) |
+  | ![Lin Feng thinks, hand to his chin](docs/screenshots/anim_lin_feng_think.png) | ![Yue Ling grieves](docs/screenshots/anim_yue_ling_grieve.png) |
+  | ![Lin Feng laughs](docs/screenshots/anim_lin_feng_laugh.png) | ![Yue Ling shows the way](docs/screenshots/anim_yue_ling_point.png) |
+  | ![Lin Feng nods](docs/screenshots/anim_lin_feng_nod.png) | ![Yue Ling offers something with both hands](docs/screenshots/anim_yue_ling_offer.png) |
+  | ![Elder Qing Xuan, startled](docs/screenshots/anim_elder_qing_shock.png) | ![Mazu offers her lantern](docs/screenshots/anim_mazu_offer.png) |
+  | ![a cutscene: Mazu waves as she speaks, framed by the conversation camera](docs/screenshots/cutscene_mazu2.png) | ![the conversation camera during narration](docs/screenshots/cutscene_mazu.png) |
+
+- **More people in every town**: 22 new townsfolk with their own Blender models and three lines each: a new disciple and the herb-gardener at the sect; a former tax-clerk of the Court carrying noodles, the noodle-seller and a courier at Cloudfoot; the ox-herd and the schoolteacher at Qingshi; a lantern-maker and the archery-master at Yanggu; a star-glass blower and a Sogdian merchant at Shazhou; a scholar who failed the examinations nine times and a cormorant fisher at Longmen; a bell-tuner and the keeper of the casting pits at Tushan; a Yumin who cannot fly and a rain-clerk at Featherfall; a silk-diver and a fruit-trader of the Deathless at Tearwater; a roll-clerk and the lamplighter at Youdu; and a fox of one tail at the Gate of Heaven. Landfall adds twelve more.
+- **A richer, more consistent world**: two new peoples (the **Thousand Children of Landfall**, mortals on the isle of the immortals for two thousand years, and the **Immortals of the Isles**) with their Daos, keepsakes and boons; **progress-aware chat** (`Data.CHAT_LATER`: people only speak of falling stars and Jade Emperors once those have happened); the Founder's caves and their letters; realm-gated lore; and **nineteen plot holes fixed** (see [below](#narrative-plot-holes-found-and-fixed)).
+- **Part XII, "The Returning Ruins"** adds 1 hour 23 minutes (see [below](#part-xii-the-returning-ruins)), verified by the playthrough bot; CI now requires **12 hours**.
+- **Code**: the game's GDScript grew from 23,697 to 25,537 lines and the Blender Python from 19,113 to 20,039 lines; all 219 assets (153 people, 40 monsters, 26 props) rebuild from their scripts.
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+
+### References
+
+Background for this release (the Isles of the Immortals and the Returning Ruins, and the people met there):
+
+- **Guixu and the five isles**: the ravine without a bottom east of the Bohai into which every water and the Silver River pour, the five mountains Daiyu, Yuanqiao, Fanghu, Yingzhou and Penglai, the fifteen giant turtles (ao) set to bear them in three shifts of sixty thousand years under Yu Qiang, and the giant of Longbo who caught six of them, in the "Tang Wen" chapter of the [*Liezi*](https://en.wikipedia.org/wiki/Liezi); [Penglai](https://en.wikipedia.org/wiki/Penglai_(mythology)) and the [Eight Immortals](https://en.wikipedia.org/wiki/Eight_Immortals).
+- **Xu Fu**: the magician the First Emperor of Qin sent east with three thousand boys and girls to find the elixir of immortality, in the *Records of the Grand Historian* ([Xu Fu](https://en.wikipedia.org/wiki/Xu_Fu)).
+- **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
+- **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
+
+### Previous release: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -16,10 +110,6 @@ Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from 
 | ![the Feathered Folk and the dragon-kin](docs/screenshots/gallery_yumin_dragons.png) | ![the celestial foxes and the Pearl-Weepers](docs/screenshots/gallery_foxes_jiaoren.png) |
 | ![the Deathless, Houtu and the shades of Youdu](docs/screenshots/gallery_deathless_shades.png) | ![Part XI bosses: Leigong, Jiufeng, Zhulong, Black Impermanence, Tubo and Li](docs/screenshots/gallery_part11.png) |
 | ![the map of the Nine Heavens](docs/screenshots/world_map_heaven.png) | ![the map of the Nine Springs](docs/screenshots/world_map_under.png) |
-
-More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
-
-## What changed in this release
 
 ```mermaid
 flowchart LR
@@ -96,7 +186,7 @@ flowchart LR
 - **Code**: the game's GDScript grew from 20,722 to 23,687 lines (+14%) and the Blender Python from 17,939 to 19,113 lines; all 174 assets (108 people, 40 monsters, 26 props) rebuild from their scripts.
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### References
+#### References for that release
 
 Background for this release (the myths of the Jianmu and the realms, the Daos and the peoples):
 
@@ -463,7 +553,7 @@ Other terminal commands:
 ```sh
 godot --headless --path . --script tests/run_tests.gd           # data-integrity and 3D-asset tests
 godot --headless --path . --script tests/manual_input_test.gd   # real keyboard-event smoke test
-godot --headless --fixed-fps 30 --path . -- --bot --min-time=39600   # bot plays the whole game, prints play time
+godot --headless --fixed-fps 30 --path . -- --bot --min-time=46800   # bot plays the whole game, prints play time
 godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-fps for real time) watch the bot
 ```
 
@@ -472,20 +562,22 @@ godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-
 | Arrows / WASD | move (relative to the camera; a held key keeps its direction while the camera turns), navigate menus |
 | Q / E | rotate the camera (it swings back behind Lin Feng as soon as he walks) |
 | Enter / Z / Space | confirm, interact, advance dialogue |
-| Esc / X | menu (Meditate, Breakthrough, Items), cancel |
+| Esc / X | menu (Meditate, Breakthrough, Items, Cultivation, ...), cancel |
 
-Walk into NPCs, enemies, pickups, stairs and bosses to interact with them. There is no save system yet: a full run takes about twelve and three-quarter hours. Esc > World Map shows the whole land and the history of where you are (Left/Right turns to the Nine Heavens and the Nine Springs once you have been there); Esc > Annals keeps the history of everywhere you have been; Esc > Dao & Peoples shows the Daos you have walked and your standing with the peoples of the realms.
+Walk into NPCs, enemies, pickups, stairs and bosses to interact with them. There is no save system yet: a full run takes about fourteen hours. Esc > Cultivation shows your realm (and what it means) and the branches of the Nine Heavens root you have woken; Esc > World Map shows the whole land and the history of where you are (Left/Right turns to the Nine Heavens, the Nine Springs and the Eastern Sea once you have been there); Esc > Annals keeps the history of everywhere you have been; Esc > Dao & Peoples shows the Daos you have walked and your standing with the peoples of the realms.
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 49 stages across seventeen realms (up to Three Realms Concord); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 52 stages across eighteen realms (up to Ten Thousand Waters Return); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through. **Realms matter**: a whole realm between two fighters is felt in every blow (realm suppression, x1.2 a realm, up to three), beasts two realms below you scatter, the Founder's nine caves on the mountain open only at their realm, and the world notices the realm you have reached (Esc > Cultivation).
+- **Talents: the nine branches of the Nine Heavens root** (Esc > Cultivation): when your qi first stirs, at every tribulation and in every Founder's cave a branch wakes and you choose which: the Sword Bone, the Thunder, Five-Phase and Yin Roots, the Vajra Body, the Sea of Qi, the Enlightened Mind, Heaven's Favour or Spirit Sense, three ranks each and a crown at full leaf. The world grows with the root, so what you wake decides how you keep up.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Forty-six regions in three realms**: forty-two on a continent within the Four Seas, two in the Nine Heavens above it and two in the Nine Springs below it, each with elites, bosses and a hunt objective, joined by winding roads and the Jianmu, and **ten towns** (the sect, Cloudfoot, Qingshi Village, Yanggu, Shazhou Oasis, Longmen, Tushan, Featherfall, Tearwater and Youdu). **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon. **Part X**: Longmen, the Dragon Gate Ferry; the Drowned Fields of Gun; Tushan, the Town of the Cauldron-Casters; and Mount Buzhou, the Broken Pillar. **Part XI (new)**: Juntian, the Level Heaven, and Changhe, the Gate of Heaven, in the Nine Heavens; the Nine Springs beneath the Roots and Youdu, the Dark Capital, in the Nine Springs.
-- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, Magpie Bridge Sword, Silver River Torrent, Seventh-Night Reunion Sword, Noon-Splitting Sword, Fall of the Nine Suns, Tenth Arrow Sword, Dragon Gate Leap, Swelling Earth Rampart, Nine Cauldrons Sword, **Strike of the Standing Tree**, **Torrent of the Nine Springs** and **Three Realms Concord Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, Starweave Net, Magpie Wing Ward, Osmanthus Moon Rain, Moon-Dew Ward, Reed-Boat Blossom, River-Mother's Ward, **Rain of Phoenix Feathers** and **Ward of the Standing Tree** (the reviving heals also raise a fallen ally); and the six **Dao techniques** (Ten Thousand Swords Return to One, Peng's Wind of Ninety Thousand Li, Lotus Heart Sutra, Eight Trigrams Grand Array, Nine-Turn Golden Elixir Fire and Mirror-Flower, Water-Moon), one for each Dao from Adept on.
-- **Upstairs and down**: 23 upper storeys and cellars, each reached by its stairs, with people, quest scenes and hidden keepsakes; the Jianmu's stairs climb to the Nine Heavens and go down to the Nine Springs.
+- **Fifty regions in four realms**: forty-two on a continent within the Four Seas, two in the Nine Heavens above it, two in the Nine Springs below it and four on the Isles of the Eastern Sea out past its shelf, each with elites, bosses and a hunt objective, joined by winding roads, the Jianmu and Mazu's boat, and **eleven towns** (the sect, Cloudfoot, Qingshi Village, Yanggu, Shazhou Oasis, Longmen, Tushan, Featherfall, Tearwater, Youdu and Landfall). **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon. **Part X**: Longmen, the Dragon Gate Ferry; the Drowned Fields of Gun; Tushan, the Town of the Cauldron-Casters; and Mount Buzhou, the Broken Pillar. **Part XI**: Juntian, the Level Heaven, and Changhe, the Gate of Heaven, in the Nine Heavens; the Nine Springs beneath the Roots and Youdu, the Dark Capital, in the Nine Springs. **Part XII (new)**: Penglai, the Isle of the Immortals (Landfall); Fangzhang, the Square-Pot Isle; Yingzhou, the Isle of Mists; and Guixu, the Returning Ruins, in the Eastern Sea.
+- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, Magpie Bridge Sword, Silver River Torrent, Seventh-Night Reunion Sword, Noon-Splitting Sword, Fall of the Nine Suns, Tenth Arrow Sword, Dragon Gate Leap, Swelling Earth Rampart, Nine Cauldrons Sword, Strike of the Standing Tree, Torrent of the Nine Springs, Three Realms Concord Sword, **Returning Tide Sword**, **Rain over the Five Isles** and **Jingwei's Stone Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, Starweave Net, Magpie Wing Ward, Osmanthus Moon Rain, Moon-Dew Ward, Reed-Boat Blossom, River-Mother's Ward, Rain of Phoenix Feathers, Ward of the Standing Tree, **Spray of the Pearl Trees** and **Mazu's Red Lantern** (the reviving heals also raise a fallen ally); and the six **Dao techniques** (Ten Thousand Swords Return to One, Peng's Wind of Ninety Thousand Li, Lotus Heart Sutra, Eight Trigrams Grand Array, Nine-Turn Golden Elixir Fire and Mirror-Flower, Water-Moon), one for each Dao from Adept on.
+- **Upstairs and down**: 30 upper storeys and cellars, each reached by its stairs, with people, quest scenes and hidden keepsakes; the Jianmu's stairs climb to the Nine Heavens and go down to the Nine Springs, and Mazu's boat sails from Fusang to the isles.
+- **Cutscenes**: conversations over the world play out with gestures (nod, shake, point, wave, laugh, grieve, think, kneel, offer, shock, bow) picked from each line, answered by the listener, and framed by a two-shot conversation camera.
 - **Daos** (Esc > Dao & Peoples): choose one of six roads when the Jianmu grows back and change at any Dao Stele; each has a mastery from Novice to Master, passive powers that grow with it and a technique from Adept on, and the story answers the one you walk.
-- **The peoples of the realms**: the Feathered Folk, the dragon-kin, the celestial foxes, the Pearl-Weepers, the Deathless and the shades of Youdu; your standing with each grows with the help you give in their lands and with the keepsakes you give them, faster if you walk the Dao they honour, and a people that calls you Friend grants a boon.
-- **The Annals** (Esc > Annals): the history of every region and town Lin Feng has been to; the world map shows the one he is standing in.
+- **The peoples of the realms**: the Feathered Folk, the dragon-kin, the celestial foxes, the Pearl-Weepers, the Deathless, the shades of Youdu, the Thousand Children of Landfall and the Immortals of the Isles; your standing with each grows with the help you give in their lands and with the keepsakes you give them, faster if you walk the Dao they honour, and a people that calls you Friend grants a boon.
+- **The Annals** (Esc > Annals): the history of every region and town Lin Feng has been to, and the Founder's words from every cave he has opened; the world map shows the one he is standing in.
 - **Economy**: spirit stones buy pills and tempering for your sword.
 
 ```mermaid
@@ -567,7 +659,14 @@ flowchart LR
     Changhe -->|down the roots| NineSprings[The Nine Springs<br/>Zhulong, the Torch Dragon]
     NineSprings --> Youdu[Youdu, the Dark Capital<br/>Li, Who Presses Down the Earth]
     end
-    Youdu ==> End((Three Realms Concord))
+    subgraph P12[Part XII: about 1h23m]
+    Youdu ==>|Three Realms Concord, the tide goes out| Sect11[Sect: a boat on an ox-cart]
+    Sect11 -->|east to Fusang, Mazu's boat| Penglai[Penglai, Landfall<br/>the Giant of Longbo]
+    Penglai --> Fangzhang[Fangzhang<br/>Tianwu]
+    Fangzhang --> Yingzhou[Yingzhou<br/>Yu Qiang]
+    Yingzhou --> Guixu[Guixu, the Returning Ruins<br/>Xu Fu]
+    end
+    Guixu ==> End((Ten Thousand Waters Return))
 ```
 
 ```mermaid
@@ -628,7 +727,7 @@ New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth
 
 ```mermaid
 flowchart TD
-    D[(data.gd: 47 areas,<br/>gates, NPCs, bosses,<br/>buildings, floors, rivers, roads)] --> MG[mapgen.gd: each region's own map<br/>organic outline, river, ponds,<br/>spline roads, A* trails]
+    D[(data.gd: 51 areas,<br/>gates, NPCs, bosses, caves,<br/>buildings, floors, rivers, roads)] --> MG[mapgen.gd: each region's own map<br/>organic outline, river, ponds,<br/>spline roads, A* trails]
     S[atlas.gd SITES: a site and a way<br/>for every region] --> L[layout: maps turned<br/>to face their road]
     MG --> AT[atlas.gd _build]
     L --> AT
@@ -648,7 +747,9 @@ flowchart TD
     W --> SEAR[Terrain3D.world_sea:<br/>one ocean for the whole world]
     W --> IN[houses: roof lifts while inside]
     AT --> RLM[the same build for the Nine Heavens<br/>and the Nine Springs, 260 x 200 each:<br/>islands over cloud, caverns over an abyss]
-    RLM --> LAD[ladders: the Jianmu's stairs line up<br/>across the realms, layer_origin]
+    AT --> ESEA[and for the Eastern Sea, 520 x 200:<br/>four isles in real sea, sandbar causeways]
+    RLM --> LAD[ladders: the Jianmu's stairs line up<br/>across the realms, layer_origin;<br/>Mazu's boat sails from Fusang]
+    ESEA --> LAD
     AT --> FLR[floors: every upper storey and cellar<br/>a small world of its own, with stairs]
     LAD --> W
     FLR --> W
@@ -668,12 +769,67 @@ flowchart TD
 | north, then west to the broken pillar | Part X | Longmen, Drowned Fields of Gun, Tushan, Mount Buzhou | the north gate, through Cloudfoot |
 | up the Jianmu's trunk, then east across the islands | Part XI | Juntian (Featherfall), Changhe | the stair round the Jianmu, west of the sect |
 | down the Jianmu's roots, then east through the caverns | Part XI | the Nine Springs (Tearwater), Youdu | the stair down the roots, from the root-cave at the Jianmu's foot |
+| east over the sea in Mazu's boat, then east from isle to isle | Part XII | Penglai (Landfall), Fangzhang, Yingzhou, Guixu | Mazu's jetty on the pool of the suns in Fusang |
 
 Each region is still generated from its own seed by `mapgen.gd` (so every boss, NPC and herb keeps its place), but its open ground is no longer the rectangle of its map: an ellipse filling the map is pushed into lobes and bays by a domain warp, bitten by a second noise and frayed at the edge, with clearings kept round everything that matters and trails (a cost-weighted A* that goes round buildings) joining anything left in the forest. `atlas.gd` then turns the map to face the way its road runs and lays it at its site. Every tile of the world belongs to the region whose site is nearest, measured in that region's own half-sizes after a two-scale domain warp (and the land round a region's people, bosses, gates and buildings always belongs to it); a forest belt marks where two regions meet. Land runs out about two half-sizes from the nearest site, which gives the continent its coast, the fjords between the mountain's spurs and the inner sea in the north-east, and fades out towards the edge of the world, which is always open sea. Roads are searched for with A* across the land (old paths cheap, forest dear, water dearer, a slow noise to make them wind), keep to their own two regions and cross the border between them exactly once, on a land bridge raised for them; where a chapter is not open yet, a Lotus Seal stands across the road at that crossing. Tests check that every entity can be walked to, that with all seals shut only the sect, the mountain (with Cloudfoot) and the bamboo forest can be reached, that the sea rings the land, that regions are not laid out in rows and columns, that every region's corners are mostly forest, and that the world is deterministic.
 
 **The realms above and below** (Part XI) are built by the same `Atlas._build`, one realm at a time (`Atlas.world_of(layer)`): `STRATA` gives each its own 260 x 200 grid, the sites of its regions, how far land reaches from a site (land runs out into open sky or into the abyss instead of the sea) and how many holes to open in the wild ground between regions (gaps of sky between the islands, chasms between the caverns). `layer_origin` lays each grid over the land's so that the Jianmu's crown in the Nine Heavens floats straight above its trunk on the mountain and its roots in the Nine Springs hang straight below. The ends of a ladder are two linked entities, one in each realm; walking onto one lifts or lowers Lin Feng and puts him on the free tile beside the other end. The Nine Heavens are drawn 96 m above the land and the Nine Springs 64 m below it, and `world.gd` keeps a bundle per realm (its land, its streamed regions, its sea of cloud or glowing abyss) and shows only the one Lin Feng is in. A **floor** (`Atlas.floor_id`, `f:<region>:<building>:<level>`) is a world of its own the size of its building, holding the people and things that live on it and the stairs back.
 
 The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part XII: The Returning Ruins
+
+Every road goes somewhere now, and for a season Lin Feng sweeps the steps in the mornings and the first hundred steps of the Standing Tree in the evenings. Then a fishing boat comes up the south-east road on an ox-cart: the sea went out in the night and did not come back. East of the Eastern Sea, the *Liezi* says, lies **Guixu, the Returning Ruins**, a ravine without a bottom into which every river, every sea and the Silver River pour, and which never fills and never empties, because everything that goes in comes back. Over it stood the five **Isles of the Immortals**, held up on the heads of fifteen great turtles; a giant of Longbo fished up six of them and two isles sank. The Court hid the rest in a mirage, so nobody could pick years off the pearl trees while it was selling them by the column, and put a bronze stopper in Guixu so that water came back only where the Rain Ministry signed for it. Somebody has pulled the stopper out. At Fusang, where the sun rises out of the sea, **Mazu**, who brings the boats home, takes Lin Feng across what is left of the sea in her boat.
+
+| Region | Realm | Size | Levels | Story beat | Final boss |
+|---|---|---|---|---|---|
+| *Azure Cloud Sect and Fusang* | the land | | | The Elder and the Archivist on Guixu, the five isles and the Court's stopper; Mazu at the pool of the suns gives Yue Ling her red lantern | |
+| Penglai, the Isle of the Immortals | the Eastern Sea | 100 x 64 | 48-49 | Landfall, the town of the Thousand Children Xu Fu brought from Qin and never came back for; the Slips of the Thousand Names; Lu Dongbin explains the elixir: a ripe fruit lets you stop when you choose, an unripe one just stops you | the Giant of Longbo, fishing the turtles off the bare shelf |
+| Fangzhang, the Square-Pot Isle | the Eastern Sea | 92 x 60 | 49 | He Xiangu's dying pearl trees; Zhang Guolao, who rides backwards, remembers the Court bringing its stopper | Tianwu, the eight-headed god who kept the stopper |
+| Yingzhou, the Isle of Mists | the Eastern Sea | 96 x 62 | 49-50 | Jingwei, who has carried stones to fill the sea for four thousand years, finds she was building a reef that can hold the isle; Old Gui of the turtles and forty thousand years without a shift | Yu Qiang, God of the Northern Sea, who keeps the turtles' shifts |
+| Guixu, the Returning Ruins | the Eastern Sea | 100 x 64 | 50 | The wreck of Xu Fu's flagship and its ghostly steersman; Xu Fu's torn logbook; the drowned summit of Daiyu at the lip of the Ruins | Xu Fu, Who Sought the Elixir |
+| *Ten Thousand Waters Return tribulation: every water in the world passes through Lin Feng into the Ruins, and the Ruins remember how to give it back* | | | | | |
+
+```mermaid
+sequenceDiagram
+    participant E as Elder and Archivist
+    participant M as Mazu
+    participant Q as Xu Qian and Lu Dongbin
+    participant H as He Xiangu and Zhang Guolao
+    participant J as Jingwei and Old Gui
+    participant Y as Yu Qiang
+    participant X as Xu Fu
+    E->>E: The sea went out. Guixu has stopped returning
+    E-->>M: Go east to Fusang
+    M-->>Q: A boat that floats, to the isle in the mirage
+    Q->>Q: Three thousand names in one hand, and a promise
+    Q-->>H: The unripe fruit stops you. Xu Fu pulled the stopper
+    H-->>J: Tianwu: who decides where the water goes?
+    J->>J: Not filling the sea. Building a reef to hold it
+    J-->>Y: Forty thousand years without a shift
+    Y->>Y: Blows the conch. Two turtles in three sleep
+    Y-->>X: Down the bare sea floor to the lip of the Ruins
+    X->>X: Eats the ripe fruit, and grows old
+    X->>E: Home to Landfall, and the water comes home: Ten Thousand Waters Return
+```
+
+| | |
+|---|---|
+| ![Landfall, the town of the Thousand Children](docs/screenshots/town_landfall.png) | ![the Pavilion of Penglai on its sea-cliff, a mirage over the water](docs/screenshots/penglai_pavilion.png) |
+| ![the Eastern Sea from above Penglai](docs/screenshots/realm_sea.png) | ![Mazu's boat at the pool of the suns in Fusang](docs/screenshots/mazu_boat.png) |
+| ![Fangzhang, the Square-Pot Isle](docs/screenshots/isle_fangzhang.png) | ![Yingzhou, the Isle of Mists](docs/screenshots/isle_yingzhou.png) |
+| ![the bare sea floor at the Returning Ruins](docs/screenshots/vista_guixu.png) | ![the lip of Guixu](docs/screenshots/guixu_whirl.png) |
+| ![Lu Dongbin's drinking-room upstairs in the wine-house](docs/screenshots/upper_drinking_room.png) | ![the steersman's cabin in the wreck of Xu Fu's flagship](docs/screenshots/upper_steersman_cabin.png) |
+| ![Jingwei, Old Gui, the mist-fisher, Furnace-Boy Dan, Steersman Hong, Ah Fu and Xu Fu](docs/screenshots/gallery_isles.png) | ![the monsters of the Eastern Sea](docs/screenshots/gallery_part12_monsters.png) |
+
+- **A fourth realm**, the **Eastern Sea** (`Atlas.STRATA.sea`), built like the others (sites, warped ownership, land that runs out into real sea, roads and seals) on a 520 x 200 grid of its own: four isles in a chain running east, the sea between them crossed on the sandbars the drain has left bare. **Mazu's boat** joins it to Fusang: a new kind of crossing (`"style": "sail"`) at a jetty on the pool where the ten suns bathed, with a boat built in code (a junk with a red batten sail and eyes on the bow), a sea-blue fade and its own map page.
+- **Sixteen bosses** from the old texts: Qianliyan and Shunfeng'er, Mazu's runaway generals, hired by Xu Fu as lookouts; the Sea-Monk who drowns fishermen; **the Giant of Longbo**; the White Deer of Longevity; the Elixir Furnace That Walked Away; the Pearl Tree That Will Not Fruit; **Tianwu**, the eight-headed god of the waters; **Wu Zixu**, god of the tidal bore, who stopped the tide; **Shen**, the clam-dragon whose breath made the mirage; the Great Ao who bears Yingzhou; **Yu Qiang**; the Admiral of the Lost Fleet; the Bronze Stopper of Guixu; **Ruo of the Northern Sea**, the sea itself (who once humbled the River Earl of Part X); and **Xu Fu**. Xu Fu and Yu Qiang answer the Dao Lin Feng walks.
+- **Twelve new monsters**: Mirage Wisps, Sharks Stranded by the Low Tide and Sandbar Crabs on Penglai; Cinnabar Toads of the Furnaces, Cranes Who Steal Elixirs and Herb-Thief Rabbits on Fangzhang; Phantoms of the Sea-Mist, White Horses of the Tidal Bore and Shell-Armoured Tide Soldiers on Yingzhou; Drowned Sailors of the Lost Fleet, Eels of the Bottomless Ravine and Sentinels of the Sunken Isles at Guixu.
+- **Two new peoples**: the **Thousand Children of Landfall** (honour the Compassionate Heart, love a handful of mainland earth, their friendship finds more spirit stones) and the **Immortals of the Isles** (honour Free Wandering, love a cake of new Cloud-Tea, their friendship makes every battle teach more).
+- **New techniques**: the Returning Tide Sword, Rain over the Five Isles and Jingwei's Stone Sword (taught by Jingwei) for Lin Feng; Spray of the Pearl Trees and Mazu's Red Lantern (it raises the fallen) for Yue Ling.
+- **A new town, Landfall**, with a Hall of the Thousand Names (and its gallery upstairs), the Wine-House of the Drunken Immortal (where Lu Dongbin drinks upstairs), a temple to Mazu, a shipyard on the sand (and its rope store) and the net-menders' house; Fangzhang has He Xiangu's Lotus Hall, the House of the Nine Furnaces and the herb-keepers' lodge; Yingzhou the Shrine of the Fifteen Turtles and its tally-room; Guixu the wreck of the flagship *Penglai-Seeker*. **23 new characters**, among them the Eight Immortals (Lu Dongbin with his sword and fly-whisk, Iron-Crutch Li, Lan Caihe, Han Xiangzi with his flute, He Xiangu with her lotus, Zhang Guolao with his fish-drum, Zhongli Quan with his fan and Cao Guojiu with his broken court tablet), Mazu, Jingwei with her speckled wings, and the ghosts of Xu Fu's lost fleet.
+- **Set pieces built in code** (`terrain3d.gd`): the **Pavilion of Penglai**, an octagonal two-storey pavilion on a white sea-cliff with a mirage of pale towers hanging over the water; and **the lip of Guixu**, the sea pouring round and round in a funnel of dark water and foam down into a ravine without a bottom, with a faint glow far below. Four new region looks: the pearl-white haze of Penglai, the golden afternoon of the immortals' gardens, the grey-green mists of Yingzhou and the violet storm over the bare sea floor at the Ruins.
+- **A new realm**, Ten Thousand Waters Return, with its own tribulation; the ending adds the isles on their sleeping turtles below the clouds, with Jingwei's reefs beside them, Mazu's lantern-boat drifting between them and Jingwei flying a pebble over the sea.
 
 ## Part XI: The Ladder of Heaven
 
@@ -900,6 +1056,16 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 | Bug | Fix |
 |---|---|
+| **Nobody ever bowed.** Townsfolk were meant to greet the hero with the cultivator's salute when he walked up, but the bow was started on the world clock while each person is animated on a clock of their own (offset by their tile, `t + e.pos.x`), so it began hundreds of seconds in the past and was dropped unplayed | The gesture is started on the model's own clock; the cutscene gestures use the same rule |
+| **Any action a model had no clip for played its attack.** `Assets.animate` fell back on the attack clip for everything but `die` and `bow`, so a gesture on an older or a monster model would have swung a sword at whoever was talking | Only battle actions (cast, hurt, victory) fall back on the attack; anything else is skipped |
+| **The bot could meditate for hours instead of fighting.** Under-levelled for a boss in the higher realms, its grind fell back on meditation (57 cultivation a second at Mountain-River Oneness, against 705,000 for the stage) whenever no pack was within 60 steps, and only stopped when the stage was reached; it stalled in Juntian for 45 game-minutes in testing | The grind walks to the nearest pack anywhere in the region (leaving an upper storey or cellar first) and leaves meditation as soon as the party is fit and a pack is back |
+| **The status panel's attack, defence and speed** were worked out from the level and tempering alone, leaving out the Daos and the peoples' boons (and now the root) | It shows the numbers the battle uses (`Game.fighter`) |
+| The bot's fifteen-hour `max_time` would have stopped a game of 14 h 7 min near its end | Seventeen hours |
+
+### Bugs fixed in the Part XI release
+
+| Bug | Fix |
+|---|---|
 | **The tests passed while a script did not compile.** `tests/run_tests.gd` runs in `_init()`, before the autoloads exist, so it never compiled the screens that use `Game` (`main.gd`, `battle.gd`, `ending.gd` and the rest); a type that could not be inferred in a new line of `ending.gd` passed every test, and the keyboard smoke test printed the parse error and passed too, while the game made its ending screen without a script | On its first frame, once the autoloads are up, the test runner compiles every script in `scripts/` and `tests/` and fails on any that does not compile; checked by putting the error back |
 | **Everyone indoors stood about 0.3 m deep in the floor.** A building's floor is a plank platform 0.31 m above the ground under its middle (`Architecture.house`), but the hero, Yue Ling and the people inside were all placed at the height of the ground under their own tile | `World._stand_y`: indoors, people stand on the planks (and upstairs on the upper storey's) |
 | **Battle messages were cut off mid-word in 36 of the 45 regions.** The battle log drew each message on one 440-pixel line, and "Enemies appear!" with three monster names ran past it (up to 759 pixels: "Frost Hare of the Moon, Three-Legged Moon Toad, Silver Crane of the Long Night"); three monster names were also wider than their 200-pixel labels | A long message wraps onto more rows of the log, which shows the newest five; names and boss banners shrink to fit, and a name that would run into its neighbour's moves down a row; a test measures every name with the game's font |
@@ -1004,13 +1170,39 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Narrative plot holes found and fixed
 
+Nineteen holes found in this release by reading every quest step, conversation and townsperson's chat against the quest order and the world map:
+
+| Plot hole | Fix |
+|---|---|
+| **Lin Feng gave the Nine Heavens root away** to the Hollow Heaven as a seed in Part III, yet everyone still calls him its bearer, and it goes on waking | Yue Ling sees it at once: a seed that is given is a seed that is planted, and the Hollow's dawn grew one back in him with every branch the old root had woken |
+| **The sect's townsfolk talked about the future on the first morning**: stars falling in the pond, saving the sky twice, three demon lords and a Jade Emperor, feeding immortals, a new sweeper with Lin Feng's old broom while Lin Feng was still sweeping | Those lines wait until the story has got there (`Data.CHAT_LATER`); Little Bai takes up the broom when Lin Feng leaves the sect; the others got lines for the beginning |
+| Houtu thanks Lin Feng for turning the Wheel "**and then** closing the Ledger": the Ledger closed in Part IV, the Wheel turned in Part VI | The right order |
+| **Who holds the sky up?** Part V: Nuwa's pillars (and once the Court's stolen years); Part XI: Chong, for four thousand years | Chong holds heaven *away from the earth*; Nuwa's pillars bear its weight |
+| **The Court's age**: ten thousand years by every ledger, but the Moon Palace was kept "since before the Court was built" and the Jianmu stood "before the Court, before Yu" | Chang'e has kept it since the archer's day; the Jianmu stood before Yu |
+| The Weaver Star is **"the Jade Emperor's granddaughter"**, and this world's Jade Emperor is the one Lin Feng ended | The Queen Mother's granddaughter, as Xiwangmu herself says |
+| The Weaver Star wove the river's banks for **three thousand** years; everybody else counts ten thousand | Ten thousand |
+| **Fox-tail arithmetic**: a thousand years for nine tails, a thousand for each, nine hundred, three hundred for three | A thousand years to grow all nine; a one-tailed fox cub at the Gate now complains that nobody will tell him the real sums |
+| **The sect's age**: three hundred years, but its Seal was co-forged by an ancestor who "waited three thousand years", its dead lie in a graveyard "a thousand years" old and its chime was "cracked for a thousand years" | Three hundred years throughout |
+| **The four pillars are not at the corners of the world**: the "western" pillar is in a desert south-east of the sect | The Elder explains that Nuwa ringed the tear in the sky at the world's south-east edge, so the books' directions are the pillars', not the map's |
+| The Moon Palace was **"in the west"** although it lies past Fusang in the far east | Over the top of the sky, into the night |
+| Longmen had **three hundred years of boats** but its River Earl took brides for a thousand | A thousand years of boats |
+| The sleeping babies of Part VII were **"gone"** in the morning, but their bodies are in their cradles | They would not wake: nobody was home behind the eyes |
+| The Naihe Bridge was open **"for the first time in sixteen years"**; the Wheel had only stopped a season before | For the first time since the Wheel stopped |
+| The Void Rift lay on the volcano's **eastern** slope (it is west), and the hermit who "knows the Emperor's name" never says it | The western slope; he knows what the Emperor is |
+| Gun says Yu **"had his mother's sense"**: in this telling Yu was cut from Gun's own body | "He did not get that from me" |
+| **Four Part X guides each forgot a boss** of their region in the briefing (the Stone Lion, Gun's turtle, the white fox, Kuafu) | Each names all five |
+| **"Nobody could climb up or down to check"**, although Lin Feng had climbed the Court's stair and walked the sun's road | The Archivist: the Court's stair went to its own door and no further; the Level Heaven is above it |
+| The Seal is **"the lotus at your belt"**, three lines before it "slept in Lin Feng's dantian"; Bai Ze's "I told you the Gate had opened for three" pointed back at a line most players never hear; the Needle General's needle was kept and never used | The lotus mark over his dantian; Bai Ze says it in the scene; the needle goes to Weaver Liu to unpick the last threads |
+
+### Plot holes fixed in the Part VII release
+
 | Plot hole | Fix |
 |---|---|
 | Why did every forest, marsh and desert have **a gate in it**, and why does the world now run on without them? | Part VII: the gates were the Court Weaver's seams; when the Wheel turned they came undone and the land grew back into one |
 | The **village midwife** who raised Lin Feng (Part VI) was never seen | Granny Wen is Part VII's first guide, in her own house |
 | The finale's **baby girl who knows Lin Feng's face** was left unexplained | Part VII: she is Little Wan, Su Wan reborn; the story turns on bringing her home |
 
-### Plot holes fixed in the previous release
+### Plot holes fixed in the Part VI release
 
 | Plot hole | Fix |
 |---|---|
@@ -1046,12 +1238,12 @@ Game logic (`game.gd`, `data.gd`, `mapgen.gd`, the battle rules and the bot) is 
 ```mermaid
 flowchart TD
     subgraph Screens
-        W[world.gd<br/>three realms and their floors, streaming,<br/>ladders, chase camera, HUD]
+        W[world.gd<br/>four realms and their floors, streaming,<br/>ladders, chase and conversation cameras,<br/>cutscene gestures, HUD]
         B[battle.gd<br/>3D arena, shoulder camera]
         T[title / ending / meditate<br/>3D scenes]
         M[menu / shop / dialogue / choice<br/>2D overlays]
     end
-    W --> ATL[atlas.gd<br/>three realms: sites, warped Voronoi,<br/>coast, A* roads, seals, ladders, floors]
+    W --> ATL[atlas.gd<br/>four realms: sites, warped Voronoi,<br/>coast, A* roads, seals, ladders, floors]
     ATL --> MG2[mapgen.gd<br/>regions, buildings]
     W --> TER[terrain3d.gd<br/>height field, ground and water shaders,<br/>horizon, bridges]
     TER --> SC[scatter.gd<br/>ecology placement]
@@ -1060,14 +1252,14 @@ flowchart TD
     TER --> ARC[architecture.gd<br/>halls, enterable houses, upper storeys,<br/>cellars, stairs, walls, dwellings]
     TER --> FA[fauna.gd<br/>wildlife]
     W --> MOD[models.gd<br/>procedural people and monsters,<br/>action poses]
-    MOD --> AS[assets.gd<br/>Blender GLBs: 108 people,<br/>40 monsters, 26 props;<br/>palettes from one tint]
+    MOD --> AS[assets.gd<br/>Blender GLBs: 153 people with<br/>21 clips each, 40 monsters, 26 props;<br/>palettes from one tint]
     B --> MOD
     B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
     TER --> MB[mb.gd<br/>primitives, limbs, lathes, ribbons<br/>toon + outline + aura shaders]
     MOD --> MB
     FX --> MB
-    TER --> LK[(look.gd<br/>46 region looks, cellar air,<br/>sky shader)]
+    TER --> LK[(look.gd<br/>50 region looks, cellar air,<br/>sky shader)]
     TER --> AS
     W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap]
     B --> UI
@@ -1089,7 +1281,7 @@ godot --path . --fixed-fps 30 -- --tour=out --areas=none --no-extras --portraits
 
 ## The playthrough bot
 
-`scripts/bot.gd` plays the entire game end to end through the **same input surface a human uses** (`up/down/confirm/cancel` presses on the top screen and a held movement direction). It pathfinds across the open world with `AStarGrid2D` (seals still closed and other monsters count as blocked), grinds and meditates when under-levelled, rests when hurt, shops, picks skills by elemental weakness, heals with pills or Spring Rain, and handles tribulations.
+`scripts/bot.gd` plays the entire game end to end through the **same input surface a human uses** (`up/down/confirm/cancel` presses on the top screen and a held movement direction). It pathfinds across the open world with `AStarGrid2D` (seals still closed and other monsters count as blocked), grinds and meditates when under-levelled, rests when hurt, shops, picks skills by elemental weakness, heals with pills or Spring Rain, and handles tribulations. Since Part XII it also wakes the branches of the Nine Heavens root by a plan, opens the Founder's caves it passes once its realm allows, and when it must grind in the higher realms it goes looking for packs anywhere in the region rather than meditate for hours.
 
 To make its clock a fair estimate of a person's playtime it uses human-scale pacing: 0.2 to 0.4 s per key press, and each dialogue line is "read" for about `length / 40` seconds after it finishes typing.
 
@@ -1099,34 +1291,37 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs). The last release took 11:27:54; the same bot now reaches the end of Part X at 11:27:55 (every earlier region takes exactly as long as before), so the game is now **1 hour 18 minutes longer**, and Part XI itself plays in about **1 hour 18 minutes**. In Part XI the bot answers the Elder with the Dao of the Sword and changes to the Compassionate Heart at the Dao Stele in Changhe, as a player trying the Daos would; it climbs the Jianmu and takes the stairs of buildings like any other way, and keeps its keepsakes:
+Latest result (seed 1234, identical across runs). The last release took 12:46:15; the same bot now reaches the end of Part XI at 12:43:56, so the new realms, talents and caves leave the earlier chapters about as long as they were (the root and realm suppression make the party stronger; the world grows with the root and tribulations test it harder), and Part XII itself plays in about **1 hour 23 minutes**: the game is now **1 hour 21 minutes longer**. The bot wakes the branches of the root as a sword-and-thunder fighter would (`TALENT_PLAN`: the Sword Bone and the Thunder Root first, the Enlightened Mind last), opens every Founder's cave as it passes once its realm allows (all nine, by Primordial Sovereign), sails with Mazu, and reports what its meditation was for (almost all of it resting, as in the last release):
 
 ```
-game play time  : 12:46:15 (45975 s)
+game play time  : 14:06:51 (50812 s)
 wall clock      : ~10 min (headless)
-final realm     : Early Three Realms Concord
-battles / kills : 1453 / 2717   deaths: 0
-time by screen  : battle 17523 s, meditate 11846 s, dialogue 8566 s, world 7797 s, menu 282 s
-time by area    : sect 1643, mountain 500,
-                  bamboo 916, marsh 726, frost 938, thunder 567, palace 546,
-                  dragon 638, volcano 1133, void 755, celestial 1472,
-                  mirror 615, grave 1044, time 723, origin 1253,
-                  cloudsea 781, court 788, forge 890, garden 1348,
-                  dunes 943, fungal 851, aurora 881, chaos 1487,
-                  maple 945, karst 806, springs 910, wheel 1039,
-                  village 917, terraces 870, silk 854, loom 1189,
-                  starferry 895, magpie 907, starpalace 958, jasper 1304,
-                  yanggu 1055, millet 1100, fusang 1124, guanghan 1178,
-                  longmen 1037, drowned 1088, tushan 1044, buzhou 1030,
-                  juntian 1198, changhe 958, ninesprings 1047, youdu 1136
-result          : PASS (needs >= 39600 s)
+final realm     : Early Ten Thousand Waters Return
+battles / kills : 1606 / 2969   deaths: 0
+time by screen  : battle 19714 s, meditate 11683 s, dialogue 10324 s, world 8851 s, menu 279 s
+meditation for  : rest 11562 s, grind 121 s
+root and caves  : 26 branches woken, 9 caves opened
+time by area    : sect 1909, mountain 793,
+                  bamboo 930, marsh 712, frost 927, thunder 584, palace 506,
+                  dragon 598, volcano 1146, void 709, celestial 1442,
+                  mirror 550, grave 984, time 699, origin 1219,
+                  cloudsea 663, court 687, forge 763, garden 1184,
+                  dunes 758, fungal 652, aurora 845, chaos 1281,
+                  maple 887, karst 779, springs 837, wheel 1001,
+                  village 949, terraces 895, silk 914, loom 1175,
+                  starferry 893, magpie 942, starpalace 999, jasper 1314,
+                  yanggu 1150, millet 1112, fusang 1261, guanghan 1215,
+                  longmen 1304, drowned 1229, tushan 1172, buzhou 1236,
+                  juntian 1307, changhe 968, ninesprings 977, youdu 1145,
+                  penglai 1378, fangzhang 1071, yingzhou 1081, guixu 1152
+result          : PASS (needs >= 46800 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 39600), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 46800), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency, the realms, floors, Daos and peoples, and that every script compiles), then runs the bot headless and **fails the build if the game is not completed or takes less than eleven hours of game time**. A second job installs Blender as a Python module, rebuilds every asset in `art/` from its script and validates the exports with `art/check_assets.py`. The bot report is uploaded as an artifact and shown in the job summary.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency, the realms, floors, Daos and peoples, the Eastern Sea, realm suppression, the nine branches of the root and the Founder's caves, cutscene gestures and progress-aware chat, and that every script compiles), then runs the bot headless and **fails the build if the game is not completed or takes less than thirteen hours of game time**. A second job installs Blender as a Python module, rebuilds every asset in `art/` from its script and validates the exports with `art/check_assets.py`. The bot report is uploaded as an artifact and shown in the job summary.
 
 ```mermaid
 flowchart LR
@@ -1134,7 +1329,7 @@ flowchart LR
     DL --> IMP[Import project]
     IMP --> T[Data-integrity tests]
     T --> B[Bot plays whole game<br/>--fixed-fps 30]
-    B --> G{completed and<br/>game time >= 11h?}
+    B --> G{completed and<br/>game time >= 13h?}
     PR --> ART[pip install bpy<br/>art/build_all.py] --> CHK[check_assets.py]
     G -- yes --> OK[Pass + report artifact]
     G -- no --> FAIL[Fail]
@@ -1158,7 +1353,7 @@ scripts/rocks.gd     procedural rocks and limestone towers
 scripts/fauna.gd     ambient wildlife
 scripts/architecture.gd  halls, roofs, walls, archways, bridges, dwellings
 art/lib/kit.py       Blender (bpy) toolkit: geometry, skinning, AO, rigs, clips, export
-art/lib/person.py    character builder shared by every person asset
+art/lib/person.py    character builder shared by every person asset, and its 21 clips (ten cutscene gestures)
 art/lib/face.py, hair.py, garment.py, accessory.py   heads, hair, clothes, hand props
 art/lib/race.py      wings, crests, fox and fin ears, tails, antlers, scales, whiskers
 art/lib/sculpt.py    lofts, profiles, noise, splines, strands
@@ -1174,7 +1369,7 @@ scripts/gfx.gd       2D UI ornaments, panels, minimap
 scripts/tour.gd      screenshot tour (developer tool)
 scripts/game.gd      autoload: state, progression, quest engine, play clock
 scripts/main.gd      screen stack, input, story flow
-scripts/choice.gd    a choice over the world: which Dao to walk, a gift for one of the peoples
+scripts/choice.gd    a choice over the world: which Dao to walk, which branch of the root to wake, a gift for one of the peoples
 scripts/world.gd     3D third-person open world: realms, floors, streaming, movement, interiors, HUD
 scripts/atlas.gd     the three realms and the floors of buildings: layout, ownership, borders, roads, seals, ladders
 scripts/mapgen.gd    seeded map generator with reachability guarantee

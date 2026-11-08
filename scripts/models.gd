@@ -581,6 +581,8 @@ static func portal(col: Color, open: bool) -> Node3D:
 static func ladder(style: String, dir: int) -> Node3D:
 	var root := Node3D.new()
 	var gcol := Color(1.0, 0.85, 0.45) if dir > 0 else Color(0.45, 0.75, 1.0)
+	if style == "sail":
+		return mazu_boat()
 	if style != "climb":
 		var mk := MB.new()
 		mk.disc(Vector3(0, 0.06, 0), 0.7, Color(gcol.r, gcol.g, gcol.b, 0.25), 20, Color(gcol.r, gcol.g, gcol.b, 0.0))
@@ -611,6 +613,72 @@ static func ladder(style: String, dir: int) -> Node3D:
 	_mi(spin, sb, MB.mat_glow())
 	root.set_meta("glow", glow)
 	root.set_meta("spin", spin)
+	return root
+
+## Mazu's boat (Part XII): a small fishing junk with a red batten sail, a lantern at the stern and an
+## eye painted on the bow so it can see the way home, moored at a plank jetty.
+static func mazu_boat() -> Node3D:
+	var root := Node3D.new()
+	var b := MB.new()
+	var hull := MB.tag(Color("6a4a2e"), MB.WOOD)
+	var hull_d := MB.tag(Color("4a3220"), MB.WOOD)
+	var red := MB.tag(Color("c8302a"), MB.CLOTH)
+	var white := MB.tag(Color("f0ece0"), MB.CLOTH)
+	var plank := MB.tag(Color("9a7a52"), MB.WOOD)
+	# the jetty under the traveller's feet
+	for i in 4:
+		b.box(Vector3(0, 0.18, -0.9 + i * 0.6), Vector3(1.5, 0.08, 0.5), plank)
+	for sx in [-0.7, 0.7]:
+		for sz in [-1.0, 0.9]:
+			b.cyl(Vector3(sx, -0.2, sz), 0.08, 0.9, hull_d)
+	# the hull alongside: a lathe stretched into a boat, the bow raised
+	b.lathe(Vector3(2.0, -0.05, 0.0), [Vector2(0.15, 0.0), Vector2(0.62, 0.12), Vector2(0.74, 0.42), Vector2(0.7, 0.62)], hull, 12, Color(0, 0, 0, -1), Vector2(1.0, 3.2))
+	b.box(Vector3(2.0, 0.6, 0.0), Vector3(1.3, 0.06, 3.6), hull_d)
+	b.box(Vector3(2.0, 0.78, 1.9), Vector3(1.0, 0.36, 0.5), hull, Vector3(-0.4, 0, 0))
+	# the painted eyes on the bow
+	for s in [-1.0, 1.0]:
+		b.disc(Vector3(2.0 + 0.66 * s, 0.62, 1.7), 0.11, white, 10, Color(0, 0, 0, -1), Vector3(0, 0, PI / 2 * s))
+		b.ball(Vector3(2.0 + 0.7 * s, 0.62, 1.72), 0.05, MB.tag(Color("1a1a24"), MB.STONE))
+	# mast and the red batten sail
+	b.cyl(Vector3(2.0, 2.1, 0.3), 0.06, 3.2, hull_d)
+	for k in 5:
+		b.box(Vector3(2.0, 1.2 + k * 0.48, 0.15), Vector3(0.04, 0.42, 1.5 - k * 0.12), red)
+		b.box(Vector3(2.0, 1.43 + k * 0.48, 0.15), Vector3(0.06, 0.04, 1.6 - k * 0.12), hull_d)
+	_mi(root, b)
+	var glow := _pivot(root, Vector3.ZERO)
+	var gb := MB.new()
+	gb.ball(Vector3(2.0, 1.1, -1.6), 0.16, Color(1.0, 0.45, 0.3, 0.9), true)
+	gb.disc(Vector3(0, 0.25, 0), 0.8, Color(1.0, 0.6, 0.4, 0.22), 20, Color(1.0, 0.6, 0.4, 0.0))
+	_mi(glow, gb, MB.mat_glow())
+	root.set_meta("glow", glow)
+	return root
+
+## One of the Founder's sealed caves (Part XII): a shoulder of mossy rock with a round stone door in it,
+## the realm that opens it carved in a ring of glowing script; the ring goes dark once it is opened.
+static func sealed_cave(open: bool) -> Node3D:
+	var root := Node3D.new()
+	var b := MB.new()
+	var rock := MB.tag(Color("7a7870"), MB.STONE)
+	var rock_d := MB.tag(Color("5a5a54"), MB.STONE)
+	var moss := MB.tag(Color("5a7a48"), MB.FOLIAGE)
+	b.sph_hi(Vector3(0, 0.9, -0.8), Vector3(1.9, 1.6, 1.3), rock)
+	b.ball(Vector3(-1.3, 0.5, -0.5), 0.8, rock_d)
+	b.ball(Vector3(1.4, 0.4, -0.4), 0.7, rock_d)
+	b.ball(Vector3(0.4, 2.2, -0.9), 0.7, moss)
+	b.ball(Vector3(-0.8, 1.8, -0.7), 0.5, moss)
+	b.disc(Vector3(0, 1.05, 0.48), 0.95, rock_d if not open else MB.tag(Color("141414"), MB.STONE), 24, Color(0, 0, 0, -1), Vector3(PI / 2, 0, 0))
+	if not open:
+		b.disc(Vector3(0, 1.05, 0.5), 0.82, MB.tag(Color("9a968c"), MB.STONE), 24, Color(0, 0, 0, -1), Vector3(PI / 2, 0, 0))
+	_mi(root, b)
+	var glow := _pivot(root, Vector3(0, 1.05, 0.53))
+	if not open:
+		var gb := MB.new()
+		for k in 16:
+			var a := TAU * k / 16.0
+			gb.box(Vector3(cos(a) * 0.72, sin(a) * 0.72, 0.0), Vector3(0.1, 0.16, 0.02), Color(1.0, 0.82, 0.4, 0.85), Vector3(0, 0, a))
+		gb.disc(Vector3.ZERO, 0.3, Color(1.0, 0.9, 0.6, 0.6), 16, Color(1.0, 0.9, 0.6, 0.0), Vector3(PI / 2, 0, 0))
+		_mi(glow, gb, MB.mat_glow())
+	root.set_meta("glow", glow)
 	return root
 
 ## A Dao Stele (Part XI): a tall slab of dark stone on a tortoise plinth, the Taiji carved at its top

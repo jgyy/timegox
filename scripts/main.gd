@@ -17,6 +17,8 @@ var bot_active := false
 var args := {}
 var toast_list: Array = []
 var chat_idx := {}
+## the realm each townsperson last noticed in Lin Feng (Part XII)
+var greeted := {}
 var post: PostFX = null
 
 func _ready() -> void:
@@ -222,6 +224,34 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 			lines.append([str(npc.get("n", "")), rl])
 	return lines
 
+## Wake a branch of the Nine Heavens root (Part XII): one choice for every awakening Lin Feng has
+## not spent yet, then `cb`.  Each option shows the branch's rank, what the next rank adds and the
+## power of its crown.  There is no way out of it: a stirring root does not wait.
+func open_talent_choice(cb: Callable = Callable()) -> void:
+	if Game.talent_pts <= 0:
+		if cb.is_valid():
+			cb.call()
+		return
+	var opts: Array = []
+	for id in Data.TALENT_ORDER:
+		var tl: Dictionary = Data.TALENTS[id]
+		var rk := Game.talent(id)
+		if rk >= Data.TALENT_MAX:
+			continue
+		var desc: String = str(tl.desc) + "\n\nEach rank: %s.\nCrown (rank %d): %s" % [tl.per, Data.TALENT_MAX, tl.crown]
+		opts.append({"id": id, "label": tl.n, "sub": "%s, then %s" % [Data.TALENT_RANKS[rk], Data.TALENT_RANKS[rk + 1]], "desc": desc, "note": "rank %d/%d" % [rk, Data.TALENT_MAX], "col": tl.col})
+	if opts.is_empty():
+		# every branch already in full leaf: the awakening deepens the root instead
+		Game.talent_pts = 0
+		Game.add_exp(float(Game.exp_need()) * 0.25)
+		if cb.is_valid():
+			cb.call()
+		return
+	choose("A branch of the Nine Heavens root stirs. Which will you wake?", opts, func(id: String):
+		Game.wake_talent(id)
+		open_talent_choice(cb)
+	, false)
+
 func start_meditation() -> void:
 	meditate.start()
 	push("meditate")
@@ -236,6 +266,7 @@ func new_game() -> void:
 	# a second run from the title must not inherit the last run's toasts or chat rotation
 	toast_list.clear()
 	chat_idx.clear()
+	greeted.clear()
 	world.clear_cache()
 	world.load_area("sect", Vector2i(20, 8))
 	set_stack(["world"])
@@ -249,7 +280,11 @@ func interact(e: Dictionary) -> void:
 		"npc":
 			talk_npc(e)
 		"enemy":
-			start_encounter(e)
+			# realm suppression in the world (Part XII): a pack two realms below Lin Feng will not fight him
+			if Game.scatters(e.group):
+				scatter_pack(e)
+			else:
+				start_encounter(e)
 		"boss":
 			boss_interact(e)
 		"seal":
@@ -274,6 +309,8 @@ func interact(e: Dictionary) -> void:
 				Game.toast("The way is closed for now. (%s)" % need2.t)
 		"stele":
 			open_dao_choice("stele")
+		"abode":
+			open_abode(e)
 
 func talk_npc(e: Dictionary) -> void:
 	var s := Game.cur_step()
@@ -293,6 +330,10 @@ func talk_npc(e: Dictionary) -> void:
 			if sid == "s_p11_home":
 				# the Jianmu has grown back: every road is open now, and Lin Feng must choose his
 				open_dao_choice("elder")
+			if sid == "s_report1":
+				# Part XII: his qi stirs for the first time, and with it the first branch of his root
+				Game.awaken("Lin Feng's qi stirred for the first time")
+				open_talent_choice()
 		)
 		return
 	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
@@ -301,9 +342,23 @@ func talk_npc(e: Dictionary) -> void:
 		var rl: String = str(Data.RACES[race].dao_lines.get(Game.dao, ""))
 		if rl != "":
 			chats.append(rl)
+	# what people only say once the story has got there (Part XII)
+	for cl in Data.CHAT_LATER.get(str(e.get("asset", e.id)), []):
+		if Game.done(str(cl[0])):
+			chats.append(str(cl[1]))
+	# what people will only tell a cultivator of a high enough realm (Part XII): the deeper lore
+	for dl in Data.CHAT_DEEP.get(str(e.get("asset", e.id)), []):
+		if Game.level >= int(dl[0]):
+			chats.append(str(dl[1]))
 	var i: int = chat_idx.get(e.id, 0)
 	chat_idx[e.id] = i + 1
 	var lines := [[e.n, chats[i % chats.size()]]]
+	# townsfolk feel a cultivator's realm (Part XII): the first word after every breakthrough is about it
+	var band := Data.realm_band(Game.level)
+	if Data.CHAT.has(str(e.get("asset", e.id))) and int(greeted.get(e.id, -1)) != Game.realm() and e.id != "elder":
+		greeted[e.id] = Game.realm()
+		if band > 0:
+			lines.push_front([e.n, Data.REALM_GREETS[band] % Game.address()])
 	if e.id == "elder":
 		lines.append([e.n, "Your task: " + Game.objective_text()])
 	var after := Callable()
@@ -327,6 +382,37 @@ func offer_gift(e: Dictionary) -> void:
 	], func(id: String):
 		if id == "give" and Game.give_gift(race):
 			say([[str(e.n), str(Data.RACES[race].thanks)]])
+	)
+
+## A pack too far below Lin Feng's realm to fight scatters before his aura: it leaves the road (and
+## comes back later, like any pack), but there is nothing to be learned from a beast that runs.
+func scatter_pack(e: Dictionary) -> void:
+	Game.defeated[e.id] = Game.playtime
+	Game.scattered += 1
+	var d: Dictionary = Data.ENEMIES[e.group[0].id]
+	Game.toast("%s scatter before your %s aura" % [d.n, Data.REALMS[Game.realm()]])
+	# a pack that runs has been driven off all the same: it counts for a hunt (an over-cultivated player
+	# could otherwise never finish one)
+	Game.record_kills(str(e.get("area", Game.area)), e.group.size())
+
+## One of the Founder's sealed caves (Part XII): a door that opens only to a cultivator of the realm
+## carved on it.  Inside, the Founder's words, a gift of spirit stones and an awakening of the root.
+func open_abode(e: Dictionary) -> void:
+	var id: String = str(e.id)
+	if Game.abodes.has(id):
+		say([["Narrator", "The cave is empty now, but for the Founder's words on the wall: \"%s\"" % str(e.motto)]])
+		return
+	if Game.level < int(e.req):
+		say([["Narrator", "A seal of the %s realm is carved on the stone door, and it does not so much as warm under Lin Feng's palm. It will open for a cultivator of %s." % [Data.REALMS[Data.realm_of(int(e.req))], Data.level_name(int(e.req))]]])
+		return
+	Game.abodes[id] = true
+	Game.stones += int(e.get("stones", 0))
+	Game.note("Opened " + str(e.n))
+	var lines: Array = Data.DIALOGUE.get("abode:" + id, []).duplicate()
+	lines.append(["Narrator", "The seal knows the realm in him and the door rolls aside. Inside: %d spirit stones the Founder left for whoever came, and on the wall, carved by a sword: \"%s\"" % [int(e.get("stones", 0)), str(e.motto)]])
+	say(lines, func():
+		Game.awaken(str(e.n))
+		open_talent_choice()
 	)
 
 func start_encounter(e: Dictionary) -> void:
@@ -353,9 +439,14 @@ func start_breakthrough() -> void:
 		return
 	var sid: String = s.id
 	say(Data.DIALOGUE.get("pre:" + sid, []), func():
-		battle.start([{"id": "tribulation", "lv": Game.level + 1, "mult": 1.1}], {"boss": true, "tribulation": true, "step": sid, "theme": "thunder"})
+		# heaven's jealousy (Part XII): the more of the Nine Heavens root is awake, the harder the test
+		battle.start([{"id": "tribulation", "lv": Game.level + 1, "mult": 1.1 * (1.0 + Data.TRIB_JEALOUSY * Game.talent_ranks())}], {"boss": true, "tribulation": true, "step": sid, "theme": "thunder"})
 		push("battle")
 	)
+
+## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
+const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
+	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10"}
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story
@@ -377,24 +468,14 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					if Game.finished:
 						Game.note("Ending reached")
 						push("ending")
-					elif sid == "s_break6":
-						recall_to_sect()
-					elif sid == "s_break8":
-						recall_to_sect("recall2")
-					elif sid == "s_break9":
-						recall_to_sect("recall3")
-					elif sid == "s_break10":
-						recall_to_sect("recall4")
-					elif sid == "s_break11":
-						recall_to_sect("recall5")
-					elif sid == "s_break12":
-						recall_to_sect("recall6")
-					elif sid == "s_break13":
-						recall_to_sect("recall7")
-					elif sid == "s_break14":
-						recall_to_sect("recall8")
-					elif sid == "s_break15":
-						recall_to_sect("recall9")
+						return
+					# every tribulation survived wakes a branch of the root (Part XII), and then the
+					# breakthroughs that close a chapter bring Lin Feng home
+					Game.awaken("the tribulation of %s" % Data.REALMS[Game.realm()])
+					open_talent_choice(func():
+						if RECALLS.has(sid):
+							recall_to_sect(RECALLS[sid])
+					)
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity

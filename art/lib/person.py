@@ -1,5 +1,6 @@
 """Articulated xianxia cultivator built with the kit: rig, sculpted head (face.py), hair (hair.py),
-layered hanfu (garment.py), weapons and eleven baked animation clips.  The character scripts in
+layered hanfu (garment.py), weapons and twenty-one baked animation clips (eleven for the world and
+battle, ten cutscene gestures).  The character scripts in
 ``art/characters`` only pick colours and options.
 
 Rig (Godot space, the model faces +Z, +X is the character's left):
@@ -782,6 +783,237 @@ def clip_die(t):
     return p
 
 
+# ---------------------------------------------------------------- cutscene gestures
+# Played once, on top of a conversation, when a line of dialogue calls for them (Data.emote_for in
+# the game picks them from the line, or a line names one).  Each starts and ends in the idle pose so
+# it blends in and out of the talk loop; `_hold` is an in-hold-out envelope.
+
+
+def _hold(k, a, b, c, d):
+    return smooth(a, b, k) * (1.0 - smooth(c, d, k))
+
+
+def _arm_in(p, sd, e, lift=0.0, bend=0.0):
+    """An arm brought in before the body on the salute's arm template (the bow brings both fists
+    together before the chest with it): `lift` raises the elbow higher (towards the face), `bend`
+    folds the forearm further; `e` blends it in from the idle pose."""
+    s = 1 if sd == "L" else -1
+    p["upper_arm." + sd] = (((-0.62 - lift) * e, 0.15 * s * e, -0.42 * s * e), (0, 0, 0))
+    p["forearm." + sd] = (((-1.55 - bend) * e - 0.2 * (1 - e), -0.35 * s * e, 0), (0, 0, 0))
+    p["hand." + sd] = ((0.2 * e, 0.0, 0.25 * s * e), (0, 0, 0))
+
+
+NOD_T = 1.0
+
+
+def clip_nod(t):
+    """Agreement: two small nods of the head, the chest dipping with the first, the eyes closing a
+    moment on the second."""
+    k = t / NOD_T
+    p = clip_idle(0.0)
+    n = math.sin(k * math.pi * 4.0) * _hold(k, 0.0, 0.12, 0.8, 1.0)
+    _add(p, "head", 0.22 * max(0.0, n), 0.0, 0.0)
+    _add(p, "neck", 0.08 * max(0.0, n), 0.0, 0.0)
+    _add(p, "chest", 0.05 * _hold(k, 0.0, 0.2, 0.4, 0.6), 0.0, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.8 * _hold(k, 0.45, 0.55, 0.62, 0.72), 1))
+    return p
+
+
+SHAKE_T = 1.2
+
+
+def clip_shake(t):
+    """Refusal: the head turns side to side three times, the right hand comes up and waves low,
+    palm out, the weight settling back."""
+    k = t / SHAKE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.15, 0.75, 1.0)
+    _add(p, "head", 0.04 * e, 0.32 * math.sin(k * math.pi * 6.0) * e, 0.0)
+    _arm_in(p, "R", e, -0.1, -0.3)
+    p["hand.R"] = ((-0.3 * e, 0.45 * math.sin(k * math.pi * 6.0) * e, -0.1 * e), (0, 0, 0))
+    _hands(p, 0.38, 0.4 - 0.35 * e)
+    _add(p, "chest", -0.05 * e, 0.0, 0.0)
+    _add(p, "sleeve.R", 0.25 * e, 0.0, 0.0)
+    return p
+
+
+POINT_T = 1.4
+
+
+def clip_point(t):
+    """Showing the way: the right arm swings up and out to point into the distance with the index
+    finger, the head and shoulders turning to follow it, held, then lowered."""
+    k = t / POINT_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.25, 0.72, 1.0)
+    p["upper_arm.R"] = ((-1.35 * e, 0.0, -0.75 * e), (0, 0, 0))
+    p["forearm.R"] = ((-0.15 * e - 0.2 * (1 - e), 0.9 * e, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.15 * e, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38, 0.38 - 0.3 * e, 0.15)
+    _add(p, "chest", 0.0, -0.28 * e, 0.0)
+    _add(p, "head", -0.06 * e, -0.3 * e, 0.0)
+    _add(p, "hips", 0.0, -0.08 * e, 0.0)
+    _add(p, "sleeve.R", 1.0 * e, 0.0, 0.0)
+    return p
+
+
+WAVE_T = 1.6
+
+
+def clip_wave(t):
+    """A greeting: the right hand raised beside the head and waved from the wrist and forearm, a
+    smile, the other hand at ease."""
+    k = t / WAVE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.18, 0.78, 1.0)
+    w = math.sin(k * math.pi * 7.0) * e
+    p["upper_arm.R"] = ((-1.9 * e, 0.0, -0.55 * e), (0, 0, 0))
+    p["forearm.R"] = ((-0.6 * e, 0.35 * w, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.0, 0.0, 0.35 * w), (0, 0, 0))
+    _hands(p, 0.38, 0.38 - 0.3 * e)
+    _add(p, "head", -0.05 * e, 0.0, 0.08 * e)
+    _add(p, "chest", -0.04 * e, 0.06 * e, 0.0)
+    _add(p, "sleeve.R", 1.4 * e, 0.0, 0.0)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.8 * e, 1))
+    return p
+
+
+LAUGH_T = 1.6
+
+
+def clip_laugh(t):
+    """Laughter: the head thrown back, the shoulders and chest shaking in quick pulses, one hand on
+    the belly, the mouth open, and a lean forward at the end as it subsides."""
+    k = t / LAUGH_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.15, 0.7, 1.0)
+    pulse = abs(math.sin(k * math.pi * 10.0)) * e
+    _add(p, "head", -0.22 * e + 0.05 * pulse, 0.0, 0.05 * math.sin(k * math.pi * 3.0) * e)
+    _add(p, "chest", -0.1 * e + 0.06 * pulse, 0.0, 0.0)
+    _add(p, "spine", 0.03 * pulse, 0.0, 0.0)
+    _arm_in(p, "L", e, -0.45, 0.1)
+    _add(p, "upper_arm.R", 0.0, 0.0, -0.2 * pulse)
+    _add(p, "hips", 0.0, 0.0, 0.0)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 2.2 * e * (0.5 + 0.5 * pulse), 1))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.6 * e, 1))
+    return p
+
+
+GRIEVE_T = 2.4
+
+
+def clip_grieve(t):
+    """Grief: the head drops, both hands come up to cover the face, the shoulders hunch and shake
+    with sobs, and slowly the hands come down again."""
+    k = t / GRIEVE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.78, 1.0)
+    sob = math.sin(k * math.pi * 9.0) * e
+    for sd in ("L", "R"):
+        _arm_in(p, sd, e, 0.3, 0.35)
+        _add(p, "sleeve." + sd, 0.5 * e, 0.0, 0.0)
+    _hands(p, 0.38 - 0.3 * e, 0.38 - 0.3 * e)
+    _add(p, "head", 0.42 * e + 0.03 * sob, 0.0, 0.0)
+    _add(p, "neck", 0.15 * e, 0.0, 0.0)
+    _add(p, "chest", 0.16 * e + 0.03 * sob, 0.0, 0.0)
+    _add(p, "spine", 0.06 * e, 0.0, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.9 * e, 1))
+    return p
+
+
+THINK_T = 2.0
+
+
+def clip_think(t):
+    """Thought: the right hand comes to the chin, the left arm folds across under its elbow, the head
+    tilts and the eyes look up and aside, the weight shifts; then a small nod as the thought lands."""
+    k = t / THINK_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.8, 1.0)
+    _arm_in(p, "R", e, 0.15, 0.55)
+    _arm_in(p, "L", e, -0.5, 0.0)
+    _hands(p, 0.38 + 0.4 * e, 0.38 + 0.5 * e)
+    land = _hold(k, 0.66, 0.72, 0.76, 0.84)
+    _add(p, "head", -0.1 * e + 0.15 * land, 0.18 * e, 0.14 * e)
+    _add(p, "hips", 0.0, 0.05 * e, -0.04 * e)
+    _add(p, "sleeve.R", 0.3 * e, 0.0, 0.0)
+    return p
+
+
+KNEEL_T = 2.4
+
+
+def clip_kneel(t):
+    """Kneeling: a step back onto the right knee, the left foot planted before it, the head and back
+    bowed and the fist pressed to the palm, held, and up again."""
+    k = t / KNEEL_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.3, 0.72, 1.0)
+    bow = _hold(k, 0.25, 0.4, 0.6, 0.75)
+    p["hips"] = ((0.1 * e + 0.1 * bow, 0.0, 0.0), (0.0, -0.42 * e, -0.06 * e))
+    p["thigh.L"] = ((-1.45 * e, 0.0, 0.08 * e), (0, 0, 0))
+    p["shin.L"] = ((1.5 * e, 0.0, 0.0), (0, 0, 0))
+    p["foot.L"] = ((-0.05 * e, 0.0, 0.0), (0, 0, 0))
+    p["thigh.R"] = ((0.05 * e, 0.0, -0.06 * e), (0, 0, 0))
+    p["shin.R"] = ((1.55 * e, 0.0, 0.0), (0, 0, 0))
+    p["foot.R"] = ((0.6 * e, 0.0, 0.0), (0, 0, 0))
+    p["toe.R"] = ((-0.9 * e, 0.0, 0.0), (0, 0, 0))
+    _add(p, "spine", 0.1 * bow, 0.0, 0.0)
+    _add(p, "chest", 0.12 * bow, 0.0, 0.0)
+    _add(p, "head", 0.25 * bow, 0.0, 0.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.62 * bow, 0.15 * s * bow, -0.42 * s * bow), (0, 0, 0))
+        p["forearm." + sd] = ((-1.55 * bow - 0.2, -0.35 * s * bow, 0), (0, 0, 0))
+    _hands(p, 0.05 + 0.3 * (1 - bow), 0.4 + 0.8 * bow)
+    _secondary(p, t, False, False, (-1.45 * e, 0.05 * e), 0.0, (0.3 * bow, 0.3 * bow))
+    return p
+
+
+OFFER_T = 1.6
+
+
+def clip_offer(t):
+    """Giving: both hands extended forward, palms up, as if offering something with both hands (the
+    courteous way), a small bow over them, held, and drawn back."""
+    k = t / OFFER_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.25, 0.75, 1.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.95 * e, 0.0, -0.18 * s * e), (0, 0, 0))
+        p["forearm." + sd] = ((-0.55 * e, 0.9 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.1 * e, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.6 * e, 0.0, 0.0)
+    _hands(p, 0.38 - 0.25 * e, 0.38 - 0.25 * e)
+    _add(p, "chest", 0.14 * e, 0.0, 0.0)
+    _add(p, "head", 0.12 * e, 0.0, 0.0)
+    return p
+
+
+SHOCK_T = 1.0
+
+
+def clip_shock(t):
+    """Surprise: a start backwards, both hands flung up before the chest, the eyes and mouth wide,
+    then settling."""
+    k = t / SHOCK_T
+    p = clip_idle(0.0)
+    snap = _hold(k, 0.0, 0.1, 0.45, 1.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.6 * snap, 0.0, 0.3 * s * snap), (0, 0, 0))
+        p["forearm." + sd] = ((-1.3 * snap, 0.0, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.4 * snap, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38 - 0.35 * snap, 0.38 - 0.35 * snap, 0.3)
+    _add(p, "chest", -0.16 * snap, 0.0, 0.0)
+    _add(p, "head", -0.14 * snap, 0.0, 0.0)
+    p["hips"] = ((-0.04 * snap, 0.0, 0.0), (0.0, 0.02 * snap, 0.08 * snap))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.25 * snap, 1))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 1.6 * snap, 1))
+    return p
+
+
+## the gestures a conversation can call for (Data.EMOTES in the game lists the same names)
+GESTURES = ("nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock")
+
 CLIPS = {
     "idle": (IDLE_T, clip_idle),
     "walk": (WALK_T, clip_walk),
@@ -794,6 +1026,17 @@ CLIPS = {
     "hurt": (ACT_T, clip_hurt),
     "victory": (1.2, clip_victory),
     "die": (DIE_T, clip_die),
+    # cutscene gestures (Part XII)
+    "nod": (NOD_T, clip_nod),
+    "shake": (SHAKE_T, clip_shake),
+    "point": (POINT_T, clip_point),
+    "wave": (WAVE_T, clip_wave),
+    "laugh": (LAUGH_T, clip_laugh),
+    "grieve": (GRIEVE_T, clip_grieve),
+    "think": (THINK_T, clip_think),
+    "kneel": (KNEEL_T, clip_kneel),
+    "offer": (OFFER_T, clip_offer),
+    "shock": (SHOCK_T, clip_shock),
 }
 
 

@@ -28,9 +28,14 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Dao & Peoples", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "dao", "map", "annals", "resume"]
-		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, Game.dao != "" or not Game.met.is_empty(), main.world.mini_tex != null, true, true]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Dao & Peoples", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "dao", "map", "annals", "resume"]
+		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, Game.dao != "" or not Game.met.is_empty(), main.world.mini_tex != null, true, true]
+	elif mode == "cultivation":
+		# Part XII: the realm and the branches of the root; an awakening not yet spent can be spent here
+		labels = ["Wake a branch (%d)" % Game.talent_pts, "Back"]
+		ids = ["wake", "back"]
+		enabled = [Game.talent_pts > 0, true]
 	elif mode == "map" or mode == "dao":
 		labels = ["Back"]
 		ids = ["back"]
@@ -72,7 +77,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode == "items" or mode == "map" or mode == "annals" or mode == "dao":
+			if mode == "items" or mode == "map" or mode == "annals" or mode == "dao" or mode == "cultivation":
 				mode = "root"
 				cursor = 0
 				_build()
@@ -106,6 +111,13 @@ func press(act: String) -> void:
 					mode = "dao"
 					cursor = 0
 					_build()
+				"cultivation":
+					mode = "cultivation"
+					cursor = 0
+					_build()
+				"wake":
+					main.pop()
+					main.open_talent_choice()
 				"annals":
 					mode = "annals"
 					cursor = 0
@@ -137,6 +149,16 @@ static func annals() -> Array:
 		for tw in Data.TOWNS:
 			if tw.area == id:
 				out.append(["town:" + str(tw.id), "   " + str(tw.n), str(tw.lore)])
+		# Part XII: the Founder's caves Lin Feng has opened on the mountain, and what she wrote in them
+		if id == Atlas.HUB:
+			for ab in Data.AREAS.mountain.get("abodes", []):
+				if not Game.abodes.has(ab.id):
+					continue
+				var words: Array = []
+				for dl in Data.DIALOGUE.get("abode:" + str(ab.id), []):
+					words.append(("%s: " % dl[0] if str(dl[0]) != "Narrator" else "") + str(dl[1]))
+				words.append("On the wall: \"%s\"" % ab.motto)
+				out.append(["cave:" + str(ab.id), "   " + str(ab.n), "\n\n".join(words)])
 	return out
 
 ## Short names for the world map (the full names run to forty letters).
@@ -152,6 +174,7 @@ const MAP_NAMES := {
 	"yanggu": "Yanggu", "millet": "Millet Plains", "fusang": "Fusang", "guanghan": "Guanghan",
 	"longmen": "Longmen", "drowned": "Drowned Fields", "tushan": "Tushan", "buzhou": "Mount Buzhou",
 	"juntian": "Juntian", "changhe": "Changhe", "ninesprings": "The Nine Springs", "youdu": "Youdu",
+	"penglai": "Penglai", "fangzhang": "Fangzhang", "yingzhou": "Yingzhou", "guixu": "Guixu",
 }
 
 ## The whole open world, the Unbroken Land within the Four Seas: every region in its own colours and
@@ -306,8 +329,69 @@ func _draw_annals() -> void:
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "What the land remembers of the places you have been. %d of %d regions visited." % [Game.seen.size(), Data.AREA_CHAIN.size() + 1], 17, UI.C_DIM, r.size.x - 48)
 
+## The Cultivation page (Part XII): what Lin Feng's realm means (how long he will live, how the world
+## addresses him, what it is like, how realm suppression works), the Founder's caves he has opened,
+## and the nine branches of the Nine Heavens root with their ranks, what each rank adds and their crowns.
+func _draw_cultivation() -> void:
+	var r := Rect2(30, 20, 1220, 680)
+	UI.panel(self, r)
+	var x0 := r.position.x + 24
+	UI.text(self, Vector2(x0, r.position.y + 36), "Realm", 22, UI.C_GOLD)
+	var ri: Dictionary = Data.REALM_INFO[mini(Game.realm(), Data.REALM_INFO.size() - 1)]
+	UI.text(self, Vector2(x0, r.position.y + 68), Data.level_name(Game.level), 20, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 380)
+	var life := "beyond counting" if int(ri.life) == 0 else "about %s years" % _thousands(int(ri.life))
+	UI.text(self, Vector2(x0, r.position.y + 94), "Lifespan: %s" % life, 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 380)
+	UI.text(self, Vector2(x0, r.position.y + 116), "The world calls you: %s" % Game.address(), 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 380)
+	var y := r.position.y + 146.0
+	y += _wrap_at(Vector2(x0, y), str(ri.note), 14, UI.C_TEXT, 380) + 14.0
+	y += _wrap_at(Vector2(x0, y), "Realm suppression: a whole realm between two fighters makes the higher strike %d%% harder and the lower strike that much softer, up to three realms. Beasts two realms below you scatter rather than fight. Heavenly Tribulations weigh on every realm alike." % int(Data.SUPPRESS * 100), 13, UI.C_DIM.lightened(0.25), 380) + 14.0
+	var opened := 0
+	var total := 0
+	for ab in Data.AREAS.mountain.get("abodes", []):
+		total += 1
+		if Game.abodes.has(ab.id):
+			opened += 1
+	UI.text(self, Vector2(x0, y), "Founder's caves opened: %d of %d" % [opened, total], 14, UI.C_GOLD)
+	y += 22.0
+	UI.text(self, Vector2(x0, y), "Packs scattered by your aura: %d" % Game.scattered, 14, UI.C_DIM)
+	y += 22.0
+	UI.text(self, Vector2(x0, y), "Awakenings of the root: %d   (unspent: %d)" % [Game.awakenings, Game.talent_pts], 14, UI.C_JADE if Game.talent_pts > 0 else UI.C_DIM)
+	UI.menu_list(self, Rect2(x0 - 8, r.end.y - 112, 300, 90), labels, cursor, enabled, 17)
+	# the nine branches
+	var x1 := r.position.x + 440
+	UI.text(self, Vector2(x1, r.position.y + 36), "The nine branches of the Nine Heavens root", 22, UI.C_GOLD)
+	var y2 := r.position.y + 66.0
+	for id in Data.TALENT_ORDER:
+		var tl: Dictionary = Data.TALENTS[id]
+		var rk := Game.talent(id)
+		var col: Color = tl.col if rk > 0 else UI.C_DIM
+		UI.text(self, Vector2(x1, y2), str(tl.n), 16, col, HORIZONTAL_ALIGNMENT_LEFT, 200)
+		for k in Data.TALENT_MAX:
+			var pip := Rect2(x1 + 206 + k * 18, y2 - 11, 12, 12)
+			draw_rect(pip, col if k < rk else Color(0.2, 0.22, 0.3, 0.9))
+			draw_rect(pip, UI.C_BORDER.darkened(0.3), false, 1.0)
+		UI.text(self, Vector2(x1 + 270, y2), str(Data.TALENT_RANKS[rk]), 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 110)
+		y2 += 17.0
+		UI.text(self, Vector2(x1 + 16, y2), "Each rank: " + str(tl.per), 12, UI.C_DIM.lightened(0.25), HORIZONTAL_ALIGNMENT_LEFT, 740)
+		y2 += 16.0
+		var crown_col := Color(tl.col.r, tl.col.g, tl.col.b, 1.0) if rk >= Data.TALENT_MAX else UI.C_DIM
+		UI.text(self, Vector2(x1 + 16, y2), "Crown: " + str(tl.crown), 12, crown_col, HORIZONTAL_ALIGNMENT_LEFT, 740)
+		y2 += 30.0
+	UI.text(self, Vector2(r.end.x - 200, r.end.y - 16), "Enter / Esc: back", 13, UI.C_DIM)
+
+static func _thousands(n: int) -> String:
+	var s := str(n)
+	var out := ""
+	while s.length() > 3:
+		out = "," + s.substr(s.length() - 3) + out
+		s = s.substr(0, s.length() - 3)
+	return s + out
+
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0, 0, 0, 0.55))
+	if mode == "cultivation":
+		_draw_cultivation()
+		return
 	if mode == "map":
 		_draw_map()
 		return
@@ -317,7 +401,7 @@ func _draw() -> void:
 	if mode == "annals":
 		_draw_annals()
 		return
-	UI.menu_list(self, Rect2(60, 80, 300, 230), labels, cursor, enabled, 24)
+	UI.menu_list(self, Rect2(60, 80, 300, 260), labels, cursor, enabled, 24)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
 	# status panel
 	var r := Rect2(400, 80, 820, 560)
@@ -328,7 +412,10 @@ func _draw() -> void:
 		UI.bar(self, Rect2(430, 162, 400, 12), Game.exp / float(Game.exp_need()), UI.C_GOLD)
 		UI.text(self, Vector2(840, 174), "%d/%d" % [Game.exp, Game.exp_need()], 14, UI.C_DIM)
 	UI.text(self, Vector2(430, 208), "HP %d/%d    QI %d/%d" % [Game.hp[0], Game.max_hp(0), Game.qi[0], Game.max_qi(0)], 18)
-	UI.text(self, Vector2(430, 238), "Attack %d   Defense %d   Speed %d" % [Data.atk(Game.level) * (1.0 + 0.12 * Game.temper), Data.defense(Game.level), Data.speed(Game.level)], 18)
+	# what he really fights with: tempering, boons and the branches of the root included
+	var f0 := Game.fighter(0)
+	UI.text(self, Vector2(430, 238), "Attack %d   Defense %d   Speed %d" % [f0.atk, f0.def, f0.spd], 18)
+	UI.text(self, Vector2(830, 238), "Root: %d/%d ranks" % [Game.talent_ranks(), Data.TALENT_ORDER.size() * Data.TALENT_MAX], 15, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 200)
 	if Game.companion:
 		UI.text(self, Vector2(430, 276), "Yue Ling   HP %d/%d   QI %d/%d" % [Game.hp[1], Game.max_hp(1), Game.qi[1], Game.max_qi(1)], 18, Color("ff9ac0"))
 	UI.text(self, Vector2(430, 320), "Techniques", 20, UI.C_GOLD)
@@ -348,4 +435,4 @@ func _draw() -> void:
 	UI.text(self, Vector2(430, 560), "Objective: " + Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 770)
 	UI.text(self, Vector2(430, 610), "Play time %s" % Fmt.clock(Game.playtime), 15, UI.C_DIM)
 	if msg != "":
-		UI.text(self, Vector2(60, 340), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)
+		UI.text(self, Vector2(60, 372), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)

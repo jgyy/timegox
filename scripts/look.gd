@@ -113,6 +113,17 @@ const THEMES := {
 		"sky_top": Color("040a0c"), "sky_hor": Color("1a3a3a"), "fog": Color("143032"), "fog_d": 0.022, "sun": Color("ffa070"), "sun_e": 0.8, "amb": Color("5a8a88"), "amb_e": 0.85, "weather": "spores", "tree": "glowcap", "decor": "sporecap"},
 	"youdu": {"g1": Color("2e3240"), "g2": Color("363a4a"), "path": Color("7a7e90"), "wall": Color("22263a"), "water": Color("3a6aa8"), "bg": Color("030308"),
 		"sky_top": Color("05050c"), "sky_hor": Color("1e2440"), "fog": Color("1a1e30"), "fog_d": 0.02, "sun": Color("a0b0ff"), "sun_e": 0.75, "amb": Color("6a74a0"), "amb_e": 0.8, "weather": "ghostfire", "tree": "ghostpagoda", "decor": "ghostcandle"},
+	# ---- Part XII: the pearl-white cliffs and blue tiles of Penglai in a haze of mirage, the herb
+	# terraces and cold furnaces of Fangzhang in golden afternoon, the grey-green mists of Yingzhou, and
+	# the bare sea floor at the lip of the Returning Ruins under a darkening violet sky
+	"penglai": {"g1": Color("8ab89a"), "g2": Color("9ac6a6"), "path": Color("f0e4c8"), "wall": Color("4a8a7a"), "water": Color("4aa8c0"), "bg": Color("0c2030"),
+		"sky_top": Color("3a7ac8"), "sky_hor": Color("f8e8d8"), "fog": Color("e8e0e0"), "fog_d": 0.014, "sun": Color("fff4e0"), "sun_e": 1.15, "amb": Color("b0c8d8"), "amb_e": 0.9, "weather": "light", "tree": "column", "decor": "shell"},
+	"fangzhang": {"g1": Color("8aa860"), "g2": Color("98b46a"), "path": Color("e8d8a8"), "wall": Color("4a7a3a"), "water": Color("5ab0a8"), "bg": Color("101a0c"),
+		"sky_top": Color("5a8ad0"), "sky_hor": Color("ffe8b0"), "fog": Color("f0e0b8"), "fog_d": 0.012, "sun": Color("fff0c0"), "sun_e": 1.2, "amb": Color("c8c8a0"), "amb_e": 0.9, "weather": "petals", "tree": "jadepeach", "decor": "flower"},
+	"yingzhou": {"g1": Color("6a8a7a"), "g2": Color("769684"), "path": Color("c8ccc0"), "wall": Color("3a5a50"), "water": Color("4a7a8a"), "bg": Color("0a1414"),
+		"sky_top": Color("6a7a88"), "sky_hor": Color("dce4e4"), "fog": Color("c8d4d4"), "fog_d": 0.03, "sun": Color("e8f0f0"), "sun_e": 0.85, "amb": Color("98aaa8"), "amb_e": 0.9, "weather": "clouds", "tree": "crag", "decor": "pebble"},
+	"guixu": {"g1": Color("8a8070"), "g2": Color("968c7a"), "path": Color("c8b890"), "wall": Color("4a5a5a"), "water": Color("1a3a6a"), "bg": Color("06060e"),
+		"sky_top": Color("1a1440"), "sky_hor": Color("c87a6a"), "fog": Color("7a6a78"), "fog_d": 0.018, "sun": Color("ffc8a0"), "sun_e": 0.95, "amb": Color("8a80a0"), "amb_e": 0.85, "weather": "rain", "tree": "coral", "decor": "shell"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -166,6 +177,10 @@ const EXTRA := {
 	"changhe": {"hill": 0.45, "tex": "marble", "tuft": "flowers", "horizon": "palace", "clouds": 0.6, "stars": 0.4, "rays": 0.6, "sun_pitch": -24.0, "sun_yaw": -70.0},
 	"ninesprings": {"hill": 0.6, "tex": "moss", "tuft": "moss", "horizon": "mushrooms", "clouds": 0.0, "stars": 0.8, "haze": 0.6, "sun_pitch": -30.0, "sun_yaw": 90.0},
 	"youdu": {"hill": 0.35, "tex": "underworld", "tuft": "crystal", "horizon": "towers", "clouds": 0.0, "stars": 0.5, "haze": 0.5},
+	"penglai": {"hill": 0.45, "tex": "grass", "tuft": "grass", "horizon": "palace", "clouds": 0.45, "rays": 0.7, "haze": 0.55, "sun_pitch": -40.0, "sun_yaw": 80.0},
+	"fangzhang": {"hill": 0.6, "tex": "grass", "tuft": "flowers", "horizon": "karst", "clouds": 0.4, "rays": 0.6, "haze": 0.35, "sun_pitch": -34.0},
+	"yingzhou": {"hill": 0.7, "tex": "rock", "tuft": "grass", "horizon": "karst", "clouds": 0.9, "haze": 0.9},
+	"guixu": {"hill": 0.55, "tex": "sand", "tuft": "kelp", "horizon": "reef", "clouds": 0.3, "stars": 0.6, "haze": 0.4, "sun_pitch": -18.0, "sun_yaw": -90.0},
 }
 
 const PICKUP_COLORS := {
@@ -181,6 +196,7 @@ const PICKUP_COLORS := {
 	"wind_bell": Color("c8e0ff"), "gate_key": Color("f0d070"), "spring_water": Color("70e8f0"), "soul_tally": Color("c8b8e8"),
 	"heaven_tablet": Color("b0f0d0"), "earth_weight": Color("8a7a6a"),
 	"wutong_seed": Color("c8a050"), "night_pearl": Color("e8f8ff"), "peach_wine": Color("ffa0b8"), "moon_lotus": Color("f0e8ff"), "autumn_leaf": Color("e85a2a"), "ancestor_incense": Color("d8c090"), "stones": Color("90ffd0"),
+	"name_slip": Color("e8d8a0"), "pearl_dew": Color("e8fff8"), "jingwei_stone": Color("d87a5a"), "xufu_log": Color("d8c8a8"), "mainland_earth": Color("a87a4a"), "cloud_tea": Color("7ac87a"),
 }
 
 static var _anime := {}
