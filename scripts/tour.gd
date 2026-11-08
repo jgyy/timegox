@@ -6,7 +6,18 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder"}
+const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder", "longmen": "earth", "drowned": "earth", "tushan": "water", "buzhou": "earth"}
+
+## [shot name, area, a tile of that area's own map to look at, eye offset, look-at offset]
+const TOWN_SHOTS := {
+	"sect": [["town_cloudfoot", "mountain", Vector2i(82, 34), Vector3(-26.0, 30.0, 34.0), Vector3(0.0, 0.0, -4.0)]],
+	"dunes": [["town_shazhou", "dunes", Vector2i(12, 40), Vector3(-24.0, 26.0, 30.0), Vector3(0.0, 0.0, 0.0)]],
+	"longmen": [["town_longmen", "longmen", Vector2i(28, 30), Vector3(-30.0, 30.0, 26.0), Vector3(4.0, 0.0, -2.0)],
+		["dragon_gate", "longmen", Vector2i(54, 3), Vector3(46.0, 12.0, 10.0), Vector3(0.0, 9.0, 0.0)]],
+	"tushan": [["town_tushan", "tushan", Vector2i(28, 26), Vector3(-26.0, 28.0, 30.0), Vector3(0.0, 0.0, -2.0)],
+		["great_cauldron", "tushan", Vector2i(38, 22), Vector3(-12.0, 8.0, 12.0), Vector3(0.0, 3.0, 0.0)]],
+	"buzhou": [["buzhou_pillar", "buzhou", Vector2i(70, 20), Vector3(-52.0, 18.0, 46.0), Vector3(0.0, 22.0, 0.0)]],
+}
 
 func _stop(id: String) -> Array:
 	## [first quest step set in this area, a sensible player level]
@@ -251,14 +262,31 @@ func _follow(id: String) -> void:
 	wo.cam_override = null
 	await _sheet("follow_" + id, strip, 0.4)
 
+## The nearest walkable tile with nobody on it, on dry ground if there is any within 20 steps: the
+## shore of a river or pond is sunk below the waterline in 3D, so heroes standing on the bank
+## itself seem to wade in the water.
 func _nearest_free(pos: Vector2i) -> Vector2i:
-	for r in 20:
-		for dx in range(-r, r + 1):
-			for dy in range(-r, r + 1):
-				var p := pos + Vector2i(dx, dy)
-				if main.world.tile_free(p) and main.world.ent_at(p) == null and maxi(absi(dx), absi(dy)) == r:
-					return p
+	for dry in [true, false]:
+		for r in 20:
+			for dx in range(-r, r + 1):
+				for dy in range(-r, r + 1):
+					var p := pos + Vector2i(dx, dy)
+					if maxi(absi(dx), absi(dy)) != r or not main.world.tile_free(p) or main.world.ent_at(p) != null:
+						continue
+					if not dry or not _by_water(p):
+						return p
 	return pos
+
+func _by_water(p: Vector2i) -> bool:
+	var gw: int = main.world.w
+	var gh: int = main.world.h
+	var g: PackedByteArray = main.world.grid
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var q := p + Vector2i(dx, dy)
+			if q.x >= 0 and q.y >= 0 and q.x < gw and q.y < gh and g[q.y * gw + q.x] == MapGen.WATER:
+				return true
+	return false
 
 func _run() -> void:
 	await _wait(1.0)
@@ -351,6 +379,15 @@ func _run() -> void:
 			main.world._snap_cam()
 			await _wait(0.8)
 			await _shot("interior_yanggu")
+		# Part X: the towns and great landmarks, each from above at an angle
+		for shot in TOWN_SHOTS.get(id, []):
+			var tp := Terrain3D.world_pos(Atlas.to_world(shot[1], shot[2]))
+			tp.y = main.world.ground_y(tp)
+			var eye: Vector3 = tp + shot[3]
+			main.world.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(tp + shot[4], Vector3.UP)
+			await _wait(0.8)
+			await _shot(shot[0])
+			main.world.cam_override = null
 		if id == "fusang":
 			# the colossal Fusang across the valley, the stuck sun glowing in its crown
 			var fo := Terrain3D.world_pos(Atlas.to_world("fusang", Data.AREAS.fusang.landmark.pos))
@@ -446,6 +483,28 @@ func _run() -> void:
 				await _gallery("show", ms, 1.3, 1.25)
 			else:
 				await _portraits("show_close", ms, 1.9, 1.0, 4.6)
+	# Part X: the people of the four new towns and the bosses of the Nine Cauldrons (--gallery10 shoots
+	# only these)
+	if main.args.has("gallery") or main.args.has("gallery10") or not main.args.has("no-extras"):
+		await _gallery("gallery_townsfolk_cloudfoot", [
+			Assets.person("cartographer_pei"), Assets.person("postmaster_lu"), Assets.person("storyteller_wu"),
+			Assets.person("caravan_kang"), Assets.person("priestess_yun"), Assets.person("stableboy_shitou"),
+		], 0.8)
+		await _gallery("gallery_townsfolk_longmen", [
+			Assets.person("harbour_yao"), Assets.person("boatwright_gao"), Assets.person("fishwife_lu"), Assets.person("lockkeeper_qian"),
+			Assets.person("shrine_hua"), Assets.person("scholar_cen"), Assets.person("carp_boy_yu"), Assets.person("innkeeper_dong"),
+		], 0.72)
+		await _gallery("gallery_townsfolk_tushan", [
+			Assets.person("tu_lan"), Assets.person("caster_wei"), Assets.person("carver_shi"), Assets.person("charcoal_tan"),
+			Assets.person("innkeeper_lou"), Assets.person("little_qi"), Assets.person("bo_yi"), Assets.person("yinglong"),
+		], 0.72)
+		await _gallery("gallery_townsfolk_shazhou", [
+			Assets.person("well_keeper_zhaya"), Assets.person("cook_aysha"), Assets.person("star_reader_kumar"),
+			Assets.person("camel_boy_temur"), Assets.person("nomad"),
+		], 0.8)
+		await _gallery("gallery_part10", [
+			_foe("he_bo", true), _foe("gun", true), _foe("taotie", true), _foe("xiangliu", true), _foe("gonggong", true),
+		], 1.7)
 	if main.args.has("gallery") or not main.args.has("no-extras"):
 		await _gallery("gallery_people", [
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
@@ -569,12 +628,21 @@ func _run() -> void:
 			Assets.person("ah_mei"), Assets.person("farmer_tian"), Assets.person("feng_meng"), Assets.person("chang_e"),
 		], 0.85, 1.5, 3.6)
 	if main.args.has("map"):
-		main.world.load_area("dunes", Vector2i(10, 28))
+		# the world map from Cloudfoot, the post town under the north gate, and the Annals
+		for rid in [Atlas.HUB] + Data.AREA_CHAIN:
+			Game.seen[rid] = true
+		main.world.load_area("mountain", Vector2i(82, 36))
 		main.open_menu()
 		main.menu.mode = "map"
 		main.menu._build()
 		await _wait(0.5)
 		await _shot("world_map")
+		main.menu.mode = "annals"
+		main.menu._build()
+		main.menu.cursor = 2
+		await _wait(0.3)
+		await _shot("annals")
+		main.pop()
 		main.pop()
 	if main.args.has("ending"):
 		# the results screen on its own (--ending): the finale set pieces of every part

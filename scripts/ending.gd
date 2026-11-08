@@ -5,7 +5,8 @@ extends ScreenBase
 ## again behind them, soul lanterns rising past it, and Lin Feng's parents walking on to rebirth.
 ## Part VIII hangs the magpie bridge across the sky, with the Cowherd and the Weaver meeting on it.
 ## Part IX puts the sun and the moon in the sky together, taking turns, with Xihe, Chang'e and the
-## nine new stars of the Dipper.
+## nine new stars of the Dipper.  Part X sets the Nine Cauldrons, recast at Tushan with the land as
+## it really is on their bellies, in an arc on the clouds below, a river winding between them.
 
 const VIEW := Vector2(1280, 720)
 
@@ -242,6 +243,42 @@ func _part9() -> void:
 		dg.ball(Vector3(sp.x, sp.y, -36.0), 0.9 if big else 0.6, Color(1.0, 0.85, 0.6, 0.18), true)
 	MB.mesh_node(scene3d, dg.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
+## Part X: the Nine Cauldrons of Yu, recast, standing in an arc on the clouds in front of the lotus,
+## each glowing faintly with the province it carries, and a river running between them to the sea
+var cauldrons: Array = []
+
+func _part10() -> void:
+	for k in 9:
+		var root := Node3D.new()
+		var a := lerpf(-1.15, 1.15, k / 8.0)
+		root.position = Vector3(sin(a) * 6.2, -1.1 - absf(a) * 0.2, -2.5 - cos(a) * 3.2)
+		scene3d.add_child(root)
+		var b := MB.new()
+		var g := MB.new()
+		var bronze := MB.tag(Color("8a7038").lerp(Color("4a8a6a"), 0.15 * (k % 3)), MB.METAL)
+		b.lathe(Vector3(0, 0.25, 0), [Vector2(0.08, 0.0), Vector2(0.38, 0.06), Vector2(0.5, 0.22), Vector2(0.52, 0.42), Vector2(0.56, 0.5)], bronze, 14)
+		for j in 3:
+			var la := TAU * j / 3.0 + 0.5
+			b.limb(Vector3(cos(la) * 0.34, 0.3, sin(la) * 0.34), Vector3(cos(la) * 0.42, -0.05, sin(la) * 0.42), 0.09, 0.07, bronze, 6)
+		for s2: float in [-1.0, 1.0]:
+			b.torus(Vector3(s2 * 0.42, 0.85, 0), 0.13, 0.03, bronze, Vector3(0, 0, PI * 0.5))
+		g.disc(Vector3(0, 0.76, 0), 0.46, Color(1.0, 0.75, 0.35, 0.6), 12, Color(0.6, 0.9, 1.0, 0.2))
+		for c in 3:
+			b.sph(Vector3((c - 1) * 0.5, -0.12, 0.1 * c), Vector3(0.55, 0.22, 0.45), MB.tag(Color(1, 0.98, 0.95), MB.CLOTH))
+		MB.mesh_node(root, b.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		cauldrons.append(root)
+	# the river that runs between them to the sea, every bend of it
+	var rv := MB.new()
+	var pts: Array = []
+	var ws: Array = []
+	for k in 13:
+		var tt := k / 12.0
+		pts.append(Vector3(sin(tt * 7.0) * 1.4 + (tt - 0.5) * 3.0, -1.32, -0.8 - tt * 12.0))
+		ws.append(0.35 + tt * 0.9)
+	rv.ribbon(pts, ws, Vector3.RIGHT, Color(0.55, 0.8, 1.0, 0.55))
+	MB.mesh_node(scene3d, rv.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
 func press(act: String) -> void:
 	if act == "confirm":
 		done = true
@@ -296,6 +333,11 @@ func _process(d: float) -> void:
 		Models.anim_monster(crow9, t + 0.7, 0.0)
 		change9.position.y = 4.2 + sin(t * 0.8) * 0.15
 		Models.anim_person(change9.get_meta("person"), t + 3.0, false)
+		if cauldrons.is_empty():
+			_part10()
+		for k in cauldrons.size():
+			(cauldrons[k] as Node3D).rotation.y = t * 0.2 + k
+			(cauldrons[k] as Node3D).position.y += sin(t * 1.1 + k) * 0.002
 		cam.position = Vector3(sin(t * 0.15) * 1.5, 1.8, 6.5)
 		cam.look_at(Vector3(0, 1.4, 0), Vector3.UP)
 		queue_redraw()
@@ -304,6 +346,7 @@ func _draw() -> void:
 	Gfx.title_text(self, Vector2(0, 110), "ASCENSION", 64, VIEW.x, t)
 	UI.text(self, Vector2(0, 160), "Lin Feng, once a sweeper of steps, holds up the sky by choice, turns the Wheel gladly, and keeps every door open.", 22, Color("f2ead3"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 190), "The land is one land now. The magpies build their bridge, and the sun and the moon take turns.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 216), "Every river runs where it will, and the Nine Cauldrons hold the land as it really is.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
 	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
 	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)

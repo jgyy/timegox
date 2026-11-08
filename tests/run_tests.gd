@@ -322,10 +322,67 @@ func _init() -> void:
 	check(Atlas.owner_id(wd, wd.start) == "sect", "open world: the journey starts in the sect")
 	var sl := Atlas.slice(wd, "bamboo")
 	var voids := 0
+	var mine := 0
 	for v in sl.grid:
 		if v == MapGen.VOID:
 			voids += 1
-	check(voids > 0 and voids < sl.grid.size() / 3, "region slices blank out their neighbours' land (%d tiles)" % voids)
+		else:
+			mine += 1
+	var own_land := 0
+	var bi: int = wd.idx.bamboo
+	for i in wd.w * wd.h:
+		if wd.owner[i] == bi and wd.sea[i] == 0:
+			own_land += 1
+	check(voids > 0 and mine == own_land, "region slices blank out their neighbours' land and the sea (%d tiles) and keep all their own (%d)" % [voids, mine])
+	# ---- the land is no longer a grid of rectangles
+	var edge_sea := true
+	for x in wd.w:
+		edge_sea = edge_sea and wd.sea[x] == 1 and wd.sea[(wd.h - 1) * wd.w + x] == 1
+	for y in wd.h:
+		edge_sea = edge_sea and wd.sea[y * wd.w] == 1 and wd.sea[y * wd.w + wd.w - 1] == 1
+	check(edge_sea, "open world: the land is a continent ringed by the sea, not a rectangle")
+	var xs := {}
+	var ys := {}
+	for sid in Atlas.SITES:
+		xs[Atlas.SITES[sid][0]] = true
+		ys[Atlas.SITES[sid][1]] = true
+	check(xs.size() >= Atlas.SITES.size() * 3 / 4 and ys.size() >= Atlas.SITES.size() * 3 / 4, "open world: regions are not laid out in rows and columns (%d distinct x, %d distinct y of %d)" % [xs.size(), ys.size(), Atlas.SITES.size()])
+	var ways := {}
+	for sid2 in Atlas.SITES:
+		ways[Atlas.SITES[sid2][2]] = true
+	check(ways.size() == 4, "open world: chains wind in all four directions")
+	var squarish: Array = []
+	for rid in Data.AREA_CHAIN:
+		if rid == "sect":
+			continue
+		var rm := MapGen.build(rid)
+		var open_mid := 0
+		var mid_n := 0
+		var open_corner := 0
+		var corner_n := 0
+		for yy in rm.h:
+			for xx in rm.w:
+				var fx: float = (xx + 0.5) / float(rm.w)
+				var fy: float = (yy + 0.5) / float(rm.h)
+				var walk := MapGen.is_walkable_tile(rm.grid[yy * rm.w + xx])
+				if (fx < 0.14 or fx > 0.86) and (fy < 0.2 or fy > 0.8):
+					corner_n += 1
+					open_corner += 1 if walk else 0
+				elif absf(fx - 0.5) < 0.25 and absf(fy - 0.5) < 0.25:
+					mid_n += 1
+					open_mid += 1 if walk else 0
+		if float(open_corner) / float(corner_n) > 0.5 * float(open_mid) / float(mid_n):
+			squarish.append(rid)
+	check(squarish.is_empty(), "every region's open ground is an organic outline, its map's corners mostly forest (squarish: %s)" % str(squarish))
+	var unlinked: Array = []
+	for i2 in Data.AREA_CHAIN.size():
+		var ra: String = Data.AREA_CHAIN[i2]
+		for gp in Data.AREAS[ra].portals:
+			var ga := Atlas.to_world(ra, gp.pos)
+			var gb := Atlas.to_world(gp.to, Data.AREAS[gp.to].portals.filter(func(q): return q.to == ra)[0].pos)
+			if not reach_all.has(ga) or not reach_all.has(gb):
+				unlinked.append(ra + "-" + gp.to)
+	check(unlinked.is_empty(), "every road joins its two gates over land (%s)" % str(unlinked))
 	print("== buildings ==")
 	var n_bld := 0
 	for bd in wd.buildings:
@@ -387,18 +444,18 @@ func _init() -> void:
 	check(Data.SKILLS.rebirth.get("revive", false) and Data.SKILLS.homeward.get("revive", false), "the Lotus of Rebirth and the Homeward Lantern raise fallen allies")
 	print("== part IX ==")
 	var p9 := ["yanggu", "millet", "fusang", "guanghan"]
-	check(Data.REALMS[Data.REALMS.size() - 1] == "Sun-Moon Harmony" and Data.MAX_LEVEL == 42, "Part IX adds the Sun-Moon Harmony realm")
+	check(Data.REALMS.has("Sun-Moon Harmony") and Data.level_name(42).ends_with("Sun-Moon Harmony"), "Part IX adds the Sun-Moon Harmony realm")
 	check(Data.DIALOGUE.has("recall7") and Data.step_index("s_break13") < Data.step_index("s_p9_home"), "Part IX starts after the Star River Crossing")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break14", "the Star River Crossing no longer ends the game: Sun-Moon Harmony does")
-	check(Data.AREAS.sect.portals.any(func(p): return p.to == "yanggu" and p.open == "s_p9_home" and p.pos == Vector2i(27, 24)), "the sect's new south gate to the Dawn Market opens after the Part IX briefing")
+	check(Data.step_index("s_break14") > Data.step_index("s_break13") and Data.STEPS[Data.step_index("s_break14")].to == 42, "the Star River Crossing no longer ends the game: Sun-Moon Harmony comes after it")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "yanggu" and p.open == "s_p9_home" and p.pos == Vector2i(34, 24)), "the sect's south-east gate to the Dawn Market opens after the Part IX briefing")
 	var sect9 := MapGen.build("sect")
-	check(sect9.grid[23 * sect9.w + 27] == MapGen.PATH and sect9.grid[22 * sect9.w + 27] == MapGen.PATH, "a road runs from the south-east road to the Dawn Market gate")
+	check(sect9.grid[23 * sect9.w + 34] == MapGen.PATH and sect9.grid[22 * sect9.w + 34] == MapGen.PATH, "a road runs from the south-east road to the Dawn Market gate")
 	var lay9 := Atlas.layout()
 	var sizes9 := {}
 	var guides9 := {}
 	for a9 in p9:
 		check(Look.THEMES.has(a9) and Look.EXTRA.has(a9) and Scatter.ECO.has(a9) and Fauna.KINDS.has(a9) and MapGen.DENSITY.has(a9) and Arch.SETTLE.has(a9), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a9)
-		check(lay9.has(a9) and int(lay9[a9].row) == int(lay9.starferry.row) + 1, a9 + " lies in its own band south of the River of Heaven")
+		check(lay9.has(a9) and int(lay9[a9].site.x) > int(lay9[Atlas.HUB].site.x) + 150, a9 + " lies east of the mountain, towards the sunrise")
 		sizes9[Vector2i(Data.AREAS[a9].w, Data.AREAS[a9].h)] = true
 		guides9[Data.AREAS[a9].npcs[0].pos] = true
 		var bpos9 := {}
@@ -426,7 +483,74 @@ func _init() -> void:
 	check(Data.known_skills(0, 41, Data.step_index("s_fs_crab")).has("tentharrow"), "Tenth Arrow Sword is learned from Feng Meng")
 	check(Data.SKILLS.moon_dew.get("revive", false), "the Moon-Dew Ward raises fallen allies")
 	check(Data.BOSS_DROPS.get("jinwu", "") == "tenth_arrow", "the Sun Crow gives back the tenth arrow that Lin Feng later shows Xihe")
+	print("== part X ==")
+	var p10 := ["longmen", "drowned", "tushan", "buzhou"]
+	check(Data.REALMS[Data.REALMS.size() - 1] == "Mountain-River Oneness" and Data.MAX_LEVEL == 45, "Part X adds the Mountain-River Oneness realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break15", "Sun-Moon Harmony no longer ends the game: Mountain-River Oneness does")
+	check(Data.DIALOGUE.has("recall8") and Data.step_index("s_break14") < Data.step_index("s_p10_home"), "Part X starts after the Sun-Moon Harmony breakthrough")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "longmen" and p.open == "s_p10_road" and p.pos == Vector2i(12, 1)), "the sect's new north gate opens on the river road once Cartographer Pei has drawn it")
+	var sect10 := MapGen.build("sect")
+	check(sect10.grid[1 * sect10.w + 12] == MapGen.PATH and sect10.grid[12 * sect10.w + 12] == MapGen.PATH, "a path runs from the courtyard up to the north gate")
+	for a10 in p10:
+		check(Look.THEMES.has(a10) and Look.EXTRA.has(a10) and Scatter.ECO.has(a10) and Fauna.KINDS.has(a10) and MapGen.DENSITY.has(a10) and Arch.SETTLE.has(a10), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a10)
+		check(Data.AREAS[a10].bosses.size() == 5 and Data.AREAS[a10].pickups.size() == 4, a10 + ": five bosses and four things to find")
+		var lm10: Dictionary = Atlas.layout()[a10]
+		check(int(lm10.site.y) < int(Atlas.layout()[Atlas.HUB].site.y), a10 + " lies north of the mountain, up the river road")
+	for st10 in ["s_p10_archive", "s_p10_road", "s_dg_intro", "s_df_intro", "s_ts_intro", "s_bz_intro"]:
+		check(Data.step_index(st10) > Data.step_index("s_p10_home"), "Part X step %s follows the briefing" % st10)
+	check(Data.known_skills(0, 42).has("dragongate") and Data.known_skills(0, 43).has("swelling") and Data.known_skills(1, 43).has("river_mother"), "Part X techniques are learnable")
+	check(not Data.known_skills(0, 44, Data.step_index("s_ts_return")).has("cauldron") and Data.known_skills(0, 44, Data.step_index("s_ts_serpent")).has("cauldron"), "the Nine Cauldrons Sword is learned from Tu Lan")
+	check(Data.SKILLS.river_mother.get("revive", false), "the River-Mother's Ward raises fallen allies")
+	check(Data.BOSS_DROPS.get("taotie", "") == "cauldron_map" and Data.BOSS_DROPS.get("he_bo", "") == "river_tablet", "the Taotie gives up the cauldron's map and He Bo his flood tablet")
+	for lk in ["dragongate", "cauldron", "buzhou"]:
+		var found := false
+		for a11 in p10:
+			found = found or Data.AREAS[a11].get("landmark", {}).get("kind", "") == lk
+		check(found, "Part X landmark %s stands in its region" % lk)
+		var lroot := Node3D.new()
+		Terrain3D.landmark(lroot, lk, Vector3.ZERO, Vector3(1, 0, 0))
+		check(lroot.get_child_count() >= 2, "Part X landmark %s builds" % lk)
+		lroot.free()
+	var lmap := MapGen.build("longmen")
+	var river_tiles := 0
+	for t10 in lmap.grid:
+		if t10 == MapGen.WATER:
+			river_tiles += 1
+	check(river_tiles > 120, "a river runs through Longmen (%d water tiles)" % river_tiles)
+	print("== towns and world-building ==")
+	var town_ids := {}
+	for tw in Data.TOWNS:
+		town_ids[tw.id] = true
+		check(Data.AREAS.has(tw.area) and str(tw.get("lore", "")).length() > 60, "town %s has a home and a history" % tw.id)
+	check(Data.TOWNS.size() >= 6, "the land has at least six towns besides the sect (%d)" % Data.TOWNS.size())
+	for tn in [["mountain", 5], ["longmen", 6], ["tushan", 5], ["dunes", 3]]:
+		var folk: int = Data.AREAS[tn[0]].get("npcs", []).size()
+		var houses: int = Data.AREAS[tn[0]].get("buildings", []).size()
+		check(folk >= tn[1] and houses >= 4, "%s is a town: %d townsfolk and %d buildings you can enter" % [tn[0], folk, houses])
+		for n10 in Data.AREAS[tn[0]].get("npcs", []):
+			check(Data.CHAT.has(n10.id) and Data.CHAT[n10.id].size() >= 3, "%s has at least three things to say" % n10.id)
+			check(Assets.PEOPLE.has(n10.id) and Assets.has(Assets.PEOPLE[n10.id]), "%s is Blender-built" % n10.id)
+	for rid2 in Atlas.region_ids():
+		check(str(Data.REGION_LORE.get(rid2, "")).length() > 80, "the land remembers the history of " + rid2)
 	print("== story ==")
+	# every line of dialogue and chat fits the dialogue box (four lines of 22 px text, 1100 px wide)
+	var too_long: Array = []
+	var dfont := ThemeDB.fallback_font
+	for dk in Data.DIALOGUE:
+		for dl in Data.DIALOGUE[dk]:
+			var par := TextParagraph.new()
+			par.add_string(str(dl[1]), dfont, 22)
+			par.width = 1100
+			if par.get_line_count() > 4:
+				too_long.append(dk)
+	for ck in Data.CHAT:
+		for cl in Data.CHAT[ck]:
+			var par2 := TextParagraph.new()
+			par2.add_string(str(cl), dfont, 22)
+			par2.width = 1100
+			if par2.get_line_count() > 4:
+				too_long.append(ck)
+	check(too_long.is_empty(), "every line of dialogue fits the dialogue box (too long: %s)" % str(too_long))
 	for st in Data.STEPS:
 		if st.kind == "collect":
 			check(Data.ITEMS.has(st.item), "collect item defined " + st.item)

@@ -92,6 +92,16 @@ const THEMES := {
 		"sky_top": Color("e89848"), "sky_hor": Color("ffe4a8"), "fog": Color("f0d8a8"), "fog_d": 0.016, "sun": Color("ffd890"), "sun_e": 1.25, "amb": Color("d0c098"), "amb_e": 0.9, "weather": "steam", "tree": "pine", "decor": "flower"},
 	"guanghan": {"g1": Color("a8b8d0"), "g2": Color("b8c8e0"), "path": Color("eef4ff"), "wall": Color("6a7aa8"), "water": Color("c0d8ff"), "bg": Color("060a18"),
 		"sky_top": Color("0a1030"), "sky_hor": Color("4a5a98"), "fog": Color("6a78a8"), "fog_d": 0.012, "sun": Color("d0dcff"), "sun_e": 0.85, "amb": Color("98a8d8"), "amb_e": 0.9, "weather": "osmanthus", "tree": "column", "decor": "snowrock"},
+	# ---- Part X: the ochre river below the Dragon Gate, the grey flood over the rice fields, the
+	# smoke and bronze-glow of the casters' mountain, and the storm over the broken pillar
+	"longmen": {"g1": Color("7a9a58"), "g2": Color("88a662"), "path": Color("dcc8a0"), "wall": Color("3e6a3a"), "water": Color("4e8a80"), "bg": Color("141008"),
+		"sky_top": Color("5a88c0"), "sky_hor": Color("ece4cc"), "fog": Color("d8d0b8"), "fog_d": 0.013, "sun": Color("fff4e0"), "sun_e": 1.1, "amb": Color("b0b098"), "amb_e": 0.85, "weather": "river_mist", "tree": "ferrypost", "decor": "reed"},
+	"drowned": {"g1": Color("6a8a58"), "g2": Color("789862"), "path": Color("b8a888"), "wall": Color("3a5a3a"), "water": Color("7a9a90"), "bg": Color("0a100c"),
+		"sky_top": Color("5a6a80"), "sky_hor": Color("c8ccd0"), "fog": Color("a8b0b0"), "fog_d": 0.02, "sun": Color("e8ecf0"), "sun_e": 0.85, "amb": Color("8a9898"), "amb_e": 0.85, "weather": "rain", "tree": "mangrove", "decor": "reed"},
+	"tushan": {"g1": Color("7a6a4a"), "g2": Color("86764e"), "path": Color("c8b090"), "wall": Color("4a3a2a"), "water": Color("ff9a40"), "bg": Color("140a06"),
+		"sky_top": Color("6a7a98"), "sky_hor": Color("e8c8a0"), "fog": Color("c8a888"), "fog_d": 0.017, "sun": Color("ffe0b8"), "sun_e": 1.0, "amb": Color("a89078"), "amb_e": 0.85, "weather": "sparks", "tree": "furnace", "decor": "ingot"},
+	"buzhou": {"g1": Color("4a5658"), "g2": Color("56625e"), "path": Color("9aa0a0"), "wall": Color("2a3438"), "water": Color("1e2e40"), "bg": Color("06080c"),
+		"sky_top": Color("1a2438"), "sky_hor": Color("6a7890"), "fog": Color("5a6878"), "fog_d": 0.022, "sun": Color("d0d8e8"), "sun_e": 0.8, "amb": Color("6a7888"), "amb_e": 0.8, "weather": "rain", "tree": "crag", "decor": "pebble"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -137,6 +147,10 @@ const EXTRA := {
 	"millet": {"hill": 0.2, "tex": "cracked", "tuft": "deadgrass", "horizon": "dunes", "clouds": 0.05, "rays": 0.6, "haze": 0.95, "sun_pitch": -62.0, "sun_yaw": 80.0},
 	"fusang": {"hill": 1.5, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.35, "rays": 1.0, "haze": 0.55, "sun_pitch": -38.0, "sun_yaw": 90.0},
 	"guanghan": {"hill": 0.5, "tex": "permafrost", "tuft": "snow", "horizon": "palace", "clouds": 0.15, "stars": 1.0, "moon": 1.0, "haze": 0.3, "sun_pitch": -32.0, "sun_yaw": -100.0},
+	"longmen": {"hill": 1.1, "tex": "grass", "tuft": "grass", "horizon": "karst", "clouds": 0.5, "haze": 0.45, "rays": 0.5},
+	"drowned": {"hill": 0.25, "tex": "mud", "tuft": "reed", "horizon": "hills", "clouds": 0.9, "haze": 0.5},
+	"tushan": {"hill": 1.2, "tex": "rock", "tuft": "grass", "horizon": "peaks", "clouds": 0.5, "haze": 0.5, "rays": 0.4},
+	"buzhou": {"hill": 1.0, "tex": "rock", "tuft": "pebble", "horizon": "crags", "clouds": 0.95, "haze": 0.4},
 }
 
 const PICKUP_COLORS := {
@@ -148,6 +162,7 @@ const PICKUP_COLORS := {
 	"soul_lantern": Color("ffc860"), "memory_pearl": Color("c0f0ff"), "forget_herb": Color("e8d090"), "wheel_spoke": Color("b0b8ff"), "silver_thread": Color("e8e8ff"), "tea_bud": Color("8ae060"), "cocoon": Color("fff4d8"), "shuttle": Color("e8c860"), "needle": Color("c8d0e0"),
 	"river_star": Color("fff4c0"), "magpie_plume": Color("e8f0ff"), "star_thread": Color("c8d0ff"), "kunlun_peach": Color("ffa8b8"), "magpie_badge": Color("2a2a3a"),
 	"noon_ember": Color("ff9a30"), "rain_stone": Color("8ab8e8"), "sun_feather": Color("ffd040"), "osmanthus": Color("ffd070"), "tenth_arrow": Color("c8a878"),
+	"carp_scale": Color("ffc840"), "xirang": Color("c8a060"), "cauldron_shard": Color("d89a4a"), "pillar_stone": Color("8a9ab8"), "river_tablet": Color("a8c0a0"), "cauldron_map": Color("d8b070"),
 }
 
 static var _anime := {}

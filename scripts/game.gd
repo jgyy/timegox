@@ -13,7 +13,7 @@ var stones := 60
 var inv := {"hp_pill": 3, "qi_pill": 1}
 var step := 0
 var area := "sect"
-var tile := Vector2i(20, 8)    # world tile (see atlas.gd)
+var tile := Vector2i(-1, -1)  # world tile (see atlas.gd)
 var companion := false
 var temper := 0
 var hp := [80.0, 0.0]
@@ -28,6 +28,8 @@ var meditated := 0.0
 var hunt := 0
 var timeline: Array = []
 var toasts: Array = []
+## regions Lin Feng has set foot in (their histories go into the Annals)
+var seen := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -43,7 +45,9 @@ func reset() -> void:
 	inv = {"hp_pill": 3, "qi_pill": 1}
 	step = 0
 	area = "sect"
-	tile = Vector2i(20, 8)
+	# a world tile: the sect's courtyard in front of the hall (Vector2i(20, 8) is the sect's own
+	# tile, which used to be stored here as if it were a world tile)
+	tile = Atlas.to_world("sect", Vector2i(20, 8))
 	companion = false
 	temper = 0
 	boss_done = {}
@@ -56,6 +60,7 @@ func reset() -> void:
 	hunt = 0
 	timeline = []
 	toasts = []
+	seen = {"sect": true}
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
 	note("Journey begins")
@@ -252,6 +257,8 @@ func respawn() -> void:
 	deaths += 1
 	stones = int(stones * 0.85)
 	area = "sect"
-	tile = Vector2i(20, 8)
+	# a world tile: the sect's courtyard in front of the hall (Vector2i(20, 8) is the sect's own
+	# tile, which used to be stored here as if it were a world tile)
+	tile = Atlas.to_world("sect", Vector2i(20, 8))
 	heal_full()
 	note("Defeated and carried back to the sect")
