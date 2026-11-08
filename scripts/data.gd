@@ -420,11 +420,11 @@ const AREAS := {
 			{"to": "bamboo", "pos": Vector2i(38, 13), "dest": Vector2i(4, 22), "open": ""},
 			{"to": "mirror", "pos": Vector2i(20, 24), "dest": Vector2i(4, 28), "open": "s_p3_home"},
 			{"to": "cloudsea", "pos": Vector2i(1, 13), "dest": Vector2i(4, 28), "open": "s_p4_home"},
-			{"to": "dunes", "pos": Vector2i(34, 24), "dest": Vector2i(4, 28), "open": "s_p5_home"},
+			{"to": "dunes", "pos": Vector2i(27, 24), "dest": Vector2i(4, 28), "open": "s_p5_home"},
 			{"to": "maple", "pos": Vector2i(1, 22), "dest": Vector2i(4, 28), "open": "s_p6_home"},
 			{"to": "village", "pos": Vector2i(6, 24), "dest": Vector2i(4, 28), "open": "s_p7_home"},
 			{"to": "starferry", "pos": Vector2i(13, 24), "dest": Vector2i(4, 28), "open": "s_p8_home"},
-			{"to": "yanggu", "pos": Vector2i(27, 24), "dest": Vector2i(4, 30), "open": "s_p9_home"},
+			{"to": "yanggu", "pos": Vector2i(34, 24), "dest": Vector2i(4, 30), "open": "s_p9_home"},
 		],
 		"npcs": [
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 4), "col": Color("e8e8ff")},
@@ -461,9 +461,9 @@ const AREAS := {
 	},
 	# the mountain around the sect: forests, terraces and the roads to every region (open world hub)
 	"mountain": {
-		"n": "Azure Cloud Mountain", "w": 60, "h": 400, "seed": 7, "theme": "sect", "enemies": 0, "hill": 2.2,
+		"n": "Azure Cloud Mountain", "w": 180, "h": 160, "seed": 7, "theme": "sect", "enemies": 0, "hill": 2.2,
 		"portals": [],
-		"springs": [Vector2i(30, 60), Vector2i(30, 330)],
+		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 	},
 	"bamboo": {
 		"n": "Whispering Bamboo Forest", "w": 70, "h": 44, "seed": 21, "theme": "bamboo", "enemies": 13,
@@ -781,7 +781,7 @@ const AREAS := {
 		"n": "Desert of Fallen Stars", "w": 96, "h": 58, "seed": 191, "theme": "dunes", "enemies": 20,
 		"pool": [["dune_scorpion", 27, 27], ["sand_wraith", 27, 27], ["meteor_golem", 27, 27]],
 		"portals": [
-			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(36, 22), "open": ""},
+			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(28, 21), "open": ""},
 			{"to": "fungal", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_du_tiger"},
 		],
 		"npcs": [{"id": "nomad", "n": "Nomad Matriarch Ba Yin", "pos": Vector2i(10, 26), "col": Color("e8c890"), "vis": ["s_du_intro", ""]}],
@@ -1120,7 +1120,7 @@ const AREAS := {
 		"n": "Yanggu, the Dawn Market", "w": 104, "h": 60, "seed": 351, "theme": "yanggu", "enemies": 22,
 		"pool": [["noon_cur", 39, 39], ["noon_cicada", 39, 39], ["clay_toad", 39, 39]],
 		"portals": [
-			{"to": "sect", "pos": Vector2i(1, 30), "dest": Vector2i(28, 21), "open": ""},
+			{"to": "sect", "pos": Vector2i(1, 30), "dest": Vector2i(36, 22), "open": ""},
 			{"to": "millet", "pos": Vector2i(102, 25), "dest": Vector2i(4, 24), "open": "s_yg_hanba"},
 		],
 		"npcs": [
@@ -1243,6 +1243,16 @@ const AREAS := {
 }
 
 const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan"]
+
+## The towns of the Unbroken Land, marked on the world map: the area they stand in and a tile of
+## that area's own map at their heart.
+const TOWNS := [
+	{"id": "qingshi", "n": "Qingshi Village", "area": "village", "pos": Vector2i(30, 28)},
+	{"id": "yanggu", "n": "Yanggu Market", "area": "yanggu", "pos": Vector2i(34, 30)},
+]
+
+## What the land remembers of each region: shown beside the world map while Lin Feng is there.
+const REGION_LORE := {}
 
 ## next area to enter when travelling from `from` to `to` (breadth-first over portals)
 static func next_hop(from: String, to: String) -> String:

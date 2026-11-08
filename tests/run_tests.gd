@@ -322,10 +322,67 @@ func _init() -> void:
 	check(Atlas.owner_id(wd, wd.start) == "sect", "open world: the journey starts in the sect")
 	var sl := Atlas.slice(wd, "bamboo")
 	var voids := 0
+	var mine := 0
 	for v in sl.grid:
 		if v == MapGen.VOID:
 			voids += 1
-	check(voids > 0 and voids < sl.grid.size() / 3, "region slices blank out their neighbours' land (%d tiles)" % voids)
+		else:
+			mine += 1
+	var own_land := 0
+	var bi: int = wd.idx.bamboo
+	for i in wd.w * wd.h:
+		if wd.owner[i] == bi and wd.sea[i] == 0:
+			own_land += 1
+	check(voids > 0 and mine == own_land, "region slices blank out their neighbours' land and the sea (%d tiles) and keep all their own (%d)" % [voids, mine])
+	# ---- the land is no longer a grid of rectangles
+	var edge_sea := true
+	for x in wd.w:
+		edge_sea = edge_sea and wd.sea[x] == 1 and wd.sea[(wd.h - 1) * wd.w + x] == 1
+	for y in wd.h:
+		edge_sea = edge_sea and wd.sea[y * wd.w] == 1 and wd.sea[y * wd.w + wd.w - 1] == 1
+	check(edge_sea, "open world: the land is a continent ringed by the sea, not a rectangle")
+	var xs := {}
+	var ys := {}
+	for sid in Atlas.SITES:
+		xs[Atlas.SITES[sid][0]] = true
+		ys[Atlas.SITES[sid][1]] = true
+	check(xs.size() >= Atlas.SITES.size() * 3 / 4 and ys.size() >= Atlas.SITES.size() * 3 / 4, "open world: regions are not laid out in rows and columns (%d distinct x, %d distinct y of %d)" % [xs.size(), ys.size(), Atlas.SITES.size()])
+	var ways := {}
+	for sid2 in Atlas.SITES:
+		ways[Atlas.SITES[sid2][2]] = true
+	check(ways.size() == 4, "open world: chains wind in all four directions")
+	var squarish: Array = []
+	for rid in Data.AREA_CHAIN:
+		if rid == "sect":
+			continue
+		var rm := MapGen.build(rid)
+		var open_mid := 0
+		var mid_n := 0
+		var open_corner := 0
+		var corner_n := 0
+		for yy in rm.h:
+			for xx in rm.w:
+				var fx: float = (xx + 0.5) / float(rm.w)
+				var fy: float = (yy + 0.5) / float(rm.h)
+				var walk := MapGen.is_walkable_tile(rm.grid[yy * rm.w + xx])
+				if (fx < 0.14 or fx > 0.86) and (fy < 0.2 or fy > 0.8):
+					corner_n += 1
+					open_corner += 1 if walk else 0
+				elif absf(fx - 0.5) < 0.25 and absf(fy - 0.5) < 0.25:
+					mid_n += 1
+					open_mid += 1 if walk else 0
+		if float(open_corner) / float(corner_n) > 0.5 * float(open_mid) / float(mid_n):
+			squarish.append(rid)
+	check(squarish.is_empty(), "every region's open ground is an organic outline, its map's corners mostly forest (squarish: %s)" % str(squarish))
+	var unlinked: Array = []
+	for i2 in Data.AREA_CHAIN.size():
+		var ra: String = Data.AREA_CHAIN[i2]
+		for gp in Data.AREAS[ra].portals:
+			var ga := Atlas.to_world(ra, gp.pos)
+			var gb := Atlas.to_world(gp.to, Data.AREAS[gp.to].portals.filter(func(q): return q.to == ra)[0].pos)
+			if not reach_all.has(ga) or not reach_all.has(gb):
+				unlinked.append(ra + "-" + gp.to)
+	check(unlinked.is_empty(), "every road joins its two gates over land (%s)" % str(unlinked))
 	print("== buildings ==")
 	var n_bld := 0
 	for bd in wd.buildings:
@@ -390,15 +447,15 @@ func _init() -> void:
 	check(Data.REALMS[Data.REALMS.size() - 1] == "Sun-Moon Harmony" and Data.MAX_LEVEL == 42, "Part IX adds the Sun-Moon Harmony realm")
 	check(Data.DIALOGUE.has("recall7") and Data.step_index("s_break13") < Data.step_index("s_p9_home"), "Part IX starts after the Star River Crossing")
 	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break14", "the Star River Crossing no longer ends the game: Sun-Moon Harmony does")
-	check(Data.AREAS.sect.portals.any(func(p): return p.to == "yanggu" and p.open == "s_p9_home" and p.pos == Vector2i(27, 24)), "the sect's new south gate to the Dawn Market opens after the Part IX briefing")
+	check(Data.AREAS.sect.portals.any(func(p): return p.to == "yanggu" and p.open == "s_p9_home" and p.pos == Vector2i(34, 24)), "the sect's south-east gate to the Dawn Market opens after the Part IX briefing")
 	var sect9 := MapGen.build("sect")
-	check(sect9.grid[23 * sect9.w + 27] == MapGen.PATH and sect9.grid[22 * sect9.w + 27] == MapGen.PATH, "a road runs from the south-east road to the Dawn Market gate")
+	check(sect9.grid[23 * sect9.w + 34] == MapGen.PATH and sect9.grid[22 * sect9.w + 34] == MapGen.PATH, "a road runs from the south-east road to the Dawn Market gate")
 	var lay9 := Atlas.layout()
 	var sizes9 := {}
 	var guides9 := {}
 	for a9 in p9:
 		check(Look.THEMES.has(a9) and Look.EXTRA.has(a9) and Scatter.ECO.has(a9) and Fauna.KINDS.has(a9) and MapGen.DENSITY.has(a9) and Arch.SETTLE.has(a9), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a9)
-		check(lay9.has(a9) and int(lay9[a9].row) == int(lay9.starferry.row) + 1, a9 + " lies in its own band south of the River of Heaven")
+		check(lay9.has(a9) and int(lay9[a9].site.x) > int(lay9[Atlas.HUB].site.x) + 150, a9 + " lies east of the mountain, towards the sunrise")
 		sizes9[Vector2i(Data.AREAS[a9].w, Data.AREAS[a9].h)] = true
 		guides9[Data.AREAS[a9].npcs[0].pos] = true
 		var bpos9 := {}

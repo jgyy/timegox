@@ -53,7 +53,25 @@ static func world_minimap(wd: Dictionary) -> ImageTexture:
 	data.resize(W * H * 3)
 	var grid: PackedByteArray = wd.grid
 	var owner: PackedByteArray = wd.owner
+	var sea: PackedByteArray = wd.get("sea", PackedByteArray())
+	var deep := Color("1b3552")
+	var shallow := Color("2f6286")
 	for i in W * H:
+		if not sea.is_empty() and sea[i] == 1:
+			# the Four Seas: one deep blue, paler in the shallows along the coast
+			var y := i / W
+			var x := i % W
+			var near_land := false
+			for d in [-3, 3, -3 * W, 3 * W, -2 - 2 * W, 2 + 2 * W, 2 - 2 * W, -2 + 2 * W]:
+				var j: int = i + d
+				if j >= 0 and j < W * H and sea[j] == 0 and absi(j % W - x) <= 3:
+					near_land = true
+					break
+			var sc := shallow if near_land else deep.lerp(shallow, 0.18 * Gfx.h(x * 0.05, y * 0.05))
+			data[i * 3] = int(sc.r8)
+			data[i * 3 + 1] = int(sc.g8)
+			data[i * 3 + 2] = int(sc.b8)
+			continue
 		var p: Array = pal[owner[i]]
 		var c: Color = p[0]
 		match grid[i]:

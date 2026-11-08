@@ -126,8 +126,8 @@ func open_world() -> void:
 		wd["hm"] = hm
 		mini_tex = Gfx.world_minimap(wd)
 		world_root = Node3D.new()
-		world_root.name = "world_edge"
-		Terrain3D.world_edge(world_root, w, h)
+		world_root.name = "world_sea"
+		Terrain3D.world_sea(world_root, wd)
 		scene3d.add_child(world_root)
 
 ## Teleport to a region-local tile (as written in Data.AREAS).
@@ -408,17 +408,18 @@ func _make_ent(e: Dictionary) -> Node3D:
 			var open: bool = seal_open(e)
 			var pc := UI.C_JADE if open else Color("8a4a4a")
 			var pm := Models.portal(pc, open)
-			# a barrier across a north-south road faces along x
-			var ts: Array = e.tiles
-			if ts.size() > 1 and ts[0].x == ts[1].x:
+			# the barrier stands across the road: turned a quarter when the road runs east-west
+			var ax: Vector2i = e.get("axis", Vector2i(0, 1))
+			if absi(ax.x) > absi(ax.y):
 				pm.rotation.y = PI / 2
+			var ts: Array = e.tiles
 			if not ts.is_empty():
 				var mid := Vector3.ZERO
 				for tt in ts:
 					mid += Terrain3D.world_pos(tt)
 				mid /= float(ts.size())
 				n.position = Vector3(mid.x, 0, mid.z)
-				pm.scale = Vector3(1.0, 1.0, 1.0) * maxf(1.0, ts.size() * 0.55)
+				pm.scale = Vector3(1.6, 1.6, 1.6)
 			n.set_meta("open", open)
 			n.add_child(pm)
 			var lbl := _label(n, "", 4.1, pc, 32)

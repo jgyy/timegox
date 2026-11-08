@@ -275,6 +275,10 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				var e = _nearest_enemy(s.area)
+				if e == null:
+					# nothing within a short walk: borders now lie well outside a region's open ground,
+					# so head for the nearest pack anywhere in the region before waiting for respawns
+					e = _any_enemy(s.area)
 				if e != null:
 					_walk_to(e.pos, "enemy:" + e.id)
 				else:
@@ -347,6 +351,24 @@ func _nearest_enemy(area: String):
 		return cur
 	if bd > 60:
 		return null
+	return best
+
+## The nearest pack of region `area` the party can handle, however far (straight-line distance).
+func _any_enemy(area: String):
+	var best = null
+	var bd := 1 << 30
+	for e in world.ents:
+		if e.kind != "enemy" or e.area != area or not world.ent_visible(e):
+			continue
+		var mx := 0
+		for g in e.group:
+			mx = maxi(mx, g.lv)
+		if mx > Game.level + 2:
+			continue
+		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		if dd < bd:
+			bd = dd
+			best = e
 	return best
 
 func _goto_nearest(kind: String, item: String) -> void:
@@ -525,7 +547,7 @@ func _meditate() -> void:
 		"grind":
 			done = _cult_met() and _hp_ratio() > 0.6
 		"respawn":
-			done = _nearest_enemy(Game.cur_step().get("area", "")) != null
+			done = _any_enemy(Game.cur_step().get("area", "")) != null
 	if done:
 		_press("cancel", 0.4)
 	else:

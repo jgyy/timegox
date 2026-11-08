@@ -863,6 +863,98 @@ static func world_edge(root: Node3D, w: int, h: int) -> void:
 	_skirt(root, w, h, "sect", 7)
 	_horizon(root, w, h, "sect", 7)
 
+const SEA_COL := Color("2a5a8a")
+const SEA_ROWS := 48
+
+## The Four Seas round the Unbroken Land.  Open-sea tiles are blanked out of every region's own
+## terrain (see Atlas.slice), so the sea is one surface for the whole world: runs of open water merged
+## into long quads, a quad with foam at its corners for every tile on the coast, water carried on under
+## the coastal land (so the bank dips into the sea instead of ending in a gap), the ocean running on
+## past the edge of the world to the horizon, a dim seabed under it and far island peaks.
+static func world_sea(root: Node3D, wd: Dictionary) -> void:
+	var W: int = wd.w
+	var H: int = wd.h
+	var sea: PackedByteArray = wd.sea
+	var grid: PackedByteArray = wd.grid
+	var mat := _water_mat(SEA_COL, 0.0, [Color("3a5a9a"), Color("c8d4e8")])
+	var calm := Color(1, 1, 1, 0)
+	for y0 in range(0, H, SEA_ROWS):
+		var mb := MB.new()
+		for y in range(y0, mini(H, y0 + SEA_ROWS)):
+			var x := 0
+			while x < W:
+				var i := y * W + x
+				if sea[i] == 0:
+					# coastal land: the sea runs on under it, unless a lake of the region's own does
+					if _touches(sea, W, H, x, y, 1) and not _lake_by(grid, sea, W, H, x, y):
+						var fl := Color(1, 1, 1, 1)
+						mb.quad4(Vector3(x * T, WATER_Y, y * T), Vector3((x + 1) * T, WATER_Y, y * T), Vector3((x + 1) * T, WATER_Y, (y + 1) * T), Vector3(x * T, WATER_Y, (y + 1) * T), fl, fl, fl, fl)
+					x += 1
+					continue
+				if _touches(sea, W, H, x, y, 0):
+					var f := _sea_foam(sea, W, H, x, y)
+					mb.quad4(Vector3(x * T, WATER_Y, y * T), Vector3((x + 1) * T, WATER_Y, y * T), Vector3((x + 1) * T, WATER_Y, (y + 1) * T), Vector3(x * T, WATER_Y, (y + 1) * T),
+						Color(1, 1, 1, f[0]), Color(1, 1, 1, f[1]), Color(1, 1, 1, f[2]), Color(1, 1, 1, f[3]))
+					x += 1
+					continue
+				var x1 := x
+				while x1 < W and sea[y * W + x1] == 1 and not _touches(sea, W, H, x1, y, 0):
+					x1 += 1
+				mb.quad4(Vector3(x * T, WATER_Y, y * T), Vector3(x1 * T, WATER_Y, y * T), Vector3(x1 * T, WATER_Y, (y + 1) * T), Vector3(x * T, WATER_Y, (y + 1) * T), calm, calm, calm, calm)
+				x = x1
+		if not mb.is_empty():
+			var mi := MB.mesh_node(root, mb.build(mat))
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# the open ocean past the edge of the world, and the seabed under all of it
+	var far := 900.0
+	var x0 := -far
+	var z0 := -far
+	var x1w := W * T + far
+	var z1 := H * T + far
+	var ob := MB.new()
+	for r in [[x0, z0, x1w, 0.0], [x0, H * T, x1w, z1], [x0, 0.0, 0.0, H * T], [W * T, 0.0, x1w, H * T]]:
+		ob.quad4(Vector3(r[0], WATER_Y, r[1]), Vector3(r[2], WATER_Y, r[1]), Vector3(r[2], WATER_Y, r[3]), Vector3(r[0], WATER_Y, r[3]), calm, calm, calm, calm)
+	var oi := MB.mesh_node(root, ob.build(mat))
+	oi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var bed := MB.new()
+	var bc := MB.tag(Color("1a3a48"), MB.STONE)
+	var nn := Vector3.UP
+	bed.quad_n([Vector3(x0, -1.6, z0), Vector3(x1w, -1.6, z0), Vector3(x1w, -1.6, z1), Vector3(x0, -1.6, z1)], [nn, nn, nn, nn], [bc, bc, bc, bc])
+	var bi := MB.mesh_node(root, bed.build(MB.mat_plain()))
+	bi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_horizon(root, W, H, "sect", 7)
+
+## does tile (x, y) have a 4- or 8-neighbour whose sea flag is `want`?
+static func _touches(sea: PackedByteArray, W: int, H: int, x: int, y: int, want: int) -> bool:
+	for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(-1, -1)]:
+		var nx: int = x + d.x
+		var ny: int = y + d.y
+		if nx >= 0 and ny >= 0 and nx < W and ny < H and sea[ny * W + nx] == want:
+			return true
+	return false
+
+## a land tile beside a lake or pond of its region's own (whose water plane already runs under it)
+static func _lake_by(grid: PackedByteArray, sea: PackedByteArray, W: int, H: int, x: int, y: int) -> bool:
+	for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		var nx: int = x + d.x
+		var ny: int = y + d.y
+		if nx >= 0 and ny >= 0 and nx < W and ny < H and sea[ny * W + nx] == 0 and grid[ny * W + nx] == MapGen.WATER:
+			return true
+	return grid[y * W + x] == MapGen.WATER
+
+## foam at each corner of a sea tile: 1 where the corner touches land
+static func _sea_foam(sea: PackedByteArray, W: int, H: int, tx: int, ty: int) -> Array:
+	var out: Array = []
+	for c in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(0, 1)]:
+		var land := 0.0
+		for d in [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(-1, 0), Vector2i(0, 0)]:
+			var nx: int = tx + c.x + d.x
+			var ny: int = ty + c.y + d.y
+			if nx >= 0 and ny >= 0 and nx < W and ny < H and sea[ny * W + nx] == 0:
+				land = 1.0
+		out.append(land)
+	return out
+
 ## the sect's five-storey pagoda (stands on the mountain outside the courtyard wall)
 static func pagoda(root: Node3D, pos: Vector3) -> void:
 	var b := MB.new()
