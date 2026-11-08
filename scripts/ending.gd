@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic"}
+const KIND_WORD := {"might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)
@@ -249,7 +249,7 @@ func _build_hero() -> void:
 	MB.mesh_node(lot, lc.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	MB.mesh_node(lot, lg.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# (no pools of light underfoot: the lotus has its own glow)
-	hero = Models.person(Color("f0f8ff"), Color("1a1a2a"), {"asset": "lin_feng", "sword": true, "hair": "topknot", "crown": true, "trim": Color("f0c850"), "cape": Color("f8e8c0")})
+	hero = Models.hero()
 	hero.position = Vector3(-0.38, 0.3, 0.12)
 	hero.rotation.y = 0.35
 	g.add_child(hero)
@@ -1010,5 +1010,13 @@ func _results(a: float, slide: float) -> void:
 		y += 34.0
 		var rl := "The heart reached by %s" % ROAD_ENDS[road][0]
 		_say(Vector2(x0, y), rl, UI.fit(rl, 15, w), Color("e8dcc0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
+	# the five fated encounters (fate.gd): how many stand with him at the end
+	var fallen := 0
+	for th in Fate.THREAD_ORDER:
+		if Fate.state(Game, th) in Fate.GONE:
+			fallen += 1
+	y += 24.0
+	var fl := "Of the five he met on the road: %d stand with him%s" % [Fate.allies(Game), (", %d fallen" % fallen) if fallen > 0 else ""]
+	_say(Vector2(x0, y), fl, UI.fit(fl, 14, w), Trials.KINDS.bond.col, a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
 	_say(Vector2(x0, r.end.y - 18.0), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)

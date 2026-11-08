@@ -35,6 +35,10 @@ var suppress_note := ""
 ## whether the trial's boss has been brought low enough to be enraged
 var boon := {}
 var enraged := false
+## Fates and Faces (lore.gd): the story of a species met for the first time, on a card over the
+## battle's opening ({"n", "text"}, or empty)
+var lore_card := {}
+const LORE_INTRO := 4.6
 
 # 3D stage
 var stages := {}
@@ -181,6 +185,9 @@ func _build_fighters() -> void:
 		var sc := 1.0
 		if f.side == "foe":
 			sc = 2.6 if boss else 1.35
+			# (a person met on the road, fate.gd, stands a little taller than life, not as a giant)
+			if str(f.shape).begins_with("person:"):
+				sc = 1.25
 		m.scale = Vector3.ONE * sc
 		var holder := Node3D.new()
 		holder.add_child(m)
@@ -247,6 +254,16 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	tide_used = false
 	state = "intro"
 	timer = INTRO_BOSS if c.get("boss", false) else 1.4
+	# the bestiary (lore.gd): every species met is remembered, and the first meeting with an ordinary
+	# one tells its story over the opening (there is time to read it)
+	lore_card = {}
+	for f in foes:
+		var fid: String = str(f.id)
+		if not Game.bestiary.has(fid) and not f.boss and lore_card.is_empty() and Lore.BEAST.has(fid):
+			lore_card = {"n": str(f.name), "text": str(Lore.BEAST[fid])}
+		Game.bestiary[fid] = int(Game.bestiary.get(fid, 0)) + 1
+	if not lore_card.is_empty():
+		timer = maxf(timer, LORE_INTRO)
 	order.clear()
 	round_no = 0
 	outcome = ""
@@ -377,7 +394,11 @@ func _assist() -> bool:
 		f.hp = maxf(0.0, f.hp - dmg)
 		f.flash = 0.35
 		fx.append({"text": str(dmg), "p": head3(f), "t": 1.0, "col": Color("8ae0c0"), "slash": ""})
-		say("Your allies strike %s for %d." % [f.name, dmg])
+		# (an old bond, fate.gd, names who came)
+		var who := str(ctx.get("path_n", "Your allies")) if str(ctx.get("path_kind", "")) == str(Trials.KINDS.bond.n) else "Your allies"
+		if who.begins_with("By "):
+			who = "The friends you made"
+		say("%s strike %s for %d." % [who, f.name, dmg])
 		if f.hp <= 0.0:
 			f.dead = true
 			Game.kills += 1
@@ -897,6 +918,13 @@ func _draw_ui() -> void:
 		UI.text(self, Vector2(VIEW.x * 0.5 - 330, 116), f0.name, UI.fit(f0.name, 34, 660, 24), Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, 660)
 		var sub := "Heavenly Tribulation" if ctx.get("tribulation", false) else "%s  -  weak to %s" % [str(f0.elem).capitalize(), str(f0.weak).capitalize()]
 		UI.text(self, Vector2(VIEW.x * 0.5 - 330, 146), sub, 16, Color(ec.r, ec.g, ec.b, a), HORIZONTAL_ALIGNMENT_CENTER, 660)
+	# a species met for the first time: its story (lore.gd), over the opening
+	if state == "intro" and not lore_card.is_empty():
+		var la := clampf(minf(LORE_INTRO - timer, timer) * 2.0, 0.0, 1.0)
+		var lr := Rect2(VIEW.x * 0.5 - 380, 64, 760, 150)
+		UI.panel(self, lr, Color(0.03, 0.03, 0.08, 0.85 * la), Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, la))
+		UI.text(self, lr.position + Vector2(20, 30), "First meeting: " + str(lore_card.n), 18, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, la))
+		UI.wrapped(self, lr.position + Vector2(20, 58), str(lore_card.text), 16, Color(UI.C_TEXT.r, UI.C_TEXT.g, UI.C_TEXT.b, la), lr.size.x - 40)
 	# command menu
 	if state == "menu":
 		UI.menu_list(self, Rect2(16, 556, 270, 150), labels, cursor, enabled, 20 if labels.size() < 5 else 16)

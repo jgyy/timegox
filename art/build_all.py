@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 ART = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(ART)
-GROUPS = ("characters", "monsters", "props")
+GROUPS = ("characters", "monsters", "mounts", "props")
 
 
 def runner():

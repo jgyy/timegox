@@ -24,7 +24,8 @@ extends RefCounted
 ## the trials passed and how, and the ending names the road a player walked most.  Requirements are
 ## arrays: ["lv", n], ["peak", n], ["temper", n], ["ranks", n], ["item", id, n], ["give", id, n],
 ## ["stones", n], ["renown", n], ["dao", id or "", tier], ["standing", race, n], ["friends", n],
-## ["gates", n].  "give" and "stones" are paid when the path is taken (once: a lost battle does not
+## ["gates", n], and (Fates and Faces, fate.gd) ["fate", thread, [states]] (a fated encounter ended
+## up in one of those states) and ["bonds", n] (so many of the five stand with Lin Feng).  "give" and "stones" are paid when the path is taken (once: a lost battle does not
 ## charge again, see Game.paid).
 ##
 ## Everything here takes the game state `g` as an argument (the Game autoload in play, a game state
@@ -38,8 +39,10 @@ const KINDS := {
 	"dao": {"n": "By the Dao", "col": Color("a8c8ff"), "what": "the road you walk"},
 	"peoples": {"n": "By friendship", "col": Color("8ae0c0"), "what": "the friendship of a people"},
 	"relic": {"n": "By a relic", "col": Color("c8a8ff"), "what": "something found and kept"},
+	# Fates and Faces: somebody whose life Lin Feng changed comes to help (fate.gd)
+	"bond": {"n": "By an old bond", "col": Color("f0a8d8"), "what": "somebody whose fate you shaped"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -114,12 +117,21 @@ const RECIPES := {
 	"drought_fan": {"at": "alchemist", "in": {"ess_fire": 8, "noon_ember": 2}, "stones": 120000, "after": "s_p13_gates", "for": "yu_shi"},
 	"clear_mirror": {"at": "smith", "in": {"ess_metal": 8, "jingwei_stone": 2}, "stones": 140000, "after": "s_p13_gates", "for": "red_banner"},
 	"kui_drumstick": {"at": "smith", "in": {"ess_earth": 8, "wind_bell": 2}, "stones": 130000, "after": "s_p13_gates", "for": "kui_drum"},
+	# ---- Part XIV: a mirror in which a debt can see whether it was ever owed
+	"settled_mirror": {"at": "smith", "in": {"ess_dark": 8, "ess_metal": 6, "wheel_spoke": 2}, "stones": 200000, "after": "s_p14_judge", "for": "nie"},
 	"homing_elixir": {"at": "alchemist", "in": {"ess_wood": 5, "ess_fire": 5, "ess_water": 5, "ess_earth": 5, "ess_metal": 5, "autumn_leaf": 1}, "stones": 300000, "after": "s_p13_gates", "for": "chiyou"},
 }
 
+## What a recipe costs in spirit stones: Alchemist Mo's are cheaper with the Hag's apprentice at his
+## side (fate.gd, Liu Ying).
+static func recipe_stones(id: String, g) -> int:
+	var r: Dictionary = RECIPES[id]
+	var k := 1.0 - (Fate.mo_discount(g) if str(r.at) == "alchemist" else 0.0)
+	return int(round(int(r.get("stones", 0)) * k))
+
 static func can_craft(id: String, g) -> bool:
 	var r: Dictionary = RECIPES[id]
-	if g.stones < int(r.get("stones", 0)):
+	if g.stones < recipe_stones(id, g):
 		return false
 	for k in r.in:
 		if int(g.inv.get(k, 0)) < int(r.in[k]):
@@ -131,7 +143,7 @@ static func craft(id: String, g) -> bool:
 	if not can_craft(id, g):
 		return false
 	var r: Dictionary = RECIPES[id]
-	g.stones -= int(r.get("stones", 0))
+	g.stones -= recipe_stones(id, g)
 	for k in r.in:
 		g.inv[k] = int(g.inv.get(k, 0)) - int(r.in[k])
 	g.inv[id] = int(g.inv.get(id, 0)) + 1
@@ -157,7 +169,7 @@ static func recipe_text(id: String, g) -> String:
 	for k in r.in:
 		parts.append("%d %s (have %d)" % [int(r.in[k]), Data.ITEMS[k].n, int(g.inv.get(k, 0))])
 	if int(r.get("stones", 0)) > 0:
-		parts.append("%s spirit stones (have %s)" % [_num(int(r.stones)), _num(g.stones)])
+		parts.append("%s spirit stones (have %s)%s" % [_num(recipe_stones(id, g)), _num(g.stones), " (Liu Ying's price)" if recipe_stones(id, g) < int(r.stones) else ""])
 	return ", ".join(parts)
 
 # ---------------------------------------------------------------- deeds: what townsfolk ask for
@@ -470,6 +482,9 @@ const TRIALS := {
 			{"id": "might", "kind": "might", "n": "Faster than the fire", "needs": [["lv", 41], ["temper", 8]], "boon": {},
 				"desc": "Late Star River Crossing and a sword tempered eight times: catch the crane before the fire catches up.",
 				"line": "Lin Feng runs the dyke road faster than the fire can follow."},
+			{"id": "bond", "kind": "bond", "n": "Tala's cloud-horses", "needs": [["fate", "tala", ["well", "bought"]]], "boon": {"assist": 0.025, "taken": 0.85},
+				"desc": "The horse-folk owe you a well. Tala's riders know how to run a fire-bird ragged: in circles, until it has no fire left to drop.",
+				"line": "Tala's horse-folk come over the burnt millet at a gallop, whooping, and Bifang has forty riders to chase instead of one."},
 		]},
 	"gun": {"might": [1.4, 1.1],
 		"why": "Gun stole the swelling earth from heaven to stop the flood, and he is still building his wall in the middle of it. Every clod he presses into place grows a mountain, and you have to get through them to reach him.",
@@ -518,6 +533,9 @@ const TRIALS := {
 			{"id": "might", "kind": "might", "n": "One voice louder than eight", "needs": [["lv", 50], ["ranks", 24]], "boon": {},
 				"desc": "Late Three Realms Concord, and twenty-four ranks of the Nine Heavens root awake.",
 				"line": "Lin Feng tells Tianwu to be quiet, once, and all eight heads stop to look at him."},
+			{"id": "bond", "kind": "bond", "n": "Liu Ying's antidote", "needs": [["fate", "liu_ying", ["physician", "alchemist"]]], "boon": {"assist": 0.02, "taken": 0.8},
+				"desc": "The Hag's apprentice knows every poison on the isles and the answer to each. Tianwu's eight heads breathe venom; she has eight antidotes ready.",
+				"line": "Liu Ying uncorks eight little bottles at once, and the venom from Tianwu's eight mouths turns to steam in the air."},
 		]},
 	"demon_lord": {"might": [1.5, 1.15],
 		"why": "Xu Mo's palace drinks blood from the moon. Inside its walls the Demon Lord heals faster than a blade can cut, and his aura alone has broken three sects. Nobody has ever walked into the throne hall and walked out again.",
@@ -619,6 +637,9 @@ const TRIALS := {
 			{"id": "might", "kind": "might", "n": "At the peak of your strength", "needs": [["peak", 32], ["ranks", 18]], "boon": {},
 				"desc": "Cultivation full at Late Primordial Sovereign, and eighteen ranks of the Nine Heavens root awake.",
 				"line": "Lin Feng takes the wet brush out of King Yama's hand and puts it down on the desk, very gently."},
+			{"id": "bond", "kind": "bond", "n": "Qiu Ye at your side", "needs": [["fate", "qiu_ye", ["brother", "turning"]]], "boon": {"assist": 0.025, "taken": 0.85},
+				"desc": "Qiu Ye walked his father to the Naihe Bridge. He knows the Wheel's courts from the queue, and he has nothing left to fear from them.",
+				"line": "Qiu Ye walks into King Yama's court beside Lin Feng with his grandfather's sword drawn, and does not bow."},
 		]},
 	# ---- Part VII
 	"qianxian": {"might": [1.55, 1.15],
@@ -636,6 +657,9 @@ const TRIALS := {
 			{"id": "might", "kind": "might", "n": "At the peak of your strength", "needs": [["peak", 35], ["ranks", 20]], "boon": {},
 				"desc": "Cultivation full at Late Samsara Transcendence, and twenty ranks of the Nine Heavens root awake.",
 				"line": "Lin Feng climbs the threads hand over hand to the top of the Loom, and Qianxian stops weaving to watch him come."},
+			{"id": "bond", "kind": "bond", "n": "Fang Hu and the village watch", "needs": [["fate", "hu", ["watchman", "guardian", "disciple"]]], "boon": {"assist": 0.025, "taken": 0.85},
+				"desc": "Iron Fang's son grew up in the village the Weaver stitched shut. He knows every thread of hers that runs through Qingshi, and where to cut.",
+				"line": "Fang Hu comes up the Loom's stair with the village watch behind him, cutting threads with his father's iron hand."},
 		]},
 	# ---- Part VIII
 	"xiwangmu": {"might": [1.55, 1.15],
@@ -704,6 +728,9 @@ const TRIALS := {
 			{"id": "might", "kind": "might", "n": "At the peak of your strength", "needs": [["peak", 47], ["dao", "", 2]], "boon": {},
 				"desc": "Cultivation full at Late Mountain-River Oneness, and Master of the Dao you walk.",
 				"line": "Lin Feng puts his shoulder under the iron weight beside Li's, and lifts."},
+			{"id": "bond", "kind": "bond", "n": "Xu Lan's lantern", "needs": [["fate", "xu_lan", ["forgiving", "just"]]], "boon": {"assist": 0.025, "taken": 0.85},
+				"desc": "Xu Lan settled her father's shade in Youdu herself. The Dark Capital's lanterns answer to the one who carried his.",
+				"line": "Xu Lan lifts her father's empty soul-lantern, and every lantern in the Dark Capital turns its light on Li."},
 		]},
 	# ---- Part XII
 	"xu_fu": {"might": [1.6, 1.2],
@@ -827,6 +854,23 @@ const TRIALS := {
 				"desc": "The drum was made to carry a name across a battlefield. Bring a name the whole world already knows, and it will beat for you.",
 				"line": "The drum beats Lin Feng's name across the land, and from every town on the road somebody answers."},
 		]},
+	# ---- Part XIV: the reckoning at the heart of the Wheel
+	"nie": {"might": [1.8, 1.2],
+		"why": "Nie is not a creature but a reckoning: every grudge of every foe Lin Feng put down on the road, every promise half-kept, every thread he cut instead of tying. It is as strong as the road was long, and the road was very long.",
+		"paths": [
+			{"id": "bond", "kind": "bond", "n": "By the bonds you made", "needs": [["bonds", 3]], "boon": {"assist": 0.035, "taken": 0.8},
+				"desc": "At least three of the five whose lives you changed stand with you. Nie is made of debts; it does not know what to do with a debt that was paid in friendship.",
+				"line": "They come down the funeral road behind him, the ones he kept faith with, and Nie's many hands do not know which of them to reach for first."},
+			{"id": "might", "kind": "might", "n": "Pay it all yourself", "needs": [["peak", 56], ["temper", 8]], "boon": {},
+				"desc": "Cultivation full at Late Myriad Daos as One and a sword tempered eight times: strength enough to stand in front of every debt of the journey at once and pay it.",
+				"line": "Lin Feng walks into the heart of the Wheel alone and holds out his hands, the way a debtor does who means to pay."},
+			{"id": "respect", "kind": "respect", "n": "A name the dead respect", "needs": [["renown", 760]], "boon": {"assist": 0.03, "taken": 0.85},
+				"desc": "Half of Nie's grudges belong to the dead, and the dead have heard of you. A name the whole world respects makes even a grudge hesitate.",
+				"line": "Lin Feng gives his name at the heart of the Wheel, and half of the voices in Nie fall quiet to listen."},
+			{"id": "craft", "kind": "craft", "n": "A mirror of settled debts", "needs": [["item", "settled_mirror", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Smith Tie can forge a mirror from two spokes of the Wheel with dark and metal essence: a debt that sees itself in it remembers whether it was ever owed at all.",
+				"line": "Lin Feng holds up the mirror of settled debts, and a great many of Nie's tallies look into it and quietly burn."},
+		]},
 	# ---- Part XIII: the heart of the formation.  Three roads to the end
 	"chiyou": {"might": [2.0, 1.25],
 		"why": "Chiyou, war god of the Nine Li, bronze-headed and iron-browed, who ate sand and stone and made the first weapons of metal. He fought the Yellow Emperor through a hundred days of fog. The formation that held him is breaking, and he remembers nothing but the war.",
@@ -872,6 +916,10 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 			return friends(g) >= int(n[1])
 		"gates":
 			return g.gates_open.size() >= int(n[1])
+		"fate":
+			return str(g.fates.get(str(n[1]), "")) in n[2]
+		"bonds":
+			return Fate.allies(g) >= int(n[1])
 	return false
 
 ## How many peoples of the realms call Lin Feng friend (or kin).
@@ -915,6 +963,14 @@ static func need_text(n: Array, g) -> String:
 			return "%d peoples of the realms call you Friend (now %d)" % [int(n[1]), friends(g)]
 		"gates":
 			return "%d of the Eight Gates open (now %d)" % [int(n[1]), g.gates_open.size()]
+		"fate":
+			var th: String = str(n[1])
+			var names: Array = []
+			for stn in n[2]:
+				names.append(str(Fate.state_text(th, str(stn))[0]).to_lower())
+			return "%s: %s (now: %s)" % [str(Fate.THREADS[th].n).get_slice(",", 0), " or ".join(names), str(Fate.state_text(th, str(g.fates.get(th, "")))[0]).to_lower()]
+		"bonds":
+			return "%d of the five you met on the road stand with you (now %d)" % [int(n[1]), Fate.allies(g)]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1008,7 +1064,7 @@ static func favourite_kind(g) -> String:
 	return best
 
 const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron and Forge", "wealth": "the Open Hand", "respect": "Whom the World Respects",
-	"dao": "Walker of Many Roads", "peoples": "Friend of the Four Realms", "relic": "Keeper of Old Things"}
+	"dao": "Walker of Many Roads", "peoples": "Friend of the Four Realms", "relic": "Keeper of Old Things", "bond": "Who Kept Faith"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

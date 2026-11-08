@@ -43,7 +43,7 @@ func _build3d() -> void:
 	MB.mesh_node(scene3d, pond.build(MB.mat_plain()))
 	var lot := Models.lotus(Color(0.6, 0.9, 1.0), 1.3)
 	scene3d.add_child(lot)
-	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": false, "glow": Color(0.5, 0.85, 1.0), "hair": "topknot", "trim": Color("e8f0ff")})
+	hero = Models.hero({"glow": Color(0.5, 0.85, 1.0)})
 	hero.position = Vector3(0, 0.25, 0)
 	scene3d.add_child(hero)
 	comp = Models.person(Color("e86a9a"), Color("402030"), {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "hair": "long", "eyes": Color("c04080")})

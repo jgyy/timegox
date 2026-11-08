@@ -97,6 +97,13 @@ var cue_npc := ""
 var cine_k := 0.0
 var cine_pos := Vector3.ZERO
 var cine_a := 0.0
+## Fates and Faces (fashion.gd): the ride under the party (rebuilt when another is summoned), its own
+## clock (a gallop runs faster than the world's), and how far the hero's model is behind the outfit
+## and the look he has now (`hero_sig`: the model is rebuilt when they change)
+var mount: Node3D = null
+var mount_id := ""
+var ride_clk := 0.0
+var hero_sig := ""
 
 func _build3d() -> void:
 	opaque = false
@@ -106,7 +113,7 @@ func _build3d() -> void:
 	scene3d.add_child(sun)
 	fill = Look.fill("sect")
 	scene3d.add_child(fill)
-	player = Models.person(Color("3a8ae8"), Color("1a1a2a"), HERO_OPTS)
+	player = Models.hero({"glow": HERO_OPTS.glow})
 	player.add_child(Models.shadow_disc(0.55))
 	scene3d.add_child(player)
 	hero_light = OmniLight3D.new()
@@ -607,6 +614,9 @@ func ent_visible(e: Dictionary) -> bool:
 				return false
 		"portal":
 			return true
+	# somebody met on the road (fate.gd): there while the story has them there
+	if e.get("fate", false) and not Fate.present(Game, str(e.id)):
+		return false
 	var v = e.get("vis", ["", ""])
 	if v[0] != "" and not Game.reached(v[0]):
 		return false
@@ -1194,8 +1204,65 @@ func _read_keys() -> Vector2i:
 		held_dir = [-r, r, f, -f][k]
 	return held_dir
 
+## Whether the party is in the saddle here: riding, with a ride, out of doors (never inside a building,
+## upstairs or in a cellar), not on the stairs or the Jianmu and not busy with something.
+func riding_here() -> bool:
+	if not Game.riding or Game.ride == "" or is_floor() or not trip.is_empty() or not using.is_empty():
+		return false
+	return building_at(ptile).is_empty() and (move_t < 0.0 or building_at(target).is_empty())
+
+## Seconds to cross one tile: running, or faster in the saddle (Fashion.RIDES speed).
+func step_time() -> float:
+	if riding_here():
+		return STEP_T / float(Fashion.RIDES[Game.ride].speed)
+	return STEP_T
+
+## R (or the bot's "ride"): whistle up the ride and get on, or get off and send it away.
+func toggle_ride() -> void:
+	if Game.ride == "" or Game.rides.is_empty():
+		Game.toast("You have no ride yet.")
+		return
+	Game.riding = not Game.riding
+	if Game.riding:
+		Game.toast("You ride the %s" % Fashion.RIDES[Game.ride].n)
+		if is_floor() or not building_at(ptile).is_empty():
+			Game.toast("(once you are out of doors)")
+	else:
+		Game.toast("You get down from the %s" % Fashion.RIDES[Game.ride].n)
+	if not headless():
+		Fx3D.dust(scene3d, _player_pos(), Color("f0f0ff"))
+
+## The hero's model again, when the look or the outfit has changed (the wardrobe, character creation).
+## `preview_id` shows another outfit for a moment (the wardrobe's cursor); "" goes back to his own.
+var preview_id := ""
+
+func preview_outfit(id: String) -> void:
+	preview_id = id
+	refresh_hero()
+
+func refresh_hero() -> void:
+	var oid := preview_id if preview_id != "" else Game.outfit
+	var keep: String = Game.outfit
+	Game.outfit = oid
+	var cols := Fashion.hero_colors(Game)
+	Game.outfit = keep
+	var sig := "%s|%s|%s" % [str(Game.hero), oid, str(cols)]
+	if sig == hero_sig or player == null:
+		return
+	hero_sig = sig
+	var at := player.transform
+	var old := player
+	player = Models.hero({"glow": HERO_OPTS.glow, "outfit": oid, "cols": cols})
+	player.add_child(Models.shadow_disc(0.55))
+	scene3d.add_child(player)
+	player.transform = at
+	old.remove_child(hero_light)
+	player.add_child(hero_light)
+	old.queue_free()
+
 func _move(d: float) -> void:
 	var budget := d
+	var st := step_time()
 	while budget > 0.0001:
 		if move_t < 0.0:
 			if move_dir == Vector2i.ZERO:
@@ -1215,7 +1282,7 @@ func _move(d: float) -> void:
 			var q := FWD.find(facing)
 			if q >= 0:
 				cam_q = q
-		var need := (1.0 - move_t) * STEP_T
+		var need := (1.0 - move_t) * st
 		if budget >= need:
 			budget -= need
 			ptile = target
@@ -1225,7 +1292,7 @@ func _move(d: float) -> void:
 			if rid != area_id:
 				_enter_region(rid)
 		else:
-			move_t += budget / STEP_T
+			move_t += budget / st
 			budget = 0.0
 
 func face_entity():
@@ -1276,7 +1343,11 @@ func _update_view(d: float) -> void:
 	if not using.is_empty():
 		# doing something (props.gd): the hero and Yue Ling are placed and moved by it
 		_use_pose(d)
+	elif riding_here():
+		_ride_view(d, pp)
 	else:
+		if mount != null:
+			mount.visible = false
 		player.position = pp
 		var want_yaw := atan2(float(facing.x), float(facing.y))
 		player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
@@ -1349,6 +1420,46 @@ func _update_view(d: float) -> void:
 	_cutscene(d, pp)
 	if cam_override != null:
 		cam.global_transform = cam_override
+
+## In the saddle: the ride stands where the hero would, turned the way he goes, galloping or standing;
+## he sits on it (astride a beast, standing on a vehicle) and Yue Ling behind him, both moving with it.
+func _ride_view(d: float, pp: Vector3) -> void:
+	if mount == null or mount_id != Game.ride:
+		if mount != null:
+			mount.queue_free()
+		mount = Models.ride(Game.ride)
+		mount_id = Game.ride
+		scene3d.add_child(mount)
+		Fx3D.dust(scene3d, pp, Color("f0f0ff"))
+	var r: Dictionary = Fashion.RIDES[Game.ride]
+	mount.visible = true
+	var moving := move_t >= 0.0
+	ride_clk += d * (1.0 if not moving else float(r.speed))
+	var want_yaw := atan2(float(facing.x), float(facing.y))
+	mount.position = pp
+	mount.rotation.y = lerp_angle(mount.rotation.y, want_yaw, 1.0 - exp(-d * 10.0))
+	var rise := Models.anim_ride(mount, ride_clk, moving)
+	var standing := str(r.kind) == "vehicle"
+	var clip := "ride_stand" if standing else ("ride" if moving else "ride_idle")
+	var basis := Basis(Vector3.UP, mount.rotation.y)
+	# the hips go to the seat (astride, the clip keeps them 0.88 m over the model's feet); standing on
+	# a deck, the feet do
+	var lift := 0.9 if not standing else 0.0
+	player.position = pp + basis * (Vector3(r.seat) + rise) - Vector3(0, lift, 0)
+	player.rotation = Vector3(0, mount.rotation.y, 0)
+	Models.anim_person(player, t, false, false, clip if Assets.has_clip(player, clip) else "sit")
+	comp.visible = Game.companion
+	if Game.companion:
+		comp.position = pp + basis * (Vector3(r.pillion) + rise) - Vector3(0, lift, 0)
+		comp.rotation = Vector3(0, mount.rotation.y, 0)
+		comp_pos = comp.position
+		comp_run = false
+		Models.anim_person(comp, t + 1.0, false, false, clip if Assets.has_clip(comp, clip) else "sit")
+	# a little dust from the hooves, or the wake of a vehicle
+	var sp := fmod(t * 6.0, 2.0)
+	if moving and int(sp) != step_side:
+		step_side = int(sp)
+		Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path) if not standing else Color("e8f0ff"))
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:
@@ -1524,8 +1635,12 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 				m.rotation.y = lerp_angle(m.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 5.0))
 			var s := Game.cur_step()
 			var mark: Label3D = n.get_meta("mark")
-			var quest: bool = not s.is_empty() and s.kind == "talk" and s.npc == e.id
+			# (a fated encounter's chapter, fate.gd, and the Part XIII and XIV steps of people in any order)
+			var quest: bool = not s.is_empty() and ((s.kind == "talk" or s.kind == "fate") and s.npc == e.id
+				or (s.kind == "visits" or s.kind == "fates") and str(e.id) in s.npcs and not Game.visited.has(str(e.id)))
 			mark.visible = quest
+			if quest and e.get("fate", false):
+				mark.modulate = Fate.THREADS[Fate.thread_of_npc(str(e.id))].col
 			if quest:
 				mark.position.y = 3.1 + sin(t * 4.0) * 0.15
 		"enemy", "boss":
@@ -1616,7 +1731,7 @@ func _draw_hud() -> void:
 		UI.text(self, Vector2(VIEW.x - 506, 56), obj, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
 	else:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35), obj, 15, UI.C_TEXT, 486)
-	UI.text(self, Vector2(VIEW.x - 330, VIEW.y - 14), "Arrows/WASD move   Q/E camera   Z/Enter act   Esc menu", 13, UI.C_DIM)
+	UI.text(self, Vector2(VIEW.x - 400, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   Z/Enter act   Esc menu", 13, UI.C_DIM)
 	_draw_minimap()
 	if banner_t > 0.0:
 		var a := clampf(banner_t, 0.0, 1.0)

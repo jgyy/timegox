@@ -282,6 +282,315 @@ static func person(robe: Color, hair: Color, o: Dictionary = {}) -> Node3D:
 	root.scale = Vector3(sc, sc, sc)
 	return root
 
+## Lin Feng as the player made him (character creation) and as he is dressed (the wardrobe):
+## his look's Blender model recoloured for his hair, eyes and robes (Assets.hero_instance) and what
+## his outfit hangs on him (accessory, on his bones).  `o` takes the usual person options ("glow",
+## "scale") and may override the look ("look"), the colours ("cols") and the outfit ("outfit"): the
+## character creation and the wardrobe preview draw him that way before anything is chosen.
+static func hero(o: Dictionary = {}) -> Node3D:
+	# (the Game autoload when there is one; the story's own hero in tests and tools)
+	var ml := Engine.get_main_loop() as SceneTree
+	var g = ml.root.get_node_or_null("Game") if ml != null and ml.root != null else null
+	var look_id: String = str(o.get("look", g.hero.get("look", "sweeper") if g != null and not g.hero.is_empty() else "sweeper"))
+	var asset: String = str(Fashion.LOOKS.get(look_id, Fashion.LOOKS.sweeper).asset)
+	if not Assets.has(Assets.PEOPLE.get(asset, "")):
+		return person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "hair": "topknot"})
+	var cols: Dictionary = o.get("cols", Fashion.hero_colors(g) if g != null and not g.hero.is_empty() else {})
+	var root := Assets.hero_instance(Assets.PEOPLE[asset], cols)
+	root.set_meta("kind", "person")
+	root.set_meta("hero", true)
+	if o.has("glow"):
+		var gc: Color = o.glow
+		var gd := MB.new()
+		gd.disc(Vector3(0, 0.05, 0), 0.75, Color(gc.r, gc.g, gc.b, 0.35), 24, Color(gc.r, gc.g, gc.b, 0.0))
+		gd.arc(Vector3(0, 0.055, 0), 0.62, 0.025, 0.0, TAU, Color(gc.r, gc.g, gc.b, 0.5), 32)
+		var gm := _mi(root, gd, MB.mat_glow())
+		gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var oid: String = str(o.get("outfit", g.outfit if g != null else "sweeper"))
+	var outfit: Dictionary = Fashion.OUTFITS.get(oid, Fashion.OUTFITS.sweeper)
+	var trim: Color = cols.get("trim", Color("e8f0ff"))
+	for acc_id in outfit.acc:
+		dress(root, str(acc_id), trim)
+	var sc: float = o.get("scale", 1.0)
+	root.scale = Vector3(sc, sc, sc)
+	return root
+
+## Hang accessory `id` (Fashion.ACCESSORY_BONES) on a person model's bone; `col` tints its trims.
+## Returns false if the model has no skeleton with that bone.
+static func dress(m: Node3D, id: String, col: Color = Color("f0c850")) -> bool:
+	var sks := m.find_children("*", "Skeleton3D", true, false)
+	if sks.is_empty():
+		return false
+	var sk := sks[0] as Skeleton3D
+	var bones: Array = [str(Fashion.ACCESSORY_BONES.get(id, "head"))]
+	if id == "pauldrons":
+		bones = ["upper_arm.L", "upper_arm.R"]
+	for bn in bones:
+		var bi := sk.find_bone(bn)
+		if bi < 0:
+			return false
+		var ba := BoneAttachment3D.new()
+		ba.bone_name = bn
+		ba.name = "acc_%s_%s" % [id, bn.replace(".", "_")]
+		sk.add_child(ba)
+		# built in model space round the bone's rest, then carried into the bone's frame
+		var rest := sk.get_bone_global_rest(bi)
+		var node := accessory(id, col, 1.0 if bn.ends_with(".L") else -1.0)
+		node.transform = rest.affine_inverse() * node.transform
+		ba.add_child(node)
+	m.set_meta("dressed", true)
+	return true
+
+## The things outfits hang on the hero, built in his model space (he faces +Z, his head bone starts
+## at 1.56 m, his chest at 1.28 m, his shoulders at +-0.17 m, 1.4 m up).
+static func accessory(id: String, col: Color, side: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	var b := MB.new()
+	var g := MB.new()
+	var gold := MB.tag(Color("e8c050"), MB.METAL)
+	match id:
+		"straw_hat":
+			# a wide conical douli of plaited straw, a darker band round the crown and a red cord
+			var straw := MB.tag(Color("d8b878"), MB.WOOD)
+			b.cone(Vector3(0, 1.98, -0.01), 0.44, 0.2, straw, Vector3.ZERO, 18)
+			b.cyl(Vector3(0, 1.9, -0.01), 0.43, 0.012, MB.tag(Color("b89858"), MB.WOOD), Vector3.ZERO, 18)
+			b.torus(Vector3(0, 1.93, -0.01), 0.22, 0.03, MB.tag(Color("8a6a3a"), MB.WOOD))
+			for s2 in [-1.0, 1.0]:
+				b.limb(Vector3(0.1 * s2, 1.9, 0.02), Vector3(0.09 * s2, 1.62, 0.08), 0.006, 0.005, MB.tag(Color("b83030"), MB.CLOTH), 5)
+		"jade_crown":
+			# a small guan of jade and gold on the crown, pierced by a long pin
+			var jade := MB.tag(Color("6ad8a8"), MB.CRYSTAL)
+			b.lathe(Vector3(0, 1.93, -0.04), [Vector2(0.05, 0.0), Vector2(0.058, 0.025), Vector2(0.05, 0.06), Vector2(0.018, 0.08)], jade, 14)
+			b.torus(Vector3(0, 1.935, -0.04), 0.11, 0.012, gold)
+			b.cyl(Vector3(0, 1.975, -0.04), 0.006, 0.26, gold, Vector3(0, 0, PI / 2), 6)
+			g.ball(Vector3(0.13, 1.975, -0.04), 0.014, Color(0.6, 1.0, 0.85, 0.9))
+		"phoenix_crest":
+			# a gold band round the brow with a phoenix rising from it at the front
+			b.torus(Vector3(0, 1.79, 0.0), 0.25, 0.018, gold, Vector3(0.12, 0, 0))
+			b.cone(Vector3(0, 1.88, 0.1), 0.035, 0.12, MB.tag(Color("f0a030"), MB.METAL), Vector3(0.3, 0, 0), 6)
+			for k in 5:
+				var a := -0.9 + k * 0.45
+				b.leaf(Vector3(0, 1.88, 0.1), Vector3(sin(a) * 0.12, 1.97 + cos(a) * 0.05, 0.06), 0.03, MB.tag(Color("e84a2a"), MB.CLOTH), Vector3(cos(a), -sin(a), 0), MB.tag(Color("f8c040"), MB.CLOTH))
+			g.ball(Vector3(0, 1.86, 0.13), 0.016, Color(1.0, 0.5, 0.2, 0.9))
+		"dragon_horns":
+			# two coral horn-combs swept back from the temples
+			for s3 in [-1.0, 1.0]:
+				b.limb(Vector3(0.08 * s3, 1.86, 0.02), Vector3(0.13 * s3, 1.98, -0.1), 0.02, 0.004, MB.tag(Color("f08a6a"), MB.CRYSTAL), 6)
+				b.limb(Vector3(0.11 * s3, 1.93, -0.05), Vector3(0.16 * s3, 1.95, -0.02), 0.008, 0.002, MB.tag(Color("f8b090"), MB.CRYSTAL), 5)
+		"veil_hat":
+			# a traveller's wide flat hat, its brim hung with a short fringe of beads against the dust
+			var lac := MB.tag(Color("3a2a2a"), MB.WOOD)
+			b.cyl(Vector3(0, 1.95, -0.01), 0.4, 0.02, lac, Vector3.ZERO, 20)
+			b.lathe(Vector3(0, 1.95, -0.01), [Vector2(0.13, 0.0), Vector2(0.12, 0.08), Vector2(0.0, 0.1)], lac, 14)
+			b.torus(Vector3(0, 1.965, -0.01), 0.27, 0.014, MB.tag(col, MB.CLOTH))
+			for k2 in 24:
+				var a2 := TAU * k2 / 24.0
+				b.limb(Vector3(cos(a2) * 0.39, 1.94, sin(a2) * 0.39 - 0.01), Vector3(cos(a2) * 0.4, 1.84, sin(a2) * 0.4 - 0.01), 0.004, 0.004, MB.tag(col.darkened(0.2), MB.CLOTH), 4)
+		"ink_mask":
+			# a lacquered half-mask over the eyes, black with a violet rim, its brow in a curl
+			b.sph(Vector3(0, 1.74, 0.105), Vector3(0.13, 0.055, 0.05), MB.tag(Color("15121c"), MB.WOOD))
+			b.torus(Vector3(0, 1.74, 0.11), 0.24, 0.008, MB.tag(Color("8a6ad8"), MB.METAL), Vector3(PI / 2, 0, 0))
+			g.ball(Vector3(0.045, 1.74, 0.155), 0.012, Color(0.7, 0.5, 1.0, 0.8))
+			g.ball(Vector3(-0.045, 1.74, 0.155), 0.012, Color(0.7, 0.5, 1.0, 0.8))
+		"pauldrons":
+			# one curved plate over the shoulder (built per side), gold on white lacquer
+			var sx := 0.2 * side
+			b.hemi(Vector3(sx, 1.42, -0.01), Vector3(0.12, 0.075, 0.12), MB.tag(Color("f0e8d8"), MB.METAL), Vector3(0, 0, -0.35 * side))
+			b.hemi(Vector3(sx + 0.02 * side, 1.37, -0.01), Vector3(0.13, 0.06, 0.13), gold, Vector3(0, 0, -0.55 * side))
+			g.ball(Vector3(sx, 1.49, 0.0), 0.016, Color(1.0, 0.85, 0.4, 0.8))
+		"feather_mantle":
+			# a collar of long feathers round the shoulders and down the back, in the trim's colour
+			for k3 in 18:
+				var a3 := -PI * 0.85 + PI * 1.7 * k3 / 17.0
+				var rr := 0.2
+				var base := Vector3(sin(a3) * rr, 1.45, cos(a3) * rr * 0.75 - 0.02)
+				var tip := base + Vector3(sin(a3) * 0.14, -0.2 - 0.08 * absf(cos(a3 * 0.5)), cos(a3) * 0.08 - 0.06)
+				b.leaf(base, tip, 0.05, MB.tag(col if k3 % 2 == 0 else col.darkened(0.25), MB.CLOTH), Vector3(cos(a3), 0, -sin(a3)), MB.tag(col.lightened(0.3), MB.CLOTH))
+		"star_cloak":
+			# a collar of night-blue silk with the Silver River's small stars caught in it
+			b.torus(Vector3(0, 1.46, -0.02), 0.32, 0.035, MB.tag(Color("141c40"), MB.CLOTH))
+			for k4 in 9:
+				var a4 := -PI * 0.8 + PI * 1.6 * k4 / 8.0
+				g.ball(Vector3(sin(a4) * 0.17, 1.47 + 0.02 * sin(k4 * 2.0), cos(a4) * 0.12 - 0.03), 0.014, Color(0.85, 0.9, 1.0, 0.95))
+	if not b.is_empty():
+		_mi(root, b)
+	if not g.is_empty():
+		var gm := _mi(root, g, MB.mat_glow())
+		gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return root
+
+# ---------------------------------------------------------------- rides (fashion.gd RIDES)
+## A ride: the horse is Blender-built (art/mounts/horse.py) in a dun coat; the qilin and the tiger are
+## the Blender monsters in the colours of the Azure Qilin and Bai Hu, with a saddle laid on their
+## backs; the flying sword, the cloud and the sky-barque are built here.  Faces +Z, origin on the
+## ground; "seat" and "pillion" in Fashion.RIDES are where the riders' hips go.
+static func ride(id: String) -> Node3D:
+	var r: Dictionary = Fashion.RIDES.get(id, {})
+	var root := Node3D.new()
+	root.name = "ride_" + id
+	root.set_meta("ride", id)
+	var sc := float(r.get("scale", 1.0))
+	match str(r.get("model", "")):
+		"horse":
+			if Assets.has(Assets.MOUNTS.horse):
+				var m := Assets.mount("horse", Assets.palette(Color("c8a060"), "", {"sec": Color("1c1612"), "acc": Color("b83a30"), "mark": Color("3a2a1a")}))
+				root.add_child(m)
+				root.set_meta("anim", m)
+		"qilin", "tiger":
+			var shape: String = str(r.model)
+			var enemy := "azure_qilin" if shape == "qilin" else "white_tiger"
+			if Assets.has_monster(shape):
+				var d: Dictionary = Data.ENEMIES[enemy]
+				var m2 := Assets.monster(shape, d.col, enemy)
+				m2.scale = Vector3.ONE * sc
+				root.add_child(m2)
+				root.set_meta("anim", m2)
+			root.add_child(_saddle(Vector3(r.seat) + Vector3(0, -0.06, 0), Color("2a5aa8") if shape == "qilin" else Color("a83a30")))
+		"sword":
+			root.add_child(_flying_sword())
+		"cloud":
+			root.add_child(_cloud_ride())
+		"barque":
+			root.add_child(_sky_barque())
+	return root
+
+## A saddle for a beast that was never meant to wear one: a cloth over the back, a leather seat with a
+## high pommel, and stirrups.
+static func _saddle(seat: Vector3, cloth: Color) -> Node3D:
+	var n := Node3D.new()
+	var b := MB.new()
+	var leather := MB.tag(Color("6a3e22"), MB.WOOD)
+	b.box(seat + Vector3(0, -0.05, 0), Vector3(0.62, 0.035, 0.62), MB.tag(cloth, MB.CLOTH))
+	for s in [-1.0, 1.0]:
+		b.box(seat + Vector3(0.33 * s, -0.22, 0), Vector3(0.04, 0.36, 0.56), MB.tag(cloth.darkened(0.15), MB.CLOTH), Vector3(0, 0, -0.25 * s))
+		b.limb(seat + Vector3(0.17 * s, -0.02, 0.04), seat + Vector3(0.3 * s, -0.5, 0.08), 0.012, 0.012, leather, 4)
+		b.torus(seat + Vector3(0.3 * s, -0.53, 0.08), 0.1, 0.02, MB.tag(Color("a8acb8"), MB.METAL), Vector3(0, 0, PI / 2))
+	b.lathe(seat + Vector3(0, -0.04, 0), [Vector2(0.0, 0.0), Vector2(0.17, 0.0), Vector2(0.18, 0.04), Vector2(0.12, 0.07), Vector2(0.0, 0.075)], leather, 14, Color(0, 0, 0, -1), Vector2(0.85, 1.5))
+	b.box(seat + Vector3(0, 0.05, 0.2), Vector3(0.12, 0.12, 0.05), leather, Vector3(-0.3, 0, 0))
+	b.box(seat + Vector3(0, 0.04, -0.2), Vector3(0.22, 0.09, 0.05), leather, Vector3(0.35, 0, 0))
+	_mi(n, b)
+	return n
+
+## His own jian grown three paces long, edge-on to the wind, a hand's breadth over the road: the blade
+## glows along its edges and trails a little light.
+static func _flying_sword() -> Node3D:
+	var n := Node3D.new()
+	var lift := _pivot(n, Vector3(0, 0.7, 0), "lift")
+	var b := MB.new()
+	var steel := MB.tag(Color("c8d4e8"), MB.METAL)
+	var steel_d := MB.tag(Color("8a9ab8"), MB.METAL)
+	# the blade: a long flat diamond section, the ridge down its middle, the point at the front
+	b.box(Vector3(0, 0, 0.25), Vector3(0.36, 0.05, 2.6), steel)
+	b.box(Vector3(0, 0.03, 0.25), Vector3(0.06, 0.03, 2.6), steel_d)
+	b.prim("cone4", Transform3D(Basis.from_euler(Vector3(PI / 2, PI / 4, 0)).scaled(Vector3(0.36, 0.5, 0.05)), Vector3(0, 0, 1.8)), steel)
+	# the guard, the grip wound in blue cord and the pommel with its tassel
+	b.box(Vector3(0, 0, -1.08), Vector3(0.62, 0.1, 0.12), MB.tag(Color("d8b050"), MB.METAL))
+	b.cyl(Vector3(0, 0, -1.4), 0.06, 0.55, MB.tag(Color("2a4a8a"), MB.CLOTH), Vector3(PI / 2, 0, 0), 10)
+	b.ball(Vector3(0, 0, -1.7), 0.09, MB.tag(Color("d8b050"), MB.METAL))
+	b.ribbon([Vector3(0, -0.04, -1.75), Vector3(0, -0.2, -1.95), Vector3(0, -0.3, -2.2)], [0.05, 0.05, 0.02], Vector3.RIGHT, MB.tag(Color("3a7ae8"), MB.CLOTH))
+	_mi(lift, b)
+	var g := MB.new()
+	for s in [-1.0, 1.0]:
+		g.box(Vector3(0.19 * s, 0.0, 0.25), Vector3(0.02, 0.03, 2.6), Color(0.6, 0.85, 1.0, 0.85))
+	g.disc(Vector3(0, -0.6, 0.0), 1.1, Color(0.5, 0.8, 1.0, 0.25), 20, Color(0.5, 0.8, 1.0, 0.0))
+	var gm := _mi(lift, g, MB.mat_glow())
+	gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	n.set_meta("lift", lift)
+	return n
+
+## A five-coloured auspicious cloud: puffs of white over a curl of gold, a ruyi scroll at its front.
+static func _cloud_ride() -> Node3D:
+	var n := Node3D.new()
+	var lift := _pivot(n, Vector3(0, 0.45, 0), "lift")
+	var b := MB.new()
+	var whites := [Color("f8f8ff"), Color("eef0fa"), Color("f8f0f4")]
+	for i in 16:
+		var a := i * 2.399
+		var rr := 0.25 + 0.6 * fmod(i * 0.37, 1.0)
+		b.sph(Vector3(cos(a) * rr * 1.1, 0.05 + 0.08 * fmod(i * 0.61, 1.0), sin(a) * rr * 1.5), Vector3(0.45, 0.28, 0.45) * (0.8 + 0.4 * fmod(i * 0.23, 1.0)), MB.tag(whites[i % 3], MB.CLOTH))
+	# the five colours in its underside: tinted puffs round the rim, under the white
+	var five := [Color("f8b0b0"), Color("f8e0a0"), Color("b0f0c0"), Color("b0d0f8"), Color("e0c0f8")]
+	for k in 10:
+		var a2 := TAU * k / 10.0
+		b.sph(Vector3(cos(a2) * 0.95, -0.12, sin(a2) * 1.25), Vector3(0.36, 0.2, 0.36), MB.tag(five[k % 5], MB.CLOTH))
+	_mi(lift, b, MB.mat_plain())
+	var g := MB.new()
+	g.disc(Vector3(0, -0.4, 0), 1.3, Color(1.0, 0.95, 0.8, 0.3), 20, Color(1.0, 0.9, 0.7, 0.0))
+	var gm := _mi(lift, g, MB.mat_glow())
+	gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	n.set_meta("lift", lift)
+	return n
+
+## The Sky-Barque of Landfall: a small boat with Mazu's painted eyes on the bow, a sail of Yumin
+## feathers, and two feather-wings either side that let it sail on the wind over land.
+static func _sky_barque() -> Node3D:
+	var n := Node3D.new()
+	var lift := _pivot(n, Vector3(0, 0.55, 0), "lift")
+	var b := MB.new()
+	var hull := MB.tag(Color("7a5434"), MB.WOOD)
+	var hull_d := MB.tag(Color("4a3220"), MB.WOOD)
+	b.lathe(Vector3(0, -0.2, 0.0), [Vector2(0.12, 0.0), Vector2(0.55, 0.12), Vector2(0.66, 0.36), Vector2(0.62, 0.5)], hull, 12, Color(0, 0, 0, -1), Vector2(1.0, 2.9))
+	b.box(Vector3(0, 0.28, 0.0), Vector3(1.1, 0.05, 3.0), MB.tag(Color("a07850"), MB.WOOD))
+	b.box(Vector3(0, 0.44, 1.6), Vector3(0.8, 0.3, 0.4), hull, Vector3(-0.4, 0, 0))
+	for s in [-1.0, 1.0]:
+		b.disc(Vector3(0.6 * s, 0.32, 1.45), 0.1, MB.tag(Color("f0ece0"), MB.CLOTH), 10, Color(0, 0, 0, -1), Vector3(0, 0, PI / 2 * s))
+		b.ball(Vector3(0.63 * s, 0.32, 1.47), 0.045, MB.tag(Color("1a1a24"), MB.STONE))
+		# a wing of long feathers, swept back from the gunwale
+		for k in 6:
+			var root := Vector3(0.62 * s, 0.3, 0.6 - k * 0.32)
+			b.leaf(root, root + Vector3((1.1 - k * 0.1) * s, 0.25 - k * 0.04, -0.45), 0.16, MB.tag(Color("e8ecf4") if k % 2 == 0 else Color("b8c8e0"), MB.CLOTH), Vector3(0, 1, 0), MB.tag(Color("6a8ab8"), MB.CLOTH))
+	# mast and a sail of feathers sewn on cloth, red-bordered
+	b.cyl(Vector3(0, 1.4, 0.2), 0.05, 2.3, hull_d)
+	b.box(Vector3(0, 1.5, 0.12), Vector3(0.03, 1.6, 1.3), MB.tag(Color("f0e8d8"), MB.CLOTH))
+	b.box(Vector3(0, 2.3, 0.12), Vector3(0.05, 0.05, 1.4), MB.tag(Color("c8302a"), MB.CLOTH))
+	b.box(Vector3(0, 0.7, 0.12), Vector3(0.05, 0.05, 1.4), MB.tag(Color("c8302a"), MB.CLOTH))
+	_mi(lift, b)
+	var g := MB.new()
+	g.ball(Vector3(0, 0.75, -1.35), 0.12, Color(1.0, 0.45, 0.3, 0.9))
+	g.disc(Vector3(0, -0.5, 0), 1.4, Color(1.0, 0.7, 0.5, 0.2), 20, Color(1.0, 0.6, 0.4, 0.0))
+	var gm := _mi(lift, g, MB.mat_glow())
+	gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	n.set_meta("lift", lift)
+	return n
+
+## Move a ride: the animal's gait (galloping, walking or standing; `clk` its own clock) or the
+## vehicle's hover (a slow bob, and a lean into the turn).  Returns how far the seat has risen or
+## fallen with it (the riders move with it).
+static func anim_ride(n: Node3D, clk: float, moving: bool) -> Vector3:
+	if n.has_meta("anim"):
+		var m: Node3D = n.get_meta("anim")
+		var clip := "idle"
+		if moving:
+			clip = "run" if Assets.has_clip(m, "run") else "walk"
+		Assets.animate(m, clk, clip, 0.0)
+		return _body_rise(m)
+	var off := Vector3.ZERO
+	for c in n.get_children():
+		if c.has_meta("lift"):
+			var lift: Node3D = c.get_meta("lift")
+			var base_y := lift.position.y
+			if not lift.has_meta("y0"):
+				lift.set_meta("y0", base_y)
+			var y0: float = lift.get_meta("y0")
+			var bob := sin(clk * (2.6 if moving else 1.4)) * (0.05 if moving else 0.07)
+			lift.position.y = y0 + bob
+			lift.rotation.z = sin(clk * 1.1) * (0.04 if moving else 0.02)
+			lift.rotation.x = -0.05 if moving else 0.0
+			off = Vector3(0, bob, 0)
+	return off
+
+## How far the body of a rigged mount has risen from its rest (the riders bob with the gallop).
+static func _body_rise(m: Node3D) -> Vector3:
+	var sks := m.find_children("*", "Skeleton3D", true, false)
+	if sks.is_empty():
+		return Vector3.ZERO
+	var sk := sks[0] as Skeleton3D
+	var bi := sk.find_bone("body")
+	if bi < 0:
+		return Vector3.ZERO
+	var d := sk.get_bone_global_pose(bi).origin - sk.get_bone_global_rest(bi).origin
+	return Vector3(0, d.y, 0) * m.scale.y
+
 ## A Blender-built character (art/characters/*.py) with the same glow pool as procedural people.
 static func _glb_person(o: Dictionary) -> Node3D:
 	var root := Assets.person(o.asset)
@@ -807,6 +1116,13 @@ static func _eyes(g: MB, b: MB, pos: Vector3, spread: float, r: float, col: Colo
 const FALLBACK := {"scorpion": "crab", "mushroom": "plant", "mammoth": "beast", "moth": "bird", "hundun": "jelly", "fox": "beast", "carp": "serpent", "oxhead": "demon", "horseface": "demon", "jiangshi": "humanoid", "qilin": "beast", "ape": "beast", "tiger": "beast", "queen": "humanoid", "warden": "humanoid", "crowmarshal": "humanoid", "kaiming": "beast", "magpie": "bird", "sun_crow": "bird", "jade_rabbit": "beast", "bifang": "bird"}
 
 static func monster(shape: String, col: Color, boss: bool = false, enemy: String = "") -> Node3D:
+	# somebody met on the road who comes to blows with Lin Feng (fate.gd): their own character model
+	if shape.begins_with("person:"):
+		var pn := person(col, col.darkened(0.5), {"asset": shape.substr(7), "sword": true})
+		pn.set_meta("kind", "person")
+		if boss:
+			_boss_halo(pn, col)
+		return pn
 	if Assets.has_monster(shape):
 		var gm := Assets.monster(shape, col, enemy)
 		if boss:
@@ -1602,7 +1918,8 @@ static func _humanoid_monster(shape: String, col: Color, boss: bool) -> Node3D:
 	var n: Node3D
 	match shape:
 		"hero":
-			n = person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff")})
+			# Lin Feng as the player made and dressed him (character creation, the wardrobe)
+			n = hero({"glow": Color(0.4, 0.7, 1.0)})
 		"healer":
 			n = person(Color("e86a9a"), Color("402030"), {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")})
 		"demon":

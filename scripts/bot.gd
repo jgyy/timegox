@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 19.0 * 3600.0
+var max_time := 22.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -65,10 +65,27 @@ var last_layer := ""
 ## and the road it takes into the heart of them (--route=sword|peoples|cauldron).
 const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord": "respect", "inferno_lord": "might", "heavenly_emperor": "wealth",
 	"founder_qing": "respect", "hollow_heaven": "craft", "registrar_siming": "craft", "jade_ledger": "might", "vermilion_bird": "wealth",
-	"hundun": "respect", "horse_face": "craft", "king_yama": "craft", "thread_matron": "respect", "qianxian": "wealth",
-	"crow_marshal": "craft", "xiwangmu": "respect", "bifang": "might", "xihe": "craft", "gun": "craft", "gonggong": "might",
+	"hundun": "respect", "horse_face": "craft", "king_yama": "bond", "thread_matron": "respect", "qianxian": "bond",
+	"crow_marshal": "craft", "xiwangmu": "respect", "bifang": "bond", "xihe": "craft", "gun": "craft", "gonggong": "might",
 	"chong": "dao", "li": "dao", "tianwu": "wealth", "xu_fu": "dao",
-	"fetter_maple": "relic", "kui_drum": "might", "liang": "dao", "xingtian": "wealth"}
+	"fetter_maple": "relic", "kui_drum": "might", "liang": "dao", "xingtian": "wealth",
+	# Part XIV: the friends it kept faith with come to the Wheel
+	"nie": "bond"}
+## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
+## order of preference (the first that can be taken), so that one run walks friends and foes alike:
+## Tala, Qiu Ye and Fang Hu become friends, Xu Lan an enemy spared at the end, Liu Ying an enemy who
+## falls.  "<step>:follow" is the choice after a chapter's battle.
+const FATE_PLAN := {
+	"s_f_hu1": ["village"], "s_f_liu1": ["keep"], "s_f_qiu1": ["share", "secret"], "s_f_tala1": ["drive"], "s_f_xu1": ["surrender"],
+	"s_f_xu2": ["stop", "trust", "first"], "s_f_qiu2": ["duel", "break", "hand"], "s_f_tala2": ["lead", "hunt"], "s_f_liu2": ["stop", "essence", "teach"],
+	"s_f_qiu3": ["walk", "farewell"], "s_f_hu2": ["fight", "teach"], "s_f_tala3": ["dig", "buy", "sell"], "s_f_hu3": ["truth", "offer", "fight"],
+	"s_f_xu3": ["stop", "forgive"], "s_f_liu3": ["stop", "forbid"],
+	"s_f_tala4": ["ride", "buyback", "absolve"], "s_f_qiu4": ["together", "vouch", "ask", "face"], "s_f_hu4": ["together", "face"],
+	"s_f_xu4": ["face", "together"], "s_f_xu4:follow": ["spare"], "s_f_liu4": ["face", "together"], "s_f_liu4:follow": ["end"],
+	"s_f_qiu4:follow": ["spare"], "s_f_hu4:follow": ["spare", "why"],
+}
+## the small choices of the road (fate.gd PICKS)
+const PICK_PLAN := {"qilin": "ride"}
 const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
@@ -145,6 +162,36 @@ func _apply_start() -> void:
 			Game.inv[st2.item] = maxi(int(Game.inv.get(st2.item, 0)), st2.n)
 		if st2.kind == "kill" and Trials.TRIALS.has(st2.boss):
 			Game.trials[st2.boss] = str(TRIAL_PLAN.get(st2.boss, "might"))
+		# the fated encounters met so far, as the plan would have chosen (what they give included)
+		if st2.kind == "fate":
+			var fv := Fate.variant(Game, str(st2.id))
+			var pick := {}
+			for want in FATE_PLAN.get(str(st2.id), []):
+				var o := Fate.option(fv, str(want))
+				if not o.is_empty() and o.get("need", []).is_empty():
+					pick = o
+					break
+			if pick.is_empty():
+				for o2 in fv.get("options", []):
+					if o2.get("need", []).is_empty():
+						pick = o2
+						break
+			if pick.has("follow"):
+				var fo := {}
+				for want2 in FATE_PLAN.get(str(st2.id) + ":follow", []):
+					fo = Fate.option(pick.follow, str(want2))
+				pick = fo if not fo.is_empty() else pick.follow.options[0]
+			if not pick.is_empty():
+				Fate.take(Game, Fate.thread_of_step(str(st2.id)), pick)
+	# and what the story gave on the way (the Elder's robe, the flying sword, an immortal's cloud)
+	for st3 in Data.STEPS.slice(0, idx):
+		for rw in Fashion.step_rewards(str(st3.id)):
+			if rw[0] == "outfit":
+				Game.outfits[str(rw[1])] = true
+			else:
+				Game.rides[str(rw[1])] = true
+	if not Game.rides.is_empty():
+		Game.ride = Fashion.best_ride(Game)
 	Game.heal_full()
 	Game.note("bot-start: jumped to step %d (%s) at %s" % [idx, Data.STEPS[idx].id, Data.level_name(lv)])
 
@@ -202,6 +249,8 @@ func _process(d: float) -> void:
 				cool = 0.6
 			else:
 				_press("confirm", 1.0)
+		"create":
+			_create()
 		"dialogue":
 			_dialogue()
 		"world":
@@ -230,6 +279,16 @@ func _log_new_events() -> void:
 		var e: Dictionary = Game.timeline[logged]
 		print("[bot] %s  %s" % [Fmt.clock(e.t), e.text])
 		logged += 1
+
+# ---------------------------------------------------------------- character creation (create.gd)
+## The bot makes the sweeper the story first told of (every choice at its first value) and looks at
+## each row on the way down, as a player reading the screen would.
+func _create() -> void:
+	var c = main.create
+	if c.cursor < c.ROWS.size() - 1:
+		_press("down", 0.6)
+	else:
+		_press("confirm", 0.8)
 
 # ---------------------------------------------------------------- dialogue
 func _dialogue() -> void:
@@ -334,6 +393,17 @@ func _world(d: float) -> void:
 	if _hp_ratio() < 0.5 or _qi_ratio() < 0.15:
 		_start_meditate("rest")
 		return
+	# 1a) Fates and Faces: ride whenever there is a ride (it waits outside buildings by itself), and
+	# wear the newest outfit earned
+	if Game.ride != "" and not Game.riding:
+		_press("ride", 0.35)
+		return
+	var fit := _want_outfit()
+	if fit != "":
+		menu_goal = "wardrobe"
+		world.move_dir = Vector2i.ZERO
+		_press("cancel", 0.4)
+		return
 	# 2) shopping while in the sect
 	var shop := _want_shop()
 	if shop != "":
@@ -359,6 +429,12 @@ func _world(d: float) -> void:
 	match s.kind:
 		"talk":
 			_goto_entity(s.area, s.npc)
+		"fate":
+			# a fated encounter may come to blows: go to it rested, as to a boss
+			if _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity(s.area, s.npc)
 		"level":
 			if not _cult_met():
 				_grind()
@@ -400,10 +476,13 @@ func _world(d: float) -> void:
 			else:
 				menu_goal = "breakthrough"
 				_press("cancel", 0.4)
-		"visits":
-			# Part XIII: the nearest of the people still to visit (any of them, in any order)
+		"visits", "fates":
+			# Part XIII: the nearest of the people still to visit (any of them, in any order); Part XIV:
+			# the nearest of the five fated encounters still to settle
 			var vt := _visit_target()
-			if vt != "":
+			if s.kind == "fates" and (_hp_ratio() < 0.85 or _qi_ratio() < 0.6):
+				_start_meditate("rest")
+			elif vt != "":
 				_goto_entity(Trials.npc_area(vt), vt)
 		"gates":
 			# Part XIII: the next of the Eight Gates (any four, in any order)
@@ -654,6 +733,29 @@ func _planned_talent(ids: Array) -> String:
 			return t
 	return str(ids[0]) if not ids.is_empty() else ""
 
+## The newest outfit earned, if the bot is not wearing it ("" if it is).
+func _want_outfit() -> String:
+	var best := ""
+	for id in Fashion.OUTFIT_ORDER:
+		if Game.outfits.has(id):
+			best = id
+	return best if best != Game.outfit else ""
+
+## The option of a fated encounter's choice the plan prefers (the first in FATE_PLAN that can be taken).
+func _fate_pick(c, ids: Array) -> int:
+	var sid: String = str(main.fate_sid)
+	# (the follow-up choice after a chapter's battle has its own plan)
+	var keys := [sid + ":follow", sid] if not main.choice.cancel_ok else [sid]
+	for key in keys:
+		for want in FATE_PLAN.get(key, []):
+			var k: int = ids.find(want)
+			if k >= 0 and c.options[k].get("enabled", true):
+				return k
+	for k2 in ids.size():
+		if c.options[k2].get("enabled", true):
+			return k2
+	return 0
+
 ## The choice screen (Part XI): the Dao the plan wants; a gift is kept; a branch of the root as the
 ## plan says (Part XII).
 func _choice() -> void:
@@ -661,6 +763,20 @@ func _choice() -> void:
 	var ids: Array = c.ids()
 	var want := -1
 	var tt := _trial_target()
+	var st := Game.cur_step()
+	if str(c.title).begins_with("The wardrobe"):
+		want = ids.find(_want_outfit())
+		if want < 0:
+			want = ids.find(Game.outfit)
+		_nav(ids.size(), c.cursor, want)
+		return
+	for pk in PICK_PLAN:
+		if str(c.title) == str(Fate.PICKS[pk].ask):
+			_nav(ids.size(), c.cursor, ids.find(PICK_PLAN[pk]))
+			return
+	if not st.is_empty() and (st.kind == "fate" or st.kind == "fates") and not str(c.title).ends_with("how will you face it?"):
+		_nav(ids.size(), c.cursor, _fate_pick(c, ids))
+		return
 	if str(c.title).ends_with("how will you face it?"):
 		# a trial: the path the plan chose (cancel if it cannot be taken after all)
 		want = ids.find(str(tt.get("pid", ""))) if not tt.is_empty() else -1

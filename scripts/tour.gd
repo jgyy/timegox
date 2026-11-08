@@ -143,6 +143,9 @@ func _gallery(n: String, models: Array, spacing: float, yaw: float = 0.35) -> vo
 	for k in 40:
 		t0 += 1.0 / 30.0
 		for m2 in models:
+			if m2.get_meta("kind", "") == "ride_group":
+				# (a ride with its riders, posed once: Fates and Faces)
+				continue
 			if m2.get_meta("kind", "") == "person":
 				Models.anim_person(m2, t0 + 3.0, false)
 			else:
@@ -706,6 +709,177 @@ func _prop_spot(lw: Dictionary, e: Dictionary) -> Vector2i:
 
 ## The state the bot's run (seed 1234) reaches the ending in: every trial passed the way its plan
 ## takes it, the heart by the Road of the Many Peoples, and the run's numbers (the clock stopped).
+## Fates and Faces (--fates): character creation, the hero's looks and outfits, the rides, the people
+## met on the road, the wardrobe, the Fates page, a chapter and its choice, a fated battle, the bestiary
+## and Nie at the heart of the Wheel.
+func _fates_state(step_id: String, lv: int) -> void:
+	Game.reset()
+	Game.level = lv
+	Game.exp = float(Game.exp_need()) * 0.4
+	Game.companion = true
+	Game.stones = 52000
+	Game.renown = 220
+	Game.step = Data.step_index(step_id)
+	Game.outfits = {"sweeper": true, "inner": true, "hunter": true, "dragon": true, "phoenix": true, "celestial": true, "immortal": true}
+	Game.rides = {"pony": true, "sword": true, "qilin": true, "cloud": true}
+	Game.ride = "pony"
+	Game.fates = {"tala": "rider", "qiu_ye": "friend", "hu": "watchman", "xu_lan": "hunted", "liu_ying": "rival"}
+	Game.fate_log = {}
+	for th in Game.fates:
+		var lg: Array = []
+		for ch in Fate.PATH[th]:
+			var v: Dictionary = FateText.CHAPTERS.get(str(ch[0]), {}).get("by", {}).values()[0] if FateText.CHAPTERS.has(str(ch[0])) else {}
+			if not v.is_empty() and lg.size() < 2:
+				lg.append(str(v.options[0].log))
+		Game.fate_log[th] = lg
+	Game.heal_full()
+
+func _fates_shots() -> void:
+	# character creation over the moonlit cliff, the story's sweeper and a sweeper of one's own
+	main.set_stack(["title"])
+	main.open_creation()
+	await _wait(1.5)
+	await _shot("create")
+	main.create.h = {"family": "Bai", "given": "Chen", "look": "wild", "hair": 2, "eyes": 3, "robe": 1, "origin": "hunter"}
+	main.create.cursor = 2
+	main.create._preview()
+	await _wait(1.5)
+	await _shot("create_custom")
+	main.set_stack(["title"])
+	# the four looks in four colourings, and the outfits
+	var looks: Array = []
+	var cs := [{}, {"hair": Color("5a3424"), "eyes": Color("2eb07e"), "robe": Color("2e9a6e"), "sec": Color("163a2c"), "trim": Color("e8f4e0")},
+		{"hair": Color("dfe6ee"), "eyes": Color("8a50d0"), "robe": Color("b8323a"), "sec": Color("3a1418"), "trim": Color("f0d8a0")},
+		{"hair": Color("1e2c5c"), "eyes": Color("e0a030"), "robe": Color("6a48b0"), "sec": Color("241840"), "trim": Color("e8dcff")}]
+	for k in Fashion.LOOK_ORDER.size():
+		looks.append(Models.hero({"look": Fashion.LOOK_ORDER[k], "cols": cs[k], "outfit": "sweeper"}))
+	await _gallery("hero_looks", looks, 0.8)
+	var outs: Array = []
+	for oid in ["inner", "dragon", "phoenix", "celestial", "ink", "starlit", "sea", "conclave"]:
+		Game.outfit = oid
+		outs.append(Models.hero({"outfit": oid, "cols": Fashion.hero_colors(Game)}))
+	Game.outfit = "sweeper"
+	await _gallery("outfits", outs, 0.62)
+	# the five people met on the road, as they are first met and as they grow
+	var folk: Array = []
+	for pid in ["tala", "qiu_ye", "little_hu", "hu_grown", "xu_lan", "liu_ying"]:
+		folk.append(Models.person(Color("888888"), Color("222222"), {"asset": pid}))
+	await _gallery("fated_people", folk, 0.7)
+	await _portraits("fated_portraits", [Models.person(Color.WHITE, Color.BLACK, {"asset": "tala"}), Models.person(Color.WHITE, Color.BLACK, {"asset": "qiu_ye"}),
+		Models.person(Color.WHITE, Color.BLACK, {"asset": "hu_grown"}), Models.person(Color.WHITE, Color.BLACK, {"asset": "xu_lan"}), Models.person(Color.WHITE, Color.BLACK, {"asset": "liu_ying"})])
+	# the rides, each with Lin Feng and Yue Ling on board
+	var rides: Array = []
+	for rid in Fashion.RIDE_ORDER:
+		var r: Dictionary = Fashion.RIDES[rid]
+		var holder := Node3D.new()
+		var rn := Models.ride(rid)
+		holder.add_child(rn)
+		var standing := str(r.kind) == "vehicle"
+		var clip := "ride_stand" if standing else "ride_idle"
+		var lift := 0.0 if standing else 0.9
+		var rise := Models.anim_ride(rn, 0.3, false)
+		var h1 := Models.hero({})
+		h1.position = Vector3(r.seat) + rise - Vector3(0, lift, 0)
+		holder.add_child(h1)
+		var y1 := Models.person(Color("e86a9a"), Color("402030"), {"asset": "yue_ling"})
+		y1.position = Vector3(r.pillion) + rise - Vector3(0, lift, 0)
+		holder.add_child(y1)
+		for pm in [h1, y1]:
+			Assets.animate(pm, 0.0, clip, 0.0)
+			Assets.animate(pm, 0.4, clip, 0.0)
+		holder.rotation.y = PI / 2.0
+		holder.set_meta("kind", "ride_group")
+		rides.append(holder)
+	await _gallery("rides", rides, 1.15, 0.0)
+	# riding in the world: the horse on the road from the sect's north gate, and the flying sword
+	_fates_state("s_f_qiu1", 3)
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.load_area("sect", Vector2i(20, 9))
+	for rid2 in ["pony", "sword", "cloud"]:
+		Game.ride = rid2
+		Game.riding = true
+		main.world.teleport(Atlas.to_world("mountain", Vector2i(82, 48)))
+		main.world.facing = Vector2i(0, -1)
+		main.world.move_dir = Vector2i(0, -1)
+		await _wait(1.2)
+		var pp: Vector3 = main.world.player.global_position
+		main.world.cam_override = Transform3D(Basis.IDENTITY, pp + Vector3(6.5, 2.4, 1.0)).looking_at(pp + Vector3(0, 1.3, -0.6), Vector3.UP)
+		await _wait(0.4)
+		await _shot("riding_" + rid2)
+		main.world.move_dir = Vector2i.ZERO
+		main.world.cam_override = null
+	Game.riding = false
+	# the wardrobe: the cursor on the Heaven-Gate Armour, and the hero in it
+	main.world.teleport(Atlas.to_world("sect", Vector2i(20, 12)))
+	main.world.facing = Vector2i(0, 1)
+	await _wait(0.6)
+	main.open_wardrobe()
+	main.choice.cursor = Fashion.OUTFIT_ORDER.find("celestial")
+	main.choice._show()
+	await _wait(0.8)
+	await _shot("wardrobe")
+	main.choice.press("cancel")
+	# the Fates page and the Bestiary
+	Game.bestiary = {"bamboo_wolf": 12, "bandit": 9, "leaf_sprite": 7, "mire_toad": 5, "bog_wraith": 4, "thunder_ape": 3}
+	Game.told = {"jade_mantis": true, "iron_fang": true, "marsh_hag": true}
+	main.open_menu()
+	main.menu.mode = "fates"
+	main.menu._build()
+	await _wait(0.4)
+	await _shot("fates_page")
+	main.menu.mode = "bestiary"
+	main.menu._build()
+	main.menu.cursor = 1
+	await _wait(0.4)
+	await _shot("bestiary")
+	main.pop()
+	# a chapter: Xu Lan in the inner sanctum, and the choice it ends in
+	_fates_state("s_f_xu1", 12)
+	Game.fates.erase("xu_lan")
+	main.world.clear_cache()
+	main.world.load_area("palace", Vector2i(48, 25))
+	main.world.facing = Vector2i(0, -1)
+	await _wait(1.0)
+	main.play_chapter("s_f_xu1", {})
+	await _wait(5.0)
+	await _shot("fate_chapter")
+	while main.top_name() == "dialogue":
+		main.dialogue.idx = main.dialogue.lines.size() - 1
+		main.dialogue.shown = 999.0
+		main.press("confirm")
+		await _wait(0.2)
+	await _wait(0.4)
+	await _shot("fate_choice")
+	main.choice.press("cancel")
+	# a fated battle: Qiu Ye of the Ashen Moon among the sword saints' barrows
+	_fates_state("s_f_qiu2", 19)
+	main.world.clear_cache()
+	main.world.load_area("grave", Vector2i(10, 28))
+	main.battle.start([{"id": "qiu_ye", "lv": 19}], {"boss": true, "fate": "s_f_qiu2", "fate_opt": {}, "theme": main.world.theme_name})
+	main.push("battle")
+	await _wait(3.0)
+	await _shot("battle_fate_qiu_ye")
+	main.pop()
+	# a species met for the first time: its story over the opening
+	Game.bestiary = {}
+	main.battle.start([{"id": "thunder_ape", "lv": 10}, {"id": "storm_hawk", "lv": 9}], {"boss": false, "theme": "thunder"})
+	main.push("battle")
+	await _wait(2.2)
+	await _shot("battle_lore")
+	main.pop()
+	# Part XIV: Nie, the Unpaid, at the heart of the Wheel, the friends Lin Feng made striking with him
+	_fates_state("s_p14_nie", 55)
+	main.world.clear_cache()
+	main.world.load_area("wheel", Vector2i(70, 30))
+	var nb: Dictionary = Trials.path("nie", "bond").boon
+	main.battle.start([{"id": "nie", "lv": 56, "mult": 1.8, "atk": 1.2}], {"boss": true, "enemy": "nie", "theme": main.world.theme_name, "trial": "nie", "path": "bond", "boon": nb,
+		"path_n": "By the bonds you made", "path_kind": str(Trials.KINDS.bond.n)})
+	main.push("battle")
+	await _wait(3.4)
+	await _shot("battle_boss_nie")
+	main.pop()
+
 func _ending_state() -> void:
 	Game.level = 54
 	Game.dao = "heart"
@@ -1199,6 +1373,8 @@ func _run() -> void:
 		await _part12_galleries()
 	if main.args.has("props"):
 		await _props_shots()
+	if main.args.has("fates"):
+		await _fates_shots()
 	if main.args.has("ending"):
 		# the ending on its own (--ending): its film and the results
 		_ending_state()

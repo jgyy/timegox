@@ -28,9 +28,25 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Dao & Peoples", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "dao", "map", "annals", "resume"]
-		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, Game.dao != "" or not Game.met.is_empty(), main.world.mini_tex != null, true, true]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Dao & Peoples", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "dao", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
+		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, Game.dao != "" or not Game.met.is_empty(),
+			true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+	elif mode == "bestiary":
+		labels = []
+		ids = []
+		enabled = []
+		for e in bestiary():
+			labels.append(e[1])
+			ids.append(e[0])
+			enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "fates":
+		labels = ["Back"]
+		ids = ["back"]
+		enabled = [true]
 	elif mode == "cultivation":
 		# Part XII: the realm and the branches of the root; an awakening not yet spent can be spent here
 		labels = ["Wake a branch (%d)" % Game.talent_pts, "Back"]
@@ -77,7 +93,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode == "items" or mode == "map" or mode == "annals" or mode == "dao" or mode == "cultivation" or mode == "journal":
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -126,6 +142,20 @@ func press(act: String) -> void:
 					mode = "annals"
 					cursor = 0
 					_build()
+				"bestiary":
+					mode = "bestiary"
+					cursor = 0
+					_build()
+				"fates":
+					mode = "fates"
+					cursor = 0
+					_build()
+				"wardrobe":
+					main.pop()
+					main.open_wardrobe()
+				"stable":
+					main.pop()
+					main.open_stable()
 				"resume":
 					main.pop()
 				"back":
@@ -133,7 +163,7 @@ func press(act: String) -> void:
 					cursor = 0
 					_build()
 				_:
-					if mode == "annals":
+					if mode == "annals" or mode == "bestiary":
 						return
 					msg = Game.use_item_field(id)
 					_build()
@@ -164,6 +194,62 @@ static func annals() -> Array:
 				words.append("On the wall: \"%s\"" % ab.motto)
 				out.append(["cave:" + str(ab.id), "   " + str(ab.n), "\n\n".join(words)])
 	return out
+
+## The Bestiary (Fates and Faces, lore.gd): every foe Lin Feng has met or been told of, in the order
+## the story meets them, each [id, label, story].
+static func bestiary() -> Array:
+	var out: Array = []
+	for id in Data.ENEMIES:
+		if not Game.bestiary.has(id) and not Game.told.has(id):
+			continue
+		var story := Lore.story(id)
+		if story == "":
+			continue
+		var boss: bool = Data.ENEMIES[id].get("boss", false)
+		out.append([id, ("* " if boss else "") + str(Data.ENEMIES[id].n), story])
+	return out
+
+func _draw_bestiary() -> void:
+	UI.text(self, Vector2(60, 70), "Bestiary", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var entries := bestiary()
+	if cursor < entries.size():
+		var e: Array = entries[cursor]
+		var d: Dictionary = Data.ENEMIES[e[0]]
+		var ec: Color = Data.ELEM_COLORS.get(d.elem, UI.C_TEXT)
+		UI.text(self, r.position + Vector2(24, 40), str(d.n), 24, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		var kind := "Boss" if d.get("boss", false) else "Met in %d battle%s" % [int(Game.bestiary.get(e[0], 0)), "" if int(Game.bestiary.get(e[0], 0)) == 1 else "s"]
+		UI.text(self, r.position + Vector2(24, 70), "%s  -  %s, weak to %s" % [kind, str(d.elem).capitalize(), str(d.weak).capitalize()], 16, ec, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		UI.wrapped(self, r.position + Vector2(24, 110), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
+	else:
+		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
+
+## The Fates page (fate.gd): the five people whose lives Lin Feng has changed, what he made of each
+## so far (their state, and every choice in order) and where their story will take him next.
+func _draw_fates() -> void:
+	var r := Rect2(30, 20, 1220, 680)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 40), "Fates: the people whose lives you changed", 24, UI.C_GOLD)
+	UI.text(self, r.position + Vector2(24, 66), "%d of the five stand with you. Choices made here are remembered to the end." % Fate.allies(Game), 15, UI.C_DIM)
+	var y := r.position.y + 100.0
+	for th in Fate.THREAD_ORDER:
+		var td: Dictionary = Fate.THREADS[th]
+		var st := Fate.state(Game, th)
+		var stt: Array = Fate.state_text(th, st)
+		var met := st != ""
+		UI.text(self, Vector2(r.position.x + 24, y), str(td.n), 19, td.col if met else UI.C_DIM)
+		UI.text(self, Vector2(r.position.x + 430, y), str(stt[0]), 18, UI.C_TEXT if met else UI.C_DIM)
+		var lines: Array = Game.fate_log.get(th, [])
+		var desc := str(stt[1]) if met else str(td.intro) if false else "Somewhere ahead on the road."
+		if met:
+			desc = str(stt[1])
+			if not lines.is_empty():
+				desc += "   " + " / ".join(lines.slice(maxi(0, lines.size() - 2)))
+		UI.wrapped(self, Vector2(r.position.x + 40, y + 24), desc, 14, UI.C_DIM.lightened(0.3), r.size.x - 70)
+		y += 112.0
+	UI.text(self, Vector2(r.position.x + 24, r.end.y - 16), "Esc back", 14, UI.C_DIM)
 
 ## Short names for the world map (the full names run to forty letters).
 const MAP_NAMES := {
@@ -523,7 +609,13 @@ func _draw() -> void:
 	if mode == "journal":
 		_draw_journal()
 		return
-	UI.menu_list(self, Rect2(60, 80, 300, 330), labels, cursor, enabled, 24)
+	if mode == "bestiary":
+		_draw_bestiary()
+		return
+	if mode == "fates":
+		_draw_fates()
+		return
+	UI.menu_list(self, Rect2(60, 80, 300, 470), labels, cursor, enabled, 22)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
 	# status panel
 	var r := Rect2(400, 80, 820, 560)
@@ -556,5 +648,9 @@ func _draw() -> void:
 	UI.text(self, Vector2(430, 530), "Spirit stones: %d    Sword tempering: %d/%d" % [Game.stones, Game.temper, Data.TEMPER_COST.size()], 17)
 	UI.text(self, Vector2(430, 560), "Objective: " + Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 770)
 	UI.text(self, Vector2(430, 610), "Play time %s" % Fmt.clock(Game.playtime), 15, UI.C_DIM)
+	# what he wears and rides (Fates and Faces)
+	var outfit: Dictionary = Fashion.OUTFITS.get(Game.outfit, Fashion.OUTFITS.sweeper)
+	var ride_n: String = str(Fashion.RIDES[Game.ride].n) if Game.ride != "" else "none yet"
+	UI.text(self, Vector2(430, 586), "Wearing the %s (%s)   Ride: %s%s" % [outfit.n, Fashion.fx_text(outfit.fx), ride_n, "  (riding)" if Game.riding and Game.ride != "" else ""], 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 780)
 	if msg != "":
-		UI.text(self, Vector2(60, 440), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)
+		UI.text(self, Vector2(60, 580), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)
