@@ -34,6 +34,9 @@ const STYLES := {
 	"kitchen": {"roof": "5a5048", "roof2": "463e38", "column": "6a3a28", "wall": "e4d8bc", "beam": "6a5040", "trim": "c09048", "double": false, "kind": "gable", "chimney": true},
 	# Part XI: the Feathered Folk's aerie tower, sky-blue tiles on white walls with a gallery
 	"aerie": {"roof": "4a6aa8", "roof2": "3a5a90", "column": "e8e4d8", "wall": "f4f0e4", "beam": "4a8ab0", "trim": "f0d070", "double": true, "balcony": true, "spire": true},
+	# Part XII: the fishermen's houses of Landfall and the wreck on the sea floor, blue-grey tiles over
+	# whitewashed walls with coral-red columns, gabled against the sea wind
+	"seahouse": {"roof": "3a5a7a", "roof2": "2a4660", "column": "c8503a", "wall": "f2f0ea", "beam": "3a6a7a", "trim": "e0d0a0", "double": false, "kind": "gable"},
 }
 ## Part XI: how high an upper storey's floor stands above the building's ground (the top of the ground
 ## floor's walls), and how deep a cellar's floor lies below it
@@ -669,6 +672,7 @@ const SETTLE := {
 	"yanggu": ["house", "house", "tower"], "millet": ["house", "ruin", "shrine"], "fusang": ["shrine", "stilt", "pavilion"], "guanghan": ["pavilion", "pavilion", "ruin"],
 	"longmen": ["stilt", "house", "shrine"], "drowned": ["stilt", "stilt", "ruin"], "tushan": ["house", "tower", "ruin"], "buzhou": ["ruin", "tower"],
 	"juntian": ["tower", "pavilion", "shrine"], "changhe": ["pavilion", "pavilion", "shrine"], "ninesprings": ["stilt", "house", "ruin"], "youdu": ["ruin", "shrine", "tower"],
+	"penglai": ["stilt", "house", "pavilion"], "fangzhang": ["pavilion", "shrine", "house"], "yingzhou": ["shrine", "ruin"], "guixu": ["ruin", "ruin"],
 }
 static var _mesh_cache := {}
 

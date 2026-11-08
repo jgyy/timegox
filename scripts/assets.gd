@@ -93,6 +93,23 @@ const PEOPLE := {
 	"bu_si": "characters/bu_si", "chang_sheng": "characters/chang_sheng",
 	"ming_yi": "characters/ming_yi", "zhi_ma": "characters/zhi_ma", "shade_lan": "characters/shade_lan",
 	"houtu": "characters/houtu",
+	# Part XII: Mazu, the Thousand Children of Landfall, the immortals of the isles, Jingwei and the lost fleet
+	"mazu": "characters/mazu", "xu_qian": "characters/xu_qian", "teacher_qin": "characters/teacher_qin",
+	"lu_dongbin": "characters/lu_dongbin", "li_tieguai": "characters/li_tieguai", "lan_caihe": "characters/lan_caihe",
+	"han_xiangzi": "characters/han_xiangzi", "shipwright_ban": "characters/shipwright_ban", "ah_shui": "characters/ah_shui",
+	"little_haibao": "characters/little_haibao", "pilot_zheng": "characters/pilot_zheng", "diver_yulan": "characters/diver_yulan",
+	"xu_fu_home": "characters/xu_fu_home", "he_xiangu": "characters/he_xiangu", "zhang_guolao": "characters/zhang_guolao",
+	"zhongli_quan": "characters/zhongli_quan", "cao_guojiu": "characters/cao_guojiu", "furnace_boy": "characters/furnace_boy",
+	"jingwei": "characters/jingwei", "gui_lao": "characters/gui_lao", "mist_fisher": "characters/mist_fisher",
+	"steersman_hong": "characters/steersman_hong", "ship_boy_ah_fu": "characters/ship_boy_ah_fu",
+	# Part XII: more people in every town
+	"xiao_qing": "characters/xiao_qing", "gardener_ruan": "characters/gardener_ruan", "clerk_wei": "characters/clerk_wei",
+	"noodle_he": "characters/noodle_he", "courier_ma": "characters/courier_ma", "ox_herd_niu": "characters/ox_herd_niu",
+	"teacher_ren": "characters/teacher_ren", "lantern_xi": "characters/lantern_xi", "archer_kong": "characters/archer_kong",
+	"farida": "characters/farida", "navid": "characters/navid", "examiner_fan": "characters/examiner_fan",
+	"xia_cormorant": "characters/xia_cormorant", "bell_tuner_gong": "characters/bell_tuner_gong", "auntie_rong": "characters/auntie_rong",
+	"ling_fei": "characters/ling_fei", "ao_xun": "characters/ao_xun", "yao_silk": "characters/yao_silk", "bu_lin": "characters/bu_lin",
+	"roll_clerk_ning": "characters/roll_clerk_ning", "lamplighter_bo": "characters/lamplighter_bo", "hu_xiao": "characters/hu_xiao",
 }
 
 static var _scenes := {}
@@ -316,7 +333,9 @@ static func animate(n: Node3D, t: float, base: String, phase: float = 0.0) -> vo
 	n.set_meta("anim_t", t)
 	var act: String = n.get_meta("act", "")
 	if act != "":
-		var clip := act if ap.has_animation(act) else ("attack" if ap.has_animation("attack") and act != "die" and act != "bow" else "")
+		# a battle action a model has no clip for falls back on its attack; a gesture it cannot make
+		# (Part XII, an older or a monster model) is simply skipped
+		var clip := act if ap.has_animation(act) else ("attack" if ap.has_animation("attack") and act in ["cast", "hurt", "victory"] else "")
 		var act_t: float = n.get_meta("act_t", 0.0)
 		var e := t - act_t
 		if clip != "" and e >= 0.0:

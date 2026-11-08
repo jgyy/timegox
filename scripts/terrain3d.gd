@@ -1036,6 +1036,89 @@ static func landmark(root: Node3D, kind: String, pos: Vector3, along: Vector3) -
 			sky_gate(root, pos, along, false)
 		"youdu_gate":
 			sky_gate(root, pos, along, true)
+		"penglai_pavilion":
+			penglai_pavilion(root, pos)
+		"guixu_whirl":
+			guixu_whirl(root, pos, along)
+
+## Part XII: the Pavilion of Penglai on its sea-cliff, where Mazu's boat comes in: a white limestone
+## cliff, a terrace with a balustrade and a two-storey octagonal pavilion of red columns under blue
+## tiles and a gilded finial; lanterns at the eaves, and a faint mirage of towers hanging over it.
+static func penglai_pavilion(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var cliff := MB.tag(Color("e0dcd0"), MB.STONE)
+	var cliff_d := MB.tag(Color("b8b2a4"), MB.STONE)
+	var red := MB.tag(Color("b8382a"), MB.WOOD)
+	var gold := MB.tag(Color("e8c060"), MB.METAL)
+	var st: Dictionary = {"roof": "2f5a7a", "roof2": "244a66", "column": "b8382a", "wall": "f0e8d8", "beam": "2a6a6a", "trim": "e8c060", "double": true}
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4712
+	for k in 9:
+		var a := TAU * k / 9.0
+		b.sph(pos + Vector3(cos(a) * 4.6, 1.4 + rng.randf() * 1.2, sin(a) * 4.6), Vector3(3.0, 2.6 + rng.randf(), 2.6), cliff if k % 2 == 0 else cliff_d)
+	b.cyl(pos + Vector3(0, 2.6, 0), 5.6, 1.2, cliff, Vector3.ZERO, 16)
+	for k2 in 16:
+		var a2 := TAU * k2 / 16.0
+		b.box(pos + Vector3(cos(a2) * 5.3, 3.6, sin(a2) * 5.3), Vector3(0.3, 0.8, 0.3), cliff_d)
+	for k3 in 8:
+		var a3 := TAU * k3 / 8.0
+		b.cyl(pos + Vector3(cos(a3) * 2.6, 5.2, sin(a3) * 2.6), 0.22, 3.2, red, Vector3.ZERO, 8)
+		b.cyl(pos + Vector3(cos(a3) * 1.8, 9.0, sin(a3) * 1.8), 0.18, 2.6, red, Vector3.ZERO, 8)
+		g.ball(pos + Vector3(cos(a3) * 3.4, 6.6, sin(a3) * 3.4), 0.22, Color(1.0, 0.55, 0.3, 0.95), true)
+	Arch.hip_roof(b, g, pos + Vector3(0, 7.0, 0), 3.4, 3.4, 1.0, 1.4, st, false)
+	Arch.hip_roof(b, g, pos + Vector3(0, 10.4, 0), 2.4, 2.4, 0.9, 1.8, st)
+	b.cone(pos + Vector3(0, 12.6, 0), 0.25, 1.2, gold, Vector3.ZERO, 8)
+	b.ball(pos + Vector3(0, 13.4, 0), 0.3, gold)
+	MB.mesh_node(root, b.build(MB.mat_scenery())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	# the mirage: pale towers hanging in the haze out over the sea
+	for k4 in 5:
+		var mp := pos + Vector3(-18.0 - k4 * 6.0, 10.0 + (k4 % 2) * 3.0, -6.0 + k4 * 4.0)
+		g.box(mp, Vector3(2.4, 8.0 + (k4 % 3) * 2.0, 2.4), Color(1.0, 0.96, 0.9, 0.12))
+		g.cone(mp + Vector3(0, 5.0 + (k4 % 3), 0), 2.2, 2.0, Color(1.0, 0.92, 0.85, 0.12), Vector3.ZERO, 6)
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## Part XII: the lip of Guixu, the Returning Ruins: the sea floor breaks off into a funnel of dark
+## water that pours round and round and down into a ravine without a bottom, foam on the rim, spray
+## hanging over it and, far below, a faint glow where every water in the world is going.
+static func guixu_whirl(root: Node3D, pos: Vector3, along: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var ax := along.normalized()
+	var c := pos + ax * 6.0
+	var rim := MB.tag(Color("5a6464"), MB.STONE)
+	var water := MB.tag(Color("1a3050"), MB.STONE)
+	var deep := MB.tag(Color("060a14"), MB.STONE)
+	b.lathe(c, [Vector2(15.0, 0.4), Vector2(13.0, -1.0), Vector2(10.0, -4.0), Vector2(6.5, -10.0), Vector2(3.5, -20.0), Vector2(1.2, -34.0)], water, 28, deep)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5011
+	for k in 22:
+		var a := TAU * k / 22.0 + rng.randf() * 0.2
+		var rr := 15.5 + rng.randf() * 2.0
+		b.sph(c + Vector3(cos(a) * rr, 0.2, sin(a) * rr), Vector3(1.8, 0.9 + rng.randf() * 0.8, 1.6), rim)
+	# the mouth of the funnel at the level of the sea floor: dark water in rings, darker towards the middle
+	# (the ground of the region is laid over the funnel, so the mouth is drawn on top of it)
+	for k4 in 6:
+		var rr2 := 14.0 - k4 * 2.3
+		b.disc(c + Vector3(0, 0.22 + k4 * 0.02, 0), rr2, MB.tag(Color("1a3050").lerp(Color("04060c"), k4 / 5.0), MB.STONE), 32)
+	MB.mesh_node(root, b.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# the spiral of foam pouring in round the mouth, and the spray over the lip
+	for k5 in 90:
+		var f2 := k5 / 90.0
+		var a5 := f2 * TAU * 4.0
+		var r5 := lerpf(13.5, 1.0, f2)
+		g.ball(c + Vector3(cos(a5) * r5, 0.42, sin(a5) * r5), lerpf(0.55, 0.15, f2), Color(0.8, 0.92, 1.0, lerpf(0.55, 0.15, f2)), true)
+	g.disc(c + Vector3(0, 0.4, 0), 2.2, Color(0.3, 0.55, 1.0, 0.5), 20, Color(0.3, 0.55, 1.0, 0.0))
+	for k2 in 60:
+		var f := k2 / 60.0
+		var a2 := f * TAU * 3.0
+		var r2 := lerpf(14.0, 2.0, f)
+		g.ball(c + Vector3(cos(a2) * r2, lerpf(0.0, -26.0, f * f), sin(a2) * r2), lerpf(0.9, 0.3, f), Color(0.85, 0.95, 1.0, lerpf(0.5, 0.05, f)), true)
+	g.torus(c + Vector3(0, 0.3, 0), 14.5, 0.5, Color(0.9, 0.97, 1.0, 0.45), Vector3.ZERO)
+	g.disc(c + Vector3(0, -33.0, 0), 4.0, Color(0.35, 0.6, 1.0, 0.6), 20, Color(0.35, 0.6, 1.0, 0.0))
+	for k3 in 8:
+		g.ball(c + Vector3(rng.randf_range(-12.0, 12.0), rng.randf_range(1.0, 4.0), rng.randf_range(-12.0, 12.0)), rng.randf_range(2.0, 3.4), Color(1.0, 1.0, 1.0, 0.1), true)
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 ## Part X: the Dragon Gate at Longmen, where the river comes down out of the gorge: two cliffs of
 ## banded rock with pines clinging to them, a carved stone gate across the gap high above the water,

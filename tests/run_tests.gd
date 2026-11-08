@@ -27,6 +27,12 @@ func _process(_d: float) -> bool:
 		quit(1 if failures > 0 else 0)
 	return false
 
+## The chapter-closing breakthroughs Main brings Lin Feng home after (read from main.gd's source: the
+## screen cannot be instanced from a test script).
+func main_recalls_s_break16() -> bool:
+	var src := FileAccess.get_file_as_string("res://scripts/main.gd")
+	return src.contains("\"s_break16\": \"recall10\"") and Data.DIALOGUE.has("recall10")
+
 func check(cond: bool, msg: String) -> void:
 	if cond:
 		print("  ok   ", msg)
@@ -119,8 +125,10 @@ func _init() -> void:
 		var ap: AnimationPlayer = pm.get_meta("ap", null)
 		check(ap != null, rel + ": has an AnimationPlayer")
 		if ap != null:
-			for clip in ["idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die"]:
+			for clip in ["idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die"] + Data.EMOTES:
 				check(ap.has_animation(clip), "%s: clip %s" % [rel, clip])
+			for gesture in Data.EMOTES:
+				check(ap.get_animation(gesture).loop_mode == Animation.LOOP_NONE, "%s: the %s gesture plays once" % [rel, gesture])
 			for loop_clip in ["walk", "run", "talk"]:
 				check(ap.get_animation(loop_clip).loop_mode == Animation.LOOP_LINEAR, "%s: %s loops" % [rel, loop_clip])
 			for once in ["attack", "bow", "die"]:
@@ -491,7 +499,7 @@ func _init() -> void:
 		check(n9.get("vis", ["", ""])[0] == "s_yg_intro" and n9.get("vis", ["", ""])[1] == "", "%s stays in the market for the rest of the game once its road opens" % n9.id)
 		if n9.id != "ah_mei":
 			folk9 += 1
-	check(folk9 >= 6 and folk9 <= 8, "six to eight townsfolk in the Dawn Market (%d)" % folk9)
+	check(folk9 >= 8 and folk9 <= 10, "eight to ten townsfolk in the Dawn Market (%d)" % folk9)
 	for sh9 in ["sun_crow", "jade_rabbit", "bifang"]:
 		check(UI.SHAPES.has(sh9) and Models.FALLBACK.has(sh9), "Part IX shape %s has a procedural stand-in until its Blender model is exported" % sh9)
 		var m9 := Models.monster(sh9, Color("ffc030"), true)
@@ -541,8 +549,8 @@ func _init() -> void:
 	check(river_tiles > 120, "a river runs through Longmen (%d water tiles)" % river_tiles)
 	print("== part XI: the realms ==")
 	var p11 := ["juntian", "changhe", "ninesprings", "youdu"]
-	check(Data.REALMS[Data.REALMS.size() - 1] == "Three Realms Concord" and Data.MAX_LEVEL == 48 and Data.level_name(48).ends_with("Three Realms Concord"), "Part XI adds the Three Realms Concord realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break16", "Mountain-River Oneness no longer ends the game: Three Realms Concord does")
+	check(Data.REALMS[16] == "Three Realms Concord" and Data.level_name(48).ends_with("Three Realms Concord"), "Part XI adds the Three Realms Concord realm")
+	check(Data.step_index("s_break16") > Data.step_index("s_break15") and Data.STEPS[Data.STEPS.size() - 1].id != "s_break16", "Mountain-River Oneness no longer ends the game, and nor does Three Realms Concord")
 	check(Data.DIALOGUE.has("recall9") and Data.step_index("s_break15") < Data.step_index("s_p11_home"), "Part XI starts after the Mountain-River Oneness breakthrough")
 	for a11 in p11:
 		var sp11: Dictionary = Data.AREAS[a11]
@@ -555,7 +563,7 @@ func _init() -> void:
 	check(Data.layer_of("juntian") == "heaven" and Data.layer_of("changhe") == "heaven" and Data.layer_of("ninesprings") == "under" and Data.layer_of("youdu") == "under", "two regions float in the Nine Heavens and two lie in the Nine Springs")
 	check(Atlas.layer_y("heaven") > 60.0 and Atlas.layer_y("under") < -40.0, "the Nine Heavens are drawn high above the land and the Nine Springs deep below it")
 	var ladders_seen := {}
-	for lid in ["heaven", "under"]:
+	for lid in ["heaven", "under", "sea"]:
 		var lw := Atlas.world_of(lid)
 		var lreach := MapGen.flood(lw.grid, lw.w, lw.h, lw.start)
 		var lcut := 0
@@ -587,7 +595,7 @@ func _init() -> void:
 			check(closed and lw.grid[bd11.door.y * lw.w + bd11.door.x] == MapGen.INTERIOR, "%s: walls all round and a door" % bd11.n)
 	var sw2 := Atlas.world()
 	for e12 in sw2.ents:
-		if e12.kind == "ladder" and str(e12.get("style", "")) == "climb":
+		if e12.kind == "ladder" and str(e12.get("style", "")) in ["climb", "sail"]:
 			ladders_seen[str(e12.id)] = true
 			var dw := Atlas.world_of(e12.to_layer)
 			check(MapGen.is_walkable_tile(dw.grid[e12.to_tile.y * dw.w + e12.to_tile.x]), "%s comes out on open ground in %s" % [e12.id, e12.to_layer])
@@ -602,7 +610,7 @@ func _init() -> void:
 	var n_floors := 0
 	var n_up := 0
 	var n_down := 0
-	for lid2 in ["surface", "heaven", "under"]:
+	for lid2 in ["surface", "heaven", "under", "sea"]:
 		var fw0 := Atlas.world_of(lid2)
 		for fid in fw0.floors:
 			var fw: Dictionary = fw0.floors[fid]
@@ -663,7 +671,7 @@ func _init() -> void:
 		var dd: Dictionary = Data.DAOS[did]
 		check(Data.SKILLS.has(dd.skill) and Data.SKILLS[dd.skill].get("dao", "") == did, "%s teaches %s" % [did, dd.skill])
 		check(Data.DAO_MODS.has(did) and str(dd.motto).length() > 10, "%s has a passive and a motto" % did)
-		check(Data.DAO_LINES.dao_chosen.has(did) and Data.DAO_LINES["post:chong"].has(did) and Data.DAO_LINES["post:li"].has(did) and Data.DAO_LINES["post:s_break16"].has(did), "the story answers the %s" % did)
+		check(Data.DAO_LINES.dao_chosen.has(did) and Data.DAO_LINES["post:chong"].has(did) and Data.DAO_LINES["post:li"].has(did) and Data.DAO_LINES["post:s_break17"].has(did) and Data.DAO_LINES["post:xu_fu"].has(did) and Data.DAO_LINES["post:yu_qiang"].has(did), "the story answers the %s" % did)
 		for mk in Data.DAO_MODS[did]:
 			check(Data.DAO_MODS[did][mk].size() == Data.DAO_RANKS.size(), "%s: %s grows with every rank" % [did, mk])
 		var honours := 0
@@ -726,6 +734,106 @@ func _init() -> void:
 	check(not Data.known_skills(0, 48).has("myriad_swords"), "Dao techniques come only from walking the Dao")
 	check(Data.SKILLS.jianmu_ward.get("revive", false), "the Ward of the Standing Tree raises fallen allies")
 	check(Data.BOSS_DROPS.get("chong", "") == "heaven_tablet" and Data.BOSS_DROPS.get("li", "") == "earth_weight", "Chong gives up his tablet and Li his weight, which go back to the tree")
+	print("== part XII: the Returning Ruins ==")
+	var p12 := ["penglai", "fangzhang", "yingzhou", "guixu"]
+	check(Data.REALMS[Data.REALMS.size() - 1] == "Ten Thousand Waters Return" and Data.MAX_LEVEL == 51 and Data.level_name(51).ends_with("Ten Thousand Waters Return"), "Part XII adds the Ten Thousand Waters Return realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break17" and Data.step_index("s_p12_home") == Data.step_index("s_break16") + 1, "Part XII follows Three Realms Concord and ends the game")
+	check(Data.EXP_NEED.size() >= Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "cultivation and battle rewards are defined up to the last realm")
+	check(main_recalls_s_break16(), "the sect calls Lin Feng home after Three Realms Concord (recall10)")
+	for a12 in p12:
+		var sp12: Dictionary = Data.AREAS[a12]
+		check(Data.layer_of(a12) == "sea" and Atlas.STRATA.sea.sites.has(a12), a12 + " lies in the Eastern Sea")
+		check(Look.THEMES.has(sp12.theme) and Look.EXTRA.has(sp12.theme) and Scatter.ECO.has(sp12.theme) and Fauna.KINDS.has(sp12.theme) and MapGen.DENSITY.has(sp12.theme) and Arch.SETTLE.has(sp12.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a12)
+		check(sp12.bosses.size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a12 + ": four bosses and four things to find")
+		for n12 in sp12.npcs:
+			check(Data.CHAT.has(str(n12.get("asset", n12.id))) and Data.CHAT[str(n12.get("asset", n12.id))].size() >= 3, "%s has at least three things to say" % n12.id)
+			check(Assets.PEOPLE.has(str(n12.get("asset", n12.id))), "%s is Blender-built" % n12.id)
+	var sea_w := Atlas.world_of("sea")
+	var sea_reach := MapGen.flood(sea_w.grid, sea_w.w, sea_w.h, sea_w.start)
+	var sea_cut := 0
+	var boat_end := false
+	for e12 in sea_w.ents:
+		if e12.kind != "spring" and not sea_reach.has(e12.pos):
+			sea_cut += 1
+		if e12.kind == "ladder" and str(e12.get("style", "")) == "sail":
+			boat_end = true
+	check(sea_cut == 0, "everything in the Eastern Sea can be walked to from Mazu's boat (%d cut off)" % sea_cut)
+	check(boat_end and Data.next_hop("sect", "guixu") != "" and Data.next_hop("guixu", "sect") != "", "Mazu's boat joins Fusang to the isles, and the Returning Ruins can be reached from the sect and left again")
+	var sea_water := 0
+	for t12 in sea_w.sea:
+		sea_water += t12
+	check(sea_water > sea_w.w * sea_w.h / 3, "the isles stand in the sea (%d sea tiles)" % sea_water)
+	for lk12 in ["penglai_pavilion", "guixu_whirl"]:
+		var lroot12 := Node3D.new()
+		Terrain3D.landmark(lroot12, lk12, Vector3.ZERO, Vector3(1, 0, 0))
+		check(lroot12.get_child_count() >= 2, "Part XII landmark %s builds" % lk12)
+		lroot12.free()
+	check(Models.ladder("sail", -1).get_child_count() >= 1 and Models.sealed_cave(false).get_child_count() >= 1, "Mazu's boat and the Founder's caves build")
+	check(Data.known_skills(0, 48).has("returning_tide") and Data.known_skills(1, 49, Data.step_index("s_pl_intro")).has("mazu_lantern") and not Data.known_skills(1, 49, Data.step_index("s_p12_shore")).has("mazu_lantern"), "Part XII techniques are learnable; Mazu gives Yue Ling her lantern")
+	check(not Data.known_skills(0, 50, Data.step_index("s_yz_return")).has("jingwei_stone") and Data.known_skills(0, 50, Data.step_index("s_yz_herald")).has("jingwei_stone"), "Jingwei's Stone Sword is learned from Jingwei")
+	for drop in ["longbo_giant", "yu_qiang", "xu_fu"]:
+		check(Data.ITEMS.has(Data.BOSS_DROPS[drop]), "%s leaves something behind" % drop)
+	check(Data.TOWNS.any(func(tw): return tw.id == "landfall") and Data.AREAS.penglai.npcs.size() >= 10, "Landfall is a town full of people (%d)" % Data.AREAS.penglai.npcs.size())
+	print("== part XII: realms that matter ==")
+	check(Data.REALM_INFO.size() == Data.REALMS.size(), "every realm has a lifespan, a title and a description")
+	check(is_equal_approx(Data.suppression(10, 9), 1.0) and Data.suppression(9, 6) > 1.0 and Data.suppression(6, 9) < 1.0 and is_equal_approx(Data.suppression(48, 0), Data.suppression(48, 30)), "realm suppression: none within a realm, one way or the other across one, capped at three")
+	var ab_ids := {}
+	var mt := MapGen.build("mountain")
+	var mreach := MapGen.flood(mt.grid, mt.w, mt.h, mt.start)
+	for ab in Data.AREAS.mountain.abodes:
+		ab_ids[ab.id] = true
+		check(Data.DIALOGUE.has("abode:" + ab.id) and str(ab.motto).length() > 10 and ab.req % 3 == 0, "%s: the Founder's words, and a door for the start of a realm" % ab.id)
+		check(mreach.has(ab.pos), "%s can be walked to" % ab.id)
+	check(ab_ids.size() == 9, "nine sealed caves on the mountain")
+	for dk12 in Data.CHAT_DEEP:
+		var known_npc := false
+		for a14 in Data.AREAS:
+			for n14 in Data.AREAS[a14].get("npcs", []):
+				known_npc = known_npc or str(n14.get("asset", n14.id)) == dk12
+		check(known_npc, "realm-gated lore for %s goes to somebody who exists" % dk12)
+	check(Data.REALM_GREETS.size() == Data.realm_band(Data.MAX_LEVEL) + 1, "townsfolk have something to say to every band of realms")
+	print("== part XII: cutscenes ==")
+	check(Data.emote_for(["Lin Feng", "Hello.", "kneel"]) == ["Lin Feng", "kneel"] and Data.emote_for(["Narrator", "She gives it to him.", "Mazu, Who Brings the Boats Home:offer"]) == ["Mazu, Who Brings the Boats Home", "offer"], "a line can name its gesture, and a narrator's line can direct somebody")
+	check(Data.emote_for(["Elder Qing Xuan", "Thank you, disciple."])[1] == "bow" and Data.emote_for(["Yue Ling", "No. Not this time."])[1] == "shake" and Data.emote_for(["Lin Feng", "Then I will bring the bells back."])[1] == "nod" and Data.emote_for(["Narrator", "The sea goes out."])[1] == "", "gestures are read from the words, and narration is left alone")
+	var gestured := 0
+	var lines_n := 0
+	for dk2 in Data.DIALOGUE:
+		for dl2 in Data.DIALOGUE[dk2]:
+			lines_n += 1
+			var ec: Array = Data.emote_for(dl2)
+			check(ec[1] == "" or Data.EMOTES.has(ec[1]), "%s: the gesture %s exists" % [dk2, ec[1]])
+			if ec[1] != "":
+				gestured += 1
+	check(gestured * 8 > lines_n, "conversations have gestures in them (%d of %d lines)" % [gestured, lines_n])
+	for ck2 in Data.CHAT_LATER:
+		for cl2 in Data.CHAT_LATER[ck2]:
+			check(Data.step_index(str(cl2[0])) >= 0 and Data.CHAT.has(ck2), "%s says '%s...' only after %s" % [ck2, str(cl2[1]).substr(0, 24), cl2[0]])
+	print("== part XII: the nine branches of the root ==")
+	check(Data.TALENT_ORDER.size() == 9 and Data.TALENTS.size() == 9, "nine branches to wake")
+	var G2 = load("res://scripts/game.gd").new()
+	G2.reset()
+	G2.level = 30
+	var base_hp: int = G2.max_hp(0)
+	var base_cost: float = G2.skill_cost("pillar")
+	check(not G2.wake_talent("vajra"), "a branch cannot be woken without an awakening")
+	G2.awaken("test")
+	check(G2.talent_pts == 1 and G2.wake_talent("vajra") and G2.talent("vajra") == 1 and G2.max_hp(0) > base_hp, "an awakening wakes the Vajra Body: more health")
+	for k15 in 2:
+		G2.awaken("test")
+		G2.wake_talent("thunder_root")
+	check(is_equal_approx(G2.talent_power("pillar"), 1.0 + 2 * 0.18) and is_equal_approx(G2.talent_power("abyss"), 1.0), "the Thunder Root strengthens thunder techniques only")
+	for k16 in 3:
+		G2.awaken("test")
+		G2.wake_talent("qi_sea")
+	check(G2.talent_crown("qi_sea") and G2.skill_cost("pillar") < base_cost and not G2.wake_talent("qi_sea"), "a branch in full leaf has its crown, costs less qi, and can grow no further")
+	G2.awaken("test")
+	G2.wake_talent("sword_bone")
+	check(G2.talent_power("strike") > 1.2 and G2.talent_power("pillar") > 1.0 + 2 * 0.18, "the Sword Bone strengthens the plain strike and every single-target technique")
+	var pack := [{"id": "bamboo_wolf", "lv": 1}, {"id": "bandit", "lv": 2}]
+	check(G2.scatters(pack) and not G2.scatters([{"id": "bamboo_wolf", "lv": 28}]), "beasts two realms below Lin Feng scatter before his aura; his equals do not")
+	G2.reset()
+	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
+	G2.free()
 	print("== towns and world-building ==")
 	var town_ids := {}
 	for tw in Data.TOWNS:
@@ -782,7 +890,8 @@ func _init() -> void:
 			check(Data.ITEMS.has(st.item), "collect item defined " + st.item)
 	for k in Data.DIALOGUE:
 		for ln in Data.DIALOGUE[k]:
-			check(ln.size() == 2 and str(ln[1]).length() > 0, "dialogue line well formed in " + k)
+			# [speaker, text] or, with a cutscene gesture (Part XII), [speaker, text, gesture or "who:gesture"]
+			check((ln.size() == 2 or (ln.size() == 3 and Data.EMOTES.has(str(ln[2]).get_slice(":", str(ln[2]).get_slice_count(":") - 1)))) and str(ln[1]).length() > 0, "dialogue line well formed in " + k)
 			break
 	for k2 in Data.BOSS_DROPS:
 		check(Data.ENEMIES.has(k2) and Data.ITEMS.has(Data.BOSS_DROPS[k2]), "boss drop " + k2)

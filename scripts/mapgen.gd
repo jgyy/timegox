@@ -28,10 +28,11 @@ const DENSITY := {
 	"yanggu": 0.17, "millet": 0.2, "fusang": 0.27, "guanghan": 0.23,
 	"longmen": 0.24, "drowned": 0.18, "tushan": 0.27, "buzhou": 0.26,
 	"juntian": 0.22, "changhe": 0.22, "ninesprings": 0.26, "youdu": 0.2,
+	"penglai": 0.2, "fangzhang": 0.24, "yingzhou": 0.26, "guixu": 0.22,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
-const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38, "fusang": -0.36, "guanghan": -0.44, "longmen": -0.42, "drowned": -0.08, "tushan": -0.52, "buzhou": -0.3, "ninesprings": -0.42, "youdu": -0.55}
+const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38, "fusang": -0.36, "guanghan": -0.44, "longmen": -0.42, "drowned": -0.08, "tushan": -0.52, "buzhou": -0.3, "ninesprings": -0.42, "youdu": -0.55, "penglai": -0.45, "fangzhang": -0.4, "yingzhou": -0.36, "guixu": -0.3}
 
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR
@@ -112,6 +113,9 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		var pe := {"kind": "pickup", "id": pk.id, "item": pk.item, "pos": pk.pos, "vis": ["" if pk.get("always", false) else spec.get("pickup_vis", ""), ""]}
 		if pk.has("n"):
 			pe["n"] = pk.n
+		# a cache only Spirit Sense can feel (Part XII)
+		if pk.get("sense", false):
+			pe["sense"] = true
 		if pk.has("floor"):
 			pe["floor"] = pk.floor
 			floor_ents.append(pe)
@@ -120,6 +124,10 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		fixed.append(pk.pos)
 	for sp in spec.get("springs", []):
 		ents.append({"kind": "spring", "id": "spring", "pos": sp})
+	# the Founder's sealed caves (Part XII): a stone door that opens only to a cultivator of its realm
+	for ab in spec.get("abodes", []):
+		ents.append({"kind": "abode", "id": ab.id, "n": ab.n, "pos": ab.pos, "req": ab.req, "stones": ab.get("stones", 0), "motto": ab.get("motto", "")})
+		fixed.append(ab.pos)
 	# Dao Steles (Part XI): where a cultivator chooses which road to walk; they stand once the Elder
 	# has spoken of the Daos
 	for k in spec.get("steles", []).size():
@@ -404,6 +412,8 @@ static func _keep_set(spec: Dictionary, id: String) -> Dictionary:
 		pts.append(a)
 	for st in spec.get("steles", []):
 		pts.append(st)
+	for ab in spec.get("abodes", []):
+		pts.append(ab.pos)
 	for le in ladder_ends(id):
 		pts.append(le[0])
 		pts.append(le[0] + le[1])
