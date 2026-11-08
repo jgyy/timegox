@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 15.0 * 3600.0
+var max_time := 17.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -42,13 +42,22 @@ var last_progress := 0.0
 var dwell := 0.0
 var time_by_screen := {}
 var time_by_area := {}
+## meditation time by what it was for: resting, grinding to a stage, waiting for packs to come back
+var time_by_med := {}
 var gave_up := ""
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-const HEALS := ["jianmu_ward", "river_mother", "moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain", "lotus_heart"]
+const HEALS := ["mazu_lantern", "jianmu_ward", "river_mother", "moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain", "lotus_heart"]
 ## Part XI: the Dao the bot walks from each quest step on (it chooses the first from the Elder, and
 ## changes roads at a Dao Stele when it reaches the later steps, as a player trying the Daos would)
 const DAO_PLAN := [["s_p11_home", "sword"], ["s_ns_intro", "heart"]]
+## Part XII: the order in which the bot wakes the branches of the root, as a sword-and-thunder fighter
+## would: the Sword Bone and the Thunder Root first, then a body that can take a blow and a dantian
+## that does not run dry, then everything else; the Enlightened Mind last (a player in a hurry would
+## take it early and meditate far less)
+const TALENT_PLAN := ["sword_bone", "thunder_root", "vajra", "sword_bone", "thunder_root", "qi_sea", "five_phase", "sword_bone",
+	"thunder_root", "vajra", "fortune", "five_phase", "yin_root", "qi_sea", "spirit_sense", "vajra", "five_phase", "qi_sea",
+	"fortune", "yin_root", "spirit_sense", "fortune", "yin_root", "spirit_sense", "insight", "insight", "insight"]
 var last_layer := ""
 
 func _ready() -> void:
@@ -109,6 +118,8 @@ func _process(d: float) -> void:
 	if Game.started:
 		time_by_screen[top] = time_by_screen.get(top, 0.0) + d
 		time_by_area[Game.area] = time_by_area.get(Game.area, 0.0) + d
+		if top == "meditate":
+			time_by_med[med_goal] = time_by_med.get(med_goal, 0.0) + d
 		_log_new_events()
 		if Game.step != last_step:
 			last_step = Game.step
@@ -272,6 +283,11 @@ func _world(d: float) -> void:
 	if shop != "":
 		_goto_entity("sect", shop)
 		return
+	# 2a) Part XII: open a Founder's cave nearby once the realm carved on its door is reached
+	var ab = _openable_abode()
+	if ab != null:
+		_walk_to(ab.pos, "abode:" + str(ab.id))
+		return
 	# 2b) Part XI: change roads at a Dao Stele when the plan says so
 	var want_dao := _planned_dao()
 	if want_dao != "" and Game.dao != "" and Game.dao != want_dao:
@@ -330,9 +346,16 @@ func _start_meditate(goal: String) -> void:
 	_press("cancel", 0.4)
 
 func _grind() -> void:
-	# fight a nearby enemy if one is safe, otherwise meditate
-	if Game.area != "sect" and _hp_ratio() > 0.55:
+	# fight a nearby enemy if one is safe; failing that, the nearest pack anywhere in the region (in the
+	# higher realms meditating to the next stage takes hours, where a few fights take minutes); only
+	# then meditate
+	if Game.area != "sect" and Game.area != Atlas.HUB and _hp_ratio() > 0.55:
+		if world.is_floor():
+			_travel(Game.area)
+			return
 		var e = _nearest_enemy("")
+		if e == null:
+			e = _any_enemy(Game.area)
 		if e != null:
 			_walk_to(e.pos, "enemy:" + e.id)
 			return
@@ -493,12 +516,37 @@ func _nearest_stele():
 				best = e
 	return best
 
-## The choice screen (Part XI): the Dao the plan wants; a gift is kept.
+## Part XII: a Founder's cave on this realm the bot can open now, not far off the road.
+func _openable_abode():
+	var best = null
+	var bd := 90
+	for e in world.ents:
+		if e.kind != "abode" or Game.abodes.has(e.id) or Game.level < int(e.req):
+			continue
+		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		if dd < bd:
+			bd = dd
+			best = e
+	return best
+
+## Part XII: the branch the plan wakes next (the first planned rank not yet woken).
+func _planned_talent(ids: Array) -> String:
+	var seen := {}
+	for t in TALENT_PLAN:
+		seen[t] = int(seen.get(t, 0)) + 1
+		if Game.talent(t) < int(seen[t]) and ids.has(t):
+			return t
+	return str(ids[0]) if not ids.is_empty() else ""
+
+## The choice screen (Part XI): the Dao the plan wants; a gift is kept; a branch of the root as the
+## plan says (Part XII).
 func _choice() -> void:
 	var c = main.choice
 	var ids: Array = c.ids()
 	var want := -1
-	if ids.has("sword"):
+	if Data.TALENTS.has(str(ids[0]) if not ids.is_empty() else ""):
+		want = ids.find(_planned_talent(ids))
+	elif ids.has("sword"):
 		want = ids.find(_planned_dao() if _planned_dao() != "" else "sword")
 	elif ids.has("keep"):
 		want = ids.find("keep")
@@ -656,7 +704,8 @@ func _meditate() -> void:
 		"rest":
 			done = _hp_ratio() > 0.97 and _qi_ratio() > 0.9
 		"grind":
-			done = _cult_met() and _hp_ratio() > 0.6
+			# back to the fight as soon as the party is fit and a pack has come back
+			done = (_cult_met() and _hp_ratio() > 0.6) or (Game.area != "sect" and Game.area != Atlas.HUB and _hp_ratio() > 0.9 and _qi_ratio() > 0.6 and _any_enemy(Game.area) != null)
 		"respawn":
 			done = _any_enemy(Game.cur_step().get("area", "")) != null
 	if done:
@@ -828,6 +877,7 @@ func _finish(reason: String) -> void:
 		"sword_tempering": Game.temper,
 		"time_by_screen_seconds": breakdown,
 		"time_by_area_seconds": areas,
+		"meditation_by_purpose_seconds": time_by_med,
 		"timeline": Game.timeline,
 	}
 	var dir := report_path.get_base_dir()
@@ -847,6 +897,7 @@ func _finish(reason: String) -> void:
 	print("battles / kills : %d / %d   deaths: %d" % [Game.battles, Game.kills, Game.deaths])
 	print("time by screen  : %s" % JSON.stringify(breakdown))
 	print("time by area    : %s" % JSON.stringify(areas))
+	print("meditation for  : %s" % JSON.stringify(time_by_med))
 	if reason != "":
 		print("FAILED          : %s" % reason)
 	print("result          : %s (needs >= %.0f s)" % ["PASS" if ok else "FAIL", min_time])

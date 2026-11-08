@@ -67,8 +67,13 @@ const STRATA := {
 		"sites": {"juntian": [90, 100, 0], "changhe": [192, 86, 0]}},
 	"under": {"n": "The Nine Springs", "w": 260, "h": 200, "y": -64.0, "land": 1.45, "holes": 184, "start": ["ninesprings", Vector2i(12, 30)],
 		"sites": {"ninesprings": [90, 100, 0], "youdu": [194, 112, 0]}},
+	# Part XII: the Isles of the Eastern Sea, out past the edge of the shelf east of Fusang, at sea level:
+	# four isles in a chain running east to the Returning Ruins, the sea between them (the roads cross it
+	# on the sandbars the drain has left bare)
+	"sea": {"n": "The Eastern Sea", "w": 520, "h": 200, "y": 0.0, "land": 1.22, "holes": 174, "start": ["penglai", Vector2i(13, 32)],
+		"sites": {"penglai": [80, 100, 0], "fangzhang": [196, 80, 0], "yingzhou": [312, 116, 0], "guixu": [430, 96, 0]}},
 }
-const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs"}
+const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs", "sea": "The Eastern Sea"}
 
 static var _layout := {}
 static var _world := {}

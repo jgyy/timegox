@@ -78,6 +78,15 @@ var off := Vector3.ZERO
 var trip := {}
 var banner_text := ""
 var cellar_env: Environment = null
+## Part XII cutscenes: the line of dialogue last acted out, the last person who spoke to Lin Feng, and
+## the conversation camera (how far it has blended in from the chase camera, where it is, its slow
+## drift during narration)
+var cue_lines: Array = []
+var cue_idx := -1
+var cue_npc := ""
+var cine_k := 0.0
+var cine_pos := Vector3.ZERO
+var cine_a := 0.0
 
 func _build3d() -> void:
 	opaque = false
@@ -164,6 +173,9 @@ func _bundle(lid: String) -> Dictionary:
 					Terrain3D.sky_world(root, lw)
 				"under":
 					Terrain3D.deep_world(root, lw)
+				"sea":
+					# the Eastern Sea (Part XII): real sea round the isles, the same ocean as the land's
+					Terrain3D.world_sea(root, lw)
 			root.visible = false
 			scene3d.add_child(root)
 			b.root = root
@@ -257,9 +269,13 @@ func use_ladder(e: Dictionary) -> void:
 	if not trip.is_empty():
 		return
 	var climb: bool = str(e.get("style", "")) == "climb"
-	trip = {"t": 0.0, "dur": 2.6 if climb else 0.7, "to_layer": str(e.to_layer), "to_tile": e.to_tile, "dir": int(e.get("dir", 1)), "climb": climb, "swapped": false}
+	# Mazu's boat (Part XII): a long trip like the Jianmu's, but over the water, not up or down it
+	var sail: bool = str(e.get("style", "")) == "sail"
+	trip = {"t": 0.0, "dur": 2.6 if climb or sail else 0.7, "to_layer": str(e.to_layer), "to_tile": e.to_tile, "dir": int(e.get("dir", 1)), "climb": climb or sail, "sail": sail, "swapped": false}
 	move_dir = Vector2i.ZERO
-	if climb:
+	if sail:
+		Game.note("Sailed with Mazu to " + ("the Isles of the Eastern Sea" if str(e.to_layer) == "sea" else "Fusang"))
+	elif climb:
 		var verb := "Climbed the Jianmu into " if int(e.get("dir", 1)) > 0 else "Went down the Jianmu into "
 		Game.note(verb + str(Atlas.LAYER_NAMES.get(str(e.to_layer), str(e.to_layer))).replace("The ", "the "))
 
@@ -288,6 +304,8 @@ func _trip_lift() -> float:
 	if trip.is_empty():
 		return 0.0
 	var k: float = trip.t / trip.dur
+	if trip.get("sail", false):
+		return 0.0
 	var amp := 26.0 if trip.climb else 1.2
 	if k < 0.5:
 		return float(trip.dir) * amp * smoothstep(0.0, 0.5, k)
@@ -305,7 +323,7 @@ func locate_ent(id: String) -> Array:
 	var e = ent_by_id.get(id)
 	if e != null:
 		return [layer, e]
-	for lid in ["surface", "heaven", "under"]:
+	for lid in ["surface", "heaven", "under", "sea"]:
 		var lw: Dictionary = Atlas.world_of(lid)
 		for e2 in lw.ents:
 			if e2.id == id:
@@ -538,12 +556,15 @@ func ent_visible(e: Dictionary) -> bool:
 	match e.kind:
 		"enemy":
 			return not Game.defeated.has(e.id)
-		"seal", "ladder":
+		"seal", "ladder", "abode":
 			return true
 		"boss":
 			return not Game.boss_done.has(e.enemy)
 		"pickup":
 			if Game.taken.has(e.id):
+				return false
+			# a cache only Spirit Sense can feel (Part XII)
+			if e.get("sense", false) and Game.talent("spirit_sense") < 1:
 				return false
 		"portal":
 			return true
@@ -739,6 +760,15 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			n.add_child(Models.shadow_disc(0.7))
 			_label(n, "Dao Stele", 3.0, UI.C_JADE, 30)
 			n.set_meta("model", sm)
+		"abode":
+			# one of the Founder's sealed caves (Part XII): the realm that opens it is on the label
+			var opened: bool = Game.abodes.has(e.id)
+			var cm := Models.sealed_cave(opened)
+			n.add_child(cm)
+			n.set_meta("model", cm)
+			n.set_meta("open", opened)
+			_label(n, "%s (%s)" % [e.n, Data.REALMS[Data.realm_of(int(e.req))]], 3.4, UI.C_GOLD, 28)
+			n.rotation.y = PI
 	return n
 
 # ---------------------------------------------------------------- update
@@ -944,6 +974,7 @@ func _update_view(d: float) -> void:
 	cam_pos = cam_pos.lerp(g[0], 1.0 - exp(-d * 9.0))
 	cam.position = cam_pos
 	cam.look_at(g[1], Vector3.UP)
+	_cutscene(d, pp)
 	if cam_override != null:
 		cam.global_transform = cam_override
 
@@ -961,6 +992,106 @@ func weather_y() -> float:
 			return 2.0
 		_:
 			return 3.5
+
+# ---------------------------------------------------------------- cutscenes (Part XII)
+## The model of somebody taking part in a conversation by name, and the clock it is animated on:
+## [model, clock offset] or [] if they are not here.
+func _actor(who: String) -> Array:
+	if who == "Lin Feng":
+		return [player, 0.0]
+	if who == "Yue Ling":
+		return [comp, 1.0] if Game.companion else []
+	var pp := _player_pos()
+	for k in views:
+		var v: Dictionary = views[k]
+		if not v.shown:
+			continue
+		for i in v.nodes:
+			var e: Dictionary = v.ents[i]
+			if e.kind == "npc" and str(e.n) == who:
+				var n: Node3D = v.nodes[i]
+				if n.visible and n.position.distance_to(pp) < 16.0:
+					return [n.get_meta("model"), float(e.pos.x)]
+	return []
+
+## A new line of dialogue begins: whoever it belongs to plays the gesture it calls for (Data.emote_for),
+## and whoever is listening answers it (a bow for a gift, a wave for a wave, a nod for grief or a joke).
+func _cue_line(line: Array) -> void:
+	var ec: Array = Data.emote_for(line)
+	var who: String = ec[0]
+	var g: String = ec[1]
+	if who != "Lin Feng" and who != "Yue Ling" and who != "Narrator":
+		cue_npc = who
+	if g == "":
+		return
+	var a := _actor(who)
+	if not a.is_empty() and Assets.has_clip(a[0], g):
+		Models.act(a[0], g, t + float(a[1]))
+	var reply: String = Data.EMOTE_REPLY.get(g, "")
+	if reply == "":
+		return
+	var listener := "Lin Feng" if who != "Lin Feng" else cue_npc
+	var b := _actor(listener)
+	if not b.is_empty() and b[0] != (a[0] if not a.is_empty() else null) and Assets.has_clip(b[0], reply):
+		Models.act(b[0], reply, t + float(b[1]) + 0.35)
+
+## The conversation camera: while somebody is speaking over the world the chase camera eases round
+## into a two-shot from the side, framing Lin Feng and whoever he is talking to at head height (higher
+## indoors, to look in over the walls); during narration it drifts slowly round him.  It eases back
+## when the conversation ends.
+func _cutscene(d: float, pp: Vector3) -> void:
+	var dl = main.dialogue if main != null else null
+	var on: bool = main != null and main.top_name() == "dialogue" and not dl.lines.is_empty() and trip.is_empty()
+	if on and (not is_same(dl.lines, cue_lines) or dl.idx != cue_idx):
+		cue_lines = dl.lines
+		cue_idx = dl.idx
+		_cue_line(dl.lines[dl.idx])
+	if not on:
+		cue_idx = -1
+		cue_lines = []
+	cine_k = clampf(cine_k + d * (1.6 if on else -2.2), 0.0, 1.0)
+	if cine_k <= 0.0:
+		cine_pos = cam.position
+		return
+	var sp := speaker()
+	var other: Array = []
+	if sp != "" and sp != "Lin Feng" and sp != "Narrator":
+		other = _actor(sp)
+	if other.is_empty() and cue_npc != "":
+		other = _actor(cue_npc)
+	var a3 := pp + Vector3(0, 1.45, 0)
+	var b3 := a3 + Vector3(facing.x, 0, facing.y) * 2.2
+	if not other.is_empty() and other[0] != player:
+		b3 = (other[0] as Node3D).global_position + Vector3(0, 1.45, 0)
+	var mid := (a3 + b3) * 0.5
+	var ax := b3 - a3
+	ax.y = 0.0
+	if ax.length() < 0.4:
+		ax = Vector3(facing.x, 0, facing.y)
+	ax = ax.normalized()
+	var side := Vector3(-ax.z, 0, ax.x)
+	if side.dot(cam.position - mid) < 0.0:
+		side = -side
+	var indoor: bool = inside != "" or is_floor()
+	var dist := clampf(a3.distance_to(b3) * 0.9 + 3.4, 4.2, 8.5)
+	var goal := mid + side * dist + Vector3(0, 0.5 + (3.2 if indoor else 0.4), 0)
+	if sp == "Narrator" or sp == "":
+		# narration: a slow drift round the scene
+		cine_a += d * 0.12
+		goal = mid + (side.rotated(Vector3.UP, sin(cine_a) * 0.5)) * (dist + 1.5) + Vector3(0, 1.4 + (3.0 if indoor else 0.6), 0)
+	elif sp == "Lin Feng":
+		goal += ax * 0.9
+	else:
+		goal -= ax * 0.9
+	goal.y = maxf(goal.y, ground_y(goal) + 1.1)
+	cine_pos = cine_pos.lerp(goal, 1.0 - exp(-d * 3.0))
+	var k := smoothstep(0.0, 1.0, cine_k)
+	var at := mid + Vector3(0, -0.15, 0)
+	var chase_look := cam.global_transform.basis.z
+	cam.position = cam.position.lerp(cine_pos, k)
+	if cam.position.distance_to(at) > 0.5:
+		var look_from := cam.position - chase_look
+		cam.look_at(look_from.lerp(at, k) if k < 1.0 else at, Vector3.UP)
 
 ## The name of whoever is speaking in the dialogue box, or "".
 func speaker() -> String:
@@ -1008,7 +1139,9 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			# a courteous bow (the cupped-fist salute) when the hero walks up
 			var near: bool = dist < 5.0
 			if near and not n.get_meta("near", false) and t - float(n.get_meta("bowed", -99.0)) > 25.0 and Assets.has_clip(m, "bow") and not talking:
-				Models.act(m, "bow", t)
+				# on the model's own clock (it is animated at t + e.pos.x below): on the world clock the bow
+				# started hundreds of seconds in the past and was dropped unplayed, so nobody ever bowed
+				Models.act(m, "bow", t + e.pos.x)
 				n.set_meta("bowed", t)
 			n.set_meta("near", near)
 			Models.anim_person(m, t + e.pos.x, false, false, "talk" if talking else "")
@@ -1033,6 +1166,17 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))
 			var base_y := _ground(vb, n.position) if not vb.is_empty() else ground_y(n.position)
 			n.position.y = base_y + sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0)
+		"abode":
+			var opened: bool = Game.abodes.has(e.id)
+			if opened != bool(n.get_meta("open", false)):
+				var old: Node3D = n.get_meta("model")
+				var nm := Models.sealed_cave(opened)
+				old.queue_free()
+				n.add_child(nm)
+				n.set_meta("model", nm)
+				n.set_meta("open", opened)
+			var gl: Node3D = (n.get_meta("model") as Node3D).get_meta("glow")
+			gl.rotation.z = t * 0.4
 		"pickup":
 			var gm: Node3D = n.get_meta("gem")
 			gm.position.y = 1.0 + sin(t * 2.0 + e.pos.y) * 0.18
@@ -1109,13 +1253,16 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele"]:
+	if fe != null and move_t < 0.0 and trip.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode"]:
 		var hint := "Talk"
 		match fe.kind:
 			"boss":
 				hint = "Challenge"
 			"ladder":
-				hint = ("Climb" if str(fe.get("style", "")) == "climb" else "Take the stairs") if ladder_open(fe) else "Look"
+				var lst := str(fe.get("style", ""))
+				hint = ("Climb" if lst == "climb" else ("Board the boat" if lst == "sail" else "Take the stairs")) if ladder_open(fe) else "Look"
+			"abode":
+				hint = "Open the sealed cave" if Game.level >= int(fe.req) and not Game.abodes.has(fe.id) else "Look"
 			"stele":
 				hint = "Choose your Dao"
 		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + hint, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
@@ -1123,6 +1270,8 @@ func _draw_hud() -> void:
 	var fade := trip_fade()
 	if fade > 0.0:
 		var fc := Color(0.96, 0.97, 1.0) if int(trip.dir) > 0 and trip.climb else Color(0.02, 0.02, 0.05)
+		if trip.get("sail", false):
+			fc = Color(0.55, 0.75, 0.86)
 		draw_rect(Rect2(Vector2.ZERO, VIEW), Color(fc.r, fc.g, fc.b, fade * (1.0 if trip.climb else 0.85)))
 	# toasts
 	var y := 170.0
@@ -1169,6 +1318,8 @@ func _draw_minimap() -> void:
 				col = Color("a8e0ff") if str(e.get("style", "")) == "climb" else Color(0, 0, 0, 0)
 			"stele":
 				col = UI.C_JADE
+			"abode":
+				col = Color("ffc860") if not Game.abodes.has(e.id) else Color(0, 0, 0, 0)
 		if col.a > 0.0:
 			draw_circle(r.position + (Vector2(e.pos) - o + Vector2(0.5, 0.5)) * sc, 2.4, col)
 	var pp := r.position + (Vector2(vt) - o + Vector2(0.5, 0.5)) * sc

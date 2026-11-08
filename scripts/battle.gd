@@ -25,6 +25,12 @@ var outcome := ""
 var result_lines: Array = []
 var theme := "bamboo"
 var level_before := 0
+## Part XII: once-a-battle powers of the woken root (the Sword Bone's first blow, the Vajra Body's
+## last breath) and the realm suppression the battle opened with
+var first_blow := true
+var vajra_used := false
+var tide_used := false
+var suppress_note := ""
 
 # 3D stage
 var stages := {}
@@ -224,6 +230,9 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	for i in Game.party_size():
 		party.append(Game.fighter(i))
 	foes = Data.make_foes(foe_list)
+	first_blow = true
+	vajra_used = false
+	tide_used = false
 	state = "intro"
 	timer = INTRO_BOSS if c.get("boss", false) else 1.4
 	order.clear()
@@ -248,6 +257,19 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		say("%s blocks your path!" % foes[0].name)
 	else:
 		say("Enemies appear!  %s" % ", ".join(foes.map(func(f): return f.name)))
+	# realm suppression (Part XII): a whole realm between the fighters is felt before the first blow
+	suppress_note = ""
+	if not ctx.get("tribulation", false):
+		var top := 0
+		for f in foes:
+			top = maxi(top, int(f.lv))
+		var dr := Game.realm() - Data.realm_of(top)
+		if dr >= 1:
+			suppress_note = "Realm suppression: your %s weighs on them (x%.1f)" % [Data.REALMS[Game.realm()], Data.suppression(Game.level, top)]
+		elif dr <= -1:
+			suppress_note = "Realm suppression: their %s weighs on you (x%.2f)" % [Data.REALMS[Data.realm_of(top)], Data.suppression(Game.level, top)]
+		if suppress_note != "":
+			say(suppress_note)
 
 func say(s: String) -> void:
 	log_lines.append(s)
@@ -296,13 +318,25 @@ func _next_turn() -> void:
 			var all := alive(party) + alive(foes)
 			all.shuffle()
 			all.sort_custom(func(a, b): return a.spd > b.spd)
+			# the crown of Spirit Sense: Lin Feng moves first in the first round
+			if round_no == 1 and Game.talent_crown("spirit_sense"):
+				for k in all.size():
+					if all[k].side == "party" and all[k].idx == 0:
+						all.push_front(all.pop_at(k))
+						break
 			order = all
 		cur = order.pop_front()
 		if not cur.dead:
 			break
 	cur.turns += 1
 	if cur.side == "party":
-		cur.qi = minf(cur.maxqi, cur.qi + cur.maxqi * 0.04)
+		# a Sea of Qi gathers more every turn
+		cur.qi = minf(cur.maxqi, cur.qi + cur.maxqi * (0.04 + (Game.talent_mod("regen") if cur.idx == 0 else 0.0)))
+		# the crown of the Sea of Qi: once a battle, when it runs low, the tide comes back in
+		if cur.idx == 0 and not tide_used and cur.qi < cur.maxqi * 0.2 and Game.talent_crown("qi_sea"):
+			tide_used = true
+			cur.qi = minf(cur.maxqi, cur.qi + cur.maxqi / 3.0)
+			say("The tide comes in: Lin Feng's qi floods back.")
 		# the Compassionate Heart: Lin Feng's wounds close by themselves
 		var regen := Game.dao_mod("regen", 0.0)
 		if cur.idx == 0 and regen > 0.0 and cur.hp < cur.maxhp:
@@ -330,30 +364,46 @@ func _foe_act(f: Dictionary) -> void:
 	_hit(f, victim, 1.0, f.elem, false)
 	timer = 0.85
 
-func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool) -> void:
-	# the Daos (Part XI): a party member may slip the blow (Free Wandering) or the foe may strike a
-	# reflection (the Mirror, and the celestial foxes' friendship)
+## One blow; returns the harm it did (0 if it missed).
+func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool) -> int:
+	# the Daos (Part XI): a party member may slip the blow (Free Wandering, and Lin Feng's Spirit Sense)
+	# or the foe may strike a reflection (the Mirror, and the celestial foxes' friendship)
 	if tgt.side == "party" and a.side == "foe":
-		var slip := Game.dao_mod("evade", 0.0)
-		var miss := Game.dao_mod("miss", 0.0) + Game.boon("miss", 0.0)
+		var slip := Game.dao_mod("evade", 0.0) + (Game.talent_mod("evade") if tgt.idx == 0 else 0.0)
+		var miss := Game.dao_mod("miss", 0.0) + Game.boon("miss", 0.0) + (0.04 if Game.talent_crown("spirit_sense") else 0.0)
 		if slip > 0.0 and randf() < slip:
 			fx.append({"text": "slips it", "p": head3(tgt), "t": 1.0, "col": Color("b8f0d0"), "slash": ""})
 			say("%s slips the blow." % tgt.name)
-			return
+			return 0
 		if miss > 0.0 and randf() < miss:
 			fx.append({"text": "a reflection", "p": head3(tgt), "t": 1.0, "col": Color("c8a8ff"), "slash": ""})
 			say("%s strikes at a reflection." % a.name)
-			return
+			return 0
 	var weak_k := Game.dao_mod("weak", 1.5) if a.side == "party" else 1.5
 	var em := weak_k if tgt.weak == elem and elem != "phys" else 1.0
 	var raw: float = a.atk * mult * randf_range(0.9, 1.1) * em - tgt.def * 0.5
+	# realm suppression (Part XII): a realm above weighs on a realm below; a tribulation is heaven
+	# itself and weighs on everyone the same
+	if not ctx.get("tribulation", false):
+		raw *= Data.suppression(int(a.lv), int(tgt.lv))
 	if tgt.side == "party":
-		# Formations and the Heart (and the shades' friendship) soften every blow
-		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0)
-	var crit := randf() < 0.08
+		# Formations and the Heart (and the shades' friendship) soften every blow; so does a Vajra Body
+		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0))
+	var lf: bool = a.side == "party" and a.idx == 0
+	var crit := randf() < 0.08 + (Game.talent_mod("crit") if lf else 0.0)
+	# the crown of the Sword Bone: Lin Feng's first blow of the battle always lands true
+	if lf and first_blow:
+		first_blow = false
+		if Game.talent_crown("sword_bone"):
+			crit = true
 	if crit:
 		raw *= 1.5
 	var dmg := maxi(1, int(round(raw)))
+	# the crown of the Vajra Body: once a battle, a blow that would fell Lin Feng leaves him a breath
+	if tgt.side == "party" and tgt.idx == 0 and tgt.hp - dmg <= 0.0 and not vajra_used and Game.talent_crown("vajra"):
+		vajra_used = true
+		dmg = maxi(0, int(tgt.hp) - 1)
+		say("Lin Feng's Vajra Body holds!")
 	tgt.hp = maxf(0.0, tgt.hp - dmg)
 	tgt.flash = 0.35
 	tgt.shake = 0.3
@@ -383,6 +433,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		say("%s is defeated." % tgt.name if tgt.side == "foe" else "%s collapses!" % tgt.name)
 		if tgt.side == "foe":
 			Game.kills += 1
+	return dmg
 
 func _heal(tgt: Dictionary, amount: float) -> void:
 	# the Compassionate Heart and the Pearl-Weepers' friendship strengthen every heal
@@ -415,15 +466,27 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 			for tg in tgts:
 				Fx3D.projectile(scene3d, pos3(actor) + Vector3(0, 1.4, 0), pos3(tg) + Vector3(0, 1.4 if not tg.boss else 2.8, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
 			Fx3D.technique(scene3d, skill_id, pos3(actor), tgts.map(func(f): return pos3(f)), atan2(cam_look.x - cam.position.x, cam_look.z - cam.position.z))
-		# the Sword's Dao: Lin Feng's single strikes cut deeper, his plain sword strike deepest
+		# the Sword's Dao: Lin Feng's single strikes cut deeper, his plain sword strike deepest; and the
+		# branches of his root he has woken strengthen the techniques of their element (Part XII)
 		var dm := 1.0
-		if actor.side == "party" and actor.idx == 0:
+		var lf: bool = actor.side == "party" and actor.idx == 0
+		if lf:
 			if skill_id == "strike":
 				dm = Game.dao_mod("strike", 1.0)
 			elif s.tgt == "one":
 				dm = Game.dao_mod("one", 1.0)
+			dm *= Game.talent_power(skill_id)
 		for tg in tgts:
-			_hit(actor, tg, s.mult * dm, s.elem, false)
+			var done := _hit(actor, tg, s.mult * dm, s.elem, false)
+			if not lf or done <= 0:
+				continue
+			# the crown of the Thunder Root: lightning answers lightning on a weakness
+			if s.elem == "thunder" and tg.weak == "thunder" and not tg.dead and Game.talent_crown("thunder_root"):
+				say("Thunder answers thunder!")
+				_hit(actor, tg, s.mult * dm * 0.5, s.elem, true)
+			# the crown of the Yin Root: the dark keeps a tenth of what it takes
+			if s.elem == "dark" and Game.talent_crown("yin_root"):
+				actor.hp = minf(actor.maxhp, actor.hp + done * 0.1)
 		if not headless() and actor.has("model"):
 			Models.act(actor.model, "cast", t)
 	_end_action()
@@ -456,10 +519,14 @@ func _win() -> void:
 		xp += Data.enemy_exp(f.lv, f.boss)
 		stones += Data.enemy_stones(f.lv, f.boss)
 	_writeback()
-	# the Cauldron's Dao pays better; every victory deepens the Dao Lin Feng walks
-	stones = int(stones * Game.dao_mod("stones", 1.0))
+	# the Cauldron's Dao pays better, and so does Heaven's Favour; every victory deepens the Dao Lin
+	# Feng walks (twice over with the crown of an Enlightened Mind), and an Enlightened Mind learns more
+	stones = int(stones * Game.dao_mod("stones", 1.0) * (1.0 + Game.talent_mod("stones")) * Game.boon("stones", 1.0))
+	xp = int(xp * (1.0 + Game.talent_mod("exp")) * Game.boon("exp", 1.0))
 	if not ctx.get("tribulation", false):
 		Game.dao_battle_won(boss)
+		if Game.talent_crown("insight"):
+			Game.dao_battle_won(boss)
 	result_lines = ["VICTORY", "+%d cultivation   +%d spirit stones" % [xp, stones]]
 	if ctx.get("tribulation", false):
 		xp = 0
@@ -467,10 +534,11 @@ func _win() -> void:
 		result_lines = ["The tribulation is endured!"]
 	Game.stones += stones
 	if boss and not ctx.get("tribulation", false):
-		Game.add_item("hp_pill", 2)
+		var fav := 3 if Game.talent_crown("fortune") else 2
+		Game.add_item("hp_pill", fav)
 		Game.add_item("qi_pill", 1)
-		result_lines.append("Found: 2 Healing Pills, 1 Spirit Qi Pill")
-	elif randf() < 0.25:
+		result_lines.append("Found: %d Healing Pills, 1 Spirit Qi Pill" % fav)
+	elif randf() < 0.25 + Game.talent_mod("drop"):
 		Game.add_item("hp_pill", 1)
 		result_lines.append("Found: Healing Pill")
 	Game.add_exp(xp)

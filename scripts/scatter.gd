@@ -129,6 +129,17 @@ const ECO := {
 		"ground": [["glowshroom", 2], ["fern", 0.5]], "land": 0.35, "rocks": ["spire", "boulder", "crystal"], "rock_p": 0.1, "grass": 0.3, "cover": 0.12},
 	"youdu": {"canopy": [["dead", 2], ["cypress", 2], ["crystal_tree", 0.6]], "under": [["deadbush", 2], ["spiderlily", 1]],
 		"ground": [["spiderlily", 1], ["deadbush", 0.5]], "land": 0.35, "rocks": ["slab", "spire"], "rock_p": 0.06, "grass": 0.25, "cover": 0.06},
+	# ---- Part XII: sea-pines, blossom and white cliffs on Penglai; peach, ginkgo and herbs in the
+	# immortals' gardens of Fangzhang; wind-bent pines and bare crags in the mists of Yingzhou; coral and
+	# kelp left standing on the bare sea floor at the Returning Ruins
+	"penglai": {"canopy": [["pine", 3], ["blossom", 2], ["cypress", 1], ["bonsai", 1]], "under": [["round_bush", 2], ["flowerbush", 1], ["fern", 1]],
+		"ground": [["flowers", 1.0], ["fern", 0.4]], "land": 0.3, "rocks": ["boulder", "slab"], "rock_p": 0.06, "grass": 0.8, "cover": 0.08},
+	"fangzhang": {"canopy": [["peach", 3], ["ginkgo", 2], ["wisteria", 1], ["bonsai", 1]], "under": [["flowerbush", 2], ["round_bush", 1], ["fern", 1]],
+		"ground": [["flowers", 2], ["fern", 0.5]], "land": 0.25, "rocks": ["slab", "boulder"], "rock_p": 0.05, "grass": 1.0, "cover": 0.1},
+	"yingzhou": {"canopy": [["pine", 3], ["bonsai", 2], ["dead", 1]], "under": [["fern", 2], ["round_bush", 1]],
+		"ground": [["fern", 1], ["flowers", 0.3]], "land": 0.45, "rocks": ["spire", "boulder", "slab"], "rock_p": 0.14, "grass": 0.6, "cover": 0.1},
+	"guixu": {"canopy": [["kelp", 3], ["dead", 1], ["mangrove", 0.5]], "under": [["kelp", 3], ["deadbush", 1]],
+		"ground": [["kelp", 1]], "land": 0.4, "rocks": ["boulder", "slab", "scree"], "rock_p": 0.1, "grass": 0.2, "cover": 0.05},
 }
 
 static var _grass := {}

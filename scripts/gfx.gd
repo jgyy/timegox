@@ -64,6 +64,10 @@ static func world_minimap(wd: Dictionary) -> ImageTexture:
 		"under":
 			deep = Color("06080c")
 			shallow = Color("16222a")
+		"sea":
+			# the Eastern Sea, out past the shelf: deeper and greener than the Four Seas
+			deep = Color("123a4a")
+			shallow = Color("2a7a86")
 	for i in W * H:
 		if not sea.is_empty() and sea[i] == 1:
 			# the Four Seas: one deep blue, paler in the shallows along the coast

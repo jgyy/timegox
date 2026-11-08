@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 48
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord"]
+const MAX_LEVEL := 51
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -17,6 +17,128 @@ static func level_name(l: int) -> String:
 
 static func realm_cap(l: int) -> bool:
 	return l % 3 == 2 and l < MAX_LEVEL
+
+# ---------------------------------------------------------------- what a realm means (Part XII)
+## The major realm of a cultivation level (0 Qi Condensation ... 17 Ten Thousand Waters Return).
+static func realm_of(l: int) -> int:
+	return int(l / 3)
+
+## Realm suppression: a cultivator a whole realm above another weighs on them (every blow lands harder
+## and every blow taken lands softer), two realms above crushes them, and a beast two realms below a
+## cultivator will not even fight (Main.interact).  The multiplier on damage dealt by a fighter of
+## level `att` to one of level `def`, capped at three realms either way.  Heavenly Tribulations are
+## not cultivators and press equally on everyone.
+const SUPPRESS := 0.2
+const SUPPRESS_CAP := 3
+static func suppression(att: int, def: int) -> float:
+	var d := clampi(realm_of(att) - realm_of(def), -SUPPRESS_CAP, SUPPRESS_CAP)
+	return 1.0 + SUPPRESS * d if d >= 0 else 1.0 / (1.0 + SUPPRESS * -d)
+
+## A pack whose strongest member is this many realms below Lin Feng scatters before his aura.
+const AURA_FLEE := 2
+
+## How long a cultivator of each realm lives (years), how the world addresses them, and what the
+## realm is like from the inside (the Cultivation page shows it; townsfolk speak to it).
+const REALM_INFO := [
+	{"life": 120, "title": "young friend", "note": "Qi gathers in the dantian like rain in a pond. A mortal could still beat you in a fair fight, and might."},
+	{"life": 200, "title": "young friend", "note": "The qi is poured into a foundation, the way a house is: everything after stands on it."},
+	{"life": 500, "title": "Daoist friend", "note": "The qi condenses into a golden core. Lesser beasts can smell it and keep their distance."},
+	{"life": 1000, "title": "Daoist friend", "note": "The core cracks and a small self is born inside it, the nascent soul, which can leave the body for a while and come back."},
+	{"life": 2000, "title": "senior", "note": "The soul and the body learn to change places. Cultivators of this realm found sects; their names go into the histories."},
+	{"life": 5000, "title": "senior", "note": "The body is refined back towards the void it came from. You can feel the seams of the world, if you are careful."},
+	{"life": 10000, "title": "elder", "note": "Your Dao and the Dao of the world begin to run together. You can hear the land think."},
+	{"life": 20000, "title": "elder", "note": "The great vehicle: carried by the Dao rather than carrying yourself towards it. Most sects have never seen one."},
+	{"life": 100000, "title": "Immortal", "note": "Your name would once have been written in the sky. Nobody writes it now; you are an immortal all the same."},
+	{"life": 1000000, "title": "Immortal Lord", "note": "Ancestors of the Dao are said to hold up the sky. You know better: the sky holds itself up, if it is asked kindly."},
+	{"life": 0, "title": "Sovereign", "note": "The realm of the first things: chaos, the four pillars, the colours of Nuwa's stones. Lifespan stops being a number."},
+	{"life": 0, "title": "Venerable", "note": "Death and rebirth turn round you like a wheel round its axle. The dead know your name, and nod."},
+	{"life": 0, "title": "Venerable", "note": "No border holds you, and you hold none. Every road is one road."},
+	{"life": 0, "title": "Star-Crosser", "note": "You can walk the Silver River from bank to bank. The stars in the water are real, and so are you."},
+	{"life": 0, "title": "Star-Crosser", "note": "The sun and the moon take turns in you. Nobody has to have nine days of noon ever again."},
+	{"life": 0, "title": "Sage", "note": "The land keeps its own shape inside you, mountains and rivers, and you do not tell it what that shape should be."},
+	{"life": 0, "title": "Sage of the Ladder", "note": "Heaven above, earth below and the middle world in your hands, held the way a ladder is held for somebody else."},
+	{"life": 0, "title": "Sage of the Ladder", "note": "Every water in the world comes home through you: the rain, the rivers, the sea and the Silver River. Nothing returns empty."},
+]
+
+## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
+## 0-1, 2-3, 4-5, 6-8, 9-12, 13 and above).  `%s` is how they address Lin Feng.
+const REALM_GREETS := [
+	"Morning, %s. Mind the puddles.",
+	"A Golden Core? At your age? Forgive me, %s, I will stop staring in a moment.",
+	"The air goes still when you come near, %s. Like before a storm. A nice storm.",
+	"My grandmother told stories about cultivators like you, %s. They were all made up. You are not.",
+	"I bowed before I knew I was going to, %s. My knees decided on their own.",
+	"Even the birds go quiet when you pass, %s. Then they start up again, louder, as if they wanted you to hear.",
+]
+static func realm_band(l: int) -> int:
+	var r := realm_of(l)
+	if r <= 1:
+		return 0
+	if r <= 3:
+		return 1
+	if r <= 5:
+		return 2
+	if r <= 8:
+		return 3
+	if r <= 12:
+		return 4
+	return 5
+
+# ---------------------------------------------------------------- the Nine Heavens root (Part XII)
+## Lin Feng's root has nine branches, and each is a talent.  They sleep until something wakes them:
+## the first time his qi stirs, every Heavenly Tribulation he survives and every one of the Founder's
+## sealed caves on the mountain wakes one rank of a branch, and he chooses which.  `fx` holds what one
+## rank adds (Game.talent_mod reads it); a rank-three branch also has a `crown`, a power of its own.
+const TALENT_ORDER := ["sword_bone", "thunder_root", "five_phase", "yin_root", "vajra", "qi_sea", "insight", "fortune", "spirit_sense"]
+const TALENT_MAX := 3
+const TALENT_RANKS := ["asleep", "stirring", "awake", "in full leaf"]
+const TALENTS := {
+	"sword_bone": {"n": "Sword Bone", "col": Color("e0e8f8"),
+		"desc": "A bone that remembers every cut it was ever part of. The plain sword strike and the sword techniques cut deeper with each rank, and so does every technique aimed at a single foe.",
+		"per": "Sword Strike and physical techniques +22%, single-target techniques +6%",
+		"crown": "Sword intent: Lin Feng's first blow of every battle lands as a critical strike.",
+		"fx": {"strike": 0.22, "phys": 0.22, "one": 0.06}},
+	"thunder_root": {"n": "Thunder Root", "col": Color("f6e85c"),
+		"desc": "The branch that drinks lightning. Thunder techniques strike harder with each rank; at the crown, lightning answers lightning.",
+		"per": "thunder techniques +18%",
+		"crown": "Thunder answers thunder: a thunder technique that finds a weakness strikes the foe again for half as much.",
+		"fx": {"thunder": 0.18}},
+	"five_phase": {"n": "Five-Phase Root", "col": Color("8ae0a0"),
+		"desc": "Fire, water, wood and earth, turning into one another the way the seasons do. Techniques of all four grow stronger with each rank.",
+		"per": "fire, water, wood and earth techniques +12%",
+		"crown": "The phases turn: a technique that strikes every foe at once costs a fifth less qi.",
+		"fx": {"fire": 0.12, "water": 0.12, "wood": 0.12, "earth": 0.12}},
+	"yin_root": {"n": "Yin Root", "col": Color("b890ff"),
+		"desc": "The branch that grows towards the dark: the void, the turning of the wheel, the far side of the mirror. Dark techniques strike harder with each rank.",
+		"per": "dark techniques +18%",
+		"crown": "What the dark takes, it keeps: a dark technique heals Lin Feng for a tenth of the harm it does.",
+		"fx": {"dark": 0.18}},
+	"vajra": {"n": "Vajra Body", "col": Color("e8b860"),
+		"desc": "Flesh tempered like the diamond-thunderbolt of the old sutras. More health and less harm from every blow with each rank.",
+		"per": "health +10%, harm taken -5%",
+		"crown": "Unbreakable: once in every battle a blow that would fell Lin Feng leaves him standing with one breath.",
+		"fx": {"hp": 0.10, "taken": 0.05}},
+	"qi_sea": {"n": "Sea of Qi", "col": Color("7ec8ff"),
+		"desc": "A dantian as deep as the Eastern Sea. More qi, more qi gathered every turn, and every technique a little cheaper.",
+		"per": "qi +10%, +1% qi each turn, techniques cost 3% less",
+		"crown": "The tide comes in: once in every battle, when Lin Feng's qi runs low, a third of it floods back.",
+		"fx": {"qi": 0.10, "regen": 0.01, "cost": 0.03}},
+	"insight": {"n": "Enlightened Mind", "col": Color("ffe0a0"),
+		"desc": "Comprehension, the talent the old masters prized above every other: meditation goes deeper, battles teach more and every Dao is learned faster.",
+		"per": "meditation +12%, cultivation from battle +6%",
+		"crown": "One insight opens three doors: every battle teaches the Dao Lin Feng walks twice as much.",
+		"fx": {"med": 0.12, "exp": 0.06}},
+	"fortune": {"n": "Heaven's Favour", "col": Color("ffd060"),
+		"desc": "Luck, which cultivators pretend not to believe in and all of them want. More spirit stones, more pills found and more blows that land true.",
+		"per": "spirit stones +15%, critical strikes +3%, pills found +8%",
+		"crown": "Fortune favours the bold: a boss always leaves a third healing pill behind.",
+		"fx": {"stones": 0.15, "crit": 0.03, "drop": 0.08}},
+	"spirit_sense": {"n": "Spirit Sense", "col": Color("a8f0e0"),
+		"desc": "The divine sense that reaches past the eyes. Lin Feng acts sooner and slips more blows with each rank, and from the first rank he can feel the caches other cultivators hid.",
+		"per": "speed +2, slip 3% of blows; reveals hidden caches",
+		"crown": "Nothing is hidden: Lin Feng moves first in every battle, and foes miss him a little more often.",
+		"fx": {"spd": 2.0, "evade": 0.03}},
+}
 
 # ---------------------------------------------------------------- skills
 # tgt: one | all | ally | allies.  "revive": the heal also raises fallen allies (Lotus of Rebirth and later)
@@ -63,6 +185,10 @@ const SKILLS := {
 	"standing_tree": {"n": "Strike of the Standing Tree", "cost": 470, "mult": 55.0, "elem": "wood", "tgt": "one", "lv": 45, "who": 0},
 	"springs_torrent": {"n": "Torrent of the Nine Springs", "cost": 380, "mult": 9.2, "elem": "water", "tgt": "all", "lv": 46, "who": 0},
 	"concord": {"n": "Three Realms Concord Sword", "cost": 500, "mult": 60.0, "elem": "thunder", "tgt": "one", "lv": 47, "who": 0, "after": "s_yd_houtu"},
+	# ---- Part XII
+	"returning_tide": {"n": "Returning Tide Sword", "cost": 520, "mult": 64.0, "elem": "water", "tgt": "one", "lv": 48, "who": 0},
+	"isles_rain": {"n": "Rain over the Five Isles", "cost": 410, "mult": 10.2, "elem": "wood", "tgt": "all", "lv": 49, "who": 0},
+	"jingwei_stone": {"n": "Jingwei's Stone Sword", "cost": 560, "mult": 70.0, "elem": "earth", "tgt": "one", "lv": 50, "who": 0, "after": "s_yz_return"},
 	# the Dao techniques (Part XI): each Dao teaches one once its walker is an Adept (see DAOS)
 	"myriad_swords": {"n": "Ten Thousand Swords Return to One", "cost": 440, "mult": 54.0, "elem": "phys", "tgt": "one", "lv": 45, "who": 0, "dao": "sword"},
 	"peng_wind": {"n": "Peng's Wind of Ninety Thousand Li", "cost": 350, "mult": 9.0, "elem": "wood", "tgt": "all", "lv": 45, "who": 0, "dao": "wander"},
@@ -89,6 +215,9 @@ const SKILLS := {
 	"river_mother": {"n": "River-Mother's Ward", "cost": 135, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 43, "who": 1, "revive": true},
 	"feather_rain": {"n": "Rain of Phoenix Feathers", "cost": 125, "mult": 7.2, "elem": "wood", "tgt": "all", "lv": 45, "who": 1},
 	"jianmu_ward": {"n": "Ward of the Standing Tree", "cost": 145, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 46, "who": 1, "revive": true},
+	# ---- Part XII
+	"pearl_spray": {"n": "Spray of the Pearl Trees", "cost": 135, "mult": 7.8, "elem": "wood", "tgt": "all", "lv": 48, "who": 1},
+	"mazu_lantern": {"n": "Mazu's Red Lantern", "cost": 155, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 49, "who": 1, "revive": true, "after": "s_p12_shore"},
 	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
@@ -451,14 +580,60 @@ const ENEMIES := {
 	"hei_wuchang": {"n": "Hei Wuchang, Black Impermanence", "elem": "dark", "weak": "fire", "col": Color("2a2a34"), "shape": "jiangshi", "boss": true, "pal": {"acc": Color("e0e0ff")}},
 	"tubo": {"n": "Tubo, Earl of the Dark Capital", "elem": "earth", "weak": "wood", "col": Color("5a3a2a"), "shape": "oxhead", "boss": true, "pal": {"acc": Color("ff3020")}},
 	"li": {"n": "Li, Who Presses Down the Earth", "elem": "earth", "weak": "wood", "col": Color("5a4a40"), "shape": "golem", "boss": true, "pal": {"acc": Color("ff7a30")}},
+	# ---- Part XII: the Isles of the Eastern Sea and the Returning Ruins
+	"mirage_wisp": {"n": "Mirage Wisp", "elem": "water", "weak": "earth", "col": Color("e8f0ff"), "shape": "wisp"},
+	"stranded_shark": {"n": "Shark Stranded by the Low Tide", "elem": "water", "weak": "thunder", "col": Color("8a98a8"), "shape": "carp", "pal": {"under": Color("f0f0ec"), "acc": Color("e04030")}},
+	"sand_crab": {"n": "Sandbar Crab", "elem": "earth", "weak": "wood", "col": Color("d8b878"), "shape": "crab"},
+	"cinnabar_toad": {"n": "Cinnabar Toad of the Furnaces", "elem": "fire", "weak": "water", "col": Color("d84a2a"), "shape": "blob"},
+	"elixir_crane": {"n": "Crane Who Steals Elixirs", "elem": "wood", "weak": "fire", "col": Color("f4f4ee"), "shape": "bird", "pal": {"sec": Color("1a1a22"), "acc": Color("e02a2a")}},
+	"herb_rabbit": {"n": "Herb-Thief Rabbit", "elem": "earth", "weak": "wood", "col": Color("e8e0d0"), "shape": "jade_rabbit"},
+	"mist_phantom": {"n": "Phantom of the Sea-Mist", "elem": "dark", "weak": "thunder", "col": Color("b8c8d8"), "shape": "wraith"},
+	"bore_horse": {"n": "White Horse of the Tidal Bore", "elem": "water", "weak": "earth", "col": Color("f0f4f8"), "shape": "qilin", "pal": {"sec": Color("a8c8e8"), "acc": Color("60d0ff")}},
+	"shell_soldier": {"n": "Shell-Armoured Tide Soldier", "elem": "water", "weak": "thunder", "col": Color("6a8aa0"), "shape": "humanoid"},
+	"drowned_sailor": {"n": "Drowned Sailor of the Lost Fleet", "elem": "dark", "weak": "fire", "col": Color("6a7a7a"), "shape": "jiangshi"},
+	"abyss_eel": {"n": "Eel of the Bottomless Ravine", "elem": "water", "weak": "thunder", "col": Color("2a3a5a"), "shape": "serpent", "pal": {"acc": Color("60ffd0")}},
+	"ruin_sentinel": {"n": "Sentinel of the Sunken Isles", "elem": "earth", "weak": "wood", "col": Color("8a9a8a"), "shape": "golem"},
+	"qianliyan": {"n": "Qianliyan, Thousand-Li Eye", "elem": "wood", "weak": "fire", "col": Color("3a8a5a"), "shape": "demon", "boss": true, "pal": {"acc": Color("fff070")}},
+	"shunfenger": {"n": "Shunfeng'er, Wind-Following Ear", "elem": "fire", "weak": "water", "col": Color("c83a2a"), "shape": "demon", "boss": true, "pal": {"acc": Color("80e0ff")}},
+	"sea_monk": {"n": "The Sea-Monk Who Drowns Fishermen", "elem": "water", "weak": "thunder", "col": Color("5a7a6a"), "shape": "tortoise", "boss": true, "pal": {"sec": Color("3a4a3a"), "acc": Color("ffb040")}},
+	"longbo_giant": {"n": "The Giant of Longbo, Who Fishes for Turtles", "elem": "earth", "weak": "wood", "col": Color("a87a5a"), "shape": "ape", "boss": true, "pal": {"sec": Color("4a6a8a"), "acc": Color("f0d060")}},
+	"longevity_deer": {"n": "The White Deer of Longevity", "elem": "wood", "weak": "fire", "col": Color("f4f0e4"), "shape": "qilin", "boss": true, "pal": {"sec": Color("d8a850"), "acc": Color("ff5a5a")}},
+	"elixir_furnace": {"n": "The Elixir Furnace That Walked Away", "elem": "fire", "weak": "water", "col": Color("b07a3a"), "shape": "golem", "boss": true, "pal": {"acc": Color("ff8a20")}},
+	"pearl_tree": {"n": "The Pearl Tree That Will Not Fruit", "elem": "earth", "weak": "thunder", "col": Color("e8eef4"), "shape": "plant", "boss": true, "pal": {"sec": Color("7ab0a0"), "acc": Color("ffe8f0")}},
+	"tianwu": {"n": "Tianwu, the Eight-Headed God of the Waters", "elem": "water", "weak": "earth", "col": Color("d8a83a"), "shape": "kaiming", "boss": true, "pal": {"mark": Color("2a4a6a"), "acc": Color("60e0ff")}},
+	"wu_zixu": {"n": "Wu Zixu, God of the Tidal Bore", "elem": "water", "weak": "earth", "col": Color("e8ecf0"), "shape": "warden", "boss": true, "pal": {"acc": Color("60c8ff")}},
+	"shen": {"n": "Shen, the Mirage Clam-Dragon", "elem": "dark", "weak": "thunder", "col": Color("e0d8e8"), "shape": "dragon", "boss": true, "pal": {"sec": Color("b8a0c8"), "under": Color("fff0f8"), "acc": Color("ff90d0")}},
+	"great_ao": {"n": "The Great Ao Who Bears Yingzhou", "elem": "earth", "weak": "wood", "col": Color("6a7a5a"), "shape": "tortoise", "boss": true, "pal": {"sec": Color("4a5a3a"), "acc": Color("a0f0c0")}},
+	"yu_qiang": {"n": "Yu Qiang, God of the Northern Sea", "elem": "thunder", "weak": "earth", "col": Color("2a5a6a"), "shape": "crowmarshal", "boss": true, "pal": {"acc": Color("c8ff60")}},
+	"drowned_admiral": {"n": "The Admiral of the Lost Fleet", "elem": "dark", "weak": "fire", "col": Color("4a5a6a"), "shape": "wraith", "boss": true, "pal": {"acc": Color("ffd060")}},
+	"guixu_stopper": {"n": "The Bronze Stopper of Guixu", "elem": "earth", "weak": "wood", "col": Color("8a6a3a"), "shape": "warden", "boss": true, "pal": {"acc": Color("40ffd0")}},
+	"hai_ruo": {"n": "Ruo of the Northern Sea, the Sea Itself", "elem": "water", "weak": "earth", "col": Color("2a6aa8"), "shape": "storm", "boss": true, "pal": {"acc": Color("e8ffff")}},
+	"xu_fu": {"n": "Xu Fu, Who Sought the Elixir", "elem": "dark", "weak": "fire", "col": Color("5a4a7a"), "shape": "humanoid", "boss": true, "pal": {"sec": Color("d8c890"), "acc": Color("90ffb0")}},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
+
+## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
+## woken by level `lv` (Part XII): the first stirring, one for every tribulation survived and one for
+## every Founder's cave whose realm has been reached.
+static func expected_ranks(lv: int) -> int:
+	if lv <= 0:
+		return 0
+	return 1 + realm_of(lv) + clampi(realm_of(lv) - 1, 0, 9)
+
+## The world grows with the root (Part XII): every foe is a little tougher for each rank a cultivator of
+## its level would be expected to have woken, so the branches a player wakes keep pace with the world,
+## and a player who neglects them (or the Founder's caves) falls behind it.
+const ROOT_HP := 0.03
+const ROOT_ATK := 0.025
+## and a Heavenly Tribulation tests a woken root harder: +1.5% to its strength for every rank awake
+const TRIB_JEALOUSY := 0.015
 
 static func make_enemy(id: String, lv: int, boss_mult: float = 1.0) -> Dictionary:
 	var d: Dictionary = ENEMIES[id]
 	var boss: bool = d.get("boss", false)
-	var hp := 60 + 48 * lv
-	var a := 7.0 + 4.3 * lv
+	var er := expected_ranks(lv)
+	var hp := int((60 + 48 * lv) * (1.0 + ROOT_HP * er))
+	var a := (7.0 + 4.3 * lv) * (1.0 + ROOT_ATK * er)
 	var df := 2.0 + 2.6 * lv
 	if boss:
 		hp = int(hp * 6.0 * boss_mult)
@@ -513,6 +688,8 @@ const AREAS := {
 			{"to": "longmen", "pos": Vector2i(12, 1), "dest": Vector2i(4, 30), "open": "s_p10_road"},
 		],
 		"npcs": [
+			{"id": "gardener_ruan", "n": "Herb-Gardener Ruan", "pos": Vector2i(24, 14), "col": Color("5a8a4a")},
+			{"id": "xiao_qing", "n": "Outer Disciple Xiao Qing", "pos": Vector2i(17, 15), "col": Color("7aa0d0"), "vis": ["s_p4_home", ""]},
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 4), "col": Color("e8e8ff")},
 			{"id": "alchemist", "n": "Alchemist Mo", "pos": Vector2i(7, 8), "col": Color("6fc08a")},
 			{"id": "smith", "n": "Smith Tie", "pos": Vector2i(32, 8), "col": Color("d08a5a")},
@@ -525,7 +702,7 @@ const AREAS := {
 			{"id": "disciple_han", "n": "Senior Brother Han", "pos": Vector2i(31, 3), "col": Color("3a6aa0")},
 			{"id": "disciple_mei", "n": "Junior Sister Mei", "pos": Vector2i(13, 18), "col": Color("6aa0c8")},
 			{"id": "cook_zhou", "n": "Auntie Zhou the Cook", "pos": Vector2i(4, 3), "col": Color("a85a3a")},
-			{"id": "sweeper_bai", "n": "Little Bai the Sweeper", "pos": Vector2i(17, 9), "col": Color("8a8a90")},
+			{"id": "sweeper_bai", "n": "Little Bai the Sweeper", "pos": Vector2i(17, 9), "col": Color("8a8a90"), "vis": ["s_elder2", ""]},
 			{"id": "gate_wu", "n": "Gate Disciple Wu", "pos": Vector2i(36, 14), "col": Color("2a3a4a")},
 			{"id": "bell_shen", "n": "Old Shen the Bell-Ringer", "pos": Vector2i(24, 10), "col": Color("b8803a")},
 		],
@@ -568,6 +745,9 @@ const AREAS := {
 		# Cloudfoot: the post town where the north road leaves the mountain for the river (a main
 		# street up from the sect's north gate and a cross street between the inns)
 		"npcs": [
+			{"id": "courier_ma", "n": "Courier Ma of the Nine Roads", "pos": Vector2i(83, 32), "col": Color("3a6a4a")},
+			{"id": "noodle_he", "n": "Granny He of the Noodle Stall", "pos": Vector2i(85, 37), "col": Color("a8503a")},
+			{"id": "clerk_wei", "n": "Wei, Who Collected Taxes for the Court", "pos": Vector2i(79, 36), "col": Color("4a4a5a"), "vis": ["s_p5_home", ""]},
 			{"id": "cartographer_pei", "n": "Cartographer Pei of Cloudfoot", "pos": Vector2i(91, 25), "col": Color("3e6a5a")},
 			{"id": "postmaster_lu", "n": "Postmaster Lu", "pos": Vector2i(70, 25), "col": Color("6a4a3a")},
 			{"id": "storyteller_wu", "n": "Old Wu the Storyteller", "pos": Vector2i(70, 41), "col": Color("8a3a3a")},
@@ -579,6 +759,20 @@ const AREAS := {
 		],
 		"pickups": [{"id": "cur_leaf3", "item": "autumn_leaf", "pos": Vector2i(74, 26), "floor": ["post_station", 1], "always": true},
 			{"id": "cur_wine2", "item": "peach_wine", "pos": Vector2i(74, 40), "floor": ["tale_teahouse", 1], "always": true}],
+		# Part XII: the Founder's nine sealed caves round the sect, each opening only to a cultivator of
+		# the realm carved on its door; inside, her words (DIALOGUE "abode:<id>"), spirit stones and an
+		# awakening of the Nine Heavens root
+		"abodes": [
+			{"id": "cave_core", "n": "The Cave of the Golden Core", "pos": Vector2i(116, 72), "req": 6, "stones": 150, "motto": "A core is only qi that has decided what it is."},
+			{"id": "cave_soul", "n": "The Cave of the Nascent Soul", "pos": Vector2i(92, 91), "req": 9, "stones": 250, "motto": "The small self inside you is the one who will do the work. Be kind to it."},
+			{"id": "cave_deity", "n": "The Cave of Deity Transformation", "pos": Vector2i(62, 72), "req": 12, "stones": 350, "motto": "The body is a house. You may visit it."},
+			{"id": "cave_void", "n": "The Cave of Void Refinement", "pos": Vector2i(68, 92), "req": 15, "stones": 500, "motto": "Where the world is thin, be careful. Where you are thin, be kind."},
+			{"id": "cave_merging", "n": "The Cave of Dao Merging", "pos": Vector2i(110, 94), "req": 18, "stones": 700, "motto": "Your Dao and the world's are one river. Swim with it, never against it, and sometimes across."},
+			{"id": "cave_mahayana", "n": "The Cave of the Great Vehicle", "pos": Vector2i(86, 57), "req": 21, "stones": 900, "motto": "A great vehicle carries others, or it is only a large one."},
+			{"id": "cave_immortal", "n": "The Cave of the True Immortal", "pos": Vector2i(52, 64), "req": 24, "stones": 1200, "motto": "Immortal only means more time to be wrong. Spend it being right."},
+			{"id": "cave_ancestor", "n": "The Cave of the Dao Ancestor", "pos": Vector2i(120, 52), "req": 27, "stones": 1500, "motto": "Everything after this door is yours. Write it on the walls for whoever comes next."},
+			{"id": "cave_sovereign", "n": "The Last Cave", "pos": Vector2i(60, 100), "req": 30, "stones": 2000, "motto": "Sweep the steps. Then go and see."},
+		],
 		# Part XI: the Jianmu, the Standing Tree, grown back overnight on the open ground west of the
 		# sect; its trunk is solid ground, its crown is in the Nine Heavens and its roots in the Nine Springs
 		"blocks": [Rect2i(30, 50, 9, 9)],
@@ -921,6 +1115,8 @@ const AREAS := {
 			{"to": "fungal", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_du_tiger"},
 		],
 		"npcs": [
+			{"id": "navid", "n": "Navid the Sogdian Merchant", "pos": Vector2i(11, 43), "col": Color("8a3a5a")},
+			{"id": "farida", "n": "Farida the Star-Glass Blower", "pos": Vector2i(12, 37), "col": Color("3a8ab0")},
 			{"id": "nomad", "n": "Nomad Matriarch Ba Yin", "pos": Vector2i(10, 26), "col": Color("e8c890"), "vis": ["s_du_intro", ""]},
 			{"id": "cook_aysha", "n": "Auntie Aysha of the Caravanserai", "pos": Vector2i(6, 36), "col": Color("a84a3a")},
 			{"id": "well_keeper_zhaya", "n": "Well-Keeper Zhaya", "pos": Vector2i(6, 44), "col": Color("c8a070")},
@@ -1089,6 +1285,8 @@ const AREAS := {
 			{"to": "terraces", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_vl_needle"},
 		],
 		"npcs": [
+			{"id": "teacher_ren", "n": "Old Teacher Ren of the Village School", "pos": Vector2i(31, 33), "col": Color("5a4a6a")},
+			{"id": "ox_herd_niu", "n": "Ah Niu the Ox-Herd", "pos": Vector2i(28, 31), "col": Color("8a6a3a")},
 			{"id": "granny_wen", "n": "Granny Wen the Midwife", "pos": Vector2i(10, 21), "col": Color("c8b8a0")},
 			{"id": "innkeeper", "n": "Innkeeper Fu", "pos": Vector2i(21, 33), "col": Color("d09a5a")},
 			{"id": "weaver_liu", "n": "Weaver Liu", "pos": Vector2i(56, 21), "col": Color("b08ad0")},
@@ -1282,6 +1480,8 @@ const AREAS := {
 			{"to": "millet", "pos": Vector2i(102, 25), "dest": Vector2i(4, 24), "open": "s_yg_hanba"},
 		],
 		"npcs": [
+			{"id": "archer_kong", "n": "Archery-Master Kong", "pos": Vector2i(32, 27), "col": Color("6a5a3a"), "vis": ["s_yg_intro", ""]},
+			{"id": "lantern_xi", "n": "Lantern-Maker Xi", "pos": Vector2i(31, 31), "col": Color("d84a2a"), "vis": ["s_yg_intro", ""]},
 			{"id": "ah_mei", "n": "Ah Mei the Lantern-Maker", "pos": Vector2i(12, 35), "col": Color("e05a4a"), "vis": ["s_yg_intro", ""]},
 			{"id": "watchman_zhou", "n": "Night-Watchman Lao Zhou", "pos": Vector2i(36, 27), "col": Color("5a6a8a"), "vis": ["s_yg_intro", ""]},
 			{"id": "innkeeper_bao", "n": "Innkeeper Bao of the Sleepless Inn", "pos": Vector2i(12, 24), "col": Color("b07a4a"), "vis": ["s_yg_intro", ""]},
@@ -1353,7 +1553,10 @@ const AREAS := {
 			{"to": "millet", "pos": Vector2i(1, 34), "dest": Vector2i(94, 30), "open": ""},
 			{"to": "guanghan", "pos": Vector2i(86, 30), "dest": Vector2i(4, 28), "open": "s_fs_jinwu"},
 		],
-		"npcs": [{"id": "feng_meng", "n": "Feng Meng, the Last Apprentice", "pos": Vector2i(15, 30), "col": Color("7a6a5a"), "vis": ["s_fs_intro", ""]}],
+		"npcs": [{"id": "feng_meng", "n": "Feng Meng, the Last Apprentice", "pos": Vector2i(15, 30), "col": Color("7a6a5a"), "vis": ["s_fs_intro", ""]},
+			# Part XII: Mazu, who brings the boats home, waiting with her boat on the pool where the ten suns
+			# bathed (its hot spring runs under the hills to the sea)
+			{"id": "mazu", "n": "Mazu, Who Brings the Boats Home", "pos": Vector2i(69, 47), "col": Color("d83a3a"), "vis": ["s_p12_home", ""]}],
 		"bosses": [
 			{"id": "boiled_crab", "pos": Vector2i(36, 16), "lv": 40, "req": 40},
 			{"id": "ninth_ember", "pos": Vector2i(52, 6), "lv": 40, "req": 40},
@@ -1408,6 +1611,8 @@ const AREAS := {
 			{"to": "drowned", "pos": Vector2i(98, 30), "dest": Vector2i(4, 29), "open": "s_dg_hebo"},
 		],
 		"npcs": [
+			{"id": "xia_cormorant", "n": "Xia and Her Cormorant", "pos": Vector2i(31, 31), "col": Color("4a6a7a")},
+			{"id": "examiner_fan", "n": "Fan, Who Failed the Examinations Nine Times", "pos": Vector2i(25, 31), "col": Color("3a3a5a")},
 			{"id": "harbour_yao", "n": "Harbourmistress Jiang Yao", "pos": Vector2i(37, 45), "col": Color("2e5a7a")},
 			{"id": "boatwright_gao", "n": "Boatwright Gao", "pos": Vector2i(34, 23), "col": Color("7a5a3a")},
 			{"id": "fishwife_lu", "n": "Fishwife Lu", "pos": Vector2i(34, 36), "col": Color("c86a4a")},
@@ -1492,6 +1697,8 @@ const AREAS := {
 			{"to": "buzhou", "pos": Vector2i(94, 30), "dest": Vector2i(4, 29), "open": "s_ts_taotie"},
 		],
 		"npcs": [
+			{"id": "auntie_rong", "n": "Auntie Rong of the Smelting Pits", "pos": Vector2i(29, 31), "col": Color("a84a2a")},
+			{"id": "bell_tuner_gong", "n": "Bell-Tuner Gong", "pos": Vector2i(25, 28), "col": Color("8a6a3a")},
 			{"id": "tu_lan", "n": "Tu Lan, Last of the Cauldron-Casters", "pos": Vector2i(11, 21), "col": Color("8a3a2a")},
 			{"id": "caster_wei", "n": "Bell-Caster Wei", "pos": Vector2i(46, 23), "col": Color("6a5a4a")},
 			{"id": "carver_shi", "n": "Stone-Carver Shi", "pos": Vector2i(24, 39), "col": Color("8a8a80")},
@@ -1569,6 +1776,8 @@ const AREAS := {
 			{"to": "changhe", "pos": Vector2i(98, 32), "dest": Vector2i(4, 30), "open": "s_jt_leigong"},
 		],
 		"npcs": [
+			{"id": "ao_xun", "n": "Rain-Clerk Ao Xun", "pos": Vector2i(41, 38), "col": Color("3a7a7a"), "race": "dragon"},
+			{"id": "ling_fei", "n": "Ling Fei, Who Cannot Fly", "pos": Vector2i(37, 34), "col": Color("9ab0d8"), "race": "yumin"},
 			{"id": "ling_yu_sky", "asset": "ling_yu", "n": "Ling Yu of the Feathered Folk", "pos": Vector2i(19, 30), "col": Color("8ac0e8"), "race": "yumin"},
 			{"id": "yu_hua", "n": "Feather-Mother Yu Hua", "pos": Vector2i(35, 24), "col": Color("f0ece0"), "race": "yumin", "floor": ["aerie_tower", 1]},
 			{"id": "yu_jian", "n": "Fletcher Yu Jian", "pos": Vector2i(48, 24), "col": Color("8a6a4a"), "race": "yumin"},
@@ -1618,6 +1827,7 @@ const AREAS := {
 			{"to": "juntian", "pos": Vector2i(1, 30), "dest": Vector2i(94, 32), "open": ""},
 		],
 		"npcs": [
+			{"id": "hu_xiao", "n": "Hu Xiao, a Fox of One Tail", "pos": Vector2i(32, 27), "col": Color("e0782a"), "race": "tianhu"},
 			{"id": "hu_qingyi", "n": "Hu Qingyi, the Ninth-Tail Matron", "pos": Vector2i(24, 22), "col": Color("f0eef8"), "race": "tianhu", "floor": ["fox_pavilion", 1]},
 			{"id": "hu_meier", "n": "Hu Mei'er of the Moon-Wine Shop", "pos": Vector2i(36, 19), "col": Color("e07a3a"), "race": "tianhu"},
 			{"id": "gate_fox_hu", "n": "Old Hu the Gate-Fox", "pos": Vector2i(52, 34), "col": Color("6a6a70"), "race": "tianhu"},
@@ -1659,6 +1869,8 @@ const AREAS := {
 			{"to": "youdu", "pos": Vector2i(94, 30), "dest": Vector2i(4, 32), "open": "s_ns_zhulong"},
 		],
 		"npcs": [
+			{"id": "bu_lin", "n": "Bu Lin the Fruit-Trader", "pos": Vector2i(35, 28), "col": Color("8a7a3a"), "race": "deathless"},
+			{"id": "yao_silk", "n": "Silk-Diver Yao", "pos": Vector2i(38, 25), "col": Color("4ab0b0"), "race": "jiaoren"},
 			{"id": "shui_lian", "n": "Pearl-Weaver Shui Lian", "pos": Vector2i(33, 16), "col": Color("6ac0b0"), "race": "jiaoren"},
 			{"id": "hai_ge", "n": "Tide-Singer Hai Ge", "pos": Vector2i(48, 28), "col": Color("2a4a8a"), "race": "jiaoren"},
 			{"id": "little_bei", "n": "Little Bei", "pos": Vector2i(40, 33), "col": Color("8ad0c8"), "race": "jiaoren"},
@@ -1704,6 +1916,8 @@ const AREAS := {
 			{"to": "ninesprings", "pos": Vector2i(1, 32), "dest": Vector2i(90, 30), "open": ""},
 		],
 		"npcs": [
+			{"id": "lamplighter_bo", "n": "Old Bo the Lamplighter", "pos": Vector2i(35, 34), "col": Color("6a6a7a"), "race": "shade"},
+			{"id": "roll_clerk_ning", "n": "Roll-Clerk Ning", "pos": Vector2i(43, 36), "col": Color("4a4a5a"), "race": "shade"},
 			{"id": "ming_yi", "n": "Lantern-Magistrate Ming Yi", "pos": Vector2i(28, 20), "col": Color("2a2a3a"), "race": "shade", "floor": ["ward_office", 1]},
 			{"id": "zhi_ma", "n": "Zhi Ma the Paper-Horse Maker", "pos": Vector2i(43, 20), "col": Color("f0f0f0"), "race": "shade"},
 			{"id": "shade_lan", "n": "Little Lan, Who Lost Her Way", "pos": Vector2i(47, 30), "col": Color("c8d8e8"), "race": "shade"},
@@ -1741,9 +1955,179 @@ const AREAS := {
 				"up": Vector2i(57, 40), "upper": {"n": "the lodgings for wandering shades", "props": [["bed", Vector2i(51, 40), true], ["bed", Vector2i(51, 42), true], ["bed", Vector2i(57, 42), true], ["lantern", Vector2i(54, 41), false]]}},
 		],
 	},
+	# ---- Part XII: The Returning Ruins.  A fourth realm (atlas.gd STRATA "sea"): the Isles of the
+	# Eastern Sea, out past the edge of the shelf where the sea still is, running east like a river
+	# into Guixu.  Mazu's boat joins them to the pool of the suns at Fusang (LADDERS).
+	# Penglai: the Isle of the Immortals, hidden in a mirage for two thousand years, and Landfall, the
+	# town of the Thousand Children Xu Fu brought from Qin and never came back for
+	"penglai": {
+		"n": "Penglai, the Isle of the Immortals", "w": 100, "h": 64, "seed": 471, "theme": "penglai", "enemies": 22, "races": ["qianzi", "xian"], "layer": "sea", "hill": 0.45,
+		"pool": [["mirage_wisp", 48, 48], ["stranded_shark", 48, 48], ["sand_crab", 48, 48]],
+		"portals": [
+			{"to": "fangzhang", "pos": Vector2i(98, 32), "dest": Vector2i(4, 30), "open": "s_pl_longbo"},
+		],
+		"npcs": [
+			{"id": "xu_qian", "n": "Headwoman Xu Qian of Landfall", "pos": Vector2i(34, 22), "col": Color("3a5a8a"), "race": "qianzi"},
+			{"id": "teacher_qin", "n": "Teacher Qin of the Thousand Names", "pos": Vector2i(38, 24), "col": Color("6a4a3a"), "race": "qianzi"},
+			{"id": "lu_dongbin", "n": "Lu Dongbin, the Sword Immortal", "pos": Vector2i(50, 23), "col": Color("e8e4d8"), "race": "xian", "floor": ["drunk_immortal", 1]},
+			{"id": "li_tieguai", "n": "Iron-Crutch Li", "pos": Vector2i(41, 30), "col": Color("6a5a4a"), "race": "xian"},
+			{"id": "lan_caihe", "n": "Lan Caihe, Who Sings in the Street", "pos": Vector2i(56, 34), "col": Color("6ab0e0"), "race": "xian"},
+			{"id": "han_xiangzi", "n": "Han Xiangzi of the Jade Flute", "pos": Vector2i(24, 35), "col": Color("8ac080"), "race": "xian"},
+			{"id": "shipwright_ban", "n": "Shipwright Ban", "pos": Vector2i(42, 46), "col": Color("8a5a3a"), "race": "qianzi"},
+			{"id": "ah_shui", "n": "Net-Mender Ah Shui", "pos": Vector2i(52, 36), "col": Color("4a7a8a"), "race": "qianzi"},
+			{"id": "little_haibao", "n": "Little Haibao", "pos": Vector2i(45, 35), "col": Color("e0a050"), "race": "qianzi"},
+			{"id": "pilot_zheng", "n": "Old Pilot Zheng", "pos": Vector2i(17, 28), "col": Color("5a5a6a"), "race": "qianzi"},
+			{"id": "diver_yulan", "n": "Pearl-Diver Yu Lan", "pos": Vector2i(66, 36), "col": Color("2a8aa0"), "race": "qianzi"},
+			# after the Returning Ruins: Xu Fu comes home to the children he left (Part XII's last scene)
+			{"id": "xu_fu_home", "n": "Xu Fu, Who Came Back", "pos": Vector2i(31, 30), "col": Color("8a7a9a"), "race": "qianzi", "vis": ["s_p12_end", ""]},
+		],
+		"bosses": [
+			{"id": "qianliyan", "pos": Vector2i(56, 47), "lv": 48, "req": 48},
+			{"id": "shunfenger", "pos": Vector2i(78, 46), "lv": 48, "req": 48},
+			{"id": "sea_monk", "pos": Vector2i(84, 15), "lv": 48, "req": 48},
+			{"id": "longbo_giant", "pos": Vector2i(90, 32), "lv": 49, "req": 49},
+		],
+		"pickups": [{"id": "nslip1", "item": "name_slip", "pos": Vector2i(22, 13)}, {"id": "nslip2", "item": "name_slip", "pos": Vector2i(46, 53)}, {"id": "nslip3", "item": "name_slip", "pos": Vector2i(72, 26)}, {"id": "nslip4", "item": "name_slip", "pos": Vector2i(86, 52)},
+			{"id": "cur_soil1", "item": "mainland_earth", "pos": Vector2i(38, 41), "floor": ["shipyard", -1], "always": true},
+			{"id": "cur_tea1", "item": "cloud_tea", "pos": Vector2i(52, 22), "floor": ["drunk_immortal", 1], "always": true},
+			{"id": "cache_pl1", "item": "stones", "n": 3400, "pos": Vector2i(30, 20), "floor": ["names_hall", 1], "always": true},
+			# a cache the Thousand Children forgot they hid: only Spirit Sense can feel it
+			{"id": "sense_pl1", "item": "stones", "n": 2400, "pos": Vector2i(12, 50), "always": true, "sense": true}],
+		"pickup_vis": "s_pl_collect",
+		"springs": [Vector2i(20, 44)],
+		"steles": [Vector2i(42, 30)],
+		"roads": [[Vector2i(13, 32), Vector2i(24, 33), Vector2i(34, 32), Vector2i(44, 31), Vector2i(56, 32), Vector2i(70, 33), Vector2i(84, 32), Vector2i(97, 32)], [Vector2i(34, 27), Vector2i(34, 32)], [Vector2i(48, 27), Vector2i(48, 31)], [Vector2i(62, 29), Vector2i(62, 32)], [Vector2i(35, 37), Vector2i(35, 33)], [Vector2i(49, 37), Vector2i(49, 33)]],
+		# the Pavilion of Penglai on its sea-cliff at the west end, where Mazu's boat comes in
+		"blocks": [Rect2i(3, 22, 7, 7)],
+		"landmark": {"kind": "penglai_pavilion", "pos": Vector2i(6, 25)},
+		"buildings": [
+			{"id": "names_hall", "n": "Hall of the Thousand Names", "style": "hall", "rect": Rect2i(28, 18, 13, 9), "door": Vector2i(34, 26),
+				"props": [["altar", Vector2i(33, 19), true], ["altar", Vector2i(34, 19), true], ["altar", Vector2i(35, 19), true], ["scroll", Vector2i(29, 21), false], ["scroll", Vector2i(39, 21), false], ["cushion", Vector2i(31, 23), false], ["lantern", Vector2i(37, 24), false]],
+				"up": Vector2i(30, 20), "upper": {"n": "the gallery of the Thousand Names", "props": [["bookshelf", Vector2i(33, 19), true], ["bookshelf", Vector2i(35, 19), true], ["desk", Vector2i(37, 22), true], ["scroll", Vector2i(39, 24), false], ["lantern", Vector2i(31, 24), false]]}},
+			{"id": "drunk_immortal", "n": "Wine-House of the Drunken Immortal", "style": "inn", "rect": Rect2i(44, 19, 10, 8), "door": Vector2i(48, 26),
+				"props": [["table", Vector2i(46, 22), true], ["stool", Vector2i(47, 22), false], ["counter", Vector2i(51, 21), true], ["barrel", Vector2i(52, 24), true], ["lantern", Vector2i(45, 24), false]],
+				"up": Vector2i(45, 20), "upper": {"n": "the immortal's drinking-room", "props": [["table", Vector2i(50, 21), true], ["cushion", Vector2i(48, 23), false], ["barrel", Vector2i(52, 24), true], ["lantern", Vector2i(46, 24), false]]}},
+			{"id": "mazu_temple", "n": "Temple of Mazu, Who Brings the Boats Home", "style": "shrine", "rect": Rect2i(58, 21, 9, 8), "door": Vector2i(62, 28),
+				"props": [["altar", Vector2i(61, 22), true], ["altar", Vector2i(62, 22), true], ["altar", Vector2i(63, 22), true], ["statue", Vector2i(62, 22), false], ["lantern", Vector2i(59, 25), false], ["lantern", Vector2i(65, 25), false]]},
+			{"id": "shipyard", "n": "Ban's Shipyard on the Sand", "style": "farmhouse", "rect": Rect2i(30, 38, 11, 7), "door": Vector2i(35, 38),
+				"props": [["rack", Vector2i(31, 40), true], ["barrel", Vector2i(31, 43), true], ["table", Vector2i(37, 41), true], ["lantern", Vector2i(34, 43), false]],
+				"down": Vector2i(39, 43), "cellar": {"n": "the rope store", "props": [["barrel", Vector2i(31, 40), true], ["barrel", Vector2i(31, 42), true], ["shelf", Vector2i(35, 43), true], ["lantern", Vector2i(36, 40), false]]}},
+			{"id": "net_house", "n": "The Net-Menders' House", "style": "seahouse", "rect": Rect2i(46, 38, 8, 6), "door": Vector2i(49, 38),
+				"props": [["loom", Vector2i(47, 41), true], ["bed", Vector2i(52, 41), true], ["lantern", Vector2i(50, 42), false]]},
+		],
+	},
+	# Fangzhang, the Square-Pot Isle: the immortals' gardens and elixir furnaces, and the pearl trees
+	# that drink from the Returning Ruins and are dying as the sea drains
+	"fangzhang": {
+		"n": "Fangzhang, the Square-Pot Isle", "w": 92, "h": 60, "seed": 481, "theme": "fangzhang", "enemies": 22, "races": ["xian"], "layer": "sea", "hill": 0.6,
+		"pool": [["cinnabar_toad", 49, 49], ["elixir_crane", 49, 49], ["herb_rabbit", 49, 49]],
+		"portals": [
+			{"to": "penglai", "pos": Vector2i(1, 30), "dest": Vector2i(94, 32), "open": ""},
+			{"to": "yingzhou", "pos": Vector2i(90, 30), "dest": Vector2i(4, 31), "open": "s_fz_tianwu"},
+		],
+		"npcs": [
+			{"id": "he_xiangu", "n": "He Xiangu of the Lotus", "pos": Vector2i(24, 21), "col": Color("f0c8d8"), "race": "xian", "floor": ["lotus_hall", 1]},
+			{"id": "zhang_guolao", "n": "Zhang Guolao, Who Rides Backwards", "pos": Vector2i(38, 18), "col": Color("8a8a7a"), "race": "xian", "floor": ["furnace_house", -1]},
+			{"id": "zhongli_quan", "n": "Zhongli Quan of the Fan", "pos": Vector2i(30, 33), "col": Color("c84a2a"), "race": "xian"},
+			{"id": "cao_guojiu", "n": "Cao Guojiu, the Court Official Who Resigned", "pos": Vector2i(46, 34), "col": Color("3a3a6a"), "race": "xian"},
+			{"id": "furnace_boy", "n": "Furnace-Boy Dan", "pos": Vector2i(40, 27), "col": Color("c87a3a"), "race": "qianzi"},
+		],
+		"bosses": [
+			{"id": "longevity_deer", "pos": Vector2i(52, 12), "lv": 49, "req": 49},
+			{"id": "elixir_furnace", "pos": Vector2i(66, 22), "lv": 49, "req": 49},
+			{"id": "pearl_tree", "pos": Vector2i(66, 40), "lv": 49, "req": 49},
+			{"id": "tianwu", "pos": Vector2i(77, 30), "lv": 49, "req": 49},
+		],
+		"pickups": [{"id": "pdew1", "item": "pearl_dew", "pos": Vector2i(12, 13)}, {"id": "pdew2", "item": "pearl_dew", "pos": Vector2i(40, 48)}, {"id": "pdew3", "item": "pearl_dew", "pos": Vector2i(58, 30)}, {"id": "pdew4", "item": "pearl_dew", "pos": Vector2i(72, 50)},
+			{"id": "cur_soil2", "item": "mainland_earth", "pos": Vector2i(26, 20), "floor": ["lotus_hall", 1], "always": true},
+			{"id": "cache_fz1", "item": "stones", "n": 3600, "pos": Vector2i(36, 20), "floor": ["furnace_house", -1], "always": true},
+			{"id": "sense_fz1", "item": "stones", "n": 2600, "pos": Vector2i(84, 10), "always": true, "sense": true}],
+		"pickup_vis": "s_fz_collect",
+		"springs": [Vector2i(12, 44)],
+		"steles": [Vector2i(30, 30)],
+		"roads": [[Vector2i(2, 30), Vector2i(14, 31), Vector2i(28, 30), Vector2i(44, 29), Vector2i(58, 31), Vector2i(72, 30), Vector2i(89, 30)], [Vector2i(23, 25), Vector2i(23, 30)], [Vector2i(38, 24), Vector2i(38, 29)], [Vector2i(54, 35), Vector2i(54, 31)]],
+		"buildings": [
+			{"id": "lotus_hall", "n": "He Xiangu's Lotus Hall", "style": "teahouse", "rect": Rect2i(18, 16, 11, 9), "door": Vector2i(23, 24),
+				"props": [["table", Vector2i(25, 19), true], ["stool", Vector2i(26, 19), false], ["cushion", Vector2i(23, 21), false], ["herbs", Vector2i(20, 22), false], ["lantern", Vector2i(21, 18), false]],
+				"up": Vector2i(20, 18), "upper": {"n": "the lotus terrace", "props": [["table", Vector2i(25, 20), true], ["cushion", Vector2i(22, 20), false], ["herbs", Vector2i(27, 22), false], ["lantern", Vector2i(19, 22), false]]}},
+			{"id": "furnace_house", "n": "The House of the Nine Furnaces", "style": "alchemist", "rect": Rect2i(33, 16, 10, 8), "door": Vector2i(38, 23),
+				"props": [["cauldron", Vector2i(35, 18), true], ["cauldron", Vector2i(41, 18), true], ["shelf", Vector2i(34, 21), true], ["herbs", Vector2i(40, 21), false]],
+				"down": Vector2i(41, 21), "cellar": {"n": "the cellar of cold furnaces", "props": [["cauldron", Vector2i(35, 18), true], ["cauldron", Vector2i(35, 21), true], ["cabinet", Vector2i(40, 18), true], ["lantern", Vector2i(38, 21), false]]}},
+			{"id": "herb_lodge", "n": "The Herb-Keepers' Lodge", "style": "house", "rect": Rect2i(50, 36, 9, 7), "door": Vector2i(54, 36),
+				"props": [["herbs", Vector2i(51, 38), false], ["table", Vector2i(54, 39), true], ["bed", Vector2i(57, 41), true], ["lantern", Vector2i(52, 41), false]]},
+		],
+	},
+	# Yingzhou, the Isle of Mists: the turtles' isle, where Jingwei has carried stones to the sea for
+	# four thousand years and Yu Qiang keeps the turtles' shifts
+	"yingzhou": {
+		"n": "Yingzhou, the Isle of Mists", "w": 96, "h": 62, "seed": 491, "theme": "yingzhou", "enemies": 22, "races": [], "layer": "sea", "hill": 0.7,
+		"pool": [["mist_phantom", 49, 50], ["bore_horse", 49, 50], ["shell_soldier", 49, 50]],
+		"portals": [
+			{"to": "fangzhang", "pos": Vector2i(1, 31), "dest": Vector2i(88, 30), "open": ""},
+			{"to": "guixu", "pos": Vector2i(94, 31), "dest": Vector2i(4, 32), "open": "s_yz_yuqiang"},
+		],
+		"npcs": [
+			{"id": "jingwei", "n": "Jingwei, the Flame Emperor's Daughter", "pos": Vector2i(33, 17), "col": Color("e05a3a")},
+			{"id": "gui_lao", "n": "Old Gui, Herald of the Turtles", "pos": Vector2i(47, 22), "col": Color("5a7a5a"), "floor": ["turtle_shrine", 1]},
+			{"id": "mist_fisher", "n": "Mist-Fisher Lao Wu", "pos": Vector2i(26, 37), "col": Color("6a7a8a"), "race": "qianzi"},
+		],
+		"bosses": [
+			{"id": "wu_zixu", "pos": Vector2i(62, 12), "lv": 49, "req": 49},
+			{"id": "shen", "pos": Vector2i(70, 27), "lv": 50, "req": 50},
+			{"id": "great_ao", "pos": Vector2i(78, 50), "lv": 50, "req": 50},
+			{"id": "yu_qiang", "pos": Vector2i(88, 31), "lv": 50, "req": 50},
+		],
+		"pickups": [{"id": "jstone1", "item": "jingwei_stone", "pos": Vector2i(16, 14)}, {"id": "jstone2", "item": "jingwei_stone", "pos": Vector2i(44, 54)}, {"id": "jstone3", "item": "jingwei_stone", "pos": Vector2i(80, 14)}, {"id": "jstone4", "item": "jingwei_stone", "pos": Vector2i(84, 44)},
+			{"id": "cur_tea2", "item": "cloud_tea", "pos": Vector2i(45, 24), "floor": ["turtle_shrine", 1], "always": true},
+			{"id": "sense_yz1", "item": "stones", "n": 2800, "pos": Vector2i(10, 52), "always": true, "sense": true}],
+		"pickup_vis": "s_yz_collect",
+		"springs": [Vector2i(18, 22)],
+		"steles": [Vector2i(42, 31)],
+		"ponds": [[Vector2i(60, 42), 7]],
+		"roads": [[Vector2i(2, 31), Vector2i(14, 32), Vector2i(26, 31), Vector2i(38, 30), Vector2i(52, 31), Vector2i(66, 31), Vector2i(80, 32), Vector2i(93, 31)], [Vector2i(47, 26), Vector2i(47, 30)], [Vector2i(33, 20), Vector2i(33, 30)]],
+		"buildings": [
+			{"id": "turtle_shrine", "n": "Shrine of the Fifteen Turtles", "style": "shrine", "rect": Rect2i(42, 18, 10, 8), "door": Vector2i(47, 25),
+				"props": [["altar", Vector2i(46, 19), true], ["altar", Vector2i(47, 19), true], ["altar", Vector2i(48, 19), true], ["statue", Vector2i(47, 19), false], ["cushion", Vector2i(47, 22), false], ["lantern", Vector2i(44, 23), false]],
+				"up": Vector2i(43, 20), "upper": {"n": "the tally-room of the turtles' shifts", "props": [["bookshelf", Vector2i(46, 19), true], ["desk", Vector2i(49, 21), true], ["scroll", Vector2i(44, 23), false], ["lantern", Vector2i(50, 23), false]]}},
+		],
+	},
+	# Guixu, the Returning Ruins: the rim of the ravine without a bottom, the sea floor left bare by
+	# the drain, the wrecks of Xu Fu's lost fleet and the drowned summits of Daiyu and Yuanqiao
+	"guixu": {
+		"n": "Guixu, the Returning Ruins", "w": 100, "h": 64, "seed": 501, "theme": "guixu", "enemies": 22, "races": [], "layer": "sea", "hill": 0.55,
+		"pool": [["drowned_sailor", 50, 50], ["abyss_eel", 50, 50], ["ruin_sentinel", 50, 50]],
+		"portals": [
+			{"to": "yingzhou", "pos": Vector2i(1, 32), "dest": Vector2i(90, 31), "open": ""},
+		],
+		"npcs": [
+			{"id": "steersman_hong", "n": "Steersman Hong of the Lost Fleet", "pos": Vector2i(28, 22), "col": Color("8a9aa8"), "floor": ["wreck_house", 1]},
+			{"id": "ship_boy_ah_fu", "n": "Ah Fu, the Ship's Boy Who Never Grew Up", "pos": Vector2i(40, 34), "col": Color("a8b8c0")},
+		],
+		"bosses": [
+			{"id": "drowned_admiral", "pos": Vector2i(60, 12), "lv": 50, "req": 50},
+			{"id": "guixu_stopper", "pos": Vector2i(62, 54), "lv": 50, "req": 50},
+			{"id": "hai_ruo", "pos": Vector2i(70, 32), "lv": 50, "req": 50},
+			{"id": "xu_fu", "pos": Vector2i(86, 32), "lv": 50, "req": 50},
+		],
+		"pickups": [{"id": "xlog1", "item": "xufu_log", "pos": Vector2i(14, 12)}, {"id": "xlog2", "item": "xufu_log", "pos": Vector2i(20, 54)}, {"id": "xlog3", "item": "xufu_log", "pos": Vector2i(64, 22)}, {"id": "xlog4", "item": "xufu_log", "pos": Vector2i(80, 50)},
+			{"id": "cache_gx1", "item": "stones", "n": 3800, "pos": Vector2i(30, 20), "floor": ["wreck_house", 1], "always": true},
+			{"id": "sense_gx1", "item": "stones", "n": 3000, "pos": Vector2i(52, 58), "always": true, "sense": true}],
+		"pickup_vis": "s_gx_collect",
+		"springs": [Vector2i(16, 44)],
+		"steles": [Vector2i(46, 34)],
+		"roads": [[Vector2i(2, 32), Vector2i(16, 33), Vector2i(30, 32), Vector2i(46, 31), Vector2i(60, 33), Vector2i(72, 32), Vector2i(82, 32)], [Vector2i(28, 27), Vector2i(28, 31)]],
+		# the lip of the Returning Ruins at the east end: the sea pours over it into the dark
+		"blocks": [Rect2i(90, 24, 8, 17)],
+		"landmark": {"kind": "guixu_whirl", "pos": Vector2i(94, 32)},
+		"buildings": [
+			{"id": "wreck_house", "n": "The Wreck of the Flagship Penglai-Seeker", "style": "seahouse", "rect": Rect2i(23, 18, 11, 9), "door": Vector2i(28, 26),
+				"props": [["barrel", Vector2i(24, 20), true], ["barrel", Vector2i(24, 22), true], ["table", Vector2i(30, 21), true], ["lantern", Vector2i(27, 24), false]],
+				"up": Vector2i(32, 19), "upper": {"n": "the steersman's cabin", "props": [["desk", Vector2i(26, 20), true], ["bed", Vector2i(24, 23), true], ["shelf", Vector2i(31, 23), true], ["lantern", Vector2i(28, 23), false]]}},
+		],
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu", "penglai", "fangzhang", "yingzhou", "guixu"]
 
 ## The towns of the Unbroken Land, marked on the world map: the area they stand in, a tile of that
 ## area's own map at their heart, and what they are.
@@ -1767,6 +2151,9 @@ const TOWNS := [
 		"lore": "The town of the Jiaoren, the Pearl-Weepers, on the shore of the black water under the roots of the world. Their tears turn to pearls; they weave a silk so fine that water will not wet it; and the Deathless of the root-groves trade them fruit that never spoils for songs that end."},
 	{"id": "youdu_city", "n": "Youdu", "area": "youdu", "pos": Vector2i(38, 30),
 		"lore": "The Dark Capital at the bottom of the world, the city of the shades, where the souls who are not ready to be reborn keep house under Houtu, Sovereign Earth. Its lanterns never go out, its inns never close and its magistrate has never once been late; Tubo guards the inner gate with three eyes and very bad manners."},
+	# ---- Part XII: the town of the Isles of the Eastern Sea
+	{"id": "landfall", "n": "Landfall", "area": "penglai", "pos": Vector2i(40, 30),
+		"lore": "The town of the Thousand Children on Penglai, where Xu Fu's three thousand boys and girls came ashore from Qin two thousand two hundred years ago and waited for him to come back. Fishermen, net-menders and shipwrights; a Hall of the Thousand Names where every child learns the names by heart; a temple to Mazu; and, up the hill, the immortals, who for two thousand years have been too grand to come down."},
 ]
 
 ## What the land remembers of each region: shown beside the world map, and kept in the Annals once
@@ -1818,6 +2205,10 @@ const REGION_LORE := {
 	"juntian": "Juntian, the Level Heaven, the middle field of the Nine Heavens: islands in the sky round the crown of the Jianmu, above a sea of cloud. The Feathered Folk nest here in Featherfall, the dragon-kin keep the Rain Ministry, and since the Court fell the winds and the thunder have been doing whatever they like.",
 	"changhe": "Changhe, the Gate of Heaven, at the top of the sky, where the old Court's great gate still stands on the highest islands. The celestial foxes, who cultivated for a thousand years to grow nine tails and climb up here, keep it now, mostly as a joke; and behind it Chong has held heaven up since the day the ladder was cut.",
 	"ninesprings": "The Nine Springs beneath the roots of the Jianmu, a cavern country under the Unbroken Land where the roots of the world tree drink. The Pearl-Weepers keep their town of Tearwater on the black water, the Deathless tend their groves, and the Torch Dragon's eye is the only sun there has ever been.",
+	"penglai": "Penglai, the first of the Isles of the Immortals in the Eastern Sea, where the sun on the water makes palaces in the air. The Court hid it in a mirage for two thousand years; the Thousand Children of Landfall lived inside it, and the Eight Immortals drank in its wine-house and waited for somebody to come.",
+	"fangzhang": "Fangzhang, the Square-Pot Isle, the immortals' garden: terraces of herbs, cold elixir furnaces and the trees of pearl that drink from the Returning Ruins. The old books say a square pot holds more than a round one. The immortals say that is a joke about the Court.",
+	"yingzhou": "Yingzhou, the Isle of Mists, which only sometimes admits to being there. The turtles who bear the isles rest their heads under it, Jingwei carries her stones across it to the sea, and Yu Qiang, God of the Northern Sea, keeps the turtles' shifts in a tally-room nobody has dusted for forty thousand years.",
+	"guixu": "Guixu, the Returning Ruins, east of everything: the lip of the ravine without a bottom into which every river, every sea and the Silver River pour, and which never fills and never empties. On its slope lie the drowned summits of Daiyu and Yuanqiao, and the wrecks of the fleet that came looking for them.",
 	"youdu": "Youdu, the Dark Capital, at the bottom of the world: the city of the shades who are not ready to be reborn, under Houtu, Sovereign Earth. Its lanterns have burned since before the Court; Tubo keeps its gate, and in the deep beyond it Li has pressed the earth down since the ladder was cut.",
 }
 
@@ -1830,9 +2221,12 @@ const LADDERS := [
 		"na": "Climb the Jianmu to the Nine Heavens", "nb": "Down the Jianmu to the Unbroken Land", "open": "s_p11_tree", "style": "climb"},
 	{"id": "jianmu_down", "a": ["mountain", Vector2i(39, 54), Vector2i(1, 0)], "b": ["ninesprings", Vector2i(11, 30), Vector2i(1, 0)],
 		"na": "Down the roots of the Jianmu to the Nine Springs", "nb": "Up the roots to the Unbroken Land", "open": "s_cg_chong", "style": "climb"},
+	# Part XII: Mazu's boat, from the pool of the suns at Fusang out to the Isles of the Eastern Sea
+	{"id": "sea_boat", "a": ["fusang", Vector2i(72, 49), Vector2i(0, -1)], "b": ["penglai", Vector2i(12, 32), Vector2i(1, 0)],
+		"na": "Sail with Mazu to the Isles of the Eastern Sea", "nb": "Sail home to Fusang", "open": "s_p12_shore", "style": "sail"},
 ]
 
-## The realm a region lies in: "surface" (the Unbroken Land), "heaven" or "under".
+## The realm a region lies in: "surface" (the Unbroken Land), "heaven", "under" or "sea".
 static func layer_of(id: String) -> String:
 	return str(AREAS[id].get("layer", "surface")) if AREAS.has(id) else "surface"
 
@@ -2268,6 +2662,48 @@ const STEPS := [
 	{"id": "s_yd_li", "kind": "kill", "boss": "li", "area": "youdu", "t": "Face Li, who has pressed the earth down since the ladder was cut", "stones": 19000},
 	{"id": "s_p11_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Climb back up the roots and take Chong's tablet and Li's weight home to the Elder"},
 	{"id": "s_break16", "kind": "breakthrough", "to": 48, "t": "Hold the ladder open for every road: Three Realms Concord"},
+	# ---- Part XII: The Returning Ruins
+	{"id": "s_p12_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The tide went out and did not come back: speak to Elder Qing Xuan", "stones": 19400},
+	{"id": "s_p12_archive", "kind": "talk", "npc": "archivist", "area": "sect", "t": "Ask Archivist Lan in the Scripture Library what the Court hid about the Eastern Sea"},
+	{"id": "s_p12_shore", "kind": "talk", "npc": "mazu", "area": "fusang", "t": "Go east to Fusang, where the sun rises out of the sea, and find out where the sea has gone"},
+	{"id": "s_pl_intro", "kind": "talk", "npc": "xu_qian", "area": "penglai", "t": "Sail to Penglai and find the Headwoman of Landfall in the Hall of the Thousand Names"},
+	{"id": "s_pl_collect", "kind": "collect", "item": "name_slip", "n": 4, "area": "penglai", "t": "Gather 4 Slips of the Thousand Names the drain left on the sandbars"},
+	{"id": "s_pl_hunt", "kind": "hunt", "area": "penglai", "n": 50, "t": "Drive the stranded sharks and sandbar crabs back from Landfall's shore"},
+	{"id": "s_pl_return", "kind": "talk", "npc": "xu_qian", "area": "penglai", "t": "Bring the name-slips back to Headwoman Xu Qian"},
+	{"id": "s_pl_immortal", "kind": "talk", "npc": "lu_dongbin", "area": "penglai", "t": "Climb to the drinking-room of the Wine-House of the Drunken Immortal and ask Lu Dongbin where the sea went"},
+	{"id": "s_pl_qianliyan", "kind": "kill", "boss": "qianliyan", "area": "penglai", "t": "Close the eyes of Qianliyan, who watches the sea for somebody else"},
+	{"id": "s_pl_shunfeng", "kind": "kill", "boss": "shunfenger", "area": "penglai", "t": "Stop the ears of Shunfeng'er, who listens to the wind for somebody else"},
+	{"id": "s_pl_monk", "kind": "kill", "boss": "sea_monk", "area": "penglai", "t": "Drive the Sea-Monk off the fishermen's sandbar"},
+	{"id": "s_pl_longbo", "kind": "kill", "boss": "longbo_giant", "area": "penglai", "t": "Stop the Giant of Longbo fishing the turtles off the bare shelf", "stones": 19800},
+	{"id": "s_fz_intro", "kind": "talk", "npc": "he_xiangu", "area": "fangzhang", "t": "Cross the sandbar to Fangzhang and find He Xiangu on the terrace of her Lotus Hall"},
+	{"id": "s_fz_collect", "kind": "collect", "item": "pearl_dew", "n": 4, "area": "fangzhang", "t": "Gather 4 Drops of Dew from the dying pearl trees"},
+	{"id": "s_fz_hunt", "kind": "hunt", "area": "fangzhang", "n": 50, "t": "Chase the toads, cranes and rabbits out of the immortals' gardens"},
+	{"id": "s_fz_return", "kind": "talk", "npc": "he_xiangu", "area": "fangzhang", "t": "Bring the pearl dew up to He Xiangu"},
+	{"id": "s_fz_zhang", "kind": "talk", "npc": "zhang_guolao", "area": "fangzhang", "t": "Go down to the cellar of cold furnaces and ask Zhang Guolao, who remembers the Court's sealing"},
+	{"id": "s_fz_deer", "kind": "kill", "boss": "longevity_deer", "area": "fangzhang", "t": "Calm the White Deer of Longevity, who has eaten the last ripe herbs"},
+	{"id": "s_fz_furnace", "kind": "kill", "boss": "elixir_furnace", "area": "fangzhang", "t": "Catch the Elixir Furnace That Walked Away"},
+	{"id": "s_fz_tree", "kind": "kill", "boss": "pearl_tree", "area": "fangzhang", "t": "Quiet the Pearl Tree That Will Not Fruit"},
+	{"id": "s_fz_tianwu", "kind": "kill", "boss": "tianwu", "area": "fangzhang", "t": "Face Tianwu, the eight-headed god who kept the stopper of the sea", "stones": 20200},
+	{"id": "s_yz_intro", "kind": "talk", "npc": "jingwei", "area": "yingzhou", "t": "Follow the sandbar into the mists of Yingzhou and find the bird who carries stones"},
+	{"id": "s_yz_collect", "kind": "collect", "item": "jingwei_stone", "n": 4, "area": "yingzhou", "t": "Gather 4 of the stones Jingwei dropped in the mist"},
+	{"id": "s_yz_hunt", "kind": "hunt", "area": "yingzhou", "n": 50, "t": "Clear the phantoms of the sea-mist off the turtles' isle"},
+	{"id": "s_yz_return", "kind": "talk", "npc": "jingwei", "area": "yingzhou", "t": "Bring Jingwei her stones"},
+	{"id": "s_yz_herald", "kind": "talk", "npc": "gui_lao", "area": "yingzhou", "t": "Climb to the tally-room of the Shrine of the Fifteen Turtles and find Old Gui"},
+	{"id": "s_yz_wuzixu", "kind": "kill", "boss": "wu_zixu", "area": "yingzhou", "t": "Face Wu Zixu, who stopped the tide when the sea went"},
+	{"id": "s_yz_shen", "kind": "kill", "boss": "shen", "area": "yingzhou", "t": "Wake Shen, the Mirage Clam-Dragon, from her false seas"},
+	{"id": "s_yz_ao", "kind": "kill", "boss": "great_ao", "area": "yingzhou", "t": "Steady the Great Ao who bears Yingzhou, thrashing on the dry shelf"},
+	{"id": "s_yz_yuqiang", "kind": "kill", "boss": "yu_qiang", "area": "yingzhou", "t": "Face Yu Qiang, God of the Northern Sea, who keeps the turtles' shifts", "stones": 20600},
+	{"id": "s_gx_intro", "kind": "talk", "npc": "steersman_hong", "area": "guixu", "t": "Go down the bare sea floor to the Returning Ruins and find the steersman's cabin in the wreck of the flagship"},
+	{"id": "s_gx_collect", "kind": "collect", "item": "xufu_log", "n": 4, "area": "guixu", "t": "Gather 4 Pages of Xu Fu's Logbook scattered over the sea floor"},
+	{"id": "s_gx_hunt", "kind": "hunt", "area": "guixu", "n": 50, "t": "Clear the drowned sailors and the eels off the rim of the Returning Ruins"},
+	{"id": "s_gx_return", "kind": "talk", "npc": "steersman_hong", "area": "guixu", "t": "Bring the logbook pages up to Steersman Hong"},
+	{"id": "s_gx_boy", "kind": "talk", "npc": "ship_boy_ah_fu", "area": "guixu", "t": "Find Ah Fu, the ship's boy, on the road to the lip of the Ruins"},
+	{"id": "s_gx_admiral", "kind": "kill", "boss": "drowned_admiral", "area": "guixu", "t": "Release the Admiral of the Lost Fleet from his dry ship"},
+	{"id": "s_gx_stopper", "kind": "kill", "boss": "guixu_stopper", "area": "guixu", "t": "Stop the Bronze Stopper of Guixu rolling over the sea floor"},
+	{"id": "s_gx_ruo", "kind": "kill", "boss": "hai_ruo", "area": "guixu", "t": "Face Ruo of the Northern Sea, the sea itself, rising out of the drain"},
+	{"id": "s_gx_xufu", "kind": "kill", "boss": "xu_fu", "area": "guixu", "t": "Face Xu Fu at the lip of the Returning Ruins", "stones": 21000},
+	{"id": "s_p12_end", "kind": "talk", "npc": "xu_qian", "area": "penglai", "t": "Sail back to Landfall with Xu Fu and bring him home to the Thousand Children"},
+	{"id": "s_break17", "kind": "breakthrough", "to": 51, "t": "Let every water come home: Ten Thousand Waters Return"},
 ]
 
 static func step_index(id: String) -> int:
@@ -2327,6 +2763,16 @@ const ITEMS := {
 	"cauldron_map": {"n": "Rubbing of the Ninth Cauldron", "desc": "The land as Yu drew it, every bay and bend, before the Court squared it off"},
 	# ---- Part XI
 	"wind_bell": {"n": "Storm-Torn Wind Bell", "desc": "Quest item"},
+	# ---- Part XII
+	"name_slip": {"n": "Slip of the Thousand Names", "desc": "A bamboo slip with names on it, carved by one hand: Quest item"},
+	"pearl_dew": {"n": "Dew of the Pearl Trees", "desc": "Quest item"},
+	"jingwei_stone": {"n": "Jingwei's Stone", "desc": "A pebble from the western hills, worn smooth by a beak: Quest item"},
+	"xufu_log": {"n": "Page of Xu Fu's Logbook", "desc": "Quest item"},
+	"longbo_hook": {"n": "The Longbo Giant's Hook", "desc": "A fish-hook the size of a plough, bent straight. Old Gui of the turtles will want to see it."},
+	"shift_horn": {"n": "Yu Qiang's Conch of the Shifts", "desc": "The horn that calls the turtles to change places under the isles."},
+	"half_fruit": {"n": "Xu Fu's Unripe Fruit", "desc": "A pearl-tree fruit picked green two thousand years ago, with one bite out of it."},
+	"mainland_earth": {"n": "A Handful of Mainland Earth", "desc": "Soil from the Unbroken Land in a twist of cloth. The Thousand Children have never stood on it."},
+	"cloud_tea": {"n": "A Cake of Cloud-Tea", "desc": "Dragon-Well tea from the terraces below the mountain. The immortals of the isles have not tasted new tea for two thousand years."},
 	"gate_key": {"n": "Key of the Gate of Heaven", "desc": "Quest item"},
 	"spring_water": {"n": "Vial of the Nine Springs", "desc": "Quest item"},
 	"soul_tally": {"n": "Soul-Tally of the Dark Capital", "desc": "Quest item"},
@@ -2347,7 +2793,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight"}
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -2425,7 +2871,7 @@ const RACES := {
 		"desc": "Foxes who cultivated for a thousand years, grew nine tails and climbed into heaven. They keep the old Gate of Heaven mostly as a joke, and honour the Dao of the Mirror: the moon in the water is still the moon.",
 		"dao_lines": {
 			"sword": "So serious! A sword is only a straight line that forgot how to laugh.",
-			"wander": "A wanderer. You could have been a fox, you know, with practice. Nine hundred years of it.",
+			"wander": "A wanderer. You could have been a fox, you know, with practice. A thousand years of it.",
 			"heart": "The Heart. Oh, how sweet. We shall have to be very careful not to break it.",
 			"formation": "Formations! Lovely. Nothing is more fun to walk through backwards.",
 			"alchemy": "An alchemist. Do you have anything that tastes like peaches and makes the colours sing?",
@@ -2461,18 +2907,39 @@ const RACES := {
 			"alchemy": "An alchemist. An elixir of life is a very rude thing to bring into a city of the dead.",
 			"illusion": "The Mirror. In Youdu nobody casts a reflection. You may find that restful."},
 		"thanks": "Incense... somebody up there still remembers. Every shade in the street will smell it and feel remembered too."},
+	# ---- Part XII: the peoples of the Isles of the Eastern Sea
+	"qianzi": {"n": "The Thousand Children of Landfall", "home": "Landfall, on Penglai", "dao": "heart", "gift": "mainland_earth", "boon": "stones", "boon_n": "Lin Feng finds more spirit stones (+10%)",
+		"desc": "The grandchildren's grandchildren of the three thousand boys and girls Xu Fu brought from Qin to fetch the elixir, who were left on Penglai when he did not come back. Mortals on the isle of the immortals for two thousand years, inside a mirage nobody could sail out of; they took care of one another because there was nobody else, and honour the Compassionate Heart.",
+		"dao_lines": {
+			"sword": "A sword. Xu Fu carried a sword. We are not sure we like swords. ...Yours looks used for the right things.",
+			"wander": "A wanderer! Oh, tell us where you have been. We have been here. All of us. For two thousand years.",
+			"heart": "The Heart's Dao. That is ours, you know. When you are three thousand children on an island, you learn it or you starve.",
+			"formation": "Formations. Teacher Qin will want to talk to you about the drainage. Everybody wants to talk to somebody about the drainage.",
+			"alchemy": "A cauldron-walker. The immortals up the hill make elixirs. They never once offered us one. Make us a cough syrup and we will love you more.",
+			"illusion": "The Mirror's Dao. We lived inside a mirage for two thousand years. You will forgive us if we pinch you."},
+		"thanks": "Earth from the mainland. ...Our ancestors walked on this. We will put it in the Hall of the Thousand Names, and the children can touch it on their birthdays."},
+	"xian": {"n": "The Immortals of the Isles", "home": "Fangzhang, the Square-Pot Isle", "dao": "wander", "gift": "cloud_tea", "boon": "exp", "boon_n": "every battle teaches a little more (+6% cultivation)",
+		"desc": "The immortals who stayed on the Isles of the Eastern Sea when the Court hid them in a mirage: a beggar with an iron crutch, a girl with a lotus, an old man who rides backwards, a drunk with a sword and their friends. They grow elixirs nobody is allowed to eat and honour the Dao of Free Wandering, which, on an island, takes imagination.",
+		"dao_lines": {
+			"sword": "A sword-walker. Lu Dongbin will want to drink with you. Do not let him pay; he pays in poems.",
+			"wander": "Free Wandering! At last, a sensible guest. Where shall we go? Nowhere, it turns out: island. But we can wander in circles together.",
+			"heart": "The Compassionate Heart. The Thousand Children will adore you. We are trying to be adorable too, after two thousand years of being aloof. It is hard.",
+			"formation": "Formations. Very tidy. Zhang Guolao says the isles are a formation, and the turtles are the pegs. He is old, but he is usually right.",
+			"alchemy": "The Cauldron's Dao. Come and see the furnaces. They are cold. Do not touch anything that is still warm.",
+			"illusion": "The Mirror. Shen the clam-dragon would have liked you. Everything she ever made was a beautiful lie."},
+		"thanks": "Cloud-Tea! New tea! Do you know how long it has been? Han Xiangzi, put the water on. No, the good water. No, the other good water."},
 }
-const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless", "shade"]
+const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless", "shade", "qianzi", "xian"]
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
 	"elder": ["The mountain wind carries the scent of blood. Stay vigilant.", "Cultivation is a marathon, disciple, not a sprint."],
 	"alchemist": ["Pills are only borrowed time. Use them wisely.", "Hehe, my furnace never lies."],
 	"smith": ["Steel remembers every blow. Bring me stones and I will temper your sword.", "A sword is only as sharp as its wielder's resolve."],
-	"archivist": ["The old maps drew every realm as its own island, stitched to the next by a gate. Look out of the window now: the roads simply run on.", "Mind the scrolls. Half of them are older than the Elder, and the other half are older than the sect.", "The Lotus Seal's barriers still stand at the borders of lands you have not earned yet. The road goes right up to them."],
+	"archivist": ["A sweeper who reads! Take anything off the lower shelves. The upper shelves bite.", "Mind the scrolls. Half of them are older than the Elder, and the other half are older than the sect.", "The Lotus Seal's barriers still stand at the borders of lands you have not earned yet. The road goes right up to them."],
 	"niu_lang": ["Every seventh night of the seventh month the magpies came. This year the sky was empty, and then the river came down instead.", "The ox is gone now, but I still talk to him. He never minded.", "She weaves the sunsets, you know. That is why they have been grey."],
 	"que_lao": ["Ten thousand magpies, wing to wing, and the Weaver walks across our backs. My back remembers every step.", "A bridge is only birds holding on to each other. Never forget that.", "Mind the cliff edge. Cloud is softer than it looks, but not that soft."],
-	"zhi_nu": ["I have woven the dawn every morning for three thousand years. I would like, just once, to watch someone else's.", "A thread is a road for a needle. A road is a thread for a traveller.", "He plays the flute badly. I can hear it from here. I have always been able to."],
+	"zhi_nu": ["I have woven the dawn every morning for ten thousand years. I would like, just once, to watch someone else's.", "A thread is a road for a needle. A road is a thread for a traveller.", "He plays the flute badly. I can hear it from here. I have always been able to."],
 	"dong_shuang": ["The peaches ripen once in three thousand years. Do not touch the ones that are humming.", "My lady drew the river with her hairpin because she was afraid. She has been afraid for a very long time.", "Kunlun is the pillar of the west. Everything up here is older than it looks, especially the tigers."],
 	# ---- Part X: Cloudfoot, the post town at the foot of the mountain
 	"cartographer_pei": ["A map is a promise you make to a stranger: this is where the road goes. The Court broke that promise in every square.", "Six rules of map-making: true scale, true direction, true distance, and the high, the low and the winding, each measured as they are. The Court kept none of them. It kept the squares.", "Every town has its own name for the same river. In Longmen it is the Old Man. In the Drowned Fields it is the Thief. In Yanggu they just call it Tea."],
@@ -2507,8 +2974,8 @@ const CHAT := {
 	"que_er": ["I can fly! ...Not far. But I can!", "Is the ground really made of ground? All of it? Doesn't it get tired?", "When I grow up I am going to fly all the way down to the Unbroken Land and back. In one go. Maybe two goes."],
 	"ao_qing": ["Every cloud has a page, every page has a column, and every column must balance. Or it did. Now I write poems in the margins.", "The Minister will not come up from the archive. Dragons sulk the way mountains sit: thoroughly.", "Rain without a signature. It sounds terrible. I think it might be wonderful."],
 	"ao_run": ["Ten thousand years of ledgers and not one blot. I am very proud of that. It is the only thing I have ever been proud of, which worries me.", "A dragon who signs his own rain. My grandfather would have swallowed the Ministry whole.", "The Duke drums for my rain now. He is terrible at keeping time. The farmers love him."],
-	"hu_qingyi": ["Nine tails, a thousand years each. Do not ask which is my favourite. All of them, darling.", "We hid the keys of the Gate of Heaven because we thought it would be funny. It was funny. It is still funny.", "The Court called us vermin, then it called us celestial. We are the same foxes, darling. We only got better at climbing."],
-	"hu_meier": ["Moon-wine! One cup and you see the moon. Two cups, two moons. Three cups, you are the moon.", "I only have three tails. That is three hundred years of not paying attention in class.", "If you meet a fox who looks exactly like you, do not worry. It is probably me."],
+	"hu_qingyi": ["Nine tails, a thousand years to grow them all. Do not ask which is my favourite. All of them, darling.", "We hid the keys of the Gate of Heaven because we thought it would be funny. It was funny. It is still funny.", "The Court called us vermin, then it called us celestial. We are the same foxes, darling. We only got better at climbing."],
+	"hu_meier": ["Moon-wine! One cup and you see the moon. Two cups, two moons. Three cups, you are the moon.", "I only have three tails. That is a great many years of not paying attention in class.", "If you meet a fox who looks exactly like you, do not worry. It is probably me."],
 	"gate_fox_hu": ["I have kept this gate for six hundred years, ever since the last gatekeeper went home and forgot to tell anybody.", "Pixiu ate the gold off the gatehouse roof. I am trying to look on the bright side. The roof is lighter now.", "A gate is only a hole in a wall that somebody decided to be polite about."],
 	"shui_lian": ["When a Jiaoren weeps, the tears turn to pearls. The traders above used to make us cry on purpose. Do not ask how.", "Our silk will not get wet. I wove a sail of it once. The boat sank anyway, out of pure spite.", "The roots of the world tree drink from the Nine Springs. When they are thirsty, the whole cavern sighs."],
 	"hai_ge": ["I sing the tides of the black water. There are no tides down here, so I make them up. The water has started listening.", "A song is a formation that moves. The shades never understand that. The Deathless understand it too well.", "Wangxiang keeps muddying the springs. I wrote him a song. He pretends not to like it. He hums it."],
@@ -2545,12 +3012,12 @@ const CHAT := {
 	"apprentice_zhi": ["I swept the Loom for two hundred years. I think I know how you felt, sweeping your steps.", "Every border she ever sewed is written on this Loom. Most of them were kind, once."],
 	"yue_ling": ["Let us go, Lin Feng.", "I will keep your wounds in check."],
 	# the sect's own people
-	"disciple_han": ["Three years I watched you sweep these steps and never once asked your name. I am asking now. Spar with me some morning?", "Footwork first, swordwork after. A blade is only as fast as the feet under it.", "The juniors copy your stance now. Badly. Please stop standing like that near them."],
-	"disciple_mei": ["The koi have been very spoiled since the stars fell in the pond. I think one of them ate a star.", "Senior Brother Lin! Everyone says you saved the sky. Twice. Is it heavy?", "I am not feeding the fish extra rice. They are just very round fish."],
-	"cook_zhou": ["You came up this mountain thin as a broom handle and you are still thin. Sit. Eat.", "Immortals still get hungry. I fed four of them this week and every one asked for seconds.", "Good broth is like cultivation: patience, low heat, and never let anyone lift the lid."],
+	"disciple_han": ["Three years I watched you sweep these steps and never once asked your name. I am asking now. Spar with me some morning?", "Footwork first, swordwork after. A blade is only as fast as the feet under it.", "The senior disciples spar at dawn in the Hall of Martial Practice. Sweepers are not invited. ...Come anyway."],
+	"disciple_mei": ["The koi in the lotus pond know my footsteps and come to the edge when I walk past. They know you too, but they think you are a broom.", "Senior Brother Lin! Is it true you swept these steps for three years and never once missed a morning? I missed one. I am still sorry.", "I am not feeding the fish extra rice. They are just very round fish."],
+	"cook_zhou": ["You came up this mountain thin as a broom handle and you are still thin. Sit. Eat.", "Cultivators think they can live on qi. They cannot. I have buried two who tried. Sit down.", "Good broth is like cultivation: patience, low heat, and never let anyone lift the lid."],
 	"sweeper_bai": ["The Elder gave me your old broom. It still sweeps to the left. Did you do that on purpose?", "Three hundred and ninety-one steps. I counted. Did you ever count them?", "When I sweep I pretend the leaves are demons. I am undefeated."],
-	"gate_wu": ["No one passes this gate without the Elder's leave. Except you. You come and go like the weather.", "Twenty years on this gate. Three demon lords, one Jade Emperor and a great deal of fog.", "Mind the third step on the east road. It wobbles. I have reported it eleven times."],
-	"bell_shen": ["I ring the hours so the mountain remembers what time it is. Lately the sky has needed reminding too.", "A bell is struck and then it is quiet. The quiet is the part worth listening to.", "When you first came up the mountain you sat under my tower every evening to hear the bell. You will not remember. I do."],
+	"gate_wu": ["No one passes this gate without the Elder's leave. Except you. You come and go like the weather.", "Twenty years on this gate, and the worst thing through it was fog. I am told that is about to change.", "Mind the third step on the east road. It wobbles. I have reported it eleven times."],
+	"bell_shen": ["I ring the hours so the mountain remembers what time it is. Somebody has to.", "A bell is struck and then it is quiet. The quiet is the part worth listening to.", "When you first came up the mountain you sat under my tower every evening to hear the bell. You will not remember. I do."],
 	# Qingshi Village
 	"farmer_lao": ["The rice does not care who rules the sky, so long as somebody remembers to send the rain.", "Granny Wen pulled me into the world too. She still tells everyone I came out complaining.", "A road through the hills all the way to the Loom, they say. My ox does not believe it either."],
 	"child_hua": ["Is it true you can fly? Show me. Just a little. Just to the roof.", "When I grow up I am going to be a cultivator and a tofu seller. Both at once.", "Granny Wen says you were a crybaby. I am not a crybaby. I only cry at night."],
@@ -2579,6 +3046,85 @@ const CHAT := {
 	"meng_po": ["Soup? No? Wise. Not yet, little Sovereign. Not yet.", "Forgetting is not the cruel part. Being made to forget by someone who profits from it, that is the cruel part."],
 	"judge_cui": ["Every soul in the six paths has a page. I wrote most of them. I am trying to write them kindly now.", "The Wheel is not a punishment. It is a door. Doors are meant to open."],
 	"peach_keeper": ["A peach of this garden ripens once in three thousand years. Do not waste it.", "The nineteen come here in their dreams. They like the shade."],
+	# ---- Part XII: Fusang's shore and the Isles of the Eastern Sea
+	"mazu": ["I was a fisherman's daughter once, on an island in the south. I dreamed my father's boat home through a storm, and woke, and kept doing it. That is all a goddess is: somebody who keeps doing it.", "Red is so they can see me from the sea. Nobody ever asks why a goddess wears red. Now you know.", "When the tide comes back, the first boat home gets a lantern lit for it on every cliff from here to the south. I have the lanterns ready."],
+	"xu_qian": ["Every headwoman of Landfall has learned the Thousand Names by heart. I can say them in my sleep. My husband says I do.", "The mirage was like living inside a pearl. Beautiful. The same every day. I did not know how tired of beautiful I was until it lifted.", "If you see a boat from the mainland, tell it to come in slowly. We have never had visitors. We will over-feed them."],
+	"teacher_qin": ["Name, father's name, village in Qin, age at landing. Three thousand times. The children chant it like a song. It is a song, really.", "The youngest child to land was two. Her name was Ah Lan. Every girl in Landfall has Lan somewhere in her name.", "I teach the children that Qin is a real place. They do not believe me. Can you blame them?"],
+	"lu_dongbin": ["I was a scholar once and failed the examinations. Twice. Then I dreamed a whole life in the time it took a pot of millet to cook, and woke up, and stopped caring about examinations.", "My sword cuts ignorance, anger and desire. Mostly it cuts bread.", "Han Xiangzi plays his flute at dawn. Every dawn. For two thousand years. You may wonder why I drink."],
+	"li_tieguai": ["My soul went wandering once, and while it was out my disciple burned my body, thinking I was dead. I came back to find a beggar's corpse to live in. I have grown fond of it.", "The gourd holds medicine. Mostly. Ask before you drink from it.", "Two thousand years with the same seven friends, on one island. You learn patience, or you learn to hide."],
+	"lan_caihe": ["I sing in the street with one shoe off and a coat in summer. People throw coins. I give them away. It confuses everybody, which is the point.", "Life is a song you sing once. Sing it badly if you must, but sing it.", "The Thousand Children know all my songs. I am thinking of writing a new one. About a sweeper."],
+	"han_xiangzi": ["My flute can make flowers open. It cannot make the sea come back. I have tried; the flowers opened.", "I play at dawn because the dawn is the only thing on Penglai that was ever different from one day to the next.", "Listen: that note is the wind over Yingzhou. That one is a turtle snoring. That one is me, out of tune."],
+	"shipwright_ban": ["Every boat in Landfall is lying on the sand with its belly showing. I am using the time to scrape the barnacles. You have to be practical about the end of the world.", "My boats were built to sail inside the mirage, round and round. I would like, before I die, to build one that goes somewhere.", "Ban is short for Ban Gong, the carpenter of the gods. My grandmother was ambitious."],
+	"ah_shui": ["A net with a hole in it still catches fish. A net that is all holes is a story. I mend the first kind and tell the second.", "When the water went, the nets came up full of things nobody has seen for two thousand years: coins from Qin, a sword, a child's shoe.", "Mend the small holes first. Nobody believes me until they have lost a big fish through a small hole."],
+	"little_haibao": ["Are you from the mainland? Is it true the mainland does not move? How do you know where you are?", "Teacher Qin says I am descended from a boy called Haibao who was nine when he landed. I am nine too! We are basically the same person.", "I found a crab with a coin stuck to its back. I named it Emperor."],
+	"pilot_zheng": ["Sixty years I piloted boats round the inside of the mirage. You learn every rock. Now the rocks are all standing up out of the sand, and they are much bigger than I thought.", "There is a channel to the east that never dried, where the sea runs into the Ruins. I would not pilot it. I would not pilot it for the Emperor himself.", "Mazu's boat came in through the haze like she knew every shoal. Of course she did. She has been watching us for two thousand years."],
+	"diver_yulan": ["I dive for pearls on the reef. Now the reef is in the air, and I walk along it picking them like plums. It feels like cheating.", "The deepest pearls glow. The old divers say they are Jiaoren tears. I said that is a fairy tale, and then a Pearl-Weeper walked through Landfall last week asking for directions.", "Hold your breath long enough and the sea sings to you. It has stopped singing. I hope it is only resting."],
+	"xu_fu_home": ["I have a grey hair. I keep looking at it. Two thousand years, and now it is the most interesting thing in the world.", "The Emperor wanted never to end. I wanted to please him. Neither of us thought to ask the children what they wanted.", "Teacher Qin has corrected my calligraphy. My own calligraphy, on my own slips. I did not know I had been doing it wrong for two thousand years."],
+	"he_xiangu": ["I ate a pearl-tree peach when I was fourteen and a dream told me to. I have been fourteen in a way ever since. It is less fun than it sounds.", "The lotus I carry grows in mud and comes up clean. Nobody tells you the mud part.", "Cao Guojiu still bows to me every morning as if I were the Empress. I have asked him to stop for two thousand years."],
+	"zhang_guolao": ["My donkey folds up like paper and I keep it in my sleeve. You may not see it. It is shy.", "I ride backwards. People laugh. Then the road turns, and they fall off, and I am still looking where I have been.", "I am older than the Court. I watched it come and I watched it go. Neither took very long, from where I sit."],
+	"zhongli_quan": ["My fan can raise the dead and turn stones to gold. I mostly use it to cool my tea. Gold is heavy and the dead are argumentative.", "I was a general once. I lost a battle, walked into the mountains and found the Dao. Losing is underrated.", "Lu Dongbin was my student. He will tell you it was the other way round. He is wrong, and drunk."],
+	"cao_guojiu": ["I was the Empress's brother and a minister of the Court. One day I looked at what the Court did with its ledgers, and I resigned, and walked into the sea. The sea brought me here.", "These castanets are my old court tablet, broken in two. Clack, clack. That is the sound of a ministry ending.", "If you meet anybody still loyal to the Court, tell them about me. There is life after a ministry."],
+	"furnace_boy": ["Furnace-Boy is a title. I have been a boy for two thousand years. Do not ask how; the answer is a pill, and I was told not to touch it.", "Nine furnaces, all cold. I keep polishing them. When they light again, I want them to look nice.", "Master Zhang says an elixir is mostly patience. I said, then I must be the strongest elixir on the island. He laughed for a week."],
+	"jingwei": ["Jingwei. Jingwei. That means: I am still here.", "The western hills have a little dip in them now, where I took the stones from. Four thousand years, one beakful at a time. Nobody notices a hill getting smaller.", "The sea is not wicked. It drowned me because I was in a little boat and it was a big sea. I know that now. I still do not like it."],
+	"gui_lao": ["Every turtle has a tally, every tally has a shift. Nine tallies have said 'on duty' for forty thousand years. I have been sharpening my brush for the day I write 'resting'.", "I am a turtle too, you know. A small one. I carry the tallies, not an isle. Somebody has to.", "Eh? Speak into the left ear. The right one has been listening for the conch for forty thousand years, and it is tired."],
+	"mist_fisher": ["I came over the sandbar from Landfall to fish the mist. You cannot catch anything in it, but you can think. My wife says I think too much.", "Sometimes the mist makes palaces. Sometimes it makes my old boat, sailing upside down. I wave. It waves back.", "Jingwei drops a stone on my head now and then. I think she is saying hello."],
+	"steersman_hong": ["Starboard. Steady. ...It is a habit. Two thousand years at the wheel of a ship that does not move.", "Sixty ships out of Langya. Fifty-nine came to Penglai and stayed. One went over the edge. Mine.", "When the sea comes back, she will float again, I think. I would like to bring her home. I do not know where home is any more. Landfall, perhaps."],
+	"ship_boy_ah_fu": ["I've been ten for two thousand years. It's mostly fine. You never have to go to bed early, because you never go to bed.", "Master Xu used to tell me stories about the Emperor's palace. Every night the same story, word for word. I know it by heart. So does he. He can't help it.", "When the sea comes back I'm going to learn to swim. I never did. I was going to learn on Penglai."],
+	# ---- Part XII: more people in every town
+	"xiao_qing": ["I came up the mountain because of the stories about you. Senior Brother Han says the stories are mostly true, and the true parts are worse.", "I sweep the east steps now. Little Bai sweeps the west. We race. The steps have never been so clean.", "Is it true the Founder left caves on the mountain that only open for the right realm? I sat outside the first one for a whole day. It did not open. I am only Qi Condensation."],
+	"gardener_ruan": ["Spirit herbs grow best where somebody has been cultivating nearby. The patch under the dormitory window comes up twice as green as the rest.", "Alchemist Mo pays me in pills I never take. I have a jar of them. Do not tell him.", "The Founder planted the first herb bed with her own hands. Three hundred years of weeding since, and I am the eleventh gardener to do it."],
+	"clerk_wei": ["I collected the land-tax for the Court for thirty years: so many years per square, payable in years. Then the squares went away, and then the Court. Then I learned to carry noodles.", "Do you know who checked the ledgers? Nobody. I just wrote numbers. I am very sorry about the numbers.", "Granny He pays me in noodles and lets me sit by the stove. It is the first honest work I have ever done, and the soup is better than anything the Court ever served."],
+	"noodle_he": ["Noodles: one bowl, one copper, one story. You can skip the copper.", "I have fed every courier on every road for fifty years. You can tell what is happening in the world by what they order. When they all order the big bowl, something has gone wrong somewhere.", "Old Wu steals my best stories and tells them in his teahouse. I steal his and tell them back. Between us we have told the whole world twice."],
+	"courier_ma": ["Nine roads, nine kinds of mud. I can tell where a man has been by his boots.", "I carried a letter from Granny Wen in Qingshi to the sect every month for three years. It always said the same thing: is he eating?", "Since the Jianmu grew back I have had to learn to deliver up a tree. The Feathered Folk write very short letters. They can fly, but not far."],
+	"ox_herd_niu": ["My ox knows the way home better than I do. Some days I just follow him.", "When the Weaver's threads came down across the roofs, my ox ate one. It is still in him somewhere. He glows a little when he lies down.", "Granny Wen says you used to sit on our fence and watch the clouds as if you were looking for something. Did you find it?"],
+	"teacher_ren": ["Forty children, one room, three brushes. We share. It is good practice for life.", "The Court's primers said the earth was square and the sky was round. I have crossed out 'square'. I have not decided what to write instead.", "Every child of Qingshi who goes out into the world signs my register when they come home. Sign it, Lin Feng. There are a great many empty pages."],
+	"lantern_xi": ["In the nine days of noon nobody bought a lantern. Now the nights are back and I cannot make them fast enough.", "A lantern is a small sun that agrees to go out when you have finished with it. Very polite. Unlike some suns.", "I made one shaped like a sun-crow for the festival. The real sun-crows came down to look at it and were offended."],
+	"archer_kong": ["This hall was built where Hou Yi practised. Every archer in the east comes here once, to stand where he stood.", "First lesson: look where you are shooting. Second lesson: look at what you are shooting. Feng Meng says most archers never learn the second.", "I could teach you to shoot. You would be terrible at it. You fight like somebody who has never wanted to be far away from anything."],
+	"farida": ["Star-glass is the sand the falling stars melted. I blow it into cups. Drink from one and you can taste the night it fell.", "My grandmother came from beyond the western desert with a caravan, and stayed for the well. Everybody in Shazhou came for the well.", "When the nomads sang the stars home, some of them left their glass behind. I made a lamp of it. It never quite goes out."],
+	"navid": ["Silk east, glass west, stories both ways. I have crossed the desert forty times. The desert has crossed me twice.", "In my country they say the sun is born in the east, in a valley with a great tree. I went to look. It was true. Nobody at home believes me.", "Since the Court fell there are no tolls on the roads. I sell everything for less and somehow make more. Your Court was a very expensive habit."],
+	"examiner_fan": ["Nine times I sat the examinations, and nine times I failed. Then the Court fell, there were no more examinations, and I have never been happier.", "They say a scholar who passes has leapt the Dragon Gate. I have watched the carp. They do not leap for a certificate. They leap because they want to be dragons.", "I teach the ferry children to read. No examination, just reading. They are very good at it, and nobody has told them they are supposed to suffer."],
+	"xia_cormorant": ["This is Hei. She fishes, I keep the fish. It is not fair, but she has never once complained.", "Before the land moved, the river ran backwards in its sleep. Hei knew. She would not fish for a week.", "Hei likes you. She does not like anybody. Do not move suddenly."],
+	"bell_tuner_gong": ["Every bell has one true note and a hundred wrong ones. I file the wrong ones away, a hair at a time.", "Old Shen the bell-ringer at your sect wrote to me about his bell. He says it bows to you now. I have never heard a bell bow. I would like to.", "Tushan bells hang from Longmen to the Jasper Pool. If you ever hear one ring by itself, it is only remembering this town."],
+	"auntie_rong": ["The pits have not gone cold since Yu's day. My mother tended them, and hers, back and back. We have never once let the fire out.", "When Tu Lan recast the cauldrons with the land as it really is, our casters cried. We had only ever cast squares.", "Bronze is copper and tin and patience. Mostly patience. The copper and tin are easy to find."],
+	"ling_fei": ["I am a Yumin who cannot fly at all. Not even not far. My wings are for show. I am very good at walking.", "Ling Yu is my cousin. She won the race up the Jianmu. I came second, by the stairs, and nobody counted me.", "When you climbed the tree without wings, everybody in Featherfall turned and looked at me. I have never been so pleased in my life."],
+	"ao_xun": ["Rain-Clerk, third grade. I copy out where the rain falls. The Minister signs it himself now. It is very irregular. I love it.", "For ten thousand years every cloud needed three signatures. Now it needs one. The other two clerks have taken up gardening.", "The Minister asked me to keep a ledger of things that are not owed. I have started. The first entry is your name."],
+	"yao_silk": ["We weave a silk the water cannot wet. You dive in it and come up dry. It is the only way to the bottom of the black water and back.", "Little Bei's songs turn to pearls when she is sad. Lately she has been too happy to cry, and we are running short of pearls, and nobody minds.", "The silk takes a year to weave and a moment to tear. Like everything worth having."],
+	"bu_lin": ["Fruit from the immortal tree: it never spoils. It never ripens either. You get used to it.", "I have traded fruit for songs with the Pearl-Weepers for four thousand years. I know every song in Tearwater and can sing none of them.", "Elder Bu Si is my grandfather. Or my great-grandfather. When nobody dies, you stop counting the greats."],
+	"roll_clerk_ning": ["Every shade on a tally, every tally on a roll, every roll in order. The Magistrate says order is the one thing the dead can still have. I say it is the one thing I am good at.", "Since you found the four lost tallies there has not been one mistake on the rolls. I have checked eleven times. I will check again.", "Some shades ask to go up to the Wheel at once. Some ask to stay a little longer. Both are allowed now. It was not always so."],
+	"lamplighter_bo": ["The lanterns of Youdu have never gone out. I have lit every one of them every night for six hundred years, just in case.", "One lantern for every shade still waiting. I count them as I light them, and every year now the count goes down a little. That is what the lanterns are for.", "When I am ready I will go up to the Wheel too, and somebody else will light the lanterns. I hope they talk to them. I always talk to them."],
+	"hu_xiao": ["I have one tail! The Matron says it takes a thousand years to grow all nine. Old Hu says it took him longer, because he kept stopping for naps. Mei'er says it depends how often you laugh. Nobody will tell me the real sums.", "The Matron says the Gate is a joke. I asked what the joke was. She said I would understand when I had more tails.", "I was the one who hid a key of the Gate in the stone lion's mouth! Nobody believed I would. That is why it was funny."],
+}
+
+## What people will only tell a cultivator of a high enough realm (Part XII): [minimum level, line].
+## Main.talk_npc adds them to the chat once Lin Feng reaches that level, so the higher he climbs the
+## more of the world's history the townsfolk let him in on.
+## Things people only say once the story has got there (Part XII fixed the sect's townsfolk talking
+## about falling stars and Jade Emperors on Lin Feng's first morning): [quest step, line], added to their
+## chat once that step is done.
+const CHAT_LATER := {
+	"archivist": [["s_p7_home", "The old maps drew every realm as its own island, stitched to the next by a gate. Look out of the window now: the roads simply run on."]],
+	"disciple_han": [["s_elder2", "The juniors copy your stance now. Badly. Please stop standing like that near them."]],
+	"disciple_mei": [["s_p8_home", "The koi have been very spoiled since the stars fell in the pond. I think one of them ate a star."], ["s_p6_home", "Senior Brother Lin! Everyone says you saved the sky. Twice. Is it heavy?"]],
+	"cook_zhou": [["s_p4_home", "Immortals still get hungry. I fed four of them this week and every one asked for seconds."]],
+	"gate_wu": [["s_p3_home", "Twenty years on this gate. Three demon lords, one Jade Emperor and a great deal of fog."]],
+	"bell_shen": [["s_p5_home", "Lately the sky has needed reminding what time it is, too. I ring a little louder."]],
+}
+
+const CHAT_DEEP := {
+	"elder": [[9, "Now that you are a Nascent Soul, I can tell you: my grandmother's grandmother was the Founder. She left nine caves on the mountain. I have opened one. You will open them all."], [24, "An immortal in my courtyard, sweeping. The Founder would laugh until she cried. She never thought the sect would last long enough to have one."], [42, "I used to think the Court was the shape of the world. It was only a very large hat."]],
+	"alchemist": [[12, "Between ourselves: half my recipes come from the Founder's own notebook. The other half I made up, and those are the ones that work."], [30, "A Sovereign of the primordial realm buying healing pills from me. My furnace will be insufferable."]],
+	"archivist": [[15, "The Sealed Archive has a shelf of letters from the nineteen bearers before you, Lin Feng. Most of them end mid-sentence. When you are ready, read them. They wanted to be read by somebody who got further."], [36, "The Court's maps have a blank square in the far east labelled 'nothing here'. The Court only ever wrote 'nothing here' over things it did not want found."]],
+	"bell_shen": [[18, "The bell rings a little differently for you now. Lower. Like it is bowing. Do not tell anybody I said a bell can bow."]],
+	"storyteller_wu": [[21, "A Mahayana cultivator listening to my stories! Very well, the true one, then: the sect's first disciple was a sweeper too. The Founder said she wanted somebody who would notice what was under the dust."], [45, "I have started telling your story. I change the ending every week. Nobody minds. They know you have not finished it."]],
+	"cartographer_pei": [[27, "Off the record: the Court's survey had a sixth rule of map-making, 'leave out what cannot be taxed'. Look at their map of the east coast. The sea just stops."]],
+	"granny_wen": [[18, "The Elder brought you down the mountain to me in a basket no bigger than a loaf. Now the whole valley bows when you walk past, and I keep wanting to tell them about the basket."]],
+	"tea_master": [[30, "Tea from the high terraces tastes of the year it was picked. The immortals of the Eastern Isles used to trade for it, they say, before the Court hid the sea. Nobody has tasted that trade in two thousand years."]],
+	"feng_meng": [[40, "My master Hou Yi shot nine suns down from the Fusang tree. He could have shot the tenth. He said: leave one, the world will need it. Sometimes I think the bravest arrow is the one you keep."]],
+	"lu_dongbin": [[50, "A cultivator of your realm on Penglai. ...We stopped growing, you see. You did not. That is why you could do what we could not."]],
+	"zhang_guolao": [[50, "Riding backwards, I can see a long way. The Court was a hiccup. The Ledger was a cough. You, I think, will be a sentence."]],
+	"jingwei": [[50, "You are nearly as patient as a bird, now. Nearly."]],
+	"houtu": [[48, "Every soul you sent me said thank you. The ones from the Eastern Sea, when they come, will say it in the accent of Qin. I am learning it now."]],
+	"yu_hua": [[48, "Our eggs hatch to the sound of wind bells and, since you, to the sound of somebody sweeping the stair of the tree. The chicks think it is a lullaby."]],
 }
 
 const DIALOGUE := {
@@ -2588,10 +3134,11 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "The Heavenly Lotus Seal that guards our mountain is failing. Xu Mo, Lord of the Blood Moon Palace, is coming for it."],
 		["Elder Qing Xuan", "I sense something sleeping in your dantian. A root of the Nine Heavens, or a curse. Either way, the sect needs strength."],
 		["Elder Qing Xuan", "Press Esc, choose Meditate, and let the spirit spring guide your breathing. Reach the Middle stage and return to me."],
-		["Lin Feng", "I will not waste this chance."],
+		["Lin Feng", "I will not waste this chance.", "kneel"],
 	],
 	"s_report1": [
-		["Elder Qing Xuan", "Your qi flows like a mountain stream at last. Splendid."],
+		["Elder Qing Xuan", "Your qi flows like a mountain stream at last. Splendid. And it flows from somewhere: something in your dantian has put out a shoot."],
+		["Elder Qing Xuan", "The old books say the Nine Heavens root has nine branches, and that they wake one at a time: when the qi first stirs, at every Heavenly Tribulation, and in the nine caves the Founder sealed on this mountain, each of which opens only for a cultivator of its realm. Nobody in three hundred years has opened more than the third. Choose well which branch you wake."],
 		["Elder Qing Xuan", "Alchemist Mo requires four Spirit Herbs from the Whispering Bamboo Forest, east of the gate."],
 		["Elder Qing Xuan", "Bandits stalk that road, and a Jade Mantis Matriarch has claimed the herb groves as her own. Meditate to recover, buy pills from Mo, and temper your blade with Smith Tie."],
 		["Lin Feng", "Understood. I will return with the herbs."],
@@ -2710,7 +3257,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "Go. The way is open."],
 	],
 	"s_swordghost": [
-		["Ancestor Jian Wuchen", "Three thousand years I have waited for a disciple whose heart does not tremble at thunder."],
+		["Ancestor Jian Wuchen", "Three hundred years I have waited for a disciple whose heart does not tremble at thunder."],
 		["Ancestor Jian Wuchen", "Gather four Thunder Shards from the valley, then slay the Roc that has made the storm its throne."],
 		["Ancestor Jian Wuchen", "Do this, and I will pass on the Heaven-Cleaving Sword."],
 		["Lin Feng", "I will earn it, Ancestor."],
@@ -2840,7 +3387,7 @@ const DIALOGUE := {
 	],
 	"post:s_break5": [
 		["Narrator", "The fire fades into cold starlight. Lin Feng stands in Void Refinement, no longer bound by the weight of the earth."],
-		["Sage Huo Rong", "The Void Rift lies beyond the volcano's eastern slope. Find Hermit Wu Ji. He knows the Emperor's name."],
+		["Sage Huo Rong", "The Void Rift lies beyond the volcano's western slope. Find Hermit Wu Ji. He knows what the Emperor is."],
 	],
 	"s_vd_intro": [
 		["Hermit Wu Ji", "You came through the fire. Few do. Sit. There is no hurry in the void."],
@@ -2882,7 +3429,7 @@ const DIALOGUE := {
 		["Gatekeeper Bai Ze", "Beyond this Gate sits the Jade Emperor of Ruin. His general, his judge, his sacred beast, and his throne guard the way."],
 		["Gatekeeper Bai Ze", "Collect four Heaven Sigils to unseal the Gate, and cleanse its fallen guardians."],
 		["Lin Feng", "And then?"],
-		["Gatekeeper Bai Ze", "Then the heavens decide who deserves them."],
+		["Gatekeeper Bai Ze", "Then the heavens decide who deserves them. The Gate has opened for three, in ten thousand years. Remember that number."],
 	],
 	"pre:heaven_general": [
 		["Heavenly General Tian Wei", "Mortal-born. Unworthy. I shall return you to the dust from which you were raised."],
@@ -2922,7 +3469,7 @@ const DIALOGUE := {
 	],
 	"post:s_break6": [
 		["Narrator", "The final bolt falls and, with it, the last chain between Lin Feng and the Dao. He ascends to Dao Merging, and the heavens open their gates."],
-		["Yue Ling", "Lin Feng, your sword... the lotus at your belt is glowing. It has never done that before."],
+		["Yue Ling", "Lin Feng, your sword... and the lotus mark over your dantian, it is glowing. It has never done that before."],
 	],
 	"recall": [
 		["Narrator", "The Lotus Seal that has slept in Lin Feng's dantian since the day he swept the sect's steps blazes like a second sun, and the world folds around him."],
@@ -3106,6 +3653,7 @@ const DIALOGUE := {
 		["The Hollow Heaven", "...warm... is this... being full?..."],
 		["Yue Ling", "It is learning, Lin Feng. It is learning to stop."],
 		["Narrator", "The Hollow's endless hunger settles into a slow tide, and the dead cloud-sky above the Origin turns, at last, to dawn. One tribulation remains: the Heavens' last, reluctant test."],
+		["Yue Ling", "Lin Feng... your dantian. Something green is growing there. A seed that is given is a seed that is planted, and the Hollow's dawn has planted one back in you, with every branch the old root had woken."],
 	],
 	"pre:s_break8": [
 		["Narrator", "The sky tears itself open for the final time. Every tribulation ever cast gathers into a single spiral of light, and the Heavens ask whether the bearer will keep the harvest or end it."],
@@ -3332,7 +3880,7 @@ const DIALOGUE := {
 		["Narrator", "The last tribulation breaks into falling peach blossoms. Lin Feng becomes a Dao Ancestor, the first in ten thousand years whose ascension cost no one anything."],
 		["Yue Ling", "The Ledger is closed, the Hollow is full, and the nineteen are resting in the peach trees. What now, Dao Ancestor?"],
 		["Lin Feng", "Now? Now I think I will go home and sweep the steps. Somebody should."],
-		["Narrator", "Far below, Elder Qing Xuan watches the clouds turn gold. The Lotus Seal's chime, cracked for a thousand years, rings clear and whole, and the first true morning in ten thousand years begins."],
+		["Narrator", "Far below, Elder Qing Xuan watches the clouds turn gold. The Lotus Seal's chime, cracked since the day it was forged, rings clear and whole, and the first true morning in ten thousand years begins."],
 	],
 	# ---- Part VI: The Turning Wheel
 	"recall4": [
@@ -3346,7 +3894,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "The Heavenly Court did not only prop up the sky with stolen years. It also turned the Wheel of Rebirth beneath the world. Every soul that went down to the Yellow Springs was weighed, taxed, and sent back up only when the Ledger allowed it."],
 		["Lin Feng", "And we closed the Ledger. So the Wheel has stopped."],
 		["Elder Qing Xuan", "Stopped, or been stopped. The dead are piling up at the Naihe Bridge, and the overflow is walking back up the old funeral road to the places where they were buried."],
-		["Elder Qing Xuan", "That road begins at our own south-west gate. It runs through the Maple Gorge, where this sect has buried its dead for a thousand years, then down the river through the Stone Forest, to the fields of red lilies and the Wheel itself."],
+		["Elder Qing Xuan", "That road begins at our own south-west gate. It runs through the Maple Gorge, where this sect has buried its dead for three hundred years, then down the river through the Stone Forest, to the fields of red lilies and the Wheel itself."],
 		["Elder Qing Xuan", "And there is something I should have told you when you were small. I did not find you on our steps, Lin Feng. I found you in that gorge, wrapped in a sweeper's cloak, under a maple beside two fresh graves with no names on them."],
 		["Lin Feng", "...My parents."],
 		["Elder Qing Xuan", "I believe so. Xu Mo's hunters were already searching for the root's twentieth bearer. Whoever those two were, they hid you, and then they led the hunters away. I buried them where I found them."],
@@ -3457,7 +4005,7 @@ const DIALOGUE := {
 		["Narrator", "The Naihe Bridge shudders. A red serpent has wound itself around the pillars, and every time a soul steps onto the bridge it shakes them off into the golden water."],
 		["Lin Feng", "You are guarding a bridge nobody is allowed to cross. What is the point of that?"],
 	],
-	"post:bridge_serpent": [["Narrator", "The Serpent uncoils and slides away beneath the lilies, and the bridge stands still and open for the first time in sixteen years."]],
+	"post:bridge_serpent": [["Narrator", "The Serpent uncoils and slides away beneath the lilies, and the bridge stands still and open for the first time since the Wheel stopped."]],
 	"pre:lily_empress": [
 		["Narrator", "The whole field of spider lilies turns to face Lin Feng at once. Their roots run down to every grave in the world, and they are all of them one flower: the Empress of the Red Lilies."],
 		["Empress of the Red Lilies", "Flowers and leaves never meet on my stems. That is the rule of the lily. The dead and the living never meet either. Why are you here, living one?"],
@@ -3552,7 +4100,7 @@ const DIALOGUE := {
 	"s_vl_intro": [
 		["Granny Wen the Midwife", "Shut the door, the threads come in on the draught. Let me look at you. Taller. Still all elbows. A Sovereign, they say, and you still wipe your feet on my step."],
 		["Lin Feng", "Granny. The Elder says children are being taken."],
-		["Granny Wen the Midwife", "Three of them, all born this spring, all born looking at their mothers like they knew them already. The threads came down the chimneys at night and wrapped them up like cocoons, and in the morning they were gone. One of them was Little Wan."],
+		["Granny Wen the Midwife", "Three of them, all born this spring, all born looking at their mothers like they knew them already. The threads came down the chimneys at night and wrapped them up like cocoons, and in the morning they would not wake. Their mothers sit by the cradles, and nobody is home behind the eyes. One of them was Little Wan."],
 		["Granny Wen the Midwife", "The threads are still strung all over the village. Cut four of them and bring them to me. A midwife knows how to read a cord: I will tell you where they lead."],
 	],
 	"s_vl_return": [
@@ -3587,7 +4135,7 @@ const DIALOGUE := {
 	"post:needle_general": [
 		["Needle General Zhen", "...The Lady said every stitch I held was a war kept out of a field. I held this road for a thousand years. Was I wrong all that time?"],
 		["Lin Feng", "Maybe not, once. But the war is over. Let them walk."],
-		["Narrator", "The General lays down his great needle and walks away up the terraces, a free man with nothing to hold. Lin Feng keeps the needle."],
+		["Narrator", "The General lays down his great needle and walks away up the terraces, a free man with nothing to hold. Lin Feng keeps the needle, and gives it to Weaver Liu, who uses it to unpick the last threads from the village roofs."],
 	],
 	"s_te_intro": [
 		["Tea Master Lu Yu", "Sit, sit. Nobody climbs nine terraces without a cup at the top. This is the last of last year's crop, and it will be the last of any crop if those threads stay on my hills."],
@@ -3721,7 +4269,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "To the hall. Both of you. I was afraid of this when Qianxian began unpicking her Loom."],
 	],
 	"s_p8_home": [
-		["Elder Qing Xuan", "Every child in the valley knows the story. The Weaver Star, granddaughter of the Jade Emperor, fell in love with a cowherd. The Queen Mother of the West drew her golden hairpin across the sky to part them, and the line she drew became the Silver River."],
+		["Elder Qing Xuan", "Every child in the valley knows the story. The Weaver Star, granddaughter of the Queen Mother of the West, fell in love with a cowherd. The Queen Mother of the West drew her golden hairpin across the sky to part them, and the line she drew became the Silver River."],
 		["Elder Qing Xuan", "Once a year, on the seventh night, the magpies of the world fly up and make a bridge of themselves so the lovers can meet. That is the story. What the story does not say is that the river is a border. The oldest border there is."],
 		["Lin Feng", "And Qianxian is unpicking every border she ever stitched."],
 		["Elder Qing Xuan", "She did not draw this one, but she bound its banks with her thread for ten thousand years. Now the thread is coming out, and the river does not know where to go. It is pouring down the old Sky Road into the world, and the magpies have been scattered by the flood."],
@@ -3810,12 +4358,12 @@ const DIALOGUE := {
 	"s_wv_intro": [
 		["Zhi Nu, the Weaver Star", "You crossed on the magpies. I felt every one of their steps on my loom. Sit, please. Mind the warp; that thread is tomorrow's sunrise."],
 		["Lin Feng", "The river is flooding the world below. The Elder says it is because the borders are coming undone."],
-		["Zhi Nu, the Weaver Star", "The river is flooding because I stopped weaving its banks. I wove them every night for three thousand years, and on the seventh night of the seventh month I would stop, and cross, and see him. This year I thought: if I stop weaving altogether, perhaps the river will simply go away."],
+		["Zhi Nu, the Weaver Star", "The river is flooding because I stopped weaving its banks. I wove them every night for ten thousand years, and on the seventh night of the seventh month I would stop, and cross, and see him. This year I thought: if I stop weaving altogether, perhaps the river will simply go away."],
 		["Zhi Nu, the Weaver Star", "It did not go away. It went down. I have done a foolish thing, Sovereign. Help me catch the threads that have blown loose from my loom, four threads of starlight, and I will begin to mend it."],
 	],
 	"s_wv_return": [
 		["Zhi Nu, the Weaver Star", "Four threads. Enough to weave banks for the river, but only banks this time. Not a wall. I will leave a ford, every seventh night and every other night too."],
-		["Zhi Nu, the Weaver Star", "But the palace is still full of things I wove in despair. A moth of my seven stars that eats the light. The weaving-frame my grandfather gave me, weaving walls on its own. The qilin of the hall, who thinks I need protecting. And the Warden of the River, who was set at the palace gate to keep me in."],
+		["Zhi Nu, the Weaver Star", "But the palace is still full of things I wove in despair. A moth of my seven stars that eats the light. The weaving-frame my grandmother gave me, weaving walls on its own. The qilin of the hall, who thinks I need protecting. And the Warden of the River, who was set at the palace gate to keep me in."],
 		["Zhi Nu, the Weaver Star", "Take this sword-form. I wove it from the night he and I first met. My grandfather never knew I had kept it."],
 		["Narrator", "Lin Feng learns the Seventh-Night Reunion Sword."],
 	],
@@ -3918,7 +4466,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "And there is worse. Where the nine suns fell there are embers in the ground, and they are waking. If they rise, it will be the age of ten suns again, and there is no Hou Yi now."],
 		["Lin Feng", "Good. I was not going to shoot anything out of the sky."],
 		["Yue Ling", "And the moon? Who walks the moon, if the Court is gone?"],
-		["Elder Qing Xuan", "The moon has a keeper of its own: Chang'e, who has lived alone in the Moon Palace since before the Court was built. She is walking it round the night side of the world by herself. She will be very tired by now."],
+		["Elder Qing Xuan", "The moon has a keeper of its own: Chang'e, who has lived alone in the Moon Palace since the archer's day, and never once asked the Court for help. She is walking it round the night side of the world by herself. She will be very tired by now."],
 		["Elder Qing Xuan", "Go east, to the Dawn Market at Yanggu, the last town on the pilgrims' road to the Valley of Sunrise. They live closest to the sun, and they will know first if anything changes. I have opened a new gate on the south road. Take water. Take a hat."],
 	],
 	"s_yg_intro": [
@@ -4063,9 +4611,9 @@ const DIALOGUE := {
 	"post:jinwu": [
 		["Narrator", "The Sun Crow tumbles onto the branch, panting sparks, and dwindles until it is no bigger than a rooster. A very bright rooster. With one of its three feet it pushes the tenth arrow back across the branch to Lin Feng."],
 		["Jinwu, the Three-Legged Sun Crow", "Keep it. It is the only arrow in the world that ever spared anybody. ...When the Court fell I kept to the road by myself, the way they taught me. Then, nine days ago, I heard my mother singing for the first time in four thousand years. She was not singing to me. She was singing my brothers up out of the ground."],
-		["Jinwu, the Three-Legged Sun Crow", "If all ten of us are in the sky, the archer comes back. Everybody knows that. So I flew as high as I could, where no arrow reaches, and I have been waiting for somebody to tell me it is safe. She is in the west, in the night. She has gone to the Moon Palace to ask the moon-lady for the dark, so that there will be room in the sky for all ten of us again."],
+		["Jinwu, the Three-Legged Sun Crow", "If all ten of us are in the sky, the archer comes back. Everybody knows that. So I flew as high as I could, where no arrow reaches, and I have been waiting for somebody to tell me it is safe. She has gone over the top of the sky, into the night. She has gone to the Moon Palace to ask the moon-lady for the dark, so that there will be room in the sky for all ten of us again."],
 		["Narrator", "From far below, at the foot of the tree, an old voice calls up."],
-		["Feng Meng, the Last Apprentice", "Then the west is where you are needed, Sovereign. Walk the sun's road across the top of the sky; the moon's road begins where it ends. And if you see her, the lady of the moon... tell her Feng Meng is sorry. Tell her I should never have come for the elixir."],
+		["Feng Meng, the Last Apprentice", "Then the night is where you are needed, Sovereign. Walk the sun's road across the top of the sky; the moon's road begins where it ends. And if you see her, the lady of the moon... tell her Feng Meng is sorry. Tell her I should never have come for the elixir."],
 	],
 	"s_gh_intro": [
 		["Chang'e of the Moon Palace", "Please do not shout. Sound carries terribly up here, and the rabbit has only just fallen asleep."],
@@ -4174,7 +4722,7 @@ const DIALOGUE := {
 	"s_dg_intro": [
 		["Harbourmistress Jiang Yao", "If you have come for the ferry, it is not running. If you have come for the post, that is not running either. If you have come to tell me the river is high, I know. I measure it every hour on the flood stele by the temple, and I have run out of stele."],
 		["Lin Feng", "Cartographer Pei sends his regards. He wants his maps back."],
-		["Harbourmistress Jiang Yao", "Ha. Tell him the river ate them. ...Longmen is a ferry town, Sovereign: three hundred years of boats crossing below the Dragon Gate. Every spring the golden carp swim up from the sea and leap the falls, and the ones that clear the gate become dragons. That is how the river knows it is spring."],
+		["Harbourmistress Jiang Yao", "Ha. Tell him the river ate them. ...Longmen is a ferry town, Sovereign: a thousand years of boats crossing below the Dragon Gate. Every spring the golden carp swim up from the sea and leap the falls, and the ones that clear the gate become dragons. That is how the river knows it is spring."],
 		["Harbourmistress Jiang Yao", "This spring the carp came up the river and stopped below the falls, and sat there, and sulked, and the river has risen every day since. Something upstream is pulling the water back up the gorge, and the carp are afraid to jump into it."],
 		["Harbourmistress Jiang Yao", "When a carp tries the gate and falls short, it sheds a golden scale. The river-readers in my family can read the water in them: how high, how fast, and which way the fear is coming from. Bring me four scales from below the falls, and I will read you the river."],
 	],
@@ -4183,6 +4731,7 @@ const DIALOGUE := {
 		["Harbourmistress Jiang Yao", "In my great-grandmother's day there was a stele at the Dragon Gate that said: Here Yu cut the mountain and let the river through; do not dam it. The Court took it for its archive. Somebody upstream is damming the river, and has been ever since the land started moving."],
 		["Yue Ling", "Who would dam a river?"],
 		["Harbourmistress Jiang Yao", "Somebody who remembers when rivers were dammed. The Drowned Fields lie beyond the gorge; that is where the old dykes are. But Longmen is in a mood. The carp-king below the falls will not leap and will not let anyone else leap. Black Eel and his river-rats are looting the flooded warehouses. The temple bell has slid into the river and rings underwater all night."],
+		["Harbourmistress Jiang Yao", "And the stone lion of the ferry stage has woken up and will not let anybody past it. Longmen, Sovereign. In a mood."],
 		["Harbourmistress Jiang Yao", "And the River Earl himself, He Bo, has come up out of the water at the ferry stage demanding a bride, the way he used to before Magistrate Ximen Bao threw his priests in the river after the last one."],
 	],
 	"pre:sulking_carp": [
@@ -4244,7 +4793,7 @@ const DIALOGUE := {
 		["Bo Yi of the Dykes", "Four clods. Feel them: warm, and growing even in your hands. And look at this one. Fingerprints, pressed into the clay. A man's hands, building."],
 		["Bo Yi of the Dykes", "Gun's hands. He has come back to finish his dam. Four thousand years dead, and when the land started moving and the water started rising, the first thing he did was come back and try to stop it again. He never learned the other way. He never had the chance."],
 		["Yue Ling", "He is trying to help."],
-		["Bo Yi of the Dykes", "So he was, the first time. Go gently with him, if you can. But the toad that swallowed the old dykes has swollen up fit to burst, a heron has made himself lord of the drowned paddies, and a dragon of mud has broken out of the last of Yu's channels. You will meet all of them before you meet him."],
+		["Bo Yi of the Dykes", "So he was, the first time. Go gently with him, if you can. But the toad that swallowed the old dykes has swollen up fit to burst, a heron has made himself lord of the drowned paddies, a dragon of mud has broken out of the last of Yu's channels, and the old turtle that carried Gun's earth is still walking in circles with it on its back. You will meet all of them before you meet him."],
 	],
 	"pre:toad_matriarch": [
 		["Narrator", "A toad the size of a farmhouse squats across the dyke road with her cheeks bulging. Every time she swallows, another field goes under."],
@@ -4282,7 +4831,7 @@ const DIALOGUE := {
 	"post:gun": [
 		["Narrator", "The yellow dragon's wall crumbles, and Gun sinks down beside it in the shape of a tired old man covered in clay. Bo Yi wades out through the falling water and sits down beside him."],
 		["Bo Yi of the Dykes", "He dug channels, old friend. He let the water go where it wanted to, and then it was not a flood any more, only a river."],
-		["Gun, Who Stole the Swelling Earth", "...Channels. Of course. You cannot hold water still. ...He had his mother's sense."],
+		["Gun, Who Stole the Swelling Earth", "...Channels. Of course. You cannot hold water still. ...He did not get that from me."],
 		["Gun, Who Stole the Swelling Earth", "Ask the Tushan casters what became of the cauldrons. When they were stolen, the land forgot its shape, and when the land forgets its shape the water forgets its way. And something under Mount Buzhou has been waiting four thousand years for the water to forget."],
 	],
 	"s_ts_carver": [
@@ -4306,6 +4855,7 @@ const DIALOGUE := {
 		["Tu Lan, Last of the Cauldron-Casters", "Hold out your sword. A caster's blessing: a blade that remembers the weight of nine provinces. Then help me clear the mountain, and I will cast the Ninth Cauldron again, the true way."],
 		["Narrator", "A new technique settles into Lin Feng's hands, heavy as bronze and steady as a mountain: the Nine Cauldrons Sword."],
 		["Tu Lan, Last of the Cauldron-Casters", "The pits have woken. There is a slag serpent in the casting pits, the Stone Mother has come down off her hill, the giant Fangfeng, who came late to Yu's assembly four thousand years ago, is still hurrying to get here, and the Taotie, the glutton cast on every cauldron as a warning, has come alive in the casting yard and is eating the engravings off the shards."],
+		["Tu Lan, Last of the Cauldron-Casters", "Oh, and the white nine-tailed fox of Tushan has come down off the hill to see what all the noise is. She is very old, very polite, and she bites."],
 	],
 	"pre:slag_serpent": [
 		["Narrator", "Out of the casting pit rears a serpent of molten bronze and slag, dripping fire, gnawing on a half-cast bell."],
@@ -4359,6 +4909,7 @@ const DIALOGUE := {
 		["Lin Feng", "Tu Lan cast the Ninth Cauldron again. This is a rubbing of it: the land, as it really is."],
 		["Yinglong, Who Dug the Rivers", "...My rivers. Every one of them, where I drew them. Oh, Sovereign. Show him this. Gonggong has only ever seen the land as a thing to drown or a thing to rule. Nobody ever showed him that it was beautiful."],
 		["Yinglong, Who Dug the Rivers", "But first: his son Xiu, who loved roads, has come back to wander the shore. The Kun, the great fish of the northern darkness, has swum up into the lake. And Xiangliu, his minister with nine heads, has been poisoning every spring round Buzhou, so that nothing can grow where the water has been. Nine heads, Sovereign, and each one eats from a different mountain."],
+		["Yinglong, Who Dug the Rivers", "And Kuafu, who chased the sun and drank the rivers dry, is lying by the lake, thirsty again."],
 	],
 	"pre:xiu": [
 		["Narrator", "A young man in a dusty travelling cloak walks the shore of the black lake in circles, a pack on his back and a map in his hand that is mostly holes."],
@@ -4423,7 +4974,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "Nor should you, Shen. Lin Feng, come to the hall. I know that tree. Everybody did, once, and then we were made to forget it."],
 	],
 	"s_p11_home": [
-		["Elder Qing Xuan", "That is the Jianmu, the Standing Tree. Before the Court, before Yu, in the days of the Yellow Emperor, it stood at the middle of the world, and it was a ladder. Gods climbed down it to visit, and people climbed up it to complain."],
+		["Elder Qing Xuan", "That is the Jianmu, the Standing Tree. Before Yu, in the days of the Yellow Emperor, it stood at the middle of the world, and it was a ladder. Gods climbed down it to visit, and people climbed up it to complain."],
 		["Elder Qing Xuan", "Then came Zhuanxu, the Yellow Emperor's grandson, who thought heaven and earth had grown too familiar. He sent his grandsons: Chong to lift heaven up and Li to press the earth down, and between them they cut the ladder through. The old books call it the severing of heaven and earth."],
 		["Lin Feng", "And the Court made a law of it."],
 		["Elder Qing Xuan", "The Court made a whole government of it. One ladder, kept by the Court. One road up it: obedience. The peoples of the heavens were cut off above, the Feathered Folk, the dragon-kin, the celestial foxes; and the peoples under the roots below, the Pearl-Weepers, the Deathless, the shades of Youdu."],
@@ -4434,6 +4985,8 @@ const DIALOGUE := {
 	"s_p11_archive": [
 		["Archivist Lan", "Down here, Lin Feng. Mind the third step. This is the Sealed Archive: everything the Court ordered the sect to forget, which we kept, because an archivist who burns books is just a cook with bad taste."],
 		["Archivist Lan", "Here: the record of the severing. Chong took heaven, Li took the earth, the ladder was cut at the middle, and the peoples above and below were told the people of the middle were cruel. The people of the middle were told the same of them. Nobody could climb up or down to check."],
+		["Lin Feng", "I have been up into the sky before, though. The Court's stair, the Sea of Clouds, the sun's own road."],
+		["Archivist Lan", "The Court kept one stair, up to its own door and no further, and only its clerks and its harvest went up it. The Level Heaven is above the Court's heaven, and its gate is not the one you opened on the north coast."],
 		["Lin Feng", "Then the first people down the tree will be expecting monsters."],
 		["Archivist Lan", "And they will meet you, which will be a great surprise to them. Something came down the trunk at dawn. Old Shen says it had wings and was very rude. Go and be polite at it. The tree stands on the open ground west of the sect."],
 	],
@@ -4497,7 +5050,7 @@ const DIALOGUE := {
 		["Hu Qingyi, the Ninth-Tail Matron", "Oh, look, a hero. On our terrace. With his sword out. Put it away, darling; nobody up here will fight you before tea. Probably."],
 		["Hu Qingyi, the Ninth-Tail Matron", "We are the Tianhu, the celestial foxes. Each of us spent a thousand years growing nine tails to climb up here, and when we arrived we found the Gate of Heaven with nobody left to keep it. A gate with no gatekeeper is a joke waiting for a punchline. So we keep it."],
 		["Lin Feng", "I need to go through it."],
-		["Hu Qingyi, the Ninth-Tail Matron", "Of course you do. Behind the Gate stands Chong, holding heaven up, as he has since the ladder was cut. The weight has pressed his ears shut; he hears nobody. And we hid the four keys of the Gate, as a joke. You will have to find them. That is the punchline."],
+		["Hu Qingyi, the Ninth-Tail Matron", "Of course you do. Behind the Gate stands Chong, holding heaven away from the earth, as he has since the ladder was cut. Nuwa's pillars bear its weight, darling; Chong only keeps it out of reach, and the strain has pressed his ears shut. He hears nobody. And we hid the four keys of the Gate, as a joke. You will have to find them. That is the punchline."],
 		["Yue Ling", "Hilarious."],
 	],
 	"s_cg_return": [
@@ -4592,7 +5145,7 @@ const DIALOGUE := {
 		["Lantern-Magistrate Ming Yi", "Not before you go down to the deep hall under the Palace of Sovereign Earth. Houtu keeps the dead, and she will want to see you. Everybody in this city does what Houtu wants. She wants very little, which is why we all do it."],
 	],
 	"s_yd_houtu": [
-		["Houtu, Sovereign Earth", "Come here, child. Let me look at you. You are the one who turned the Wheel and let the dead go home, and then closed the Ledger. I remember every soul you sent me. They all said the same thing: tell him thank you."],
+		["Houtu, Sovereign Earth", "Come here, child. Let me look at you. You are the one who closed the Ledger, and then turned the Wheel and let the dead go home. I remember every soul you sent me. They all said the same thing: tell him thank you."],
 		["Houtu, Sovereign Earth", "I am Houtu. I am the earth everybody walks on and everybody is buried in. Li presses on me. He has pressed for four thousand years, because his grandfather told him the earth must be kept down, away from heaven. I have never once complained. I should have."],
 		["Lin Feng", "Why didn't you?"],
 		["Houtu, Sovereign Earth", "Because a mother does not complain about her children. Li is a child of the earth, as you are. Go to him. And take the earth's own blessing on your sword, so that whatever you strike, you strike with the weight of everything that was ever buried kindly."],
@@ -4650,6 +5203,287 @@ const DIALOGUE := {
 		["Ling Yu of the Feathered Folk", "You climbed it without wings. I still won the race."],
 		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect, and then the first hundred steps of the stair round the Standing Tree, because somebody should, and the tree, very slightly, leans down to let him."],
 	],
+	# ---- Part XII: inside the Founder's sealed caves (Main.open_abode adds the gift and the words on the wall)
+	"abode:cave_core": [
+		["Narrator", "Inside, a plain room cut in the rock: a cushion, a lamp that lights itself, and on the wall, in a woman's quick sword-strokes, the beginning of a letter."],
+		["Echo of Founder Qing Lian", "To whoever carries the root after me. It has nine branches, and it wakes one at a time. I have left a door on this mountain for each realm you reach. Do not hurry. A root that is hurried snaps."],
+	],
+	"abode:cave_soul": [
+		["Narrator", "Under the Founder's words somebody has scratched, small, with a knife: 'The seventh bearer was here. Nascent Soul at nineteen! Next door next year.' There is no other mark, and the next door was never opened."],
+		["Yue Ling", "Xu Mo found him first. ...Then we open the next one for him."],
+	],
+	"abode:cave_deity": [
+		["Narrator", "In the dust of this cave, two sets of footprints, one large and one small, and on the wall in charcoal: 'The twelfth bearer and her brother. We will come back for the next door together.' Nobody did."],
+		["Echo of Founder Qing Lian", "The body is a house. You may leave it, and come back, and find the furniture moved. That is all this realm is. Do not let anybody tell you it makes you more than you were."],
+	],
+	"abode:cave_void": [
+		["Narrator", "The Founder's writing here is older and shakier than at the other doors: 'Nobody has opened this door. I check it every spring. Xu Mo hunts every bearer down before the fifth realm. If you are reading this, he has failed at last. Good.'"],
+	],
+	"abode:cave_merging": [
+		["Echo of Founder Qing Lian", "I wove a girl from the Seal's lotus so that the bearer would never face the end alone. If she is with you, tell her I am proud of her. If she is not, go and find her."],
+		["Yue Ling", "...She knew I would come this far. She left a cushion for me, Lin Feng. Look. Two cushions."],
+	],
+	"abode:cave_mahayana": [
+		["Echo of Founder Qing Lian", "The Court sends an inspector up the mountain every spring to count our disciples. I let him count. He never once asks what is in the caves. A government that only counts what it can tax will never see a root grow."],
+	],
+	"abode:cave_immortal": [
+		["Echo of Founder Qing Lian", "If you have come this far, the Court is failing, or you are. There is a Ledger in the sky with every year it stole written in it, and every name. I could not close it. Perhaps you can. Perhaps, by the time you read this, you have."],
+	],
+	"abode:cave_ancestor": [
+		["Echo of Founder Qing Lian", "I never went past this realm. I do not know what is behind the last door, and I made it anyway, because a road should not stop just because the person who built it did."],
+	],
+	"abode:cave_sovereign": [
+		["Narrator", "The last cave is empty: no cushion, no lamp, no words. Only a brush and an ink-stone, set out ready. Lin Feng thinks for a long time, then takes up the brush and writes the Founder an answer on her own wall."],
+	],
+	# ---- Part XII: The Returning Ruins
+	"recall10": [
+		["Narrator", "Every road goes somewhere now. Farmers from Qingshi climb the Jianmu on rest days to look down on the clouds, Ling Yu races anyone who will race her, and Lin Feng sweeps the steps in the mornings and the first hundred steps of the Standing Tree in the evenings."],
+		["Narrator", "Then, one morning in early autumn, a fishing boat comes up the south-east road on an ox-cart, with three fishermen from the east coast sitting in it, still holding their nets."],
+		["Old Shen the Bell-Ringer", "Elder! There is a boat at the gate. On a cart. The fishermen say the sea went out last night and did not come back. Every boat on the east coast is sitting on the sand."],
+		["Elder Qing Xuan", "Then it has gone somewhere, Shen. Water always goes somewhere. Lin Feng, to the hall. And somebody wake the Archivist."],
+	],
+	"s_p12_home": [
+		["Elder Qing Xuan", "East of the Eastern Sea, says the Liezi, who knows how many hundred million li away, there is a ravine without a bottom. It is called Guixu, the Returning Ruins. Every river in the world, every sea and the Silver River of heaven pour into it, and it never fills and never empties."],
+		["Elder Qing Xuan", "Over it stood five mountains: Daiyu, Yuanqiao, Fanghu, Yingzhou and Penglai, the Isles of the Immortals, with palaces of gold and trees of pearl whose fruit stops you growing old. They floated, so the Heavenly Emperor set fifteen great turtles to hold them on their heads, in three shifts of sixty thousand years."],
+		["Lin Feng", "And the sea going out has something to do with a fairy tale?"],
+		["Elder Qing Xuan", "Everything in this sect has had something to do with a fairy tale, disciple, since the day you picked up a broom. Water goes into Guixu and comes back as cloud and rain and rivers. That is why the sea stays the sea. If it goes out and does not come back, the Returning Ruins have stopped returning."],
+		["Elder Qing Xuan", "Ask Archivist Lan what the Court did with the Eastern Sea; she has been in the Sealed Archive since dawn. Then go east to Fusang, where the sun comes up out of the sea, and see for yourself."],
+	],
+	"s_p12_archive": [
+		["Archivist Lan", "The Liezi, the Records of the Grand Historian and a Court memorandum marked 'not to be read'. Sit. A giant of the Kingdom of Longbo once walked out to the isles in a few strides, caught six of the turtles on one line and took them home to tell fortunes with their shells. Daiyu and Yuanqiao drifted north and sank into the Ruins."],
+		["Archivist Lan", "Then the First Emperor of Qin sent his magician Xu Fu east with three thousand boys and girls to fetch the elixir of immortality. Xu Fu sailed, came back once without it, sailed again with sixty ships, and was never seen again. The historian says he found a plain with broad marshes and made himself king. The memorandum says otherwise."],
+		["Lin Feng", "What does it say?"],
+		["Archivist Lan", "That the Court hid the isles in a mirage, so nobody could pick years off a tree while the Court was selling them by the column; and put a bronze stopper in Guixu, so the water of the world would come back only where the Rain Ministry signed for it. Somebody has pulled the stopper out. That is where your sea went."],
+		["Archivist Lan", "And Lin Feng: the memorandum has a list of everyone the Court left on the isles. It is very long, and it is in the column marked 'forgotten'. Be kind to them. Nobody has visited in two thousand years."],
+	],
+	"s_p12_shore": [
+		["Narrator", "Past the Fusang tree the valley falls away east, and where the sea should be there is wet sand to the horizon, shining, with boats lying on it like dropped shoes. By the pool where the ten suns used to bathe, a young woman in red sits in a small boat that is somehow still afloat."],
+		["Mazu, Who Brings the Boats Home", "You are the sweeper. The fishermen pray to me, and lately they pray about you: let him come and fix the sea. I am Lin Moniang. On the coast they call me Mazu, Grandmother, which I find very ageing. I bring the boats home.", "wave"],
+		["Mazu, Who Brings the Boats Home", "There are no boats to bring home now. The sea has not gone, only gone east: past the edge of the shelf it runs like a river into the Returning Ruins. The hot spring under this pool runs beneath the hills to that river, and my boat floats wherever there is water. Get in."],
+		["Mazu, Who Brings the Boats Home", "And watch the horizon. My two generals ran away when the tide went: Qianliyan, who sees a thousand li, and Shunfeng'er, who hears every wind. Demons I tamed once, with a red lantern and a great deal of patience. Somebody is paying them to watch the sea."],
+		["Narrator", "Mazu lifts the red lantern from the stern and puts it in Yue Ling's hands, and its light settles there like a warm stone: Mazu's Red Lantern, which brings the fallen home as surely as it brings boats.", "Mazu, Who Brings the Boats Home:offer"],
+		["Yue Ling", "We will bring it back, Grandmother. And your generals.", "bow"],
+	],
+	"s_pl_intro": [
+		["Narrator", "Out of the haze rises an isle of white cliffs and green terraces, a pavilion on the highest cliff and, along the old shore, a town of blue-tiled houses with every boat in it lying on the sand. A woman with a carved staff is waiting at the door of the biggest hall."],
+		["Headwoman Xu Qian of Landfall", "A boat. A boat that floats. From outside. Forgive me, honoured guest: nobody has come from outside in two thousand two hundred years, and we have rehearsed what to say for most of them, and I have forgotten all of it.", "shock"],
+		["Headwoman Xu Qian of Landfall", "This is Landfall. We are the Thousand Children: the grandchildren's grandchildren of the three thousand boys and girls Xu Fu brought from Qin to fetch the elixir. He went up the hill to ask the immortals for it, and he did not come back down. We stayed. Where would we go? The mirage let nobody in, or out."],
+		["Headwoman Xu Qian of Landfall", "Now the mirage has lifted and the sea has gone, both at once. The drain took our boats, and the Slips of the Thousand Names: every child's name, carved on bamboo, kept in this hall since the landing. Four bundles went out with the water. The sharks it stranded are snapping at the children. Please."],
+		["Lin Feng", "I will bring the names home.", "nod"],
+	],
+	"s_pl_return": [
+		["Headwoman Xu Qian of Landfall", "Four bundles. Every name... Teacher Qin, count them! ...All here. Look: the oldest slips are all in one hand. The same hand, three thousand names.", "grieve"],
+		["Teacher Qin of the Thousand Names", "Xu Fu's hand. He carved every name himself, the first night ashore, so that none of us would be forgotten. And on the last slip, not a name: I will come back with the elixir, and none of you will ever grow old."],
+		["Headwoman Xu Qian of Landfall", "None of us grew old waiting, honoured guest. We grew old in the ordinary way. If you want to know where the sea went, ask the immortals. One of them comes down to drink: Lu Dongbin, upstairs in the wine-house. He has drunk there for two thousand years and never once paid in coin."],
+	],
+	"s_pl_immortal": [
+		["Lu Dongbin, the Sword Immortal", "A guest! And sober! Sit, sit. I am Lu Dongbin. I carry a sword to cut through ignorance, mostly my own. The others are up on Fangzhang being dignified; I prefer the wine down here, and the company.", "laugh"],
+		["Lu Dongbin, the Sword Immortal", "Xu Fu came up the hill two thousand years ago and asked for the elixir. We told him the truth: the fruit of the pearl trees does not make you live for ever. It makes you stop. A ripe fruit, eaten when you are ready, lets you stop when you choose. An unripe one just stops you."],
+		["Lu Dongbin, the Sword Immortal", "He did not believe us. He stole a green one and bit it, and he has not changed since: not a hair, not a thought. He cannot sleep, he cannot forget the Emperor's orders and he cannot change his mind. The only ripe fruit left grows on Daiyu, which sank into the Returning Ruins."],
+		["Lin Feng", "So he pulled out the stopper, to drain the sea down to Daiyu."],
+		["Lu Dongbin, the Sword Immortal", "Clever sweeper. Stop him before the sea is gone. Mazu's runaway generals are his lookouts, the Sea-Monk is drowning fishermen on the sandbar for fun, and the Giant of Longbo is wading on the shelf, fishing for turtles. If he catches three more, Penglai sinks. Have a drink first. No? Suit yourself."],
+	],
+	"pre:qianliyan": [
+		["Narrator", "On a crag above the shoals stands a green-faced demon with eyes like lanterns, shading them with one hand and staring east."],
+		["Qianliyan, Thousand-Li Eye", "I see you. I saw you leave Fusang. I saw you eat your breakfast. A man with a green fruit pays me in pearls to watch the sea, and I watch it. There is not much sea left to watch."],
+		["Yue Ling", "Mazu misses you."],
+		["Qianliyan, Thousand-Li Eye", "...Does she? No. Lies. I would have seen it."],
+	],
+	"post:qianliyan": [["Narrator", "Qianliyan sits down hard on his crag and rubs his eyes, which have not shut for a month. Far away on the mainland, he says quietly, a woman in red is standing on a cliff with a lantern, every night, waiting for boats. He had not looked that way. He looks now."]],
+	"pre:shunfenger": [
+		["Narrator", "Among the dunes of the bare sea floor a red-faced demon with ears like sails crouches with one hand cupped to the wind."],
+		["Shunfeng'er, Wind-Following Ear", "Shh. I hear everything: the sand settling, the turtles groaning, the giant's line in the water, your heart, a bit fast. The man with the green fruit pays me to listen. He says the sea will be gone in a month, and then I can hear the trees on Daiyu."],
+		["Lin Feng", "Then listen to this."],
+	],
+	"post:shunfenger": [["Narrator", "Shunfeng'er sits back in the sand with his ears ringing, and under the ringing he hears something he has ignored for a month: Mazu, on the mainland, calling the names of her boats one by one, every night. He gets up and starts walking west."]],
+	"pre:sea_monk": [
+		["Narrator", "On the fishermen's sandbar crouches a thing like a great turtle with a shaved man's head, chuckling, holding a fisherman down in the last puddle of the shoal."],
+		["The Sea-Monk Who Drowns Fishermen", "Heh. When the sea was deep I had to swim after them. Now they walk right up to me, looking for their boats."],
+		["Yue Ling", "Let him go."],
+	],
+	"post:sea_monk": [["Narrator", "The Sea-Monk lets the fisherman go and slides off into the channel, muttering that it was better sport when there was sea. Old Pilot Zheng says Landfall will remember, and the Sea-Monk will find the shoals rather crowded with nets when the water comes back."]],
+	"pre:longbo_giant": [
+		["Narrator", "Out on the bare shelf east of Penglai, where the sea was a thousand feet deep, stands a giant up to his ankles in the last of the water, casting a line as thick as a cable. Something vast under the isle groans."],
+		["The Giant of Longbo, Who Fishes for Turtles", "Six turtles, my great-great-grandfather caught, in one cast! The Emperor shrank our whole kingdom for it. Now the Court is gone, the shrinking is wearing off, and the sea is down to my ankles. Three more and I beat his record."],
+		["Lin Feng", "Three more and Penglai sinks, with the Thousand Children on it."],
+		["The Giant of Longbo, Who Fishes for Turtles", "Then they should learn to swim. Out of my light, little fisherman."],
+	],
+	"post:longbo_giant": [
+		["Narrator", "The giant sits down in the shallows with a splash that runs all the way to Landfall, and looks at his great hook, bent straight. Lin Feng takes it from him."],
+		["The Giant of Longbo, Who Fishes for Turtles", "...My great-great-grandfather told it as a fishing story. He never said there were people on the islands. He never said they sank."],
+		["Narrator", "The giant wades away west, a little smaller with every stride. Beyond the shelf a sandbar the drain has left bare runs east into the haze, towards a square-topped isle, and the way to Fangzhang is open."],
+	],
+	"s_fz_intro": [
+		["He Xiangu of the Lotus", "Lu Dongbin sent you up? He never sends anybody; he forgets. I am He Xiangu. I carry a lotus and keep the gardens of Fangzhang, the Square-Pot Isle: the elixir herbs, the furnaces and the pearl trees."],
+		["He Xiangu of the Lotus", "The pearl trees drink from the Returning Ruins through roots a thousand li long. Since the sea started going out they have been drinking nothing, and their leaves fall like coins. Bring me the dew from four of them before it dries, and I will show you what the elixir really is."],
+		["Yue Ling", "And the toads in the herb beds?"],
+		["He Xiangu of the Lotus", "The furnaces went cold and the cinnabar toads came out of them; the cranes are stealing what pills are left and the rabbits are eating the herbs. Chase them out, if you would. Gently. They are only hungry, like everybody on this isle."],
+	],
+	"s_fz_return": [
+		["Narrator", "He Xiangu lets one drop of the dew fall on a withered lotus. The lotus opens, and then stays exactly as it is: not a petal moves, not in the wind, not when Yue Ling touches it.", "He Xiangu of the Lotus:offer"],
+		["He Xiangu of the Lotus", "That is the elixir: water from the Returning Ruins, where every water in the world has been and come back. It does not give you years. It takes away the need for them. Xu Fu wanted it for an emperor who wanted never to end. We said no, not to keep it from Xu Fu, but to keep it from the emperor."],
+		["Lin Feng", "And the Court hid you anyway."],
+		["He Xiangu of the Lotus", "The Court hid everybody it could not tax. Go down to the cellar of cold furnaces and ask Zhang Guolao. He is the oldest of us, and he was there when the Court came. He sits on his donkey backwards, so mind his back. His front. Whichever."],
+	],
+	"s_fz_zhang": [
+		["Zhang Guolao, Who Rides Backwards", "Sit. I ride backwards so I can see where I have been; you would be amazed how few people look. I was there when the Court came, with ledgers, to put a stopper in Guixu.", "wave"],
+		["Zhang Guolao, Who Rides Backwards", "It used to be simple. Every water ran east into the Ruins and came back up, as cloud over the sea, as springs, as the Silver River. Nobody signed for it. The Court wanted it signed for. So it set Tianwu, the god of the waters, to keep a bronze stopper in the Ruins, and water came back only where the Rain Ministry wrote it down."],
+		["Lin Feng", "And when the Court fell?"],
+		["Zhang Guolao, Who Rides Backwards", "Tianwu kept the stopper anyway, because nobody told him to stop. Then Xu Fu told him the Court had ordered it pulled. Tianwu has eight heads, and not one of them is good at checking orders. So the stopper is out, the water goes in, and nothing comes back but wind. The water has forgotten how to come back by itself."],
+		["Zhang Guolao, Who Rides Backwards", "Tianwu is at the east end of the isle, eight heads arguing about whose fault it is. The White Deer has eaten our last ripe herbs, the furnace that walked off is still burning, and the pearl tree at the bottom of the garden has stopped fruiting out of spite. One thing at a time, sweeper. That is the whole secret of immortality."],
+	],
+	"pre:longevity_deer": [
+		["Narrator", "In the high meadow a white deer with antlers like coral is eating the last ripe herbs of the immortals' garden, leaf, root and flower, and growing a little younger with every mouthful."],
+		["The White Deer of Longevity", "The garden is dying. Somebody should eat it while it is still good."],
+		["Yue Ling", "Somebody should save it."],
+	],
+	"post:longevity_deer": [["Narrator", "The White Deer stops eating and looks at the bare meadow, and for the first time in a thousand years looks its age. It lies down among the stalks and stays there, keeping the seeds warm, until somebody plants them."]],
+	"pre:elixir_furnace": [
+		["Narrator", "A bronze furnace taller than a house is stamping across the terraces on three legs, its belly roaring, spilling half-made pills that burn holes in the grass."],
+		["The Elixir Furnace That Walked Away", "FED. NOT FED. FED. NOT FED. The fire said: make the elixir. There is no water from the Ruins. So I make everything else. For ever."],
+		["Lin Feng", "Then let the fire rest."],
+	],
+	"post:elixir_furnace": [["Narrator", "Lin Feng banks the furnace's fire the way Alchemist Mo taught him in his first week, ash over the embers, and the furnace kneels on its three legs and goes quiet. Furnace-Boy Dan climbs inside to sleep, which, he says, is what furnaces are for."]],
+	"pre:pearl_tree": [
+		["Narrator", "At the bottom of the garden stands a tree of white pearl with leaves of jade, rattling like a box of beads, its bare branches lashing at anything that comes near."],
+		["The Pearl Tree That Will Not Fruit", "Everything that eats my fruit stops. Stops growing. Stops changing. Stops. Why should I fruit, so that things can stop?"],
+		["Yue Ling", "Because some things are tired."],
+	],
+	"post:pearl_tree": [["Narrator", "The pearl tree goes still, and one green bud opens among its leaves: not a fruit, a flower. He Xiangu says no pearl tree has flowered in two thousand years. Flowers do not stop anything. They only open."]],
+	"pre:tianwu": [
+		["Narrator", "At the east end of Fangzhang, on a cliff over the drained sea, crouches a tiger the size of a temple with eight human heads, eight legs and eight tails, and every head is shouting at the others."],
+		["Tianwu, the Eight-Headed God of the Waters", "The stopper was pulled by order! No, it was stolen! The Court ordered it! The Court is gone! Then who ordered it? HE did! Who is he? The man with the green fruit! Is he the Court? He SAID he was the Court!"],
+		["Lin Feng", "Nobody is the Court now."],
+		["Tianwu, the Eight-Headed God of the Waters", "...Then who do we obey? ATTACK HIM! Wait. Why?"],
+	],
+	"post:tianwu": [
+		["Tianwu, the Eight-Headed God of the Waters", "...If nobody is the Court, who decides where the water goes?"],
+		["Lin Feng", "The water. It always did, until somebody put a stopper in it."],
+		["Narrator", "The eight heads look at one another and, for once, say nothing at all. Tianwu lies down across the cliff and points all eight noses east: beyond Yingzhou, at the lip of the Ruins, Xu Fu rolled the stopper away down the sea floor. A sandbar runs north-east into the mist, and the way to Yingzhou is open."],
+	],
+	"s_yz_intro": [
+		["Narrator", "Yingzhou comes out of the mist in pieces: a cliff, a pine, a shrine roof, a long grey shape breathing under the shore. On a rock at the water's old edge sits a girl with red feet, a white beak of a mouth and a pebble in her hand."],
+		["Jingwei, the Flame Emperor's Daughter", "Jingwei. Jingwei. That is what I say, so that is what they call me. I was the Flame Emperor's daughter. I went out on the Eastern Sea in a little boat, and the sea drowned me, and I came back as a bird."],
+		["Jingwei, the Flame Emperor's Daughter", "For four thousand years I have carried stones and twigs from the western hills and dropped them in the sea, to fill it up, so that it can never drown anybody else. And now look. It is going. It is nearly gone."],
+		["Lin Feng", "You don't sound happy."],
+		["Jingwei, the Flame Emperor's Daughter", "...If the sea goes by itself, what was I doing? I lost four stones in the mist this morning and I could not even remember why I wanted them. Find them for me. And chase the phantoms out of the mist; they frighten the turtles."],
+	],
+	"s_yz_return": [
+		["Jingwei, the Flame Emperor's Daughter", "My stones. Thank you. Now look over the edge, while the water is low. No, there. Under the isle."],
+		["Narrator", "Below the cliff, where the sea has drained away, Yingzhou stands not only on the back of a turtle but on a reef of pebbles and twigs, grey and white and red, packed hard and four thousand years deep."],
+		["Jingwei, the Flame Emperor's Daughter", "...I was not filling the sea. I was building something. I never saw it, with the water over it.", "grieve"],
+		["Yue Ling", "It could hold the isle. Then the turtles could rest."],
+		["Narrator", "Jingwei presses one pebble into Lin Feng's palm, worn smooth as a sword hilt by four thousand years of beaks, and a technique settles into him with it, patient and heavy: Jingwei's Stone Sword.", "Jingwei, the Flame Emperor's Daughter:offer"],
+		["Jingwei, the Flame Emperor's Daughter", "I will keep building. Not to fill. To hold. Old Gui at the shrine keeps the turtles' tallies; go up the stairs and shout. He is deaf in one ear and stubborn in the other."],
+	],
+	"s_yz_herald": [
+		["Old Gui, Herald of the Turtles", "Eh? A visitor in the tally-room? I am Gui, herald of the turtles, and these are the tallies of their shifts: fifteen turtles, five isles, three shifts of sixty thousand years. At every shift the God of the Northern Sea blows his conch, and the turtles change places."],
+		["Old Gui, Herald of the Turtles", "Then the giant of Longbo took six and two isles sank. Nine turtles were left for three isles, all of them holding at once, and no shift to relieve them. Forty thousand years without a rest. Now the sea has drained and they lie on the dry shelf with the isles on their heads, and they cannot even float."],
+		["Lin Feng", "I took the giant's hook from him. Here."],
+		["Old Gui, Herald of the Turtles", "...Bent straight. Then nine of us can stop listening for it. But the conch of the shifts belongs to Yu Qiang, God of the Northern Sea, and he has not blown it since the Court told him to wait for orders. He stands at the east end of the isle in a wind of his own.", "grieve"],
+		["Old Gui, Herald of the Turtles", "And mind: Wu Zixu, who drove the tidal bore up every river mouth, has stopped the tide, because there is no sea to drive; Shen the clam-dragon, who breathed the mirage that hid us, is breathing false seas to feel better; and the Great Ao who bears Yingzhou is thrashing on the shelf. Mind your feet."],
+	],
+	"pre:wu_zixu": [
+		["Narrator", "On the northern cliffs a pale general in white armour sits a horse made of foam on the bare sand where the tide used to come in, a leather sack slung from his saddle."],
+		["Wu Zixu, God of the Tidal Bore", "My king had me sewn into a sack and thrown into the river for telling him the truth, so I became the tide that comes up the river twice a day to tell it again. Now there is no sea. What truth is a tide without water?"],
+		["Yue Ling", "The same truth, General. Only quieter."],
+	],
+	"post:wu_zixu": [["Narrator", "Wu Zixu's horse dissolves into foam, and the foam runs west into the last of the channel and lies there, waiting. When the sea comes back, he says, he will ride the bore up every river again and tell the truth to whoever stands on the bank. He hopes somebody will listen this time."]],
+	"pre:shen": [
+		["Narrator", "In the mist over the drained bay lies a great pale clam with a dragon's head, breathing out of her shell, and every breath builds a city in the air: towers, markets, a harbour full of ships, and a sea that is not there."],
+		["Shen, the Mirage Clam-Dragon", "The Court said: breathe, and hide the isles, and I breathed for two thousand years. Now nobody tells me what to hide, so I breathe what is missing. Isn't it lovely? It's a sea."],
+		["Lin Feng", "It isn't a sea. People are walking into it."],
+	],
+	"post:shen": [["Narrator", "Shen's mirage folds up like a fan and goes back into her shell. When the sea comes home, she says, she will breathe only for fun: palaces over the water at dawn, for fishermen to look at and know they are not real. Every mirage should know it is a mirage."]],
+	"pre:great_ao": [
+		["Narrator", "On the dry shelf under Yingzhou lies a turtle the size of a hill with the whole isle on its head, its flippers beating the sand for water that is not there."],
+		["The Great Ao Who Bears Yingzhou", "...thirsty... forty thousand years... the sea is gone... I cannot put it down... I cannot put it down..."],
+		["Lin Feng", "Then let me hold it with you, for a moment."],
+	],
+	"post:great_ao": [["Narrator", "The Great Ao's thrashing slows and stops. Yue Ling calls down the Spring Rain she learned in her first winter on the mountain, and it falls on the old shell like a blessing, and the turtle sighs, and sees the reef of Jingwei's stones beside its head, and notices for the first time that it is not holding the isle alone."]],
+	"pre:yu_qiang": [
+		["Narrator", "At the east end of Yingzhou, in a wind of his own, stands a god with a man's face and a bird's body, green snakes hanging from his ears and green snakes under his feet. A great conch hangs at his side."],
+		["Yu Qiang, God of the Northern Sea", "The Emperor told me: keep the shifts, and wait for orders. I have waited forty thousand years. The orders are coming. Everybody tells me there are no more orders. That is exactly what somebody would say who wanted me to stop waiting."],
+		["Lin Feng", "I am asking you to stop waiting."],
+	],
+	"post:yu_qiang": [
+		["Yu Qiang, God of the Northern Sea", "...Then who will tell me when to blow the conch?"],
+		["Lin Feng", "The turtles. They have been telling you for forty thousand years."],
+		["Narrator", "Yu Qiang gives Lin Feng the conch of the shifts, and Lin Feng blows it. The sound goes down through the isles into the shelf, and under Penglai, Fangzhang and Yingzhou two turtles out of every three let go, for the first time in forty thousand years, and sleep, while the third and Jingwei's reef hold. Old Gui weeps into his tallies."],
+		["Narrator", "Beyond Yingzhou the sea floor slopes down and down to the east, towards a roar like every river in the world at once. The way to the Returning Ruins is open."],
+	],
+	"s_gx_intro": [
+		["Narrator", "The sea floor runs down for a hundred li to the lip of the Returning Ruins: wrecks, drowned forests of coral, whole sunken mountains standing in the open air for the first time since the Yellow Emperor. On a slope lies a great ship of Qin, its stern cabin still dry, and in it sits the ghost of an old sailor, steering nothing."],
+		["Steersman Hong of the Lost Fleet", "Starboard... steady... Oh. A living man, on my deck. You are not on the crew list, but then nobody is any more. I am Hong, steersman of the Penglai-Seeker, Xu Fu's flagship: sixty ships out of Langya, two thousand two hundred years ago.", "shock"],
+		["Steersman Hong of the Lost Fleet", "He came back down from the isle with a green fruit with a bite out of it and a look in his eyes I did not like, and told me to steer east, to Guixu, where the sunken isles were. I said no ship comes back from Guixu. He said: then it will not have to."],
+		["Steersman Hong of the Lost Fleet", "He tore up his logbook on the way down, and the pages are all over the sea floor now the water is gone. Bring them to me. I would like to know, before I go, what he was thinking."],
+	],
+	"s_gx_return": [
+		["Steersman Hong of the Lost Fleet", "Four pages, all in his hand. Listen: 'Day one. Three thousand children ashore. I have carved every name. I will be back before the youngest loses a tooth.'"],
+		["Steersman Hong of the Lost Fleet", "'Year forty. I have not grown one grey hair. I cannot sleep. I remember the Emperor's order word for word, and I cannot remember my mother's face.' And the last: 'If I find a ripe fruit, I can finish. I would like to finish.'"],
+		["Yue Ling", "He doesn't want to live for ever. He wants to stop being stopped."],
+		["Steersman Hong of the Lost Fleet", "Then he is down at the lip of the Ruins, where the summit of Daiyu has come up out of the water, waiting for the last tree to ripen. Ah Fu the ship's boy will show you the way; he never grew up either. Go on. I have a ship to steer."],
+	],
+	"s_gx_boy": [
+		["Ah Fu, the Ship's Boy Who Never Grew Up", "Are you going to see Master Xu? He gave me a bite of the green fruit when I was hungry, two thousand years ago. Just a little bite. So I'm still ten."],
+		["Ah Fu, the Ship's Boy Who Never Grew Up", "He isn't wicked, you know. He just can't change his mind. Once he decides something he can't undecide it. He decided to come back with the elixir, so he can't come back without it.", "shake"],
+		["Lin Feng", "Then we'll help him find a way to come back."],
+		["Ah Fu, the Ship's Boy Who Never Grew Up", "There's things in the way. The Admiral, who still thinks we're at sea. The stopper Master Xu rolled down the slope, which won't stop rolling. And the Sea. The real one: Ruo of the Northern Sea, rising out of the drain. She's very, very angry."],
+	],
+	"pre:drowned_admiral": [
+		["Narrator", "On the northern slope a warship of Qin stands upright on the dry sea floor with every sail set, and on its deck an admiral in rusted armour is shouting orders at a crew of skeletons."],
+		["The Admiral of the Lost Fleet", "HOLD COURSE! Steady as she goes! Sixty ships to Penglai for the Emperor's elixir, and we shall not turn back!"],
+		["Yue Ling", "Admiral... your ship has not moved for two thousand years."],
+	],
+	"post:drowned_admiral": [["Narrator", "The Admiral lowers his sword and looks over the rail at the sand for a long time. Then he gives his last order: all hands ashore. The skeletons climb down and walk west across the sea floor in a long, neat line towards Landfall, where somebody's grandchildren's grandchildren may still have their names."]],
+	"pre:guixu_stopper": [
+		["Narrator", "Up and down the southern slope, like a boulder in a gutter, rolls a plug of bronze as big as a temple, engraved with the Court's seals and a ledger of every river in the world."],
+		["The Bronze Stopper of Guixu", "WHERE DO I GO? WHERE DO I GO? I was made to be in a hole. Then I was pulled out. Nobody made me to be out."],
+		["Lin Feng", "Then rest. You don't have to go back in."],
+	],
+	"post:guixu_stopper": [["Narrator", "The Stopper rolls to a halt against a coral reef and lies there ringing softly. It is not going back in, Lin Feng tells it. Nothing is. Under the open sky the ledger engraved on it, every river in the world signed for, begins to fade."]],
+	"pre:hai_ruo": [
+		["Narrator", "At the lip of the Returning Ruins the last of the sea pours over the edge into a darkness without a bottom, and out of the roar rises a figure of water as tall as the sky, with the whole Eastern Sea in her eyes."],
+		["Ruo of the Northern Sea, the Sea Itself", "The River Earl came to me once so proud of his little river, and I showed him how small he was. Now some little man has pulled out my floor, and I am pouring away into the dark, and I am small. I hate being small."],
+		["Lin Feng", "He Bo learned to like it."],
+	],
+	"post:hai_ruo": [["Narrator", "Ruo sinks back into the roar, and for a moment the sea holds still at the lip, listening, while Lin Feng tells her about He Bo at Longmen, who leaves the brides alone now and keeps a small and very happy river. The sea laughs, a wave the size of a province, and goes on pouring; but slower."]],
+	"pre:xu_fu": [
+		["Narrator", "On the drowned summit of Daiyu, in the open air at the very lip of the Ruins, grows a single tree of pearl with one fruit on it, not yet ripe. Under it stands a man in the robes of a Qin court magician, not a day older than the morning he sailed, holding a green fruit with one bite out of it."],
+		["Xu Fu, Who Sought the Elixir", "Another one come to stop me. Everybody has tried: the immortals, the sea, my own ship. I cannot be stopped. That is the trouble. I was stopped two thousand years ago, by this."],
+		["Lin Feng", "The children you left are still waiting at Landfall. Their grandchildren's grandchildren."],
+		["Xu Fu, Who Sought the Elixir", "I promised them the elixir. I cannot go back without it. I cannot. I have tried to want to, and I cannot."],
+	],
+	"post:xu_fu": [
+		["Narrator", "Xu Fu falls to his knees under the pearl tree. Above him, in the roar of the sea pouring into the dark, the last fruit of Daiyu turns from green to white, ripe at last, and drops into his hands."],
+		["Xu Fu, Who Sought the Elixir", "...Ripe. After two thousand years. I could eat it and stop when I choose. I could live as long as I liked."],
+		["Yue Ling", "What would you like?"],
+		["Xu Fu, Who Sought the Elixir", "...I would like to grow old. I would like to see the children. I would like to finish."],
+		["Narrator", "He eats the ripe fruit, and his first grey hair comes in while they watch. He gives Lin Feng the green one with the bite out of it. Behind him the sea goes on pouring over the lip into the dark, and nothing comes back up. The water has forgotten how; somebody will have to remind it."],
+	],
+	"s_p12_end": [
+		["Narrator", "Mazu's boat brings them back along the channel to Penglai at dusk, with Xu Fu sitting in the bow, getting older by the hour and looking at everything. The whole of Landfall is on the sand to meet them."],
+		["Headwoman Xu Qian of Landfall", "...You are him. The hand on the slips. You are older than I thought you would be.", "shock"],
+		["Xu Fu, Who Came Back", "I am older than I was this morning. I said I would come back with the elixir, and that none of you would grow old. I was wrong. You all grew old. That was the elixir. I just did not know what it looked like.", "kneel"],
+		["Teacher Qin of the Thousand Names", "Three thousand names, Master Xu. Every child in Landfall can say them. Will you hear them?", "offer"],
+		["Narrator", "He listens to all three thousand, sitting on the floor of the Hall of the Thousand Names. Lin Feng gives the Headwoman the green fruit with the bite out of it, and she buries it under the hall, where nobody will ever eat it. Then everybody looks at Lin Feng, because out to the east the sea is still pouring into the dark."],
+		["Mazu, Who Brings the Boats Home", "The Ruins took the sea because they have forgotten how to give it back. The Court wrote every return in a ledger for so long that the water does not remember how to rise by itself."],
+		["Yue Ling", "Like the Jianmu, which forgot how to grow. Somebody has to remind it."],
+		["Lin Feng", "Then I will go and stand at the lip.", "nod"],
+	],
+	"pre:s_break17": [
+		["Narrator", "Lin Feng stands on the drowned summit of Daiyu at the lip of the Returning Ruins, Jingwei's pebble in his pocket and Yu Qiang's conch at his belt. The tribulation that gathers is every water in the world at once, the rain, the rivers, the springs under the Jianmu's roots and the Silver River of heaven, pouring past him into the dark and asking where home is."],
+		["Yue Ling", "Which way does it come back?"],
+		["Lin Feng", "Every way. That is what returning is.", "point"],
+	],
+	"post:s_break17": [
+		["Narrator", "Lin Feng lets every water in the world pass through him into the Ruins, holding nothing back and keeping nothing, and in the dark at the bottom of the world the water remembers, and rises: as cloud over the Eastern Sea, as springs under the Jianmu, as the Silver River across the night."],
+		["Narrator", "He becomes the first cultivator of Ten Thousand Waters Return: a realm in which everything that goes away can come home."],
+		["Narrator", "The tide comes back into Fusang at dawn. Mazu stands on her cliff with her red lantern and two sheepish generals, calling the boats home by name. Wu Zixu rides the bore up every river on the east coast. Rain-Minister Ao Run signs his first page with real sea in it, and Leigong drums for it."],
+		["Narrator", "On Penglai, Xu Fu teaches the children of Landfall to sail, slowly, because he is old now and in no hurry. Under the isles two turtles out of every three are asleep, and Jingwei goes on dropping her stones: not to fill the sea, but to hold."],
+		["Jingwei, the Flame Emperor's Daughter", "Jingwei. Jingwei. It means: I am still here."],
+		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect and the first hundred steps of the Standing Tree, and then goes down to the spring to fill the water jars, because somebody should, and the water comes up out of the ground to meet him."],
+	],
 	# ---- Part V: The Falling Sky
 	"recall3": [
 		["Narrator", "Lin Feng keeps his word. For nine quiet days the first Dao Ancestor in ten thousand years sweeps the steps of Azure Cloud Sect, and nobody quite dares to stop him."],
@@ -4664,6 +5498,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "Not nothing. The eastern pillar still stands. The Azure Dragon King holds it up with his own back, out of gratitude to a boy who freed him."],
 		["Lin Feng", "His scale still hangs at my belt. He said the tide remembers every promise."],
 		["Elder Qing Xuan", "The other three wardens were not so lucky. Bai Hu in the western desert, Zhu Que in the southern vale, Xuan Wu on the northern steppe. Starved for an age, they have gone wild, and their pillars are crumbling."],
+		["Elder Qing Xuan", "Nuwa did not set her pillars at the corners of the world, whatever the Court's maps say. She ringed the tear in the sky, at its south-east edge, so the 'western' pillar stands in a desert south-east of us, and the books still call it west."],
 		["Elder Qing Xuan", "And at the centre, where the pillars meet, something older than the sky is waking up because the sky is thinning. The books call it Hundun. It has no face, and it does not know it is hungry."],
 		["Yue Ling", "Then we feed the pillars ourselves. Not with stolen years. With qi that is given."],
 		["Elder Qing Xuan", "That is the only way it can be done now. I have opened the old south-east road. It leads to the Desert of Fallen Stars. The nomads there have watched the western pillar for a thousand years."],
@@ -4805,7 +5640,7 @@ const DIALOGUE := {
 		["Narrator", "The other Lin Feng comes apart like smoke, and the nineteen names on his sleeves fly free and settle among the drifting stones like stars."],
 	],
 	"pre:hundun": [
-		["Narrator", "At the centre of everything, where the four pillars point, Hundun waits: a vast cinnabar shape with six legs and four wings and, where its face should be, nothing at all."],
+		["Narrator", "At the centre of the four pillars, where they all point, Hundun waits: a vast cinnabar shape with six legs and four wings and, where its face should be, nothing at all."],
 		["Echo of Nuwa", "Long ago, two kind gods tried to give Hundun a face. They bored seven holes in him, one each day, and on the seventh day he died, and the world was born from him."],
 		["Yue Ling", "So the world itself is built on a kindness that went wrong."],
 		["Lin Feng", "Then let us do the kindness right. Not holes. Just a face, if he wants one. Hundun! Wake up gently. We will not take anything."],
@@ -4856,15 +5691,86 @@ const DAO_LINES := {
 		"alchemy": [["Li, Who Presses Down the Earth", "You mended yourself and me with the same hand. The Deathless will like you."]],
 		"illusion": [["Li, Who Presses Down the Earth", "I pressed down on a reflection the whole fight. Is everything I pressed for four thousand years a reflection too?"]],
 	},
-	"post:s_break16": {
-		"sword": [["Narrator", "Later they will tell it as the story of the swordsman who cut nothing at all, and opened the way between three worlds with one clean stroke of kindness."]],
-		"wander": [["Narrator", "Later they will tell it as the story of the wanderer who went up to heaven and down to the dead and was home for supper, the way the Peng flies, on a wind of ninety thousand li."]],
-		"heart": [["Narrator", "Later they will tell it as the story of the cultivator whose Dao was his heart, who held three realms up only as long as he chose, and asked for help, and got it."]],
-		"formation": [["Narrator", "Later they will tell it as the story of the master of formations who drew no lines at all, only a ladder, and let everybody climb it."]],
-		"alchemy": [["Narrator", "Later they will tell it as the story of the cultivator of the cauldron who borrowed time from heaven and earth and paid it back, with interest, to everybody."]],
-		"illusion": [["Narrator", "Later they will tell it as the story of the cultivator of the mirror who showed heaven and earth their reflections in each other, so that neither ever again forgot what the other looked like."]],
+	"post:xu_fu": {
+		"sword": [["Xu Fu, Who Sought the Elixir", "You fought with one direction, the way I lived. The difference is that you can still turn round."]],
+		"wander": [["Xu Fu, Who Sought the Elixir", "You were never where I struck. I have stood in one place for two thousand years. Teach the children that, if you teach them anything."]],
+		"heart": [["Xu Fu, Who Sought the Elixir", "You held back every blow. Why? ...Because I am somebody's ancestor. I had forgotten that."]],
+		"formation": [["Xu Fu, Who Sought the Elixir", "Every step placed, like the names on the slips. I carved them in order too, once."]],
+		"alchemy": [["Xu Fu, Who Sought the Elixir", "A cauldron-walker. Then you know what I did not: no elixir is worth anything unless it is shared."]],
+		"illusion": [["Xu Fu, Who Sought the Elixir", "I struck at reflections all fight. I have been chasing one for two thousand years. It was the same one."]],
+	},
+	"post:yu_qiang": {
+		"sword": [["Yu Qiang, God of the Northern Sea", "One stroke and no orders. ...It is a strange feeling, being told nothing and agreeing anyway."]],
+		"wander": [["Yu Qiang, God of the Northern Sea", "A wind of your own, like mine. Mine only ever blew where the Court pointed it. Yours goes where it likes."]],
+		"heart": [["Yu Qiang, God of the Northern Sea", "You asked me how the turtles were before you asked me anything else. Nobody has asked me that in forty thousand years."]],
+		"formation": [["Yu Qiang, God of the Northern Sea", "Three isles, nine turtles, shifts of three. You see it too: a formation is only a kindness that has been counted."]],
+		"alchemy": [["Yu Qiang, God of the Northern Sea", "Rest is the oldest medicine. You fight like somebody who knows that."]],
+		"illusion": [["Yu Qiang, God of the Northern Sea", "Every blow I struck found a mirror. Like waiting for orders: all reflection, no light."]],
+	},
+	"post:s_break17": {
+		"sword": [["Narrator", "Later they will tell it as the story of the swordsman who cut nothing at all, and opened the way between three worlds with one clean stroke of kindness, and then put his sword away and let the sea come home."]],
+		"wander": [["Narrator", "Later they will tell it as the story of the wanderer who went up to heaven and down to the dead and out to the edge of the sea and was home for supper, the way the Peng flies, on a wind of ninety thousand li."]],
+		"heart": [["Narrator", "Later they will tell it as the story of the cultivator whose Dao was his heart, who held three realms up only as long as he chose, asked for help, got it, and taught an old magician to grow old."]],
+		"formation": [["Narrator", "Later they will tell it as the story of the master of formations who drew no lines at all, only a ladder and a shift for the turtles, and let everybody climb it and everybody rest."]],
+		"alchemy": [["Narrator", "Later they will tell it as the story of the cultivator of the cauldron who borrowed time from heaven and earth and paid it back, with interest, to everybody, and found the elixir was only water coming home."]],
+		"illusion": [["Narrator", "Later they will tell it as the story of the cultivator of the mirror who showed heaven and earth their reflections in each other, so that neither ever again forgot what the other looked like. Even the mirage of Penglai learned it was a mirage."]],
 	},
 }
+# ---------------------------------------------------------------- cutscene gestures (Part XII)
+## The gestures every Blender character can play in a conversation (art/lib/person.py GESTURES, and the
+## bow they already had).  A line of dialogue may name one as a third element: ["Speaker", "text",
+## "kneel"]; a narrator's line may direct somebody present: ["Narrator", "text", "Speaker:offer"].
+## Otherwise emote_for reads one from the words, and most lines are only talk.
+const EMOTES := ["nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock", "bow"]
+## what whoever is listening does when the speaker makes a gesture
+const EMOTE_REPLY := {"offer": "bow", "wave": "wave", "kneel": "bow", "grieve": "nod", "laugh": "nod", "bow": "bow"}
+
+static func _starts(low: String, words: Array) -> bool:
+	for wd in words:
+		if low.begins_with(wd):
+			return true
+	return false
+
+static func _has(low: String, words: Array) -> bool:
+	for wd in words:
+		if low.contains(wd):
+			return true
+	return false
+
+## [who, gesture] for a line of dialogue: the speaker (or, for a directed narrator's line, the person it
+## names) and what they do as the line begins; gesture "" for plain talk.
+static func emote_for(line: Array) -> Array:
+	var who := str(line[0])
+	if line.size() > 2:
+		var cue := str(line[2])
+		if cue.contains(":"):
+			return [cue.get_slice(":", 0), cue.get_slice(":", 1)]
+		return [who, cue]
+	if who == "Narrator":
+		return [who, ""]
+	var low := str(line[1]).to_lower().strip_edges()
+	if _starts(low, ["thank"]) or low.contains("thank you"):
+		return [who, "bow"]
+	if _has(low, ["haha", "hah!", "heh", "hehe", "ha! "]) or low.begins_with("ha!"):
+		return [who, "laugh"]
+	if _starts(low, ["no.", "no,", "no!", "never", "lies", "nobody passes"]):
+		return [who, "shake"]
+	if _has(low, ["i weep", "weeping", "my tears", "i miss", "never came back", "did not come back", "could save none", "i am sorry", "i'm sorry"]):
+		return [who, "grieve"]
+	if _starts(low, ["welcome", "greetings", "hello", "a guest", "a visitor", "a boat", "a living man", "oh, look"]):
+		return [who, "wave"]
+	if _has(low, ["take this", "take it", "for you.", "here.", "here,", "bring them to me", "i give you"]):
+		return [who, "offer"]
+	if _starts(low, ["...", "eh?", "what?", "wait"]) or low.contains("?!"):
+		return [who, "shock" if low.contains("!") else "think"]
+	if _starts(low, ["yes", "good.", "good,", "very well", "of course", "just so", "indeed", "agreed", "understood", "splendid", "then i will", "then we"]):
+		return [who, "nod"]
+	if _has(low, ["go east", "go west", "go north", "go south", "go down", "go up", "climb", "look over", "look:", "over there", "beyond the", "at the east end", "at the west end"]):
+		return [who, "point"]
+	if low.ends_with("?") and low.length() < 140:
+		return [who, "think"]
+	return [who, ""]
+
 ## Quest scenes in which one of the peoples of the realms first meets Lin Feng: the speaker adds what
 ## their people think of the Dao he walks (RACES dao_lines).
-const DAO_GREETS := ["s_p11_tree", "s_jt_intro", "s_jt_minister", "s_cg_intro", "s_ns_intro", "s_ns_elder", "s_yd_intro"]
+const DAO_GREETS := ["s_p11_tree", "s_jt_intro", "s_jt_minister", "s_cg_intro", "s_ns_intro", "s_ns_elder", "s_yd_intro", "s_pl_intro", "s_pl_immortal", "s_fz_intro"]
