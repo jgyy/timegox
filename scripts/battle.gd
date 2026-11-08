@@ -703,6 +703,7 @@ func _screen(p: Vector3) -> Vector2:
 func _draw() -> void:
 	# overhead bars / names
 	# foes only: the party stands under the command panels and has its own status panel
+	var placed: Array = []
 	for f in foes:
 		if f.dead or f.fade <= 0.5 or not f.has("node"):
 			continue
@@ -711,7 +712,16 @@ func _draw() -> void:
 		var by := sp.y + (14.0 if not f.boss else 22.0)
 		UI.bar(self, Rect2(sp.x - bw / 2, by, bw, 8), f.hp / f.maxhp, UI.C_RED)
 		var nw := 360.0 if f.boss else 200.0
-		UI.text(self, Vector2(sp.x - nw / 2, by + 24), f.name, UI.fit(f.name, 14, nw, 11), UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, nw)
+		var fs := UI.fit(f.name, 14, nw, 11)
+		var tw := minf(UI.font().get_string_size(f.name, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x, nw)
+		# a name that would run into one already drawn (two long names side by side) moves down a row
+		var lr := Rect2(sp.x - tw / 2, by + 24 - fs, tw, fs + 4)
+		var guard := 0
+		while guard < 4 and placed.any(func(q): return (q as Rect2).intersects(lr)):
+			lr.position.y += 15
+			guard += 1
+		placed.append(lr)
+		UI.text(self, Vector2(sp.x - nw / 2, lr.position.y + fs), f.name, fs, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, nw)
 	for p in fx:
 		var a := clampf(p.t, 0.0, 1.0)
 		var sp2 := _screen(p.p) + Vector2(0, -(1.0 - p.t) * 40.0)

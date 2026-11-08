@@ -26,7 +26,7 @@ const TOWN_SHOTS := {
 		["realm_heaven", "juntian", Vector2i(46, 34), Vector3(-90.0, 54.0, 110.0), Vector3(30.0, -14.0, -30.0)]],
 	"changhe": [["changhe_gate", "changhe", Vector2i(80, 30), Vector3(-44.0, 14.0, 34.0), Vector3(6.0, 14.0, 0.0)]],
 	"ninesprings": [["town_tearwater", "ninesprings", Vector2i(40, 26), Vector3(-30.0, 24.0, 30.0), Vector3(2.0, 0.0, -2.0)],
-		["jianmu_roots", "ninesprings", Vector2i(8, 30), Vector3(40.0, 8.0, 34.0), Vector3(0.0, 14.0, 0.0)],
+		["jianmu_roots", "ninesprings", Vector2i(8, 30), Vector3(36.0, 24.0, 30.0), Vector3(0.0, 12.0, 0.0)],
 		["realm_under", "ninesprings", Vector2i(44, 32), Vector3(-80.0, 26.0, 90.0), Vector3(30.0, -6.0, -30.0)]],
 	"youdu": [["town_youdu", "youdu", Vector2i(40, 30), Vector3(-30.0, 26.0, 32.0), Vector3(2.0, 0.0, -2.0)],
 		["youdu_gate", "youdu", Vector2i(72, 32), Vector3(-40.0, 12.0, 30.0), Vector3(6.0, 10.0, 0.0)]],
@@ -347,8 +347,11 @@ func _run() -> void:
 		main.world.cam_q = 1  # behind the hero, who faces east
 		main.world._snap_cam()
 		main.world.banner_t = 0.0
-		await _wait(1.2)
-		await _shot("world_" + id)
+		# --battles-only (developer tool): only the battle screenshots of the chosen regions
+		var battles_only: bool = main.args.has("battles-only")
+		await _wait(0.2 if battles_only else 1.2)
+		if not battles_only:
+			await _shot("world_" + id)
 		if main.args.has("follow"):
 			await _follow(id)
 		if main.args.has("vista"):
@@ -405,7 +408,7 @@ func _run() -> void:
 			await _wait(0.8)
 			await _shot("interior_yanggu")
 		# Part X: the towns and great landmarks, each from above at an angle
-		for shot in TOWN_SHOTS.get(id, []):
+		for shot in ([] if battles_only else TOWN_SHOTS.get(id, [])):
 			var tp: Vector3 = main.world.wpos(Atlas.to_world(shot[1], shot[2]))
 			tp.y = main.world.ground_y(tp)
 			var eye: Vector3 = tp + shot[3]
@@ -414,7 +417,7 @@ func _run() -> void:
 			await _shot(shot[0])
 			main.world.cam_override = null
 		# Part XI: upstairs and down: the hero on the floor where the stairs come out, looking into the room
-		for fshot in FLOOR_SHOTS.get(id, []):
+		for fshot in ([] if battles_only else FLOOR_SHOTS.get(id, [])):
 			var fwd: Dictionary = Atlas.world_of(fshot[1])
 			if fwd.is_empty():
 				continue
@@ -429,7 +432,7 @@ func _run() -> void:
 			main.world._snap_cam()
 			await _wait(0.8)
 			await _shot(fshot[0])
-		if not FLOOR_SHOTS.get(id, []).is_empty():
+		if not battles_only and not FLOOR_SHOTS.get(id, []).is_empty():
 			main.world.enter_layer(lid)
 			main.world.teleport(_nearest_free(Atlas.to_world(id, focus)), lid)
 		if id == "fusang":
