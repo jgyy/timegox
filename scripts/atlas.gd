@@ -55,8 +55,24 @@ const SITES := {
 ## the sect sits a little north of the mountain's middle, its south gates facing the lower slopes
 const SECT_OFFSET := Vector2i(0, -6)
 
+## The realms above and below the Unbroken Land (Part XI).  Each is a world of its own, built the way
+## the land is (sites and ways, warped ownership, land that runs out into open sky or the abyss, roads
+## and seals) on a grid of its own.  `y` is how high it is drawn above the land (metres); its grid is
+## laid over the land's so that the crown of the Jianmu in the Nine Heavens floats straight above its
+## trunk on the mountain, and its roots in the Nine Springs hang straight below it (layer_origin).
+## `land` is how far land reaches from a site (in half-sizes, like LAND); `holes` opens chasms of sky
+## or abyss in the wild ground between regions; `start` is where every road of the realm must reach.
+const STRATA := {
+	"heaven": {"n": "The Nine Heavens", "w": 260, "h": 200, "y": 96.0, "land": 1.3, "holes": 168, "start": ["juntian", Vector2i(13, 32)],
+		"sites": {"juntian": [90, 100, 0], "changhe": [192, 86, 0]}},
+	"under": {"n": "The Nine Springs", "w": 260, "h": 200, "y": -64.0, "land": 1.45, "holes": 184, "start": ["ninesprings", Vector2i(12, 30)],
+		"sites": {"ninesprings": [90, 100, 0], "youdu": [194, 112, 0]}},
+}
+const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs"}
+
 static var _layout := {}
 static var _world := {}
+static var _worlds := {}
 
 # ---------------------------------------------------------------- layout (cheap, no map generation)
 ## id -> {origin, size (as laid in the world), local (the map's own size), rot, site, cell}; plus
@@ -76,6 +92,18 @@ static func layout() -> Dictionary:
 		var site := Vector2i(s[0], s[1])
 		var origin := site - size / 2
 		L[id] = {"origin": origin, "size": size, "local": loc, "rot": rot, "site": site, "cell": Rect2i(origin, size)}
+	for lid in STRATA:
+		var sites: Dictionary = STRATA[lid].sites
+		for id2 in sites:
+			if not Data.AREAS.has(id2):
+				continue
+			var s2: Array = sites[id2]
+			var rot2: int = s2[2]
+			var loc2 := Vector2i(Data.AREAS[id2].w, Data.AREAS[id2].h)
+			var size2 := loc2 if rot2 % 2 == 0 else Vector2i(loc2.y, loc2.x)
+			var site2 := Vector2i(s2[0], s2[1])
+			var origin2 := site2 - size2 / 2
+			L[id2] = {"origin": origin2, "size": size2, "local": loc2, "rot": rot2, "site": site2, "cell": Rect2i(origin2, size2), "layer": lid}
 	var ss := Vector2i(Data.AREAS.sect.w, Data.AREAS.sect.h)
 	var so: Vector2i = L[HUB].site - ss / 2 + SECT_OFFSET
 	L["sect"] = {"origin": so, "size": ss, "local": ss, "rot": 0, "site": so + ss / 2, "cell": Rect2i(so, ss)}
@@ -84,12 +112,57 @@ static func layout() -> Dictionary:
 	_layout = L
 	return L
 
-static func region_ids() -> Array:
+## The regions of a realm, in a fixed order ("surface": the mountain, the sect and the land's own).
+static func region_ids(layer: String = "surface") -> Array:
+	if layer != "surface":
+		var lo: Array = []
+		if STRATA.has(layer):
+			for id2 in STRATA[layer].sites:
+				if Data.AREAS.has(id2):
+					lo.append(id2)
+		return lo
 	var out: Array = [HUB, "sect"]
 	for id in SITES:
 		if id != HUB and Data.AREAS.has(id):
 			out.append(id)
 	return out
+
+## Every region of every realm.
+static func all_region_ids() -> Array:
+	var out := region_ids("surface")
+	for lid in STRATA:
+		out.append_array(region_ids(lid))
+	return out
+
+static func layer_of(id: String) -> String:
+	return Data.layer_of(id)
+
+## The grid size of a realm.
+static func layer_size(layer: String) -> Vector2i:
+	if STRATA.has(layer):
+		return Vector2i(int(STRATA[layer].w), int(STRATA[layer].h))
+	return Vector2i(W_WORLD, H_WORLD)
+
+## How high a realm is drawn above the land (metres).
+static func layer_y(layer: String) -> float:
+	return float(STRATA[layer].y) if STRATA.has(layer) else 0.0
+
+## Where a realm's grid lies over the land's (tiles): the end of the Jianmu's ladder in the realm sits
+## straight above (or below) its end on the mountain.
+static func layer_origin(layer: String) -> Vector2i:
+	if not STRATA.has(layer):
+		return Vector2i.ZERO
+	for ld in Data.LADDERS:
+		for e in [["a", "b"], ["b", "a"]]:
+			var here: Array = ld[e[0]]
+			var there: Array = ld[e[1]]
+			if Data.layer_of(here[0]) == "surface" and Data.layer_of(there[0]) == layer:
+				return to_world(here[0], here[1]) - to_world(there[0], there[1])
+	return Vector2i.ZERO
+
+## Floors of buildings (upper storeys and cellars) are small realms of their own: "f:<area>:<building>:<level>".
+static func floor_id(area: String, bid: String, level: int) -> String:
+	return "f:%s:%s:%d" % [area, bid, level]
 
 ## local tile of region `id` (as written in Data.AREAS) -> world tile
 static func to_world(id: String, p: Vector2i) -> Vector2i:
@@ -144,7 +217,20 @@ static func rect_to_world(id: String, r: Rect2i) -> Rect2i:
 static func world() -> Dictionary:
 	if _world.is_empty():
 		_world = _build()
+		_worlds["surface"] = _world
 	return _world
+
+## The world of a realm ("surface", "heaven", "under") or of a building's floor ("f:..."), built once.
+static func world_of(layer: String) -> Dictionary:
+	if layer == "surface":
+		return world()
+	if layer.begins_with("f:"):
+		var parts := layer.split(":")
+		var parent := world_of(Data.layer_of(parts[1]))
+		return parent.floors.get(layer, {})
+	if not _worlds.has(layer):
+		_worlds[layer] = _build(layer)
+	return _worlds[layer]
 
 ## A noise field over the whole world as bytes (0..255 for -1..1), generated natively: per-tile
 ## FastNoiseLite calls from GDScript would dominate the build time on a world this size.
@@ -155,19 +241,23 @@ static func _field(seed_: int, freq: float, octaves: int, W: int, H: int) -> Pac
 	n.fractal_octaves = octaves
 	return n.get_image(W, H, false, false, false).get_data()
 
-static func _build() -> Dictionary:
+static func _build(layer: String = "surface") -> Dictionary:
 	var L := layout()
-	var W: int = L._W
-	var H: int = L._H
+	var surf := layer == "surface"
+	var lsz := layer_size(layer)
+	var W: int = lsz.x
+	var H: int = lsz.y
 	var N := W * H
-	var ids := region_ids()
+	var ids := region_ids(layer)
 	var idx := {}
 	for i in ids.size():
 		idx[ids[i]] = i
 	var maps := {}
 	for id in ids:
 		maps[id] = MapGen.build(id)
-	var sect_r: Rect2i = L.sect.cell
+	# (the realms above and below have no sect: an empty rectangle contains nothing)
+	var sect_r: Rect2i = L.sect.cell if surf else Rect2i(-9999, -9999, 0, 0)
+	var land_far: float = LAND if surf else float(STRATA[layer].land)
 	# ---- pins: the land round everything that matters in a region belongs to that region, however
 	# far the border wanders (its look, its name on the screen, its kills)
 	var pin := PackedInt32Array()
@@ -243,10 +333,10 @@ static func _build() -> Dictionary:
 	owner.resize(N)
 	var sea := PackedByteArray()
 	sea.resize(N)
-	var k_sect: int = idx.sect
-	var k_hub_site := 0
+	var k_sect: int = idx.get("sect", -1)
+	var k_hub_site := -1
 	for k in ns:
-		if sid[k] == idx[HUB]:
+		if sid[k] == idx.get(HUB, -2):
 			k_hub_site = k
 	for y in H:
 		var row := y * W
@@ -273,7 +363,7 @@ static func _build() -> Dictionary:
 			owner[i] = o
 			# the coast: land reaches about LAND half-sizes out from the nearest site (the mountain
 			# is broad, so its own shores come in closer)
-			var reach_land := (LAND_HUB if bk == k_hub_site else LAND) + (coast[i] / 127.5 - 1.0) * 0.45
+			var reach_land := (LAND_HUB if bk == k_hub_site else land_far) + (coast[i] / 127.5 - 1.0) * 0.45
 			# ... and fades out towards the edge of the world, which is always open sea
 			reach_land *= clampf(mini(mini(x, y), mini(W - 1 - x, H - 1 - y)) / 30.0, 0.0, 1.0)
 			if pin[i] < 0 and o != k_sect and sqrt(bd) > reach_land:
@@ -291,10 +381,15 @@ static func _build() -> Dictionary:
 	var lake := _field(7070, 0.022, 2, W, H)
 	for id in ids:
 		_stamp_region(grid, owner, sea, W, H, id, idx[id], maps[id], sect_r)
-	# lakes in the wild forest between regions (never in a region's open ground or by its people)
+	# lakes in the wild forest between regions (never in a region's open ground or by its people); in
+	# the realms above and below they are chasms instead, down through the islands to the clouds or the
+	# abyss
+	var holes: int = 200 if surf else int(STRATA[layer].holes)
 	for i in N:
-		if grid[i] == MapGen.WALL and pin[i] < 0 and lake[i] > 200 and owner[i] != k_sect:
+		if grid[i] == MapGen.WALL and pin[i] < 0 and lake[i] > holes and owner[i] != k_sect:
 			grid[i] = MapGen.WATER
+			if not surf:
+				sea[i] = 1
 	# every region's open ground hangs together, inside its own land
 	for id in ids:
 		if id == "sect" or id == HUB:
@@ -303,10 +398,11 @@ static func _build() -> Dictionary:
 	# ---- the belt between regions: forest and rock where two regions meet (it never opens anything)
 	_belts(grid, owner, pin, W, H, k_sect)
 	# ---- the sect's pagoda stands on the mountain north-west of the courtyard
-	var pag := sect_r.position + Vector2i(-5, 3)
-	for yy in range(pag.y - 1, pag.y + 2):
-		for xx in range(pag.x - 1, pag.x + 2):
-			grid[yy * W + xx] = MapGen.BUILDING
+	if surf:
+		var pag := sect_r.position + Vector2i(-5, 3)
+		for yy in range(pag.y - 1, pag.y + 2):
+			for xx in range(pag.x - 1, pag.x + 2):
+				grid[yy * W + xx] = MapGen.BUILDING
 	# ---- roads between gates, seals where the story has not opened the way yet
 	var road_cost := _field(8080, 0.045, 2, W, H)
 	var blocked := {}
@@ -320,7 +416,7 @@ static func _build() -> Dictionary:
 	for a in ids:
 		for p in Data.AREAS[a].get("portals", []):
 			var b: String = p.to
-			if not Data.AREAS.has(b) or not L.has(b):
+			if not Data.AREAS.has(b) or not L.has(b) or not idx.has(b):
 				continue
 			var key := [a, b]
 			key.sort()
@@ -356,6 +452,7 @@ static func _build() -> Dictionary:
 	# ---- entities, in world tiles
 	var ents: Array = []
 	var buildings: Array = []
+	var floor_ents: Array = []
 	for id in ids:
 		var m: Dictionary = maps[id]
 		for e in m.ents:
@@ -364,9 +461,15 @@ static func _build() -> Dictionary:
 			var ge: Dictionary = e.duplicate(true)
 			ge.pos = to_world(id, e.pos)
 			ge["area"] = id
+			ge["layer"] = layer
 			if ge.kind == "enemy":
 				ge.id = id + ":" + str(e.id)
 			ents.append(ge)
+		for fe in m.floor_ents:
+			var gf: Dictionary = fe.duplicate(true)
+			gf.pos = to_world(id, fe.pos)
+			gf["area"] = id
+			floor_ents.append(gf)
 		for bd in m.buildings:
 			var gb2: Dictionary = bd.duplicate(true)
 			gb2.rect = rect_to_world(id, bd.rect)
@@ -376,12 +479,47 @@ static func _build() -> Dictionary:
 			for pr in bd.get("props", []):
 				props.append([pr[0], to_world(id, pr[1]), pr.size() > 2 and pr[2]])
 			gb2.props = props
+			# an upper storey and a cellar: their stairs and furniture in world tiles too
+			for key2 in [["up", "upper"], ["down", "cellar"]]:
+				if not bd.has(key2[0]):
+					continue
+				gb2[key2[0]] = to_world(id, bd[key2[0]])
+				var fprops: Array = []
+				for pr2 in bd[key2[1]].get("props", []):
+					fprops.append([pr2[0], to_world(id, pr2[1]), pr2.size() > 2 and pr2[2]])
+				gb2[key2[1]] = {"n": str(bd[key2[1]].get("n", "")), "props": fprops}
 			buildings.append(gb2)
+		# the ladders between the realms that have an end in this region
+		for le in MapGen.ladder_ends(id):
+			var ld: Dictionary = le[2]
+			var other: Array = ld["b" if le[3] == "a" else "a"]
+			var to_layer := Data.layer_of(other[0])
+			ents.append({"kind": "ladder", "id": "%s:%s" % [ld.id, le[3]], "n": ld["n" + str(le[3])], "pos": to_world(id, le[0]), "area": id, "layer": layer,
+				"to_layer": to_layer, "to_tile": to_world(other[0], other[1] + other[2]), "open": ld.open, "style": str(ld.get("style", "climb")),
+				"dir": 1 if layer_y(to_layer) > layer_y(layer) else -1})
 	for s in seals:
+		s["layer"] = layer
 		ents.append(s)
 	var start := to_world("sect", Vector2i(20, 8))
+	if not surf:
+		var st: Array = STRATA[layer].start
+		start = to_world(st[0], st[1])
+	# ---- the floors of buildings with an upper storey or a cellar, and the stairs to them
+	var floors := {}
+	for bd2 in buildings:
+		for lv in [1, -1]:
+			var fl_key := "upper" if lv == 1 else "cellar"
+			if not bd2.has(fl_key):
+				continue
+			var fw := _floor(layer, bd2, lv, grid, W, H, ents, floor_ents)
+			floors[fw.layer] = fw
 	# ---- every entity must be reachable from the sect with all seals open
-	_connect(grid, W, H, owner, idx, ents, start)
+	_connect(grid, W, H, owner, idx, ents, start, sea)
+	# a monster pack the borders left on a pocket of its region's land that no trail of the region can
+	# reach is dropped (only ever happens among the floating islands and chasms of the realms above
+	# and below)
+	var reach_e := MapGen.flood(grid, W, H, start)
+	ents = ents.filter(func(e): return e.kind != "enemy" or reach_e.has(e.pos))
 	# ---- each region's cell: the bounding box of the land it owns
 	var lo: Array = []
 	var hi: Array = []
@@ -405,7 +543,68 @@ static func _build() -> Dictionary:
 		if hi[o2].x >= 0:
 			L[id].cell = Rect2i(lo[o2], hi[o2] - lo[o2] + Vector2i.ONE)
 	return {"w": W, "h": H, "grid": grid, "owner": owner, "sea": sea, "ids": ids, "idx": idx, "ents": ents, "buildings": buildings,
-		"start": start, "layout": L, "maps": maps}
+		"start": start, "layout": L, "maps": maps, "layer": layer, "floors": floors, "origin": layer_origin(layer), "y": layer_y(layer)}
+
+## A building's upper storey (`lv` 1) or cellar (-1) as a small world of its own, the size of the
+## building's rectangle (its own tiles start at the rectangle's corner), with the people and things
+## that live on it and the stairs back down (or up); the stairs to it are added to the realm's
+## entities.  Each flight of stairs puts a traveller on the first free tile beside the other end,
+## nearest the middle of the room.
+static func _floor(layer: String, bd: Dictionary, lv: int, grid: PackedByteArray, W: int, H: int, ents: Array, floor_ents: Array) -> Dictionary:
+	var r: Rect2i = bd.rect
+	var area: String = bd.area
+	var fl: Dictionary = bd.upper if lv == 1 else bd.cellar
+	var stairs: Vector2i = bd.up if lv == 1 else bd.down
+	var g := MapGen.floor_grid(r, fl, stairs)
+	var fid := floor_id(area, bd.id, lv)
+	var fents: Array = []
+	var taken := {stairs - r.position: true}
+	for fe in floor_ents:
+		if fe.area == area and str(fe.floor[0]) == str(bd.id) and int(fe.floor[1]) == lv:
+			var e: Dictionary = fe.duplicate(true)
+			e.erase("floor")
+			e.pos = fe.pos - r.position
+			e["layer"] = fid
+			fents.append(e)
+			taken[e.pos] = true
+	var owner := PackedByteArray()
+	owner.resize(r.size.x * r.size.y)
+	var mid := Vector2(r.size) * 0.5
+	var arrive := _beside(g, r.size.x, r.size.y, stairs - r.position, taken, mid)
+	# where the stairs come out on the realm's own floor (the ground floor of the building)
+	var taken2 := {}
+	for e2 in ents:
+		if r.has_point(e2.pos):
+			taken2[e2.pos] = true
+	taken2[stairs] = true
+	var back := _beside(grid, W, H, stairs, taken2, Vector2(r.position) + mid)
+	var fname := str(fl.get("n", ""))
+	fents.append({"kind": "ladder", "id": "stairs:%s:%s:%d:back" % [area, bd.id, lv], "n": "Stairs down" if lv == 1 else "Stairs up", "pos": stairs - r.position,
+		"area": area, "layer": fid, "to_layer": layer, "to_tile": back, "open": "", "style": "stairs", "dir": -lv})
+	ents.append({"kind": "ladder", "id": "stairs:%s:%s:%d" % [area, bd.id, lv], "n": ("Up to " if lv == 1 else "Down to ") + fname, "pos": stairs,
+		"area": area, "layer": layer, "to_layer": fid, "to_tile": arrive, "open": "", "style": "stairs", "dir": lv})
+	var lprops: Array = []
+	for pr in fl.get("props", []):
+		lprops.append([pr[0], pr[1] - r.position, pr[2]])
+	return {"layer": fid, "kind": "floor", "parent": layer, "bld": bd.id, "bld_n": bd.n, "floor_n": fname, "level": lv, "area": area,
+		"w": r.size.x, "h": r.size.y, "origin": r.position, "grid": g, "owner": owner, "sea": PackedByteArray(), "ids": [area], "idx": {area: 0},
+		"ents": fents, "buildings": [], "start": arrive, "floors": {}, "y": 0.0, "props": lprops, "stairs": stairs - r.position, "style": str(bd.get("style", "house"))}
+
+## The free tile beside `at` (4-neighbours) nearest `toward`, skipping tiles in `taken`.
+static func _beside(g: PackedByteArray, w: int, h: int, at: Vector2i, taken: Dictionary, toward: Vector2) -> Vector2i:
+	var best := at
+	var bd := 1e20
+	for d in MapGen.DIRS:
+		var n: Vector2i = at + d
+		if n.x < 0 or n.y < 0 or n.x >= w or n.y >= h or taken.has(n):
+			continue
+		if not MapGen.is_walkable_tile(g[n.y * w + n.x]):
+			continue
+		var dd := (Vector2(n) + Vector2(0.5, 0.5)).distance_squared_to(toward)
+		if dd < bd:
+			bd = dd
+			best = n
+	return best
 
 ## Raise land along the straight way between every pair of gates a road will join (on the two
 ## regions' own land only), so the coast never cuts a road.
@@ -456,6 +655,8 @@ static func _spots(id: String, m: Dictionary) -> Array:
 	for p in Data.AREAS[id].get("portals", []):
 		spots.append([p.pos, 4])
 		spots.append([p.dest, 3])
+	for le in MapGen.ladder_ends(id):
+		spots.append([le[0], 4])
 	return spots
 
 ## Stamp region `id`'s own map into the world where it owns the land.
@@ -514,6 +715,8 @@ static func _reconnect(grid: PackedByteArray, owner: PackedByteArray, W: int, H:
 		need.append(a)
 	for p in Data.AREAS[id].get("portals", []):
 		need.append(p.pos)
+	for le in MapGen.ladder_ends(id):
+		need.append(le[0])
 	for _pass in 40:
 		var reach := MapGen.flood(local, mw, mh, start)
 		var miss := false
@@ -747,7 +950,7 @@ static func _seal(rd: Dictionary, id: String, at: Vector2i, from_tile: Vector2i,
 	return {"kind": "seal", "id": "seal_" + id, "area": id, "to": id, "from": from, "pos": at, "tiles": tiles, "open": req, "axis": at - from_tile}
 
 ## Any entity the borders cut off is reconnected by a trail inside its own region.
-static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, idx: Dictionary, ents: Array, start: Vector2i) -> void:
+static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, idx: Dictionary, ents: Array, start: Vector2i, sea: PackedByteArray = PackedByteArray()) -> void:
 	for _pass in 6:
 		var reach := MapGen.flood(grid, W, H, start)
 		var fixed := 0
@@ -787,9 +990,13 @@ static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArr
 			while cur != e.pos:
 				if not MapGen.is_walkable_tile(grid[cur.y * W + cur.x]):
 					grid[cur.y * W + cur.x] = MapGen.FLOOR
+					if not sea.is_empty():
+						sea[cur.y * W + cur.x] = 0
 				cur = prev[cur]
 			if not MapGen.is_walkable_tile(grid[cur.y * W + cur.x]):
 				grid[cur.y * W + cur.x] = MapGen.FLOOR
+				if not sea.is_empty():
+					sea[cur.y * W + cur.x] = 0
 		if fixed == 0:
 			return
 

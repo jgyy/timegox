@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 12.0 * 3600.0
+var max_time := 15.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -45,7 +45,11 @@ var time_by_area := {}
 var gave_up := ""
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-const HEALS := ["river_mother", "moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
+const HEALS := ["jianmu_ward", "river_mother", "moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain", "lotus_heart"]
+## Part XI: the Dao the bot walks from each quest step on (it chooses the first from the Elder, and
+## changes roads at a Dao Stele when it reaches the later steps, as a player trying the Daos would)
+const DAO_PLAN := [["s_p11_home", "sword"], ["s_ns_intro", "heart"]]
+var last_layer := ""
 
 func _ready() -> void:
 	world = main.world
@@ -121,6 +125,12 @@ func _process(d: float) -> void:
 		path = []
 		dwell = 0.0
 		grind_target = ""
+	if world.layer != last_layer:
+		# up or down a ladder or the stairs: tiles are a different realm's now
+		last_layer = world.layer
+		path = []
+		path_key = ""
+		grind_target = ""
 	if top != last_top:
 		if last_top == "shop":
 			shop_done[main.shop.kind] = true
@@ -153,6 +163,8 @@ func _process(d: float) -> void:
 			_shop()
 		"meditate":
 			_meditate()
+		"choice":
+			_choice()
 		"ending":
 			cool = 2.0
 			await _shot("ending")
@@ -234,6 +246,10 @@ func _want_shop() -> String:
 
 func _world(d: float) -> void:
 	dwell += d
+	if world.traveling():
+		# on a ladder or the stairs
+		world.move_dir = Vector2i.ZERO
+		return
 	# stuck watchdog
 	if world.ptile == last_tile and world.move_dir != Vector2i.ZERO:
 		stuck_t += d
@@ -256,6 +272,13 @@ func _world(d: float) -> void:
 	if shop != "":
 		_goto_entity("sect", shop)
 		return
+	# 2b) Part XI: change roads at a Dao Stele when the plan says so
+	var want_dao := _planned_dao()
+	if want_dao != "" and Game.dao != "" and Game.dao != want_dao:
+		var st = _nearest_stele()
+		if st != null:
+			_walk_to(st.pos, "stele:" + str(st.id))
+			return
 	# 3) quest objective
 	match s.kind:
 		"talk":
@@ -264,12 +287,13 @@ func _world(d: float) -> void:
 			if not _cult_met():
 				_grind()
 		"collect":
-			if Game.area != s.area:
+			if Game.area != s.area or world.layer != Data.layer_of(s.area):
+				# (upstairs or in a cellar of the region: the things to find are out in it, Part XI)
 				_travel(s.area)
 			else:
 				_goto_nearest("pickup", s.item)
 		"hunt":
-			if Game.area != s.area:
+			if Game.area != s.area or world.layer != Data.layer_of(s.area):
 				_travel(s.area)
 			elif _hp_ratio() < 0.6:
 				_start_meditate("rest")
@@ -386,26 +410,113 @@ func _goto_nearest(kind: String, item: String) -> void:
 func _goto_entity(area: String, id: String) -> void:
 	var e = world.find_ent(id)
 	if e == null:
+		# in another realm or on another floor (Part XI): head for the ladder or stairs towards it
+		var hit: Array = world.locate_ent(id)
+		if not hit.is_empty():
+			_goto_layer(str(hit[0]))
+			return
 		_travel(area)
 		return
 	_walk_to(e.pos, "ent:" + id)
 
-## Walk to where travellers arrive in region `dest` (the open world has no gates to step through).
+## Walk to where travellers arrive in region `dest` (the open world has no gates to step through),
+## by way of the ladders if it lies in another realm.
 func _travel(dest: String) -> void:
+	var lid := Data.layer_of(dest)
+	if lid != world.layer:
+		_goto_layer(lid)
+		return
 	var goal := Atlas.to_world("sect", Vector2i(20, 8))
 	if dest != "sect":
 		var arr: Array = MapGen.arrival_tiles(dest)
 		if not arr.is_empty():
 			goal = Atlas.to_world(dest, arr[0])
+		else:
+			# a realm's first region has no road in: its ladder end is where travellers arrive
+			for le in MapGen.ladder_ends(dest):
+				goal = Atlas.to_world(dest, le[0] + le[1])
 	_walk_to(goal, "travel:" + dest)
+
+## Head for the ladder or stairs that leads one step nearer realm (or floor) `target`: a breadth-first
+## search over the realms the open ladders join.
+func _goto_layer(target: String) -> void:
+	var lad = _ladder_towards(target)
+	if lad == null:
+		world.move_dir = Vector2i.ZERO
+		return
+	_walk_to(lad.pos, "ladder:" + str(lad.id))
+
+func _ladder_towards(target: String):
+	var start: String = world.layer
+	var prev := {start: null}
+	var q: Array = [start]
+	var i := 0
+	while i < q.size():
+		var cur: String = q[i]
+		i += 1
+		if cur == target:
+			break
+		for e in _realm_ents(cur):
+			if e.kind != "ladder" or not world.ladder_open(e):
+				continue
+			var nx: String = str(e.to_layer)
+			if not prev.has(nx):
+				prev[nx] = [cur, e]
+				q.append(nx)
+	if not prev.has(target) or target == start:
+		return null
+	var step = prev[target]
+	while step[0] != start:
+		step = prev[step[0]]
+	return step[1]
+
+func _realm_ents(lid: String) -> Array:
+	var lw: Dictionary = Atlas.world_of(lid)
+	return lw.get("ents", [])
+
+## Part XI: the Dao the plan wants for the current quest step ("" before Part XI).
+func _planned_dao() -> String:
+	var want := ""
+	for pl in DAO_PLAN:
+		if Game.reached(pl[0]):
+			want = pl[1]
+	return want
+
+func _nearest_stele():
+	var best = null
+	var bd := 1 << 30
+	for e in world.ents:
+		if e.kind == "stele" and world.ent_visible(e):
+			var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+			if dd < bd:
+				bd = dd
+				best = e
+	return best
+
+## The choice screen (Part XI): the Dao the plan wants; a gift is kept.
+func _choice() -> void:
+	var c = main.choice
+	var ids: Array = c.ids()
+	var want := -1
+	if ids.has("sword"):
+		want = ids.find(_planned_dao() if _planned_dao() != "" else "sword")
+	elif ids.has("keep"):
+		want = ids.find("keep")
+	if want < 0:
+		want = 0
+	_nav(ids.size(), c.cursor, want)
 
 # ---------------------------------------------------------------- pathing
 var astar: AStarGrid2D = null
+var astars := {}
 
+## The path grid of the realm (or floor) the hero is in, built once per realm.
 func _astar() -> AStarGrid2D:
-	if astar != null:
+	if astars.has(world.layer):
+		astar = astars[world.layer]
 		return astar
 	astar = AStarGrid2D.new()
+	astars[world.layer] = astar
 	astar.region = Rect2i(0, 0, world.w, world.h)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
@@ -604,7 +715,7 @@ func _plan(b) -> Dictionary:
 		if me.skills.has(hid):
 			heal_id = hid
 			break
-	var heal_cost: float = Data.SKILLS[heal_id].cost
+	var heal_cost: float = Game.skill_cost(heal_id)
 	# an ally has fallen: raise them if a reviving heal is known
 	if allies.size() < b.party.size() and me.skills.has(heal_id) and me.qi >= heal_cost and Data.SKILLS[heal_id].get("revive", false):
 		return {"top": "skills", "skill": heal_id}
@@ -622,7 +733,7 @@ func _plan(b) -> Dictionary:
 	best_score = 1.0
 	for sid in me.skills:
 		var sk: Dictionary = Data.SKILLS[sid]
-		if sk.has("heal") or me.qi < sk.cost or sk.cost == 0:
+		if sk.has("heal") or me.qi < Game.skill_cost(sid) or sk.cost == 0:
 			continue
 		var tgt: Dictionary = _weakest(foes, sk.elem)
 		var score: float = sk.mult * (1.5 if tgt.weak == sk.elem else 1.0)

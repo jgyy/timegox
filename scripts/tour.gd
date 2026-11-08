@@ -6,17 +6,39 @@ extends Node
 var main
 var dir := ""
 
-const ELEMS := {"sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder", "longmen": "earth", "drowned": "earth", "tushan": "water", "buzhou": "earth"}
+const ELEMS := {"juntian": "thunder", "changhe": "wood", "ninesprings": "thunder", "youdu": "fire", "sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder", "longmen": "earth", "drowned": "earth", "tushan": "water", "buzhou": "earth"}
 
 ## [shot name, area, a tile of that area's own map to look at, eye offset, look-at offset]
 const TOWN_SHOTS := {
-	"sect": [["town_cloudfoot", "mountain", Vector2i(82, 34), Vector3(-26.0, 30.0, 34.0), Vector3(0.0, 0.0, -4.0)]],
+	"sect": [["town_cloudfoot", "mountain", Vector2i(82, 34), Vector3(-26.0, 30.0, 34.0), Vector3(0.0, 0.0, -4.0)],
+		# Part XI: the Jianmu, grown overnight on the open ground west of the sect
+		["jianmu", "mountain", Vector2i(34, 54), Vector3(-30.0, 10.0, 62.0), Vector3(0.0, 46.0, 0.0)],
+		["jianmu_foot", "mountain", Vector2i(34, 60), Vector3(-10.0, 5.0, 14.0), Vector3(0.0, 6.0, -6.0)]],
 	"dunes": [["town_shazhou", "dunes", Vector2i(12, 40), Vector3(-24.0, 26.0, 30.0), Vector3(0.0, 0.0, 0.0)]],
 	"longmen": [["town_longmen", "longmen", Vector2i(28, 30), Vector3(-30.0, 30.0, 26.0), Vector3(4.0, 0.0, -2.0)],
 		["dragon_gate", "longmen", Vector2i(54, 3), Vector3(46.0, 12.0, 10.0), Vector3(0.0, 9.0, 0.0)]],
 	"tushan": [["town_tushan", "tushan", Vector2i(28, 26), Vector3(-26.0, 28.0, 30.0), Vector3(0.0, 0.0, -2.0)],
 		["great_cauldron", "tushan", Vector2i(38, 22), Vector3(-12.0, 8.0, 12.0), Vector3(0.0, 3.0, 0.0)]],
 	"buzhou": [["buzhou_pillar", "buzhou", Vector2i(70, 20), Vector3(-52.0, 18.0, 46.0), Vector3(0.0, 22.0, 0.0)]],
+	# Part XI: the realms above and below, their towns and the great tree between them
+	"juntian": [["town_featherfall", "juntian", Vector2i(42, 30), Vector3(-30.0, 30.0, 32.0), Vector3(2.0, 0.0, -4.0)],
+		["jianmu_crown", "juntian", Vector2i(9, 32), Vector3(46.0, 10.0, 40.0), Vector3(0.0, 16.0, 0.0)],
+		["realm_heaven", "juntian", Vector2i(46, 34), Vector3(-90.0, 54.0, 110.0), Vector3(30.0, -14.0, -30.0)]],
+	"changhe": [["changhe_gate", "changhe", Vector2i(80, 30), Vector3(-44.0, 14.0, 34.0), Vector3(6.0, 14.0, 0.0)]],
+	"ninesprings": [["town_tearwater", "ninesprings", Vector2i(40, 26), Vector3(-30.0, 24.0, 30.0), Vector3(2.0, 0.0, -2.0)],
+		["jianmu_roots", "ninesprings", Vector2i(8, 30), Vector3(40.0, 8.0, 34.0), Vector3(0.0, 14.0, 0.0)],
+		["realm_under", "ninesprings", Vector2i(44, 32), Vector3(-80.0, 26.0, 90.0), Vector3(30.0, -6.0, -30.0)]],
+	"youdu": [["town_youdu", "youdu", Vector2i(40, 30), Vector3(-30.0, 26.0, 32.0), Vector3(2.0, 0.0, -2.0)],
+		["youdu_gate", "youdu", Vector2i(72, 32), Vector3(-40.0, 12.0, 30.0), Vector3(6.0, 10.0, 0.0)]],
+}
+## Part XI: upstairs and down in the buildings: [shot name, floor id]
+const FLOOR_SHOTS := {
+	"sect": [["cellar_sealed_archive", "f:sect:library:-1"], ["cellar_ancestral_crypt", "f:sect:hall:-1"], ["upper_dormitory", "f:sect:dormitory:1"]],
+	"juntian": [["upper_aerie_tower", "f:juntian:aerie_tower:1"], ["cellar_archive_of_rain", "f:juntian:rain_ministry:-1"], ["cellar_egg_nursery", "f:juntian:egg_nursery:-1"]],
+	"changhe": [["upper_moon_terrace", "f:changhe:fox_pavilion:1"]],
+	"ninesprings": [["cellar_pearl_vault", "f:ninesprings:pearl_hall:-1"], ["upper_root_loft", "f:ninesprings:root_house:1"]],
+	"youdu": [["upper_ward_office", "f:youdu:ward_office:1"], ["cellar_deep_hall", "f:youdu:earth_palace:-1"]],
+	"longmen": [["upper_guest_rooms", "f:longmen:carp_inn:1"]],
 }
 
 func _stop(id: String) -> Array:
@@ -317,7 +339,10 @@ func _run() -> void:
 			focus = spec.npcs[0].pos + Vector2i(0, 3)
 		main.set_stack(["world"])
 		main.world.open_world()
-		main.world.teleport(_nearest_free(Atlas.to_world(id, focus)))
+		# (the realm the region lies in first: its tiles are its own, Part XI)
+		var lid: String = Data.layer_of(id)
+		main.world.enter_layer(lid)
+		main.world.teleport(_nearest_free(Atlas.to_world(id, focus)), lid)
 		main.world.facing = Vector2i(1, 0)
 		main.world.cam_q = 1  # behind the hero, who faces east
 		main.world._snap_cam()
@@ -381,13 +406,32 @@ func _run() -> void:
 			await _shot("interior_yanggu")
 		# Part X: the towns and great landmarks, each from above at an angle
 		for shot in TOWN_SHOTS.get(id, []):
-			var tp := Terrain3D.world_pos(Atlas.to_world(shot[1], shot[2]))
+			var tp: Vector3 = main.world.wpos(Atlas.to_world(shot[1], shot[2]))
 			tp.y = main.world.ground_y(tp)
 			var eye: Vector3 = tp + shot[3]
 			main.world.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(tp + shot[4], Vector3.UP)
 			await _wait(0.8)
 			await _shot(shot[0])
 			main.world.cam_override = null
+		# Part XI: upstairs and down: the hero on the floor where the stairs come out, looking into the room
+		for fshot in FLOOR_SHOTS.get(id, []):
+			var fwd: Dictionary = Atlas.world_of(fshot[1])
+			if fwd.is_empty():
+				continue
+			main.world.teleport(fwd.start, fshot[1])
+			var mid := Vector2(fwd.w, fwd.h) * 0.5
+			var dv := mid - Vector2(fwd.start)
+			var fdir := Vector2i(signi(int(dv.x)), 0) if absf(dv.x) > absf(dv.y) else Vector2i(0, signi(int(dv.y)))
+			if fdir == Vector2i.ZERO:
+				fdir = Vector2i(0, 1)
+			main.world.facing = fdir
+			main.world.cam_q = main.world.FWD.find(fdir)
+			main.world._snap_cam()
+			await _wait(0.8)
+			await _shot(fshot[0])
+		if not FLOOR_SHOTS.get(id, []).is_empty():
+			main.world.enter_layer(lid)
+			main.world.teleport(_nearest_free(Atlas.to_world(id, focus)), lid)
 		if id == "fusang":
 			# the colossal Fusang across the valley, the stuck sun glowing in its crown
 			var fo := Terrain3D.world_pos(Atlas.to_world("fusang", Data.AREAS.fusang.landmark.pos))
@@ -505,6 +549,25 @@ func _run() -> void:
 		await _gallery("gallery_part10", [
 			_foe("he_bo", true), _foe("gun", true), _foe("taotie", true), _foe("xiangliu", true), _foe("gonggong", true),
 		], 1.7)
+	# Part XI: the peoples of the realms above and below and the bosses of the Ladder of Heaven
+	# (--gallery11 shoots only these)
+	if main.args.has("gallery") or main.args.has("gallery11") or not main.args.has("no-extras"):
+		await _gallery("gallery_yumin_dragons", [
+			Assets.person("ling_yu"), Assets.person("yu_hua"), Assets.person("yu_jian"), Assets.person("egg_warden_luan"),
+			Assets.person("que_er"), Assets.person("ao_run"), Assets.person("ao_qing"),
+		], 0.76)
+		await _gallery("gallery_foxes_jiaoren", [
+			Assets.person("hu_qingyi"), Assets.person("hu_meier"), Assets.person("gate_fox_hu"),
+			Assets.person("shui_lian"), Assets.person("hai_ge"), Assets.person("little_bei"),
+		], 0.8)
+		await _gallery("gallery_deathless_shades", [
+			Assets.person("bu_si"), Assets.person("chang_sheng"), Assets.person("houtu"),
+			Assets.person("ming_yi"), Assets.person("zhi_ma"), Assets.person("shade_lan"),
+		], 0.8)
+		await _gallery("gallery_part11", [
+			_foe("leigong", true), _foe("jiufeng", true), _foe("zhulong", true), _foe("hei_wuchang", true),
+			_foe("tubo", true), _foe("li", true),
+		], 1.5)
 	if main.args.has("gallery") or not main.args.has("no-extras"):
 		await _gallery("gallery_people", [
 			Models.person(Color("3a8ae8"), Color("1a1a2a"), main.world.HERO_OPTS),
@@ -643,6 +706,32 @@ func _run() -> void:
 		await _wait(0.3)
 		await _shot("annals")
 		main.pop()
+		main.pop()
+	if main.args.has("daos"):
+		# Part XI: choosing a road at a Dao Stele, the Dao and peoples page, the maps of the realms
+		Game.dao = "heart"
+		Game.dao_xp = {"heart": 22, "sword": 44, "wander": 3}
+		Game.standing = {"yumin": 64, "dragon": 38, "tianhu": 51, "jiaoren": 20, "deathless": 8, "shade": 70}
+		Game.met = {"yumin": true, "dragon": true, "tianhu": true, "jiaoren": true, "deathless": true, "shade": true}
+		main.world.load_area("sect", Vector2i(16, 12))
+		main.open_dao_choice("stele")
+		main.choice.cursor = 2
+		await _wait(0.5)
+		await _shot("dao_choice")
+		main.pop()
+		main.open_menu()
+		main.menu.mode = "dao"
+		main.menu._build()
+		await _wait(0.4)
+		await _shot("dao_peoples")
+		main.menu.mode = "map"
+		for rid3 in Atlas.all_region_ids():
+			Game.seen[rid3] = true
+		for ml in ["surface", "heaven", "under"]:
+			main.menu.map_layer = ml
+			main.menu._build()
+			await _wait(0.4)
+			await _shot("world_map" if ml == "surface" else "world_map_" + ml)
 		main.pop()
 	if main.args.has("ending"):
 		# the results screen on its own (--ending): the finale set pieces of every part

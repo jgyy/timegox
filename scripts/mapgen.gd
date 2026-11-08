@@ -27,10 +27,11 @@ const DENSITY := {
 	"starferry": 0.2, "magpie": 0.26, "starpalace": 0.22, "jasper": 0.24,
 	"yanggu": 0.17, "millet": 0.2, "fusang": 0.27, "guanghan": 0.23,
 	"longmen": 0.24, "drowned": 0.18, "tushan": 0.27, "buzhou": 0.26,
+	"juntian": 0.22, "changhe": 0.22, "ninesprings": 0.26, "youdu": 0.2,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
-const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38, "fusang": -0.36, "guanghan": -0.44, "longmen": -0.42, "drowned": -0.08, "tushan": -0.52, "buzhou": -0.3}
+const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38, "fusang": -0.36, "guanghan": -0.44, "longmen": -0.42, "drowned": -0.08, "tushan": -0.52, "buzhou": -0.3, "ninesprings": -0.42, "youdu": -0.55}
 
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR
@@ -88,20 +89,47 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 
 	var ents: Array = []
 	var fixed: Array = []
+	# people and things upstairs or in a cellar (Part XI) live on that floor, not on the ground
+	var floor_ents: Array = []
 	for p in spec.get("portals", []):
 		ents.append({"kind": "portal", "id": "p_" + p.to, "to": p.to, "pos": p.pos, "dest": p.dest, "open": p.open})
 		fixed.append(p.pos)
 	for n in spec.get("npcs", []):
-		ents.append({"kind": "npc", "id": n.id, "n": n.n, "pos": n.pos, "col": n.col, "vis": n.get("vis", ["", ""])})
+		var ne := {"kind": "npc", "id": n.id, "n": n.n, "pos": n.pos, "col": n.col, "vis": n.get("vis", ["", ""])}
+		for k in ["asset", "race", "hide"]:
+			if n.has(k):
+				ne[k] = n[k]
+		if n.has("floor"):
+			ne["floor"] = n.floor
+			floor_ents.append(ne)
+			continue
+		ents.append(ne)
 		fixed.append(n.pos)
 	for b in spec.get("bosses", []):
 		ents.append({"kind": "boss", "id": "boss_" + b.id, "enemy": b.id, "pos": b.pos, "lv": b.lv, "req": b.req})
 		fixed.append(b.pos)
 	for pk in spec.get("pickups", []):
-		ents.append({"kind": "pickup", "id": pk.id, "item": pk.item, "pos": pk.pos, "vis": [spec.get("pickup_vis", ""), ""]})
+		var pe := {"kind": "pickup", "id": pk.id, "item": pk.item, "pos": pk.pos, "vis": ["" if pk.get("always", false) else spec.get("pickup_vis", ""), ""]}
+		if pk.has("n"):
+			pe["n"] = pk.n
+		if pk.has("floor"):
+			pe["floor"] = pk.floor
+			floor_ents.append(pe)
+			continue
+		ents.append(pe)
 		fixed.append(pk.pos)
 	for sp in spec.get("springs", []):
 		ents.append({"kind": "spring", "id": "spring", "pos": sp})
+	# Dao Steles (Part XI): where a cultivator chooses which road to walk; they stand once the Elder
+	# has spoken of the Daos
+	for k in spec.get("steles", []).size():
+		var st: Vector2i = spec.steles[k]
+		ents.append({"kind": "stele", "id": "stele_%s_%d" % [id, k], "pos": st, "vis": ["s_p11_home", ""]})
+		fixed.append(st)
+	# the ends of the ladders between the realms must be open ground everyone can walk to
+	for le in ladder_ends(id):
+		fixed.append(le[0])
+		fixed.append(le[0] + le[1])
 	# every door opens onto walkable ground that the rest of the map can reach
 	for bd in buildings:
 		var o := _outside(bd.rect.position + Vector2i(1, 1), buildings)
@@ -180,7 +208,33 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 				var pe: Array = pool[rng.randi() % pool.size()]
 				group.append({"id": pe[0], "lv": rng.randi_range(pe[1], pe[2])})
 			ents.append({"kind": "enemy", "id": "e%d" % placed.size(), "pos": c, "group": group})
-	return {"w": w, "h": h, "grid": grid, "ents": ents, "theme": spec.theme, "name": spec.n, "start": start, "buildings": buildings}
+	return {"w": w, "h": h, "grid": grid, "ents": ents, "theme": spec.theme, "name": spec.n, "start": start, "buildings": buildings, "floor_ents": floor_ents}
+
+## The ladders (Data.LADDERS) with an end in region `id`: [[tile, out, ladder, end ("a" or "b")], ...]
+static func ladder_ends(id: String) -> Array:
+	var out: Array = []
+	for ld in Data.LADDERS:
+		for e in ["a", "b"]:
+			if ld[e][0] == id:
+				out.append([ld[e][1], ld[e][2], ld, e])
+	return out
+
+## The grid of a building's upper storey (level 1) or cellar (level -1), the size of the building's
+## rectangle: walls round the edge (no door: the stairs are the way in), floor inside, furniture that
+## blocks.  `fl` is the floor's spec ({"props": [[kind, tile, blocks], ...]}) and `stairs` the tile of
+## the stairs, both in the same tiles as the rectangle.
+static func floor_grid(r: Rect2i, fl: Dictionary, stairs: Vector2i) -> PackedByteArray:
+	var g := PackedByteArray()
+	g.resize(r.size.x * r.size.y)
+	for y in r.size.y:
+		for x in r.size.x:
+			var edge := x == 0 or y == 0 or x == r.size.x - 1 or y == r.size.y - 1
+			g[y * r.size.x + x] = BUILDING if edge else INTERIOR
+	for pr in fl.get("props", []):
+		var pt: Vector2i = pr[1] - r.position
+		if pr.size() > 2 and pr[2] and pt != stairs - r.position:
+			g[pt.y * r.size.x + pt.x] = BUILDING
+	return g
 
 ## Walls on the rectangle's edge, a door gap, a plank floor inside and furniture tiles that block.
 static func stamp_building(grid: PackedByteArray, w: int, bd: Dictionary) -> Dictionary:
@@ -348,6 +402,11 @@ static func _keep_set(spec: Dictionary, id: String) -> Dictionary:
 		pts.append(sp)
 	for a in arrival_tiles(id):
 		pts.append(a)
+	for st in spec.get("steles", []):
+		pts.append(st)
+	for le in ladder_ends(id):
+		pts.append(le[0])
+		pts.append(le[0] + le[1])
 	for c in pts:
 		for dy in range(-3, 4):
 			for dx in range(-3, 4):

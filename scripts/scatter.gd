@@ -118,6 +118,17 @@ const ECO := {
 		"ground": [["deadbush", 0.6], ["flowers", 0.3]], "land": 0.15, "rocks": ["boulder", "slab", "spire"], "rock_p": 0.08, "grass": 0.7, "cover": 0.06},
 	"buzhou": {"canopy": [["dead", 2], ["snowpine", 1], ["fir", 1]], "under": [["deadbush", 2], ["snowbush", 1]],
 		"ground": [["deadbush", 0.5]], "land": 0.45, "rocks": ["spire", "boulder", "slab", "scree"], "rock_p": 0.12, "grass": 0.5, "cover": 0.04},
+	# ---- Part XI: cloud-pines, blossom and floating islets in the Level Heaven, peach and wisteria by
+	# the Gate of Heaven, giant glowing mushrooms and crystal trees under the roots, cypress and dead
+	# trees among the spider lilies of the Dark Capital
+	"juntian": {"canopy": [["pine", 3], ["bonsai", 2], ["blossom", 1], ["birch", 1]], "under": [["round_bush", 2], ["flowerbush", 1], ["fern", 1]],
+		"ground": [["flowers", 1.5], ["fern", 0.4]], "land": 0.2, "rocks": ["boulder", "slab"], "rock_p": 0.04, "grass": 1.0, "cover": 0.08},
+	"changhe": {"canopy": [["peach", 2], ["wisteria", 2], ["ginkgo", 1], ["bonsai", 1]], "under": [["flowerbush", 2], ["round_bush", 1]],
+		"ground": [["flowers", 2], ["fern", 0.3]], "land": 0.25, "rocks": ["slab", "crystal"], "rock_p": 0.04, "grass": 0.8, "cover": 0.08},
+	"ninesprings": {"canopy": [["giant_shroom", 3], ["crystal_tree", 1.5], ["dead", 1]], "under": [["glowshroom", 3], ["fern", 1], ["deadbush", 1]],
+		"ground": [["glowshroom", 2], ["fern", 0.5]], "land": 0.35, "rocks": ["spire", "boulder", "crystal"], "rock_p": 0.1, "grass": 0.3, "cover": 0.12},
+	"youdu": {"canopy": [["dead", 2], ["cypress", 2], ["crystal_tree", 0.6]], "under": [["deadbush", 2], ["spiderlily", 1]],
+		"ground": [["spiderlily", 1], ["deadbush", 0.5]], "land": 0.35, "rocks": ["slab", "spire"], "rock_p": 0.06, "grass": 0.25, "cover": 0.06},
 }
 
 static var _grass := {}

@@ -20,6 +20,28 @@ static func text(ci: CanvasItem, p: Vector2, s: String, size: int = 20, col: Col
 	ci.draw_string(font(), p + Vector2(1.5, 1.5), s, align, width, size, Color(0, 0, 0, 0.7))
 	ci.draw_string(font(), p, s, align, width, size, col)
 
+## The largest font size from `size` down to `min_size` at which `s` fits in `width` pixels.
+static func fit(s: String, size: int, width: float, min_size: int = 10) -> int:
+	var sz := size
+	while sz > min_size and font().get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > width:
+		sz -= 1
+	return sz
+
+## `s` broken at spaces into lines that fit `width` pixels at font size `size`.
+static func wrap_lines(s: String, size: int, width: float) -> PackedStringArray:
+	var out := PackedStringArray()
+	var cur := ""
+	for w in s.split(" ", false):
+		var tryl: String = w if cur == "" else cur + " " + w
+		if cur != "" and font().get_string_size(tryl, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > width:
+			out.append(cur)
+			cur = w
+		else:
+			cur = tryl
+	if cur != "":
+		out.append(cur)
+	return out
+
 static func wrapped(ci: CanvasItem, p: Vector2, s: String, size: int, col: Color, width: float) -> void:
 	ci.draw_multiline_string(font(), p + Vector2(1.5, 1.5), s, HORIZONTAL_ALIGNMENT_LEFT, width, size, -1, Color(0, 0, 0, 0.7))
 	ci.draw_multiline_string(font(), p, s, HORIZONTAL_ALIGNMENT_LEFT, width, size, -1, col)
