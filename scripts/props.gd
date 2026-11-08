@@ -363,9 +363,11 @@ static func use(e: Dictionary, g) -> Array:
 				g.add_item("ess_wood")
 				out.append("Gathered a Wood Essence")
 		"train":
-			if _ready(g, pid, 600.0) and not g.at_cap():
+			# (nothing to teach at the peak of a realm, and the stones' time is not spent then; what they
+			# teach counts like any other cultivation, so a stage reached is reached)
+			if not g.at_cap() and _ready(g, pid, 600.0):
 				var gain := maxi(1, int(g.exp_need() * 0.03))
-				g.exp = minf(g.exp + gain, float(g.exp_need()))
+				g.add_exp(gain)
 				out.append("Cultivation +%d" % gain)
 		"luck", "find":
 			if not g.prop_found.has(pid):

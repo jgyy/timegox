@@ -75,6 +75,8 @@ var cam_q := 0
 ## direction stays fixed while the key is held, so the camera can swing round behind the hero
 ## without turning the walk with it
 var held_key := -1
+## after the stairs, a ladder or a boat: the movement keys are ignored until they are let go
+var key_lock := false
 var held_dir := Vector2i.ZERO
 ## screenshot tour: a fixed wide establishing shot replaces the chase camera while set
 var cam_override: Variant = null
@@ -320,6 +322,9 @@ func _trip_step(d: float) -> void:
 			banner_t = 3.0
 	if trip.t >= trip.dur:
 		trip = {}
+		# the hero arrives facing the way back (the stairs down are beside the stairs up): a key still
+		# held from before the trip must be let go first, or he walks straight back in, for ever
+		key_lock = true
 
 ## How far the hero has risen (or sunk) on a trip: away from the floor he left in the first half, then
 ## down onto the new one from above in the second.
@@ -1195,6 +1200,9 @@ func _read_keys() -> Vector2i:
 		k = 3
 	if k < 0:
 		held_key = -1
+		key_lock = false
+		return Vector2i.ZERO
+	if key_lock:
 		return Vector2i.ZERO
 	if k != held_key:
 		# a new press is read relative to where the camera looks now
@@ -1731,7 +1739,7 @@ func _draw_hud() -> void:
 		UI.text(self, Vector2(VIEW.x - 506, 56), obj, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
 	else:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35), obj, 15, UI.C_TEXT, 486)
-	UI.text(self, Vector2(VIEW.x - 400, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   Z/Enter act   Esc menu", 13, UI.C_DIM)
+	UI.text(self, Vector2(VIEW.x - 532, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 520.0)
 	_draw_minimap()
 	if banner_t > 0.0:
 		var a := clampf(banner_t, 0.0, 1.0)

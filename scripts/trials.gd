@@ -855,7 +855,7 @@ const TRIALS := {
 				"line": "The drum beats Lin Feng's name across the land, and from every town on the road somebody answers."},
 		]},
 	# ---- Part XIV: the reckoning at the heart of the Wheel
-	"nie": {"might": [1.8, 1.2],
+	"nie": {"might": [2.2, 1.25],
 		"why": "Nie is not a creature but a reckoning: every grudge of every foe Lin Feng put down on the road, every promise half-kept, every thread he cut instead of tying. It is as strong as the road was long, and the road was very long.",
 		"paths": [
 			{"id": "bond", "kind": "bond", "n": "By the bonds you made", "needs": [["bonds", 3]], "boon": {"assist": 0.035, "taken": 0.8},

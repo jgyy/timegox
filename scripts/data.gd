@@ -639,6 +639,13 @@ const ENEMIES := {
 	"debt_shade": {"n": "Debt Shade", "elem": "dark", "weak": "thunder", "col": Color("5a5a7a"), "shape": "wraith"},
 	"karma_moth": {"n": "Karma Moth", "elem": "earth", "weak": "wood", "col": Color("c8a050"), "shape": "moth"},
 	"nie": {"n": "Nie, the Unpaid", "elem": "dark", "weak": "thunder", "col": Color("4a1a3a"), "shape": "hundun", "boss": true, "pal": {"sec": Color("1a0a14"), "acc": Color("ff4a8a"), "mark": Color("e8c050")}},
+	# ---- Part XIV: the grudges that stayed where their owners fell (grudges.gd), in their owners' shapes gone to soot
+	"grudge_iron_fang": {"n": "Iron Fang's Grudge", "elem": "dark", "weak": "water", "col": Color("5a2a26"), "shape": "humanoid", "boss": true, "grudge": true},
+	"grudge_marsh_hag": {"n": "The Marsh Hag's Grudge", "elem": "dark", "weak": "fire", "col": Color("3a2444"), "shape": "wraith", "boss": true, "grudge": true, "pal": {"sec": Color("140a18"), "acc": Color("ff4a7a")}},
+	"grudge_headless_saint": {"n": "The Headless Saint's Grudge", "elem": "dark", "weak": "thunder", "col": Color("4a4a5c"), "shape": "demon", "boss": true, "grudge": true},
+	"grudge_fangfeng": {"n": "Fangfeng's Grudge", "elem": "earth", "weak": "wood", "col": Color("3c4434"), "shape": "humanoid", "boss": true, "grudge": true},
+	"grudge_kui": {"n": "Kui's Grudge", "elem": "thunder", "weak": "earth", "col": Color("3a4252"), "shape": "mammoth", "boss": true, "grudge": true, "pal": {"acc": Color("ff5a7a")}},
+	"grudge_admiral": {"n": "The Admiral's Grudge", "elem": "water", "weak": "thunder", "col": Color("28323c"), "shape": "wraith", "boss": true, "grudge": true, "pal": {"sec": Color("10161c"), "acc": Color("ffd060")}},
 }
 
 ## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
@@ -843,6 +850,8 @@ const AREAS := {
 		"bosses": [
 			{"id": "jade_mantis", "pos": Vector2i(32, 30), "lv": 1, "req": 1},
 			{"id": "iron_fang", "pos": Vector2i(44, 12), "lv": 1, "req": 1},
+			# Part XIV: what Iron Fang was owed, standing where he fell (grudges.gd)
+			{"id": "grudge_iron_fang", "pos": Vector2i(46, 13), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "bamboo_spirit", "pos": Vector2i(60, 34), "lv": 2, "req": 2},
 		],
 		"pickups": [
@@ -861,7 +870,8 @@ const AREAS := {
 			{"to": "frost", "pos": Vector2i(78, 24), "dest": Vector2i(4, 25), "open": "s_elder3"},
 		],
 		"bosses": [
-			{"id": "bog_colossus", "pos": Vector2i(40, 28), "lv": 4, "req": 4},{"id": "marsh_hag", "pos": Vector2i(66, 10), "lv": 5, "req": 5}],
+			{"id": "bog_colossus", "pos": Vector2i(40, 28), "lv": 4, "req": 4},{"id": "marsh_hag", "pos": Vector2i(66, 10), "lv": 5, "req": 5},
+			{"id": "grudge_marsh_hag", "pos": Vector2i(68, 11), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]}],
 		"pickups": [
 			{"id": "lotus1", "item": "lotus", "pos": Vector2i(20, 38)}, {"id": "lotus2", "item": "lotus", "pos": Vector2i(38, 8)},
 			{"id": "lotus3", "item": "lotus", "pos": Vector2i(54, 40)}, {"id": "lotus4", "item": "lotus", "pos": Vector2i(70, 30)},
@@ -1029,6 +1039,7 @@ const AREAS := {
 		"bosses": [
 			{"id": "bone_wyrm", "pos": Vector2i(34, 40), "lv": 19, "req": 19},
 			{"id": "headless_saint", "pos": Vector2i(48, 22), "lv": 20, "req": 20},
+			{"id": "grudge_headless_saint", "pos": Vector2i(50, 23), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "grave_empress", "pos": Vector2i(60, 12), "lv": 20, "req": 20},
 			{"id": "founder_qing", "pos": Vector2i(82, 30), "lv": 20, "req": 20},
 		],
@@ -1780,6 +1791,7 @@ const AREAS := {
 			{"id": "slag_serpent", "pos": Vector2i(64, 12), "lv": 43, "req": 43},
 			{"id": "stone_mother", "pos": Vector2i(62, 48), "lv": 43, "req": 43},
 			{"id": "fangfeng", "pos": Vector2i(76, 34), "lv": 44, "req": 44},
+			{"id": "grudge_fangfeng", "pos": Vector2i(78, 35), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "tushan_fox", "pos": Vector2i(58, 24), "lv": 44, "req": 44},
 			{"id": "taotie", "pos": Vector2i(88, 30), "lv": 44, "req": 44},
 		],
@@ -1863,6 +1875,7 @@ const AREAS := {
 		"bosses": [
 			{"id": "feilian", "pos": Vector2i(56, 47), "lv": 45, "req": 45},
 			{"id": "kui", "pos": Vector2i(78, 46), "lv": 45, "req": 45},
+			{"id": "grudge_kui", "pos": Vector2i(80, 47), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "jiufeng", "pos": Vector2i(84, 15), "lv": 46, "req": 46},
 			{"id": "leigong", "pos": Vector2i(90, 32), "lv": 46, "req": 46},
 			# Part XIII: a General of the Eight Gates
@@ -2203,6 +2216,7 @@ const AREAS := {
 		],
 		"bosses": [
 			{"id": "drowned_admiral", "pos": Vector2i(60, 12), "lv": 50, "req": 50},
+			{"id": "grudge_admiral", "pos": Vector2i(62, 13), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "guixu_stopper", "pos": Vector2i(62, 54), "lv": 50, "req": 50},
 			{"id": "hai_ruo", "pos": Vector2i(70, 32), "lv": 50, "req": 50},
 			{"id": "xu_fu", "pos": Vector2i(86, 32), "lv": 50, "req": 50},
@@ -2838,6 +2852,8 @@ const STEPS := [
 	{"id": "s_p14_judge", "kind": "talk", "npc": "judge_cui", "area": "wheel", "t": "Go down the funeral road to the Wheel of the Six Paths and ask Judge Cui what is gathering there"},
 	{"id": "s_p14_hunt", "kind": "hunt", "area": "wheel", "n": 16, "of": ["grudge_wisp", "debt_shade", "karma_moth"], "t": "Drive back the grudges and debts swarming round the Wheel"},
 	{"id": "s_p14_fates", "kind": "fates", "npcs": ["tala_end", "qiu_ye_end", "hu_end", "xu_lan_end", "liu_ying_end"], "n": 5, "area": "sect", "t": "Settle the five threads of your journey, in any order: Tala, Qiu Ye, Fang Hu, Xu Lan and Liu Ying"},
+	{"id": "s_p14_mirror", "kind": "talk", "npc": "judge_cui", "area": "wheel", "t": "Go back down to the Wheel and ask Judge Cui what else the Karma Mirror shows"},
+	{"id": "s_p14_grudges", "kind": "grudges", "n": 6, "area": "wheel", "t": "Lay to rest the six grudges that stayed where they fell, in any order (Esc > Journal)", "stones": 12000},
 	{"id": "s_p14_nie", "kind": "kill", "boss": "nie", "area": "wheel", "t": "Face Nie, the Unpaid, at the heart of the Wheel", "stones": 22600},
 	{"id": "s_p14_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Go home: every debt is paid, one way or another"},
 	{"id": "s_break19", "kind": "breakthrough", "to": 57, "t": "Let every cause meet its effect: Karma Fulfilled"},
@@ -5834,6 +5850,72 @@ const DIALOGUE := {
 		["Judge Cui Jue", "Look into the Karma Mirror. Your five threads run straight into the heart of it, and something is pulling on them from the other end. Nie. It is as old as the first unpaid debt, and you have been feeding it all the way up the mountain."],
 		["Lin Feng", "Every foe I put down. Every promise I made in a hurry."],
 		["Judge Cui Jue", "And every one you kept. It cannot eat those. Thin out the grudges round the rim before they find the funeral road; then go and settle your threads. A debt that is paid cannot be eaten.", "nod"],
+	],
+	"s_p14_mirror": [
+		["Judge Cui Jue", "Your five are settled, one way or another. Good. Now look into the Mirror again, and look past them."],
+		["Narrator", "In the Karma Mirror the Wheel turns and the soot round its rim is thinner. But six threads of it never come to the Wheel at all: they run back up the funeral road and away across the world, and every one ends somewhere Lin Feng remembers."],
+		["Narrator", "The bamboo below the sect. The red water of the marsh. The graves of the sword saints. A dry riverbed under Tushan. The aeries of Juntian. A wreck on the slope of the Returning Ruins."],
+		["Judge Cui Jue", "Most of what the dead are owed comes down here, and the Wheel grinds it small. These six would not come. Their owners have gone over the bridge, but what they were owed is still owed, and it has taken root where they fell. Nie drinks from all six."],
+		["Lin Feng", "Iron Fang. The Marsh Hag. The Headless Saint. Fangfeng. Kui. The Admiral. I put every one of them down.", "think"],
+		["Judge Cui Jue", "And never asked them anything. Go to each where it fell. A grudge does not listen until it has spent itself, so it will fight you; when it is spent, ask it what it was owed. Pay it if you can. Whatever you leave unpaid, Nie will be holding when you come back.", "point"],
+		["Yue Ling", "Six fights with six people we already beat once."],
+		["Lin Feng", "We beat them. That part is done. It's the asking that was left over."],
+	],
+	# the grudges that stayed (grudges.gd): their last words before the fight and once they are spent;
+	# the choice of what to do about each follows the "post:" lines
+	"pre:grudge_iron_fang": [
+		["Iron Fang's Grudge", "The sweeper. You swept me off this road once. Has the sect sent you back to sweep up what's left?"],
+		["Lin Feng", "I came to ask what you were owed."],
+		["Iron Fang's Grudge", "Then hold out your hands the way I held out mine at that gate, and see how far asking gets you."],
+	],
+	"post:grudge_iron_fang": [
+		["Narrator", "The grudge comes apart like wet paper. Under it, sitting in the bamboo litter with his knees drawn up, is a boy of twelve with a gap where a tooth should be."],
+		["Iron Fang's Grudge", "They never tested me. Not even with the stone. The gate disciple looked at my father's patched sleeves and sent me down the steps, and I never knew if there was anything in me to test."],
+	],
+	"pre:grudge_marsh_hag": [
+		["The Marsh Hag's Grudge", "Another bright young root come for my lotuses. They are not for sale. They were never for sale. Nobody ever paid for them."],
+		["Yue Ling", "She's reading out names. Settlers' names, and sums of money."],
+		["The Marsh Hag's Grudge", "Thirty-six families and not one copper. Pay or drown, cultivator. Those are the terms."],
+	],
+	"post:grudge_marsh_hag": [
+		["Narrator", "The red water stills. The grudge sits down on the bank among the blood lotuses: a stooped woman in a wet shawl with a ledger open on her knees, running her finger down a list that never ends."],
+		["The Marsh Hag's Grudge", "I kept them alive a whole winter on lotus-root and willow bark. The Court sent them, and the Court never paid, and when the water took them nobody came to say sorry. I don't even remember my own name. It was at the top of the ledger once."],
+	],
+	"pre:grudge_headless_saint": [
+		["Narrator", "Among the graves of the sword saints a figure without a head salutes Lin Feng in the old way: sword raised, heels together. The bow is perfect. It is the bow Lin Feng learned on the steps of the sect."],
+		["Yue Ling", "He doesn't want to hurt you. He just has nothing to say it with except the sword."],
+		["Lin Feng", "Then I'll answer the same way. Sword Saint, I am of your school."],
+	],
+	"post:grudge_headless_saint": [
+		["Narrator", "The saint lowers his blade, kneels, and writes in the grave-dust with one finger, slowly, like a man who has not held a brush in a thousand years."],
+		["Narrator", "A name, his own, in the old script. Beneath it, smaller: Why was it taken down?"],
+	],
+	"pre:grudge_fangfeng": [
+		["Fangfeng's Grudge", "STOP. STOP AND LISTEN. There's a village under the dyke and the water is coming and I have to tell somebody!"],
+		["Yue Ling", "It thinks the flood is still coming. It has been standing in that breach for four thousand years."],
+		["Lin Feng", "Then let's help it put the water down first."],
+	],
+	"post:grudge_fangfeng": [
+		["Narrator", "The giant's grudge goes down on one knee in the dry riverbed and, for the first time in four thousand years, lets go of the water that is not there. It is panting like a man who has run a very long way."],
+		["Fangfeng's Grudge", "I was late. I know I was late. They were cutting off my head before I could tell them why."],
+	],
+	"pre:grudge_kui": [
+		["Narrator", "The thunderhead over the aeries comes down on one leg with a sound like the first beat of a war drum, and every wind bell in Juntian rings at once."],
+		["Kui's Grudge", "BOOM. BOOM. Before you can beat me, I beat you. BOOM."],
+		["Yue Ling", "It isn't angry. It's frightened. Every thunderclap still sounds like the drum to it."],
+	],
+	"post:grudge_kui": [
+		["Narrator", "The thunder-ox's grudge settles on the cloud like a tired animal, its one leg folded under it, its great sides heaving. Far off in the Eastern Sea, something it remembers smells of salt."],
+		["Kui's Grudge", "I used to bellow because I was happy. Now I bellow first. Before the drum."],
+	],
+	"pre:grudge_admiral": [
+		["Narrator", "On the tilted deck of the wrecked flagship a shadow in an admiral's coat stands at the wheel, holding a course for a shore it will never reach. When it turns it has no face, only the shape of somebody listening very hard."],
+		["The Admiral's Grudge", "You came from the east. From the isles. Did you see her? A girl of eleven with a red ribbon. They called the names on the beach. Did anybody call hers?"],
+		["Lin Feng", "I'll tell you what I know. But you'll have to let go of the wheel first."],
+	],
+	"post:grudge_admiral": [
+		["Narrator", "The Admiral's grudge lets go of the wheel. It has never let go of it before, and its hands do not know what to do."],
+		["The Admiral's Grudge", "Lingbo. Eleven years old. She had a red ribbon, and she was afraid of the sea. I told her she would be home within the year."],
 	],
 	"pre:nie": [
 		["Narrator", "At the heart of the Wheel, where the six paths meet, the soot of a thousand grudges stands up and becomes a shape: no face, many hands, and in every hand a tally of something Lin Feng owes."],

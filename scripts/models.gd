@@ -350,19 +350,20 @@ static func accessory(id: String, col: Color, side: float = 1.0) -> Node3D:
 	var gold := MB.tag(Color("e8c050"), MB.METAL)
 	match id:
 		"straw_hat":
-			# a wide conical douli of plaited straw, a darker band round the crown and a red cord
+			# a wide conical douli of plaited straw over the crown (the hair fits up inside it), its
+			# underside, a darker band of reed and a red chin cord
 			var straw := MB.tag(Color("d8b878"), MB.WOOD)
-			b.cone(Vector3(0, 1.98, -0.01), 0.44, 0.2, straw, Vector3.ZERO, 18)
-			b.cyl(Vector3(0, 1.9, -0.01), 0.43, 0.012, MB.tag(Color("b89858"), MB.WOOD), Vector3.ZERO, 18)
-			b.torus(Vector3(0, 1.93, -0.01), 0.22, 0.03, MB.tag(Color("8a6a3a"), MB.WOOD))
+			b.lathe(Vector3(0, 1.87, -0.01), [Vector2(0.33, 0.0), Vector2(0.24, 0.05), Vector2(0.13, 0.1), Vector2(0.03, 0.15), Vector2(0.0, 0.16)], straw, 20, MB.tag(Color("e8cc90"), MB.WOOD))
+			b.disc(Vector3(0, 1.867, -0.01), 0.325, MB.tag(Color("a88848"), MB.WOOD), 20, Color(0, 0, 0, -1), Vector3(PI, 0, 0))
+			b.torus(Vector3(0, 1.905, -0.01), 0.2, 0.014, MB.tag(Color("8a6a3a"), MB.WOOD))
 			for s2 in [-1.0, 1.0]:
-				b.limb(Vector3(0.1 * s2, 1.9, 0.02), Vector3(0.09 * s2, 1.62, 0.08), 0.006, 0.005, MB.tag(Color("b83030"), MB.CLOTH), 5)
+				b.limb(Vector3(0.11 * s2, 1.86, 0.02), Vector3(0.07 * s2, 1.63, 0.07), 0.005, 0.004, MB.tag(Color("b83030"), MB.CLOTH), 5)
 		"jade_crown":
 			# a small guan of jade and gold on the crown, pierced by a long pin
 			var jade := MB.tag(Color("6ad8a8"), MB.CRYSTAL)
 			b.lathe(Vector3(0, 1.93, -0.04), [Vector2(0.05, 0.0), Vector2(0.058, 0.025), Vector2(0.05, 0.06), Vector2(0.018, 0.08)], jade, 14)
 			b.torus(Vector3(0, 1.935, -0.04), 0.11, 0.012, gold)
-			b.cyl(Vector3(0, 1.975, -0.04), 0.006, 0.26, gold, Vector3(0, 0, PI / 2), 6)
+			b.cyl(Vector3(0, 1.975, -0.04), 0.006, 0.13, gold, Vector3(0, 0, PI / 2), 6)
 			g.ball(Vector3(0.13, 1.975, -0.04), 0.014, Color(0.6, 1.0, 0.85, 0.9))
 		"phoenix_crest":
 			# a gold band round the brow with a phoenix rising from it at the front
@@ -387,11 +388,12 @@ static func accessory(id: String, col: Color, side: float = 1.0) -> Node3D:
 				var a2 := TAU * k2 / 24.0
 				b.limb(Vector3(cos(a2) * 0.39, 1.94, sin(a2) * 0.39 - 0.01), Vector3(cos(a2) * 0.4, 1.84, sin(a2) * 0.4 - 0.01), 0.004, 0.004, MB.tag(col.darkened(0.2), MB.CLOTH), 4)
 		"ink_mask":
-			# a lacquered half-mask over the eyes, black with a violet rim, its brow in a curl
-			b.sph(Vector3(0, 1.74, 0.105), Vector3(0.13, 0.055, 0.05), MB.tag(Color("15121c"), MB.WOOD))
-			b.torus(Vector3(0, 1.74, 0.11), 0.24, 0.008, MB.tag(Color("8a6ad8"), MB.METAL), Vector3(PI / 2, 0, 0))
-			g.ball(Vector3(0.045, 1.74, 0.155), 0.012, Color(0.7, 0.5, 1.0, 0.8))
-			g.ball(Vector3(-0.045, 1.74, 0.155), 0.012, Color(0.7, 0.5, 1.0, 0.8))
+			# a lacquered half-mask across the eyes (the face's front is 11 cm before the head's centre
+			# at the eye line, 1.72 m up), black with violet eye-slits, tied behind with a violet cord
+			b.sph(Vector3(0, 1.718, 0.108), Vector3(0.108, 0.04, 0.036), MB.tag(Color("15121c"), MB.WOOD))
+			b.torus(Vector3(0, 1.72, -0.005), 0.112, 0.006, MB.tag(Color("8a6ad8"), MB.CLOTH), Vector3(0, 0, 0))
+			for s4 in [-1.0, 1.0]:
+				g.sph(Vector3(0.042 * s4, 1.72, 0.141), Vector3(0.022, 0.007, 0.004), Color(0.75, 0.55, 1.0, 0.9))
 		"pauldrons":
 			# one curved plate over the shoulder (built per side), gold on white lacquer
 			var sx := 0.2 * side
@@ -408,10 +410,10 @@ static func accessory(id: String, col: Color, side: float = 1.0) -> Node3D:
 				b.leaf(base, tip, 0.05, MB.tag(col if k3 % 2 == 0 else col.darkened(0.25), MB.CLOTH), Vector3(cos(a3), 0, -sin(a3)), MB.tag(col.lightened(0.3), MB.CLOTH))
 		"star_cloak":
 			# a collar of night-blue silk with the Silver River's small stars caught in it
-			b.torus(Vector3(0, 1.46, -0.02), 0.32, 0.035, MB.tag(Color("141c40"), MB.CLOTH))
+			b.torus(Vector3(0, 1.44, -0.015), 0.17, 0.014, MB.tag(Color("141c40"), MB.CLOTH))
 			for k4 in 9:
 				var a4 := -PI * 0.8 + PI * 1.6 * k4 / 8.0
-				g.ball(Vector3(sin(a4) * 0.17, 1.47 + 0.02 * sin(k4 * 2.0), cos(a4) * 0.12 - 0.03), 0.014, Color(0.85, 0.9, 1.0, 0.95))
+				g.ball(Vector3(sin(a4) * 0.17, 1.445 + 0.01 * sin(k4 * 2.0), cos(a4) * 0.15 - 0.02), 0.011, Color(0.85, 0.9, 1.0, 0.95))
 	if not b.is_empty():
 		_mi(root, b)
 	if not g.is_empty():
@@ -540,7 +542,8 @@ static func _sky_barque() -> Node3D:
 			var root := Vector3(0.62 * s, 0.3, 0.6 - k * 0.32)
 			b.leaf(root, root + Vector3((1.1 - k * 0.1) * s, 0.25 - k * 0.04, -0.45), 0.16, MB.tag(Color("e8ecf4") if k % 2 == 0 else Color("b8c8e0"), MB.CLOTH), Vector3(0, 1, 0), MB.tag(Color("6a8ab8"), MB.CLOTH))
 	# mast and a sail of feathers sewn on cloth, red-bordered
-	b.cyl(Vector3(0, 1.4, 0.2), 0.05, 2.3, hull_d)
+	# (a standard eight-sided cylinder is two units tall: this is a mast of 2.3 m standing on the deck)
+	b.cyl(Vector3(0, 1.4, 0.2), 0.05, 1.15, hull_d)
 	b.box(Vector3(0, 1.5, 0.12), Vector3(0.03, 1.6, 1.3), MB.tag(Color("f0e8d8"), MB.CLOTH))
 	b.box(Vector3(0, 2.3, 0.12), Vector3(0.05, 0.05, 1.4), MB.tag(Color("c8302a"), MB.CLOTH))
 	b.box(Vector3(0, 0.7, 0.12), Vector3(0.05, 0.05, 1.4), MB.tag(Color("c8302a"), MB.CLOTH))
@@ -1116,6 +1119,14 @@ static func _eyes(g: MB, b: MB, pos: Vector3, spread: float, r: float, col: Colo
 const FALLBACK := {"scorpion": "crab", "mushroom": "plant", "mammoth": "beast", "moth": "bird", "hundun": "jelly", "fox": "beast", "carp": "serpent", "oxhead": "demon", "horseface": "demon", "jiangshi": "humanoid", "qilin": "beast", "ape": "beast", "tiger": "beast", "queen": "humanoid", "warden": "humanoid", "crowmarshal": "humanoid", "kaiming": "beast", "magpie": "bird", "sun_crow": "bird", "jade_rabbit": "beast", "bifang": "bird"}
 
 static func monster(shape: String, col: Color, boss: bool = false, enemy: String = "") -> Node3D:
+	var m := _monster_body(shape, col, boss, enemy)
+	# a grudge that stayed where its owner fell (grudges.gd, Part XIV): its owner's shape gone to soot,
+	# smouldering
+	if enemy != "" and Data.ENEMIES.get(enemy, {}).get("grudge", false):
+		Fx3D.soot(m, col)
+	return m
+
+static func _monster_body(shape: String, col: Color, boss: bool = false, enemy: String = "") -> Node3D:
 	# somebody met on the road who comes to blows with Lin Feng (fate.gd): their own character model
 	if shape.begins_with("person:"):
 		var pn := person(col, col.darkened(0.5), {"asset": shape.substr(7), "sword": true})

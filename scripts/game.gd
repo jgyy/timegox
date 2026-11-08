@@ -82,6 +82,8 @@ var fate_log := {}
 var picks := {}
 var bestiary := {}
 var told := {}
+## the grudges that stayed (grudges.gd, Part XIV): grudge boss id -> the option taken once it was spent
+var grudges := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -145,6 +147,7 @@ func reset() -> void:
 	picks = {}
 	bestiary = {}
 	told = {}
+	grudges = {}
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -517,6 +520,9 @@ func poll_steps() -> void:
 			"visits", "fates":
 				# any of the people named, in any order (Part XIII's invitations, Part XIV's five threads)
 				ok = visits_done(s) >= int(s.n)
+			"grudges":
+				# Part XIV: the grudges that stayed, in any order, each fought and then answered
+				ok = grudges.size() >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -536,6 +542,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(gates_open.size(), int(s.n)), int(s.n)]
 	elif s.kind == "visits" or s.kind == "fates":
 		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
+	elif s.kind == "grudges":
+		t += "  (%d/%d)" % [mini(grudges.size(), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":

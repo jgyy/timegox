@@ -1400,6 +1400,41 @@ func _init() -> void:
 ## encounters (their story machinery: every state any choice can lead to has a chapter written for it,
 ## so no thread can run into a dead end), and Part XIV.
 func _fates_and_faces() -> void:
+	print("== bugs fixed in this release ==")
+	# a cylinder or a cone of an uncommon number of sides was drawn as a box (the great drum, the halls'
+	# columns, the pillars of heaven): now built round, at the unit height the box had
+	var c10: Array = MB._proto("cyl10")
+	var cone5: Array = MB._proto("cone5")
+	var ys10 := Vector2(INF, -INF)
+	var top5 := 0.0
+	for v10 in c10[0]:
+		ys10 = Vector2(minf(ys10.x, v10.y), maxf(ys10.y, v10.y))
+	for v5 in cone5[0]:
+		if v5.y > 0.49:
+			top5 = maxf(top5, Vector2(v5.x, v5.z).length())
+	check((c10[0] as PackedVector3Array).size() > 24 and is_equal_approx(ys10.y - ys10.x, 1.0) and top5 < 0.01, "a ten-sided cylinder is round and a unit tall, a five-sided cone comes to a point")
+	# the people met on the road lost their "fate" mark on the way into the world, so all of them stood
+	# about from the first morning (two Qiu Yes in the courtyard) and only ever said "..."
+	var sect_ents: Array = MapGen.build("sect").ents
+	var qy: Array = sect_ents.filter(func(e): return str(e.get("id", "")) == "qiu_ye" or str(e.get("id", "")) == "qiu_ye_end")
+	var BG = load("res://scripts/game.gd").new()
+	BG.reset()
+	check(qy.size() == 2 and qy.all(func(e): return e.get("fate", false)) and not Fate.present(BG, "qiu_ye_end") and not Fate.present(BG, "qiu_ye"), "the people met on the road carry their mark into the world, and stand there only when the story has them there")
+	# training stones at the peak of a realm used up their time and taught nothing; below it, what they
+	# taught was set straight into the cultivation bar, so a stage reached was not reached
+	var cap_lv := 0
+	while not Data.realm_cap(cap_lv):
+		cap_lv += 1
+	BG.level = cap_lv
+	BG.exp = 0.0
+	var tstones := {"kind": "prop", "id": "test:stones2", "prop": "stones", "pos": Vector2i.ZERO}
+	Props.use(tstones, BG)
+	check(BG.exp == 0.0 and not BG.prop_t.has("test:stones2"), "at the peak of a realm the training stones teach nothing, and keep their time")
+	BG.level = 0
+	BG.exp = float(BG.exp_need()) - 0.5
+	Props.use(tstones, BG)
+	check(BG.level == 1, "the cultivation the stones teach can complete a stage")
+	BG.free()
 	print("== character creation ==")
 	for lk in Fashion.LOOK_ORDER:
 		var asset: String = str(Fashion.LOOKS[lk].asset)
@@ -1598,3 +1633,69 @@ func _fates_and_faces() -> void:
 	check(Trials.TRIALS.has("nie") and Trials.boss_area("nie") == "wheel" and Trials.path("nie", "bond").needs[0][0] == "bonds", "Nie is a trial at the Wheel, open to the friends Lin Feng made")
 	var wb: Dictionary = Data.AREAS.wheel.warband
 	check(str(wb.vis) == "s_p14_judge" and wb.pool.all(func(pe): return Data.ENEMIES.has(pe[0]) and Lore.BEAST.has(pe[0])), "the grudges round the Wheel are new foes, with stories")
+	print("== part XIV: the grudges that stayed ==")
+	check(Data.step_index("s_p14_mirror") > Data.step_index("s_p14_fates") and Data.step_index(Grudges.STEP) == Data.step_index("s_p14_mirror") + 1
+		and Data.step_index("s_p14_nie") > Data.step_index(Grudges.STEP) and Data.DIALOGUE.has("s_p14_mirror"), "Judge Cui shows the grudges after the threads are settled, and they are laid to rest before Nie")
+	check(int(Data.STEPS[Data.step_index(Grudges.STEP)].n) == Grudges.ORDER.size() and Grudges.ORDER.size() == Grudges.GRUDGES.size(), "the grudges step asks for all six")
+	var gareas := {}
+	for gid in Grudges.ORDER:
+		var gd: Dictionary = Grudges.GRUDGES[gid]
+		var ge: Dictionary = Data.ENEMIES.get(gid, {})
+		var owner: String = str(gd.of)
+		var ga := Trials.boss_area(gid)
+		gareas[ga] = true
+		check(ge.get("boss", false) and ge.get("grudge", false) and Data.ENEMIES.has(owner) and Trials.boss_area(owner) == ga, "%s: a boss standing in the region where %s fell" % [gid, owner])
+		var placed := {}
+		for b in Data.AREAS[ga].bosses:
+			if str(b.id) == gid:
+				placed = b
+		var owner_pos := Vector2i(-99, -99)
+		for b2 in Data.AREAS[ga].bosses:
+			if str(b2.id) == owner:
+				owner_pos = b2.pos
+		check(placed.get("vis", ["", ""])[0] == Grudges.STEP and placed.pos != owner_pos and (placed.pos - owner_pos).length() <= 3.0, "%s: appears with its step, beside (not on) the place its owner fell" % gid)
+		check(Lore.BOSS.has(gid) and Data.DIALOGUE.has("pre:" + gid) and Data.DIALOGUE.has("post:" + gid), "%s: has a story, last words before the fight and words once spent" % gid)
+		var free_way := false
+		var ids := {}
+		for o in gd.options:
+			ids[str(o.id)] = true
+			check(str(o.then) in ["eased", "paid", "unpaid"] and str(o.label) != "" and str(o.desc) != "" and str(o.log) != "" and not o.get("after", []).is_empty(), "%s/%s: says what it does, is written down and has an answer" % [gid, o.id])
+			check(str(o.then) == "unpaid" or str(o.get("epilogue", "")) != "", "%s/%s: the ending tells what came of it" % [gid, o.id])
+			for n in o.get("need", []):
+				var nk := str(n[0])
+				check(nk in ["fate", "stones", "renown", "item", "rides"] and (nk != "item" or Data.ITEMS.has(str(n[1]))) and (nk != "fate" or Fate.THREADS.has(str(n[1]))), "%s/%s: needs something real" % [gid, o.id])
+			if o.get("need", []).is_empty():
+				free_way = true
+		check(ids.has("wheel") and free_way and gd.options.size() >= 2, "%s: can always be answered (the Wheel), and at least one way costs something" % gid)
+	check(gareas.size() == 6 and gareas.has("juntian") and gareas.has("guixu"), "the six grudges stand in six regions, up in the heavens and out at sea too")
+	var GG = load("res://scripts/game.gd").new()
+	GG.reset()
+	check(Grudges.nie_mult(GG) == 1.0 and Grudges.nie_line(GG) == "" and Grudges.epilogues(GG).is_empty(), "before any grudge is met, Nie is as it was")
+	GG.stones = 10
+	var tst := Grudges.option("grudge_iron_fang", "test")
+	check(not Fate.option_ok(GG, tst) and not Fate.option_ok(GG, Grudges.option("grudge_iron_fang", "son")) and Fate.option_ok(GG, Grudges.option("grudge_iron_fang", "wheel")), "a grudge's costly answers need what they cost; the Wheel needs nothing")
+	GG.stones = 40000
+	GG.fates["hu"] = "ally"
+	check(Fate.option_ok(GG, tst) and Fate.option_ok(GG, Grudges.option("grudge_iron_fang", "son")), "and a friend can answer for a father")
+	Fate.pay(GG, tst)
+	Grudges.take(GG, "grudge_iron_fang", tst)
+	check(GG.stones == 10000 and Grudges.state(GG, "grudge_iron_fang") == "paid" and Grudges.settled(GG) == 1 and Grudges.nie_mult(GG) < 1.0, "a grudge paid is remembered, and Nie is the lighter for it")
+	Grudges.take(GG, "grudge_admiral", Grudges.option("grudge_admiral", "wheel"))
+	check(Grudges.unpaid(GG) == 1 and Grudges.unpaid_names(GG) == "the Admiral" and Grudges.nie_line(GG).contains("the Admiral") and Grudges.epilogues(GG).size() == 1, "a grudge left to the Wheel is carried by Nie, and told of")
+	for gid2 in Grudges.ORDER:
+		GG.grudges[gid2] = "wheel"
+	check(Grudges.nie_mult(GG) > 1.8 and Grudges.epilogues(GG).is_empty(), "six grudges left unpaid make Nie far stronger")
+	for gid3 in Grudges.ORDER:
+		GG.grudges[gid3] = str(Grudges.GRUDGES[gid3].options[1].id)
+	check(Grudges.nie_mult(GG) < 0.8 and Grudges.nie_line(GG).begins_with("Not one") and Grudges.epilogues(GG).size() == 6, "six laid to rest leave Nie smaller, and six lines for the ending")
+	GG.step = Data.step_index(Grudges.STEP)
+	GG.grudges = {}
+	GG.poll_steps()
+	check(Data.STEPS[GG.step].id == Grudges.STEP and GG.objective_text().contains("(0/6)"), "the grudges step waits for all six")
+	for gid4 in Grudges.ORDER:
+		GG.grudges[gid4] = "wheel"
+	GG.poll_steps()
+	check(Data.STEPS[GG.step].id == "s_p14_nie", "and goes on to Nie once all six are answered")
+	GG.free()
+	var bot_src := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bot_src.contains("GRUDGE_ROUTE") and Grudges.ORDER.all(func(g): return bot_src.contains("\"%s\"" % g)), "the bot goes to every grudge and has an answer for each")

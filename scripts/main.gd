@@ -171,7 +171,14 @@ func _process(d: float) -> void:
 		t.t -= d
 	toast_list = toast_list.filter(func(t): return t.t > 0.0)
 	while not Game.toasts.is_empty():
-		toast_list.append({"text": Game.toasts.pop_front(), "t": 3.5})
+		var txt: String = Game.toasts.pop_front()
+		# the same news again (walking into a closed Lotus Seal every frame) keeps its one line up instead
+		# of filling the corner with copies and pushing out what else was said
+		var same: Array = toast_list.filter(func(t): return t.text == txt)
+		if not same.is_empty():
+			same[0].t = 3.5
+		else:
+			toast_list.append({"text": txt, "t": 3.5})
 	while toast_list.size() > 4:
 		toast_list.pop_front()
 
@@ -239,6 +246,9 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 			var ep := Fate.epilogue(Game, th)
 			if ep != "":
 				lines.append(["Narrator", ep])
+		# and of the grudges that stayed, the ones laid to rest (grudges.gd)
+		for ep2 in Grudges.epilogues(Game):
+			lines.append(["Narrator", ep2])
 		lines.append_array(origin_lines("ending"))
 	# the road Lin Feng took into the heart of the Eight Gates (Part XIII) tells the end its own way
 	var road: String = str(Game.trials.get("chiyou", ""))
@@ -355,7 +365,12 @@ func interact(e: Dictionary) -> void:
 				var need2: Dictionary = Data.STEPS[Data.step_index(str(e.open))]
 				Game.toast("The way is closed for now. (%s)" % need2.t)
 		"stele":
-			open_dao_choice("stele")
+			if Game.dao == "":
+				# (the steles stand once the Elder is ready to speak of the roads; until he has, they are
+				# only carved stone, and the first choice is his to offer)
+				say([["Narrator", "Six roads are carved on the stele, and every one runs off the edge of the stone. Elder Qing Xuan means to speak of them first."]])
+			else:
+				open_dao_choice("stele")
 		"abode":
 			open_abode(e)
 		"prop":
@@ -544,6 +559,27 @@ func ask_picks() -> void:
 		, false)
 		return
 
+## A grudge that stayed is spent (grudges.gd, Part XIV): what was it owed?  Every option says what it
+## does, needs and costs; one whose needs are not met cannot be taken, and leaving it to the Wheel
+## always can.  There is no way out of the choice: a grudge that has spoken waits for an answer.
+func ask_grudge(id: String) -> void:
+	var gd: Dictionary = Grudges.GRUDGES[id]
+	var opts: Array = []
+	for o in gd.options:
+		var ok := Fate.option_ok(Game, o)
+		var extra := Fate.option_text(Game, o)
+		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yet", "desc": str(o.desc) + ("\n\n" + extra if extra != "" else ""),
+			"col": gd.col, "enabled": ok})
+	choose(str(gd.ask), opts, func(oid: String):
+		var o := Grudges.option(id, oid)
+		if o.is_empty() or not Fate.option_ok(Game, o):
+			# (never leave a spent grudge unanswered: it could not be met again)
+			o = Grudges.option(id, "wheel")
+		Fate.pay(Game, o)
+		Grudges.take(Game, id, o)
+		say(o.get("after", []), func(): Game.poll_steps())
+	, false)
+
 # ---------------------------------------------------------------- the wardrobe, the stable, the dyer (fashion.gd)
 ## The wardrobe: every outfit, the ones not yet earned greyed out with how to earn them; the hero in
 ## the world changes as the cursor moves.
@@ -677,6 +713,11 @@ func boss_interact(e: Dictionary) -> void:
 		if not Game.reached(Trials.GATE_STEP):
 			say([["Narrator", "%s stands in a column of gold light that will not let you near. Not yet." % d.n]])
 			return
+	elif Grudges.is_grudge(e.enemy):
+		# a grudge that stayed (grudges.gd, Part XIV): any of them, in any order, once the Mirror has shown them
+		if s.is_empty() or s.kind != "grudges" or Game.grudges.has(e.enemy):
+			say([["Narrator", "%s stands where its owner fell, muttering a sum nobody ever paid. It does not see you yet." % d.n]])
+			return
 	elif s.is_empty() or s.kind != "kill" or s.boss != e.enemy:
 		say([["Narrator", "%s looms before you, but this is not the time. Finish your current objective first." % d.n]])
 		return
@@ -687,12 +728,20 @@ func boss_interact(e: Dictionary) -> void:
 		# a trial (trials.gd): nobody faces this one unprepared, and there is more than one way to prepare
 		var why: Array = boss_story(e.enemy)
 		why.append(["Narrator", str(Trials.TRIALS[e.enemy].why)])
+		if e.enemy == "nie" and Grudges.nie_line(Game) != "":
+			# the grudges that stayed (grudges.gd): the ones left to the Wheel are in Nie's hands
+			why.append(["Narrator", Grudges.nie_line(Game)])
 		say(why, func(): open_trial(e))
 		return
 	var pre: Array = boss_story(e.enemy)
 	pre.append_array(Data.DIALOGUE.get("pre:" + e.enemy, []))
 	say(pre, func():
-		battle.start([{"id": e.enemy, "lv": e.lv}], {"entity": e, "boss": true, "enemy": e.enemy, "theme": world.theme_name})
+		var foe := {"id": e.enemy, "lv": e.lv}
+		if Grudges.is_grudge(e.enemy):
+			# a grudge does not listen until it has spent itself: it fights as hard as a trial's boss
+			foe["mult"] = float(Grudges.MIGHT[0])
+			foe["atk"] = float(Grudges.MIGHT[1])
+		battle.start([foe], {"entity": e, "boss": true, "enemy": e.enemy, "theme": world.theme_name})
 		push("battle")
 	)
 
@@ -737,6 +786,9 @@ func trial_battle(e: Dictionary, p: Dictionary) -> void:
 		# every gate opened beyond the four that break the lock takes a little off the war god
 		var extra := maxi(0, Game.gates_open.size() - Trials.GATES_NEEDED)
 		bn["foe_hp"] = float(bn.get("foe_hp", 1.0)) * (1.0 - Trials.GATE_WEAKEN * extra)
+	elif tid == "nie":
+		# every grudge left to the Wheel feeds Nie, every one laid to rest takes something off it (grudges.gd)
+		bn["foe_hp"] = float(bn.get("foe_hp", 1.0)) * Grudges.nie_mult(Game)
 	battle.start([{"id": tid, "lv": e.lv, "mult": mt[0], "atk": mt[1]}], {"entity": e, "boss": true, "enemy": tid, "theme": world.theme_name,
 		"trial": tid, "path": str(p.id), "boon": bn, "path_n": str(p.n), "path_kind": str(Trials.KINDS[p.kind].n)})
 	push("battle")
@@ -811,11 +863,15 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					Game.toast("%s stands open (%d of 8)" % [gn.substr(0, 1).to_upper() + gn.substr(1), Game.gates_open.size()])
 					Game.note("Opened " + str(Trials.GATE_NAMES[ctx.enemy]))
 					Game.poll_steps()
-				else:
+				elif not Grudges.is_grudge(ctx.enemy):
 					Game.advance()
 				var post: Array = dao_dialogue("post:" + ctx.enemy)
+				if Grudges.is_grudge(ctx.enemy):
+					# a grudge that stayed is spent: it says what it was owed, and waits for an answer
+					var gid: String = ctx.enemy
+					say(post, func(): ask_grudge(gid))
 				# (a small choice of the road may wait on this boss: fate.gd PICKS)
-				if not post.is_empty():
+				elif not post.is_empty():
 					say(post, func(): ask_picks())
 				else:
 					ask_picks()

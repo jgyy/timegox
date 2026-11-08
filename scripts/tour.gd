@@ -735,6 +735,11 @@ func _fates_state(step_id: String, lv: int) -> void:
 	Game.heal_full()
 
 func _fates_shots() -> void:
+	if str(main.args.get("fates", "")) == "grudges":
+		# (--fates=grudges: only Part XIV's grudges and Nie)
+		main.set_stack(["world"])
+		await _grudge_shots()
+		return
 	# character creation over the moonlit cliff, the story's sweeper and a sweeper of one's own
 	main.set_stack(["title"])
 	main.open_creation()
@@ -745,7 +750,8 @@ func _fates_shots() -> void:
 	main.create._preview()
 	await _wait(1.5)
 	await _shot("create_custom")
-	main.set_stack(["title"])
+	# (the galleries draw over an empty world: nothing of the title screen's menu over them)
+	main.set_stack(["world"])
 	# the four looks in four colourings, and the outfits
 	var looks: Array = []
 	var cs := [{}, {"hair": Color("5a3424"), "eyes": Color("2eb07e"), "robe": Color("2e9a6e"), "sec": Color("163a2c"), "trim": Color("e8f4e0")},
@@ -766,7 +772,9 @@ func _fates_shots() -> void:
 		folk.append(Models.person(Color("888888"), Color("222222"), {"asset": pid}))
 	await _gallery("fated_people", folk, 0.7)
 	await _portraits("fated_portraits", [Models.person(Color.WHITE, Color.BLACK, {"asset": "tala"}), Models.person(Color.WHITE, Color.BLACK, {"asset": "qiu_ye"}),
-		Models.person(Color.WHITE, Color.BLACK, {"asset": "hu_grown"}), Models.person(Color.WHITE, Color.BLACK, {"asset": "xu_lan"}), Models.person(Color.WHITE, Color.BLACK, {"asset": "liu_ying"})])
+		Models.person(Color.WHITE, Color.BLACK, {"asset": "hu_grown"})])
+	await _portraits("fated_portraits2", [Models.person(Color.WHITE, Color.BLACK, {"asset": "xu_lan"}), Models.person(Color.WHITE, Color.BLACK, {"asset": "liu_ying"}),
+		Models.person(Color.WHITE, Color.BLACK, {"asset": "little_hu"})], 0.95, 1.4)
 	# the rides, each with Lin Feng and Yue Ling on board
 	var rides: Array = []
 	for rid in Fashion.RIDE_ORDER:
@@ -790,7 +798,7 @@ func _fates_shots() -> void:
 		holder.rotation.y = PI / 2.0
 		holder.set_meta("kind", "ride_group")
 		rides.append(holder)
-	await _gallery("rides", rides, 1.15, 0.0)
+	await _gallery("rides", rides, 1.15, 1.1)
 	# riding in the world: the horse on the road from the sect's north gate, and the flying sword
 	_fates_state("s_f_qiu1", 3)
 	main.set_stack(["world"])
@@ -868,12 +876,68 @@ func _fates_shots() -> void:
 	await _wait(2.2)
 	await _shot("battle_lore")
 	main.pop()
+	await _grudge_shots()
+
+## Part XIV: the grudges that stayed (grudges.gd), the choice once one is spent, and Nie.
+func _grudge_shots() -> void:
+	# Iron Fang's grudge in the bamboo and Kui's over the aeries of Juntian, each smouldering beside the
+	# place its owner fell; a battle with Kui's
+	_fates_state(Grudges.STEP, 55)
+	Game.fates = {"tala": "ally", "qiu_ye": "ally", "hu": "ally", "xu_lan": "spared", "liu_ying": "fallen"}
+	Game.grudges = {"grudge_headless_saint": "bow", "grudge_marsh_hag": "pay"}
+	Game.rides["barque"] = true
+	for gs2 in [["grudge_iron_fang", Vector3(-6.5, 3.6, 8.5)], ["grudge_kui", Vector3(-11.0, 5.5, 13.0)]]:
+		var gid2: String = gs2[0]
+		var ga2 := Trials.boss_area(gid2)
+		var gpos2 := Vector2i.ZERO
+		for b2 in Data.AREAS[ga2].bosses:
+			if b2.id == gid2:
+				gpos2 = b2.pos
+		var lid2 := Data.layer_of(ga2)
+		main.world.open_world()
+		main.world.enter_layer(lid2)
+		main.world.teleport(_nearest_free(Atlas.to_world(ga2, gpos2 + Vector2i(-4, 3))), lid2)
+		main.world.facing = Vector2i(1, 0)
+		main.world.cam_q = 1
+		main.world._snap_cam()
+		var bp2: Vector3 = main.world.wpos(Atlas.to_world(ga2, gpos2))
+		bp2.y = main.world.ground_y(bp2)
+		main.world.cam_override = Transform3D(Basis.IDENTITY, bp2 + gs2[1]).looking_at(bp2 + Vector3(0, 2.2, 0), Vector3.UP)
+		await _wait(2.2)
+		await _shot(gid2)
+		main.world.cam_override = null
+	main.battle.start([{"id": "grudge_kui", "lv": 55}], {"boss": true, "enemy": "grudge_kui", "theme": main.world.theme_name})
+	main.push("battle")
+	await _wait(3.0)
+	await _shot("battle_grudge_kui")
+	main.pop()
+	main.world.enter_layer("surface")
+	main.world.teleport(Atlas.to_world("sect", Vector2i(20, 9)), "surface")
+	# the journal keeps the six, where they stand and what became of them
+	main.open_menu()
+	main.menu.mode = "journal"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("grudges_journal")
+	main.pop()
+	# a grudge spent: what was it owed?  (Fang Hu stands with Lin Feng, so his son can answer him)
+	main.ask_grudge("grudge_iron_fang")
+	await _wait(0.6)
+	await _shot("grudge_choice")
+	main.choice.press("confirm")
+	await _wait(0.4)
+	while main.top_name() == "dialogue":
+		main.dialogue.idx = main.dialogue.lines.size() - 1
+		main.dialogue.shown = 999.0
+		main.press("confirm")
+		await _wait(0.2)
 	# Part XIV: Nie, the Unpaid, at the heart of the Wheel, the friends Lin Feng made striking with him
 	_fates_state("s_p14_nie", 55)
 	main.world.clear_cache()
 	main.world.load_area("wheel", Vector2i(70, 30))
 	var nb: Dictionary = Trials.path("nie", "bond").boon
-	main.battle.start([{"id": "nie", "lv": 56, "mult": 1.8, "atk": 1.2}], {"boss": true, "enemy": "nie", "theme": main.world.theme_name, "trial": "nie", "path": "bond", "boon": nb,
+	var nm: Array = Trials.TRIALS.nie.might
+	main.battle.start([{"id": "nie", "lv": 56, "mult": float(nm[0]), "atk": float(nm[1])}], {"boss": true, "enemy": "nie", "theme": main.world.theme_name, "trial": "nie", "path": "bond", "boon": nb,
 		"path_n": "By the bonds you made", "path_kind": str(Trials.KINDS.bond.n)})
 	main.push("battle")
 	await _wait(3.4)
@@ -881,8 +945,13 @@ func _fates_shots() -> void:
 	main.pop()
 
 func _ending_state() -> void:
-	Game.level = 54
+	Game.level = Data.MAX_LEVEL
 	Game.dao = "heart"
+	# the five people met on the road and the six grudges that stayed, as the bot leaves them
+	Game.fates = {"tala": "ally", "qiu_ye": "ally", "hu": "ally", "xu_lan": "redeemed", "liu_ying": "fallen"}
+	Game.grudges = {}
+	for gid in BOT.GRUDGE_PLAN:
+		Game.grudges[gid] = str(BOT.GRUDGE_PLAN[gid][0]) if gid != "grudge_marsh_hag" else "pay"
 	Game.trials = BOT.TRIAL_PLAN.duplicate()
 	Game.trials["chiyou"] = "peoples"
 	Game.gates_open = {}

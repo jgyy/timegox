@@ -65,6 +65,8 @@ const REST_LOOK := Vector3(1.56, 2.0, -5.4)
 
 var done := false
 var built := false
+## the hero's look and dress the lotus's model was built for (character creation, the wardrobe)
+var hero_sig := ""
 var groups := {}
 var shot_on := -1
 var hero: Node3D = null
@@ -120,6 +122,21 @@ func _on_show(v: bool) -> void:
 		t = 0.0
 		done = false
 		shot_on = -1
+		_refresh_hero()
+
+## The hero on the lotus as the player made him and dressed him: the world is built once, so a second
+## New Game (another name, another look) used to end with the first game's hero.
+func _refresh_hero() -> void:
+	var sig := "%s|%s" % [str(Game.hero), Game.outfit]
+	if not built or hero == null or sig == hero_sig:
+		return
+	var parent := hero.get_parent()
+	var xf := hero.transform
+	hero.queue_free()
+	hero = Models.hero()
+	hero.transform = xf
+	parent.add_child(hero)
+	hero_sig = sig
 
 func _build3d() -> void:
 	opaque = true
@@ -250,6 +267,7 @@ func _build_hero() -> void:
 	MB.mesh_node(lot, lg.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# (no pools of light underfoot: the lotus has its own glow)
 	hero = Models.hero()
+	hero_sig = "%s|%s" % [str(Game.hero), Game.outfit]
 	hero.position = Vector3(-0.38, 0.3, 0.12)
 	hero.rotation.y = 0.35
 	g.add_child(hero)
@@ -813,6 +831,8 @@ func _say(p: Vector2, s: String, size: int, col: Color, a: float, align: int = H
 	if a <= 0.0:
 		return
 	var f := UI.font()
+	# (the name the player chose, character creation)
+	s = UI.named(s)
 	draw_string(f, p + Vector2(1.5, 2.0), s, align, w, size, Color(0, 0, 0, 0.75 * a))
 	draw_string(f, p, s, align, w, size, Color(col.r, col.g, col.b, col.a * a))
 
@@ -927,7 +947,7 @@ func _results(a: float, slide: float) -> void:
 	var cx := r.position.x + r.size.x * 0.5
 	var y := r.position.y + 38.0
 	var n := smoothstep(tf + 0.3, tf + 2.0, t)
-	_caps(Vector2(cx, y), "THE ANNALS OF LIN FENG", 12, UI.C_GOLD.darkened(0.1), a, 3.5)
+	_caps(Vector2(cx, y), UI.named("The Annals of Lin Feng").to_upper(), 12, UI.C_GOLD.darkened(0.1), a, 3.5)
 	y += 32.0
 	_say(Vector2(x0, y), "Total play time", 14, UI.C_DIM, a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	y += 44.0
@@ -1017,6 +1037,9 @@ func _results(a: float, slide: float) -> void:
 			fallen += 1
 	y += 24.0
 	var fl := "Of the five he met on the road: %d stand with him%s" % [Fate.allies(Game), (", %d fallen" % fallen) if fallen > 0 else ""]
+	# and the grudges that stayed where their owners fell (grudges.gd)
+	if not Game.grudges.is_empty():
+		fl += ".  Of the six old grudges: %d laid to rest" % Grudges.settled(Game)
 	_say(Vector2(x0, y), fl, UI.fit(fl, 14, w), Trials.KINDS.bond.col, a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
 	_say(Vector2(x0, r.end.y - 18.0), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)

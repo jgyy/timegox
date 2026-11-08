@@ -257,11 +257,15 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	# the bestiary (lore.gd): every species met is remembered, and the first meeting with an ordinary
 	# one tells its story over the opening (there is time to read it)
 	lore_card = {}
+	var met := {}
 	for f in foes:
 		var fid: String = str(f.id)
 		if not Game.bestiary.has(fid) and not f.boss and lore_card.is_empty() and Lore.BEAST.has(fid):
 			lore_card = {"n": str(f.name), "text": str(Lore.BEAST[fid])}
-		Game.bestiary[fid] = int(Game.bestiary.get(fid, 0)) + 1
+		# (battles, not heads: a pack of three wolves is one battle with wolves)
+		if not met.has(fid):
+			met[fid] = true
+			Game.bestiary[fid] = int(Game.bestiary.get(fid, 0)) + 1
 	if not lore_card.is_empty():
 		timer = maxf(timer, LORE_INTRO)
 	order.clear()
@@ -678,7 +682,7 @@ func _open_skills() -> void:
 		var s: Dictionary = Data.SKILLS[sid]
 		if sid == "strike" or sid == "needle":
 			continue
-		labels.append("%s  [%d qi]" % [s.n, Game.skill_cost(sid)])
+		labels.append("%s\t%d qi" % [s.n, Game.skill_cost(sid)])
 		ids.append(sid)
 		enabled.append(cur.qi >= Game.skill_cost(sid))
 	if ids.is_empty():

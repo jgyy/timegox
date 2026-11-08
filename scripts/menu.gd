@@ -248,7 +248,11 @@ func _draw_fates() -> void:
 			if not lines.is_empty():
 				desc += "   " + " / ".join(lines.slice(maxi(0, lines.size() - 2)))
 		UI.wrapped(self, Vector2(r.position.x + 40, y + 24), desc, 14, UI.C_DIM.lightened(0.3), r.size.x - 70)
-		y += 112.0
+		y += 104.0
+	# Part XIV: the grudges that stayed (grudges.gd), once Judge Cui has shown them
+	if Game.reached(Grudges.STEP):
+		var gl := "The grudges that stayed: %d of 6 laid to rest, %d left to the Wheel" % [Grudges.settled(Game), Grudges.unpaid(Game)]
+		UI.text(self, Vector2(r.position.x + 24, r.end.y - 40), gl, 16, Trials.KINDS.bond.col)
 	UI.text(self, Vector2(r.position.x + 24, r.end.y - 16), "Esc back", 14, UI.C_DIM)
 
 ## Short names for the world map (the full names run to forty letters).
@@ -385,19 +389,19 @@ func _draw_dao() -> void:
 		var rc: Dictionary = Data.RACES[race]
 		if race != "human" and not Game.met.has(race):
 			continue
-		UI.text(self, r.position + Vector2(600, y2), str(rc.n), 17, UI.C_GOLD if race != "human" else UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 330)
-		UI.text(self, r.position + Vector2(940, y2), str(rc.home), 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 250)
-		y2 += 20.0
-		var line := "Honour the %s." % Data.DAOS[rc.dao].n
+		# the name and the standing on one row, the rest under it: eight peoples and the humans have to fit
+		# on the page (the Road of the Many Peoples asks for all eight; the eighth used to fall off it)
+		UI.text(self, r.position + Vector2(600, y2), str(rc.n), 16, UI.C_GOLD if race != "human" else UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 290)
+		var line := "%s.  Honour the %s." % [str(rc.home), Data.DAOS[rc.dao].n]
 		if race != "human":
 			var st: int = int(Game.standing.get(race, 0))
-			UI.bar(self, Rect2(r.position + Vector2(600, y2 - 9), Vector2(120, 8)), float(st) / float(Data.KIN), Color("8ae0c0"))
-			UI.text(self, r.position + Vector2(730, y2), Game.race_title(race), 13, UI.C_JADE)
+			UI.bar(self, Rect2(r.position + Vector2(900, y2 - 9), Vector2(110, 8)), float(st) / float(Data.KIN), Color("8ae0c0"))
+			UI.text(self, r.position + Vector2(1020, y2), Game.race_title(race), 13, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 170)
 			line += "  Love: %s." % Data.ITEMS[rc.gift].n
 			if Game.race_tier(race) >= 1:
-				line += "\nBoon: %s." % rc.boon_n
-			y2 += 18.0
-		y2 += _wrap_at(r.position + Vector2(600, y2), line, 12, UI.C_DIM.lightened(0.25), 590) + 12.0
+				line += "  Boon: %s." % rc.boon_n
+		y2 += 17.0
+		y2 += _wrap_at(r.position + Vector2(612, y2), line, 12, UI.C_DIM.lightened(0.25), 578) + 9.0
 	UI.text(self, Vector2(r.end.x - 200, r.end.y - 16), "Enter / Esc: back", 13, UI.C_DIM)
 
 ## Draw `s` wrapped to `width` with its first baseline at `p`; returns how far the next line moves down.
@@ -563,6 +567,17 @@ func _draw_journal() -> void:
 			UI.text(self, Vector2(x1, y2), "%s%s, %s" % [gn.substr(0, 1).to_upper(), gn.substr(1), MAP_NAMES.get(area, area)], 14, UI.C_JADE if open else (UI.C_GOLD if any_ok else UI.C_TEXT), HORIZONTAL_ALIGNMENT_LEFT, w1)
 			y2 += 17.0
 			UI.text(self, Vector2(x1 + 14, y2), "%s: %s" % [Data.ENEMIES[gid].n, st], 12, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, w1 - 14)
+			y2 += 22.0
+	elif s.get("kind", "") == "grudges":
+		# Part XIV: the grudges that stayed (grudges.gd), where each stands and what became of it
+		y2 += _wrap_at(Vector2(x1, y2), "Each stands where its owner fell. It will fight first; then ask what it was owed. Every one laid to rest takes something off Nie, every one left to the Wheel feeds it.", 13, UI.C_DIM.lightened(0.2), w1) + 10.0
+		var how := {"eased": "laid to rest", "paid": "paid", "unpaid": "left to the Wheel"}
+		for gid2 in Grudges.ORDER:
+			var gs := Grudges.state(Game, gid2)
+			var ga2 := Trials.boss_area(gid2)
+			UI.text(self, Vector2(x1, y2), "%s, %s" % [Data.ENEMIES[gid2].n, MAP_NAMES.get(ga2, ga2)], 14, (UI.C_JADE if gs in Grudges.SETTLED else UI.C_RED.lightened(0.3)) if gs != "" else UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, w1)
+			y2 += 17.0
+			UI.text(self, Vector2(x1 + 14, y2), str(how.get(gs, "still waiting")), 12, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, w1 - 14)
 			y2 += 22.0
 	else:
 		var nx := ""

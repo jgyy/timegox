@@ -86,6 +86,13 @@ const FATE_PLAN := {
 }
 ## the small choices of the road (fate.gd PICKS)
 const PICK_PLAN := {"qilin": "ride"}
+## Part XIV, the grudges that stayed (grudges.gd): the order the bot goes to them in (a round trip from
+## the Wheel: the old roads near the sect, up the Jianmu, out to sea), and what it answers each, in order
+## of preference: a friend answers where one can, else it pays, and it leaves the Admiral to the Wheel
+## so that one run sees a grudge feed Nie.
+const GRUDGE_ROUTE := ["grudge_headless_saint", "grudge_iron_fang", "grudge_marsh_hag", "grudge_fangfeng", "grudge_kui", "grudge_admiral"]
+const GRUDGE_PLAN := {"grudge_iron_fang": ["son", "test"], "grudge_marsh_hag": ["name", "pay"], "grudge_headless_saint": ["bow", "tablet"],
+	"grudge_fangfeng": ["ask", "shrine"], "grudge_kui": ["home", "unstring"], "grudge_admiral": ["wheel"]}
 const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
@@ -336,6 +343,11 @@ func _cult_target() -> Dictionary:
 			for b2 in Data.AREAS.get(Trials.boss_area(ng), {}).get("bosses", []):
 				if b2.id == ng:
 					tg = {"lv": b2.req, "full": false}
+		"grudges":
+			var ngr := _next_grudge()
+			for b3 in Data.AREAS.get(Trials.boss_area(ngr), {}).get("bosses", []):
+				if b3.id == ngr:
+					tg = {"lv": b3.req, "full": false}
 		"breakthrough":
 			return {"lv": s.to - 1, "full": true}
 	if tg.is_empty():
@@ -484,6 +496,17 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			elif vt != "":
 				_goto_entity(Trials.npc_area(vt), vt)
+		"grudges":
+			# Part XIV: the next of the grudges that stayed (all six, in any order), each a boss
+			var gr := _next_grudge()
+			if gr == "":
+				return
+			if not _cult_met():
+				_grind()
+			elif _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity(Trials.boss_area(gr), "boss_" + gr)
 		"gates":
 			# Part XIII: the next of the Eight Gates (any four, in any order)
 			var g := _next_gate()
@@ -774,6 +797,16 @@ func _choice() -> void:
 		if str(c.title) == str(Fate.PICKS[pk].ask):
 			_nav(ids.size(), c.cursor, ids.find(PICK_PLAN[pk]))
 			return
+	for gid in GRUDGE_PLAN:
+		if str(c.title) == str(Grudges.GRUDGES[gid].ask):
+			# a grudge that stayed, spent: the answer the plan prefers that can be given
+			want = -1
+			for oid in GRUDGE_PLAN[gid]:
+				var k: int = ids.find(oid)
+				if want < 0 and k >= 0 and c.options[k].get("enabled", true):
+					want = k
+			_nav(ids.size(), c.cursor, want if want >= 0 else ids.find("wheel"))
+			return
 	if not st.is_empty() and (st.kind == "fate" or st.kind == "fates") and not str(c.title).ends_with("how will you face it?"):
 		_nav(ids.size(), c.cursor, _fate_pick(c, ids))
 		return
@@ -817,6 +850,13 @@ func _trial_target() -> Dictionary:
 		return tt_cache
 	tt_cache = {"tid": tid, "pid": _path_for(tid), "area": Trials.boss_area(tid)}
 	return tt_cache
+
+## The next of the grudges that stayed (Part XIV) on the bot's round, "" once all six are answered.
+func _next_grudge() -> String:
+	for gid in GRUDGE_ROUTE:
+		if not Game.grudges.has(gid):
+			return gid
+	return ""
 
 ## The next of the Eight Gates: the planned ones in order, then any a way is open through.
 func _next_gate() -> String:

@@ -164,17 +164,17 @@ const OUTFIT_ORDER := ["sweeper", "inner", "hunter", "dragon", "phoenix", "celes
 ## `model` what Models.ride builds; `speed` how much faster than running; `seat` where the rider's
 ## hips go and `pillion` Yue Ling's (mount space, the model's scale included); `how` how it is earned.
 const RIDES := {
-	"pony": {"n": "Mountain Horse", "kind": "mount", "model": "horse", "speed": 1.2, "seat": Vector3(0, 1.32, 0.02), "pillion": Vector3(0, 1.34, -0.4), "scale": 1.0,
+	"pony": {"n": "Mountain Horse", "kind": "mount", "model": "horse", "speed": 1.15, "seat": Vector3(0, 1.32, 0.02), "pillion": Vector3(0, 1.34, -0.4), "scale": 1.0,
 		"desc": "A dun steppe horse with a black mane and a temper, bred by the horse-folk who winter below Thunder Valley. She bites everyone but you. Mostly.", "how": "Tala of the horse-folk, if you find her herd."},
-	"sword": {"n": "Flying Sword", "kind": "vehicle", "model": "sword", "speed": 1.3, "seat": Vector3(0, 0.78, 0.25), "pillion": Vector3(0, 0.78, -0.6), "scale": 1.0,
+	"sword": {"n": "Flying Sword", "kind": "vehicle", "model": "sword", "speed": 1.25, "seat": Vector3(0, 0.78, 0.25), "pillion": Vector3(0, 0.78, -0.6), "scale": 1.0,
 		"desc": "His own jian, grown three paces long under his qi, carrying him a hand's breadth above the road. The first thing every Golden Core learns, and the last thing any of them forgets.", "how": "The Elder teaches you to ride your sword at Golden Core.", "step": "s_elder3"},
-	"qilin": {"n": "Azure Qilin", "kind": "mount", "model": "qilin", "speed": 1.4, "seat": Vector3(0, 1.36, 0.0), "pillion": Vector3(0, 1.36, -0.42), "scale": 1.22,
+	"qilin": {"n": "Azure Qilin", "kind": "mount", "model": "qilin", "speed": 1.3, "seat": Vector3(0, 1.36, 0.0), "pillion": Vector3(0, 1.36, -0.42), "scale": 1.22,
 		"desc": "The Azure Qilin of the Celestial Gate, calm now, who chose to carry the one who calmed it. Its hooves do not quite touch the ground, and no flower it steps on ever bends.", "how": "The Azure Qilin, if you let it choose to carry you.", "pick": ["qilin", "ride"]},
-	"cloud": {"n": "Auspicious Cloud", "kind": "vehicle", "model": "cloud", "speed": 1.45, "seat": Vector3(0, 0.62, 0.2), "pillion": Vector3(0, 0.62, -0.55), "scale": 1.0,
+	"cloud": {"n": "Auspicious Cloud", "kind": "vehicle", "model": "cloud", "speed": 1.35, "seat": Vector3(0, 0.62, 0.2), "pillion": Vector3(0, 0.62, -0.55), "scale": 1.0,
 		"desc": "A five-coloured cloud that comes when an immortal whistles for it. It smells of rain and peaches, and it sulks if you leave it waiting.", "how": "Every True Immortal's first cloud comes to them at the ascension.", "step": "s_break8"},
-	"tiger": {"n": "White Tiger of the West", "kind": "mount", "model": "tiger", "speed": 1.5, "seat": Vector3(0, 1.3, -0.08), "pillion": Vector3(0, 1.3, -0.5), "scale": 1.45,
+	"tiger": {"n": "White Tiger of the West", "kind": "mount", "model": "tiger", "speed": 1.4, "seat": Vector3(0, 1.3, -0.08), "pillion": Vector3(0, 1.3, -0.5), "scale": 1.45,
 		"desc": "A cub of Bai Hu's own litter, grown in a season to the size of a horse, white as the moon on sand. It purrs like a landslide and is afraid of moths.", "how": "Bai Hu's cub follows you out of the Desert of Fallen Stars.", "step": "s_du_tiger"},
-	"barque": {"n": "Sky-Barque of Landfall", "kind": "vehicle", "model": "barque", "speed": 1.6, "seat": Vector3(0, 0.9, 0.5), "pillion": Vector3(0, 0.9, -0.5), "scale": 1.0,
+	"barque": {"n": "Sky-Barque of Landfall", "kind": "vehicle", "model": "barque", "speed": 1.45, "seat": Vector3(0, 0.9, 0.5), "pillion": Vector3(0, 0.9, -0.5), "scale": 1.0,
 		"desc": "The first keel Landfall laid in two thousand years, finished with Yumin feathers for a sail and Mazu's blessing on the bow, so that it sails on the wind over the land as well as on the sea.", "how": "Built for you by the Thousand Children when the sea comes home.", "step": "s_p12_end"},
 }
 const RIDE_ORDER := ["pony", "sword", "qilin", "cloud", "tiger", "barque"]

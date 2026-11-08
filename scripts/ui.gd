@@ -112,7 +112,22 @@ static func menu_list(ci: CanvasItem, r: Rect2, labels: Array, cursor: int, enab
 		if i == cursor:
 			Gfx.cursor_glow(ci, Rect2(r.position.x + 8, y - size, r.size.x - 16, size + 8), Time.get_ticks_msec() / 1000.0)
 			text(ci, Vector2(r.position.x + 14, y), "> ", size, C_GOLD)
-		text(ci, Vector2(r.position.x + 38, y), str(labels[i]), size, col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		var lab := str(labels[i])
+		var tab := lab.find("\t")
+		if tab >= 0:
+			# a label with a value in a column of its own ("Nine Heavens Thunder\t22 qi"): the value
+			# right-aligned and always whole, the name made smaller to fit beside it (it used to be cut
+			# off at the panel's edge, taking the cost with it)
+			var right := lab.substr(tab + 1)
+			var left := lab.substr(0, tab)
+			var rs := maxi(11, size - 3)
+			var rw := font().get_string_size(right, HORIZONTAL_ALIGNMENT_LEFT, -1, rs).x
+			# (clear of the scroll arrows at the panel's right edge)
+			var lw := r.size.x - 48.0 - rw - 30.0
+			text(ci, Vector2(r.position.x + 38, y), left, fit(left, size, lw, 11), col, HORIZONTAL_ALIGNMENT_LEFT, lw)
+			text(ci, Vector2(r.position.x + r.size.x - 30.0 - rw, y), right, rs, C_GOLD.darkened(0.15) if on else C_DIM)
+		else:
+			text(ci, Vector2(r.position.x + 38, y), lab, size, col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
 		y += step
 	# scroll hints
 	if first > 0:
