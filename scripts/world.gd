@@ -897,6 +897,8 @@ func _use_step() -> void:
 func _use_begin() -> void:
 	var k: Dictionary = using.k
 	var clip := str(k.clip)
+	# (a gesture still going from before would play over the clip: it ends here)
+	player.set_meta("act", "")
 	if Props.ONCE.has(clip):
 		Models.act(player, clip, t)
 	if headless():
@@ -934,6 +936,8 @@ func _use_clear() -> void:
 		(sn as Node).queue_free()
 	comp_pos = player.position if not Game.companion else comp.position
 	player.rotation.x = 0.0
+	# and a gesture for it that is still going ends with it (only when he is hurried on)
+	player.set_meta("act", "")
 	using = {}
 
 ## The thing in the hero's hand (Props.held), on his right hand bone; null if the model has no
