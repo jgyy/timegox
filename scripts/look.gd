@@ -102,6 +102,17 @@ const THEMES := {
 		"sky_top": Color("6a7a98"), "sky_hor": Color("e8c8a0"), "fog": Color("c8a888"), "fog_d": 0.017, "sun": Color("ffe0b8"), "sun_e": 1.0, "amb": Color("a89078"), "amb_e": 0.85, "weather": "sparks", "tree": "furnace", "decor": "ingot"},
 	"buzhou": {"g1": Color("4a5658"), "g2": Color("56625e"), "path": Color("9aa0a0"), "wall": Color("2a3438"), "water": Color("1e2e40"), "bg": Color("06080c"),
 		"sky_top": Color("1a2438"), "sky_hor": Color("6a7890"), "fog": Color("5a6878"), "fog_d": 0.022, "sun": Color("d0d8e8"), "sun_e": 0.8, "amb": Color("6a7888"), "amb_e": 0.8, "weather": "rain", "tree": "crag", "decor": "pebble"},
+	# ---- Part XI: the bright high air of the Level Heaven over a sea of cloud, the violet-and-gold
+	# dusk at the Gate of Heaven, the teal glow of the caverns under the roots (lit red from the east
+	# by the Torch Dragon's eye) and the ghost-fire of the Dark Capital
+	"juntian": {"g1": Color("8ac0a0"), "g2": Color("9ad0b0"), "path": Color("f4ecd8"), "wall": Color("5a9a80"), "water": Color("d8ecff"), "bg": Color("142848"),
+		"sky_top": Color("2a68d8"), "sky_hor": Color("f4f8ff"), "fog": Color("e4ecf8"), "fog_d": 0.01, "sun": Color("fffaf0"), "sun_e": 1.2, "amb": Color("c0d4f0"), "amb_e": 0.9, "weather": "clouds", "tree": "floatisle", "decor": "cloudpuff"},
+	"changhe": {"g1": Color("a8a0c8"), "g2": Color("b8b0d4"), "path": Color("f4e4b8"), "wall": Color("8a7ab8"), "water": Color("e0d8ff"), "bg": Color("1a1430"),
+		"sky_top": Color("4a3a98"), "sky_hor": Color("ffd8a0"), "fog": Color("e8d0d8"), "fog_d": 0.012, "sun": Color("fff0c8"), "sun_e": 1.05, "amb": Color("c8b8e0"), "amb_e": 0.85, "weather": "light", "tree": "jadepillar", "decor": "cloudpuff"},
+	"ninesprings": {"g1": Color("2a4a48"), "g2": Color("325450"), "path": Color("6a8a80"), "wall": Color("1a3a38"), "water": Color("1a4a5a"), "bg": Color("020808"),
+		"sky_top": Color("040a0c"), "sky_hor": Color("1a3a3a"), "fog": Color("143032"), "fog_d": 0.022, "sun": Color("ffa070"), "sun_e": 0.8, "amb": Color("5a8a88"), "amb_e": 0.85, "weather": "spores", "tree": "glowcap", "decor": "sporecap"},
+	"youdu": {"g1": Color("2e3240"), "g2": Color("363a4a"), "path": Color("7a7e90"), "wall": Color("22263a"), "water": Color("3a6aa8"), "bg": Color("030308"),
+		"sky_top": Color("05050c"), "sky_hor": Color("1e2440"), "fog": Color("1a1e30"), "fog_d": 0.02, "sun": Color("a0b0ff"), "sun_e": 0.75, "amb": Color("6a74a0"), "amb_e": 0.8, "weather": "ghostfire", "tree": "ghostpagoda", "decor": "ghostcandle"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -151,6 +162,10 @@ const EXTRA := {
 	"drowned": {"hill": 0.25, "tex": "mud", "tuft": "reed", "horizon": "hills", "clouds": 0.9, "haze": 0.5},
 	"tushan": {"hill": 1.2, "tex": "rock", "tuft": "grass", "horizon": "peaks", "clouds": 0.5, "haze": 0.5, "rays": 0.4},
 	"buzhou": {"hill": 1.0, "tex": "rock", "tuft": "pebble", "horizon": "crags", "clouds": 0.95, "haze": 0.4},
+	"juntian": {"hill": 0.5, "tex": "grass", "tuft": "grass", "horizon": "islands", "clouds": 0.75, "rays": 0.5, "sun_pitch": -52.0},
+	"changhe": {"hill": 0.45, "tex": "marble", "tuft": "flowers", "horizon": "palace", "clouds": 0.6, "stars": 0.4, "rays": 0.6, "sun_pitch": -24.0, "sun_yaw": -70.0},
+	"ninesprings": {"hill": 0.6, "tex": "moss", "tuft": "moss", "horizon": "mushrooms", "clouds": 0.0, "stars": 0.8, "haze": 0.6, "sun_pitch": -30.0, "sun_yaw": 90.0},
+	"youdu": {"hill": 0.35, "tex": "underworld", "tuft": "crystal", "horizon": "towers", "clouds": 0.0, "stars": 0.5, "haze": 0.5},
 }
 
 const PICKUP_COLORS := {
@@ -163,6 +178,9 @@ const PICKUP_COLORS := {
 	"river_star": Color("fff4c0"), "magpie_plume": Color("e8f0ff"), "star_thread": Color("c8d0ff"), "kunlun_peach": Color("ffa8b8"), "magpie_badge": Color("2a2a3a"),
 	"noon_ember": Color("ff9a30"), "rain_stone": Color("8ab8e8"), "sun_feather": Color("ffd040"), "osmanthus": Color("ffd070"), "tenth_arrow": Color("c8a878"),
 	"carp_scale": Color("ffc840"), "xirang": Color("c8a060"), "cauldron_shard": Color("d89a4a"), "pillar_stone": Color("8a9ab8"), "river_tablet": Color("a8c0a0"), "cauldron_map": Color("d8b070"),
+	"wind_bell": Color("c8e0ff"), "gate_key": Color("f0d070"), "spring_water": Color("70e8f0"), "soul_tally": Color("c8b8e8"),
+	"heaven_tablet": Color("b0f0d0"), "earth_weight": Color("8a7a6a"),
+	"wutong_seed": Color("c8a050"), "night_pearl": Color("e8f8ff"), "peach_wine": Color("ffa0b8"), "moon_lotus": Color("f0e8ff"), "autumn_leaf": Color("e85a2a"), "ancestor_incense": Color("d8c090"), "stones": Color("90ffd0"),
 }
 
 static var _anime := {}
@@ -390,6 +408,28 @@ static func environment(name: String, fog_scale: float = 1.0) -> Environment:
 	env.adjustment_saturation = 1.08
 	env.adjustment_contrast = 1.12
 	env.adjustment_brightness = 1.0
+	return env
+
+## The air in a cellar (Part XI): dark, close and warm, lit only by lanterns; no sky.
+static func cellar_environment() -> Environment:
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.015, 0.012, 0.01)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.85, 0.7, 0.55)
+	env.ambient_light_energy = 0.55
+	env.fog_enabled = true
+	env.fog_light_color = Color(0.06, 0.045, 0.035)
+	env.fog_density = 0.02
+	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.tonemap_exposure = 1.1
+	env.glow_enabled = true
+	env.glow_intensity = 0.5
+	env.glow_hdr_threshold = 1.0
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_ADDITIVE
+	env.adjustment_enabled = true
+	env.adjustment_saturation = 1.05
+	env.adjustment_contrast = 1.1
 	return env
 
 ## Re-tint an existing environment (title and meditation screens use custom skies).

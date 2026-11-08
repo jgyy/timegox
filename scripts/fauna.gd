@@ -54,6 +54,10 @@ const KINDS := {
 	"drowned": [["cranes", 3], ["fish", 3], ["dragonflies", 3], ["birds", 1]],
 	"tushan": [["birds", 2], ["bats", 1]],
 	"buzhou": [["birds", 1], ["bats", 1]],
+	"juntian": [["cranes", 3], ["birds", 3]],
+	"changhe": [["cranes", 2], ["butterflies", 2]],
+	"ninesprings": [["moths", 3], ["bats", 2], ["fish", 2]],
+	"youdu": [["bats", 2], ["moths", 2]],
 }
 
 const FLAP := """

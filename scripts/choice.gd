@@ -1,0 +1,79 @@
+extends ScreenBase
+## A choice laid over the world (Part XI): which Dao to walk (when the Jianmu grows back, and at any
+## Dao Stele), and whether to give a keepsake to one of the peoples of the realms.  A list of options
+## on the left, the one under the cursor described on the right.
+
+const VIEW := Vector2(1280, 720)
+
+var title := ""
+## [{"id", "label", "sub" (a short line under the title), "desc", "note" (e.g. a mastery rank), "col",
+## "enabled"}, ...]
+var options: Array = []
+var cursor := 0
+var cancel_ok := true
+var cb: Callable = Callable()
+
+func start(t: String, opts: Array, callback: Callable, can_cancel: bool = true) -> void:
+	title = t
+	options = opts
+	cb = callback
+	cancel_ok = can_cancel
+	cursor = 0
+	for i in options.size():
+		if options[i].get("current", false):
+			cursor = i
+
+func ids() -> Array:
+	return options.map(func(o): return o.id)
+
+func press(act: String) -> void:
+	if options.is_empty():
+		return
+	match act:
+		"up":
+			cursor = (cursor - 1 + options.size()) % options.size()
+		"down":
+			cursor = (cursor + 1) % options.size()
+		"cancel":
+			if cancel_ok:
+				_done("")
+		"confirm":
+			if options[cursor].get("enabled", true):
+				_done(str(options[cursor].id))
+
+func _done(id: String) -> void:
+	main.pop()
+	if cb.is_valid():
+		cb.call(id)
+
+func _process(d: float) -> void:
+	t += d
+	redraw()
+
+func _draw() -> void:
+	if options.is_empty():
+		return
+	# dark enough that the world HUD under it does not show through behind the title
+	draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0.02, 0.03, 0.06, 0.8))
+	UI.text(self, Vector2(60, 76), title, 24, UI.C_GOLD)
+	var labels: Array = []
+	var enabled: Array = []
+	for o in options:
+		var lb := str(o.label)
+		if str(o.get("note", "")) != "":
+			lb += "  (%s)" % o.note
+		labels.append(lb)
+		enabled.append(o.get("enabled", true))
+	UI.menu_list(self, Rect2(40, 92, 470, mini(600, 40 + options.size() * 46)), labels, cursor, enabled, 20)
+	var o: Dictionary = options[cursor]
+	var r := Rect2(530, 92, 710, 420)
+	UI.panel(self, r)
+	var col: Color = o.get("col", UI.C_GOLD)
+	draw_rect(Rect2(r.position + Vector2(18, 20), Vector2(6, 40)), col)
+	UI.text(self, r.position + Vector2(36, 50), str(o.label), 26, col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 60)
+	var y := 96.0
+	if str(o.get("sub", "")) != "":
+		UI.wrapped(self, r.position + Vector2(36, y), "\"%s\"" % o.sub, 18, UI.C_TEXT, r.size.x - 64)
+		y += 74.0
+	UI.wrapped(self, r.position + Vector2(36, y), str(o.get("desc", "")), 17, UI.C_DIM.lightened(0.35), r.size.x - 64)
+	UI.text(self, Vector2(530, 540), "Up/Down choose   Enter confirm" + ("   Esc back" if cancel_ok else ""), 15, UI.C_DIM)

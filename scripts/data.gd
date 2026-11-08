@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 45
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness"]
+const MAX_LEVEL := 48
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -59,6 +59,17 @@ const SKILLS := {
 	"dragongate": {"n": "Dragon Gate Leap", "cost": 420, "mult": 46.5, "elem": "thunder", "tgt": "one", "lv": 42, "who": 0},
 	"swelling": {"n": "Swelling Earth Rampart", "cost": 345, "mult": 8.2, "elem": "earth", "tgt": "all", "lv": 43, "who": 0},
 	"cauldron": {"n": "Nine Cauldrons Sword", "cost": 450, "mult": 51.0, "elem": "earth", "tgt": "one", "lv": 44, "who": 0, "after": "s_ts_return"},
+	# ---- Part XI
+	"standing_tree": {"n": "Strike of the Standing Tree", "cost": 470, "mult": 55.0, "elem": "wood", "tgt": "one", "lv": 45, "who": 0},
+	"springs_torrent": {"n": "Torrent of the Nine Springs", "cost": 380, "mult": 9.2, "elem": "water", "tgt": "all", "lv": 46, "who": 0},
+	"concord": {"n": "Three Realms Concord Sword", "cost": 500, "mult": 60.0, "elem": "thunder", "tgt": "one", "lv": 47, "who": 0, "after": "s_yd_houtu"},
+	# the Dao techniques (Part XI): each Dao teaches one once its walker is an Adept (see DAOS)
+	"myriad_swords": {"n": "Ten Thousand Swords Return to One", "cost": 440, "mult": 54.0, "elem": "phys", "tgt": "one", "lv": 45, "who": 0, "dao": "sword"},
+	"peng_wind": {"n": "Peng's Wind of Ninety Thousand Li", "cost": 350, "mult": 9.0, "elem": "wood", "tgt": "all", "lv": 45, "who": 0, "dao": "wander"},
+	"lotus_heart": {"n": "Lotus Heart Sutra", "cost": 160, "heal": 0.8, "elem": "water", "tgt": "allies", "lv": 45, "who": 0, "dao": "heart", "revive": true},
+	"bagua_array": {"n": "Eight Trigrams Grand Array", "cost": 340, "mult": 8.8, "elem": "earth", "tgt": "all", "lv": 45, "who": 0, "dao": "formation"},
+	"nine_turn": {"n": "Nine-Turn Golden Elixir Fire", "cost": 330, "mult": 8.6, "elem": "fire", "tgt": "all", "lv": 45, "who": 0, "dao": "alchemy"},
+	"mirror_moon": {"n": "Mirror-Flower, Water-Moon", "cost": 420, "mult": 52.0, "elem": "dark", "tgt": "one", "lv": 45, "who": 0, "dao": "illusion"},
 	"needle": {"n": "Jade Needle", "cost": 0, "mult": 1.0, "elem": "wood", "tgt": "one", "lv": 0, "who": 1},
 	"rain": {"n": "Spring Rain", "cost": 16, "heal": 0.35, "elem": "water", "tgt": "allies", "lv": 0, "who": 1},
 	"lotus_burst": {"n": "Lotus Burst", "cost": 22, "mult": 1.4, "elem": "water", "tgt": "all", "lv": 4, "who": 1},
@@ -76,6 +87,8 @@ const SKILLS := {
 	"moon_dew": {"n": "Moon-Dew Ward", "cost": 125, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 40, "who": 1, "revive": true},
 	"reed_boat": {"n": "Reed-Boat Blossom", "cost": 115, "mult": 6.6, "elem": "wood", "tgt": "all", "lv": 42, "who": 1},
 	"river_mother": {"n": "River-Mother's Ward", "cost": 135, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 43, "who": 1, "revive": true},
+	"feather_rain": {"n": "Rain of Phoenix Feathers", "cost": 125, "mult": 7.2, "elem": "wood", "tgt": "all", "lv": 45, "who": 1},
+	"jianmu_ward": {"n": "Ward of the Standing Tree", "cost": 145, "heal": 1.0, "elem": "water", "tgt": "allies", "lv": 46, "who": 1, "revive": true},
 	"thread": {"n": "Five-Colour Thread", "cost": 60, "mult": 3.2, "elem": "earth", "tgt": "all", "lv": 27, "who": 1},
 }
 
@@ -83,6 +96,9 @@ static func known_skills(who: int, level: int, step: int = 1 << 20) -> Array:
 	var out := []
 	for id in SKILLS:
 		var s = SKILLS[id]
+		# (a Dao's technique comes from walking that Dao: Game.dao_skills)
+		if s.has("dao"):
+			continue
 		if s.who == who and s.lv <= level:
 			if s.has("after") and step <= step_index(s.after):
 				continue
@@ -405,6 +421,36 @@ const ENEMIES := {
 	"tushan_fox": {"n": "The White Nine-Tailed Fox of Tushan", "elem": "wood", "weak": "fire", "col": Color("f4f0e8"), "shape": "fox", "boss": true, "pal": {"acc": Color("ff8a40")}},
 	"kuafu": {"n": "Kuafu, Who Drank the Rivers Dry", "elem": "fire", "weak": "water", "col": Color("a86a4a"), "shape": "ape", "boss": true},
 	"gonggong": {"n": "Gonggong, God of the Flood", "elem": "water", "weak": "earth", "col": Color("1a2a4a"), "shape": "dragon", "boss": true, "pal": {"sec": Color("c83020"), "acc": Color("ff6040")}},
+	# ---- Part XI: The Ladder of Heaven (the Nine Heavens above the clouds, the Nine Springs below
+	# the roots)
+	"cloud_kite": {"n": "Cloud Kite", "elem": "wood", "weak": "thunder", "col": Color("d8e8f8"), "shape": "bird"},
+	"thunder_mote": {"n": "Loose Thunder-Mote", "elem": "thunder", "weak": "earth", "col": Color("f0e070"), "shape": "wisp"},
+	"rain_serpent": {"n": "Rain Serpent Without a Ledger", "elem": "water", "weak": "earth", "col": Color("5a9ac8"), "shape": "serpent"},
+	"gate_lion": {"n": "Gilded Gate-Lion", "elem": "earth", "weak": "wood", "col": Color("d8b050"), "shape": "tiger"},
+	"fox_wisp": {"n": "Foxfire Wisp", "elem": "fire", "weak": "water", "col": Color("7ab0ff"), "shape": "wisp"},
+	"cloud_soldier": {"n": "Cloud-Armour Soldier Still at His Post", "elem": "phys", "weak": "thunder", "col": Color("b8c0d8"), "shape": "humanoid"},
+	"root_worm": {"n": "Root-Gnawer Worm", "elem": "earth", "weak": "wood", "col": Color("8a6a4a"), "shape": "serpent"},
+	"blindfish": {"n": "Blind Carp of the Black Water", "elem": "water", "weak": "thunder", "col": Color("c8d0d8"), "shape": "carp"},
+	"glow_crab": {"n": "Glow-Shell Cave Crab", "elem": "water", "weak": "earth", "col": Color("3ab0a0"), "shape": "crab"},
+	"ghost_soldier": {"n": "Ghost Soldier of Youdu", "elem": "dark", "weak": "fire", "col": Color("5a6a7a"), "shape": "humanoid"},
+	"paper_horse": {"n": "Paper Horse Who Ran Away", "elem": "wood", "weak": "fire", "col": Color("f0e8d8"), "shape": "qilin"},
+	"lantern_shade": {"n": "Lantern Shade", "elem": "fire", "weak": "water", "col": Color("8ab0d8"), "shape": "wraith"},
+	"feilian": {"n": "Feilian, Earl of the Wind", "elem": "wood", "weak": "thunder", "col": Color("c8a868"), "shape": "qilin", "boss": true, "pal": {"mark": Color("4a3a2a"), "acc": Color("80f0c0")}},
+	"kui": {"n": "Kui, the One-Legged Thunder Ox", "elem": "thunder", "weak": "earth", "col": Color("7a8898"), "shape": "mammoth", "boss": true, "pal": {"acc": Color("fff070")}},
+	"jiufeng": {"n": "Jiufeng, the Nine-Headed Phoenix", "elem": "fire", "weak": "water", "col": Color("e05a3a"), "shape": "phoenix", "boss": true, "pal": {"sec": Color("f0c040")}},
+	"leigong": {"n": "Leigong, Duke of Thunder", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "crowmarshal", "boss": true, "pal": {"acc": Color("fff080")}},
+	"pixiu": {"n": "Pixiu, Who Ate the Gold of the Gate", "elem": "earth", "weak": "wood", "col": Color("e0b848"), "shape": "tiger", "boss": true, "pal": {"mark": Color("8a5a1a"), "acc": Color("60e0ff")}},
+	"shentu": {"n": "Shentu, Door God of the Peach Tree", "elem": "phys", "weak": "thunder", "col": Color("b83a2a"), "shape": "demon", "boss": true},
+	"yulei": {"n": "Yulei, Door God of the Reed Rope", "elem": "phys", "weak": "fire", "col": Color("2a5a4a"), "shape": "warden", "boss": true},
+	"chong": {"n": "Chong, Who Lifts Heaven", "elem": "thunder", "weak": "earth", "col": Color("6a88c8"), "shape": "humanoid", "boss": true, "pal": {"sec": Color("e8c860"), "acc": Color("fff4c0")}},
+	"root_wyrm": {"n": "The Wyrm Who Gnaws the Jianmu", "elem": "earth", "weak": "wood", "col": Color("6a5a3a"), "shape": "serpent", "boss": true, "pal": {"acc": Color("c8f060")}},
+	"wangxiang": {"n": "Wangxiang, Goblin of the Springs", "elem": "water", "weak": "thunder", "col": Color("3a6a6a"), "shape": "ape", "boss": true, "pal": {"acc": Color("ff4030")}},
+	"pearl_mother": {"n": "The Weeping Pearl-Mother", "elem": "water", "weak": "earth", "col": Color("d8e0f0"), "shape": "jelly", "boss": true},
+	"zhulong": {"n": "Zhulong, the Torch Dragon", "elem": "fire", "weak": "water", "col": Color("c83a2a"), "shape": "dragon", "boss": true, "pal": {"under": Color("f0d0a0"), "acc": Color("fff080")}},
+	"bai_wuchang": {"n": "Bai Wuchang, White Impermanence", "elem": "dark", "weak": "fire", "col": Color("e8ecf0"), "shape": "jiangshi", "boss": true, "pal": {"acc": Color("ff5050")}},
+	"hei_wuchang": {"n": "Hei Wuchang, Black Impermanence", "elem": "dark", "weak": "fire", "col": Color("2a2a34"), "shape": "jiangshi", "boss": true, "pal": {"acc": Color("e0e0ff")}},
+	"tubo": {"n": "Tubo, Earl of the Dark Capital", "elem": "earth", "weak": "wood", "col": Color("5a3a2a"), "shape": "oxhead", "boss": true, "pal": {"acc": Color("ff3020")}},
+	"li": {"n": "Li, Who Presses Down the Earth", "elem": "earth", "weak": "wood", "col": Color("5a4a40"), "shape": "golem", "boss": true, "pal": {"acc": Color("ff7a30")}},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
 }
 
@@ -470,7 +516,10 @@ const AREAS := {
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 4), "col": Color("e8e8ff")},
 			{"id": "alchemist", "n": "Alchemist Mo", "pos": Vector2i(7, 8), "col": Color("6fc08a")},
 			{"id": "smith", "n": "Smith Tie", "pos": Vector2i(32, 8), "col": Color("d08a5a")},
-			{"id": "archivist", "n": "Archivist Lan", "pos": Vector2i(33, 18), "col": Color("a8b8e0")},
+			{"id": "archivist", "n": "Archivist Lan", "pos": Vector2i(33, 18), "col": Color("a8b8e0"), "hide": ["s_p11_archive", "s_p11_archive"]},
+			# Part XI: Archivist Lan down in the Sealed Archive under the library, reading the record of the
+			# day the ladder between heaven and earth was cut
+			{"id": "archivist_deep", "asset": "archivist", "n": "Archivist Lan", "pos": Vector2i(33, 18), "col": Color("a8b8e0"), "vis": ["s_p11_archive", "s_p11_archive"], "floor": ["library", -1]},
 			# the sect's own people: sparring master, pond keeper, cook, the new sweeper, gate warden
 			# and bell-ringer
 			{"id": "disciple_han", "n": "Senior Brother Han", "pos": Vector2i(31, 3), "col": Color("3a6aa0")},
@@ -481,22 +530,32 @@ const AREAS := {
 			{"id": "bell_shen", "n": "Old Shen the Bell-Ringer", "pos": Vector2i(24, 10), "col": Color("b8803a")},
 		],
 		"springs": [Vector2i(20, 13)],
-		## enterable buildings: rect includes the walls; props are [kind, tile, blocks]
+		# Part XI: the Dao Stele in the courtyard, where a cultivator chooses the road they walk
+		"steles": [Vector2i(16, 11)],
+		# things to find upstairs and below: keepsakes the peoples of the other realms are fond of
+		"pickups": [{"id": "cur_incense1", "item": "ancestor_incense", "pos": Vector2i(22, 4), "floor": ["hall", -1], "always": true},
+			{"id": "cur_leaf1", "item": "autumn_leaf", "pos": Vector2i(30, 16), "floor": ["library", -1], "always": true},
+			{"id": "cur_lotus1", "item": "moon_lotus", "pos": Vector2i(9, 19), "floor": ["dormitory", 1], "always": true}],
+		## enterable buildings: rect includes the walls; props are [kind, tile, blocks].  "up"/"down" are
+		## the stairs (a floor tile inside) to an "upper" storey or a "cellar", each with its own props
 		"buildings": [
 			{"id": "hall", "n": "Hall of Azure Clouds", "style": "hall", "rect": Rect2i(14, 1, 13, 7), "door": Vector2i(20, 7),
-				"props": [["altar", Vector2i(19, 2), true], ["altar", Vector2i(20, 2), true], ["altar", Vector2i(21, 2), true], ["statue", Vector2i(20, 2), false], ["cushion", Vector2i(17, 5), false], ["cushion", Vector2i(23, 5), false], ["scroll", Vector2i(15, 3), false], ["scroll", Vector2i(25, 3), false]]},
+				"props": [["altar", Vector2i(19, 2), true], ["altar", Vector2i(20, 2), true], ["altar", Vector2i(21, 2), true], ["statue", Vector2i(20, 2), false], ["cushion", Vector2i(17, 5), false], ["cushion", Vector2i(23, 5), false], ["scroll", Vector2i(15, 3), false], ["scroll", Vector2i(25, 3), false]],
+				"down": Vector2i(25, 6), "cellar": {"n": "the ancestral crypt", "props": [["altar", Vector2i(19, 2), true], ["altar", Vector2i(20, 2), true], ["altar", Vector2i(21, 2), true], ["statue", Vector2i(20, 2), false], ["cabinet", Vector2i(15, 5), true], ["lantern", Vector2i(17, 3), false], ["lantern", Vector2i(23, 3), false]]}},
 			{"id": "pharmacy", "n": "Alchemist's Pharmacy", "style": "alchemist", "rect": Rect2i(3, 7, 9, 5), "door": Vector2i(7, 11),
 				"props": [["cauldron", Vector2i(10, 9), true], ["shelf", Vector2i(4, 8), true], ["counter", Vector2i(8, 9), false], ["herbs", Vector2i(4, 10), false]]},
 			{"id": "forge", "n": "Smithy", "style": "smithy", "rect": Rect2i(28, 7, 9, 5), "door": Vector2i(32, 11),
 				"props": [["hearth", Vector2i(35, 8), true], ["anvil", Vector2i(34, 10), true], ["rack", Vector2i(29, 8), true], ["barrel", Vector2i(29, 10), false]]},
 			{"id": "library", "n": "Scripture Library", "style": "library", "rect": Rect2i(27, 15, 10, 6), "door": Vector2i(31, 15),
-				"props": [["bookshelf", Vector2i(28, 19), true], ["bookshelf", Vector2i(29, 19), true], ["bookshelf", Vector2i(35, 16), true], ["desk", Vector2i(34, 18), true], ["scroll", Vector2i(28, 16), false]]},
+				"props": [["bookshelf", Vector2i(28, 19), true], ["bookshelf", Vector2i(29, 19), true], ["bookshelf", Vector2i(35, 16), true], ["desk", Vector2i(34, 18), true], ["scroll", Vector2i(28, 16), false]],
+				"down": Vector2i(35, 19), "cellar": {"n": "the Sealed Archive", "props": [["bookshelf", Vector2i(28, 17), true], ["bookshelf", Vector2i(30, 19), true], ["desk", Vector2i(32, 17), true], ["cabinet", Vector2i(35, 16), true], ["scroll", Vector2i(28, 16), false], ["lantern", Vector2i(33, 19), false]]}},
 			{"id": "kitchen", "n": "Sect Kitchen", "style": "kitchen", "rect": Rect2i(2, 1, 10, 5), "door": Vector2i(7, 5),
 				"props": [["stove", Vector2i(3, 2), true], ["stove", Vector2i(5, 2), true], ["table", Vector2i(8, 3), true], ["barrel", Vector2i(10, 2), true], ["shelf", Vector2i(10, 4), false], ["lantern", Vector2i(9, 4), false]]},
 			{"id": "training_hall", "n": "Hall of Martial Practice", "style": "dorm", "rect": Rect2i(28, 1, 11, 5), "door": Vector2i(33, 5),
 				"props": [["rack", Vector2i(29, 2), true], ["rack", Vector2i(37, 2), true], ["cushion", Vector2i(33, 3), false], ["barrel", Vector2i(37, 4), false], ["scroll", Vector2i(34, 2), false]]},
 			{"id": "dormitory", "n": "Disciples' Dormitory", "style": "dorm", "rect": Rect2i(2, 15, 11, 6), "door": Vector2i(7, 15),
-				"props": [["bed", Vector2i(3, 17), true], ["bed", Vector2i(3, 19), true], ["bed", Vector2i(11, 17), true], ["bed", Vector2i(11, 19), true], ["table", Vector2i(7, 18), true], ["lantern", Vector2i(6, 19), false]]},
+				"props": [["bed", Vector2i(3, 17), true], ["bed", Vector2i(3, 19), true], ["bed", Vector2i(11, 17), true], ["bed", Vector2i(11, 19), true], ["table", Vector2i(7, 18), true], ["lantern", Vector2i(6, 19), false]],
+				"up": Vector2i(10, 16), "upper": {"n": "the upper dormitory", "props": [["bed", Vector2i(3, 17), true], ["bed", Vector2i(3, 19), true], ["bed", Vector2i(11, 18), true], ["table", Vector2i(7, 17), true], ["lantern", Vector2i(5, 18), false]]}},
 		],
 	},
 	# the mountain around the sect: forests, terraces and the roads to every region (open world hub)
@@ -515,15 +574,25 @@ const AREAS := {
 			{"id": "caravan_kang", "n": "Caravan-Master Kang", "pos": Vector2i(93, 42), "col": Color("a86a3a")},
 			{"id": "priestess_yun", "n": "Wayfarer-Priestess Yun", "pos": Vector2i(90, 50), "col": Color("e8e4d8")},
 			{"id": "stableboy_shitou", "n": "Shitou the Stable-Boy", "pos": Vector2i(104, 32), "col": Color("8a6a4a")},
+			# Part XI: a messenger of the Feathered Folk, come down the Jianmu to see who regrew it
+			{"id": "ling_yu", "n": "Ling Yu of the Feathered Folk", "pos": Vector2i(32, 62), "col": Color("8ac0e8"), "race": "yumin", "vis": ["s_p11_archive", "s_p11_tree"]},
 		],
+		"pickups": [{"id": "cur_leaf3", "item": "autumn_leaf", "pos": Vector2i(74, 26), "floor": ["post_station", 1], "always": true},
+			{"id": "cur_wine2", "item": "peach_wine", "pos": Vector2i(74, 40), "floor": ["tale_teahouse", 1], "always": true}],
+		# Part XI: the Jianmu, the Standing Tree, grown back overnight on the open ground west of the
+		# sect; its trunk is solid ground, its crown is in the Nine Heavens and its roots in the Nine Springs
+		"blocks": [Rect2i(30, 50, 9, 9)],
+		"landmark": {"kind": "jianmu", "pos": Vector2i(34, 54)},
 		"roads": [[Vector2i(82, 57), Vector2i(82, 46), Vector2i(81, 34), Vector2i(83, 22), Vector2i(82, 10)], [Vector2i(58, 36), Vector2i(70, 34), Vector2i(82, 33), Vector2i(96, 35), Vector2i(108, 33)]],
 		"buildings": [
 			{"id": "post_station", "n": "Cloudfoot Post Station", "style": "inn", "rect": Rect2i(66, 22, 13, 8), "door": Vector2i(78, 26),
-				"props": [["counter", Vector2i(72, 23), true], ["table", Vector2i(68, 27), true], ["stool", Vector2i(67, 27), false], ["shelf", Vector2i(75, 23), true], ["barrel", Vector2i(76, 28), true], ["lantern", Vector2i(73, 27), false]]},
+				"props": [["counter", Vector2i(72, 23), true], ["table", Vector2i(68, 27), true], ["stool", Vector2i(67, 27), false], ["shelf", Vector2i(75, 23), true], ["barrel", Vector2i(76, 28), true], ["lantern", Vector2i(73, 27), false]],
+				"up": Vector2i(67, 23), "upper": {"n": "the letter room", "props": [["shelf", Vector2i(75, 23), true], ["desk", Vector2i(71, 24), true], ["shelf", Vector2i(77, 28), true], ["bed", Vector2i(68, 27), true], ["lantern", Vector2i(73, 27), false]]}},
 			{"id": "map_house", "n": "Pei's House of Maps", "style": "library", "rect": Rect2i(87, 22, 10, 8), "door": Vector2i(87, 26),
 				"props": [["desk", Vector2i(93, 26), true], ["bookshelf", Vector2i(95, 23), true], ["bookshelf", Vector2i(95, 28), true], ["scroll", Vector2i(89, 23), false], ["lantern", Vector2i(89, 28), false]]},
 			{"id": "tale_teahouse", "n": "Teahouse of Ten Thousand Tales", "style": "teahouse", "rect": Rect2i(66, 38, 11, 7), "door": Vector2i(71, 38),
-				"props": [["table", Vector2i(68, 41), true], ["stool", Vector2i(67, 41), false], ["table", Vector2i(74, 41), true], ["stool", Vector2i(75, 41), false], ["cushion", Vector2i(70, 43), false], ["lantern", Vector2i(72, 43), false]]},
+				"props": [["table", Vector2i(68, 41), true], ["stool", Vector2i(67, 41), false], ["table", Vector2i(74, 41), true], ["stool", Vector2i(75, 41), false], ["cushion", Vector2i(70, 43), false], ["lantern", Vector2i(72, 43), false]],
+				"up": Vector2i(75, 39), "upper": {"n": "the upper gallery", "props": [["table", Vector2i(69, 40), true], ["table", Vector2i(73, 42), true], ["cushion", Vector2i(71, 41), false], ["lantern", Vector2i(68, 43), false]]}},
 			{"id": "caravanserai", "n": "Caravanserai of the Four Roads", "style": "huizhou", "rect": Rect2i(88, 38, 12, 8), "door": Vector2i(93, 38),
 				"props": [["barrel", Vector2i(89, 39), true], ["barrel", Vector2i(89, 41), true], ["table", Vector2i(96, 41), true], ["bed", Vector2i(98, 43), true], ["bed", Vector2i(90, 44), true], ["lantern", Vector2i(95, 39), false]]},
 			{"id": "road_shrine", "n": "Shrine of Xiu, God of Roads", "style": "shrine", "rect": Rect2i(86, 47, 8, 7), "door": Vector2i(86, 50),
@@ -1036,12 +1105,14 @@ const AREAS := {
 			{"id": "well_spider", "pos": Vector2i(60, 40), "lv": 33, "req": 33},
 			{"id": "needle_general", "pos": Vector2i(86, 28), "lv": 33, "req": 33},
 		],
-		"pickups": [{"id": "sthread1", "item": "silver_thread", "pos": Vector2i(22, 12)}, {"id": "sthread2", "item": "silver_thread", "pos": Vector2i(40, 46)}, {"id": "sthread3", "item": "silver_thread", "pos": Vector2i(64, 30)}, {"id": "sthread4", "item": "silver_thread", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "sthread1", "item": "silver_thread", "pos": Vector2i(22, 12)}, {"id": "sthread2", "item": "silver_thread", "pos": Vector2i(40, 46)}, {"id": "sthread3", "item": "silver_thread", "pos": Vector2i(64, 30)}, {"id": "sthread4", "item": "silver_thread", "pos": Vector2i(76, 10)},
+			{"id": "cur_wutong2", "item": "wutong_seed", "pos": Vector2i(11, 23), "floor": ["wen_house", -1], "always": true}],
 		"pickup_vis": "s_vl_collect",
 		"springs": [Vector2i(30, 22)],
 		"buildings": [
 			{"id": "wen_house", "n": "Granny Wen's House", "style": "house", "rect": Rect2i(6, 19, 9, 6), "door": Vector2i(10, 24),
-				"props": [["bed", Vector2i(7, 20), true], ["stove", Vector2i(13, 20), true], ["table", Vector2i(12, 22), true], ["cabinet", Vector2i(7, 23), false], ["lantern", Vector2i(13, 23), false]]},
+				"props": [["bed", Vector2i(7, 20), true], ["stove", Vector2i(13, 20), true], ["table", Vector2i(12, 22), true], ["cabinet", Vector2i(7, 23), false], ["lantern", Vector2i(13, 23), false]],
+				"down": Vector2i(8, 22), "cellar": {"n": "Granny Wen's root cellar", "props": [["barrel", Vector2i(7, 20), true], ["barrel", Vector2i(13, 20), true], ["shelf", Vector2i(13, 22), true], ["lantern", Vector2i(10, 21), false]]}},
 			{"id": "inn", "n": "The Green Stone Inn", "style": "inn", "rect": Rect2i(16, 30, 11, 6), "door": Vector2i(21, 30),
 				"props": [["table", Vector2i(18, 32), true], ["stool", Vector2i(17, 32), false], ["table", Vector2i(18, 34), true], ["counter", Vector2i(24, 33), true], ["barrel", Vector2i(25, 31), true], ["barrel", Vector2i(25, 34), false], ["lantern", Vector2i(23, 31), false]]},
 			{"id": "village_shrine", "n": "Shrine of the Earth God", "style": "shrine", "rect": Rect2i(34, 5, 9, 7), "door": Vector2i(38, 11),
@@ -1353,7 +1424,9 @@ const AREAS := {
 			{"id": "stone_lion", "pos": Vector2i(82, 14), "lv": 42, "req": 42},
 			{"id": "he_bo", "pos": Vector2i(90, 30), "lv": 42, "req": 42},
 		],
-		"pickups": [{"id": "cscale1", "item": "carp_scale", "pos": Vector2i(66, 6)}, {"id": "cscale2", "item": "carp_scale", "pos": Vector2i(76, 22)}, {"id": "cscale3", "item": "carp_scale", "pos": Vector2i(84, 44)}, {"id": "cscale4", "item": "carp_scale", "pos": Vector2i(20, 52)}],
+		"pickups": [{"id": "cscale1", "item": "carp_scale", "pos": Vector2i(66, 6)}, {"id": "cscale2", "item": "carp_scale", "pos": Vector2i(76, 22)}, {"id": "cscale3", "item": "carp_scale", "pos": Vector2i(84, 44)}, {"id": "cscale4", "item": "carp_scale", "pos": Vector2i(20, 52)},
+			{"id": "cur_pearl3", "item": "night_pearl", "pos": Vector2i(13, 24), "floor": ["carp_inn", 1], "always": true},
+			{"id": "cache_lm1", "item": "stones", "n": 1800, "pos": Vector2i(38, 47), "floor": ["harbour_office", -1], "always": true}],
 		"pickup_vis": "s_dg_collect",
 		"springs": [Vector2i(25, 46)],
 		# the river comes down from the Dragon Gate falls and runs past the quay; the main street
@@ -1364,7 +1437,8 @@ const AREAS := {
 		"landmark": {"kind": "dragongate", "pos": Vector2i(54, 3)},
 		"buildings": [
 			{"id": "carp_inn", "n": "The Leaping Carp Inn", "style": "inn", "rect": Rect2i(6, 20, 11, 8), "door": Vector2i(11, 27),
-				"props": [["table", Vector2i(8, 22), true], ["stool", Vector2i(9, 22), false], ["table", Vector2i(8, 25), true], ["counter", Vector2i(14, 22), true], ["barrel", Vector2i(15, 25), true], ["lantern", Vector2i(13, 25), false]]},
+				"props": [["table", Vector2i(8, 22), true], ["stool", Vector2i(9, 22), false], ["table", Vector2i(8, 25), true], ["counter", Vector2i(14, 22), true], ["barrel", Vector2i(15, 25), true], ["lantern", Vector2i(13, 25), false]],
+				"up": Vector2i(15, 21), "upper": {"n": "the guest rooms", "props": [["bed", Vector2i(8, 21), true], ["bed", Vector2i(8, 25), true], ["bed", Vector2i(14, 25), true], ["table", Vector2i(11, 23), true], ["lantern", Vector2i(12, 21), false]]}},
 			{"id": "river_temple", "n": "Temple of the River Earl", "style": "shrine", "rect": Rect2i(12, 33, 11, 9), "door": Vector2i(17, 33),
 				"props": [["altar", Vector2i(16, 40), true], ["altar", Vector2i(17, 40), true], ["altar", Vector2i(18, 40), true], ["statue", Vector2i(17, 40), false], ["cushion", Vector2i(15, 37), false], ["scroll", Vector2i(13, 35), false], ["scroll", Vector2i(21, 35), false]]},
 			{"id": "boatyard", "n": "Gao's Boatyard", "style": "dorm", "rect": Rect2i(30, 20, 10, 7), "door": Vector2i(34, 26),
@@ -1376,7 +1450,8 @@ const AREAS := {
 			{"id": "stilt_teahouse", "n": "Teahouse on Stilts", "style": "teahouse", "rect": Rect2i(18, 8, 9, 7), "door": Vector2i(22, 14),
 				"props": [["table", Vector2i(20, 10), true], ["stool", Vector2i(19, 10), false], ["table", Vector2i(25, 11), true], ["lantern", Vector2i(24, 9), false]]},
 			{"id": "harbour_office", "n": "Harbourmaster's Office", "style": "huizhou", "rect": Rect2i(33, 42, 9, 7), "door": Vector2i(37, 42),
-				"props": [["desk", Vector2i(39, 45), true], ["shelf", Vector2i(34, 47), true], ["scroll", Vector2i(34, 43), false], ["lantern", Vector2i(40, 47), false]]},
+				"props": [["desk", Vector2i(39, 45), true], ["shelf", Vector2i(34, 47), true], ["scroll", Vector2i(34, 43), false], ["lantern", Vector2i(40, 47), false]],
+				"down": Vector2i(40, 43), "cellar": {"n": "the flood-record store", "props": [["shelf", Vector2i(34, 44), true], ["shelf", Vector2i(34, 46), true], ["barrel", Vector2i(40, 46), true], ["lantern", Vector2i(37, 44), false]]}},
 		],
 	},
 	# a slow flood over the old rice fields, crossed by Yu's dykes; Gun's walls of growing earth
@@ -1431,7 +1506,8 @@ const AREAS := {
 			{"id": "tushan_fox", "pos": Vector2i(58, 24), "lv": 44, "req": 44},
 			{"id": "taotie", "pos": Vector2i(88, 30), "lv": 44, "req": 44},
 		],
-		"pickups": [{"id": "cshard1", "item": "cauldron_shard", "pos": Vector2i(56, 6)}, {"id": "cshard2", "item": "cauldron_shard", "pos": Vector2i(70, 52)}, {"id": "cshard3", "item": "cauldron_shard", "pos": Vector2i(82, 12)}, {"id": "cshard4", "item": "cauldron_shard", "pos": Vector2i(52, 40)}],
+		"pickups": [{"id": "cshard1", "item": "cauldron_shard", "pos": Vector2i(56, 6)}, {"id": "cshard2", "item": "cauldron_shard", "pos": Vector2i(70, 52)}, {"id": "cshard3", "item": "cauldron_shard", "pos": Vector2i(82, 12)}, {"id": "cshard4", "item": "cauldron_shard", "pos": Vector2i(52, 40)},
+			{"id": "cur_wine3", "item": "peach_wine", "pos": Vector2i(41, 39), "floor": ["late_inn", -1], "always": true}],
 		"pickup_vis": "s_ts_collect",
 		"springs": [Vector2i(16, 47)],
 		"roads": [[Vector2i(2, 30), Vector2i(14, 31), Vector2i(30, 29), Vector2i(46, 31), Vector2i(58, 30)], [Vector2i(30, 29), Vector2i(30, 17)]],
@@ -1448,7 +1524,8 @@ const AREAS := {
 			{"id": "carver_shop", "n": "Stone-Carver Shi's Workshop", "style": "huizhou", "rect": Rect2i(20, 36, 9, 7), "door": Vector2i(24, 36),
 				"props": [["table", Vector2i(22, 40), true], ["rack", Vector2i(27, 38), true], ["scroll", Vector2i(21, 38), false]]},
 			{"id": "late_inn", "n": "Inn of the Late Arrival", "style": "inn", "rect": Rect2i(36, 35, 11, 7), "door": Vector2i(41, 35),
-				"props": [["table", Vector2i(38, 38), true], ["stool", Vector2i(37, 38), false], ["counter", Vector2i(44, 37), true], ["barrel", Vector2i(45, 39), true], ["lantern", Vector2i(39, 40), false]]},
+				"props": [["table", Vector2i(38, 38), true], ["stool", Vector2i(37, 38), false], ["counter", Vector2i(44, 37), true], ["barrel", Vector2i(45, 39), true], ["lantern", Vector2i(39, 40), false]],
+				"down": Vector2i(45, 36), "cellar": {"n": "the wine cellar", "props": [["barrel", Vector2i(37, 37), true], ["barrel", Vector2i(37, 39), true], ["barrel", Vector2i(43, 40), true], ["shelf", Vector2i(45, 38), true], ["lantern", Vector2i(40, 37), false]]}},
 			{"id": "bell_works", "n": "Wei's Bell Works", "style": "dorm", "rect": Rect2i(42, 20, 10, 7), "door": Vector2i(46, 26),
 				"props": [["hearth", Vector2i(50, 21), true], ["rack", Vector2i(43, 21), true], ["anvil", Vector2i(49, 24), true]]},
 		],
@@ -1480,9 +1557,193 @@ const AREAS := {
 				"props": [["altar", Vector2i(9, 37), true], ["altar", Vector2i(10, 37), true], ["altar", Vector2i(11, 37), true], ["statue", Vector2i(10, 37), false], ["scroll", Vector2i(7, 34), false], ["lantern", Vector2i(14, 34), false]]},
 		],
 	},
+	# ---- Part XI: The Ladder of Heaven.  Two realms of their own, built like the land (atlas.gd
+	# STRATA): the Nine Heavens float above the clouds over the mountain, the Nine Springs lie under
+	# its roots.  The Jianmu joins them to the Unbroken Land (LADDERS).
+	# Juntian, the Level Heaven: islands in the sky round the crown of the Jianmu, the aerie-town of
+	# the Feathered Folk and the Rain Ministry of the dragon-kin
+	"juntian": {
+		"n": "Juntian, the Level Heaven", "w": 100, "h": 64, "seed": 431, "theme": "juntian", "enemies": 22, "races": ["yumin", "dragon"], "layer": "heaven", "hill": 0.5,
+		"pool": [["cloud_kite", 45, 45], ["thunder_mote", 45, 45], ["rain_serpent", 45, 45]],
+		"portals": [
+			{"to": "changhe", "pos": Vector2i(98, 32), "dest": Vector2i(4, 30), "open": "s_jt_leigong"},
+		],
+		"npcs": [
+			{"id": "ling_yu_sky", "asset": "ling_yu", "n": "Ling Yu of the Feathered Folk", "pos": Vector2i(19, 30), "col": Color("8ac0e8"), "race": "yumin"},
+			{"id": "yu_hua", "n": "Feather-Mother Yu Hua", "pos": Vector2i(35, 24), "col": Color("f0ece0"), "race": "yumin", "floor": ["aerie_tower", 1]},
+			{"id": "yu_jian", "n": "Fletcher Yu Jian", "pos": Vector2i(48, 24), "col": Color("8a6a4a"), "race": "yumin"},
+			{"id": "egg_warden_luan", "n": "Egg-Warden Luan", "pos": Vector2i(33, 40), "col": Color("a8a8b0"), "race": "yumin"},
+			{"id": "que_er", "n": "Little Que'er", "pos": Vector2i(41, 34), "col": Color("a8783a"), "race": "yumin"},
+			{"id": "ao_qing", "n": "Cloud-Scribe Ao Qing", "pos": Vector2i(65, 18), "col": Color("c8e8d8"), "race": "dragon"},
+			{"id": "ao_run", "n": "Rain-Minister Ao Run", "pos": Vector2i(69, 17), "col": Color("2a6a6a"), "race": "dragon", "floor": ["rain_ministry", -1]},
+		],
+		"bosses": [
+			{"id": "feilian", "pos": Vector2i(56, 47), "lv": 45, "req": 45},
+			{"id": "kui", "pos": Vector2i(78, 46), "lv": 45, "req": 45},
+			{"id": "jiufeng", "pos": Vector2i(84, 15), "lv": 46, "req": 46},
+			{"id": "leigong", "pos": Vector2i(90, 32), "lv": 46, "req": 46},
+		],
+		"pickups": [{"id": "wbell1", "item": "wind_bell", "pos": Vector2i(22, 14)}, {"id": "wbell2", "item": "wind_bell", "pos": Vector2i(48, 52)}, {"id": "wbell3", "item": "wind_bell", "pos": Vector2i(70, 30)}, {"id": "wbell4", "item": "wind_bell", "pos": Vector2i(86, 51)},
+			{"id": "cur_wutong1", "item": "wutong_seed", "pos": Vector2i(50, 22), "floor": ["fletcher_loft", 1], "always": true},
+			{"id": "cur_pearl1", "item": "night_pearl", "pos": Vector2i(72, 18), "floor": ["rain_ministry", -1], "always": true},
+			{"id": "cache_jt1", "item": "stones", "n": 2600, "pos": Vector2i(34, 43), "floor": ["egg_nursery", -1], "always": true}],
+		"pickup_vis": "s_jt_collect",
+		"springs": [Vector2i(20, 44)],
+		"steles": [Vector2i(42, 30)],
+		"roads": [[Vector2i(13, 32), Vector2i(24, 33), Vector2i(34, 32), Vector2i(44, 31), Vector2i(56, 32), Vector2i(70, 33), Vector2i(84, 32), Vector2i(97, 32)], [Vector2i(35, 29), Vector2i(35, 32)], [Vector2i(35, 37), Vector2i(35, 33)], [Vector2i(48, 27), Vector2i(48, 31)], [Vector2i(68, 21), Vector2i(68, 31)]],
+		# the crown of the Jianmu rises out of the clouds at the west end of the islands
+		"blocks": [Rect2i(3, 28, 8, 9)],
+		"landmark": {"kind": "jianmu_crown", "pos": Vector2i(7, 32)},
+		"buildings": [
+			{"id": "aerie_tower", "n": "The Aerie Tower of Featherfall", "style": "aerie", "rect": Rect2i(30, 20, 11, 9), "door": Vector2i(35, 28),
+				"props": [["nest", Vector2i(39, 22), true], ["shelf", Vector2i(39, 26), true], ["cushion", Vector2i(35, 24), false], ["lantern", Vector2i(33, 26), false]],
+				"up": Vector2i(32, 22), "upper": {"n": "the top of the Aerie Tower", "props": [["nest", Vector2i(39, 22), true], ["nest", Vector2i(39, 26), true], ["altar", Vector2i(35, 21), true], ["cushion", Vector2i(35, 23), false], ["lantern", Vector2i(31, 26), false]]}},
+			{"id": "fletcher_loft", "n": "Yu Jian's Fletching Loft", "style": "shop", "rect": Rect2i(44, 20, 9, 7), "door": Vector2i(48, 26),
+				"props": [["rack", Vector2i(51, 22), true], ["table", Vector2i(50, 24), true], ["barrel", Vector2i(45, 24), false]],
+				"up": Vector2i(46, 22), "upper": {"n": "the feather loft", "props": [["rack", Vector2i(51, 22), true], ["bed", Vector2i(50, 24), true], ["shelf", Vector2i(45, 24), true], ["lantern", Vector2i(48, 23), false]]}},
+			{"id": "egg_nursery", "n": "The Egg-Nursery", "style": "farmhouse", "rect": Rect2i(30, 38, 10, 7), "door": Vector2i(35, 38),
+				"props": [["nest", Vector2i(31, 40), true], ["nest", Vector2i(31, 42), true], ["cushion", Vector2i(34, 41), false], ["lantern", Vector2i(36, 40), false]],
+				"down": Vector2i(37, 42), "cellar": {"n": "the warm cellar under the nursery", "props": [["nest", Vector2i(31, 40), true], ["nest", Vector2i(31, 42), true], ["nest", Vector2i(36, 39), true], ["lantern", Vector2i(33, 40), false], ["barrel", Vector2i(38, 39), true]]}},
+			{"id": "rain_ministry", "n": "The Rain Ministry", "style": "hall", "rect": Rect2i(62, 12, 13, 9), "door": Vector2i(68, 20),
+				"props": [["altar", Vector2i(67, 13), true], ["altar", Vector2i(68, 13), true], ["altar", Vector2i(69, 13), true], ["statue", Vector2i(68, 13), false], ["desk", Vector2i(64, 15), true], ["scroll", Vector2i(63, 17), false], ["cushion", Vector2i(68, 17), false]],
+				"down": Vector2i(72, 15), "cellar": {"n": "the Archive of Rain", "props": [["bookshelf", Vector2i(63, 14), true], ["bookshelf", Vector2i(63, 16), true], ["bookshelf", Vector2i(63, 18), true], ["desk", Vector2i(68, 15), true], ["scroll", Vector2i(70, 13), false], ["lantern", Vector2i(66, 18), false]]}},
+		],
+	},
+	# Changhe, the Gate of Heaven: the high islands where the gate of the old Court still stands, kept
+	# (and played tricks with) by the celestial foxes, and where Chong holds the sky up
+	"changhe": {
+		"n": "Changhe, the Gate of Heaven", "w": 92, "h": 60, "seed": 441, "theme": "changhe", "enemies": 22, "races": ["tianhu"], "layer": "heaven", "hill": 0.45,
+		"pool": [["gate_lion", 45, 46], ["fox_wisp", 46, 46], ["cloud_soldier", 45, 46]],
+		"portals": [
+			{"to": "juntian", "pos": Vector2i(1, 30), "dest": Vector2i(94, 32), "open": ""},
+		],
+		"npcs": [
+			{"id": "hu_qingyi", "n": "Hu Qingyi, the Ninth-Tail Matron", "pos": Vector2i(24, 22), "col": Color("f0eef8"), "race": "tianhu", "floor": ["fox_pavilion", 1]},
+			{"id": "hu_meier", "n": "Hu Mei'er of the Moon-Wine Shop", "pos": Vector2i(36, 19), "col": Color("e07a3a"), "race": "tianhu"},
+			{"id": "gate_fox_hu", "n": "Old Hu the Gate-Fox", "pos": Vector2i(52, 34), "col": Color("6a6a70"), "race": "tianhu"},
+		],
+		"bosses": [
+			{"id": "pixiu", "pos": Vector2i(52, 12), "lv": 46, "req": 46},
+			{"id": "shentu", "pos": Vector2i(66, 22), "lv": 46, "req": 46},
+			{"id": "yulei", "pos": Vector2i(66, 40), "lv": 46, "req": 46},
+			{"id": "chong", "pos": Vector2i(77, 30), "lv": 46, "req": 46},
+		],
+		"pickups": [{"id": "gkey1", "item": "gate_key", "pos": Vector2i(12, 13)}, {"id": "gkey2", "item": "gate_key", "pos": Vector2i(40, 48)}, {"id": "gkey3", "item": "gate_key", "pos": Vector2i(60, 30)}, {"id": "gkey4", "item": "gate_key", "pos": Vector2i(72, 50)},
+			{"id": "cur_wine1", "item": "peach_wine", "pos": Vector2i(39, 20), "floor": ["moonwine_shop", 1], "always": true},
+			{"id": "cache_cg1", "item": "stones", "n": 2800, "pos": Vector2i(55, 40), "floor": ["gatehouse", -1], "always": true}],
+		"pickup_vis": "s_cg_collect",
+		"springs": [Vector2i(12, 44)],
+		"steles": [Vector2i(30, 33)],
+		"roads": [[Vector2i(2, 30), Vector2i(14, 31), Vector2i(28, 30), Vector2i(44, 29), Vector2i(58, 31), Vector2i(72, 30), Vector2i(80, 30)], [Vector2i(23, 25), Vector2i(23, 30)], [Vector2i(36, 23), Vector2i(36, 29)], [Vector2i(54, 35), Vector2i(54, 31)]],
+		# the two towers of the Gate of Heaven, the way through them between
+		"blocks": [Rect2i(81, 20, 6, 7), Rect2i(81, 34, 6, 7)],
+		"landmark": {"kind": "changhe_gate", "pos": Vector2i(84, 30)},
+		"buildings": [
+			{"id": "fox_pavilion", "n": "Pavilion of the Moon-Foxes", "style": "teahouse", "rect": Rect2i(18, 16, 11, 9), "door": Vector2i(23, 24),
+				"props": [["table", Vector2i(25, 19), true], ["stool", Vector2i(26, 19), false], ["cushion", Vector2i(23, 21), false], ["lantern", Vector2i(21, 22), false], ["scroll", Vector2i(27, 18), false]],
+				"up": Vector2i(20, 18), "upper": {"n": "the moon terrace of the Pavilion", "props": [["table", Vector2i(25, 20), true], ["cushion", Vector2i(22, 20), false], ["lantern", Vector2i(19, 22), false], ["shelf", Vector2i(27, 22), true]]}},
+			{"id": "moonwine_shop", "n": "The Moon-Wine Shop", "style": "shop", "rect": Rect2i(32, 16, 9, 7), "door": Vector2i(36, 22),
+				"props": [["counter", Vector2i(36, 18), false], ["barrel", Vector2i(39, 18), true], ["barrel", Vector2i(39, 20), true], ["lantern", Vector2i(33, 20), false]],
+				"up": Vector2i(33, 18), "upper": {"n": "the wine loft", "props": [["barrel", Vector2i(39, 18), true], ["bed", Vector2i(38, 21), true], ["lantern", Vector2i(35, 20), false]]}},
+			{"id": "gatehouse", "n": "The Old Gatehouse of Changhe", "style": "dorm", "rect": Rect2i(50, 36, 9, 7), "door": Vector2i(54, 36),
+				"props": [["rack", Vector2i(51, 38), true], ["table", Vector2i(54, 39), true], ["lantern", Vector2i(52, 41), false]],
+				"down": Vector2i(57, 40), "cellar": {"n": "the gatehouse cellar", "props": [["barrel", Vector2i(51, 38), true], ["barrel", Vector2i(51, 40), true], ["shelf", Vector2i(53, 41), true], ["lantern", Vector2i(55, 38), false]]}},
+		],
+	},
+	# The Nine Springs under the roots: caverns where the roots of the Jianmu drink, the black water of
+	# the Pearl-Weepers' town and the groves of the Deathless
+	"ninesprings": {
+		"n": "The Nine Springs beneath the Roots", "w": 96, "h": 62, "seed": 451, "theme": "ninesprings", "enemies": 22, "races": ["jiaoren", "deathless"], "layer": "under", "hill": 0.6,
+		"pool": [["root_worm", 46, 46], ["blindfish", 46, 46], ["glow_crab", 46, 46]],
+		"portals": [
+			{"to": "youdu", "pos": Vector2i(94, 30), "dest": Vector2i(4, 32), "open": "s_ns_zhulong"},
+		],
+		"npcs": [
+			{"id": "shui_lian", "n": "Pearl-Weaver Shui Lian", "pos": Vector2i(33, 16), "col": Color("6ac0b0"), "race": "jiaoren"},
+			{"id": "hai_ge", "n": "Tide-Singer Hai Ge", "pos": Vector2i(48, 28), "col": Color("2a4a8a"), "race": "jiaoren"},
+			{"id": "little_bei", "n": "Little Bei", "pos": Vector2i(40, 33), "col": Color("8ad0c8"), "race": "jiaoren"},
+			{"id": "bu_si", "n": "Elder Bu Si of the Deathless", "pos": Vector2i(27, 42), "col": Color("b8a060"), "race": "deathless", "floor": ["root_house", 1]},
+			{"id": "chang_sheng", "n": "Grove-Keeper Chang Sheng", "pos": Vector2i(20, 50), "col": Color("5a8a3a"), "race": "deathless"},
+		],
+		"bosses": [
+			{"id": "root_wyrm", "pos": Vector2i(62, 12), "lv": 46, "req": 46},
+			{"id": "pearl_mother", "pos": Vector2i(70, 27), "lv": 46, "req": 46},
+			{"id": "wangxiang", "pos": Vector2i(78, 50), "lv": 47, "req": 47},
+			{"id": "zhulong", "pos": Vector2i(88, 30), "lv": 47, "req": 47},
+		],
+		"pickups": [{"id": "svial1", "item": "spring_water", "pos": Vector2i(16, 14)}, {"id": "svial2", "item": "spring_water", "pos": Vector2i(44, 54)}, {"id": "svial3", "item": "spring_water", "pos": Vector2i(80, 14)}, {"id": "svial4", "item": "spring_water", "pos": Vector2i(84, 46)},
+			{"id": "cur_pearl2", "item": "night_pearl", "pos": Vector2i(38, 17), "floor": ["pearl_hall", -1], "always": true},
+			{"id": "cur_lotus2", "item": "moon_lotus", "pos": Vector2i(46, 20), "floor": ["tide_house", 1], "always": true},
+			{"id": "cache_ns1", "item": "stones", "n": 3000, "pos": Vector2i(29, 15), "floor": ["pearl_hall", -1], "always": true}],
+		"pickup_vis": "s_ns_collect",
+		"springs": [Vector2i(18, 22)],
+		"steles": [Vector2i(42, 30)],
+		"ponds": [[Vector2i(60, 42), 7]],
+		"roads": [[Vector2i(12, 30), Vector2i(24, 31), Vector2i(38, 30), Vector2i(52, 29), Vector2i(66, 30), Vector2i(80, 31), Vector2i(93, 30)], [Vector2i(33, 20), Vector2i(33, 29)], [Vector2i(47, 22), Vector2i(47, 29)], [Vector2i(26, 37), Vector2i(26, 31)]],
+		# the roots of the Jianmu come down out of the cavern roof at the west end
+		"blocks": [Rect2i(2, 26, 8, 9)],
+		"landmark": {"kind": "jianmu_roots", "pos": Vector2i(6, 30)},
+		"buildings": [
+			{"id": "pearl_hall", "n": "Hall of the Pearl-Weavers", "style": "hall", "rect": Rect2i(28, 12, 12, 8), "door": Vector2i(33, 19),
+				"props": [["loom", Vector2i(30, 14), true], ["loom", Vector2i(36, 14), true], ["shelf", Vector2i(29, 17), true], ["lantern", Vector2i(35, 17), false]],
+				"down": Vector2i(38, 15), "cellar": {"n": "the pearl vault", "props": [["cabinet", Vector2i(29, 13), true], ["cabinet", Vector2i(31, 13), true], ["barrel", Vector2i(36, 18), true], ["lantern", Vector2i(33, 16), false]]}},
+			{"id": "tide_house", "n": "The Tide-Singer's House", "style": "house", "rect": Rect2i(44, 16, 8, 6), "door": Vector2i(47, 21),
+				"props": [["bed", Vector2i(50, 18), true], ["stove", Vector2i(45, 19), true], ["lantern", Vector2i(49, 20), false]],
+				"up": Vector2i(45, 17), "upper": {"n": "the singing room", "props": [["bed", Vector2i(50, 18), true], ["cushion", Vector2i(48, 19), false], ["lantern", Vector2i(46, 20), false]]}},
+			{"id": "root_house", "n": "The House under the Great Root", "style": "farmhouse", "rect": Rect2i(22, 38, 10, 8), "door": Vector2i(26, 38),
+				"props": [["table", Vector2i(25, 41), true], ["stove", Vector2i(23, 43), true], ["herbs", Vector2i(30, 43), false]],
+				"up": Vector2i(29, 40), "upper": {"n": "the loft under the great root", "props": [["bed", Vector2i(23, 40), true], ["cushion", Vector2i(26, 42), false], ["herbs", Vector2i(30, 43), false], ["lantern", Vector2i(24, 43), false]]}},
+		],
+	},
+	# Youdu, the Dark Capital: the city of the shades under Sovereign Earth, Tubo at its gate and, in
+	# the deep beyond, Li pressing the earth down
+	"youdu": {
+		"n": "Youdu, the Dark Capital", "w": 100, "h": 64, "seed": 461, "theme": "youdu", "enemies": 22, "races": ["shade"], "layer": "under", "hill": 0.35,
+		"pool": [["ghost_soldier", 47, 47], ["paper_horse", 47, 47], ["lantern_shade", 47, 47]],
+		"portals": [
+			{"to": "ninesprings", "pos": Vector2i(1, 32), "dest": Vector2i(90, 30), "open": ""},
+		],
+		"npcs": [
+			{"id": "ming_yi", "n": "Lantern-Magistrate Ming Yi", "pos": Vector2i(28, 20), "col": Color("2a2a3a"), "race": "shade", "floor": ["ward_office", 1]},
+			{"id": "zhi_ma", "n": "Zhi Ma the Paper-Horse Maker", "pos": Vector2i(43, 20), "col": Color("f0f0f0"), "race": "shade"},
+			{"id": "shade_lan", "n": "Little Lan, Who Lost Her Way", "pos": Vector2i(47, 30), "col": Color("c8d8e8"), "race": "shade"},
+			{"id": "houtu", "n": "Houtu, Sovereign Earth", "pos": Vector2i(36, 43), "col": Color("8a6a3a"), "floor": ["earth_palace", -1]},
+		],
+		"bosses": [
+			{"id": "bai_wuchang", "pos": Vector2i(60, 12), "lv": 47, "req": 47},
+			{"id": "hei_wuchang", "pos": Vector2i(62, 54), "lv": 47, "req": 47},
+			{"id": "tubo", "pos": Vector2i(70, 32), "lv": 47, "req": 47},
+			{"id": "li", "pos": Vector2i(90, 32), "lv": 47, "req": 47},
+		],
+		"pickups": [{"id": "stally1", "item": "soul_tally", "pos": Vector2i(14, 12)}, {"id": "stally2", "item": "soul_tally", "pos": Vector2i(20, 54)}, {"id": "stally3", "item": "soul_tally", "pos": Vector2i(64, 22)}, {"id": "stally4", "item": "soul_tally", "pos": Vector2i(86, 50)},
+			{"id": "cur_incense2", "item": "ancestor_incense", "pos": Vector2i(40, 21), "floor": ["paper_shop", -1], "always": true},
+			{"id": "cur_leaf2", "item": "autumn_leaf", "pos": Vector2i(58, 40), "floor": ["ghost_inn", 1], "always": true},
+			{"id": "cache_yd1", "item": "stones", "n": 3200, "pos": Vector2i(32, 40), "floor": ["earth_palace", -1], "always": true}],
+		"pickup_vis": "s_yd_collect",
+		"springs": [Vector2i(16, 44)],
+		"steles": [Vector2i(46, 34)],
+		"roads": [[Vector2i(2, 32), Vector2i(16, 33), Vector2i(30, 32), Vector2i(46, 31), Vector2i(60, 33), Vector2i(72, 32), Vector2i(84, 32), Vector2i(94, 32)], [Vector2i(29, 24), Vector2i(29, 31)], [Vector2i(42, 23), Vector2i(42, 30)], [Vector2i(36, 37), Vector2i(36, 33)], [Vector2i(54, 37), Vector2i(54, 33)]],
+		# the two towers of the inner gate, the way through them between
+		"blocks": [Rect2i(74, 22, 5, 7), Rect2i(74, 37, 5, 7)],
+		"landmark": {"kind": "youdu_gate", "pos": Vector2i(76, 32)},
+		"buildings": [
+			{"id": "ward_office", "n": "Ward Office of the Dark Capital", "style": "huizhou", "rect": Rect2i(24, 16, 11, 8), "door": Vector2i(29, 23),
+				"props": [["desk", Vector2i(31, 18), true], ["shelf", Vector2i(33, 20), true], ["scroll", Vector2i(25, 21), false], ["lantern", Vector2i(28, 21), false]],
+				"up": Vector2i(26, 18), "upper": {"n": "the magistrate's upper room", "props": [["desk", Vector2i(31, 18), true], ["bookshelf", Vector2i(33, 20), true], ["lantern", Vector2i(25, 21), false], ["cushion", Vector2i(29, 21), false]]}},
+			{"id": "paper_shop", "n": "Zhi Ma's Paper-Horse Shop", "style": "shop", "rect": Rect2i(38, 16, 9, 7), "door": Vector2i(42, 22),
+				"props": [["counter", Vector2i(41, 18), false], ["shelf", Vector2i(39, 20), true], ["lantern", Vector2i(44, 20), false]],
+				"down": Vector2i(45, 18), "cellar": {"n": "the paper store", "props": [["shelf", Vector2i(39, 18), true], ["shelf", Vector2i(39, 20), true], ["barrel", Vector2i(44, 21), true], ["lantern", Vector2i(42, 19), false]]}},
+			{"id": "earth_palace", "n": "Palace of Sovereign Earth", "style": "hall", "rect": Rect2i(30, 38, 14, 9), "door": Vector2i(36, 38),
+				"props": [["altar", Vector2i(35, 45), true], ["altar", Vector2i(36, 45), true], ["altar", Vector2i(37, 45), true], ["statue", Vector2i(36, 45), false], ["cushion", Vector2i(36, 42), false], ["scroll", Vector2i(31, 41), false]],
+				"down": Vector2i(41, 44), "cellar": {"n": "the deep hall of Sovereign Earth", "props": [["altar", Vector2i(35, 45), true], ["altar", Vector2i(36, 45), true], ["altar", Vector2i(37, 45), true], ["cushion", Vector2i(34, 42), false], ["lantern", Vector2i(32, 42), false], ["lantern", Vector2i(40, 41), false]]}},
+			{"id": "ghost_inn", "n": "Inn of the Last Lantern", "style": "inn", "rect": Rect2i(50, 38, 10, 7), "door": Vector2i(54, 38),
+				"props": [["table", Vector2i(52, 40), true], ["stool", Vector2i(53, 40), false], ["counter", Vector2i(56, 42), true], ["lantern", Vector2i(52, 42), false]],
+				"up": Vector2i(57, 40), "upper": {"n": "the lodgings for wandering shades", "props": [["bed", Vector2i(51, 40), true], ["bed", Vector2i(51, 42), true], ["bed", Vector2i(57, 42), true], ["lantern", Vector2i(54, 41), false]]}},
+		],
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu"]
 
 ## The towns of the Unbroken Land, marked on the world map: the area they stand in, a tile of that
 ## area's own map at their heart, and what they are.
@@ -1499,6 +1760,13 @@ const TOWNS := [
 		"lore": "The ferry town below the Dragon Gate, where Yu the Great cut the gorge and the golden carp leap the falls each spring to become dragons. Boatwrights, fishwives and lock-keepers live by the river; the flood stele by the River Earl's temple carries a mark for every flood since Yu."},
 	{"id": "tushan", "n": "Tushan", "area": "tushan", "pos": Vector2i(28, 28),
 		"lore": "The cauldron-casters' town on Mount Kuaiji, home of the clan that cast Yu's Nine Cauldrons. Its casting pits have never gone cold; its bells hang in temples from Longmen to the Jasper Pool, and the Stone Mother, who was Yu's wife, still watches the road from the hill above."},
+	# ---- Part XI: the towns of the realms above and below
+	{"id": "featherfall", "n": "Featherfall", "area": "juntian", "pos": Vector2i(38, 31),
+		"lore": "The aerie-town of the Yumin, the Feathered Folk, on the islands round the crown of the Jianmu. Every Yumin hatches from an egg in the warm cellar of the Egg-Nursery, learns to glide before it can walk, and is told on its first birthday that it can fly, but not far. The Aerie Tower is the tallest thing in heaven that nobody ordered built."},
+	{"id": "tearwater", "n": "Tearwater", "area": "ninesprings", "pos": Vector2i(38, 26),
+		"lore": "The town of the Jiaoren, the Pearl-Weepers, on the shore of the black water under the roots of the world. Their tears turn to pearls; they weave a silk so fine that water will not wet it; and the Deathless of the root-groves trade them fruit that never spoils for songs that end."},
+	{"id": "youdu_city", "n": "Youdu", "area": "youdu", "pos": Vector2i(38, 30),
+		"lore": "The Dark Capital at the bottom of the world, the city of the shades, where the souls who are not ready to be reborn keep house under Houtu, Sovereign Earth. Its lanterns never go out, its inns never close and its magistrate has never once been late; Tubo guards the inner gate with three eyes and very bad manners."},
 ]
 
 ## What the land remembers of each region: shown beside the world map, and kept in the Annals once
@@ -1547,9 +1815,29 @@ const REGION_LORE := {
 	"drowned": "The Drowned Fields of Gun, old rice country over which the Flood once stood for nine years behind Gun's walls of swelling earth. Yu drained it with channels instead of walls, and Bo Yi has kept the dykes ever since.",
 	"tushan": "Tushan on Mount Kuaiji, where the Tushan clan cast Yu's Nine Cauldrons from the bronze of the nine provinces, and where Yu called every lord of the land to his great assembly. The giant Fangfeng arrived late.",
 	"buzhou": "Mount Buzhou in the far north-west, the pillar of heaven that Gonggong broke with his head when he lost the war for the sky; the sky tilted north-west and every river has run east to the sea ever since. A black lake lies at its foot, and it is listening.",
+	"juntian": "Juntian, the Level Heaven, the middle field of the Nine Heavens: islands in the sky round the crown of the Jianmu, above a sea of cloud. The Feathered Folk nest here in Featherfall, the dragon-kin keep the Rain Ministry, and since the Court fell the winds and the thunder have been doing whatever they like.",
+	"changhe": "Changhe, the Gate of Heaven, at the top of the sky, where the old Court's great gate still stands on the highest islands. The celestial foxes, who cultivated for a thousand years to grow nine tails and climb up here, keep it now, mostly as a joke; and behind it Chong has held heaven up since the day the ladder was cut.",
+	"ninesprings": "The Nine Springs beneath the roots of the Jianmu, a cavern country under the Unbroken Land where the roots of the world tree drink. The Pearl-Weepers keep their town of Tearwater on the black water, the Deathless tend their groves, and the Torch Dragon's eye is the only sun there has ever been.",
+	"youdu": "Youdu, the Dark Capital, at the bottom of the world: the city of the shades who are not ready to be reborn, under Houtu, Sovereign Earth. Its lanterns have burned since before the Court; Tubo keeps its gate, and in the deep beyond it Li has pressed the earth down since the ladder was cut.",
 }
 
-## next area to enter when travelling from `from` to `to` (breadth-first over portals)
+## The ways between the realms (Part XI): each joins a tile of one region to a tile of another in a
+## different realm, `out` being the side a traveller steps off on.  They open at a quest step, like
+## the Lotus Seals.  "climb" is the long way up or down the Jianmu; stairs inside buildings are made
+## from the buildings themselves (see Atlas).
+const LADDERS := [
+	{"id": "jianmu_up", "a": ["mountain", Vector2i(34, 59), Vector2i(0, 1)], "b": ["juntian", Vector2i(12, 32), Vector2i(1, 0)],
+		"na": "Climb the Jianmu to the Nine Heavens", "nb": "Down the Jianmu to the Unbroken Land", "open": "s_p11_tree", "style": "climb"},
+	{"id": "jianmu_down", "a": ["mountain", Vector2i(39, 54), Vector2i(1, 0)], "b": ["ninesprings", Vector2i(11, 30), Vector2i(1, 0)],
+		"na": "Down the roots of the Jianmu to the Nine Springs", "nb": "Up the roots to the Unbroken Land", "open": "s_cg_chong", "style": "climb"},
+]
+
+## The realm a region lies in: "surface" (the Unbroken Land), "heaven" or "under".
+static func layer_of(id: String) -> String:
+	return str(AREAS[id].get("layer", "surface")) if AREAS.has(id) else "surface"
+
+## next area to enter when travelling from `from` to `to` (breadth-first over portals and the ladders
+## between the realms)
 static func next_hop(from: String, to: String) -> String:
 	if from == to:
 		return from
@@ -1559,10 +1847,23 @@ static func next_hop(from: String, to: String) -> String:
 	while i < q.size():
 		var c: String = q[i]
 		i += 1
+		var outs: Array = []
 		for p in AREAS[c].get("portals", []):
-			if not prev.has(p.to):
-				prev[p.to] = c
-				q.append(p.to)
+			outs.append(p.to)
+		for ld in LADDERS:
+			if ld.a[0] == c:
+				outs.append(ld.b[0])
+			elif ld.b[0] == c:
+				outs.append(ld.a[0])
+		# the sect stands on the mountain: its gates open straight onto it
+		if c == "sect":
+			outs.append("mountain")
+		elif c == "mountain":
+			outs.append("sect")
+		for nx in outs:
+			if not prev.has(nx):
+				prev[nx] = c
+				q.append(nx)
 	if not prev.has(to):
 		return ""
 	var cur := to
@@ -1926,6 +2227,47 @@ const STEPS := [
 	{"id": "s_bz_kuafu", "kind": "kill", "boss": "kuafu", "area": "buzhou", "t": "Stop Kuafu, who drank the rivers dry, drinking the black lake"},
 	{"id": "s_bz_gonggong", "kind": "kill", "boss": "gonggong", "area": "buzhou", "t": "Show Gonggong, God of the Flood, the land as it really is", "stones": 17000},
 	{"id": "s_break15", "kind": "breakthrough", "to": 45, "t": "Let the land keep its own shape: Mountain-River Oneness"},
+	# ---- Part XI: The Ladder of Heaven
+	{"id": "s_p11_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "A tree has grown on the mountain in the night: speak to Elder Qing Xuan", "stones": 17400},
+	{"id": "s_p11_archive", "kind": "talk", "npc": "archivist_deep", "area": "sect", "t": "Find Archivist Lan in the Sealed Archive, down the stairs inside the Scripture Library"},
+	{"id": "s_p11_tree", "kind": "talk", "npc": "ling_yu", "area": "mountain", "t": "Go to the foot of the Jianmu, west of the sect, and meet whoever came down it"},
+	{"id": "s_jt_intro", "kind": "talk", "npc": "yu_hua", "area": "juntian", "t": "Climb the Jianmu into the Nine Heavens and find the Feather-Mother at the top of the Aerie Tower"},
+	{"id": "s_jt_collect", "kind": "collect", "item": "wind_bell", "n": 4, "area": "juntian", "t": "Gather 4 Storm-Torn Wind Bells blown off the aeries"},
+	{"id": "s_jt_hunt", "kind": "hunt", "area": "juntian", "n": 50, "t": "Calm the loose winds and thunder over the islands of Juntian"},
+	{"id": "s_jt_return", "kind": "talk", "npc": "yu_hua", "area": "juntian", "t": "Bring the wind bells to Feather-Mother Yu Hua at the top of the Aerie Tower"},
+	{"id": "s_jt_minister", "kind": "talk", "npc": "ao_run", "area": "juntian", "t": "Find Rain-Minister Ao Run in the Archive of Rain, below the Rain Ministry"},
+	{"id": "s_jt_feilian", "kind": "kill", "boss": "feilian", "area": "juntian", "t": "Catch Feilian, Earl of the Wind, and take back his bag of winds"},
+	{"id": "s_jt_kui", "kind": "kill", "boss": "kui", "area": "juntian", "t": "Quiet Kui, the One-Legged Thunder Ox"},
+	{"id": "s_jt_jiufeng", "kind": "kill", "boss": "jiufeng", "area": "juntian", "t": "Settle the nine quarrelling heads of Jiufeng"},
+	{"id": "s_jt_leigong", "kind": "kill", "boss": "leigong", "area": "juntian", "t": "Face Leigong, Duke of Thunder, who strikes at everything now", "stones": 17800},
+	{"id": "s_cg_intro", "kind": "talk", "npc": "hu_qingyi", "area": "changhe", "t": "Cross to Changhe, the Gate of Heaven, and find the Ninth-Tail Matron on the moon terrace of her pavilion"},
+	{"id": "s_cg_collect", "kind": "collect", "item": "gate_key", "n": 4, "area": "changhe", "t": "Find the 4 Keys of the Gate the foxes hid as a joke"},
+	{"id": "s_cg_hunt", "kind": "hunt", "area": "changhe", "n": 50, "t": "Clear the islands before the Gate of Heaven"},
+	{"id": "s_cg_return", "kind": "talk", "npc": "hu_qingyi", "area": "changhe", "t": "Bring the four keys up to Hu Qingyi on the moon terrace"},
+	{"id": "s_cg_pixiu", "kind": "kill", "boss": "pixiu", "area": "changhe", "t": "Make Pixiu give back the gold of the Gate"},
+	{"id": "s_cg_shentu", "kind": "kill", "boss": "shentu", "area": "changhe", "t": "Get past Shentu, the door god under the peach tree"},
+	{"id": "s_cg_yulei", "kind": "kill", "boss": "yulei", "area": "changhe", "t": "Get past Yulei and his rope of reeds"},
+	{"id": "s_cg_chong", "kind": "kill", "boss": "chong", "area": "changhe", "t": "Face Chong, who has held heaven up since the ladder was cut", "stones": 18200},
+	{"id": "s_ns_intro", "kind": "talk", "npc": "shui_lian", "area": "ninesprings", "t": "Go down the roots of the Jianmu into the Nine Springs and find the Pearl-Weavers of Tearwater"},
+	{"id": "s_ns_collect", "kind": "collect", "item": "spring_water", "n": 4, "area": "ninesprings", "t": "Fill 4 Vials at the springs the roots drink from"},
+	{"id": "s_ns_hunt", "kind": "hunt", "area": "ninesprings", "n": 50, "t": "Drive the root-gnawers away from the Jianmu"},
+	{"id": "s_ns_return", "kind": "talk", "npc": "shui_lian", "area": "ninesprings", "t": "Bring the spring water to Shui Lian in the Hall of the Pearl-Weavers"},
+	{"id": "s_ns_elder", "kind": "talk", "npc": "bu_si", "area": "ninesprings", "t": "Climb to the loft of the House under the Great Root and ask Elder Bu Si of the Deathless"},
+	{"id": "s_ns_wyrm", "kind": "kill", "boss": "root_wyrm", "area": "ninesprings", "t": "Stop the Wyrm Who Gnaws the Jianmu"},
+	{"id": "s_ns_pearl", "kind": "kill", "boss": "pearl_mother", "area": "ninesprings", "t": "Comfort the Weeping Pearl-Mother of the black water"},
+	{"id": "s_ns_wangxiang", "kind": "kill", "boss": "wangxiang", "area": "ninesprings", "t": "Catch Wangxiang, the goblin who muddies the springs"},
+	{"id": "s_ns_zhulong", "kind": "kill", "boss": "zhulong", "area": "ninesprings", "t": "Face Zhulong, the Torch Dragon, whose eye is the only sun below", "stones": 18600},
+	{"id": "s_yd_intro", "kind": "talk", "npc": "ming_yi", "area": "youdu", "t": "Enter Youdu, the Dark Capital, and find the Lantern-Magistrate in the upper room of the Ward Office"},
+	{"id": "s_yd_collect", "kind": "collect", "item": "soul_tally", "n": 4, "area": "youdu", "t": "Gather 4 Soul-Tallies blown out of the Dark Capital's rolls"},
+	{"id": "s_yd_hunt", "kind": "hunt", "area": "youdu", "n": 50, "t": "Clear the streets of the Dark Capital of runaway spirits"},
+	{"id": "s_yd_return", "kind": "talk", "npc": "ming_yi", "area": "youdu", "t": "Bring the soul-tallies up to Magistrate Ming Yi"},
+	{"id": "s_yd_houtu", "kind": "talk", "npc": "houtu", "area": "youdu", "t": "Go down to the deep hall under the Palace of Sovereign Earth and meet Houtu"},
+	{"id": "s_yd_bai", "kind": "kill", "boss": "bai_wuchang", "area": "youdu", "t": "Stop White Impermanence collecting the living"},
+	{"id": "s_yd_hei", "kind": "kill", "boss": "hei_wuchang", "area": "youdu", "t": "Stop Black Impermanence collecting the living"},
+	{"id": "s_yd_tubo", "kind": "kill", "boss": "tubo", "area": "youdu", "t": "Get past Tubo, Earl of the Dark Capital, at the inner gate"},
+	{"id": "s_yd_li", "kind": "kill", "boss": "li", "area": "youdu", "t": "Face Li, who has pressed the earth down since the ladder was cut", "stones": 19000},
+	{"id": "s_p11_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Climb back up the roots and take Chong's tablet and Li's weight home to the Elder"},
+	{"id": "s_break16", "kind": "breakthrough", "to": 48, "t": "Hold the ladder open for every road: Three Realms Concord"},
 ]
 
 static func step_index(id: String) -> int:
@@ -1983,6 +2325,21 @@ const ITEMS := {
 	"pillar_stone": {"n": "Stone of Mount Buzhou", "desc": "Quest item"},
 	"river_tablet": {"n": "He Bo's Flood Tablet", "desc": "The River Earl's tally of every flood since Yu's day"},
 	"cauldron_map": {"n": "Rubbing of the Ninth Cauldron", "desc": "The land as Yu drew it, every bay and bend, before the Court squared it off"},
+	# ---- Part XI
+	"wind_bell": {"n": "Storm-Torn Wind Bell", "desc": "Quest item"},
+	"gate_key": {"n": "Key of the Gate of Heaven", "desc": "Quest item"},
+	"spring_water": {"n": "Vial of the Nine Springs", "desc": "Quest item"},
+	"soul_tally": {"n": "Soul-Tally of the Dark Capital", "desc": "Quest item"},
+	"heaven_tablet": {"n": "Chong's Jade Tablet", "desc": "The tablet Chong held heaven up with for four thousand years. It is lighter than it looks, and heavier than it feels"},
+	"earth_weight": {"n": "Li's Iron Weight", "desc": "The weight Li pressed the earth down with since the ladder was cut. Still warm"},
+	# keepsakes the peoples of the other realms are fond of (gifts: see RACES)
+	"wutong_seed": {"n": "Seed of the Wutong Tree", "desc": "A phoenix-tree seed. The Feathered Folk say a phoenix will only land on a wutong"},
+	"night_pearl": {"n": "Night-Shining Pearl", "desc": "It glows in the dark. Dragons cannot leave one alone"},
+	"peach_wine": {"n": "Jar of Peach-Blossom Wine", "desc": "Foxes will forgive almost anything for a jar of this"},
+	"moon_lotus": {"n": "Pressed Moon Lotus", "desc": "A lotus that opened in moonlight, pressed flat. The Pearl-Weepers have never seen the moon"},
+	"autumn_leaf": {"n": "Pressed Autumn Leaf", "desc": "A red maple leaf. The Deathless love anything that ends"},
+	"ancestor_incense": {"n": "Ancestor Incense", "desc": "Sweet incense for the dead. The shades can smell it from the bottom of the world"},
+	"stones": {"n": "Cache of Spirit Stones", "desc": "Someone's savings"},
 	"bell": {"n": "Ox-Head's Iron Bell", "desc": "It once rang every soul down the funeral road"},
 	"feather": {"n": "Thunder Roc Feather", "desc": "Proof of the Roc's defeat"},
 	"scale": {"n": "Dragon King's Scale", "desc": "Proof of the Dragon King's gratitude"},
@@ -1990,10 +2347,122 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map"}
+const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
+
+# ---------------------------------------------------------------- daos (Part XI)
+## The roads a cultivator may walk now that the Court's one Dao (obedience) is gone.  Lin Feng
+## chooses one when the Jianmu grows back and may change roads at any Dao Stele; each keeps its own
+## mastery (DAO_TIERS points from battles won while walking it: Novice, Adept, Master), each has a
+## passive that grows with mastery (DAO_MODS) and a technique of its own from Adept on, and each is
+## honoured by one of the peoples of the realms (RACES).
+const DAOS := {
+	"sword": {"n": "Dao of the Sword", "motto": "A blade has one direction: forward.", "skill": "myriad_swords", "col": Color("a8d8ff"),
+		"desc": "Lin Feng's single-strike techniques hit harder, and his plain sword strike much harder."},
+	"wander": {"n": "Dao of Free Wandering", "motto": "The Peng rises on a wind of ninety thousand li, and goes where it likes.", "skill": "peng_wind", "col": Color("b8f0d0"),
+		"desc": "Lin Feng acts sooner, and now and then the party slips a blow entirely."},
+	"heart": {"n": "Dao of the Compassionate Heart", "motto": "Hold the sky only as long as you choose, and ask for help.", "skill": "lotus_heart", "col": Color("ffb0c8"),
+		"desc": "Every heal is stronger, the party takes a little less harm, and Lin Feng's wounds close by themselves."},
+	"formation": {"n": "Dao of Formations", "motto": "The land keeps its shape because it is allowed to.", "skill": "bagua_array", "col": Color("e8c870"),
+		"desc": "The party takes much less harm from every blow."},
+	"alchemy": {"n": "Dao of the Cauldron", "motto": "Every pill is borrowed time. Borrow wisely, and for others.", "skill": "nine_turn", "col": Color("ff9a50"),
+		"desc": "Pills do far more good, victories pay more spirit stones and techniques cost less qi."},
+	"illusion": {"n": "Dao of the Mirror", "motto": "The moon in the water is still the moon.", "skill": "mirror_moon", "col": Color("c8a8ff"),
+		"desc": "Foes strike at reflections and miss, and their weaknesses cut deeper."},
+}
+const DAO_ORDER := ["sword", "wander", "heart", "formation", "alchemy", "illusion"]
+## mastery points needed for each rank (a battle won while walking the Dao is one point, a boss four)
+const DAO_TIERS := [0, 12, 40]
+const DAO_RANKS := ["Novice", "Adept", "Master"]
+## Dao passives by rank (Novice, Adept, Master).  one: Lin Feng's single-target techniques; strike:
+## his plain sword strike; spd: his speed; evade: the chance the party slips a blow; heal: heals and
+## healing pills; regen: Lin Feng's wounds close by this share of his health each turn; taken: the
+## harm the party takes; pill: what pills restore; stones: spirit stones won; qi: technique costs;
+## miss: the chance a foe strikes a reflection; weak: how deep a weakness cuts (normally 1.5).
+const DAO_MODS := {
+	"sword": {"one": [1.15, 1.22, 1.3], "strike": [1.5, 1.6, 1.7]},
+	"wander": {"spd": [3.0, 5.0, 7.0], "evade": [0.07, 0.1, 0.14]},
+	"heart": {"heal": [1.2, 1.3, 1.4], "regen": [0.03, 0.04, 0.05], "taken": [0.96, 0.94, 0.92]},
+	"formation": {"taken": [0.88, 0.84, 0.8]},
+	"alchemy": {"pill": [1.6, 1.8, 2.0], "stones": [1.25, 1.35, 1.5], "qi": [0.92, 0.88, 0.85]},
+	"illusion": {"miss": [0.07, 0.1, 0.13], "weak": [1.65, 1.75, 1.85]},
+}
+
+# ---------------------------------------------------------------- the peoples of the realms (Part XI)
+## Who lives above, on and below the land.  Lin Feng's standing with each people grows with the help
+## he gives them (quest steps and bosses in their lands) and with gifts of the keepsakes they love,
+## and faster if he walks the Dao they honour; as a friend (FRIEND standing) a people grants a boon.
+## Their people speak to his Dao in `dao_lines`.
+const FRIEND := 50
+const KIN := 100
+const RACES := {
+	"human": {"n": "Humans", "home": "The Unbroken Land", "dao": "sword", "gift": "", "boon": "", "boon_n": "",
+		"desc": "The people of the Unbroken Land: farmers, ferrymen, cauldron-casters, sect disciples and cartographers. They hatch from nothing, fly not at all and die too soon, and they are the only people who ever cut the ladder to heaven down and then grew it back.",
+		"dao_lines": {}, "thanks": ""},
+	"yumin": {"n": "Yumin, the Feathered Folk", "home": "Featherfall, in Juntian", "dao": "wander", "gift": "wutong_seed", "boon": "spd", "boon_n": "Lin Feng acts sooner (+3 speed)",
+		"desc": "The Feathered People of the Classic of Mountains and Seas: long heads, feathered bodies, born from eggs. They can fly, but not far, and they think that is the best joke in heaven. They nest round the crown of the Jianmu and honour the Dao of Free Wandering.",
+		"dao_lines": {
+			"sword": "A sword-walker. You cut straight lines through the sky; we have never understood straight lines. Mind you don't cut the wind.",
+			"wander": "You walk the Wandering Dao! Then you already know: you can fly, but not far, and that is more than enough.",
+			"heart": "The Heart's Dao. Our elders say a kind heart is a light heart, and a light heart glides further.",
+			"formation": "Formations? Up here? Everything you draw, the wind rubs out by morning. We admire the effort.",
+			"alchemy": "A cauldron-walker. Can you brew something for wing-ache? Asking for my whole family.",
+			"illusion": "The Mirror's Dao. The foxes will like you. We are not sure we do. Is that really you?"},
+		"thanks": "A wutong seed! We will plant it on the highest island. If a phoenix ever comes back, it will need somewhere to land."},
+	"dragon": {"n": "Dragon-kin of the Rain Ministry", "home": "The Rain Ministry, in Juntian", "dao": "sword", "gift": "night_pearl", "boon": "atk", "boon_n": "Lin Feng hits harder (+6% attack)",
+		"desc": "The dragon-kin who kept the rain for the Heavenly Court, a ledger for every cloud. With the Court gone they keep the Rain Ministry out of habit and pride, and honour the Dao of the Sword: one clean stroke, owed and paid.",
+		"dao_lines": {
+			"sword": "The Sword's Dao. Good. A dragon respects one clean stroke above a thousand clever ones.",
+			"wander": "You wander? Rain does not wander. Rain falls where it is owed. ...Or it used to.",
+			"heart": "Compassion. The Ministry had a column for it once. Nobody ever filled it in.",
+			"formation": "Formations. Order. The Ministry approves, in triplicate.",
+			"alchemy": "An alchemist. Dragon blood is not an ingredient, whatever the old recipes say.",
+			"illusion": "The Mirror. Dragons do not care for tricks. Show me your true face before you speak."},
+		"thanks": "A night-shining pearl. ...You may consider the Ministry in your debt. Do not tell anyone I said that."},
+	"tianhu": {"n": "Tianhu, the Celestial Foxes", "home": "Changhe, the Gate of Heaven", "dao": "illusion", "gift": "peach_wine", "boon": "miss", "boon_n": "Foes miss a little more often",
+		"desc": "Foxes who cultivated for a thousand years, grew nine tails and climbed into heaven. They keep the old Gate of Heaven mostly as a joke, and honour the Dao of the Mirror: the moon in the water is still the moon.",
+		"dao_lines": {
+			"sword": "So serious! A sword is only a straight line that forgot how to laugh.",
+			"wander": "A wanderer. You could have been a fox, you know, with practice. Nine hundred years of it.",
+			"heart": "The Heart. Oh, how sweet. We shall have to be very careful not to break it.",
+			"formation": "Formations! Lovely. Nothing is more fun to walk through backwards.",
+			"alchemy": "An alchemist. Do you have anything that tastes like peaches and makes the colours sing?",
+			"illusion": "The Mirror's Dao! Are you a fox in disguise? Are WE foxes in disguise? Delicious."},
+		"thanks": "Peach-blossom wine! You understand foxes better than foxes do. We forgive you for everything you have not done yet."},
+	"jiaoren": {"n": "Jiaoren, the Pearl-Weepers", "home": "Tearwater, in the Nine Springs", "dao": "heart", "gift": "moon_lotus", "boon": "heal", "boon_n": "Every heal is 10% stronger",
+		"desc": "The Pearl-Weepers of the black water under the world, whose tears turn to pearls and whose silk water cannot wet. They honour the Dao of the Compassionate Heart, which is why their tears are worth something.",
+		"dao_lines": {
+			"sword": "A sword. The black water remembers every blade ever dropped in it. Most of them were dropped in grief.",
+			"wander": "You wander. The currents wander too, and they always come home.",
+			"heart": "You walk the Heart's Dao. Then you know why we weep, and why the tears are worth something.",
+			"formation": "Formations. The shades like those. We prefer songs: a song is a formation that moves.",
+			"alchemy": "An alchemist. Please do not ask for our tears. Everyone asks for our tears.",
+			"illusion": "The Mirror. The black water is a mirror too, but nothing in it is ever a lie."},
+		"thanks": "A lotus that opened under the moon? I have never seen the moon. Now I have seen something it touched."},
+	"deathless": {"n": "Deathless People", "home": "The root-groves of the Nine Springs", "dao": "alchemy", "gift": "autumn_leaf", "boon": "hp", "boon_n": "Lin Feng is hardier (+8% health)",
+		"desc": "The black-skinned Deathless people of the old texts, who eat the fruit of the immortal tree under the roots of the Jianmu, drink from the red spring and never die. They love anything that ends, and honour the Dao of the Cauldron.",
+		"dao_lines": {
+			"sword": "A sword. We have watched ten thousand swordsmen go by. Every one of them was in a hurry.",
+			"wander": "Wandering. When you have for ever, every road is short. Walk slowly anyway.",
+			"heart": "The Heart. It breaks, you know. That is what makes it worth having. We would not know.",
+			"formation": "Formations. Patience you can see. You would have made a good Deathless.",
+			"alchemy": "The Cauldron's Dao! Then you know a pill is only time, folded small. We have too much of it to fold.",
+			"illusion": "The Mirror. Illusions fade. Lucky things."},
+		"thanks": "A leaf that ended in red. How beautiful. We will keep it for ever, which is exactly the wrong thing to do with it."},
+	"shade": {"n": "Shades of Youdu", "home": "Youdu, the Dark Capital", "dao": "formation", "gift": "ancestor_incense", "boon": "taken", "boon_n": "The party takes 6% less harm",
+		"desc": "The shades of Youdu, souls not yet ready to be reborn, keeping house in the Dark Capital under Sovereign Earth. They are pale, polite and never late, and honour the Dao of Formations: every lantern in its place.",
+		"dao_lines": {
+			"sword": "A sword. The living are always holding something sharp. Do sit down.",
+			"wander": "Wandering. Half the shades in Youdu wandered here by accident. Mind you can find the way back.",
+			"heart": "The Heart. The living feel things so loudly. We can hear you from three streets away.",
+			"formation": "Formations! At last, a visitor who understands lines. The magistrate will want to meet you.",
+			"alchemy": "An alchemist. An elixir of life is a very rude thing to bring into a city of the dead.",
+			"illusion": "The Mirror. In Youdu nobody casts a reflection. You may find that restful."},
+		"thanks": "Incense... somebody up there still remembers. Every shade in the street will smell it and feel remembered too."},
+}
+const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless", "shade"]
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
@@ -2030,6 +2499,26 @@ const CHAT := {
 	"innkeeper_lou": ["The Inn of the Late Arrival, named for Fangfeng, who came late to Yu's assembly. Everyone here is late for something.", "Pilgrims climb the mountain to see the cauldron hall and stay for the noodles. The noodles are not historical, but they are very good.", "Do not mention the giant. When he walks past, the soup slops over."],
 	"little_qi": ["My name is Qi, like the boy who was born from the stone. I was born from my ma, which is less interesting.", "I climb the Stone Mother every day. She does not mind. I asked.", "When I grow up I will cast a cauldron so big that the whole world fits in it. Then I will cast a lid."],
 	"yinglong": ["I drew every river in the land with my tail. The crooked ones were the days I was tired.", "Do not swim in the black lake. It is not that it is cold. It is that it is listening.", "Yu used to say a river is only a long argument between a mountain and the sea. I always took the sea's side."],
+	# ---- Part XI: the peoples of the realms above and below
+	"ling_yu": ["We hatch from eggs, glide before we walk, and are told on our first birthday that we can fly, but not far. It is the best joke in heaven.", "The view from the top of the Jianmu is the whole world at once. It makes you very quiet, or very rude. I went for rude.", "Ground-walkers are slower than the stories said, and kinder. Do not tell anybody I said that."],
+	"yu_hua": ["Every Yumin chick hears the wind bells before anything else. A bell says: the wind is safe, come out.", "I am four hundred years old and I have flown, at most, a li in a straight line. It was a very good li.", "The Court called us its feathered servants. We called the Court the noise under the clouds."],
+	"yu_jian": ["An arrow is a feather that learned to be brave. I fletch mine with my own moulted feathers, which is either very thrifty or very strange.", "Feilian keeps letting the winds out of his bag. My arrows go everywhere except where I aim them.", "A ground-walker who climbed the Jianmu! You must have legs like a mule. No offence. Mules are much respected up here."],
+	"egg_warden_luan": ["Shh. The eggs are listening. They hatch when the world sounds safe.", "Eighty-one eggs in the warm cellar, and every one of them has a name already. The names are very long. We have a lot of time.", "A chick peeps at the first face it sees. Mind you are not standing in front of the egg, or it will think you are its mother."],
+	"que_er": ["I can fly! ...Not far. But I can!", "Is the ground really made of ground? All of it? Doesn't it get tired?", "When I grow up I am going to fly all the way down to the Unbroken Land and back. In one go. Maybe two goes."],
+	"ao_qing": ["Every cloud has a page, every page has a column, and every column must balance. Or it did. Now I write poems in the margins.", "The Minister will not come up from the archive. Dragons sulk the way mountains sit: thoroughly.", "Rain without a signature. It sounds terrible. I think it might be wonderful."],
+	"ao_run": ["Ten thousand years of ledgers and not one blot. I am very proud of that. It is the only thing I have ever been proud of, which worries me.", "A dragon who signs his own rain. My grandfather would have swallowed the Ministry whole.", "The Duke drums for my rain now. He is terrible at keeping time. The farmers love him."],
+	"hu_qingyi": ["Nine tails, a thousand years each. Do not ask which is my favourite. All of them, darling.", "We hid the keys of the Gate of Heaven because we thought it would be funny. It was funny. It is still funny.", "The Court called us vermin, then it called us celestial. We are the same foxes, darling. We only got better at climbing."],
+	"hu_meier": ["Moon-wine! One cup and you see the moon. Two cups, two moons. Three cups, you are the moon.", "I only have three tails. That is three hundred years of not paying attention in class.", "If you meet a fox who looks exactly like you, do not worry. It is probably me."],
+	"gate_fox_hu": ["I have kept this gate for six hundred years, ever since the last gatekeeper went home and forgot to tell anybody.", "Pixiu ate the gold off the gatehouse roof. I am trying to look on the bright side. The roof is lighter now.", "A gate is only a hole in a wall that somebody decided to be polite about."],
+	"shui_lian": ["When a Jiaoren weeps, the tears turn to pearls. The traders above used to make us cry on purpose. Do not ask how.", "Our silk will not get wet. I wove a sail of it once. The boat sank anyway, out of pure spite.", "The roots of the world tree drink from the Nine Springs. When they are thirsty, the whole cavern sighs."],
+	"hai_ge": ["I sing the tides of the black water. There are no tides down here, so I make them up. The water has started listening.", "A song is a formation that moves. The shades never understand that. The Deathless understand it too well.", "Wangxiang keeps muddying the springs. I wrote him a song. He pretends not to like it. He hums it."],
+	"little_bei": ["I cried yesterday and it came out as grit! Mama says it is the water. I think I am broken.", "Is the moon like the Torch Dragon's eye? Mama says it is white and kind and nobody owns it.", "When I grow up I am going to swim all the way up a root and look at the sky. Just once."],
+	"bu_si": ["I am four thousand and eleven. Or twelve. After the first thousand you stop counting and start guessing.", "The fruit of the immortal tree tastes of nothing, for ever. I would give a great deal for a bad apple.", "Sit down. Whatever you are hurrying towards will still be there. Everything always is, down here."],
+	"chang_sheng": ["I tend the groves on the roots. The fruit never spoils, the trees never die and the weeds never stop. A gardener's paradise and a gardener's punishment.", "We trade the Pearl-Weepers our fruit for their songs. A fruit lasts for ever and a song is over in a minute. We get the better bargain.", "My grandmother was here when the ladder was cut. She is still here, in the grove, complaining about the light."],
+	"ming_yi": ["Every shade in Youdu has a tally. Every tally has a place. Every place has a lantern. That is a city.", "The living are so untidy. They arrive with all their feelings still attached.", "I have never once been late. There is nothing to be late for down here, which makes it a point of pride."],
+	"zhi_ma": ["Paper horses, paper houses, paper servants. The living burn them up above, and down here they arrive for the dead. I make the ones nobody burned.", "One of my horses ran away last week. It is somewhere in the streets, being made of paper at people.", "The best paper is mulberry bark. The worst is a tax form. You would be surprised how many of those come down."],
+	"shade_lan": ["I lost my tally. I lost my name. Do you know who I am?", "The lanterns here never go out. I wish one would, just once, so I could see the dark.", "When I go back up to the Wheel, I want to be born somewhere with snow."],
+	"houtu": ["Every soul you ever saw buried, I held. Every one of them was somebody's child.", "I am the earth. I do not mind being walked on. It is what I am for.", "Li is my child too, you know. Every god of the earth is. They never call."],
 	# ---- Shazhou Oasis in the Desert of Fallen Stars
 	"well_keeper_zhaya": ["A cup of the Sweet Well for a story, and a story for a cup. Nobody leaves Shazhou thirsty or bored.", "The well is older than the oasis. The stars that fell here melted the sand into glass, and the glass kept the water in.", "When the sky was falling, the nomads came in from the dunes to drink and watch. Ba Yin says she has never seen so many people looking up."],
 	"cook_aysha": ["Lamb noodles, flatbread, and tea with salt in it. Do not make that face; you are in the desert now.", "Every caravan that comes in off the sand gets a bowl before it gets a bed. That is the rule of the caravanserai.", "Kang's camels eat better than his drivers. I have told him. He says the camels complain less."],
@@ -3926,6 +4415,241 @@ const DIALOGUE := {
 		["Archivist Lan", "The Unbroken Land. That is what I am calling it. Do not argue."],
 		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng walks the new north road down to the river and back again. It bends, and he follows it."],
 	],
+	# ---- Part XI: The Ladder of Heaven
+	"recall9": [
+		["Narrator", "The land keeps its own shape, and for a season everybody lets it. Pei's new map goes up in the Library, Harbourmistress Jiang writes rude letters to it, and Lin Feng sweeps the steps in the mornings and walks the new north road in the evenings."],
+		["Narrator", "Then, one morning before dawn, the whole mountain shudders. When the sun comes up there is a tree west of the sect that was not there the night before: a trunk wider than the Hall, bark like old bronze, not one branch below the clouds, and roots that have split the hillside open."],
+		["Old Shen the Bell-Ringer", "I rang the bell at it. No echo. I shouted at it. No echo. And at noon it casts no shadow. Elder, I have rung bells for forty years, and I do not like a tree that will not echo."],
+		["Elder Qing Xuan", "Nor should you, Shen. Lin Feng, come to the hall. I know that tree. Everybody did, once, and then we were made to forget it."],
+	],
+	"s_p11_home": [
+		["Elder Qing Xuan", "That is the Jianmu, the Standing Tree. Before the Court, before Yu, in the days of the Yellow Emperor, it stood at the middle of the world, and it was a ladder. Gods climbed down it to visit, and people climbed up it to complain."],
+		["Elder Qing Xuan", "Then came Zhuanxu, the Yellow Emperor's grandson, who thought heaven and earth had grown too familiar. He sent his grandsons: Chong to lift heaven up and Li to press the earth down, and between them they cut the ladder through. The old books call it the severing of heaven and earth."],
+		["Lin Feng", "And the Court made a law of it."],
+		["Elder Qing Xuan", "The Court made a whole government of it. One ladder, kept by the Court. One road up it: obedience. The peoples of the heavens were cut off above, the Feathered Folk, the dragon-kin, the celestial foxes; and the peoples under the roots below, the Pearl-Weepers, the Deathless, the shades of Youdu."],
+		["Yue Ling", "And now the land has its own shape again, so the tree remembered how to grow."],
+		["Elder Qing Xuan", "Just so. Chong is still holding heaven up and Li is still pressing the earth down, four thousand years on, and the old books say they are very tired. Whatever comes down that tree, or up through its roots, will ask you one thing first: what is your Dao?"],
+		["Elder Qing Xuan", "The Court allowed one road. There are many: the sword, free wandering, the heart, formations, the cauldron, the mirror. Every people walks one, and none of them is wrong. Choose the road you will walk for now. You may change roads at any Dao Stele. That is the whole point of roads."],
+	],
+	"s_p11_archive": [
+		["Archivist Lan", "Down here, Lin Feng. Mind the third step. This is the Sealed Archive: everything the Court ordered the sect to forget, which we kept, because an archivist who burns books is just a cook with bad taste."],
+		["Archivist Lan", "Here: the record of the severing. Chong took heaven, Li took the earth, the ladder was cut at the middle, and the peoples above and below were told the people of the middle were cruel. The people of the middle were told the same of them. Nobody could climb up or down to check."],
+		["Lin Feng", "Then the first people down the tree will be expecting monsters."],
+		["Archivist Lan", "And they will meet you, which will be a great surprise to them. Something came down the trunk at dawn. Old Shen says it had wings and was very rude. Go and be polite at it. The tree stands on the open ground west of the sect."],
+	],
+	"s_p11_tree": [
+		["Ling Yu of the Feathered Folk", "Stay back, ground-walker. ...Oh. You are the one. You smell of tribulation smoke and broom straw. The wind told us somebody down here let the land go, and the next thing we knew there was a ladder."],
+		["Ling Yu of the Feathered Folk", "I am Ling Yu of the Yumin, the Feathered Folk. We hatch from eggs, we can fly, though not far, and we nest round the crown of this tree in the Level Heaven. I came down to see if the middle world was as horrible as the stories. You are much shorter than the stories."],
+		["Lin Feng", "What is it like up there, now the Court is gone?"],
+		["Ling Yu of the Feathered Folk", "Loud. The winds do what they like, the dragon-kin will not rain without a ledger, the Thunder Duke strikes at everything that moves, and our eggs will not hatch in the noise. The Feather-Mother sent me down to find help. I suppose you will do."],
+		["Ling Yu of the Feathered Folk", "There is a stair round the trunk, for those without wings. Climb. I will race you to the top, and I will win."],
+	],
+	"s_jt_intro": [
+		["Feather-Mother Yu Hua", "Ling Yu says you climbed the whole Jianmu without wings and only stopped to be sick twice. Welcome to Featherfall, ground-walker, and to Juntian, the Level Heaven: the middle field of the Nine Heavens."],
+		["Feather-Mother Yu Hua", "Every Yumin hatches in the warm cellar under the Egg-Nursery, and the first thing a chick hears is the wind bells on the aeries telling it the wind is safe. Since the Court fell the winds have run wild and torn the bells from every tower, and the chicks have stopped hatching."],
+		["Lin Feng", "Then I will bring the bells back."],
+		["Feather-Mother Yu Hua", "Four of them have fallen among the islands, the big bronze ones from the top of this tower. Bring them home, and clear the loose thunder and the cloud-kites from the islands, so the chicks can hear something besides storms."],
+	],
+	"s_jt_return": [
+		["Feather-Mother Yu Hua", "Four bells. Listen to them... they still ring true. Hang them, Ling Yu. ...And listen to that. The first egg is cracking, down in the cellar."],
+		["Feather-Mother Yu Hua", "But hear what the bells say when the wind blows from the east: rain that will not fall, wind that will not settle, thunder that will not stop. The storm is not wild, ground-walker. It is unmanaged. The Rain Ministry has stopped working."],
+		["Yue Ling", "Then we ask the Ministry why."],
+		["Feather-Mother Yu Hua", "The Rain-Minister sits in the archive under the Ministry hall and will not come up. Dragons sulk magnificently. Go down and ask him. He will not listen to birds."],
+	],
+	"s_jt_minister": [
+		["Rain-Minister Ao Run", "A mortal, in the Archive of Rain. Shut the door. Every cloud in heaven is entered in these ledgers: where it will rain, how much and on whom. For ten thousand years the Court signed every page. Now nobody signs them."],
+		["Rain-Minister Ao Run", "So I do not rain. Rain without a signature is not rain, it is only water falling about. And with no rain to carry, Feilian lets the winds out of his bag for fun, and the thunder has nothing to follow, so Kui and the Duke strike whatever they please."],
+		["Lin Feng", "Then sign it yourself."],
+		["Rain-Minister Ao Run", "...Myself. A dragon, signing his own rain, with no ledger to answer to. ...Ao Qing, fetch me a brush. No, a big one."],
+		["Rain-Minister Ao Run", "But catch the winds first, or the rain will only blow sideways. Feilian keeps his bag of winds on the southern islands, Kui stamps in the east, Jiufeng's nine heads cannot agree which way the wind is blowing, and Leigong, Duke of Thunder, sits at the eastern edge of Juntian striking at everything."],
+	],
+	"pre:feilian": [
+		["Narrator", "On the southern islands a creature with a deer's body, a bird's head and a snake's tail lounges on a bulging leather bag, letting out little gusts that knock the cloud-kites over."],
+		["Feilian, Earl of the Wind", "The Court used to tell me when to blow and how hard. Now nobody tells me anything. Do you know how much fun it is to blow whenever you like?"],
+		["Yue Ling", "The Feathered Folk's eggs will not hatch."],
+		["Feilian, Earl of the Wind", "Eggs! Who thinks about eggs? Take the bag from me, then, if you can."],
+	],
+	"post:feilian": [["Narrator", "Lin Feng ties the neck of the bag of winds shut. Feilian sulks, then grins: the Rain-Minister will need winds to carry his rain, he says, and he can blow on purpose, if somebody asks nicely. Ling Yu asks, very nicely, and the wind over Featherfall drops to a breeze."]],
+	"pre:kui": [
+		["Narrator", "In the east of Juntian a grey ox with one leg and no horns hops from island to island. Wherever it lands there is lightning, and when it bellows it sounds like thunder rolling round the sky."],
+		["Lin Feng", "Kui. The Yellow Emperor made a drum from your hide once."],
+		["Kui, the One-Legged Thunder Ox", "And they beat it, and it was heard for five hundred li, and the whole world trembled. Every time I hear thunder I think somebody is beating me again. So I bellow first."],
+	],
+	"post:kui": [["Narrator", "Kui stops hopping, stands very still on its one leg, and listens. There is no drum. There has not been a drum for four thousand years. It lies down in the clouds with a long sigh like distant thunder, and the eastern islands go quiet."]],
+	"pre:jiufeng": [
+		["Narrator", "On the northern crags sits a vast bird with nine human heads, on a nest of cloud. Every head is arguing with every other head about which way the wind is blowing."],
+		["Jiufeng, the Nine-Headed Phoenix", "North! South! It is not blowing! It is blowing in a circle! Who are you? Nobody asked you! Everybody, attack him! No, everybody attack HER!"],
+		["Yue Ling", "Nine heads, and not one of them listening."],
+	],
+	"post:jiufeng": [["Narrator", "Out of breath, the nine heads fall silent one by one, until only the smallest says, quite calmly, that the wind is blowing from the west now, and it smells of rain. The other eight look at it, and for the first time in a long while, they agree."]],
+	"pre:leigong": [
+		["Narrator", "At the eastern edge of the Level Heaven, on a ring of drums, sits a blue-skinned god with a bird's face and wings, a chisel in one hand and a mallet in the other. Every few heartbeats he strikes a drum, and lightning splits a cloud somewhere far below."],
+		["Leigong, Duke of Thunder", "The Court gave me a list: the wicked, the oath-breakers, the ones who wasted rice. I struck whoever was on the list. Then the list stopped coming. So now I strike everybody, to be fair."],
+		["Lin Feng", "That is not fair. That is just loud."],
+		["Leigong, Duke of Thunder", "Then you write me a list."],
+	],
+	"post:leigong": [
+		["Leigong, Duke of Thunder", "...No list. Nobody to strike. What is a thunder god for, with nobody to strike?"],
+		["Rain-Minister Ao Run", "For rain, Duke. Rain needs thunder ahead of it, to tell the farmers to bring in the washing. I have signed my first page. Will you come and drum for it?"],
+		["Narrator", "Leigong lowers his mallet. Then he strikes one drum, gently, and far below over the Unbroken Land the first rain of the new heaven begins to fall, signed by nobody but the dragon who decided it. In Featherfall, between the thunder and the bells, a whole cellar of eggs begins to hatch."],
+	],
+	"s_cg_intro": [
+		["Hu Qingyi, the Ninth-Tail Matron", "Oh, look, a hero. On our terrace. With his sword out. Put it away, darling; nobody up here will fight you before tea. Probably."],
+		["Hu Qingyi, the Ninth-Tail Matron", "We are the Tianhu, the celestial foxes. Each of us spent a thousand years growing nine tails to climb up here, and when we arrived we found the Gate of Heaven with nobody left to keep it. A gate with no gatekeeper is a joke waiting for a punchline. So we keep it."],
+		["Lin Feng", "I need to go through it."],
+		["Hu Qingyi, the Ninth-Tail Matron", "Of course you do. Behind the Gate stands Chong, holding heaven up, as he has since the ladder was cut. The weight has pressed his ears shut; he hears nobody. And we hid the four keys of the Gate, as a joke. You will have to find them. That is the punchline."],
+		["Yue Ling", "Hilarious."],
+	],
+	"s_cg_return": [
+		["Hu Qingyi, the Ninth-Tail Matron", "All four keys! You found the one we put in the lion's mouth? We never thought anybody would look there. Very well: the Gate is yours."],
+		["Hu Qingyi, the Ninth-Tail Matron", "But listen, little hero, because this part is not a joke. When Chong lifted heaven he swore to hold it until somebody told him it was safe to stop. Nobody ever has. If you go to him, you had better be ready to tell him."],
+		["Lin Feng", "Is it safe?"],
+		["Hu Qingyi, the Ninth-Tail Matron", "That is what you are going to find out. The door gods still stand before the Gate, and Pixiu has been eating its gold. Mind your purse."],
+	],
+	"pre:pixiu": [
+		["Narrator", "On the gold-roofed island a winged lion with one horn is gnawing the gilded tiles off the gatehouse roof, swallowing them, and looking for more."],
+		["Pixiu, Who Ate the Gold of the Gate", "Gold goes in and nothing ever comes out. That is my whole nature. The Court fed me tribute; now I feed myself."],
+		["Yue Ling", "Then you are about to have a very bad day."],
+	],
+	"post:pixiu": [["Narrator", "Pixiu lies down on the bare roof beams looking sorry for itself. It cannot give the gold back, it explains; it never could. But it will guard what is left, if somebody scratches it behind the horn now and then. Old Hu the Gate-Fox says he will see to it."]],
+	"pre:shentu": [
+		["Narrator", "Under a peach tree before the Gate of Heaven stands a red-faced giant in armour, a rope of reeds coiled at his belt and a tiger crouched at his feet."],
+		["Shentu, Door God of the Peach Tree", "I am Shentu. With my brother Yulei I stand under the peach tree and bind every evil spirit that tries to pass, and feed it to the tiger. Are you an evil spirit?"],
+		["Lin Feng", "I am a sweeper."],
+		["Shentu, Door God of the Peach Tree", "That is exactly what an evil spirit would say."],
+	],
+	"post:shentu": [["Narrator", "Shentu looks at Lin Feng for a long moment, then at the tiger, which has gone to sleep. Not evil, he says. Only stubborn. He steps aside, and goes to tell his brother."]],
+	"pre:yulei": [
+		["Narrator", "On the far side of the peach tree stands Shentu's brother, green-faced, holding the other end of the rope of reeds."],
+		["Yulei, Door God of the Reed Rope", "My brother is too soft. Every door needs two keepers, one to open it and one to shut it. I am the one who shuts."],
+		["Yue Ling", "Doors are meant to open sometimes."],
+	],
+	"post:yulei": [["Narrator", "Yulei coils his rope and hangs it on the peach tree. A door that opens is still a door, he admits. He pushes, and for the first time in four thousand years the Gate of Heaven swings open, and beyond it, in a pillar of cloud, somebody is holding up the sky."]],
+	"pre:chong": [
+		["Narrator", "Beyond the Gate stands a giant whose head is lost in the sky. His arms are raised, his palms flat against heaven itself, and his whole body shakes with the weight of it."],
+		["Chong, Who Lifts Heaven", "WHO? I cannot hear you. I have not heard anything for four thousand years. My grandfather told me: lift heaven, and hold it, until it is safe to let go. Is it safe? I CANNOT HEAR YOU."],
+		["Lin Feng", "Then I will have to show you."],
+	],
+	"post:chong": [
+		["Chong, Who Lifts Heaven", "...I can hear. The wind. A bird. You. Why can I hear?"],
+		["Lin Feng", "Because you put your hands down to fight me. And heaven did not fall."],
+		["Chong, Who Lifts Heaven", "...It did not fall. The tree. The Jianmu is holding it. My grandfather cut the ladder so heaven would not lean on the earth. But a ladder does not lean. A ladder holds hands."],
+		["Narrator", "Chong gives Lin Feng the jade tablet he held heaven up with, still warm after four thousand years. My brother Li presses the earth down at the bottom of the world, he says, and he will not be able to hear either. Go down the roots. Tell him what you told me."],
+	],
+	"s_ns_intro": [
+		["Narrator", "Down the roots of the Jianmu, through the dark, past glowing moss and the sound of water, the roots open into a cavern country under the land. On the shore of a black lake stands a town of shell and silk: Tearwater."],
+		["Pearl-Weaver Shui Lian", "A living man from above, in Tearwater. You climbed down the roots? Then you came the way the stories said the monsters would come. You do not look like a monster. You look tired."],
+		["Pearl-Weaver Shui Lian", "I am Shui Lian of the Jiaoren, the Pearl-Weepers. When we weep, our tears are pearls; we weave a silk the water cannot wet; and we live here by the black water, where the roots of the world tree drink from the Nine Springs."],
+		["Pearl-Weaver Shui Lian", "The springs are going wrong. The tree drinks and drinks, it has grown back so fast, and the springs run thin and bitter, and our children's tears come out as grit. Fill me four vials at the springs among the roots, and I will tell you what the water says."],
+	],
+	"s_ns_return": [
+		["Pearl-Weaver Shui Lian", "Four springs. Taste: bitter, and cold, and something under it like iron. The roots are not only drinking. Something is gnawing them. And the water is being pushed down, as if a great hand were pressing on the whole cavern from below."],
+		["Lin Feng", "Li."],
+		["Pearl-Weaver Shui Lian", "The one who presses the earth down, at the bottom of everything, under Youdu. The Deathless will know more; they have tended the roots since the ladder was cut. Elder Bu Si lives in the loft of the house under the great root. Go up the stairs, and speak slowly. He has all the time in the world."],
+	],
+	"s_ns_elder": [
+		["Elder Bu Si of the Deathless", "Sit. Sit. I have been waiting for you for four thousand years. Not you, exactly. Somebody. You will do."],
+		["Elder Bu Si of the Deathless", "We are the Deathless. We eat the fruit of the immortal tree that grows on the roots of the Jianmu, we drink from the red spring, and we do not die. It sounds pleasant. It is mostly a great deal of waiting."],
+		["Elder Bu Si of the Deathless", "When the ladder was cut, Li went down under Youdu to press the earth flat, and he has pressed ever since. Now the tree pushes up and Li pushes down, and the roots are caught between them like a hand in a door, and the creatures of the deep are gnawing at whatever is caught."],
+		["Lin Feng", "Then I will go and ask Li to stop."],
+		["Elder Bu Si of the Deathless", "Good. But first: a wyrm is gnawing the great root, a goblin is muddying the springs, the Pearl-Mother weeps so hard she is drowning the shore, and the Torch Dragon has shut his eyes, and without them there is no day down here at all. Li has waited four thousand years. He can wait an afternoon."],
+	],
+	"pre:root_wyrm": [
+		["Narrator", "In the dark between the roots a long pale wyrm is coiled round the greatest root of the Jianmu, gnawing at it, and with every bite the whole cavern shivers."],
+		["The Wyrm Who Gnaws the Jianmu", "The tree is in my sky. For four thousand years there was no tree, only dark, and the dark was mine. Now there is a root through the middle of it."],
+		["Yue Ling", "Then the dark will have to share."],
+	],
+	"post:root_wyrm": [["Narrator", "The wyrm uncoils and slides away into a crack between two roots. It is cold, it complains, and the root is warm. Chang Sheng the grove-keeper says it may sleep against the root if it stops biting it, and after a while, it does."]],
+	"pre:pearl_mother": [
+		["Narrator", "Over the black lake drifts a great pale shape like a jellyfish the size of a house, weeping. Every tear is a pearl as big as a fist, and they are piling up so fast they are pushing the water over the shore."],
+		["The Weeping Pearl-Mother", "The children's tears come out as grit. So I weep for them. I weep for all of them. Somebody has to."],
+		["Lin Feng", "If you drown Tearwater, there will be no children left to weep for."],
+	],
+	"post:pearl_mother": [["Narrator", "The Pearl-Mother stops weeping long enough to hear Little Bei singing on the shore, and the song is not sad. She drifts back out over the black water, and the pearls she wept settle on the lake bed and glow there, so that Tearwater has a little light of its own."]],
+	"pre:wangxiang": [
+		["Narrator", "Among the springs a goblin with red eyes, long ears and black claws is splashing mud into every pool, giggling."],
+		["Wangxiang, Goblin of the Springs", "Clear water is boring! You can see the bottom! Mud is a mystery! Everybody likes a mystery!"],
+		["Yue Ling", "The Pearl-Weepers have to drink it."],
+	],
+	"post:wangxiang": [["Narrator", "Wangxiang agrees, grudgingly, to keep his mud to one pool, his own, where anybody who likes a mystery can come and look. Hai Ge the Tide-Singer writes a song about it at once, which Wangxiang pretends not to like."]],
+	"pre:zhulong": [
+		["Narrator", "At the eastern end of the cavern lies a red dragon a thousand li long, with a man's face and his eyes shut. When Zhulong opens his eyes it is day in the deep; when he shuts them it is night. They have been shut for a month."],
+		["Zhulong, the Torch Dragon", "Why should I open them? The tree came through the roof of my world without asking. Everything I lit for four thousand years is lit by somebody else's tree now."],
+		["Lin Feng", "The Pearl-Weepers have been weeping in the dark."],
+		["Zhulong, the Torch Dragon", "Then let them weep. Come closer, and I will open one eye, just for you."],
+	],
+	"post:zhulong": [["Narrator", "Zhulong opens both eyes, and red daylight floods the Nine Springs, and all along the black water the Pearl-Weepers come out of their houses and look up. The tree did not take your light, Lin Feng tells him; it brought you visitors. The Torch Dragon looks at the crowd on the shore and, for the first time in four thousand years, has the grace to look embarrassed."]],
+	"s_yd_intro": [
+		["Narrator", "Past the Torch Dragon the cavern drops into a great hollow, and in it lies a city of grey walls and paper lanterns that have never once gone out: Youdu, the Dark Capital, where the shades live who are not yet ready to be reborn."],
+		["Lantern-Magistrate Ming Yi", "A living man in the Dark Capital, climbing my stairs. You are not on any roll. Sit down; you are making the lanterns nervous."],
+		["Lantern-Magistrate Ming Yi", "I am Ming Yi, magistrate of the Ward Office. Every shade in Youdu is on a roll, on a bamboo tally: who they were, when they came, when they will be ready to go up to the Wheel again. Order, Lin Feng. The dead like order. It is the one thing they can still have."],
+		["Lantern-Magistrate Ming Yi", "Since the tree came down through our roof the earth has been heaving and the rolls have scattered. Four tallies are lost in the streets, and four shades do not know who they are. Find them, clear the runaway spirits out of my streets, and then we will talk about why you are here."],
+	],
+	"s_yd_return": [
+		["Lantern-Magistrate Ming Yi", "Four tallies: a ferryman, a weaver, a soldier, and a girl called Lan who has been asking everybody in the street who she is. Thank you. Order is restored, in this room at least."],
+		["Lantern-Magistrate Ming Yi", "Now, the heaving. It comes from under the city, from the deep beyond the inner gate, where Li presses the earth down. For four thousand years he pressed steadily. Since the tree came he presses harder, because the tree pushes back. A little harder still and he will crack the floor of the world."],
+		["Yue Ling", "Then we go through the inner gate."],
+		["Lantern-Magistrate Ming Yi", "Not before you go down to the deep hall under the Palace of Sovereign Earth. Houtu keeps the dead, and she will want to see you. Everybody in this city does what Houtu wants. She wants very little, which is why we all do it."],
+	],
+	"s_yd_houtu": [
+		["Houtu, Sovereign Earth", "Come here, child. Let me look at you. You are the one who turned the Wheel and let the dead go home, and then closed the Ledger. I remember every soul you sent me. They all said the same thing: tell him thank you."],
+		["Houtu, Sovereign Earth", "I am Houtu. I am the earth everybody walks on and everybody is buried in. Li presses on me. He has pressed for four thousand years, because his grandfather told him the earth must be kept down, away from heaven. I have never once complained. I should have."],
+		["Lin Feng", "Why didn't you?"],
+		["Houtu, Sovereign Earth", "Because a mother does not complain about her children. Li is a child of the earth, as you are. Go to him. And take the earth's own blessing on your sword, so that whatever you strike, you strike with the weight of everything that was ever buried kindly."],
+		["Narrator", "A new technique settles into Lin Feng's hands, as heavy and as gentle as the earth: the Three Realms Concord Sword."],
+		["Houtu, Sovereign Earth", "White and Black Impermanence have been collecting the living by mistake since the rolls scattered, and Tubo guards the inner gate with three eyes and bad manners. Be kind to all of them. They are only doing their jobs, badly."],
+	],
+	"pre:bai_wuchang": [
+		["Narrator", "Through the lantern-lit streets comes a tall pale figure in white, with a long tongue and a tall white hat that reads: one glance and you will be rich. On the end of his chain is a very confused, very alive fishmonger."],
+		["Bai Wuchang, White Impermanence", "On the roll, off the roll, the rolls have scattered, so I collect whoever I meet. It is easier. Hold still."],
+		["Lin Feng", "That man is alive."],
+		["Bai Wuchang, White Impermanence", "Details."],
+	],
+	"post:bai_wuchang": [["Narrator", "White Impermanence unlocks the fishmonger, who runs all the way back up the roots without stopping. Bai Wuchang tucks his chain away: he will check the rolls before he collects anybody else, now Magistrate Ming has them in order. His hat still promises riches. Nobody has ever taken it up on the offer."]],
+	"pre:hei_wuchang": [
+		["Narrator", "In the alley behind the inn waits White Impermanence's partner, short and black-robed, with a hat that reads: peace under heaven. His chain is wrapped round three living crab-fishers from Tearwater."],
+		["Hei Wuchang, Black Impermanence", "My partner collects the ones who are owed. I collect the ones who are left over. Everyone is left over these days."],
+		["Yue Ling", "Not these three."],
+	],
+	"post:hei_wuchang": [["Narrator", "Black Impermanence lets the crab-fishers go and sits down on the inn step with a sigh. Peace under heaven, his hat says. He has worn it so long that he forgot it was a wish."]],
+	"pre:tubo": [
+		["Narrator", "At the inner gate of Youdu crouches a monster with a tiger's head, three eyes, horns like knives and the body of a bull, coiled nine times round itself, licking its bloody thumbs."],
+		["Tubo, Earl of the Dark Capital", "Nobody passes the inner gate. The living stay up there, the dead stay down here, and the gate stays shut. That was the order I was given when the ladder was cut, and nobody has given me another."],
+		["Lin Feng", "Houtu sent me."],
+		["Tubo, Earl of the Dark Capital", "...Did she. She never sends anybody. Prove it."],
+	],
+	"post:tubo": [["Narrator", "Tubo uncoils, one coil at a time, all nine of them, and opens the inner gate with a groan of old iron. Beyond it the cavern floor falls away into a deep red glow, and at the bottom of it a figure kneels with both hands pressed flat against the floor of the world."]],
+	"pre:li": [
+		["Narrator", "At the bottom of the world, in a pit of red-hot stone, kneels a giant of earth and fire with both palms pressed against the ground. The whole of the Nine Springs shudders each time he pushes."],
+		["Li, Who Presses Down the Earth", "DOWN. Keep the earth down, away from heaven. My grandfather said it. My brother holds the sky up and I hold the earth down, and between us there is nothing, nothing, nothing at all."],
+		["Lin Feng", "Your brother put his hands down. Heaven did not fall."],
+		["Li, Who Presses Down the Earth", "LIES. If I lift my hands the earth will rise up and strike the sky. Come down here and make me."],
+	],
+	"post:li": [
+		["Li, Who Presses Down the Earth", "...My hands. I lifted my hands. The earth did not rise."],
+		["Lin Feng", "It is held. The tree holds heaven and earth apart and together at once. That is what a ladder does."],
+		["Li, Who Presses Down the Earth", "...Four thousand years. And all it needed was a tree."],
+		["Narrator", "Li gives Lin Feng the iron weight he pressed the earth down with, lies back on the warm stone of the world's floor and shuts his eyes, and for the first time since the ladder was cut the Nine Springs are still. Take my weight to the middle of the world, he says. Let the tree carry it. And tell my brother I said hello."],
+	],
+	"s_p11_end": [
+		["Elder Qing Xuan", "Chong's tablet and Li's weight. You went to the top of heaven and the bottom of the earth and brought back the two halves of an order four thousand years old. How do they feel?"],
+		["Lin Feng", "Lighter than they should. Heavier than they look."],
+		["Elder Qing Xuan", "Then come to the tree. All of us."],
+		["Narrator", "They are waiting at the foot of the Jianmu: Ling Yu and the Feather-Mother, Rain-Minister Ao Run with a brush behind his ear, Hu Qingyi and three of her foxes, Shui Lian with Little Bei on her shoulders, old Bu Si, Magistrate Ming with his lantern, and Houtu herself, plainly dressed, standing a little apart."],
+		["Elder Qing Xuan", "The ladder was cut so that the realms would not mix, and the Court kept it cut so that every road would run through the Court. The tree will carry the tablet and the weight, Lin Feng. But somebody must stand at its middle, once, and hold all three realms in one breath, so that it knows it is allowed."],
+		["Yue Ling", "And that somebody is you. Obviously."],
+	],
+	"pre:s_break16": [
+		["Narrator", "Lin Feng sets Chong's tablet in a fork of the Jianmu's bark and Li's weight between its roots. The tribulation that gathers is three storms at once: wind and thunder from the Nine Heavens, cold water and red stone from the Nine Springs, and from the middle world, nothing but the sound of people waiting."],
+		["Yue Ling", "Which way does it come from?"],
+		["Lin Feng", "Every way. That is the point of a ladder."],
+	],
+	"post:s_break16": [
+		["Narrator", "Lin Feng holds heaven above him, the earth below him and the middle world in his two hands, the way you hold a ladder steady for somebody else to climb, and becomes the first cultivator of Three Realms Concord: a realm in which every road goes somewhere and every realm can be visited."],
+		["Narrator", "Up the trunk go the farmers of Qingshi, to see the clouds from above; down the roots go the Feathered Folk, to see the Torch Dragon's day; and foxes and Pearl-Weepers cross the middle world to drink Old Wu's tea at Cloudfoot and complain about it. Chong and Li meet halfway up the Jianmu, and shake hands, and say nothing for a very long time."],
+		["Ling Yu of the Feathered Folk", "You climbed it without wings. I still won the race."],
+		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect, and then the first hundred steps of the stair round the Standing Tree, because somebody should, and the tree, very slightly, leans down to let him."],
+	],
 	# ---- Part V: The Falling Sky
 	"recall3": [
 		["Narrator", "Lin Feng keeps his word. For nine quiet days the first Dao Ancestor in ten thousand years sweeps the steps of Azure Cloud Sect, and nobody quite dares to stop him."],
@@ -4104,3 +4828,43 @@ const DIALOGUE := {
 		["Narrator", "In the Azure Cloud Sect, Elder Qing Xuan sets down his books, walks out onto the steps, and finds a broom leaning against the gate. He smiles, and starts to sweep."],
 	],
 }
+
+## Lines the Dao Lin Feng walks adds to a conversation (Part XI): the Elder's answer when he chooses,
+## what Chong and Li make of the way he fought them, and how the story is told afterwards.
+const DAO_LINES := {
+	"dao_chosen": {
+		"sword": [["Elder Qing Xuan", "The Sword. Of course. Three years with a broom taught you to put everything you have into one stroke."], ["Yue Ling", "Just do not cut the tree down by accident."]],
+		"wander": [["Elder Qing Xuan", "Free Wandering: Zhuangzi's road. The Peng rises on the wind and the little dove laughs at it. Be the Peng, disciple, and never laugh at the dove."], ["Yue Ling", "I will pack lightly, then."]],
+		"heart": [["Elder Qing Xuan", "The Compassionate Heart. You have walked it since the day you refused to take the sky. Now you will know its name."], ["Yue Ling", "Then I will keep yours company."]],
+		"formation": [["Elder Qing Xuan", "Formations. The land keeps its shape because it is allowed to, and so does a battle, and so does a city. A careful road."], ["Yue Ling", "Careful. That will be new."]],
+		"alchemy": [["Elder Qing Xuan", "The Cauldron. Alchemist Mo will be unbearable. Every pill is borrowed time, disciple: borrow it for others."], ["Yue Ling", "I will carry the pills. You carry the bill."]],
+		"illusion": [["Elder Qing Xuan", "The Mirror. The moon in the water is still the moon. Only be sure, when you trick the world, that you never trick yourself."], ["Yue Ling", "Is that really you? ...Just checking."]],
+	},
+	"post:chong": {
+		"sword": [["Chong, Who Lifts Heaven", "You fight like a man with one direction. Good. Heaven has had enough of people with no direction at all."]],
+		"wander": [["Chong, Who Lifts Heaven", "You fought like the wind, never where I struck. Go where you like, little Peng. Heaven is wide now."]],
+		"heart": [["Chong, Who Lifts Heaven", "You held back. I felt it. Four thousand years, and the first person to touch me was gentle about it."]],
+		"formation": [["Chong, Who Lifts Heaven", "Every blow in its place, like the stones of a wall. You would have made a good minister of heaven. Do not."]],
+		"alchemy": [["Chong, Who Lifts Heaven", "You fought on borrowed time and paid it all back. My grandfather would have hated you. I like you."]],
+		"illusion": [["Chong, Who Lifts Heaven", "I struck at you nine times and hit the sky every time. A good trick. Heaven needs more people who are hard to pin down."]],
+	},
+	"post:li": {
+		"sword": [["Li, Who Presses Down the Earth", "One stroke, all the way down. The earth respects that. So do I."]],
+		"wander": [["Li, Who Presses Down the Earth", "You never stood still long enough to be pressed. Perhaps that is the whole trick of it."]],
+		"heart": [["Li, Who Presses Down the Earth", "You could have crushed me. You lifted me. ...My grandfather never lifted anybody."]],
+		"formation": [["Li, Who Presses Down the Earth", "Every step placed like a foundation stone. You build. I only ever pressed."]],
+		"alchemy": [["Li, Who Presses Down the Earth", "You mended yourself and me with the same hand. The Deathless will like you."]],
+		"illusion": [["Li, Who Presses Down the Earth", "I pressed down on a reflection the whole fight. Is everything I pressed for four thousand years a reflection too?"]],
+	},
+	"post:s_break16": {
+		"sword": [["Narrator", "Later they will tell it as the story of the swordsman who cut nothing at all, and opened the way between three worlds with one clean stroke of kindness."]],
+		"wander": [["Narrator", "Later they will tell it as the story of the wanderer who went up to heaven and down to the dead and was home for supper, the way the Peng flies, on a wind of ninety thousand li."]],
+		"heart": [["Narrator", "Later they will tell it as the story of the cultivator whose Dao was his heart, who held three realms up only as long as he chose, and asked for help, and got it."]],
+		"formation": [["Narrator", "Later they will tell it as the story of the master of formations who drew no lines at all, only a ladder, and let everybody climb it."]],
+		"alchemy": [["Narrator", "Later they will tell it as the story of the cultivator of the cauldron who borrowed time from heaven and earth and paid it back, with interest, to everybody."]],
+		"illusion": [["Narrator", "Later they will tell it as the story of the cultivator of the mirror who showed heaven and earth their reflections in each other, so that neither ever again forgot what the other looked like."]],
+	},
+}
+## Quest scenes in which one of the peoples of the realms first meets Lin Feng: the speaker adds what
+## their people think of the Dao he walks (RACES dao_lines).
+const DAO_GREETS := ["s_p11_tree", "s_jt_intro", "s_jt_minister", "s_cg_intro", "s_ns_intro", "s_ns_elder", "s_yd_intro"]

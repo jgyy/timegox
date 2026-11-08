@@ -303,6 +303,10 @@ func _next_turn() -> void:
 	cur.turns += 1
 	if cur.side == "party":
 		cur.qi = minf(cur.maxqi, cur.qi + cur.maxqi * 0.04)
+		# the Compassionate Heart: Lin Feng's wounds close by themselves
+		var regen := Game.dao_mod("regen", 0.0)
+		if cur.idx == 0 and regen > 0.0 and cur.hp < cur.maxhp:
+			cur.hp = minf(cur.maxhp, cur.hp + cur.maxhp * regen)
 		_open_main()
 		state = "menu"
 	else:
@@ -327,8 +331,25 @@ func _foe_act(f: Dictionary) -> void:
 	timer = 0.85
 
 func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool) -> void:
-	var em := 1.5 if tgt.weak == elem and elem != "phys" else 1.0
+	# the Daos (Part XI): a party member may slip the blow (Free Wandering) or the foe may strike a
+	# reflection (the Mirror, and the celestial foxes' friendship)
+	if tgt.side == "party" and a.side == "foe":
+		var slip := Game.dao_mod("evade", 0.0)
+		var miss := Game.dao_mod("miss", 0.0) + Game.boon("miss", 0.0)
+		if slip > 0.0 and randf() < slip:
+			fx.append({"text": "slips it", "p": head3(tgt), "t": 1.0, "col": Color("b8f0d0"), "slash": ""})
+			say("%s slips the blow." % tgt.name)
+			return
+		if miss > 0.0 and randf() < miss:
+			fx.append({"text": "a reflection", "p": head3(tgt), "t": 1.0, "col": Color("c8a8ff"), "slash": ""})
+			say("%s strikes at a reflection." % a.name)
+			return
+	var weak_k := Game.dao_mod("weak", 1.5) if a.side == "party" else 1.5
+	var em := weak_k if tgt.weak == elem and elem != "phys" else 1.0
 	var raw: float = a.atk * mult * randf_range(0.9, 1.1) * em - tgt.def * 0.5
+	if tgt.side == "party":
+		# Formations and the Heart (and the shades' friendship) soften every blow
+		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0)
 	var crit := randf() < 0.08
 	if crit:
 		raw *= 1.5
@@ -364,6 +385,8 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 			Game.kills += 1
 
 func _heal(tgt: Dictionary, amount: float) -> void:
+	# the Compassionate Heart and the Pearl-Weepers' friendship strengthen every heal
+	amount *= Game.dao_mod("heal", 1.0) * Game.boon("heal", 1.0)
 	tgt.hp = minf(tgt.maxhp, tgt.hp + amount)
 	fx.append({"text": "+%d" % int(amount), "p": head3(tgt), "t": 1.0, "col": UI.C_JADE, "slash": ""})
 	if not headless() and tgt.has("node"):
@@ -371,7 +394,7 @@ func _heal(tgt: Dictionary, amount: float) -> void:
 
 func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 	var s: Dictionary = Data.SKILLS[skill_id]
-	actor.qi -= s.cost
+	actor.qi -= Game.skill_cost(skill_id)
 	if s.has("heal"):
 		say("%s casts %s." % [actor.name, s.n])
 		if not headless() and actor.has("model"):
@@ -392,20 +415,29 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 			for tg in tgts:
 				Fx3D.projectile(scene3d, pos3(actor) + Vector3(0, 1.4, 0), pos3(tg) + Vector3(0, 1.4 if not tg.boss else 2.8, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
 			Fx3D.technique(scene3d, skill_id, pos3(actor), tgts.map(func(f): return pos3(f)), atan2(cam_look.x - cam.position.x, cam_look.z - cam.position.z))
+		# the Sword's Dao: Lin Feng's single strikes cut deeper, his plain sword strike deepest
+		var dm := 1.0
+		if actor.side == "party" and actor.idx == 0:
+			if skill_id == "strike":
+				dm = Game.dao_mod("strike", 1.0)
+			elif s.tgt == "one":
+				dm = Game.dao_mod("one", 1.0)
 		for tg in tgts:
-			_hit(actor, tg, s.mult, s.elem, false)
+			_hit(actor, tg, s.mult * dm, s.elem, false)
 		if not headless() and actor.has("model"):
 			Models.act(actor.model, "cast", t)
 	_end_action()
 
 func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	Game.inv[item] -= 1
+	# the Cauldron's Dao: pills do far more good
+	var pk := Game.dao_mod("pill", 1.0)
 	if item == "hp_pill":
 		say("%s feeds %s a healing pill." % [actor.name, tgt.name])
-		_heal(tgt, tgt.maxhp * 0.4)
+		_heal(tgt, tgt.maxhp * 0.4 * pk)
 	else:
 		say("%s restores %s's qi." % [actor.name, tgt.name])
-		tgt.qi = minf(tgt.maxqi, tgt.qi + tgt.maxqi * 0.5)
+		tgt.qi = minf(tgt.maxqi, tgt.qi + tgt.maxqi * 0.5 * pk)
 		fx.append({"text": "+qi", "p": head3(tgt), "t": 1.0, "col": UI.C_BLUE, "slash": ""})
 	_end_action()
 
@@ -424,6 +456,10 @@ func _win() -> void:
 		xp += Data.enemy_exp(f.lv, f.boss)
 		stones += Data.enemy_stones(f.lv, f.boss)
 	_writeback()
+	# the Cauldron's Dao pays better; every victory deepens the Dao Lin Feng walks
+	stones = int(stones * Game.dao_mod("stones", 1.0))
+	if not ctx.get("tribulation", false):
+		Game.dao_battle_won(boss)
 	result_lines = ["VICTORY", "+%d cultivation   +%d spirit stones" % [xp, stones]]
 	if ctx.get("tribulation", false):
 		xp = 0
@@ -482,9 +518,9 @@ func _open_skills() -> void:
 		var s: Dictionary = Data.SKILLS[sid]
 		if sid == "strike" or sid == "needle":
 			continue
-		labels.append("%s  [%d qi]" % [s.n, s.cost])
+		labels.append("%s  [%d qi]" % [s.n, Game.skill_cost(sid)])
 		ids.append(sid)
-		enabled.append(cur.qi >= s.cost)
+		enabled.append(cur.qi >= Game.skill_cost(sid))
 	if ids.is_empty():
 		labels.append("(no techniques)")
 		ids.append("")
@@ -667,6 +703,7 @@ func _screen(p: Vector3) -> Vector2:
 func _draw() -> void:
 	# overhead bars / names
 	# foes only: the party stands under the command panels and has its own status panel
+	var placed: Array = []
 	for f in foes:
 		if f.dead or f.fade <= 0.5 or not f.has("node"):
 			continue
@@ -675,7 +712,16 @@ func _draw() -> void:
 		var by := sp.y + (14.0 if not f.boss else 22.0)
 		UI.bar(self, Rect2(sp.x - bw / 2, by, bw, 8), f.hp / f.maxhp, UI.C_RED)
 		var nw := 360.0 if f.boss else 200.0
-		UI.text(self, Vector2(sp.x - nw / 2, by + 24), f.name, 14, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, nw)
+		var fs := UI.fit(f.name, 14, nw, 11)
+		var tw := minf(UI.font().get_string_size(f.name, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x, nw)
+		# a name that would run into one already drawn (two long names side by side) moves down a row
+		var lr := Rect2(sp.x - tw / 2, by + 24 - fs, tw, fs + 4)
+		var guard := 0
+		while guard < 4 and placed.any(func(q): return (q as Rect2).intersects(lr)):
+			lr.position.y += 15
+			guard += 1
+		placed.append(lr)
+		UI.text(self, Vector2(sp.x - nw / 2, lr.position.y + fs), f.name, fs, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, nw)
 	for p in fx:
 		var a := clampf(p.t, 0.0, 1.0)
 		var sp2 := _screen(p.p) + Vector2(0, -(1.0 - p.t) * 40.0)
@@ -685,10 +731,14 @@ func _draw() -> void:
 func _draw_ui() -> void:
 	# log
 	UI.panel(self, Rect2(300, 556, 470, 150))
-	var y := 584.0
+	# the newest messages, wrapped to the panel (three long names take two rows)
+	var rows: Array = []
 	for l in log_lines:
-		UI.text(self, Vector2(316, y), l, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 440)
-		y += 26
+		rows.append_array(UI.wrap_lines(l, 16, 440))
+	var y := 584.0
+	for row in rows.slice(maxi(0, rows.size() - 5)):
+		UI.text(self, Vector2(316, y), row, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 440)
+		y += 25
 	# party status
 	UI.panel(self, Rect2(786, 556, 480, 150))
 	for p in party:
@@ -705,7 +755,7 @@ func _draw_ui() -> void:
 		var a := clampf(minf(INTRO_BOSS - timer, timer) * 2.5, 0.0, 1.0)
 		var ec: Color = Data.ELEM_COLORS.get(f0.elem, Color.WHITE)
 		UI.panel(self, Rect2(VIEW.x * 0.5 - 330, 70, 660, 92), Color(0.03, 0.03, 0.08, 0.8 * a), Color(ec.r, ec.g, ec.b, a))
-		UI.text(self, Vector2(VIEW.x * 0.5 - 330, 116), f0.name, 34, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, 660)
+		UI.text(self, Vector2(VIEW.x * 0.5 - 330, 116), f0.name, UI.fit(f0.name, 34, 660, 24), Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, 660)
 		var sub := "Heavenly Tribulation" if ctx.get("tribulation", false) else "%s  -  weak to %s" % [str(f0.elem).capitalize(), str(f0.weak).capitalize()]
 		UI.text(self, Vector2(VIEW.x * 0.5 - 330, 146), sub, 16, Color(ec.r, ec.g, ec.b, a), HORIZONTAL_ALIGNMENT_CENTER, 660)
 	# command menu

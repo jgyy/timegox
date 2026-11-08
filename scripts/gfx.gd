@@ -54,8 +54,16 @@ static func world_minimap(wd: Dictionary) -> ImageTexture:
 	var grid: PackedByteArray = wd.grid
 	var owner: PackedByteArray = wd.owner
 	var sea: PackedByteArray = wd.get("sea", PackedByteArray())
+	# the sea round the land; the sky round the Nine Heavens' islands; the abyss under the Nine Springs
 	var deep := Color("1b3552")
 	var shallow := Color("2f6286")
+	match str(wd.get("layer", "surface")):
+		"heaven":
+			deep = Color("c8d8ec")
+			shallow = Color("e8f0fa")
+		"under":
+			deep = Color("06080c")
+			shallow = Color("16222a")
 	for i in W * H:
 		if not sea.is_empty() and sea[i] == 1:
 			# the Four Seas: one deep blue, paler in the shallows along the coast

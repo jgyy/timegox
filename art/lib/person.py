@@ -22,7 +22,8 @@ sword, blade, hilt, scabbard, staff, staff_gem, halberd, hat (straw, scholar, ho
 hat_col, talisman, horns, horn_col, beast_head (ox, horse), head_col, muzzle_col, embroidery,
 jade, pin, collar2, folds, flare, sleeve_w, ahoge, hair_len, tint_cloth, head_scale, scale,
 claws, claw_col, claw_len, fangs, tail, beads, badge, bracers, props (accessory.py names), pose
-(hold_l, hold_both, flute, hold_r) and extra (a callable adding custom geometry).
+(hold_l, hold_both, flute, hold_r) and extra (a callable adding custom geometry).  Race features
+(wings, crest, ears, tails, scales, whiskers and horns "antler") are built by art/lib/race.py.
 """
 
 import math
@@ -31,6 +32,7 @@ import accessory as acc
 import face as facelib
 import garment as G
 import hair as hairlib
+import race
 from kit import CLOTH, HAIR, METAL, SKIN, STONE, Builder, Rig, V, darken, env, finish_rigged, harmonise, lighten, mix, rgb
 from kit import hsv as kit_hsv
 from kit import to_hsv as kit_to_hsv
@@ -146,6 +148,7 @@ def build(o):
         G.hand(b, o, s, skin)
 
     # ---------------- neck and head
+    f = s = None
     if o.get("beast_head") is not None:
         b.tube([V(0, 1.46, 0.0), V(0, 1.6, 0.01)], [0.06, 0.055], o.get("head_col", "6a4a3a"), cls=CLOTH, bones=[{"neck": 0.6, "chest": 0.4}, {"neck": 0.5, "head": 0.5}], seg=14)
         beast_head(b, o)
@@ -153,7 +156,10 @@ def build(o):
     else:
         f = facelib.Face(o)
         facelib.neck(b, f, o, [{"chest": 0.6, "neck": 0.4}, "neck", {"neck": 0.5, "head": 0.5}, "head"])
-        facelib.head(b, o, "head", "eyes")
+        if race.hides_ears(o):
+            race.head(b, o, "head", "eyes")
+        else:
+            facelib.head(b, o, "head", "eyes")
         s = hairlib.build(b, f, o.get("hair_style", "topknot"), hair_col, o)
         top = hairlib.top_y(s)
         if o.get("beard", False):
@@ -166,7 +172,9 @@ def build(o):
         G.hat(b, o, o["hat"], top)
     if o.get("talisman", False):
         G.talisman(b, facelib.HC)
-    if o.get("horns", False):
+    if o.get("horns") == "antler":
+        race.antlers(b, o, top)
+    elif o.get("horns", False):
         hcol = o.get("horn_col", "2a1a20")
         for side in (1, -1):
             pts = [V(0.06 * side, top - 0.04, 0.03), V(0.11 * side, top + 0.04, -0.0), V(0.16 * side, top + 0.12, -0.07), V(0.15 * side, top + 0.2, -0.16)]
@@ -174,6 +182,9 @@ def build(o):
             for k in range(3):
                 q = V(0.06 * side, top - 0.04, 0.03).lerp(pts[2], 0.2 + k * 0.2)
                 b.tube([q + V(0, 0.004, 0), q - V(0, 0.004, 0)], [0.031 - k * 0.006] * 2, darken(hcol, 0.3), cls=STONE, bone="head", seg=10, cap0=False, cap1=False)
+    # wings, crest, fox or fin ears, fox tails, scales, whiskers (art/lib/race.py)
+    if race.wanted(o):
+        race.build(b, o, f, s)
 
     # ---------------- ribbons in the hair
     if o.get("ribbon") is not None:

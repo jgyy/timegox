@@ -574,6 +574,80 @@ static func portal(col: Color, open: bool) -> Node3D:
 	root.set_meta("swirl", swirl)
 	return root
 
+## The end of a ladder between the realms (Part XI): at the foot of the Jianmu's stair a carved
+## stone landing with a column of rising golden light (going up) or a well of blue light sinking into
+## the roots (going down).  A flight of stairs inside a building has only a faint glowing mark (the
+## building draws the stairs themselves).  "glow" is hidden while the way is still closed; "spin" turns.
+static func ladder(style: String, dir: int) -> Node3D:
+	var root := Node3D.new()
+	var gcol := Color(1.0, 0.85, 0.45) if dir > 0 else Color(0.45, 0.75, 1.0)
+	if style != "climb":
+		var mk := MB.new()
+		mk.disc(Vector3(0, 0.06, 0), 0.7, Color(gcol.r, gcol.g, gcol.b, 0.25), 20, Color(gcol.r, gcol.g, gcol.b, 0.0))
+		var pv := _pivot(root, Vector3.ZERO)
+		_mi(pv, mk, MB.mat_glow())
+		root.set_meta("glow", pv)
+		return root
+	var b := MB.new()
+	var stone := MB.tag(Color("a8a29a"), MB.STONE)
+	var gold := MB.tag(Color("d8b050"), MB.METAL)
+	b.lathe(Vector3.ZERO, [Vector2(1.5, 0.0), Vector2(1.55, 0.14), Vector2(1.35, 0.26), Vector2(1.3, 0.32)], stone, 20)
+	for i in 8:
+		var a := TAU * i / 8.0
+		b.box(Vector3(cos(a) * 1.4, 0.36, sin(a) * 1.4), Vector3(0.28, 0.12, 0.28), gold, Vector3(0, -a, 0))
+	_mi(root, b)
+	var glow := _pivot(root, Vector3.ZERO)
+	var gb := MB.new()
+	gb.disc(Vector3(0, 0.34, 0), 1.25, Color(gcol.r, gcol.g, gcol.b, 0.7), 24, Color(gcol.r, gcol.g, gcol.b, 0.08))
+	gb.cyl(Vector3(0, 3.5 if dir > 0 else 1.2, 0), 0.9, 7.0 if dir > 0 else 2.4, Color(gcol.r, gcol.g, gcol.b, 0.14), Vector3.ZERO, 16)
+	_mi(glow, gb, MB.mat_glow())
+	var spin := _pivot(glow, Vector3.ZERO)
+	var sb := MB.new()
+	for k in 10:
+		var a2 := TAU * k / 10.0
+		var y2 := 0.6 + (k % 5) * (0.9 if dir > 0 else 0.3)
+		sb.ball(Vector3(cos(a2) * 0.8, y2, sin(a2) * 0.8), 0.07, Color(1, 1, 1, 0.9), true)
+		sb.leaf(Vector3(cos(a2) * 0.7, y2 - 0.1, sin(a2) * 0.7), Vector3(cos(a2) * 0.7, y2 + 0.3, sin(a2) * 0.7), 0.06, Color(gcol.r, gcol.g, gcol.b, 0.5))
+	_mi(spin, sb, MB.mat_glow())
+	root.set_meta("glow", glow)
+	root.set_meta("spin", spin)
+	return root
+
+## A Dao Stele (Part XI): a tall slab of dark stone on a tortoise plinth, the Taiji carved at its top
+## and the eight trigrams round it, a slow ring of six coloured lights, one for each Dao.
+static func dao_stele() -> Node3D:
+	var root := Node3D.new()
+	var b := MB.new()
+	var stone := MB.tag(Color("4a4c54"), MB.STONE)
+	var pale := MB.tag(Color("d8d4c8"), MB.STONE)
+	var gold := MB.tag(Color("d8b050"), MB.METAL)
+	# the tortoise plinth (bixi) and the slab
+	b.sph(Vector3(0, 0.35, 0), Vector3(0.9, 0.4, 1.1), MB.tag(Color("6a6a60"), MB.STONE))
+	b.sph(Vector3(0, 0.4, 1.05), Vector3(0.25, 0.22, 0.3), MB.tag(Color("6a6a60"), MB.STONE))
+	b.box(Vector3(0, 1.75, 0), Vector3(1.0, 2.4, 0.3), stone)
+	b.box(Vector3(0, 3.05, 0), Vector3(1.15, 0.25, 0.38), stone)
+	b.prim("prism", Transform3D(Basis.IDENTITY.scaled(Vector3(1.2, 0.3, 0.42)), Vector3(0, 3.3, 0)), stone)
+	# the Taiji: two halves of a disc, light and dark, on both faces
+	for f: float in [-1.0, 1.0]:
+		b.disc(Vector3(0, 2.45, f * 0.16), 0.32, pale, 20, pale, Vector3(PI / 2, 0, 0))
+		b.disc(Vector3(-0.08, 2.45, f * 0.165), 0.16, stone, 14, stone, Vector3(PI / 2, 0, 0))
+		for k in 8:
+			var a := TAU * k / 8.0
+			b.box(Vector3(cos(a) * 0.42, 2.45 + sin(a) * 0.42, f * 0.16), Vector3(0.12, 0.04, 0.02), gold, Vector3(0, 0, a))
+		for r in 5:
+			b.box(Vector3(0, 1.0 + r * 0.22, f * 0.16), Vector3(0.6, 0.05, 0.02), MB.tag(Color("2a2a30"), MB.STONE))
+	_mi(root, b)
+	var spin := _pivot(root, Vector3(0, 0.0, 0))
+	var gb := MB.new()
+	for k2 in Data.DAO_ORDER.size():
+		var a2 := TAU * k2 / float(Data.DAO_ORDER.size())
+		var c: Color = Data.DAOS[Data.DAO_ORDER[k2]].col
+		gb.ball(Vector3(cos(a2) * 1.3, 1.6 + 0.3 * sin(a2 * 2.0), sin(a2) * 1.3), 0.12, Color(c.r, c.g, c.b, 0.95), true)
+		gb.ball(Vector3(cos(a2) * 1.3, 1.6 + 0.3 * sin(a2 * 2.0), sin(a2) * 1.3), 0.3, Color(c.r, c.g, c.b, 0.2), true)
+	_mi(spin, gb, MB.mat_glow())
+	root.set_meta("spin", spin)
+	return root
+
 static func spring_basin() -> Node3D:
 	var root := Node3D.new()
 	var b := MB.new()
