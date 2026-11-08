@@ -545,24 +545,70 @@ func _part13_shots() -> void:
 	await _wait(2.9)
 	await _shot("battle_boss_chiyou")
 	main.pop()
-	# the ending, with the Eight Gates and the roads taken, and the numbers of the bot's run (seed 1234;
-	# the clock runs on for the 14 s before the shot)
+	# the ending: a frame of every shot of its film, and the results
+	_ending_state()
+	await _ending_shots()
+
+## The state the bot's run (seed 1234) reaches the ending in: every trial passed the way its plan
+## takes it, the heart by the Road of the Many Peoples, and the run's numbers (the clock stopped).
+func _ending_state() -> void:
 	Game.level = 54
+	Game.dao = "heart"
 	Game.trials = BOT.TRIAL_PLAN.duplicate()
 	Game.trials["chiyou"] = "peoples"
+	Game.gates_open = {}
+	for gid in ["fetter_maple", "kui_drum", "liang", "xingtian"]:
+		Game.gates_open[gid] = true
 	Game.renown = 612
 	Game.deeds = {}
 	for did in Trials.DEEDS.keys().slice(0, 8):
 		Game.deeds[did] = true
-	Game.playtime = 57757.0
+	Game.playtime = 57771.0
+	Game.finished = true
 	Game.kills = 3150
 	Game.battles = 1696
+	Game.deaths = 0
 	Game.meditated = 12460.0
 	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 3, "qi_sea": 3, "five_phase": 3, "fortune": 3, "yin_root": 3, "spirit_sense": 3, "insight": 3}
+
+## The ending: a frame from the middle of every shot of the film (ending_<shot>.png, and all of them
+## on one sheet, ending_film.png) and the results once the film is over (ending.png).
+func _ending_shots() -> void:
 	main.push("ending")
-	await _wait(14.0)
+	await _wait(1.0)
+	var e = main.ending
+	var frames: Array = []
+	var t0 := 0.0
+	for s in e.FILM:
+		e.t = t0 + float(s.dur) * 0.55
+		await _wait(0.5)
+		await _shot("ending_%s" % s.id)
+		frames.append(last_img.duplicate())
+		t0 += float(s.dur)
+	# the six wonders on one sheet (the last shot, on the lotus, is the results without them)
+	_grid("ending_film", frames.slice(0, 6), 2)
+	# Enter in the middle of the film skips to the results, as a player would
+	e.t = 4.0
+	main.press("confirm")
+	await _wait(3.5)
 	await _shot("ending")
 	main.pop()
+
+## Frames laid out on a grid at half size, `cols` to a row.
+func _grid(n: String, frames: Array, cols: int) -> void:
+	if frames.is_empty():
+		return
+	var fw: int = frames[0].get_width() / 2
+	var fh: int = frames[0].get_height() / 2
+	var rows := int(ceil(frames.size() / float(cols)))
+	var out := Image.create(fw * cols, fh * rows, false, Image.FORMAT_RGB8)
+	for i in frames.size():
+		var im: Image = frames[i]
+		im.convert(Image.FORMAT_RGB8)
+		im.resize(fw, fh, Image.INTERPOLATE_LANCZOS)
+		out.blit_rect(im, Rect2i(0, 0, fw, fh), Vector2i((i % cols) * fw, (i / cols) * fh))
+	out.save_png("%s/%s.png" % [dir, n])
+	print("[tour] ", n)
 
 func _run() -> void:
 	await _wait(1.0)
@@ -997,10 +1043,9 @@ func _run() -> void:
 	if main.args.has("gallery12"):
 		await _part12_galleries()
 	if main.args.has("ending"):
-		# the results screen on its own (--ending): the finale set pieces of every part
-		main.push("ending")
-		await _wait(14.0)
-		await _shot("ending")
+		# the ending on its own (--ending): its film and the results
+		_ending_state()
+		await _ending_shots()
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
 		return
@@ -1041,7 +1086,6 @@ func _run() -> void:
 	await _wait(3.5)
 	await _shot("02_dialogue")
 	main.pop()
-	main.push("ending")
-	await _wait(1.5)
-	await _shot("ending")
+	_ending_state()
+	await _ending_shots()
 	get_tree().quit(0)

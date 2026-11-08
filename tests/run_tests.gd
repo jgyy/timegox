@@ -23,6 +23,25 @@ func _process(_d: float) -> bool:
 				if f.ends_with(".gd"):
 					var sc = load(d + "/" + f)
 					check(sc != null and (sc as GDScript).can_instantiate(), "%s/%s compiles" % [d.trim_prefix("res://"), f])
+		# the ending's film (it uses Game, so it is only read once compiled): a line and time to read
+		# it in every shot, every wonder in a shot, last words for every road into the heart and a
+		# word on the results for every way through a trial
+		var ending = load("res://scripts/ending.gd")
+		if ending != null:
+			print("== the ending ==")
+			var shown := {}
+			for f in ending.FILM:
+				check(str(f.line) != "" and float(f.dur) >= 5.0, "the ending's shot %s has its line and time to read it" % f.id)
+				for g in f.show:
+					shown[g] = true
+			for g in ["bridge", "cauldrons", "jianmu", "isles", "gates", "wheel", "hero"]:
+				check(shown.has(g), "the ending's film shows the %s" % g)
+			var last: Array = ending.shot_at(ending.film_length() + 30.0)
+			check(int(last[0]) == ending.FILM.size() - 1, "after the film the ending rests on the lotus")
+			for p in Trials.TRIALS.chiyou.paths:
+				check(ending.ROAD_ENDS.has(p.id), "the ending has last words for the road %s" % p.id)
+			for kd in Trials.KIND_ORDER:
+				check(ending.KIND_WORD.has(kd), "the results name the way %s" % kd)
 		print("failures: ", failures)
 		quit(1 if failures > 0 else 0)
 	return false
