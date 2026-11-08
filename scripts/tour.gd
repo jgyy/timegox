@@ -498,8 +498,9 @@ func _part13_shots() -> void:
 	for tid in BOT.TRIAL_PLAN:
 		if not Trials.is_gate(tid):
 			Game.trials[tid] = BOT.TRIAL_PLAN[tid]
-	Game.trials["fetter_maple"] = "relic"
+	# the two gates standing open, and how they were passed
 	Game.trials["liang"] = "dao"
+	Game.trials["red_banner"] = "craft"
 	Game.inv = {"hp_pill": 8, "qi_pill": 4, "ess_wood": 23, "ess_fire": 31, "ess_water": 40, "ess_earth": 27, "ess_thunder": 18, "ess_dark": 35, "ess_metal": 12, "autumn_leaf": 1, "spring_water": 4, "noon_ember": 4, "jingwei_stone": 4, "wind_bell": 4, "shift_horn": 1}
 	for gs in [["gate_kui_drum", "kui_drum", Vector3(-12.0, 7.0, 13.0)], ["gate_fetter_maple", "fetter_maple", Vector3(-9.0, 13.0, 15.0)]]:
 		var ga := Trials.boss_area(str(gs[1]))
@@ -528,13 +529,11 @@ func _part13_shots() -> void:
 	await _wait(0.5)
 	await _shot("journal_gates")
 	main.pop()
-	# a Gate General's trial battle, by the friendship of the foxes: allies strike every round
+	# a Gate General's trial battle, by the friendship of the foxes: allies strike every round (the first strike at once)
 	main.battle.start([{"id": "xingtian", "lv": 52, "mult": 1.3, "atk": 1.1}], {"entity": {"id": "boss_xingtian"}, "boss": true, "enemy": "xingtian", "theme": "changhe",
 		"trial": "xingtian", "path": "peoples", "boon": Trials.path("xingtian", "peoples").boon, "path_n": "Kin of the celestial foxes", "path_kind": "By friendship"})
 	main.push("battle")
-	await _wait(2.6)
-	main.battle._assist()
-	await _wait(0.5)
+	await _wait(3.1)
 	await _shot("battle_boss_xingtian")
 	main.pop()
 	# Chiyou at the heart, on the Road of the Many Peoples
@@ -546,18 +545,19 @@ func _part13_shots() -> void:
 	await _wait(2.9)
 	await _shot("battle_boss_chiyou")
 	main.pop()
-	# the ending, with the Eight Gates and the roads taken
+	# the ending, with the Eight Gates and the roads taken, and the numbers of the bot's run (seed 1234;
+	# the clock runs on for the 14 s before the shot)
 	Game.level = 54
 	Game.trials = BOT.TRIAL_PLAN.duplicate()
 	Game.trials["chiyou"] = "peoples"
-	Game.renown = 642
+	Game.renown = 612
 	Game.deeds = {}
-	for did in Trials.DEEDS.keys().slice(0, 13):
+	for did in Trials.DEEDS.keys().slice(0, 8):
 		Game.deeds[did] = true
-	Game.playtime = 55000.0
-	Game.kills = 3291
-	Game.battles = 1771
-	Game.meditated = 12730.0
+	Game.playtime = 57757.0
+	Game.kills = 3150
+	Game.battles = 1696
+	Game.meditated = 12460.0
 	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 3, "qi_sea": 3, "five_phase": 3, "fortune": 3, "yin_root": 3, "spirit_sense": 3, "insight": 3}
 	main.push("ending")
 	await _wait(14.0)
