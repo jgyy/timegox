@@ -382,13 +382,23 @@ func _part12_shots() -> void:
 	await _shot("talent_choice")
 	main.pop()
 	Game.talent_pts = 0
-	# a Founder's cave on the mountain, sealed for a realm Lin Feng has not reached
-	main.world.load_area("mountain", Vector2i(60, 103))
-	main.world.facing = Vector2i(0, -1)
-	main.world.cam_q = 0
+	# a Founder's cave on the mountain, sealed for a realm Lin Feng has not reached (its door faces the
+	# sect, to the north-east)
+	main.world.load_area("mountain", Vector2i(113, 72))
+	main.world.facing = Vector2i(1, 0)
+	main.world.cam_q = 1
 	main.world._snap_cam()
+	var cave_t: Vector2i = Atlas.to_world("mountain", Vector2i(116, 72))
+	var cp: Vector3 = main.world.wpos(cave_t)
+	cp.y = main.world.ground_y(cp)
+	var to_sect: Vector2i = Atlas.to_world("sect", Vector2i(20, 13)) - cave_t
+	var dir := Vector3(to_sect.x, 0, to_sect.y).normalized()
+	main.world.cam_override = Transform3D(Basis.IDENTITY, cp + dir * 9.0 + Vector3(dir.z, 0, -dir.x) * 3.0 + Vector3(0, 5.5, 0)).looking_at(cp + Vector3(0, 1.2, 0), Vector3.UP)
 	await _wait(1.2)
 	await _shot("founder_cave")
+	main.world.cam_override = null
+	if main.args.has("cave-only"):
+		return
 	# a cutscene: Mazu gives Yue Ling her lantern at the pool of the suns (gestures and the two-shot)
 	Game.step = Data.step_index("s_p12_shore")
 	main.world.load_area("fusang", Vector2i(69, 49))

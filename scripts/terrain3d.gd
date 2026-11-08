@@ -1096,8 +1096,19 @@ static func guixu_whirl(root: Node3D, pos: Vector3, along: Vector3) -> void:
 		var a := TAU * k / 22.0 + rng.randf() * 0.2
 		var rr := 15.5 + rng.randf() * 2.0
 		b.sph(c + Vector3(cos(a) * rr, 0.2, sin(a) * rr), Vector3(1.8, 0.9 + rng.randf() * 0.8, 1.6), rim)
+	# the mouth of the funnel at the level of the sea floor: dark water in rings, darker towards the middle
+	# (the ground of the region is laid over the funnel, so the mouth is drawn on top of it)
+	for k4 in 6:
+		var rr2 := 14.0 - k4 * 2.3
+		b.disc(c + Vector3(0, 0.22 + k4 * 0.02, 0), rr2, MB.tag(Color("1a3050").lerp(Color("04060c"), k4 / 5.0), MB.STONE), 32)
 	MB.mesh_node(root, b.build(MB.mat_plain())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	# the spiral of foam pouring in, and the spray over the lip
+	# the spiral of foam pouring in round the mouth, and the spray over the lip
+	for k5 in 90:
+		var f2 := k5 / 90.0
+		var a5 := f2 * TAU * 4.0
+		var r5 := lerpf(13.5, 1.0, f2)
+		g.ball(c + Vector3(cos(a5) * r5, 0.42, sin(a5) * r5), lerpf(0.55, 0.15, f2), Color(0.8, 0.92, 1.0, lerpf(0.55, 0.15, f2)), true)
+	g.disc(c + Vector3(0, 0.4, 0), 2.2, Color(0.3, 0.55, 1.0, 0.5), 20, Color(0.3, 0.55, 1.0, 0.0))
 	for k2 in 60:
 		var f := k2 / 60.0
 		var a2 := f * TAU * 3.0

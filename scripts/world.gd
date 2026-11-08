@@ -768,7 +768,9 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			n.set_meta("model", cm)
 			n.set_meta("open", opened)
 			_label(n, "%s (%s)" % [e.n, Data.REALMS[Data.realm_of(int(e.req))]], 3.4, UI.C_GOLD, 28)
-			n.rotation.y = PI
+			# the door faces the sect, the way a disciple comes to it
+			var to_sect: Vector2i = Atlas.to_world("sect", Vector2i(20, 13)) - e.pos
+			cm.rotation.y = atan2(float(to_sect.x), float(to_sect.y))
 	return n
 
 # ---------------------------------------------------------------- update
@@ -1171,6 +1173,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			if opened != bool(n.get_meta("open", false)):
 				var old: Node3D = n.get_meta("model")
 				var nm := Models.sealed_cave(opened)
+				nm.rotation.y = old.rotation.y
 				old.queue_free()
 				n.add_child(nm)
 				n.set_meta("model", nm)

@@ -73,6 +73,15 @@ flowchart LR
   - **The world grows with the root**: every foe is a little tougher for each rank a cultivator of its level would be expected to have woken (`Data.expected_ranks`), so the branches a player wakes (and the caves they open) decide whether they keep pace; and a **Heavenly Tribulation tests a woken root harder** (+1.5% per rank awake, heaven's jealousy).
   - **Spirit Sense** reveals four caches hidden on the isles; the ending names the ranks awake.
 - **Custom animations in the cutscenes**: every person in the game (153 Blender characters) has **ten new gesture clips** baked in `art/lib/person.py` (nod, shake, point, wave, laugh, grieve, think, kneel, offer, shock). A line of dialogue can name its gesture (`["Speaker", "text", "kneel"]`), a narrator's line can direct somebody present (`"Mazu, Who Brings the Boats Home:offer"`), and otherwise one is read from the words (`Data.emote_for`: thanks bow, refusals shake their heads, welcomes wave, directions point, questions think); the listener answers (a bow for a gift, a wave for a wave, a nod for grief). A **conversation camera** eases from the chase camera into a two-shot from the side at head height (higher indoors), drifts during narration and eases back. The ending screen has Yue Ling waving, bowing and laughing and Mazu waving from her boat.
+  | | |
+  |---|---|
+  | ![Lin Feng kneels with the cultivator's salute](docs/screenshots/anim_lin_feng_kneel.png) | ![Yue Ling waves](docs/screenshots/anim_yue_ling_wave.png) |
+  | ![Lin Feng thinks, hand to his chin](docs/screenshots/anim_lin_feng_think.png) | ![Yue Ling grieves](docs/screenshots/anim_yue_ling_grieve.png) |
+  | ![Lin Feng laughs](docs/screenshots/anim_lin_feng_laugh.png) | ![Yue Ling shows the way](docs/screenshots/anim_yue_ling_point.png) |
+  | ![Lin Feng nods](docs/screenshots/anim_lin_feng_nod.png) | ![Yue Ling offers something with both hands](docs/screenshots/anim_yue_ling_offer.png) |
+  | ![Elder Qing Xuan, startled](docs/screenshots/anim_elder_qing_shock.png) | ![Mazu offers her lantern](docs/screenshots/anim_mazu_offer.png) |
+  | ![a cutscene: Mazu waves as she speaks, framed by the conversation camera](docs/screenshots/cutscene_mazu2.png) | ![the conversation camera during narration](docs/screenshots/cutscene_mazu.png) |
+
 - **More people in every town**: 22 new townsfolk with their own Blender models and three lines each: a new disciple and the herb-gardener at the sect; a former tax-clerk of the Court carrying noodles, the noodle-seller and a courier at Cloudfoot; the ox-herd and the schoolteacher at Qingshi; a lantern-maker and the archery-master at Yanggu; a star-glass blower and a Sogdian merchant at Shazhou; a scholar who failed the examinations nine times and a cormorant fisher at Longmen; a bell-tuner and the keeper of the casting pits at Tushan; a Yumin who cannot fly and a rain-clerk at Featherfall; a silk-diver and a fruit-trader of the Deathless at Tearwater; a roll-clerk and the lamplighter at Youdu; and a fox of one tail at the Gate of Heaven. Landfall adds twelve more.
 - **A richer, more consistent world**: two new peoples (the **Thousand Children of Landfall**, mortals on the isle of the immortals for two thousand years, and the **Immortals of the Isles**) with their Daos, keepsakes and boons; **progress-aware chat** (`Data.CHAT_LATER`: people only speak of falling stars and Jade Emperors once those have happened); the Founder's caves and their letters; realm-gated lore; and **nineteen plot holes fixed** (see [below](#narrative-plot-holes-found-and-fixed)).
 - **Part XII, "The Returning Ruins"** adds 1 hour 23 minutes (see [below](#part-xii-the-returning-ruins)), verified by the playthrough bot; CI now requires **12 hours**.
@@ -803,6 +812,15 @@ sequenceDiagram
     X->>X: Eats the ripe fruit, and grows old
     X->>E: Home to Landfall, and the water comes home: Ten Thousand Waters Return
 ```
+
+| | |
+|---|---|
+| ![Landfall, the town of the Thousand Children](docs/screenshots/town_landfall.png) | ![the Pavilion of Penglai on its sea-cliff, a mirage over the water](docs/screenshots/penglai_pavilion.png) |
+| ![the Eastern Sea from above Penglai](docs/screenshots/realm_sea.png) | ![Mazu's boat at the pool of the suns in Fusang](docs/screenshots/mazu_boat.png) |
+| ![Fangzhang, the Square-Pot Isle](docs/screenshots/isle_fangzhang.png) | ![Yingzhou, the Isle of Mists](docs/screenshots/isle_yingzhou.png) |
+| ![the bare sea floor at the Returning Ruins](docs/screenshots/vista_guixu.png) | ![the lip of Guixu](docs/screenshots/guixu_whirl.png) |
+| ![Lu Dongbin's drinking-room upstairs in the wine-house](docs/screenshots/upper_drinking_room.png) | ![the steersman's cabin in the wreck of Xu Fu's flagship](docs/screenshots/upper_steersman_cabin.png) |
+| ![Jingwei, Old Gui, the mist-fisher, Furnace-Boy Dan, Steersman Hong, Ah Fu and Xu Fu](docs/screenshots/gallery_isles.png) | ![the monsters of the Eastern Sea](docs/screenshots/gallery_part12_monsters.png) |
 
 - **A fourth realm**, the **Eastern Sea** (`Atlas.STRATA.sea`), built like the others (sites, warped ownership, land that runs out into real sea, roads and seals) on a 520 x 200 grid of its own: four isles in a chain running east, the sea between them crossed on the sandbars the drain has left bare. **Mazu's boat** joins it to Fusang: a new kind of crossing (`"style": "sail"`) at a jetty on the pool where the ten suns bathed, with a boat built in code (a junk with a red batten sail and eyes on the bow), a sea-blue fade and its own map page.
 - **Sixteen bosses** from the old texts: Qianliyan and Shunfeng'er, Mazu's runaway generals, hired by Xu Fu as lookouts; the Sea-Monk who drowns fishermen; **the Giant of Longbo**; the White Deer of Longevity; the Elixir Furnace That Walked Away; the Pearl Tree That Will Not Fruit; **Tianwu**, the eight-headed god of the waters; **Wu Zixu**, god of the tidal bore, who stopped the tide; **Shen**, the clam-dragon whose breath made the mirage; the Great Ao who bears Yingzhou; **Yu Qiang**; the Admiral of the Lost Fleet; the Bronze Stopper of Guixu; **Ruo of the Northern Sea**, the sea itself (who once humbled the River Earl of Part X); and **Xu Fu**. Xu Fu and Yu Qiang answer the Dao Lin Feng walks.
