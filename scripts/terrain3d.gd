@@ -598,7 +598,7 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 	root.set_meta("h", h)
 	var cw := int(ceil(w / float(CH)))
 	var chh := int(ceil(h / float(CH)))
-	var water_glow := 1.1 if theme_name in ["volcano", "time", "void", "origin", "abyss", "forge", "fungal", "chaos", "lilies", "diyu"] else 0.0
+	var water_glow := 1.1 if theme_name in ["volcano", "time", "void", "origin", "abyss", "forge", "fungal", "chaos", "lilies", "diyu", "tushan"] else 0.0
 	var wmat := _water_mat(th.water, water_glow, [th.sky_top, th.sky_hor])
 	var gmat := ground_mat(theme_name)
 	var rw := w + 1
@@ -1007,6 +1007,155 @@ static func fusang_tree(root: Node3D, pos: Vector3) -> void:
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	var gm := MB.mesh_node(root, g.build(MB.mat_glow()))
 	gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## A region's great landmark, at `pos` (relative to its terrain root); `along` is the direction of the
+## region's own x axis in the world, for landmarks that span something (the Dragon Gate spans the
+## river).
+static func landmark(root: Node3D, kind: String, pos: Vector3, along: Vector3) -> void:
+	match kind:
+		"fusang":
+			fusang_tree(root, pos - Vector3(0, 0.6, 0))
+		"dragongate":
+			dragon_gate(root, pos, along)
+		"cauldron":
+			great_cauldron(root, pos)
+		"buzhou":
+			buzhou_pillar(root, pos)
+
+## Part X: the Dragon Gate at Longmen, where the river comes down out of the gorge: two cliffs of
+## banded rock with pines clinging to them, a carved stone gate across the gap high above the water,
+## the falls pouring through it in three sheets, spray at their foot, and stone carp leaping up the
+## gate's pillars.  Scenery material, so the cliffs dissolve if they come between camera and hero.
+static func dragon_gate(root: Node3D, pos: Vector3, along: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var ax := along.normalized()
+	var fw := Vector3(-ax.z, 0, ax.x)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7171
+	var rock := MB.tag(Color("8a7a62"), MB.STONE)
+	var rock_d := MB.tag(Color("6a5c48"), MB.STONE)
+	for s: float in [-1.0, 1.0]:
+		var c := pos + ax * (s * 9.0)
+		b.lathe(c + Vector3(0, -1.0, 0), [Vector2(5.2, 0.0), Vector2(4.6, 4.0), Vector2(4.2, 9.0), Vector2(3.6, 14.0), Vector2(2.6, 18.0), Vector2(0.8, 20.5)], rock, 10)
+		for k in 4:
+			# strata: bands of darker rock round the cliff
+			b.torus(c + Vector3(0, 3.0 + k * 4.2, 0), 4.7 - k * 0.45, 0.35, rock_d, Vector3.ZERO)
+		for k in 5:
+			var a := rng.randf() * TAU
+			var pp := c + Vector3(cos(a) * 3.8, 6.0 + rng.randf() * 12.0, sin(a) * 3.8)
+			b.limb(pp, pp + Vector3(cos(a) * 1.4, 1.2, sin(a) * 1.4), 0.12, 0.06, MB.tag(Color("5a4030"), MB.WOOD), 5)
+			b.sph(pp + Vector3(cos(a) * 1.6, 1.7, sin(a) * 1.6), Vector3(1.4, 0.7, 1.4), MB.tag(Color("3e6a3a"), MB.FOLIAGE), Vector3.ZERO, true)
+		# the gate's pillar on this bank, with a carp climbing it
+		var pl := pos + ax * (s * 4.4)
+		b.cyl(pl + Vector3(0, 7.0, 0), 0.7, 14.0, MB.tag(Color("b8ac98"), MB.STONE), Vector3.ZERO, 10)
+		b.box(pl + Vector3(0, 0.3, 0), Vector3(2.0, 0.6, 2.0), MB.tag(Color("9a907e"), MB.STONE))
+		var cp := pl + fw * 0.75 + Vector3(0, 5.5 + s, 0)
+		b.sph(cp, Vector3(0.45, 1.1, 0.35), MB.tag(Color("e0a030"), MB.METAL), Vector3(0.0, 0.0, 0.3 * s), false)
+		b.cone(cp + Vector3(0, -1.2, 0), 0.4, 0.6, MB.tag(Color("e0a030"), MB.METAL), Vector3(PI, 0, 0), 5)
+	# the gate: a carved beam and roof across the gap, a gold plaque in the middle (MB boxes scale
+	# along world axes, so the turned pieces get a rotate-then-scale transform of their own)
+	var top := pos + Vector3(0, 14.0, 0)
+	var ang := atan2(-ax.z, ax.x)
+	var turned := func(sz: Vector3, at: Vector3) -> Transform3D:
+		return Transform3D(Basis(Vector3.UP, ang) * Basis.from_scale(sz), at)
+	b.prim("box", turned.call(Vector3(10.4, 0.8, 1.0), top), MB.tag(Color("8a3a2a"), MB.WOOD))
+	b.prim("box", turned.call(Vector3(11.6, 0.4, 1.6), top + Vector3(0, 1.0, 0)), MB.tag(Color("2a4a5a"), MB.STONE))
+	b.prim("prism", turned.call(Vector3(11.0, 0.9, 1.6), top + Vector3(0, 1.6, 0)), MB.tag(Color("2a4a5a"), MB.STONE))
+	b.prim("box", turned.call(Vector3(2.4, 0.7, 0.1), top + fw * 0.55), MB.tag(Color("d8b050"), MB.METAL))
+	# the falls: three sheets of water pouring through the gate, spray where they land
+	for k in 3:
+		var off := ax * ((k - 1) * 2.2)
+		var t0 := top + off + Vector3(0, -0.6, 0) - fw * 0.2
+		g.ribbon([t0, t0 - fw * 0.6 + Vector3(0, -6.0, 0), t0 - fw * 1.0 + Vector3(0, -13.4, 0)], [1.9, 2.1, 2.4], ax, Color(0.9, 0.96, 1.0, 0.55))
+	for k in 6:
+		g.ball(pos - fw * 1.2 + ax * rng.randf_range(-3.5, 3.5) + Vector3(0, 0.4 + rng.randf() * 1.2, 0), 1.2 + rng.randf(), Color(0.95, 0.98, 1.0, 0.22), true)
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	var gi := MB.mesh_node(root, g.build(MB.mat_glow()))
+	gi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## Part X: the great bronze cauldron (ding) in the casting yard at Tushan: a deep round belly on
+## three thick legs, two upright handles, a band of taotie faces round the rim, the glow of molten
+## bronze inside and smoke rising out of it.
+static func great_cauldron(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var bronze := MB.tag(Color("7a6a3a"), MB.METAL)
+	var verd := MB.tag(Color("4a8a6a"), MB.METAL)
+	var c := pos + Vector3(0, 2.0, 0)
+	b.lathe(c, [Vector2(0.4, 0.0), Vector2(2.4, 0.3), Vector2(3.2, 1.2), Vector2(3.4, 2.4), Vector2(3.3, 3.2), Vector2(3.6, 3.4), Vector2(3.5, 3.6)], bronze, 18)
+	for k in 3:
+		var a := TAU * k / 3.0 + PI / 6.0
+		var top := c + Vector3(cos(a) * 2.4, 0.6, sin(a) * 2.4)
+		b.limb(top, pos + Vector3(cos(a) * 2.9, -0.2, sin(a) * 2.9), 0.75, 0.55, bronze, 8)
+		b.ball(pos + Vector3(cos(a) * 2.9, 0.1, sin(a) * 2.9), 0.75, verd)
+	for s: float in [-1.0, 1.0]:
+		b.torus(c + Vector3(s * 2.6, 4.4, 0), 0.9, 0.22, bronze, Vector3(0, 0, PI * 0.5))
+	# taotie faces round the belly: two eyes and a curled snout in relief, every quarter
+	for k in 6:
+		var a2 := TAU * k / 6.0
+		var d := Vector3(cos(a2), 0, sin(a2))
+		var f := c + d * 3.35 + Vector3(0, 2.3, 0)
+		var sd := Vector3(-d.z, 0, d.x)
+		for s2: float in [-1.0, 1.0]:
+			b.ball(f + sd * (0.55 * s2), 0.3, verd)
+			b.torus(f + sd * (0.55 * s2), 0.38, 0.06, verd, Vector3(PI * 0.5, a2, 0))
+		b.box(f + Vector3(0, -0.5, 0) + d * 0.1, Vector3(0.3, 0.6, 0.3), verd, Vector3(0, -a2, 0))
+	g.disc(c + Vector3(0, 3.45, 0), 3.0, Color(1.0, 0.55, 0.2, 0.85), 18, Color(1.0, 0.8, 0.4, 0.4))
+	for k in 4:
+		g.ball(c + Vector3(0.3 * k, 5.0 + k * 1.3, 0.2 * k), 0.8 + k * 0.4, Color(0.6, 0.58, 0.55, 0.16), true)
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## Part X: the stump of Mount Buzhou, the pillar of the north-west that Gonggong broke with his head:
+## a colossal column of banded black stone leaning towards the north-west, its top shattered into
+## jagged teeth, fallen blocks round its foot, old chains hanging from it and a cold blue glow in the
+## cracks where the sky once rested on it.
+static func buzhou_pillar(root: Node3D, pos: Vector3) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 4040
+	var stone := MB.tag(Color("3a4248"), MB.STONE)
+	var band := MB.tag(Color("5a6670"), MB.STONE)
+	var tilt := Vector3(-0.21, 0.0, -0.17)
+	var up := Vector3(0, 1, 0).rotated(Vector3(1, 0, 0), tilt.z).rotated(Vector3(0, 0, 1), -tilt.x).normalized()
+	var top_h := 38.0
+	var segs := 7
+	for k in segs:
+		var y0 := top_h * k / float(segs)
+		var y1 := top_h * (k + 1) / float(segs)
+		var r0 := 5.6 - k * 0.32
+		var r1 := 5.6 - (k + 1) * 0.32
+		b.limb(pos + up * y0, pos + up * y1, r0, r1, stone, 12)
+		b.torus(pos + up * (y1 - 0.4), r1 + 0.25, 0.32, band, Vector3(-tilt.z, 0, tilt.x))
+		if k % 2 == 1:
+			g.limb(pos + up * (y0 + 1.0) + Vector3(r0 * 0.9, 0, 0), pos + up * (y1 - 1.0) + Vector3(r1 * 0.8, 0, r1 * 0.3), 0.12, 0.05, Color(0.4, 0.75, 1.0, 0.7), 4)
+	# the shattered top: jagged teeth of stone round the break
+	var tp := pos + up * top_h
+	for k in 9:
+		var a := TAU * k / 9.0 + rng.randf_range(-0.2, 0.2)
+		var d := Vector3(cos(a), 0, sin(a))
+		var hh := rng.randf_range(2.0, 7.0)
+		b.cone(tp + d * 3.0 + up * (hh * 0.5), 1.3, hh, stone, Vector3(rng.randf_range(-0.3, 0.3), rng.randf() * TAU, rng.randf_range(-0.3, 0.3)), 5)
+	g.disc(tp + up * 0.3, 3.4, Color(0.45, 0.75, 1.0, 0.5), 14, Color(0.45, 0.75, 1.0, 0.0))
+	# fallen blocks round its foot
+	for k in 10:
+		var a2 := rng.randf() * TAU
+		var r := rng.randf_range(7.0, 13.0)
+		var bp := pos + Vector3(cos(a2) * r, rng.randf_range(0.2, 1.0), sin(a2) * r)
+		b.box(bp, Vector3(rng.randf_range(1.5, 3.4), rng.randf_range(1.0, 2.6), rng.randf_range(1.5, 3.2)), stone if k % 3 else band, Vector3(rng.randf_range(-0.4, 0.4), rng.randf() * TAU, rng.randf_range(-0.4, 0.4)))
+	# chains hanging from the upper bands
+	for k in 3:
+		var a3 := TAU * k / 3.0 + 0.4
+		var h0 := pos + up * (top_h * 0.72) + Vector3(cos(a3) * 4.6, 0, sin(a3) * 4.6)
+		for j in 7:
+			b.torus(h0 + Vector3(cos(a3) * j * 0.15, -j * 0.7, sin(a3) * j * 0.15), 0.32, 0.07, MB.tag(Color("5a5048"), MB.METAL), Vector3(0, a3 + (PI * 0.5 if j % 2 else 0.0), PI * 0.5))
+	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 ## An enterable building: walls, door, floor and furniture as one mesh, the roof as another
 ## (returned, so the world can lift it away while the hero is inside).

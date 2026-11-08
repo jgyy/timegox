@@ -17,13 +17,24 @@ func open() -> void:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "World Map", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "map", "resume"]
-		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, main.world.mini_tex != null, true]
+		labels = ["Meditate", "Breakthrough", "Items", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "map", "annals", "resume"]
+		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, main.world.mini_tex != null, true, true]
 	elif mode == "map":
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
+	elif mode == "annals":
+		labels = []
+		ids = []
+		enabled = []
+		for e in annals():
+			labels.append(e[1])
+			ids.append(e[0])
+			enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
 	else:
 		labels = []
 		ids = []
@@ -44,7 +55,7 @@ func press(act: String) -> void:
 		"down":
 			cursor = (cursor + 1) % labels.size()
 		"cancel":
-			if mode == "items" or mode == "map":
+			if mode == "items" or mode == "map" or mode == "annals":
 				mode = "root"
 				cursor = 0
 				_build()
@@ -69,6 +80,10 @@ func press(act: String) -> void:
 					mode = "map"
 					cursor = 0
 					_build()
+				"annals":
+					mode = "annals"
+					cursor = 0
+					_build()
 				"resume":
 					main.pop()
 				"back":
@@ -76,12 +91,27 @@ func press(act: String) -> void:
 					cursor = 0
 					_build()
 				_:
+					if mode == "annals":
+						return
 					msg = Game.use_item_field(id)
 					_build()
 
 func _process(d: float) -> void:
 	t += d
 	redraw()
+
+## The Annals: what the land remembers of every region Lin Feng has been to, and of the towns in
+## them, in the order the story reaches them.  Each entry is [id, title, text].
+static func annals() -> Array:
+	var out: Array = []
+	for id in [Atlas.HUB] + Data.AREA_CHAIN:
+		if not Game.seen.has(id):
+			continue
+		out.append([id, Data.AREAS[id].n, Data.REGION_LORE.get(id, "")])
+		for tw in Data.TOWNS:
+			if tw.area == id:
+				out.append(["town:" + str(tw.id), "   " + str(tw.n), str(tw.lore)])
+	return out
 
 ## Short names for the world map (the full names run to forty letters).
 const MAP_NAMES := {
@@ -146,10 +176,26 @@ func _draw_map() -> void:
 	UI.text(self, Vector2(cx + 18, ly + 46), "Lin Feng", 13, UI.C_DIM)
 	UI.text(self, Vector2(cx, r.end.y - 18), "Enter / Esc: back", 13, UI.C_DIM)
 
+func _draw_annals() -> void:
+	UI.text(self, Vector2(60, 70), "Annals", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 360, 600), labels, cursor, enabled, 17)
+	var r := Rect2(420, 80, 820, 600)
+	UI.panel(self, r)
+	var entries := annals()
+	if cursor < entries.size():
+		var e: Array = entries[cursor]
+		UI.text(self, r.position + Vector2(24, 40), str(e[1]).strip_edges(), 24, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		UI.wrapped(self, r.position + Vector2(24, 80), str(e[2]), 17, UI.C_TEXT, r.size.x - 48)
+	else:
+		UI.wrapped(self, r.position + Vector2(24, 40), "What the land remembers of the places you have been. %d of %d regions visited." % [Game.seen.size(), Data.AREA_CHAIN.size() + 1], 17, UI.C_DIM, r.size.x - 48)
+
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0, 0, 0, 0.55))
 	if mode == "map":
 		_draw_map()
+		return
+	if mode == "annals":
+		_draw_annals()
 		return
 	UI.menu_list(self, Rect2(60, 80, 300, 230), labels, cursor, enabled, 24)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
@@ -166,13 +212,17 @@ func _draw() -> void:
 	if Game.companion:
 		UI.text(self, Vector2(430, 276), "Yue Ling   HP %d/%d   QI %d/%d" % [Game.hp[1], Game.max_hp(1), Game.qi[1], Game.max_qi(1)], 18, Color("ff9ac0"))
 	UI.text(self, Vector2(430, 320), "Techniques", 20, UI.C_GOLD)
+	var known := Data.known_skills(0, Game.level, Game.step)
+	# four columns, as many rows as the list needs in the space above the stones line: four fixed
+	# columns of seven ran the 29th and 30th techniques (the end of Part IX) off the right edge of the
+	# panel, and Part X brings the list to 33
+	var rows := maxi(7, int(ceil(known.size() / 4.0)))
+	var step := minf(22.0, 160.0 / rows)
 	var ki := 0
-	for sid in Data.known_skills(0, Game.level, Game.step):
+	for sid in known:
 		var s: Dictionary = Data.SKILLS[sid]
-		# four columns of seven: the full list (24 techniques by Part VII) used to run off the right
-		# of the panel once it passed 21 entries in three columns
-		var kp := Vector2(430 + (ki / 7) * 196, 348.0 + (ki % 7) * 22.0)
-		UI.text(self, kp, "%s  %d" % [s.n, s.cost], 13, Data.ELEM_COLORS[s.elem], HORIZONTAL_ALIGNMENT_LEFT, 192)
+		var kp := Vector2(430 + (ki / rows) * 196, 348.0 + (ki % rows) * step)
+		UI.text(self, kp, "%s  %d" % [s.n, s.cost], 13 if step >= 18.0 else 12, Data.ELEM_COLORS[s.elem], HORIZONTAL_ALIGNMENT_LEFT, 192)
 		ki += 1
 	UI.text(self, Vector2(430, 530), "Spirit stones: %d    Sword tempering: %d/%d" % [Game.stones, Game.temper, Data.TEMPER_COST.size()], 17)
 	UI.text(self, Vector2(430, 560), "Objective: " + Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 770)

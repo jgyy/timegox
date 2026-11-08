@@ -108,6 +108,16 @@ const ECO := {
 		"ground": [["fern", 1.5], ["flowers", 1]], "land": 0.05, "rocks": ["boulder", "slab", "karst"], "rock_p": 0.06, "grass": 1.1, "cover": 0.1, "logs": 0.02},
 	"guanghan": {"canopy": [["osmanthus", 4], ["snowpine", 1], ["crystal_tree", 0.6]], "under": [["snowbush", 2], ["round_bush", 1]],
 		"ground": [["snowbush", 0.6], ["flowers", 0.4]], "land": 0.2, "rocks": ["crystal", "slab", "boulder"], "rock_p": 0.04, "grass": 0.45, "cover": 0.05},
+	# ---- Part X: willows and cliff pines along the river, drowned willows and reeds over the flood,
+	# smoke-dark pines and cypress round the foundries, and dead pines on the broken mountain
+	"longmen": {"canopy": [["willow", 3], ["pine", 2], ["bonsai", 1], ["karst_bush", 1]], "under": [["reeds", 2], ["bush", 2], ["fern", 1]],
+		"ground": [["reeds", 1], ["flowers", 0.6]], "land": 0.08, "rocks": ["karst", "boulder", "slab"], "rock_p": 0.06, "grass": 0.9, "cover": 0.09, "logs": 0.02},
+	"drowned": {"canopy": [["willow", 3], ["marsh_dead", 2], ["mulberry", 1]], "under": [["reeds", 4], ["bush", 1]],
+		"ground": [["reeds", 2], ["flowers", 0.3]], "land": 0.1, "rocks": ["slab", "scree"], "rock_p": 0.02, "grass": 0.8, "cover": 0.14, "logs": 0.04},
+	"tushan": {"canopy": [["pine", 3], ["cypress", 2], ["ashen", 1], ["dead", 0.5]], "under": [["bush", 2], ["deadbush", 1], ["round_bush", 1]],
+		"ground": [["deadbush", 0.6], ["flowers", 0.3]], "land": 0.15, "rocks": ["boulder", "slab", "spire"], "rock_p": 0.08, "grass": 0.7, "cover": 0.06},
+	"buzhou": {"canopy": [["dead", 2], ["snowpine", 1], ["fir", 1]], "under": [["deadbush", 2], ["snowbush", 1]],
+		"ground": [["deadbush", 0.5]], "land": 0.45, "rocks": ["spire", "boulder", "slab", "scree"], "rock_p": 0.12, "grass": 0.5, "cover": 0.04},
 }
 
 static var _grass := {}

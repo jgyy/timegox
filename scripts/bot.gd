@@ -45,7 +45,7 @@ var time_by_area := {}
 var gave_up := ""
 
 const DIRS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-const HEALS := ["moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
+const HEALS := ["river_mother", "moon_dew", "magpie_wing", "homeward", "rebirth", "mending", "seal_bloom", "dawn", "starlight", "rain"]
 
 func _ready() -> void:
 	world = main.world

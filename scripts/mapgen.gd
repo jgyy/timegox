@@ -26,10 +26,11 @@ const DENSITY := {
 	"village": 0.2, "tea": 0.24, "silk": 0.3, "loom": 0.22,
 	"starferry": 0.2, "magpie": 0.26, "starpalace": 0.22, "jasper": 0.24,
 	"yanggu": 0.17, "millet": 0.2, "fusang": 0.27, "guanghan": 0.23,
+	"longmen": 0.24, "drowned": 0.18, "tushan": 0.27, "buzhou": 0.26,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)
-const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38, "fusang": -0.36, "guanghan": -0.44}
+const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4, "maple": -0.5, "karst": -0.3, "lilies": -0.35, "diyu": -0.45, "village": -0.32, "tea": -0.5, "silk": -0.45, "loom": -0.4, "starferry": -0.3, "jasper": -0.38, "fusang": -0.36, "guanghan": -0.44, "longmen": -0.42, "drowned": -0.08, "tushan": -0.52, "buzhou": -0.3}
 
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR
@@ -45,13 +46,28 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 	if id == "sect":
 		_town(grid, w, h)
 	else:
+		var keep := _keep_set(spec, id)
 		_wild(grid, w, h, spec, rng)
-		_outline(grid, w, h, spec, id)
+		_outline(grid, w, h, spec, keep)
+		# a river through the region (Longmen) and ponds (the Shazhou oasis), never over a clearing
+		if spec.has("river"):
+			_river(grid, w, h, spec.river, spec.seed, keep)
+		for pd in spec.get("ponds", []):
+			var pc: Vector2i = pd[0]
+			var pr: int = pd[1]
+			for dy in range(-pr, pr + 1):
+				for dx in range(-pr, pr + 1):
+					var q := pc + Vector2i(dx, dy)
+					if dx * dx + dy * dy <= pr * pr and q.x > 0 and q.y > 0 and q.x < w - 1 and q.y < h - 1 and not keep.has(q):
+						grid[q.y * w + q.x] = WATER
 	# lanes: paved strips (market streets, farm tracks, causeways) laid over the ground before the
 	# buildings go up; a Rect2i each, in the region's own tiles
 	for ln in spec.get("lanes", []):
 		var lr: Rect2i = ln
 		_rect(grid, w, lr.position.x, lr.position.y, lr.end.x - 1, lr.end.y - 1, PATH)
+	# roads: winding streets and dyke paths, a smooth curve through the given points, two tiles wide
+	for rd in spec.get("roads", []):
+		_road(grid, w, h, rd)
 	# blocks: ground kept solid under a great landmark (the Fusang's trunk)
 	for bk in spec.get("blocks", []):
 		var br: Rect2i = bk
@@ -313,7 +329,9 @@ static func _wild(grid: PackedByteArray, w: int, h: int, spec: Dictionary, rng: 
 ## and the connectivity pass below joins any that end up in the forest with a trail.
 const OUTLINE_P := 2.3
 
-static func _outline(grid: PackedByteArray, w: int, h: int, spec: Dictionary, id: String) -> void:
+## Tiles of a region's own map that must stay dry, open ground: round everything that matters
+## (gates, arrivals, people, bosses, pickups, springs), buildings and lanes.
+static func _keep_set(spec: Dictionary, id: String) -> Dictionary:
 	var keep := {}
 	var pts: Array = []
 	for p in spec.get("portals", []):
@@ -344,6 +362,9 @@ static func _outline(grid: PackedByteArray, w: int, h: int, spec: Dictionary, id
 		for yy in range(rr.position.y, rr.end.y):
 			for xx in range(rr.position.x, rr.end.x):
 				keep[Vector2i(xx, yy)] = true
+	return keep
+
+static func _outline(grid: PackedByteArray, w: int, h: int, spec: Dictionary, keep: Dictionary) -> void:
 	var warp := FastNoiseLite.new()
 	warp.seed = spec.seed * 5 + 1
 	warp.frequency = 0.02
@@ -368,6 +389,50 @@ static func _outline(grid: PackedByteArray, w: int, h: int, spec: Dictionary, id
 			var r := pow(pow(u, OUTLINE_P) + pow(v, OUTLINE_P), 1.0 / OUTLINE_P)
 			if r > 0.86 + bite.get_noise_2d(x, y) * 0.24 + fray.get_noise_2d(x, y) * 0.06:
 				grid[i] = WALL
+
+## A river from `rv[0]` to `rv[1]`, `rv[2]` tiles wide, meandering either side of the straight line
+## (the bends grow towards the middle of its course and fade at the ends).
+static func _river(grid: PackedByteArray, w: int, h: int, rv: Array, seed_: int, keep: Dictionary) -> void:
+	var a: Vector2 = Vector2(rv[0])
+	var b: Vector2 = Vector2(rv[1])
+	var width: float = float(rv[2])
+	var n := FastNoiseLite.new()
+	n.seed = seed_ * 3 + 17
+	n.frequency = 0.06
+	var ln := a.distance_to(b)
+	var side := (b - a).orthogonal().normalized()
+	var steps := int(ln * 2.0)
+	var r := width * 0.5
+	for k in steps + 1:
+		var t := k / float(maxi(steps, 1))
+		var c := a.lerp(b, t) + side * n.get_noise_1d(k * 0.5) * 7.0 * sin(PI * t)
+		for dy in range(-int(ceil(r)) - 1, int(ceil(r)) + 2):
+			for dx in range(-int(ceil(r)) - 1, int(ceil(r)) + 2):
+				var q := Vector2i(int(round(c.x)) + dx, int(round(c.y)) + dy)
+				if q.x < 1 or q.y < 1 or q.x >= w - 1 or q.y >= h - 1 or keep.has(q):
+					continue
+				if Vector2(q).distance_to(c) <= r:
+					grid[q.y * w + q.x] = WATER
+
+## A road through `pts` (local tiles): a Catmull-Rom curve, sampled finely, paved two tiles wide.
+static func _road(grid: PackedByteArray, w: int, h: int, pts: Array) -> void:
+	var p: Array = [pts[0]] + pts + [pts[pts.size() - 1]]
+	for i in range(1, p.size() - 2):
+		var p0 := Vector2(p[i - 1])
+		var p1 := Vector2(p[i])
+		var p2 := Vector2(p[i + 1])
+		var p3 := Vector2(p[i + 2])
+		var steps := int(p1.distance_to(p2) * 3.0) + 1
+		for k in steps + 1:
+			var t := k / float(steps)
+			var t2 := t * t
+			var t3 := t2 * t
+			var c := 0.5 * ((2.0 * p1) + (-p0 + p2) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3)
+			var q := Vector2i(int(floor(c.x)), int(floor(c.y)))
+			for d in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
+				var e: Vector2i = q + d
+				if e.x > 0 and e.y > 0 and e.x < w - 1 and e.y < h - 1:
+					grid[e.y * w + e.x] = PATH
 
 static func _rect(grid: PackedByteArray, w: int, x0: int, y0: int, x1: int, y1: int, t: int) -> void:
 	for y in range(y0, y1 + 1):
@@ -405,6 +470,7 @@ static func _town(grid: PackedByteArray, w: int, h: int) -> void:
 	_rect(grid, w, 34, 22, 34, h - 2, PATH)    # down to the Dawn Market at Yanggu (Part IX)
 	_rect(grid, w, 6, 22, 6, h - 2, PATH)      # down to the village (Part VII)
 	_rect(grid, w, 27, 22, 27, h - 2, PATH)    # to the desert gate (Part V)
+	_rect(grid, w, 12, 1, 12, 12, PATH)        # up to the north gate and the river road (Part X)
 	for i in 36:
 		var x := rng.randi_range(2, w - 3)
 		var y := rng.randi_range(2, h - 3)
