@@ -1279,6 +1279,7 @@ func _init() -> void:
 		check(str(kd.get("at", "face")) in ["face", "seat", "before", "on"] and Props.EFFECTS.has(str(kd.get("effect", ""))), "thing %s: where it is done and what comes of it" % pk)
 		check((kd.get("lines", []) as Array).size() >= 3, "thing %s: three things to say of it" % pk)
 		check(str(kd.get("hold", "")) == "" or Props.HELD.has(str(kd.hold)), "thing %s: what is held can be held" % pk)
+		check(str(kd.get("fx", "")) == "" or Props.FX.has(str(kd.fx)), "thing %s: how it answers is drawn" % pk)
 		check(pap0.has_animation(str(kd.clip)), "Lin Feng can %s (%s)" % [str(kd.verb).to_lower(), kd.clip])
 		var pcc := str(kd.get("comp", "watch"))
 		check(pcc == "watch" or pap1.has_animation(pcc), "Yue Ling joins in at the %s (%s)" % [pk, pcc])

@@ -3,7 +3,7 @@
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
 Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Myriad Daos as One, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 202 bosses, eighteen Heavenly Tribulations, eleven towns full of people and 84 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos** and earn the trust of **eight peoples** of the realms.
 
-> **Total gameplay duration: about 16 hours 3 minutes** (16:02:51 of game time for the end-to-end bot run, seed 1234), **1 hour 56 minutes more than the last release** (14:06:51). **The game is no longer a straight line, and its battles have to be earned.** 34 battles that carry the main story forward are now **trials**: harder than the bosses before them (up to twice the health, a quarter more attack, enraged when brought low) and closed to anyone unprepared, and every one can be passed in **three or four ways**: **by might** (a level, cultivation full at the peak of a realm, a tempered sword, the branches of the root), **by craft** (a talisman, lens, seal, ink or elixir made at Alchemist Mo's cauldron or Smith Tie's forge from the **essences** monsters leave behind and what the quests turn up: 29 recipes), **by wealth** (spirit stones), **by respect** (**renown**, earned from bosses, trials and **28 deeds** townsfolk ask of you), **by the Dao** you walk, **by the friendship** of a people, or **by a relic** found and kept; the way you take changes the battle and is remembered to the end. **Part XIII, "The Eight Gates", adds 49 minutes** and is non-linear: open **any four of eight gates in four realms, in any order**, each a trial of its own, and then reach the ending by **one of three roads** (the Sword, the Many Peoples or the Cauldron), each with its own requirements, battle and epilogue, up to a new realm, **Myriad Daos as One**. A new **Journal** (Esc > Journal) shows your renown, essences, treasures, the townsfolk's requests and every way through the trial ahead. And **the ending is new**: a short film of the wonders the story set right, each with its line of the epilogue, and then the results laid out beside Lin Feng and Yue Ling on a lotus over the clouds.
+> **Total gameplay duration: about 16 hours 3 minutes** (16:02:51 of game time for the end-to-end bot run, seed 1234), **1 hour 56 minutes more than the last release** (14:06:51). **The game is no longer a straight line, and its battles have to be earned.** 34 battles that carry the main story forward are now **trials**: harder than the bosses before them (up to twice the health, a quarter more attack, enraged when brought low) and closed to anyone unprepared, and every one can be passed in **three or four ways**: **by might** (a level, cultivation full at the peak of a realm, a tempered sword, the branches of the root), **by craft** (a talisman, lens, seal, ink or elixir made at Alchemist Mo's cauldron or Smith Tie's forge from the **essences** monsters leave behind and what the quests turn up: 29 recipes), **by wealth** (spirit stones), **by respect** (**renown**, earned from bosses, trials and **28 deeds** townsfolk ask of you), **by the Dao** you walk, **by the friendship** of a people, or **by a relic** found and kept; the way you take changes the battle and is remembered to the end. **Part XIII, "The Eight Gates", adds 49 minutes** and is non-linear: open **any four of eight gates in four realms, in any order**, each a trial of its own, and then reach the ending by **one of three roads** (the Sword, the Many Peoples or the Cauldron), each with its own requirements, battle and epilogue, up to a new realm, **Myriad Daos as One**. A new **Journal** (Esc > Journal) shows your renown, essences, treasures, the townsfolk's requests and every way through the trial ahead. And **the ending is new**: a short film of the wonders the story set right, each with its line of the epilogue, and then the results laid out beside Lin Feng and Yue Ling on a lotus over the clouds. And there are **810 things to do** in the world, each with an animation of its own: sit on a bench, drink from a well, strike a temple bell, play the qin, fish, swing, pray at a shrine, gather herbs, lift the training stones, sweep the leaves, read, stir a cauldron, work an anvil, weave, sleep in a bed.
 
 | | |
 |---|---|
@@ -76,8 +76,47 @@ flowchart LR
 - **The Journal** (Esc > Journal): your renown and title, your essences and treasures, the townsfolk's requests (and which you can do now), the trial ahead with every way through and its needs ticked off, the Eight Gates during Part XIII, and the trials you have passed and how.
 - **Part XIII, "The Eight Gates"**, adds 49 minutes of play (see [below](#part-xiii-the-eight-gates)) and is **non-linear**: after the briefing, Yinglong's account of Zhuolu and a hunt of the war god's war-band, **open any four of eight gates, in any order**, two in each of the four realms, each a trial of its own (one asks for a Dao, another for a people's friendship, another for wealth, renown, a crafted key, a relic or plain strength); every gate opened beyond four weakens the war god at the heart; carry the invitations to the Conclave to **any four of the eight peoples' leaders, in any order**; and then reach the end by **one of three roads**, each with its own requirements, its own battle and its own epilogue. A new realm, **Myriad Daos as One**, its tribulation, eight Gate Generals and Chiyou, five new monsters, two war-bands marching in every gate's region, and a new ending (below).
 - **A new ending: the Ascension, as a short film** (`scripts/ending.gd`). The old results screen had piled thirteen chapters' finales into one frame around the hero (the pillars, Nuwa's rings, the Wheel, the Loom's threads, the bridge, the sun and the moon, the cauldrons, the Jianmu, the isles, the gates), under a camera six metres away, with a yellow lotus and lily pads filling the foreground, seven lines of epilogue printed straight over the brightest part of the sky and the results in a box over the characters' feet. Now every wonder the story set right has a place of its own on a sea of clouds at sunset and a **shot of its own, with its line of the epilogue as a subtitle** between letterbox bars: the magpie bridge over the Star River with the sun and the moon taking turns, the Nine Cauldrons with their river, the Jianmu (the crown the world builds in the Nine Heavens), the Isles of the Eastern Sea on their sleeping turtles, the Eight Gates standing open under the Jianmu, and the Wheel of the Six Paths between two of Nuwa's pillars with Lin Feng's parents walking up a road of light to it. Then the camera draws back from Lin Feng and Yue Ling on a lotus, the sun going down behind the gates, and **the results come up beside them**: the time, the realm and the Dao, the battles, renown and deeds, a bar of the ways taken through the trials, the name the climb earned (from the way taken most) and how the war god's story ended on the road chosen. Enter skips the film.
+- **Things to do: 810 things in the world Lin Feng can use, on 18 new animations** (`scripts/props.gd`, `World.start_use`, `art/lib/person.py` INTERACT). Facing one, the hint names it ("Enter: Strike the bell"); Enter, and he steps up to it (or onto it, to sit), does it, steps back, and something comes of it. **Outdoors**, every region has things of its own beside the road, chosen by its theme (270 in all, 20 kinds): a stone bench, a well, a wayside shrine, a bronze bell and a great drum, a qin on a stone table, a fishing jetty and a fish pond, a swing, a wishing tree hung with red ribbons, an inscribed stele, spirit herbs, a campfire, training stones, a broom and a heap of leaves (he swept the sect's steps for three years; his hands still know how), a weiqi board, a tea table, a stone lion, wind chimes, a stone lantern. **Indoors**, every piece of furniture in every building, upstairs and in the cellars, can be used (540, 22 kinds): pray at the altars, bow to the founders' statues, meditate on the cushions, read at the bookshelves and desks, look at the calligraphy, drink tea at the tables and taste from the barrels, sit on the stools, stir the cauldrons, cook at the stoves, warm your hands at the hearths, work the anvils, practise a form at the weapon racks, weave at the looms, sleep in the beds, trim the lanterns.
+
+  | | What he does | What he holds | How it answers | What comes of it |
+  |---|---|---|---|---|
+  | bench, swing, stool | sits (beside Yue Ling on a bench; on the swing, higher and higher) | | the swing goes | rest: health and qi |
+  | well, tea, table, barrel | draws water or pours tea and drinks | a dipper, a cup | the bucket comes up | a drink: health |
+  | shrine, altar, statue, cushion | lights incense and prays, bows, meditates (Yue Ling prays too) | | incense smoke | qi |
+  | bell, drum | takes the hanging beam and strikes | | the bell swings and rings out | a line of lore |
+  | qin, chimes, broom, loom, cauldron, koi | plays, sets them ringing, sweeps, weaves, stirs, feeds the fish | a broom, a ladle | notes, chimes, leaves, steam, the fish rise | qi |
+  | fishing | fishes from the jetty | a rod | the float bobs and dips | a quiet hour: health and qi |
+  | stele, bookshelf, desk, scroll, shelf, counter, lantern, nest, weiqi | lays a hand on it, reads, looks, studies the game | a book | the inscription glows; the lantern stays lit | a line of lore |
+  | wishing tree, stone lion, cabinet | throws up a wish ribbon, rubs the lion's head, looks inside | | the ribbon flies up | a find: spirit stones (once) |
+  | herbs | kneels and gathers | | sparkles | a Wood Essence (again after a while) |
+  | training stones, anvil, weapon rack | lifts the stone lock overhead, works the anvil, practises | a stone lock, a hammer | dust, sparks | a little cultivation (again after a while) |
+  | campfire, hearth, stove | warms his hands, cooks | a ladle | the fire flares, embers rise | rest |
+  | bed | sits on the edge and nods off | | | sleep: everybody restored |
+
+  Every thing has three things said of it, in turn; the first time Lin Feng does each kind of thing it is a new **pastime** (renown +1, "A new pastime: strike the bell (12 of 42)"). Yue Ling joins in or reacts: she sits beside him on a bench, sits on the bank while he fishes and beside the table while he plays, prays at the shrines, warms her hands at the fire, laughs when he lifts the stones. While he does something Enter or Esc stops him. Nothing stands in anyone's way: the things outdoors stand on the forest edge or in the water by the bank (in a little clearing of their own), and the furniture on the tiles it already filled (the walk-over pieces, a cushion or a stool, are used by facing them), so no road changes and the bot, which never uses them, plays the same game to the second.
+
+  The **animations** are new Blender clips for the party (`art/lib/person.py` INTERACT, baked into Lin Feng and Yue Ling): sit on a bench, doze, drink, strike, read, play the qin, meditate, fish, pray, gather, warm the hands, stir, hammer, sweep, weave, lift, toss and touch, each starting and ending in the idle pose or holding a breathing loop, the clips that sit or crouch lowering the hips themselves. A swordsman's rig now has a **sword bone** in the right hand (Lin Feng and three others), so a clip that needs both hands puts the blade away; what he holds is built in code and hung on his hand bone while he needs it.
+
+```mermaid
+flowchart LR
+    W[face a thing:<br/>Enter: the hint names it] --> S{where is it done?}
+    S -->|face| F[a step up to it]
+    S -->|seat| SE[onto it, turned round to sit]
+    S -->|before| B[sitting down in front of it]
+    S -->|on| O[on its own tile: a cushion]
+    F & SE & B & O --> C[the clip: sit, drink, strike, read,<br/>play the qin, fish, pray, gather,<br/>warm, stir, hammer, sweep, weave,<br/>lift, toss, touch, meditate, doze]
+    C --> H[in his hand: a dipper, a cup, a rod,<br/>a broom, a hammer, a ladle, a book, a stone]
+    C --> A[the thing answers: the bell swings,<br/>the fire flares, the fish rise]
+    C --> Y[Yue Ling sits beside him,<br/>prays, warms her hands, laughs]
+    C --> E[what comes of it: rest, a drink,<br/>qi, lore, a find, herbs, cultivation]
+    E --> P[the first time: a new pastime,<br/>renown +1]
+```
+
+![things to do, in use: the bench, the well, the shrine, the bell, the qin and the fishing jetty](docs/screenshots/props_sheet_0.png)
+![more things to do: the swing, the wishing tree, the campfire, the training stones, the broom and the fish pond](docs/screenshots/props_sheet_1.png)
+![and indoors: the altar, the bookshelf, the bed, the cauldron, the anvil and the loom](docs/screenshots/props_sheet_2.png)
 - **The bot** walks every kind of road: its plan takes the trials by every way there is (in the verified run: craft 9, respect 5, wealth 5, might 5, dao 4, relic 1, peoples 1), and it hunts essences, crafts at the cauldron and the forge, does deeds for renown, fetches keepsakes from upper storeys and cellars, changes Daos at the steles and opens the gates nearest first. The other two roads into the heart are verified with `--bot-start=s_p13_heart --route=sword|cauldron`. **16:02:51** for the whole game, **1 hour 56 minutes more than the last release**; CI now requires **15 hours**.
-- **Code**: the game's GDScript grew from 26,632 to 29,829 lines (`scripts/trials.gd`, the trials, recipes, deeds and renown, is new); no art assets changed: every new boss and monster is one of the existing script-built models in a palette of its own.
+- **Code**: the game's GDScript grew from 26,632 to 31,236 lines (`scripts/trials.gd`, the trials, recipes, deeds and renown, and `scripts/props.gd`, the things to do, are new). Every new boss and monster is one of the existing script-built models in a palette of its own; five character exports were rebuilt from their scripts (Lin Feng and Yue Ling with the interaction clips, and the swordsmen with the sword bone).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
 | | |
@@ -1404,7 +1443,7 @@ flowchart TD
     TER --> ARC[architecture.gd<br/>halls, enterable houses, upper storeys,<br/>cellars, stairs, walls, dwellings]
     TER --> FA[fauna.gd<br/>wildlife]
     W --> MOD[models.gd<br/>procedural people and monsters,<br/>action poses]
-    MOD --> AS[assets.gd<br/>Blender GLBs: 153 people with<br/>21 clips each, 40 monsters, 26 props;<br/>palettes from one tint]
+    MOD --> AS[assets.gd<br/>Blender GLBs: 153 people with<br/>21 clips each, the party 39,<br/>40 monsters, 26 props;<br/>palettes from one tint]
     B --> MOD
     B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
@@ -1492,6 +1531,7 @@ flowchart LR
 ```
 scripts/data.gd      content: skills, enemies, areas, quest chain, dialogue
 scripts/trials.gd    many roads: trials and their ways, essences, crafting recipes, renown and deeds
+scripts/props.gd     things to do: outdoor props by theme, usable furniture, what comes of using them
 scripts/mb.gd        mesh builder (primitives to merged ArrayMesh)
 scripts/models.gd    3D people, monsters, props
 scripts/terrain3d.gd 3D terrain, landmarks, buildings
@@ -1506,7 +1546,8 @@ scripts/rocks.gd     procedural rocks and limestone towers
 scripts/fauna.gd     ambient wildlife
 scripts/architecture.gd  halls, roofs, walls, archways, bridges, dwellings
 art/lib/kit.py       Blender (bpy) toolkit: geometry, skinning, AO, rigs, clips, export
-art/lib/person.py    character builder shared by every person asset, and its 21 clips (ten cutscene gestures)
+art/lib/person.py    character builder shared by every person asset, and its 21 clips (ten cutscene gestures),
+                     and the party's 18 interaction clips
 art/lib/face.py, hair.py, garment.py, accessory.py   heads, hair, clothes, hand props
 art/lib/race.py      wings, crests, fox and fin ears, tails, antlers, scales, whiskers
 art/lib/sculpt.py    lofts, profiles, noise, splines, strands

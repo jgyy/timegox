@@ -826,7 +826,7 @@ const USE_STEP := 0.45
 ## when a thing answers, seconds into the clip (by clip), and how often a long one answers again (by
 ## what it does)
 const FX_AT := {"strike": 0.95, "toss": 0.62, "drink": 0.9, "gather": 1.0, "lift": 1.45, "touch": 0.8, "bow": 0.6, "attack": 0.3, "hammer": 0.82}
-const FX_EVERY := {"notes": 1.1, "steam": 1.3, "smoke": 1.5, "sparks": 1.2, "ripple": 1.7, "leaves": 1.8, "qi": 1.6, "chime": 1.4, "koi": 1.5, "zzz": 2.0}
+const FX_EVERY := {"notes": 1.1, "steam": 1.3, "smoke": 1.5, "sparks": 1.2, "embers": 0.9, "ripple": 1.7, "leaves": 1.8, "qi": 1.6, "chime": 1.4, "koi": 1.5, "zzz": 2.0}
 ## Yue Ling's part, by what she does: the ones she keeps doing for as long as he does
 const COMP_LOOP := ["pray", "warm", "read", "meditate", "sit_bench", "gather"]
 
@@ -1036,45 +1036,49 @@ func _use_fx_tick(el: float) -> void:
 func _prop_fx(fx: String, e: Dictionary) -> void:
 	var nd = ent_nodes.get(e.id)
 	var c: Vector3 = (nd as Node3D).position if nd != null and is_instance_valid(nd) else ent_pos(e)
-	var hand: Vector3 = player.position + Vector3(using.dir.x, 0, using.dir.z) * 0.45 + Vector3(0, 1.1, 0)
+	var to_hero := -Vector3(using.dir.x, 0, using.dir.z) if using.has("dir") else Vector3.ZERO
 	match fx:
 		"splash":
-			Fx3D.splash(scene3d, hand, Color(0.6, 0.82, 1.0), 0.6)
+			# the bucket breaking the water down in the well
+			Fx3D.splash(scene3d, c + Vector3(0, 0.55, 0), Color(0.6, 0.82, 1.0), 0.5, 0.3)
 		"smoke":
-			Fx3D.ascend(scene3d, c + Vector3(0, 0.6, 0) - Vector3(using.dir.x, 0, using.dir.z) * 0.4, Color(0.92, 0.9, 0.95))
+			# incense, from the censer on the near side
+			Fx3D.drift(scene3d, c + Vector3(0, 0.75, 0) + to_hero * 0.4, Color(0.9, 0.88, 0.95, 0.45), "smoke", 3, 0.45, 0.4, 2.6, 0.05, false)
 		"ring":
 			Fx3D.shockwave(scene3d, c + Vector3(0, 1.8, 0), Color(1.0, 0.88, 0.55), 9.0, 1.4)
 			Fx3D.shockwave(scene3d, c + Vector3(0, 1.8, 0), Color(1.0, 0.95, 0.8), 5.0, 1.0)
 		"boom":
 			Fx3D.shockwave(scene3d, c + Vector3(0, 1.1, 0), Color(1.0, 0.7, 0.5), 6.0, 0.9)
 		"notes":
-			Fx3D.ascend(scene3d, c + Vector3(0, 0.45, 0), Color(1.0, 0.88, 0.5))
+			Fx3D.drift(scene3d, c + Vector3(0, 0.55, 0), Color(1.0, 0.88, 0.5), "note", 2, 0.3, 0.55, 2.2, 0.4)
 		"ripple":
-			Fx3D.shockwave(scene3d, Vector3(c.x, c.y + Terrain3D.WATER_Y + 0.05, c.z) + Vector3(using.dir.x, 0, using.dir.z) * 1.2, Color(0.8, 0.92, 1.0), 2.2, 1.2)
+			Fx3D.shockwave(scene3d, Vector3(c.x, c.y + Terrain3D.WATER_Y + 0.05, c.z) - to_hero * 1.2, Color(0.8, 0.92, 1.0), 2.2, 1.2)
 		"ribbon":
 			Fx3D.leaf_spiral(scene3d, c + Vector3(0, 1.6, 0), Color(0.9, 0.12, 0.15), 1.4)
 		"glow":
-			Fx3D.heal(scene3d, c + Vector3(0, 0.6, 0))
+			Fx3D.glimmer(scene3d, c + Vector3(0, 0.9, 0), Color(1.0, 0.9, 0.6))
 		"sparkle":
-			Fx3D.heal(scene3d, c + Vector3(0, 0.2, 0))
+			Fx3D.glimmer(scene3d, c + Vector3(0, 0.3, 0), Color(0.55, 1.0, 0.7))
 		"sparks":
-			Fx3D.hit(scene3d, c + Vector3(0, 0.9, 0) - Vector3(using.dir.x, 0, using.dir.z) * 0.3, "fire")
+			Fx3D.sparks(scene3d, c + Vector3(0, 0.85, 0) + to_hero * 0.3)
+		"embers":
+			Fx3D.drift(scene3d, c + Vector3(0, 0.45, 0), Color(1.0, 0.62, 0.25), "glow", 6, 0.12, 1.1, 1.5, 0.3)
 		"dust":
 			Fx3D.dust(scene3d, player.position, Color(0.75, 0.68, 0.55))
 		"leaves":
-			Fx3D.leaf_spiral(scene3d, player.position + Vector3(using.dir.x, 0, using.dir.z) * 0.8, Color(0.85, 0.45, 0.2), 1.2)
+			Fx3D.leaf_spiral(scene3d, player.position - to_hero * 0.8, Color(0.85, 0.45, 0.2), 1.2)
 		"steam":
-			Fx3D.ascend(scene3d, c + Vector3(0, 0.9, 0), Color(0.96, 0.96, 1.0))
+			Fx3D.drift(scene3d, c + Vector3(0, 0.9, 0), Color(0.96, 0.96, 1.0, 0.4), "smoke", 3, 0.5, 0.5, 2.2, 0.15, false)
 		"chime":
 			Fx3D.shockwave(scene3d, c + Vector3(0, 2.0, 0), Color(0.95, 0.9, 0.7), 2.5, 0.9)
 		"light":
-			Fx3D.heal(scene3d, c + Vector3(0, 1.4, 0))
+			Fx3D.glimmer(scene3d, c + Vector3(0, 1.4, 0), Color(1.0, 0.8, 0.45))
 		"koi":
-			Fx3D.splash(scene3d, Vector3(c.x, c.y + Terrain3D.WATER_Y + 0.1, c.z), Color(1.0, 0.75, 0.4), 0.7)
+			Fx3D.splash(scene3d, Vector3(c.x, c.y + Terrain3D.WATER_Y + 0.1, c.z), Color(1.0, 0.75, 0.4), 0.6, 0.45)
 		"qi":
-			Fx3D.ascend(scene3d, player.position + Vector3(0, 0.3, 0), Color(0.6, 0.9, 1.0))
+			Fx3D.drift(scene3d, player.position + Vector3(0, 0.5, 0), Color(0.6, 0.9, 1.0), "glow", 8, 0.16, 0.45, 1.8, 0.7)
 		"zzz":
-			Fx3D.ascend(scene3d, player.position + Vector3(0, 1.0, 0), Color(0.75, 0.8, 1.0))
+			Fx3D.drift(scene3d, player.position + Vector3(0, 0.9, 0), Color(0.8, 0.85, 1.0), "zed", 1, 0.28, 0.35, 2.4, 0.05)
 
 ## What the things do on their own, and when they have just been used: the bell swings, the drum
 ## shivers, the bucket comes up, the fire flickers, the chimes and the swing sway, the float bobs, the

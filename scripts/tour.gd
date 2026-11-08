@@ -556,7 +556,7 @@ func _part13_shots() -> void:
 ## first one of it in the land, Lin Feng beside it with Yue Ling, Enter, and a frame from the side while
 ## he does it (prop_<kind>.png), and all of them on sheets (props_sheet_<n>.png).
 const PROP_SHOTS := ["bench", "well", "shrine", "bell", "qin", "fishing", "swing", "wish_tree", "campfire", "stones", "broom", "koi",
-	"tea", "drum", "herb_patch", "stele", "altar", "bookshelf", "bed", "cauldron", "anvil", "loom", "cushion", "stove", "barrel", "rack"]
+	"altar", "bookshelf", "bed", "cauldron", "anvil", "loom", "tea", "drum", "herb_patch", "stele", "cushion", "stove", "barrel", "rack"]
 
 func _props_shots() -> void:
 	Game.reset()
@@ -627,9 +627,7 @@ func _props_shots() -> void:
 		var dir := Vector3(c.x - hp.x, 0, c.z - hp.z).normalized()
 		var side := Vector3(dir.z, 0, -dir.x)
 		var mid := hp.lerp(Vector3(c.x, hp.y, c.z), 0.45) + Vector3(0, 0.9, 0)
-		var eye := mid + side * 4.2 - dir * 2.2 + Vector3(0, 1.4, 0)
-		if e2.has("furn"):
-			eye = mid + side * 3.0 - dir * 1.6 + Vector3(0, 2.2, 0)
+		var eye := _prop_eye(lw2, mid, dir, e2.has("furn"))
 		main.world.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(mid, Vector3.UP)
 		await _wait(0.2)
 		await _shot("prop_" + kind)
@@ -640,6 +638,42 @@ func _props_shots() -> void:
 		main.world.cam_override = null
 	for sh in range(0, frames.size(), 6):
 		_grid("props_sheet_%d" % (sh / 6), frames.slice(sh, sh + 6), 2)
+
+## Where to put the side camera on a thing (looking at `mid`, the thing along `dir` from the hero): off to
+## one side and a little back, over open ground (not inside the trees beside it, or a wall indoors) and
+## above the ground there. The first place with a clear view, else the clearest.
+func _prop_eye(lw: Dictionary, mid: Vector3, dir: Vector3, furn: bool) -> Vector3:
+	var wo = main.world
+	var g: PackedByteArray = lw.grid
+	var W: int = lw.w
+	var H: int = lw.h
+	var side := Vector3(dir.z, 0, -dir.x)
+	# [to the side, back, up]
+	var tries: Array = [[3.0, 1.6, 2.2], [1.8, 2.6, 2.4], [0.6, 3.0, 2.6]] if furn else \
+		[[4.2, 2.2, 1.4], [3.2, 3.2, 1.6], [1.8, 4.0, 1.9], [2.8, 1.2, 2.8], [1.0, 2.6, 3.4]]
+	var best := Vector3.ZERO
+	var best_n := -1
+	for t in tries:
+		for s in [1.0, -1.0]:
+			var eye: Vector3 = mid + side * (float(t[0]) * s) - dir * float(t[1]) + Vector3(0, float(t[2]), 0)
+			var n := 0
+			for i in 8:
+				var p: Vector3 = eye.lerp(mid, i / 10.0)
+				var tx := floori((p.x - wo.off.x) / Terrain3D.T)
+				var ty := floori((p.z - wo.off.z) / Terrain3D.T)
+				if tx >= 0 and ty >= 0 and tx < W and ty < H:
+					var tile: int = g[ty * W + tx]
+					if MapGen.is_walkable_tile(tile) or tile == MapGen.WATER:
+						n += 1
+			if n > best_n:
+				best_n = n
+				best = eye
+			if n == 8:
+				break
+		if best_n == 8:
+			break
+	best.y = maxf(best.y, wo.ground_y(best) + 1.2)
+	return best
 
 ## A free tile beside thing `e` in world `lw` to use it from (-1,-1 if none).
 func _prop_spot(lw: Dictionary, e: Dictionary) -> Vector2i:

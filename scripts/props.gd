@@ -47,7 +47,7 @@ const KINDS := {
 		"lines": ["\"Whoever walks this road, walk it lightly.\" The rest is worn away.", "A list of names, and above them: \"They held the pass.\"", "An old poem about the moon. Somebody has corrected the rhyme in the margin."]},
 	"herb_patch": {"n": "Spirit herbs", "verb": "Gather herbs", "clip": "gather", "dur": 2.8, "at": "face", "fx": "sparkle", "effect": "herb", "comp": "gather",
 		"lines": ["A sprig of spirit grass, its dew still on it.", "He leaves the roots: they will grow back by the next moon.", "Yue Ling sniffs it and nods: good for the cauldron."]},
-	"campfire": {"n": "Campfire", "verb": "Warm your hands", "clip": "warm", "dur": 4.5, "at": "face", "fx": "sparks", "effect": "rest", "comp": "warm",
+	"campfire": {"n": "Campfire", "verb": "Warm your hands", "clip": "warm", "dur": 4.5, "at": "face", "fx": "embers", "effect": "rest", "comp": "warm",
 		"lines": ["The fire pops and settles. His fingers come back to life.", "Somebody left this fire laid and dry for the next traveller. He will do the same.", "Smoke and pine resin and the stars coming out."]},
 	"stones": {"n": "Training stones", "verb": "Lift the stone lock", "clip": "lift", "dur": 3.0, "at": "face", "hold": "stone_lock", "fx": "dust", "effect": "train", "comp": "laugh",
 		"lines": ["The stone lock goes up and stays up. Three years ago it would not have moved.", "He presses it overhead ten times and only the last one shakes.", "The disciples who train here have worn the grips smooth."]},
@@ -90,7 +90,7 @@ const KINDS := {
 		"lines": ["Clockwise nine times, counter-clockwise nine. The brew turns gold.", "It smells of ginseng and something better not asked about.", "Yue Ling corrects his stirring. He was doing it fine."]},
 	"herbs": {"n": "Drying herbs", "verb": "Sort the herbs", "clip": "gather", "dur": 2.8, "at": "face", "fx": "sparkle", "effect": "herb", "comp": "gather",
 		"lines": ["Mugwort, angelica, a sprig of something that glows faintly.", "The good leaves in one basket, the bitter in another.", "Yue Ling tells him the names. He forgets half of them at once."]},
-	"hearth": {"n": "Hearth", "verb": "Warm your hands", "clip": "warm", "dur": 4.5, "at": "face", "fx": "sparks", "effect": "rest", "comp": "warm",
+	"hearth": {"n": "Hearth", "verb": "Warm your hands", "clip": "warm", "dur": 4.5, "at": "face", "fx": "embers", "effect": "rest", "comp": "warm",
 		"lines": ["The embers glow up as if they were glad of him.", "A hearth is a house's heart. This one beats slow and warm.", "He feeds it a log. It thanks him in sparks."]},
 	"stove": {"n": "Stove", "verb": "Cook something", "clip": "stir", "dur": 4.5, "at": "face", "hold": "ladle", "fx": "steam", "effect": "drink", "comp": "watch",
 		"lines": ["Congee with ginger: the best medicine in the world.", "He burns the first batch and eats the second.", "Yue Ling says it needs salt. It always needs salt."]},
@@ -141,6 +141,42 @@ const THEMES := {
 	"springs": ["well", "fishing", "tea", "bench", "shrine", "koi"],
 	"silk": ["swing", "tea", "chimes", "wish_tree", "bench", "well"],
 	"millet": ["well", "broom", "bench", "shrine", "campfire", "swing"],
+	# the realms past the first
+	"volcano": ["stones", "stele", "shrine", "drum", "campfire", "bench"],
+	"abyss": ["stele", "shrine", "bell", "lantern_st", "stones", "bench"],
+	"void": ["stele", "shrine", "lantern_st", "chimes", "weiqi", "bench"],
+	"celestial": ["bell", "lion", "lantern_st", "weiqi", "qin", "chimes"],
+	"mirror": ["koi", "fishing", "qin", "tea", "chimes", "bench"],
+	"time": ["stele", "bell", "weiqi", "shrine", "lantern_st", "bench"],
+	"origin": ["stele", "shrine", "herb_patch", "wish_tree", "well", "bench"],
+	"cloudsea": ["chimes", "qin", "tea", "lantern_st", "shrine", "bench"],
+	"court": ["lion", "lantern_st", "bell", "weiqi", "drum", "bench"],
+	"dunes": ["well", "campfire", "shrine", "stele", "stones", "bench"],
+	"fungal": ["herb_patch", "campfire", "lantern_st", "shrine", "stele", "bench"],
+	"aurora": ["campfire", "chimes", "shrine", "stele", "fishing", "bench"],
+	"chaos": ["stele", "shrine", "stones", "drum", "campfire", "bench"],
+	"karst": ["fishing", "tea", "qin", "herb_patch", "shrine", "bench"],
+	"wheel": ["lantern_st", "bell", "shrine", "stele", "drum", "chimes"],
+	"loom": ["chimes", "swing", "tea", "wish_tree", "well", "bench"],
+	"starferry": ["lantern_st", "fishing", "wish_tree", "chimes", "shrine", "bench"],
+	"magpie": ["wish_tree", "lantern_st", "chimes", "swing", "koi", "bench"],
+	"starpalace": ["lantern_st", "bell", "lion", "weiqi", "chimes", "bench"],
+	"jasper": ["koi", "tea", "qin", "lion", "chimes", "bench"],
+	"yanggu": ["campfire", "drum", "shrine", "stele", "well", "bench"],
+	"fusang": ["wish_tree", "shrine", "drum", "campfire", "stele", "bench"],
+	"guanghan": ["lantern_st", "qin", "chimes", "wish_tree", "tea", "bench"],
+	"longmen": ["fishing", "koi", "stele", "drum", "shrine", "bench"],
+	"drowned": ["shrine", "stele", "lantern_st", "bell", "fishing", "bench"],
+	"tushan": ["wish_tree", "lantern_st", "tea", "swing", "shrine", "bench"],
+	"buzhou": ["stele", "shrine", "stones", "campfire", "drum", "bench"],
+	"juntian": ["bell", "drum", "qin", "chimes", "lion", "bench"],
+	"changhe": ["lion", "bell", "lantern_st", "drum", "stele", "bench"],
+	"ninesprings": ["lantern_st", "well", "shrine", "stele", "chimes", "bench"],
+	"youdu": ["lantern_st", "bell", "shrine", "stele", "drum", "lion"],
+	"penglai": ["tea", "qin", "koi", "fishing", "herb_patch", "bench"],
+	"fangzhang": ["herb_patch", "tea", "qin", "shrine", "fishing", "bench"],
+	"yingzhou": ["koi", "fishing", "tea", "chimes", "herb_patch", "bench"],
+	"guixu": ["stele", "shrine", "bell", "lantern_st", "fishing", "bench"],
 }
 ## outdoor things that stand in the water by the bank; the rest stand on the forest edge
 const WATER_KINDS := ["fishing", "koi"]
@@ -153,6 +189,9 @@ const ONCE := ["drink", "strike", "gather", "lift", "toss", "touch", "bow", "thi
 const HELD := ["dipper", "cup", "rod", "broom", "hammer", "ladle", "book", "stone_lock"]
 ## the effects (use())
 const EFFECTS := ["rest", "drink", "qi", "lore", "fish", "luck", "herb", "train", "find", "sleep"]
+## how the things answer while used (drawn by World._prop_fx; the swing's is the swing going)
+const FX := ["splash", "smoke", "ring", "boom", "notes", "ripple", "ribbon", "glow", "sparkle", "sparks", "embers", "dust",
+	"leaves", "steam", "chime", "light", "koi", "qi", "zzz", "swing"]
 
 static func kind_of(e: Dictionary) -> Dictionary:
 	return KINDS.get(str(e.get("prop", "")), {})

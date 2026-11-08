@@ -17,7 +17,7 @@ static func headless() -> bool:
 	return DisplayServer.get_name() == "headless"
 
 # ---------------------------------------------------------------- procedural sprite textures
-## kind: glow | flake | streak | petal | star | ring | smoke
+## kind: glow | flake | streak | petal | star | ring | maple | flame | smoke | note | zed
 static func sprite(kind: String) -> ImageTexture:
 	if _sprites.has(kind):
 		return _sprites[kind]
@@ -63,6 +63,24 @@ static func sprite(kind: String) -> ImageTexture:
 				"smoke":
 					var nz := 0.5 + 0.25 * sin(u * 7.0 + v * 3.0) * cos(v * 6.0 - u * 2.0)
 					a = pow(clampf(1.0 - r, 0.0, 1.0), 1.4) * nz * 1.3
+				"note":
+					# a quaver: a tilted oval head, a stem and a flag
+					var hu := u + 0.24
+					var hv := v - 0.5
+					var ru := (hu * 0.9 + hv * 0.43) / 0.3
+					var rv := (-hu * 0.43 + hv * 0.9) / 0.2
+					a = smoothstep(0.0, 0.3, 1.0 - (ru * ru + rv * rv))
+					if v > -0.84 and v < 0.48:
+						a = maxf(a, smoothstep(0.0, 0.04, 0.06 - absf(u - 0.03)))
+					if v > -0.84 and v < -0.2:
+						var fs := (-0.35 + sqrt(maxf(0.0, 0.1225 + 1.2 * (0.84 + v)))) / 0.6
+						a = maxf(a, smoothstep(0.0, 0.04, 0.12 * (1.0 - 0.5 * fs) - absf(u - (0.03 + 0.34 * fs))))
+				"zed":
+					# a sleeper's z
+					var bar := 1.0 if absf(u) < 0.46 else 0.0
+					a = maxf(smoothstep(0.0, 0.04, 0.1 - absf(v + 0.5)), smoothstep(0.0, 0.04, 0.1 - absf(v - 0.5))) * bar
+					if absf(v) < 0.56:
+						a = maxf(a, smoothstep(0.0, 0.04, 0.1 - absf(u + 0.9 * v) / 1.345))
 			img.set_pixel(x, y, Color(1, 1, 1, clampf(a, 0.0, 1.0)))
 	var tex := ImageTexture.create_from_image(img)
 	_sprites[kind] = tex
@@ -871,7 +889,7 @@ static func leaf_spiral(parent: Node3D, pos: Vector3, col: Color, life: float = 
 	tw.chain().tween_callback(holder.queue_free)
 
 ## expanding water ring with droplets
-static func splash(parent: Node3D, pos: Vector3, col: Color, life: float = 0.8) -> void:
+static func splash(parent: Node3D, pos: Vector3, col: Color, life: float = 0.8, size: float = 1.0) -> void:
 	if headless() or parent == null or not parent.is_inside_tree():
 		return
 	var b := MB.new()
@@ -881,8 +899,8 @@ static func splash(parent: Node3D, pos: Vector3, col: Color, life: float = 0.8) 
 	mi.scale = Vector3.ONE * 0.2
 	var tw := mi.create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(mi, "scale", Vector3(2.4, 2.8, 2.4), life).set_ease(Tween.EASE_OUT)
-	tw.tween_property(mi, "position:y", pos.y + 1.2, life)
+	tw.tween_property(mi, "scale", Vector3(2.4, 2.8, 2.4) * size, life).set_ease(Tween.EASE_OUT)
+	tw.tween_property(mi, "position:y", pos.y + 1.2 * size, life)
 	tw.chain().tween_callback(mi.queue_free)
 
 ## element-coloured hit effect at a world position (big = boss heavy attack or a technique)
@@ -936,6 +954,54 @@ static func ascend(parent: Node3D, pos: Vector3, col: Color = Color(1.0, 0.85, 0
 	pillar(parent, pos, col, 9.0, 1.2, 1.4)
 	shockwave(parent, pos, col, 9.0, 1.0)
 	_burst(parent, pos + Vector3(0, 1.0, 0), col, 60, 3.0, 1.8, quad("star", 0.3), Vector3(0, 2.5, 0), Vector3(0, 1, 0), 60.0, 1.0)
+
+## A few small things drifting up from a point and fading: notes off a qin, steam off a pot, incense
+## smoke, embers off a fire, qi gathering about a sitter, a sleeper's z's. Quiet, nothing like `ascend`.
+static func drift(parent: Node3D, pos: Vector3, col: Color, kind: String = "glow", amount: int = 4, size: float = 0.25,
+		rise: float = 0.5, life: float = 2.0, radius: float = 0.15, additive: bool = true) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	var p := CPUParticles3D.new()
+	p.mesh = quad(kind, size, additive)
+	p.amount = amount
+	p.lifetime = life
+	p.one_shot = true
+	p.explosiveness = 0.35
+	p.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	p.emission_sphere_radius = radius
+	p.direction = Vector3(0, 1, 0)
+	p.spread = 28.0
+	p.initial_velocity_min = rise * 0.6
+	p.initial_velocity_max = rise
+	p.gravity = Vector3(0, 0.05, 0)
+	p.damping_min = 0.05
+	p.damping_max = 0.2
+	p.scale_amount_min = 0.75
+	p.scale_amount_max = 1.15
+	p.color = col
+	p.color_ramp = _fade_ramp()
+	p.position = pos
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(p)
+	p.emitting = true
+	var tm := parent.get_tree().create_timer(life * 2.0 + 0.3)
+	tm.timeout.connect(p.queue_free)
+
+## A small glint and a few stars rising: a blessing at a statue, herbs found, a lamp lit.
+static func glimmer(parent: Node3D, pos: Vector3, col: Color = Color(1.0, 0.9, 0.6)) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	_flash(parent, pos, col, 1.3, 0.5)
+	var p := _burst(parent, pos, Color(col.r, col.g, col.b, 0.9), 14, 1.1, 1.4, quad("star", 0.2), Vector3(0, 0.7, 0), Vector3(0, 1, 0), 55.0, 0.3)
+	p.explosiveness = 0.7
+
+## A spray of sparks off a hammer blow.
+static func sparks(parent: Node3D, pos: Vector3, col: Color = Color(1.0, 0.72, 0.3)) -> void:
+	if headless() or parent == null or not parent.is_inside_tree():
+		return
+	_flash(parent, pos, col, 0.9, 0.2)
+	var p := _burst(parent, pos, col, 18, 3.5, 0.55, quad("glow", 0.14), Vector3(0, -7.0, 0), Vector3(0, 1, 0), 75.0, 0.06)
+	p.scale_amount_max = 1.3
 
 ## Little cloud of dust at the feet (footsteps, landing).
 static func dust(parent: Node3D, pos: Vector3, col: Color) -> void:
