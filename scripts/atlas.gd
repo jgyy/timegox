@@ -1,130 +1,144 @@
 class_name Atlas
 extends RefCounted
-## The open world.  Every region of the game lies on one continuous tile grid: the sect sits on
-## Azure Cloud Mountain in the west, and each chapter's chain of regions runs east from the
-## mountain as a band of land.  Roads replace the old teleporting gates; a region the story has
-## not opened yet is closed by a Lotus Seal barrier across its road.  Borders between regions are
-## forest and rock belts with organic, noise-warped edges, and the land itself (theme, trees,
-## ground) changes along a wavy line rather than a straight seam.
+## The open world: the Unbroken Land, one continent within the Four Seas.
+##
+## Azure Cloud Mountain rises in the middle of the land with the sect on its slope, and each
+## chapter's chain of regions winds outward from it as a province of its own.  Nothing is laid out
+## on a grid any more (the old Heavenly Court surveyed the land into square provinces; Part X is
+## the story of the land relaxing out of them):
+##
+## - every region has a site and a way (the direction its road runs through it), and its own map
+##   is turned to face that way;
+## - each tile belongs to the region whose site is nearest, measured in that region's own
+##   half-sizes (so long regions own long land) under a two-scale domain warp, so borders wander
+##   like coasts and ridges; the land round everything that matters in a region always belongs to
+##   it;
+## - land runs out about two half-sizes from every site: past that is the sea, so the coast curves
+##   round bays, capes and inland seas;
+## - a region's open ground is an ellipse warped into lobes and bays (MapGen._outline), not the
+##   rectangle of its map; between regions lies a belt of forest and rock;
+## - roads are searched for (A*) across the land, preferring open ground and old paths and paying
+##   for forest and water, so they wind; each crosses its border once, where a Lotus Seal closes
+##   it until the story opens the way.
 ##
 ## The world is built once and cached (`Atlas.world()`); it is fully deterministic.
 
-const MARGIN := 8          # wild border round the whole world
-const EAST := 14           # room on the east edge for the road that links one band to the next
 const HUB := "mountain"
-const HUB_W := 60          # the mountain column west of the bands
-const ROW_PAD := 8
-const WARP := 3.0          # how far region borders wander at the small scale (tiles)
-const WARP_BIG := 12.0     # ... and at the large scale, so borders meander like coasts and ridges
-const BAND := 2.2          # half-thickness of the forest belt between regions (tiles)
-const JITTER := 4          # regions sit a little up or down in their band, off the grid
-const EDGE := 7.0          # how deep the forest reaches in from a region's edge (tiles, varies)
+const W_WORLD := 1040
+const H_WORLD := 900
+const WARP := 6.0          # how far borders wander at the small scale (tiles)
+const WARP_BIG := 22.0     # ... and at the large scale, so borders meander like coasts and ridges
+const LAND := 1.95         # the coast lies about this many half-sizes out from the nearest site
+const LAND_HUB := 1.45     # ... and closer round the broad mountain
+const BAND_MIN := 1.6      # half-width of the forest belt between regions varies between these
+const BAND_MAX := 3.6
+const BLK := 16            # block size for the nearest-site search
 
-## bands of regions, north to south; a flipped band runs west (its regions are mirrored)
-const ROWS := [
-	{"ids": ["cloudsea", "court", "forge", "garden"], "flip": false},
-	{"ids": ["bamboo", "marsh", "frost", "thunder", "palace"], "flip": false},
-	{"ids": ["dragon", "volcano", "void", "celestial"], "flip": true},
-	{"ids": ["mirror", "grave", "time", "origin"], "flip": false},
-	{"ids": ["dunes", "fungal", "aurora", "chaos"], "flip": false},
-	{"ids": ["maple", "karst", "springs", "wheel"], "flip": false},
-	{"ids": ["village", "terraces", "silk", "loom"], "flip": false},
-	{"ids": ["starferry", "magpie", "starpalace", "jasper"], "flip": false},
-	{"ids": ["yanggu", "millet", "fusang", "guanghan"], "flip": false},
-]
+## Where every region lies: [x, y, way], its centre tile and the way its road runs through it
+## (0 east, 1 south, 2 west, 3 north).  Each chapter winds outward from the mountain: Part I east
+## and north up the east coast, Part II west along the north coast, Part IX east to the sunrise,
+## Part V south-east, Part III south, Part VIII south-south-west, Part VII south-west, Part VI
+## west, Part IV west and north up into the sky, Part X north and west to Mount Buzhou.
+const SITES := {
+	"mountain": [520, 460, 0],
+	"bamboo": [680, 430, 0], "marsh": [770, 370, 3], "frost": [790, 265, 3], "thunder": [750, 165, 3], "palace": [660, 95, 2],
+	"dragon": [545, 80, 2], "volcano": [430, 95, 2], "void": [320, 80, 2], "celestial": [200, 70, 2],
+	"mirror": [535, 655, 1], "grave": [585, 770, 1], "time": [690, 800, 0], "origin": [800, 810, 0],
+	"cloudsea": [330, 390, 2], "court": [225, 350, 3], "forge": [200, 255, 2], "garden": [95, 260, 3],
+	"dunes": [635, 640, 1], "fungal": [720, 680, 0], "aurora": [825, 640, 0], "chaos": [910, 715, 1],
+	"maple": [320, 490, 2], "karst": [215, 530, 2], "springs": [115, 495, 3], "wheel": [100, 390, 3],
+	"village": [345, 590, 2], "terraces": [300, 700, 1], "silk": [190, 720, 2], "loom": [110, 630, 3],
+	"starferry": [440, 650, 1], "magpie": [460, 770, 1], "starpalace": [380, 840, 2], "jasper": [270, 830, 2],
+	"yanggu": [705, 530, 0], "millet": [825, 495, 0], "fusang": [920, 405, 3], "guanghan": [925, 280, 3],
+	"longmen": [525, 300, 3], "drowned": [420, 245, 2], "tushan": [320, 215, 3], "buzhou": [215, 170, 2],
+}
+## the sect sits a little north of the mountain's middle, its south gates facing the lower slopes
+const SECT_OFFSET := Vector2i(0, -6)
 
 static var _layout := {}
 static var _world := {}
 
 # ---------------------------------------------------------------- layout (cheap, no map generation)
-## id -> {origin, size, cell (Rect2i), flip, row}; plus "_W", "_H", "_x0"
+## id -> {origin, size (as laid in the world), local (the map's own size), rot, site, cell}; plus
+## "_W", "_H".  `cell` starts as the region's footprint and becomes the bounding box of the land it
+## owns once the world is built.
 static func layout() -> Dictionary:
 	if not _layout.is_empty():
 		return _layout
 	var L := {}
-	var x0 := MARGIN + HUB_W
-	var max_w := 0
-	var rows: Array = []
-	for row in ROWS:
-		var ids: Array = []
-		for id in row.ids:
-			if Data.AREAS.has(id):
-				ids.append(id)
-		if ids.is_empty():
+	for id in SITES:
+		if not Data.AREAS.has(id):
 			continue
-		var rw := 0
-		var rh := 0
-		for id in ids:
-			rw += int(Data.AREAS[id].w)
-			rh = maxi(rh, int(Data.AREAS[id].h))
-		max_w = maxi(max_w, rw)
-		rows.append({"ids": ids, "flip": row.flip, "w": rw, "h": rh + ROW_PAD})
-	var x_end := x0 + max_w
-	var W := x_end + EAST
-	var y := MARGIN
-	for ri in rows.size():
-		var row: Dictionary = rows[ri]
-		var top := 0 if ri == 0 else y
-		var bottom := y + int(row.h)
-		var ids: Array = row.ids
-		var x := x0 if not row.flip else x_end
-		for k in ids.size():
-			var id: String = ids[k]
-			var sw: int = Data.AREAS[id].w
-			var sh: int = Data.AREAS[id].h
-			if row.flip:
-				x -= sw
-			# off the grid: each region sits a little higher or lower in its band
-			var jit := int(round((Terrain3D.hash2(k * 7 + 3, ri * 11 + 5, 9.0) - 0.5) * 2.0 * JITTER))
-			var origin := Vector2i(x, y + (int(row.h) - sh) / 2 + jit)
-			var cl := x
-			var cr := x + sw
-			if not row.flip:
-				if k == 0:
-					cl = x0
-				if k == ids.size() - 1:
-					cr = W
-				x += sw
-			else:
-				if k == 0:
-					cr = W
-				if k == ids.size() - 1:
-					cl = x0
-			L[id] = {"origin": origin, "size": Vector2i(sw, sh), "cell": Rect2i(cl, top, cr - cl, bottom - top), "flip": row.flip, "row": ri}
-		y = bottom
-	var H := y + MARGIN
-	# stretch the last band's cells to the south edge
-	for id in L:
-		var c: Rect2i = L[id].cell
-		if c.end.y == y:
-			L[id].cell = Rect2i(c.position, Vector2i(c.size.x, H - c.position.y))
-	L[HUB] = {"origin": Vector2i(MARGIN, MARGIN), "size": Vector2i(HUB_W, H - 2 * MARGIN), "cell": Rect2i(0, 0, x0, H), "flip": false, "row": -1}
-	# the sect: inside the mountain, its east gate lined up with the bamboo forest's west gate
-	var bo: Vector2i = L.bamboo.origin
-	var sect_o := Vector2i(x0 - int(Data.AREAS.sect.w) - 1, bo.y + 22 - 13)
-	L["sect"] = {"origin": sect_o, "size": Vector2i(Data.AREAS.sect.w, Data.AREAS.sect.h), "cell": Rect2i(sect_o, Vector2i(Data.AREAS.sect.w, Data.AREAS.sect.h)), "flip": false, "row": -1}
-	L["_W"] = W
-	L["_H"] = H
-	L["_x0"] = x0
+		var s: Array = SITES[id]
+		var rot: int = s[2]
+		var loc := Vector2i(Data.AREAS[id].w, Data.AREAS[id].h)
+		var size := loc if rot % 2 == 0 else Vector2i(loc.y, loc.x)
+		var site := Vector2i(s[0], s[1])
+		var origin := site - size / 2
+		L[id] = {"origin": origin, "size": size, "local": loc, "rot": rot, "site": site, "cell": Rect2i(origin, size)}
+	var ss := Vector2i(Data.AREAS.sect.w, Data.AREAS.sect.h)
+	var so: Vector2i = L[HUB].site - ss / 2 + SECT_OFFSET
+	L["sect"] = {"origin": so, "size": ss, "local": ss, "rot": 0, "site": so + ss / 2, "cell": Rect2i(so, ss)}
+	L["_W"] = W_WORLD
+	L["_H"] = H_WORLD
 	_layout = L
 	return L
 
 static func region_ids() -> Array:
 	var out: Array = [HUB, "sect"]
-	for row in ROWS:
-		for id in row.ids:
-			if Data.AREAS.has(id):
-				out.append(id)
+	for id in SITES:
+		if id != HUB and Data.AREAS.has(id):
+			out.append(id)
 	return out
 
 ## local tile of region `id` (as written in Data.AREAS) -> world tile
 static func to_world(id: String, p: Vector2i) -> Vector2i:
-	var L := layout()
-	var r: Dictionary = L[id]
-	var q := p
-	if r.flip:
-		q.x = int(r.size.x) - 1 - p.x
-	return r.origin + q
+	var r: Dictionary = layout()[id]
+	return r.origin + _turn(p, r.local, int(r.rot))
+
+## world tile -> local tile of region `id`
+static func to_local(id: String, q: Vector2i) -> Vector2i:
+	var r: Dictionary = layout()[id]
+	var d: Vector2i = q - r.origin
+	var lw: int = r.local.x
+	var lh: int = r.local.y
+	match int(r.rot):
+		1:
+			return Vector2i(d.y, lh - 1 - d.x)
+		2:
+			return Vector2i(lw - 1 - d.x, lh - 1 - d.y)
+		3:
+			return Vector2i(lw - 1 - d.y, d.x)
+	return d
+
+static func _turn(p: Vector2i, loc: Vector2i, rot: int) -> Vector2i:
+	match rot:
+		1:
+			return Vector2i(loc.y - 1 - p.y, p.x)
+		2:
+			return Vector2i(loc.x - 1 - p.x, loc.y - 1 - p.y)
+		3:
+			return Vector2i(p.y, loc.x - 1 - p.x)
+	return p
+
+## a direction in region `id`'s own map -> the same direction in the world
+static func dir_to_world(id: String, d: Vector2i) -> Vector2i:
+	match int(layout()[id].rot):
+		1:
+			return Vector2i(-d.y, d.x)
+		2:
+			return -d
+		3:
+			return Vector2i(d.y, -d.x)
+	return d
+
+## a rectangle of region `id`'s own map -> the rectangle it covers in the world
+static func rect_to_world(id: String, r: Rect2i) -> Rect2i:
+	var a := to_world(id, r.position)
+	var b := to_world(id, r.end - Vector2i.ONE)
+	var lo := Vector2i(mini(a.x, b.x), mini(a.y, b.y))
+	var hi := Vector2i(maxi(a.x, b.x), maxi(a.y, b.y))
+	return Rect2i(lo, hi - lo + Vector2i.ONE)
 
 # ---------------------------------------------------------------- world build
 static func world() -> Dictionary:
@@ -132,113 +146,174 @@ static func world() -> Dictionary:
 		_world = _build()
 	return _world
 
-static func _cell_index(cells: Array, x: float, y: float) -> int:
-	for i in cells.size():
-		var c: Rect2i = cells[i]
-		if x >= c.position.x and x < c.end.x and y >= c.position.y and y < c.end.y:
-			return i
-	return 0
+## A noise field over the whole world as bytes (0..255 for -1..1), generated natively: per-tile
+## FastNoiseLite calls from GDScript would dominate the build time on a world this size.
+static func _field(seed_: int, freq: float, octaves: int, W: int, H: int) -> PackedByteArray:
+	var n := FastNoiseLite.new()
+	n.seed = seed_
+	n.frequency = freq
+	n.fractal_octaves = octaves
+	return n.get_image(W, H, false, false, false).get_data()
 
 static func _build() -> Dictionary:
 	var L := layout()
 	var W: int = L._W
 	var H: int = L._H
-	var x0: int = L._x0
+	var N := W * H
 	var ids := region_ids()
 	var idx := {}
 	for i in ids.size():
 		idx[ids[i]] = i
-	var grid := PackedByteArray()
-	grid.resize(W * H)
-	grid.fill(MapGen.WALL)
 	var maps := {}
-	# ---- stamp every region's own map
 	for id in ids:
-		var r: Dictionary = L[id]
-		var m: Dictionary = MapGen.build(id, r.size if id == HUB else Vector2i.ZERO)
-		maps[id] = m
-		var mw: int = m.w
-		for yy in int(m.h):
-			for xx in mw:
-				var p := to_world(id, Vector2i(xx, yy))
-				grid[p.y * W + p.x] = m.grid[yy * mw + xx]
-	# ---- forest margins: each region's own map used to end in a straight wall, so the land you can
-	# walk on was a rectangle.  The forest now reaches in from the edge by a depth that varies with
-	# noise, leaving clearings round everything that matters (gates, arrivals, people, bosses,
-	# pickups, buildings and monster packs).
-	_erode_edges(grid, W, H, ids, maps)
-	# ---- ownership: the cell under a noise-warped point, so region borders wander
-	var cells: Array = []
-	var cell_ids: Array = []
+		maps[id] = MapGen.build(id)
+	var sect_r: Rect2i = L.sect.cell
+	# ---- pins: the land round everything that matters in a region belongs to that region, however
+	# far the border wanders (its look, its name on the screen, its kills)
+	var pin := PackedInt32Array()
+	pin.resize(N)
+	pin.fill(-1)
 	for id in ids:
 		if id == "sect":
 			continue
-		cells.append(L[id].cell)
-		cell_ids.append(idx[id])
-	var nx := FastNoiseLite.new()
-	nx.seed = 4242
-	nx.frequency = 0.06
-	var ny := FastNoiseLite.new()
-	ny.seed = 9191
-	ny.frequency = 0.06
-	var bx := FastNoiseLite.new()
-	bx.seed = 1717
-	bx.frequency = 0.017
-	bx.fractal_octaves = 2
-	var by := FastNoiseLite.new()
-	by.seed = 2828
-	by.frequency = 0.017
-	by.fractal_octaves = 2
-	var owner := PackedByteArray()
-	owner.resize(W * H)
-	var sect_r: Rect2i = L.sect.cell
-	# the land round what matters in a region always belongs to that region, however far the
-	# border wanders (its look, its name on the screen, its kills)
-	var pinned := {}
-	for id in ids:
-		if id == HUB or id == "sect":
-			continue
-		var pts: Array = []
-		for e in maps[id].ents:
-			pts.append(e.pos)
-		for a in MapGen.arrival_tiles(id):
-			pts.append(a)
-		for pp in Data.AREAS[id].get("portals", []):
-			pts.append(pp.pos)
-		for lp in pts:
-			var c: Vector2i = to_world(id, lp)
-			for dy in range(-4, 5):
-				for dx in range(-4, 5):
+		for sp in _spots(id, maps[id]):
+			var c: Vector2i = to_world(id, sp[0])
+			var r: int = sp[1]
+			for dy in range(-r, r + 1):
+				for dx in range(-r, r + 1):
+					if dx * dx + dy * dy > r * r + 1:
+						continue
 					var q := c + Vector2i(dx, dy)
-					if q.x >= 0 and q.y >= 0 and q.x < W and q.y < H and not pinned.has(q):
-						pinned[q] = idx[id]
+					if q.x >= 0 and q.y >= 0 and q.x < W and q.y < H and pin[q.y * W + q.x] < 0:
+						pin[q.y * W + q.x] = idx[id]
+		for bd in maps[id].buildings:
+			var br := rect_to_world(id, (bd.rect as Rect2i).grow(2))
+			for yy in range(br.position.y, br.end.y):
+				for xx in range(br.position.x, br.end.x):
+					if xx >= 0 and yy >= 0 and xx < W and yy < H:
+						pin[yy * W + xx] = idx[id]
+	# ---- ownership: the nearest site, measured in each region's own half-sizes, under a warp
+	var sid := PackedInt32Array()
+	var sx := PackedFloat32Array()
+	var sy := PackedFloat32Array()
+	var shx := PackedFloat32Array()
+	var shy := PackedFloat32Array()
+	for id in ids:
+		if id == "sect":
+			continue
+		var rr: Dictionary = L[id]
+		sid.append(idx[id])
+		sx.append(rr.site.x + 0.5)
+		sy.append(rr.site.y + 0.5)
+		shx.append(rr.size.x * 0.5)
+		shy.append(rr.size.y * 0.5)
+	var ns := sid.size()
+	var fx := _field(4242, 0.06, 1, W, H)
+	var fy := _field(9191, 0.06, 1, W, H)
+	var gx := _field(1717, 0.012, 2, W, H)
+	var gy := _field(2828, 0.012, 2, W, H)
+	var coast := _field(3131, 0.02, 3, W, H)
+	# candidate sites per block: only sites that could be nearest somewhere in the block
+	var bw := (W + BLK - 1) / BLK
+	var bh := (H + BLK - 1) / BLK
+	var cand: Array = []
+	var reach := WARP + WARP_BIG + 1.0
+	for by in bh:
+		for bx in bw:
+			var x0 := bx * BLK - reach
+			var x1 := (bx + 1) * BLK + reach
+			var y0 := by * BLK - reach
+			var y1 := (by + 1) * BLK + reach
+			var dmin := PackedFloat32Array()
+			dmin.resize(ns)
+			var cap := 1e20
+			for k in ns:
+				var nx := (clampf(sx[k], x0, x1) - sx[k]) / shx[k]
+				var ny := (clampf(sy[k], y0, y1) - sy[k]) / shy[k]
+				dmin[k] = nx * nx + ny * ny
+				var ex := maxf(absf(x0 - sx[k]), absf(x1 - sx[k])) / shx[k]
+				var ey := maxf(absf(y0 - sy[k]), absf(y1 - sy[k])) / shy[k]
+				cap = minf(cap, ex * ex + ey * ey)
+			var lst := PackedInt32Array()
+			for k in ns:
+				if dmin[k] <= cap:
+					lst.append(k)
+			cand.append(lst)
+	var owner := PackedByteArray()
+	owner.resize(N)
+	var sea := PackedByteArray()
+	sea.resize(N)
+	var k_sect: int = idx.sect
+	var k_hub_site := 0
+	for k in ns:
+		if sid[k] == idx[HUB]:
+			k_hub_site = k
 	for y in H:
+		var row := y * W
+		var brow := (y / BLK) * bw
 		for x in W:
-			var i := y * W + x
+			var i := row + x
+			var wx := x + 0.5 + (fx[i] / 127.5 - 1.0) * WARP + (gx[i] / 127.5 - 1.0) * WARP_BIG
+			var wy := y + 0.5 + (fy[i] / 127.5 - 1.0) * WARP + (gy[i] / 127.5 - 1.0) * WARP_BIG
+			var lst: PackedInt32Array = cand[brow + x / BLK]
+			var bd := 1e20
+			var bk := 0
+			for k in lst:
+				var dx := (wx - sx[k]) / shx[k]
+				var dy := (wy - sy[k]) / shy[k]
+				var dd := dx * dx + dy * dy
+				if dd < bd:
+					bd = dd
+					bk = k
+			var o: int = sid[bk]
 			if sect_r.has_point(Vector2i(x, y)):
-				owner[i] = idx.sect
-				continue
-			# the big meanders fade out towards the mountain, whose roads stay on the mountain
-			var big := WARP_BIG * clampf((x - x0) / 16.0, 0.0, 1.0)
-			var wx := clampf(x + 0.5 + nx.get_noise_2d(x, y) * WARP + bx.get_noise_2d(x, y) * big, 0.0, W - 0.01)
-			var wy := clampf(y + 0.5 + ny.get_noise_2d(x, y) * WARP + by.get_noise_2d(x, y) * big, 0.0, H - 0.01)
-			var ci := _cell_index(cells, wx, wy)
-			owner[i] = cell_ids[ci]
-			if pinned.has(Vector2i(x, y)):
-				owner[i] = pinned[Vector2i(x, y)]
-				continue
-			# the forest belt between regions (never opens anything; only adds trees and rock)
-			var c: Rect2i = cells[ci]
-			var dist := minf(minf(wx - c.position.x, c.end.x - wx), minf(wy - c.position.y, c.end.y - wy))
-			var at_edge := wx - c.position.x < BAND and c.position.x == 0 or c.end.x - wx < BAND and c.end.x == W
-			if dist < BAND or at_edge:
-				grid[i] = MapGen.WALL
+				o = k_sect
+			elif pin[i] >= 0:
+				o = pin[i]
+			owner[i] = o
+			# the coast: land reaches about LAND half-sizes out from the nearest site (the mountain
+			# is broad, so its own shores come in closer)
+			var reach_land := (LAND_HUB if bk == k_hub_site else LAND) + (coast[i] / 127.5 - 1.0) * 0.45
+			# ... and fades out towards the edge of the world, which is always open sea
+			reach_land *= clampf(mini(mini(x, y), mini(W - 1 - x, H - 1 - y)) / 30.0, 0.0, 1.0)
+			if pin[i] < 0 and o != k_sect and sqrt(bd) > reach_land:
+				sea[i] = 1
+	# ---- land bridges: every road gets an isthmus to run on, so no road has to cross the sea
+	_isthmuses(owner, sea, W, H, idx)
+	# ---- the land: forest everywhere, the sea beyond the coast, and each region's own map (whose
+	# open ground is already an organic outline, see MapGen._outline) where it owns the land
+	var grid := PackedByteArray()
+	grid.resize(N)
+	grid.fill(MapGen.WALL)
+	for i in N:
+		if sea[i] == 1:
+			grid[i] = MapGen.WATER
+	var lake := _field(7070, 0.022, 2, W, H)
+	for id in ids:
+		_stamp_region(grid, owner, sea, W, H, id, idx[id], maps[id], sect_r)
+	# lakes in the wild forest between regions (never in a region's open ground or by its people)
+	for i in N:
+		if grid[i] == MapGen.WALL and pin[i] < 0 and lake[i] > 200 and owner[i] != k_sect:
+			grid[i] = MapGen.WATER
+	# every region's open ground hangs together, inside its own land
+	for id in ids:
+		if id == "sect" or id == HUB:
+			continue
+		_reconnect(grid, owner, W, H, id, idx[id], maps[id])
+	# ---- the belt between regions: forest and rock where two regions meet (it never opens anything)
+	_belts(grid, owner, pin, W, H, k_sect)
 	# ---- the sect's pagoda stands on the mountain north-west of the courtyard
 	var pag := sect_r.position + Vector2i(-5, 3)
 	for yy in range(pag.y - 1, pag.y + 2):
 		for xx in range(pag.x - 1, pag.x + 2):
 			grid[yy * W + xx] = MapGen.BUILDING
 	# ---- roads between gates, seals where the story has not opened the way yet
+	var road_cost := _field(8080, 0.045, 2, W, H)
+	var blocked := {}
+	for id in ids:
+		for e in maps[id].ents:
+			if e.kind in ["npc", "boss", "pickup"]:
+				blocked[to_world(id, e.pos)] = true
 	var seals: Array = []
 	var done := {}
 	var road_n := 0
@@ -258,19 +333,26 @@ static func _build() -> Dictionary:
 					back = q
 			if back == null:
 				continue
+			road_n += 1
 			var ga := to_world(a, p.pos)
 			var gb := to_world(b, back.pos)
-			road_n += 1
-			_road(grid, W, H, x0, ga, _gate_dir(a, p.pos), gb, _gate_dir(b, back.pos), road_n, a == "sect" or b == "sect")
-			# the road runs on through the border forest to where travellers arrive in each region
+			var rd := _road(grid, owner, sea, road_cost, blocked, W, H, idx, a, ga, _gate_dir(a, p.pos), b, gb, _gate_dir(b, back.pos))
+			# the road runs on to where travellers arrive in each region
 			if a != "sect":
 				_line(grid, W, ga, to_world(a, back.dest))
 			if b != "sect":
 				_line(grid, W, gb, to_world(b, p.dest))
+			if rd.is_empty():
+				push_warning("Atlas: no road between %s and %s" % [a, b])
+				continue
 			if p.open != "":
-				seals.append(_seal(grid, W, b, back.pos, p.open, a))
+				seals.append(_seal(rd, b, rd.cross_b, rd.cross_a, p.open, a))
 			elif back.open != "":
-				seals.append(_seal(grid, W, a, p.pos, back.open, b))
+				seals.append(_seal(rd, a, rd.cross_a, rd.cross_b, back.open, b))
+	# a road that still had to cross the open sea runs on a causeway, which belongs to the land
+	for i in N:
+		if sea[i] == 1 and grid[i] == MapGen.PATH:
+			sea[i] = 0
 	# ---- entities, in world tiles
 	var ents: Array = []
 	var buildings: Array = []
@@ -287,8 +369,7 @@ static func _build() -> Dictionary:
 			ents.append(ge)
 		for bd in m.buildings:
 			var gb2: Dictionary = bd.duplicate(true)
-			var rr: Rect2i = bd.rect
-			gb2.rect = Rect2i(to_world(id, rr.position), rr.size)
+			gb2.rect = rect_to_world(id, bd.rect)
 			gb2.door = to_world(id, bd.door)
 			gb2["area"] = id
 			var props: Array = []
@@ -301,82 +382,188 @@ static func _build() -> Dictionary:
 	var start := to_world("sect", Vector2i(20, 8))
 	# ---- every entity must be reachable from the sect with all seals open
 	_connect(grid, W, H, owner, idx, ents, start)
-	return {"w": W, "h": H, "grid": grid, "owner": owner, "ids": ids, "idx": idx, "ents": ents, "buildings": buildings,
+	# ---- each region's cell: the bounding box of the land it owns
+	var lo: Array = []
+	var hi: Array = []
+	for i in ids.size():
+		lo.append(Vector2i(W, H))
+		hi.append(Vector2i(-1, -1))
+	for y in H:
+		for x in W:
+			var i := y * W + x
+			if sea[i] == 1:
+				continue
+			var o := owner[i]
+			var l: Vector2i = lo[o]
+			var hh: Vector2i = hi[o]
+			if x < l.x or y < l.y:
+				lo[o] = Vector2i(mini(l.x, x), mini(l.y, y))
+			if x > hh.x or y > hh.y:
+				hi[o] = Vector2i(maxi(hh.x, x), maxi(hh.y, y))
+	for id in ids:
+		var o2: int = idx[id]
+		if hi[o2].x >= 0:
+			L[id].cell = Rect2i(lo[o2], hi[o2] - lo[o2] + Vector2i.ONE)
+	return {"w": W, "h": H, "grid": grid, "owner": owner, "sea": sea, "ids": ids, "idx": idx, "ents": ents, "buildings": buildings,
 		"start": start, "layout": L, "maps": maps}
 
-static func _erode_edges(grid: PackedByteArray, W: int, H: int, ids: Array, maps: Dictionary) -> void:
-	var L := layout()
-	var en := FastNoiseLite.new()
-	en.seed = 6060
-	en.frequency = 0.07
-	en.fractal_octaves = 3
-	for id in ids:
-		if id == HUB or id == "sect":
-			continue
-		var m: Dictionary = maps[id]
-		var mw: int = m.w
-		var mh: int = m.h
-		# protected clearings, in the region's own coordinates
-		var keep := {}
-		var spots: Array = []
-		for e in m.ents:
-			spots.append([e.pos, 2 if e.kind == "enemy" else 4])
-		for a in MapGen.arrival_tiles(id):
-			spots.append([a, 4])
-		for p in Data.AREAS[id].get("portals", []):
-			spots.append([p.pos, 4])
-			spots.append([p.dest, 3])
-		for bd in m.buildings:
-			var rr: Rect2i = bd.rect
-			for yy in range(rr.position.y - 2, rr.end.y + 2):
-				for xx in range(rr.position.x - 2, rr.end.x + 2):
-					keep[Vector2i(xx, yy)] = true
-		for sp in spots:
-			var c: Vector2i = sp[0]
-			var r: int = sp[1]
-			for dy in range(-r, r + 1):
-				for dx in range(-r, r + 1):
-					if dx * dx + dy * dy <= r * r + 1:
-						keep[c + Vector2i(dx, dy)] = true
-		var local := PackedByteArray()
-		local.resize(mw * mh)
-		for yy in mh:
-			for xx in mw:
-				var p := Vector2i(xx, yy)
-				var wp := to_world(id, p)
-				var gi := wp.y * W + wp.x
-				var t := grid[gi]
-				if not keep.has(p):
-					var d := float(mini(mini(xx, mw - 1 - xx), mini(yy, mh - 1 - yy)))
-					var depth := 1.5 + (en.get_noise_2d(wp.x, wp.y) * 0.5 + 0.5) * EDGE
-					if d < depth and (t == MapGen.FLOOR or t == MapGen.DECOR):
-						t = MapGen.WALL
-				local[yy * mw + xx] = t
-		# the forest must not cut anything off: reconnect inside the region's own map, the way
-		# MapGen does (trails wander like deer tracks)
-		var arr: Array = MapGen.arrival_tiles(id)
-		var start: Vector2i = arr[0] if not arr.is_empty() else m.start
-		var need: Array = []
-		for e in m.ents:
+## Raise land along the straight way between every pair of gates a road will join (on the two
+## regions' own land only), so the coast never cuts a road.
+static func _isthmuses(owner: PackedByteArray, sea: PackedByteArray, W: int, H: int, idx: Dictionary) -> void:
+	var done := {}
+	for a in idx:
+		for p in Data.AREAS[a].get("portals", []):
+			var b: String = p.to
+			if not idx.has(b):
+				continue
+			var key := [a, b]
+			key.sort()
+			if done.has(str(key)):
+				continue
+			done[str(key)] = true
+			var back = null
+			for q in Data.AREAS[b].get("portals", []):
+				if q.to == a:
+					back = q
+			if back == null:
+				continue
+			var pa := to_world(a, p.pos) + _gate_dir(a, p.pos) * 3
+			var pb := to_world(b, back.pos) + _gate_dir(b, back.pos) * 3
+			var sa := _side(idx, a)
+			var sb := _side(idx, b)
+			var n := maxi(absi(pb.x - pa.x), absi(pb.y - pa.y))
+			for k in n + 1:
+				var c := Vector2(pa).lerp(Vector2(pb), k / float(maxi(n, 1)))
+				for dy in range(-5, 6):
+					for dx in range(-5, 6):
+						if dx * dx + dy * dy > 26:
+							continue
+						var x := int(round(c.x)) + dx
+						var y := int(round(c.y)) + dy
+						if x < 0 or y < 0 or x >= W or y >= H:
+							continue
+						var i := y * W + x
+						if owner[i] == sa or owner[i] == sb:
+							sea[i] = 0
+
+## Places in a region's own map that must stay open and belong to it: [local tile, radius].
+static func _spots(id: String, m: Dictionary) -> Array:
+	var spots: Array = []
+	for e in m.ents:
+		spots.append([e.pos, 2 if e.kind == "enemy" else 4])
+	for a in MapGen.arrival_tiles(id):
+		spots.append([a, 4])
+	for p in Data.AREAS[id].get("portals", []):
+		spots.append([p.pos, 4])
+		spots.append([p.dest, 3])
+	return spots
+
+## Stamp region `id`'s own map into the world where it owns the land.
+static func _stamp_region(grid: PackedByteArray, owner: PackedByteArray, sea: PackedByteArray, W: int, H: int, id: String, me: int, m: Dictionary, sect_r: Rect2i) -> void:
+	var r: Dictionary = layout()[id]
+	var o: Vector2i = r.origin
+	var loc: Vector2i = r.local
+	var rot: int = r.rot
+	var mw: int = m.w
+	var mh: int = m.h
+	var mg: PackedByteArray = m.grid
+	var is_sect := id == "sect"
+	for ly in mh:
+		for lx in mw:
+			var q := o + _turn(Vector2i(lx, ly), loc, rot)
+			if q.x < 0 or q.y < 0 or q.x >= W or q.y >= H:
+				continue
+			var i := q.y * W + q.x
+			if owner[i] != me or sea[i] == 1:
+				continue
+			if not is_sect and sect_r.has_point(q):
+				continue
+			grid[i] = mg[ly * mw + lx]
+
+## The forest must not cut anything off: reconnect inside the region's own map and its own land, the
+## way MapGen does (trails wander like deer tracks, and go round buildings).
+static func _reconnect(grid: PackedByteArray, owner: PackedByteArray, W: int, H: int, id: String, me: int, m: Dictionary) -> void:
+	var r: Dictionary = layout()[id]
+	var o: Vector2i = r.origin
+	var loc: Vector2i = r.local
+	var rot: int = r.rot
+	var mw: int = m.w
+	var mh: int = m.h
+	var local := PackedByteArray()
+	local.resize(mw * mh)
+	var wi := PackedInt32Array()
+	wi.resize(mw * mh)
+	for ly in mh:
+		for lx in mw:
+			var q := o + _turn(Vector2i(lx, ly), loc, rot)
+			var li := ly * mw + lx
+			if q.x < 0 or q.y < 0 or q.x >= W or q.y >= H or owner[q.y * W + q.x] != me:
+				# other regions' land: a trail may not cross it
+				local[li] = MapGen.BUILDING
+				wi[li] = -1
+				continue
+			wi[li] = q.y * W + q.x
+			local[li] = grid[wi[li]]
+	var arr: Array = MapGen.arrival_tiles(id)
+	var start: Vector2i = arr[0] if not arr.is_empty() else m.start
+	var need: Array = []
+	for e in m.ents:
+		if e.kind != "spring":
 			need.append(MapGen._outside(e.pos, m.buildings))
-		for a in arr:
-			need.append(a)
-		for p in Data.AREAS[id].get("portals", []):
-			need.append(p.pos)
-		for _pass in 30:
-			var reach := MapGen.flood(local, mw, mh, start)
-			var miss := false
-			for q in need:
-				if not reach.has(q):
-					_carve_around(local, mw, mh, q, reach)
-					miss = true
-					break
-			if not miss:
+	for a in arr:
+		need.append(a)
+	for p in Data.AREAS[id].get("portals", []):
+		need.append(p.pos)
+	for _pass in 40:
+		var reach := MapGen.flood(local, mw, mh, start)
+		var miss := false
+		for q2 in need:
+			if not reach.has(q2):
+				_carve_around(local, mw, mh, q2, reach)
+				miss = true
 				break
-		for yy in mh:
-			for xx in mw:
-				var wp2 := to_world(id, Vector2i(xx, yy))
-				grid[wp2.y * W + wp2.x] = local[yy * mw + xx]
+		if not miss:
+			break
+	for li in mw * mh:
+		if wi[li] >= 0:
+			grid[wi[li]] = local[li]
+
+## Forest and rock where two regions meet, its width wandering between BAND_MIN and BAND_MAX on each
+## side.  Never across the sect's own courtyard or a region's pinned clearings.
+static func _belts(grid: PackedByteArray, owner: PackedByteArray, pin: PackedInt32Array, W: int, H: int, k_sect: int) -> void:
+	var N := W * H
+	var dist := PackedByteArray()
+	dist.resize(N)
+	dist.fill(255)
+	var q := PackedInt32Array()
+	for y in range(1, H - 1):
+		for x in range(1, W - 1):
+			var i := y * W + x
+			var o := owner[i]
+			if owner[i - 1] != o or owner[i + 1] != o or owner[i - W] != o or owner[i + W] != o:
+				dist[i] = 0
+				q.append(i)
+	var head := 0
+	var cap := int(ceil(BAND_MAX))
+	while head < q.size():
+		var i := q[head]
+		head += 1
+		var nd := dist[i] + 1
+		if nd > cap:
+			continue
+		for j in [i - 1, i + 1, i - W, i + W]:
+			if j >= 0 and j < N and dist[j] > nd:
+				dist[j] = nd
+				q.append(j)
+	var band := _field(5151, 0.05, 2, W, H)
+	for i in N:
+		if dist[i] == 255 or pin[i] >= 0 or owner[i] == k_sect:
+			continue
+		var t := grid[i]
+		if t != MapGen.FLOOR and t != MapGen.DECOR and t != MapGen.PATH:
+			continue
+		if dist[i] < BAND_MIN + band[i] / 255.0 * (BAND_MAX - BAND_MIN):
+			grid[i] = MapGen.WALL
 
 ## Carve the shortest trail from `from` to the nearest tile in `reach`, going round buildings (a
 ## trail must never break through a wall; the door is the way in).
@@ -412,8 +599,7 @@ static func _carve_around(grid: PackedByteArray, w: int, h: int, from: Vector2i,
 
 ## which way a gate faces out of its region (in world directions)
 static func _gate_dir(id: String, pos: Vector2i) -> Vector2i:
-	var r: Dictionary = layout()[id]
-	var s: Vector2i = r.size
+	var s: Vector2i = layout()[id].local
 	var d := Vector2i.ZERO
 	if pos.x <= 1:
 		d = Vector2i(-1, 0)
@@ -423,96 +609,142 @@ static func _gate_dir(id: String, pos: Vector2i) -> Vector2i:
 		d = Vector2i(0, -1)
 	else:
 		d = Vector2i(0, 1)
-	if r.flip:
-		d.x = -d.x
-	return d
+	return dir_to_world(id, d)
 
-## A road from gate `ga` to gate `gb`, two tiles wide, gently meandering on long stretches.
-static func _road(grid: PackedByteArray, W: int, H: int, x0: int, ga: Vector2i, da: Vector2i, gb: Vector2i, db: Vector2i, n: int, hub: bool) -> void:
-	var pts: Array = [ga]
-	var a1 := ga + da * 3
-	var b1 := gb + db * 3
-	if da.x != 0 and da == db:
-		# both gates face the same way (one band to the next, round the east edge)
-		var cx := maxi(ga.x, gb.x) + 5 if da.x > 0 else mini(ga.x, gb.x) - 5
-		pts += [Vector2i(cx, ga.y), Vector2i(cx, gb.y)]
-	elif hub:
-		# a mountain road: away from the sect, along the mountain, then east into the band
-		var lane := x0 - 6
-		if da.y != 0:
-			pts += [a1, Vector2i(a1.x, gb.y), Vector2i(mini(a1.x, lane), gb.y)]
-		elif da.x < 0:
-			var wx := a1.x - 3 - (n % 4) * 3
-			pts += [Vector2i(wx, ga.y), Vector2i(wx, gb.y), Vector2i(lane, gb.y)]
-		else:
-			pts += [Vector2i((ga.x + gb.x) / 2, ga.y), Vector2i((ga.x + gb.x) / 2, gb.y)]
-	else:
-		var mx := (ga.x + gb.x) / 2
-		pts += [Vector2i(mx, ga.y), Vector2i(mx, gb.y)]
-	pts.append(gb)
-	var noise := FastNoiseLite.new()
-	noise.seed = 700 + n
-	noise.frequency = 0.05
-	var prev := ga
-	for i in range(1, pts.size()):
-		var p0: Vector2i = pts[i - 1]
-		var p1: Vector2i = pts[i]
-		var seg := Vector2(p1 - p0)
-		var ln := seg.length()
-		var steps := int(ceil(ln))
-		var perp := Vector2(-seg.y, seg.x).normalized() if ln > 0.0 else Vector2.ZERO
-		var amp := 3.5 if ln > 16.0 else 0.0
-		for k in range(1, steps + 1):
-			var t := k / float(steps)
-			var q := Vector2(p0).lerp(Vector2(p1), t) + perp * amp * sin(PI * t) * noise.get_noise_1d(k + i * 97.0)
-			var c := Vector2i(roundi(q.x), roundi(q.y))
-			if hub and absi(c.y - gb.y) > 1:
-				c.x = mini(c.x, x0 - 4)
-			c.x = clampi(c.x, 2, W - 3)
-			c.y = clampi(c.y, 2, H - 3)
-			_line(grid, W, prev, c)
-			prev = c
+## The region whose land a road runs over on `id`'s side: the sect's roads leave over the mountain.
+static func _side(idx: Dictionary, id: String) -> int:
+	return idx[HUB] if id == "sect" else idx[id]
 
-## 4-connected line of 2x2 road stamps
-static func _line(grid: PackedByteArray, W: int, a: Vector2i, b: Vector2i) -> void:
+## A road from gate `ga` of region `a` to gate `gb` of region `b`.  It leaves each gate straight for a
+## few steps, then is searched for (A*) across the land: open ground is cheap, old paths cheaper,
+## forest dear and water dearer, and a slow noise field makes it wind.  It crosses from one region
+## to the other exactly once, at the point of their border that makes the way shortest, and keeps
+## to its own two regions' land.  Returns {"tiles", "cross_a", "cross_b"} ({} if there is no way).
+static func _road(grid: PackedByteArray, owner: PackedByteArray, sea: PackedByteArray, cost: PackedByteArray, blocked: Dictionary, W: int, H: int, idx: Dictionary, a: String, ga: Vector2i, da: Vector2i, b: String, gb: Vector2i, db: Vector2i) -> Dictionary:
+	var sa := _side(idx, a)
+	var sb := _side(idx, b)
+	var lead := 3 if a == "sect" else 2
+	var lead_b := 3 if b == "sect" else 2
+	var pa := ga + da * lead
+	var pb := gb + db * lead_b
+	var box := Rect2i(Vector2i(mini(pa.x, pb.x), mini(pa.y, pb.y)), Vector2i.ONE).merge(Rect2i(Vector2i(maxi(pa.x, pb.x), maxi(pa.y, pb.y)), Vector2i.ONE))
+	box = box.grow(60).intersection(Rect2i(1, 1, W - 2, H - 2))
+	# where to cross: the border tile pair that makes the way shortest (land before water)
+	var best := 1e20
+	var ca := Vector2i(-1, -1)
+	var cb := Vector2i(-1, -1)
+	for y in range(box.position.y, box.end.y):
+		for x in range(box.position.x, box.end.x):
+			var i := y * W + x
+			if owner[i] != sb:
+				continue
+			for d in MapGen.DIRS:
+				var n: Vector2i = Vector2i(x, y) + d
+				if owner[n.y * W + n.x] != sa:
+					continue
+				var c := Vector2(pa).distance_to(Vector2(n)) + Vector2(pb).distance_to(Vector2(x, y))
+				if sea[i] == 1 or sea[n.y * W + n.x] == 1:
+					c += 40.0
+				if grid[i] == MapGen.BUILDING or grid[n.y * W + n.x] == MapGen.BUILDING:
+					c += 1000.0
+				if c < best:
+					best = c
+					ca = n
+					cb = Vector2i(x, y)
+	if ca.x < 0:
+		return {}
+	var p1 := _astar(grid, owner, cost, blocked, W, box, sa, pa, ca)
+	var p2 := _astar(grid, owner, cost, blocked, W, box, sb, cb, pb)
+	if p1.is_empty() or p2.is_empty():
+		return {}
+	var tiles := {}
+	_line_t(grid, W, ga, pa, tiles)
+	var prev: Vector2i = pa
+	for c2 in p1:
+		_line_t(grid, W, prev, c2, tiles)
+		prev = c2
+	_line_t(grid, W, prev, cb, tiles)
+	prev = cb
+	for c3 in p2:
+		_line_t(grid, W, prev, c3, tiles)
+		prev = c3
+	_line_t(grid, W, prev, gb, tiles)
+	return {"tiles": tiles, "cross_a": ca, "cross_b": cb}
+
+## A* over `box` keeping to the land of region `me`.
+static func _astar(grid: PackedByteArray, owner: PackedByteArray, cost: PackedByteArray, blocked: Dictionary, W: int, box: Rect2i, me: int, from: Vector2i, to: Vector2i) -> Array:
+	var a := AStarGrid2D.new()
+	a.region = box
+	a.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	a.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	a.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	a.update()
+	for y in range(box.position.y, box.end.y):
+		for x in range(box.position.x, box.end.x):
+			var i := y * W + x
+			var p := Vector2i(x, y)
+			if owner[i] != me:
+				a.set_point_solid(p, true)
+				continue
+			var t := grid[i]
+			var wgt := 1.0
+			match t:
+				MapGen.BUILDING, MapGen.INTERIOR:
+					a.set_point_solid(p, true)
+					continue
+				MapGen.PATH:
+					wgt = 0.45
+				MapGen.FLOOR:
+					wgt = 1.0
+				MapGen.DECOR:
+					wgt = 1.3
+				MapGen.WATER:
+					wgt = 9.0
+				_:
+					wgt = 2.8
+			wgt += cost[i] / 255.0 * 1.8
+			if blocked.has(p):
+				wgt += 12.0
+			a.set_point_weight_scale(p, wgt)
+	for e in [from, to]:
+		if a.is_in_boundsv(e):
+			a.set_point_solid(e, false)
+	if not a.is_in_boundsv(from) or not a.is_in_boundsv(to):
+		return []
+	return Array(a.get_id_path(from, to))
+
+## 4-connected line of 2x2 road stamps, remembering the tiles it paved
+static func _line_t(grid: PackedByteArray, W: int, a: Vector2i, b: Vector2i, tiles: Dictionary) -> void:
 	var c := a
-	_stamp(grid, W, c)
+	_stamp(grid, W, c, tiles)
 	while c != b:
 		if absi(b.x - c.x) >= absi(b.y - c.y):
 			c.x += signi(b.x - c.x)
 		else:
 			c.y += signi(b.y - c.y)
-		_stamp(grid, W, c)
+		_stamp(grid, W, c, tiles)
 
-static func _stamp(grid: PackedByteArray, W: int, c: Vector2i) -> void:
+static func _line(grid: PackedByteArray, W: int, a: Vector2i, b: Vector2i) -> void:
+	_line_t(grid, W, a, b, {})
+
+static func _stamp(grid: PackedByteArray, W: int, c: Vector2i, tiles: Dictionary = {}) -> void:
 	for d in [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]:
 		var p: Vector2i = c + d
 		var t := grid[p.y * W + p.x]
 		if t != MapGen.BUILDING and t != MapGen.INTERIOR:
 			grid[p.y * W + p.x] = MapGen.PATH
+			tiles[p] = true
 
-## A Lotus Seal barrier across the road where it crosses the border of region `id` at gate `pos`.
-static func _seal(grid: PackedByteArray, W: int, id: String, pos: Vector2i, req: String, from: String) -> Dictionary:
-	var r: Dictionary = layout()[id]
-	var s: Vector2i = r.size
-	var line: Array = []
-	if pos.x <= 1 or pos.x >= s.x - 2:
-		var lx := 0 if pos.x <= 1 else s.x - 1
-		for dy in range(-3, 4):
-			line.append(to_world(id, Vector2i(lx, pos.y + dy)))
-	else:
-		var ly := 0 if pos.y <= 1 else s.y - 1
-		for dx in range(-3, 4):
-			line.append(to_world(id, Vector2i(pos.x + dx, ly)))
+## A Lotus Seal barrier across the road where it crosses into region `id`: every tile of that road
+## within two steps of the crossing.  `axis` is the way the road runs there.
+static func _seal(rd: Dictionary, id: String, at: Vector2i, from_tile: Vector2i, req: String, from: String) -> Dictionary:
 	var tiles: Array = []
-	for t in line:
+	for t in rd.tiles:
 		var tv: Vector2i = t
-		if MapGen.is_walkable_tile(grid[tv.y * W + tv.x]):
+		if maxi(absi(tv.x - at.x), absi(tv.y - at.y)) <= 2:
 			tiles.append(tv)
-	var c: Vector2i = to_world(id, pos)
-	if not tiles.is_empty():
-		c = tiles[tiles.size() / 2]
-	return {"kind": "seal", "id": "seal_" + id, "area": id, "to": id, "from": from, "pos": c, "tiles": tiles, "open": req}
+	tiles.sort()
+	return {"kind": "seal", "id": "seal_" + id, "area": id, "to": id, "from": from, "pos": at, "tiles": tiles, "open": req, "axis": at - from_tile}
 
 ## Any entity the borders cut off is reconnected by a trail inside its own region.
 static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, idx: Dictionary, ents: Array, start: Vector2i) -> void:
@@ -526,16 +758,13 @@ static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArr
 				continue
 			fixed += 1
 			# breadth-first through anything in the same region to the nearest reachable tile, never
-			# leaving the region's own map (a trail round the outside could bypass a Lotus Seal)
+			# leaving the region's own land (a trail round the outside could bypass a Lotus Seal)
 			var own := owner[e.pos.y * W + e.pos.x]
-			var box := Rect2i(0, 0, W, H)
-			if e.has("area") and layout().has(e.area) and e.area != HUB:
-				box = Rect2i(layout()[e.area].origin, layout()[e.area].size).grow(-1)
 			var prev := {e.pos: e.pos}
 			var q: Array = [e.pos]
 			var i := 0
 			var hit := Vector2i(-1, -1)
-			while i < q.size() and i < 20000:
+			while i < q.size() and i < 40000:
 				var c: Vector2i = q[i]
 				i += 1
 				if reach.has(c):
@@ -545,7 +774,7 @@ static func _connect(grid: PackedByteArray, W: int, H: int, owner: PackedByteArr
 					var n: Vector2i = c + d
 					if n.x < 1 or n.y < 1 or n.x >= W - 1 or n.y >= H - 1 or prev.has(n):
 						continue
-					if owner[n.y * W + n.x] != own or not box.has_point(n):
+					if owner[n.y * W + n.x] != own:
 						continue
 					var tn := grid[n.y * W + n.x]
 					if tn == MapGen.BUILDING:
@@ -570,28 +799,22 @@ static func owner_id(wd: Dictionary, p: Vector2i) -> String:
 		return HUB
 	return wd.ids[wd.owner[p.y * wd.w + p.x]]
 
-## The tiles a region renders: a copy of its bounding box with other regions' tiles blanked out.
+static func is_sea(wd: Dictionary, p: Vector2i) -> bool:
+	if p.x < 0 or p.y < 0 or p.x >= wd.w or p.y >= wd.h:
+		return true
+	return wd.sea[p.y * wd.w + p.x] == 1
+
+## The tiles a region renders: a copy of the bounding box of its land with other regions' tiles and
+## the open sea blanked out (the sea is one surface for the whole world, see Terrain3D.world_sea).
 static func slice(wd: Dictionary, id: String) -> Dictionary:
 	var W: int = wd.w
 	var me: int = wd.idx[id]
-	var x_lo := W
-	var y_lo: int = wd.h
-	var x_hi := -1
-	var y_hi := -1
-	var c: Rect2i = wd.layout[id].cell
-	var probe := c.grow(int(WARP + WARP_BIG) + 3).intersection(Rect2i(0, 0, W, wd.h))
-	for y in range(probe.position.y, probe.end.y):
-		for x in range(probe.position.x, probe.end.x):
-			if wd.owner[y * W + x] == me:
-				x_lo = mini(x_lo, x)
-				x_hi = maxi(x_hi, x)
-				y_lo = mini(y_lo, y)
-				y_hi = maxi(y_hi, y)
-	var r := Rect2i(x_lo, y_lo, x_hi - x_lo + 1, y_hi - y_lo + 1)
+	var r: Rect2i = wd.layout[id].cell
 	var g := PackedByteArray()
 	g.resize(r.size.x * r.size.y)
+	var sea: PackedByteArray = wd.sea
 	for y in r.size.y:
 		for x in r.size.x:
 			var i: int = (y + r.position.y) * W + x + r.position.x
-			g[y * r.size.x + x] = wd.grid[i] if wd.owner[i] == me else MapGen.VOID
+			g[y * r.size.x + x] = wd.grid[i] if wd.owner[i] == me and sea[i] == 0 else MapGen.VOID
 	return {"rect": r, "grid": g}

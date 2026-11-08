@@ -126,8 +126,8 @@ func open_world() -> void:
 		wd["hm"] = hm
 		mini_tex = Gfx.world_minimap(wd)
 		world_root = Node3D.new()
-		world_root.name = "world_edge"
-		Terrain3D.world_edge(world_root, w, h)
+		world_root.name = "world_sea"
+		Terrain3D.world_sea(world_root, wd)
 		scene3d.add_child(world_root)
 
 ## Teleport to a region-local tile (as written in Data.AREAS).
@@ -153,6 +153,7 @@ func _enter_region(id: String, quiet: bool = false) -> void:
 	theme_name = spec.theme
 	area_name = spec.n
 	Game.area = id
+	Game.seen[id] = true
 	banner_t = 3.0
 	if not quiet:
 		Game.note("Entered " + area_name)
@@ -238,10 +239,12 @@ func _build_view(id: String) -> void:
 		var pg := Atlas.to_world("sect", Vector2i(-5, 3))
 		var pp := Terrain3D.world_pos(pg)
 		Terrain3D.pagoda(root, Vector3(pp.x, ground_y(pp) - 0.3, pp.z) - root.position)
-	if spec.has("landmark") and spec.landmark.kind == "fusang":
-		# Part IX: the colossal Fusang mulberry in the middle of the Valley of Sunrise
+	if spec.has("landmark"):
+		# the Fusang mulberry (Part IX); the Dragon Gate, the great cauldron and the broken pillar of
+		# Buzhou (Part X)
 		var fp := Terrain3D.world_pos(Atlas.to_world(id, spec.landmark.pos))
-		Terrain3D.fusang_tree(root, Vector3(fp.x, ground_y(fp) - 0.6, fp.z) - root.position)
+		var ax := Atlas.dir_to_world(id, Vector2i(1, 0))
+		Terrain3D.landmark(root, spec.landmark.kind, Vector3(fp.x, ground_y(fp), fp.z) - root.position, Vector3(ax.x, 0, ax.y))
 	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {})}
 
 # ---------------------------------------------------------------- entities
@@ -408,17 +411,18 @@ func _make_ent(e: Dictionary) -> Node3D:
 			var open: bool = seal_open(e)
 			var pc := UI.C_JADE if open else Color("8a4a4a")
 			var pm := Models.portal(pc, open)
-			# a barrier across a north-south road faces along x
-			var ts: Array = e.tiles
-			if ts.size() > 1 and ts[0].x == ts[1].x:
+			# the barrier stands across the road: turned a quarter when the road runs east-west
+			var ax: Vector2i = e.get("axis", Vector2i(0, 1))
+			if absi(ax.x) > absi(ax.y):
 				pm.rotation.y = PI / 2
+			var ts: Array = e.tiles
 			if not ts.is_empty():
 				var mid := Vector3.ZERO
 				for tt in ts:
 					mid += Terrain3D.world_pos(tt)
 				mid /= float(ts.size())
 				n.position = Vector3(mid.x, 0, mid.z)
-				pm.scale = Vector3(1.0, 1.0, 1.0) * maxf(1.0, ts.size() * 0.55)
+				pm.scale = Vector3(1.6, 1.6, 1.6)
 			n.set_meta("open", open)
 			n.add_child(pm)
 			var lbl := _label(n, "", 4.1, pc, 32)
@@ -741,10 +745,15 @@ func _draw_hud() -> void:
 	UI.text(self, Vector2(26, 112), "QI %d/%d" % [Game.qi[0], Game.max_qi(0)], 14)
 	UI.bar(self, Rect2(140, 100, 186, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
 	UI.text(self, Vector2(26, 126), "Stones: %d" % Game.stones, 13, UI.C_DIM)
-	# objective
+	# objective: long quest titles (one in eight runs past the panel, up to 770 px of text) used to be
+	# cut off mid-sentence; they now wrap onto a second line in place of the heading
 	UI.panel(self, Rect2(VIEW.x - 520, 12, 508, 58))
-	UI.text(self, Vector2(VIEW.x - 506, 34), "Objective", 13, UI.C_DIM)
-	UI.text(self, Vector2(VIEW.x - 506, 56), Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
+	var obj := Game.objective_text()
+	if UI.font().get_string_size(obj, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x <= 480.0:
+		UI.text(self, Vector2(VIEW.x - 506, 34), "Objective", 13, UI.C_DIM)
+		UI.text(self, Vector2(VIEW.x - 506, 56), obj, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
+	else:
+		UI.wrapped(self, Vector2(VIEW.x - 506, 35), obj, 15, UI.C_TEXT, 486)
 	UI.text(self, Vector2(VIEW.x - 330, VIEW.y - 14), "Arrows/WASD move   Q/E camera   Z/Enter act   Esc menu", 13, UI.C_DIM)
 	_draw_minimap()
 	if banner_t > 0.0:

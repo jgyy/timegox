@@ -1,24 +1,81 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Sun-Moon Harmony, across **one open world** of 38 regions around Azure Cloud Mountain, with 141 bosses, fourteen Heavenly Tribulations, three towns full of people and buildings you can walk into.
+Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Mountain-River Oneness, across **one open world**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with 161 bosses, fifteen Heavenly Tribulations, seven towns full of people and 60 buildings you can walk into.
 
-> **Total gameplay duration: about 10 hours 18 minutes** (10:17:41 of game time for the end-to-end bot run, seed 1234). Parts I to VIII take 8:58:59; **Part IX, "The Tenth Sun", adds another hour** (1 hour 19 minutes): four new regions in the scorched east and on the moon, 16 new bosses, 12 new monsters, a new realm (Sun-Moon Harmony), five new techniques, a market town with eight townsfolk and four new Blender-built leads. **Every character and monster was rebuilt again** (hanfu cut the way it is really cut, cel shading with tinted shadows, richer rigs, eleven character clips and five per monster, monsters sculpted from metaballs with painted coats), **the land lost its rectangles** (curved shorelines, meandering borders, irregular forest edges), and **the towns filled up** (nine new buildings in new styles and twenty new people).
+> **Total gameplay duration: about 11 hours 28 minutes** (11:27:54 of game time for the end-to-end bot run, seed 1234), **1 hour 10 minutes more than the last release** (10:17:41). **The world map was redesigned from the ground up**: the grid of rectangular regions is gone, replaced by an organic continent with a curving coast, an inner sea, regions of every shape winding out from the mountain and roads that find their own way. **Part X, "The Nine Cauldrons", adds 1 hour 14 minutes of play**: four new regions north of the mountain, 20 new bosses, 12 new monsters, a new realm (Mountain-River Oneness), five new techniques and three set-piece landmarks. **The world got deeper**: four new towns (Cloudfoot, Longmen, Tushan and Shazhou Oasis) with 22 new townsfolk and 4 new guides, all Blender-built, a written history for every region and town, and an **Annals** page that keeps them. **Bugs found and fixed** along the way are listed [below](#bugs-found-and-fixed).
 
 | | |
 |---|---|
+| ![the world map now: an organic continent within the Four Seas](docs/screenshots/world_map.png) | ![the world map before: a grid of rectangles](docs/screenshots/world_map_before.png) |
+| ![Longmen, the ferry town below the Dragon Gate](docs/screenshots/town_longmen.png) | ![the Dragon Gate falls](docs/screenshots/dragon_gate.png) |
+| ![Cloudfoot, the post town under the north gate](docs/screenshots/town_cloudfoot.png) | ![Tushan, the cauldron-casters' town](docs/screenshots/town_tushan.png) |
+| ![the great cauldron of Tushan](docs/screenshots/great_cauldron.png) | ![the broken pillar of Mount Buzhou](docs/screenshots/buzhou_pillar.png) |
+| ![townsfolk of Longmen](docs/screenshots/gallery_townsfolk_longmen.png) | ![townsfolk of Cloudfoot](docs/screenshots/gallery_townsfolk_cloudfoot.png) |
+| ![Part X bosses: He Bo, Gun, the Taotie, Xiangliu and Gonggong](docs/screenshots/gallery_part10.png) | ![the Annals](docs/screenshots/annals.png) |
 | ![Lin Feng turnaround](docs/screenshots/turnaround_lin_feng.png) | ![Yue Ling turnaround](docs/screenshots/turnaround_yue_ling.png) |
-| ![portraits](docs/screenshots/portrait_heroes.png) | ![the run](docs/screenshots/anim_lin_feng_run.png) |
-| ![part 9 creatures](docs/screenshots/gallery_part9.png) | ![beasts](docs/screenshots/gallery_part8.png) |
-| ![one enemy per element: dominant, underside, secondary, markings and the element's accent](docs/screenshots/gallery_elements.png) | ![Yue Ling runs beside the hero, facing where she goes](docs/screenshots/follow_village.png) |
-| ![sect](docs/screenshots/architecture_sect.png) | ![the marsh](docs/screenshots/vista_marsh.png) |
-| ![townsfolk of the sect](docs/screenshots/gallery_townsfolk_sect.png) | ![townsfolk of the market](docs/screenshots/gallery_townsfolk_market.png) |
-| ![dawn market](docs/screenshots/market_yanggu.png) | ![Fusang tree](docs/screenshots/fusang_tree.png) |
-| ![world map](docs/screenshots/world_map.png) | ![ending](docs/screenshots/ending.png) |
+| ![sect](docs/screenshots/architecture_sect.png) | ![dawn market](docs/screenshots/market_yanggu.png) |
 
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph OLD[Before]
+    G1[38 rectangles in<br/>nine east-west bands] --> G2[a mountain column<br/>down the west side]
+    G2 --> G3[ladder of L-shaped<br/>roads, rectangular world]
+    end
+    subgraph MAP[The new world map: atlas.gd]
+    S[a site and a way<br/>for every region] --> T[maps turned to face<br/>their road]
+    T --> V[anisotropic Voronoi<br/>under a two-scale warp]
+    V --> C[coast where land runs out:<br/>the Four Seas, an inner sea]
+    V --> O[open ground: a warped ellipse<br/>with lobes and bays]
+    V --> R[roads by A*: winding,<br/>one border crossing, land bridges]
+    R --> SL[Lotus Seals where<br/>each road crosses]
+    end
+    subgraph WB[World-building]
+    TW[4 new towns, 26 new<br/>Blender-built people] --> AN[history of every region<br/>and town: the Annals]
+    AN --> WM[world map shows where<br/>you are and what it was]
+    end
+    subgraph P[Part X: +1h14m]
+    CF[Cloudfoot] --> LM[Longmen, the Dragon Gate] --> DF[Drowned Fields of Gun] --> TS[Tushan, the cauldron-casters] --> BZ[Mount Buzhou]
+    end
+    OLD ==>|the Court's squares give way| MAP
+    MAP --> GAME((Game))
+    WB --> GAME
+    P --> GAME
+    GAME --> BOT[bot: 11:27:54,<br/>CI needs 10 h]
+```
+
+- **The world map is no longer a grid.** The old world was 38 rectangles packed into nine east-west bands with a 60-tile mountain column down the west side: every region's open ground a rounded rectangle, every border a straight seam between rows, the coast a frame. Now (`scripts/atlas.gd`, `scripts/mapgen.gd`):
+  - **Sites, not rows.** Every region has a site and a *way*, the direction its road runs through it, and its own map is turned to face that way. Each chapter winds outward from Azure Cloud Mountain as a province of its own: Part I east and up the east coast, Part II west along the north coast, Part IX east to the sunrise, Part V south-east, Part III south, Part VIII south-south-west, Part VII south-west, Part VI west, Part IV west and up into the sky, and Part X north to the river and the broken pillar.
+  - **Organic borders.** A tile belongs to the region whose site is nearest, measured in that region's own half-sizes (an anisotropic, weighted Voronoi diagram), so long regions own long land, and the point is first moved by a two-scale domain warp, so borders wander like coasts and ridges. The land round everything that matters in a region (people, bosses, gates, buildings, monster packs) always belongs to it.
+  - **A coast.** Land runs out about two half-sizes from the nearest site, so the continent has bays, capes, fjords between the mountain's spurs and an inner sea in the north-east. The sea is one surface for the whole world (sea tiles are cut out of every region's terrain) with foam along the coast, water carried under the coastal land, the ocean running on past the edge of the world and a seabed under it.
+  - **Open ground with a shape.** A region's open ground is an ellipse filling its map, pushed and pulled into lobes and bays by a domain warp, bitten by a second noise and frayed at the edge, with forest beyond; clearings stay round everything that matters and trails join any that end up in the forest. A test checks that every region's corners are mostly forest.
+  - **Roads that find their way.** Roads are searched for with A* across the land: old paths are cheap, open ground cheap, forest dear and water dearer, and a slow noise field makes them wind. Each road crosses from one region to the next exactly once, at the point of their border that makes the way shortest, and the Lotus Seal stands right there, turned across the road. Land bridges are raised along every road, so none has to cross the sea.
+  - **Rivers, ponds and winding streets** inside regions (`river`, `ponds` and `roads` in `Data.AREAS`): a river runs through Longmen under the main street's bridge, a pond gives Shazhou its oasis, and towns and dykes get curved streets drawn as splines.
+  - The **world map** is a full-screen page now: one sea colour with paler shallows, every region's name at its site (a town at a region's heart names it), towns marked in gold, closed seals in red, and beside the map the history of the region Lin Feng is standing in.
+- **Four new towns and a deeper world.**
+  - **Cloudfoot**, the post town at the foot of the mountain where the north road leaves for the river: a post station, Cartographer Pei's House of Maps, the Teahouse of Ten Thousand Tales, the Caravanserai of the Four Roads, a shrine to Xiu, god of roads, and the post stables.
+  - **Longmen**, the ferry town below the Dragon Gate: the Leaping Carp Inn, the Temple of the River Earl with its flood stele, a boatyard, the fish market, the lock-keeper's house, a teahouse on stilts and the harbourmaster's office, on a river with a bridge.
+  - **Tushan**, the cauldron-casters' town on Mount Kuaiji: the Hall of the Nine Cauldrons, Tu Lan's foundry, the bell works, the stone-carver's workshop, the Inn of the Late Arrival and the charcoal-burner's lodge, round a great bronze cauldron.
+  - **Shazhou Oasis**, a caravan town round a sweet well in the Desert of Fallen Stars: a caravanserai, the Sweet Well, the Temple of the Fallen Stars and the camel yard.
+  - **26 new people, all Blender-built** with their own props and three things each to say, and those things tie the world together: the postmaster knows who writes to whom between the towns, the caravan master's camels know every road from the desert to the Silk Woods, the stone-carver cuts the flood marks for Longmen's stele.
+  - **A history for every region and town** (`Data.REGION_LORE`, `Data.TOWNS`): where it lies, who lives there and what happened there. It is shown beside the world map, and the new **Annals** page in the pause menu keeps every place Lin Feng has been.
+  - **Part X tells why the map changed**: the Heavenly Court had surveyed the land into squares and pinned it with Yu the Great's Nine Cauldrons; with the Court gone the land is lying down in its own shape again.
+- **Part X, "The Nine Cauldrons"** adds 1 hour 14 minutes (see [below](#part-x-the-nine-cauldrons)), verified by the playthrough bot; CI now requires **10 hours**.
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+
+### References
+
+Background for this release (the techniques behind the new map, cartography and the myths of Part X):
+
+- **Map generation**: [Red Blob Games: polygonal map generation](https://www.redblobgames.com/maps/polygon-map-generation/) (Voronoi regions, coasts by distance), [Red Blob Games: making maps with noise](https://www.redblobgames.com/maps/terrain-from-noise/) (island shaping by distance), [Inigo Quilez: domain warping](https://iquilezles.org/articles/warp/), [Frozen Fractal: continents and domain warping](https://frozenfractal.com/blog/2023/11/2/around-the-world-1-continents/), [weighted Voronoi diagrams](https://en.wikipedia.org/wiki/Weighted_Voronoi_diagram), [A* for roads (Red Blob Games: introduction to A*)](https://www.redblobgames.com/pathfinding/a-star/introduction.html), [Catmull-Rom splines](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline).
+- **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
+- **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
+
+### Previous release: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -78,13 +135,13 @@ flowchart LR
 - **Monsters sculpted, painted and animated** (`art/lib/clay.py`, `anatomy.py`, `canine.py`, `feline.py`, `bird.py`, `creature.py`): bodies are modelled from metaballs (balls, ellipsoids and capsule chains, each carrying smooth bone weights) instead of hundreds of outlined fur cards, with fur as shingled clumps that belong to the silhouette. Heads are built per species (the tiger's broad skull and cheek ruffs, the wolf's long muzzle and stop, the qilin's dragon head with one ridged horn and cloven hooves, the dragon's nine resemblances on an S-curved serpent body), and coats are painted in the grey values so a recolour still reads as an animal: tiger stripes and the king mark, the wolf's dark saddle and mask, the fox's white bib and black stockings, scales and belly plates. Horns, claws and fangs taper and shade from base to tip. Rigs gained spine, neck, jaw, ear, toe and long tail chains; every monster has **idle, walk, attack, hurt and die**, quadrupeds walk in the four-beat lateral sequence with the hips and chest bouncing out of step and the tail following through, insects and crabs walk on IK legs in an alternating tripod. Three new creatures: the **sun crow**, the **jade rabbit** and **Bifang**. The simpler shapes were restyled too: a **golem** of split, lichen-spotted boulders over a core that glows through the seams, a real **tortoise** (a high shell of raised scutes with growth rings over a plated underside, neck folds, a hooked beak and thick scaly legs), **scorpion, crab, spider and mantis** built from keeled exoskeleton segments (`anatomy.sclerite`) with proper chelae, an uneven crusher claw and raptorial forelegs, a **slime** that sags into a puddle with drips and half-swallowed things, a **jellyfish** with frilled oral arms and trailing tentacles, **mushroom folk** whose stems are their bodies, a **koi** with painted scales, barbels and trailing fins, a lofted **manta**, a scowling **thundercloud**, solid wisp flames and a tattered wraith. The person-shaped monsters (Ox-Head, Horse-Face, the hopping corpse, the Queen Mother and the rest) are built with the new character library.
 - **Monsters in five colours, not one** (`Assets.palette`, `Builder.coat_slots`, research below). Each enemy's colour now expands into a palette with a clear hierarchy, as creature designers build one: a **dominant** colour over most of the body; a pale, cream-leaning **underside** (countershading on the belly, throat, bib and inner legs); **markings** that contrast in value (dark stripes, saddles, masks and tail tips on a light coat, pale ones on a dark coat); a **secondary** a clear step round the colour wheel and different in value (manes, wings, shells, fins, skirts of hair); and one small, saturated **accent** for the focal points, taken from the element (fire gold, water cyan, wood spring green, earth amber, thunder violet, dark magenta) or its alternate when the body already has that hue. The painted grey coats are split automatically (the pale parts blend into the underside, the dark ones into the markings, measured against the coat's median by surface area), and every creature got accent parts: the eyes of all of them, the dragon's dorsal spines, tail tuft and elbow flames, the qilin's horn, the serpent's horns and fin rays, the tiger's king mark, the wolf's brow spots, fox-fire, bird crests, the phoenix's tail eyes, the golem's molten core and faults, the ape's crest, crab claws, the scorpion's venom gland, spider and mantis eyes, moth eyespots, ghost-fire, storm runes and the jelly's glowing organs. The classic creatures keep the colours of the old texts: **Bifang** red markings on a blue-green body (the *Shan Hai Jing*: "red markings on a blue-green ground and a white beak"), **Hundun** a yellow sack red as cinnabar, **Bai Hu** white with black stripes, **Zhu Que** vermilion and gold, **Xuan Wu** a black shell lined in gold, the **Azure Dragon King** with a golden mane and cream belly plates, a nine-tailed fox with blue fox-fire.
 - **Yue Ling no longer runs sideways** (see [bugs](#bugs-found-and-fixed)).
-- **Part IX, "The Tenth Sun"** adds +1 hour (see [below](#part-ix-the-tenth-sun)), verified by the playthrough bot; CI now requires **9 hours**.
+- **Part IX, "The Tenth Sun"** added +1 hour (see [below](#part-ix-the-tenth-sun)), verified by the playthrough bot; CI then required **9 hours**.
 - **Art code** grew from 12,550 to 17,548 lines of Blender Python (+40%) and the game's GDScript from 17,359 to 19,113 lines; all 129 assets (63 people, 40 monsters, 26 props) rebuild from their scripts in about three minutes on four cores (the build now runs in parallel).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### References
+#### References for that release
 
-Researched for this release (characters, creatures, rigs, animation, landscape and towns):
+Researched for that release (characters, creatures, rigs, animation, landscape and towns):
 
 - **Stylised characters and faces**: [PoseMyArt anime head guide](https://posemy.art/blog/anime-head-drawing-guide/), [anime proportions step by step](https://www.alibaba.com/product-insights/how-to-draw-anime-characters-with-correct-proportions-step-by-step.html), [80.lv: capturing anime art style in 3D](https://80.lv/articles/cg-jolyne-cujoh-here-s-how-to-capture-anime-art-style-in-3d), [Blender Studio stylised character workflow](https://studio.blender.org/training/stylized-character-workflow/5e70a631db0e8bc0c8b226f2), [3D character body](https://tinakuang.myblog.arts.ac.uk/?p=656).
 - **Toon shading**: [Adrian Mendez, Genshin shading breakdown](https://adrianmendez.artstation.com/projects/wJZ4Gg), [B. J. Ayers, recreating the Genshin shader](https://bjayers.artstation.com/blog/category/5), [URP Simple Genshin Shaders](https://github.com/NoiRC256/URPSimpleGenshinShaders), [80.lv Genshin shader for EEVEE](https://80.lv/articles/genshin-impact-character-shader-for-eevee), [GDC 2015: Guilty Gear Xrd's art style](https://gdcvault.com/play/1022031/GuiltyGearXrd-s-Art-Style-The) ([handout](https://www.ggxrd.com/Motomura_Junya_GuiltyGearXrd.pdf)).
@@ -98,7 +155,7 @@ Researched for this release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Previous release: rebuilt models and Part VIII
+### Two releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -151,7 +208,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Two releases ago: one open world and Part VII
+### Three releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -167,7 +224,7 @@ flowchart LR
     W3[hilliness blends across<br/>region borders] --> LAND
     end
     subgraph B[Buildings you can enter]
-    H[architecture.gd house():<br/>walls, door, plank floor,<br/>furniture, lanterns] --> RF[roof lifts away<br/>while you are inside]
+    H["architecture.gd house():<br/>walls, door, plank floor,<br/>furniture, lanterns"] --> RF[roof lifts away<br/>while you are inside]
     H --> NPC[Elder, Alchemist, Smith,<br/>Archivist and villagers indoors]
     end
     subgraph P[Part VII: +1 hour]
@@ -185,7 +242,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Three releases ago: natural landscapes and Part VI
+### Four releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -286,7 +343,7 @@ flowchart TD
 
 ```sh
 pip install bpy==5.2.3                        # Blender as a Python module (or use a Blender install)
-python art/build_all.py                       # rebuild all 129 assets in parallel (about 7 min on 4 cores; ART_JOBS=N)
+python art/build_all.py                       # rebuild all 155 assets in parallel (about 7 min on 4 cores; ART_JOBS=N)
 python art/check_assets.py                     # validate the exports
 blender --background --python art/monsters/hundun.py   # or one asset with Blender itself
 godot --headless --path . --import            # re-import into Godot
@@ -329,14 +386,15 @@ godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-
 | Enter / Z / Space | confirm, interact, advance dialogue |
 | Esc / X | menu (Meditate, Breakthrough, Items), cancel |
 
-Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes about nine hours. Esc > World Map shows the whole land.
+Walk into NPCs, enemies, pickups and bosses to interact with them. There is no save system yet: a full run takes about eleven and a half hours. Esc > World Map shows the whole land and the history of where you are; Esc > Annals keeps the history of everywhere you have been.
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 43 stages across fifteen realms (up to Sun-Moon Harmony); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 46 stages across sixteen realms (up to Mountain-River Oneness); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Thirty-eight regions in one open world**, each with elites, bosses and a hunt objective, joined by roads. **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX (new)**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon.
-- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, Magpie Bridge Sword, Silver River Torrent, Seventh-Night Reunion Sword, **Noon-Splitting Sword**, **Fall of the Nine Suns** and **Tenth Arrow Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, Starweave Net, Magpie Wing Ward, **Osmanthus Moon Rain** and **Moon-Dew Ward** (the reviving heals also raise a fallen ally).
+- **Forty-two regions in one open world**, a continent within the Four Seas, each with elites, bosses and a hunt objective, joined by winding roads, and **seven towns** (the sect, Cloudfoot, Qingshi Village, Yanggu, Shazhou Oasis, Longmen and Tushan). **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon. **Part X (new)**: Longmen, the Dragon Gate Ferry; the Drowned Fields of Gun; Tushan, the Town of the Cauldron-Casters; and Mount Buzhou, the Broken Pillar.
+- **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, Magpie Bridge Sword, Silver River Torrent, Seventh-Night Reunion Sword, Noon-Splitting Sword, Fall of the Nine Suns, Tenth Arrow Sword, **Dragon Gate Leap**, **Swelling Earth Rampart** and **Nine Cauldrons Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, Starweave Net, Magpie Wing Ward, Osmanthus Moon Rain, Moon-Dew Ward, **Reed-Boat Blossom** and **River-Mother's Ward** (the reviving heals also raise a fallen ally).
+- **The Annals** (Esc > Annals): the history of every region and town Lin Feng has been to; the world map shows the one he is standing in.
 - **Economy**: spirit stones buy pills and tempering for your sword.
 
 ```mermaid
@@ -396,7 +454,6 @@ flowchart LR
     Magpie --> Star[Weaver Star Palace<br/>Heavenly Warden of the River]
     Star --> Jasper[Jasper Pool of Kunlun<br/>Xiwangmu, Queen Mother of the West]
     end
-    end
     subgraph P9[Part IX: about 1h19m]
     Jasper ==>|Star River Crossing, the sun will not set| Sect8[Sect: noon for nine days]
     Sect8 -->|the new south road| Yanggu[Yanggu Dawn Market<br/>Hanba, the Drought Fiend]
@@ -404,7 +461,15 @@ flowchart LR
     Millet --> Fusang[Fusang Valley of Sunrise<br/>Jinwu, the Sun Crow]
     Fusang --> Guanghan[Guanghan, Palace of the Moon<br/>Xihe, Mother of Suns]
     end
-    Guanghan ==> End((Sun-Moon Harmony))
+    subgraph P10[Part X: about 1h14m]
+    Guanghan ==>|Sun-Moon Harmony, the maps are wrong| Sect9[Sect: the Court's squares give way]
+    Sect9 -->|the north gate| Cloudfoot[Cloudfoot<br/>Cartographer Pei]
+    Cloudfoot --> Longmen[Longmen, the Dragon Gate<br/>He Bo, Earl of the River]
+    Longmen --> Drowned[Drowned Fields of Gun<br/>Gun, the Swelling Earth]
+    Drowned --> Tushan[Tushan of the Cauldrons<br/>Taotie, the Glutton]
+    Tushan --> Buzhou[Mount Buzhou<br/>Gonggong, God of the Flood]
+    end
+    Buzhou ==> End((Mountain-River Oneness))
 ```
 
 ```mermaid
@@ -465,36 +530,84 @@ New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth
 
 ```mermaid
 flowchart TD
-    D[(data.gd: 40 areas,<br/>gates, NPCs, bosses,<br/>buildings)] --> MG[mapgen.gd<br/>each region's own map]
-    MG --> AT[atlas.gd]
-    L[layout: mountain column in the west,<br/>a band of regions per chapter] --> AT
-    AT --> G[one world grid 492 x 448]
-    AT --> OW[ownership: the cell under a<br/>noise-warped point]
-    OW --> BE[forest belt where two<br/>regions meet]
-    AT --> RO[roads gate to gate,<br/>on to the arrival tile]
-    RO --> SE[Lotus Seals where a<br/>chapter is not open yet]
-    AT --> CO[reconnect anything a belt cut off]
+    D[(data.gd: 43 areas,<br/>gates, NPCs, bosses,<br/>buildings, rivers, roads)] --> MG[mapgen.gd: each region's own map<br/>organic outline, river, ponds,<br/>spline roads, A* trails]
+    S[atlas.gd SITES: a site and a way<br/>for every region] --> L[layout: maps turned<br/>to face their road]
+    MG --> AT[atlas.gd _build]
+    L --> AT
+    AT --> PIN[pins: the land round people,<br/>bosses, gates and buildings]
+    AT --> OW[ownership: nearest site in its own<br/>half-sizes, after a two-scale warp]
+    PIN --> OW
+    OW --> SEA[coast: land runs out about two<br/>half-sizes out; the Four Seas]
+    OW --> BE[forest belt where<br/>two regions meet]
+    SEA --> IS[land bridges along<br/>every road]
+    IS --> RO[roads: A* over the land,<br/>one border crossing each]
+    RO --> SE[Lotus Seal across the road<br/>where it crosses]
+    RO --> CO[reconnect anything cut off]
+    CO --> G[one world grid 1040 x 900:<br/>558k tiles of land, 378k of sea]
     G --> BOT[bot: AStarGrid2D over the world]
     G --> W[world.gd]
-    W --> STR[stream regions within 46 tiles:<br/>slice + shared heights + Terrain3D.build]
-    STR --> IN[houses: roof lifts while inside]
+    W --> STR[stream regions within 46 tiles:<br/>land slice + shared heights + Terrain3D.build]
+    W --> SEAR[Terrain3D.world_sea:<br/>one ocean for the whole world]
+    W --> IN[houses: roof lifts while inside]
 ```
 
-| Band (north to south) | Regions (west to east) | Entered from |
-|---|---|---|
-| Part IV | Sea of Clouds, Jade Court, Heaven's Forge, Peach Garden | the sect's west gate, up the mountain |
-| Part I | Bamboo Forest, Crimson Marsh, Frostpeak, Thunder Valley, Blood Moon Palace | the sect's east gate |
-| Part II (runs west) | Celestial Gate, Void Rift, Ashen Volcano, Sunken Dragon Palace | the road round the east edge from the Blood Moon Palace |
-| Part III | Mirror Lake, Sword Graveyard, River of Ten Thousand Years, Origin of the Dao | the sect's south gate |
-| Part V | Desert of Fallen Stars, Glowcap Vale, Aurora Steppe, Primordial Chaos | the south-east road |
-| Part VI | Maple Gorge, Stone Forest, Yellow Springs, Wheel of the Six Paths | the south-west funeral road |
-| Part VII | Qingshi Village, Cloud-Tea Terraces, Mulberry Silk Woods, Loom of Borders | the village road at the foot of the mountain |
-| Part VIII | Starfall Ferry, Magpie Bridge Heights, Weaver Star Palace, Jasper Pool of Kunlun | the old Sky Road from the sect's south gate |
-| Part IX | Yanggu Dawn Market, Scorched Millet Plains, Fusang Valley, Guanghan Moon Palace | the new south road |
+| Way out of the mountain | Chapter | Regions | Entered from |
+|---|---|---|---|
+| east, then north up the east coast | Part I | Bamboo Forest, Crimson Marsh, Frostpeak, Thunder Valley, Blood Moon Palace | the sect's east gate |
+| west along the north coast | Part II | Sunken Dragon Palace, Ashen Volcano, Void Rift, Celestial Gate | the road on from the Blood Moon Palace |
+| south | Part III | Mirror Lake, Sword Graveyard, River of Ten Thousand Years, Origin of the Dao | the sect's south gate |
+| west, then north into the sky | Part IV | Sea of Clouds, Jade Court, Heaven's Forge, Peach Garden | the sect's west gate |
+| south-east | Part V | Desert of Fallen Stars (Shazhou Oasis), Glowcap Vale, Aurora Steppe, Primordial Chaos | the south-east road |
+| west-south-west | Part VI | Maple Gorge, Stone Forest, Yellow Springs, Wheel of the Six Paths | the south-west funeral road |
+| south-west | Part VII | Qingshi Village, Cloud-Tea Terraces, Mulberry Silk Woods, Loom of Borders | the village road |
+| south-south-west | Part VIII | Starfall Ferry, Magpie Bridge Heights, Weaver Star Palace, Jasper Pool of Kunlun | the old Sky Road |
+| east to the sunrise | Part IX | Yanggu, Scorched Millet Plains, Fusang, Guanghan | the east road from the south gates |
+| north, then west to the broken pillar | Part X | Longmen, Drowned Fields of Gun, Tushan, Mount Buzhou | the north gate, through Cloudfoot |
 
-Each region is still generated from its own seed by `mapgen.gd` (so every boss, NPC and herb keeps its place) and then stamped into the world grid by `atlas.gd`, a little higher or lower in its band so the regions do not sit on a grid. The forest then reaches in from each region's edge by a depth that varies with noise (1.5 to 8.5 tiles), keeping clearings round every gate, arrival, person, boss, pickup, building and monster pack, and anything it cuts off is reconnected by a trail that goes round buildings, so the land you can walk on is no longer a rectangle. Ownership of each tile is decided by looking up the region cell under a point warped at two scales (a few tiles of ripple on meanders of up to eight tiles, fading out at the mountain so its roads stay on it), so borders wander like coasts and ridges, and the land round what matters in a region always belongs to that region; where two regions meet the tiles become a forest-and-rock belt (it only ever adds trees, never opens a way through a region's own edge). Roads are carved from gate to gate and on through the belt to each region's arrival point; where a chapter is not open yet, a Lotus Seal entity covers the road where it crosses the region's edge. Finally anything a belt cut off is reconnected by a trail inside its own region. Tests check that every entity can be walked to, that with all seals shut only the sect, the mountain and the bamboo forest can be reached, and that the world is deterministic.
+Each region is still generated from its own seed by `mapgen.gd` (so every boss, NPC and herb keeps its place), but its open ground is no longer the rectangle of its map: an ellipse filling the map is pushed into lobes and bays by a domain warp, bitten by a second noise and frayed at the edge, with clearings kept round everything that matters and trails (a cost-weighted A* that goes round buildings) joining anything left in the forest. `atlas.gd` then turns the map to face the way its road runs and lays it at its site. Every tile of the world belongs to the region whose site is nearest, measured in that region's own half-sizes after a two-scale domain warp (and the land round a region's people, bosses, gates and buildings always belongs to it); a forest belt marks where two regions meet. Land runs out about two half-sizes from the nearest site, which gives the continent its coast, the fjords between the mountain's spurs and the inner sea in the north-east, and fades out towards the edge of the world, which is always open sea. Roads are searched for with A* across the land (old paths cheap, forest dear, water dearer, a slow noise to make them wind), keep to their own two regions and cross the border between them exactly once, on a land bridge raised for them; where a chapter is not open yet, a Lotus Seal stands across the road at that crossing. Tests check that every entity can be walked to, that with all seals shut only the sect, the mountain (with Cloudfoot) and the bamboo forest can be reached, that the sea rings the land, that regions are not laid out in rows and columns, that every region's corners are mostly forest, and that the world is deterministic.
 
-The 3D view builds a region when the player comes within 46 tiles of it: its tiles are cut out of the world grid (other regions' tiles blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. Far regions are hidden and the furthest dropped. One skirt of hills and a ring of mountains surround the whole world.
+The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part X: The Nine Cauldrons
+
+A month after the sun and the moon agree to take turns, Archivist Lan comes running into the courtyard in her nightcap: the great map in the Scripture Library, the Court's survey, is wrong. The rivers have moved; the coasts have bays; the roads go round bends that were never drawn. The Elder explains that the Heavenly Court surveyed the land into squares so that every square could be taxed in years, and pinned the corners with the Nine Cauldrons that Yu the Great cast when he tamed the Flood, engraved with the true map of the Nine Provinces. With the Court gone the land is lying down in its own shape again (the world map you walk through is the true one). But land that moves floods, and under the Court's squares lay something Yu never killed, only channelled: Gonggong, the Flood God, who once broke a pillar of heaven with his head.
+
+| Region | Size | Levels | Story beat | Final boss |
+|---|---|---|---|---|
+| *Cloudfoot (on the mountain)* | | | Cartographer Pei, twelve years right about the Court's maps, draws the north road properly | |
+| Longmen, the Dragon Gate Ferry | 100 x 60 | 42 | A ferry town on a river that runs backwards in its sleep; the carp will not leap the Dragon Gate; He Bo's flood tablet goes back to his temple | He Bo, Earl of the Yellow River |
+| The Drowned Fields of Gun | 96 x 58 | 42-43 | Bo Yi, who dug the channels with Yu, and the Swelling Earth rising out of the flood: Gun has come back to finish his dam | Gun, Who Stole the Swelling Earth |
+| Tushan, the Town of the Cauldron-Casters | 96 x 60 | 43-44 | The stone-carver reads the flood tablet; Tu Lan recasts the Ninth Cauldron from its shards, the land as Yu drew it | Taotie, the Glutton on the Cauldron |
+| Mount Buzhou, the Broken Pillar | 96 x 58 | 44 | Yinglong, who drew every river with his tail; Xiu who loved roads, the Kun, Xiangliu and Kuafu round the black lake | Gonggong, God of the Flood |
+| *Mountain-River Oneness tribulation: the land is allowed to keep its own shape* | | | | |
+
+```mermaid
+sequenceDiagram
+    participant E as Elder and Archivist
+    participant P as Cartographer Pei
+    participant J as Jiang Yao and He Bo
+    participant B as Bo Yi and Gun
+    participant T as Tu Lan
+    participant Y as Yinglong
+    participant G as Gonggong
+    E->>P: The maps are wrong. The land is lying down in its own shape
+    P-->>J: The north road, drawn properly. The carp will not leap
+    J-->>B: The river runs backwards. Someone upstream builds with earth that grows
+    B-->>T: Gun never learned channels. Ask what became of the cauldrons
+    T->>T: Recasts the Ninth Cauldron: the land as Yu drew it
+    T-->>Y: Show him the rubbing
+    Y->>G: Every river runs east because of you
+    G-->>G: Then let the water go where it goes
+    G->>E: The Nine Cauldrons hold the land as it really is: Mountain-River Oneness
+```
+
+- **Five bosses in each region** from the old texts: the Carp Who Would Not Leap, Black Eel and his river-rats, the Drowned Temple Bell, the Stone Lion of the ferry stage and **He Bo**, who used to demand a bride every spring until Ximen Bao threw his priests in the river; the Toad Who Swallowed the Dykes, the Heron Lord of the Drowned Paddies, the Mud Dragon, the Turtle Who Carried Gun's Earth (the *Tianwen*'s owls and turtles) and **Gun**, Yu's father, still building his wall; the Slag Serpent, the Stone Mother (Yu's wife, turned to stone), Fangfeng (executed for coming late to Yu's assembly), the White Nine-Tailed Fox of Tushan and the **Taotie**, the glutton cast on every cauldron, eating the map off the shards; Xiu, Gonggong's son and god of roads, the Kun of the Northern Darkness, Xiangliu with nine heads, Kuafu who drank the rivers dry and **Gonggong** himself.
+- **Twelve new monsters** (Dragon-Gate Carp, River-Rat Eel Bandits, Silt-Shell Crabs, Paddy Flood-Toads, Mud-Wading Herons, Drowned-Rice Wraiths, Slag Golems, Bronze Taotie Hounds, Charcoal-Pit Wisps, Black-Water Wolves, Pillar-Shard Sentinels and Kun-Fish Fry); most of the flood is water and weak to earth.
+- **Five new techniques**: Dragon Gate Leap, Swelling Earth Rampart and the Nine Cauldrons Sword (taught by Tu Lan) for Lin Feng; Reed-Boat Blossom and the River-Mother's Ward (it raises the fallen) for Yue Ling.
+- **Three set-piece landmarks** built in code (`Terrain3D.landmark`): the **Dragon Gate**, two banded cliffs with a carved gate across the gorge and the falls pouring through it in three sheets; the **great cauldron** of Tushan on three legs with taotie faces round its belly and molten bronze glowing inside; and the **stump of Mount Buzhou**, a banded column of black stone leaning north-west with a shattered crown, chains and fallen blocks.
+- **New region looks**: the ochre river and cliff pines of Longmen under river mist, the grey flood and reeds of the Drowned Fields in the rain, the smoke and bronze-glow of Tushan with sparks in the air, and the storm over the black lake at Buzhou.
+- **The guides and townsfolk are Blender-built**: Harbourmistress Jiang Yao with her oar, Bo Yi in his straw hat with the hoe he dug the first channels with, Tu Lan in a scorched apron with her clan's hammer, Yinglong as an old man with dragon horns, and the people of Longmen, Tushan, Cloudfoot and Shazhou.
+- The **ending** sets the Nine Cauldrons, recast, in an arc on the clouds with a river winding between them to the sea.
 
 ## Part IX: The Tenth Sun
 
@@ -635,6 +748,20 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 | Bug | Fix |
 |---|---|
+| **Trails broke through the walls of houses.** `MapGen._carve` joined anything cut off by a greedy random walk towards the target that turned whatever it stepped on into path, building walls included; once a region's open ground stopped being its whole map, the Tea House of the Nine Terraces, the Silkworm House, the Cowherd's Ferry House and the Sleepless Inn each lost wall tiles | A trail is the cheapest way across a cost grid (open ground cheap, forest and water dear, a little noise so it still wanders) where buildings and the map's edge cannot be crossed; the "walls all round except the door" test covers every building |
+| **The bot could meditate for ever in a region it had reached**: it counted itself "in" a region as soon as it crossed the border, and looked for monsters only within 64 steps; in the new world, borders lie well outside a region's open ground, so at the Blood Moon Palace every pack was out of reach and it waited 45 game-minutes for a "respawn" | If nothing is close, the bot walks to the nearest pack anywhere in the region, and the respawn wait ends when any pack of the region is back |
+| **Buildings in a mirrored region would have stood at the wrong end of it**: a building's rectangle was moved into the world by its top-left corner (`Rect2i(to_world(position), size)`), which on a flipped map is the top-right corner (no flipped region happened to have a building) | `Atlas.rect_to_world` maps both corners; needed now that maps are turned to face their road |
+| **Techniques ran off the pause menu**: the list had four fixed columns of seven (28 places), and Lin Feng knows 30 techniques by the end of Part IX, so the last two were drawn past the right edge of the panel | Four columns with as many rows as the list needs; Part X brings it to 33 |
+| **Long objectives were cut off mid-sentence**: the HUD drew the objective on one 480-pixel line, and 40 of the 344 quest objectives are longer (up to 770 pixels: "Follow the east road onto the Scorched Millet Plains and find Old Farmer Tian at the shrine of Hou Ji") | Objectives that do not fit wrap onto a second line in place of the heading |
+| `Game.tile`, a world tile, was set to the sect's own tile (20, 8) by `reset()` and `respawn()`, a spot in the north-west sea of the new world | The sect's courtyard in world tiles |
+| The Nomad Matriarch had only two things to say (every other townsperson has three) | A third line, and a test that every townsperson has three |
+| Nothing checked that dialogue fits the dialogue box (four lines); one new line of Part X ran to five | A test measures every line of dialogue and chat with the game's font; the long line was split |
+| **Two of this README's diagrams did not render on GitHub**: the big gameplay flowchart had an extra `end` after Part VIII's subgraph, and the open-world release's flowchart had `house():` unquoted inside a node label; Mermaid rejects both | Fixed; every Mermaid block in this README was checked with Mermaid's own parser (11.4) for this release |
+
+### Bugs fixed in the Part IX release
+
+| Bug | Fix |
+|---|---|
 | **Every exported clip ran a quarter too slow.** `kit.bake_action` keys a pose every 1/30 s on consecutive frames, but Blender's factory scene runs at 24 frames per second, so a 0.55 s attack lasted 0.69 s and every walk dragged | The scene runs at 30 fps and clips start at 0 s (`kit.reset`, `kit.export`), so loops meet their first frame |
 | **Characters walked like pacing camels**: in the walk clip `thigh.L` and `upper_arm.L` were driven by the same `sin(phase)` with the same sign, so each arm swung forward with the leg on its own side | Arms counter-swing, a few frames behind the legs |
 | **The hero slid along the road**: he crosses a 2 m tile every 0.16 s (12.5 m/s) on a walk cycle of 0.7 s per stride | A run clip with a flight phase for the hero and Yue Ling |
@@ -763,7 +890,7 @@ flowchart TD
         T[title / ending / meditate<br/>3D scenes]
         M[menu / shop / dialogue<br/>2D overlays]
     end
-    W --> ATL[atlas.gd<br/>one world grid, roads, seals]
+    W --> ATL[atlas.gd<br/>one continent: sites, warped Voronoi,<br/>coast, A* roads, seals]
     ATL --> MG2[mapgen.gd<br/>regions, buildings]
     W --> TER[terrain3d.gd<br/>height field, ground and water shaders,<br/>horizon, bridges]
     TER --> SC[scatter.gd<br/>ecology placement]
@@ -772,14 +899,14 @@ flowchart TD
     TER --> ARC[architecture.gd<br/>halls, enterable houses, walls, dwellings]
     TER --> FA[fauna.gd<br/>wildlife]
     W --> MOD[models.gd<br/>procedural people and monsters,<br/>action poses]
-    MOD --> AS[assets.gd<br/>Blender GLBs: 63 people,<br/>40 monsters, 26 props;<br/>palettes from one tint]
+    MOD --> AS[assets.gd<br/>Blender GLBs: 89 people,<br/>40 monsters, 26 props;<br/>palettes from one tint]
     B --> MOD
     B --> FX[fx3d.gd<br/>weather, spells, slashes, projectiles]
     W --> FX
     TER --> MB[mb.gd<br/>primitives, limbs, lathes, ribbons<br/>toon + outline + aura shaders]
     MOD --> MB
     FX --> MB
-    TER --> LK[(look.gd<br/>34 region looks, sky shader)]
+    TER --> LK[(look.gd<br/>42 region looks, sky shader)]
     TER --> AS
     W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap]
     B --> UI
@@ -811,32 +938,33 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs). The same bot without Part IX takes 8:58:59, so Part IX adds about **1 hour 19 minutes**:
+Latest result (seed 1234, identical across runs). The last release took 10:17:41; the same bot on the redesigned world without Part X takes 10:11:19 (the new geography changes how far the bot walks and where it fights), so the game is now **1 hour 10 minutes longer**, and Part X itself plays in about **1 hour 14 minutes**:
 
 ```
-game play time  : 10:17:41 (37062 s)
-wall clock      : ~11 min (headless)
-final realm     : Early Sun-Moon Harmony
-battles / kills : 1168 / 2188   deaths: 0
-time by screen  : battle 15066 s, meditate 9770 s, world 6216 s, dialogue 5817 s
-time by area    : sect 1157, mountain 292,
-                  bamboo 883, marsh 653, frost 1076, thunder 511, palace 559,
-                  dragon 640, volcano 1032, void 721, celestial 1466,
-                  mirror 594, grave 990, time 709, origin 1230,
-                  cloudsea 821, court 810, forge 899, garden 1397,
-                  dunes 832, fungal 807, aurora 863, chaos 1503,
-                  maple 976, karst 926, springs 963, wheel 1142,
-                  village 937, terraces 964, silk 895, loom 1220,
-                  starferry 984, magpie 946, starpalace 981, jasper 1217,
-                  yanggu 1039, millet 1129, fusang 1190, guanghan 1161
-result          : PASS (needs >= 32400 s)
+game play time  : 11:27:54 (41275 s)
+wall clock      : ~6 min (headless)
+final realm     : Early Mountain-River Oneness
+battles / kills : 1315 / 2466   deaths: 0
+time by screen  : battle 16176 s, meditate 10568 s, world 7016 s, dialogue 7288 s
+time by area    : sect 1340, mountain 428,
+                  bamboo 916, marsh 726, frost 938, thunder 567, palace 546,
+                  dragon 638, volcano 1133, void 755, celestial 1472,
+                  mirror 615, grave 1044, time 723, origin 1253,
+                  cloudsea 781, court 788, forge 890, garden 1348,
+                  dunes 943, fungal 851, aurora 881, chaos 1487,
+                  maple 945, karst 806, springs 910, wheel 1039,
+                  village 917, terraces 870, silk 854, loom 1189,
+                  starferry 895, magpie 907, starpalace 958, jasper 1304,
+                  yanggu 1055, millet 1100, fusang 1124, guanghan 1178,
+                  longmen 1037, drowned 1088, tushan 1044, buzhou 1030
+result          : PASS (needs >= 36000 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 32400), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 36000), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state every frame after that game time).
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than nine hours of game time**. A second job installs Blender as a Python module, rebuilds every asset in `art/` from its script and validates the exports with `art/check_assets.py`. The bot report is uploaded as an artifact and shown in the job summary.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency), then runs the bot headless and **fails the build if the game is not completed or takes less than ten hours of game time**. A second job installs Blender as a Python module, rebuilds every asset in `art/` from its script and validates the exports with `art/check_assets.py`. The bot report is uploaded as an artifact and shown in the job summary.
 
 ```mermaid
 flowchart LR
@@ -844,7 +972,7 @@ flowchart LR
     DL --> IMP[Import project]
     IMP --> T[Data-integrity tests]
     T --> B[Bot plays whole game<br/>--fixed-fps 30]
-    B --> G{completed and<br/>game time >= 9h?}
+    B --> G{completed and<br/>game time >= 10h?}
     PR --> ART[pip install bpy<br/>art/build_all.py] --> CHK[check_assets.py]
     G -- yes --> OK[Pass + report artifact]
     G -- no --> FAIL[Fail]

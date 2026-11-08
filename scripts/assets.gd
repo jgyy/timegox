@@ -71,6 +71,17 @@ const PEOPLE := {
 	"watchman_zhou": "characters/watchman_zhou", "innkeeper_bao": "characters/innkeeper_bao", "tea_seller_pan": "characters/tea_seller_pan",
 	"dyer_su": "characters/dyer_su", "monk_huiming": "characters/monk_huiming", "granny_gu": "characters/granny_gu",
 	"porter_niu": "characters/porter_niu", "little_dou": "characters/little_dou",
+	# ---- Part X: the guides, and the people of four new towns (Cloudfoot, Longmen, Tushan and
+	# Shazhou Oasis)
+	"harbour_yao": "characters/harbour_yao", "bo_yi": "characters/bo_yi", "tu_lan": "characters/tu_lan", "yinglong": "characters/yinglong",
+	"cartographer_pei": "characters/cartographer_pei", "postmaster_lu": "characters/postmaster_lu", "storyteller_wu": "characters/storyteller_wu",
+	"caravan_kang": "characters/caravan_kang", "priestess_yun": "characters/priestess_yun", "stableboy_shitou": "characters/stableboy_shitou",
+	"boatwright_gao": "characters/boatwright_gao", "fishwife_lu": "characters/fishwife_lu", "lockkeeper_qian": "characters/lockkeeper_qian",
+	"shrine_hua": "characters/shrine_hua", "scholar_cen": "characters/scholar_cen", "carp_boy_yu": "characters/carp_boy_yu",
+	"innkeeper_dong": "characters/innkeeper_dong", "caster_wei": "characters/caster_wei", "carver_shi": "characters/carver_shi",
+	"charcoal_tan": "characters/charcoal_tan", "innkeeper_lou": "characters/innkeeper_lou", "little_qi": "characters/little_qi",
+	"well_keeper_zhaya": "characters/well_keeper_zhaya", "cook_aysha": "characters/cook_aysha", "star_reader_kumar": "characters/star_reader_kumar",
+	"camel_boy_temur": "characters/camel_boy_temur",
 }
 
 static var _scenes := {}

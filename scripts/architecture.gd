@@ -658,6 +658,7 @@ const SETTLE := {
 	"village": ["house", "house", "shrine"], "tea": ["pavilion", "house"], "silk": ["house", "shrine"], "loom": ["pavilion", "ruin"],
 	"starferry": ["stilt", "house", "shrine"], "magpie": ["tower", "pavilion"], "starpalace": ["pavilion", "pavilion", "ruin"], "jasper": ["pavilion", "shrine"],
 	"yanggu": ["house", "house", "tower"], "millet": ["house", "ruin", "shrine"], "fusang": ["shrine", "stilt", "pavilion"], "guanghan": ["pavilion", "pavilion", "ruin"],
+	"longmen": ["stilt", "house", "shrine"], "drowned": ["stilt", "stilt", "ruin"], "tushan": ["house", "tower", "ruin"], "buzhou": ["ruin", "tower"],
 }
 static var _mesh_cache := {}
 
