@@ -68,10 +68,12 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 	# roads: winding streets and dyke paths, a smooth curve through the given points, two tiles wide
 	for rd in spec.get("roads", []):
 		_road(grid, w, h, rd)
-	# blocks: ground kept solid under a great landmark (the Fusang's trunk)
+	# blocks: solid, flattened ground under a great landmark (the Fusang's trunk, the Dragon Gate's
+	# cliffs, the great cauldron, the pillar of Buzhou).  BUILDING, not WALL: the forest is planted on
+	# WALL tiles, and pines grew up through the middle of the cauldron
 	for bk in spec.get("blocks", []):
 		var br: Rect2i = bk
-		_rect(grid, w, br.position.x, br.position.y, br.end.x - 1, br.end.y - 1, WALL)
+		_rect(grid, w, br.position.x, br.position.y, br.end.x - 1, br.end.y - 1, BUILDING)
 	# solid border
 	for x in w:
 		grid[x] = WALL

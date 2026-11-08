@@ -13,9 +13,9 @@ const TOWN_SHOTS := {
 	"sect": [["town_cloudfoot", "mountain", Vector2i(82, 34), Vector3(-26.0, 30.0, 34.0), Vector3(0.0, 0.0, -4.0)]],
 	"dunes": [["town_shazhou", "dunes", Vector2i(12, 40), Vector3(-24.0, 26.0, 30.0), Vector3(0.0, 0.0, 0.0)]],
 	"longmen": [["town_longmen", "longmen", Vector2i(28, 30), Vector3(-30.0, 30.0, 26.0), Vector3(4.0, 0.0, -2.0)],
-		["dragon_gate", "longmen", Vector2i(54, 22), Vector3(-34.0, 14.0, 6.0), Vector3(0.0, 8.0, 0.0)]],
+		["dragon_gate", "longmen", Vector2i(54, 3), Vector3(46.0, 12.0, 10.0), Vector3(0.0, 9.0, 0.0)]],
 	"tushan": [["town_tushan", "tushan", Vector2i(28, 26), Vector3(-26.0, 28.0, 30.0), Vector3(0.0, 0.0, -2.0)],
-		["great_cauldron", "tushan", Vector2i(38, 22), Vector3(-11.0, 7.0, 11.0), Vector3(0.0, 3.0, 0.0)]],
+		["great_cauldron", "tushan", Vector2i(38, 22), Vector3(-12.0, 8.0, 12.0), Vector3(0.0, 3.0, 0.0)]],
 	"buzhou": [["buzhou_pillar", "buzhou", Vector2i(70, 20), Vector3(-52.0, 18.0, 46.0), Vector3(0.0, 22.0, 0.0)]],
 }
 
@@ -262,14 +262,31 @@ func _follow(id: String) -> void:
 	wo.cam_override = null
 	await _sheet("follow_" + id, strip, 0.4)
 
+## The nearest walkable tile with nobody on it, on dry ground if there is any within 20 steps: the
+## shore of a river or pond is sunk below the waterline in 3D, so heroes standing on the bank
+## itself seem to wade in the water.
 func _nearest_free(pos: Vector2i) -> Vector2i:
-	for r in 20:
-		for dx in range(-r, r + 1):
-			for dy in range(-r, r + 1):
-				var p := pos + Vector2i(dx, dy)
-				if main.world.tile_free(p) and main.world.ent_at(p) == null and maxi(absi(dx), absi(dy)) == r:
-					return p
+	for dry in [true, false]:
+		for r in 20:
+			for dx in range(-r, r + 1):
+				for dy in range(-r, r + 1):
+					var p := pos + Vector2i(dx, dy)
+					if maxi(absi(dx), absi(dy)) != r or not main.world.tile_free(p) or main.world.ent_at(p) != null:
+						continue
+					if not dry or not _by_water(p):
+						return p
 	return pos
+
+func _by_water(p: Vector2i) -> bool:
+	var gw: int = main.world.w
+	var gh: int = main.world.h
+	var g: PackedByteArray = main.world.grid
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var q := p + Vector2i(dx, dy)
+			if q.x >= 0 and q.y >= 0 and q.x < gw and q.y < gh and g[q.y * gw + q.x] == MapGen.WATER:
+				return true
+	return false
 
 func _run() -> void:
 	await _wait(1.0)

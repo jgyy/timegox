@@ -141,15 +141,27 @@ func _draw_map() -> void:
 	UI.text(self, r.position + Vector2(20, 28), "The Unbroken Land", 20, UI.C_GOLD)
 	draw_texture_rect(w.mini_tex, Rect2(o, sz), false)
 	draw_rect(Rect2(o, sz), UI.C_BORDER.darkened(0.4), false, 1.0)
+	var town_at := {}
+	for tw in Data.TOWNS:
+		town_at[tw.id] = o + (Vector2(Atlas.to_world(tw.area, tw.pos)) + Vector2(0.5, 0.5)) * scale
 	for id in w.wd.ids:
 		if id == "sect":
 			continue
 		var site: Vector2i = w.wd.layout[id].site
+		if id == Atlas.HUB:
+			site += Vector2i(0, 48)  # below the sect, whose own label sits on the mountain's site
 		var mid := o + (Vector2(site) + Vector2(0.5, 0.5)) * scale
+		# a town at the heart of its region names it (Longmen Ferry, Tushan): the two labels would overlap
+		var named_by_town := false
+		for tw2 in Data.TOWNS:
+			if tw2.area == id and (town_at[tw2.id] as Vector2).distance_to(mid) < 26.0:
+				named_by_town = true
+		if named_by_town:
+			continue
 		var col := Color(1, 1, 1, 0.92) if id != Atlas.HUB else Color(0.85, 1.0, 0.85, 0.9)
 		UI.text(self, mid + Vector2(-60, 4), MAP_NAMES.get(id, Data.AREAS[id].n), 10, col, HORIZONTAL_ALIGNMENT_CENTER, 120)
 	for tw in Data.TOWNS:
-		var tp: Vector2 = o + (Vector2(Atlas.to_world(tw.area, tw.pos)) + Vector2(0.5, 0.5)) * scale
+		var tp: Vector2 = town_at[tw.id]
 		draw_rect(Rect2(tp - Vector2(3, 3), Vector2(6, 6)), UI.C_GOLD)
 		draw_rect(Rect2(tp - Vector2(3, 3), Vector2(6, 6)), Color(0, 0, 0, 0.8), false, 1.0)
 		UI.text(self, tp + Vector2(-60, -6), tw.n, 9, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 120)

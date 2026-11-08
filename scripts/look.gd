@@ -94,7 +94,7 @@ const THEMES := {
 		"sky_top": Color("0a1030"), "sky_hor": Color("4a5a98"), "fog": Color("6a78a8"), "fog_d": 0.012, "sun": Color("d0dcff"), "sun_e": 0.85, "amb": Color("98a8d8"), "amb_e": 0.9, "weather": "osmanthus", "tree": "column", "decor": "snowrock"},
 	# ---- Part X: the ochre river below the Dragon Gate, the grey flood over the rice fields, the
 	# smoke and bronze-glow of the casters' mountain, and the storm over the broken pillar
-	"longmen": {"g1": Color("7a9a58"), "g2": Color("88a662"), "path": Color("dcc8a0"), "wall": Color("3e6a3a"), "water": Color("b09a60"), "bg": Color("141008"),
+	"longmen": {"g1": Color("7a9a58"), "g2": Color("88a662"), "path": Color("dcc8a0"), "wall": Color("3e6a3a"), "water": Color("4e8a80"), "bg": Color("141008"),
 		"sky_top": Color("5a88c0"), "sky_hor": Color("ece4cc"), "fog": Color("d8d0b8"), "fog_d": 0.013, "sun": Color("fff4e0"), "sun_e": 1.1, "amb": Color("b0b098"), "amb_e": 0.85, "weather": "river_mist", "tree": "ferrypost", "decor": "reed"},
 	"drowned": {"g1": Color("6a8a58"), "g2": Color("789862"), "path": Color("b8a888"), "wall": Color("3a5a3a"), "water": Color("7a9a90"), "bg": Color("0a100c"),
 		"sky_top": Color("5a6a80"), "sky_hor": Color("c8ccd0"), "fog": Color("a8b0b0"), "fog_d": 0.02, "sun": Color("e8ecf0"), "sun_e": 0.85, "amb": Color("8a9898"), "amb_e": 0.85, "weather": "rain", "tree": "mangrove", "decor": "reed"},
