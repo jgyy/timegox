@@ -12,7 +12,9 @@ extends ScreenBase
 ## pearl-lights and shade-lanterns rising up its roots, and the six colours of the Daos round it.
 ## Part XII sets the Isles of the Eastern Sea on the shells of their sleeping turtles below, with
 ## Mazu's lantern-boat drifting between them and Jingwei flying a pebble over the sea, and Yue Ling
-## waves, bows and laughs from the lotus.
+## waves, bows and laughs from the lotus.  Part XIII stands the Eight Gates of Qimen in a ring on the
+## clouds, every one of them open, each with the trigram of its quarter glowing over the arch, and
+## maple leaves drifting down through them; the results name the roads Lin Feng took.
 
 const VIEW := Vector2(1280, 720)
 
@@ -377,6 +379,61 @@ func _part12() -> void:
 	MB.mesh_node(bird12, bb.build(MB.mat_plain()))
 	scene3d.add_child(bird12)
 
+var gates13: Node3D = null
+var leaves13: Array = []
+## the trigrams of the Eight Gates in the order of Trials.GATES (Opening, Alarm, Rest, Death, Sight,
+## Closing, Life, Harm), lines from the bottom up: 1 an unbroken (yang) line, 0 a broken (yin) one
+const TRIGRAMS := [[1, 1, 1], [1, 1, 0], [0, 1, 0], [0, 0, 0], [1, 0, 1], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
+
+func _part13() -> void:
+	gates13 = Node3D.new()
+	gates13.position = Vector3(0.0, -8.5, -27.0)
+	scene3d.add_child(gates13)
+	var b := MB.new()
+	var g := MB.new()
+	var wood := MB.tag(Color("b8382a"), MB.WOOD)
+	var tile := MB.tag(Color("2f4a6a"), MB.STONE)
+	var gold := Color(1.0, 0.82, 0.4, 0.95)
+	for k in 8:
+		var a := TAU * k / 8.0 + PI / 8.0
+		var c := Vector3(cos(a) * 21.0, 0.0, sin(a) * 9.0)
+		# every gate faces the centre, where the war god used to be
+		var yaw := atan2(-c.x, -c.z)
+		var bs := Basis.from_euler(Vector3(0, yaw, 0))
+		var right: Vector3 = bs * Vector3(1, 0, 0)
+		var front: Vector3 = bs * Vector3(0, 0, 1)
+		for sd: float in [-1.0, 1.0]:
+			b.cyl(c + right * sd * 1.7 + Vector3(0, 2.1, 0), 0.24, 4.2, wood, Vector3.ZERO, 8)
+			b.box(c + right * sd * 1.7 + Vector3(0, 0.15, 0), Vector3(0.7, 0.3, 0.7), tile, Vector3(0, yaw, 0))
+		b.box(c + Vector3(0, 4.25, 0), Vector3(4.4, 0.36, 0.5), wood, Vector3(0, yaw, 0))
+		b.box(c + Vector3(0, 4.7, 0), Vector3(5.2, 0.28, 1.0), tile, Vector3(0, yaw, 0))
+		b.box(c + Vector3(0, 3.45, 0), Vector3(2.0, 1.1, 0.12), MB.tag(Color("3a2a22"), MB.WOOD), Vector3(0, yaw, 0))
+		# the trigram on the plaque, glowing: every gate stands open
+		var tri: Array = TRIGRAMS[k]
+		for ln in 3:
+			var y := 3.1 + ln * 0.32
+			var at: Vector3 = c + Vector3(0, y, 0) + front * 0.1
+			if int(tri[ln]) == 1:
+				g.box(at, Vector3(1.5, 0.14, 0.06), gold, Vector3(0, yaw, 0))
+			else:
+				for sd2: float in [-1.0, 1.0]:
+					g.box(at + right * sd2 * 0.45, Vector3(0.6, 0.14, 0.06), gold, Vector3(0, yaw, 0))
+		# a pool of gold light where the gate opens
+		g.disc(c + Vector3(0, 0.05, 0) + front * 1.2, 1.4, Color(1.0, 0.8, 0.35, 0.35), 16)
+	var mi := MB.mesh_node(gates13, b.build(MB.mat_plain()))
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var mg := MB.mesh_node(gates13, g.build(MB.mat_glow()))
+	mg.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	# red maple leaves (Chiyou's fetters, let go) drifting down past the lotus
+	var lb := MB.new()
+	lb.leaf(Vector3.ZERO, Vector3(0, 0, 0.3), 0.22, MB.tag(Color("c8402a"), MB.FOLIAGE), Vector3(1, 0, 0), MB.tag(Color("e89030"), MB.FOLIAGE))
+	var lm := lb.build(MB.mat_plain())
+	for q in 14:
+		var lf := MB.mesh_node(scene3d, lm)
+		lf.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		lf.set_meta("phase", q * 0.37)
+		leaves13.append(lf)
+
 func press(act: String) -> void:
 	if act == "confirm":
 		done = true
@@ -440,6 +497,15 @@ func _process(d: float) -> void:
 			_part11()
 		if isles12.is_empty():
 			_part12()
+		if gates13 == null:
+			_part13()
+		gates13.rotation.y = sin(t * 0.05) * 0.08
+		for k in leaves13.size():
+			var lf: Node3D = leaves13[k]
+			var ph := float(lf.get_meta("phase"))
+			var fall := fmod(t * 0.12 + ph, 1.0)
+			lf.position = Vector3(sin(ph * 7.0) * 5.0 + sin(t * 0.7 + ph) * 0.6, 6.0 - fall * 10.0, -2.0 - cos(ph * 5.0) * 3.0)
+			lf.rotation = Vector3(t * 1.3 + ph, t * 0.9 + ph * 2.0, 0.0)
 		# the turtles breathe in their sleep; Mazu's boat drifts between the isles and Jingwei flies over
 		for k in isles12.size():
 			(isles12[k] as Node3D).position.y = -5.5 - k * 0.6 + sin(t * 0.4 + k * 1.7) * 0.15
@@ -476,11 +542,22 @@ func _draw() -> void:
 	UI.text(self, Vector2(0, 216), "Every river runs where it will, and the Nine Cauldrons hold the land as it really is.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 242), "The Jianmu stands again between heaven, earth and the Nine Springs, and every road climbs it.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 268), "Every water comes home through the Returning Ruins; the turtles take turns, and an old magician grows old.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 294), "The Eight Gates stand open, the war god of the Nine Li has stopped fighting, and the Conclave argues happily under the Jianmu.", 18, Color("e8dcc0"), HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	if Game.dao != "":
-		UI.text(self, Vector2(0, 294), "Walker of the %s, the Nine Heavens root %d ranks awake" % [Data.DAOS[Game.dao].n, Game.talent_ranks()], 17, Data.DAOS[Game.dao].col, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
-	UI.panel(self, Rect2(400, 480, 480, 190), Color(0.04, 0.06, 0.13, 0.85))
-	UI.text(self, Vector2(400, 520), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 480)
-	UI.text(self, Vector2(400, 556), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)
-	UI.text(self, Vector2(400, 586), "Foes defeated: %d   Battles: %d   Falls: %d" % [Game.kills, Game.battles, Game.deaths], 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)
-	UI.text(self, Vector2(400, 616), "Time spent meditating: %s" % Fmt.clock(Game.meditated), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 480)
-	UI.text(self, Vector2(400, 652), "Press Enter", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 480)
+		UI.text(self, Vector2(0, 320), "Walker of the %s, the Nine Heavens root %d ranks awake" % [Data.DAOS[Game.dao].n, Game.talent_ranks()], 17, Data.DAOS[Game.dao].col, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.panel(self, Rect2(330, 466, 620, 214), Color(0.04, 0.06, 0.13, 0.85))
+	UI.text(self, Vector2(330, 502), "Total play time  %s" % Fmt.clock(Game.playtime), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 620)
+	UI.text(self, Vector2(330, 532), "Realm: %s" % Data.level_name(Game.level), 18, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 620)
+	UI.text(self, Vector2(330, 558), "Foes defeated: %d   Battles: %d   Falls: %d" % [Game.kills, Game.battles, Game.deaths], 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 620)
+	UI.text(self, Vector2(330, 582), "Time spent meditating: %s" % Fmt.clock(Game.meditated), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 620)
+	# the roads Lin Feng took (many roads, trials.gd)
+	UI.text(self, Vector2(330, 606), "Renown %d, %s   Deeds done for townsfolk: %d" % [Game.renown, Game.renown_title(), Game.deeds.size()], 16, Trials.KINDS.respect.col, HORIZONTAL_ALIGNMENT_CENTER, 620)
+	var fav := Trials.favourite_kind(Game)
+	var road := Trials.path("chiyou", str(Game.trials.get("chiyou", "")))
+	var roads := "%d trials passed%s" % [Game.trials.size(), (", most often %s" % str(Trials.KINDS[fav].n).to_lower()) if fav != "" else ""]
+	if not road.is_empty():
+		roads += "; the heart reached by %s" % str(road.n).replace("The Road", "the Road")
+	UI.text(self, Vector2(330, 630), roads, UI.fit(roads, 15, 600, 12), UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 620)
+	if fav != "":
+		UI.text(self, Vector2(330, 652), "Lin Feng, %s" % Trials.EPITHETS[fav], 15, Trials.KINDS[fav].col, HORIZONTAL_ALIGNMENT_CENTER, 620)
+	UI.text(self, Vector2(330, 672), "Press Enter", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 620)

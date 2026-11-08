@@ -213,6 +213,10 @@ func open_dao_choice(from: String) -> void:
 ## him in a quest scene, what their people think of his Dao.
 func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 	var lines: Array = Data.DIALOGUE.get(key, []).duplicate()
+	# the road Lin Feng took into the heart of the Eight Gates (Part XIII) tells the end its own way
+	var road: String = str(Game.trials.get("chiyou", ""))
+	if road != "":
+		lines.append_array(Data.ROUTE_LINES.get(key, {}).get(road, []))
 	if Game.dao == "":
 		return lines
 	var extra: Array = Data.DAO_LINES.get(key, {}).get(Game.dao, [])
@@ -336,6 +340,17 @@ func talk_npc(e: Dictionary) -> void:
 				open_talent_choice()
 		)
 		return
+	# a step that asks for visits, in any order (Part XIII: the Conclave's invitations): this is one
+	if not s.is_empty() and s.kind == "visits" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
+		say(Data.DIALOGUE.get("visit:" + str(e.id), []), func():
+			Game.visited[str(e.id)] = true
+			Game.toast("Invitation delivered (%d of %d)" % [Game.visits_done(s), int(s.n)])
+			Game.note("Invited " + str(e.n))
+			if race != "":
+				Game.race_gain(race, 5)
+			Game.poll_steps()
+		)
+		return
 	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
 	# the peoples of the realms speak to the Dao Lin Feng walks, now and then
 	if race != "" and Game.dao != "":
@@ -353,6 +368,10 @@ func talk_npc(e: Dictionary) -> void:
 	var i: int = chat_idx.get(e.id, 0)
 	chat_idx[e.id] = i + 1
 	var lines := [[e.n, chats[i % chats.size()]]]
+	# a townsperson with something to ask (a deed, trials.gd) asks it instead
+	var deed := Trials.deed_of(str(e.id), Game)
+	if deed != "":
+		lines = [[e.n, str(Trials.DEEDS[deed].ask)]]
 	# townsfolk feel a cultivator's realm (Part XII): the first word after every breakthrough is about it
 	var band := Data.realm_band(Game.level)
 	if Data.CHAT.has(str(e.get("asset", e.id))) and int(greeted.get(e.id, -1)) != Game.realm() and e.id != "elder":
@@ -366,10 +385,25 @@ func talk_npc(e: Dictionary) -> void:
 		after = func(): shop.open("alchemist"); push("shop")
 	elif e.id == "smith":
 		after = func(): shop.open("smith"); push("shop")
+	elif deed != "":
+		after = func(): offer_deed(e, deed)
 	elif race != "" and Game.inv.get(str(Data.RACES[race].gift), 0) > 0:
 		# carrying a keepsake their people love: offer it
 		after = func(): offer_gift(e)
 	say(lines, after)
+
+## A townsperson's request (trials.gd DEEDS): give them what they asked for, or come back later.
+func offer_deed(e: Dictionary, id: String) -> void:
+	var d: Dictionary = Trials.DEEDS[id]
+	var ready := Trials.deed_ready(id, Game)
+	var reward := "Renown +%d, %d spirit stones." % [int(d.renown), int(d.get("stones", 0))]
+	choose("A request from %s" % e.n, [
+		{"id": "help", "label": "Help", "note": "ready" if ready else "not yet", "desc": str(d.ask) + "\n\nThey want: " + Trials.want_text(id, Game) + "\n\n" + reward, "col": Trials.KINDS.respect.col, "enabled": ready},
+		{"id": "later", "label": "Not now", "desc": "Come back when you have it.", "col": UI.C_DIM},
+	], func(pick: String):
+		if pick == "help" and Game.do_deed(id):
+			say([[str(e.n), str(d.thanks)]])
+	)
 
 ## Offer one of the peoples of the realms the keepsake they love (Part XI).
 func offer_gift(e: Dictionary) -> void:
@@ -377,7 +411,7 @@ func offer_gift(e: Dictionary) -> void:
 	var item: String = str(Data.RACES[race].gift)
 	var have: int = Game.inv.get(item, 0)
 	choose("A gift for %s?" % e.n, [
-		{"id": "give", "label": "Give the %s" % Data.ITEMS[item].n, "note": "you have %d" % have, "desc": str(Data.ITEMS[item].desc) + "\n\nThe %s call you %s." % [Data.RACES[race].n, Game.race_title(race)], "col": Look.PICKUP_COLORS.get(item, UI.C_GOLD)},
+		{"id": "give", "label": "Give the %s" % Data.ITEMS[item].n, "note": "you have %d" % have, "desc": str(Data.ITEMS[item].desc) + "\n\n%s call you %s." % [Game.the_race(race), Game.race_title(race)], "col": Look.PICKUP_COLORS.get(item, UI.C_GOLD)},
 		{"id": "keep", "label": "Not now", "desc": "Keep it for now.", "col": UI.C_DIM},
 	], func(id: String):
 		if id == "give" and Game.give_gift(race):
@@ -393,7 +427,7 @@ func scatter_pack(e: Dictionary) -> void:
 	Game.toast("%s scatter before your %s aura" % [d.n, Data.REALMS[Game.realm()]])
 	# a pack that runs has been driven off all the same: it counts for a hunt (an over-cultivated player
 	# could otherwise never finish one)
-	Game.record_kills(str(e.get("area", Game.area)), e.group.size())
+	Game.record_kills(str(e.get("area", Game.area)), e.group.size(), e.group.map(func(g): return g.id))
 
 ## One of the Founder's sealed caves (Part XII): a door that opens only to a cultivator of the realm
 ## carved on it.  Inside, the Founder's words, a gift of spirit stones and an awakening of the root.
@@ -422,16 +456,59 @@ func start_encounter(e: Dictionary) -> void:
 func boss_interact(e: Dictionary) -> void:
 	var s := Game.cur_step()
 	var d: Dictionary = Data.ENEMIES[e.enemy]
-	if s.is_empty() or s.kind != "kill" or s.boss != e.enemy:
+	if Trials.is_gate(e.enemy):
+		# one of the Eight Gates (Part XIII): any of them, in any order, once the lock has been explained
+		if not Game.reached(Trials.GATE_STEP):
+			say([["Narrator", "%s stands in a column of gold light that will not let you near. Not yet." % d.n]])
+			return
+	elif s.is_empty() or s.kind != "kill" or s.boss != e.enemy:
 		say([["Narrator", "%s looms before you, but this is not the time. Finish your current objective first." % d.n]])
 		return
 	if Game.level < e.req:
 		say([["Narrator", "%s radiates a suffocating aura. You need at least %s cultivation." % [d.n, Data.level_name(e.req)]]])
 		return
+	if Trials.TRIALS.has(e.enemy):
+		# a trial (trials.gd): nobody faces this one unprepared, and there is more than one way to prepare
+		say([["Narrator", str(Trials.TRIALS[e.enemy].why)]], func(): open_trial(e))
+		return
 	say(Data.DIALOGUE.get("pre:" + e.enemy, []), func():
 		battle.start([{"id": e.enemy, "lv": e.lv}], {"entity": e, "boss": true, "enemy": e.enemy, "theme": world.theme_name})
 		push("battle")
 	)
+
+## The ways through a trial, on the choice screen: each with what it needs (ticked or not) and what it
+## does in battle; only a path whose needs are met can be taken.  Taking it pays what it costs (once),
+## and the battle starts with its boon.
+func open_trial(e: Dictionary) -> void:
+	var tid: String = e.enemy
+	var d: Dictionary = Data.ENEMIES[tid]
+	var opts: Array = []
+	for p in Trials.TRIALS[tid].paths:
+		var ok := Trials.path_met(tid, p, Game)
+		var kind: Dictionary = Trials.KINDS[p.kind]
+		opts.append({"id": p.id, "label": p.n, "note": "ready" if ok else "", "desc": "%s: %s.\n\n" % [kind.n, kind.what] + Trials.path_desc(tid, p, Game), "col": kind.col, "enabled": ok})
+	choose("%s: how will you face it?" % d.n, opts, func(pid: String):
+		if pid == "":
+			return
+		var p := Game.take_path(tid, pid)
+		if p.is_empty():
+			return
+		var lines: Array = [["Narrator", str(p.line)]]
+		lines.append_array(Data.DIALOGUE.get("pre:" + tid, []))
+		say(lines, func(): trial_battle(e, p))
+	)
+
+func trial_battle(e: Dictionary, p: Dictionary) -> void:
+	var tid: String = e.enemy
+	var mt: Array = Trials.TRIALS[tid].get("might", Trials.MIGHT)
+	var bn: Dictionary = p.get("boon", {}).duplicate()
+	if tid == "chiyou":
+		# every gate opened beyond the four that break the lock takes a little off the war god
+		var extra := maxi(0, Game.gates_open.size() - Trials.GATES_NEEDED)
+		bn["foe_hp"] = float(bn.get("foe_hp", 1.0)) * (1.0 - Trials.GATE_WEAKEN * extra)
+	battle.start([{"id": tid, "lv": e.lv, "mult": mt[0], "atk": mt[1]}], {"entity": e, "boss": true, "enemy": tid, "theme": world.theme_name,
+		"trial": tid, "path": str(p.id), "boon": bn, "path_n": str(p.n), "path_kind": str(Trials.KINDS[p.kind].n)})
+	push("battle")
 
 func start_breakthrough() -> void:
 	var s := Game.cur_step()
@@ -446,7 +523,7 @@ func start_breakthrough() -> void:
 
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
-	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10"}
+	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11"}
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story
@@ -480,19 +557,31 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity
 				Game.boss_done[ctx.enemy] = true
+				# every boss is talked of; a trial passed is remembered with the path that passed it
+				Game.add_renown(Trials.RENOWN_BOSS)
+				if str(ctx.get("trial", "")) != "":
+					Game.trial_won(str(ctx.trial), str(ctx.path))
 				if Data.BOSS_DROPS.has(ctx.enemy):
 					var drop: String = Data.BOSS_DROPS[ctx.enemy]
 					Game.add_item(drop)
 					Game.toast("Obtained %s" % Data.ITEMS[drop].n)
 				Game.note("Defeated " + Data.ENEMIES[ctx.enemy].n)
-				Game.advance()
+				if Trials.is_gate(ctx.enemy):
+					# one of the Eight Gates stands open (Part XIII): the lock breaks at the fourth
+					Game.gates_open[ctx.enemy] = true
+					var gn: String = str(Trials.GATE_NAMES[ctx.enemy])
+					Game.toast("%s stands open (%d of 8)" % [gn.substr(0, 1).to_upper() + gn.substr(1), Game.gates_open.size()])
+					Game.note("Opened " + str(Trials.GATE_NAMES[ctx.enemy]))
+					Game.poll_steps()
+				else:
+					Game.advance()
 				var post: Array = dao_dialogue("post:" + ctx.enemy)
 				if not post.is_empty():
 					say(post)
 			else:
 				var e2: Dictionary = ctx.entity
 				Game.defeated[e2.id] = Game.playtime
-				Game.record_kills(e2.get("area", Game.area), e2.group.size())
+				Game.record_kills(e2.get("area", Game.area), e2.group.size(), e2.group.map(func(g): return g.id))
 		"lose":
 			Game.respawn()
 			world.load_area("sect", Vector2i(20, 8))

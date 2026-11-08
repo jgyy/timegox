@@ -523,7 +523,8 @@ func _init() -> void:
 	for a10 in p10:
 		check(Look.THEMES.has(a10) and Look.EXTRA.has(a10) and Scatter.ECO.has(a10) and Fauna.KINDS.has(a10) and MapGen.DENSITY.has(a10) and Arch.SETTLE.has(a10), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a10)
 		# (the keepsakes and caches upstairs and in cellars, Part XI, are not what the quest asks for)
-		check(Data.AREAS[a10].bosses.size() == 5 and Data.AREAS[a10].pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a10 + ": five bosses and four things to find")
+		# (Part XIII's Gate Generals only visit, `vis`: they are not the region's own)
+		check(Data.AREAS[a10].bosses.filter(func(b): return not b.has("vis")).size() == 5 and Data.AREAS[a10].pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a10 + ": five bosses and four things to find")
 		var lm10: Dictionary = Atlas.layout()[a10]
 		check(int(lm10.site.y) < int(Atlas.layout()[Atlas.HUB].site.y), a10 + " lies north of the mountain, up the river road")
 	for st10 in ["s_p10_archive", "s_p10_road", "s_dg_intro", "s_df_intro", "s_ts_intro", "s_bz_intro"]:
@@ -555,7 +556,7 @@ func _init() -> void:
 	for a11 in p11:
 		var sp11: Dictionary = Data.AREAS[a11]
 		check(Look.THEMES.has(sp11.theme) and Look.EXTRA.has(sp11.theme) and Scatter.ECO.has(sp11.theme) and Fauna.KINDS.has(sp11.theme) and MapGen.DENSITY.has(sp11.theme) and Arch.SETTLE.has(sp11.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a11)
-		check(sp11.bosses.size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a11 + ": four bosses and four things to find")
+		check(sp11.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a11 + ": four bosses and four things to find")
 		check(Data.layer_of(a11) in ["heaven", "under"], a11 + " lies in a realm above or below the land")
 		for n11 in sp11.npcs:
 			check(Data.CHAT.has(str(n11.get("asset", n11.id))) and Data.CHAT[str(n11.get("asset", n11.id))].size() >= 3, "%s has at least three things to say" % n11.id)
@@ -736,15 +737,15 @@ func _init() -> void:
 	check(Data.BOSS_DROPS.get("chong", "") == "heaven_tablet" and Data.BOSS_DROPS.get("li", "") == "earth_weight", "Chong gives up his tablet and Li his weight, which go back to the tree")
 	print("== part XII: the Returning Ruins ==")
 	var p12 := ["penglai", "fangzhang", "yingzhou", "guixu"]
-	check(Data.REALMS[Data.REALMS.size() - 1] == "Ten Thousand Waters Return" and Data.MAX_LEVEL == 51 and Data.level_name(51).ends_with("Ten Thousand Waters Return"), "Part XII adds the Ten Thousand Waters Return realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break17" and Data.step_index("s_p12_home") == Data.step_index("s_break16") + 1, "Part XII follows Three Realms Concord and ends the game")
+	check(Data.REALMS[17] == "Ten Thousand Waters Return" and Data.level_name(51).ends_with("Ten Thousand Waters Return"), "Part XII adds the Ten Thousand Waters Return realm")
+	check(Data.step_index("s_p12_home") == Data.step_index("s_break16") + 1 and Data.step_index("s_p13_home") == Data.step_index("s_break17") + 1, "Part XII follows Three Realms Concord, and Part XIII follows it")
 	check(Data.EXP_NEED.size() >= Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "cultivation and battle rewards are defined up to the last realm")
 	check(main_recalls_s_break16(), "the sect calls Lin Feng home after Three Realms Concord (recall10)")
 	for a12 in p12:
 		var sp12: Dictionary = Data.AREAS[a12]
 		check(Data.layer_of(a12) == "sea" and Atlas.STRATA.sea.sites.has(a12), a12 + " lies in the Eastern Sea")
 		check(Look.THEMES.has(sp12.theme) and Look.EXTRA.has(sp12.theme) and Scatter.ECO.has(sp12.theme) and Fauna.KINDS.has(sp12.theme) and MapGen.DENSITY.has(sp12.theme) and Arch.SETTLE.has(sp12.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a12)
-		check(sp12.bosses.size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a12 + ": four bosses and four things to find")
+		check(sp12.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a12 + ": four bosses and four things to find")
 		for n12 in sp12.npcs:
 			check(Data.CHAT.has(str(n12.get("asset", n12.id))) and Data.CHAT[str(n12.get("asset", n12.id))].size() >= 3, "%s has at least three things to say" % n12.id)
 			check(Assets.PEOPLE.has(str(n12.get("asset", n12.id))), "%s is Blender-built" % n12.id)
@@ -834,6 +835,233 @@ func _init() -> void:
 	G2.reset()
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
+	print("== many roads: trials, crafting, renown, deeds ==")
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates"]
+	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
+	var kinds_used := {}
+	var dfont2 := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont2, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	for tid in Trials.TRIALS:
+		var tr: Dictionary = Trials.TRIALS[tid]
+		check(Data.ENEMIES.has(tid) and Data.ENEMIES[tid].get("boss", false) and Trials.boss_area(tid) != "", "trial %s guards a boss placed in the world" % tid)
+		var in_story := Trials.is_gate(tid)
+		for st in Data.STEPS:
+			in_story = in_story or (st.kind == "kill" and st.boss == tid)
+		check(in_story, "trial %s stands on the main story's road (a quest boss or one of the Eight Gates)" % tid)
+		check(fits.call(str(tr.why)) and tr.get("might", Trials.MIGHT).size() == 2 and float(tr.get("might", Trials.MIGHT)[0]) >= 1.0, "trial %s: why it is hard, and it is harder than an ordinary boss" % tid)
+		var pids := {}
+		var kinds := {}
+		for p in tr.paths:
+			check(not pids.has(p.id) and Trials.KINDS.has(p.kind) and str(p.n) != "" and str(p.desc).length() > 20 and fits.call(str(p.line)), "%s/%s: a named path of a known kind, described, with a line that fits" % [tid, p.id])
+			pids[p.id] = true
+			kinds[p.kind] = true
+			kinds_used[p.kind] = int(kinds_used.get(p.kind, 0)) + 1
+			check(not p.needs.is_empty(), "%s/%s asks for something" % [tid, p.id])
+			for k in p.boon:
+				check(k in boon_keys, "%s/%s: boon %s is understood by the battle" % [tid, p.id, k])
+			for n in p.needs:
+				var ok := need_kinds.has(str(n[0]))
+				match str(n[0]):
+					"lv", "peak":
+						ok = ok and int(n[1]) <= Data.MAX_LEVEL
+					"item", "give":
+						ok = ok and Data.ITEMS.has(str(n[1])) and int(n[2]) >= 1
+					"dao":
+						ok = ok and (str(n[1]) == "" or Data.DAOS.has(str(n[1]))) and int(n[2]) < Data.DAO_RANKS.size()
+					"standing":
+						ok = ok and Data.RACES.has(str(n[1])) and int(n[2]) <= Data.KIN
+				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
+				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
+					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
+		check(tr.paths.size() >= 3 and kinds.size() >= 3, "trial %s can be passed in at least three different ways (%d)" % [tid, kinds.size()])
+	for kd in Trials.KINDS:
+		check(int(kinds_used.get(kd, 0)) >= 2, "the road %s is offered by at least two trials (%d)" % [kd, int(kinds_used.get(kd, 0))])
+	var story_trials := 0
+	for st2 in Data.STEPS:
+		if Trials.trial_of_step(st2) != "":
+			story_trials += 1
+	check(story_trials >= 14, "the main story's chapter lords are guarded by trials (%d)" % story_trials)
+	for el in Data.ELEM_COLORS:
+		if el != "none":
+			check(Data.ITEMS.has(Trials.essence_of(el)), "foes of %s leave an essence that exists" % el)
+	for eid in Data.ENEMIES:
+		var el2: String = str(Data.ENEMIES[eid].elem)
+		check(el2 == "none" or Trials.essence_of(el2) != "", "%s leaves an essence" % eid)
+	for rid in Trials.RECIPES:
+		var r: Dictionary = Trials.RECIPES[rid]
+		check(Trials.STATIONS.has(str(r.at)) and Data.ITEMS.has(rid) and Data.step_index(str(r.after)) >= 0 and Trials.TRIALS.has(str(r.get("for", ""))), "recipe %s: made at a station, of a real item, listed from a real step, for a real trial" % rid)
+		var tstep := Data.step_index(Trials.GATE_STEP) if Trials.is_gate(str(r.for)) or str(r.for) == "chiyou" else -1
+		for i3 in Data.STEPS.size():
+			if Data.STEPS[i3].kind == "kill" and Data.STEPS[i3].boss == str(r.for):
+				tstep = i3
+		check(Data.step_index(str(r.after)) <= tstep, "recipe %s can be made before its trial" % rid)
+		for k2 in r.in:
+			check(Data.ITEMS.has(k2) and int(r.in[k2]) > 0, "recipe %s: input %s exists" % [rid, k2])
+			if str(k2).begins_with("ess_"):
+				# the essence can be hunted before the trial: some region on the way has foes of its element
+				var el3 := Trials.elem_of(str(k2))
+				var found := false
+				for i4 in tstep + 1:
+					var sa: String = str(Data.STEPS[i4].get("area", ""))
+					if sa == "" or not Data.AREAS.has(sa):
+						continue
+					var pools: Array = Data.AREAS[sa].get("pool", []) + Data.AREAS[sa].get("warband", {}).get("pool", [])
+					for pe in pools:
+						found = found or str(Data.ENEMIES[pe[0]].elem) == el3
+				check(found, "recipe %s: %s can be hunted on the way to its trial" % [rid, k2])
+			else:
+				# anything else is found on the quests before the trial
+				var got := false
+				for i5 in tstep:
+					var st5: Dictionary = Data.STEPS[i5]
+					got = got or (st5.kind == "collect" and st5.item == k2 and st5.n >= int(r.in[k2]))
+				for a5 in Data.AREAS:
+					for pk5 in Data.AREAS[a5].get("pickups", []):
+						got = got or (pk5.item == k2 and pk5.get("always", false))
+				check(got, "recipe %s: %s is found before its trial" % [rid, k2])
+	for did in Trials.DEEDS:
+		var d: Dictionary = Trials.DEEDS[did]
+		var npc_ok := false
+		for n5 in Data.AREAS.get(str(d.area), {}).get("npcs", []):
+			if str(n5.id) == str(d.npc):
+				var nv = n5.get("vis", ["", ""])
+				npc_ok = str(nv[1]) == "" and (str(nv[0]) == "" or Data.step_index(str(nv[0])) <= Data.step_index(str(d.after))) and not n5.has("floor")
+		check(npc_ok, "deed %s: %s lives in %s for good by the time they ask" % [did, d.npc, d.area])
+		check(Data.step_index(str(d.after)) >= 0 and int(d.renown) > 0 and fits.call(str(d.ask)) and fits.call(str(d.thanks)), "deed %s: asked from a real step, worth renown, and its lines fit" % did)
+		for k3 in d.want:
+			check(Data.ITEMS.has(k3) and int(d.want[k3]) > 0, "deed %s wants something that exists" % did)
+	check(Trials.DEEDS.size() >= 24, "townsfolk all over the world ask for help (%d deeds)" % Trials.DEEDS.size())
+	check(Trials.renown_title(0) == "Unknown" and Trials.renown_title(600) == "Legendary", "renown has titles")
+	# the rules, on a game state of their own
+	var G3 = load("res://scripts/game.gd").new()
+	G3.reset()
+	G3.level = 11
+	G3.exp = 0.0
+	check(Trials.need_met(["lv", 11], G3) and not Trials.need_met(["peak", 11], G3), "a level is met; the peak of a realm needs full cultivation")
+	G3.exp = float(G3.exp_need())
+	check(Trials.need_met(["peak", 11], G3), "cultivation full at the peak counts")
+	G3.stones = 1000
+	var wealth_p := Trials.path("demon_lord", "wealth")
+	check(not Trials.path_met("demon_lord", wealth_p, G3), "a path that costs more than Lin Feng has cannot be taken")
+	G3.stones = 3000
+	check(Trials.path_met("demon_lord", wealth_p, G3) and not G3.take_path("demon_lord", "wealth").is_empty() and G3.stones == 600, "taking the wealth path pays for it")
+	G3.stones = 0
+	check(Trials.path_met("demon_lord", wealth_p, G3) and not G3.take_path("demon_lord", "wealth").is_empty() and G3.stones == 0, "a path already paid for is not charged again after a lost battle")
+	check(not Trials.path_met("demon_lord", Trials.path("demon_lord", "respect"), G3), "respect must be earned")
+	G3.inv = {"ess_thunder": 6, "shard": 4}
+	G3.stones = 599
+	G3.step = Data.step_index("s_lord")
+	check(Trials.recipes_at("alchemist", G3).has("thunder_seal") and not Trials.can_craft("thunder_seal", G3), "the alchemist offers the talisman, but it costs stones too")
+	G3.stones = 700
+	check(G3.craft("thunder_seal") and G3.inv.thunder_seal == 1 and G3.inv.ess_thunder == 0 and G3.inv.shard == 2 and G3.stones == 100, "crafting uses up its essences, its quest items and its stones")
+	check(Trials.path_met("demon_lord", Trials.path("demon_lord", "craft"), G3) and not Trials.recipes_at("alchemist", G3).has("thunder_seal"), "the talisman opens the craft path, and is not offered twice")
+	G3.trial_won("demon_lord", "craft")
+	check(G3.trials.demon_lord == "craft" and G3.renown == Trials.RENOWN_TRIAL and Trials.favourite_kind(G3) == "craft", "a trial passed is remembered with its path, and the world hears of it")
+	G3.step = Data.step_index("s_lord")
+	var dd := Trials.deed_of("cook_zhou", G3)
+	check(dd == "deed_cook" and not G3.do_deed(dd), "Auntie Zhou asks for wood essence; nothing to give yet")
+	G3.inv["ess_wood"] = 5
+	var st0: int = G3.stones
+	check(G3.do_deed(dd) and G3.inv.ess_wood == 2 and G3.renown == Trials.RENOWN_TRIAL + int(Trials.DEEDS.deed_cook.renown) and G3.stones == st0 + int(Trials.DEEDS.deed_cook.stones) and Trials.deed_of("cook_zhou", G3) == "", "a deed takes what was asked, pays and raises renown, once")
+	G3.step = 0
+	check(Trials.deed_of("disciple_han", G3) == "", "nobody asks before the story gets there")
+	G3.reset()
+	check(G3.renown == 0 and G3.trials.is_empty() and G3.deeds.is_empty() and G3.gates_open.is_empty() and G3.paid.is_empty(), "a new game starts with no renown, trials, deeds or gates")
+	G3.step = Data.step_index("s_p13_gates")
+	for gk in 3:
+		G3.gates_open[Trials.GATES[gk]] = true
+	G3.poll_steps()
+	check(G3.cur_step().id == "s_p13_gates", "three gates do not break the lock")
+	G3.gates_open[Trials.GATES[5]] = true
+	G3.poll_steps()
+	check(G3.cur_step().id == "s_p13_heart", "any four of the Eight Gates, in any order, break it")
+	G3.free()
+	var weak_boss: Dictionary = Data.make_enemy("demon_lord", 12)
+	var trial_boss: Dictionary = Data.make_enemy("demon_lord", 12, 1.5, 1.15)
+	check(trial_boss.maxhp > weak_boss.maxhp * 1.4 and trial_boss.atk > weak_boss.atk * 1.1, "a trial's boss is stronger than the same boss unguarded")
+	print("== part XIII: the Eight Gates ==")
+	check(Data.REALMS.size() == 19 and Data.REALMS[18] == "Myriad Daos as One" and Data.MAX_LEVEL == 54 and Data.level_name(54).ends_with("Myriad Daos as One"), "Part XIII adds the Myriad Daos as One realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break18" and Data.DIALOGUE.has("recall11") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break17\": \"recall11\""), "Part XIII follows Ten Thousand Waters Return (recall11) and ends the game")
+	check(Trials.GATES.size() == 8 and Trials.GATES_NEEDED == 4, "eight gates, any four of which break the lock")
+	var gate_layers := {}
+	var gate_areas := {}
+	for gid in Trials.GATES:
+		var ga := Trials.boss_area(gid)
+		gate_areas[ga] = true
+		gate_layers[Data.layer_of(ga)] = int(gate_layers.get(Data.layer_of(ga), 0)) + 1
+		var gb: Dictionary = {}
+		for b5 in Data.AREAS[ga].bosses:
+			if b5.id == gid:
+				gb = b5
+		check(gb.get("vis", ["", ""])[0] == Trials.GATE_STEP and Trials.TRIALS.has(gid) and Trials.GATE_NAMES.has(gid), "%s: a General of the Eight Gates in %s, from the gates step on, guarded by a trial" % [gid, ga])
+		check(Data.DIALOGUE.has("pre:" + gid) and Data.DIALOGUE.has("post:" + gid), "%s has something to say before and after" % gid)
+	check(gate_areas.size() == 8 and gate_layers.get("surface", 0) == 2 and gate_layers.get("heaven", 0) == 2 and gate_layers.get("under", 0) == 2 and gate_layers.get("sea", 0) == 2, "two gates in each of the four realms")
+	var roads := {}
+	for p6 in Trials.TRIALS.chiyou.paths:
+		roads[p6.id] = true
+		for key6 in ["post:chiyou", "s_p13_end", "post:s_break18"]:
+			check(Data.ROUTE_LINES.has(key6) and not Data.ROUTE_LINES[key6].get(p6.id, []).is_empty(), "the road %s tells %s its own way" % [p6.id, key6])
+			for ln6 in Data.ROUTE_LINES[key6].get(p6.id, []):
+				check(fits.call(str(ln6[1])) and (ln6.size() == 2 or Data.EMOTES.has(str(ln6[2]))), "%s/%s: a line that fits the box" % [key6, p6.id])
+	check(roads.has("sword") and roads.has("peoples") and roads.has("cauldron"), "three roads into the heart: the Sword, the Many Peoples and the Cauldron")
+	var bands := 0
+	for a6 in Data.AREAS:
+		var band: Dictionary = Data.AREAS[a6].get("warband", {})
+		if band.is_empty():
+			continue
+		bands += 1
+		check(Data.step_index(str(band.vis)) >= 0 and int(band.n) > 0, "%s: the war-band marches from a real step" % a6)
+		for pe6 in band.pool:
+			check(Data.ENEMIES.has(pe6[0]) and not Data.ENEMIES[pe6[0]].get("boss", false) and int(pe6[1]) > 50, "%s: war-band soldier %s is one of Chiyou's, at Part XIII's level" % [a6, pe6[0]])
+		var mw := MapGen.build(a6)
+		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis))
+		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
+	check(bands == 8, "the war-bands march in every gate's region, the heart's among them (%d)" % bands)
+	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
+	# the Conclave's invitations: any four of eight leaders, in any order
+	var visits_steps := 0
+	for st7 in Data.STEPS:
+		if st7.kind != "visits":
+			continue
+		visits_steps += 1
+		check(int(st7.n) >= 1 and int(st7.n) < st7.npcs.size(), "%s: any %d of %d, so there is a choice" % [st7.id, st7.n, st7.npcs.size()])
+		var realms7 := {}
+		for nid in st7.npcs:
+			var na := Trials.npc_area(str(nid))
+			realms7[Data.layer_of(na)] = true
+			check(na != "" and Data.DIALOGUE.has("visit:" + str(nid)), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
+		check(realms7.size() >= 3, "%s: the people to visit live in at least three realms" % st7.id)
+	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
+	for st8 in Data.STEPS:
+		if st8.kind == "hunt" and st8.has("of"):
+			var band8: Dictionary = Data.AREAS[st8.area].get("warband", {})
+			var marching8 := {}
+			for pe8 in band8.get("pool", []):
+				marching8[pe8[0]] = true
+			for fid in st8.of:
+				check(Data.ENEMIES.has(fid) and marching8.has(fid), "%s hunts %s, who marches in %s" % [st8.id, fid, st8.area])
+	var G5 = load("res://scripts/game.gd").new()
+	G5.reset()
+	G5.step = Data.step_index("s_p13_hunt")
+	G5.record_kills("maple", 3, ["maple_fox", "maple_fox", "lost_lantern"])
+	G5.record_kills("maple", 2, ["jiuli_warrior", "maple_fox"])
+	check(G5.hunt == 1, "a hunt for Chiyou's war-band counts only the war-band (not the gorge's own beasts, which scatter)")
+	G5.free()
+	var G4 = load("res://scripts/game.gd").new()
+	G4.reset()
+	G4.step = Data.step_index("s_p13_envoys")
+	for vk in ["ming_yi", "xu_qian", "yu_hua"]:
+		G4.visited[vk] = true
+	G4.poll_steps()
+	check(G4.cur_step().id == "s_p13_envoys", "three invitations are not enough")
+	G4.visited["bu_si"] = true
+	G4.poll_steps()
+	check(G4.cur_step().id == "s_p13_chiyou", "any four leaders, in any order, and the way into Zhuolu is open")
+	G4.free()
 	print("== towns and world-building ==")
 	var town_ids := {}
 	for tw in Data.TOWNS:

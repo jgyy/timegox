@@ -555,11 +555,19 @@ func _floor_view(fid: String) -> void:
 func ent_visible(e: Dictionary) -> bool:
 	match e.kind:
 		"enemy":
-			return not Game.defeated.has(e.id)
+			if Game.defeated.has(e.id):
+				return false
+			# the war-bands of the Eight Gates (Part XIII) only march once the formation wakes
+			var ev = e.get("vis", ["", ""])
+			return ev[0] == "" or Game.reached(ev[0])
 		"seal", "ladder", "abode":
 			return true
 		"boss":
-			return not Game.boss_done.has(e.enemy)
+			if Game.boss_done.has(e.enemy):
+				return false
+			# a boss who only appears later in the story (the Gate Generals and Chiyou, Part XIII)
+			var bv = e.get("vis", ["", ""])
+			return bv[0] == "" or Game.reached(bv[0])
 		"pickup":
 			if Game.taken.has(e.id):
 				return false

@@ -31,6 +31,10 @@ var first_blow := true
 var vajra_used := false
 var tide_used := false
 var suppress_note := ""
+## Many roads (trials.gd): what the path taken through a trial does in this battle (its boon), and
+## whether the trial's boss has been brought low enough to be enraged
+var boon := {}
+var enraged := false
 
 # 3D stage
 var stages := {}
@@ -230,6 +234,14 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	for i in Game.party_size():
 		party.append(Game.fighter(i))
 	foes = Data.make_foes(foe_list)
+	# the path taken through a trial shapes the battle: a talisman, allies, a bought advantage
+	boon = c.get("boon", {})
+	enraged = false
+	if not c.get("tribulation", false):
+		for f in foes:
+			if f.boss:
+				f.hp = float(f.maxhp) * float(boon.get("foe_hp", 1.0))
+				f.atk = float(f.atk) * float(boon.get("foe_atk", 1.0))
 	first_blow = true
 	vajra_used = false
 	tide_used = false
@@ -270,6 +282,8 @@ func start(foe_list: Array, c: Dictionary) -> void:
 			suppress_note = "Realm suppression: their %s weighs on you (x%.2f)" % [Data.REALMS[Data.realm_of(top)], Data.suppression(Game.level, top)]
 		if suppress_note != "":
 			say(suppress_note)
+	if str(c.get("path_n", "")) != "":
+		say("%s: %s" % [str(c.get("path_kind", "")), str(c.path_n)])
 
 func say(s: String) -> void:
 	log_lines.append(s)
@@ -319,12 +333,15 @@ func _next_turn() -> void:
 			all.shuffle()
 			all.sort_custom(func(a, b): return a.spd > b.spd)
 			# the crown of Spirit Sense: Lin Feng moves first in the first round
-			if round_no == 1 and Game.talent_crown("spirit_sense"):
+			if round_no == 1 and (Game.talent_crown("spirit_sense") or boon.get("first", false)):
 				for k in all.size():
 					if all[k].side == "party" and all[k].idx == 0:
 						all.push_front(all.pop_at(k))
 						break
 			order = all
+			# allies a trial's path brought strike at the start of every round
+			if _assist():
+				continue
 		cur = order.pop_front()
 		if not cur.dead:
 			break
@@ -347,12 +364,40 @@ func _next_turn() -> void:
 		_foe_act(cur)
 		state = "acting"
 
+## The allies a trial's path brought (the sect's elders, a people's warriors) strike every boss at the
+## start of a round for a share of its health.  Returns whether the battle is over because of it.
+func _assist() -> bool:
+	var share := float(boon.get("assist", 0.0))
+	if share <= 0.0:
+		return false
+	for f in alive(foes):
+		if not f.boss:
+			continue
+		var dmg := maxi(1, int(float(f.maxhp) * share))
+		f.hp = maxf(0.0, f.hp - dmg)
+		f.flash = 0.35
+		fx.append({"text": str(dmg), "p": head3(f), "t": 1.0, "col": Color("8ae0c0"), "slash": ""})
+		say("Your allies strike %s for %d." % [f.name, dmg])
+		if f.hp <= 0.0:
+			f.dead = true
+			Game.kills += 1
+			if f.has("model"):
+				Models.act(f.model, "die", t)
+			say("%s is defeated." % f.name)
+	return alive(foes).is_empty()
+
 func _foe_act(f: Dictionary) -> void:
 	var tg: Array = alive(party)
 	if f.boss and f.turns % 3 == 0:
-		say("%s unleashes a devastating attack!" % f.name)
+		# a talisman or a ward (a trial's path) blunts the worst of it
+		var heavy := 1.45
+		if boon.get("no_heavy", false):
+			heavy = 1.1
+			say("%s unleashes a devastating attack, but it is blunted!" % f.name)
+		else:
+			say("%s unleashes a devastating attack!" % f.name)
 		for p in tg:
-			_hit(f, p, 1.45, f.elem, true)
+			_hit(f, p, heavy, f.elem, true)
 		timer = 1.3
 		return
 	var victim: Dictionary = tg[randi() % tg.size()]
@@ -380,6 +425,9 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 			say("%s strikes at a reflection." % a.name)
 			return 0
 	var weak_k := Game.dao_mod("weak", 1.5) if a.side == "party" else 1.5
+	# a trial's path can show where a foe is weakest (a lens, a Dao)
+	if a.side == "party" and boon.has("weak_k"):
+		weak_k = maxf(weak_k, float(boon.weak_k))
 	var em := weak_k if tgt.weak == elem and elem != "phys" else 1.0
 	var raw: float = a.atk * mult * randf_range(0.9, 1.1) * em - tgt.def * 0.5
 	# realm suppression (Part XII): a realm above weighs on a realm below; a tribulation is heaven
@@ -389,6 +437,8 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	if tgt.side == "party":
 		# Formations and the Heart (and the shades' friendship) soften every blow; so does a Vajra Body
 		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0))
+		# and a formation or allies a trial's path brought
+		raw *= float(boon.get("taken", 1.0))
 	var lf: bool = a.side == "party" and a.idx == 0
 	var crit := randf() < 0.08 + (Game.talent_mod("crit") if lf else 0.0)
 	# the crown of the Sword Bone: Lin Feng's first blow of the battle always lands true
@@ -426,6 +476,11 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		if big:
 			cam_shake = 0.35
 			main.fx_flash(col.lerp(Color.WHITE, 0.5), 0.22 if tgt.side == "foe" else 0.3)
+	# a trial's boss brought low is enraged, once (trials.gd): it is harder than the bosses before it
+	if tgt.side == "foe" and tgt.boss and str(ctx.get("trial", "")) != "" and not enraged and tgt.hp > 0.0 and tgt.hp < tgt.maxhp * Trials.ENRAGE_AT:
+		enraged = true
+		tgt.atk = float(tgt.atk) * Trials.ENRAGE
+		say("%s is enraged!" % tgt.name)
 	if tgt.hp <= 0.0:
 		tgt.dead = true
 		if tgt.has("model"):
@@ -532,6 +587,22 @@ func _win() -> void:
 		xp = 0
 		stones = 0
 		result_lines = ["The tribulation is endured!"]
+	else:
+		# essences (trials.gd): what the foes leave behind, for the cauldron, the forge and the townsfolk
+		var ess := {}
+		for f in foes:
+			var ek := Trials.essence_of(str(f.elem))
+			if ek == "":
+				continue
+			var n: int = Trials.ESS_BOSS if f.boss else (1 if randf() < Trials.ESS_DROP + Game.talent_mod("drop") else 0)
+			if n > 0:
+				ess[ek] = int(ess.get(ek, 0)) + n
+		var got: Array = []
+		for ek in ess:
+			Game.add_item(ek, ess[ek])
+			got.append("%d %s" % [ess[ek], Data.ITEMS[ek].n])
+		if not got.is_empty():
+			result_lines.append("Essences: " + ", ".join(got))
 	Game.stones += stones
 	if boss and not ctx.get("tribulation", false):
 		var fav := 3 if Game.talent_crown("fortune") else 2
@@ -831,9 +902,9 @@ func _draw_ui() -> void:
 		UI.menu_list(self, Rect2(16, 556, 270, 150), labels, cursor, enabled, 20 if labels.size() < 5 else 16)
 		UI.text(self, Vector2(20, 548), "%s's turn" % cur.name, 15, UI.C_GOLD)
 	elif state == "result":
-		UI.panel(self, Rect2(320, 150, 640, 230))
+		UI.panel(self, Rect2(320, 150, 640, 254))
 		var yy2 := 205.0
 		for i in result_lines.size():
 			UI.text(self, Vector2(320, yy2), result_lines[i], 32 if i == 0 else 20, UI.C_GOLD if i == 0 else UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, 640)
 			yy2 += 50 if i == 0 else 34
-		UI.text(self, Vector2(320, 360), "Press Enter", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 640)
+		UI.text(self, Vector2(320, 390), "Press Enter", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 640)

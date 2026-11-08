@@ -49,6 +49,16 @@ var talent_pts := 0
 var awakenings := 0
 var abodes := {}
 var scattered := 0
+## Many roads (Part XIII's release, see trials.gd): Lin Feng's renown (the respect of the world), the
+## trials he has passed and the path he took through each, the paths he has already paid for (a lost
+## battle does not charge twice), the deeds he has done for townsfolk and the Eight Gates he has opened
+var renown := 0
+var trials := {}
+var paid := {}
+var deeds := {}
+var gates_open := {}
+## the leaders Lin Feng has carried the Conclave's invitations to (Part XIII)
+var visited := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -91,6 +101,12 @@ func reset() -> void:
 	awakenings = 0
 	abodes = {}
 	scattered = 0
+	renown = 0
+	trials = {}
+	paid = {}
+	deeds = {}
+	gates_open = {}
+	visited = {}
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
 	note("Journey begins")
@@ -271,6 +287,12 @@ func race_tier(race: String) -> int:
 func race_title(race: String) -> String:
 	return ["Stranger", "Friend", "Kin"][race_tier(race)]
 
+## A people's name to start a sentence with: "The Shades of Youdu", "The Thousand Children of Landfall"
+## (whose names already begin with "The": the toast used to read "The The Thousand Children...").
+static func the_race(race: String) -> String:
+	var n: String = str(Data.RACES[race].n)
+	return n if n.begins_with("The ") else "The " + n
+
 ## Standing grows with help given; walking the Dao a people honours makes it grow half as fast again.
 func race_gain(race: String, n: int) -> void:
 	if not Data.RACES.has(race) or race == "human":
@@ -282,8 +304,8 @@ func race_gain(race: String, n: int) -> void:
 	standing[race] = mini(int(standing.get(race, 0)) + n, Data.KIN)
 	var after := race_tier(race)
 	if after > before:
-		toast("The %s call you %s" % [Data.RACES[race].n, race_title(race)])
-		note("The %s call Lin Feng %s" % [Data.RACES[race].n, race_title(race)])
+		toast("%s call you %s" % [the_race(race), race_title(race)])
+		note("%s call Lin Feng %s" % [the_race(race), race_title(race)])
 		if after == 1 and str(Data.RACES[race].boon_n) != "":
 			toast("Boon: %s" % Data.RACES[race].boon_n)
 
@@ -295,6 +317,7 @@ func give_gift(race: String) -> bool:
 		return false
 	inv[item] -= 1
 	race_gain(race, 12)
+	add_renown(Trials.RENOWN_GIFT)
 	return true
 
 ## The boons of the peoples who call Lin Feng friend: spd (speed), atk, miss, heal, hp and taken
@@ -359,9 +382,14 @@ func add_exp(x: float) -> bool:
 		poll_steps()
 	return gained
 
-func record_kills(a: String, n: int) -> void:
+func record_kills(a: String, n: int, ids: Array = []) -> void:
 	var s := cur_step()
 	if not s.is_empty() and s.kind == "hunt" and s.area == a:
+		# a hunt for particular foes (Part XIII: Chiyou's war-band) counts only those
+		if s.has("of") and not ids.is_empty():
+			n = ids.filter(func(id): return str(id) in s.of).size()
+		elif s.has("of"):
+			n = 0
 		hunt += n
 		poll_steps()
 
@@ -427,6 +455,12 @@ func poll_steps() -> void:
 				ok = hunt >= s.n
 			"breakthrough":
 				ok = level >= s.to and not finished
+			"gates":
+				# Part XIII: any of the Eight Gates, in any order
+				ok = gates_open.size() >= int(s.n)
+			"visits":
+				# any of the people named, in any order
+				ok = visits_done(s) >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -442,7 +476,82 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(inv.get(s.item, 0), s.n), s.n]
 	elif s.kind == "hunt":
 		t += "  (%d/%d)" % [mini(hunt, s.n), s.n]
+	elif s.kind == "gates":
+		t += "  (%d/%d)" % [mini(gates_open.size(), int(s.n)), int(s.n)]
+	elif s.kind == "visits":
+		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
+	if Trials.trial_of_step(s) != "" or s.kind == "gates":
+		# a trial: more than one way to prepare for it (Esc > Journal)
+		t += "  - a trial: Esc > Journal"
 	return t
+
+# ---------------------------------------------------------------- many roads (see trials.gd)
+func renown_title() -> String:
+	return Trials.renown_title(renown)
+
+## The world thinks a little better of Lin Feng; a new title is news.
+func add_renown(n: int) -> void:
+	if n <= 0:
+		return
+	var before := Trials.renown_title(renown)
+	renown += n
+	var after := Trials.renown_title(renown)
+	if after != before:
+		toast("Renown: the world calls you %s" % after)
+		note("Renown %d: %s" % [renown, after])
+
+## Take path `pid` through the trial in front of boss `tid`: what it costs is paid now (once), and the
+## path is returned for the battle.  An empty dictionary if it cannot be taken.
+func take_path(tid: String, pid: String) -> Dictionary:
+	var p := Trials.path(tid, pid)
+	if p.is_empty() or not Trials.path_met(tid, p, self):
+		return {}
+	Trials.pay(tid, p, self)
+	note("Faced %s %s: %s" % [Data.ENEMIES[tid].n, str(Trials.KINDS[p.kind].n).to_lower(), str(p.n)])
+	return p
+
+## A trial passed: remembered with the path that passed it, and the world hears of it.
+func trial_won(tid: String, pid: String) -> void:
+	trials[tid] = pid
+	add_renown(Trials.RENOWN_TRIAL)
+
+## Make something at a cauldron or a forge.
+func craft(id: String) -> bool:
+	if not Trials.craft(id, self):
+		return false
+	toast("Crafted %s" % Data.ITEMS[id].n)
+	note("Crafted " + str(Data.ITEMS[id].n))
+	return true
+
+## Do what a townsperson asked: they take what they wanted, pay what they can, and Lin Feng's name
+## goes round.
+func do_deed(id: String) -> bool:
+	if deeds.has(id) or not Trials.deed_ready(id, self):
+		return false
+	var d: Dictionary = Trials.DEEDS[id]
+	for k in d.want:
+		inv[k] = int(inv.get(k, 0)) - int(d.want[k])
+	deeds[id] = true
+	stones += int(d.get("stones", 0))
+	toast("Deed done: +%d renown, +%d spirit stones" % [int(d.renown), int(d.get("stones", 0))])
+	note("A deed for %s" % Trials.npc_name(str(d.npc)))
+	add_renown(int(d.renown))
+	return true
+
+## How many of the people a "visits" step names Lin Feng has been to.
+func visits_done(s: Dictionary) -> int:
+	var k := 0
+	for id in s.get("npcs", []):
+		if visited.has(id):
+			k += 1
+	return k
+
+## Total essences of all kinds in hand.
+func essences() -> int:
+	var n := 0
+	for k in Trials.ESSENCE_ORDER:
+		n += int(inv.get(k, 0))
+	return n
 
 # ---------------------------------------------------------------- items
 func add_item(id: String, n: int = 1) -> void:

@@ -5,6 +5,8 @@ extends Node
 
 var main
 var dir := ""
+## the playthrough bot's plan through the trials (the screenshots show a game that took those roads)
+const BOT := preload("res://scripts/bot.gd")
 
 const ELEMS := {"penglai": "earth", "fangzhang": "water", "yingzhou": "thunder", "guixu": "fire", "juntian": "thunder", "changhe": "wood", "ninesprings": "thunder", "youdu": "fire", "sect": "phys", "bamboo": "fire", "marsh": "fire", "frost": "thunder", "thunder": "earth", "palace": "water", "dragon": "thunder", "volcano": "water", "void": "dark", "celestial": "thunder", "mirror": "thunder", "grave": "fire", "time": "dark", "origin": "thunder", "cloudsea": "thunder", "court": "fire", "forge": "water", "garden": "fire", "dunes": "wood", "fungal": "fire", "aurora": "earth", "chaos": "thunder", "maple": "water", "karst": "thunder", "springs": "fire", "wheel": "thunder", "mountain": "phys", "village": "thunder", "terraces": "earth", "silk": "fire", "loom": "fire", "starferry": "earth", "magpie": "wood", "starpalace": "earth", "jasper": "wood", "yanggu": "water", "millet": "fire", "fusang": "thunder", "guanghan": "thunder", "longmen": "earth", "drowned": "earth", "tushan": "water", "buzhou": "earth"}
 
@@ -426,6 +428,140 @@ func _part12_shots() -> void:
 	main.menu._build()
 	await _wait(0.5)
 	await _shot("world_map_sea")
+	main.pop()
+
+## Many roads and Part XIII (--part13): a trial's paths on the choice screen, the alchemist's
+## crafting, the Journal, a townsperson's request, two Gate Generals in their regions, the Journal
+## during the Eight Gates, a trial battle with allies striking, Chiyou, and the ending.
+func _part13_shots() -> void:
+	Game.reset()
+	Game.level = 11
+	Game.exp = float(Game.exp_need())
+	Game.companion = true
+	Game.temper = 3
+	Game.stones = 2650
+	Game.renown = 38
+	Game.deeds = {"deed_cook": true, "deed_gate": true}
+	Game.trials = {"iron_fang": "craft", "thunder_roc": "craft"}
+	Game.inv = {"hp_pill": 6, "qi_pill": 3, "ess_wood": 4, "ess_fire": 1, "ess_water": 7, "ess_earth": 2, "ess_thunder": 5, "ess_dark": 9, "ess_metal": 3, "shard": 4, "herb": 3, "jade": 2, "feather": 1}
+	Game.heal_full()
+	Game.step = Data.step_index("s_lord")
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.world.banner_t = 0.0
+	# the Demon Lord's trial: four ways, one of them open
+	main.open_trial({"enemy": "demon_lord", "lv": 12, "req": 11, "id": "boss_demon_lord", "pos": Vector2i.ZERO})
+	main.choice.cursor = 2
+	await _wait(0.6)
+	await _shot("trial_choice")
+	main.pop()
+	# Alchemist Mo's cauldron: one more Thunder Essence and the talisman can be made
+	main.shop.open("alchemist")
+	main.push("shop")
+	main.shop.cursor = main.shop.ids.find("craft:thunder_seal")
+	await _wait(0.5)
+	await _shot("crafting")
+	main.pop()
+	# the Journal: renown, essences, requests, the trial ahead
+	main.open_menu()
+	main.menu.mode = "journal"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("journal")
+	main.pop()
+	# a request: Old Shen's cracked bell
+	main.offer_deed({"id": "bell_shen", "n": "Old Shen the Bell-Ringer"}, "deed_bell")
+	await _wait(0.5)
+	await _shot("deed_request")
+	main.pop()
+	# Part XIII: two of the Eight Gates, standing in their regions in gold light
+	Game.level = 52
+	Game.exp = 0.0
+	Game.temper = 8
+	Game.stones = 420000
+	Game.renown = 470
+	Game.dao = "heart"
+	Game.dao_xp = {"sword": 44, "heart": 41}
+	for rc in Data.RACE_ORDER:
+		if rc != "human":
+			Game.standing[rc] = 64
+			Game.met[rc] = true
+	Game.standing["xian"] = 100
+	Game.step = Data.step_index("s_p13_gates")
+	Game.gates_open = {"liang": true, "red_banner": true}
+	Game.heal_full()
+	Game.deeds = {}
+	for did in Trials.DEEDS.keys().slice(0, 11):
+		Game.deeds[did] = true
+	Game.trials = {}
+	for tid in BOT.TRIAL_PLAN:
+		if not Trials.is_gate(tid):
+			Game.trials[tid] = BOT.TRIAL_PLAN[tid]
+	Game.trials["fetter_maple"] = "relic"
+	Game.trials["liang"] = "dao"
+	Game.inv = {"hp_pill": 8, "qi_pill": 4, "ess_wood": 23, "ess_fire": 31, "ess_water": 40, "ess_earth": 27, "ess_thunder": 18, "ess_dark": 35, "ess_metal": 12, "autumn_leaf": 1, "spring_water": 4, "noon_ember": 4, "jingwei_stone": 4, "wind_bell": 4, "shift_horn": 1}
+	for gs in [["gate_kui_drum", "kui_drum", Vector3(-12.0, 7.0, 13.0)], ["gate_fetter_maple", "fetter_maple", Vector3(-9.0, 13.0, 15.0)]]:
+		var ga := Trials.boss_area(str(gs[1]))
+		var gpos: Vector2i = Vector2i.ZERO
+		for b in Data.AREAS[ga].bosses:
+			if b.id == gs[1]:
+				gpos = b.pos
+		var lid := Data.layer_of(ga)
+		main.world.open_world()
+		main.world.enter_layer(lid)
+		main.world.teleport(_nearest_free(Atlas.to_world(ga, gpos + Vector2i(-5, 3))), lid)
+		main.world.facing = Vector2i(1, 0)
+		main.world.cam_q = 1
+		main.world._snap_cam()
+		var bp: Vector3 = main.world.wpos(Atlas.to_world(ga, gpos))
+		bp.y = main.world.ground_y(bp)
+		main.world.cam_override = Transform3D(Basis.IDENTITY, bp + gs[2]).looking_at(bp + Vector3(0, 3.0, 0), Vector3.UP)
+		await _wait(1.4)
+		await _shot(str(gs[0]))
+		main.world.cam_override = null
+	main.world.enter_layer("surface")
+	main.world.teleport(Atlas.to_world("sect", Vector2i(20, 9)), "surface")
+	main.open_menu()
+	main.menu.mode = "journal"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("journal_gates")
+	main.pop()
+	# a Gate General's trial battle, by the friendship of the foxes: allies strike every round
+	main.battle.start([{"id": "xingtian", "lv": 52, "mult": 1.3, "atk": 1.1}], {"entity": {"id": "boss_xingtian"}, "boss": true, "enemy": "xingtian", "theme": "changhe",
+		"trial": "xingtian", "path": "peoples", "boon": Trials.path("xingtian", "peoples").boon, "path_n": "Kin of the celestial foxes", "path_kind": "By friendship"})
+	main.push("battle")
+	await _wait(2.6)
+	main.battle._assist()
+	await _wait(0.5)
+	await _shot("battle_boss_xingtian")
+	main.pop()
+	# Chiyou at the heart, on the Road of the Many Peoples
+	Game.step = Data.step_index("s_p13_chiyou")
+	Game.level = 53
+	main.battle.start([{"id": "chiyou", "lv": 53, "mult": 2.0, "atk": 1.25}], {"entity": {"id": "boss_chiyou"}, "boss": true, "enemy": "chiyou", "theme": "maple",
+		"trial": "chiyou", "path": "peoples", "boon": Trials.path("chiyou", "peoples").boon, "path_n": "The Road of the Many Peoples", "path_kind": "By friendship"})
+	main.push("battle")
+	await _wait(2.9)
+	await _shot("battle_boss_chiyou")
+	main.pop()
+	# the ending, with the Eight Gates and the roads taken
+	Game.level = 54
+	Game.trials = BOT.TRIAL_PLAN.duplicate()
+	Game.trials["chiyou"] = "peoples"
+	Game.renown = 642
+	Game.deeds = {}
+	for did in Trials.DEEDS.keys().slice(0, 13):
+		Game.deeds[did] = true
+	Game.playtime = 55000.0
+	Game.kills = 3291
+	Game.battles = 1771
+	Game.meditated = 12730.0
+	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 3, "qi_sea": 3, "five_phase": 3, "fortune": 3, "yin_root": 3, "spirit_sense": 3, "insight": 3}
+	main.push("ending")
+	await _wait(14.0)
+	await _shot("ending")
 	main.pop()
 
 func _run() -> void:
@@ -856,6 +992,8 @@ func _run() -> void:
 		main.pop()
 	if main.args.has("part12"):
 		await _part12_shots()
+	if main.args.has("part13"):
+		await _part13_shots()
 	if main.args.has("gallery12"):
 		await _part12_galleries()
 	if main.args.has("ending"):
