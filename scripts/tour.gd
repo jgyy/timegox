@@ -621,6 +621,10 @@ func _props_shots() -> void:
 		await _wait(0.07)
 		if once:
 			main.world.player.set_meta("act_t", main.world.t - into + 0.1)
+		# and Yue Ling's answer to it, when it is a gesture (she laughs a second after), well begun
+		var cc := str(k.get("comp", "watch"))
+		if Game.companion and cc != "watch" and not main.world.COMP_LOOP.has(cc):
+			main.world.comp.set_meta("act_t", main.world.t - 0.7)
 		# a camera off to the side, looking across the hero at the thing
 		var hp: Vector3 = main.world.player.position
 		var c: Vector3 = main.world.ent_pos(e2)

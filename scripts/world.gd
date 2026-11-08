@@ -525,12 +525,17 @@ func _build_view(id: String) -> void:
 	# the things to do on the forest edge stand in little clearings of their own (only the look of the
 	# ground changes: the tile is as closed as ever)
 	var vg: PackedByteArray = sl.grid
+	var clear := {}
 	for e0 in lw.ents:
 		if e0.kind == "prop" and e0.area == id and not e0.has("furn"):
 			var lt: Vector2i = e0.pos - r.position
 			if lt.x >= 0 and lt.y >= 0 and lt.x < r.size.x and lt.y < r.size.y and vg[lt.y * r.size.x + lt.x] == MapGen.WALL:
 				vg[lt.y * r.size.x + lt.x] = MapGen.FLOOR
+				clear[lt] = true
+	# (and no house or pavilion of the wilds is built beside one, facing it)
+	Scatter.clearings = clear
 	var root := Terrain3D.build(vg, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
+	Scatter.clearings = {}
 	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS) + bb.off
 	scene3d.add_child(root)
 	var nodes := {}
@@ -897,8 +902,9 @@ func _use_step() -> void:
 func _use_begin() -> void:
 	var k: Dictionary = using.k
 	var clip := str(k.clip)
-	# (a gesture still going from before would play over the clip: it ends here)
+	# (a gesture still going from before, his or hers, would play over the clip: it ends here)
 	player.set_meta("act", "")
+	comp.set_meta("act", "")
 	if Props.ONCE.has(clip):
 		Models.act(player, clip, t)
 	if headless():
@@ -1054,7 +1060,7 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 		"boom":
 			Fx3D.shockwave(scene3d, c + Vector3(0, 1.1, 0), Color(1.0, 0.7, 0.5), 6.0, 0.9)
 		"notes":
-			Fx3D.drift(scene3d, c + Vector3(0, 0.55, 0), Color(1.0, 0.88, 0.5), "note", 2, 0.3, 0.55, 2.2, 0.4)
+			Fx3D.drift(scene3d, c + Vector3(0, 0.75, 0), Color(1.0, 0.88, 0.5), "note", 3, 0.34, 0.5, 2.2, 0.45)
 		"ripple":
 			Fx3D.shockwave(scene3d, Vector3(c.x, c.y + Terrain3D.WATER_Y + 0.05, c.z) - to_hero * 1.2, Color(0.8, 0.92, 1.0), 2.2, 1.2)
 		"ribbon":
