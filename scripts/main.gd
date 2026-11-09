@@ -142,6 +142,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_T:
 			# talk to Yue Ling (the Lotus release: bonds.gd)
 			press("talk")
+		KEY_F:
+			# swing the sword at what is in front of him (the Living Land release: havoc.gd)
+			press("strike")
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -160,6 +163,8 @@ func press(act: String) -> void:
 	if top == "world":
 		if act == "ride":
 			world.toggle_ride()
+		elif act == "strike":
+			world.strike()
 		elif act == "talk":
 			talk_yue()
 		elif act == "cancel":
@@ -345,6 +350,8 @@ func interact(e: Dictionary) -> void:
 	match e.kind:
 		"npc":
 			talk_npc(e)
+		"folk":
+			talk_folk(e)
 		"enemy":
 			# realm suppression in the world (Part XII): a pack two realms below Lin Feng will not fight him
 			if Game.scatters(e.group):
@@ -394,6 +401,31 @@ func interact(e: Dictionary) -> void:
 			# a thing to do (props.gd): Lin Feng steps up to it and does it
 			world.start_use(e)
 
+## The Living Land release (folk.gd): a word with one of the people of the towns.
+func talk_folk(e: Dictionary) -> void:
+	var fp: Dictionary = e.p
+	var lines := [[str(fp.n), Folk.line(fp, Game)]]
+	Game.folk_talk[str(fp.id)] = int(Game.folk_talk.get(str(fp.id), 0)) + 1
+	world.folk_talking = str(fp.id)
+	# Part XVI: a step's errand with the people of the towns (red paper from the merchants, red envelopes
+	# for the children on New Year's Day, folk.gd ERRANDS)
+	var s := Game.cur_step()
+	var done := false
+	if not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.folk_has(s, str(fp.id)) and Folk.ERRANDS.has(str(s.id)):
+		var er: Dictionary = Folk.ERRANDS[str(s.id)]
+		Game.folk_mark(s, str(fp.id))
+		Game.stones = maxi(0, Game.stones - int(er.price))
+		done = true
+		lines = [["Lin Feng", str(er.ask)], [str(fp.n), Folk.errand_line(str(s.id), fp)]]
+	say(lines, func():
+		world.folk_talking = ""
+		if done:
+			var er2: Dictionary = Folk.ERRANDS[str(s.id)]
+			Game.toast(("%s (%d of %d)" % [str(er2.toast), Game.folk_count(s), int(s.n)]) % str(fp.n))
+			Game.note(str(er2.toast) % str(fp.n))
+			Game.poll_steps()
+	)
+
 func talk_npc(e: Dictionary) -> void:
 	var s := Game.cur_step()
 	var race: String = str(e.get("race", ""))
@@ -416,6 +448,10 @@ func talk_npc(e: Dictionary) -> void:
 				# Part XII: his qi stirs for the first time, and with it the first branch of his root
 				Game.awaken("Lin Feng's qi stirred for the first time")
 				open_talent_choice()
+			if sid == "s_p16_doorgods":
+				# Part XVI: two boards of peach wood carved with the door gods' names
+				Game.add_item("peach_charm", 2)
+				Game.toast("Obtained %s x2" % Data.ITEMS.peach_charm.n)
 		)
 		return
 	# a fated encounter (fate.gd): a chapter of somebody's story, and a choice in it
@@ -436,12 +472,27 @@ func talk_npc(e: Dictionary) -> void:
 			Game.poll_steps()
 		)
 		return
+	# Part XVI: a town reminded of the old ways, in any order; its people come out and practise
+	if not s.is_empty() and s.kind == "rally" and str(e.id) in s.npcs and not Game.rallied.has(str(e.id)):
+		say(Data.DIALOGUE.get("rally:" + str(e.id), []), func():
+			Game.rallied[str(e.id)] = true
+			world.drill(str(e.get("area", Game.area)))
+			Game.toast("A town remembers the old ways (%d of %d)" % [Game.visits_done(s), int(s.n)])
+			Game.note("%s's town remembers the old ways" % str(e.n))
+			Game.poll_steps()
+		)
+		return
 	# a step that asks for visits, in any order (Part XIII: the Conclave's invitations): this is one
 	if not s.is_empty() and s.kind == "visits" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
 		say(Data.DIALOGUE.get("visit:" + str(e.id), []), func():
 			Game.visited[str(e.id)] = true
-			Game.toast("Invitation delivered (%d of %d)" % [Game.visits_done(s), int(s.n)])
-			Game.note("Invited " + str(e.n))
+			# (the Conclave's invitations, Part XIII; a step may say what a visit is instead: Part XVI's New Year calls)
+			if s.has("did"):
+				Game.toast("%s (%d of %d)" % [str(s.did) % str(e.n), Game.visits_done(s), int(s.n)])
+				Game.note(str(s.did) % str(e.n))
+			else:
+				Game.toast("Invitation delivered (%d of %d)" % [Game.visits_done(s), int(s.n)])
+				Game.note("Invited " + str(e.n))
 			if race != "":
 				Game.race_gain(race, 5)
 			Game.poll_steps()
@@ -728,7 +779,9 @@ func share_scene(e: Dictionary, sid: String) -> void:
 				if o.is_empty():
 					o = sh.options[0]
 				Bonds.lean(Game, str(o.get("lean", "")), 3)
-				Bonds.add(Game, 3, "by the lotus pond")
+				# (the closeness is credited to where it happened: every share used to say "by the lotus
+				# pond", the loom in the hermitage and the naming feast's stage too)
+				Bonds.add(Game, 3, Bonds.share_place(sid))
 				Game.note("With Yue Ling (%s): %s" % [str(Data.STEPS[Data.step_index(sid)].t).split(":")[0], str(o.label)])
 				after = o.get("after", [])
 			say(after, func():
@@ -970,7 +1023,7 @@ func start_breakthrough() -> void:
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
-	"s_break18": "recall12", "s_break19": "recall13"}
+	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14"}
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story
@@ -1009,6 +1062,7 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				)
 			elif ctx.get("boss", false):
 				var e: Dictionary = ctx.entity
+				world.battle_mark(e, true)
 				Game.boss_done[ctx.enemy] = true
 				# every boss is talked of; a trial passed is remembered with the path that passed it
 				Game.add_renown(Trials.RENOWN_BOSS)
@@ -1040,6 +1094,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					ask_picks()
 			else:
 				var e2: Dictionary = ctx.entity
+				# the Living Land release: the fight leaves its mark on the ground (havoc.gd)
+				world.battle_mark(e2, false)
 				Game.defeated[e2.id] = Game.playtime
 				Game.record_kills(e2.get("area", Game.area), e2.group.size(), e2.group.map(func(g): return g.id))
 		"lose":

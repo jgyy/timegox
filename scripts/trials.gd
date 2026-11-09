@@ -43,8 +43,10 @@ const KINDS := {
 	"bond": {"n": "By an old bond", "col": Color("f0a8d8"), "what": "somebody whose fate you shaped"},
 	# the Lotus release (Part XV): the two of them, side by side (bonds.gd)
 	"heart": {"n": "Side by side", "col": Color("ff9ac0"), "what": "how close you and Yue Ling have come"},
+	# the Living Land release (Part XVI): the people of the towns (folk.gd), who remember the old ways
+	"folk": {"n": "By the people", "col": Color("ffb060"), "what": "the towns that remember the old ways"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -124,6 +126,9 @@ const RECIPES := {
 	# ---- Part XV: a shuttle that weaves back what is unwoven, and a key that opens by leaving open
 	"lotus_shuttle": {"at": "alchemist", "in": {"ess_wood": 8, "ess_water": 4, "pressed_petal": 3}, "stones": 220000, "after": "s_p15_memories", "for": "unweaver"},
 	"open_key": {"at": "smith", "in": {"ess_metal": 8, "ess_dark": 5, "pressed_petal": 2}, "stones": 240000, "after": "s_p15_memories", "for": "lock_warden"},
+	# ---- Part XVI (the Living Land release): red, fire and noise
+	"thunder_cracker": {"at": "alchemist", "in": {"ess_fire": 8, "thunder_bamboo": 2}, "stones": 260000, "after": "s_p16_bamboo", "for": "xi_beast"},
+	"hearth_lantern": {"at": "smith", "in": {"ess_fire": 6, "ess_metal": 5, "thunder_bamboo": 2}, "stones": 280000, "after": "s_p16_hunt", "for": "nian"},
 	"homing_elixir": {"at": "alchemist", "in": {"ess_wood": 5, "ess_fire": 5, "ess_water": 5, "ess_earth": 5, "ess_metal": 5, "autumn_leaf": 1}, "stones": 300000, "after": "s_p13_gates", "for": "chiyou"},
 }
 
@@ -893,6 +898,42 @@ const TRIALS := {
 				"desc": "Late Kindred cultivation within reach and a sword tempered eight times: fast enough to cut every thread the Unweaver holds before it can wind it.",
 				"line": "Lin Feng goes in under the hundred hands, and the sword is quicker than the spindle."},
 		]},
+	# ---- Part XVI (the Living Land release): the Last Night and the Year Beast
+	"xi_beast": {"might": [2.1, 1.25],
+		"why": "Xi is the last night of the year, and it has eaten the hours with the light: until the year is driven out the night will not end, and every lamp it swallows makes it longer.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Charms of peach wood", "needs": [["give", "peach_charm", 1]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "The door gods under the great peach tree gave you two boards of peach wood carved with their names. Everything that comes out of the dark hates peach wood, and Xi is nothing but dark.",
+				"line": "Lin Feng nails the peach-wood board to the lantern pole, and Xi recoils from the names on it as from a flame."},
+			{"id": "folk", "kind": "folk", "n": "Every gong in the market", "needs": [["rallied", 3]], "boon": {"assist": 0.035},
+				"desc": "Three towns remember the old ways, and the word has run down the roads ahead of you: the Dawn Market's stallholders come out with gongs and pans and strike every time Xi does.",
+				"line": "Watchman Zhou's gong starts it, and then every pan in Yanggu: Xi cannot hear itself think."},
+			{"id": "craft", "kind": "craft", "n": "Thunder-bamboo crackers", "needs": [["item", "thunder_cracker", 1]], "boon": {"foe_hp": 0.7, "weak_k": 1.5},
+				"desc": "Alchemist Mo can pack two stalks of thunder bamboo with fire essence into a string of crackers loud enough to drive off a night. The first firecrackers were bamboo thrown on a fire; these are the loudest ever made.",
+				"line": "The string of thunder-bamboo crackers goes off at Xi's feet, a hundred bangs in a row, and the Last Night flinches from every one."},
+			{"id": "might", "kind": "might", "n": "Cut the night in two", "needs": [["lv", 61], ["temper", 8]], "boon": {},
+				"desc": "Middle Kindred Dao and a sword tempered eight times: fast enough to cut a coil of night before it can close round you.",
+				"line": "Lin Feng's sword goes through the dark like a lamp through a curtain."},
+		]},
+	"nian": {"might": [2.3, 1.3],
+		"why": "Nian is the year: every fear of the longest year the world has ever had, eaten in its sleep. It has never been this big or this hungry, and it is very hard to frighten something made of fear.",
+		"paths": [
+			{"id": "folk", "kind": "folk", "n": "Every pot in the land", "needs": [["rallied", 4]], "boon": {"assist": 0.045, "taken": 0.85},
+				"desc": "Four towns remember the old ways, and the word has gone down every road. All Qingshi is out in the lane with woks, ladles and a temple bell, and the noise of it goes into Nian like a sword.",
+				"line": "Granny Wen raises her ladle, and two hundred pots answer her: the Year Beast staggers in the noise."},
+			{"id": "heart", "kind": "heart", "n": "Not alone", "needs": [["heart", 3]], "boon": {"assist": 0.04, "taken": 0.8},
+				"desc": "Lin Feng and Yue Ling have become kindred spirits. In a thousand years Nian has never eaten a family that stayed up together, and the two of them have been up together all year.",
+				"line": "Yue Ling takes his hand, and Nian, looking for somebody alone in the dark, cannot find anybody."},
+			{"id": "craft", "kind": "craft", "n": "The Lantern of Ten Thousand Doors", "needs": [["item", "hearth_lantern", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Smith Tie can raise a great red lantern of bronze and thunder bamboo, hot with fire essence and hard with metal: red, fire and noise all at once, in one light.",
+				"line": "The great red lantern swings up over the lane, crackling and blazing, and Nian cannot look at it."},
+			{"id": "respect", "kind": "respect", "n": "The name the world knows", "needs": [["renown", 900]], "boon": {"assist": 0.03, "taken": 0.9},
+				"desc": "Renown of 900: every family in the land tells the story of the sweeper who swept the sky. Nian has eaten a great many fears, but never one with a name like yours in it.",
+				"line": "Nian hears the name Lin Feng in a thousand stories at once, and for the first time in a thousand years it is the one afraid."},
+			{"id": "might", "kind": "might", "n": "Drive the year out", "needs": [["lv", 62], ["temper", 8]], "boon": {},
+				"desc": "Late Kindred Dao and a sword tempered eight times: strength enough to drive a whole year out of the village by hand.",
+				"line": "Lin Feng stands in the lane between the beast and the village, and does not move."},
+		]},
 	"lock_warden": {"might": [2.2, 1.25],
 		"why": "Suo was the part of the Lotus Seal that was always a lock. For three hundred years it took Yue Ling back and made her new whenever a bearer died. It will not let her go now: in the lock, it says, she can never be lost.",
 		"paths": [
@@ -961,6 +1002,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"heart":
 			# the Lotus release: how close Lin Feng and Yue Ling have come (bonds.gd)
 			return Bonds.level(g) >= int(n[1])
+		"rallied":
+			# the Living Land release: the towns reminded of the old ways (Part XVI)
+			return g.rallied.size() >= int(n[1])
 	return false
 
 ## How many peoples of the realms call Lin Feng friend (or kin).
@@ -1014,6 +1058,8 @@ static func need_text(n: Array, g) -> String:
 			return "%d of the five you met on the road stand with you (now %d)" % [int(n[1]), Fate.allies(g)]
 		"heart":
 			return "You and Yue Ling: %s at least (now %s)" % [Bonds.TITLES[int(n[1])], Bonds.title(g)]
+		"rallied":
+			return "%d towns reminded of the old ways: red, fire and noise (now %d)" % [int(n[1]), g.rallied.size()]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).

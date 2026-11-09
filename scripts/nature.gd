@@ -34,6 +34,8 @@ uniform float glow = 0.0;
 uniform float bright = 1.75;
 uniform float near_fade = 5.5;
 global uniform vec3 hero_pos;
+// the Living Land release (clock.gd): how dark it is; leaves lit by the sun stop glowing at night
+global uniform float night_k;
 uniform vec3 sun_tint : source_color = vec3(1.0, 0.96, 0.85);
 varying vec3 wp;
 varying float sway;
@@ -79,14 +81,14 @@ void fragment() {
 	if (!FRONT_FACING) {
 		NORMAL = -NORMAL;
 	}
-	vec3 c = COLOR.rgb * t.rgb * bright;
+	vec3 c = COLOR.rgb * t.rgb * bright * (1.0 - 0.3 * night_k);
 	ALBEDO = c;
 	ALPHA = t.a;
 	ALPHA_SCISSOR_THRESHOLD = cut;
-	BACKLIGHT = c * sun_tint * translucency;
+	BACKLIGHT = c * sun_tint * translucency * (1.0 - 0.6 * night_k);
 	ROUGHNESS = 0.75;
 	SPECULAR = 0.25;
-	EMISSION = c * glow * (0.7 + 0.3 * sin(TIME * 1.3 + wp.x * 0.7 + wp.z));
+	EMISSION = c * glow * (0.7 + 0.3 * sin(TIME * 1.3 + wp.x * 0.7 + wp.z)) * (1.0 - 0.7 * night_k);
 }
 """
 
@@ -124,6 +126,9 @@ void vertex() {
 	NORMAL = normalize(mix(NORMAL, vec3(0.0, 1.0, 0.0), 0.75));
 }
 
+// (and grass by night: no sunlit glow)
+global uniform float night_k;
+
 void fragment() {
 	if (!FRONT_FACING) {
 		NORMAL = -NORMAL;
@@ -133,9 +138,9 @@ void fragment() {
 	vec3 c = mix(root_col, tip, smoothstep(0.0, 1.0, hgt)) * COLOR.rgb;
 	c *= 0.92 + 0.16 * h21(floor(wp.xz * 9.0));
 	ALBEDO = c;
-	BACKLIGHT = c * 0.45 * hgt;
+	BACKLIGHT = c * 0.45 * hgt * (1.0 - 0.6 * night_k);
 	ROUGHNESS = 0.9;
-	EMISSION = c * glow * hgt;
+	EMISSION = c * glow * hgt * (1.0 - 0.7 * night_k);
 }
 """
 

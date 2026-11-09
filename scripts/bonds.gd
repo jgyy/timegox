@@ -385,6 +385,49 @@ const TALKS := [
 			{"id": "every", "label": "\"Every year. I'll remember the date.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Every year, on this night. I will remember the date. I will make you eat two bowls of noodles."], ["Yue Ling", "You will burn the noodles."], ["Lin Feng", "I will burn them with love."]]},
 			{"id": "here", "label": "\"The sect will never forget it now.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "The sect will never forget it now. Han will tell the new disciples about the night the healer was born."], ["Yue Ling", "He will get it wrong. He will say there was a dragon."], ["Lin Feng", "There should have been a dragon."]]},
 			{"id": "next", "label": "\"Where do you want your next birthday?\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Where do you want your next one? Penglai? The moon? The bottom of the sea?"], ["Yue Ling", "All three. In that order."]]}]},
+	# ---- Part XVI (the Living Land release): her first New Year, and the night that would not end
+	{"id": "t_newyear", "after": "s_p16_kitchen", "lines": [
+		["Yue Ling", "Lin Feng, every New Year before this one I was somewhere else. Some years I was a girl in a village nobody remembers. Some years I was a lotus in the pond, and the snow fell on me."],
+		["Yue Ling", "I can remember the snow. I cannot remember anybody ever putting a dumpling in my bowl."],
+		["Lin Feng", "Auntie Zhou will put twelve in your bowl. You will not be able to stop her."],
+		["Yue Ling", "Good. I want to be fed until I complain. I want to complain about it to somebody who laughs."],
+		], "ask": "What do you promise her for the New Year?",
+		"options": [
+			{"id": "bowl", "label": "\"I'll fill your bowl myself.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "I will fill your bowl myself, and laugh every time you complain."], ["Yue Ling", "That is a very specific vow. I accept it."]]},
+			{"id": "snow", "label": "\"We'll watch the snow together.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "We will watch the snow from the steps, together, with something hot."], ["Yue Ling", "From the steps. Like the lotus, but warmer. Yes."]]},
+			{"id": "towns", "label": "\"Every town's New Year with you.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "We will see how every town does it: lanterns in Yanggu, bells in Tushan, carp in the windows at Longmen."], ["Yue Ling", "Every town in one week? Lin Feng, that is the best idea you have ever had."]]},
+		]},
+	{"id": "t_hunger", "after": "s_p16_lean", "lines": [
+		["Yue Ling", "I knew a winter like that once. The ninth bearer's village, before he was a ferryman. The Lean Month came, and his mother gave him her rice and said she had eaten already."],
+		["Yue Ling", "She had not eaten already. I knew, and he knew, and nobody said so. That is what I remember: the three of us at the table, all pretending, so that the pretending would be enough."],
+		["Lin Feng", "Granny Wen used to do that. Every winter. I always knew."]],
+		"ask": "What do you say about the hungry winters?",
+		"options": [
+			{"id": "never", "label": "\"Nobody goes hungry on our mountain.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Then nobody goes hungry on our mountain again. Not while Auntie Zhou has a stove."], ["Yue Ling", "Not while she has a stove. That is a vow I believe."]]},
+			{"id": "share", "label": "\"I'll always say I've eaten.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "If there is ever only one bowl, I will say I have eaten already."], ["Yue Ling", "And I will know, and I will not say so. That is how it works, isn't it?"]]},
+			{"id": "feed", "label": "\"Then let's feed every village.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Then in spring we carry rice to every village that had a lean month."], ["Yue Ling", "Every village? That is a lot of rice. I will start a list."]]},
+		]},
+	{"id": "t_lastnight", "after": "s_p16_xi", "lines": [
+		["Yue Ling", "The night is not moving, Lin Feng. The stars have been in the same place for hours. Is this what it was like, the nine days of noon? Only dark?"],
+		["Lin Feng", "At noon nobody could sleep. Tonight nobody wants to."],
+		["Yue Ling", "I do not mind it. That is the strange part. If the night will not end, then we only have more of it."],
+		], "ask": "What do you say to her in the long night?",
+		"options": [
+			{"id": "stay", "label": "\"Then let's not waste it.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Then let us not waste it."], ["Yue Ling", "...You have become dangerously good at saying things, sweeper."]]},
+			{"id": "home", "label": "\"Everybody home first.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Let us get everybody home first. Then we can have all the night we want."], ["Yue Ling", "Everybody home. Yes. That is what tonight is for."]]},
+			{"id": "stars", "label": "\"Name me the stars.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "While they hold still, name me some stars."], ["Yue Ling", "That one is the Sweeper. That one is the Dumpling. That one is you, being slow."]]},
+		]},
+	{"id": "t_newday", "after": "s_p16_dawn", "lines": [
+		["Yue Ling", "Lin Feng. It is a new year, and I am in it. Last New Year I was a lotus nobody remembered. Now I have a page, and a bowl, and a door with my name spelt wrong on it."],
+		["Yue Ling", "What do people do on the first morning of a year? I want to do it properly."],
+		["Lin Feng", "They put on new clothes, they go round wishing everybody a good one, and they do not sweep, whatever happens."],
+		["Yue Ling", "Then I am wearing red, and you are coming with me, and if you so much as look at a broom I am telling Little Bai."]],
+		"ask": "What do you say on the first morning of her first year?",
+		"options": [
+			{"id": "red", "label": "\"Red suits you.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Red suits you."], ["Yue Ling", "Everything suits me today. It is my first morning. I could wear a cabbage."]]},
+			{"id": "round", "label": "\"Let's go round the sect.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Let us go round the sect, then. Everybody. Auntie Zhou first, or she will never forgive us."], ["Yue Ling", "Auntie Zhou first. Then everybody. Then Auntie Zhou again, for seconds."]]},
+			{"id": "out", "label": "\"And then down the mountain.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "And then down the mountain, to see how the towns did it."], ["Yue Ling", "Every town's first morning. Yes. Bring the red envelopes."]]},
+		]},
 ]
 
 static func talk(id: String) -> Dictionary:
@@ -704,6 +747,73 @@ static func take_memory(g, id: String, o: Dictionary) -> void:
 ## Kind "share" steps: Lin Feng and Yue Ling at the pond, and a choice.  The first leans her heart; the
 ## last is hers to make (FUTURES), with the one her heart leans to marked.
 const SHARES := {
+	# ---- Part XVI (the Living Land release): the last sweeping, the reunion dinner, the vigil and the first dawn
+	"s_p16_couplets": {"lines": [
+		["Narrator", "The Scripture Library smells of ink and cold stone. Yue Ling unrolls the red paper the merchants sold them across the desk, weighs the ends down with two of Archivist Lan's heaviest books, and grinds the ink herself, very seriously."],
+		["Yue Ling", "Two lines for the sides of the gate and four characters for over it. Every door in the land has them. They say what the household hopes for in the new year. Archivist Lan says your handwriting looks like a chicken walked through a puddle."],
+		["Lin Feng", "Archivist Lan has never seen a chicken walk through a puddle. It is beautiful."]],
+		"ask": "What do you write over the sect's gate?",
+		"options": [
+			{"id": "together", "label": "\"Two Brushes, One Spring\"", "lean": "companion", "after": [["Lin Feng", "Two brushes, one spring. You write half."], ["Yue Ling", "...I will write the half on the right. It is the better half. Do not argue."]]},
+			{"id": "home", "label": "\"The Door Is Always Open\"", "lean": "lotus", "after": [["Lin Feng", "The door is always open. Anybody who comes up the mountain, whatever they are."], ["Yue Ling", "The door is always open. The Founder would have liked that. She made a door once, after all."]]},
+			{"id": "roads", "label": "\"Every Road Comes Home\"", "lean": "wander", "after": [["Lin Feng", "Every road comes home. Even the long ones."], ["Yue Ling", "Especially the long ones. I am putting a little boat in the corner. Nobody will notice."]]},
+		]},
+	"s_p16_lanterns": {"lines": [
+		["Narrator", "On the fifteenth night of the first month the Dawn Market hangs every lantern it has ever made: rabbits, carp, dragons, lotuses, a lantern shaped like the sun that it is a little embarrassed about. Riddles hang from their tassels, and the whole market walks under them guessing."],
+		["Narrator", "Somebody remembers that the sweeper does sword forms on stages now. By the time Lin Feng has been told, the whole of Yanggu is standing round the stage at the crossroads with sweet dumplings in their hands, waiting."],
+		["Yue Ling", "Tangyuan: round, sweet, one for every person at the table. It means everybody is together. I ate eleven. Go on. They are all waiting for you."]],
+		"ask": "Under every lantern in Yanggu, who is the sword form for?",
+		"options": [
+			{"id": "her", "label": "\"For Yue Ling, who saw her first year in.\"", "lean": "companion", "after": [["Lin Feng", "This one is for Yue Ling, who saw her first year in."], ["Narrator", "The market cheers, and somebody hangs a lantern shaped like a lotus over her head, and she lets it stay."]]},
+			{"id": "town", "label": "\"For the Dawn Market, that kept its lamps lit.\"", "lean": "lotus", "after": [["Lin Feng", "For the Dawn Market, that kept its lamps lit when the Last Night came for them."], ["Narrator", "Night-Watchman Lao Zhou strikes his gong once, very loudly, and pretends there is something in his eye."]]},
+			{"id": "road", "label": "\"For the roads, all of them.\"", "lean": "wander", "after": [["Lin Feng", "For every road out of this town, and everybody coming home along them."], ["Narrator", "The caravan hands cheer loudest. Yue Ling is already reading the riddles on the lanterns pointing east."]]},
+		]},
+	"s_p16_sweep": {"lines": [
+		["Narrator", "The last sweeping of the year sweeps out the bad luck and nothing else: on New Year's Day itself nobody sweeps at all, or the good luck goes out with the dust. Lin Feng takes the old broom from beside the courtyard steps. His hands know it before he does."],
+		["Yue Ling", "Three years you swept these steps. What did you think about, all that time?"],
+		["Lin Feng", "The leaves. Whether there would be rice at supper. Whether anybody would ever look at me the way the Elder looked at the disciples who could fly."],
+		["Yue Ling", "And now everybody looks at you like that."],
+		["Lin Feng", "Little Bai doesn't. He looks at me as if I might take his broom back."],
+		], "ask": "What do you sweep out with the old year?",
+		"options": [
+			{"id": "fear", "label": "\"The fear. All of it.\"", "lean": "companion", "after": [["Lin Feng", "The fear. The whole year of it. Every time I thought you were gone."], ["Yue Ling", "Then sweep hard. I am not going anywhere, and I would like the courtyard to know it."]]},
+			{"id": "leaves", "label": "\"Just the leaves.\"", "lean": "lotus", "after": [["Lin Feng", "Just the leaves. The rest I want to keep, even the bad parts. They were ours."], ["Yue Ling", "Then we sweep the leaves, and keep the rest in a box under the bed."]]},
+			{"id": "dust", "label": "\"The dust of every road.\"", "lean": "wander", "after": [["Lin Feng", "The dust of every road we walked, so the next ones can start clean."], ["Yue Ling", "You are already thinking about the next roads. Good. So am I."]]},
+		]},
+	"s_p16_eve": {"lines": [
+		["Narrator", "On New Year's Eve the whole sect squeezes into the kitchen, because the hall is too cold and Auntie Zhou refuses to carry forty dishes across the courtyard in the snow. The Elder sits between Alchemist Mo and Smith Tie, who are not speaking. Little Bai has been given the chicken's head and is very proud of it."],
+		["Narrator", "Zao Jun sits on the stove with a bowl of his own. Nobody mentions that there is a god at dinner."],
+		["Yue Ling", "Lin Feng. This is my first. My first New Year's Eve. Everybody keeps putting dumplings in my bowl and I do not know how to make them stop."],
+		["Lin Feng", "You don't. That is the whole point. There is a coin in one of them, for luck."],
+		["Yue Ling", "...I think I swallowed it."],
+		], "ask": "What do you wish her for her first year?",
+		"options": [
+			{"id": "with", "label": "\"Every year, with me.\"", "lean": "companion", "after": [["Lin Feng", "That there are a great many more of these, and that I am sitting next to you at all of them."], ["Yue Ling", "That is two wishes. You are only allowed one. I will allow it."], ["Narrator", "Then the kitchen door bangs open on the snow, and a courier from Yanggu falls in out of the cold: the lanterns of the Dawn Market are going out, one by one, and something long and dark is eating them."]]},
+			{"id": "home", "label": "\"A home that is yours.\"", "lean": "lotus", "after": [["Lin Feng", "A home that is yours. This one, if you want it. Somewhere with your name on the door."], ["Yue Ling", "There is a door with my name on it. Little Bai painted it this morning. He spelt it wrong."], ["Narrator", "Then the kitchen door bangs open on the snow, and a courier from Yanggu falls in out of the cold: the lanterns of the Dawn Market are going out, one by one, and something long and dark is eating them."]]},
+			{"id": "far", "label": "\"Somewhere new every spring.\"", "lean": "wander", "after": [["Lin Feng", "Somewhere new every spring, and somewhere warm to come home to every New Year."], ["Yue Ling", "Then I wish you the same. We can argue about where."], ["Narrator", "Then the kitchen door bangs open on the snow, and a courier from Yanggu falls in out of the cold: the lanterns of the Dawn Market are going out, one by one, and something long and dark is eating them."]]},
+		]},
+	"s_p16_vigil": {"lines": [
+		["Narrator", "Granny Wen's house is small, warm and full of neighbours, because every family in Qingshi decided at once that the old woman should not keep the vigil alone, and then all decided to bring their own stools."],
+		["Granny Wen the Midwife", "Nobody sleeps tonight. Not the children, not the old, not the cat. That is the rule. Nian has never eaten a house that stayed awake together."],
+		["Yue Ling", "Is that why everybody stays up? Not for the year at all. For each other."],
+		["Granny Wen the Midwife", "Clever girl. He was never clever. He was good, which is rarer."],
+		["Narrator", "The candles burn down. Somebody's grandfather tells the story of the beggar and the bamboo, wrongly, and is corrected by four people at once. Out in the dark above the terraces, the mountain begins, very slowly, to move."],
+		], "ask": "What do you tell Granny Wen about Yue Ling?",
+		"options": [
+			{"id": "mine", "label": "\"She is the one I walk with.\"", "lean": "companion", "after": [["Lin Feng", "She is the one I walk with, Granny. All the way."], ["Granny Wen the Midwife", "I know. I knew when you came through the door. Sit up straight, both of you. Nian is coming."]]},
+			{"id": "family", "label": "\"She is family now.\"", "lean": "lotus", "after": [["Lin Feng", "She is family, Granny. Yours too, if you will have her."], ["Granny Wen the Midwife", "I had her the moment she shelled my beans without being asked. Here, hold this ladle. Nian is coming."]]},
+			{"id": "free", "label": "\"She goes where she likes.\"", "lean": "wander", "after": [["Lin Feng", "She goes where she likes, Granny. Tonight she likes it here."], ["Granny Wen the Midwife", "A good answer. The best ones always come home for New Year. Now: pots, everybody. Nian is coming."]]},
+		]},
+	"s_p16_dawn": {"lines": [
+		["Narrator", "The first dawn of the new year comes up over the sea of clouds pink and gold, and the whole sect is out on the steps to see it, red-eyed and full of dumplings. Old Shen the Bell-Ringer hands Lin Feng the beam of the great bell."],
+		["Old Shen the Bell-Ringer", "A hundred and eight strikes on New Year's morning: one for every trouble a person can have. I have rung them forty years, and my arms are old. You and the girl ring them this year."],
+		["Narrator", "They ring them together, a hundred and eight, and on the last one every lantern on the mountain goes out by itself, because it is day and they are not needed, and the Kitchen God goes up the chimney at last with sugar on his lips."],
+		], "ask": "On the last strike, what do you wish for?",
+		"options": [
+			{"id": "us", "label": "A year with her in it", "lean": "companion", "after": [["Yue Ling", "You said it out loud. You are supposed to wish in your head."], ["Lin Feng", "I wanted the bell to hear."]]},
+			{"id": "mountain", "label": "A quiet year on the mountain", "lean": "lotus", "after": [["Yue Ling", "A quiet year. Do you think the world will let us have one?"], ["Lin Feng", "No. But I am allowed to wish."]]},
+			{"id": "roads", "label": "New roads in spring", "lean": "wander", "after": [["Yue Ling", "New roads. Then we start in spring. I have already packed."], ["Lin Feng", "It is New Year's morning."], ["Yue Ling", "I packed fast."]]},
+		]},
 	"s_p15_loom": {"lines": [
 		["Narrator", "The Founder's Hermitage stands under the Last Cave as if it had been waiting: white walls, a round moon gate, and inside, under three hundred years of dust, a loom strung with thread the colour of lotus petals."],
 		["Yue Ling", "I know this room. Not the way I knew the pond. The way you know the inside of your own eyelids."],
@@ -766,6 +876,15 @@ static func spot_is(spot: String, e: Dictionary) -> bool:
 		var parts := spot.split(":")
 		return str(e.get("kind", "")) == "prop" and not e.has("furn") and str(e.get("area", "")) == parts[1] and str(e.get("prop", "")) == parts[2] and not e.has("memory")
 	return str(e.get("id", "")) == spot
+
+## Where a shared scene happened, as the Annals tell it ("Yue Ling and Lin Feng: Kindred Spirit (at the
+## loom she was woven on)").  Every share used to be put down as "by the lotus pond".
+const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the lotus pond", "s_p15_loom": "at the loom she was woven on",
+	"s_p15_feast": "at her naming feast", "s_p16_sweep": "sweeping out the old year", "s_p16_eve": "at the reunion dinner",
+	"s_p16_vigil": "keeping the vigil", "s_p16_dawn": "at the first dawn of the year", "s_p16_lanterns": "at the Lantern Festival", "s_p16_couplets": "writing the New Year couplets"}
+
+static func share_place(sid: String) -> String:
+	return str(SHARE_PLACES.get(sid, "side by side"))
 
 ## The thing a share spot names among `ents` ({} if none).
 static func find_spot(ents: Array, spot: String) -> Dictionary:

@@ -311,14 +311,41 @@ float fbm(vec3 p) {
 }
 bool is_cls(float a, float target) { return abs(a - target) < 0.05; }
 
+// the Living Land release (folk.gd): a townsperson's clothes dyed on the fly.  dye_a is the robe
+// (palette slot 0), dye_b the secondary (slot 0.5): x the new hue, y the new saturation, z a value
+// scale, w whether to dye at all.  The value of every vertex stays, so the folds and the baked
+// occlusion survive the dye, and one mesh dresses a whole town.
+uniform vec4 dye_a = vec4(0.0);
+uniform vec4 dye_b = vec4(0.0);
+varying float slot;
+vec3 rgb2hsv(vec3 c) {
+	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+	vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+	vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+	float d = q.x - min(q.w, q.y);
+	return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + 1.0e-10)), d / (q.x + 1.0e-10), q.x);
+}
+vec3 hsv2rgb(vec3 c) {
+	vec3 p = abs(fract(c.xxx + vec3(1.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0);
+	return c.z * mix(vec3(1.0), clamp(p - 1.0, 0.0, 1.0), c.y);
+}
+
 void vertex() {
 	cls = COLOR.a;
 	opos = VERTEX;
 	onrm = NORMAL;
+	slot = 1.0 - UV.y;
 }
 
 void fragment() {
 	vec3 col = COLOR.rgb;
+	if ((dye_a.w > 0.0 || dye_b.w > 0.0) && cls > 0.94) {
+		vec4 dy = slot < 0.25 ? dye_a : (slot < 0.75 ? dye_b : vec4(0.0));
+		if (dy.w > 0.0) {
+			vec3 hsv = rgb2hsv(col);
+			col = hsv2rgb(vec3(dy.x, mix(hsv.y, dy.y, 0.85), clamp(hsv.z * dy.z, 0.0, 1.0)));
+		}
+	}
 	// the filmic tonemapper works per channel and pushes saturated dyes further: ease them first
 	col = mix(vec3(dot(col, vec3(0.3, 0.59, 0.11))), col, 0.84);
 	shade_tint = vec3(0.6, 0.58, 0.78);
@@ -461,6 +488,24 @@ static func mat_actor_plain() -> Material:
 		_mat_actor_plain = ShaderMaterial.new()
 		_mat_actor_plain.shader = mat_actor().shader
 	return _mat_actor_plain
+
+## The Living Land release (folk.gd): the character material with a townsperson's dye: `a` and `b`
+## are the robe and the secondary colours ([hue, saturation, value scale]); `plain` for the surfaces
+## drawn without ink lines.  Cached by the colours, so a town of a few hundred people needs a few
+## dozen materials and no extra meshes.
+static var _dyed := {}
+static func mat_dyed(a: Vector3, b: Vector3, plain: bool) -> Material:
+	var key := "%s|%s|%s" % [str(a), str(b), plain]
+	if _dyed.has(key):
+		return _dyed[key]
+	var m := ShaderMaterial.new()
+	m.shader = mat_actor().shader
+	m.set_shader_parameter("dye_a", Vector4(a.x, a.y, a.z, 1.0))
+	m.set_shader_parameter("dye_b", Vector4(b.x, b.y, b.z, 1.0))
+	if not plain:
+		m.next_pass = (mat_actor() as ShaderMaterial).next_pass
+	_dyed[key] = m
+	return m
 
 static var _mat_glow: StandardMaterial3D = null
 static var _mat_glass: StandardMaterial3D = null
@@ -1007,6 +1052,15 @@ static func mat_glow() -> StandardMaterial3D:
 		_mat_glow.cull_mode = BaseMaterial3D.CULL_DISABLED
 		_mat_glow.no_depth_test = false
 	return _mat_glow
+
+## the Living Land release (clock.gd): lanterns, lit windows and every glow burn brighter after dark.
+## `k` is how dark it is (0 day .. 1 night); the glow material is shared, so this is one change.
+static var night_k := -1.0
+static func set_night(k: float) -> void:
+	if absf(k - night_k) < 0.01:
+		return
+	night_k = k
+	mat_glow().albedo_color = Color(1, 1, 1).lerp(Color(2.4, 2.05, 1.7), clampf(k, 0.0, 1.0))
 
 ## fresnel halo (auras, gem glows, spell orbs)
 static func mat_aura() -> ShaderMaterial:
