@@ -504,24 +504,27 @@ func _living_shots(which: String) -> void:
 	if only.is_empty() or only.has("living_hours"):
 		await _hours_sheet()
 
-## One street of Qingshi from one place at dawn, noon, dusk and night, side by side.
+## The square of Qingshi from one place at dawn, noon, dusk and night, side by side.
 func _hours_sheet() -> void:
 	main.world.enter_layer("surface")
-	main.world.teleport(_nearest_free(Atlas.to_world("village", Vector2i(26, 30))), "surface")
+	main.world.teleport(_nearest_free(Atlas.to_world("village", Vector2i(30, 28))), "surface")
 	main.world.facing = Vector2i(1, 0)
 	main.world.cam_q = 1
 	main.world._snap_cam()
+	# one camera for all four hours: framed on the square's people at mid-morning, and kept
+	Game.clock = 8.6 * 60.0
+	await _wait(1.6)
+	_frame_crowd(Vector3(-13.0, 8.0, 15.0))
+	var view = main.world.cam_override
 	var frames: Array = []
-	var view = null
 	for h in [6.0, 12.5, 18.7, 22.5]:
 		Game.clock = h * 60.0
-		await _wait(1.6)
-		# (one camera for all four: framed on the street's people at the first hour, and kept)
-		if view == null:
-			_frame_crowd(Vector3(-12.0, 7.0, 13.0))
-			view = main.world.cam_override
 		main.world.cam_override = view
-		await _wait(0.3)
+		# (no banner or toast left over from the shots before)
+		main.world.banner_t = 0.0
+		Game.toasts.clear()
+		main.toast_list.clear()
+		await _wait(0.8)
 		await _shot("living_hour_%02d" % int(h), false)
 		frames.append(last_img.duplicate())
 	main.world.cam_override = null
@@ -602,12 +605,12 @@ func _strike_shots() -> void:
 	var pp: Vector3 = main.world._player_pos()
 	var fwd := Vector3(main.world.facing.x, 0, main.world.facing.y)
 	var side := fwd.cross(Vector3.UP)
-	var look := pp + fwd * 1.0 + Vector3(0, 0.8, 0)
-	# over his shoulder from the street, or from one side: the first eye with no tree, wall or house
-	# beside it or in the way
-	var eye := pp - fwd * 3.2 + side * 1.8 + Vector3(0, 2.3, 0)
-	for c2 in [[-3.2, 1.8], [-3.2, -1.8], [-1.2, 4.2], [-1.2, -4.2], [-4.6, 2.6], [-4.6, -2.6]]:
-		var e: Vector3 = pp + fwd * float(c2[0]) + side * float(c2[1]) + Vector3(0, 2.3, 0)
+	var look := pp + fwd * 1.5 + Vector3(0, 0.7, 0)
+	# from one side (the pieces fly out past him), or else over his shoulder from the street: the first
+	# eye with no tree, wall or house beside it or in the way
+	var eye := pp - fwd * 0.6 + side * 3.6 + Vector3(0, 2.0, 0)
+	for c2 in [[-0.6, 3.6], [-0.6, -3.6], [-2.0, 3.0], [-2.0, -3.0], [-3.2, 1.8], [-3.2, -1.8]]:
+		var e: Vector3 = pp + fwd * float(c2[0]) + side * float(c2[1]) + Vector3(0, 2.0, 0)
 		if _open_round(e) and _clear_view(e, look):
 			eye = e
 			break

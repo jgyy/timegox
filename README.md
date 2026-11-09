@@ -7,10 +7,10 @@ Play Lin Feng (or whoever you make him: name, look, colours and where he came fr
 
 | | |
 |---|---|
-| ![the Dawn Market at mid-morning: merchants at their shop fronts, a farmer off to the fields, children at play](docs/screenshots/living_yanggu_market.png) | ![the same market at night: lit windows and lanterns, the watchman on his round](docs/screenshots/living_yanggu_night.png) |
-| ![one street of Qingshi at dawn, noon, dusk and night](docs/screenshots/living_hours.png) | ![Qingshi in the Hour of the Dragon: villagers round the well and the pond, a seller calling "Fresh today!", a farmer off with his basket](docs/screenshots/living_qingshi_morning.png) |
-| ![F: the sword meets a jar and it comes apart, its pieces flying](docs/screenshots/living_strike.png) | ![Zao Jun, Lord of the Stove, who would not go up the chimney](docs/screenshots/part16_kitchen_god.png) |
-| ![a town reminded of the old ways: every gong and pot in Yanggu](docs/screenshots/part16_drill.png) | ![Xi, the Last Night, faced with the door gods' peach wood](docs/screenshots/battle_boss_xi_beast.png) |
+| ![the Dawn Market at mid-morning: townsfolk crowd its shop fronts, and one of them knows the hero ("It's him!")](docs/screenshots/living_yanggu_market.png) | ![the same market in the second watch: lit windows and lanterns under the stars](docs/screenshots/living_yanggu_night.png) |
+| ![the square of Qingshi from one place at dawn, noon, dusk and night](docs/screenshots/living_hours.png) | ![Qingshi in the Hour of the Dragon: villagers round the well and the pond, a seller calling "Fresh today!", a farmer off with his basket](docs/screenshots/living_qingshi_morning.png) |
+| ![F: the sword meets a jar of pickles, it comes apart into rigid-body pieces, and its owner is paid](docs/screenshots/living_strike.png) | ![Zao Jun, Lord of the Stove, who would not go up the chimney](docs/screenshots/part16_kitchen_god.png) |
+| ![a town reminded of the old ways: Yanggu turns out with every gong and pot, Night-Watchman Lao Zhou at the front](docs/screenshots/part16_drill.png) | ![Xi, the Last Night, faced with the door gods' peach wood](docs/screenshots/battle_boss_xi_beast.png) |
 | ![the vigil at Granny Wen's: nobody stays up alone](docs/screenshots/part16_vigil.png) | ![Nian, the Year Beast, faced by every pot in the land](docs/screenshots/battle_boss_nian.png) |
 | ![New Year's Day: the children in red, and a red envelope](docs/screenshots/part16_hongbao.png) | ![the first dawn of the year: the bell, a hundred and eight times](docs/screenshots/part16_dawn_bell.png) |
 
