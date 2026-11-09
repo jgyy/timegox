@@ -720,6 +720,15 @@ func _fates_state(step_id: String, lv: int) -> void:
 	Game.stones = 52000
 	Game.renown = 220
 	Game.step = Data.step_index(step_id)
+	# every boss the story has put down by then is gone from the world, and the gates the bot opened
+	# stand open (else Iron Fang would stand beside his own grudge)
+	for i in Game.step:
+		if str(Data.STEPS[i].kind) == "kill":
+			Game.boss_done[str(Data.STEPS[i].boss)] = true
+	if Game.step > Data.step_index(Trials.GATE_STEP):
+		for gid in BOT.GATE_PLAN:
+			Game.boss_done[gid] = true
+			Game.gates_open[gid] = true
 	Game.outfits = {"sweeper": true, "inner": true, "hunter": true, "dragon": true, "phoenix": true, "celestial": true, "immortal": true}
 	Game.rides = {"pony": true, "sword": true, "qilin": true, "cloud": true}
 	Game.ride = "pony"
@@ -756,6 +765,11 @@ func _fates_shots() -> void:
 		# (--fates=grudges: only Part XIV's grudges and Nie)
 		main.set_stack(["world"])
 		await _grudge_shots()
+		return
+	if str(main.args.get("fates", "")) == "chapter":
+		# (--fates=chapter: a chapter and its choice, the battles, the grudges and Nie)
+		main.set_stack(["world"])
+		await _fates_chapter_shots()
 		return
 	if str(main.args.get("fates", "")) == "page":
 		# (--fates=page: only the Fates page and the Bestiary)
@@ -918,6 +932,8 @@ func _grudge_shots() -> void:
 	_fates_state(Grudges.STEP, 55)
 	Game.fates = {"tala": "ally", "qiu_ye": "ally", "hu": "ally", "xu_lan": "spared", "liu_ying": "fallen"}
 	Game.grudges = {"grudge_headless_saint": "bow", "grudge_marsh_hag": "pay"}
+	for gd in Game.grudges:
+		Game.boss_done[gd] = true
 	Game.rides["barque"] = true
 	for gs2 in [["grudge_iron_fang", Vector3(-6.5, 3.6, 8.5)], ["grudge_kui", Vector3(-11.0, 5.5, 13.0)]]:
 		var gid2: String = gs2[0]
@@ -936,7 +952,9 @@ func _grudge_shots() -> void:
 		var bp2: Vector3 = main.world.wpos(Atlas.to_world(ga2, gpos2))
 		bp2.y = main.world.ground_y(bp2)
 		main.world.cam_override = Transform3D(Basis.IDENTITY, bp2 + gs2[1]).looking_at(bp2 + Vector3(0, 2.2, 0), Vector3.UP)
-		await _wait(1.4)
+		# (the land round him was built on arrival; a few frames for the soot to rise. The bamboo is slow
+		# to draw in software, a frame every few seconds)
+		await _wait(0.6)
 		await _shot(gid2)
 		main.world.cam_override = null
 	main.battle.start([{"id": "grudge_kui", "lv": 55}], {"boss": true, "enemy": "grudge_kui", "theme": main.world.theme_name})
