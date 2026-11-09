@@ -579,12 +579,21 @@ func _clear_view(a: Vector3, b: Vector3) -> bool:
 func _strike_shots() -> void:
 	Game.clock = 11.0 * 60.0
 	var lw := Atlas.world_of("surface")
-	var b: Dictionary = Havoc.of_area(lw, "yanggu")[3]
-	var spot := Vector2i(-1, -1)
-	for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
-		if spot.x < 0 and main.world.tile_free(b.tile + d) and Havoc.at_tile(lw, b.tile + d).is_empty():
-			spot = b.tile + d
 	main.world.enter_layer("surface")
+	# a jar (or else a stack of pots, a barrel, a crate) with open street in front of it to stand on
+	var b := {}
+	var spot := Vector2i(-1, -1)
+	for want in ["jar", "pots", "barrel", "crate"]:
+		for c in Havoc.of_area(lw, "yanggu"):
+			if not b.is_empty() or str(c.kind) != want:
+				continue
+			for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+				var s: Vector2i = c.tile + d
+				if b.is_empty() and main.world.tile_free(s) and main.world.tile_free(s + d) and Havoc.at_tile(lw, s).is_empty():
+					b = c
+					spot = s
+	if b.is_empty():
+		return
 	main.world.teleport(spot, "surface")
 	main.world.facing = b.tile - spot
 	main.world.cam_q = _quarter(Vector2(main.world.facing))
@@ -593,13 +602,34 @@ func _strike_shots() -> void:
 	var pp: Vector3 = main.world._player_pos()
 	var fwd := Vector3(main.world.facing.x, 0, main.world.facing.y)
 	var side := fwd.cross(Vector3.UP)
-	main.world.cam_override = Transform3D(Basis.IDENTITY, pp + side * 5.0 - fwd * 2.0 + Vector3(0, 2.6, 0)).looking_at(pp + fwd * 1.4 + Vector3(0, 0.8, 0), Vector3.UP)
+	var look := pp + fwd * 1.0 + Vector3(0, 0.8, 0)
+	# over his shoulder from the street, or from one side: the first eye with no tree, wall or house
+	# beside it or in the way
+	var eye := pp - fwd * 3.2 + side * 1.8 + Vector3(0, 2.3, 0)
+	for c2 in [[-3.2, 1.8], [-3.2, -1.8], [-1.2, 4.2], [-1.2, -4.2], [-4.6, 2.6], [-4.6, -2.6]]:
+		var e: Vector3 = pp + fwd * float(c2[0]) + side * float(c2[1]) + Vector3(0, 2.3, 0)
+		if _open_round(e) and _clear_view(e, look):
+			eye = e
+			break
+	main.world.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(look, Vector3.UP)
 	main.world.strike()
 	await _wait(0.42)
 	await _shot("living_strike")
 	await _wait(0.9)
 	await _shot("living_strike_after")
 	main.world.cam_override = null
+
+## Whether the ground round world point `p` (its tile and the eight about it) is open: no tree,
+## wall, house or water for a camera to be inside.
+func _open_round(p: Vector3) -> bool:
+	var w = main.world
+	var tile := Vector2i(int(floor((p.x - w.off.x) / Terrain3D.T)), int(floor((p.z - w.off.z) / Terrain3D.T)))
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var q := tile + Vector2i(dx, dy)
+			if not w.tile_free(q) or w.grid[q.y * w.w + q.x] == MapGen.INTERIOR:
+				return false
+	return true
 
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for dry in [true, false]:
