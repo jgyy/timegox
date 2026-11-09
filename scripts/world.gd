@@ -137,6 +137,7 @@ func clear_cache() -> void:
 	views.clear()
 	cur_view = {}
 	area_id = ""
+	announced = ""
 	inside = ""
 	trip = {}
 	using = {}
@@ -362,6 +363,15 @@ func locate_ent(id: String) -> Array:
 					return [fid, e3]
 	return []
 
+## the region last announced (its banner, a line in the timeline, its sky, fog and weather) and how
+## long the hero has been in another one.  Walking along a border used to flip the banner, the sky and
+## the weather back and forth with every step (four times in two seconds on the road past the Magpie
+## Bridge), and wrote "Entered ..." into the timeline every time; the game's own idea of where he is
+## (Game.area) still changes at once.
+var announced := ""
+var pending_t := 0.0
+const ANNOUNCE_AFTER := 0.8
+
 func _enter_region(id: String, quiet: bool = false) -> void:
 	if id == area_id:
 		return
@@ -371,6 +381,13 @@ func _enter_region(id: String, quiet: bool = false) -> void:
 	area_name = spec.n
 	Game.area = id
 	Game.seen[id] = true
+	pending_t = 0.0
+	if quiet or announced == "":
+		_announce(quiet)
+
+## Tell of the region he is in now: the banner, the timeline and the look of the sky.
+func _announce(quiet: bool) -> void:
+	announced = area_id
 	banner_t = 3.0
 	if not quiet:
 		Game.note("Entered " + area_name)
@@ -541,9 +558,14 @@ func _build_view(id: String) -> void:
 	for e0 in lw.ents:
 		if e0.kind == "prop" and e0.area == id and not e0.has("furn"):
 			var lt: Vector2i = e0.pos - r.position
-			if lt.x >= 0 and lt.y >= 0 and lt.x < r.size.x and lt.y < r.size.y and vg[lt.y * r.size.x + lt.x] == MapGen.WALL:
-				vg[lt.y * r.size.x + lt.x] = MapGen.FLOOR
-				clear[lt] = true
+			# the bigger things (a pavilion, a watchtower, a stage) stand in a wider clearing
+			var cr: int = int(Props.KINDS.get(str(e0.prop), {}).get("clear", 0))
+			for cy in range(-cr, cr + 1):
+				for cx in range(-cr, cr + 1):
+					var ct := lt + Vector2i(cx, cy)
+					if ct.x >= 0 and ct.y >= 0 and ct.x < r.size.x and ct.y < r.size.y and vg[ct.y * r.size.x + ct.x] == MapGen.WALL:
+						vg[ct.y * r.size.x + ct.x] = MapGen.FLOOR
+						clear[ct] = true
 	# (and no house or pavilion of the wilds is built beside one, facing it)
 	Scatter.clearings = clear
 	var root := Terrain3D.build(vg, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
@@ -706,7 +728,7 @@ func _npc_opts(id: String) -> Dictionary:
 			return {"asset": id, "sash": false, "hair": "wild", "armor": true, "metal": Color("b07a40"), "beard": true}
 		"peach_keeper":
 			return {"asset": id, "ribbon": Color("ffd0e0"), "hair": "long", "crown": true, "glow": Color(1.0, 0.8, 0.9)}
-		"nomad", "spore_witch", "steppe_shaman", "nuwa_echo", "lantern_monk", "fisher", "meng_po", "judge_cui":
+		"nomad", "spore_witch", "steppe_shaman", "nuwa_echo", "lantern_monk", "fisher", "meng_po", "judge_cui", "qing_lian_echo":
 			return {"asset": id, "staff": true, "hair": "long", "glow": Color(1.0, 0.95, 0.8)}
 		"archivist", "innkeeper":
 			return {"asset": id, "beard": true, "hat": true, "hair": "bun"}
@@ -739,15 +761,25 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"prop":
 			# a thing to do (props.gd): outdoors its own model, turned to face the open ground it is
 			# used from; furniture is drawn by its building, and the node only carries what it does
+			if e.has("furn") and str(e.id) == Bonds.LOOM:
+				# (Part XV: the loom she was woven on gets the lotus-pink mark too)
+				var lm := _label(n, "!", 2.6, Color("ff9ac0"), 72)
+				lm.visible = false
+				n.set_meta("mark", lm)
 			if not e.has("furn"):
 				var pm := Props.model(str(e.prop), str(Data.AREAS[e.area].theme))
 				var fd: Vector2i = e.get("face", Vector2i(0, 1))
 				pm.rotation.y = atan2(float(fd.x), float(fd.y))
 				n.add_child(pm)
 				n.set_meta("model", pm)
-				var pl := _label(n, str(Props.kind_of(e).get("n", "")), 2.5, Color("f0e6c8"), 24)
+				var pl := _label(n, Props.name_of(e), 2.5 if not Props.is_structure(str(e.prop)) else 3.6, Color("f0e6c8") if not e.has("memory") else Color("ffb0d0"), 24)
 				pl.visible = false
 				n.set_meta("label", pl)
+				if e.has("memory"):
+					# Part XV: a lotus-pink mark over a memory waiting to be given back (bonds.gd)
+					var pm2 := _label(n, "!", 4.6, Color("ff9ac0"), 72)
+					pm2.visible = false
+					n.set_meta("mark", pm2)
 		"npc":
 			# (someone who appears in two places shares one model: "asset")
 			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(str(e.get("asset", e.id))))
@@ -845,10 +877,32 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 const USE_STEP := 0.45
 ## when a thing answers, seconds into the clip (by clip), and how often a long one answers again (by
 ## what it does)
-const FX_AT := {"strike": 0.95, "toss": 0.62, "drink": 0.9, "gather": 1.0, "lift": 1.45, "touch": 0.8, "bow": 0.6, "attack": 0.3, "hammer": 0.82}
-const FX_EVERY := {"notes": 1.1, "steam": 1.3, "smoke": 1.5, "sparks": 1.2, "embers": 0.9, "ripple": 1.7, "leaves": 1.8, "qi": 1.6, "chime": 1.4, "koi": 1.5, "zzz": 2.0}
+const FX_AT := {"strike": 0.95, "toss": 0.62, "drink": 0.9, "gather": 1.0, "lift": 1.45, "touch": 0.8, "bow": 0.6, "attack": 0.3, "hammer": 0.82,
+	"archery": 1.68, "release": 2.0, "float_lantern": 1.45, "sword_dance": 0.4, "kite": 0.3, "stargaze": 0.8, "write": 0.6, "push": 0.5, "dance": 0.3}
+const FX_EVERY := {"notes": 1.1, "steam": 1.3, "smoke": 1.5, "sparks": 1.2, "embers": 0.9, "ripple": 1.7, "leaves": 1.8, "qi": 1.6, "chime": 1.4, "koi": 1.5, "zzz": 2.0,
+	"blade": 0.8, "flour": 1.1, "petals": 1.0, "stars": 1.4, "ink": 1.2}
 ## Yue Ling's part, by what she does: the ones she keeps doing for as long as he does
-const COMP_LOOP := ["pray", "warm", "read", "meditate", "sit_bench", "gather"]
+const COMP_LOOP := ["pray", "warm", "read", "meditate", "sit_bench", "gather", "play_flute", "dance", "soak", "stargaze"]
+## the Lotus release: how long the watchtower's ladder takes, each way (seconds of the time it takes)
+const CLIMB_S := 1.6
+
+## Lin Feng and Yue Ling do thing `e` for as long as a scene goes on over it (a memory given back, the
+## lotus pond, bonds.gd): end_use() lets them step back.
+func start_scene_use(e: Dictionary) -> void:
+	start_use(e)
+	if not using.is_empty():
+		using.scene = true
+		using.dur = 3600.0
+
+## The scene is over: they finish what they are doing and step back (what comes of it still comes).
+func end_use() -> void:
+	if using.is_empty():
+		return
+	using.scene = false
+	if not bool(using.started):
+		using.dur = 0.6
+	else:
+		using.dur = maxf(0.6, t - float(using.t0) - USE_STEP)
 
 ## Lin Feng uses thing `e`: he steps up to it (or onto it, to sit), does it, and steps back; what comes
 ## of it is shown when he is done.
@@ -869,26 +923,38 @@ func start_use(e: Dictionary) -> void:
 	var at := str(k.get("at", "face"))
 	var to := from + dir * 0.55
 	var yaw := atan2(dir.x, dir.z)
-	var comp_sit: bool = Game.companion and str(k.get("comp", "")) == "sit_bench" and at == "seat"
+	# (a thing for two, Lin Feng and Yue Ling side by side: a bench, a pavilion, a hot spring, the
+	# lantern green, the grass under the stars)
+	var comp_sit: bool = Game.companion and ((str(k.get("comp", "")) == "sit_bench" and at == "seat") or bool(k.get("pair", false)))
 	match at:
 		"seat":
 			to = c - dir * float(k.get("off", 0.0))
 			yaw = atan2(-dir.x, -dir.z)
-			if comp_sit:
-				# room for two: he takes one end of the bench and she the other
-				to -= side * 0.4
 		"before":
 			to = c - dir * float(k.get("off", 0.0))
 		"on":
 			to = c
+		"stage":
+			# up the steps and onto the boards, turned to face whoever is watching
+			to = c + dir * 0.05
+			yaw = atan2(-dir.x, -dir.z)
+		"climb":
+			# the foot of the watchtower's ladder
+			to = c - dir * 0.95
+		"circle":
+			# the end of the millstone's bar
+			to = c + side * Structures.MILL_R
+	if comp_sit:
+		# room for two: he takes one end of the bench and she the other
+		to -= side * 0.4
 	# on the thing's own ground outdoors (a bench on the forest edge stands a little higher), on the
 	# floorboards he stands on indoors
 	var base_y: float = from.y
 	if at != "face" and not e.has("furn") and nd != null and is_instance_valid(nd):
 		base_y = (nd as Node3D).position.y
-	using = {"e": e, "k": k, "t0": t, "dur": float(k.dur), "from": from, "to": Vector3(to.x, base_y, to.z), "yaw": yaw, "yaw0": player.rotation.y,
+	using = {"e": e, "k": k, "t0": t, "dur": float(k.dur), "from": from, "to": Vector3(to.x, base_y + float(k.get("rise", 0.0)), to.z), "yaw": yaw, "yaw0": player.rotation.y,
 		"c": c, "dir": dir, "side": side, "started": false, "ended": false, "fx_n": 0, "held": null, "stool": null, "comp_sit": comp_sit,
-		"comp_from": comp_pos}
+		"comp_from": comp_pos, "comp_held": null, "base_y": base_y}
 	move_dir = Vector2i.ZERO
 	if nd != null and is_instance_valid(nd):
 		(nd as Node3D).set_meta("used_t", t + USE_STEP)
@@ -924,12 +990,18 @@ func _use_begin() -> void:
 		Models.act(player, clip, t)
 	if headless():
 		return
-	# what he holds for it, in his right hand
+	# what he holds for it, in his right hand (a bow in his left)
 	var hold := str(k.get("hold", ""))
 	if hold != "":
-		var hn := _hold_in_hand(player, hold)
+		var hn := _hold_in_hand(player, hold, "hand.L" if Props.LEFT_HAND.has(hold) else "hand.R")
 		if hn != null:
 			using.held = hn
+	# and what she holds for her part (her flute to his qin, a sky lantern of her own)
+	var chold := str(k.get("comp_hold", ""))
+	if chold != "" and Game.companion:
+		var ch := _hold_in_hand(comp, chold)
+		if ch != null:
+			using.comp_held = ch
 	# a stool for a loom that has none
 	if str(using.e.get("furn", "")) == "loom":
 		var sb := MB.new()
@@ -950,28 +1022,36 @@ func _use_finish() -> void:
 	if hn != null and is_instance_valid(hn):
 		(hn as Node).queue_free()
 	using.held = null
+	var ch = using.get("comp_held")
+	if ch != null and is_instance_valid(ch):
+		(ch as Node).queue_free()
+	using.comp_held = null
 
 func _use_clear() -> void:
 	var sn = using.get("stool")
 	if sn != null and is_instance_valid(sn):
 		(sn as Node).queue_free()
+	for key in ["held", "comp_held"]:
+		var hn2 = using.get(key)
+		if hn2 != null and is_instance_valid(hn2):
+			(hn2 as Node).queue_free()
 	comp_pos = player.position if not Game.companion else comp.position
 	player.rotation.x = 0.0
 	# and a gesture for it that is still going ends with it (only when he is hurried on)
 	player.set_meta("act", "")
 	using = {}
 
-## The thing in the hero's hand (Props.held), on his right hand bone; null if the model has no
-## skeleton to hold it.
-func _hold_in_hand(m: Node3D, what: String) -> Node3D:
+## The thing in the hero's hand (Props.held), on his right hand bone (or `bone`); null if the model
+## has no skeleton to hold it.
+func _hold_in_hand(m: Node3D, what: String, bone: String = "hand.R") -> Node3D:
 	var sks := m.find_children("*", "Skeleton3D", true, false)
 	if sks.is_empty():
 		return null
 	var sk := sks[0] as Skeleton3D
-	if sk.find_bone("hand.R") < 0:
+	if sk.find_bone(bone) < 0:
 		return null
 	var ba := BoneAttachment3D.new()
-	ba.bone_name = "hand.R"
+	ba.bone_name = bone
 	sk.add_child(ba)
 	ba.add_child(Props.held(what))
 	return ba
@@ -1009,9 +1089,42 @@ func _use_pose(d: float) -> void:
 		# (the seat swings about the beam: back and up on one side of the arc, forward and up on the other)
 		pos += Vector3(-using.dir.x, 0, -using.dir.z) * dz + Vector3(0, dy, 0)
 		tilt = sw
+	var clip := str(k.clip)
+	var at := str(k.get("at", "face"))
+	if at == "circle" and doing:
+		# round the millstone with the bar: the stone turns with him (three turns in the time it takes)
+		var ph2 := (el - USE_STEP) / maxf(dur, 0.1) * TAU * 3.0
+		var cc: Vector3 = using.c
+		var s0: Vector3 = using.side
+		var d0: Vector3 = using.dir
+		var rad := Structures.MILL_R
+		var off2 := s0 * cos(ph2) + d0 * sin(ph2)
+		# walking round behind the bar with his hands on its end: facing along the circle
+		var tang := -s0 * sin(ph2) + d0 * cos(ph2)
+		pos = Vector3(cc.x, float(using.to.y), cc.z) + off2 * rad - tang * 0.45
+		yaw = atan2(tang.x, tang.z)
+		var nd2 = ent_nodes.get(using.e.id)
+		if nd2 != null and is_instance_valid(nd2) and (nd2 as Node3D).has_meta("model"):
+			var pm2 := (nd2 as Node3D).get_meta("model") as Node3D
+			if pm2.has_meta("mover"):
+				# the bar points where he pushes it: in the model's own space (turned to face the open
+				# ground), from its +x
+				var local := Basis(Vector3.UP, -pm2.rotation.y) * off2
+				(pm2.get_meta("mover") as Node3D).rotation.y = atan2(-local.z, local.x)
+	elif at == "climb" and doing:
+		# up the ladder, a long look from the top, and down again
+		var ph3 := el - USE_STEP
+		var top: Vector3 = Vector3(using.c.x, float(using.base_y) + Structures.TOWER_TOP, using.c.z) - Vector3(using.dir.x, 0, using.dir.z) * 0.1
+		var foot: Vector3 = using.to
+		var up_k := smoothstep(0.0, CLIMB_S, ph3) * (1.0 - smoothstep(dur - CLIMB_S, dur, ph3))
+		pos = foot.lerp(top, up_k)
+		if ph3 < CLIMB_S or ph3 > dur - CLIMB_S:
+			clip = "climb"
+		else:
+			# from the top he looks out over the land, away from the ladder
+			yaw = atan2(-using.dir.x, -using.dir.z)
 	player.position = pos
 	player.rotation = Vector3(tilt, yaw, 0.0)
-	var clip := str(k.clip)
 	if not doing:
 		Models.anim_person(player, t, at_k > 0.02 and at_k < 0.98, false, "")
 	elif Props.ONCE.has(clip):
@@ -1029,14 +1142,16 @@ func _comp_use(d: float, el: float, doing: bool) -> void:
 	var cc := str(k.get("comp", "watch"))
 	var c: Vector3 = using.c
 	if bool(using.comp_sit):
-		# beside him on the bench
+		# beside him on the bench (in the pavilion, in the hot spring, on the lantern green, in the
+		# grass under the stars), doing her part there
 		var seat: Vector3 = using.to + using.side * 0.8
 		var dur := float(using.dur)
 		var a := smoothstep(0.0, USE_STEP, el) * (1.0 - smoothstep(USE_STEP + dur, USE_STEP * 2.0 + dur, el))
 		var cf: Vector3 = using.comp_from
 		comp.position = cf.lerp(seat, a)
 		comp.rotation.y = lerp_angle(comp.rotation.y, float(using.yaw), 1.0 - exp(-d * 8.0))
-		Models.anim_person(comp, t + 1.0, a > 0.02 and a < 0.98 and not doing, false, "sit_bench" if doing else "")
+		var pc := cc if cc != "watch" else "sit_bench"
+		Models.anim_person(comp, t + 1.0, a > 0.02 and a < 0.98 and not doing, false, pc if doing else "")
 		return
 	comp.position = comp_pos
 	var want := atan2(c.x - comp_pos.x, c.z - comp_pos.z)
@@ -1104,6 +1219,37 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 			Fx3D.drift(scene3d, player.position + Vector3(0, 0.5, 0), Color(0.6, 0.9, 1.0), "glow", 8, 0.16, 0.45, 1.8, 0.7)
 		"zzz":
 			Fx3D.drift(scene3d, player.position + Vector3(0, 0.9, 0), Color(0.8, 0.85, 1.0), "zed", 1, 0.28, 0.35, 2.4, 0.05)
+		# ---- the Lotus release
+		"blade":
+			# the sword's path in the air, a pale arc left behind each figure
+			Fx3D.shockwave(scene3d, player.position + Vector3(0, 1.2, 0), Color(0.75, 0.9, 1.0), 1.6, 0.5)
+			Fx3D.drift(scene3d, player.position + Vector3(0, 1.1, 0), Color(0.8, 0.92, 1.0), "glow", 6, 0.12, 0.6, 0.9, 0.6)
+		"flour":
+			Fx3D.dust(scene3d, c + Vector3(0, 0.55, 0), Color(0.95, 0.93, 0.88))
+		"arrow":
+			# the thock of the arrow going home: a small ring off the face of the target
+			Fx3D.shockwave(scene3d, c + _model_point(e, Structures.TARGET + Vector3(0, 0, 0.16)), Color(1.0, 0.9, 0.6), 0.9, 0.35)
+		"petals":
+			Fx3D.leaf_spiral(scene3d, player.position + Vector3(0, 0.4, 0), Color(1.0, 0.55, 0.65), 1.3)
+		"kite":
+			Fx3D.leaf_spiral(scene3d, player.position + Vector3(0, 1.2, 0) + to_hero * -0.6, Color(0.9, 0.85, 0.75), 0.8)
+		"stars":
+			Fx3D.drift(scene3d, player.position + Vector3(0, 2.5, 0), Color(0.85, 0.9, 1.0), "glow", 6, 1.6, 0.25, 2.6, 0.2)
+		"sky_lantern", "float":
+			# (the lantern itself rises or drifts away: _animate_prop); the ones in their hands are let go
+			for key in ["held", "comp_held"]:
+				var hn = using.get(key)
+				if fx == "sky_lantern" and hn != null and is_instance_valid(hn):
+					(hn as Node).queue_free()
+					using[key] = null
+			Fx3D.glimmer(scene3d, player.position + Vector3(0, 1.6 if fx == "sky_lantern" else 0.3, 0) - to_hero * 0.4, Color(1.0, 0.75, 0.4))
+		"ink":
+			Fx3D.drift(scene3d, c + Vector3(0, 0.8, 0), Color(0.25, 0.25, 0.35, 0.8), "glow", 3, 0.25, 0.4, 1.8, 0.2)
+
+## A point of a thing's model (its own space, front towards +z) as an offset from where it stands.
+func _model_point(e: Dictionary, p: Vector3) -> Vector3:
+	var fd: Vector2i = e.get("face", Vector2i(0, 1))
+	return Basis(Vector3.UP, atan2(float(fd.x), float(fd.y))) * p
 
 ## What the things do on their own, and when they have just been used: the bell swings, the drum
 ## shivers, the bucket comes up, the fire flickers, the chimes and the swing sway, the float bobs, the
@@ -1111,6 +1257,12 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 	if n.has_meta("label"):
 		(n.get_meta("label") as Label3D).visible = dist < 7.0 and using.is_empty()
+	if n.has_meta("mark"):
+		var s := Game.cur_step()
+		var mk := n.get_meta("mark") as Label3D
+		mk.visible = using.is_empty() and (e.has("memory") and Bonds.memory_ready(Game, str(e.memory)) or not s.is_empty() and str(s.kind) == "share" and str(s.get("spot", "")) == str(e.id))
+		if mk.visible:
+			mk.position.y = 4.6 + sin(t * 4.0) * 0.15
 	if not n.has_meta("model"):
 		return
 	var m := n.get_meta("model") as Node3D
@@ -1147,12 +1299,70 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 				mo.rotation.x = sin(t * 1.1 + e.pos.x) * 0.03
 		"lantern_st":
 			mo.visible = Game.prop_uses.has(e.id) or (since > 0.8 and since < 60.0)
+		# ---- the Lotus release (structures.gd)
+		"armillary":
+			mo.rotation.y = t * (0.08 + (0.6 if since > 0.0 and since < 9.0 else 0.0))
+		"lantern_green":
+			mo.rotation.z = sin(t * 1.3 + e.pos.x) * 0.02
+			mo.rotation.x = sin(t * 0.9) * 0.015
+		"millstone":
+			pass
+		"archery":
+			# the arrow, in the target once he has shot
+			mo.visible = Game.prop_uses.has(e.id) or since > float(FX_AT.archery)
+		"sky_lantern":
+			# the lantern he let go, rising and drifting east until it is a spark
+			var up := since - float(FX_AT.release)
+			mo.visible = up > 0.0 and up < 30.0
+			if mo.visible:
+				var at0: Vector3 = m.get_meta("mover_at", Vector3.ZERO)
+				mo.position = at0 + Vector3(sin(up * 0.4) * 0.3 + up * 0.15, up * 0.9, up * 0.05)
+		"river_lantern":
+			# the lotus lantern he set out, drifting off over the water
+			var fl := since - float(FX_AT.float_lantern)
+			mo.visible = fl > 0.0 and fl < 40.0
+			if mo.visible:
+				var at1: Vector3 = m.get_meta("mover_at", Vector3.ZERO)
+				mo.position = at1 + Vector3(sin(fl * 0.5) * 0.25, sin(fl * 2.0) * 0.015, -fl * 0.22)
+				mo.rotation.y = fl * 0.3
+		"kite":
+			# the kite goes up while he flies it and comes down after
+			# (the clock of a thing starts when he starts doing it: start_use)
+			var fly := clampf(since, 0.0, 99.0)
+			var dur_k := float(Props.KINDS.kite.dur)
+			var hgt := 0.0
+			if since > 0.0 and since < dur_k + 2.0:
+				hgt = 7.0 * smoothstep(0.0, 2.5, fly) * (1.0 - smoothstep(dur_k - 0.5, dur_k + 2.0, fly))
+			mo.visible = hgt > 0.2
+			var at2: Vector3 = m.get_meta("mover_at", Vector3.ZERO)
+			mo.position = at2 + Vector3(sin(t * 0.7) * 0.6 * hgt / 7.0, hgt, -hgt * 0.8)
+			mo.rotation = Vector3(0.3, 0.0, sin(t * 1.9) * 0.25)
+			if m.has_meta("string"):
+				var sn := m.get_meta("string") as Node3D
+				sn.visible = mo.visible
+				if sn.visible:
+					# from the kite down to the hero's hand (or the post)
+					var hand := m.to_local(player.global_position + Vector3(0, 1.3, 0)) if m.is_inside_tree() and not using.is_empty() and str(using.e.id) == str(e.id) else at2
+					var v: Vector3 = hand - mo.position
+					var ln := v.length()
+					if ln > 0.05:
+						var yv := -v / ln
+						var xv := yv.cross(Vector3.FORWARD).normalized()
+						if xv.length() < 0.5:
+							xv = Vector3.RIGHT
+						var zv := xv.cross(yv).normalized()
+						sn.transform = Transform3D(Basis(xv, yv * ln, zv), mo.position)
 
 # ---------------------------------------------------------------- update
 func _process(d: float) -> void:
 	t += d
 	if banner_t > 0.0:
 		banner_t -= d
+	# a region is announced once he has stayed in it a moment (see _enter_region)
+	if announced != area_id and area_id != "":
+		pending_t += d
+		if pending_t >= ANNOUNCE_AFTER:
+			_announce(false)
 	# respawn defeated enemies after a while (only when away from them)
 	for k in Game.defeated.keys():
 		if Game.playtime - Game.defeated[k] > 150.0:
@@ -1163,8 +1373,9 @@ func _process(d: float) -> void:
 	if not trip.is_empty():
 		# on a ladder or the stairs: no walking until the trip is over
 		_trip_step(d)
-	elif active and not using.is_empty():
-		# doing something (props.gd): no walking until it is done
+	elif not using.is_empty() and (active or bool(using.get("scene", false))):
+		# doing something (props.gd): no walking until it is done (and a thing done through a scene,
+		# a memory of Yue Ling's, goes on under the conversation)
 		_use_step()
 	elif active:
 		if not main.bot_active:
@@ -1644,8 +1855,10 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			var s := Game.cur_step()
 			var mark: Label3D = n.get_meta("mark")
 			# (a fated encounter's chapter, fate.gd, and the Part XIII and XIV steps of people in any order)
+			# (and Part XV: the people who can still tie a thread for Yue Ling)
 			var quest: bool = not s.is_empty() and ((s.kind == "talk" or s.kind == "fate") and s.npc == e.id
-				or (s.kind == "visits" or s.kind == "fates") and str(e.id) in s.npcs and not Game.visited.has(str(e.id)))
+				or (s.kind == "visits" or s.kind == "fates") and str(e.id) in s.npcs and not Game.visited.has(str(e.id))
+				or s.kind == "threads" and str(e.id) in s.npcs and not Game.threads.has(str(e.id)))
 			mark.visible = quest
 			if quest and e.get("fate", false):
 				mark.modulate = Fate.THREADS[Fate.thread_of_npc(str(e.id))].col

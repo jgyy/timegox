@@ -41,8 +41,10 @@ const KINDS := {
 	"relic": {"n": "By a relic", "col": Color("c8a8ff"), "what": "something found and kept"},
 	# Fates and Faces: somebody whose life Lin Feng changed comes to help (fate.gd)
 	"bond": {"n": "By an old bond", "col": Color("f0a8d8"), "what": "somebody whose fate you shaped"},
+	# the Lotus release (Part XV): the two of them, side by side (bonds.gd)
+	"heart": {"n": "Side by side", "col": Color("ff9ac0"), "what": "how close you and Yue Ling have come"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -119,6 +121,9 @@ const RECIPES := {
 	"kui_drumstick": {"at": "smith", "in": {"ess_earth": 8, "wind_bell": 2}, "stones": 130000, "after": "s_p13_gates", "for": "kui_drum"},
 	# ---- Part XIV: a mirror in which a debt can see whether it was ever owed
 	"settled_mirror": {"at": "smith", "in": {"ess_dark": 8, "ess_metal": 6, "wheel_spoke": 2}, "stones": 200000, "after": "s_p14_judge", "for": "nie"},
+	# ---- Part XV: a shuttle that weaves back what is unwoven, and a key that opens by leaving open
+	"lotus_shuttle": {"at": "alchemist", "in": {"ess_wood": 8, "ess_water": 4, "pressed_petal": 3}, "stones": 220000, "after": "s_p15_memories", "for": "unweaver"},
+	"open_key": {"at": "smith", "in": {"ess_metal": 8, "ess_dark": 5, "pressed_petal": 2}, "stones": 240000, "after": "s_p15_memories", "for": "lock_warden"},
 	"homing_elixir": {"at": "alchemist", "in": {"ess_wood": 5, "ess_fire": 5, "ess_water": 5, "ess_earth": 5, "ess_metal": 5, "autumn_leaf": 1}, "stones": 300000, "after": "s_p13_gates", "for": "chiyou"},
 }
 
@@ -871,6 +876,39 @@ const TRIALS := {
 				"desc": "Smith Tie can forge a mirror from two spokes of the Wheel with dark and metal essence: a debt that sees itself in it remembers whether it was ever owed at all.",
 				"line": "Lin Feng holds up the mirror of settled debts, and a great many of Nie's tallies look into it and quietly burn."},
 		]},
+	# ---- Part XV (the Lotus release): what came for Yue Ling
+	"unweaver": {"might": [2.0, 1.2],
+		"why": "The Unweaver is the hand that wove every road on the Loom of Borders, turned round to wind thread back onto the spindle. Every stitch it takes is a stitch of Yue Ling, and it is in no hurry.",
+		"paths": [
+			{"id": "heart", "kind": "heart", "n": "Side by side", "needs": [["heart", 2]], "boon": {"assist": 0.03, "taken": 0.85},
+				"desc": "Lin Feng and Yue Ling have become dear friends at least. The Unweaver winds back what is loose; what two people hold between them is not loose at all.",
+				"line": "Yue Ling takes his hand before the spindle, and the threads the Unweaver pulls at do not come."},
+			{"id": "craft", "kind": "craft", "n": "A shuttle of pressed petals", "needs": [["item", "lotus_shuttle", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Alchemist Mo can make a weaver's shuttle of three pressed petals and wood and water essence. Thrown through the Unweaver's hands, it weaves back whatever they unpick.",
+				"line": "Lin Feng throws the shuttle of pressed petals through the Unweaver's hundred hands, and they tangle in pink thread."},
+			{"id": "bond", "kind": "bond", "n": "Her friends' threads", "needs": [["bonds", 3]], "boon": {"assist": 0.035},
+				"desc": "Three of the five people you met on the road stand with you. They have tied threads of their own on her wrists, and the Unweaver cannot find the end of any of them.",
+				"line": "The friends' threads on Yue Ling's wrists, green and grey and red and silver, tie the Unweaver's hands in knots."},
+			{"id": "might", "kind": "might", "n": "Cut every thread it holds", "needs": [["lv", 59], ["temper", 8]], "boon": {},
+				"desc": "Late Kindred cultivation within reach and a sword tempered eight times: fast enough to cut every thread the Unweaver holds before it can wind it.",
+				"line": "Lin Feng goes in under the hundred hands, and the sword is quicker than the spindle."},
+		]},
+	"lock_warden": {"might": [2.2, 1.25],
+		"why": "Suo was the part of the Lotus Seal that was always a lock. For three hundred years it took Yue Ling back and made her new whenever a bearer died. It will not let her go now: in the lock, it says, she can never be lost.",
+		"paths": [
+			{"id": "heart", "kind": "heart", "n": "She chooses to stay", "needs": [["heart", 3]], "boon": {"assist": 0.04, "taken": 0.8},
+				"desc": "Lin Feng and Yue Ling have become kindred spirits. A lock is made to keep what would otherwise be lost; nothing is lost that chooses to stay.",
+				"line": "Yue Ling steps in front of Lin Feng, between him and the keyhole, and the Warden does not know what to do with somebody who will not be kept."},
+			{"id": "craft", "kind": "craft", "n": "The Key of the Open Door", "needs": [["item", "open_key", 1]], "boon": {"foe_hp": 0.7, "weak_k": 1.6},
+				"desc": "Smith Tie can beat two pressed petals into a bronze key with metal and dark essence: a key with no lock, that opens by leaving open. The Warden's keyhole will not know what to do with it.",
+				"line": "Lin Feng turns the Key of the Open Door in the keyhole of the Warden's heart, and it opens, and stays open."},
+			{"id": "respect", "kind": "respect", "n": "A name the world will not forget", "needs": [["renown", 800]], "boon": {"assist": 0.03, "taken": 0.85},
+				"desc": "Stand beside her with a name the whole world remembers. The world forgets nobody who stands that close to somebody it cannot forget.",
+				"line": "Lin Feng gives his name to the Warden, and hers after it, and a great many voices on the mountain say them back."},
+			{"id": "might", "kind": "might", "n": "Break the lock", "needs": [["peak", 59], ["temper", 8]], "boon": {},
+				"desc": "Cultivation full at Late Kindred Dao and a sword tempered eight times: strength enough to break a lock the Founder made.",
+				"line": "Lin Feng goes at the Warden with nothing but his sword and the road behind him."},
+		]},
 	# ---- Part XIII: the heart of the formation.  Three roads to the end
 	"chiyou": {"might": [2.0, 1.25],
 		"why": "Chiyou, war god of the Nine Li, bronze-headed and iron-browed, who ate sand and stone and made the first weapons of metal. He fought the Yellow Emperor through a hundred days of fog. The formation that held him is breaking, and he remembers nothing but the war.",
@@ -920,6 +958,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 			return str(g.fates.get(str(n[1]), "")) in n[2]
 		"bonds":
 			return Fate.allies(g) >= int(n[1])
+		"heart":
+			# the Lotus release: how close Lin Feng and Yue Ling have come (bonds.gd)
+			return Bonds.level(g) >= int(n[1])
 	return false
 
 ## How many peoples of the realms call Lin Feng friend (or kin).
@@ -971,6 +1012,8 @@ static func need_text(n: Array, g) -> String:
 			return "%s: %s (now: %s)" % [str(Fate.THREADS[th].n).get_slice(",", 0), " or ".join(names), str(Fate.state_text(th, str(g.fates.get(th, "")))[0]).to_lower()]
 		"bonds":
 			return "%d of the five you met on the road stand with you (now %d)" % [int(n[1]), Fate.allies(g)]
+		"heart":
+			return "You and Yue Ling: %s at least (now %s)" % [Bonds.TITLES[int(n[1])], Bonds.title(g)]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).

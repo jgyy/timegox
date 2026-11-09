@@ -12,8 +12,8 @@ extends RefCounted
 ## the world hears of it (renown +1: a pastime).
 ##
 ## Outdoor things stand on the forest edge or the shore beside open ground and furniture on the tiles
-## it already filled: no tile anybody walks on is taken, so no road changes (and the bot, which never
-## uses them, plays exactly the same game).
+## it already filled: no tile anybody walks on is taken, so no road changes (the bot uses them only to
+## grant Yue Ling's wishes and give back her memories, bonds.gd).
 
 ## what each thing is and what doing it means:
 ##   n      its name; verb: the hint ("Enter: ...")
@@ -35,7 +35,7 @@ const KINDS := {
 		"lines": ["BONG. The note goes out over the land and takes a long time to come back.", "The bell hums for a full minute. Birds lift off three hills away.", "Old Shen would approve: a clean strike, right on the lotus boss."]},
 	"drum": {"n": "Great drum", "verb": "Beat the drum", "clip": "strike", "dur": 2.0, "at": "face", "fx": "boom", "effect": "lore", "comp": "laugh",
 		"lines": ["DOOM. The drum answers like distant thunder.", "The beat rolls away down the valley like a stone.", "A drum like this once called armies. Today it calls nobody, and that is better."]},
-	"qin": {"n": "Qin on a stone table", "verb": "Play the qin", "clip": "play_qin", "dur": 6.0, "at": "before", "off": 0.2, "fx": "notes", "effect": "qi", "comp": "meditate",
+	"qin": {"n": "Qin on a stone table", "verb": "Play the qin", "clip": "play_qin", "dur": 6.0, "at": "before", "off": 0.2, "fx": "notes", "effect": "qi", "comp": "play_flute", "comp_hold": "flute",
 		"lines": ["Lin Feng plays Flowing Water, badly, and the stream plays it better beside him.", "A tune his mother hummed. He did not know he still remembered it.", "Yue Ling says it is the worst High Mountains she has ever heard, and asks for it again."]},
 	"fishing": {"n": "Fishing spot", "verb": "Fish a while", "clip": "fish", "dur": 6.0, "at": "face", "hold": "rod", "fx": "ripple", "effect": "fish", "comp": "meditate",
 		"lines": ["A tug: a silver carp, which he admires and puts back.", "Nothing bites. It is very peaceful not catching anything.", "A fat old fish rises, looks at the hook, and declines."]},
@@ -55,7 +55,7 @@ const KINDS := {
 		"lines": ["Three years he swept the sect's steps. His hands still know how.", "Sweep, sweep. The mind goes quiet, and the leaves go into a neat heap.", "Yue Ling says he sweeps better than he fights. He takes it as a compliment."]},
 	"weiqi": {"n": "Weiqi board", "verb": "Study the game left here", "clip": "sit_bench", "dur": 5.0, "at": "before", "off": 0.42, "fx": "", "effect": "lore", "comp": "watch",
 		"lines": ["Black is winning, but White has a ladder nobody has seen. He leaves it for them.", "A game left half finished. He resists the urge to play a stone.", "Somebody is very good at this, and somebody else is very stubborn."]},
-	"tea": {"n": "Tea table", "verb": "Pour a cup of tea", "clip": "drink", "dur": 2.6, "at": "face", "hold": "cup", "fx": "steam", "effect": "rest", "comp": "drink",
+	"tea": {"n": "Tea table", "verb": "Pour a cup of tea", "clip": "drink", "dur": 2.6, "at": "face", "hold": "cup", "fx": "steam", "effect": "rest", "comp": "drink", "comp_hold": "cup",
 		"lines": ["Mountain tea, a little bitter, and good.", "The pot is still warm. Somebody expects company.", "He pours a cup for Yue Ling first, as one should."]},
 	"lion": {"n": "Stone lion", "verb": "Rub the lion's head for luck", "clip": "touch", "dur": 2.4, "at": "face", "fx": "glow", "effect": "luck", "comp": "laugh",
 		"lines": ["The lion's head is worn bright by a thousand hands.", "A coin in the lion's mouth: somebody's thanks. He leaves it there.", "The lion looks unimpressed. Stone lions always do."]},
@@ -65,6 +65,75 @@ const KINDS := {
 		"lines": ["The lamp takes the flame and the road is a little less dark.", "A moth arrives at once, as if it had been waiting.", "Somebody keeps this lantern trimmed. He trims it too."]},
 	"koi": {"n": "Fish pond", "verb": "Feed the fish", "clip": "toss", "dur": 2.0, "at": "face", "fx": "koi", "effect": "qi", "comp": "laugh",
 		"lines": ["The crumbs land and the water boils with orange and gold.", "One old carp, very large and very slow, gets nothing and does not mind.", "The fish follow him along the bank, hoping."]},
+	# ---- the Lotus release (Part XV): bigger things, built by structures.gd, most of them done side by
+	# side.  rise: how far above (or below) the ground he does it; pair: Yue Ling takes the place beside
+	# him and does her part there; comp_hold: what she holds; clear: how many tiles round it the forest
+	# stands back (only the look of the ground changes)
+	"pavilion": {"n": "Pavilion", "verb": "Sit in the pavilion together", "clip": "sit_bench", "dur": 6.0, "at": "seat", "off": 0.05, "rise": Structures.PAVILION_TOP, "pair": true, "effect": "rest", "comp": "sit_bench", "clear": 1,
+		"lines": ["They sit in the pavilion and let the land go by. Nobody says anything for a long time, and it is the best conversation of the week.",
+			"Somebody has written a poem on the beam: \"I came to see the view and stayed for the company.\" Yue Ling says that is them exactly.",
+			"The wind bells under the eaves ring once each, like people saying goodnight.",
+			"Yue Ling leans her head on his shoulder for a moment, says the bench is very hard, and does not move."]},
+	"watchtower": {"n": "Watchtower", "verb": "Climb up and look out", "clip": "gaze", "dur": 7.0, "at": "climb", "effect": "lore", "comp": "wave", "clear": 1,
+		"lines": ["From the top the road runs out of sight both ways, and every bend of it is somewhere he has been.",
+			"Far off a column of cooking smoke goes straight up. Somebody is making supper. The world is all right.",
+			"Yue Ling waves from the bottom of the ladder, very small, and shouts something the wind takes away.",
+			"He finds the sect on the horizon, a white dot on a blue mountain, and is surprised how much he misses it."]},
+	"stage": {"n": "Open-air stage", "verb": "Perform a sword form", "clip": "sword_dance", "dur": 6.4, "at": "stage", "rise": Structures.STAGE_TOP, "fx": "blade", "effect": "train", "comp": "clap", "clear": 1,
+		"lines": ["Rising cut, turning sweep, the low guard, the thrust. Yue Ling claps every figure as if she had never seen one before.",
+			"The stage was built for operas. Today the opera is one sweeper and a sword, and the audience is one healer and three goats.",
+			"He finishes the form with the blade dead still. Somewhere behind the painted screen an old actor shouts \"Hao!\"",
+			"The boards remember a thousand performances. His is not the best, but it is the most sincere."]},
+	"hot_spring": {"n": "Hot spring", "verb": "Soak in the hot spring", "clip": "soak", "dur": 7.0, "at": "on", "rise": -0.42, "pair": true, "fx": "steam", "effect": "sleep", "comp": "soak", "clear": 1,
+		"lines": ["The water is hot enough to make him gasp, and then every ache of the road lets go at once.",
+			"Steam, stars, and the drip of the bamboo spout. Yue Ling says this is the only medicine she has ever been jealous of.",
+			"They soak until their fingers wrinkle. Yue Ling says healers know exactly how long that is. She does not tell him.",
+			"A monkey on the rocks watches them very seriously, then gets in at the far side."]},
+	"millstone": {"n": "Millstone", "verb": "Push the millstone round", "clip": "push", "dur": 6.6, "at": "circle", "fx": "flour", "effect": "train", "comp": "laugh", "clear": 1,
+		"lines": ["Round and round, and the grain goes in grey and comes out white. A donkey would do it faster. A donkey would not do it better.",
+			"Three turns and his legs remember the sect's steps. Ten turns and they remember why he left them.",
+			"Yue Ling sweeps the flour into the sack as it comes and says they could open a noodle stall.",
+			"The miller's widow will find her week's flour ground in the morning, and wonder."]},
+	"archery": {"n": "Archery butts", "verb": "Shoot an arrow", "clip": "archery", "dur": 2.6, "at": "face", "hold": "bow", "fx": "arrow", "effect": "train", "comp": "clap", "clear": 1,
+		"lines": ["THOK. A finger's width from the gold. Yue Ling says that counts.",
+			"The bow is an old horn bow, stiffer than it looks. The arrow goes exactly where he looked, which is a lesson in itself.",
+			"Gold! Yue Ling claps, and then asks him to do it again so she can watch properly.",
+			"Somebody has carved a tally of hits into the rack. He adds one, small, at the bottom."]},
+	"lantern_green": {"n": "Lantern green", "verb": "Dance under the lanterns", "clip": "dance", "dur": 8.0, "at": "on", "pair": true, "fx": "petals", "effect": "luck", "comp": "dance", "clear": 1,
+		"lines": ["Nobody plays any music. They dance anyway, under the red lanterns, and the lanterns sway as if somebody did.",
+			"He steps on her foot twice. She steps on his three times, on purpose, to stay ahead.",
+			"Yue Ling's sleeves go up like wings and come down like rain. He forgets his own feet watching.",
+			"The village children watch from the edge of the green and then, one by one, join in."]},
+	"kite": {"n": "Kite post", "verb": "Fly a kite", "clip": "kite", "dur": 7.0, "at": "face", "hold": "reel", "effect": "luck", "comp": "laugh", "clear": 0,
+		"lines": ["The red swallow kite goes up on the first gust and keeps going until it is a spark against the cloud.",
+			"It dips, it dives, he hauls, and it climbs again. Yue Ling says the kite flies better than he does. It is true.",
+			"Somebody tied a wish to the kite's tail before him. He lets the string run out so it reaches heaven.",
+			"For a while there is nothing in the world but the pull of the string and the shape against the sky."]},
+	"armillary": {"n": "Armillary sphere", "verb": "Lie back and watch the stars", "clip": "stargaze", "dur": 7.0, "at": "before", "off": 1.05, "pair": true, "fx": "stars", "effect": "qi", "comp": "stargaze", "clear": 0,
+		"lines": ["They lie back in the grass by the bronze rings and name the stars. Hers are better names than the astronomers'.",
+			"The Weaver and the Herdboy, either side of the Silver River. Yue Ling says she has met them and they are very nice.",
+			"A shooting star. Neither of them says what they wished for, and both of them smile.",
+			"The rings of the sphere turn very slowly, as if they were watching the sky too."]},
+	"sky_lantern": {"n": "Sky lanterns", "verb": "Let a sky lantern go", "clip": "release", "dur": 3.2, "at": "face", "hold": "sky_lantern", "fx": "sky_lantern", "effect": "luck", "comp": "release", "comp_hold": "sky_lantern", "clear": 0,
+		"lines": ["Two lanterns go up together and drift apart, and come together again higher up, and are lost among the stars.",
+			"He writes a wish on the paper. She writes one on hers. They promise not to read each other's, and both do.",
+			"The lantern rises so slowly it seems to be thinking about it. Then the wind takes it east, towards the sea.",
+			"Up and up, a warm orange dot. Somebody far away will look up and see it and not know it was theirs."]},
+	"river_lantern": {"n": "Lotus lanterns", "verb": "Set a lantern on the water", "clip": "float_lantern", "dur": 3.0, "at": "face", "fx": "float", "effect": "qi", "comp": "float_lantern", "clear": 0,
+		"lines": ["The little lotus lantern turns once in the current, as if bowing, and floats away downstream.",
+			"Two lanterns on the dark water, his and hers, drifting side by side for as long as they can see them.",
+			"For the dead, the river lanterns. Yue Ling sets hers out for somebody whose name she cannot remember, and cries a little, and does not say why.",
+			"The candle gutters, steadies, and goes on. That is all anybody can ask of a candle."]},
+	"calligraphy": {"n": "Writing table", "verb": "Write a line of verse", "clip": "write", "dur": 5.0, "at": "face", "hold": "brush", "fx": "ink", "effect": "lore", "comp": "think", "clear": 0,
+		"lines": ["\"The road is long; good company shortens it.\" His hand is a sweeper's, but the characters stand up straight.",
+			"He writes her name. She takes the brush and writes his underneath, better, and laughs at his face.",
+			"One character, written in one breath: home. The ink is still wet when the wind dries it.",
+			"\"Mountains do not meet; people do.\" Yue Ling says she will keep that one."]},
+	"flute_rock": {"n": "Flute on a rock", "verb": "Play the bamboo flute", "clip": "play_flute", "dur": 6.0, "at": "face", "hold": "flute", "fx": "notes", "effect": "qi", "comp": "dance", "clear": 0,
+		"lines": ["A thin, wavering tune, and Yue Ling dances to it as if it were a court orchestra.",
+			"Somebody left this flute here for anybody passing to play. He plays the one tune he knows, twice.",
+			"The notes go out over the water. A heron lifts its head, decides they are no threat, and goes back to fishing.",
+			"Yue Ling takes the flute from him and plays a tune so old the stones seem to know it. She does not know where she learned it."]},
 	# ---- furniture (the building draws it; see Architecture._furnish)
 	"altar": {"n": "Altar", "verb": "Pray at the altar", "clip": "pray", "dur": 4.5, "at": "face", "fx": "smoke", "effect": "qi", "comp": "pray",
 		"lines": ["Incense for the ancestors of the house. The smoke bends towards him and away.", "He bows three times and the candle flames bow back.", "A quiet room, and a quieter heart."]},
@@ -74,11 +143,11 @@ const KINDS := {
 		"lines": ["Breathe in for four, out for six. The qi settles like silt in a pool.", "His root hums in the stillness.", "Yue Ling sits a little way off and is quiet for once."]},
 	"scroll": {"n": "Calligraphy", "verb": "Look at the calligraphy", "clip": "think", "dur": 2.4, "at": "face", "fx": "", "effect": "lore", "comp": "think",
 		"lines": ["\"Water is soft and wins.\" The last stroke runs off the paper.", "One character, written in one breath: Dao.", "The brushwork is wild. The poem is about patience."]},
-	"bookshelf": {"n": "Bookshelf", "verb": "Read a while", "clip": "read", "dur": 5.0, "at": "face", "hold": "book", "fx": "", "effect": "lore", "comp": "read",
+	"bookshelf": {"n": "Bookshelf", "verb": "Read a while", "clip": "read", "dur": 5.0, "at": "face", "hold": "book", "fx": "", "effect": "lore", "comp": "read", "comp_hold": "book",
 		"lines": ["A treatise on the five phases with somebody's arguments in the margins.", "A book of ghost stories. He reads one too many.", "An old almanac: the auspicious days are all in the past."]},
 	"shelf": {"n": "Shelf", "verb": "Look over the shelf", "clip": "touch", "dur": 2.2, "at": "face", "fx": "", "effect": "lore", "comp": "watch",
 		"lines": ["Jars of pickles, salt, dried mushrooms, and a jar labelled DO NOT.", "Everything here has been mended at least once.", "A child's carved horse, put up high out of reach."]},
-	"table": {"n": "Table", "verb": "Pour a cup of tea", "clip": "drink", "dur": 2.6, "at": "face", "hold": "cup", "fx": "steam", "effect": "rest", "comp": "drink",
+	"table": {"n": "Table", "verb": "Pour a cup of tea", "clip": "drink", "dur": 2.6, "at": "face", "hold": "cup", "fx": "steam", "effect": "rest", "comp": "drink", "comp_hold": "cup",
 		"lines": ["Tea in a chipped cup, and very welcome.", "The table has a ring for every cup ever set on it.", "Sit, rest, drink: the oldest courtesy."]},
 	"desk": {"n": "Writing desk", "verb": "Read the papers", "clip": "read", "dur": 4.5, "at": "face", "hold": "book", "fx": "", "effect": "lore", "comp": "watch",
 		"lines": ["Accounts, letters, a poem crossed out three times.", "Somebody practises the character for 'eternity' here, over and over.", "Ink still wet. Whoever writes here has just stepped out."]},
@@ -108,6 +177,8 @@ const KINDS := {
 		"lines": ["Shuttle, beater, treadle. The pattern grows by a finger's width.", "He weaves a mistake into it. The weaver will find it and laugh.", "The Weaver of the Star River would weave faster. Not much better."]},
 	"lantern": {"n": "Lantern", "verb": "Trim the lantern", "clip": "touch", "dur": 2.0, "at": "face", "fx": "light", "effect": "lore", "comp": "watch",
 		"lines": ["The wick trimmed, the flame stands up straight.", "Paper and bamboo and a little light: enough.", "A moth leaves in a huff."]},
+	"tub": {"n": "Cedar bath", "verb": "Soak in the bath", "clip": "soak", "dur": 6.0, "at": "on", "rise": 0.12, "fx": "steam", "effect": "sleep", "comp": "watch",
+		"lines": ["Hot cedar and steam. Every ache the road ever gave him floats up and away.", "The water smells of pine and something floral the Founder must have liked.", "He soaks until Yue Ling knocks on the screen and asks if he has drowned."]},
 	"nest": {"n": "Nest", "verb": "Look into the nest", "clip": "touch", "dur": 2.2, "at": "face", "fx": "", "effect": "lore", "comp": "watch",
 		"lines": ["Woven of cloud-silk and feathers, and still warm.", "A Feathered Folk nest, swept clean and waiting.", "Three blue feathers left as a gift. He leaves them."]},
 }
@@ -119,7 +190,7 @@ const KINDS := {
 const FURNITURE := {"altar": "altar", "statue": "statue", "cushion": "cushion", "scroll": "scroll", "bookshelf": "bookshelf", "shelf": "shelf",
 	"table": "table", "desk": "desk", "counter": "counter", "stool": "stool", "cauldron": "cauldron", "herbs": "herbs", "hearth": "hearth",
 	"stove": "stove", "anvil": "anvil", "rack": "rack", "barrel": "barrel", "bed": "bed", "cabinet": "cabinet", "loom": "loom",
-	"lantern": "lantern", "nest": "nest"}
+	"lantern": "lantern", "nest": "nest", "tub": "tub"}
 
 ## The outdoor things to look for in a region by its theme (the first found a place get one); where
 ## a theme is not listed, the region takes the common list turned round by its own name.
@@ -178,23 +249,60 @@ const THEMES := {
 	"yingzhou": ["koi", "fishing", "tea", "chimes", "herb_patch", "bench"],
 	"guixu": ["stele", "shrine", "bell", "lantern_st", "fishing", "bench"],
 }
+## The bigger things of the Lotus release (structures.gd) a region looks for by its theme (or its own
+## id), placed after the six above; where neither is listed, LOTUS_COMMON.
+const LOTUS := {
+	"sect": ["stage", "archery", "calligraphy"], "mountain": ["watchtower", "pavilion", "kite"], "bamboo": ["flute_rock", "pavilion", "calligraphy"],
+	"marsh": ["river_lantern", "watchtower", "flute_rock"], "frost": ["hot_spring", "watchtower", "armillary"], "thunder": ["watchtower", "archery", "kite"],
+	"palace": ["stage", "lantern_green", "pavilion"], "garden": ["pavilion", "lantern_green", "kite"], "village": ["millstone", "lantern_green", "kite"],
+	"grave": ["sky_lantern", "calligraphy", "pavilion"], "forge": ["millstone", "archery", "watchtower"], "maple": ["pavilion", "sky_lantern", "calligraphy"],
+	"terraces": ["millstone", "pavilion", "kite"], "springs": ["river_lantern", "hot_spring", "sky_lantern"], "silk": ["lantern_green", "millstone", "pavilion"],
+	"millet": ["millstone", "kite", "watchtower"], "volcano": ["hot_spring", "watchtower", "archery"], "abyss": ["river_lantern", "armillary", "pavilion"],
+	"void": ["armillary", "sky_lantern", "watchtower"], "celestial": ["stage", "armillary", "pavilion"], "mirror": ["river_lantern", "flute_rock", "pavilion"],
+	"time": ["armillary", "calligraphy", "sky_lantern"], "origin": ["armillary", "pavilion", "flute_rock"], "cloudsea": ["kite", "pavilion", "flute_rock"],
+	"court": ["stage", "calligraphy", "archery"], "dunes": ["armillary", "watchtower", "kite"], "fungal": ["hot_spring", "lantern_green", "flute_rock"],
+	"aurora": ["hot_spring", "armillary", "archery"], "chaos": ["armillary", "watchtower", "stage"], "karst": ["flute_rock", "pavilion", "river_lantern"],
+	"wheel": ["sky_lantern", "river_lantern", "calligraphy"], "loom": ["lantern_green", "kite", "pavilion"], "starferry": ["river_lantern", "armillary", "sky_lantern"],
+	"magpie": ["lantern_green", "sky_lantern", "pavilion"], "starpalace": ["armillary", "stage", "calligraphy"], "jasper": ["pavilion", "flute_rock", "hot_spring"],
+	"yanggu": ["stage", "millstone", "lantern_green"], "fusang": ["sky_lantern", "kite", "archery"], "guanghan": ["armillary", "pavilion", "flute_rock"],
+	"longmen": ["river_lantern", "watchtower", "stage"], "drowned": ["river_lantern", "watchtower", "millstone"], "tushan": ["lantern_green", "calligraphy", "stage"],
+	"buzhou": ["watchtower", "armillary", "archery"], "juntian": ["kite", "pavilion", "stage"], "changhe": ["pavilion", "lantern_green", "calligraphy"],
+	"ninesprings": ["hot_spring", "river_lantern", "sky_lantern"], "youdu": ["sky_lantern", "stage", "calligraphy"], "penglai": ["pavilion", "flute_rock", "kite"],
+	"fangzhang": ["hot_spring", "calligraphy", "pavilion"], "yingzhou": ["river_lantern", "flute_rock", "armillary"], "guixu": ["watchtower", "sky_lantern", "river_lantern"],
+}
+const LOTUS_COMMON := ["pavilion", "kite", "sky_lantern"]
 ## outdoor things that stand in the water by the bank; the rest stand on the forest edge
-const WATER_KINDS := ["fishing", "koi"]
-## how many outdoor things a region has
+const WATER_KINDS := ["fishing", "koi", "river_lantern"]
+## how many outdoor things a region has: six of its theme's, then up to three of the bigger ones
 const PER_REGION := 6
+const LOTUS_PER := 3
+## (a region with fewer good tiles than this also takes the corners of its forest)
+const FEW_TILES := 18
 
 ## the clips played once (the rest loop for as long as the thing takes)
-const ONCE := ["drink", "strike", "gather", "lift", "toss", "touch", "bow", "think", "attack", "offer"]
-## what the hero holds for a clip that needs something in his hand (built in held())
-const HELD := ["dipper", "cup", "rod", "broom", "hammer", "ladle", "book", "stone_lock"]
+const ONCE := ["drink", "strike", "gather", "lift", "toss", "touch", "bow", "think", "attack", "offer", "archery", "release", "float_lantern", "clap", "wave", "laugh"]
+## what the hero holds for a clip that needs something in his hand (built in held(), the Lotus
+## release's in Structures.held; the bow goes in the left hand)
+const HELD := ["dipper", "cup", "rod", "broom", "hammer", "ladle", "book", "stone_lock", "flute", "reel", "sky_lantern", "brush", "bow"]
+const LEFT_HAND := ["bow"]
 ## the effects (use())
 const EFFECTS := ["rest", "drink", "qi", "lore", "fish", "luck", "herb", "train", "find", "sleep"]
 ## how the things answer while used (drawn by World._prop_fx; the swing's is the swing going)
 const FX := ["splash", "smoke", "ring", "boom", "notes", "ripple", "ribbon", "glow", "sparkle", "sparks", "embers", "dust",
-	"leaves", "steam", "chime", "light", "koi", "qi", "zzz", "swing"]
+	"leaves", "steam", "chime", "light", "koi", "qi", "zzz", "swing",
+	# the Lotus release
+	"blade", "flour", "arrow", "petals", "kite", "stars", "sky_lantern", "float", "ink"]
+## where a thing is done ("at"): see KINDS; the Lotus release adds "circle" (walked round: the
+## millstone) and "climb" (up a ladder to the top and down again: the watchtower), and "stage" (up
+## on its boards)
+const AT := ["face", "seat", "before", "on", "circle", "climb", "stage"]
 
 static func kind_of(e: Dictionary) -> Dictionary:
 	return KINDS.get(str(e.get("prop", "")), {})
+
+## What a thing is called where it stands (a memory's place has a name of its own, bonds.gd).
+static func name_of(e: Dictionary) -> String:
+	return str(e.get("n", kind_of(e).get("n", "")))
 
 ## A line of what is said about doing it: a different one each time.
 static func line_for(e: Dictionary, n: int) -> String:
@@ -214,6 +322,17 @@ static func wanted(area: String) -> Array:
 		return THEMES[th]
 	var k := absi(hash(area)) % COMMON.size()
 	return COMMON.slice(k) + COMMON.slice(0, k)
+
+## The bigger things (structures.gd) a region looks for, in order, once its six are placed.
+static func wanted_lotus(area: String) -> Array:
+	var th: String = str(Data.AREAS[area].get("theme", area))
+	if LOTUS.has(area):
+		return LOTUS[area]
+	return LOTUS.get(th, LOTUS_COMMON)
+
+## Whether a kind is one of the Lotus release's bigger things (built by structures.gd).
+static func is_structure(kind: String) -> bool:
+	return Structures.KINDS.has(kind)
 
 static func _walkable(t: int) -> bool:
 	return t == MapGen.FLOOR or t == MapGen.PATH or t == MapGen.DECOR
@@ -288,18 +407,26 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 						cands[o].append(c0)
 					break
 	var out: Array = []
+	var all_placed: Array = []
 	for k in ids.size():
 		var area: String = ids[k]
 		var list: Array = cands[k]
 		list.sort_custom(func(a, b): return a[0] < b[0])
 		var more: Array = loose[k]
 		more.sort_custom(func(a, b): return a[0] < b[0])
-		if list.size() < PER_REGION * 3:
+		if list.size() < FEW_TILES:
 			list.append_array(more)
 		var used := {}
 		var placed: Array = []
-		for kind in wanted(area):
-			if placed.size() >= PER_REGION:
+		var base_n: int = wanted(area).size()
+		var kinds: Array = wanted(area) + wanted_lotus(area)
+		for ki in kinds.size():
+			var kind: String = kinds[ki]
+			# six of the region's own, then the bigger things after them (so the six stand where they
+			# always stood)
+			if ki < base_n and placed.size() >= PER_REGION:
+				continue
+			if placed.size() >= PER_REGION + LOTUS_PER:
 				break
 			var water: bool = WATER_KINDS.has(kind)
 			for c2 in list:
@@ -317,6 +444,15 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 				used[tile] = true
 				out.append({"kind": "prop", "id": "prop:%s:%d" % [area, placed.size()], "prop": kind, "pos": tile, "face": c2[2], "area": area, "layer": layer})
 				break
+		all_placed.append_array(placed)
+	# Part XV: the places of Yue Ling's memories, and the lotus pond where she woke (bonds.gd), on what
+	# is left of the edge, after everything else
+	var every := {}
+	for k2 in ids.size():
+		var both: Array = (cands[k2] as Array) + (loose[k2] as Array)
+		both.sort_custom(func(a, b): return a[0] < b[0])
+		every[k2] = both
+	out.append_array(Bonds.place(ids, every, all_placed, layer, out))
 	return out
 
 ## The furniture of a realm's buildings (or of one floor) as things to use: [kind, tile, blocks] from
@@ -375,8 +511,11 @@ static func use(e: Dictionary, g) -> Array:
 				var st := 5 + absi(hash(pid)) % 26
 				g.stones += st
 				out.append("Found %d spirit stones" % st)
-	# the first time Lin Feng does each kind of thing, the world hears of it
+	# with Yue Ling there: a wish of hers granted, and a little closer for doing it together (bonds.gd)
 	var kind := str(e.prop)
+	if g.companion:
+		out.append_array(Bonds.did_together(g, kind, str(k.get("comp", "watch")) != "watch" or bool(k.get("pair", false))))
+	# the first time Lin Feng does each kind of thing, the world hears of it
 	if not g.pastimes.has(kind):
 		g.pastimes[kind] = true
 		g.add_renown(1)
@@ -418,6 +557,8 @@ const BRONZE := Color("8a7038")
 ## towards +z.  Parts that move are kept as named children: "swing" (the bell, the drum skin, the
 ## swing seat, the chimes), "flame", "water".
 static func model(kind: String, theme: String) -> Node3D:
+	if is_structure(kind):
+		return Structures.model(kind, theme)
 	var root := Node3D.new()
 	var b := MB.new()
 	var g := MB.new()
@@ -630,6 +771,9 @@ static func model(kind: String, theme: String) -> Node3D:
 ## Something in the hero's hand for a clip, in the hand bone's own space (the bone runs from the
 ## wrist down to the fingers along -y; the palm faces +x for the right hand).
 static func held(what: String) -> Node3D:
+	var more := Structures.held(what)
+	if more != null:
+		return more
 	var root := Node3D.new()
 	var b := MB.new()
 	match what:

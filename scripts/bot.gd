@@ -70,7 +70,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"chong": "dao", "li": "dao", "tianwu": "wealth", "xu_fu": "dao",
 	"fetter_maple": "relic", "kui_drum": "might", "liang": "dao", "xingtian": "wealth",
 	# Part XIV: the friends it kept faith with come to the Wheel
-	"nie": "bond"}
+	"nie": "bond",
+	# Part XV: side by side with Yue Ling against the Unweaver; a key of pressed petals for the Warden
+	"unweaver": "heart", "lock_warden": "craft"}
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
 ## Tala, Qiu Ye and Fang Hu become friends, Xu Lan an enemy spared at the end, Liu Ying an enemy who
@@ -94,6 +96,18 @@ const GRUDGE_ROUTE := ["grudge_headless_saint", "grudge_iron_fang", "grudge_mars
 const GRUDGE_PLAN := {"grudge_iron_fang": ["son", "test"], "grudge_marsh_hag": ["name", "pay"], "grudge_headless_saint": ["bow", "tablet"],
 	"grudge_fangfeng": ["ask", "shrine"], "grudge_kui": ["home", "unstring"], "grudge_admiral": ["wheel"]}
 const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
+## The Lotus release (bonds.gd): the bot has every heart-to-heart Yue Ling wants as soon as she wants
+## it (T), and answers by TALK_PLAN (mostly towards walking beside him, now and then towards the
+## mountain or a road of her own, so one run leans all three ways); the memories it gives back in Part
+## XV, in this order (any six of seven do: the bamboo and the snow of Part I, the Yellow Springs on the
+## funeral road, the ferry's stars, the Magpie Bridge and the tea hills on the way to the silk woods), what it says at each,
+## and at the lotus pond; and the future she writes for herself (the one her heart leans to).
+const TALK_PLAN := {"t_lotus": "mine", "t_hands": "teach", "t_winter": "here", "t_chains": "cut", "t_sky": "share", "t_seal": "you",
+	"t_ageless": "keep", "t_mend": "me", "t_ancestors": "make", "t_mother": "sing", "t_bridge": "yes", "t_noon": "duty", "t_maps": "draw",
+	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_moths": "keep", "t_wrist": "family", "t_after": "never"}
+const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "mem_dance", "mem_kite"]
+const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
+const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both"}
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
@@ -190,6 +204,11 @@ func _apply_start() -> void:
 				pick = fo if not fo.is_empty() else pick.follow.options[0]
 			if not pick.is_empty():
 				Fate.take(Game, Fate.thread_of_step(str(st2.id)), pick)
+	# the heart-to-hearts Yue Ling would have had by then, answered as the plan answers them (bonds.gd)
+	for tk in Bonds.TALKS:
+		if Data.step_index(str(tk.after)) < idx:
+			var o := Bonds.talk_option(str(tk.id), str(TALK_PLAN.get(str(tk.id), "")))
+			Bonds.take_talk(Game, str(tk.id), o if not o.is_empty() else tk.options[0])
 	# and what the story gave on the way (the Elder's robe, the flying sword, an immortal's cloud)
 	for st3 in Data.STEPS.slice(0, idx):
 		for rw in Fashion.step_rewards(str(st3.id)):
@@ -388,6 +407,10 @@ func _world(d: float) -> void:
 		# on a ladder or the stairs
 		world.move_dir = Vector2i.ZERO
 		return
+	if not world.using.is_empty():
+		# doing something (props.gd): let it be done (a key now would cut it short)
+		world.move_dir = Vector2i.ZERO
+		return
 	# stuck watchdog
 	if world.ptile == last_tile and world.move_dir != Vector2i.ZERO:
 		stuck_t += d
@@ -404,6 +427,17 @@ func _world(d: float) -> void:
 	# 1) rest when hurt or out of qi
 	if _hp_ratio() < 0.5 or _qi_ratio() < 0.15:
 		_start_meditate("rest")
+		return
+	# 1b) the Lotus release: Yue Ling has something to say; hear her out (T)
+	if Bonds.talk_ready(Game) != "" and world.using.is_empty():
+		world.move_dir = Vector2i.ZERO
+		_press("talk", 0.5)
+		return
+	# 1c) and a wish of hers that a thing near the road can grant: a player passing a swing she asked
+	# about would stop for it
+	var wt = _wish_target(d)
+	if wt != null:
+		_walk_to(wt.pos, "wish:" + str(wt.id))
 		return
 	# 1a) Fates and Faces: ride whenever there is a ride (it waits outside buildings by itself), and
 	# wear the newest outfit earned
@@ -496,6 +530,23 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			elif vt != "":
 				_goto_entity(Trials.npc_area(vt), vt)
+		"share":
+			# Part XV: the lotus pond where Yue Ling woke
+			_goto_entity(str(s.area), str(s.spot))
+		"memories":
+			# Part XV: the next of her memories on the bot's round (any five), each guarded by moths
+			var mm := _next_memory()
+			if mm == "":
+				return
+			if _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity(str(Bonds.MEMORIES[mm].area), "mem:" + mm)
+		"threads":
+			# Part XV: the nearest of the people still to tie a thread for her
+			var tv := _visit_target()
+			if tv != "":
+				_goto_entity(Trials.npc_area(tv), tv)
 		"grudges":
 			# Part XIV: the next of the grudges that stayed (all six, in any order), each a boss
 			var gr := _next_grudge()
@@ -543,8 +594,10 @@ func _grind() -> void:
 			return
 	# nothing here will fight (the sect, the mountain, a region whose beasts all scatter): go to where
 	# the quest or the trial ahead is, if anything there will, rather than meditate for hours (back at
-	# the sect to craft for a trial, the bot sat meditating towards Chiyou's realm, Part XIII)
-	if Game.area == "sect" or Game.area == Atlas.HUB or world.is_floor():
+	# the sect to craft for a trial, the bot sat meditating towards Chiyou's realm, Part XIII).  From
+	# anywhere, not only the sect: on its way to the graves it used to sit down in the Mirror Lake,
+	# whose beasts all scatter, and meditate there for the rest of the game
+	if true:
 		var tt := _trial_target()
 		var qa: String = str(tt.get("area", Game.cur_step().get("area", "")))
 		if qa == "" or not _fights_in(qa):
@@ -797,6 +850,22 @@ func _choice() -> void:
 		if str(c.title) == str(Fate.PICKS[pk].ask):
 			_nav(ids.size(), c.cursor, ids.find(PICK_PLAN[pk]))
 			return
+	# the Lotus release (bonds.gd): a heart-to-heart, a memory given back, the lotus pond
+	for tk in Bonds.TALKS:
+		if str(c.title) == str(tk.ask):
+			_nav(ids.size(), c.cursor, maxi(0, ids.find(str(TALK_PLAN.get(str(tk.id), "")))))
+			return
+	for mid in Bonds.MEMORIES:
+		if str(c.title) == str(Bonds.MEMORIES[mid].ask):
+			_nav(ids.size(), c.cursor, maxi(0, ids.find(str(MEMORY_PLAN.get(mid, "")))))
+			return
+	for shid in Bonds.SHARES:
+		if str(c.title) == str(Bonds.SHARES[shid].ask):
+			var want_s := str(SHARE_PLAN.get(shid, ""))
+			if Bonds.SHARES[shid].get("future", false):
+				want_s = Bonds.leaning(Game) if Bonds.leaning(Game) != "" else "companion"
+			_nav(ids.size(), c.cursor, maxi(0, ids.find(want_s)))
+			return
 	for gid in GRUDGE_PLAN:
 		if str(c.title) == str(Grudges.GRUDGES[gid].ask):
 			# a grudge that stayed, spent: the answer the plan prefers that can be given
@@ -850,6 +919,60 @@ func _trial_target() -> Dictionary:
 		return tt_cache
 	tt_cache = {"tid": tid, "pid": _path_for(tid), "area": Trials.boss_area(tid)}
 	return tt_cache
+
+## A thing near the bot that grants one of Yue Ling's open wishes (bonds.gd), or null: the nearest of
+## that kind within a short walk, out of doors, while she is with him.  One it cannot get to within half
+## a minute is left alone.
+var wish_id := ""
+var wish_t := 0.0
+var wish_skip := {}
+const WISH_REACH := 24
+
+func _wish_target(d: float):
+	if not Game.companion or world.is_floor():
+		return null
+	var st := Game.cur_step()
+	if st.is_empty() or str(st.kind) in ["fate", "fates", "breakthrough"]:
+		return null
+	if wish_id != "":
+		var we = world.find_ent(wish_id)
+		var still := false
+		if we != null:
+			for wid in Bonds.wishes_open(Game):
+				still = still or str(Bonds.wish(str(wid)).kind) == str(we.prop)
+		wish_t += d
+		if we != null and still and wish_t < 30.0:
+			return we
+		if wish_t >= 30.0:
+			wish_skip[wish_id] = true
+		wish_id = ""
+	var kinds := {}
+	for wid2 in Bonds.wishes_open(Game):
+		kinds[str(Bonds.wish(str(wid2)).kind)] = true
+	if kinds.is_empty():
+		return null
+	var best = null
+	var bd := WISH_REACH + 1
+	for e in world.ents:
+		if e.kind != "prop" or e.has("furn") or not kinds.has(str(e.prop)) or wish_skip.has(str(e.id)):
+			continue
+		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		if dd < bd:
+			bd = dd
+			best = e
+	if best != null:
+		wish_id = str(best.id)
+		wish_t = 0.0
+	return best
+
+## The next of Yue Ling's memories (Part XV) on the bot's round, "" when none is left to give back.
+func _next_memory() -> String:
+	for mid in MEMORY_ROUTE + Bonds.MEMORY_ORDER:
+		if Game.memories.has(mid):
+			continue
+		if world.find_ent("mem:" + mid) != null or not world.locate_ent("mem:" + mid).is_empty():
+			return mid
+	return ""
 
 ## The next of the grudges that stayed (Part XIV) on the bot's round, "" once all six are answered.
 func _next_grudge() -> String:
@@ -928,6 +1051,9 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 				var did: String = str(n[1]) if str(n[1]) != "" else Game.dao
 				if did == "" or Game.dao == "" or Game.dao_tier(did) < int(n[2]):
 					return false
+			"heart":
+				# closeness with Yue Ling grows by itself on the road (talks, memories); none to make
+				return false
 			_:
 				return false
 	return true
@@ -1035,17 +1161,22 @@ var visit_id := ""
 func _visit_target() -> String:
 	var s := Game.cur_step()
 	var want: Array = s.get("npcs", [])
-	if visit_id != "" and want.has(visit_id) and not Game.visited.has(visit_id):
+	# (Part XV's threads are counted apart from the visits of Parts XIII and XIV)
+	var seen_: Dictionary = Game.threads if str(s.kind) == "threads" else Game.visited
+	if visit_id != "" and want.has(visit_id) and not seen_.has(visit_id):
 		return visit_id
 	var here: String = str(world.layer) if not world.is_floor() else str(world.wd.parent)
 	var best := ""
 	var bd := 1 << 30
 	for k in want.size():
 		var id: String = str(want[k])
-		if Game.visited.has(id):
+		if seen_.has(id):
 			continue
 		var cost := k + (0 if Data.layer_of(Trials.npc_area(id)) == here else 1000)
 		var e = world.find_ent(id)
+		if e != null and not world.ent_visible(e):
+			# (somebody who is not there: a friend who fell, Part XIV)
+			continue
 		if e != null:
 			cost = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y) - 2000
 		if cost < bd:

@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 57
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled"]
+const MAX_LEVEL := 60
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 330000, 370000, 410000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -61,6 +61,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Sage of Many Roads", "note": "Every road you have walked runs through you at once, and you never have to choose between them. Nobody does. That was the secret all along."},
 	# Part XIV: every cause he set moving has met its effect, and nothing is owed either way
 	{"life": 0, "title": "Settled One", "note": "Every cause you set moving has come home and been answered. Nothing is owed you and you owe nothing; the threads of other lives still run through yours, but none of them pulls."},
+	# Part XV (the Lotus release): nobody reaches the top alone
+	{"life": 0, "title": "Kindred Sage", "note": "Nobody ever reached the top of the mountain alone. Everyone who walked beside you is part of your Dao now, and you of theirs; you carry them the way a river carries the sky, and they carry you back."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -646,6 +648,13 @@ const ENEMIES := {
 	"grudge_fangfeng": {"n": "Fangfeng's Grudge", "elem": "earth", "weak": "wood", "col": Color("3c4434"), "shape": "humanoid", "boss": true, "grudge": true},
 	"grudge_kui": {"n": "Kui's Grudge", "elem": "thunder", "weak": "earth", "col": Color("3a4252"), "shape": "mammoth", "boss": true, "grudge": true, "pal": {"acc": Color("ff5a7a")}},
 	"grudge_admiral": {"n": "The Admiral's Grudge", "elem": "water", "weak": "thunder", "col": Color("28323c"), "shape": "wraith", "boss": true, "grudge": true, "pal": {"sec": Color("10161c"), "acc": Color("ffd060")}},
+	# ---- Part XV (the Lotus release): the things that eat forgetting, and the Warden of the Lock
+	"loose_thread": {"n": "Loose Thread", "elem": "wood", "weak": "fire", "col": Color("e8a8c8"), "shape": "wisp"},
+	"forgetting_moth": {"n": "Moth of Forgetting", "elem": "dark", "weak": "fire", "col": Color("9a9aa8"), "shape": "moth", "pal": {"sec": Color("4a4a58"), "acc": Color("e8e8f0")}},
+	"unweaver_shuttle": {"n": "Unweaving Shuttle", "elem": "phys", "weak": "thunder", "col": Color("b8a070"), "shape": "spider"},
+	"forgetting_queen": {"n": "The Moth-Queen of Forgetting", "elem": "dark", "weak": "fire", "col": Color("8a8a98"), "shape": "moth", "boss": true, "pal": {"sec": Color("2a2a34"), "acc": Color("f0f0ff")}},
+	"unweaver": {"n": "The Unweaver", "elem": "phys", "weak": "thunder", "col": Color("c8b080"), "shape": "spider", "boss": true, "pal": {"sec": Color("3a2a1a"), "acc": Color("ff9ac0")}},
+	"lock_warden": {"n": "Suo, Warden of the Lock", "elem": "earth", "weak": "wood", "col": Color("8a7038"), "shape": "golem", "boss": true, "pal": {"sec": Color("2a4a3a"), "acc": Color("ff9ac0"), "mark": Color("e8c860")}},
 }
 
 ## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
@@ -779,6 +788,9 @@ const AREAS := {
 	"mountain": {
 		"n": "Azure Cloud Mountain", "w": 180, "h": 160, "seed": 7, "theme": "sect", "enemies": 0, "hill": 2.2,
 		"portals": [],
+		# Part XV: the Warden of the Lock, under the Founder's Last Cave, where the mountain goes down to
+		# the root of the sect's pond
+		"bosses": [{"id": "lock_warden", "pos": Vector2i(63, 103), "lv": 59, "req": 59, "vis": ["s_p15_warden", ""]}],
 		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 		# trails that join the mountain's people start just north of the sect's north wall
 		"start": Vector2i(82, 56),
@@ -835,6 +847,14 @@ const AREAS := {
 				"props": [["altar", Vector2i(92, 49), true], ["altar", Vector2i(92, 50), true], ["altar", Vector2i(92, 51), true], ["statue", Vector2i(92, 50), false], ["cushion", Vector2i(89, 50), false]]},
 			{"id": "post_stables", "n": "Post Stables", "style": "farmhouse", "rect": Rect2i(100, 24, 8, 6), "door": Vector2i(103, 29),
 				"props": [["barrel", Vector2i(101, 25), true], ["barrel", Vector2i(106, 25), true], ["rack", Vector2i(104, 25), true]]},
+			# Part XV (the Lotus release): the Founder's hermitage below the Last Cave, where she wove Yue Ling
+			# out of the Seal's lotus three hundred years ago, and its bathhouse
+			{"id": "lotus_hermitage", "n": "The Founder's Hermitage", "style": "hermitage", "rect": Rect2i(68, 101, 11, 8), "door": Vector2i(68, 104),
+				"props": [["altar", Vector2i(77, 104), true], ["statue", Vector2i(77, 104), false], ["loom", Vector2i(72, 102), true], ["bookshelf", Vector2i(75, 102), true],
+					["cushion", Vector2i(73, 106), false], ["scroll", Vector2i(70, 102), false], ["lantern", Vector2i(74, 105), false], ["cabinet", Vector2i(76, 107), true]]},
+			{"id": "lotus_bathhouse", "n": "The Hermitage Bathhouse", "style": "bathhouse", "rect": Rect2i(70, 112, 8, 6), "door": Vector2i(73, 112),
+				"props": [["tub", Vector2i(72, 115), true], ["tub", Vector2i(75, 115), true], ["stool", Vector2i(73, 114), false], ["barrel", Vector2i(71, 116), true],
+					["shelf", Vector2i(76, 113), true], ["lantern", Vector2i(74, 116), false]]},
 		],
 	},
 	"bamboo": {
@@ -1035,7 +1055,9 @@ const AREAS := {
 		],
 		"npcs": [
 			# a fated encounter (fate.gd): there while the story has them there
-			{"id": "qiu_ye_grave", "n": "Qiu Ye", "pos": Vector2i(8, 26), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},{"id": "grave_keeper", "n": "Gravekeeper Mu Gu", "pos": Vector2i(10, 26), "col": Color("b8b8c8"), "vis": ["s_gv_intro", ""]}],
+			{"id": "qiu_ye_grave", "n": "Qiu Ye", "pos": Vector2i(8, 26), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},{"id": "grave_keeper", "n": "Gravekeeper Mu Gu", "pos": Vector2i(10, 26), "col": Color("b8b8c8"), "vis": ["s_gv_intro", ""]},
+			# Part XV: the Founder's echo, threading a needle beside her own barrow
+			{"id": "qing_lian_echo", "n": "Echo of Founder Qing Lian", "pos": Vector2i(80, 33), "col": Color("f0f0f4"), "vis": ["s_p15_founder", ""]}],
 		"bosses": [
 			{"id": "bone_wyrm", "pos": Vector2i(34, 40), "lv": 19, "req": 19},
 			{"id": "headless_saint", "pos": Vector2i(48, 22), "lv": 20, "req": 20},
@@ -1048,6 +1070,8 @@ const AREAS := {
 			{"id": "relic3", "item": "relic", "pos": Vector2i(66, 30)}, {"id": "relic4", "item": "relic", "pos": Vector2i(76, 10)},
 		],
 		"pickup_vis": "s_gv_collect",
+		# Part XV: the things that eat forgetting, unpicking the Founder's weave among the graves
+		"warband": {"pool": [["loose_thread", 57, 58], ["forgetting_moth", 57, 58], ["unweaver_shuttle", 57, 58]], "n": 8, "vis": "s_p15_judge"},
 	},
 	"time": {
 		"n": "River of Ten Thousand Years", "w": 96, "h": 58, "seed": 131, "theme": "time", "enemies": 20,
@@ -1442,6 +1466,8 @@ const AREAS := {
 		"bosses": [
 			{"id": "silkworm_queen", "pos": Vector2i(30, 40), "lv": 34, "req": 34},
 			{"id": "moth_empress", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
+			# Part XV: the queen of the moths that eat forgetting
+			{"id": "forgetting_queen", "pos": Vector2i(49, 18), "lv": 58, "req": 57, "vis": ["s_p15_moth", ""]},
 			{"id": "mulberry_ent", "pos": Vector2i(60, 40), "lv": 34, "req": 34},
 			{"id": "thousand_hands", "pos": Vector2i(86, 28), "lv": 34, "req": 34},
 		],
@@ -1464,6 +1490,8 @@ const AREAS := {
 			{"id": "spindle_golem", "pos": Vector2i(46, 16), "lv": 35, "req": 35},
 			{"id": "shuttle_dragon", "pos": Vector2i(60, 40), "lv": 35, "req": 35},
 			{"id": "qianxian", "pos": Vector2i(86, 28), "lv": 35, "req": 35},
+			# Part XV: the hand that winds every thread back to the spindle
+			{"id": "unweaver", "pos": Vector2i(83, 31), "lv": 59, "req": 58, "vis": ["s_p15_unweaver", ""]},
 		],
 		"pickups": [{"id": "shuttle1", "item": "shuttle", "pos": Vector2i(22, 12)}, {"id": "shuttle2", "item": "shuttle", "pos": Vector2i(40, 46)}, {"id": "shuttle3", "item": "shuttle", "pos": Vector2i(64, 30)}, {"id": "shuttle4", "item": "shuttle", "pos": Vector2i(76, 10)}],
 		"pickup_vis": "s_lm_collect",
@@ -2857,6 +2885,23 @@ const STEPS := [
 	{"id": "s_p14_nie", "kind": "kill", "boss": "nie", "area": "wheel", "t": "Face Nie, the Unpaid, at the heart of the Wheel", "stones": 22600},
 	{"id": "s_p14_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Go home: every debt is paid, one way or another"},
 	{"id": "s_break19", "kind": "breakthrough", "to": 57, "t": "Let every cause meet its effect: Karma Fulfilled"},
+	# ---- Part XV: The Thread She Never Had (the Lotus release).  Yue Ling's chapter: give her a past,
+	# friends who remember her, and the first line of a life of her own (bonds.gd)
+	{"id": "s_p15_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Nobody can remember Yue Ling's name: speak to Elder Qing Xuan", "stones": 23000},
+	{"id": "s_p15_pond", "kind": "share", "spot": "mem:mem_pond", "area": "sect", "t": "Sit with Yue Ling by the lotus pond where she woke, at the foot of the courtyard"},
+	{"id": "s_p15_judge", "kind": "talk", "npc": "judge_cui", "area": "wheel", "t": "Go down the funeral road and ask Judge Cui why the Book of Life and Death has no page for her"},
+	{"id": "s_p15_hunt", "kind": "hunt", "area": "grave", "n": 16, "of": ["loose_thread", "forgetting_moth", "unweaver_shuttle"], "t": "Drive off the things unpicking the Founder's weave in the Graveyard of Sword Saints"},
+	{"id": "s_p15_founder", "kind": "talk", "npc": "qing_lian_echo", "area": "grave", "t": "Find the Founder's echo beside her barrow in the Graveyard of Sword Saints"},
+	{"id": "s_p15_loom", "kind": "share", "spot": "furn:mountain:lotus_hermitage:2", "area": "mountain", "t": "Go up to the Founder's Hermitage under the Last Cave on the mountain, and sit with Yue Ling at the loom she was woven on"},
+	{"id": "s_p15_memories", "kind": "memories", "n": 6, "area": "grave", "t": "Give Yue Ling back six of the seven memories the Founder pressed where she was happiest, in any order (Esc > Yue Ling)"},
+	{"id": "s_p15_moth", "kind": "kill", "boss": "forgetting_queen", "area": "silk", "t": "Find what woke the moths: the Moth-Queen of Forgetting in the Mulberry Silk Woods"},
+	{"id": "s_p15_unweaver", "kind": "kill", "boss": "unweaver", "area": "loom", "t": "Stop the Unweaver winding her threads back at the Loom of Borders"},
+	{"id": "s_p15_threads", "kind": "threads", "npcs": ["qiu_ye_end", "tala_end", "hu_end", "xu_lan_end", "liu_ying_end", "alchemist", "archivist", "mazu", "meng_po", "smith", "granny_wen"], "n": 5, "area": "sect",
+		"t": "Ask five of the people who knew her to tie a thread for Yue Ling, in any order: her friends, Alchemist Mo, Smith Tie, Archivist Lan, Granny Wen, Mazu, Meng Po"},
+	{"id": "s_p15_warden", "kind": "kill", "boss": "lock_warden", "area": "mountain", "t": "Face Suo, Warden of the Lock, under the Founder's Last Cave on the mountain", "stones": 23600},
+	{"id": "s_p15_name", "kind": "share", "spot": "mem:mem_pond", "area": "sect", "t": "Go back to the lotus pond with Yue Ling: there is a page in the Book of Life and Death with her name on it"},
+	{"id": "s_p15_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell the Elder: Yue Ling has written the first line of her life"},
+	{"id": "s_break20", "kind": "breakthrough", "to": 60, "t": "Climb the last step together: Kindred Dao"},
 ]
 
 static func step_index(id: String) -> int:
@@ -2981,6 +3026,10 @@ const ITEMS := {
 	"clear_mirror": {"n": "Mirror of Clear Sight", "desc": "Polished from Jingwei's stones. It shows only what is really there"},
 	"kui_drumstick": {"n": "Drumstick of the Thunder-Beast", "desc": "Whoever holds it decides when the drum of Kui's hide is struck"},
 	"settled_mirror": {"n": "Mirror of Settled Debts", "desc": "Two spokes of the Wheel forged into a mirror with dark and metal essence. A debt that looks into it remembers whether it was ever owed"},
+	# Part XV (the Lotus release)
+	"pressed_petal": {"n": "Pressed Petal", "desc": "A lotus petal the Founder pressed a memory of Yue Ling's into, given back. It smells of whichever summer it was"},
+	"lotus_shuttle": {"n": "Shuttle of Pressed Petals", "desc": "A weaver's shuttle Alchemist Mo made of pressed petals and wood essence. Whatever unweaves, it weaves back"},
+	"open_key": {"n": "Key of the Open Door", "desc": "Smith Tie's key with no lock: two pressed petals beaten into bronze with metal and dark essence. It opens what is shut by leaving it open"},
 	"homing_elixir": {"n": "Elixir of Coming Home", "desc": "Five essences and an autumn leaf, refined for a fortune. It smells of fields a war god has not seen in five thousand years"},
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
@@ -3236,6 +3285,7 @@ const CHAT := {
 	"lantern_monk": ["A lantern is only a question: where are you going? The dead have forgotten the answer.", "Walk softly in the gorge. Every maple here was planted over someone."],
 	"fisher": ["My birds fish for memories now. The river is thick with them, since the Wheel stopped.", "Nine bends, and every one of them remembers a different drowning. Mind your footing."],
 	"meng_po": ["Soup? No? Wise. Not yet, little Sovereign. Not yet.", "Forgetting is not the cruel part. Being made to forget by someone who profits from it, that is the cruel part."],
+	"qing_lian_echo": ["I am mostly a needle and a habit. Sit, if you like. Habits are good company.", "Every bearer thought he was the hero. Every one of them was right, for a little while. She was the one who stayed.", "I gave her a rose robe. I always meant to give her a better name, and then she chose her own, and it was better than anything I would have thought of."],
 	"judge_cui": ["Every soul in the six paths has a page. I wrote most of them. I am trying to write them kindly now.", "The Wheel is not a punishment. It is a door. Doors are meant to open."],
 	"peach_keeper": ["A peach of this garden ripens once in three thousand years. Do not waste it.", "The nineteen come here in their dreams. They like the shade."],
 	# ---- Part XII: Fusang's shore and the Isles of the Eastern Sea
@@ -5943,6 +5993,147 @@ const DIALOGUE := {
 		["Narrator", "He becomes the first cultivator of Karma Fulfilled: a realm in which the threads of other lives still run through yours, and none of them pulls."],
 		["Narrator", "The Conclave of the Realms meets every autumn after that, under the Jianmu, and argues happily about everything. Nobody is in charge of it. Auntie Zhou feeds everybody."],
 		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect, which are the first steps of every road, because somebody should."],
+	],
+	# ---- Part XV: The Thread She Never Had (the Lotus release; bonds.gd)
+	"recall13": [
+		["Narrator", "For nine days after the last tribulation nothing on Azure Cloud Mountain is owed to anybody, and Lin Feng sleeps the way he has not slept since he was six."],
+		["Narrator", "On the tenth morning Disciple Han brings the Elder's tea and sets out two cups. He stops with the pot in the air and frowns at the second one."],
+		["Disciple Han", "Elder, forgive me. Who is the second cup for?"],
+		["Yue Ling", "It is for me, Han. It has been for me every morning for ten years.", "shock"],
+		["Narrator", "Han looks at her and smiles politely, the way you smile at a guest whose name you are sure you ought to know."],
+	],
+	"s_p15_home": [
+		["Elder Qing Xuan", "Sit, both of you. No, Yue Ling, sit. I mean you most of all. Forgive an old man: this morning, for the space of a breath, I could not remember your name, and I have known it longer than anybody living."],
+		["Yue Ling", "Everybody is doing it, Elder. The cook gave me a bowl and then asked if I was lost. The cats still know me. I am clinging to the cats.", "laugh"],
+		["Elder Qing Xuan", "When every thread in the world went slack at the Wheel, one thing had no thread to go slack. You were woven, child, not born. Everything you did on the road was counted in Lin Feng's column, because the Seal was his."],
+		["Elder Qing Xuan", "While there were debts, the world needed you to help carry them. Now there are none, and the world is very tidy. It is putting away what it has no use for. Gently. But it is putting you away."],
+		["Lin Feng", "Then we stop it.", "shake"],
+		["Elder Qing Xuan", "You cannot stop tidiness, Lin Feng. I have tried for sixty years with this study. But a thing that has a place does not get put away. She needs a place in the world that is hers: a page in the Book of Life and Death."],
+		["Elder Qing Xuan", "Sit with her by the lotus pond where she woke, first. Then go down the funeral road to Judge Cui. If anybody can find a page for somebody who was never born, it is the clerk of the dead.", "point"],
+		["Yue Ling", "The pond. Yes. I would like to see it while I still remember it.", "nod"],
+	],
+	"s_p15_judge": [
+		["Judge Cui Jue", "Lin Feng. And... a moment... Yue Ling. I had to look twice. You are fading out of the Karma Mirror, healer, like breath off bronze.", "shock"],
+		["Judge Cui Jue", "The Book of Life and Death has a page for everybody who was ever born, and for nobody else. You were woven by the Founder out of the Seal's own lotus. There is nothing to write you on."],
+		["Yue Ling", "Then write me in the margin. I do not take up much room."],
+		["Judge Cui Jue", "Ha. The margins are full of my notes. But listen. A page is not made; it is grown. Three things grow one: a past that is your own, people who remember you and tie their threads to yours, and a first line you write yourself.", "think"],
+		["Judge Cui Jue", "Your past was not lost, healer. Every time a bearer died, the Seal was unwoven and woven again, and what you remembered was pressed out of you like a flower in a book. The Founder kept the pressings. Ask her where."],
+		["Lin Feng", "The Founder has been dead for three hundred years."],
+		["Judge Cui Jue", "So is half my staff. Go to her barrow in the Graveyard of Sword Saints. But hurry: something has been unpicking the old weave there, and feeding on what comes loose. Moths with no faces and threads that walk.", "point"],
+	],
+	"s_p15_founder": [
+		["Narrator", "Beside the Founder's barrow, where Lin Feng once earned her blessing with a sword, a woman in white sits on the grass threading a needle against the light. She is not quite there. Neither, these days, is Yue Ling."],
+		["Echo of Founder Qing Lian", "There you are. I gave you a rose robe because I thought you would grow into it. You have.", "nod"],
+		["Yue Ling", "Founder. Mother? I do not know what to call you."],
+		["Echo of Founder Qing Lian", "Call me Qing Lian. Mother is a name you earn by staying, and I did not stay. I wove you so that the bearer would never face the end alone, and then I died and left you to do it twenty times.", "grieve"],
+		["Echo of Founder Qing Lian", "Every time a bearer died, the Seal came apart and was woven again, and you came up out of the pond with your name and nothing else. I could not bear to throw the rest away. So I pressed it."],
+		["Echo of Founder Qing Lian", "What you remembered of each of them, I pressed where the two of you had been happiest: a flute stone, a jetty of lanterns, a kite post on the tea hills, a green under lanterns. Seven pressings are still whole. The rest have been eaten."],
+		["Lin Feng", "By the moths.", "think"],
+		["Echo of Founder Qing Lian", "By what woke them. When the Seal became a door, the part of it that was a lock was left with nothing to keep shut. It calls itself the Warden now, and it is unweaving her thread by thread, to take her back into the lock where she can never be lost."],
+		["Echo of Founder Qing Lian", "Give her back five of the pressings. Ask the people who knew her to tie a thread for her. Then the Warden will have to come out and face you, because she will be too much a person to be a key.", "point"],
+		["Yue Ling", "Will you be here when we come back?"],
+		["Echo of Founder Qing Lian", "I am an echo, child. Mostly a needle and a habit. But I will try."],
+	],
+	"pre:forgetting_queen": [
+		["Narrator", "In the mulberry woods the silk moths have gone grey and silent. In the middle of them sits their queen, as big as a cart, with a face like a blank page."],
+		["The Moth-Queen of Forgetting", "So many little names. So many little days. Give them to me, healer, and nobody will ever hurt you by forgetting them. Nothing hurts once it is gone."],
+		["Yue Ling", "Moths go to the light. It is the one thing they cannot forget. Fire, Lin Feng!", "point"],
+	],
+	"post:forgetting_queen": [
+		["Narrator", "The queen falls apart into a snow of grey scales, and out of the scales, all over the woods, come the things the moths had eaten: a child's song, the smell of rain on a roof, a woodcutter's laugh."],
+		["Yue Ling", "That laugh was Ah Zhu's. I know it was. She is still in there somewhere, Lin Feng.", "laugh"],
+	],
+	"pre:unweaver": [
+		["Narrator", "On the Loom of Borders, where every thread of every road was once woven, something with a hundred thin hands is winding thread back onto a spindle as big as a tree. Every thread is pink. Every thread is hers."],
+		["The Unweaver", "Every thread that was ever spun runs back to a spindle. I am the hand that winds it home. Hold still, little weave. I am only taking you back, stitch by stitch."],
+		["Yue Ling", "Not one more stitch.", "shake"],
+	],
+	"post:unweaver": [
+		["Narrator", "The Unweaver's hundred hands go slack, and the threads it was winding run out of the spindle like water: hundreds of them, fine and pink, and every one of them finds its way back to Yue Ling's wrists."],
+		["Yue Ling", "They are mine. Lin Feng, look. They are coming back.", "shock"],
+	],
+	"pre:lock_warden": [
+		["Narrator", "Under the Founder's Last Cave, where the mountain goes down to the root of the sect's pond, the Warden waits: a shape of bronze leaves and lotus petals, with a keyhole where its heart should be."],
+		["Suo, Warden of the Lock", "Three hundred years I kept the door. Three hundred years she came back to me, every time, and I made her new. Now the door stands open and nobody needs a lock. Give her back. In the lock she will never be forgotten, never be tidied away, never be lost again."],
+		["Yue Ling", "In the lock I would never be anything at all. I would rather be forgotten as myself than kept as something else."],
+		["Lin Feng", "You heard her.", "nod"],
+	],
+	"post:lock_warden": [
+		["Suo, Warden of the Lock", "...A door that is held open by somebody who chooses to stand in it. I never thought of that. I was only ever made to think about shutting."],
+		["Narrator", "The Warden unlocks itself. Leaf by bronze leaf it comes apart and goes down into the pond as lotus seeds, and the last thing to go is the keyhole, which closes."],
+		["Yue Ling", "It was only frightened. Like me. Like everybody.", "grieve"],
+	],
+	"s_p15_end": [
+		["Elder Qing Xuan", "Yue Ling. Yue Ling, Yue Ling. I have said it a hundred times this morning to be sure of it, and it stays. Welcome home, child. Properly, this time.", "bow"],
+		["Yue Ling", "The cook gave me two bowls this morning and called me by my name, and then scolded me for being thin. It was the best thing that has ever happened to me.", "laugh"],
+		["Elder Qing Xuan", "And you, Lin Feng. There is something new in your qi. Every cultivator I ever taught climbed alone; the books say that is what the path is. You have been climbing with somebody beside you the whole way, and it shows."],
+		["Elder Qing Xuan", "One more tribulation, I think. The last one is always a mirror. Go and look into it together.", "point"],
+	],
+	"pre:s_break20": [
+		["Narrator", "The last tribulation does not come down out of the sky. It comes up out of the lotus pond: two reflections, his and hers, standing on the water and waiting to see whether the two of them will agree."],
+		["Yue Ling", "Together, then. Do not step on my feet."],
+		["Lin Feng", "No promises."],
+	],
+	"post:s_break20": [
+		["Narrator", "The reflections bow to each other and go down into the pond, and the pond is only a pond again, with lotuses on it and two people standing at its edge."],
+		["Narrator", "Lin Feng becomes the first cultivator of Kindred Dao. Nobody, the old books say, reaches the top of the mountain alone. He finds the books were right, and that it was never meant as a warning."],
+		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, two people sweep the steps of the sect together, and argue about the right way to hold a broom, and neither of them is ever forgotten again."],
+	],
+	# the people who tie a thread for her (step s_p15_threads, any four, in any order)
+	"thread:qiu_ye_end": [
+		["Qiu Ye", "Yue Ling? Of course I remember her. She stitched my arm in the Graveyard when I was too proud to say it hurt, and told me pride was very bad for wounds."],
+		["Qiu Ye", "Here. The House of Qiu ties a thread for a guest who is family. My grandmother would have tied it tighter. Hold out your wrist, healer."],
+		["Narrator", "Qiu Ye ties a green silk thread round Yue Ling's wrist, very correctly, with the knot the old houses of Cloudfoot use, and bows."],
+	],
+	"thread:tala_end": [
+		["Tala of the Horse-Folk", "The healer with the rose sleeves! She sat up all night with my grey mare when the foal came wrong. The herd remembers her better than they remember me."],
+		["Tala of the Horse-Folk", "The horse-folk tie a hair from the herd's oldest mare round a friend's wrist, so the herd always knows them by smell. It is not very romantic. It works."],
+		["Narrator", "Tala braids a long grey horsehair round Yue Ling's wrist, and somewhere on the steppe an old mare lifts her head and whickers."],
+	],
+	"thread:hu_end": [
+		["Fang Hu", "She was there when I stood over my father with a kitchen knife. I remember her better than I remember him, almost. She did not say anything. She just made sure I ate."],
+		["Fang Hu", "Village custom: you tie a red thread on somebody's wrist at New Year for luck. It is not New Year. She can have it early."],
+		["Narrator", "Fang Hu ties a red cotton thread round her wrist with big clumsy fingers, and is embarrassed, and grins anyway."],
+	],
+	"thread:xu_lan_end": [
+		["Xu Lan", "She was the first person after the chains who looked at me as if I were not my father's daughter. I have never thanked her for that."],
+		["Xu Lan", "My mother's people tied a silver thread for somebody they meant to see again. Silver, for the moon. I have kept one for a long time, waiting for somebody to give it to."],
+		["Narrator", "Xu Lan ties a fine silver thread round Yue Ling's wrist, and for a moment looks very much younger than she is."],
+	],
+	"thread:liu_ying_end": [
+		["Liu Ying", "The other healer. The one who sorts her herbs wrong and gets them right anyway. I have been jealous of her for years. Do not tell her."],
+		["Liu Ying", "A herb-wife ties a thread of dyed hemp round a colleague's wrist: green for a healer, so the sick know who to trust. Hold still. I am not going to poison you."],
+		["Narrator", "Liu Ying ties a green hemp thread round Yue Ling's wrist with the precision of somebody who measures doses in grains."],
+	],
+	"thread:alchemist": [
+		["Alchemist Mo", "Remember her? She corrected my Spring Rain Pill in front of the whole hall in the first week. I have never forgiven her. It was a much better pill."],
+		["Alchemist Mo", "There. A thread from the sect's own herb bundles: the red one we tie on a remedy that works. She is a remedy that works."],
+		["Narrator", "Mo ties the red string round her wrist with the same knot he ties on every bundle in the storeroom, and pretends to have something in his eye."],
+	],
+	"thread:archivist": [
+		["Archivist Lan", "I have her in the Annals. Every chapter. 'And Yue Ling, the healer.' I wrote it a hundred times and never once asked where she came from. An archivist's sin."],
+		["Archivist Lan", "Scholars tie a thread of blue silk round a scroll that must not be lost. I suppose a person can be a scroll."],
+		["Narrator", "Archivist Lan ties a blue silk scroll-thread round Yue Ling's wrist, and writes something in the margin of his ledger, and underlines it twice."],
+	],
+	"thread:mazu": [
+		["Mazu, Who Brings the Boats Home", "I bring every boat home, Lin Feng. Every one that was ever lost. I did not know there was a girl who had been lost twenty times, and every time came home by herself."],
+		["Mazu, Who Brings the Boats Home", "The fisherwives tie a red thread on the mast so I can find the boat in a storm. I will find her, now. Wherever she goes."],
+		["Narrator", "Mazu ties a red mast-thread round Yue Ling's wrist, and out on the pool of the suns every boat at its mooring turns, just a little, to face her."],
+	],
+	"thread:smith": [
+		["Smith Tie", "The healer? She set my arm when a billet slipped, and told me if I ever quenched a blade with that arm again she would set it the other way round. I believed her."],
+		["Smith Tie", "Smiths tie a strip of quenched bronze wire on an apprentice who has stood a whole day at the forge. She stood more days than any of them."],
+		["Narrator", "Smith Tie twists a fine bronze wire round Yue Ling's wrist with tongs, very gently for a man with hands like anvils, and nods once, the way he nods at a good blade."],
+	],
+	"thread:granny_wen": [
+		["Granny Wen", "Feng'er's healer girl! She sat with me a whole night when my chest was bad, the year of the threads, and sang me that old song about the boat. My own mother used to sing it."],
+		["Granny Wen", "In Qingshi we tie a red thread on a girl who has eaten at our table three times. She has eaten at mine thirty. Give me your wrist, child, and stop growing thin."],
+		["Narrator", "Granny Wen ties a red thread round Yue Ling's wrist with a village knot, and then, because she cannot help herself, presses a steamed bun into her other hand."],
+	],
+	"thread:meng_po": [
+		["Meng Po of the Naihe Bridge", "Oh, I remember her. I remember everybody, child; it is my curse and my soup. She came over my bridge twenty times without ever being dead, and she never once took the soup."],
+		["Meng Po of the Naihe Bridge", "This is the thread I tie on a soul I am sorry to see go. I have never tied it on somebody coming back. Hold still."],
+		["Narrator", "Meng Po ties a thread of red-lily fibre round Yue Ling's wrist, and pats her hand, and offers her soup out of habit, and laughs when she says no."],
 	],
 	# ---- Part V: The Falling Sky
 	"recall3": [

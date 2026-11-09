@@ -871,7 +871,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -916,6 +916,9 @@ func _init() -> void:
 							ok = ok and FateText.STATES.get(str(n[1]), {}).has(str(stn))
 					"bonds":
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Fate.THREAD_ORDER.size()
+					"heart":
+						# how close Lin Feng and Yue Ling have come (bonds.gd): a step she can reach
+						ok = ok and int(n[1]) >= 1 and int(n[1]) < Bonds.TITLES.size()
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -964,6 +967,8 @@ func _init() -> void:
 				for a5 in Data.AREAS:
 					for pk5 in Data.AREAS[a5].get("pickups", []):
 						got = got or (pk5.item == k2 and pk5.get("always", false))
+				# (Part XV: every memory given back to Yue Ling leaves a pressed petal)
+				got = got or (k2 == Bonds.PETAL and Data.step_index(Bonds.MEMORY_STEP) < tstep and Bonds.MEMORIES_NEEDED >= int(r.in[k2]))
 				check(got, "recipe %s: %s is found before its trial" % [rid, k2])
 	for did in Trials.DEEDS:
 		var d: Dictionary = Trials.DEEDS[did]
@@ -1059,12 +1064,12 @@ func _init() -> void:
 		bands += 1
 		check(Data.step_index(str(band.vis)) >= 0 and int(band.n) > 0, "%s: the war-band marches from a real step" % a6)
 		for pe6 in band.pool:
-			check(Data.ENEMIES.has(pe6[0]) and not Data.ENEMIES[pe6[0]].get("boss", false) and int(pe6[1]) > 50, "%s: war-band soldier %s is one of Chiyou's, at Part XIII's level" % [a6, pe6[0]])
+			check(Data.ENEMIES.has(pe6[0]) and not Data.ENEMIES[pe6[0]].get("boss", false) and int(pe6[1]) > 50, "%s: war-band soldier %s is one of the late chapters' foes, at their level" % [a6, pe6[0]])
 		var mw := MapGen.build(a6)
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis))
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 9, "the war-bands march in every gate's region, the heart's among them (%d), and Part XIV's grudges round the Wheel" % p13_bands)
+	check(p13_bands == 8 and bands == 10, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel and Part XV's moths among the graves" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1292,9 +1297,12 @@ func _init() -> void:
 	for pk in Props.KINDS:
 		var kd: Dictionary = Props.KINDS[pk]
 		check(str(kd.get("n", "")) != "" and str(kd.get("verb", "")) != "" and float(kd.get("dur", 0.0)) >= 1.5, "thing %s: a name, a hint and time to do it" % pk)
-		check(str(kd.get("at", "face")) in ["face", "seat", "before", "on"] and Props.EFFECTS.has(str(kd.get("effect", ""))), "thing %s: where it is done and what comes of it" % pk)
+		check(str(kd.get("at", "face")) in Props.AT and Props.EFFECTS.has(str(kd.get("effect", ""))), "thing %s: where it is done and what comes of it" % pk)
 		check((kd.get("lines", []) as Array).size() >= 3, "thing %s: three things to say of it" % pk)
 		check(str(kd.get("hold", "")) == "" or Props.HELD.has(str(kd.hold)), "thing %s: what is held can be held" % pk)
+		check(str(kd.get("comp_hold", "")) == "" or Props.HELD.has(str(kd.comp_hold)), "thing %s: what Yue Ling holds can be held" % pk)
+		# (she does not drink from an empty hand or read thin air: the bugs of the Lotus release)
+		check(not str(kd.get("comp", "")) in ["drink", "read", "play_flute", "release"] or str(kd.get("comp_hold", "")) != "", "thing %s: Yue Ling has something in her hands for it" % pk)
 		check(str(kd.get("fx", "")) == "" or Props.FX.has(str(kd.fx)), "thing %s: how it answers is drawn" % pk)
 		check(pap0.has_animation(str(kd.clip)), "Lin Feng can %s (%s)" % [str(kd.verb).to_lower(), kd.clip])
 		var pcc := str(kd.get("comp", "watch"))
@@ -1345,9 +1353,11 @@ func _init() -> void:
 				if absi(op.x - pe2.pos.x) <= 2 and absi(op.y - pe2.pos.y) <= 2:
 					bad_near += 1
 			for q2 in outs:
-				if q2[0] == pe2.area and (q2[1] as Vector2i).distance_squared_to(pe2.pos) < 64:
+				# (the places of Yue Ling's memories stand nearest the spot their memory names, bonds.gd:
+				# never on top of another thing, but they may be nearer than the rest)
+				if q2[0] == pe2.area and (q2[1] as Vector2i).distance_squared_to(pe2.pos) < (16 if pe2.has("memory") or bool(q2[2]) else 64):
 					bad_apart += 1
-			outs.append([pe2.area, pe2.pos])
+			outs.append([pe2.area, pe2.pos, pe2.has("memory")])
 		check(bad_tile == 0, "%s: every thing to do stands where nobody walks (%d astray)" % [plid, bad_tile])
 		check(bad_near == 0, "%s: outdoor things stand clear of everybody and everything (%d too close)" % [plid, bad_near])
 		check(bad_apart == 0, "%s: a region's outdoor things stand well apart (%d too close)" % [plid, bad_apart])
@@ -1627,8 +1637,9 @@ func _fates_and_faces() -> void:
 	FG.free()
 	CG.free()
 	print("== part XIV: the Ripening of Karma ==")
-	check(Data.REALMS.size() == 20 and Data.REALMS[19] == "Karma Fulfilled" and Data.MAX_LEVEL == 57 and Data.level_name(57).ends_with("Karma Fulfilled") and Data.REALM_INFO.size() == 20, "Part XIV adds the Karma Fulfilled realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break19" and Data.DIALOGUE.has("recall12") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break18\": \"recall12\""), "Part XIV follows Myriad Daos as One (recall12) and ends the game")
+	check(Data.REALMS[19] == "Karma Fulfilled" and Data.level_name(57).ends_with("Karma Fulfilled"), "Part XIV adds the Karma Fulfilled realm")
+	check(Data.DIALOGUE.has("recall12") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break18\": \"recall12\""), "Part XIV follows Myriad Daos as One (recall12)")
+	# (Part XIV no longer ends the game: Part XV follows its breakthrough, see _lotus)
 	check(Data.step_index("s_p14_fates") > Data.step_index("s_p14_hunt") and Data.step_index("s_p14_nie") > Data.step_index("s_p14_fates"), "the threads are settled before Nie is faced")
 	check(Trials.TRIALS.has("nie") and Trials.boss_area("nie") == "wheel" and Trials.path("nie", "bond").needs[0][0] == "bonds", "Nie is a trial at the Wheel, open to the friends Lin Feng made")
 	var wb: Dictionary = Data.AREAS.wheel.warband
@@ -1699,3 +1710,135 @@ func _fates_and_faces() -> void:
 	GG.free()
 	var bot_src := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bot_src.contains("GRUDGE_ROUTE") and Grudges.ORDER.all(func(g): return bot_src.contains("\"%s\"" % g)), "the bot goes to every grudge and has an answer for each")
+	_lotus()
+
+## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
+## things to do (structures.gd) and Part XV, the Thread She Never Had.
+func _lotus() -> void:
+	print("== the Lotus release: Yue Ling ==")
+	var prev_talk := -1
+	for tk in Bonds.TALKS:
+		var ti := Data.step_index(str(tk.after))
+		check(ti >= 0 and ti >= prev_talk, "heart-to-heart %s opens from a real step, in story order" % tk.id)
+		prev_talk = ti
+		check(not (tk.lines as Array).is_empty() and str(tk.ask) != "" and (tk.options as Array).size() >= 3, "heart-to-heart %s: something to say, a question and at least three replies" % tk.id)
+		var leans := {}
+		for o in tk.options:
+			check(Bonds.FUTURES.has(str(o.get("lean", ""))) and int(o.get("bond", 0)) > 0 and str(o.label) != "" and not (o.get("after", []) as Array).is_empty(), "%s/%s: leans her heart somewhere, brings them closer and has an answer" % [tk.id, o.id])
+			leans[str(o.lean)] = true
+		check(leans.size() == Bonds.FUTURES.size(), "heart-to-heart %s offers every way her heart can lean" % tk.id)
+	var chapters := {}
+	for tk2 in Bonds.TALKS:
+		var ti2 := Data.step_index(str(tk2.after))
+		var ch := 1
+		for st in Data.STEPS.slice(0, ti2 + 1):
+			if str(st.id).ends_with("_home"):
+				ch += 1
+		chapters[ch] = true
+	check(Bonds.TALKS.size() >= 15 and chapters.size() >= 13, "Yue Ling has something to say in every chapter (%d heart-to-hearts over %d chapters)" % [Bonds.TALKS.size(), chapters.size()])
+	for a in Data.AREA_CHAIN:
+		check(Bonds.REGION.has(a), "Yue Ling has a word to say about %s" % a)
+	var outdoor := {}
+	for lid in ["surface", "heaven", "under", "sea"]:
+		for e in Atlas.world_of(lid).ents:
+			if e.kind == "prop" and not e.has("furn"):
+				outdoor[str(e.prop)] = true
+	for w in Bonds.WISHES:
+		check(Data.step_index(str(w.after)) >= 0 and Props.KINDS.has(str(w.kind)) and outdoor.has(str(w.kind)) and str(w.ask) != "" and str(w.done) != "", "Yue Ling's wish %s: opened by a real step, for a thing that stands somewhere in the world" % w.id)
+	for kd in Structures.KINDS:
+		check(Props.KINDS.has(kd) and outdoor.has(kd), "the bigger thing %s is a thing to do, and stands somewhere in the world" % kd)
+		var sm := Props.model(kd, "sect")
+		check(sm.get_child_count() > 0 and (not kd in ["kite", "armillary", "sky_lantern", "river_lantern", "archery", "millstone", "lantern_green"] or sm.has_meta("mover")), "the %s is built, with its moving part" % kd)
+		sm.free()
+	for hk in ["flute", "reel", "sky_lantern", "brush", "bow"]:
+		var hn := Props.held(hk)
+		check(hn.get_child_count() > 0, "something to hold: %s" % hk)
+		hn.free()
+	# the rules, on a game state of their own
+	var LG = load("res://scripts/game.gd").new()
+	LG.reset()
+	check(LG.bond == 0 and Bonds.level(LG) == 0 and Bonds.leaning(LG) == "" and Bonds.talk_ready(LG) == "", "a new game: no closeness, no leaning, nothing to talk about without her")
+	LG.companion = true
+	LG.step = Data.step_index("s_spirit") + 1
+	check(Bonds.talk_ready(LG) == "t_lotus", "once the bamboo spirit is calm, she has something to say")
+	var lo := Bonds.talk_option("t_lotus", "mine")
+	Bonds.take_talk(LG, "t_lotus", lo)
+	check(LG.talks.has("t_lotus") and LG.bond == int(lo.bond) and Bonds.leaning(LG) == "companion" and Bonds.talk_ready(LG) == "", "a reply is remembered, brings them closer and leans her heart")
+	LG.step = Data.step_index("s_yue") + 1
+	var wl: Array = Bonds.did_together(LG, "bench", true)
+	var b0: int = LG.bond
+	check(LG.wishes.has("w_bench") and wl.size() >= 2 and Bonds.did_together(LG, "bench", true).is_empty() and LG.bond == b0, "a wish is granted once, and doing it again so soon is not news")
+	LG.playtime += Bonds.SHARED_AGAIN + 1.0
+	Bonds.did_together(LG, "bench", true)
+	check(LG.bond == b0 + Bonds.SHARED, "doing things together again, later, brings them a little closer")
+	LG.bond = Bonds.LEVELS[2]
+	check(Trials.need_met(["heart", 2], LG) and not Trials.need_met(["heart", 3], LG), "how close they are opens the Side by side ways")
+	LG.step = Data.step_index(Bonds.MEMORY_STEP)
+	for mid in Bonds.MEMORY_ORDER.slice(0, Bonds.MEMORIES_NEEDED - 1):
+		Bonds.take_memory(LG, mid, Bonds.MEMORIES[mid].options[0])
+	LG.poll_steps()
+	check(Data.STEPS[LG.step].id == Bonds.MEMORY_STEP and LG.objective_text().contains("(%d/%d)" % [Bonds.MEMORIES_NEEDED - 1, Bonds.MEMORIES_NEEDED]) and int(LG.inv.get(Bonds.PETAL, 0)) == Bonds.MEMORIES_NEEDED - 1, "the memories step waits for five, and every memory leaves a pressed petal")
+	Bonds.take_memory(LG, Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1], Bonds.MEMORIES[Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1]].options[0])
+	LG.poll_steps()
+	check(Data.STEPS[LG.step].id == "s_p15_moth" and not Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[6]), "five given back, in any order, and the story goes on")
+	LG.step = Data.step_index("s_p15_threads")
+	LG.visited = {"alchemist": true, "qiu_ye_end": true, "tala_end": true, "hu_end": true}
+	LG.poll_steps()
+	check(Data.STEPS[LG.step].id == "s_p15_threads", "the people visited in Parts XIII and XIV do not count as threads tied for her")
+	for nid in ["alchemist", "archivist", "mazu", "meng_po", "smith"]:
+		LG.threads[nid] = true
+	LG.poll_steps()
+	check(Data.STEPS[LG.step].id == "s_p15_warden", "five threads tied, by anybody who knew her, and the Warden must come out")
+	Bonds.choose_future(LG, "wander")
+	check(LG.future == "wander" and Bonds.epilogues(LG).size() >= 1, "the road she chooses is remembered and told at the end")
+	LG.free()
+	print("== part XV: the Thread She Never Had ==")
+	check(Data.REALMS.size() == 21 and Data.REALMS[20] == "Kindred Dao" and Data.MAX_LEVEL == 60 and Data.level_name(60).ends_with("Kindred Dao") and Data.REALM_INFO.size() == 21 and Data.EXP_NEED.size() == Data.MAX_LEVEL, "Part XV adds the Kindred Dao realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break20" and Data.DIALOGUE.has("recall13") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break19\": \"recall13\""), "Part XV follows Karma Fulfilled (recall13) and ends the game")
+	for sid in ["s_p15_home", "s_p15_judge", "s_p15_founder", "s_p15_end", "pre:s_break20", "post:s_break20"]:
+		check(Data.DIALOGUE.has(sid), "Part XV has its words for %s" % sid)
+	for shid in Bonds.SHARES:
+		var si := Data.step_index(shid)
+		var spot_id := str(Data.STEPS[si].spot) if si >= 0 else ""
+		check(si >= 0 and str(Data.STEPS[si].kind) == "share" and (spot_id == "mem:" + Bonds.POND or spot_id == Bonds.LOOM), "%s happens at the lotus pond or at the loom she was woven on" % shid)
+	var sw := Atlas.world_of("surface")
+	var spots := {}
+	for e2 in sw.ents:
+		if e2.kind == "prop" and e2.has("memory"):
+			spots[str(e2.memory)] = e2
+	check(spots.has(Bonds.POND) and str(spots[Bonds.POND].area) == "sect", "the lotus pond where she woke is by the sect")
+	var loom_found := false
+	for e3 in sw.ents:
+		loom_found = loom_found or (str(e3.get("id", "")) == Bonds.LOOM and str(e3.get("furn", "")) == "loom" and str(e3.area) == "mountain")
+	check(loom_found, "the loom she was woven on stands in the Founder's hermitage on the mountain")
+	for mid2 in Bonds.MEMORIES:
+		var m: Dictionary = Bonds.MEMORIES[mid2]
+		check(Props.KINDS.has(str(m.prop)) and Data.AREAS.has(str(m.area)) and Data.step_index("s_p15_memories") >= 0, "memory %s: a real thing in a real region" % mid2)
+		check(spots.has(mid2) and str(spots[mid2].area) == str(m.area) and str(spots[mid2].prop) == str(m.prop), "memory %s stands in %s" % [mid2, m.area])
+		var foes_ok := not (m.battle as Array).is_empty()
+		for f in m.battle:
+			foes_ok = foes_ok and Data.ENEMIES.has(str(f[0])) and Lore.BEAST.has(str(f[0]))
+		check(foes_ok, "memory %s is guarded by foes with stories" % mid2)
+		check(not (m.lines as Array).is_empty() and not (m.scene as Array).is_empty() and (m.options as Array).size() >= 3 and m.options.all(func(o): return Bonds.FUTURES.has(str(o.lean))), "memory %s: what she remembers, the scene and what Lin Feng says" % mid2)
+	check(Bonds.MEMORIES.size() > Bonds.MEMORIES_NEEDED and int(Data.STEPS[Data.step_index(Bonds.MEMORY_STEP)].n) == Bonds.MEMORIES_NEEDED, "five of seven memories, in any order")
+	var thr: Dictionary = Data.STEPS[Data.step_index("s_p15_threads")]
+	for nid2 in thr.npcs:
+		check(Data.DIALOGUE.has("thread:" + str(nid2)) and Trials.npc_area(str(nid2)) != "", "%s can tie a thread for her" % nid2)
+	check(int(thr.n) <= (thr.npcs as Array).size() - Fate.THREAD_ORDER.size(), "the threads can be tied even if every one of the five fell")
+	for bid in ["forgetting_queen", "unweaver", "lock_warden"]:
+		var ba := Trials.boss_area(bid)
+		var bspec: Dictionary = {}
+		for b in Data.AREAS.get(ba, {}).get("bosses", []):
+			if str(b.id) == bid:
+				bspec = b
+		var bstep := ""
+		for st2 in Data.STEPS:
+			if st2.kind == "kill" and st2.boss == bid:
+				bstep = str(st2.id)
+		check(bstep != "" and str(bspec.get("vis", ["", ""])[0]) == bstep, "%s appears with its step, in %s" % [bid, ba])
+		check(Lore.BOSS.has(bid) and Data.DIALOGUE.has("pre:" + bid) and Data.DIALOGUE.has("post:" + bid), "%s has a story and words before and after" % bid)
+	check(Trials.TRIALS.has("unweaver") and Trials.TRIALS.has("lock_warden") and Trials.path("unweaver", "heart").needs[0][0] == "heart" and Trials.path("lock_warden", "heart").needs[0][0] == "heart", "the Unweaver and the Warden are trials, and the two of them side by side is a way through each")
+	var gb: Dictionary = Data.AREAS.grave.warband
+	check(str(gb.vis) == "s_p15_judge" and gb.pool.all(func(pe): return Lore.BEAST.has(pe[0])), "the things that eat forgetting march among the graves once Judge Cui has spoken")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(Bonds.TALKS.all(func(tk3): return bsrc.contains("\"%s\"" % tk3.id)) and bsrc.contains("MEMORY_ROUTE") and bsrc.contains("\"unweaver\"") and bsrc.contains("\"lock_warden\""), "the bot has a reply for every heart-to-heart, a round of the memories and a way through both trials")

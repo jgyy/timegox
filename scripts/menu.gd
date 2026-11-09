@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Dao & Peoples", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "dao", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
-		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, Game.dao != "" or not Game.met.is_empty(),
-			true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Yue Ling", "Dao & Peoples", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "yue", "dao", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
+		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, Game.companion or Game.bond > 0,
+			Game.dao != "" or not Game.met.is_empty(), true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -47,6 +47,12 @@ func _build() -> void:
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
+	elif mode == "yue":
+		# the Lotus release (bonds.gd): a heart-to-heart she is waiting to have can be had from here
+		var tid := Bonds.talk_ready(Game)
+		labels = ["Talk with her (T)" if tid != "" else "Nothing to talk about yet", "Back"]
+		ids = ["talk", "back"]
+		enabled = [tid != "", true]
 	elif mode == "cultivation":
 		# Part XII: the realm and the branches of the root; an awakening not yet spent can be spent here
 		labels = ["Wake a branch (%d)" % Game.talent_pts, "Back"]
@@ -93,7 +99,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -150,6 +156,13 @@ func press(act: String) -> void:
 					mode = "fates"
 					cursor = 0
 					_build()
+				"yue":
+					mode = "yue"
+					cursor = 0
+					_build()
+				"talk":
+					main.pop()
+					main.talk_yue()
 				"wardrobe":
 					main.pop()
 					main.open_wardrobe()
@@ -254,6 +267,65 @@ func _draw_fates() -> void:
 		var gl := "The grudges that stayed: %d of 6 laid to rest, %d left to the Wheel" % [Grudges.settled(Game), Grudges.unpaid(Game)]
 		UI.text(self, Vector2(r.position.x + 24, r.end.y - 40), gl, 16, Trials.KINDS.bond.col)
 	UI.text(self, Vector2(r.position.x + 24, r.end.y - 16), "Esc back", 14, UI.C_DIM)
+
+## Yue Ling (the Lotus release, bonds.gd): how close the two of them are, which way her heart leans,
+## the heart-to-hearts had, her wishes, and in Part XV the memories the Founder pressed.
+func _draw_yue() -> void:
+	var r := Rect2(30, 20, 1220, 680)
+	UI.panel(self, r)
+	var pink := Color("ff9ac0")
+	UI.text(self, r.position + Vector2(24, 40), "Yue Ling", 26, pink)
+	var lv := Bonds.level(Game)
+	UI.text(self, r.position + Vector2(160, 40), Bonds.TITLES[lv], 20, UI.C_GOLD)
+	var nt := Bonds.next_text(Game)
+	var frac := 1.0
+	if lv < Bonds.LEVELS.size() - 1:
+		frac = float(Game.bond - Bonds.LEVELS[lv]) / float(Bonds.LEVELS[lv + 1] - Bonds.LEVELS[lv])
+	UI.bar(self, Rect2(r.position.x + 24, r.position.y + 54, 420, 10), frac, pink)
+	UI.text(self, r.position + Vector2(460, 64), nt if nt != "" else "as close as two people come", 14, UI.C_DIM)
+	# her heart: the three futures
+	var y := r.position.y + 104.0
+	UI.text(self, Vector2(r.position.x + 24, y), "Her heart", 19, UI.C_GOLD)
+	var lean := Bonds.leaning(Game)
+	var tot := 0
+	for fk in Bonds.FUTURE_ORDER:
+		tot += int(Game.heart.get(fk, 0))
+	for fk2 in Bonds.FUTURE_ORDER:
+		y += 26.0
+		var fut: Dictionary = Bonds.FUTURES[fk2]
+		var wt := int(Game.heart.get(fk2, 0))
+		var chosen: bool = Game.future == fk2
+		UI.text(self, Vector2(r.position.x + 40, y), str(fut.n) + ("   (her choice)" if chosen else ("   (leaning)" if fk2 == lean and Game.future == "" else "")), 16, fut.col if wt > 0 or chosen else UI.C_DIM)
+		UI.bar(self, Rect2(r.position.x + 360, y - 11, 240, 8), float(wt) / float(maxi(1, tot)), fut.col)
+	# the heart-to-hearts and her wishes
+	y += 40.0
+	var had: int = Game.talks.size()
+	var waiting := Bonds.talk_ready(Game) != ""
+	UI.text(self, Vector2(r.position.x + 24, y), "Heart-to-hearts: %d had of %d so far%s" % [had, Bonds.talks_open(Game), "   - she wants to talk (T)" if waiting else ""], 17, pink if waiting else UI.C_TEXT)
+	y += 30.0
+	UI.text(self, Vector2(r.position.x + 24, y), "Her wishes: %d of %d granted" % [Game.wishes.size(), Bonds.WISHES.size()], 17, UI.C_TEXT)
+	for wid in Bonds.wishes_open(Game).slice(0, 3):
+		y += 24.0
+		UI.wrapped(self, Vector2(r.position.x + 40, y), "\"%s\"" % str(Bonds.wish(str(wid)).ask), 14, UI.C_DIM.lightened(0.3), 560)
+		y += 6.0
+	# Part XV: the memories the Founder pressed (once the echo has told of them)
+	var x2 := r.position.x + 640
+	var y2 := r.position.y + 104.0
+	if Game.reached("s_p15_memories"):
+		UI.text(self, Vector2(x2, y2), "The memories the Founder pressed: %d given back" % Game.memories.size(), 19, UI.C_GOLD)
+		for mid in Bonds.MEMORY_ORDER:
+			y2 += 28.0
+			var m: Dictionary = Bonds.MEMORIES[mid]
+			var got: bool = Game.memories.has(mid)
+			UI.text(self, Vector2(x2 + 16, y2), str(m.bearer), 16, m.col if got else UI.C_TEXT)
+			UI.text(self, Vector2(x2 + 300, y2), ("given back" if got else str(menu_place(str(m.area)))), 14, UI.C_JADE if got else UI.C_DIM)
+	else:
+		UI.wrapped(self, Vector2(x2, y2), "Woke beside a lotus pond with her name and nothing else. A healer whose hands remember more than she does.", 16, UI.C_DIM.lightened(0.2), 540)
+	UI.menu_list(self, Rect2(r.position.x + 24, r.end.y - 120, 360, 96), labels, cursor, enabled, 18)
+
+## Where a region is, for the Yue Ling page.
+static func menu_place(area: String) -> String:
+	return str(MAP_NAMES.get(area, Data.AREAS.get(area, {}).get("n", area)))
 
 ## Short names for the world map (the full names run to forty letters).
 const MAP_NAMES := {
@@ -579,6 +651,16 @@ func _draw_journal() -> void:
 			y2 += 17.0
 			UI.text(self, Vector2(x1 + 14, y2), str(how.get(gs, "still waiting")), 12, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, w1 - 14)
 			y2 += 22.0
+	elif s.get("kind", "") == "memories":
+		# Part XV: the memories the Founder pressed (bonds.gd), where each is and whether it is given back
+		y2 += _wrap_at(Vector2(x1, y2), "Seven places where Yue Ling was happiest with a bearer, each guarded by the moths that eat forgetting. Any %d will do; do there what she did, together." % Bonds.MEMORIES_NEEDED, 13, UI.C_DIM.lightened(0.2), w1) + 10.0
+		for mid in Bonds.MEMORY_ORDER:
+			var m: Dictionary = Bonds.MEMORIES[mid]
+			var got: bool = Game.memories.has(mid)
+			UI.text(self, Vector2(x1, y2), "%s, %s" % [str(m.n), MAP_NAMES.get(str(m.area), str(m.area))], 14, UI.C_JADE if got else UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, w1)
+			y2 += 17.0
+			UI.text(self, Vector2(x1 + 14, y2), "given back" if got else str(Props.KINDS[str(m.prop)].verb).to_lower(), 12, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_LEFT, w1 - 14)
+			y2 += 22.0
 	else:
 		var nx := ""
 		for i in range(Game.step, Data.STEPS.size()):
@@ -629,6 +711,9 @@ func _draw() -> void:
 		return
 	if mode == "fates":
 		_draw_fates()
+		return
+	if mode == "yue":
+		_draw_yue()
 		return
 	UI.menu_list(self, Rect2(60, 80, 300, 470), labels, cursor, enabled, 22)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)

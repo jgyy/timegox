@@ -42,7 +42,10 @@ MOUNT_CLIPS = ("idle", "walk", "run")
 # (RIDE): Lin Feng in each of the looks a player can choose at character creation, and Yue Ling
 PARTY = ("lin_feng", "lin_feng_wanderer", "lin_feng_wild", "lin_feng_scholar", "yue_ling")
 PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir",
-               "hammer", "sweep", "weave", "lift", "toss", "touch", "ride", "ride_idle", "ride_stand")
+               "hammer", "sweep", "weave", "lift", "toss", "touch", "ride", "ride_idle", "ride_stand",
+               # the Lotus release (Part XV)
+               "play_flute", "dance", "kite", "stargaze", "release", "float_lantern", "write", "archery", "soak", "push",
+               "climb", "gaze", "clap", "sword_dance")
 MATERIALS = {"toon", "plain", "glow"}
 
 

@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds"}
+const KIND_WORD := {"might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)
@@ -1044,5 +1044,11 @@ func _results(a: float, slide: float) -> void:
 		var up := Grudges.unpaid(Game)
 		var gl := "Of the six grudges that stayed: %d laid to rest%s" % [Grudges.settled(Game), (", %d left to the Wheel" % up) if up > 0 else ""]
 		_say(Vector2(x0, y), gl, UI.fit(gl, 14, w), UI.C_RED.lightened(0.4), a, HORIZONTAL_ALIGNMENT_CENTER, w)
+	# and Yue Ling (bonds.gd, the Lotus release): the road she chose, and how close the two of them came
+	if Game.future != "" or Game.bond > 0:
+		y += 18.0
+		var fut: Dictionary = Bonds.FUTURES.get(Game.future, {})
+		var yl := "Yue Ling: %s%s" % [Bonds.title(Game), (", " + str(fut.n).to_lower()) if not fut.is_empty() else ""]
+		_say(Vector2(x0, y), yl, UI.fit(yl, 14, w), Color("ff9ac0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
 	_say(Vector2(x0, r.end.y - 12.0), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)
