@@ -37,6 +37,14 @@ const STYLES := {
 	# Part XII: the fishermen's houses of Landfall and the wreck on the sea floor, blue-grey tiles over
 	# whitewashed walls with coral-red columns, gabled against the sea wind
 	"seahouse": {"roof": "3a5a7a", "roof2": "2a4660", "column": "c8503a", "wall": "f2f0ea", "beam": "3a6a7a", "trim": "e0d0a0", "double": false, "kind": "gable"},
+	# the Lotus release (Part XV): the Founder's hermitage under the Last Cave, white plaster and pale
+	# jade tiles, a round moon gate for a door, round windows, a lotus finial on the ridge and a little
+	# two-storey pagoda rising out of the roof; and its bathhouse, gabled, with a raised louver along the
+	# ridge to let the steam out
+	"hermitage": {"roof": "6aa898", "roof2": "4a8878", "column": "f0ece4", "wall": "f6f4f0", "beam": "8ab8a8", "trim": "e8b0c0", "double": false,
+		"moon_gate": true, "lotus_finial": true, "tiers": 2},
+	"bathhouse": {"roof": "5a6a78", "roof2": "46545e", "column": "7a4a32", "wall": "ece4d4", "beam": "5a7a7a", "trim": "c8b890", "double": false, "kind": "gable",
+		"louver": true, "moon_gate": true},
 }
 ## Part XI: how high an upper storey's floor stands above the building's ground (the top of the ground
 ## floor's walls), and how deep a cellar's floor lies below it
@@ -823,6 +831,8 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		b.limb(lpos + Vector3(0, 0.45, 0), lpos + Vector3(0, 0.7, 0), 0.012, 0.012, trim, 4)
 		_lantern(b, g, lpos, trim)
 		lights.append([lpos, Color(1.0, 0.72, 0.45)])
+	if st.get("moon_gate", false):
+		_moon_gate(b, g, door, Rect2(x0, z0, x1 - x0, z1 - z0), ph, wall_h, th, st)
 	# furniture
 	for pr in props:
 		_furnish(b, g, str(pr[0]), pr[1] + Vector3(0, ph, 0), Rect2(x0, z0, x1 - x0, z1 - z0), st, rng, lights)
@@ -956,6 +966,50 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		for s9: float in [-1.0, 1.0]:
 			var np := Vector3(cx, ry + 2.9, cz) + (Vector3(s9 * (hx - 1.0), 0, 0) if hx >= hz else Vector3(0, 0, s9 * (hz - 1.0)))
 			roof.torus(np, 0.45, 0.16, MB.tag(Color("8a6a3a"), MB.WOOD))
+	if st.get("louver", false) and (kind == "gable" or kind == "thatch"):
+		# a raised louver along the ridge: a little roof on posts over a gap, and the steam coming out
+		var alongl := hx >= hz
+		var risel := 1.3 + minf(hx, hz) * 0.22
+		var lv := MB.new()
+		var ll := (hx if alongl else hz) * 0.55
+		for k5 in 4:
+			var xk := -ll + k5 * ll * 2.0 / 3.0
+			for s10: float in [-1.0, 1.0]:
+				lv.box(Vector3(xk, 0.25, s10 * 0.45), Vector3(0.1, 0.5, 0.1), column)
+		_gable(lv, Vector3(0, 0.5, 0), ll + 0.2, 0.75, 0.45, MB.tag(_c(st.roof2), MB.STONE), false)
+		roof.merge(lv, Transform3D(Basis.IDENTITY if alongl else Basis(Vector3.UP, PI * 0.5), Vector3(cx, ry + risel, cz)))
+		for k6 in 3:
+			roof_g.ball(Vector3(cx, ry + risel + 1.3 + k6 * 0.45, cz) + (Vector3((k6 - 1) * ll * 0.6, 0, 0) if alongl else Vector3(0, 0, (k6 - 1) * ll * 0.6)), 0.35 + k6 * 0.12, Color(0.92, 0.92, 0.95, 0.16), true)
+	if st.get("lotus_finial", false):
+		# a bronze lotus bud on the ridge, its petals opening, on a little drum
+		var fy := ry + 1.6 + minf(hx, hz) * 0.15 + 0.05
+		var fc := Vector3(cx, fy, cz) + (Vector3(hx * 0.45, 0, 0) if hx >= hz else Vector3(0, 0, hz * 0.45))
+		roof.cyl(fc + Vector3(0, 0.15, 0), 0.16, 0.3, trim, Vector3.ZERO, 10)
+		for k7 in 8:
+			var a7 := TAU * k7 / 8.0
+			roof.leaf(fc + Vector3(0, 0.3, 0), fc + Vector3(cos(a7) * 0.32, 0.62, sin(a7) * 0.32), 0.16, MB.tag(_c(st.trim), MB.METAL), Vector3(-sin(a7), 0, cos(a7)))
+		roof.lathe(fc + Vector3(0, 0.3, 0), [Vector2(0.12, 0.0), Vector2(0.16, 0.2), Vector2(0.08, 0.42), Vector2(0.01, 0.5)], MB.tag(Color("f0c8d0"), MB.METAL), 10)
+	if int(st.get("tiers", 0)) > 0:
+		# a small pagoda of `tiers` storeys rising out of the middle of the roof (a drum tower, a
+		# reading room for the stars)
+		var tb2 := Vector3(cx, ry + 1.15, cz) - (Vector3(hx * 0.3, 0, 0) if hx >= hz else Vector3(0, 0, hz * 0.3))
+		var py := 0.0
+		for tier in int(st.tiers):
+			var w2 := 2.2 - tier * 0.5
+			var hh := 1.2 - tier * 0.1
+			roof.box(tb2 + Vector3(0, py + hh * 0.5, 0), Vector3(w2, hh, w2), wall)
+			for s11: float in [-1.0, 1.0]:
+				roof_g.box(tb2 + Vector3(0, py + hh * 0.55, s11 * (w2 * 0.5 + 0.01)), Vector3(w2 * 0.45, hh * 0.45, 0.02), Color(1.0, 0.85, 0.6, 0.45))
+				roof_g.box(tb2 + Vector3(s11 * (w2 * 0.5 + 0.01), py + hh * 0.55, 0), Vector3(0.02, hh * 0.45, w2 * 0.45), Color(1.0, 0.85, 0.6, 0.45))
+				# round windows on the tower too
+				roof.torus(tb2 + Vector3(0, py + hh * 0.55, s11 * (w2 * 0.5 + 0.03)), w2 * 0.22, 0.04, column, Vector3(PI * 0.5, 0, 0))
+			for cx2: float in [-1.0, 1.0]:
+				for cz2: float in [-1.0, 1.0]:
+					roof.cyl(tb2 + Vector3(cx2 * w2 * 0.5, py + hh * 0.5, cz2 * w2 * 0.5), 0.07, hh, column, Vector3.ZERO, 8)
+			hip_roof(roof, roof_g, tb2 + Vector3(0, py + hh + 0.05, 0), w2 * 0.5, w2 * 0.5, 0.45, 0.5, st, false)
+			py += hh + 0.5
+		roof.cyl(tb2 + Vector3(0, py + 0.35, 0), 0.04, 0.7, trim, Vector3.ZERO, 6)
+		roof.ball(tb2 + Vector3(0, py + 0.75, 0), 0.1, trim, true)
 	if st.has("awning"):
 		# a cloth awning over the shop front and a tall signboard by the door
 		var horiz2 := absf(door.z - z0) < T * 0.6 or absf(door.z - z1) < T * 0.6
@@ -972,6 +1026,44 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		for k4 in 4:
 			b.box(sp + Vector3(0, 2.85 - k4 * 0.36, 0) + out_v * 0.04, Vector3(0.26, 0.2, 0.05) if horiz2 else Vector3(0.05, 0.2, 0.26), MB.tag(Color("2a1a1a"), MB.CLOTH))
 	return lights
+
+## A moon gate (the Lotus release): a round stone frame about the doorway in the wall the door is in,
+## with a carved band over it, and round lattice windows in the other walls in place of square ones'
+## frames (a lantern glow behind each).
+static func _moon_gate(b: MB, g: MB, door: Vector3, inner: Rect2, ph: float, wall_h: float, th: float, st: Dictionary) -> void:
+	var T := Terrain3D.T
+	var frame := MB.tag(Color("e8e4dc"), MB.STONE)
+	var horiz := absf(door.z - inner.position.y) < T * 0.6 or absf(door.z - inner.end.y) < T * 0.6
+	var rot := Vector3(PI * 0.5, 0, 0) if horiz else Vector3(0, 0, PI * 0.5)
+	var dc := Vector3(door.x, ph + 1.05, door.z)
+	# the ring stands proud of the wall on both faces
+	for s: float in [-1.0, 1.0]:
+		var face := (Vector3(0, 0, s * (th * 0.5 + 0.04)) if horiz else Vector3(s * (th * 0.5 + 0.04), 0, 0))
+		b.torus(dc + face, 1.12, 0.1, frame, rot, true)
+		b.torus(dc + face * 1.3, 1.2, 0.04, MB.tag(_c(st.trim), MB.METAL), rot)
+	# a carved name band over the gate
+	var band := dc + Vector3(0, 1.32, 0)
+	b.box(band, Vector3(1.4, 0.3, th + 0.12) if horiz else Vector3(th + 0.12, 0.3, 1.4), MB.tag(_c(st.beam), MB.WOOD))
+	for k in 3:
+		var off := (k - 1) * 0.36
+		b.box(band + (Vector3(off, 0, 0) if horiz else Vector3(0, 0, off)), Vector3(0.18, 0.18, th + 0.16) if horiz else Vector3(th + 0.16, 0.18, 0.18), MB.tag(Color("2a2a30"), MB.CLOTH))
+	# round windows: a ring and a lattice disc in the middle of each other wall
+	var cxm := inner.get_center().x
+	var czm := inner.get_center().y
+	var walls := [[Vector3(cxm, 0, inner.position.y), true], [Vector3(cxm, 0, inner.end.y), true], [Vector3(inner.position.x, 0, czm), false], [Vector3(inner.end.x, 0, czm), false]]
+	for wv in walls:
+		var wp: Vector3 = wv[0]
+		var wh: bool = wv[1]
+		if (wh and horiz and absf(wp.z - door.z) < T * 0.6) or (not wh and not horiz and absf(wp.x - door.x) < T * 0.6):
+			continue
+		var wc := wp + Vector3(0, ph + 1.75, 0)
+		var wr := Vector3(PI * 0.5, 0, 0) if wh else Vector3(0, 0, PI * 0.5)
+		for s2: float in [-1.0, 1.0]:
+			var f2 := Vector3(0, 0, s2 * (th * 0.5 + 0.03)) if wh else Vector3(s2 * (th * 0.5 + 0.03), 0, 0)
+			b.torus(wc + f2, 0.48, 0.06, frame, wr)
+			b.box(wc + f2, Vector3(0.9, 0.04, 0.04) if wh else Vector3(0.04, 0.04, 0.9), MB.tag(_c(st.column).darkened(0.4), MB.WOOD))
+			b.box(wc + f2, Vector3(0.04, 0.9, 0.04), MB.tag(_c(st.column).darkened(0.4), MB.WOOD))
+		g.disc(wc, 0.44, Color(1.0, 0.82, 0.55, 0.35), 16, Color(1.0, 0.82, 0.55, 0.2), wr)
 
 static func _lantern(b: MB, g: MB, lp: Vector3, trim: Color) -> void:
 	b.lathe(lp, [Vector2(0.06, 0.0), Vector2(0.2, 0.1), Vector2(0.22, 0.25), Vector2(0.17, 0.4), Vector2(0.06, 0.46)], MB.tag(Color("e04a3a"), MB.CLOTH), 10)
@@ -1108,6 +1200,14 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 				var bl := rp + side * (-0.6 + k8 * 0.3)
 				b.box(bl + Vector3(0, 0.75, 0), Vector3(0.03, 1.3, 0.06) if not ax else Vector3(0.06, 1.3, 0.03), MB.tag(Color("c8ccd8"), MB.METAL))
 				b.box(bl + Vector3(0, 0.12, 0), Vector3(0.12, 0.05, 0.05), trim)
+		"tub":
+			# a cedar bath (the Lotus release): staves, iron hoops, a step, and hot water to the brim
+			b.lathe(p, [Vector2(0.62, 0.0), Vector2(0.66, 0.35), Vector2(0.68, 0.62), Vector2(0.62, 0.64)], MB.tag(Color("b88a5a"), MB.WOOD), 16)
+			for k8 in 2:
+				b.torus(p + Vector3(0, 0.15 + k8 * 0.38, 0), 0.67, 0.025, iron)
+			g.disc(p + Vector3(0, 0.56, 0), 0.6, Color(0.5, 0.8, 0.78, 0.7), 16)
+			b.box(p - back * 0.0 + side * 0.0 + (-back) * 0.78 + Vector3(0, 0.12, 0), Vector3(0.5, 0.24, 0.3) if ax else Vector3(0.3, 0.24, 0.5), wood_l)
+			g.ball(p + Vector3(0, 1.0, 0), 0.4, Color(0.95, 0.95, 1.0, 0.12), true)
 		"barrel":
 			b.lathe(p, [Vector2(0.3, 0.0), Vector2(0.36, 0.35), Vector2(0.3, 0.7)], wood, 12)
 			b.torus(p + Vector3(0, 0.15, 0), 0.33, 0.02, iron)

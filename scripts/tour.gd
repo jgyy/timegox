@@ -995,6 +995,238 @@ func _grudge_shots() -> void:
 	await _shot("battle_boss_nie")
 	main.pop()
 
+# ---------------------------------------------------------------- the Lotus release (--lotus)
+## A game state in Part XV at step `step_id`: the friends the bot makes, how close Lin Feng and Yue Ling
+## have come, the heart-to-hearts had (as the bot answers them) and her wishes granted so far.
+func _lotus_state(step_id: String) -> void:
+	_fates_state(step_id, 57)
+	Game.fates = {"tala": "ally", "qiu_ye": "ally", "hu": "ally", "xu_lan": "redeemed", "liu_ying": "fallen"}
+	Game.bond = 52
+	Game.heart = {"companion": 24, "lotus": 10, "wander": 9}
+	Game.talks = {}
+	for tk in Bonds.TALKS:
+		if Data.step_index(str(tk.after)) < Game.step:
+			Game.talks[str(tk.id)] = str(BOT.TALK_PLAN.get(str(tk.id), tk.options[0].id))
+	Game.wishes = {}
+	for w in Bonds.WISHES.slice(0, 11):
+		Game.wishes[str(w.id)] = true
+	Game.heal_full()
+
+## A thing to do (or anybody) of the land by its id, and a free tile beside it to stand on.
+func _land_ent(id: String) -> Dictionary:
+	for e in Atlas.world_of("surface").ents:
+		if str(e.get("id", "")) == id:
+			return e
+	return {}
+
+func _stand_by(e: Dictionary) -> void:
+	var lw := Atlas.world_of("surface")
+	var spot := _prop_spot(lw, e) if e.kind == "prop" else _nearest_free(e.pos + Vector2i(0, 2))
+	main.world.open_world()
+	main.world.enter_layer("surface")
+	main.world.teleport(spot, "surface")
+	main.world.facing = e.pos - spot if e.kind == "prop" else Vector2i(0, -1)
+	main.world.cam_q = _quarter(Vector2(main.world.facing))
+	main.world._snap_cam()
+	main.world.banner_t = 0.0
+	Game.toasts.clear()
+	main.toast_list.clear()
+
+## The camera's quarter that looks most nearly along `v` (a thing beside him can be on a diagonal, or
+## two tiles off: FWD.find only knows the four straight steps).
+func _quarter(v: Vector2) -> int:
+	var best := 0
+	var bd := -INF
+	for i in main.world.FWD.size():
+		var f: Vector2i = main.world.FWD[i]
+		var d := f.x * v.x + f.y * v.y
+		if d > bd:
+			bd = d
+			best = i
+	return best
+
+## Every line of the conversation on top shown at once and passed, up to the next choice.
+func _skip_talk() -> void:
+	var guard := 0
+	while main.top_name() == "dialogue" and guard < 60:
+		guard += 1
+		main.dialogue.shown = 999.0
+		main.press("confirm")
+		await _wait(0.12)
+
+## The Founder's hermitage and its bathhouse under the Last Cave, and the Warden waiting by them
+## (also on their own: --hermitage).
+func _hermitage_shots() -> void:
+	_lotus_state("s_p15_warden")
+	var hp := Atlas.to_world("mountain", Vector2i(62, 106))
+	main.world.open_world()
+	main.world.teleport(_nearest_free(hp), "surface")
+	main.world.facing = Vector2i(1, 0)
+	main.world.cam_q = 1
+	main.world._snap_cam()
+	await _wait(0.8)
+	var hc: Vector3 = main.world.wpos(Atlas.to_world("mountain", Vector2i(70, 108)))
+	hc.y = main.world.ground_y(hc)
+	main.world.cam_override = Transform3D(Basis.IDENTITY, hc + Vector3(-14.0, 9.0, 13.0)).looking_at(hc + Vector3(2.0, 1.5, -2.0), Vector3.UP)
+	await _wait(0.5)
+	await _shot("hermitage")
+	# the moon gate: the door in the middle of its west wall, seen from the path that comes up to it
+	var dg: Vector3 = main.world.wpos(Atlas.to_world("mountain", Vector2i(68, 104)))
+	dg.y = main.world.ground_y(dg)
+	main.world.cam_override = Transform3D(Basis.IDENTITY, dg + Vector3(-8.0, 2.4, 2.0)).looking_at(dg + Vector3(1.0, 1.6, 0.0), Vector3.UP)
+	await _wait(0.4)
+	await _shot("hermitage_gate")
+	main.world.cam_override = null
+
+## The bigger things in use, Yue Ling's heart-to-hearts and her page, Part XV's memories, the
+## Founder's echo and her hermitage, the lotus pond, and the new battles.
+func _lotus_shots() -> void:
+	# a memory given back: Wen Shu's lantern green on the Magpie Bridge, the two of them dancing under
+	# the lanterns as she danced at his wedding
+	_lotus_state("s_p15_memories")
+	Game.memories = {"mem_spring": "nothing", "mem_lanterns": "two", "mem_flute": "forest"}
+	var mf := _land_ent("mem:mem_dance")
+	if not mf.is_empty():
+		_stand_by(mf)
+		await _wait(0.3)
+		main._memory_won("mem_dance")
+		for k in 3:
+			main.dialogue.shown = 999.0
+			main.press("confirm")
+			await _wait(0.2)
+		main.world.using.t0 = main.world.t - main.world.USE_STEP - 2.0
+		await _wait(1.2)
+		main.dialogue.shown = 999.0
+		await _wait(0.4)
+		await _shot("memory_dance")
+		await _skip_talk()
+		await _wait(0.5)
+		await _shot("memory_choice")
+		main.choice.press("confirm")
+		await _wait(0.3)
+		await _skip_talk()
+	# the fight for a memory: the moths that eat forgetting
+	main.battle.start([{"id": "forgetting_moth", "lv": 57}, {"id": "loose_thread", "lv": 57}, {"id": "unweaver_shuttle", "lv": 58}], {"boss": false, "theme": "magpie"})
+	main.push("battle")
+	await _wait(3.0)
+	await _shot("battle_forgetting")
+	main.pop()
+	# a heart-to-heart in the courtyard: what she is, and whether he still wants her beside him
+	_lotus_state("s_p15_memories")
+	main.world.clear_cache()
+	main.world.load_area("sect", Vector2i(20, 12))
+	Game.talks.erase("t_seal")
+	main.open_talk("t_seal")
+	for k2 in 4:
+		main.dialogue.shown = 999.0
+		main.press("confirm")
+		await _wait(0.25)
+	main.dialogue.shown = 999.0
+	await _wait(0.6)
+	await _shot("talk_seal")
+	await _skip_talk()
+	await _wait(0.5)
+	await _shot("talk_choice")
+	main.choice.press("confirm")
+	await _wait(0.3)
+	await _skip_talk()
+	# her page
+	Game.memories = {"mem_spring": "nothing", "mem_lanterns": "two", "mem_flute": "forest", "mem_dance": "again"}
+	main.open_menu()
+	main.menu.mode = "yue"
+	main.menu._build()
+	await _wait(0.5)
+	await _shot("yue_page")
+	main.pop()
+	# the Founder's echo by her barrow
+	_lotus_state("s_p15_founder")
+	var fe := _land_ent("qing_lian_echo")
+	if not fe.is_empty():
+		_stand_by(fe)
+		await _wait(0.4)
+		main.talk_npc(fe)
+		for k3 in 2:
+			main.dialogue.shown = 999.0
+			main.press("confirm")
+			await _wait(0.25)
+		main.dialogue.shown = 999.0
+		await _wait(1.0)
+		await _shot("founder_echo")
+		await _skip_talk()
+	await _hermitage_shots()
+	# the two trials
+	var ub: Dictionary = Trials.path("unweaver", "heart").boon
+	main.battle.start([{"id": "unweaver", "lv": 59, "mult": 2.0, "atk": 1.2}], {"boss": true, "enemy": "unweaver", "theme": "loom", "trial": "unweaver", "path": "heart", "boon": ub, "path_n": str(Trials.path("unweaver", "heart").n), "path_kind": str(Trials.KINDS.heart.n)})
+	main.push("battle")
+	await _wait(3.2)
+	await _shot("battle_unweaver")
+	main.pop()
+	var wb: Dictionary = Trials.path("lock_warden", "craft").boon
+	main.battle.start([{"id": "lock_warden", "lv": 59, "mult": 2.2, "atk": 1.25}], {"boss": true, "enemy": "lock_warden", "theme": "sect", "trial": "lock_warden", "path": "craft", "boon": wb, "path_n": "The Key of the Open Door", "path_kind": str(Trials.KINDS.craft.n)})
+	main.push("battle")
+	await _wait(3.2)
+	await _shot("battle_lock_warden")
+	main.pop()
+	# the lotus pond at dawn: the first line of her life
+	_lotus_state("s_p15_name")
+	Game.memories = {"mem_spring": "nothing", "mem_lanterns": "two", "mem_flute": "forest", "mem_stars": "beside", "mem_kite": "cut"}
+	var pe := _land_ent("mem:mem_pond")
+	if not pe.is_empty():
+		_stand_by(pe)
+		await _wait(0.4)
+		main.share_scene(pe, "s_p15_name")
+		for k4 in 2:
+			main.dialogue.shown = 999.0
+			main.press("confirm")
+			await _wait(0.25)
+		main.world.using.t0 = main.world.t - main.world.USE_STEP - 1.4
+		main.dialogue.shown = 999.0
+		await _wait(1.0)
+		await _shot("pond_scene")
+		await _skip_talk()
+		await _wait(0.5)
+		await _shot("future_choice")
+		main.choice.press("confirm")
+		await _wait(0.3)
+		await _skip_talk()
+	await _kite_shot()
+
+## A red kite high over the hills: Chun's kite post on the Cloud-Tea Terraces (failing that, the first
+## kite post in the land), flown for a few seconds (also on its own: --kite).
+func _kite_shot() -> void:
+	_lotus_state("s_p15_memories")
+	var kt := _land_ent("mem:mem_kite")
+	if kt.is_empty() or _prop_spot(Atlas.world_of("surface"), kt) == Vector2i(-1, -1):
+		kt = {}
+		for e2 in Atlas.world_of("surface").ents:
+			if e2.kind == "prop" and str(e2.prop) == "kite" and _prop_spot(Atlas.world_of("surface"), e2) != Vector2i(-1, -1):
+				kt = e2
+				break
+	if kt.is_empty():
+		return
+	_stand_by(kt)
+	await _wait(0.3)
+	main.world.start_use(kt)
+	# a few seconds into the flight: his clock and the kite's (it climbs by the time since he began)
+	main.world.using.t0 = main.world.t - main.world.USE_STEP - 3.6
+	var nd = main.world.ent_nodes.get(kt.id)
+	if nd != null:
+		(nd as Node3D).set_meta("used_t", main.world.t - 3.6)
+	await _wait(0.4)
+	var kp: Vector3 = main.world.player.position + Vector3(0, 5.0, 0)
+	if nd != null and (nd as Node3D).has_meta("model"):
+		var mm := (nd as Node3D).get_meta("model") as Node3D
+		if mm.has_meta("mover"):
+			kp = (mm.get_meta("mover") as Node3D).global_position
+	var pp: Vector3 = main.world.player.position
+	var away := Vector3(pp.x - kp.x, 0, pp.z - kp.z).normalized()
+	main.world.cam_override = Transform3D(Basis.IDENTITY, pp + away * 4.5 + Vector3(0, 1.2, 0) + Vector3(away.z, 0, -away.x) * 1.5).looking_at(pp.lerp(kp, 0.55), Vector3.UP)
+	await _wait(0.3)
+	await _shot("kite_sky")
+	main.world.cam_override = null
+	main.world.using.t0 = main.world.t - 100.0
+	await _wait(0.2)
+
 func _ending_state() -> void:
 	Game.level = Data.MAX_LEVEL
 	Game.dao = "heart"
@@ -1007,17 +1239,28 @@ func _ending_state() -> void:
 	Game.gates_open = {}
 	for gid in ["fetter_maple", "kui_drum", "liang", "xingtian"]:
 		Game.gates_open[gid] = true
-	Game.renown = 698
+	Game.renown = 716
 	Game.deeds = {}
-	for did in Trials.DEEDS.keys().slice(0, 7):
+	for did in Trials.DEEDS.keys().slice(0, 5):
 		Game.deeds[did] = true
-	Game.playtime = 62536.5
+	Game.playtime = 66222.1
 	Game.finished = true
-	Game.kills = 3127
-	Game.battles = 1700
+	Game.kills = 3223
+	Game.battles = 1741
 	Game.deaths = 0
-	Game.meditated = 11994.5
+	Game.meditated = 12057.0
 	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 3, "qi_sea": 3, "five_phase": 3, "fortune": 3, "yin_root": 3, "spirit_sense": 3, "insight": 3}
+	# the Lotus release (bonds.gd): Part XV's two trials, and Yue Ling as the bot leaves her
+	Game.trials["unweaver"] = "heart"
+	Game.trials["lock_warden"] = "craft"
+	Game.bond = 120
+	Game.future = "companion"
+	Game.heart = {"companion": 44, "lotus": 12, "wander": 9}
+	Game.memories = {}
+	for mid in BOT.MEMORY_ROUTE:
+		Game.memories[mid] = str(BOT.MEMORY_PLAN.get(mid, ""))
+	for tk in Bonds.TALKS:
+		Game.talks[str(tk.id)] = str(BOT.TALK_PLAN.get(str(tk.id), ""))
 
 ## The ending: a frame from the middle of every shot of the film (ending_<shot>.png, and all of them
 ## on one sheet, ending_film.png) and the results once the film is over (ending.png).
@@ -1492,6 +1735,12 @@ func _run() -> void:
 		await _part12_galleries()
 	if main.args.has("props"):
 		await _props_shots()
+	if main.args.has("lotus"):
+		await _lotus_shots()
+	elif main.args.has("hermitage"):
+		await _hermitage_shots()
+	elif main.args.has("kite"):
+		await _kite_shot()
 	if main.args.has("fates"):
 		await _fates_shots()
 	if main.args.has("ending"):

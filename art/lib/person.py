@@ -1544,6 +1544,413 @@ def clip_touch(t):
     return p
 
 
+# ---------------------------------------------------------------- things done together (Part XV)
+# The Lotus release: more things to do in the world (scripts/props.gd) and the things Lin Feng and
+# Yue Ling do side by side (scripts/bonds.gd): a flute played to his qin, a sleeve dance, a kite, the
+# stars from the grass, a sky lantern let go and a river lantern pushed out, a poem written, a bow
+# drawn at the butts, a soak in a hot spring, the millstone pushed round, a watchtower climbed and the
+# land looked over from the top, a clap for the other's turn, and a sword form on an open-air stage.
+
+FLUTE_T = 2.4
+
+
+def clip_play_flute(t):
+    """Playing the bamboo flute (dizi): held level out to the right at the lips, both hands along it,
+    the fingers lifting and falling over the holes, the body swaying with the tune, eyes half shut."""
+    w = 2 * math.pi / FLUTE_T
+    p = clip_idle(t * IDLE_T / FLUTE_T)
+    sway = math.sin(t * w)
+    trill = math.sin(t * w * 4.0)
+    p["upper_arm.L"] = ((-0.72 + 0.02 * sway, 0.0, -0.42), (0, 0, 0))
+    p["forearm.L"] = ((-2.1, 0.12, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.1, 0.2, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.57 + 0.02 * sway, 0.0, 0.02), (0, 0, 0))
+    p["forearm.R"] = ((-1.98, -0.12, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.1, -0.2, 0.0), (0, 0, 0))
+    _hands(p, 0.3 + 0.2 * max(0.0, trill), 0.3 + 0.2 * max(0.0, -trill), 0.25)
+    _add(p, "sleeve.L", 0.7, 0.0, 0.0)
+    _add(p, "sleeve.R", 0.7, 0.0, 0.0)
+    p["hips"] = ((0.02, 0.06 * sway, -0.03 * sway), (0.0, -0.005, 0.0))
+    _add(p, "spine", 0.0, 0.05 * sway, 0.03 * sway)
+    p["head"] = ((0.06, -0.12, -0.12 + 0.04 * sway), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.45 * _blink(t, (1.4,)), 1))
+    return p
+
+
+DANCE_T = 4.0
+
+
+def clip_dance(t):
+    """A sleeve dance: stepping on the spot in a slow figure, the body turning half one way and back,
+    the arms sweeping up and round in long arcs so the sleeves fly out, the head following the
+    leading hand."""
+    w = 2 * math.pi / DANCE_T
+    ph = t * w
+    a = math.sin(ph)
+    b = math.cos(ph)
+    st = math.sin(ph * 2.0)
+    p = clip_idle(0.0)
+    p["root"] = ((0, 0.55 * a, 0), (0, 0, 0))
+    p["hips"] = ((0.03, 0.2 * a, 0.05 * st), (0.0, -0.04 - 0.03 * abs(st), 0.0))
+    p["spine"] = ((-0.04, 0.15 * a, -0.06 * b), (0, 0, 0))
+    p["chest"] = ((-0.06, 0.12 * a, -0.05 * b), (0, 0, 0))
+    for sd, s, ph2 in (("L", 1, 0.0), ("R", -1, math.pi)):
+        sweep = math.sin(ph + ph2)
+        hi = max(0.0, sweep)
+        p["upper_arm." + sd] = ((-0.6 - 1.7 * hi, 0.0, (0.55 + 0.5 * math.cos(ph + ph2)) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.35 - 0.45 * (1.0 - hi), 0.3 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.35 - 0.6 * hi, 0.25 * s * sweep, 0.0), (0, 0, 0))
+        p["sleeve." + sd] = ((0.6 + 0.9 * abs(math.cos(ph + ph2)), 0, 0.3 * s * sweep), (0, 0, 0))
+    _hands(p, 0.1, 0.1, 0.1)
+    for sd, ph3 in (("L", 0.0), ("R", math.pi)):
+        k = max(0.0, math.sin(ph * 2.0 + ph3))
+        p["thigh." + sd] = ((-0.4 * k, 0.0, 0.06 * (1 if sd == "L" else -1)), (0, 0, 0))
+        p["shin." + sd] = ((0.7 * k + 0.05, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.2 * k, 0.0, 0.0), (0, 0, 0))
+        p["toe." + sd] = ((0.3 * k, 0.0, 0.0), (0, 0, 0))
+    p["head"] = ((-0.08, 0.35 * a, 0.08 * b), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.7 * _blink(t, (1.0, 3.1)), 1))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.15, 1))
+    flow = math.sin(ph * 2.0 - 0.8)
+    p["robe_f"] = ((-0.2 - 0.15 * abs(st), 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.2 + 0.15 * abs(st), 0, 0), (0, 0, 0))
+    p["robe_l"] = ((-0.1, 0, -0.25 - 0.15 * flow), (0, 0, 0))
+    p["robe_r"] = ((-0.1, 0, 0.25 + 0.15 * flow), (0, 0, 0))
+    p["hair_tail"] = ((0.25, 0, -0.35 * a), (0, 0, 0))
+    p["hair_tail2"] = ((0.15, 0, -0.3 * math.sin(ph - 0.7)), (0, 0, 0))
+    p["cape"] = ((0.15, 0.1 * a, 0), (0, 0, 0))
+    p["cape2"] = ((0.08, 0, -0.1 * a), (0, 0, 0))
+    p["cape3"] = ((0.06, 0, -0.12 * math.sin(ph - 0.6)), (0, 0, 0))
+    return p
+
+
+KITE_T = 3.0
+
+
+def clip_kite(t):
+    """Flying a kite: standing with the head tipped back to watch it, the right hand holding the reel
+    before the chest and the left hand up on the string, tugging it in short pulls when it dips."""
+    w = 2 * math.pi / KITE_T
+    k = (t % KITE_T) / KITE_T
+    p = clip_idle(t * IDLE_T / KITE_T)
+    tug = _hold(k, 0.55, 0.62, 0.68, 0.8)
+    drift = math.sin(t * w)
+    p["upper_arm.R"] = ((-0.75 - 0.1 * tug, 0.0, -0.15), (0, 0, 0))
+    p["forearm.R"] = ((-1.2 + 0.2 * tug, 0.35, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.15, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-2.1 + 0.4 * tug + 0.05 * drift, 0.0, 0.25), (0, 0, 0))
+    p["forearm.L"] = ((-0.4 - 0.3 * tug, -0.2, 0.0), (0, 0, 0))
+    p["hand.L"] = ((-0.2, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.9, 1.0)
+    _add(p, "sleeve.L", 1.1, 0.0, 0.0)
+    _add(p, "sleeve.R", 0.5, 0.0, 0.0)
+    _add(p, "chest", -0.12 - 0.04 * tug, 0.0, 0.0)
+    p["neck"] = ((-0.12, 0.0, 0.0), (0, 0, 0))
+    p["head"] = ((-0.45 + 0.05 * drift, 0.12 * drift, 0.0), (0, 0, 0))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.1, 1))
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, -0.01, -0.03 * tug))
+    _add(p, "thigh.R", 0.15 * tug)
+    _add(p, "shin.R", 0.1 * tug)
+    return p
+
+
+STAR_T = 4.0
+
+
+def clip_stargaze(t):
+    """Watching the stars from the grass: sitting on the ground with the legs out in front, leaning
+    back on both hands, the head tipped back to the sky; now and then the right hand comes up to
+    point out a star, and goes back."""
+    w = 2 * math.pi / STAR_T
+    k = (t % (STAR_T * 2.0)) / (STAR_T * 2.0)
+    p = clip_idle(0.0)
+    br = math.sin(t * w * 0.5)
+    point = _hold(k, 0.5, 0.58, 0.72, 0.8)
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((-0.25, 0.0, 0.0), (0.0, -0.8 + br * 0.004, -0.12))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.3, 0.0, 0.12 * s), (0, 0, 0))
+        p["shin." + sd] = ((0.35 if sd == "L" else 0.9, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((0.25, 0.0, 0.0), (0, 0, 0))
+    p["spine"] = ((-0.12 + br * 0.01, 0.0, 0.0), (0, 0, 0))
+    p["chest"] = ((-0.08 - br * 0.02, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((0.75, 0.0, 0.3), (0, 0, 0))
+    p["forearm.L"] = ((-0.15, 0.0, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.8, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((0.75 * (1.0 - point) - 2.4 * point, 0.0, -0.3 * (1.0 - point) - 0.1 * point), (0, 0, 0))
+    p["forearm.R"] = ((-0.15 - 0.1 * point, 0.0, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.8 * (1.0 - point), 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.2, 0.2 + 0.6 * point)
+    p["neck"] = ((-0.2, 0.0, 0.0), (0, 0, 0))
+    p["head"] = ((-0.42, 0.15 * math.sin(t * w * 0.5 + 1.0), 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, _blink(t, (2.1, 5.9)), 1))
+    _secondary(p, t, False, True, (-1.3, -1.3), br, (0.3, 0.3 + 0.8 * point))
+    return p
+
+
+RELEASE_T = 3.2
+
+
+def clip_release(t):
+    """Letting a sky lantern go: both hands hold it before the chest while the warm air fills it,
+    lift it slowly overhead, open and let it rise, the head tipping back to watch it go."""
+    k = t / RELEASE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.12, 0.88, 1.0)
+    up = smooth(0.22, 0.58, k)
+    let = smooth(0.58, 0.66, k)
+    watch = _hold(k, 0.5, 0.62, 0.85, 0.98)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = (((-0.55 * (1.0 - up) - 2.55 * up) * e, 0.0, (0.3 * (1.0 - up) + 0.18 * up + 0.2 * let) * s * e), (0, 0, 0))
+        p["forearm." + sd] = (((-1.3 * (1.0 - up) - 0.3 * up) * e - 0.22 * (1 - e), -0.3 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.15 * e - 0.3 * let * e, 0.0, 0.3 * s * e * (1.0 - let)), (0, 0, 0))
+        _add(p, "sleeve." + sd, (0.5 + 1.0 * up) * e, 0.0, 0.0)
+    _hands(p, 0.38 - 0.3 * e * (1.0 - let), 0.38 - 0.3 * e * (1.0 - let), 0.1)
+    _add(p, "chest", -0.1 * up * e, 0.0, 0.0)
+    p["neck"] = ((-0.15 * watch, 0.0, 0.0), (0, 0, 0))
+    _add(p, "head", -0.25 * up * e - 0.25 * watch, 0.0, 0.0)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.25 * watch, 1))
+    return p
+
+
+FLOAT_T = 3.0
+
+
+def clip_float_lantern(t):
+    """Setting a lantern on the water: down on one knee at the bank, both hands lower the little lotus
+    lantern to the water and push it gently out, then a moment watching it drift, and up again."""
+    k = t / FLOAT_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.25, 0.75, 1.0)
+    push = _hold(k, 0.32, 0.46, 0.52, 0.64)
+    _crouch(p, e)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-(0.75 + 0.45 * push) * e, 0.0, 0.18 * s * e), (0, 0, 0))
+        p["forearm." + sd] = ((-(0.75 - 0.45 * push) * e - 0.22 * (1 - e), -0.25 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.25 * e, 0.0, 0.2 * s * e), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.4 * e, 0.0, 0.0)
+    _hands(p, 0.38 - 0.25 * e, 0.38 - 0.25 * e, 0.1)
+    _add(p, "spine", 0.3 * e + 0.1 * push)
+    _add(p, "chest", 0.2 * e)
+    _add(p, "head", 0.3 * e, 0.0, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.3 * e, 1))
+    return p
+
+
+WRITE_T = 2.4
+
+
+def clip_write(t):
+    """Writing with a brush at a table: standing bent a little over the paper, the left hand holding
+    the right sleeve back out of the ink, the right hand moving the brush in strokes, lifting between
+    characters; the head follows the brush."""
+    w = 2 * math.pi / WRITE_T
+    k = (t % WRITE_T) / WRITE_T
+    p = clip_idle(t * IDLE_T / WRITE_T)
+    stroke = math.sin(t * w * 2.0)
+    lift = _hold(k, 0.42, 0.5, 0.56, 0.64)
+    p["upper_arm.R"] = ((-0.85 + 0.06 * stroke + 0.12 * lift, 0.0, -0.15 + 0.08 * math.cos(t * w * 2.0)), (0, 0, 0))
+    p["forearm.R"] = ((-0.9 - 0.08 * stroke - 0.15 * lift, 0.4, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.35 + 0.15 * stroke, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.55, 0.0, -0.35), (0, 0, 0))
+    p["forearm.L"] = ((-1.45, -0.2, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.1, 0.0, 0.2), (0, 0, 0))
+    _hands(p, 0.8, 0.85, 0.3)
+    _add(p, "sleeve.R", 0.6, 0.0, 0.0)
+    _add(p, "sleeve.L", 0.5, 0.0, 0.0)
+    _add(p, "spine", 0.18)
+    _add(p, "chest", 0.14)
+    p["head"] = ((0.38, 0.06 * stroke, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.7 * _blink(t, (1.9,)), 1))
+    p["hips"] = ((0.06, 0.0, 0.0), (0.0, -0.02, -0.04))
+    return p
+
+
+ARCHERY_T = 2.6
+
+
+def clip_archery(t):
+    """Drawing a bow at the butts: the bow comes up in the left hand at arm's length, the right hand
+    draws the string back to the cheek, a held breath, the loose (the right hand flies back open),
+    and the bow comes down."""
+    k = t / ARCHERY_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.15, 0.85, 1.0)
+    draw = smooth(0.18, 0.45, k) * (1.0 - smooth(0.62, 0.66, k))
+    loose = _hold(k, 0.62, 0.66, 0.74, 0.85)
+    p["upper_arm.L"] = ((-1.5 * e, 0.0, -0.12 * e), (0, 0, 0))
+    p["forearm.L"] = ((-0.05 * e - 0.2 * (1 - e), 0.0, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.0, 1.2 * e, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((-1.45 * e + 0.15 * draw, 0.0, 0.2 * e * (1.0 - draw) - 0.55 * draw - 0.25 * loose), (0, 0, 0))
+    p["forearm.R"] = ((-0.4 * e - 1.8 * draw - 0.5 * loose - 0.24 * (1 - e), 0.0, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.2 * draw, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38 + 0.7 * e, 0.38 + 0.4 * draw - 0.35 * loose)
+    _add(p, "sleeve.L", 1.0 * e, 0.0, 0.0)
+    _add(p, "sleeve.R", 0.6 * e, 0.0, 0.0)
+    _add(p, "chest", -0.06 * draw, -0.18 * e, 0.0)
+    _add(p, "spine", 0.0, -0.1 * e, 0.0)
+    _add(p, "head", 0.05 * e, 0.22 * e, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.35 * draw, 1))
+    p["thigh.L"] = ((-0.08 * e, 0.0, 0.16 * e), (0, 0, 0))
+    p["thigh.R"] = ((0.05 * e, 0.0, -0.16 * e), (0, 0, 0))
+    return p
+
+
+SOAK_T = 4.0
+
+
+def clip_soak(t):
+    """Soaking in a hot spring: sitting on the ledge under the water with the legs out, the arms laid
+    along the rim of stones to either side, the head back and the eyes shut, slow deep breaths."""
+    w = 2 * math.pi / SOAK_T
+    p = clip_idle(0.0)
+    br = _seated(p, t, w * 0.5, drop=0.6)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.35, 0.0, 0.16 * s), (0, 0, 0))
+        p["shin." + sd] = ((0.7, 0.0, 0.0), (0, 0, 0))
+        p["upper_arm." + sd] = ((0.25, 0.0, (1.15 + 0.02 * br) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.35, 0.3 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.1, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.2, 0.2)
+    p["spine"] = ((-0.2 + br * 0.01, 0.0, 0.0), (0, 0, 0))
+    p["chest"] = ((-0.08 - br * 0.025, 0.0, 0.0), (0, 0.004 * br, 0))
+    p["head"] = ((-0.32, 0.06 * math.sin(t * w * 0.5), 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.08, 1))
+    _secondary(p, t, False, True, (-1.35, -1.35), br, (0.2, 0.2))
+    return p
+
+
+PUSH_T = WALK_T
+
+
+def clip_push(t):
+    """Pushing the millstone round: leaning into the bar with both hands on it at chest height,
+    walking steadily on a circle (the game moves him round), the head down with the effort."""
+    p = clip_walk(t)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-1.2, 0.0, 0.12 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.65, 0.2 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.45, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.7, 0.0, 0.0)
+    _hands(p, 1.0, 1.0)
+    _add(p, "hips", 0.14, 0.0, 0.0)
+    _add(p, "spine", 0.22, 0.0, 0.0)
+    _add(p, "chest", 0.12, 0.0, 0.0)
+    _add(p, "head", -0.25, 0.0, 0.0)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.2, 1))
+    return p
+
+
+CLIMB_T = 1.2
+
+
+def clip_climb(t):
+    """Climbing a ladder: hand over hand and foot over foot, each hand reaching up for the next rung
+    as the opposite foot steps up, the body close in to the ladder."""
+    w = 2 * math.pi / CLIMB_T
+    a = math.sin(t * w)
+    p = clip_idle(0.0)
+    for sd, s, sg in (("L", 1, 1.0), ("R", -1, -1.0)):
+        r = max(0.0, a * sg)
+        p["upper_arm." + sd] = ((-2.3 - 0.45 * r, 0.0, 0.18 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.75 + 0.45 * r, 0.0, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.2, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 1.2, 0.0, 0.0)
+        lift = max(0.0, -a * sg)
+        p["thigh." + sd] = ((-0.35 - 0.85 * lift, 0.0, 0.08 * s), (0, 0, 0))
+        p["shin." + sd] = ((0.45 + 1.0 * lift, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.1 - 0.15 * lift, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.0, 1.0)
+    p["hips"] = ((0.18, 0.06 * a, 0.0), (0.0, -0.06, -0.08))
+    _add(p, "spine", 0.08, 0.0, 0.0)
+    p["head"] = ((-0.2, 0.0, 0.0), (0, 0, 0))
+    return p
+
+
+GAZE_T = 4.0
+
+
+def clip_gaze(t):
+    """Looking out from a height: standing with the weight on one leg, the right hand shading the eyes,
+    the head turning slowly from one side of the land to the other, the left hand on the hip."""
+    w = 2 * math.pi / GAZE_T
+    p = clip_idle(t)
+    look = math.sin(t * w * 0.5)
+    p["upper_arm.R"] = ((-1.65, 0.0, 0.42), (0, 0, 0))
+    p["forearm.R"] = ((-1.55, -0.3, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.4, 0.0, -0.45), (0, 0, 0))
+    p["upper_arm.L"] = ((0.1, 0.0, 0.55), (0, 0, 0))
+    p["forearm.L"] = ((-1.2, 0.5, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.6, 0.4, 0.0), (0, 0, 0))
+    _hands(p, 0.6, 0.15)
+    _add(p, "sleeve.R", 1.2, 0.0, 0.0)
+    _add(p, "chest", -0.04, 0.12 * look, 0.0)
+    p["head"] = ((-0.04, 0.45 * look, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.6 * _blink(t, (1.7, 3.5)), 1))
+    return p
+
+
+CLAP_T = 1.6
+
+
+def clip_clap(t):
+    """Clapping for the other's turn: the hands come together before the chest three times, quick,
+    with a little bounce on the toes and a wide smile."""
+    k = t / CLAP_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.15, 0.82, 1.0)
+    cl = max(0.0, math.sin(k * math.pi * 6.0)) * smooth(0.1, 0.2, k) * (1.0 - smooth(0.72, 0.8, k))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.65 * e, 0.0, (0.15 - 0.32 * cl) * s * e - 0.05 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-1.4 * e - 0.22 * (1 - e), -0.45 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.2 * e, 0.0, 0.45 * s * e), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.6 * e, 0.0, 0.0)
+    _hands(p, 0.05, 0.05, 0.05)
+    bounce = abs(math.sin(k * math.pi * 3.0)) * e
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, 0.015 * bounce, 0.0))
+    _add(p, "head", -0.06 * e, 0.0, 0.05 * math.sin(k * math.pi * 3.0) * e)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.6 * e, 1))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.5 * e, 1))
+    return p
+
+
+SWORD_T = 3.2
+
+
+def clip_sword_dance(t):
+    """A sword form on the stage (the sword stays in the hand): a rising cut with the weight on the back
+    leg, a turn with the blade sweeping round at shoulder height, a low sweep dropping into a bow
+    stance, a thrust from it, and back to the opening guard: one figure, round and round."""
+    k = (t % SWORD_T) / SWORD_T
+    p = clip_idle(0.0)
+    rise = _hold(k, 0.0, 0.18, 0.25, 0.35)
+    turn = _hold(k, 0.25, 0.42, 0.45, 0.55)
+    low = _hold(k, 0.5, 0.62, 0.66, 0.75)
+    thrust = _hold(k, 0.68, 0.78, 0.84, 0.98)
+    p["root"] = ((0, 1.2 * turn - 0.3 * low, 0), (0, 0, 0))
+    p["hips"] = ((0.05 + 0.2 * low, 0.3 * turn, 0.0), (0.0, -0.05 - 0.28 * low - 0.1 * thrust, 0.12 * thrust - 0.04 * rise))
+    p["upper_arm.R"] = ((-0.5 - 2.3 * rise - 1.3 * turn - 0.6 * low - 1.35 * thrust, 0.0, -0.25 + 0.2 * rise - 0.9 * turn + 0.4 * low), (0, 0, 0))
+    p["forearm.R"] = ((-0.45 - 0.3 * rise + 0.25 * turn + 0.2 * thrust, 0.0, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.2 * rise - 0.3 * low, 0.0, 0.0), (0, 0, 0))
+    # the sword-seal hand balances the blade
+    p["upper_arm.L"] = ((-0.6 - 0.9 * turn + 0.6 * thrust, 0.0, 0.6 + 0.5 * low + 0.4 * thrust), (0, 0, 0))
+    p["forearm.L"] = ((-1.2 + 0.6 * turn + 0.5 * thrust, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.3, 0.2, 0.0), (0, 0, 0))
+    _hands(p, 0.2, 1.15, 0.3)
+    p["spine"] = ((0.05 + 0.15 * low + 0.08 * thrust, -0.15 * turn, 0.0), (0, 0, 0))
+    p["chest"] = ((0.05 - 0.06 * rise, -0.2 * turn + 0.1 * thrust, 0.0), (0, 0, 0))
+    p["head"] = ((-0.05 * rise + 0.1 * low, 0.25 * turn - 0.1 * thrust, 0.0), (0, 0, 0))
+    p["thigh.L"] = ((-0.9 * low - 0.6 * thrust + 0.1 * rise, 0.0, 0.12), (0, 0, 0))
+    p["shin.L"] = ((1.0 * low + 0.5 * thrust + 0.2 * rise, 0.0, 0.0), (0, 0, 0))
+    p["foot.L"] = ((-0.1 * low, 0.0, 0.0), (0, 0, 0))
+    p["thigh.R"] = ((0.35 * low + 0.45 * thrust - 0.25 * rise, 0.0, -0.12), (0, 0, 0))
+    p["shin.R"] = ((0.35 * low + 0.25 * thrust + 0.45 * rise, 0.0, 0.0), (0, 0, 0))
+    p["foot.R"] = ((0.3 * thrust, 0.0, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.9, 1))
+    _secondary(p, t, True, False, (-0.9 * low - 0.6 * thrust, 0.35 * low + 0.45 * thrust), math.sin(k * 2 * math.pi), (0.4 + 0.6 * turn, 0.8 * rise + 0.6 * turn))
+    return p
+
+
 def _stowing(fn):
     return lambda t: _stow(fn(t))
 
@@ -1568,8 +1975,24 @@ INTERACT = {
     "lift": (LIFT_T, clip_lift),
     "toss": (TOSS_T, clip_toss),
     "touch": (TOUCH_T, clip_touch),
+    # the Lotus release (Part XV): more things to do, and things done side by side
+    "play_flute": (FLUTE_T, clip_play_flute),
+    "dance": (DANCE_T, clip_dance),
+    "kite": (KITE_T, clip_kite),
+    "stargaze": (STAR_T, clip_stargaze),
+    "release": (RELEASE_T, clip_release),
+    "float_lantern": (FLOAT_T, clip_float_lantern),
+    "write": (WRITE_T, clip_write),
+    "archery": (ARCHERY_T, clip_archery),
+    "soak": (SOAK_T, clip_soak),
+    "push": (PUSH_T, clip_push),
+    "climb": (CLIMB_T, clip_climb),
+    "gaze": (GAZE_T, clip_gaze),
+    "clap": (CLAP_T, clip_clap),
 }
 INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
+# the sword form on the stage is the one thing done with the blade out
+INTERACT["sword_dance"] = (SWORD_T, clip_sword_dance)
 
 
 # ---------------------------------------------------------------- riding (mounts and vehicles)

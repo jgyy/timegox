@@ -84,6 +84,18 @@ var bestiary := {}
 var told := {}
 ## the grudges that stayed (grudges.gd, Part XIV): grudge boss id -> the option taken once it was spent
 var grudges := {}
+## Yue Ling (bonds.gd, the Lotus release): how close the two of them are, which way her heart leans
+## (future -> weight), the heart-to-hearts had (talk -> the reply given), her wishes granted, when each
+## kind of thing was last done together, the memories given back to her in Part XV (memory -> what Lin
+## Feng said), the people who tied a thread for her (Part XV) and the future she chose for herself
+var bond := 0
+var heart := {}
+var talks := {}
+var wishes := {}
+var shared := {}
+var memories := {}
+var threads := {}
+var future := ""
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -148,6 +160,14 @@ func reset() -> void:
 	bestiary = {}
 	told = {}
 	grudges = {}
+	bond = 0
+	heart = {}
+	talks = {}
+	wishes = {}
+	shared = {}
+	memories = {}
+	threads = {}
+	future = ""
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -523,6 +543,12 @@ func poll_steps() -> void:
 			"grudges":
 				# Part XIV: the grudges that stayed, in any order, each fought and then answered
 				ok = grudges.size() >= int(s.n)
+			"memories":
+				# Part XV: Yue Ling's memories, any of them, in any order (bonds.gd)
+				ok = memories.size() >= int(s.n)
+			"threads":
+				# Part XV: the people who tied a thread for her, any of them, in any order
+				ok = visits_done(s) >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -544,6 +570,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
 	elif s.kind == "grudges":
 		t += "  (%d/%d)" % [mini(grudges.size(), int(s.n)), int(s.n)]
+	elif s.kind == "memories":
+		t += "  (%d/%d)" % [mini(memories.size(), int(s.n)), int(s.n)]
+	elif s.kind == "threads":
+		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":
@@ -604,11 +634,13 @@ func do_deed(id: String) -> bool:
 	add_renown(int(d.renown))
 	return true
 
-## How many of the people a "visits" step names Lin Feng has been to.
+## How many of the people a "visits" step names Lin Feng has been to (for a "threads" step, Part XV:
+## how many of them have tied a thread for Yue Ling).
 func visits_done(s: Dictionary) -> int:
 	var k := 0
+	var seen_: Dictionary = threads if str(s.get("kind", "")) == "threads" else visited
 	for id in s.get("npcs", []):
-		if visited.has(id):
+		if seen_.has(id):
 			k += 1
 	return k
 
