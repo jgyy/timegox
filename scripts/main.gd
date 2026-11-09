@@ -631,7 +631,7 @@ func open_talk(tid: String) -> void:
 		var opts: Array = []
 		for o in tk.options:
 			var fut: Dictionary = Bonds.FUTURES.get(str(o.get("lean", "")), {})
-			opts.append({"id": str(o.id), "label": str(o.label), "desc": "Leans her heart towards %s." % str(fut.get("n", "nothing in particular")).to_lower(), "col": fut.get("col", UI.C_GOLD)})
+			opts.append({"id": str(o.id), "label": str(o.label), "desc": "Leans her heart towards %s." % Bonds.toward(str(o.get("lean", ""))), "col": fut.get("col", UI.C_GOLD)})
 		choose(str(tk.ask), opts, func(oid: String):
 			var o := Bonds.talk_option(tid, oid)
 			if o.is_empty():
@@ -683,7 +683,7 @@ func _memory_won(mid: String) -> void:
 		var opts: Array = []
 		for o in m.options:
 			var fut: Dictionary = Bonds.FUTURES.get(str(o.get("lean", "")), {})
-			opts.append({"id": str(o.id), "label": str(o.label), "desc": "Leans her heart towards %s." % str(fut.get("n", "")).to_lower(), "col": fut.get("col", UI.C_GOLD)})
+			opts.append({"id": str(o.id), "label": str(o.label), "desc": "Leans her heart towards %s." % Bonds.toward(str(o.get("lean", ""))), "col": fut.get("col", UI.C_GOLD)})
 		choose(str(m.ask), opts, func(oid: String):
 			var o := Bonds.memory_option(mid, oid)
 			if o.is_empty():

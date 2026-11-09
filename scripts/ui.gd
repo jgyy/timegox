@@ -127,7 +127,10 @@ static func menu_list(ci: CanvasItem, r: Rect2, labels: Array, cursor: int, enab
 			text(ci, Vector2(r.position.x + 38, y), left, fit(left, size, lw, 11), col, HORIZONTAL_ALIGNMENT_LEFT, lw)
 			text(ci, Vector2(r.position.x + r.size.x - 30.0 - rw, y), right, rs, C_GOLD.darkened(0.15) if on else C_DIM)
 		else:
-			text(ci, Vector2(r.position.x + 38, y), lab, size, col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+			# (a long label, such as a reply to Yue Ling, made a little smaller to fit: it used to be cut
+			# off mid-word at the panel's edge, "You came from our mountain. That's famil")
+			var lw2 := r.size.x - 48.0
+			text(ci, Vector2(r.position.x + 38, y), lab, fit(lab, size, lw2, maxi(11, size - 6)), col, HORIZONTAL_ALIGNMENT_LEFT, lw2)
 		y += step
 	# scroll hints
 	if first > 0:

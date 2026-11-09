@@ -305,9 +305,11 @@ func _draw_yue() -> void:
 	y += 30.0
 	UI.text(self, Vector2(r.position.x + 24, y), "Her wishes: %d of %d granted" % [Game.wishes.size(), Bonds.WISHES.size()], 17, UI.C_TEXT)
 	for wid in Bonds.wishes_open(Game).slice(0, 3):
+		# (a long wish runs to two lines: the next starts below it, not on top of its second line)
+		var ask := "\"%s\"" % str(Bonds.wish(str(wid)).ask)
 		y += 24.0
-		UI.wrapped(self, Vector2(r.position.x + 40, y), "\"%s\"" % str(Bonds.wish(str(wid)).ask), 14, UI.C_DIM.lightened(0.3), 560)
-		y += 6.0
+		UI.wrapped(self, Vector2(r.position.x + 40, y), ask, 14, UI.C_DIM.lightened(0.3), 560)
+		y += 6.0 + UI.font().get_height(14) * (UI.wrap_lines(ask, 14, 560).size() - 1)
 	# Part XV: the memories the Founder pressed (once the echo has told of them)
 	var x2 := r.position.x + 640
 	var y2 := r.position.y + 104.0

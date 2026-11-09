@@ -1026,11 +1026,33 @@ func _stand_by(e: Dictionary) -> void:
 	main.world.enter_layer("surface")
 	main.world.teleport(spot, "surface")
 	main.world.facing = e.pos - spot if e.kind == "prop" else Vector2i(0, -1)
-	main.world.cam_q = maxi(0, main.world.FWD.find(main.world.facing))
+	main.world.cam_q = _quarter(Vector2(main.world.facing))
 	main.world._snap_cam()
 	main.world.banner_t = 0.0
 	Game.toasts.clear()
 	main.toast_list.clear()
+
+## The camera's quarter that looks most nearly along `v` (a thing beside him can be on a diagonal, or
+## two tiles off, and a scene picks its own spot: FWD.find only knows the four straight steps, and
+## a thing for two seen from the side hid her behind him).
+func _quarter(v: Vector2) -> int:
+	var best := 0
+	var bd := -INF
+	for i in main.world.FWD.size():
+		var f: Vector2i = main.world.FWD[i]
+		var d := f.x * v.x + f.y * v.y
+		if d > bd:
+			bd = d
+			best = i
+	return best
+
+## The camera behind the two of them as they do what the scene has them do, side by side.
+func _behind_use() -> void:
+	if main.world.using.is_empty():
+		return
+	var d: Vector3 = main.world.using.dir
+	main.world.cam_q = _quarter(Vector2(d.x, d.z))
+	main.world._snap_cam()
 
 ## Every line of the conversation on top shown at once and passed, up to the next choice.
 func _skip_talk() -> void:
@@ -1053,6 +1075,7 @@ func _lotus_shots() -> void:
 		_stand_by(mf)
 		await _wait(0.3)
 		main._memory_won("mem_dance")
+		_behind_use()
 		for k in 3:
 			main.dialogue.shown = 999.0
 			main.press("confirm")

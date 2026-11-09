@@ -1727,6 +1727,24 @@ func _lotus() -> void:
 			check(Bonds.FUTURES.has(str(o.get("lean", ""))) and int(o.get("bond", 0)) > 0 and str(o.label) != "" and not (o.get("after", []) as Array).is_empty(), "%s/%s: leans her heart somewhere, brings them closer and has an answer" % [tk.id, o.id])
 			leans[str(o.lean)] = true
 		check(leans.size() == Bonds.FUTURES.size(), "heart-to-heart %s offers every way her heart can lean" % tk.id)
+	# every reply to her fits the choice list whole (422 px of 20 px text, shrunk to 16 px at most)
+	var wide := []
+	var replies := []
+	for tk2 in Bonds.TALKS:
+		replies.append_array(tk2.options)
+	for mid0 in Bonds.MEMORIES:
+		replies.append_array(Bonds.MEMORIES[mid0].get("options", []))
+	for sid0 in Bonds.SHARES:
+		replies.append_array(Bonds.SHARES[sid0].get("options", []))
+	for o0 in replies:
+		if UI.font().get_string_size(UI.named(str(o0.label)), HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x > 422.0:
+			wide.append(str(o0.label))
+	for fk0 in Bonds.FUTURES:
+		if UI.font().get_string_size(str(Bonds.FUTURES[fk0].n) + "  (her heart)", HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x > 422.0:
+			wide.append(str(Bonds.FUTURES[fk0].n))
+	check(wide.is_empty(), "every reply to Yue Ling fits the choice list (too wide: %s)" % str(wide))
+	# (mid-sentence a future keeps its capitals: "towards his Dao companion", not "his dao companion")
+	check(Bonds.toward("companion") == "his Dao companion" and Bonds.toward("lotus") == "the lotus of the mountain" and Bonds.toward("") == "nothing in particular", "a future's name reads right in the middle of a sentence")
 	var chapters := {}
 	for tk2 in Bonds.TALKS:
 		var ti2 := Data.step_index(str(tk2.after))
@@ -1777,10 +1795,10 @@ func _lotus() -> void:
 	for mid in Bonds.MEMORY_ORDER.slice(0, Bonds.MEMORIES_NEEDED - 1):
 		Bonds.take_memory(LG, mid, Bonds.MEMORIES[mid].options[0])
 	LG.poll_steps()
-	check(Data.STEPS[LG.step].id == Bonds.MEMORY_STEP and LG.objective_text().contains("(%d/%d)" % [Bonds.MEMORIES_NEEDED - 1, Bonds.MEMORIES_NEEDED]) and int(LG.inv.get(Bonds.PETAL, 0)) == Bonds.MEMORIES_NEEDED - 1, "the memories step waits for five, and every memory leaves a pressed petal")
+	check(Data.STEPS[LG.step].id == Bonds.MEMORY_STEP and LG.objective_text().contains("(%d/%d)" % [Bonds.MEMORIES_NEEDED - 1, Bonds.MEMORIES_NEEDED]) and int(LG.inv.get(Bonds.PETAL, 0)) == Bonds.MEMORIES_NEEDED - 1, "the memories step waits for six, and every memory leaves a pressed petal")
 	Bonds.take_memory(LG, Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1], Bonds.MEMORIES[Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1]].options[0])
 	LG.poll_steps()
-	check(Data.STEPS[LG.step].id == "s_p15_moth" and not Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[6]), "five given back, in any order, and the story goes on")
+	check(Data.STEPS[LG.step].id == "s_p15_moth" and not Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[6]), "six given back, in any order, and the story goes on")
 	LG.step = Data.step_index("s_p15_threads")
 	LG.visited = {"alchemist": true, "qiu_ye_end": true, "tala_end": true, "hu_end": true}
 	LG.poll_steps()

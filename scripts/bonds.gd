@@ -19,8 +19,8 @@ extends RefCounted
 ##     anywhere with her there grants one.
 ##   * **Part XV, the Thread She Never Had**: woven, not born, she has no thread on the Wheel; now every
 ##     debt is settled the world is tidying her away.  The Founder pressed what she remembered of the
-##     nineteen bearers into the places she was happiest (`MEMORIES`): find five, fight off what is
-##     eating them, and give them back to her.
+##     nineteen bearers into the places she was happiest (`MEMORIES`): find six of the seven, fight
+##     off what is eating them, and give them back to her.
 
 # ---------------------------------------------------------------- closeness
 const LEVELS := [0, 10, 24, 42, 64]
@@ -76,6 +76,12 @@ static func lean(g, key: String, n: int) -> void:
 	if not FUTURES.has(key) or n <= 0:
 		return
 	g.heart[key] = int(g.heart.get(key, 0)) + n
+
+## "Leans her heart towards ...": future `key`'s name to go mid-sentence (its first letter lower
+## case, so "his Dao companion" keeps its Dao); `none` when `key` is no future.
+static func toward(key: String, none: String = "nothing in particular") -> String:
+	var n := str(FUTURES.get(key, {}).get("n", none))
+	return n.substr(0, 1).to_lower() + n.substr(1)
 
 ## The future her heart leans towards most (the first of FUTURE_ORDER on a tie, "" before any).
 static func leaning(g) -> String:
@@ -666,7 +672,8 @@ const MEMORIES := {
 			{"id": "rest", "label": "\"Every soldier should have a place like this.\"", "lean": "lotus", "after": [["Yue Ling", "A place to come home to and not be asked anything. The sect could be that, for people. I could help it be."]]},
 			{"id": "find", "label": "\"Find the others who can't sleep.\"", "lean": "wander", "after": [["Yue Ling", "There are so many of them, Lin Feng. Every war leaves a Bai Shan. I could go and sit with them."]]}]},
 }
-const MEMORY_ORDER := ["mem_flute", "mem_spring", "mem_lanterns", "mem_kite", "mem_dance", "mem_stars", "mem_mill"]
+## (by the bearer each was pressed for, third to eighteenth)
+const MEMORY_ORDER := ["mem_flute", "mem_spring", "mem_lanterns", "mem_kite", "mem_dance", "mem_mill", "mem_stars"]
 
 static func memory(id: String) -> Dictionary:
 	return MEMORIES.get(id, {})
