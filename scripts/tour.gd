@@ -494,7 +494,7 @@ func _living_shots(which: String) -> void:
 		main.world.banner_t = 0.0
 		# a moment for the people to come out (two are made a frame)
 		Game.clock = float(sh[3]) * 60.0
-		await _wait(2.5)
+		await _wait(1.5)
 		_frame_crowd(sh[4])
 		await _wait(0.5)
 		await _shot(str(sh[0]))
