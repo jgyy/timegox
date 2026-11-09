@@ -1147,6 +1147,14 @@ func _init() -> void:
 			if par2.get_line_count() > 4:
 				too_long.append(ck)
 	check(too_long.is_empty(), "every line of dialogue fits the dialogue box (too long: %s)" % str(too_long))
+	# every "Quest complete" toast is read whole: at most two lines of the toast's width (world.gd)
+	var toast_w: float = UI.TOAST_W
+	var long_toasts := []
+	for stq in Data.STEPS:
+		var tq := "Quest complete: " + str(stq.t)
+		if UI.wrap_lines(tq, UI.fit(tq, 18, toast_w, 15), toast_w).size() > 2:
+			long_toasts.append(str(stq.id))
+	check(toast_w > 0.0 and long_toasts.is_empty(), "every quest's \"Quest complete\" toast fits in two lines (too long: %s)" % str(long_toasts))
 	# every foe's name fits its label in battle (200 px, a boss 360 px, shrunk to 11 px at most) and
 	# every boss's name its banner (660 px, down to 24 px); a battle message wraps onto more rows of
 	# the 440 px log, so none is cut off

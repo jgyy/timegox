@@ -50,6 +50,10 @@ static func text(ci: CanvasItem, p: Vector2, s: String, size: int = 20, col: Col
 	ci.draw_string(font(), p + Vector2(1.5, 1.5), s, align, width, size, Color(0, 0, 0, 0.7))
 	ci.draw_string(font(), p, s, align, width, size, col)
 
+## how wide a line in the world's corner (a toast) may be, under the banner, clear of the status
+## panel and the minimap
+const TOAST_W := 840.0
+
 ## The largest font size from `size` down to `min_size` at which `s` fits in `width` pixels.
 static func fit(s: String, size: int, width: float, min_size: int = 10) -> int:
 	s = named(s)

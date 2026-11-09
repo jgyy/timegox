@@ -880,7 +880,7 @@ const TRIALS := {
 	"unweaver": {"might": [2.0, 1.2],
 		"why": "The Unweaver is the hand that wove every road on the Loom of Borders, turned round to wind thread back onto the spindle. Every stitch it takes is a stitch of Yue Ling, and it is in no hurry.",
 		"paths": [
-			{"id": "heart", "kind": "heart", "n": "Side by side", "needs": [["heart", 2]], "boon": {"assist": 0.03, "taken": 0.85},
+			{"id": "heart", "kind": "heart", "n": "Hand in hand", "needs": [["heart", 2]], "boon": {"assist": 0.03, "taken": 0.85},
 				"desc": "Lin Feng and Yue Ling have become dear friends at least. The Unweaver winds back what is loose; what two people hold between them is not loose at all.",
 				"line": "Yue Ling takes his hand before the spindle, and the threads the Unweaver pulls at do not come."},
 			{"id": "craft", "kind": "craft", "n": "A shuttle of pressed petals", "needs": [["item", "lotus_shuttle", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},

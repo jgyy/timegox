@@ -1033,8 +1033,7 @@ func _stand_by(e: Dictionary) -> void:
 	main.toast_list.clear()
 
 ## The camera's quarter that looks most nearly along `v` (a thing beside him can be on a diagonal, or
-## two tiles off, and a scene picks its own spot: FWD.find only knows the four straight steps, and
-## a thing for two seen from the side hid her behind him).
+## two tiles off: FWD.find only knows the four straight steps).
 func _quarter(v: Vector2) -> int:
 	var best := 0
 	var bd := -INF
@@ -1046,14 +1045,6 @@ func _quarter(v: Vector2) -> int:
 			best = i
 	return best
 
-## The camera behind the two of them as they do what the scene has them do, side by side.
-func _behind_use() -> void:
-	if main.world.using.is_empty():
-		return
-	var d: Vector3 = main.world.using.dir
-	main.world.cam_q = _quarter(Vector2(d.x, d.z))
-	main.world._snap_cam()
-
 ## Every line of the conversation on top shown at once and passed, up to the next choice.
 func _skip_talk() -> void:
 	var guard := 0
@@ -1062,6 +1053,30 @@ func _skip_talk() -> void:
 		main.dialogue.shown = 999.0
 		main.press("confirm")
 		await _wait(0.12)
+
+## The Founder's hermitage and its bathhouse under the Last Cave, and the Warden waiting by them
+## (also on their own: --hermitage).
+func _hermitage_shots() -> void:
+	_lotus_state("s_p15_warden")
+	var hp := Atlas.to_world("mountain", Vector2i(62, 106))
+	main.world.open_world()
+	main.world.teleport(_nearest_free(hp), "surface")
+	main.world.facing = Vector2i(1, 0)
+	main.world.cam_q = 1
+	main.world._snap_cam()
+	await _wait(0.8)
+	var hc: Vector3 = main.world.wpos(Atlas.to_world("mountain", Vector2i(70, 108)))
+	hc.y = main.world.ground_y(hc)
+	main.world.cam_override = Transform3D(Basis.IDENTITY, hc + Vector3(-14.0, 9.0, 13.0)).looking_at(hc + Vector3(2.0, 1.5, -2.0), Vector3.UP)
+	await _wait(0.5)
+	await _shot("hermitage")
+	# the moon gate: the door in the middle of its west wall, seen from the path that comes up to it
+	var dg: Vector3 = main.world.wpos(Atlas.to_world("mountain", Vector2i(68, 104)))
+	dg.y = main.world.ground_y(dg)
+	main.world.cam_override = Transform3D(Basis.IDENTITY, dg + Vector3(-8.0, 2.4, 2.0)).looking_at(dg + Vector3(1.0, 1.6, 0.0), Vector3.UP)
+	await _wait(0.4)
+	await _shot("hermitage_gate")
+	main.world.cam_override = null
 
 ## The bigger things in use, Yue Ling's heart-to-hearts and her page, Part XV's memories, the
 ## Founder's echo and her hermitage, the lotus pond, and the new battles.
@@ -1075,7 +1090,6 @@ func _lotus_shots() -> void:
 		_stand_by(mf)
 		await _wait(0.3)
 		main._memory_won("mem_dance")
-		_behind_use()
 		for k in 3:
 			main.dialogue.shown = 999.0
 			main.press("confirm")
@@ -1139,27 +1153,10 @@ func _lotus_shots() -> void:
 		await _wait(1.0)
 		await _shot("founder_echo")
 		await _skip_talk()
-	# the Founder's hermitage and its bathhouse under the Last Cave, and the Warden waiting by them
-	_lotus_state("s_p15_warden")
-	var hp := Atlas.to_world("mountain", Vector2i(62, 106))
-	main.world.open_world()
-	main.world.teleport(_nearest_free(hp), "surface")
-	main.world.facing = Vector2i(1, 0)
-	main.world.cam_q = 1
-	main.world._snap_cam()
-	await _wait(0.8)
-	var hc: Vector3 = main.world.wpos(Atlas.to_world("mountain", Vector2i(70, 108)))
-	hc.y = main.world.ground_y(hc)
-	main.world.cam_override = Transform3D(Basis.IDENTITY, hc + Vector3(-14.0, 9.0, 13.0)).looking_at(hc + Vector3(2.0, 1.5, -2.0), Vector3.UP)
-	await _wait(0.5)
-	await _shot("hermitage")
-	main.world.cam_override = Transform3D(Basis.IDENTITY, hc + Vector3(-5.0, 2.6, -3.0)).looking_at(hc + Vector3(-0.5, 1.6, -7.0), Vector3.UP)
-	await _wait(0.4)
-	await _shot("hermitage_gate")
-	main.world.cam_override = null
+	await _hermitage_shots()
 	# the two trials
 	var ub: Dictionary = Trials.path("unweaver", "heart").boon
-	main.battle.start([{"id": "unweaver", "lv": 59, "mult": 2.0, "atk": 1.2}], {"boss": true, "enemy": "unweaver", "theme": "loom", "trial": "unweaver", "path": "heart", "boon": ub, "path_n": "Side by side", "path_kind": str(Trials.KINDS.heart.n)})
+	main.battle.start([{"id": "unweaver", "lv": 59, "mult": 2.0, "atk": 1.2}], {"boss": true, "enemy": "unweaver", "theme": "loom", "trial": "unweaver", "path": "heart", "boon": ub, "path_n": str(Trials.path("unweaver", "heart").n), "path_kind": str(Trials.KINDS.heart.n)})
 	main.push("battle")
 	await _wait(3.2)
 	await _shot("battle_unweaver")
@@ -1192,33 +1189,43 @@ func _lotus_shots() -> void:
 		main.choice.press("confirm")
 		await _wait(0.3)
 		await _skip_talk()
-	# a red kite high over the hills
+	await _kite_shot()
+
+## A red kite high over the hills: Chun's kite post on the Cloud-Tea Terraces (failing that, the first
+## kite post in the land), flown for a few seconds (also on its own: --kite).
+func _kite_shot() -> void:
 	_lotus_state("s_p15_memories")
-	var kt := {}
-	for e2 in Atlas.world_of("surface").ents:
-		if e2.kind == "prop" and str(e2.prop) == "kite" and _prop_spot(Atlas.world_of("surface"), e2) != Vector2i(-1, -1):
-			kt = e2
-			break
-	if not kt.is_empty():
-		_stand_by(kt)
-		await _wait(0.3)
-		main.world.start_use(kt)
-		main.world.using.t0 = main.world.t - main.world.USE_STEP - 3.6
-		await _wait(0.4)
-		var nd = main.world.ent_nodes.get(kt.id)
-		var kp: Vector3 = main.world.player.position + Vector3(0, 5.0, 0)
-		if nd != null and (nd as Node3D).has_meta("model"):
-			var mm := (nd as Node3D).get_meta("model") as Node3D
-			if mm.has_meta("mover"):
-				kp = (mm.get_meta("mover") as Node3D).global_position
-		var pp: Vector3 = main.world.player.position
-		var away := Vector3(pp.x - kp.x, 0, pp.z - kp.z).normalized()
-		main.world.cam_override = Transform3D(Basis.IDENTITY, pp + away * 4.5 + Vector3(0, 1.2, 0) + Vector3(away.z, 0, -away.x) * 1.5).looking_at(pp.lerp(kp, 0.55), Vector3.UP)
-		await _wait(0.3)
-		await _shot("kite_sky")
-		main.world.cam_override = null
-		main.world.using.t0 = main.world.t - 100.0
-		await _wait(0.2)
+	var kt := _land_ent("mem:mem_kite")
+	if kt.is_empty() or _prop_spot(Atlas.world_of("surface"), kt) == Vector2i(-1, -1):
+		kt = {}
+		for e2 in Atlas.world_of("surface").ents:
+			if e2.kind == "prop" and str(e2.prop) == "kite" and _prop_spot(Atlas.world_of("surface"), e2) != Vector2i(-1, -1):
+				kt = e2
+				break
+	if kt.is_empty():
+		return
+	_stand_by(kt)
+	await _wait(0.3)
+	main.world.start_use(kt)
+	# a few seconds into the flight: his clock and the kite's (it climbs by the time since he began)
+	main.world.using.t0 = main.world.t - main.world.USE_STEP - 3.6
+	var nd = main.world.ent_nodes.get(kt.id)
+	if nd != null:
+		(nd as Node3D).set_meta("used_t", main.world.t - 3.6)
+	await _wait(0.4)
+	var kp: Vector3 = main.world.player.position + Vector3(0, 5.0, 0)
+	if nd != null and (nd as Node3D).has_meta("model"):
+		var mm := (nd as Node3D).get_meta("model") as Node3D
+		if mm.has_meta("mover"):
+			kp = (mm.get_meta("mover") as Node3D).global_position
+	var pp: Vector3 = main.world.player.position
+	var away := Vector3(pp.x - kp.x, 0, pp.z - kp.z).normalized()
+	main.world.cam_override = Transform3D(Basis.IDENTITY, pp + away * 4.5 + Vector3(0, 1.2, 0) + Vector3(away.z, 0, -away.x) * 1.5).looking_at(pp.lerp(kp, 0.55), Vector3.UP)
+	await _wait(0.3)
+	await _shot("kite_sky")
+	main.world.cam_override = null
+	main.world.using.t0 = main.world.t - 100.0
+	await _wait(0.2)
 
 func _ending_state() -> void:
 	Game.level = Data.MAX_LEVEL
@@ -1730,6 +1737,10 @@ func _run() -> void:
 		await _props_shots()
 	if main.args.has("lotus"):
 		await _lotus_shots()
+	elif main.args.has("hermitage"):
+		await _hermitage_shots()
+	elif main.args.has("kite"):
+		await _kite_shot()
 	if main.args.has("fates"):
 		await _fates_shots()
 	if main.args.has("ending"):

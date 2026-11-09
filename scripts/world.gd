@@ -519,6 +519,10 @@ func _stand_y(bb: Dictionary, p: Vector3) -> float:
 func wpos(tile: Vector2i) -> Vector3:
 	return Terrain3D.world_pos(tile) + off
 
+## Whether the ground at world point `p` can be walked on (no trees, wall or water there).
+func _open_at(p: Vector3) -> bool:
+	return tile_free(Vector2i(floori((p.x - off.x) / Terrain3D.T), floori((p.z - off.z) / Terrain3D.T)))
+
 func _build_view(id: String) -> void:
 	var lid := Data.layer_of(id)
 	var bb := _bundle(lid)
@@ -1764,7 +1768,17 @@ func _cutscene(d: float, pp: Vector3) -> void:
 		other = _actor(sp)
 	if other.is_empty() and cue_npc != "":
 		other = _actor(cue_npc)
+	# a scene the two of them play out together (a memory given back, the lotus pond): narration and
+	# his lines frame the pair of them, as hers do, not him and the air ahead of him (side by side
+	# across that line, she stood hidden behind him)
+	var pair := false
+	if other.is_empty() and Game.companion and bool(using.get("scene", false)):
+		other = [comp, 1.0]
+		pair = true
 	var a3 := pp + Vector3(0, 1.45, 0)
+	if pair:
+		# (where he is, on the thing they share, not the tile he stepped onto it from)
+		a3 = player.global_position + Vector3(0, 1.45, 0)
 	var b3 := a3 + Vector3(facing.x, 0, facing.y) * 2.2
 	if not other.is_empty() and other[0] != player:
 		b3 = (other[0] as Node3D).global_position + Vector3(0, 1.45, 0)
@@ -1775,10 +1789,17 @@ func _cutscene(d: float, pp: Vector3) -> void:
 		ax = Vector3(facing.x, 0, facing.y)
 	ax = ax.normalized()
 	var side := Vector3(-ax.z, 0, ax.x)
-	if side.dot(cam.position - mid) < 0.0:
+	# (the side the camera is on already; for the two of them, the side he came in by: he walked over
+	# that ground to get there)
+	var lean: Vector3 = -(using.dir as Vector3) if pair else cam.position - mid
+	if side.dot(lean) < 0.0:
 		side = -side
 	var indoor: bool = inside != "" or is_floor()
 	var dist := clampf(a3.distance_to(b3) * 0.9 + 3.4, 4.2, 8.5)
+	# not into a wood: if the ground on that side is trees (or a wall, or water) and the other side
+	# is open, the camera goes round to the other side
+	if not indoor and not _open_at(mid + side * dist) and _open_at(mid - side * dist):
+		side = -side
 	var goal := mid + side * dist + Vector3(0, 0.5 + (3.2 if indoor else 0.4), 0)
 	if sp == "Narrator" or sp == "":
 		# narration: a slow drift round the scene
@@ -1990,11 +2011,16 @@ func _draw_hud() -> void:
 			fc = Color(0.55, 0.75, 0.86)
 		draw_rect(Rect2(Vector2.ZERO, VIEW), Color(fc.r, fc.g, fc.b, fade * (1.0 if trip.climb else 0.85)))
 	# toasts
+	# (a long one, as most "Quest complete: ..." lines are, a little smaller to fit, and over two lines
+	# if it still does not: 176 of them used to be cut off mid-word at 600 pixels)
 	var y := 170.0
-	var i := 0
 	for s in main.toast_list:
-		UI.text(self, Vector2(VIEW.x * 0.5 - 300, y + i * 26), s.text, 18, Color(UI.C_JADE.r, UI.C_JADE.g, UI.C_JADE.b, clampf(s.t, 0.0, 1.0)), HORIZONTAL_ALIGNMENT_CENTER, 600)
-		i += 1
+		var col := Color(UI.C_JADE.r, UI.C_JADE.g, UI.C_JADE.b, clampf(s.t, 0.0, 1.0))
+		var sz := UI.fit(str(s.text), 18, UI.TOAST_W, 15)
+		for ln in UI.wrap_lines(str(s.text), sz, UI.TOAST_W):
+			UI.text(self, Vector2(VIEW.x * 0.5 - UI.TOAST_W * 0.5, y), ln, sz, col, HORIZONTAL_ALIGNMENT_CENTER, UI.TOAST_W)
+			y += sz + 4.0
+		y += 26.0 - (sz + 4.0)
 
 func _draw_minimap() -> void:
 	if mini_tex == null:

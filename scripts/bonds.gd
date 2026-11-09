@@ -807,6 +807,15 @@ static func epilogues(g) -> Array:
 		out.append("Every one of the seven memories the Founder pressed was given back. Yue Ling can name all twenty bearers she walked beside, and does, every year, on the night of the lotus lanterns.")
 	return out
 
+## Whether tile `t` is the deck of a bridge: a road tile with water on both sides across it, under
+## the humped stone bridge (terrain3d.gd), whose arch stands higher than the ground it is drawn over.
+static func _bridge_deck(grid: PackedByteArray, W: int, H: int, t: Vector2i) -> bool:
+	if grid.is_empty() or t.x < 1 or t.y < 1 or t.x >= W - 1 or t.y >= H - 1 or grid[t.y * W + t.x] != MapGen.PATH:
+		return false
+	var wet := func(x: int, y: int) -> bool:
+		return grid[y * W + x] == MapGen.WATER
+	return (wet.call(t.x - 1, t.y) and wet.call(t.x + 1, t.y)) or (wet.call(t.x, t.y - 1) and wet.call(t.x, t.y + 1))
+
 # ---------------------------------------------------------------- where the memories stand
 ## The places of the memories (and of the pond) in a realm: each a thing to do (props.gd) standing on
 ## the forest edge or the bank nearest the tile its memory names, never on a tile anybody walks over and
@@ -836,6 +845,10 @@ static func place(ids: Array, cands: Dictionary, placed_all: Array, layer: Strin
 					continue
 				var tile: Vector2i = c[1]
 				if big and Props._by_building(grid, W, H, tile, 3):
+					continue
+				# (a lantern set from the bank, not from a bridge: on the humped bridge's tile the two of
+				# them stood inside its arch, she with her head through the deck)
+				if water and _bridge_deck(grid, W, H, tile + (c[2] as Vector2i)):
 					continue
 				var near := false
 				for p in placed_all:
