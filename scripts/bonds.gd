@@ -397,6 +397,16 @@ const TALKS := [
 			{"id": "snow", "label": "\"We'll watch the snow together.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "We will watch the snow from the steps, together, with something hot."], ["Yue Ling", "From the steps. Like the lotus, but warmer. Yes."]]},
 			{"id": "towns", "label": "\"Every town's New Year with you.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "We will see how every town does it: lanterns in Yanggu, bells in Tushan, carp in the windows at Longmen."], ["Yue Ling", "Every town in one week? Lin Feng, that is the best idea you have ever had."]]},
 		]},
+	{"id": "t_hunger", "after": "s_p16_lean", "lines": [
+		["Yue Ling", "I knew a winter like that once. The ninth bearer's village, before he was a ferryman. The Lean Month came, and his mother gave him her rice and said she had eaten already."],
+		["Yue Ling", "She had not eaten already. I knew, and he knew, and nobody said so. That is what I remember: the three of us at the table, all pretending, so that the pretending would be enough."],
+		["Lin Feng", "Granny Wen used to do that. Every winter. I always knew."]],
+		"ask": "What do you say about the hungry winters?",
+		"options": [
+			{"id": "never", "label": "\"Nobody goes hungry on our mountain.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Then nobody goes hungry on our mountain again. Not while Auntie Zhou has a stove."], ["Yue Ling", "Not while she has a stove. That is a vow I believe."]]},
+			{"id": "share", "label": "\"I'll always say I've eaten.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "If there is ever only one bowl, I will say I have eaten already."], ["Yue Ling", "And I will know, and I will not say so. That is how it works, isn't it?"]]},
+			{"id": "feed", "label": "\"Then let's feed every village.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Then in spring we carry rice to every village that had a lean month."], ["Yue Ling", "Every village? That is a lot of rice. I will start a list."]]},
+		]},
 	{"id": "t_lastnight", "after": "s_p16_xi", "lines": [
 		["Yue Ling", "The night is not moving, Lin Feng. The stars have been in the same place for hours. Is this what it was like, the nine days of noon? Only dark?"],
 		["Lin Feng", "At noon nobody could sleep. Tonight nobody wants to."],
@@ -738,6 +748,26 @@ static func take_memory(g, id: String, o: Dictionary) -> void:
 ## last is hers to make (FUTURES), with the one her heart leans to marked.
 const SHARES := {
 	# ---- Part XVI (the Living Land release): the last sweeping, the reunion dinner, the vigil and the first dawn
+	"s_p16_couplets": {"lines": [
+		["Narrator", "The Scripture Library smells of ink and cold stone. Yue Ling unrolls the red paper the merchants sold them across the desk, weighs the ends down with two of Archivist Lan's heaviest books, and grinds the ink herself, very seriously."],
+		["Yue Ling", "Two lines for the sides of the gate and four characters for over it. Every door in the land has them. They say what the household hopes for in the new year. Archivist Lan says your handwriting looks like a chicken walked through a puddle."],
+		["Lin Feng", "Archivist Lan has never seen a chicken walk through a puddle. It is beautiful."]],
+		"ask": "What do you write over the sect's gate?",
+		"options": [
+			{"id": "together", "label": "\"Two Brushes, One Spring\"", "lean": "companion", "after": [["Lin Feng", "Two brushes, one spring. You write half."], ["Yue Ling", "...I will write the half on the right. It is the better half. Do not argue."]]},
+			{"id": "home", "label": "\"The Door Is Always Open\"", "lean": "lotus", "after": [["Lin Feng", "The door is always open. Anybody who comes up the mountain, whatever they are."], ["Yue Ling", "The door is always open. The Founder would have liked that. She made a door once, after all."]]},
+			{"id": "roads", "label": "\"Every Road Comes Home\"", "lean": "wander", "after": [["Lin Feng", "Every road comes home. Even the long ones."], ["Yue Ling", "Especially the long ones. I am putting a little boat in the corner. Nobody will notice."]]},
+		]},
+	"s_p16_lanterns": {"lines": [
+		["Narrator", "On the fifteenth night of the first month the Dawn Market hangs every lantern it has ever made: rabbits, carp, dragons, lotuses, a lantern shaped like the sun that it is a little embarrassed about. Riddles hang from their tassels, and the whole market walks under them guessing."],
+		["Narrator", "Somebody remembers that the sweeper does sword forms on stages now. By the time Lin Feng has been told, the whole of Yanggu is standing round the stage at the crossroads with sweet dumplings in their hands, waiting."],
+		["Yue Ling", "Tangyuan: round, sweet, one for every person at the table. It means everybody is together. I ate eleven. Go on. They are all waiting for you."]],
+		"ask": "Under every lantern in Yanggu, who is the sword form for?",
+		"options": [
+			{"id": "her", "label": "\"For Yue Ling, who saw her first year in.\"", "lean": "companion", "after": [["Lin Feng", "This one is for Yue Ling, who saw her first year in."], ["Narrator", "The market cheers, and somebody hangs a lantern shaped like a lotus over her head, and she lets it stay."]]},
+			{"id": "town", "label": "\"For the Dawn Market, that kept its lamps lit.\"", "lean": "lotus", "after": [["Lin Feng", "For the Dawn Market, that kept its lamps lit when the Last Night came for them."], ["Narrator", "Night-Watchman Lao Zhou strikes his gong once, very loudly, and pretends there is something in his eye."]]},
+			{"id": "road", "label": "\"For the roads, all of them.\"", "lean": "wander", "after": [["Lin Feng", "For every road out of this town, and everybody coming home along them."], ["Narrator", "The caravan hands cheer loudest. Yue Ling is already reading the riddles on the lanterns pointing east."]]},
+		]},
 	"s_p16_sweep": {"lines": [
 		["Narrator", "The last sweeping of the year sweeps out the bad luck and nothing else: on New Year's Day itself nobody sweeps at all, or the good luck goes out with the dust. Lin Feng takes the old broom from beside the courtyard steps. His hands know it before he does."],
 		["Yue Ling", "Three years you swept these steps. What did you think about, all that time?"],
@@ -851,7 +881,7 @@ static func spot_is(spot: String, e: Dictionary) -> bool:
 ## loom she was woven on)").  Every share used to be put down as "by the lotus pond".
 const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the lotus pond", "s_p15_loom": "at the loom she was woven on",
 	"s_p15_feast": "at her naming feast", "s_p16_sweep": "sweeping out the old year", "s_p16_eve": "at the reunion dinner",
-	"s_p16_vigil": "keeping the vigil", "s_p16_dawn": "at the first dawn of the year"}
+	"s_p16_vigil": "keeping the vigil", "s_p16_dawn": "at the first dawn of the year", "s_p16_lanterns": "at the Lantern Festival", "s_p16_couplets": "writing the New Year couplets"}
 
 static func share_place(sid: String) -> String:
 	return str(SHARE_PLACES.get(sid, "side by side"))

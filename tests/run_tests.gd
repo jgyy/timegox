@@ -1069,7 +1069,7 @@ func _init() -> void:
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis))
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 11, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves and Part XVI's hunger on the terraces" % p13_bands)
+	check(p13_bands == 8 and bands == 12, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves and Part XVI's hunger on the terraces and moths in the market" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -2081,22 +2081,25 @@ func _living() -> void:
 	check(RG.cur_step().id == "s_p16_rally" and Trials.path_met("xi_beast", Trials.path("xi_beast", "folk"), RG), "three towns: the people's road through Xi is open, but the step wants four")
 	RG.rallied["caster_wei"] = true
 	RG.poll_steps()
-	check(RG.cur_step().id == "s_p16_hunt" and Trials.path_met("nian", Trials.path("nian", "folk"), RG), "four towns remember the old ways: the hunt is next, and the people's road through Nian is open")
+	check(RG.cur_step().id == "s_p16_rally" and Trials.path_met("nian", Trials.path("nian", "folk"), RG), "four towns: the people's road through Nian is open, but the step wants five")
+	RG.rallied["lockkeeper_qian"] = true
+	RG.poll_steps()
+	check(RG.cur_step().id == "s_p16_hunt", "five towns remember the old ways: the hunt is next")
 	RG.step = Data.step_index("s_p16_hongbao")
 	var kids_seen := 0
-	for tid3 in ["cloudfoot", "qingshi"]:
+	for tid3 in ["cloudfoot", "qingshi", "yanggu"]:
 		for fp3 in Folk.people(Atlas.world_of("surface"), tid3):
 			if Folk.is_role(fp3, "child"):
 				RG.folk_mark(RG.cur_step(), str(fp3.id))
 				kids_seen += 1
 	RG.poll_steps()
-	check(kids_seen >= 6 and RG.cur_step().id == "s_p16_calls", "six red envelopes for the children of two towns, and then the New Year calls (%d children)" % kids_seen)
+	check(kids_seen >= 8 and RG.cur_step().id == "s_p16_elders", "eight red envelopes for the children of the towns, and then the grandparents (%d children)" % kids_seen)
 	RG.free()
 	for tid4 in ["xi_beast", "nian"]:
 		check(Trials.TRIALS.has(tid4) and Lore.BOSS.has(tid4) and Data.DIALOGUE.has("pre:" + tid4) and Data.DIALOGUE.has("post:" + tid4), "%s is a trial, with a story and words before and after" % tid4)
 	for mon in ["lean_month", "candle_moth", "nian_cub"]:
 		check(Data.ENEMIES.has(mon) and Lore.BEAST.has(mon), "%s has a story" % mon)
-	for sid2 in ["s_p16_sweep", "s_p16_eve", "s_p16_vigil", "s_p16_dawn"]:
+	for sid2 in ["s_p16_sweep", "s_p16_couplets", "s_p16_eve", "s_p16_vigil", "s_p16_dawn", "s_p16_lanterns"]:
 		var sp: Dictionary = Data.STEPS[Data.step_index(sid2)]
 		check(Bonds.SHARES.has(sid2) and not Bonds.find_spot(Atlas.world_of(Data.layer_of(str(sp.area))).ents, str(sp.spot)).is_empty(), "%s: a scene with Yue Ling, at a place that is there" % sid2)
 		check(Bonds.share_place(sid2) != "by the lotus pond", "%s is remembered where it happened" % sid2)

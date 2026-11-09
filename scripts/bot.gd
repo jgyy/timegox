@@ -108,11 +108,11 @@ const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
 const TALK_PLAN := {"t_lotus": "mine", "t_hands": "teach", "t_winter": "here", "t_chains": "cut", "t_sky": "share", "t_seal": "you",
 	"t_ageless": "keep", "t_mend": "me", "t_ancestors": "make", "t_mother": "sing", "t_bridge": "yes", "t_noon": "duty", "t_maps": "draw",
 	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_dragon": "ask", "t_nineteen": "left", "t_peach": "see", "t_heaven": "home", "t_xufu": "front", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_loom": "through", "t_moths": "keep", "t_wrist": "family", "t_after": "never", "t_feast": "every",
-	"t_newyear": "bowl", "t_lastnight": "stay", "t_newday": "red",
+	"t_newyear": "bowl", "t_hunger": "share", "t_lastnight": "stay", "t_newday": "red",
 }
 const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "mem_dance", "mem_kite"]
 const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
-const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us",}
+const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us", "s_p16_lanterns": "her", "s_p16_couplets": "together",}
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
@@ -1203,8 +1203,15 @@ func _folk_step(s: Dictionary) -> void:
 	var role: String = str(s.get("role", "child"))
 	var tgt := _folk_target(role)
 	if tgt.is_empty():
-		if Game.area != str(s.area) or world.layer != Data.layer_of(str(s.area)):
-			_travel(str(s.area))
+		# nobody to be found out of doors: wait in the town it is working through (the step's own town
+		# first), never in the one before; a town of the step's region before any other
+		var town := _folk_town(role)
+		var ar: String = str(Folk.TOWNS[town].area) if town != "" else str(s.area)
+		var hc: Vector2i = Folk.heart(town) if town != "" else world.ptile
+		if Game.area != ar or world.layer != Data.layer_of(ar):
+			_travel(ar)
+		elif absi(hc.x - world.ptile.x) + absi(hc.y - world.ptile.y) > Folk.RADIUS:
+			_walk_to(_near_free(hc), "folk_town:" + town)
 		else:
 			_start_meditate("children")
 		return
@@ -1230,34 +1237,61 @@ func _folk_step(s: Dictionary) -> void:
 		return
 	_walk_to(best, "folk:%s:%s" % [str(tgt.id), str(best)])
 
-## The child (or townsperson of kind `role`) nearest the bot in this realm who is out of doors and
-## standing still for a while yet: {id, tile} or {}.
-func _folk_target(role: String) -> Dictionary:
+## The town the bot works an errand through (Part XVI): the town of the step's own region while anybody
+## there is still to be done, else the nearest town of this realm with somebody left ("" if none).
+func _folk_town(role: String) -> String:
+	var s := Game.cur_step()
 	if world.is_floor() or world.wd.is_empty():
-		return {}
-	var m: float = Game.clock
-	var best := {}
+		return ""
+	var best := ""
 	var bd := 1 << 30
 	for tid in Folk.TOWNS:
 		var ar: String = Folk.TOWNS[tid].area
 		if Data.layer_of(ar) != world.layer:
 			continue
-		var hc := Folk.heart(tid)
-		var town_d := absi(hc.x - world.ptile.x) + absi(hc.y - world.ptile.y)
-		if town_d > bd + Folk.RADIUS:
-			continue
+		var left := 0
 		for fp in Folk.people(world.wd, tid):
-			if not Folk.is_role(fp, role) or Game.folk_has(Game.cur_step(), str(fp.id)):
-				continue
-			var st := Folk.state(world.wd, fp, m)
-			if not st.vis or st.walk or float(st.seg.b) - m < 4.0:
-				continue
-			var tile := Vector2i(int(floor((st.at as Vector2).x)), int(floor((st.at as Vector2).y)))
-			var dd := absi(tile.x - world.ptile.x) + absi(tile.y - world.ptile.y)
-			if dd < bd:
-				bd = dd
-				best = {"id": str(fp.id), "tile": tile}
+			if Folk.is_role(fp, role) and not Game.folk_has(s, str(fp.id)):
+				left += 1
+		if left == 0:
+			continue
+		var hc := Folk.heart(tid)
+		var cost := absi(hc.x - world.ptile.x) + absi(hc.y - world.ptile.y) + (0 if ar == str(s.get("area", "")) else 100000)
+		if cost < bd:
+			bd = cost
+			best = tid
 	return best
+
+## The child (or townsperson of kind `role`) of the town the errand is going through who is out of
+## doors and standing still for a while yet, nearest the bot: {id, tile} or {}.
+func _folk_target(role: String) -> Dictionary:
+	var town := _folk_town(role)
+	if town == "":
+		return {}
+	var best := {}
+	var bd := 1 << 30
+	for fp in Folk.people(world.wd, town):
+		if not Folk.is_role(fp, role) or Game.folk_has(Game.cur_step(), str(fp.id)):
+			continue
+		var st := Folk.state(world.wd, fp, Game.clock)
+		if not st.vis or st.walk or float(st.left) < 4.0:
+			continue
+		var tile := Vector2i(int(floor((st.at as Vector2).x)), int(floor((st.at as Vector2).y)))
+		var dd := absi(tile.x - world.ptile.x) + absi(tile.y - world.ptile.y)
+		if dd < bd:
+			bd = dd
+			best = {"id": str(fp.id), "tile": tile}
+	return best
+
+## A free tile at or near `p` to walk to.
+func _near_free(p: Vector2i) -> Vector2i:
+	for r in 8:
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var q := p + Vector2i(dx, dy)
+				if maxi(absi(dx), absi(dy)) == r and world.tile_free(q) and world.ent_at(q) == null:
+					return q
+	return p
 
 ## Renown the bot can still earn from deeds the story has reached.
 func _deed_renown() -> int:

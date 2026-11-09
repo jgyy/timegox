@@ -5,7 +5,7 @@ extends RefCounted
 const MAX_LEVEL := 63
 const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 300000, 340000, 380000]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000]
 const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
@@ -1603,6 +1603,8 @@ const AREAS := {
 	"yanggu": {
 		"n": "Yanggu, the Dawn Market", "w": 104, "h": 60, "seed": 351, "theme": "yanggu", "enemies": 22,
 		"pool": [["noon_cur", 39, 39], ["noon_cicada", 39, 39], ["clay_toad", 39, 39]],
+		# Part XVI: Xi's candle-moths, eating the lanterns of the Dawn Market on New Year's Eve
+		"warband": {"pool": [["candle_moth", 61, 61], ["lean_month", 61, 61]], "n": 6, "vis": "s_p16_eve"},
 		"portals": [
 			{"to": "sect", "pos": Vector2i(1, 30), "dest": Vector2i(36, 22), "open": ""},
 			{"to": "millet", "pos": Vector2i(102, 25), "dest": Vector2i(4, 24), "open": "s_yg_hanba"},
@@ -2934,20 +2936,25 @@ const STEPS := [
 	{"id": "s_p16_kitchen", "kind": "talk", "npc": "zao_jun", "area": "sect", "t": "Find Zao Jun, Lord of the Stove, sitting on the stove in the sect's kitchen"},
 	{"id": "s_p16_sweep", "kind": "share", "spot": "kind:sect:broom", "area": "sect", "t": "Sweep the old year out of the courtyard with Yue Ling: the last sweeping takes the bad luck with it"},
 	{"id": "s_p16_paper", "kind": "folk", "role": "merchant", "n": 4, "area": "mountain", "t": "Buy red paper for the sect's couplets from four merchants of the towns (face one and press Enter)"},
+	{"id": "s_p16_couplets", "kind": "share", "spot": "furn:sect:library:3", "area": "sect", "t": "Write the sect's New Year couplets on the red paper with Yue Ling, at the desk in the Scripture Library"},
+	{"id": "s_p16_report", "kind": "folk", "role": "farmer", "n": 5, "area": "village", "t": "Help Zao Jun write his report to Heaven: ask five of Qingshi's farmers what their year was like (face one and press Enter)"},
 	{"id": "s_p16_bamboo", "kind": "collect", "item": "thunder_bamboo", "n": 4, "area": "bamboo", "t": "Cut 4 stalks of Thunder Bamboo in the Whispering Bamboo Forest: on a fire they bang like the first firecrackers"},
-	{"id": "s_p16_rally", "kind": "rally", "npcs": ["granny_wen", "watchman_zhou", "postmaster_lu", "lockkeeper_qian", "caster_wei", "well_keeper_zhaya"], "n": 4, "area": "village",
-		"t": "Remind four towns of the old ways before New Year's Eve: Qingshi, Yanggu, Cloudfoot, Longmen, Tushan or Shazhou"},
-	{"id": "s_p16_hunt", "kind": "hunt", "area": "terraces", "n": 16, "of": ["lean_month", "candle_moth", "nian_cub"], "t": "Drive the Lean Months, the candle-moths and Nian's cubs off the Cloud-Tea Terraces before they reach the villages"},
+	{"id": "s_p16_rally", "kind": "rally", "npcs": ["granny_wen", "watchman_zhou", "postmaster_lu", "lockkeeper_qian", "caster_wei", "well_keeper_zhaya"], "n": 5, "area": "village",
+		"t": "Remind five towns of the old ways before New Year's Eve: Qingshi, Yanggu, Cloudfoot, Longmen, Tushan or Shazhou"},
+	{"id": "s_p16_hunt", "kind": "hunt", "area": "terraces", "n": 20, "of": ["lean_month", "candle_moth", "nian_cub"], "t": "Drive the Lean Months, the candle-moths and Nian's cubs off the Cloud-Tea Terraces before they reach the villages"},
 	{"id": "s_p16_lean", "kind": "kill", "boss": "lean_king", "area": "terraces", "t": "Find what drives the hunger down the terraces: the Lean Month King"},
 	{"id": "s_p16_doorgods", "kind": "talk", "npc": "shenshu", "area": "garden", "t": "Ask the door gods under the great peach tree in the Garden of Immortal Peaches for charms of peach wood"},
 	{"id": "s_p16_eve", "kind": "share", "spot": "furn:sect:kitchen:2", "area": "sect", "t": "New Year's Eve: sit down to the reunion dinner with the whole sect in the kitchen"},
+	{"id": "s_p16_moths", "kind": "hunt", "area": "yanggu", "n": 16, "of": ["candle_moth", "lean_month"], "t": "The candle-moths are eating the lanterns of the Dawn Market: drive them out of the lanes of Yanggu"},
 	{"id": "s_p16_xi", "kind": "kill", "boss": "xi_beast", "area": "yanggu", "t": "The lanterns of the Dawn Market are going out one by one: stop Xi, the Last Night, in Yanggu"},
 	{"id": "s_p16_vigil", "kind": "share", "spot": "furn:village:wen_house:2", "area": "village", "t": "Keep the vigil in Granny Wen's house in Qingshi: on the last night of the year nobody stays up alone"},
 	{"id": "s_p16_nian", "kind": "kill", "boss": "nian", "area": "village", "t": "Midnight: Nian comes down out of the mountains into Qingshi Village", "stones": 24600},
 	{"id": "s_p16_dawn", "kind": "share", "spot": "kind:sect:bell", "area": "sect", "t": "The first dawn of the new year: ring the sect's bell a hundred and eight times with Yue Ling"},
-	{"id": "s_p16_hongbao", "kind": "folk", "role": "child", "n": 6, "area": "mountain", "t": "New Year's Day: give red envelopes to six children of the towns (face one and press Enter)"},
-	{"id": "s_p16_calls", "kind": "visits", "npcs": ["alchemist", "smith", "archivist", "cook_zhou", "bell_shen", "gardener_ruan", "disciple_han", "sweeper_bai"], "n": 5, "area": "sect",
-		"t": "New Year's Day: go round the sect wishing everybody a good new year, in any order (five of them)"},
+	{"id": "s_p16_hongbao", "kind": "folk", "role": "child", "n": 8, "area": "mountain", "t": "New Year's Day: give red envelopes to eight children of the towns (face one and press Enter)"},
+	{"id": "s_p16_elders", "kind": "folk", "role": "elder", "n": 4, "area": "village", "t": "New Year's Day: pay your respects to four grandparents of the towns (face one and press Enter)"},
+	{"id": "s_p16_calls", "kind": "visits", "npcs": ["alchemist", "smith", "archivist", "cook_zhou", "bell_shen", "gardener_ruan", "disciple_han", "sweeper_bai"], "n": 6, "area": "sect",
+		"t": "New Year's Day: go round the sect wishing everybody a good new year, in any order (six of them)"},
+	{"id": "s_p16_lanterns", "kind": "share", "spot": "kind:yanggu:stage", "area": "yanggu", "t": "The Lantern Festival: on the fifteenth night the Dawn Market asks for a sword form on its stage, under every lantern in Yanggu"},
 	{"id": "s_p16_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Wish Elder Qing Xuan a good new year"},
 	{"id": "s_break21", "kind": "breakthrough", "to": 63, "t": "Keep every lamp in the land lit: Ten Thousand Hearths"},
 ]

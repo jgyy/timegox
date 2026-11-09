@@ -1584,7 +1584,11 @@ func face_entity():
 		e = walk_props.get(ptile + facing)
 	if e == null and not is_floor() and not wd.is_empty():
 		# one of the people of the towns standing (or walking) there (folk.gd)
-		var fp := Folk.at_tile(wd, ptile + facing, Game.clock)
+		var fs := Game.cur_step()
+		var want := Callable()
+		if not fs.is_empty() and str(fs.kind) == "folk":
+			want = func(q: Dictionary) -> bool: return Folk.is_role(q, str(fs.role)) and not Game.folk_has(fs, str(q.id))
+		var fp := Folk.at_tile(wd, ptile + facing, Game.clock, want)
 		if not fp.is_empty():
 			e = {"kind": "folk", "id": fp.id, "n": fp.n, "p": fp, "pos": ptile + facing, "area": fp.area}
 	return e

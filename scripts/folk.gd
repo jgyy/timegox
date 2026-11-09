@@ -593,7 +593,7 @@ static func state(wd: Dictionary, p: Dictionary, m: float) -> Dictionary:
 			sg = s
 			break
 	if sg.kind == "walk" and bool(sg.in):
-		return {"vis": false, "at": sg.pts[0] if (sg.pts as PackedVector2Array).size() > 0 else Vector2.ZERO, "yaw": 0.0, "walk": true, "clip": "walk", "hold": "", "seg": sg}
+		return {"vis": false, "at": sg.pts[0] if (sg.pts as PackedVector2Array).size() > 0 else Vector2.ZERO, "yaw": 0.0, "walk": true, "clip": "walk", "hold": "", "seg": sg, "left": float(sg.b) - mm}
 	if sg.kind == "walk":
 		var pts: PackedVector2Array = sg.pts
 		var k := clampf((mm - float(sg.a)) / maxf(0.001, float(sg.b) - float(sg.a)), 0.0, 1.0)
@@ -608,10 +608,10 @@ static func state(wd: Dictionary, p: Dictionary, m: float) -> Dictionary:
 				break
 			want -= l
 		var role: Dictionary = ROLES[str(p.role)]
-		return {"vis": true, "at": at, "yaw": atan2(dir.x, dir.y), "walk": true, "clip": str(role.get("walk", "walk")), "hold": str(role.get("go_hold", "")), "seg": sg}
+		return {"vis": true, "at": at, "yaw": atan2(dir.x, dir.y), "walk": true, "clip": str(role.get("walk", "walk")), "hold": str(role.get("go_hold", "")), "seg": sg, "left": float(sg.b) - mm}
 	var clips := str(sg.clip).split("|")
 	var ci := int((mm - float(sg.a)) / 9.0 + float(p.seed)) % clips.size()
-	return {"vis": not bool(sg.in), "at": sg.at, "yaw": float(sg.yaw), "walk": false, "clip": clips[ci], "hold": str(sg.hold), "seg": sg}
+	return {"vis": not bool(sg.in), "at": sg.at, "yaw": float(sg.yaw), "walk": false, "clip": clips[ci], "hold": str(sg.hold), "seg": sg, "left": float(sg.b) - mm}
 
 ## Everybody of the towns in region `area` (of realm data `wd`).
 static func of_area(wd: Dictionary, area: String) -> Array:
@@ -622,18 +622,24 @@ static func of_area(wd: Dictionary, area: String) -> Array:
 
 ## The person standing on (or walking through) tile `tile` of the realm in `wd` at minute `m`, or {}
 ## (someone indoors is nowhere).  Used for "face one and press Enter".
-static func at_tile(wd: Dictionary, tile: Vector2i, m: float) -> Dictionary:
+static func at_tile(wd: Dictionary, tile: Vector2i, m: float, want: Callable = Callable()) -> Dictionary:
 	var area := Atlas.owner_id(wd, tile)
 	var best := {}
 	var bd := 0.75
+	var wanted := false
 	for p in of_area(wd, area):
 		var st := state(wd, p, m)
 		if not st.vis:
 			continue
 		var d := (st.at as Vector2).distance_to(Vector2(tile) + Vector2(0.5, 0.5))
-		if d < bd:
+		if d >= 0.75:
+			continue
+		# (when two stand close, the one an errand of the story still needs is the one he means)
+		var w: bool = want.is_valid() and bool(want.call(p))
+		if (w and not wanted) or (w == wanted and d < bd):
 			bd = d
 			best = p
+			wanted = w
 	return best
 
 # ---------------------------------------------------------------- what they say
@@ -768,6 +774,20 @@ const ERRANDS := {
 		"lines": ["Red paper! The first anybody has asked for all year. Take the whole roll. No, take two. Somebody should have a New Year.", "Red paper, gold edges, the good stuff from Tushan. For the sweeper who swept the sky, a third off.",
 			"For couplets? Then you'll want this too: a sheet of gold paper for the Fu on the door. Upside down, mind. The luck's arrived, see?", "I'd forgotten I had it. It was under the jars of nothing we've been selling all year. Here. Happy new year, early."]},
 	"s_p16_hongbao": {"ask": "A good new year to you. Here: for luck.", "price": 0, "toast": "A red envelope for %s", "lines": HONGBAO_LINES},
+	"s_p16_elders": {"ask": "A good new year, Grandfather. Grandmother. Long life, and good health in it.", "price": 0, "toast": "New Year respects paid to %s",
+		"lines": ["Long life? I have had a long life, young man. What I want is a short winter. Still: thank you. Here, take a sweet.",
+			"Kneel, kneel, a little bow is enough, you'll ruin your trousers. A good new year to you too. Come back next year and I'll still be here. I always am.",
+			"In my day the young ones came round with oranges. You came round with nothing and I don't mind at all. Sit a while.",
+			"Good health in it! At my age I'll take the health and you can keep the long life. Happy new year, child.",
+			"Another year! I've seen eighty of them. This one began with dragons and ended with dumplings. That's the right way round."]},
+	"s_p16_report": {"ask": "The Kitchen God is writing his report to Heaven. What was your year like?", "price": 0, "toast": "%s's year, for the Kitchen God's report",
+		"lines": ["The low field flooded in spring and we planted it again in summer, and it came good. Tell him that. Tell him we planted it again.",
+			"My son went to Tushan to cast bells and came back with a wife. I had to sell the pig for the wedding. Put down the wife. Leave out the pig.",
+			"Nine days of noon cracked the paddies like old pots. The whole village carried water at night. Nobody asked us to. Write that down.",
+			"The threads came across the roofs and we pulled them out of the thatch for a month. My hands still find them. It was a hard year and we are still here.",
+			"My mother died in the autumn, and the child came in the winter. I don't know what that adds up to. Tell him it was a year.",
+			"Too much rain, then too little, then a tree in the night. But the tea came good on the terraces, and the cabbages were enormous. Enormous.",
+			"Bandits in the spring, a flood in summer, cultivators every week. And the sweeper came home a hero. That one's the best part. Put it first."]},
 }
 
 ## What townsperson `p` answers to errand `sid`.
