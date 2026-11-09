@@ -564,6 +564,20 @@ func wpos(tile: Vector2i) -> Vector3:
 func _open_at(p: Vector3) -> bool:
 	return tile_free(Vector2i(floori((p.x - off.x) / Terrain3D.T), floori((p.z - off.z) / Terrain3D.T)))
 
+## How far out from `mid` along `dir` a conversation camera can stand outdoors, up to `want` metres:
+## with open ground under it and a metre beyond, so that it is never up in the roof of a hall (or a
+## tree) beside the scene, as it was by the sect's bell at the first dawn of the year.
+func _cam_reach(mid: Vector3, dir: Vector3, want: float) -> float:
+	var r := want
+	while r > 2.6 and not (_out_at(mid + dir * r) and _out_at(mid + dir * (r + 1.0))):
+		r -= 0.5
+	return r
+
+## Whether world point `p` is over open ground out of doors (walkable, and not a building's floor).
+func _out_at(p: Vector3) -> bool:
+	var t := Vector2i(floori((p.x - off.x) / Terrain3D.T), floori((p.z - off.z) / Terrain3D.T))
+	return tile_free(t) and grid[t.y * w + t.x] != MapGen.INTERIOR
+
 func _build_view(id: String) -> void:
 	var lid := Data.layer_of(id)
 	var bb := _bundle(lid)
@@ -1873,11 +1887,12 @@ func _cutscene(d: float, pp: Vector3) -> void:
 	# is open, the camera goes round to the other side
 	if not indoor and not _open_at(mid + side * dist) and _open_at(mid - side * dist):
 		side = -side
-	var goal := mid + side * dist + Vector3(0, 0.5 + (3.2 if indoor else 0.4), 0)
+	var goal := mid + side * (dist if indoor else _cam_reach(mid, side, dist)) + Vector3(0, 0.5 + (3.2 if indoor else 0.4), 0)
 	if sp == "Narrator" or sp == "":
 		# narration: a slow drift round the scene
 		cine_a += d * 0.12
-		goal = mid + (side.rotated(Vector3.UP, sin(cine_a) * 0.5)) * (dist + 1.5) + Vector3(0, 1.4 + (3.0 if indoor else 0.6), 0)
+		var drift := side.rotated(Vector3.UP, sin(cine_a) * 0.5)
+		goal = mid + drift * ((dist + 1.5) if indoor else _cam_reach(mid, drift, dist + 1.5)) + Vector3(0, 1.4 + (3.0 if indoor else 0.6), 0)
 	elif sp == "Lin Feng":
 		goal += ax * 0.9
 	else:

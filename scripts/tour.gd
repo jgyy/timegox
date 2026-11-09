@@ -305,8 +305,9 @@ func _follow(id: String) -> void:
 ## The nearest walkable tile with nobody on it, on dry ground if there is any within 20 steps: the
 ## shore of a river or pond is sunk below the waterline in 3D, so heroes standing on the bank
 ## itself seem to wade in the water.
-## Part XVI (--part16): the Kitchen God, a town drilled in the old ways, the noise of the long last
-## night, Xi and Nian, the vigil, the first dawn and the red envelopes of New Year's Day.
+## Part XVI (--part16, or --part16=a,b to pick shots): the Kitchen God, a town drilled in the old
+## ways, the noise of the long last night, Xi and Nian, the vigil, the first dawn and the red
+## envelopes of New Year's Day.
 func _part16_state(step_id: String) -> void:
 	_lotus_state("s_p15_end")
 	Game.step = Data.step_index(step_id)
@@ -319,141 +320,159 @@ func _part16_state(step_id: String) -> void:
 	Game.bond = 400
 	Game.heal_full()
 
-func _part16_shots() -> void:
+func _part16_shots(which: String = "1") -> void:
+	# (--part16=a,b renders only those shots)
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(names: Array) -> bool:
+		if only.is_empty():
+			return true
+		for n in names:
+			if only.has(str(n)):
+				return true
+		return false
+	main.set_stack(["world"])
 	# the Kitchen God on the stove
-	_part16_state("s_p16_kitchen")
-	Game.clock = 10.0 * 60.0
-	var zj := _land_ent("zao_jun")
-	if not zj.is_empty():
-		_stand_by(zj)
-		await _wait(0.6)
-		main.talk_npc(zj)
-		for k in 2:
+	if want.call(["part16_kitchen_god"]):
+		_part16_state("s_p16_kitchen")
+		Game.clock = 10.0 * 60.0
+		var zj := _land_ent("zao_jun")
+		if not zj.is_empty():
+			_stand_by(zj)
+			await _wait(0.6)
+			main.talk_npc(zj)
+			for k in 2:
+				main.dialogue.shown = 999.0
+				main.press("confirm")
+				await _wait(0.25)
 			main.dialogue.shown = 999.0
-			main.press("confirm")
-			await _wait(0.25)
-		main.dialogue.shown = 999.0
-		await _wait(1.0)
-		await _shot("part16_kitchen_god")
-		await _skip_talk()
+			await _wait(1.0)
+			await _shot("part16_kitchen_god")
+			await _skip_talk()
 	# Yanggu remembers the old ways: the drill
-	_part16_state("s_p16_rally")
-	Game.clock = 15.5 * 60.0
-	var wz := _land_ent("watchman_zhou")
-	if not wz.is_empty():
-		_stand_by(wz)
-		await _wait(1.5)
-		main.talk_npc(wz)
-		await _skip_talk()
-		await _wait(2.0)
-		_frame_crowd(Vector3(-11.0, 7.0, 12.0))
-		await _wait(0.4)
-		await _shot("part16_drill")
-		main.world.cam_override = null
+	if want.call(["part16_drill"]):
+		_part16_state("s_p16_rally")
+		Game.clock = 15.5 * 60.0
+		var wz := _land_ent("watchman_zhou")
+		if not wz.is_empty():
+			_stand_by(wz)
+			await _wait(1.5)
+			main.talk_npc(wz)
+			await _skip_talk()
+			await _wait(2.0)
+			_frame_crowd(Vector3(-11.0, 7.0, 12.0))
+			await _wait(0.4)
+			await _shot("part16_drill")
+			main.world.cam_override = null
 	# the long last night: every pot in Yanggu, with lanterns
-	_part16_state("s_p16_vigil")
-	for npc in ["granny_wen", "watchman_zhou", "postmaster_lu", "caster_wei"]:
-		Game.rallied[npc] = true
-	Game.clock = 22.4 * 60.0
-	main.world.enter_layer("surface")
-	main.world.teleport(_nearest_free(Atlas.to_world("yanggu", Vector2i(34, 30))), "surface")
-	main.world._snap_cam()
-	await _wait(2.5)
-	_frame_crowd(Vector3(-10.0, 6.0, 11.0))
-	await _wait(0.4)
-	await _shot("part16_noise_night")
-	main.world.cam_override = null
-	# Xi, the Last Night, by the door gods' peach wood
-	var xm: Array = Trials.TRIALS.xi_beast.might
-	main.battle.start([{"id": "xi_beast", "lv": 61, "mult": float(xm[0]), "atk": float(xm[1])}], {"boss": true, "enemy": "xi_beast", "theme": "yanggu", "trial": "xi_beast", "path": "relic",
-		"boon": Trials.path("xi_beast", "relic").boon, "path_n": "Charms of peach wood", "path_kind": str(Trials.KINDS.relic.n)})
-	main.push("battle")
-	await _wait(3.4)
-	await _shot("battle_boss_xi_beast")
-	main.pop()
-	# the vigil at Granny Wen's
-	_part16_state("s_p16_vigil")
-	Game.clock = 23.0 * 60.0
-	var vt := _land_ent("furn:village:wen_house:2")
-	if not vt.is_empty():
-		main.world.open_world()
+	if want.call(["part16_noise_night"]):
+		_part16_state("s_p16_vigil")
+		for npc in ["granny_wen", "watchman_zhou", "postmaster_lu", "caster_wei"]:
+			Game.rallied[npc] = true
+		Game.clock = 22.4 * 60.0
 		main.world.enter_layer("surface")
-		main.world.teleport(_nearest_free(vt.pos + Vector2i(1, 0)), "surface")
+		main.world.teleport(_nearest_free(Atlas.to_world("yanggu", Vector2i(34, 30))), "surface")
 		main.world._snap_cam()
-		await _wait(0.6)
-		main.share_scene(vt, "s_p16_vigil")
-		for k2 in 3:
-			main.dialogue.shown = 999.0
-			main.press("confirm")
-			await _wait(0.3)
-		main.world.using.t0 = main.world.t - main.world.USE_STEP - 2.0
-		main.dialogue.shown = 999.0
-		await _wait(1.0)
-		await _shot("part16_vigil")
-		await _skip_talk()
+		await _wait(2.5)
+		_frame_crowd(Vector3(-10.0, 6.0, 11.0))
 		await _wait(0.4)
-		await _shot("part16_vigil_choice")
-		main.choice.press("confirm")
-		await _wait(0.3)
-		await _skip_talk()
+		await _shot("part16_noise_night")
+		main.world.cam_override = null
+	# Xi, the Last Night, by the door gods' peach wood
+	if want.call(["battle_boss_xi_beast"]):
+		var xm: Array = Trials.TRIALS.xi_beast.might
+		main.battle.start([{"id": "xi_beast", "lv": 61, "mult": float(xm[0]), "atk": float(xm[1])}], {"boss": true, "enemy": "xi_beast", "theme": "yanggu", "trial": "xi_beast", "path": "relic",
+			"boon": Trials.path("xi_beast", "relic").boon, "path_n": "Charms of peach wood", "path_kind": str(Trials.KINDS.relic.n)})
+		main.push("battle")
+		await _wait(3.4)
+		await _shot("battle_boss_xi_beast")
+		main.pop()
+	# the vigil at Granny Wen's
+	if want.call(["part16_vigil", "part16_vigil_choice"]):
+		_part16_state("s_p16_vigil")
+		Game.clock = 23.0 * 60.0
+		var vt := _land_ent("furn:village:wen_house:2")
+		if not vt.is_empty():
+			main.world.open_world()
+			main.world.enter_layer("surface")
+			main.world.teleport(_nearest_free(vt.pos + Vector2i(1, 0)), "surface")
+			main.world._snap_cam()
+			await _wait(0.6)
+			main.share_scene(vt, "s_p16_vigil")
+			for k2 in 3:
+				main.dialogue.shown = 999.0
+				main.press("confirm")
+				await _wait(0.3)
+			main.world.using.t0 = main.world.t - main.world.USE_STEP - 2.0
+			main.dialogue.shown = 999.0
+			await _wait(1.0)
+			await _shot("part16_vigil")
+			await _skip_talk()
+			await _wait(0.4)
+			await _shot("part16_vigil_choice")
+			main.choice.press("confirm")
+			await _wait(0.3)
+			await _skip_talk()
 	# Nian, the Year Beast, by every pot in the land
-	var nm: Array = Trials.TRIALS.nian.might
-	main.battle.start([{"id": "nian", "lv": 62, "mult": float(nm[0]), "atk": float(nm[1])}], {"boss": true, "enemy": "nian", "theme": "village", "trial": "nian", "path": "folk",
-		"boon": Trials.path("nian", "folk").boon, "path_n": "Every pot in the land", "path_kind": str(Trials.KINDS.folk.n)})
-	main.push("battle")
-	await _wait(3.4)
-	await _shot("battle_boss_nian")
-	main.pop()
+	if want.call(["battle_boss_nian"]):
+		var nm: Array = Trials.TRIALS.nian.might
+		main.battle.start([{"id": "nian", "lv": 62, "mult": float(nm[0]), "atk": float(nm[1])}], {"boss": true, "enemy": "nian", "theme": "village", "trial": "nian", "path": "folk",
+			"boon": Trials.path("nian", "folk").boon, "path_n": "Every pot in the land", "path_kind": str(Trials.KINDS.folk.n)})
+		main.push("battle")
+		await _wait(3.4)
+		await _shot("battle_boss_nian")
+		main.pop()
 	# New Year's Day in Cloudfoot: the children in red, and a red envelope
-	_part16_state("s_p16_hongbao")
-	Game.clock = 8.0 * 60.0
-	main.world.enter_layer("surface")
-	main.world.teleport(_nearest_free(Atlas.to_world("mountain", Vector2i(82, 34))), "surface")
-	main.world._snap_cam()
-	await _wait(2.0)
-	var lw := Atlas.world_of("surface")
-	var kid := {}
-	for fp in Folk.people(lw, "cloudfoot"):
-		var st := Folk.state(lw, fp, Game.clock)
-		if fp.kid and st.vis and not st.walk and kid.is_empty():
-			kid = {"p": fp, "tile": Vector2i(int(floor(st.at.x)), int(floor(st.at.y)))}
-	if not kid.is_empty():
-		var kt: Vector2i = kid.tile
-		var spot := _nearest_free(kt + Vector2i(0, 1))
-		main.world.teleport(spot, "surface")
-		main.world.facing = Vector2i(signi(kt.x - spot.x), signi(kt.y - spot.y)) if (kt - spot).length() > 0 else Vector2i(0, -1)
-		main.world.cam_q = _quarter(Vector2(main.world.facing))
+	if want.call(["part16_new_year_children", "part16_hongbao"]):
+		_part16_state("s_p16_hongbao")
+		Game.clock = 8.0 * 60.0
+		main.world.enter_layer("surface")
+		main.world.teleport(_nearest_free(Atlas.to_world("mountain", Vector2i(82, 34))), "surface")
 		main.world._snap_cam()
-		await _wait(1.5)
-		await _shot("part16_new_year_children")
-		main.talk_folk({"kind": "folk", "id": kid.p.id, "n": kid.p.n, "p": kid.p})
-		main.dialogue.shown = 999.0
-		main.press("confirm")
-		await _wait(0.3)
-		main.dialogue.shown = 999.0
-		await _wait(0.8)
-		await _shot("part16_hongbao")
-		await _skip_talk()
-	# the first dawn of the year: the bell
-	_part16_state("s_p16_dawn")
-	Game.clock = 6.3 * 60.0
-	var bspot := Bonds.find_spot(Atlas.world_of("surface").ents, "kind:sect:bell")
-	if not bspot.is_empty():
-		_stand_by(bspot)
-		await _wait(0.6)
-		main.share_scene(bspot, "s_p16_dawn")
-		for k3 in 2:
+		await _wait(2.0)
+		var lw := Atlas.world_of("surface")
+		var kid := {}
+		for fp in Folk.people(lw, "cloudfoot"):
+			var st := Folk.state(lw, fp, Game.clock)
+			if fp.kid and st.vis and not st.walk and kid.is_empty():
+				kid = {"p": fp, "tile": Vector2i(int(floor(st.at.x)), int(floor(st.at.y)))}
+		if not kid.is_empty():
+			var kt: Vector2i = kid.tile
+			var spot := _nearest_free(kt + Vector2i(0, 1))
+			main.world.teleport(spot, "surface")
+			main.world.facing = Vector2i(signi(kt.x - spot.x), signi(kt.y - spot.y)) if (kt - spot).length() > 0 else Vector2i(0, -1)
+			main.world.cam_q = _quarter(Vector2(main.world.facing))
+			main.world._snap_cam()
+			await _wait(1.5)
+			await _shot("part16_new_year_children")
+			main.talk_folk({"kind": "folk", "id": kid.p.id, "n": kid.p.n, "p": kid.p})
 			main.dialogue.shown = 999.0
 			main.press("confirm")
 			await _wait(0.3)
-		main.world.using.t0 = main.world.t - main.world.USE_STEP - 1.0
-		main.dialogue.shown = 999.0
-		await _wait(1.0)
-		await _shot("part16_dawn_bell")
-		await _skip_talk()
-		main.choice.press("confirm")
-		await _wait(0.3)
-		await _skip_talk()
+			main.dialogue.shown = 999.0
+			await _wait(0.8)
+			await _shot("part16_hongbao")
+			await _skip_talk()
+	# the first dawn of the year: the bell
+	if want.call(["part16_dawn_bell"]):
+		_part16_state("s_p16_dawn")
+		Game.clock = 6.3 * 60.0
+		var bspot := Bonds.find_spot(Atlas.world_of("surface").ents, "kind:sect:bell")
+		if not bspot.is_empty():
+			_stand_by(bspot)
+			await _wait(0.6)
+			main.share_scene(bspot, "s_p16_dawn")
+			for k3 in 2:
+				main.dialogue.shown = 999.0
+				main.press("confirm")
+				await _wait(0.3)
+			main.world.using.t0 = main.world.t - main.world.USE_STEP - 1.0
+			main.dialogue.shown = 999.0
+			await _wait(1.0)
+			await _shot("part16_dawn_bell")
+			await _skip_talk()
+			main.choice.press("confirm")
+			await _wait(0.3)
+			await _skip_talk()
 
 ## The Living Land release (--living, or --living=a,b to pick shots): the hours of the day and the
 ## people of the towns.  [shot, region, a tile of its own map, hour, eye offset, look-at offset]
@@ -2078,7 +2097,7 @@ func _run() -> void:
 	if main.args.has("living"):
 		await _living_shots(str(main.args.living))
 	if main.args.has("part16"):
-		await _part16_shots()
+		await _part16_shots(str(main.args.part16))
 	if main.args.has("ending"):
 		# the ending on its own (--ending): its film and the results
 		_ending_state()
