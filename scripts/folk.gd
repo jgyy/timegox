@@ -350,12 +350,18 @@ static func _spots(wd: Dictionary, tid: String, kind: String) -> Array:
 				for d4 in MapGen.DIRS:
 					var q3: Vector2i = door + d4
 					if not (bd.rect as Rect2i).has_point(q3) and reach.has(q3):
-						# one or two steps out, so they never stand in the doorway itself
+						# one or two steps out, so they never stand in the doorway itself, and a step either
+						# side along the front, so a shop's people stand in a row and not on one tile
 						var q4: Vector2i = q3 + d4
 						var st: Vector2i = q4 if reach.has(q4) and not taken.has(q4) else q3
-						out.append([st, atan2(float(-d4.x), float(-d4.y)), str(bd.id)])
+						var side := Vector2i(-d4.y, d4.x)
+						for sd in [Vector2i.ZERO, side * 2, -side * 2]:
+							var q6: Vector2i = st + sd
+							if reach.has(q6) and (sd == Vector2i.ZERO or not taken.has(q6)):
+								out.append([q6, atan2(float(-d4.x), float(-d4.y)), str(bd.id)])
 						break
-		if not out.is_empty():
+		# (enough places for a town's worth of people: the next kind of place too, if there are few)
+		if out.size() >= 6:
 			break
 	if out.is_empty():
 		var any: Vector2i = c
@@ -433,6 +439,10 @@ static func _grid(wd: Dictionary, tid: String) -> Array:
 				a.set_point_solid(p, true)
 			elif wd.grid[y * int(wd.w) + x] != MapGen.PATH:
 				a.set_point_weight_scale(p, 1.7)
+	# (and round the jars and woodpiles people leave by their walls, havoc.gd, never through them)
+	for bt in Havoc.tiles(wd, area):
+		if rect.has_point(bt) and not a.is_point_solid(bt):
+			a.set_point_weight_scale(bt, 10.0)
 	var out := [a, rect]
 	_astar[key] = out
 	return out
@@ -498,7 +508,9 @@ static func day_of(wd: Dictionary, p: Dictionary) -> Array:
 			# Youdu: the shades keep the night as other towns keep the day
 			h = fposmod(h + 12.0, 24.0)
 		var pl := _place(wd, p, str(e[1]), i)
-		var st := {"m": h * 60.0, "kind": str(e[1]), "tile": pl[0], "yaw": float(pl[1]), "clip": str(e[2]), "hold": str(e[3])}
+		var st := {"m": h * 60.0, "kind": str(e[1]), "tile": pl[0], "yaw": float(pl[1]), "clip": str(e[2]), "hold": str(e[3]),
+			# (a little room of their own: two people sent to one spot stand side by side, not inside each other)
+			"nudge": Vector2(Terrain3D.hash2(int(p.seed), i, 1.0) - 0.5, Terrain3D.hash2(int(p.seed), i, 2.0) - 0.5) * 0.7}
 		if str(e[1]) == str(role.get("round", "-")):
 			# a round of the town: four stops of its kind, walked in turn
 			var wps: Array = []
@@ -549,7 +561,7 @@ static func day_of(wd: Dictionary, p: Dictionary) -> Array:
 		var w2 := walk_minutes(l2, next_m - l2 / SPEED)
 		var depart := maxf(t + MIN_STAY, next_m - w2)
 		if not st2.has("round"):
-			segs.append({"a": t, "b": depart, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5), "yaw": float(st2.yaw), "clip": st2.clip, "hold": st2.hold, "in": at_in})
+			segs.append({"a": t, "b": depart, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5) + (st2.nudge as Vector2), "yaw": float(st2.yaw), "clip": st2.clip, "hold": st2.hold, "in": at_in})
 		elif depart > t:
 			segs.append({"a": t, "b": depart, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5), "yaw": 0.0, "clip": st2.clip, "hold": st2.hold, "in": false})
 		if cur != nx.tile:
@@ -725,12 +737,43 @@ const CHILD_NEW_YEAR := ["I've got new clothes! Red ones! Look!", "I stayed up a
 const HONGBAO_LINES := ["A red envelope? For me? Thank you! Happy new year, big brother cultivator!", "Ooh. Ooh! I'm going to buy a whole sugar figure. A dragon. No, two dragons!",
 	"Thank you! I'll keep it under my pillow. That's where you keep luck.", "Mother! Mother! The sweeper gave me a red envelope! The real one! The sky one!"]
 
+## What a townsperson says as Lin Feng goes by: a word for the hour, his name or his title.
+const GREETINGS := {"dawn": ["Up early!", "Morning!"], "morning": ["Morning, %s!", "Good morning!"], "noon": ["Eaten yet?", "Hot one!"],
+	"afternoon": ["Afternoon!", "%s!"], "dusk": ["Evening!", "Lamps soon!"], "evening": ["Evening, %s.", "Good evening!"],
+	"night": ["Late, isn't it?", "Mind the dark!"], "late night": ["Who's there?", "Can't sleep?"]}
+
+static func greeting(p: Dictionary, g) -> String:
+	if new_year(g):
+		return "Happy new year!"
+	if Clock.frozen(g) == "night":
+		return "Louder!" if int(p.seed) % 2 == 0 else "Bang it!"
+	if bool(p.kid):
+		return ["Hello!", "It's him!", "Can you fly?"][int(p.seed) % 3]
+	var opts: Array = GREETINGS.get(Clock.part(Clock.hour(g)), ["Hello!"])
+	var s: String = str(opts[int(p.seed) % opts.size()])
+	# (the hero's own family name, as the player chose it: a Label3D does not go through UI.named)
+	return s.replace("%s", ("Lord " + str(g.hero.get("family", "Lin"))) if g.realm() >= 4 else "young master") if s.contains("%s") else s
+
 ## Whether townsperson `p` is of kind `role` ("child" means any child of the towns).
 static func is_role(p: Dictionary, role: String) -> bool:
 	return bool(p.kid) if role == "child" else str(p.role) == role
 
 static func hongbao_line(p: Dictionary) -> String:
 	return str(HONGBAO_LINES[int(p.seed) % HONGBAO_LINES.size()])
+
+## What Lin Feng says to a townsperson for a step of the story, what they say back, the news of it
+## and what it costs (Part XVI: red paper from the merchants, red envelopes for the children).
+const ERRANDS := {
+	"s_p16_paper": {"ask": "Red paper, for the New Year couplets on the sect's doors. As much as you can spare.", "price": 120, "toast": "Red paper bought from %s",
+		"lines": ["Red paper! The first anybody has asked for all year. Take the whole roll. No, take two. Somebody should have a New Year.", "Red paper, gold edges, the good stuff from Tushan. For the sweeper who swept the sky, a third off.",
+			"For couplets? Then you'll want this too: a sheet of gold paper for the Fu on the door. Upside down, mind. The luck's arrived, see?", "I'd forgotten I had it. It was under the jars of nothing we've been selling all year. Here. Happy new year, early."]},
+	"s_p16_hongbao": {"ask": "A good new year to you. Here: for luck.", "price": 0, "toast": "A red envelope for %s", "lines": HONGBAO_LINES},
+}
+
+## What townsperson `p` answers to errand `sid`.
+static func errand_line(sid: String, p: Dictionary) -> String:
+	var ls: Array = ERRANDS[sid].lines
+	return str(ls[int(p.seed) % ls.size()])
 
 ## New Year's Day, from the first dawn of the year until the Elder has been wished a good one.
 static func new_year(g) -> bool:

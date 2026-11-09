@@ -661,6 +661,7 @@ const ENEMIES := {
 	"lean_month": {"n": "Lean Month", "elem": "dark", "weak": "fire", "col": Color("7a8098"), "shape": "wraith", "pal": {"sec": Color("3a3e4a"), "acc": Color("e8e0c8")}},
 	"candle_moth": {"n": "Candle-Eating Moth", "elem": "dark", "weak": "fire", "col": Color("5a4a3a"), "shape": "moth", "pal": {"sec": Color("2a2018"), "acc": Color("ffb040")}},
 	"nian_cub": {"n": "Nian Cub", "elem": "earth", "weak": "wood", "col": Color("3a8a6a"), "shape": "tiger", "pal": {"sec": Color("c83a2a"), "acc": Color("f0d040")}},
+	"lean_king": {"n": "The Lean Month King", "elem": "dark", "weak": "fire", "col": Color("5a6078"), "shape": "wraith", "boss": true, "pal": {"sec": Color("262832"), "acc": Color("f0d890")}},
 	"xi_beast": {"n": "Xi, the Last Night", "elem": "dark", "weak": "fire", "col": Color("262a52"), "shape": "serpent", "boss": true, "pal": {"sec": Color("10101e"), "acc": Color("f0c850")}},
 	"nian": {"n": "Nian, the Year Beast", "elem": "earth", "weak": "fire", "col": Color("2e8a64"), "shape": "qilin", "boss": true, "pal": {"sec": Color("c8302a"), "acc": Color("f8d850"), "mark": Color("f0f0e0")}},
 }
@@ -1467,6 +1468,8 @@ const AREAS := {
 			{"id": "terrace_dragon", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
 			{"id": "hill_golem", "pos": Vector2i(60, 40), "lv": 34, "req": 34},
 			{"id": "thread_matron", "pos": Vector2i(86, 28), "lv": 34, "req": 34},
+			# Part XVI: the king of the hungry months, driving them down towards the villages
+			{"id": "lean_king", "pos": Vector2i(59, 30), "lv": 61, "req": 60, "vis": ["s_p16_lean", ""]},
 		],
 		"pickups": [{"id": "teabud1", "item": "tea_bud", "pos": Vector2i(22, 12)}, {"id": "teabud2", "item": "tea_bud", "pos": Vector2i(40, 46)}, {"id": "teabud3", "item": "tea_bud", "pos": Vector2i(64, 30)}, {"id": "teabud4", "item": "tea_bud", "pos": Vector2i(76, 10)}],
 		"pickup_vis": "s_te_collect",
@@ -2930,10 +2933,12 @@ const STEPS := [
 	{"id": "s_p16_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The Kitchen God would not go up the chimney: speak to Elder Qing Xuan", "stones": 24000},
 	{"id": "s_p16_kitchen", "kind": "talk", "npc": "zao_jun", "area": "sect", "t": "Find Zao Jun, Lord of the Stove, sitting on the stove in the sect's kitchen"},
 	{"id": "s_p16_sweep", "kind": "share", "spot": "kind:sect:broom", "area": "sect", "t": "Sweep the old year out of the courtyard with Yue Ling: the last sweeping takes the bad luck with it"},
+	{"id": "s_p16_paper", "kind": "folk", "role": "merchant", "n": 4, "area": "mountain", "t": "Buy red paper for the sect's couplets from four merchants of the towns (face one and press Enter)"},
 	{"id": "s_p16_bamboo", "kind": "collect", "item": "thunder_bamboo", "n": 4, "area": "bamboo", "t": "Cut 4 stalks of Thunder Bamboo in the Whispering Bamboo Forest: on a fire they bang like the first firecrackers"},
 	{"id": "s_p16_rally", "kind": "rally", "npcs": ["granny_wen", "watchman_zhou", "postmaster_lu", "lockkeeper_qian", "caster_wei", "well_keeper_zhaya"], "n": 4, "area": "village",
-		"t": "Remind four towns of the old ways before New Year's Eve, in any order: Qingshi, Yanggu, Cloudfoot, Longmen, Tushan or Shazhou"},
+		"t": "Remind four towns of the old ways before New Year's Eve: Qingshi, Yanggu, Cloudfoot, Longmen, Tushan or Shazhou"},
 	{"id": "s_p16_hunt", "kind": "hunt", "area": "terraces", "n": 16, "of": ["lean_month", "candle_moth", "nian_cub"], "t": "Drive the Lean Months, the candle-moths and Nian's cubs off the Cloud-Tea Terraces before they reach the villages"},
+	{"id": "s_p16_lean", "kind": "kill", "boss": "lean_king", "area": "terraces", "t": "Find what drives the hunger down the terraces: the Lean Month King"},
 	{"id": "s_p16_doorgods", "kind": "talk", "npc": "shenshu", "area": "garden", "t": "Ask the door gods under the great peach tree in the Garden of Immortal Peaches for charms of peach wood"},
 	{"id": "s_p16_eve", "kind": "share", "spot": "furn:sect:kitchen:2", "area": "sect", "t": "New Year's Eve: sit down to the reunion dinner with the whole sect in the kitchen"},
 	{"id": "s_p16_xi", "kind": "kill", "boss": "xi_beast", "area": "yanggu", "t": "The lanterns of the Dawn Market are going out one by one: stop Xi, the Last Night, in Yanggu"},
@@ -2941,6 +2946,8 @@ const STEPS := [
 	{"id": "s_p16_nian", "kind": "kill", "boss": "nian", "area": "village", "t": "Midnight: Nian comes down out of the mountains into Qingshi Village", "stones": 24600},
 	{"id": "s_p16_dawn", "kind": "share", "spot": "kind:sect:bell", "area": "sect", "t": "The first dawn of the new year: ring the sect's bell a hundred and eight times with Yue Ling"},
 	{"id": "s_p16_hongbao", "kind": "folk", "role": "child", "n": 6, "area": "mountain", "t": "New Year's Day: give red envelopes to six children of the towns (face one and press Enter)"},
+	{"id": "s_p16_calls", "kind": "visits", "npcs": ["alchemist", "smith", "archivist", "cook_zhou", "bell_shen", "gardener_ruan", "disciple_han", "sweeper_bai"], "n": 5, "area": "sect",
+		"t": "New Year's Day: go round the sect wishing everybody a good new year, in any order (five of them)"},
 	{"id": "s_p16_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Wish Elder Qing Xuan a good new year"},
 	{"id": "s_break21", "kind": "breakthrough", "to": 63, "t": "Keep every lamp in the land lit: Ten Thousand Hearths"},
 ]
@@ -6050,7 +6057,7 @@ const DIALOGUE := {
 	"recall13": [
 		["Narrator", "For nine days after the last tribulation nothing on Azure Cloud Mountain is owed to anybody, and Lin Feng sleeps the way he has not slept since he was six."],
 		["Narrator", "On the tenth morning Disciple Han brings the Elder's tea and sets out two cups. He stops with the pot in the air and frowns at the second one."],
-		["Disciple Han", "Elder, forgive me. Who is the second cup for?"],
+		["Senior Brother Han", "Elder, forgive me. Who is the second cup for?"],
 		["Yue Ling", "It is for me, Han. It has been for me every morning for ten years.", "shock"],
 		["Narrator", "Han looks at her and smiles politely, the way you smile at a guest whose name you are sure you ought to know."],
 	],
@@ -6240,6 +6247,50 @@ const DIALOGUE := {
 		["Lin Feng", "Then here is one. A sweeper swept the sky, and the sky stayed up."],
 		["Narrator", "Zhaya laughs so loudly that the whole oasis comes to see why, and then, because they are all there anyway, they bang everything they have."],
 	],
+	# Part XVI: the Lean Month King, and New Year's Day calls round the sect
+	"pre:lean_king": [
+		["Narrator", "Above the last terrace, where the tea bushes give out into frozen grass, something sits on a throne of empty rice jars: a crowned skeleton of a king in a robe of sacking, counting grains of millet from one hand into the other and sighing at every one."],
+		["The Lean Month King", "One for the cold. One for the rent. One for the debt. None for the children. Every winter I count it out, and every winter it comes to nothing. This year I counted for the whole land, and it came to less."],
+		["Yue Ling", "You are the hunger at the end of the year. The month when the jars are empty and the new rice is not in."],
+		["The Lean Month King", "And Nian is my lord, who eats what I leave. Go home, little cultivators. There is nothing up here but counting."],
+	],
+	"post:lean_king": [
+		["Narrator", "The Lean Month King's throne of jars cracks and spills, and out of every jar comes a little rice, the last handful every family in the land had saved for the New Year and been too frightened to eat."],
+		["The Lean Month King", "Oh. They saved some. They always save some. I keep forgetting to count that."],
+		["Narrator", "He crumbles into a heap of millet husks, and the wind takes them down the terraces towards the villages, where tomorrow somebody will find a few more grains in the bottom of the jar than they remembered."],
+	],
+	"visit:alchemist": [
+		["Lin Feng", "A good new year, Alchemist Mo."],
+		["Alchemist Mo", "Hah! A good new year, boy. Here: a pill for luck. It is mostly sugar. The best pills always are."],
+	],
+	"visit:smith": [
+		["Lin Feng", "A good new year, Smith Tie."],
+		["Smith Tie", "Mm. And to you. I let the forge go out last night for the first time in thirty years. The anvil looked so surprised I nearly lit it again."],
+	],
+	"visit:archivist": [
+		["Lin Feng", "A good new year, Archivist Lan."],
+		["Archivist Lan", "A good new year. I have opened a new scroll for it. The first line says: Nothing happened today. I would very much like to keep it that way until at least noon."],
+	],
+	"visit:cook_zhou": [
+		["Lin Feng", "A good new year, Auntie Zhou."],
+		["Auntie Zhou the Cook", "A good new year! Have you eaten? You have not eaten. Sit. The Kitchen God is gone up and I can do as I like in my own kitchen again."],
+	],
+	"visit:bell_shen": [
+		["Lin Feng", "A good new year, Old Shen."],
+		["Old Shen the Bell-Ringer", "A hundred and eight strikes, and not one of them out of time. You and the girl ring better than I do. Don't tell the bell."],
+	],
+	"visit:gardener_ruan": [
+		["Lin Feng", "A good new year, Gardener Ruan."],
+		["Herb-Gardener Ruan", "And a green one to you. The plum tree by the pond flowered in the night, in the snow, with all that noise. I think it wanted to join in."],
+	],
+	"visit:disciple_han": [
+		["Lin Feng", "A good new year, Senior Brother Han."],
+		["Senior Brother Han", "Senior Brother? You are three realms past the sect's founders and you still call me that. A good new year, Lin Feng. Spar with me in the spring. Gently."],
+	],
+	"visit:sweeper_bai": [
+		["Lin Feng", "A good new year, Little Bai."],
+		["Little Bai the Sweeper", "A good new year! I'm not sweeping today. Nobody sweeps on New Year's Day or the luck goes out with the dust. I'm just holding the broom so it doesn't feel left out."],
+	],
 	# the people who tie a thread for her (step s_p15_threads, any four, in any order)
 	"thread:qiu_ye_end": [
 		["Qiu Ye", "Yue Ling? Of course I remember her. She stitched my arm in the Graveyard when I was too proud to say it hurt, and told me pride was very bad for wounds."],
@@ -6287,8 +6338,8 @@ const DIALOGUE := {
 		["Narrator", "Smith Tie twists a fine bronze wire round Yue Ling's wrist with tongs, very gently for a man with hands like anvils, and nods once, the way he nods at a good blade."],
 	],
 	"thread:granny_wen": [
-		["Granny Wen", "Feng'er's healer girl! She sat with me a whole night when my chest was bad, the year of the threads, and sang me that old song about the boat. My own mother used to sing it."],
-		["Granny Wen", "In Qingshi we tie a red thread on a girl who has eaten at our table three times. She has eaten at mine thirty. Give me your wrist, child, and stop growing thin."],
+		["Granny Wen the Midwife", "Feng'er's healer girl! She sat with me a whole night when my chest was bad, the year of the threads, and sang me that old song about the boat. My own mother used to sing it."],
+		["Granny Wen the Midwife", "In Qingshi we tie a red thread on a girl who has eaten at our table three times. She has eaten at mine thirty. Give me your wrist, child, and stop growing thin."],
 		["Narrator", "Granny Wen ties a red thread round Yue Ling's wrist with a village knot, and then, because she cannot help herself, presses a steamed bun into her other hand."],
 	],
 	"thread:meng_po": [

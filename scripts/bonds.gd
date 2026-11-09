@@ -407,6 +407,17 @@ const TALKS := [
 			{"id": "home", "label": "\"Everybody home first.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Let us get everybody home first. Then we can have all the night we want."], ["Yue Ling", "Everybody home. Yes. That is what tonight is for."]]},
 			{"id": "stars", "label": "\"Name me the stars.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "While they hold still, name me some stars."], ["Yue Ling", "That one is the Sweeper. That one is the Dumpling. That one is you, being slow."]]},
 		]},
+	{"id": "t_newday", "after": "s_p16_dawn", "lines": [
+		["Yue Ling", "Lin Feng. It is a new year, and I am in it. Last New Year I was a lotus nobody remembered. Now I have a page, and a bowl, and a door with my name spelt wrong on it."],
+		["Yue Ling", "What do people do on the first morning of a year? I want to do it properly."],
+		["Lin Feng", "They put on new clothes, they go round wishing everybody a good one, and they do not sweep, whatever happens."],
+		["Yue Ling", "Then I am wearing red, and you are coming with me, and if you so much as look at a broom I am telling Little Bai."]],
+		"ask": "What do you say on the first morning of her first year?",
+		"options": [
+			{"id": "red", "label": "\"Red suits you.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Red suits you."], ["Yue Ling", "Everything suits me today. It is my first morning. I could wear a cabbage."]]},
+			{"id": "round", "label": "\"Let's go round the sect.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Let us go round the sect, then. Everybody. Auntie Zhou first, or she will never forgive us."], ["Yue Ling", "Auntie Zhou first. Then everybody. Then Auntie Zhou again, for seconds."]]},
+			{"id": "out", "label": "\"And then down the mountain.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "And then down the mountain, to see how the towns did it."], ["Yue Ling", "Every town's first morning. Yes. Bring the red envelopes."]]},
+		]},
 ]
 
 static func talk(id: String) -> Dictionary:

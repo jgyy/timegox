@@ -407,18 +407,22 @@ func talk_folk(e: Dictionary) -> void:
 	var lines := [[str(fp.n), Folk.line(fp, Game)]]
 	Game.folk_talk[str(fp.id)] = int(Game.folk_talk.get(str(fp.id), 0)) + 1
 	world.folk_talking = str(fp.id)
-	# Part XVI: on New Year's Day the children of the towns are given red envelopes
+	# Part XVI: a step's errand with the people of the towns (red paper from the merchants, red envelopes
+	# for the children on New Year's Day, folk.gd ERRANDS)
 	var s := Game.cur_step()
-	var given := false
-	if not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.hongbao.has(str(fp.id)):
-		Game.hongbao[str(fp.id)] = true
-		given = true
-		lines = [["Lin Feng", "A good new year to you. Here: for luck."], [str(fp.n), Folk.hongbao_line(fp)]]
+	var done := false
+	if not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.folk_has(s, str(fp.id)) and Folk.ERRANDS.has(str(s.id)):
+		var er: Dictionary = Folk.ERRANDS[str(s.id)]
+		Game.folk_mark(s, str(fp.id))
+		Game.stones = maxi(0, Game.stones - int(er.price))
+		done = true
+		lines = [["Lin Feng", str(er.ask)], [str(fp.n), Folk.errand_line(str(s.id), fp)]]
 	say(lines, func():
 		world.folk_talking = ""
-		if given:
-			Game.toast("A red envelope for %s (%d of %d)" % [str(fp.n), Game.hongbao.size(), int(s.n)])
-			Game.note("Gave %s a red envelope" % str(fp.n))
+		if done:
+			var er2: Dictionary = Folk.ERRANDS[str(s.id)]
+			Game.toast(("%s (%d of %d)" % [str(er2.toast), Game.folk_count(s), int(s.n)]) % str(fp.n))
+			Game.note(str(er2.toast) % str(fp.n))
 			Game.poll_steps()
 	)
 

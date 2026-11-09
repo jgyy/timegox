@@ -293,7 +293,9 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		# the Living Land release: a battle is fought at the hour it was met (a tribulation brings its
 		# own storm, whatever the hour: its sky is the stage's own, as at one in the afternoon)
 		var bh := 13.0 if ctx.get("tribulation", false) else Clock.hour(Game)
-		MB.set_night(float(Look.apply_hour(st.env, sun, fill, theme, bh, 0.8).night))
+		var bn := float(Look.apply_hour(st.env, sun, fill, theme, bh, 0.8).night)
+		MB.set_night(bn)
+		RenderingServer.global_shader_parameter_set("night_k", bn)
 		main.fx_theme(theme)
 		_build_fighters()
 		cam.position = cam_base

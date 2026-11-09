@@ -105,10 +105,11 @@ var folk_talk := {}
 ## and how many things he has broken in all
 var broken := {}
 var smashed := 0
-## Part XVI: the towns Lin Feng reminded of the old ways (npc id -> true), and the children of the
-## towns given a red envelope on New Year's Day (townsperson id -> true)
+## Part XVI: the towns Lin Feng reminded of the old ways (npc id -> true), and the people of the towns
+## he has done what a step asked of with (step id -> {townsperson id -> true}): the merchants he bought
+## red paper from, the children he gave a red envelope to
 var rallied := {}
-var hongbao := {}
+var folk_done := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -188,7 +189,7 @@ func reset() -> void:
 	broken = {}
 	smashed = 0
 	rallied = {}
-	hongbao = {}
+	folk_done = {}
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -577,7 +578,7 @@ func poll_steps() -> void:
 				ok = visits_done(s) >= int(s.n)
 			"folk":
 				# Part XVI: so many of the people of the towns (folk.gd) of one kind, any of them
-				ok = hongbao.size() >= int(s.n)
+				ok = folk_count(s) >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -604,7 +605,7 @@ func objective_text() -> String:
 	elif s.kind == "threads" or s.kind == "rally":
 		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
 	elif s.kind == "folk":
-		t += "  (%d/%d)" % [mini(hongbao.size(), int(s.n)), int(s.n)]
+		t += "  (%d/%d)" % [mini(folk_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":
@@ -674,6 +675,19 @@ func visits_done(s: Dictionary) -> int:
 		if seen_.has(id):
 			k += 1
 	return k
+
+## Part XVI: the townsfolk Lin Feng has done what step `s` asked with, and whether `id` is one.
+func folk_count(s: Dictionary) -> int:
+	return (folk_done.get(str(s.get("id", "")), {}) as Dictionary).size()
+
+func folk_has(s: Dictionary, id: String) -> bool:
+	return (folk_done.get(str(s.get("id", "")), {}) as Dictionary).has(id)
+
+func folk_mark(s: Dictionary, id: String) -> void:
+	var k := str(s.get("id", ""))
+	if not folk_done.has(k):
+		folk_done[k] = {}
+	folk_done[k][id] = true
 
 ## Total essences of all kinds in hand.
 func essences() -> int:

@@ -108,7 +108,7 @@ const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
 const TALK_PLAN := {"t_lotus": "mine", "t_hands": "teach", "t_winter": "here", "t_chains": "cut", "t_sky": "share", "t_seal": "you",
 	"t_ageless": "keep", "t_mend": "me", "t_ancestors": "make", "t_mother": "sing", "t_bridge": "yes", "t_noon": "duty", "t_maps": "draw",
 	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_dragon": "ask", "t_nineteen": "left", "t_peach": "see", "t_heaven": "home", "t_xufu": "front", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_loom": "through", "t_moths": "keep", "t_wrist": "family", "t_after": "never", "t_feast": "every",
-	"t_newyear": "bowl", "t_lastnight": "stay",
+	"t_newyear": "bowl", "t_lastnight": "stay", "t_newday": "red",
 }
 const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "mem_dance", "mem_kite"]
 const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
@@ -1247,7 +1247,7 @@ func _folk_target(role: String) -> Dictionary:
 		if town_d > bd + Folk.RADIUS:
 			continue
 		for fp in Folk.people(world.wd, tid):
-			if not Folk.is_role(fp, role) or Game.hongbao.has(str(fp.id)):
+			if not Folk.is_role(fp, role) or Game.folk_has(Game.cur_step(), str(fp.id)):
 				continue
 			var st := Folk.state(world.wd, fp, m)
 			if not st.vis or st.walk or float(st.seg.b) - m < 4.0:

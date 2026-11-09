@@ -305,6 +305,156 @@ func _follow(id: String) -> void:
 ## The nearest walkable tile with nobody on it, on dry ground if there is any within 20 steps: the
 ## shore of a river or pond is sunk below the waterline in 3D, so heroes standing on the bank
 ## itself seem to wade in the water.
+## Part XVI (--part16): the Kitchen God, a town drilled in the old ways, the noise of the long last
+## night, Xi and Nian, the vigil, the first dawn and the red envelopes of New Year's Day.
+func _part16_state(step_id: String) -> void:
+	_lotus_state("s_p15_end")
+	Game.step = Data.step_index(step_id)
+	Game.level = 61
+	Game.exp = float(Game.exp_need()) * 0.4
+	for i in Game.step:
+		if str(Data.STEPS[i].kind) == "kill":
+			Game.boss_done[str(Data.STEPS[i].boss)] = true
+	Game.future = "companion"
+	Game.bond = 400
+	Game.heal_full()
+
+func _part16_shots() -> void:
+	# the Kitchen God on the stove
+	_part16_state("s_p16_kitchen")
+	Game.clock = 10.0 * 60.0
+	var zj := _land_ent("zao_jun")
+	if not zj.is_empty():
+		_stand_by(zj)
+		await _wait(0.6)
+		main.talk_npc(zj)
+		for k in 2:
+			main.dialogue.shown = 999.0
+			main.press("confirm")
+			await _wait(0.25)
+		main.dialogue.shown = 999.0
+		await _wait(1.0)
+		await _shot("part16_kitchen_god")
+		await _skip_talk()
+	# Yanggu remembers the old ways: the drill
+	_part16_state("s_p16_rally")
+	Game.clock = 15.5 * 60.0
+	var wz := _land_ent("watchman_zhou")
+	if not wz.is_empty():
+		_stand_by(wz)
+		await _wait(1.5)
+		main.talk_npc(wz)
+		await _skip_talk()
+		await _wait(2.0)
+		_frame_crowd(Vector3(-11.0, 7.0, 12.0))
+		await _wait(0.4)
+		await _shot("part16_drill")
+		main.world.cam_override = null
+	# the long last night: every pot in Yanggu, with lanterns
+	_part16_state("s_p16_vigil")
+	for npc in ["granny_wen", "watchman_zhou", "postmaster_lu", "caster_wei"]:
+		Game.rallied[npc] = true
+	Game.clock = 22.4 * 60.0
+	main.world.enter_layer("surface")
+	main.world.teleport(_nearest_free(Atlas.to_world("yanggu", Vector2i(34, 30))), "surface")
+	main.world._snap_cam()
+	await _wait(2.5)
+	_frame_crowd(Vector3(-10.0, 6.0, 11.0))
+	await _wait(0.4)
+	await _shot("part16_noise_night")
+	main.world.cam_override = null
+	# Xi, the Last Night, by the door gods' peach wood
+	var xm: Array = Trials.TRIALS.xi_beast.might
+	main.battle.start([{"id": "xi_beast", "lv": 61, "mult": float(xm[0]), "atk": float(xm[1])}], {"boss": true, "enemy": "xi_beast", "theme": "yanggu", "trial": "xi_beast", "path": "relic",
+		"boon": Trials.path("xi_beast", "relic").boon, "path_n": "Charms of peach wood", "path_kind": str(Trials.KINDS.relic.n)})
+	main.push("battle")
+	await _wait(3.4)
+	await _shot("battle_boss_xi_beast")
+	main.pop()
+	# the vigil at Granny Wen's
+	_part16_state("s_p16_vigil")
+	Game.clock = 23.0 * 60.0
+	var vt := _land_ent("furn:village:wen_house:2")
+	if not vt.is_empty():
+		main.world.open_world()
+		main.world.enter_layer("surface")
+		main.world.teleport(_nearest_free(vt.pos + Vector2i(1, 0)), "surface")
+		main.world._snap_cam()
+		await _wait(0.6)
+		main.share_scene(vt, "s_p16_vigil")
+		for k2 in 3:
+			main.dialogue.shown = 999.0
+			main.press("confirm")
+			await _wait(0.3)
+		main.world.using.t0 = main.world.t - main.world.USE_STEP - 2.0
+		main.dialogue.shown = 999.0
+		await _wait(1.0)
+		await _shot("part16_vigil")
+		await _skip_talk()
+		await _wait(0.4)
+		await _shot("part16_vigil_choice")
+		main.choice.press("confirm")
+		await _wait(0.3)
+		await _skip_talk()
+	# Nian, the Year Beast, by every pot in the land
+	var nm: Array = Trials.TRIALS.nian.might
+	main.battle.start([{"id": "nian", "lv": 62, "mult": float(nm[0]), "atk": float(nm[1])}], {"boss": true, "enemy": "nian", "theme": "village", "trial": "nian", "path": "folk",
+		"boon": Trials.path("nian", "folk").boon, "path_n": "Every pot in the land", "path_kind": str(Trials.KINDS.folk.n)})
+	main.push("battle")
+	await _wait(3.4)
+	await _shot("battle_boss_nian")
+	main.pop()
+	# New Year's Day in Cloudfoot: the children in red, and a red envelope
+	_part16_state("s_p16_hongbao")
+	Game.clock = 8.0 * 60.0
+	main.world.enter_layer("surface")
+	main.world.teleport(_nearest_free(Atlas.to_world("mountain", Vector2i(82, 34))), "surface")
+	main.world._snap_cam()
+	await _wait(2.0)
+	var lw := Atlas.world_of("surface")
+	var kid := {}
+	for fp in Folk.people(lw, "cloudfoot"):
+		var st := Folk.state(lw, fp, Game.clock)
+		if fp.kid and st.vis and not st.walk and kid.is_empty():
+			kid = {"p": fp, "tile": Vector2i(int(floor(st.at.x)), int(floor(st.at.y)))}
+	if not kid.is_empty():
+		var kt: Vector2i = kid.tile
+		var spot := _nearest_free(kt + Vector2i(0, 1))
+		main.world.teleport(spot, "surface")
+		main.world.facing = Vector2i(signi(kt.x - spot.x), signi(kt.y - spot.y)) if (kt - spot).length() > 0 else Vector2i(0, -1)
+		main.world.cam_q = _quarter(Vector2(main.world.facing))
+		main.world._snap_cam()
+		await _wait(1.5)
+		await _shot("part16_new_year_children")
+		main.talk_folk({"kind": "folk", "id": kid.p.id, "n": kid.p.n, "p": kid.p})
+		main.dialogue.shown = 999.0
+		main.press("confirm")
+		await _wait(0.3)
+		main.dialogue.shown = 999.0
+		await _wait(0.8)
+		await _shot("part16_hongbao")
+		await _skip_talk()
+	# the first dawn of the year: the bell
+	_part16_state("s_p16_dawn")
+	Game.clock = 6.3 * 60.0
+	var bspot := Bonds.find_spot(Atlas.world_of("surface").ents, "kind:sect:bell")
+	if not bspot.is_empty():
+		_stand_by(bspot)
+		await _wait(0.6)
+		main.share_scene(bspot, "s_p16_dawn")
+		for k3 in 2:
+			main.dialogue.shown = 999.0
+			main.press("confirm")
+			await _wait(0.3)
+		main.world.using.t0 = main.world.t - main.world.USE_STEP - 1.0
+		main.dialogue.shown = 999.0
+		await _wait(1.0)
+		await _shot("part16_dawn_bell")
+		await _skip_talk()
+		main.choice.press("confirm")
+		await _wait(0.3)
+		await _skip_talk()
+
 ## The Living Land release (--living, or --living=a,b to pick shots): the hours of the day and the
 ## people of the towns.  [shot, region, a tile of its own map, hour, eye offset, look-at offset]
 const LIVING := [
@@ -325,6 +475,9 @@ func _living_shots(which: String) -> void:
 	Game.step = Data.step_index("s_p15_home")
 	Game.companion = true
 	Game.heal_full()
+	# (everything she had to say said, so the corner is clear for the picture)
+	for tk in Bonds.TALKS:
+		Game.talks[str(tk.id)] = str(tk.options[0].id)
 	main.world.clear_cache()
 	main.set_stack(["world"])
 	main.world.open_world()
@@ -342,11 +495,111 @@ func _living_shots(which: String) -> void:
 		# a moment for the people to come out (two are made a frame)
 		Game.clock = float(sh[3]) * 60.0
 		await _wait(2.5)
-		var pp: Vector3 = main.world._player_pos()
-		main.world.cam_override = Transform3D(Basis.IDENTITY, pp + sh[4]).looking_at(pp + sh[5], Vector3.UP)
+		_frame_crowd(sh[4])
 		await _wait(0.5)
 		await _shot(str(sh[0]))
 		main.world.cam_override = null
+	if only.is_empty() or only.has("living_strike"):
+		await _strike_shots()
+	if only.is_empty() or only.has("living_hours"):
+		await _hours_sheet()
+
+## One street of Qingshi from one place at dawn, noon, dusk and night, side by side.
+func _hours_sheet() -> void:
+	main.world.enter_layer("surface")
+	main.world.teleport(_nearest_free(Atlas.to_world("village", Vector2i(26, 30))), "surface")
+	main.world.facing = Vector2i(1, 0)
+	main.world.cam_q = 1
+	main.world._snap_cam()
+	var frames: Array = []
+	var view = null
+	for h in [6.0, 12.5, 18.7, 22.5]:
+		Game.clock = h * 60.0
+		await _wait(1.6)
+		# (one camera for all four: framed on the street's people at the first hour, and kept)
+		if view == null:
+			_frame_crowd(Vector3(-12.0, 7.0, 13.0))
+			view = main.world.cam_override
+		main.world.cam_override = view
+		await _wait(0.3)
+		await _shot("living_hour_%02d" % int(h), false)
+		frames.append(last_img.duplicate())
+	main.world.cam_override = null
+	_sheet("living_hours", frames, 0.5)
+
+## Point the camera at the busiest knot of townsfolk in sight (the one with the most others within
+## eight metres), from offset `eye`, or past the hero if nobody is about.
+func _frame_crowd(eye: Vector3) -> void:
+	var pp: Vector3 = main.world._player_pos()
+	var best := pp
+	var bn := -1
+	for id in main.world.folk_nodes:
+		var a: Node3D = main.world.folk_nodes[id]
+		if not a.visible or a.position.distance_to(pp) > 40.0:
+			continue
+		var n := 0
+		for id2 in main.world.folk_nodes:
+			var b: Node3D = main.world.folk_nodes[id2]
+			if b.visible and b.position.distance_to(a.position) < 8.0:
+				n += 1
+		if n > bn:
+			bn = n
+			best = a.position
+	# round the knot of people, the first eye whose view of them no house or tree is in the way of
+	var look := best + Vector3(0, 0.9, 0)
+	var e := best + eye * 0.85
+	var dist := Vector2(eye.x, eye.z).length() * 0.85
+	for k in 12:
+		var a := atan2(eye.z, eye.x) + k * TAU / 12.0
+		var c := best + Vector3(cos(a) * dist, eye.y * 0.85, sin(a) * dist)
+		c.y = maxf(c.y, main.world.ground_y(c) + 3.0)
+		if _clear_view(c, look):
+			e = c
+			break
+	main.world.cam_override = Transform3D(Basis.IDENTITY, e).looking_at(look, Vector3.UP)
+
+## Whether nothing built or grown stands between `a` and `b`: no wall, roof or forest tile under the
+## line where it runs low enough to hit it.
+func _clear_view(a: Vector3, b: Vector3) -> bool:
+	var w = main.world
+	for i in range(1, 14):
+		var p := a.lerp(b, float(i) / 14.0)
+		var tile := Vector2i(int(floor((p.x - w.off.x) / Terrain3D.T)), int(floor((p.z - w.off.z) / Terrain3D.T)))
+		if tile.x < 0 or tile.y < 0 or tile.x >= w.w or tile.y >= w.h:
+			continue
+		var g: int = w.grid[tile.y * w.w + tile.x]
+		var above: float = p.y - w.ground_y(p)
+		if (g == MapGen.BUILDING or g == MapGen.INTERIOR) and above < 7.5:
+			return false
+		if g == MapGen.WALL and above < 9.0:
+			return false
+	return true
+
+## F at a jar by a house in Yanggu: the sword swings, the jar comes apart, its pieces fly and fall.
+func _strike_shots() -> void:
+	Game.clock = 11.0 * 60.0
+	var lw := Atlas.world_of("surface")
+	var b: Dictionary = Havoc.of_area(lw, "yanggu")[3]
+	var spot := Vector2i(-1, -1)
+	for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+		if spot.x < 0 and main.world.tile_free(b.tile + d) and Havoc.at_tile(lw, b.tile + d).is_empty():
+			spot = b.tile + d
+	main.world.enter_layer("surface")
+	main.world.teleport(spot, "surface")
+	main.world.facing = b.tile - spot
+	main.world.cam_q = _quarter(Vector2(main.world.facing))
+	main.world._snap_cam()
+	await _wait(1.0)
+	var pp: Vector3 = main.world._player_pos()
+	var fwd := Vector3(main.world.facing.x, 0, main.world.facing.y)
+	var side := fwd.cross(Vector3.UP)
+	main.world.cam_override = Transform3D(Basis.IDENTITY, pp + side * 5.0 - fwd * 2.0 + Vector3(0, 2.6, 0)).looking_at(pp + fwd * 1.4 + Vector3(0, 0.8, 0), Vector3.UP)
+	main.world.strike()
+	await _wait(0.42)
+	await _shot("living_strike")
+	await _wait(0.9)
+	await _shot("living_strike_after")
+	main.world.cam_override = null
 
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for dry in [true, false]:
@@ -1791,6 +2044,8 @@ func _run() -> void:
 		await _fates_shots()
 	if main.args.has("living"):
 		await _living_shots(str(main.args.living))
+	if main.args.has("part16"):
+		await _part16_shots()
 	if main.args.has("ending"):
 		# the ending on its own (--ending): its film and the results
 		_ending_state()

@@ -450,6 +450,7 @@ func _apply_hour() -> void:
 	var lk := Look.apply_hour(cam.environment, sun, fill, theme_name, Clock.hour(Game))
 	night_k = float(lk.night)
 	MB.set_night(night_k)
+	RenderingServer.global_shader_parameter_set("night_k", night_k)
 	# the hero carries a little light of his own after dark
 	hero_light.light_energy = 0.6 + 1.2 * night_k
 	hero_light.omni_range = 9.0 + 5.0 * night_k
@@ -2292,7 +2293,7 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 		Folk.apply_dye(m, dy)
 		m.set_meta("dye", dy)
 	var s := Game.cur_step()
-	var want_mark: bool = not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.hongbao.has(str(fp.id))
+	var want_mark: bool = not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.folk_has(s, str(fp.id))
 	if want_mark and not fn.has_meta("mark"):
 		fn.set_meta("mark", _label(fn, "!", 2.2 if not fp.kid else 1.7, Color("ff6a5a"), 64))
 	if fn.has_meta("mark"):
@@ -2300,8 +2301,21 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 		mk.visible = want_mark
 		if want_mark:
 			mk.position.y = (2.2 if not fp.kid else 1.7) + sin(t * 4.0) * 0.12
+	# a word as he passes: a bow (a child waves) and a greeting over their head, once in a while
+	if dist < 4.2 and not talking and t - float(fn.get_meta("greeted", -99.0)) > 50.0:
+		fn.set_meta("greeted", t)
+		fn.set_meta("say_until", t + 2.6)
+		fn.set_meta("say", Folk.greeting(fp, Game))
+		Models.act(m, "wave" if fp.kid else "bow", t + float(fp.seed))
+	var saying: bool = t < float(fn.get_meta("say_until", -1.0))
 	# a hawker calls the wares, the watchman the watch
-	if clip == "call" and dist < 24.0:
+	if saying and dist < 24.0:
+		if not fn.has_meta("bubble"):
+			fn.set_meta("bubble", _label(fn, "", 2.35 if not fp.kid else 1.8, Color("fff4d8"), 26))
+		var lb2: Label3D = fn.get_meta("bubble")
+		lb2.text = str(fn.get_meta("say", ""))
+		lb2.visible = true
+	elif clip == "call" and dist < 24.0:
 		if not fn.has_meta("bubble"):
 			fn.set_meta("bubble", _label(fn, "", 2.35 if not fp.kid else 1.8, Color("fff4d8"), 26))
 		var lbl: Label3D = fn.get_meta("bubble")
@@ -2338,7 +2352,10 @@ func _draw_hud() -> void:
 		UI.text(self, Vector2(VIEW.x - 506, 34), "Objective", 13, UI.C_DIM)
 		UI.text(self, Vector2(VIEW.x - 506, 56), obj, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
 	else:
-		UI.wrapped(self, Vector2(VIEW.x - 506, 35), obj, 15, UI.C_TEXT, 486)
+		# (two lines is all the panel holds: a longer objective is set a little smaller rather than spill a
+		# third line out of the panel onto the minimap, as three of Part XV's did)
+		var osz := UI.objective_size(obj)
+		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
 	_draw_minimap()
 	_draw_clock()

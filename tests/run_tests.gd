@@ -1083,7 +1083,8 @@ func _init() -> void:
 			var na := Trials.npc_area(str(nid))
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and Data.DIALOGUE.has("visit:" + str(nid)), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
-		check(realms7.size() >= 3, "%s: the people to visit live in at least three realms" % st7.id)
+		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
+		check(realms7.size() >= 3 or str(st7.id) == "s_p16_calls", "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -2028,6 +2029,42 @@ func _living() -> void:
 	check(not Havoc.is_broken(HG, bv) and not HG.broken.has(bv.id), "mended by the next dawn")
 	HG.free()
 	LG2.free()
+	print("== the objective panel ==")
+	# every objective, with its count and its trial note, fits the two lines of the panel (three of
+	# Part XV's ran onto a third, out of the panel and over the minimap's frame)
+	var OG = load("res://scripts/game.gd").new()
+	OG.reset()
+	var long_obj: Array = []
+	for i9 in Data.STEPS.size():
+		OG.step = i9
+		var ob: String = OG.objective_text()
+		if UI.wrap_lines(ob, UI.objective_size(ob), 486.0).size() > 2:
+			long_obj.append(str(Data.STEPS[i9].id))
+	check(long_obj.is_empty(), "every objective fits the panel's two lines (too long: %s)" % str(long_obj))
+	OG.free()
+	print("== who speaks in a conversation ==")
+	# a conversation held with somebody in the world finds its speakers by their names (their gestures
+	# and the conversation camera, world.gd _actor): every speaker has to be somebody there, by the name
+	# they go by ("Disciple Han" and "Granny Wen" were not, and nothing they said was acted out)
+	var who_ok := {"Narrator": true, "Lin Feng": true, "Yue Ling": true}
+	for a8 in Data.AREAS:
+		for n8 in Data.AREAS[a8].get("npcs", []):
+			who_ok[str(n8.n)] = true
+	for e8 in Data.ENEMIES:
+		who_ok[str(Data.ENEMIES[e8].n)] = true
+	var talk_keys := {}
+	for st8 in Data.STEPS:
+		if str(st8.kind) == "talk":
+			talk_keys[str(st8.id)] = true
+	var strangers: Array = []
+	for k8 in Data.DIALOGUE:
+		var ks8 := str(k8)
+		if not (talk_keys.has(ks8) or ks8.begins_with("thread:") or ks8.begins_with("visit:") or ks8.begins_with("rally:") or ks8.begins_with("recall")):
+			continue
+		for ln8 in Data.DIALOGUE[k8]:
+			if not who_ok.has(str(ln8[0])):
+				strangers.append("%s in %s" % [str(ln8[0]), ks8])
+	check(strangers.is_empty(), "everybody who speaks in a conversation in the world goes by the name they have there (%s)" % str(strangers))
 	print("== Part XVI: the Year Turns ==")
 	check(Data.REALMS.size() == 22 and Data.REALMS[21] == "Ten Thousand Hearths" and Data.MAX_LEVEL == 63 and Data.level_name(63).ends_with("Ten Thousand Hearths") and Data.REALM_INFO.size() == 22 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "Part XVI adds the Ten Thousand Hearths realm")
 	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break21" and Data.DIALOGUE.has("recall14") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break20\": \"recall14\""), "Part XVI follows Kindred Dao (recall14) and ends the game")
@@ -2050,10 +2087,10 @@ func _living() -> void:
 	for tid3 in ["cloudfoot", "qingshi"]:
 		for fp3 in Folk.people(Atlas.world_of("surface"), tid3):
 			if Folk.is_role(fp3, "child"):
-				RG.hongbao[str(fp3.id)] = true
+				RG.folk_mark(RG.cur_step(), str(fp3.id))
 				kids_seen += 1
 	RG.poll_steps()
-	check(kids_seen >= 6 and RG.cur_step().id == "s_p16_end", "six red envelopes for the children of two towns end New Year's Day (%d children)" % kids_seen)
+	check(kids_seen >= 6 and RG.cur_step().id == "s_p16_calls", "six red envelopes for the children of two towns, and then the New Year calls (%d children)" % kids_seen)
 	RG.free()
 	for tid4 in ["xi_beast", "nian"]:
 		check(Trials.TRIALS.has(tid4) and Lore.BOSS.has(tid4) and Data.DIALOGUE.has("pre:" + tid4) and Data.DIALOGUE.has("post:" + tid4), "%s is a trial, with a story and words before and after" % tid4)

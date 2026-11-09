@@ -83,6 +83,14 @@ static func wrapped(ci: CanvasItem, p: Vector2, s: String, size: int, col: Color
 	ci.draw_multiline_string(font(), p + Vector2(1.5, 1.5), s, HORIZONTAL_ALIGNMENT_LEFT, width, size, -1, Color(0, 0, 0, 0.7))
 	ci.draw_multiline_string(font(), p, s, HORIZONTAL_ALIGNMENT_LEFT, width, size, -1, col)
 
+## The font size the world's objective is drawn at when it is too long for one line: the largest from
+## 15 down that keeps it to the two lines its panel holds.
+static func objective_size(obj: String) -> int:
+	for sz in [15, 14, 13, 12]:
+		if wrap_lines(obj, sz, 486.0).size() <= 2:
+			return sz
+	return 12
+
 static func panel(ci: CanvasItem, r: Rect2, fill: Color = C_PANEL, border: Color = C_BORDER) -> void:
 	Gfx.panel(ci, r, fill, border)
 
