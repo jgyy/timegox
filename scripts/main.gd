@@ -139,6 +139,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_R:
 			# mount up or get down (Fates and Faces: the stable)
 			press("ride")
+		KEY_T:
+			# talk to Yue Ling (the Lotus release: bonds.gd)
+			press("talk")
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -157,6 +160,8 @@ func press(act: String) -> void:
 	if top == "world":
 		if act == "ride":
 			world.toggle_ride()
+		elif act == "talk":
+			talk_yue()
 		elif act == "cancel":
 			open_menu()
 		elif act == "confirm":
@@ -167,6 +172,7 @@ func press(act: String) -> void:
 		screens[top].press(act)
 
 func _process(d: float) -> void:
+	_talk_hint()
 	for t in toast_list:
 		t.t -= d
 	toast_list = toast_list.filter(func(t): return t.t > 0.0)
@@ -249,6 +255,9 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		# and of the grudges that stayed, the ones laid to rest (grudges.gd)
 		for ep2 in Grudges.epilogues(Game):
 			lines.append(["Narrator", ep2])
+		# and of Yue Ling, and the road she chose for herself (bonds.gd)
+		for ep3 in Bonds.epilogues(Game):
+			lines.append(["Narrator", ep3])
 		lines.append_array(origin_lines("ending"))
 	# the road Lin Feng took into the heart of the Eight Gates (Part XIII) tells the end its own way
 	var road: String = str(Game.trials.get("chiyou", ""))
@@ -374,6 +383,14 @@ func interact(e: Dictionary) -> void:
 		"abode":
 			open_abode(e)
 		"prop":
+			# Part XV: one of Yue Ling's memories, or the lotus pond where she woke (bonds.gd)
+			if e.has("memory") and Bonds.memory_ready(Game, str(e.memory)):
+				memory_scene(e)
+				return
+			var s0 := Game.cur_step()
+			if not s0.is_empty() and str(s0.kind) == "share" and Bonds.spot_is(str(s0.get("spot", "")), e):
+				share_scene(e, str(s0.id))
+				return
 			# a thing to do (props.gd): Lin Feng steps up to it and does it
 			world.start_use(e)
 
@@ -408,6 +425,16 @@ func talk_npc(e: Dictionary) -> void:
 	# Part XIV: the five threads settled in any order, each its own last chapter
 	if not s.is_empty() and s.kind == "fates" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
 		play_chapter(Fate.chapter_of_npc(str(e.id)), e)
+		return
+	# Part XV: the people who knew Yue Ling tie a thread for her, in any order
+	if not s.is_empty() and s.kind == "threads" and str(e.id) in s.npcs and not Game.threads.has(str(e.id)) and Game.companion:
+		say(Data.DIALOGUE.get("thread:" + str(e.id), []), func():
+			Game.threads[str(e.id)] = true
+			Bonds.add(Game, 2, "a thread tied")
+			Game.toast("A thread tied for Yue Ling (%d of %d)" % [Game.visits_done(s), int(s.n)])
+			Game.note("%s tied a thread for Yue Ling" % str(e.n))
+			Game.poll_steps()
+		)
 		return
 	# a step that asks for visits, in any order (Part XIII: the Conclave's invitations): this is one
 	if not s.is_empty() and s.kind == "visits" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
@@ -579,6 +606,139 @@ func ask_grudge(id: String) -> void:
 		Grudges.take(Game, id, o)
 		say(o.get("after", []), func(): Game.poll_steps())
 	, false)
+
+# ---------------------------------------------------------------- Yue Ling (bonds.gd, the Lotus release)
+var yue_chat := 0
+
+## T in the world: a heart-to-heart if she has one waiting, else a word about where they are.
+func talk_yue() -> void:
+	if not Game.companion:
+		Game.toast("Yue Ling is not with you yet.")
+		return
+	var tid := Bonds.talk_ready(Game)
+	if tid != "":
+		open_talk(tid)
+		return
+	yue_chat += 1
+	say([["Yue Ling", Bonds.chat(Game, world.area_id if not world.is_floor() else "", yue_chat)]])
+
+## A heart-to-heart: her lines, then Lin Feng's reply (no way out of it once she has said it).
+func open_talk(tid: String) -> void:
+	var tk := Bonds.talk(tid)
+	if tk.is_empty():
+		return
+	say(tk.lines, func():
+		var opts: Array = []
+		for o in tk.options:
+			var fut: Dictionary = Bonds.FUTURES.get(str(o.get("lean", "")), {})
+			opts.append({"id": str(o.id), "label": str(o.label), "desc": "Leans her heart towards %s." % Bonds.toward(str(o.get("lean", ""))), "col": fut.get("col", UI.C_GOLD)})
+		choose(str(tk.ask), opts, func(oid: String):
+			var o := Bonds.talk_option(tid, oid)
+			if o.is_empty():
+				o = tk.options[0]
+			Bonds.take_talk(Game, tid, o)
+			say(o.get("after", []))
+		, false)
+	)
+
+## Tell the player when she has something to talk about (once for each heart-to-heart).
+var talk_told := ""
+
+var talk_seen := Vector2i(-1, -1)
+
+func _talk_hint() -> void:
+	# (asked again only when the story moves on or a heart-to-heart is had)
+	var key := Vector2i(Game.step, Game.talks.size() + (1000 if Game.companion else 0))
+	if key == talk_seen:
+		return
+	talk_seen = key
+	var tid := Bonds.talk_ready(Game)
+	if tid != "" and tid != talk_told:
+		talk_told = tid
+		Game.toast("Yue Ling wants to talk (T)")
+
+## One of the memories the Founder pressed (Part XV): what Yue Ling remembers of the place, the things
+## eating it driven off, then the memory itself while the two of them do what she did there with the
+## bearer, and what Lin Feng says to her afterwards.
+func memory_scene(e: Dictionary) -> void:
+	var mid := str(e.memory)
+	var m := Bonds.memory(mid)
+	say(m.get("lines", []), func():
+		var foes: Array = []
+		for f in m.get("battle", []):
+			foes.append({"id": str(f[0]), "lv": int(f[1])})
+		if foes.is_empty():
+			_memory_won(mid)
+			return
+		battle.start(foes, {"boss": false, "memory": mid, "theme": world.theme_name})
+		push("battle")
+	)
+
+func _memory_won(mid: String) -> void:
+	var m := Bonds.memory(mid)
+	var e = world.find_ent("mem:" + mid)
+	if e != null:
+		world.start_scene_use(e)
+	say(m.get("scene", []), func():
+		var opts: Array = []
+		for o in m.options:
+			var fut: Dictionary = Bonds.FUTURES.get(str(o.get("lean", "")), {})
+			opts.append({"id": str(o.id), "label": str(o.label), "desc": "Leans her heart towards %s." % Bonds.toward(str(o.get("lean", ""))), "col": fut.get("col", UI.C_GOLD)})
+		choose(str(m.ask), opts, func(oid: String):
+			var o := Bonds.memory_option(mid, oid)
+			if o.is_empty():
+				o = m.options[0]
+			Bonds.take_memory(Game, mid, o)
+			say(o.get("after", []), func():
+				world.end_use()
+				Game.poll_steps()
+			)
+		, false)
+	)
+
+## Kind "share" (Part XV): the lotus pond where she woke.  The first time her heart leans one way;
+## the last time she writes the first line of her own life (Bonds.FUTURES).
+func share_scene(e: Dictionary, sid: String) -> void:
+	var sh: Dictionary = Bonds.SHARES.get(sid, {})
+	world.start_scene_use(e)
+	say(sh.get("lines", []), func():
+		var opts: Array = []
+		if sh.get("future", false):
+			var lean := Bonds.leaning(Game)
+			for fk in Bonds.FUTURE_ORDER:
+				var fut: Dictionary = Bonds.FUTURES[fk]
+				opts.append({"id": fk, "label": str(fut.n), "note": "her heart" if fk == lean else "", "desc": "She would choose %s." % str(fut.what), "col": fut.col})
+		else:
+			for o in sh.options:
+				var fut2: Dictionary = Bonds.FUTURES.get(str(o.get("lean", "")), {})
+				opts.append({"id": str(o.id), "label": str(o.label), "desc": str(o.get("desc", "")), "col": fut2.get("col", UI.C_GOLD)})
+		choose(str(sh.ask), opts, func(oid: String):
+			var after: Array = []
+			if sh.get("future", false):
+				var key := oid if Bonds.FUTURES.has(oid) else Bonds.FUTURE_ORDER[0]
+				var was := Bonds.leaning(Game)
+				Bonds.choose_future(Game, key)
+				after = Bonds.FUTURE_AFTER[key].duplicate()
+				after.append_array(Bonds.HEART_YES if key == was or was == "" else Bonds.HEART_NO)
+			else:
+				var o: Dictionary = {}
+				for o2 in sh.options:
+					if str(o2.id) == oid:
+						o = o2
+				if o.is_empty():
+					o = sh.options[0]
+				Bonds.lean(Game, str(o.get("lean", "")), 3)
+				Bonds.add(Game, 3, "by the lotus pond")
+				Game.note("With Yue Ling (%s): %s" % [str(Data.STEPS[Data.step_index(sid)].t).split(":")[0], str(o.label)])
+				after = o.get("after", [])
+			say(after, func():
+				world.end_use()
+				var s := Game.cur_step()
+				if not s.is_empty() and str(s.id) == sid:
+					Game.advance()
+			)
+		, false)
+	)
 
 # ---------------------------------------------------------------- the wardrobe, the stable, the dyer (fashion.gd)
 ## The wardrobe: every outfit, the ones not yet earned greyed out with how to earn them; the hero in
@@ -810,7 +970,7 @@ func start_breakthrough() -> void:
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
-	"s_break18": "recall12"}
+	"s_break18": "recall12", "s_break19": "recall13"}
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story
@@ -827,6 +987,9 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 			if str(ctx.get("fate", "")) != "":
 				# the fight of a fated encounter (fate.gd): the chapter goes on
 				_fate_won(str(ctx.fate), ctx.fate_opt)
+			elif str(ctx.get("memory", "")) != "":
+				# the things eating one of Yue Ling's memories are driven off (bonds.gd): it comes back
+				_memory_won(str(ctx.memory))
 			elif ctx.get("tribulation", false):
 				var sid: String = ctx.step
 				Game.do_breakthrough()
