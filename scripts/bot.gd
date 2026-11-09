@@ -104,10 +104,10 @@ const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
 ## and at the lotus pond; and the future she writes for herself (the one her heart leans to).
 const TALK_PLAN := {"t_lotus": "mine", "t_hands": "teach", "t_winter": "here", "t_chains": "cut", "t_sky": "share", "t_seal": "you",
 	"t_ageless": "keep", "t_mend": "me", "t_ancestors": "make", "t_mother": "sing", "t_bridge": "yes", "t_noon": "duty", "t_maps": "draw",
-	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_moths": "keep", "t_wrist": "family", "t_after": "never"}
+	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_dragon": "ask", "t_nineteen": "left", "t_peach": "see", "t_heaven": "home", "t_xufu": "front", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_loom": "through", "t_moths": "keep", "t_wrist": "family", "t_after": "never", "t_feast": "every"}
 const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "mem_dance", "mem_kite"]
 const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
-const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both"}
+const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her"}
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
@@ -532,7 +532,8 @@ func _world(d: float) -> void:
 				_goto_entity(Trials.npc_area(vt), vt)
 		"share":
 			# Part XV: the lotus pond where Yue Ling woke
-			_goto_entity(str(s.area), str(s.spot))
+			var sp := Bonds.find_spot(world.ents, str(s.spot))
+			_goto_entity(str(s.area), str(sp.get("id", s.spot)))
 		"memories":
 			# Part XV: the next of her memories on the bot's round (any five), each guarded by moths
 			var mm := _next_memory()

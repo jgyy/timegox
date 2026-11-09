@@ -1785,10 +1785,10 @@ func _lotus() -> void:
 	LG.visited = {"alchemist": true, "qiu_ye_end": true, "tala_end": true, "hu_end": true}
 	LG.poll_steps()
 	check(Data.STEPS[LG.step].id == "s_p15_threads", "the people visited in Parts XIII and XIV do not count as threads tied for her")
-	for nid in ["alchemist", "archivist", "mazu", "meng_po", "smith"]:
+	for nid in ["alchemist", "archivist", "mazu", "meng_po", "smith", "granny_wen"]:
 		LG.threads[nid] = true
 	LG.poll_steps()
-	check(Data.STEPS[LG.step].id == "s_p15_warden", "five threads tied, by anybody who knew her, and the Warden must come out")
+	check(Data.STEPS[LG.step].id == "s_p15_warden", "six threads tied, by anybody who knew her, and the Warden must come out")
 	Bonds.choose_future(LG, "wander")
 	check(LG.future == "wander" and Bonds.epilogues(LG).size() >= 1, "the road she chooses is remembered and told at the end")
 	LG.free()
@@ -1797,11 +1797,20 @@ func _lotus() -> void:
 	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break20" and Data.DIALOGUE.has("recall13") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break19\": \"recall13\""), "Part XV follows Karma Fulfilled (recall13) and ends the game")
 	for sid in ["s_p15_home", "s_p15_judge", "s_p15_founder", "s_p15_end", "pre:s_break20", "post:s_break20"]:
 		check(Data.DIALOGUE.has(sid), "Part XV has its words for %s" % sid)
+	var sw := Atlas.world_of("surface")
 	for shid in Bonds.SHARES:
 		var si := Data.step_index(shid)
 		var spot_id := str(Data.STEPS[si].spot) if si >= 0 else ""
-		check(si >= 0 and str(Data.STEPS[si].kind) == "share" and (spot_id == "mem:" + Bonds.POND or spot_id == Bonds.LOOM), "%s happens at the lotus pond or at the loom she was woven on" % shid)
-	var sw := Atlas.world_of("surface")
+		var spot_e := Bonds.find_spot(sw.ents, spot_id)
+		check(si >= 0 and str(Data.STEPS[si].kind) == "share" and not spot_e.is_empty() and str(spot_e.area) == str(Data.STEPS[si].area), "%s happens at a thing that stands in %s (%s)" % [shid, str(Data.STEPS[si].get("area", "")), spot_id])
+	check(Bonds.find_spot(sw.ents, Bonds.FEAST).get("prop", "") == "stage", "the mountain has an open-air stage for the naming feast")
+	# the bigger things stand clear of the towns' buildings (the sect's stage once had a shop's signboard
+	# standing up through its boards)
+	var crowded := 0
+	for e4 in sw.ents:
+		if e4.kind == "prop" and not e4.has("furn") and Props.is_structure(str(e4.prop)) and Props._by_building(sw.grid, sw.w, sw.h, e4.pos, 3):
+			crowded += 1
+	check(crowded == 0, "no pavilion, tower or stage stands in a building's way (%d)" % crowded)
 	var spots := {}
 	for e2 in sw.ents:
 		if e2.kind == "prop" and e2.has("memory"):

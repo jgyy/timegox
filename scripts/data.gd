@@ -5,7 +5,7 @@ extends RefCounted
 const MAX_LEVEL := 60
 const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 330000, 370000, 410000]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000]
 const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
@@ -2896,10 +2896,11 @@ const STEPS := [
 	{"id": "s_p15_memories", "kind": "memories", "n": 6, "area": "grave", "t": "Give Yue Ling back six of the seven memories the Founder pressed where she was happiest, in any order (Esc > Yue Ling)"},
 	{"id": "s_p15_moth", "kind": "kill", "boss": "forgetting_queen", "area": "silk", "t": "Find what woke the moths: the Moth-Queen of Forgetting in the Mulberry Silk Woods"},
 	{"id": "s_p15_unweaver", "kind": "kill", "boss": "unweaver", "area": "loom", "t": "Stop the Unweaver winding her threads back at the Loom of Borders"},
-	{"id": "s_p15_threads", "kind": "threads", "npcs": ["qiu_ye_end", "tala_end", "hu_end", "xu_lan_end", "liu_ying_end", "alchemist", "archivist", "mazu", "meng_po", "smith", "granny_wen"], "n": 5, "area": "sect",
-		"t": "Ask five of the people who knew her to tie a thread for Yue Ling, in any order: her friends, Alchemist Mo, Smith Tie, Archivist Lan, Granny Wen, Mazu, Meng Po"},
+	{"id": "s_p15_threads", "kind": "threads", "npcs": ["qiu_ye_end", "tala_end", "hu_end", "xu_lan_end", "liu_ying_end", "alchemist", "archivist", "mazu", "meng_po", "smith", "granny_wen"], "n": 6, "area": "sect",
+		"t": "Ask six of the people who knew her to tie a thread for Yue Ling, in any order: her friends, Alchemist Mo, Smith Tie, Archivist Lan, Granny Wen, Mazu, Meng Po"},
 	{"id": "s_p15_warden", "kind": "kill", "boss": "lock_warden", "area": "mountain", "t": "Face Suo, Warden of the Lock, under the Founder's Last Cave on the mountain", "stones": 23600},
 	{"id": "s_p15_name", "kind": "share", "spot": "mem:mem_pond", "area": "sect", "t": "Go back to the lotus pond with Yue Ling: there is a page in the Book of Life and Death with her name on it"},
+	{"id": "s_p15_feast", "kind": "share", "spot": "kind:mountain:stage", "area": "mountain", "t": "The sect throws Yue Ling a naming feast on the mountain: go up on the open-air stage below the Jianmu and give them a sword form"},
 	{"id": "s_p15_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell the Elder: Yue Ling has written the first line of her life"},
 	{"id": "s_break20", "kind": "breakthrough", "to": 60, "t": "Climb the last step together: Kindred Dao"},
 ]

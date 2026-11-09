@@ -63,11 +63,11 @@ static func next_text(g) -> String:
 
 # ---------------------------------------------------------------- her heart: three futures
 const FUTURES := {
-	"companion": {"n": "His Dao companion", "col": Color("f08ab0"), "what": "to walk beside Lin Feng as his Dao companion, not because a seal was woven so, but because she chose to",
+	"companion": {"n": "His Dao companion", "short": "walks beside him by choice", "col": Color("f08ab0"), "what": "to walk beside Lin Feng as his Dao companion, not because a seal was woven so, but because she chose to",
 		"epilogue": "Yue Ling walks beside Lin Feng still, as his Dao companion, and has a page of her own in the Book of Life and Death. It is mostly about him. She says that is her business."},
-	"lotus": {"n": "The lotus of the mountain", "col": Color("8ae0c0"), "what": "to stay on Azure Cloud Mountain as the lotus of its pond, keeper of the door the Seal became, rooted and free at once",
+	"lotus": {"n": "The lotus of the mountain", "short": "keeps the mountain's door", "col": Color("8ae0c0"), "what": "to stay on Azure Cloud Mountain as the lotus of its pond, keeper of the door the Seal became, rooted and free at once",
 		"epilogue": "Yue Ling keeps the lotus pond of Azure Cloud Sect. Disciples who sit by it come away calmer, and the old ones say a healer in rose comes out of the water on spring nights to scold anybody who is not sleeping enough."},
-	"wander": {"n": "A road of her own", "col": Color("f0c860"), "what": "to go out into the world as the wandering healer she once only pretended to be, and make threads of her own",
+	"wander": {"n": "A road of her own", "short": "walks a road of her own", "col": Color("f0c860"), "what": "to go out into the world as the wandering healer she once only pretended to be, and make threads of her own",
 		"epilogue": "Yue Ling wanders the four realms as a healer, and comes home to the sect every spring with a basket of strange herbs and a hundred new friends. Lin Feng sweeps the steps for her coming, every year, a day early."},
 }
 const FUTURE_ORDER := ["companion", "lotus", "wander"]
@@ -131,6 +131,16 @@ const TALKS := [
 			{"id": "cut", "label": "\"Then I'll help you cut it.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "If there is a rope, we will find where it is tied and cut it together."], ["Yue Ling", "And if it is tied to you?"], ["Lin Feng", "Then I will untie it, and you can decide whether to walk away."]]},
 			{"id": "root", "label": "\"Some ropes are roots.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Not every rope is a chain. A tree is tied to the ground. It does not feel trapped."], ["Yue Ling", "Trees do not get to see the sea, Lin Feng."]]},
 			{"id": "run", "label": "\"Go wherever you like. I mean it.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "You can walk away from this road any day you like. I mean it."], ["Yue Ling", "I know. That is exactly why I stay."]]}]},
+	{"id": "t_dragon", "after": "s_dr_king", "lines": [
+		["Narrator", "The Azure Dragon King swims up out of the rift and away into the deep, and the whole sunken palace sighs as the water clears."],
+		["Yue Ling", "He thanked you, Lin Feng. A dragon king. He looked at me as well, as if he knew me, and bowed lower than he bowed to you."],
+		["Lin Feng", "Maybe dragons have better manners than sweepers."],
+		["Yue Ling", "Maybe. Or maybe a bearer before you freed him once too, and I was there, and only the dragon remembers."]],
+		"ask": "What do you say?",
+		"options": [
+			{"id": "ask", "label": "\"Then we'll ask him, one day. Together.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Then one day we come back down here and ask him, the two of us."], ["Yue Ling", "You want to go back into a sunken palace full of hydras to ask a dragon a personal question. You are a very strange sweeper."]]},
+			{"id": "honour", "label": "\"Then the sea honours you. That's no small thing.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Then the whole sea honours you. That is a better family tree than most of the sect has."], ["Yue Ling", "The sea as an aunt. I like that."]]},
+			{"id": "swim", "label": "\"Then go and find out. Swim after him.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "You could go after him and ask. Dragons like the curious."], ["Yue Ling", "Not today. Today I want to stand somewhere dry. But one day, yes."]]}]},
 	{"id": "t_sky", "after": "s_ce_emperor", "lines": [
 		["Narrator", "Above the Celestial Gate the sky is cracked like old porcelain. Yue Ling will not stop looking at it."],
 		["Yue Ling", "When the Emperor fell, the Seal at your waist went warm against my hand. Not your hand. Mine. Why would it do that?"],
@@ -141,6 +151,16 @@ const TALKS := [
 			{"id": "share", "label": "\"Then we carry it together.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Then it is both of ours. We carry it together."], ["Yue Ling", "Lin Feng, it is a very heavy seal, and you are giving away half of it as if it were a dumpling."]]},
 			{"id": "elder", "label": "\"The Elder will know.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "We are going home soon. The Elder will know what it means."], ["Yue Ling", "He will know. Whether he will tell us is a different question."]]},
 			{"id": "free", "label": "\"Whatever it is, you are still you.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Whatever it recognised, you are still the girl who threw a pot at Iron Fang's head."], ["Yue Ling", "It was a very good pot. I miss that pot."]]}]},
+	{"id": "t_nineteen", "after": "s_ml_xumo", "lines": [
+		["Narrator", "The Mirror Lake is still at last. In the water, if you look long enough, the nineteen bearers stand in a row, waiting, the way people wait for a boat."],
+		["Yue Ling", "Lin Feng, look at the fourth one. And the ninth. There is somebody standing behind each of them, a little to the left. A girl in rose."],
+		["Yue Ling", "It is me. In every reflection. Standing exactly where I stand now, beside you."],
+		["Lin Feng", "Then you were never alone either."]],
+		"ask": "What do you say?",
+		"options": [
+			{"id": "left", "label": "\"Stand a little to the left of me, then. Always.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Then stand there. A little to the left. It suits you."], ["Yue Ling", "You are very bad at being solemn at a haunted lake, Lin Feng."], ["Lin Feng", "I know."]]},
+			{"id": "keep", "label": "\"The lake keeps them. Let it keep you too.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "The lake keeps all of them. It is keeping you too, somewhere. That is not nothing."], ["Yue Ling", "Kept in a lake. I would rather be kept in a person."]]},
+			{"id": "step", "label": "\"Then step out of the reflection. Be in the front.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Twenty times a little to the left. Stand in front, for once. See what it is like."], ["Yue Ling", "In front. It is very bright. I am not sure I like it. Ask me again later."]]}]},
 	{"id": "t_seal", "after": "s_or_heaven", "lines": [
 		["Narrator", "The Origin is quiet now: white stone, slow light. Yue Ling sits on the edge of the place where the Hollow Heaven was, and does not look at him."],
 		["Yue Ling", "I am the Seal, Lin Feng. The Founder wove me out of its lotus so that the bearer would never face the end alone. Twenty bearers. I walked beside every one of them, and forgot every one."],
@@ -162,6 +182,15 @@ const TALKS := [
 			{"id": "grey", "label": "\"Then I'll get old slowly, for you.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Then I will cultivate until I am very, very hard to kill, and get old so slowly you will not notice."], ["Yue Ling", "You will still go grey first. I am going to laugh at you."]]},
 			{"id": "keep", "label": "\"Someone has to remember us all.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Somebody has to remember all of us. The sect would be lucky if it were you."], ["Yue Ling", "The sect's memory. I would keep it in a very untidy drawer."]]},
 			{"id": "live", "label": "\"Then live everything, while you can.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Then do everything. See everything. Make the time count, since you have so much of it."], ["Yue Ling", "That is a very cultivator thing to say. I like it more than I should."]]}]},
+	{"id": "t_peach", "after": "s_gd_nineteen", "lines": [
+		["Narrator", "The nineteen wake under the peach trees with their names back in their mouths, and one by one they walk out of the Garden into the dawn."],
+		["Yue Ling", "None of them looked at me, Lin Feng. Not one. I walked beside every one of them and they walked straight past."],
+		["Yue Ling", "I suppose that is fair. I did not remember them either. We are even. It does not feel even."]],
+		"ask": "What do you say?",
+		"options": [
+			{"id": "see", "label": "\"I see you. That has to count for something.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "I see you. Every day. That has to count for something against nineteen."], ["Yue Ling", "It counts for a great deal more than nineteen, actually. Do not let it go to your head."]]},
+			{"id": "later", "label": "\"They'll remember. Names come back slowly.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "They have only just got their own names back. Give them time. Yours will come to them."], ["Yue Ling", "Maybe at a festival, one day, one of them will look up and frown and say: wait."]]},
+			{"id": "own", "label": "\"Then make memories nobody can walk past.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Then make some memories of your own. Ones nobody can walk past."], ["Yue Ling", "Loud ones. With fireworks. Yes."]]}]},
 	{"id": "t_mend", "after": "s_p5_home", "lines": [
 		["Yue Ling", "Nuwa mended the sky with stones of five colours, Lin Feng. Do you think she did it because she had to, or because she could not bear to see it broken?"],
 		["Lin Feng", "Is there a difference?"],
@@ -227,6 +256,15 @@ const TALKS := [
 			{"id": "proof", "label": "\"You argue with me. The weave wouldn't.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "You argue with me about everything. Salt. Stars. My stance. No seal ever woven would bother."], ["Yue Ling", "...That is the most romantic thing anybody has ever said to me and it was about salt."]]},
 			{"id": "stele", "label": "\"Then choose at a stele, like me.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "There is a stele in the courtyard. Choose a road. Any road. See how it feels."], ["Yue Ling", "I touched it this morning, when nobody was looking. It went warm, and showed me a lotus. I do not think that is one of the six."]]},
 			{"id": "time", "label": "\"There'll be a day you choose. I'll wait.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "One day something will happen that is only yours to choose, and you will know it. I will wait for that day with you."], ["Yue Ling", "Promise?"], ["Lin Feng", "Promise."]]}]},
+	{"id": "t_heaven", "after": "s_jt_leigong", "lines": [
+		["Narrator", "Above the aeries of Juntian the thunder stops, and the Feathered Folk come out of their towers to look at a sky that is, for once, only a sky."],
+		["Yue Ling", "We are standing in heaven, Lin Feng. Actual heaven. When I was a girl, or whatever I was, I thought heaven would be quiet."],
+		["Yue Ling", "It is full of birds arguing about whose turn it is to sweep the terraces. I have never liked anywhere so much."]],
+		"ask": "What do you say?",
+		"options": [
+			{"id": "here", "label": "\"Heaven is wherever you're arguing with me.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Heaven is wherever you are arguing with me about something unimportant."], ["Yue Ling", "That is the worst line anybody has ever said in heaven. Say it again."]]},
+			{"id": "home", "label": "\"Our sect is louder. And it's home.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "The sect is louder than this, and it has worse food, and it is home."], ["Yue Ling", "Home is louder than heaven. I am going to embroider that on something."]]},
+			{"id": "stay", "label": "\"Stay a while. The birds would have you.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Stay a while, if you like. The Feathered Folk would adopt you by the end of the week."], ["Yue Ling", "They have already offered. Twice. I said I would think about it."]]}]},
 	{"id": "t_sea", "after": "s_p12_home", "lines": [
 		["Yue Ling", "The sea has gone, Lin Feng, and the first thing I thought was: but I never saw it."],
 		["Yue Ling", "Three hundred years of bearers and not one of them took me to the sea. Or they did, and I forgot. I do not know which is worse."]],
@@ -235,6 +273,15 @@ const TALKS := [
 			{"id": "take", "label": "\"I'll take you when it comes back.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "When the sea comes back, the very first morning, I will take you down to it, and you can stand in it up to your knees and complain that it is cold."], ["Yue Ling", "I will complain. I will complain magnificently."]]},
 			{"id": "pond", "label": "\"Our pond is a small sea.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "The sect's pond is a very small sea. It has fish. It has a tide when the Elder wades in."], ["Yue Ling", "Lin Feng. That is not the same, and you know it is not the same, and I love you a little for saying it anyway."]]},
 			{"id": "sail", "label": "\"Mazu has a boat. Go and see.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Mazu has a boat that goes to the edge of the world. Go and see where it went."], ["Yue Ling", "Alone? No. With you. But I like that you said go."]]}]},
+	{"id": "t_xufu", "after": "s_gx_xufu", "lines": [
+		["Narrator", "Xu Fu sits on the lip of the Returning Ruins with his three thousand children's names in his lap, and weeps, and the sea starts to come home."],
+		["Yue Ling", "He sailed away to find a cure for death, Lin Feng, and found three thousand children instead, and never once noticed which one was the cure."],
+		["Yue Ling", "I keep thinking about it. Everybody is looking for something to make them last for ever. Nobody looks at what is right in front of them, lasting."]],
+		"ask": "What do you say?",
+		"options": [
+			{"id": "front", "label": "\"I'm looking. At what's in front of me.\"", "lean": "companion", "bond": 4, "after": [["Lin Feng", "I am looking at what is in front of me."], ["Narrator", "She does not say anything for the whole walk back to Landfall, but she walks very close, and she is smiling at the sand."]]},
+			{"id": "children", "label": "\"The Thousand Children were his for ever.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "His children were his for ever, and he did not know it. Landfall is what lasts."], ["Yue Ling", "A town is a kind of for ever. Yes. I could live with that kind."]]},
+			{"id": "cure", "label": "\"There's no cure. Just going on.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "There is no cure. There is just going on, and seeing as much as you can on the way."], ["Yue Ling", "Going on. Yes. That is the only immortality I want."]]}]},
 	{"id": "t_war", "after": "s_p13_home", "lines": [
 		["Yue Ling", "Eight gates and a war god behind them. I am frightened, Lin Feng. I am not supposed to be. Seals do not get frightened."],
 		["Yue Ling", "But the war god's grave makes my hands shake. As if one of the bearers fell in a war, and I sat with him at the end."]],
@@ -275,6 +322,15 @@ const TALKS := [
 			{"id": "missed", "label": "\"You'd be missed. By me, first.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "If you went, you would be missed every day by somebody who swept the steps for three years without ever being missed once. I know what it costs. I would pay it."], ["Yue Ling", "Do not say things like that when I am already crying about my mother, Lin Feng. It is not fair."]]},
 			{"id": "mother", "label": "\"Call her mother. She'd like it.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Call her mother anyway. She is a needle and a habit, she said. Habits like to be called by their names."], ["Yue Ling", "Mother Qing Lian. It sounds like a temple. She would hate it. I am going to say it every time."]]},
 			{"id": "go", "label": "\"Then be the one who comes back.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Then be somebody who goes away and comes back. Every time. That is a kind of staying too."], ["Yue Ling", "Out every morning, home every night. You keep giving me that. I think I am starting to want it."]]}]},
+	{"id": "t_loom", "after": "s_p15_loom", "lines": [
+		["Narrator", "They come out of the hermitage through the round moon gate into the evening. Yue Ling stops in the middle of the gate, as if she were a picture in a frame."],
+		["Yue Ling", "She built the door round, Lin Feng. A round door has no top and no bottom. You cannot tell from the shape of it whether you are coming in or going out."],
+		["Yue Ling", "I think she meant it for me. I think she knew I would have to decide which."]],
+		"ask": "What do you say?",
+		"options": [
+			{"id": "through", "label": "\"Walk through it with me. Either way.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Walk through it with me, then. In or out. We can decide on the other side."], ["Yue Ling", "That is cheating. I accept."]]},
+			{"id": "in", "label": "\"In. This is a house that wants somebody in it.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "In, I think. It is a house that has been waiting three hundred years for somebody to come in."], ["Yue Ling", "It does have a very good bath."]]},
+			{"id": "out", "label": "\"Out. Doors are for going through.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Out. A door is for going through, not for standing in."], ["Yue Ling", "And coming back through. Do not forget the coming back."]]}]},
 	{"id": "t_twenty", "after": "s_p15_memories", "lines": [
 		["Yue Ling", "Ah Zhu and her terrible flute. Old Jiang and his lanterns. Bai Shan who could not sleep. Chun and her kite. They are mine now, Lin Feng. I can feel them, like stones in a pocket."],
 		["Yue Ling", "And all of them are gone. Every person I ever loved before you is three hundred years dead. I got them back just in time to miss them."],
@@ -313,6 +369,16 @@ const TALKS := [
 			{"id": "never", "label": "\"Never. I'll walk beside you, not in front.\"", "lean": "companion", "bond": 4, "after": [["Lin Feng", "Never. I will walk beside you, not in front of you and not behind you, for as long as you want somebody beside you."], ["Yue Ling", "That might be a very long time, sweeper."], ["Lin Feng", "I have time."]]},
 			{"id": "door", "label": "\"The door stays open. Always.\"", "lean": "lotus", "bond": 3, "after": [["Lin Feng", "The sect's door is open. It always will be. Go out of it, come back through it, sit on its step. Nobody will ever lock it again."], ["Yue Ling", "An open door. Yes. That is what a home is, I think. Not walls. A door somebody leaves open for you."]]},
 			{"id": "free", "label": "\"Go wherever your page goes.\"", "lean": "wander", "bond": 3, "after": [["Lin Feng", "Go wherever the page takes you. I will not hold the string. I learned that from a kite."], ["Yue Ling", "From Chun's kite. You remembered."]]}]},
+	{"id": "t_feast", "after": "s_p15_feast", "lines": [
+		["Narrator", "Late, when the lanterns are guttering and Auntie Zhou has finally sat down, Yue Ling finds Lin Feng sitting on the edge of the stage with his sword across his knees."],
+		["Yue Ling", "Forty-one people sang to me tonight, Lin Feng. Forty-one. Disciple Han cried. The cat sat on my lap for an hour and would not move."],
+		["Yue Ling", "For three hundred years I was the thing that kept somebody else alive. Tonight they had a party because I am."],
+		["Lin Feng", "Happy birthday, Yue Ling."]],
+		"ask": "What do you say next?",
+		"options": [
+			{"id": "every", "label": "\"Every year. I'll remember the date.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Every year, on this night. I will remember the date. I will make you eat two bowls of noodles."], ["Yue Ling", "You will burn the noodles."], ["Lin Feng", "I will burn them with love."]]},
+			{"id": "here", "label": "\"The sect will never forget it now.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "The sect will never forget it now. Han will tell the new disciples about the night the healer was born."], ["Yue Ling", "He will get it wrong. He will say there was a dragon."], ["Lin Feng", "There should have been a dragon."]]},
+			{"id": "next", "label": "\"Where do you want your next birthday?\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Where do you want your next one? Penglai? The moon? The bottom of the sea?"], ["Yue Ling", "All three. In that order."]]}]},
 ]
 
 static func talk(id: String) -> Dictionary:
@@ -492,6 +558,8 @@ const MEMORIES_NEEDED := 6
 const POND := "mem_pond"
 ## the loom in the Founder's hermitage on which she was woven (a piece of its furniture)
 const LOOM := "furn:mountain:lotus_hermitage:2"
+## the open-air stage on the mountain below the Jianmu, where the sect holds her naming feast
+const FEAST := "kind:mountain:stage"
 ## the pressed petal each memory gives back (the Unweaver's craft path and the Warden's key use them)
 const PETAL := "pressed_petal"
 ## The memories: the region, a tile of it to look near (the nearest place a thing of that kind can
@@ -659,6 +727,21 @@ const SHARES := {
 				"after": [["Lin Feng", "You were made on this mountain, out of this pond. The mountain does not forget its own. Neither does the sect. We will hold on."], ["Yue Ling", "Hold on very tight, then. I am slippery."]]},
 			{"id": "past", "label": "\"Then let's go and find you a past.\"", "lean": "wander", "desc": "If she has no past of her own, they will go and get it back.",
 				"after": [["Lin Feng", "If the world has no page for you, we go out and find what you were and bring it back. All of it. Every bearer."], ["Yue Ling", "That is twenty bearers and three hundred years, Lin Feng."], ["Lin Feng", "I have time. So do you."]]}]},
+	"s_p15_feast": {"lines": [
+		["Narrator", "The sect decides, without asking anybody, that a person who has just been written into the Book of Life and Death has just been born, and that a person who has just been born must have a naming feast."],
+		["Narrator", "Auntie Zhou cooks for three days. The disciples hang lanterns from every eave. Alchemist Mo brews something he refuses to name. The Elder makes a speech and forgets the end of it on purpose, so that everybody laughs."],
+		["Yue Ling", "Lin Feng. They want a performance. Everybody does something at a naming feast: a song, a poem. They are all looking at you."],
+		["Lin Feng", "I do not sing."],
+		["Yue Ling", "You do a sword form on a stage. I asked you once. Now the whole sect is asking."],
+		["Narrator", "The whole sect has carried its tables out to the old open-air stage on the mountain, below the Jianmu. He climbs onto it under the red lanterns with his old sword, and the whole of Azure Cloud Sect goes quiet to watch."]],
+		"ask": "The whole sect is watching. Who do you dedicate the form to?",
+		"options": [
+			{"id": "her", "label": "To Yue Ling, out loud", "lean": "companion", "desc": "In front of everybody.",
+				"after": [["Lin Feng", "This one is for Yue Ling. Who chose."], ["Narrator", "The courtyard erupts. Yue Ling hides her face in her sleeves and is seen, by at least forty witnesses, to be smiling."]]},
+			{"id": "sect", "label": "To the sect, her family", "lean": "lotus", "desc": "Hers, and his.",
+				"after": [["Lin Feng", "For the sect, which is her family, and mine."], ["Narrator", "The Elder wipes his eyes and claims it is the incense. There is no incense."]]},
+			{"id": "road", "label": "To every road she has not walked yet", "lean": "wander", "desc": "There are a great many.",
+				"after": [["Lin Feng", "For every road she has not walked yet."], ["Yue Ling", "Then it will have to be a very long form."], ["Narrator", "It is. Nobody leaves."]]}]},
 	"s_p15_name": {"lines": [
 		["Narrator", "The lotus pond again, at dawn. Judge Cui's runner has come up the funeral road in the night with a book wrapped in yellow silk: the Book of Life and Death, open at a page that was not there yesterday."],
 		["Narrator", "It is blank except for a name, written in a hand Lin Feng knows, because it is his own: Yue Ling. Every memory given back, every thread tied by a friend, every thing done side by side has gone into the ink."],
@@ -668,6 +751,21 @@ const SHARES := {
 		"ask": "Yue Ling writes the first line of her life. What will she be?",
 		"future": true},
 }
+
+## a share spot is a thing's id, or "kind:<region>:<kind>": the first thing of that kind in that region
+## (the mountain's open-air stage, wherever the land put it)
+static func spot_is(spot: String, e: Dictionary) -> bool:
+	if spot.begins_with("kind:"):
+		var parts := spot.split(":")
+		return str(e.get("kind", "")) == "prop" and not e.has("furn") and str(e.get("area", "")) == parts[1] and str(e.get("prop", "")) == parts[2] and not e.has("memory")
+	return str(e.get("id", "")) == spot
+
+## The thing a share spot names among `ents` ({} if none).
+static func find_spot(ents: Array, spot: String) -> Dictionary:
+	for e in ents:
+		if spot_is(spot, e):
+			return e
+	return {}
 
 ## The lines the last share closes with, by the future she chose and whether it was the one her heart
 ## leaned to.
@@ -707,7 +805,7 @@ static func epilogues(g) -> Array:
 ## the forest edge or the bank nearest the tile its memory names, never on a tile anybody walks over and
 ## clear of everything else.  `cands` holds each region's candidate tiles ([hash, tile, open side,
 ## water?], as Props.place gathers them), `placed` the things already standing.
-static func place(ids: Array, cands: Dictionary, placed_all: Array, layer: String, others: Array = []) -> Array:
+static func place(ids: Array, cands: Dictionary, placed_all: Array, layer: String, others: Array = [], grid: PackedByteArray = PackedByteArray(), W: int = 0, H: int = 0) -> Array:
 	var out: Array = []
 	var spots := {}
 	for mid in MEMORIES:
@@ -720,6 +818,7 @@ static func place(ids: Array, cands: Dictionary, placed_all: Array, layer: Strin
 			continue
 		var want := Atlas.to_world(str(sp.area), sp.near)
 		var water: bool = Props.WATER_KINDS.has(str(sp.prop))
+		var big := Props.is_structure(str(sp.prop)) and not grid.is_empty()
 		var best = null
 		# the nearest free place at least four tiles from every other thing; failing that, the region's
 		# own thing of that kind becomes the memory's place; failing that, two tiles will do
@@ -729,6 +828,8 @@ static func place(ids: Array, cands: Dictionary, placed_all: Array, layer: Strin
 				if bool(c[3]) != water:
 					continue
 				var tile: Vector2i = c[1]
+				if big and Props._by_building(grid, W, H, tile, 3):
+					continue
 				var near := false
 				for p in placed_all:
 					if (p as Vector2i).distance_squared_to(tile) < gap:

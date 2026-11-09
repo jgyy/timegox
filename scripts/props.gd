@@ -252,7 +252,7 @@ const THEMES := {
 ## The bigger things of the Lotus release (structures.gd) a region looks for by its theme (or its own
 ## id), placed after the six above; where neither is listed, LOTUS_COMMON.
 const LOTUS := {
-	"sect": ["stage", "archery", "calligraphy"], "mountain": ["watchtower", "pavilion", "kite"], "bamboo": ["flute_rock", "pavilion", "calligraphy"],
+	"sect": ["stage", "archery", "calligraphy"], "mountain": ["stage", "watchtower", "pavilion", "kite"], "bamboo": ["flute_rock", "pavilion", "calligraphy"],
 	"marsh": ["river_lantern", "watchtower", "flute_rock"], "frost": ["hot_spring", "watchtower", "armillary"], "thunder": ["watchtower", "archery", "kite"],
 	"palace": ["stage", "lantern_green", "pavilion"], "garden": ["pavilion", "lantern_green", "kite"], "village": ["millstone", "lantern_green", "kite"],
 	"grave": ["sky_lantern", "calligraphy", "pavilion"], "forge": ["millstone", "archery", "watchtower"], "maple": ["pavilion", "sky_lantern", "calligraphy"],
@@ -429,9 +429,14 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 			if placed.size() >= PER_REGION + LOTUS_PER:
 				break
 			var water: bool = WATER_KINDS.has(kind)
+			var big := is_structure(kind)
 			for c2 in list:
 				var tile: Vector2i = c2[1]
 				if bool(c2[3]) != water or used.has(tile):
+					continue
+				# (a building of the Lotus release stands clear of the town's own buildings: the sect's
+				# stage once had a shop's signboard standing up through its boards)
+				if big and _by_building(grid, W, H, tile, 3):
 					continue
 				var near := false
 				for p in placed:
@@ -452,8 +457,21 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 		var both: Array = (cands[k2] as Array) + (loose[k2] as Array)
 		both.sort_custom(func(a, b): return a[0] < b[0])
 		every[k2] = both
-	out.append_array(Bonds.place(ids, every, all_placed, layer, out))
+	out.append_array(Bonds.place(ids, every, all_placed, layer, out, grid, W, H))
 	return out
+
+## Whether a building (its walls or its floor) stands within `r` tiles of `tile`.
+static func _by_building(grid: PackedByteArray, W: int, H: int, tile: Vector2i, r: int) -> bool:
+	for dy in range(-r, r + 1):
+		for dx in range(-r, r + 1):
+			var x := tile.x + dx
+			var y := tile.y + dy
+			if x < 0 or y < 0 or x >= W or y >= H:
+				continue
+			var t := grid[y * W + x]
+			if t == MapGen.BUILDING or t == MapGen.INTERIOR:
+				return true
+	return false
 
 ## The furniture of a realm's buildings (or of one floor) as things to use: [kind, tile, blocks] from
 ## the building's props, in the realm's (or the floor's) own tiles of `grid` (`w` wide).

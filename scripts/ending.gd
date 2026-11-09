@@ -940,7 +940,7 @@ func _card(a: float) -> void:
 
 func _results(a: float, slide: float) -> void:
 	var tf := film_length()
-	var r := Rect2(806.0 + slide, 58.0, 434.0, 604.0)
+	var r := Rect2(806.0 + slide, 44.0, 434.0, 632.0)
 	UI.panel(self, r, Color(0.035, 0.05, 0.11, 0.88 * a), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, a))
 	var x0 := r.position.x + 30.0
 	var w := r.size.x - 60.0
@@ -974,12 +974,12 @@ func _results(a: float, slide: float) -> void:
 	y += 30.0
 	for k in cells.size():
 		var col := k % 2
-		var cy := y + (k / 2) * 50.0
+		var cy := y + (k / 2) * 46.0
 		var cc := x0 + w * (0.25 + 0.5 * col)
 		_caps(Vector2(cc, cy), str(cells[k][0]), 11, UI.C_DIM, a, 2.0, 0.5)
 		var vs := str(cells[k][1])
 		_say(Vector2(x0 + w * 0.5 * col, cy + 25.0), vs, UI.fit(vs, 21, w * 0.5 - 8.0, 14), cells[k][2], a, HORIZONTAL_ALIGNMENT_CENTER, w * 0.5)
-	y += 150.0
+	y += 138.0
 	_rule(Vector2(cx, y - 8.0), w * 0.5, a)
 	# the roads taken through the trials: a bar of the ways, coloured by kind
 	var counts := {}
@@ -1020,14 +1020,14 @@ func _results(a: float, slide: float) -> void:
 			var lw := f.get_string_size(lab, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + 30.0
 			if lx + lw > x0 + w + 4.0:
 				lx = x0
-				y += 22.0
+				y += 20.0
 			var kc: Color = Trials.KINDS[kd].col
 			draw_rect(Rect2(lx, y - 10, 10, 10), Color(kc.r, kc.g, kc.b, a))
 			_say(Vector2(lx + 15.0, y), lab, 14, UI.C_TEXT, a, HORIZONTAL_ALIGNMENT_LEFT)
 			lx += lw
 	var road := str(Game.trials.get("chiyou", ""))
 	if ROAD_ENDS.has(road):
-		y += 28.0
+		y += 24.0
 		var rl := "The heart reached by %s" % ROAD_ENDS[road][0]
 		_say(Vector2(x0, y), rl, UI.fit(rl, 15, w), Color("e8dcc0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	# the five fated encounters (fate.gd): how many stand with him at the end
@@ -1048,7 +1048,7 @@ func _results(a: float, slide: float) -> void:
 	if Game.future != "" or Game.bond > 0:
 		y += 18.0
 		var fut: Dictionary = Bonds.FUTURES.get(Game.future, {})
-		var yl := "Yue Ling: %s%s" % [Bonds.title(Game), (", " + str(fut.n).to_lower()) if not fut.is_empty() else ""]
+		var yl := "Yue Ling: %s%s" % [Bonds.title(Game), ("; " + str(fut.get("short", fut.n))) if not fut.is_empty() else ""]
 		_say(Vector2(x0, y), yl, UI.fit(yl, 14, w), Color("ff9ac0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
-	_say(Vector2(x0, r.end.y - 12.0), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)
+	_say(Vector2(x0, maxf(r.end.y - 14.0, y + 24.0)), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)

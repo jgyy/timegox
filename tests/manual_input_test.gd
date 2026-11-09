@@ -109,10 +109,20 @@ func _process(_d: float) -> bool:
 	if frame > 64 and wait_from > 0:
 		var u: Dictionary = main.world.using
 		if prop.has("started"):
-			if u.is_empty():
+			if u.is_empty() and not prop.has("talked"):
 				var gs = root.get_node("Game")
 				expect(gs.pastimes.has(str(prop.prop)) and gs.prop_uses.has(str(prop.id)), "Enter again finishes it: a new pastime")
 				expect(main.top_name() == "world", "and he can walk on")
+				# the Lotus release: T talks to Yue Ling (bonds.gd); before she has joined, it only says so
+				tap(KEY_T)
+				prop["talked"] = frame
+			elif prop.has("talked") and frame == int(prop.talked) + 2:
+				var gs2 = root.get_node("Game")
+				expect(main.top_name() == "world" and gs2.toasts.has("Yue Ling is not with you yet.") or main.toast_list.any(func(tt): return str(tt.text) == "Yue Ling is not with you yet."), "T before Yue Ling has joined: she is not with you yet")
+				gs2.companion = true
+				tap(KEY_T)
+			elif prop.has("talked") and frame == int(prop.talked) + 4:
+				expect(main.top_name() == "dialogue" and str(main.dialogue.lines[0][0]) == "Yue Ling", "T with Yue Ling beside him: she has a word to say")
 				print("failures: ", fails)
 				quit(1 if fails > 0 else 0)
 		elif not u.is_empty() and bool(u.started):

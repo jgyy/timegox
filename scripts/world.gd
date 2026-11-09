@@ -761,7 +761,7 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"prop":
 			# a thing to do (props.gd): outdoors its own model, turned to face the open ground it is
 			# used from; furniture is drawn by its building, and the node only carries what it does
-			if e.has("furn") and str(e.id) == Bonds.LOOM:
+			if e.has("furn") and str(e.id) == Bonds.LOOM or Bonds.spot_is(Bonds.FEAST, e):
 				# (Part XV: the loom she was woven on gets the lotus-pink mark too)
 				var lm := _label(n, "!", 2.6, Color("ff9ac0"), 72)
 				lm.visible = false
@@ -1227,14 +1227,15 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 		"flour":
 			Fx3D.dust(scene3d, c + Vector3(0, 0.55, 0), Color(0.95, 0.93, 0.88))
 		"arrow":
-			# the thock of the arrow going home: a small ring off the face of the target
-			Fx3D.shockwave(scene3d, c + _model_point(e, Structures.TARGET + Vector3(0, 0, 0.16)), Color(1.0, 0.9, 0.6), 0.9, 0.35)
+			# the thock of the arrow going home: a few splinters of straw off the face of the target
+			Fx3D.drift(scene3d, c + _model_point(e, Structures.TARGET + Vector3(0, 0, 0.16)), Color(1.0, 0.88, 0.55), "glow", 5, 0.06, 0.3, 0.6, 0.15)
 		"petals":
 			Fx3D.leaf_spiral(scene3d, player.position + Vector3(0, 0.4, 0), Color(1.0, 0.55, 0.65), 1.3)
 		"kite":
 			Fx3D.leaf_spiral(scene3d, player.position + Vector3(0, 1.2, 0) + to_hero * -0.6, Color(0.9, 0.85, 0.75), 0.8)
 		"stars":
-			Fx3D.drift(scene3d, player.position + Vector3(0, 2.5, 0), Color(0.85, 0.9, 1.0), "glow", 6, 1.6, 0.25, 2.6, 0.2)
+			# a few stars coming out over their heads, one by one
+			Fx3D.drift(scene3d, player.position + Vector3(0, 2.6, 0), Color(0.85, 0.9, 1.0), "glow", 6, 0.07, 0.3, 2.6, 1.2)
 		"sky_lantern", "float":
 			# (the lantern itself rises or drifts away: _animate_prop); the ones in their hands are let go
 			for key in ["held", "comp_held"]:
@@ -1242,7 +1243,9 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 				if fx == "sky_lantern" and hn != null and is_instance_valid(hn):
 					(hn as Node).queue_free()
 					using[key] = null
-			Fx3D.glimmer(scene3d, player.position + Vector3(0, 1.6 if fx == "sky_lantern" else 0.3, 0) - to_hero * 0.4, Color(1.0, 0.75, 0.4))
+			# (small warm sparks where the lantern leaves the hands: a flash the size of a door washed
+			# the two of them out)
+			Fx3D.drift(scene3d, player.position + Vector3(0, 2.0 if fx == "sky_lantern" else 0.25, 0) - to_hero * 0.4, Color(1.0, 0.75, 0.4), "glow", 6, 0.08, 0.9, 1.6, 0.3)
 		"ink":
 			Fx3D.drift(scene3d, c + Vector3(0, 0.8, 0), Color(0.25, 0.25, 0.35, 0.8), "glow", 3, 0.25, 0.4, 1.8, 0.2)
 
@@ -1260,7 +1263,7 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 	if n.has_meta("mark"):
 		var s := Game.cur_step()
 		var mk := n.get_meta("mark") as Label3D
-		mk.visible = using.is_empty() and (e.has("memory") and Bonds.memory_ready(Game, str(e.memory)) or not s.is_empty() and str(s.kind) == "share" and str(s.get("spot", "")) == str(e.id))
+		mk.visible = using.is_empty() and (e.has("memory") and Bonds.memory_ready(Game, str(e.memory)) or not s.is_empty() and str(s.kind) == "share" and Bonds.spot_is(str(s.get("spot", "")), e))
 		if mk.visible:
 			mk.position.y = 4.6 + sin(t * 4.0) * 0.15
 	if not n.has_meta("model"):
@@ -1952,7 +1955,7 @@ func _draw_hud() -> void:
 		UI.text(self, Vector2(VIEW.x - 506, 56), obj, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
 	else:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35), obj, 15, UI.C_TEXT, 486)
-	UI.text(self, Vector2(VIEW.x - 532, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 520.0)
+	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
 	_draw_minimap()
 	if banner_t > 0.0:
 		var a := clampf(banner_t, 0.0, 1.0)

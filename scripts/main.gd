@@ -388,7 +388,7 @@ func interact(e: Dictionary) -> void:
 				memory_scene(e)
 				return
 			var s0 := Game.cur_step()
-			if not s0.is_empty() and str(s0.kind) == "share" and str(s0.get("spot", "")) == str(e.id):
+			if not s0.is_empty() and str(s0.kind) == "share" and Bonds.spot_is(str(s0.get("spot", "")), e):
 				share_scene(e, str(s0.id))
 				return
 			# a thing to do (props.gd): Lin Feng steps up to it and does it
@@ -729,7 +729,7 @@ func share_scene(e: Dictionary, sid: String) -> void:
 					o = sh.options[0]
 				Bonds.lean(Game, str(o.get("lean", "")), 3)
 				Bonds.add(Game, 3, "by the lotus pond")
-				Game.note("By the lotus pond: %s" % str(o.label))
+				Game.note("With Yue Ling (%s): %s" % [str(Data.STEPS[Data.step_index(sid)].t).split(":")[0], str(o.label)])
 				after = o.get("after", [])
 			say(after, func():
 				world.end_use()

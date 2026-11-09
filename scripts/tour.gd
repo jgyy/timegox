@@ -1044,14 +1044,15 @@ func _skip_talk() -> void:
 ## The bigger things in use, Yue Ling's heart-to-hearts and her page, Part XV's memories, the
 ## Founder's echo and her hermitage, the lotus pond, and the new battles.
 func _lotus_shots() -> void:
-	# a memory given back: Ah Zhu's flute stone in the bamboo, Yue Ling playing the flute while he listens
+	# a memory given back: Wen Shu's lantern green on the Magpie Bridge, the two of them dancing under
+	# the lanterns as she danced at his wedding
 	_lotus_state("s_p15_memories")
-	Game.memories = {"mem_spring": "nothing", "mem_lanterns": "two"}
-	var mf := _land_ent("mem:mem_flute")
+	Game.memories = {"mem_spring": "nothing", "mem_lanterns": "two", "mem_flute": "forest"}
+	var mf := _land_ent("mem:mem_dance")
 	if not mf.is_empty():
 		_stand_by(mf)
 		await _wait(0.3)
-		main._memory_won("mem_flute")
+		main._memory_won("mem_dance")
 		for k in 3:
 			main.dialogue.shown = 999.0
 			main.press("confirm")
@@ -1060,7 +1061,7 @@ func _lotus_shots() -> void:
 		await _wait(1.2)
 		main.dialogue.shown = 999.0
 		await _wait(0.4)
-		await _shot("memory_flute")
+		await _shot("memory_dance")
 		await _skip_talk()
 		await _wait(0.5)
 		await _shot("memory_choice")
@@ -1068,7 +1069,7 @@ func _lotus_shots() -> void:
 		await _wait(0.3)
 		await _skip_talk()
 	# the fight for a memory: the moths that eat forgetting
-	main.battle.start([{"id": "forgetting_moth", "lv": 57}, {"id": "loose_thread", "lv": 57}, {"id": "unweaver_shuttle", "lv": 58}], {"boss": false, "theme": "bamboo"})
+	main.battle.start([{"id": "forgetting_moth", "lv": 57}, {"id": "loose_thread", "lv": 57}, {"id": "unweaver_shuttle", "lv": 58}], {"boss": false, "theme": "magpie"})
 	main.push("battle")
 	await _wait(3.0)
 	await _shot("battle_forgetting")
@@ -1093,7 +1094,7 @@ func _lotus_shots() -> void:
 	await _wait(0.3)
 	await _skip_talk()
 	# her page
-	Game.memories = {"mem_spring": "nothing", "mem_lanterns": "two", "mem_flute": "forest"}
+	Game.memories = {"mem_spring": "nothing", "mem_lanterns": "two", "mem_flute": "forest", "mem_dance": "again"}
 	main.open_menu()
 	main.menu.mode = "yue"
 	main.menu._build()
@@ -1208,16 +1209,16 @@ func _ending_state() -> void:
 	Game.gates_open = {}
 	for gid in ["fetter_maple", "kui_drum", "liang", "xingtian"]:
 		Game.gates_open[gid] = true
-	Game.renown = 698
+	Game.renown = 716
 	Game.deeds = {}
-	for did in Trials.DEEDS.keys().slice(0, 7):
+	for did in Trials.DEEDS.keys().slice(0, 5):
 		Game.deeds[did] = true
-	Game.playtime = 62536.5
+	Game.playtime = 66222.1
 	Game.finished = true
-	Game.kills = 3127
-	Game.battles = 1700
+	Game.kills = 3223
+	Game.battles = 1741
 	Game.deaths = 0
-	Game.meditated = 11994.5
+	Game.meditated = 12057.0
 	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 3, "qi_sea": 3, "five_phase": 3, "fortune": 3, "yin_root": 3, "spirit_sense": 3, "insight": 3}
 	# the Lotus release (bonds.gd): Part XV's two trials, and Yue Ling as the bot leaves her
 	Game.trials["unweaver"] = "heart"
