@@ -723,14 +723,31 @@ func _fates_state(step_id: String, lv: int) -> void:
 	Game.outfits = {"sweeper": true, "inner": true, "hunter": true, "dragon": true, "phoenix": true, "celestial": true, "immortal": true}
 	Game.rides = {"pony": true, "sword": true, "qilin": true, "cloud": true}
 	Game.ride = "pony"
-	Game.fates = {"tala": "rider", "qiu_ye": "friend", "hu": "watchman", "xu_lan": "hunted", "liu_ying": "rival"}
+	# the first two meetings of every thread, answered as the bot answers them (bot.gd FATE_PLAN), so that
+	# the Fates page's words agree with where each person stands
+	Game.fates = {}
 	Game.fate_log = {}
-	for th in Game.fates:
+	for th in Fate.THREAD_ORDER:
 		var lg: Array = []
-		for ch in Fate.PATH[th]:
-			var v: Dictionary = FateText.CHAPTERS.get(str(ch[0]), {}).get("by", {}).values()[0] if FateText.CHAPTERS.has(str(ch[0])) else {}
-			if not v.is_empty() and lg.size() < 2:
-				lg.append(str(v.options[0].log))
+		for ch in Fate.PATH[th].slice(0, 2):
+			var sid := str(ch[0])
+			var v := Fate.variant(Game, sid)
+			var o := {}
+			for want in BOT.FATE_PLAN.get(sid, []):
+				o = Fate.option(v, str(want))
+				if not o.is_empty():
+					break
+			if o.is_empty():
+				o = v.options[0]
+			if o.has("follow"):
+				var fo: Dictionary = o.follow.options[0]
+				for want2 in BOT.FATE_PLAN.get(sid + ":follow", []):
+					if not Fate.option(o.follow, str(want2)).is_empty():
+						fo = Fate.option(o.follow, str(want2))
+						break
+				o = fo
+			Game.fates[th] = str(o.then)
+			lg.append(str(o.get("log", "")))
 		Game.fate_log[th] = lg
 	Game.heal_full()
 
@@ -739,6 +756,14 @@ func _fates_shots() -> void:
 		# (--fates=grudges: only Part XIV's grudges and Nie)
 		main.set_stack(["world"])
 		await _grudge_shots()
+		return
+	if str(main.args.get("fates", "")) == "page":
+		# (--fates=page: only the Fates page and the Bestiary)
+		main.set_stack(["world"])
+		_fates_state("s_f_qiu1", 3)
+		main.world.clear_cache()
+		main.world.load_area("sect", Vector2i(20, 12))
+		await _fates_pages()
 		return
 	# character creation over the moonlit cliff, the story's sweeper and a sweeper of one's own
 	main.set_stack(["title"])
@@ -828,7 +853,12 @@ func _fates_shots() -> void:
 	await _wait(0.8)
 	await _shot("wardrobe")
 	main.choice.press("cancel")
-	# the Fates page and the Bestiary
+	await _fates_pages()
+	# a chapter: Xu Lan in the inner sanctum, and the choice it ends in
+	await _fates_chapter_shots()
+
+## The Fates page and the Bestiary.
+func _fates_pages() -> void:
 	Game.bestiary = {"bamboo_wolf": 12, "bandit": 9, "leaf_sprite": 7, "mire_toad": 5, "bog_wraith": 4, "thunder_ape": 3}
 	Game.told = {"jade_mantis": true, "iron_fang": true, "marsh_hag": true}
 	main.open_menu()
@@ -842,7 +872,10 @@ func _fates_shots() -> void:
 	await _wait(0.4)
 	await _shot("bestiary")
 	main.pop()
-	# a chapter: Xu Lan in the inner sanctum, and the choice it ends in
+
+## A fated encounter's chapter, its choice and a fated battle; a species' story over a battle's opening;
+## then Part XIV's grudges and Nie.
+func _fates_chapter_shots() -> void:
 	_fates_state("s_f_xu1", 12)
 	Game.fates.erase("xu_lan")
 	main.world.clear_cache()
@@ -903,7 +936,7 @@ func _grudge_shots() -> void:
 		var bp2: Vector3 = main.world.wpos(Atlas.to_world(ga2, gpos2))
 		bp2.y = main.world.ground_y(bp2)
 		main.world.cam_override = Transform3D(Basis.IDENTITY, bp2 + gs2[1]).looking_at(bp2 + Vector3(0, 2.2, 0), Vector3.UP)
-		await _wait(2.2)
+		await _wait(1.4)
 		await _shot(gid2)
 		main.world.cam_override = null
 	main.battle.start([{"id": "grudge_kui", "lv": 55}], {"boss": true, "enemy": "grudge_kui", "theme": main.world.theme_name})
@@ -952,21 +985,20 @@ func _ending_state() -> void:
 	Game.grudges = {}
 	for gid in BOT.GRUDGE_PLAN:
 		Game.grudges[gid] = str(BOT.GRUDGE_PLAN[gid][0]) if gid != "grudge_marsh_hag" else "pay"
-	Game.trials = BOT.TRIAL_PLAN.duplicate()
-	Game.trials["chiyou"] = "peoples"
+	Game.trials = {"bifang": "bond", "chiyou": "peoples", "chong": "dao", "crow_marshal": "craft", "demon_lord": "respect", "fetter_maple": "relic", "founder_qing": "respect", "gonggong": "might", "gun": "craft", "heavenly_emperor": "wealth", "hollow_heaven": "craft", "horse_face": "craft", "hundun": "respect", "inferno_lord": "might", "iron_fang": "craft", "jade_ledger": "might", "king_yama": "bond", "kui_drum": "might", "li": "dao", "liang": "dao", "nie": "bond", "qianxian": "bond", "registrar_siming": "craft", "thread_matron": "respect", "thunder_roc": "craft", "tianwu": "wealth", "vermilion_bird": "wealth", "xihe": "craft", "xingtian": "wealth", "xiwangmu": "respect", "xu_fu": "dao"}
 	Game.gates_open = {}
 	for gid in ["fetter_maple", "kui_drum", "liang", "xingtian"]:
 		Game.gates_open[gid] = true
-	Game.renown = 612
+	Game.renown = 698
 	Game.deeds = {}
-	for did in Trials.DEEDS.keys().slice(0, 8):
+	for did in Trials.DEEDS.keys().slice(0, 7):
 		Game.deeds[did] = true
-	Game.playtime = 57771.0
+	Game.playtime = 62536.5
 	Game.finished = true
-	Game.kills = 3150
-	Game.battles = 1696
+	Game.kills = 3127
+	Game.battles = 1700
 	Game.deaths = 0
-	Game.meditated = 12460.0
+	Game.meditated = 11994.5
 	Game.talents = {"sword_bone": 3, "thunder_root": 3, "vajra": 3, "qi_sea": 3, "five_phase": 3, "fortune": 3, "yin_root": 3, "spirit_sense": 3, "insight": 3}
 
 ## The ending: a frame from the middle of every shot of the film (ending_<shot>.png, and all of them

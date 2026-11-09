@@ -1027,7 +1027,7 @@ func _results(a: float, slide: float) -> void:
 			lx += lw
 	var road := str(Game.trials.get("chiyou", ""))
 	if ROAD_ENDS.has(road):
-		y += 34.0
+		y += 28.0
 		var rl := "The heart reached by %s" % ROAD_ENDS[road][0]
 		_say(Vector2(x0, y), rl, UI.fit(rl, 15, w), Color("e8dcc0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	# the five fated encounters (fate.gd): how many stand with him at the end
@@ -1035,11 +1035,14 @@ func _results(a: float, slide: float) -> void:
 	for th in Fate.THREAD_ORDER:
 		if Fate.state(Game, th) in Fate.GONE:
 			fallen += 1
-	y += 24.0
+	y += 21.0
 	var fl := "Of the five he met on the road: %d stand with him%s" % [Fate.allies(Game), (", %d fallen" % fallen) if fallen > 0 else ""]
+	_say(Vector2(x0, y), fl, UI.fit(fl, 14, w), Trials.KINDS.bond.col, a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	# and the grudges that stayed where their owners fell (grudges.gd)
 	if not Game.grudges.is_empty():
-		fl += ".  Of the six old grudges: %d laid to rest" % Grudges.settled(Game)
-	_say(Vector2(x0, y), fl, UI.fit(fl, 14, w), Trials.KINDS.bond.col, a, HORIZONTAL_ALIGNMENT_CENTER, w)
+		y += 18.0
+		var up := Grudges.unpaid(Game)
+		var gl := "Of the six grudges that stayed: %d laid to rest%s" % [Grudges.settled(Game), (", %d left to the Wheel" % up) if up > 0 else ""]
+		_say(Vector2(x0, y), gl, UI.fit(gl, 14, w), UI.C_RED.lightened(0.4), a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
-	_say(Vector2(x0, r.end.y - 18.0), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)
+	_say(Vector2(x0, r.end.y - 12.0), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)
