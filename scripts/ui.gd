@@ -11,17 +11,48 @@ const C_JADE := Color("5fd6a4")
 const C_RED := Color("e0584f")
 const C_BLUE := Color("5aa9ff")
 const C_GOLD := Color("f0c860")
-const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix", "ray", "mantis", "tortoise", "tome", "scorpion", "mushroom", "mammoth", "moth", "hundun", "fox", "carp", "oxhead", "horseface", "jiangshi", "qilin", "ape", "tiger", "queen", "warden", "crowmarshal", "kaiming", "magpie", "sun_crow", "jade_rabbit", "bifang"]
+const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix", "ray", "mantis", "tortoise", "tome", "scorpion", "mushroom", "mammoth", "moth", "hundun", "fox", "carp", "oxhead", "horseface", "jiangshi", "qilin", "ape", "tiger", "queen", "warden", "crowmarshal", "kaiming", "magpie", "sun_crow", "jade_rabbit", "bifang",
+	# people met on the road who come to blows with Lin Feng (fate.gd), in their own models
+	"person:qiu_ye", "person:hu_grown", "person:xu_lan", "person:liu_ying"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font
 
+## The name the player gave the hero at character creation (fashion.gd): every "Lin Feng" drawn on
+## screen becomes it, and so do Granny Wen's "Feng'er" and the juniors' "Senior Brother Lin".  The
+## story's data keeps the name it was written with (speakers, cues and tests read it); only what is
+## drawn changes.  Names are single words of letters, so the swap can never apply twice.
+static var _rename: Array = []
+
+static func set_hero_name(family: String, given: String) -> void:
+	_rename = []
+	if family == Fashion.DEFAULT_FAMILY and given == Fashion.DEFAULT_GIVEN:
+		return
+	var subs := [["\\bLin Feng\\b", family + " " + given]]
+	if given != Fashion.DEFAULT_GIVEN:
+		subs.append(["\\bFeng'er\\b", given + "'er"])
+	if family != Fashion.DEFAULT_FAMILY:
+		subs.append(["\\bBrother Lin\\b", "Brother " + family])
+	for sb in subs:
+		var r := RegEx.new()
+		r.compile(str(sb[0]))
+		_rename.append([r, str(sb[1])])
+
+static func named(s: String) -> String:
+	if _rename.is_empty() or (s.find("Lin") < 0 and s.find("Feng") < 0):
+		return s
+	for r in _rename:
+		s = (r[0] as RegEx).sub(s, str(r[1]), true)
+	return s
+
 static func text(ci: CanvasItem, p: Vector2, s: String, size: int = 20, col: Color = C_TEXT, align: int = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
+	s = named(s)
 	ci.draw_string(font(), p + Vector2(1.5, 1.5), s, align, width, size, Color(0, 0, 0, 0.7))
 	ci.draw_string(font(), p, s, align, width, size, col)
 
 ## The largest font size from `size` down to `min_size` at which `s` fits in `width` pixels.
 static func fit(s: String, size: int, width: float, min_size: int = 10) -> int:
+	s = named(s)
 	var sz := size
 	while sz > min_size and font().get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x > width:
 		sz -= 1
@@ -29,6 +60,7 @@ static func fit(s: String, size: int, width: float, min_size: int = 10) -> int:
 
 ## `s` broken at spaces into lines that fit `width` pixels at font size `size`.
 static func wrap_lines(s: String, size: int, width: float) -> PackedStringArray:
+	s = named(s)
 	var out := PackedStringArray()
 	var cur := ""
 	for w in s.split(" ", false):
@@ -43,6 +75,7 @@ static func wrap_lines(s: String, size: int, width: float) -> PackedStringArray:
 	return out
 
 static func wrapped(ci: CanvasItem, p: Vector2, s: String, size: int, col: Color, width: float) -> void:
+	s = named(s)
 	ci.draw_multiline_string(font(), p + Vector2(1.5, 1.5), s, HORIZONTAL_ALIGNMENT_LEFT, width, size, -1, Color(0, 0, 0, 0.7))
 	ci.draw_multiline_string(font(), p, s, HORIZONTAL_ALIGNMENT_LEFT, width, size, -1, col)
 
@@ -79,7 +112,22 @@ static func menu_list(ci: CanvasItem, r: Rect2, labels: Array, cursor: int, enab
 		if i == cursor:
 			Gfx.cursor_glow(ci, Rect2(r.position.x + 8, y - size, r.size.x - 16, size + 8), Time.get_ticks_msec() / 1000.0)
 			text(ci, Vector2(r.position.x + 14, y), "> ", size, C_GOLD)
-		text(ci, Vector2(r.position.x + 38, y), str(labels[i]), size, col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		var lab := str(labels[i])
+		var tab := lab.find("\t")
+		if tab >= 0:
+			# a label with a value in a column of its own ("Nine Heavens Thunder\t22 qi"): the value
+			# right-aligned and always whole, the name made smaller to fit beside it (it used to be cut
+			# off at the panel's edge, taking the cost with it)
+			var right := lab.substr(tab + 1)
+			var left := lab.substr(0, tab)
+			var rs := maxi(11, size - 3)
+			var rw := font().get_string_size(right, HORIZONTAL_ALIGNMENT_LEFT, -1, rs).x
+			# (clear of the scroll arrows at the panel's right edge)
+			var lw := r.size.x - 48.0 - rw - 30.0
+			text(ci, Vector2(r.position.x + 38, y), left, fit(left, size, lw, 11), col, HORIZONTAL_ALIGNMENT_LEFT, lw)
+			text(ci, Vector2(r.position.x + r.size.x - 30.0 - rw, y), right, rs, C_GOLD.darkened(0.15) if on else C_DIM)
+		else:
+			text(ci, Vector2(r.position.x + 38, y), lab, size, col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
 		y += step
 	# scroll hints
 	if first > 0:

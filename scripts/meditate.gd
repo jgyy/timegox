@@ -9,6 +9,8 @@ var motes: Array = []
 var status := ""
 
 var hero: Node3D
+## the hero's look and dress the model was built for (character creation, the wardrobe)
+var hero_sig := ""
 var comp: Node3D
 var rings: Array = []
 var orbit: Node3D
@@ -43,9 +45,7 @@ func _build3d() -> void:
 	MB.mesh_node(scene3d, pond.build(MB.mat_plain()))
 	var lot := Models.lotus(Color(0.6, 0.9, 1.0), 1.3)
 	scene3d.add_child(lot)
-	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": false, "glow": Color(0.5, 0.85, 1.0), "hair": "topknot", "trim": Color("e8f0ff")})
-	hero.position = Vector3(0, 0.25, 0)
-	scene3d.add_child(hero)
+	_refresh_hero()
 	comp = Models.person(Color("e86a9a"), Color("402030"), {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "hair": "long", "eyes": Color("c04080")})
 	comp.position = Vector3(-2.6, 0.1, 0.6)
 	scene3d.add_child(comp)
@@ -85,6 +85,20 @@ func start() -> void:
 	spring = main.world.near_spring()
 	gained = 0.0
 	status = "Circulating qi..." + ("  (Spirit Spring: x3)" if spring else "")
+	_refresh_hero()
+
+## The hero on the lotus as the player made him and as he is dressed now (this screen is built once,
+## at start-up, before anybody has been made: it used to show the story's sweeper for ever).
+func _refresh_hero() -> void:
+	var sig := "%s|%s" % [str(Game.hero), Game.outfit]
+	if scene3d == null or (hero != null and sig == hero_sig):
+		return
+	hero_sig = sig
+	if hero != null:
+		hero.queue_free()
+	hero = Models.hero({"glow": Color(0.5, 0.85, 1.0)})
+	hero.position = Vector3(0, 0.25, 0)
+	scene3d.add_child(hero)
 
 func press(act: String) -> void:
 	if act == "cancel" or act == "confirm":
@@ -103,8 +117,11 @@ func _process(d: float) -> void:
 			if Game.hp[i] < Game.max_hp(i) - 0.5 or Game.qi[i] < Game.max_qi(i) - 0.5:
 				full = false
 		if Game.level < Data.MAX_LEVEL:
+			# (only what was really gained: at the peak of a realm cultivation stops until the breakthrough)
+			var lv0 := Game.level
+			var ex0 := Game.exp
 			Game.add_exp(rate * d)
-			gained += rate * d
+			gained += Game.exp - ex0 if Game.level == lv0 else rate * d
 		if Game.level > before:
 			main.pop()
 		elif Game.can_breakthrough() and full:

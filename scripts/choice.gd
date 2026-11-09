@@ -12,6 +12,9 @@ var options: Array = []
 var cursor := 0
 var cancel_ok := true
 var cb: Callable = Callable()
+## the wardrobe (Fates and Faces): called with the option under the cursor as it moves, so the world
+## can show it; the screen stays light enough to see the hero through.  Cleared when the choice ends.
+var preview: Callable = Callable()
 
 func start(t: String, opts: Array, callback: Callable, can_cancel: bool = true) -> void:
 	title = t
@@ -22,6 +25,11 @@ func start(t: String, opts: Array, callback: Callable, can_cancel: bool = true) 
 	for i in options.size():
 		if options[i].get("current", false):
 			cursor = i
+	_show()
+
+func _show() -> void:
+	if preview.is_valid() and not options.is_empty():
+		preview.call(str(options[cursor].id))
 
 func ids() -> Array:
 	return options.map(func(o): return o.id)
@@ -32,8 +40,10 @@ func press(act: String) -> void:
 	match act:
 		"up":
 			cursor = (cursor - 1 + options.size()) % options.size()
+			_show()
 		"down":
 			cursor = (cursor + 1) % options.size()
+			_show()
 		"cancel":
 			if cancel_ok:
 				_done("")
@@ -43,6 +53,7 @@ func press(act: String) -> void:
 
 func _done(id: String) -> void:
 	main.pop()
+	preview = Callable()
 	if cb.is_valid():
 		cb.call(id)
 
@@ -53,8 +64,14 @@ func _process(d: float) -> void:
 func _draw() -> void:
 	if options.is_empty():
 		return
-	# dark enough that the world HUD under it does not show through behind the title
-	draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0.02, 0.03, 0.06, 0.8))
+	# dark enough that the world HUD under it does not show through behind the title (the wardrobe
+	# leaves the middle of the screen clear, where the hero stands in his new clothes)
+	var light := preview.is_valid()
+	if light:
+		draw_rect(Rect2(Vector2.ZERO, Vector2(520, VIEW.y)), Color(0.02, 0.03, 0.06, 0.75))
+		draw_rect(Rect2(Vector2(VIEW.x - 420, 0), Vector2(420, VIEW.y)), Color(0.02, 0.03, 0.06, 0.75))
+	else:
+		draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0.02, 0.03, 0.06, 0.8))
 	UI.text(self, Vector2(60, 76), title, 24, UI.C_GOLD)
 	var labels: Array = []
 	var enabled: Array = []
@@ -66,7 +83,7 @@ func _draw() -> void:
 		enabled.append(o.get("enabled", true))
 	UI.menu_list(self, Rect2(40, 92, 470, mini(600, 40 + options.size() * 46)), labels, cursor, enabled, 20)
 	var o: Dictionary = options[cursor]
-	var r := Rect2(530, 92, 710, 420)
+	var r := Rect2(530, 92, 710, 420) if not light else Rect2(VIEW.x - 405, 92, 390, 560)
 	UI.panel(self, r)
 	var col: Color = o.get("col", UI.C_GOLD)
 	draw_rect(Rect2(r.position + Vector2(18, 20), Vector2(6, 40)), col)
@@ -76,4 +93,4 @@ func _draw() -> void:
 		UI.wrapped(self, r.position + Vector2(36, y), "\"%s\"" % o.sub, 18, UI.C_TEXT, r.size.x - 64)
 		y += 74.0
 	UI.wrapped(self, r.position + Vector2(36, y), str(o.get("desc", "")), 17, UI.C_DIM.lightened(0.35), r.size.x - 64)
-	UI.text(self, Vector2(530, 540), "Up/Down choose   Enter confirm" + ("   Esc back" if cancel_ok else ""), 15, UI.C_DIM)
+	UI.text(self, Vector2(530 if not light else 40, 540 if not light else 700), "Up/Down choose   Enter confirm" + ("   Esc back" if cancel_ok else ""), 15, UI.C_DIM)

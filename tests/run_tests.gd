@@ -589,6 +589,9 @@ func _init() -> void:
 		check(sp11.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a11 + ": four bosses and four things to find")
 		check(Data.layer_of(a11) in ["heaven", "under"], a11 + " lies in a realm above or below the land")
 		for n11 in sp11.npcs:
+			if n11.get("fate", false):
+				# (somebody met on the road, fate.gd: checked with the fated encounters)
+				continue
 			check(Data.CHAT.has(str(n11.get("asset", n11.id))) and Data.CHAT[str(n11.get("asset", n11.id))].size() >= 3, "%s has at least three things to say" % n11.id)
 			check(n11.id == "houtu" or Data.RACES.has(str(n11.get("race", ""))), "%s belongs to one of the peoples of the realms" % n11.id)
 	check(Data.layer_of("juntian") == "heaven" and Data.layer_of("changhe") == "heaven" and Data.layer_of("ninesprings") == "under" and Data.layer_of("youdu") == "under", "two regions float in the Nine Heavens and two lie in the Nine Springs")
@@ -777,6 +780,8 @@ func _init() -> void:
 		check(Look.THEMES.has(sp12.theme) and Look.EXTRA.has(sp12.theme) and Scatter.ECO.has(sp12.theme) and Fauna.KINDS.has(sp12.theme) and MapGen.DENSITY.has(sp12.theme) and Arch.SETTLE.has(sp12.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a12)
 		check(sp12.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a12 + ": four bosses and four things to find")
 		for n12 in sp12.npcs:
+			if n12.get("fate", false):
+				continue
 			check(Data.CHAT.has(str(n12.get("asset", n12.id))) and Data.CHAT[str(n12.get("asset", n12.id))].size() >= 3, "%s has at least three things to say" % n12.id)
 			check(Assets.PEOPLE.has(str(n12.get("asset", n12.id))), "%s is Blender-built" % n12.id)
 	var sea_w := Atlas.world_of("sea")
@@ -866,7 +871,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -904,6 +909,13 @@ func _init() -> void:
 						ok = ok and (str(n[1]) == "" or Data.DAOS.has(str(n[1]))) and int(n[2]) < Data.DAO_RANKS.size()
 					"standing":
 						ok = ok and Data.RACES.has(str(n[1])) and int(n[2]) <= Data.KIN
+					"fate":
+						# a fated encounter in one of the states its story can reach (fate.gd)
+						ok = ok and Fate.THREADS.has(str(n[1])) and n[2] is Array and not (n[2] as Array).is_empty()
+						for stn in n[2]:
+							ok = ok and FateText.STATES.get(str(n[1]), {}).has(str(stn))
+					"bonds":
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Fate.THREAD_ORDER.size()
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1014,8 +1026,9 @@ func _init() -> void:
 	var trial_boss: Dictionary = Data.make_enemy("demon_lord", 12, 1.5, 1.15)
 	check(trial_boss.maxhp > weak_boss.maxhp * 1.4 and trial_boss.atk > weak_boss.atk * 1.1, "a trial's boss is stronger than the same boss unguarded")
 	print("== part XIII: the Eight Gates ==")
-	check(Data.REALMS.size() == 19 and Data.REALMS[18] == "Myriad Daos as One" and Data.MAX_LEVEL == 54 and Data.level_name(54).ends_with("Myriad Daos as One"), "Part XIII adds the Myriad Daos as One realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break18" and Data.DIALOGUE.has("recall11") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break17\": \"recall11\""), "Part XIII follows Ten Thousand Waters Return (recall11) and ends the game")
+	check(Data.REALMS[18] == "Myriad Daos as One" and Data.level_name(54).ends_with("Myriad Daos as One"), "Part XIII adds the Myriad Daos as One realm")
+	# (Part XIII no longer ends the game: Part XIV follows its breakthrough, see below)
+	check(Data.step_index("s_break18") < Data.step_index("s_p14_home") and Data.DIALOGUE.has("recall11") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break17\": \"recall11\""), "Part XIII follows Ten Thousand Waters Return (recall11)")
 	check(Trials.GATES.size() == 8 and Trials.GATES_NEEDED == 4, "eight gates, any four of which break the lock")
 	var gate_layers := {}
 	var gate_areas := {}
@@ -1050,7 +1063,8 @@ func _init() -> void:
 		var mw := MapGen.build(a6)
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis))
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
-	check(bands == 8, "the war-bands march in every gate's region, the heart's among them (%d)" % bands)
+	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
+	check(p13_bands == 8 and bands == 9, "the war-bands march in every gate's region, the heart's among them (%d), and Part XIV's grudges round the Wheel" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1103,6 +1117,8 @@ func _init() -> void:
 		var houses: int = Data.AREAS[tn[0]].get("buildings", []).size()
 		check(folk >= tn[1] and houses >= 4, "%s is a town: %d townsfolk and %d buildings you can enter" % [tn[0], folk, houses])
 		for n10 in Data.AREAS[tn[0]].get("npcs", []):
+			if n10.get("fate", false):
+				continue
 			check(Data.CHAT.has(n10.id) and Data.CHAT[n10.id].size() >= 3, "%s has at least three things to say" % n10.id)
 			check(Assets.PEOPLE.has(n10.id) and Assets.has(Assets.PEOPLE[n10.id]), "%s is Blender-built" % n10.id)
 	for rid2 in Atlas.all_region_ids():
@@ -1376,5 +1392,310 @@ func _init() -> void:
 	Props.use({"kind": "prop", "id": "test:bed", "prop": "bed", "pos": Vector2i.ZERO}, PG)
 	check(PG.hp[0] == float(PG.max_hp(0)) and PG.qi[1] == float(PG.max_qi(1)), "a sleep in a bed restores everybody")
 	PG.free()
+	_fates_and_faces()
 	# the rest (every script compiles) runs on the first frame, see _process
 	finished = true
+
+## The Fates and Faces release: character creation, outfits, rides, the bestiary and the fated
+## encounters (their story machinery: every state any choice can lead to has a chapter written for it,
+## so no thread can run into a dead end), and Part XIV.
+func _fates_and_faces() -> void:
+	print("== bugs fixed in this release ==")
+	# a cylinder or a cone of an uncommon number of sides was drawn as a box (the great drum, the halls'
+	# columns, the pillars of heaven): now built round, at the unit height the box had
+	var c10: Array = MB._proto("cyl10")
+	var cone5: Array = MB._proto("cone5")
+	var ys10 := Vector2(INF, -INF)
+	var top5 := 0.0
+	for v10 in c10[0]:
+		ys10 = Vector2(minf(ys10.x, v10.y), maxf(ys10.y, v10.y))
+	for v5 in cone5[0]:
+		if v5.y > 0.49:
+			top5 = maxf(top5, Vector2(v5.x, v5.z).length())
+	check((c10[0] as PackedVector3Array).size() > 24 and is_equal_approx(ys10.y - ys10.x, 1.0) and top5 < 0.01, "a ten-sided cylinder is round and a unit tall, a five-sided cone comes to a point")
+	# the people met on the road lost their "fate" mark on the way into the world, so all of them stood
+	# about from the first morning (two Qiu Yes in the courtyard) and only ever said "..."
+	var sect_ents: Array = MapGen.build("sect").ents
+	var qy: Array = sect_ents.filter(func(e): return str(e.get("id", "")) == "qiu_ye" or str(e.get("id", "")) == "qiu_ye_end")
+	var BG = load("res://scripts/game.gd").new()
+	BG.reset()
+	check(qy.size() == 2 and qy.all(func(e): return e.get("fate", false)) and not Fate.present(BG, "qiu_ye_end") and not Fate.present(BG, "qiu_ye"), "the people met on the road carry their mark into the world, and stand there only when the story has them there")
+	# training stones at the peak of a realm used up their time and taught nothing; below it, what they
+	# taught was set straight into the cultivation bar, so a stage reached was not reached
+	var cap_lv := 0
+	while not Data.realm_cap(cap_lv):
+		cap_lv += 1
+	BG.level = cap_lv
+	BG.exp = 0.0
+	var tstones := {"kind": "prop", "id": "test:stones2", "prop": "stones", "pos": Vector2i.ZERO}
+	Props.use(tstones, BG)
+	check(BG.exp == 0.0 and not BG.prop_t.has("test:stones2"), "at the peak of a realm the training stones teach nothing, and keep their time")
+	BG.level = 0
+	BG.exp = float(BG.exp_need()) - 0.5
+	Props.use(tstones, BG)
+	check(BG.level == 1, "the cultivation the stones teach can complete a stage")
+	BG.free()
+	print("== character creation ==")
+	for lk in Fashion.LOOK_ORDER:
+		var asset: String = str(Fashion.LOOKS[lk].asset)
+		check(Assets.PEOPLE.has(asset) and Assets.has(Assets.PEOPLE[asset]), "the look %s is Blender-built (%s)" % [lk, asset])
+		var hm := Assets.instance(Assets.PEOPLE[asset])
+		var hap: AnimationPlayer = hm.get_meta("ap", null)
+		for clip in ["ride", "ride_idle", "ride_stand", "sit_bench", "attack", "talk"]:
+			check(hap != null and hap.has_animation(clip), "the look %s can %s" % [lk, clip])
+		hm.free()
+	var yap: AnimationPlayer = Assets.person("yue_ling").get_meta("ap", null)
+	check(yap != null and yap.has_animation("ride") and yap.has_animation("ride_stand"), "Yue Ling rides pillion and stands on the vehicles")
+	check(Fashion.HAIR.size() >= 5 and Fashion.EYES.size() >= 5 and Fashion.ROBES.size() >= 5 and Fashion.FAMILY.size() >= 8 and Fashion.GIVEN.size() >= 8, "enough hair, eyes, robes and names to choose from")
+	var fx_keys := ["hp", "qi", "atk", "spd", "miss", "heal", "taken", "stones", "exp", "cost"]
+	for oid in Fashion.ORIGIN_ORDER:
+		var o: Dictionary = Fashion.ORIGINS[oid]
+		var ok_fx := true
+		for k in o.fx:
+			ok_fx = ok_fx and k in fx_keys
+		check(ok_fx and str(o.desc).length() > 60 and Fashion.ORIGIN_LINES.intro.has(oid) and Fashion.ORIGIN_LINES.ending.has(oid), "origin %s: its strength, its story, its words in the prologue and the ending" % oid)
+	check(Fashion.clean_name(" bAi7 ") == "Bai" and Fashion.clean_name("123") == "", "a typed name keeps its letters, capitalised")
+	UI.set_hero_name("Bai", "Chen")
+	var once := UI.named("Lin Feng's broom. Senior Brother Lin! Feng'er, come in.")
+	check(once == "Bai Chen's broom. Senior Brother Bai! Chen'er, come in." and UI.named(once) == once, "the chosen name replaces the story's on screen, once (%s)" % once)
+	check(UI.named("Lin Shan and Feng Meng and Warden Feng") == "Lin Shan and Feng Meng and Warden Feng", "other people's names are left alone")
+	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
+	var CG = load("res://scripts/game.gd").new()
+	CG.reset()
+	var hp_plain: int = CG.max_hp(0)
+	CG.create_hero({"family": "Su", "given": "Ming", "look": "wild", "hair": 2, "eyes": 1, "robe": 3, "origin": "fisher"})
+	check(CG.hero_name() == "Su Ming" and CG.max_hp(0) > hp_plain and CG.fighter(0).spd < Data.speed(0), "an origin's strength and weakness are felt (a ferry-hand: health up, speed down)")
+	var cols := Fashion.hero_colors(CG)
+	check(cols.has("hair") and cols.has("eyes") and cols.has("robe") and cols.has("trim"), "the hero is drawn in the colours chosen")
+	var hm2 := Models.hero({"look": "wild", "cols": cols, "outfit": "sweeper"})
+	var recol := 0
+	for mi in hm2.get_meta("meshes", []):
+		var arr: Array = (mi as MeshInstance3D).mesh.surface_get_arrays(0)
+		var cs: PackedColorArray = arr[Mesh.ARRAY_COLOR]
+		var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
+		var ps: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		var want: Color = (cols.robe as Color).srgb_to_linear()
+		for i in cs.size():
+			if Assets.hero_part(cs[i], uvs[i], ps[i], false) == "robe" and absf(cs[i].h - want.h) < 0.06:
+				recol += 1
+	check(recol > 500, "the robe is recoloured on the model (%d vertices)" % recol)
+	hm2.free()
+	print("== outfits and rides ==")
+	for oid2 in Fashion.OUTFIT_ORDER:
+		var od: Dictionary = Fashion.OUTFITS[oid2]
+		var ok2: bool = od.cols.size() == 3
+		for k2 in od.fx:
+			ok2 = ok2 and k2 in fx_keys
+		for acc in od.acc:
+			ok2 = ok2 and Fashion.ACCESSORY_BONES.has(acc)
+		var src := 0
+		if od.has("step"):
+			src += 1
+			ok2 = ok2 and Data.step_index(str(od.step)) >= 0
+		if od.has("buy"):
+			src += 1
+			ok2 = ok2 and Data.step_index(str(od.get("after", ""))) >= 0
+		if od.has("fate") or od.has("origin"):
+			src += 1
+		check(ok2 and (src > 0 or oid2 == "sweeper") and str(od.desc).length() > 40, "outfit %s: colours, passives, accessories and a way to earn it" % oid2)
+	for acc2 in Fashion.ACCESSORY_BONES:
+		var an := Models.accessory(acc2, Color("f0c850"))
+		check(an.get_child_count() > 0, "accessory %s builds" % acc2)
+		an.free()
+	var dressed := Models.hero({"outfit": "celestial"})
+	check(dressed.find_children("acc_pauldrons*", "BoneAttachment3D", true, false).size() == 2, "an outfit's pauldrons hang on both shoulders")
+	dressed.free()
+	var kinds := {}
+	for rid in Fashion.RIDE_ORDER:
+		var rd: Dictionary = Fashion.RIDES[rid]
+		kinds[rd.kind] = true
+		check(float(rd.speed) > 1.0 and (rd.has("step") or rd.has("pick") or rid == "pony") and (not rd.has("step") or Data.step_index(str(rd.step)) >= 0), "ride %s: faster than running and earned somewhere" % rid)
+		var rn := Models.ride(rid)
+		check(rn.get_child_count() > 0, "ride %s builds" % rid)
+		rn.free()
+	check(kinds.has("mount") and kinds.has("vehicle"), "mounts to sit astride and vehicles to stand on")
+	check(Assets.has(Assets.MOUNTS.horse), "the horse is Blender-built")
+	var horse := Assets.mount("horse")
+	var hap2: AnimationPlayer = horse.get_meta("ap", null)
+	check(hap2 != null and hap2.has_animation("idle") and hap2.has_animation("walk") and hap2.has_animation("run"), "the horse stands, walks and gallops")
+	horse.free()
+	CG.grant_ride("sword")
+	CG.grant_ride("pony")
+	check(CG.ride == "sword", "a slower ride does not replace a faster one in the saddle")
+	CG.grant_outfit("dragon")
+	check(CG.wear("dragon") and Fashion.gear(CG, "taken") < 0.0, "an outfit's passive is worn with it")
+	print("== the bestiary ==")
+	var no_story: Array = []
+	for eid in Data.ENEMIES:
+		var boss: bool = Data.ENEMIES[eid].get("boss", false)
+		if (boss and not Lore.BOSS.has(eid)) or (not boss and not Lore.BEAST.has(eid)):
+			no_story.append(eid)
+	check(no_story.is_empty(), "every foe has a story (missing: %s)" % str(no_story))
+	var dfont := ThemeDB.fallback_font
+	var too_long: Array = []
+	for bid in Lore.BOSS:
+		check(Data.ENEMIES.has(bid), "the story of %s is of a real foe" % bid)
+		for ln in Lore.BOSS[bid]:
+			var par := TextParagraph.new()
+			par.add_string(str(ln), dfont, 22)
+			par.width = 1100
+			if par.get_line_count() > 4:
+				too_long.append(bid)
+	check(too_long.is_empty(), "every boss's story fits the dialogue box (too long: %s)" % str(too_long))
+	print("== fated encounters ==")
+	for th in Fate.THREAD_ORDER:
+		var path: Array = Fate.PATH[th]
+		var reach := {"": true}
+		for k in path.size():
+			var sid: String = path[k][0]
+			var npc: String = path[k][1]
+			var ch: Dictionary = FateText.CHAPTERS.get(sid, {})
+			check(not ch.is_empty(), "%s: chapter %s is written" % [th, sid])
+			if k < path.size() - 1:
+				var si := Data.step_index(sid)
+				check(si >= 0 and Data.STEPS[si].kind == "fate" and str(Data.STEPS[si].npc) == npc, "%s: chapter %s is a step of the story, with %s" % [th, sid, npc])
+				if k > 0:
+					check(si > Data.step_index(str(path[k - 1][0])), "%s: chapter %s comes after the one before" % [th, sid])
+			else:
+				check(Data.STEPS[Data.step_index(Fate.FINALE_STEP)].npcs.has(npc), "%s: the last chapter is settled in Part XIV, with %s" % [th, npc])
+			var placed := false
+			for a in Data.AREAS:
+				for n in Data.AREAS[a].get("npcs", []):
+					if str(n.id) == npc:
+						placed = n.get("fate", false) and Assets.PEOPLE.has(str(n.get("asset", n.id))) and Assets.has(Assets.PEOPLE[str(n.get("asset", n.id))])
+			check(placed, "%s: %s stands in the world, Blender-built" % [th, npc])
+			check(FateText.CHAT.get(npc, []).size() >= 3, "%s: %s has three things to say afterwards" % [th, npc])
+			if ch.is_empty():
+				continue
+			var nxt := {}
+			for st in reach:
+				var v: Dictionary = ch.by.get(st, ch.by.get("*", {}))
+				check(not v.is_empty(), "%s: chapter %s is written for the state '%s' (no dead end)" % [th, sid, st])
+				var free_way := false
+				for o in v.get("options", []):
+					free_way = free_way or o.get("need", []).is_empty()
+					for f in o.get("battle", []):
+						check(Data.ENEMIES.has(str(f[0])) and int(f[1]) >= 0 and int(f[1]) <= Data.MAX_LEVEL, "%s/%s/%s: a battle with %s" % [sid, st, o.id, f[0]])
+					var gv: Dictionary = o.get("gain", {})
+					check((not gv.has("ride") or Fashion.RIDES.has(gv.ride)) and (not gv.has("outfit") or Fashion.OUTFITS.has(gv.outfit)), "%s/%s/%s: what it gives exists" % [sid, st, o.id])
+					for ik in gv.get("items", {}):
+						check(Data.ITEMS.has(ik), "%s/%s/%s: item %s exists" % [sid, st, o.id, ik])
+					var outs: Array = []
+					if o.has("follow"):
+						check(o.has("battle") and not o.follow.get("options", []).is_empty(), "%s/%s/%s: a choice after a battle" % [sid, st, o.id])
+						for fo in o.follow.options:
+							outs.append(str(fo.then))
+					else:
+						outs.append(str(o.then))
+					for ns in outs:
+						check(FateText.STATES.get(th, {}).has(ns), "%s/%s/%s: leads to a described state %s" % [sid, st, o.id, ns])
+						nxt[ns] = true
+				check(free_way, "%s/%s: at least one way needs nothing (the story can always go on)" % [sid, st])
+			reach = nxt
+		for fs in reach:
+			check(FateText.EPILOGUE.get(th, {}).has(fs), "%s: the ending tells of the final state %s" % [th, fs])
+	for tid in Fate.BONDS:
+		var bd: Array = Fate.BONDS[tid]
+		check(Trials.TRIALS.has(tid) and Trials.path(tid, "bond").kind == "bond" and Trials.path(tid, "bond").needs[0][1] == bd[0], "an old bond (%s) opens a way through the trial of %s" % [bd[0], tid])
+		var bstep := Data.step_index("s_f_" + {"tala": "tala3", "qiu_ye": "qiu3", "hu": "hu2", "xu_lan": "xu3", "liu_ying": "liu3"}[bd[0]])
+		var tstep := -1
+		for i2 in Data.STEPS.size():
+			if Data.STEPS[i2].kind == "kill" and str(Data.STEPS[i2].boss) == tid:
+				tstep = i2
+		check(bstep >= 0 and bstep < tstep, "the bond for %s is made before its trial" % tid)
+	# a thread taken step by step on a game state of its own
+	var FG = load("res://scripts/game.gd").new()
+	FG.reset()
+	FG.step = Data.step_index("s_f_qiu1")
+	var v1 := Fate.variant(FG, "s_f_qiu1")
+	var share := Fate.option(v1, "share")
+	FG.stones = 100
+	check(not Fate.option_ok(FG, share), "a choice that costs stones cannot be taken without them")
+	FG.stones = 500
+	check(Fate.option_ok(FG, share), "and can with them")
+	Fate.pay(FG, share)
+	Fate.take(FG, "qiu_ye", share)
+	check(FG.stones == 300 and Fate.state(FG, "qiu_ye") == "shared" and FG.fate_log.qiu_ye.size() == 1, "a choice is paid for, remembered and written down")
+	check(Fate.variant(FG, "s_f_qiu2") == FateText.CHAPTERS.s_f_qiu2.by.shared, "the next chapter is the one written for what was chosen")
+	FG.step = Data.step_index("s_f_qiu1")
+	check(Fate.present(FG, "qiu_ye") and not Fate.present(FG, "qiu_ye_grave") and not Fate.present(FG, "qiu_ye_end"), "a fated encounter stands where the story has them")
+	FG.fates["liu_ying"] = "apprentice"
+	check(Trials.recipe_stones("bearer_incense", FG) < int(Trials.RECIPES.bearer_incense.stones), "the Hag's apprentice makes Alchemist Mo's recipes cheaper")
+	for th2 in ["tala", "qiu_ye", "hu"]:
+		FG.fates[th2] = "ally"
+	check(Fate.allies(FG) == 3 and Trials.need_met(["bonds", 3], FG), "three friends open the way of bonds through Nie's trial")
+	FG.free()
+	CG.free()
+	print("== part XIV: the Ripening of Karma ==")
+	check(Data.REALMS.size() == 20 and Data.REALMS[19] == "Karma Fulfilled" and Data.MAX_LEVEL == 57 and Data.level_name(57).ends_with("Karma Fulfilled") and Data.REALM_INFO.size() == 20, "Part XIV adds the Karma Fulfilled realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break19" and Data.DIALOGUE.has("recall12") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break18\": \"recall12\""), "Part XIV follows Myriad Daos as One (recall12) and ends the game")
+	check(Data.step_index("s_p14_fates") > Data.step_index("s_p14_hunt") and Data.step_index("s_p14_nie") > Data.step_index("s_p14_fates"), "the threads are settled before Nie is faced")
+	check(Trials.TRIALS.has("nie") and Trials.boss_area("nie") == "wheel" and Trials.path("nie", "bond").needs[0][0] == "bonds", "Nie is a trial at the Wheel, open to the friends Lin Feng made")
+	var wb: Dictionary = Data.AREAS.wheel.warband
+	check(str(wb.vis) == "s_p14_judge" and wb.pool.all(func(pe): return Data.ENEMIES.has(pe[0]) and Lore.BEAST.has(pe[0])), "the grudges round the Wheel are new foes, with stories")
+	print("== part XIV: the grudges that stayed ==")
+	check(Data.step_index("s_p14_mirror") > Data.step_index("s_p14_fates") and Data.step_index(Grudges.STEP) == Data.step_index("s_p14_mirror") + 1
+		and Data.step_index("s_p14_nie") > Data.step_index(Grudges.STEP) and Data.DIALOGUE.has("s_p14_mirror"), "Judge Cui shows the grudges after the threads are settled, and they are laid to rest before Nie")
+	check(int(Data.STEPS[Data.step_index(Grudges.STEP)].n) == Grudges.ORDER.size() and Grudges.ORDER.size() == Grudges.GRUDGES.size(), "the grudges step asks for all six")
+	var gareas := {}
+	for gid in Grudges.ORDER:
+		var gd: Dictionary = Grudges.GRUDGES[gid]
+		var ge: Dictionary = Data.ENEMIES.get(gid, {})
+		var owner: String = str(gd.of)
+		var ga := Trials.boss_area(gid)
+		gareas[ga] = true
+		check(ge.get("boss", false) and ge.get("grudge", false) and Data.ENEMIES.has(owner) and Trials.boss_area(owner) == ga, "%s: a boss standing in the region where %s fell" % [gid, owner])
+		var placed := {}
+		for b in Data.AREAS[ga].bosses:
+			if str(b.id) == gid:
+				placed = b
+		var owner_pos := Vector2i(-99, -99)
+		for b2 in Data.AREAS[ga].bosses:
+			if str(b2.id) == owner:
+				owner_pos = b2.pos
+		check(placed.get("vis", ["", ""])[0] == Grudges.STEP and placed.pos != owner_pos and (placed.pos - owner_pos).length() <= 3.0, "%s: appears with its step, beside (not on) the place its owner fell" % gid)
+		check(Lore.BOSS.has(gid) and Data.DIALOGUE.has("pre:" + gid) and Data.DIALOGUE.has("post:" + gid), "%s: has a story, last words before the fight and words once spent" % gid)
+		var free_way := false
+		var ids := {}
+		for o in gd.options:
+			ids[str(o.id)] = true
+			check(str(o.then) in ["eased", "paid", "unpaid"] and str(o.label) != "" and str(o.desc) != "" and str(o.log) != "" and not o.get("after", []).is_empty(), "%s/%s: says what it does, is written down and has an answer" % [gid, o.id])
+			check(str(o.then) == "unpaid" or str(o.get("epilogue", "")) != "", "%s/%s: the ending tells what came of it" % [gid, o.id])
+			for n in o.get("need", []):
+				var nk := str(n[0])
+				check(nk in ["fate", "stones", "renown", "item", "rides"] and (nk != "item" or Data.ITEMS.has(str(n[1]))) and (nk != "fate" or Fate.THREADS.has(str(n[1]))), "%s/%s: needs something real" % [gid, o.id])
+			if o.get("need", []).is_empty():
+				free_way = true
+		check(ids.has("wheel") and free_way and gd.options.size() >= 2, "%s: can always be answered (the Wheel), and at least one way costs something" % gid)
+	check(gareas.size() == 6 and gareas.has("juntian") and gareas.has("guixu"), "the six grudges stand in six regions, up in the heavens and out at sea too")
+	var GG = load("res://scripts/game.gd").new()
+	GG.reset()
+	check(Grudges.nie_mult(GG) == 1.0 and Grudges.nie_line(GG) == "" and Grudges.epilogues(GG).is_empty(), "before any grudge is met, Nie is as it was")
+	GG.stones = 10
+	var tst := Grudges.option("grudge_iron_fang", "test")
+	check(not Fate.option_ok(GG, tst) and not Fate.option_ok(GG, Grudges.option("grudge_iron_fang", "son")) and Fate.option_ok(GG, Grudges.option("grudge_iron_fang", "wheel")), "a grudge's costly answers need what they cost; the Wheel needs nothing")
+	GG.stones = 40000
+	GG.fates["hu"] = "ally"
+	check(Fate.option_ok(GG, tst) and Fate.option_ok(GG, Grudges.option("grudge_iron_fang", "son")), "and a friend can answer for a father")
+	Fate.pay(GG, tst)
+	Grudges.take(GG, "grudge_iron_fang", tst)
+	check(GG.stones == 10000 and Grudges.state(GG, "grudge_iron_fang") == "paid" and Grudges.settled(GG) == 1 and Grudges.nie_mult(GG) < 1.0, "a grudge paid is remembered, and Nie is the lighter for it")
+	Grudges.take(GG, "grudge_admiral", Grudges.option("grudge_admiral", "wheel"))
+	check(Grudges.unpaid(GG) == 1 and Grudges.unpaid_names(GG) == "the Admiral" and Grudges.nie_line(GG).contains("the Admiral") and Grudges.epilogues(GG).size() == 1, "a grudge left to the Wheel is carried by Nie, and told of")
+	for gid2 in Grudges.ORDER:
+		GG.grudges[gid2] = "wheel"
+	check(Grudges.nie_mult(GG) > 1.8 and Grudges.epilogues(GG).is_empty(), "six grudges left unpaid make Nie far stronger")
+	for gid3 in Grudges.ORDER:
+		GG.grudges[gid3] = str(Grudges.GRUDGES[gid3].options[1].id)
+	check(Grudges.nie_mult(GG) < 0.8 and Grudges.nie_line(GG).begins_with("Not one") and Grudges.epilogues(GG).size() == 6, "six laid to rest leave Nie smaller, and six lines for the ending")
+	GG.step = Data.step_index(Grudges.STEP)
+	GG.grudges = {}
+	GG.poll_steps()
+	check(Data.STEPS[GG.step].id == Grudges.STEP and GG.objective_text().contains("(0/6)"), "the grudges step waits for all six")
+	for gid4 in Grudges.ORDER:
+		GG.grudges[gid4] = "wheel"
+	GG.poll_steps()
+	check(Data.STEPS[GG.step].id == "s_p14_nie", "and goes on to Nie once all six are answered")
+	GG.free()
+	var bot_src := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bot_src.contains("GRUDGE_ROUTE") and Grudges.ORDER.all(func(g): return bot_src.contains("\"%s\"" % g)), "the bot goes to every grudge and has an answer for each")

@@ -74,7 +74,7 @@ func _build3d() -> void:
 	var moon := MB.new()
 	moon.sph_hi(Vector3.ZERO, Vector3(10.0, 10.0, 10.0), Color(1, 0.9, 0.7, 0.6))
 	MB.mesh_node(scene3d, moon.build(MB.mat_aura()), Vector3(14, 12, -40))
-	hero = Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")})
+	hero = Models.hero({"glow": Color(0.4, 0.7, 1.0), "look": "sweeper", "cols": {}, "outfit": "sweeper"})
 	hero.position = Vector3(0, 0.1, 0)
 	scene3d.add_child(hero)
 	var w := Fx3D.make_weather()
@@ -82,19 +82,41 @@ func _build3d() -> void:
 	Fx3D.configure_weather(w, "petals")
 	w.position = Vector3(0, 10, 0)
 
+## The hero on the cliff as he is being made (character creation): rebuilt with the look and colours
+## chosen so far.
+func show_hero(o: Dictionary) -> void:
+	var at := hero.transform
+	hero.queue_free()
+	o["glow"] = Color(0.4, 0.7, 1.0)
+	hero = Models.hero(o)
+	hero.transform = at
+	scene3d.add_child(hero)
+
+## Whether the character creation is laid over the cliff (the camera comes in close to the hero).
+func creating() -> bool:
+	return main.top_name() == "create"
+
 func press(act: String) -> void:
 	match act:
 		"up", "down":
 			cursor = (cursor + 1) % 2
 		"confirm":
 			if cursor == 0:
-				main.new_game()
+				main.open_creation()
 			else:
 				get_tree().quit()
 
 func _process(d: float) -> void:
 	t += d
 	if not headless() and visible:
+		if creating():
+			# close in on the hero, who turns slowly on the spot, a little to the left of the choices
+			cam.position = cam.position.lerp(Vector3(-0.9, 1.55, 3.3), 1.0 - exp(-d * 4.0))
+			cam.look_at(Vector3(0.75, 1.15, 0), Vector3.UP)
+			hero.rotation.y = 0.35 + sin(t * 0.35) * 0.9
+			Models.anim_person(hero, t, false)
+			queue_redraw()
+			return
 		var a := -0.6 + sin(t * 0.2) * 0.5
 		cam.position = Vector3(sin(a) * 6.5, 1.8 + sin(t * 0.3) * 0.2, cos(a) * 6.5)
 		cam.look_at(Vector3(2.2, 1.5, 0), Vector3.UP)
@@ -103,9 +125,11 @@ func _process(d: float) -> void:
 		queue_redraw()
 
 func _draw() -> void:
+	if creating():
+		return
 	Gfx.title_text(self, Vector2(0, 170), "Ascension of the Azure Cloud", 56, VIEW.x, t)
 	UI.text(self, Vector2(0, 214), "A Xianxia Cultivation RPG  -  now in 3D", 22, UI.C_TEXT, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	draw_line(Vector2(380, 228), Vector2(900, 228), Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, 0.6), 2.0)
 	Gfx.diamond(self, Vector2(640, 228), 7.0, UI.C_GOLD)
 	UI.menu_list(self, Rect2(520, 380, 240, 110), labels, cursor, enabled, 24)
-	UI.text(self, Vector2(0, 700), "Arrows/WASD move  -  Q/E camera  -  Enter/Z confirm  -  Esc menu", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
+	UI.text(self, Vector2(0, 700), "Arrows/WASD move  -  Q/E camera  -  R ride  -  Enter/Z confirm  -  Esc menu", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)

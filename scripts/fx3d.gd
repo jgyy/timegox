@@ -988,6 +988,46 @@ static func drift(parent: Node3D, pos: Vector3, col: Color, kind: String = "glow
 	var tm := parent.get_tree().create_timer(life * 2.0 + 0.3)
 	tm.timeout.connect(p.queue_free)
 
+## Soot smouldering off a grudge (grudges.gd, Part XIV): dark smoke rising round the body for as long as
+## it stands, with a few grudge-red embers and tally-slips of ash drifting up in it.
+static func soot(parent: Node3D, col: Color) -> void:
+	if headless() or parent == null:
+		return
+	var smoke := CPUParticles3D.new()
+	smoke.mesh = quad("smoke", 0.9, false)
+	smoke.amount = 18
+	smoke.lifetime = 2.6
+	smoke.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	smoke.emission_sphere_radius = 0.55
+	smoke.direction = Vector3(0, 1, 0)
+	smoke.spread = 20.0
+	smoke.initial_velocity_min = 0.35
+	smoke.initial_velocity_max = 0.7
+	smoke.gravity = Vector3(0, 0.12, 0)
+	smoke.scale_amount_min = 0.7
+	smoke.scale_amount_max = 1.4
+	smoke.color = Color(col.r * 0.25, col.g * 0.18, col.b * 0.22, 0.55)
+	smoke.color_ramp = _fade_ramp(0.8)
+	smoke.position = Vector3(0, 0.9, 0)
+	smoke.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(smoke)
+	var embers := CPUParticles3D.new()
+	embers.mesh = quad("glow", 0.16)
+	embers.amount = 12
+	embers.lifetime = 2.0
+	embers.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	embers.emission_sphere_radius = 0.6
+	embers.direction = Vector3(0, 1, 0)
+	embers.spread = 35.0
+	embers.initial_velocity_min = 0.4
+	embers.initial_velocity_max = 0.9
+	embers.gravity = Vector3(0, 0.2, 0)
+	embers.color = Color(1.0, 0.3, 0.42, 0.9)
+	embers.color_ramp = _fade_ramp()
+	embers.position = Vector3(0, 0.8, 0)
+	embers.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(embers)
+
 ## A small glint and a few stars rising: a blessing at a statue, herbs found, a lamp lit.
 static func glimmer(parent: Node3D, pos: Vector3, col: Color = Color(1.0, 0.9, 0.6)) -> void:
 	if headless() or parent == null or not parent.is_inside_tree():
