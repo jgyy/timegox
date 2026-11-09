@@ -595,7 +595,21 @@ static func _proto(key: String) -> Array:
 			var pr := PrismMesh.new()
 			m = pr
 		_:
-			m = BoxMesh.new()
+			# a cylinder or cone of any other number of sides (a drum of 20, a column of 10, a spire of
+			# 5): these used to fall through to a box, so round drums, hall columns and spires were drawn
+			# square.  Built here at the documented unit height, the height the box gave them, so they
+			# keep their size and simply turn round.
+			var sides := key.trim_prefix("cyl").trim_prefix("cone")
+			if (key.begins_with("cyl") or key.begins_with("cone")) and sides.is_valid_int() and int(sides) >= 3:
+				var cn := CylinderMesh.new()
+				cn.radial_segments = int(sides)
+				cn.rings = 1
+				cn.height = 1.0
+				if key.begins_with("cone"):
+					cn.top_radius = 0.0
+				m = cn
+			else:
+				m = BoxMesh.new()
 	var arr := m.get_mesh_arrays()
 	var out := [arr[Mesh.ARRAY_VERTEX], arr[Mesh.ARRAY_NORMAL], arr[Mesh.ARRAY_INDEX]]
 	_protos[key] = out
@@ -619,8 +633,10 @@ func _shade(p: Vector3, col: Color) -> Color:
 	var f := lerpf(1.0 - ao_strength, 1.0, k)
 	return Color(col.r * f, col.g * f, col.b * f, col.a)
 
-## Add a unit primitive transformed by `xf` (all prototypes have unit size: box 1x1x1, sphere diameter 1,
-## cylinder/cone radius 0.5 and height 1, torus outer diameter 1).
+## Add a unit primitive transformed by `xf` (prototypes have unit size: box 1x1x1, sphere diameter 1,
+## cylinder/cone radius 0.5 and height 1, torus outer diameter 1; except that the standard cylinders and
+## cones, cyl4/6/8/14/24 and cone4/6/8/14, are Godot's own meshes and two units tall, the height every
+## model built on them was shaped with).
 func prim(key: String, xf: Transform3D, col: Color) -> void:
 	var p := _proto(key)
 	var pv: PackedVector3Array = p[0]

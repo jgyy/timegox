@@ -66,6 +66,24 @@ var pastimes := {}
 var prop_uses := {}
 var prop_found := {}
 var prop_t := {}
+## Fates and Faces (fashion.gd, fate.gd, lore.gd): who the player made Lin Feng (name, look, colours,
+## origin), the outfits he owns and wears, the rides he owns, the one he summons and whether he is in
+## the saddle; the fated encounters (thread -> its state, and the choices made in it, in order); the
+## small choices of the road (a choice id -> the option taken); the foes he has met (species -> how
+## many battles) and the bosses whose story has been told
+var hero := {}
+var outfits := {}
+var outfit := "sweeper"
+var rides := {}
+var ride := ""
+var riding := false
+var fates := {}
+var fate_log := {}
+var picks := {}
+var bestiary := {}
+var told := {}
+## the grudges that stayed (grudges.gd, Part XIV): grudge boss id -> the option taken once it was spent
+var grudges := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -118,6 +136,19 @@ func reset() -> void:
 	prop_uses = {}
 	prop_found = {}
 	prop_t = {}
+	hero = Fashion.default_hero()
+	outfits = {"sweeper": true}
+	outfit = "sweeper"
+	rides = {}
+	ride = ""
+	riding = false
+	fates = {}
+	fate_log = {}
+	picks = {}
+	bestiary = {}
+	told = {}
+	grudges = {}
+	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
 	note("Journey begins")
@@ -133,13 +164,16 @@ func party_size() -> int:
 	return 2 if companion else 1
 
 func member_name(i: int) -> String:
+	# (the name the player chose is put on screen by UI.named: the story's data keeps "Lin Feng")
 	return "Lin Feng" if i == 0 else "Yue Ling"
 
 func max_hp(i: int) -> int:
-	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * (1.0 + talent_mod("hp") if i == 0 else 1.0))
+	# (his origin and outfit build his body only, not Yue Ling's: Fashion.gear)
+	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else 1.0))
 
 func max_qi(i: int) -> int:
-	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * (1.0 + talent_mod("qi") if i == 0 else 1.0))
+	# (his origin and his outfit may widen or narrow his dantian: Fashion.gear)
+	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * ((1.0 + talent_mod("qi")) * (1.0 + Fashion.gear(self, "qi")) if i == 0 else 1.0))
 
 func fighter(i: int) -> Dictionary:
 	var a := float(Data.atk(level)) * (1.0 + 0.12 * temper) * boon("atk", 1.0)
@@ -213,7 +247,7 @@ func dao_skills(i: int) -> Array:
 
 ## What a technique costs to use (the Cauldron's Dao makes them cheaper).
 func skill_cost(id: String) -> float:
-	var c := float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0) * (1.0 - talent_mod("cost"))
+	var c := float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0) * (1.0 - talent_mod("cost")) * (1.0 - Fashion.gear(self, "cost"))
 	# the crown of the Five-Phase Root: techniques that strike every foe cost a fifth less
 	if talent_crown("five_phase") and str(Data.SKILLS[id].tgt) == "all":
 		c *= 0.8
@@ -356,6 +390,14 @@ func boon(key: String, fallback: float) -> float:
 				v *= 1.1
 			"exp":
 				v *= 1.06
+	# who he was before the sect (his origin) and what he wears (Fates and Faces): small strengths and
+	# small weaknesses through the same channels
+	var gv := Fashion.gear(self, key) if key != "hp" else 0.0
+	if gv != 0.0:
+		if key == "spd" or key == "miss":
+			v += gv
+		else:
+			v *= 1.0 + gv
 	return v
 
 func heal_full() -> void:
@@ -441,6 +483,12 @@ func advance() -> void:
 	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
 	for race in Data.AREAS.get(str(s.get("area", "")), {}).get("races", []):
 		race_gain(race, 8 if s.kind == "kill" else 5)
+	# an outfit or a ride the story gives here (the Elder's robe, the flying sword, an immortal's cloud)
+	for rw in Fashion.step_rewards(str(s.id)):
+		if rw[0] == "outfit":
+			grant_outfit(str(rw[1]))
+		else:
+			grant_ride(str(rw[1]))
 	step += 1
 	hunt = 0
 	if step >= Data.STEPS.size():
@@ -469,9 +517,12 @@ func poll_steps() -> void:
 			"gates":
 				# Part XIII: any of the Eight Gates, in any order
 				ok = gates_open.size() >= int(s.n)
-			"visits":
-				# any of the people named, in any order
+			"visits", "fates":
+				# any of the people named, in any order (Part XIII's invitations, Part XIV's five threads)
 				ok = visits_done(s) >= int(s.n)
+			"grudges":
+				# Part XIV: the grudges that stayed, in any order, each fought and then answered
+				ok = grudges.size() >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -489,8 +540,12 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(hunt, s.n), s.n]
 	elif s.kind == "gates":
 		t += "  (%d/%d)" % [mini(gates_open.size(), int(s.n)), int(s.n)]
-	elif s.kind == "visits":
+	elif s.kind == "visits" or s.kind == "fates":
 		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
+	elif s.kind == "grudges":
+		t += "  (%d/%d)" % [mini(grudges.size(), int(s.n)), int(s.n)]
+	elif s.kind == "fate":
+		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":
 		# a trial: more than one way to prepare for it (Esc > Journal)
 		t += "  - a trial: Esc > Journal"
@@ -563,6 +618,65 @@ func essences() -> int:
 	for k in Trials.ESSENCE_ORDER:
 		n += int(inv.get(k, 0))
 	return n
+
+# ---------------------------------------------------------------- who he is, what he wears and rides (fashion.gd)
+func hero_name() -> String:
+	return Fashion.full_name(hero)
+
+## Set who the player made him at creation: name, look, colours and origin; the origin's keepsakes are
+## given now, and so is the outfit a hunter's orphan grew up in.
+func create_hero(h: Dictionary) -> void:
+	hero = Fashion.default_hero()
+	for k in h:
+		hero[k] = h[k]
+	UI.set_hero_name(str(hero.family), str(hero.given))
+	var o := Fashion.origin_of(self)
+	for k2 in o.give:
+		if k2 == "stones":
+			stones += int(o.give[k2])
+		else:
+			add_item(k2, int(o.give[k2]))
+	for oid in Fashion.OUTFITS:
+		if str(Fashion.OUTFITS[oid].get("origin", "")) == str(hero.origin):
+			outfits[oid] = true
+	# the dantian and body the origin gives start full
+	hp[0] = float(max_hp(0))
+	qi[0] = float(max_qi(0))
+	note("%s, %s, sets out" % [hero_name(), str(o.short)])
+
+func grant_outfit(id: String) -> void:
+	if outfits.has(id) or not Fashion.OUTFITS.has(id):
+		return
+	outfits[id] = true
+	toast("New outfit: %s (Esc > Wardrobe)" % Fashion.OUTFITS[id].n)
+	note("Received the " + str(Fashion.OUTFITS[id].n))
+
+## Put on an outfit he owns: the passives change at once, and the health and qi it widens are filled.
+func wear(id: String) -> bool:
+	if not outfits.has(id) or id == outfit:
+		return false
+	var hp_r: float = hp[0] / float(max_hp(0))
+	var qi_r: float = qi[0] / float(max_qi(0))
+	outfit = id
+	hp[0] = minf(float(max_hp(0)), float(max_hp(0)) * hp_r)
+	qi[0] = minf(float(max_qi(0)), float(max_qi(0)) * qi_r)
+	note("Dressed in the " + str(Fashion.OUTFITS[id].n))
+	return true
+
+func grant_ride(id: String) -> void:
+	if rides.has(id) or not Fashion.RIDES.has(id):
+		return
+	rides[id] = true
+	toast("New ride: %s (Esc > Stable, R to ride)" % Fashion.RIDES[id].n)
+	note("Gained a ride: " + str(Fashion.RIDES[id].n))
+	# the first ride is saddled at once; a faster one replaces a slower one he was using
+	if ride == "" or float(Fashion.RIDES[id].speed) > float(Fashion.RIDES[ride].speed):
+		ride = id
+
+## A small choice of the road (fate.gd PICKS) made: remembered for the rest of the game.
+func pick(id: String, option: String) -> void:
+	picks[id] = option
+	note("Chose: %s" % option)
 
 # ---------------------------------------------------------------- items
 func add_item(id: String, n: int = 1) -> void:

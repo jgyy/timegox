@@ -12,6 +12,7 @@ var meditate
 var title
 var ending
 var choice
+var create
 var bot = null
 var bot_active := false
 var args := {}
@@ -19,6 +20,8 @@ var toast_list: Array = []
 var chat_idx := {}
 ## the realm each townsperson last noticed in Lin Feng (Part XII)
 var greeted := {}
+## the chapter of a fated encounter being played (fate.gd), "" when none
+var fate_sid := ""
 var post: PostFX = null
 
 func _ready() -> void:
@@ -35,6 +38,7 @@ func _ready() -> void:
 	menu = _make("menu")
 	shop = _make("shop")
 	choice = _make("choice")
+	create = _make("create")
 	if DisplayServer.get_name() != "headless" and not args.has("no-post"):
 		post = PostFX.new()
 		post.name = "post"
@@ -117,6 +121,10 @@ func fx_pulse() -> void:
 func _unhandled_input(ev: InputEvent) -> void:
 	if bot_active or not (ev is InputEventKey) or not ev.pressed or ev.echo:
 		return
+	# writing a name at character creation: the keyboard types letters, not commands
+	if top_name() == "create" and create.typing != "":
+		create.type_key(ev)
+		return
 	match ev.keycode:
 		KEY_ENTER, KEY_KP_ENTER, KEY_Z, KEY_SPACE:
 			press("confirm")
@@ -128,6 +136,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_E:
 			if top_name() == "world":
 				world.rotate_cam(1)
+		KEY_R:
+			# mount up or get down (Fates and Faces: the stable)
+			press("ride")
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -144,7 +155,9 @@ func press(act: String) -> void:
 		world.press_use(act)
 		return
 	if top == "world":
-		if act == "cancel":
+		if act == "ride":
+			world.toggle_ride()
+		elif act == "cancel":
 			open_menu()
 		elif act == "confirm":
 			var e = world.face_entity()
@@ -158,7 +171,14 @@ func _process(d: float) -> void:
 		t.t -= d
 	toast_list = toast_list.filter(func(t): return t.t > 0.0)
 	while not Game.toasts.is_empty():
-		toast_list.append({"text": Game.toasts.pop_front(), "t": 3.5})
+		var txt: String = Game.toasts.pop_front()
+		# the same news again (walking into a closed Lotus Seal every frame) keeps its one line up instead
+		# of filling the corner with copies and pushing out what else was said
+		var same: Array = toast_list.filter(func(t): return t.text == txt)
+		if not same.is_empty():
+			same[0].t = 3.5
+		else:
+			toast_list.append({"text": txt, "t": 3.5})
 	while toast_list.size() > 4:
 		toast_list.pop_front()
 
@@ -217,6 +237,19 @@ func open_dao_choice(from: String) -> void:
 ## him in a quest scene, what their people think of his Dao.
 func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 	var lines: Array = Data.DIALOGUE.get(key, []).duplicate()
+	# who he was before the sect (character creation) has a word to say here and there
+	lines.append_array(origin_lines(key))
+	# the end of the climb: what became of the five whose lives he changed (fate.gd), and of the place
+	# he came from
+	if key == "post:" + str(Data.STEPS[Data.STEPS.size() - 1].id):
+		for th in Fate.THREAD_ORDER:
+			var ep := Fate.epilogue(Game, th)
+			if ep != "":
+				lines.append(["Narrator", ep])
+		# and of the grudges that stayed, the ones laid to rest (grudges.gd)
+		for ep2 in Grudges.epilogues(Game):
+			lines.append(["Narrator", ep2])
+		lines.append_array(origin_lines("ending"))
 	# the road Lin Feng took into the heart of the Eight Gates (Part XIII) tells the end its own way
 	var road: String = str(Game.trials.get("chiyou", ""))
 	if road != "":
@@ -269,19 +302,35 @@ func game_finished_ack() -> void:
 		set_stack(["title"])
 
 # ---------------------------------------------------------------- flow
-func new_game() -> void:
+## New Game: first the sweeper is made (create.gd), then the journey begins (start_journey).
+func open_creation() -> void:
+	create.start()
+	push("create")
+
+## The journey begins with the sweeper the player made (character creation).
+func start_journey(h: Dictionary) -> void:
+	new_game(h)
+
+func new_game(h: Dictionary = {}) -> void:
 	Game.reset()
+	if not h.is_empty():
+		Game.create_hero(h)
 	# a second run from the title must not inherit the last run's toasts or chat rotation
 	toast_list.clear()
 	chat_idx.clear()
 	greeted.clear()
 	world.clear_cache()
+	world.refresh_hero()
 	world.load_area("sect", Vector2i(20, 8))
 	set_stack(["world"])
-	say([
-		["Narrator", "Azure Cloud Sect, perched above the sea of clouds. For three years the orphan Lin Feng has swept its steps."],
-		["Narrator", "Today, the old Elder summons him. Walk to the Elder with the arrow keys and press Enter to speak."],
-	])
+	var intro: Array = [["Narrator", "Azure Cloud Sect, perched above the sea of clouds. For three years the orphan Lin Feng has swept its steps."]]
+	intro.append_array(origin_lines("intro"))
+	intro.append(["Narrator", "Today, the old Elder summons him. Walk to the Elder with the arrow keys and press Enter to speak."])
+	say(intro)
+
+## The lines the hero's origin (character creation, Fashion.ORIGIN_LINES) adds to a conversation.
+func origin_lines(key: String) -> Array:
+	return Fashion.ORIGIN_LINES.get(key, {}).get(str(Game.hero.get("origin", "foundling")), []).duplicate()
 
 func interact(e: Dictionary) -> void:
 	match e.kind:
@@ -316,7 +365,12 @@ func interact(e: Dictionary) -> void:
 				var need2: Dictionary = Data.STEPS[Data.step_index(str(e.open))]
 				Game.toast("The way is closed for now. (%s)" % need2.t)
 		"stele":
-			open_dao_choice("stele")
+			if Game.dao == "":
+				# (the steles stand once the Elder is ready to speak of the roads; until he has, they are
+				# only carved stone, and the first choice is his to offer)
+				say([["Narrator", "Six roads are carved on the stele, and every one runs off the edge of the stone. Elder Qing Xuan means to speak of them first."]])
+			else:
+				open_dao_choice("stele")
 		"abode":
 			open_abode(e)
 		"prop":
@@ -347,6 +401,14 @@ func talk_npc(e: Dictionary) -> void:
 				open_talent_choice()
 		)
 		return
+	# a fated encounter (fate.gd): a chapter of somebody's story, and a choice in it
+	if not s.is_empty() and s.kind == "fate" and s.npc == e.id:
+		play_chapter(str(s.id), e)
+		return
+	# Part XIV: the five threads settled in any order, each its own last chapter
+	if not s.is_empty() and s.kind == "fates" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
+		play_chapter(Fate.chapter_of_npc(str(e.id)), e)
+		return
 	# a step that asks for visits, in any order (Part XIII: the Conclave's invitations): this is one
 	if not s.is_empty() and s.kind == "visits" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
 		say(Data.DIALOGUE.get("visit:" + str(e.id), []), func():
@@ -359,6 +421,9 @@ func talk_npc(e: Dictionary) -> void:
 		)
 		return
 	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
+	# somebody met on the road (fate.gd) has their own words for afterwards
+	if e.get("fate", false):
+		chats = FateText.CHAT.get(str(e.id), ["..."]).duplicate()
 	# the peoples of the realms speak to the Dao Lin Feng walks, now and then
 	if race != "" and Game.dao != "":
 		var rl: String = str(Data.RACES[race].dao_lines.get(Game.dao, ""))
@@ -381,14 +446,17 @@ func talk_npc(e: Dictionary) -> void:
 		lines = [[e.n, str(Trials.DEEDS[deed].ask)]]
 	# townsfolk feel a cultivator's realm (Part XII): the first word after every breakthrough is about it
 	var band := Data.realm_band(Game.level)
-	if Data.CHAT.has(str(e.get("asset", e.id))) and int(greeted.get(e.id, -1)) != Game.realm() and e.id != "elder":
+	if Data.CHAT.has(str(e.get("asset", e.id))) and int(greeted.get(e.id, -1)) != Game.realm() and e.id != "elder" and not e.get("fate", false):
 		greeted[e.id] = Game.realm()
 		if band > 0:
 			lines.push_front([e.n, Data.REALM_GREETS[band] % Game.address()])
 	if e.id == "elder":
 		lines.append([e.n, "Your task: " + Game.objective_text()])
 	var after := Callable()
-	if e.id == "alchemist":
+	if e.id == "dyer_su" and _dyer_stock().size() > 0 and deed == "":
+		# Dyer Su of the Dawn Market sells outfits (fashion.gd)
+		after = func(): offer_outfits(e)
+	elif e.id == "alchemist":
 		after = func(): shop.open("alchemist"); push("shop")
 	elif e.id == "smith":
 		after = func(): shop.open("smith"); push("shop")
@@ -398,6 +466,183 @@ func talk_npc(e: Dictionary) -> void:
 		# carrying a keepsake their people love: offer it
 		after = func(): offer_gift(e)
 	say(lines, after)
+
+# ---------------------------------------------------------------- fated encounters (fate.gd)
+## A chapter of somebody's story: the variant for what Lin Feng made of them so far, then the choice.
+func play_chapter(sid: String, e: Dictionary) -> void:
+	var v := Fate.variant(Game, sid)
+	if v.is_empty():
+		return
+	fate_sid = sid
+	say(v.get("lines", []), func(): _fate_choice(sid, v))
+
+## The choice of a chapter (or of the follow-up once its battle is won): every option says what it
+## does, needs and brings; one whose needs are not met cannot be taken.  Cancelling leaves the
+## chapter to come back to.
+func _fate_choice(sid: String, v: Dictionary, outer: Dictionary = {}) -> void:
+	var th := Fate.thread_of_step(sid)
+	var opts: Array = []
+	for o in v.get("options", []):
+		var ok := Fate.option_ok(Game, o)
+		var extra := Fate.option_text(Game, o)
+		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yet", "desc": str(o.desc) + ("\n\n" + extra if extra != "" else ""),
+			"col": Fate.THREADS[th].col, "enabled": ok})
+	choose(str(v.get("ask", "What will you do?")), opts, func(pid: String):
+		if pid == "":
+			return
+		var o := Fate.option(v, pid)
+		if o.is_empty() or not Fate.option_ok(Game, o):
+			return
+		Fate.pay(Game, o)
+		if o.has("battle"):
+			fate_battle(sid, o)
+		else:
+			_fate_end(sid, o)
+	, outer.is_empty())
+
+## A chapter's fight: the option's foes, in the region where it happens.
+func fate_battle(sid: String, o: Dictionary) -> void:
+	var foes: Array = []
+	var boss := false
+	for f in o.battle:
+		foes.append({"id": str(f[0]), "lv": int(f[1])})
+		boss = boss or Data.ENEMIES[str(f[0])].get("boss", false)
+	battle.start(foes, {"boss": boss, "fate": sid, "fate_opt": o, "theme": world.theme_name})
+	push("battle")
+
+## The fight of a chapter is won: its follow-up choice, if it has one, or the end of the chapter.
+func _fate_won(sid: String, o: Dictionary) -> void:
+	if o.has("follow"):
+		var fv: Dictionary = o.follow
+		say(fv.get("lines", []), func(): _fate_choice(sid, fv, o))
+	else:
+		_fate_end(sid, o)
+
+## The end of a chapter: the thread's new state, what the option brings, the lines that follow; then
+## the story goes on (a "fate" step is done, or one of Part XIV's five is settled).
+func _fate_end(sid: String, o: Dictionary) -> void:
+	var th := Fate.thread_of_step(sid)
+	Fate.take(Game, th, o)
+	say(o.get("after", []), func():
+		var s := Game.cur_step()
+		if not s.is_empty() and s.kind == "fate" and str(s.id) == sid:
+			Game.advance()
+		elif not s.is_empty() and s.kind == "fates":
+			var npc: String = str(Fate.PATH[th][Fate.PATH[th].size() - 1][1])
+			Game.visited[npc] = true
+			Game.toast("A thread settled (%d of %d)" % [Game.visits_done(s), int(s.n)])
+			Game.poll_steps()
+		world.refresh_hero()
+	)
+
+## The small choices of the road (fate.gd PICKS), asked once after their step's own dialogue.
+func ask_picks() -> void:
+	for pid in Fate.PICKS:
+		var pk: Dictionary = Fate.PICKS[pid]
+		if Game.picks.has(pid) or not Game.done(str(pk.step)):
+			continue
+		var opts: Array = []
+		for o in pk.options:
+			opts.append({"id": str(o.id), "label": str(o.label), "desc": str(o.desc), "col": UI.C_GOLD})
+		choose(str(pk.ask), opts, func(oid: String):
+			var o2: Dictionary = {}
+			for o3 in pk.options:
+				if str(o3.id) == oid:
+					o2 = o3
+			Game.pick(pid, str(o2.get("log", oid)))
+			Game.picks[pid] = oid
+			if pid == "qilin" and oid == "ride":
+				Game.grant_ride("qilin")
+			elif pid == "qilin":
+				Game.add_renown(12)
+			say(pk.after.get(oid, []))
+		, false)
+		return
+
+## A grudge that stayed is spent (grudges.gd, Part XIV): what was it owed?  Every option says what it
+## does, needs and costs; one whose needs are not met cannot be taken, and leaving it to the Wheel
+## always can.  There is no way out of the choice: a grudge that has spoken waits for an answer.
+func ask_grudge(id: String) -> void:
+	var gd: Dictionary = Grudges.GRUDGES[id]
+	var opts: Array = []
+	for o in gd.options:
+		var ok := Fate.option_ok(Game, o)
+		var extra := Fate.option_text(Game, o)
+		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yet", "desc": str(o.desc) + ("\n\n" + extra if extra != "" else ""),
+			"col": gd.col, "enabled": ok})
+	choose(str(gd.ask), opts, func(oid: String):
+		var o := Grudges.option(id, oid)
+		if o.is_empty() or not Fate.option_ok(Game, o):
+			# (never leave a spent grudge unanswered: it could not be met again)
+			o = Grudges.option(id, "wheel")
+		Fate.pay(Game, o)
+		Grudges.take(Game, id, o)
+		say(o.get("after", []), func(): Game.poll_steps())
+	, false)
+
+# ---------------------------------------------------------------- the wardrobe, the stable, the dyer (fashion.gd)
+## The wardrobe: every outfit, the ones not yet earned greyed out with how to earn them; the hero in
+## the world changes as the cursor moves.
+func open_wardrobe() -> void:
+	var opts: Array = []
+	for id in Fashion.OUTFIT_ORDER:
+		var o: Dictionary = Fashion.OUTFITS[id]
+		var have: bool = Game.outfits.has(id)
+		var col := Color(str(o.cols[0])) if str(o.cols[0]) != "" else UI.C_GOLD
+		opts.append({"id": id, "label": str(o.n) if have else "? " + str(o.n), "note": "wearing" if id == Game.outfit else ("" if have else "not yet"),
+			"desc": str(o.desc) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.outfit})
+	choice.preview = func(id: String): world.preview_outfit(id)
+	choose("The wardrobe: what will you wear?", opts, func(id: String):
+		world.preview_outfit("")
+		if id != "" and Game.wear(id):
+			Game.toast("You wear the %s" % Fashion.OUTFITS[id].n)
+		world.refresh_hero()
+	)
+
+## The stable: the rides owned (and the ones still to be earned); choosing one saddles it and mounts.
+func open_stable() -> void:
+	var opts: Array = []
+	for id in Fashion.RIDE_ORDER:
+		var r: Dictionary = Fashion.RIDES[id]
+		var have: bool = Game.rides.has(id)
+		opts.append({"id": id, "label": str(r.n) if have else "? " + str(r.n), "note": ("riding" if Game.riding else "saddled") if id == Game.ride else ("" if have else "not yet"),
+			"desc": str(r.desc) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else "Stood on", int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
+			"col": UI.C_JADE, "enabled": have, "current": id == Game.ride})
+	opts.append({"id": "off", "label": "Go on foot", "desc": "Send the ride away and walk (R mounts again).", "col": UI.C_DIM, "enabled": Game.riding})
+	choose("The stable: what will you ride?", opts, func(id: String):
+		if id == "off":
+			Game.riding = false
+		elif id != "":
+			Game.ride = id
+			Game.riding = true
+			Game.toast("You ride the %s" % Fashion.RIDES[id].n)
+	)
+
+## What Dyer Su has for sale now (fashion.gd outfits with a price).
+func _dyer_stock() -> Array:
+	var out: Array = []
+	for id in Fashion.OUTFIT_ORDER:
+		if Fashion.outfit_for_sale(id, Game):
+			out.append(id)
+	return out
+
+func offer_outfits(e: Dictionary) -> void:
+	var opts: Array = []
+	for id in _dyer_stock():
+		var o: Dictionary = Fashion.OUTFITS[id]
+		opts.append({"id": id, "label": "%s (%d stones)" % [o.n, int(o.buy)], "desc": str(o.desc) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
+			"col": Color(str(o.cols[0])), "enabled": Game.stones >= int(o.buy)})
+	opts.append({"id": "later", "label": "Not today", "desc": "Dyer Su will keep it for you. She says that to everyone.", "col": UI.C_DIM})
+	choose("Dyer Su's stall: something to wear?", opts, func(id: String):
+		if id == "" or id == "later":
+			return
+		var o: Dictionary = Fashion.OUTFITS[id]
+		if Game.stones < int(o.buy):
+			return
+		Game.stones -= int(o.buy)
+		Game.grant_outfit(id)
+		say([[str(e.n), "It suits you. I would say that anyway, but this time it is true."]])
+	)
 
 ## A townsperson's request (trials.gd DEEDS): give them what they asked for, or come back later.
 func offer_deed(e: Dictionary, id: String) -> void:
@@ -468,6 +713,11 @@ func boss_interact(e: Dictionary) -> void:
 		if not Game.reached(Trials.GATE_STEP):
 			say([["Narrator", "%s stands in a column of gold light that will not let you near. Not yet." % d.n]])
 			return
+	elif Grudges.is_grudge(e.enemy):
+		# a grudge that stayed (grudges.gd, Part XIV): any of them, in any order, once the Mirror has shown them
+		if s.is_empty() or s.kind != "grudges" or Game.grudges.has(e.enemy):
+			say([["Narrator", "%s stands where its owner fell, muttering a sum nobody ever paid. It does not see you yet." % d.n]])
+			return
 	elif s.is_empty() or s.kind != "kill" or s.boss != e.enemy:
 		say([["Narrator", "%s looms before you, but this is not the time. Finish your current objective first." % d.n]])
 		return
@@ -476,12 +726,35 @@ func boss_interact(e: Dictionary) -> void:
 		return
 	if Trials.TRIALS.has(e.enemy):
 		# a trial (trials.gd): nobody faces this one unprepared, and there is more than one way to prepare
-		say([["Narrator", str(Trials.TRIALS[e.enemy].why)]], func(): open_trial(e))
+		var why: Array = boss_story(e.enemy)
+		why.append(["Narrator", str(Trials.TRIALS[e.enemy].why)])
+		if e.enemy == "nie" and Grudges.nie_line(Game) != "":
+			# the grudges that stayed (grudges.gd): the ones left to the Wheel are in Nie's hands
+			why.append(["Narrator", Grudges.nie_line(Game)])
+		say(why, func(): open_trial(e))
 		return
-	say(Data.DIALOGUE.get("pre:" + e.enemy, []), func():
-		battle.start([{"id": e.enemy, "lv": e.lv}], {"entity": e, "boss": true, "enemy": e.enemy, "theme": world.theme_name})
+	var pre: Array = boss_story(e.enemy)
+	pre.append_array(Data.DIALOGUE.get("pre:" + e.enemy, []))
+	say(pre, func():
+		var foe := {"id": e.enemy, "lv": e.lv}
+		if Grudges.is_grudge(e.enemy):
+			# a grudge does not listen until it has spent itself: it fights as hard as a trial's boss
+			foe["mult"] = float(Grudges.MIGHT[0])
+			foe["atk"] = float(Grudges.MIGHT[1])
+		battle.start([foe], {"entity": e, "boss": true, "enemy": e.enemy, "theme": world.theme_name})
 		push("battle")
 	)
+
+## Who a boss was before it stood in the road (lore.gd), told by the narrator the first time Lin Feng
+## comes to face it (and kept in the Bestiary); nothing the second time.
+func boss_story(id: String) -> Array:
+	if Game.told.has(id) or not Lore.BOSS.has(id):
+		return []
+	Game.told[id] = true
+	var out: Array = []
+	for ln in Lore.BOSS[id]:
+		out.append(["Narrator", str(ln)])
+	return out
 
 ## The ways through a trial, on the choice screen: each with what it needs (ticked or not) and what it
 ## does in battle; only a path whose needs are met can be taken.  Taking it pays what it costs (once),
@@ -513,6 +786,9 @@ func trial_battle(e: Dictionary, p: Dictionary) -> void:
 		# every gate opened beyond the four that break the lock takes a little off the war god
 		var extra := maxi(0, Game.gates_open.size() - Trials.GATES_NEEDED)
 		bn["foe_hp"] = float(bn.get("foe_hp", 1.0)) * (1.0 - Trials.GATE_WEAKEN * extra)
+	elif tid == "nie":
+		# every grudge left to the Wheel feeds Nie, every one laid to rest takes something off it (grudges.gd)
+		bn["foe_hp"] = float(bn.get("foe_hp", 1.0)) * Grudges.nie_mult(Game)
 	battle.start([{"id": tid, "lv": e.lv, "mult": mt[0], "atk": mt[1]}], {"entity": e, "boss": true, "enemy": tid, "theme": world.theme_name,
 		"trial": tid, "path": str(p.id), "boon": bn, "path_n": str(p.n), "path_kind": str(Trials.KINDS[p.kind].n)})
 	push("battle")
@@ -522,7 +798,10 @@ func start_breakthrough() -> void:
 	if s.is_empty() or s.kind != "breakthrough" or not Game.can_breakthrough():
 		return
 	var sid: String = s.id
-	say(Data.DIALOGUE.get("pre:" + sid, []), func():
+	# the first tribulation tells what a tribulation is (lore.gd)
+	var pre: Array = boss_story("tribulation")
+	pre.append_array(Data.DIALOGUE.get("pre:" + sid, []))
+	say(pre, func():
 		# heaven's jealousy (Part XII): the more of the Nine Heavens root is awake, the harder the test
 		battle.start([{"id": "tribulation", "lv": Game.level + 1, "mult": 1.1 * (1.0 + Data.TRIB_JEALOUSY * Game.talent_ranks())}], {"boss": true, "tribulation": true, "step": sid, "theme": "thunder"})
 		push("battle")
@@ -530,7 +809,8 @@ func start_breakthrough() -> void:
 
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
-	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11"}
+	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
+	"s_break18": "recall12"}
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story
@@ -544,7 +824,10 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 	pop() # battle
 	match outcome:
 		"win":
-			if ctx.get("tribulation", false):
+			if str(ctx.get("fate", "")) != "":
+				# the fight of a fated encounter (fate.gd): the chapter goes on
+				_fate_won(str(ctx.fate), ctx.fate_opt)
+			elif ctx.get("tribulation", false):
 				var sid: String = ctx.step
 				Game.do_breakthrough()
 				Game.advance()
@@ -580,11 +863,18 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					Game.toast("%s stands open (%d of 8)" % [gn.substr(0, 1).to_upper() + gn.substr(1), Game.gates_open.size()])
 					Game.note("Opened " + str(Trials.GATE_NAMES[ctx.enemy]))
 					Game.poll_steps()
-				else:
+				elif not Grudges.is_grudge(ctx.enemy):
 					Game.advance()
 				var post: Array = dao_dialogue("post:" + ctx.enemy)
-				if not post.is_empty():
-					say(post)
+				if Grudges.is_grudge(ctx.enemy):
+					# a grudge that stayed is spent: it says what it was owed, and waits for an answer
+					var gid: String = ctx.enemy
+					say(post, func(): ask_grudge(gid))
+				# (a small choice of the road may wait on this boss: fate.gd PICKS)
+				elif not post.is_empty():
+					say(post, func(): ask_picks())
+				else:
+					ask_picks()
 			else:
 				var e2: Dictionary = ctx.entity
 				Game.defeated[e2.id] = Game.playtime

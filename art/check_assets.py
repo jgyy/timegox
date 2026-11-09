@@ -15,7 +15,9 @@ Checks
   (idle, walk, run, sit, talk, bow, attack, cast, hurt, victory, die, and the ten cutscene gestures
   nod, shake, point, wave, laugh, grieve, think, kneel, offer and shock);
 * monsters have a skin and at least the five clips the game plays: idle and walk (loops), attack,
-  hurt and die.
+  hurt and die; mounts (the animals the party rides) idle, walk and run (the gallop);
+* the party (Lin Feng in all four of his looks, and Yue Ling) also has the interaction clips and the
+  three riding clips (ride, ride_idle, ride_stand).
 
 Exits non-zero and lists every problem if anything fails.
 """
@@ -26,8 +28,8 @@ import sys
 
 ART = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(ART)
-GROUPS = ("characters", "monsters", "props")
-BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "props": (200, 5000)}
+GROUPS = ("characters", "monsters", "mounts", "props")
+BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "mounts": (3000, 90000), "props": (200, 5000)}
 # one-off set pieces shown once (ending screen), not scattered across maps
 SET_PIECES = {"props/magpiebridge": (2000, 24000)}
 PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "hand.R", "fingers.L", "fingers.R",
@@ -35,10 +37,12 @@ PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "han
 PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die",
                 "nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock")
 MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
-# the party does things with the world's props and furniture (art/lib/person.py INTERACT)
-PARTY = ("lin_feng", "yue_ling")
+MOUNT_CLIPS = ("idle", "walk", "run")
+# the party does things with the world's props and furniture (art/lib/person.py INTERACT) and rides
+# (RIDE): Lin Feng in each of the looks a player can choose at character creation, and Yue Ling
+PARTY = ("lin_feng", "lin_feng_wanderer", "lin_feng_wild", "lin_feng_scholar", "yue_ling")
 PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir",
-               "hammer", "sweep", "weave", "lift", "toss", "touch")
+               "hammer", "sweep", "weave", "lift", "toss", "touch", "ride", "ride_idle", "ride_stand")
 MATERIALS = {"toon", "plain", "glow"}
 
 
@@ -119,6 +123,8 @@ def check_asset(group, name, path):
         if missing:
             problems.append("%s: rig lacks bones %s" % (tag, missing))
         need = PERSON_CLIPS + (PARTY_CLIPS if tag.split("/")[-1] in PARTY else ())
+    elif group == "mounts":
+        need = MOUNT_CLIPS
     else:
         need = MONSTER_CLIPS
     miss_clips = [c for c in need if c not in clips]

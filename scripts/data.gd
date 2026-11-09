@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 54
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One"]
+const MAX_LEVEL := 57
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -59,6 +59,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Sage of the Ladder", "note": "Heaven above, earth below and the middle world in your hands, held the way a ladder is held for somebody else."},
 	{"life": 0, "title": "Sage of the Ladder", "note": "Every water in the world comes home through you: the rain, the rivers, the sea and the Silver River. Nothing returns empty."},
 	{"life": 0, "title": "Sage of Many Roads", "note": "Every road you have walked runs through you at once, and you never have to choose between them. Nobody does. That was the secret all along."},
+	# Part XIV: every cause he set moving has met its effect, and nothing is owed either way
+	{"life": 0, "title": "Settled One", "note": "Every cause you set moving has come home and been answered. Nothing is owed you and you owe nothing; the threads of other lives still run through yours, but none of them pulls."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -627,6 +629,23 @@ const ENEMIES := {
 	"kui_drum": {"n": "The Drum of Kui's Hide", "elem": "thunder", "weak": "earth", "col": Color("6a5a7a"), "shape": "golem", "boss": true, "pal": {"acc": Color("c8e0ff")}},
 	"chiyou": {"n": "Chiyou, War God of the Nine Li", "elem": "phys", "weak": "fire", "col": Color("8a6a3a"), "shape": "oxhead", "boss": true, "pal": {"sec": Color("3a3a42"), "acc": Color("ff4a2a")}},
 	"tribulation": {"n": "Heavenly Tribulation", "elem": "thunder", "weak": "none", "col": Color("c8d8ff"), "shape": "storm", "boss": true},
+	# ---- Fates and Faces: people met on the road who come to blows with Lin Feng (fate.gd), in their own models
+	"qiu_ye": {"n": "Qiu Ye of the Ashen Moon", "elem": "dark", "weak": "thunder", "col": Color("2e5a48"), "shape": "person:qiu_ye", "boss": true},
+	"young_fang": {"n": "Young Fang", "elem": "phys", "weak": "water", "col": Color("8a5a34"), "shape": "person:hu_grown", "boss": true},
+	"xu_lan": {"n": "Xu Lan of the Blood Moon", "elem": "dark", "weak": "fire", "col": Color("b02848"), "shape": "person:xu_lan", "boss": true},
+	"liu_ying": {"n": "Liu Ying, the Poison Saint", "elem": "wood", "weak": "fire", "col": Color("6a8a4a"), "shape": "person:liu_ying", "boss": true},
+	# ---- Part XIV: the grudges and debts of the whole journey, and Nie, the Unpaid
+	"grudge_wisp": {"n": "Grudge Wisp", "elem": "dark", "weak": "fire", "col": Color("a8385a"), "shape": "wisp"},
+	"debt_shade": {"n": "Debt Shade", "elem": "dark", "weak": "thunder", "col": Color("5a5a7a"), "shape": "wraith"},
+	"karma_moth": {"n": "Karma Moth", "elem": "earth", "weak": "wood", "col": Color("c8a050"), "shape": "moth"},
+	"nie": {"n": "Nie, the Unpaid", "elem": "dark", "weak": "thunder", "col": Color("4a1a3a"), "shape": "hundun", "boss": true, "pal": {"sec": Color("1a0a14"), "acc": Color("ff4a8a"), "mark": Color("e8c050")}},
+	# ---- Part XIV: the grudges that stayed where their owners fell (grudges.gd), in their owners' shapes gone to soot
+	"grudge_iron_fang": {"n": "Iron Fang's Grudge", "elem": "dark", "weak": "water", "col": Color("5a2a26"), "shape": "humanoid", "boss": true, "grudge": true},
+	"grudge_marsh_hag": {"n": "The Marsh Hag's Grudge", "elem": "dark", "weak": "fire", "col": Color("3a2444"), "shape": "wraith", "boss": true, "grudge": true, "pal": {"sec": Color("140a18"), "acc": Color("ff4a7a")}},
+	"grudge_headless_saint": {"n": "The Headless Saint's Grudge", "elem": "dark", "weak": "thunder", "col": Color("4a4a5c"), "shape": "demon", "boss": true, "grudge": true},
+	"grudge_fangfeng": {"n": "Fangfeng's Grudge", "elem": "earth", "weak": "wood", "col": Color("3c4434"), "shape": "humanoid", "boss": true, "grudge": true},
+	"grudge_kui": {"n": "Kui's Grudge", "elem": "thunder", "weak": "earth", "col": Color("3a4252"), "shape": "mammoth", "boss": true, "grudge": true, "pal": {"acc": Color("ff5a7a")}},
+	"grudge_admiral": {"n": "The Admiral's Grudge", "elem": "water", "weak": "thunder", "col": Color("28323c"), "shape": "wraith", "boss": true, "grudge": true, "pal": {"sec": Color("10161c"), "acc": Color("ffd060")}},
 }
 
 ## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
@@ -706,6 +725,9 @@ const AREAS := {
 			{"to": "longmen", "pos": Vector2i(12, 1), "dest": Vector2i(4, 30), "open": "s_p10_road"},
 		],
 		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "qiu_ye", "n": "Qiu Ye", "pos": Vector2i(23, 12), "col": Color("2e5a48"), "fate": true},
+			{"id": "qiu_ye_end", "n": "Qiu Ye", "pos": Vector2i(25, 12), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},
 			{"id": "gardener_ruan", "n": "Herb-Gardener Ruan", "pos": Vector2i(24, 14), "col": Color("5a8a4a")},
 			{"id": "xiao_qing", "n": "Outer Disciple Xiao Qing", "pos": Vector2i(17, 15), "col": Color("7aa0d0"), "vis": ["s_p4_home", ""]},
 			{"id": "elder", "n": "Elder Qing Xuan", "pos": Vector2i(20, 4), "col": Color("e8e8ff")},
@@ -763,6 +785,8 @@ const AREAS := {
 		# Cloudfoot: the post town where the north road leaves the mountain for the river (a main
 		# street up from the sect's north gate and a cross street between the inns)
 		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "tala_end", "n": "Tala of the Horse-Folk", "pos": Vector2i(106, 32), "col": Color("d8a04a"), "asset": "tala", "fate": true},
 			{"id": "courier_ma", "n": "Courier Ma of the Nine Roads", "pos": Vector2i(83, 32), "col": Color("3a6a4a")},
 			{"id": "noodle_he", "n": "Granny He of the Noodle Stall", "pos": Vector2i(85, 37), "col": Color("a8503a")},
 			{"id": "clerk_wei", "n": "Wei, Who Collected Taxes for the Court", "pos": Vector2i(79, 36), "col": Color("4a4a5a"), "vis": ["s_p5_home", ""]},
@@ -820,10 +844,14 @@ const AREAS := {
 			{"to": "sect", "pos": Vector2i(1, 22), "dest": Vector2i(36, 13), "open": ""},
 			{"to": "marsh", "pos": Vector2i(68, 22), "dest": Vector2i(4, 24), "open": "s_elder2"},
 		],
-		"npcs": [{"id": "yue_ling", "n": "Yue Ling", "pos": Vector2i(43, 12), "col": Color("f08ab0"), "vis": ["s_ironfang", "s_yue"]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "little_hu", "n": "Little Hu", "pos": Vector2i(41, 10), "col": Color("6a4a30"), "fate": true},{"id": "yue_ling", "n": "Yue Ling", "pos": Vector2i(43, 12), "col": Color("f08ab0"), "vis": ["s_ironfang", "s_yue"]}],
 		"bosses": [
 			{"id": "jade_mantis", "pos": Vector2i(32, 30), "lv": 1, "req": 1},
 			{"id": "iron_fang", "pos": Vector2i(44, 12), "lv": 1, "req": 1},
+			# Part XIV: what Iron Fang was owed, standing where he fell (grudges.gd)
+			{"id": "grudge_iron_fang", "pos": Vector2i(46, 13), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "bamboo_spirit", "pos": Vector2i(60, 34), "lv": 2, "req": 2},
 		],
 		"pickups": [
@@ -834,13 +862,16 @@ const AREAS := {
 	},
 	"marsh": {
 		"n": "Crimson Marsh", "w": 80, "h": 48, "seed": 31, "theme": "marsh", "enemies": 14,
+		# a fated encounter (fate.gd): there while the story has them there
+		"npcs": [{"id": "liu_ying", "n": "Liu Ying", "pos": Vector2i(38, 27), "col": Color("6a7a5a"), "fate": true}, {"id": "liu_ying_end", "n": "Liu Ying", "pos": Vector2i(45, 32), "col": Color("6a7a5a"), "asset": "liu_ying", "fate": true}],
 		"pool": [["mire_toad", 3, 4], ["bog_wraith", 4, 5], ["poison_vine", 3, 5]],
 		"portals": [
 			{"to": "bamboo", "pos": Vector2i(1, 24), "dest": Vector2i(66, 22), "open": ""},
 			{"to": "frost", "pos": Vector2i(78, 24), "dest": Vector2i(4, 25), "open": "s_elder3"},
 		],
 		"bosses": [
-			{"id": "bog_colossus", "pos": Vector2i(40, 28), "lv": 4, "req": 4},{"id": "marsh_hag", "pos": Vector2i(66, 10), "lv": 5, "req": 5}],
+			{"id": "bog_colossus", "pos": Vector2i(40, 28), "lv": 4, "req": 4},{"id": "marsh_hag", "pos": Vector2i(66, 10), "lv": 5, "req": 5},
+			{"id": "grudge_marsh_hag", "pos": Vector2i(68, 11), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]}],
 		"pickups": [
 			{"id": "lotus1", "item": "lotus", "pos": Vector2i(20, 38)}, {"id": "lotus2", "item": "lotus", "pos": Vector2i(38, 8)},
 			{"id": "lotus3", "item": "lotus", "pos": Vector2i(54, 40)}, {"id": "lotus4", "item": "lotus", "pos": Vector2i(70, 30)},
@@ -869,7 +900,9 @@ const AREAS := {
 			{"to": "frost", "pos": Vector2i(1, 25), "dest": Vector2i(74, 25), "open": ""},
 			{"to": "palace", "pos": Vector2i(88, 25), "dest": Vector2i(4, 28), "open": "s_elder5"},
 		],
-		"npcs": [{"id": "sword_ghost", "n": "Ancestor Jian Wuchen", "pos": Vector2i(14, 10), "col": Color("9ad8ff"), "vis": ["s_swordghost", ""]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "tala", "n": "Tala of the Horse-Folk", "pos": Vector2i(12, 10), "col": Color("d8a04a"), "fate": true},{"id": "sword_ghost", "n": "Ancestor Jian Wuchen", "pos": Vector2i(14, 10), "col": Color("9ad8ff"), "vis": ["s_swordghost", ""]}],
 		"bosses": [
 			{"id": "storm_ape_king", "pos": Vector2i(60, 12), "lv": 10, "req": 10},{"id": "thunder_roc", "pos": Vector2i(78, 25), "lv": 11, "req": 11}],
 		"pickups": [
@@ -880,6 +913,8 @@ const AREAS := {
 	},
 	"palace": {
 		"n": "Blood Moon Palace", "w": 90, "h": 56, "seed": 61, "theme": "palace", "enemies": 16,
+		# a fated encounter (fate.gd): there while the story has them there
+		"npcs": [{"id": "xu_lan", "n": "Xu Lan", "pos": Vector2i(50, 23), "col": Color("7a1a2a"), "fate": true}, {"id": "xu_lan_end", "n": "Xu Lan", "pos": Vector2i(46, 23), "col": Color("7a1a2a"), "asset": "xu_lan", "fate": true}],
 		"pool": [["blood_acolyte", 11, 11], ["bone_soldier", 11, 11], ["shadow_fiend", 11, 11]],
 		"portals": [
 			{"to": "thunder", "pos": Vector2i(1, 28), "dest": Vector2i(84, 25), "open": ""},
@@ -976,7 +1011,9 @@ const AREAS := {
 			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(20, 22), "open": ""},
 			{"to": "grave", "pos": Vector2i(90, 28), "dest": Vector2i(4, 28), "open": "s_ml_xumo"},
 		],
-		"npcs": [{"id": "lake_keeper", "n": "Keeper Lan Jing", "pos": Vector2i(10, 26), "col": Color("a8e0ff"), "vis": ["s_ml_intro", ""]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "xu_lan_lake", "n": "Xu Lan", "pos": Vector2i(11, 24), "col": Color("7a1a2a"), "asset": "xu_lan", "fate": true},{"id": "lake_keeper", "n": "Keeper Lan Jing", "pos": Vector2i(10, 26), "col": Color("a8e0ff"), "vis": ["s_ml_intro", ""]}],
 		"bosses": [
 			{"id": "shard_mimic", "pos": Vector2i(32, 14), "lv": 18, "req": 18},
 			{"id": "glass_colossus", "pos": Vector2i(44, 30), "lv": 18, "req": 18},
@@ -996,10 +1033,13 @@ const AREAS := {
 			{"to": "mirror", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
 			{"to": "time", "pos": Vector2i(92, 28), "dest": Vector2i(4, 28), "open": "s_break7"},
 		],
-		"npcs": [{"id": "grave_keeper", "n": "Gravekeeper Mu Gu", "pos": Vector2i(10, 26), "col": Color("b8b8c8"), "vis": ["s_gv_intro", ""]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "qiu_ye_grave", "n": "Qiu Ye", "pos": Vector2i(8, 26), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},{"id": "grave_keeper", "n": "Gravekeeper Mu Gu", "pos": Vector2i(10, 26), "col": Color("b8b8c8"), "vis": ["s_gv_intro", ""]}],
 		"bosses": [
 			{"id": "bone_wyrm", "pos": Vector2i(34, 40), "lv": 19, "req": 19},
 			{"id": "headless_saint", "pos": Vector2i(48, 22), "lv": 20, "req": 20},
+			{"id": "grudge_headless_saint", "pos": Vector2i(50, 23), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "grave_empress", "pos": Vector2i(60, 12), "lv": 20, "req": 20},
 			{"id": "founder_qing", "pos": Vector2i(82, 30), "lv": 20, "req": 20},
 		],
@@ -1174,7 +1214,9 @@ const AREAS := {
 			{"to": "dunes", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "aurora", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_fu_bird"},
 		],
-		"npcs": [{"id": "spore_witch", "n": "Spore-Witch Mo Gu", "pos": Vector2i(10, 26), "col": Color("c8a0e0"), "vis": ["s_fu_intro", ""]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "liu_ying_vale", "n": "Liu Ying", "pos": Vector2i(8, 26), "col": Color("6a7a5a"), "asset": "liu_ying", "fate": true},{"id": "spore_witch", "n": "Spore-Witch Mo Gu", "pos": Vector2i(10, 26), "col": Color("c8a0e0"), "vis": ["s_fu_intro", ""]}],
 		"bosses": [
 			{"id": "spore_mother", "pos": Vector2i(32, 14), "lv": 27, "req": 27},
 			{"id": "moth_queen", "pos": Vector2i(44, 34), "lv": 28, "req": 28},
@@ -1194,7 +1236,9 @@ const AREAS := {
 			{"to": "fungal", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "chaos", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_au_tortoise"},
 		],
-		"npcs": [{"id": "steppe_shaman", "n": "Steppe Shaman A Lan", "pos": Vector2i(10, 26), "col": Color("d0f0ff"), "vis": ["s_au_intro", ""]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "tala_steppe", "n": "Tala of the Horse-Folk", "pos": Vector2i(8, 24), "col": Color("d8a04a"), "asset": "tala", "fate": true},{"id": "steppe_shaman", "n": "Steppe Shaman A Lan", "pos": Vector2i(10, 26), "col": Color("d0f0ff"), "vis": ["s_au_intro", ""]}],
 		"bosses": [
 			{"id": "mammoth_ancestor", "pos": Vector2i(30, 40), "lv": 28, "req": 28},
 			{"id": "aurora_serpent", "pos": Vector2i(46, 16), "lv": 28, "req": 28},
@@ -1274,7 +1318,9 @@ const AREAS := {
 			{"to": "karst", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "wheel", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_sp_unforgotten"},
 		],
-		"npcs": [{"id": "meng_po", "n": "Meng Po of the Naihe Bridge", "pos": Vector2i(10, 26), "col": Color("e0d0c0"), "vis": ["s_sp_intro", ""]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "qiu_ye_springs", "n": "Qiu Ye", "pos": Vector2i(12, 26), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},{"id": "meng_po", "n": "Meng Po of the Naihe Bridge", "pos": Vector2i(10, 26), "col": Color("e0d0c0"), "vis": ["s_sp_intro", ""]}],
 		"bosses": [
 			{"id": "corpse_patriarch", "pos": Vector2i(30, 40), "lv": 31, "req": 31},
 			{"id": "bridge_serpent", "pos": Vector2i(46, 16), "lv": 31, "req": 31},
@@ -1296,7 +1342,11 @@ const AREAS := {
 			{"id": "burning_judge", "pos": Vector2i(46, 16), "lv": 32, "req": 32},
 			{"id": "wheel_guardian", "pos": Vector2i(60, 40), "lv": 32, "req": 32},
 			{"id": "king_yama", "pos": Vector2i(86, 28), "lv": 32, "req": 32},
+			# Part XIV: Nie, the Unpaid, gathers at the heart of the Wheel once the threads are settled
+			{"id": "nie", "pos": Vector2i(78, 30), "lv": 56, "req": 55, "vis": ["s_p14_nie", ""]},
 		],
+		# Part XIV: the grudges and debts of the whole journey swarm round the Wheel
+		"warband": {"pool": [["grudge_wisp", 54, 56], ["debt_shade", 54, 56], ["karma_moth", 54, 56]], "n": 8, "vis": "s_p14_judge"},
 		"pickups": [{"id": "spoke1", "item": "wheel_spoke", "pos": Vector2i(22, 12)}, {"id": "spoke2", "item": "wheel_spoke", "pos": Vector2i(40, 46)}, {"id": "spoke3", "item": "wheel_spoke", "pos": Vector2i(64, 30)}, {"id": "spoke4", "item": "wheel_spoke", "pos": Vector2i(76, 10)}],
 		"pickup_vis": "s_wh_collect",
 	},
@@ -1309,6 +1359,9 @@ const AREAS := {
 			{"to": "terraces", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_vl_needle"},
 		],
 		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "hu_village", "n": "Fang Hu", "pos": Vector2i(14, 17), "col": Color("6a4a32"), "asset": "hu_grown", "fate": true},
+			{"id": "hu_end", "n": "Fang Hu", "pos": Vector2i(15, 26), "col": Color("6a4a32"), "asset": "hu_grown", "fate": true},
 			{"id": "teacher_ren", "n": "Old Teacher Ren of the Village School", "pos": Vector2i(31, 33), "col": Color("5a4a6a")},
 			{"id": "ox_herd_niu", "n": "Ah Niu the Ox-Herd", "pos": Vector2i(28, 31), "col": Color("8a6a3a")},
 			{"id": "granny_wen", "n": "Granny Wen the Midwife", "pos": Vector2i(10, 21), "col": Color("c8b8a0")},
@@ -1551,7 +1604,9 @@ const AREAS := {
 			{"to": "yanggu", "pos": Vector2i(1, 24), "dest": Vector2i(98, 25), "open": ""},
 			{"to": "fusang", "pos": Vector2i(98, 30), "dest": Vector2i(4, 34), "open": "s_mf_bifang"},
 		],
-		"npcs": [{"id": "farmer_tian", "n": "Old Farmer Tian", "pos": Vector2i(15, 21), "col": Color("8a7a4a"), "vis": ["s_mf_intro", ""]}],
+		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "tala_plains", "n": "Tala of the Horse-Folk", "pos": Vector2i(17, 22), "col": Color("d8a04a"), "asset": "tala", "fate": true},{"id": "farmer_tian", "n": "Old Farmer Tian", "pos": Vector2i(15, 21), "col": Color("8a7a4a"), "vis": ["s_mf_intro", ""]}],
 		"bosses": [
 			{"id": "locust_marquis", "pos": Vector2i(34, 10), "lv": 39, "req": 39},
 			{"id": "dust_devil", "pos": Vector2i(46, 43), "lv": 40, "req": 40},
@@ -1635,6 +1690,8 @@ const AREAS := {
 			{"to": "drowned", "pos": Vector2i(98, 30), "dest": Vector2i(4, 29), "open": "s_dg_hebo"},
 		],
 		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "hu_longmen", "n": "Fang Hu", "pos": Vector2i(33, 31), "col": Color("6a4a32"), "asset": "hu_grown", "fate": true},
 			{"id": "xia_cormorant", "n": "Xia and Her Cormorant", "pos": Vector2i(31, 31), "col": Color("4a6a7a")},
 			{"id": "examiner_fan", "n": "Fan, Who Failed the Examinations Nine Times", "pos": Vector2i(25, 31), "col": Color("3a3a5a")},
 			{"id": "harbour_yao", "n": "Harbourmistress Jiang Yao", "pos": Vector2i(37, 45), "col": Color("2e5a7a")},
@@ -1734,6 +1791,7 @@ const AREAS := {
 			{"id": "slag_serpent", "pos": Vector2i(64, 12), "lv": 43, "req": 43},
 			{"id": "stone_mother", "pos": Vector2i(62, 48), "lv": 43, "req": 43},
 			{"id": "fangfeng", "pos": Vector2i(76, 34), "lv": 44, "req": 44},
+			{"id": "grudge_fangfeng", "pos": Vector2i(78, 35), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "tushan_fox", "pos": Vector2i(58, 24), "lv": 44, "req": 44},
 			{"id": "taotie", "pos": Vector2i(88, 30), "lv": 44, "req": 44},
 		],
@@ -1817,6 +1875,7 @@ const AREAS := {
 		"bosses": [
 			{"id": "feilian", "pos": Vector2i(56, 47), "lv": 45, "req": 45},
 			{"id": "kui", "pos": Vector2i(78, 46), "lv": 45, "req": 45},
+			{"id": "grudge_kui", "pos": Vector2i(80, 47), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "jiufeng", "pos": Vector2i(84, 15), "lv": 46, "req": 46},
 			{"id": "leigong", "pos": Vector2i(90, 32), "lv": 46, "req": 46},
 			# Part XIII: a General of the Eight Gates
@@ -1956,6 +2015,8 @@ const AREAS := {
 			{"to": "ninesprings", "pos": Vector2i(1, 32), "dest": Vector2i(90, 30), "open": ""},
 		],
 		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "xu_lan_youdu", "n": "Xu Lan", "pos": Vector2i(33, 33), "col": Color("7a1a2a"), "asset": "xu_lan", "fate": true},
 			{"id": "lamplighter_bo", "n": "Old Bo the Lamplighter", "pos": Vector2i(35, 34), "col": Color("6a6a7a"), "race": "shade"},
 			{"id": "roll_clerk_ning", "n": "Roll-Clerk Ning", "pos": Vector2i(43, 36), "col": Color("4a4a5a"), "race": "shade"},
 			{"id": "ming_yi", "n": "Lantern-Magistrate Ming Yi", "pos": Vector2i(28, 20), "col": Color("2a2a3a"), "race": "shade", "floor": ["ward_office", 1]},
@@ -2070,6 +2131,8 @@ const AREAS := {
 			{"to": "yingzhou", "pos": Vector2i(90, 30), "dest": Vector2i(4, 31), "open": "s_fz_tianwu"},
 		],
 		"npcs": [
+			# a fated encounter (fate.gd): there while the story has them there
+			{"id": "liu_ying_isle", "n": "Liu Ying", "pos": Vector2i(32, 34), "col": Color("6a7a5a"), "asset": "liu_ying", "fate": true},
 			{"id": "he_xiangu", "n": "He Xiangu of the Lotus", "pos": Vector2i(24, 21), "col": Color("f0c8d8"), "race": "xian", "floor": ["lotus_hall", 1]},
 			{"id": "zhang_guolao", "n": "Zhang Guolao, Who Rides Backwards", "pos": Vector2i(38, 18), "col": Color("8a8a7a"), "race": "xian", "floor": ["furnace_house", -1]},
 			{"id": "zhongli_quan", "n": "Zhongli Quan of the Fan", "pos": Vector2i(30, 33), "col": Color("c84a2a"), "race": "xian"},
@@ -2153,6 +2216,7 @@ const AREAS := {
 		],
 		"bosses": [
 			{"id": "drowned_admiral", "pos": Vector2i(60, 12), "lv": 50, "req": 50},
+			{"id": "grudge_admiral", "pos": Vector2i(62, 13), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "guixu_stopper", "pos": Vector2i(62, 54), "lv": 50, "req": 50},
 			{"id": "hai_ruo", "pos": Vector2i(70, 32), "lv": 50, "req": 50},
 			{"id": "xu_fu", "pos": Vector2i(86, 32), "lv": 50, "req": 50},
@@ -2329,13 +2393,16 @@ const STEPS := [
 	{"id": "s_mantis", "kind": "kill", "boss": "jade_mantis", "area": "bamboo", "t": "Hunt the Jade Mantis Matriarch"},
 	{"id": "s_ironfang", "kind": "kill", "boss": "iron_fang", "area": "bamboo", "t": "Defeat the bandit chief Iron Fang"},
 	{"id": "s_yue", "kind": "talk", "npc": "yue_ling", "area": "bamboo", "t": "Speak to the captive girl"},
+	{"id": "s_f_hu1", "kind": "fate", "npc": "little_hu", "area": "bamboo", "t": "A boy with a kitchen knife is standing over Iron Fang: speak to him"},
 	{"id": "s_spirit", "kind": "kill", "boss": "bamboo_spirit", "area": "bamboo", "t": "Calm the Ancient Bamboo Spirit"},
 	{"id": "s_break1", "kind": "breakthrough", "to": 3, "t": "Break through to Foundation Establishment (Esc > Breakthrough)"},
 	{"id": "s_elder2", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell the Elder of your breakthrough", "stones": 200},
+	{"id": "s_f_qiu1", "kind": "fate", "npc": "qiu_ye", "area": "sect", "t": "Somebody is creeping out of Alchemist Mo's storeroom at night: stop him in the courtyard"},
 	{"id": "s_lotus", "kind": "collect", "item": "lotus", "n": 4, "area": "marsh", "t": "Pluck 4 Blood Lotuses in the Crimson Marsh"},
 	{"id": "s_hunt2", "kind": "hunt", "area": "marsh", "n": 16, "t": "Purge the marsh of its toxic denizens"},
 	{"id": "s_colossus", "kind": "kill", "boss": "bog_colossus", "area": "marsh", "t": "Topple the Bog Colossus"},
 	{"id": "s_hag", "kind": "kill", "boss": "marsh_hag", "area": "marsh", "t": "Slay the Marsh Hag"},
+	{"id": "s_f_liu1", "kind": "fate", "npc": "liu_ying", "area": "marsh", "t": "Somebody is still in the Marsh Hag's hut: look inside"},
 	{"id": "s_antidote", "kind": "talk", "npc": "alchemist", "area": "sect", "t": "Bring the lotuses to Alchemist Mo", "stones": 300},
 	{"id": "s_break2", "kind": "breakthrough", "to": 6, "t": "Break through to Golden Core"},
 	{"id": "s_elder3", "kind": "talk", "npc": "elder", "area": "sect", "t": "Seek the Elder's counsel", "stones": 300},
@@ -2348,6 +2415,7 @@ const STEPS := [
 	{"id": "s_swordghost", "kind": "talk", "npc": "sword_ghost", "area": "thunder", "t": "Seek the sword ancestor in Thunder Valley"},
 	{"id": "s_shards", "kind": "collect", "item": "shard", "n": 4, "area": "thunder", "t": "Gather 4 Thunder Shards"},
 	{"id": "s_hunt4", "kind": "hunt", "area": "thunder", "n": 16, "t": "Thin the storm creatures of Thunder Valley"},
+	{"id": "s_f_tala1", "kind": "fate", "npc": "tala", "area": "thunder", "t": "A horse-girl is calling for her herd at a gorge in Thunder Valley: find out what happened"},
 	{"id": "s_apeking", "kind": "kill", "boss": "storm_ape_king", "area": "thunder", "t": "Subdue the Storm Ape King"},
 	{"id": "s_roc", "kind": "kill", "boss": "thunder_roc", "area": "thunder", "t": "Slay the Thunder Roc"},
 	{"id": "s_elder5", "kind": "talk", "npc": "elder", "area": "sect", "t": "Return to the Elder with the Roc's feather", "stones": 500},
@@ -2356,6 +2424,7 @@ const STEPS := [
 	{"id": "s_gen1", "kind": "kill", "boss": "general_blood", "area": "palace", "t": "Defeat General Xue Sha"},
 	{"id": "s_gen2", "kind": "kill", "boss": "general_shadow", "area": "palace", "t": "Defeat General Mo Ying"},
 	{"id": "s_lord", "kind": "kill", "boss": "demon_lord", "area": "palace", "t": "Defeat Demon Lord Xu Mo"},
+	{"id": "s_f_xu1", "kind": "fate", "npc": "xu_lan", "area": "palace", "t": "Somebody is chained in the inner sanctum of the Blood Moon Palace: go and see"},
 	{"id": "s_break4", "kind": "breakthrough", "to": 12, "t": "Endure the Deity Tribulation"},
 	# ---- Part II: The Shattered Heavens
 	{"id": "s_dr_intro", "kind": "talk", "npc": "dragon_envoy", "area": "dragon", "t": "Seek the Dragon Palace envoy beyond the Blood Moon Palace", "stones": 600},
@@ -2393,6 +2462,7 @@ const STEPS := [
 	{"id": "s_ml_intro", "kind": "talk", "npc": "lake_keeper", "area": "mirror", "t": "Seek the Keeper of the Mirror Lake through the Lotus Gate"},
 	{"id": "s_ml_collect", "kind": "collect", "item": "echo", "n": 4, "area": "mirror", "t": "Gather 4 Echo Shards from the lake"},
 	{"id": "s_ml_hunt", "kind": "hunt", "area": "mirror", "n": 30, "t": "Shatter the reflections prowling the Mirror Lake"},
+	{"id": "s_f_xu2", "kind": "fate", "npc": "xu_lan_lake", "area": "mirror", "t": "Xu Lan has come to the Mirror Lake, where her father's echo waits: find her on the shore"},
 	{"id": "s_ml_mimic", "kind": "kill", "boss": "shard_mimic", "area": "mirror", "t": "Break the Shard Mimic"},
 	{"id": "s_ml_colossus", "kind": "kill", "boss": "glass_colossus", "area": "mirror", "t": "Topple the Glass Colossus"},
 	{"id": "s_ml_drowned", "kind": "kill", "boss": "drowned_bearer", "area": "mirror", "t": "Lay the Drowned Bearer to rest"},
@@ -2400,6 +2470,7 @@ const STEPS := [
 	{"id": "s_gv_intro", "kind": "talk", "npc": "grave_keeper", "area": "grave", "t": "Find the Gravekeeper in the Graveyard of Sword Saints"},
 	{"id": "s_gv_collect", "kind": "collect", "item": "relic", "n": 4, "area": "grave", "t": "Recover 4 Saint Relics from the barrows"},
 	{"id": "s_gv_hunt", "kind": "hunt", "area": "grave", "n": 30, "t": "Put the restless dead to sleep"},
+	{"id": "s_f_qiu2", "kind": "fate", "npc": "qiu_ye_grave", "area": "grave", "t": "Qiu Ye is in the Graveyard of Sword Saints: find out why"},
 	{"id": "s_gv_wyrm", "kind": "kill", "boss": "bone_wyrm", "area": "grave", "t": "Break the Bone Wyrm"},
 	{"id": "s_gv_saint", "kind": "kill", "boss": "headless_saint", "area": "grave", "t": "Duel the Headless Sword Saint"},
 	{"id": "s_gv_empress", "kind": "kill", "boss": "grave_empress", "area": "grave", "t": "Dethrone the Empress of Bones"},
@@ -2468,6 +2539,7 @@ const STEPS := [
 	{"id": "s_fu_intro", "kind": "talk", "npc": "spore_witch", "area": "fungal", "t": "Enter Glowcap Vale and seek the Spore-Witch"},
 	{"id": "s_fu_collect", "kind": "collect", "item": "glowcap", "n": 4, "area": "fungal", "t": "Pick 4 Ember Glowcaps"},
 	{"id": "s_fu_hunt", "kind": "hunt", "area": "fungal", "n": 46, "t": "Clear the spore-choked paths of the vale"},
+	{"id": "s_f_liu2", "kind": "fate", "npc": "liu_ying_vale", "area": "fungal", "t": "Liu Ying is in Glowcap Vale, where a blight is spreading: find her"},
 	{"id": "s_fu_return", "kind": "talk", "npc": "spore_witch", "area": "fungal", "t": "Bring the glowcaps to Mo Gu"},
 	{"id": "s_fu_mother", "kind": "kill", "boss": "spore_mother", "area": "fungal", "t": "Calm the Mother of Spores"},
 	{"id": "s_fu_moth", "kind": "kill", "boss": "moth_queen", "area": "fungal", "t": "Dim the Lantern Moth Queen"},
@@ -2476,6 +2548,7 @@ const STEPS := [
 	{"id": "s_au_intro", "kind": "talk", "npc": "steppe_shaman", "area": "aurora", "t": "Cross onto the Aurora Steppe and find its shaman"},
 	{"id": "s_au_collect", "kind": "collect", "item": "aurora_shard", "n": 4, "area": "aurora", "t": "Catch 4 Aurora Shards where the lights touch the snow"},
 	{"id": "s_au_hunt", "kind": "hunt", "area": "aurora", "n": 46, "t": "Turn back the frozen herds stampeding south"},
+	{"id": "s_f_tala2", "kind": "fate", "npc": "tala_steppe", "area": "aurora", "t": "Tala's people are trapped in a blizzard pass on the Aurora Steppe: go to them"},
 	{"id": "s_au_return", "kind": "talk", "npc": "steppe_shaman", "area": "aurora", "t": "Bring the aurora shards to Shaman A Lan"},
 	{"id": "s_au_mammoth", "kind": "kill", "boss": "mammoth_ancestor", "area": "aurora", "t": "Wake the Mammoth Ancestor"},
 	{"id": "s_au_serpent", "kind": "kill", "boss": "aurora_serpent", "area": "aurora", "t": "Ground the Aurora Serpent"},
@@ -2511,6 +2584,7 @@ const STEPS := [
 	{"id": "s_sp_intro", "kind": "talk", "npc": "meng_po", "area": "springs", "t": "Cross into the Yellow Springs and find Meng Po at the Naihe Bridge"},
 	{"id": "s_sp_collect", "kind": "collect", "item": "forget_herb", "n": 4, "area": "springs", "t": "Pick 4 Herbs of Forgetting among the red lilies"},
 	{"id": "s_sp_hunt", "kind": "hunt", "area": "springs", "n": 60, "t": "Settle the hungry dead crowding the bridge"},
+	{"id": "s_f_qiu3", "kind": "fate", "npc": "qiu_ye_springs", "area": "springs", "t": "Qiu Ye's father is in the queue of the dead: find Qiu Ye at the Yellow Springs"},
 	{"id": "s_sp_return", "kind": "talk", "npc": "meng_po", "area": "springs", "t": "Bring the Herbs of Forgetting to Meng Po"},
 	{"id": "s_sp_patriarch", "kind": "kill", "boss": "corpse_patriarch", "area": "springs", "t": "Lay Corpse Patriarch Jiang to rest"},
 	{"id": "s_sp_serpent", "kind": "kill", "boss": "bridge_serpent", "area": "springs", "t": "Drive off the Serpent Beneath the Naihe Bridge"},
@@ -2530,6 +2604,7 @@ const STEPS := [
 	{"id": "s_vl_intro", "kind": "talk", "npc": "granny_wen", "area": "village", "t": "Take the south road down to Qingshi Village and find Granny Wen in her house"},
 	{"id": "s_vl_collect", "kind": "collect", "item": "silver_thread", "n": 4, "area": "village", "t": "Cut 4 Silver Threads stitched across the village"},
 	{"id": "s_vl_hunt", "kind": "hunt", "area": "village", "n": 56, "t": "Drive the thread-creatures out of the paddies"},
+	{"id": "s_f_hu2", "kind": "fate", "npc": "hu_village", "area": "village", "t": "Iron Fang's son is in Qingshi Village: find him"},
 	{"id": "s_vl_return", "kind": "talk", "npc": "granny_wen", "area": "village", "t": "Bring the Silver Threads to Granny Wen"},
 	{"id": "s_vl_tiger", "kind": "kill", "boss": "paper_tiger", "area": "village", "t": "Tear down the Paper Tiger"},
 	{"id": "s_vl_scarecrow", "kind": "kill", "boss": "scarecrow_king", "area": "village", "t": "Unstuff the Scarecrow King of the Paddies"},
@@ -2608,6 +2683,7 @@ const STEPS := [
 	{"id": "s_mf_intro", "kind": "talk", "npc": "farmer_tian", "area": "millet", "t": "Follow the east road onto the Scorched Millet Plains and find Old Farmer Tian at the shrine of Hou Ji"},
 	{"id": "s_mf_collect", "kind": "collect", "item": "rain_stone", "n": 4, "area": "millet", "t": "Find 4 Rain-Stones the dust devil scattered across the plain"},
 	{"id": "s_mf_hunt", "kind": "hunt", "area": "millet", "n": 64, "t": "Drive the locusts and drought-beasts off the millet"},
+	{"id": "s_f_tala3", "kind": "fate", "npc": "tala_plains", "area": "millet", "t": "Tala's herd is dying of thirst at the edge of the Millet Plains: go to her"},
 	{"id": "s_mf_return", "kind": "talk", "npc": "farmer_tian", "area": "millet", "t": "Bring the Rain-Stones to Old Farmer Tian"},
 	{"id": "s_mf_locust", "kind": "kill", "boss": "locust_marquis", "area": "millet", "t": "Scatter the Locust Marquis"},
 	{"id": "s_mf_devil", "kind": "kill", "boss": "dust_devil", "area": "millet", "t": "Stop the Dust-Devil spinning in the dry river"},
@@ -2637,6 +2713,7 @@ const STEPS := [
 	{"id": "s_dg_intro", "kind": "talk", "npc": "harbour_yao", "area": "longmen", "t": "Follow the north road down to the river at Longmen and find the Harbourmistress"},
 	{"id": "s_dg_collect", "kind": "collect", "item": "carp_scale", "n": 4, "area": "longmen", "t": "Gather 4 Dragon-Gate Scales shed below the falls"},
 	{"id": "s_dg_hunt", "kind": "hunt", "area": "longmen", "n": 64, "t": "Clear the flooded quays and riverbanks of Longmen"},
+	{"id": "s_f_hu3", "kind": "fate", "npc": "hu_longmen", "area": "longmen", "t": "Fang Hu has heard something about his father at Longmen: find him"},
 	{"id": "s_dg_return", "kind": "talk", "npc": "harbour_yao", "area": "longmen", "t": "Bring the Dragon-Gate Scales to Harbourmistress Jiang"},
 	{"id": "s_dg_carp", "kind": "kill", "boss": "sulking_carp", "area": "longmen", "t": "Coax the Carp Who Would Not Leap over the Dragon Gate"},
 	{"id": "s_dg_eel", "kind": "kill", "boss": "eel_king", "area": "longmen", "t": "Run Black Eel and his river-rats out of the flooded warehouses"},
@@ -2706,6 +2783,7 @@ const STEPS := [
 	{"id": "s_yd_intro", "kind": "talk", "npc": "ming_yi", "area": "youdu", "t": "Enter Youdu, the Dark Capital, and find the Lantern-Magistrate in the upper room of the Ward Office"},
 	{"id": "s_yd_collect", "kind": "collect", "item": "soul_tally", "n": 4, "area": "youdu", "t": "Gather 4 Soul-Tallies blown out of the Dark Capital's rolls"},
 	{"id": "s_yd_hunt", "kind": "hunt", "area": "youdu", "n": 50, "t": "Clear the streets of the Dark Capital of runaway spirits"},
+	{"id": "s_f_xu3", "kind": "fate", "npc": "xu_lan_youdu", "area": "youdu", "t": "Xu Lan has come to Youdu, where her father's shade is kept: find her"},
 	{"id": "s_yd_return", "kind": "talk", "npc": "ming_yi", "area": "youdu", "t": "Bring the soul-tallies up to Magistrate Ming Yi"},
 	{"id": "s_yd_houtu", "kind": "talk", "npc": "houtu", "area": "youdu", "t": "Go down to the deep hall under the Palace of Sovereign Earth and meet Houtu"},
 	{"id": "s_yd_bai", "kind": "kill", "boss": "bai_wuchang", "area": "youdu", "t": "Stop White Impermanence collecting the living"},
@@ -2730,6 +2808,7 @@ const STEPS := [
 	{"id": "s_fz_intro", "kind": "talk", "npc": "he_xiangu", "area": "fangzhang", "t": "Cross the sandbar to Fangzhang and find He Xiangu on the terrace of her Lotus Hall"},
 	{"id": "s_fz_collect", "kind": "collect", "item": "pearl_dew", "n": 4, "area": "fangzhang", "t": "Gather 4 Drops of Dew from the dying pearl trees"},
 	{"id": "s_fz_hunt", "kind": "hunt", "area": "fangzhang", "n": 50, "t": "Chase the toads, cranes and rabbits out of the immortals' gardens"},
+	{"id": "s_f_liu3", "kind": "fate", "npc": "liu_ying_isle", "area": "fangzhang", "t": "Liu Ying has come to Fangzhang to study the immortals' elixirs: find her"},
 	{"id": "s_fz_return", "kind": "talk", "npc": "he_xiangu", "area": "fangzhang", "t": "Bring the pearl dew up to He Xiangu"},
 	{"id": "s_fz_zhang", "kind": "talk", "npc": "zhang_guolao", "area": "fangzhang", "t": "Go down to the cellar of cold furnaces and ask Zhang Guolao, who remembers the Court's sealing"},
 	{"id": "s_fz_deer", "kind": "kill", "boss": "longevity_deer", "area": "fangzhang", "t": "Calm the White Deer of Longevity, who has eaten the last ripe herbs"},
@@ -2768,6 +2847,16 @@ const STEPS := [
 	{"id": "s_p13_chiyou", "kind": "kill", "boss": "chiyou", "area": "maple", "t": "Walk into the field of Zhuolu by the road you choose, and face Chiyou", "stones": 21800},
 	{"id": "s_p13_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Go home: the Conclave of the Realms meets at last under the Jianmu"},
 	{"id": "s_break18", "kind": "breakthrough", "to": 54, "t": "Walk every road at once: Myriad Daos as One"},
+	# ---- Part XIV: The Ripening of Karma.  Every cause comes home: the five threads, then Nie at the Wheel
+	{"id": "s_p14_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The sky over the sect is heavy with something owed: speak to Elder Qing Xuan", "stones": 22000},
+	{"id": "s_p14_judge", "kind": "talk", "npc": "judge_cui", "area": "wheel", "t": "Go down the funeral road to the Wheel of the Six Paths and ask Judge Cui what is gathering there"},
+	{"id": "s_p14_hunt", "kind": "hunt", "area": "wheel", "n": 16, "of": ["grudge_wisp", "debt_shade", "karma_moth"], "t": "Drive back the grudges and debts swarming round the Wheel"},
+	{"id": "s_p14_fates", "kind": "fates", "npcs": ["tala_end", "qiu_ye_end", "hu_end", "xu_lan_end", "liu_ying_end"], "n": 5, "area": "sect", "t": "Settle the five threads of your journey, in any order: Tala, Qiu Ye, Fang Hu, Xu Lan and Liu Ying"},
+	{"id": "s_p14_mirror", "kind": "talk", "npc": "judge_cui", "area": "wheel", "t": "Go back down to the Wheel and ask Judge Cui what else the Karma Mirror shows"},
+	{"id": "s_p14_grudges", "kind": "grudges", "n": 6, "area": "wheel", "t": "Lay to rest the six grudges that stayed where they fell, in any order (Esc > Journal)", "stones": 12000},
+	{"id": "s_p14_nie", "kind": "kill", "boss": "nie", "area": "wheel", "t": "Face Nie, the Unpaid, at the heart of the Wheel", "stones": 22600},
+	{"id": "s_p14_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Go home: every debt is paid, one way or another"},
+	{"id": "s_break19", "kind": "breakthrough", "to": 57, "t": "Let every cause meet its effect: Karma Fulfilled"},
 ]
 
 static func step_index(id: String) -> int:
@@ -2891,6 +2980,7 @@ const ITEMS := {
 	"drought_fan": {"n": "Fan of Nuba's Drought", "desc": "Noon Embers in a fan of fire essence. One sweep turns a storm to steam"},
 	"clear_mirror": {"n": "Mirror of Clear Sight", "desc": "Polished from Jingwei's stones. It shows only what is really there"},
 	"kui_drumstick": {"n": "Drumstick of the Thunder-Beast", "desc": "Whoever holds it decides when the drum of Kui's hide is struck"},
+	"settled_mirror": {"n": "Mirror of Settled Debts", "desc": "Two spokes of the Wheel forged into a mirror with dark and metal essence. A debt that looks into it remembers whether it was ever owed"},
 	"homing_elixir": {"n": "Elixir of Coming Home", "desc": "Five essences and an autumn leaf, refined for a fortune. It smells of fields a war god has not seen in five thousand years"},
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
@@ -5737,6 +5827,120 @@ const DIALOGUE := {
 	"post:s_break18": [
 		["Narrator", "Every road Lin Feng has walked runs through him at once, and none of them is the only right one, and the tribulation, finding nothing in him to divide, thins out into a clear autumn sky."],
 		["Narrator", "He becomes the first cultivator of Myriad Daos as One: a realm in which every road leads somewhere worth going."],
+		["Narrator", "The Conclave of the Realms sits down for the first time under the Jianmu, and argues happily about everything. Nobody is in charge of it. Auntie Zhou feeds everybody."],
+	],
+	# ---- Part XIV: The Ripening of Karma
+	"recall12": [
+		["Narrator", "The first Conclave goes on for nine days, and on the tenth everybody goes home. The sect is very quiet. Lin Feng sweeps the steps in the evening, and the broom keeps catching on something that is not there."],
+		["Narrator", "It is a thread. Then a dozen of them: fine as spider silk and warm, running from his wrists out over the edge of the mountain in every direction, and every one of them pulling, very gently, south-west."],
+		["Yue Ling", "Lin Feng, your hands. There is something tied to them.", "shock"],
+		["Lin Feng", "To both of us. Look at yours."],
+	],
+	"s_p14_home": [
+		["Elder Qing Xuan", "Cause and effect. Every cultivator who climbs far enough meets them at last: everything you set moving on the road comes home, the good and the bad, and asks to be settled."],
+		["Elder Qing Xuan", "Most of the threads are light. A herb you picked, a bell you mended. But a few of them were people, and those are heavy, because you changed which way their lives ran."],
+		["Lin Feng", "Tala and her herd. Qiu Ye. Iron Fang's boy. Xu Mo's daughter. The girl in the Hag's hut.", "think"],
+		["Elder Qing Xuan", "And at the far end of every thread that was cut instead of tied, something has been feeding. The old books call it Nie: the shadow of everything owed and never paid. It gathers where debts are reckoned."],
+		["Yue Ling", "The Wheel of the Six Paths."],
+		["Elder Qing Xuan", "Go down the funeral road and ask Judge Cui what is waiting there. Then go and find your five. Whatever you made of them, they are part of you now, and they are going to be part of what happens.", "point"],
+	],
+	"s_p14_judge": [
+		["Narrator", "The Wheel turns slowly, the way it should. But round its rim something has settled like soot: a darkness made of tally-slips and broken oaths and the ends of a thousand quarrels."],
+		["Judge Cui Jue", "Every grudge the dead cannot carry over the bridge, they leave here, and the Wheel grinds it small. It has always been so. But this year the grudges have learned to stand up."],
+		["Judge Cui Jue", "Look into the Karma Mirror. Your five threads run straight into the heart of it, and something is pulling on them from the other end. Nie. It is as old as the first unpaid debt, and you have been feeding it all the way up the mountain."],
+		["Lin Feng", "Every foe I put down. Every promise I made in a hurry."],
+		["Judge Cui Jue", "And every one you kept. It cannot eat those. Thin out the grudges round the rim before they find the funeral road; then go and settle your threads. A debt that is paid cannot be eaten.", "nod"],
+	],
+	"s_p14_mirror": [
+		["Judge Cui Jue", "Your five are settled, one way or another. Good. Now look into the Mirror again, and look past them."],
+		["Narrator", "In the Karma Mirror the Wheel turns and the soot round its rim is thinner. But six threads of it never come to the Wheel at all: they run back up the funeral road and away across the world, and every one ends somewhere Lin Feng remembers."],
+		["Narrator", "The bamboo below the sect. The red water of the marsh. The graves of the sword saints. A dry riverbed under Tushan. The aeries of Juntian. A wreck on the slope of the Returning Ruins."],
+		["Judge Cui Jue", "Most of what the dead are owed comes down here, and the Wheel grinds it small. These six would not come. Their owners have gone over the bridge, but what they were owed is still owed, and it has taken root where they fell. Nie drinks from all six."],
+		["Lin Feng", "Iron Fang. The Marsh Hag. The Headless Saint. Fangfeng. Kui. The Admiral. I put every one of them down.", "think"],
+		["Judge Cui Jue", "And never asked them anything. Go to each where it fell. A grudge does not listen until it has spent itself, so it will fight you; when it is spent, ask it what it was owed. Pay it if you can. Whatever you leave unpaid, Nie will be holding when you come back.", "point"],
+		["Yue Ling", "Six fights with six people we already beat once."],
+		["Lin Feng", "We beat them. That part is done. It's the asking that was left over."],
+	],
+	# the grudges that stayed (grudges.gd): their last words before the fight and once they are spent;
+	# the choice of what to do about each follows the "post:" lines
+	"pre:grudge_iron_fang": [
+		["Iron Fang's Grudge", "The sweeper. You swept me off this road once. Has the sect sent you back to sweep up what's left?"],
+		["Lin Feng", "I came to ask what you were owed."],
+		["Iron Fang's Grudge", "Then hold out your hands the way I held out mine at that gate, and see how far asking gets you."],
+	],
+	"post:grudge_iron_fang": [
+		["Narrator", "The grudge comes apart like wet paper. Under it, sitting in the bamboo litter with his knees drawn up, is a boy of twelve with a gap where a tooth should be."],
+		["Iron Fang's Grudge", "They never tested me. Not even with the stone. The gate disciple looked at my father's patched sleeves and sent me down the steps, and I never knew if there was anything in me to test."],
+	],
+	"pre:grudge_marsh_hag": [
+		["The Marsh Hag's Grudge", "Another bright young root come for my lotuses. They are not for sale. They were never for sale. Nobody ever paid for them."],
+		["Yue Ling", "She's reading out names. Settlers' names, and sums of money."],
+		["The Marsh Hag's Grudge", "Thirty-six families and not one copper. Pay or drown, cultivator. Those are the terms."],
+	],
+	"post:grudge_marsh_hag": [
+		["Narrator", "The red water stills. The grudge sits down on the bank among the blood lotuses: a stooped woman in a wet shawl with a ledger open on her knees, running her finger down a list that never ends."],
+		["The Marsh Hag's Grudge", "I kept them alive a whole winter on lotus-root and willow bark. The Court sent them, and the Court never paid, and when the water took them nobody came to say sorry. I don't even remember my own name. It was at the top of the ledger once."],
+	],
+	"pre:grudge_headless_saint": [
+		["Narrator", "Among the graves of the sword saints a figure without a head salutes Lin Feng in the old way: sword raised, heels together. The bow is perfect. It is the bow Lin Feng learned on the steps of the sect."],
+		["Yue Ling", "He doesn't want to hurt you. He just has nothing to say it with except the sword."],
+		["Lin Feng", "Then I'll answer the same way. Sword Saint, I am of your school."],
+	],
+	"post:grudge_headless_saint": [
+		["Narrator", "The saint lowers his blade, kneels, and writes in the grave-dust with one finger, slowly, like a man who has not held a brush in a thousand years."],
+		["Narrator", "A name, his own, in the old script. Beneath it, smaller: Why was it taken down?"],
+	],
+	"pre:grudge_fangfeng": [
+		["Fangfeng's Grudge", "STOP. STOP AND LISTEN. There's a village under the dyke and the water is coming and I have to tell somebody!"],
+		["Yue Ling", "It thinks the flood is still coming. It has been standing in that breach for four thousand years."],
+		["Lin Feng", "Then let's help it put the water down first."],
+	],
+	"post:grudge_fangfeng": [
+		["Narrator", "The giant's grudge goes down on one knee in the dry riverbed and, for the first time in four thousand years, lets go of the water that is not there. It is panting like a man who has run a very long way."],
+		["Fangfeng's Grudge", "I was late. I know I was late. They were cutting off my head before I could tell them why."],
+	],
+	"pre:grudge_kui": [
+		["Narrator", "The thunderhead over the aeries comes down on one leg with a sound like the first beat of a war drum, and every wind bell in Juntian rings at once."],
+		["Kui's Grudge", "BOOM. BOOM. Before you can beat me, I beat you. BOOM."],
+		["Yue Ling", "It isn't angry. It's frightened. Every thunderclap still sounds like the drum to it."],
+	],
+	"post:grudge_kui": [
+		["Narrator", "The thunder-ox's grudge settles on the cloud like a tired animal, its one leg folded under it, its great sides heaving. Far off in the Eastern Sea, something it remembers smells of salt."],
+		["Kui's Grudge", "I used to bellow because I was happy. Now I bellow first. Before the drum."],
+	],
+	"pre:grudge_admiral": [
+		["Narrator", "On the tilted deck of the wrecked flagship a shadow in an admiral's coat stands at the wheel, holding a course for a shore it will never reach. When it turns it has no face, only the shape of somebody listening very hard."],
+		["The Admiral's Grudge", "You came from the east. From the isles. Did you see her? A girl of eleven with a red ribbon. They called the names on the beach. Did anybody call hers?"],
+		["Lin Feng", "I'll tell you what I know. But you'll have to let go of the wheel first."],
+	],
+	"post:grudge_admiral": [
+		["Narrator", "The Admiral's grudge lets go of the wheel. It has never let go of it before, and its hands do not know what to do."],
+		["The Admiral's Grudge", "Lingbo. Eleven years old. She had a red ribbon, and she was afraid of the sea. I told her she would be home within the year."],
+	],
+	"pre:nie": [
+		["Narrator", "At the heart of the Wheel, where the six paths meet, the soot of a thousand grudges stands up and becomes a shape: no face, many hands, and in every hand a tally of something Lin Feng owes."],
+		["Nie, the Unpaid", "Three thousand foes you put down on the road up. Did you ever ask what any of them was owed? I asked. I remember every one."],
+		["Yue Ling", "It is speaking with their voices. The bamboo wolves. The bandits. The Hag."],
+		["Lin Feng", "Then let them speak. I will pay what I can, and stand for the rest."],
+	],
+	"post:nie": [
+		["Narrator", "Nie comes apart the way a quarrel does when somebody finally says sorry: not all at once, but thread by thread, each tally burning down to a grey ash that the Wheel takes in and grinds and turns, at last, into something new."],
+		["Judge Cui Jue", "Paid. Or forgiven, which in my courts comes to the same thing. Go home, Lin Feng. The Wheel will take it from here."],
+		["Yue Ling", "The threads on my wrists are gone. No. Not gone. They just do not pull any more."],
+	],
+	"s_p14_end": [
+		["Elder Qing Xuan", "I watched the sky over the Wheel clear from the gate. Every thread on the mountain went slack at once, like a bell rope when the ringing stops."],
+		["Elder Qing Xuan", "Whatever you made of your five, it is done now and it is yours. That is what a cultivator becomes at the end of the road: not stronger, only settled."],
+		["Lin Feng", "Then I think it is time I was settled too.", "nod"],
+	],
+	"pre:s_break19": [
+		["Narrator", "Lin Feng sits on the bottom step of the sect, where he sat the day he came, with every thread of the journey lying slack across his knees. The tribulation that gathers is not lightning: it is every face he met on the road, waiting to hear what he will say."],
+		["Yue Ling", "What will you say?"],
+		["Lin Feng", "Thank you, mostly. And I am sorry, to some. And goodbye to nobody."],
+	],
+	"post:s_break19": [
+		["Narrator", "Every cause he set moving has met its effect, and nothing is owed either way. The faces nod, one by one, and go back to their own roads."],
+		["Narrator", "He becomes the first cultivator of Karma Fulfilled: a realm in which the threads of other lives still run through yours, and none of them pulls."],
 		["Narrator", "The Conclave of the Realms meets every autumn after that, under the Jianmu, and argues happily about everything. Nobody is in charge of it. Auntie Zhou feeds everybody."],
 		["Narrator", "And on Azure Cloud Mountain, in the cool of the evening, Lin Feng sweeps the steps of the sect, which are the first steps of every road, because somebody should."],
 	],

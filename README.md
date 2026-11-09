@@ -1,21 +1,97 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Myriad Daos as One, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 202 bosses, eighteen Heavenly Tribulations, eleven towns full of people and 84 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos** and earn the trust of **eight peoples** of the realms.
+Play Lin Feng (or whoever you make him: name, look, colours and where he came from), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Karma Fulfilled, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 209 bosses, nineteen Heavenly Tribulations, eleven towns full of people and 84 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, and decide the fates of **five people** met on the road.
 
-> **Total gameplay duration: about 16 hours 3 minutes** (16:02:51 of game time for the end-to-end bot run, seed 1234), **1 hour 56 minutes more than the last release** (14:06:51). **The game is no longer a straight line, and its battles have to be earned.** 34 battles that carry the main story forward are now **trials**: harder than the bosses before them (up to twice the health, a quarter more attack, enraged when brought low) and closed to anyone unprepared, and every one can be passed in **three or four ways**: **by might** (a level, cultivation full at the peak of a realm, a tempered sword, the branches of the root), **by craft** (a talisman, lens, seal, ink or elixir made at Alchemist Mo's cauldron or Smith Tie's forge from the **essences** monsters leave behind and what the quests turn up: 29 recipes), **by wealth** (spirit stones), **by respect** (**renown**, earned from bosses, trials and **28 deeds** townsfolk ask of you), **by the Dao** you walk, **by the friendship** of a people, or **by a relic** found and kept; the way you take changes the battle and is remembered to the end. **Part XIII, "The Eight Gates", adds 49 minutes** and is non-linear: open **any four of eight gates in four realms, in any order**, each a trial of its own, and then reach the ending by **one of three roads** (the Sword, the Many Peoples or the Cauldron), each with its own requirements, battle and epilogue, up to a new realm, **Myriad Daos as One**. A new **Journal** (Esc > Journal) shows your renown, essences, treasures, the townsfolk's requests and every way through the trial ahead. And **the ending is new**: a short film of the wonders the story set right, each with its line of the epilogue, and then the results laid out beside Lin Feng and Yue Ling on a lotus over the clouds. And there are **810 things to do** in the world, each with an animation of its own: sit on a bench, drink from a well, strike a temple bell, play the qin, fish, swing, pray at a shrine, gather herbs, lift the training stones, sweep the leaves, read, stir a cauldron, work an anvil, weave, sleep in a bed.
+> **Total gameplay duration: about 17 hours 22 minutes** (17:22:16 of game time for the end-to-end bot run, seed 1234), **1 hour 19 minutes more than the last release** (16:02:51). **You make the hero now, and the people you meet remember what you did.** New Game opens **character creation**: a name the whole story uses, four looks, his hair, eyes and robe, and one of five origins, each with a strength, a weakness and lines of its own. **Twelve outfits** change how he looks (and fights, a little), and **six mounts and vehicles** carry the party over open ground: a horse, the qilin, a white tiger, a flying sword, a cloud and a sky-barque. **Five new people**, each with a story of their own, are met in Part I and again and again to the end. **Every meeting ends in a choice** that decides the next chapter, opens (or closes) a way through a trial, and decides who stands with Lin Feng at the last and who is fought. **Every one of the 369 foes now has a story**, told before the fight and kept in a Bestiary. **Part XIV, "The Ripening of Karma", plays in about 49 minutes**: settle the five threads, lay to rest **six grudges of foes put down on the road** where they fell (pay what each was owed, let a friend answer it, or leave it to feed the last enemy), and face **Nie, the Unpaid**, at the Wheel of the Six Paths, up to a new realm, **Karma Fulfilled**. Eight older bugs were found and fixed.
 
 | | |
 |---|---|
-| ![a trial: the Demon Lord's four ways through, one of them open](docs/screenshots/trial_choice.png) | ![crafting at Alchemist Mo's cauldron](docs/screenshots/crafting.png) |
-| ![the Journal: renown, essences, requests and the trial ahead](docs/screenshots/journal.png) | ![the Journal during Part XIII: the Eight Gates](docs/screenshots/journal_gates.png) |
-| ![the Gate of Harm: the drum of Kui's hide below the broken pillar](docs/screenshots/gate_kui_drum.png) | ![Chiyou, War God of the Nine Li, on the Road of the Many Peoples](docs/screenshots/battle_boss_chiyou.png) |
-| ![Landfall, the town of the Thousand Children on Penglai](docs/screenshots/town_landfall.png) | ![the lip of Guixu, the Returning Ruins](docs/screenshots/guixu_whirl.png) |
-| ![the Cultivation page: realm, lifespan, suppression and the nine branches of the root](docs/screenshots/cultivation.png) | ![a cutscene: Mazu gives Yue Ling her red lantern](docs/screenshots/cutscene_mazu.png) |
+| ![character creation over the moonlit cliff: a sweeper of one's own, the Wild Child's hair, the hunter's apprentice](docs/screenshots/create_custom.png) | ![the wardrobe: the Heaven-Gate Armour, and the hero in it](docs/screenshots/wardrobe.png) |
+| ![on the Mountain Horse, Yue Ling riding pillion](docs/screenshots/riding_pony.png) | ![the six rides: the horse, the flying sword, the qilin, the cloud, the white tiger and the sky-barque](docs/screenshots/rides.png) |
+| ![a fated encounter: what will you do with Xu Mo's daughter?](docs/screenshots/fate_choice.png) | ![the Fates page: every choice, in words](docs/screenshots/fates_page.png) |
+| ![Iron Fang's grudge, smouldering in the bamboo where he fell](docs/screenshots/grudge_iron_fang.png) | ![a grudge spent: what was it owed?](docs/screenshots/grudge_choice.png) |
+| ![Nie, the Unpaid, by the bonds you made](docs/screenshots/battle_boss_nie.png) | ![the ending's results: Karma Fulfilled, the friends and the fallen, the grudges laid to rest](docs/screenshots/ending.png) |
 
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph CC[Character creation]
+    NG[New Game] --> MK[name, look, hair, eyes,<br/>robe, origin] --> J((the journey))
+    MK -.->|origin| OL[a strength, a weakness,<br/>a keepsake, lines of its own]
+    end
+    subgraph FA[Fated encounters: five people, five meetings each]
+    C1[Part I: Tala, Qiu Ye,<br/>Little Hu, Xu Lan, Liu Ying] --> CH{a choice at<br/>every meeting}
+    CH -->|the state it leaves them in| C2[Parts III-XII: the next<br/>chapter is written for it]
+    C2 --> CH
+    CH -->|a battle, a ride, an outfit,<br/>a cheaper cauldron| R[rewards and costs]
+    CH -->|the right state| BO[a way through a trial:<br/>By an old bond]
+    C2 --> F14[Part XIV: friends come to the Wheel,<br/>enemies are fought, spared or fall]
+    end
+    subgraph LO[Every foe has a story]
+    B1[355 foes] --> BC[first meeting: its story<br/>over the battle's opening]
+    B1 --> BS[every boss: who it was,<br/>told before the fight]
+    BC & BS --> BE[the Bestiary]
+    end
+    subgraph RD[Wardrobe and stable]
+    OU[12 outfits: colours, hats,<br/>crowns, pauldrons, a passive] --> W[Esc > Wardrobe]
+    RI[6 rides: horse, qilin, tiger,<br/>flying sword, cloud, sky-barque] --> S[R to ride, Esc > Stable]
+    end
+    subgraph P14[Part XIV: the Ripening of Karma]
+    E[the Elder: every cause<br/>comes home] --> JC[Judge Cui at the Wheel] --> GR[the grudges round its rim]
+    GR --> FV{settle the five,<br/>in any order} --> MI[the Mirror again:<br/>six grudges that stayed]
+    MI --> GS{lay each to rest where<br/>it fell, in any order:<br/>pay it, a friend answers,<br/>or leave it to the Wheel}
+    GS -->|unpaid grudges feed Nie| NIE[Nie, the Unpaid:<br/>a trial] --> KF((Karma Fulfilled))
+    end
+    CC --> GAME((Game))
+    FA --> GAME
+    LO --> GAME
+    RD --> GAME
+    P14 --> GAME
+    GAME --> BOT[bot: 17:22:16,<br/>CI needs 16 h]
+```
+
+- **Character creation** (`scripts/create.gd`, `scripts/fashion.gd`). New Game no longer drops you straight onto the steps: first, over the moonlit cliff of the title screen, you make the sweeper. **Name** him (from the sect's rolls with Left/Right, or Enter to type your own: the story then calls him by it everywhere, Granny Wen's "Feng'er" and the juniors' "Senior Brother Lin" included, while the data keeps the name it was written with), choose his **look** (four Blender builds of the same rig: the Sweeper's topknot, the Wanderer's braid, the Wild Child's untameable hair, the Scholar's Ward's neat crop), the colour of his **hair** (six), his **eyes** (six) and his **sweeper's robe** (six colourings of robe, trousers and trims), and his **origin**: what he was in Qingshi Village before he climbed the steps at thirteen (Granny Wen's boy, the ferry-hand, Scholar Wang's pupil, the old hunter's apprentice, the runner of the Four Roads). Each origin has a small strength and a small weakness (a ferry-hand's back: health +8%, speed -1; a scholar's mind: qi +8% and cheaper techniques, health -5%...), a keepsake to start with, and lines of its own: in the prologue, in the Elder's first summons, at Granny Wen's door in Part VII and at the very end. The hero turns on the cliff as you choose, recoloured on the fly (`Assets.hero_instance` keeps every vertex's brightness relative to its part, so the baked occlusion, the folds, the embroidery and the hair's sheen survive the dye).
+- **The wardrobe** (Esc > Wardrobe). **Twelve outfits**, earned along the road (the Elder's white robe at Foundation, the Dragon King's scale-silk, the Phoenix-Plume Robe, the Heaven-Gate Armour, an immortal's moon-white robe, the Weaver Star's star-river silk, the Sea-Wanderer's coat of Landfall's first sailcloth, the Robe of the Many Peoples from the Conclave), given by the people met on the road (Tala's hunter's greens, the Ashen Moon's black robe and mask) or bought from Dyer Su at the Dawn Market. Each recolours robe, trousers and trims and hangs things on the hero's bones (a straw douli, a jade crown, a phoenix crest, coral horn-combs, a traveller's beaded hat, a lacquered half-mask, gold-and-white pauldrons, a feather mantle, a collar of small stars), and carries a small passive (qi +5%, harm taken -4%, attack +5%, foes miss 3% more...). The hero in the world changes as the cursor moves.
+- **Mounts and vehicles** (R to ride, Esc > Stable). **Six rides**: the **Mountain Horse** (a new Blender asset, `art/mounts/horse.py`, sculpted in clay over the muscle masses like the qilin, saddled and bridled, with a four-beat walk and a bounding gallop), the **Azure Qilin** and **Bai Hu's cub** (the Blender monsters in their own colours, with a saddle laid on), the **Flying Sword** (his own jian grown three paces long), an **Auspicious Cloud** in five colours and the **Sky-Barque of Landfall** (all three built in code). Lin Feng sits astride or stands on the deck with three new clips (`ride`, `ride_idle`, `ride_stand` in `art/lib/person.py`, baked into all four looks and Yue Ling, who rides pillion). Riding carries the party over open ground 15 to 45% faster, never indoors (the ride waits outside and comes back), and the rides are earned in the story: the horse from Tala's herd, the sword at Golden Core, the qilin if you let it choose you, the cloud at the True Immortal ascension, the tiger from Bai Hu, the barque from Landfall.
+- **Fated encounters: five people, a choice at every meeting, and choices that matter to the end** (`scripts/fate.gd`, `scripts/fate_text.gd`, Esc > Fates). Five new characters (Blender-built, `art/characters/tala.py`, `qiu_ye.py`, `little_hu.py`, `hu_grown.py`, `xu_lan.py`, `liu_ying.py`) are met in Part I and again in three later chapters, each time in the state the earlier choices left them in, and settled in Part XIV:
+
+  | Who | First met | Met again | The question |
+  |---|---|---|---|
+  | **Tala of the Horse-Folk** | Thunder Valley: starving apes have penned her herd | the Aurora Steppe's long winter, the drought on the Millet Plains | keep the herd, feed the apes, or let the horses run free? |
+  | **Qiu Ye, the Second Son** | the sect at night, a stolen Foundation pill in his hand | the Graveyard of Sword Saints, the queue of the dead at the Yellow Springs | report him, keep his secret, or pay for the pill yourself? |
+  | **Little Hu, Iron Fang's son** | over his father's body with a kitchen knife | Qingshi Village under the Weaver's threads, Longmen | the village, the sect, or the bamboo? and later: was his father a hero? |
+  | **Xu Lan, the Moon's Daughter** | in silver chains in the Blood Moon Palace, the purge coming up the stairs | her father's echo in the Mirror Lake, his shade in Youdu | hand her over, cut her loose, or vouch for her? |
+  | **Liu Ying, the Hag's Apprentice** | sorting poisons in the Marsh Hag's hut | the spore-blight of Glowcap Vale, the immortals' elixir on Fangzhang | Alchemist Mo, her family, or the grimoire? |
+
+  Every chapter is written for every state a choice can leave its person in (**65 variants, 120 options, about 400 lines of dialogue**; the tests walk every path through every thread and fail if any state could run into a chapter with nothing written for it). A choice may cost something (spirit stones, essences, pills, a name the world respects), be fought out (a fight with a pack, or with the person themselves, in their own model, and a second choice once they lie beaten: spare them or end it), and bring something (a horse, an outfit, stones). And it is **remembered**: the next chapter opens on it, the Fates page lists every choice in words, the person stays where they are (or is gone from where they were met), and it pays off:
+  - **By an old bond**, a new kind of way through a trial: Tala's riders run Bifang ragged, Qiu Ye walks into King Yama's court at Lin Feng's side, Fang Hu cuts the Weaver's threads with the village watch, Xu Lan turns Youdu's lanterns on Li, Liu Ying's antidotes meet Tianwu's venom, each only if their story went that way.
+  - Liu Ying at Alchemist Mo's side makes every one of his recipes 15% cheaper.
+  - In **Part XIV** the friends Lin Feng made come to the Wheel (three or more open **By the bonds you made** through Nie's trial, and they strike Nie every round), and the ones he made enemies of have been reached by Nie's whisper: they are fought, and spared or ended. Friends also answer the grudges of the road: Fang Hu speaks to his father's grudge, Liu Ying gives the Marsh Hag back her name, Qiu Ye makes the Headless Saint's bow.
+  - The narrator tells what became of all five, and of the hero's village, before the ending's film; the results count the friends and the fallen.
+- **Every foe has a story** (`scripts/lore.gd`, Esc > Bestiary). All **369 foes** (155 kinds of monster and 214 bosses) have a history: who or what they were, what happened to them and why they stand in the road. The first battle against a species shows its story on a card over the battle's opening; before every boss's battle (and every trial's choice of ways) the narrator tells who it was; the **Bestiary** keeps every foe met, with its element, weakness, how often it has been fought and its story. The early bosses, who used to have one line each ("Intruder in my grove"), now have a past: the Jade Mantis Matriarch guarding a season of egg-cases, Iron Fang turned away at the sect gate at twelve for want of a spirit root, the Marsh Hag who was the settlers' herb-wife before the red water took them.
+- **Part XIV, "The Ripening of Karma"**, adds a chapter, a realm (**Karma Fulfilled**) and a final trial (see [below](#part-xiv-the-ripening-of-karma)): the Elder explains why threads have appeared on Lin Feng's wrists, Judge Cui shows him the darkness gathering round the Wheel of the Six Paths, he drives back the grudges round its rim (three new monsters), settles his five threads in any order, goes back across the whole world (the old roads round the sect, up the Jianmu to the Nine Heavens, out to the Returning Ruins) to lay to rest **the six grudges that stayed** where their owners fell (six new bosses, each with its story, each fought and then answered: paid, answered by a friend, or left to feed Nie), and faces **Nie, the Unpaid**, the shadow of every debt of the journey, by his friends, by his own strength, by his renown or by a mirror of settled debts.
+- **The bot** plays all of it: it makes the story's sweeper, rides the fastest ride it has, wears the newest outfit, takes every fated encounter by a plan (`FATE_PLAN`) that makes friends of three and enemies of two (one spared at the end, one who falls), takes the bond paths through King Yama, the Weaver and Bifang, goes round the six grudges that stayed (`GRUDGE_ROUTE`, `GRUDGE_PLAN`: a friend answers where one can, else it pays, and it leaves the Admiral to the Wheel), and reaches Nie with four friends and one grudge unpaid. In the verified run (seed 1234) it plays the whole game in **17:22:16**, **1 hour 19 minutes more than the last release** (16:02:51); CI now requires **16 hours**.
+- **Code**: the game's GDScript grew from 31,270 to 41,101 lines (`create.gd`, `fashion.gd`, `fate.gd`, `fate_text.gd`, `grudges.gd` and `lore.gd` are new) and the Blender Python from 20,578 to 21,088 lines: ten new characters (the five people met on the road, a grown Fang Hu, three more looks for the hero) and a new art group, `art/mounts`; Lin Feng and Yue Ling were rebuilt from their scripts with the riding clips.
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+
+| | |
+|---|---|
+| ![character creation: "Who swept the steps?", the story's sweeper turning on the cliff](docs/screenshots/create.png) | ![the four looks (the Sweeper, the Wanderer, the Wild Child, the Scholar's Ward) in four colourings](docs/screenshots/hero_looks.png) |
+| ![eight of the twelve outfits, with their hats, crowns, masks, pauldrons and mantles](docs/screenshots/outfits.png) | ![the five people met on the road, and Fang Hu grown](docs/screenshots/fated_people.png) |
+| ![on the Flying Sword](docs/screenshots/riding_sword.png) | ![on the Auspicious Cloud](docs/screenshots/riding_cloud.png) |
+| ![Tala of the Horse-Folk, Qiu Ye and Fang Hu grown](docs/screenshots/fated_portraits.png) | ![Xu Lan, Liu Ying and Little Hu](docs/screenshots/fated_portraits2.png) |
+| ![a fated encounter: Xu Lan in silver chains in the Blood Moon Palace](docs/screenshots/fate_chapter.png) | ![a fated battle: Qiu Ye of the Ashen Moon among the sword saints' barrows](docs/screenshots/battle_fate_qiu_ye.png) |
+| ![a species met for the first time: its story over the battle's opening](docs/screenshots/battle_lore.png) | ![the Bestiary](docs/screenshots/bestiary.png) |
+| ![Kui's grudge over the aeries of Juntian, where the drum of its hide was struck](docs/screenshots/grudge_kui.png) | ![a battle with Kui's grudge](docs/screenshots/battle_grudge_kui.png) |
+| ![the Journal in Part XIV: the six grudges, where each stands and what became of it](docs/screenshots/grudges_journal.png) | ![the ending's results: Karma Fulfilled, the friends and the fallen, the grudges laid to rest](docs/screenshots/ending.png) |
+
+![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.png)
+
+### Previous release: many roads, crafting, renown and Part XIII
 
 ```mermaid
 flowchart LR
@@ -129,16 +205,16 @@ flowchart LR
 
 ![the ending's film: the magpie bridge, the Nine Cauldrons, the Jianmu, the Isles of the Eastern Sea, the Eight Gates and the Wheel of the Six Paths, each with its line of the epilogue](docs/screenshots/ending_film.png)
 
-### References
+#### References for that release
 
-Background for this release (the Eight Gates, Chiyou and the war at Zhuolu):
+Background for that release (the Eight Gates, Chiyou and the war at Zhuolu):
 
 - **Chiyou and the battle of Zhuolu**: the war god of the Nine Li, with bronze heads and iron brows, who made the first weapons of metal and fought the Yellow Emperor through a hundred days of fog; the Wind Earl and the Rain Master who fought for him, Nüba who dried the rain, the drum of Kui's hide whose beat broke his army, and the fetters struck off him that grew into the first maples, in the "Great Wilderness" chapters of the [*Classic of Mountains and Seas*](https://en.wikipedia.org/wiki/Classic_of_Mountains_and_Seas) ([Chiyou](https://en.wikipedia.org/wiki/Chiyou), [the battle of Zhuolu](https://en.wikipedia.org/wiki/Battle_of_Zhuolu)); "Chiyou's Banner", the red vapour that rose from his tomb every autumn and later the name of a comet.
 - **Xingtian**, the giant who fought on after the Yellow Emperor cut off his head, with eyes in his chest and a mouth in his belly ([Xingtian](https://en.wikipedia.org/wiki/Xingtian)).
 - **The Eight Gates**: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death of [Qimen Dunjia](https://en.wikipedia.org/wiki/Qimen_Dunjia), taught to the Yellow Emperor by the Mysterious Lady of the Nine Heavens, laid on the eight trigrams ([Bagua](https://en.wikipedia.org/wiki/Bagua)); the "Eight Gates Golden Lock" formation of the *Romance of the Three Kingdoms*, which falls when it is entered by the right gate.
 - **Wang and Liang, Chi and Mei**: the goblins of the mountains, old things and waters that fought in Chiyou's host.
 
-### Previous release: realms and talents that matter, cutscenes and Part XII
+### Two releases ago: realms and talents that matter, cutscenes and Part XII
 
 ```mermaid
 flowchart LR
@@ -218,7 +294,7 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 - **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
 - **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
 
-### Two releases ago: three realms, six Daos, six peoples and Part XI
+### Three releases ago: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -317,7 +393,7 @@ Background for this release (the myths of the Jianmu and the realms, the Daos an
 - **The peoples**: the Feathered People, the Deathless (black-skinned people who eat of the immortal tree) and the dragon-kin in the *Classic of Mountains and Seas*; the Jiaoren, whose tears turn to pearls, in the *Bowuzhi* and Gan Bao's *Soushen Ji*; celestial foxes who climb to heaven at a thousand years ([huli jing](https://en.wikipedia.org/wiki/Huli_jing)).
 - **The bosses**: [Leigong](https://en.wikipedia.org/wiki/Leigong), Duke of Thunder; Feilian, Earl of the Wind; Kui, the one-legged thunder ox of the *Classic of Mountains and Seas*; Jiufeng, the nine-headed bird of Chu; [Pixiu](https://en.wikipedia.org/wiki/Pixiu); Shentu and Yulei, the door gods under the peach tree ([Menshen](https://en.wikipedia.org/wiki/Menshen)); [Zhulong](https://en.wikipedia.org/wiki/Zhulong_(mythology)), the Torch Dragon whose open eye is day; Wangxiang, the water goblin; [Heibai Wuchang](https://en.wikipedia.org/wiki/Heibai_Wuchang), Black and White Impermanence.
 
-### Three releases ago: an organic continent, four towns and Part X
+### Four releases ago: an organic continent, four towns and Part X
 
 ```mermaid
 flowchart LR
@@ -374,7 +450,7 @@ Background for this release (the techniques behind the new map, cartography and 
 - **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
 - **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
 
-### Four releases ago: hanfu characters, five-colour monsters and Part IX
+### Five releases ago: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -454,7 +530,7 @@ Researched for that release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Five releases ago: rebuilt models and Part VIII
+### Six releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -507,7 +583,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Six releases ago: one open world and Part VII
+### Seven releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -541,7 +617,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Seven releases ago: natural landscapes and Part VI
+### Eight releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -674,7 +750,7 @@ Other terminal commands:
 ```sh
 godot --headless --path . --script tests/run_tests.gd           # data-integrity and 3D-asset tests
 godot --headless --path . --script tests/manual_input_test.gd   # real keyboard-event smoke test
-godot --headless --fixed-fps 30 --path . -- --bot --min-time=54000   # bot plays the whole game, prints play time
+godot --headless --fixed-fps 30 --path . -- --bot --min-time=57600   # bot plays the whole game, prints play time
 godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-fps for real time) watch the bot
 ```
 
@@ -682,20 +758,26 @@ godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-
 |---|---|
 | Arrows / WASD | move (relative to the camera; a held key keeps its direction while the camera turns), navigate menus |
 | Q / E | rotate the camera (it swings back behind Lin Feng as soon as he walks) |
+| R | summon your ride or get down (out of doors; it waits outside buildings) |
 | Enter / Z / Space | confirm, interact, advance dialogue |
-| Esc / X | menu (Meditate, Breakthrough, Items, Cultivation, ...), cancel |
+| Esc / X | menu (Meditate, Breakthrough, Items, Cultivation, Journal, Fates, Wardrobe, Stable, Bestiary, ...), cancel |
+| Letters, Backspace | type a name of your own at character creation (Enter on a name row) |
 
-Walk into NPCs, enemies, pickups, stairs and bosses to interact with them; walking up to a boss that guards the story opens its trial, with every way through it. There is no save system yet: a full run takes about fifteen hours. Esc > Journal shows your renown, essences and treasures, what townsfolk have asked of you, and every way through the trial ahead. Esc > Cultivation shows your realm (and what it means) and the branches of the Nine Heavens root you have woken; Esc > World Map shows the whole land and the history of where you are (Left/Right turns to the Nine Heavens, the Nine Springs and the Eastern Sea once you have been there); Esc > Annals keeps the history of everywhere you have been; Esc > Dao & Peoples shows the Daos you have walked and your standing with the peoples of the realms.
+Walk into NPCs, enemies, pickups, stairs and bosses to interact with them; walking up to a boss that guards the story opens its trial, with every way through it. There is no save system yet: a full run takes about seventeen hours. Esc > Journal shows your renown, essences and treasures, what townsfolk have asked of you, and every way through the trial ahead. Esc > Cultivation shows your realm (and what it means) and the branches of the Nine Heavens root you have woken; Esc > World Map shows the whole land and the history of where you are (Left/Right turns to the Nine Heavens, the Nine Springs and the Eastern Sea once you have been there); Esc > Annals keeps the history of everywhere you have been; Esc > Dao & Peoples shows the Daos you have walked and your standing with the peoples of the realms; Esc > Fates shows the people whose lives you changed and every choice you made about them; Esc > Wardrobe and Esc > Stable change your outfit and your ride; Esc > Bestiary keeps the story of every foe you have met.
 
 ## Gameplay
 
-- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 55 stages across nineteen realms (up to Myriad Daos as One); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through. **Realms matter**: a whole realm between two fighters is felt in every blow (realm suppression, x1.2 a realm, up to three), beasts two realms below you scatter, the Founder's nine caves on the mountain open only at their realm, and the world notices the realm you have reached (Esc > Cultivation).
+- **Character creation**: name the sweeper (or keep the story's name), choose his look, hair, eyes and robe, and his origin in Qingshi Village, which gives him a small strength, a small weakness, a keepsake and lines of his own in the story.
+- **Fated encounters** (Esc > Fates): five people met in Part I and again and again until Part XIV, a choice at every meeting; each choice decides the next chapter, can open a way through a trial (**by an old bond**), and decides who stands with Lin Feng at the end and who is fought.
+- **Outfits and rides**: twelve outfits (Esc > Wardrobe) with their own colours, hats, crowns and armour and a small passive each; six rides (R to ride, Esc > Stable): a horse, a qilin, a white tiger, a flying sword, a cloud and a sky-barque, faster than running over open ground.
+- **Every foe has a story**: the first battle against a kind of monster tells its story over the opening, every boss's story is told before the fight, and the Bestiary (Esc > Bestiary) keeps them all. In Part XIV six of the foes put down on the road come back as **grudges**, each asking what it was owed: pay it, let a friend answer it, or leave it to feed Nie.
+- **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 58 stages across twenty realms (up to Karma Fulfilled); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through. **Realms matter**: a whole realm between two fighters is felt in every blow (realm suppression, x1.2 a realm, up to three), beasts two realms below you scatter, the Founder's nine caves on the mountain open only at their realm, and the world notices the realm you have reached (Esc > Cultivation).
 - **Talents: the nine branches of the Nine Heavens root** (Esc > Cultivation): when your qi first stirs, at every tribulation and in every Founder's cave a branch wakes and you choose which: the Sword Bone, the Thunder, Five-Phase and Yin Roots, the Vajra Body, the Sea of Qi, the Enlightened Mind, Heaven's Favour or Spirit Sense, three ranks each and a crown at full leaf. The world grows with the root, so what you wake decides how you keep up.
 - **Trials and many roads**: 34 battles that carry the story forward (two lords in every chapter, three in the first, the eight Gate Generals and Chiyou) are trials, harder than the bosses before them and open only to a cultivator who has prepared one of their three or four ways: by might, by craft, by wealth, by respect, by the Dao, by a people's friendship or by a relic. The way taken changes the battle (a weaker foe, allies striking every round, wards, a weakness shown) and the ending names the road you walked most.
 - **Crafting**: every foe may leave an essence of its element (bosses always do); Alchemist Mo's cauldron and Smith Tie's forge make 29 talismans, lenses, seals, inks, mirrors and elixirs from essences, things found on the quests and spirit stones.
 - **Renown and deeds**: bosses, trials and gifts raise your renown, and so do 28 deeds, requests from townsfolk all over the world; seven titles from Unknown to Legendary, and every respect path asks for a name earned by helping people.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Fifty regions in four realms**: forty-two on a continent within the Four Seas, two in the Nine Heavens above it, two in the Nine Springs below it and four on the Isles of the Eastern Sea out past its shelf, each with elites, bosses and a hunt objective, joined by winding roads, the Jianmu and Mazu's boat, and **eleven towns** (the sect, Cloudfoot, Qingshi Village, Yanggu, Shazhou Oasis, Longmen, Tushan, Featherfall, Tearwater, Youdu and Landfall). **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon. **Part X**: Longmen, the Dragon Gate Ferry; the Drowned Fields of Gun; Tushan, the Town of the Cauldron-Casters; and Mount Buzhou, the Broken Pillar. **Part XI**: Juntian, the Level Heaven, and Changhe, the Gate of Heaven, in the Nine Heavens; the Nine Springs beneath the Roots and Youdu, the Dark Capital, in the Nine Springs. **Part XII**: Penglai, the Isle of the Immortals (Landfall); Fangzhang, the Square-Pot Isle; Yingzhou, the Isle of Mists; and Guixu, the Returning Ruins, in the Eastern Sea. **Part XIII (new)**: the Eight Gates, in eight of these regions across all four realms, and the buried field of Zhuolu under the oldest maples of the Maple Gorge.
+- **Fifty regions in four realms**: forty-two on a continent within the Four Seas, two in the Nine Heavens above it, two in the Nine Springs below it and four on the Isles of the Eastern Sea out past its shelf, each with elites, bosses and a hunt objective, joined by winding roads, the Jianmu and Mazu's boat, and **eleven towns** (the sect, Cloudfoot, Qingshi Village, Yanggu, Shazhou Oasis, Longmen, Tushan, Featherfall, Tearwater, Youdu and Landfall). **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon. **Part X**: Longmen, the Dragon Gate Ferry; the Drowned Fields of Gun; Tushan, the Town of the Cauldron-Casters; and Mount Buzhou, the Broken Pillar. **Part XI**: Juntian, the Level Heaven, and Changhe, the Gate of Heaven, in the Nine Heavens; the Nine Springs beneath the Roots and Youdu, the Dark Capital, in the Nine Springs. **Part XII**: Penglai, the Isle of the Immortals (Landfall); Fangzhang, the Square-Pot Isle; Yingzhou, the Isle of Mists; and Guixu, the Returning Ruins, in the Eastern Sea. **Part XIII**: the Eight Gates, in eight of these regions across all four realms, and the buried field of Zhuolu under the oldest maples of the Maple Gorge. **Part XIV (new)**: the five threads of the journey, settled where their people wait, six grudges that stayed where their owners fell (in the Bamboo Forest, the Crimson Marsh, the Graveyard of Sword Saints, Tushan, Juntian and Guixu), and Nie at the heart of the Wheel of the Six Paths.
 - **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, Magpie Bridge Sword, Silver River Torrent, Seventh-Night Reunion Sword, Noon-Splitting Sword, Fall of the Nine Suns, Tenth Arrow Sword, Dragon Gate Leap, Swelling Earth Rampart, Nine Cauldrons Sword, Strike of the Standing Tree, Torrent of the Nine Springs, Three Realms Concord Sword, **Returning Tide Sword**, **Rain over the Five Isles** and **Jingwei's Stone Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, Starweave Net, Magpie Wing Ward, Osmanthus Moon Rain, Moon-Dew Ward, Reed-Boat Blossom, River-Mother's Ward, Rain of Phoenix Feathers, Ward of the Standing Tree, **Spray of the Pearl Trees** and **Mazu's Red Lantern** (the reviving heals also raise a fallen ally); and the six **Dao techniques** (Ten Thousand Swords Return to One, Peng's Wind of Ninety Thousand Li, Lotus Heart Sutra, Eight Trigrams Grand Array, Nine-Turn Golden Elixir Fire and Mirror-Flower, Water-Moon), one for each Dao from Adept on.
 - **Upstairs and down**: 30 upper storeys and cellars, each reached by its stairs, with people, quest scenes and hidden keepsakes; the Jianmu's stairs climb to the Nine Heavens and go down to the Nine Springs, and Mazu's boat sails from Fusang to the isles.
 - **Cutscenes**: conversations over the world play out with gestures (nod, shake, point, wave, laugh, grieve, think, kneel, offer, shock, bow) picked from each line, answered by the listener, and framed by a two-shot conversation camera.
@@ -796,7 +878,14 @@ flowchart LR
     MapleH --> Gates{any four of the Eight Gates,<br/>in any order, in four realms}
     Gates --> Zhuolu[the field of Zhuolu: Chiyou,<br/>by the Sword, the Many Peoples or the Cauldron]
     end
-    Zhuolu ==> End((Myriad Daos as One))
+    subgraph P14[Part XIV: about 49 minutes]
+    Zhuolu ==>|Myriad Daos as One, threads on his wrists| Sect13[Sect: the ripening of karma]
+    Sect13 -->|the funeral road| Wheel2[the Wheel: Judge Cui,<br/>the grudges round its rim]
+    Wheel2 --> Five{settle the five threads,<br/>in any order}
+    Five --> Grudges{the six grudges that stayed,<br/>where they fell, in any order:<br/>bamboo, marsh, graves, Tushan,<br/>Juntian, Guixu}
+    Grudges --> Nie[Nie, the Unpaid,<br/>by the bonds you made]
+    end
+    Nie ==> End((Karma Fulfilled))
 ```
 
 ```mermaid
@@ -906,6 +995,72 @@ Each region is still generated from its own seed by `mapgen.gd` (so every boss, 
 **The realms above and below** (Part XI) are built by the same `Atlas._build`, one realm at a time (`Atlas.world_of(layer)`): `STRATA` gives each its own 260 x 200 grid, the sites of its regions, how far land reaches from a site (land runs out into open sky or into the abyss instead of the sea) and how many holes to open in the wild ground between regions (gaps of sky between the islands, chasms between the caverns). `layer_origin` lays each grid over the land's so that the Jianmu's crown in the Nine Heavens floats straight above its trunk on the mountain and its roots in the Nine Springs hang straight below. The ends of a ladder are two linked entities, one in each realm; walking onto one lifts or lowers Lin Feng and puts him on the free tile beside the other end. The Nine Heavens are drawn 96 m above the land and the Nine Springs 64 m below it, and `world.gd` keeps a bundle per realm (its land, its streamed regions, its sea of cloud or glowing abyss) and shows only the one Lin Feng is in. A **floor** (`Atlas.floor_id`, `f:<region>:<building>:<level>`) is a world of its own the size of its building, holding the people and things that live on it and the stairs back.
 
 The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part XIV: The Ripening of Karma
+
+The first Conclave goes on for nine days, and on the tenth everybody goes home. In the evening, sweeping the steps, Lin Feng finds threads on his wrists, fine as spider silk and warm, running out over the edge of the mountain and all pulling, very gently, south-west. **Cause and effect**, the Elder says: everything a cultivator set moving on the road comes home at the end of it and asks to be settled. Most threads are light; a few were people, and those are heavy. And at the far end of every thread that was cut instead of tied, something has been feeding: **Nie**, the shadow of everything owed and never paid, gathering where debts are reckoned, at the Wheel of the Six Paths.
+
+| Step | Where | What happens |
+|---|---|---|
+| The threads | the sect | the Elder explains the ripening of karma, and sends Lin Feng to the Wheel |
+| The Karma Mirror | the Wheel of the Six Paths | Judge Cui shows the five threads running into the darkness round the Wheel's rim |
+| The grudges | the Wheel | drive back the Grudge Wisps, Debt Shades and Karma Moths (three new monsters, each with its story) |
+| The five threads | the sect, Cloudfoot, Qingshi Village, the Blood Moon Palace, the Crimson Marsh | settle Tala, Qiu Ye, Fang Hu, Xu Lan and Liu Ying, **in any order**: each meeting is written for what Lin Feng made of them, and ends with a friend, an enemy fought (and spared or ended) or a parting |
+| The Mirror again | the Wheel | Judge Cui shows six grudges that never came to the Wheel: their owners went over the bridge, but what they were owed took root where they fell, and Nie drinks from all six |
+| **The grudges that stayed** | the Bamboo Forest, the Crimson Marsh, the Sword Graveyard, Tushan, Juntian (the Nine Heavens), Guixu (the Eastern Sea) | six new bosses, **in any order**, each standing beside the place its owner fell, in its owner's shape gone to soot: it fights first (as hard as a trial's boss), then says what it was owed, and Lin Feng chooses: **pay it**, **let a friend answer it** (only if that thread went that way), or **leave it to the Wheel**. Every grudge left unpaid gives Nie 15% more health, every one laid to rest takes 4% off; Nie names the ones it carries, and the ending tells what came of the rest |
+| Nie, the Unpaid | the heart of the Wheel | a trial: **by the bonds you made** (three or more friends; they strike Nie every round), **by might** (the peak of Myriad Daos and a fully tempered sword), **by respect** (renown 760: the dead have heard of you) or **by craft** (a Mirror of Settled Debts, forged from two spokes of the Wheel) |
+| Home | the sect | every thread goes slack at once, like a bell rope when the ringing stops |
+| *Karma Fulfilled* | | the last tribulation is every face met on the road, waiting to hear what Lin Feng will say; then the narrator tells what became of all five, and of his village |
+
+```mermaid
+flowchart TD
+    Q1{Part I, the sect at night:<br/>Qiu Ye and a stolen pill} -->|take him to the Elder| EX[expelled]
+    Q1 -->|keep his secret| SE[secret]
+    Q1 -->|pay Mo for the pill| SH[shared]
+    EX -->|fight him: he flees| BE[beaten]
+    EX -->|offer your hand| DO[doubt]
+    SE -->|break the cursed sword: its guardians rise| FR[freed]
+    SE -->|let him keep it| PO[possessed]
+    SH -->|duel him honestly| FI[friend]
+    SH -->|let him win| FL[flattered]
+    BE & PO -->|Part VI: stop the binding of his father's shade| FOE[foe]
+    BE & PO -->|help him say goodbye| TU[turning]
+    DO & FR & FI & FL -->|walk them to the Naihe Bridge| BR[brother]
+    DO & FR & FI & FL -->|leave them to it| DI[distant]
+    FOE -->|Part XIV: he comes with the Ashen Moon; spare him| RE((redeemed: at the Wheel))
+    FOE -->|end it| FA((fallen))
+    TU -->|vouch for him| RE
+    TU -->|refuse| PA((parted))
+    BR --> AL((ally: at the Wheel))
+    DI -->|ask him as an equal| AL
+    DI -->|let him go home| PA
+    BR -.->|Part VI: a way through King Yama's trial| KY[By an old bond]
+    TU -.-> KY
+```
+
+*Qiu Ye's thread, every way through it (the other four are as branched: 65 variants in all).*
+
+The six grudges (`scripts/grudges.gd`), every one a foe Lin Feng put down on the road and never asked about:
+
+| The grudge | Where it fell | What it was owed | The answers |
+|---|---|---|---|
+| **Iron Fang's** | the Bamboo Forest (Part I) | a test at the sect gate: at twelve he was sent down the steps for his father's patched sleeves, without even the stone | let **Fang Hu** answer his father (if he stands with you), **test him at last** and pay for testers at the gate (30,000 stones), or the Wheel |
+| **The Marsh Hag's** | the Crimson Marsh (Part I) | a winter of cures for thirty-six settler families the Court never paid for, and her own name, which she has forgotten | let **Liu Ying** read her name from the grimoire's first page, **pay the settlers' bill** (40,000 stones), or the Wheel |
+| **The Headless Saint's** | the Sword Graveyard (Part III) | his name, taken off the sect's ancestral tablets because a saint who refused an Emperor was an awkward ancestor | let **Qiu Ye** make the old bow, **put his name back** (renown 450), or the Wheel |
+| **Fangfeng's** | Tushan (Part X) | somebody to ask why he was late: he stood in a burst dyke for a day and a night, and was beheaded before he could say so | **ask him** (free), **raise him a shrine** on the dyke (25,000 stones), or the Wheel |
+| **Kui's** | Juntian, in the Nine Heavens (Part XI) | its joy: its hide became a war drum, and every thunderclap since has sounded like the drum | **carry it home** to Liubo (three rides of your own), **unstring the drum** (six thunder essences), or the Wheel |
+| **The Admiral's** | Guixu, out at sea (Part XII) | word of his daughter, rowed ashore at Penglai at eleven with a red ribbon | **read him her name** from Xu Fu's log, **bring his wheel to Landfall** (30,000 stones), or the Wheel |
+
+```mermaid
+flowchart LR
+    M[the Karma Mirror:<br/>six grudges that<br/>never came] --> G{any order}
+    G --> F1[fight it where<br/>its owner fell] --> O{what was<br/>it owed?}
+    O -->|a friend answers it| E[laid to rest]
+    O -->|pay it| P[paid]
+    O -->|leave it to the Wheel| U[unpaid]
+    E & P -->|Nie health -4% each,<br/>a line of the ending| N((Nie, the Unpaid))
+    U -->|Nie health +15% each,<br/>Nie names it| N
+```
 
 ## Part XIII: The Eight Gates
 
@@ -1236,6 +1391,22 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Bugs found and fixed
 
+Found in this release by playing, by screenshots and by a read of the game's logic against its data, each confirmed by a run before it was fixed:
+
+| Bug | Fix |
+|---|---|
+| **Round things with an uncommon number of sides were drawn as boxes.** The mesh builder only knew the cylinders and cones of 4, 6, 8, 14 and 24 sides; anything else fell through to a cube, so the great drum (20 sides), the hall columns (10), the pillars of heaven and the five- and seven-sided spires stood square | Every number of sides is built round, at the height the cube had, so nothing changes size (`MB._proto`; the standard cylinders' two-unit height is now documented) |
+| **Holding a key into a flight of stairs bounced the hero between floors for ever.** He arrives facing the stairs back (they stand side by side), and a key still held walked him straight in again: 14 changes of floor in ten seconds; 66 of the 204 ways between floors and realms arrive like that | After the stairs, a ladder, the Jianmu or the boat, the movement keys wait to be let go |
+| **The courtyard's Dao Stele ran the Elder's choice early.** It stands from the moment the Elder is ready to speak of the six roads; used first, it opened the one-time "Which road will you walk?" (no way out of it), the Elder's answer came from the stone, and the Elder then offered "The Dao Stele: walk another road?" | Until the Elder has spoken the stele is only carved stone, and says so |
+| **Walking into a closed Lotus Seal flooded the corner with copies of one message.** Every frame of a held key added the same toast, four of them pushed out "Quest complete" and whatever else had just been said | The same message again keeps its one line up for longer |
+| **The Dao page lost the last of the peoples.** Each people took about 85 pixels, so with seven or eight met (the Road of the Many Peoples needs all eight as Friends) the seventh ran over "Enter / Esc: back" and the eighth, the Immortals of the Isles, was off the bottom of the screen | Name and standing share a row, the rest one or two lines beneath: all nine fit |
+| **The qi a technique costs was cut off in battle.** The technique menu is 222 pixels wide, and 32 of the 65 techniques' labels were wider ("Nine Heavens Thunder  [22") | The cost has a right-aligned column of its own and the name shrinks to fit beside it (`UI.menu_list`, a tab in the label) |
+| **Meditation counted cultivation it did not give.** At the peak of a realm cultivation stops until the breakthrough, but "(+N this session)" went on rising | Only what is gained is counted |
+| **The training stones wasted their time at the peak of a realm and could not complete a stage.** They started their ten-minute wait before finding there was nothing to teach, and wrote what they taught straight into the cultivation bar, so reaching a stage's threshold did not reach the stage | They check first, and teach through `add_exp` like any other cultivation |
+| Caught in this release's own new code before it shipped: the people met on the road lost their mark on the way into the world (all twenty stood about from the first morning, two Qiu Yes in the courtyard, and only ever said "..."); the meditation screen and the ending showed the story's sweeper (or the first game's hero on a second New Game), not the one the player made; the ending's results card said "Lin Feng" whatever the hero was called; and the Bestiary counted foes, not battles | The mark is carried, both screens rebuild the hero when he has changed, the card uses the chosen name, a battle counts once per kind of foe |
+
+### Bugs fixed in the Part XIII release
+
 | Bug | Fix |
 |---|---|
 | **"The The Thousand Children call you Friend."** The toast, the timeline and the gift screen put "The" in front of a people's name, and two peoples' names (the Thousand Children of Landfall, the Immortals of the Isles) already begin with it | `Game.the_race` adds "The" only where the name has none |
@@ -1432,7 +1603,7 @@ flowchart TD
         W[world.gd<br/>four realms and their floors, streaming,<br/>ladders, chase and conversation cameras,<br/>cutscene gestures, HUD]
         B[battle.gd<br/>3D arena, shoulder camera]
         T[title / ending / meditate<br/>3D scenes]
-        M[menu / shop / dialogue / choice<br/>2D overlays]
+        M[menu / shop / dialogue / choice /<br/>create: 2D overlays]
     end
     W --> ATL[atlas.gd<br/>four realms: sites, warped Voronoi,<br/>coast, A* roads, seals, ladders, floors]
     ATL --> MG2[mapgen.gd<br/>regions, buildings]
@@ -1452,7 +1623,13 @@ flowchart TD
     FX --> MB
     TER --> LK[(look.gd<br/>50 region looks, cellar air,<br/>sky shader)]
     TER --> AS
-    W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap]
+    W --> UI[ui.gd and gfx.gd<br/>panels, bars, minimap,<br/>the chosen name on screen]
+    W --> FS[fashion.gd<br/>looks, origins, outfits, rides]
+    MOD --> FS
+    M --> FT[fate.gd + fate_text.gd<br/>five threads, their states,<br/>bonds through the trials]
+    M --> GD[grudges.gd<br/>the six grudges that stayed,<br/>what each was owed, Nie]
+    GD --> FT
+    B --> LR[lore.gd<br/>a story for every foe]
     B --> UI
 ```
 
@@ -1472,7 +1649,7 @@ godot --path . --fixed-fps 30 -- --tour=out --areas=none --no-extras --portraits
 
 ## The playthrough bot
 
-`scripts/bot.gd` plays the entire game end to end through the **same input surface a human uses** (`up/down/confirm/cancel` presses on the top screen and a held movement direction). It pathfinds across the open world with `AStarGrid2D` (seals still closed and other monsters count as blocked), grinds and meditates when under-levelled, rests when hurt, shops, picks skills by elemental weakness, heals with pills or Spring Rain, and handles tribulations. Since Part XII it also wakes the branches of the Nine Heavens root by a plan, opens the Founder's caves it passes once its realm allows, and when it must grind in the higher realms it goes looking for packs anywhere in the region rather than meditate for hours. Since Part XIII it **prepares for every trial** by a plan that takes each one a different way (`TRIAL_PLAN`: craft, respect, wealth, might, the Dao, a relic) and falls back on the cheapest feasible way: it hunts the essences a recipe needs, crafts at the cauldron or the forge, earns stones, does deeds for renown (nearest first), fetches keepsakes from upper storeys and cellars, changes Daos at a stele, tempers its sword, and opens the Eight Gates in the order of `GATE_PLAN`; `--route=sword|peoples|cauldron` picks its road into the heart (the default is the Many Peoples).
+`scripts/bot.gd` plays the entire game end to end through the **same input surface a human uses** (`up/down/confirm/cancel` presses on the top screen and a held movement direction). It pathfinds across the open world with `AStarGrid2D` (seals still closed and other monsters count as blocked), grinds and meditates when under-levelled, rests when hurt, shops, picks skills by elemental weakness, heals with pills or Spring Rain, and handles tribulations. Since Part XII it also wakes the branches of the Nine Heavens root by a plan, opens the Founder's caves it passes once its realm allows, and when it must grind in the higher realms it goes looking for packs anywhere in the region rather than meditate for hours. Since Part XIII it **prepares for every trial** by a plan that takes each one a different way (`TRIAL_PLAN`: craft, respect, wealth, might, the Dao, a relic) and falls back on the cheapest feasible way: it hunts the essences a recipe needs, crafts at the cauldron or the forge, earns stones, does deeds for renown (nearest first), fetches keepsakes from upper storeys and cellars, changes Daos at a stele, tempers its sword, and opens the Eight Gates in the order of `GATE_PLAN`; `--route=sword|peoples|cauldron` picks its road into the heart (the default is the Many Peoples). Since the Fates and Faces release it makes the story's sweeper at the creation screen, summons the fastest ride it owns (R) whenever it is out of doors, changes into the newest outfit it has earned, answers every fated encounter by `FATE_PLAN` (Tala, Qiu Ye and Fang Hu become friends, Xu Lan an enemy spared at the end, Liu Ying an enemy who falls, so one run walks friendship, enmity, sparing and ending), takes the bond paths through King Yama, the Weaver and Bifang, goes round the six grudges that stayed in the order of `GRUDGE_ROUTE` and answers each by `GRUDGE_PLAN` (a friend where one can, else it pays, and it leaves the Admiral to the Wheel so that one run sees a grudge feed Nie).
 
 To make its clock a fair estimate of a person's playtime it uses human-scale pacing: 0.2 to 0.4 s per key press, and each dialogue line is "read" for about `length / 40` seconds after it finishes typing.
 
@@ -1482,37 +1659,37 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs). The last release took 14:06:51. The same bot now reaches the end of Part XII at 15:13:53: the trials of the old chapters (crafting trips back to the sect, deeds for renown, Daos changed at the steles, harder battles and the rests they need) add **1 hour 7 minutes**, and Part XIII itself plays in about **49 minutes**: the game is now **1 hour 56 minutes longer**. It passes 30 trials (craft 9, respect 5, wealth 5, might 5, dao 4, relic 1, peoples 1), crafts 9 things, does 8 deeds, opens 4 of the Eight Gates and reaches the heart by the Road of the Many Peoples. The other two roads were played to the ending from `--bot-start=s_p13_heart`: the Road of the Sword in 0:45:25 and the Road of the Cauldron in 0:43:38 of game time.
+Latest result (seed 1234, identical across runs). The last release took 16:02:51. The same bot now reaches the end of Part XIII at 16:33:07: the fated encounters' chapters and fights, the foes' stories told before every boss, and the creation screen add 30 minutes to the old chapters (riding, 15 to 45% faster over open ground, gives a little of it back), and Part XIV plays in about 49 minutes: the game is now **1 hour 19 minutes longer**. It passes 31 trials (might 4, craft 8, wealth 4, respect 5, dao 4, peoples 1, relic 1, bond 4), four of them by an old bond, crafts 8 things, does 7 deeds, opens 4 of the Eight Gates and reaches the heart by the Road of the Many Peoples; of the five people met on the road it makes friends of four (Xu Lan an enemy spared at the end) and Liu Ying falls; it lays five of the six grudges to rest and leaves the Admiral's to the Wheel, so Nie comes to the last battle carrying one. The other two roads into the heart were played through Part XIV to the ending from `--bot-start=s_p13_heart`: the Road of the Sword in 1:43:30 and the Road of the Cauldron in 1:42:06 of game time.
 
 ```
-game play time  : 16:02:51 (57772 s)
-wall clock      : ~16 min (headless)
-final realm     : Early Myriad Daos as One
-battles / kills : 1696 / 3150   deaths: 0
-time by screen  : battle 20760 s, meditate 12460 s, dialogue 11517 s, world 12718 s, menu 295 s, shop 24 s, choice 35 s
-meditation for  : rest 12097 s, grind 363 s
-trials passed   : 30 (craft 9, respect 5, wealth 5, might 5, dao 4, relic 1, peoples 1), renown 612, deeds 8, gates 4
-time by area    : sect 2292, mountain 1669
-                  bamboo 1722, marsh 845, frost 1099, thunder 526, palace 595
-                  dragon 650, volcano 1241, void 688, celestial 1447
-                  mirror 655, grave 1099, time 737, origin 1212
-                  cloudsea 717, court 712, forge 774, garden 1214
-                  dunes 828, fungal 710, aurora 888, chaos 1341
-                  maple 2188, karst 858, springs 901, wheel 1103
-                  village 1013, terraces 924, silk 913, loom 1235
-                  starferry 967, magpie 961, starpalace 1011, jasper 1267
-                  yanggu 1237, millet 1907, fusang 1342, guanghan 1143
-                  longmen 1444, drowned 1321, tushan 1272, buzhou 1400
-                  juntian 1337, changhe 1091, ninesprings 1139, youdu 1585
-                  penglai 1356, fangzhang 1083, yingzhou 1064, guixu 1082
-result          : PASS (needs >= 54000 s)
+game play time  : 17:22:16 (62536 s)
+wall clock      : ~17 min (headless)
+final realm     : Early Karma Fulfilled
+battles / kills : 1700 / 3127   deaths: 0
+time by screen  : battle 21157 s, meditate 11994 s, dialogue 18100 s, world 11014 s, menu 312 s, shop 22 s, choice 51 s
+meditation for  : rest 11686 s, grind 307 s
+trials passed   : 31 (might 4, craft 8, wealth 4, respect 5, dao 4, peoples 1, relic 1, bond 4), renown 698, deeds 7, gates 4
+time by area    : sect 2437, mountain 1686
+                  bamboo 1978, marsh 1185, frost 1101, thunder 712, palace 840
+                  dragon 700, volcano 1251, void 753, celestial 1516
+                  mirror 831, grave 1243, time 802, origin 1262
+                  cloudsea 747, court 744, forge 845, garden 1274
+                  dunes 847, fungal 837, aurora 911, chaos 1250
+                  maple 2604, karst 950, springs 1053, wheel 1489
+                  village 1188, terraces 980, silk 957, loom 1211
+                  starferry 1061, magpie 1041, starpalace 1035, jasper 1377
+                  yanggu 1323, millet 1382, fusang 1377, guanghan 1264
+                  longmen 1546, drowned 1425, tushan 1444, buzhou 1504
+                  juntian 1568, changhe 1141, ninesprings 1182, youdu 1712
+                  penglai 1400, fangzhang 1237, yingzhou 1158, guixu 1290
+result          : PASS (needs >= 57600 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 54000), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state, its goal and the trial ahead every frame after that game time), and `--route=sword|peoples|cauldron` (the road into the heart of the Eight Gates).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 57600), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state, its goal and the trial ahead every frame after that game time), and `--route=sword|peoples|cauldron` (the road into the heart of the Eight Gates).
 
 ## CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency, the realms, floors, Daos and peoples, the Eastern Sea, realm suppression, the nine branches of the root and the Founder's caves, cutscene gestures and progress-aware chat, every trial and its ways, the recipes and where their ingredients come from, the deeds, renown, the Eight Gates and the three roads, and that every script compiles), then runs the bot headless and **fails the build if the game is not completed or takes less than 15 hours of game time**. A second job installs Blender as a Python module, rebuilds every asset in `art/` from its script and validates the exports with `art/check_assets.py`. The bot report is uploaded as an artifact and shown in the job summary.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) downloads Godot, imports the project, runs the data-integrity tests (`tests/run_tests.gd`: quest/dialogue/NPC/boss references, gate symmetry, map reachability and determinism, the open world (everything reachable, seals closing every unopened region, determinism), every building's walls and door, every 3D model and terrain builds, story consistency, the realms, floors, Daos and peoples, the Eastern Sea, realm suppression, the nine branches of the root and the Founder's caves, cutscene gestures and progress-aware chat, every trial and its ways, the recipes and where their ingredients come from, the deeds, renown, the Eight Gates and the three roads, character creation, the outfits and rides, a story for every foe, every path through every fated encounter, the grudges that stayed, and that every script compiles), then runs the bot headless and **fails the build if the game is not completed or takes less than 16 hours of game time**. A second job installs Blender as a Python module, rebuilds every asset in `art/` from its script and validates the exports with `art/check_assets.py`. The bot report is uploaded as an artifact and shown in the job summary.
 
 ```mermaid
 flowchart LR
@@ -1520,7 +1697,7 @@ flowchart LR
     DL --> IMP[Import project]
     IMP --> T[Data-integrity tests]
     T --> B[Bot plays whole game<br/>--fixed-fps 30]
-    B --> G{completed and<br/>game time >= 15h?}
+    B --> G{completed and<br/>game time >= 16h?}
     PR --> ART[pip install bpy<br/>art/build_all.py] --> CHK[check_assets.py]
     G -- yes --> OK[Pass + report artifact]
     G -- no --> FAIL[Fail]
@@ -1532,6 +1709,12 @@ flowchart LR
 scripts/data.gd      content: skills, enemies, areas, quest chain, dialogue
 scripts/trials.gd    many roads: trials and their ways, essences, crafting recipes, renown and deeds
 scripts/props.gd     things to do: outdoor props by theme, usable furniture, what comes of using them
+scripts/fashion.gd   who Lin Feng is (character creation: names, looks, colours, origins), outfits and rides
+scripts/create.gd    the character creation screen over the title's cliff
+scripts/fate.gd      fated encounters: the five threads, their chapters and states, bonds, presence, rewards
+scripts/fate_text.gd the words of the fated encounters: every chapter's variants, choices, states, epilogues
+scripts/lore.gd      a story for every foe: the bestiary's monsters and the bosses' pasts
+scripts/grudges.gd   Part XIV's six grudges that stayed: what each was owed, the answers, Nie's weight, epilogues
 scripts/mb.gd        mesh builder (primitives to merged ArrayMesh)
 scripts/models.gd    3D people, monsters, props
 scripts/terrain3d.gd 3D terrain, landmarks, buildings
@@ -1555,7 +1738,7 @@ art/lib/clay.py      metaball sculpting with bone weights (creature bodies)
 art/lib/anatomy.py   animal heads, bodies, legs, fur, feathers, scales; canine.py, feline.py, bird.py
 art/lib/creature.py  monster rigs, leg IK, gaits and the shared motion clips
 art/check_assets.py  validator for the exported GLBs
-art/characters, art/monsters, art/props   one Blender script per asset
+art/characters, art/monsters, art/mounts, art/props   one Blender script per asset (art/mounts: the horse)
 art/build_all.py     rebuild every asset
 assets/              generated .glb files (never edited by hand)
 scripts/screen.gd    ScreenBase: 3D scene + 2D overlay

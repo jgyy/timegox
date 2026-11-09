@@ -1,6 +1,7 @@
 extends SceneTree
-## Feeds real keyboard events (no bot) into the game: title -> new game -> dialogue -> walk -> menu ->
-## a thing to do (props.gd): face it, Enter, he does it, Enter again finishes it.
+## Feeds real keyboard events (no bot) into the game: title -> character creation (a name typed, a
+## look and an origin changed) -> dialogue -> walk -> menu -> a thing to do (props.gd): face it, Enter,
+## he does it, Enter again finishes it.
 ## Run: godot --headless --path . --script tests/manual_input_test.gd
 
 var main
@@ -40,9 +41,41 @@ func _process(_d: float) -> bool:
 		5:
 			expect(main.top_name() == "title", "starts on title")
 			tap(KEY_ENTER)
+		8:
+			expect(main.top_name() == "create", "New Game opens character creation")
+			# Enter on the family name writes one of your own
+			tap(KEY_ENTER)
+		9:
+			expect(main.create.typing == "family", "Enter on the name starts typing")
+			for c in [KEY_B, KEY_A, KEY_I, KEY_1]:
+				tap(c)
+			tap(KEY_BACKSPACE)
+			tap(KEY_I)
+			tap(KEY_ENTER)
 		10:
-			expect(main.top_name() == "dialogue", "Enter starts new game with prologue")
+			expect(main.create.typing == "" and str(main.create.h.family) == "Bai", "a typed family name, letters only (%s)" % str(main.create.h.family))
+			# the given name from the rolls, the next look, the next origin
+			tap(KEY_DOWN)
+			tap(KEY_RIGHT)
+			tap(KEY_DOWN)
+			tap(KEY_RIGHT)
 			for i in 4:
+				tap(KEY_DOWN)
+			tap(KEY_RIGHT)
+		11:
+			var h: Dictionary = main.create.h
+			expect(str(h.given) == "Chen" and str(h.look) == "wanderer" and str(h.origin) == "fisher", "Left/Right change the name, the look and the origin (%s)" % str(h))
+			tap(KEY_DOWN)
+			tap(KEY_ENTER)
+		12:
+			var gs0 = root.get_node("Game")
+			expect(gs0.hero_name() == "Bai Chen" and UI.named("Lin Feng swept the steps.") == "Bai Chen swept the steps.", "the journey begins with the name chosen, on screen everywhere")
+			expect(int(gs0.inv.get("hp_pill", 0)) == 5 and gs0.max_hp(0) > Data.max_hp(0), "the origin's gift and strength (a ferry-hand: two more pills, more health)")
+		15:
+			expect(main.top_name() == "dialogue", "Begin starts the new game with its prologue")
+			# (three lines: the prologue, a line of the hero's origin, the way to the Elder; Enter once to
+			# finish typing a line and once to go on)
+			for i in 6:
 				tap(KEY_ENTER)
 		20:
 			expect(main.top_name() == "world", "dialogue dismissed with Enter")

@@ -47,7 +47,7 @@ func _draw() -> void:
 	var l: Array = lines[idx]
 	var r := Rect2(60, 520, VIEW.x - 120, 170)
 	UI.panel(self, r)
-	var who: String = l[0]
+	var who: String = UI.named(str(l[0]))
 	# the name tag grows for long titles ("Xuan Wu, Black Tortoise of the North")
 	var tw := maxf(280.0, UI.font().get_string_size(who, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x + 48.0)
 	var tag := Rect2(84, 496, tw, 36)

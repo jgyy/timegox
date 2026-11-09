@@ -15,4 +15,4 @@
 ## Checks before pushing
 - `godot --headless --path . --script tests/run_tests.gd`
 - `godot --headless --path . --script tests/manual_input_test.gd`
-- `godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --min-time=54000` (CI requires the full game to complete in at least 15 hours of game time)
+- `godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --min-time=57600` (CI requires the full game to complete in at least 16 hours of game time)

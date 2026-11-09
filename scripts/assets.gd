@@ -19,7 +19,9 @@ extends RefCounted
 ## and the bot stay deterministic.
 
 const DIR := "res://assets/"
-const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim"]
+const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim", "ride", "ride_idle", "ride_stand"]
+## the animals the party rides (fashion.gd RIDES; art/mounts)
+const MOUNTS := {"horse": "mounts/horse"}
 ## shape -> asset path for monsters that have a Blender model
 const MONSTERS := {
 	"beast": "monsters/beast", "dragon": "monsters/dragon", "phoenix": "monsters/phoenix", "bird": "monsters/phoenix",
@@ -41,6 +43,8 @@ const MONSTERS := {
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
+	# the hero's other looks (character creation, fashion.gd LOOKS)
+	"lin_feng_wanderer": "characters/lin_feng_wanderer", "lin_feng_wild": "characters/lin_feng_wild", "lin_feng_scholar": "characters/lin_feng_scholar",
 	"alchemist": "characters/alchemist", "smith": "characters/smith", "nomad": "characters/nomad",
 	"spore_witch": "characters/spore_witch", "steppe_shaman": "characters/steppe_shaman", "nuwa_echo": "characters/nuwa_echo",
 	# earlier NPCs, now Blender-built too
@@ -110,6 +114,9 @@ const PEOPLE := {
 	"xia_cormorant": "characters/xia_cormorant", "bell_tuner_gong": "characters/bell_tuner_gong", "auntie_rong": "characters/auntie_rong",
 	"ling_fei": "characters/ling_fei", "ao_xun": "characters/ao_xun", "yao_silk": "characters/yao_silk", "bu_lin": "characters/bu_lin",
 	"roll_clerk_ning": "characters/roll_clerk_ning", "lamplighter_bo": "characters/lamplighter_bo", "hu_xiao": "characters/hu_xiao",
+	# Fates and Faces: the five people met again and again on the road (fate.gd)
+	"tala": "characters/tala", "qiu_ye": "characters/qiu_ye", "little_hu": "characters/little_hu", "hu_grown": "characters/hu_grown",
+	"xu_lan": "characters/xu_lan", "liu_ying": "characters/liu_ying",
 }
 
 static var _scenes := {}
@@ -143,9 +150,9 @@ static func _material_for(src: Material, actor: bool = false) -> Material:
 		return MB.mat_actor_plain() if actor else MB.mat_plain()
 	return MB.mat_actor() if actor else MB.mat_vc()
 
-## characters and monsters (rigged assets) use the actor shading; props keep the scenery toon
+## characters, monsters and mounts (rigged assets) use the actor shading; props keep the scenery toon
 static func is_actor(rel: String) -> bool:
-	return rel.begins_with("characters/") or rel.begins_with("monsters/")
+	return rel.begins_with("characters/") or rel.begins_with("monsters/") or rel.begins_with("mounts/")
 
 ## Accent colours by element: small, saturated focal colours (a fire beast's eyes, crest and spines
 ## glow gold, a water beast's cyan ...), each with an alternate for bodies already of that hue.
@@ -291,6 +298,103 @@ static func instance(rel: String, tint: Color = Color(0, 0, 0, 0), pal: Array = 
 	root.set_meta("glb", rel)
 	root.set_meta("meshes", meshes)
 	return root
+
+## The hero as the player made and dressed him (fashion.gd): his look's model with parts recoloured.
+## `cols` may hold "robe" (the robe: cloth on the primary slot), "sec" (trousers, sash, boots and cape:
+## cloth on the secondary slot), "trim" (collar and trims: cloth on the accent slot), "hair" (the hair
+## class) and "eyes" (the irises); a part left out keeps its authored colour, so with no colours this
+## is the plain asset.  Every recoloured vertex keeps its brightness relative to its part's average,
+## so the baked occlusion, the folds, the embroidery and the hair's sheen all survive the dye.
+static func hero_instance(rel: String, cols: Dictionary) -> Node3D:
+	if cols.is_empty():
+		return instance(rel)
+	var inst: Node3D = _scene(rel).instantiate()
+	var meshes: Array = []
+	_walk(inst, meshes, "MeshInstance3D")
+	var sig := ""
+	for k in ["robe", "sec", "trim", "hair", "eyes"]:
+		sig += (cols[k] as Color).to_html(false) if cols.has(k) else "-"
+	for mi in meshes:
+		var m: MeshInstance3D = mi
+		m.mesh = _hero_mesh(m.mesh, cols, "%s|%s|hero:%s" % [rel, m.name, sig])
+	var aps: Array = []
+	_walk(inst, aps, "AnimationPlayer")
+	var root := Node3D.new()
+	root.name = rel.get_file()
+	root.add_child(inst)
+	if not aps.is_empty():
+		var ap: AnimationPlayer = aps[0]
+		ap.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+		for an in ap.get_animation_list():
+			var a: Animation = ap.get_animation(an)
+			a.loop_mode = Animation.LOOP_LINEAR if an in LOOPS else Animation.LOOP_NONE
+		root.set_meta("ap", ap)
+	root.set_meta("glb", rel)
+	root.set_meta("meshes", meshes)
+	return root
+
+## Which recolourable part of a person a vertex belongs to ("" for none): cloth by its palette slot,
+## the hair, and the irises (crystal in the unoutlined surface, at eye height).
+static func hero_part(col: Color, uv: Vector2, pos: Vector3, plain: bool) -> String:
+	var cls := col.a
+	if cls >= 0.94:
+		var slot := 1.0 - uv.y
+		return "robe" if slot < 0.25 else ("sec" if slot < 0.75 else "trim")
+	if cls >= 0.15 and cls <= 0.25:
+		return "hair"
+	if plain and cls >= 0.45 and cls <= 0.55 and pos.y > 1.5:
+		return "eyes"
+	return ""
+
+static func _lum(c: Color) -> float:
+	return c.r * 0.3 + c.g * 0.55 + c.b * 0.15
+
+static func _hero_mesh(src: Mesh, cols: Dictionary, key: String) -> Mesh:
+	if _meshes.has(key):
+		return _meshes[key]
+	var out := ArrayMesh.new()
+	var lin := {}
+	for k in cols:
+		lin[k] = (cols[k] as Color).srgb_to_linear()
+	for s in src.get_surface_count():
+		var arr: Array = src.surface_get_arrays(s)
+		var smat: Material = src.surface_get_material(s)
+		var plain := smat != null and smat.resource_name.begins_with("plain")
+		var mat: Material = _material_for(smat, true)
+		if arr[Mesh.ARRAY_TEX_UV] != null and arr[Mesh.ARRAY_COLOR] != null:
+			var cs: PackedColorArray = arr[Mesh.ARRAY_COLOR]
+			var uvs: PackedVector2Array = arr[Mesh.ARRAY_TEX_UV]
+			var ps: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+			var parts := PackedStringArray()
+			parts.resize(cs.size())
+			var sum := {}
+			var cnt := {}
+			for i in cs.size():
+				var part := hero_part(cs[i], uvs[i], ps[i], plain)
+				parts[i] = part
+				if part != "" and lin.has(part):
+					sum[part] = float(sum.get(part, 0.0)) + _lum(cs[i])
+					cnt[part] = int(cnt.get(part, 0)) + 1
+			for i in cs.size():
+				var part2: String = parts[i]
+				if part2 == "" or not lin.has(part2):
+					continue
+				var mean: float = maxf(0.0005, float(sum[part2]) / float(cnt[part2]))
+				var k := clampf(_lum(cs[i]) / mean, 0.2, 1.7)
+				var tc: Color = lin[part2]
+				cs[i] = Color(minf(1.0, tc.r * k), minf(1.0, tc.g * k), minf(1.0, tc.b * k), cs[i].a)
+			arr[Mesh.ARRAY_COLOR] = cs
+		var flags: int = src.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
+		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr, [], {}, flags)
+		out.surface_set_material(out.get_surface_count() - 1, mat)
+	_meshes[key] = out
+	return out
+
+## A mount (art/mounts) in a coat: `pal` from `palette()` (empty keeps the authored colours).
+static func mount(id: String, pal: Array = []) -> Node3D:
+	var n := instance(MOUNTS[id], Color(0, 0, 0, 0), pal)
+	n.set_meta("kind", "mount")
+	return n
 
 ## The (first) mesh of a static prop, with the game's materials, for MultiMesh instancing.
 static func static_mesh(rel: String) -> Mesh:

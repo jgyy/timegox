@@ -97,7 +97,8 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		fixed.append(p.pos)
 	for n in spec.get("npcs", []):
 		var ne := {"kind": "npc", "id": n.id, "n": n.n, "pos": n.pos, "col": n.col, "vis": n.get("vis", ["", ""])}
-		for k in ["asset", "race", "hide"]:
+		# (a fated encounter, fate.gd, stands where the story has them: world.ent_visible asks Fate.present)
+		for k in ["asset", "race", "hide", "fate"]:
 			if n.has(k):
 				ne[k] = n[k]
 		if n.has("floor"):

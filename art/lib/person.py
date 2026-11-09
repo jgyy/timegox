@@ -1570,7 +1570,137 @@ INTERACT = {
     "touch": (TOUCH_T, clip_touch),
 }
 INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
-HERO_CLIPS = dict(CLIPS, **INTERACT)
+
+
+# ---------------------------------------------------------------- riding (mounts and vehicles)
+# The party rides (scripts/fashion.gd RIDES): astride a horse, a qilin or a tiger ("ride" on the move,
+# "ride_idle" standing still), or standing on a flying sword, a cloud or a sky-barque ("ride_stand").
+# The hips stay at their standing height (HIP_Y): the game stands the model so they meet the saddle,
+# or its feet on the deck.  Hands are busy with the reins (or a sword-seal), so the blade is put away.
+
+RIDE_T = 0.62          # one bounding stride of the horse's gallop (art/mounts/horse.py)
+RIDE_IDLE_T = 4.0
+RIDE_STAND_T = 3.0
+
+
+def _astride(p, bob=0.0, lean=0.1):
+    """Sitting astride a saddle: thighs forward and wide round the barrel, knees bent, heels down in
+    the stirrups, the back upright with a little forward lean."""
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.05, 0.0, 0.0), (0.0, -0.04 + bob, -0.04))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.1, 0.0, 0.5 * s), (0, 0, 0))
+        p["shin." + sd] = ((1.25, 0.0, -0.12 * s), (0, 0, 0))
+        p["foot." + sd] = ((-0.2, 0.0, 0.0), (0, 0, 0))
+        p["toe." + sd] = ((0.1, 0.0, 0.0), (0, 0, 0))
+    p["spine"] = ((lean, 0.0, 0.0), (0, 0, 0))
+    p["chest"] = ((0.05, 0.0, 0.0), (0, 0, 0))
+    p["neck"] = ((-0.04, 0.0, 0.0), (0, 0, 0))
+
+
+def _reins(p, k=1.0, br=0.0):
+    """Both hands forward over the pommel, holding the reins."""
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.55 * k - br * 0.01, 0.0, -0.08 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-1.0 * k, 0.28 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.2, 0.15 * s, 0.0), (0, 0, 0))
+    _hands(p, 0.95, 0.95, 0.35)
+
+
+def clip_ride(t):
+    """Riding at the gallop: the rider sits deep and moves with the horse, one bob a stride, leaning
+    into the run with the reins in both hands; the cape, sleeves and hair stream back."""
+    ph = t * 2 * math.pi / RIDE_T
+    s = math.sin(ph)
+    p = {}
+    _astride(p, 0.028 * s, 0.16 + 0.03 * math.sin(ph - 0.6))
+    _reins(p, 1.0)
+    _add(p, "forearm.L", -0.12 * s, 0.0, 0.0)
+    _add(p, "forearm.R", -0.12 * s, 0.0, 0.0)
+    p["head"] = ((-0.12 - 0.04 * s, 0.0, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1, 1))
+    lag = math.sin(ph - 0.9)
+    p["robe_f"] = ((-1.0, 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.7 + 0.12 * abs(lag), 0, 0), (0, 0, 0))
+    p["robe_l"] = ((-0.7, 0, -0.55), (0, 0, 0))
+    p["robe_r"] = ((-0.7, 0, 0.55), (0, 0, 0))
+    p["cape"] = ((1.0 + 0.12 * math.sin(2 * ph - 0.8), 0.04 * lag, 0), (0, 0, 0))
+    p["cape2"] = ((0.3 + 0.14 * math.sin(2 * ph - 1.6), 0, 0.06 * lag), (0, 0, 0))
+    p["cape3"] = ((0.2 + 0.12 * math.sin(2 * ph - 2.4), 0, 0.08 * lag), (0, 0, 0))
+    p["hair_tail"] = ((0.7 + 0.1 * math.sin(2 * ph - 0.8), 0, 0.1 * lag), (0, 0, 0))
+    p["hair_tail2"] = ((0.35 + 0.12 * math.sin(2 * ph - 1.7), 0, 0.12 * lag), (0, 0, 0))
+    p["sleeve.L"] = ((0.8 + 0.2 * math.sin(ph - 1.3), 0, 0), (0, 0, 0))
+    p["sleeve.R"] = ((0.8 - 0.2 * math.sin(ph - 1.3), 0, 0), (0, 0, 0))
+    return _stow(p)
+
+
+def clip_ride_idle(t):
+    """Sitting a standing horse: upright and easy, the reins low in the hands, breathing, the head
+    turning to look about."""
+    w = 2 * math.pi / RIDE_IDLE_T
+    br = math.sin(t * w * 2)
+    look = math.sin(t * w + 0.6)
+    p = {}
+    _astride(p, br * 0.004, 0.03)
+    _reins(p, 0.8, br)
+    p["chest"] = ((-br * 0.02, 0.0, 0.0), (0, 0.003 * br, 0))
+    p["head"] = ((0.02 + 0.03 * math.sin(t * w * 2 + 1.0), 0.28 * look, 0.0), (0, 0, 0))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, _blink(t, (1.2, 3.1)), 1))
+    _secondary(p, t, False, True, (-1.1, -1.1), br, (0.35, 0.35))
+    return _stow(p)
+
+
+def clip_ride_stand(t):
+    """Standing on a flying sword or a cloud: feet set one before the other along the blade, knees
+    soft, the left hand raised in a sword-seal before the chest and the right held back for balance;
+    a slow sway against the wind, and everything loose streaming back."""
+    w = 2 * math.pi / RIDE_STAND_T
+    sw = math.sin(t * w)
+    br = math.sin(t * w * 2)
+    p = {}
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.06, 0.12 + 0.03 * sw, 0.02 * sw), (0.0, -0.08 + 0.01 * br, 0.0))
+    p["thigh.L"] = ((-0.38, 0.0, 0.08), (0, 0, 0))
+    p["shin.L"] = ((0.42, 0.0, 0.0), (0, 0, 0))
+    p["foot.L"] = ((-0.04, 0.0, 0.0), (0, 0, 0))
+    p["thigh.R"] = ((0.3, 0.0, -0.1), (0, 0, 0))
+    p["shin.R"] = ((0.38, 0.0, 0.0), (0, 0, 0))
+    p["foot.R"] = ((-0.62, 0.0, 0.0), (0, 0, 0))
+    p["toe.R"] = ((0.45, 0.0, 0.0), (0, 0, 0))
+    p["spine"] = ((0.1, -0.1 - 0.03 * sw, 0.0), (0, 0, 0))
+    p["chest"] = ((0.04 - br * 0.015, -0.06, 0.0), (0, 0, 0))
+    p["neck"] = ((-0.04, 0.08, 0.0), (0, 0, 0))
+    p["head"] = ((-0.1, 0.12 + 0.04 * sw, 0.0), (0, 0, 0))
+    # the sword-seal: index and middle fingers raised before the chest
+    p["upper_arm.L"] = ((-0.75, 0.0, -0.32), (0, 0, 0))
+    p["forearm.L"] = ((-1.55, 0.35, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.0, 0.3, 0.2), (0, 0, 0))
+    p["upper_arm.R"] = ((0.35 + 0.05 * sw, 0.0, -0.45), (0, 0, 0))
+    p["forearm.R"] = ((-0.35, -0.2, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.1, -0.2, 0.0), (0, 0, 0))
+    _hands(p, 0.2, 0.6, 0.3)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, _blink(t, (0.9, 2.4)), 1))
+    flap = math.sin(t * w * 4)
+    p["robe_f"] = ((-0.25 + 0.06 * flap, 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.75 + 0.1 * flap, 0, 0), (0, 0, 0))
+    p["robe_l"] = ((0.25 + 0.05 * flap, 0, -0.12), (0, 0, 0))
+    p["robe_r"] = ((0.25 - 0.05 * flap, 0, 0.12), (0, 0, 0))
+    p["cape"] = ((1.1 + 0.1 * flap, 0.05 * sw, 0), (0, 0, 0))
+    p["cape2"] = ((0.35 + 0.12 * math.sin(t * w * 4 - 0.8), 0, 0.06 * sw), (0, 0, 0))
+    p["cape3"] = ((0.22 + 0.12 * math.sin(t * w * 4 - 1.6), 0, 0.08 * sw), (0, 0, 0))
+    p["hair_tail"] = ((0.8 + 0.08 * flap, 0, 0.1 * sw), (0, 0, 0))
+    p["hair_tail2"] = ((0.4 + 0.1 * math.sin(t * w * 4 - 1.0), 0, 0.1 * sw), (0, 0, 0))
+    p["sleeve.L"] = ((0.6 + 0.15 * flap, 0, 0), (0, 0, 0))
+    p["sleeve.R"] = ((0.9 + 0.15 * flap, 0, 0), (0, 0, 0))
+    return _stow(p)
+
+
+RIDE = {
+    "ride": (RIDE_T, clip_ride),
+    "ride_idle": (RIDE_IDLE_T, clip_ride_idle),
+    "ride_stand": (RIDE_STAND_T, clip_ride_stand),
+}
+HERO_CLIPS = dict(CLIPS, **INTERACT, **RIDE)
 
 
 def _with_posture(fn, age):
