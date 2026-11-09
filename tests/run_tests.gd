@@ -1069,7 +1069,7 @@ func _init() -> void:
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis))
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 12, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves and Part XVI's hunger on the terraces and moths in the market" % p13_bands)
+	check(p13_bands == 8 and bands == 13, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves and Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -2095,6 +2095,29 @@ func _living() -> void:
 	RG.poll_steps()
 	check(kids_seen >= 8 and RG.cur_step().id == "s_p16_elders", "eight red envelopes for the children of the towns, and then the grandparents (%d children)" % kids_seen)
 	RG.free()
+	# the errands of the towns: words for each, and enough people of its kind in the towns of its realm
+	for st9 in Data.STEPS:
+		if st9.kind != "folk":
+			continue
+		var own9 := ""
+		var have9 := 0
+		for tid9 in Folk.TOWNS:
+			var ar9: String = Folk.TOWNS[tid9].area
+			if ar9 == str(st9.area):
+				own9 = tid9
+			if Data.layer_of(ar9) != Data.layer_of(str(st9.area)):
+				continue
+			for fp9 in Folk.people(Atlas.world_of(Data.layer_of(ar9)), tid9):
+				if Folk.is_role(fp9, str(st9.role)):
+					have9 += 1
+		check(Folk.ERRANDS.has(str(st9.id)) and (Folk.ERRANDS[str(st9.id)].lines as Array).size() >= 4, "%s: an errand, with words for the people it is done with" % st9.id)
+		check(own9 != "" and have9 >= int(st9.n), "%s: its region has a town, and the towns of its realm %d people of the kind it wants (%d)" % [st9.id, int(st9.n), have9])
+	var plum: Array = Data.AREAS.frost.pickups.filter(func(pk): return pk.item == "plum_sprig" and pk.get("vis", ["", ""])[0] == "s_p16_plum")
+	check(plum.size() >= int(Data.STEPS[Data.step_index("s_p16_plum")].n) and Data.ITEMS.has("plum_sprig") and Look.PICKUP_COLORS.has("plum_sprig"), "the winter plum flowers in the snows of Frostpeak from the step that asks for it (%d sprigs)" % plum.size())
+	var cubs: Dictionary = Data.AREAS.bamboo.get("warband", {})
+	check(not cubs.is_empty() and Data.step_index(str(cubs.vis)) < Data.step_index("s_p16_cubs") and int(cubs.n) * 2 >= int(Data.STEPS[Data.step_index("s_p16_cubs")].n), "Nian's cubs hide in the bamboo from the first dawn of the year, enough of them for the hunt")
+	check(str(Data.STEPS[Data.step_index("s_p16_calls")].get("did", "")).contains("good new year") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("s.has(\"did\")"), "New Year calls are wished, not invitations delivered (the visits of the Conclave are)")
+	check(Data.step_index("s_p16_fish") < Data.step_index("s_p16_eve") and Data.step_index("s_p16_riddles") == Data.step_index("s_p16_lanterns") - 1, "the fish is bought before the reunion dinner, and the riddles guessed on the night of the lanterns")
 	for tid4 in ["xi_beast", "nian"]:
 		check(Trials.TRIALS.has(tid4) and Lore.BOSS.has(tid4) and Data.DIALOGUE.has("pre:" + tid4) and Data.DIALOGUE.has("post:" + tid4), "%s is a trial, with a story and words before and after" % tid4)
 	for mon in ["lean_month", "candle_moth", "nian_cub"]:

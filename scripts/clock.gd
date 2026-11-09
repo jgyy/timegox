@@ -83,8 +83,9 @@ static func set_hour(g, h: float) -> void:
 ## Hours the story sets when a step is done (step id -> hour).  When Xihe and Chang'e agree to take
 ## turns, the sun goes down for the first time in nine days.
 ## Part XVI: the reunion dinner ends at nine on New Year's Eve; the vigil runs to ten to midnight;
-## Nian goes and the old year with it, and the new one dawns; the bell is rung at sunrise.
-const STORY_HOURS := {"s_gh_xihe": 18.6, "s_p16_eve": 21.2, "s_p16_vigil": 23.8, "s_p16_nian": 5.4, "s_p16_dawn": 6.3}
+## Nian goes and the old year with it, and the new one dawns; the bell is rung at sunrise; once the
+## lantern riddles are guessed it is the evening of the Lantern Festival, and every lantern is lit.
+const STORY_HOURS := {"s_gh_xihe": 18.6, "s_p16_eve": 21.2, "s_p16_vigil": 23.8, "s_p16_nian": 5.4, "s_p16_dawn": 6.3, "s_p16_riddles": 19.8}
 
 static func story_hour(g, sid: String) -> void:
 	if STORY_HOURS.has(sid):

@@ -486,8 +486,13 @@ func talk_npc(e: Dictionary) -> void:
 	if not s.is_empty() and s.kind == "visits" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
 		say(Data.DIALOGUE.get("visit:" + str(e.id), []), func():
 			Game.visited[str(e.id)] = true
-			Game.toast("Invitation delivered (%d of %d)" % [Game.visits_done(s), int(s.n)])
-			Game.note("Invited " + str(e.n))
+			# (the Conclave's invitations, Part XIII; a step may say what a visit is instead: Part XVI's New Year calls)
+			if s.has("did"):
+				Game.toast("%s (%d of %d)" % [str(s.did) % str(e.n), Game.visits_done(s), int(s.n)])
+				Game.note(str(s.did) % str(e.n))
+			else:
+				Game.toast("Invitation delivered (%d of %d)" % [Game.visits_done(s), int(s.n)])
+				Game.note("Invited " + str(e.n))
 			if race != "":
 				Game.race_gain(race, 5)
 			Game.poll_steps()

@@ -768,11 +768,26 @@ static func hongbao_line(p: Dictionary) -> String:
 	return str(HONGBAO_LINES[int(p.seed) % HONGBAO_LINES.size()])
 
 ## What Lin Feng says to a townsperson for a step of the story, what they say back, the news of it
-## and what it costs (Part XVI: red paper from the merchants, red envelopes for the children).
+## and what it costs (Part XVI: red paper from the merchants, a fish for the reunion table, red envelopes for the
+## children, the lantern riddles).
 const ERRANDS := {
 	"s_p16_paper": {"ask": "Red paper, for the New Year couplets on the sect's doors. As much as you can spare.", "price": 120, "toast": "Red paper bought from %s",
 		"lines": ["Red paper! The first anybody has asked for all year. Take the whole roll. No, take two. Somebody should have a New Year.", "Red paper, gold edges, the good stuff from Tushan. For the sweeper who swept the sky, a third off.",
 			"For couplets? Then you'll want this too: a sheet of gold paper for the Fu on the door. Upside down, mind. The luck's arrived, see?", "I'd forgotten I had it. It was under the jars of nothing we've been selling all year. Here. Happy new year, early."]},
+	"s_p16_fish": {"ask": "A fish for the reunion table, so the year has more than enough. The best you have, please.", "price": 80, "toast": "A New Year's fish bought from %s",
+		"lines": ["A carp from below the Dragon Gate: one that didn't jump. Don't let them finish it at the table, mind. Leave some over for next year. That's the whole point.",
+			"For the reunion dinner? Then you want the one with the red tail. Luckiest fish in Longmen, and it knows it.",
+			"Every year, more than enough: that's what the fish is for. This one was more than enough trouble to catch. Take it, take it.",
+			"I kept it in the tank all week for somebody who'd ask nicely. Head to the guests, tail to the host, and nobody turns it over.",
+			"The river gave back everything it took from us this year. The least I can do is give you its best fish. A good new year, sweeper.",
+			"Twice as heavy as last year's, and last year's was a good one. That's a sign, that is."]},
+	"s_p16_riddles": {"ask": "A riddle on your lantern? Let me try it.", "price": 0, "toast": "Guessed %s's lantern riddle",
+		"lines": ["\"Red outside, a fire inside, it walks on a stick and never takes a step.\" A lantern, you say? First time! A sweet dumpling for that.",
+			"\"It has a hundred teeth and never bites, and it works every morning and never tires.\" A broom! They said the sweeper would get that one.",
+			"\"Round as the moon, eaten on the fifteenth, sweet in the middle.\" Tangyuan, yes. You'll be eating them tonight. Take two.",
+			"\"Everybody waits up for it, it comes in one night, and nobody sees it arrive.\" The New Year! The last one to guess that was a scholar from Tushan, and he took an hour.",
+			"\"Pasted on the door upside down, so that it has arrived.\" Fu, the luck! You had it before I'd finished. Have a sugar figure.",
+			"\"The sun's sister, out all night, with a different face every evening.\" The moon. Chang'e would be pleased with you. Keep the lantern, it's yours."]},
 	"s_p16_hongbao": {"ask": "A good new year to you. Here: for luck.", "price": 0, "toast": "A red envelope for %s", "lines": HONGBAO_LINES},
 	"s_p16_elders": {"ask": "A good new year, Grandfather. Grandmother. Long life, and good health in it.", "price": 0, "toast": "New Year respects paid to %s",
 		"lines": ["Long life? I have had a long life, young man. What I want is a short winter. Still: thank you. Here, take a sweet.",

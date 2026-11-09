@@ -184,7 +184,7 @@ const EXTRA := {
 }
 
 const PICKUP_COLORS := {
-	"thunder_bamboo": Color("7ac85a"), "peach_charm": Color("e05a4a"),
+	"thunder_bamboo": Color("7ac85a"), "peach_charm": Color("e05a4a"), "plum_sprig": Color("f4a6c4"),
 	"herb": Color("6fe08a"), "lotus": Color("ff7aa8"), "jade": Color("7affe0"), "shard": Color("f6e85c"), "pearl": Color("e8f4ff"),
 	"ember": Color("ff8a3a"), "star": Color("c8a0ff"), "sigil": Color("ffe890"),
 	"echo": Color("9ae8ff"), "relic": Color("d8e0f0"), "sand": Color("ffd060"), "rune": Color("ffb0f0"),
