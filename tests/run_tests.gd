@@ -871,7 +871,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -1069,7 +1069,7 @@ func _init() -> void:
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis))
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 10, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel and Part XV's moths among the graves" % p13_bands)
+	check(p13_bands == 8 and bands == 11, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves and Part XVI's hunger on the terraces" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1719,6 +1719,7 @@ func _fates_and_faces() -> void:
 	var bot_src := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bot_src.contains("GRUDGE_ROUTE") and Grudges.ORDER.all(func(g): return bot_src.contains("\"%s\"" % g)), "the bot goes to every grudge and has an answer for each")
 	_lotus()
+	_living()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -1819,8 +1820,8 @@ func _lotus() -> void:
 	check(LG.future == "wander" and Bonds.epilogues(LG).size() >= 1, "the road she chooses is remembered and told at the end")
 	LG.free()
 	print("== part XV: the Thread She Never Had ==")
-	check(Data.REALMS.size() == 21 and Data.REALMS[20] == "Kindred Dao" and Data.MAX_LEVEL == 60 and Data.level_name(60).ends_with("Kindred Dao") and Data.REALM_INFO.size() == 21 and Data.EXP_NEED.size() == Data.MAX_LEVEL, "Part XV adds the Kindred Dao realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break20" and Data.DIALOGUE.has("recall13") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break19\": \"recall13\""), "Part XV follows Karma Fulfilled (recall13) and ends the game")
+	check(Data.REALMS[20] == "Kindred Dao" and Data.level_name(60).ends_with("Kindred Dao") and Data.STEPS[Data.step_index("s_break20")].to == 60, "Part XV adds the Kindred Dao realm")
+	check(Data.step_index("s_break20") > Data.step_index("s_p15_end") and Data.DIALOGUE.has("recall13") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break19\": \"recall13\""), "Part XV follows Karma Fulfilled (recall13)")
 	for sid in ["s_p15_home", "s_p15_judge", "s_p15_founder", "s_p15_end", "pre:s_break20", "post:s_break20"]:
 		check(Data.DIALOGUE.has(sid), "Part XV has its words for %s" % sid)
 	var sw := Atlas.world_of("surface")
@@ -1877,3 +1878,192 @@ func _lotus() -> void:
 	check(str(gb.vis) == "s_p15_judge" and gb.pool.all(func(pe): return Lore.BEAST.has(pe[0])), "the things that eat forgetting march among the graves once Judge Cui has spoken")
 	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(Bonds.TALKS.all(func(tk3): return bsrc.contains("\"%s\"" % tk3.id)) and bsrc.contains("MEMORY_ROUTE") and bsrc.contains("\"unweaver\"") and bsrc.contains("\"lock_warden\""), "the bot has a reply for every heart-to-heart, a round of the memories and a way through both trials")
+
+
+## The Living Land release: the hours of the day, the people of the towns, the things that break, and
+## Part XVI, the Year Turns.
+func _living() -> void:
+	print("== the hours of the day (clock.gd) ==")
+	var CG = load("res://scripts/game.gd").new()
+	CG.reset()
+	check(absf(Clock.hour(CG) - 7.0) < 0.01 and CG.day == 1 and Clock.shichen_name(7.2) == "Hour of the Dragon" and Clock.shichen_name(23.5) == "Hour of the Rat" and Clock.shichen_name(0.5) == "Hour of the Rat", "a new game starts at seven, in the Hour of the Dragon")
+	check(Clock.rate(12 * 60.0) == Clock.DAY_RATE and Clock.rate(23 * 60.0) == Clock.NIGHT_RATE and Clock.NIGHT_RATE > Clock.DAY_RATE, "the night goes by faster than the day")
+	CG.clock = 23.9 * 60.0
+	Clock.advance(CG, 30.0)
+	check(CG.day == 2 and Clock.hour(CG) < 1.0, "midnight starts a new day (%s)" % Clock.text(CG))
+	check(Clock.daylight(12.0) > 0.99 and Clock.daylight(1.0) < 0.01 and Clock.daylight(6.0) > 0.0 and Clock.daylight(6.0) < 1.0, "day is light, night is dark, and dawn is between")
+	var noon_l: Dictionary = Look.at_hour("village", 12.0)
+	var night_l: Dictionary = Look.at_hour("village", 1.0)
+	var dusk_l: Dictionary = Look.at_hour("village", 18.6)
+	check(float(night_l.night) > 0.9 and float(noon_l.night) < 0.05 and float(night_l.stars) > float(noon_l.stars) and night_l.moon and not noon_l.moon, "the village sky at night has the moon and the stars in it")
+	check(float(night_l.sun_e) < float(noon_l.sun_e) and float(night_l.amb_e) < float(noon_l.amb_e) and (night_l.top as Color).get_luminance() < (noon_l.top as Color).get_luminance(), "the night is darker than the day")
+	var warm := func(c: Color) -> float: return c.r - c.b
+	check(float(warm.call(dusk_l.hor)) > float(warm.call(noon_l.hor)) and float(dusk_l.gold) > 0.3, "dusk warms the horizon")
+	check(float(Look.at_hour("void", 1.0).night) < float(night_l.night), "the places whose light is not the sun's follow it less")
+	var la_m: Array = Clock.light_angles(8.0)
+	var la_e: Array = Clock.light_angles(17.0)
+	check(float(la_m[1]) > 0.0 and float(la_e[1]) < 0.0 and not la_m[3] and Clock.light_angles(0.0)[3], "the sun comes up in the east and goes down in the west, and the moon has the night")
+	CG.step = Data.step_index("s_yg_intro")
+	CG.clock = 9.0 * 60.0
+	Clock.advance(CG, 100.0)
+	check(Clock.frozen(CG) == "noon" and absf(Clock.hour(CG) - 12.0) < 0.01, "in Part IX the sun stands at noon for nine days")
+	CG.step = Data.step_index("s_gh_xihe")
+	Clock.story_hour(CG, "s_gh_xihe")
+	CG.step += 1
+	check(Clock.frozen(CG) == "" and Clock.hour(CG) > 18.0, "when Xihe and Chang'e agree to take turns, the sun goes down")
+	CG.step = Data.step_index("s_p16_xi")
+	var held: float = CG.clock
+	Clock.advance(CG, 300.0)
+	check(Clock.frozen(CG) == "night" and CG.clock == held, "in Part XVI the last night of the year will not end until Nian is driven out")
+	CG.step = Data.step_index("s_p16_dawn")
+	CG.clock = 22.0 * 60.0
+	var d0: int = CG.day
+	Props.use({"kind": "prop", "id": "test:bed2", "prop": "bed", "pos": Vector2i.ZERO}, CG)
+	check(absf(Clock.hour(CG) - 6.0) < 0.01 and CG.day == d0 + 1, "a night's sleep in a bed: he wakes at six the next morning")
+	CG.clock = 14.0 * 60.0
+	Props.use({"kind": "prop", "id": "test:bed3", "prop": "bed", "pos": Vector2i.ZERO}, CG)
+	check(absf(Clock.hour(CG) - 14.0) < 0.01, "a nap in the afternoon is only a nap")
+	CG.free()
+	print("== the people of the towns (folk.gd) ==")
+	var total := 0
+	for tid in Folk.TOWNS:
+		var t: Dictionary = Folk.TOWNS[tid]
+		check(Data.AREAS.has(str(t.area)) and Folk.BODIES.has(str(t.race)), "%s: a town of a real region, of a people with bodies" % tid)
+		var wd := Atlas.world_of(Data.layer_of(str(t.area)))
+		var ppl := Folk.people(wd, tid)
+		total += ppl.size()
+		check(ppl.size() >= 12, "%s: lived in (%d people)" % [tid, ppl.size()])
+		var bad := 0
+		var noon := 0
+		var late := 0
+		var wrong_area := 0
+		for fp in ppl:
+			check(Folk.ROLES.has(str(fp.role)) and Assets.has("characters/" + str(fp.body)), "%s: %s is a %s with a body (%s)" % [tid, fp.n, fp.role, fp.body])
+			var segs := Folk.day_of(wd, fp)
+			var span: float = float(segs[segs.size() - 1].b) - float(segs[0].a)
+			if span < 1430.0:
+				bad += 1
+			for h in [3.0, 8.0, 12.5, 16.0, 20.0]:
+				var st := Folk.state(wd, fp, h * 60.0)
+				if not st.vis:
+					continue
+				var tl := Vector2i(int(floor((st.at as Vector2).x)), int(floor((st.at as Vector2).y)))
+				var g: int = wd.grid[tl.y * int(wd.w) + tl.x]
+				if not MapGen.is_walkable_tile(g) or g == MapGen.INTERIOR:
+					bad += 1
+				if Atlas.owner_id(wd, tl) != str(t.area):
+					wrong_area += 1
+			if Folk.state(wd, fp, 10.5 * 60.0).vis:
+				noon += 1
+			if Folk.state(wd, fp, 2.5 * 60.0).vis:
+				late += 1
+		check(bad == 0 and wrong_area == 0, "%s: everybody's day covers the whole day, on open ground of the town's own region" % tid)
+		if bool(t.get("night", false)):
+			check(late > noon, "%s: the shades keep the night as other towns keep the day (%d out at night, %d by day)" % [tid, late, noon])
+		else:
+			check(noon > late * 3 and noon >= ppl.size() / 2, "%s: out and about by day, home at night (%d by day, %d at night)" % [tid, noon, late])
+		var again := Folk.people(wd, tid)
+		check(again == ppl and str(Folk.state(wd, ppl[0], 600.0)) == str(Folk.state(wd, again[0], 600.0)), "%s: the same people, in the same places, every time" % tid)
+	check(total >= 200, "the towns are full of people (%d)" % total)
+	for role in Folk.ROLES:
+		check(Folk.LINES.has(role) or role == "servant", "the %ss have something to say" % role)
+		for e in Folk.ROLES[role].day:
+			check(Folk.PLACES.has(str(e[1])), "%s: the place %s can be found" % [role, e[1]])
+	var LG2 = load("res://scripts/game.gd").new()
+	LG2.reset()
+	var pw := Atlas.world_of("surface")
+	var cf: Dictionary = Folk.people(pw, "cloudfoot")[0]
+	check(Folk.line(cf, LG2) != "" and not Folk.line(cf, LG2).contains("%s"), "a townsperson's words are filled in")
+	for pid in Folk.POSTS:
+		var found := false
+		for a in Data.AREAS:
+			for n in Data.AREAS[a].get("npcs", []):
+				found = found or str(n.get("asset", n.id)) == pid or str(n.id) == pid
+		check(found, "%s works at a place of their own in the world" % pid)
+		var pd: Array = Folk.POSTS[pid]
+		for c in str(pd[0]).split("|") + str(pd[2]).split("|"):
+			check(c in Assets.LEND or c in ["talk", "idle"] or c in Data.EMOTES, "%s's work %s is a clip every person can play" % [pid, c])
+	print("== lent clips (assets.gd) ==")
+	var kid := Assets.instance("characters/folk_girl")
+	Assets.lend_clips(kid)
+	check(Assets.has_clip(kid, "hoe") and Assets.has_clip(kid, "sweep") and Assets.has_clip(kid, "bang") and Assets.has_clip(kid, "eat"), "every townsperson can do the towns' work and the party's interactions")
+	var ap: AnimationPlayer = kid.get_meta("ap")
+	var sw: Animation = ap.get_animation("sweep")
+	var hips_y := 0.0
+	for i in sw.get_track_count():
+		if str(sw.track_get_path(i)).ends_with(":hips") and sw.track_get_type(i) == Animation.TYPE_POSITION_3D:
+			hips_y = (sw.track_get_key_value(i, 0) as Vector3).y
+		check(not str(sw.track_get_path(i)).ends_with(":sword"), "a lent clip leaves out the bones a person does not have")
+	check(hips_y > 0.4 and hips_y < 0.8, "a child's lent clip is scaled to the child's rig (hips at %.2f m)" % hips_y)
+	kid.free()
+	print("== the things that break (havoc.gd) ==")
+	var HG = load("res://scripts/game.gd").new()
+	HG.reset()
+	HG.level = 30
+	HG.stones = 1000
+	var n_brk := 0
+	for tid2 in Folk.TOWNS:
+		var ar: String = Folk.TOWNS[tid2].area
+		var wd2 := Atlas.world_of(Data.layer_of(ar))
+		var occ := {}
+		for e2 in wd2.ents:
+			occ[e2.pos] = true
+		for b in Havoc.of_area(wd2, ar):
+			n_brk += 1
+			var g2: int = wd2.grid[b.tile.y * int(wd2.w) + b.tile.x]
+			check(Havoc.KINDS.has(str(b.kind)) and g2 != MapGen.PATH and g2 != MapGen.INTERIOR and MapGen.is_walkable_tile(g2) and not occ.has(b.tile), "%s: %s stands on open ground, off the road and out of everybody's way" % [ar, b.id])
+	check(n_brk >= 60, "the towns are full of things to break (%d)" % n_brk)
+	var bw := Atlas.world_of("surface")
+	var bv: Dictionary = Havoc.of_area(bw, "yanggu")[0]
+	var said: Array = Havoc.smash(HG, bw, bv, "strike")
+	check(Havoc.is_broken(HG, bv) and HG.stones == 1000 - Havoc.PRICE - Havoc.PRICE_REALM * HG.realm() and said.size() == 1 and str(said[0]).contains(str(Havoc.owner_of(bw, bv).n)), "a thing broken on purpose is paid for, to its owner (%s)" % str(said))
+	check(Havoc.smash(HG, bw, bv, "strike").is_empty() and HG.smashed == 1, "a broken thing cannot be broken again")
+	var bv2: Dictionary = Havoc.of_area(bw, "yanggu")[1]
+	var st0: int = HG.stones
+	check(str(Havoc.smash(HG, bw, bv2, "ride")[0]).contains("Mind where you ride") and HG.stones == st0, "a thing ridden through earns a piece of the owner's mind, not a bill")
+	HG.clock = 5.9 * 60.0
+	check(Havoc.is_broken(HG, bv), "still broken before dawn")
+	HG.day += 1
+	HG.clock = 6.1 * 60.0
+	check(not Havoc.is_broken(HG, bv) and not HG.broken.has(bv.id), "mended by the next dawn")
+	HG.free()
+	LG2.free()
+	print("== Part XVI: the Year Turns ==")
+	check(Data.REALMS.size() == 22 and Data.REALMS[21] == "Ten Thousand Hearths" and Data.MAX_LEVEL == 63 and Data.level_name(63).ends_with("Ten Thousand Hearths") and Data.REALM_INFO.size() == 22 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "Part XVI adds the Ten Thousand Hearths realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break21" and Data.DIALOGUE.has("recall14") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break20\": \"recall14\""), "Part XVI follows Kindred Dao (recall14) and ends the game")
+	var ry: Dictionary = Data.STEPS[Data.step_index("s_p16_rally")]
+	for npc in ry.npcs:
+		check(Data.DIALOGUE.has("rally:" + str(npc)) and Folk.RALLY_TOWN.has(npc) and Trials.npc_area(str(npc)) != "", "%s can be reminded of the old ways, in a town of their own" % npc)
+	check(int(ry.n) <= ry.npcs.size() and int(ry.n) >= int(Trials.path("nian", "folk").needs[0][1]), "enough towns can be rallied for the people's road through Nian")
+	var RG = load("res://scripts/game.gd").new()
+	RG.reset()
+	RG.step = Data.step_index("s_p16_rally")
+	for npc2 in ["granny_wen", "watchman_zhou", "postmaster_lu"]:
+		RG.rallied[npc2] = true
+	RG.poll_steps()
+	check(RG.cur_step().id == "s_p16_rally" and Trials.path_met("xi_beast", Trials.path("xi_beast", "folk"), RG), "three towns: the people's road through Xi is open, but the step wants four")
+	RG.rallied["caster_wei"] = true
+	RG.poll_steps()
+	check(RG.cur_step().id == "s_p16_hunt" and Trials.path_met("nian", Trials.path("nian", "folk"), RG), "four towns remember the old ways: the hunt is next, and the people's road through Nian is open")
+	RG.step = Data.step_index("s_p16_hongbao")
+	var kids_seen := 0
+	for tid3 in ["cloudfoot", "qingshi"]:
+		for fp3 in Folk.people(Atlas.world_of("surface"), tid3):
+			if Folk.is_role(fp3, "child"):
+				RG.hongbao[str(fp3.id)] = true
+				kids_seen += 1
+	RG.poll_steps()
+	check(kids_seen >= 6 and RG.cur_step().id == "s_p16_end", "six red envelopes for the children of two towns end New Year's Day (%d children)" % kids_seen)
+	RG.free()
+	for tid4 in ["xi_beast", "nian"]:
+		check(Trials.TRIALS.has(tid4) and Lore.BOSS.has(tid4) and Data.DIALOGUE.has("pre:" + tid4) and Data.DIALOGUE.has("post:" + tid4), "%s is a trial, with a story and words before and after" % tid4)
+	for mon in ["lean_month", "candle_moth", "nian_cub"]:
+		check(Data.ENEMIES.has(mon) and Lore.BEAST.has(mon), "%s has a story" % mon)
+	for sid2 in ["s_p16_sweep", "s_p16_eve", "s_p16_vigil", "s_p16_dawn"]:
+		var sp: Dictionary = Data.STEPS[Data.step_index(sid2)]
+		check(Bonds.SHARES.has(sid2) and not Bonds.find_spot(Atlas.world_of(Data.layer_of(str(sp.area))).ents, str(sp.spot)).is_empty(), "%s: a scene with Yue Ling, at a place that is there" % sid2)
+		check(Bonds.share_place(sid2) != "by the lotus pond", "%s is remembered where it happened" % sid2)
+	check(Bonds.share_place("s_p15_loom") != Bonds.share_place("s_p15_pond"), "the loom is not the lotus pond (every share used to be put down as by the pond)")
+	var bsrc2 := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bsrc2.contains("\"xi_beast\": ") and bsrc2.contains("\"nian\": ") and bsrc2.contains("_folk_step") and bsrc2.contains("\"s_p16_eve\""), "the bot has a way through both trials, a plan for every scene and a way to find the children")
+	check(Assets.PEOPLE.has("zao_jun") and Assets.PEOPLE.has("shenshu") and Assets.PEOPLE.has("yulei"), "the Kitchen God and the door gods are Blender-built")

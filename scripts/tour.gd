@@ -305,6 +305,49 @@ func _follow(id: String) -> void:
 ## The nearest walkable tile with nobody on it, on dry ground if there is any within 20 steps: the
 ## shore of a river or pond is sunk below the waterline in 3D, so heroes standing on the bank
 ## itself seem to wade in the water.
+## The Living Land release (--living, or --living=a,b to pick shots): the hours of the day and the
+## people of the towns.  [shot, region, a tile of its own map, hour, eye offset, look-at offset]
+const LIVING := [
+	["living_qingshi_morning", "village", Vector2i(30, 28), 8.6, Vector3(-13.0, 8.0, 15.0), Vector3(3.0, 0.0, -3.0)],
+	["living_qingshi_dusk", "village", Vector2i(30, 28), 18.4, Vector3(-13.0, 8.0, 15.0), Vector3(3.0, 0.0, -3.0)],
+	["living_yanggu_market", "yanggu", Vector2i(34, 30), 10.4, Vector3(-12.0, 9.0, 14.0), Vector3(2.0, 0.0, -2.0)],
+	["living_yanggu_night", "yanggu", Vector2i(34, 30), 21.2, Vector3(-11.0, 7.0, 12.0), Vector3(2.0, 0.0, -2.0)],
+	["living_sect_dawn", "sect", Vector2i(20, 12), 5.6, Vector3(-12.0, 8.0, 13.0), Vector3(2.0, 0.0, -3.0)],
+	["living_sect_practice", "sect", Vector2i(20, 12), 7.6, Vector3(-12.0, 8.0, 13.0), Vector3(2.0, 0.0, -3.0)],
+	["living_longmen_fishers", "longmen", Vector2i(28, 30), 6.2, Vector3(-14.0, 9.0, 15.0), Vector3(2.0, 0.0, -2.0)],
+	["living_youdu_night", "youdu", Vector2i(38, 30), 22.5, Vector3(-12.0, 8.0, 14.0), Vector3(2.0, 0.0, -2.0)],
+]
+
+func _living_shots(which: String) -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	Game.reset()
+	Game.level = 45
+	Game.step = Data.step_index("s_p15_home")
+	Game.companion = true
+	Game.heal_full()
+	main.world.clear_cache()
+	main.set_stack(["world"])
+	main.world.open_world()
+	for sh in LIVING:
+		if not only.is_empty() and not only.has(str(sh[0])):
+			continue
+		var lid := Data.layer_of(str(sh[1]))
+		main.world.enter_layer(lid)
+		Game.clock = float(sh[3]) * 60.0
+		main.world.teleport(_nearest_free(Atlas.to_world(str(sh[1]), sh[2])), lid)
+		main.world.facing = Vector2i(1, 0)
+		main.world.cam_q = 1
+		main.world._snap_cam()
+		main.world.banner_t = 0.0
+		# a moment for the people to come out (two are made a frame)
+		Game.clock = float(sh[3]) * 60.0
+		await _wait(2.5)
+		var pp: Vector3 = main.world._player_pos()
+		main.world.cam_override = Transform3D(Basis.IDENTITY, pp + sh[4]).looking_at(pp + sh[5], Vector3.UP)
+		await _wait(0.5)
+		await _shot(str(sh[0]))
+		main.world.cam_override = null
+
 func _nearest_free(pos: Vector2i) -> Vector2i:
 	for dry in [true, false]:
 		for r in 20:
@@ -1311,6 +1354,9 @@ func _run() -> void:
 			continue
 		var stop: Array = _stop(id)
 		Game.reset()
+		# the Living Land release: --hour=H shows the land at that hour (clock.gd)
+		if main.args.has("hour"):
+			Game.clock = float(main.args.hour) * 60.0
 		Game.level = stop[1]
 		Game.exp = Data.EXP_NEED[mini(Game.level, Data.EXP_NEED.size() - 1)] * 0.45
 		Game.stones = 800
@@ -1743,6 +1789,8 @@ func _run() -> void:
 		await _kite_shot()
 	if main.args.has("fates"):
 		await _fates_shots()
+	if main.args.has("living"):
+		await _living_shots(str(main.args.living))
 	if main.args.has("ending"):
 		# the ending on its own (--ending): its film and the results
 		_ending_state()

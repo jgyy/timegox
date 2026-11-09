@@ -184,6 +184,7 @@ const EXTRA := {
 }
 
 const PICKUP_COLORS := {
+	"thunder_bamboo": Color("7ac85a"), "peach_charm": Color("e05a4a"),
 	"herb": Color("6fe08a"), "lotus": Color("ff7aa8"), "jade": Color("7affe0"), "shard": Color("f6e85c"), "pearl": Color("e8f4ff"),
 	"ember": Color("ff8a3a"), "star": Color("c8a0ff"), "sigil": Color("ffe890"),
 	"echo": Color("9ae8ff"), "relic": Color("d8e0f0"), "sand": Color("ffd060"), "rune": Color("ffb0f0"),
@@ -254,6 +255,8 @@ uniform float nebula = 0.0;
 uniform float moon = 0.0;
 uniform float haze = 0.0;
 uniform float rays = 0.0;
+// the Living Land release: at night the light in the sky is the moon (clock.gd)
+uniform float night = 0.0;
 
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float n2(vec2 p) {
@@ -288,7 +291,15 @@ void sky() {
 	float sdot = dot(d, sd);
 	float disc = smoothstep(1.0 - sun_size * 0.03, 1.0 - sun_size * 0.02, sdot);
 	float halo = pow(max(sdot, 0.0), 180.0) * 0.6 + pow(max(sdot, 0.0), 12.0) * 0.18;
-	col += sun_col * (disc * 2.5 + halo) * LIGHT0_ENERGY;
+	vec3 dcol = sun_col;
+	if (night > 0.0) {
+		// a pale moon with soft grey seas, a small cold halo, and brighter than its light would say
+		vec2 mp2 = (d - sd).xz * 95.0;
+		dcol = mix(sun_col, vec3(0.93, 0.95, 1.0) * (0.7 + 0.3 * n2(mp2 * 1.2 + 3.0)), night);
+		halo *= 1.0 - 0.7 * night;
+		disc *= 1.0 + 2.2 * night;
+	}
+	col += (dcol * disc * 2.5 + sun_col * halo) * LIGHT0_ENERGY;
 	// god rays: soft radial streaks fanning out from the sun
 	if (rays > 0.0) {
 		vec3 rx = normalize(cross(sd, vec3(0.0, 1.0, 0.0)));
@@ -382,6 +393,88 @@ static func sky_material(name: String) -> ShaderMaterial:
 	m.set_shader_parameter("haze", th.haze)
 	m.set_shader_parameter("rays", th.rays)
 	return m
+
+# ---------------------------------------------------------------- the hours (the Living Land release)
+## A theme's own colours are its day.  Dawn and dusk warm the horizon and the light, and night turns the
+## sky deep blue, puts the moon and the stars in it and dims the land, all scaled by how much the place
+## follows the sun (Clock.CYCLE).  Night is never black: the toon shading keeps people readable by
+## moonlight, and the lanterns and windows glow (MB.set_night).
+const NIGHT_TOP := Color(0.03, 0.045, 0.12)
+const NIGHT_HOR := Color(0.13, 0.17, 0.33)
+const NIGHT_FOG := Color(0.1, 0.13, 0.25)
+const NIGHT_AMB := Color(0.52, 0.62, 1.0)
+const MOON_COL := Color(0.74, 0.82, 1.0)
+const DUSK_HOR := Color(1.0, 0.58, 0.4)
+const DUSK_TOP := Color(0.34, 0.33, 0.62)
+const DUSK_SUN := Color(1.0, 0.6, 0.34)
+const DUSK_FOG := Color(0.98, 0.7, 0.55)
+
+## Everything that changes with the hour for theme `name` at hour `h` (0..24): sky colours, fog,
+## ambient light, the light in the sky (colour, energy, angles, whether it is the moon), stars, how
+## dark it is (`night`) and the exposure.
+static func at_hour(name: String, h: float) -> Dictionary:
+	var th := theme(name)
+	var k := float(Clock.CYCLE.get(name, 1.0))
+	var night := (1.0 - Clock.daylight(h)) * k
+	var gold := Clock.golden(h) * k
+	var la: Array = Clock.light_angles(h)
+	var moon: bool = la[3]
+	var top: Color = (th.sky_top as Color).lerp(DUSK_TOP, gold * 0.5)
+	top = top.lerp((th.sky_top as Color).darkened(0.75).lerp(NIGHT_TOP, 0.65), night)
+	var hor: Color = (th.sky_hor as Color).lerp(DUSK_HOR, gold * 0.62)
+	hor = hor.lerp((th.sky_hor as Color).darkened(0.72).lerp(NIGHT_HOR, 0.6), night)
+	var fog: Color = (th.fog as Color).lerp(DUSK_FOG, gold * 0.4).lerp(NIGHT_FOG, night * 0.85)
+	var sun_c: Color = (th.sun as Color).lerp(DUSK_SUN, gold * 0.75)
+	var sun_e: float = float(th.sun_e) * float(la[2])
+	if moon:
+		sun_c = MOON_COL
+		sun_e = float(th.sun_e) * 0.42 * float(la[2])
+	# a place half out of the sun's reach keeps some of its own light
+	sun_c = (th.sun as Color).lerp(sun_c, k)
+	sun_e = lerpf(float(th.sun_e), sun_e, k)
+	var ex: Dictionary = EXTRA.get(name, {})
+	var pitch: float = la[0]
+	var yaw: float = la[1]
+	if not moon and ex.has("sun_pitch"):
+		# a sky with a sun of its own (the Fusang's high sun, the low light on the moon) keeps it by day
+		pitch = float(ex.sun_pitch)
+		yaw = float(ex.get("sun_yaw", yaw))
+	# a little morning mist in the valleys
+	var mist := smoothstep(4.5, 6.0, h) * (1.0 - smoothstep(7.0, 9.0, h)) * k
+	return {"top": top, "hor": hor, "fog": fog, "amb": (th.amb as Color).lerp(NIGHT_AMB, night), "amb_e": lerpf(float(th.amb_e), 0.4, night),
+		"sun": sun_c, "sun_e": sun_e, "pitch": pitch, "yaw": yaw, "moon": moon, "night": night, "gold": gold,
+		"stars": maxf(float(th.stars), night * 0.95), "moon_disc": moon and float(th.moon) <= 0.0, "exposure": lerpf(1.05, 1.2, night),
+		"fog_d": float(th.fog_d) * (1.0 + 1.6 * mist + 0.3 * night)}
+
+## Apply the hour to an environment made by environment() and to its sun and fill lights.
+static func apply_hour(env: Environment, s: DirectionalLight3D, f: DirectionalLight3D, name: String, h: float, fog_scale: float = 1.0) -> Dictionary:
+	var lk := at_hour(name, h)
+	if env != null and env.sky != null:
+		var m := env.sky.sky_material as ShaderMaterial
+		if m != null:
+			m.set_shader_parameter("top", lk.top)
+			m.set_shader_parameter("hor", lk.hor)
+			m.set_shader_parameter("ground", (lk.fog as Color).darkened(0.45))
+			m.set_shader_parameter("sun_col", lk.sun)
+			m.set_shader_parameter("stars", lk.stars)
+			m.set_shader_parameter("night", float(lk.night) if lk.moon else 0.0)
+			# a sky with a moon of its own (the moon's palace, the starry ferry) hides the light's disc at night
+			m.set_shader_parameter("sun_size", 0.035 * (1.0 + 0.5 * float(lk.night)) if not lk.moon or lk.moon_disc else 0.0004)
+	if env != null:
+		env.fog_light_color = lk.fog
+		env.fog_density = float(lk.fog_d) * fog_scale
+		env.ambient_light_color = lk.amb
+		env.ambient_light_energy = lk.amb_e
+		env.tonemap_exposure = lk.exposure
+	if s != null:
+		s.light_color = lk.sun
+		s.light_energy = lk.sun_e
+		s.rotation_degrees = Vector3(lk.pitch, lk.yaw, 0.0)
+	if f != null:
+		var th := theme(name)
+		f.light_color = Color(th.sky_top).lerp(Color(0.7, 0.8, 1.0), 0.5).lerp(MOON_COL, float(lk.night))
+		f.light_energy = lerpf(0.28, 0.18, float(lk.night))
+	return lk
 
 ## Build an Environment for a theme (sky, fog, ambient light, bloom, grade).
 static func environment(name: String, fog_scale: float = 1.0) -> Environment:

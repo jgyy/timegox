@@ -72,7 +72,10 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XIV: the friends it kept faith with come to the Wheel
 	"nie": "bond",
 	# Part XV: side by side with Yue Ling against the Unweaver; a key of pressed petals for the Warden
-	"unweaver": "heart", "lock_warden": "craft"}
+	"unweaver": "heart", "lock_warden": "craft",
+	# Part XVI: the door gods' peach wood for the Last Night, and every pot in the land for the Year Beast
+	"xi_beast": "relic", "nian": "folk",
+}
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
 ## Tala, Qiu Ye and Fang Hu become friends, Xu Lan an enemy spared at the end, Liu Ying an enemy who
@@ -104,10 +107,12 @@ const GATE_PLAN := ["fetter_maple", "kui_drum", "liang", "xingtian"]
 ## and at the lotus pond; and the future she writes for herself (the one her heart leans to).
 const TALK_PLAN := {"t_lotus": "mine", "t_hands": "teach", "t_winter": "here", "t_chains": "cut", "t_sky": "share", "t_seal": "you",
 	"t_ageless": "keep", "t_mend": "me", "t_ancestors": "make", "t_mother": "sing", "t_bridge": "yes", "t_noon": "duty", "t_maps": "draw",
-	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_dragon": "ask", "t_nineteen": "left", "t_peach": "see", "t_heaven": "home", "t_xufu": "front", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_loom": "through", "t_moths": "keep", "t_wrist": "family", "t_after": "never", "t_feast": "every"}
+	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_dragon": "ask", "t_nineteen": "left", "t_peach": "see", "t_heaven": "home", "t_xufu": "front", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_loom": "through", "t_moths": "keep", "t_wrist": "family", "t_after": "never", "t_feast": "every",
+	"t_newyear": "bowl", "t_lastnight": "stay",
+}
 const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "mem_dance", "mem_kite"]
 const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
-const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her"}
+const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us",}
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
@@ -543,11 +548,15 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				_goto_entity(str(Bonds.MEMORIES[mm].area), "mem:" + mm)
-		"threads":
-			# Part XV: the nearest of the people still to tie a thread for her
+		"threads", "rally":
+			# Part XV: the nearest of the people still to tie a thread for her; Part XVI: the nearest town
+			# still to be reminded of the old ways
 			var tv := _visit_target()
 			if tv != "":
 				_goto_entity(Trials.npc_area(tv), tv)
+		"folk":
+			# Part XVI: the nearest child of the towns still without a red envelope (folk.gd)
+			_folk_step(s)
 		"grudges":
 			# Part XIV: the next of the grudges that stayed (all six, in any order), each a boss
 			var gr := _next_grudge()
@@ -1163,7 +1172,8 @@ func _visit_target() -> String:
 	var s := Game.cur_step()
 	var want: Array = s.get("npcs", [])
 	# (Part XV's threads are counted apart from the visits of Parts XIII and XIV)
-	var seen_: Dictionary = Game.threads if str(s.kind) == "threads" else Game.visited
+	# (and Part XVI's towns reminded of the old ways)
+	var seen_: Dictionary = Game.threads if str(s.kind) == "threads" else (Game.rallied if str(s.kind) == "rally" else Game.visited)
 	if visit_id != "" and want.has(visit_id) and not seen_.has(visit_id):
 		return visit_id
 	var here: String = str(world.layer) if not world.is_floor() else str(world.wd.parent)
@@ -1184,6 +1194,69 @@ func _visit_target() -> String:
 			bd = cost
 			best = id
 	visit_id = best
+	return best
+
+## Part XVI's red envelopes (folk.gd): walk up to the nearest child of the towns still to be given
+## one, turn to them and press Enter, as a player would; while they are all indoors (the dinner hour,
+## the night), wait in the town of the step for them to come out.
+func _folk_step(s: Dictionary) -> void:
+	var role: String = str(s.get("role", "child"))
+	var tgt := _folk_target(role)
+	if tgt.is_empty():
+		if Game.area != str(s.area) or world.layer != Data.layer_of(str(s.area)):
+			_travel(str(s.area))
+		else:
+			_start_meditate("children")
+		return
+	var at: Vector2i = tgt.tile
+	var here: Vector2i = world.ptile
+	if world.move_t < 0.0 and absi(at.x - here.x) + absi(at.y - here.y) == 1:
+		world.move_dir = Vector2i.ZERO
+		world.facing = at - here
+		_press("confirm", 0.4)
+		return
+	var best := Vector2i(-1, -1)
+	var bd := 1 << 30
+	for d in DIRS:
+		var q: Vector2i = at + d
+		if not world.tile_free(q) or world.ent_at(q) != null:
+			continue
+		var dd := absi(q.x - here.x) + absi(q.y - here.y)
+		if dd < bd:
+			bd = dd
+			best = q
+	if best.x < 0:
+		_start_meditate("children")
+		return
+	_walk_to(best, "folk:%s:%s" % [str(tgt.id), str(best)])
+
+## The child (or townsperson of kind `role`) nearest the bot in this realm who is out of doors and
+## standing still for a while yet: {id, tile} or {}.
+func _folk_target(role: String) -> Dictionary:
+	if world.is_floor() or world.wd.is_empty():
+		return {}
+	var m: float = Game.clock
+	var best := {}
+	var bd := 1 << 30
+	for tid in Folk.TOWNS:
+		var ar: String = Folk.TOWNS[tid].area
+		if Data.layer_of(ar) != world.layer:
+			continue
+		var hc := Folk.heart(tid)
+		var town_d := absi(hc.x - world.ptile.x) + absi(hc.y - world.ptile.y)
+		if town_d > bd + Folk.RADIUS:
+			continue
+		for fp in Folk.people(world.wd, tid):
+			if not Folk.is_role(fp, role) or Game.hongbao.has(str(fp.id)):
+				continue
+			var st := Folk.state(world.wd, fp, m)
+			if not st.vis or st.walk or float(st.seg.b) - m < 4.0:
+				continue
+			var tile := Vector2i(int(floor((st.at as Vector2).x)), int(floor((st.at as Vector2).y)))
+			var dd := absi(tile.x - world.ptile.x) + absi(tile.y - world.ptile.y)
+			if dd < bd:
+				bd = dd
+				best = {"id": str(fp.id), "tile": tile}
 	return best
 
 ## Renown the bot can still earn from deeds the story has reached.
@@ -1298,6 +1371,15 @@ func _astar() -> AStarGrid2D:
 		for x in world.w:
 			if not MapGen.is_walkable_tile(world.grid[y * world.w + x]):
 				astar.set_point_solid(Vector2i(x, y), true)
+	# the Living Land release: the things people leave about their towns (havoc.gd) are walked round,
+	# not galloped through, as a player minding other people's jars would
+	if not world.is_floor():
+		for tid in Folk.TOWNS:
+			var ar: String = Folk.TOWNS[tid].area
+			if Data.layer_of(ar) == world.layer:
+				for b in Havoc.of_area(world.wd, ar):
+					if astar.is_in_boundsv(b.tile) and not astar.is_point_solid(b.tile):
+						astar.set_point_weight_scale(b.tile, 12.0)
 	return astar
 
 ## tiles an entity stands on (closed seals always; enemies only when avoiding fights)
@@ -1445,6 +1527,9 @@ func _meditate() -> void:
 		"respawn_any":
 			# waiting for packs to come back to fight (essences, spirit stones for a trial)
 			done = _any_enemy(Game.area, true) != null
+		"children":
+			# Part XVI: waiting for the children of the towns to come out of doors (folk.gd)
+			done = not _folk_target(str(Game.cur_step().get("role", "child"))).is_empty() or Game.cur_step().get("kind", "") != "folk"
 	if done:
 		_press("cancel", 0.4)
 	else:

@@ -96,10 +96,24 @@ var shared := {}
 var memories := {}
 var threads := {}
 var future := ""
+## the Living Land release (clock.gd): the minute of the day (0..1440) and the day it is
+var clock := Clock.START
+var day := 1
+## the people of the towns (folk.gd): how often Lin Feng has talked with each
+var folk_talk := {}
+## things broken (havoc.gd): thing id -> the minute of the game it broke (mended by the next dawn),
+## and how many things he has broken in all
+var broken := {}
+var smashed := 0
+## Part XVI: the towns Lin Feng reminded of the old ways (npc id -> true), and the children of the
+## towns given a red envelope on New Year's Day (townsperson id -> true)
+var rallied := {}
+var hongbao := {}
 
 func _process(d: float) -> void:
 	if started and not finished:
 		playtime += d
+		Clock.advance(self, d)
 
 func reset() -> void:
 	started = true
@@ -168,6 +182,13 @@ func reset() -> void:
 	memories = {}
 	threads = {}
 	future = ""
+	clock = Clock.START
+	day = 1
+	folk_talk = {}
+	broken = {}
+	smashed = 0
+	rallied = {}
+	hongbao = {}
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -500,6 +521,8 @@ func advance() -> void:
 		toast("+%d spirit stones" % s.stones)
 	toast("Quest complete: %s" % s.t)
 	note("Quest complete: %s" % s.t)
+	# the story sets the hour here and there (clock.gd)
+	Clock.story_hour(self, str(s.id))
 	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
 	for race in Data.AREAS.get(str(s.get("area", "")), {}).get("races", []):
 		race_gain(race, 8 if s.kind == "kill" else 5)
@@ -549,6 +572,12 @@ func poll_steps() -> void:
 			"threads":
 				# Part XV: the people who tied a thread for her, any of them, in any order
 				ok = visits_done(s) >= int(s.n)
+			"rally":
+				# Part XVI: the towns reminded of the old ways, any of them, in any order
+				ok = visits_done(s) >= int(s.n)
+			"folk":
+				# Part XVI: so many of the people of the towns (folk.gd) of one kind, any of them
+				ok = hongbao.size() >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -572,8 +601,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(grudges.size(), int(s.n)), int(s.n)]
 	elif s.kind == "memories":
 		t += "  (%d/%d)" % [mini(memories.size(), int(s.n)), int(s.n)]
-	elif s.kind == "threads":
+	elif s.kind == "threads" or s.kind == "rally":
 		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
+	elif s.kind == "folk":
+		t += "  (%d/%d)" % [mini(hongbao.size(), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":
@@ -638,7 +669,7 @@ func do_deed(id: String) -> bool:
 ## how many of them have tied a thread for Yue Ling).
 func visits_done(s: Dictionary) -> int:
 	var k := 0
-	var seen_: Dictionary = threads if str(s.get("kind", "")) == "threads" else visited
+	var seen_: Dictionary = threads if str(s.get("kind", "")) == "threads" else (rallied if str(s.get("kind", "")) == "rally" else visited)
 	for id in s.get("npcs", []):
 		if seen_.has(id):
 			k += 1

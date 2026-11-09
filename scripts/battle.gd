@@ -7,6 +7,8 @@ const VIEW := Vector2(1280, 720)
 var party: Array = []
 var foes: Array = []
 var ctx: Dictionary = {}
+## the Living Land release (havoc.gd): this battle's scorch marks and thrown-up floor
+var scar_root: Node3D = null
 var state := "intro"
 var timer := 0.0
 var order: Array = []
@@ -276,12 +278,22 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	level_before = Game.level
 	Game.battles += 1
 	if not headless():
+		# the scars of the last battle's arena are swept away
+		if scar_root != null and is_instance_valid(scar_root):
+			scar_root.queue_free()
+		scar_root = Node3D.new()
+		scar_root.name = "scars"
+		scene3d.add_child(scar_root)
 		for k in stages:
 			stages[k].node.visible = false
 		var st: Dictionary = _stage_for(theme)
 		st.node.visible = true
 		cam.environment = st.env
 		Look.apply_lights(theme, sun, fill)
+		# the Living Land release: a battle is fought at the hour it was met (a tribulation brings its
+		# own storm, whatever the hour: its sky is the stage's own, as at one in the afternoon)
+		var bh := 13.0 if ctx.get("tribulation", false) else Clock.hour(Game)
+		MB.set_night(float(Look.apply_hour(st.env, sun, fill, theme, bh, 0.8).night))
 		main.fx_theme(theme)
 		_build_fighters()
 		cam.position = cam_base
@@ -501,6 +513,15 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		if big:
 			cam_shake = 0.35
 			main.fx_flash(col.lerp(Color.WHITE, 0.5), 0.22 if tgt.side == "foe" else 0.3)
+			# the Living Land release (havoc.gd): a heavy blow throws up the arena floor and scorches it
+			var fl := pos3(tgt)
+			fl.y = 0.0
+			# (the pieces fly out from the middle of the arena, past the one who was hit)
+			var from: Vector3 = fl if fl.length() > 0.5 else Vector3(0, 0, 1)
+			if scar_root != null:
+				Havoc.burst(scar_root, "rubble", fl, from, null, 0.85 if not tgt.boss else 1.1, Color(Look.theme(theme).path).darkened(0.25))
+				if scar_root.get_child_count() < 40:
+					scar_root.add_child(Havoc.scar(fl, 1.0 if not tgt.boss else 1.7, null))
 	# a trial's boss brought low is enraged, once (trials.gd): it is harder than the bosses before it
 	if tgt.side == "foe" and tgt.boss and str(ctx.get("trial", "")) != "" and not enraged and tgt.hp > 0.0 and tgt.hp < tgt.maxhp * Trials.ENRAGE_AT:
 		enraged = true

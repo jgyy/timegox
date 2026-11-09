@@ -45,7 +45,9 @@ PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
                "hammer", "sweep", "weave", "lift", "toss", "touch", "ride", "ride_idle", "ride_stand",
                # the Lotus release (Part XV)
                "play_flute", "dance", "kite", "stargaze", "release", "float_lantern", "write", "archery", "soak", "push",
-               "climb", "gaze", "clap", "sword_dance")
+               "climb", "gaze", "clap", "sword_dance",
+               # the Living Land release: the work of the towns, which every townsperson borrows (scripts/folk.gd)
+               "hoe", "chop", "carry", "bang", "call", "eat")
 MATERIALS = {"toon", "plain", "glow"}
 
 

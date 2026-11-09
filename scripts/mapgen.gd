@@ -115,7 +115,8 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		ents.append(be)
 		fixed.append(b.pos)
 	for pk in spec.get("pickups", []):
-		var pe := {"kind": "pickup", "id": pk.id, "item": pk.item, "pos": pk.pos, "vis": ["" if pk.get("always", false) else spec.get("pickup_vis", ""), ""]}
+		# (a pickup may name the step it appears with: Part XVI's thunder bamboo is not there in Part I)
+		var pe := {"kind": "pickup", "id": pk.id, "item": pk.item, "pos": pk.pos, "vis": pk.get("vis", ["" if pk.get("always", false) else spec.get("pickup_vis", ""), ""])}
 		if pk.has("n"):
 			pe["n"] = pk.n
 		# a cache only Spirit Sense can feel (Part XII)
