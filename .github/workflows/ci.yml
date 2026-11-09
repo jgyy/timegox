@@ -12,7 +12,7 @@ jobs:
   art:
     name: Rebuild Blender assets from art/
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30  # 255 assets with four workers: about 15 minutes on a hosted runner
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +36,7 @@ jobs:
 
   test-and-playthrough:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 50  # the bot plays over 19 hours of game time: about 30 minutes on a hosted runner
     steps:
       - uses: actions/checkout@v4
 

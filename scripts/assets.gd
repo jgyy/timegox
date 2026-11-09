@@ -117,6 +117,8 @@ const PEOPLE := {
 	# Fates and Faces: the five people met again and again on the road (fate.gd)
 	"tala": "characters/tala", "qiu_ye": "characters/qiu_ye", "little_hu": "characters/little_hu", "hu_grown": "characters/hu_grown",
 	"xu_lan": "characters/xu_lan", "liu_ying": "characters/liu_ying",
+	# the Living Land release: Zao Jun, Lord of the Stove, and the door gods of the peach tree (Part XVI)
+	"zao_jun": "characters/zao_jun", "shenshu": "characters/shenshu", "yulei": "characters/yulei",
 }
 
 static var _scenes := {}
@@ -422,14 +424,82 @@ static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
 	n.set_meta("shape", shape)
 	return n
 
+# ---------------------------------------------------------------- lent clips (the Living Land release)
+## Every person in the game is built on one rig (art/lib/person.py make_rig), so the clips Lin Feng
+## carries for doing things (INTERACT: sweeping, hammering, stirring, fishing, reading, praying, the
+## towns' work of hoeing, chopping, carrying, beating a gong, calling out and eating) can be lent to
+## anybody: the people of the towns (folk.gd) and the named townsfolk at their work.  A child's rig is
+## the same rig scaled, so a lent clip's bone positions are scaled to it; tracks for bones a person
+## does not have (a swordsman's sword) are left out.  Each model's lent clips are made once.
+const LEND := ["sit_bench", "doze", "drink", "strike", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir", "hammer",
+	"sweep", "weave", "lift", "toss", "touch", "play_flute", "dance", "kite", "stargaze", "release", "write", "archery", "push", "gaze",
+	"clap", "sword_dance", "hoe", "chop", "carry", "bang", "call", "eat"]
+## the lent clips that go round and round (the rest are one-shots, played again when they end)
+const LEND_LOOPS := ["sit_bench", "doze", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir", "hammer", "sweep",
+	"weave", "play_flute", "dance", "push", "gaze", "hoe", "chop", "carry", "bang", "eat", "write", "stargaze"]
+static var _donor_lib: AnimationLibrary = null
+static var _donor_hips := 0.92
+static var _lent := {}
+
+static func _skeleton(n: Node) -> Skeleton3D:
+	var sks := n.find_children("*", "Skeleton3D", true, false)
+	return null if sks.is_empty() else sks[0] as Skeleton3D
+
+## Lend the party's clips to person model `n` (an instance()); a no-op for the party themselves.
+static func lend_clips(n: Node3D) -> void:
+	if n == null or not n.has_meta("ap"):
+		return
+	var ap: AnimationPlayer = n.get_meta("ap")
+	if ap == null or ap.has_animation("hoe") or not has(PEOPLE.lin_feng):
+		return
+	if _donor_lib == null:
+		var dn: Node3D = _scene(PEOPLE.lin_feng).instantiate()
+		var aps: Array = []
+		_walk(dn, aps, "AnimationPlayer")
+		_donor_lib = (aps[0] as AnimationPlayer).get_animation_library("")
+		var dsk := _skeleton(dn)
+		_donor_hips = dsk.get_bone_rest(dsk.find_bone("hips")).origin.y
+		dn.free()
+	var rel: String = n.get_meta("glb", "")
+	if not _lent.has(rel):
+		var sk := _skeleton(n)
+		if sk == null:
+			return
+		var ratio := sk.get_bone_rest(sk.find_bone("hips")).origin.y / _donor_hips
+		var made := {}
+		for nm in LEND:
+			if not _donor_lib.has_animation(nm):
+				continue
+			var a: Animation = _donor_lib.get_animation(nm).duplicate(true)
+			for i in range(a.get_track_count() - 1, -1, -1):
+				var bone := str(a.track_get_path(i)).get_slice(":", 1)
+				if bone != "" and sk.find_bone(bone) < 0:
+					a.remove_track(i)
+				elif absf(ratio - 1.0) > 0.005 and a.track_get_type(i) == Animation.TYPE_POSITION_3D:
+					for kx in a.track_get_key_count(i):
+						a.track_set_key_value(i, kx, (a.track_get_key_value(i, kx) as Vector3) * ratio)
+			a.loop_mode = Animation.LOOP_LINEAR if nm in LEND_LOOPS else Animation.LOOP_NONE
+			made[nm] = a
+		_lent[rel] = made
+	var lib: AnimationLibrary = ap.get_animation_library("")
+	var lent: Dictionary = _lent[rel]
+	for nm2 in lent:
+		if not lib.has_animation(nm2):
+			lib.add_animation(nm2, lent[nm2])
+
 static func has_clip(n: Node3D, clip: String) -> bool:
-	var ap: AnimationPlayer = n.get_meta("ap", null) if n != null else null
+	# (a procedural model has no player: get_meta's default of null counts as no default at all)
+	if n == null or not n.has_meta("ap"):
+		return false
+	var ap: AnimationPlayer = n.get_meta("ap")
 	return ap != null and ap.has_animation(clip)
 
 ## Drive a model's AnimationPlayer: `base` is the looping clip, an action set by Models.act()
 ## overrides it until it finishes.  `t` is the caller's clock (deltas are taken from it).
 static func animate(n: Node3D, t: float, base: String, phase: float = 0.0) -> void:
-	var ap: AnimationPlayer = n.get_meta("ap", null)
+	if not n.has_meta("ap"):
+		return
+	var ap: AnimationPlayer = n.get_meta("ap")
 	if ap == null:
 		return
 	var last: float = n.get_meta("anim_t", t)

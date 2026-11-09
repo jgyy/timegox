@@ -1951,6 +1951,164 @@ def clip_sword_dance(t):
     return p
 
 
+# ---------------------------------------------------------------- the Living Land release: work
+# What the people of the towns do all day (scripts/folk.gd in the game, which plays these on every
+# townsperson as well as on the party): hoe a field, chop firewood, carry a shoulder pole, beat a gong
+# or a pot (the noise that drives Nian off at the New Year), call out their wares or the watch, and eat.
+
+HOE_T = 1.7
+
+
+def clip_hoe(t):
+    """Hoeing a field: both hands on the long handle, the right back by the hip and the left forward,
+    the blade swung up over the right shoulder and brought down into the soil in front, drawn back
+    towards the feet with a bend of the back, and lifted again; the left foot forward."""
+    k = (t % HOE_T) / HOE_T
+    p = clip_idle(0.0)
+    up = smooth(0.0, 0.42, k) * (1.0 - smooth(0.5, 0.62, k))
+    down = smooth(0.5, 0.62, k) * (1.0 - smooth(0.86, 1.0, k))
+    pull = smooth(0.64, 0.84, k) * (1.0 - smooth(0.88, 1.0, k))
+    p["upper_arm.R"] = ((-0.45 - 1.65 * up + 0.25 * down, 0.0, -0.3 + 0.12 * up), (0, 0, 0))
+    p["forearm.R"] = ((-0.95 - 0.85 * up + 0.35 * pull, 0.3, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.25 - 0.35 * up, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.75 - 1.45 * up + 0.2 * down, 0.0, -0.18), (0, 0, 0))
+    p["forearm.L"] = ((-0.55 - 0.55 * up + 0.3 * pull, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.15, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.1, 1.1)
+    p["hips"] = ((0.1 + 0.12 * down, 0.0, 0.0), (0.0, -0.06 - 0.04 * down, -0.02 * down))
+    _add(p, "spine", 0.1 - 0.12 * up + 0.22 * down + 0.08 * pull)
+    _add(p, "chest", 0.06 - 0.12 * up + 0.16 * down)
+    _add(p, "head", 0.22 + 0.1 * down)
+    _add(p, "sleeve.R", 0.5 + 0.6 * up)
+    _add(p, "sleeve.L", 0.4 + 0.5 * up)
+    _add(p, "thigh.L", -0.25)
+    _add(p, "shin.L", 0.3)
+    _add(p, "foot.L", -0.05)
+    _add(p, "thigh.R", 0.12)
+    _add(p, "shin.R", 0.25)
+    _add(p, "foot.R", -0.35)
+    return p
+
+
+CHOP_T = 1.5
+
+
+def clip_chop(t):
+    """Chopping firewood: both hands together at the end of the axe handle, raised straight up over
+    the head, brought down onto the log on the block with a bend of the knees and the back, a beat,
+    and up again."""
+    k = (t % CHOP_T) / CHOP_T
+    p = clip_idle(0.0)
+    up = smooth(0.05, 0.5, k) * (1.0 - smooth(0.58, 0.66, k))
+    blow = smooth(0.58, 0.66, k) * (1.0 - smooth(0.84, 1.0, k))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.85 - 2.0 * up + 0.3 * blow, 0.0, -0.22 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.45 - 0.55 * up, -0.35 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.2 - 0.3 * up + 0.3 * blow, 0.0, 0.3 * s), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.4 + 0.7 * up)
+    _hands(p, 1.1, 1.1)
+    p["hips"] = ((0.06 + 0.12 * blow, 0.0, 0.0), (0.0, -0.05 - 0.07 * blow, 0.0))
+    _add(p, "spine", 0.04 - 0.12 * up + 0.26 * blow)
+    _add(p, "chest", -0.1 * up + 0.16 * blow)
+    _add(p, "head", 0.12 + 0.18 * blow - 0.12 * up)
+    for sd in ("L", "R"):
+        _add(p, "thigh." + sd, -0.14 - 0.12 * blow)
+        _add(p, "shin." + sd, 0.26 + 0.24 * blow)
+        _add(p, "foot." + sd, -0.12 - 0.12 * blow)
+    return p
+
+
+CARRY_T = WALK_T
+
+
+def clip_carry(t):
+    """Walking under a shoulder pole (a porter's load, two buckets of water, baskets of greens): the
+    right hand steadies the pole on the right shoulder, the left arm swings, the head tips away
+    from the pole and the body leans a little into the load."""
+    p = clip_walk(t)
+    p["upper_arm.R"] = ((-0.35, 0.0, -0.95), (0, 0, 0))
+    p["forearm.R"] = ((-1.95, -0.25, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.3, 0.0, 0.25), (0, 0, 0))
+    _hands(p, 0.42, 1.0)
+    _add(p, "chest", 0.05, 0.0, 0.05)
+    _add(p, "spine", 0.04, 0.0, 0.0)
+    _add(p, "head", 0.0, 0.0, 0.08)
+    _add(p, "sleeve.R", 0.6)
+    return p
+
+
+BANG_T = 1.0
+
+
+def clip_bang(t):
+    """Beating a gong or a pot (the noise that drives Nian off at the New Year, the watchman's gong):
+    the left hand holds it up before the chest, the right beats it with a stick twice a beat, with a
+    little bounce and a shout."""
+    k = (t % BANG_T) / BANG_T
+    p = clip_idle(t * IDLE_T / BANG_T * 0.25)
+    lift = abs(math.sin(k * math.pi * 2.0))
+    p["upper_arm.L"] = ((-0.95, 0.0, -0.12), (0, 0, 0))
+    p["forearm.L"] = ((-1.1, -0.5, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.1, 0.0, 0.6), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.6 - 0.5 * lift, 0.0, -0.05), (0, 0, 0))
+    p["forearm.R"] = ((-1.2 - 0.6 * lift, 0.4, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.3 - 0.5 * lift, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.0, 1.1)
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, 0.012 * (1.0 - lift), 0.0))
+    _add(p, "head", -0.1, 0.0, 0.0)
+    _add(p, "sleeve.L", 0.5)
+    _add(p, "sleeve.R", 0.5 + 0.3 * lift)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.8 * lift, 1))
+    return p
+
+
+CALL_T = 2.4
+
+
+def clip_call(t):
+    """Calling out (a hawker's wares, the watchman's hour, a name across the street): the right hand
+    cupped at the mouth, the chest lifting and the head tipping back for the shout, and down."""
+    k = t / CALL_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.8, 1.0)
+    shout = _hold(k, 0.25, 0.35, 0.65, 0.75)
+    p["upper_arm.R"] = ((-0.7 * e, 0.0, -0.45 * e - 0.035 * (1 - e)), (0, 0, 0))
+    p["forearm.R"] = ((-2.1 * e - 0.24 * (1 - e), 0.4 * e, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.2 * e, 0.0, 0.5 * e), (0, 0, 0))
+    _hands(p, 0.4, 0.3 + 0.4 * e)
+    _add(p, "chest", -0.08 * shout)
+    _add(p, "head", -0.22 * shout, 0.0, 0.0)
+    _add(p, "sleeve.R", 0.8 * e)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 1.0 * shout, 1))
+    return p
+
+
+EAT_T = 2.0
+
+
+def clip_eat(t):
+    """Eating at a table: seated, the left hand holds the bowl up near the chin, the right brings the
+    chopsticks to the mouth and back down to the bowl, a chew, and again."""
+    w = 2 * math.pi / EAT_T
+    k = (t % EAT_T) / EAT_T
+    p = clip_idle(0.0)
+    br = _seated(p, t, w * 0.25)
+    bite = _hold(k, 0.1, 0.35, 0.5, 0.75)
+    p["upper_arm.L"] = ((-0.55, 0.0, -0.28), (0, 0, 0))
+    p["forearm.L"] = ((-1.6, -0.45, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.2, 0.0, 0.3), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.5 - 0.25 * bite, 0.0, 0.25), (0, 0, 0))
+    p["forearm.R"] = ((-1.5 - 0.6 * bite, 0.4, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.1 - 0.2 * bite, 0.0, 0.1), (0, 0, 0))
+    _hands(p, 0.8, 0.9)
+    _add(p, "head", 0.12 - 0.06 * bite)
+    _add(p, "sleeve.L", 0.5)
+    _add(p, "sleeve.R", 0.5 + 0.3 * bite)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.4 * math.sin(k * math.pi * 6.0) ** 2 * (1.0 - bite), 1))
+    _secondary(p, t, False, False, (-1.5, -1.5), br, (0.4, 0.4))
+    return p
+
+
 def _stowing(fn):
     return lambda t: _stow(fn(t))
 
@@ -1989,6 +2147,13 @@ INTERACT = {
     "climb": (CLIMB_T, clip_climb),
     "gaze": (GAZE_T, clip_gaze),
     "clap": (CLAP_T, clip_clap),
+    # the Living Land release: the work of the towns (scripts/folk.gd plays these on everybody)
+    "hoe": (HOE_T, clip_hoe),
+    "chop": (CHOP_T, clip_chop),
+    "carry": (CARRY_T, clip_carry),
+    "bang": (BANG_T, clip_bang),
+    "call": (CALL_T, clip_call),
+    "eat": (EAT_T, clip_eat),
 }
 INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
 # the sword form on the stage is the one thing done with the blade out

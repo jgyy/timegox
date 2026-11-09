@@ -102,6 +102,11 @@ var cine_a := 0.0
 ## Fates and Faces (fashion.gd): the ride under the party (rebuilt when another is summoned), its own
 ## clock (a gallop runs faster than the world's), and how far the hero's model is behind the outfit
 ## and the look he has now (`hero_sig`: the model is rebuilt when they change)
+## the Living Land release (havoc.gd): the body that kicks the pieces of broken things about, the last
+## swing of the sword, and the marks battles left on the ground ([node, the minute it was made])
+var kick: AnimatableBody3D = null
+var strike_t := -9.0
+var scars: Array = []
 var mount: Node3D = null
 var mount_id := ""
 var ride_clk := 0.0
@@ -130,6 +135,16 @@ func _build3d() -> void:
 	scene3d.add_child(comp)
 	weather = Fx3D.make_weather()
 	scene3d.add_child(weather)
+	# the Living Land release (havoc.gd): the party's bodies push the pieces of broken things about
+	kick = AnimatableBody3D.new()
+	var kcs := CollisionShape3D.new()
+	var kcap := CapsuleShape3D.new()
+	kcap.radius = 0.38
+	kcap.height = 1.6
+	kcs.shape = kcap
+	kick.add_child(kcs)
+	kick.position = Vector3(0, -500, 0)
+	scene3d.add_child(kick)
 
 func clear_cache() -> void:
 	for k in views:
@@ -143,11 +158,18 @@ func clear_cache() -> void:
 	using = {}
 	ent_nodes.clear()
 
+func _free_view_brk(v: Dictionary) -> void:
+	for bid in v.get("brk", {}):
+		var bn: Node3D = v.brk[bid]
+		if is_instance_valid(bn):
+			bn.queue_free()
+
 func _free_view(k: String) -> void:
 	var v: Dictionary = views[k]
 	v.root.queue_free()
 	for i in v.nodes:
 		v.nodes[i].queue_free()
+	_free_view_brk(v)
 
 ## (Re)load the open world, if needed (the land first; the realms above and below and the floors of
 ## buildings are built the first time they are needed).
@@ -413,6 +435,25 @@ func _apply_look() -> void:
 	Look.apply_lights(theme_name, sun, fill)
 	# upstairs is indoors: no rain, snow or drifting cloud in the room
 	Fx3D.configure_weather(weather, "none" if is_floor() else th.weather)
+	_apply_hour()
+
+## The Living Land release (clock.gd): the sky, the sun or the moon, the fog and the lanterns follow
+## the hour.  Called every frame the world is on screen (a handful of parameters on shared resources).
+var night_k := 0.0
+func _apply_hour() -> void:
+	if headless() or cam == null or cam.environment == null:
+		return
+	if is_floor() and int(wd.level) < 0:
+		# a cellar has no sky: only its lanterns know what hour it is
+		MB.set_night(0.6)
+		return
+	var lk := Look.apply_hour(cam.environment, sun, fill, theme_name, Clock.hour(Game))
+	night_k = float(lk.night)
+	MB.set_night(night_k)
+	RenderingServer.global_shader_parameter_set("night_k", night_k)
+	# the hero carries a little light of his own after dark
+	hero_light.light_energy = 0.6 + 1.2 * night_k
+	hero_light.omni_range = 9.0 + 5.0 * night_k
 
 ## Show the realm the hero is in and hide the others; build the floor's own view when on a floor.
 func _show_layer() -> void:
@@ -523,6 +564,20 @@ func wpos(tile: Vector2i) -> Vector3:
 func _open_at(p: Vector3) -> bool:
 	return tile_free(Vector2i(floori((p.x - off.x) / Terrain3D.T), floori((p.z - off.z) / Terrain3D.T)))
 
+## How far out from `mid` along `dir` a conversation camera can stand outdoors, up to `want` metres:
+## with open ground under it and a metre beyond, so that it is never up in the roof of a hall (or a
+## tree) beside the scene, as it was by the sect's bell at the first dawn of the year.
+func _cam_reach(mid: Vector3, dir: Vector3, want: float) -> float:
+	var r := want
+	while r > 2.6 and not (_out_at(mid + dir * r) and _out_at(mid + dir * (r + 1.0))):
+		r -= 0.5
+	return r
+
+## Whether world point `p` is over open ground out of doors (walkable, and not a building's floor).
+func _out_at(p: Vector3) -> bool:
+	var t := Vector2i(floori((p.x - off.x) / Terrain3D.T), floori((p.z - off.z) / Terrain3D.T))
+	return tile_free(t) and grid[t.y * w + t.x] != MapGen.INTERIOR
+
 func _build_view(id: String) -> void:
 	var lid := Data.layer_of(id)
 	var bb := _bundle(lid)
@@ -599,7 +654,18 @@ func _build_view(id: String) -> void:
 		var fp := Terrain3D.world_pos(Atlas.to_world(id, spec.landmark.pos)) + boff
 		var ax := Atlas.dir_to_world(id, Vector2i(1, 0))
 		Terrain3D.landmark(root, spec.landmark.kind, Vector3(fp.x, _ground(bb, fp), fp.z) - root.position, Vector3(ax.x, 0, ax.y))
-	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {}), "uppers": root.get_meta("uppers", {}), "layer": lid, "ents": lw.ents, "bundle": lid}
+	# the Living Land release: the things people leave about their towns (havoc.gd)
+	var brk := {}
+	for b in Havoc.of_area(lw, id):
+		var bn := Havoc.model(str(b.kind))
+		var bp: Vector3 = Terrain3D.world_pos(b.tile) + bb.off
+		bp.y = _stand_y(bb, bp)
+		bn.position = bp
+		bn.rotation.y = float(b.yaw)
+		bn.set_meta("b", b)
+		scene3d.add_child(bn)
+		brk[b.id] = bn
+	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {}), "uppers": root.get_meta("uppers", {}), "layer": lid, "ents": lw.ents, "bundle": lid, "brk": brk}
 
 ## A floor's own view: its people and things (an upper storey is drawn with its building; a cellar
 ## is built here, under the building).
@@ -787,6 +853,9 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"npc":
 			# (someone who appears in two places shares one model: "asset")
 			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(str(e.get("asset", e.id))))
+			# the Living Land release: the people with names work at their place all day (folk.gd POSTS)
+			if Folk.POSTS.has(str(e.get("asset", e.id))):
+				Assets.lend_clips(m)
 			n.add_child(m)
 			n.add_child(Models.shadow_disc(0.6))
 			_label(n, e.n, 2.45, UI.C_GOLD)
@@ -1394,6 +1463,7 @@ func _process(d: float) -> void:
 			stream_t = 0.35
 			_stream(false)
 		_update_view(d)
+		_apply_hour()
 		queue_redraw()
 	# scenery between the camera and the hero turns see-through (shader global, see mb.gd);
 	# parked far away whenever the world is not the screen being shown
@@ -1514,6 +1584,7 @@ func _move(d: float) -> void:
 			ptile = target
 			move_t = -1.0
 			Game.tile = ptile
+			_trample(ptile)
 			var rid := Atlas.owner_id(wd, ptile)
 			if rid != area_id:
 				_enter_region(rid)
@@ -1525,6 +1596,15 @@ func face_entity():
 	var e = ent_at(ptile + facing)
 	if e == null:
 		e = walk_props.get(ptile + facing)
+	if e == null and not is_floor() and not wd.is_empty():
+		# one of the people of the towns standing (or walking) there (folk.gd)
+		var fs := Game.cur_step()
+		var want := Callable()
+		if not fs.is_empty() and str(fs.kind) == "folk":
+			want = func(q: Dictionary) -> bool: return Folk.is_role(q, str(fs.role)) and not Game.folk_has(fs, str(q.id))
+		var fp := Folk.at_tile(wd, ptile + facing, Game.clock, want)
+		if not fp.is_empty():
+			e = {"kind": "folk", "id": fp.id, "n": fp.n, "p": fp, "pos": ptile + facing, "area": fp.area}
 	return e
 
 # ---------------------------------------------------------------- 3D view update
@@ -1615,6 +1695,8 @@ func _update_view(d: float) -> void:
 			if dist > 46.0:
 				continue
 			_animate_ent(e, n, pp, dist, d, vb)
+	_update_folk(d, pp)
+	_update_havoc(d, pp)
 	# inside a building the roof lifts away so the follow camera can look in; on the ground floor of a
 	# building with an upper storey the storey lifts away too, and upstairs only the roof does
 	var key := ""
@@ -1721,6 +1803,11 @@ func _actor(who: String) -> Array:
 				var n: Node3D = v.nodes[i]
 				if n.visible and n.position.distance_to(pp) < 16.0:
 					return [n.get_meta("model"), float(e.pos.x)]
+	# one of the people of the towns (folk.gd), the one Lin Feng is talking to
+	if folk_talking != "" and folk_nodes.has(folk_talking):
+		var fn: Node3D = folk_nodes[folk_talking]
+		if fn.visible and str(fn.get_meta("name", "")) == who:
+			return [fn.get_meta("model"), float(fn.get_meta("seed", 0))]
 	return []
 
 ## A new line of dialogue begins: whoever it belongs to plays the gesture it calls for (Data.emote_for),
@@ -1800,11 +1887,12 @@ func _cutscene(d: float, pp: Vector3) -> void:
 	# is open, the camera goes round to the other side
 	if not indoor and not _open_at(mid + side * dist) and _open_at(mid - side * dist):
 		side = -side
-	var goal := mid + side * dist + Vector3(0, 0.5 + (3.2 if indoor else 0.4), 0)
+	var goal := mid + side * (dist if indoor else _cam_reach(mid, side, dist)) + Vector3(0, 0.5 + (3.2 if indoor else 0.4), 0)
 	if sp == "Narrator" or sp == "":
 		# narration: a slow drift round the scene
 		cine_a += d * 0.12
-		goal = mid + (side.rotated(Vector3.UP, sin(cine_a) * 0.5)) * (dist + 1.5) + Vector3(0, 1.4 + (3.0 if indoor else 0.6), 0)
+		var drift := side.rotated(Vector3.UP, sin(cine_a) * 0.5)
+		goal = mid + drift * ((dist + 1.5) if indoor else _cam_reach(mid, drift, dist + 1.5)) + Vector3(0, 1.4 + (3.0 if indoor else 0.6), 0)
 	elif sp == "Lin Feng":
 		goal += ax * 0.9
 	else:
@@ -1872,8 +1960,18 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 				Models.act(m, "bow", t + e.pos.x)
 				n.set_meta("bowed", t)
 			n.set_meta("near", near)
-			Models.anim_person(m, t + e.pos.x, false, false, "talk" if talking else "")
-			if dist < 9.0:
+			# the Living Land release: at work at their place by day, asleep at it late at night, until the
+			# hero comes close (folk.gd POSTS); the thing in their hands goes with the work
+			var job: Array = [] if talking or dist < 4.5 else Folk.post(str(e.get("asset", e.id)), Clock.hour(Game))
+			if not job.is_empty() and not Assets.has_clip(m, str(job[0])):
+				job = []
+			_post_hold(n, m, "" if job.is_empty() else str(job[1]))
+			if not job.is_empty():
+				Models.anim_person(m, t + e.pos.x, false, false, str(job[0]))
+				m.rotation.y = lerp_angle(m.rotation.y, 0.0, 1.0 - exp(-d * 3.0))
+			else:
+				Models.anim_person(m, t + e.pos.x, false, false, "talk" if talking else "")
+			if dist < 9.0 and job.is_empty():
 				var dv := pp - n.position
 				m.rotation.y = lerp_angle(m.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 5.0))
 			var s := Game.cur_step()
@@ -1882,7 +1980,8 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			# (and Part XV: the people who can still tie a thread for Yue Ling)
 			var quest: bool = not s.is_empty() and ((s.kind == "talk" or s.kind == "fate") and s.npc == e.id
 				or (s.kind == "visits" or s.kind == "fates") and str(e.id) in s.npcs and not Game.visited.has(str(e.id))
-				or s.kind == "threads" and str(e.id) in s.npcs and not Game.threads.has(str(e.id)))
+				or s.kind == "threads" and str(e.id) in s.npcs and not Game.threads.has(str(e.id))
+				or s.kind == "rally" and str(e.id) in s.npcs and not Game.rallied.has(str(e.id)))
 			mark.visible = quest
 			if quest and e.get("fate", false):
 				mark.modulate = Fate.THREADS[Fate.thread_of_npc(str(e.id))].col
@@ -1948,6 +2047,303 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			if smd.has_meta("spin"):
 				(smd.get_meta("spin") as Node3D).rotation.y = t * 0.4
 
+## What a named townsperson holds at work (folk.gd POSTS), swapped as the work changes.
+func _post_hold(n: Node3D, m: Node3D, what: String) -> void:
+	if str(n.get_meta("hold", "")) == what:
+		return
+	if n.has_meta("hold_node"):
+		var old = n.get_meta("hold_node")
+		if old != null and is_instance_valid(old):
+			(old as Node).queue_free()
+		n.remove_meta("hold_node")
+	n.set_meta("hold", what)
+	if what != "":
+		var hn := _hold_in_hand(m, what, Folk.hand_of(what))
+		if hn != null:
+			n.set_meta("hold_node", hn)
+
+# ---------------------------------------------------------------- things that break (havoc.gd)
+## Walking onto a tile with something on it: at the gallop it is smashed, on foot it is only jostled.
+func _trample(tile: Vector2i) -> void:
+	if is_floor() or wd.is_empty():
+		return
+	var b := Havoc.at_tile(wd, tile)
+	if b.is_empty() or Havoc.is_broken(Game, b):
+		return
+	if riding_here():
+		_smash(b, Vector3(facing.x, 0, facing.y), "ride")
+	else:
+		var bn := _brk_node(str(b.id))
+		if bn != null:
+			bn.set_meta("jostle", t)
+
+func _brk_node(id: String) -> Node3D:
+	for k in views:
+		var bn = views[k].get("brk", {}).get(id)
+		if bn != null:
+			return bn
+	return null
+
+## F: Lin Feng swings his sword at what is in front of him.  Whatever it meets breaks (havoc.gd), the
+## grass and the leaves feel the wind of it, and the townsfolk nearby start and stare.
+func strike() -> void:
+	if t - strike_t < 0.5 or not using.is_empty() or not trip.is_empty():
+		return
+	strike_t = t
+	Models.act(player, "attack", t)
+	var fwd := Vector3(facing.x, 0, facing.y)
+	var side := Vector2i(-facing.y, facing.x)
+	var any := false
+	if not is_floor() and not wd.is_empty():
+		for dt in [facing, facing * 2, facing + side, facing - side]:
+			var b := Havoc.at_tile(wd, ptile + dt)
+			if not b.is_empty() and not Havoc.is_broken(Game, b):
+				_smash(b, fwd, "strike")
+				any = true
+	if headless():
+		return
+	var pp := _player_pos()
+	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), Color(0.78, 0.9, 1.0), atan2(fwd.x, fwd.z), 2.6)
+	if not any:
+		# the cut goes through the grass: blades and leaves fly
+		Fx3D.leaf_spiral(scene3d, pp + fwd * 1.6 + Vector3(0, 0.3, 0), Color(Look.theme(theme_name).g2).lightened(0.15), 0.7)
+	_folk_start(pp, 7.0)
+
+## Thing `b` breaks: game state (what the owner says, a price paid), and on screen its pieces fly.
+func _smash(b: Dictionary, dir: Vector3, why: String) -> void:
+	for ln in Havoc.smash(Game, wd, b, why):
+		Game.toast(str(ln))
+	if headless():
+		return
+	var bn := _brk_node(str(b.id))
+	var at := Terrain3D.world_pos(b.tile) + off
+	if bn != null:
+		at = bn.position
+		bn.visible = false
+	var bb: Dictionary = bundles[layer]
+	Havoc.burst(scene3d, str(b.kind), at, dir, func(q: Vector3) -> float: return _stand_y(bb, q), 1.0 if why != "ride" else 1.4)
+	_folk_start(at, 9.0)
+
+## The townsfolk within `r` metres of `at` start at a crash.
+func _folk_start(at: Vector3, r: float) -> void:
+	for id in folk_nodes:
+		var fn: Node3D = folk_nodes[id]
+		if fn.visible and fn.position.distance_to(at) < r:
+			Models.act(fn.get_meta("model"), "shock", t + float(fn.get_meta("seed", 0)))
+
+## A battle won in the land leaves its mark where it was fought: scorched ground with cracks, and
+## the things standing next to it broken (a boss's mark is bigger).
+func battle_mark(e: Dictionary, boss: bool) -> void:
+	if e.is_empty() or not e.has("pos") or is_floor() or wd.is_empty():
+		return
+	var tile: Vector2i = e.pos
+	for dy in range(-2, 3):
+		for dx in range(-2, 3):
+			var b := Havoc.at_tile(wd, tile + Vector2i(dx, dy))
+			if not b.is_empty() and not Havoc.is_broken(Game, b):
+				_smash(b, Vector3(dx, 0, dy), "battle")
+	if headless():
+		return
+	var bb: Dictionary = bundles[layer]
+	var at := Terrain3D.world_pos(tile) + off
+	var sc := Havoc.scar(at, 2.4 if boss else 1.5, func(q: Vector3) -> float: return _ground(bb, q))
+	scene3d.add_child(sc)
+	scars.append([sc, Havoc.now(Game), layer])
+	while scars.size() > 24:
+		var old: Array = scars.pop_front()
+		if is_instance_valid(old[0]):
+			(old[0] as Node).queue_free()
+
+## Every frame: the things of the regions on show stand where they stand (unless broken), shake a
+## moment when jostled; the scars of old battles fade and go; the kick body follows the hero.
+func _update_havoc(d: float, pp: Vector3) -> void:
+	for k in views:
+		var v: Dictionary = views[k]
+		var brk: Dictionary = v.get("brk", {})
+		for bid in brk:
+			var bn: Node3D = brk[bid]
+			var vis: bool = v.shown and (not Game.broken.has(bid) or not Havoc.is_broken(Game, bn.get_meta("b")))
+			bn.visible = vis
+			if vis and bn.has_meta("jostle"):
+				var e := t - float(bn.get_meta("jostle"))
+				if e < 0.8:
+					bn.rotation.z = sin(e * 26.0) * 0.12 * (1.0 - e / 0.8)
+				else:
+					bn.rotation.z = 0.0
+					bn.remove_meta("jostle")
+	var now := Havoc.now(Game)
+	for i in range(scars.size() - 1, -1, -1):
+		var sc: Array = scars[i]
+		if not is_instance_valid(sc[0]):
+			scars.remove_at(i)
+			continue
+		var age := now - float(sc[1])
+		var mi: MeshInstance3D = sc[0]
+		mi.visible = str(sc[2]) == layer
+		if age > Havoc.SCAR_MINUTES:
+			mi.queue_free()
+			scars.remove_at(i)
+		else:
+			mi.transparency = clampf((age - Havoc.SCAR_MINUTES * 0.6) / (Havoc.SCAR_MINUTES * 0.4), 0.0, 1.0)
+	if kick != null:
+		kick.global_position = pp + Vector3(0, 0.85, 0)
+
+# ---------------------------------------------------------------- the people of the towns (folk.gd)
+## the 3D node of each townsperson in sight (by id), and the one Lin Feng is talking to
+var folk_nodes := {}
+var folk_talking := ""
+## lines called out over the street (a hawker's wares, the watch) while a townsperson calls
+const FOLK_CALLS := {"merchant": ["Silk! Tea! Needles!", "Fresh today!", "Two for one!"], "fisher": ["Fish! Fresh fish!", "Carp from the river!"],
+	"cook": ["Hot buns!", "Noodles! Hot noodles!", "Dumplings!"], "watchman": ["Mind your fires!", "All is well!", "Lock your doors!"],
+	"porter": ["Make way!", "Coming through!"], "lamplighter": ["Lamps lit!"], "monk": ["Amituofo."], "fishwife": ["Fish!"]}
+
+## Part XVI: a town reminded of the old ways comes out at once and practises: everybody banging a pot.
+var drill_area := ""
+var drill_t := -99.0
+func drill(area: String) -> void:
+	drill_area = area
+	drill_t = t
+
+## The people of the towns of the regions on show: where the clock puts them, doing what it says,
+## made as they come within sight (two a frame at most), hidden indoors or out of sight, freed when
+## their town is far behind.  They step aside for the hero, turn to him when he stops beside them,
+## carry a lantern after dark and call their wares or the watch.
+func _update_folk(d: float, pp: Vector3) -> void:
+	var near := {}
+	if not is_floor() and not wd.is_empty():
+		var bb: Dictionary = bundles[layer]
+		var made := 0
+		var m: float = Game.clock
+		var dark := night_k > 0.35
+		for k in views:
+			var v: Dictionary = views[k]
+			if not v.shown or str(v.layer) != layer:
+				continue
+			for tid in Folk.towns_in(str(k)):
+				var hc := wpos(Folk.heart(tid))
+				if Vector2(hc.x - pp.x, hc.z - pp.z).length() > Folk.RADIUS * TS + Folk.SEE:
+					continue
+				near[tid] = true
+				# Part XVI: a town practising the old ways, or out all the long last night of the year
+				var noise: bool = (str(Folk.TOWNS[tid].area) == drill_area and t - drill_t < 30.0) or Folk.noisy(Game, tid)
+				for fp in Folk.people(wd, tid):
+					var st := Folk.state(wd, fp, m)
+					if noise:
+						st = st.duplicate()
+						st.vis = true
+						st.walk = false
+						st.clip = "bang" if int(fp.seed) % 4 != 0 else "clap"
+						st.hold = "gong" if st.clip == "bang" else ""
+					var at: Vector2 = st.at
+					var goal := Vector3(at.x * TS, 0.0, at.y * TS) + off
+					var id: String = fp.id
+					var fn: Node3D = folk_nodes.get(id)
+					var flat := Vector2(goal.x - pp.x, goal.z - pp.z)
+					if not st.vis or flat.length() > Folk.SEE:
+						if fn != null:
+							fn.visible = false
+						continue
+					if fn == null:
+						if made >= 2:
+							continue
+						fn = _make_folk(fp)
+						made += 1
+						fn.position = goal
+						fn.position.y = _stand_y(bb, goal)
+					_place_folk(fn, fp, st, goal, pp, d, bb, dark)
+	for id2 in folk_nodes.keys():
+		var nd: Node3D = folk_nodes[id2]
+		if not near.has(str(nd.get_meta("town", ""))):
+			nd.queue_free()
+			folk_nodes.erase(id2)
+
+func _make_folk(fp: Dictionary) -> Node3D:
+	var n := Node3D.new()
+	var m := Folk.model(fp)
+	n.add_child(m)
+	n.add_child(Models.shadow_disc(0.45 if not fp.kid else 0.32))
+	n.set_meta("model", m)
+	n.set_meta("town", fp.town)
+	n.set_meta("name", fp.n)
+	n.set_meta("seed", int(fp.seed))
+	scene3d.add_child(n)
+	folk_nodes[fp.id] = n
+	return n
+
+func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: Vector3, d: float, bb: Dictionary, dark: bool) -> void:
+	fn.visible = true
+	var m: Node3D = fn.get_meta("model")
+	var talking: bool = folk_talking == str(fp.id) and main.top_name() == "dialogue"
+	# make way: nobody stands where the hero is (they step aside, the way people do)
+	var hp := Vector2(pp.x, pp.z)
+	var g2 := Vector2(goal.x, goal.z)
+	var away := g2 - hp
+	if away.length() < 1.15:
+		var side := away.normalized() if away.length() > 0.05 else Vector2(cos(float(fp.seed)), sin(float(fp.seed)))
+		g2 = hp + side * 1.15
+	var want := Vector3(g2.x, 0.0, g2.y)
+	want.y = _stand_y(bb, want)
+	fn.position = fn.position.lerp(want, 1.0 - exp(-d * 9.0))
+	var yaw: float = st.yaw
+	var dist := Vector2(fn.position.x - pp.x, fn.position.z - pp.z).length()
+	var clip: String = st.clip
+	if clip in ["idle", "look", "in"]:
+		clip = ""
+	if talking or (not st.walk and dist < 3.2):
+		# he has stopped beside them: they turn to him (and talk, if he is talking to them)
+		var dv := pp - fn.position
+		yaw = atan2(dv.x, dv.z)
+		clip = "talk" if talking else ""
+	m.rotation.y = lerp_angle(m.rotation.y, yaw, 1.0 - exp(-d * (8.0 if st.walk else 4.0)))
+	if clip != "" and not Assets.has_clip(m, clip):
+		clip = "walk" if st.walk else ""
+	Models.anim_person(m, t + float(fp.seed), false, false, clip)
+	# what is in their hands: their work's tool, the load on the road, a lantern after dark
+	var hold: String = st.hold if clip != "" and clip != "talk" else ""
+	if st.walk and dark and hold == "":
+		hold = "lantern"
+	elif dark and fp.role in ["watchman", "lamplighter"] and hold == "":
+		hold = "lantern"
+	_post_hold(fn, m, hold)
+	# New Year's Day: the children in new red clothes (folk.gd), and a mark over every child still
+	# to be given a red envelope while that is what the day asks
+	var dy := Folk.dye_now(fp, Game)
+	if str(m.get_meta("dye", [])) != str(dy):
+		Folk.apply_dye(m, dy)
+		m.set_meta("dye", dy)
+	var s := Game.cur_step()
+	var want_mark: bool = not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.folk_has(s, str(fp.id))
+	if want_mark and not fn.has_meta("mark"):
+		fn.set_meta("mark", _label(fn, "!", 2.2 if not fp.kid else 1.7, Color("ff6a5a"), 64))
+	if fn.has_meta("mark"):
+		var mk: Label3D = fn.get_meta("mark")
+		mk.visible = want_mark
+		if want_mark:
+			mk.position.y = (2.2 if not fp.kid else 1.7) + sin(t * 4.0) * 0.12
+	# a word as he passes: a bow (a child waves) and a greeting over their head, once in a while
+	if dist < 4.2 and not talking and t - float(fn.get_meta("greeted", -99.0)) > 50.0:
+		fn.set_meta("greeted", t)
+		fn.set_meta("say_until", t + 2.6)
+		fn.set_meta("say", Folk.greeting(fp, Game))
+		Models.act(m, "wave" if fp.kid else "bow", t + float(fp.seed))
+	var saying: bool = t < float(fn.get_meta("say_until", -1.0))
+	# a hawker calls the wares, the watchman the watch
+	if saying and dist < 24.0:
+		if not fn.has_meta("bubble"):
+			fn.set_meta("bubble", _label(fn, "", 2.35 if not fp.kid else 1.8, Color("fff4d8"), 26))
+		var lb2: Label3D = fn.get_meta("bubble")
+		lb2.text = str(fn.get_meta("say", ""))
+		lb2.visible = true
+	elif clip == "call" and dist < 24.0:
+		if not fn.has_meta("bubble"):
+			fn.set_meta("bubble", _label(fn, "", 2.35 if not fp.kid else 1.8, Color("fff4d8"), 26))
+		var lbl: Label3D = fn.get_meta("bubble")
+		var calls: Array = FOLK_CALLS.get(str(fp.role), ["Hey!"])
+		lbl.text = str(calls[int(float(Game.clock) / 7.0 + float(fp.seed)) % calls.size()])
+		lbl.visible = true
+	elif fn.has_meta("bubble"):
+		(fn.get_meta("bubble") as Label3D).visible = false
+
 # ---------------------------------------------------------------- 2D HUD overlay
 func _draw() -> void:
 	if grid.is_empty():
@@ -1975,9 +2371,13 @@ func _draw_hud() -> void:
 		UI.text(self, Vector2(VIEW.x - 506, 34), "Objective", 13, UI.C_DIM)
 		UI.text(self, Vector2(VIEW.x - 506, 56), obj, 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 480)
 	else:
-		UI.wrapped(self, Vector2(VIEW.x - 506, 35), obj, 15, UI.C_TEXT, 486)
-	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
+		# (two lines is all the panel holds: a longer objective is set a little smaller rather than spill a
+		# third line out of the panel onto the minimap, as three of Part XV's did)
+		var osz := UI.objective_size(obj)
+		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
+	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
 	_draw_minimap()
+	_draw_clock()
 	if banner_t > 0.0:
 		var a := clampf(banner_t, 0.0, 1.0)
 		var btxt := banner_text if banner_text != "" else area_name
@@ -1988,8 +2388,8 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop"]:
-		var hint := "Talk"
+	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk"]:
+		var hint := "Talk" if fe.kind != "folk" else "Talk to %s" % str(fe.n)
 		match fe.kind:
 			"prop":
 				hint = str(Props.kind_of(fe).get("verb", "Look"))
@@ -2021,6 +2421,42 @@ func _draw_hud() -> void:
 			UI.text(self, Vector2(VIEW.x * 0.5 - UI.TOAST_W * 0.5, y), ln, sz, col, HORIZONTAL_ALIGNMENT_CENTER, UI.TOAST_W)
 			y += sz + 4.0
 		y += 26.0 - (sz + 4.0)
+
+## The Living Land release (clock.gd): the hour under the minimap, with the sun or the moon on a
+## little arc of sky (rising on the left, setting on the right) and the watch of the night.
+func _draw_clock() -> void:
+	var h := Clock.hour(Game)
+	var r := Rect2(VIEW.x - 210, 218, 198, 46)
+	UI.panel(self, r)
+	var c := r.position + Vector2(26, 34)
+	var night := Clock.is_night(h)
+	# the arc of the sky, and where on it the light stands
+	draw_arc(c, 18.0, PI, TAU, 18, Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, 0.6), 1.5)
+	draw_line(c + Vector2(-22, 0), c + Vector2(22, 0), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, 0.6), 1.0)
+	var k := 0.0
+	if not night:
+		k = clampf((h - Clock.DAWN) / (Clock.DUSK - Clock.DAWN), 0.0, 1.0)
+	else:
+		k = clampf(fposmod(h - Clock.DUSK, 24.0) / (24.0 - (Clock.DUSK - Clock.DAWN)), 0.0, 1.0)
+	var p := c + Vector2(-cos(k * PI), -sin(k * PI)) * 18.0
+	if night:
+		draw_circle(p, 5.5, Color("e8f0ff"))
+		draw_circle(p + Vector2(2.6, -1.6), 4.8, UI.C_PANEL)
+	else:
+		for i in 8:
+			var a := i * TAU / 8.0
+			draw_line(p + Vector2(cos(a), sin(a)) * 6.5, p + Vector2(cos(a), sin(a)) * 9.0, UI.C_GOLD, 1.5)
+		draw_circle(p, 5.0, UI.C_GOLD)
+	UI.text(self, r.position + Vector2(52, 19), Clock.shichen_name(h), 14, UI.C_GOLD if not night else Color("c8d8ff"))
+	var wt := Clock.watch(h)
+	var sub := "%s  day %d" % [Clock.hm(h), Game.day]
+	if Clock.frozen(Game) == "noon":
+		sub = "the sun will not move"
+	elif Clock.frozen(Game) == "night":
+		sub = "the night will not move"
+	elif wt >= 0:
+		sub = "%s  %s watch" % [Clock.hm(h), Clock.WATCHES[wt]]
+	UI.text(self, r.position + Vector2(52, 38), sub, 13, UI.C_DIM)
 
 func _draw_minimap() -> void:
 	if mini_tex == null:

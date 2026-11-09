@@ -41,3 +41,7 @@ hero_pos={
 "type": "vec3",
 "value": Vector3(0, -1000, 0)
 }
+night_k={
+"type": "float",
+"value": 0.0
+}

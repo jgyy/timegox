@@ -509,7 +509,11 @@ static func use(e: Dictionary, g) -> Array:
 			out.append(_restore(g, 0.0, 0.35, "Calmed"))
 		"sleep":
 			g.heal_full()
-			out.append("Slept: health and qi restored")
+			# after dark a bed is a night's sleep (clock.gd): he wakes at six with the cocks crowing
+			if Clock.sleep(g):
+				out.append("Slept the night through: woke at the Hour of the Rabbit, health and qi restored")
+			else:
+				out.append("Slept: health and qi restored")
 		"fish":
 			out.append(_restore(g, 0.15, 0.2, "A quiet hour"))
 		"herb":
