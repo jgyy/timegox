@@ -40,6 +40,8 @@ const MONSTERS := {
 	"sun_crow": "monsters/sun_crow",
 	"jade_rabbit": "monsters/jade_rabbit",
 	"bifang": "monsters/bifang",
+	# the Spring Thunder release (Part XVII): Qing Nu, the Maiden of Frost, built with the anime re-sculpt
+	"frost_maiden": "monsters/frost_maiden",
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
@@ -119,6 +121,8 @@ const PEOPLE := {
 	"xu_lan": "characters/xu_lan", "liu_ying": "characters/liu_ying",
 	# the Living Land release: Zao Jun, Lord of the Stove, and the door gods of the peach tree (Part XVI)
 	"zao_jun": "characters/zao_jun", "shenshu": "characters/shenshu", "yulei": "characters/yulei",
+	# Part XVII (the Spring Thunder release): the Lord of Spring, and the Duke of Thunder in person
+	"gou_mang": "characters/gou_mang", "lei_gong": "characters/lei_gong",
 }
 
 static var _scenes := {}
@@ -299,7 +303,54 @@ static func instance(rel: String, tint: Color = Color(0, 0, 0, 0), pal: Array = 
 		root.set_meta("ap", ap)
 	root.set_meta("glb", rel)
 	root.set_meta("meshes", meshes)
+	if rel.begins_with("characters/"):
+		add_springs(root)
 	return root
+
+## The Spring Thunder release: secondary motion the way gacha games give it, by spring bones.  The hair's
+## tail, the cape, the hanging pockets of the sleeves and the four panels of the robe each get a chain
+## of Godot's SpringBoneSimulator3D (a VRM-style spring, after the defaults of UniVRM and the tuning
+## guides of VRoid and VRChat PhysBones: see the README's references): every frame it pulls each bone
+## back towards where the baked clip puts it (stiffness), damps it (drag) and lets it hang (gravity), so
+## when Lin Feng turns, stops or gallops his hair and cape swing on a beat behind him instead of being
+## nailed to the clip.  Robe panels are stiffer than hair, so they never swing through the legs.  On
+## screen only: headless there is nothing to see.
+## [root bone, end bone, stiffness, drag, gravity, radius]
+const SPRINGS := [["hair_tail", "hair_tail2", 1.6, 0.45, 0.15, 0.04], ["cape", "cape3", 1.3, 0.5, 0.2, 0.05],
+	["robe_f", "robe_f", 3.6, 0.55, 0.05, 0.06], ["robe_b", "robe_b", 3.0, 0.55, 0.06, 0.06],
+	["robe_l", "robe_l", 3.6, 0.55, 0.05, 0.06], ["robe_r", "robe_r", 3.6, 0.55, 0.05, 0.06],
+	["sleeve.L", "sleeve.L", 2.6, 0.5, 0.12, 0.04], ["sleeve.R", "sleeve.R", 2.6, 0.5, 0.12, 0.04]]
+
+static func add_springs(root: Node3D) -> SpringBoneSimulator3D:
+	if DisplayServer.get_name() == "headless" or not ClassDB.class_exists("SpringBoneSimulator3D"):
+		return null
+	var sk := _skeleton(root)
+	if sk == null:
+		return null
+	var have: Array = []
+	for c in SPRINGS:
+		if sk.find_bone(str(c[0])) >= 0 and sk.find_bone(str(c[1])) >= 0:
+			have.append(c)
+	if have.is_empty():
+		return null
+	var sb := SpringBoneSimulator3D.new()
+	sb.name = "springs"
+	sk.add_child(sb)
+	sb.setting_count = have.size()
+	for i in have.size():
+		var c: Array = have[i]
+		sb.set_root_bone_name(i, str(c[0]))
+		sb.set_end_bone_name(i, str(c[1]))
+		# (the last bone of a chain swings on a tail of its own length)
+		sb.set_extend_end_bone(i, true)
+		sb.set_end_bone_direction(i, SpringBoneSimulator3D.BONE_DIRECTION_FROM_PARENT)
+		sb.set_end_bone_length(i, 0.3)
+		sb.set_stiffness(i, float(c[2]))
+		sb.set_drag(i, float(c[3]))
+		sb.set_gravity(i, float(c[4]))
+		sb.set_radius(i, float(c[5]))
+	root.set_meta("springs", sb)
+	return sb
 
 ## The hero as the player made and dressed him (fashion.gd): his look's model with parts recoloured.
 ## `cols` may hold "robe" (the robe: cloth on the primary slot), "sec" (trousers, sash, boots and cape:
@@ -333,6 +384,7 @@ static func hero_instance(rel: String, cols: Dictionary) -> Node3D:
 		root.set_meta("ap", ap)
 	root.set_meta("glb", rel)
 	root.set_meta("meshes", meshes)
+	add_springs(root)
 	return root
 
 ## Which recolourable part of a person a vertex belongs to ("" for none): cloth by its palette slot,

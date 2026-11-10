@@ -2017,7 +2017,7 @@ static func _great_wheel(b: MB, g: MB, cx: float, cz: float, r: float, far: Colo
 	b.cyl(hub, 7.0, 6.0, stone.darkened(0.15), bs.get_euler() + Vector3(PI / 2, 0, 0), 12)
 	g.ball(hub, 9.0, Color(0.4, 0.75, 1.0, 0.35), true)
 
-static func _add_mm(root: Node3D, mesh: Mesh, xf: Array, cols: Array, shadow: bool, vis_end: float) -> void:
+static func _add_mm(root: Node3D, mesh: Mesh, xf: Array, cols: Array, shadow: bool, vis_end: float) -> MultiMeshInstance3D:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.use_colors = true
@@ -2033,6 +2033,7 @@ static func _add_mm(root: Node3D, mesh: Mesh, xf: Array, cols: Array, shadow: bo
 	mi.visibility_range_end_margin = 6.0
 	mi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
 	root.add_child(mi)
+	return mi
 
 # ---------------------------------------------------------------- landmark prototypes
 static func _proto(key: String, theme_name: String) -> Mesh:

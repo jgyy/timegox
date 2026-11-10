@@ -110,6 +110,19 @@ var smashed := 0
 ## red paper from, the children he gave a red envelope to
 var rallied := {}
 var folk_done := {}
+## the Sword's Wake (impact.gd, the Spring Thunder release): things of the land felled or shattered on
+## screen (key -> the minute of the game; they grow back by the next dawn) and how many in all; the
+## obstacles of the story cleared (id -> "kind|region") and the blows landed on those not yet cleared;
+## and how often Lin Feng struck a pack first, threw the sword qi and swung at the world at all
+var felled := {}
+var felled_n := 0
+var cleared := {}
+var obstacle_hits := {}
+var ambushes := 0
+var waves := 0
+var strikes := 0
+## steps just finished that have words to say about it, waiting for the world ("done:<step>")
+var done_pending: Array = []
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -190,6 +203,14 @@ func reset() -> void:
 	smashed = 0
 	rallied = {}
 	folk_done = {}
+	felled = {}
+	felled_n = 0
+	cleared = {}
+	obstacle_hits = {}
+	ambushes = 0
+	waves = 0
+	strikes = 0
+	done_pending = []
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -522,6 +543,8 @@ func advance() -> void:
 		toast("+%d spirit stones" % s.stones)
 	toast("Quest complete: %s" % s.t)
 	note("Quest complete: %s" % s.t)
+	if Data.DIALOGUE.has("done:" + str(s.id)):
+		done_pending.append(str(s.id))
 	# the story sets the hour here and there (clock.gd)
 	Clock.story_hour(self, str(s.id))
 	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
@@ -579,6 +602,9 @@ func poll_steps() -> void:
 			"folk":
 				# Part XVI: so many of the people of the towns (folk.gd) of one kind, any of them
 				ok = folk_count(s) >= int(s.n)
+			"clear":
+				# Part XVII: so many of the obstacles of one kind in a region cleared with the sword
+				ok = cleared_count(s) >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -606,6 +632,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
 	elif s.kind == "folk":
 		t += "  (%d/%d)" % [mini(folk_count(s), int(s.n)), int(s.n)]
+	elif s.kind == "clear":
+		t += "  (%d/%d)" % [mini(cleared_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":
@@ -688,6 +716,16 @@ func folk_mark(s: Dictionary, id: String) -> void:
 	if not folk_done.has(k):
 		folk_done[k] = {}
 	folk_done[k][id] = true
+
+## Part XVII (impact.gd): how many obstacles of the kind a "clear" step names (`what`) are cleared in its
+## region.
+func cleared_count(s: Dictionary) -> int:
+	var want := "%s|%s" % [str(s.get("what", "")), str(s.get("area", ""))]
+	var n := 0
+	for id in cleared:
+		if str(cleared[id]) == want:
+			n += 1
+	return n
 
 ## Total essences of all kinds in hand.
 func essences() -> int:

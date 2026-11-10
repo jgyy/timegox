@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side"}
+const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)
@@ -923,7 +923,7 @@ func _card(a: float) -> void:
 	var ta := smoothstep(tf - 0.2, tf + 1.0, t)
 	_caps(Vector2(lc, 96.0), "ASCENSION", 58, Color("ffe6a0").lerp(Color("fff6d8"), 0.5 + 0.5 * sin(t * 1.2)), ta, 14.0, 0.85)
 	var fav := Trials.favourite_kind(Game)
-	var who := "Lin Feng, %s" % Trials.EPITHETS[fav] if fav != "" else "Lin Feng of the Azure Cloud"
+	var who := "Lin Feng, %s" % str(Trials.EPITHETS.get(fav, "")) if Trials.EPITHETS.has(fav) else "Lin Feng of the Azure Cloud"
 	var ncol: Color = Trials.KINDS[fav].col if fav != "" else UI.C_GOLD
 	_say(Vector2(lc - 380.0, 138.0), who, 22, ncol.lerp(Color.WHITE, 0.3), ta, HORIZONTAL_ALIGNMENT_CENTER, 760.0)
 	_rule(Vector2(lc, 158.0), 210.0, ta)

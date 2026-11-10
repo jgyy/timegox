@@ -107,6 +107,14 @@ var cine_a := 0.0
 var kick: AnimatableBody3D = null
 var strike_t := -9.0
 var scars: Array = []
+## the Sword's Wake (impact.gd, the Spring Thunder release): the pack struck first and when (its
+## battle begins once it has been seen to fly back), the last throw of the sword qi, and the stumps of
+## felled trees and the things felled in the views on show ([key, node or null, view id, kind, mmi,
+## instance index, transform]) until they grow back
+var ambush_t := -1.0
+var ambush_e := {}
+var wave_t := -9.0
+var downed: Array = []
 var mount: Node3D = null
 var mount_id := ""
 var ride_clk := 0.0
@@ -156,6 +164,8 @@ func clear_cache() -> void:
 	inside = ""
 	trip = {}
 	using = {}
+	ambush_t = -1.0
+	ambush_e = {}
 	ent_nodes.clear()
 
 func _free_view_brk(v: Dictionary) -> void:
@@ -170,6 +180,13 @@ func _free_view(k: String) -> void:
 	for i in v.nodes:
 		v.nodes[i].queue_free()
 	_free_view_brk(v)
+	# (the Sword's Wake: the stumps and felled things of the region go with it; _keep_down hides them
+	# again if it is built anew before they grow back)
+	for i2 in range(downed.size() - 1, -1, -1):
+		if str(downed[i2][2]) == k:
+			if downed[i2][1] != null and is_instance_valid(downed[i2][1]):
+				(downed[i2][1] as Node).queue_free()
+			downed.remove_at(i2)
 
 ## (Re)load the open world, if needed (the land first; the realms above and below and the floors of
 ## buildings are built the first time they are needed).
@@ -665,7 +682,9 @@ func _build_view(id: String) -> void:
 		bn.set_meta("b", b)
 		scene3d.add_child(bn)
 		brk[b.id] = bn
-	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {}), "uppers": root.get_meta("uppers", {}), "layer": lid, "ents": lw.ents, "bundle": lid, "brk": brk}
+	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {}), "uppers": root.get_meta("uppers", {}), "layer": lid, "ents": lw.ents, "bundle": lid, "brk": brk, "origin": r.position}
+	# the Sword's Wake (impact.gd): what was felled here and has not yet grown back stays down
+	_keep_down(id)
 
 ## A floor's own view: its people and things (an upper storey is drawn with its building; a cellar
 ## is built here, under the building).
@@ -711,6 +730,10 @@ func ent_visible(e: Dictionary) -> bool:
 				return false
 		"portal":
 			return true
+		"obstacle":
+			# Part XVII (impact.gd): an obstacle of the story stays cleared
+			if Game.cleared.has(e.id):
+				return false
 	# somebody met on the road (fate.gd): there while the story has them there
 	if e.get("fate", false) and not Fate.present(Game, str(e.id)):
 		return false
@@ -916,6 +939,14 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			var lbl := _label(n, "", 4.1, pc, 32)
 			n.set_meta("label", lbl)
 			n.set_meta("model", pm)
+		"obstacle":
+			# Part XVII (impact.gd): a fallen trunk, a rockfall, an ice jam, the clay Spring Ox...
+			var om := Impact.obstacle_model(str(e.what), str(Data.AREAS.get(str(e.get("area", "")), {}).get("theme", "")))
+			om.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y, 5.0) * TAU
+			n.add_child(om)
+			n.add_child(Models.shadow_disc(1.0, 0.35))
+			_label(n, str(Impact.OBSTACLES.get(str(e.what), {}).get("n", "")).capitalize(), 2.2 if str(e.what) != "spring_ox" else 2.6, Color("e8dcc0"), 26)
+			n.set_meta("model", om)
 		"spring":
 			n.add_child(Models.spring_basin())
 		"ladder":
@@ -1446,6 +1477,18 @@ func _process(d: float) -> void:
 			if e == null or maxi(absi(e.pos.x - ptile.x), absi(e.pos.y - ptile.y)) > 6:
 				Game.defeated.erase(k)
 	var active: bool = main.top_name() == "world"
+	if ambush_t >= 0.0 and t - ambush_t >= Impact.AMBUSH_SHOW:
+		# (the Sword's Wake: the pack struck first has been seen to fly back; now it fights, reeling)
+		var ae := ambush_e
+		ambush_t = -1.0
+		ambush_e = {}
+		var an: Node3D = ent_nodes.get(ae.get("id", ""))
+		if an != null:
+			an.position = Vector3(Terrain3D.world_pos(ae.pos).x + off.x, an.position.y, Terrain3D.world_pos(ae.pos).z + off.z)
+			an.rotation.z = 0.0
+			an.remove_meta("knock")
+		if active:
+			main.start_encounter(ae, true)
 	if not trip.is_empty():
 		# on a ladder or the stairs: no walking until the trip is over
 		_trip_step(d)
@@ -1453,7 +1496,7 @@ func _process(d: float) -> void:
 		# doing something (props.gd): no walking until it is done (and a thing done through a scene,
 		# a memory of Yue Ling's, goes on under the conversation)
 		_use_step()
-	elif active:
+	elif active and ambush_t < 0.0:
 		if not main.bot_active:
 			move_dir = _read_keys()
 		_move(minf(d, 0.1))
@@ -1472,6 +1515,8 @@ func _process(d: float) -> void:
 		if active and visible and cam_override == null:
 			hp = _player_pos() + Vector3(0, 1.0, 0)
 		RenderingServer.global_shader_parameter_set("hero_pos", hp)
+		# (the Sword's Wake: the clock the mown grass grows back by, impact.gd)
+		RenderingServer.global_shader_parameter_set("mow_now", t)
 
 func rotate_cam(dir: int) -> void:
 	cam_q = (cam_q + dir + 4) % 4
@@ -1569,6 +1614,9 @@ func _move(d: float) -> void:
 			if e != null:
 				move_dir = Vector2i.ZERO
 				main.interact(e)
+				# the key still held must be let go first, or the conversation opens again the moment
+				# it closes, for ever (as on the stairs)
+				key_lock = true
 				return
 			if not tile_free(nt):
 				return
@@ -1988,6 +2036,9 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			if quest:
 				mark.position.y = 3.1 + sin(t * 4.0) * 0.15
 		"enemy", "boss":
+			if n.has_meta("knock"):
+				# (struck first, impact.gd: flying back under its own tween)
+				return
 			var ms: Array = n.get_meta("models")
 			if e.kind == "enemy":
 				_wander(ms, e, n, dist, d)
@@ -2084,30 +2135,193 @@ func _brk_node(id: String) -> Node3D:
 			return bn
 	return null
 
-## F: Lin Feng swings his sword at what is in front of him.  Whatever it meets breaks (havoc.gd), the
-## grass and the leaves feel the wind of it, and the townsfolk nearby start and stare.
+## F: Lin Feng swings his sword at what is in front of him, and whatever it meets answers it
+## (impact.gd): a pack of monsters is struck first (knocked back, and the battle opens with it
+## reeling), an obstacle of the story takes a blow, the things people leave about break (havoc.gd),
+## trees fall, rocks shatter, the grass is mown and the water splashes; and the townsfolk nearby start
+## and stare.
 func strike() -> void:
-	if t - strike_t < 0.5 or not using.is_empty() or not trip.is_empty():
+	if t - strike_t < 0.5 or not using.is_empty() or not trip.is_empty() or ambush_t >= 0.0:
 		return
 	strike_t = t
+	Game.strikes += 1
 	Models.act(player, "attack", t)
 	var fwd := Vector3(facing.x, 0, facing.y)
-	var side := Vector2i(-facing.y, facing.x)
-	var any := false
 	if not is_floor() and not wd.is_empty():
-		for dt in [facing, facing * 2, facing + side, facing - side]:
-			var b := Havoc.at_tile(wd, ptile + dt)
-			if not b.is_empty() and not Havoc.is_broken(Game, b):
-				_smash(b, fwd, "strike")
-				any = true
+		var tiles: Array = []
+		for dt in Impact.reach(facing):
+			tiles.append(ptile + dt)
+		if _blow(tiles, fwd):
+			return
 	if headless():
 		return
 	var pp := _player_pos()
 	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), Color(0.78, 0.9, 1.0), atan2(fwd.x, fwd.z), 2.6)
-	if not any:
-		# the cut goes through the grass: blades and leaves fly
+	if not is_floor():
+		# the cut goes through the grass: it is mown in an arc in front of the blade, the clippings fly
+		Impact.mow(pp + fwd * 1.6, 1.9, t)
 		Fx3D.leaf_spiral(scene3d, pp + fwd * 1.6 + Vector3(0, 0.3, 0), Color(Look.theme(theme_name).g2).lightened(0.15), 0.7)
 	_folk_start(pp, 7.0)
+
+## G: the sword qi (impact.gd).  A crescent of qi thrown from the blade flies seven tiles ahead and
+## everything along its way feels it, as if struck: the first pack it reaches is struck first, the
+## obstacles and the things people leave about take a blow, trees fall, rocks shatter, grass is mown.
+## It costs an eighth of Lin Feng's qi.
+func qi_wave() -> void:
+	if t - wave_t < Impact.WAVE_COOL or not using.is_empty() or not trip.is_empty() or ambush_t >= 0.0 or is_floor() or wd.is_empty():
+		return
+	var cost := float(Game.max_qi(0)) * Impact.WAVE_QI
+	if float(Game.qi[0]) < cost:
+		Game.toast("Not enough qi for the sword qi (G)")
+		return
+	Game.qi[0] = float(Game.qi[0]) - cost
+	wave_t = t
+	Game.waves += 1
+	Models.act(player, "cast", t)
+	var fwd := Vector3(facing.x, 0, facing.y)
+	var path: Array = []
+	for dt in Impact.wave_path(facing):
+		var tl: Vector2i = ptile + dt
+		# the qi flies over open ground and water; a wall of the land (the forest's deep, a cliff, a
+		# building) stops it, though the tree at the forest's edge it hits still falls
+		if tl.x < 0 or tl.y < 0 or tl.x >= w or tl.y >= h:
+			break
+		path.append(tl)
+		if not tile_free(tl) and grid[tl.y * w + tl.x] != MapGen.WATER:
+			break
+	var reach: Array = []
+	# (how many tiles of the path it crosses before a pack in the way stops it)
+	var span := path.size()
+	for k0 in path.size():
+		var tl2: Vector2i = path[k0]
+		reach.append(tl2)
+		var side := Vector2i(-facing.y, facing.x)
+		reach.append(tl2 + side)
+		reach.append(tl2 - side)
+		var e = ent_at(tl2)
+		if e != null and e.kind == "enemy":
+			span = k0 + 1
+			break
+	if _blow(reach, fwd):
+		if not headless():
+			Impact.wave(scene3d, _player_pos() + Vector3(0, 1.0, 0) + fwd * 0.8, fwd, maxf(2.0, (span - 1) * TS))
+		return
+	if headless():
+		return
+	var pp := _player_pos()
+	Impact.wave(scene3d, pp + Vector3(0, 1.0, 0) + fwd * 0.8, fwd, path.size() * TS)
+	for k in path.size():
+		if k % 2 == 1:
+			Impact.mow(wpos(path[k]), 2.2, t)
+	_folk_start(pp, 9.0)
+
+## A blow (the sword's, or the qi's as it flies) reaches `tiles`.  Returns whether it struck a pack
+## first (whose battle then begins).
+func _blow(tiles: Array, dir: Vector3) -> bool:
+	for tl in tiles:
+		var e = ent_at(tl)
+		if e != null and e.kind == "enemy":
+			if _ambush(e, dir):
+				return true
+			break
+	for tl in tiles:
+		var e2 = ent_at(tl)
+		if e2 != null and e2.kind == "obstacle":
+			_hit_obstacle(e2, dir)
+		var b := Havoc.at_tile(wd, tl)
+		if not b.is_empty() and not Havoc.is_broken(Game, b):
+			_smash(b, dir, "strike")
+	if not headless():
+		for tl2 in tiles:
+			_nature_blow(tl2, dir)
+	return false
+
+## A pack struck first in the land (impact.gd): it flies back off its feet, and once it has been seen to
+## land the battle begins with every one of them reeling.  A pack two realms below scatters instead, as
+## it would before Lin Feng's aura (and the swing goes on through the grass).  Returns whether a battle
+## follows.
+func _ambush(e: Dictionary, dir: Vector3) -> bool:
+	if Game.scatters(e.group):
+		main.scatter_pack(e)
+		return false
+	Game.ambushes += 1
+	move_dir = Vector2i.ZERO
+	if headless():
+		main.start_encounter(e, true)
+		return true
+	ambush_t = t
+	ambush_e = e
+	var n: Node3D = ent_nodes.get(e.id)
+	if n != null:
+		n.set_meta("knock", t)
+		Impact.knock(n, dir)
+		Fx3D.hit(scene3d, n.position + Vector3(0, 1.0, 0), "phys", true)
+		for m in n.get_meta("models", []):
+			Models.act(m, "hurt", t)
+	main.fx_flash(Color(1, 1, 1), 0.25)
+	return true
+
+## A blow on an obstacle of the story (Part XVII): so many blows clear it, and then it comes apart.
+func _hit_obstacle(e: Dictionary, dir: Vector3) -> void:
+	var r := Impact.hit_obstacle(Game, e)
+	if r == "":
+		return
+	var spec: Dictionary = Impact.OBSTACLES.get(str(e.what), {})
+	if r == "cleared":
+		Game.toast("Cleared the %s" % str(spec.get("n", "obstacle")))
+		Game.poll_steps()
+	if headless():
+		return
+	var n: Node3D = ent_nodes.get(e.id)
+	var at := Terrain3D.world_pos(e.pos) + off
+	if n != null:
+		at = n.position
+		if r == "hit" and n.has_meta("model"):
+			# (it shakes under the blow)
+			var om: Node3D = n.get_meta("model")
+			var tw := om.create_tween()
+			tw.tween_property(om, "position", dir * 0.12, 0.06)
+			tw.tween_property(om, "position", Vector3.ZERO, 0.14)
+	var bb: Dictionary = bundles[layer]
+	Impact.obstacle_burst(scene3d, str(e.what), at, dir, func(q: Vector3) -> float: return _stand_y(bb, q), r == "cleared")
+	_folk_start(at, 9.0)
+
+## The land answers a blow on tile `tl` (on screen only): the tree there falls, the bush is cut, the rock
+## shatters (impact.gd; they grow back by the next dawn), and water splashes.
+func _nature_blow(tl: Vector2i, dir: Vector3) -> void:
+	if tl.x < 0 or tl.y < 0 or tl.x >= w or tl.y >= h:
+		return
+	var rid := Atlas.owner_id(wd, tl)
+	if not views.has(rid) or not bool(views[rid].shown):
+		return
+	var v: Dictionary = views[rid]
+	var root: Node3D = v.root
+	var reg: Dictionary = root.get_meta("nature", {})
+	var r0: Vector2i = v.get("origin", Vector2i.ZERO)
+	var local := tl - r0
+	var bb: Dictionary = bundles[layer]
+	var gfn := func(q: Vector3) -> float: return _stand_y(bb, q)
+	for en in reg.get(local, []):
+		var mmi = en.get("mmi")
+		if mmi == null or not is_instance_valid(mmi):
+			continue
+		var k := Impact.key(layer, rid, local, int(en.i) * 1000 + str(en.key).hash() % 1000)
+		if Impact.is_down(Game, k):
+			continue
+		Impact.fell(Game, k)
+		var xf0: Transform3D = (mmi as MultiMeshInstance3D).multimesh.get_instance_transform(int(en.i))
+		var stump: Node3D = null
+		match str(en.kind):
+			"tree":
+				stump = Impact.topple(scene3d, mmi, int(en.i), dir, gfn)
+			"plant":
+				Impact.cut_plant(scene3d, mmi, int(en.i), dir)
+			"rock":
+				Impact.shatter(scene3d, mmi, int(en.i), dir, gfn)
+		downed.append([k, stump, rid, str(en.kind), mmi, int(en.i), xf0])
+	var gi := tl.y * w + tl.x
+	if tl.x >= 0 and tl.y >= 0 and tl.x < w and tl.y < h and grid[gi] == MapGen.WATER:
+		Impact.splash(scene3d, Vector3(wpos(tl).x, Terrain3D.WATER_Y + off.y, wpos(tl).z), dir)
 
 ## Thing `b` breaks: game state (what the owner says, a price paid), and on screen its pieces fly.
 func _smash(b: Dictionary, dir: Vector3, why: String) -> void:
@@ -2187,6 +2401,34 @@ func _update_havoc(d: float, pp: Vector3) -> void:
 			mi.transparency = clampf((age - Havoc.SCAR_MINUTES * 0.6) / (Havoc.SCAR_MINUTES * 0.4), 0.0, 1.0)
 	if kick != null:
 		kick.global_position = pp + Vector3(0, 0.85, 0)
+	# the Sword's Wake (impact.gd): what was felled grows back at dawn (a tree where its stump was)
+	for i2 in range(downed.size() - 1, -1, -1):
+		var dn: Array = downed[i2]
+		if Impact.is_down(Game, str(dn[0])) and views.has(str(dn[2])):
+			continue
+		if dn[1] != null and is_instance_valid(dn[1]):
+			(dn[1] as Node).queue_free()
+		if is_instance_valid(dn[4]) and views.has(str(dn[2])):
+			Impact.show_instance(dn[4], int(dn[5]), dn[6])
+		downed.remove_at(i2)
+
+## A region's view was (re)built: the trees, plants and rocks of it felled and not yet grown back are
+## hidden again (their stumps are not redrawn: a stump is only left the day the tree falls).
+func _keep_down(id: String) -> void:
+	var v: Dictionary = views[id]
+	var reg: Dictionary = (v.root as Node3D).get_meta("nature", {})
+	var pre := "%s|%s|" % [str(v.layer), id]
+	for k in Game.felled.keys():
+		if not str(k).begins_with(pre) or not Impact.is_down(Game, str(k)):
+			continue
+		var parts := str(k).split("|")
+		var local := Vector2i(int(parts[2]), int(parts[3]))
+		for en in reg.get(local, []):
+			var mmi = en.get("mmi")
+			if mmi != null and int(en.i) * 1000 + str(en.key).hash() % 1000 == int(parts[4]):
+				var xf0: Transform3D = (mmi as MultiMeshInstance3D).multimesh.get_instance_transform(int(en.i))
+				Impact.hide_instance(mmi, int(en.i))
+				downed.append([str(k), null, id, str(en.kind), mmi, int(en.i), xf0])
 
 # ---------------------------------------------------------------- the people of the towns (folk.gd)
 ## the 3D node of each townsperson in sight (by id), and the one Lin Feng is talking to
@@ -2375,7 +2617,7 @@ func _draw_hud() -> void:
 		# third line out of the panel onto the minimap, as three of Part XV's did)
 		var osz := UI.objective_size(obj)
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
-	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
+	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:

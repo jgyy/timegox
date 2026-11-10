@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 63
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths"]
+const MAX_LEVEL := 66
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -65,6 +65,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Kindred Sage", "note": "Nobody ever reached the top of the mountain alone. Everyone who walked beside you is part of your Dao now, and you of theirs; you carry them the way a river carries the sky, and they carry you back."},
 	# Part XVI (the Living Land release): every lamp in the land kept lit
 	{"life": 0, "title": "Keeper of Hearths", "note": "Every lit window in the land is a family that stayed up together, and every one of them has a seat for you. You never walk into the cold again unless you choose to; somewhere, always, a door is open and the kettle is on."},
+	# Part XVII (the Spring Thunder release): everything asleep wakes when you pass
+	{"life": 0, "title": "Herald of Spring", "note": "Whatever has gone to sleep near you wakes when you pass: seeds, insects, old friendships, the ground itself. You have learned the one thunder that frightens nobody, the one that says it is time to get up."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -664,6 +666,17 @@ const ENEMIES := {
 	"lean_king": {"n": "The Lean Month King", "elem": "dark", "weak": "fire", "col": Color("5a6078"), "shape": "wraith", "boss": true, "pal": {"sec": Color("262832"), "acc": Color("f0d890")}},
 	"xi_beast": {"n": "Xi, the Last Night", "elem": "dark", "weak": "fire", "col": Color("262a52"), "shape": "serpent", "boss": true, "pal": {"sec": Color("10101e"), "acc": Color("f0c850")}},
 	"nian": {"n": "Nian, the Year Beast", "elem": "earth", "weak": "fire", "col": Color("2e8a64"), "shape": "qilin", "boss": true, "pal": {"sec": Color("c8302a"), "acc": Color("f8d850"), "mark": Color("f0f0e0")}},
+	# ---- Part XVII (the Spring Thunder release): the cold that comes back, the poisons the first thunder
+	# wakes, the Maiden of Frost and the lord of the year under the earth
+	"rime_wisp": {"n": "Rime Wisp", "elem": "water", "weak": "fire", "col": Color("cfe8f8"), "shape": "wisp", "pal": {"sec": Color("7aa8d0"), "acc": Color("ffffff")}},
+	"hoarfrost_hare": {"n": "Hoarfrost Hare", "elem": "water", "weak": "fire", "col": Color("e8f0f8"), "shape": "jade_rabbit", "pal": {"sec": Color("a8c0d8"), "acc": Color("6ad0ff")}},
+	"late_frost": {"n": "The Cold That Comes Back", "elem": "water", "weak": "fire", "col": Color("a8c8e0"), "shape": "wraith", "pal": {"sec": Color("4a6a8a"), "acc": Color("e8f8ff")}},
+	"waking_scorpion": {"n": "Thunder-Woken Scorpion", "elem": "dark", "weak": "fire", "col": Color("6a4a2a"), "shape": "scorpion", "pal": {"sec": Color("2a1a10"), "acc": Color("f0c040")}},
+	"waking_centipede": {"n": "Thunder-Woken Centipede", "elem": "dark", "weak": "thunder", "col": Color("8a2a1a"), "shape": "serpent", "pal": {"sec": Color("f0a040"), "acc": Color("1a1010")}},
+	"waking_toad": {"n": "Thunder-Woken Toad", "elem": "earth", "weak": "wood", "col": Color("7a8a3a"), "shape": "blob", "pal": {"sec": Color("e8c040"), "acc": Color("c83a2a")}},
+	"poison_mother": {"n": "Mother of the Five Poisons", "elem": "dark", "weak": "fire", "col": Color("4a6a2a"), "shape": "blob", "boss": true, "pal": {"sec": Color("e8a030"), "acc": Color("c02a40"), "mark": Color("1a1a10")}},
+	"qing_nu": {"n": "Qing Nu, Maiden of Frost", "elem": "water", "weak": "fire", "col": Color("e0f0ff"), "shape": "frost_maiden", "boss": true, "pal": {"sec": Color("8ab0d8"), "acc": Color("ffffff")}},
+	"taisui": {"n": "Taisui, Lord of the Year Under the Earth", "elem": "earth", "weak": "wood", "col": Color("c87a6a"), "shape": "blob", "boss": true, "pal": {"sec": Color("5a3a2a"), "acc": Color("f0e040"), "mark": Color("2a1a1a")}},
 }
 
 ## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
@@ -870,6 +883,10 @@ const AREAS := {
 	},
 	"bamboo": {
 		"n": "Whispering Bamboo Forest", "w": 70, "h": 44, "seed": 21, "theme": "bamboo", "enemies": 13,
+		# Part XVII (impact.gd): bamboo the long winter's snow broke and laid across the paths
+		"obstacles": [{"id": "p17_dead1", "what": "deadfall", "pos": Vector2i(28, 31), "vis": ["s_p17_deadfall", ""]}, {"id": "p17_dead2", "what": "deadfall", "pos": Vector2i(67, 23), "vis": ["s_p17_deadfall", ""]},
+			{"id": "p17_dead3", "what": "deadfall", "pos": Vector2i(2, 11), "vis": ["s_p17_deadfall", ""]}, {"id": "p17_dead4", "what": "deadfall", "pos": Vector2i(44, 8), "vis": ["s_p17_deadfall", ""]},
+			{"id": "p17_dead5", "what": "deadfall", "pos": Vector2i(50, 38), "vis": ["s_p17_deadfall", ""]}, {"id": "p17_dead6", "what": "deadfall", "pos": Vector2i(20, 7), "vis": ["s_p17_deadfall", ""]}],
 		"pool": [["bamboo_wolf", 0, 1], ["bandit", 1, 2], ["leaf_sprite", 0, 2]],
 		"portals": [
 			{"to": "sect", "pos": Vector2i(1, 22), "dest": Vector2i(36, 13), "open": ""},
@@ -916,13 +933,18 @@ const AREAS := {
 	},
 	"frost": {
 		"n": "Frostpeak Caverns", "w": 80, "h": 50, "seed": 41, "theme": "frost", "enemies": 14,
+		# Part XVII: the things of the high snow, come down with the cold that comes back
+		"warband": {"pool": [["rime_wisp", 63, 64], ["hoarfrost_hare", 63, 64], ["late_frost", 63, 64]], "n": 10, "vis": "s_p17_rockfall", "late": true},
 		"pool": [["frost_wolf", 6, 7], ["ice_golem", 7, 8], ["snow_wraith", 6, 8]],
 		"portals": [
 			{"to": "marsh", "pos": Vector2i(1, 25), "dest": Vector2i(74, 24), "open": ""},
 			{"to": "thunder", "pos": Vector2i(78, 25), "dest": Vector2i(4, 25), "open": "s_elder4"},
 		],
 		"bosses": [
-			{"id": "ice_empress", "pos": Vector2i(36, 22), "lv": 7, "req": 7},{"id": "frost_wyrm", "pos": Vector2i(66, 40), "lv": 8, "req": 8}],
+			{"id": "ice_empress", "pos": Vector2i(36, 22), "lv": 7, "req": 7},{"id": "frost_wyrm", "pos": Vector2i(66, 40), "lv": 8, "req": 8},
+			# Part XVII: the Maiden of Frost, who will not take her frost back
+			{"id": "qing_nu", "pos": Vector2i(9, 25), "lv": 64, "req": 63, "vis": ["s_p17_qingnu", ""], "late": true}
+		],
 		"pickups": [
 			{"id": "jade1", "item": "jade", "pos": Vector2i(18, 10)}, {"id": "jade2", "item": "jade", "pos": Vector2i(34, 42)},
 			{"id": "jade3", "item": "jade", "pos": Vector2i(52, 8)}, {"id": "jade4", "item": "jade", "pos": Vector2i(70, 16)},
@@ -943,12 +965,19 @@ const AREAS := {
 		],
 		"npcs": [
 			# a fated encounter (fate.gd): there while the story has them there
-			{"id": "tala", "n": "Tala of the Horse-Folk", "pos": Vector2i(12, 10), "col": Color("d8a04a"), "fate": true},{"id": "sword_ghost", "n": "Ancestor Jian Wuchen", "pos": Vector2i(14, 10), "col": Color("9ad8ff"), "vis": ["s_swordghost", ""]}],
+			{"id": "tala", "n": "Tala of the Horse-Folk", "pos": Vector2i(12, 10), "col": Color("d8a04a"), "fate": true},{"id": "sword_ghost", "n": "Ancestor Jian Wuchen", "pos": Vector2i(14, 10), "col": Color("9ad8ff"), "vis": ["s_swordghost", ""]},
+			# Part XVII: Lei Gong, Duke of Thunder, come down to the valley to drum the first thunder of spring
+			{"id": "lei_gong", "n": "Lei Gong, Duke of Thunder", "pos": Vector2i(67, 24), "col": Color("6a8ac0"), "vis": ["s_p17_chains", ""], "late": true}
+		],
 		"bosses": [
 			{"id": "storm_ape_king", "pos": Vector2i(60, 12), "lv": 10, "req": 10},{"id": "thunder_roc", "pos": Vector2i(78, 25), "lv": 11, "req": 11}],
 		"pickups": [
 			{"id": "shard1", "item": "shard", "pos": Vector2i(30, 40)}, {"id": "shard2", "item": "shard", "pos": Vector2i(48, 10)},
 			{"id": "shard3", "item": "shard", "pos": Vector2i(64, 38)}, {"id": "shard4", "item": "shard", "pos": Vector2i(40, 24)},
+			# Part XVII: thunder eggs, the round stones the thunder leaves where it strikes
+			{"id": "p17_egg1", "item": "thunder_egg", "pos": Vector2i(86, 24), "vis": ["s_p17_eggs", ""], "late": true}, {"id": "p17_egg2", "item": "thunder_egg", "pos": Vector2i(2, 30), "vis": ["s_p17_eggs", ""], "late": true},
+			{"id": "p17_egg3", "item": "thunder_egg", "pos": Vector2i(43, 7), "vis": ["s_p17_eggs", ""], "late": true}, {"id": "p17_egg4", "item": "thunder_egg", "pos": Vector2i(39, 47), "vis": ["s_p17_eggs", ""], "late": true},
+			{"id": "p17_egg5", "item": "thunder_egg", "pos": Vector2i(62, 35), "vis": ["s_p17_eggs", ""], "late": true}
 		],
 		"pickup_vis": "s_shards",
 	},
@@ -970,6 +999,9 @@ const AREAS := {
 	},
 	"dragon": {
 		"n": "Sunken Dragon Palace", "w": 92, "h": 56, "seed": 71, "theme": "abyss", "enemies": 18,
+		# Part XVII (impact.gd): the chains of black ice holding the old rain dragon's head down
+		"obstacles": [{"id": "p17_chain1", "what": "chain", "pos": Vector2i(48, 13), "vis": ["s_p17_chains", ""]}, {"id": "p17_chain2", "what": "chain", "pos": Vector2i(11, 48), "vis": ["s_p17_chains", ""]},
+			{"id": "p17_chain3", "what": "chain", "pos": Vector2i(66, 53), "vis": ["s_p17_chains", ""]}, {"id": "p17_chain4", "what": "chain", "pos": Vector2i(9, 10), "vis": ["s_p17_chains", ""]}],
 		"pool": [["coral_guard", 12, 13], ["kelp_serpent", 12, 13], ["abyss_jelly", 12, 13]],
 		"portals": [
 			{"to": "palace", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
@@ -1064,6 +1096,10 @@ const AREAS := {
 		"pickups": [
 			{"id": "echo1", "item": "echo", "pos": Vector2i(22, 44)}, {"id": "echo2", "item": "echo", "pos": Vector2i(40, 10)},
 			{"id": "echo3", "item": "echo", "pos": Vector2i(62, 14)}, {"id": "echo4", "item": "echo", "pos": Vector2i(72, 46)},
+			# Part XVII: willow for Qingming, over the doors and in the hair
+			{"id": "p17_willow1", "item": "willow_sprig", "pos": Vector2i(6, 27), "vis": ["s_p17_willow", ""], "late": true}, {"id": "p17_willow2", "item": "willow_sprig", "pos": Vector2i(89, 30), "vis": ["s_p17_willow", ""], "late": true},
+			{"id": "p17_willow3", "item": "willow_sprig", "pos": Vector2i(48, 2), "vis": ["s_p17_willow", ""], "late": true}, {"id": "p17_willow4", "item": "willow_sprig", "pos": Vector2i(48, 53), "vis": ["s_p17_willow", ""], "late": true},
+			{"id": "p17_willow5", "item": "willow_sprig", "pos": Vector2i(61, 27), "vis": ["s_p17_willow", ""], "late": true}, {"id": "p17_willow6", "item": "willow_sprig", "pos": Vector2i(18, 52), "vis": ["s_p17_willow", ""], "late": true}
 		],
 		"pickup_vis": "s_ml_collect",
 	},
@@ -1401,6 +1437,11 @@ const AREAS := {
 	# ---- Part VII: The Unbroken Land
 	"village": {
 		"n": "Qingshi Village Below the Mountain", "w": 96, "h": 58, "seed": 271, "theme": "village", "enemies": 18,
+		# Part XVII (impact.gd): the clay Spring Ox, and the paper petty men the village beats on the
+		# day of the first thunder
+		"obstacles": [{"id": "p17_ox", "what": "spring_ox", "pos": Vector2i(35, 23), "vis": ["s_p17_ox", ""]},
+			{"id": "p17_petty1", "what": "petty", "pos": Vector2i(36, 14), "vis": ["s_p17_petty", ""]}, {"id": "p17_petty2", "what": "petty", "pos": Vector2i(14, 43), "vis": ["s_p17_petty", ""]},
+			{"id": "p17_petty3", "what": "petty", "pos": Vector2i(45, 43), "vis": ["s_p17_petty", ""]}, {"id": "p17_petty4", "what": "petty", "pos": Vector2i(14, 12), "vis": ["s_p17_petty", ""]}],
 		"pool": [["thread_moth", 33, 33], ["paper_crow", 33, 33], ["silk_bandit", 33, 33]],
 		"portals": [
 			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(6, 21), "open": ""},
@@ -1421,6 +1462,8 @@ const AREAS := {
 			{"id": "scholar_wang", "n": "Scholar Wang", "pos": Vector2i(48, 37), "col": Color("e8e4d0")},
 			{"id": "carpenter_gu", "n": "Carpenter Gu", "pos": Vector2i(21, 20), "col": Color("8a6a4a")},
 			{"id": "herb_lan", "n": "Xiao Lan the Herb-Picker", "pos": Vector2i(37, 20), "col": Color("6a9a5a")},
+			# Part XVII: Gou Mang, Lord of Spring, waiting by the ox-pen for somebody to whip the Spring Ox
+			{"id": "gou_mang", "n": "Gou Mang, Lord of Spring", "pos": Vector2i(38, 35), "col": Color("4a9a5a"), "vis": ["s_p17_home", "s_p17_kites"], "late": true}
 		],
 		"bosses": [
 			# Part XVI: the Year Beast, down out of the mountains at midnight
@@ -1429,6 +1472,8 @@ const AREAS := {
 			{"id": "scarecrow_king", "pos": Vector2i(46, 16), "lv": 33, "req": 33},
 			{"id": "well_spider", "pos": Vector2i(60, 40), "lv": 33, "req": 33},
 			{"id": "needle_general", "pos": Vector2i(86, 28), "lv": 33, "req": 33},
+			# Part XVII: the lord of the year under the earth, woken by the whole land broken open at once
+			{"id": "taisui", "pos": Vector2i(55, 8), "lv": 65, "req": 64, "vis": ["s_p17_taisui", ""], "late": true}
 		],
 		"pickups": [{"id": "sthread1", "item": "silver_thread", "pos": Vector2i(22, 12)}, {"id": "sthread2", "item": "silver_thread", "pos": Vector2i(40, 46)}, {"id": "sthread3", "item": "silver_thread", "pos": Vector2i(64, 30)}, {"id": "sthread4", "item": "silver_thread", "pos": Vector2i(76, 10)},
 			{"id": "cur_wutong2", "item": "wutong_seed", "pos": Vector2i(11, 23), "floor": ["wen_house", -1], "always": true}],
@@ -1462,6 +1507,10 @@ const AREAS := {
 	},
 	"terraces": {
 		"n": "Cloud-Tea Terraces", "w": 96, "h": 58, "seed": 281, "theme": "tea", "enemies": 20,
+		# Part XVII (impact.gd): the frost split the hillside, and the rocks came down into the channels
+		"obstacles": [{"id": "p17_rock1", "what": "boulder", "pos": Vector2i(27, 27), "vis": ["s_p17_rockfall", ""]}, {"id": "p17_rock2", "what": "boulder", "pos": Vector2i(93, 29), "vis": ["s_p17_rockfall", ""]},
+			{"id": "p17_rock3", "what": "boulder", "pos": Vector2i(60, 3), "vis": ["s_p17_rockfall", ""]}, {"id": "p17_rock4", "what": "boulder", "pos": Vector2i(59, 51), "vis": ["s_p17_rockfall", ""]},
+			{"id": "p17_rock5", "what": "boulder", "pos": Vector2i(32, 53), "vis": ["s_p17_rockfall", ""]}],
 		"pool": [["tea_beetle", 33, 34], ["terrace_serpent", 33, 34], ["hill_sprite", 33, 34]],
 		# Part XVI: the hunger that runs before Nian, coming down the terraces towards the villages
 		"warband": {"pool": [["lean_month", 60, 61], ["candle_moth", 60, 61], ["nian_cub", 60, 61]], "n": 8, "vis": "s_p16_rally"},
@@ -1478,7 +1527,12 @@ const AREAS := {
 			# Part XVI: the king of the hungry months, driving them down towards the villages
 			{"id": "lean_king", "pos": Vector2i(59, 30), "lv": 61, "req": 60, "vis": ["s_p16_lean", ""]},
 		],
-		"pickups": [{"id": "teabud1", "item": "tea_bud", "pos": Vector2i(22, 12)}, {"id": "teabud2", "item": "tea_bud", "pos": Vector2i(40, 46)}, {"id": "teabud3", "item": "tea_bud", "pos": Vector2i(64, 30)}, {"id": "teabud4", "item": "tea_bud", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "teabud1", "item": "tea_bud", "pos": Vector2i(22, 12)}, {"id": "teabud2", "item": "tea_bud", "pos": Vector2i(40, 46)}, {"id": "teabud3", "item": "tea_bud", "pos": Vector2i(64, 30)}, {"id": "teabud4", "item": "tea_bud", "pos": Vector2i(76, 10)},
+			# Part XVII: Mingqian tea, the first buds of the year, picked before Qingming
+			{"id": "p17_tea1", "item": "spring_tea", "pos": Vector2i(24, 27), "vis": ["s_p17_tea", ""], "late": true}, {"id": "p17_tea2", "item": "spring_tea", "pos": Vector2i(90, 26), "vis": ["s_p17_tea", ""], "late": true},
+			{"id": "p17_tea3", "item": "spring_tea", "pos": Vector2i(57, 3), "vis": ["s_p17_tea", ""], "late": true}, {"id": "p17_tea4", "item": "spring_tea", "pos": Vector2i(56, 51), "vis": ["s_p17_tea", ""], "late": true},
+			{"id": "p17_tea5", "item": "spring_tea", "pos": Vector2i(65, 27), "vis": ["s_p17_tea", ""], "late": true}, {"id": "p17_tea6", "item": "spring_tea", "pos": Vector2i(31, 50), "vis": ["s_p17_tea", ""], "late": true}
+		],
 		"pickup_vis": "s_te_collect",
 		"buildings": [
 			{"id": "tea_house", "n": "Tea House of the Nine Terraces", "style": "inn", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
@@ -1661,6 +1715,8 @@ const AREAS := {
 	# cracked drought farmland and withered millet along a dry river, a wayside shrine of Hou Ji
 	"millet": {
 		"n": "The Scorched Millet Plains", "w": 100, "h": 52, "seed": 361, "theme": "millet", "enemies": 20,
+		# Part XVII: the five poisons the first thunder woke in the plains
+		"warband": {"pool": [["waking_scorpion", 64, 65], ["waking_centipede", 64, 65], ["waking_toad", 64, 65]], "n": 10, "vis": "s_p17_thunder", "late": true},
 		"pool": [["plague_locust", 39, 40], ["drought_scorpion", 39, 40], ["haze_wisp", 39, 40]],
 		"portals": [
 			{"to": "yanggu", "pos": Vector2i(1, 24), "dest": Vector2i(98, 25), "open": ""},
@@ -1674,6 +1730,8 @@ const AREAS := {
 			{"id": "dust_devil", "pos": Vector2i(46, 43), "lv": 40, "req": 40},
 			{"id": "well_tortoise", "pos": Vector2i(70, 15), "lv": 40, "req": 40},
 			{"id": "bifang", "pos": Vector2i(88, 33), "lv": 40, "req": 40},
+			# Part XVII: the mother of everything poisonous the first thunder woke under the millet
+			{"id": "poison_mother", "pos": Vector2i(47, 40), "lv": 65, "req": 64, "vis": ["s_p17_mother", ""], "late": true}
 		],
 		"pickups": [{"id": "rstone1", "item": "rain_stone", "pos": Vector2i(20, 42)}, {"id": "rstone2", "item": "rain_stone", "pos": Vector2i(50, 22)}, {"id": "rstone3", "item": "rain_stone", "pos": Vector2i(66, 44)}, {"id": "rstone4", "item": "rain_stone", "pos": Vector2i(84, 8)}],
 		"pickup_vis": "s_mf_collect",
@@ -1746,6 +1804,10 @@ const AREAS := {
 	# a ferry town on the river below the Dragon Gate, where the golden carp leap to become dragons
 	"longmen": {
 		"n": "Longmen, the Dragon Gate Ferry", "w": 100, "h": 60, "seed": 391, "theme": "longmen", "enemies": 22,
+		# Part XVII (impact.gd): ice jammed against the banks of the river above the Dragon Gate
+		"obstacles": [{"id": "p17_ice1", "what": "ice", "pos": Vector2i(57, 32), "vis": ["s_p17_ice", ""]}, {"id": "p17_ice2", "what": "ice", "pos": Vector2i(9, 35), "vis": ["s_p17_ice", ""]},
+			{"id": "p17_ice3", "what": "ice", "pos": Vector2i(95, 39), "vis": ["s_p17_ice", ""]}, {"id": "p17_ice4", "what": "ice", "pos": Vector2i(78, 10), "vis": ["s_p17_ice", ""]},
+			{"id": "p17_ice5", "what": "ice", "pos": Vector2i(38, 53), "vis": ["s_p17_ice", ""]}, {"id": "p17_ice6", "what": "ice", "pos": Vector2i(52, 7), "vis": ["s_p17_ice", ""]}],
 		"pool": [["gate_carp", 42, 42], ["eel_bandit", 42, 42], ["silt_crab", 42, 42]],
 		"portals": [
 			{"to": "sect", "pos": Vector2i(1, 30), "dest": Vector2i(12, 3), "open": ""},
@@ -2968,6 +3030,39 @@ const STEPS := [
 	{"id": "s_p16_lanterns", "kind": "share", "spot": "kind:yanggu:stage", "area": "yanggu", "t": "The Lantern Festival: on the fifteenth night the Dawn Market asks for a sword form on its stage, under every lantern in Yanggu"},
 	{"id": "s_p16_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Wish Elder Qing Xuan a good new year"},
 	{"id": "s_break21", "kind": "breakthrough", "to": 63, "t": "Keep every lamp in the land lit: Ten Thousand Hearths"},
+	# ---- Part XVII: The Spring Thunder (the Spring Thunder release).  Spring will not come by itself: the
+	# Spring Ox must be whipped, the land cleared of the long winter, the frost sent home, the dragon's head
+	# raised, the first thunder drummed and the lord under the soil made peace with, before Qingming
+	{"id": "s_p17_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Spring has not come: speak to Elder Qing Xuan", "stones": 25200},
+	{"id": "s_p17_goumang", "kind": "talk", "npc": "gou_mang", "area": "village", "t": "Go down to Qingshi and find the young man with a swallow's shadow by Ah Niu's ox-pen"},
+	{"id": "s_p17_ox", "kind": "clear", "what": "spring_ox", "n": 1, "area": "village", "t": "Whip the Spring Ox: strike the clay ox Qingshi made from its fields with Gou Mang's willow switch until it breaks (F)"},
+	{"id": "s_p17_deadfall", "kind": "clear", "what": "deadfall", "n": 6, "area": "bamboo", "t": "Clear the roads: cut through 6 trunks the winter's snow laid across the paths of the Whispering Bamboo Forest (F)"},
+	{"id": "s_p17_rockfall", "kind": "clear", "what": "boulder", "n": 5, "area": "terraces", "t": "Break up 5 rockfalls the frost brought down into the water channels of the Cloud-Tea Terraces (F)"},
+	{"id": "s_p17_hunt", "kind": "hunt", "area": "frost", "n": 20, "of": ["rime_wisp", "hoarfrost_hare", "late_frost"], "first": true,
+		"t": "Drive the Rime Wisps, the Hoarfrost Hares and the Cold That Comes Back up into Frostpeak (strike a pack first: F, or the sword qi: G)"},
+	{"id": "s_p17_ice", "kind": "clear", "what": "ice", "n": 6, "area": "longmen", "t": "Break up 6 ice jams on the river at Longmen before the thaw breaks them for you and floods the fields of Gun again (F)"},
+	{"id": "s_p17_qingnu", "kind": "kill", "boss": "qing_nu", "area": "frost", "t": "Ask Qing Nu, the Maiden of Frost, in the caverns of Frostpeak why she will not take her frost home", "stones": 25600},
+	{"id": "s_p17_haircut", "kind": "share", "spot": "kind:village:bench", "area": "village", "t": "The second day of the second month, when the Dragon raises its head: get your hair cut for luck on the bench in Qingshi's lane"},
+	{"id": "s_p17_envoy", "kind": "talk", "npc": "dragon_envoy", "area": "dragon", "t": "The dragon has not raised its head: ask Envoy Ao Lan in the Sunken Dragon Palace why"},
+	{"id": "s_p17_chains", "kind": "clear", "what": "chain", "n": 4, "area": "dragon", "t": "Break the 4 chains of black ice that hold the old Rain Dragon's head down under the palace (F)"},
+	{"id": "s_p17_leigong", "kind": "talk", "npc": "lei_gong", "area": "thunder", "t": "The rain has come, but not the thunder: find Lei Gong, Duke of Thunder, in Thunder Valley"},
+	{"id": "s_p17_eggs", "kind": "collect", "item": "thunder_egg", "n": 5, "area": "thunder", "t": "Find 5 thunder eggs in Thunder Valley, the round stones the lightning leaves where it strikes, for new drumheads"},
+	{"id": "s_p17_thunder", "kind": "share", "spot": "kind:thunder:drum", "area": "thunder", "t": "Jingzhe, the Waking of Insects: beat the first thunder of spring on Lei Gong's drum with Yue Ling"},
+	{"id": "s_p17_petty", "kind": "clear", "what": "petty", "n": 4, "area": "village", "t": "On the day of the first thunder the women of Qingshi beat the petty people out of the year: beat 4 paper petty men with Granny Wen (F)"},
+	{"id": "s_p17_poisons", "kind": "hunt", "area": "millet", "n": 20, "of": ["waking_scorpion", "waking_centipede", "waking_toad"], "first": true,
+		"t": "The thunder woke the five poisons under the millet: drive the scorpions, centipedes and toads off the plains before the sowing (strike first: F or G)"},
+	{"id": "s_p17_mother", "kind": "kill", "boss": "poison_mother", "area": "millet", "t": "Find where the poisons come from: the Mother of the Five Poisons, under the scorched plain"},
+	{"id": "s_p17_taisui", "kind": "kill", "boss": "taisui", "area": "village", "t": "The ground under Qingshi's fields is moving: face Taisui, Lord of the Year Under the Earth", "stones": 26000},
+	{"id": "s_p17_sow", "kind": "folk", "role": "farmer", "n": 6, "area": "village", "t": "The fields are open at last: help six of Qingshi's farmers with the sowing (face one and press Enter)"},
+	{"id": "s_p17_tea", "kind": "collect", "item": "spring_tea", "n": 6, "area": "terraces", "t": "The first tea of the year is picked before Qingming: pick 6 buds of Mingqian tea on the Cloud-Tea Terraces"},
+	{"id": "s_p17_teacup", "kind": "share", "spot": "kind:terraces:tea", "area": "terraces", "t": "Brew the first cup of the year's tea for Yue Ling at the tea table on the terraces"},
+	{"id": "s_p17_willow", "kind": "collect", "item": "willow_sprig", "n": 6, "area": "mirror", "t": "Qingming is coming: cut 6 willow sprigs by the Mirror Lake, for the doors and for the graves"},
+	{"id": "s_p17_graves", "kind": "share", "spot": "kind:maple:shrine", "area": "maple", "t": "Qingming: sweep the graves under the maples in the gorge where the Elder found you, with Yue Ling"},
+	{"id": "s_p17_kites", "kind": "folk", "role": "child", "n": 8, "area": "mountain", "t": "Qingming is for kites as well as graves: fly a kite with eight children of the towns (face one and press Enter)"},
+	{"id": "s_p17_kite", "kind": "share", "spot": "kind:village:kite", "area": "village", "t": "Fly Yue Ling's kite from Qingshi's kite post, and cut the string so it carries the year's bad luck away"},
+	{"id": "s_p17_newborn", "kind": "talk", "npc": "granny_wen", "area": "village", "t": "Granny Wen has sent for you from Qingshi: a child was born on the night of the first thunder"},
+	{"id": "s_p17_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan that spring has come"},
+	{"id": "s_break22", "kind": "breakthrough", "to": 66, "t": "Wake with the ten thousand things: Myriad Things Awake"},
 ]
 
 static func step_index(id: String) -> int:
@@ -3099,6 +3194,13 @@ const ITEMS := {
 	"thunder_bamboo": {"n": "Thunder Bamboo", "desc": "A stalk of the bamboo that bangs when it is thrown on a fire: the first firecrackers, before anybody thought of gunpowder"},
 	"plum_sprig": {"n": "Winter Plum", "desc": "A sprig of the plum that flowers in the snow, the first flower of the year. A vase of it on the reunion table says the cold is nearly over"},
 	"peach_charm": {"n": "Peach-Wood Charm", "desc": "A board of old peach wood carved with the names of the door gods Shenshu and Yulei. Everything that comes out of the dark hates it"},
+	# Part XVII (the Spring Thunder release): spring's own whip, the thunder's eggs, willow for Qingming
+	"willow_switch": {"n": "Gou Mang's Willow Switch", "desc": "A switch of green willow from the first willow that ever came into leaf, warm as if it had lain in the sun. The Lord of Spring has whipped the Spring Ox with it for three thousand years. The frost hates it"},
+	"thunder_egg": {"n": "Thunder Egg", "desc": "A round stone with a star of crystal inside, found where lightning struck. People used to think the thunder laid them. Lei Gong says it does"},
+	"spring_tea": {"n": "Mingqian Tea", "desc": "Two leaves and a bud, picked on the terraces before Qingming: the first tea of the year, and the best. It tastes of rain that has not fallen yet"},
+	"willow_sprig": {"n": "Willow Sprig", "desc": "A green sprig of weeping willow, cut for Qingming: one over every door to keep the year's ghosts polite, and one in the hair so you are not reborn a yellow dog"},
+	"warm_brazier": {"n": "Brazier of the South Wind", "desc": "Alchemist Mo's bronze brazier, fed with fire and wood essence: it breathes out the warm wet wind of the third month, the one that tells the frost it is time to go"},
+	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
 	"open_key": {"n": "Key of the Open Door", "desc": "Smith Tie's key with no lock: two pressed petals beaten into bronze with metal and dark essence. It opens what is shut by leaving it open"},
@@ -6233,6 +6335,172 @@ const DIALOGUE := {
 		["Yue Ling", "Happy new year, Lin Feng."],
 		["Lin Feng", "Happy new year, Yue Ling. Your first."],
 		["Yue Ling", "Our first."],
+	],
+	# ---- Part XVII: The Spring Thunder (the Spring Thunder release)
+	"recall15": [
+		["Narrator", "The Lantern Festival ends, and the almanac turns its page. Lichun, the beginning of spring, comes and goes on paper. On Azure Cloud Mountain the snow does not even begin to think about it."],
+		["Narrator", "Every morning the frost is thicker than the night before. The plum blossom cut for the reunion table has frozen on its branches, pink under glass. Down in Qingshi the ploughs stand in their sheds, and the ground under the snow rings like an anvil when you stamp on it."],
+		["Yue Ling", "Lin Feng, is spring always this late? I have woken by the pond in spring before. I remember the frogs. There are no frogs."],
+		["Lin Feng", "Granny Wen says spring is like a guest. You sweep the doorstep and leave the gate open, and one morning it is sitting in your kitchen eating your noodles."],
+		["Yue Ling", "Then somebody has forgotten to open the gate."],
+	],
+	"s_p17_home": [
+		["Elder Qing Xuan", "Lin Feng. The almanac says it is spring. Either the almanac is wrong, or the world has stopped reading it."],
+		["Elder Qing Xuan", "Every year at Lichun the villages make a Spring Ox out of the clay of their own fields, paint it in the five colours and whip it to pieces, so that the ground knows it is time to be ploughed. This year Qingshi was too busy seeing the old year out to make one. So was everybody."],
+		["Elder Qing Xuan", "And last night a young man came to the gate. He would not come in. He had a willow switch in his hand and the shadow of a swallow on the snow behind him, though there was no moon to cast it. He asked for the sweeper."],
+		["Lin Feng", "A swallow's shadow. The swallows come back in spring."],
+		["Elder Qing Xuan", "When they can find it. He said he would wait in Qingshi, by the ox-pen. I believe he is Gou Mang, Lord of Spring, who walks in front of the Spring Ox in every Lichun procession in the land. I have seen his face on a thousand paper prints. I never expected to see it at my gate, looking worried."],
+		["Yue Ling", "A god of spring who is worried. That cannot be good."],
+		["Elder Qing Xuan", "No. Go down to the village, both of you. And take your sword, Lin Feng. If spring is stuck somewhere, I suspect it will have to be cut loose."],
+	],
+	"s_p17_goumang": [
+		["Narrator", "Beside Ah Niu's ox-pen, where the village's Spring Ox should have stood a month ago, a young man in a green robe sits on the fence with his knees drawn up. He has the round, solemn face of the almanac prints, and behind him on the snow the shadow of a swallow is flying, though he sits quite still."],
+		["Gou Mang, Lord of Spring", "The sweeper, and the Seal's lotus. Good. I am Gou Mang. Every spring I walk in front of the ox and open the first furrow of the year, and the world wakes up behind me. For a month now I have been walking in front of nothing."],
+		["Gou Mang, Lord of Spring", "Spring is not a season, sweeper. It is a door, and somebody has to push it. The ox has to be whipped, so the earth knows to open. On the second day of the second month the dragon has to lift his head out of the water, so the rain can fall. The thunder has to roll, so everything asleep in the ground wakes up. And the frost has to agree to go home."],
+		["Lin Feng", "And none of it has happened."],
+		["Gou Mang, Lord of Spring", "None of it. The longest winter the world ever had has left the land tangled shut: bamboo the snow broke lying across every path, rocks the frost split off the hills lying in the channels, ice jammed in the rivers. And Qing Nu, the Maiden of Frost, will not take her frost back. Every night she lays it down again, thicker."],
+		["Yue Ling", "Why would the frost not want to go home?"],
+		["Gou Mang, Lord of Spring", "Ask her. She will not answer me. I am the one who always tells her it is time to go."],
+		["Gou Mang, Lord of Spring", "Here. My switch, cut from the first willow that ever came into leaf. I have whipped the Spring Ox with it for three thousand years. This year you whip it. The village made one at last: Ah Niu built it from the clay of the fields and painted it the five colours. Hit it hard. The ground is listening."],
+		["Narrator", "Gou Mang puts a switch of green willow into Lin Feng's hand. It is warm, as if it had been lying in the sun."],
+	],
+	"done:s_p17_ox": [
+		["Narrator", "On the fifth blow the Spring Ox bursts apart in a spray of painted clay and grain, and the whole village dives for the pieces: a shard of the ox on the windowsill keeps the house lucky all year, and a handful of its clay in the field makes the rice grow."],
+		["Ah Niu the Ox-Herd", "Green on the head: a wet spring! Yellow on the belly: a good harvest! Granny, look, I got a horn!"],
+		["Gou Mang, Lord of Spring", "There. The ground heard that. Now the roads, sweeper: nothing can get to the fields while the paths are full of fallen bamboo. Then the terraces, then the river. Spring is a lot of carrying."],
+	],
+	"done:s_p17_deadfall": [
+		["Narrator", "The last trunk splits under the sword and rolls away down the slope, and the carts that have waited at the edge of the bamboo since the New Year creak forward at once, loaded with seed rice and dung and a great deal of opinion about the state of the roads."],
+		["Yue Ling", "You are very good at cutting things down, Lin Feng. Three years with a broom and now the whole forest sweeps itself out of your way."],
+	],
+	"done:s_p17_rockfall": [
+		["Narrator", "With the last rockfall broken, the meltwater that has been backing up behind the stones all month finds its way into the channels and runs down the Cloud-Tea Terraces from step to step, loud and silver."],
+		["Narrator", "And with the water, from the high snow above the terraces, come the things that were living in the cold: the wisps of rime, the white hares, and a thin grey shape like a widow in a veil that leaves frost wherever it stops."],
+		["Gou Mang, Lord of Spring", "The cold that comes back. Every spring it tries once more. Drive it up into Frostpeak where it belongs, and do not let it touch you first: it is quicker than it looks."],
+	],
+	"done:s_p17_hunt": [
+		["Narrator", "The last of the white things goes back up into the high snow of Frostpeak, and the terraces below are wet and dark and steaming in the sun. In the caverns above, though, the frost is thicker than ever, and the icicles at the mouth of the deepest cave are as long as spears."],
+		["Yue Ling", "Somebody up there is still combing out the winter. I can hear it, Lin Feng. Like a comb going through very long hair."],
+	],
+	"done:s_p17_ice": [
+		["Narrator", "The ice jams break up one after another and go down through the Dragon Gate in a long grinding procession, and the river behind them, which had been rising all month against the ice, sinks back into its bed with a sigh you can hear from the ferry."],
+		["Harbourmistress Jiang Yao", "Another week and that would have come over the dykes all at once and taken the fields of Gun with it, like in the old flood. I owe you a boat. I owe you a fleet."],
+		["Lin Feng", "Then lend me one in summer. Somebody has been promised the sea."],
+	],
+	"pre:qing_nu": [
+		["Narrator", "In the deepest cavern of Frostpeak, where the ice is blue all the way through, a woman in white sits on a bench of frozen snow, combing the frost out of her long hair. Every hair that falls becomes a night's frost somewhere in the land. She has been combing for a month."],
+		["Qing Nu, Maiden of Frost", "The sweeper who swept the sky. You have come to tell me it is time to go home. Gou Mang tells me so every year, very politely."],
+		["Yue Ling", "We came to ask why you will not."],
+		["Qing Nu, Maiden of Frost", "...Nobody has ever asked. Look at the land, little lotus. This year the sky fell. The sun stood still. The dead walked home. A girl was nearly unpicked from the world. Every grave and every burnt field and every empty cradle in the land is under my snow tonight, and under my snow none of it hurts."],
+		["Qing Nu, Maiden of Frost", "If I take it away they wake up into all of it again. I am only keeping them asleep a little longer. Is that so cruel?"],
+	],
+	"post:qing_nu": [
+		["Narrator", "Qing Nu lowers her comb. Somewhere far below, a drop of water falls from an icicle, and then another."],
+		["Qing Nu, Maiden of Frost", "You opened the roads. You cleared the channels. You whipped the ox, and the ground heard it. They will wake into a land somebody has made ready for them. ...I did not think anybody would."],
+		["Lin Feng", "Come back in autumn. The plum will want you in winter. It flowers in the cold."],
+		["Qing Nu, Maiden of Frost", "The plum. Yes. It is the only thing that ever thanked me."],
+		["Narrator", "She gathers her hair over one shoulder and walks into the blue ice, and the ice lets her in. When Lin Feng and Yue Ling come out of the caverns the snow on the path has gone to slush, and there is a smell in the air like wet earth, and far away, very faint, a frog."],
+	],
+	"s_p17_envoy": [
+		["Envoy Ao Lan", "Sweeper. You have come about the rain. Everybody has come about the rain. The farmers have come, the tea-pickers, the ferrymen, the Rain Ministry has sent four letters, one of them rude."],
+		["Envoy Ao Lan", "On the second day of the second month the old Rain Dragon who sleeps under this palace lifts his head out of the deep, and the spring rain falls behind him. This year he cannot lift it. In the long frost the deep water froze into chains of black ice round his neck, and he is too old and too proud to call for help."],
+		["Yue Ling", "That is why the barbers in Qingshi have been sitting in the lane with nobody to shave. You cut your hair on the day the dragon raises its head, for luck. And the dragon has not raised it."],
+		["Envoy Ao Lan", "Four chains. Iron would have been easier: the ice is the Maiden's, and it does not want to break. Break them, and do not be offended by anything he says when his head is free. He has been looking at the floor for a month."],
+	],
+	"done:s_p17_chains": [
+		["Narrator", "The last chain of black ice snaps, and something enormous and old moves in the deep water under the palace. A head as long as a ferry boat rises out of the sea of the Sunken Palace, whiskers trailing weed, and opens one gold eye the size of a window."],
+		["The Old Rain Dragon", "...I was not stuck. I was resting. A dragon does not get stuck."],
+		["Yue Ling", "Of course not. You were resting very hard."],
+		["The Old Rain Dragon", "Hmph. Tell the barbers they may begin."],
+		["Narrator", "He lifts his head towards the surface, and far above, over the whole of the Unbroken Land, the first rain of spring begins to fall: soft, warm, the kind that makes the ground smell. But no thunder comes with it."],
+	],
+	"done:s_p17_eggs": [
+		["Lei Gong, Duke of Thunder", "Five. Five thunder eggs, and every one of them still warm from the strike that laid it. Look at the star inside that one, sweeper. That is a thunderbolt from the spring my grandfather drummed."],
+		["Lei Gong, Duke of Thunder", "Now come up to the drum before the rain stops. The first thunder of spring goes out at dusk, in the rain. That is when the frogs are listening."],
+	],
+	"s_p17_leigong": [
+		["Narrator", "On the highest crag of Thunder Valley a great blue man with a bird's wings and a crest of gold feathers sits among a ring of drums, hitting them with a mallet. Every drum is cracked. Every blow comes out as a dull wooden clonk, like somebody knocking on a door nobody will answer."],
+		["Lei Gong, Duke of Thunder", "The sweeper who would not give me a list. You see what has become of me. The rain is falling, and I cannot drum a single thunder to go with it."],
+		["Lei Gong, Duke of Thunder", "The first thunder of spring is the one that matters. Jingzhe, the Waking of Insects: one roll of it and everything asleep in the ground wakes up, the seeds and the worms and the beetles and the frogs. Without it they will sleep through the spring and wake in summer, and nothing will be sown."],
+		["Lin Feng", "What happened to your drums?"],
+		["Lei Gong, Duke of Thunder", "The frost got into the drumheads all winter and split them, every one. New heads are made from thunder eggs, the round stones the lightning leaves where it strikes. This valley is full of them. I used to know where. I struck everybody and forgot to look."],
+		["Yue Ling", "We will find them. Five?"],
+		["Lei Gong, Duke of Thunder", "Five. And then you will drum it with me. I have done the first thunder alone for three thousand years. It would be nice, this once, to have somebody to strike with."],
+	],
+	"done:s_p17_petty": [
+		["Narrator", "Granny Wen and the women of Qingshi stand under the bridge with their sleeves rolled up, old shoes in their hands, and beat the paper petty men until there is nothing left of them but confetti, chanting the old rhyme the whole while: beat the petty man's head, and he will never raise it; beat his mouth, and he will never gossip."],
+		["Granny Wen the Midwife", "Every year on the day of the first thunder, sweeper. The snakes and the scorpions wake up, and so do the people who want to make trouble for you. You beat them out of the year before they get going. Your sword is very good for it. Better than a shoe."],
+		["Yue Ling", "Whose petty men are they, Granny?"],
+		["Granny Wen the Midwife", "Nobody's. Everybody's. The ones who whisper. Mine is the woman at the market who said my dumplings were small. Here: hold my shoe."],
+	],
+	"done:s_p17_poisons": [
+		["Narrator", "The packs scatter back into their holes under the millet, and the plain goes quiet. Too quiet. Under the scorched ground, where the five poisons go down, something heavy turns over and begins to climb."],
+	],
+	"pre:poison_mother": [
+		["Narrator", "Where the plain was scorched blackest in the nine days of noon the ground has cracked open, and out of the crack heaves a toad as big as a granary, green-black and warted with orange, with a scorpion's tail and a centipede's hundred legs folded under her. Her eyes are two lamps of yellow poison."],
+		["Mother of the Five Poisons", "The thunder. The THUNDER. All winter I kept my children warm in the cracks the sun left, and then a great fool drums the sky open and they all wake up at once, starving."],
+		["Yue Ling", "It is the fifth day of the fifth month you are afraid of, not this. The day they hang mugwort on the doors and drink realgar wine against you."],
+		["Mother of the Five Poisons", "Clever lotus. That is three months away. Until then the fields are MINE."],
+	],
+	"post:poison_mother": [
+		["Narrator", "The Mother of the Five Poisons sinks back into her crack, croaking, and drags it shut behind her like a quilt. The packs of her children go with her."],
+		["Old Farmer Tian", "She comes up every spring, a little. Never like this. We hang mugwort and pray to Hou Ji and she goes down again. You hit her harder than mugwort, young man."],
+		["Old Farmer Tian", "But listen. Listen. Do you feel it? The ground is still moving. It is not her. It is coming from the north, from under Qingshi's fields, and it is a great deal bigger."],
+	],
+	"pre:taisui": [
+		["Narrator", "In the middle of Qingshi's top field the earth heaves up into a mound, and the mound opens, and it is not earth. It is flesh: a great soft lump of it, pale and pink and veined like the inside of a shell, with eyes opening all over it, dozens of them, every one of them furious."],
+		["Taisui, Lord of the Year Under the Earth", "WHO HAS BROKEN THE GROUND."],
+		["Granny Wen the Midwife", "Taisui. The lord of the year, under the earth. He moves under the ground with the year star, a little every year, and anybody who digs where he lies brings a year of bad luck down on the whole house. Everybody knows that. Everybody asks before they dig a well."],
+		["Taisui, Lord of the Year Under the Earth", "Every ox whipped, every furrow cut, every stone broken, every trunk split, every chain shattered: all at once, all this spring, and all of it on my head. I have not slept a single night of this year."],
+		["Lin Feng", "That was me. All of it. I am sorry. The land had to wake up."],
+		["Taisui, Lord of the Year Under the Earth", "THEN WAKE IT ON SOMEBODY ELSE'S HEAD."],
+	],
+	"post:taisui": [
+		["Narrator", "Taisui sinks back into the field, his eyes closing one after another like windows at night, until there is only a soft brown hump in the earth, and then not even that."],
+		["Granny Wen the Midwife", "You say sorry to Taisui. Every year, at the start of it, you light a stick of incense and say: we know you are there, and we are sorry to be digging, and we will be careful. Nobody said it this year. Nobody had the time."],
+		["Lin Feng", "We know you are there. We are sorry to be digging. We will be careful."],
+		["Narrator", "The field is quiet. And then, very faintly, the soil at his feet stirs, and a single green shoot of winter wheat comes up through it, the first in the land, as if somebody under the earth had decided to accept the apology."],
+	],
+	"done:s_p17_tea": [
+		["Narrator", "The tea master of the terraces looks at the six buds in Lin Feng's hand, two leaves and a bud each, picked with the dew still on them, and takes off his hat."],
+		["Narrator", "On the terraces they say that tea picked before Qingming is worth its weight in silver, and tea picked by the sweeper who carried the spring in is worth more than that, because nobody can buy it."],
+	],
+	"done:s_p17_willow": [
+		["Narrator", "Six sprigs of willow, green and dripping, cut from the trees where the Mirror Lake gives back the sky. On Qingming every door in the land wears one, and so does everybody's hair, so that nobody is reborn a yellow dog."],
+		["Yue Ling", "Hold still. One in your hair. There. Now you will be reborn as something better than a dog. A heron, perhaps. You walk like a heron."],
+	],
+	"done:s_p17_sow": [
+		["Narrator", "By evening the fields of Qingshi are sown from the river to the terraces, and the whole village stands at the edge of them with mud to the knees, looking at bare brown earth as if it were the most beautiful thing in the world. In a way it is."],
+		["Farmer Lao", "Ten days, and you'll see green. Twenty, and you'll see rows. A hundred, and you'll see rice. And in all that time not one single thing for us to do but worry about the weather. That is what spring is."],
+	],
+	"s_p17_newborn": [
+		["Narrator", "Granny Wen's house smells of ginger and hot water. In the back room a young mother is asleep, and on Granny Wen's knee, wrapped in red, is a baby girl with a great deal of black hair and her eyes wide open."],
+		["Granny Wen the Midwife", "Born on the night of the first thunder, with the whole sky drumming. I have delivered three hundred babies in this village, and I have never heard one come into the world laughing before. Her mother says she may name her, since she would not stop laughing for anybody else."],
+		["Granny Wen the Midwife", "Here. Hold her. Mind her head. You were this size when the Elder put you in my arms, you know. You cried for three days."],
+		["Narrator", "Lin Feng holds the baby, and the baby looks up at him. She does not cry. She stares at him the way you look at somebody you have been waiting a very long time to see again, as if she has known his face all her life."],
+		["Yue Ling", "...Lin Feng. Look how she is looking at you."],
+		["Lin Feng", "My mother said... at the Wheel, she said: look for a child who stares at you as if she has known you all her life."],
+		["Granny Wen the Midwife", "Well? What do we call her?"],
+		["Lin Feng", "Su Chun. Spring. After somebody who walked a long road to keep a promise."],
+		["Narrator", "The baby closes her eyes and goes to sleep in his arms, and does not stir when Granny Wen takes her back, and Yue Ling has to look out of the window for a little while."],
+	],
+	"s_p17_end": [
+		["Elder Qing Xuan", "The swallows are back under the eaves of the hall. Gardener Ruan says the peach trees are in bud, and Little Bai has found a frog in his broom cupboard and named it after you."],
+		["Elder Qing Xuan", "I have been Elder of this sect for a long time, Lin Feng, and I have seen a great many springs come. I have never seen one carried in on somebody's back before."],
+		["Lin Feng", "It was heavy, Elder. Most of it was ice."],
+		["Yue Ling", "And a dragon, and a frog, and a very large thing under a field that we said sorry to."],
+		["Elder Qing Xuan", "Then sit with me a moment, both of you, and listen. That is the sound of ten thousand things waking up. Most cultivators climb their whole lives to get away from it. I think you are about to climb into it instead."],
+	],
+	"pre:s_break22": [
+		["Narrator", "The tribulation comes in the third month, in the evening, and it does not fall. It wakes: in the soil under the courtyard, in the moss on the steps, in the swallows' nest under the eaves, in every seed and grub and root in the land at once, ten thousand small lives turning over in the dark and opening their eyes."],
+		["Yue Ling", "They are all waking up, Lin Feng. Everything. Can you hear it?"],
+		["Lin Feng", "I can hear it. Stay with me."],
+	],
+	"post:s_break22": [
+		["Narrator", "The waking goes through Lin Feng like the first thunder through the ground, and he wakes with it: wide awake, all at once, the way a seed wakes, the way you wake on the first warm morning of the year and cannot remember why you were ever asleep. He becomes a cultivator of Myriad Things Awake."],
+		["Yue Ling", "Good morning, Lin Feng."],
+		["Lin Feng", "It's evening."],
+		["Yue Ling", "Not for everything."],
 	],
 	"rally:granny_wen": [
 		["Granny Wen the Midwife", "Red paper? Firecrackers? Of course I remember. I have done it every year for seventy years, and every year the village laughs at me. This year nobody bought any paper at all. Too frightened, all of them, after the year we had."],

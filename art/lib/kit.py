@@ -220,6 +220,9 @@ class Builder:
         self.groups = []
         self.gidx = {}
         self.auto = None  # optional callable(pos) -> {bone: weight} used when no bone is given
+        # shading normals of their own for some vertices ([(BMVert, Blender-space direction)]):
+        # see set_normals
+        self.nover = []
 
     # ---- low level
     def gi(self, bone):
@@ -729,6 +732,25 @@ class Builder:
                 # keep the vertex's own class alpha (thin sheets carry an offset the outline needs)
                 v[self.cl] = (c[0], c[1], c[2], v[self.cl][3])
 
+    def set_normals(self, verts, fn, blend=1.0):
+        """Shade vertices `verts` (as returned by ``add`` and the primitives) with normals of their
+        own: ``fn(godot_point) -> godot direction``, blended with the surface's own normal by
+        `blend` (1 = only fn).  The surface keeps its shape and only the light sees the smooth form:
+        the anime-face trick of shading a face from a smooth sphere-like shape, so the nose, the
+        cheeks and the sockets never cast blotchy cel shadows across it, and the inverted-hull
+        outline follows the smooth shape too (references: Arc System Works' Guilty Gear Xrd GDC 2015
+        talk on edited normals; the "normal transfer from a sphere" face set-up of anime-style
+        modelling guides; miHoYo's Unite 2017 talk on face shading)."""
+        self.bm.normal_update()
+        for v in verts:
+            n = Vector(fn(b2g(v.co)))
+            if n.length < 1e-6:
+                continue
+            nb = g2b(n.normalized())
+            if blend < 1.0:
+                nb = (v.normal * (1.0 - blend) + nb * blend).normalized()
+            self.nover.append((v, nb))
+
     def scale_where(self, pred, pivot, k):
         """Scale every vertex for which pred(vertex weights {bone: w}) is true about `pivot`."""
         inv = {i: n for n, i in self.gidx.items()}
@@ -737,6 +759,16 @@ class Builder:
             w = {inv[g]: x for g, x in v[self.dl].items()}
             if pred(w):
                 v.co = pv + (v.co - pv) * k
+
+    def shift_where(self, fn, offset):
+        """Move every vertex by `offset` (Godot space) times fn(vertex weights {bone: w}), a share
+        from 0 to 1: a vertex half on a bone that moves goes half the way, so nothing tears."""
+        inv = {i: n for n, i in self.gidx.items()}
+        d = g2b(V(offset))
+        for v in self.bm.verts:
+            k = fn({inv[g]: x for g, x in v[self.dl].items()})
+            if k > 0.0:
+                v.co = v.co + d * k
 
     # ---- finishing
     def bake_ao(self, samples=20, dist=0.35, strength=0.55, floor_y=None, floor_k=0.25):
@@ -775,7 +807,21 @@ class Builder:
         name = name or self.name
         me = bpy.data.meshes.new(name)
         self.bm.normal_update()
+        self.bm.verts.index_update()
+        over = {}
+        for v, n in self.nover:
+            if v.is_valid:
+                over[v.index] = n
         self.bm.to_mesh(me)
+        if over:
+            # the corners of the vertices with normals of their own take them; every other corner keeps
+            # the normal Blender works out (so flat-shaded faces stay flat)
+            cn = [Vector(c.vector) for c in me.corner_normals]
+            for li, lp in enumerate(me.loops):
+                n = over.get(lp.vertex_index)
+                if n is not None:
+                    cn[li] = n
+            me.normals_split_custom_set(cn)
         ob = bpy.data.objects.new(name, me)
         bpy.context.scene.collection.objects.link(ob)
         # vertex groups in the order the deform layer refers to them

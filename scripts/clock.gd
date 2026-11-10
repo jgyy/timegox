@@ -85,7 +85,10 @@ static func set_hour(g, h: float) -> void:
 ## Part XVI: the reunion dinner ends at nine on New Year's Eve; the vigil runs to ten to midnight;
 ## Nian goes and the old year with it, and the new one dawns; the bell is rung at sunrise; once the
 ## lantern riddles are guessed it is the evening of the Lantern Festival, and every lantern is lit.
-const STORY_HOURS := {"s_gh_xihe": 18.6, "s_p16_eve": 21.2, "s_p16_vigil": 23.8, "s_p16_nian": 5.4, "s_p16_dawn": 6.3, "s_p16_riddles": 19.8}
+const STORY_HOURS := {"s_gh_xihe": 18.6, "s_p16_eve": 21.2, "s_p16_vigil": 23.8, "s_p16_nian": 5.4, "s_p16_dawn": 6.3, "s_p16_riddles": 19.8,
+	# Part XVII: the first thunder is drummed at dusk in the rain, the petty men beaten the next morning, and
+	# the graves swept on Qingming morning
+	"s_p17_eggs": 19.2, "s_p17_thunder": 7.4, "s_p17_willow": 8.2}
 
 static func story_hour(g, sid: String) -> void:
 	if STORY_HOURS.has(sid):

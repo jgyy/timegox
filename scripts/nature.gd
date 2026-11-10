@@ -113,8 +113,26 @@ float n2(vec2 p) {
 	return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y);
 }
 
+// the Sword's Wake (impact.gd): the grass a blow mowed (x, z, radius, the world clock when it was
+// cut) is cut short and grows back over a minute; `mow_now` is the world clock
+global uniform vec4 mow0;
+global uniform vec4 mow1;
+global uniform vec4 mow2;
+global uniform vec4 mow3;
+global uniform float mow_now;
+float mown(vec4 m, vec2 p) {
+	float age = mow_now - m.w;
+	if (m.z <= 0.0 || age < 0.0 || age > 60.0) {
+		return 1.0;
+	}
+	float inside = 1.0 - smoothstep(m.z * 0.75, m.z, length(p - m.xy));
+	return mix(1.0, mix(0.1, 1.0, smoothstep(10.0, 60.0, age)), inside);
+}
+
 void vertex() {
 	hgt = COLOR.a;
+	vec2 root = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xz;
+	VERTEX.y *= min(min(mown(mow0, root), mown(mow1, root)), min(mown(mow2, root), mown(mow3, root)));
 	wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	float front = sin(dot(wp.xz, vec2(0.06, 0.04)) - TIME * 0.9) * 0.5 + 0.5;
 	float bend = hgt * hgt * (0.12 + 0.28 * front * front);
