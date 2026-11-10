@@ -25,7 +25,7 @@ const HE := {"he": "she", "him": "her", "his": "her", "himself": "herself"}
 ## said to or of the hero wherever they stand (whole phrases; capitals are kept)
 const PHRASES := [
 	["senior brother lin", "Senior Sister Lin"], ["junior brother lin", "Junior Sister Lin"], ["brother lin", "Sister Lin"],
-	["big brother cultivator", "big sister cultivator"], ["lord lin", "Lady Lin"], ["young master", "young mistress"], ["granny wen's boy", "Granny Wen's girl"],
+	["big brother cultivator", "big sister cultivator"], ["lord lin", "Lady Lin"], ["his dao companion", "her Dao companion"], ["young master", "young mistress"], ["granny wen's boy", "Granny Wen's girl"],
 	["sect boy", "sect girl"], ["sweeper boy", "sweeper girl"], ["the boy who swept", "the girl who swept"], ["the boy who held up the sky", "the girl who held up the sky"],
 	["he is our son", "she is our daughter"], ["our son", "our daughter"], ["they had a son", "they had a daughter"], ["a son, looking for his parents", "a daughter, looking for her parents"],
 	["waiting for a son to grow up", "waiting for a daughter to grow up"], ["their son to grow up", "their daughter to grow up"],
@@ -203,6 +203,7 @@ static func _phrases(s: String) -> String:
 				var cut0 := from.rfind(" ") + 1
 				if cut > 0 and cut0 > 0:
 					to = to.substr(0, cut) + _cap(from.substr(cut0), to.substr(cut))
+				to = _cap(from, to)
 			s = s.substr(0, k) + to + s.substr(k + from.length())
 			low = s.to_lower()
 			k = low.find(str(ph[0]), k + to.length())

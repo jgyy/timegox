@@ -1098,6 +1098,9 @@ func _results(a: float, slide: float) -> void:
 			fallen += 1
 	y += 21.0
 	var fl := "Of the five he met on the road: %d stand with him%s" % [Fate.allies(Game), (", %d fallen" % fallen) if fallen > 0 else ""]
+	# (the results are about nobody but the hero: told of her when she is one, voice.gd)
+	if Game.fem():
+		fl = Voice.her(fl)
 	_say(Vector2(x0, y), fl, UI.fit(fl, 14, w), Trials.KINDS.bond.col, a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	# and the grudges that stayed where their owners fell (grudges.gd)
 	if not Game.grudges.is_empty():
@@ -1110,6 +1113,8 @@ func _results(a: float, slide: float) -> void:
 		y += 18.0
 		var fut: Dictionary = Bonds.FUTURES.get(Game.future, {})
 		var yl := "Yue Ling: %s%s" % [Bonds.title(Game), ("; " + str(fut.get("short", fut.n))) if not fut.is_empty() else ""]
+		if Game.fem():
+			yl = Voice.her(yl)
 		_say(Vector2(x0, y), yl, UI.fit(yl, 14, w), Color("ff9ac0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
 	_say(Vector2(x0, maxf(r.end.y - 14.0, y + 24.0)), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)
