@@ -219,6 +219,9 @@ func say(lines: Array, cb: Callable = Callable()) -> void:
 		if cb.is_valid():
 			cb.call()
 		return
+	# (the New Fire release: when the hero is a woman the conversation is told of her, voice.gd)
+	if Game.fem():
+		lines = Voice.lines(lines)
 	dialogue.start(lines, cb)
 	push("dialogue")
 
@@ -284,6 +287,7 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		for ep3 in Bonds.epilogues(Game):
 			lines.append(["Narrator", ep3])
 		lines.append_array(origin_lines("ending"))
+		# (and where the hero's own fire is kept, cultures.gd, is told when the end is chosen: choose_ending)
 	# the road Lin Feng took into the heart of the Eight Gates (Part XIII) tells the end its own way
 	var road: String = str(Game.trials.get("chiyou", ""))
 	if road != "":
@@ -359,12 +363,52 @@ func new_game(h: Dictionary = {}) -> void:
 	yue_chat = 0
 	world.clear_cache()
 	world.refresh_hero()
+	# the New Fire release (cultures.gd): the story begins three years earlier, on the last morning at
+	# the hearth where the hero spent the year away: a different town, keeper and farewell for each.
+	# (`h` empty: a game begun without the creation screen, by the tests and the tools, begins at the
+	# sect as it always did)
+	if not h.is_empty() and not args.has("no-prologue"):
+		begin_prologue()
+		return
+	begin_at_sect()
+
+## Words that are about nobody but the hero (what he wears, what he rides), told of whoever the hero is
+## (voice.gd).
+func told(s: String) -> String:
+	return Voice.her(s) if Game.fem() else s
+
+## The story proper: the morning of the Elder's summons.
+func begin_at_sect() -> void:
+	Game.prologue = ""
 	world.load_area("sect", Vector2i(20, 8))
 	set_stack(["world"])
 	var intro: Array = [["Narrator", "Azure Cloud Sect, perched above the sea of clouds. For three years the orphan Lin Feng has swept its steps."]]
 	intro.append_array(origin_lines("intro"))
-	intro.append(["Narrator", "Today, the old Elder summons him. Walk to the Elder with the arrow keys and press Enter to speak."])
+	intro.append(["Narrator", "Today, the old Elder summons %s. Walk to the Elder with the arrow keys and press Enter to speak." % Game.gw("him", "her")])
 	say(intro)
+
+## The beginning (cultures.gd): the last morning of the year away, at the hero's own hearth.  The
+## hero stands a few steps from the hearth's keeper, in the keeper's town, with nobody to fight and
+## nowhere else to go until the farewell is said (world.gd: ent_visible, _move).
+func begin_prologue() -> void:
+	var hid := Cultures.own(Game)
+	var hh: Dictionary = Cultures.HEARTHS[hid]
+	Game.prologue = hid
+	var at: Vector2i = Cultures.start_tile(str(hh.keeper_area), str(hh.keeper))
+	world.teleport(at, Data.layer_of(str(hh.keeper_area)))
+	world.leash = at
+	set_stack(["world"])
+	Game.note("Three years earlier: the last morning at %s" % str(hh.n))
+	say(hh.prologue)
+
+## The farewell said: the keepsake is given, and the story goes on three years later at the sect.
+func end_prologue() -> void:
+	var hid := Game.prologue
+	var hh: Dictionary = Cultures.HEARTHS[hid]
+	Game.toast("Keepsake: %s" % str(hh.keepsake))
+	Game.note("Left %s with %s" % [str(hh.n), str(hh.keepsake)])
+	world.leash = Vector2i(-1, -1)
+	say([["Narrator", "Three years later."]], func(): begin_at_sect())
 
 ## The lines the hero's origin (character creation, Fashion.ORIGIN_LINES) adds to a conversation.
 func origin_lines(key: String) -> Array:
@@ -432,13 +476,17 @@ func interact(e: Dictionary) -> void:
 func talk_folk(e: Dictionary) -> void:
 	var fp: Dictionary = e.p
 	var lines := [[str(fp.n), Folk.line(fp, Game)]]
+	# a first word with one of a hearth's people (cultures.gd) is a step towards being its guest
+	var hid := Cultures.of_town(str(fp.town))
+	if hid != "" and not Game.folk_talk.has(str(fp.id)) and Game.prologue == "":
+		Game.add_hearth(hid, Cultures.TALK)
 	Game.folk_talk[str(fp.id)] = int(Game.folk_talk.get(str(fp.id), 0)) + 1
 	world.folk_talking = str(fp.id)
 	# Part XVI: a step's errand with the people of the towns (red paper from the merchants, red envelopes
 	# for the children on New Year's Day, folk.gd ERRANDS)
 	var s := Game.cur_step()
 	var done := false
-	if not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.folk_has(s, str(fp.id)) and Folk.ERRANDS.has(str(s.id)):
+	if not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and Folk.in_town(fp, s) and not Game.folk_has(s, str(fp.id)) and Folk.ERRANDS.has(str(s.id)):
 		var er: Dictionary = Folk.ERRANDS[str(s.id)]
 		Game.folk_mark(s, str(fp.id))
 		Game.stones = maxi(0, Game.stones - int(er.price))
@@ -454,6 +502,15 @@ func talk_folk(e: Dictionary) -> void:
 	)
 
 func talk_npc(e: Dictionary) -> void:
+	# the beginning (cultures.gd): the farewell at the hero's own hearth
+	if Game.prologue != "":
+		if str(e.id) == str(Cultures.HEARTHS[Game.prologue].keeper):
+			say(Cultures.HEARTHS[Game.prologue].farewell, func(): end_prologue())
+		else:
+			say([[str(e.n), "Off today, are you? Go and say your goodbyes, child. Don't keep the road waiting."]])
+		return
+	# the first time the hero sits down with one of a hearth's own people (cultures.gd)
+	Game.sit_with(str(e.id))
 	var s := Game.cur_step()
 	var race: String = str(e.get("race", ""))
 	if race != "":
@@ -479,6 +536,10 @@ func talk_npc(e: Dictionary) -> void:
 				# Part XVI: two boards of peach wood carved with the door gods' names
 				Game.add_item("peach_charm", 2)
 				Game.toast("Obtained %s x2" % Data.ITEMS.peach_charm.n)
+			if sid == "s_p18_zao":
+				# Part XVIII: the ash-pot from Auntie Zhou's shelf, to carry a coal from every hearth
+				Game.add_item("ember_pot", 1)
+				Game.toast("Obtained %s" % Data.ITEMS.ember_pot.n)
 			if sid == "s_p17_goumang":
 				# Part XVII: spring's own whip, from the first willow that ever came into leaf
 				Game.add_item("willow_switch", 1)
@@ -814,7 +875,9 @@ func share_scene(e: Dictionary, sid: String) -> void:
 				# pond", the loom in the hermitage and the naming feast's stage too)
 				Bonds.add(Game, 3, Bonds.share_place(sid))
 				Game.note("With Yue Ling (%s): %s" % [str(Data.STEPS[Data.step_index(sid)].t).split(":")[0], str(o.label)])
-				after = o.get("after", [])
+				after = (o.get("after", []) as Array).duplicate()
+			# (Part XVIII: what happens when the scene is over, whatever was said in it)
+			after.append_array(sh.get("end", []))
 			say(after, func():
 				world.end_use()
 				var s := Game.cur_step()
@@ -834,7 +897,7 @@ func open_wardrobe() -> void:
 		var have: bool = Game.outfits.has(id)
 		var col := Color(str(o.cols[0])) if str(o.cols[0]) != "" else UI.C_GOLD
 		opts.append({"id": id, "label": str(o.n) if have else "? " + str(o.n), "note": "wearing" if id == Game.outfit else ("" if have else "not yet"),
-			"desc": str(o.desc) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.outfit})
+			"desc": told(str(o.desc)) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.outfit})
 	choice.preview = func(id: String): world.preview_outfit(id)
 	choose("The wardrobe: what will you wear?", opts, func(id: String):
 		world.preview_outfit("")
@@ -850,7 +913,7 @@ func open_stable() -> void:
 		var r: Dictionary = Fashion.RIDES[id]
 		var have: bool = Game.rides.has(id)
 		opts.append({"id": id, "label": str(r.n) if have else "? " + str(r.n), "note": ("riding" if Game.riding else "saddled") if id == Game.ride else ("" if have else "not yet"),
-			"desc": str(r.desc) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else "Stood on", int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
+			"desc": told(str(r.desc)) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else "Stood on", int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
 			"col": UI.C_JADE, "enabled": have, "current": id == Game.ride})
 	opts.append({"id": "off", "label": "Go on foot", "desc": "Send the ride away and walk (R mounts again).", "col": UI.C_DIM, "enabled": Game.riding})
 	choose("The stable: what will you ride?", opts, func(id: String):
@@ -874,7 +937,7 @@ func offer_outfits(e: Dictionary) -> void:
 	var opts: Array = []
 	for id in _dyer_stock():
 		var o: Dictionary = Fashion.OUTFITS[id]
-		opts.append({"id": id, "label": "%s (%d stones)" % [o.n, int(o.buy)], "desc": str(o.desc) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
+		opts.append({"id": id, "label": "%s (%d stones)" % [o.n, int(o.buy)], "desc": told(str(o.desc)) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
 			"col": Color(str(o.cols[0])), "enabled": Game.stones >= int(o.buy)})
 	opts.append({"id": "later", "label": "Not today", "desc": "Dyer Su will keep it for you. She says that to everyone.", "col": UI.C_DIM})
 	choose("Dyer Su's stall: something to wear?", opts, func(id: String):
@@ -1055,7 +1118,28 @@ func start_breakthrough() -> void:
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
-	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15"}
+	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16"}
+
+## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
+## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
+## what the hero's hearth says of it, and the film.
+func choose_ending() -> void:
+	var opts: Array = []
+	for id in Cultures.ENDING_ORDER:
+		var en: Dictionary = Cultures.ENDINGS[id]
+		var open := Cultures.ending_open(id, Game)
+		var desc: String = str(en.desc)
+		for n in en.needs:
+			var nt := Cultures.ending_need_text(n, Game)
+			if nt != "":
+				desc += "\n%s %s" % ["+" if Cultures.ending_need_met(n, Game) else "-", nt]
+		opts.append({"id": id, "label": str(en.label), "sub": str(en.sub), "desc": desc, "note": str(en.n) if open else "not earned", "col": Color(en.sky).darkened(0.25), "enabled": open})
+	choose(ENDING_ASK, opts, func(id: String):
+		Game.ending = id if Cultures.ENDINGS.has(id) and Cultures.ending_open(id, Game) else "azure"
+		Game.note("Ending reached: %s" % str(Cultures.ENDINGS[Game.ending].n))
+		say(Cultures.ending_lines(Game), func(): push("ending"))
+	, false)
+const ENDING_ASK := "The sky is held. Where will you keep your own fire?"
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story
@@ -1081,8 +1165,8 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				Game.advance()
 				say(dao_dialogue("post:" + sid), func():
 					if Game.finished:
-						Game.note("Ending reached")
-						push("ending")
+						# the New Fire release: where the hero's own fire is kept is the player's to say
+						choose_ending()
 						return
 					# every tribulation survived wakes a branch of the root (Part XII), and then the
 					# breakthroughs that close a chapter bring Lin Feng home

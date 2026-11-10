@@ -29,6 +29,18 @@ README's references):
 All positions are in Godot space; the head's centre is ``HC``.  ``surface(x, y)`` finds the point
 of the face at a given height and offset, so features sit *on* the sculpted surface instead of
 floating in front of it.
+
+The Hundred Hearths release brings the faces a step back towards life (the README's notes on it):
+
+* a **wider lower jaw**: the V of the jaw tapers far less (``JAW_TAPER``), the corners of the jaw
+  under the ears have a mass of their own (``JAW_CORNER``: the angle of the mandible, a man's squarer
+  than a woman's), and the chin is broader, so the outline of the face from the front runs from the
+  cheekbone down to a jaw nearly as wide before it turns in to the chin, instead of a heart drawn
+  to a point;
+* **smaller, more lifelike eyes** (``EYE_K``, and ``eyes``): about a fifth of the face's width each
+  and one eye's width apart, as in life; an almond opening well under half as tall as it is wide; a
+  *round* iris whose top the upper lid covers, a pupil in proportion, one small highlight; a thin
+  upper lash line instead of the heavy wing, and eyebrows brought down to sit over the socket.
 """
 
 import math
@@ -45,12 +57,17 @@ LOW = 0.88   # the lower half of the head (centre to chin) against the upper: a 
 RZF = 0.1    # half depth, front
 RZB = 0.112  # half depth, back
 EYE_Y = -0.012   # eye line, relative to HC: a little below the middle of the head
-EYE_X = 0.043    # half the distance between the eyes' centres: set wide
+EYE_X = 0.0365   # half the distance between the eyes' centres: one eye's width between them, as in life
 NOSE_Y = -0.05
 MOUTH_Y = -0.078
 CHIN_Y = -RY * LOW
 # every eye's size against what its script asks for (Face.eye_r)
-EYE_K = 0.9
+EYE_K = 0.8
+# the lower jaw (Face.skull): how much the face narrows from the cheeks to the chin, and how far the
+# corners of the jaw (the angle of the mandible, below and in front of the ears) stand out
+JAW_TAPER = 0.22
+JAW_CORNER = 0.085
+JAW_CORNER_F = 0.06
 # full cheeks (Face.cheeks): how far forward, where (either side of the nose, below the eyes)
 CHEEK = 0.017
 CHEEK_M = 0.013
@@ -96,7 +113,9 @@ class Face:
         self.skin = rgb(o.get("skin", "f5d6c2"))
         # (every eye a tenth smaller than its script asks for, since the Spring Thunder release: with
         # the bigger head and the chin's mass, the eyes the faces were first drawn with crowded them)
-        self.eye_r = o.get("eye_size", 1.3 if self.fem else 1.16) * EYE_K
+        # (and since the Hundred Hearths release the scripts' sizes are drawn together as well: the
+        # biggest eyes of the cast are a quarter wider than the smallest, not half as wide again)
+        self.eye_r = (1.0 + 0.45 * (o.get("eye_size", 1.3 if self.fem else 1.16) - 1.0)) * EYE_K / 0.9 * 0.98
         if "eye_size" not in o:
             self.eye_r *= 1.0 - 0.14 * self.age   # eyes look smaller as lids and brows sag
         # an elder's face keeps more of its bones: less of the anime softness
@@ -120,8 +139,11 @@ class Face:
         p.x *= 1.0 + 0.035 * soft * bump(-y, 0.18, 0.2) * smooth(-0.1, 0.5, z)
         # jaw: a soft V, the lower face tapering to a small chin (the young and the women more)
         jt = smooth(0.3, 1.0, low) ** 1.25
-        taper = 0.36 - 0.24 * (self.jaw - 1.0) + 0.06 * soft
+        taper = JAW_TAPER - 0.24 * (self.jaw - 1.0) + 0.04 * soft
         p.x *= 1.0 - taper * jt
+        # the corners of the jaw: the lower face keeps its width down to the angle of the mandible,
+        # two thirds of the way from the eyes to the chin, and only then turns in
+        p.x *= 1.0 + (JAW_CORNER_F if self.fem else JAW_CORNER) * (0.6 + 0.4 * self.jaw) * bump(low, 0.6, 0.3) * smooth(-0.55, 0.15, z)
         # back of the lower skull curves in to the neck
         if z < 0:
             p.z *= 1.0 - 0.55 * smooth(0.15, 0.95, low) * smooth(0.0, 0.6, -z)
@@ -148,7 +170,7 @@ class Face:
             # soft cheeks in the young, hollows under the cheekbone in the old
             off += (0.005 * (1.0 - self.age) - 0.006 * self.age) * blob3(q, (0.052 * s, -0.056, 0.07), (0.024, 0.022, 0.03))
             # eye sockets: shallow (anime eyes are not deep-set)
-            off -= (0.003 + 0.004 * (1.0 - soft)) * blob3(q, (EYE_X * s, self.eye_y + 0.004, 0.092), (0.022, 0.017, 0.03))
+            off -= (0.003 + 0.004 * (1.0 - soft)) * blob3(q, (EYE_X * s, self.eye_y + 0.003, 0.092), (0.02, 0.013, 0.03))
             # temples
             off -= 0.004 * blob3(q, (0.085 * s, 0.03, 0.04), (0.02, 0.03, 0.03))
         # brow ridge and forehead
@@ -209,7 +231,7 @@ class Face:
         # the lower face a little fuller from below the nose to the chin, all the way round the jaw (so
         # its lines run straight into the chin), and the chin a small rounded tip, not a point (a
         # man's broader)
-        q.x *= 1.0 + (0.2 if fem else 0.3) * jw * smooth(-0.06, -0.118, b.y) * smooth(-0.06, 0.0, p.z)
+        q.x *= 1.0 + (0.3 if fem else 0.42) * jw * smooth(-0.06, -0.118, b.y) * smooth(-0.06, 0.0, p.z)
         # the slight hollow between the lower lip and the chin
         q.z -= 0.001 * blob3(q, (0.0, MOUTH_Y - 0.013, 0.07), (0.017, 0.0055, 0.02))
         return q
@@ -293,9 +315,9 @@ class Face:
         blush = 0.0
         for s in (1, -1):
             blush += blob3(p, (0.056 * s, -0.04, 0.08), (0.022, 0.014, 0.03))
-            lid = blob3(p, (EYE_X * s, self.eye_y + 0.02, 0.09), (0.024, 0.01, 0.03))
+            lid = blob3(p, (EYE_X * s, self.eye_y + 0.013, 0.09), (0.021, 0.007, 0.03))
             c = mix(c, mix(sk, "c88a80", 0.55), lid * 0.35)
-            under = blob3(p, (EYE_X * s, self.eye_y - 0.022, 0.09), (0.02, 0.006, 0.03))
+            under = blob3(p, (EYE_X * s, self.eye_y - 0.014, 0.09), (0.018, 0.005, 0.03))
             c = mix(c, darken(sk, 0.12), under * (0.25 + 0.35 * self.age))
         c = mix(c, "f39a94", min(1.0, blush) * (0.42 if self.fem else 0.22))
         c = mix(c, mix(sk, "e8a090", 0.4), blob3(p, (0.0, NOSE_Y, 0.11), (0.012, 0.012, 0.03)) * 0.5)
@@ -400,8 +422,10 @@ def eyes(b, f, o, eye_bone, bone):
     hair = rgb(o.get("hair", "1a1a2a"))
     brow_col = rgb(o.get("brow_col", darken(hair, 0.15) if sum(hair) < 2.2 else mix(hair, "8a8070", 0.35)))
     k = f.eye_r
-    # a woman's eye nearly as tall as it is wide, a man's a little over half as tall
-    ew, eh = 0.0222 * k, (0.019 if f.fem else 0.0162) * k
+    # an almond opening well under half as tall as it is wide (a woman's a little more open)
+    ew, eh = 0.0222 * k, (0.0128 if f.fem else 0.0116) * k
+    # everything drawn round the eye (lids, lashes, the depth of the ball) is in proportion to it
+    u_ = ew / 0.026
     glow = o.get("glow_eyes", False)
     slit = o.get("slit_eyes", False)
     stern = o.get("stern", False)
@@ -418,30 +442,30 @@ def eyes(b, f, o, eye_bone, bone):
             return c + R @ Vector((u, v, w))
 
         # the white: the shadow of the upper lid falls across its top
-        b.ellipsoid(c, (ew, eh, 0.0065), "d8dcec", cls=SKIN, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=10, mat=MAT_PLAIN, col2="fbfbff")
+        b.ellipsoid(c, (ew, eh, 0.0065 * u_), "d0d4e2", cls=SKIN, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=10, mat=MAT_PLAIN, col2="fbfbff")
         # iris: tall, a darker rim, dark under the lid and bright at the bottom
-        ir = eh * 0.98
-        icen = at(0.0, eh * 0.02, 0.0056)
-        b.ellipsoid(icen, (ir * 0.74, ir, 0.0022), darken(iris, 0.66), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=8, mat=MAT_PLAIN)
-        b.ellipsoid(icen + R @ Vector((0, -ir * 0.04, 0.0006)), (ir * 0.64, ir * 0.88, 0.0022), darken(iris, 0.42), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=8,
+        # (round, as an iris is: the upper lid covers its top, and the white shows on both sides of it)
+        ir = eh * 0.97
+        icen = at(0.0, eh * 0.03, 0.0056 * u_)
+        b.ellipsoid(icen, (ir * 0.98, ir, 0.0022), darken(iris, 0.66), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=8, mat=MAT_PLAIN)
+        b.ellipsoid(icen + R @ Vector((0, -ir * 0.04, 0.0006)), (ir * 0.86, ir * 0.88, 0.0022), darken(iris, 0.42), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=8,
                     mat=MAT_GLOW if glow else MAT_PLAIN, col2=lighten(iris, 0.2))
         # the bright crescent at the bottom of the iris, and a ring of lighter colour inside the rim
-        b.ellipsoid(icen + R @ Vector((0, -ir * 0.46, 0.0012)), (ir * 0.48, ir * 0.3, 0.0016), lighten(iris, 0.5), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=14, rings=6, mat=MAT_PLAIN)
+        b.ellipsoid(icen + R @ Vector((0, -ir * 0.46, 0.0012)), (ir * 0.6, ir * 0.3, 0.0016), lighten(iris, 0.35), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=14, rings=6, mat=MAT_PLAIN)
         # pupil: small, of the iris's own deepest colour
         if slit:
-            b.ellipsoid(icen + R @ Vector((0, 0, 0.0016)), (ir * 0.14, ir * 0.72, 0.0016), "0c0810", cls=SKIN, bone=eye_bone, rot=(0, yaw, 0), seg=10, rings=6, mat=MAT_PLAIN)
+            b.ellipsoid(icen + R @ Vector((0, 0, 0.0016)), (ir * 0.16, ir * 0.72, 0.0016), "0c0810", cls=SKIN, bone=eye_bone, rot=(0, yaw, 0), seg=10, rings=6, mat=MAT_PLAIN)
         else:
-            b.ellipsoid(icen + R @ Vector((0, ir * 0.06, 0.0016)), (ir * 0.27, ir * 0.36, 0.0016), mix(darken(iris, 0.85), "0c0812", 0.5), cls=SKIN, bone=eye_bone, rot=(0, yaw, 0), seg=12, rings=6, mat=MAT_PLAIN)
-        # highlights: a large one towards the light (up and out), a small one low on the other side
-        b.ellipsoid(icen + R @ Vector((ir * 0.3 * s, ir * 0.36, 0.0025)), (ir * 0.24, ir * 0.27, 0.0012), "ffffff", cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=10, rings=5, mat=MAT_GLOW)
-        b.ellipsoid(icen + R @ Vector((-ir * 0.26 * s, -ir * 0.44, 0.0025)), (ir * 0.1, ir * 0.08, 0.001), "ffffff", cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=6, rings=4, mat=MAT_GLOW)
+            b.ellipsoid(icen + R @ Vector((0, ir * 0.06, 0.0016)), (ir * 0.38, ir * 0.38, 0.0016), mix(darken(iris, 0.85), "0c0812", 0.7), cls=SKIN, bone=eye_bone, rot=(0, yaw, 0), seg=12, rings=6, mat=MAT_PLAIN)
+        # one small highlight towards the light (up and out): the window in a living eye
+        b.ellipsoid(icen + R @ Vector((ir * 0.34 * s, ir * 0.3, 0.0025)), (ir * 0.17, ir * 0.17, 0.0012), "ffffff", cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=8, rings=4, mat=MAT_GLOW)
         # upper lid: a skin shell over the top of the eyeball
         lid = []
         for i in range(9):
             t = i / 8
             a = math.pi * (1.0 - t)
-            lid.append(at(math.cos(a) * ew * 1.04, math.sin(a) * eh * 0.5 + eh * 0.56, 0.0045 + 0.002 * math.sin(a)))
-        b.tube(lid, [0.0024, 0.003, 0.0034, 0.0036, 0.0036, 0.0036, 0.0034, 0.003, 0.0024], f.skin, cls=SKIN, bone=eye_bone, seg=6, flat=0.6, up=(0, 0, 1), mat=MAT_PLAIN)
+            lid.append(at(math.cos(a) * ew * 1.04, math.sin(a) * eh * 0.5 + eh * 0.56, (0.0045 + 0.002 * math.sin(a)) * u_))
+        b.tube(lid, [r * u_ for r in (0.0024, 0.003, 0.0034, 0.0036, 0.0036, 0.0036, 0.0034, 0.003, 0.0024)], f.skin, cls=SKIN, bone=eye_bone, seg=6, flat=0.6, up=(0, 0, 1), mat=MAT_PLAIN)
         # upper lash line: heavy and dark, lifting to a flick past the outer corner
         ul = []
         rad = []
@@ -450,32 +474,34 @@ def eyes(b, f, o, eye_bone, bone):
             u = (t - 0.5) * 2.0          # -1 inner .. +1 outer (mirrored by s)
             x = u * ew * 1.08 * s
             y = eh * (0.78 - 0.36 * u * u) + eh * 0.16 * u
-            ul.append(at(x, y, 0.0066 - 0.002 * u * u))
-            rad.append(0.0014 + 0.0019 * math.sin(math.pi * clamp(t * 0.85 + 0.12)) + (0.0012 * smooth(0.6, 1.0, t) if f.fem else 0.0004 * smooth(0.6, 1.0, t)))
-        flick = 0.0075 if f.fem else 0.004
-        ul.append(at(ew * 1.3 * s, eh * 0.34 + flick * 0.55, 0.0042))
-        rad.append(0.0008)
+            ul.append(at(x, y, (0.0066 - 0.002 * u * u) * u_))
+            # (a line, not a wing: thin at the inner corner, a little heavier over the outer half)
+            rad.append((0.0009 + 0.0009 * math.sin(math.pi * clamp(t * 0.85 + 0.12)) + (0.0005 * smooth(0.6, 1.0, t) if f.fem else 0.0001 * smooth(0.6, 1.0, t))) * u_)
+        flick = (0.0032 if f.fem else 0.0012) * u_
+        ul.append(at(ew * 1.2 * s, eh * 0.3 + flick * 0.55, 0.0042 * u_))
+        rad.append(0.0005 * u_)
         b.tube(ul, rad, lash, cls=HAIR, bone=eye_bone, seg=6, flat=0.62, up=(0, 0, 1), mat=MAT_PLAIN)
         if f.fem:
             # two lashes off the outer corner
-            for j, (u0, ln) in enumerate(((0.62, 0.006), (0.86, 0.008))):
-                root = at(u0 * ew * s, eh * (0.78 - 0.36 * u0 * u0) + eh * 0.16 * u0 + 0.001, 0.0062)
-                b.tube([root, root + R @ Vector((ln * 0.7 * s, ln * 0.55, 0.0)), root + R @ Vector((ln * 1.1 * s, ln * 0.8, -0.001))], [0.0011, 0.0007, 0.0002], lash, cls=HAIR, bone=eye_bone, seg=4, mat=MAT_PLAIN)
+            for j, (u0, ln) in enumerate(((0.62, 0.0026 * u_), (0.86, 0.0036 * u_))):
+                root = at(u0 * ew * s, eh * (0.78 - 0.36 * u0 * u0) + eh * 0.16 * u0 + 0.0006, 0.0062 * u_)
+                b.tube([root, root + R @ Vector((ln * 0.7 * s, ln * 0.55, 0.0)), root + R @ Vector((ln * 1.1 * s, ln * 0.8, -0.001))], [0.0007 * u_, 0.0005 * u_, 0.0002], lash, cls=HAIR, bone=eye_bone, seg=4, mat=MAT_PLAIN)
         # lower lash line: fine, on the outer half only
-        ll = [at(((i / 6) * 0.62 + 0.36) * ew * s, -eh * (0.76 - 0.3 * ((i / 6) - 0.2) ** 2), 0.0055) for i in range(7)]
-        b.tube(ll, [0.0003, 0.0005, 0.0006, 0.0007, 0.0007, 0.0008, 0.0003], mix(lash, f.skin, 0.4), cls=HAIR, bone=eye_bone, seg=5, mat=MAT_PLAIN)
+        ll = [at(((i / 6) * 0.62 + 0.36) * ew * s, -eh * (0.76 - 0.3 * ((i / 6) - 0.2) ** 2), 0.0055 * u_) for i in range(7)]
+        b.tube(ll, [0.0003, 0.0004, 0.0005, 0.0005, 0.0005, 0.0005, 0.0003], mix(lash, f.skin, 0.55), cls=HAIR, bone=eye_bone, seg=5, mat=MAT_PLAIN)
         # lid crease
-        cr = [at(((i / 5) * 1.2 - 0.3) * ew * s, eh * (1.22 - 0.2 * ((i / 5) - 0.45) ** 2), 0.004) for i in range(6)]
+        cr = [at(((i / 5) * 1.2 - 0.3) * ew * s, eh * (1.3 - 0.2 * ((i / 5) - 0.45) ** 2), 0.004 * u_) for i in range(6)]
         b.tube(cr, [0.0002, 0.0003, 0.0004, 0.0004, 0.0003, 0.0002], darken(f.skin, 0.2), cls=SKIN, bone=bone, seg=5, mat=MAT_PLAIN)
         # eyebrow: thin, long and high, tapering to a fine tail; lower and angled down for stern faces
         bp = []
         for i in range(7):
             t = i / 6
-            x = (EYE_X - 0.022 + t * 0.054) * s
-            y = f.eye_y + (0.038 if f.fem else 0.033) + 0.007 * math.sin(math.pi * t) - (0.007 * (1.0 - t) if stern else 0.0) - 0.004 * t
+            x = (EYE_X - 0.02 + t * 0.047) * s
+            # (over the socket, an eye's height above the lid: nearer a man's eye than a woman's)
+            y = f.eye_y + (0.0265 if f.fem else 0.0225) + 0.005 * math.sin(math.pi * t) - (0.007 * (1.0 - t) if stern else 0.0) - 0.004 * t
             sp2 = f.surface(x, y)
             bp.append(HC + sp2 + f.normal(x, y) * 0.0018)
-        b.tube(bp, [0.0018, 0.0021, 0.002, 0.0018, 0.0015, 0.001, 0.0005], brow_col, cls=HAIR, bone=bone, seg=6, flat=0.45, up=(0, 0, 1), mat=MAT_PLAIN)
+        b.tube(bp, [r * (1.0 if f.fem else 1.35) for r in (0.0019, 0.0024, 0.0023, 0.002, 0.0016, 0.0011, 0.0005)], brow_col, cls=HAIR, bone=bone, seg=6, flat=0.45, up=(0, 0, 1), mat=MAT_PLAIN)
 
 
 def wrinkles(b, f, bone):

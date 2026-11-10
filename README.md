@@ -1,22 +1,88 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng (or whoever you make him: name, look, colours and where he came from), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Myriad Things Awake, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 218 bosses, twenty-two Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns lived in by **219 townsfolk with days of their own**, things in the streets that really break, and 86 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, decide the fates of **five people** met on the road, and walk the whole way with **Yue Ling**, who has a story of her own now. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
+Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Fire Passed On, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 220 bosses, twenty-three Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns lived in by **219 townsfolk with days of their own**, things in the streets that really break, and 86 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (five ways), and walk the whole way with **Yue Ling**, who has a story of her own. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
 
-> **Total gameplay duration: about 20 hours 31 minutes** (20:31:21 of game time for the end-to-end bot run, seed 1234), **1 hour 3 minutes more than the last release** (19:28:20). **The cast is re-sculpted after the 3D anime characters of gacha games.** Every face has big eyes set low and wide with tall, layered irises and heavy upper lashes, a hint of a nose, a small mouth, full cheeks that swell in three-quarter view and a chin with mass of its own, on a shorter neck, and is shaded from a smooth shape, so the cel shading falls across it as one clean form; hair has a ring of light even when it is black; men are built as a V and women with a high waist, a bust, hips and a seat, and robes fall from the hips; hair, capes, sleeves and robe panels swing on spring bones. **The sword reaches the land**: F at a tree at the forest's edge cuts it through, and it falls about its stump and breaks into logs that roll down the slope; rocks shatter, the grass is mown and grows back, water splashes, and a pack of monsters struck first is thrown off its feet and fights the battle reeling; **G** throws the sword qi, a crescent that does all of that seven tiles ahead. **Part XVII, "The Spring Thunder", plays in about 1 hour 3 minutes**: spring will not come after the longest winter, so Lin Feng carries it with his sword: the Spring Ox whipped, the land cleared of what the winter left in the way, the Maiden of Frost, the dragon's head day, the first thunder struck on Lei Gong's new drums, the five poisons, Taisui under the soil, Qingming, kites, and a child of the thunder; a new realm, **Myriad Things Awake**, and a new way through trials, **By the land**. Bugs were found and fixed.
+> **Total gameplay duration: about 21 hours 43 minutes** (21:42:46 of game time for the end-to-end bot run, seed 1234), **1 hour 11 minutes more than the last release** (20:31:21). **The faces are re-sculpted towards life**: a wider lower jaw (the face keeps its width down to the corners of the jaw before it turns in to a broader chin), and smaller, more lifelike eyes (an almond opening, a round iris the upper lid covers, one small highlight, a thin lash line, brows over the socket); women's chests are fuller. **The land has six cultures**: the Rice Hearth of the valley, the Felt Hearth of the horse-folk, the Sweet-Well Hearth of the sand roads, the Boat Hearth of the river, the Casting Hearth of the bronze-founders and the Lantern Hearth of the Dawn Market, each with its own greeting, table, festival, fire, dress, names and a thing nobody does; you earn a place at each. **The hero can be a young man or a young woman** (four looks on each frame, and the whole story told of either). **Six beginnings**: the story opens three years early, on the last morning of the year away, at the hearth you chose. **Five endings**: when the sky is held you choose where to keep your own fire, among the ends your journey earned. **Part XVIII, "The New Fire", plays in about 1 hour 1 minute**: the fire of the whole land is tired and must be changed, and no hearth will let its own go out, so a coal is begged from each, in each one's way, Suiren's fire-drill is asked of the Lord of the Southern Fire, and six fires are made one; a new realm, **Fire Passed On**, and a new way through trials, **By the hearths**. Bugs were found and fixed.
 
 | | |
 |---|---|
-| ![the anime re-sculpt up close: Yue Ling, Lin Feng, Chang'e and Hu Qingyi, with big eyes set low and wide, tall layered irises, heavy upper lashes, a hint of a nose, a small mouth and a chin with mass of its own](docs/screenshots/anime_faces.png) | ![the face before and after the last pass: a chin with mass of its own, full cheeks that swell under the eye in three-quarter view, a shorter neck and eyes a tenth smaller](docs/screenshots/anime_before_after.png) |
-| ![the cast in a row: Yue Ling, Lin Feng, Chang'e, the Elder, Ah Mei, Hu Qingyi, Granny Wen, Little Hua and Gou Mang](docs/screenshots/anime_cast.png) | ![Yue Ling from every side: the high waist where her sash is tied, the robe falling from the hips](docs/screenshots/turnaround_yue_ling.png) |
-| ![F at the forest's edge: the tree is cut through at the foot, falls about its stump and breaks into logs that roll](docs/screenshots/sword_fell_sheet.png) | ![G: the sword qi flies seven tiles over the Cloud-Tea Terraces, the grass in its way cut and its clippings flying, a rock in its path shattered](docs/screenshots/sword_qi.png) |
-| ![a pack struck first in the snows of Frostpeak is thrown back off its feet...](docs/screenshots/sword_first_strike.png) | ![...and the battle opens with it reeling: every foe a fifth down, the party first](docs/screenshots/sword_first_strike_battle.png) |
-| ![Part XVII: the Spring Ox of Qingshi, whipped with Gou Mang's willow switch until it breaks](docs/screenshots/part17_spring_ox_broken.png) | ![Gou Mang, Lord of Spring, and Lei Gong, Duke of Thunder](docs/screenshots/part17_gods.png) |
-| ![Qing Nu, the Maiden of Frost, who will not take her frost home](docs/screenshots/battle_boss_qing_nu.png) | ![Taisui, Lord of the Year Under the Earth, every blow of the spring fallen on his head](docs/screenshots/battle_boss_taisui.png) |
+| ![the faces before (above) and after (below) this release: the lower jaw wider down to its corners and the chin broader, the eyes smaller with a round iris the lid covers, one highlight and a thin lash line](docs/screenshots/sculpt_before_after.png) | ![the cast after the re-sculpt: Yue Ling, Lin Feng as a young woman and as a young man, Chang'e, the Elder, Ah Mei, Granny Wen, Grandmother Sarnai of the horse-folk and Zhurong, Lord of the Southern Fire](docs/screenshots/sculpt_cast.png) |
+| ![the hero as a young woman from every side: the same robe, sword and clips on a woman's frame](docs/screenshots/turnaround_lin_feng_f.png) | ![the four looks on a woman's frame and on a man's](docs/screenshots/hero_women_and_men.png) |
+| ![character creation: a young woman, the Wanderer, the old hunter's apprentice, kin of the Felt Hearth, and where the story will begin](docs/screenshots/create_hearth.png) | ![the Hearths page: six cultures of the land, how each greets, eats and keeps its fire, what nobody does there, and whether they call you a stranger, a guest or kin](docs/screenshots/hearths_page.png) |
+| ![one of six beginnings: three years ago, the last morning in the tents of the horse-folk below Thunder Valley](docs/screenshots/prologue_steppe.png) | ![the farewell at the Felt Hearth: Grandmother Sarnai, who keeps the fire for the people who fly](docs/screenshots/prologue_steppe_farewell.png) |
+| ![the people and the dress of the hearths: Grandmother Sarnai and Batu, a herder woman and man, a woman of the oasis, a boat-wife, a founder and a lantern-maker's girl](docs/screenshots/hearth_people.png) | ![Part XVIII: clinker, the crust a tired fire leaves, on the mouth of a casting pit at Tushan](docs/screenshots/part18_clinker.png) |
+| ![Zhurong, Lord of the Southern Fire, who keeps Suiren's fire-drill and will not bless six hearths that would not empty](docs/screenshots/battle_boss_zhurong.png) | ![Huilu, the fire nobody sat up with: six bonfires in one skin](docs/screenshots/battle_boss_huilu.png) |
+| ![the sky is held: where will you keep your own fire? Five ends, the ones the journey earned open](docs/screenshots/ending_choice.png) | ![one of five endings: the Road of Six Fires, and the hero's own fire on the lotus](docs/screenshots/ending_road.png) |
 
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph SC[Faces towards life: art/lib]
+    JW[a wider lower jaw:<br/>less taper, the corners of the jaw,<br/>a broader chin] --> ALL[all 203 characters<br/>rebuilt from their scripts]
+    EY[smaller, lifelike eyes:<br/>almond opening, round iris under the lid,<br/>one highlight, a thin lash line] --> ALL
+    BU[a fuller chest for women] --> ALL
+    end
+    subgraph HR[Six hearths: cultures.gd]
+    SIX[Rice, Felt, Sweet-Well,<br/>Boat, Casting, Lantern] --> WAYS[each: a greeting, a table, a festival,<br/>a fire, a thing nobody does]
+    SIX --> FOLK[towns: their dress, names,<br/>hails and things to say]
+    SIX --> ST[standing: stranger, guest, kin<br/>a first word, a seat, a deed]
+    ST --> GIFT[each hearth's gift<br/>to its guests]
+    end
+    subgraph WHO[Who the sweeper is: fashion.gd, voice.gd]
+    MF[a young man or a young woman:<br/>four looks on each frame] --> TOLD[the whole story told of either:<br/>whose 'he' is whose, clause by clause]
+    HE[the hearth of the year away] --> BEG[six beginnings: the last morning<br/>at that hearth, three years early]
+    end
+    subgraph P18[Part XVIII: the New Fire]
+    TIRED[the fire of the land is tired] --> COALS[a coal from each hearth,<br/>begged in each one's way]
+    COALS --> ZR{Zhurong, Lord of the<br/>Southern Fire: a trial} --> DRILL[six coals drilled<br/>into one fire at Cloudfoot]
+    DRILL --> HL{Huilu, the fire nobody<br/>sat up with: a trial} --> HOME[the new fire carried home<br/>to all six] --> FP((Fire<br/>Passed On))
+    end
+    ST -.->|By the hearths: a new<br/>way through trials| ZR
+    ST -.->|By the hearths| HL
+    ST --> END[five endings: where the hero's<br/>own fire is kept, among<br/>the ends the journey earned]
+    BEG --> GAME((Game))
+    SC --> GAME
+    HR --> GAME
+    P18 --> GAME
+    END --> GAME
+    GAME --> BOT[bot: 21:42:46,<br/>CI needs 16 h]
+```
+
+- **Faces re-sculpted towards life** (`art/lib/face.py`, `garment.py`; all 203 characters rebuilt from their scripts, see the before and after above).
+  - **A wider lower jaw.** The V of the jaw tapers far less (`JAW_TAPER`, 0.36 of the face's width before, 0.22 now), the corners of the jaw under the ears have a mass of their own (`JAW_CORNER`: the angle of the mandible, two thirds of the way from the eyes to the chin, a man's squarer than a woman's), and the chin is half as broad again. From the front the face now keeps its width from the cheekbone down to the jaw and only then turns in to the chin, instead of a heart drawn to a point.
+  - **Smaller, more lifelike eyes** (`EYE_K`, `eyes`). Each eye is about a fifth of the face's width and they stand one eye's width apart, as in life (`EYE_X`); the opening is an almond well under half as tall as it is wide (it was nearly round on women); the iris is **round** and its top goes under the upper lid, with white showing on both sides; the pupil is in proportion; there is one small highlight where there were two large ones; the heavy winged lash is a thin line a little heavier over the outer half; the brows come down to sit over the socket; and the biggest eyes of the cast are a quarter wider than the smallest where they were half as wide again. Everything drawn round the eye (lids, lashes, the depth of the ball) scales with it.
+  - **Women's chests are fuller** (`BUST` in `garment.py`: 5 cm before, 8.2 cm now, a little lower, with a rounder underside and less of the robe stretched flat between), so the figure reads as a woman's from the front and in three-quarter view as well as in profile.
+- **Six cultures: the hearths of the land** (`scripts/cultures.gd`, new). The realms above and below had their peoples since Part XI; the towns of the land were all one people until now. They are six, each with a home, a keeper, a way of greeting, a table, a festival, a way of keeping fire, a custom and a thing nobody does:
+
+  | Hearth | People and home | They ask | Table | Their fire | Nobody ever |
+  |---|---|---|---|---|---|
+  | **Rice** | the Valley Folk: Qingshi, Cloudfoot, the sect's kitchens | "Have you eaten?" | gruel, pickled mustard, a salted duck egg; green tea | a brick stove under the Stove God's picture, banked every night | stands chopsticks upright in the rice |
+  | **Felt** | the Horse-Folk: the tents below Thunder Valley | "Are your horses fat?" | mutton off the knife, dried curds; salted milk tea | three stones in the middle of the tent, fed with dried dung; the youngest keeps it | steps on the threshold, or points feet at the fire |
+  | **Sweet-Well** | the Sand-Road Folk: Shazhou Oasis | "Peace on your road." | flatbread from the oven wall, torn, never cut; water before words | a clay oven lit once, fed one stick by every caravan | asks a traveller where they are going before they have drunk |
+  | **Boat** | the River Folk: Longmen Ferry | "Smooth water." | river fish steamed whole; warm yellow wine | a charcoal pot in the stern, carried aboard from the mother's boat | turns the fish over, or says the word |
+  | **Casting** | the Bronze-Founders: Tushan | "May your metal run clean." | millet cakes baked on the furnace lid; barley tea | the casting pit, never cold since Yu the Great | whistles at the furnace |
+  | **Lantern** | the Dawn-Market Folk: Yanggu | "First light to you." | sesame cakes before sunrise; tea still dark in the cup | the shrine lamp, a taper handed on at every dusk | blows a lamp out with their breath |
+
+  - **In the towns** (`folk.gd`): each hearth's people wear its dress (six new crowd models and three new hats, `art/characters/folk_*.py`, `garment.py`: the felt hat with a fur brim, the wound headcloth of the sand roads, the river women's headcloth, a founder's apron and sweat-cloth, a lantern girl's persimmon jacket), the people of Shazhou have the sand roads' names, every other grown townsperson hails in their own hearth's way as you pass, and the first thing anybody says to a stranger is one of their hearth's own lines.
+  - **Standing** (Esc > **Hearths**, new): a first word with each of a hearth's townsfolk, sitting down with one of its named people for the first time, and what the story does for it make you a **guest** and then **kin**; the region's banner says whose country you are in and what they call you there. Every hearth has a gift for its guests (healing, speed, spirit stones, harm taken, attack, cultivation from battle; kin have half as much again).
+  - **By the hearths**: a new way through trials, for the hearths that call you a guest.
+- **The hero can be a young man or a young woman** (`fashion.gd`, `create.gd`, and `scripts/voice.gd`, new).
+  - Character creation has a new row, **Who**; the four looks are built on a woman's frame as well (`art/characters/lin_feng_f*.py`: the same rig, robe, sword and all 21 + interaction + riding clips), and every outfit, ride, battle, cutscene and the ending draw her.
+  - **The whole story is told of her.** Its ten thousand lines were written about a "he" and are left as they were; when the hero is a woman they are changed on the way to the screen, like the name the player chose. Most of the story says "you" and needs nothing. Narration is read a clause at a time: the first person named in a clause is the one spoken of (the hero, or another man, whose "his" stays his: "He Bo gives Lin Feng the tablet of his office"), a woman's name takes no "he" away from her, a name that only owns something names nobody, and a "him" in the clause she is the subject of is somebody else. What people say aloud is addressed to her, so only what they call her changes (Senior Sister, "sect girl", "our daughter"). Where the rule would be wrong the line is written out by hand. A test reads every conversation in the game through it.
+- **Six beginnings.** At twelve every child of Qingshi is sent away for a year to eat at somebody else's hearth; character creation's other new row, **Hearth**, is where your year was spent. It gives a keepsake, a small gift and a small burden of its own, kinship with that people from the first day, and the start of the game: the story now opens **three years before the Elder's summons, on the last morning at that hearth**, in its own town (Qingshi, the tents below Thunder Valley, Shazhou, Longmen, Tushan or Yanggu), with its own keeper to say goodbye to in that hearth's own manner, nothing prowling, and nowhere else to go until the goodbye is said. Then: "Three years later."
+- **Five endings** (`Cultures.ENDINGS`, `ending.gd`). When the last tribulation is passed the player chooses where the hero's own fire is to be kept, among the ends the journey earned: **the Azure Cloud** (stay, always open), **the Fire at Home** (go home to your own hearth, always open), **the Road of Six Fires** (five hearths call you a guest), **the Open Door** (four hearths and four peoples of the realms), **the Lotus Hearth** (you and Yue Ling are kindred spirits). Each has its own last words, then your own hearth's, its own title on the results, its own light over the film, and the hero's fire burns on the lotus between the two of them.
+- **Part XVIII, "The New Fire"** adds about 1 hour 1 minute (see [below](#part-xviii-the-new-fire)), verified by the playthrough bot; CI still requires **16 hours**. A new realm, **Fire Passed On**, two lords guarded by trials, nine new foes, two new kinds of obstacle for the sword, and Suiren's fire-drill.
+- **The bot** says its goodbye at the hero's hearth as a player would, plays the chapter's errands among each hearth's own people, takes Zhurong with a drill of summer wood from the smith and Huilu by the hearths, and chooses an end. `--hero=f`, `--hearth=<id>` and `--ending=<id>` play the other heroes, beginnings and ends.
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+- **Code**: the game's GDScript grew from 49,528 to 51,693 lines (`scripts/cultures.gd` and `scripts/voice.gd` are new) and the Blender Python from 22,445 to 22,711 lines; all 271 assets (203 people, 41 monsters, a mount and 26 props) rebuild from their scripts: thirteen new people (the hero's four looks as a young woman, Grandmother Sarnai and Batu, Zhurong, and six crowd models in the dress of the hearths). The tests grew from 2,338 to 2,564 lines (24,767 checks). The captures at the top of this page and the turnarounds of Lin Feng and Yue Ling are from this release; the older galleries further down in [`docs/screenshots`](docs/screenshots) were taken before the faces were re-sculpted.
+
+**What the hearths are made from.** None of the six is one living people. Each is put together from old customs of the lands the story's myths come from: *zuan sui gai huo*, the changing of the fire with the seasons recorded in the Zhou li and the Analects (elm and willow in spring, jujube and apricot in summer, mulberry at the turn, oak in autumn, sophora in winter), and the cold food that went with it; "have you eaten?" as a greeting, and chopsticks never stood in the rice; the boat-dwelling families of the southern rivers, the fire that goes aboard with the bride and the fish that is never turned over; the hearth-ring of the felt tent, the threshold not stepped on, the bowl taken with the right hand and the youngest son as keeper of the fire; bread torn and never cut, and water before words, along the oasis roads; and "the firewood burns out, the fire is passed on" from the Zhuangzi, which gives the new realm its name. Suiren, Zhurong and Huilu are the Fire-Driller, the Fire Regulator and the fire that visits uninvited of the old books.
+
+### Previous release: anime faces and bodies, the sword's wake and Part XVII
 
 ```mermaid
 flowchart LR
@@ -90,7 +156,7 @@ The anime look was researched from published material on gacha-game characters (
 - **Physics**: a felled tree falls as a rod pivoting on its base (the physical pendulum, I = mL^2/3), integrated once per tree; Godot's rigid bodies and height-field shapes for the pieces.
 - **Part XVII**: [Lichun](https://en.wikipedia.org/wiki/Lichun) and the whipping of the Spring Ox; [Gou Mang](https://en.wikipedia.org/wiki/Goumang), god of spring and wood; [Jingzhe](https://en.wikipedia.org/wiki/Jingzhe), the Waking of Insects, and the beating of the petty people under bridges ([Da Siu Yan](https://en.wikipedia.org/wiki/Villain_hitting)); [Longtaitou](https://en.wikipedia.org/wiki/Zhonghe_Festival), the day the dragon raises its head, and its haircuts; [Leigong](https://en.wikipedia.org/wiki/Leigong); [Qingnü](https://zh.wikipedia.org/wiki/%E9%9D%92%E5%A5%B3), goddess of frost and snow; [Taisui](https://en.wikipedia.org/wiki/Tai_Sui) and asking his pardon before digging; the five poisons ([Wu Du](https://en.wikipedia.org/wiki/Five_poisons)); [Mingqian tea](https://en.wikipedia.org/wiki/Longjing_tea) picked before Qingming; [Qingming](https://en.wikipedia.org/wiki/Qingming_Festival), its willow, its tomb-sweeping and its kites.
 
-### Previous release: day and night, the people of the towns, things that break and Part XVI
+### Two releases ago: day and night, the people of the towns, things that break and Part XVI
 
 ```mermaid
 flowchart LR
@@ -142,7 +208,7 @@ flowchart LR
 - **Code**: the game's GDScript grew from 44,004 to 47,498 lines (`scripts/clock.gd`, `scripts/folk.gd` and `scripts/havoc.gd` are new) and the Blender Python from 21,542 to 21,984 lines: 22 commoners, the Kitchen God and the two door gods are new characters, six new clips, and Lin Feng (all four looks) and Yue Ling are rebuilt with them. The tests grew from 1,879 to 2,132 lines (22,603 checks).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### Two releases ago: Yue Ling's own story, more to do and Part XV
+### Three releases ago: Yue Ling's own story, more to do and Part XV
 
 ```mermaid
 flowchart LR
@@ -204,7 +270,7 @@ flowchart LR
 | ![the hermitage's moon gate](docs/screenshots/hermitage_gate.png) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.png) |
 | ![the moths that eat forgetting](docs/screenshots/battle_forgetting.png) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.png) |
 
-### Three releases ago: fates and faces, outfits, rides and Part XIV
+### Four releases ago: fates and faces, outfits, rides and Part XIV
 
 ```mermaid
 flowchart LR
@@ -280,7 +346,7 @@ flowchart LR
 
 ![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.png)
 
-### Four releases ago: many roads, crafting, renown and Part XIII
+### Five releases ago: many roads, crafting, renown and Part XIII
 
 ```mermaid
 flowchart LR
@@ -403,7 +469,7 @@ Background for that release (the Eight Gates, Chiyou and the war at Zhuolu):
 - **The Eight Gates**: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death of [Qimen Dunjia](https://en.wikipedia.org/wiki/Qimen_Dunjia), taught to the Yellow Emperor by the Mysterious Lady of the Nine Heavens, laid on the eight trigrams ([Bagua](https://en.wikipedia.org/wiki/Bagua)); the "Eight Gates Golden Lock" formation of the *Romance of the Three Kingdoms*, which falls when it is entered by the right gate.
 - **Wang and Liang, Chi and Mei**: the goblins of the mountains, old things and waters that fought in Chiyou's host.
 
-### Five releases ago: realms and talents that matter, cutscenes and Part XII
+### Six releases ago: realms and talents that matter, cutscenes and Part XII
 
 ```mermaid
 flowchart LR
@@ -483,7 +549,7 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 - **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
 - **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
 
-### Six releases ago: three realms, six Daos, six peoples and Part XI
+### Seven releases ago: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -582,7 +648,7 @@ Background for this release (the myths of the Jianmu and the realms, the Daos an
 - **The peoples**: the Feathered People, the Deathless (black-skinned people who eat of the immortal tree) and the dragon-kin in the *Classic of Mountains and Seas*; the Jiaoren, whose tears turn to pearls, in the *Bowuzhi* and Gan Bao's *Soushen Ji*; celestial foxes who climb to heaven at a thousand years ([huli jing](https://en.wikipedia.org/wiki/Huli_jing)).
 - **The bosses**: [Leigong](https://en.wikipedia.org/wiki/Leigong), Duke of Thunder; Feilian, Earl of the Wind; Kui, the one-legged thunder ox of the *Classic of Mountains and Seas*; Jiufeng, the nine-headed bird of Chu; [Pixiu](https://en.wikipedia.org/wiki/Pixiu); Shentu and Yulei, the door gods under the peach tree ([Menshen](https://en.wikipedia.org/wiki/Menshen)); [Zhulong](https://en.wikipedia.org/wiki/Zhulong_(mythology)), the Torch Dragon whose open eye is day; Wangxiang, the water goblin; [Heibai Wuchang](https://en.wikipedia.org/wiki/Heibai_Wuchang), Black and White Impermanence.
 
-### Seven releases ago: an organic continent, four towns and Part X
+### Eight releases ago: an organic continent, four towns and Part X
 
 ```mermaid
 flowchart LR
@@ -639,7 +705,7 @@ Background for this release (the techniques behind the new map, cartography and 
 - **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
 - **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
 
-### Eight releases ago: hanfu characters, five-colour monsters and Part IX
+### Nine releases ago: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -719,7 +785,7 @@ Researched for that release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Nine releases ago: rebuilt models and Part VIII
+### Ten releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -772,7 +838,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Ten releases ago: one open world and Part VII
+### Eleven releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -806,7 +872,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Eleven releases ago: natural landscapes and Part VI
+### Twelve releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -956,7 +1022,7 @@ godot --fixed-fps 30 --path . -- --bot --timescale=1            # (drop --fixed-
 | Esc / X | menu (Meditate, Breakthrough, Items, Cultivation, Journal, Fates, Yue Ling, Wardrobe, Stable, Bestiary, ...), cancel |
 | Letters, Backspace | type a name of your own at character creation (Enter on a name row) |
 
-Walk into NPCs, enemies, pickups, stairs and bosses to interact with them; walking up to a boss that guards the story opens its trial, with every way through it. There is no save system yet: a full run takes about seventeen hours. Esc > Journal shows your renown, essences and treasures, what townsfolk have asked of you, and every way through the trial ahead. Esc > Cultivation shows your realm (and what it means) and the branches of the Nine Heavens root you have woken; Esc > World Map shows the whole land and the history of where you are (Left/Right turns to the Nine Heavens, the Nine Springs and the Eastern Sea once you have been there); Esc > Annals keeps the history of everywhere you have been; Esc > Dao & Peoples shows the Daos you have walked and your standing with the peoples of the realms; Esc > Fates shows the people whose lives you changed and every choice you made about them; Esc > Wardrobe and Esc > Stable change your outfit and your ride; Esc > Bestiary keeps the story of every foe you have met.
+Walk into NPCs, enemies, pickups, stairs and bosses to interact with them; walking up to a boss that guards the story opens its trial, with every way through it. There is no save system yet: a full run takes about twenty-one hours. Esc > Hearths shows the six cultures of the land, their customs and whether each calls you a stranger, a guest or kin. Esc > Journal shows your renown, essences and treasures, what townsfolk have asked of you, and every way through the trial ahead. Esc > Cultivation shows your realm (and what it means) and the branches of the Nine Heavens root you have woken; Esc > World Map shows the whole land and the history of where you are (Left/Right turns to the Nine Heavens, the Nine Springs and the Eastern Sea once you have been there); Esc > Annals keeps the history of everywhere you have been; Esc > Dao & Peoples shows the Daos you have walked and your standing with the peoples of the realms; Esc > Fates shows the people whose lives you changed and every choice you made about them; Esc > Wardrobe and Esc > Stable change your outfit and your ride; Esc > Bestiary keeps the story of every foe you have met.
 
 ## Gameplay
 
@@ -1202,6 +1268,41 @@ Each region is still generated from its own seed by `mapgen.gd` (so every boss, 
 **The realms above and below** (Part XI) are built by the same `Atlas._build`, one realm at a time (`Atlas.world_of(layer)`): `STRATA` gives each its own 260 x 200 grid, the sites of its regions, how far land reaches from a site (land runs out into open sky or into the abyss instead of the sea) and how many holes to open in the wild ground between regions (gaps of sky between the islands, chasms between the caverns). `layer_origin` lays each grid over the land's so that the Jianmu's crown in the Nine Heavens floats straight above its trunk on the mountain and its roots in the Nine Springs hang straight below. The ends of a ladder are two linked entities, one in each realm; walking onto one lifts or lowers Lin Feng and puts him on the free tile beside the other end. The Nine Heavens are drawn 96 m above the land and the Nine Springs 64 m below it, and `world.gd` keeps a bundle per realm (its land, its streamed regions, its sea of cloud or glowing abyss) and shows only the one Lin Feng is in. A **floor** (`Atlas.floor_id`, `f:<region>:<building>:<level>`) is a world of its own the size of its building, holding the people and things that live on it and the stairs back.
 
 The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part XVIII: The New Fire
+
+Qingming passes, the paddies go green, and by every sign in the almanac the year is running again. Only the kitchen is wrong: for three days the rice in Auntie Zhou's pot has come to the table hard in the middle. The fire burns. It simply does not make anything hot. The same letters come from everywhere: the bread will not rise at Shazhou, the bronze will not run at Tushan, the lamps of Yanggu are lit and the street is dark. **At the turn of every season the fire used to be changed**: every hearth put out for a day of cold food, new fire drilled from the wood of the season and carried to every house. Nobody has done it for sixty years, and this fire has burned through the falling of the sky, nine days of noon and the longest winter there ever was. But it cannot be put out either: **every one of the Six Hearths has a fire it has sworn never to let die**. So nothing is put out. A coal is asked of each, in each one's own way.
+
+```mermaid
+flowchart LR
+    Z[Zao Jun: the pot<br/>of six coals] --> W[apricot wood<br/>for the drill]
+    W --> V[Rice: cold gruel<br/>with five farmers] --> S[Felt: argal<br/>for the tent] --> A[Sweet-Well: a stick<br/>for the oven] --> R[Boat: drive the damp<br/>out of the sterns] --> C[Casting: break<br/>the clinker] --> D[Lantern: the first<br/>sale by lamplight]
+    D --> ZR{Zhurong: hearths,<br/>craft or might}
+    ZR --> FB[Kang's firebreak] --> DR[drill the new fire<br/>with Yue Ling] --> WF[six bonfires<br/>run together]
+    WF --> HL{Huilu: hearths,<br/>the land or might} --> CH[carry it home<br/>to all six] --> FE[six tables,<br/>one fire] --> FP((Fire<br/>Passed On))
+```
+
+| Step | Where | What happens |
+|---|---|---|
+| The rice will not cook | the sect | the Elder remembers the changing of the fire; **Zao Jun**, Lord of the Stove, has his head in his hands: the fire must be changed and cannot be put out. Yue Ling's answer: one coal from every hearth. He hands down **the Pot of Six Coals** |
+| The wood of summer | the orchards of Qingshi | cut **five billets of apricot** (elm and willow for spring, apricot and jujube for summer) |
+| **The Rice Hearth** | Qingshi | eat cold gruel with **five farmers** whose stoves will not boil: "have you eaten?", and the answer is always no. **Granny Wen** gives a coal from the back of the stove, "the one that knows you" |
+| **The Felt Hearth** | the grass below Thunder Valley | nobody comes to a tent empty-handed: gather **five baskets of argal**. Over the threshold without touching it, round the fire by the left, the bowl in both hands: **Grandmother Sarnai** gives a coal from the middle stone, and wants one back |
+| **The Sweet-Well Hearth** | Shazhou Oasis | every caravan puts one stick in the oven: carry one with **three porters**. **Auntie Aysha**: no caravan came all winter; "even my fire wants strangers" |
+| **The Boat Hearth** | Longmen | the damp is in every stern: drive off the **Damp Smokes, Bilge Imps and Drowned Embers** (strike first). **Fishwife Lu** has sat up nine nights; the coal is carried lid on, and never set down on bare ground |
+| **The Casting Hearth** | Tushan | a tired fire leaves clinker: **break the crust off five casting pits** (F, two blows each). **Auntie Rong**: the pit is the roll of the clan, and it is dying of loneliness. "Let it meet somebody" |
+| **The Lantern Hearth** | Yanggu | be the **first customer of five stallholders**, by lamplight, at their price. **Lantern-Maker Xi**: a flame you are handed, you owe to whoever handed it |
+| Six coals, not one fire | the Ashen Volcano | Sage Huo Rong: they lie side by side, each keeping to itself. Somebody has to drill it. The cinders of the mountain come for the coals (a hunt; they were only cold) |
+| **Zhurong, Lord of the Southern Fire** | the crater | a trial: **speak for the hearths** (three call you a guest), **a drill of summer wood** (craft: Smith Tie, wood and fire essence, two apricot billets) or might. "A new fire wants an empty hearth." Afterwards: Suiren did not make fire out of nothing either. He gives **Suiren's fire-drill** |
+| The Gathering | Cloudfoot, where the roads meet | all six keepers have come, each with kindling stacked the only proper way. Kang wants a firebreak: **cut six stands of dry brush** (F) |
+| **The new fire** | the fire-ring on the mountain | drilled with Yue Ling, four hands on the spindle; six colours of coal, and the fire that stands up is gold. Then six people each take a brand, without a word, and walk quickly to six piles of kindling |
+| The wildfire | the mountain | six bonfires run together: **Wildfire Sprites, Spark Swallows, Smoke Hounds** (strike first) |
+| **Huilu, the Fire Nobody Sat Up With** | the road above Cloudfoot | a trial: **six lines of buckets** (five hearths), **Kang's firebreak** (by the land: 34 obstacles cleared) or might. It is not angry. It was lit and nobody stayed. Afterwards six people who each know the only right way to keep a fire keep one, between them, till morning |
+| Home | all six hearths, in any order | a coal of the new fire for every keeper: the pit is told a new name, the tea tastes of bronze, the bread rises, the mother boat will mother a fleet |
+| Six tables | the stage at Cloudfoot | nobody can agree which is the head, so they stand in a ring. Whose table is Yue Ling's? |
+| The rice is cooked | the sect | Zao Jun's report to Heaven: the fire was changed in the old way, by a new method. The tribulation comes as a taper lowered to a wick: **Fire Passed On** |
+
+New in this chapter: nine foes with stories in the bestiary (`lore.gd`), two lords with pasts, two kinds of obstacle (`impact.gd`: a pit's mouth crusted with glowing slag, a stand of dry brush), two scenes with Yue Ling, errands among three hearths' own people (they are done with that town's people only), Grandmother Sarnai and Batu the horse-herd in the tents below Thunder Valley, and every step done for a hearth earns its standing, so the story alone makes a guest of anybody at all six before Huilu asks for five.
 
 ## Part XVII: The Spring Thunder
 
@@ -1751,6 +1852,18 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Bugs found and fixed
 
+Found in this release by starting the new beginnings with a hero under another name, by reading every conversation in the game through the new voice (`tests/run_tests.gd` does it now), by screenshots and by the bot's logs, each confirmed before it was fixed:
+
+| Bug | Fix |
+|---|---|
+| **With a hero called anything but Lin Feng, the story's name flashed letter by letter in every conversation.** The typewriter counted the letters of the line as the story wrote it and renamed what it had typed so far: "Lin F" stood on screen until the whole of "Lin Feng" was out and was then replaced by the player's name, and a line with a longer name in it stopped short of its end until Enter was pressed (a shorter one sat finished and waited) | The line is renamed first and then typed (`Dialogue.text_of`); the keyboard test starts a game as Bai Chen and checks the line |
+| **"Lord Lin" kept the story's family name whatever the player chose**: the outer disciples' "Senior Brother Lin! Forgive me, I mean... Lord Lin?" came out as "Senior Brother Bai! ... Lord Lin?" | "Lord" (and "Lady") are renamed with the family name too; tested |
+| **The key-hint bar at the foot of the world screen was cut off: "... Z/Enter act   Esc men".** The line grew a key with every release and was still drawn 580 pixels wide; since G was added in the last release its end no longer fitted (seen in this release's first screenshot of a beginning) | The bar is 700 pixels wide |
+| **The screenshot tour's `--boss-shots` could not shoot a lord who stands on the mountain round the sect**: it looked for the lord only in the chain of regions the story opens one after another, and the mountain is not on it (Part XV's Warden of the Lock, and this release's Huilu) | It looks in every region |
+| Caught in this release's own new code before it shipped: the first cut of the voice turned "He Bo", the River Earl, into "She Bo" (the name is a pronoun with a capital) and for the same reason never changed a "He" at the start of a sentence; "your son" matched "our son" and made Yu the Great Gun's daughter; "Go, Lin Feng. Take his generals" became "her generals" until what is said aloud was told apart from what is narrated; the dialogue box told an already-told line a second time without knowing who had spoken it; the townsfolk's hails and the children's "It's him!" are drawn by `Label3D`, past the UI's text, and would have called a woman "young master"; an errand for one hearth could be done with the people of any town; the headline of the Hearths page ran off the right edge of its panel; "Granny Wen's Boy" became "Granny wen's girl"; the ending's results said "of the five he met on the road" of a woman; and a hero's choices set as a whole dictionary by the screenshot tour (written before there was a body or a hearth to choose) were a script error on the new rows | Each fixed, most with a test |
+
+### Bugs fixed in the Part XVII release
+
 Found in this release by two reviews of the game's code (the battle and trial rules, and the screens, input and conversations), by playing, by screenshots, by reading the bot's logs and by new tests, each confirmed before it was fixed (most by running it):
 
 | Bug | Fix |
@@ -2066,38 +2179,41 @@ To make its clock a fair estimate of a person's playtime it uses human-scale pac
 
 ```sh
 godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --report=build/bot_report.json
+godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --hero=f --hearth=steppe --ending=road   # a young woman of the Felt Hearth
 ```
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs). The last release took 19:28:20. The same bot now reaches the end of Part XVI at 19:28:20 (the old chapters play exactly as they did: everything Part XVII adds is placed in the finished world after it is built, and nothing older moved for it), and Part XVII plays in about 1 hour 3 minutes: the game is now **1 hour 3 minutes longer**. It passes 37 trials (might 4, craft 9, wealth 4, respect 5, dao 4, peoples 1, relic 2, bond 4, side by side 1, by the people 2, by the land 1), opens 4 of the Eight Gates, does 5 deeds and reaches the heart by the Road of the Many Peoples; it has all 38 heart-to-hearts and every one of Yue Ling's wishes; in Part XVII it clears all 26 of the obstacles the winter left with the sword (walking up to each one, turning to it and swinging until it goes), strikes 9 packs first in the two hunts that ask for it (4 times with the sword qi from a few tiles off), takes the Maiden of Frost by the land and Taisui by the people, helps six farmers with the sowing and flies kites with eight children of the towns. Its one defeat is early in Part I, in the Bamboo Forest's cull, as in the last release; it is carried back to the sect and goes on.
+Latest result (seed 1234, identical across runs: this release's run was made twice). The last release took 20:31:21. The same bot now reaches the end of Part XVII at 20:42:05, eleven minutes later than it did: the story begins with a goodbye at the hero's hearth, the people of every town greet a stranger in their own hearth's way before they talk of their trade, and the hearths' gifts change how its fights and its hours fall. Part XVIII then plays in **1:00:41**, and the game is **1 hour 11 minutes longer** in all. It passes 39 trials (might 4, craft 10, wealth 4, respect 5, dao 4, peoples 1, relic 2, bond 4, side by side 1, by the people 2, by the land 1, by the hearths 1), opens 4 of the Eight Gates, does 5 deeds and reaches the heart by the Road of the Many Peoples. In this release it says goodbye to Granny Wen at the Rice Hearth before the story begins; is a guest of the Lantern Hearth by 10:25 of play and of all six by 18:47, on the story's road alone; in Part XVIII eats cold gruel with five farmers of Qingshi, carries a stick with three porters of Shazhou, is the first customer of five stallholders at Yanggu (each errand with that town's own people), breaks five crusts of clinker and cuts six stands of brush, strikes 18 packs first in the chapter's three hunts, has Smith Tie make the drill of summer wood and takes Zhurong by craft, takes Huilu by the hearths, carries the new fire home to all six keepers, and at the end, with six hearths and its friends among the peoples of the realms, chooses **the Open Door**. Its one defeat is early in Part I, in the Bamboo Forest's cull, as in the last release.
+
+Two more heroes were played through Part XVIII from the chapter's first step (`--bot-start=s_p18_home`): the story's own sweeper (1:08:51), and a young woman of the Felt Hearth, `--hero=f --hearth=steppe --look=wanderer --ending=road`, who finishes in 1:09:22 and takes the Road of Six Fires. (A game begun at a late chapter has not earned its place at the hearths on the way, so both pass Zhurong by craft and Huilu by the hearths the chapter itself makes them guests of.)
 
 ```
-game play time  : 20:31:21 (73881 s)
-wall clock      : ~34 min (headless, sharing the machine with a screenshot tour)
-final realm     : Early Myriad Things Awake
-battles / kills : 1809 / 3340   deaths: 1
-time by screen  : battle 22482 s, meditate 12562 s, dialogue 22723 s, world 15478 s, menu 650 s, shop 26 s, choice 74 s
-meditation for  : rest 12122 s, children 350 s, grind 53 s, respawn 38 s
-trials passed   : 37 (might 4, craft 9, wealth 4, respect 5, dao 4, peoples 1, relic 2, bond 4, side by side 1, by the people 2, by the land 1), renown 749, deeds 5, gates 4
-the sword       : 54 strikes, 9 packs struck first, 4 sword qi, 26 obstacles cleared
-time by area    : sect 3919, mountain 4138
-                  bamboo 2361, marsh 1436, frost 2020, thunder 964, palace 923
-                  dragon 861, volcano 1249, void 746, celestial 1533
-                  mirror 950, grave 1745, time 797, origin 1298
-                  cloudsea 787, court 771, forge 858, garden 1492
-                  dunes 882, fungal 830, aurora 948, chaos 1251
-                  maple 2682, karst 981, springs 1199, wheel 1615
-                  village 2592, terraces 1858, silk 1116, loom 1327
-                  starferry 1157, magpie 1119, starpalace 1026, jasper 1322
-                  yanggu 1793, millet 1812, fusang 1368, guanghan 1226
-                  longmen 1834, drowned 1498, tushan 1530, buzhou 1493
-                  juntian 1543, changhe 1167, ninesprings 1525, youdu 1275
-                  penglai 1392, fangzhang 1245, yingzhou 1203, guixu 1336
+game play time  : 21:42:46 (78167 s)
+wall clock      : ~42 min (headless, sharing the machine with a screenshot tour)
+final realm     : Early Fire Passed On
+battles / kills : 1821 / 3378   deaths: 1
+time by screen  : battle 22707 s, meditate 13194 s, dialogue 24164 s, world 17340 s, menu 802 s, shop 27 s, choice 76 s
+meditation for  : rest 12360 s, children 749 s, grind 41 s, respawn 42 s
+trials passed   : 39 (might 4, craft 10, wealth 4, respect 5, dao 4, peoples 1, relic 2, bond 4, side by side 1, by the people 2, by the land 1, by the hearths 1), renown 762, deeds 5, gates 4
+the sword       : 78 strikes, 27 packs struck first, 14 sword qi, 37 obstacles cleared
+the hero        : Lin Feng, a young man, kin of the Rice Hearth; guest of 6 hearths (kin of all six)
+the ending      : The Open Door
+time by area    : sect 4442, mountain 5128
+                  bamboo 2264, marsh 1765, frost 2182, thunder 1133, palace 1005
+                  dragon 889, volcano 1643, void 757, celestial 1521, mirror 956
+                  grave 1694, time 811, origin 1286, cloudsea 794, court 758
+                  forge 872, garden 1490, dunes 1038, fungal 829, aurora 900
+                  chaos 1315, maple 2693, karst 1000, springs 1194, wheel 1600
+                  village 3673, terraces 1679, silk 1105, loom 1331, starferry 1115
+                  magpie 1110, starpalace 1005, jasper 1367, yanggu 2085, millet 1805
+                  fusang 1398, guanghan 1210, longmen 2208, drowned 1553, tushan 1619
+                  buzhou 1496, juntian 1506, changhe 1170, ninesprings 1491, youdu 1305
+                  penglai 1358, fangzhang 1243, yingzhou 1182, guixu 1322
 result          : PASS (needs >= 57600 s)
 ```
 
-Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 57600), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state, its goal and the trial ahead every frame after that game time), and `--route=sword|peoples|cauldron` (the road into the heart of the Eight Gates).
+Bot flags: `--bot`, `--seed=N`, `--report=PATH`, `--min-time=SECONDS` (default 3600; CI uses 57600), `--max-time=SECONDS`, `--timescale=N`, `--shots=DIR` (needs a window, saves screenshots at key moments), and `--tour=DIR` (screenshot tour, see Architecture), `--hero=f` (play a young woman), `--hearth=valley|steppe|sand|river|forge|dawn` (the hearth of the year away, and so where the story begins), `--look=ID`, `--origin=ID`, `--ending=azure|home|road|open|lotus` (the end to choose, if the journey earned it), and for development `--bot-start=STEP_ID` (start a fresh game at a quest step with the level and boss kills a player would have) and `--bot-trace=SECONDS` (print the bot state, its goal and the trial ahead every frame after that game time), and `--route=sword|peoples|cauldron` (the road into the heart of the Eight Gates).
 
 ## CI
 
@@ -2121,7 +2237,9 @@ flowchart LR
 scripts/data.gd      content: skills, enemies, areas, quest chain, dialogue
 scripts/trials.gd    many roads: trials and their ways, essences, crafting recipes, renown and deeds
 scripts/props.gd     things to do: outdoor props by theme (and the bigger things after them), usable furniture, what comes of using them
-scripts/fashion.gd   who Lin Feng is (character creation: names, looks, colours, origins), outfits and rides
+scripts/fashion.gd   who Lin Feng is (character creation: names, a young man or woman, looks, colours, origins), outfits and rides
+scripts/cultures.gd  the Six Hearths of the land: peoples, greetings, tables, fires, customs, standing, the six beginnings and the five ends
+scripts/voice.gd     the story told of a young woman: whose "he" is whose, clause by clause, and the lines written out by hand
 scripts/create.gd    the character creation screen over the title's cliff
 scripts/fate.gd      fated encounters: the five threads, their chapters and states, bonds, presence, rewards
 scripts/fate_text.gd the words of the fated encounters: every chapter's variants, choices, states, epilogues

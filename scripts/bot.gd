@@ -77,6 +77,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"xi_beast": "relic", "nian": "folk",
 	# Part XVII: the land it opened with its sword for the Maiden of Frost, the old way of asking for Taisui
 	"qing_nu": "land", "taisui": "folk",
+	# Part XVIII: a drill of summer wood from the smith for the Lord of Fire, and six lines of buckets (the
+	# hearths that call it a guest) for the fire nobody sat up with
+	"zhurong": "craft", "huilu": "hearth",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -116,7 +119,10 @@ const TALK_PLAN := {"t_lotus": "mine", "t_hands": "teach", "t_winter": "here", "
 const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "mem_dance", "mem_kite"]
 const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
 const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us", "s_p16_lanterns": "her", "s_p16_couplets": "together",
-	"s_p17_haircut": "trust", "s_p17_thunder": "us", "s_p17_teacup": "home", "s_p17_graves": "her", "s_p17_kite": "road",}
+	"s_p17_haircut": "trust", "s_p17_thunder": "us", "s_p17_teacup": "home", "s_p17_graves": "her", "s_p17_kite": "road",
+	"s_p18_drill": "both", "s_p18_feast": "seventh",}
+## the end of the story the bot chooses (cultures.gd ENDINGS), rarest first, of those its journey earned
+const ENDING_PLAN := ["open", "road", "lotus", "home", "azure"]
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
@@ -318,8 +324,20 @@ func _log_new_events() -> void:
 # ---------------------------------------------------------------- character creation (create.gd)
 ## The bot makes the sweeper the story first told of (every choice at its first value) and looks at
 ## each row on the way down, as a player reading the screen would.
+## (the New Fire release: --hero=f plays a young woman, --hearth=<id> the hearth of the year away, and so
+## where the story begins: steppe, sand, river, forge or dawn; --look=<id> and --origin=<id> the rest)
+const CREATE_ARGS := {"body": "hero", "hearth": "hearth", "look": "look", "origin": "origin"}
+
 func _create() -> void:
 	var c = main.create
+	var row: String = c.ROWS[c.cursor]
+	if CREATE_ARGS.has(row) and main.args.has(CREATE_ARGS[row]):
+		var want := str(main.args[CREATE_ARGS[row]])
+		var have := str(c.h.get(row, ""))
+		var known: Array = {"body": Fashion.BODY_ORDER, "hearth": Cultures.ORDER, "look": Fashion.LOOK_ORDER, "origin": Fashion.ORIGIN_ORDER}[row]
+		if want in known and have != want:
+			_press("right", 0.5)
+			return
 	if c.cursor < c.ROWS.size() - 1:
 		_press("down", 0.6)
 	else:
@@ -430,6 +448,12 @@ func _world(d: float) -> void:
 	else:
 		stuck_t = 0.0
 	last_tile = world.ptile
+	# 0) the beginning (cultures.gd): the last morning at the hero's own hearth; walk to its keeper and
+	# say goodbye, as a player would
+	if Game.prologue != "":
+		var hh: Dictionary = Cultures.HEARTHS[Game.prologue]
+		_goto_entity(str(hh.keeper_area), str(hh.keeper))
+		return
 	var s := Game.cur_step()
 	if s.is_empty():
 		return
@@ -929,6 +953,15 @@ func _choice() -> void:
 	var want := -1
 	var tt := _trial_target()
 	var st := Game.cur_step()
+	if str(c.title) == main.ENDING_ASK:
+		# the end of the story (cultures.gd): the end asked for (--ending=<id>) if the journey earned it,
+		# else the rarest it did earn
+		for eid in [str(main.args.get("ending", ""))] + ENDING_PLAN:
+			var k0: int = ids.find(eid)
+			if want < 0 and k0 >= 0 and c.options[k0].get("enabled", true):
+				want = k0
+		_nav(ids.size(), c.cursor, maxi(want, 0))
+		return
 	if str(c.title).begins_with("The wardrobe"):
 		want = ids.find(_want_outfit())
 		if want < 0:
@@ -1147,6 +1180,10 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 				# the Spring Thunder release: the land is opened by the chapter's own clearing quests on
 				# the way to the trial (impact.gd); there is nothing else to do for it
 				pass
+			"hearths":
+				# the New Fire release: a place at the hearths is earned by the chapter's own errands
+				# among their people on the way to the trial (cultures.gd); nothing else to do for it
+				pass
 			_:
 				return false
 	return true
@@ -1334,7 +1371,7 @@ func _folk_town(role: String) -> String:
 			continue
 		var left := 0
 		for fp in Folk.people(world.wd, tid):
-			if Folk.is_role(fp, role) and not Game.folk_has(s, str(fp.id)):
+			if Folk.is_role(fp, role) and Folk.in_town(fp, s) and not Game.folk_has(s, str(fp.id)):
 				left += 1
 		if left == 0:
 			continue
@@ -1354,7 +1391,7 @@ func _folk_target(role: String) -> Dictionary:
 	var best := {}
 	var bd := 1 << 30
 	for fp in Folk.people(world.wd, town):
-		if not Folk.is_role(fp, role) or Game.folk_has(Game.cur_step(), str(fp.id)):
+		if not Folk.is_role(fp, role) or not Folk.in_town(fp, Game.cur_step()) or Game.folk_has(Game.cur_step(), str(fp.id)):
 			continue
 		var st := Folk.state(world.wd, fp, Game.clock)
 		if not st.vis or st.walk or float(st.left) < 4.0:
@@ -1818,6 +1855,9 @@ func _finish(reason: String) -> void:
 		"deeds": Game.deeds.size(),
 		# the Spring Thunder release (impact.gd): the sword in the open world
 		"strikes": Game.strikes, "first_strikes": Game.ambushes, "sword_qi": Game.waves, "cleared": Game.cleared.size(),
+		# the New Fire release (cultures.gd): who the hero was, the hearths and the end chosen
+		"hero": {"body": str(Game.hero.get("body", "m")), "hearth": Cultures.own(Game), "look": str(Game.hero.get("look", "")), "origin": str(Game.hero.get("origin", ""))},
+		"hearths": Game.hearth, "guest_of": Cultures.guests(Game), "ending": Cultures.ending_of(Game),
 		"trials": Game.trials,
 		"gates": Game.gates_open.keys(),
 		"time_by_screen_seconds": breakdown,
@@ -1846,6 +1886,8 @@ func _finish(reason: String) -> void:
 	print("trials passed   : %d   renown: %d   deeds: %d   gates: %d" % [Game.trials.size(), Game.renown, Game.deeds.size(), Game.gates_open.size()])
 	print("paths taken     : %s" % JSON.stringify(Game.trials))
 	print("the sword       : %d strikes, %d packs struck first, %d sword qi, %d obstacles cleared" % [Game.strikes, Game.ambushes, Game.waves, Game.cleared.size()])
+	print("the hero        : %s, a young %s, kin %s; guest of %d hearths %s" % [Game.hero_name(), "woman" if Game.fem() else "man", str(Cultures.HEARTHS[Cultures.own(Game)].short), Cultures.guests(Game), JSON.stringify(Game.hearth)])
+	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)
 	print("result          : %s (needs >= %.0f s)" % ["PASS" if ok else "FAIL", min_time])

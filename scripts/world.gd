@@ -85,6 +85,10 @@ var cam_pos := Vector3.ZERO
 ## the realm (or floor) the hero is in, every realm's data and 3D offset, and a trip between two of
 ## them while one is under way ({t, dur, to_layer, to_tile, dir, climb, swapped})
 var layer := "surface"
+## the beginning (cultures.gd): the tile the hero's last morning at the hearth starts on; until the
+## farewell is said nobody can walk further than LEASH tiles from it ((-1, -1): no leash)
+var leash := Vector2i(-1, -1)
+const LEASH := 16
 var bundles := {}
 var off := Vector3.ZERO
 var trip := {}
@@ -707,6 +711,13 @@ func _floor_view(fid: String) -> void:
 
 # ---------------------------------------------------------------- entities
 func ent_visible(e: Dictionary) -> bool:
+	# the beginning (cultures.gd): the last morning at the hearth is three years before the story: its
+	# keeper is at home, nothing prowls, and nothing of the chapters to come is lying about
+	if Game.prologue != "":
+		if e.kind == "npc" and str(e.id) == str(Cultures.HEARTHS[Game.prologue].keeper):
+			return true
+		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode"] or e.get("fate", false):
+			return false
 	match e.kind:
 		"enemy":
 			if Game.defeated.has(e.id):
@@ -876,6 +887,10 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"npc":
 			# (someone who appears in two places shares one model: "asset")
 			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(str(e.get("asset", e.id))))
+			# the Felt Hearth (cultures.gd): the keeper of the tents sits by her fire, the three stones and
+			# the kettle, with a felt windbreak at her back
+			if str(e.id) == "sarnai":
+				n.add_child(Cultures.camp())
 			# the Living Land release: the people with names work at their place all day (folk.gd POSTS)
 			if Folk.POSTS.has(str(e.get("asset", e.id))):
 				Assets.lend_clips(m)
@@ -1619,6 +1634,12 @@ func _move(d: float) -> void:
 				key_lock = true
 				return
 			if not tile_free(nt):
+				return
+			# the beginning (cultures.gd): nobody leaves before the farewell is said
+			if Game.prologue != "" and leash.x >= 0 and maxi(absi(nt.x - leash.x), absi(nt.y - leash.y)) > LEASH:
+				move_dir = Vector2i.ZERO
+				key_lock = true
+				Game.toast("Not yet. There is a goodbye to say first.")
 				return
 			target = nt
 			move_t = 0.0
@@ -2617,7 +2638,9 @@ func _draw_hud() -> void:
 		# third line out of the panel onto the minimap, as three of Part XV's did)
 		var osz := UI.objective_size(obj)
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
-	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
+	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
+	# end was cut off, "Esc men")
+	UI.text(self, Vector2(VIEW.x - 712, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 700.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:
@@ -2626,6 +2649,12 @@ func _draw_hud() -> void:
 		var bw := maxf(440.0, UI.font().get_string_size(btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 26).x + 60.0)
 		UI.panel(self, Rect2(VIEW.x * 0.5 - bw * 0.5, 96, bw, 52), Color(0.04, 0.06, 0.13, 0.85 * a), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, a))
 		UI.text(self, Vector2(VIEW.x * 0.5 - bw * 0.5, 130), btxt, 26, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, bw)
+		# the Six Hearths (cultures.gd): whose country this is, and what they call the hero there
+		var bh := Cultures.of_area(area_id)
+		if bh != "" and banner_text == "":
+			var hh: Dictionary = Cultures.HEARTHS[bh]
+			var hc: Color = hh.col
+			UI.text(self, Vector2(VIEW.x * 0.5 - 300.0, 166), "Country of %s  -  %s" % [str(hh.n), Cultures.tier_name(Cultures.tier(Game, bh)).to_lower()], 15, Color(hc.r, hc.g, hc.b, a).lightened(0.3), HORIZONTAL_ALIGNMENT_CENTER, 600.0)
 	elif banner_text != "":
 		banner_text = ""
 	# interaction hint

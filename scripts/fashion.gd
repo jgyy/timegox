@@ -28,17 +28,28 @@ const GIVEN := ["Feng", "Chen", "Yu", "Xuan", "Ming", "Jing", "Hao", "Lan", "Ze"
 const DEFAULT_FAMILY := "Lin"
 const DEFAULT_GIVEN := "Feng"
 
+## (the New Fire release: `asset_f` the same look on a woman's frame, art/characters/lin_feng_f*.py, and
+## `desc_f` what it looks like on her; the rest of a look's words are told of her by UI.she)
 const LOOKS := {
-	"sweeper": {"n": "The Sweeper", "asset": "lin_feng",
+	"sweeper": {"n": "The Sweeper", "asset": "lin_feng", "asset_f": "lin_feng_f",
+		"desc_f": "Hair pinned up in a knot with a jade pin through it, a cowlick no pin can hold down, and a level, serious mouth: the girl who swept the sect's steps for three years and never once complained out loud.",
 		"desc": "A topknot tied up with a copper crown and a jade pin, a cowlick no pin can hold down, and a stern young mouth: the boy who swept the sect's steps for three years and never once complained out loud."},
-	"wanderer": {"n": "The Wanderer", "asset": "lin_feng_wanderer",
+	"wanderer": {"n": "The Wanderer", "asset": "lin_feng_wanderer", "asset_f": "lin_feng_f_wanderer",
+		"desc_f": "Hair in one long braid down the back, tied with a red cord, and an easy smile that has talked her out of more trouble than it has got her into. She looks like somebody who is always about to leave.",
 		"desc": "Hair in one long braid down the back, tied with a red cord, and an easy smile that has talked him out of more trouble than it has got him into. He looks like somebody who is always about to leave."},
-	"wild": {"n": "The Wild Child", "asset": "lin_feng_wild",
+	"wild": {"n": "The Wild Child", "asset": "lin_feng_wild", "asset_f": "lin_feng_f_wild",
+		"desc_f": "Hair that no comb has ever beaten, a grin with a chipped edge to it and a cowlick that stands up in the wind. The sect's elders have given up trying to make her look like a disciple.",
 		"desc": "Hair that no comb has ever beaten, a grin with a chipped edge to it and a cowlick that stands up in the wind. The sect's elders have given up trying to make him look like a disciple."},
-	"scholar": {"n": "The Scholar's Ward", "asset": "lin_feng_scholar",
+	"scholar": {"n": "The Scholar's Ward", "asset": "lin_feng_scholar", "asset_f": "lin_feng_f_scholar",
+		"desc_f": "Long straight hair and a calm, thoughtful face that reads before it speaks. She looks younger than she is until she frowns at something, and then she looks like somebody's grandmother.",
 		"desc": "Short, neatly cropped hair and a calm, thoughtful face that reads before it speaks. He looks younger than he is until he frowns at something, and then he looks like somebody's grandfather."},
 }
 const LOOK_ORDER := ["sweeper", "wanderer", "wild", "scholar"]
+## Who the sweeper is (the New Fire release): a young man or a young woman.  The story is the same
+## story; it calls her she (UI.she), the juniors call her Senior Sister, and Granny Wen raised a girl.
+const BODIES := {"m": {"n": "A young man", "desc": "The sweeper of the story as it was first told: Lin Feng, a boy of thirteen when he climbed the steps, sixteen now."},
+	"f": {"n": "A young woman", "desc": "The sweeper of the story, and the story is hers: Lin Feng, a girl of thirteen when she climbed the steps, sixteen now. The world calls her she, the juniors call her Senior Sister, and nothing else about the road is any easier."}}
+const BODY_ORDER := ["m", "f"]
 
 ## [name, colour]: the first of each is the colour the story's Lin Feng was built with
 const HAIR := [["Ink-black", "1a1a2a"], ["Chestnut", "5a3424"], ["Frost-white", "dfe6ee"], ["Midnight blue", "1e2c5c"], ["Ember red", "8a2a1e"], ["Ash grey", "6c6c76"]]
@@ -66,12 +77,15 @@ const ORIGINS := {
 		"fx": {"hp": 0.08, "spd": -1}, "give": {"hp_pill": 2}, "fx_text": "A river-hauler's back: health +8%, but a little slower (speed -1). Two Healing Pills from the fishermen."},
 	"scholar": {"n": "Scholar Wang's Pupil", "short": "Scholar Wang's pupil",
 		"desc": "Scholar Wang, who failed the Court's examinations nine times, taught him his letters for nothing and then everything else for nothing too. He can read any script on any stone, and he has never once won a fight.",
+		"desc_f": "Scholar Wang, who failed the Court's examinations nine times, taught her her letters for nothing and then everything else for nothing too. She can read any script on any stone, and she has never once won a fight.",
 		"fx": {"qi": 0.08, "cost": 0.04, "hp": -0.05}, "give": {"qi_pill": 1}, "fx_text": "A mind trained on old books: qi +8% and techniques 4% cheaper, but health -5%. One Spirit Qi Pill."},
 	"hunter": {"n": "Hunter's Apprentice", "short": "the old hunter's apprentice",
 		"desc": "Old Geng, who hunted the edge of the Whispering Bamboo, took him on to carry the game and kept him on because he walked without breaking twigs. When Geng's knees went, the boy climbed the mountain instead.",
-		"fx": {"atk": 0.05, "spd": 1, "qi": -0.05}, "give": {}, "fx_text": "A hunter's eye and feet: attack +5% and speed +1, but qi -5%. The old hunter's greens are his to wear."},
+		"desc_f": "Old Geng, who hunted the edge of the Whispering Bamboo, took her on to carry the game and kept her on because she walked without breaking twigs. When Geng's knees went, the girl climbed the mountain instead.",
+		"fx": {"atk": 0.05, "spd": 1, "qi": -0.05}, "give": {}, "fx_text": "A hunter's eye and feet: attack +5% and speed +1, but qi -5%. The old hunter's greens come with the trade."},
 	"merchant": {"n": "Runner of the Four Roads", "short": "the runner of the Four Roads",
 		"desc": "He ran messages between Qingshi and the caravans at Cloudfoot for copper coins, and learned to count in five currencies and haggle in three dialects. Caravan-Master Kang still says he owes him a donkey.",
+		"desc_f": "She ran messages between Qingshi and the caravans at Cloudfoot for copper coins, and learned to count in five currencies and haggle in three dialects. Caravan-Master Kang still says she owes him a donkey.",
 		"fx": {"stones": 0.12, "taken": 0.04}, "give": {"stones": 120}, "fx_text": "A trader's luck: spirit stones +12% and 120 to start with, but he takes 4% more harm."},
 }
 ## A line of his own here and there, by origin: the prologue, the Elder's first summons, Granny Wen's
@@ -107,7 +121,28 @@ const ORIGIN_LINES := {
 const ORIGIN_ORDER := ["foundling", "fisher", "scholar", "hunter", "merchant"]
 
 static func default_hero() -> Dictionary:
-	return {"family": DEFAULT_FAMILY, "given": DEFAULT_GIVEN, "look": "sweeper", "hair": 0, "eyes": 0, "robe": 0, "origin": "foundling"}
+	return {"family": DEFAULT_FAMILY, "given": DEFAULT_GIVEN, "body": "m", "look": "sweeper", "hair": 0, "eyes": 0, "robe": 0, "origin": "foundling", "hearth": "valley"}
+
+## Whether the hero `h` (Game.hero, or the choices of the creation screen) is a woman.
+static func fem(h: Dictionary) -> bool:
+	return str(h.get("body", "m")) == "f"
+
+## The Blender model of look `look_id` for the hero's body.
+static func look_asset(look_id: String, is_fem: bool) -> String:
+	var lk: Dictionary = LOOKS.get(look_id, LOOKS.sweeper)
+	return str(lk.asset_f) if is_fem else str(lk.asset)
+
+## What the hero did in Qingshi before the broom, told of a young man or a young woman (the lines
+## where another man is spoken of as well are written out for her: `desc_f`).
+static func origin_desc(id: String, is_fem: bool) -> String:
+	var o: Dictionary = ORIGINS.get(id, ORIGINS.foundling)
+	if not is_fem:
+		return str(o.desc)
+	return str(o.desc_f) if o.has("desc_f") else Voice.her(str(o.desc))
+
+static func look_desc(look_id: String, is_fem: bool) -> String:
+	var lk: Dictionary = LOOKS.get(look_id, LOOKS.sweeper)
+	return str(lk.desc_f) if is_fem else str(lk.desc)
 
 static func full_name(h: Dictionary) -> String:
 	return "%s %s" % [str(h.get("family", DEFAULT_FAMILY)), str(h.get("given", DEFAULT_GIVEN))]
@@ -209,9 +244,10 @@ static func hero_colors(g) -> Dictionary:
 			out[keys[k]] = Color(str(robe[k + 1]))
 	return out
 
-## The sum of one passive over the hero's origin and the outfit he wears (see the keys above).
+## The sum of one passive over the hero's origin, the outfit he wears (see the keys above) and the
+## hearths of the land (cultures.gd: the gift of his own, and what each gives its guests).
 static func gear(g, key: String) -> float:
-	var v := float(origin_of(g).fx.get(key, 0.0))
+	var v := float(origin_of(g).fx.get(key, 0.0)) + Cultures.gear(g, key)
 	v += float(OUTFITS.get(str(g.outfit), OUTFITS.sweeper).fx.get(key, 0.0))
 	return v
 
