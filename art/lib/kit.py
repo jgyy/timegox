@@ -760,6 +760,16 @@ class Builder:
             if pred(w):
                 v.co = pv + (v.co - pv) * k
 
+    def shift_where(self, fn, offset):
+        """Move every vertex by `offset` (Godot space) times fn(vertex weights {bone: w}), a share
+        from 0 to 1: a vertex half on a bone that moves goes half the way, so nothing tears."""
+        inv = {i: n for n, i in self.gidx.items()}
+        d = g2b(V(offset))
+        for v in self.bm.verts:
+            k = fn({inv[g]: x for g, x in v[self.dl].items()})
+            if k > 0.0:
+                v.co = v.co + d * k
+
     # ---- finishing
     def bake_ao(self, samples=20, dist=0.35, strength=0.55, floor_y=None, floor_k=0.25):
         """Ambient occlusion baked into the vertex colours with BVH ray casts (rest pose), plus an

@@ -8,6 +8,8 @@ README's references):
 * a large cranium and a short lower face: the eye line sits a little below the middle of the head,
   and nose, mouth and chin are packed into the lower part (the lower half of the skull is ``LOW`` of
   the upper);
+* full cheeks (``Face.cheeks``): the face below the eyes and beside the nose carried forward, never
+  past its middle, so the three-quarter outline swells at the cheek before the jaw draws in;
 * a soft V jaw: full cheeks at the eyes and below them, tapering in straight lines to a small chin
   with a mass of its own (``Face.chin_mass``: rounded at the tip, the lowest point of the face, nearly
   level with the lower lip in profile, turning in a tight curve into an underside that rises to the
@@ -47,6 +49,13 @@ EYE_X = 0.043    # half the distance between the eyes' centres: set wide
 NOSE_Y = -0.05
 MOUTH_Y = -0.078
 CHIN_Y = -RY * LOW
+# every eye's size against what its script asks for (Face.eye_r)
+EYE_K = 0.9
+# full cheeks (Face.cheeks): how far forward, where (either side of the nose, below the eyes)
+CHEEK = 0.017
+CHEEK_M = 0.013
+CHEEK_X = 0.058
+CHEEK_Y = -0.05
 # the chin's mass (Face.chin_mass): the profile below the mouth is a rounded box from CHIN_C down,
 # CHIN_DROP deep (a man's CHIN_DROP_M), with corners as square as the exponent says
 CHIN_C = -0.074
@@ -85,7 +94,9 @@ class Face:
         self.chin = o.get("chin", 0.8 if self.fem else 1.0)
         self.wide = o.get("face_w", 0.97 if self.fem else 1.0)
         self.skin = rgb(o.get("skin", "f5d6c2"))
-        self.eye_r = o.get("eye_size", 1.3 if self.fem else 1.16)
+        # (every eye a tenth smaller than its script asks for, since the Spring Thunder release: with
+        # the bigger head and the chin's mass, the eyes the faces were first drawn with crowded them)
+        self.eye_r = o.get("eye_size", 1.3 if self.fem else 1.16) * EYE_K
         if "eye_size" not in o:
             self.eye_r *= 1.0 - 0.14 * self.age   # eyes look smaller as lids and brows sag
         # an elder's face keeps more of its bones: less of the anime softness
@@ -94,8 +105,7 @@ class Face:
 
     # ---- the sculpted skull: unit direction -> local point
     def shape(self, d):
-        p = self.chin_mass(self.skull(d), d)
-        return self.features(p)
+        return self.cheeks(self.features(self.chin_mass(self.skull(d), d)), d)
 
     def skull(self, d):
         """The skull before the chin is given its mass and before cheekbones, sockets and brow."""
@@ -202,6 +212,34 @@ class Face:
         q.x *= 1.0 + (0.2 if fem else 0.3) * jw * smooth(-0.06, -0.118, b.y) * smooth(-0.06, 0.0, p.z)
         # the slight hollow between the lower lip and the chin
         q.z -= 0.001 * blob3(q, (0.0, MOUTH_Y - 0.013, 0.07), (0.017, 0.0055, 0.02))
+        return q
+
+    def cheeks(self, p, d):
+        """Full anime cheeks: local point `p` -> moved.  The cheek line is what makes a face read soft
+        or sharp, and it shows in neither the front view nor the profile but in the three-quarter
+        view, the one a face is seen in most: there the far cheek swells out under the eye before
+        the jaw draws in to the chin.  The modelling guides fill the cheek out forwards (along the
+        face, not across it), so the outline from the front keeps its width; the shading stays one
+        smooth shape (head(): the face takes the normals of an ellipsoid).  So the face below the eyes
+        and beside the nose is carried forward, most on the young and on women, but never further
+        forward than the middle of the face at that height (or the nose would sit in a hollow between
+        two puffs)."""
+        k = (CHEEK if self.fem else CHEEK_M) * (0.35 + 0.65 * self.soft)
+        if k <= 0.0 or p.z <= 0.0 or d.y > 0.2:
+            return p
+        push = 0.0
+        for s in (1, -1):
+            g = math.exp(-((p.x - s * CHEEK_X) / 0.025) ** 2 - ((p.y - CHEEK_Y) / 0.024) ** 2)
+            push += k * g * smooth(0.0, 0.04, p.z)
+        if push < 1e-7:
+            return p
+        dm = Vector((0.0, d.y, math.sqrt(max(0.0, 1.0 - d.y * d.y))))
+        mid = self.features(self.chin_mass(self.skull(dm), dm))
+        room = max(0.0, mid.z - 0.0015 - p.z)
+        q = p.copy()
+        # (the push, or the room left if that is less, with a soft corner: never below nothing, never
+        # beyond either)
+        q.z += push * (1.0 - math.exp(-room / push))
         return q
 
     def shade_normal(self, p):

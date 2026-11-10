@@ -263,7 +263,8 @@ def body(b, o, tor, robe, trim, inner, gold):
     loft(b, rings, robe, cls=CLOTH, col_fn=col, bone_fn=torso_w, cap0=False, cap1=False)
 
 
-V_Y = 1.425   # bottom of the V at the throat
+V_Y = 1.442   # bottom of the V at the throat (the Spring Thunder release: a little higher, with the
+              # shorter neck, so less of the throat shows)
 
 
 def band(b, pts, normals, width, thick, col, cols=None, bone_fn=None, bone=None, n=8, cls=CLOTH, tint=0.0):

@@ -43,6 +43,9 @@ SKIN_COL = "f5d6c2"
 HIP_Y = G.HIP_Y
 SHO, ELB, WRI, KNEE, ANK = G.SHO, G.ELB, G.WRI, G.KNEE, G.ANK
 EYE_Y = facelib.HC.y + facelib.EYE_Y
+# how much lower the head sits on a shorter neck (see build): the chin about a third of a head above
+# the collar, not half of one
+NECK_DROP = 0.028
 
 
 def make_rig(o=None):
@@ -263,6 +266,19 @@ def build(o):
             rig.bones[nm] = (pivot + (V(h0) - pivot) * hk, pivot + (V(t0) - pivot) * hk, par)
         h0, t0, par = rig.bones["head"]
         rig.bones["head"] = (h0, pivot + (V(t0) - pivot) * hk, par)
+    # a shorter neck (the Spring Thunder release): the head, and everything that hangs from it, sits
+    # NECK_DROP lower on a neck bone that much shorter.  The bigger anime head had left a long column
+    # of neck between the chin and the collar; the modelling guides shorten the neck itself and bring
+    # the head down to it rather than scale the head
+    drop = o.get("neck_drop", NECK_DROP if o.get("beast_head") is None else 0.0)
+    if drop != 0.0:
+        heads = ("head", "eyes", "mouth", "hair_tail", "hair_tail2")
+        b.shift_where(lambda w: min(1.0, sum(w.get(nm, 0.0) for nm in heads)), V(0, -drop, 0))
+        for nm in heads:
+            h0, t0, par = rig.bones[nm]
+            rig.bones[nm] = (V(h0) + V(0, -drop, 0), V(t0) + V(0, -drop, 0), par)
+        h0, t0, par = rig.bones["neck"]
+        rig.bones["neck"] = (h0, V(t0) + V(0, -drop, 0), par)
     sc = o.get("scale", 1.0)
     if sc != 1.0:
         for v in b.bm.verts:
