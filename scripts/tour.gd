@@ -2367,8 +2367,16 @@ func _qi_shots() -> void:
 	Game.qi[0] = float(Game.max_qi(0))
 	var pp: Vector3 = w._player_pos()
 	var fwd := Vector3(dir.x, 0, dir.y)
-	var look := pp + fwd * 6.0 + Vector3(0, 0.8, 0)
-	w.cam_override = Transform3D(Basis.IDENTITY, _side_eye(pp, fwd, look, 7.0, 3.0)).looking_at(look, Vector3.UP)
+	var look := pp + fwd * 6.0 + Vector3(0, 0.6, 0)
+	# (over his shoulder, down the way the qi flies: from the side the eye can land in a house)
+	var side := fwd.cross(Vector3.UP)
+	var eye := pp - fwd * 4.2 + side * 1.4 + Vector3(0, 2.7, 0)
+	for c3 in [[4.2, 1.4], [4.2, -1.4], [3.2, 2.2], [3.2, -2.2], [2.4, 0.8]]:
+		var e3: Vector3 = pp - fwd * float(c3[0]) + side * float(c3[1]) + Vector3(0, 2.7, 0)
+		if _open_round(e3) and _clear_view(e3, look):
+			eye = e3
+			break
+	w.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(look, Vector3.UP)
 	w.qi_wave()
 	await _wait(0.3)
 	await _shot("sword_qi")
@@ -2381,10 +2389,17 @@ func _first_strike_shots() -> void:
 	var w = main.world
 	main.world.open_world()
 	w.enter_layer("surface")
-	Game.level = 12
 	var lw := Atlas.world_of("surface")
 	for e in lw.ents:
 		if e.kind != "enemy" or str(e.get("area", "")) != "frost" or not w.ent_visible(e):
+			continue
+		# (at the pack's own level: two realms above it, it would scatter before his aura instead)
+		var top_lv := 1
+		for g in e.group:
+			top_lv = maxi(top_lv, int(g.lv))
+		Game.level = top_lv
+		Game.heal_full()
+		if Game.scatters(e.group):
 			continue
 		var sf := _swing_from(e.pos)
 		if sf.is_empty():
