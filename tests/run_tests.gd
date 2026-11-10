@@ -871,7 +871,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -929,6 +929,9 @@ func _init() -> void:
 					"hearths":
 						# the New Fire release: hearths of the land that can call the hero a guest (cultures.gd)
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Cultures.ORDER.size()
+					"works":
+						# the Hundred Works release: works there are to build (works.gd), of any school, of one, or of the one most built
+						ok = ok and n.size() == 3 and (str(n[1]) in ["", "best"] or Works.SCHOOLS.has(str(n[1]))) and int(n[2]) >= 1 and int(n[2]) <= (Works.ORDER.size() if str(n[1]) == "" else Works.TIERS)
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1081,7 +1084,7 @@ func _init() -> void:
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis) and str(e6.get("area", a6)) == a6)
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 18, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, Part XVII's cold in Frostpeak and poisons in the millet, and Part XVIII's damp at Longmen, cinders on the volcano and wildfire on the mountain" % p13_bands)
+	check(p13_bands == 8 and bands == 24, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, Part XVII's cold in Frostpeak and poisons in the millet, Part XVIII's damp at Longmen, and Part XIX's mites at Qingshi, engines at Tushan, strays in the dunes, counters in Heaven's Forge, looms in the Silkworm Woods and kites over the Sea of Clouds, cinders on the volcano and wildfire on the mountain" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1095,9 +1098,9 @@ func _init() -> void:
 		for nid in st7.npcs:
 			var na := Trials.npc_area(str(nid))
 			realms7[Data.layer_of(na)] = true
-			check(na != "" and Data.DIALOGUE.has("visit:" + str(nid)), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
+			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -1737,6 +1740,7 @@ func _fates_and_faces() -> void:
 	_living()
 	_spring()
 	_new_fire()
+	_hundred_works()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -2531,8 +2535,8 @@ func _new_fire() -> void:
 	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
 	check(msrc.contains("func choose_ending") and msrc.contains("begin_prologue") and msrc.contains("ENDING_ASK") and FileAccess.get_file_as_string("res://scripts/ending.gd").contains("Cultures.ending_of"), "the game begins at the hero's hearth and ends where the player says")
 	print("== Part XVIII: the New Fire ==")
-	check(Data.REALMS.size() == 24 and Data.REALMS[23] == "Fire Passed On" and Data.MAX_LEVEL == 69 and Data.level_name(69).ends_with("Fire Passed On") and Data.REALM_INFO.size() == 24 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XVIII adds the Fire Passed On realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break23" and Data.DIALOGUE.has("recall16") and msrc.contains("\"s_break22\": \"recall16\""), "Part XVIII follows Myriad Things Awake (recall16) and ends the game")
+	check(Data.REALMS.size() >= 24 and Data.REALMS[23] == "Fire Passed On" and Data.MAX_LEVEL >= 69 and Data.level_name(69).ends_with("Fire Passed On") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XVIII adds the Fire Passed On realm")
+	check(Data.step_index("s_break23") == Data.step_index("s_p18_end") + 1 and Data.DIALOGUE.has("recall16") and msrc.contains("\"s_break22\": \"recall16\""), "Part XVIII follows Myriad Things Awake (recall16) and ends with its own tribulation")
 	for tid5 in ["zhurong", "huilu"]:
 		check(Trials.TRIALS.has(tid5) and Lore.BOSS.has(tid5) and Data.DIALOGUE.has("pre:" + tid5) and Data.DIALOGUE.has("post:" + tid5), "%s is a trial, with a story and words before and after" % tid5)
 		check((Trials.TRIALS[tid5].paths as Array).any(func(pth): return str(pth.kind) == "hearth"), "%s can be passed by the hearths" % tid5)
@@ -2559,6 +2563,341 @@ func _new_fire() -> void:
 	check(Impact.OBSTACLES.has("clinker") and Impact.OBSTACLES.has("brush") and Data.ITEMS.has("ember_pot") and Trials.RECIPES.has("fire_drill") and Data.CHAT.has("sarnai") and Data.CHAT.has("batu"), "clinker and brush, the pot of six coals, a drill of summer wood, and two people of the tents with things to say")
 	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bsrc.contains("\"zhurong\": \"craft\"") and bsrc.contains("\"huilu\": \"hearth\"") and bsrc.contains("Game.prologue") and bsrc.contains("ENDING_PLAN") and bsrc.contains("\"s_p18_feast\""), "the bot says its goodbye, has a way through both trials, and chooses an end")
+
+## The Hundred Works release: the hours of the wild (habits.gd), the works and their machines (works.gd,
+## machines.gd), the crossroads and their echoes (echoes.gd), and Part XIX.
+func _hundred_works() -> void:
+	print("== the hours of the wild (habits.gd) ==")
+	var by_habit := {}
+	for eid in Data.ENEMIES:
+		var hb := Habits.habit(eid)
+		check(Habits.HABITS.has(hb), "%s keeps hours (%s)" % [eid, hb])
+		if not Data.ENEMIES[eid].get("boss", false):
+			by_habit[hb] = int(by_habit.get(hb, 0)) + 1
+	for hb2 in Habits.HABIT_ORDER:
+		check(int(by_habit.get(hb2, 0)) >= 10, "there are creatures %s (%d)" % [str(Habits.HABITS[hb2].n), int(by_habit.get(hb2, 0))])
+		var acts := {}
+		for hr in 24:
+			var a := Habits.act_at(hb2, float(hr) + 0.5)
+			check(Habits.ACTS.has(a), "a creature %s does something at hour %d (%s)" % [str(Habits.HABITS[hb2].n), hr, a])
+			acts[a] = true
+		check(acts.size() >= 2, "a creature %s does not do the same thing all day (%s)" % [str(Habits.HABITS[hb2].n), str(acts.keys())])
+	for own in Habits.OWN:
+		check(Data.ENEMIES.has(own) and Habits.HABITS.has(str(Habits.OWN[own])), "%s, which keeps hours of its own, is a real creature" % own)
+	check(Habits.act_at("day", 12.0) == "bask" and Habits.act_at("day", 23.0) == "sleep" and Habits.act_at("night", 12.0) == "sleep" and Habits.act_at("night", 20.5) == "hunt"
+		and Habits.act_at("dusk", 5.0) == "hunt" and Habits.act_at("dusk", 12.0) == "sleep" and Habits.act_at("tide", 3.0) == "drift", "day creatures sleep at night, night creatures by day, the hunters of the half-light at noon, and the rest never")
+	check(Habits.first("sleep") == "party" and Habits.first("hunt") == "foe" and Habits.mod("hunt", "atk") > 1.0 and Habits.mod("hunt", "exp") > 1.0 and Habits.mod("bask", "spd") < 1.0 and Habits.mod("gather", "hp") > 1.0
+		and Habits.mod("forage", "atk") == 1.0, "asleep the party moves first; hunting they hit harder, move first and are worth more; basking they are slow; gathered they stand up to more")
+	# over a whole day the wild is no easier for keeping hours: what a pack asleep gives is paid for on one hunting or gathered
+	for hb3 in Habits.HABIT_ORDER:
+		var hp_sum := 0.0
+		var atk_sum := 0.0
+		for hr2 in 24:
+			var a2 := Habits.act_at(hb3, float(hr2) + 0.5)
+			hp_sum += Habits.mod(a2, "hp")
+			atk_sum += Habits.mod(a2, "atk")
+		check(hp_sum / 24.0 >= 1.0 and atk_sum / 24.0 >= 0.98, "a creature %s is no easier over a whole day than it was (health x%.2f, blows x%.2f)" % [str(Habits.HABITS[hb3].n), hp_sum / 24.0, atk_sum / 24.0])
+	check(Habits.sleeps("day") != "never" and Habits.sleeps("night") != "never" and Habits.sleeps("tide") == "never", "the bestiary can say when a creature sleeps (day: %s; night: %s)" % [Habits.sleeps("day"), Habits.sleeps("night")])
+	var HWG = load("res://scripts/game.gd").new()
+	HWG.reset()
+	HWG.clock = 12.0 * 60.0
+	check(Habits.act(HWG, "bamboo_wolf") == "sleep" and Habits.act(HWG, "iron_fang") == "watch", "by the game's clock: a wolf sleeps at noon, and a lord keeps no hours")
+	HWG.clock = 5.0 * 60.0
+	check(Habits.act(HWG, "bamboo_wolf") == "hunt" and Habits.act_of_group(HWG, [{"id": "bamboo_wolf", "lv": 1}, {"id": "bandit", "lv": 1}]) == "hunt" and Habits.line(HWG, "bamboo_wolf").contains("hunting"), "and hunts at dawn; a pack does what its leader does")
+	# the sun stood at noon for nine days (Part IX): nothing of the night woke
+	HWG.step = Data.step_index("s_p9_home") + 1
+	Clock.advance(HWG, 30.0)
+	check(Clock.frozen(HWG) == "noon" and Habits.act(HWG, "moth_queen") == "watch" and Habits.act(HWG, "bamboo_wolf") == "sleep", "while the sun stands at noon the hunters of the half-light never wake")
+	var bsrc2 := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	var wsrc2 := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(bsrc2.contains("Habits.mod(habit, \"atk\")") and bsrc2.contains("Caught asleep") and bsrc2.contains("The hunters saw you first") and wsrc2.contains("Habits.act_of_group(Game, e.group)")
+		and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"habit\": Habits.act_of_group"), "what a pack is doing is seen in the land and felt in the battle")
+	# (a battle the party loses must end: a careless edit to the turn loop once left it going round for ever)
+	var turn_src := bsrc2.substr(bsrc2.find("func _next_turn"), 400)
+	check(turn_src.contains("if alive(foes).is_empty():") and turn_src.contains("if alive(party).is_empty():") and turn_src.contains("_lose()"), "the turn loop ends the battle when either side has nobody left standing")
+	print("== the Hundred Works (works.gd) ==")
+	check(Works.ORDER.size() == 18 and Works.WORKS.size() == 18 and Works.SCHOOL_ORDER.size() == 3, "eighteen works in three schools")
+	var keys := {}
+	var total_know := 0
+	for wid in Works.ORDER:
+		var w: Dictionary = Works.WORKS[wid]
+		var whole := true
+		for k in ["school", "tier", "n", "key", "v", "site", "does", "desc"]:
+			whole = whole and w.has(k)
+		check(whole and Works.SCHOOLS.has(str(w.school)) and int(w.tier) >= 0 and int(w.tier) < Works.TIERS and str(w.desc).length() > 120 and str(w.does).length() > 20, "%s: a work of a school, with a story and a use" % wid)
+		check(not keys.has(str(w.key)), "%s: no other work does the same thing (%s)" % [wid, str(w.key)])
+		keys[str(w.key)] = true
+		check(Data.AREAS.has(str(w.site[0])) and Data.layer_of(str(w.site[0])) == "surface", "%s stands somewhere in the land" % wid)
+		total_know += Works.cost_know(wid)
+		check((Works.before(wid) == "") == (int(w.tier) == 0), "%s: follows the work before it in its school" % wid)
+	for sc in Works.SCHOOL_ORDER:
+		check(Works.ORDER.filter(func(o): return str(Works.WORKS[o].school) == sc).size() == Works.TIERS, "the school of %s has six works" % str(Works.SCHOOLS[sc].n))
+	for ta in Works.TIER_AFTER:
+		check(Data.step_index(str(ta)) >= 0, "a tier of works waits for a real step (%s)" % ta)
+	for ti in range(1, Works.TIERS):
+		check(Data.step_index(str(Works.TIER_AFTER[ti])) > Data.step_index(str(Works.TIER_AFTER[ti - 1])) and int(Works.TIER_KNOW[ti]) > int(Works.TIER_KNOW[ti - 1]) and int(Works.TIER_STONES[ti]) > int(Works.TIER_STONES[ti - 1]),
+			"tier %d of the works comes later and costs more than the one before" % (ti + 1))
+	# a whole journey's know-how: every creature, every lord, every thing to do, every obstacle, every deed and cave
+	var beasts := 0
+	var lords := 0
+	for eid2 in Data.ENEMIES:
+		if Data.ENEMIES[eid2].get("boss", false):
+			lords += 1
+		else:
+			beasts += 1
+	var clears := 0
+	for st in Data.STEPS:
+		if str(st.kind) == "clear":
+			clears += int(st.n)
+	# (a lord is in the bestiary and among the defeated: he counts twice)
+	var most: int = beasts + 2 * lords + Props.KINDS.size() + clears + 2 * Trials.DEEDS.size() + 2 * (Data.AREAS.mountain.get("abodes", []) as Array).size()
+	check(most < total_know and most > total_know / 2, "one journey's know-how (%d at the very most) builds more than half the works and never all of them (%d): which to build is a choice" % [most, total_know])
+	HWG.reset()
+	check(Works.count(HWG) == 0 and Works.leading(HWG) == "" and Works.mod(HWG, "exp") == 1.0 and Works.add(HWG, "volley") == 0.0 and Works.title(HWG) == "No maker yet", "with nothing built the works change nothing")
+	check(not Works.can_build(HWG, "well_sweep") and Works.blocked(HWG, "well_sweep").contains("knows how"), "a work cannot be built before the story reaches it")
+	HWG.step = Data.step_index("s_hunt1")
+	check(Works.blocked(HWG, "well_sweep").begins_with("Know-how") and Works.blocked(HWG, "trip_hammer").contains("knows how"), "nor without the know-how; and the second tier is not yet known")
+	for k2 in 8:
+		HWG.bestiary["b%d" % k2] = 1
+	HWG.stones = 10
+	check(Works.know(HWG) == 8 and Works.blocked(HWG, "well_sweep").contains("spirit stones"), "nor without the spirit stones")
+	HWG.stones = 1000
+	var p0 := Works.pill_price(HWG, "hp_pill", 10)
+	check(Works.build(HWG, "well_sweep") and Works.has(HWG, "well_sweep") and HWG.stones == 1000 - Works.cost_stones(HWG, "well_sweep") and Works.know(HWG) == 2 and Works.pill_price(HWG, "hp_pill", 10) < p0,
+		"the well-sweep is built: paid for in stones, the know-how spent, and pills cost less")
+	check(not Works.build(HWG, "well_sweep") and not Works.can_build(HWG, "trip_hammer") and Works.count(HWG, "wheel") == 1 and Works.leading(HWG) == "wheel" and Works.title(HWG) == "Apprentice of The Wheel", "once; and its maker is an apprentice of the Wheel")
+	HWG.step = Data.STEPS.size() - 1
+	for k3 in 1100:
+		HWG.bestiary["c%d" % k3] = 1
+	HWG.stones = 10000000
+	for wid2 in ["trip_hammer", "water_bellows", "crossbow", "chariot", "wooden_ox", "fire_kit", "cords", "sling", "kiln", "adze", "hide_coat", "array", "talismans", "furnace", "paper_servants", "mirror", "flags"]:
+		check(Works.build(HWG, wid2), "%s can be built in its turn" % wid2)
+	check(Works.count(HWG) == 18 and Works.know_spent(HWG) == total_know and Works.buildable(HWG).is_empty(), "all eighteen stand (in a test, with know-how no journey has)")
+	check(Works.mod(HWG, "exp") > 1.0 and Works.mod(HWG, "stones") > 1.0 and Works.mod(HWG, "pill") > 1.0 and Works.mod(HWG, "price") < 1.0 and Works.mod(HWG, "temper") < 1.0 and Works.mod(HWG, "recipe") < 1.0
+		and Works.mod(HWG, "med") > 1.0 and Works.mod(HWG, "hp") > 1.0 and Works.mod(HWG, "heavy") < 1.0 and Works.mod(HWG, "cost") < 1.0 and Works.mod(HWG, "taken") < 1.0, "the works that multiply, multiply")
+	check(Works.add(HWG, "ambush") > 0.0 and Works.add(HWG, "volley") > 0.0 and Works.add(HWG, "drop") > 0.0 and Works.add(HWG, "doze") > 0.0 and Works.add(HWG, "weak") > 0.0
+		and Works.blows(HWG, 2) == 1 and Works.blows(HWG, 1) == 1 and Works.temper_cost(HWG) < int(Data.TEMPER_COST[0]), "the works that add, add; the adze takes a blow off an obstacle, never the last")
+	check(Trials.recipe_stones("fire_drill", HWG) < int(Trials.RECIPES.fire_drill.stones) and HWG.med_rate(false) > (3.0 + 1.2 * HWG.level) * (1.0 + HWG.talent_mod("med")), "the forge is cheaper and meditation deeper for them")
+	check(not FileAccess.get_file_as_string("res://scripts/meditate.gd").contains("Works.") and not Works.ADDS.has("mend"), "no work shortens a rest: what waiting takes is the same for every maker")
+	var bare = load("res://scripts/game.gd").new()
+	bare.reset()
+	check(HWG.max_hp(0) > bare.max_hp(0), "a fire of one's own: the party is hardier for a hot meal")
+	bare.free()
+	for src_f in ["battle", "shop", "impact", "trials", "game"]:
+		check(FileAccess.get_file_as_string("res://scripts/%s.gd" % src_f).contains("Works."), "%s.gd asks the works" % src_f)
+	# the machines stand in the land, each once, on open ground with nothing near, and are built from code
+	var wsurf2: Dictionary = Atlas.world_of("surface")
+	var mach: Array = wsurf2.ents.filter(func(e): return e.kind == "machine")
+	check(mach.size() == Works.sites().size() and mach.size() == 19, "eighteen works and Gongshu Ban's wheel stand in the land (%d)" % mach.size())
+	var reach2 := MapGen.flood(wsurf2.grid, wsurf2.w, wsurf2.h, wsurf2.start)
+	var crowded := 0
+	var closed := 0
+	for me in mach:
+		if not reach2.has(me.pos) or Atlas.owner_id(wsurf2, me.pos) != str(me.area):
+			closed += 1
+		var ring := 0
+		for dy in range(-1, 2):
+			for dx in range(-1, 2):
+				if reach2.has(me.pos + Vector2i(dx, dy)):
+					ring += 1
+		if ring < 9:
+			closed += 1
+		for oe in wsurf2.ents:
+			if oe != me and oe.kind != "spring" and oe.kind != "seal" and absi(oe.pos.x - me.pos.x) <= 2 and absi(oe.pos.y - me.pos.y) <= 2:
+				crowded += 1
+	check(closed == 0 and crowded == 0, "every machine stands on open ground of its own region with a way round it and nothing within two tiles (%d shut in, %d crowded)" % [closed, crowded])
+	for ms in Works.sites():
+		var key3: String = str(Works.STORY_SITES[ms[1]].model) if Works.STORY_SITES.has(str(ms[1])) else str(ms[1])
+		var mn := Machines.model(key3)
+		var tris := 0
+		for ch in mn.get_children():
+			if ch is MeshInstance3D and ch.mesh != null:
+				for si in ch.mesh.get_surface_count():
+					tris += ch.mesh.surface_get_array_index_len(si) / 3 if ch.mesh.surface_get_array_index_len(si) > 0 else ch.mesh.surface_get_array_len(si) / 3
+		check(tris > 100 and tris < 6000 and Works.site_name(str(ms[1])) != "" and Works.site_desc(str(ms[1])).length() > 60, "the %s is built from code (%d triangles) and has something to say for itself" % [Works.site_name(str(ms[1])), tris])
+		Machines.animate(mn, 3.0)
+		mn.free()
+	HWG.reset()
+	check(not Works.stands(HWG, "ban_wheel") and not Works.stands(HWG, "well_sweep"), "nothing stands before it is built")
+	HWG.step = Data.step_index("s_p19_ban")
+	check(Works.stands(HWG, "ban_wheel"), "Gongshu Ban's wheel stands from the step in which he is met")
+	print("== crossroads and echoes (echoes.gd) ==")
+	check(Echoes.ORDER.size() == Echoes.CROSSROADS.size() and Echoes.ORDER.size() >= 16, "sixteen crossroads (%d)" % Echoes.ORDER.size())
+	var parts := {}
+	var last_step := -1
+	var echo_n := 0
+	var tilt_lo := {"heart": 0, "craft": 0, "reach": 0}
+	var tilt_hi := {"heart": 0, "craft": 0, "reach": 0}
+	var key_step := func(key: String) -> int:
+		if key.begins_with("pre:") or key.begins_with("post:"):
+			var who := key.get_slice(":", 1)
+			if Data.step_index(who) >= 0:
+				return Data.step_index(who)
+			return _kill_step(who)
+		if key.begins_with("done:"):
+			return Data.step_index(key.get_slice(":", 1))
+		return Data.step_index(key)
+	for cid in Echoes.ORDER:
+		var c: Dictionary = Echoes.CROSSROADS[cid]
+		var si2 := Data.step_index(str(c.step))
+		check(si2 > last_step and str(c.ask).length() > 60 and (c.options as Array).size() >= 2, "%s: asked after a real step, later than the one before, with a choice" % cid)
+		last_step = si2
+		parts[str(c.part)] = true
+		var lo := {"heart": 0, "craft": 0, "reach": 0}
+		var hi := {"heart": 0, "craft": 0, "reach": 0}
+		var ids := {}
+		for o in c.options:
+			ids[str(o.id)] = true
+			check(str(o.label) != "" and str(o.desc).length() > 60 and str(o.log) != "" and not (o.get("tilt", {}) as Dictionary).is_empty(), "%s/%s: says what it does, is remembered, and tips a scale" % [cid, o.id])
+			check((c.after as Dictionary).has(str(o.id)) and (c.end as Dictionary).has(str(o.id)), "%s/%s: has its words when it is chosen, and at the end" % [cid, o.id])
+			for sc2 in o.tilt:
+				check(Echoes.SCALES.has(str(sc2)), "%s/%s tips a real scale" % [cid, o.id])
+				lo[sc2] = mini(int(lo[sc2]), int(o.tilt[sc2]))
+				hi[sc2] = maxi(int(hi[sc2]), int(o.tilt[sc2]))
+			for it in o.get("gain", {}).get("items", {}):
+				check(Data.ITEMS.has(str(it)), "%s/%s gives something real" % [cid, o.id])
+		for sc3 in lo:
+			tilt_lo[sc3] += int(lo[sc3])
+			tilt_hi[sc3] += int(hi[sc3])
+		check((c.echo as Dictionary).size() >= 1, "%s echoes later in the story" % cid)
+		for ek in c.echo:
+			check(Data.DIALOGUE.has(str(ek)) and key_step.call(str(ek)) > si2, "%s echoes in a conversation that is there, later in the story (%s)" % [cid, ek])
+			for oid in c.echo[ek]:
+				check(ids.has(str(oid)), "%s: the echo in %s is of a real answer (%s)" % [cid, ek, oid])
+				echo_n += 1
+				for el in c.echo[ek][oid]:
+					var par := TextParagraph.new()
+					par.add_string(str(el[1]), ThemeDB.fallback_font, 22)
+					par.width = 1100
+					check((el as Array).size() == 2 and par.get_line_count() <= 4, "%s: the echo in %s fits the dialogue box" % [cid, ek])
+	check(parts.size() >= 10 and echo_n >= 60, "the crossroads lie in %d parts of the story, and their answers echo %d times" % [parts.size(), echo_n])
+	for sc4 in Echoes.SCALE_ORDER:
+		check(int(tilt_hi[sc4]) >= Echoes.KNOWN and int(tilt_lo[sc4]) <= -Echoes.KNOWN, "the scale of %s can be leaned either way far enough to be known for it (%d to %d)" % [str(Echoes.SCALES[sc4].n), int(tilt_lo[sc4]), int(tilt_hi[sc4])])
+	HWG.reset()
+	check(Echoes.waiting(HWG) == "" and Echoes.scale(HWG, "heart") == 0 and Echoes.lean(HWG, "heart") == 0 and Echoes.names(HWG) == "" and Echoes.epilogue(HWG).is_empty(), "nothing is asked and nothing leans before the road")
+	HWG.step = Data.step_index("s_ironfang")
+	HWG.advance()
+	check(HWG.cross_pending == ["bandits"] and Echoes.waiting(HWG) == "bandits", "Iron Fang falls, and his men are waiting to be told what they are now")
+	var r0: int = HWG.renown
+	Echoes.take(HWG, "bandits", "mend")
+	check(Echoes.chosen(HWG, "bandits") == "mend" and Echoes.scale(HWG, "heart") == 2 and HWG.renown == r0 + 3 and Echoes.waiting(HWG) == "", "set to mend the road: remembered, mercy tipped, the valley hears")
+	Echoes.take(HWG, "bandits", "drive")
+	check(Echoes.chosen(HWG, "bandits") == "mend" and Echoes.scale(HWG, "heart") == 2, "a crossroads is answered once")
+	var gw: Array = Echoes.told(HWG, "s_vl_intro", Data.DIALOGUE.s_vl_intro)
+	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 2],
+		"six parts later Granny Wen speaks of the road-menders, and the echo is kept")
+	check(Echoes.told(HWG, "s_intro", Data.DIALOGUE.s_intro) == Data.DIALOGUE.s_intro, "a conversation with no crossroads behind it is as it was")
+	check(not Echoes.merciful(HWG), "one kindness is not yet a name")
+	Echoes.take(HWG, "roc_egg", "hatch")
+	check(Echoes.merciful(HWG) and Echoes.lean(HWG, "heart") == 1 and Echoes.name_of(HWG, "heart") == "Merciful" and Echoes.names(HWG) == "Merciful" and Echoes.lean_mod(HWG, "stones") > 1.0 and Echoes.lean_mod(HWG, "drop") > 0.0,
+		"two are: the land calls him Merciful, and a beaten pack gives up what it guarded")
+	Echoes.take(HWG, "ancestor", "strike")
+	Echoes.take(HWG, "crows", "banish")
+	Echoes.take(HWG, "roc_egg", "sell")
+	check(Echoes.scale(HWG, "heart") == -1 and not Echoes.merciful(HWG) and not Echoes.feared(HWG), "and rigour afterwards tips it back")
+	HWG.fates = {"tala": "fallen", "hu": "fallen"}
+	check(Echoes.feared(HWG) and Echoes.lean_mod(HWG, "open_hp") == Echoes.FEAR_HP and Echoes.name_of(HWG, "heart") == "Unbending", "the fallen of the five weigh too: unbending, and the wild opens the battle afraid")
+	Echoes.take(HWG, "drawings", "keep")
+	check(Echoes.lean(HWG, "craft") == 1 and Echoes.lean_mod(HWG, "works_stones") == Echoes.WORKS_STONES and Works.cost_stones(HWG, "wooden_ox") < int(Works.TIER_STONES[5]), "of the new works: the makers ask less")
+	Echoes.take(HWG, "cauldron_map", "keep")
+	check(Echoes.lean(HWG, "reach") == -1 and Echoes.lean_mod(HWG, "renown") == float(Echoes.RENOWN_MORE) and Echoes.lean_mod(HWG, "regard") == 1.0, "of the home fire: his name comes back larger")
+	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 2") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
+	# the last question of Part XIX can only be answered for a school by somebody who has built three works of it
+	HWG.works = {}
+	var lastq: Dictionary = Echoes.CROSSROADS.the_works
+	check(not Echoes.option_ok(HWG, Echoes.option("the_works", "wheel")) and not Echoes.option_ok(HWG, Echoes.option("the_works", "hand")) and Echoes.option_ok(HWG, Echoes.option("the_works", "ask")), "with nothing built it is not his to say: only the gardener can be asked")
+	HWG.works = {"well_sweep": 1, "trip_hammer": 1, "water_bellows": 1}
+	check(Echoes.option_ok(HWG, Echoes.option("the_works", "wheel")) and not Echoes.option_ok(HWG, Echoes.option("the_works", "dao")) and Echoes.option_text(HWG, Echoes.option("the_works", "wheel")).contains("[x] 3 works"), "three works of the Wheel: he may answer for the Wheel, and for no other school")
+	check((lastq.options as Array).filter(func(o2): return (o2.get("need", []) as Array).is_empty()).size() == 1, "one answer to the last question is open to everybody")
+	var msrc2 := FileAccess.get_file_as_string("res://scripts/main.gd")
+	check(msrc2.contains("func ask_crossroads") and msrc2.contains("Echoes.told(Game, key") and msrc2.contains("Echoes.epilogue(Game)") and bsrc2.contains("Echoes.lean_mod(Game, \"stones\")") and bsrc2.contains("Echoes.FEAR_HP") and not bsrc2.contains("yielded"),
+		"the crossroads are asked, echo in the story, are told at the end, and are felt in battle")
+	# every echo and every word at a crossroads is told of her as well as of him (voice.gd)
+	var odd2: Array = []
+	for cid2 in Echoes.ORDER:
+		var c2: Dictionary = Echoes.CROSSROADS[cid2]
+		var convs: Array = []
+		for oid2 in c2.after:
+			convs.append(c2.after[oid2])
+		for ek2 in c2.echo:
+			for oid3 in c2.echo[ek2]:
+				convs.append(c2.echo[ek2][oid3])
+		for src in convs:
+			var told: Array = Voice.lines(src)
+			for i in (src as Array).size():
+				if str(src[i][0]) != "Narrator" and str(told[i][1]) != Voice.said(str(src[i][1])):
+					odd2.append("%s:%s" % [cid2, str(src[i][1]).substr(0, 30)])
+	check(odd2.is_empty(), "nobody who speaks at a crossroads has their own words changed when the hero is a woman (%s)" % str(odd2.slice(0, 4)))
+	HWG.free()
+	print("== Part XIX: the Machine Heart ==")
+	check(Data.REALMS.size() == 25 and Data.REALMS[24] == "Skill Become Dao" and Data.MAX_LEVEL == 72 and Data.level_name(72).ends_with("Skill Become Dao") and Data.REALM_INFO.size() == 25 and Data.EXP_NEED.size() == Data.MAX_LEVEL
+		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XIX adds the Skill Become Dao realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break24" and Data.DIALOGUE.has("recall17") and msrc2.contains("\"s_break23\": \"recall17\"") and Data.DIALOGUE.has("pre:s_break24") and Data.DIALOGUE.has("post:s_break24"),
+		"Part XIX follows Fire Passed On (recall17) and ends the game")
+	for tid in ["cloud_ladder", "the_player", "jixin", "wooden_magpie"]:
+		check(Trials.TRIALS.has(tid) and Lore.BOSS.has(tid) and Data.DIALOGUE.has("pre:" + tid) and Data.DIALOGUE.has("post:" + tid), "%s is a trial, with a story and words before and after" % tid)
+		check((Trials.TRIALS[tid].paths as Array).any(func(pth): return str(pth.kind) == "works"), "%s can be passed by the works" % tid)
+		check(_kill_step(tid) > Data.step_index("s_p19_home"), "%s is faced in Part XIX" % tid)
+	check(Trials.KINDS.has("works") and Trials.EPITHETS.has("works") and Assets.PEOPLE.has("the_player") and "person:the_player" in UI.SHAPES and Data.BOSS_DROPS.get("jixin", "") == "still_heart" and Data.ITEMS.has("still_heart"),
+		"the Player is Blender-built, and the Machine Heart leaves the stopped escapement")
+	for mon in ["wheel_mite", "treadle_imp", "idle_shuttle", "cog_crab", "bellows_wraith", "hammer_golem", "wooden_kite", "stray_ox", "paper_servant", "brass_spiderling", "counting_wasp", "tally_golem"]:
+		check(Data.ENEMIES.has(mon) and Lore.BEAST.has(mon), "%s has a story" % mon)
+	for who in ["gongshu_ban", "mo_di", "gardener_hanyin", "yan_shi"]:
+		check(Assets.PEOPLE.has(who) and FileAccess.file_exists("res://art/characters/%s.py" % who) and Data.CHAT.has(who) and Trials.npc_area(who) != "", "%s is Blender-built, lives somewhere and has things to say" % who)
+	var wsurf3: Dictionary = Atlas.world_of("surface")
+	for lid in ["gongshu_ban", "gardener_hanyin", "mo_di", "yan_shi", "boss_cloud_ladder", "boss_the_player", "boss_jixin", "boss_wooden_magpie", "p19_tim1", "p19_tim6", "p19_part1", "p19_part6", "p19_cog1", "p19_cog5"]:
+		check(wsurf3.ents.filter(func(e3): return str(e3.id) == lid).size() == 1, "%s stands in the world once (late: no older map moved for it)" % lid)
+	for sid2 in ["s_p19_campfire", "s_p19_rest"]:
+		var sp: Dictionary = Data.STEPS[Data.step_index(sid2)]
+		check(Bonds.SHARES.has(sid2) and not Bonds.find_spot(wsurf3.ents, str(sp.spot)).is_empty() and Bonds.share_place(sid2) != "side by side", "%s: a scene with Yue Ling, at a place that is there" % sid2)
+	for sid3 in ["s_p19_timber", "s_p19_build", "s_p19_farm", "s_p19_mites", "s_p19_cogs", "s_p19_hammer", "s_p19_ferry", "s_p19_parts", "s_p19_porters", "s_p19_kites", "s_p19_lamps", "s_p19_doors", "s_p19_spiders", "s_p19_founders", "s_p19_shuttles", "s_p19_clouds"]:
+		check(Data.DIALOGUE.has("done:" + sid3), "%s has its word to say when it is done" % sid3)
+	for hs in ["s_p19_mites", "s_p19_hammer", "s_p19_kites", "s_p19_spiders", "s_p19_shuttles", "s_p19_clouds"]:
+		var hst: Dictionary = Data.STEPS[Data.step_index(hs)]
+		var band: Dictionary = Data.AREAS[str(hst.area)].get("warband", {})
+		check(bool(hst.get("first", false)) and bool(band.get("late", false)) and Data.step_index(str(band.vis)) < Data.step_index(hs) and int(band.n) * 2 >= int(hst.n), "%s: the packs are there before it, enough of them, and it asks for the first strike" % hs)
+		for pe in band.pool:
+			check(str(pe[0]) in hst.of, "%s hunts %s" % [hs, pe[0]])
+	var wk: Dictionary = Data.STEPS[Data.step_index("s_p19_build")]
+	var WG = load("res://scripts/game.gd").new()
+	WG.reset()
+	WG.step = Data.step_index("s_p19_build")
+	WG.works = {"well_sweep": 1, "fire_kit": 1}
+	check(str(wk.kind) == "works" and WG.objective_text().contains("(2/3)"), "the step that asks for works counts them")
+	WG.works["array"] = 1
+	WG.poll_steps()
+	check(WG.step == Data.step_index("s_p19_build") + 1, "three works built with his own hands, and the story goes on")
+	# a step of visits begins with nobody visited, whoever was called on in an earlier chapter
+	WG.step = Data.step_index("s_p19_makers") - 1
+	WG.visited = {"smith": true, "auntie_rong": true, "lantern_xi": true, "yu_hua": true}
+	WG.boss_done["the_player"] = true
+	WG.advance()
+	var mk: Dictionary = Data.STEPS[Data.step_index("s_p19_makers")]
+	check(WG.cur_step().id == "s_p19_makers" and WG.visits_done(mk) == 0 and WG.visited.has("yu_hua"), "the makers are all still to be called on, though three of them were called on in earlier chapters")
+	for nid in mk.npcs:
+		check(Data.DIALOGUE.has("visit:s_p19_makers:" + str(nid)), "%s has words of their own for this call" % nid)
+	# the answer is carried home to the keepers of the hearths, who were carried the new fire in Part XVIII
+	var wd2: Dictionary = Data.STEPS[Data.step_index("s_p19_word")]
+	var keepers2: Array = Cultures.ORDER.map(func(h6): return str(Cultures.HEARTHS[h6].keeper))
+	for kn in wd2.npcs:
+		check(str(kn) in keepers2 and Data.DIALOGUE.has("visit:s_p19_word:" + str(kn)), "%s keeps a hearth, and has words for what was decided" % kn)
+	check(Data.step_index("s_p19_word") > Data.step_index("s_p19_heart") and Data.step_index("s_p19_magpie") > Data.step_index("s_p19_heart") and Data.BOSS_DROPS.get("jixin", "") == "still_heart"
+		and (Trials.TRIALS.wooden_magpie.paths as Array).any(func(pm): return str(pm.kind) == "relic" and pm.needs == [["item", "still_heart", 1]]),
+		"the stopped escapement the Machine Heart leaves is what brings the Wooden Magpie down, and the answer is carried home after it is given")
+	WG.free()
+	check(Impact.OBSTACLES.has("cogwork") and Data.ITEMS.has("catalpa_timber") and Data.ITEMS.has("player_part") and Trials.RECIPES.has("defence_models") and Folk.ERRANDS.has("s_p19_farm") and Folk.ERRANDS.has("s_p19_porters"),
+		"locked gear-trains, catalpa, the Player's cast-off pieces, Mozi's belt and nine sticks, and two errands")
+	for fs in ["s_p19_farm", "s_p19_ferry", "s_p19_porters", "s_p19_lamps", "s_p19_founders"]:
+		var fst: Dictionary = Data.STEPS[Data.step_index(fs)]
+		check(str(fst.kind) == "folk" and fst.has("hearth") and fst.has("town") and Cultures.HEARTHS.has(str(fst.hearth)) and str(fst.town) in Cultures.HEARTHS[str(fst.hearth)].towns, "%s is an errand among a hearth's own townsfolk" % fs)
+	for cid3 in ["the_wheel", "the_player", "the_works"]:
+		check(Data.step_index(str(Echoes.CROSSROADS[cid3].step)) > Data.step_index("s_p19_home"), "the crossroads %s is in Part XIX" % cid3)
+	var bsrc3 := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bsrc3.contains("\"cloud_ladder\": \"craft\"") and bsrc3.contains("\"jixin\": \"works\"") and bsrc3.contains("\"wooden_magpie\": \"relic\"") and bsrc3.contains("CROSS_PLAN") and bsrc3.contains("WORKS_PLAN") and bsrc3.contains("\"s_p19_rest\""),
+		"the bot builds works, answers at every crossroads, and has a way through the three trials")
+	var plan_src := bsrc3.substr(bsrc3.find("const CROSS_PLAN"), 1400)
+	for cid4 in Echoes.ORDER:
+		check(plan_src.contains("\"%s\": [" % cid4), "the bot has an answer for the crossroads %s" % cid4)
 
 ## Whether `s` has one of `words` as a whole word (any case).
 func _has_word(s: String, words: Array) -> bool:

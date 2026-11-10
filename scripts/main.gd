@@ -49,15 +49,28 @@ func _ready() -> void:
 	if args.has("timescale"):
 		Engine.time_scale = float(args.timescale)
 	push("title")
+	# the land is generated in the background while the title is on screen (atlas.gd): by the time the
+	# hero is made it is there, instead of eight seconds of nothing after "Begin"
+	if DisplayServer.get_name() != "headless" and not args.has("bot") and not args.has("tour") and not args.has("no-warm"):
+		Atlas.warm()
 	if args.has("tour"):
 		var tour = load("res://scripts/tour.gd").new()
 		tour.main = self
 		add_child(tour)
+	if args.has("bench"):
+		# (developer tool: how long the world takes to open and what a frame costs, bench.gd)
+		var bench = load("res://scripts/bench.gd").new()
+		bench.main = self
+		add_child(bench)
 	if args.has("bot"):
 		bot_active = true
 		bot = load("res://scripts/bot.gd").new()
 		bot.main = self
 		add_child(bot)
+
+func _exit_tree() -> void:
+	# (the land may still be being generated behind the title: atlas.gd)
+	Atlas.settle()
 
 func _make(n: String) -> ScreenBase:
 	var node := ScreenBase.new()
@@ -189,6 +202,9 @@ func press(act: String) -> void:
 func _process(d: float) -> void:
 	_talk_hint()
 	_done_scene()
+	# a crossroads of the road reached out in the land (echoes.gd) is asked once nothing else is going on
+	if not Game.cross_pending.is_empty() and Game.done_pending.is_empty() and top_name() == "world" and world.using.is_empty() and not world.traveling() and world.ambush_t < 0.0 and Game.prologue == "":
+		ask_picks()
 	for t in toast_list:
 		t.t -= d
 	toast_list = toast_list.filter(func(t): return t.t > 0.0)
@@ -270,7 +286,8 @@ func open_dao_choice(from: String) -> void:
 ## what Chong and Li make of it, the ending; and when one of the peoples of the realms first speaks to
 ## him in a quest scene, what their people think of his Dao.
 func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
-	var lines: Array = Data.DIALOGUE.get(key, []).duplicate()
+	# (the crossroads behind this conversation add their echoes to it: echoes.gd)
+	var lines: Array = Echoes.told(Game, key, Data.DIALOGUE.get(key, [])).duplicate()
 	# who he was before the sect (character creation) has a word to say here and there
 	lines.append_array(origin_lines(key))
 	# the end of the climb: what became of the five whose lives he changed (fate.gd), and of the place
@@ -286,6 +303,15 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		# and of Yue Ling, and the road she chose for herself (bonds.gd)
 		for ep3 in Bonds.epilogues(Game):
 			lines.append(["Narrator", ep3])
+		# and of every crossroads of the road (echoes.gd): what came of each answer, a few at a time, and
+		# what the land came to call him for them; and of what he built (works.gd)
+		var ce: Array = Echoes.epilogue(Game)
+		for k0 in range(0, ce.size(), 4):
+			lines.append(["Narrator", " ".join(ce.slice(k0, k0 + 4))])
+		if Echoes.names(Game) != "":
+			lines.append(["Narrator", "And the land, which had watched every one of those choices, had its own names for Lin Feng by the end: %s." % Echoes.names(Game)])
+		if Works.count(Game) > 0:
+			lines.append(["Narrator", "%d works stand in the land that Lin Feng built with his own hands, and the makers call him %s." % [Works.count(Game), Works.title(Game)]])
 		lines.append_array(origin_lines("ending"))
 		# (and where the hero's own fire is kept, cultures.gd, is told when the end is chosen: choose_ending)
 	# the road Lin Feng took into the heart of the Eight Gates (Part XIII) tells the end its own way
@@ -448,6 +474,9 @@ func interact(e: Dictionary) -> void:
 			else:
 				var need2: Dictionary = Data.STEPS[Data.step_index(str(e.open))]
 				Game.toast("The way is closed for now. (%s)" % need2.t)
+		"machine":
+			# the Hundred Works (works.gd): what it is and what it does
+			say([["Narrator", Works.site_desc(str(e.work))]])
 		"obstacle":
 			# Part XVII (impact.gd): it stands in the way until the sword clears it
 			Game.toast(str(Impact.OBSTACLES.get(str(e.what), {}).get("hint", "Something stands in the way (F)")))
@@ -576,7 +605,9 @@ func talk_npc(e: Dictionary) -> void:
 		return
 	# a step that asks for visits, in any order (Part XIII: the Conclave's invitations): this is one
 	if not s.is_empty() and s.kind == "visits" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
-		say(Data.DIALOGUE.get("visit:" + str(e.id), []), func():
+		# (a later chapter may call on somebody an earlier one called on: its own words for them, if it has any)
+		var vkey := "visit:%s:%s" % [str(s.id), str(e.id)]
+		say(Data.DIALOGUE.get(vkey, Data.DIALOGUE.get("visit:" + str(e.id), [])), func():
 			Game.visited[str(e.id)] = true
 			# (the Conclave's invitations, Part XIII; a step may say what a visit is instead: Part XVI's New Year calls)
 			if s.has("did"):
@@ -728,6 +759,29 @@ func ask_picks() -> void:
 			say(pk.after.get(oid, []))
 		, false)
 		return
+	ask_crossroads()
+
+## A crossroads of the road (echoes.gd): asked once, after the step it follows, with no way out of
+## answering.  Every answer says what it does and which way it leans; the last question of Part XIX
+## can only be answered for a school of the works by somebody who has built three of it.
+func ask_crossroads() -> void:
+	while not Game.cross_pending.is_empty() and Game.picks.has(str(Game.cross_pending[0])):
+		Game.cross_pending.pop_front()
+	if Game.cross_pending.is_empty():
+		return
+	var cid: String = str(Game.cross_pending[0])
+	var c: Dictionary = Echoes.CROSSROADS[cid]
+	var opts: Array = []
+	for o in c.options:
+		var ok := Echoes.option_ok(Game, o)
+		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yours to say", "desc": Echoes.option_text(Game, o), "col": Color("e8d090"), "enabled": ok})
+	choose(str(c.ask), opts, func(oid: String):
+		if oid == "" or not Echoes.option_ok(Game, Echoes.option(cid, oid)):
+			return
+		Echoes.take(Game, cid, oid)
+		Game.cross_pending.erase(cid)
+		say(c.get("after", {}).get(oid, []), func(): ask_picks())
+	, false)
 
 ## A grudge that stayed is spent (grudges.gd, Part XIV): what was it owed?  Every option says what it
 ## does, needs and costs; one whose needs are not met cannot be taken, and leaving it to the Wheel
@@ -1010,7 +1064,8 @@ func open_abode(e: Dictionary) -> void:
 
 func start_encounter(e: Dictionary, ambush: bool = false) -> void:
 	# (`ambush`: the pack was struck first in the land, impact.gd, and opens the battle reeling)
-	battle.start(e.group, {"entity": e, "boss": false, "theme": world.theme_name, "ambush": ambush})
+	# (and the hour it was met at decides what it was doing: asleep, hunting, resting, habits.gd)
+	battle.start(e.group, {"entity": e, "boss": false, "theme": world.theme_name, "ambush": ambush, "habit": Habits.act_of_group(Game, e.group)})
 	push("battle")
 
 func boss_interact(e: Dictionary) -> void:
@@ -1042,7 +1097,7 @@ func boss_interact(e: Dictionary) -> void:
 		say(why, func(): open_trial(e))
 		return
 	var pre: Array = boss_story(e.enemy)
-	pre.append_array(Data.DIALOGUE.get("pre:" + e.enemy, []))
+	pre.append_array(Echoes.told(Game, "pre:" + str(e.enemy), Data.DIALOGUE.get("pre:" + e.enemy, [])))
 	say(pre, func():
 		var foe := {"id": e.enemy, "lv": e.lv}
 		if Grudges.is_grudge(e.enemy):
@@ -1082,7 +1137,7 @@ func open_trial(e: Dictionary) -> void:
 		if p.is_empty():
 			return
 		var lines: Array = [["Narrator", str(p.line)]]
-		lines.append_array(Data.DIALOGUE.get("pre:" + tid, []))
+		lines.append_array(Echoes.told(Game, "pre:" + tid, Data.DIALOGUE.get("pre:" + tid, [])))
 		say(lines, func(): trial_battle(e, p))
 	)
 
@@ -1118,7 +1173,7 @@ func start_breakthrough() -> void:
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
-	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16"}
+	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

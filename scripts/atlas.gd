@@ -221,9 +221,36 @@ static func rect_to_world(id: String, r: Rect2i) -> Rect2i:
 # ---------------------------------------------------------------- world build
 static func world() -> Dictionary:
 	if _world.is_empty():
-		_world = _build()
+		if _warm != null:
+			# (it is being generated in the background, `warm`: wait for that rather than start again)
+			_world = _warm.wait_to_finish()
+			_warm = null
+		else:
+			_world = _build()
 		_worlds["surface"] = _world
 	return _world
+
+## Start generating the land in the background (it takes several seconds, and nothing but the layout
+## is read from anywhere else while it runs), so that it is ready, or nearly, by the time the title
+## screen and the making of the hero are done.  The game with a window calls this as it starts; the
+## bot, the tests and the tour do not, and generate it where they first ask for it, as before.  The
+## result is the same either way: the generator draws on nothing but the data and its own seeds.
+static var _warm: Thread = null
+
+static func warm() -> void:
+	if not _world.is_empty() or _warm != null:
+		return
+	layout()
+	_warm = Thread.new()
+	_warm.start(func() -> Dictionary: return _build())
+
+## The background generation, if it is still running, is waited for (the game is closing: a thread
+## must not be left behind).
+static func settle() -> void:
+	if _warm != null:
+		_world = _warm.wait_to_finish()
+		_worlds["surface"] = _world
+		_warm = null
 
 ## The world of a realm ("surface", "heaven", "under") or of a building's floor ("f:..."), built once.
 static func world_of(layer: String) -> Dictionary:
@@ -555,6 +582,11 @@ static func _build(layer: String = "surface") -> Dictionary:
 				if pk2.has("n"):
 					pe["n"] = pk2.n
 				ents.append(pe)
+	# ---- the Hundred Works (works.gd): the machines stand in the land once they are built (and Gongshu
+	# Ban's wheel from the step in which he is met), added after everything else, so no older map moves
+	for ms in Works.sites():
+		if ids.has(str(ms[2])):
+			ents.append({"kind": "machine", "id": str(ms[0]), "work": str(ms[1]), "pos": to_world(str(ms[2]), ms[3]), "area": str(ms[2]), "layer": layer, "late": true})
 	# and the war-bands that came later in the story: packs of two or three on open ground of their
 	# region that the sect can reach, four tiles from anybody and anything (a seeded draw, so the same
 	# every time)

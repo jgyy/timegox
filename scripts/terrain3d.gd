@@ -588,6 +588,7 @@ static func _corner_col(grid: PackedByteArray, w: int, h: int, cx: int, cz: int,
 ## opts: "hm" (corner heights to use instead of this map's own), "open" (part of the open world:
 ## no skirt or horizon of its own), "buildings" (enterable buildings in local tiles), "area"
 static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, seed_: int, opts: Dictionary = {}) -> Node3D:
+	var pt_start := Time.get_ticks_usec()
 	var th := Look.theme(theme_name)
 	var root := Node3D.new()
 	root.name = "terrain_" + str(opts.get("area", theme_name))
@@ -658,12 +659,16 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 			if not water.is_empty():
 				var wi := MB.mesh_node(root, water.build(wmat))
 				wi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var prof := OS.has_environment("AZ_PROFILE")
+	var pt0 := Time.get_ticks_usec()
 	# trees, undergrowth, grass, rocks, landmarks: natural placement (see scatter.gd)
 	Scatter.populate(root, grid, w, h, hm, theme_name, seed_)
+	var pt1 := Time.get_ticks_usec()
 	# stone bridges wherever a road crosses water
 	_bridges(root, grid, w, h, hm)
 	# birds, butterflies, dragonflies, fish... (see fauna.gd)
 	Fauna.populate(root, grid, w, h, hm, theme_name, seed_)
+	var pt2 := Time.get_ticks_usec()
 	if not opts.get("open", false):
 		_skirt(root, w, h, theme_name, seed_)
 		_horizon(root, w, h, theme_name, seed_)
@@ -678,6 +683,9 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 	root.set_meta("uppers", uppers)
 	if str(opts.get("area", theme_name)) == "sect":
 		_sect_props(root, grid, w, h, hm)
+	if prof:
+		print("[profile]   terrain %-10s ground %5d ms, scatter %5d ms, bridges+fauna %5d ms, houses %5d ms" % [str(opts.get("area", theme_name)), (pt0 - pt_start) / 1000, (pt1 - pt0) / 1000, (pt2 - pt1) / 1000,
+			(Time.get_ticks_usec() - pt2) / 1000])
 	return root
 
 ## Ground height at a point inside the region (tile units) near water: land and water share are
@@ -931,6 +939,12 @@ static func world_sea(root: Node3D, wd: Dictionary) -> void:
 
 ## does tile (x, y) have a 4- or 8-neighbour whose sea flag is `want`?
 static func _touches(sea: PackedByteArray, W: int, H: int, x: int, y: int, want: int) -> bool:
+	# (asked of every tile of the world when the sea is laid: away from the world's edge the eight
+	# neighbours are read straight out of the array, with nothing built to walk over)
+	if x > 0 and y > 0 and x < W - 1 and y < H - 1:
+		var i := y * W + x
+		return sea[i + 1] == want or sea[i - 1] == want or sea[i + W] == want or sea[i - W] == want \
+			or sea[i + W + 1] == want or sea[i + W - 1] == want or sea[i - W + 1] == want or sea[i - W - 1] == want
 	for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(-1, -1)]:
 		var nx: int = x + d.x
 		var ny: int = y + d.y
@@ -2017,22 +2031,131 @@ static func _great_wheel(b: MB, g: MB, cx: float, cz: float, r: float, far: Colo
 	b.cyl(hub, 7.0, 6.0, stone.darkened(0.15), bs.get_euler() + Vector3(PI / 2, 0, 0), 12)
 	g.ball(hub, 9.0, Color(0.4, 0.75, 1.0, 0.35), true)
 
-static func _add_mm(root: Node3D, mesh: Mesh, xf: Array, cols: Array, shadow: bool, vis_end: float) -> MultiMeshInstance3D:
+## Beyond this distance (metres) a heavy thing of the scatter (a tree, a landform, a karst tower) is
+## drawn from its far mesh: the same vertices with the solid parts thinned to about a third of their
+## triangles (`far_mesh`).  It is also where the sun's shadows end (Look.sun), so nothing that casts a
+## shadow changes shape.  Only things drawn out to FAR_FROM or more and heavy enough to matter get one.
+const FAR_AT := 56.0
+const FAR_FROM := 100.0
+const FAR_TRIS := 500
+const FAR_KEEP := 0.4
+static var _far := {}
+
+## The far mesh of `mesh` (null if it is too light to need one): every surface with enough triangles
+## has its index list replaced by one of the engine's own simplifications of it (the first that keeps
+## no more than FAR_KEEP of the triangles); leaf cards, glow and small parts are kept as they are.
+## The vertices, colours and materials are the mesh's own, so it reads the same from a distance.
+static func far_mesh(mesh: Mesh) -> Mesh:
+	var id := mesh.get_instance_id()
+	if _far.has(id):
+		return _far[id]
+	var out: ArrayMesh = null
+	var am := mesh as ArrayMesh
+	if am != null:
+		var total := 0
+		var kept := 0
+		var parts: Array = []
+		for si in am.get_surface_count():
+			var arr: Array = am.surface_get_arrays(si)
+			var ind = arr[Mesh.ARRAY_INDEX]
+			var tris: int = (ind as PackedInt32Array).size() / 3 if ind != null else 0
+			total += tris
+			if tris >= 160:
+				var im := ImporterMesh.new()
+				im.add_surface(Mesh.PRIMITIVE_TRIANGLES, arr)
+				im.generate_lods(25.0, 60.0, [])
+				var best := PackedInt32Array()
+				for li in im.get_surface_lod_count(0):
+					var li_ind := im.get_surface_lod_indices(0, li)
+					if best.is_empty() or (best.size() > int(tris * 3 * FAR_KEEP) and li_ind.size() < best.size()):
+						best = li_ind
+				if not best.is_empty() and best.size() < (ind as PackedInt32Array).size():
+					arr[Mesh.ARRAY_INDEX] = best
+					tris = best.size() / 3
+			kept += tris
+			parts.append([arr, am.surface_get_material(si)])
+		if total >= FAR_TRIS and kept <= int(total * 0.75):
+			out = ArrayMesh.new()
+			for pt in parts:
+				out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, pt[0])
+				out.surface_set_material(out.get_surface_count() - 1, pt[1])
+	_far[id] = out
+	return out
+
+static func _mm(mesh: Mesh, xf: Array, cols: Array) -> MultiMesh:
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
 	mm.use_colors = true
 	mm.mesh = mesh
-	mm.instance_count = xf.size()
-	for i in xf.size():
-		mm.set_instance_transform(i, xf[i])
-		mm.set_instance_color(i, cols[i])
+	var n := xf.size()
+	mm.instance_count = n
+	# (one buffer for the whole chunk instead of two calls into the engine for every instance: a
+	# region's scatter is some hundreds of thousands of instances)
+	var buf := PackedFloat32Array()
+	buf.resize(n * 16)
+	var o := 0
+	for i in n:
+		var t: Transform3D = xf[i]
+		var bx := t.basis.x
+		var by := t.basis.y
+		var bz := t.basis.z
+		var c: Color = cols[i]
+		buf[o] = bx.x
+		buf[o + 1] = by.x
+		buf[o + 2] = bz.x
+		buf[o + 3] = t.origin.x
+		buf[o + 4] = bx.y
+		buf[o + 5] = by.y
+		buf[o + 6] = bz.y
+		buf[o + 7] = t.origin.y
+		buf[o + 8] = bx.z
+		buf[o + 9] = by.z
+		buf[o + 10] = bz.z
+		buf[o + 11] = t.origin.z
+		buf[o + 12] = c.r
+		buf[o + 13] = c.g
+		buf[o + 14] = c.b
+		buf[o + 15] = c.a
+		o += 16
+	mm.buffer = buf
+	return mm
+
+static func _add_mm(root: Node3D, mesh: Mesh, xf: Array, cols: Array, shadow: bool, vis_end: float) -> MultiMeshInstance3D:
 	var mi := MultiMeshInstance3D.new()
-	mi.multimesh = mm
+	mi.multimesh = _mm(mesh, xf, cols)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if shadow else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.visibility_range_end = vis_end
 	mi.visibility_range_end_margin = 6.0
 	mi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
 	root.add_child(mi)
+	# from far off, a heavy thing is drawn thinned (far_mesh): the full mesh out to FAR_AT, the far
+	# one from there to where it stops being drawn at all
+	var fm: Mesh = far_mesh(mesh) if vis_end >= FAR_FROM else null
+	if fm != null:
+		mi.visibility_range_end = FAR_AT
+		mi.visibility_range_end_margin = 4.0
+		var fi := MultiMeshInstance3D.new()
+		fi.multimesh = _mm(fm, xf, cols)
+		fi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		fi.visibility_range_begin = FAR_AT
+		fi.visibility_range_begin_margin = 4.0
+		fi.visibility_range_end = vis_end
+		fi.visibility_range_end_margin = 6.0
+		fi.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
+		root.add_child(fi)
+		mi.set_meta("far", fi)
+		if shadow:
+			# and its shadow is cast by the thinned mesh too (the same instances, drawn into the shadow
+			# map only): a soft shadow does not show a trunk with fewer sides, and the sun's two shadow
+			# passes are where a near tree was drawn most often
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			var si := MultiMeshInstance3D.new()
+			si.multimesh = fi.multimesh
+			si.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+			si.visibility_range_end = FAR_AT
+			si.visibility_range_end_margin = 4.0
+			si.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_DISABLED
+			root.add_child(si)
 	return mi
 
 # ---------------------------------------------------------------- landmark prototypes

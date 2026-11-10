@@ -129,6 +129,14 @@ var done_pending: Array = []
 var hearth := {}
 var sat := {}
 var prologue := ""
+## the Hundred Works release: the works built (works.gd: id -> the day it was built), the crossroads
+## of the road and what was chosen at each (echoes.gd; `picks` keeps the choices themselves), and the
+## three scales those choices tip (echoes.gd SCALES: scale -> points)
+var works := {}
+var scales := {}
+var echoed := {}
+## crossroads reached in play and not yet answered (asked by Main once nothing else is going on)
+var cross_pending: Array = []
 var ending := ""
 
 func _process(d: float) -> void:
@@ -192,6 +200,10 @@ func reset() -> void:
 	fates = {}
 	fate_log = {}
 	picks = {}
+	works = {}
+	scales = {}
+	echoed = {}
+	cross_pending = []
 	bestiary = {}
 	told = {}
 	grudges = {}
@@ -243,7 +255,7 @@ func member_name(i: int) -> String:
 
 func max_hp(i: int) -> int:
 	# (his origin and outfit build his body only, not Yue Ling's: Fashion.gear)
-	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else 1.0))
+	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else 1.0) * Works.mod(self, "hp"))
 
 func max_qi(i: int) -> int:
 	# (his origin and his outfit may widen or narrow his dantian: Fashion.gear)
@@ -321,7 +333,7 @@ func dao_skills(i: int) -> Array:
 
 ## What a technique costs to use (the Cauldron's Dao makes them cheaper).
 func skill_cost(id: String) -> float:
-	var c := float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0) * (1.0 - talent_mod("cost")) * (1.0 - Fashion.gear(self, "cost"))
+	var c := float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0) * (1.0 - talent_mod("cost")) * (1.0 - Fashion.gear(self, "cost")) * Works.mod(self, "cost")
 	# the crown of the Five-Phase Root: techniques that strike every foe cost a fifth less
 	if talent_crown("five_phase") and str(Data.SKILLS[id].tgt) == "all":
 		c *= 0.8
@@ -420,6 +432,8 @@ func race_gain(race: String, n: int) -> void:
 	var before := race_tier(race)
 	if dao != "" and Data.RACES[race].dao == dao:
 		n = int(ceil(n * 1.5))
+	# (echoes.gd: the peoples warm faster to somebody known to belong to the wide world)
+	n = int(ceil(n * Echoes.lean_mod(self, "regard")))
 	standing[race] = mini(int(standing.get(race, 0)) + n, Data.KIN)
 	var after := race_tier(race)
 	if after > before:
@@ -531,7 +545,7 @@ func do_breakthrough() -> void:
 
 func med_rate(near_spring: bool) -> float:
 	# an Enlightened Mind goes deeper into every meditation
-	return (3.0 + 1.2 * level) * (3.0 if near_spring else 1.0) * (1.0 + talent_mod("med"))
+	return (3.0 + 1.2 * level) * (3.0 if near_spring else 1.0) * (1.0 + talent_mod("med")) * Works.mod(self, "med")
 
 # ---------------------------------------------------------------- quests
 func cur_step() -> Dictionary:
@@ -556,6 +570,10 @@ func advance() -> void:
 	note("Quest complete: %s" % s.t)
 	if Data.DIALOGUE.has("done:" + str(s.id)):
 		done_pending.append(str(s.id))
+	# a crossroads of the road waits behind this step (echoes.gd): asked once Lin Feng is free to answer
+	for cid in Echoes.ORDER:
+		if str(Echoes.CROSSROADS[cid].step) == str(s.id) and not picks.has(cid) and not cross_pending.has(cid):
+			cross_pending.append(cid)
 	# the story sets the hour here and there (clock.gd)
 	Clock.story_hour(self, str(s.id))
 	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
@@ -564,7 +582,8 @@ func advance() -> void:
 	# and what is done among a hearth of the land for its own people (cultures.gd): a step that names
 	# its hearth is a deed for it; a word, an errand or a scene in its country is a small one
 	if s.has("hearth"):
-		add_hearth(str(s.hearth), Cultures.DEED)
+		# (echoes.gd: a keeper of the old ways is thanked a little more at every hearth)
+		add_hearth(str(s.hearth), Cultures.DEED + int(Echoes.lean_mod(self, "hearth")))
 	elif str(s.kind) in ["talk", "folk", "share", "visits", "rally"]:
 		add_hearth(Cultures.of_area(str(s.get("area", ""))), 1)
 	# an outfit or a ride the story gives here (the Elder's robe, the flying sword, an immortal's cloud)
@@ -575,6 +594,12 @@ func advance() -> void:
 			grant_ride(str(rw[1]))
 	step += 1
 	hunt = 0
+	# a step that asks for visits starts with nobody visited: somebody called on in an earlier chapter
+	# (Smith Tie at the New Year, Auntie Rong with the new fire) is called on again
+	var ns := cur_step()
+	if not ns.is_empty() and str(ns.kind) == "visits":
+		for vn in ns.get("npcs", []):
+			visited.erase(vn)
 	if step >= Data.STEPS.size():
 		finished = true
 		note("Ascended")
@@ -622,6 +647,9 @@ func poll_steps() -> void:
 			"clear":
 				# Part XVII: so many of the obstacles of one kind in a region cleared with the sword
 				ok = cleared_count(s) >= int(s.n)
+			"works":
+				# Part XIX: so many works built with his own hands, any of them (works.gd)
+				ok = Works.count(self) >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -655,6 +683,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(folk_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "clear":
 		t += "  (%d/%d)" % [mini(cleared_count(s), int(s.n)), int(s.n)]
+	elif s.kind == "works":
+		t += "  (%d/%d)" % [mini(Works.count(self), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":
@@ -690,7 +720,8 @@ func take_path(tid: String, pid: String) -> Dictionary:
 ## A trial passed: remembered with the path that passed it, and the world hears of it.
 func trial_won(tid: String, pid: String) -> void:
 	trials[tid] = pid
-	add_renown(Trials.RENOWN_TRIAL)
+	# (echoes.gd: a name that goes out from one valley comes back larger)
+	add_renown(Trials.RENOWN_TRIAL + int(Echoes.lean_mod(self, "renown")))
 
 ## Make something at a cauldron or a forge.
 func craft(id: String) -> bool:
@@ -712,7 +743,7 @@ func do_deed(id: String) -> bool:
 	stones += int(d.get("stones", 0))
 	toast("Deed done: +%d renown, +%d spirit stones" % [int(d.renown), int(d.get("stones", 0))])
 	note("A deed for %s" % Trials.npc_name(str(d.npc)))
-	add_renown(int(d.renown))
+	add_renown(int(d.renown) + int(Echoes.lean_mod(self, "renown")))
 	return true
 
 ## How many of the people a "visits" step names Lin Feng has been to (for a "threads" step, Part XV:
@@ -867,7 +898,7 @@ func use_item_field(id: String) -> String:
 		if hp[i] >= max_hp(i) - 0.5:
 			return "Everyone is already at full health."
 		inv[id] -= 1
-		hp[i] = minf(float(max_hp(i)), hp[i] + max_hp(i) * 0.4 * dao_mod("pill", 1.0))
+		hp[i] = minf(float(max_hp(i)), hp[i] + max_hp(i) * 0.4 * dao_mod("pill", 1.0) * Works.mod(self, "pill"))
 		return "%s recovers health." % member_name(i)
 	if id == "qi_pill":
 		inv[id] -= 1
@@ -881,7 +912,7 @@ func use_item_field(id: String) -> String:
 		if qi[j] >= max_qi(j) - 0.5:
 			inv[id] += 1
 			return "Everyone's qi is already full."
-		qi[j] = minf(float(max_qi(j)), qi[j] + max_qi(j) * 0.5 * dao_mod("pill", 1.0))
+		qi[j] = minf(float(max_qi(j)), qi[j] + max_qi(j) * 0.5 * dao_mod("pill", 1.0) * Works.mod(self, "pill"))
 		return "%s recovers qi." % member_name(j)
 	return ""
 

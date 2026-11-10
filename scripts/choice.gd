@@ -72,7 +72,17 @@ func _draw() -> void:
 		draw_rect(Rect2(Vector2(VIEW.x - 420, 0), Vector2(420, VIEW.y)), Color(0.02, 0.03, 0.06, 0.75))
 	else:
 		draw_rect(Rect2(Vector2.ZERO, VIEW), Color(0.02, 0.03, 0.06, 0.8))
-	UI.text(self, Vector2(60, 76), title, 24, UI.C_GOLD)
+	# a question too long for one line (the crossroads of the road, echoes.gd, are whole sentences) is
+	# wrapped over as many lines as it needs, and the panels start under it: it used to run off the
+	# right edge of the screen
+	var top := 92.0
+	var tfont := UI.font()
+	if tfont.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, 24).x > VIEW.x - 110.0:
+		var th: float = tfont.get_multiline_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, VIEW.x - 120.0, 19).y
+		UI.wrapped(self, Vector2(60, 46), title, 19, UI.C_GOLD, VIEW.x - 120.0)
+		top = 46.0 + th + 6.0
+	else:
+		UI.text(self, Vector2(60, 76), title, 24, UI.C_GOLD)
 	var labels: Array = []
 	var enabled: Array = []
 	for o in options:
@@ -81,9 +91,9 @@ func _draw() -> void:
 			lb += "  (%s)" % o.note
 		labels.append(lb)
 		enabled.append(o.get("enabled", true))
-	UI.menu_list(self, Rect2(40, 92, 470, mini(600, 40 + options.size() * 46)), labels, cursor, enabled, 20)
+	UI.menu_list(self, Rect2(40, top, 470, mini(600, 40 + options.size() * 46)), labels, cursor, enabled, 20)
 	var o: Dictionary = options[cursor]
-	var r := Rect2(530, 92, 710, 420) if not light else Rect2(VIEW.x - 405, 92, 390, 560)
+	var r := Rect2(530, top, 710, 420) if not light else Rect2(VIEW.x - 405, top, 390, 560)
 	UI.panel(self, r)
 	var col: Color = o.get("col", UI.C_GOLD)
 	draw_rect(Rect2(r.position + Vector2(18, 20), Vector2(6, 40)), col)
@@ -93,4 +103,4 @@ func _draw() -> void:
 		UI.wrapped(self, r.position + Vector2(36, y), "\"%s\"" % o.sub, 18, UI.C_TEXT, r.size.x - 64)
 		y += 74.0
 	UI.wrapped(self, r.position + Vector2(36, y), str(o.get("desc", "")), 17, UI.C_DIM.lightened(0.35), r.size.x - 64)
-	UI.text(self, Vector2(530 if not light else 40, 540 if not light else 700), "Up/Down choose   Enter confirm" + ("   Esc back" if cancel_ok else ""), 15, UI.C_DIM)
+	UI.text(self, Vector2(530 if not light else 40, (top + 448.0) if not light else 700.0), "Up/Down choose   Enter confirm" + ("   Esc back" if cancel_ok else ""), 15, UI.C_DIM)

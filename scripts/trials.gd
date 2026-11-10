@@ -49,8 +49,10 @@ const KINDS := {
 	"land": {"n": "By the land", "col": Color("9ad870"), "what": "the land you have opened with your own blade"},
 	# the New Fire release (Part XVIII): the hearths of the land that call the hero a guest (cultures.gd)
 	"hearth": {"n": "By the hearths", "col": Color("f0a060"), "what": "the hearths of the land that call you a guest"},
+	# the Hundred Works release (Part XIX): what Lin Feng has built with his own hands (works.gd)
+	"works": {"n": "By the works", "col": Color("7ab8d8"), "what": "what you have built with your own hands"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -133,6 +135,8 @@ const RECIPES := {
 	# ---- Part XVI (the Living Land release): red, fire and noise
 	"thunder_cracker": {"at": "alchemist", "in": {"ess_fire": 8, "thunder_bamboo": 2}, "stones": 260000, "after": "s_p16_rally", "for": "xi_beast"},
 	# the New Fire release (Part XVIII): a drill of summer wood, made the way Suiren made his
+	# the Hundred Works release (Part XIX): the belt and nine sticks Mozi laid in front of a king
+	"defence_models": {"at": "smith", "in": {"ess_wood": 8, "ess_metal": 6, "catalpa_timber": 1}, "stones": 360000, "after": "s_p19_cogs", "for": "cloud_ladder"},
 	"fire_drill": {"at": "smith", "in": {"ess_wood": 8, "ess_fire": 6, "apricot_wood": 2}, "stones": 340000, "after": "s_p18_valley", "for": "zhurong"},
 	# the Spring Thunder release (Part XVII)
 	"warm_brazier": {"at": "alchemist", "in": {"ess_fire": 8, "ess_wood": 6}, "stones": 300000, "after": "s_p17_ice", "for": "qing_nu"},
@@ -146,7 +150,8 @@ const RECIPES := {
 static func recipe_stones(id: String, g) -> int:
 	var r: Dictionary = RECIPES[id]
 	var k := 1.0 - (Fate.mo_discount(g) if str(r.at) == "alchemist" else 0.0)
-	return int(round(int(r.get("stones", 0)) * k))
+	# (the water-bellows, works.gd: a furnace blown by the river burns less)
+	return int(round(int(r.get("stones", 0)) * k * Works.mod(g, "recipe")))
 
 static func can_craft(id: String, g) -> bool:
 	var r: Dictionary = RECIPES[id]
@@ -943,6 +948,60 @@ const TRIALS := {
 				"desc": "Late Kindred Dao and a sword tempered eight times: strength enough to drive a whole year out of the village by hand.",
 				"line": "Lin Feng stands in the lane between the beast and the village, and does not move."},
 		]},
+	# ---- Part XIX (the Hundred Works release): the ladder that goes up because up is where a ladder goes,
+	# the dancer who built herself a heart, and what is left of a founder who never said it was enough
+	"cloud_ladder": {"might": [2.4, 1.3],
+		"why": "Gongshu Ban built the first cloud ladder for a king, to go over a wall. This one has no king, no wall and no hand on it: every engine in the land is sending it timber, and it is going up because nobody ever built it a reason to stop.",
+		"paths": [
+			{"id": "craft", "kind": "craft", "n": "A belt and nine sticks", "needs": [["item", "defence_models", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Smith Tie can copy the models Mozi laid on a table in front of the King of Chu: a belt for a wall and nine slips of catalpa for nine defences. Nine times the ladder came on, and nine times it was turned. Every one of its assaults has an answer, and you will be holding them.",
+				"line": "Lin Feng lays the belt on the ground in front of the tower and sets the nine slips on it, one by one, and the Cloud Ladder stops with a wheel in the air, as if it remembered losing."},
+			{"id": "works", "kind": "works", "n": "A maker's eye", "needs": [["works", "", 5]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Five works built with your own hands. Somebody who has cut a mortise knows where a thing is held together, and so where it comes apart: the wedges, the king-post, the one peg everything hangs from.",
+				"line": "Lin Feng walks once round the tower, the way Gongshu Ban walks round a baulk of timber, and knows which peg."},
+			{"id": "might", "kind": "might", "n": "Cut it at the foot", "needs": [["lv", 70], ["temper", 8]], "boon": {},
+				"desc": "Early Skill Become Dao and a sword tempered eight times: a blade that goes through seasoned oak and bronze strapping as an adze goes through pine.",
+				"line": "Lin Feng draws at the foot of the tower, where the eight axles meet, and does not look up."},
+		]},
+	"wooden_magpie": {"might": [2.4, 1.3],
+		"why": "Gongshu Ban built it too well to stop: a magpie of bamboo and wood that flew three days, of which Mozi said a linchpin was worth more. It has been on the wind for two thousand years, and every kite in the land that has nowhere left to go has followed it up.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Show it how to stop", "needs": [["item", "still_heart", 1]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "The stopped escapement from the oldest pit at Tushan: the first one, the piece that lets a machine rest. Hold it up where a thing with one black peg for an eye can see it. It was never given one.",
+				"line": "Lin Feng holds up the little toothed wheel, not turning, and the great bird's wingbeat falters, as if it had heard its own name."},
+			{"id": "works", "kind": "works", "n": "Find the string", "needs": [["works", "", 6]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Six works built with your own hands. A kite, however large, was flown on a string once, and somebody who has made things knows where the bridle was tied: the one place the whole bird hangs from.",
+				"line": "Lin Feng looks at the Wooden Magpie the way Gongshu Ban looks at a joint, and sees the worn place under the breast where the string was."},
+			{"id": "might", "kind": "might", "n": "Out-fly it", "needs": [["lv", 71], ["temper", 8]], "boon": {},
+				"desc": "Middle Skill Become Dao and a sword tempered eight times: a flying sword quick enough to stay above a bird that has had two thousand years of practice.",
+				"line": "Lin Feng steps on to his sword and goes up into the wind after it."},
+		]},
+	"the_player": {"might": [2.4, 1.3],
+		"why": "Yan Shi made a dancer, took out its heart to save his own neck, and kept it. The Player has filled the hollow with the escapements of every machine in the land, and will not be emptied a second time. It has had three thousand years to practise every movement a body can make.",
+		"paths": [
+			{"id": "heart", "kind": "heart", "n": "One who was made, to another", "needs": [["heart", 3]], "boon": {"assist": 0.04, "foe_atk": 0.85},
+				"desc": "Lin Feng and Yue Ling are kindred spirits at least. She was woven on a loom and woke by a pond with nobody's leave. She will not fight the Player: she will stand in front of it and tell it what the first year of having a heart is like.",
+				"line": "Yue Ling steps into the swept circle with her hands open. 'It gets quieter,' she says. 'Not soon. I will not lie to you. But it does.'"},
+			{"id": "works", "kind": "works", "n": "Read the joinery", "needs": [["works", "", 7]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Seven works built with your own hands. The Player moves like water, but it is jointed like a cabinet, and by now you can see how a thing is jointed while it is moving.",
+				"line": "Lin Feng watches the Player's wrist turn once, and sees the silk cord in it, and the pin."},
+			{"id": "might", "kind": "might", "n": "Faster than the dance", "needs": [["lv", 71], ["temper", 8]], "boon": {},
+				"desc": "Middle Skill Become Dao and a sword tempered eight times: quick enough to follow a dancer who has not missed a step since the reign of King Mu.",
+				"line": "Lin Feng steps into the swept circle, and for the first time in three thousand years the Player has a partner."},
+		]},
+	"jixin": {"might": [2.5, 1.3],
+		"why": "The first master of the oldest pit said he would rest when the work was done, and said it for four thousand years. What is left of him is the Machine Heart: every escapement in the land in one wheel, and at the hub a founder who has forgotten there is such a thing as enough.",
+		"paths": [
+			{"id": "works", "kind": "works", "n": "Speak as a maker", "needs": [["works", "best", 4]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Four works of one school, built with your own hands: enough to be a journeyman of it. Jixin does not hear cultivators. He hears makers. Tell him, as one who has also not wanted to put the tool down, what it was like to put it down.",
+				"line": "Lin Feng holds up his two hands, with the splinters in them. 'I know,' he says. 'It works, and you cannot stop looking at it. I know. Stop anyway.'"},
+			{"id": "hearth", "kind": "hearth", "n": "Nine stools and a bench", "needs": [["hearths", 6]], "boon": {"assist": 0.04, "foe_hp": 0.8},
+				"desc": "All six hearths of the land call you a guest. Their makers came down into the pit because you asked, and they will do the one thing the Machine Heart cannot bear: sit down, all together, in front of it, and rest.",
+				"line": "Auntie Rong sits down first. Then Tie, and Gao, and the lantern-maker, and the keeper of one well. The great wheel shudders, as if at a blow."},
+			{"id": "might", "kind": "might", "n": "Stop the wheel by hand", "needs": [["lv", 71], ["temper", 8]], "boon": {},
+				"desc": "Middle Skill Become Dao and a sword tempered eight times: a blade to put between the teeth of a wheel as wide as the pit, and an arm to hold it there.",
+				"line": "Lin Feng walks down the ramp alone, and sets the flat of his sword against the turning rim."},
+		]},
 	# ---- Part XVIII (the New Fire release): the Lord of the Southern Fire, and the fire nobody sat up with
 	"zhurong": {"might": [2.3, 1.3],
 		"why": "Zhurong has opened every summer for ten thousand years by giving the land new fire from Suiren's drill, to hearths put out to receive it. Lin Feng has come with six that would not be put out, and asks him to bless the pot.",
@@ -1083,7 +1142,17 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"hearths":
 			# the New Fire release: the hearths of the land that call the hero a guest (cultures.gd)
 			return Cultures.guests(g) >= int(n[1])
+		"works":
+			# the Hundred Works release: works built (works.gd), of any school (""), of one, or of the
+			# school most built ("best")
+			return works_n(g, str(n[1])) >= int(n[2])
 	return false
+
+## How many works count towards a ["works", school, n] need.
+static func works_n(g, school: String) -> int:
+	if school == "best":
+		return Works.count(g, Works.leading(g)) if Works.leading(g) != "" else 0
+	return Works.count(g, school)
 
 ## How many peoples of the realms call Lin Feng friend (or kin).
 static func friends(g) -> int:
@@ -1145,6 +1214,9 @@ static func need_text(n: Array, g) -> String:
 			return "%d things the long winter left in the way cleared with your sword (now %d)" % [int(n[1]), g.cleared.size()]
 		"hearths":
 			return "%d hearths of the land that call you a guest (now %d; Esc > Hearths)" % [int(n[1]), Cultures.guests(g)]
+		"works":
+			var what := "works built" if str(n[1]) == "" else ("works of one school" if str(n[1]) == "best" else "works of %s" % str(Works.SCHOOLS[n[1]].n))
+			return "%d %s with your own hands (now %d; Esc > Works)" % [int(n[2]), what, works_n(g, str(n[1]))]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1243,7 +1315,8 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	"dao": "Walker of Many Roads", "peoples": "Friend of the Four Realms", "relic": "Keeper of Old Things", "bond": "Who Kept Faith",
 	# (the roads added since had none, and the ending's title read a key that was not there: a player who
 	# went through most trials side by side or by the people had a script error for a title)
-	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire"}
+	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire",
+	"works": "Whose Hands Made It"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

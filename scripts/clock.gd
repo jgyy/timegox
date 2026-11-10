@@ -91,7 +91,10 @@ const STORY_HOURS := {"s_gh_xihe": 18.6, "s_p16_eve": 21.2, "s_p16_vigil": 23.8,
 	"s_p17_eggs": 19.2, "s_p17_thunder": 7.4, "s_p17_willow": 8.2,
 	# Part XVIII: the first sale at Yanggu is made by lamplight before the sun, the new fire is drilled
 	# towards evening, and the feast is eaten at dusk
-	"s_p18_rong": 4.6, "s_p18_brush": 17.2, "s_p18_carry": 18.0}
+	"s_p18_rong": 4.6, "s_p18_brush": 17.2, "s_p18_carry": 18.0,
+	# Part XIX: the wheel is looked at at midnight, as the gardener said; the caravan fire is sat at after
+	# dark and the Player met at first light; the makers come down into the oldest pit by torchlight
+	"s_p19_gardener": 23.2, "s_p19_kites": 20.4, "s_p19_campfire": 5.2, "s_p19_makers": 21.0, "s_p19_gardener2": 16.5}
 
 static func story_hour(g, sid: String) -> void:
 	if STORY_HOURS.has(sid):

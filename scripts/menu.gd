@@ -28,9 +28,9 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Yue Ling", "Dao & Peoples", "Hearths", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "yue", "dao", "hearths", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
-		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, Game.companion or Game.bond > 0,
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
+		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
 			Game.dao != "" or not Game.met.is_empty(), true, true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
@@ -47,6 +47,31 @@ func _build() -> void:
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
+	elif mode == "works":
+		# the Hundred Works (works.gd): every work, by school; Enter builds the one under the cursor
+		labels = []
+		ids = []
+		enabled = []
+		for wid in Works.ORDER:
+			labels.append(Works.label(Game, wid))
+			ids.append("work:" + wid)
+			enabled.append(Works.has(Game, wid) or Works.known(Game, wid))
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "roads":
+		# the crossroads of the road (echoes.gd): every one reached, what was chosen and what came of it
+		labels = []
+		ids = []
+		enabled = []
+		for cid in Echoes.ORDER:
+			var ch := Echoes.chosen(Game, cid)
+			labels.append(("Part %s: %s" % [str(Echoes.CROSSROADS[cid].part), str(Echoes.CROSSROADS[cid].n)]) if ch != "" else "Part %s: ..." % str(Echoes.CROSSROADS[cid].part))
+			ids.append("road:" + cid)
+			enabled.append(ch != "")
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
 	elif mode == "yue":
 		# the Lotus release (bonds.gd): a heart-to-heart she is waiting to have can be had from here
 		var tid := Bonds.talk_ready(Game)
@@ -99,7 +124,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -160,6 +185,11 @@ func press(act: String) -> void:
 					mode = "hearths"
 					cursor = 0
 					_build()
+				"works", "roads":
+					mode = id
+					cursor = 0
+					msg = ""
+					_build()
 				"yue":
 					mode = "yue"
 					cursor = 0
@@ -180,7 +210,14 @@ func press(act: String) -> void:
 					cursor = 0
 					_build()
 				_:
-					if mode == "annals" or mode == "bestiary":
+					if mode == "works":
+						# build the work under the cursor, if it can be built
+						var wid2 := id.trim_prefix("work:")
+						if Works.build(Game, wid2):
+							msg = "Built: %s." % str(Works.WORKS[wid2].n)
+						_build()
+						return
+					if mode == "annals" or mode == "bestiary" or mode == "roads":
 						return
 					msg = Game.use_item_field(id)
 					_build()
@@ -239,9 +276,71 @@ func _draw_bestiary() -> void:
 		UI.text(self, r.position + Vector2(24, 40), str(d.n), 24, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
 		var kind := "Boss" if d.get("boss", false) else "Met in %d battle%s" % [int(Game.bestiary.get(e[0], 0)), "" if int(Game.bestiary.get(e[0], 0)) == 1 else "s"]
 		UI.text(self, r.position + Vector2(24, 70), "%s  -  %s, weak to %s" % [kind, str(d.elem).capitalize(), str(d.weak).capitalize()], 16, ec, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
-		UI.wrapped(self, r.position + Vector2(24, 110), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
+		var ty := 110.0
+		if not d.get("boss", false):
+			# the hours of the wild (habits.gd): when it is abroad, when it sleeps, what it is doing now
+			var hb := Habits.habit(str(e[0]))
+			var hl := "%s  Asleep from %s." % [Habits.line(Game, str(e[0])), Habits.sleeps(hb).replace("-", " to ").replace(",", " and from")] if Habits.sleeps(hb) != "never" else Habits.line(Game, str(e[0]))
+			UI.text(self, r.position + Vector2(24, 96), hl, UI.fit(hl, 14, r.size.x - 48), Habits.info(Habits.act(Game, str(e[0]))).col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+			ty = 134.0
+		UI.wrapped(self, r.position + Vector2(24, ty), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
+
+## The Works page (works.gd, the Hundred Works release): the eighteen works in their three schools,
+## what each does, what it costs in know-how and spirit stones, and what stands already.
+func _draw_works() -> void:
+	UI.text(self, Vector2(60, 70), "The Hundred Works", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 15)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 36), "%s      Know-how: %d (of %d learned)      Spirit stones: %d" % [Works.title(Game), Works.know(Game), Works.know_earned(Game), Game.stones], 15, UI.C_JADE,
+		HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	for k in Works.SCHOOL_ORDER.size():
+		var sc: Dictionary = Works.SCHOOLS[Works.SCHOOL_ORDER[k]]
+		UI.text(self, r.position + Vector2(24 + k * 256, 62), "%s  %d/%d" % [str(sc.n), Works.count(Game, Works.SCHOOL_ORDER[k]), Works.TIERS], 15, sc.col, HORIZONTAL_ALIGNMENT_LEFT, 250)
+	if cursor < Works.ORDER.size():
+		var wid: String = Works.ORDER[cursor]
+		var w: Dictionary = Works.WORKS[wid]
+		var sc2: Dictionary = Works.SCHOOLS[w.school]
+		var shown: bool = Works.has(Game, wid) or Works.known(Game, wid)
+		UI.text(self, r.position + Vector2(24, 110), str(w.n) if shown else "Not yet known", 24, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		UI.text(self, r.position + Vector2(24, 138), "%s, the %s of six: %s.  \"%s\"" % [str(sc2.n), ["first", "second", "third", "fourth", "fifth", "sixth"][int(w.tier)], str(sc2.what), str(sc2.motto)], 14, sc2.col,
+			HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		UI.wrapped(self, r.position + Vector2(24, 180), Works.text(Game, wid), 18, UI.C_TEXT, r.size.x - 48)
+	else:
+		UI.wrapped(self, r.position + Vector2(24, 110), "Know-how is what Lin Feng has learned by looking: one for every kind of creature met, every lord defeated, every thing of the land tried and every obstacle cleared, two for every deed and every cave of the Founder's opened. It is spent on nothing but works, and there is not enough in one journey for all three schools.", 17, UI.C_DIM, r.size.x - 48)
+	if msg != "":
+		UI.text(self, r.position + Vector2(24, r.size.y - 20), msg, 16, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+
+## The Crossroads page (echoes.gd): the three scales and where they stand, and every crossroads of the
+## road: what was asked, what was chosen, how many of its echoes have been heard, and how it ends.
+func _draw_roads() -> void:
+	UI.text(self, Vector2(60, 70), "Crossroads", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 15)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	for k in Echoes.SCALE_ORDER.size():
+		var sid: String = Echoes.SCALE_ORDER[k]
+		var sc: Dictionary = Echoes.SCALES[sid]
+		var v := Echoes.scale(Game, sid)
+		var at := r.position + Vector2(24, 34 + k * 44)
+		UI.text(self, at, str(sc.neg), 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 150)
+		UI.text(self, at + Vector2(560, 0), str(sc.pos), 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 190)
+		var bar := Rect2(at + Vector2(150, -10), Vector2(400, 8))
+		draw_rect(bar, Color(1, 1, 1, 0.08))
+		draw_rect(Rect2(bar.position + Vector2(200, 0), Vector2(clampf(v / 10.0, -1.0, 1.0) * 200.0, 8)), sc.col)
+		draw_rect(Rect2(bar.position + Vector2(199, -3), Vector2(2, 14)), UI.C_DIM)
+		var nm := Echoes.name_of(Game, sid)
+		var what := "" if nm == "" else str(sc.pos_text if v > 0 else sc.neg_text)
+		var sl: String = ("%s: %s" % [nm, what]) if nm != "" else "%s: not leaning either way yet." % str(sc.n)
+		UI.text(self, at + Vector2(0, 18), sl, UI.fit(sl, 12, r.size.x - 48), sc.col if nm != "" else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	if cursor < Echoes.ORDER.size():
+		var cid: String = Echoes.ORDER[cursor]
+		UI.text(self, r.position + Vector2(24, 190), str(Echoes.CROSSROADS[cid].n) if Echoes.chosen(Game, cid) != "" else "A crossroads not yet reached", 22, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		UI.wrapped(self, r.position + Vector2(24, 224), Echoes.text(Game, cid), 17, UI.C_TEXT, r.size.x - 48)
+	else:
+		UI.wrapped(self, r.position + Vector2(24, 200), "A crossroads is asked once and cannot be taken back. Each answer tips a scale, and a scale that leans far enough changes how the world meets Lin Feng. Each answer is also remembered: people speak of it later, sometimes many chapters later, and the ending tells what came of it.", 17, UI.C_DIM, r.size.x - 48)
 
 ## The Fates page (fate.gd): the five people whose lives Lin Feng has changed, what he made of each
 ## so far (their state, and every choice in order) and where their story will take him next.
@@ -748,10 +847,16 @@ func _draw() -> void:
 	if mode == "fates":
 		_draw_fates()
 		return
+	if mode == "works":
+		_draw_works()
+		return
+	if mode == "roads":
+		_draw_roads()
+		return
 	if mode == "yue":
 		_draw_yue()
 		return
-	UI.menu_list(self, Rect2(60, 80, 300, 470 if mode != "root" else 506), labels, cursor, enabled, 22 if mode != "root" else 21)
+	UI.menu_list(self, Rect2(60, 80, 300, 470 if mode != "root" else 506), labels, cursor, enabled, 22 if mode != "root" else 18)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
 	# status panel
 	var r := Rect2(400, 80, 820, 560)

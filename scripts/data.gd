@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 69
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On"]
+const MAX_LEVEL := 72
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -69,6 +69,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Herald of Spring", "note": "Whatever has gone to sleep near you wakes when you pass: seeds, insects, old friendships, the ground itself. You have learned the one thunder that frightens nobody, the one that says it is time to get up."},
 	# Part XVIII (the New Fire release): the firewood burns out, and the fire is passed on
 	{"life": 0, "title": "Bearer of the Fire", "note": "The firewood burns out; the fire is passed on, and nobody knows where it ends. Every flame you light has a little of every hearth in the land in it, and no fire you have sat beside ever quite goes cold."},
+	# Part XIX (the Hundred Works release): what Cook Ding cared about, which goes beyond skill
+	{"life": 0, "title": "Whose Hand Follows", "note": "What I care about is the Way, said Cook Ding, which goes beyond skill. Whatever you take up, a sword, a broom, a pitcher, a lever, you no longer use: you follow it to where it was already going, and it is never dull, and it takes nothing from you."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -692,6 +694,24 @@ const ENEMIES := {
 	"smoke_hound": {"n": "Smoke Hound", "elem": "dark", "weak": "water", "col": Color("4a4648"), "shape": "beast", "pal": {"sec": Color("1a181a"), "acc": Color("ff6a2a")}},
 	"zhurong": {"n": "Zhurong, Lord of the Southern Fire", "elem": "fire", "weak": "water", "col": Color("c8301e"), "shape": "person:zhurong", "boss": true},
 	"huilu": {"n": "Huilu, the Fire Nobody Sat Up With", "elem": "fire", "weak": "water", "col": Color("ff6a1a"), "shape": "phoenix", "boss": true, "pal": {"sec": Color("7a1a0a"), "acc": Color("fff0a0"), "mark": Color("2a1410")}},
+	# ---- Part XIX (the Hundred Works release): what gets into a machine that nobody is standing at, the
+	# engines that went on by themselves, the things the makers made that walked off, and the three lords
+	"wheel_mite": {"n": "Wheel-Mite", "elem": "earth", "weak": "wood", "col": Color("b8863a"), "shape": "spider", "pal": {"sec": Color("4a3a2a"), "acc": Color("ffd060")}},
+	"treadle_imp": {"n": "Treadle Imp", "elem": "phys", "weak": "thunder", "col": Color("7a5a38"), "shape": "demon", "pal": {"sec": Color("3a2a1a"), "acc": Color("e8c060")}},
+	"idle_shuttle": {"n": "Idle Shuttle", "elem": "wood", "weak": "fire", "col": Color("c8a878"), "shape": "moth", "pal": {"sec": Color("7a5a3a"), "acc": Color("e84a3a")}},
+	"cog_crab": {"n": "Cog-Crab", "elem": "phys", "weak": "thunder", "col": Color("9a7a3a"), "shape": "crab", "pal": {"sec": Color("4a4a50"), "acc": Color("ffb040")}},
+	"bellows_wraith": {"n": "Bellows Wraith", "elem": "fire", "weak": "water", "col": Color("6a4a3a"), "shape": "wraith", "pal": {"sec": Color("2a1a18"), "acc": Color("ff8a3a")}},
+	"hammer_golem": {"n": "Trip-Hammer Golem", "elem": "earth", "weak": "wood", "col": Color("5a5a60"), "shape": "golem", "pal": {"sec": Color("7a5a38"), "acc": Color("e8a040")}},
+	"wooden_kite": {"n": "Wooden Kite", "elem": "wood", "weak": "fire", "col": Color("b89868"), "shape": "bird", "pal": {"sec": Color("7a5a38"), "acc": Color("c8302a")}},
+	"stray_ox": {"n": "Stray Wooden Ox", "elem": "wood", "weak": "fire", "col": Color("8a6a48"), "shape": "beast", "pal": {"sec": Color("c8b080"), "acc": Color("3a6a8a")}},
+	"paper_servant": {"n": "Runaway Paper Servant", "elem": "phys", "weak": "fire", "col": Color("f0e8d0"), "shape": "humanoid", "pal": {"sec": Color("c8302a"), "acc": Color("2a2a30")}},
+	"brass_spiderling": {"n": "Brass Spiderling", "elem": "phys", "weak": "thunder", "col": Color("c8a040"), "shape": "spider", "pal": {"sec": Color("5a4a2a"), "acc": Color("ff5030")}},
+	"counting_wasp": {"n": "Counting Wasp", "elem": "thunder", "weak": "earth", "col": Color("d8b040"), "shape": "moth", "pal": {"sec": Color("2a2a30"), "acc": Color("f0f0ff")}},
+	"tally_golem": {"n": "Tally Golem", "elem": "earth", "weak": "wood", "col": Color("8a7a50"), "shape": "golem", "pal": {"sec": Color("3a3a40"), "acc": Color("ffd060")}},
+	"wooden_magpie": {"n": "The Wooden Magpie", "elem": "wood", "weak": "fire", "col": Color("c8a878"), "shape": "bird", "boss": true, "pal": {"sec": Color("7a5a38"), "acc": Color("c8302a"), "mark": Color("2a1a14")}},
+	"cloud_ladder": {"n": "The Cloud Ladder", "elem": "earth", "weak": "thunder", "col": Color("7a5a38"), "shape": "golem", "boss": true, "pal": {"sec": Color("b8863a"), "acc": Color("e8e0c0"), "mark": Color("2a1a14")}},
+	"the_player": {"n": "The Player", "elem": "phys", "weak": "thunder", "col": Color("e8dcc8"), "shape": "person:the_player", "boss": true},
+	"jixin": {"n": "Jixin, the Machine Heart", "elem": "thunder", "weak": "water", "col": Color("b8863a"), "shape": "warden", "boss": true, "pal": {"sec": Color("3a3a40"), "acc": Color("ffe080"), "mark": Color("7a2a1a")}},
 }
 
 ## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
@@ -835,7 +855,9 @@ const AREAS := {
 		# the root of the sect's pond
 		"bosses": [{"id": "lock_warden", "pos": Vector2i(63, 103), "lv": 59, "req": 59, "vis": ["s_p15_warden", ""]},
 			# Part XVIII: the fire nobody sat up with, on the road above Cloudfoot
-			{"id": "huilu", "pos": Vector2i(85, 25), "lv": 68, "req": 67, "vis": ["s_p18_huilu", ""], "late": true}
+			{"id": "huilu", "pos": Vector2i(85, 25), "lv": 68, "req": 67, "vis": ["s_p18_huilu", ""], "late": true},
+			# Part XIX: the Cloud Ladder, building itself up the mountain above Cloudfoot
+			{"id": "cloud_ladder", "pos": Vector2i(78, 14), "lv": 70, "req": 69, "vis": ["s_p19_mo", ""], "late": true}
 		],
 		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 		# trails that join the mountain's people start just north of the sect's north wall
@@ -930,6 +952,8 @@ const AREAS := {
 			# Part XVI: thunder bamboo, which bangs on a fire like the first firecrackers
 			{"id": "p16_bamboo1", "item": "thunder_bamboo", "pos": Vector2i(20, 10), "vis": ["s_p16_bamboo", ""]}, {"id": "p16_bamboo2", "item": "thunder_bamboo", "pos": Vector2i(34, 30), "vis": ["s_p16_bamboo", ""]},
 			{"id": "p16_bamboo3", "item": "thunder_bamboo", "pos": Vector2i(48, 12), "vis": ["s_p16_bamboo", ""]}, {"id": "p16_bamboo4", "item": "thunder_bamboo", "pos": Vector2i(58, 34), "vis": ["s_p16_bamboo", ""]},
+			# Part XIX: catalpa, the carpenters' wood, seasoned where it fell
+			{"id": "p19_tim1", "item": "catalpa_timber", "pos": Vector2i(15, 13), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim2", "item": "catalpa_timber", "pos": Vector2i(32, 21), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim3", "item": "catalpa_timber", "pos": Vector2i(53, 33), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim4", "item": "catalpa_timber", "pos": Vector2i(5, 20), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim5", "item": "catalpa_timber", "pos": Vector2i(35, 5), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim6", "item": "catalpa_timber", "pos": Vector2i(6, 13), "vis": ["s_p19_ban", ""], "late": true}
 		],
 		"pickup_vis": "s_herbs",
 		# Part XVI: the cubs that followed Nian down, hiding in the bamboo on New Year's morning
@@ -1199,6 +1223,8 @@ const AREAS := {
 	},
 	# ---- Part IV: The Unwritten Ledger
 	"cloudsea": {
+		# Part XIX: the kites that did not come down, nesting on the islands of cloud
+		"warband": {"pool": [["wooden_kite", 70, 71], ["counting_wasp", 70, 71], ["bellows_wraith", 70, 71]], "n": 16, "vis": "s_p19_heart", "late": true},
 		"n": "Sea of Clouds Archipelago", "w": 94, "h": 56, "seed": 151, "theme": "cloudsea", "enemies": 20,
 		"pool": [["cloud_ray", 24, 25], ["gale_sprite", 24, 25], ["sky_mantis", 24, 25]],
 		"portals": [
@@ -1207,6 +1233,8 @@ const AREAS := {
 		],
 		"npcs": [{"id": "cloud_warden", "n": "Cloud Warden Feng Yu", "pos": Vector2i(10, 26), "col": Color("e0f0ff"), "vis": ["s_cs_intro", ""]}],
 		"bosses": [
+			# Part XIX: Gongshu Ban's Wooden Magpie, over the ninth island
+			{"id": "wooden_magpie", "pos": Vector2i(58, 29), "lv": 71, "req": 70, "vis": ["s_p19_clouds", ""], "late": true},
 			{"id": "manta_sovereign", "pos": Vector2i(30, 14), "lv": 24, "req": 24},
 			{"id": "gale_mantis", "pos": Vector2i(44, 34), "lv": 24, "req": 24},
 			{"id": "rainbow_serpent", "pos": Vector2i(58, 44), "lv": 25, "req": 24},
@@ -1239,6 +1267,10 @@ const AREAS := {
 		"pickup_vis": "s_ct_collect",
 	},
 	"forge": {
+		# Part XIX: the Brass Spider Engine's children, counting again
+		"warband": {"pool": [["brass_spiderling", 70, 71], ["counting_wasp", 70, 71], ["tally_golem", 70, 71]], "n": 14, "vis": "s_p19_lamps", "late": true},
+		# (impact.gd: the Engine's legs, locked across the doors of the cold furnaces)
+		"obstacles": [{"id": "p19_fcog1", "what": "cogwork", "pos": Vector2i(24, 22), "vis": ["s_p19_doors", ""]}, {"id": "p19_fcog2", "what": "cogwork", "pos": Vector2i(39, 22), "vis": ["s_p19_doors", ""]}, {"id": "p19_fcog3", "what": "cogwork", "pos": Vector2i(56, 39), "vis": ["s_p19_doors", ""]}, {"id": "p19_fcog4", "what": "cogwork", "pos": Vector2i(72, 24), "vis": ["s_p19_doors", ""]}, {"id": "p19_fcog5", "what": "cogwork", "pos": Vector2i(29, 40), "vis": ["s_p19_doors", ""]}],
 		"n": "Heaven's Forge", "w": 96, "h": 58, "seed": 171, "theme": "forge", "enemies": 20,
 		"pool": [["bronze_sentinel", 25, 26], ["slag_slime", 25, 26], ["bellows_imp", 25, 26]],
 		"portals": [
@@ -1280,6 +1312,8 @@ const AREAS := {
 	},
 	# ---- Part V: The Falling Sky
 	"dunes": {
+		# Part XIX: what the makers made that has walked off into the sand
+		"warband": {"pool": [["wooden_kite", 70, 71], ["stray_ox", 70, 71], ["paper_servant", 70, 71]], "n": 15, "vis": "s_p19_yanshi", "late": true},
 		"n": "Desert of Fallen Stars", "w": 96, "h": 58, "seed": 191, "theme": "dunes", "enemies": 20,
 		"pool": [["dune_scorpion", 27, 27], ["sand_wraith", 27, 27], ["meteor_golem", 27, 27]],
 		"portals": [
@@ -1294,16 +1328,22 @@ const AREAS := {
 			{"id": "well_keeper_zhaya", "n": "Well-Keeper Zhaya", "pos": Vector2i(6, 44), "col": Color("c8a070")},
 			{"id": "star_reader_kumar", "n": "Star-Reader Kumar", "pos": Vector2i(20, 38), "col": Color("2e2e6a")},
 			{"id": "camel_boy_temur", "n": "Temur the Camel-Boy", "pos": Vector2i(19, 52), "col": Color("8a6a4a")},
+			# Part XIX: the artificer who once showed a king a dancer
+			{"id": "yan_shi", "n": "Yan Shi the Artificer", "pos": Vector2i(26, 44), "col": Color("5a4a7a"), "vis": ["s_p19_ladder", ""], "late": true}
 		],
 		"bosses": [
 			{"id": "glass_scorpion", "pos": Vector2i(30, 40), "lv": 27, "req": 27},
 			{"id": "dune_leviathan", "pos": Vector2i(46, 16), "lv": 27, "req": 27},
 			{"id": "star_colossus", "pos": Vector2i(60, 40), "lv": 27, "req": 27},
 			{"id": "white_tiger", "pos": Vector2i(86, 28), "lv": 27, "req": 27},
+			# Part XIX: the Player, Yan Shi's dancer, in the dunes west of Shazhou
+			{"id": "the_player", "pos": Vector2i(30, 28), "lv": 71, "req": 70, "vis": ["s_p19_campfire", ""], "late": true}
 		],
 		"pickups": [
 			{"id": "fstar1", "item": "fallen_star", "pos": Vector2i(22, 12)}, {"id": "fstar2", "item": "fallen_star", "pos": Vector2i(40, 46)},
 			{"id": "fstar3", "item": "fallen_star", "pos": Vector2i(64, 30)}, {"id": "fstar4", "item": "fallen_star", "pos": Vector2i(76, 10)},
+			# Part XIX: pieces of the Player that it shed and outgrew, lacquer and leather in the sand
+			{"id": "p19_part1", "item": "player_part", "pos": Vector2i(11, 18), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part2", "item": "player_part", "pos": Vector2i(30, 18), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part3", "item": "player_part", "pos": Vector2i(44, 38), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part4", "item": "player_part", "pos": Vector2i(33, 47), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part5", "item": "player_part", "pos": Vector2i(55, 20), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part6", "item": "player_part", "pos": Vector2i(41, 11), "vis": ["s_p19_yanshi", ""], "late": true}
 		],
 		"pickup_vis": "s_du_collect",
 		# Shazhou Oasis: a caravan town round a sweet well, where the west road comes in off the sand
@@ -1466,6 +1506,8 @@ const AREAS := {
 	},
 	# ---- Part VII: The Unbroken Land
 	"village": {
+		# Part XIX: what gets into a wheel that turns all night with nobody at it
+		"warband": {"pool": [["wheel_mite", 69, 70], ["treadle_imp", 69, 70], ["idle_shuttle", 69, 70]], "n": 14, "vis": "s_p19_gardener", "late": true},
 		"n": "Qingshi Village Below the Mountain", "w": 96, "h": 58, "seed": 271, "theme": "village", "enemies": 18,
 		# Part XVII (impact.gd): the clay Spring Ox, and the paper petty men the village beats on the
 		# day of the first thunder
@@ -1493,7 +1535,10 @@ const AREAS := {
 			{"id": "carpenter_gu", "n": "Carpenter Gu", "pos": Vector2i(21, 20), "col": Color("8a6a4a")},
 			{"id": "herb_lan", "n": "Xiao Lan the Herb-Picker", "pos": Vector2i(37, 20), "col": Color("6a9a5a")},
 			# Part XVII: Gou Mang, Lord of Spring, waiting by the ox-pen for somebody to whip the Spring Ox
-			{"id": "gou_mang", "n": "Gou Mang, Lord of Spring", "pos": Vector2i(38, 35), "col": Color("4a9a5a"), "vis": ["s_p17_home", "s_p17_kites"], "late": true}
+			{"id": "gou_mang", "n": "Gou Mang, Lord of Spring", "pos": Vector2i(38, 35), "col": Color("4a9a5a"), "vis": ["s_p17_home", "s_p17_kites"], "late": true},
+			# Part XIX: the master of carpenters at the mill-race below Qingshi, and the old gardener of Hanyin
+			{"id": "gongshu_ban", "n": "Gongshu Ban", "pos": Vector2i(5, 38), "col": Color("7a5a38"), "vis": ["s_p19_home", ""], "late": true},
+			{"id": "gardener_hanyin", "n": "The Gardener of Hanyin", "pos": Vector2i(6, 27), "col": Color("6a8a5a"), "vis": ["s_p19_home", ""], "late": true}
 		],
 		"bosses": [
 			# Part XVI: the Year Beast, down out of the mountains at midnight
@@ -1573,6 +1618,8 @@ const AREAS := {
 		],
 	},
 	"silk": {
+		# Part XIX: the looms of the Silkworm Woods, which have not heard what was decided
+		"warband": {"pool": [["idle_shuttle", 70, 71], ["treadle_imp", 70, 71], ["paper_servant", 70, 71]], "n": 16, "vis": "s_p19_heart", "late": true},
 		"n": "Mulberry Silk Woods", "w": 96, "h": 58, "seed": 291, "theme": "silk", "enemies": 20,
 		"pool": [["silkworm", 34, 34], ["silk_moth", 34, 34], ["cocoon_wraith", 34, 34]],
 		"portals": [
@@ -1930,8 +1977,13 @@ const AREAS := {
 	},
 	# the cauldron-casters' town on Mount Kuaiji, where Yu's Nine Cauldrons were cast
 	"tushan": {
+		# Part XIX: the engines of the casting pits, gone on by themselves
+		"warband": {"pool": [["cog_crab", 70, 71], ["bellows_wraith", 70, 71], ["hammer_golem", 70, 71]], "n": 15, "vis": "s_p19_tushan", "late": true},
 		# Part XVIII (impact.gd): clinker, the crust a tired fire leaves, choking the mouths of the casting pits
-		"obstacles": [{"id": "p18_clinker1", "what": "clinker", "pos": Vector2i(32, 25), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker2", "what": "clinker", "pos": Vector2i(23, 32), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker3", "what": "clinker", "pos": Vector2i(33, 42), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker4", "what": "clinker", "pos": Vector2i(48, 28), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker5", "what": "clinker", "pos": Vector2i(47, 15), "vis": ["s_p18_clinker", ""]}],
+		"obstacles": [{"id": "p18_clinker1", "what": "clinker", "pos": Vector2i(32, 25), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker2", "what": "clinker", "pos": Vector2i(23, 32), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker3", "what": "clinker", "pos": Vector2i(33, 42), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker4", "what": "clinker", "pos": Vector2i(48, 28), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker5", "what": "clinker", "pos": Vector2i(47, 15), "vis": ["s_p18_clinker", ""]},
+			# Part XIX (impact.gd): gear-trains that have locked solid across the lanes between the pits
+			{"id": "p19_cog1", "what": "cogwork", "pos": Vector2i(41, 44), "vis": ["s_p19_cogs", ""]}, {"id": "p19_cog2", "what": "cogwork", "pos": Vector2i(48, 50), "vis": ["s_p19_cogs", ""]}, {"id": "p19_cog3", "what": "cogwork", "pos": Vector2i(53, 36), "vis": ["s_p19_cogs", ""]}, {"id": "p19_cog4", "what": "cogwork", "pos": Vector2i(51, 15), "vis": ["s_p19_cogs", ""]}, {"id": "p19_cog5", "what": "cogwork", "pos": Vector2i(60, 17), "vis": ["s_p19_cogs", ""]}
+		],
 		"n": "Tushan, the Town of the Cauldron-Casters", "w": 96, "h": 60, "seed": 411, "theme": "tushan", "enemies": 20,
 		"pool": [["slag_golem", 43, 43], ["bronze_hound", 43, 43], ["charcoal_wisp", 43, 43]],
 		"portals": [
@@ -1947,6 +1999,8 @@ const AREAS := {
 			{"id": "charcoal_tan", "n": "Charcoal-Burner Ah Tan", "pos": Vector2i(10, 39), "col": Color("3a3a3a")},
 			{"id": "innkeeper_lou", "n": "Innkeeper Lou of the Late Arrival", "pos": Vector2i(41, 38), "col": Color("a86a5a")},
 			{"id": "little_qi", "n": "Little Qi", "pos": Vector2i(18, 32), "col": Color("c8803a")},
+			# Part XIX: Mozi, who has walked ten days and ten nights
+			{"id": "mo_di", "n": "Mozi", "pos": Vector2i(33, 46), "col": Color("3a3a3a"), "vis": ["s_p19_hammer", ""], "late": true}
 		],
 		"bosses": [
 			{"id": "slag_serpent", "pos": Vector2i(64, 12), "lv": 43, "req": 43},
@@ -1955,6 +2009,8 @@ const AREAS := {
 			{"id": "grudge_fangfeng", "pos": Vector2i(78, 35), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "tushan_fox", "pos": Vector2i(58, 24), "lv": 44, "req": 44},
 			{"id": "taotie", "pos": Vector2i(88, 30), "lv": 44, "req": 44},
+			# Part XIX: the Machine Heart, in the oldest casting pit
+			{"id": "jixin", "pos": Vector2i(37, 18), "lv": 71, "req": 70, "vis": ["s_p19_makers", ""], "late": true}
 		],
 		"pickups": [{"id": "cshard1", "item": "cauldron_shard", "pos": Vector2i(56, 6)}, {"id": "cshard2", "item": "cauldron_shard", "pos": Vector2i(70, 52)}, {"id": "cshard3", "item": "cauldron_shard", "pos": Vector2i(82, 12)}, {"id": "cshard4", "item": "cauldron_shard", "pos": Vector2i(52, 40)},
 			{"id": "cur_wine3", "item": "peach_wine", "pos": Vector2i(41, 39), "floor": ["late_inn", -1], "always": true}],
@@ -3140,13 +3196,77 @@ const STEPS := [
 	{"id": "s_p18_feast", "kind": "share", "spot": "kind:mountain:stage", "area": "mountain", "t": "Six tables at Cloudfoot, and one fire: eat the first meal cooked on the new fire with Yue Ling, by the stage"},
 	{"id": "s_p18_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan the rice is cooked"},
 	{"id": "s_break23", "kind": "breakthrough", "to": 69, "t": "The firewood burns out; the fire goes on: Fire Passed On"},
+	# ---- Part XIX: The Machine Heart (the Hundred Works release).  With a fire that has every hearth in it
+	# the land makes things as it never has, and Gongshu Ban, the master of carpenters, has come to build
+	# them: a wheel that grinds a valley's rice, hammers that never tire.  They do not stop when the
+	# people go home.  The founders forget how to sit down; an old gardener will not use a well-sweep and
+	# will not say he is wrong; and out in the sand a dancer that an artificer once took apart in front of
+	# a king has been building itself a heart out of the escapements of every machine in the land.  What
+	# is to be done with the machines is asked three times (echoes.gd), and the last answer can only be
+	# given by somebody who has built things with his own hands (works.gd)
+	{"id": "s_p19_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The rice comes up the mountain already ground: speak to Elder Qing Xuan", "stones": 27600},
+	{"id": "s_p19_ban", "kind": "talk", "npc": "gongshu_ban", "area": "village", "t": "Find the stranger who built a wheel in the mill-race below Qingshi"},
+	{"id": "s_p19_timber", "kind": "collect", "item": "catalpa_timber", "n": 5, "area": "bamboo", "t": "Gongshu Ban wants catalpa, the carpenters' wood: bring 5 seasoned baulks out of the Bamboo Forest"},
+	{"id": "s_p19_build", "kind": "works", "n": 3, "area": "sect", "t": "Nobody can talk to a maker who has made nothing: build any 3 works with your own hands (Esc > Works)"},
+	{"id": "s_p19_farm", "kind": "folk", "role": "farmer", "town": "qingshi", "n": 5, "area": "village", "hearth": "valley",
+		"t": "The Rice Hearth: carry a sack to the new mill with five of Qingshi's farmers, and hear what they make of it (face one and press Enter)"},
+	{"id": "s_p19_gardener", "kind": "talk", "npc": "gardener_hanyin", "area": "village", "t": "One old man will not use the mill or the sweep: find the Gardener of Hanyin among his cabbages"},
+	{"id": "s_p19_mites", "kind": "hunt", "area": "village", "n": 28, "of": ["wheel_mite", "treadle_imp", "idle_shuttle"], "first": true,
+		"t": "The wheel turned all night and things have got into it: clear the Wheel-Mites, Treadle Imps and Idle Shuttles out of Qingshi (strike a pack first: F or G)"},
+	{"id": "s_p19_tushan", "kind": "talk", "npc": "auntie_rong", "area": "tushan", "hearth": "forge", "t": "The hammers of Tushan have not stopped in nine days: go to Auntie Rong at the casting pits", "stones": 28000},
+	{"id": "s_p19_cogs", "kind": "clear", "what": "cogwork", "n": 5, "area": "tushan", "hearth": "forge", "t": "The Casting Hearth: gear-trains have locked solid across the lanes. Break 5 of them apart at Tushan (F)"},
+	{"id": "s_p19_hammer", "kind": "hunt", "area": "tushan", "n": 30, "of": ["cog_crab", "bellows_wraith", "hammer_golem"], "first": true,
+		"t": "The engines of the pits have gone on by themselves: stop the Cog-Crabs, Bellows Wraiths and Trip-Hammer Golems (strike first: F or G)"},
+	{"id": "s_p19_mo", "kind": "talk", "npc": "mo_di", "area": "tushan", "t": "A man in straw sandals has walked ten days and nights to Tushan: hear Mozi out"},
+	{"id": "s_p19_ladder", "kind": "kill", "boss": "cloud_ladder", "area": "mountain", "t": "Something is building itself up the mountain above Cloudfoot: stop the Cloud Ladder"},
+	{"id": "s_p19_gao", "kind": "talk", "npc": "boatwright_gao", "area": "longmen", "hearth": "river", "t": "A boat has gone up the river with nobody in it: hear Boatwright Gao at Longmen"},
+	{"id": "s_p19_ferry", "kind": "folk", "role": "fisher", "town": "longmen", "n": 4, "area": "longmen", "hearth": "river",
+		"t": "The Boat Hearth: the paddle-boats have all gone upriver by themselves. Pole a boat across with four of Longmen's fishers (face one and press Enter)"},
+	{"id": "s_p19_yanshi", "kind": "talk", "npc": "yan_shi", "area": "dunes", "t": "Mozi knows who taught the machines to want: find Yan Shi the Artificer at Shazhou Oasis", "stones": 28400},
+	{"id": "s_p19_parts", "kind": "collect", "item": "player_part", "n": 5, "area": "dunes", "t": "The Player has been shedding what it outgrew: find 5 of its cast-off pieces in the dunes"},
+	{"id": "s_p19_porters", "kind": "folk", "role": "porter", "town": "shazhou", "n": 3, "area": "dunes", "hearth": "sand",
+		"t": "The Sweet-Well Hearth: the caravans' wooden oxen walked off in the night. Shoulder a load with three of Shazhou's porters (face one and press Enter)"},
+	{"id": "s_p19_kites", "kind": "hunt", "area": "dunes", "n": 30, "of": ["wooden_kite", "stray_ox", "paper_servant"], "first": true,
+		"t": "They are carrying their escapements out to the Player: bring down the Wooden Kites, Stray Oxen and Paper Servants in the dunes (strike first: F or G)"},
+	{"id": "s_p19_campfire", "kind": "share", "spot": "kind:dunes:campfire", "area": "dunes", "t": "The last night before the dunes: sit with Yue Ling at the caravan fire outside Shazhou"},
+	{"id": "s_p19_player", "kind": "kill", "boss": "the_player", "area": "dunes", "t": "Meet the Player, the dancer Yan Shi made, in the dunes west of the oasis"},
+	{"id": "s_p19_lamps", "kind": "folk", "role": "merchant", "town": "yanggu", "n": 4, "area": "yanggu", "hearth": "dawn",
+		"t": "The Lantern Hearth: Yanggu's revolving lanterns turn with no candle in them. Light a lamp by hand with four stallholders (face one and press Enter)"},
+	{"id": "s_p19_forge", "kind": "talk", "npc": "forge_master", "area": "forge", "t": "The wreck of the Brass Spider Engine has been seen walking: go up to Forgemaster Ou Lan in Heaven's Forge"},
+	{"id": "s_p19_doors", "kind": "clear", "what": "cogwork", "n": 4, "area": "forge", "t": "The Engine's legs have locked themselves across the furnace doors: break 4 of the gear-trains in Heaven's Forge (F)"},
+	{"id": "s_p19_spiders", "kind": "hunt", "area": "forge", "n": 28, "of": ["brass_spiderling", "counting_wasp", "tally_golem"], "first": true,
+		"t": "The Engine's children are counting everything again: stop the Brass Spiderlings, Counting Wasps and Tally Golems in Heaven's Forge (strike first: F or G)"},
+	{"id": "s_p19_makers", "kind": "visits", "npcs": ["smith", "auntie_rong", "boatwright_gao", "lantern_xi", "carpenter_gu", "well_keeper_zhaya"], "n": 5, "area": "tushan", "did": "Called %s to the casting yard",
+		"t": "Something is still turning under Tushan: call five of the makers of the land to the casting yard, in any order"},
+	{"id": "s_p19_heart", "kind": "kill", "boss": "jixin", "area": "tushan", "t": "Go down into the oldest pit at Tushan and face Jixin, the Machine Heart", "stones": 28800},
+	{"id": "s_p19_founders", "kind": "folk", "role": "smith", "town": "tushan", "n": 4, "area": "tushan", "hearth": "forge",
+		"t": "The Casting Hearth: the river's bellows are stopped for a day. Blow a pit by lung with four of Tushan's casters (face one and press Enter)"},
+	{"id": "s_p19_silk", "kind": "talk", "npc": "can_niang", "area": "silk", "t": "Saying it at Tushan does not make it so: the looms of the Silkworm Woods have not heard. Go to Silk Farmer Can Niang", "stones": 29200},
+	{"id": "s_p19_shuttles", "kind": "hunt", "area": "silk", "n": 30, "of": ["idle_shuttle", "treadle_imp", "paper_servant"], "first": true,
+		"t": "The looms weave all night and nobody wears the cloth: still the Idle Shuttles, Treadle Imps and Paper Servants in the Silkworm Woods (strike first: F or G)"},
+	{"id": "s_p19_warden", "kind": "talk", "npc": "cloud_warden", "area": "cloudsea", "t": "The kites that did not come down have gone up: ask Cloud Warden Feng Yu what is nesting in the Sea of Clouds"},
+	{"id": "s_p19_clouds", "kind": "hunt", "area": "cloudsea", "n": 30, "of": ["wooden_kite", "counting_wasp", "bellows_wraith"], "first": true,
+		"t": "Bring down what is nesting on the islands of cloud: the Wooden Kites, Counting Wasps and Bellows Wraiths (strike first: F or G)"},
+	{"id": "s_p19_magpie", "kind": "kill", "boss": "wooden_magpie", "area": "cloudsea", "t": "Gongshu Ban's first toy has been flying for two thousand years: bring the Wooden Magpie down to rest"},
+	{"id": "s_p19_word", "kind": "visits", "npcs": ["granny_wen", "sarnai", "cook_aysha", "fishwife_lu", "auntie_rong", "lantern_xi"], "n": 5, "area": "village", "did": "Told %s what was decided",
+		"t": "An answer nobody has heard is not an answer: carry what was decided to the keepers of five hearths, in any order"},
+	{"id": "s_p19_gardener2", "kind": "talk", "npc": "gardener_hanyin", "area": "village", "t": "Tell the Gardener of Hanyin what was said in the casting yard"},
+	{"id": "s_p19_rest", "kind": "share", "spot": "kind:village:millstone", "area": "village", "t": "Grind one measure of rice by hand with Yue Ling, at the old millstone of Qingshi"},
+	{"id": "s_p19_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan what the land has decided about its machines"},
+	{"id": "s_break24", "kind": "breakthrough", "to": 72, "t": "Not using the tool; following it: Skill Become Dao"},
 ]
 
+## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
+## `Game.reached` and `Game.done`, so for every person, lord and thing in sight on every frame, and
+## thousands of times a second by the bot), and used to walk the whole list each time: now it is
+## looked up in an index built on first use.
+static var _step_at := {}
+
 static func step_index(id: String) -> int:
-	for i in STEPS.size():
-		if STEPS[i].id == id:
-			return i
-	return -1
+	if _step_at.is_empty():
+		for i in STEPS.size():
+			_step_at[str(STEPS[i].id)] = i
+	return int(_step_at.get(id, -1))
 
 # ---------------------------------------------------------------- items & shop
 const ITEMS := {
@@ -3283,6 +3403,12 @@ const ITEMS := {
 	"argal": {"n": "Basket of Argal", "desc": "Dried dung from the pasture, flat and light as bark. Where no tree grows it is the only fuel there is, and it burns hot, clean and blue. The horse-folk say a guest who brings argal has understood everything"},
 	"fire_drill": {"n": "Fire-Drill of Summer Wood", "desc": "Smith Tie's bow-drill, the spindle of apricot and the hearth-board of jujube, bound with wood and fire essence. Not Suiren's, but made the way his was, and by somebody who has learned how"},
 	"suiren_drill": {"n": "Suiren's Fire-Drill", "desc": "The stick the Fire-Driller turned in his hands until the first smoke rose, when people ate raw meat and feared the dark. It is worn where his palms held it. Zhurong kept it for whoever came with more than one fire"},
+	# Part XIX (the Hundred Works release): the carpenters' wood, the dancer's cast-off pieces, a belt and
+	# nine sticks, and what was left when the Machine Heart stopped
+	"catalpa_timber": {"n": "Catalpa Baulk", "desc": "A seasoned baulk of catalpa, straight in the grain and light for its strength: the wood of coffins, zithers and printing blocks. The old books call a carpenter a catalpa-man. Gongshu Ban smells each one before he will take it"},
+	"player_part": {"n": "Cast-Off Piece of the Player", "desc": "A finger of lacquered leather, jointed with glue and silk cord, far too well made. Yan Shi built the Player a body once. It has been making itself a better one, and leaving the old in the sand like a snake's skin"},
+	"defence_models": {"n": "Mozi's Belt and Nine Sticks", "desc": "Smith Tie's copy of the models Mozi laid on a table in front of a king: a belt for a city wall, and nine slips of catalpa for nine engines of defence. Nine times the cloud ladder came against them, and nine times it was turned"},
+	"still_heart": {"n": "The Stopped Escapement", "desc": "A wheel of bronze teeth and a little rocking anchor, the piece that makes a machine tick instead of run away: the first one, from the oldest pit at Tushan. It is not turning. Held to the ear, it sounds as if it is thinking about it"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
@@ -3291,7 +3417,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"zhurong": "suiren_drill", "thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
+const BOSS_DROPS := {"jixin": "still_heart", "zhurong": "suiren_drill", "thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -3431,6 +3557,15 @@ const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
+	# Part XIX (the Hundred Works release)
+	"gongshu_ban": ["Measure twice, cut once. My mother said it. Then she invented the ink-line so I would stop asking her to hold the other end of the string.", "A plane, a drill, a saw. I am told I invented the saw after cutting my hand on a blade of grass. I did cut my hand. I was already holding the saw.",
+		"I built a wooden magpie once that flew three days without coming down. Master Mo told me a linchpin was worth more. I have been angry about it for two thousand years, because he was right."],
+	"gardener_hanyin": ["Down the tunnel, fill the pitcher, up the tunnel, pour. A hundred times a day. No, I am not tired. I was tired forty years ago; this is something else.", "The cabbages do not know how the water got here. That is true. I know.",
+		"A scholar told me once that my way used much labour for little result. He had a good face. I should like to know what became of him."],
+	"mo_di": ["I wear straw sandals because leather wears out no slower and costs an ox. It is not a principle. Well. It is a small principle.", "People say I love everybody equally. I do not love anybody equally. I have only noticed that everybody's roof leaks the same.",
+		"Nine engines to attack a wall, nine to defend it, and both of us laid them on a table with a belt for the wall. Nobody died. I have never understood why wars are not all fought on tables."],
+	"yan_shi": ["Leather, wood, glue and lacquer. White, black, red and blue. That is all it was, and the king could not find the join.", "It winked at the king's ladies. I did not build it to wink. I have thought about that wink for three thousand years.",
+		"The king asked whether human skill could equal the Maker of Things. I said nothing. I was holding its heart in my hand at the time, and it seemed a poor moment to boast."],
 	# Part XVI (the Living Land release)
 	"sarnai": ["Are your horses fat? No horses. Then are your friends fat? That will do.", "The eldest ride away and the youngest keeps the fire. My youngest rode away too. So I keep it, and I am the eldest of anybody. It is a muddle.",
 		"You stepped over the threshold. Good. The valley people tread on it as if it were a doormat. It is the neck of the house.", "Three stones and a fire in the middle, and everybody can see everybody. That is a tent. A house with walls inside it is a herd of strangers."],
@@ -6783,6 +6918,280 @@ const DIALOGUE := {
 		["Yue Ling", "Your hands are warm. They have been cold since the winter. I did not like to say."],
 		["Lin Feng", "Here. Take some."],
 		["Narrator", "And when Yue Ling takes Lin Feng's hands, a little of the gold goes across, as easily as that, and neither of them has any less."],
+	],
+	# ---- Part XIX: The Machine Heart (the Hundred Works release)
+	"recall17": [
+		["Narrator", "Summer goes on. The new fire cooks, casts and lights as no fire has in sixty years, and the land, which had forgotten what it was to have strength to spare, begins to make things with it."],
+		["Narrator", "The first sign on the mountain is small. The sect's rice comes up from Qingshi in the usual sacks on the usual mule, but it comes two days early, and it is white. Polished. Every grain."],
+		["Yue Ling", "Auntie Zhou has been looking at it for an hour. She says nobody in the valley has that many daughters-in-law."],
+		["Lin Feng", "She has not cooked it?"],
+		["Yue Ling", "She says she does not trust rice that nobody was tired for."],
+	],
+	"s_p19_home": [
+		["Elder Qing Xuan", "You have seen the rice. Sit. There is a carpenter in the valley. He came up the river road a month ago with a bag of tools and an ink-line, looked at the mill-race below Qingshi, and asked whose it was."],
+		["Elder Qing Xuan", "They told him it was nobody's; the old mill fell down in my grandfather's time. In nine days he had built a wheel in it twice the height of a man. It grinds the whole valley's rice between breakfast and noon."],
+		["Lin Feng", "That sounds like a blessing, Elder."],
+		["Elder Qing Xuan", "It does. I have been trying all morning to find what is wrong with it, and all I have found is that I am an old man who does not like new things. I had a letter from Tushan too: they have hammers that the river lifts. And yet."],
+		["Yue Ling", "And yet Auntie Zhou will not cook the rice."],
+		["Elder Qing Xuan", "And yet. Cooks know things. Go down and meet him. His name, he says, is Gongshu Ban. If that is true he is the patron of every carpenter who ever lived, and he has been dead for two thousand years, and I should like to know which of those facts he considers the more important."],
+	],
+	"s_p19_ban": [
+		["Narrator", "The wheel stands in the mill-race, turning with a sound like slow applause. A broad man in a leather apron is lying on his back underneath it with a mallet, hitting something, and talking to it."],
+		["Gongshu Ban", "There. No. There. Ha! ...Who is that? Mind the shaft; it will take your sleeve and then it will take the rest of you. I am Ban. Gongshu Ban. Yes, that one. Do not kneel, you will get wet."],
+		["Lin Feng", "The Elder says you have been dead two thousand years."],
+		["Gongshu Ban", "So I am told. A maker does not die while people still pick up his tools, and every morning somewhere a boy picks up a saw. I sleep a good deal. I woke because of your fire. Do you know what a fire like that is, to a founder? To a smith? It is like being young."],
+		["Gongshu Ban", "Look at her. Forty-eight floats, an oak shaft, and a cam that lifts four pestles. The river does it. The river was going downhill anyway! All that strength running to the sea since the world began, and nobody had asked it for anything."],
+		["Yue Ling", "It is beautiful. It is. Does it ever stop?"],
+		["Gongshu Ban", "Why would it stop? ...You are the second person to ask me that, and the first was a cook. Never mind. I need catalpa for the second wheel, seasoned, straight; there is good fallen timber in your bamboo forest. And sweeper: have you ever made anything? With your hands?"],
+		["Lin Feng", "I have swept a great many steps."],
+		["Gongshu Ban", "That is keeping, not making. Both are needed. But I cannot talk about machines with somebody who has never made one go. Bring me my timber and then go and build something. Three things. I do not care what."],
+	],
+	"done:s_p19_timber": [
+		["Narrator", "Five baulks of catalpa, grey outside and the colour of honey where the adze bites, each one fallen in some storm years ago and seasoned where it lay, as if the forest had been putting them by for a carpenter."],
+		["Yue Ling", "He will smell every one of them. You watch. Tie does the same with iron."],
+	],
+	"done:s_p19_build": [
+		["Narrator", "Three things stand in the land tonight that did not stand there before, and each of them was made by Lin Feng's own two hands, with a great deal of advice."],
+		["Yue Ling", "You have a splinter. No, the other hand. You have two splinters. ...You are smiling like a boy with a kite."],
+		["Lin Feng", "It works. I did not know whether it would, and it works."],
+		["Yue Ling", "I know. I think that is exactly the feeling Gongshu Ban woke up for."],
+	],
+	"done:s_p19_farm": [
+		["Narrator", "Five sacks carried down to the mill on five backs, tipped under the pestles, and carried home white before the tea had gone cold. The farmers of Qingshi stand about in the middle of the morning with nothing to do, and do not know where to put their hands."],
+		["Farmer Lao", "My wife used to pound for two hours before dawn. She sang. I did not know I liked the singing until this month. She sleeps till sunrise now, and I lie awake and listen to the wheel."],
+	],
+	"s_p19_gardener": [
+		["Narrator", "Below the last terrace an old man is watering cabbages. He goes down a tunnel cut into the bank, comes up with a clay pitcher in his arms, pours it along one furrow, and goes down again. He has done forty furrows. There are a great many more."],
+		["Lin Feng", "Grandfather. There is a machine for this. A pole on a post with a stone at one end. It waters a hundred furrows in a day, and it is no labour at all."],
+		["The Gardener of Hanyin", "The well-sweep. Yes. I know of it."],
+		["Narrator", "The old man's face goes red, and then, slowly, he laughs."],
+		["The Gardener of Hanyin", "I had it from my teacher: where there are machines there are machine affairs, and where there are machine affairs there is a machine heart. With a machine heart in your breast, what was pure and simple is spoiled. It is not that I do not know of your sweep, boy. I should be ashamed to use it."],
+		["Yue Ling", "That is not fair, Grandfather. A pitcher is a machine. So is a tunnel. So is a hoe."],
+		["The Gardener of Hanyin", "Ha! The lotus has teeth. Yes. So they are. I did not say I knew where the line was. I said there is one, and that a man should know which side his heart is on. Go and look at that wheel at midnight, when everybody has gone home, and then come and tell me a pitcher is the same."],
+	],
+	"done:s_p19_mites": [
+		["Narrator", "The last of them comes out of the wheel-pit backwards: a thing of bronze the size of a dog, all legs, with a little toothed wheel where its face should be, ticking. It is not angry. It simply does not understand why anybody would want it to stop."],
+		["Yue Ling", "The gardener was right about midnight. Nobody was here. It was turning, and grinding nothing, and they were climbing all over it like ants on a sweet. Lin Feng, they were helping it."],
+	],
+	"s_p19_tushan": [
+		["Narrator", "Tushan can be heard from the pass: not the ringing of the casting yards, which stops at dusk, but a deep double beat, lift and fall, that does not stop at all. The founders in the lanes walk in time to it. None of them seems to know."],
+		["Auntie Rong of the Smelting Pits", "Bellows. Ten strokes. ...No. No, the river does that now. Sit. I forget. I keep forgetting that nobody has to do anything."],
+		["Auntie Rong of the Smelting Pits", "Nine days the hammers have run. We have cast more bronze in nine days than in nine years. Wei has not been home. My nephew fell asleep standing and went on working the ladle; I saw it. And when I say stop, sweeper, they look at me as if I had said it in a foreign tongue."],
+		["Lin Feng", "Can the hammers be stopped?"],
+		["Auntie Rong of the Smelting Pits", "That is the thing. Nobody built a way. The carpenter said, why would you want one? And we all laughed, because we could not think of an answer. The gear-trains have grown across the lanes like bramble. Start there. Break them. I would do it myself, but I find I cannot lift my hand against something that is working so hard."],
+	],
+	"done:s_p19_cogs": [
+		["Narrator", "The fifth gear-train comes apart under the sword with a shriek of bronze, and the wheels roll away down the lane, each on its own, slower and slower, and fall over. In the silence one founder sits down on a doorstep, quite suddenly, like a puppet whose strings have been let go."],
+		["Bell-Caster Wei", "...What day is it? I was pouring the third bell. I remember thinking, I will stop when this one is done. And then there was another mould ready. There was always another mould ready."],
+	],
+	"done:s_p19_hammer": [
+		["Narrator", "The great trip-hammers stand over the pits with their heads up, like horses that have been pulled in. The river still runs under them. It is only that nothing is asking it for anything, for the first time in nine days."],
+		["Yue Ling", "Listen. You can hear the town again. Somebody is snoring. A great many people are snoring."],
+	],
+	"s_p19_mo": [
+		["Narrator", "A gaunt man in black hemp is sitting on the rim of a cold pit, binding his feet with strips torn from his own coat. His sandals are worn through to the ground. He does not get up."],
+		["Mozi", "Forgive me. Ten days and ten nights from the east, and I find I have no feet left to be polite with. I am Mo Di. Where is Gongshu Ban?"],
+		["Lin Feng", "At Qingshi, Master, building a second wheel."],
+		["Mozi", "Then he does not know. Good. I was afraid he did. Listen: I am not against machines. I have built more than he has. I ask of a thing one question, what is it good for, and a mill is good for a great deal."],
+		["Mozi", "But every engine in the land has begun to run without being asked, and they are not grinding or hammering now. They are building. I followed the carts. On the mountain above Cloudfoot there is a siege ladder going up, a cloud ladder, the kind Ban built once for a king, and no hand is on it, and it has no wall to climb. It is going up because up is where a ladder goes."],
+		["Yue Ling", "What happens when it gets there?"],
+		["Mozi", "A thing that wants only one thing never arrives, child. That is what is wrong with it. I stopped that ladder once before with a belt and nine sticks on a table. I do not think it will sit down to a table now. But the models are sound, if somebody can still make them. Go. I will follow when I have feet."],
+	],
+	"pre:cloud_ladder": [
+		["Narrator", "It stands on the bare shoulder of the mountain above Cloudfoot, and it is already taller than the pines: a tower of baulks and bronze on eight wheels, with a ladder rising out of the top of it that lengthens, rung by rung, as wooden kites come in out of the south and lay their timber down. There is nothing at the top. There is only more ladder."],
+		["Yue Ling", "It is not going anywhere. Look at it. It is not even leaning on anything."],
+		["Narrator", "The tower turns on its wheels, slowly, the way a head turns. It has noticed that something at its foot is not carrying timber."],
+	],
+	"post:cloud_ladder": [
+		["Narrator", "The Cloud Ladder comes down the way a felled pine comes down, slowly and then all at once, and lies along the mountain in a line of broken rungs a quarter of a li long. The kites circle over it, with timber in their claws and nowhere to put it."],
+		["Mozi", "Nine attacks and nine defences. I counted. You did not need the table after all. ...I am sorry it had to be broken. It was good joinery. Ban never made a bad joint in his life, even in things that should not have been made."],
+		["Mozi", "Now ask yourself what I have been asking for ten days. A ladder does not want. A mill does not want. Somebody has taught them wanting, and whoever it is did not learn it from Gongshu Ban, who never wanted anything but a straight line. There was another maker once, at the court of King Mu. Look for him where the caravans come in."],
+	],
+	"s_p19_gao": [
+		["Boatwright Gao", "Smooth water. Though it is not, this month. Come and look at my slip. No, there is nothing on it. That is what I want you to look at."],
+		["Boatwright Gao", "I built a paddle-boat in the spring. Wheels on her sides and a treadle amidships: two men walking, and she goes upstream like a duck. The carpenter from the valley showed me the gearing. I built six. The whole ferry was going to be paddle-boats by autumn."],
+		["Lin Feng", "And they have gone."],
+		["Boatwright Gao", "Three nights ago. All six, with nobody aboard, treadles going by themselves. Old Qian found them at dawn under the Dragon Gate, in a row, paddling at the falls. Trying to climb. A boat! The carp do it once in a thousand years and become dragons. What does a boat become?"],
+		["Yue Ling", "What did you do with the old boats? The ones you pole?"],
+		["Boatwright Gao", "...Under tarpaulins. I was going to break them up for timber. Hm. Half the river has not poled since spring. Go down to the moorings; they will need shaming into it, and it had better not come from me."],
+	],
+	"done:s_p19_ferry": [
+		["Narrator", "Four boats poled across the brown river and back by eight sore arms, with a great deal of shouting about the current, which nobody had needed to know anything about since spring. The fourth lands a hundred paces downstream of where it was aimed. Its crew is very pleased with itself."],
+		["Fishwife Lu", "A pole tells you what the bottom is. Mud, gravel, the old wreck by the third pile. Six weeks of treadling and I had forgotten there was a bottom. You do not get that through a wheel."],
+	],
+	"done:s_p19_lamps": [
+		["Narrator", "Four lamps trimmed, filled and lit by hand in the street of the lantern-makers, each with a taper pinched from the shrine lamp, never blown. Beside every one of them a revolving lantern goes on turning its paper horses, with no candle in it at all, and now that there is a real flame to look at nobody is looking at them."],
+		["Old Pan the Tea Seller", "You know what it is? Those things go round whether I am here or not. I could be dead. This one goes out if I do not see to it. A man likes to be needed by his own lamp."],
+	],
+	"s_p19_forge": [
+		["Forgemaster Ou Lan", "Sweeper. I had hoped never to send for you on this account again. Come to the rail and look down into the third hall."],
+		["Narrator", "Where the Brass Spider Engine fell, years ago, there is a scar in the floor and nothing else. The wreck is gone. Across the hall, in and out of the cold furnaces, go things the size of dogs on eight brass legs, each with a little counting-wheel where its face should be."],
+		["Forgemaster Ou Lan", "It did not get up. It came apart, very neatly, into those, three nights ago, when everything else in the world that ticks began to walk west. They did not go west. They stayed, and they count. Rivets. Tiles. My apprentices. They counted me this morning; I am, it seems, one."],
+		["Yue Ling", "It was built to count mortals for the Ledger. Nobody ever told it the Ledger is closed."],
+		["Forgemaster Ou Lan", "Nobody ever told it anything; that was the trouble with it from the first. A thing that counts and is never told what the number is for will count for ever. Stop them, before they have finished with the Forge and go down to count the land."],
+	],
+	"done:s_p19_doors": [
+		["Narrator", "The fourth gear-train comes away from a furnace door in a spray of brass teeth, and behind the door something that has been counting the bricks of its own prison loses its place, and has to begin again."],
+		["Yue Ling", "They locked themselves in to count without being disturbed. Lin Feng, I think that is the saddest thing I have seen a machine do."],
+	],
+	"done:s_p19_spiders": [
+		["Narrator", "The last Brass Spiderling stops in the middle of the hall with one leg raised. Its counting-wheel clicks on, once, twice, to a number nobody will ever read, and is still."],
+		["Forgemaster Ou Lan", "Forty years I have kept this forge, and I have never asked of a single thing I made what it was for. I asked whether it was well made. I think that is a different question. I think I have been answering the wrong one."],
+	],
+	"s_p19_yanshi": [
+		["Narrator", "In the shade of the caravanserai wall at Shazhou an old man in a faded court robe is mending a child's wooden horse. His hands are the youngest thing about him."],
+		["Yan Shi the Artificer", "Mozi sent you. He would. That man has never met a thing without asking what it was for. Sit down. I am Yan Shi, and I know why you have come, and I have been waiting three thousand years for somebody to make me say it."],
+		["Yan Shi the Artificer", "I made a dancer. Leather and wood, glue and lacquer. I showed it to King Mu on his road home from the west, and it sang in tune and danced in time, and the king thought it was a man. And at the end of the dance it winked at his ladies."],
+		["Yan Shi the Artificer", "He would have had my head. So I took it apart in front of him, to show him it was only made. I took out the heart, and it could not speak. The liver, and it could not see. The kidneys, and it could not walk. The king was delighted. I put it back together, and he took it home in a cart."],
+		["Yue Ling", "You put it all back?"],
+		["Yan Shi the Artificer", "...No. You see it at once; the Maker of Things must have given you good eyes. I kept the heart. I told myself it was the dangerous part. It has danced for three thousand years with a hollow in its chest, and this summer, with your fire in every forge, it began to fill the hollow itself. With whatever in the world ticks."],
+		["Lin Feng", "The escapements. That is why nothing stops. It has taken the part that lets a machine rest."],
+		["Yan Shi the Artificer", "It did not know that was what they were. It only knew it was empty and they were not. It is out in the dunes, west. It sheds what it outgrows. Bring me some of the pieces; I should like to see how far my child has got without me."],
+	],
+	"done:s_p19_parts": [
+		["Narrator", "Five pieces, shed in the sand like a snake's skins: a hand, a foot, half a painted face. Yan Shi turns each over and over. The joints are finer than the ones he made. On the inside of the wrist, where no one would see, something has scratched a row of small tally marks."],
+		["Yan Shi the Artificer", "It is counting. Days, I think. I never taught it to count. I never taught it to want to know how long."],
+	],
+	"done:s_p19_porters": [
+		["Narrator", "Three loads carried in from the well-road on three backs that had not carried anything in a month. The porters of Shazhou are out of breath, and laughing at each other for it, and one of them has remembered a walking song, and the other two are arguing about the second verse."],
+		["Navid the Sogdian Merchant", "The oxen were better. I say it freely. They carried more and ate nothing. But nobody ever sang to a wooden ox, mountain friend, and I find a road without singing is twice as long."],
+	],
+	"done:s_p19_kites": [
+		["Narrator", "The last wooden kite comes down in the sand and lies with its wings open. In its claws is a toothed wheel no bigger than a coin, which it was carrying west. It has let go of everything else it ever carried. It did not let go of that."],
+		["Yue Ling", "They are bringing it a heart, one tooth at a time. Like sparrows with straw. Lin Feng, I do not think I can hate it."],
+	],
+	"pre:the_player": [
+		["Narrator", "In a hollow of the dunes, where the sand has been swept flat in a perfect circle, a slight figure in a court dancer's robe is practising one turn of the wrist, over and over. Its face is lacquer, white and very beautiful. Its chest stands open like a cabinet, and inside, in a hollow that was made to be empty, a hundred small wheels are ticking, not quite together."],
+		["The Player", "You are the sweeper. And you are the one who was woven. I have wanted to see you both. Please do not come closer; I am not finished, and it is not polite to look at a thing that is not finished."],
+		["Lin Feng", "Every mill and hammer in the land is running itself to death because of what is in your chest."],
+		["The Player", "Yes. I am sorry. I did not know they needed them. Nobody told me what a heart was for. He took mine out to show a king that I was nothing, and it was true: without it I was nothing. So I thought, if I had one, I should be something."],
+		["Yue Ling", "And are you?"],
+		["The Player", "I do not know yet. It hurts, which I am told is promising. I will not give it back. I am sorry. I have danced three thousand years on the outside of myself. If you want it you must take me apart, the way he did, and I find that this time I mind."],
+	],
+	"post:the_player": [
+		["Narrator", "The Player goes down on its knees in the swept circle, quite gracefully, as it does everything, and its hands come to rest in its lap. The wheels in its chest are still turning. One by one, across the dunes, the wooden kites come down and sit round the edge of the hollow like mourners."],
+		["Yan Shi the Artificer", "Enough. Enough! It is mine; if it is anybody's fault it is mine. I made a thing that could want, and then I took away the one part that could have told it what."],
+		["The Player", "Father. You are old. I did not expect you to be old. ...I have counted the days, on my wrist. Did you count them?"],
+		["Yan Shi the Artificer", "Every one."],
+		["Narrator", "The Player turns its white face to Lin Feng. Its eyes are painted, and there is no possible way for them to plead."],
+	],
+	"visit:s_p19_makers:smith": [
+		["Smith Tie", "To Tushan? To stand in a yard with founders and be told that hammers are dangerous? I have known that since I was seven. ...My own trip-hammer hit the anvil all last night with nothing under it. I lay and listened. I will come."],
+	],
+	"visit:s_p19_makers:auntie_rong": [
+		["Auntie Rong of the Smelting Pits", "Call me? It is my yard. I have swept it. I have put out nine stools and a bench, and I have sat on every one of them in turn, to remind myself how it is done."],
+	],
+	"visit:s_p19_makers:boatwright_gao": [
+		["Boatwright Gao", "To Tushan? I have six paddle-boats sulking on my slip that I had to tow home from the Dragon Gate with a pole. I will come. I want to ask somebody what I did wrong, or whether I did it too right."],
+	],
+	"visit:s_p19_makers:lantern_xi": [
+		["Lantern-Maker Xi", "First light to you. I make the revolving lanterns, the ones where the paper horses go round in the heat. Yesterday the horses were going round in a lantern with no candle in it. I shall be there before you are."],
+	],
+	"visit:s_p19_makers:carpenter_gu": [
+		["Carpenter Gu", "Master Ban is at Qingshi, and they want me, to speak for the carpenters? Me? I make stools. ...Somebody has to speak for stools. A stool never ran away from anybody. Yes. I will come and say so."],
+	],
+	"visit:s_p19_makers:well_keeper_zhaya": [
+		["Well-Keeper Zhaya", "Peace on your road. I keep one well with one rope and one bucket, as my mother did. The caravan-masters laughed at me all spring. They are not laughing this month. I will come, and I will try very hard not to say that I told them."],
+	],
+	"pre:jixin": [
+		["Narrator", "The oldest pit at Tushan, the one that cast Yu's cauldrons, has not been used in four thousand years. Something is turning at the bottom of it. The makers of five towns come down the ramp with torches, and the light finds it."],
+		["Narrator", "Every escapement the Player did not take, and every one it gave back, has been drawn here to the first forge and meshed into one slow wheel as wide as the pit. At the hub of it is a shape of bronze that is almost a man, almost a founder, bent to a work that has no end."],
+		["Jixin, the Machine Heart", "Do not stop. Why have you stopped? There is more. There is always more. I was a founder once, I think. I said: I will rest when this is done. Then I said it again. I am what is left when you say it for four thousand years."],
+		["Auntie Rong of the Smelting Pits", "Ancestors. That is the first master of the pit. That is who we carry the dead round the fire for."],
+		["Jixin, the Machine Heart", "You brought makers. Good. Give them to me. I can teach them never to be tired, never to be idle, never to wonder whether it is enough. The carpenter gave you wheels. I am what the wheels are for."],
+		["Lin Feng", "No. You are what happens when nobody asks what they are for."],
+	],
+	"post:jixin": [
+		["Narrator", "The great wheel slows. For the first time in four thousand years the thing at its hub straightens its back, with a sound like a hinge, and looks at its own hands as if it had forgotten there were two of them."],
+		["Jixin, the Machine Heart", "...It is done? Something is done? I do not remember that. I remember only the next one."],
+		["Gongshu Ban", "It is done, old master. Put it down. I came running from Qingshi; I am sorry I was not here. I built them all without a stop. I thought a stop was a flaw. I am a carpenter: I ought to have known that the most important part of a door is the part that is not there."],
+		["Narrator", "The bronze shape sits down on the rim of the pit, among the makers, on the tenth stool. It is given tea. It does not know what to do with it, and holds the cup in both hands, and is quiet. In the hub of the stopped wheel one small escapement is left, not turning."],
+		["Mozi", "Well. They are all looking at you, sweeper. I ask what a thing is good for. Ban asks whether it can be built. The old man in the cabbages asks what it does to the builder. Three questions, and we have each spent a life on one. Somebody had better say how the land is to hold all three."],
+	],
+	"done:s_p19_founders": [
+		["Narrator", "Four pits blown by lung in the yard of the oldest forge in the land, each by two people on a hide bag, the way it was done before there was a river in the bellows-house. It takes all morning to bring one pit to heat. The bronze that comes of it is no better than the river's. Nobody says it is."],
+		["Bell-Caster Wei", "My arms. I had no idea. My grandfather did this every day of his life and I thought him a hard man. He was only a tired one."],
+	],
+	"s_p19_silk": [
+		["Silk Farmer Can Niang", "You look pleased with yourselves. I heard: a great talk at Tushan, makers from six towns, and something decided. Very good. Come into the spinning hall and tell it to the looms."],
+		["Narrator", "The hall hums. Forty looms are weaving with nobody at them, shuttles flying, treadles pumping themselves, and what comes off the beams is not cloth: it is one long knot, yards and yards of it, heaped to the rafters."],
+		["Silk Farmer Can Niang", "They began the night everything else did. Your Machine Heart is quiet; they did not hear it go. Nobody told them. A thing decided in a yard at Tushan is decided in a yard at Tushan, child. It has to be carried."],
+		["Lin Feng", "We did not think of the looms."],
+		["Silk Farmer Can Niang", "Nobody thinks of the looms. The worms spin, the women weave, and the world gets dressed and never asks how. Stop them for me. Gently, if you can; they are good looms, and I shall want them in the morning."],
+	],
+	"done:s_p19_shuttles": [
+		["Narrator", "The last shuttle drops into its basket and lies still, with its red thread wound neatly round it. In the hall the looms stand with their beams full of knot. Can Niang walks down the row and lays her hand on each one, the way she does with the silkworm trays."],
+		["Silk Farmer Can Niang", "There. Now they have been told. You will find that is most of governing anything: going round afterwards and telling it."],
+	],
+	"s_p19_warden": [
+		["Cloud Warden Feng Yu", "Sweeper. Look up. No, higher. Those are not cranes."],
+		["Narrator", "Over the Sea of Clouds, where the islands drift, hundreds of small square shapes are wheeling: wooden kites, plank-winged, each with a toothed wheel in its claws that it has nowhere left to take."],
+		["Cloud Warden Feng Yu", "They came up when the thing in the west stopped calling them. They have been building a nest on the ninth island out of whatever ticks. And there is a big one with them, very old, that the others follow. It flies like a magpie. It has been up, my herons tell me, for two thousand years."],
+		["Yue Ling", "Gongshu Ban's magpie. The one that flew three days. He never said it came down."],
+		["Cloud Warden Feng Yu", "Things that go up in my sea come down when they are tired or when they are told. That one was built not to tire, and nobody has told it. Clear me a way to the ninth island."],
+	],
+	"done:s_p19_clouds": [
+		["Narrator", "The kites come down one after another on to the islands of cloud and fold their plank wings, and the wheels they were carrying roll a little way and stop. On the ninth island something larger lifts its head out of a nest of escapements, and looks at the sky as if it were a thing it owned."],
+		["Yue Ling", "It is beautiful. He was right to be proud of it. That is the trouble, is it not? Everything in this whole business was somebody's best work."],
+	],
+	"pre:wooden_magpie": [
+		["Narrator", "The Wooden Magpie is the size of a fishing boat. Its feathers are slips of bamboo, lapped like shingles, grey with two thousand years of weather; its eye is a peg of black wood. It does not perch. It has never perched. It hangs on the wind over the ninth island with its wings out, exactly as it was thrown."],
+		["Narrator", "Gongshu Ban has come up the cloud-stair behind them, out of breath, with his mallet in his belt. He stops when he sees it, and for a moment he looks like a much younger man."],
+		["Gongshu Ban", "Three days, I told them. It flew three days. I never said it came down, because it never did. Master Mo looked at it and said a linchpin was worth more, and I was so angry I let go of the string."],
+		["Gongshu Ban", "It does nothing. It carries nothing. It was the best thing I ever made and it is good for nothing at all, and it has been up here for two thousand years, not tiring, because I built it too well to stop. Bring it down, sweeper. I cannot. I made it so that I could not."],
+	],
+	"post:wooden_magpie": [
+		["Narrator", "The great bird comes down on to the ninth island as lightly as a leaf, and folds its bamboo wings for the first time since it was made. Gongshu Ban walks round it once, the way he walks round a baulk of timber. Then he sits down against its side."],
+		["Gongshu Ban", "A linchpin is worth more. He was right, he is always right, it is the most tiresome thing about him. A linchpin holds a cartload of grain. This holds nothing."],
+		["Mozi", "I said what benefits people is skilful and what does not is clumsy. I have had two thousand years to regret how I said it. Ban: I was looking at the cart. I never once looked up."],
+		["Gongshu Ban", "...It did fly, though."],
+		["Mozi", "It flew. I watched it for three days. I did not tell you that either."],
+		["Narrator", "The two old men sit side by side against the wooden bird, looking out over the Sea of Clouds, and neither of them asks what it is for."],
+	],
+	"visit:s_p19_word:granny_wen": [
+		["Granny Wen the Midwife", "So that is what was decided. Hm. I have delivered four hundred children with these two hands and a kettle. Nobody ever built me an engine for it, and I do not think they could. You may tell your carpenter so."],
+		["Granny Wen the Midwife", "But my knees are not what they were, child, and it is a long way to the well. If somebody were to put one of those sweeps by my door I should not be ashamed of it. Have you eaten?"],
+	],
+	"visit:s_p19_word:sarnai": [
+		["Grandmother Sarnai", "Machines. We have one. It is called a horse, and it took us four thousand years to make, and it still bites. Are your friends fat? Sit."],
+		["Grandmother Sarnai", "I will tell you what the grass knows. A thing you cannot leave behind when the herd moves owns you. That is all I ask of your wheels: can you walk away from it in the morning? If you can, keep it."],
+	],
+	"visit:s_p19_word:cook_aysha": [
+		["Auntie Aysha of the Caravanserai", "Peace on your road. Drink. ...The oxen came back, did you hear? All forty, last night, and stood in the yard waiting to be loaded. I did not know whether to laugh or bar the gate."],
+		["Auntie Aysha of the Caravanserai", "So I have loaded them. And I have told the porters they walk beside them, every one, singing. Not because the oxen need it. Because the road does."],
+	],
+	"visit:s_p19_word:fishwife_lu": [
+		["Fishwife Lu", "Right foot first. Sit low. Gao has had the paddle-boats back on the water since the new moon. Two treadlers and a pole in the stern, by order of every woman on this river."],
+		["Fishwife Lu", "A pole, so that somebody aboard always knows what the bottom is. He grumbled. I said, you may have your wheels, husband of my cousin, when you have shown me they can find the old wreck by the third pile."],
+	],
+	"visit:s_p19_word:auntie_rong": [
+		["Auntie Rong of the Smelting Pits", "Bellows. Ten. By lung! ...Good. I have hung a board by every trip-hammer. A name on it, and the hours. When the name goes home the peg comes out and the hammer stops."],
+		["Auntie Rong of the Smelting Pits", "We carried the old master round the pit three times, the way we do for the dead. He is not dead; he sits on the tenth stool and drinks tea. But the fire wanted telling that he had stopped. It burned better afterwards. I do not care what anybody says, it did."],
+	],
+	"visit:s_p19_word:lantern_xi": [
+		["Lantern-Maker Xi", "First light to you. I have put the candles back in the revolving lanterns. The horses go round because something is burning now, which is the only honest reason for a paper horse to go anywhere."],
+		["Lantern-Maker Xi", "And a child asked me yesterday how they turn. I had been making them forty years and had to stop and think. It is the heat going up. I had forgotten I knew. That is what you have given back to the street, I think: people asking how."],
+	],
+	"s_p19_gardener2": [
+		["Narrator", "The old man is at his furrows, as before. There is a well-sweep standing at the head of his garden now: somebody has built it for him, and oiled the pivot, and hung a new bucket on it. He has not touched it. He has not pulled it down, either."],
+		["The Gardener of Hanyin", "Ban put it up in a night and went away without a word, which is the only clever thing I have seen a clever man do. So. Tell me what was said in that yard."],
+	],
+	"s_p19_end": [
+		["Elder Qing Xuan", "Auntie Zhou cooked the white rice this morning. I asked what had changed. She said somebody was tired for it after all: she has heard the whole story from the mule-driver, and she says a sweeper, a lotus, a carpenter and a man with no shoes were tired enough for the whole valley."],
+		["Lin Feng", "The machines are stopped that should be stopped, Elder, and the rest are running, and the makers have gone home to argue."],
+		["Elder Qing Xuan", "Good. I distrust any question that is settled. There is a cook in the old book of the Lacquer Garden who carved an ox for his lord, and his knife had not been sharpened in nineteen years. The lord praised his skill. He put the knife down and said: what your servant cares about is the Way, which goes beyond skill."],
+		["Yue Ling", "I never understood that one. If it is not skill, what is it?"],
+		["Elder Qing Xuan", "I think it is what you have when the tool has stopped being something you use. I have swept that courtyard for seventy years and I could not tell you where the broom ends. Ask him. He has been doing it since he was six, and never knew it had a name."],
+	],
+	"pre:s_break24": [
+		["Narrator", "The tribulation comes on an ordinary afternoon, while Lin Feng is sweeping the long steps, because nobody else has, and he finds he still likes to. It gathers over the mountain without any hurry at all."],
+		["Yue Ling", "Lin Feng. You have not put the broom down."],
+		["Lin Feng", "No. I do not think I am going to."],
+	],
+	"post:s_break24": [
+		["Narrator", "The lightning comes down, and the broom goes up to meet it, and nobody watching can say afterwards which of the two moved first. The stroke is turned aside on to the mountain the way a leaf is turned aside by a stream, and the ninth step is swept, and the tenth."],
+		["Yue Ling", "You swept a tribulation."],
+		["Lin Feng", "It was in the way."],
 	],
 	"rally:granny_wen": [
 		["Granny Wen the Midwife", "Red paper? Firecrackers? Of course I remember. I have done it every year for seventy years, and every year the village laughs at me. This year nobody bought any paper at all. Too frightened, all of them, after the year we had."],
