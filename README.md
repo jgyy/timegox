@@ -7,13 +7,13 @@ Play Lin Feng, **a young man or a young woman** (or whoever you make them: name,
 
 | | |
 |---|---|
-| ![the faces before (above) and after (below) this release: the lower jaw wider down to its corners and the chin broader, the eyes smaller with a round iris the lid covers, one highlight and a thin lash line](docs/screenshots/sculpt_before_after.png) | ![the cast after the re-sculpt: Yue Ling, Lin Feng as a young woman and as a young man, Chang'e, the Elder, Ah Mei, Granny Wen, Grandmother Sarnai of the horse-folk and Zhurong, Lord of the Southern Fire](docs/screenshots/sculpt_cast.png) |
-| ![the hero as a young woman from every side: the same robe, sword and clips on a woman's frame](docs/screenshots/turnaround_lin_feng_f.png) | ![the four looks on a woman's frame and on a man's](docs/screenshots/hero_women_and_men.png) |
-| ![character creation: a young woman, the Wanderer, the old hunter's apprentice, kin of the Felt Hearth, and where the story will begin](docs/screenshots/create_hearth.png) | ![the Hearths page: six cultures of the land, how each greets, eats and keeps its fire, what nobody does there, and whether they call you a stranger, a guest or kin](docs/screenshots/hearths_page.png) |
-| ![one of six beginnings: three years ago, the last morning in the tents of the horse-folk below Thunder Valley](docs/screenshots/prologue_steppe.png) | ![the farewell at the Felt Hearth: Grandmother Sarnai, who keeps the fire for the people who fly](docs/screenshots/prologue_steppe_farewell.png) |
-| ![the people and the dress of the hearths: Grandmother Sarnai and Batu, a herder woman and man, a woman of the oasis, a boat-wife, a founder and a lantern-maker's girl](docs/screenshots/hearth_people.png) | ![Part XVIII: clinker, the crust a tired fire leaves, on the mouth of a casting pit at Tushan](docs/screenshots/part18_clinker.png) |
-| ![Zhurong, Lord of the Southern Fire, who keeps Suiren's fire-drill and will not bless six hearths that would not empty](docs/screenshots/battle_boss_zhurong.png) | ![Huilu, the fire nobody sat up with: six bonfires in one skin](docs/screenshots/battle_boss_huilu.png) |
-| ![the sky is held: where will you keep your own fire? Five ends, the ones the journey earned open](docs/screenshots/ending_choice.png) | ![one of five endings: the Road of Six Fires, and the hero's own fire on the lotus](docs/screenshots/ending_road.png) |
+| ![the faces before (above) and after (below) this release: the lower jaw wider down to its corners and the chin broader, the eyes smaller with a round iris the lid covers, one highlight and a thin lash line](docs/screenshots/sculpt_before_after.webp) | ![the cast after the re-sculpt: Yue Ling, Lin Feng as a young woman and as a young man, Chang'e, the Elder, Ah Mei, Granny Wen, Grandmother Sarnai of the horse-folk and Zhurong, Lord of the Southern Fire](docs/screenshots/sculpt_cast.webp) |
+| ![the hero as a young woman from every side: the same robe, sword and clips on a woman's frame](docs/screenshots/turnaround_lin_feng_f.webp) | ![the four looks on a woman's frame and on a man's](docs/screenshots/hero_women_and_men.webp) |
+| ![character creation: a young woman, the Wanderer, the old hunter's apprentice, kin of the Felt Hearth, and where the story will begin](docs/screenshots/create_hearth.webp) | ![the Hearths page: six cultures of the land, how each greets, eats and keeps its fire, what nobody does there, and whether they call you a stranger, a guest or kin](docs/screenshots/hearths_page.webp) |
+| ![one of six beginnings: three years ago, the last morning in the tents of the horse-folk below Thunder Valley](docs/screenshots/prologue_steppe.webp) | ![the farewell at the Felt Hearth: Grandmother Sarnai, who keeps the fire for the people who fly](docs/screenshots/prologue_steppe_farewell.webp) |
+| ![the people and the dress of the hearths: Grandmother Sarnai and Batu, a herder woman and man, a woman of the oasis, a boat-wife, a founder and a lantern-maker's girl](docs/screenshots/hearth_people.webp) | ![Part XVIII: clinker, the crust a tired fire leaves, on the mouth of a casting pit at Tushan](docs/screenshots/part18_clinker.webp) |
+| ![Zhurong, Lord of the Southern Fire, who keeps Suiren's fire-drill and will not bless six hearths that would not empty](docs/screenshots/battle_boss_zhurong.webp) | ![Huilu, the fire nobody sat up with: six bonfires in one skin](docs/screenshots/battle_boss_huilu.webp) |
+| ![the sky is held: where will you keep your own fire? Five ends, the ones the journey earned open](docs/screenshots/ending_choice.webp) | ![one of five endings: the Road of Six Fires, and the hero's own fire on the lotus](docs/screenshots/ending_road.webp) |
 
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
@@ -138,10 +138,10 @@ flowchart LR
 
 | | |
 |---|---|
-| ![Lin Feng from every side: a man built as a V](docs/screenshots/turnaround_lin_feng.png) | ![Gou Mang, Lord of Spring, with the swallow's wings and the willow switch](docs/screenshots/turnaround_gou_mang.png) |
-| ![where it fell: the logs, two stumps and the leaves still coming down, Yue Ling looking on](docs/screenshots/sword_fell.png) | ![where the sword qi flew: the shards of the rock it broke along its line](docs/screenshots/sword_qi_mown.png) |
-| ![an ice jam on the river at Longmen: two blows of the sword break it before the thaw floods the fields](docs/screenshots/part17_ice.png) | ![a chain of the Maiden's black ice under the Dragon Palace](docs/screenshots/part17_chains_broken.png) |
-| ![Part XVII's foes: the Maiden of Frost, Taisui and the Mother of the Five Poisons among the beasts of the late frost and the thunder-woken poisons](docs/screenshots/part17_foes.png) | ![the Mother of the Five Poisons, under the scorched plain](docs/screenshots/battle_boss_poison_mother.png) |
+| ![Lin Feng from every side: a man built as a V](docs/screenshots/turnaround_lin_feng.webp) | ![Gou Mang, Lord of Spring, with the swallow's wings and the willow switch](docs/screenshots/turnaround_gou_mang.webp) |
+| ![where it fell: the logs, two stumps and the leaves still coming down, Yue Ling looking on](docs/screenshots/sword_fell.webp) | ![where the sword qi flew: the shards of the rock it broke along its line](docs/screenshots/sword_qi_mown.webp) |
+| ![an ice jam on the river at Longmen: two blows of the sword break it before the thaw floods the fields](docs/screenshots/part17_ice.webp) | ![a chain of the Maiden's black ice under the Dragon Palace](docs/screenshots/part17_chains_broken.webp) |
+| ![Part XVII's foes: the Maiden of Frost, Taisui and the Mother of the Five Poisons among the beasts of the late frost and the thunder-woken poisons](docs/screenshots/part17_foes.webp) | ![the Mother of the Five Poisons, under the scorched plain](docs/screenshots/battle_boss_poison_mother.webp) |
 
 #### References for this release
 
@@ -263,12 +263,12 @@ flowchart LR
 
 | | |
 |---|---|
-| ![a heart-to-heart in the courtyard: "Do you still want me beside you, now you know what I am?"](docs/screenshots/talk_seal.png) | ![a memory given back: what do you say to her?](docs/screenshots/memory_choice.png) |
-| ![the lantern green: a sleeve dance under strings of red lanterns](docs/screenshots/lotus_lantern_green.png) | ![the armillary sphere in the Void Rift: lying back to watch the stars](docs/screenshots/lotus_armillary.png) |
-| ![the millstone in Heaven's Forge: pushed round and round](docs/screenshots/lotus_millstone.png) | ![lotus lanterns set on the water together, in the Stone Forest](docs/screenshots/lotus_river_lantern.png) |
-| ![a red kite high over the Cloud-Tea Terraces, at Chun's kite post](docs/screenshots/kite_sky.png) | ![the Echo of Founder Qing Lian, threading a needle by her barrow](docs/screenshots/founder_echo.png) |
-| ![the hermitage's moon gate](docs/screenshots/hermitage_gate.png) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.png) |
-| ![the moths that eat forgetting](docs/screenshots/battle_forgetting.png) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.png) |
+| ![a heart-to-heart in the courtyard: "Do you still want me beside you, now you know what I am?"](docs/screenshots/talk_seal.webp) | ![a memory given back: what do you say to her?](docs/screenshots/memory_choice.webp) |
+| ![the lantern green: a sleeve dance under strings of red lanterns](docs/screenshots/lotus_lantern_green.webp) | ![the armillary sphere in the Void Rift: lying back to watch the stars](docs/screenshots/lotus_armillary.webp) |
+| ![the millstone in Heaven's Forge: pushed round and round](docs/screenshots/lotus_millstone.webp) | ![lotus lanterns set on the water together, in the Stone Forest](docs/screenshots/lotus_river_lantern.webp) |
+| ![a red kite high over the Cloud-Tea Terraces, at Chun's kite post](docs/screenshots/kite_sky.webp) | ![the Echo of Founder Qing Lian, threading a needle by her barrow](docs/screenshots/founder_echo.webp) |
+| ![the hermitage's moon gate](docs/screenshots/hermitage_gate.webp) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.webp) |
+| ![the moths that eat forgetting](docs/screenshots/battle_forgetting.webp) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.webp) |
 
 ### Four releases ago: fates and faces, outfits, rides and Part XIV
 
@@ -335,16 +335,16 @@ flowchart LR
 
 | | |
 |---|---|
-| ![character creation: "Who swept the steps?", the story's sweeper turning on the cliff](docs/screenshots/create.png) | ![the four looks (the Sweeper, the Wanderer, the Wild Child, the Scholar's Ward) in four colourings](docs/screenshots/hero_looks.png) |
-| ![eight of the twelve outfits, with their hats, crowns, masks, pauldrons and mantles](docs/screenshots/outfits.png) | ![the five people met on the road, and Fang Hu grown](docs/screenshots/fated_people.png) |
-| ![on the Flying Sword](docs/screenshots/riding_sword.png) | ![on the Auspicious Cloud](docs/screenshots/riding_cloud.png) |
-| ![Tala of the Horse-Folk, Qiu Ye and Fang Hu grown](docs/screenshots/fated_portraits.png) | ![Xu Lan, Liu Ying and Little Hu](docs/screenshots/fated_portraits2.png) |
-| ![a fated encounter: Xu Lan in silver chains in the Blood Moon Palace](docs/screenshots/fate_chapter.png) | ![a fated battle: Qiu Ye of the Ashen Moon among the sword saints' barrows](docs/screenshots/battle_fate_qiu_ye.png) |
-| ![a species met for the first time: its story over the battle's opening](docs/screenshots/battle_lore.png) | ![the Bestiary](docs/screenshots/bestiary.png) |
-| ![Kui's grudge over the aeries of Juntian, where the drum of its hide was struck](docs/screenshots/grudge_kui.png) | ![a battle with Kui's grudge](docs/screenshots/battle_grudge_kui.png) |
-| ![the Journal in Part XIV: the six grudges, where each stands and what became of it](docs/screenshots/grudges_journal.png) | ![the ending's results: Karma Fulfilled, the friends and the fallen, the grudges laid to rest](docs/screenshots/ending.png) |
+| ![character creation: "Who swept the steps?", the story's sweeper turning on the cliff](docs/screenshots/create.webp) | ![the four looks (the Sweeper, the Wanderer, the Wild Child, the Scholar's Ward) in four colourings](docs/screenshots/hero_looks.webp) |
+| ![eight of the twelve outfits, with their hats, crowns, masks, pauldrons and mantles](docs/screenshots/outfits.webp) | ![the five people met on the road, and Fang Hu grown](docs/screenshots/fated_people.webp) |
+| ![on the Flying Sword](docs/screenshots/riding_sword.webp) | ![on the Auspicious Cloud](docs/screenshots/riding_cloud.webp) |
+| ![Tala of the Horse-Folk, Qiu Ye and Fang Hu grown](docs/screenshots/fated_portraits.webp) | ![Xu Lan, Liu Ying and Little Hu](docs/screenshots/fated_portraits2.webp) |
+| ![a fated encounter: Xu Lan in silver chains in the Blood Moon Palace](docs/screenshots/fate_chapter.webp) | ![a fated battle: Qiu Ye of the Ashen Moon among the sword saints' barrows](docs/screenshots/battle_fate_qiu_ye.webp) |
+| ![a species met for the first time: its story over the battle's opening](docs/screenshots/battle_lore.webp) | ![the Bestiary](docs/screenshots/bestiary.webp) |
+| ![Kui's grudge over the aeries of Juntian, where the drum of its hide was struck](docs/screenshots/grudge_kui.webp) | ![a battle with Kui's grudge](docs/screenshots/battle_grudge_kui.webp) |
+| ![the Journal in Part XIV: the six grudges, where each stands and what became of it](docs/screenshots/grudges_journal.webp) | ![the ending's results: Karma Fulfilled, the friends and the fallen, the grudges laid to rest](docs/screenshots/ending.webp) |
 
-![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.png)
+![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.webp)
 
 ### Five releases ago: many roads, crafting, renown and Part XIII
 
@@ -443,22 +443,22 @@ flowchart LR
     E --> P[the first time: a new pastime,<br/>renown +1]
 ```
 
-![things to do, in use: the bench, the well, the shrine, the bell, the qin and the fishing jetty](docs/screenshots/props_sheet_0.png)
-![more things to do: the swing, the wishing tree, the campfire, the training stones, the broom and the fish pond](docs/screenshots/props_sheet_1.png)
-![and indoors: the altar, the bookshelf, the bed, the cauldron, the anvil and the loom](docs/screenshots/props_sheet_2.png)
+![things to do, in use: the bench, the well, the shrine, the bell, the qin and the fishing jetty](docs/screenshots/props_sheet_0.webp)
+![more things to do: the swing, the wishing tree, the campfire, the training stones, the broom and the fish pond](docs/screenshots/props_sheet_1.webp)
+![and indoors: the altar, the bookshelf, the bed, the cauldron, the anvil and the loom](docs/screenshots/props_sheet_2.webp)
 - **The bot** walks every kind of road: its plan takes the trials by every way there is (in the verified run: craft 9, respect 5, wealth 5, might 5, dao 4, relic 1, peoples 1), and it hunts essences, crafts at the cauldron and the forge, does deeds for renown, fetches keepsakes from upper storeys and cellars, changes Daos at the steles and opens the gates nearest first. The other two roads into the heart are verified with `--bot-start=s_p13_heart --route=sword|cauldron`. **16:02:51** for the whole game, **1 hour 56 minutes more than the last release**; CI now requires **15 hours**.
 - **Code**: the game's GDScript grew from 26,632 to 31,270 lines (`scripts/trials.gd`, the trials, recipes, deeds and renown, and `scripts/props.gd`, the things to do, are new). Every new boss and monster is one of the existing script-built models in a palette of its own; five character exports were rebuilt from their scripts (Lin Feng and Yue Ling with the interaction clips, and the swordsmen with the sword bone).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
 | | |
 |---|---|
-| ![a trial: the Demon Lord's four ways, one of them open](docs/screenshots/trial_choice.png) | ![crafting at Alchemist Mo's cauldron](docs/screenshots/crafting.png) |
-| ![the Journal: renown, essences, requests and the trial ahead](docs/screenshots/journal.png) | ![a townsperson's request](docs/screenshots/deed_request.png) |
-| ![the Journal during Part XIII: the Eight Gates](docs/screenshots/journal_gates.png) | ![the Gate of Harm: the drum of Kui's hide on Mount Buzhou, a war-band of Chiyou's brothers nearby](docs/screenshots/gate_kui_drum.png) |
-| ![the Gate of Life: the Fetter-Maple in the Maple Gorge](docs/screenshots/gate_fetter_maple.png) | ![Xingtian at the Gate of Opening, by the friendship of the foxes: allies strike every round](docs/screenshots/battle_boss_xingtian.png) |
-| ![Chiyou, War God of the Nine Li, on the Road of the Many Peoples](docs/screenshots/battle_boss_chiyou.png) | ![the ending: the results beside Lin Feng and Yue Ling on the lotus, the sun going down behind the Eight Gates](docs/screenshots/ending.png) |
+| ![a trial: the Demon Lord's four ways, one of them open](docs/screenshots/trial_choice.webp) | ![crafting at Alchemist Mo's cauldron](docs/screenshots/crafting.webp) |
+| ![the Journal: renown, essences, requests and the trial ahead](docs/screenshots/journal.webp) | ![a townsperson's request](docs/screenshots/deed_request.webp) |
+| ![the Journal during Part XIII: the Eight Gates](docs/screenshots/journal_gates.webp) | ![the Gate of Harm: the drum of Kui's hide on Mount Buzhou, a war-band of Chiyou's brothers nearby](docs/screenshots/gate_kui_drum.webp) |
+| ![the Gate of Life: the Fetter-Maple in the Maple Gorge](docs/screenshots/gate_fetter_maple.webp) | ![Xingtian at the Gate of Opening, by the friendship of the foxes: allies strike every round](docs/screenshots/battle_boss_xingtian.webp) |
+| ![Chiyou, War God of the Nine Li, on the Road of the Many Peoples](docs/screenshots/battle_boss_chiyou.webp) | ![the ending: the results beside Lin Feng and Yue Ling on the lotus, the sun going down behind the Eight Gates](docs/screenshots/ending.webp) |
 
-![the ending's film: the magpie bridge, the Nine Cauldrons, the Jianmu, the Isles of the Eastern Sea, the Eight Gates and the Wheel of the Six Paths, each with its line of the epilogue](docs/screenshots/ending_film.png)
+![the ending's film: the magpie bridge, the Nine Cauldrons, the Jianmu, the Isles of the Eastern Sea, the Eight Gates and the Wheel of the Six Paths, each with its line of the epilogue](docs/screenshots/ending_film.webp)
 
 #### References for that release
 
@@ -527,12 +527,12 @@ flowchart LR
 - **Custom animations in the cutscenes**: every person in the game (153 Blender characters) has **ten new gesture clips** baked in `art/lib/person.py` (nod, shake, point, wave, laugh, grieve, think, kneel, offer, shock). A line of dialogue can name its gesture (`["Speaker", "text", "kneel"]`), a narrator's line can direct somebody present (`"Mazu, Who Brings the Boats Home:offer"`), and otherwise one is read from the words (`Data.emote_for`: thanks bow, refusals shake their heads, welcomes wave, directions point, questions think); the listener answers (a bow for a gift, a wave for a wave, a nod for grief). A **conversation camera** eases from the chase camera into a two-shot from the side at head height (higher indoors), drifts during narration and eases back. The ending screen has Yue Ling waving, bowing and laughing and Mazu waving from her boat.
   | | |
   |---|---|
-  | ![Lin Feng kneels with the cultivator's salute](docs/screenshots/anim_lin_feng_kneel.png) | ![Yue Ling waves](docs/screenshots/anim_yue_ling_wave.png) |
-  | ![Lin Feng thinks, hand to his chin](docs/screenshots/anim_lin_feng_think.png) | ![Yue Ling grieves](docs/screenshots/anim_yue_ling_grieve.png) |
-  | ![Lin Feng laughs](docs/screenshots/anim_lin_feng_laugh.png) | ![Yue Ling shows the way](docs/screenshots/anim_yue_ling_point.png) |
-  | ![Lin Feng nods](docs/screenshots/anim_lin_feng_nod.png) | ![Yue Ling offers something with both hands](docs/screenshots/anim_yue_ling_offer.png) |
-  | ![Elder Qing Xuan, startled](docs/screenshots/anim_elder_qing_shock.png) | ![Mazu offers her lantern](docs/screenshots/anim_mazu_offer.png) |
-  | ![a cutscene: Mazu waves as she speaks, framed by the conversation camera](docs/screenshots/cutscene_mazu2.png) | ![the conversation camera during narration](docs/screenshots/cutscene_mazu.png) |
+  | ![Lin Feng kneels with the cultivator's salute](docs/screenshots/anim_lin_feng_kneel.webp) | ![Yue Ling waves](docs/screenshots/anim_yue_ling_wave.webp) |
+  | ![Lin Feng thinks, hand to his chin](docs/screenshots/anim_lin_feng_think.webp) | ![Yue Ling grieves](docs/screenshots/anim_yue_ling_grieve.webp) |
+  | ![Lin Feng laughs](docs/screenshots/anim_lin_feng_laugh.webp) | ![Yue Ling shows the way](docs/screenshots/anim_yue_ling_point.webp) |
+  | ![Lin Feng nods](docs/screenshots/anim_lin_feng_nod.webp) | ![Yue Ling offers something with both hands](docs/screenshots/anim_yue_ling_offer.webp) |
+  | ![Elder Qing Xuan, startled](docs/screenshots/anim_elder_qing_shock.webp) | ![Mazu offers her lantern](docs/screenshots/anim_mazu_offer.webp) |
+  | ![a cutscene: Mazu waves as she speaks, framed by the conversation camera](docs/screenshots/cutscene_mazu2.webp) | ![the conversation camera during narration](docs/screenshots/cutscene_mazu.webp) |
 
 - **More people in every town**: 22 new townsfolk with their own Blender models and three lines each: a new disciple and the herb-gardener at the sect; a former tax-clerk of the Court carrying noodles, the noodle-seller and a courier at Cloudfoot; the ox-herd and the schoolteacher at Qingshi; a lantern-maker and the archery-master at Yanggu; a star-glass blower and a Sogdian merchant at Shazhou; a scholar who failed the examinations nine times and a cormorant fisher at Longmen; a bell-tuner and the keeper of the casting pits at Tushan; a Yumin who cannot fly and a rain-clerk at Featherfall; a silk-diver and a fruit-trader of the Deathless at Tearwater; a roll-clerk and the lamplighter at Youdu; and a fox of one tail at the Gate of Heaven. Landfall adds twelve more.
 - **A richer, more consistent world**: two new peoples (the **Thousand Children of Landfall**, mortals on the isle of the immortals for two thousand years, and the **Immortals of the Isles**) with their Daos, keepsakes and boons; **progress-aware chat** (`Data.CHAT_LATER`: people only speak of falling stars and Jade Emperors once those have happened); the Founder's caves and their letters; realm-gated lore; and **nineteen plot holes fixed** (see [below](#narrative-plot-holes-found-and-fixed)).
@@ -553,15 +553,15 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 
 | | |
 |---|---|
-| ![the Nine Heavens: islands over a sea of cloud, the Jianmu's crown among them](docs/screenshots/realm_heaven.png) | ![the Nine Springs: a cavern country over a glowing abyss](docs/screenshots/realm_under.png) |
-| ![the Jianmu, grown overnight west of the sect](docs/screenshots/jianmu.png) | ![the Jianmu's crown in Juntian, the Level Heaven](docs/screenshots/jianmu_crown.png) |
-| ![Featherfall, the Feathered Folk's town in the sky](docs/screenshots/town_featherfall.png) | ![Youdu, the Dark Capital](docs/screenshots/town_youdu.png) |
-| ![Tearwater on the black water of the Nine Springs](docs/screenshots/town_tearwater.png) | ![the Gate of Heaven at Changhe](docs/screenshots/changhe_gate.png) |
-| ![upstairs in the Aerie Tower](docs/screenshots/upper_aerie_tower.png) | ![the Sealed Archive, down the stairs under the Scripture Library](docs/screenshots/cellar_sealed_archive.png) |
-| ![choosing a road at a Dao Stele](docs/screenshots/dao_choice.png) | ![the Daos and the peoples of the realms](docs/screenshots/dao_peoples.png) |
-| ![the Feathered Folk and the dragon-kin](docs/screenshots/gallery_yumin_dragons.png) | ![the celestial foxes and the Pearl-Weepers](docs/screenshots/gallery_foxes_jiaoren.png) |
-| ![the Deathless, Houtu and the shades of Youdu](docs/screenshots/gallery_deathless_shades.png) | ![Part XI bosses: Leigong, Jiufeng, Zhulong, Black Impermanence, Tubo and Li](docs/screenshots/gallery_part11.png) |
-| ![the map of the Nine Heavens](docs/screenshots/world_map_heaven.png) | ![the map of the Nine Springs](docs/screenshots/world_map_under.png) |
+| ![the Nine Heavens: islands over a sea of cloud, the Jianmu's crown among them](docs/screenshots/realm_heaven.webp) | ![the Nine Springs: a cavern country over a glowing abyss](docs/screenshots/realm_under.webp) |
+| ![the Jianmu, grown overnight west of the sect](docs/screenshots/jianmu.webp) | ![the Jianmu's crown in Juntian, the Level Heaven](docs/screenshots/jianmu_crown.webp) |
+| ![Featherfall, the Feathered Folk's town in the sky](docs/screenshots/town_featherfall.webp) | ![Youdu, the Dark Capital](docs/screenshots/town_youdu.webp) |
+| ![Tearwater on the black water of the Nine Springs](docs/screenshots/town_tearwater.webp) | ![the Gate of Heaven at Changhe](docs/screenshots/changhe_gate.webp) |
+| ![upstairs in the Aerie Tower](docs/screenshots/upper_aerie_tower.webp) | ![the Sealed Archive, down the stairs under the Scripture Library](docs/screenshots/cellar_sealed_archive.webp) |
+| ![choosing a road at a Dao Stele](docs/screenshots/dao_choice.webp) | ![the Daos and the peoples of the realms](docs/screenshots/dao_peoples.webp) |
+| ![the Feathered Folk and the dragon-kin](docs/screenshots/gallery_yumin_dragons.webp) | ![the celestial foxes and the Pearl-Weepers](docs/screenshots/gallery_foxes_jiaoren.webp) |
+| ![the Deathless, Houtu and the shades of Youdu](docs/screenshots/gallery_deathless_shades.webp) | ![Part XI bosses: Leigong, Jiufeng, Zhulong, Black Impermanence, Tubo and Li](docs/screenshots/gallery_part11.webp) |
+| ![the map of the Nine Heavens](docs/screenshots/world_map_heaven.webp) | ![the map of the Nine Springs](docs/screenshots/world_map_under.webp) |
 
 ```mermaid
 flowchart LR
@@ -631,8 +631,8 @@ flowchart LR
 
     | | |
     |---|---|
-    | ![Hu Qingyi, the Ninth-Tail Matron: fox ears and nine tails](docs/screenshots/turnaround_hu_qingyi.png) | ![Feather-Mother Yu Hua: wings and a crest](docs/screenshots/turnaround_yu_hua.png) |
-    | ![Rain-Minister Ao Run: dragon antlers, scales and whiskers](docs/screenshots/turnaround_ao_run.png) | ![Pearl-Weaver Shui Lian: fin ears and scales](docs/screenshots/turnaround_shui_lian.png) |
+    | ![Hu Qingyi, the Ninth-Tail Matron: fox ears and nine tails](docs/screenshots/turnaround_hu_qingyi.webp) | ![Feather-Mother Yu Hua: wings and a crest](docs/screenshots/turnaround_yu_hua.webp) |
+    | ![Rain-Minister Ao Run: dragon antlers, scales and whiskers](docs/screenshots/turnaround_ao_run.webp) | ![Pearl-Weaver Shui Lian: fin ears and scales](docs/screenshots/turnaround_shui_lian.webp) |
 
 - **Part XI, "The Ladder of Heaven"** adds 1 hour 18 minutes (see [below](#part-xi-the-ladder-of-heaven)), verified by the playthrough bot; CI now requires **11 hours**.
 - **Code**: the game's GDScript grew from 20,722 to 23,687 lines (+14%) and the Blender Python from 17,939 to 19,113 lines; all 174 assets (108 people, 40 monsters, 26 props) rebuild from their scripts.
@@ -929,10 +929,10 @@ flowchart LR
 | Monsters | 12 Blender shapes, 15 primitive | all 29 shapes Blender-built (serpent, crab, spider, mantis, jelly, manta, wisp, wraith, plant, slime, storm, tome, fox, koi, Ox-Head, Horse-Face, hopping corpse, ...) |
 | Image | soft, misty | 4x MSAA, highlight-only bloom, light fog, distance-scaled ink outline |
 
-| ![landmarks](docs/screenshots/gallery_landmarks.png) | ![spirits](docs/screenshots/gallery_spirits.png) |
+| ![landmarks](docs/screenshots/gallery_landmarks.webp) | ![spirits](docs/screenshots/gallery_spirits.webp) |
 |---|---|
-| ![npcs6](docs/screenshots/gallery_npcs_part6.png) | ![keepers](docs/screenshots/gallery_npcs_keepers.png) |
-| ![beasts](docs/screenshots/gallery_beasts.png) | ![giants](docs/screenshots/gallery_giants.png) |
+| ![npcs6](docs/screenshots/gallery_npcs_part6.webp) | ![keepers](docs/screenshots/gallery_npcs_keepers.webp) |
+| ![beasts](docs/screenshots/gallery_beasts.webp) | ![giants](docs/screenshots/gallery_giants.webp) |
 
 ```mermaid
 flowchart TD
@@ -1613,12 +1613,12 @@ sequenceDiagram
 
 | | |
 |---|---|
-| ![Landfall, the town of the Thousand Children](docs/screenshots/town_landfall.png) | ![the Pavilion of Penglai on its sea-cliff, a mirage over the water](docs/screenshots/penglai_pavilion.png) |
-| ![the Eastern Sea from above Penglai](docs/screenshots/realm_sea.png) | ![Mazu's boat at the pool of the suns in Fusang](docs/screenshots/mazu_boat.png) |
-| ![Fangzhang, the Square-Pot Isle](docs/screenshots/isle_fangzhang.png) | ![Yingzhou, the Isle of Mists](docs/screenshots/isle_yingzhou.png) |
-| ![the bare sea floor at the Returning Ruins](docs/screenshots/vista_guixu.png) | ![the lip of Guixu](docs/screenshots/guixu_whirl.png) |
-| ![Lu Dongbin's drinking-room upstairs in the wine-house](docs/screenshots/upper_drinking_room.png) | ![the steersman's cabin in the wreck of Xu Fu's flagship](docs/screenshots/upper_steersman_cabin.png) |
-| ![Jingwei, Old Gui, the mist-fisher, Furnace-Boy Dan, Steersman Hong, Ah Fu and Xu Fu](docs/screenshots/gallery_isles.png) | ![the monsters of the Eastern Sea](docs/screenshots/gallery_part12_monsters.png) |
+| ![Landfall, the town of the Thousand Children](docs/screenshots/town_landfall.webp) | ![the Pavilion of Penglai on its sea-cliff, a mirage over the water](docs/screenshots/penglai_pavilion.webp) |
+| ![the Eastern Sea from above Penglai](docs/screenshots/realm_sea.webp) | ![Mazu's boat at the pool of the suns in Fusang](docs/screenshots/mazu_boat.webp) |
+| ![Fangzhang, the Square-Pot Isle](docs/screenshots/isle_fangzhang.webp) | ![Yingzhou, the Isle of Mists](docs/screenshots/isle_yingzhou.webp) |
+| ![the bare sea floor at the Returning Ruins](docs/screenshots/vista_guixu.webp) | ![the lip of Guixu](docs/screenshots/guixu_whirl.webp) |
+| ![Lu Dongbin's drinking-room upstairs in the wine-house](docs/screenshots/upper_drinking_room.webp) | ![the steersman's cabin in the wreck of Xu Fu's flagship](docs/screenshots/upper_steersman_cabin.webp) |
+| ![Jingwei, Old Gui, the mist-fisher, Furnace-Boy Dan, Steersman Hong, Ah Fu and Xu Fu](docs/screenshots/gallery_isles.webp) | ![the monsters of the Eastern Sea](docs/screenshots/gallery_part12_monsters.webp) |
 
 - **A fourth realm**, the **Eastern Sea** (`Atlas.STRATA.sea`), built like the others (sites, warped ownership, land that runs out into real sea, roads and seals) on a 520 x 200 grid of its own: four isles in a chain running east, the sea between them crossed on the sandbars the drain has left bare. **Mazu's boat** joins it to Fusang: a new kind of crossing (`"style": "sail"`) at a jetty on the pool where the ten suns bathed, with a boat built in code (a junk with a red batten sail and eyes on the bow), a sea-blue fade and its own map page.
 - **Sixteen bosses** from the old texts: Qianliyan and Shunfeng'er, Mazu's runaway generals, hired by Xu Fu as lookouts; the Sea-Monk who drowns fishermen; **the Giant of Longbo**; the White Deer of Longevity; the Elixir Furnace That Walked Away; the Pearl Tree That Will Not Fruit; **Tianwu**, the eight-headed god of the waters; **Wu Zixu**, god of the tidal bore, who stopped the tide; **Shen**, the clam-dragon whose breath made the mirage; the Great Ao who bears Yingzhou; **Yu Qiang**; the Admiral of the Lost Fleet; the Bronze Stopper of Guixu; **Ruo of the Northern Sea**, the sea itself (who once humbled the River Earl of Part X); and **Xu Fu**. Xu Fu and Yu Qiang answer the Dao Lin Feng walks.
