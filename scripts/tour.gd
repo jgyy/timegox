@@ -80,7 +80,7 @@ func _shot(n: String, save: bool = true) -> void:
 	await RenderingServer.frame_post_draw
 	last_img = get_viewport().get_texture().get_image()
 	if save:
-		last_img.save_png("%s/%s.png" % [dir, n])
+		last_img.save_webp("%s/%s.webp" % [dir, n], true, 0.9)
 		print("[tour] ", n)
 
 ## Compose a row of captured frames into one image: the middle `keep` of each frame's width,
@@ -99,7 +99,7 @@ func _sheet(n: String, frames: Array, keep: float = 0.36) -> void:
 	var max_w := 1920
 	if out.get_width() > max_w:
 		out.resize(max_w, int(fh * float(max_w) / out.get_width()), Image.INTERPOLATE_LANCZOS)
-	out.save_png("%s/%s.png" % [dir, n])
+	out.save_webp("%s/%s.webp" % [dir, n], true, 0.9)
 	print("[tour] ", n)
 
 ## A showroom shot: models in a row on a lotus-pond stage, lit from the front.
@@ -199,7 +199,7 @@ func _portraits(n: String, models: Array, spacing: float = 0.95, height: float =
 
 ## Turnaround of one model (developer tool, --inspect=a,b,c): front, three-quarter, side and back
 ## views of the whole figure and a close-up of the head, so faces, hands and costume details can be
-## checked from every side.  Writes inspect_<id>_<view>.png.
+## checked from every side.  Writes inspect_<id>_<view>.webp.
 func _inspect(id: String, m: Node3D, height: float) -> void:
 	main.world.hide()
 	var stage := Node3D.new()
@@ -269,7 +269,7 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 	main.world.show()
 
 ## The hero runs down the longest free line of tiles with Yue Ling at his shoulder, then stops; a
-## camera on her side tracks them (--follow writes follow_<id>.png).  Both should face the way they
+## camera on her side tracks them (--follow writes follow_<id>.webp).  Both should face the way they
 ## run, and she should stop running once she has caught up.
 func _follow(id: String) -> void:
 	var wo = main.world
@@ -905,7 +905,7 @@ func _part13_shots() -> void:
 
 ## Things to do (--props, props.gd): for each kind of thing (or those named, --props=bench,well), the
 ## first one of it in the land, Lin Feng beside it with Yue Ling, Enter, and a frame from the side while
-## he does it (prop_<kind>.png), and all of them on sheets (props_sheet_<n>.png).
+## he does it (prop_<kind>.webp), and all of them on sheets (props_sheet_<n>.webp).
 const PROP_SHOTS := ["bench", "well", "shrine", "bell", "qin", "fishing", "swing", "wish_tree", "campfire", "stones", "broom", "koi",
 	"altar", "bookshelf", "bed", "cauldron", "anvil", "loom", "tea", "drum", "herb_patch", "stele", "cushion", "stove", "barrel", "rack"]
 
@@ -1610,8 +1610,8 @@ func _ending_state() -> void:
 	for tk in Bonds.TALKS:
 		Game.talks[str(tk.id)] = str(BOT.TALK_PLAN.get(str(tk.id), ""))
 
-## The ending: a frame from the middle of every shot of the film (ending_<shot>.png, and all of them
-## on one sheet, ending_film.png) and the results once the film is over (ending.png).
+## The ending: a frame from the middle of every shot of the film (ending_<shot>.webp, and all of them
+## on one sheet, ending_film.webp) and the results once the film is over (ending.webp).
 func _ending_shots() -> void:
 	main.push("ending")
 	await _wait(1.0)
@@ -1646,7 +1646,7 @@ func _grid(n: String, frames: Array, cols: int) -> void:
 		im.convert(Image.FORMAT_RGB8)
 		im.resize(fw, fh, Image.INTERPOLATE_LANCZOS)
 		out.blit_rect(im, Rect2i(0, 0, fw, fh), Vector2i((i % cols) * fw, (i / cols) * fh))
-	out.save_png("%s/%s.png" % [dir, n])
+	out.save_webp("%s/%s.webp" % [dir, n], true, 0.9)
 	print("[tour] ", n)
 
 func _run() -> void:
@@ -2289,7 +2289,7 @@ func _fell_shots() -> void:
 			strip.append(last_img)
 		await _sheet("sword_fell_sheet", strip, 0.4)
 		last_img = strip[2]
-		last_img.save_png("%s/sword_fell.png" % dir)
+		last_img.save_webp("%s/sword_fell.webp" % dir, true, 0.9)
 		await _wait(1.0)
 		await _shot("sword_fell_after")
 		w.cam_override = null
@@ -2524,17 +2524,17 @@ func _fire_shots(which: String = "1") -> void:
 			Assets.person("folk_boatwoman"), Assets.person("folk_founder"), Assets.person("folk_lantern_f")], 0.6, 0.2)
 		await _portraits("hearth_faces", [Assets.person("sarnai"), Assets.person("folk_oasis_f"), Assets.person("folk_boatwoman"), Assets.person("folk_lantern_f")], 0.66, 1.68, 2.1)
 	if want.call("sculpt"):
-		# the faces after the re-sculpt, beside what docs/screenshots/anime_faces.png showed before it
+		# the faces after the re-sculpt, beside what docs/screenshots/anime_faces.webp showed before it
 		await _portraits("sculpt_faces", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0), "look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false}), Assets.person("chang_e"), Assets.person("hu_qingyi")], 0.62, 1.68, 1.9)
 		var after: Image = last_img.duplicate()
-		var before := Image.load_from_file(ProjectSettings.globalize_path("res://docs/screenshots/anime_faces.png"))
+		var before := Image.load_from_file(ProjectSettings.globalize_path("res://docs/screenshots/anime_faces.webp"))
 		if before != null and not before.is_empty():
 			before.resize(after.get_width(), after.get_height(), Image.INTERPOLATE_LANCZOS)
 			var sheet := Image.create(after.get_width(), after.get_height() * 2, false, after.get_format())
 			before.convert(after.get_format())
 			sheet.blit_rect(before, Rect2i(0, 0, after.get_width(), after.get_height()), Vector2i(0, 0))
 			sheet.blit_rect(after, Rect2i(0, 0, after.get_width(), after.get_height()), Vector2i(0, after.get_height()))
-			sheet.save_png("%s/sculpt_before_after.png" % dir)
+			sheet.save_webp("%s/sculpt_before_after.webp" % dir, true, 0.9)
 			print("[tour] sculpt_before_after")
 		await _gallery("sculpt_cast", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0), "look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": true}), Models.hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false}),
 			Assets.person("chang_e"), Assets.person("elder_qing"), Assets.person("ah_mei"), Assets.person("granny_wen"), Assets.person("sarnai"), Assets.person("zhurong")], 0.46, 0.0)

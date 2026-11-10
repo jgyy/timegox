@@ -1823,7 +1823,7 @@ func _shot(n: String) -> void:
 	shots_taken[n] = true
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
-	img.save_png("%s/%s.png" % [shots_dir, n])
+	img.save_webp("%s/%s.webp" % [shots_dir, n], true, 0.9)
 
 # ---------------------------------------------------------------- report
 func _finish(reason: String) -> void:
