@@ -2109,6 +2109,10 @@ func _run() -> void:
 		# the New Fire release (--fire, or --fire=a,b): the Six Hearths, the hero as a young woman, the
 		# beginnings and the ends, and Part XVIII
 		await _fire_shots(str(main.args.fire))
+	if main.args.has("works"):
+		# the Hundred Works release (--works, or --works=a,b): the machines, the Works and Crossroads
+		# pages, a crossroads being asked, the wild by the hour, and Part XIX
+		await _works_shots(str(main.args.works))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -2482,6 +2486,141 @@ func _obstacle_shots(step_id: String, ob_id: String, n: String) -> void:
 	while main.top_name() == "dialogue":
 		_skip_talk()
 		await _wait(0.1)
+
+## Stand beside the thing of the land `ent_id` at hour `hour` and look at it from the side: screenshot `n`.
+func _ent_shot(ent_id: String, n: String, hour: float, dist: float = 4.6, hgt: float = 2.2, up: float = 1.0) -> void:
+	var w = main.world
+	w.open_world()
+	w.enter_layer("surface")
+	Game.clock = hour * 60.0
+	var e := _land_ent(ent_id)
+	if e.is_empty():
+		print("[tour] nothing called ", ent_id)
+		return
+	var sf := _swing_from(e.pos)
+	if sf.is_empty():
+		sf = [_nearest_free(e.pos + Vector2i(0, 2)), Vector2i(0, -1)]
+	w.teleport(sf[0], "surface")
+	w.facing = sf[1]
+	w.cam_q = _quarter(Vector2(w.facing))
+	w._snap_cam()
+	w.banner_t = 0.0
+	await _wait(1.2)
+	var pp: Vector3 = w._player_pos()
+	var fwd := Vector3(w.facing.x, 0, w.facing.y)
+	var look := pp + fwd * 1.6 + Vector3(0, up, 0)
+	w.cam_override = Transform3D(Basis.IDENTITY, _side_eye(pp, fwd, look, dist, hgt)).looking_at(look, Vector3.UP)
+	await _wait(0.5)
+	await _shot(n)
+	w.cam_override = null
+
+## The Hundred Works release (works.gd, machines.gd, echoes.gd, habits.gd): the machines of the three
+## schools, the people and the foes of Part XIX, the Works and Crossroads pages, the last question of
+## Part XIX being asked, machines standing in the land, and a pack of the wild at noon and at dawn.
+func _works_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	main.set_stack(["world"])
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.world.banner_t = 0.0
+	if want.call("machines"):
+		var by_school := {"works_wheel": ["well_sweep", "water_wheel", "trip_hammer", "water_bellows", "crossbow", "chariot", "wooden_ox"],
+			"works_hand": ["fire_kit", "cords", "sling", "kiln", "adze", "hide_coat"], "works_art": ["array", "talismans", "furnace", "paper_servants", "mirror", "flags"]}
+		for shot in by_school:
+			var ms: Array = []
+			for k in by_school[shot]:
+				var mm := Machines.model(str(k))
+				Machines.animate(mm, 2.2)
+				mm.scale = Vector3.ONE * 1.5
+				ms.append(mm)
+			await _gallery(shot, ms, 2.0, 0.35)
+	if want.call("people"):
+		await _gallery("part19_people", [Assets.person("gongshu_ban"), Assets.person("mo_di"), Assets.person("gardener_hanyin"), Assets.person("yan_shi"), Assets.person("the_player")], 0.7, 0.2)
+		await _portraits("part19_faces", [Assets.person("gongshu_ban"), Assets.person("mo_di"), Assets.person("gardener_hanyin"), Assets.person("the_player")], 0.66, 1.68, 2.1)
+	if want.call("foes"):
+		await _gallery("part19_foes", [_foe("wheel_mite"), _foe("treadle_imp"), _foe("idle_shuttle"), _foe("cloud_ladder", true), _foe("cog_crab"), _foe("bellows_wraith"), _foe("hammer_golem"),
+			_foe("the_player", true), _foe("wooden_kite"), _foe("stray_ox"), _foe("paper_servant"), _foe("jixin", true), _foe("brass_spiderling"), _foe("counting_wasp"), _foe("tally_golem"), _foe("wooden_magpie", true)], 1.2, 0.25)
+	if want.call("page") or want.call("choice") or want.call("land"):
+		# a journey as the bot makes it: the wheel's school first, the answers of its plan at the crossroads
+		_spring_state("s_p19_makers")
+		Game.level = 71
+		for eid in Data.ENEMIES:
+			Game.bestiary[eid] = 1
+		Game.stones = 420000
+		for wid in ["well_sweep", "trip_hammer", "water_bellows", "crossbow", "chariot", "fire_kit", "cords", "sling", "kiln", "array", "talismans", "furnace"]:
+			Game.works[wid] = 3 + Works.ORDER.find(wid) * 9
+		for cid in BOT.CROSS_PLAN:
+			if Data.step_index(str(Echoes.CROSSROADS[cid].step)) < Game.step:
+				Echoes.take(Game, cid, str(BOT.CROSS_PLAN[cid][0]))
+		for cid2 in Game.picks:
+			for ek in Echoes.CROSSROADS.get(cid2, {}).get("echo", {}):
+				Game.echoed["%s|%s" % [cid2, ek]] = true
+		Game.toasts.clear()
+		main.world.clear_cache()
+		main.world.load_area("sect", Vector2i(20, 12))
+	if want.call("page"):
+		main.open_menu()
+		main.menu.cursor = main.menu.ids.find("works")
+		await _wait(0.6)
+		await _shot("menu_works_root")
+		main.menu.mode = "works"
+		main.menu.cursor = Works.ORDER.find("wooden_ox")
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("works_page")
+		main.menu.mode = "roads"
+		main.menu.cursor = Echoes.ORDER.find("bandits")
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("crossroads_page")
+		main.menu.mode = "bestiary"
+		main.menu._build()
+		main.menu.cursor = maxi(0, main.menu.ids.find("bamboo_wolf"))
+		await _wait(0.6)
+		await _shot("bestiary_hours")
+		main.pop()
+	if want.call("choice"):
+		Game.cross_pending = ["the_works"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_choice")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("land"):
+		await _ent_shot("work_ban_wheel", "works_ban_wheel", 9.5, 6.4, 2.6, 1.6)
+		await _ent_shot("work_well_sweep", "works_well_sweep", 16.5, 5.6, 2.4, 1.4)
+		await _ent_shot("work_trip_hammer", "works_trip_hammer", 10.5, 5.0, 2.2, 1.0)
+		await _ent_shot("work_chariot", "works_chariot", 8.0, 5.0, 2.2, 1.0)
+	if want.call("wild"):
+		# the same pack of wolves in the Bamboo Forest at noon (asleep), at dawn (hunting) and at
+		# dusk on the same day (hunting again); and things of the night gathered at midnight
+		Game.reset()
+		Game.level = 2
+		Game.companion = true
+		Game.heal_full()
+		Game.step = Data.step_index("s_hunt1")
+		main.world.clear_cache()
+		main.set_stack(["world"])
+		main.world.open_world()
+		var pack := ""
+		for e in Atlas.world_of("surface").ents:
+			if e.kind == "enemy" and str(e.area) == "bamboo" and str(e.group[0].id) == "bamboo_wolf" and (e.group as Array).size() >= 2 and not _swing_from(e.pos).is_empty():
+				pack = str(e.id)
+				break
+		if pack != "":
+			await _ent_shot(pack, "wild_noon_asleep", 12.2, 5.2, 2.0, 0.8)
+			await _ent_shot(pack, "wild_dawn_hunting", 5.3, 5.2, 2.0, 0.8)
+			await _ent_shot(pack, "wild_morning_foraging", 9.0, 5.2, 2.0, 0.8)
+		else:
+			print("[tour] no pack of wolves to look at")
+	if want.call("part19"):
+		_spring_state("s_p19_cogs")
+		Game.level = 70
+		main.world.clear_cache()
+		main.set_stack(["world"])
+		main.world.open_world()
+		await _obstacle_shots("s_p19_cogs", "p19_cog1", "part19_cogwork")
 
 ## The New Fire release (cultures.gd, voice.gd): the creation screen with its two new choices, the four
 ## looks on a woman's frame, the people and the dress of the Six Hearths, the faces before and after

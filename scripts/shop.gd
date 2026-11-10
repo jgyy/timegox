@@ -25,13 +25,13 @@ func _build() -> void:
 	enabled = []
 	if kind == "alchemist":
 		for k in ["hp_pill", "qi_pill"]:
-			var price := Data.pill_price(k, Game.level)
+			var price := Works.pill_price(Game, k, Game.level)
 			labels.append("%s  %d stones  (own %d)" % [Data.ITEMS[k].n, price, Game.inv.get(k, 0)])
 			ids.append(k)
 			enabled.append(Game.stones >= price)
 	else:
 		if Game.temper < Data.TEMPER_COST.size():
-			var price: int = Data.TEMPER_COST[Game.temper]
+			var price: int = Works.temper_cost(Game)
 			labels.append("Temper sword (tier %d)  %d stones" % [Game.temper + 1, price])
 			ids.append("temper")
 			enabled.append(Game.stones >= price)
@@ -64,7 +64,7 @@ func press(act: String) -> void:
 			if id == "leave":
 				main.pop()
 			elif id == "temper":
-				Game.stones -= Data.TEMPER_COST[Game.temper]
+				Game.stones -= Works.temper_cost(Game)
 				Game.temper += 1
 				Game.note("Sword tempered to tier %d" % Game.temper)
 				msg = "The blade sings. Attack permanently increased."
@@ -75,7 +75,7 @@ func press(act: String) -> void:
 					msg = ("The cauldron hisses: %s." if kind == "alchemist" else "The anvil rings: %s.") % Data.ITEMS[rid].n
 				_build()
 			else:
-				Game.stones -= Data.pill_price(id, Game.level)
+				Game.stones -= Works.pill_price(Game, id, Game.level)
 				Game.add_item(id)
 				msg = "Purchased %s." % Data.ITEMS[id].n
 				_build()

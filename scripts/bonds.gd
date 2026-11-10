@@ -833,6 +833,29 @@ const SHARES := {
 			{"id": "carry", "label": "\"Now we have six roads to walk.\"", "lean": "wander", "after": [["Lin Feng", "One coal home to each of them. That is six roads, and none of them short."], ["Yue Ling", "Good. I was afraid it was nearly over."]]},
 		],
 		"end": [["Narrator", "And while the two of them are still kneeling there, getting their breath, six people each take a brand out of the new fire, without a word to one another, and walk quickly to six piles of kindling."]]},
+	# ---- Part XIX (the Hundred Works release)
+	"s_p19_campfire": {"lines": [
+		["Narrator", "The caravan fire outside the wall of Shazhou, in the last hour of the night. West of here the dunes begin, and somewhere in them a dancer is practising. Yan Shi has given them five cast-off pieces of it in a cloth. Yue Ling has had the hand in her lap since moonrise, turning it over."],
+		["Yue Ling", "Look at the stitching inside the wrist. She did that herself. Nobody showed her. She unpicked what he made and sewed it better."],
+		["Yue Ling", "I was woven, Lin Feng. On a loom, by somebody, for something. I have a seam too; you have seen it. All this month people have been saying a made thing should not want, and I have nodded, and passed the tea."]],
+		"ask": "The fire is nearly out, and she is waiting. What do you say?",
+		"options": [
+			{"id": "same", "label": "\"You are not a made thing. You are Yue Ling.\"", "lean": "companion", "after": [["Lin Feng", "I have never once thought of you as made. You are Yue Ling. I knew that before I knew anything else about you."], ["Yue Ling", "I know you did. It is why I stayed. But I am both, Lin Feng, and I should like the other one to be allowed in the room."]]},
+			{"id": "both", "label": "\"You are both. So is she.\"", "lean": "lotus", "after": [["Lin Feng", "You were made, and you are yourself. I do not see why it must be one. Perhaps it is the same for her."], ["Yue Ling", "...Yes. That. Say that to her tomorrow, before anybody draws anything."]]},
+			{"id": "ask", "label": "\"What did you want, the first day?\"", "lean": "wander", "after": [["Lin Feng", "The day you woke by the pond. Before anybody told you what you were for. What did you want?"], ["Yue Ling", "To see what was over the wall. That was all. I had not learned any bigger wants yet. ...She has never seen over the wall, has she. She was carried home in a cart."]]},
+		],
+		"end": [["Narrator", "She wraps the little lacquered hand in its cloth again, carefully, the way one wraps something that belongs to somebody, and the sky over the dunes goes grey."]]},
+	"s_p19_rest": {"lines": [
+		["Narrator", "The old millstone of Qingshi stands under its thatch where it has stood for three hundred years, with a groove worn round it by the feet of everybody's grandmother. Nobody has turned it since the wheel was built. Lin Feng pours in one measure of rice; Yue Ling takes the other end of the bar."],
+		["Narrator", "It is slow. It is much slower than either of them remembered, and the bar is the wrong height, and after forty turns there is a small heap of something that is nearly flour."],
+		["Yue Ling", "The wheel does this in the time it takes to sneeze. My arms hurt. Why am I happy? Lin Feng, explain to me at once why I am happy."]],
+		"ask": "Why is she happy?",
+		"options": [
+			{"id": "us", "label": "\"Because we did it.\"", "lean": "companion", "after": [["Lin Feng", "Because it was us. The flour does not care. We do."], ["Yue Ling", "Then I want the wheel for the valley's rice, and this for ours. One measure. Every new moon. Write it down."]]},
+			{"id": "know", "label": "\"Because now you know how.\"", "lean": "lotus", "after": [["Lin Feng", "Because your hands know something tonight that they did not know this morning. The gardener would say that is the whole of it."], ["Yue Ling", "The gardener carries water in a pot and is the smuggest man I have ever met. ...He is right, though. Do not tell him."]]},
+			{"id": "slow", "label": "\"Because it took all evening.\"", "lean": "wander", "after": [["Lin Feng", "Because it took the whole evening, and nobody was waiting for it, and there was nowhere else we had to be."], ["Yue Ling", "We have saved the world a great many times in a hurry. I do not think we have ever before ground rice."]]},
+		],
+		"end": [["Narrator", "They carry the flour up the hill in a twist of cloth. It makes two small cakes, slightly burnt. Auntie Zhou eats one, and says nothing, and puts the other on the stove god's shelf."]]},
 	"s_p18_feast": {"lines": [
 		["Narrator", "Six tables in the square at Cloudfoot, by the stage, and nobody can agree which is the head, so they have been set in a ring with the new fire in the middle. Gruel and pickled mustard; mutton off the knife; flatbread, torn; a river fish with its bone lifted out; millet cakes burnt on one side; sesame cakes and sweet rice balls."],
 		["Narrator", "The horse-folk eat on the left of the fire and will not be moved. A founder is teaching a boat-child to whistle and being told very firmly by Auntie Rong where he may not do it. Granny Wen has asked forty people whether they have eaten."],
@@ -1001,7 +1024,8 @@ const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the 
 	"s_p16_vigil": "keeping the vigil", "s_p16_dawn": "at the first dawn of the year", "s_p16_lanterns": "at the Lantern Festival", "s_p16_couplets": "writing the New Year couplets",
 	"s_p17_haircut": "on the day the dragon raised its head", "s_p17_thunder": "drumming the first thunder", "s_p17_teacup": "over the first tea of spring",
 	"s_p17_graves": "at the graves on Qingming", "s_p17_kite": "flying the Qingming kite",
-	"s_p18_drill": "drilling the new fire", "s_p18_feast": "at the feast of six tables"}
+	"s_p18_drill": "drilling the new fire", "s_p18_feast": "at the feast of six tables",
+	"s_p19_campfire": "at the caravan fire before the dunes", "s_p19_rest": "grinding rice by hand at the old millstone"}
 
 static func share_place(sid: String) -> String:
 	return str(SHARE_PLACES.get(sid, "side by side"))

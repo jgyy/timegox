@@ -1,12 +1,19 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Fire Passed On, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 220 bosses, twenty-three Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns lived in by **219 townsfolk with days of their own**, things in the streets that really break, and 86 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (five ways), and walk the whole way with **Yue Ling**, who has a story of her own. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
+Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Skill Become Dao, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 224 bosses, twenty-four Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns lived in by **219 townsfolk with days of their own**, things in the streets that really break, and 86 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (five ways), answer at **sixteen crossroads** that the whole story remembers, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
 
-> **Total gameplay duration: about 21 hours 43 minutes** (21:42:46 of game time for the end-to-end bot run, seed 1234), **1 hour 11 minutes more than the last release** (20:31:21). **The faces are re-sculpted towards life**: a wider lower jaw (the face keeps its width down to the corners of the jaw before it turns in to a broader chin), and smaller, more lifelike eyes (an almond opening, a round iris the upper lid covers, one small highlight, a thin lash line, brows over the socket); women's chests are fuller. **The land has six cultures**: the Rice Hearth of the valley, the Felt Hearth of the horse-folk, the Sweet-Well Hearth of the sand roads, the Boat Hearth of the river, the Casting Hearth of the bronze-founders and the Lantern Hearth of the Dawn Market, each with its own greeting, table, festival, fire, dress, names and a thing nobody does; you earn a place at each. **The hero can be a young man or a young woman** (four looks on each frame, and the whole story told of either). **Six beginnings**: the story opens three years early, on the last morning of the year away, at the hearth you chose. **Five endings**: when the sky is held you choose where to keep your own fire, among the ends your journey earned. **Part XVIII, "The New Fire", plays in about 1 hour 1 minute**: the fire of the whole land is tired and must be changed, and no hearth will let its own go out, so a coal is begged from each, in each one's way, Suiren's fire-drill is asked of the Lord of the Southern Fire, and six fires are made one; a new realm, **Fire Passed On**, and a new way through trials, **By the hearths**. Bugs were found and fixed.
+> **Total gameplay duration: about 22 hours 46 minutes** (22:45:41 of game time for the end-to-end bot run, seed 1234), **1 hour 3 minutes more than the last release** (21:42:46). **Smaller and faster**: the assets directory is a third smaller (526 MB to 352 MB, every model packed as it is exported, the same in the game), the world opens ten seconds sooner (the land is generated behind the title screen), and a frame in a town draws a fraction of what it did (40 million triangles to 6 million at Qingshi: every figure keeps its levels of detail, heavy scenery has a far mesh, nothing is drawn past where it can be made out). **Choices matter to the whole story**: sixteen **crossroads**, one in almost every part, each asked once; every answer tips one of three scales that change how the world meets you, **echoes** in later conversations (68 sets of lines only ever said to somebody who chose that way, up to fifteen parts later), and is told at the end. **Technology**: the **Hundred Works**, eighteen things to build in three schools (the Hand, the Wheel, the Art) from know-how learned by looking, each standing in the land as a machine and changing how the game plays; a journey builds about two schools of the three. **Monsters keep hours**: asleep, foraging, hunting, resting in the heat or gathered by the clock, seen in the land and felt in the battle. **Part XIX, "The Machine Heart", plays in about 1 hour 39 minutes**: Gongshu Ban builds a wheel that never stops, an old gardener will not use a well-sweep, a dancer taken apart in front of a king has built itself a heart, a wooden magpie has been on the wind for two thousand years, and what the land is to do with its machines is asked three times; a new realm, **Skill Become Dao**, and a new way through trials, **By the works**. Bugs were found and fixed.
 
 | | |
 |---|---|
+| ![the machines of the Wheel, built from code: the well-sweep, a water-wheel, the water trip-hammer, the water-bellows, the repeating crossbow, the south-pointing chariot and the wooden ox](docs/screenshots/works_wheel.webp) | ![the Works page: eighteen works in three schools, what each does and costs, and the know-how learned by looking](docs/screenshots/works_page.webp) |
+| ![the oldest tools (the fire-drill, knotted cords, the sling, the kiln, the stone adze, the hide coat)](docs/screenshots/works_hand.webp) | ![the arts of the Dao worked into things (the spirit-gathering array, cinnabar talismans, the eight-trigram furnace, paper servants, the heaven-watching mirror, formation flags)](docs/screenshots/works_art.webp) |
+| ![the last crossroads of Part XIX: what the land does with its machines, which only a maker of a school may answer for it](docs/screenshots/crossroads_choice.webp) | ![the Crossroads page: the three scales, and what was asked, chosen and heard of each answer](docs/screenshots/crossroads_page.webp) |
+| ![the wild at noon: a pack of bamboo wolves asleep where it stood](docs/screenshots/wild_noon_asleep.webp) | ![the same pack at dawn, hunting](docs/screenshots/wild_dawn_hunting.webp) |
+| ![Gongshu Ban's water-wheel in the mill-race below Qingshi](docs/screenshots/works_ban_wheel.webp) | ![the people of Part XIX: Gongshu Ban, Mozi, the Gardener of Hanyin, Yan Shi the Artificer and the Player](docs/screenshots/part19_people.webp) |
+| ![the Player, the dancer Yan Shi made, who has built itself a heart](docs/screenshots/battle_boss_the_player.webp) | ![Jixin, the Machine Heart, in the oldest pit at Tushan](docs/screenshots/battle_boss_jixin.webp) |
+| ![the foes of Part XIX: wheel-mites, treadle imps, idle shuttles, the Cloud Ladder, cog-crabs, bellows wraiths, trip-hammer golems, the Player, wooden kites, stray oxen, paper servants, the Machine Heart, and the Engine's children](docs/screenshots/part19_foes.webp) | ![the bestiary says when a creature is abroad, when it sleeps and what it is doing now](docs/screenshots/bestiary_hours.webp) |
 | ![the faces before (above) and after (below) this release: the lower jaw wider down to its corners and the chin broader, the eyes smaller with a round iris the lid covers, one highlight and a thin lash line](docs/screenshots/sculpt_before_after.webp) | ![the cast after the re-sculpt: Yue Ling, Lin Feng as a young woman and as a young man, Chang'e, the Elder, Ah Mei, Granny Wen, Grandmother Sarnai of the horse-folk and Zhurong, Lord of the Southern Fire](docs/screenshots/sculpt_cast.webp) |
 | ![the hero as a young woman from every side: the same robe, sword and clips on a woman's frame](docs/screenshots/turnaround_lin_feng_f.webp) | ![the four looks on a woman's frame and on a man's](docs/screenshots/hero_women_and_men.webp) |
 | ![character creation: a young woman, the Wanderer, the old hunter's apprentice, kin of the Felt Hearth, and where the story will begin](docs/screenshots/create_hearth.webp) | ![the Hearths page: six cultures of the land, how each greets, eats and keeps its fire, what nobody does there, and whether they call you a stranger, a guest or kin](docs/screenshots/hearths_page.webp) |
@@ -18,6 +25,120 @@ Play Lin Feng, **a young man or a young woman** (or whoever you make them: name,
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph SZ[Smaller and faster]
+    PK[art/lib/pack.py: every .glb packed<br/>as it is exported] --> AS[assets/: 526 MB to 352 MB]
+    LOD[the importer's LODs kept on<br/>every person and monster] --> FR[a frame at the sect:<br/>8.2 M triangles to 4.95 M]
+    FAR[far meshes for heavy scenery,<br/>nothing drawn past where<br/>it can be made out] --> FR
+    WARM[the land generated in the<br/>background behind the title] --> LT[after Begin: 21.1 s to 10.9 s]
+    IDX[story steps looked up,<br/>not searched] --> BOTT[the bot plays 1.6 times<br/>as fast]
+    end
+    subgraph CR[Crossroads and echoes: echoes.gd]
+    ASK[16 questions, one in almost<br/>every part, asked once] --> TIP[three scales: mercy and rigour,<br/>new works and old ways,<br/>the wide world and the home fire]
+    ASK --> ECHO[68 echoes: later conversations<br/>say what you chose,<br/>up to fifteen parts later]
+    TIP --> LEAN[a scale that leans changes the world:<br/>packs give up more or open afraid, makers ask less,<br/>hearths, peoples and renown come faster]
+    ASK --> ENDS[the ending tells what<br/>came of every answer]
+    end
+    subgraph WK[The Hundred Works: works.gd, machines.gd]
+    KH[know-how: learned by looking<br/>at creatures, lords, things, obstacles] --> BUILD[18 works in 3 schools:<br/>the Hand, the Wheel, the Art]
+    BUILD --> EFF[each changes one number:<br/>pills, the forge, prices, battles,<br/>meditation, first strikes,<br/>and none shortens the waiting]
+    BUILD --> MACH[each stands in the land<br/>as a machine built from code]
+    KH -.->|never enough for all three| BUILD
+    end
+    subgraph HB[The hours of the wild: habits.gd]
+    CLK[the clock] --> ACT[asleep, stirring, foraging, hunting,<br/>resting in the heat, gathered,<br/>on watch, drifting]
+    ACT --> LAND[seen in the land: packs lie down,<br/>range wide, circle together]
+    ACT --> BAT[felt in battle: who moves first,<br/>stronger, slower, worth more]
+    end
+    subgraph P19[Part XIX: the Machine Heart]
+    BAN[Gongshu Ban builds a wheel<br/>that never stops] --> GARD[the Gardener of Hanyin<br/>will not use a well-sweep]
+    GARD --> Q1{{crossroads:<br/>the wheel at Qingshi}} --> CL{the Cloud Ladder:<br/>a trial}
+    CL --> PL{the Player, Yan Shi's dancer,<br/>who built itself a heart: a trial} --> Q2{{crossroads:<br/>may it keep it?}}
+    Q2 --> JX{Jixin, the Machine Heart:<br/>a trial} --> Q3{{crossroads: what the land<br/>does with its machines}} --> MG{the Wooden Magpie:<br/>a trial} --> SD((Skill<br/>Become Dao))
+    end
+    BUILD -.->|By the works: a new<br/>way through trials| CL
+    BUILD -.->|only a maker of a school<br/>may answer for it| Q3
+    ECHO -.-> P19
+    SZ --> GAME((Game))
+    CR --> GAME
+    WK --> GAME
+    HB --> GAME
+    P19 --> GAME
+    GAME --> BOT[bot: 22:45:41,<br/>CI needs 16 h]
+```
+
+- **The assets directory is a third smaller: 526 MB to 352 MB** (`art/lib/pack.py`, new; `python art/pack_all.py`). The Blender exporter writes every skin weight and tint UV as 32-bit floats, three animation channels for every bone of every clip (most of them two keys that say "stay where the rig rests"), a time track of its own for each, and a JSON entry for all of it: a character with sixty clips was two thirds bookkeeping. `kit.export` now packs each `.glb` as it writes it: channels of a clip in which the bone never leaves its rest pose are dropped (Godot's importer makes no track of those, so the game's clips are the same, track for track), bone rotations are stored as normalised 16-bit quaternions, identical time tracks are stored once, weights become normalised bytes (four that still sum to exactly one), the tint UV normalised 16-bit, one buffer view per kind of data instead of one per accessor, compact JSON. Positions, normals, vertex colours (the surface class lives in their alpha) and the rig are untouched; packing a packed file changes nothing. Lin Feng went from 4.0 MB to 2.1 MB. Measured in Godot against the raw exports: the same meshes (weights within 1/255, UVs within 1/65535) and the same clips (rotations within 0.006 of a degree). Quantised normals would have saved another 30 MB, but Godot's importer refuses `KHR_mesh_quantization`, so they stay floats.
+- **Loading: the world opens ten seconds sooner** (measured with the new `--bench`, see [Performance](#performance)).
+  - **The land is generated in the background while the title is on screen** (`Atlas.warm`): 8.5 of the 21.1 seconds between "Begin" and the first frame of the world were spent generating the continent, with nothing on screen. It is a pure function of the game's data, so it now runs on a thread from the moment the game starts and is there, or nearly, by the time the hero is made. The bot, the tests and the tour still generate it where they first ask for it, and get the same land.
+  - **The sea is laid in 0.9 s instead of 2.1 s** (the coast test, asked of every one of the world's 936,000 tiles, built an array of eight neighbours each time), and a region's scatter is handed to the engine as **one buffer per chunk** instead of two calls for every one of its several hundred thousand instances.
+- **Frame rate in the open world: a frame at the sect draws 4.95 million triangles where it drew 8.2 million, in 1,843 draw calls where it took 2,138** (40% fewer triangles; at Qingshi 6.1 million).
+  - **Every person and monster keeps its levels of detail** (`Assets.lods_of`). The importer makes seven LODs for each Blender model; the loader rebuilds each mesh to tint it and was passing an empty list of LODs to the new one, so every figure in sight was drawn with all of its forty thousand triangles however far off it stood. This was the largest single cost of a frame in a town.
+  - **Nobody is drawn from further off than they can be made out** (`World.ENT_SHOW`): every model of every loaded region (five regions' worth at Qingshi: several hundred people, packs and lords) was handed to the renderer every frame, and the story was asked whether each should be there. People, packs and pickups are now drawn to 92 m and the big things to 150 m, and beyond the reach of anything that could change them the story is asked every eighth frame.
+  - **Heavy scenery has a far mesh** (`Terrain3D.far_mesh`): beyond 56 m (where the sun's shadows end) a tree, a landform or a karst tower is drawn from the same vertices with its solid parts thinned to about a third of their triangles by the engine's own simplifier (leaf cards are kept), and the shadows of the near ones are cast by the thinned mesh too. A 2,826-triangle landform draws as 704.
+  - **`Data.step_index` is a lookup.** `Game.reached` and `Game.done` walked the whole list of 580 story steps comparing strings, for every person, lord and thing in sight on every frame, and thousands of times a second in the bot: in the same three minutes of wall clock the bot played 1 h 18 min of the game before and 2 h 03 min after, and the whole game, an hour longer, is played in 26 min 30 s.
+- **Choices matter to the whole story: crossroads and their echoes** (`scripts/echoes.gd`, new; Esc > **Crossroads**). Until now a choice mattered where it was made: five people met on the road, one qilin, a Dao, a hearth. Now there is a **crossroads in almost every part**: sixteen questions, each asked once, after a lord has fallen or a thing has been found, with two to four answers and no way to take it back.
+
+  | Part | Crossroads | The answers | Echoes later in |
+  |---|---|---|---|
+  | I | Iron Fang's forty men | set them to mend the road they robbed, or drive them over the pass with nothing | Part VII (Granny Wen), Part XVI (who stands on Qingshi's wall the night Nian comes) |
+  | I | the Marsh Hag's poison garden | dig it up for Alchemist Mo, or burn and salt it | the antidote, Part XVII (the Mother of the Five Poisons) |
+  | I | the Thunder Roc's egg | carry it to the horse-folk, leave it to the storm, or sell it | Part XI (the Duke of Thunder), Part XVIII (Grandmother Sarnai) |
+  | I | the Blood Moon Palace | seal it as the ancestors would, or open it to whoever has nowhere | Part III (the Echo of Xu Mo), Part XIV (the Elder) |
+  | II | the Dragon King's one boon | rain for the valley every spring, or a safe road for every ship | Part IX (the drought), Part XII (the sea) |
+  | IV | the drawings of the Brass Spider Engine | carry them down to Smith Tie, or put them in Heaven's forge | Forge-Lord Tian Gong, Part XIX (Gongshu Ban's bench, and the Forgemaster when the wreck walks again) |
+  | IV | the names of the Nineteen | set them in the sect's wall, or give them to the wind | Part VI (King Yama), Part XVII (the Elder) |
+  | V | the Ancestor Who Took | strike his name from the lineage, or leave his tablet with the truth carved under it | Part XIV (Nie, the Unpaid) |
+  | VI | the Willow Widow's question | the truth, or the kind lie | Part VIII (the Widow of the Reed Ford) |
+  | VIII | the Crow Marshal's ten thousand crows | bridge-builders beside the magpies, or banished | Part IX (Jinwu, the Sun Crow) |
+  | IX | Wu Gang's axe that never dulls | to the woodcutters of Qingshi, or left in the cassia tree | Part XVI (the Elder), Part XIX (the Gardener) |
+  | X | Yu's map on the Nine Cauldrons | rubbings for every town, or left under its lid at Tushan | Part XIII (the Eight Gates), Part XVIII (Caravan-Master Kang) |
+  | XII | the elixir furnace that walked away | let it walk, or carry it home to its masters | Part XIX (the Player has heard) |
+  | XIX | the wheel at Qingshi | run night and day, give it hours, or take it down | Tushan, the Elder |
+  | XIX | the Player's heart | it is yours, that is for your maker to say, or take it out | the oldest pit at Tushan |
+  | XIX | what the land does with its machines | the hand first, the wheel kept by hours, the Dao in the tool, or ask the gardener | the weavers of the Silkworm Woods, the Gardener, the last tribulation |
+
+  - **Every answer gives or costs something there and then** (spirit stones, renown, essences, pills) **and tips a scale**: *mercy and rigour*, *new works and old ways*, *the wide world and the home fire*. The five fated encounters weigh on the first (every one who stands with Lin Feng is a point of mercy, every one who fell a point of rigour) and the qilin on the third.
+  - **A scale that leans changes how the world meets Lin Feng for the rest of the game.** *Merciful*: a beaten pack gives up what it was guarding sooner than die for it (a tenth more spirit stones from battles, and essences left more often). *Unbending*: the wild has heard, and packs open the battle with some of their strength already gone. *Of the New Works*: every work costs a quarter fewer spirit stones. *Of the Old Ways*: whatever is done for a hearth counts for more. *Of the Wide World*: the peoples of the realms warm a quarter faster. *Of the Home Fire*: every deed and trial earns more renown. Leaning twice as far, the land knows him for it, and says so at the end.
+  - **Every answer echoes**: 68 sets of lines in later conversations are only ever said to somebody who chose that way. The bandits set to mend the road are six big men with mallets on the wall of Qingshi the night Nian comes, fifteen parts later; driven out, there are gaps on that wall. The drawings carried out of Heaven's Forge are on Gongshu Ban's bench in Part XIX, corrected in charcoal; burned, he has heard, and wants a word. Conversations are fetched through `Echoes.told`, and the Crossroads page counts each echo as it is heard.
+  - **The ending tells what came of each** (one sentence for every crossroads answered), what the land came to call him, and what he built.
+- **Technology: the Hundred Works** (`scripts/works.gd`, `scripts/machines.gd`, new; Esc > **Works**). Eighteen things to build, in three schools: primitive tools, machinery, and the arts of the Dao.
+
+  | | The Hand: the oldest tools | The Wheel: wood, bronze and falling water | The Art: qi worked into a thing |
+  |---|---|---|---|
+  | 1 | **Fire-Drill and Tinder**: a hot meal every night, health a twenty-fifth greater | **Well-Sweep**: pills cost 8% less | **Spirit-Gathering Array**: meditation 8% deeper |
+  | 2 | **Knotted Cords**: +4% cultivation from battle | **Water Trip-Hammer**: tempering the sword costs 15% less | **Cinnabar Talismans**: techniques cost 5% less qi |
+  | 3 | **Sling and River Stones**: a pack struck first loses another twentieth | **Water-Bellows**: the cauldron and the forge cost 15% less | **Eight-Trigram Furnace**: monsters leave essences more often |
+  | 4 | **Clay Kiln and Sealed Jars**: pills restore 15% more | **Repeating Crossbow**: every foe of a pack opens 4% down | **Paper Servants**: a lord's devastating blows land a tenth softer |
+  | 5 | **Stone Adze**: an obstacle takes one blow fewer | **South-Pointing Chariot**: a hunting pack never moves first | **Heaven-Watching Mirror**: a pack caught asleep opens a tenth down |
+  | 6 | **Hide Coat and Bone Needle**: a twentieth less harm | **Wooden Ox and Gliding Horse**: battles pay 12% more | **Formation Flags**: a weakness cuts deeper |
+
+  - **Know-how** is what they are built with, and it is never bought: one for every kind of creature in the bestiary (a lord is in it too), every lord defeated, every thing of the land tried and every obstacle cleared, two for every deed done and every one of the Founder's caves opened. A work also costs spirit stones, waits for the story to reach its tier (the first from the first hunt, the last from Part XVII) and for the work before it in its school. **A whole journey's know-how builds about two schools of the three** (the tests check that it can never build all eighteen), so which to build is a choice, and one the story asks about. **No work shortens the waiting**: the first cut had a fire-drill that made resting quicker and paper servants that bound wounds after every battle, and the bot finished the old chapters over half an hour sooner for those two alone; a work makes the wanderer hardier, the towns richer or the cultivator deeper, and a rest takes as long as it ever did.
+  - **Every work stands in the land once it is built**: nineteen machines made from code (`machines.gd`, a few hundred triangles each; the wheel turns, the sweep rocks, the trip-hammer lifts and falls, the wooden figure on the chariot keeps its arm to the south), each at its own place, to be walked up to and looked at.
+  - **By the works**: a new way through trials for what you have built with your own hands, and **the last question of Part XIX can only be answered for a school by somebody who has built three works of it**.
+  - The makers are the old books' own: Suiren who drilled fire, the knotted cords before writing, Lu Ban the carpenter, Du Shi's water-blown furnaces, the trip-hammer that husked rice by a stream, Ma Jun's south-pointing chariot that found the way by counting and not by a lodestone, Zhuge Liang's wooden ox and repeating crossbow, the gardener's well-sweep.
+- **Monsters keep hours** (`scripts/habits.gd`, new). A pack of wolves stood in its clearing at noon exactly as it stood there at midnight. Now every kind of monster has a **habit** and, by the clock, an **activity**:
+
+  | Habit | Who | Dawn | Morning | Noon | Afternoon | Dusk | Evening | Night | Small hours |
+  |---|---|---|---|---|---|---|---|---|---|
+  | of the day | birds, apes, qilin, carp, growing things, fire and thunder wisps | foraging | foraging | resting | foraging | gathered | asleep | asleep | asleep |
+  | of the night | ghosts, moths, spiders, foxes, the dead, dark wisps | asleep | asleep | asleep | asleep | stirring | hunting | gathered | hunting |
+  | of the half-light | wolves, tigers, serpents, scorpions, crabs, dragons | hunting | foraging | asleep | resting | hunting | foraging | asleep | asleep |
+  | of no hour | golems, slimes, bandits, storms, water and earth wisps | on watch | on watch | on watch | on watch | on watch | drifting | drifting | drifting |
+
+  - **Seen in the land**: a pack asleep lies down where it stood (a thing that floats sinks to the ground) under a line of z's and does not turn to watch you; a hunting pack ranges nearly twice as wide and fast and never stands still; a pack gathered to roost or revel goes round and round a common centre; one resting in the heat barely moves.
+  - **Felt in the battle**: walk in on a pack **asleep** and the party moves before anything is on its feet; a **hunting** pack is in its strength (an eighth more health, blows 15% harder), moves first unless you struck it first in the land (F or G), and is worth 15% more cultivation; one **resting** is slow and hits a little softer; one **gathered** stands up to a fifth more and is worth a tenth more. The battle says which it was.
+  - **The wild is no easier for keeping hours** (the tests add up every habit over a whole day). The first cut gave the party the whole first round against anything asleep, and since something is asleep at every hour the bot finished the old chapters a quarter of an hour sooner: an hour of the day is now a reason to look at the clock before walking into a wood, not a discount. (For the same reason no name the land gives ends a battle early: the first cut had packs yield to a merciful hero at their last strength.)
+  - **The story holds the clock here and there, and the wild is held with it**: for the nine days the sun stood at noon (Part IX) the hunters of the half-light never woke, and on the last night of the year (Part XVI) nothing of the night slept. The bestiary says of every creature when it is abroad, when it sleeps and what it is doing now. Lords keep no hours.
+- **Part XIX, "The Machine Heart"** plays in about 1 hour 39 minutes (see [below](#part-xix-the-machine-heart)) and the whole game is **1 hour 3 minutes longer** than the last release, verified by the playthrough bot; CI still requires **16 hours**. (The eighteen older parts play 36 minutes shorter than they did: a maker with works to his name is a little stronger and rests twelve minutes less, an errand that waits on the hour of the day fell nine minutes luckier, and later lords fall a little sooner. The chapter was written long enough to be an hour more all the same.) A new realm, **Skill Become Dao**, four lords guarded by trials, three crossroads, twelve new foes, five new people built in Blender (Gongshu Ban, Mozi, the Gardener of Hanyin, Yan Shi the Artificer and the Player), a new kind of obstacle, errands among four hearths' own people and two scenes with Yue Ling.
+- **The bot** builds works as a builder of engines would (the Wheel's school first, saving up for it), answers at every crossroads by a plan that leans every scale far enough to be felt, takes the Cloud Ladder with Mozi's belt and nine sticks from the smith, the Player side by side with Yue Ling, the Machine Heart by the works and the Wooden Magpie with the stopped escapement the Machine Heart left, answers the last question for the Wheel, and keeps back what the forge will ask for the trials ahead before it spends spirit stones on a work. Its report lists the works, the know-how, the answers and the scales.
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+- **Code**: the game's GDScript grew from 51,693 to 55,082 lines (`scripts/echoes.gd`, `works.gd`, `machines.gd`, `habits.gd` and `bench.gd` are new) and the Blender Python from 22,711 to 23,112 lines (`art/lib/pack.py` is new); all 276 assets (208 people, 41 monsters, a mount and 26 props) rebuild from their scripts. The tests grew by about 2,000 checks to 26,841.
+
+**Where the chapter comes from.** The old gardener is in the *Zhuangzi* (the chapter Heaven and Earth): Zigong, travelling south of the Han, sees an old man watering his garden with a pitcher carried up out of a tunnel, tells him of the well-sweep that waters a hundred plots a day, and is told: where there are machines there will be machine affairs, and where there are machine affairs there will be a machine heart; "it is not that I do not know of it: I would be ashamed to use it." Gongshu Ban (Lu Ban) and Mozi are in the *Mozi*: the cloud ladder built for Chu to take Song, the ten days and nights' walk, the belt for a wall and the slips of wood, nine assaults turned on a tabletop; and the wooden magpie that flew three days, of which Mozi said a linchpin was worth more. Yan Shi and the dancer who winked at King Mu's ladies, taken apart to show it was leather, wood, glue and lacquer with a heart that made it speak, are in the *Liezi*. Cook Ding, whose knife was not sharpened in nineteen years ("what your servant cares about is the Way, which goes beyond skill"), and Wheelwright Pian, who could not teach his son the trick of it, are in the *Zhuangzi* again. The chapter does not decide between them: the last question has four answers, and the makers are still arguing at the end.
+
+### Previous release: faces towards life, six hearths, a hero of either sex and Part XVIII
 
 ```mermaid
 flowchart LR
@@ -75,14 +196,14 @@ flowchart LR
   - **The whole story is told of her.** Its ten thousand lines were written about a "he" and are left as they were; when the hero is a woman they are changed on the way to the screen, like the name the player chose. Most of the story says "you" and needs nothing. Narration is read a clause at a time: the first person named in a clause is the one spoken of (the hero, or another man, whose "his" stays his: "He Bo gives Lin Feng the tablet of his office"), a woman's name takes no "he" away from her, a name that only owns something names nobody, and a "him" in the clause she is the subject of is somebody else. What people say aloud is addressed to her, so only what they call her changes (Senior Sister, "sect girl", "our daughter"). Where the rule would be wrong the line is written out by hand. A test reads every conversation in the game through it.
 - **Six beginnings.** At twelve every child of Qingshi is sent away for a year to eat at somebody else's hearth; character creation's other new row, **Hearth**, is where your year was spent. It gives a keepsake, a small gift and a small burden of its own, kinship with that people from the first day, and the start of the game: the story now opens **three years before the Elder's summons, on the last morning at that hearth**, in its own town (Qingshi, the tents below Thunder Valley, Shazhou, Longmen, Tushan or Yanggu), with its own keeper to say goodbye to in that hearth's own manner, nothing prowling, and nowhere else to go until the goodbye is said. Then: "Three years later."
 - **Five endings** (`Cultures.ENDINGS`, `ending.gd`). When the last tribulation is passed the player chooses where the hero's own fire is to be kept, among the ends the journey earned: **the Azure Cloud** (stay, always open), **the Fire at Home** (go home to your own hearth, always open), **the Road of Six Fires** (five hearths call you a guest), **the Open Door** (four hearths and four peoples of the realms), **the Lotus Hearth** (you and Yue Ling are kindred spirits). Each has its own last words, then your own hearth's, its own title on the results, its own light over the film, and the hero's fire burns on the lotus between the two of them.
-- **Part XVIII, "The New Fire"** adds about 1 hour 1 minute (see [below](#part-xviii-the-new-fire)), verified by the playthrough bot; CI still requires **16 hours**. A new realm, **Fire Passed On**, two lords guarded by trials, nine new foes, two new kinds of obstacle for the sword, and Suiren's fire-drill.
+- **Part XVIII, "The New Fire"** added about 1 hour 1 minute (see [below](#part-xviii-the-new-fire)), verified by the playthrough bot. A new realm, **Fire Passed On**, two lords guarded by trials, nine new foes, two new kinds of obstacle for the sword, and Suiren's fire-drill.
 - **The bot** says its goodbye at the hero's hearth as a player would, plays the chapter's errands among each hearth's own people, takes Zhurong with a drill of summer wood from the smith and Huilu by the hearths, and chooses an end. `--hero=f`, `--hearth=<id>` and `--ending=<id>` play the other heroes, beginnings and ends.
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 - **Code**: the game's GDScript grew from 49,528 to 51,693 lines (`scripts/cultures.gd` and `scripts/voice.gd` are new) and the Blender Python from 22,445 to 22,711 lines; all 271 assets (203 people, 41 monsters, a mount and 26 props) rebuild from their scripts: thirteen new people (the hero's four looks as a young woman, Grandmother Sarnai and Batu, Zhurong, and six crowd models in the dress of the hearths). The tests grew from 2,338 to 2,564 lines (24,767 checks). The captures at the top of this page and the turnarounds of Lin Feng and Yue Ling are from this release; the older galleries further down in [`docs/screenshots`](docs/screenshots) were taken before the faces were re-sculpted.
 
 **What the hearths are made from.** None of the six is one living people. Each is put together from old customs of the lands the story's myths come from: *zuan sui gai huo*, the changing of the fire with the seasons recorded in the Zhou li and the Analects (elm and willow in spring, jujube and apricot in summer, mulberry at the turn, oak in autumn, sophora in winter), and the cold food that went with it; "have you eaten?" as a greeting, and chopsticks never stood in the rice; the boat-dwelling families of the southern rivers, the fire that goes aboard with the bride and the fish that is never turned over; the hearth-ring of the felt tent, the threshold not stepped on, the bowl taken with the right hand and the youngest son as keeper of the fire; bread torn and never cut, and water before words, along the oasis roads; and "the firewood burns out, the fire is passed on" from the Zhuangzi, which gives the new realm its name. Suiren, Zhurong and Huilu are the Fire-Driller, the Fire Regulator and the fire that visits uninvited of the old books.
 
-### Previous release: anime faces and bodies, the sword's wake and Part XVII
+### Two releases ago: anime faces and bodies, the sword's wake and Part XVII
 
 ```mermaid
 flowchart LR
@@ -156,7 +277,7 @@ The anime look was researched from published material on gacha-game characters (
 - **Physics**: a felled tree falls as a rod pivoting on its base (the physical pendulum, I = mL^2/3), integrated once per tree; Godot's rigid bodies and height-field shapes for the pieces.
 - **Part XVII**: [Lichun](https://en.wikipedia.org/wiki/Lichun) and the whipping of the Spring Ox; [Gou Mang](https://en.wikipedia.org/wiki/Goumang), god of spring and wood; [Jingzhe](https://en.wikipedia.org/wiki/Jingzhe), the Waking of Insects, and the beating of the petty people under bridges ([Da Siu Yan](https://en.wikipedia.org/wiki/Villain_hitting)); [Longtaitou](https://en.wikipedia.org/wiki/Zhonghe_Festival), the day the dragon raises its head, and its haircuts; [Leigong](https://en.wikipedia.org/wiki/Leigong); [Qingnü](https://zh.wikipedia.org/wiki/%E9%9D%92%E5%A5%B3), goddess of frost and snow; [Taisui](https://en.wikipedia.org/wiki/Tai_Sui) and asking his pardon before digging; the five poisons ([Wu Du](https://en.wikipedia.org/wiki/Five_poisons)); [Mingqian tea](https://en.wikipedia.org/wiki/Longjing_tea) picked before Qingming; [Qingming](https://en.wikipedia.org/wiki/Qingming_Festival), its willow, its tomb-sweeping and its kites.
 
-### Two releases ago: day and night, the people of the towns, things that break and Part XVI
+### Three releases ago: day and night, the people of the towns, things that break and Part XVI
 
 ```mermaid
 flowchart LR
@@ -208,7 +329,7 @@ flowchart LR
 - **Code**: the game's GDScript grew from 44,004 to 47,498 lines (`scripts/clock.gd`, `scripts/folk.gd` and `scripts/havoc.gd` are new) and the Blender Python from 21,542 to 21,984 lines: 22 commoners, the Kitchen God and the two door gods are new characters, six new clips, and Lin Feng (all four looks) and Yue Ling are rebuilt with them. The tests grew from 1,879 to 2,132 lines (22,603 checks).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### Three releases ago: Yue Ling's own story, more to do and Part XV
+### Four releases ago: Yue Ling's own story, more to do and Part XV
 
 ```mermaid
 flowchart LR
@@ -270,7 +391,7 @@ flowchart LR
 | ![the hermitage's moon gate](docs/screenshots/hermitage_gate.webp) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.webp) |
 | ![the moths that eat forgetting](docs/screenshots/battle_forgetting.webp) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.webp) |
 
-### Four releases ago: fates and faces, outfits, rides and Part XIV
+### Five releases ago: fates and faces, outfits, rides and Part XIV
 
 ```mermaid
 flowchart LR
@@ -346,7 +467,7 @@ flowchart LR
 
 ![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.webp)
 
-### Five releases ago: many roads, crafting, renown and Part XIII
+### Six releases ago: many roads, crafting, renown and Part XIII
 
 ```mermaid
 flowchart LR
@@ -469,7 +590,7 @@ Background for that release (the Eight Gates, Chiyou and the war at Zhuolu):
 - **The Eight Gates**: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death of [Qimen Dunjia](https://en.wikipedia.org/wiki/Qimen_Dunjia), taught to the Yellow Emperor by the Mysterious Lady of the Nine Heavens, laid on the eight trigrams ([Bagua](https://en.wikipedia.org/wiki/Bagua)); the "Eight Gates Golden Lock" formation of the *Romance of the Three Kingdoms*, which falls when it is entered by the right gate.
 - **Wang and Liang, Chi and Mei**: the goblins of the mountains, old things and waters that fought in Chiyou's host.
 
-### Six releases ago: realms and talents that matter, cutscenes and Part XII
+### Seven releases ago: realms and talents that matter, cutscenes and Part XII
 
 ```mermaid
 flowchart LR
@@ -549,7 +670,7 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 - **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
 - **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
 
-### Seven releases ago: three realms, six Daos, six peoples and Part XI
+### Eight releases ago: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -648,7 +769,7 @@ Background for this release (the myths of the Jianmu and the realms, the Daos an
 - **The peoples**: the Feathered People, the Deathless (black-skinned people who eat of the immortal tree) and the dragon-kin in the *Classic of Mountains and Seas*; the Jiaoren, whose tears turn to pearls, in the *Bowuzhi* and Gan Bao's *Soushen Ji*; celestial foxes who climb to heaven at a thousand years ([huli jing](https://en.wikipedia.org/wiki/Huli_jing)).
 - **The bosses**: [Leigong](https://en.wikipedia.org/wiki/Leigong), Duke of Thunder; Feilian, Earl of the Wind; Kui, the one-legged thunder ox of the *Classic of Mountains and Seas*; Jiufeng, the nine-headed bird of Chu; [Pixiu](https://en.wikipedia.org/wiki/Pixiu); Shentu and Yulei, the door gods under the peach tree ([Menshen](https://en.wikipedia.org/wiki/Menshen)); [Zhulong](https://en.wikipedia.org/wiki/Zhulong_(mythology)), the Torch Dragon whose open eye is day; Wangxiang, the water goblin; [Heibai Wuchang](https://en.wikipedia.org/wiki/Heibai_Wuchang), Black and White Impermanence.
 
-### Eight releases ago: an organic continent, four towns and Part X
+### Nine releases ago: an organic continent, four towns and Part X
 
 ```mermaid
 flowchart LR
@@ -705,7 +826,7 @@ Background for this release (the techniques behind the new map, cartography and 
 - **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
 - **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
 
-### Nine releases ago: hanfu characters, five-colour monsters and Part IX
+### Ten releases ago: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -785,7 +906,7 @@ Researched for that release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Ten releases ago: rebuilt models and Part VIII
+### Eleven releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -838,7 +959,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Eleven releases ago: one open world and Part VII
+### Twelve releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -872,7 +993,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Twelve releases ago: natural landscapes and Part VI
+### Thirteen releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -953,6 +1074,42 @@ flowchart TD
     GR --> MM
 ```
 
+## Performance
+
+`godot --path . -- --bench=build/bench.json` (a developer tool, `scripts/bench.gd`; it needs a window, so `xvfb-run -a` on a server) opens the world at the sect the way a new game does and then stands and walks the hero through seven regions, and writes for each: the time to arrive, the mean and worst frame, and what the renderer was asked to draw. `--census` lists every triangle in the scene by the kind of thing it belongs to (`--census-view`: only what the camera can see; `--census-detail`: the scatter by draw distance and weight), which is how this release's costs were found. `AZ_PROFILE=1` prints where the time goes when a realm is generated and a region is built.
+
+The numbers below are from the same machine before and after this release (a four-core server with no graphics card: frames are drawn by a software rasteriser, so the frame times are thousands of times a real card's, but the triangle and draw-call counts are exactly what any card is sent, and the load times are the CPU's own).
+
+| | Before | After |
+|---|---|---|
+| `assets/` on disk | 526 MB | **352 MB** |
+| The land generated (once per run) | 8.5 s, after "Begin" | 8.5 s, **behind the title screen** |
+| The sea laid | 2.1 s | **0.9 s** |
+| "Begin" to the first frame of the world | 21.1 s | **10.9 s** once the title has been up twelve seconds (19.0 s if the world is opened at once, as the tour does) |
+| A frame at the sect: triangles drawn | 8.23 million | **4.95 million** |
+| A frame at the sect: draw calls | 2,138 | **1,843** |
+| A frame at the sect (software rasteriser) | 2.13 s | **1.26 s** |
+| A frame at Qingshi: triangles drawn | 40.4 million | **6.1 million** |
+| A frame at Qingshi: draw calls | 3,819 | **2,298** |
+| A frame at Qingshi (software rasteriser) | 15.3 s | **3.8 s** |
+| Arriving at Qingshi (five regions built) | 19.1 s | **12.1 s** |
+| The bot's pace: game time played in the first 174 s of wall clock | 1:18:09 | **2:03:08** |
+
+```mermaid
+flowchart LR
+    subgraph BEFORE[Before: a frame in a town]
+    A1[every model of five regions<br/>handed to the renderer] --> A2[each at all 40,000 triangles:<br/>its LODs were dropped at load]
+    A3[trees and landforms at full<br/>detail out to 115 m] --> A4[8.2 M triangles]
+    A2 --> A4
+    end
+    subgraph AFTER[After]
+    B1[people and packs to 92 m,<br/>big things to 150 m] --> B2[seven LODs each,<br/>thinned as they shrink]
+    B3[full mesh to 56 m, far mesh beyond:<br/>solid parts at a third] --> B4[4.95 M triangles]
+    B2 --> B4
+    end
+    BEFORE --> AFTER
+```
+
 ## Art pipeline
 
 **Rule: all art is generated from scripts.** Every model, texture, animation and effect must be reproducible by running code that lives in this repository. Hand-made, downloaded or AI-image-generated asset files are not allowed. Rendered screenshots in `docs/screenshots` are outputs, not inputs.
@@ -962,6 +1119,7 @@ flowchart TD
 | **Godot code** (GDScript and shaders) | anything built from game data or changing at runtime: terrain, weather, spell effects, shaders, UI | `scripts/` |
 | **Blender Python** (`bpy`, Blender 5.2) | hero assets: characters, monsters, rigs and animations, landmarks | `art/` |
 
+- `art/lib/pack.py` (this release): every export is **packed** as `kit.export` writes it (byte weights, 16-bit tint UVs and bone rotations, no channels for a bone that rests through a clip, shared time tracks, one buffer view per kind of data): a third smaller on disk, and the same meshes and clips once Godot has imported them. `python art/pack_all.py` packs anything exported with `ART_PACK=0`; `art/check_assets.py` reads packed files as it read raw ones.
 - `art/lib/kit.py`: the toolkit. Coordinates are written in Godot space; primitives (ellipsoids, superquadrics, swept tubes with per-point bone weights, lathes, double-sided sheets, leaves, eyes), organic bodies from Blender's **Skin + Subdivision modifiers**, **ray-cast ambient occlusion** baked into vertex colours, the **Decimate** modifier for landmark triangle budgets, armatures, clips baked from Python functions and GLB export.
 - **The anime re-sculpt (the Spring Thunder release)**: `face.py` builds the gacha-style face (eye line at 0.43 of the head for women and 0.47 for men, eyes an eye's width apart, tall irises dark under the lid and bright at the bottom, heavy upper lashes with a flick, a lower lash on the outer half, almost no nose, a small low mouth, a soft V jaw, the lower half of the skull shorter than the upper, and a chin with mass of its own: `Face.chin_mass` fits the profile below the mouth to a rounded box, so the chin is the lowest point of the face with a short underside rising to the throat, and the jaw lines run straight into a rounded tip; and full cheeks: `Face.cheeks` carries the face below the eyes forward, never past its middle, so the three-quarter outline swells at the cheek) and gives the skin, nose and lips **normals of their own** from an ellipsoid round the head (`Builder.set_normals`, exported as glTF custom normals), so cel shading falls across a face as one clean shape; `hair.py` does the same for the cap and the fringe. `garment.py`'s `Torso` has a man's and a woman's sections (a V-taper chest with flat pectoral planes; a high narrow waist, a lifted bust, wide hips) and the seat behind both, and the skirt hangs from the widest point of the hips; legs have a thigh, a slim knee, a calf and a fine ankle; sleeves are snug at the shoulder and open into a bell below the elbow. Proportions follow published gacha proportion sheets (see References for this release).
 - `art/lib/person.py` builds every character from options (robe, hair style, hat, weapon, beard, horns, build, age, props, pose, brocade, tinting) with `face.py`, `hair.py`, `garment.py` and `accessory.py`, and the features of the peoples of the realms (wings, crests, fox and fin ears, tails, antlers, scales, whiskers) with `race.py`; `sculpt.py` holds the shared modelling tools (lofts through cross-section profiles, noise, splines, strands).
@@ -1268,6 +1426,60 @@ Each region is still generated from its own seed by `mapgen.gd` (so every boss, 
 **The realms above and below** (Part XI) are built by the same `Atlas._build`, one realm at a time (`Atlas.world_of(layer)`): `STRATA` gives each its own 260 x 200 grid, the sites of its regions, how far land reaches from a site (land runs out into open sky or into the abyss instead of the sea) and how many holes to open in the wild ground between regions (gaps of sky between the islands, chasms between the caverns). `layer_origin` lays each grid over the land's so that the Jianmu's crown in the Nine Heavens floats straight above its trunk on the mountain and its roots in the Nine Springs hang straight below. The ends of a ladder are two linked entities, one in each realm; walking onto one lifts or lowers Lin Feng and puts him on the free tile beside the other end. The Nine Heavens are drawn 96 m above the land and the Nine Springs 64 m below it, and `world.gd` keeps a bundle per realm (its land, its streamed regions, its sea of cloud or glowing abyss) and shows only the one Lin Feng is in. A **floor** (`Atlas.floor_id`, `f:<region>:<building>:<level>`) is a world of its own the size of its building, holding the people and things that live on it and the stairs back.
 
 The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part XIX: The Machine Heart
+
+Summer goes on. The new fire cooks, casts and lights as no fire has in sixty years, and the land, which had forgotten what it was to have strength to spare, begins to make things with it. The first sign on the mountain is small: the sect's rice comes up from Qingshi two days early, and it is white. Polished. Every grain. Auntie Zhou will not cook it. She says she does not trust rice that nobody was tired for.
+
+```mermaid
+flowchart LR
+    H[the rice comes up<br/>already ground] --> B[Gongshu Ban's wheel<br/>in the mill-race] --> T[catalpa for<br/>the second wheel] --> W[build three works<br/>with your own hands]
+    W --> F[Rice: a sack to the mill<br/>with five farmers] --> G[the Gardener of Hanyin:<br/>where there are machines...] --> M[midnight: what has got<br/>into the wheel]
+    M --> Q1{{the wheel at Qingshi:<br/>run, hours or down}}
+    Q1 --> R[Casting: the hammers have<br/>not stopped in nine days] --> C[break five<br/>gear-trains] --> E[the engines of the pits]
+    E --> MO[Mozi has walked<br/>ten days and nights] --> CL{the Cloud Ladder: craft,<br/>the works or might}
+    CL --> GA[Boat: six paddle-boats<br/>climbing the Dragon Gate] --> Y[Yan Shi: I kept<br/>the heart] --> P[five cast-off pieces] --> PO[Sweet-Well: the oxen<br/>walked off] --> K[kites, oxen and<br/>paper servants]
+    K --> CF[the caravan fire:<br/>I was woven, Lin Feng] --> PL{the Player: side by side,<br/>the works or might}
+    PL --> Q2{{may it keep the heart<br/>it made?}} --> LA[Lantern: a lamp<br/>lit by hand] --> FO[Heaven's Forge: the Engine's<br/>children, counting] --> MK[call five makers<br/>to the casting yard] --> JX{Jixin, the Machine Heart:<br/>the works, the hearths or might}
+    JX --> Q3{{what the land does<br/>with its machines}} --> SK[the looms that<br/>were not told] --> MG{the Wooden Magpie:<br/>a relic, the works or might} --> WD[the answer carried<br/>to five hearths] --> G2[the gardener, again] --> MS[one measure of rice,<br/>ground by hand] --> SD((Skill<br/>Become Dao))
+```
+
+| Step | Where | What happens |
+|---|---|---|
+| The rice is white | the sect | a carpenter came up the river road with a bag of tools and an ink-line, and in nine days built a wheel that grinds the valley's rice between breakfast and noon. The Elder cannot find what is wrong with it. "And yet Auntie Zhou will not cook the rice" |
+| **Gongshu Ban** | the mill-race below Qingshi | Lu Ban, patron of every carpenter, dead two thousand years: "a maker does not die while people still pick up his tools." He woke because of the new fire. Does it ever stop? "Why would it stop? ...You are the second person to ask me that, and the first was a cook" |
+| The carpenters' wood | the Bamboo Forest | **five baulks of catalpa**, seasoned where they fell |
+| **Three works** | anywhere | "I cannot talk about machines with somebody who has never made one go": **build any three works** (Esc > Works). The story waits; works built earlier count |
+| **The Rice Hearth** | Qingshi | carry a sack to the mill with **five farmers**, who stand about in the middle of the morning not knowing where to put their hands. "She sang. I did not know I liked the singing until this month" |
+| **The Gardener of Hanyin** | below the last terrace | down the tunnel, fill the pitcher, up, pour. He knows about the well-sweep. "I should be ashamed to use it." Yue Ling: a pitcher is a machine, and so is a hoe. He did not say he knew where the line was; go and look at that wheel at midnight |
+| Midnight | Qingshi | **Wheel-Mites, Treadle Imps and Idle Shuttles** (strike first): nobody was there, and they were helping it |
+| *Crossroads* | the mill-race | **the wheel at Qingshi**: let it run night and day with a watch on it, give it hours (opened at dawn by the first up, shut at dusk by the last home), or take it down |
+| **The Casting Hearth** | Tushan | a double beat that does not stop; the founders walk in time to it and do not know. Nobody built a way to stop the hammers. **Break five locked gear-trains** (F, two blows each), then the **Cog-Crabs, Bellows Wraiths and Trip-Hammer Golems** |
+| **Mozi** | Tushan | ten days and nights from the east, in what is left of his sandals. He is not against machines; he asks what a thing is good for. The engines are building now: a cloud ladder, going up because up is where a ladder goes |
+| **The Cloud Ladder** | the mountain above Cloudfoot | a trial: **a belt and nine sticks** (craft: Smith Tie copies Mozi's models from wood and metal essence and a baulk of catalpa), **a maker's eye** (by the works: five built) or might |
+| **The Boat Hearth** | Longmen | **Boatwright Gao** built six paddle-boats in the spring; three nights ago all six went upriver with nobody aboard and were found under the Dragon Gate, in a row, paddling at the falls. "The carp do it once in a thousand years and become dragons. What does a boat become?" Pole a boat across with **four fishers**: "a pole tells you what the bottom is" |
+| **Yan Shi the Artificer** | Shazhou Oasis | he made a dancer for King Mu, took it apart in front of the king to save his neck, put it back together, and kept the heart. It has been filling the hollow with whatever in the world ticks: the escapements, the part that lets a machine rest |
+| What it shed | the dunes | **five cast-off pieces**, finer than the ones he made, with tally marks scratched inside the wrist: it is counting the days |
+| **The Sweet-Well Hearth** | Shazhou | the caravans' wooden oxen walked west in the night: shoulder a load with **three porters**, who remember a walking song |
+| The carriers | the dunes | **Wooden Kites, Stray Oxen and Paper Servants** (strike first), each carrying one small toothed wheel |
+| The caravan fire | outside Shazhou | Yue Ling with the little lacquered hand in her lap: "I was woven, Lin Feng. On a loom, by somebody, for something" |
+| **The Player** | a swept circle in the dunes | a trial: **one who was made, to another** (side by side: Yue Ling tells it what the first year of having a heart is like), **read the joinery** (by the works: seven built) or might. "I have danced three thousand years on the outside of myself" |
+| *Crossroads* | the dunes | **the Player's heart**: it is yours, you made it; that is for your maker to say; or take it out and give the pieces back |
+| **The Lantern Hearth** | Yanggu | the revolving lanterns turn with no candle in them: trim and light a lamp by hand with **four stallholders**, a taper pinched from the shrine lamp, never blown. "A man likes to be needed by his own lamp" |
+| The Engine's children | Heaven's Forge | where the Brass Spider Engine fell in Part IV there is a scar in the floor and nothing else: it came apart at every joint into **Brass Spiderlings, Counting Wasps and Tally Golems**, and they are counting the Forge: **break four of the gear-trains** they have locked across the furnace doors (F), then stop them (strike first). **Forgemaster Ou Lan**: "they counted me this morning; I am, it seems, one." What he says of the Engine's drawings depends on what was done with them in Part IV |
+| The makers | six towns, any five | Smith Tie, Auntie Rong, Boatwright Gao (whose paddle-boat tried to climb the Dragon Gate), Lantern-Maker Xi, Carpenter Gu ("somebody has to speak for stools") and Well-Keeper Zhaya, called to the casting yard |
+| **Jixin, the Machine Heart** | the oldest pit at Tushan | the first master of the pit, who said "I will rest when this is done" for four thousand years. A trial: **speak as a maker** (by the works: four of one school), **nine stools and a bench** (all six hearths: the makers sit down in front of it, and rest) or might |
+| *Crossroads* | the casting yard | **what the land does with its machines**: the hand first, the wheel kept by hours, the Dao in the tool (each only for somebody who has built three works of that school), or it is not mine to say: ask the gardener |
+| **The Casting Hearth** | Tushan | the river's bellows are stopped for a day, and a pit is blown by lung with **four casters**: it takes all morning to bring one pit to heat. "My grandfather did this every day of his life and I thought him a hard man. He was only a tired one" |
+| The looms | the Silkworm Woods | saying it at Tushan does not make it so. **Silk Farmer Can Niang**'s forty looms are weaving one long knot with nobody at them: nobody told them (what she makes of the answer depends on the answer). Still the **Idle Shuttles, Treadle Imps and Paper Servants** (strike first). "That is most of governing anything: going round afterwards and telling it" |
+| The kites | the Sea of Clouds | the kites that did not come down went up. **Cloud Warden Feng Yu**: there is a big one with them, very old, that flies like a magpie. Clear the **Wooden Kites, Counting Wasps and Bellows Wraiths** off the islands of cloud (strike first) |
+| **The Wooden Magpie** | the ninth island | Gongshu Ban's first toy, which flew three days; Mozi said a linchpin was worth more, and Ban was so angry he let go of the string. It never came down: he built it too well to stop. A trial: **show it how to stop** (a relic: the stopped escapement the Machine Heart left), **find the string** (by the works: six built) or might. Afterwards two old men sit against a wooden bird, and neither asks what it is for |
+| The answer, carried | five of the six hearths, in any order | each keeper has done something with it already: a pole in the stern of every paddle-boat, a name and hours on a board by every trip-hammer, porters singing beside the wooden oxen, candles back in the revolving lanterns, a sweep Granny Wen would not be ashamed of, and Grandmother Sarnai's one question: can you walk away from it in the morning? |
+| The gardener, again | Qingshi | somebody has built him a well-sweep and oiled the pivot. He has not touched it. He has not pulled it down, either |
+| One measure | the old millstone of Qingshi | ground by hand with Yue Ling, slowly; two small cakes, slightly burnt. "Explain to me at once why I am happy" |
+| The Way, which goes beyond skill | the sect | the tribulation comes while Lin Feng is sweeping the long steps, and he does not put the broom down: **Skill Become Dao** |
+
+New in this chapter: twelve foes with stories in the bestiary and hours of their own (the mites work the wheel by night; the kites fly by day), four lords with pasts, a locked gear-train for the sword (`impact.gd`), five people built in Blender (`art/characters/gongshu_ban.py`, `mo_di.py`, `gardener_hanyin.py`, `yan_shi.py`, `the_player.py`), Gongshu Ban's wheel turning in the mill-race, Mozi's belt and nine sticks at the smith, errands among four hearths' own people, and a step that asks for works. A step of visits now begins with nobody visited: three of this chapter's makers had been called on in earlier chapters, and would have counted as called on already.
 
 ## Part XVIII: The New Fire
 
@@ -1852,7 +2064,21 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Bugs found and fixed
 
-Found in this release by starting the new beginnings with a hero under another name, by reading every conversation in the game through the new voice (`tests/run_tests.gd` does it now), by screenshots and by the bot's logs, each confirmed before it was fixed:
+Found in this release by counting what a frame draws (the new `--bench` and its census), by timing the opening of the world, by writing a chapter that calls on people an earlier chapter had called on, by screenshots and by the bot's logs, each confirmed before it was fixed:
+
+| Bug | Fix |
+|---|---|
+| **Every person and monster was drawn with all of its triangles at any distance.** The importer makes seven levels of detail for each Blender model. The loader rebuilds every mesh to tint it (`Assets.prepare_mesh`, `_hero_mesh`) and passed an empty list of LODs to the rebuilt one, so a townsperson two hundred metres off cost forty thousand triangles, three times over (the picture and the sun's two shadow passes). In a town this was the largest single cost of a frame | `Assets.lods_of` reads the importer's LODs for each surface and hands them to the rebuilt mesh; a frame at the sect went from 8.2 million triangles to 4.95 million with the other changes below |
+| **Everybody in five regions was on screen.** The world sets every person, pack, lord and thing of every *loaded* region visible each frame, and regions are loaded out to 46 tiles (ninety metres) past the edge of the one the hero is in: at Qingshi that is the village, the mountain, the terraces, the ferry and the maple woods, several hundred models, each asked of the story every frame (`ent_visible`) and left to the renderer to cull | drawn only within sight (`World.ENT_SHOW`, 92 m; lords, buildings' things and ladders 150 m), measured from the camera when a scene has moved it; past 46 m the story is asked every eighth frame |
+| **`Game.reached` searched the whole story every time it was asked.** `Data.step_index` walked the list of 580 steps comparing names; `reached` and `done` call it, and they are called for everything in sight every frame and constantly by the bot | an index built on first use; the bot plays the game over half as fast again for it |
+| **A step of visits counted people called on in an earlier chapter as already visited.** `Game.visited` is one list for the whole game and was never cleared: no two chapters had asked for the same person until Part XIX calls on Smith Tie (called on at the New Year, Part XVI) and Auntie Rong and Lantern-Maker Xi (brought the new fire, Part XVIII), and "call five makers" would have begun at three of five with their words unsaid | a step of visits begins with the people it names unvisited (`Game.advance`), and may have words of its own for somebody an earlier chapter also had words for (`visit:<step>:<npc>`); tested with all three |
+| **The coast was tested by building an array for every tile of the world.** Laying the sea asks of each of 936,000 tiles whether a neighbour is sea; each call built a list of eight offsets and walked it: 2.1 seconds of every start | away from the world's edge the eight neighbours are read straight from the array: 0.9 s |
+| **A region's scatter was sent to the engine one instance at a time**: two calls into the renderer for each of several hundred thousand trees, tufts and stones | one buffer for each chunk (`Terrain3D._mm`) |
+| Caught in this release's own new code before it shipped: the first cut of the packer stored normals as 16-bit (`KHR_mesh_quantization`), which Godot's importer refuses outright (found by loading packed and raw exports side by side in Godot and comparing every vertex and every animation track, which is also how the packer's tolerances were measured); it dropped a resting bone's channel only if the bone rested in *every* clip, which left Godot importing more tracks than from the raw file, because 16-bit rotations no longer compared equal to the rest pose; the menu's root list, two entries longer, scrolled "Resume" off its panel; the machines' first sites were guesses, and two tests said so (one stood within two tiles of a shrine, four were walled in); three of Part XIX's visits collided with earlier chapters' (above); a whole journey's know-how bought sixteen of the eighteen works, which made the choice of a school no choice (the costs of the upper tiers were raised until it buys about two schools); the first works to make resting quicker and bind wounds after every battle shortened the old chapters by over half an hour, and were given other uses; a free first round against anything asleep, and packs that yielded to a merciful hero, did the same again, and neither ends a battle early now; a crossroads' question, a whole sentence long, ran off the right edge of the choice screen (it is wrapped now, and the panels start under it), and the lines under the scales and the bestiary's line of hours were cut off at their panels' edges | fixed, with tests (and one more, caught by the bot: an edit to the turn loop took out the line that ends a battle the party has lost, and the fifth battle of the game went round for forty-five minutes of game time; the tests check the loop now) |
+
+### Bugs fixed in the Part XVIII release
+
+Found by starting the new beginnings with a hero under another name, by reading every conversation in the game through the new voice (`tests/run_tests.gd` does it now), by screenshots and by the bot's logs, each confirmed before it was fixed:
 
 | Bug | Fix |
 |---|---|
@@ -2184,32 +2410,33 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --hero=f --hearth=
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234, identical across runs: this release's run was made twice). The last release took 20:31:21. The same bot now reaches the end of Part XVII at 20:42:05, eleven minutes later than it did: the story begins with a goodbye at the hero's hearth, the people of every town greet a stranger in their own hearth's way before they talk of their trade, and the hearths' gifts change how its fights and its hours fall. Part XVIII then plays in **1:00:41**, and the game is **1 hour 11 minutes longer** in all. It passes 39 trials (might 4, craft 10, wealth 4, respect 5, dao 4, peoples 1, relic 2, bond 4, side by side 1, by the people 2, by the land 1, by the hearths 1), opens 4 of the Eight Gates, does 5 deeds and reaches the heart by the Road of the Many Peoples. In this release it says goodbye to Granny Wen at the Rice Hearth before the story begins; is a guest of the Lantern Hearth by 10:25 of play and of all six by 18:47, on the story's road alone; in Part XVIII eats cold gruel with five farmers of Qingshi, carries a stick with three porters of Shazhou, is the first customer of five stallholders at Yanggu (each errand with that town's own people), breaks five crusts of clinker and cuts six stands of brush, strikes 18 packs first in the chapter's three hunts, has Smith Tie make the drill of summer wood and takes Zhurong by craft, takes Huilu by the hearths, carries the new fire home to all six keepers, and at the end, with six hearths and its friends among the peoples of the realms, chooses **the Open Door**. Its one defeat is early in Part I, in the Bamboo Forest's cull, as in the last release.
-
-Two more heroes were played through Part XVIII from the chapter's first step (`--bot-start=s_p18_home`): the story's own sweeper (1:08:51), and a young woman of the Felt Hearth, `--hero=f --hearth=steppe --look=wanderer --ending=road`, who finishes in 1:09:22 and takes the Road of Six Fires. (A game begun at a late chapter has not earned its place at the hearths on the way, so both pass Zhurong by craft and Huilu by the hearths the chapter itself makes them guests of.)
+Latest result (seed 1234). The last release took 21:42:46. The same bot now reaches the end of Part XVIII at 21:06:38, thirty-six minutes sooner than it did: it rests twelve minutes less (a maker with a hide coat, sealed jars and a hot meal every night takes less harm), the errand of Part XVI that waits for the children of the towns to come out fell nine minutes luckier by the clock, and the later lords fall a little sooner to somebody whose works lean on their weaknesses. Part XIX is 1:39:03. The run answers at all sixteen crossroads and the qilin, hears 29 echoes of its answers on the way, builds fifteen works (all six of the Wheel), and is known by the end as merciful, of the new works and of the wide world.
 
 ```
-game play time  : 21:42:46 (78167 s)
-wall clock      : ~42 min (headless, sharing the machine with a screenshot tour)
-final realm     : Early Fire Passed On
-battles / kills : 1821 / 3378   deaths: 1
-time by screen  : battle 22707 s, meditate 13194 s, dialogue 24164 s, world 17340 s, menu 802 s, shop 27 s, choice 76 s
-meditation for  : rest 12360 s, children 749 s, grind 41 s, respawn 42 s
-trials passed   : 39 (might 4, craft 10, wealth 4, respect 5, dao 4, peoples 1, relic 2, bond 4, side by side 1, by the people 2, by the land 1, by the hearths 1), renown 762, deeds 5, gates 4
-the sword       : 78 strikes, 27 packs struck first, 14 sword qi, 37 obstacles cleared
+game play time  : 22:45:41 (81941 s)
+wall clock      : 26 min 31 s (headless)
+final realm     : Early Skill Become Dao
+battles / kills : 1882 / 3549   deaths: 1
+time by screen  : battle 23764 s, meditate 12115 s, dialogue 26607 s, world 18675 s, menu 904 s, shop 28 s, choice 85 s
+meditation for  : rest 11859 s, children 192 s, grind 41 s, respawn 22 s
+trials passed   : 43 (might 4, craft 11, wealth 4, respect 5, dao 4, peoples 1, relic 3, bond 4, side by side 2, by the people 2, by the land 1, by the hearths 1, by the works 1), renown 792, deeds 4, gates 4
+the sword       : 122 strikes, 83 packs struck first, 26 sword qi, 46 obstacles cleared
+works           : 15 built (the Hand 5, the Wheel 6, the Art 4): Grand Master of The Wheel; know-how 710 earned, 640 spent
+crossroads      : 17 answered (the qilin among them), 29 echoes heard; mercy +8, new works +17, the wide world +12
+                  Merciful, and known for it, of the New Works, and known for it, of the Wide World, and known for it
 the hero        : Lin Feng, a young man, kin of the Rice Hearth; guest of 6 hearths (kin of all six)
 the ending      : The Open Door
-time by area    : sect 4442, mountain 5128
-                  bamboo 2264, marsh 1765, frost 2182, thunder 1133, palace 1005
-                  dragon 889, volcano 1643, void 757, celestial 1521, mirror 956
-                  grave 1694, time 811, origin 1286, cloudsea 794, court 758
-                  forge 872, garden 1490, dunes 1038, fungal 829, aurora 900
-                  chaos 1315, maple 2693, karst 1000, springs 1194, wheel 1600
-                  village 3673, terraces 1679, silk 1105, loom 1331, starferry 1115
-                  magpie 1110, starpalace 1005, jasper 1367, yanggu 2085, millet 1805
-                  fusang 1398, guanghan 1210, longmen 2208, drowned 1553, tushan 1619
-                  buzhou 1496, juntian 1506, changhe 1170, ninesprings 1491, youdu 1305
-                  penglai 1358, fangzhang 1243, yingzhou 1182, guixu 1322
+time by area    : sect 4915, mountain 5729
+                  bamboo 2572, marsh 1597, frost 2166, thunder 1185, palace 1034
+                  dragon 910, volcano 1604, void 745, celestial 1486, mirror 983
+                  grave 1607, time 738, origin 1240, cloudsea 1349, court 832
+                  forge 1261, garden 1359, dunes 1799, fungal 797, aurora 852
+                  chaos 1148, maple 2701, karst 1012, springs 1254, wheel 1624
+                  village 3683, terraces 1677, silk 1441, loom 1196, starferry 1173
+                  magpie 1128, starpalace 998, jasper 1171, yanggu 2092, millet 1663
+                  fusang 1372, guanghan 1214, longmen 2432, drowned 1651, tushan 3040
+                  buzhou 1467, juntian 1480, changhe 1142, ninesprings 1381, youdu 1304
+                  penglai 1305, fangzhang 1206, yingzhou 1139, guixu 1302
 result          : PASS (needs >= 57600 s)
 ```
 
@@ -2238,6 +2465,11 @@ scripts/data.gd      content: skills, enemies, areas, quest chain, dialogue
 scripts/trials.gd    many roads: trials and their ways, essences, crafting recipes, renown and deeds
 scripts/props.gd     things to do: outdoor props by theme (and the bigger things after them), usable furniture, what comes of using them
 scripts/fashion.gd   who Lin Feng is (character creation: names, a young man or woman, looks, colours, origins), outfits and rides
+scripts/echoes.gd    crossroads and their echoes: sixteen questions, three scales, what each answer gives, the lines later conversations gain, the ending's epilogue
+scripts/works.gd     the Hundred Works: eighteen works in three schools, know-how, what each changes, where each stands
+scripts/machines.gd  the machines of the works, built from code and animated from the world's clock
+scripts/habits.gd    the hours of the wild: every monster's habit, what it is doing by the clock, what that changes in the land and in battle
+scripts/bench.gd     developer tool: times the opening of the world, counts what a frame draws, lists the scene's triangles by kind
 scripts/cultures.gd  the Six Hearths of the land: peoples, greetings, tables, fires, customs, standing, the six beginnings and the five ends
 scripts/voice.gd     the story told of a young woman: whose "he" is whose, clause by clause, and the lines written out by hand
 scripts/create.gd    the character creation screen over the title's cliff

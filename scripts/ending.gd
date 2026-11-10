@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths"}
+const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths", "works": "the Works"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)
@@ -1116,5 +1116,16 @@ func _results(a: float, slide: float) -> void:
 		if Game.fem():
 			yl = Voice.her(yl)
 		_say(Vector2(x0, y), yl, UI.fit(yl, 14, w), Color("ff9ac0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
+	# and what he built and what his choices made of him (works.gd, echoes.gd, the Hundred Works release)
+	if Works.count(Game) > 0 or Echoes.names(Game) != "":
+		y += 18.0
+		var parts: Array = []
+		if Works.count(Game) > 0:
+			parts.append("%s (%d works)" % [Works.title(Game), Works.count(Game)])
+		if Echoes.names(Game) != "":
+			parts.append("known as " + Echoes.names(Game).left(1).to_lower() + Echoes.names(Game).substr(1))
+		var wl := "; ".join(parts)
+		wl = wl.left(1).to_upper() + wl.substr(1)
+		_say(Vector2(x0, y), wl, UI.fit(wl, 14, w), Trials.KINDS.works.col, a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
 	_say(Vector2(x0, maxf(r.end.y - 14.0, y + 24.0)), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)

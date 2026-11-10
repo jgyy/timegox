@@ -15,7 +15,9 @@ const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon
 	# people met on the road who come to blows with Lin Feng (fate.gd), in their own models
 	"person:qiu_ye", "person:hu_grown", "person:xu_lan", "person:liu_ying",
 	# Part XVIII: the Lord of the Southern Fire, in his own model
-	"person:zhurong"]
+	"person:zhurong",
+	# Part XIX: the Player, Yan Shi's dancer, in its own model
+	"person:the_player"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font
