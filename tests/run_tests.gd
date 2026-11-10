@@ -1491,6 +1491,7 @@ func _fates_and_faces() -> void:
 	var once := UI.named("Lin Feng's broom. Senior Brother Lin! Feng'er, come in.")
 	check(once == "Bai Chen's broom. Senior Brother Bai! Chen'er, come in." and UI.named(once) == once, "the chosen name replaces the story's on screen, once (%s)" % once)
 	check(UI.named("Lin Shan and Feng Meng and Warden Feng") == "Lin Shan and Feng Meng and Warden Feng", "other people's names are left alone")
+	check(UI.named("Senior Brother Lin! Forgive me, I mean... Lord Lin?") == "Senior Brother Bai! Forgive me, I mean... Lord Bai?", "what the disciples call a Sovereign has the family name the player chose too")
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	var CG = load("res://scripts/game.gd").new()
 	CG.reset()
@@ -2462,6 +2463,8 @@ func _new_fire() -> void:
 	check(Voice.tell("Lin Feng looks at Yue Ling, and she laughs, and he laughs too.")[0] == "Lin Feng looks at Yue Ling, and she laughs, and she laughs too.", "a woman's name takes no 'he' away from her")
 	check(Voice.tell("The sweeper has his broom. The choice is his.")[0] == "The sweeper has her broom. The choice is hers.", "the sweeper is the hero; 'his' at the end of a sentence is 'hers'")
 	check(Voice.tell("Thank you, Senior Brother Lin! Happy new year, big brother cultivator!")[0] == "Thank you, Senior Sister Lin! Happy new year, big sister cultivator!", "the juniors call her Senior Sister")
+	for oid3 in Fashion.OUTFIT_ORDER:
+		check(not _has_word(Voice.her(str(Fashion.OUTFITS[oid3].desc)).replace("The Elder had it made", "").replace("his mother", ""), ["he", "him", "his"]) or oid3 in ["conclave"], "the outfit %s is hers" % oid3)
 	check(Voice.tell("Lin Shan and Feng Meng and Warden Feng met him.")[0] == "Lin Shan and Feng Meng and Warden Feng met him.", "other people's names are not hers")
 	check(Voice.tell("Lin Feng, the boy who swept the steps, is ready. He's sure. You hit hard, young man.")[0] == "Lin Feng, the girl who swept the steps, is ready. She's sure. You hit hard, young woman.", "the boy who swept the steps is the girl who did")
 	check(Voice.tell("He Bo gives Lin Feng the tablet of his office.")[0] == "He Bo gives Lin Feng the tablet of his office." and Voice.tell("Lin Feng takes it from him.", true)[0] == "Lin Feng takes it from him."
@@ -2482,6 +2485,8 @@ func _new_fire() -> void:
 		for shk in Bonds.SHARES:
 			for ln3 in Bonds.SHARES[shk].get("lines", []):
 				found = found or str(ln3[1]) == str(fx)
+		for oid2 in Fashion.OUTFITS:
+			found = found or str(Fashion.OUTFITS[oid2].desc) == str(fx)
 		check(found and str(Voice.FIX[fx]) != str(fx), "a line written out for her is a line of the story: %s..." % str(fx).substr(0, 40))
 	var changed := 0
 	var total := 0

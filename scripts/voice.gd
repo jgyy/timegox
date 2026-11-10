@@ -27,7 +27,7 @@ const NOUNS := {"boy": "girl", "lad": "lass", "boyhood": "girlhood"}
 ## said to or of the hero wherever they stand (whole phrases; capitals are kept)
 const PHRASES := [
 	["senior brother lin", "Senior Sister Lin"], ["junior brother lin", "Junior Sister Lin"], ["brother lin", "Sister Lin"],
-	["big brother cultivator", "big sister cultivator"], ["young master", "young mistress"], ["granny wen's boy", "granny wen's girl"],
+	["big brother cultivator", "big sister cultivator"], ["lord lin", "Lady Lin"], ["young master", "young mistress"], ["granny wen's boy", "granny wen's girl"],
 	["sect boy", "sect girl"], ["sweeper boy", "sweeper girl"], ["the boy who swept", "the girl who swept"], ["the boy who held up the sky", "the girl who held up the sky"],
 	["he is our son", "she is our daughter"], ["our son", "our daughter"], ["they had a son", "they had a daughter"], ["a son, looking for his parents", "a daughter, looking for her parents"],
 	["waiting for a son to grow up", "waiting for a daughter to grow up"], ["their son to grow up", "their daughter to grow up"],
@@ -66,6 +66,10 @@ const STOP := ["The", "Of", "Who", "And", "His", "Her", "Last", "Old", "Little",
 
 ## the whole line as the data has it -> as it is told of a woman, where the rule would be wrong
 const FIX := {
+	"White silk with an azure sash and the sect's cloud on the back, and a small jade crown for the topknot. The Elder had it made the night he broke through to Foundation.":
+		"White silk with an azure sash and the sect's cloud on the back, and a small jade crown for the topknot. The Elder had it made the night she broke through to Foundation.",
+	"Crimson and gold, with a mantle of ash-phoenix feathers that never quite stop smouldering at the tips. Sage Huo Rong says it suits him. Sage Huo Rong is a liar.":
+		"Crimson and gold, with a mantle of ash-phoenix feathers that never quite stop smouldering at the tips. Sage Huo Rong says it suits her. Sage Huo Rong is a liar.",
 	"Lin Feng banks the furnace's fire the way Alchemist Mo taught him in his first week, ash over the embers, and the furnace kneels on its three legs and goes quiet. Furnace-Boy Dan climbs inside to sleep, which, he says, is what furnaces are for.":
 		"Lin Feng banks the furnace's fire the way Alchemist Mo taught her in her first week, ash over the embers, and the furnace kneels on its three legs and goes quiet. Furnace-Boy Dan climbs inside to sleep, which, he says, is what furnaces are for.",
 	"The tea table on the terraces looks out over the whole valley: the new green of the paddies, the river at Longmen, the smoke of Qingshi's chimneys, and the mountain behind it all with cloud on its shoulders. Lin Feng heats the water to just below the boil, the way the tea master showed him, and pours it over the six buds.":

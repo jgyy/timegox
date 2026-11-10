@@ -42,7 +42,9 @@ static func set_hero_name(family: String, given: String, fem: bool = false) -> v
 	if given != Fashion.DEFAULT_GIVEN:
 		subs.append(["\\bFeng'er\\b", given + "'er"])
 	if family != Fashion.DEFAULT_FAMILY:
-		subs.append(["\\b(Brother|Sister) Lin\\b", "$1 " + family])
+		# ("Lord Lin", what the outer disciples call him once he is a Sovereign, kept the story's name
+		# whatever family the player chose, until the New Fire release)
+		subs.append(["\\b(Brother|Sister|Lord|Lady) Lin\\b", "$1 " + family])
 	for sb in subs:
 		var r := RegEx.new()
 		r.compile(str(sb[0]))

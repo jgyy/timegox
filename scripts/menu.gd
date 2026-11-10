@@ -489,7 +489,7 @@ func _draw_hearths() -> void:
 	var r := Rect2(30, 20, 1220, 680)
 	UI.panel(self, r)
 	UI.text(self, r.position + Vector2(24, 36), "The Six Hearths of the Unbroken Land", 22, UI.C_GOLD)
-	UI.text(self, r.position + Vector2(600, 36), "Guest of %d of 6.  A first word with a hearth's townsfolk, sitting with its people and deeds done for it earn a place at it." % Cultures.guests(Game), 12, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 600)
+	_wrap_at(r.position + Vector2(624, 26), "Guest of %d of 6.  A first word with a hearth's townsfolk, a seat with one of its people, and what is done for it in the story earn a place at it." % Cultures.guests(Game), 12, UI.C_DIM, 570)
 	var own := Cultures.own(Game)
 	for k in Cultures.ORDER.size():
 		var id: String = Cultures.ORDER[k]

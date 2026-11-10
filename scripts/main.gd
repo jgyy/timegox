@@ -372,6 +372,11 @@ func new_game(h: Dictionary = {}) -> void:
 		return
 	begin_at_sect()
 
+## Words that are about nobody but the hero (what he wears, what he rides), told of whoever the hero is
+## (voice.gd).
+func told(s: String) -> String:
+	return Voice.her(s) if Game.fem() else s
+
 ## The story proper: the morning of the Elder's summons.
 func begin_at_sect() -> void:
 	Game.prologue = ""
@@ -892,7 +897,7 @@ func open_wardrobe() -> void:
 		var have: bool = Game.outfits.has(id)
 		var col := Color(str(o.cols[0])) if str(o.cols[0]) != "" else UI.C_GOLD
 		opts.append({"id": id, "label": str(o.n) if have else "? " + str(o.n), "note": "wearing" if id == Game.outfit else ("" if have else "not yet"),
-			"desc": str(o.desc) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.outfit})
+			"desc": told(str(o.desc)) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.outfit})
 	choice.preview = func(id: String): world.preview_outfit(id)
 	choose("The wardrobe: what will you wear?", opts, func(id: String):
 		world.preview_outfit("")
@@ -908,7 +913,7 @@ func open_stable() -> void:
 		var r: Dictionary = Fashion.RIDES[id]
 		var have: bool = Game.rides.has(id)
 		opts.append({"id": id, "label": str(r.n) if have else "? " + str(r.n), "note": ("riding" if Game.riding else "saddled") if id == Game.ride else ("" if have else "not yet"),
-			"desc": str(r.desc) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else "Stood on", int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
+			"desc": told(str(r.desc)) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else "Stood on", int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
 			"col": UI.C_JADE, "enabled": have, "current": id == Game.ride})
 	opts.append({"id": "off", "label": "Go on foot", "desc": "Send the ride away and walk (R mounts again).", "col": UI.C_DIM, "enabled": Game.riding})
 	choose("The stable: what will you ride?", opts, func(id: String):
@@ -932,7 +937,7 @@ func offer_outfits(e: Dictionary) -> void:
 	var opts: Array = []
 	for id in _dyer_stock():
 		var o: Dictionary = Fashion.OUTFITS[id]
-		opts.append({"id": id, "label": "%s (%d stones)" % [o.n, int(o.buy)], "desc": str(o.desc) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
+		opts.append({"id": id, "label": "%s (%d stones)" % [o.n, int(o.buy)], "desc": told(str(o.desc)) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
 			"col": Color(str(o.cols[0])), "enabled": Game.stones >= int(o.buy)})
 	opts.append({"id": "later", "label": "Not today", "desc": "Dyer Su will keep it for you. She says that to everyone.", "col": UI.C_DIM})
 	choose("Dyer Su's stall: something to wear?", opts, func(id: String):
