@@ -1087,8 +1087,10 @@ static func need_text(n: Array, g) -> String:
 			return "Walk the %s%s" % [Data.DAOS[str(n[1])].n, (" as %s or better" % rank) if int(n[2]) > 0 else ""]
 		"standing":
 			var title := "Kin" if int(n[2]) >= Data.KIN else "Friend"
-			# (a people whose name already begins with "The": the Thousand Children, the Immortals)
-			return "%s call you %s (standing %d of %d)" % [Game.the_race(str(n[1])), title, int(g.standing.get(str(n[1]), 0)), int(n[2])]
+			# (a people whose name already begins with "The": the Thousand Children, the Immortals; as
+			# Game.the_race writes it)
+			var rn: String = str(Data.RACES[str(n[1])].n)
+			return "%s call you %s (standing %d of %d)" % [rn if rn.begins_with("The ") else "The " + rn, title, int(g.standing.get(str(n[1]), 0)), int(n[2])]
 		"friends":
 			return "%d peoples of the realms call you Friend (now %d)" % [int(n[1]), friends(g)]
 		"gates":
