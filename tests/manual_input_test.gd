@@ -82,6 +82,9 @@ func _process(_d: float) -> bool:
 			expect(Cultures.own(gs0) == "steppe" and Cultures.tier(gs0, "steppe") == 2 and gs0.prologue == "steppe", "kin of the Felt Hearth, and the story begins there")
 		15:
 			expect(main.top_name() == "dialogue" and str(main.dialogue.lines[0][1]).contains("tents of the horse-folk"), "Begin starts the new game with the last morning at her hearth")
+			# (the typewriter types the name the player gave, never the story's own letter by letter)
+			expect(main.dialogue.text_of(1).contains("Bai Chen's year was spent here") and not main.dialogue.text_of(1).contains("Lin Feng") and main.dialogue.line_len() == main.dialogue.text_of(0).length(),
+				"a line is typed with the hero's own name in it from its first letter")
 			# (three lines; Enter once to finish typing a line and once to go on)
 			for i in 6:
 				tap(KEY_ENTER)

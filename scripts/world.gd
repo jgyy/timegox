@@ -2643,6 +2643,12 @@ func _draw_hud() -> void:
 		var bw := maxf(440.0, UI.font().get_string_size(btxt, HORIZONTAL_ALIGNMENT_LEFT, -1, 26).x + 60.0)
 		UI.panel(self, Rect2(VIEW.x * 0.5 - bw * 0.5, 96, bw, 52), Color(0.04, 0.06, 0.13, 0.85 * a), Color(UI.C_BORDER.r, UI.C_BORDER.g, UI.C_BORDER.b, a))
 		UI.text(self, Vector2(VIEW.x * 0.5 - bw * 0.5, 130), btxt, 26, Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, a), HORIZONTAL_ALIGNMENT_CENTER, bw)
+		# the Six Hearths (cultures.gd): whose country this is, and what they call the hero there
+		var bh := Cultures.of_area(area_id)
+		if bh != "" and banner_text == "":
+			var hh: Dictionary = Cultures.HEARTHS[bh]
+			var hc: Color = hh.col
+			UI.text(self, Vector2(VIEW.x * 0.5 - 300.0, 166), "Country of %s  -  %s" % [str(hh.n), Cultures.tier_name(Cultures.tier(Game, bh)).to_lower()], 15, Color(hc.r, hc.g, hc.b, a).lightened(0.3), HORIZONTAL_ALIGNMENT_CENTER, 600.0)
 	elif banner_text != "":
 		banner_text = ""
 	# interaction hint

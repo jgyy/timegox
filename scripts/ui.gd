@@ -30,6 +30,8 @@ static var _fem := false
 ## set while a line already told of her is drawn (a conversation: main.say tells it line by line, with
 ## who spoke and what was said before, which a line by itself cannot know)
 static var told := false
+## set while words are drawn exactly as given (a line the typewriter is part of the way through)
+static var raw := false
 
 static func set_hero_name(family: String, given: String, fem: bool = false) -> void:
 	_rename = []
@@ -47,6 +49,8 @@ static func set_hero_name(family: String, given: String, fem: bool = false) -> v
 		_rename.append([r, str(sb[1])])
 
 static func named(s: String) -> String:
+	if raw:
+		return s
 	# (told of a woman first, while the line still has the name the story was written with)
 	if _fem and not told:
 		s = Voice.she(s)

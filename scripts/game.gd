@@ -787,7 +787,7 @@ func create_hero(h: Dictionary) -> void:
 	# the dantian and body the origin gives start full
 	hp[0] = float(max_hp(0))
 	qi[0] = float(max_qi(0))
-	note("%s, %s, kin %s, sets out" % [hero_name(), str(o.short), str(hh.short)])
+	note("%s, %s, kin %s, sets out" % [hero_name(), Voice.her(str(o.short)) if Fashion.fem(hero) else str(o.short), str(hh.short)])
 
 ## Whether the hero is a woman (character creation), and one word or the other by it.
 func fem() -> bool:
