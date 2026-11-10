@@ -1814,7 +1814,9 @@ func _run() -> void:
 	if main.args.has("boss-shots"):
 		main.world.open_world()
 	for bid in str(main.args.get("boss-shots", "")).split(",", false):
-		for aid in Data.AREA_CHAIN:
+		# (every region, the mountain round the sect too: it is not on the chain of regions the story
+		# opens one after another, and a lord who stands on it, Part XVIII's Huilu, could not be shot)
+		for aid in Data.AREAS:
 			var aspec: Dictionary = Data.AREAS[aid]
 			for bb in aspec.get("bosses", []):
 				if bb.id != bid:
@@ -2103,9 +2105,16 @@ func _run() -> void:
 	if main.args.has("sword"):
 		# the Spring Thunder release (--sword, or --sword=a,b): the sword in the open world and Part XVII
 		await _sword_shots(str(main.args.sword))
+	if main.args.has("fire"):
+		# the New Fire release (--fire, or --fire=a,b): the Six Hearths, the hero as a young woman, the
+		# beginnings and the ends, and Part XVIII
+		await _fire_shots(str(main.args.fire))
 	if main.args.has("ending"):
-		# the ending on its own (--ending): its film and the results
+		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
+		# and the results
 		_ending_state()
+		if Cultures.ENDINGS.has(str(main.args.ending)):
+			Game.ending = str(main.args.ending)
 		await _ending_shots()
 	if main.args.has("no-extras"):
 		get_tree().quit(0)
@@ -2473,3 +2482,146 @@ func _obstacle_shots(step_id: String, ob_id: String, n: String) -> void:
 	while main.top_name() == "dialogue":
 		_skip_talk()
 		await _wait(0.1)
+
+## The New Fire release (cultures.gd, voice.gd): the creation screen with its two new choices, the four
+## looks on a woman's frame, the people and the dress of the Six Hearths, the faces before and after
+## the re-sculpt, the Hearths page, two of the six beginnings, Part XVIII's obstacles and foes, and the
+## choice of an end with one of the ends chosen.
+func _fire_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	if want.call("create"):
+		Game.reset()
+		main.set_stack(["title"])
+		main.open_creation()
+		main.create.h = {"family": "Lin", "given": "Feng", "body": "f", "look": "sweeper", "hair": 0, "eyes": 0, "robe": 0, "origin": "foundling", "hearth": "valley"}
+		main.create.cursor = main.create.ROWS.find("body")
+		main.create._preview()
+		await _wait(1.5)
+		await _shot("create_woman")
+		main.create.h = {"family": "Su", "given": "Lan", "body": "f", "look": "wanderer", "hair": 1, "eyes": 2, "robe": 1, "origin": "hunter", "hearth": "steppe"}
+		main.create.cursor = main.create.ROWS.find("hearth")
+		main.create._preview()
+		await _wait(1.5)
+		await _shot("create_hearth")
+		main.set_stack(["title"])
+		main.title.show_hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false})
+	main.set_stack(["world"])
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.world.banner_t = 0.0
+	if want.call("looks"):
+		var looks: Array = []
+		for lk in Fashion.LOOK_ORDER:
+			looks.append(Models.hero({"look": lk, "cols": {}, "outfit": "sweeper", "fem": true}))
+		for lk2 in Fashion.LOOK_ORDER:
+			looks.append(Models.hero({"look": lk2, "cols": {}, "outfit": "sweeper", "fem": false}))
+		await _gallery("hero_women_and_men", looks, 0.62, 0.2)
+		await _portraits("hero_women_faces", [Models.hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": true}), Models.hero({"look": "wanderer", "cols": {}, "outfit": "sweeper", "fem": true}),
+			Models.hero({"look": "wild", "cols": {}, "outfit": "sweeper", "fem": true}), Models.hero({"look": "scholar", "cols": {}, "outfit": "sweeper", "fem": true})], 0.62, 1.68, 1.9)
+	if want.call("people"):
+		# the keeper of the Felt Hearth and her grandson, the dress of five hearths, and the Lord of Fire
+		await _gallery("hearth_people", [Assets.person("sarnai"), Assets.person("batu"), Assets.person("folk_herder_f"), Assets.person("folk_herder"), Assets.person("folk_oasis_f"),
+			Assets.person("folk_boatwoman"), Assets.person("folk_founder"), Assets.person("folk_lantern_f")], 0.6, 0.2)
+		await _portraits("hearth_faces", [Assets.person("sarnai"), Assets.person("folk_oasis_f"), Assets.person("folk_boatwoman"), Assets.person("folk_lantern_f")], 0.66, 1.68, 2.1)
+	if want.call("sculpt"):
+		# the faces after the re-sculpt, beside what docs/screenshots/anime_faces.png showed before it
+		await _portraits("sculpt_faces", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0), "look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false}), Assets.person("chang_e"), Assets.person("hu_qingyi")], 0.62, 1.68, 1.9)
+		var after: Image = last_img.duplicate()
+		var before := Image.load_from_file(ProjectSettings.globalize_path("res://docs/screenshots/anime_faces.png"))
+		if before != null and not before.is_empty():
+			before.resize(after.get_width(), after.get_height(), Image.INTERPOLATE_LANCZOS)
+			var sheet := Image.create(after.get_width(), after.get_height() * 2, false, after.get_format())
+			before.convert(after.get_format())
+			sheet.blit_rect(before, Rect2i(0, 0, after.get_width(), after.get_height()), Vector2i(0, 0))
+			sheet.blit_rect(after, Rect2i(0, 0, after.get_width(), after.get_height()), Vector2i(0, after.get_height()))
+			sheet.save_png("%s/sculpt_before_after.png" % dir)
+			print("[tour] sculpt_before_after")
+		await _gallery("sculpt_cast", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0), "look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": true}), Models.hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false}),
+			Assets.person("chang_e"), Assets.person("elder_qing"), Assets.person("ah_mei"), Assets.person("granny_wen"), Assets.person("sarnai"), Assets.person("zhurong")], 0.46, 0.0)
+	if want.call("page"):
+		_ending_state()
+		Game.finished = false
+		Game.hearth = {"valley": 12, "steppe": 10, "sand": 12, "river": 7, "forge": 4, "dawn": 12}
+		main.world.clear_cache()
+		main.world.load_area("sect", Vector2i(20, 12))
+		main.open_menu()
+		await _wait(0.6)
+		await _shot("menu_hearths_root")
+		main.menu.mode = "hearths"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("hearths_page")
+		main.pop()
+	if want.call("prologue") or which.contains("prologue_"):
+		for hid in ["steppe", "sand", "valley"]:
+			# (--fire=prologue_steppe: one of them)
+			if not want.call("prologue") and not only.has("prologue_" + hid):
+				continue
+			main.new_game({"family": "Su", "given": "Lan", "body": "f", "look": "wanderer", "hair": 1, "eyes": 2, "robe": 1, "origin": "hunter", "hearth": hid})
+			Game.clock = 7.2 * 60.0
+			await _wait(2.5)
+			await _shot("prologue_%s_words" % hid)
+			while main.top_name() == "dialogue":
+				_skip_talk()
+				await _wait(0.1)
+			var keeper = main.world.find_ent(str(Cultures.HEARTHS[hid].keeper))
+			if keeper != null:
+				var by := _nearest_free(keeper.pos)
+				main.world.teleport(by)
+				main.world.leash = by
+				main.world.facing = keeper.pos - by if absi(keeper.pos.x - by.x) + absi(keeper.pos.y - by.y) == 1 else Vector2i(0, -1)
+				main.world.cam_q = _quarter(Vector2(main.world.facing))
+				main.world._snap_cam()
+			main.world.banner_t = 3.0
+			await _wait(2.0)
+			await _shot("prologue_%s" % hid)
+			if keeper != null and hid == "steppe":
+				main.interact(keeper)
+				await _wait(1.0)
+				main.dialogue.shown = 999.0
+				await _wait(0.6)
+				await _shot("prologue_%s_farewell" % hid)
+				while main.top_name() == "dialogue":
+					_skip_talk()
+					await _wait(0.1)
+		Game.reset()
+	if want.call("part18"):
+		_spring_state("s_p18_home")
+		Game.level = 67
+		main.world.clear_cache()
+		main.set_stack(["world"])
+		main.world.open_world()
+		await _obstacle_shots("s_p18_clinker", "p18_clinker1", "part18_clinker")
+		await _obstacle_shots("s_p18_brush", "p18_brush1", "part18_brush")
+		await _gallery("part18_foes", [_foe("damp_smoke"), _foe("bilge_imp"), _foe("drowned_ember"), _foe("zhurong", true), _foe("ash_moth"), _foe("cinder_imp"), _foe("clinker_crab"),
+			_foe("huilu", true), _foe("wildfire_sprite"), _foe("spark_swallow"), _foe("smoke_hound")], 1.15, 0.25)
+	if want.call("ends"):
+		_ending_state()
+		Game.hero = Fashion.default_hero()
+		Game.hero["body"] = "f"
+		Game.hero["hearth"] = "river"
+		UI.set_hero_name("Lin", "Feng", true)
+		Game.hearth = {"valley": 9, "steppe": 10, "sand": 12, "river": 12, "forge": 7, "dawn": 12}
+		for rc in ["yumin", "dragon", "tianhu", "jiaoren", "deathless", "shade"]:
+			Game.standing[rc] = 60
+			Game.met[rc] = true
+		main.world.clear_cache()
+		main.set_stack(["world"])
+		main.world.load_area("sect", Vector2i(20, 12))
+		main.world.refresh_hero()
+		main.choose_ending()
+		main.choice.cursor = 2
+		await _wait(1.0)
+		await _shot("ending_choice")
+		main.pop()
+		Game.ending = "road"
+		main.push("ending")
+		await _wait(1.0)
+		main.ending.t = 4.0
+		main.press("confirm")
+		await _wait(3.5)
+		await _shot("ending_road")
+		main.pop()
+		UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
+		Game.reset()

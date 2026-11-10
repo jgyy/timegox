@@ -153,7 +153,21 @@ const TITLES := {"farmer": ["Farmer", "Farmer"], "fisher": ["Fisherman", "Fisher
 	"disciple": ["Disciple", "Disciple"], "servant": ["Steward", "Steward"]}
 
 ## the bodies that are women and girls (for names and words)
-const FEM := ["folk_farmwife", "folk_shopwife", "folk_girl", "folk_grandma", "folk_maiden", "folk_disciple_f", "folk_jiaoren"]
+const FEM := ["folk_farmwife", "folk_shopwife", "folk_girl", "folk_grandma", "folk_maiden", "folk_disciple_f", "folk_jiaoren",
+	"folk_oasis_f", "folk_boatwoman", "folk_lantern_f", "folk_herder_f"]
+## The Six Hearths (cultures.gd, the New Fire release): the dress of each hearth of the land
+## (art/characters/folk_*.py), worn by about half of its grown men ("m") or women ("f"), or by everybody
+## of one trade ("m:smith"); and the names its people go by where they are not the valley's.
+const HEARTH_BODIES := {
+	"sand": {"f": "folk_oasis_f"},
+	"river": {"f": "folk_boatwoman", "f:washer": "folk_boatwoman", "f:merchant": "folk_boatwoman", "f:fisher": "folk_boatwoman"},
+	"forge": {"m:smith": "folk_founder", "m:porter": "folk_founder"},
+	"dawn": {"f": "folk_lantern_f"},
+}
+const HEARTH_NAMES := {
+	"sand": {"m": ["Rustam", "Darab", "Bahram", "Yusuf", "Anush", "Sartak", "Varaz", "Kamran", "Zurab", "Mihr", "Tarkhan", "Ormuz"],
+		"f": ["Shirin", "Laleh", "Parvana", "Roshan", "Anahit", "Zarina", "Gulnar", "Mahin", "Soraya", "Nilufar", "Tamina", "Yasmin"]},
+}
 ## the bodies that are children and elders
 const KID := ["folk_boy", "folk_girl"]
 const OLD := ["folk_grandpa", "folk_grandma"]
@@ -195,10 +209,34 @@ static func people(wd: Dictionary, tid: String) -> Array:
 				"fem": body in FEM, "kid": body in KID, "old": body in OLD, "night": bool(t.get("night", false))}
 			p.n = _name(p, rng, used_names)
 			p.dye = _dye(role, rng)
+			_hearth_dress(p, used_names)
 			out.append(p)
 			i += 1
 	_towns[key] = out
 	return out
+
+## The Six Hearths (cultures.gd): person `p` in the dress and under a name of their own hearth.  Decided
+## from the seed they already have, so nobody else in the town changes for it.
+static func _hearth_dress(p: Dictionary, used: Dictionary) -> void:
+	var hid := Cultures.of_town(str(p.town))
+	if hid == "" or bool(p.kid) or bool(p.old):
+		return
+	var sx := "f" if bool(p.fem) else "m"
+	var hb: Dictionary = HEARTH_BODIES.get(hid, {})
+	if hb.has(sx + ":" + str(p.role)):
+		p.body = str(hb[sx + ":" + str(p.role)])
+	elif hb.has(sx) and int(p.seed) % 2 == 0 and not str(p.role) in ["monk", "guard", "disciple"]:
+		p.body = str(hb[sx])
+	var hn: Dictionary = HEARTH_NAMES.get(hid, {})
+	if hn.has(sx) and str(p.role) != "monk":
+		var pool: Array = hn[sx]
+		var tt: Array = TITLES.get(str(p.role), ["Brother", "Sister"])
+		for k in pool.size():
+			var n := "%s %s" % [str(tt[1] if bool(p.fem) else tt[0]), str(pool[(int(p.seed) + k) % pool.size()])]
+			if not used.has(n):
+				used[n] = true
+				p.n = n
+				break
 
 static func _body(race: String, role: String, rng: RandomNumberGenerator) -> String:
 	var b: Dictionary = BODIES.get(race, BODIES.human)
@@ -710,6 +748,13 @@ static func line(p: Dictionary, g) -> String:
 		pool.append_array(PEOPLE_LINES[race])
 	pool.append_array(LINES.get(str(p.role), LINES.youth))
 	pool.append_array(HOUR_LINES.get(Clock.part(h), []))
+	# the Six Hearths (cultures.gd): the first thing anybody says to a stranger is their own hearth's
+	# way of saying hello, and after that its customs come up as often as their trade does
+	var hid := Cultures.of_town(str(p.town))
+	if hid != "":
+		pool.append_array(Cultures.HEARTHS[hid].lines)
+		if n == 0 and not new_year(g) and Clock.frozen(g) == "":
+			pool = [str(Cultures.HEARTHS[hid].lines[int(p.seed) % (Cultures.HEARTHS[hid].lines as Array).size()])]
 	if new_year(g):
 		# New Year's Day: everybody has the same thing to say, and says it
 		pool = (CHILD_NEW_YEAR if bool(p.kid) else NEW_YEAR_LINES).duplicate()
@@ -756,15 +801,25 @@ static func greeting(p: Dictionary, g) -> String:
 	if Clock.frozen(g) == "night":
 		return "Louder!" if int(p.seed) % 2 == 0 else "Bang it!"
 	if bool(p.kid):
-		return ["Hello!", "It's him!", "Can you fly?"][int(p.seed) % 3]
+		return ["Hello!", "It's %s!" % ("her" if Fashion.fem(g.hero) else "him"), "Can you fly?"][int(p.seed) % 3]
+	# the Six Hearths (cultures.gd): every other grown person hails in their own hearth's way
+	var hid := Cultures.of_town(str(p.town))
+	if hid != "" and int(p.seed) % 2 == 1:
+		return Cultures.hail(hid, int(p.seed) / 2)
 	var opts: Array = GREETINGS.get(Clock.part(Clock.hour(g)), ["Hello!"])
 	var s: String = str(opts[int(p.seed) % opts.size()])
 	# (the hero's own family name, as the player chose it: a Label3D does not go through UI.named)
-	return s.replace("%s", ("Lord " + str(g.hero.get("family", "Lin"))) if g.realm() >= 4 else "young master") if s.contains("%s") else s
+	var fem: bool = Fashion.fem(g.hero)
+	return s.replace("%s", (("Lady " if fem else "Lord ") + str(g.hero.get("family", "Lin"))) if g.realm() >= 4 else ("young mistress" if fem else "young master")) if s.contains("%s") else s
 
 ## Whether townsperson `p` is of kind `role` ("child" means any child of the towns).
 static func is_role(p: Dictionary, role: String) -> bool:
 	return bool(p.kid) if role == "child" else str(p.role) == role
+
+## Whether townsperson `p` lives where step `s` asks for its people (Part XVIII: an errand among the
+## people of one hearth names its town; the older errands are for anybody's).
+static func in_town(p: Dictionary, s: Dictionary) -> bool:
+	return not s.has("town") or str(p.town) == str(s.town)
 
 static func hongbao_line(p: Dictionary) -> String:
 	return str(HONGBAO_LINES[int(p.seed) % HONGBAO_LINES.size()])
@@ -797,6 +852,27 @@ const ERRANDS := {
 			"In my day the young ones came round with oranges. You came round with nothing and I don't mind at all. Sit a while.",
 			"Good health in it! At my age I'll take the health and you can keep the long life. Happy new year, child.",
 			"Another year! I've seen eighty of them. This one began with dragons and ended with dumplings. That's the right way round."]},
+	# Part XVIII (the New Fire release, cultures.gd): the ways of three of the Six Hearths, done their way
+	"s_p18_valley": {"ask": "Have you eaten? ...No, wait. That is yours to ask.", "price": 0, "toast": "Ate cold gruel at %s's table",
+		"lines": ["Have you eaten? No? Good. Sit. It's cold, mind. The stove's been sulking for three days and I've given up coaxing it.",
+			"Have you eaten? You have not. Nobody who says yes is telling the truth. Here: gruel, mustard, half a duck egg. Cold, and no worse for it.",
+			"Eat first. Then tell me why the sweeper is going round the village at supper time asking for cold rice. Is it a cultivation thing?",
+			"My mother kept the cold-food day every year. Fire out, cold rice, and she'd say: now you know what it's for. I thought she was only being difficult.",
+			"Have you eaten? Sit down. Don't stand your chopsticks in it, there's a good child. You were always doing that. Granny Wen used to slap your hand.",
+			"Cold. I know. I held the pot over the fire an hour and it came off the way it went on. Eat it anyway; the mustard is the good part.",
+			"You'll have a bowl with us. Don't argue. A person who leaves a Qingshi kitchen empty takes the luck with them, and we haven't much to spare this month."]},
+	"s_p18_sand": {"ask": "One stick for the oven from every caravan. Shall I carry one with you?", "price": 0, "toast": "Carried a stick to the oven with %s",
+		"lines": ["A stick for Aysha's oven? From the mountain? Then carry it on the left shoulder, friend. The right is for goods you mean to sell.",
+			"One stick each, and you say where it is from when you lay it in. I say Samarkand every time. I have never been to Samarkand. The oven does not mind.",
+			"Have you drunk? Drink first. Then lift. A man who carries wood in this sun on an empty skin is a man we carry afterwards.",
+			"Every caravan, one stick. There was none all winter, you know. Not one caravan. I used to curse the loads. I never thought I would miss a load."]},
+	"s_p18_dawn": {"ask": "First light to you. I'll be your first sale, at your price.", "price": 60, "toast": "Was %s's first customer of the day",
+		"lines": ["First light! At my price? You know the rule, then. Take it, take it, and may everybody after you be half as easy.",
+			"The first sale by lamplight sets the luck for the day. Mind you, by these lamps I can hardly see what I'm selling you. It may be a fan. Let us both hope it is a fan.",
+			"No haggling? On the first? Somebody raised you properly. Here, and one extra, which is not a discount, it is a custom, there is a difference.",
+			"First light to you too. I was about to light a second lamp to see the first one by. Whatever is wrong with the fire, do hurry up and mend it.",
+			"At my price! I had a speech ready and everything. Well. Take it. You have ruined my morning in the pleasantest way.",
+			"The first customer is never argued with. The second pays for it. Stay and watch the second, if you like; it is the best show in the market."]},
 	# Part XVII (the Spring Thunder release): the sowing, and Qingming kites
 	"s_p17_sow": {"ask": "The ground's open at last. Can I help with the sowing?", "price": 0, "toast": "Helped %s with the sowing",
 		"lines": ["Help? From the sweeper? Then take the basket and walk behind me. Scatter, don't throw. You're feeding the field, not fighting it.",

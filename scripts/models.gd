@@ -292,7 +292,9 @@ static func hero(o: Dictionary = {}) -> Node3D:
 	var ml := Engine.get_main_loop() as SceneTree
 	var g = ml.root.get_node_or_null("Game") if ml != null and ml.root != null else null
 	var look_id: String = str(o.get("look", g.hero.get("look", "sweeper") if g != null and not g.hero.is_empty() else "sweeper"))
-	var asset: String = str(Fashion.LOOKS.get(look_id, Fashion.LOOKS.sweeper).asset)
+	# (the New Fire release: the same look on a woman's frame when the hero is one)
+	var is_fem: bool = bool(o.get("fem", Fashion.fem(g.hero) if g != null else false))
+	var asset: String = Fashion.look_asset(look_id, is_fem)
 	if not Assets.has(Assets.PEOPLE.get(asset, "")):
 		return person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "hair": "topknot"})
 	var cols: Dictionary = o.get("cols", Fashion.hero_colors(g) if g != null and not g.hero.is_empty() else {})

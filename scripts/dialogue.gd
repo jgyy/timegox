@@ -15,8 +15,19 @@ func start(l: Array, callback: Callable = Callable()) -> void:
 	shown = 0.0
 	cb = callback
 
+## The words of line `i` as they are drawn: with the name the player gave the hero (the conversation
+## was told of a man or a woman when it began, main.say).  The typewriter counts these letters: it
+## used to count the story's own and rename what it had typed so far, so with a hero called anything
+## but Lin Feng the old name flashed letter by letter ("Lin F...") before the new one replaced it, and
+## a line with a longer name in it was cut off until Enter.
+func text_of(i: int) -> String:
+	UI.told = true
+	var s := UI.named(str(lines[i][1]))
+	UI.told = false
+	return s
+
 func line_len() -> int:
-	return str(lines[idx][1]).length()
+	return text_of(idx).length()
 
 func typed_done() -> bool:
 	return shown >= line_len()
@@ -53,8 +64,10 @@ func _draw() -> void:
 	var tag := Rect2(84, 496, tw, 36)
 	UI.panel(self, tag, Color(0.12, 0.09, 0.04, 0.95))
 	UI.text(self, Vector2(84, 521), who, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, tw)
-	var txt: String = l[1]
+	var txt: String = text_of(idx)
 	var n := mini(int(shown), txt.length())
+	UI.raw = true
 	UI.wrapped(self, Vector2(88, 572), txt.substr(0, n), 22, UI.C_TEXT, VIEW.x - 180)
+	UI.raw = false
 	if typed_done():
 		UI.text(self, Vector2(VIEW.x - 120, 676 + sin(t * 6) * 3), "v", 22, UI.C_GOLD)

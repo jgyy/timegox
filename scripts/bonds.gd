@@ -820,6 +820,29 @@ const SHARES := {
 			{"id": "home", "label": "\"I came home, like you wanted.\"", "lean": "lotus", "after": [["Lin Feng", "I came home. Every time. Even from the moon. I think that is what you would have wanted most."], ["Yue Ling", "They would. Anybody would."]]},
 			{"id": "world", "label": "\"The world you gave me is still here.\"", "lean": "wander", "after": [["Lin Feng", "The world you led the hunters away to save is still here. I have seen most of it now. It is very large, and some of it is on fire, and it is worth it."], ["Yue Ling", "And we are going to see the rest. Tell them that too."]]},
 		]},
+	# ---- Part XVIII (the New Fire release)
+	"s_p18_drill": {"lines": [
+		["Narrator", "The old fire-ring on the hill above Cloudfoot, inside Kang's circle of bare earth. Six keepers stand round it, each beside a neat pile of kindling stacked in the only proper way. In the middle is a board of jujube wood with a notch in it, a pinch of tinder, and a pot of six coals with the lid off."],
+		["Narrator", "Lin Feng sets Suiren's drill in the notch. It is a two-handed thing, and it goes faster with four: Yue Ling kneels opposite, and their hands go down the spindle one pair after the other, over and over, the way two people pull a saw."],
+		["Yue Ling", "Do not stop. Do not look up. Sarnai is telling the founder that her pile is too tight. ...There. Lin Feng. Smoke."],
+		["Narrator", "A thread of it, and then a red eye in the dust of the notch. Lin Feng tips the six coals on to it one after another, blue, white, yellow, red, orange, green, and for one breath they lie apart. Then the new ember takes hold of all of them at once, and the fire that stands up in the ring is gold."]],
+		"ask": "The new fire is burning. What do you say to her, across it?",
+		"options": [
+			{"id": "both", "label": "\"It took both of us.\"", "lean": "companion", "after": [["Lin Feng", "It would not have caught with two hands. It took four."], ["Yue Ling", "Suiren did it alone. I always thought that was the sad part of the story."]]},
+			{"id": "kitchen", "label": "\"Auntie Zhou will get the first coal.\"", "lean": "lotus", "after": [["Lin Feng", "The first coal goes up the mountain to Auntie Zhou. Before anybody else."], ["Yue Ling", "She will pretend she does not care, and then she will cook for two days."]]},
+			{"id": "carry", "label": "\"Now we have six roads to walk.\"", "lean": "wander", "after": [["Lin Feng", "One coal home to each of them. That is six roads, and none of them short."], ["Yue Ling", "Good. I was afraid it was nearly over."]]},
+		],
+		"end": [["Narrator", "And while the two of them are still kneeling there, getting their breath, six people each take a brand out of the new fire, without a word to one another, and walk quickly to six piles of kindling."]]},
+	"s_p18_feast": {"lines": [
+		["Narrator", "Six tables in the square at Cloudfoot, by the stage, and nobody can agree which is the head, so they have been set in a ring with the new fire in the middle. Gruel and pickled mustard; mutton off the knife; flatbread, torn; a river fish with its bone lifted out; millet cakes burnt on one side; sesame cakes and sweet rice balls."],
+		["Narrator", "The horse-folk eat on the left of the fire and will not be moved. A founder is teaching a boat-child to whistle and being told very firmly by Auntie Rong where he may not do it. Granny Wen has asked forty people whether they have eaten."],
+		["Yue Ling", "Six ways to hold a bowl, and I have been corrected on all of them. Lin Feng, I do not have a way. I woke up by a pond. Whose table do I belong at?"]],
+		"ask": "Whose table does she belong at?",
+		"options": [
+			{"id": "mine", "label": "\"Whichever one I am at.\"", "lean": "companion", "after": [["Lin Feng", "Whichever one I am sitting at. That has been the rule for some time."], ["Yue Ling", "Then you had better choose a table, because Sarnai and Fishwife Lu are both waving at you."]]},
+			{"id": "seventh", "label": "\"Ours. We will set a seventh.\"", "lean": "lotus", "after": [["Lin Feng", "At ours. The mountain's. We set a seventh table, with Auntie Zhou's rice on it."], ["Yue Ling", "A seventh hearth. With a pond. Yes. I should like to be asked whether I have eaten, at my own table."]]},
+			{"id": "all", "label": "\"All of them. One dish at each.\"", "lean": "wander", "after": [["Lin Feng", "All of them. One dish at each table, and the right way to hold the bowl at every one."], ["Yue Ling", "I shall be corrected six more times. I can hardly wait."]]},
+		]},
 	"s_p17_teacup": {"lines": [
 		["Narrator", "The tea table on the terraces looks out over the whole valley: the new green of the paddies, the river at Longmen, the smoke of Qingshi's chimneys, and the mountain behind it all with cloud on its shoulders. Lin Feng heats the water to just below the boil, the way the tea master showed him, and pours it over the six buds."],
 		["Yue Ling", "They are opening. Look. They are standing up in the cup like they have just woken."],
@@ -977,7 +1000,8 @@ const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the 
 	"s_p15_feast": "at her naming feast", "s_p16_sweep": "sweeping out the old year", "s_p16_eve": "at the reunion dinner",
 	"s_p16_vigil": "keeping the vigil", "s_p16_dawn": "at the first dawn of the year", "s_p16_lanterns": "at the Lantern Festival", "s_p16_couplets": "writing the New Year couplets",
 	"s_p17_haircut": "on the day the dragon raised its head", "s_p17_thunder": "drumming the first thunder", "s_p17_teacup": "over the first tea of spring",
-	"s_p17_graves": "at the graves on Qingming", "s_p17_kite": "flying the Qingming kite"}
+	"s_p17_graves": "at the graves on Qingming", "s_p17_kite": "flying the Qingming kite",
+	"s_p18_drill": "drilling the new fire", "s_p18_feast": "at the feast of six tables"}
 
 static func share_place(sid: String) -> String:
 	return str(SHARE_PLACES.get(sid, "side by side"))

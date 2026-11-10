@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Yue Ling", "Dao & Peoples", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "yue", "dao", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Yue Ling", "Dao & Peoples", "Hearths", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "yue", "dao", "hearths", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -58,7 +58,7 @@ func _build() -> void:
 		labels = ["Wake a branch (%d)" % Game.talent_pts, "Back"]
 		ids = ["wake", "back"]
 		enabled = [Game.talent_pts > 0, true]
-	elif mode == "map" or mode == "dao" or mode == "journal":
+	elif mode == "map" or mode == "dao" or mode == "journal" or mode == "hearths":
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
@@ -99,7 +99,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -154,6 +154,10 @@ func press(act: String) -> void:
 					_build()
 				"fates":
 					mode = "fates"
+					cursor = 0
+					_build()
+				"hearths":
+					mode = "hearths"
 					cursor = 0
 					_build()
 				"yue":
@@ -478,6 +482,33 @@ func _draw_dao() -> void:
 		y2 += _wrap_at(r.position + Vector2(612, y2), line, 12, UI.C_DIM.lightened(0.25), 578) + 9.0
 	UI.text(self, Vector2(r.end.x - 200, r.end.y - 16), "Enter / Esc: back", 13, UI.C_DIM)
 
+## The Six Hearths (cultures.gd, the New Fire release): the peoples of the land, how each greets,
+## eats, keeps its fire and what nobody does there, and whether they call the hero a stranger, a guest
+## or kin; the hero's own hearth is marked.
+func _draw_hearths() -> void:
+	var r := Rect2(30, 20, 1220, 680)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 36), "The Six Hearths of the Unbroken Land", 22, UI.C_GOLD)
+	_wrap_at(r.position + Vector2(624, 26), "Guest of %d of 6.  A first word with a hearth's townsfolk, a seat with one of its people, and what is done for it in the story earn a place at it." % Cultures.guests(Game), 12, UI.C_DIM, 570)
+	var own := Cultures.own(Game)
+	for k in Cultures.ORDER.size():
+		var id: String = Cultures.ORDER[k]
+		var hh: Dictionary = Cultures.HEARTHS[id]
+		var at := r.position + Vector2(24 + (k % 2) * 600, 66 + (k / 2) * 204)
+		var t := Cultures.tier(Game, id)
+		var col: Color = hh.col if t >= 1 else UI.C_DIM.lightened(0.15)
+		draw_rect(Rect2(at + Vector2(-6, -16), Vector2(586, 196)), Color(hh.col.r, hh.col.g, hh.col.b, 0.07 if t >= 1 else 0.03))
+		UI.text(self, at, "%s  -  %s" % [str(hh.n).trim_prefix("the "), str(hh.people)], 17, col, HORIZONTAL_ALIGNMENT_LEFT, 360)
+		UI.bar(self, Rect2(at + Vector2(372, -10), Vector2(100, 8)), float(int(Game.hearth.get(id, 0))) / float(Cultures.KIN), hh.col)
+		UI.text(self, at + Vector2(480, 0), Cultures.tier_name(t) + ("  (yours)" if id == own else ""), 13, UI.C_JADE if t >= 1 else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 110)
+		var y := 18.0
+		y += _wrap_at(at + Vector2(0, y), "%s.  \"%s\"" % [str(hh.home), str(hh.greet)], 13, UI.C_TEXT, 570)
+		y += _wrap_at(at + Vector2(0, y), "Table: %s; %s." % [str(hh.dish), str(hh.drink)], 12, UI.C_DIM.lightened(0.3), 570)
+		y += _wrap_at(at + Vector2(0, y), "Fire: %s." % str(hh.fire), 12, UI.C_DIM.lightened(0.3), 570)
+		y += _wrap_at(at + Vector2(0, y), "Custom: %s  %s" % [str(hh.custom), str(hh.taboo)], 12, UI.C_DIM.lightened(0.3), 570)
+		_wrap_at(at + Vector2(0, y), "Festival: %s.  To its guests: %s." % [str(hh.festival), str(hh.guest_text)], 12, col.lightened(0.2), 570)
+	UI.text(self, Vector2(r.end.x - 200, r.end.y - 16), "Enter / Esc: back", 13, UI.C_DIM)
+
 ## Draw `s` wrapped to `width` with its first baseline at `p`; returns how far the next line moves down.
 func _wrap_at(p: Vector2, s: String, size: int, col: Color, width: float) -> float:
 	UI.wrapped(self, p, s, size, col, width)
@@ -702,6 +733,9 @@ func _draw() -> void:
 	if mode == "dao":
 		_draw_dao()
 		return
+	if mode == "hearths":
+		_draw_hearths()
+		return
 	if mode == "annals":
 		_draw_annals()
 		return
@@ -717,7 +751,7 @@ func _draw() -> void:
 	if mode == "yue":
 		_draw_yue()
 		return
-	UI.menu_list(self, Rect2(60, 80, 300, 470), labels, cursor, enabled, 22)
+	UI.menu_list(self, Rect2(60, 80, 300, 470 if mode != "root" else 506), labels, cursor, enabled, 22 if mode != "root" else 21)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
 	# status panel
 	var r := Rect2(400, 80, 820, 560)

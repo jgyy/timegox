@@ -123,6 +123,13 @@ var waves := 0
 var strikes := 0
 ## steps just finished that have words to say about it, waiting for the world ("done:<step>")
 var done_pending: Array = []
+## the Six Hearths (cultures.gd, the New Fire release): standing with each hearth of the land; the
+## named people of the hearths the hero has sat down with; the hearth whose farewell is still to be
+## said (the beginning of the game: "" once the story proper has begun); and the end chosen
+var hearth := {}
+var sat := {}
+var prologue := ""
+var ending := ""
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -211,6 +218,10 @@ func reset() -> void:
 	waves = 0
 	strikes = 0
 	done_pending = []
+	hearth = {"valley": Cultures.KIN}
+	sat = {}
+	prologue = ""
+	ending = ""
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -550,6 +561,12 @@ func advance() -> void:
 	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
 	for race in Data.AREAS.get(str(s.get("area", "")), {}).get("races", []):
 		race_gain(race, 8 if s.kind == "kill" else 5)
+	# and what is done among a hearth of the land for its own people (cultures.gd): a step that names
+	# its hearth is a deed for it; a word, an errand or a scene in its country is a small one
+	if s.has("hearth"):
+		add_hearth(str(s.hearth), Cultures.DEED)
+	elif str(s.kind) in ["talk", "folk", "share", "visits", "rally"]:
+		add_hearth(Cultures.of_area(str(s.get("area", ""))), 1)
 	# an outfit or a ride the story gives here (the Elder's robe, the flying sword, an immortal's cloud)
 	for rw in Fashion.step_rewards(str(s.id)):
 		if rw[0] == "outfit":
@@ -612,6 +629,10 @@ func poll_steps() -> void:
 		advance()
 
 func objective_text() -> String:
+	# the beginning (cultures.gd): the farewell at the hero's own hearth
+	if prologue != "" and Cultures.HEARTHS.has(prologue):
+		var hh: Dictionary = Cultures.HEARTHS[prologue]
+		return "Three years ago, at %s: say goodbye to %s" % [str(hh.n), Trials.npc_name(str(hh.keeper))]
 	var s := cur_step()
 	if s.is_empty():
 		return "The journey is complete."
@@ -744,7 +765,16 @@ func create_hero(h: Dictionary) -> void:
 	hero = Fashion.default_hero()
 	for k in h:
 		hero[k] = h[k]
-	UI.set_hero_name(str(hero.family), str(hero.given))
+	UI.set_hero_name(str(hero.family), str(hero.given), Fashion.fem(hero))
+	# the hearth of the year away (cultures.gd): kin there from the first day, and its keepsakes
+	var hid := Cultures.own(self)
+	hearth = {hid: Cultures.KIN}
+	var hh: Dictionary = Cultures.HEARTHS[hid]
+	for k0 in hh.give:
+		if k0 == "stones":
+			stones += int(hh.give[k0])
+		else:
+			add_item(k0, int(hh.give[k0]))
 	var o := Fashion.origin_of(self)
 	for k2 in o.give:
 		if k2 == "stones":
@@ -757,7 +787,29 @@ func create_hero(h: Dictionary) -> void:
 	# the dantian and body the origin gives start full
 	hp[0] = float(max_hp(0))
 	qi[0] = float(max_qi(0))
-	note("%s, %s, sets out" % [hero_name(), str(o.short)])
+	note("%s, %s, kin %s, sets out" % [hero_name(), Voice.her(str(o.short)) if Fashion.fem(hero) else str(o.short), str(hh.short)])
+
+## Whether the hero is a woman (character creation), and one word or the other by it.
+func fem() -> bool:
+	return Fashion.fem(hero)
+
+func gw(m: String, f: String) -> String:
+	return f if fem() else m
+
+## Standing earned with a hearth of the land (cultures.gd): told when it makes the hero a guest or kin.
+func add_hearth(id: String, n: int) -> void:
+	var t := Cultures.earn(self, id, n)
+	if t > 0:
+		toast(Cultures.welcome(id, t))
+		note("%s of %s" % [Cultures.tier_name(t), str(Cultures.HEARTHS[id].n)])
+
+## The first time the hero sits down with one of a hearth's named people (talk_npc).
+func sit_with(npc: String) -> void:
+	var id := Cultures.of_npc(npc)
+	if id == "" or sat.has(npc) or prologue != "":
+		return
+	sat[npc] = true
+	add_hearth(id, Cultures.SIT)
 
 func grant_outfit(id: String) -> void:
 	if outfits.has(id) or not Fashion.OUTFITS.has(id):

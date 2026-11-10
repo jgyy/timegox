@@ -38,6 +38,10 @@ def _gy(y, c, up, down):
     return math.exp(-((y - c) / s) ** 2)
 
 
+# how far a woman's bust stands out from the section of her chest at its fullest (Torso.anatomy), metres
+BUST = 0.082
+
+
 def _ga(a, c, w):
     """A bump in angle round the body (wrapping), `w` wide."""
     d = math.atan2(math.sin(a - c), math.cos(a - c))
@@ -55,7 +59,8 @@ class Torso:
     * a man is a V: shoulders and chest broad (about 0.19 H across the chest), the waist about
       0.145 H, the hips narrower than the chest, the chest two flat planes of muscle;
     * a woman has narrow shoulders, a high, slender waist (about 0.12 H across, its narrowest at
-      0.6 H, where her sash is tied), hips as wide as her shoulders (about 0.19 H), a lifted bust;
+      0.6 H, where her sash is tied), hips as wide as her shoulders (about 0.19 H), a lifted bust (fuller since the
+      Hundred Hearths release: ``BUST``);
     * both have a seat: round glutes behind the hips, a woman's fuller and higher;
     * the robe falls from the widest point of the hips and seat (`hip_y`), so the waist, the hips
       and the curve of the back show in its silhouette.
@@ -150,10 +155,13 @@ class Torso:
         out = 0.0
         if self.bust > 0.0 and 1.15 < y < 1.42:
             # two lobes either side of the front, lifted, the robe bridging between them
-            gy = _gy(y, 1.295, 0.07, 0.038)
-            lobes = max(_ga(a, 0.58, 0.36), _ga(a, -0.58, 0.36))
-            bridge = 0.8 * smooth(1.0, 0.0, abs(a) / 0.58) if abs(a) < 0.58 else 0.0
-            out += 0.05 * self.bust * gy * max(lobes, bridge)
+            # (the Hundred Hearths release: fuller and a little lower, with a rounder underside and less
+            # of the robe stretched flat between, so the chest reads as a woman's from the front and the
+            # three-quarter view as well as in profile)
+            gy = _gy(y, 1.288, 0.078, 0.046)
+            lobes = max(_ga(a, 0.56, 0.38), _ga(a, -0.56, 0.38))
+            bridge = 0.66 * smooth(1.0, 0.0, abs(a) / 0.56) if abs(a) < 0.56 else 0.0
+            out += BUST * self.bust * gy * max(lobes, bridge)
         if self.pecs > 0.0 and 1.2 < y < 1.42:
             # the chest: two flat planes with a crisp lower edge
             gy = _gy(y, 1.335, 0.06, 0.026)
@@ -906,6 +914,40 @@ def hat(b, o, kind, top):
         for k in range(8):
             a = math.pi * 0.3 + k / 7 * math.pi * 1.4
             b.ball(V(math.sin(a) * 0.32, base - 0.28, math.cos(a) * 0.32 - 0.01), 0.008, "c02a20", cls=CRYSTAL, bone="neck", seg=6, rings=4)
+    elif kind == "felt":
+        # the horse-folk's hat (the New Fire release, the Felt Hearth): a pointed crown of felt with a
+        # turned-up brim of fur and a red knot at the peak
+        col = rgb(hc or "8a3a2a")
+        fur = rgb(o.get("hat_trim", "d8c8a8"))
+        base = top - 0.065
+        b.lathe(V(0, base + 0.03, -0.015), [(0.128, 0.0), (0.12, 0.05), (0.09, 0.11), (0.05, 0.16), (0.012, 0.2), (0.001, 0.205)], col, cls=CLOTH, bone="head", seg=28)
+        verts = b.lathe(V(0, base, -0.015), [(0.132, 0.0), (0.158, 0.012), (0.165, 0.04), (0.15, 0.065), (0.128, 0.07)], fur, cls=HAIR, bone="head", seg=28, folds=(23, 0.05, 0.2), cap_bottom=False)
+        b.recolor(verts, lambda p: lighten(fur, 0.14) if fbm3((p.x * 60, p.y * 30, p.z * 60), 2, 3) > 0.55 else None, cls=HAIR)
+        b.ball(V(0, base + 0.24, -0.015), 0.016, "c02a20", cls=CLOTH, bone="head", seg=8, rings=5)
+        for side in (1, -1):
+            strand(b, [V(0.0, base + 0.235, -0.02), V(0.03 * side, base + 0.2, -0.07), V(0.045 * side, base + 0.1, -0.13)], 0.006, 0.002, "c02a20", cls=CLOTH, bone="head", flat=0.4, seg=5)
+    elif kind == "turban":
+        # the sand roads' wound headcloth (the Sweet-Well Hearth): three turns of cloth round the head, a
+        # tail down the back against the sun
+        col = rgb(hc or "e8dcc0")
+        base = top - 0.085
+        for k, (r, y) in enumerate(((0.142, 0.0), (0.146, 0.04), (0.132, 0.08))):
+            b.lathe(V(0, base + y, -0.015), [(r - 0.03, -0.012), (r, 0.0), (r + 0.006, 0.022), (r - 0.012, 0.045), (r - 0.04, 0.05)], darken(col, 0.05 * k), cls=CLOTH, bone="head", seg=26, folds=(9 + 4 * k, 0.05, 0.6 * k), cap_bottom=False)
+        b.ellipsoid(V(0, base + 0.12, -0.015), (0.1, 0.045, 0.1), col, cls=CLOTH, bone="head", seg=16, rings=8)
+        b.ribbon([V(0.03, base + 0.03, -0.15), V(0.035, base - 0.1, -0.17), V(0.03, base - 0.26, -0.16)], [0.05, 0.055, 0.04], (1, 0, 0), col,
+                 bones=[{"head": 1.0}, {"head": 0.6, "neck": 0.4}, {"neck": 0.5, "chest": 0.5}], col_end=darken(col, 0.15))
+    elif kind == "headcloth":
+        # the river women's headcloth (the Boat Hearth) and the oasis women's scarf: a square of cloth
+        # tied low over the hair with its knot and corners at the nape
+        col = rgb(hc or "3a6a9a")
+        base = top - 0.1
+        b.lathe(V(0, base, -0.02), [(0.142, 0.0), (0.146, 0.04), (0.132, 0.085), (0.09, 0.118), (0.001, 0.13)], col, cls=CLOTH, bone="head", seg=26, folds=(7, 0.03, 0.4))
+        b.tube([V(math.sin(a) * 0.146, base + 0.012 + 0.012 * math.cos(a), math.cos(a) * 0.146 - 0.02) for a in [i / 24 * 2 * math.pi for i in range(25)]], [0.009] * 25,
+               rgb(o.get("hat_trim", lighten(col, 0.35))), cls=CLOTH, bone="head", seg=5, cap0=False, cap1=False)
+        b.ellipsoid(V(0, base + 0.02, -0.165), (0.03, 0.022, 0.02), darken(col, 0.1), cls=CLOTH, bone="head", seg=10, rings=6)
+        for side in (1, -1):
+            b.ribbon([V(0.01 * side, base + 0.02, -0.17), V(0.05 * side, base - 0.08, -0.19), V(0.07 * side, base - 0.18, -0.17)], [0.03, 0.034, 0.012], (1, 0, 0), col,
+                     bones=[{"head": 1.0}, {"head": 0.6, "neck": 0.4}, {"neck": 1.0}], col_end=darken(col, 0.15))
     elif kind == "qing":
         col = rgb(hc or "2a2a30")
         base = top - 0.06

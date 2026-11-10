@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land"}
+const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)
@@ -67,6 +67,11 @@ var done := false
 var built := false
 ## the hero's look and dress the lotus's model was built for (character creation, the wardrobe)
 var hero_sig := ""
+## the New Fire release (cultures.gd ENDINGS): the light of the film for the end chosen, and the hero's
+## own fire on the lotus between the two of them
+var sun_light: DirectionalLight3D = null
+var hearth_fire: Node3D = null
+var ending_sig := "-"
 var groups := {}
 var shot_on := -1
 var hero: Node3D = null
@@ -123,6 +128,7 @@ func _on_show(v: bool) -> void:
 		done = false
 		shot_on = -1
 		_refresh_hero()
+		_refresh_ending()
 
 ## The hero on the lotus as the player made him and dressed him: the world is built once, so a second
 ## New Game (another name, another look) used to end with the first game's hero.
@@ -137,6 +143,33 @@ func _refresh_hero() -> void:
 	hero.transform = xf
 	parent.add_child(hero)
 	hero_sig = sig
+
+## The end the player chose (cultures.gd ENDINGS): its light over the whole film and the colour of the
+## hero's own fire.
+func _refresh_ending() -> void:
+	var id := Cultures.ending_of(Game)
+	if not built or id == ending_sig:
+		return
+	ending_sig = id
+	var sky: Color = Cultures.ENDINGS[id].sky
+	if sun_light != null:
+		sun_light.light_color = Color(1.0, 0.84, 0.66) * sky
+	if hearth_fire != null:
+		for c in hearth_fire.get_children():
+			if c is OmniLight3D:
+				(c as OmniLight3D).light_color = Color(1.0, 0.62, 0.3) * sky
+
+## The film's last line and its caption for the end chosen.
+static func hero_shot() -> Dictionary:
+	var ml := Engine.get_main_loop() as SceneTree
+	var g = ml.root.get_node_or_null("Game") if ml != null and ml.root != null else null
+	var s: Dictionary = FILM[FILM.size() - 1].duplicate()
+	if g != null and str(g.ending) != "" and Cultures.ENDINGS.has(str(g.ending)) and str(g.ending) != "azure":
+		var en: Dictionary = Cultures.ENDINGS[str(g.ending)]
+		s["place"] = str(en.n)
+		var sub: String = str(en.sub)
+		s["line"] = "Lin Feng, once a sweeper of steps, holds up the sky by choice, and keeps a fire: %s." % (sub.substr(0, 1).to_lower() + sub.substr(1))
+	return s
 
 func _build3d() -> void:
 	opaque = true
@@ -155,6 +188,7 @@ func _build3d() -> void:
 	sun.rotation_degrees = Vector3(-24.0, -28.0, 0.0)
 	sun.sky_mode = DirectionalLight3D.SKY_MODE_LIGHT_ONLY
 	scene3d.add_child(sun)
+	sun_light = sun
 	scene3d.add_child(Look.fill("garden"))
 
 func _group(n: String, pos: Vector3) -> Node3D:
@@ -275,6 +309,29 @@ func _build_hero() -> void:
 	comp.position = Vector3(0.42, 0.3, -0.2)
 	comp.rotation.y = -0.15
 	g.add_child(comp)
+	# the New Fire release: the hero's own fire, three stones and a flame on the lotus before the two
+	# of them (wherever it is kept, cultures.gd ENDINGS: the film's light changes with the end chosen)
+	hearth_fire = Node3D.new()
+	hearth_fire.position = Vector3(0.06, 0.34, 0.62)
+	g.add_child(hearth_fire)
+	var hs := MB.new()
+	for k3 in 3:
+		var a3 := TAU * k3 / 3.0 + 0.4
+		hs.sph_hi(Vector3(cos(a3) * 0.13, 0.03, sin(a3) * 0.13), Vector3(0.075, 0.055, 0.07), MB.tag(Color("6a6460"), MB.STONE))
+	MB.mesh_node(hearth_fire, hs.build(MB.mat_plain()))
+	var hf := MB.new()
+	hf.sph_hi(Vector3(0, 0.1, 0), Vector3(0.07, 0.13, 0.07), Color(1.0, 0.66, 0.22, 0.95))
+	hf.sph_hi(Vector3(0.02, 0.17, 0.01), Vector3(0.04, 0.1, 0.04), Color(1.0, 0.9, 0.5, 0.95))
+	_halo(hf, Vector3(0, 0.12, 0), 0.34, Color(1.0, 0.6, 0.25, 0.5), 4)
+	var hfn := MB.mesh_node(hearth_fire, hf.build(MB.mat_glow()))
+	hfn.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	hfn.set_meta("flame", true)
+	var hl := OmniLight3D.new()
+	hl.light_color = Color(1.0, 0.62, 0.3)
+	hl.light_energy = 1.4
+	hl.omni_range = 3.2
+	hl.position = Vector3(0, 0.25, 0)
+	hearth_fire.add_child(hl)
 	for k in 3:
 		var sl := MB.new()
 		sl.sph_hi(Vector3.ZERO, Vector3.ONE * 0.045, Color(1.0, 0.92, 0.7, 1.0))
@@ -893,7 +950,7 @@ func _draw() -> void:
 
 ## the shot's place in gold capitals and its line of the epilogue, low in the frame
 func _subtitle(i: int, u: float) -> void:
-	var s: Dictionary = FILM[i]
+	var s: Dictionary = FILM[i] if i < FILM.size() - 1 else hero_shot()
 	var dur := float(s.dur)
 	var a := smoothstep(0.6, 1.3, u) * (1.0 - smoothstep(dur - 0.9, dur - 0.4, u))
 	if i == FILM.size() - 1:
@@ -927,6 +984,10 @@ func _card(a: float) -> void:
 	var ncol: Color = Trials.KINDS[fav].col if fav != "" else UI.C_GOLD
 	_say(Vector2(lc - 380.0, 138.0), who, 22, ncol.lerp(Color.WHITE, 0.3), ta, HORIZONTAL_ALIGNMENT_CENTER, 760.0)
 	_rule(Vector2(lc, 158.0), 210.0, ta)
+	# the end the player chose for the hero's own fire (cultures.gd ENDINGS)
+	var en: Dictionary = Cultures.ENDINGS[Cultures.ending_of(Game)]
+	_caps(Vector2(lc, 184.0), str(en.n).to_upper(), 15, Color("ffd9a0").lerp(Color(en.sky), 0.5), ta, 5.0)
+	_say(Vector2(lc - 380.0, 208.0), str(en.sub), 16, Color("f4ecd8"), ta, HORIZONTAL_ALIGNMENT_CENTER, 760.0)
 	# how the war god's story ended, at the foot of the frame
 	var road := str(Game.trials.get("chiyou", ""))
 	if ROAD_ENDS.has(road):
@@ -1037,6 +1098,9 @@ func _results(a: float, slide: float) -> void:
 			fallen += 1
 	y += 21.0
 	var fl := "Of the five he met on the road: %d stand with him%s" % [Fate.allies(Game), (", %d fallen" % fallen) if fallen > 0 else ""]
+	# (the results are about nobody but the hero: told of her when she is one, voice.gd)
+	if Game.fem():
+		fl = Voice.her(fl)
 	_say(Vector2(x0, y), fl, UI.fit(fl, 14, w), Trials.KINDS.bond.col, a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	# and the grudges that stayed where their owners fell (grudges.gd)
 	if not Game.grudges.is_empty():
@@ -1049,6 +1113,8 @@ func _results(a: float, slide: float) -> void:
 		y += 18.0
 		var fut: Dictionary = Bonds.FUTURES.get(Game.future, {})
 		var yl := "Yue Ling: %s%s" % [Bonds.title(Game), ("; " + str(fut.get("short", fut.n))) if not fut.is_empty() else ""]
+		if Game.fem():
+			yl = Voice.her(yl)
 		_say(Vector2(x0, y), yl, UI.fit(yl, 14, w), Color("ff9ac0"), a, HORIZONTAL_ALIGNMENT_CENTER, w)
 	var pa := smoothstep(tf + 2.0, tf + 2.6, t) * (0.65 + 0.35 * sin(t * 2.4))
 	_say(Vector2(x0, maxf(r.end.y - 14.0, y + 24.0)), "Press Enter", 13, UI.C_DIM, a * pa, HORIZONTAL_ALIGNMENT_CENTER, w)
