@@ -2336,27 +2336,41 @@ func _qi_shots() -> void:
 	main.world.open_world()
 	w.enter_layer("surface")
 	var lw := Atlas.world_of("surface")
-	# a long straight run of open ground in the village's fields
+	# a long straight run of open ground in a field: the Scorched Millet Plains first, else round the
+	# village, the tea terraces or the maple gorge
 	var start := Vector2i(-1, -1)
 	var dir := Vector2i(1, 0)
-	var vg := _land_ent("granny_wen")
-	var base: Vector2i = vg.pos if not vg.is_empty() else Atlas.to_world("village", Vector2i(30, 30))
-	for r in 30:
-		for dx in range(-r, r + 1):
-			for dy in [-r, r]:
-				for dd in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
-					var p: Vector2i = base + Vector2i(dx, dy)
-					if start.x >= 0:
-						continue
-					var ok := true
-					for k in 9:
-						var q: Vector2i = p + dd * k
-						if not w.tile_free(q) or lw.grid[q.y * int(lw.w) + q.x] == MapGen.PATH or w.ent_at(q) != null:
-							ok = false
-							break
-					if ok:
-						start = p
-						dir = dd
+	var bases: Array = []
+	for aid in ["millet", "village", "terraces", "maple"]:
+		var sp: Dictionary = Data.AREAS[aid]
+		bases.append(Atlas.to_world(aid, Vector2i(int(sp.w) / 2, int(sp.h) / 2)))
+	for base in bases:
+		if start.x >= 0:
+			break
+		for r in 45:
+			if start.x >= 0:
+				break
+			for dx in range(-r, r + 1):
+				for dy in [-r, r]:
+					for dd in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
+						var p: Vector2i = base + Vector2i(dx, dy)
+						if start.x >= 0:
+							continue
+						var ok := true
+						# (open ground behind him too, for the eye over his shoulder, and two tiles either side: a
+						# field, not a lane between houses)
+						var sd := Vector2i(-dd.y, dd.x)
+						for k in range(-6, 9):
+							for o2 in [0, -2, -1, 1, 2]:
+								var q: Vector2i = p + dd * k + sd * o2
+								if not w.tile_free(q) or lw.grid[q.y * int(lw.w) + q.x] == MapGen.PATH or w.ent_at(q) != null:
+									ok = false
+									break
+							if not ok:
+								break
+						if ok:
+							start = p
+							dir = dd
 	if start.x < 0:
 		return
 	w.teleport(start, "surface")
@@ -2378,7 +2392,7 @@ func _qi_shots() -> void:
 			break
 	w.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(look, Vector3.UP)
 	w.qi_wave()
-	await _wait(0.3)
+	await _wait(0.12)
 	await _shot("sword_qi")
 	await _wait(1.6)
 	await _shot("sword_qi_mown")
