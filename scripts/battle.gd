@@ -32,6 +32,9 @@ var level_before := 0
 var first_blow := true
 ## the Sword's Wake (impact.gd): this pack was struck first in the land (it opens the battle reeling)
 var ambush := false
+## the hours of the wild (habits.gd): what the pack was doing when it was met ("" for a boss, a
+## tribulation, a battle of the story)
+var habit := ""
 var vajra_used := false
 var tide_used := false
 var suppress_note := ""
@@ -258,7 +261,32 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	if ambush:
 		for f in foes:
 			if not f.boss:
-				f.hp = maxf(1.0, float(f.hp) - float(f.maxhp) * Impact.AMBUSH_HURT)
+				f.hp = maxf(1.0, float(f.hp) - float(f.maxhp) * (Impact.AMBUSH_HURT + Works.add(Game, "ambush")))
+	# the hours of the wild (habits.gd): a pack met hunting hits harder, one met roosting stands up to
+	# more, one met resting in the heat is slow (what it was doing is told with the first words below)
+	habit = str(c.get("habit", ""))
+	if habit != "":
+		for f in foes:
+			if not f.boss:
+				f.atk = float(f.atk) * Habits.mod(habit, "atk")
+				f.spd = float(f.spd) * Habits.mod(habit, "spd")
+				var hk := Habits.mod(habit, "hp")
+				if hk != 1.0:
+					f.maxhp = float(f.maxhp) * hk
+					f.hp = float(f.hp) * hk
+	# the Hundred Works (works.gd): Yue Ling's repeating crossbow opens on a pack before anybody moves,
+	# and the heaven-watching mirror finds a pack that sleeps before it wakes
+	if not c.get("boss", false) and not c.get("tribulation", false):
+		var open_k := Works.add(Game, "volley") + (Works.add(Game, "doze") if habit == "sleep" else 0.0)
+		if open_k > 0.0:
+			for f in foes:
+				if not f.boss:
+					f.hp = maxf(1.0, float(f.hp) - float(f.maxhp) * open_k)
+	# the scales (echoes.gd): the wild has heard of somebody unbending, and opens the battle afraid
+	if not c.get("boss", false) and not c.get("tribulation", false) and Echoes.feared(Game):
+		for f in foes:
+			if not f.boss:
+				f.hp = maxf(1.0, float(f.hp) * Echoes.FEAR_HP)
 	first_blow = true
 	vajra_used = false
 	tide_used = false
@@ -312,6 +340,8 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		say("%s blocks your path!" % foes[0].name)
 	else:
 		say("Enemies appear!  %s" % ", ".join(foes.map(func(f): return f.name)))
+		if habit != "" and habit != "watch" and habit != "forage":
+			say("%s: %s." % [str(Habits.info(habit).word), str(Habits.info(habit).hint).get_slice(": ", 1)])
 	# realm suppression (Part XII): a whole realm between the fighters is felt before the first blow
 	suppress_note = ""
 	if not ctx.get("tribulation", false):
@@ -382,6 +412,18 @@ func _next_turn() -> void:
 				var fs: Array = all.filter(func(f): return f.side != "party")
 				all = ps + fs
 				say("First strike: the pack is still reeling from the blow!")
+			elif round_no == 1 and Habits.first(habit) == "party":
+				# (habits.gd: walked in on asleep, the party moves before anything is on its feet)
+				var ps3: Array = all.filter(func(f): return f.side == "party")
+				var fs3: Array = all.filter(func(f): return f.side != "party")
+				all = ps3 + fs3
+				say("Caught asleep: you move before they are on their feet.")
+			elif round_no == 1 and Habits.first(habit) == "foe" and not Works.has(Game, "chariot"):
+				# (a hunting pack saw the party first; the south-pointing chariot, works.gd, is never surprised)
+				var fs2: Array = all.filter(func(f): return f.side != "party")
+				var ps2: Array = all.filter(func(f): return f.side == "party")
+				all = fs2 + ps2
+				say("The hunters saw you first!")
 			if round_no == 1 and (Game.talent_crown("spirit_sense") or boon.get("first", false)):
 				for k in all.size():
 					if all[k].side == "party" and all[k].idx == 0:
@@ -449,6 +491,8 @@ func _foe_act(f: Dictionary) -> void:
 			say("%s unleashes a devastating attack, but it is blunted!" % f.name)
 		else:
 			say("%s unleashes a devastating attack!" % f.name)
+		# (the Hundred Works: paper servants stand in front of the worst of it)
+		heavy = maxf(1.0, heavy * Works.mod(Game, "heavy"))
 		for p in tg:
 			_hit(f, p, heavy, f.elem, true)
 		timer = 1.3
@@ -477,7 +521,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 			fx.append({"text": "a reflection", "p": head3(tgt), "t": 1.0, "col": Color("c8a8ff"), "slash": ""})
 			say("%s strikes at a reflection." % a.name)
 			return 0
-	var weak_k := Game.dao_mod("weak", 1.5) if a.side == "party" else 1.5
+	var weak_k := (Game.dao_mod("weak", 1.5) + Works.add(Game, "weak")) if a.side == "party" else 1.5
 	# a trial's path can show where a foe is weakest (a lens, a Dao)
 	if a.side == "party" and boon.has("weak_k"):
 		weak_k = maxf(weak_k, float(boon.weak_k))
@@ -489,7 +533,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		raw *= Data.suppression(int(a.lv), int(tgt.lv))
 	if tgt.side == "party":
 		# Formations and the Heart (and the shades' friendship) soften every blow; so does a Vajra Body
-		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0))
+		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0)) * Works.mod(Game, "taken")
 		# and a formation or allies a trial's path brought
 		raw *= float(boon.get("taken", 1.0))
 	var lf: bool = a.side == "party" and a.idx == 0
@@ -611,7 +655,7 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	Game.inv[item] -= 1
 	# the Cauldron's Dao: pills do far more good
-	var pk := Game.dao_mod("pill", 1.0)
+	var pk := Game.dao_mod("pill", 1.0) * Works.mod(Game, "pill")
 	if item == "hp_pill":
 		say("%s feeds %s a healing pill." % [actor.name, tgt.name])
 		_heal(tgt, tgt.maxhp * 0.4 * pk)
@@ -639,7 +683,9 @@ func _win() -> void:
 	# the Cauldron's Dao pays better, and so does Heaven's Favour; every victory deepens the Dao Lin
 	# Feng walks (twice over with the crown of an Enlightened Mind), and an Enlightened Mind learns more
 	stones = int(stones * Game.dao_mod("stones", 1.0) * (1.0 + Game.talent_mod("stones")) * Game.boon("stones", 1.0))
-	xp = int(xp * (1.0 + Game.talent_mod("exp")) * Game.boon("exp", 1.0))
+	xp = int(xp * (1.0 + Game.talent_mod("exp")) * Game.boon("exp", 1.0) * Habits.mod(habit, "exp") * Works.mod(Game, "exp"))
+	# (and the scales, echoes.gd: a beaten pack gives up what it guarded to somebody known to spare)
+	stones = int(stones * Works.mod(Game, "stones") * (Echoes.lean_mod(Game, "stones") if not boss else 1.0))
 	if not ctx.get("tribulation", false):
 		Game.dao_battle_won(boss)
 		if Game.talent_crown("insight"):
@@ -656,7 +702,7 @@ func _win() -> void:
 			var ek := Trials.essence_of(str(f.elem))
 			if ek == "":
 				continue
-			var n: int = Trials.ESS_BOSS if f.boss else (1 if randf() < Trials.ESS_DROP + Game.talent_mod("drop") else 0)
+			var n: int = Trials.ESS_BOSS if f.boss else (1 if randf() < Trials.ESS_DROP + Game.talent_mod("drop") + Works.add(Game, "drop") + Echoes.lean_mod(Game, "drop") else 0)
 			if n > 0:
 				ess[ek] = int(ess.get(ek, 0)) + n
 		var got: Array = []

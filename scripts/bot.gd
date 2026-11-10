@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 22.0 * 3600.0
+var max_time := 26.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -80,6 +80,12 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XVIII: a drill of summer wood from the smith for the Lord of Fire, and six lines of buckets (the
 	# hearths that call it a guest) for the fire nobody sat up with
 	"zhurong": "craft", "huilu": "hearth",
+	# Part XIX: Mozi's belt and nine sticks from the smith for the Cloud Ladder, Yue Ling to speak to the
+	# Player as one who was made to another, and a maker's own word (four works of one school) for the
+	# Machine Heart
+	"cloud_ladder": "craft", "the_player": "heart", "jixin": "works",
+	# and the stopped escapement the Machine Heart left, held up to the Wooden Magpie
+	"wooden_magpie": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -96,6 +102,22 @@ const FATE_PLAN := {
 }
 ## the small choices of the road (fate.gd PICKS)
 const PICK_PLAN := {"qilin": "ride"}
+## The crossroads of the road (echoes.gd): what the bot answers at each, in order of preference (the
+## first that can be taken), chosen so that one run leans every scale far enough to be known for it:
+## mercy (the bandits mend the road, the egg is carried down, the crows build, the Player keeps its
+## heart; but the Ancestor's name is struck and the widow told the truth), the new works (the garden
+## studied, the drawings kept, the axe given, the wheel given hours) and the wide world (the palace
+## opened, the sea-roads, the names to the wind, the map copied); and for the last question the
+## wheel's answer, as a builder of engines, if it has built three of them.
+const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatch"], "palace": ["open"], "dragon_boon": ["sea"], "drawings": ["keep"], "nineteen": ["wind"],
+	"ancestor": ["strike"], "widow": ["truth"], "crows": ["pardon"], "axe": ["give"], "cauldron_map": ["copy"], "furnace": ["return"],
+	"the_wheel": ["hours"], "the_player": ["keep"], "the_works": ["wheel", "hand", "dao", "ask"]}
+## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
+## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
+## of the other two beside it.  It builds a work once it can and has four times its price in hand
+## (so the trials' cauldron and forge are never kept waiting), or at once when the story asks for works.
+const WORKS_PLAN := ["well_sweep", "fire_kit", "array", "trip_hammer", "cords", "water_bellows", "talismans", "crossbow", "sling", "chariot", "furnace", "wooden_ox",
+	"kiln", "paper_servants", "adze", "mirror", "hide_coat", "flags"]
 ## Part XIV, the grudges that stayed (grudges.gd): the order the bot goes to them in (a round trip from
 ## the Wheel: the old roads near the sect, up the Jianmu, out to sea), and what it answers each, in order
 ## of preference: a friend answers where one can, else it pays, and it leaves the Admiral to the Wheel
@@ -120,7 +142,8 @@ const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "
 const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
 const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us", "s_p16_lanterns": "her", "s_p16_couplets": "together",
 	"s_p17_haircut": "trust", "s_p17_thunder": "us", "s_p17_teacup": "home", "s_p17_graves": "her", "s_p17_kite": "road",
-	"s_p18_drill": "both", "s_p18_feast": "seventh",}
+	"s_p18_drill": "both", "s_p18_feast": "seventh",
+	"s_p19_campfire": "both", "s_p19_rest": "us",}
 ## the end of the story the bot chooses (cultures.gd ENDINGS), rarest first, of those its journey earned
 const ENDING_PLAN := ["open", "road", "lotus", "home", "azure"]
 var route := "peoples"
@@ -421,8 +444,8 @@ func _cult_met() -> bool:
 func _want_shop() -> String:
 	if Game.area != "sect":
 		return ""
-	var price := Data.pill_price("hp_pill", Game.level)
-	if not shop_done.get("smith", false) and Game.temper < Data.TEMPER_COST.size() and Game.stones >= Data.TEMPER_COST[Game.temper] + price * 2:
+	var price := Works.pill_price(Game, "hp_pill", Game.level)
+	if not shop_done.get("smith", false) and Game.temper < Data.TEMPER_COST.size() and Game.stones >= Works.temper_cost(Game) + price * 2:
 		return "smith"
 	if not shop_done.get("alchemist", false) and Game.stones >= price * 2 and (Game.inv.get("hp_pill", 0) < 8 or Game.inv.get("qi_pill", 0) < 3):
 		return "alchemist"
@@ -480,6 +503,12 @@ func _world(d: float) -> void:
 	var fit := _want_outfit()
 	if fit != "":
 		menu_goal = "wardrobe"
+		world.move_dir = Vector2i.ZERO
+		_press("cancel", 0.4)
+		return
+	# 1b) the Hundred Works (works.gd): build the next work of the plan when it can be afforded
+	if _want_work() != "":
+		menu_goal = "works"
 		world.move_dir = Vector2i.ZERO
 		_press("cancel", 0.4)
 		return
@@ -593,6 +622,10 @@ func _world(d: float) -> void:
 			# Part XVII: the nearest obstacle of the kind the step names, struck with the sword until it
 			# goes (impact.gd)
 			_clear_step(s)
+		"works":
+			# Part XIX: works are built from the menu (1b above builds as soon as one can be); if none
+			# can be yet, there is know-how and there are spirit stones to be had from the wild
+			_grind()
 		"grudges":
 			# Part XIV: the next of the grudges that stayed (all six, in any order), each a boss
 			var gr := _next_grudge()
@@ -972,6 +1005,20 @@ func _choice() -> void:
 		if str(c.title) == str(Fate.PICKS[pk].ask):
 			_nav(ids.size(), c.cursor, ids.find(PICK_PLAN[pk]))
 			return
+	# a crossroads of the road (echoes.gd): the answer the plan prefers that can be given
+	for cid in Echoes.ORDER:
+		if str(c.title) == str(Echoes.CROSSROADS[cid].ask):
+			want = -1
+			for oid in CROSS_PLAN.get(cid, []):
+				var kc: int = ids.find(oid)
+				if want < 0 and kc >= 0 and c.options[kc].get("enabled", true):
+					want = kc
+			if want < 0:
+				for kc2 in ids.size():
+					if want < 0 and c.options[kc2].get("enabled", true):
+						want = kc2
+			_nav(ids.size(), c.cursor, maxi(want, 0))
+			return
 	# the Lotus release (bonds.gd): a heart-to-heart, a memory given back, the lotus pond
 	for tk in Bonds.TALKS:
 		if str(c.title) == str(tk.ask):
@@ -1184,6 +1231,10 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 				# the New Fire release: a place at the hearths is earned by the chapter's own errands
 				# among their people on the way to the trial (cultures.gd); nothing else to do for it
 				pass
+			"works":
+				# the Hundred Works release: works are built as the plan affords them (WORKS_PLAN); a path
+				# that asks for more than stand is not one to wait for
+				return false
 			_:
 				return false
 	return true
@@ -1204,7 +1255,7 @@ func _prepare_trial() -> bool:
 			continue
 		match str(n[0]):
 			"temper":
-				if Game.stones >= Data.TEMPER_COST[mini(Game.temper, Data.TEMPER_COST.size() - 1)]:
+				if Game.stones >= Works.temper_cost(Game):
 					_goto_entity("sect", "smith")
 				else:
 					_earn(tt)
@@ -1627,9 +1678,61 @@ func _nav(labels_n: int, cursor: int, want: int) -> void:
 		var fwd := (want - cursor + labels_n) % labels_n
 		_press("down" if fwd <= labels_n / 2 else "up", 0.22)
 
+## The work the bot would build now ("" for none): the first of its plan that can be built, when it
+## has four times the price in hand or the story is asking for works (then any that can be built).
+func _want_work() -> String:
+	var asked: bool = str(Game.cur_step().get("kind", "")) == "works"
+	var keep := _stones_ahead()
+	for id in WORKS_PLAN:
+		if Works.has(Game, id):
+			continue
+		# (four times its price in hand, and what the cauldron and the forge will ask for the trials of
+		# the next chapter or so left over: a work bought with a trial's recipe money is paid for twice,
+		# in an hour of fighting for spirit stones)
+		if Works.can_build(Game, id) and (asked or (Game.stones >= Works.cost_stones(Game, id) * 4 and Game.stones - Works.cost_stones(Game, id) >= keep)):
+			return id
+		# (the next work of the plan that the land knows how to make is saved up for: know-how spent
+		# on a cheaper one further down the list would never finish the wheel's school)
+		if not asked and Works.known(Game, id) and (Works.before(id) == "" or Works.has(Game, Works.before(id))):
+			return ""
+		# (and a work of the wheel's school that the land does not yet know how to make is waited for: what
+		# comes after it in the plan would spend what it will cost)
+		if not asked and not Works.known(Game, id) and str(Works.WORKS[id].school) == "wheel":
+			return ""
+	return ""
+
+## The spirit stones the recipes of the trials ahead will ask for: every recipe made for a trial not
+## yet passed (that the bot means to take by craft) whose step is within fifty steps of the story.
+func _stones_ahead() -> int:
+	var n := 0
+	for rid in Trials.RECIPES:
+		var r: Dictionary = Trials.RECIPES[rid]
+		if Game.trials.has(str(r.get("for", ""))) or int(Game.inv.get(rid, 0)) > 0:
+			continue
+		var at := Data.step_index(str(r.after))
+		if at >= Game.step - 12 and at <= Game.step + 50 and str(TRIAL_PLAN.get(str(r.get("for", "")), "")) == "craft":
+			n += Trials.recipe_stones(rid, Game)
+	return n
+
 func _menu() -> void:
 	var m = main.menu
 	if menu_goal == "":
+		_press("cancel", 0.3)
+		return
+	if menu_goal == "works":
+		# the Works page: down to the work wanted and Enter builds it; out again when there is no more
+		var ww := _want_work()
+		if m.mode == "works":
+			if ww == "":
+				menu_goal = ""
+				_press("cancel", 0.3)
+			else:
+				_nav(m.labels.size(), m.cursor, m.ids.find("work:" + ww))
+			return
+		if m.mode == "root" and ww != "":
+			_nav(m.labels.size(), m.cursor, m.ids.find("works"))
+			return
+		menu_goal = ""
 		_press("cancel", 0.3)
 		return
 	if m.mode != "root":
@@ -1660,8 +1763,8 @@ func _shop() -> void:
 		if s.ids.has("temper") and s.enabled[s.ids.find("temper")]:
 			want = "temper"
 	else:
-		var hp_price := Data.pill_price("hp_pill", Game.level)
-		var qi_price := Data.pill_price("qi_pill", Game.level)
+		var hp_price := Works.pill_price(Game, "hp_pill", Game.level)
+		var qi_price := Works.pill_price(Game, "qi_pill", Game.level)
 		if Game.inv.get("hp_pill", 0) < 8 and Game.stones >= hp_price:
 			want = "hp_pill"
 		elif Game.inv.get("qi_pill", 0) < 4 and Game.stones >= qi_price:
@@ -1858,6 +1961,12 @@ func _finish(reason: String) -> void:
 		# the New Fire release (cultures.gd): who the hero was, the hearths and the end chosen
 		"hero": {"body": str(Game.hero.get("body", "m")), "hearth": Cultures.own(Game), "look": str(Game.hero.get("look", "")), "origin": str(Game.hero.get("origin", ""))},
 		"hearths": Game.hearth, "guest_of": Cultures.guests(Game), "ending": Cultures.ending_of(Game),
+		# the Hundred Works release: what was built (works.gd), what was answered at the crossroads and how
+		# the scales stand (echoes.gd)
+		"works": Game.works.keys(), "works_by_school": {"hand": Works.count(Game, "hand"), "wheel": Works.count(Game, "wheel"), "dao": Works.count(Game, "dao")},
+		"know_how": {"earned": Works.know_earned(Game), "spent": Works.know_spent(Game)}, "maker": Works.title(Game),
+		"crossroads": Game.picks, "scales": {"heart": Echoes.scale(Game, "heart"), "craft": Echoes.scale(Game, "craft"), "reach": Echoes.scale(Game, "reach")},
+		"known_as": Echoes.names(Game), "echoes_heard": Game.echoed.size(),
 		"trials": Game.trials,
 		"gates": Game.gates_open.keys(),
 		"time_by_screen_seconds": breakdown,
@@ -1886,6 +1995,10 @@ func _finish(reason: String) -> void:
 	print("trials passed   : %d   renown: %d   deeds: %d   gates: %d" % [Game.trials.size(), Game.renown, Game.deeds.size(), Game.gates_open.size()])
 	print("paths taken     : %s" % JSON.stringify(Game.trials))
 	print("the sword       : %d strikes, %d packs struck first, %d sword qi, %d obstacles cleared" % [Game.strikes, Game.ambushes, Game.waves, Game.cleared.size()])
+	print("works           : %d built (hand %d, wheel %d, art %d): %s; know-how %d earned, %d spent" % [Works.count(Game), Works.count(Game, "hand"), Works.count(Game, "wheel"), Works.count(Game, "dao"), Works.title(Game),
+		Works.know_earned(Game), Works.know_spent(Game)])
+	print("crossroads      : %d answered, %d echoes heard; mercy %+d, new works %+d, wide world %+d%s" % [Game.picks.size(), Game.echoed.size(), Echoes.scale(Game, "heart"), Echoes.scale(Game, "craft"), Echoes.scale(Game, "reach"),
+		(": " + Echoes.names(Game)) if Echoes.names(Game) != "" else ""])
 	print("the hero        : %s, a young %s, kin %s; guest of %d hearths %s" % [Game.hero_name(), "woman" if Game.fem() else "man", str(Cultures.HEARTHS[Cultures.own(Game)].short), Cultures.guests(Game), JSON.stringify(Game.hearth)])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":

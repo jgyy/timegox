@@ -206,7 +206,10 @@ func open_world() -> void:
 func _bundle(lid: String) -> Dictionary:
 	if bundles.has(lid):
 		return bundles[lid]
+	var pb0 := Time.get_ticks_usec()
 	var lw: Dictionary = Atlas.world_of(lid)
+	if OS.has_environment("AZ_PROFILE"):
+		print("[profile] realm %s generated in %d ms" % [lid, (Time.get_ticks_usec() - pb0) / 1000])
 	var b := {"wd": lw, "tile_ents": {}, "walk_props": {}, "ent_by_id": {}, "off": Vector3.ZERO, "hm": PackedFloat32Array(), "mini": null, "root": null, "placed": false}
 	for e in lw.ents:
 		b.ent_by_id[e.id] = e
@@ -230,7 +233,10 @@ func _bundle(lid: String) -> Dictionary:
 		b.hm.resize((lw.w + 1) * (lw.h + 1))
 		if not floor:
 			lw["hm"] = b.hm
+			var pb1 := Time.get_ticks_usec()
 			b.mini = Gfx.world_minimap(lw)
+			if OS.has_environment("AZ_PROFILE"):
+				print("[profile] realm %s minimap in %d ms" % [lid, (Time.get_ticks_usec() - pb1) / 1000])
 			var root := Node3D.new()
 			root.name = "realm_" + lid
 			root.position = b.off
@@ -244,6 +250,8 @@ func _bundle(lid: String) -> Dictionary:
 				"sea":
 					# the Eastern Sea (Part XII): real sea round the isles, the same ocean as the land's
 					Terrain3D.world_sea(root, lw)
+			if OS.has_environment("AZ_PROFILE"):
+				print("[profile] realm %s dressed (sea, sky) by %d ms" % [lid, (Time.get_ticks_usec() - pb0) / 1000])
 			root.visible = false
 			scene3d.add_child(root)
 			b.root = root
@@ -600,6 +608,7 @@ func _out_at(p: Vector3) -> bool:
 	return tile_free(t) and grid[t.y * w + t.x] != MapGen.INTERIOR
 
 func _build_view(id: String) -> void:
+	var prof_tv := Time.get_ticks_usec()
 	var lid := Data.layer_of(id)
 	var bb := _bundle(lid)
 	var lw: Dictionary = bb.wd
@@ -648,7 +657,9 @@ func _build_view(id: String) -> void:
 						clear[ct] = true
 	# (and no house or pavilion of the wilds is built beside one, facing it)
 	Scatter.clearings = clear
+	var prof_t0 := Time.get_ticks_usec()
 	var root := Terrain3D.build(vg, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
+	var prof_t1 := Time.get_ticks_usec()
 	Scatter.clearings = {}
 	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS) + bb.off
 	scene3d.add_child(root)
@@ -686,6 +697,8 @@ func _build_view(id: String) -> void:
 		bn.set_meta("b", b)
 		scene3d.add_child(bn)
 		brk[b.id] = bn
+	if OS.has_environment("AZ_PROFILE"):
+		print("[profile] view %-10s heights+prep %5d ms, terrain %5d ms, things %5d ms (%d)" % [id, (prof_t0 - prof_tv) / 1000, (prof_t1 - prof_t0) / 1000, (Time.get_ticks_usec() - prof_t1) / 1000, nodes.size()])
 	views[id] = {"root": root, "nodes": nodes, "shown": true, "roofs": root.get_meta("roofs", {}), "uppers": root.get_meta("uppers", {}), "layer": lid, "ents": lw.ents, "bundle": lid, "brk": brk, "origin": r.position}
 	# the Sword's Wake (impact.gd): what was felled here and has not yet grown back stays down
 	_keep_down(id)
@@ -716,7 +729,7 @@ func ent_visible(e: Dictionary) -> bool:
 	if Game.prologue != "":
 		if e.kind == "npc" and str(e.id) == str(Cultures.HEARTHS[Game.prologue].keeper):
 			return true
-		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode"] or e.get("fate", false):
+		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode", "machine"] or e.get("fate", false):
 			return false
 	match e.kind:
 		"enemy":
@@ -745,6 +758,9 @@ func ent_visible(e: Dictionary) -> bool:
 			# Part XVII (impact.gd): an obstacle of the story stays cleared
 			if Game.cleared.has(e.id):
 				return false
+		"machine":
+			# the Hundred Works (works.gd): a machine stands once it has been built
+			return Works.stands(Game, str(e.work))
 	# somebody met on the road (fate.gd): there while the story has them there
 	if e.get("fate", false) and not Fate.present(Game, str(e.id)):
 		return false
@@ -915,6 +931,8 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 				models.append(mk)
 			n.add_child(Models.shadow_disc(0.8))
 			_label(n, "%s x%d" % [d.n, g.size()], 2.5, UI.C_RED.lightened(0.3), 30)
+			# the hours of the wild (habits.gd): what the pack is doing, when it is worth knowing
+			n.set_meta("hab", _label(n, "", 3.0, Color.WHITE, 26))
 			n.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y) * TAU
 			n.set_meta("models", models)
 		"boss":
@@ -962,6 +980,15 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			n.add_child(Models.shadow_disc(1.0, 0.35))
 			_label(n, str(Impact.OBSTACLES.get(str(e.what), {}).get("n", "")).capitalize(), 2.2 if str(e.what) != "spring_ox" else 2.6, Color("e8dcc0"), 26)
 			n.set_meta("model", om)
+		"machine":
+			# the Hundred Works (works.gd, machines.gd): something Lin Feng built, or Gongshu Ban did
+			var mm := Machines.model(str(Works.STORY_SITES[e.work].model) if Works.STORY_SITES.has(str(e.work)) else str(e.work))
+			mm.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y, 9.0) * TAU
+			n.add_child(mm)
+			n.add_child(Models.shadow_disc(1.2, 0.35))
+			var ml := _label(n, Works.site_name(str(e.work)), 3.0, Color("e8d090"), 26)
+			n.set_meta("label", ml)
+			n.set_meta("model", mm)
 		"spring":
 			n.add_child(Models.spring_basin())
 		"ladder":
@@ -1713,6 +1740,12 @@ func _snap_cam() -> void:
 	comp.rotation.y = atan2(float(facing.x), float(facing.y))
 	comp_run = false
 
+## how far off the people, packs and things of the land are drawn (metres), and the big ones
+const ENT_SHOW := 92.0
+const ENT_SHOW_BIG := 150.0
+const ENT_BIG := ["boss", "prop", "machine", "seal", "ladder", "abode", "stele", "portal"]
+var frame_n := 0
+
 func _update_view(d: float) -> void:
 	var pp := _player_pos()
 	if not using.is_empty():
@@ -1748,6 +1781,8 @@ func _update_view(d: float) -> void:
 			comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
 			Models.anim_person(comp, t + 1.0, comp_run, false, "run" if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
 	# entities of the regions on show
+	frame_n += 1
+	var seen_from: Vector3 = pp if cam_override == null else cam.global_position
 	for k in views:
 		var v: Dictionary = views[k]
 		if not v.shown:
@@ -1756,11 +1791,23 @@ func _update_view(d: float) -> void:
 		for i in v.nodes:
 			var e: Dictionary = v.ents[i]
 			var n: Node3D = v.nodes[i]
+			# nobody and nothing is drawn from further off than it can be made out (ENT_SHOW; the big
+			# things, a lord, a building's furniture, a ladder between realms, from further): every model
+			# of every region on show used to be handed to the renderer every frame, forty thousand
+			# triangles a head, and the story asked whether each of them should be there
+			var dist := n.position.distance_to(seen_from)
+			if dist > (ENT_SHOW_BIG if e.kind in ENT_BIG else ENT_SHOW):
+				if n.visible:
+					n.visible = false
+				continue
+			# (beyond the reach of anything that could change it this frame, the story is asked now and then)
+			if dist > 46.0 and n.visible and (frame_n + i) % 8 != 0:
+				continue
 			var vis := ent_visible(e)
 			n.visible = vis
 			if not vis:
 				continue
-			var dist := n.position.distance_to(pp)
+			dist = n.position.distance_to(pp)
 			if dist > 46.0:
 				continue
 			_animate_ent(e, n, pp, dist, d, vb)
@@ -1990,7 +2037,22 @@ func speaker() -> String:
 func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void:
 	var seed_ := Terrain3D.hash2(e.pos.x, e.pos.y, 3.0) * 17.0
 	var cyc := fmod(t * 0.11 + seed_, 1.0)
-	var walking := dist > 9.0 and cyc < 0.62
+	# the hours of the wild (habits.gd): what the pack is doing this hour decides how far it ranges, how
+	# fast, how much of the time it is on the move, and whether it is lying asleep or circling together
+	var act := Habits.act_of_group(Game, e.group)
+	var hi: Dictionary = Habits.info(act)
+	var rg: Array = hi.range
+	var lie: bool = hi.get("lie", false)
+	var ring: bool = hi.get("ring", false)
+	var run: bool = hi.get("run", false)
+	var walking := (dist > 9.0 or run) and cyc < float(rg[2])
+	if str(n.get_meta("act", "")) != act:
+		n.set_meta("act", act)
+		var hl: Label3D = n.get_meta("hab", null)
+		if hl != null:
+			hl.text = "" if act in ["watch", "forage"] else ("z z z" if lie else str(hi.word))
+			hl.modulate = hi.col
+	var k := 1.0 - exp(-d * 3.0)
 	for i in ms.size():
 		var mk: Node3D = ms[i]
 		if not mk.has_meta("home"):
@@ -1998,20 +2060,41 @@ func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void
 			mk.set_meta("prog", seed_ + i * 1.3)
 		var prog: float = mk.get_meta("prog")
 		var shape: String = mk.get_meta("shape", "")
-		var r := 1.6 if i == 0 else 1.0
+		var r := (1.6 if i == 0 else 1.0) * float(rg[0])
 		if walking:
-			prog += d * 0.32 / r
+			prog += d * 0.32 * float(rg[1]) / maxf(r, 0.6)
 			mk.set_meta("prog", prog)
 		var home: Vector3 = mk.get_meta("home")
-		var off := Vector3(sin(prog) * r, 0.0, sin(prog * 2.0) * r * 0.45)
-		var vel := Vector3(cos(prog), 0.0, cos(prog * 2.0) * 0.9)
-		mk.position = home + off
-		if walking:
-			mk.rotation.y = lerp_angle(mk.rotation.y, atan2(vel.x, vel.z), 1.0 - exp(-d * 4.0))
+		var floats := shape in ["wisp", "jelly", "storm", "ray"]
+		if lie:
+			# asleep: down where it stood, on its side (a thing that floats sinks to the ground and dims its bob)
+			mk.position = mk.position.lerp(home + Vector3(0.0, 0.0 if floats else 0.18, 0.0), k)
+			mk.rotation.z = lerp_angle(mk.rotation.z, 0.0 if floats else (1.25 if i % 2 == 0 else -1.25), k)
+			mk.rotation.y = lerp_angle(mk.rotation.y, seed_ + i * 2.1, k)
+			# (breathing: the idle clip at a third of its pace)
+			Models.anim_monster(mk, t * 0.3, i * 1.7 + e.pos.x, "idle")
+			continue
+		mk.rotation.z = lerp_angle(mk.rotation.z, 0.0, k)
+		if ring:
+			# gathered: round and round a common centre, a flock settling to roost, a revel of ghosts
+			var a := prog * 0.8 + TAU * float(i) / float(ms.size())
+			var c := Vector3(0.0, home.y, -0.2)
+			mk.position = mk.position.lerp(c + Vector3(cos(a), 0.0, sin(a)) * 1.25, k)
+			mk.rotation.y = lerp_angle(mk.rotation.y, atan2(-sin(a), cos(a)) + PI * 0.5, k)
+			Models.anim_monster(mk, t, i * 1.7 + e.pos.x, "walk" if Assets.has_clip(mk, "walk") else "idle")
 		else:
-			mk.rotation.y = lerp_angle(mk.rotation.y, 0.0, 1.0 - exp(-d * 3.0))
-		Models.anim_monster(mk, t, i * 1.7 + e.pos.x, "walk" if walking and Assets.has_clip(mk, "walk") else "idle")
-		if shape in ["wisp", "jelly", "storm", "ray"]:
+			var off2 := Vector3(sin(prog) * r, 0.0, sin(prog * 2.0) * r * 0.45)
+			var vel := Vector3(cos(prog), 0.0, cos(prog * 2.0) * 0.9)
+			mk.position = mk.position.lerp(home + off2, clampf(k * 3.0, 0.0, 1.0))
+			if walking:
+				mk.rotation.y = lerp_angle(mk.rotation.y, atan2(vel.x, vel.z), 1.0 - exp(-d * 4.0))
+			else:
+				mk.rotation.y = lerp_angle(mk.rotation.y, 0.0, k)
+			var clip := "idle"
+			if walking:
+				clip = "run" if run and Assets.has_clip(mk, "run") else ("walk" if Assets.has_clip(mk, "walk") else "idle")
+			Models.anim_monster(mk, t * (1.5 if run and walking and clip == "walk" else 1.0), i * 1.7 + e.pos.x, clip)
+		if floats:
 			mk.position.y = home.y + 0.15 * sin(t * 1.6 + i)
 
 func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, vb: Dictionary = {}) -> void:
@@ -2066,11 +2149,16 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			else:
 				for i in ms.size():
 					Models.anim_monster(ms[i], t, i * 1.7 + e.pos.x)
-			if dist < 10.0:
+			if dist < 10.0 and not (e.kind == "enemy" and str(n.get_meta("act", "")) == "sleep"):
 				var dv2 := pp - n.position
 				n.rotation.y = lerp_angle(n.rotation.y, atan2(dv2.x, dv2.z), 1.0 - exp(-d * 2.0))
 			var base_y := _ground(vb, n.position) if not vb.is_empty() else ground_y(n.position)
-			n.position.y = base_y + sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0)
+			# (a pack asleep, habits.gd, neither bobs nor hovers)
+			var asleep: bool = e.kind == "enemy" and str(n.get_meta("act", "")) == "sleep"
+			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0))
+		"machine":
+			Machines.animate(n.get_meta("model"), t + float(e.pos.x))
+			(n.get_meta("label") as Label3D).visible = dist < 12.0
 		"abode":
 			var opened: bool = Game.abodes.has(e.id)
 			if opened != bool(n.get_meta("open", false)):
@@ -2661,6 +2749,8 @@ func _draw_hud() -> void:
 	var fe = face_entity()
 	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk"]:
 		var hint := "Talk" if fe.kind != "folk" else "Talk to %s" % str(fe.n)
+		if fe.kind == "machine":
+			hint = "Look"
 		match fe.kind:
 			"prop":
 				hint = str(Props.kind_of(fe).get("verb", "Look"))

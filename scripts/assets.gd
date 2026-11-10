@@ -51,6 +51,9 @@ const PEOPLE := {
 	# the New Fire release (cultures.gd): the keeper of the Felt Hearth and her grandson, the Lord of the
 	# Southern Fire, and the dress of the hearths for the towns' crowds (folk.gd HEARTH_BODIES)
 	"sarnai": "characters/sarnai", "batu": "characters/batu", "zhurong": "characters/zhurong",
+	# the Hundred Works release (Part XIX): the master of carpenters, the man in straw sandals, the old
+	# gardener who will not use a well-sweep, the artificer of King Mu's court, and the dancer he made
+	"gongshu_ban": "characters/gongshu_ban", "mo_di": "characters/mo_di", "gardener_hanyin": "characters/gardener_hanyin", "yan_shi": "characters/yan_shi", "the_player": "characters/the_player",
 	"folk_herder": "characters/folk_herder", "folk_herder_f": "characters/folk_herder_f", "folk_oasis_f": "characters/folk_oasis_f",
 	"folk_boatwoman": "characters/folk_boatwoman", "folk_founder": "characters/folk_founder", "folk_lantern_f": "characters/folk_lantern_f",
 	"lin_feng_f": "characters/lin_feng_f", "lin_feng_f_wanderer": "characters/lin_feng_f_wanderer", "lin_feng_f_wild": "characters/lin_feng_f_wild", "lin_feng_f_scholar": "characters/lin_feng_f_scholar",
@@ -228,6 +231,27 @@ static func palette(c: Color, elem: String = "", over: Dictionary = {}) -> Array
 	mark = over.get("mark", mark)
 	return [c, shade, light, sec, acc, under, mark]
 
+## The levels of detail the importer made for surface `s` of `src` (edge length -> its index list), to
+## hand on to a mesh rebuilt from that surface's arrays.  Rebuilding used to drop them, so every
+## person and monster in sight was drawn with all of its forty thousand triangles however far off it
+## stood; with them the renderer thins a figure as it shrinks on the screen.
+static func lods_of(src: Mesh, s: int) -> Dictionary:
+	var out := {}
+	var d: Dictionary = RenderingServer.mesh_get_surface(src.get_rid(), s)
+	var wide: bool = int(d.get("vertex_count", 0)) > 65535
+	for l in d.get("lods", []):
+		var raw: PackedByteArray = l.get("index_data", PackedByteArray())
+		var ind := PackedInt32Array()
+		if wide:
+			ind = raw.to_int32_array()
+		else:
+			ind.resize(raw.size() / 2)
+			for i in ind.size():
+				ind[i] = raw.decode_u16(i * 2)
+		if not ind.is_empty():
+			out[float(l.get("edge_length", 0.0))] = ind
+	return out
+
 ## Rebuild a mesh with the game's materials, tinting vertices by their UV.x weight and palette slot
 ## (`pal` from `palette()`; empty keeps the authored colours).
 static func prepare_mesh(src: Mesh, pal: Array, key: String, actor: bool = false) -> Mesh:
@@ -251,7 +275,7 @@ static func prepare_mesh(src: Mesh, pal: Array, key: String, actor: bool = false
 					cols[i] = Color(lerpf(c.r, c.r * tl.r, k), lerpf(c.g, c.g * tl.g, k), lerpf(c.b, c.b * tl.b, k), c.a)
 			arr[Mesh.ARRAY_COLOR] = cols
 		var flags: int = src.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
-		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr, [], {}, flags)
+		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr, [], lods_of(src, s), flags)
 		out.surface_set_material(out.get_surface_count() - 1, mat)
 	_meshes[key] = out
 	return out
@@ -446,7 +470,7 @@ static func _hero_mesh(src: Mesh, cols: Dictionary, key: String) -> Mesh:
 				cs[i] = Color(minf(1.0, tc.r * k), minf(1.0, tc.g * k), minf(1.0, tc.b * k), cs[i].a)
 			arr[Mesh.ARRAY_COLOR] = cs
 		var flags: int = src.surface_get_format(s) & Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS
-		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr, [], {}, flags)
+		out.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr, [], lods_of(src, s), flags)
 		out.surface_set_material(out.get_surface_count() - 1, mat)
 	_meshes[key] = out
 	return out

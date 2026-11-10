@@ -992,6 +992,11 @@ def export(path, objs, animations=True):
         # clips are keyed from frame 1: start them at 0 s so a loop's last frame meets its first
         kw["export_anim_slide_to_zero"] = True
     bpy.ops.export_scene.gltf(**kw)
+    # the exporter's file is generous (float weights, a track for every resting bone): pack it smaller
+    # without changing what the game sees (pack.py; ART_PACK=0 keeps the raw export)
+    if os.environ.get("ART_PACK", "1") != "0":
+        import pack
+        pack.pack(path)
     print("[art] wrote", os.path.relpath(path, ROOT))
 
 

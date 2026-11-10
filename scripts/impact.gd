@@ -93,6 +93,9 @@ const OBSTACLES := {
 	# Part XVIII (the New Fire release): what a tired fire leaves, and what a wildfire eats
 	"clinker": {"n": "clinker crust", "hits": 2, "piece": "rock", "col": Color("3a3432"), "n_p": 8, "puff": Color("8a8480"),
 		"hint": "Clinker has crusted over the mouth of a casting pit (F to break it off)"},
+	# Part XIX (the Hundred Works release): a gear-train that has locked solid across a lane
+	"cogwork": {"n": "locked gear-train", "hits": 2, "piece": "rock", "col": Color("b8863a"), "n_p": 8, "puff": Color("c8b890"),
+		"hint": "A train of bronze gears has locked solid across the lane (F to break it apart)"},
 	"brush": {"n": "dry brush", "hits": 1, "piece": "log", "col": Color("9a8450"), "n_p": 5, "puff": Color("c8b890"),
 		"hint": "A stand of brush as dry as tinder (F to cut it for the firebreak)"},
 }
@@ -106,7 +109,8 @@ static func hit_obstacle(g, e: Dictionary) -> String:
 	var spec: Dictionary = OBSTACLES.get(str(e.what), {"hits": 1})
 	var n := int(g.obstacle_hits.get(id, 0)) + 1
 	g.obstacle_hits[id] = n
-	if n < int(spec.hits):
+	# (the stone adze, works.gd, takes one blow off whatever stands in the road)
+	if n < Works.blows(g, int(spec.hits)):
 		return "hit"
 	# (remembered with its kind and region: a "clear" step counts them, Game.cleared_count)
 	g.cleared[id] = "%s|%s" % [str(e.what), str(e.area)]
@@ -197,6 +201,19 @@ static func obstacle_model(what: String, theme_name: String = "") -> Node3D:
 				b.limb(base5.lerp(top5, 0.55), base5.lerp(top5, 0.8) + Vector3(sin(a5) * 0.4, 0.2, -cos(a5) * 0.4), 0.02, 0.006, twig, 3)
 				b.limb(base5.lerp(top5, 0.75), top5 + Vector3(-sin(a5) * 0.3, 0.1, cos(a5) * 0.3), 0.016, 0.005, twig, 3)
 			b.sph(Vector3(0, 0.12, 0), Vector3(0.7, 0.12, 0.7), MB.tag(Color("b8a468"), MB.WOOD))
+		"cogwork":
+			# three meshed gears of bronze on a timber frame, jammed tooth to tooth
+			var bz := MB.tag(Color("b8863a"), MB.METAL)
+			var bz2 := MB.tag(Color("7a6a3a"), MB.METAL)
+			b.box(Vector3(0, 0.1, 0), Vector3(2.0, 0.2, 0.5), MB.tag(Color("5a4030"), MB.WOOD))
+			for gk in 3:
+				var gc := Vector3(-0.72 + gk * 0.72, 0.62 + (0.22 if gk == 1 else 0.0), 0.0)
+				var gr := 0.42 if gk != 1 else 0.34
+				Machines._cyl(b, gc, gr, 0.14, bz if gk != 1 else bz2, Vector3(PI * 0.5, 0, 0), 12)
+				Machines._cyl(b, gc, 0.07, 0.4, MB.tag(Color("3a3a40"), MB.METAL), Vector3(PI * 0.5, 0, 0), 6)
+				for tk in 10:
+					var ta := TAU * tk / 10.0 + gk * 0.3
+					b.box(gc + Vector3(cos(ta), sin(ta), 0) * (gr + 0.05), Vector3(0.1, 0.1, 0.14), bz if gk != 1 else bz2, Vector3(0, 0, ta))
 		"chain":
 			var ice := MB.tag(Color("6a8aa0"), MB.CRYSTAL)
 			for k3 in 6:
@@ -219,7 +236,7 @@ static func obstacle_burst(parent: Node3D, what: String, at: Vector3, dir: Vecto
 		Fx3D.sparks(parent, at + Vector3(0, 0.8, 0) - dir * 0.3, Color(1.0, 0.9, 0.7))
 		return
 	Havoc.burst(parent, "rubble", at, dir, ground, 1.2 if what != "petty" else 0.7, spec.col)
-	if what in ["spring_ox", "ice", "chain", "deadfall", "clinker", "brush"]:
+	if what in ["spring_ox", "ice", "chain", "deadfall", "clinker", "brush", "cogwork"]:
 		Havoc.burst(parent, "rubble", at + Vector3(0, 0.4, 0), -dir, ground, 0.8, Color(spec.col).darkened(0.2))
 	if what == "ice" or what == "chain":
 		Fx3D.splash(parent, at + Vector3(0, 0.2, 0), Color(0.8, 0.92, 1.0), 0.9, 1.4)
@@ -238,10 +255,16 @@ static func hide_instance(mmi: MultiMeshInstance3D, i: int) -> void:
 	var xf := mm.get_instance_transform(i)
 	if xf.basis.get_scale().length() < 0.01:
 		return
-	mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * 0.0001), xf.origin - Vector3(0, 40, 0)))
+	var gone := Transform3D(Basis().scaled(Vector3.ONE * 0.0001), xf.origin - Vector3(0, 40, 0))
+	mm.set_instance_transform(i, gone)
+	# (the same tree as it is drawn from far off, Terrain3D._add_mm, goes with it)
+	if mmi.has_meta("far"):
+		(mmi.get_meta("far") as MultiMeshInstance3D).multimesh.set_instance_transform(i, gone)
 
 static func show_instance(mmi: MultiMeshInstance3D, i: int, xf: Transform3D) -> void:
 	mmi.multimesh.set_instance_transform(i, xf)
+	if mmi.has_meta("far"):
+		(mmi.get_meta("far") as MultiMeshInstance3D).multimesh.set_instance_transform(i, xf)
 
 ## The fall of a felled trunk: the angle of a rod of height `h` pivoting on its stump, from the nudge of
 ## the cut to lying flat, integrated once (theta'' = 3g / 2L sin theta).  Returns [seconds, angles at
