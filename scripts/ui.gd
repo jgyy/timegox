@@ -13,7 +13,9 @@ const C_BLUE := Color("5aa9ff")
 const C_GOLD := Color("f0c860")
 const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon", "bird", "demon", "storm", "hero", "healer", "golem", "serpent", "crab", "spider", "jelly", "phoenix", "ray", "mantis", "tortoise", "tome", "scorpion", "mushroom", "mammoth", "moth", "hundun", "fox", "carp", "oxhead", "horseface", "jiangshi", "qilin", "ape", "tiger", "queen", "warden", "crowmarshal", "kaiming", "magpie", "sun_crow", "jade_rabbit", "bifang", "frost_maiden",
 	# people met on the road who come to blows with Lin Feng (fate.gd), in their own models
-	"person:qiu_ye", "person:hu_grown", "person:xu_lan", "person:liu_ying"]
+	"person:qiu_ye", "person:hu_grown", "person:xu_lan", "person:liu_ying",
+	# Part XVIII: the Lord of the Southern Fire, in his own model
+	"person:zhurong"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font
@@ -23,22 +25,31 @@ static func font() -> Font:
 ## story's data keeps the name it was written with (speakers, cues and tests read it); only what is
 ## drawn changes.  Names are single words of letters, so the swap can never apply twice.
 static var _rename: Array = []
+## whether the hero is a woman (the New Fire release): then every line drawn is told of her (voice.gd)
+static var _fem := false
+## set while a line already told of her is drawn (a conversation: main.say tells it line by line, with
+## who spoke and what was said before, which a line by itself cannot know)
+static var told := false
 
-static func set_hero_name(family: String, given: String) -> void:
+static func set_hero_name(family: String, given: String, fem: bool = false) -> void:
 	_rename = []
+	_fem = fem
 	if family == Fashion.DEFAULT_FAMILY and given == Fashion.DEFAULT_GIVEN:
 		return
 	var subs := [["\\bLin Feng\\b", family + " " + given]]
 	if given != Fashion.DEFAULT_GIVEN:
 		subs.append(["\\bFeng'er\\b", given + "'er"])
 	if family != Fashion.DEFAULT_FAMILY:
-		subs.append(["\\bBrother Lin\\b", "Brother " + family])
+		subs.append(["\\b(Brother|Sister) Lin\\b", "$1 " + family])
 	for sb in subs:
 		var r := RegEx.new()
 		r.compile(str(sb[0]))
 		_rename.append([r, str(sb[1])])
 
 static func named(s: String) -> String:
+	# (told of a woman first, while the line still has the name the story was written with)
+	if _fem and not told:
+		s = Voice.she(s)
 	if _rename.is_empty() or (s.find("Lin") < 0 and s.find("Feng") < 0):
 		return s
 	for r in _rename:

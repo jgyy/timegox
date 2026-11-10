@@ -47,6 +47,13 @@ const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
 	# the hero's other looks (character creation, fashion.gd LOOKS)
 	"lin_feng_wanderer": "characters/lin_feng_wanderer", "lin_feng_wild": "characters/lin_feng_wild", "lin_feng_scholar": "characters/lin_feng_scholar",
+	# the New Fire release: the same four looks on a woman's frame (the hero can be either)
+	# the New Fire release (cultures.gd): the keeper of the Felt Hearth and her grandson, the Lord of the
+	# Southern Fire, and the dress of the hearths for the towns' crowds (folk.gd HEARTH_BODIES)
+	"sarnai": "characters/sarnai", "batu": "characters/batu", "zhurong": "characters/zhurong",
+	"folk_herder": "characters/folk_herder", "folk_herder_f": "characters/folk_herder_f", "folk_oasis_f": "characters/folk_oasis_f",
+	"folk_boatwoman": "characters/folk_boatwoman", "folk_founder": "characters/folk_founder", "folk_lantern_f": "characters/folk_lantern_f",
+	"lin_feng_f": "characters/lin_feng_f", "lin_feng_f_wanderer": "characters/lin_feng_f_wanderer", "lin_feng_f_wild": "characters/lin_feng_f_wild", "lin_feng_f_scholar": "characters/lin_feng_f_scholar",
 	"alchemist": "characters/alchemist", "smith": "characters/smith", "nomad": "characters/nomad",
 	"spore_witch": "characters/spore_witch", "steppe_shaman": "characters/steppe_shaman", "nuwa_echo": "characters/nuwa_echo",
 	# earlier NPCs, now Blender-built too

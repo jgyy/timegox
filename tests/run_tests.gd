@@ -871,7 +871,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -926,6 +926,9 @@ func _init() -> void:
 							if Data.step_index(str(st_c.id)) < _kill_step(tid) and str(st_c.kind) == "clear":
 								before += int(st_c.n)
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= before
+					"hearths":
+						# the New Fire release: hearths of the land that can call the hero a guest (cultures.gd)
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Cultures.ORDER.size()
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1078,7 +1081,7 @@ func _init() -> void:
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis) and str(e6.get("area", a6)) == a6)
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 15, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, and Part XVII's cold in Frostpeak and poisons in the millet" % p13_bands)
+	check(p13_bands == 8 and bands == 18, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, Part XVII's cold in Frostpeak and poisons in the millet, and Part XVIII's damp at Longmen, cinders on the volcano and wildfire on the mountain" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1086,14 +1089,15 @@ func _init() -> void:
 		if st7.kind != "visits":
 			continue
 		visits_steps += 1
-		check(int(st7.n) >= 1 and int(st7.n) < st7.npcs.size(), "%s: any %d of %d, so there is a choice" % [st7.id, st7.n, st7.npcs.size()])
+		# (Part XVIII's new fire goes home to every one of the six hearths: there the choice is only the order)
+		check(int(st7.n) >= 1 and (int(st7.n) < st7.npcs.size() or (str(st7.id) == "s_p18_carry" and int(st7.n) == st7.npcs.size())), "%s: any %d of %d, so there is a choice" % [st7.id, st7.n, st7.npcs.size()])
 		var realms7 := {}
 		for nid in st7.npcs:
 			var na := Trials.npc_area(str(nid))
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and Data.DIALOGUE.has("visit:" + str(nid)), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) == "s_p16_calls", "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -1731,6 +1735,7 @@ func _fates_and_faces() -> void:
 	_lotus()
 	_living()
 	_spring()
+	_new_fire()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -2217,8 +2222,8 @@ func _spring() -> void:
 					early.append("%s (%s, %s)" % [rid, item, cs.id])
 	check(early.is_empty(), "every recipe that needs what a collect step gathers is offered only after the step (%s)" % str(early))
 	print("== Part XVII: the Spring Thunder ==")
-	check(Data.REALMS.size() == 23 and Data.REALMS[22] == "Myriad Things Awake" and Data.MAX_LEVEL == 66 and Data.level_name(66).ends_with("Myriad Things Awake") and Data.REALM_INFO.size() == 23 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "Part XVII adds the Myriad Things Awake realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break22" and Data.DIALOGUE.has("recall15") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break21\": \"recall15\""), "Part XVII follows Ten Thousand Hearths (recall15) and ends the game")
+	check(Data.REALMS.size() >= 23 and Data.REALMS[22] == "Myriad Things Awake" and Data.level_name(66).ends_with("Myriad Things Awake") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XVII adds the Myriad Things Awake realm")
+	check(Data.STEPS[Data.step_index("s_break22")].to == 66 and Data.DIALOGUE.has("recall15") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break21\": \"recall15\""), "Part XVII follows Ten Thousand Hearths (recall15) and ends at Myriad Things Awake")
 	var wsurf: Dictionary = Atlas.world_of("surface")
 	var by_tile := {}
 	for e0 in wsurf.ents:
@@ -2336,3 +2341,229 @@ func _spring() -> void:
 	var bsrc3 := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bsrc3.contains("\"qing_nu\": \"land\"") and bsrc3.contains("\"taisui\": ") and bsrc3.contains("_clear_step") and bsrc3.contains("_strike_first") and bsrc3.contains("\"s_p17_graves\""), "the bot has a way through both trials, clears the land with its sword, strikes first and has a plan for every scene")
 	check(Trials.EPITHETS.has("heart") and Trials.EPITHETS.has("folk") and Trials.EPITHETS.has("land"), "every way through a trial has an epithet for the ending (the ending read a key that was not there)")
+
+## The New Fire release: the Six Hearths (cultures.gd), the hero as a young man or a young woman
+## (fashion.gd, voice.gd), the beginnings and the ends of the story, and Part XVIII, the New Fire.
+func _new_fire() -> void:
+	print("== the Six Hearths (cultures.gd) ==")
+	check(Cultures.ORDER.size() == 6 and Cultures.HEARTHS.size() == 6, "six hearths of the land")
+	var town_of := {}
+	for hid in Cultures.ORDER:
+		var hh: Dictionary = Cultures.HEARTHS[hid]
+		var whole := true
+		for k in ["n", "people", "short", "col", "home", "towns", "areas", "keeper", "keeper_area", "kin", "hail", "greet", "dish", "drink", "festival", "fire", "taboo", "custom", "desc", "fx", "give", "fx_text",
+				"guest_fx", "guest_text", "keepsake", "prologue", "farewell", "lines", "ending"]:
+			whole = whole and hh.has(k)
+		check(whole and (hh.lines as Array).size() >= 4 and (hh.hail as Array).size() >= 3, "%s: a hearth with a people, a table, a fire, a custom, a thing nobody does and words of its own" % hid)
+		check(Trials.npc_area(str(hh.keeper)) == str(hh.keeper_area) and str(hh.keeper) in hh.kin and str(hh.keeper_area) in hh.areas, "%s: its keeper lives in its own country" % hid)
+		for nid in hh.kin:
+			check(Trials.npc_area(str(nid)) != "", "%s: %s, one of its people, lives somewhere" % [hid, nid])
+		for tid in hh.towns:
+			check(Folk.TOWNS.has(tid) and not town_of.has(tid), "%s: %s is a town, and of this hearth only" % [hid, tid])
+			town_of[tid] = hid
+		for a in hh.areas:
+			check(Data.AREAS.has(a) and Cultures.of_area(str(a)) == hid, "%s: %s is a region, and of this hearth only" % [hid, a])
+		for fk in (hh.fx as Dictionary).keys() + (hh.guest_fx as Dictionary).keys() + (hh.give as Dictionary).keys():
+			check(str(fk) in ["hp", "qi", "atk", "spd", "miss", "heal", "taken", "stones", "exp", "cost", "hp_pill", "qi_pill"], "%s: gift %s is one the game knows" % [hid, fk])
+		check((hh.prologue as Array).size() >= 3 and (hh.farewell as Array).size() >= 4 and str(hh.farewell[0][0]) == Trials.npc_name(str(hh.keeper)) and (hh.farewell as Array).any(func(ln): return str(ln[0]) == "Lin Feng"),
+			"%s: a beginning of its own, and a farewell its keeper and the hero both speak in" % hid)
+		# the last morning at the hearth: open ground of its country, a short walk from its keeper
+		var st: Vector2i = Cultures.start_tile(str(hh.keeper_area), str(hh.keeper))
+		var lw: Dictionary = Atlas.world_of(Data.layer_of(str(hh.keeper_area)))
+		var kp := Vector2i(-1, -1)
+		for e in lw.ents:
+			if e.kind == "npc" and str(e.id) == str(hh.keeper):
+				kp = e.pos
+		var dk: int = absi(st.x - kp.x) + absi(st.y - kp.y)
+		check(kp.x >= 0 and MapGen.is_walkable_tile(lw.grid[st.y * int(lw.w) + st.x]) and dk >= 2 and dk <= 6 and maxi(absi(st.x - kp.x), absi(st.y - kp.y)) < 16,
+			"%s: the story begins %d steps from %s, on ground that can be walked" % [hid, dk, hh.keeper])
+	for tid2 in Folk.TOWNS:
+		if str(Folk.TOWNS[tid2].race) in ["human", "desert"] and Data.layer_of(str(Folk.TOWNS[tid2].area)) == "surface":
+			check(Cultures.of_town(tid2) != "", "the town of %s belongs to a hearth of the land" % tid2)
+	check(Cultures.of_town("featherfall") == "" and Cultures.of_area("juntian") == "" and Cultures.of_npc("elder") == "", "the towns of the other realms have peoples of their own (Part XI), not hearths")
+	var HG = load("res://scripts/game.gd").new()
+	HG.reset()
+	check(Cultures.own(HG) == "valley" and Cultures.tier(HG, "valley") == 2 and Cultures.guests(HG) == 1, "the story's own sweeper is kin of the Rice Hearth, and a stranger everywhere else")
+	check(Cultures.earn(HG, "steppe", Cultures.GUEST - 1) == 0 and Cultures.tier(HG, "steppe") == 0 and Cultures.earn(HG, "steppe", 1) == 1 and Cultures.guests(HG) == 2, "standing makes a guest at %d" % Cultures.GUEST)
+	var spd0: float = Fashion.gear(HG, "spd")
+	check(is_equal_approx(spd0, 1.0) and Cultures.earn(HG, "steppe", 99) == 2 and int(HG.hearth.steppe) == Cultures.KIN, "a guest of the Felt Hearth is a little faster; standing stops at kin")
+	check(is_equal_approx(Cultures.gear(HG, "heal"), 0.045), "kin have half as much again of a hearth's gift (the Rice Hearth's healing)")
+	HG.sit_with("cook_aysha")
+	HG.sit_with("cook_aysha")
+	check(int(HG.hearth.get("sand", 0)) == Cultures.SIT and HG.sat.has("cook_aysha"), "sitting down with one of a hearth's people counts once")
+	HG.create_hero({"body": "f", "hearth": "forge", "family": "Bai", "given": "Chen"})
+	check(Cultures.own(HG) == "forge" and Cultures.tier(HG, "forge") == 2 and Cultures.tier(HG, "valley") == 0 and int(HG.inv.get("qi_pill", 0)) >= 1 and HG.fem(), "a hero of the Casting Hearth is kin there from the first day, with its keepsake")
+	check(is_equal_approx(Fashion.gear(HG, "atk"), 0.04 + 0.03) and is_equal_approx(Fashion.gear(HG, "spd"), -1.0), "and has its gift and its burden (attack, a founder's tread)")
+	HG.reset()
+	# the story alone makes the hero a guest of every hearth before the last trial asks for five
+	var deeds := {}
+	for stp in Data.STEPS:
+		if stp.has("hearth") and Data.step_index(str(stp.id)) < _kill_step("huilu"):
+			check(Cultures.HEARTHS.has(str(stp.hearth)), "%s is done for a hearth there is" % stp.id)
+			deeds[str(stp.hearth)] = int(deeds.get(str(stp.hearth), 0)) + Cultures.DEED
+	for hid2 in Cultures.ORDER:
+		check(int(deeds.get(hid2, 0)) >= Cultures.GUEST, "Part XVIII's errands for %s make a guest of anybody (%d)" % [hid2, int(deeds.get(hid2, 0))])
+	print("== the people of the hearths (folk.gd) ==")
+	var wsurf: Dictionary = Atlas.world_of("surface")
+	var dressed := {}
+	for tid3 in ["shazhou", "longmen", "tushan", "yanggu"]:
+		var hid3 := Cultures.of_town(tid3)
+		var own_dress := 0
+		for fp in Folk.people(wsurf, tid3):
+			check(FileAccess.file_exists("res://art/characters/%s.py" % str(fp.body)), "%s wears a body there is (%s)" % [fp.n, fp.body])
+			if str(fp.body) in (Folk.HEARTH_BODIES[hid3] as Dictionary).values():
+				own_dress += 1
+				dressed[str(fp.body)] = true
+				check((str(fp.body) in Folk.FEM) == bool(fp.fem), "%s: the dress of the hearth fits who wears it" % fp.n)
+		check(own_dress >= 2, "%s: some of its people wear the dress of %s (%d)" % [tid3, Cultures.HEARTHS[hid3].n, own_dress])
+	for hb in Folk.HEARTH_BODIES:
+		for bk in Folk.HEARTH_BODIES[hb]:
+			var body := str(Folk.HEARTH_BODIES[hb][bk])
+			check(FileAccess.file_exists("res://art/characters/%s.py" % body) and Assets.has("characters/" + body), "%s is Blender-built" % body)
+	var sand_named := 0
+	var names := {}
+	for fp2 in Folk.people(wsurf, "shazhou"):
+		names[str(fp2.n)] = true
+		for nm in Folk.HEARTH_NAMES.sand.m + Folk.HEARTH_NAMES.sand.f:
+			if str(fp2.n).ends_with(" " + str(nm)):
+				sand_named += 1
+	check(sand_named >= 8 and names.size() == Folk.people(wsurf, "shazhou").size(), "the people of Shazhou have the sand roads' names, each their own (%d)" % sand_named)
+	var q1: Dictionary = Folk.people(wsurf, "qingshi")[0]
+	HG.reset()
+	check(Folk.line(q1, HG) in Cultures.HEARTHS.valley.lines or Folk.line(q1, HG).replace(HG.address(), "%s") in Cultures.HEARTHS.valley.lines, "the first thing a villager of Qingshi says is the Rice Hearth's own")
+	var hails := 0
+	for fp3 in Folk.people(wsurf, "longmen"):
+		if Folk.greeting(fp3, HG) in Cultures.HEARTHS.river.hail:
+			hails += 1
+	check(hails >= 4, "the river folk hail in their own way in the street (%d)" % hails)
+	for sid in ["s_p18_valley", "s_p18_sand", "s_p18_dawn"]:
+		var fs: Dictionary = Data.STEPS[Data.step_index(sid)]
+		var of_role := 0
+		for fp4 in Folk.people(wsurf, str(fs.town)):
+			if Folk.is_role(fp4, str(fs.role)) and Folk.in_town(fp4, fs):
+				of_role += 1
+		check(Folk.ERRANDS.has(sid) and Cultures.of_town(str(fs.town)) == str(fs.hearth) and str(Folk.TOWNS[str(fs.town)].area) == str(fs.area) and of_role >= int(fs.n) + 1 and (Folk.ERRANDS[sid].lines as Array).size() >= 4,
+			"%s: an errand among the %ss of %s, with one to spare (%d for %d)" % [sid, fs.role, fs.town, of_role, int(fs.n)])
+	var other: Dictionary = Folk.people(wsurf, "cloudfoot")[0]
+	check(not Folk.in_town(other, Data.STEPS[Data.step_index("s_p18_sand")]) and Folk.in_town(other, Data.STEPS[Data.step_index("s_p17_sow")]), "an errand that names its town is done there; the older ones anywhere")
+	print("== a young man or a young woman (fashion.gd, voice.gd) ==")
+	check(Fashion.BODY_ORDER == ["m", "f"] and Fashion.default_hero().body == "m" and Fashion.default_hero().hearth == "valley", "the story's own sweeper is the young man of the Rice Hearth")
+	for lk in Fashion.LOOK_ORDER:
+		var af := Fashion.look_asset(lk, true)
+		check(af != Fashion.look_asset(lk, false) and Assets.has(Assets.PEOPLE.get(af, "")) and FileAccess.file_exists("res://art/characters/%s.py" % af) and Fashion.look_desc(lk, true) != Fashion.look_desc(lk, false),
+			"the look %s is built on a woman's frame too (%s)" % [lk, af])
+	for oid in Fashion.ORIGIN_ORDER:
+		var od := Fashion.origin_desc(oid, true)
+		check(not _has_word(od, ["he", "him", "boy"]) or oid in ["merchant", "scholar", "hunter"], "the trade %s is told of her" % oid)
+	check(Fashion.origin_desc("merchant", true).contains("she owes him a donkey") and Fashion.origin_desc("foundling", true).contains("raised her"), "and the men in her story stay men")
+	check(Voice.tell("Lin Feng lifts his sword and the mountain answers him.")[0] == "Lin Feng lifts her sword and the mountain answers her.", "what is told of Lin Feng is told of her")
+	check(Voice.tell("Elder Qing Xuan puts down his cup.")[0] == "Elder Qing Xuan puts down his cup." and Voice.tell("He lowers his comb.")[0] == "He lowers his comb.", "what is told of another man, or of nobody named, is left alone")
+	check(Voice.tell("Lin Feng bows. The Elder strokes his beard, and Lin Feng picks up his broom.")[0] == "Lin Feng bows. The Elder strokes his beard, and Lin Feng picks up her broom.", "a 'his' belongs to whoever was named last")
+	check(Voice.tell("Lin Feng looks at Yue Ling, and she laughs, and he laughs too.")[0] == "Lin Feng looks at Yue Ling, and she laughs, and she laughs too.", "a woman's name takes no 'he' away from her")
+	check(Voice.tell("The sweeper has his broom. The choice is his.")[0] == "The sweeper has her broom. The choice is hers.", "the sweeper is the hero; 'his' at the end of a sentence is 'hers'")
+	check(Voice.tell("Thank you, Senior Brother Lin! Happy new year, big brother cultivator!")[0] == "Thank you, Senior Sister Lin! Happy new year, big sister cultivator!", "the juniors call her Senior Sister")
+	check(Voice.tell("Lin Shan and Feng Meng and Warden Feng met him.")[0] == "Lin Shan and Feng Meng and Warden Feng met him.", "other people's names are not hers")
+	check(Voice.tell("Lin Feng, the boy who swept the steps, is ready. He's sure. You hit hard, young man.")[0] == "Lin Feng, the girl who swept the steps, is ready. She's sure. You hit hard, young woman.", "the boy who swept the steps is the girl who did")
+	check(Voice.tell("He Bo gives Lin Feng the tablet of his office.")[0] == "He Bo gives Lin Feng the tablet of his office." and Voice.tell("Lin Feng takes it from him.", true)[0] == "Lin Feng takes it from him."
+		and Voice.tell("A man steps out wearing Lin Feng's face, names stitched into his sleeves.")[0].ends_with("his sleeves."), "the subject of a clause keeps its own 'his'; a 'him' in her own clause is somebody else; a face that is only hers names nobody")
+	check(Voice.tell("Yue Ling looks at Lin Feng. He smiles.")[0] == "Yue Ling looks at Lin Feng. She smiles.", "after a woman is named first, the 'he' is still hers")
+	var conv: Array = Voice.lines([["Narrator", "Lin Feng kneels."], ["Narrator", "He does not look up."], ["Elder Qing Xuan", "Rise."], ["Narrator", "He strokes his beard."], ["Lin Feng", "He is late, Elder."], ["Narrator", "He waits."]])
+	check(conv[1][1] == "She does not look up." and conv[3][1] == "He strokes his beard." and conv[4][1] == "He is late, Elder." and conv[5][1] == "She waits.",
+		"in a conversation who was spoken of carries from line to line: the narrator's 'he' after her, the Elder's own, and never what anybody says aloud")
+	for fx in Voice.FIX:
+		var found := false
+		for ok2 in Fashion.ORIGIN_LINES:
+			for oo in Fashion.ORIGIN_LINES[ok2]:
+				for ln in Fashion.ORIGIN_LINES[ok2][oo]:
+					found = found or str(ln[1]) == str(fx)
+		for dk in Data.DIALOGUE:
+			for ln2 in Data.DIALOGUE[dk]:
+				found = found or str(ln2[1]) == str(fx)
+		for shk in Bonds.SHARES:
+			for ln3 in Bonds.SHARES[shk].get("lines", []):
+				found = found or str(ln3[1]) == str(fx)
+		check(found and str(Voice.FIX[fx]) != str(fx), "a line written out for her is a line of the story: %s..." % str(fx).substr(0, 40))
+	var changed := 0
+	var total := 0
+	var odd: Array = []
+	for key in Data.DIALOGUE:
+		var src: Array = Data.DIALOGUE[key]
+		var told: Array = Voice.lines(src)
+		for i in src.size():
+			total += 1
+			if str(told[i][0]) != str(src[i][0]) or (told[i] as Array).size() != (src[i] as Array).size():
+				odd.append(key)
+			if str(told[i][1]) != str(src[i][1]):
+				changed += 1
+				# nobody who speaks has a "he" changed in what they say, unless the line was written out for her
+				if str(src[i][0]) != "Narrator" and str(told[i][1]) != Voice.said(str(src[i][1])):
+					odd.append("%s:%d" % [key, i])
+			for bad in ["she she", "her her her"]:
+				if str(told[i][1]).contains(bad):
+					odd.append("%s:%d %s" % [key, i, bad])
+	check(odd.is_empty() and changed >= 40 and changed < total / 4, "the whole story is told of her: %d of %d lines change, no speaker does, and her own words never (%s)" % [changed, total, str(odd.slice(0, 5))])
+	UI.set_hero_name("Bai", "Chen", true)
+	check(UI.named("Lin Feng lifts his broom. Senior Brother Lin!") == "Bai Chen lifts her broom. Senior Sister Bai!", "on screen she has the name the player gave her")
+	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
+	check(UI.named("Lin Feng lifts his broom.") == "Lin Feng lifts his broom.", "and the story's own sweeper is told as he was written")
+	print("== the ends of the story (cultures.gd) ==")
+	check(Cultures.ENDING_ORDER.size() == 5 and Cultures.ENDINGS.size() == 5, "five ends")
+	HG.reset()
+	check(Cultures.endings_open(HG) == ["azure", "home"] and Cultures.ending_of(HG) == "azure", "the mountain and the way home are always open; the others are earned")
+	for eid in Cultures.ENDING_ORDER:
+		var en: Dictionary = Cultures.ENDINGS[eid]
+		check(str(en.n) != "" and str(en.label) != "" and str(en.desc).length() > 60 and (en.lines as Array).size() >= 2 and en.sky is Color, "the ending %s has a name, a choice, and its own last words" % eid)
+		for nd in en.needs:
+			check(str(nd[0]) in ["home", "guests", "peoples", "heart"] and (str(nd[0]) == "home" or Cultures.ending_need_text(nd, HG) != ""), "%s: what it asks is something the journey can earn" % eid)
+	for hid4 in ["steppe", "sand", "river", "forge"]:
+		Cultures.earn(HG, hid4, Cultures.GUEST)
+	check(Cultures.ending_open("road", HG) and not Cultures.ending_open("open", HG), "five hearths open the road; the open door wants the peoples of the realms as well")
+	for rc in ["yumin", "dragon", "tianhu", "jiaoren"]:
+		HG.standing[rc] = Data.FRIEND
+	check(Cultures.ending_open("open", HG), "four hearths and four peoples open the door")
+	HG.bond = Bonds.LEVELS[3]
+	check(Cultures.ending_open("lotus", HG) and Cultures.endings_open(HG).size() == 5, "and a kindred spirit builds a house")
+	HG.ending = "road"
+	HG.hero["hearth"] = "river"
+	var el: Array = Cultures.ending_lines(HG)
+	check(el.size() == 3 and str(el[0][1]).contains("pot of coals") and str(el[2][1]).contains("Longmen"), "the last words are the ending's, and then the hero's own hearth's")
+	HG.ending = "home"
+	check(str(Cultures.ending_lines(HG)[0][1]).contains("Longmen Ferry"), "the way home goes to the hero's own hearth")
+	HG.free()
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	check(msrc.contains("func choose_ending") and msrc.contains("begin_prologue") and msrc.contains("ENDING_ASK") and FileAccess.get_file_as_string("res://scripts/ending.gd").contains("Cultures.ending_of"), "the game begins at the hero's hearth and ends where the player says")
+	print("== Part XVIII: the New Fire ==")
+	check(Data.REALMS.size() == 24 and Data.REALMS[23] == "Fire Passed On" and Data.MAX_LEVEL == 69 and Data.level_name(69).ends_with("Fire Passed On") and Data.REALM_INFO.size() == 24 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XVIII adds the Fire Passed On realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break23" and Data.DIALOGUE.has("recall16") and msrc.contains("\"s_break22\": \"recall16\""), "Part XVIII follows Myriad Things Awake (recall16) and ends the game")
+	for tid5 in ["zhurong", "huilu"]:
+		check(Trials.TRIALS.has(tid5) and Lore.BOSS.has(tid5) and Data.DIALOGUE.has("pre:" + tid5) and Data.DIALOGUE.has("post:" + tid5), "%s is a trial, with a story and words before and after" % tid5)
+		check((Trials.TRIALS[tid5].paths as Array).any(func(pth): return str(pth.kind) == "hearth"), "%s can be passed by the hearths" % tid5)
+	check(Trials.KINDS.has("hearth") and Trials.EPITHETS.has("hearth") and Assets.PEOPLE.has("zhurong") and "person:zhurong" in UI.SHAPES and Data.BOSS_DROPS.get("zhurong", "") == "suiren_drill", "the Lord of the Southern Fire is Blender-built, and gives Suiren's drill")
+	for mon in ["damp_smoke", "bilge_imp", "drowned_ember", "ash_moth", "cinder_imp", "clinker_crab", "wildfire_sprite", "spark_swallow", "smoke_hound"]:
+		check(Data.ENEMIES.has(mon) and Lore.BEAST.has(mon), "%s has a story" % mon)
+	for sid2 in ["s_p18_drill", "s_p18_feast"]:
+		var sp: Dictionary = Data.STEPS[Data.step_index(sid2)]
+		check(Bonds.SHARES.has(sid2) and not Bonds.find_spot(wsurf.ents, str(sp.spot)).is_empty() and Bonds.share_place(sid2) != "side by side", "%s: a scene with Yue Ling, at a place that is there" % sid2)
+	for sid3 in ["s_p18_wood", "s_p18_valley", "s_p18_argal", "s_p18_sand", "s_p18_smoke", "s_p18_clinker", "s_p18_dawn", "s_p18_ash", "s_p18_brush", "s_p18_wild"]:
+		check(Data.DIALOGUE.has("done:" + sid3), "%s has its word to say when it is done" % sid3)
+	for hs in ["s_p18_smoke", "s_p18_ash", "s_p18_wild"]:
+		var hst: Dictionary = Data.STEPS[Data.step_index(hs)]
+		var band: Dictionary = Data.AREAS[str(hst.area)].get("warband", {})
+		check(bool(hst.get("first", false)) and bool(band.get("late", false)) and Data.step_index(str(band.vis)) < Data.step_index(hs) and int(band.n) * 2 >= int(hst.n), "%s: the packs are there before it, enough of them, and it asks for the first strike" % hs)
+	var carry: Dictionary = Data.STEPS[Data.step_index("s_p18_carry")]
+	var keepers: Array = Cultures.ORDER.map(func(h5): return str(Cultures.HEARTHS[h5].keeper))
+	keepers.sort()
+	var carried: Array = (carry.npcs as Array).duplicate()
+	carried.sort()
+	check(carried == keepers and int(carry.n) == 6, "the new fire is carried home to the keeper of every hearth")
+	for lid in ["sarnai", "batu", "boss_zhurong", "boss_huilu", "p18_wood1", "p18_argal5", "p18_clinker3", "p18_brush6"]:
+		check(wsurf.ents.filter(func(e3): return str(e3.id) == lid).size() == 1, "%s stands in the world once (late: no older map moved for it)" % lid)
+	check(Impact.OBSTACLES.has("clinker") and Impact.OBSTACLES.has("brush") and Data.ITEMS.has("ember_pot") and Trials.RECIPES.has("fire_drill") and Data.CHAT.has("sarnai") and Data.CHAT.has("batu"), "clinker and brush, the pot of six coals, a drill of summer wood, and two people of the tents with things to say")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bsrc.contains("\"zhurong\": \"craft\"") and bsrc.contains("\"huilu\": \"hearth\"") and bsrc.contains("Game.prologue") and bsrc.contains("ENDING_PLAN") and bsrc.contains("\"s_p18_feast\""), "the bot says its goodbye, has a way through both trials, and chooses an end")
+
+## Whether `s` has one of `words` as a whole word (any case).
+func _has_word(s: String, words: Array) -> bool:
+	var r := RegEx.new()
+	r.compile("(?i)\\b(" + "|".join(words) + ")\\b")
+	return r.search(s) != null

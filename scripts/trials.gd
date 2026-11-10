@@ -47,8 +47,10 @@ const KINDS := {
 	"folk": {"n": "By the people", "col": Color("ffb060"), "what": "the towns that remember the old ways"},
 	# the Spring Thunder release (Part XVII): the land Lin Feng opened with his own sword (impact.gd)
 	"land": {"n": "By the land", "col": Color("9ad870"), "what": "the land you have opened with your own blade"},
+	# the New Fire release (Part XVIII): the hearths of the land that call the hero a guest (cultures.gd)
+	"hearth": {"n": "By the hearths", "col": Color("f0a060"), "what": "the hearths of the land that call you a guest"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -130,6 +132,8 @@ const RECIPES := {
 	"open_key": {"at": "smith", "in": {"ess_metal": 8, "ess_dark": 5, "pressed_petal": 2}, "stones": 240000, "after": "s_p15_memories", "for": "lock_warden"},
 	# ---- Part XVI (the Living Land release): red, fire and noise
 	"thunder_cracker": {"at": "alchemist", "in": {"ess_fire": 8, "thunder_bamboo": 2}, "stones": 260000, "after": "s_p16_rally", "for": "xi_beast"},
+	# the New Fire release (Part XVIII): a drill of summer wood, made the way Suiren made his
+	"fire_drill": {"at": "smith", "in": {"ess_wood": 8, "ess_fire": 6, "apricot_wood": 2}, "stones": 340000, "after": "s_p18_valley", "for": "zhurong"},
 	# the Spring Thunder release (Part XVII)
 	"warm_brazier": {"at": "alchemist", "in": {"ess_fire": 8, "ess_wood": 6}, "stones": 300000, "after": "s_p17_ice", "for": "qing_nu"},
 	"taisui_charm": {"at": "smith", "in": {"ess_earth": 8, "ess_metal": 6, "thunder_egg": 1}, "stones": 320000, "after": "s_p17_thunder", "for": "taisui"},
@@ -939,6 +943,33 @@ const TRIALS := {
 				"desc": "Late Kindred Dao and a sword tempered eight times: strength enough to drive a whole year out of the village by hand.",
 				"line": "Lin Feng stands in the lane between the beast and the village, and does not move."},
 		]},
+	# ---- Part XVIII (the New Fire release): the Lord of the Southern Fire, and the fire nobody sat up with
+	"zhurong": {"might": [2.3, 1.3],
+		"why": "Zhurong has opened every summer for ten thousand years by giving the land new fire from Suiren's drill, to hearths put out to receive it. Lin Feng has come with six that would not be put out, and asks him to bless the pot.",
+		"paths": [
+			{"id": "hearth", "kind": "hearth", "n": "Speak for the hearths", "needs": [["hearths", 3]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Three hearths of the land call you a guest: you have eaten their way, carried their fuel, kept their rules. Tell the Lord of Fire whose fires these are, one by one, and what it cost each keeper to hand you a coal.",
+				"line": "Lin Feng names the keepers: the midwife, the grandmother in the tent, the cook, the boat-wife, the founder, the lantern-maker. The dragons of flame lift their heads at every name."},
+			{"id": "craft", "kind": "craft", "n": "A drill of summer wood", "needs": [["item", "fire_drill", 1]], "boon": {"foe_hp": 0.7, "weak_k": 1.9},
+				"desc": "Smith Tie can make a bow-drill of apricot and jujube, bound with wood and fire essence, the way Suiren made his. Turn it in front of the Lord of Fire: you did not come to be given fire. You came knowing how it is made.",
+				"line": "Lin Feng sets the spindle to the board and turns it, and a thread of smoke rises in front of the god who thought only he remembered how."},
+			{"id": "might", "kind": "might", "n": "Stand in the forge mouth", "needs": [["lv", 67], ["temper", 8]], "boon": {},
+				"desc": "Middle Myriad Things cultivation and a sword tempered eight times: a blade that has been through as many fires as his season has days.",
+				"line": "Lin Feng walks into the heat with the pot under one arm and his sword in the other hand, and does not put the pot down."},
+		]},
+	"huilu": {"might": [2.4, 1.3],
+		"why": "The new fire was drilled, and six keepers each lit a bonfire of their own from it to show the others the right way, and turned their backs to argue. Six fires nobody sat up with ran together in the dry wind, and went looking for somebody.",
+		"paths": [
+			{"id": "hearth", "kind": "hearth", "n": "Six lines of buckets", "needs": [["hearths", 5]], "boon": {"assist": 0.04, "foe_hp": 0.8},
+				"desc": "Five hearths or more call you a guest. Their people will take a bucket from your hand, whoever is standing next to them: horse-folk beside founders, boat-wives beside lantern-makers, six lines from the well to the fire.",
+				"line": "The lines form without anybody giving an order: a bucket goes from a herder to a founder to a river woman to a child of Yanggu, and nobody asks whose turn it is."},
+			{"id": "land", "kind": "land", "n": "Kang's firebreak", "needs": [["cleared", 34]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Thirty-four things cleared out of the land's way with your own sword, the brush round the Gathering ground among them. Draw the fire down on to the bare earth you cut, where there is nothing for it to eat.",
+				"line": "Lin Feng backs down the hill, step by step, on to the ring of bare earth, and the great bird follows him on to ground where nothing burns."},
+			{"id": "might", "kind": "might", "n": "Cut the wind out from under it", "needs": [["lv", 68], ["temper", 8]], "boon": {},
+				"desc": "Late Myriad Things cultivation and a sword tempered eight times: a stroke wide enough to take the wind out from under a fire with wings.",
+				"line": "Lin Feng draws, and for the width of one stroke there is no wind on the mountain at all."},
+		]},
 	# ---- Part XVII (the Spring Thunder release): the frost that will not go home, and the lord under the soil
 	"qing_nu": {"might": [2.2, 1.25],
 		"why": "Qing Nu has laid the frost on the land every winter since there were winters, and taken it home every spring. This year she will not: under her snow, she says, nothing that the long year broke can hurt.",
@@ -1049,6 +1080,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"cleared":
 			# the Spring Thunder release: the obstacles of the story cleared with the sword (impact.gd)
 			return g.cleared.size() >= int(n[1])
+		"hearths":
+			# the New Fire release: the hearths of the land that call the hero a guest (cultures.gd)
+			return Cultures.guests(g) >= int(n[1])
 	return false
 
 ## How many peoples of the realms call Lin Feng friend (or kin).
@@ -1109,6 +1143,8 @@ static func need_text(n: Array, g) -> String:
 			return "%d towns reminded of the old ways: red, fire and noise (now %d)" % [int(n[1]), g.rallied.size()]
 		"cleared":
 			return "%d things the long winter left in the way cleared with your sword (now %d)" % [int(n[1]), g.cleared.size()]
+		"hearths":
+			return "%d hearths of the land that call you a guest (now %d; Esc > Hearths)" % [int(n[1]), Cultures.guests(g)]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1207,7 +1243,7 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	"dao": "Walker of Many Roads", "peoples": "Friend of the Four Realms", "relic": "Keeper of Old Things", "bond": "Who Kept Faith",
 	# (the roads added since had none, and the ending's title read a key that was not there: a player who
 	# went through most trials side by side or by the people had a script error for a title)
-	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land"}
+	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

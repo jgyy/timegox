@@ -55,7 +55,9 @@ func _process(_d: float) -> bool:
 			tap(KEY_ENTER)
 		10:
 			expect(main.create.typing == "" and str(main.create.h.family) == "Bai", "a typed family name, letters only (%s)" % str(main.create.h.family))
-			# the given name from the rolls, the next look, the next origin
+			# the given name from the rolls, a young woman, the next look, the next trade, the next hearth
+			tap(KEY_DOWN)
+			tap(KEY_RIGHT)
 			tap(KEY_DOWN)
 			tap(KEY_RIGHT)
 			tap(KEY_DOWN)
@@ -63,22 +65,51 @@ func _process(_d: float) -> bool:
 			for i in 4:
 				tap(KEY_DOWN)
 			tap(KEY_RIGHT)
+			tap(KEY_DOWN)
+			tap(KEY_RIGHT)
 		11:
 			var h: Dictionary = main.create.h
 			expect(str(h.given) == "Chen" and str(h.look) == "wanderer" and str(h.origin) == "fisher", "Left/Right change the name, the look and the origin (%s)" % str(h))
+			expect(str(h.body) == "f" and str(h.hearth) == "steppe" and main.create.value_text("origin") == "Ferry-Hand of Qingshi" and not main.create.told("He poled the ferry.").contains("He "),
+				"and who the sweeper is, and the hearth of the year away (the New Fire release)")
 			tap(KEY_DOWN)
 			tap(KEY_ENTER)
 		12:
 			var gs0 = root.get_node("Game")
 			expect(gs0.hero_name() == "Bai Chen" and UI.named("Lin Feng swept the steps.") == "Bai Chen swept the steps.", "the journey begins with the name chosen, on screen everywhere")
-			expect(int(gs0.inv.get("hp_pill", 0)) == 5 and gs0.max_hp(0) > Data.max_hp(0), "the origin's gift and strength (a ferry-hand: two more pills, more health)")
+			expect(gs0.fem() and UI.named("Lin Feng lifts his broom.") == "Bai Chen lifts her broom." and UI.named("Elder Qing Xuan puts down his cup.") == "Elder Qing Xuan puts down his cup.", "she is told of as she, and the Elder as he")
+			expect(int(gs0.inv.get("hp_pill", 0)) == 6 and gs0.max_hp(0) > Data.max_hp(0), "the origin's gift and strength (a ferry-hand: two more pills, more health), and the hearth's (one more)")
+			expect(Cultures.own(gs0) == "steppe" and Cultures.tier(gs0, "steppe") == 2 and gs0.prologue == "steppe", "kin of the Felt Hearth, and the story begins there")
 		15:
-			expect(main.top_name() == "dialogue", "Begin starts the new game with its prologue")
-			# (three lines: the prologue, a line of the hero's origin, the way to the Elder; Enter once to
-			# finish typing a line and once to go on)
+			expect(main.top_name() == "dialogue" and str(main.dialogue.lines[0][1]).contains("tents of the horse-folk"), "Begin starts the new game with the last morning at her hearth")
+			# (three lines; Enter once to finish typing a line and once to go on)
 			for i in 6:
 				tap(KEY_ENTER)
+		17:
+			var gs1 = root.get_node("Game")
+			var keeper = main.world.find_ent("sarnai")
+			expect(main.top_name() == "world" and gs1.area == "thunder" and gs1.objective_text().contains("say goodbye to Grandmother Sarnai") and keeper != null, "three years ago, in the tents below Thunder Valley, with a goodbye to say")
+			var dk: int = absi(keeper.pos.x - main.world.ptile.x) + absi(keeper.pos.y - main.world.ptile.y)
+			var foes: int = main.world.ents.filter(func(e0): return e0.kind in ["enemy", "boss"] and main.world.ent_visible(e0)).size()
+			expect(dk >= 2 and dk <= 6 and foes == 0 and main.world.leash == main.world.ptile, "the keeper is a short walk off, and nothing prowls (%d steps, %d foes)" % [dk, foes])
+			# the leash: nobody leaves before the farewell is said
+			main.world.ptile = main.world.leash + Vector2i(main.world.LEASH, 0)
+			main.world.target = main.world.ptile
+			main.world.move_dir = Vector2i(1, 0)
+			main.world._move(0.2)
+			expect(main.world.ptile == main.world.leash + Vector2i(main.world.LEASH, 0) and main.world.move_dir == Vector2i.ZERO, "and no walking away before it is said")
+			main.world.key_lock = false
+			main.world.ptile = main.world.leash
+			main.world.target = main.world.leash
+			main.interact(keeper)
+		18:
+			expect(main.top_name() == "dialogue" and str(main.dialogue.lines[0][0]) == "Grandmother Sarnai", "Enter facing the keeper: the farewell")
+			# (the farewell's five lines, "Three years later.", and the three lines at the sect)
+			for i in 18:
+				tap(KEY_ENTER)
 		20:
+			var gs1b = root.get_node("Game")
+			expect(gs1b.prologue == "" and gs1b.area == "sect" and gs1b.cur_step().id == "s_intro", "three years later: the sect, and the Elder's summons")
 			expect(main.top_name() == "world", "dialogue dismissed with Enter")
 			start_y = main.world.ptile.y
 			key(KEY_DOWN, true)

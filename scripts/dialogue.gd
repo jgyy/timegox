@@ -55,6 +55,9 @@ func _draw() -> void:
 	UI.text(self, Vector2(84, 521), who, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, tw)
 	var txt: String = l[1]
 	var n := mini(int(shown), txt.length())
+	# (the words were told of the hero, man or woman, when the conversation began: main.say)
+	UI.told = true
 	UI.wrapped(self, Vector2(88, 572), txt.substr(0, n), 22, UI.C_TEXT, VIEW.x - 180)
+	UI.told = false
 	if typed_done():
 		UI.text(self, Vector2(VIEW.x - 120, 676 + sin(t * 6) * 3), "v", 22, UI.C_GOLD)

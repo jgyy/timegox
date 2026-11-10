@@ -88,7 +88,10 @@ static func set_hour(g, h: float) -> void:
 const STORY_HOURS := {"s_gh_xihe": 18.6, "s_p16_eve": 21.2, "s_p16_vigil": 23.8, "s_p16_nian": 5.4, "s_p16_dawn": 6.3, "s_p16_riddles": 19.8,
 	# Part XVII: the first thunder is drummed at dusk in the rain, the petty men beaten the next morning, and
 	# the graves swept on Qingming morning
-	"s_p17_eggs": 19.2, "s_p17_thunder": 7.4, "s_p17_willow": 8.2}
+	"s_p17_eggs": 19.2, "s_p17_thunder": 7.4, "s_p17_willow": 8.2,
+	# Part XVIII: the first sale at Yanggu is made by lamplight before the sun, the new fire is drilled
+	# towards evening, and the feast is eaten at dusk
+	"s_p18_rong": 4.6, "s_p18_brush": 17.2, "s_p18_carry": 18.0}
 
 static func story_hour(g, sid: String) -> void:
 	if STORY_HOURS.has(sid):

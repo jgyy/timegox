@@ -90,6 +90,11 @@ const OBSTACLES := {
 		"hint": "A paper petty man pinned under the bridge (F to beat it)"},
 	"chain": {"n": "frozen chain", "hits": 3, "piece": "rock", "col": Color("9ab8c8"), "n_p": 7, "puff": Color("e8f4ff"),
 		"hint": "A chain of black ice holds the dragon's head down (F to break it)"},
+	# Part XVIII (the New Fire release): what a tired fire leaves, and what a wildfire eats
+	"clinker": {"n": "clinker crust", "hits": 2, "piece": "rock", "col": Color("3a3432"), "n_p": 8, "puff": Color("8a8480"),
+		"hint": "Clinker has crusted over the mouth of a casting pit (F to break it off)"},
+	"brush": {"n": "dry brush", "hits": 1, "piece": "log", "col": Color("9a8450"), "n_p": 5, "puff": Color("c8b890"),
+		"hint": "A stand of brush as dry as tinder (F to cut it for the firebreak)"},
 }
 
 ## A blow lands on obstacle `e`.  Returns "cleared" when it is the blow that clears it, "hit" when
@@ -165,6 +170,33 @@ static func obstacle_model(what: String, theme_name: String = "") -> Node3D:
 				b.box(Vector3(x2, 0.95, 0.06), Vector3(0.2, 0.36, 0.01), MB.tag(Color("f0ead8"), MB.CLOTH))
 				b.sph(Vector3(x2, 1.2, 0.06), Vector3(0.07, 0.07, 0.01), MB.tag(Color("f0ead8"), MB.CLOTH))
 				b.box(Vector3(x2, 0.6, 0.06), Vector3(0.05, 0.3, 0.01), MB.tag(Color("e05040"), MB.CLOTH))
+		"clinker":
+			# a casting pit's mouth crusted over: a ring of stone, a dome of black glassy slag, and a
+			# dull glow where the fire shows through the cracks
+			var slag := MB.tag(Color("2a2624"), MB.CRYSTAL)
+			var slag2 := MB.tag(Color("4a423c"), MB.STONE)
+			b.torus(Vector3(0, 0.14, 0), 0.82, 0.16, MB.tag(Color("6a6058"), MB.STONE))
+			b.sph(Vector3(0, 0.2, 0), Vector3(0.72, 0.42, 0.72), slag)
+			b.sph(Vector3(0.3, 0.42, 0.15), Vector3(0.3, 0.2, 0.28), slag2)
+			b.sph(Vector3(-0.28, 0.4, -0.2), Vector3(0.26, 0.18, 0.3), slag2)
+			b.sph(Vector3(0.05, 0.5, -0.3), Vector3(0.22, 0.16, 0.2), slag)
+			for k4 in 5:
+				var a4 := TAU * k4 / 5.0 + 0.3
+				g.box(Vector3(cos(a4) * 0.4, 0.5, sin(a4) * 0.4), Vector3(0.36, 0.03, 0.03), Color(1.0, 0.45, 0.15, 0.85), Vector3(0.3, -a4, 0.5))
+			g.ball(Vector3(0, 0.5, 0), 0.75, Color(1.0, 0.4, 0.15, 0.16), true)
+		"brush":
+			# a stand of summer-dry brush: bare grey stems and straw-coloured twigs
+			var stem := MB.tag(Color("8a7450"), MB.WOOD)
+			var twig := MB.tag(Color("c8b070"), MB.WOOD)
+			for k5 in 9:
+				var a5 := TAU * k5 / 9.0 + 0.2
+				var r5 := 0.25 + 0.3 * float(k5 % 3) / 2.0
+				var base5 := Vector3(cos(a5) * r5, 0.0, sin(a5) * r5)
+				var top5 := base5 * 1.9 + Vector3(0, 1.3 + 0.35 * float(k5 % 2), 0)
+				b.limb(base5, top5, 0.045, 0.012, stem, 4)
+				b.limb(base5.lerp(top5, 0.55), base5.lerp(top5, 0.8) + Vector3(sin(a5) * 0.4, 0.2, -cos(a5) * 0.4), 0.02, 0.006, twig, 3)
+				b.limb(base5.lerp(top5, 0.75), top5 + Vector3(-sin(a5) * 0.3, 0.1, cos(a5) * 0.3), 0.016, 0.005, twig, 3)
+			b.sph(Vector3(0, 0.12, 0), Vector3(0.7, 0.12, 0.7), MB.tag(Color("b8a468"), MB.WOOD))
 		"chain":
 			var ice := MB.tag(Color("6a8aa0"), MB.CRYSTAL)
 			for k3 in 6:
@@ -187,7 +219,7 @@ static func obstacle_burst(parent: Node3D, what: String, at: Vector3, dir: Vecto
 		Fx3D.sparks(parent, at + Vector3(0, 0.8, 0) - dir * 0.3, Color(1.0, 0.9, 0.7))
 		return
 	Havoc.burst(parent, "rubble", at, dir, ground, 1.2 if what != "petty" else 0.7, spec.col)
-	if what in ["spring_ox", "ice", "chain", "deadfall"]:
+	if what in ["spring_ox", "ice", "chain", "deadfall", "clinker", "brush"]:
 		Havoc.burst(parent, "rubble", at + Vector3(0, 0.4, 0), -dir, ground, 0.8, Color(spec.col).darkened(0.2))
 	if what == "ice" or what == "chain":
 		Fx3D.splash(parent, at + Vector3(0, 0.2, 0), Color(0.8, 0.92, 1.0), 0.9, 1.4)

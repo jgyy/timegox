@@ -85,6 +85,10 @@ var cam_pos := Vector3.ZERO
 ## the realm (or floor) the hero is in, every realm's data and 3D offset, and a trip between two of
 ## them while one is under way ({t, dur, to_layer, to_tile, dir, climb, swapped})
 var layer := "surface"
+## the beginning (cultures.gd): the tile the hero's last morning at the hearth starts on; until the
+## farewell is said nobody can walk further than LEASH tiles from it ((-1, -1): no leash)
+var leash := Vector2i(-1, -1)
+const LEASH := 16
 var bundles := {}
 var off := Vector3.ZERO
 var trip := {}
@@ -707,6 +711,13 @@ func _floor_view(fid: String) -> void:
 
 # ---------------------------------------------------------------- entities
 func ent_visible(e: Dictionary) -> bool:
+	# the beginning (cultures.gd): the last morning at the hearth is three years before the story: its
+	# keeper is at home, nothing prowls, and nothing of the chapters to come is lying about
+	if Game.prologue != "":
+		if e.kind == "npc" and str(e.id) == str(Cultures.HEARTHS[Game.prologue].keeper):
+			return true
+		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode"] or e.get("fate", false):
+			return false
 	match e.kind:
 		"enemy":
 			if Game.defeated.has(e.id):
@@ -1619,6 +1630,12 @@ func _move(d: float) -> void:
 				key_lock = true
 				return
 			if not tile_free(nt):
+				return
+			# the beginning (cultures.gd): nobody leaves before the farewell is said
+			if Game.prologue != "" and leash.x >= 0 and maxi(absi(nt.x - leash.x), absi(nt.y - leash.y)) > LEASH:
+				move_dir = Vector2i.ZERO
+				key_lock = true
+				Game.toast("Not yet. There is a goodbye to say first.")
 				return
 			target = nt
 			move_t = 0.0

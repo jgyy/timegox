@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 66
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake"]
+const MAX_LEVEL := 69
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -67,6 +67,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Keeper of Hearths", "note": "Every lit window in the land is a family that stayed up together, and every one of them has a seat for you. You never walk into the cold again unless you choose to; somewhere, always, a door is open and the kettle is on."},
 	# Part XVII (the Spring Thunder release): everything asleep wakes when you pass
 	{"life": 0, "title": "Herald of Spring", "note": "Whatever has gone to sleep near you wakes when you pass: seeds, insects, old friendships, the ground itself. You have learned the one thunder that frightens nobody, the one that says it is time to get up."},
+	# Part XVIII (the New Fire release): the firewood burns out, and the fire is passed on
+	{"life": 0, "title": "Bearer of the Fire", "note": "The firewood burns out; the fire is passed on, and nobody knows where it ends. Every flame you light has a little of every hearth in the land in it, and no fire you have sat beside ever quite goes cold."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -677,6 +679,19 @@ const ENEMIES := {
 	"poison_mother": {"n": "Mother of the Five Poisons", "elem": "dark", "weak": "fire", "col": Color("4a6a2a"), "shape": "blob", "boss": true, "pal": {"sec": Color("e8a030"), "acc": Color("c02a40"), "mark": Color("1a1a10")}},
 	"qing_nu": {"n": "Qing Nu, Maiden of Frost", "elem": "water", "weak": "fire", "col": Color("e0f0ff"), "shape": "frost_maiden", "boss": true, "pal": {"sec": Color("8ab0d8"), "acc": Color("ffffff")}},
 	"taisui": {"n": "Taisui, Lord of the Year Under the Earth", "elem": "earth", "weak": "wood", "col": Color("c87a6a"), "shape": "blob", "boss": true, "pal": {"sec": Color("5a3a2a"), "acc": Color("f0e040"), "mark": Color("2a1a1a")}},
+	# ---- Part XVIII (the New Fire release): what gets into a fire that is tired, the cinders of the
+	# Ashen Volcano, the fire that runs wild, the Lord of the Southern Fire and the fire nobody sat up with
+	"damp_smoke": {"n": "Damp Smoke", "elem": "water", "weak": "fire", "col": Color("9aa8b0"), "shape": "wisp", "pal": {"sec": Color("5a6a78"), "acc": Color("d8e4ec")}},
+	"bilge_imp": {"n": "Bilge Imp", "elem": "water", "weak": "thunder", "col": Color("3a5a5a"), "shape": "blob", "pal": {"sec": Color("1a2a30"), "acc": Color("a0d8c0")}},
+	"drowned_ember": {"n": "Drowned Ember", "elem": "dark", "weak": "fire", "col": Color("4a3a3a"), "shape": "wraith", "pal": {"sec": Color("1a1418"), "acc": Color("e86a3a")}},
+	"ash_moth": {"n": "Ash Moth", "elem": "fire", "weak": "water", "col": Color("8a8078"), "shape": "moth", "pal": {"sec": Color("3a302a"), "acc": Color("ff8a3a")}},
+	"cinder_imp": {"n": "Cinder Imp", "elem": "fire", "weak": "water", "col": Color("5a2a1a"), "shape": "demon", "pal": {"sec": Color("1a1010"), "acc": Color("ffb040")}},
+	"clinker_crab": {"n": "Clinker Crab", "elem": "earth", "weak": "wood", "col": Color("6a6058"), "shape": "crab", "pal": {"sec": Color("2a2420"), "acc": Color("e06a2a")}},
+	"wildfire_sprite": {"n": "Wildfire Sprite", "elem": "fire", "weak": "water", "col": Color("ff8a2a"), "shape": "wisp", "pal": {"sec": Color("c8301a"), "acc": Color("fff0a0")}},
+	"spark_swallow": {"n": "Spark Swallow", "elem": "fire", "weak": "water", "col": Color("e0502a"), "shape": "bird", "pal": {"sec": Color("2a1a18"), "acc": Color("ffd060")}},
+	"smoke_hound": {"n": "Smoke Hound", "elem": "dark", "weak": "water", "col": Color("4a4648"), "shape": "beast", "pal": {"sec": Color("1a181a"), "acc": Color("ff6a2a")}},
+	"zhurong": {"n": "Zhurong, Lord of the Southern Fire", "elem": "fire", "weak": "water", "col": Color("c8301e"), "shape": "person:zhurong", "boss": true},
+	"huilu": {"n": "Huilu, the Fire Nobody Sat Up With", "elem": "fire", "weak": "water", "col": Color("ff6a1a"), "shape": "phoenix", "boss": true, "pal": {"sec": Color("7a1a0a"), "acc": Color("fff0a0"), "mark": Color("2a1410")}},
 }
 
 ## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
@@ -810,11 +825,18 @@ const AREAS := {
 	},
 	# the mountain around the sect: forests, terraces and the roads to every region (open world hub)
 	"mountain": {
+		# Part XVIII (impact.gd): dry brush round the Gathering ground at Cloudfoot, to be cut for a firebreak
+		"obstacles": [{"id": "p18_brush1", "what": "brush", "pos": Vector2i(72, 32), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush2", "what": "brush", "pos": Vector2i(75, 35), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush3", "what": "brush", "pos": Vector2i(82, 27), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush4", "what": "brush", "pos": Vector2i(83, 43), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush5", "what": "brush", "pos": Vector2i(89, 34), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush6", "what": "brush", "pos": Vector2i(92, 32), "vis": ["s_p18_brush", ""]}],
+		# Part XVIII: six bonfires run together, and what comes out of them
+		"warband": {"pool": [["wildfire_sprite", 67, 68], ["spark_swallow", 67, 68], ["smoke_hound", 67, 68]], "n": 10, "vis": "s_p18_drill", "late": true},
 		"n": "Azure Cloud Mountain", "w": 180, "h": 160, "seed": 7, "theme": "sect", "enemies": 0, "hill": 2.2,
 		"portals": [],
 		# Part XV: the Warden of the Lock, under the Founder's Last Cave, where the mountain goes down to
 		# the root of the sect's pond
-		"bosses": [{"id": "lock_warden", "pos": Vector2i(63, 103), "lv": 59, "req": 59, "vis": ["s_p15_warden", ""]}],
+		"bosses": [{"id": "lock_warden", "pos": Vector2i(63, 103), "lv": 59, "req": 59, "vis": ["s_p15_warden", ""]},
+			# Part XVIII: the fire nobody sat up with, on the road above Cloudfoot
+			{"id": "huilu", "pos": Vector2i(85, 25), "lv": 68, "req": 67, "vis": ["s_p18_huilu", ""], "late": true}
+		],
 		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 		# trails that join the mountain's people start just north of the sect's north wall
 		"start": Vector2i(82, 56),
@@ -967,7 +989,9 @@ const AREAS := {
 			# a fated encounter (fate.gd): there while the story has them there
 			{"id": "tala", "n": "Tala of the Horse-Folk", "pos": Vector2i(12, 10), "col": Color("d8a04a"), "fate": true},{"id": "sword_ghost", "n": "Ancestor Jian Wuchen", "pos": Vector2i(14, 10), "col": Color("9ad8ff"), "vis": ["s_swordghost", ""]},
 			# Part XVII: Lei Gong, Duke of Thunder, come down to the valley to drum the first thunder of spring
-			{"id": "lei_gong", "n": "Lei Gong, Duke of Thunder", "pos": Vector2i(67, 24), "col": Color("6a8ac0"), "vis": ["s_p17_chains", ""], "late": true}
+			{"id": "lei_gong", "n": "Lei Gong, Duke of Thunder", "pos": Vector2i(67, 24), "col": Color("6a8ac0"), "vis": ["s_p17_chains", ""], "late": true},
+			# Part XVIII (cultures.gd): the keeper of the Felt Hearth, in the tents below the valley, and her grandson
+			{"id": "sarnai", "n": "Grandmother Sarnai", "pos": Vector2i(28, 11), "col": Color("8a2a3a"), "late": true}, {"id": "batu", "n": "Batu the Horse-Herd", "pos": Vector2i(38, 8), "col": Color("2a5a9a"), "late": true}
 		],
 		"bosses": [
 			{"id": "storm_ape_king", "pos": Vector2i(60, 12), "lv": 10, "req": 10},{"id": "thunder_roc", "pos": Vector2i(78, 25), "lv": 11, "req": 11}],
@@ -977,7 +1001,9 @@ const AREAS := {
 			# Part XVII: thunder eggs, the round stones the thunder leaves where it strikes
 			{"id": "p17_egg1", "item": "thunder_egg", "pos": Vector2i(86, 24), "vis": ["s_p17_eggs", ""], "late": true}, {"id": "p17_egg2", "item": "thunder_egg", "pos": Vector2i(2, 30), "vis": ["s_p17_eggs", ""], "late": true},
 			{"id": "p17_egg3", "item": "thunder_egg", "pos": Vector2i(43, 7), "vis": ["s_p17_eggs", ""], "late": true}, {"id": "p17_egg4", "item": "thunder_egg", "pos": Vector2i(39, 47), "vis": ["s_p17_eggs", ""], "late": true},
-			{"id": "p17_egg5", "item": "thunder_egg", "pos": Vector2i(62, 35), "vis": ["s_p17_eggs", ""], "late": true}
+			{"id": "p17_egg5", "item": "thunder_egg", "pos": Vector2i(62, 35), "vis": ["s_p17_eggs", ""], "late": true},
+			# Part XVIII: argal, the dried dung the horse-folk burn where no tree grows
+			{"id": "p18_argal1", "item": "argal", "pos": Vector2i(19, 23), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal2", "item": "argal", "pos": Vector2i(41, 19), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal3", "item": "argal", "pos": Vector2i(30, 32), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal4", "item": "argal", "pos": Vector2i(14, 29), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal5", "item": "argal", "pos": Vector2i(9, 20), "vis": ["s_p18_argal", ""], "late": true}
 		],
 		"pickup_vis": "s_shards",
 	},
@@ -1021,6 +1047,8 @@ const AREAS := {
 		"pickup_vis": "s_dr_pearl",
 	},
 	"volcano": {
+		# Part XVIII: the cinders of the mountain where the first fire is kept
+		"warband": {"pool": [["ash_moth", 66, 67], ["cinder_imp", 66, 67], ["clinker_crab", 66, 67]], "n": 9, "vis": "s_p18_sage", "late": true},
 		"n": "Ashen Volcano", "w": 94, "h": 56, "seed": 81, "theme": "volcano", "enemies": 18,
 		"pool": [["magma_slime", 13, 14], ["ash_salamander", 13, 14], ["ember_sprite", 13, 14]],
 		"portals": [
@@ -1033,6 +1061,8 @@ const AREAS := {
 			{"id": "cinder_behemoth", "pos": Vector2i(48, 24), "lv": 13, "req": 13},
 			{"id": "ash_phoenix", "pos": Vector2i(58, 12), "lv": 14, "req": 14},
 			{"id": "inferno_lord", "pos": Vector2i(82, 30), "lv": 14, "req": 14},
+			# Part XVIII: Zhurong, Lord of the Southern Fire, who keeps Suiren's fire-drill
+			{"id": "zhurong", "pos": Vector2i(39, 24), "lv": 67, "req": 66, "vis": ["s_p18_zhurong", ""], "late": true}
 		],
 		"pickups": [
 			{"id": "ember1", "item": "ember", "pos": Vector2i(20, 12)}, {"id": "ember2", "item": "ember", "pos": Vector2i(42, 46)},
@@ -1476,7 +1506,10 @@ const AREAS := {
 			{"id": "taisui", "pos": Vector2i(55, 8), "lv": 65, "req": 64, "vis": ["s_p17_taisui", ""], "late": true}
 		],
 		"pickups": [{"id": "sthread1", "item": "silver_thread", "pos": Vector2i(22, 12)}, {"id": "sthread2", "item": "silver_thread", "pos": Vector2i(40, 46)}, {"id": "sthread3", "item": "silver_thread", "pos": Vector2i(64, 30)}, {"id": "sthread4", "item": "silver_thread", "pos": Vector2i(76, 10)},
-			{"id": "cur_wutong2", "item": "wutong_seed", "pos": Vector2i(11, 23), "floor": ["wen_house", -1], "always": true}],
+			{"id": "cur_wutong2", "item": "wutong_seed", "pos": Vector2i(11, 23), "floor": ["wen_house", -1], "always": true},
+			# Part XVIII: apricot and jujube wood, the wood of summer, for the fire-drill
+			{"id": "p18_wood1", "item": "apricot_wood", "pos": Vector2i(41, 20), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood2", "item": "apricot_wood", "pos": Vector2i(41, 41), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood3", "item": "apricot_wood", "pos": Vector2i(20, 27), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood4", "item": "apricot_wood", "pos": Vector2i(26, 17), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood5", "item": "apricot_wood", "pos": Vector2i(59, 33), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood6", "item": "apricot_wood", "pos": Vector2i(24, 40), "vis": ["s_p18_wood", ""], "late": true}
+		],
 		"pickup_vis": "s_vl_collect",
 		"springs": [Vector2i(30, 22)],
 		"buildings": [
@@ -1803,6 +1836,8 @@ const AREAS := {
 	# ---- Part X: The Nine Cauldrons
 	# a ferry town on the river below the Dragon Gate, where the golden carp leap to become dragons
 	"longmen": {
+		# Part XVIII: the damp that gets into a tired fire, come up out of the bilges of the river boats
+		"warband": {"pool": [["damp_smoke", 66, 67], ["bilge_imp", 66, 67], ["drowned_ember", 66, 67]], "n": 9, "vis": "s_p18_aysha", "late": true},
 		"n": "Longmen, the Dragon Gate Ferry", "w": 100, "h": 60, "seed": 391, "theme": "longmen", "enemies": 22,
 		# Part XVII (impact.gd): ice jammed against the banks of the river above the Dragon Gate
 		"obstacles": [{"id": "p17_ice1", "what": "ice", "pos": Vector2i(57, 32), "vis": ["s_p17_ice", ""]}, {"id": "p17_ice2", "what": "ice", "pos": Vector2i(9, 35), "vis": ["s_p17_ice", ""]},
@@ -1895,6 +1930,8 @@ const AREAS := {
 	},
 	# the cauldron-casters' town on Mount Kuaiji, where Yu's Nine Cauldrons were cast
 	"tushan": {
+		# Part XVIII (impact.gd): clinker, the crust a tired fire leaves, choking the mouths of the casting pits
+		"obstacles": [{"id": "p18_clinker1", "what": "clinker", "pos": Vector2i(32, 25), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker2", "what": "clinker", "pos": Vector2i(23, 32), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker3", "what": "clinker", "pos": Vector2i(33, 42), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker4", "what": "clinker", "pos": Vector2i(48, 28), "vis": ["s_p18_clinker", ""]}, {"id": "p18_clinker5", "what": "clinker", "pos": Vector2i(47, 15), "vis": ["s_p18_clinker", ""]}],
 		"n": "Tushan, the Town of the Cauldron-Casters", "w": 96, "h": 60, "seed": 411, "theme": "tushan", "enemies": 20,
 		"pool": [["slag_golem", 43, 43], ["bronze_hound", 43, 43], ["charcoal_wisp", 43, 43]],
 		"portals": [
@@ -3063,6 +3100,46 @@ const STEPS := [
 	{"id": "s_p17_newborn", "kind": "talk", "npc": "granny_wen", "area": "village", "t": "Granny Wen has sent for you from Qingshi: a child was born on the night of the first thunder"},
 	{"id": "s_p17_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan that spring has come"},
 	{"id": "s_break22", "kind": "breakthrough", "to": 66, "t": "Wake with the ten thousand things: Myriad Things Awake"},
+	# ---- Part XVIII: The New Fire (the New Fire release).  At the turn of every season the fire used to
+	# be changed: put out, drilled new from the wood of the season, and carried to every house.  Nobody
+	# has done it since the long year began, and the fire of the whole land is tired.  It cannot be put
+	# out, either: every one of the Six Hearths (cultures.gd) has a fire it has sworn never to let die.
+	# So a coal is begged from each, the fire-drill is asked of the Lord of the Southern Fire, the six
+	# coals are made one fire at the crossroads, and each hearth carries home a fire with all the others in it
+	{"id": "s_p18_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Summer is beginning, and the kitchen fire will not cook: speak to Elder Qing Xuan", "stones": 26400},
+	{"id": "s_p18_zao", "kind": "talk", "npc": "zao_jun", "area": "sect", "t": "Ask Zao Jun, Lord of the Stove, on the stove in the sect's kitchen, what is wrong with the fire"},
+	{"id": "s_p18_wood", "kind": "collect", "item": "apricot_wood", "n": 5, "area": "village", "t": "The summer fire is drilled from apricot and jujube: cut 5 billets of apricot wood in the orchards of Qingshi"},
+	{"id": "s_p18_valley", "kind": "folk", "role": "farmer", "town": "qingshi", "n": 5, "area": "village", "hearth": "valley",
+		"t": "The Rice Hearth: eat a bowl of cold gruel with five of Qingshi's farmers, whose stoves will not boil (face one and press Enter)"},
+	{"id": "s_p18_wen", "kind": "talk", "npc": "granny_wen", "area": "village", "hearth": "valley", "t": "Ask Granny Wen for a coal from the stove that has not gone out in sixty years"},
+	{"id": "s_p18_argal", "kind": "collect", "item": "argal", "n": 5, "area": "thunder", "hearth": "steppe", "t": "The Felt Hearth: nobody comes to a tent empty-handed. Gather 5 baskets of argal in the grass below Thunder Valley"},
+	{"id": "s_p18_sarnai", "kind": "talk", "npc": "sarnai", "area": "thunder", "hearth": "steppe", "t": "Carry the argal to Grandmother Sarnai's tent and ask for a coal from the three stones"},
+	{"id": "s_p18_sand", "kind": "folk", "role": "porter", "town": "shazhou", "n": 3, "area": "dunes", "hearth": "sand",
+		"t": "The Sweet-Well Hearth: every caravan puts one stick in the oven. Carry a stick with three of Shazhou's porters (face one and press Enter)"},
+	{"id": "s_p18_aysha", "kind": "talk", "npc": "cook_aysha", "area": "dunes", "hearth": "sand", "t": "Ask Auntie Aysha for a coal from the oven that has wood in it from forty countries"},
+	{"id": "s_p18_smoke", "kind": "hunt", "area": "longmen", "n": 16, "of": ["damp_smoke", "bilge_imp", "drowned_ember"], "first": true, "hearth": "river",
+		"t": "The Boat Hearth: the damp is in every stern at Longmen. Drive off the Damp Smokes, Bilge Imps and Drowned Embers (strike a pack first: F or G)"},
+	{"id": "s_p18_lu", "kind": "talk", "npc": "fishwife_lu", "area": "longmen", "hearth": "river", "t": "Ask Fishwife Lu for a coal from the pot that came aboard from her mother's boat"},
+	{"id": "s_p18_clinker", "kind": "clear", "what": "clinker", "n": 5, "area": "tushan", "hearth": "forge", "t": "The Casting Hearth: a tired fire leaves clinker. Break the crust off the mouths of 5 casting pits at Tushan (F)"},
+	{"id": "s_p18_rong", "kind": "talk", "npc": "auntie_rong", "area": "tushan", "hearth": "forge", "t": "Take the bellows from Auntie Rong, and ask for a coal from the pit that has never been cold"},
+	{"id": "s_p18_dawn", "kind": "folk", "role": "merchant", "town": "yanggu", "n": 5, "area": "yanggu", "hearth": "dawn",
+		"t": "The Lantern Hearth: be the first customer of five of Yanggu's stallholders, by lamplight, and do not haggle (face one and press Enter)"},
+	{"id": "s_p18_xi", "kind": "talk", "npc": "lantern_xi", "area": "yanggu", "hearth": "dawn", "t": "Ask Lantern-Maker Xi for a taper lit from the shrine lamp of the Sun"},
+	{"id": "s_p18_sage", "kind": "talk", "npc": "fire_sage", "area": "volcano", "t": "Six coals in one pot, and no way to make them one fire: ask Sage Huo Rong at the Ashen Volcano who keeps the fire-drill", "stones": 26800},
+	{"id": "s_p18_ash", "kind": "hunt", "area": "volcano", "n": 18, "of": ["ash_moth", "cinder_imp", "clinker_crab"], "first": true,
+		"t": "The cinders of the mountain are after the six coals: drive off the Ash Moths, Cinder Imps and Clinker Crabs (strike first: F or G)"},
+	{"id": "s_p18_zhurong", "kind": "kill", "boss": "zhurong", "area": "volcano", "t": "Ask Zhurong, Lord of the Southern Fire, for the fire-drill of Suiren"},
+	{"id": "s_p18_kang", "kind": "talk", "npc": "caravan_kang", "area": "mountain", "t": "The six hearths are gathering where the roads meet: find Caravan-Master Kang at Cloudfoot"},
+	{"id": "s_p18_brush", "kind": "clear", "what": "brush", "n": 6, "area": "mountain", "t": "Kang will not have fire drilled in a dry summer without a firebreak: cut 6 stands of dry brush round the Gathering ground at Cloudfoot (F)"},
+	{"id": "s_p18_drill", "kind": "share", "spot": "kind:mountain:campfire", "area": "mountain", "t": "Lixia, the Beginning of Summer: drill the new fire from the six coals with Yue Ling, at the fire-ring on the mountain"},
+	{"id": "s_p18_wild", "kind": "hunt", "area": "mountain", "n": 20, "of": ["wildfire_sprite", "spark_swallow", "smoke_hound"], "first": true,
+		"t": "Six bonfires have run together and got away: put out the Wildfire Sprites, Spark Swallows and Smoke Hounds on the mountain (strike first: F or G)"},
+	{"id": "s_p18_huilu", "kind": "kill", "boss": "huilu", "area": "mountain", "t": "Stand in front of Huilu, the Fire Nobody Sat Up With, on the road above Cloudfoot", "stones": 27200},
+	{"id": "s_p18_carry", "kind": "visits", "npcs": ["granny_wen", "sarnai", "cook_aysha", "fishwife_lu", "auntie_rong", "lantern_xi"], "n": 6, "area": "village", "did": "Carried the new fire home to %s",
+		"t": "Carry the new fire home to the keepers of all six hearths, in any order"},
+	{"id": "s_p18_feast", "kind": "share", "spot": "kind:mountain:stage", "area": "mountain", "t": "Six tables at Cloudfoot, and one fire: eat the first meal cooked on the new fire with Yue Ling, by the stage"},
+	{"id": "s_p18_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan the rice is cooked"},
+	{"id": "s_break23", "kind": "breakthrough", "to": 69, "t": "The firewood burns out; the fire goes on: Fire Passed On"},
 ]
 
 static func step_index(id: String) -> int:
@@ -3200,6 +3277,12 @@ const ITEMS := {
 	"spring_tea": {"n": "Mingqian Tea", "desc": "Two leaves and a bud, picked on the terraces before Qingming: the first tea of the year, and the best. It tastes of rain that has not fallen yet"},
 	"willow_sprig": {"n": "Willow Sprig", "desc": "A green sprig of weeping willow, cut for Qingming: one over every door to keep the year's ghosts polite, and one in the hair so you are not reborn a yellow dog"},
 	"warm_brazier": {"n": "Brazier of the South Wind", "desc": "Alchemist Mo's bronze brazier, fed with fire and wood essence: it breathes out the warm wet wind of the third month, the one that tells the frost it is time to go"},
+	# Part XVIII (the New Fire release): the wood of summer, the fuel of the grass, the pot of six coals
+	"ember_pot": {"n": "The Pot of Six Coals", "desc": "A clay pot with a lid and a wicker handle, from Auntie Zhou's shelf, half full of ash to keep a coal alive. The Lord of the Stove says a fire can be carried as far as anybody is willing to walk with it"},
+	"apricot_wood": {"n": "Apricot Billet", "desc": "A billet of apricot wood from the orchards of Qingshi. The old rule: elm and willow for the fire of spring, jujube and apricot for summer, mulberry at the turn, oak for autumn, sophora for winter"},
+	"argal": {"n": "Basket of Argal", "desc": "Dried dung from the pasture, flat and light as bark. Where no tree grows it is the only fuel there is, and it burns hot, clean and blue. The horse-folk say a guest who brings argal has understood everything"},
+	"fire_drill": {"n": "Fire-Drill of Summer Wood", "desc": "Smith Tie's bow-drill, the spindle of apricot and the hearth-board of jujube, bound with wood and fire essence. Not Suiren's, but made the way his was, and by somebody who has learned how"},
+	"suiren_drill": {"n": "Suiren's Fire-Drill", "desc": "The stick the Fire-Driller turned in his hands until the first smoke rose, when people ate raw meat and feared the dark. It is worn where his palms held it. Zhurong kept it for whoever came with more than one fire"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
@@ -3208,7 +3291,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
+const BOSS_DROPS := {"zhurong": "suiren_drill", "thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -3349,6 +3432,10 @@ const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
 	# Part XVI (the Living Land release)
+	"sarnai": ["Are your horses fat? No horses. Then are your friends fat? That will do.", "The eldest ride away and the youngest keeps the fire. My youngest rode away too. So I keep it, and I am the eldest of anybody. It is a muddle.",
+		"You stepped over the threshold. Good. The valley people tread on it as if it were a doormat. It is the neck of the house.", "Three stones and a fire in the middle, and everybody can see everybody. That is a tent. A house with walls inside it is a herd of strangers."],
+	"batu": ["Grandmother says I talk to the horses more than to people. The horses say the same about her.", "Forty head, and the dun mare, who counts as three. She bit a founder last week. He bit her back. They are friends now.",
+		"In summer we race, the long race, a day's ride out and back, and the children ride because they weigh nothing. I won it at seven. I have been losing weight ever since, trying to win it again."],
 	"zao_jun": ["Sugar on my lips, so I say only sweet things in Heaven. Between you and me, I have never said a sweet thing in my life.",
 		"Every household has a god in its kitchen. Most of us are very good cooks and very bad gossips. I am the other way round.",
 		"Eat something. You never eat enough. I have been watching you since you were six, and you have never once eaten enough."],
@@ -6501,6 +6588,201 @@ const DIALOGUE := {
 		["Yue Ling", "Good morning, Lin Feng."],
 		["Lin Feng", "It's evening."],
 		["Yue Ling", "Not for everything."],
+	],
+	# ---- Part XVIII: The New Fire (the New Fire release)
+	"recall16": [
+		["Narrator", "Qingming passes, and the Grain Rain after it. The paddies of Qingshi go from brown to a green so bright it looks wet, and the swallows under the eaves of the hall have eggs. By every sign in the almanac the year is running again."],
+		["Narrator", "Only the kitchen is wrong. For three days the rice in Auntie Zhou's great pot has come to the table hard in the middle. The fire burns: anybody can see it burning. It simply does not seem to be making anything hot."],
+		["Yue Ling", "Lin Feng, hold your hand over the stove. No, lower. It is like holding it over a painting of a fire."],
+		["Lin Feng", "Auntie Zhou has been feeding that fire since before I came here. She says it has never done this."],
+		["Yue Ling", "Then it is not her. It is the fire. Can a fire be tired?"],
+	],
+	"s_p18_home": [
+		["Elder Qing Xuan", "You have noticed the rice. Everybody has noticed the rice. I have had four letters this morning: the bread will not rise at Shazhou, the bronze will not run at Tushan, and at Yanggu the lamps are lit and the street is dark."],
+		["Elder Qing Xuan", "Tomorrow is Lixia, the Beginning of Summer. When I was a boy, at the turn of every season the fire was changed. Every hearth in the valley was put out for a day, and we ate cold food and complained. Then new fire was drilled from the wood of the season and carried to every house."],
+		["Lin Feng", "And nobody has done it this year."],
+		["Elder Qing Xuan", "Nobody has done it for sixty years, child. We grew careless; a fire burns just as well unchanged, for a while. But this fire has burned through the falling of the sky, nine days of noon, and the longest winter there ever was, and nobody once let it rest."],
+		["Yue Ling", "Then we put the fires out, and drill a new one."],
+		["Elder Qing Xuan", "So I would have said. Go down to the kitchen and say it to the Lord of the Stove, and watch his face. He has been sitting on the stove since dawn with his head in his hands."],
+	],
+	"s_p18_zao": [
+		["Zao Jun, Lord of the Stove", "Put them out. Yes. Change the fire, the way it was always done. I have been saying so to the wall for an hour."],
+		["Zao Jun, Lord of the Stove", "Now go and say it to a founder of Tushan, whose pit has not been cold since Yu the Great. Say it to a boat-wife at Longmen, whose stern-pot came aboard from her mother's boat. Say it to the horse-folk. They will put you out."],
+		["Lin Feng", "Every hearth has sworn never to let its fire die."],
+		["Zao Jun, Lord of the Stove", "Every one, and each in a different way, and every one of them right. That is the trouble with customs: there are six of them. The fire has to be changed and it cannot be put out. I report to Heaven on every kitchen in the land, and I do not know what to write."],
+		["Yue Ling", "What if nothing is put out? What if we ask each of them for one coal?"],
+		["Zao Jun, Lord of the Stove", "...Six coals in one pot. It would not be a new fire. It would be all the old ones. It has never been done. Nobody ever needed a fire from anybody else's hearth; that is rather the point of having one."],
+		["Zao Jun, Lord of the Stove", "Take the ash-pot from the shelf. And you will want the wood of summer for the drill: apricot and jujube. Start in the orchards. And sweeper: at every hearth, do it their way. Not yours. They will know."],
+		["Narrator", "Zao Jun hands down a clay pot with a lid, half full of fine grey ash, still faintly warm."],
+	],
+	"done:s_p18_wood": [
+		["Narrator", "Five billets of apricot, cut where the orchard keeper pointed, each from a branch that had borne fruit and would not again. The sap is still running in them, and they smell of the fruit."],
+		["Yue Ling", "Elm and willow for spring, apricot and jujube for summer. Somebody once sat down and decided which wood each season's fire should be born from. I should like to have met them."],
+	],
+	"done:s_p18_valley": [
+		["Narrator", "Five kitchens, five bowls of gruel gone cold on stoves that will not boil, and in every one the same question at the door: have you eaten? Lin Feng says no five times, and eats five times, and is asked a sixth time on the way out."],
+		["Farmer Lao", "Cold gruel in summer. My grandfather would have said it was the cold-food day and been pleased. He liked it. He said one day of cold food a year teaches you what the stove is for."],
+	],
+	"s_p18_wen": [
+		["Granny Wen the Midwife", "A coal. From my stove. Sixty years I have kept that fire, child, through four floods and a husband, and you want me to hand you a piece of it in a pot."],
+		["Lin Feng", "I am not asking you to put it out, Granny. Only for one coal."],
+		["Granny Wen the Midwife", "Hm. That is different. The Elder's way, we would all sit in the dark for a day eating cold rice, and I am too old for cold rice. Give me the tongs."],
+		["Granny Wen the Midwife", "There. That one. It is from the back, where it is oldest. I lit the fire under your first bath with a coal from back there. Do not tell the Stove God I said this, but that is the one that knows you."],
+		["Narrator", "The coal goes into the ash, red as a pomegranate seed, and the pot is suddenly warm in the hand, the way nothing in the kitchen has been warm for days."],
+	],
+	"done:s_p18_argal": [
+		["Narrator", "Five baskets of argal from the summer pasture, flat and dry and light as bark. It does not smell of anything but grass."],
+		["Yue Ling", "On the mountain we would have brought tea. Here you bring something to burn. I think I like it better. It says: I mean to stay long enough to need a fire."],
+	],
+	"s_p18_sarnai": [
+		["Grandmother Sarnai", "Argal. Five baskets. Who taught a valley sweeper to come to a tent with fuel in both hands? No, do not tell me. Sit. Not there."],
+		["Narrator", "Lin Feng steps over the threshold without touching it, goes round the fire by the left, and sits on the guests' side. The old woman watches every step of it and says nothing, which from her is a great deal."],
+		["Grandmother Sarnai", "Tea. Both hands. So. Now ask."],
+		["Lin Feng", "The fire of the whole land is tired, Grandmother. I am asking each hearth for one coal, to make one fire of all of them."],
+		["Grandmother Sarnai", "My fire is tired too. Batu says it is the argal. It is not the argal. A fire that is only ever fed from its own ashes goes thin, like a herd with no new blood. We have always known that about horses. It seems nobody thought it about fire."],
+		["Grandmother Sarnai", "The youngest keeps the fire, and my youngest is on the mountain learning to fly. So I will say it for him: take a coal. Take it from the middle stone. And bring one back, child, when you have made your fire of everybody's. I want to know what a founder's fire tastes like in the tea."],
+	],
+	"done:s_p18_sand": [
+		["Narrator", "Three sticks carried in from the caravan road on three sweating backs and laid, one each, into the mouth of the clay oven in the caravanserai wall: one of tamarisk, one of poplar, and one of apricot from a mountain far to the east."],
+		["Navid the Sogdian Merchant", "Your stick is in it now. That is not nothing, mountain friend. There are men who have traded on this road for forty years and never been asked to put a stick in."],
+	],
+	"s_p18_aysha": [
+		["Auntie Aysha of the Caravanserai", "Peace on your road. Drink. ...Good. You waited to be told this time. Three years on a mountain have done you no harm."],
+		["Auntie Aysha of the Caravanserai", "So. You want a coal from my oven. You know what is in that fire? A stick from every caravan since my grandmother's grandmother. If I give you a coal I am giving you a piece of forty countries."],
+		["Lin Feng", "That is why I came here, Auntie. It is the only fire in the land that already has other people's wood in it."],
+		["Auntie Aysha of the Caravanserai", "Hah. And still it bakes like a cold stone this month. Do you know why? No caravan came through in the long winter. A whole year of nothing but our own tamarisk. Even my fire wants strangers."],
+		["Auntie Aysha of the Caravanserai", "Take it from the back wall where the bread goes on. And tear this loaf, do not cut it, and eat it on the road. It is raw in the middle. I am ashamed. Come back when it is not."],
+	],
+	"done:s_p18_smoke": [
+		["Narrator", "The last of the grey things goes over the side and into the river with a hiss, and all along the moorings of Longmen the stern-pots that have smouldered sullenly for a month give one cough of smoke and begin, a little, to glow."],
+		["Boatwright Gao", "Damp. It gets into a tired fire the way worm gets into a tired hull. My wife has sat up with our pot nine nights running, blowing on it. Nine nights. I offered to strike a new one and she offered to drown me."],
+	],
+	"s_p18_lu": [
+		["Fishwife Lu", "Right foot first. Good. Sit low. You look like somebody who has come to ask for something I am going to say no to."],
+		["Lin Feng", "A coal from your stern-pot, Auntie. Not the fire. One coal."],
+		["Fishwife Lu", "That pot came aboard from my mother's boat the day I married, and hers from her mother's. If it goes out while the boat floats, the boat's dead: we would have to burn her and build another. You understand what you are asking to carry about in a jar."],
+		["Yue Ling", "We understand that you have been awake nine nights keeping it alive. So has every woman on this river. We are trying to find a way that you can all sleep."],
+		["Fishwife Lu", "...Hm. Lotus-girl has it. Nine nights. My eyes feel like two oysters."],
+		["Fishwife Lu", "One coal. And you carry it the way a river woman would: lid on, and you do not set it down on bare ground. Not once. If you must rest, you hold it. There. Now eat this fish with me, the top side only, and do not say the word."],
+	],
+	"done:s_p18_clinker": [
+		["Narrator", "The last crust of clinker breaks away from the mouth of the pit like the shell off an egg, black glass on the outside and grey ash within, and the fire underneath, with room to breathe at last, lifts its head and roars. For a moment. Then it settles back to a dull orange, like a man who has stood up too fast."],
+		["Bell-Caster Wei", "That is the fifth this week, and it grows back by morning. Clinker is what a fire leaves when it is burning itself instead of its fuel. I never saw it on the old pit before this year. Not once."],
+	],
+	"s_p18_rong": [
+		["Auntie Rong of the Smelting Pits", "Don't sit. Bellows. Ten strokes. ...Twelve; you always did get carried away. Now sit."],
+		["Auntie Rong of the Smelting Pits", "I know why you are here. The bell-cart brought the gossip up before you. One coal from every hearth. And you want one from the pit that Yu's own founders lit, that has not been cold in four thousand years."],
+		["Lin Feng", "I fed it through one night of those four thousand years. I am not asking to put it out. I would not know how to ask."],
+		["Auntie Rong of the Smelting Pits", "No. You would not. Listen: when a founder dies we carry them round the pit three times, so the fire knows who is gone. That fire has been told the name of every one of us. It is not fuel and air, sweeper. It is the roll of the clan."],
+		["Auntie Rong of the Smelting Pits", "And it is dying of loneliness, I think. Four thousand years of bronze and not one coal that was not born in this pit. Take one from the lip where the first pour of the year goes. Carry it in your pot with the tent-fire and the boat-fire and that gossip Aysha's oven. Let it meet somebody."],
+	],
+	"done:s_p18_dawn": [
+		["Narrator", "Five stalls, five first sales of the day made by lamplight while the sky over the Valley of Sunrise is still black: a sesame cake, a twist of tea, a paper fan, a hank of red thread and a sugar dragon, each paid for at the asking price, which nearly kills the seller of the sugar dragon with surprise."],
+		["Old Pan the Tea Seller", "No haggling on the first sale. You remembered. Mind you, the lamps are so dim this month I could have given you the wrong change and neither of us would know."],
+	],
+	"s_p18_xi": [
+		["Lantern-Maker Xi", "First light to you. Though I have seen brighter light out of a firefly than out of my own lanterns this month. Four hundred lamps in this street and you cannot read a riddle by them."],
+		["Lantern-Maker Xi", "You want a taper from the shrine lamp. Everybody in Yanggu takes one every dusk; it is hardly a great thing to ask. Except that you mean to carry it out of the town."],
+		["Lin Feng", "You told me once that a flame you are handed, you owe to whoever handed it."],
+		["Lantern-Maker Xi", "I did. I talk too much before sunrise. So think what you are doing, child: you will have a flame from me, and a coal from a tent, and one from a boat, and you will owe all of us at once. That is a great deal of owing for one pot."],
+		["Yue Ling", "He has been in debt to everybody in the land since the sky fell. He is used to it."],
+		["Lantern-Maker Xi", "Ha. Then here. Pinched from the shrine lamp, not blown. Six fires in a pot. In sixty years of making lanterns I never once wondered what colour that would burn."],
+	],
+	"s_p18_sage": [
+		["Sage Huo Rong", "Six coals in one pot, and you have carried them up a volcano. You do like to make a point, sweeper."],
+		["Sage Huo Rong", "Look at them. No, look. They are not one fire. They are six, lying side by side and each keeping to itself: the tent-fire blue, the pit-fire white, the lamp-flame yellow. Put wood on them and you will have six small fires quarrelling in a pot."],
+		["Lin Feng", "Then how are they made one?"],
+		["Sage Huo Rong", "The way the first was made. Somebody has to drill it. Suiren, the Fire-Driller, turned a stick in his hands until smoke rose, when people still ate their meat raw. His drill is kept by Zhurong, Lord of the Southern Fire, whose season begins tomorrow. He holds court in the crater, and he is in a temper."],
+		["Sage Huo Rong", "He will have smelled the coals by now. So will everything else on this mountain that is made of cinders. Mind your pot on the way up."],
+	],
+	"done:s_p18_ash": [
+		["Narrator", "The last of the cinder-things falls apart into grey flakes on the wind. In the pot the six coals are untouched, each its own colour, each keeping a careful distance from its neighbours, like six strangers on one bench."],
+		["Yue Ling", "They wanted the coals because they were warm. Everything up here is burnt out. Lin Feng, I think they were only cold."],
+	],
+	"pre:zhurong": [
+		["Narrator", "In the crater of the Ashen Volcano the air shakes. A red giant in armour the colour of a forge mouth sits on a throne of cooled lava with a staff across his knees, and behind him two dragons of flame lie coiled, asleep, breathing out sparks."],
+		["Zhurong, Lord of the Southern Fire", "The sweeper. With a pot. I am Zhurong. I was set over fire when the world was made, and every summer for ten thousand years I have opened my season by giving the land new fire from Suiren's drill."],
+		["Zhurong, Lord of the Southern Fire", "A new fire wants an empty hearth. The old is put out, the house sits cold a day, and then the new is welcomed in. That is the law. And you come up my mountain with six hearths that would not empty, and ask me to bless a jar of leftovers."],
+		["Yue Ling", "They are not leftovers. One of them is four thousand years old. One of them has been handed from mother to daughter down a river."],
+		["Zhurong, Lord of the Southern Fire", "Then they are old. Old is not new. Give me one reason, little lotus, why I should put the first drill in the world into the hand of somebody who will not obey the first rule of fire."],
+	],
+	"post:zhurong": [
+		["Narrator", "Zhurong sits back on his throne. The two dragons of flame have woken, and they are both looking into the pot with their heads on one side, like dogs."],
+		["Zhurong, Lord of the Southern Fire", "...Hm. Suiren did not make fire out of nothing either. He made it out of two sticks, and both of them had been trees. I had forgotten that. It is a long time since I watched him."],
+		["Zhurong, Lord of the Southern Fire", "An empty hearth is the easy way. You put out what was there and you need never ask what it was. Six full ones, and none of them yielding to another: that is harder. I do not know that it can be done. I should like to see somebody try."],
+		["Zhurong, Lord of the Southern Fire", "Take the drill. It is worn where his palms held it; put yours there. Drill where the roads cross, so that no hearth can say it was done on another's ground. And sweeper: sit up with it. Whatever you make. A fire that somebody sits up with is a hearth. I will not say what the other kind is called."],
+		["Narrator", "He puts into Lin Feng's hands a stick of dark wood no longer than a forearm, polished by nothing but use."],
+	],
+	"s_p18_kang": [
+		["Caravan-Master Kang", "There you are. I have forty horse-folk camped in my wagon yard, a boat-wife who will not sleep under a roof, three founders who have already rebuilt my forge without asking, and Aysha, who has taken over my kitchen. Sarnai will not sit downwind of the founders. The lantern man gets up at an hour I did not know existed."],
+		["Caravan-Master Kang", "They have all come to see their coal made into one fire. They have also each brought kindling, stacked their own way, and each has told me privately that theirs is the proper way and the other five will smother it."],
+		["Lin Feng", "Zhurong said to drill it where the roads cross. That is here."],
+		["Caravan-Master Kang", "It is. And it has not rained in three weeks, and the brush on that hill is as dry as an abacus. I have run caravans through grass fires, boy. Before anybody turns a drill within a mile of my town, I want a firebreak cut round that fire-ring. Six stands of brush. Humour an old man who owes you nothing and whom you owe a donkey."],
+	],
+	"done:s_p18_brush": [
+		["Narrator", "Six stands of dry brush come down and are dragged clear, and round the old fire-ring on the hill there is now a wide ring of bare earth. It looks like a great deal of trouble for nothing. Kang walks all the way round it twice and says it will do."],
+		["Caravan-Master Kang", "I have never once regretted a firebreak. I have regretted not cutting one. You may tell them they can light their fire."],
+	],
+	"done:s_p18_wild": [
+		["Narrator", "The last of the sparks is stamped out on the slope, and all over the mountain little threads of smoke stand up from the places where the fire's children were. But up the road, above Cloudfoot, the sky is still red, and the red is moving, and it is coming down towards the town."],
+		["Caravan-Master Kang", "That is the heart of it. That is six bonfires in one skin, and it is on the wrong side of your firebreak, boy, because it started on the right side and jumped. Go. I will get the buckets."],
+	],
+	"pre:huilu": [
+		["Narrator", "On the road above Cloudfoot the fire stands up. It has the shape of a great bird with its wings open across the whole width of the hill, and in its breast, turning over and over one another and never touching, are six colours: blue, white, yellow, red, orange and a green like copper."],
+		["Huilu, the Fire Nobody Sat Up With", "SIX FATHERS. SIX MOTHERS. EACH ONE SAID: MINE. EACH ONE LIT ME FIRST, TO SHOW THE OTHERS. THEN THEY TURNED THEIR BACKS TO ARGUE."],
+		["Yue Ling", "Lin Feng. It is the new fire. We drilled it, and they each took a brand and ran to light their own pile before the others could, and then nobody stayed with any of them."],
+		["Huilu, the Fire Nobody Sat Up With", "NOBODY SAT UP. I WAS BORN AND NOBODY SAT UP. SO I WENT LOOKING. I AM STILL LOOKING. I WILL LOOK IN EVERY HOUSE."],
+		["Lin Feng", "Then look here. I am the one who drilled you. I will sit up."],
+	],
+	"post:huilu": [
+		["Narrator", "The great bird folds. It comes down out of the sky like a kite when the wind drops, smaller and smaller, until it is a fire of ordinary size burning on the road, with six colours in it that have at last run into one: a plain warm gold, the colour of a window at night."],
+		["Narrator", "And round it, in a ring, black to the eyebrows and holding empty buckets, stand a midwife, a herder, a cook, a boat-wife, a founder and a lantern-maker, who have just spent a night passing water to one another without once asking whose turn it was."],
+		["Grandmother Sarnai", "Well. Somebody sit down. It is not going to keep itself."],
+		["Narrator", "They sit: the horse-folk's side, the river's side, nobody's side. Granny Wen asks whether anybody has eaten. Nobody has. Aysha tears bread. Until the sun comes up, six people who each know the only right way to keep a fire keep one, between them, without a word about how."],
+		["Yue Ling", "He said a fire somebody sits up with is a hearth. He never said it had to be one somebody."],
+	],
+	"visit:granny_wen": [
+		["Granny Wen the Midwife", "So that is it. It looks like any coal. ...Oh. No it does not. Put your hand there. That is heat, that is. That is proper heat."],
+		["Granny Wen the Midwife", "There is argal in that, you say, and a boat. Well. My stove has had worse in it; your first swaddling, for one. In it goes. And you: have you eaten?"],
+	],
+	"visit:sarnai": [
+		["Grandmother Sarnai", "You brought one back. I said bring one back, and people say yes to an old woman and then they do not."],
+		["Grandmother Sarnai", "On the middle stone. So. Batu, the kettle. ...Hm. I can taste the bronze. And something that gets up too early. It is not bad tea. Tell the founder her fire is welcome in my tent, and that she still sits on the wrong side."],
+	],
+	"visit:cook_aysha": [
+		["Auntie Aysha of the Caravanserai", "Peace on your road. Give it here, quickly, the dough has been waiting since morning. Into the back wall, so."],
+		["Auntie Aysha of the Caravanserai", "Forty countries, and now six hearths. Look at that. Look at it rise. Sit. You will eat the first loaf, and it will not be raw in the middle, and then you will tell Kang that I have sent the bill for his kitchen."],
+	],
+	"visit:fishwife_lu": [
+		["Fishwife Lu", "You did not set it down. Not once? ...No, you did not; I can tell by your arms."],
+		["Fishwife Lu", "Into the stern-pot, then, with my mother's. They can get acquainted. Look at that, she is drawing like a chimney. I am going to sleep for two days, and when I wake up, any boat on this river that wants a coal of this can come and ask the mother boat for it. That is how it is done."],
+	],
+	"visit:auntie_rong": [
+		["Auntie Rong of the Smelting Pits", "Bellows. Ten. ...Ten! He can count. Now give it here."],
+		["Auntie Rong of the Smelting Pits", "On the lip, where the first pour goes. There. Listen to that. Hear the pit take it? That is the first thing that was not born here to go into that fire in four thousand years. We will have to tell it the names of some new people. I shall start with a sweeper."],
+	],
+	"visit:lantern_xi": [
+		["Lantern-Maker Xi", "First light to you. It is the middle of the afternoon; say it anyway. Is that it? Hold it up."],
+		["Lantern-Maker Xi", "Gold. So that is the colour. I should have guessed; it is the colour of every window I ever walked home towards. Into the shrine lamp, then, and tonight every lamplighter in Yanggu takes a taper of it. You will be able to read the riddles from the far end of the street. Do not tell the dragon the answers."],
+	],
+	"s_p18_end": [
+		["Elder Qing Xuan", "I can smell it from here. Auntie Zhou has cooked rice for the whole sect and then, I am told, cooked it again, because she did not believe the first pot."],
+		["Lin Feng", "The fire is changed, Elder. Nothing was put out. Every hearth in the land has a coal in it from all the others now."],
+		["Elder Qing Xuan", "So I hear. I have had six letters. The founders say the bronze runs like water. The lamplighters say the street is too bright to sleep. Sarnai of the horse-folk has written to say that our tea is weak and she is sending some."],
+		["Yue Ling", "And Zao Jun?"],
+		["Elder Qing Xuan", "The Lord of the Stove has written his report to Heaven. He showed it to me. It says: the fire was changed in the old way, by a new method. He is very pleased with the sentence."],
+		["Elder Qing Xuan", "There is an old saying of the Master of the Lacquer Garden. The firewood burns out; the fire is passed on, and nobody knows where it ends. I have recited it for seventy years. I do not think I understood until this week that the passing on is done by people. Sit down, both of you. Eat while it is hot."],
+	],
+	"pre:s_break23": [
+		["Narrator", "The tribulation comes at dusk on the day of Lixia, and it comes as fire: not lightning, but a slow gold light that kindles in the air over the courtyard and comes down, as gently as a taper lowered to a wick, towards the one who carried six coals in a pot."],
+		["Yue Ling", "It is not going to strike you. Lin Feng, it is being handed to you."],
+		["Lin Feng", "Then somebody had better be here to hand it on to. Stay close."],
+	],
+	"post:s_break23": [
+		["Narrator", "The gold light goes into Lin Feng and does not burn. It does what fire does when it is passed from one wick to another: the first flame is no smaller for it, and now there are two."],
+		["Yue Ling", "Your hands are warm. They have been cold since the winter. I did not like to say."],
+		["Lin Feng", "Here. Take some."],
+		["Narrator", "And when Yue Ling takes Lin Feng's hands, a little of the gold goes across, as easily as that, and neither of them has any less."],
 	],
 	"rally:granny_wen": [
 		["Granny Wen the Midwife", "Red paper? Firecrackers? Of course I remember. I have done it every year for seventy years, and every year the village laughs at me. This year nobody bought any paper at all. Too frightened, all of them, after the year we had."],
