@@ -143,8 +143,12 @@ func _unhandled_input(ev: InputEvent) -> void:
 			# talk to Yue Ling (the Lotus release: bonds.gd)
 			press("talk")
 		KEY_F:
-			# swing the sword at what is in front of him (the Living Land release: havoc.gd)
+			# swing the sword at what is in front of him (the Living Land release: havoc.gd; the Spring
+			# Thunder release: impact.gd, and the whole land answers)
 			press("strike")
+		KEY_G:
+			# throw the sword qi ahead (the Spring Thunder release: impact.gd)
+			press("qi")
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -165,6 +169,8 @@ func press(act: String) -> void:
 			world.toggle_ride()
 		elif act == "strike":
 			world.strike()
+		elif act == "qi":
+			world.qi_wave()
 		elif act == "talk":
 			talk_yue()
 		elif act == "cancel":
@@ -178,6 +184,7 @@ func press(act: String) -> void:
 
 func _process(d: float) -> void:
 	_talk_hint()
+	_done_scene()
 	for t in toast_list:
 		t.t -= d
 	toast_list = toast_list.filter(func(t): return t.t > 0.0)
@@ -192,6 +199,15 @@ func _process(d: float) -> void:
 			toast_list.append({"text": txt, "t": 3.5})
 	while toast_list.size() > 4:
 		toast_list.pop_front()
+
+## The Spring Thunder release: a step finished out in the world (a hunt, a clearing, a search) may have
+## a word to say about it ("done:<step>" in Data.DIALOGUE), said once Lin Feng is back in the world with
+## nothing else going on.
+func _done_scene() -> void:
+	if Game.done_pending.is_empty() or top_name() != "world" or not world.using.is_empty() or world.traveling() or world.ambush_t >= 0.0:
+		return
+	var sid: String = str(Game.done_pending.pop_front())
+	say(Data.DIALOGUE.get("done:" + sid, []))
 
 func say(lines: Array, cb: Callable = Callable()) -> void:
 	# an empty conversation used to push an empty dialogue box that Enter could never close
@@ -380,6 +396,9 @@ func interact(e: Dictionary) -> void:
 			else:
 				var need2: Dictionary = Data.STEPS[Data.step_index(str(e.open))]
 				Game.toast("The way is closed for now. (%s)" % need2.t)
+		"obstacle":
+			# Part XVII (impact.gd): it stands in the way until the sword clears it
+			Game.toast(str(Impact.OBSTACLES.get(str(e.what), {}).get("hint", "Something stands in the way (F)")))
 		"stele":
 			if Game.dao == "":
 				# (the steles stand once the Elder is ready to speak of the roads; until he has, they are
@@ -452,6 +471,10 @@ func talk_npc(e: Dictionary) -> void:
 				# Part XVI: two boards of peach wood carved with the door gods' names
 				Game.add_item("peach_charm", 2)
 				Game.toast("Obtained %s x2" % Data.ITEMS.peach_charm.n)
+			if sid == "s_p17_goumang":
+				# Part XVII: spring's own whip, from the first willow that ever came into leaf
+				Game.add_item("willow_switch", 1)
+				Game.toast("Obtained %s" % Data.ITEMS.willow_switch.n)
 		)
 		return
 	# a fated encounter (fate.gd): a chapter of somebody's story, and a choice in it
@@ -914,8 +937,9 @@ func open_abode(e: Dictionary) -> void:
 		open_talent_choice()
 	)
 
-func start_encounter(e: Dictionary) -> void:
-	battle.start(e.group, {"entity": e, "boss": false, "theme": world.theme_name})
+func start_encounter(e: Dictionary, ambush: bool = false) -> void:
+	# (`ambush`: the pack was struck first in the land, impact.gd, and opens the battle reeling)
+	battle.start(e.group, {"entity": e, "boss": false, "theme": world.theme_name, "ambush": ambush})
 	push("battle")
 
 func boss_interact(e: Dictionary) -> void:
@@ -1023,7 +1047,7 @@ func start_breakthrough() -> void:
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
-	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14"}
+	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15"}
 
 ## After the Dao-Merging tribulation (Part III), the True Immortal ascension (Part IV) and the
 ## Dao Ancestor ascension (Part V) and the Primordial Sovereign ascension (Part VI) the story

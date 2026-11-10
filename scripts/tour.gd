@@ -2098,6 +2098,9 @@ func _run() -> void:
 		await _living_shots(str(main.args.living))
 	if main.args.has("part16"):
 		await _part16_shots(str(main.args.part16))
+	if main.args.has("sword"):
+		# the Spring Thunder release (--sword, or --sword=a,b): the sword in the open world and Part XVII
+		await _sword_shots(str(main.args.sword))
 	if main.args.has("ending"):
 		# the ending on its own (--ending): its film and the results
 		_ending_state()
@@ -2145,3 +2148,296 @@ func _run() -> void:
 	_ending_state()
 	await _ending_shots()
 	get_tree().quit(0)
+
+
+# ---------------------------------------------------------------- the Spring Thunder release (--sword)
+## The game as it stands at Part XVII's step `step_id`.
+func _spring_state(step_id: String) -> void:
+	_part16_state("s_p16_end")
+	Game.step = Data.step_index(step_id)
+	Game.level = 64
+	Game.exp = float(Game.exp_need()) * 0.4
+	for i in Game.step:
+		if str(Data.STEPS[i].kind) == "kill":
+			Game.boss_done[str(Data.STEPS[i].boss)] = true
+	Game.heal_full()
+
+## An open tile beside world tile `t` with another open tile behind it (to stand on and swing from),
+## and the direction from it to `t`; [] if there is none.
+func _swing_from(t: Vector2i) -> Array:
+	var w = main.world
+	for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+		var st: Vector2i = t + d
+		if w.tile_free(st) and w.tile_free(st + d) and w.ent_at(st) == null and Havoc.at_tile(w.wd, st).is_empty():
+			return [st, -d]
+	return []
+
+## A camera beside the swing: the first open eye from the side or over the shoulder with a clear view.
+func _side_eye(pp: Vector3, fwd: Vector3, look: Vector3, dist: float = 3.6, hgt: float = 2.0) -> Vector3:
+	var side := fwd.cross(Vector3.UP)
+	for c2 in [[-0.6, 1.0], [-0.6, -1.0], [-2.0, 0.85], [-2.0, -0.85], [-3.2, 0.5], [-3.2, -0.5]]:
+		var e: Vector3 = pp + fwd * float(c2[0]) + side * float(c2[1]) * dist + Vector3(0, hgt, 0)
+		if _open_round(e) and _clear_view(e, look):
+			return e
+	return pp - fwd * 0.6 + side * dist + Vector3(0, hgt, 0)
+
+func _sword_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_spring_state("s_p17_home")
+	for tk in Bonds.TALKS:
+		Game.talks[str(tk.id)] = str(tk.options[0].id)
+	main.world.clear_cache()
+	main.set_stack(["world"])
+	main.world.open_world()
+	Game.clock = 10.5 * 60.0
+	if want.call("fell"):
+		await _fell_shots()
+	if want.call("rock"):
+		await _rock_shot()
+	if want.call("qi"):
+		await _qi_shots()
+	if want.call("first"):
+		await _first_strike_shots()
+	if want.call("ox"):
+		await _obstacle_shots("s_p17_ox", "p17_ox", "part17_spring_ox")
+	if want.call("deadfall"):
+		await _obstacle_shots("s_p17_deadfall", "p17_dead1", "part17_deadfall")
+	if want.call("ice"):
+		await _obstacle_shots("s_p17_ice", "p17_ice1", "part17_ice")
+	if want.call("chains"):
+		await _obstacle_shots("s_p17_chains", "p17_chain1", "part17_chains")
+	if want.call("gods"):
+		await _portraits("part17_gods", [Assets.person("gou_mang"), Assets.person("lei_gong")], 1.2, 1.55, 3.6)
+		await _gallery("part17_foes", [_foe("qing_nu", true), _foe("taisui", true), _foe("poison_mother", true), _foe("rime_wisp"), _foe("hoarfrost_hare"), _foe("late_frost"), _foe("waking_scorpion"), _foe("waking_centipede"), _foe("waking_toad")], 1.9)
+	if want.call("cast"):
+		# the anime re-sculpt: the cast of the game in a row, women and men, young and old
+		await _gallery("anime_cast", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0)}), Assets.person("chang_e"), Assets.person("elder_qing"),
+			Assets.person("ah_mei"), Assets.person("hu_qingyi"), Assets.person("granny_wen"), Assets.person("child_hua"), Assets.person("gou_mang")], 1.15, 0.0)
+		await _portraits("anime_faces", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0)}), Assets.person("chang_e"), Assets.person("hu_qingyi")], 0.62, 1.68, 1.9)
+
+## A tree at the forest's edge is cut through and falls: a strip of its fall, and the logs after.
+func _fell_shots() -> void:
+	var w = main.world
+	main.world.open_world()
+	for area in ["bamboo", "sect", "garden", "maple"]:
+		var lw := Atlas.world_of("surface")
+		var target := Vector2i(-1, -1)
+		var stand: Array = []
+		w.enter_layer("surface")
+		var cand: Array = []
+		for e in lw.ents:
+			if str(e.get("area", "")) == area and e.kind in ["npc", "pickup", "prop"]:
+				cand.append(e.pos)
+		if cand.is_empty():
+			continue
+		w.teleport(_nearest_free(cand[0]), "surface")
+		await _wait(1.5)
+		var v: Dictionary = w.views.get(area, {})
+		if v.is_empty():
+			print("[tour] no view of %s yet (views: %s)" % [area, str(w.views.keys())])
+			continue
+		var reg: Dictionary = (v.root as Node3D).get_meta("nature", {})
+		var r0: Vector2i = v.get("origin", Vector2i.ZERO)
+		print("[tour] %s: %d tiles with things growing on them" % [area, reg.size()])
+		var best := 1 << 30
+		for lt in reg:
+			var has_tree := false
+			for en in reg[lt]:
+				if str(en.kind) == "tree":
+					has_tree = true
+			if not has_tree:
+				continue
+			var wt: Vector2i = lt + r0
+			var sf := _swing_from(wt)
+			if sf.is_empty():
+				continue
+			var dd: int = absi(wt.x - w.ptile.x) + absi(wt.y - w.ptile.y)
+			if dd < best:
+				best = dd
+				target = wt
+				stand = sf
+		if stand.is_empty():
+			continue
+		w.teleport(stand[0], "surface")
+		w.facing = stand[1]
+		w.cam_q = _quarter(Vector2(w.facing))
+		w._snap_cam()
+		await _wait(1.2)
+		var pp: Vector3 = w._player_pos()
+		var fwd := Vector3(w.facing.x, 0, w.facing.y)
+		var look := pp + fwd * 2.5 + Vector3(0, 1.6, 0)
+		var eye := _side_eye(pp, fwd, look, 6.0, 2.6)
+		w.cam_override = Transform3D(Basis.IDENTITY, eye).looking_at(look, Vector3.UP)
+		w.strike()
+		var strip: Array = []
+		for k in 5:
+			await _wait(0.42)
+			await _shot("sword_fell_%d" % k, false)
+			strip.append(last_img)
+		await _sheet("sword_fell_sheet", strip, 0.4)
+		last_img = strip[2]
+		last_img.save_png("%s/sword_fell.png" % dir)
+		await _wait(1.0)
+		await _shot("sword_fell_after")
+		w.cam_override = null
+		return
+
+## A boulder on open ground shatters.
+func _rock_shot() -> void:
+	var w = main.world
+	main.world.open_world()
+	for area in ["thunder", "frost", "sect", "bamboo"]:
+		var lw := Atlas.world_of("surface")
+		w.enter_layer("surface")
+		var cand: Array = []
+		for e in lw.ents:
+			if str(e.get("area", "")) == area and e.kind in ["npc", "pickup", "prop"]:
+				cand.append(e.pos)
+		if cand.is_empty():
+			continue
+		w.teleport(_nearest_free(cand[0]), "surface")
+		await _wait(1.5)
+		var v: Dictionary = w.views.get(area, {})
+		if v.is_empty():
+			continue
+		var reg: Dictionary = (v.root as Node3D).get_meta("nature", {})
+		var r0: Vector2i = v.get("origin", Vector2i.ZERO)
+		var stand: Array = []
+		for lt in reg:
+			for en in reg[lt]:
+				if str(en.kind) == "rock" and stand.is_empty():
+					var sf := _swing_from(lt + r0)
+					if not sf.is_empty():
+						stand = sf
+		if stand.is_empty():
+			continue
+		w.teleport(stand[0], "surface")
+		w.facing = stand[1]
+		w.cam_q = _quarter(Vector2(w.facing))
+		w._snap_cam()
+		await _wait(1.2)
+		var pp: Vector3 = w._player_pos()
+		var fwd := Vector3(w.facing.x, 0, w.facing.y)
+		var look := pp + fwd * 1.5 + Vector3(0, 0.6, 0)
+		w.cam_override = Transform3D(Basis.IDENTITY, _side_eye(pp, fwd, look, 3.8, 1.8)).looking_at(look, Vector3.UP)
+		w.strike()
+		await _wait(0.4)
+		await _shot("sword_rock")
+		w.cam_override = null
+		return
+
+## The sword qi across a meadow: in flight, and the swathe it mowed.
+func _qi_shots() -> void:
+	var w = main.world
+	main.world.open_world()
+	w.enter_layer("surface")
+	var lw := Atlas.world_of("surface")
+	# a long straight run of open ground in the village's fields
+	var start := Vector2i(-1, -1)
+	var dir := Vector2i(1, 0)
+	var vg := _land_ent("granny_wen")
+	var base: Vector2i = vg.pos if not vg.is_empty() else Atlas.to_world("village", Vector2i(30, 30))
+	for r in 30:
+		for dx in range(-r, r + 1):
+			for dy in [-r, r]:
+				for dd in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
+					var p: Vector2i = base + Vector2i(dx, dy)
+					if start.x >= 0:
+						continue
+					var ok := true
+					for k in 9:
+						var q: Vector2i = p + dd * k
+						if not w.tile_free(q) or lw.grid[q.y * int(lw.w) + q.x] == MapGen.PATH or w.ent_at(q) != null:
+							ok = false
+							break
+					if ok:
+						start = p
+						dir = dd
+	if start.x < 0:
+		return
+	w.teleport(start, "surface")
+	w.facing = dir
+	w.cam_q = _quarter(Vector2(dir))
+	w._snap_cam()
+	await _wait(1.5)
+	Game.qi[0] = float(Game.max_qi(0))
+	var pp: Vector3 = w._player_pos()
+	var fwd := Vector3(dir.x, 0, dir.y)
+	var look := pp + fwd * 6.0 + Vector3(0, 0.8, 0)
+	w.cam_override = Transform3D(Basis.IDENTITY, _side_eye(pp, fwd, look, 7.0, 3.0)).looking_at(look, Vector3.UP)
+	w.qi_wave()
+	await _wait(0.3)
+	await _shot("sword_qi")
+	await _wait(1.6)
+	await _shot("sword_qi_mown")
+	w.cam_override = null
+
+## A pack struck first in the land: thrown back, and the battle that opens with it reeling.
+func _first_strike_shots() -> void:
+	var w = main.world
+	main.world.open_world()
+	w.enter_layer("surface")
+	Game.level = 12
+	var lw := Atlas.world_of("surface")
+	for e in lw.ents:
+		if e.kind != "enemy" or str(e.get("area", "")) != "frost" or not w.ent_visible(e):
+			continue
+		var sf := _swing_from(e.pos)
+		if sf.is_empty():
+			continue
+		w.teleport(sf[0], "surface")
+		w.facing = sf[1]
+		w.cam_q = _quarter(Vector2(w.facing))
+		w._snap_cam()
+		await _wait(1.5)
+		var pp: Vector3 = w._player_pos()
+		var fwd := Vector3(w.facing.x, 0, w.facing.y)
+		var look := pp + fwd * 2.0 + Vector3(0, 0.9, 0)
+		w.cam_override = Transform3D(Basis.IDENTITY, _side_eye(pp, fwd, look, 4.2, 2.0)).looking_at(look, Vector3.UP)
+		w.strike()
+		await _wait(0.22)
+		await _shot("sword_first_strike")
+		w.cam_override = null
+		await _wait(2.4)
+		await _shot("sword_first_strike_battle")
+		return
+
+## One of Part XVII's obstacles, before the blow and as it comes apart.
+func _obstacle_shots(step_id: String, ob_id: String, n: String) -> void:
+	_spring_state(step_id)
+	for tk in Bonds.TALKS:
+		Game.talks[str(tk.id)] = str(tk.options[0].id)
+	Game.clock = 10.5 * 60.0
+	var w = main.world
+	main.world.open_world()
+	w.enter_layer("surface")
+	var e := _land_ent(ob_id)
+	if e.is_empty():
+		print("[tour] no obstacle ", ob_id)
+		return
+	var sf := _swing_from(e.pos)
+	if sf.is_empty():
+		print("[tour] nowhere to swing at ", ob_id, " from")
+		return
+	w.teleport(sf[0], "surface")
+	w.facing = sf[1]
+	w.cam_q = _quarter(Vector2(w.facing))
+	w._snap_cam()
+	await _wait(1.6)
+	var pp: Vector3 = w._player_pos()
+	var fwd := Vector3(w.facing.x, 0, w.facing.y)
+	var look := pp + fwd * 1.3 + Vector3(0, 0.8, 0)
+	w.cam_override = Transform3D(Basis.IDENTITY, _side_eye(pp, fwd, look, 3.9, 2.0)).looking_at(look, Vector3.UP)
+	await _wait(0.3)
+	await _shot(n)
+	var spec: Dictionary = Impact.OBSTACLES.get(str(e.what), {"hits": 1})
+	for k in int(spec.hits):
+		w.strike_t = -9.0
+		w.strike()
+		await _wait(0.2 if k < int(spec.hits) - 1 else 0.38)
+	await _shot(n + "_broken")
+	w.cam_override = null
+	while main.top_name() == "dialogue":
+		_skip_talk()
+		await _wait(0.1)

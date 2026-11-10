@@ -31,30 +31,93 @@ ANK = V(0.105, 0.1, -0.01)
 
 
 # ---------------------------------------------------------------- the torso
+def _gy(y, c, up, down):
+    """An asymmetric bump in height: `up` wide above `c`, `down` below (a lifted shape: a long upper
+    slope and a full, crisp lower curve)."""
+    s = up if y > c else down
+    return math.exp(-((y - c) / s) ** 2)
+
+
+def _ga(a, c, w):
+    """A bump in angle round the body (wrapping), `w` wide."""
+    d = math.atan2(math.sin(a - c), math.cos(a - c))
+    return math.exp(-(d / w) ** 2)
+
+
 class Torso:
-    """Cross-sections of the clothed torso: a superellipse (square-ish shoulders and chest,
-    rounder waist) whose width and depth change with height."""
+    """Cross-sections of the clothed torso: a superellipse (square-ish shoulders and chest, rounder
+    waist) whose width and depth change with height, and the anatomy under the robe added to it.
+
+    The Spring Thunder release gives men and women their own sections after the 3D anime bodies of
+    gacha games (proportion sheets and measurements in the README's references; H is the height,
+    about 1.86 m to the crown):
+
+    * a man is a V: shoulders and chest broad (about 0.19 H across the chest), the waist about
+      0.145 H, the hips narrower than the chest, the chest two flat planes of muscle;
+    * a woman has narrow shoulders, a high, slender waist (about 0.12 H across, its narrowest at
+      0.6 H, where her sash is tied), hips as wide as her shoulders (about 0.19 H), a lifted bust;
+    * both have a seat: round glutes behind the hips, a woman's fuller and higher;
+    * the robe falls from the widest point of the hips and seat (`hip_y`), so the waist, the hips
+      and the curve of the back show in its silhouette.
+
+    Options: build (wider shoulders and chest), bust and pecs (0 none .. 1.5), glutes, waist (a
+    multiplier on the waist's width)."""
 
     # y, half width, half depth, front shift, squareness exponent
-    TABLE = [
-        (0.9, 0.158, 0.122, 0.0, 2.2),
-        (0.98, 0.148, 0.115, 0.004, 2.2),
-        (1.06, 0.14, 0.11, 0.006, 2.25),
-        (1.16, 0.15, 0.115, 0.008, 2.35),
-        (1.26, 0.162, 0.121, 0.01, 2.45),
-        (1.33, 0.165, 0.119, 0.008, 2.4),
-        (1.375, 0.163, 0.112, 0.004, 2.3),
-        (1.41, 0.157, 0.104, 0.0, 2.25),
-        (1.44, 0.143, 0.095, 0.0, 2.2),
-        (1.465, 0.12, 0.084, 0.0, 2.1),
-        (1.49, 0.094, 0.073, 0.0, 2.05),
+    TABLE_M = [
+        (0.86, 0.148, 0.104, -0.004, 2.2),
+        (0.92, 0.152, 0.106, -0.002, 2.2),
+        (0.98, 0.146, 0.102, 0.002, 2.2),
+        (1.04, 0.138, 0.097, 0.005, 2.25),
+        (1.1, 0.14, 0.099, 0.007, 2.3),
+        (1.18, 0.152, 0.106, 0.009, 2.4),
+        (1.26, 0.166, 0.114, 0.011, 2.5),
+        (1.33, 0.172, 0.116, 0.009, 2.5),
+        (1.375, 0.171, 0.111, 0.004, 2.4),
+        (1.41, 0.164, 0.104, 0.0, 2.3),
+        (1.44, 0.148, 0.095, 0.0, 2.2),
+        (1.465, 0.122, 0.084, 0.0, 2.1),
+        (1.49, 0.095, 0.073, 0.0, 2.05),
         (1.51, 0.072, 0.064, 0.0, 2.0),
         (1.53, 0.06, 0.058, 0.002, 2.0),
+    ]
+    TABLE_F = [
+        (0.86, 0.158, 0.106, -0.006, 2.1),
+        (0.92, 0.17, 0.11, -0.004, 2.1),
+        (0.98, 0.166, 0.104, -0.001, 2.15),
+        (1.05, 0.142, 0.092, 0.003, 2.2),
+        (1.12, 0.12, 0.084, 0.005, 2.2),
+        (1.18, 0.122, 0.087, 0.007, 2.25),
+        (1.24, 0.13, 0.093, 0.009, 2.3),
+        (1.3, 0.137, 0.097, 0.009, 2.3),
+        (1.36, 0.14, 0.097, 0.006, 2.3),
+        (1.41, 0.139, 0.093, 0.0, 2.25),
+        (1.44, 0.128, 0.087, 0.0, 2.2),
+        (1.465, 0.108, 0.077, 0.0, 2.1),
+        (1.49, 0.085, 0.067, 0.0, 2.05),
+        (1.51, 0.065, 0.058, 0.0, 2.0),
+        (1.53, 0.054, 0.052, 0.002, 2.0),
     ]
 
     def __init__(self, o):
         self.fem = o.get("fem", False)
         self.build_k = o.get("build", 1.0)
+        self.age = o.get("age", 0.0)
+        child = o.get("scale", 1.0) < 0.85
+        elder = smooth(0.45, 0.9, self.age)
+        self.TABLE = self.TABLE_F if self.fem else self.TABLE_M
+        # where the sash is tied: a woman's high, at the narrow of her waist; a man's at his navel
+        self.waist_y = 1.12 if self.fem else 1.03
+        # the widest point of the hips and seat, from which the robe falls
+        self.hip_y = 0.93 if self.fem else 0.94
+        if child:
+            self.bust = 0.0
+        else:
+            self.bust = o.get("bust", (1.0 - 0.45 * elder) if self.fem else 0.0)
+        self.pecs = o.get("pecs", 0.0 if (self.fem or child) else 1.0 - 0.6 * elder)
+        self.glutes = o.get("glutes", (1.0 if self.fem else 0.7) * (0.6 if child else 1.0) * (1.0 - 0.4 * elder))
+        # an elder's waist has thickened; o["waist"] narrows or widens it
+        self.waist_k = o.get("waist", 1.0) * (1.0 + 0.12 * elder) * (1.08 if child else 1.0)
 
     def params(self, y):
         T = self.TABLE
@@ -73,20 +136,41 @@ class Torso:
                 k = self.build_k
                 if y > 1.1:
                     w *= 1.0 + (k - 1.0) * 0.8
-                if self.fem:
-                    w *= 0.93 if y > 1.3 else (0.94 if y > 1.0 else 1.0)
+                # the waist (the narrow between the ribs and the hips) by the waist option and age
+                wk = bump(y, self.waist_y, 0.12)
+                w *= 1.0 + (self.waist_k - 1.0) * wk
+                d *= 1.0 + (self.waist_k - 1.0) * wk * 1.2
                 return w, d, z, e
         row = T[-1]
         return row[1], row[2], row[3], row[4]
+
+    def anatomy(self, y, a):
+        """What the body under the robe adds to the section at height `y`, angle `a` (metres, out
+        from it): the bust or the planes of the chest in front, the seat behind."""
+        out = 0.0
+        if self.bust > 0.0 and 1.15 < y < 1.42:
+            # two lobes either side of the front, lifted, the robe bridging between them
+            gy = _gy(y, 1.295, 0.07, 0.038)
+            lobes = max(_ga(a, 0.58, 0.36), _ga(a, -0.58, 0.36))
+            bridge = 0.8 * smooth(1.0, 0.0, abs(a) / 0.58) if abs(a) < 0.58 else 0.0
+            out += 0.05 * self.bust * gy * max(lobes, bridge)
+        if self.pecs > 0.0 and 1.2 < y < 1.42:
+            # the chest: two flat planes with a crisp lower edge
+            gy = _gy(y, 1.335, 0.06, 0.026)
+            lobes = max(_ga(a, 0.52, 0.42), _ga(a, -0.52, 0.42))
+            out += 0.013 * self.pecs * gy * max(lobes, 0.55 * smooth(0.52, 0.0, abs(a)))
+        if self.glutes > 0.0 and 0.8 < y < 1.06:
+            # the seat: two round glutes behind the hips, high and lifted
+            gy = _gy(y, self.hip_y + 0.005, 0.085, 0.045)
+            lobes = max(_ga(a, math.pi - 0.5, 0.42), _ga(a, -math.pi + 0.5, 0.42))
+            out += (0.036 if self.fem else 0.021) * self.glutes * gy * max(lobes, 0.7 * _ga(a, math.pi, 0.5))
+        return out
 
     def radius(self, y, a):
         w, d, _, e = self.params(y)
         s, c = abs(math.sin(a)), abs(math.cos(a))
         r = (((s / w) ** e) + ((c / d) ** e)) ** (-1.0 / e)
-        if self.fem and 1.2 < y < 1.38:
-            # a soft bust line under the robe
-            r *= 1.0 + 0.1 * bump(y, 1.29, 0.08) * (max(0.0, math.cos(a)) ** 2) * (0.6 + 0.4 * math.cos(2 * (abs(a) - 0.45)))
-        return r
+        return r + self.anatomy(y, a)
 
     def point(self, y, a, out=0.0):
         _, _, z, _ = self.params(y)
@@ -126,7 +210,8 @@ def torso_w(p):
 
 
 def skirt_w(p):
-    t = clamp((1.0 - p.y) / 0.7)
+    # (the panels swing below the seat; the hips and the seat themselves move with the hips)
+    t = clamp((0.95 - p.y) / 0.65)
     a = math.atan2(p.x, p.z)
     cf = max(0.0, math.cos(a)) ** 2
     cb = max(0.0, -math.cos(a)) ** 2
@@ -149,8 +234,8 @@ def drape(a, y, top, n_major=7, n_minor=17, depth=1.0, phase=0.0):
 def body(b, o, tor, robe, trim, inner, gold):
     """The upper robe on the torso, with draped folds below the chest."""
     rings = []
-    ys = [0.9, 0.94, 0.98, 1.02, 1.06, 1.1, 1.15, 1.2, 1.25, 1.3, 1.34, 1.38, 1.41, 1.435, 1.455, 1.475, 1.49, 1.505, 1.518, 1.53, 1.54, 1.548]
-    n = 34
+    ys = [0.9, 0.94, 0.98, 1.02, 1.06, 1.1, 1.15, 1.2, 1.24, 1.27, 1.3, 1.33, 1.36, 1.39, 1.41, 1.435, 1.455, 1.475, 1.49, 1.505, 1.518, 1.53, 1.54, 1.548]
+    n = 32
     for y in ys:
         ring = []
         for i in range(n):
@@ -224,7 +309,7 @@ def collar(b, o, tor, robe, trim, inner, gold):
     # outer collar: back of the neck round to the left front, then diagonally across the chest to
     # the right front, where the overlap edge of the skirt carries the line on down to the hem
     ps1, ns1 = path(math.pi * 0.98, 1.505, 0.62, 1.49, 12)
-    ps2, ns2 = path(0.62, 1.49, -0.6, 0.995, 22, 0.15)
+    ps2, ns2 = path(0.62, 1.49, -0.6, tor.waist_y - 0.027, 22, 0.15)
     ps = ps1 + ps2[1:]
     ns = ns1 + ns2[1:]
     cols = [mix(trim, gold, 0.55) if (k % 4 == 1 and k > 10) else rgb(trim) for k in range(len(ps))]
@@ -239,7 +324,8 @@ def sash(b, o, tor, sash_col, gold):
     """Wide sash on the waist with a woven pattern, a cord belt, a bow knot with long tails and a
     jade pendant on a tasselled cord."""
     n = 40
-    lo, hi = 0.97, 1.075
+    # (tied at the waist: a woman's high at the narrow of it, a man's at the navel)
+    lo, hi = tor.waist_y - 0.053, tor.waist_y + 0.052
     rings = []
     ys = [lo, lo + 0.012, (lo + hi) / 2, hi - 0.012, hi]
     for y in ys:
@@ -255,10 +341,10 @@ def sash(b, o, tor, sash_col, gold):
 
     loft(b, rings, sash_col, cls=CLOTH, col_fn=col, bone="hips", cap0=False, cap1=False)
     # cord belt just below
-    ring = [tor.point(0.955, 2 * math.pi * i / 30, 0.014) for i in range(31)]
+    ring = [tor.point(lo - 0.015, 2 * math.pi * i / 30, 0.014) for i in range(31)]
     b.tube(ring, [0.0055] * 31, darken(sash_col, 0.3), cls=CLOTH, bone="hips", seg=6, cap0=False, cap1=False)
     # bow knot at the front left with two loops and two long tails
-    kc = tor.point(1.02, 0.28, 0.03)
+    kc = tor.point(tor.waist_y - 0.003, 0.28, 0.03)
     b.ellipsoid(kc, (0.026, 0.024, 0.016), lighten(sash_col, 0.1), cls=CLOTH, bone="hips", seg=12, rings=8)
     for s in (1, -1):
         loop = [kc + V(0.0, 0.0, 0.004), kc + V(0.04 * s, 0.03, 0.008), kc + V(0.07 * s, 0.012, 0.006), kc + V(0.05 * s, -0.012, 0.004), kc + V(0.006 * s, -0.004, 0.004)]
@@ -278,7 +364,7 @@ def sash(b, o, tor, sash_col, gold):
             b.tube([end + V(x, 0, 0), end + V(x * 1.1, -0.04, 0.003)], [0.0025, 0.001], gold, cls=CLOTH, bone="robe_f", seg=4)
     # jade pendant (pei) on a cord with a knot and tassel
     jade = o.get("jade", "6af0b0")
-    top = tor.point(0.96, -0.5, 0.02)
+    top = tor.point(lo - 0.01, -0.5, 0.02)
     cord = [top, top + V(0.004, -0.06, 0.01), top + V(0.002, -0.12, 0.014)]
     b.tube(cord, [0.0028] * 3, "b8302a", cls=CLOTH, bones=[{"hips": 1}, {"hips": 0.5, "robe_f": 0.5}, {"robe_f": 1}], seg=5)
     pc = cord[-1] + V(0, -0.03, 0.004)
@@ -295,18 +381,28 @@ def skirt(b, o, tor, robe, trim, inner, gold, lapel_end):
     the collar at the right front to the hem as one trimmed line.  (The old skirt was open there and
     showed a wide stripe of white inner robe from waist to hem, like an apron.)  Pleats deepen
     towards the hem, which is trimmed, embroidered and shows a finger's breadth of the inner robe."""
-    n = 56
-    ys = [1.0, 0.92, 0.84, 0.76, 0.66, 0.56, 0.46, 0.36, 0.28, 0.21, 0.17]
+    n = 50
+    # (the Spring Thunder release: it starts at the waist, follows the hips and the seat down to their
+    # widest point, `hip_y`, and falls from there in an A-line; a woman's waist is higher and her robe
+    # flares a little more)
+    top = tor.waist_y - 0.02
+    hip = tor.hip_y
+    ys = [top, (top + hip) * 0.5 + 0.02, (top + hip) * 0.5 - 0.02, hip, 0.86, 0.78, 0.68, 0.58, 0.48, 0.38, 0.29, 0.21, 0.17]
     if o.get("robe_len") == "short":
         # a working man's short robe: the hem stops above the knee so the legs can move
-        ys = [1.0 - (1.0 - y) * 0.52 for y in ys]
+        ys = [y if y >= hip else hip - (hip - y) * 0.52 for y in ys]
     edge_a = -0.6           # the overlap edge sits at the right front
-    flare = o.get("flare", 1.0)
+    flare = o.get("flare", 1.0) * (1.25 if tor.fem else 1.0)
 
     def r_at(y, a):
-        base = tor.radius(min(max(y, 0.9), 1.0), a) + 0.012
-        k = clamp((1.0 - y) / 0.85)
-        return base * (1.0 + (0.4 * flare) * k ** 1.15) + drape(a, y, 1.0, 8, 23, 1.3, 0.4)
+        if y >= hip:
+            # over the hips and seat, close to the body
+            base = tor.radius(y, a) + 0.014
+        else:
+            base = tor.radius(hip, a) + 0.014
+            k = clamp((hip - y) / (hip - 0.17))
+            base *= 1.0 + (0.42 * flare) * k ** 1.1
+        return base + drape(a, y, hip, 8, 23, 1.3, 0.4)
 
     def over(a):
         # how far the top panel stands proud of the one beneath (a ridge along the edge)
@@ -322,18 +418,20 @@ def skirt(b, o, tor, robe, trim, inner, gold, lapel_end):
         ring = []
         for i in range(n):
             a = ang(i)
-            z = tor.params(min(max(y, 0.9), 1.0))[2]
-            r = r_at(y, a) + over(a) * clamp((1.0 - y) / 0.2)
+            z = tor.params(max(y, hip))[2]
+            r = r_at(y, a) + over(a) * clamp((top - y) / 0.2)
             # the hem lifts a little at the front so the shoes show
             yy = y + (0.02 * max(0.0, math.cos(a)) if y < 0.25 else 0.0)
-            ring.append(V(math.sin(a) * r, yy, math.cos(a) * r * 0.86 + z))
+            # (deeper than wide below the hips, as cloth over two legs hangs; above, the body's own depth)
+            zk = 1.0 - 0.14 * clamp((hip - y) / 0.12)
+            ring.append(V(math.sin(a) * r, yy, math.cos(a) * r * zk + z))
         rings.append(ring)
 
     def col(p, j, i):
         a = ang(i)
         y = ys[j]
-        d = drape(a, y, 1.0, 8, 23, 1.3, 0.4)
-        c = mix(robe, darken(robe, 0.16), clamp((1.0 - y) / 0.85))
+        d = drape(a, y, hip, 8, 23, 1.3, 0.4)
+        c = mix(robe, darken(robe, 0.16), clamp((hip - y) / 0.8))
         # the panel tucked under the edge sits in shadow
         e = (a - edge_a) % (2 * math.pi)
         if e > 2 * math.pi - 0.18:
@@ -434,7 +532,7 @@ def sleeve(b, o, s, sleeve_col, trim, inner, gold):
         O = (V(s, 0, 0) - A * (A.x * s) - F * (F.x * s)).normalized()
         return P, A, F, O
 
-    bag = 0.12 * width
+    bag = 0.1 * width
 
     def shape(d):
         y = d.y
@@ -443,9 +541,12 @@ def sleeve(b, o, s, sleeve_col, trim, inner, gold):
         cx, cz = (d.x / m, d.z / m) if m > 1e-6 else (0.0, 1.0)
         P, A, F, O = frame(u)
         flare = smooth(0.0, 0.88, u)
-        ro = width * (0.054 + 0.04 * flare)
-        rf = width * (0.056 + 0.022 * smooth(0.1, 0.9, u))
-        rb = width * (0.058 + 0.15 * smooth(0.28, 0.92, u))
+        # (the Spring Thunder release: snug round the shoulder and upper arm, opening into a bell
+        # below the elbow, the pocket behind it smaller: no longer a balloon from shoulder to cuff)
+        bell = smooth(0.45, 1.0, u)
+        ro = width * (0.047 + 0.012 * flare + 0.034 * bell)
+        rf = width * (0.049 + 0.01 * smooth(0.1, 0.9, u) + 0.016 * bell)
+        rb = width * (0.051 + 0.03 * smooth(0.2, 0.6, u) + 0.1 * smooth(0.4, 0.92, u))
         q = m ** (0.22 if y > 0.0 else 0.5)          # blunt top inside the shoulder, rounded bottom
         ox = cx * ro * q
         f = cz * (rf if cz >= 0.0 else rb) * q
@@ -505,7 +606,7 @@ def hand(b, o, s, skin):
     wr = V(WRI.x * s, WRI.y, WRI.z) + V(0.004 * s, -0.018, 0.004)
     sk = rgb(skin)
     nail = mix(sk, "ffe8e0", 0.5)
-    k = o.get("hand_k", 1.0)
+    k = o.get("hand_k", 0.92 if o.get("fem") else 1.0)
     L = 0.085 * k
     # palm: a flattened box-ish loft, wider at the knuckles
     rings = []
@@ -565,18 +666,22 @@ def legs(b, o, pants, boots, trim):
         an = V(ANK.x * s, ANK.y, ANK.z)
         th, sh, ft = "thigh." + sd, "shin." + sd, "foot." + sd
         tb = "toe." + sd
-        b.tube([hip, hip.lerp(kn, 0.5), kn, kn.lerp(an, 0.35)], [0.088, 0.078, 0.063, 0.059], pants, cls=CLOTH, bones=[th, th, {th: 0.5, sh: 0.5}, sh], seg=14)
+        # (the Spring Thunder release: long anime legs with a shape to them, a full thigh tapering to a
+        # slim knee, the curve of the calf and a fine ankle; a woman's slimmer)
+        lk = 0.9 if o.get("fem") else 1.0
+        b.tube([hip, hip.lerp(kn, 0.4), hip.lerp(kn, 0.75), kn, kn.lerp(an, 0.3)], [0.086 * lk, 0.077 * lk, 0.066 * lk, 0.058 * lk, 0.058 * lk], pants, cls=CLOTH, bones=[th, th, th, {th: 0.5, sh: 0.5}, sh], seg=14)
         if o.get("shoes") == "sandals":
             # trousers run on to the ankle above bare feet
-            b.tube([kn.lerp(an, 0.3), kn.lerp(an, 0.75), an + V(0, 0.01, 0)], [0.059, 0.055, 0.052], pants, cls=CLOTH, bones=[sh, sh, {sh: 0.6, ft: 0.4}], seg=14)
+            b.tube([kn.lerp(an, 0.3), kn.lerp(an, 0.75), an + V(0, 0.01, 0)], [0.058 * lk, 0.05 * lk, 0.046 * lk], pants, cls=CLOTH, bones=[sh, sh, {sh: 0.6, ft: 0.4}], seg=14)
         else:
             # boot shaft, slightly flared at the top, creased at the ankle
             top = kn.lerp(an, 0.32)
-            b.tube([top, kn.lerp(an, 0.6), kn.lerp(an, 0.85), an + V(0, -0.02, 0.005)], [0.066, 0.058, 0.054, 0.056], boots, cls=CLOTH, bones=[sh, sh, sh, {sh: 0.5, ft: 0.5}], seg=14, cols=[lighten(boots, 0.05), boots, darken(boots, 0.08), boots])
-            b.tube([top + V(0, 0.016, 0), top - V(0, 0.016, 0)], [0.07, 0.07], trim, cls=CLOTH, bone=sh, seg=14, cap0=False, cap1=False)
+            b.tube([top, kn.lerp(an, 0.45), kn.lerp(an, 0.68), kn.lerp(an, 0.88), an + V(0, -0.02, 0.005)], [0.064 * lk, 0.062 * lk, 0.052 * lk, 0.048 * lk, 0.052 * lk], boots, cls=CLOTH,
+                   bones=[sh, sh, sh, sh, {sh: 0.5, ft: 0.5}], seg=14, cols=[lighten(boots, 0.05), boots, boots, darken(boots, 0.08), boots])
+            b.tube([top + V(0, 0.016, 0), top - V(0, 0.016, 0)], [0.068 * lk, 0.068 * lk], trim, cls=CLOTH, bone=sh, seg=14, cap0=False, cap1=False)
             for k in range(3):
                 q = kn.lerp(an, 0.8 + k * 0.05)
-                b.tube([q + V(0.0, 0.002, 0.0), q - V(0, 0.002, 0)], [0.057, 0.057], darken(boots, 0.18), cls=CLOTH, bone=sh, seg=12, cap0=False, cap1=False)
+                b.tube([q + V(0.0, 0.002, 0.0), q - V(0, 0.002, 0)], [0.05 * lk, 0.05 * lk], darken(boots, 0.18), cls=CLOTH, bone=sh, seg=12, cap0=False, cap1=False)
         if o.get("wraps"):
             # cloth wrappings bound round the shin, criss-crossed with cord
             for k in range(7):
@@ -725,7 +830,7 @@ def armour(b, o, tor, metal):
     # tassets
     for k in range(9):
         a = (k / 8 - 0.5) * 3.6
-        top = tor.point(0.97, a, 0.03)
+        top = tor.point(tor.waist_y - 0.05, a, 0.03)
         for r in range(3):
             c = top + V(0, -0.04 - r * 0.05, 0) + (top - V(0, top.y, 0)).normalized() * (0.01 + r * 0.012)
             b.superquad(c, (0.028, 0.026, 0.005), mt if (k + r) % 2 else dk, e=0.4, cls=METAL, bone=skirt_w(c), rot=(0, a, 0), seg=8, rings=5)

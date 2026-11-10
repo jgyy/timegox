@@ -63,7 +63,9 @@ static func of_area(wd: Dictionary, area: String) -> Array:
 	var out: Array = []
 	var taken := {}
 	for e in wd.ents:
-		if str(e.get("area", "")) != area:
+		# (Part XVII's obstacles, impact.gd, and the people and things that came later in the story, "late",
+		# came after these were set out: they leave them where they were)
+		if str(e.get("area", "")) != area or e.kind == "obstacle" or e.get("late", false):
 			continue
 		taken[e.pos] = true
 		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 1), Vector2i(-1, -1), Vector2i(1, -1), Vector2i(-1, 1)]:

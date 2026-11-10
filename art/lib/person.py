@@ -59,7 +59,8 @@ def make_rig(o=None):
     r.bone("chest", (0, 1.28, 0), (0, 1.47, 0), "spine")
     r.bone("neck", (0, 1.47, 0.0), (0, 1.56, 0.01), "chest")
     r.bone("head", (0, 1.56, 0.01), (0, 1.88, 0.0), "neck")
-    r.bone("eyes", (0, EYE_Y, 0.08), (0, EYE_Y + 0.05, 0.08), "head")
+    ey = facelib.HC.y + facelib.eye_y_of(o)
+    r.bone("eyes", (0, ey, 0.08), (0, ey + 0.05, 0.08), "head")
     mouth_y = facelib.HC.y + facelib.MOUTH_Y
     r.bone("mouth", (0, mouth_y + 0.001, 0.09), (0, mouth_y + 0.03, 0.09), "head")
     r.bone("hair_tail", (0, 1.78, -0.1), (0, 1.4, -0.18), "head")
@@ -251,7 +252,9 @@ def build(o):
                 v[b.tl] = 1.0
     # a slightly larger head than life (about 6.6 heads tall) reads better at game distance, the
     # usual stylised proportion (references: anime proportion guides; Genshin model evolution)
-    hk = o.get("head_scale", 1.0 if o.get("beast_head") is not None else 1.08)
+    # (the Spring Thunder release: a woman's head a little bigger again, about 6.5 heads tall like the
+    # gacha games' adult women, a man's about 7)
+    hk = o.get("head_scale", 1.0 if o.get("beast_head") is not None else (1.13 if o.get("fem") else 1.08))
     if hk != 1.0:
         pivot = V(0, 1.58, 0.0)
         b.scale_where(lambda w: w.get("head", 0.0) + w.get("eyes", 0.0) + w.get("mouth", 0.0) + w.get("hair_tail", 0.0) >= 0.5, pivot, hk)

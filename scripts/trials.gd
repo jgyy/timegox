@@ -45,8 +45,10 @@ const KINDS := {
 	"heart": {"n": "Side by side", "col": Color("ff9ac0"), "what": "how close you and Yue Ling have come"},
 	# the Living Land release (Part XVI): the people of the towns (folk.gd), who remember the old ways
 	"folk": {"n": "By the people", "col": Color("ffb060"), "what": "the towns that remember the old ways"},
+	# the Spring Thunder release (Part XVII): the land Lin Feng opened with his own sword (impact.gd)
+	"land": {"n": "By the land", "col": Color("9ad870"), "what": "the land you have opened with your own blade"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -128,6 +130,9 @@ const RECIPES := {
 	"open_key": {"at": "smith", "in": {"ess_metal": 8, "ess_dark": 5, "pressed_petal": 2}, "stones": 240000, "after": "s_p15_memories", "for": "lock_warden"},
 	# ---- Part XVI (the Living Land release): red, fire and noise
 	"thunder_cracker": {"at": "alchemist", "in": {"ess_fire": 8, "thunder_bamboo": 2}, "stones": 260000, "after": "s_p16_bamboo", "for": "xi_beast"},
+	# the Spring Thunder release (Part XVII)
+	"warm_brazier": {"at": "alchemist", "in": {"ess_fire": 8, "ess_wood": 6}, "stones": 300000, "after": "s_p17_ice", "for": "qing_nu"},
+	"taisui_charm": {"at": "smith", "in": {"ess_earth": 8, "ess_metal": 6, "thunder_egg": 1}, "stones": 320000, "after": "s_p17_eggs", "for": "taisui"},
 	"hearth_lantern": {"at": "smith", "in": {"ess_fire": 6, "ess_metal": 5, "thunder_bamboo": 2}, "stones": 280000, "after": "s_p16_hunt", "for": "nian"},
 	"homing_elixir": {"at": "alchemist", "in": {"ess_wood": 5, "ess_fire": 5, "ess_water": 5, "ess_earth": 5, "ess_metal": 5, "autumn_leaf": 1}, "stones": 300000, "after": "s_p13_gates", "for": "chiyou"},
 }
@@ -934,6 +939,42 @@ const TRIALS := {
 				"desc": "Late Kindred Dao and a sword tempered eight times: strength enough to drive a whole year out of the village by hand.",
 				"line": "Lin Feng stands in the lane between the beast and the village, and does not move."},
 		]},
+	# ---- Part XVII (the Spring Thunder release): the frost that will not go home, and the lord under the soil
+	"qing_nu": {"might": [2.2, 1.25],
+		"why": "Qing Nu has laid the frost on the land every winter since there were winters, and taken it home every spring. This year she will not: under her snow, she says, nothing that the long year broke can hurt.",
+		"paths": [
+			{"id": "land", "kind": "land", "n": "The land made ready", "needs": [["cleared", 16]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Sixteen things the long winter left in the way, cleared with your own sword: the ox whipped, the roads, the channels and the river opened. Show her the land is ready to wake, and that somebody made it ready.",
+				"line": "Lin Feng tells the Maiden of Frost every road he opened, every channel, every jam of ice, and her comb goes still in her hair."},
+			{"id": "relic", "kind": "relic", "n": "Gou Mang's willow switch", "needs": [["give", "willow_switch", 1]], "boon": {"foe_hp": 0.75, "weak_k": 1.5},
+				"desc": "The Lord of Spring's own switch, cut from the first willow that ever came into leaf. Frost has never once won against it.",
+				"line": "Lin Feng lays the willow switch on the bench of snow, and green leaves open along it one by one."},
+			{"id": "craft", "kind": "craft", "n": "The Brazier of the South Wind", "needs": [["item", "warm_brazier", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Alchemist Mo can make a bronze brazier that breathes out the wet warm wind of the third month, from fire and wood essence. Frost cannot stand in front of it for long.",
+				"line": "The brazier breathes out the south wind, and the cavern drips."},
+			{"id": "might", "kind": "might", "n": "Melt the frost by hand", "needs": [["lv", 64], ["temper", 8]], "boon": {},
+				"desc": "Early Myriad Things cultivation within reach and a sword tempered eight times: hot enough, close enough, to melt a season.",
+				"line": "Lin Feng goes into the blue ice with nothing but his sword and his own warm breath."},
+		]},
+	"taisui": {"might": [2.3, 1.3],
+		"why": "Taisui moves under the earth with the year star, and anybody who breaks the ground where he lies has broken it on his head. This spring the whole land was broken open at once, and every blow of it fell on him.",
+		"paths": [
+			{"id": "folk", "kind": "folk", "n": "The old way of asking", "needs": [["rallied", 5]], "boon": {"assist": 0.04, "taken": 0.85},
+				"desc": "Five towns remember the old ways. Every family that remembers lights a stick of incense for Taisui at the start of the year and asks his pardon for the digging. Let them ask it now, all at once.",
+				"line": "Two hundred sticks of incense go up at once from five towns, and the smoke settles over the field like an apology."},
+			{"id": "craft", "kind": "craft", "n": "A charm of peace with the year", "needs": [["item", "taisui_charm", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Smith Tie can beat earth and metal essence round a thunder egg into a bronze charm with the year's Taisui engraved on it: we know you are there, it says, and we are sorry to have woken you.",
+				"line": "Lin Feng holds up the charm, and a dozen of Taisui's eyes read it at once and narrow."},
+			{"id": "land", "kind": "land", "n": "Every stone put right", "needs": [["cleared", 24]], "boon": {"foe_hp": 0.75, "taken": 0.9},
+				"desc": "Twenty-four obstacles the long winter left, cleared with your own sword and none of it wasted: show Taisui that every blow that fell on his head was for the year and not against him.",
+				"line": "Lin Feng tells Taisui of every stone and trunk and chain, and where each one went, and the lord of the year listens."},
+			{"id": "respect", "kind": "respect", "n": "A name even the earth knows", "needs": [["renown", 1000]], "boon": {"assist": 0.03, "taken": 0.85},
+				"desc": "Renown of 1000: the sweeper who swept the sky, carried the spring and said sorry for it. Even under the ground they have heard.",
+				"line": "Taisui hears the name in the roots of every field in the land, and some of his eyes close."},
+			{"id": "might", "kind": "might", "n": "Hold the year down", "needs": [["lv", 65], ["temper", 8]], "boon": {},
+				"desc": "Middle Myriad Things cultivation and a sword tempered eight times: strength enough to hold a year in its place until it calms down.",
+				"line": "Lin Feng plants his feet in the furrow and does not let the field move."},
+		]},
 	"lock_warden": {"might": [2.2, 1.25],
 		"why": "Suo was the part of the Lotus Seal that was always a lock. For three hundred years it took Yue Ling back and made her new whenever a bearer died. It will not let her go now: in the lock, it says, she can never be lost.",
 		"paths": [
@@ -1005,6 +1046,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"rallied":
 			# the Living Land release: the towns reminded of the old ways (Part XVI)
 			return g.rallied.size() >= int(n[1])
+		"cleared":
+			# the Spring Thunder release: the obstacles of the story cleared with the sword (impact.gd)
+			return g.cleared.size() >= int(n[1])
 	return false
 
 ## How many peoples of the realms call Lin Feng friend (or kin).
@@ -1060,6 +1104,8 @@ static func need_text(n: Array, g) -> String:
 			return "You and Yue Ling: %s at least (now %s)" % [Bonds.TITLES[int(n[1])], Bonds.title(g)]
 		"rallied":
 			return "%d towns reminded of the old ways: red, fire and noise (now %d)" % [int(n[1]), g.rallied.size()]
+		"cleared":
+			return "%d things the long winter left in the way cleared with your sword (now %d)" % [int(n[1]), g.cleared.size()]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1153,7 +1199,10 @@ static func favourite_kind(g) -> String:
 	return best
 
 const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron and Forge", "wealth": "the Open Hand", "respect": "Whom the World Respects",
-	"dao": "Walker of Many Roads", "peoples": "Friend of the Four Realms", "relic": "Keeper of Old Things", "bond": "Who Kept Faith"}
+	"dao": "Walker of Many Roads", "peoples": "Friend of the Four Realms", "relic": "Keeper of Old Things", "bond": "Who Kept Faith",
+	# (the roads added since had none, and the ending's title read a key that was not there: a player who
+	# went through most trials side by side or by the people had a script error for a title)
+	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))
