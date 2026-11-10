@@ -2456,6 +2456,7 @@ func _new_fire() -> void:
 	for oid in Fashion.ORIGIN_ORDER:
 		var od := Fashion.origin_desc(oid, true)
 		check(not _has_word(od, ["he", "him", "boy"]) or oid in ["merchant", "scholar", "hunter"], "the trade %s is told of her" % oid)
+	check(Voice.her("Granny Wen's Boy") == "Granny Wen's Girl" and Voice.her("Granny Wen's boy") == "Granny Wen's girl" and Voice.said("Senior Brother Lin!") == "Senior Sister Lin!", "what she is called keeps the capitals it was written with")
 	check(Fashion.origin_desc("merchant", true).contains("she owes him a donkey") and Fashion.origin_desc("foundling", true).contains("raised her"), "and the men in her story stay men")
 	check(Voice.tell("Lin Feng lifts his sword and the mountain answers him.")[0] == "Lin Feng lifts her sword and the mountain answers her.", "what is told of Lin Feng is told of her")
 	check(Voice.tell("Elder Qing Xuan puts down his cup.")[0] == "Elder Qing Xuan puts down his cup." and Voice.tell("He lowers his comb.")[0] == "He lowers his comb.", "what is told of another man, or of nobody named, is left alone")

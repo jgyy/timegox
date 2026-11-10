@@ -363,21 +363,22 @@ static func camp() -> Node3D:
 	var wood := MB.tag(Color("7a5a38"), MB.WOOD)
 	# the windbreak: an arc of felt panels behind the fire, lattice showing at the foot
 	for k in 9:
-		var a := -1.15 + 2.3 * float(k) / 8.0
-		var c := Vector3(sin(a) * 2.0, 0.0, -cos(a) * 2.0 - 0.1)
-		b.box(c + Vector3(0, 0.62, 0), Vector3(0.56, 1.0, 0.07), felt, Vector3(0, -a, 0))
-		b.box(c + Vector3(0, 0.09, 0), Vector3(0.56, 0.18, 0.05), wood, Vector3(0, -a, 0))
-		b.box(c + Vector3(0, 1.14, 0), Vector3(0.58, 0.06, 0.09), MB.tag(Color("8a2a3a"), MB.CLOTH), Vector3(0, -a, 0))
-	b.limb(Vector3(0, 0, -2.1), Vector3(0, 2.3, -2.1), 0.045, 0.03, wood, 6)
-	b.box(Vector3(0.16, 2.1, -2.1), Vector3(0.34, 0.2, 0.02), MB.tag(Color("3a6ac8"), MB.CLOTH), Vector3(0, 0, -0.25))
+		# (close at her back, inside her own tile, so nobody who walks up to her has it in the way)
+		var a := -1.0 + 2.0 * float(k) / 8.0
+		var c := Vector3(sin(a) * 1.05, 0.0, -cos(a) * 1.05 - 0.1)
+		b.box(c + Vector3(0, 0.5, 0), Vector3(0.27, 0.78, 0.06), felt, Vector3(0, -a, 0))
+		b.box(c + Vector3(0, 0.08, 0), Vector3(0.27, 0.16, 0.045), wood, Vector3(0, -a, 0))
+		b.box(c + Vector3(0, 0.91, 0), Vector3(0.28, 0.05, 0.08), MB.tag(Color("8a2a3a"), MB.CLOTH), Vector3(0, -a, 0))
+	b.limb(Vector3(0, 0, -1.2), Vector3(0, 2.1, -1.2), 0.04, 0.028, wood, 6)
+	b.box(Vector3(0.16, 1.92, -1.2), Vector3(0.34, 0.2, 0.02), MB.tag(Color("3a6ac8"), MB.CLOTH), Vector3(0, 0, -0.25))
 	# the three stones, the fire and the kettle
 	for k2 in 3:
 		var a2 := TAU * float(k2) / 3.0 + 0.5
-		b.sph(Vector3(sin(a2) * 0.34, 0.1, -1.0 + cos(a2) * 0.34), Vector3(0.17, 0.13, 0.16), MB.tag(Color("6a6460"), MB.STONE))
-	b.sph(Vector3(0, 0.34, -1.0), Vector3(0.2, 0.15, 0.2), MB.tag(Color("3a3432"), MB.STONE))
-	b.limb(Vector3(0.16, 0.38, -1.0), Vector3(0.36, 0.5, -1.0), 0.03, 0.02, MB.tag(Color("3a3432"), MB.STONE), 5)
-	g.sph(Vector3(0, 0.14, -1.0), Vector3(0.14, 0.1, 0.14), Color(1.0, 0.62, 0.25, 0.95))
-	g.ball(Vector3(0, 0.2, -1.0), 0.5, Color(0.5, 0.7, 1.0, 0.14), true)
+		b.sph(Vector3(0.55 + sin(a2) * 0.24, 0.08, -0.45 + cos(a2) * 0.24), Vector3(0.13, 0.1, 0.12), MB.tag(Color("6a6460"), MB.STONE))
+	b.sph(Vector3(0.55, 0.27, -0.45), Vector3(0.15, 0.12, 0.15), MB.tag(Color("3a3432"), MB.STONE))
+	b.limb(Vector3(0.67, 0.3, -0.45), Vector3(0.83, 0.4, -0.45), 0.025, 0.016, MB.tag(Color("3a3432"), MB.STONE), 5)
+	g.sph(Vector3(0.55, 0.11, -0.45), Vector3(0.1, 0.08, 0.1), Color(1.0, 0.62, 0.25, 0.95))
+	g.ball(Vector3(0.55, 0.16, -0.45), 0.36, Color(0.5, 0.7, 1.0, 0.14), true)
 	MB.mesh_node(root, b.build(MB.mat_vc()))
 	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return root

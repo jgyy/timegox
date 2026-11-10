@@ -1814,7 +1814,9 @@ func _run() -> void:
 	if main.args.has("boss-shots"):
 		main.world.open_world()
 	for bid in str(main.args.get("boss-shots", "")).split(",", false):
-		for aid in Data.AREA_CHAIN:
+		# (every region, the mountain round the sect too: it is not on the chain of regions the story
+		# opens one after another, and a lord who stands on it, Part XVIII's Huilu, could not be shot)
+		for aid in Data.AREAS:
 			var aspec: Dictionary = Data.AREAS[aid]
 			for bb in aspec.get("bosses", []):
 				if bb.id != bid:
@@ -2551,8 +2553,11 @@ func _fire_shots(which: String = "1") -> void:
 		await _wait(0.6)
 		await _shot("hearths_page")
 		main.pop()
-	if want.call("prologue"):
+	if want.call("prologue") or which.contains("prologue_"):
 		for hid in ["steppe", "sand", "valley"]:
+			# (--fire=prologue_steppe: one of them)
+			if not want.call("prologue") and not only.has("prologue_" + hid):
+				continue
 			main.new_game({"family": "Su", "given": "Lan", "body": "f", "look": "wanderer", "hair": 1, "eyes": 2, "robe": 1, "origin": "hunter", "hearth": hid})
 			Game.clock = 7.2 * 60.0
 			await _wait(2.5)
@@ -2573,7 +2578,9 @@ func _fire_shots(which: String = "1") -> void:
 			await _shot("prologue_%s" % hid)
 			if keeper != null and hid == "steppe":
 				main.interact(keeper)
-				await _wait(2.5)
+				await _wait(1.0)
+				main.dialogue.shown = 999.0
+				await _wait(0.6)
 				await _shot("prologue_%s_farewell" % hid)
 				while main.top_name() == "dialogue":
 					_skip_talk()
