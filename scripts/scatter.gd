@@ -224,10 +224,33 @@ static func _add(layers: Dictionary, key: String, mesh_fn: Callable, xf: Transfo
 	ly.col.append(col)
 
 static func _flush(root: Node3D, layers: Dictionary) -> void:
+	var made := {}
 	for k in layers:
 		var ly: Layer = layers[k]
 		if ly.mesh != null and not ly.xf.is_empty():
-			Terrain3D._add_mm(root, ly.mesh, ly.xf, ly.col, ly.shadow, ly.vis)
+			made[k] = Terrain3D._add_mm(root, ly.mesh, ly.xf, ly.col, ly.shadow, ly.vis)
+	# the Sword's Wake (impact.gd): the things noted in this chunk learn the instance that draws them
+	for e in _pending:
+		e["mmi"] = made.get(e.key)
+	_pending = []
+
+## The Sword's Wake (the Spring Thunder release, impact.gd): what grows or lies on each tile of the
+## region being populated, so a blow can find it: local tile -> [{kind ("tree", "plant" or "rock"),
+## the layer key, the instance index "i", and after the chunk is flushed its MultiMeshInstance3D
+## "mmi"}].  populate() leaves it on the root as meta "nature".
+static var _reg := {}
+static var _pending: Array = []
+## the rocks a blow can break (scree, pebbles and the karst towers are left be)
+const BREAKS := ["boulder", "slab", "spire", "crystal"]
+
+static func _note(kind: String, tx: int, ty: int, layers: Dictionary, key: String) -> void:
+	var ly: Layer = layers[key]
+	var e := {"kind": kind, "key": key, "i": ly.xf.size() - 1}
+	var t := Vector2i(tx, ty)
+	if not _reg.has(t):
+		_reg[t] = []
+	_reg[t].append(e)
+	_pending.append(e)
 
 static func _xf(pos: Vector3, yaw: float, s: float, tilt: Vector2 = Vector2.ZERO, sy: float = 1.0) -> Transform3D:
 	return Transform3D(Basis.from_euler(Vector3(tilt.x, yaw, tilt.y)).scaled(Vector3(s, s * sy, s)), pos)
@@ -267,6 +290,8 @@ static func populate(root: Node3D, grid: PackedByteArray, w: int, hh: int, hm: P
 	var real_grass := tuft_kind in ["grass", "deadgrass", "dunegrass", "snow", "moss", "flowers", "reed"] and grass_k > 0.0
 	var lily_ok := theme_name in ["sect", "garden", "marsh", "mirror", "lilies", "karst"]
 	_settled = []
+	_reg = {}
+	_pending = []
 	# direction from a forest-edge tile towards the open ground beside it
 	_open_dir = func(tx: int, ty: int) -> Vector2i:
 		for o in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
@@ -321,6 +346,8 @@ static func populate(root: Node3D, grid: PackedByteArray, w: int, hh: int, hm: P
 								var kv := int(h(tx, ty, 15.0) * Flora.VARIANTS)
 								_add(layers, "flora:kelp#%d" % kv, func(): return Flora.mesh("kelp", kv), _xf(gx.call(0.5, 0.5), h(tx, ty, 16.0) * TAU, 1.0), _tint(tx, ty, 17.0, 0.2), false, 55.0)
 			_flush(root, layers)
+	root.set_meta("nature", _reg)
+	_reg = {}
 
 static func _shore(grid: PackedByteArray, w: int, hh: int, tx: int, ty: int) -> bool:
 	for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
@@ -336,6 +363,8 @@ static func _tree(layers: Dictionary, sp: String, tx: int, ty: int, salt: float,
 	var tilt := Vector2((h(tx, ty, salt + 1.0) - 0.5) * 0.12, (h(tx, ty, salt + 2.0) - 0.5) * 0.12)
 	var col := _tint(tx, ty, salt + 3.0, 0.22 if not small else 0.3)
 	_add(layers, "flora:%s#%d" % [sp, v], func(): return Flora.mesh(sp, v), _xf(pos, h(tx, ty, salt + 4.0) * TAU, scale, tilt), col, not small, 55.0 if small else 115.0)
+	if sp not in ["log", "stump", "lotus", "kelp"]:
+		_note("plant" if small else "tree", tx, ty, layers, "flora:%s#%d" % [sp, v])
 
 static func _wall_tile(layers: Dictionary, tx: int, ty: int, depth: int, gx: Callable, theme_name: String, canopy: Array, under: Array, rocks: Array, groves: Array, land: float, karst: float, rocky: FastNoiseLite) -> void:
 	var r0 := h(tx, ty, 40.0)
@@ -395,6 +424,8 @@ static func _wall_tile(layers: Dictionary, tx: int, ty: int, depth: int, gx: Cal
 			rk = "boulder"
 		var rv := int(h(tx, ty, 75.0) * Rocks.VARIANTS)
 		_add(layers, "rock:%s#%d" % [rk, rv], func(): return Rocks.mesh(rk, rv, theme_name), _xf(gx.call(h(tx, ty, 76.0), h(tx, ty, 77.0)), h(tx, ty, 78.0) * TAU, 0.8 + h(tx, ty, 79.0) * 0.9), _tint(tx, ty, 80.0, 0.15), true, 80.0)
+		if rk in BREAKS:
+			_note("rock", tx, ty, layers, "rock:%s#%d" % [rk, rv])
 
 static var _settled: Array = []
 static var _open_dir := Callable()
@@ -460,6 +491,8 @@ static func _floor_tile(layers: Dictionary, tx: int, ty: int, to_wall: int, to_w
 			var rv := int(h(tx, ty, 104.0) * Rocks.VARIANTS)
 			var rs := (0.35 + h(tx, ty, 105.0) * 0.5) if rk != "scree" else (0.8 + h(tx, ty, 105.0) * 0.8)
 			_add(layers, "rock:%s#%d" % [rk, rv], func(): return Rocks.mesh(rk, rv, theme_name), _xf(gx.call(h(tx, ty, 106.0), h(tx, ty, 107.0)), h(tx, ty, 108.0) * TAU, rs), _tint(tx, ty, 109.0, 0.15), rk != "scree", 70.0)
+			if rk in BREAKS:
+				_note("rock", tx, ty, layers, "rock:%s#%d" % [rk, rv])
 		elif h(tx, ty, 110.0) < 0.05 and theme_name not in ["celestial", "court", "palace"]:
 			var pv := int(h(tx, ty, 111.0) * Rocks.VARIANTS)
 			_add(layers, "rock:pebbles#%d" % pv, func(): return Rocks.mesh("pebbles", pv, theme_name), _xf(gx.call(h(tx, ty, 112.0), h(tx, ty, 113.0)), h(tx, ty, 114.0) * TAU, 1.0), _tint(tx, ty, 115.0, 0.2), false, 40.0)

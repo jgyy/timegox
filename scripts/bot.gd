@@ -75,6 +75,8 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"unweaver": "heart", "lock_warden": "craft",
 	# Part XVI: the door gods' peach wood for the Last Night, and every pot in the land for the Year Beast
 	"xi_beast": "relic", "nian": "folk",
+	# Part XVII: the land it opened with its sword for the Maiden of Frost, the old way of asking for Taisui
+	"qing_nu": "land", "taisui": "folk",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -109,10 +111,12 @@ const TALK_PLAN := {"t_lotus": "mine", "t_hands": "teach", "t_winter": "here", "
 	"t_ageless": "keep", "t_mend": "me", "t_ancestors": "make", "t_mother": "sing", "t_bridge": "yes", "t_noon": "duty", "t_maps": "draw",
 	"t_choice": "proof", "t_sea": "sail", "t_war": "hold", "t_threads": "tie", "t_dragon": "ask", "t_nineteen": "left", "t_peach": "see", "t_heaven": "home", "t_xufu": "front", "t_page": "long", "t_qinglian": "mother", "t_twenty": "share", "t_loom": "through", "t_moths": "keep", "t_wrist": "family", "t_after": "never", "t_feast": "every",
 	"t_newyear": "bowl", "t_hunger": "share", "t_lastnight": "stay", "t_newday": "red",
+	"t_spring": "first", "t_thunder": "glad", "t_soil": "mend", "t_qingming": "first",
 }
 const MEMORY_ROUTE := ["mem_flute", "mem_spring", "mem_lanterns", "mem_stars", "mem_dance", "mem_kite"]
 const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring": "nothing", "mem_stars": "beside", "mem_kite": "cut", "mem_dance": "again", "mem_mill": "cook"}
-const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us", "s_p16_lanterns": "her", "s_p16_couplets": "together",}
+const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us", "s_p16_lanterns": "her", "s_p16_couplets": "together",
+	"s_p17_haircut": "trust", "s_p17_thunder": "us", "s_p17_teacup": "home", "s_p17_graves": "her", "s_p17_kite": "road",}
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
@@ -509,6 +513,10 @@ func _world(d: float) -> void:
 					# so head for the nearest pack anywhere in the region before waiting for respawns
 					e = _any_enemy(s.area, false, of)
 				if e != null:
+					# Part XVII: a hunt that asks for the first strike (impact.gd) is fought that way: the
+					# sword qi from a few tiles off when there is qi to spare, else F from beside the pack
+					if bool(s.get("first", false)) and _strike_first(e):
+						return
 					_walk_to(e.pos, "enemy:" + e.id)
 				else:
 					_start_meditate("respawn")
@@ -557,6 +565,10 @@ func _world(d: float) -> void:
 		"folk":
 			# Part XVI: the nearest child of the towns still without a red envelope (folk.gd)
 			_folk_step(s)
+		"clear":
+			# Part XVII: the nearest obstacle of the kind the step names, struck with the sword until it
+			# goes (impact.gd)
+			_clear_step(s)
 		"grudges":
 			# Part XIV: the next of the grudges that stayed (all six, in any order), each a boss
 			var gr := _next_grudge()
@@ -579,6 +591,73 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				_goto_entity(Trials.boss_area(g), "boss_" + g)
+
+## Part XVII (impact.gd): an obstacle of the story, cleared as a player would clear it: walk up to it,
+## turn to it (walking into it says what it is) and swing the sword (F) until it goes.
+func _clear_step(s: Dictionary) -> void:
+	if Game.area != str(s.area) or world.layer != Data.layer_of(str(s.area)):
+		_travel(str(s.area))
+		return
+	var dist := _bfs_dist(world.ptile, 90)
+	var best = null
+	var bd := 1 << 30
+	for e in world.ents:
+		if e.kind != "obstacle" or str(e.area) != str(s.area) or str(e.what) != str(s.what) or not world.ent_visible(e):
+			continue
+		var ed := 1 << 20
+		for dd in DIRS:
+			if dist.has(e.pos + dd):
+				ed = mini(ed, int(dist[e.pos + dd]))
+		if ed >= 1 << 20:
+			ed = (1 << 20) + absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		if ed < bd:
+			bd = ed
+			best = e
+	if best == null:
+		return
+	if world.move_t < 0.0 and _beside(best.pos):
+		var d: Vector2i = best.pos - world.ptile
+		if world.facing != d:
+			world.move_dir = d
+			return
+		world.move_dir = Vector2i.ZERO
+		_press("strike", 0.45)
+		return
+	_walk_to(best.pos, "obstacle:" + str(best.id))
+
+## Standing right beside tile `p` (not diagonally).
+func _beside(p: Vector2i) -> bool:
+	var d: Vector2i = p - world.ptile
+	return absi(d.x) + absi(d.y) == 1
+
+## The first strike (impact.gd) on pack `e`, as a player would deal it: walking straight at the pack,
+## stop beside it and swing the sword (F), or stop a few tiles short in a clear line and throw the sword
+## qi (G) when there is qi to spare.  Returns whether it is doing that this frame (else the bot walks on
+## towards the pack, and walks into it: the ordinary battle).
+func _strike_first(e: Dictionary) -> bool:
+	if Game.scatters(e.group):
+		return false
+	# (where he is, or the tile he is stepping onto: the decision is made before he gets there)
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	var d: Vector2i = e.pos - here
+	var n := absi(d.x) + absi(d.y)
+	if (d.x == 0) == (d.y == 0) or n > 5:
+		return false
+	var step := Vector2i(signi(d.x), signi(d.y))
+	# (only the way he is already going: turning to a pack beside him walks into it)
+	if world.facing != step:
+		return false
+	for k in range(1, n):
+		var q: Vector2i = here + step * k
+		if not world.tile_free(q) or world.ent_at(q) != null:
+			return false
+	if n > 1 and _qi_ratio() <= 0.6:
+		return false
+	# stop where he is going, then swing
+	world.move_dir = Vector2i.ZERO
+	if world.move_t < 0.0:
+		_press("strike" if n == 1 else "qi", 0.4)
+	return true
 
 func _start_meditate(goal: String) -> void:
 	med_goal = goal
@@ -1064,6 +1143,10 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 			"heart":
 				# closeness with Yue Ling grows by itself on the road (talks, memories); none to make
 				return false
+			"cleared":
+				# the Spring Thunder release: the land is opened by the chapter's own clearing quests on
+				# the way to the trial (impact.gd); there is nothing else to do for it
+				pass
 			_:
 				return false
 	return true
@@ -1733,6 +1816,8 @@ func _finish(reason: String) -> void:
 		"sword_tempering": Game.temper,
 		"renown": Game.renown,
 		"deeds": Game.deeds.size(),
+		# the Spring Thunder release (impact.gd): the sword in the open world
+		"strikes": Game.strikes, "first_strikes": Game.ambushes, "sword_qi": Game.waves, "cleared": Game.cleared.size(),
 		"trials": Game.trials,
 		"gates": Game.gates_open.keys(),
 		"time_by_screen_seconds": breakdown,
@@ -1760,6 +1845,7 @@ func _finish(reason: String) -> void:
 	print("meditation for  : %s" % JSON.stringify(time_by_med))
 	print("trials passed   : %d   renown: %d   deeds: %d   gates: %d" % [Game.trials.size(), Game.renown, Game.deeds.size(), Game.gates_open.size()])
 	print("paths taken     : %s" % JSON.stringify(Game.trials))
+	print("the sword       : %d strikes, %d packs struck first, %d sword qi, %d obstacles cleared" % [Game.strikes, Game.ambushes, Game.waves, Game.cleared.size()])
 	if reason != "":
 		print("FAILED          : %s" % reason)
 	print("result          : %s (needs >= %.0f s)" % ["PASS" if ok else "FAIL", min_time])

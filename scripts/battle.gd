@@ -30,6 +30,8 @@ var level_before := 0
 ## Part XII: once-a-battle powers of the woken root (the Sword Bone's first blow, the Vajra Body's
 ## last breath) and the realm suppression the battle opened with
 var first_blow := true
+## the Sword's Wake (impact.gd): this pack was struck first in the land (it opens the battle reeling)
+var ambush := false
 var vajra_used := false
 var tide_used := false
 var suppress_note := ""
@@ -251,6 +253,12 @@ func start(foe_list: Array, c: Dictionary) -> void:
 			if f.boss:
 				f.hp = float(f.maxhp) * float(boon.get("foe_hp", 1.0))
 				f.atk = float(f.atk) * float(boon.get("foe_atk", 1.0))
+	# the Sword's Wake (impact.gd): a pack struck first in the land opens the battle reeling
+	ambush = bool(c.get("ambush", false))
+	if ambush:
+		for f in foes:
+			if not f.boss:
+				f.hp = maxf(1.0, float(f.hp) - float(f.maxhp) * Impact.AMBUSH_HURT)
 	first_blow = true
 	vajra_used = false
 	tide_used = false
@@ -367,7 +375,13 @@ func _next_turn() -> void:
 			var all := alive(party) + alive(foes)
 			all.shuffle()
 			all.sort_custom(func(a, b): return a.spd > b.spd)
-			# the crown of Spirit Sense: Lin Feng moves first in the first round
+			# the crown of Spirit Sense: Lin Feng moves first in the first round (and so does the party
+			# that struck the pack first in the land, impact.gd)
+			if round_no == 1 and ambush:
+				var ps: Array = all.filter(func(f): return f.side == "party")
+				var fs: Array = all.filter(func(f): return f.side != "party")
+				all = ps + fs
+				say("First strike: the pack is still reeling from the blow!")
 			if round_no == 1 and (Game.talent_crown("spirit_sense") or boon.get("first", false)):
 				for k in all.size():
 					if all[k].side == "party" and all[k].idx == 0:

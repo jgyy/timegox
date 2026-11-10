@@ -289,6 +289,8 @@ varying float spec_k;
 varying float shin;
 varying float rim_k;
 varying float ring;
+// skin's softer terminator (0 cloth, hair and the rest: a crisp cel edge)
+varying float soft_k;
 
 float h31(vec3 p) { return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453); }
 float vnoise(vec3 p) {
@@ -353,19 +355,25 @@ void fragment() {
 	shin = 30.0;
 	rim_k = 0.32;
 	ring = 0.0;
+	soft_k = 0.0;
 	if (is_cls(cls, 1.0)) {
 		// cloth: a faint weave and soft tonal variation, never a pattern you notice first
 		float weave = sin(opos.x * 160.0) * sin(opos.y * 160.0 + opos.z * 160.0);
 		float folds = fbm(vec3(opos.x * 3.0, opos.y * 8.0, opos.z * 3.0) * detail);
 		col *= 0.95 + 0.02 * weave + 0.08 * folds;
 	} else if (is_cls(cls, 0.6)) {
-		// skin: smooth, warm rose shadows
-		shade_tint = vec3(0.98, 0.66, 0.64);
+		// skin: smooth, light, warm rose shadows (an anime face's shadow is a pinker shade of the skin,
+		// never a dark one: #FDE7DA in the light, #EBBCAA in the shade) with a softer edge
+		shade_tint = vec3(1.42, 1.18, 1.16);
+		soft_k = 1.0;
 		rim_k = 0.45;
 	} else if (is_cls(cls, 0.2)) {
-		// hair and fur: fine strands, a cool deep shadow and the anime highlight ring
+		// hair and fur: fine strands, a cool deep shadow and the anime highlight ring.  Black hair is
+		// drawn the anime way, as a deep blue-black with a lighter ring, never as a flat black helmet
+		// (the Spring Thunder release)
 		float strand = vnoise(vec3(opos.x * 90.0, opos.y * 5.0, opos.z * 90.0));
 		col *= 0.9 + 0.16 * strand;
+		col = col * 0.88 + vec3(0.018, 0.02, 0.034);
 		shade_tint = vec3(0.52, 0.52, 0.72);
 		ring = smoothstep(0.08, 0.0, abs(onrm.y - 0.42 + 0.05 * sin(atan(onrm.x, onrm.z) * 14.0))) * step(0.0, onrm.z + 0.35);
 		rim_k = 0.28;
@@ -424,7 +432,7 @@ void light() {
 		// soft two-tone ramp: the terminator sits a little past the half-Lambert midpoint and the
 		// received shadow joins the same ramp, so cast shadows read as part of the cel shading
 		float h = ndl * 0.5 + 0.5;
-		float lit = smoothstep(0.44, 0.52, h) * smoothstep(0.15, 0.65, ATTENUATION);
+		float lit = smoothstep(0.45 - 0.06 * soft_k, 0.51 + 0.06 * soft_k, h) * smoothstep(0.15, 0.65, ATTENUATION);
 		vec3 ramp = mix(shade_tint * 0.52, vec3(1.0), lit);
 		DIFFUSE_LIGHT += lc * ramp * key;
 		// a thin rim of light on the lit side only
@@ -435,7 +443,9 @@ void light() {
 		vec3 hv = normalize(VIEW + LIGHT);
 		float sp = pow(max(dot(NORMAL, hv), 0.0), shin);
 		SPECULAR_LIGHT += lc * smoothstep(0.42, 0.5, sp) * spec_k * lit * 0.6;
-		SPECULAR_LIGHT += lc * ALBEDO * ring * (0.35 + 0.45 * lit) * 0.6;
+		// (the ring is a lighter shade of the hair, so it shows on black hair too)
+		vec3 ring_col = mix(ALBEDO * 2.4 + vec3(0.05, 0.06, 0.09), vec3(0.85, 0.88, 1.0), 0.18);
+		SPECULAR_LIGHT += lc * ring_col * ring * (0.35 + 0.45 * lit) * 0.55;
 	} else {
 		// lanterns and spell lights: a soft wrapped Lambert
 		float l = clamp(ndl * 0.6 + 0.4, 0.0, 1.0);

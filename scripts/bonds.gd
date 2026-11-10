@@ -428,6 +428,47 @@ const TALKS := [
 			{"id": "round", "label": "\"Let's go round the sect.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Let us go round the sect, then. Everybody. Auntie Zhou first, or she will never forgive us."], ["Yue Ling", "Auntie Zhou first. Then everybody. Then Auntie Zhou again, for seconds."]]},
 			{"id": "out", "label": "\"And then down the mountain.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "And then down the mountain, to see how the towns did it."], ["Yue Ling", "Every town's first morning. Yes. Bring the red envelopes."]]},
 		]},
+	# ---- Part XVII (the Spring Thunder release): spring, the first thunder and Qingming
+	{"id": "t_spring", "after": "s_p17_goumang", "lines": [
+		["Yue Ling", "Lin Feng, I have been every season, but never on purpose. Some springs I was a girl in a village. Some I was a lotus under the ice, waiting. I always woke up in spring. I never once saw it come."],
+		["Yue Ling", "I want to see it come this year. All of it. The first green, the first frog, the first swallow. I want to be there when it gets here, and say hello."],
+		["Lin Feng", "Then we will carry it in ourselves, since it is too tired to walk."]],
+		"ask": "What do you promise her about the spring?",
+		"options": [
+			{"id": "first", "label": "\"We'll see every first thing together.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Every first thing. The first green, the first frog, the first swallow. Together."], ["Yue Ling", "I am going to keep a list. You are not allowed to see anything first without me."]]},
+			{"id": "pond", "label": "\"We'll watch the pond thaw.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Then we will sit by your pond every morning until the ice goes."], ["Yue Ling", "And the lotus comes up. Mine. It will be very proud of itself."]]},
+			{"id": "follow", "label": "\"We'll follow it across the land.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Spring goes north a day's walk at a time. We could walk with it."], ["Yue Ling", "All the way north. Yes. I want to see where it ends up."]]},
+		]},
+	{"id": "t_thunder", "after": "s_p17_thunder", "lines": [
+		["Yue Ling", "When the thunder rolled, everything under the ground woke up at once. I felt it in my feet. Seeds, worms, beetles, the frogs in the paddies, all of them stretching."],
+		["Yue Ling", "Lin Feng, I think I woke up too. Not the way I used to, by a pond, new and empty. Like somebody who has slept a long time in her own bed and remembers everything, and is glad."],
+		["Lin Feng", "Then good morning, Yue Ling."]],
+		"ask": "What do you say to her, the morning after the first thunder?",
+		"options": [
+			{"id": "glad", "label": "\"I'm glad it's you who woke.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "I am glad it was you who woke up. Out of everything."], ["Yue Ling", "Out of every beetle in the land? That is a very high compliment."]]},
+			{"id": "bed", "label": "\"Your own bed. On our mountain.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Your own bed, on our mountain. That is where you woke."], ["Yue Ling", "On our mountain. I like how you say it. Our."]]},
+			{"id": "go", "label": "\"Then where shall we go first?\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Awake, then. So where first?"], ["Yue Ling", "Everywhere the thunder reached. That is all of it. We had better start early."]]},
+		]},
+	{"id": "t_soil", "after": "s_p17_taisui", "lines": [
+		["Yue Ling", "Lin Feng. You said sorry to the ground. To a thing under the ground with a hundred eyes that wanted to eat the village, you said: we are sorry to be digging, and we will be careful."],
+		["Yue Ling", "When I was the Seal, every bearer before you broke something to get where he was going. Mountains, doors, people. Not one of them ever said sorry to the thing he broke."],
+		["Lin Feng", "I was a sweeper for three years. You learn to say sorry to the floor."]],
+		"ask": "What do you tell her about the things you broke this spring?",
+		"options": [
+			{"id": "careful", "label": "\"I'll be more careful with you than with anything.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "Whatever I break, I will never be careless with you."], ["Yue Ling", "You are already the least careless person I know. It is very annoying. Thank you."]]},
+			{"id": "mend", "label": "\"Everything we broke, we'll mend.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "Everything we broke this spring we will mend: the roads, the channels, the bridge at Longmen."], ["Yue Ling", "And Taisui's sleep. We owe him a quiet year."]]},
+			{"id": "light", "label": "\"Walk lightly, wherever we go.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Then we walk lightly, wherever we go next. Leave nothing broken behind us."], ["Yue Ling", "Walk lightly. Yes. That is a good rule for a road."]]},
+		]},
+	{"id": "t_qingming", "after": "s_p17_graves", "lines": [
+		["Yue Ling", "Lin Feng. Qingming is for sweeping the graves of the people who came before you. I have none. The Founder was not my mother, not really. The bearers were not my family. I am the first of mine."],
+		["Yue Ling", "Who will sweep for me, one day? Do you think anybody will?"],
+		["Lin Feng", "..."]],
+		"ask": "What do you tell her?",
+		"options": [
+			{"id": "me", "label": "\"I will. Every year.\"", "lean": "companion", "bond": 3, "after": [["Lin Feng", "I will. Every year, for as long as there are years, and then I will haunt somebody into doing it."], ["Yue Ling", "You would make a terrible ghost. You would apologise to everybody you frightened."]]},
+			{"id": "sect", "label": "\"The whole sect will.\"", "lean": "lotus", "bond": 2, "after": [["Lin Feng", "The whole sect will. Little Bai will sweep it every morning. He sweeps everything."], ["Yue Ling", "Little Bai will sweep it whether I am in it or not. That is very comforting."]]},
+			{"id": "first", "label": "\"You'll be the first of a long line.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "You are the first of yours. There will be a great many people one day who sweep a grave and say: she was the first."], ["Yue Ling", "The first of a long line. Then I had better do something worth sweeping for."]]},
+		]},
 ]
 
 static func talk(id: String) -> Dictionary:
@@ -727,11 +768,12 @@ static func memory_option(id: String, oid: String) -> Dictionary:
 			return o
 	return {}
 
-## Whether memory `id` can be given back now: the memories step is the one in hand and it is not
-## given back yet.
+## Whether memory `id` can be given back now: from the memories step on, if it is not given back yet.
+## (The step goes on with six of the seven; the seventh can still be found after it, and the ending
+## tells of all seven given back: before the Spring Thunder release it closed with the step, and that
+## line of the ending could never be reached.)
 static func memory_ready(g, id: String) -> bool:
-	var s: Dictionary = g.cur_step()
-	return not s.is_empty() and str(s.kind) == "memories" and MEMORIES.has(id) and not g.memories.has(id)
+	return MEMORIES.has(id) and not g.memories.has(id) and g.reached(MEMORY_STEP)
 
 ## A memory given back: remembered with what Lin Feng said, a pressed petal of it, her heart and
 ## their closeness.
@@ -740,13 +782,65 @@ static func take_memory(g, id: String, o: Dictionary) -> void:
 	g.add_item(PETAL)
 	lean(g, str(o.get("lean", "")), 3)
 	add(g, MEMORY, "a memory given back")
-	g.toast("A memory given back: %s (%d of %d)" % [str(memory(id).bearer), g.memories.size(), MEMORIES_NEEDED])
+	g.toast("A memory given back: %s (%d of %d)" % [str(memory(id).bearer), g.memories.size(), MEMORIES_NEEDED if g.memories.size() <= MEMORIES_NEEDED else MEMORIES.size()])
 	g.note("Gave Yue Ling back her memory of %s" % str(memory(id).bearer))
 
 # ---------------------------------------------------------------- the lotus pond: where it begins and ends
 ## Kind "share" steps: Lin Feng and Yue Ling at the pond, and a choice.  The first leans her heart; the
 ## last is hers to make (FUTURES), with the one her heart leans to marked.
 const SHARES := {
+	# ---- Part XVII (the Spring Thunder release): the dragon's head day, the first thunder, Qingming
+	"s_p17_haircut": {"lines": [
+		["Narrator", "On the second day of the second month the barbers of Qingshi set up their stools in the lane with a basin and a razor and a kettle, because on the day the dragon raises its head everybody has their hair cut for luck, and the barbers have been waiting a month."],
+		["Narrator", "The queue is long. Yue Ling takes the shears from the youngest barber, very politely, sits Lin Feng down on the bench and starts on him herself, to cheers."],
+		["Yue Ling", "Hold still. A haircut on the dragon's day is a whole year's luck. A bad haircut on the dragon's day is a whole year's luck and everybody laughing at you. Do you want a dragon's luck or a sweeper's?"]],
+		"ask": "How do you want it cut?",
+		"options": [
+			{"id": "trust", "label": "\"However you like. I trust you.\"", "lean": "companion", "after": [["Lin Feng", "However you like. I trust you."], ["Yue Ling", "That was a mistake. A lovely mistake. Hold still."], ["Narrator", "It comes out rather well, apart from one piece at the back that she swears is on purpose."]]},
+			{"id": "same", "label": "\"Just like the old sweeper's.\"", "lean": "lotus", "after": [["Lin Feng", "Like it was when I swept the steps. Short. Nothing to get caught in a broom."], ["Yue Ling", "The sweeper's cut. Yes. The mountain should have its sweeper back for a day."]]},
+			{"id": "road", "label": "\"Something for the road.\"", "lean": "wander", "after": [["Lin Feng", "Something that will not need cutting again for a long way."], ["Yue Ling", "A traveller's cut. Short at the sides, long enough on top for the wind. You are already halfway down the road, aren't you?"]]},
+		]},
+	"s_p17_thunder": {"lines": [
+		["Narrator", "Lei Gong stretches the five new drumheads over his frames, each with a thunder egg set in the middle like a jewel, and hands Lin Feng the second mallet. The rain is still falling, soft and warm, over the whole of the Unbroken Land."],
+		["Lei Gong, Duke of Thunder", "Not hard. That is the secret everybody gets wrong. The first thunder of spring is not to frighten anybody. It is to wake them. Strike it the way you would knock on the door of somebody you love, early in the morning."],
+		["Narrator", "Lin Feng and Yue Ling strike the drum together, once. The thunder goes out over the land like a door opening: across the paddies of Qingshi, the terraces, the millet plains, the river at Longmen, and everywhere it goes, everything asleep in the ground turns over and wakes."]],
+		"ask": "As the thunder rolls away over the land, what do you wish for?",
+		"options": [
+			{"id": "us", "label": "That everything wakes beside somebody", "lean": "companion", "after": [["Yue Ling", "That everything wakes up beside somebody. That is a very you wish."], ["Lei Gong, Duke of Thunder", "That is a very good wish. I shall drum it into the next one."]]},
+			{"id": "home", "label": "That the mountain wakes green", "lean": "lotus", "after": [["Yue Ling", "The mountain green again. The pond full of frogs. Yes."], ["Lei Gong, Duke of Thunder", "Green it is. I will send the next roll over your sect, sweeper, and rattle your Elder's windows."]]},
+			{"id": "far", "label": "That it reaches every road", "lean": "wander", "after": [["Yue Ling", "Every road in the land, waking up at once, and all of them going somewhere."], ["Lei Gong, Duke of Thunder", "Every road. I can do that. It is a great deal of thunder, but I have new drums."]]},
+		]},
+	"s_p17_graves": {"lines": [
+		["Narrator", "On Qingming the whole land goes out to the graves with brooms and willow, food and paper money, and sweeps the winter off the people who came before them. Lin Feng and Yue Ling go down the funeral road to the Maple Gorge, to the old maple where the Elder found a baby wrapped in a sweeper's cloak between two graves."],
+		["Narrator", "The two graves had no names when the Elder dug them. Somebody has since carved them in the stone, small and straight: Lin Shan. Su Wan. Lin Feng carved them himself, the year after the Wheel, and has never told anybody."],
+		["Yue Ling", "I'll sweep. You talk to them. That is how it is done. You tell them the year."]],
+		"ask": "What do you tell your parents about the year?",
+		"options": [
+			{"id": "her", "label": "\"I brought somebody to meet you.\"", "lean": "companion", "after": [["Lin Feng", "Father. Mother. I brought somebody to meet you properly. This is Yue Ling. She is the reason I made it through the year."], ["Yue Ling", "...Good afternoon. He is very good with a broom. You raised him well, for the short time you had."]]},
+			{"id": "home", "label": "\"I came home, like you wanted.\"", "lean": "lotus", "after": [["Lin Feng", "I came home. Every time. Even from the moon. I think that is what you would have wanted most."], ["Yue Ling", "They would. Anybody would."]]},
+			{"id": "world", "label": "\"The world you gave me is still here.\"", "lean": "wander", "after": [["Lin Feng", "The world you led the hunters away to save is still here. I have seen most of it now. It is very large, and some of it is on fire, and it is worth it."], ["Yue Ling", "And we are going to see the rest. Tell them that too."]]},
+		]},
+	"s_p17_teacup": {"lines": [
+		["Narrator", "The tea table on the terraces looks out over the whole valley: the new green of the paddies, the river at Longmen, the smoke of Qingshi's chimneys, and the mountain behind it all with cloud on its shoulders. Lin Feng heats the water to just below the boil, the way the tea master showed him, and pours it over the six buds."],
+		["Yue Ling", "They are opening. Look. They are standing up in the cup like they have just woken."],
+		["Lin Feng", "The first tea of the year. The tea master says you drink it in three sips: the first for the winter you came through, the second for the spring you are in, and the third for whoever you are drinking it with."]],
+		"ask": "Who is the third sip for?",
+		"options": [
+			{"id": "her", "label": "\"For you.\"", "lean": "companion", "after": [["Lin Feng", "The third is for you. Obviously."], ["Yue Ling", "Obviously. And mine is for you. That is how three sips becomes two cups."]]},
+			{"id": "home", "label": "\"For the mountain and everyone on it.\"", "lean": "lotus", "after": [["Lin Feng", "For the mountain, and everybody on it. The Elder, Auntie Zhou, Little Bai and his frog."], ["Yue Ling", "And the frog. Yes. Especially the frog."]]},
+			{"id": "road", "label": "\"For whoever we meet next.\"", "lean": "wander", "after": [["Lin Feng", "For whoever we meet next, wherever the road goes."], ["Yue Ling", "Then we had better keep some leaves back for them. The road is long."]]},
+		]},
+	"s_p17_kite": {"lines": [
+		["Narrator", "On Qingming afternoon the sky over Qingshi is full of kites: swallows, centipedes, butterflies, a dragon forty feet long that takes six boys to hold. At the kite post above the village Yue Ling has a red one shaped like a lotus, with her name painted on its tail in Little Bai's handwriting."],
+		["Yue Ling", "At Qingming you fly your kite as high as it will go, and then you cut the string. It carries the bad luck of the year away with it, and whoever finds it is supposed to burn it, not keep it."],
+		["Lin Feng", "And if somebody keeps it?"],
+		["Yue Ling", "Then they get our bad luck, and serve them right for not reading the rules."]],
+		"ask": "The string is cut. What do you watch it carry away?",
+		"options": [
+			{"id": "fear", "label": "Every time you were afraid for her", "lean": "companion", "after": [["Lin Feng", "Every time I thought you were gone. Every one of them, on a red lotus kite."], ["Yue Ling", "That is a great deal of fear for one kite. It is going very high, though. Look at it go."]]},
+			{"id": "winter", "label": "The long winter", "lean": "lotus", "after": [["Lin Feng", "The long winter. The frost, the ice, the dark. All of it."], ["Yue Ling", "And here we are in spring, on our own hill, with nothing to carry but the kite string."]]},
+			{"id": "road", "label": "Nothing: it is going where we go next", "lean": "wander", "after": [["Lin Feng", "Nothing. It is just going ahead of us, to see where we go next."], ["Yue Ling", "East. It is going east. ...Lin Feng, it is going towards the sea."]]},
+		]},
 	# ---- Part XVI (the Living Land release): the last sweeping, the reunion dinner, the vigil and the first dawn
 	"s_p16_couplets": {"lines": [
 		["Narrator", "The Scripture Library smells of ink and cold stone. Yue Ling unrolls the red paper the merchants sold them across the desk, weighs the ends down with two of Archivist Lan's heaviest books, and grinds the ink herself, very seriously."],
@@ -881,7 +975,9 @@ static func spot_is(spot: String, e: Dictionary) -> bool:
 ## loom she was woven on)").  Every share used to be put down as "by the lotus pond".
 const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the lotus pond", "s_p15_loom": "at the loom she was woven on",
 	"s_p15_feast": "at her naming feast", "s_p16_sweep": "sweeping out the old year", "s_p16_eve": "at the reunion dinner",
-	"s_p16_vigil": "keeping the vigil", "s_p16_dawn": "at the first dawn of the year", "s_p16_lanterns": "at the Lantern Festival", "s_p16_couplets": "writing the New Year couplets"}
+	"s_p16_vigil": "keeping the vigil", "s_p16_dawn": "at the first dawn of the year", "s_p16_lanterns": "at the Lantern Festival", "s_p16_couplets": "writing the New Year couplets",
+	"s_p17_haircut": "on the day the dragon raised its head", "s_p17_thunder": "drumming the first thunder", "s_p17_teacup": "over the first tea of spring",
+	"s_p17_graves": "at the graves on Qingming", "s_p17_kite": "flying the Qingming kite"}
 
 static func share_place(sid: String) -> String:
 	return str(SHARE_PLACES.get(sid, "side by side"))

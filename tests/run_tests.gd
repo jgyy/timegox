@@ -871,7 +871,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -919,6 +919,13 @@ func _init() -> void:
 					"heart":
 						# how close Lin Feng and Yue Ling have come (bonds.gd): a step she can reach
 						ok = ok and int(n[1]) >= 1 and int(n[1]) < Bonds.TITLES.size()
+					"cleared":
+						# the Spring Thunder release: obstacles of the story there are to clear before the trial
+						var before := 0
+						for st_c in Data.STEPS:
+							if Data.step_index(str(st_c.id)) < _kill_step(tid) and str(st_c.kind) == "clear":
+								before += int(st_c.n)
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= before
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1065,11 +1072,13 @@ func _init() -> void:
 		check(Data.step_index(str(band.vis)) >= 0 and int(band.n) > 0, "%s: the war-band marches from a real step" % a6)
 		for pe6 in band.pool:
 			check(Data.ENEMIES.has(pe6[0]) and not Data.ENEMIES[pe6[0]].get("boss", false) and int(pe6[1]) > 50, "%s: war-band soldier %s is one of the late chapters' foes, at their level" % [a6, pe6[0]])
-		var mw := MapGen.build(a6)
-		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis))
+		# (a band that came later in the story, "late", is placed in the finished world, atlas.gd, so that no
+		# older map moves for it)
+		var mw: Dictionary = MapGen.build(a6) if not band.get("late", false) else Atlas.world_of(Data.layer_of(a6))
+		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis) and str(e6.get("area", a6)) == a6)
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 13, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves and Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo" % p13_bands)
+	check(p13_bands == 8 and bands == 15, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, and Part XVII's cold in Frostpeak and poisons in the millet" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1721,6 +1730,7 @@ func _fates_and_faces() -> void:
 	check(bot_src.contains("GRUDGE_ROUTE") and Grudges.ORDER.all(func(g): return bot_src.contains("\"%s\"" % g)), "the bot goes to every grudge and has an answer for each")
 	_lotus()
 	_living()
+	_spring()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -1808,7 +1818,12 @@ func _lotus() -> void:
 	check(Data.STEPS[LG.step].id == Bonds.MEMORY_STEP and LG.objective_text().contains("(%d/%d)" % [Bonds.MEMORIES_NEEDED - 1, Bonds.MEMORIES_NEEDED]) and int(LG.inv.get(Bonds.PETAL, 0)) == Bonds.MEMORIES_NEEDED - 1, "the memories step waits for six, and every memory leaves a pressed petal")
 	Bonds.take_memory(LG, Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1], Bonds.MEMORIES[Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1]].options[0])
 	LG.poll_steps()
-	check(Data.STEPS[LG.step].id == "s_p15_moth" and not Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[6]), "six given back, in any order, and the story goes on")
+	check(Data.STEPS[LG.step].id == "s_p15_moth", "six given back, in any order, and the story goes on")
+	# (the seventh can still be given back after the step, and then the ending tells of all seven: the
+	# Spring Thunder release; before it the seventh closed with the step and that line was out of reach)
+	check(Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[6]) and not Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[0]), "the seventh memory can still be found after the step; one given back cannot be given again")
+	Bonds.take_memory(LG, Bonds.MEMORY_ORDER[6], Bonds.MEMORIES[Bonds.MEMORY_ORDER[6]].options[0])
+	check(LG.memories.size() == Bonds.MEMORIES.size() and Bonds.epilogues(LG).any(func(ln): return str(ln).begins_with("Every one of the seven memories")), "all seven given back: the ending says so")
 	LG.step = Data.step_index("s_p15_threads")
 	LG.visited = {"alchemist": true, "qiu_ye_end": true, "tala_end": true, "hu_end": true}
 	LG.poll_steps()
@@ -2066,8 +2081,8 @@ func _living() -> void:
 				strangers.append("%s in %s" % [str(ln8[0]), ks8])
 	check(strangers.is_empty(), "everybody who speaks in a conversation in the world goes by the name they have there (%s)" % str(strangers))
 	print("== Part XVI: the Year Turns ==")
-	check(Data.REALMS.size() == 22 and Data.REALMS[21] == "Ten Thousand Hearths" and Data.MAX_LEVEL == 63 and Data.level_name(63).ends_with("Ten Thousand Hearths") and Data.REALM_INFO.size() == 22 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "Part XVI adds the Ten Thousand Hearths realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break21" and Data.DIALOGUE.has("recall14") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break20\": \"recall14\""), "Part XVI follows Kindred Dao (recall14) and ends the game")
+	check(Data.REALMS.size() >= 22 and Data.REALMS[21] == "Ten Thousand Hearths" and Data.level_name(63).ends_with("Ten Thousand Hearths") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "Part XVI adds the Ten Thousand Hearths realm")
+	check(Data.STEPS[Data.step_index("s_break21")].to == 63 and Data.DIALOGUE.has("recall14") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break20\": \"recall14\""), "Part XVI follows Kindred Dao (recall14) and ends at Ten Thousand Hearths")
 	var ry: Dictionary = Data.STEPS[Data.step_index("s_p16_rally")]
 	for npc in ry.npcs:
 		check(Data.DIALOGUE.has("rally:" + str(npc)) and Folk.RALLY_TOWN.has(npc) and Trials.npc_area(str(npc)) != "", "%s can be reminded of the old ways, in a town of their own" % npc)
@@ -2130,3 +2145,194 @@ func _living() -> void:
 	var bsrc2 := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bsrc2.contains("\"xi_beast\": ") and bsrc2.contains("\"nian\": ") and bsrc2.contains("_folk_step") and bsrc2.contains("\"s_p16_eve\""), "the bot has a way through both trials, a plan for every scene and a way to find the children")
 	check(Assets.PEOPLE.has("zao_jun") and Assets.PEOPLE.has("shenshu") and Assets.PEOPLE.has("yulei"), "the Kitchen God and the door gods are Blender-built")
+
+## The index of the step that fights boss `boss` (-1 if none).
+func _kill_step(boss: String) -> int:
+	for i in Data.STEPS.size():
+		if str(Data.STEPS[i].kind) == "kill" and str(Data.STEPS[i].get("boss", "")) == boss:
+			return i
+	return -1
+
+## The Spring Thunder release: the sword's wake in the open world (impact.gd), and Part XVII, the
+## Spring Thunder.
+func _spring() -> void:
+	print("== the sword's wake (impact.gd) ==")
+	check(Impact.reach(Vector2i(1, 0)) == [Vector2i(1, 0), Vector2i(2, 0), Vector2i(1, 1), Vector2i(1, -1)] and Impact.wave_path(Vector2i(0, 1)).size() == Impact.WAVE_TILES, "a swing reaches the two tiles ahead and both sides of the first; the sword qi flies seven")
+	var fc: Array = Impact.fall_curve(6.0)
+	var fc2: Array = Impact.fall_curve(1.0)
+	check(float(fc[0]) > float(fc2[0]) and float(fc[0]) > 1.0 and float(fc[0]) < 4.0 and float((fc[1] as Array)[(fc[1] as Array).size() - 1]) > 1.4, "a felled trunk falls as a rod about its stump: a tall one takes longer than a sapling (%.2fs, %.2fs)" % [fc[0], fc2[0]])
+	var IG = load("res://scripts/game.gd").new()
+	IG.reset()
+	IG.day = 3
+	IG.clock = 14 * 60.0
+	Impact.fell(IG, "surface|bamboo|3|4|1001")
+	check(Impact.is_down(IG, "surface|bamboo|3|4|1001") and IG.felled_n == 1, "a felled tree stays down")
+	IG.day = 4
+	IG.clock = 5 * 60.0
+	check(Impact.is_down(IG, "surface|bamboo|3|4|1001"), "until dawn")
+	IG.clock = 6.5 * 60.0
+	check(not Impact.is_down(IG, "surface|bamboo|3|4|1001") and not IG.felled.has("surface|bamboo|3|4|1001"), "and has grown back after it")
+	var ox := {"id": "p17_ox", "what": "spring_ox", "area": "village"}
+	var hits := 0
+	while Impact.hit_obstacle(IG, ox) == "hit":
+		hits += 1
+	check(hits == int(Impact.OBSTACLES.spring_ox.hits) - 1 and IG.cleared.get("p17_ox", "") == "spring_ox|village" and Impact.hit_obstacle(IG, ox) == "", "the Spring Ox takes five blows, and then it is cleared for good")
+	IG.free()
+	for k in Impact.OBSTACLES:
+		var ob: Dictionary = Impact.OBSTACLES[k]
+		check(int(ob.hits) >= 1 and Havoc._piece(str(ob.piece), Color.WHITE).size() == 3 and str(ob.hint).contains("(F"), "obstacle %s: blows, pieces and a hint" % k)
+	check(Assets.MONSTERS.size() > 0 and FileAccess.get_file_as_string("res://scripts/battle.gd").contains("Impact.AMBUSH_HURT") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("KEY_G"), "a pack struck first opens the battle reeling, and G throws the sword qi")
+	# the scatter remembers what grows on every tile, so a blow can find it
+	var tg := PackedByteArray()
+	tg.resize(24 * 24)
+	tg.fill(MapGen.FLOOR)
+	for y in 24:
+		for x in 8:
+			tg[y * 24 + x] = MapGen.WALL
+	var troot := Terrain3D.build(tg, 24, 24, "bamboo", 7)
+	var nat: Dictionary = troot.get_meta("nature", {})
+	var n_tree := 0
+	var n_mmi := 0
+	for tl in nat:
+		for en in nat[tl]:
+			if str(en.kind) == "tree":
+				n_tree += 1
+			if en.get("mmi") is MultiMeshInstance3D and int(en.i) < (en.mmi as MultiMeshInstance3D).multimesh.instance_count:
+				n_mmi += 1
+	var all_n := 0
+	for tl2 in nat:
+		all_n += (nat[tl2] as Array).size()
+	check(n_tree > 0 and n_mmi == all_n, "every tree, bush and rock of a region knows the instance that draws it (%d trees, %d things)" % [n_tree, all_n])
+	troot.free()
+	# a recipe never asks for what a collect step is still gathering: refined while the step is in hand,
+	# it would eat the things the step counts, and with no more of them in the world the story stops
+	# (the Thunder-Bamboo Crackers and Taisui's charm did, until the Spring Thunder release)
+	var early: Array = []
+	for rid in Trials.RECIPES:
+		var rr: Dictionary = Trials.RECIPES[rid]
+		for item in rr["in"]:
+			for si in Data.STEPS.size():
+				var cs: Dictionary = Data.STEPS[si]
+				if str(cs.kind) == "collect" and str(cs.get("item", "")) == str(item) and Data.step_index(str(rr.after)) <= si:
+					early.append("%s (%s, %s)" % [rid, item, cs.id])
+	check(early.is_empty(), "every recipe that needs what a collect step gathers is offered only after the step (%s)" % str(early))
+	print("== Part XVII: the Spring Thunder ==")
+	check(Data.REALMS.size() == 23 and Data.REALMS[22] == "Myriad Things Awake" and Data.MAX_LEVEL == 66 and Data.level_name(66).ends_with("Myriad Things Awake") and Data.REALM_INFO.size() == 23 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "Part XVII adds the Myriad Things Awake realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break22" and Data.DIALOGUE.has("recall15") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break21\": \"recall15\""), "Part XVII follows Ten Thousand Hearths (recall15) and ends the game")
+	var wsurf: Dictionary = Atlas.world_of("surface")
+	var by_tile := {}
+	for e0 in wsurf.ents:
+		if e0.kind != "obstacle":
+			if not by_tile.has(e0.pos):
+				by_tile[e0.pos] = []
+			by_tile[e0.pos].append(e0)
+	var obst: Array = wsurf.ents.filter(func(e1): return e1.kind == "obstacle")
+	var n_obst := 0
+	for a8 in Data.AREAS:
+		n_obst += (Data.AREAS[a8].get("obstacles", []) as Array).size()
+	check(obst.size() == n_obst and n_obst >= 26, "every obstacle of the story stands in the world (%d)" % obst.size())
+	for ob2 in obst:
+		var g2: int = wsurf.grid[ob2.pos.y * int(wsurf.w) + ob2.pos.x]
+		var round_it := 0
+		for d2 in MapGen.DIRS:
+			var q: Vector2i = ob2.pos + d2
+			if MapGen.is_walkable_tile(wsurf.grid[q.y * int(wsurf.w) + q.x]):
+				round_it += 1
+		check(MapGen.is_walkable_tile(g2) and g2 != MapGen.INTERIOR and Atlas.owner_id(wsurf, ob2.pos) == str(ob2.area) and not by_tile.has(ob2.pos) and Havoc.at_tile(wsurf, ob2.pos).is_empty() and round_it >= 3,
+			"obstacle %s stands on open ground of %s, on nobody else's tile, with a way round it" % [ob2.id, ob2.area])
+		check(Impact.OBSTACLES.has(str(ob2.what)) and Data.step_index(str(ob2.vis[0])) >= 0, "obstacle %s is a known kind and appears with its step" % ob2.id)
+	# every story step's people, lords and things to find are still in reach with every obstacle standing
+	var blocked := {}
+	for ob3 in obst:
+		blocked[ob3.pos] = true
+	var reach := {}
+	var start: Vector2i = Atlas.to_world("sect", Vector2i(20, 8))
+	var q2: Array = [start]
+	reach[start] = true
+	var qi := 0
+	while qi < q2.size():
+		var c: Vector2i = q2[qi]
+		qi += 1
+		for d3 in MapGen.DIRS:
+			var nb: Vector2i = c + d3
+			if nb.x < 0 or nb.y < 0 or nb.x >= int(wsurf.w) or nb.y >= int(wsurf.h) or reach.has(nb) or blocked.has(nb):
+				continue
+			if not MapGen.is_walkable_tile(wsurf.grid[nb.y * int(wsurf.w) + nb.x]):
+				continue
+			reach[nb] = true
+			q2.append(nb)
+	var lost: Array = []
+	for e2 in wsurf.ents:
+		if e2.kind in ["npc", "boss", "pickup", "obstacle"] and str(e2.get("area", "")) in ["village", "bamboo", "terraces", "longmen", "dragon", "thunder", "frost", "millet", "mirror", "maple"]:
+			var near := false
+			for d4 in MapGen.DIRS:
+				if reach.has(e2.pos + d4):
+					near = true
+			if not near:
+				lost.append(str(e2.id))
+	check(lost.is_empty(), "with every obstacle standing, everybody and everything the story needs can still be walked up to (%s)" % str(lost))
+	# nothing that came later in the story moved an older map: every region built with Part XVII's late
+	# people, lords, things to find, war-bands and obstacles taken out is the same map with the same
+	# packs, people and things in it
+	for a9 in Data.AREAS:
+		var sp9: Dictionary = Data.AREAS[a9]
+		var has_late: bool = sp9.has("obstacles") or bool(sp9.get("warband", {}).get("late", false))
+		for k9 in ["npcs", "bosses", "pickups"]:
+			for x9 in sp9.get(k9, []):
+				if x9.get("late", false):
+					has_late = true
+		if not has_late:
+			continue
+		var bare: Dictionary = sp9.duplicate(true)
+		bare.erase("obstacles")
+		if bare.get("warband", {}).get("late", false):
+			bare.erase("warband")
+		for k10 in ["npcs", "bosses", "pickups"]:
+			if bare.has(k10):
+				bare[k10] = (bare[k10] as Array).filter(func(x10): return not x10.get("late", false))
+		var m_full: Dictionary = MapGen.build(a9)
+		var m_bare: Dictionary = MapGen.build(a9, Vector2i.ZERO, bare)
+		var keys_full: Array = m_full.ents.map(func(e10): return "%s|%s|%s" % [e10.kind, e10.id, e10.pos])
+		var keys_bare: Array = m_bare.ents.map(func(e11): return "%s|%s|%s" % [e11.kind, e11.id, e11.pos])
+		check(m_full.grid == m_bare.grid and keys_full == keys_bare, "%s: Part XVII's additions move nothing in the region's own map" % a9)
+	for lid in ["gou_mang", "lei_gong", "boss_qing_nu", "boss_taisui", "boss_poison_mother", "p17_egg1", "p17_willow6"]:
+		var found: Array = wsurf.ents.filter(func(e3): return str(e3.id) == lid)
+		check(found.size() == 1, "%s stands in the world once (late: no older map moved for it)" % lid)
+	for st in Data.STEPS:
+		if str(st.kind) != "clear":
+			continue
+		var have: Array = obst.filter(func(e4): return str(e4.what) == str(st.what) and str(e4.area) == str(st.area) and str(e4.vis[0]) == str(st.id))
+		check(have.size() >= int(st.n), "%s: %d %s to clear in %s (%d)" % [st.id, int(st.n), st.what, st.area, have.size()])
+	var CG2 = load("res://scripts/game.gd").new()
+	CG2.reset()
+	CG2.step = Data.step_index("s_p17_deadfall")
+	for k5 in 5:
+		Impact.hit_obstacle(CG2, {"id": "p17_dead%d" % (k5 + 1), "what": "deadfall", "area": "bamboo"})
+	CG2.poll_steps()
+	check(CG2.cur_step().id == "s_p17_deadfall" and CG2.objective_text().contains("(5/6)"), "five trunks cleared: the step wants six")
+	Impact.hit_obstacle(CG2, {"id": "p17_dead6", "what": "deadfall", "area": "bamboo"})
+	CG2.poll_steps()
+	check(CG2.cur_step().id == "s_p17_rockfall" and CG2.done_pending.has("s_p17_deadfall"), "six: the rockfall is next, and the deadfall has its word to say")
+	CG2.free()
+	for tid5 in ["qing_nu", "taisui"]:
+		check(Trials.TRIALS.has(tid5) and Lore.BOSS.has(tid5) and Data.DIALOGUE.has("pre:" + tid5) and Data.DIALOGUE.has("post:" + tid5), "%s is a trial, with a story and words before and after" % tid5)
+		var kinds5 := {}
+		for pth in Trials.TRIALS[tid5].paths:
+			kinds5[pth.kind] = true
+		check(kinds5.has("land") or kinds5.has("folk"), "%s can be passed by the land or by the people" % tid5)
+	check(Lore.BOSS.has("poison_mother") and Data.DIALOGUE.has("pre:poison_mother") and Data.DIALOGUE.has("post:poison_mother"), "the Mother of the Five Poisons has a story and words before and after")
+	for mon5 in ["rime_wisp", "hoarfrost_hare", "late_frost", "waking_scorpion", "waking_centipede", "waking_toad"]:
+		check(Data.ENEMIES.has(mon5) and Lore.BEAST.has(mon5), "%s has a story" % mon5)
+	for sid5 in ["s_p17_haircut", "s_p17_thunder", "s_p17_teacup", "s_p17_graves", "s_p17_kite"]:
+		var sp5: Dictionary = Data.STEPS[Data.step_index(sid5)]
+		check(Bonds.SHARES.has(sid5) and not Bonds.find_spot(Atlas.world_of(Data.layer_of(str(sp5.area))).ents, str(sp5.spot)).is_empty() and Bonds.share_place(sid5) != "side by side", "%s: a scene with Yue Ling, at a place that is there, remembered where it happened" % sid5)
+	for sid6 in ["s_p17_ox", "s_p17_deadfall", "s_p17_rockfall", "s_p17_ice", "s_p17_chains", "s_p17_poisons", "s_p17_sow"]:
+		check(Data.DIALOGUE.has("done:" + sid6), "%s has its word to say when it is done" % sid6)
+	for hs in ["s_p17_hunt", "s_p17_poisons"]:
+		var hst: Dictionary = Data.STEPS[Data.step_index(hs)]
+		var band6: Dictionary = Data.AREAS[str(hst.area)].get("warband", {})
+		check(bool(hst.get("first", false)) and not band6.is_empty() and Data.step_index(str(band6.vis)) < Data.step_index(hs) and int(band6.n) * 2 >= int(hst.n), "%s: the packs are there before it, enough of them, and it asks for the first strike" % hs)
+	check(Assets.PEOPLE.has("gou_mang") and Assets.PEOPLE.has("lei_gong") and FileAccess.file_exists("res://art/characters/gou_mang.py") and FileAccess.file_exists("res://art/characters/lei_gong.py"), "Gou Mang and Lei Gong are Blender-built")
+	var bsrc3 := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bsrc3.contains("\"qing_nu\": \"land\"") and bsrc3.contains("\"taisui\": ") and bsrc3.contains("_clear_step") and bsrc3.contains("_strike_first") and bsrc3.contains("\"s_p17_graves\""), "the bot has a way through both trials, clears the land with its sword, strikes first and has a plan for every scene")
+	check(Trials.EPITHETS.has("heart") and Trials.EPITHETS.has("folk") and Trials.EPITHETS.has("land"), "every way through a trial has an epithet for the ending (the ending read a key that was not there)")

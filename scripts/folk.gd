@@ -264,7 +264,9 @@ static func _taken(wd: Dictionary, tid: String) -> Dictionary:
 	var area: String = TOWNS[tid].area
 	var out := {}
 	for e in wd.ents:
-		if str(e.get("area", "")) != area:
+		# (Part XVII's obstacles, impact.gd, and the people and things that came later in the story, "late",
+		# stand for a chapter: the people of the towns keep the places they had before them)
+		if str(e.get("area", "")) != area or e.kind == "obstacle" or e.get("late", false):
 			continue
 		out[e.pos] = true
 		if e.kind in ["npc", "prop", "ladder", "boss", "seal", "stele", "abode"]:
@@ -795,6 +797,24 @@ const ERRANDS := {
 			"In my day the young ones came round with oranges. You came round with nothing and I don't mind at all. Sit a while.",
 			"Good health in it! At my age I'll take the health and you can keep the long life. Happy new year, child.",
 			"Another year! I've seen eighty of them. This one began with dragons and ended with dumplings. That's the right way round."]},
+	# Part XVII (the Spring Thunder release): the sowing, and Qingming kites
+	"s_p17_sow": {"ask": "The ground's open at last. Can I help with the sowing?", "price": 0, "toast": "Helped %s with the sowing",
+		"lines": ["Help? From the sweeper? Then take the basket and walk behind me. Scatter, don't throw. You're feeding the field, not fighting it.",
+			"Seed rice in the warm water two nights, then into the mud. Mind the edges. My grandfather said the edges are where the field remembers you.",
+			"Ten days and it's green, twenty and it's rows. The best part is now, though, before it's anything. All promise, no weeds.",
+			"You whipped the ox? Then this field's yours too, a bit. Here: you plant this corner, and in autumn you can come and argue with me about it.",
+			"I thought we'd never sow this year. The ground rang like a bell. Look at it now. Soft as a bun. Put your hand in it, go on.",
+			"Mind the frogs. They're back. Everything's back. My wife cried this morning over a frog. I didn't. I had something in my eye.",
+			"Beans in this row, sweeper, then millet, then beans again. The beans feed the ground and the millet feeds us. That's the whole of farming. The rest is weather."]},
+	"s_p17_kites": {"ask": "It's Qingming! Shall we fly your kite?", "price": 0, "toast": "Flew a kite with %s",
+		"lines": ["Higher! Higher! It's a swallow, see, so it has to be the highest, or the real swallows will laugh at it.",
+			"Mine's a centipede. It has thirty legs. I painted every one. Don't let it touch the tree. Don't let it TOUCH the TREE.",
+			"Now we cut the string and the bad luck flies away with it! ...Can we cut it a bit later? I like this kite.",
+			"Granny says the kites are for the people who've gone. So they can see we're all right. Wave at them! Wave!",
+			"It's going over the river! Run! RUN!",
+			"You hold it. You hold it and I'll hold you, in case it pulls you into the sky. Cultivators fly, don't they? Is that how?",
+			"Mine's a butterfly with a whistle in it. Listen! When it's high enough it sings. Granny says the dead like the singing ones best.",
+			"Can you make it go higher with qi? Just a little? I won't tell anybody. Everybody already knows you can fly."]},
 	"s_p16_report": {"ask": "The Kitchen God is writing his report to Heaven. What was your year like?", "price": 0, "toast": "%s's year, for the Kitchen God's report",
 		"lines": ["The low field flooded in spring and we planted it again in summer, and it came good. Tell him that. Tell him we planted it again.",
 			"My son went to Tushan to cast bells and came back with a wife. I had to sell the pig for the wedding. Put down the wife. Leave out the pig.",

@@ -85,8 +85,18 @@ class Scalp:
         return mix(self.hc, c, 0.75)
 
 
+def shell_normal(p):
+    """The normal anime hair is lit with near the head (the Spring Thunder release): that of a sphere
+    round the skull, so the cap and the fringe shade as one smooth helmet of hair and the highlight
+    ring runs round it in one clean band (references: the "spherical normals for hair" set-up of
+    gacha-style shaders; Kuro Games' Wuthering Waves rendering notes)."""
+    d = p - (HC + Vector((0.0, -0.02, -0.012)))
+    return d.normalized() if d.length > 1e-6 else Vector((0, 1, 0))
+
+
 def cap(b, s, bone="head"):
-    morph_sphere(b, HC, lambda d: s.pt(d) - HC, s.colour, cls=HAIR, bone=bone, seg=32, rings=22)
+    vs = morph_sphere(b, HC, lambda d: s.pt(d) - HC, s.colour, cls=HAIR, bone=bone, seg=30, rings=22)
+    b.set_normals(vs, shell_normal, 0.85)
 
 
 def lock(b, s, d0, d1, width, col=None, steps=6, drop=0.0, flare=0.0, curl=0.0, extra=0.006, bones=None, bone="head", flat=0.32, tip=None, sway=None):
@@ -157,7 +167,9 @@ def bangs(b, s, n=9, length=1.0, part=0.0, swept=0.0, spread=1.0):
         pts = [p0, p0.lerp(p1, 0.55) + Vector((0, 0.008, 0.012)), p1, tip.lerp(p1, 0.35) + Vector((0, 0, 0.006)), tip]
         col = (s.hc, s.dk, s.lt)[i % 3] if i % 4 else s.hc
         w = (0.017 + 0.005 * math.cos(i * 1.7)) * (1.15 if abs(u) < 0.2 else 1.0) * CLUMP
-        strand(b, pts, w, 0.0012, col, col_tip=lighten(col, 0.12), cls=HAIR, bone="head", flat=0.32, seg=6, per=3, up=(0, 0.3, 1), power=1.3)
+        vs = strand(b, pts, w, 0.0012, col, col_tip=lighten(col, 0.12), cls=HAIR, bone="head", flat=0.32, seg=6, per=3, up=(0, 0.3, 1), power=1.3)
+        if vs:
+            b.set_normals(vs, shell_normal, 0.7)
 
 
 def side_locks(b, s, length=0.2, n=2, fwd=0.0, width=0.021):

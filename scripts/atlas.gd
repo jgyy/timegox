@@ -530,6 +530,68 @@ static func _build(layer: String = "surface") -> Dictionary:
 	ents.append_array(Props.place(grid, W, H, owner, sea, ids, ents, layer))
 	for bd3 in buildings:
 		ents.append_array(Props.furniture(bd3.props, bd3.area, layer, "furn:%s:%s" % [bd3.area, bd3.id], grid, W))
+	# ---- Part XVII (impact.gd): the obstacles of the story (fallen trunks, rockfalls, ice jams, the clay
+	# Spring Ox), added last so that no road, seal, pack or thing to do moves for them; each stands on
+	# open ground of its region with a way round it (tests/run_tests.gd checks both)
+	for id2 in ids:
+		for ob in Data.AREAS[id2].get("obstacles", []):
+			ents.append({"kind": "obstacle", "id": str(ob.id), "what": str(ob.what), "pos": to_world(id2, ob.pos), "area": id2, "layer": layer, "vis": ob.get("vis", ["", ""])})
+		# and the people, lords and things to find that came later in the story ("late": mapgen.gd leaves
+		# them out of the region's own map), stood in the finished world in the same way
+		var spec2: Dictionary = Data.AREAS[id2]
+		for n2 in spec2.get("npcs", []):
+			if n2.get("late", false):
+				var ne := {"kind": "npc", "id": n2.id, "n": n2.n, "pos": to_world(id2, n2.pos), "col": n2.col, "vis": n2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true}
+				for k2 in ["asset", "race", "hide", "fate"]:
+					if n2.has(k2):
+						ne[k2] = n2[k2]
+				ents.append(ne)
+		for b2 in spec2.get("bosses", []):
+			if b2.get("late", false):
+				ents.append({"kind": "boss", "id": "boss_" + str(b2.id), "enemy": b2.id, "pos": to_world(id2, b2.pos), "lv": b2.lv, "req": b2.req, "vis": b2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true})
+		for pk2 in spec2.get("pickups", []):
+			if pk2.get("late", false):
+				var pe := {"kind": "pickup", "id": pk2.id, "item": pk2.item, "pos": to_world(id2, pk2.pos), "vis": pk2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true}
+				if pk2.has("n"):
+					pe["n"] = pk2.n
+				ents.append(pe)
+	# and the war-bands that came later in the story: packs of two or three on open ground of their
+	# region that the sect can reach, four tiles from anybody and anything (a seeded draw, so the same
+	# every time)
+	for id3 in ids:
+		var band: Dictionary = Data.AREAS[id3].get("warband", {})
+		if band.is_empty() or not band.get("late", false):
+			continue
+		var near := {}
+		for e5 in ents:
+			if str(e5.get("area", "")) == id3:
+				for dy5 in range(-4, 5):
+					for dx5 in range(-4, 5):
+						near[e5.pos + Vector2i(dx5, dy5)] = true
+		var cands: Array = []
+		for p5 in reach_e:
+			var g5: int = grid[p5.y * W + p5.x]
+			if (g5 == MapGen.FLOOR or g5 == MapGen.PATH or g5 == MapGen.DECOR) and owner_id({"owner": owner, "w": W, "h": H, "ids": ids}, p5) == id3 and not near.has(p5):
+				cands.append(p5)
+		cands.sort()
+		var rng5 := RandomNumberGenerator.new()
+		rng5.seed = int(Data.AREAS[id3].seed) * 977 + 31
+		var made := 0
+		var tries := 0
+		while made < int(band.n) and tries < 4000 and not cands.is_empty():
+			tries += 1
+			var c5: Vector2i = cands[rng5.randi() % cands.size()]
+			if near.has(c5):
+				continue
+			made += 1
+			var group5: Array = []
+			for _k5 in rng5.randi_range(2, 3):
+				var pe5: Array = band.pool[rng5.randi() % (band.pool as Array).size()]
+				group5.append({"id": pe5[0], "lv": rng5.randi_range(int(pe5[1]), int(pe5[2]))})
+			ents.append({"kind": "enemy", "id": "%s:w%d" % [id3, made], "pos": c5, "group": group5, "vis": [str(band.vis), ""], "area": id3, "layer": layer, "late": true})
+			for dy6 in range(-4, 5):
+				for dx6 in range(-4, 5):
+					near[c5 + Vector2i(dx6, dy6)] = true
 	# ---- each region's cell: the bounding box of the land it owns
 	var lo: Array = []
 	var hi: Array = []

@@ -45,3 +45,23 @@ night_k={
 "type": "float",
 "value": 0.0
 }
+mow0={
+"type": "vec4",
+"value": Vector4(0, 0, 0, -9999)
+}
+mow1={
+"type": "vec4",
+"value": Vector4(0, 0, 0, -9999)
+}
+mow2={
+"type": "vec4",
+"value": Vector4(0, 0, 0, -9999)
+}
+mow3={
+"type": "vec4",
+"value": Vector4(0, 0, 0, -9999)
+}
+mow_now={
+"type": "float",
+"value": 0.0
+}

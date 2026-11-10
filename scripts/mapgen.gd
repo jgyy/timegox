@@ -37,8 +37,10 @@ const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4,
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR
 
-static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
-	var spec: Dictionary = Data.AREAS[id]
+## (`spec_over`, for the tests: build from this spec instead of the region's own, e.g. with everything
+## that came later in the story taken out, to show that it moves nothing)
+static func build(id: String, size := Vector2i.ZERO, spec_over: Dictionary = {}) -> Dictionary:
+	var spec: Dictionary = Data.AREAS[id] if spec_over.is_empty() else spec_over
 	var w: int = spec.w if size == Vector2i.ZERO else size.x
 	var h: int = spec.h if size == Vector2i.ZERO else size.y
 	var rng := RandomNumberGenerator.new()
@@ -96,6 +98,9 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		ents.append({"kind": "portal", "id": "p_" + p.to, "to": p.to, "pos": p.pos, "dest": p.dest, "open": p.open})
 		fixed.append(p.pos)
 	for n in spec.get("npcs", []):
+		# (somebody who came later in the story, "late", is stood in the world after it is built: atlas.gd)
+		if n.get("late", false):
+			continue
 		var ne := {"kind": "npc", "id": n.id, "n": n.n, "pos": n.pos, "col": n.col, "vis": n.get("vis", ["", ""])}
 		# (a fated encounter, fate.gd, stands where the story has them: world.ent_visible asks Fate.present)
 		for k in ["asset", "race", "hide", "fate"]:
@@ -108,6 +113,8 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		ents.append(ne)
 		fixed.append(n.pos)
 	for b in spec.get("bosses", []):
+		if b.get("late", false):
+			continue
 		var be := {"kind": "boss", "id": "boss_" + b.id, "enemy": b.id, "pos": b.pos, "lv": b.lv, "req": b.req}
 		# a boss who appears later in the story (Part XIII's Gate Generals and Chiyou)
 		if b.has("vis"):
@@ -115,6 +122,8 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		ents.append(be)
 		fixed.append(b.pos)
 	for pk in spec.get("pickups", []):
+		if pk.get("late", false):
+			continue
 		# (a pickup may name the step it appears with: Part XVI's thunder bamboo is not there in Part I)
 		var pe := {"kind": "pickup", "id": pk.id, "item": pk.item, "pos": pk.pos, "vis": pk.get("vis", ["" if pk.get("always", false) else spec.get("pickup_vis", ""), ""])}
 		if pk.has("n"):
@@ -225,7 +234,8 @@ static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
 		# Part XIII: the war-bands of the Eight Gates, placed after the region's own packs (so those do
 		# not move) and marching only once the formation wakes (`vis`)
 		var band: Dictionary = spec.get("warband", {})
-		if not band.is_empty():
+		# (a band that came later in the story, "late", is stood in the finished world: atlas.gd)
+		if not band.is_empty() and not band.get("late", false):
 			var bpool: Array = band.pool
 			var bplaced := 0
 			tries = 0
@@ -435,12 +445,17 @@ static func _keep_set(spec: Dictionary, id: String) -> Dictionary:
 	var pts: Array = []
 	for p in spec.get("portals", []):
 		pts.append(p.pos)
+	# (not the people, lords and things that came later in the story, "late": they are stood in the
+	# finished world, atlas.gd, and no older map moves for them)
 	for n in spec.get("npcs", []):
-		pts.append(n.pos)
+		if not n.get("late", false):
+			pts.append(n.pos)
 	for b in spec.get("bosses", []):
-		pts.append(b.pos)
+		if not b.get("late", false):
+			pts.append(b.pos)
 	for pk in spec.get("pickups", []):
-		pts.append(pk.pos)
+		if not pk.get("late", false):
+			pts.append(pk.pos)
 	for sp in spec.get("springs", []):
 		pts.append(sp)
 	for a in arrival_tiles(id):
