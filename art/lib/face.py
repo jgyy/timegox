@@ -8,8 +8,11 @@ README's references):
 * a large cranium and a short lower face: the eye line sits a little below the middle of the head,
   and nose, mouth and chin are packed into the lower part (the lower half of the skull is ``LOW`` of
   the upper);
-* a soft V jaw: full cheeks at the eyes and below them, tapering to a small pointed chin, and a
-  front of the face that is a gentle plane rather than the front of a ball;
+* a soft V jaw: full cheeks at the eyes and below them, tapering in straight lines to a small chin
+  with a mass of its own (``Face.chin_mass``: rounded at the tip, the lowest point of the face, nearly
+  level with the lower lip in profile, turning in a tight curve into an underside that rises to the
+  throat; a man's broader and squarer), and a front of the face that is a gentle plane rather than
+  the front of a ball;
 * big eyes set wide (an eye's width or more between them): a dark, heavy upper lash line with a
   flick at the outer corner, a fine lower lash on the outer half only, a tall iris that is dark under
   the lid and bright at the bottom, a small pupil, a large highlight and a small one, and the
@@ -44,6 +47,19 @@ EYE_X = 0.043    # half the distance between the eyes' centres: set wide
 NOSE_Y = -0.05
 MOUTH_Y = -0.078
 CHIN_Y = -RY * LOW
+# the chin's mass (Face.chin_mass): the profile below the mouth is a rounded box from CHIN_C down,
+# CHIN_DROP deep (a man's CHIN_DROP_M), with corners as square as the exponent says
+CHIN_C = -0.074
+CHIN_DROP = 0.049
+CHIN_DROP_M = 0.052
+CHIN_N = 4.4
+CHIN_N_M = 5.2
+
+
+def smax(a, b, k):
+    """Smooth maximum of a and b, blended over a width of k (polynomial; never less than max(a, b))."""
+    h = clamp(0.5 + 0.5 * (a - b) / k)
+    return b + (a - b) * h + k * h * (1.0 - h)
 
 
 def eye_y_of(o):
@@ -78,6 +94,11 @@ class Face:
 
     # ---- the sculpted skull: unit direction -> local point
     def shape(self, d):
+        p = self.chin_mass(self.skull(d), d)
+        return self.features(p)
+
+    def skull(self, d):
+        """The skull before the chin is given its mass and before cheekbones, sockets and brow."""
         x, y, z = d.x, d.y, d.z
         rz = RZF if z >= 0 else RZB
         p = Vector((x * RX * self.wide, y * (RY if y >= 0 else RY * LOW), z * rz))
@@ -98,10 +119,16 @@ class Face:
         if z > 0:
             flat = smooth(0.3, 0.95, z) * (1.0 - smooth(0.6, 1.0, abs(y)))
             p.z *= 1.0 - (0.06 + 0.035 * soft) * flat
-        # the chin comes forward a little and to a point; the jaw line under it is clean
+        # the chin comes forward a little; the jaw line under it is clean
         if z > -0.2:
             p.z += (0.014 + 0.004 * soft) * self.chin * smooth(0.6, 0.97, low) * smooth(-0.2, 0.6, z)
             p.y -= 0.007 * smooth(0.75, 1.0, low) * smooth(0.25, 0.9, z)
+        return p
+
+    def features(self, p):
+        """Cheekbones, cheeks, eye sockets, temples, brow, forehead, occiput and the mouth's fullness,
+        pushed out along the direction from the head's centre."""
+        soft = self.soft
         n = p.normalized() if p.length > 1e-6 else Vector((0, 1, 0))
         q = p.copy()
         off = 0.0
@@ -122,6 +149,60 @@ class Face:
         # the mouth area pushed forward a touch (the teeth behind the lips)
         off += 0.004 * blob3(q, (0.0, MOUTH_Y + 0.004, 0.088), (0.026, 0.016, 0.03))
         return p + n * off
+
+    def chin_mass(self, p, d):
+        """The chin as a mass of its own: point `p` of the skull (direction `d`) -> moved.
+
+        Anime chins are drawn small and sharp, but a 3D head shaped that way ends in the bottom of a
+        ball: a needle from the front and, in profile, a chin that rolls back into the neck in one
+        big curve.  The drawing guides build the profile as "two out, one in" (the brow out, the
+        socket in, the cheekbone out, the jaw in under it, the tip of the chin out), and the chin as
+        a small rounded mass below the mouth: the lowest point of the face, nearly level with the
+        lower lip, turning in a tight curve into a short underside that runs back up to the throat;
+        from the front, a rounded tip with some width at the end of straight V jaw lines (a woman's
+        tapered and round, a man's broader and squarer, his jaw a little longer); see the README's
+        references.
+
+        So the lower front of the face is fitted to a rounded box in profile: the skull's midline
+        below the mouth is pushed out, along rays from a point behind the mouth, to a superellipse
+        (exponent CHIN_N) whose front is the face at the mouth and whose bottom is the chin, and the
+        same push is given to every point at that height, less and less round the jaw towards the
+        ears and none at the throat.  The chin's bottom is widened a little, and there is a slight
+        hollow under the lower lip."""
+        fem = self.fem
+        if d.y > -0.45:
+            return p
+        k = self.chin / (0.8 if fem else 1.0)            # 1 at the default chin
+        jw = self.jaw / (0.9 if fem else 1.0)            # 1 at the default jaw
+        # the midline of the skull at this height, and where the rounded box puts it
+        mz = math.sqrt(max(0.0, 1.0 - d.y * d.y))
+        b = self.skull(Vector((0.0, d.y, mz)))
+        cy = CHIN_C
+        if b.y >= cy or b.z <= 1e-6:
+            return p
+        top = self.skull(Vector((0.0, CHIN_C / (RY * LOW), math.sqrt(max(0.0, 1.0 - (CHIN_C / (RY * LOW)) ** 2)))))
+        az = top.z
+        ay = (CHIN_DROP if fem else CHIN_DROP_M) * (0.94 + 0.06 * k)
+        n = (CHIN_N if fem else CHIN_N_M) + 0.4 * (k - 1.0)
+        vy, vz = b.y - cy, b.z
+        lam = (abs(vy / ay) ** n + abs(vz / az) ** n) ** (-1.0 / n)
+        dy, dz = vy * (lam - 1.0), vz * (lam - 1.0)
+        # all of it at the front, less round the jaw, none at the sides or the throat
+        ring = math.sqrt(d.x * d.x + d.z * d.z)
+        front = smooth(0.15, 0.75, d.z / ring) * smooth(0.0, 0.3, ring) if ring > 1e-6 else 0.0
+        # (and it eases in from the mouth down, so the face above it is untouched)
+        ease = smooth(0.0, 0.012, cy - b.y)
+        w = front * ease
+        q = p.copy()
+        q.y += dy * w
+        q.z += dz * w
+        # the lower face a little fuller from below the nose to the chin, all the way round the jaw (so
+        # its lines run straight into the chin), and the chin a small rounded tip, not a point (a
+        # man's broader)
+        q.x *= 1.0 + (0.2 if fem else 0.3) * jw * smooth(-0.06, -0.118, b.y) * smooth(-0.06, 0.0, p.z)
+        # the slight hollow between the lower lip and the chin
+        q.z -= 0.001 * blob3(q, (0.0, MOUTH_Y - 0.013, 0.07), (0.017, 0.0055, 0.02))
+        return q
 
     def shade_normal(self, p):
         """The normal an anime face is lit with at Godot-space point `p` (see head): that of an

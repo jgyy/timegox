@@ -1818,7 +1818,12 @@ func _lotus() -> void:
 	check(Data.STEPS[LG.step].id == Bonds.MEMORY_STEP and LG.objective_text().contains("(%d/%d)" % [Bonds.MEMORIES_NEEDED - 1, Bonds.MEMORIES_NEEDED]) and int(LG.inv.get(Bonds.PETAL, 0)) == Bonds.MEMORIES_NEEDED - 1, "the memories step waits for six, and every memory leaves a pressed petal")
 	Bonds.take_memory(LG, Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1], Bonds.MEMORIES[Bonds.MEMORY_ORDER[Bonds.MEMORIES_NEEDED - 1]].options[0])
 	LG.poll_steps()
-	check(Data.STEPS[LG.step].id == "s_p15_moth" and not Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[6]), "six given back, in any order, and the story goes on")
+	check(Data.STEPS[LG.step].id == "s_p15_moth", "six given back, in any order, and the story goes on")
+	# (the seventh can still be given back after the step, and then the ending tells of all seven: the
+	# Spring Thunder release; before it the seventh closed with the step and that line was out of reach)
+	check(Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[6]) and not Bonds.memory_ready(LG, Bonds.MEMORY_ORDER[0]), "the seventh memory can still be found after the step; one given back cannot be given again")
+	Bonds.take_memory(LG, Bonds.MEMORY_ORDER[6], Bonds.MEMORIES[Bonds.MEMORY_ORDER[6]].options[0])
+	check(LG.memories.size() == Bonds.MEMORIES.size() and Bonds.epilogues(LG).any(func(ln): return str(ln).begins_with("Every one of the seven memories")), "all seven given back: the ending says so")
 	LG.step = Data.step_index("s_p15_threads")
 	LG.visited = {"alchemist": true, "qiu_ye_end": true, "tala_end": true, "hu_end": true}
 	LG.poll_steps()
@@ -2199,6 +2204,18 @@ func _spring() -> void:
 		all_n += (nat[tl2] as Array).size()
 	check(n_tree > 0 and n_mmi == all_n, "every tree, bush and rock of a region knows the instance that draws it (%d trees, %d things)" % [n_tree, all_n])
 	troot.free()
+	# a recipe never asks for what a collect step is still gathering: refined while the step is in hand,
+	# it would eat the things the step counts, and with no more of them in the world the story stops
+	# (the Thunder-Bamboo Crackers and Taisui's charm did, until the Spring Thunder release)
+	var early: Array = []
+	for rid in Trials.RECIPES:
+		var rr: Dictionary = Trials.RECIPES[rid]
+		for item in rr["in"]:
+			for si in Data.STEPS.size():
+				var cs: Dictionary = Data.STEPS[si]
+				if str(cs.kind) == "collect" and str(cs.get("item", "")) == str(item) and Data.step_index(str(rr.after)) <= si:
+					early.append("%s (%s, %s)" % [rid, item, cs.id])
+	check(early.is_empty(), "every recipe that needs what a collect step gathers is offered only after the step (%s)" % str(early))
 	print("== Part XVII: the Spring Thunder ==")
 	check(Data.REALMS.size() == 23 and Data.REALMS[22] == "Myriad Things Awake" and Data.MAX_LEVEL == 66 and Data.level_name(66).ends_with("Myriad Things Awake") and Data.REALM_INFO.size() == 23 and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() > Data.MAX_LEVEL, "Part XVII adds the Myriad Things Awake realm")
 	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break22" and Data.DIALOGUE.has("recall15") and FileAccess.get_file_as_string("res://scripts/main.gd").contains("\"s_break21\": \"recall15\""), "Part XVII follows Ten Thousand Hearths (recall15) and ends the game")

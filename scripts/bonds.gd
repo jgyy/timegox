@@ -768,11 +768,12 @@ static func memory_option(id: String, oid: String) -> Dictionary:
 			return o
 	return {}
 
-## Whether memory `id` can be given back now: the memories step is the one in hand and it is not
-## given back yet.
+## Whether memory `id` can be given back now: from the memories step on, if it is not given back yet.
+## (The step goes on with six of the seven; the seventh can still be found after it, and the ending
+## tells of all seven given back: before the Spring Thunder release it closed with the step, and that
+## line of the ending could never be reached.)
 static func memory_ready(g, id: String) -> bool:
-	var s: Dictionary = g.cur_step()
-	return not s.is_empty() and str(s.kind) == "memories" and MEMORIES.has(id) and not g.memories.has(id)
+	return MEMORIES.has(id) and not g.memories.has(id) and g.reached(MEMORY_STEP)
 
 ## A memory given back: remembered with what Lin Feng said, a pressed petal of it, her heart and
 ## their closeness.
@@ -781,7 +782,7 @@ static func take_memory(g, id: String, o: Dictionary) -> void:
 	g.add_item(PETAL)
 	lean(g, str(o.get("lean", "")), 3)
 	add(g, MEMORY, "a memory given back")
-	g.toast("A memory given back: %s (%d of %d)" % [str(memory(id).bearer), g.memories.size(), MEMORIES_NEEDED])
+	g.toast("A memory given back: %s (%d of %d)" % [str(memory(id).bearer), g.memories.size(), MEMORIES_NEEDED if g.memories.size() <= MEMORIES_NEEDED else MEMORIES.size()])
 	g.note("Gave Yue Ling back her memory of %s" % str(memory(id).bearer))
 
 # ---------------------------------------------------------------- the lotus pond: where it begins and ends

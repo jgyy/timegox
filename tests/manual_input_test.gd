@@ -1,7 +1,8 @@
 extends SceneTree
 ## Feeds real keyboard events (no bot) into the game: title -> character creation (a name typed, a
 ## look and an origin changed) -> dialogue -> walk -> menu -> a thing to do (props.gd): face it, Enter,
-## he does it, Enter again finishes it; T to Yue Ling; F swings the sword and G throws the sword qi.
+## he does it, Enter again finishes it; T to Yue Ling; F swings the sword and G throws the sword qi;
+## a key held into somebody talks to them once.
 ## Run: godot --headless --path . --script tests/manual_input_test.gd
 
 var main
@@ -142,6 +143,49 @@ func _process(_d: float) -> bool:
 				var gs4 = root.get_node("Game")
 				expect(main.top_name() == "world" and gs4.strikes == int(prop.strikes0) + 1, "F swings the sword")
 				expect(gs4.waves == int(prop.waves0) + 1 and float(gs4.qi[0]) < float(prop.qi0), "G throws the sword qi, for some of his qi (%.0f -> %.0f)" % [float(prop.qi0), float(gs4.qi[0])])
+				# walking into somebody talks to them: hold the key into the Elder, Enter through what he
+				# says, and keep holding it (the conversation used to open again the moment it closed)
+				var w2 = main.world
+				for e2 in w2.ents:
+					if str(e2.id) != "elder" or not w2.ent_visible(e2):
+						continue
+					for dd in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+						var spot2: Vector2i = e2.pos + dd
+						if prop.has("hold") or not w2.tile_free(spot2) or w2.ent_at(spot2) != null:
+							continue
+						w2.teleport(spot2)
+						var f2: Vector2i = w2.FWD[w2.cam_q]
+						var r2: Vector2i = w2.RIGHT[w2.cam_q]
+						var keys := [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN]
+						var dirs := [-r2, r2, f2, -f2]
+						prop["hold"] = keys[dirs.find(-dd)]
+						prop["held"] = frame
+				expect(prop.has("hold"), "there is a way to walk up to the Elder")
+				if prop.has("hold"):
+					key(int(prop.hold), true)
+				else:
+					print("failures: ", fails)
+					quit(1)
+			elif prop.has("held") and not prop.has("closed"):
+				if main.top_name() == "dialogue":
+					prop["opened"] = true
+					tap(KEY_ENTER)
+				elif prop.has("opened") and main.top_name() == "world":
+					prop["closed"] = frame
+				elif frame > int(prop.held) + 600:
+					expect(false, "walking into the Elder opens a conversation")
+					print("failures: ", fails)
+					quit(1)
+			elif prop.has("closed") and frame == int(prop.closed) + 30:
+				expect(main.top_name() == "world", "and with the key still held it does not open again the moment it closes")
+				key(int(prop.hold), false)
+				# a pack struck first flies back for a moment before its battle (impact.gd): Esc then must
+				# not open the menu in its way (the battle never began)
+				main.world.ambush_t = main.world.t
+				tap(KEY_ESCAPE)
+			elif prop.has("closed") and frame == int(prop.closed) + 32:
+				expect(main.top_name() == "world", "Esc while a pack struck first is flying back does not open the menu over its battle")
+				main.world.ambush_t = -1.0
 				print("failures: ", fails)
 				quit(1 if fails > 0 else 0)
 		elif not u.is_empty() and bool(u.started):

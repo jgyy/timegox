@@ -160,6 +160,10 @@ func _unhandled_input(ev: InputEvent) -> void:
 
 func press(act: String) -> void:
 	var top := top_name()
+	# a pack struck first is flying back (impact.gd): its battle is a moment away, and Esc, T or Enter
+	# now would open something else in its way and the battle would never begin
+	if top == "world" and world.ambush_t >= 0.0:
+		return
 	if top == "world" and not world.using.is_empty():
 		# doing something (props.gd): Enter or Esc finishes it
 		world.press_use(act)
@@ -349,6 +353,10 @@ func new_game(h: Dictionary = {}) -> void:
 	toast_list.clear()
 	chat_idx.clear()
 	greeted.clear()
+	# (nor which of Yue Ling's heart-to-hearts was last announced, or where her chat had got to)
+	talk_told = ""
+	talk_seen = Vector2i(-1, -1)
+	yue_chat = 0
 	world.clear_cache()
 	world.refresh_hero()
 	world.load_area("sect", Vector2i(20, 8))

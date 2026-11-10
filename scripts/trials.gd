@@ -129,10 +129,10 @@ const RECIPES := {
 	"lotus_shuttle": {"at": "alchemist", "in": {"ess_wood": 8, "ess_water": 4, "pressed_petal": 3}, "stones": 220000, "after": "s_p15_memories", "for": "unweaver"},
 	"open_key": {"at": "smith", "in": {"ess_metal": 8, "ess_dark": 5, "pressed_petal": 2}, "stones": 240000, "after": "s_p15_memories", "for": "lock_warden"},
 	# ---- Part XVI (the Living Land release): red, fire and noise
-	"thunder_cracker": {"at": "alchemist", "in": {"ess_fire": 8, "thunder_bamboo": 2}, "stones": 260000, "after": "s_p16_bamboo", "for": "xi_beast"},
+	"thunder_cracker": {"at": "alchemist", "in": {"ess_fire": 8, "thunder_bamboo": 2}, "stones": 260000, "after": "s_p16_rally", "for": "xi_beast"},
 	# the Spring Thunder release (Part XVII)
 	"warm_brazier": {"at": "alchemist", "in": {"ess_fire": 8, "ess_wood": 6}, "stones": 300000, "after": "s_p17_ice", "for": "qing_nu"},
-	"taisui_charm": {"at": "smith", "in": {"ess_earth": 8, "ess_metal": 6, "thunder_egg": 1}, "stones": 320000, "after": "s_p17_eggs", "for": "taisui"},
+	"taisui_charm": {"at": "smith", "in": {"ess_earth": 8, "ess_metal": 6, "thunder_egg": 1}, "stones": 320000, "after": "s_p17_thunder", "for": "taisui"},
 	"hearth_lantern": {"at": "smith", "in": {"ess_fire": 6, "ess_metal": 5, "thunder_bamboo": 2}, "stones": 280000, "after": "s_p16_hunt", "for": "nian"},
 	"homing_elixir": {"at": "alchemist", "in": {"ess_wood": 5, "ess_fire": 5, "ess_water": 5, "ess_earth": 5, "ess_metal": 5, "autumn_leaf": 1}, "stones": 300000, "after": "s_p13_gates", "for": "chiyou"},
 }
@@ -913,7 +913,7 @@ const TRIALS := {
 			{"id": "folk", "kind": "folk", "n": "Every gong in the market", "needs": [["rallied", 3]], "boon": {"assist": 0.035},
 				"desc": "Three towns remember the old ways, and the word has run down the roads ahead of you: the Dawn Market's stallholders come out with gongs and pans and strike every time Xi does.",
 				"line": "Watchman Zhou's gong starts it, and then every pan in Yanggu: Xi cannot hear itself think."},
-			{"id": "craft", "kind": "craft", "n": "Thunder-bamboo crackers", "needs": [["item", "thunder_cracker", 1]], "boon": {"foe_hp": 0.7, "weak_k": 1.5},
+			{"id": "craft", "kind": "craft", "n": "Thunder-bamboo crackers", "needs": [["item", "thunder_cracker", 1]], "boon": {"foe_hp": 0.7, "weak_k": 1.9},
 				"desc": "Alchemist Mo can pack two stalks of thunder bamboo with fire essence into a string of crackers loud enough to drive off a night. The first firecrackers were bamboo thrown on a fire; these are the loudest ever made.",
 				"line": "The string of thunder-bamboo crackers goes off at Xi's feet, a hundred bangs in a row, and the Last Night flinches from every one."},
 			{"id": "might", "kind": "might", "n": "Cut the night in two", "needs": [["lv", 61], ["temper", 8]], "boon": {},
@@ -946,7 +946,7 @@ const TRIALS := {
 			{"id": "land", "kind": "land", "n": "The land made ready", "needs": [["cleared", 16]], "boon": {"foe_hp": 0.7, "taken": 0.85},
 				"desc": "Sixteen things the long winter left in the way, cleared with your own sword: the ox whipped, the roads, the channels and the river opened. Show her the land is ready to wake, and that somebody made it ready.",
 				"line": "Lin Feng tells the Maiden of Frost every road he opened, every channel, every jam of ice, and her comb goes still in her hair."},
-			{"id": "relic", "kind": "relic", "n": "Gou Mang's willow switch", "needs": [["give", "willow_switch", 1]], "boon": {"foe_hp": 0.75, "weak_k": 1.5},
+			{"id": "relic", "kind": "relic", "n": "Gou Mang's willow switch", "needs": [["give", "willow_switch", 1]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
 				"desc": "The Lord of Spring's own switch, cut from the first willow that ever came into leaf. Frost has never once won against it.",
 				"line": "Lin Feng lays the willow switch on the bench of snow, and green leaves open along it one by one."},
 			{"id": "craft", "kind": "craft", "n": "The Brazier of the South Wind", "needs": [["item", "warm_brazier", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
@@ -1087,7 +1087,8 @@ static func need_text(n: Array, g) -> String:
 			return "Walk the %s%s" % [Data.DAOS[str(n[1])].n, (" as %s or better" % rank) if int(n[2]) > 0 else ""]
 		"standing":
 			var title := "Kin" if int(n[2]) >= Data.KIN else "Friend"
-			return "The %s call you %s (standing %d of %d)" % [Data.RACES[str(n[1])].n, title, int(g.standing.get(str(n[1]), 0)), int(n[2])]
+			# (a people whose name already begins with "The": the Thousand Children, the Immortals)
+			return "%s call you %s (standing %d of %d)" % [Game.the_race(str(n[1])), title, int(g.standing.get(str(n[1]), 0)), int(n[2])]
 		"friends":
 			return "%d peoples of the realms call you Friend (now %d)" % [int(n[1]), friends(g)]
 		"gates":
@@ -1152,7 +1153,9 @@ static func boon_text(b: Dictionary) -> String:
 	if b.has("taken"):
 		parts.append("the party takes %d%% less harm" % int(round((1.0 - float(b.taken)) * 100.0)))
 	if b.has("assist"):
-		parts.append("allies strike it for %d%% of its health every round" % int(round(float(b.assist) * 1000.0) / 10.0))
+		# (2.5% is not 2%: a half per cent is shown)
+		var ap := float(b.assist) * 100.0
+		parts.append("allies strike it for %s%% of its health every round" % (str(int(round(ap))) if is_equal_approx(ap, round(ap)) else "%.1f" % ap))
 	if b.has("weak_k"):
 		parts.append("its weakness cuts deeper (x%.1f)" % float(b.weak_k))
 	if b.get("no_heavy", false):

@@ -1614,6 +1614,9 @@ func _move(d: float) -> void:
 			if e != null:
 				move_dir = Vector2i.ZERO
 				main.interact(e)
+				# the key still held must be let go first, or the conversation opens again the moment
+				# it closes, for ever (as on the stairs)
+				key_lock = true
 				return
 			if not tile_free(nt):
 				return
