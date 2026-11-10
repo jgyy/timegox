@@ -887,6 +887,10 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"npc":
 			# (someone who appears in two places shares one model: "asset")
 			var m := Models.person(e.col, Color("2a2a3a"), _npc_opts(str(e.get("asset", e.id))))
+			# the Felt Hearth (cultures.gd): the keeper of the tents sits by her fire, the three stones and
+			# the kettle, with a felt windbreak at her back
+			if str(e.id) == "sarnai":
+				n.add_child(Cultures.camp())
 			# the Living Land release: the people with names work at their place all day (folk.gd POSTS)
 			if Folk.POSTS.has(str(e.get("asset", e.id))):
 				Assets.lend_clips(m)
@@ -2634,7 +2638,9 @@ func _draw_hud() -> void:
 		# third line out of the panel onto the minimap, as three of Part XV's did)
 		var osz := UI.objective_size(obj)
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
-	UI.text(self, Vector2(VIEW.x - 592, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 580.0)
+	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
+	# end was cut off, "Esc men")
+	UI.text(self, Vector2(VIEW.x - 712, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 700.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:

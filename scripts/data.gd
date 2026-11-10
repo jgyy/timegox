@@ -6717,7 +6717,7 @@ const DIALOGUE := {
 		["Caravan-Master Kang", "There you are. I have forty horse-folk camped in my wagon yard, a boat-wife who will not sleep under a roof, three founders who have already rebuilt my forge without asking, and Aysha, who has taken over my kitchen. Sarnai will not sit downwind of the founders. The lantern man gets up at an hour I did not know existed."],
 		["Caravan-Master Kang", "They have all come to see their coal made into one fire. They have also each brought kindling, stacked their own way, and each has told me privately that theirs is the proper way and the other five will smother it."],
 		["Lin Feng", "Zhurong said to drill it where the roads cross. That is here."],
-		["Caravan-Master Kang", "It is. And it has not rained in three weeks, and the brush on that hill is as dry as an abacus. I have run caravans through grass fires, boy. Before anybody turns a drill within a mile of my town, I want a firebreak cut round that fire-ring. Six stands of brush. Humour an old man who owes you nothing and whom you owe a donkey."],
+		["Caravan-Master Kang", "It is. And it has not rained in three weeks, and the brush on that hill is as dry as an abacus. I have run caravans through grass fires, sweeper. Before anybody turns a drill within a mile of my town, I want a firebreak cut round that fire-ring. Six stands of brush. Humour an old man who owes you nothing and whom you owe a donkey."],
 	],
 	"done:s_p18_brush": [
 		["Narrator", "Six stands of dry brush come down and are dragged clear, and round the old fire-ring on the hill there is now a wide ring of bare earth. It looks like a great deal of trouble for nothing. Kang walks all the way round it twice and says it will do."],
@@ -6725,7 +6725,7 @@ const DIALOGUE := {
 	],
 	"done:s_p18_wild": [
 		["Narrator", "The last of the sparks is stamped out on the slope, and all over the mountain little threads of smoke stand up from the places where the fire's children were. But up the road, above Cloudfoot, the sky is still red, and the red is moving, and it is coming down towards the town."],
-		["Caravan-Master Kang", "That is the heart of it. That is six bonfires in one skin, and it is on the wrong side of your firebreak, boy, because it started on the right side and jumped. Go. I will get the buckets."],
+		["Caravan-Master Kang", "That is the heart of it. That is six bonfires in one skin, and it is on the wrong side of your firebreak, sweeper, because it started on the right side and jumped. Go. I will get the buckets."],
 	],
 	"pre:huilu": [
 		["Narrator", "On the road above Cloudfoot the fire stands up. It has the shape of a great bird with its wings open across the whole width of the hill, and in its breast, turning over and over one another and never touching, are six colours: blue, white, yellow, red, orange and a green like copper."],

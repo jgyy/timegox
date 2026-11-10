@@ -352,6 +352,36 @@ static func hail(id: String, k: int) -> String:
 	var hs: Array = HEARTHS[id].hail
 	return str(hs[posmod(k, hs.size())])
 
+## The Felt Hearth's fire, as it stands by its keeper in the grass below Thunder Valley: three hearth
+## stones with a fire of argal between them, a kettle on it, and behind it a curved windbreak of white
+## felt on a lattice, with a blue scarf tied to its pole.
+static func camp() -> Node3D:
+	var root := Node3D.new()
+	var b := MB.new()
+	var g := MB.new()
+	var felt := MB.tag(Color("e8e0cc"), MB.CLOTH)
+	var wood := MB.tag(Color("7a5a38"), MB.WOOD)
+	# the windbreak: an arc of felt panels behind the fire, lattice showing at the foot
+	for k in 9:
+		var a := -1.15 + 2.3 * float(k) / 8.0
+		var c := Vector3(sin(a) * 2.0, 0.0, -cos(a) * 2.0 - 0.1)
+		b.box(c + Vector3(0, 0.62, 0), Vector3(0.56, 1.0, 0.07), felt, Vector3(0, -a, 0))
+		b.box(c + Vector3(0, 0.09, 0), Vector3(0.56, 0.18, 0.05), wood, Vector3(0, -a, 0))
+		b.box(c + Vector3(0, 1.14, 0), Vector3(0.58, 0.06, 0.09), MB.tag(Color("8a2a3a"), MB.CLOTH), Vector3(0, -a, 0))
+	b.limb(Vector3(0, 0, -2.1), Vector3(0, 2.3, -2.1), 0.045, 0.03, wood, 6)
+	b.box(Vector3(0.16, 2.1, -2.1), Vector3(0.34, 0.2, 0.02), MB.tag(Color("3a6ac8"), MB.CLOTH), Vector3(0, 0, -0.25))
+	# the three stones, the fire and the kettle
+	for k2 in 3:
+		var a2 := TAU * float(k2) / 3.0 + 0.5
+		b.sph(Vector3(sin(a2) * 0.34, 0.1, -1.0 + cos(a2) * 0.34), Vector3(0.17, 0.13, 0.16), MB.tag(Color("6a6460"), MB.STONE))
+	b.sph(Vector3(0, 0.34, -1.0), Vector3(0.2, 0.15, 0.2), MB.tag(Color("3a3432"), MB.STONE))
+	b.limb(Vector3(0.16, 0.38, -1.0), Vector3(0.36, 0.5, -1.0), 0.03, 0.02, MB.tag(Color("3a3432"), MB.STONE), 5)
+	g.sph(Vector3(0, 0.14, -1.0), Vector3(0.14, 0.1, 0.14), Color(1.0, 0.62, 0.25, 0.95))
+	g.ball(Vector3(0, 0.2, -1.0), 0.5, Color(0.5, 0.7, 1.0, 0.14), true)
+	MB.mesh_node(root, b.build(MB.mat_vc()))
+	MB.mesh_node(root, g.build(MB.mat_glow())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return root
+
 # ---------------------------------------------------------------- the beginning
 ## The beginning (cultures.gd): where the hero stands on the last morning at the hearth: open ground
 ## six steps' walk from the hearth's keeper `keeper` in region `area` (the same tile every time).

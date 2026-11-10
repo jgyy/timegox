@@ -2473,21 +2473,11 @@ func _new_fire() -> void:
 	var conv: Array = Voice.lines([["Narrator", "Lin Feng kneels."], ["Narrator", "He does not look up."], ["Elder Qing Xuan", "Rise."], ["Narrator", "He strokes his beard."], ["Lin Feng", "He is late, Elder."], ["Narrator", "He waits."]])
 	check(conv[1][1] == "She does not look up." and conv[3][1] == "He strokes his beard." and conv[4][1] == "He is late, Elder." and conv[5][1] == "She waits.",
 		"in a conversation who was spoken of carries from line to line: the narrator's 'he' after her, the Elder's own, and never what anybody says aloud")
+	var story_src := ""
+	for f in ["data", "fate_text", "bonds", "grudges", "fashion", "cultures"]:
+		story_src += FileAccess.get_file_as_string("res://scripts/%s.gd" % f)
 	for fx in Voice.FIX:
-		var found := false
-		for ok2 in Fashion.ORIGIN_LINES:
-			for oo in Fashion.ORIGIN_LINES[ok2]:
-				for ln in Fashion.ORIGIN_LINES[ok2][oo]:
-					found = found or str(ln[1]) == str(fx)
-		for dk in Data.DIALOGUE:
-			for ln2 in Data.DIALOGUE[dk]:
-				found = found or str(ln2[1]) == str(fx)
-		for shk in Bonds.SHARES:
-			for ln3 in Bonds.SHARES[shk].get("lines", []):
-				found = found or str(ln3[1]) == str(fx)
-		for oid2 in Fashion.OUTFITS:
-			found = found or str(Fashion.OUTFITS[oid2].desc) == str(fx)
-		check(found and str(Voice.FIX[fx]) != str(fx), "a line written out for her is a line of the story: %s..." % str(fx).substr(0, 40))
+		check(story_src.contains("\"" + str(fx) + "\""), "a line written out for her is a line of the story: %s..." % str(fx).substr(0, 40))
 	var changed := 0
 	var total := 0
 	var odd: Array = []

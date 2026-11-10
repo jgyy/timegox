@@ -22,8 +22,6 @@ extends RefCounted
 ## about another man changes and that the lines about the hero do.
 
 const HE := {"he": "she", "him": "her", "his": "her", "himself": "herself"}
-## what the hero is called when he is called a boy (only while the hero is the one spoken of)
-const NOUNS := {"boy": "girl", "lad": "lass", "boyhood": "girlhood"}
 ## said to or of the hero wherever they stand (whole phrases; capitals are kept)
 const PHRASES := [
 	["senior brother lin", "Senior Sister Lin"], ["junior brother lin", "Junior Sister Lin"], ["brother lin", "Sister Lin"],
@@ -31,7 +29,7 @@ const PHRASES := [
 	["sect boy", "sect girl"], ["sweeper boy", "sweeper girl"], ["the boy who swept", "the girl who swept"], ["the boy who held up the sky", "the girl who held up the sky"],
 	["he is our son", "she is our daughter"], ["our son", "our daughter"], ["they had a son", "they had a daughter"], ["a son, looking for his parents", "a daughter, looking for her parents"],
 	["waiting for a son to grow up", "waiting for a daughter to grow up"], ["their son to grow up", "their daughter to grow up"],
-	[", young man", ", young woman"], ["it's him!", "it's her!"], ["good boy", "good girl"], [", boy", ", girl"], ["a boy once swept", "a girl once swept"],
+	[", young man", ", young woman"], ["it's him!", "it's her!"], ["good boy", "good girl"], ["a boy once swept", "a girl once swept"], ["it is their son", "it is their daughter"],
 ]
 ## the words that make whoever is named with them a woman (a name with one of these in it never takes
 ## a "he" away from the hero)
@@ -47,11 +45,17 @@ const MEN := ["Lin Shan", "Elder", "Qiu Ye", "Fang Hu", "Iron Fang", "Chiyou", "
 	"General", "Marshal", "Judge", "Yama", "Taisui", "Gou Mang", "Lei Gong", "Uncle", "Grandpa", "Father", "Zhurong", "Huilu", "Suiren", "Batu", "Nie", "Shitou", "Temur", "Xuan Wu", "Xiu", "Feilian",
 	"Shentu", "Yulei", "Yinglong", "Niu Lang", "Tiger", "He Bo", "Yu Qiang", "Li", "Saint", "Giant", "Admiral", "Dan", "Navid", "Pei", "Mo", "Tie"]
 ## words that begin a new clause (the one spoken of carries over, but its subject is still to come)
-const JOINS := ["and", "but", "while", "because", "so", "then", "until", "when", "where", "though", "although", "as", "before", "after", "since", "or", "yet", "for"]
+const JOINS := ["and", "but", "so", "then", "or", "yet"]
+## words that begin a clause inside another ("He is gone before Lin Feng can answer, and the flowers
+## close behind him"): who is spoken of inside it is forgotten again at its comma, unless the sentence
+## began with it ("When Lin Feng draws the pearl out, ... in his palm")
+const UNDER := ["while", "because", "until", "when", "where", "though", "although", "as", "before", "after", "since"]
+## after one of these a name is somebody something is done to, not the one the clause is about
+const TO := ["to", "at", "for", "from", "by", "of", "upon", "towards", "toward", "past", "beside", "behind", "with"]
 ## after these a "him" in the hero's own clause is still the hero ("Lin Feng holds heaven above him")
 const AROUND := ["above", "below", "behind", "beside", "around", "round", "about", "through", "past", "before", "in", "on", "over", "under", "within", "towards", "toward", "beneath", "inside", "upon", "with", "at"]
 ## men spoken of without a name ("the giant", "the old man"): they take a "he" as a named man does
-const COMMON_MEN := ["saint", "giant", "general", "god", "king", "emperor", "lord", "monk", "man", "sage", "hermit", "ferryman", "magician", "fisherman", "merchant", "father", "husband",
+const COMMON_MEN := ["boy", "saint", "giant", "general", "god", "king", "emperor", "lord", "monk", "man", "sage", "hermit", "ferryman", "magician", "fisherman", "merchant", "father", "husband",
 	"brother", "uncle", "son", "warden", "judge", "magistrate", "minister", "prince", "smith", "farmer", "hunter", "scholar", "soldier", "bandit", "immortal", "founder", "patriarch", "cowherd",
 	"herdsman", "duke", "marshal", "captain", "priest", "abbot", "grandfather", "boatman", "ghost", "shade", "stranger", "tiger", "dragon", "elder", "master", "admiral", "marquis", "earl"]
 ## titles that are not a person by themselves
@@ -66,6 +70,15 @@ const STOP := ["The", "Of", "Who", "And", "His", "Her", "Last", "Old", "Little",
 
 ## the whole line as the data has it -> as it is told of a woman, where the rule would be wrong
 const FIX := {
+	"...You have your mother's ears. Don't let anybody send a child down those steps, boy.": "...You have your mother's ears. Don't let anybody send a child down those steps, girl.",
+	"They talk until the golden light dims. Afterwards Qiu Ye comes back through the lilies and says, to nobody in particular, that when Lin Feng goes down to the King he is going too.":
+		"They talk until the golden light dims. Afterwards Qiu Ye comes back through the lilies and says, to nobody in particular, that when Lin Feng goes down to the King he is going too.",
+	"They talk until the golden light dims. When it is done, Qiu Ye tells Lin Feng that he knows every court of this place from the queue, and that when Lin Feng goes down to the King, he is coming.":
+		"They talk until the golden light dims. When it is done, Qiu Ye tells Lin Feng that he knows every court of this place from the queue, and that when Lin Feng goes down to the King, he is coming.",
+	"At the foot of the bridge Lin Feng tells the old man the truth, in front of his son: that he dropped his guard on purpose among the barrows, and that Qiu Ye never knew.":
+		"At the foot of the bridge Lin Feng tells the old man the truth, in front of his son: that she dropped her guard on purpose among the barrows, and that Qiu Ye never knew.",
+	"Four pearls. Hold one to your ear, boy. Go on.": "Four pearls. Hold one to your ear, girl. Go on.",
+	"Hah! A good new year, boy. Here: a pill for luck. It is mostly sugar. The best pills always are.": "Hah! A good new year, girl. Here: a pill for luck. It is mostly sugar. The best pills always are.",
 	"White silk with an azure sash and the sect's cloud on the back, and a small jade crown for the topknot. The Elder had it made the night he broke through to Foundation.":
 		"White silk with an azure sash and the sect's cloud on the back, and a small jade crown for the topknot. The Elder had it made the night she broke through to Foundation.",
 	"Crimson and gold, with a mantle of ash-phoenix feathers that never quite stop smouldering at the tips. Sage Huo Rong says it suits him. Sage Huo Rong is a liar.":
@@ -211,6 +224,13 @@ static func tell(s: String, about: bool = false) -> Array:
 	var hero_subj := false
 	var hero_sentence := false
 	var her_title := false
+	var obj_hero := false
+	var under := false
+	var saved_about := false
+	var saved_topic := false
+	var first_word := true
+	var man_here := false
+	var hero_met := false
 	var prev_low := ""
 	for i in ms.size():
 		var m: RegExMatch = ms[i]
@@ -220,12 +240,25 @@ static func tell(s: String, about: bool = false) -> Array:
 		var gap := s.substr(at, a - at)
 		out += gap
 		at = b
+		if under and (gap.contains(",") or gap.contains(".") or gap.contains("!") or gap.contains("?") or gap.contains(";") or gap.contains(":")):
+			# the clause inside the clause is over: who the sentence was about is spoken of again
+			under = false
+			about = saved_about
+			topic_set = saved_topic
+			hero_subj = false
 		for ch in [".", "!", "?", ";", ":"]:
 			if gap.contains(ch):
 				topic_set = false
 				hero_subj = false
 				if ch != ";" and ch != ":":
+					# ("Yue Ling looks at Lin Feng. He smiles.": the hero was the only one a "he" could be)
+					if hero_met and not man_here:
+						about = true
 					hero_sentence = false
+					obj_hero = false
+					first_word = true
+					man_here = false
+					hero_met = false
 		var base := w
 		var tail := ""
 		var ap := w.find("'")
@@ -254,21 +287,37 @@ static func tell(s: String, about: bool = false) -> Array:
 		elif base == low and tail == "" and JOINS.has(low):
 			topic_set = false
 			hero_subj = false
+		elif tail == "" and UNDER.has(low) and not first_word and not under and topic_set:
+			under = true
+			saved_about = about
+			saved_topic = topic_set
+			topic_set = false
+			hero_subj = false
 		elif (base == "Lin" and i + 1 < ms.size() and (ms[i + 1] as RegExMatch).get_string().begins_with("Feng")) or (base == "Feng" and tail == "'er") or (low == "sweeper" and base == low and prev_low in ["the", "a"]):
 			if base == "Lin":
 				skip = true
 				owns = (ms[i + 1] as RegExMatch).get_string().ends_with("'s")
-			if not owns:
+			hero_met = true
+			if not owns and TO.has(prev_low):
+				# ("bows once to Lin Feng", "stops a sword's length from Lin Feng and looks him up and
+				# down": somebody something is done to; a "him" after it in the sentence is the hero)
+				obj_hero = true
+			elif not owns:
 				if not topic_set:
 					about = true
 					topic_set = true
+				else:
+					obj_hero = true
 				if about:
 					hero_subj = true
 					hero_sentence = true
 			elif not topic_set:
 				# ("the stamps on Lin Feng's sleeve... the grey at his temples": the hero is the one
-				# spoken of, though not the one doing anything; where a man was named first, he is not)
+				# spoken of, though not the one doing anything, so a "him" in the clause is somebody
+				# else: "Lin Feng's last blow knocks him off the roof"; where a man was named first,
+				# it is still him)
 				about = true
+				hero_subj = true
 		elif base != low and ((i + 1 < ms.size() and _her_names.has(w + " " + (ms[i + 1] as RegExMatch).get_string().trim_suffix("'s"))) or (_her_names.has(base) and not _men.has(base))
 				or (_women.has(base) and not _men.has(base))):
 			# a woman, by both her names ("Yue Ling") or by one no man bears: she takes nothing away
@@ -277,12 +326,21 @@ static func tell(s: String, about: bool = false) -> Array:
 		elif (_men.has(base) and base != low) or (base == low and tail != "'ll" and COMMON_MEN.has(low)):
 			# (a man who only owns something in a sentence about the hero, "Yu Qiang's conch at his belt",
 			# takes nothing away)
+			man_here = true
 			if not topic_set and not (owns and hero_sentence):
 				about = false
 				topic_set = true
+			if not owns:
+				obj_hero = false
+		elif not about and low == "him" and obj_hero and tail == "":
+			out += _cap(base, "her")
+			prev_low = low
+			first_word = false
+			continue
 		elif not about and HE.has(low):
 			# a "he" that is somebody else's: that somebody is the one this clause is about
 			topic_set = true
+			man_here = true
 		elif about and HE.has(low) and (tail == "" or tail in ["'s", "'d", "'ll"]) and not (low == "him" and hero_subj and not AROUND.has(prev_low)):
 			var to: String = HE[low]
 			if low == "his" and tail == "":
@@ -293,11 +351,8 @@ static func tell(s: String, about: bool = false) -> Array:
 			out += _cap(base, to) + tail
 			prev_low = low
 			continue
-		elif about and tail == "" and NOUNS.has(low):
-			out += _cap(base, str(NOUNS[low]))
-			prev_low = low
-			continue
 		prev_low = low
+		first_word = false
 		out += w
 	out += s.substr(at)
 	return [out, about]
@@ -339,13 +394,9 @@ static func lines(ls: Array) -> Array:
 			l2[1] = said(str(ln[1]))
 			if who == "Lin Feng":
 				about = true
-			else:
-				var man := false
-				for w in _lead(who):
-					if _men.has(w):
-						man = true
-				if man:
-					about = false
+			elif not is_woman(who):
+				# (a man has spoken, or somebody who may be one: the narrator's next "he" is his)
+				about = false
 		out.append(l2)
 	return out
 
