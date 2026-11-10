@@ -2254,6 +2254,30 @@ func _spring() -> void:
 			if not near:
 				lost.append(str(e2.id))
 	check(lost.is_empty(), "with every obstacle standing, everybody and everything the story needs can still be walked up to (%s)" % str(lost))
+	# nothing that came later in the story moved an older map: every region built with Part XVII's late
+	# people, lords, things to find, war-bands and obstacles taken out is the same map with the same
+	# packs, people and things in it
+	for a9 in Data.AREAS:
+		var sp9: Dictionary = Data.AREAS[a9]
+		var has_late: bool = sp9.has("obstacles") or bool(sp9.get("warband", {}).get("late", false))
+		for k9 in ["npcs", "bosses", "pickups"]:
+			for x9 in sp9.get(k9, []):
+				if x9.get("late", false):
+					has_late = true
+		if not has_late:
+			continue
+		var bare: Dictionary = sp9.duplicate(true)
+		bare.erase("obstacles")
+		if bare.get("warband", {}).get("late", false):
+			bare.erase("warband")
+		for k10 in ["npcs", "bosses", "pickups"]:
+			if bare.has(k10):
+				bare[k10] = (bare[k10] as Array).filter(func(x10): return not x10.get("late", false))
+		var m_full: Dictionary = MapGen.build(a9)
+		var m_bare: Dictionary = MapGen.build(a9, Vector2i.ZERO, bare)
+		var keys_full: Array = m_full.ents.map(func(e10): return "%s|%s|%s" % [e10.kind, e10.id, e10.pos])
+		var keys_bare: Array = m_bare.ents.map(func(e11): return "%s|%s|%s" % [e11.kind, e11.id, e11.pos])
+		check(m_full.grid == m_bare.grid and keys_full == keys_bare, "%s: Part XVII's additions move nothing in the region's own map" % a9)
 	for lid in ["gou_mang", "lei_gong", "boss_qing_nu", "boss_taisui", "boss_poison_mother", "p17_egg1", "p17_willow6"]:
 		var found: Array = wsurf.ents.filter(func(e3): return str(e3.id) == lid)
 		check(found.size() == 1, "%s stands in the world once (late: no older map moved for it)" % lid)

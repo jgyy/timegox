@@ -37,8 +37,10 @@ const POOLS := {"dunes": -0.55, "fungal": -0.42, "aurora": -0.45, "chaos": -0.4,
 static func is_walkable_tile(t: int) -> bool:
 	return t == FLOOR or t == PATH or t == DECOR or t == INTERIOR
 
-static func build(id: String, size := Vector2i.ZERO) -> Dictionary:
-	var spec: Dictionary = Data.AREAS[id]
+## (`spec_over`, for the tests: build from this spec instead of the region's own, e.g. with everything
+## that came later in the story taken out, to show that it moves nothing)
+static func build(id: String, size := Vector2i.ZERO, spec_over: Dictionary = {}) -> Dictionary:
+	var spec: Dictionary = Data.AREAS[id] if spec_over.is_empty() else spec_over
 	var w: int = spec.w if size == Vector2i.ZERO else size.x
 	var h: int = spec.h if size == Vector2i.ZERO else size.y
 	var rng := RandomNumberGenerator.new()

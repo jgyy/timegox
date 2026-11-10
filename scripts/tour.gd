@@ -1821,7 +1821,9 @@ func _run() -> void:
 					continue
 				var bstop: Array = _stop(aid)
 				Game.reset()
-				Game.level = bstop[1]
+				# (at the level a player meets the boss at, at the least: the region's own stop may be
+				# chapters earlier, and Part XVII's lords would floor a cultivator of Part I at a blow)
+				Game.level = maxi(int(bstop[1]), int(bb.get("req", 0)))
 				Game.companion = true
 				Game.heal_full()
 				Game.step = Data.step_index(bstop[0])
@@ -2209,11 +2211,12 @@ func _sword_shots(which: String = "1") -> void:
 		await _obstacle_shots("s_p17_chains", "p17_chain1", "part17_chains")
 	if want.call("gods"):
 		await _portraits("part17_gods", [Assets.person("gou_mang"), Assets.person("lei_gong")], 1.2, 1.55, 3.6)
-		await _gallery("part17_foes", [_foe("qing_nu", true), _foe("taisui", true), _foe("poison_mother", true), _foe("rime_wisp"), _foe("hoarfrost_hare"), _foe("late_frost"), _foe("waking_scorpion"), _foe("waking_centipede"), _foe("waking_toad")], 1.9)
+		# (the lords between the beasts, so the big ones do not stand shoulder to shoulder)
+		await _gallery("part17_foes", [_foe("rime_wisp"), _foe("qing_nu", true), _foe("hoarfrost_hare"), _foe("late_frost"), _foe("taisui", true), _foe("waking_scorpion"), _foe("waking_centipede"), _foe("poison_mother", true), _foe("waking_toad")], 1.15, 0.25)
 	if want.call("cast"):
 		# the anime re-sculpt: the cast of the game in a row, women and men, young and old
 		await _gallery("anime_cast", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0)}), Assets.person("chang_e"), Assets.person("elder_qing"),
-			Assets.person("ah_mei"), Assets.person("hu_qingyi"), Assets.person("granny_wen"), Assets.person("child_hua"), Assets.person("gou_mang")], 1.15, 0.0)
+			Assets.person("ah_mei"), Assets.person("hu_qingyi"), Assets.person("granny_wen"), Assets.person("child_hua"), Assets.person("gou_mang")], 0.42, 0.0)
 		await _portraits("anime_faces", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0)}), Assets.person("chang_e"), Assets.person("hu_qingyi")], 0.62, 1.68, 1.9)
 
 ## A tree at the forest's edge is cut through and falls: a strip of its fall, and the logs after.

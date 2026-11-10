@@ -1,7 +1,7 @@
 extends SceneTree
 ## Feeds real keyboard events (no bot) into the game: title -> character creation (a name typed, a
 ## look and an origin changed) -> dialogue -> walk -> menu -> a thing to do (props.gd): face it, Enter,
-## he does it, Enter again finishes it.
+## he does it, Enter again finishes it; T to Yue Ling; F swings the sword and G throws the sword qi.
 ## Run: godot --headless --path . --script tests/manual_input_test.gd
 
 var main
@@ -123,6 +123,25 @@ func _process(_d: float) -> bool:
 				tap(KEY_T)
 			elif prop.has("talked") and frame == int(prop.talked) + 4:
 				expect(main.top_name() == "dialogue" and str(main.dialogue.lines[0][0]) == "Yue Ling", "T with Yue Ling beside him: she has a word to say")
+				prop["sword"] = frame
+			elif prop.has("sword") and not prop.has("struck"):
+				# Enter through her words, then the sword (the Spring Thunder release: impact.gd): F swings
+				# it, G throws the sword qi
+				if main.top_name() == "dialogue":
+					tap(KEY_ENTER)
+				elif main.top_name() == "world":
+					var gs3 = root.get_node("Game")
+					gs3.qi[0] = gs3.max_qi(0)
+					prop["struck"] = frame
+					prop["strikes0"] = gs3.strikes
+					prop["waves0"] = gs3.waves
+					prop["qi0"] = float(gs3.qi[0])
+					tap(KEY_F)
+					tap(KEY_G)
+			elif prop.has("struck") and frame == int(prop.struck) + 2:
+				var gs4 = root.get_node("Game")
+				expect(main.top_name() == "world" and gs4.strikes == int(prop.strikes0) + 1, "F swings the sword")
+				expect(gs4.waves == int(prop.waves0) + 1 and float(gs4.qi[0]) < float(prop.qi0), "G throws the sword qi, for some of his qi (%.0f -> %.0f)" % [float(prop.qi0), float(gs4.qi[0])])
 				print("failures: ", fails)
 				quit(1 if fails > 0 else 0)
 		elif not u.is_empty() and bool(u.started):

@@ -40,6 +40,8 @@ const MONSTERS := {
 	"sun_crow": "monsters/sun_crow",
 	"jade_rabbit": "monsters/jade_rabbit",
 	"bifang": "monsters/bifang",
+	# the Spring Thunder release (Part XVII): Qing Nu, the Maiden of Frost, built with the anime re-sculpt
+	"frost_maiden": "monsters/frost_maiden",
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",

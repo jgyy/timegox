@@ -675,7 +675,7 @@ const ENEMIES := {
 	"waking_centipede": {"n": "Thunder-Woken Centipede", "elem": "dark", "weak": "thunder", "col": Color("8a2a1a"), "shape": "serpent", "pal": {"sec": Color("f0a040"), "acc": Color("1a1010")}},
 	"waking_toad": {"n": "Thunder-Woken Toad", "elem": "earth", "weak": "wood", "col": Color("7a8a3a"), "shape": "blob", "pal": {"sec": Color("e8c040"), "acc": Color("c83a2a")}},
 	"poison_mother": {"n": "Mother of the Five Poisons", "elem": "dark", "weak": "fire", "col": Color("4a6a2a"), "shape": "blob", "boss": true, "pal": {"sec": Color("e8a030"), "acc": Color("c02a40"), "mark": Color("1a1a10")}},
-	"qing_nu": {"n": "Qing Nu, Maiden of Frost", "elem": "water", "weak": "fire", "col": Color("e0f0ff"), "shape": "wraith", "boss": true, "pal": {"sec": Color("8ab0d8"), "acc": Color("ffffff")}},
+	"qing_nu": {"n": "Qing Nu, Maiden of Frost", "elem": "water", "weak": "fire", "col": Color("e0f0ff"), "shape": "frost_maiden", "boss": true, "pal": {"sec": Color("8ab0d8"), "acc": Color("ffffff")}},
 	"taisui": {"n": "Taisui, Lord of the Year Under the Earth", "elem": "earth", "weak": "wood", "col": Color("c87a6a"), "shape": "blob", "boss": true, "pal": {"sec": Color("5a3a2a"), "acc": Color("f0e040"), "mark": Color("2a1a1a")}},
 }
 

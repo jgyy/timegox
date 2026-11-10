@@ -2187,17 +2187,21 @@ func qi_wave() -> void:
 		if not tile_free(tl) and grid[tl.y * w + tl.x] != MapGen.WATER:
 			break
 	var reach: Array = []
-	for tl2 in path:
+	# (how many tiles of the path it crosses before a pack in the way stops it)
+	var span := path.size()
+	for k0 in path.size():
+		var tl2: Vector2i = path[k0]
 		reach.append(tl2)
 		var side := Vector2i(-facing.y, facing.x)
 		reach.append(tl2 + side)
 		reach.append(tl2 - side)
 		var e = ent_at(tl2)
 		if e != null and e.kind == "enemy":
+			span = k0 + 1
 			break
 	if _blow(reach, fwd):
 		if not headless():
-			Impact.wave(scene3d, _player_pos() + Vector3(0, 1.0, 0) + fwd * 0.8, fwd, maxf(2.0, (path.size() - 1) * TS))
+			Impact.wave(scene3d, _player_pos() + Vector3(0, 1.0, 0) + fwd * 0.8, fwd, maxf(2.0, (span - 1) * TS))
 		return
 	if headless():
 		return
