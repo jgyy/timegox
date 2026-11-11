@@ -33,6 +33,17 @@ var hunt := 0
 ## cave's floor -> true), and the things of a cave done during the step that asks for them (their kind)
 var delved := {}
 var step_uses := {}
+## the High Roads release (peaks.gd): the summits stood on (the peak's id -> true), the metres of rock
+## climbed, the flights under the kite (how many, the tiles flown in all, the longest, and the
+## greatest height come down in one) and the wayfarers met on the road (wayfarers of folk.gd)
+var summits := {}
+var climbed := 0.0
+var glides := 0
+var glided := 0
+var glide_best := 0
+var glide_drop := 0.0
+## the longest flight since the step of the story that asks for one began (tiles)
+var step_glide := 0
 var timeline: Array = []
 var toasts: Array = []
 ## regions Lin Feng has set foot in (their histories go into the Annals)
@@ -180,6 +191,13 @@ func reset() -> void:
 	hunt = 0
 	delved = {}
 	step_uses = {}
+	summits = {}
+	climbed = 0.0
+	glides = 0
+	glided = 0
+	glide_best = 0
+	glide_drop = 0.0
+	step_glide = 0
 	timeline = []
 	toasts = []
 	seen = {"sect": true}
@@ -647,6 +665,7 @@ func advance() -> void:
 	step += 1
 	hunt = 0
 	step_uses = {}
+	step_glide = 0
 	# a step that asks for visits starts with nobody visited: somebody called on in an earlier chapter
 	# (Smith Tie at the New Year, Auntie Rong with the new fire) is called on again
 	var ns := cur_step()
@@ -712,6 +731,13 @@ func poll_steps() -> void:
 			"arms":
 				# Part XXI: so many Daos of arms learned to Adept (arms.gd)
 				ok = Arms.adept(self) >= int(s.n)
+			"summit":
+				# Part XXII: the very top of a region's highest peak (`peak`), or so many summits, any of
+				# them (peaks.gd)
+				ok = summits.has("peak:%s:%d" % [str(s.peak), int(s.get("k", 0))]) if s.has("peak") else summits.size() >= int(s.n)
+			"glide":
+				# Part XXII: one flight under the cloud-kite of so many tiles, made since the step began
+				ok = step_glide >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -726,6 +752,26 @@ func tried_count(s: Dictionary) -> int:
 		if (s.has("things") and str(k) in s.things) or (not s.has("things") and CaveThings.KINDS.has(str(k))):
 			n += 1
 	return n
+
+## The High Roads: Lin Feng has stood on the very top of a peak: it is remembered, and it is news the
+## first time.
+func summit(pid: String, peak_name: String, height: float) -> void:
+	if summits.has(pid):
+		return
+	summits[pid] = true
+	note("Stood on %s (%d m)" % [peak_name, int(round(height))])
+	toast("The summit of %s, %d metres up (%d summits)" % [peak_name, int(round(height)), summits.size()])
+	poll_steps()
+
+## A flight under the kite has ended: `tiles` flown, `fell` metres come down.
+func glide_done(tiles: int, fell: float) -> void:
+	if tiles > glide_best:
+		glide_best = tiles
+	glide_drop = maxf(glide_drop, fell)
+	step_glide = maxi(step_glide, tiles)
+	if tiles >= 12:
+		note("Flew %d metres under the cloud-kite" % (tiles * 2))
+	poll_steps()
 
 ## Part XX: Lin Feng has been to the very back of a cave (he found what was left there): it is
 ## remembered, and it is news the first time.
@@ -763,6 +809,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(visits_done(s), int(s.n)), int(s.n)]
 	elif s.kind == "folk":
 		t += "  (%d/%d)" % [mini(folk_count(s), int(s.n)), int(s.n)]
+	elif s.kind == "summit" and not s.has("peak"):
+		t += "  (%d/%d)" % [mini(summits.size(), int(s.n)), int(s.n)]
+	elif s.kind == "glide":
+		t += "  (%d/%d m)" % [mini(step_glide, int(s.n)) * 2, int(s.n) * 2]
 	elif s.kind == "clear":
 		t += "  (%d/%d)" % [mini(cleared_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "works":

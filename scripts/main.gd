@@ -162,6 +162,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_G:
 			# throw the sword qi ahead (the Spring Thunder release: impact.gd)
 			press("qi")
+		KEY_V:
+			# open the cloud-kite, or fold it in the air (the High Roads release: peaks.gd, glider.gd)
+			press("glide")
 		KEY_UP, KEY_W:
 			press("up")
 		KEY_DOWN, KEY_S:
@@ -188,6 +191,8 @@ func press(act: String) -> void:
 			world.strike()
 		elif act == "qi":
 			world.qi_wave()
+		elif act == "glide":
+			world.toggle_glide()
 		elif act == "talk":
 			talk_yue()
 		elif act == "cancel":
@@ -1209,7 +1214,7 @@ func start_breakthrough() -> void:
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
-	"s_break24": "recall18", "s_break25": "recall19"}
+	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

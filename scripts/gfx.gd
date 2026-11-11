@@ -100,6 +100,23 @@ static func world_minimap(wd: Dictionary) -> ImageTexture:
 		data[i * 3] = int(c.r8)
 		data[i * 3 + 1] = int(c.g8)
 		data[i * 3 + 2] = int(c.b8)
+	# the High Roads (peaks.gd): the mountains are drawn as a mapmaker draws them, grey rock lit from
+	# the north-west and paler towards the top
+	for pk in wd.get("peaks", []):
+		var pc: Vector2i = pk.c
+		var pr: int = pk.r
+		for y2 in range(pc.y - pr, pc.y + pr + 1):
+			for x2 in range(pc.x - pr, pc.x + pr + 1):
+				var rv := Peaks.rise_of(pk, float(x2) + 0.5, float(y2) + 0.5)
+				if rv < 0.6:
+					continue
+				var lit := clampf((rv - Peaks.rise_of(pk, float(x2) + 1.5, float(y2) + 1.5)) / 5.0, -1.0, 1.0)
+				var rc := Color("7c7a76").lerp(Color("f0f2f6"), clampf(rv / maxf(float(pk.h), 1.0), 0.0, 1.0) * 0.75)
+				rc = rc.lightened(0.25 * lit) if lit > 0.0 else rc.darkened(-0.3 * lit)
+				var k := (y2 * W + x2) * 3
+				data[k] = int(rc.r8)
+				data[k + 1] = int(rc.g8)
+				data[k + 2] = int(rc.b8)
 	return ImageTexture.create_from_image(Image.create_from_data(W, H, false, Image.FORMAT_RGB8, data))
 
 static func draw_minimap(ci: CanvasItem, tex: ImageTexture, r: Rect2, w: int, h_: int, ptile: Vector2i, marks: Array, t: float) -> void:

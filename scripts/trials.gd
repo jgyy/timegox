@@ -55,8 +55,10 @@ const KINDS := {
 	"delve": {"n": "By the dark", "col": Color("8ad0c8"), "what": "the caves you have gone to the very back of"},
 	# the Hundred Arms release (Part XXI): the Daos of arms Lin Feng has learned to Adept (arms.gd)
 	"arms": {"n": "By the hand", "col": Color("dce8ff"), "what": "the weapons whose Dao you have learned"},
+	# the High Roads release (peaks.gd): the summits stood on
+	"heights": {"n": "By the heights", "col": Color("f4f8ff"), "what": "the summits you have stood on"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -145,6 +147,9 @@ const RECIPES := {
 	"lamb_bell": {"at": "alchemist", "in": {"ess_earth": 8, "ess_water": 6, "earth_basket": 1}, "stones": 240000, "after": "s_p20_moles", "for": "fen_yang"},
 	# the Hundred Arms release (Part XXI): peaches for an ape, one scabbard for two swords, and a cock of wood
 	"ape_fruit": {"at": "alchemist", "in": {"ess_wood": 8, "ess_water": 6, "bamboo_switch": 1}, "stones": 250000, "after": "s_p21_ape", "for": "yuan_gong"},
+	# Part XXII: green bamboo that cracks in the fire, and a king's jade slip ground smooth
+	"crackle_bamboo": {"at": "alchemist", "in": {"ess_earth": 8, "ess_water": 6, "salt_bag": 1}, "stones": 260000, "after": "s_p22_xiao", "for": "shanxiao"},
+	"blank_slip": {"at": "smith", "in": {"ess_earth": 8, "ess_fire": 6, "merit_slip": 1}, "stones": 270000, "after": "s_p22_yue", "for": "dongyue"},
 	"mated_scabbard": {"at": "smith", "in": {"ess_water": 8, "ess_metal": 6, "old_hilt": 1}, "stones": 250000, "after": "s_p21_dragons", "for": "sword_dragons"},
 	"wooden_cock": {"at": "smith", "in": {"ess_wood": 8, "ess_fire": 6, "challenge_tally": 1}, "stones": 250000, "after": "s_p21_zhao", "for": "king_zhao"},
 	"pine_torch": {"at": "smith", "in": {"ess_fire": 6, "ess_wood": 6, "cave_rubbing": 1}, "stones": 240000, "after": "s_p20_shades", "for": "wangliang"},
@@ -1133,6 +1138,59 @@ const TRIALS := {
 				"desc": "Late Hollow Vessel and a sword tempered eight times. It asked what a hand does. One answer is: this. It is the answer it expects, and the only one that will teach it nothing it does not know.",
 				"line": "Lin Feng draws the jian. Four thousand blades turn their points to him, pleased."},
 		]},
+	# ---- Part XXII: The High Roads
+	"shanxiao": {"might": [2.4, 1.3],
+		"why": "It has one leg, the wrong number of fingers and nobody to talk to, and it has learned that people come when they are called by name. It has carried off every bag of salt on the south road and every voice it has overheard, and three woodcutters have gone up into the cloud after it. It is faster on one foot than a man on two, and afraid of exactly one thing.",
+		"paths": [
+			{"id": "heights", "kind": "heights", "n": "Somebody who came up the same way", "needs": [["summits", 2]], "boon": {"foe_hp": 0.7, "weak_k": 1.9},
+				"desc": "Two summits stood on. It has watched people fly over its mountain all its life and never once seen one arrive at the top on his hands, out of breath, as it does. A thing that is met on its own ground by its own road stops to look.",
+				"line": "Lin Feng comes over the edge of the height on his hands, breathing hard, and the shanxiao, which has only ever been looked down on, sits back on its one heel to stare."},
+			{"id": "craft", "kind": "craft", "n": "Green bamboo on the fire", "needs": [["item", "crackle_bamboo", 1]], "boon": {"foe_hp": 0.75, "no_heavy": true},
+				"desc": "Alchemist Mo can pack three joints of green bamboo so that they crack in a fire like a string of thunder, as the grandmothers burned them at the New Year. It does the creature no harm. It only cannot bear to be startled, and a thief with its hands over its ears strikes no heavy blow.",
+				"line": "Lin Feng lays three green joints on the embers. At the first crack the shanxiao claps both hands to its head and forgets every voice it owns."},
+			{"id": "might", "kind": "might", "n": "Quicker than one foot", "needs": [["lv", 78], ["temper", 8]], "boon": {},
+				"desc": "Early Sheathed Edge and a sword tempered eight times. It hops faster than a horse runs, uphill, and throws salt. Nobody has caught one since the books were written. It can be done; it will not make it any less lonely.",
+				"line": "Lin Feng draws. The shanxiao says, in his own voice, a little out: Lin Feng draws."},
+		]},
+	"fei_lian": {"might": [2.5, 1.3],
+		"why": "The Earl of the Wind blew for Chiyou at Zhuolu and has carried every sail, seed and banner since, and in all that time nobody has asked. This spring there are paper swallows all over his sky, and now grown men hanging underneath. He has drawn his bag shut on every breath from the mountain to the sea, and come to see who is falling through his air without leave.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "His own knot, handed back", "needs": [["item", "wind_knot", 1]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "One of his own cords, with the three knots still in it. Any sailor would undo the first for a breeze. Hand it back to him tied, all three, and he will know that somebody could have taken his wind and did not: it is the nearest thing to being asked that he has had.",
+				"line": "Lin Feng holds out a cord of grey silk with three knots in it, untouched. The Earl of the Wind lowers his head to look, and the gale he had been drawing in goes out of him as a sigh."},
+			{"id": "heights", "kind": "heights", "n": "One who climbed to the edge", "needs": [["summits", 3]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Three summits stood on. He despises whatever wants to get somewhere. Somebody who has gone up three mountains by his hands to stand on the top and come down again has plainly not been trying to get anywhere at all.",
+				"line": "Fei Lian snuffs at Lin Feng's hands: rock-dust, three mountains of it. Whatever this one wants, it is not to be somewhere else."},
+			{"id": "might", "kind": "might", "n": "Against the wind", "needs": [["lv", 79], ["temper", 8]], "boon": {},
+				"desc": "Middle Sheathed Edge and a sword tempered eight times: weight enough to stand in what took the roofs off Zhuolu. The Yellow Emperor needed a goddess of drought to do it.",
+				"line": "Lin Feng sets his feet. The Earl of the Wind undoes the second knot."},
+		]},
+	"shan_gui": {"might": [2.5, 1.3],
+		"why": "She came late to the top of the mountain, and the one she came to meet was not there, and she has never known whether he had been and gone or had not come. So she keeps every summit in the land in cloud, that nobody may arrive at any of them: for if nobody can, he has not arrived without her. Her leopards lie across the paths.",
+		"paths": [
+			{"id": "heights", "kind": "heights", "n": "The paths he did not come by", "needs": [["summits", 4]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Four summits stood on. She does not know which top he meant. Somebody who has stood on four of them, and can tell her truthfully that he was on none, has done for her what she has not been able to do for herself in a thousand years: looked.",
+				"line": "Lin Feng tells her the four tops he has stood on, by name, and who was on each. She listens to every one as to a door opening on an empty room."},
+			{"id": "heart", "kind": "heart", "n": "One who was waited for", "needs": [["heart", 3]], "boon": {"assist": 0.04, "foe_atk": 0.85},
+				"desc": "Yue Ling a companion of the heart. She slept in a lotus for three hundred years and somebody did come. She will not tell the Mountain Spirit that he is coming; she will stand beside her, facing down the path, and say what it was like on the day the waiting stopped.",
+				"line": "Yue Ling goes and stands beside her, shoulder to shoulder, facing down the path, and says nothing at all for a long time. The red leopard, after a while, lies down across both their feet."},
+			{"id": "might", "kind": "might", "n": "Through the cloud", "needs": [["lv", 79], ["temper", 8]], "boon": {},
+				"desc": "Middle Sheathed Edge and a sword tempered eight times: enough to part a cloud that a goddess has held together with her two hands for a thousand years. It will be parted. She will see the path. Nobody will be on it.",
+				"line": "Lin Feng draws. The cloud comes down to the height of his knees and stays there."},
+		]},
+	"dongyue": {"might": [2.6, 1.3],
+		"why": "Seventy-two kings climbed him to tell Heaven they had succeeded, and he received every one; after the kings the prefects, and after the prefects anybody with a chisel. He is the mountain and cannot go home. Nine days of a goddess's cloud kept everybody off him, and he was glad of it. Now he means to put a lid of stone on his own top.",
+		"paths": [
+			{"id": "heights", "kind": "heights", "n": "Nine tops, and nothing to report", "needs": [["summits", 9]], "boon": {"foe_hp": 0.7, "weak_k": 1.9},
+				"desc": "Nine summits stood on. Everybody who has ever reached his desk has told him what they had done. Somebody who has stood on nine mountains this spring, and has put a stone on each and written his name on none, is a thing he has no form to fill in for.",
+				"line": "The Lord of the Eastern Peak asks what Lin Feng has to report. Nine summits, says Yue Ling, for him. And what did he leave on them? A stone. The great brush stops over the register, and does not come down."},
+			{"id": "craft", "kind": "craft", "n": "A slip with nothing on it", "needs": [["item", "blank_slip", 1]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Smith Tie can grind one of the old kings' jade slips smooth again, until not a stroke of the report is left. Hand it in at the desk like any other. In two thousand years he has received every kind of announcement but this one.",
+				"line": "Lin Feng lays a jade slip on the stone desk. The Lord of the Eastern Peak turns it over, and over again. There is nothing on it. He reads it twice."},
+			{"id": "might", "kind": "might", "n": "Move the mountain", "needs": [["lv", 80], ["temper", 8]], "boon": {},
+				"desc": "Late Sheathed Edge and a sword tempered eight times. Yu Gong meant to move two mountains with a basket, and Heaven sent giants to do it for him. This is the eldest of the five, and there are no giants.",
+				"line": "Lin Feng draws. The Lord of the Eastern Peak writes it down."},
+		]},
 	# ---- Part XVIII (the New Fire release): the Lord of the Southern Fire, and the fire nobody sat up with
 	"zhurong": {"might": [2.3, 1.3],
 		"why": "Zhurong has opened every summer for ten thousand years by giving the land new fire from Suiren's drill, to hearths put out to receive it. Lin Feng has come with six that would not be put out, and asks him to bless the pot.",
@@ -1283,6 +1341,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"arms":
 			# the Hundred Arms release: Daos of arms learned to Adept (arms.gd)
 			return Arms.adept(g) >= int(n[1])
+		"summits":
+			# the High Roads release: summits stood on (peaks.gd)
+			return g.summits.size() >= int(n[1])
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1358,6 +1419,8 @@ static func need_text(n: Array, g) -> String:
 			return "%d caves gone to the very back of (now %d; a cave mouth stands in almost every region)" % [int(n[1]), g.delved.size()]
 		"arms":
 			return "%d Daos of arms learned to Adept (now %d: win battles with a weapon in hand; Esc > Arms)" % [int(n[1]), Arms.adept(g)]
+		"summits":
+			return "%d summits stood on (now %d; every region has peaks, marked on the map)" % [int(n[1]), g.summits.size()]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1457,7 +1520,8 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	# (the roads added since had none, and the ending's title read a key that was not there: a player who
 	# went through most trials side by side or by the people had a script error for a title)
 	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire",
-	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave", "arms": "Whose Hand Is Open"}
+	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave", "arms": "Whose Hand Is Open",
+	"heights": "Who Stood on the Tops"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

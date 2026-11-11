@@ -319,6 +319,13 @@ static func populate(root: Node3D, grid: PackedByteArray, w: int, hh: int, hm: P
 						MapGen.WALL:
 							_wall_tile(layers, tx, ty, wall_d[i], gx, theme_name, canopy, under, rocks, groves, land, karst, rocky)
 						MapGen.FLOOR:
+							# the High Roads (peaks.gd): a crag has no meadow on it, only what clings there
+							var hi0 := i + ty
+							var c_lo := minf(minf(hm[hi0], hm[hi0 + 1]), minf(hm[hi0 + w + 1], hm[hi0 + w + 2]))
+							var c_hi := maxf(maxf(hm[hi0], hm[hi0 + 1]), maxf(hm[hi0 + w + 1], hm[hi0 + w + 2]))
+							if c_hi - c_lo > 1.15:
+								_crag_tile(layers, tx, ty, gx, theme_name, canopy, rocks, groves, c_hi - c_lo)
+								continue
 							_floor_tile(layers, tx, ty, open_d[i], water_d[i], path_d[i], gx, theme_name, under, ground, rocks, groves, meadow, rocky, grass_k, cover, rock_p, logs, real_grass, tuft_kind)
 						MapGen.DECOR:
 							var dp := Terrain3D._proto("decor:" + theme_name, theme_name)
@@ -496,6 +503,17 @@ static func _floor_tile(layers: Dictionary, tx: int, ty: int, to_wall: int, to_w
 		elif h(tx, ty, 110.0) < 0.05 and theme_name not in ["celestial", "court", "palace"]:
 			var pv := int(h(tx, ty, 111.0) * Rocks.VARIANTS)
 			_add(layers, "rock:pebbles#%d" % pv, func(): return Rocks.mesh("pebbles", pv, theme_name), _xf(gx.call(h(tx, ty, 112.0), h(tx, ty, 113.0)), h(tx, ty, 114.0) * TAU, 1.0), _tint(tx, ty, 115.0, 0.2), false, 40.0)
+
+## A tile of a mountain's flank: bare rock, with a boulder lodged on it now and then and, where the
+## slope allows, one of the region's own trees holding on (smaller the steeper it stands).
+static func _crag_tile(layers: Dictionary, tx: int, ty: int, gx: Callable, theme_name: String, canopy: Array, rocks: Array, groves: Array, drop: float) -> void:
+	var r := h(tx, ty, 131.0)
+	if r < 0.1 and not rocks.is_empty():
+		var rv := int(h(tx, ty, 132.0) * Rocks.VARIANTS)
+		_add(layers, "rock:boulder#%d" % rv, func(): return Rocks.mesh("boulder", rv, theme_name), _xf(gx.call(h(tx, ty, 133.0), h(tx, ty, 134.0)) - Vector3(0, 0.25, 0), h(tx, ty, 135.0) * TAU, 0.45 + h(tx, ty, 136.0) * 0.7), _tint(tx, ty, 137.0, 0.15), true, 90.0)
+	elif r < 0.17 and drop < 3.2 and not canopy.is_empty():
+		var sp := pick(canopy, groves, tx, ty, h(tx, ty, 138.0))
+		_tree(layers, sp, tx, ty, 139.0, gx.call(0.2 + h(tx, ty, 140.0) * 0.6, 0.2 + h(tx, ty, 141.0) * 0.6) - Vector3(0, 0.2, 0), 0.45 + h(tx, ty, 142.0) * 0.3)
 
 static func _grass_at(layers: Dictionary, tx: int, ty: int, gx: Callable, theme_name: String, count: int, scale: float) -> void:
 	for k in count:

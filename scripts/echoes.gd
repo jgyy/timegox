@@ -128,6 +128,11 @@ const CROSSROADS := {
 			"sell": [["Narrator", "The collector weighs it in both hands, holds it to a candle, and counts out four hundred stones without a word. He has a shelf of such things. None of them tick."], ["Yue Ling", "...It was warm, Lin Feng."]],
 		},
 		"echo": {
+			"s_p22_lie": {
+				"hatch": [["Master Lie, Who Rode the Wind", "There is a young roc over this valley most mornings, hatched by somebody's patience, the horse-folk say. It has been walking, this week. Walking! It looks at the sky the way I do."]],
+				"leave": [["Master Lie, Who Rode the Wind", "There was an egg on this height once that somebody had the sense to leave alone. It hatched by itself and the bird is grown. It sits on the far rim now with its wings shut, waiting, as I am."]],
+				"sell": [["Master Lie, Who Rode the Wind", "They tell me a roc's egg from this valley went to a collector. A pity. I should have liked a bird to ask. A bird would know where the wind had gone, and would not have had to be told why."]],
+			},
 			"s_p18_sarnai": {
 				"hatch": [["Grandmother Sarnai", "And you are the one who brought us the storm-chick. It sits on the smoke-ring of Batu's tent and eats a sheep a month. The children ride it when they think I am not looking. I am always looking."]],
 				"leave": [["Grandmother Sarnai", "There is a young roc in the valley again. It hatched by itself in a storm, the herders say, and was raised by nobody. It takes a foal now and then. We do not grudge it. It was here first."]],
@@ -557,6 +562,11 @@ const CROSSROADS := {
 			"leave": [["Yu Gong, the Foolish Old Man", "Put them down. Put the baskets down. ...I never thought to hear myself say it. It is very quiet, is it not, with nobody walking. I shall have to have the gatepost recarved. I do not know what to. Give me a day or two."]],
 		},
 		"echo": {
+			"s_p22_xie": {
+				"road": [["Duke Xie of the Toothed Clogs", "You are the one who had a road cut through Yu Gong's mountains instead of moving them! I walked it in the autumn. A good road. It goes round the things worth looking at, which is more than mine do."]],
+				"dig": [["Duke Xie of the Toothed Clogs", "You are the one who let the old man go on digging. I have seen his two mountains; they are a hand lower than they were. I thought: there is somebody who understands that a hill is only a thing in the way."]],
+				"leave": [["Duke Xie of the Toothed Clogs", "You are the one who had Yu Gong's mountains left where they stood. I ought to have expected trouble from you. ...No, no. Sit down. A man with three hundred axes should talk to one like you at least once."]],
+			},
 			"s_p20_gong2": {
 				"road": [["Yu Gong, the Foolish Old Man", "The heading is forty paces in already. We found two more rooms and went round both, and my eldest knocked first each time. He says it is manners. I say it is sense. We are both pleased."]],
 				"dig": [["Yu Gong, the Foolish Old Man", "The first baskets will be at the sea by midsummer. It is slow. It was always meant to be slow; that was the part the story was about, and I was the one who forgot it."]],
@@ -584,6 +594,11 @@ const CROSSROADS := {
 			"write": [["Xu Xiake the Traveller", "All of them? Ten thousand? ...I have paper for four hundred. Fisherman! Have you a boy who can run to Longmen for paper? And ink. And a lamp. And tell my wife, if anyone is going as far as Jiangyin, that it will be the spring after next."]],
 		},
 		"echo": {
+			"s_p22_ziqi": {
+				"home": [["Zhong Ziqi the Woodcutter", "You sent the ten thousand echoes home, they say, each to its own mouth. Then these are new ones. I thought so; they have no dust on them. Somebody is collecting again who has not heard it was settled."]],
+				"keep": [["Zhong Ziqi the Woodcutter", "You left the ten thousand echoes in their cave, they say, to be visited. Then this is something that could not find the cave. It is keeping what it hears on a hillside, in the rain, with no roof."]],
+				"write": [["Zhong Ziqi the Woodcutter", "You had the ten thousand echoes written down, they say. I cannot read. But I have wondered since whether a voice in a book still knows whose it was. These up the slope do not."]],
+			},
 			"done:s_p20_delve": {
 				"home": [["Xu Xiake the Traveller", "It echoes again, the big one. I went back to hear. You shout your name and it gives you your name, an afternoon long, and nothing else. I had not known how much I wanted that."]],
 				"keep": [["Xu Xiake the Traveller", "The karst folk have put a rope across the big mouth with red rags on it, and they take their hats off going past. It is the best-kept cave in the land now, and nobody goes into it at all. I am trying to decide how I feel."]],
@@ -723,6 +738,12 @@ const CROSSROADS := {
 			"bury": [["Gravekeeper Mu Gu", "Four thousand. I have a chisel and a good eye and perhaps thirty years. I shall not finish. But I shall name one a day, and say it aloud, and the apprentice I have not got yet can do the rest. You have given me a reason to find one."]],
 		},
 		"echo": {
+			"s_p22_home": {
+				"melt": [["Elder Qing Xuan", "The ploughs you had made of all those blades are in the ground by now, and the valley sown. A good spring for the roads to shut, with every hand wanted in a field. Nobody has had time to be frightened."]],
+				"rack": [["Elder Qing Xuan", "Every hearth has its one rack now, and its keeper. The keeper at Cloudfoot tells me nobody has asked for so much as a spear. Whatever is on the mountain, the people of the road do not think it is a thing one takes a spear to."]],
+				"school": [["Elder Qing Xuan", "Your school has nineteen pupils and eleven brooms. They swept the upper road yesterday as far as the cloud, came out below where they went in, and swept it again. I have told them it is good practice."]],
+				"bury": [["Elder Qing Xuan", "The barrow is closed and the grass is on it. Four thousand edges under the ground, and now the tops of the mountains gone into the sky. The land is putting a good deal away this year."]],
+			},
 			"done:s_p21_racks": {
 				"melt": [["Narrator", "The three blades go into Granny Wen's handcart, to be taken to Tushan with the rest. One farmer asks if his might come back as a hoe. He is told it will come back as whatever the valley is short of, and he says: then a hoe."]],
 				"rack": [["Narrator", "One of the three is hung on the new rack by the well, with Granny Wen's name cut beside it. The other two go in the cart for the fire. The farmer whose blade was kept looks rather proud, and is told to stop."]],
@@ -744,10 +765,122 @@ const CROSSROADS := {
 		},
 		"end": {"melt": "The unasked blades of the land were melted, and the first of them is a bell at Tushan.", "rack": "Every hearth has one rack for its arms, in the open, and the name beside it is never a young man's.",
 			"school": "There is a school of arms below the kitchen of the Azure Cloud Sect, where the broom is learned first.", "bury": "Gravekeeper Mu Gu names one unmade sword a day and buries it, and has taken an apprentice."}},
+	# ---- Part XXII: The High Roads.  What a voice, the air and the top of a mountain are for.
+	"the_voices": {"step": "s_p22_xiao", "part": "XXII", "n": "The thief of voices",
+		"ask": "The shanxiao sits in its ring of salt with a pedlar's bell in both hands, and at the foot of the height the woodcutters of the south road have come up with torches to see what has been calling them. It is afraid of them, and they of it. Zhong Ziqi, who hears what is meant, says he heard only that it is lonely, and that this is not his to settle. What is done with it?",
+		"options": [
+			{"id": "fire", "label": "A place at the camp fires", "tilt": {"heart": 3, "reach": 1}, "gain": {"renown": 4},
+				"desc": "It stole salt because salt is what a fire has that a mountain has not. Give it a place at the fires of the road: a pinch left out on a flat stone, nobody to laugh at its foot, and its own cracked voice to use. A thing that is spoken to has less need to borrow (renown).",
+				"log": "Asked the camps of the road to leave salt out for the shanxiao, and a place by the fire."},
+			{"id": "bamboo", "label": "Green bamboo at every fire, as it always was", "tilt": {"craft": -3, "reach": -1}, "gain": {"items": {"ess_earth": 3, "ess_wood": 3}},
+				"desc": "The grandmothers knew what to do. Three joints of green bamboo on every fire at dusk, to crack and keep it up its mountain; and it keeps its height, its salt and its bell, and nobody goes up there. It is the old bargain, and nobody was ever hurt by it (essences).",
+				"log": "Had green bamboo burned at every camp, as the grandmothers did, and left the shanxiao its height."},
+			{"id": "drive", "label": "Over the ridge with it, and the voices given back", "tilt": {"heart": -3}, "gain": {"stones": 400},
+				"desc": "Three men went up into the cloud after their mothers' voices. A thing that does that, whatever it meant by it, does not stay on a road with children on it. The cutters have torches. Let it go over the ridge to where there are no fires to come to (spirit stones, from the camps).",
+				"log": "Had the shanxiao driven over the ridge by torchlight."},
+		],
+		"after": {
+			"fire": [["Zhong Ziqi the Woodcutter", "A place by the fire. Then it wants a name, and not one of ours. ...It says: Bell. Very well. Bell, this is the salt. That is the fire. You sit on that side of it, and nobody laughs. High mountains, Bell."]],
+			"bamboo": [["Zhong Ziqi the Woodcutter", "Green bamboo. My grandmother will be pleased, wherever she is; she always said the young cutters had grown careless. He will hear it crack and know the road is shut to him, and I shall hear him know it. That is mine to carry. Go on."]],
+			"drive": [["Zhong Ziqi the Woodcutter", "Over the ridge. ...I heard what it called as it went. It called my name, the way my mother never did. It had practised. I shall not tell the others that. Take your stones, cultivator. The road is safe."]],
+		},
+		"echo": {
+			"done:s_p22_hermits": {
+				"fire": [["Yue Ling", "The second hermit had a bell hung on his cairn. He says something small with one leg brought it up last week, set it down, said, quite clearly, in nobody's voice at all, for the top, and went away again on its hands and its foot."]],
+				"bamboo": [["Yue Ling", "The second hermit hears bamboo cracking at every camp below him at dusk. He says it is a comfortable sound, like a village. He also says something sits on its own height across the valley and listens to it, every evening, until the last fire is out."]],
+				"drive": [["Yue Ling", "The second hermit asked what the torches were for, the other night. I told him. He said nothing for a while. Then he said a mountain with nothing on it that calls your name is a quieter mountain, and went back to looking."]],
+			},
+			"s_p22_xie2": {
+				"fire": [["Duke Xie of the Toothed Clogs", "And my axemen have a one-legged cook's boy who seasons everything twice. They would not part with him. He answers to Bell and has not borrowed a voice since."]],
+				"bamboo": [["Duke Xie of the Toothed Clogs", "And my axemen burn bamboo at dusk like their grandmothers and sleep like their grandfathers. I have written a poem about the sound. It is not good, but it is accurate."]],
+				"drive": [["Duke Xie of the Toothed Clogs", "And my axemen sleep sound, and nobody calls them. One of them told me he misses it. His wife's voice, a little out. He said it was better than nothing. I did not put that in a poem."]],
+			},
+		},
+		"end": {
+			"fire": "There is a flat stone by every fire on the south road with a pinch of salt on it, and no woodcutter under fifty can tell you why. The wood comes down from the heights by itself.",
+			"bamboo": "Bamboo cracks at dusk at every camp of the south road, as it did in the grandmothers' time, and on its own height something keeps a bell and a wall of salt and comes no nearer.",
+			"drive": "Nothing calls anybody by name in the Mulberry Silk Woods now. The cutters say the nights are longer for it.",
+		}},
+	"the_kites": {"step": "s_p22_lian", "part": "XXII", "n": "Whose the air is",
+		"ask": "The Earl of the Wind stands with his bag open, and every kite in Thunder Valley is up. He has been in the air since before there were hands to make string, and nobody has ever once asked him whether they might. Master Lie says he asked, and took silence for yes, and is no longer sure that was honest. The horse-folk's children are waiting below with their reels to hear what you say. Whose is the air?",
+		"options": [
+			{"id": "ask", "label": "His. Ask first, every time", "tilt": {"craft": -2, "heart": 1}, "gain": {"items": {"ess_thunder": 4}},
+				"desc": "A pinch of incense and a word to the Earl before any kite goes up, as a fisherman speaks to the river: may I. It costs nothing, and it is true. He was here first. Some days he will say no, and on those days nobody flies (essences, of his own giving).",
+				"log": "Asked that nobody fly without first asking the Earl of the Wind."},
+			{"id": "free", "label": "Nobody's. Let whoever can, fly", "tilt": {"reach": 3, "craft": 1}, "gain": {"renown": 4},
+				"desc": "Wind goes; he said so himself. A thing that only goes cannot be owned, even by an earl. Let every child and pedlar in the land hang a swallow in it, and let Duke Xie's three hundred carry the pattern to every valley they cut a road to (renown).",
+				"log": "Said the air is nobody's, and had the pattern of the cloud-kite carried to every valley."},
+			{"id": "climbers", "label": "Theirs who climbed to it", "tilt": {"reach": -2, "craft": 1}, "gain": {"stones": 500},
+				"desc": "A kite flown from a field is a toy on a string. A kite opened on a top you reached with your hands is the way down from something. Let the Earl bear up those who have come as far as they can by themselves, and nobody else; it is what he liked in Master Lie (spirit stones, from the horse-folk).",
+				"log": "Asked the Earl of the Wind to bear up only those who had climbed to where they leapt from."},
+		],
+		"after": {
+			"ask": [["Fei Lian, Earl of the Wind", "Asked. Hm. Asked! Every time? ...I shall say no on the fifth day of every month, on principle, and when I am out of temper. The rest of the time: yes. You may tell the small ones yes. Do not tell them I smiled. I am an earl."]],
+			"free": [["Fei Lian, Earl of the Wind", "Nobody's. I said that. I said wind GOES, and you have hung my own word round my neck like the bag. ...Very well. I blew for Chiyou and lost; I can lose to a sweeper. Tell them to make the tails longer. A swallow with a short tail is an insult to both of us."]],
+			"climbers": [["Fei Lian, Earl of the Wind", "Those who have climbed. Yes. YES. They arrive at the edge with nothing left, and step off, and want nothing but not to fall. That I can carry all day. That weighs what Master Lie weighed. The ones in the fields may keep their string."]],
+		},
+		"echo": {
+			"done:s_p22_down": {
+				"ask": [["Han Yu, Who Cannot Get Down", "You spoke to the air before we left the rock. I heard you: may I. Sir, in thirty years at court I never once heard a man ask leave of anything he was strong enough to take. I shall put that in too."]],
+				"free": [["Han Yu, Who Cannot Get Down", "There are two children down there with kites exactly like yours. One of them waved. I waved back, sir. I have not waved at anybody since I passed the examinations."]],
+				"climbers": [["Han Yu, Who Cannot Get Down", "I did not climb for this, you understand; I climbed to see a view. I hope the gentleman who owns the wind will overlook it. He seems to be overlooking it. I shall not look down to check."]],
+			},
+			"done:s_p22_long": {
+				"ask": [["Narrator", "On the way down something keeps pace alongside for a moment, at the edge of sight: a stag's flank, a leopard's spots. It had been asked. It seems to have wished to see what it had said yes to."]],
+				"free": [["Narrator", "On the way down Lin Feng passes, well below him and to the left, a pedlar under a patched swallow with his whole street on his back, going the other way and singing."]],
+				"climbers": [["Narrator", "The air under the kite is different from this height: firmer, like a hand. Nobody is flying from the fields today. Whoever is up, is up from somewhere."]],
+			},
+		},
+		"end": {
+			"ask": "Nobody in the land opens a kite without a word to the Earl first, and on the fifth of the month nobody opens one at all. The children say he is a grumpy old thing. They say it fondly.",
+			"free": "There is a paper swallow in every sky from the sand to the sea, and a pedlar can cross three valleys in a morning. The Earl of the Wind has been heard to complain about the tails.",
+			"climbers": "A kite is opened only from somewhere one has climbed to. There are fewer in the sky, and every one of them is on its way down from something.",
+		}},
+	"the_tops": {"step": "s_p22_yue", "part": "XXII", "n": "What a summit is for",
+		"ask": "It is dawn on Sun-Viewing Peak. The Lord of the Eastern Peak has watched the sun come up for the first time since the first king stood in front of it, and the steles have stopped on the eighteen bends, and below them Duke Xie's three hundred are leaning on their axes with every pilgrim, hermit and woodcutter of the road behind them, looking up. The Lord says he is the mountain and cannot go home; let somebody who can come down again say it. What is the top of a mountain for?",
+		"options": [
+			{"id": "cairn", "label": "A stone on the cairn, and no name on it", "tilt": {"heart": 2, "craft": -2}, "gain": {"renown": 5},
+				"desc": "Anybody may come up, on their hands, and put one stone on the heap, and say nothing, and go down. The steles go back to the foot, where a name belongs: among the people who knew whose it was. It is how the tops were kept before there were kings (renown).",
+				"log": "Said that a summit is for a stone on the cairn with no name on it, and had the steles taken back down."},
+			{"id": "steps", "label": "Duke Xie's nine thousand steps", "tilt": {"craft": 3, "reach": 2}, "gain": {"stones": 800},
+				"desc": "The old, the lame and the six-year-old have as much right to a sunrise as a cultivator. Cut the steps, hang the chain, and let everybody arrive. The Lord will have more company than he likes; but nobody who has been carried up a mountain on his own two feet ever came to boast (spirit stones, from the pilgrims' purse).",
+				"log": "Said that a summit is for whoever can be got to it, and let Duke Xie cut his nine thousand steps."},
+			{"id": "shut", "label": "For the mountain. Nobody, unless sent for", "tilt": {"heart": -3, "reach": -1}, "gain": {"items": {"ess_earth": 4, "ess_wood": 4}},
+				"desc": "He has received for two thousand years, and was glad of nine days' cloud. Let him have his top. Put a gate at the last bend, and let the Lord of the Eastern Peak open it to whom he pleases, when he pleases. It is orderly, and it is quiet, and it is entirely fair (essences, from his own slopes).",
+				"log": "Said that a summit is the mountain's own, and had a gate put at the last bend."},
+		],
+		"after": {
+			"cairn": [["The Lord of the Eastern Peak", "A stone. No name. And they say nothing? Not even: I have succeeded? ...I shall be able to hear the wind. I had forgotten there was one up here. Take the prefect's bridge down first. It offends me most."]],
+			"steps": [["The Lord of the Eastern Peak", "Nine thousand. With a chain. So I am to be a staircase. ...A six-year-old, you say. Who has not succeeded at anything. Hm. Those I never received. Not one. Send the small ones up first, then, before I change my mind."]],
+			"shut": [["The Lord of the Eastern Peak", "A gate. Mine to open. ...I ought to thank you. I do thank you. It is only that I find I had rather expected you to argue. Go down, sweeper. I shall send for you. Probably I shall send for you."]],
+		},
+		"echo": {
+			"done:s_p22_pilgrims": {
+				"cairn": [["Yue Ling", "The oldest of them has a stone in her sleeve from her own doorstep. She has carried it four hundred li. She says she was always going to leave it up there, and is glad it will not have to stand next to a prefect."]],
+				"steps": [["Yue Ling", "The oldest of them cannot climb any more; her knees. She has been coming to the foot for six years to look up. I told her about the steps. She did not say anything. She began, quite slowly, to put her shoes on."]],
+				"shut": [["Yue Ling", "The oldest of them took it very well. She said she had never needed the top, only the going. But she looked up at it for some time after, the way one looks at a door one has always been able to walk through."]],
+			},
+			"s_p22_end": {
+				"cairn": [["Elder Qing Xuan", "And nothing on the top but stones nobody signed. Qing Lian would have approved. She never put her name on anything she built; I had to find out which caves were hers by the draught."]],
+				"steps": [["Elder Qing Xuan", "And nine thousand steps going up Sun-Viewing Peak. I hope the Duke knows who is going to be asked to sweep them. ...No. I shall send novices. You have swept enough."]],
+				"shut": [["Elder Qing Xuan", "And a gate on the great peak. Well. He is an old thing and has earned his quiet. But I notice, Lin Feng, that you gave a mountain what you would not have taken for yourself."]],
+			},
+			"post:s_break27": {
+				"cairn": [["Narrator", "On the cairn of the Lookout, that evening, there is one stone more. It has no broom scratched on it. It has nothing scratched on it at all."]],
+				"steps": [["Narrator", "From the fork of the pine he can see them already, a pale line going up the great peak: the first three hundred steps, and on the lowest a very small figure sitting down to rest."]],
+				"shut": [["Narrator", "From the fork of the pine the great peak is very clean against the evening, with nobody on it. A light is lit at the top, behind the new gate: one lamp, for one desk."]],
+			},
+		},
+		"end": {
+			"cairn": "The steles stand at the foot of Sun-Viewing Peak, where their owners' grandchildren can read them. On the top there is a heap of stones, a little higher every year, and nobody has ever said a word beside it.",
+			"steps": "Nine thousand steps go up Sun-Viewing Peak, with a chain, and at dawn there are grandmothers on the top, and children asleep on their fathers' backs. The Lord of the Eastern Peak is said to receive the six-year-olds in person.",
+			"shut": "There is a gate at the last of the eighteen bends, and it is not often opened. The Lord of the Eastern Peak watches the sun rise alone, and has let it be known that he is entirely content.",
+		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
 	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow",
-	"the_pupils", "the_three_thousand", "the_arms"]
+	"the_pupils", "the_three_thousand", "the_arms",
+	"the_voices", "the_kites", "the_tops"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

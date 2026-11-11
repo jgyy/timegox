@@ -356,3 +356,58 @@ static func held(what: String) -> Node3D:
 	var root := Node3D.new()
 	MB.mesh_node(root, b.build(MB.mat_vc())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return root
+
+## The High Roads release (folk.gd): a camp of the people of the road, out in the land at the foot of
+## a mountain.  A fire in a ring of stones (the campfire of props.gd, so its flames move like any
+## other's), two logs to sit on, a lean-to of poles and oiled cloth with bedrolls under it, a pedlar's
+## pole of boxes stood against a post, a stack of cut wood, and a light for the night.
+static func camp(seed_: int) -> Node3D:
+	var root := Node3D.new()
+	root.name = "camp"
+	var fire := Props.model("campfire", "")
+	fire.scale = Vector3.ONE * 1.3
+	root.add_child(fire)
+	var b := MB.new()
+	var wood := MB.tag(Color("5a4030"), MB.WOOD)
+	var cloth := Color("8a6a48").lerp(Color("5a7a8a"), Terrain3D.hash2(seed_, 3, 1.0))
+	# the lean-to: two forked poles, a ridge, a sloping sheet down to the ground behind
+	var back := Vector3(0, 0, -4.2)
+	for sx in [-1.5, 1.5]:
+		b.limb(back + Vector3(sx, 0, 1.2), back + Vector3(sx, 1.75, 1.2), 0.05, 0.04, wood, 6)
+		b.limb(back + Vector3(sx, 1.72, 1.2), back + Vector3(sx, 0.0, -0.9), 0.035, 0.03, wood, 5)
+	b.limb(back + Vector3(-1.7, 1.75, 1.2), back + Vector3(1.7, 1.75, 1.2), 0.04, 0.04, wood, 6)
+	b.quad4(back + Vector3(-1.6, 1.78, 1.25), back + Vector3(1.6, 1.78, 1.25), back + Vector3(1.6, 0.04, -0.95), back + Vector3(-1.6, 0.04, -0.95), cloth, cloth, cloth.darkened(0.2), cloth.darkened(0.2))
+	b.quad4(back + Vector3(-1.6, 0.03, -0.96), back + Vector3(1.6, 0.03, -0.96), back + Vector3(1.6, 1.77, 1.24), back + Vector3(-1.6, 1.77, 1.24), cloth.darkened(0.3), cloth.darkened(0.3), cloth.darkened(0.15), cloth.darkened(0.15))
+	# bedrolls under it
+	for k in 3:
+		var bx := -1.0 + k * 1.0
+		b.box(back + Vector3(bx, 0.06, 0.25), Vector3(0.7, 0.1, 1.7), MB.tag(Color("b8a888").darkened(k * 0.08), MB.CLOTH))
+		b.limb(back + Vector3(bx - 0.3, 0.17, 0.95), back + Vector3(bx + 0.3, 0.17, 0.95), 0.12, 0.12, MB.tag(Color("7a3a34").lerp(Color("3a5a7a"), k * 0.5), MB.CLOTH), 8)
+	# the stack of cut wood, and the pedlar's pole and boxes
+	for k2 in 7:
+		var ly := 0.1 + float(k2 / 4) * 0.19
+		var lz := -0.9 + float(k2 % 4) * 0.21 + float(k2 / 4) * 0.1
+		b.limb(Vector3(2.85, ly, lz), Vector3(3.95, ly, lz), 0.1, 0.095, MB.tag(Color("6a4a30").darkened(Terrain3D.hash2(seed_, k2, 2.0) * 0.2), MB.WOOD), 6)
+	b.limb(Vector3(-3.3, 0.0, -0.6), Vector3(-3.3, 1.5, -0.6), 0.045, 0.04, wood, 6)
+	b.limb(Vector3(-3.25, 1.35, -1.5), Vector3(-3.25, 1.2, 0.3), 0.025, 0.025, MB.tag(Color("b89a5a"), MB.WOOD), 5)
+	for k3 in 2:
+		var bz := -1.4 + k3 * 1.6
+		b.box(Vector3(-3.25, 0.28, bz), Vector3(0.5, 0.56, 0.5), MB.tag(Color("7a5030"), MB.WOOD))
+		b.box(Vector3(-3.25, 0.58, bz), Vector3(0.54, 0.05, 0.54), MB.tag(Color("a03a2a"), MB.WOOD))
+	# a pot on three sticks beside the fire
+	for k4 in 3:
+		var a := TAU * k4 / 3.0
+		b.limb(Vector3(1.3 + cos(a) * 0.4, 0.0, 0.6 + sin(a) * 0.4), Vector3(1.3, 0.95, 0.6), 0.022, 0.02, wood, 5)
+	b.sph(Vector3(1.3, 0.42, 0.6), Vector3(0.19, 0.16, 0.19), MB.tag(Color("2a2a2e"), MB.METAL))
+	MB.mesh_node(root, b.build(MB.mat_scenery()))
+	var lt := OmniLight3D.new()
+	lt.light_color = Color(1.0, 0.62, 0.3)
+	lt.light_energy = 2.8
+	lt.omni_range = 9.5
+	lt.position = Vector3(0, 0.9, 0)
+	lt.shadow_enabled = false
+	lt.distance_fade_enabled = true
+	lt.distance_fade_begin = 40.0
+	lt.distance_fade_length = 15.0
+	root.add_child(lt)
+	return root

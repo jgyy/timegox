@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 78
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge"]
+const MAX_LEVEL := 81
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -75,6 +75,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Keeper of the Empty Place", "note": "Thirty spokes share one hub: where there is nothing, there is the use of the cart. Clay is shaped into a jar: where there is nothing, there is the use of the jar. You no longer fill what you find. Rooms are quieter where you have been, wells deeper, and people find they have somewhere to put things down."},
 	# Part XXI (the Hundred Arms release): the edge that is kept
 	{"life": 0, "title": "Who Does Not Draw", "note": "Arms are instruments of ill omen, says the old book, and not the tools of the gentleman, who takes them up only when he cannot do otherwise. The best soldier is not soldierly; the best fighter is not angry. Every weapon you carry knows it is carried by somebody who would rather not, and is the sharper for it."},
+	# Part XXII (the High Roads release): what is left to stand on
+	{"life": 0, "title": "Who Leans on Nothing", "note": "Master Lie rode the wind, cool and light, and came back after fifteen days; and still, says the old book, he had something to lean on. One who mounts on what is true of heaven and earth, and rides the changes of the six breaths, leans on nothing. You go up by your hands and come down by the air, and need neither. Paths are a little easier behind you, and nobody who walks them knows why."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -764,6 +766,23 @@ const ENEMIES := {
 	"sword_dragons": {"n": "Gan Jiang and Mo Ye, the Paired Dragons", "elem": "water", "weak": "thunder", "col": Color("5a9ab8"), "shape": "dragon", "boss": true, "pal": {"sec": Color("b84a5a"), "acc": Color("f0f4ff"), "mark": Color("2a3a4a")}},
 	"king_zhao": {"n": "King Wen of Zhao, Who Loved Swords", "elem": "phys", "weak": "wood", "col": Color("6a2a3a"), "shape": "person:king_zhao", "boss": true},
 	"wuzhu": {"n": "Wuzhu, the Masterless Edge", "elem": "phys", "weak": "earth", "col": Color("b0bcd0"), "shape": "person:wuzhu", "boss": true},
+	# ---- Part XXII: The High Roads (the High Roads release): what was on the mountains, and why nobody arrived
+	"salt_thief": {"n": "Salt-Thief", "elem": "earth", "weak": "fire", "col": Color("7a6a4a"), "shape": "ape", "pal": {"sec": Color("4a3a2a"), "acc": Color("f0f0f0")}},
+	"false_echo": {"n": "False Echo", "elem": "dark", "weak": "thunder", "col": Color("8a80a8"), "shape": "wisp", "pal": {"sec": Color("4a4466"), "acc": Color("e0d8ff")}},
+	"fire_crab": {"n": "Night-Fire Crab", "elem": "water", "weak": "thunder", "col": Color("b8583a"), "shape": "crab", "pal": {"sec": Color("6a2a1a"), "acc": Color("ffd080")}},
+	"stray_gust": {"n": "Stray Gust", "elem": "thunder", "weak": "earth", "col": Color("c8dce8"), "shape": "storm", "pal": {"sec": Color("8aa0b4"), "acc": Color("ffffff")}},
+	"kite_hawk": {"n": "Kite-Hawk", "elem": "phys", "weak": "thunder", "col": Color("8a6a4a"), "shape": "bird", "pal": {"sec": Color("e8dcc0"), "acc": Color("c83a2a")}},
+	"wind_bag": {"n": "Leaking Wind-Bag", "elem": "thunder", "weak": "fire", "col": Color("b89a6a"), "shape": "blob", "pal": {"sec": Color("6a5030"), "acc": Color("d8ecf8")}},
+	"red_leopard": {"n": "Red Leopard", "elem": "fire", "weak": "water", "col": Color("c8502a"), "shape": "tiger", "pal": {"sec": Color("3a1a12"), "acc": Color("f0d8a0")}},
+	"fig_creeper": {"n": "Fig-Leaf Creeper", "elem": "wood", "weak": "fire", "col": Color("4a8a4a"), "shape": "plant", "pal": {"sec": Color("2a4a2a"), "acc": Color("a84a6a")}},
+	"rain_gibbon": {"n": "Rain-Calling Gibbon", "elem": "water", "weak": "thunder", "col": Color("5a6a7a"), "shape": "ape", "pal": {"sec": Color("2a323a"), "acc": Color("c8d8e8")}},
+	"merit_stele": {"n": "Stele of Somebody's Merit", "elem": "earth", "weak": "water", "col": Color("9a968a"), "shape": "golem", "pal": {"sec": Color("5a584e"), "acc": Color("c83a2a")}},
+	"report_smoke": {"n": "Smoke of Announcements", "elem": "fire", "weak": "water", "col": Color("b8a890"), "shape": "wraith", "pal": {"sec": Color("6a5a4a"), "acc": Color("ffb060")}},
+	"bends_serpent": {"n": "Serpent of the Eighteen Bends", "elem": "wood", "weak": "fire", "col": Color("6a7a5a"), "shape": "serpent", "pal": {"sec": Color("3a4630"), "acc": Color("d8c080")}},
+	"shanxiao": {"n": "Shanxiao, the One-Legged Thief of Voices", "elem": "earth", "weak": "fire", "col": Color("5a4a3a"), "shape": "ape", "boss": true, "pal": {"sec": Color("2a2018"), "acc": Color("e8e0d0"), "mark": Color("c83a2a")}},
+	"fei_lian": {"n": "Fei Lian, Earl of the Wind", "elem": "thunder", "weak": "earth", "col": Color("d8e4ec"), "shape": "qilin", "boss": true, "pal": {"sec": Color("8aa0b4"), "acc": Color("3a4a5a"), "mark": Color("f0d080")}},
+	"shan_gui": {"n": "The Mountain Spirit, Who Is Still Waiting", "elem": "wood", "weak": "fire", "col": Color("4a7a4a"), "shape": "person:shan_gui", "boss": true},
+	"dongyue": {"n": "The Lord of the Eastern Peak", "elem": "earth", "weak": "wood", "col": Color("8a8a96"), "shape": "person:dongyue", "boss": true},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -902,6 +921,8 @@ const AREAS := {
 		"obstacles": [{"id": "p18_brush1", "what": "brush", "pos": Vector2i(72, 32), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush2", "what": "brush", "pos": Vector2i(75, 35), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush3", "what": "brush", "pos": Vector2i(82, 27), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush4", "what": "brush", "pos": Vector2i(83, 43), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush5", "what": "brush", "pos": Vector2i(89, 34), "vis": ["s_p18_brush", ""]}, {"id": "p18_brush6", "what": "brush", "pos": Vector2i(92, 32), "vis": ["s_p18_brush", ""]}],
 		# Part XVIII: six bonfires run together, and what comes out of them
 		"warband": {"pool": [["wildfire_sprite", 67, 68], ["spark_swallow", 67, 68], ["smoke_hound", 67, 68]], "n": 10, "vis": "s_p18_drill", "late": true},
+		# Part XXII: what came up Sun-Viewing Peak the night the tops were opened
+		"warband2": {"pool": [["merit_stele", 80, 80], ["report_smoke", 80, 80], ["bends_serpent", 80, 80]], "n": 16, "vis": "s_p22_hermits", "late": true},
 		"n": "Azure Cloud Mountain", "w": 180, "h": 160, "seed": 7, "theme": "sect", "enemies": 0, "hill": 2.2,
 		"portals": [],
 		# Part XV: the Warden of the Lock, under the Founder's Last Cave, where the mountain goes down to
@@ -912,7 +933,9 @@ const AREAS := {
 			# Part XIX: the Cloud Ladder, building itself up the mountain above Cloudfoot
 			{"id": "cloud_ladder", "pos": Vector2i(78, 14), "lv": 70, "req": 69, "vis": ["s_p19_mo", ""], "late": true},
 			# Part XX: the Valley Spirit, in the Hollow of the Mountain under Rotten-Axe Cave
-			{"id": "xuanpin", "pos": Vector2i.ZERO, "lv": 74, "req": 74, "vis": ["s_p20_wang", ""], "late": true, "cave": -2, "stand": "deep"}
+			{"id": "xuanpin", "pos": Vector2i.ZERO, "lv": 74, "req": 74, "vis": ["s_p20_wang", ""], "late": true, "cave": -2, "stand": "deep"},
+			# Part XXII: the Lord of the Eastern Peak, at his desk on the very top of Sun-Viewing Peak (peaks.gd stands him there)
+			{"id": "dongyue", "pos": Vector2i.ZERO, "lv": 80, "req": 80, "vis": ["s_p22_slips", ""], "late": true, "peak": 0, "stand": "top"}
 		],
 		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 		# trails that join the mountain's people start just north of the sect's north wall
@@ -934,10 +957,16 @@ const AREAS := {
 			# Part XI: a messenger of the Feathered Folk, come down the Jianmu to see who regrew it
 			{"id": "ling_yu", "n": "Ling Yu of the Feathered Folk", "pos": Vector2i(32, 62), "col": Color("8ac0e8"), "race": "yumin", "vis": ["s_p11_archive", "s_p11_tree"]},
 			# Part XX: in Rotten-Axe Cave (caves.gd stands him at the back of it)
-			{"id": "wang_zhi", "n": "Wang Zhi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("7a5a3a"), "vis": ["s_p20_delve", ""], "late": true, "cave": -1, "stand": "deep"}
+			{"id": "wang_zhi", "n": "Wang Zhi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("7a5a3a"), "vis": ["s_p20_delve", ""], "late": true, "cave": -1, "stand": "deep"},
+			# Part XXII: Duke Xie of the toothed clogs, camped at the foot of Sun-Viewing Peak
+			{"id": "xie_lingyun", "n": "Duke Xie of the Toothed Clogs", "pos": Vector2i.ZERO, "col": Color("3a6a5a"), "vis": ["s_p22_home", ""], "late": true, "peak": 0, "stand": "foot"},
 		],
 		"pickups": [{"id": "cur_leaf3", "item": "autumn_leaf", "pos": Vector2i(74, 26), "floor": ["post_station", 1], "always": true},
-			{"id": "cur_wine2", "item": "peach_wine", "pos": Vector2i(74, 40), "floor": ["tale_teahouse", 1], "always": true}],
+			{"id": "cur_wine2", "item": "peach_wine", "pos": Vector2i(74, 40), "floor": ["tale_teahouse", 1], "always": true},
+			# Part XXII: the jade slips the old kings buried on the way up, on the rock of the two great peaks
+			{"id": "p22_slip1", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p22_slip2", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p22_slip3", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_slip4", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p22_slip5", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 1, "stand": "foot"}],
 		# Part XII: the Founder's nine sealed caves round the sect, each opening only to a cultivator of
 		# the realm carved on its door; inside, her words (DIALOGUE "abode:<id>"), spirit stones and an
 		# awakening of the Nine Heavens root
@@ -1074,6 +1103,8 @@ const AREAS := {
 	"thunder": {
 		# Part XX: the pasture below Thunder Valley, falling into holes
 		"warband": {"pool": [["burrow_marmot", 73, 74], ["sink_toad", 73, 74], ["stone_bat", 73, 74]], "n": 15, "vis": "s_p20_rat", "late": true},
+		# Part XXII: the winds the Earl let loose when he shut the rest in his bag
+		"warband2": {"pool": [["stray_gust", 78, 79], ["kite_hawk", 78, 79], ["wind_bag", 78, 79]], "n": 15, "vis": "s_p22_xiao", "late": true},
 		"n": "Thunder Valley", "w": 90, "h": 50, "seed": 51, "theme": "thunder", "enemies": 15,
 		"pool": [["storm_hawk", 9, 10], ["thunder_ape", 10, 11], ["spark_wisp", 9, 11]],
 		"portals": [
@@ -1086,10 +1117,14 @@ const AREAS := {
 			# Part XVII: Lei Gong, Duke of Thunder, come down to the valley to drum the first thunder of spring
 			{"id": "lei_gong", "n": "Lei Gong, Duke of Thunder", "pos": Vector2i(67, 24), "col": Color("6a8ac0"), "vis": ["s_p17_chains", ""], "late": true},
 			# Part XVIII (cultures.gd): the keeper of the Felt Hearth, in the tents below the valley, and her grandson
-			{"id": "sarnai", "n": "Grandmother Sarnai", "pos": Vector2i(28, 11), "col": Color("8a2a3a"), "late": true}, {"id": "batu", "n": "Batu the Horse-Herd", "pos": Vector2i(38, 8), "col": Color("2a5a9a"), "late": true}
+			{"id": "sarnai", "n": "Grandmother Sarnai", "pos": Vector2i(28, 11), "col": Color("8a2a3a"), "late": true}, {"id": "batu", "n": "Batu the Horse-Herd", "pos": Vector2i(38, 8), "col": Color("2a5a9a"), "late": true},
+			# Part XXII: Master Lie, who rode the wind, on the one height of the valley, waiting for it to come back
+			{"id": "liezi", "n": "Master Lie, Who Rode the Wind", "pos": Vector2i.ZERO, "col": Color("c8d4e0"), "vis": ["s_p22_xiao", ""], "late": true, "peak": 0, "stand": "top"}
 		],
 		"bosses": [
-			{"id": "storm_ape_king", "pos": Vector2i(60, 12), "lv": 10, "req": 10},{"id": "thunder_roc", "pos": Vector2i(78, 25), "lv": 11, "req": 11}],
+			{"id": "storm_ape_king", "pos": Vector2i(60, 12), "lv": 10, "req": 10},{"id": "thunder_roc", "pos": Vector2i(78, 25), "lv": 11, "req": 11},
+			# Part XXII: the Earl of the Wind, come up to see who is in his sky
+			{"id": "fei_lian", "pos": Vector2i.ZERO, "lv": 79, "req": 79, "vis": ["s_p22_flight", ""], "late": true, "peak": 0, "stand": "top"}],
 		"pickups": [
 			{"id": "shard1", "item": "shard", "pos": Vector2i(30, 40)}, {"id": "shard2", "item": "shard", "pos": Vector2i(48, 10)},
 			{"id": "shard3", "item": "shard", "pos": Vector2i(64, 38)}, {"id": "shard4", "item": "shard", "pos": Vector2i(40, 24)},
@@ -1098,7 +1133,10 @@ const AREAS := {
 			{"id": "p17_egg3", "item": "thunder_egg", "pos": Vector2i(43, 7), "vis": ["s_p17_eggs", ""], "late": true}, {"id": "p17_egg4", "item": "thunder_egg", "pos": Vector2i(39, 47), "vis": ["s_p17_eggs", ""], "late": true},
 			{"id": "p17_egg5", "item": "thunder_egg", "pos": Vector2i(62, 35), "vis": ["s_p17_eggs", ""], "late": true},
 			# Part XVIII: argal, the dried dung the horse-folk burn where no tree grows
-			{"id": "p18_argal1", "item": "argal", "pos": Vector2i(19, 23), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal2", "item": "argal", "pos": Vector2i(41, 19), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal3", "item": "argal", "pos": Vector2i(30, 32), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal4", "item": "argal", "pos": Vector2i(14, 29), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal5", "item": "argal", "pos": Vector2i(9, 20), "vis": ["s_p18_argal", ""], "late": true}
+			{"id": "p18_argal1", "item": "argal", "pos": Vector2i(19, 23), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal2", "item": "argal", "pos": Vector2i(41, 19), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal3", "item": "argal", "pos": Vector2i(30, 32), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal4", "item": "argal", "pos": Vector2i(14, 29), "vis": ["s_p18_argal", ""], "late": true}, {"id": "p18_argal5", "item": "argal", "pos": Vector2i(9, 20), "vis": ["s_p18_argal", ""], "late": true},
+			# Part XXII: the cords the Earl knots his winds in, hung where the rock is steepest
+			{"id": "p22_knot1", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p22_knot2", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p22_knot3", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_knot4", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "foot"},
 		],
 		"pickup_vis": "s_shards",
 	},
@@ -1536,24 +1574,34 @@ const AREAS := {
 	"karst": {
 		# Part XX: what lived in the Cave of Ten Thousand Echoes, out among the towers
 		"warband": {"pool": [["stone_bat", 73, 74], ["karst_crawler", 73, 74], ["kept_voice", 73, 74]], "n": 15, "vis": "s_p20_tea", "late": true},
+		# Part XXII: what keeps the path clear for whoever the Mountain Spirit is waiting for
+		"warband2": {"pool": [["red_leopard", 79, 80], ["fig_creeper", 79, 80], ["rain_gibbon", 79, 80]], "n": 16, "vis": "s_p22_lian", "late": true},
 		"n": "Stone Forest of the Nine Bends", "w": 96, "h": 58, "seed": 241, "theme": "karst", "enemies": 20,
 		"pool": [["river_carp", 30, 31], ["stone_macaque", 30, 31], ["mist_heron", 30, 31]],
 		"portals": [
 			{"to": "maple", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "springs", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_kr_horse"},
 		],
-		"npcs": [{"id": "fisher", "n": "Cormorant Fisher Old Yu", "pos": Vector2i(10, 26), "col": Color("a0b0a0"), "vis": ["s_kr_intro", ""]}],
+		"npcs": [{"id": "fisher", "n": "Cormorant Fisher Old Yu", "pos": Vector2i(10, 26), "col": Color("a0b0a0"), "vis": ["s_kr_intro", ""]},
+			# Part XXII: the scholar who went up to see the view, and saw it (he is carried down; after that he is by the water)
+			{"id": "han_yu", "n": "Han Yu, Who Cannot Get Down", "pos": Vector2i.ZERO, "col": Color("3a4a6a"), "vis": ["s_p22_anglers", "s_p22_down"], "late": true, "peak": 0, "stand": "top"}],
 		"bosses": [
 			{"id": "cormorant_king", "pos": Vector2i(30, 40), "lv": 30, "req": 30},
 			{"id": "karst_jiao", "pos": Vector2i(46, 16), "lv": 31, "req": 31},
 			{"id": "stone_sentinel", "pos": Vector2i(60, 40), "lv": 31, "req": 31},
 			{"id": "horse_face", "pos": Vector2i(86, 28), "lv": 31, "req": 31},
 			# Part XX: the Penumbra, at the back of the Cave of Ten Thousand Echoes
-			{"id": "wangliang", "pos": Vector2i.ZERO, "lv": 74, "req": 73, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "deep"}
+			{"id": "wangliang", "pos": Vector2i.ZERO, "lv": 74, "req": 73, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "deep"},
+			# Part XXII: the Mountain Spirit of the Nine Songs, in the thick of her own cloud
+			{"id": "shan_gui", "pos": Vector2i.ZERO, "lv": 80, "req": 79, "vis": ["s_p22_down", ""], "late": true, "peak": 0, "stand": "top"}
 		],
 		"pickups": [{"id": "mpearl1", "item": "memory_pearl", "pos": Vector2i(22, 12)}, {"id": "mpearl2", "item": "memory_pearl", "pos": Vector2i(40, 46)}, {"id": "mpearl3", "item": "memory_pearl", "pos": Vector2i(64, 30)}, {"id": "mpearl4", "item": "memory_pearl", "pos": Vector2i(76, 10)},
 			# Part XX: Xu Xiake's rubbings, in the Cave of Ten Thousand Echoes
-			{"id": "p20_rub1", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_rub2", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_rub3", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_rub4", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_rub5", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "deep"}
+			{"id": "p20_rub1", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_rub2", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_rub3", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_rub4", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_rub5", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "deep"},
+			# Part XXII: Han Yu's farewells, thrown off the top
+			{"id": "p22_letter1", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_letter2", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "p22_letter3", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_letter4", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p22_letter5", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "flank"},
 		],
 		"pickup_vis": "s_kr_collect",
 	},
@@ -1718,22 +1766,31 @@ const AREAS := {
 	"silk": {
 		# Part XIX: the looms of the Silkworm Woods, which have not heard what was decided
 		"warband": {"pool": [["idle_shuttle", 70, 71], ["treadle_imp", 70, 71], ["paper_servant", 70, 71]], "n": 16, "vis": "s_p19_heart", "late": true},
+		# Part XXII: what has been calling the woodcutters by name
+		"warband2": {"pool": [["salt_thief", 78, 79], ["false_echo", 78, 79], ["fire_crab", 78, 79]], "n": 15, "vis": "s_p22_ziqi", "late": true},
 		"n": "Mulberry Silk Woods", "w": 96, "h": 58, "seed": 291, "theme": "silk", "enemies": 20,
 		"pool": [["silkworm", 34, 34], ["silk_moth", 34, 34], ["cocoon_wraith", 34, 34]],
 		"portals": [
 			{"to": "terraces", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "loom", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_sk_hands"},
 		],
-		"npcs": [{"id": "can_niang", "n": "Silk Farmer Can Niang", "pos": Vector2i(9, 25), "col": Color("e8d8b0"), "vis": ["s_sk_intro", ""]}],
+		"npcs": [{"id": "can_niang", "n": "Silk Farmer Can Niang", "pos": Vector2i(9, 25), "col": Color("e8d8b0"), "vis": ["s_sk_intro", ""]},
+			# Part XXII: the woodcutter who hears what is meant, at the foot of the mulberry heights
+			{"id": "zhong_ziqi", "n": "Zhong Ziqi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("6a5a3a"), "vis": ["s_p22_leap", ""], "late": true, "peak": 0, "stand": "foot"}],
 		"bosses": [
 			{"id": "silkworm_queen", "pos": Vector2i(30, 40), "lv": 34, "req": 34},
 			{"id": "moth_empress", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
 			# Part XV: the queen of the moths that eat forgetting
 			{"id": "forgetting_queen", "pos": Vector2i(49, 18), "lv": 58, "req": 57, "vis": ["s_p15_moth", ""]},
 			{"id": "mulberry_ent", "pos": Vector2i(60, 40), "lv": 34, "req": 34},
+			# Part XXII: the shanxiao, in its ring of salt on a height of the woods (its second, where there are two)
+			{"id": "shanxiao", "pos": Vector2i.ZERO, "lv": 79, "req": 78, "vis": ["s_p22_thieves", ""], "late": true, "peak": 1, "stand": "top"},
 			{"id": "thousand_hands", "pos": Vector2i(86, 28), "lv": 34, "req": 34},
 		],
-		"pickups": [{"id": "cocoon1", "item": "cocoon", "pos": Vector2i(22, 12)}, {"id": "cocoon2", "item": "cocoon", "pos": Vector2i(40, 46)}, {"id": "cocoon3", "item": "cocoon", "pos": Vector2i(64, 30)}, {"id": "cocoon4", "item": "cocoon", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "cocoon1", "item": "cocoon", "pos": Vector2i(22, 12)}, {"id": "cocoon2", "item": "cocoon", "pos": Vector2i(40, 46)}, {"id": "cocoon3", "item": "cocoon", "pos": Vector2i(64, 30)}, {"id": "cocoon4", "item": "cocoon", "pos": Vector2i(76, 10)},
+			# Part XXII: the salt of every camp on the road, carried up the heights
+			{"id": "p22_salt1", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 1, "stand": "flank"}, {"id": "p22_salt2", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 1, "stand": "foot"},
+			{"id": "p22_salt3", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p22_salt4", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 0, "stand": "foot"}],
 		"pickup_vis": "s_sk_collect",
 		"buildings": [
 			{"id": "silk_house", "n": "Silkworm House", "style": "house", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
@@ -3489,6 +3546,46 @@ const STEPS := [
 	{"id": "s_p21_ou2", "kind": "talk", "npc": "ou_yezi", "area": "tushan", "hearth": "forge", "t": "Tell Ou Yezi what was decided about the things he makes"},
 	{"id": "s_p21_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The racks of the armoury have something on them again: tell Elder Qing Xuan what it is"},
 	{"id": "s_break26", "kind": "breakthrough", "to": 78, "t": "The best fighter is not angry: Sheathed Edge"},
+	# ---- Part XXII: The High Roads (the High Roads release): the mountains, the people of the road, and why nobody arrived
+	{"id": "s_p22_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Nobody has come down the mountain road in nine days, and nobody has gone up it: speak to Elder Qing Xuan", "stones": 34800},
+	{"id": "s_p22_xie", "kind": "talk", "npc": "xie_lingyun", "area": "mountain", "t": "A man in toothed clogs is camped at the foot of Sun-Viewing Peak with three hundred friends and a great many axes: find Duke Xie"},
+	{"id": "s_p22_first", "kind": "summit", "peak": "mountain", "k": 1, "area": "mountain",
+		"t": "A rise of more than a stride is climbed, hand over hand: go up the Sweeper's Lookout, the crag beside the great peak, to its very top"},
+	{"id": "s_p22_leap", "kind": "glide", "n": 8, "area": "mountain", "t": "Duke Xie has lent a cloud-kite of paper and bamboo: open it on a height (V) and let it carry you sixteen metres"},
+	{"id": "s_p22_ziqi", "kind": "talk", "npc": "zhong_ziqi", "area": "silk", "t": "The people of the road have stopped at their fires: find the woodcutter who hears what is meant, Zhong Ziqi, at the foot of the heights in the Mulberry Silk Woods"},
+	{"id": "s_p22_cutters", "kind": "folk", "role": "woodcutter", "n": 3, "area": "silk",
+		"t": "Something calls them by name from above the fire: ask 3 woodcutters, at the camps of the road, whose voice they heard"},
+	{"id": "s_p22_thieves", "kind": "hunt", "area": "silk", "n": 20, "of": ["salt_thief", "false_echo", "fire_crab"], "first": true,
+		"t": "There is not a grain of salt left at any fire on the road: strike first and scatter 20 of the salt-thieves, false echoes and night-fire crabs of the Mulberry Silk Woods"},
+	{"id": "s_p22_salt", "kind": "collect", "item": "salt_bag", "n": 4, "area": "silk", "t": "It has all been carried up the rock: bring down 4 bags of road salt from the rock of the Mulberry Silk Woods"},
+	{"id": "s_p22_xiao", "kind": "kill", "boss": "shanxiao", "area": "silk", "t": "On the height itself something with one leg is trying on other people's voices: face the Shanxiao"},
+	{"id": "s_p22_lie", "kind": "talk", "npc": "liezi", "area": "thunder", "t": "The wind has stopped, all of it, from here to the sea: climb the one height of Thunder Valley to Master Lie, who used to ride it", "stones": 35200},
+	{"id": "s_p22_gusts", "kind": "hunt", "area": "thunder", "n": 20, "of": ["stray_gust", "kite_hawk", "wind_bag"],
+		"t": "A wind with nowhere to go turns round and bites: still 20 of the stray gusts, kite-hawks and leaking wind-bags loose in Thunder Valley"},
+	{"id": "s_p22_knots", "kind": "collect", "item": "wind_knot", "n": 4, "area": "thunder", "t": "The Earl keeps his good winds knotted on cords, where the rock is steepest: gather 4 knotted cords of wind from the height"},
+	{"id": "s_p22_flight", "kind": "glide", "n": 14, "area": "thunder", "t": "One knot undone is a breeze: fly twenty-eight metres under the cloud-kite from the top of the height, and do not lean back"},
+	{"id": "s_p22_lian", "kind": "kill", "boss": "fei_lian", "area": "thunder", "t": "Nobody asked him whether they might: answer to Fei Lian, Earl of the Wind, for every kite in his sky"},
+	{"id": "s_p22_anglers", "kind": "folk", "role": "angler", "n": 3, "area": "karst",
+		"t": "Folded papers have been coming down the streams of the south country: ask 3 anglers, at the camps of the road, what they have seen float by", "stones": 35600},
+	{"id": "s_p22_han", "kind": "talk", "npc": "han_yu", "area": "karst", "t": "Somebody is writing to the whole world from the top of the Stone Forest: climb to him"},
+	{"id": "s_p22_letters", "kind": "collect", "item": "thrown_letter", "n": 5, "area": "karst", "t": "He would rather like them back; some were hasty: find 5 of the scholar's farewells on the rock and at the foot of it"},
+	{"id": "s_p22_leopards", "kind": "hunt", "area": "karst", "n": 22, "of": ["red_leopard", "fig_creeper", "rain_gibbon"],
+		"t": "Something with a cat's tread is keeping the path clear for somebody: get past 22 red leopards, fig-leaf creepers and rain-calling gibbons of the Stone Forest"},
+	{"id": "s_p22_down", "kind": "glide", "n": 16, "area": "karst", "t": "His legs have resigned their office: carry the scholar down under the cloud-kite, thirty-two metres from the top in one flight"},
+	{"id": "s_p22_gui", "kind": "kill", "boss": "shan_gui", "area": "karst", "t": "In the thick of the cloud a lady in fig leaves is looking down the path for somebody who is late: go up to the Mountain Spirit"},
+	{"id": "s_p22_summits", "kind": "summit", "n": 7, "area": "mountain", "t": "The cloud has thinned on every top in the land: stand on seven summits, any of them, and see who else has arrived", "stones": 36000},
+	{"id": "s_p22_hermits", "kind": "folk", "role": "hermit", "n": 3, "area": "mountain",
+		"t": "Somebody has been on the tops the whole time: climb to 3 hermits on their summits and ask what they have seen go by"},
+	{"id": "s_p22_steles", "kind": "hunt", "area": "mountain", "n": 24, "of": ["merit_stele", "report_smoke", "bends_serpent"],
+		"t": "The first thing up an open mountain is a row of names: knock down 24 steles, smokes and serpents of the bends on Azure Cloud Mountain"},
+	{"id": "s_p22_slips", "kind": "collect", "item": "merit_slip", "n": 5, "area": "mountain", "t": "Every king who came up left Heaven a note: dig out 5 jade slips of announcement from the rock of the two great peaks"},
+	{"id": "s_p22_long", "kind": "glide", "n": 24, "area": "mountain", "t": "Before the last climb, Master Lie's lesson to the end: forty-eight metres in one flight, leaning on nothing"},
+	{"id": "s_p22_yue", "kind": "kill", "boss": "dongyue", "area": "mountain", "t": "On Sun-Viewing Peak somebody has been receiving reports for two thousand years: climb to the Lord of the Eastern Peak", "stones": 36400},
+	{"id": "s_p22_pilgrims", "kind": "folk", "role": "pilgrim", "n": 3, "area": "mountain",
+		"t": "The tops are where they were: tell 3 pilgrims at the camps of the road"},
+	{"id": "s_p22_xie2", "kind": "talk", "npc": "xie_lingyun", "area": "mountain", "t": "Tell Duke Xie what was decided about the tops of mountains, before he cuts anything"},
+	{"id": "s_p22_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The mountain is the shape he left it: tell Elder Qing Xuan"},
+	{"id": "s_break27", "kind": "breakthrough", "to": 81, "t": "What a man stands on when it is nothing: Leaning on Nothing"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -3666,6 +3763,13 @@ const ITEMS := {
 	"mated_scabbard": {"n": "The Double Scabbard", "desc": "Smith Tie's work: one scabbard of lacquered wood with two mouths, lined with water essence so that nothing kept in it rusts, and bound with a hilt from the Sword Pool. Two swords made as a pair were never meant to be kept in two places"},
 	"wooden_cock": {"n": "The Wooden Fighting Cock", "desc": "Smith Tie's carving after Ji Xingzi's bird, which was forty days in training: at ten it was still vain and quick to anger, at forty it stood like a cock of wood, and no other bird would face it. Set down in front of a fighter, it is a question"},
 	"three_swords": {"n": "Scroll of the Three Swords", "desc": "What King Wen left: the discourse he was given, in his own hand. The sword of the Son of Heaven, whose point is the northern mountains and whose edge is the eastern sea; the sword of the lord, whose point is men of courage; and the sword of the common man, which is no different from a fighting cock"},
+	# ---- Part XXII: The High Roads
+	"salt_bag": {"n": "Bag of Road Salt", "desc": "A cloth bag the size of two fists, tied with the knot of the camp it was taken from, a little damp. A woodcutter carries one up the mountain and brings it down lighter; it is the one thing on the road nobody lends. The shanxiao carried off every bag on the south road and did not eat a grain"},
+	"wind_knot": {"n": "Knotted Cord of Wind", "desc": "Grey silk, three knots. Sailors buy them of wise women: undo the first for a breeze, the second for a gale, and the third never. These are the Earl of the Wind's own, and the knots are tied in a hand older than rope"},
+	"thrown_letter": {"n": "Letter Thrown from the Ledge", "desc": "Good paper, folded small, in a firm official hand that gets less firm towards the bottom. A farewell, from a man who went up to see the view and saw it. The second paragraph, about duty, is rather fine. The postscript asks whoever finds it to look after a horse"},
+	"merit_slip": {"n": "Jade Slip of Announcement", "desc": "A tablet of white jade bound with gold cord, as the kings buried them on the mountain: to Heaven, from the undersigned, reporting that all under it is at peace and that he has succeeded. Five reigns left five, and the sentence is the same in every one"},
+	"crackle_bamboo": {"n": "Green Bamboo for the Fire", "desc": "Three joints of green bamboo, sealed at both ends, packed by Alchemist Mo with a little earth essence so that they burst in the fire like a string of thunder. It is what grandmothers burned at the New Year to keep the one-legged thing from the door. It does it no harm. It only cannot bear to be startled"},
+	"blank_slip": {"n": "Jade Slip with Nothing on It", "desc": "One of the old kings' slips, ground smooth again by Smith Tie until no stroke of the report is left, and bound with plain cord. It announces nothing. Nobody has ever handed the Lord of the Eastern Peak one of these"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
@@ -3814,6 +3918,19 @@ const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
+	# ---- Part XXII: the people of the High Roads
+	"xie_lingyun": ["The clogs? Pear wood. Two teeth to each, pegged, not glued. Front out going up, back out coming down. My servants think I am mad. My servants are carrying the wine, so I let them think.",
+		"I write the poem at the top, always, while I am still out of breath. A poem written at the bottom is a poem about a mountain. One written at the top is a poem about lungs. Readers prefer the second and do not know why.",
+		"A governor once sent soldiers against my road-gang. Three hundred men with axes coming out of a forest; I see his point. I sent him a poem. He sent the soldiers anyway. Critics."],
+	"zhong_ziqi": ["People think it is the ears. It is not the ears. I only do not start answering while the other is still speaking. You would be surprised what there is room to hear.",
+		"He broke his qin when I died, in the story they tell. I have not died. I have a cold most winters. But I like that they think somebody would.",
+		"That hum is your sword. A fifth below where a new blade sits. It is content. I should not sharpen it this week."],
+	"liezi": ["Fifteen days. They always ask how. Nobody asks what I ate. Nothing, is what I ate. One cannot carry a lunch on the wind; it wants you light.",
+		"My master did not look at me for three years. In the fifth he smiled. In the seventh he let me sit on his mat. In the ninth I could not tell whether the wind rode me or I it. Then I came down, and my wife asked where the firewood was.",
+		"Do not envy it. The Peng needs ninety thousand li of air under it before it can turn south. I need a breeze. You, I begin to think, need only somewhere to put your foot. That is the least of the three, and the freest."],
+	"han_yu": ["I have memorialised against a relic, been banished eight thousand li, and driven the crocodiles from a river with an essay. None of it prepared me for looking over an edge.",
+		"A good prose style, sir, is a man walking: no ornament, each foot where the last one was not. I notice that I admire it most from a seated position.",
+		"If you see my nephew, tell him the snow is on the Blue Pass and the horse will not go on. He will know the poem. Everybody knows the poem. I wish I had written it somewhere flatter."],
 	# Part XXI (the Hundred Arms release)
 	"ou_yezi": ["Five swords for the King of Yue: Zhanlu, Chunjun, Shengxie, Yuchang, Juque. The mountain of Chijin split to give the tin, and the stream of Ruoye dried to give the copper. I have not been easy about either since.",
 		"Zhanlu left the King of Wu in the night and went by water to the King of Chu, because Wu was unjust. A sword that walks out on a king. I made that. I have never decided whether to be proud of it.",
@@ -7639,6 +7756,169 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "The old book says arms are instruments of ill omen, and that the gentleman lives with them on his left and does not make them his delight. I read that for sixty years as a warning about swords. It is about the left hand. It says: keep them where the heart is."],
 		["Yue Ling", "He swept the steps this morning, Elder. With the staff. I watched. It took him twice as long as it used to, and he did not look pleased with himself once."],
 		["Elder Qing Xuan", "Then he has it. Go and sit under the pine, Lin Feng. There is a thing left to put down, and I think it is not any of the eight.", "nod"],
+	],
+	# ---- Part XXII: The High Roads (the High Roads release)
+	"recall20": [
+		["Narrator", "The racks are full again, and the armoury door stands open; nobody has thought to bar it since. Spring comes up the valley a terrace at a time, and with it the people of the road: the woodcutters, the gatherers of herbs, the pedlars with a street on one shoulder, the pilgrims bound for the tops."],
+		["Narrator", "They come as far as the foot of the mountain. This year they stop there. On the ninth day the Elder, who has watched one road from one step for seventy springs, sends for his sweeper."],
+	],
+	"s_p22_home": [
+		["Elder Qing Xuan", "Nine days, Lin Feng. Not a pilgrim on the upper road, not a woodcutter above the first bend. They are all down at the fires at the foot, eating their own provisions and looking up. I asked one why. He said: the top is not there this year."],
+		["Lin Feng", "The top of what?"],
+		["Elder Qing Xuan", "Of anything. They go up into the cloud, he says, and come out of it going down, on the side they went up, and never once stood anywhere. I should call it nonsense if I had not tried the Lookout myself yesterday. I was back at the gate before the tea was cold.", "shrug"],
+		["Yue Ling", "There is a camp at the foot of Sun-Viewing Peak that was not there last week. Three hundred men, the porters say, with axes and ropes, and one in front in the oddest shoes. He is not waiting for the cloud to lift. He means to cut it a staircase."],
+		["Elder Qing Xuan", "Then go and see him before he cuts my mountain. And take your hands with you. You fly over most things nowadays. Whatever has shut the tops, I do not think it will open to somebody who arrives without having come.", "point"],
+	],
+	"s_p22_xie": [
+		["Narrator", "At the foot of the great peak, beside a fire with a pot on three sticks, a man in a short green robe is taking the front teeth out of a pair of wooden clogs and fitting them into the heels. Behind him three hundred men are sharpening axes with the air of people who have been promised a view."],
+		["Duke Xie of the Toothed Clogs", "Front teeth out for the way up, back teeth out for the way down, and the foot stays level on any slope under heaven. My own invention. I am Xie Lingyun, Duke of Kangle. I have walked up every mountain between here and the sea, and written a poem on top of each. Some of them good."],
+		["Lin Feng", "And this one?"],
+		["Duke Xie of the Toothed Clogs", "This one I have been up four times and have not arrived. So I am going to cut steps. Nine thousand, straight, with a chain. A top cannot hide at the end of a staircase. The last governor who saw my road-gang coming called out the militia, mind you. He took us for bandits.", "laugh"],
+		["Duke Xie of the Toothed Clogs", "You are the sweeper? Good; you know steps. Before I spoil it: go up the small crag there, the Lookout, with your hands. No sword-flying. I want to know whether it is the mountains that are shut, or only the people.", "point"],
+	],
+	"done:s_p22_first": [
+		["Narrator", "Hand over hand, with the rock an inch from his face the whole way: lichen, a seam of quartz, a snail that has been going up since the autumn. Then there is no more rock to reach for, and Lin Feng is standing beside a cairn somebody built before the sect was founded, with the whole valley under him."],
+		["Yue Ling", "You have flown over this a hundred times. You have never once been on it. ...Neither have I. There is a stone on that cairn for everybody who came up. Put ours on."],
+		["Duke Xie of the Toothed Clogs", "He arrived! Then it is not the mountains. It is how we have been coming. That is a great nuisance to a man with three hundred axes. Come down. No, wait: not the way you went up. I have a better way down, and it wants trying by somebody younger than I am.", "cheer"],
+	],
+	"done:s_p22_leap": [
+		["Narrator", "A swallow of oiled paper on split bamboo, the kind the children fly from the fields below Qingshi, made large enough to hang under. It does not go up. It only declines to come down in a hurry, and for sixteen metres Lin Feng learns the difference between flying and being carried."],
+		["Duke Xie of the Toothed Clogs", "Ha! He leans back like a man on a mule. Never mind. The air does the work; you have only to be something it can hold. Keep the kite. Now, the road. My axemen say the woods to the south have started calling them by name at night, and three have gone home.", "laugh"],
+	],
+	"s_p22_ziqi": [
+		["Narrator", "At the camp under the mulberry heights a young woodcutter is sitting with his axe across his knees and his head on one side, listening to nothing. When Lin Feng's foot turns a pebble forty paces off he says, without looking round, that it is a cultivator, a tired one, and that the girl with him steps more lightly than he does."],
+		["Zhong Ziqi the Woodcutter", "A gentleman played the qin by the river once while I was resting my load. I said: high mountains. He played again. I said: running water. He wept. Nobody had ever heard what he meant before. I only said what I heard. I am Zhong Ziqi. I cut wood."],
+		["Lin Feng", "What do you hear now?"],
+		["Zhong Ziqi the Woodcutter", "My mother, up the slope, calling me to supper. She has been dead six years, and she never once called me Ziqi. She called me Dog. Whatever is up there has learned my name off somebody and has not learned what I am called. And the salt is gone from every camp on the road."],
+		["Zhong Ziqi the Woodcutter", "Ask the other cutters. Each of them has heard somebody. I should like to know whether it has got any of them right.", "think"],
+	],
+	"done:s_p22_cutters": [
+		["Narrator", "Three camps, three woodcutters, and at each the same account: a voice from the dark above the fire, a wife's, a brother's, a foreman's, with the name right and the voice a little out, like a tune whistled by somebody who heard it once. In the morning: one footprint. Always the left."],
+		["Zhong Ziqi the Woodcutter", "One foot. Then I know what it is, and so did my grandmother, who burned green bamboo in the fire every New Year to keep it off. A shanxiao. They are not wicked. They are lonely, and they like salt, and roast crab, and somebody else's fire. But a man who answers one goes up into the cloud after it."],
+	],
+	"done:s_p22_thieves": [
+		["Zhong Ziqi the Woodcutter", "Hear that? Quieter. The small ones only carry; it is the old one who does the voices. He is on the height itself, across the saddle, with every bag of salt on this road, and he has not eaten a grain. He stacks it. I think he believes it is what makes people come back to a fire."],
+	],
+	"done:s_p22_salt": [
+		["Narrator", "Four bags, damp, each tied with the knot of a different camp. Under the last is a heap of things that are not salt: a child's shoe, a pedlar's bell, a comb, a tally stick. Everything somebody on the road once turned round to look for."],
+		["Yue Ling", "He has been keeping them safe. Look how they are laid out. Nothing on top of anything."],
+	],
+	"pre:shanxiao": [
+		["Narrator", "On the height itself, in a ring of salt bags laid like a wall, sits something the size of a child of ten, with one leg, a face like a worried old man's and the wrong number of fingers. It looks at Lin Feng. Then it says, in Elder Qing Xuan's voice, very nearly: Lin Feng. Supper."],
+		["Shanxiao, the One-Legged Thief of Voices", "Lin Feng. Supper. ...No? Lin Feng, the steps want sweeping. No. Wait. I had a good one. A girl's. You have flown over this a hundred times."],
+		["Yue Ling", "That is mine. That was this morning. Give it back."],
+		["Shanxiao, the One-Legged Thief of Voices", "Mine now. I keep them. Nobody keeps them as I do. They come up for their names, and then they stay by the fire. That is how it is done. I have watched.", "refuse"],
+	],
+	"post:shanxiao": [
+		["Narrator", "The shanxiao sits down hard among its salt, puts both hands over its mouth, and for the first time in nine nights says nothing in anybody's voice. After a while, in a small cracked one that is plainly its own, it asks whether it may keep the bell."],
+		["Zhong Ziqi the Woodcutter", "There. That one I have not heard before. That is him. ...High mountains. I mean it kindly. It is what I say when I have heard somebody.", "nod"],
+	],
+	"s_p22_lie": [
+		["Narrator", "On the one height of Thunder Valley a thin man in pale sleeves is standing at the very edge with his arms a little out from his sides, like a heron deciding. He has stood so, the horse-folk say, since the wind stopped. There is no wind at all. The grass below is as still as a painting of grass."],
+		["Master Lie, Who Rode the Wind", "I rode it for fifteen days once. Cool, light, wherever it went. They wrote that down as a great thing. Then they wrote the next line, which nobody quotes: and still he had something to lean on. They were right. Look at me. The wind goes, and I am a man on a rock.", "shrug"],
+		["Lin Feng", "Where has it gone?"],
+		["Master Lie, Who Rode the Wind", "Into a bag. The Earl of the Wind has drawn the neck of it shut, every breath from here to the sea, because of the kites. Paper swallows all over his sky this spring. He says nobody asked him. He is quite right. Nobody did."],
+		["Master Lie, Who Rode the Wind", "His loose gusts are biting people in the valley. Still them. And his good winds he keeps knotted on cords, as sailors do: bring me the cords and I can let out enough to stand on. Then you shall fly from here. Properly.", "point"],
+	],
+	"done:s_p22_gusts": [
+		["Master Lie, Who Rode the Wind", "Better. I felt my sleeve move. The loose ones were only frightened; a wind with nowhere to go turns round and round and bites. The knotted ones are his own. Four cords. They hang where the rock is steepest. He likes a view."],
+	],
+	"done:s_p22_knots": [
+		["Narrator", "Four cords of grey silk, three knots in each. Master Lie undoes the first knot of the first cord, and a breeze comes up the face of the rock as if it had been waiting at the bottom to be asked. He does not touch the second. The third, he says, nobody should ever undo on purpose."],
+		["Master Lie, Who Rode the Wind", "One knot for a breeze, two for a gale, three for the kind that takes roofs. Now. Off the edge with you. Twenty-eight metres, and I shall be watching your shoulders."],
+	],
+	"done:s_p22_flight": [
+		["Master Lie, Who Rode the Wind", "There. Did you feel where it carried you, and where you were only falling politely? No? You will. I rode fifteen days before I could tell. ...He has seen you. That was his sky you were in. He is coming up the far side now. He walks like a stag, and he is not pleased.", "point"],
+	],
+	"pre:fei_lian": [
+		["Narrator", "It comes over the edge of the height with the body of a stag, the head of a sparrow, a serpent's tail and the spots of a leopard, and round its neck a bag of grey hide drawn shut with a cord. Where it sets its feet the grass lies down in a ring. Nothing else moves at all."],
+		["Fei Lian, Earl of the Wind", "Paper. Paper and string and split bamboo, in MY air, with children on the end of it, and now grown men hanging underneath. Did one of you ask? I blew for Chiyou at Zhuolu. I am an earl. And I am to be a thing a sweeper falls off rocks on?"],
+		["Master Lie, Who Rode the Wind", "I asked, my lord. Once. You said nothing, and bore me up for fifteen days. I took it for yes."],
+		["Fei Lian, Earl of the Wind", "You I liked. You weighed nothing and wanted nothing. These WANT. Every one of them wants to get somewhere. Wind does not go somewhere! Wind GOES!", "refuse"],
+	],
+	"post:fei_lian": [
+		["Narrator", "The Earl of the Wind stands with his head down and his sides going. The cord at his neck has come undone, and for a mile around every blade of grass is leaning one way, and every kite in the valley that was hanging dead on its string has gone up like a shout."],
+		["Fei Lian, Earl of the Wind", "...They are laughing. The small ones, on the ends of the strings. I had forgotten that sound came with it. Hm. I do not say I am mollified. I say only that I had forgotten."],
+	],
+	"done:s_p22_anglers": [
+		["Narrator", "Three anglers at three waters, none of whom has caught anything in a week and none of whom minds. Each has seen the same thing float past: a sheet of good paper, folded small, written on in a fine official hand. One says it was a poem. One says it was a will. The third could not read it, and kept it for the paper."],
+		["Yue Ling", "They come down out of the Stone Forest. Somebody is up one of those towers writing to the whole world, and nobody is writing back."],
+	],
+	"s_p22_han": [
+		["Narrator", "On the one summit of the Stone Forest, in cloud so thick it drips, a large man in a soaked official's robe is sitting with his back to the cairn and his eyes shut, holding on to it with both arms. Beside him: an ink-stone, a brush, and a neat stack of paper weighted with a rock."],
+		["Han Yu, Who Cannot Get Down", "Do not tell me to look. I have looked. That is how I come to be here. I came up to see the view, sir, as a man of letters should. I saw it. All of it. Straight down. And my legs resigned their office."],
+		["Lin Feng", "How long have you been up here?"],
+		["Han Yu, Who Cannot Get Down", "I have written eleven farewells. One to my wife, two to my students, one to the Emperor explaining that the memorial on the bone was kindly meant, and seven to posterity. I threw them off, since nobody was coming. I should rather like them back. Some were hasty.", "grieve"],
+		["Han Yu, Who Cannot Get Down", "And there is a lady. Farther along, in the thick of it. She does not speak. She looks down the path. I offered her my umbrella and she did not see me. I think it is her cloud, sir. I think I am sitting in somebody's waiting."],
+	],
+	"done:s_p22_letters": [
+		["Han Yu, Who Cannot Get Down", "All five? And dry, more or less. Do not read the one to posterity. ...You have read it. Well, I stand by the second paragraph. Sir, I have been listening to things move below us while you were gone. Large things, with a tread like a cat's. They are hers. I think they are keeping the path clear."],
+	],
+	"done:s_p22_leopards": [
+		["Yue Ling", "They were not hunting. Did you see? Every one of them was lying across the path, facing down it, the way a dog lies in a doorway when somebody is expected. We have just walked through nine days of somebody's welcome.", "grieve"],
+	],
+	"done:s_p22_down": [
+		["Narrator", "It takes some time to get a large official under a paper swallow, and longer to get him to open his eyes. Then the rock is gone from under all three of them, and the Stone Forest is turning below like a tray of ink-brushes, and Han Yu, who has been composing his twelfth farewell, stops in the middle of a line."],
+		["Han Yu, Who Cannot Get Down", "Oh. Oh, but it is beautiful from here. I could not see it for being afraid of it. ...Put me down by the water, sir, anywhere at all, and I shall write that the way up a mountain is hard and the way down impossible, and that I was carried, and by whom. Go back up. She is still looking down that path."],
+	],
+	"pre:shan_gui": [
+		["Narrator", "Where the cloud is thickest a woman is standing on the rock in a dress of fig leaves, girdled with hanging moss, with one hand on the neck of a red leopard. She is looking down the path. She has, it is plain, been looking down it for a very long time, and has arranged her face for somebody."],
+		["The Mountain Spirit, Who Is Still Waiting", "You are not he. You are the fourth who was not. I came late, you understand. The bamboo was so thick I could not see the sky, and the way was steep, and I came late, and he had been and gone. Or had not come. I have never known which."],
+		["Yue Ling", "So you kept the top in cloud. So that if he came you would be here. And if he had been already, you need not see that he had gone."],
+		["The Mountain Spirit, Who Is Still Waiting", "On every top. He did not say which. He said: on the mountain. I thought, if no one can arrive at any of them, he cannot have arrived without me. Do not look at me so. It is reasonable. It has been reasonable for a thousand years.", "grieve"],
+	],
+	"post:shan_gui": [
+		["Narrator", "The cloud does not lift. It thins, a little, the way breath does on a glass, and through it for a moment there is the whole south country in the rain, and no one on the path. The Mountain Spirit looks at that. She goes on looking. The leopard leans its whole weight against her."],
+		["The Mountain Spirit, Who Is Still Waiting", "No one. ...Then I may be angry with him. I have not been able to be angry: I did not know which of us was late. Thunder rolls, rain darkens, the gibbons cry all night. I thought of you, lord, and had only sorrow of it. I should like, now, to think of something else."],
+	],
+	"done:s_p22_summits": [
+		["Narrator", "Seven tops. On each a cairn, and on each cairn one more stone than there was. From the seventh, on a clear evening, Lin Feng can count the other six, and on every one of them, small and bright, there is somebody who has just arrived and is standing very still."],
+		["Yue Ling", "Nobody shouts. I thought they would shout. They get there and go quiet, all of them, even the pedlar. I wonder what the ones who live up here make of it. Somebody must have been on these the whole time, cloud or no cloud."],
+	],
+	"done:s_p22_hermits": [
+		["Narrator", "Three hermits on three summits, a hundred years up between them, and not one had noticed that the tops were shut. Cloud comes, they say, and cloud goes. But all three have watched the same thing these last nights, going up the great peak above the sect in a line, by torchlight: stones. Dressed stones, with writing on."],
+		["Yue Ling", "Steles. Walking. Somebody has opened the tops, and the first thing up them is a row of people's names."],
+	],
+	"done:s_p22_steles": [
+		["Duke Xie of the Toothed Clogs", "I knew three of those! That one was put up by a prefect I dined with, to record that he had mended a bridge. He had not mended it. And the smoke, did you smell it? Sacrifice smoke. Announcements. Somebody up top is being told a great many things at once, sweeper, and I do not think he asked to hear them."],
+	],
+	"done:s_p22_slips": [
+		["Narrator", "Jade slips, bound with gold cord, buried shallow where the old kings left them: to Heaven, from the undersigned, reporting success. Five reigns, five hands, and the same sentence in every one. Under the cord of the last is tucked a strip of plain bamboo in a clerk's writing: received. received. received. received."],
+	],
+	"done:s_p22_long": [
+		["Yue Ling", "Forty-eight metres, and you did not lean back once. I watched your shoulders, since he was not here to. You looked like something the air had decided to keep. ...Now the top. On your hands, the Elder said. I think he was right about that."],
+	],
+	"pre:dongyue": [
+		["Narrator", "On Sun-Viewing Peak, where seventy-two kings came up to tell Heaven they had succeeded, an official the size of a gate-tower is sitting at a stone desk with his crown pushed back and his head in his hand. Round him, as far as the edge, stand steles; and up the last of the eighteen bends, in a patient line, come more."],
+		["The Lord of the Eastern Peak", "Next. ...No. You have no slip. You have no stele. You have not even a brush. What have you succeeded at? Quickly. There is a prefect behind you who has mended a bridge."],
+		["Lin Feng", "Nothing. I came up to see the sun rise."],
+		["The Lord of the Eastern Peak", "Nobody comes up to see the sun rise. They come up to be seen by it. Seventy-two kings, and I received every one. I am the mountain, do you understand: I cannot go home. I was GLAD of her cloud. Nine days with nobody arriving. And you have thinned it, and here they all are again, with their names.", "grieve"],
+		["The Lord of the Eastern Peak", "I shall close it in stone this time. A top with a lid on. Stand aside, or be carved on.", "refuse"],
+	],
+	"post:dongyue": [
+		["Narrator", "The great official sits down again at his desk, heavily, and the steles on the eighteen bends stop where they are, like men who have forgotten what they came upstairs for. It is very nearly dawn. For once there is nobody on Sun-Viewing Peak with anything to report."],
+		["The Lord of the Eastern Peak", "...It comes up over there. Between the two islands. I had not looked since the first king. He stood in front of it. They all stand in front of it. Hm. Stay, if you like. You are the first in two thousand years who has not told me anything."],
+	],
+	"done:s_p22_pilgrims": [
+		["Narrator", "Three pilgrims, at three camps, told that the tops are there again. Each of them says the same thing: that they knew. They had been setting out every morning regardless. It is not, the oldest explains kindly, the top that one goes for."],
+	],
+	"s_p22_xie2": [
+		["Duke Xie of the Toothed Clogs", "So. A shanxiao with a bell, an earl with his bag open, a lady who has stopped waiting and a mountain that has seen the sun. And I have three hundred men, sharpened, and nothing to cut. I have written nine poems this week and climbed nothing. It is the best week I have had."],
+		["Lin Feng", "What will you do with the clogs?"],
+		["Duke Xie of the Toothed Clogs", "Wear them. Front teeth out going up, back teeth out coming down, and the foot stays level. That is all they ever were: a way of being level on something that is not. You do it without clogs. I have watched. Go home, sweeper. Your Elder will want to know his mountain is the shape he left it.", "laugh"],
+	],
+	"s_p22_end": [
+		["Elder Qing Xuan", "I went up the Lookout this morning. On my hands, at my age, with a novice behind me to catch what fell off. I arrived. There is a stone on that cairn with a broom scratched on it. I did not ask whose."],
+		["Yue Ling", "He has stood on more tops this spring than in all the years he could fly over them, Elder. And come down from most of them under a paper bird, looking like washing."],
+		["Elder Qing Xuan", "Master Lie rode the wind, and leaned on the wind. Duke Xie leans on his clogs, and I on my seventy years. Go and sit under the pine, Lin Feng, and see whether there is anything left that you lean on. I am curious to know what a man stands on when it is nothing.", "nod"],
+	],
+	"pre:s_break27": [
+		["Narrator", "Lin Feng does not sit under the pine. He climbs it: hand over hand, the bark an inch from his face, to the fork where the sweepers of the sect have tied a rag every spring for three hundred years. There is no kite. The sky above the mountain goes the white of the inside of a cloud."],
+		["Narrator", "The tribulation comes as wind. It takes the pine by the crown and bends it like a bow, and looks for whatever he is holding on by."],
+	],
+	"post:s_break27": [
+		["Narrator", "He lets go. The pine springs back without him. For the space of a breath the sweeper of Azure Cloud is standing on nothing at all, above nine hundred steps, leaning on neither wind nor rock nor root; and the tribulation, finding no handle anywhere on him, goes round him like water round a stone and out to sea."],
+		["Narrator", "Lin Feng becomes a cultivator who Leans on Nothing: one who mounts on what is true of heaven and earth, and rides the changes of the six breaths, has nothing left to depend on. He comes down the ordinary way, by the branches, and is late for supper."],
 	],
 	"pre:s_break26": [
 		["Narrator", "Under the old pine Lin Feng lays out the eight in a row on the grass: the jian, the staff, the sabre, the spear, the fan, the bow, the whip, the brush. Then he sits down with his hands empty, and the sky above the mountain goes the grey of a drawn blade."],

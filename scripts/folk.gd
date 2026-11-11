@@ -61,7 +61,11 @@ const BODIES := {
 		"monk": ["folk_monk"], "guard": ["folk_guard"], "watchman": ["folk_guard", "folk_grandpa"], "scholar": ["folk_scholar"],
 		"cook": ["folk_cook"], "washer": ["folk_farmwife", "folk_maiden"], "youth": ["folk_youth", "folk_maiden"],
 		"lamplighter": ["folk_youth", "folk_maiden"], "smith": ["folk_porter", "folk_youth"],
-		"disciple": ["folk_disciple", "folk_disciple_f"], "servant": ["folk_youth", "folk_maiden"]},
+		"disciple": ["folk_disciple", "folk_disciple_f"], "servant": ["folk_youth", "folk_maiden"],
+		# the people of the road (the High Roads release)
+		"woodcutter": ["folk_porter", "folk_youth", "folk_farmer"], "herbalist": ["folk_farmwife", "folk_maiden", "folk_grandma"], "angler": ["folk_fisher", "folk_grandpa"],
+		"pedlar": ["folk_merchant", "folk_porter", "folk_shopwife"], "hunter": ["folk_guard", "folk_youth"], "pilgrim": ["folk_monk", "folk_grandma", "folk_scholar"],
+		"hermit": ["folk_grandpa", "folk_monk", "folk_scholar"]},
 	"desert": {"merchant": ["folk_nomad", "folk_shopwife"], "porter": ["folk_nomad", "folk_porter"], "guard": ["folk_guard", "folk_nomad"],
 		"child": ["folk_boy", "folk_girl"], "elder": ["folk_grandpa", "folk_grandma"], "cook": ["folk_cook"], "washer": ["folk_maiden", "folk_farmwife"],
 		"watchman": ["folk_nomad"], "_": ["folk_nomad"]},
@@ -112,6 +116,26 @@ const ROLES := {
 	"servant": {"day": [[5.0, "kitchen", "chop|stir", "axe"], [8.0, "square", "sweep", "broom"], [10.5, "well", "lift", ""], [12.0, "kitchen", "stir", "ladle"],
 			[15.0, "yard", "sweep|toss", "broom"], [18.0, "kitchen", "stir|eat", "ladle"], [21.0, "home", "in", ""]], "go_hold": "pole", "walk": "carry",
 		"dye": [[0.08, 0.1, 0.55], [0.06, 0.6], 0.3, 1.0]},
+	# ---- the people of the road (the High Roads release): nobody goes indoors, for there is no indoors;
+	# at night they sit by the camp's fire and sleep sitting up
+	"woodcutter": {"day": [[5.4, "wood", "chop", "axe"], [11.4, "camp", "eat", "bowl"], [12.7, "wood", "chop|lift|stretch", "axe"], [17.2, "camp", "chop|lift", "axe"], [18.8, "camp", "warm|drink|laugh", "cup"], [21.6, "camp", "doze", ""]],
+		"walk": "carry", "go_hold": "pole", "dye": [[0.08, 0.1, 0.3], [0.06, 0.08], 0.3, 0.95]},
+	"herbalist": {"day": [[5.0, "meadow", "gather|dig", ""], [9.4, "crag", "gather|peer", ""], [12.0, "camp", "eat", "bowl"], [13.2, "wood", "gather|peer", ""], [17.4, "camp", "pound|count", ""], [19.4, "camp", "warm|drink", "cup"],
+			[21.2, "camp", "doze", ""]],
+		"go_hold": "basket", "dye": [[0.3, 0.35, 0.28, 0.12], [0.1, 0.55], 0.35, 1.0]},
+	"angler": {"day": [[4.7, "water", "fish", "rod"], [11.6, "camp", "eat|stir", "bowl"], [13.4, "water", "fish", "rod"], [18.4, "camp", "warm|drink|laugh", "cup"], [21.0, "camp", "doze", ""]],
+		"go_hold": "rod", "dye": [[0.52, 0.56, 0.6, 0.08], [0.1, 0.12, 0.58], 0.3, 1.0]},
+	"pedlar": {"day": [[6.0, "road", "call|offer|count", ""], [12.0, "camp", "eat", "bowl"], [13.0, "road", "call|wave|count", ""], [18.2, "camp", "count|drink|laugh", "cup"], [21.3, "camp", "doze", ""]],
+		"round": "road", "walk": "carry", "go_hold": "pole", "dye": [[0.0, 0.97, 0.75, 0.6, 0.05], [0.12, 0.55, 0.0], 0.5, 1.0]},
+	"hunter": {"day": [[4.4, "meadow", "archery|peer|look", ""], [9.8, "wood", "trace|peer|look", ""], [12.4, "camp", "eat", "bowl"], [13.8, "meadow", "archery|look|stretch", ""], [18.6, "camp", "warm|laugh|drink", "cup"],
+			[21.8, "camp", "doze", ""]],
+		"dye": [[0.08, 0.3, 0.1], [0.07, 0.3], 0.3, 0.85]},
+	"pilgrim": {"day": [[5.2, "camp", "pray", ""], [6.4, "peak", "pray|gaze|stretch", ""], [11.4, "camp", "eat", "bowl"], [12.8, "road", "pray|think", ""], [16.2, "crag", "touch|pray", ""], [19.0, "camp", "warm|drink", "cup"],
+			[21.4, "camp", "doze", ""]],
+		"dye": [[0.1, 0.12, 0.6], [0.08, 0.0], 0.25, 0.95]},
+	"hermit": {"day": [[4.6, "peak", "meditate", ""], [8.6, "peak", "gaze|stretch|think", ""], [11.8, "peak", "eat", "bowl"], [13.0, "peak", "play_flute|read|write", "book"], [17.2, "peak", "gaze|meditate", ""], [19.6, "peak", "stargaze", ""],
+			[22.4, "peak", "doze", ""]],
+		"dye": [[0.58, 0.1, 0.0], [0.6, 0.0], 0.15, 0.95]},
 }
 
 ## where each kind of place may be found, best first: building styles (the doorstep outside), things
@@ -139,6 +163,15 @@ const PLACES := {
 	"shore": ["shore", "open:8-20"],
 	"patrol": ["path:8-16", "open:6-14"],
 	"lamps": ["prop:lantern_st", "path:3-12", "open:3-10"],
+	# the places of the road (the High Roads release): round the camp's fire, the forest's edge, open
+	# country, the road, the water, the foot of the crag and its very top
+	"camp": ["ring"],
+	"wood": ["wood", "open:6-16"],
+	"meadow": ["open:10-22"],
+	"road": ["path:4-24", "open:8-20"],
+	"water": ["shore", "open:6-18"],
+	"crag": ["crag", "open:6-14"],
+	"peak": ["peak", "crag", "open:6-14"],
 }
 
 const FAMILY := ["Wang", "Li", "Zhang", "Liu", "Chen", "Yang", "Zhao", "Huang", "Zhou", "Wu", "Xu", "Sun", "Hu", "Zhu", "Gao", "Lin", "He", "Guo", "Ma", "Luo",
@@ -150,7 +183,9 @@ const DHARMA := ["Jingkong", "Huineng", "Zhiyuan", "Wuxin", "Jueming", "Hongren"
 const TITLES := {"farmer": ["Farmer", "Farmer"], "fisher": ["Fisherman", "Fisherwoman"], "merchant": ["Merchant", "Shopkeeper"], "porter": ["Porter", "Porter"],
 	"monk": ["Brother", "Sister"], "guard": ["Guard", "Guard"], "watchman": ["Watchman", "Watchwoman"], "scholar": ["Scholar", "Scholar"], "cook": ["Cook", "Cook"],
 	"washer": ["Brother", "Auntie"], "youth": ["Brother", "Sister"], "lamplighter": ["Lamplighter", "Lamplighter"], "smith": ["Caster", "Caster"],
-	"disciple": ["Disciple", "Disciple"], "servant": ["Steward", "Steward"]}
+	"disciple": ["Disciple", "Disciple"], "servant": ["Steward", "Steward"],
+	"woodcutter": ["Woodcutter", "Woodcutter"], "herbalist": ["Herb-Gatherer", "Herb-Gatherer"], "angler": ["Old Angler", "Angler"], "pedlar": ["Pedlar", "Pedlar"],
+	"hunter": ["Hunter", "Huntress"], "pilgrim": ["Pilgrim", "Pilgrim"], "hermit": ["Hermit", "Hermit"]}
 
 ## the bodies that are women and girls (for names and words)
 const FEM := ["folk_farmwife", "folk_shopwife", "folk_girl", "folk_grandma", "folk_maiden", "folk_disciple_f", "folk_jiaoren",
@@ -176,8 +211,90 @@ const OLD := ["folk_grandpa", "folk_grandma"]
 static var _towns := {}
 static var _astar := {}
 
+# ---------------------------------------------------------------- the people of the road
+## The High Roads release: the land between the towns is lived in too.  At the foot of the highest
+## peak of every region there is a camp (a ring of stones, a fire, a lean-to), and the people of it
+## have days of their own like anybody's: a woodcutter at the forest's edge, a gatherer of herbs
+## under the crag, somebody fishing, a pedlar walking the road with a pole of goods, a hunter, a
+## pilgrim who goes up to the summit every morning, and a hermit who never comes down from it.
+## At dusk they come in to the fire, and sleep sitting up beside it.  They are made, moved and
+## talked to by everything that makes, moves and talks to the people of the towns: a camp is a town
+## with no houses (`town`), whose heart is where Atlas put it (`place_camps`).
+const CAMP_ROLES := {"woodcutter": 1, "herbalist": 1, "angler": 1, "pedlar": 1, "hunter": 1, "pilgrim": 1, "hermit": 1}
+## the people of the camps of each realm that is not the land's own, and of the sands
+const CAMP_RACE := {"heaven": "yumin", "under": "jiaoren", "dunes": "desert", "youdu": "shade"}
+
+static func is_camp(tid: String) -> bool:
+	return tid.begins_with("camp_")
+
+## The camp of region `area` in realm data `wd` ("" if it has none).
+static func camp_of(wd: Dictionary, area: String) -> String:
+	return ("camp_" + area) if (wd.get("camps", {}) as Dictionary).has(area) else ""
+
+## What a town or a camp is: its name, region, people and who lives in it.
+static func town(tid: String) -> Dictionary:
+	if TOWNS.has(tid):
+		return TOWNS[tid]
+	var area := tid.trim_prefix("camp_")
+	var spec: Dictionary = Data.AREAS.get(area, {})
+	var race: String = str(CAMP_RACE.get(area, CAMP_RACE.get(Data.layer_of(area), "human")))
+	return {"n": "the road through " + str(spec.get("n", area)), "area": area, "race": race, "roles": CAMP_ROLES, "camp": true}
+
+## Where the camps of a realm stand: for each region with a peak, open ground a little way from the
+## foot of its highest one, with room round it, nearest the road if there is one.  Called when the
+## realm is built (Atlas._build), after the peaks; returns {region: tile}.
+static func place_camps(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, reach: Dictionary, peaks: Array) -> Dictionary:
+	var out := {}
+	var near := {}
+	for e in ents:
+		for et in (e.tiles if e.kind == "seal" else ([e.pos] if e.has("pos") else [])):
+			for dy in range(-4, 5):
+				for dx in range(-4, 5):
+					near[(et as Vector2i) + Vector2i(dx, dy)] = true
+	var best_h := {}
+	for pk in peaks:
+		if float(pk.h) > float(best_h.get(pk.area, {"h": 0.0}).h):
+			best_h[pk.area] = pk
+	for area in best_h:
+		var pk2: Dictionary = best_h[area]
+		var c: Vector2i = pk2.c
+		var me: int = ids.find(area)
+		var want := float(int(pk2.r) + 7)
+		var best := Vector2i(-1, -1)
+		var bs := -1.0e9
+		var reach_r := int(pk2.r) + 22
+		for y in range(maxi(3, c.y - reach_r), mini(H - 3, c.y + reach_r + 1)):
+			for x in range(maxi(3, c.x - reach_r), mini(W - 3, c.x + reach_r + 1)):
+				var p := Vector2i(x, y)
+				if owner[y * W + x] != me or near.has(p) or not reach.has(p) or grid[y * W + x] != MapGen.FLOOR:
+					continue
+				var d := Vector2(p - c).length()
+				if d < float(pk2.r) + 3.0:
+					continue
+				var open_n := 0
+				var roads := 0
+				for dy2 in range(-2, 3):
+					for dx2 in range(-2, 3):
+						var g: int = grid[(y + dy2) * W + x + dx2]
+						if MapGen.is_walkable_tile(g) and g != MapGen.INTERIOR:
+							open_n += 1
+						if g == MapGen.PATH:
+							roads += 1
+				if open_n < 19 or roads > 6:
+					continue
+				var sc := -absf(d - want) + float(open_n) * 0.1 + Terrain3D.hash2(x, y, 41.0) * 0.5
+				if sc > bs:
+					bs = sc
+					best = p
+		if best.x >= 0:
+			out[area] = best
+	return out
+
 ## The tile at the heart of town `tid` (a world tile of its realm).
 static func heart(tid: String) -> Vector2i:
+	if is_camp(tid):
+		var area := tid.trim_prefix("camp_")
+		return Atlas.world_of(Data.layer_of(area)).camps[area]
 	var t: Dictionary = TOWNS[tid]
 	return Atlas.to_world(str(t.area), t.at)
 
@@ -195,7 +312,7 @@ static func people(wd: Dictionary, tid: String) -> Array:
 	var key := "%s|%s" % [str(wd.get("layer", "")), tid]
 	if _towns.has(key):
 		return _towns[key]
-	var t: Dictionary = TOWNS[tid]
+	var t: Dictionary = town(tid)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("folk:" + tid)
 	var out: Array = []
@@ -299,7 +416,7 @@ static func _taken(wd: Dictionary, tid: String) -> Dictionary:
 	var key := "taken|%s|%s" % [str(wd.get("layer", "")), tid]
 	if _towns.has(key):
 		return _towns[key]
-	var area: String = TOWNS[tid].area
+	var area: String = town(tid).area
 	var out := {}
 	for e in wd.ents:
 		# (Part XVII's obstacles, impact.gd, and the people and things that came later in the story, "late",
@@ -321,7 +438,7 @@ static func _spots(wd: Dictionary, tid: String, kind: String) -> Array:
 	var key := "spots|%s|%s|%s" % [str(wd.get("layer", "")), tid, kind]
 	if _towns.has(key):
 		return _towns[key]
-	var area: String = TOWNS[tid].area
+	var area: String = town(tid).area
 	var c := heart(tid)
 	var taken := _taken(wd, tid)
 	# (only places that can be walked to from the heart of the town: a doorstep cut off by water is
@@ -368,6 +485,45 @@ static func _spots(wd: Dictionary, tid: String, kind: String) -> Array:
 							continue
 					var to_c := Vector2(c - p)
 					out.append([p, atan2(to_c.x, to_c.y) if to_c.length() > 0.5 else Terrain3D.hash2(x, y, 5.0) * TAU])
+		elif s == "ring":
+			# round the fire of a camp, facing it
+			for k in 8:
+				var a := TAU * float(k) / 8.0
+				var q0 := c + Vector2i(int(round(cos(a))), int(round(sin(a))))
+				if reach.has(q0) and not taken.has(q0) and q0 != c:
+					out.append([q0, atan2(float(c.x - q0.x), float(c.y - q0.y))])
+		elif s == "wood":
+			# the forest's edge: open ground with a tree beside it, facing the tree
+			for y0 in range(c.y - RADIUS, c.y + RADIUS + 1):
+				for x0 in range(c.x - RADIUS, c.x + RADIUS + 1):
+					var p0 := Vector2i(x0, y0)
+					if maxi(absi(x0 - c.x), absi(y0 - c.y)) < 4 or taken.has(p0) or not reach.has(p0):
+						continue
+					for d0 in MapGen.DIRS:
+						var t0: Vector2i = p0 + d0
+						if t0.x >= 0 and t0.y >= 0 and t0.x < int(wd.w) and t0.y < int(wd.h) and wd.grid[t0.y * int(wd.w) + t0.x] == MapGen.WALL:
+							out.append([p0, atan2(float(d0.x), float(d0.y))])
+							break
+		elif s == "peak" or s == "crag":
+			# the very top of the region's peaks, looking out; or the foot of one, facing the rock
+			for pk0 in Peaks.of_area(wd, area):
+				var pc: Vector2i = pk0.c
+				if s == "peak":
+					for d1 in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(-1, 1), Vector2i(2, 0)]:
+						var q1: Vector2i = pc + d1
+						if reach.has(q1):
+							var away := Vector2(c - pc)
+							out.append([q1, atan2(away.x, away.y) + float(d1.x) * 0.6 - float(d1.y) * 0.4])
+				else:
+					var rr := int(pk0.r) + 2
+					for y1 in range(pc.y - rr, pc.y + rr + 1):
+						for x1 in range(pc.x - rr, pc.x + rr + 1):
+							var p1 := Vector2i(x1, y1)
+							var up := Peaks.at(wd, p1)
+							if up < 0.15 or up > 1.6 or taken.has(p1) or not reach.has(p1):
+								continue
+							var to_p := Vector2(pc - p1)
+							out.append([p1, atan2(to_p.x, to_p.y)])
 		elif s.begins_with("prop:"):
 			var pk := s.get_slice(":", 1)
 			for e in wd.ents:
@@ -400,8 +556,9 @@ static func _spots(wd: Dictionary, tid: String, kind: String) -> Array:
 							if reach.has(q6) and (sd == Vector2i.ZERO or not taken.has(q6)):
 								out.append([q6, atan2(float(-d4.x), float(-d4.y)), str(bd.id)])
 						break
-		# (enough places for a town's worth of people: the next kind of place too, if there are few)
-		if out.size() >= 6:
+		# (enough places for a town's worth of people: the next kind of place too, if there are few;
+		# a summit has room for few, and whoever is sent to one goes to it)
+		if out.size() >= 6 or (s == "peak" and not out.is_empty()):
 			break
 	if out.is_empty():
 		var any: Vector2i = c
@@ -461,7 +618,7 @@ static func _grid(wd: Dictionary, tid: String) -> Array:
 	var key := "%s|%s" % [str(wd.get("layer", "")), tid]
 	if _astar.has(key):
 		return _astar[key]
-	var area: String = TOWNS[tid].area
+	var area: String = town(tid).area
 	var c := heart(tid)
 	var r := RADIUS + 8
 	var rect := Rect2i(c - Vector2i(r, r), Vector2i(r * 2 + 1, r * 2 + 1)).intersection(Rect2i(0, 0, int(wd.w), int(wd.h)))
@@ -658,6 +815,18 @@ static func of_area(wd: Dictionary, area: String) -> Array:
 	var out: Array = []
 	for tid in towns_in(area):
 		out.append_array(people(wd, tid))
+	# (and the people of the road, the High Roads release)
+	var cid := camp_of(wd, area)
+	if cid != "":
+		out.append_array(people(wd, cid))
+	return out
+
+## The towns and the camp of region `area`: everywhere in it somebody lives.
+static func homes_in(wd: Dictionary, area: String) -> Array:
+	var out := towns_in(area)
+	var cid := camp_of(wd, area)
+	if cid != "":
+		out.append(cid)
 	return out
 
 ## The person standing on (or walking through) tile `tile` of the realm in `wd` at minute `m`, or {}
@@ -696,6 +865,28 @@ const LINES := {
 		"The caravan's late again. The caravan is always late. I'm the only thing on this road that's ever on time."],
 	"child": ["Are you a real cultivator? Can you fly? Fly! Fly now!", "I'm not allowed past the well. I go past the well all the time.", "Teacher says if we learn the thousand characters we can read anything. I know forty.",
 		"Play with us! You can be the dragon. You have to be the dragon, you're the biggest.", "My kite went up higher than the temple roof and nobody believed me."],
+	# the people of the road (the High Roads release)
+	"woodcutter": ["Take the dead wood and the crooked wood. The straight ones have somewhere to be in a hundred years.", "An axe wants a hundred strokes a day or it sulks. So does a woodcutter.",
+		"I knew a man once who stopped to watch two old fellows play weiqi in a cave. You have heard that one? Then you know why I do not stop.",
+		"Listen. Hear it? No? Neither do I. That is what I come up here for, %s.", "Wood warms you three times: cutting it, carrying it, and burning it. The carrying is the one nobody sings about."],
+	"herbalist": ["This one for fevers, this one for sleep, this one I do not know yet. I will know by the evening, one way or the other.", "The good roots grow where the going is bad. I have never once found ginseng beside a road.",
+		"Do not pull it. Dig round it, lift it, thank it. Then it works.", "The Divine Farmer tasted a hundred herbs in a day and was poisoned seventy times. I taste one a day. I intend to be old.",
+		"The higher the crag, the stronger the leaf. And the thinner the gatherer. Look at me."],
+	"angler": ["I have fished this water for thirty years with a straight hook. I am not here for the fish, %s.", "They say the Grand Duke fished three feet above the water, and what he caught was a king. I would settle for a carp.",
+		"Shh. No, it has gone. It was never there. Sit down anyway.", "The fish know the hour better than the watchman. Dawn and dusk. The rest of the day is for thinking.",
+		"A line in the water is a question. You do not always want the answer on the bank beside you, flapping."],
+	"pedlar": ["Needles, thread, salt, a comb, a mirror no bigger than your thumb! I carry a whole street on one shoulder.", "The road between two towns is the only place where neither of them can tell me the price.",
+		"I have sold the same kettle in six valleys. Bought it back in four. It is a good kettle.", "You want news? News is free. It is the salt that costs, %s.",
+		"Forty li today. My legs say fifty. My legs have always been liars."],
+	"hunter": ["Downwind and quiet. No, the other downwind.", "I take what the hills can spare, and I ask first. You would be surprised how often the answer is no.",
+		"There is a pack that sleeps through the noon in that hollow. I leave them their noon; they leave me my nights.", "A bow is half a year in the making and one breath in the using. I think about that a good deal, up here.",
+		"Tracks, %s. Two days old. Something that walks like a man and is not one. I would go round, myself."],
+	"pilgrim": ["Up before the sun, to the top by the time it is over the ridge, down by noon. Every day. The mountain has not noticed yet.", "It is not the top one goes for. It is the going. But I notice everybody stops at the top.",
+		"I am walking to all the great mountains before I die. I have done one. It was this one.", "The cairn up there? Put a stone on it when you pass. Nobody knows who put the first.",
+		"My knees pray on the way up and curse on the way down. Heaven, I am told, hears both."],
+	"hermit": ["Somebody came up. Well. Sit, since you have. The view is not mine to charge for.", "I came up for a season, forty years ago. It has been a long season.",
+		"Below they ask what I do all day. I look. It takes all day.", "The clouds come to me now. When I was young I went to them.",
+		"You climbed with your hands, %s? Good. Those who fly up never see what the mountain is made of."],
 	"elder": ["In my day the roads were full of bandits and the bandits were full of manners.", "Sit a while, %s. Young people are always walking somewhere. Where is everybody walking?",
 		"I've seen sixty springs. This one is the best. I say that every spring.", "Weiqi is like life. You think you're surrounding them, and they're surrounding you."],
 	"monk": ["Amituofo. The sweeping is the practice, and the leaves are the teachers.", "May your road be smooth, %s, and when it isn't, may you be.", "Every bowl of rice holds the work of a hundred hands. Eat slowly."],
@@ -741,9 +932,9 @@ static func line(p: Dictionary, g) -> String:
 	var h := Clock.hour(g)
 	var n := int(g.folk_talk.get(str(p.id), 0))
 	var pool: Array = []
-	if bool(p.night) and str(TOWNS[str(p.town)].race) == "shade":
+	if bool(p.night) and str(town(str(p.town)).race) == "shade":
 		pool.append_array(SHADE_LINES)
-	var race := str(TOWNS[str(p.town)].race)
+	var race := str(town(str(p.town)).race)
 	if PEOPLE_LINES.has(race):
 		pool.append_array(PEOPLE_LINES[race])
 	pool.append_array(LINES.get(str(p.role), LINES.youth))
@@ -895,6 +1086,32 @@ const ERRANDS := {
 	# Part XX (the Hollow Hills release): a basket of Yu Gong's mountain, a prop set at the pit-head, the
 	# first water of a well that has come back, and a boat bailed out now the river is up
 	# ---- Part XXI (the Hundred Arms release)
+	# Part XXII: the people of the road (the High Roads release): what calls the woodcutters, what the anglers
+	# saw float by, what the hermits watched go up, and the pilgrims told that the tops are there again
+	"s_p22_cutters": {"ask": "Something has been calling the cutters by name at night. Whose voice did you hear?", "price": 0, "toast": "Heard from %s whose voice it was",
+		"lines": ["My wife's. From up the slope, clear as a bell: come to bed. She is in Qingshi with her mother. And she has never in her life told me to come to bed; she tells me to mind my boots. I pulled the blanket over my head and counted my axe-strokes till dawn.",
+			"The foreman's. Calling the tally, the way he does. I very nearly answered: here. I had my mouth open. Then I remembered he lost his front teeth at the New Year and whistles on every name, and this one did not whistle.",
+			"My brother's. He went up for wood six winters ago in the snow and we found the sledge. It had his voice, and it had my name, and it put them together the wrong way round. He never called me by it. He called me Second.",
+			"A child's. I have no child. It said my name and then it said: carry me. I am a strong man and I have never been so frightened of anything so small. In the morning the salt was gone and there was one footprint in the ash. The left.",
+			"I did not hear a voice. I heard my own axe, up on the height, chopping, at midnight, with my axe lying beside me. The rhythm was right. Whatever it is has been listening to me work. I find I mind that more than the salt."]},
+	"s_p22_anglers": {"ask": "Have you seen anything come down the water these last days that was not a fish?", "price": 0, "toast": "Heard from %s what came down the stream",
+		"lines": ["Paper. Good paper, folded like a little boat, with writing. I let it go by. A man who fishes with a straight hook does not go grabbing at other people's letters. It bumped my float, mind, and I took that as a bite, and I was pleased for a moment.",
+			"A will. I read a little of it, I confess. It left a horse to a nephew and a library to nobody, because, it said, nobody deserved it. Very fine hand. It got less fine towards the bottom, as though the table were moving.",
+			"Poems, I think. Short lines. I cannot read, but I know the shape of a poem when it floats past; it has more edge to it than a letter. I dried one on a rock. I am using it to wrap bait. Do not look at me like that, it is good paper.",
+			"Seven of them, one behind another, like ducklings. All addressed the same way; I had the pedlar read me the top line. To posterity. I do not know the gentleman. I put them back in the water. They seemed to know where they were going.",
+			"A leaf with writing on. Not paper: a fig leaf, a big one, and the writing scratched with a thorn. It said only: are you coming. I have had that leaf in my hat three days. I do not know why I cannot throw it away."]},
+	"s_p22_hermits": {"ask": "You have been up here the whole time. What have you seen go by?", "price": 0, "toast": "Heard from %s what went up the great peak",
+		"lines": ["Shut? Were the tops shut? There was cloud. There is often cloud. I sat in it. ...What I did see, three nights running, was lights on the great peak above your sect. Going up, in a line, very slowly. Too slowly for men. I thought: somebody is moving house.",
+			"A week ago, nothing. That was pleasant. Since then, stones. Tall ones, with writing on, walking up the eighteen bends by torchlight with nobody carrying the torches. I have been a hermit for forty years to get away from people's names, and now they come up by themselves.",
+			"Smoke. Not cook-fire smoke: the heavy kind, from paper. It hangs in the gullies over there and mutters. When the wind is right I can make out words. All under heaven is at peace. It has been saying that for two thousand years and has not once looked down to check.",
+			"You climbed. Good. I knew somebody had; the mountain changes its mind about a person who comes up that way. As for what went by: a great many things in a great hurry to be at the top of something. They went straight past me. I am only at the top of this.",
+			"Kites! I have seen kites. In my sky, at my age. A pedlar went by yesterday at the height of my knees, singing. I did not know what to do. I waved. ...And at night, on the big one over there: torches, and stones walking. I liked the pedlar better."]},
+	"s_p22_pilgrims": {"ask": "The tops are there again. All of them. You can go up.", "price": 0, "toast": "Told %s the tops were back",
+		"lines": ["Are they? Good. I went up this morning anyway, as far as there was, and came down, and said my prayer at the bottom to the place where the top would have been. It heard, I think. It is not so particular as people suppose.",
+			"I knew. My knees told me before you did: they began to complain a bend earlier than they have all week, which means the mountain has got longer again. Thank you for coming to say so. People do not usually come and tell a pilgrim things. They sell him things.",
+			"Back? They never went, young master. A top is not a thing that can be taken away; it is only where the going stops. Nine days I went up into that cloud and nine days I stopped somewhere. That was the top, each time. You will see it when you are older and slower.",
+			"Then I shall take my stone up tomorrow. I have one from my own doorstep, four hundred li off. I was beginning to think I should have to carry it home again, and I did not know how to explain that to the doorstep.",
+			"Thank Heaven. Not for my sake; I should have gone on trying until I died, and enjoyed it. For the hermit's. He has not said so, but I think he was lonely up there with nobody arriving out of breath to be told to sit down."]},
 	"s_p21_cast": {"ask": "Pouring? I will stand by the mould and watch your hands.", "price": 0, "toast": "Stood at the mould with %s",
 		"lines": ["It was to be a bell. Look at it. I did not turn my wrist. ...I did. I felt it go. My brother-in-law has the next yard and a temper, and I was thinking of him, and it ran long.",
 			"A ploughshare, the order said. That is no ploughshare. I have poured forty years and never once made a thing I did not mean. Do not tell Auntie Rong. She will know by the sound of it anyway.",

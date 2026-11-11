@@ -95,6 +95,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Paired Dragons in to one another; a cock of wood from the smith for the king who loved swords; and
 	# the scroll the king left, read aloud to the Masterless Edge
 	"yuan_gong": "arms", "sword_dragons": "heart", "king_zhao": "craft", "wuzhu": "relic",
+	# Part XXII: up on its hands to the shanxiao, the Earl's own knot handed back to him, four tops told
+	# to the Mountain Spirit, and nine summits with nothing to report to the Lord of the Eastern Peak
+	"shanxiao": "heights", "fei_lian": "relic", "shan_gui": "heights", "dongyue": "heights",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -125,7 +128,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_mountain": ["road"], "the_echoes": ["home"], "the_hollow": ["open"],
 	# Part XXI: the Maiden teaches those who have swept a year, the three thousand go home by way of
 	# their dead, and a school is founded where the broom is learned first
-	"the_pupils": ["sweep"], "the_three_thousand": ["home"], "the_arms": ["school", "rack"]}
+	"the_pupils": ["sweep"], "the_three_thousand": ["home"], "the_arms": ["school", "rack"],
+	# Part XXII: a place at the fires for the shanxiao, the air asked for, and a stone on the cairn
+	"the_voices": ["fire"], "the_kites": ["ask"], "the_tops": ["cairn"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -477,6 +482,10 @@ func _world(d: float) -> void:
 		# doing something (props.gd): let it be done (a key now would cut it short)
 		world.move_dir = Vector2i.ZERO
 		return
+	if world.gliding():
+		# under the cloud-kite (peaks.gd): the flight was aimed before it began
+		world.move_dir = Vector2i.ZERO
+		return
 	# stuck watchdog
 	if world.ptile == last_tile and world.move_dir != Vector2i.ZERO:
 		stuck_t += d
@@ -668,6 +677,12 @@ func _world(d: float) -> void:
 		"try":
 			# Part XX: the nearest thing of the cave still to be done (props.gd)
 			_try_step(s)
+		"summit":
+			# Part XXII: the top of the peak the step names, or of the nearest it has not stood on (peaks.gd)
+			_summit_step(s)
+		"glide":
+			# Part XXII: up something high enough, and off it under the cloud-kite
+			_glide_step(s)
 		"grudges":
 			# Part XIV: the next of the grudges that stayed (all six, in any order), each a boss
 			var gr := _next_grudge()
@@ -1314,6 +1329,9 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 				# the Hundred Arms release: a Dao of arms is learned by fighting with the weapon in hand,
 				# which the bot does all along (_want_arm)
 				pass
+			"summits":
+				# the High Roads release: a summit can be climbed whenever it likes (_summit_step)
+				pass
 			_:
 				return false
 	return true
@@ -1356,6 +1374,9 @@ func _prepare_trial() -> bool:
 				# the Hundred Arms release: more battles with the weapon it is learning in hand
 				_grind()
 				return true
+			"summits":
+				# the High Roads release: up the nearest peak it has not stood on
+				return _summit_step({})
 			_:
 				# levels: the quest's own grinding (_cult_target); a Dao: the stele (_planned_dao)
 				return false
@@ -1391,6 +1412,91 @@ func _delve_step() -> bool:
 		return false
 	_goto_entity(delve_id.get_slice(":", 1), delve_id)
 	return true
+
+## Part XXII (peaks.gd): climb to the very top of the peak step `s` names (the highest of a region), or
+## of the nearest peak of this realm it has not stood on, as a player with the map open would: there is
+## a mark on the minimap for every one.  Returns false if there is none left.
+var summit_id := ""
+
+func _summit_step(s: Dictionary) -> bool:
+	var realm: String = str(world.wd.parent) if world.is_floor() else str(world.layer)
+	if s.has("peak"):
+		var lid := Data.layer_of(str(s.peak))
+		if lid != realm:
+			_goto_layer(lid)
+			return true
+		summit_id = "peak:%s:%d" % [str(s.peak), int(s.get("k", 0))]
+	if world.is_floor():
+		_goto_layer(realm)
+		return true
+	var lw: Dictionary = world.wd
+	if summit_id != "" and (Game.summits.has(summit_id) or Peaks.by_id(lw, summit_id).is_empty()):
+		summit_id = ""
+	if summit_id == "":
+		var bd := 1 << 30
+		for pk in lw.get("peaks", []):
+			if Game.summits.has(str(pk.id)):
+				continue
+			# (a peak in a region the journey has been through, before one it has not)
+			var c: Vector2i = pk.c
+			var dd: int = absi(c.x - world.ptile.x) + absi(c.y - world.ptile.y) + (0 if Game.seen.has(str(pk.area)) else 100000)
+			if dd < bd:
+				bd = dd
+				summit_id = str(pk.id)
+	if summit_id == "":
+		return false
+	_walk_to(Peaks.by_id(lw, summit_id).c, "summit:" + summit_id)
+	return true
+
+## Part XXII: a flight of so many tiles: up the nearest peak tall enough for it, and off its top in
+## whichever direction the air is clear for longest (V), as a player on a summit would look round
+## before leaping.  A peak whose every side is shut is not tried twice.
+var glide_from := ""
+var glide_skip := {}
+
+func _glide_step(s: Dictionary) -> void:
+	if world.gliding():
+		world.move_dir = Vector2i.ZERO
+		return
+	if world.is_floor():
+		_goto_layer(str(world.wd.parent))
+		return
+	var lw: Dictionary = world.wd
+	var need := int(s.n)
+	if glide_from == "" or Peaks.by_id(lw, glide_from).is_empty() or glide_skip.has(glide_from):
+		glide_from = ""
+		var bd := 1 << 30
+		for pk in lw.get("peaks", []):
+			# (a flight loses four fifths of a metre a tile: a peak must be tall enough to give it room)
+			if glide_skip.has(str(pk.id)) or float(pk.h) + float(world.GLIDE_LEAP) < float(need) * float(world.GLIDE_SINK) + 1.0 or not Game.seen.has(str(pk.area)):
+				continue
+			var c: Vector2i = pk.c
+			var dd: int = absi(c.x - world.ptile.x) + absi(c.y - world.ptile.y) + (0 if str(pk.area) == str(s.get("area", "")) else 600)
+			if dd < bd:
+				bd = dd
+				glide_from = str(pk.id)
+	if glide_from == "":
+		# nowhere it has been is tall enough: go and stand on more of the land's peaks
+		glide_skip = {}
+		_summit_step({})
+		return
+	var top: Vector2i = Peaks.by_id(lw, glide_from).c
+	if world.ptile != top or world.move_t >= 0.0:
+		_walk_to(top, "glide:" + glide_from)
+		return
+	var best := Vector2i.ZERO
+	var bn := 0
+	for d in DIRS:
+		var n: int = world.glide_reach(d)
+		if n > bn:
+			bn = n
+			best = d
+	if bn < need:
+		glide_skip[glide_from] = true
+		return
+	world.move_dir = Vector2i.ZERO
+	world.facing = best
+	_press("glide", 0.5)
 
 ## Part XX: do the nearest thing of the step's cave that has not been done for it yet.
 func _try_step(s: Dictionary) -> void:
@@ -1515,7 +1621,7 @@ func _folk_step(s: Dictionary) -> void:
 		# nobody to be found out of doors: wait in the town it is working through (the step's own town
 		# first), never in the one before; a town of the step's region before any other
 		var town := _folk_town(role)
-		var ar: String = str(Folk.TOWNS[town].area) if town != "" else str(s.area)
+		var ar: String = str(Folk.town(town).area) if town != "" else str(s.area)
 		var hc: Vector2i = Folk.heart(town) if town != "" else world.ptile
 		if Game.area != ar or world.layer != Data.layer_of(ar):
 			_travel(ar)
@@ -1554,8 +1660,16 @@ func _folk_town(role: String) -> String:
 		return ""
 	var best := ""
 	var bd := 1 << 30
-	for tid in Folk.TOWNS:
-		var ar: String = Folk.TOWNS[tid].area
+	var homes: Array = Folk.TOWNS.keys()
+	# (the High Roads release: an errand among the people of the road is run from camp to camp, the
+	# camps of regions the journey has been through)
+	if Folk.CAMP_ROLES.has(role):
+		homes = []
+		for ca in world.wd.get("camps", {}):
+			if Game.seen.has(str(ca)):
+				homes.append("camp_" + str(ca))
+	for tid in homes:
+		var ar: String = Folk.town(tid).area
 		if Data.layer_of(ar) != world.layer:
 			continue
 		var left := 0
@@ -1714,6 +1828,17 @@ func _astar() -> AStarGrid2D:
 		for x in world.w:
 			if not MapGen.is_walkable_tile(world.grid[y * world.w + x]):
 				astar.set_point_solid(Vector2i(x, y), true)
+	# the High Roads release (peaks.gd): a crag is gone round unless the top of it is where he is going,
+	# as anybody goes round one (a climbed tile costs what it costs in time)
+	if not world.is_floor():
+		for pk in world.wd.get("peaks", []):
+			var pc: Vector2i = pk.c
+			var pr: int = pk.r
+			for py in range(pc.y - pr, pc.y + pr + 1):
+				for px in range(pc.x - pr, pc.x + pr + 1):
+					var pt := Vector2i(px, py)
+					if astar.is_in_boundsv(pt) and not astar.is_point_solid(pt) and Peaks.rise_of(pk, float(px) + 0.5, float(py) + 0.5) > 0.25:
+						astar.set_point_weight_scale(pt, 3.0)
 	# the Living Land release: the things people leave about their towns (havoc.gd) are walked round,
 	# not galloped through, as a player minding other people's jars would
 	if not world.is_floor():
@@ -2110,6 +2235,9 @@ func _finish(reason: String) -> void:
 		"arm_switches": Game.arm_switches, "ending_kind": Cultures.ending_kind(Game),
 		# the Hollow Hills release: the caves gone to the very back of (caves.gd)
 		"caves_delved": Game.delved.keys(),
+		# the High Roads release: the summits stood on, the rock climbed and the flights under the cloud-kite (peaks.gd)
+		"summits": Game.summits.keys(), "metres_climbed": snappedf(Game.climbed, 0.1), "flights": Game.glides, "metres_flown": Game.glided * 2,
+		"longest_flight_metres": Game.glide_best * 2, "greatest_descent_metres": snappedf(Game.glide_drop, 0.1),
 		"trials": Game.trials,
 		"gates": Game.gates_open.keys(),
 		"time_by_screen_seconds": breakdown,
@@ -2141,6 +2269,7 @@ func _finish(reason: String) -> void:
 	print("works           : %d built (hand %d, wheel %d, art %d): %s; know-how %d earned, %d spent" % [Works.count(Game), Works.count(Game, "hand"), Works.count(Game, "wheel"), Works.count(Game, "dao"), Works.title(Game),
 		Works.know_earned(Game), Works.know_spent(Game)])
 	print("the dark        : %d caves gone to the very back of" % Game.delved.size())
+	print("the heights     : %d summits stood on, %.0f m of rock climbed, %d flights under the cloud-kite (%d m flown, the longest %d m)" % [Game.summits.size(), Game.climbed, Game.glides, Game.glided * 2, Game.glide_best * 2])
 	var arm_parts: Array = []
 	for aid in Arms.ORDER:
 		if Game.arms.has(aid):

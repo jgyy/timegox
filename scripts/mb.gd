@@ -757,7 +757,9 @@ func torus(pos: Vector3, r: float, thick: float, col: Color, rot: Vector3 = Vect
 func capsule(a: Vector3, b: Vector3, r: float, col: Color) -> void:
 	var d := b - a
 	var len := d.length()
-	var bs := basis_y(d).scaled(Vector3(r * 4.0, (len + r * 2.0), r * 4.0))
+	# (scaled along its own axes: Basis.scaled() scales along the world's, which sheared every capsule
+	# that did not stand upright into a vertical sliver)
+	var bs := basis_y(d) * Basis.from_scale(Vector3(r * 4.0, (len + r * 2.0), r * 4.0))
 	prim("cap", Transform3D(bs, (a + b) * 0.5), col)
 
 ## tapered cylinder from point `a` (radius r0) to point `b` (radius r1); builds its own ring geometry
