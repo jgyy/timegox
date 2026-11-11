@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Songs", "Feats", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "songs", "feats", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -40,6 +40,48 @@ func _build() -> void:
 			labels.append(e[1])
 			ids.append(e[0])
 			enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "feats":
+		# feats.gd: every feat by its kind, then the things nobody was told to look for (eggs.gd)
+		labels = []
+		ids = []
+		enabled = []
+		for fid in Feats.order():
+			var f: Dictionary = Feats.FEATS[fid]
+			var has: bool = Game.feats.has(fid)
+			labels.append(str(f.n) if has or not bool(f.get("hide", false)) else "? ? ?")
+			ids.append("feat:" + fid)
+			enabled.append(has)
+		for eid in Eggs.ORDER:
+			labels.append(Eggs.label(Game, eid))
+			ids.append("egg:" + eid)
+			enabled.append(Game.eggs.has(eid))
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "songs":
+		# music.gd: the songbook; Enter plays the tune under the cursor
+		labels = []
+		ids = []
+		enabled = []
+		for tid in Music.book(Game):
+			labels.append(Music.label(Game, tid))
+			ids.append("song:" + tid)
+			enabled.append(Game.heard.has(tid))
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "host":
+		# war.gd: the companies of the host
+		labels = []
+		ids = []
+		enabled = []
+		for cid in War.ORDER:
+			labels.append(War.label(Game, cid))
+			ids.append("company:" + cid)
+			enabled.append(War.has(Game, cid))
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
@@ -124,7 +166,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -185,7 +227,7 @@ func press(act: String) -> void:
 					mode = "hearths"
 					cursor = 0
 					_build()
-				"works", "roads":
+				"works", "roads", "feats", "songs", "host":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -220,7 +262,12 @@ func press(act: String) -> void:
 							msg = "Built: %s." % str(Works.WORKS[wid2].n)
 						_build()
 						return
-					if mode == "annals" or mode == "bestiary" or mode == "roads":
+					if mode == "songs":
+						# the songbook: play the tune under the cursor
+						Music.play_from_book(Game, id.trim_prefix("song:"))
+						_build()
+						return
+					if mode == "annals" or mode == "bestiary" or mode == "roads" or mode == "feats" or mode == "host":
 						return
 					msg = Game.use_item_field(id)
 					_build()
@@ -289,6 +336,136 @@ func _draw_bestiary() -> void:
 		UI.wrapped(self, r.position + Vector2(24, ty), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
+
+## The Feats page (feats.gd, eggs.gd): what the journey is remembered for, by kind, how far along each
+## is, and under them the things nobody was told to look for.
+func _draw_feats() -> void:
+	UI.text(self, Vector2(60, 70), "Feats", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 15)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var pts := Feats.points(Game)
+	UI.text(self, r.position + Vector2(24, 36), "%s      %d of %d feats      %d of %d points      %d of %d found unasked" % [Feats.title(Game), Game.feats.size(), Feats.FEATS.size(), pts, Feats.total(), Game.eggs.size(), Eggs.ORDER.size()],
+		15, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	UI.bar(self, Rect2(r.position + Vector2(24, 48), Vector2(r.size.x - 48, 8)), float(pts) / float(Feats.total()), UI.C_GOLD)
+	# the kinds, and how many of each are done
+	var kx := 0
+	for kd in Feats.KIND_ORDER:
+		var have := 0
+		var of := 0
+		for fid in Feats.FEATS:
+			if str(Feats.FEATS[fid].kind) == kd:
+				of += 1
+				have += 1 if Game.feats.has(fid) else 0
+		UI.text(self, r.position + Vector2(24 + (kx % 5) * 152, 84 + int(kx / 5) * 22), "%s %d/%d" % [str(Feats.KINDS[kd].n), have, of], 13, Feats.KINDS[kd].col, HORIZONTAL_ALIGNMENT_LEFT, 150)
+		kx += 1
+	var order := Feats.order()
+	if cursor < order.size():
+		var fid2: String = order[cursor]
+		var f: Dictionary = Feats.FEATS[fid2]
+		var has: bool = Game.feats.has(fid2)
+		UI.text(self, r.position + Vector2(24, 170), str(f.n) if has or not bool(f.get("hide", false)) else "? ? ?", 26, UI.C_GOLD if has else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		UI.text(self, r.position + Vector2(24, 196), str(Feats.KINDS[str(f.kind)].n), 15, Feats.KINDS[str(f.kind)].col)
+		UI.wrapped(self, r.position + Vector2(24, 236), Feats.text(Game, fid2), 18, UI.C_TEXT, r.size.x - 48)
+		var t2: Array = f.test
+		if not has and not bool(f.get("hide", false)) and not str(t2[0]) in ["step", "war_swift"]:
+			UI.bar(self, Rect2(r.position + Vector2(24, 400), Vector2(r.size.x - 48, 10)), clampf(Feats.value(Game, t2) / maxf(1.0, Feats.need(t2)), 0.0, 1.0), Feats.KINDS[str(f.kind)].col)
+	elif cursor < order.size() + Eggs.ORDER.size():
+		var eid: String = Eggs.ORDER[cursor - order.size()]
+		var got: bool = Game.eggs.has(eid)
+		UI.text(self, r.position + Vector2(24, 170), str(Eggs.EGGS[eid].n) if got else "? ? ?", 26, UI.C_GOLD if got else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		UI.text(self, r.position + Vector2(24, 196), "The Unasked: something nobody told you to look for", 15, Feats.KINDS.odd.col)
+		var words: Array = []
+		if got:
+			for l in Eggs.EGGS[eid].lines:
+				if str(l[0]) == "Narrator":
+					words.append(str(l[1]))
+			words.append("Found at %s of the journey." % Fmt.clock(float(Game.eggs[eid])))
+		else:
+			words.append(str(Eggs.EGGS[eid].hint))
+		UI.wrapped(self, r.position + Vector2(24, 236), UI.named("\n\n".join(words)), 17, UI.C_TEXT, r.size.x - 48)
+	else:
+		UI.wrapped(self, r.position + Vector2(24, 190), "Nobody asks for a feat, and no step of the story waits on one. Each is told the moment it is true and kept here. A few are not shown until they are done; twelve things are not feats at all, only found.", 17, UI.C_DIM, r.size.x - 48)
+
+## The songbook (music.gd): every tune heard, what it is played on and where, and its notes as a roll
+## (time across, pitch up, a colour for each voice).  Enter plays the tune under the cursor.
+func _draw_songs() -> void:
+	UI.text(self, Vector2(60, 70), "Songs", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 15)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var book := Music.book(Game)
+	UI.text(self, r.position + Vector2(24, 36), "%d of %d tunes heard      %d of 6 airs of the hearths learned" % [Game.heard.size(), Music.count(), Game.airs.size()], 15, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	if cursor >= book.size():
+		UI.wrapped(self, r.position + Vector2(24, 90), "Every tune of the land is written in this book as it is heard, in the numbered notes the land has always used: one to six, a dash to hold, a line under to hurry. Nothing in it was recorded. Each is played from its notes, on instruments made of arithmetic. Enter plays the tune under the cursor.", 17, UI.C_DIM, r.size.x - 48)
+		return
+	var tid: String = book[cursor]
+	var tn: Dictionary = Music.TUNES[tid]
+	if not Game.heard.has(tid):
+		UI.text(self, r.position + Vector2(24, 90), "Not yet heard", 26, UI.C_DIM)
+		UI.wrapped(self, r.position + Vector2(24, 130), str(tn.where), 17, UI.C_DIM, r.size.x - 48)
+		return
+	UI.text(self, r.position + Vector2(24, 90), str(tn.n), 26, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	var playing: bool = Music.asked() == tid
+	UI.text(self, r.position + Vector2(24, 116), "%s      %d beats a minute, %d s      %s" % [Music.instruments(tid), int(tn.bpm), int(Music.seconds(tid)), "playing" if playing else ("the air of %s" % str(Cultures.HEARTHS[str(tn.air)].n) if tn.has("air") else "")],
+		14, UI.C_JADE if playing else Color("c8a0e8"), HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	UI.wrapped(self, r.position + Vector2(24, 150), str(tn.desc), 17, UI.C_TEXT, r.size.x - 48)
+	UI.text(self, r.position + Vector2(24, 300), str(tn.where), 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	# the roll
+	var rr := Rect2(r.position + Vector2(24, 320), Vector2(r.size.x - 48, 230))
+	draw_rect(rr, Color(0, 0, 0, 0.35))
+	var notes := Music.roll(tid)
+	var total := Music.beats(tid)
+	var lo := 200
+	var hi := 0
+	for n in notes:
+		lo = mini(lo, int(n[2]))
+		hi = maxi(hi, int(n[2]))
+	var span := maxf(12.0, float(hi - lo + 1))
+	for bar in range(0, int(total) + 1, 4):
+		draw_rect(Rect2(rr.position + Vector2(bar / total * rr.size.x, 0), Vector2(1, rr.size.y)), Color(1, 1, 1, 0.07))
+	var cols := [Color("f0c850"), Color("7ad8a0"), Color("8ac0e8"), Color("e86a9a"), Color("c8a0e8")]
+	for n2 in notes:
+		var x := rr.position.x + float(n2[0]) / total * rr.size.x
+		var w := maxf(2.0, float(n2[1]) / total * rr.size.x - 1.0)
+		var y := rr.end.y - (float(int(n2[2]) - lo) + 0.5) / span * rr.size.y
+		draw_rect(Rect2(Vector2(x, y - 2.5), Vector2(w, 5.0)), cols[int(n2[3]) % cols.size()])
+	if playing:
+		var px := fposmod(t * float(tn.bpm) / 60.0, total) / total * rr.size.x
+		draw_rect(Rect2(rr.position + Vector2(px, 0), Vector2(2, rr.size.y)), Color(1, 1, 1, 0.5))
+	# the first bars as they are written
+	var first := str(tn.voices[0][3]).split("|")
+	var written := " | ".join(Array(first).slice(0, 4).map(func(x): return str(x).strip_edges()))
+	UI.text(self, r.position + Vector2(24, 574), written, UI.fit(written, 15, r.size.x - 48), UI.C_DIM.lightened(0.3), HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	UI.text(self, Vector2(r.end.x - 260, r.end.y - 16), "Enter: play   Esc: back", 13, UI.C_DIM)
+
+## The Host (war.gd): the companies that have come in, by arm, what each is, the airs it can sound, and
+## the fields held.
+func _draw_host() -> void:
+	UI.text(self, Vector2(60, 70), "The Host", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 15)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var m := War.muster(Game)
+	UI.text(self, r.position + Vector2(24, 36), "%d companies      Foot %d   Bows %d   Horse %d   Drums %d      %d airs to sound" % [War.companies(Game).size(), int(m.foot), int(m.bow), int(m.horse), int(m.drum), Game.airs.size()],
+		15, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	if cursor < War.ORDER.size():
+		var cid: String = War.ORDER[cursor]
+		var c: Dictionary = War.COMPANIES[cid]
+		var has: bool = War.has(Game, cid)
+		draw_rect(Rect2(r.position + Vector2(24, 70), Vector2(8, 40)), c.col if has else UI.C_DIM)
+		UI.text(self, r.position + Vector2(44, 100), str(c.n) if has else "Not yet in the host", 24, UI.C_GOLD if has else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 68)
+		UI.wrapped(self, r.position + Vector2(24, 140), War.text(Game, cid), 18, UI.C_TEXT, r.size.x - 48)
+	else:
+		UI.wrapped(self, r.position + Vector2(24, 100), "A host is raised, not hired: a company from every hearth that is asked, the sect's own, and what the works put in the field. Foot hold and go in, bows shoot, horse charge, and the drums sound the airs of the land, which strike at nothing but the heart. A field battle is fought by drums, a dozen at most, one order to a drum.", 17, UI.C_DIM, r.size.x - 48)
+	# the fields held
+	var y := r.end.y - 150.0
+	UI.text(self, Vector2(r.position.x + 24, y), "Fields held: %d of %d      driven off: %d" % [Game.war_won.size(), War.BATTLE_ORDER.size(), Game.war_lost], 16, UI.C_GOLD)
+	y += 22.0
+	for bid in War.BATTLE_ORDER:
+		var won: bool = Game.war_won.has(bid)
+		UI.text(self, Vector2(r.position.x + 24, y), "%s%s" % [str(War.BATTLES[bid].n), ", in %d drums" % int(Game.war_won[bid]) if won else ""], 14, UI.C_JADE if won else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		y += 19.0
 
 ## The Works page (works.gd, the Hundred Works release): the eighteen works in their three schools,
 ## what each does, what it costs in know-how and spirit stones, and what stands already.
@@ -856,10 +1033,19 @@ func _draw() -> void:
 	if mode == "roads":
 		_draw_roads()
 		return
+	if mode == "feats":
+		_draw_feats()
+		return
+	if mode == "songs":
+		_draw_songs()
+		return
+	if mode == "host":
+		_draw_host()
+		return
 	if mode == "yue":
 		_draw_yue()
 		return
-	UI.menu_list(self, Rect2(60, 80, 300, 470 if mode != "root" else 506), labels, cursor, enabled, 22 if mode != "root" else 17)
+	UI.menu_list(self, Rect2(60, 80, 300, 470 if mode != "root" else 590), labels, cursor, enabled, 22 if mode != "root" else 17)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
 	# status panel
 	var r := Rect2(400, 80, 820, 560)
@@ -897,4 +1083,4 @@ func _draw() -> void:
 	var ride_n: String = str(Fashion.RIDES[Game.ride].n) if Game.ride != "" else "none yet"
 	UI.text(self, Vector2(430, 586), "Wearing the %s (%s)   Ride: %s%s" % [outfit.n, Fashion.fx_text(outfit.fx), ride_n, "  (riding)" if Game.riding and Game.ride != "" else ""], 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 780)
 	if msg != "":
-		UI.text(self, Vector2(60, 580), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)
+		UI.text(self, Vector2(60, 580 if mode != "root" else 696), msg, 17, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 300)

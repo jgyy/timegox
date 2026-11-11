@@ -5,7 +5,8 @@ extends SceneTree
 ## a key held into somebody talks to them once; and (the Hollow Hills release) a key held into the mouth
 ## of a cave goes down into it, a step is walked on its floor, and the way out comes up into the daylight;
 ## and (the High Roads release) a key held up a crag climbs it to the top, V opens the cloud-kite there,
-## and the flight comes down on open ground.
+## and the flight comes down on open ground; and (the Thundering Pots release) a field battle is fought to
+## the end with the arrow keys and Enter, and the songbook is opened and a tune asked for.
 ## Run: godot --headless --path . --script tests/manual_input_test.gd
 
 var main
@@ -17,6 +18,8 @@ var prop := {}
 var wait_from := 0
 ## the walk into a cave and out again: its stage, and the frame the stage began
 var cave := {}
+## the field battle and the pages at the very end
+var pots := {}
 
 func key(code: int, down: bool) -> void:
 	var e := InputEventKey.new()
@@ -193,15 +196,78 @@ func high_step() -> void:
 	elif cave.has("air") and not w.gliding():
 		expect(int(g.glided) >= 6 and int(g.glide_best) == int(g.glided) and w.tile_free(w.ptile) and w.ent_at(w.ptile) == null and Peaks.at(w.wd, w.ptile) < float(cave.peak.h) * 0.5 and main.top_name() == "world",
 			"the flight ends on open ground lower down (%d tiles flown)" % int(g.glided))
-		print("failures: ", fails)
-		quit(1 if fails > 0 else 0)
+		# and last (the Thundering Pots release): a field battle fought with the keys, and the new pages
+		pots = {"field": frame, "clock": Time.get_ticks_msec()}
+		g.host = {"sect": true, "valley": true, "steppe": true, "sand": true, "river": true, "forge": true, "dawn": true}
+		g.airs = {"valley": true, "river": true}
+		main.start_war("drill1", {})
 	elif cave.has("top") and frame > int(cave.top) + 1500:
 		expect(false, "the flight comes down")
 		print("failures: ", fails)
 		quit(1)
 
+
+## The Thundering Pots release: a lesson of Master Sun's fought with the arrow keys and Enter, then the
+## menu's new pages and a tune asked for out of the songbook.
+func pots_step() -> void:
+	var g = root.get_node("Game")
+	if not pots.has("done"):
+		# (a key every sixth frame: one press is seen before the next is made)
+		if frame % 6 != 0:
+			return
+		var f = main.field
+		if main.top_name() == "field" and str(f.state) == "order":
+			if not pots.has("seen"):
+				pots["seen"] = true
+				expect(f.labels.size() == War.ORDER_IDS.size() and War.intent(f.st) != "", "a field battle opens on the scouts' word and seven orders")
+				tap(KEY_DOWN)
+			elif not pots.has("moved"):
+				pots["moved"] = true
+				expect(int(f.cursor) == 1, "Down moves the cursor down the orders")
+				tap(KEY_UP)
+			else:
+				# the order Master Sun would give: walk the cursor to it, a key at a time, and Enter
+				var want: int = f.ids.find(War.best(f.st))
+				if int(f.cursor) == want:
+					tap(KEY_ENTER)
+				else:
+					tap(KEY_DOWN if int(f.cursor) < want else KEY_UP)
+		elif main.top_name() == "field" and str(f.state) == "result":
+			pots["over"] = str(f.st.over)
+			pots["drums"] = int(f.st.drum)
+			tap(KEY_ENTER)
+		elif main.top_name() == "world" and pots.has("over"):
+			pots["done"] = frame
+			expect(str(pots.over) == "won" and g.war_won.has("drill1") and int(g.war_won.drill1) == int(pots.drums), "the lesson is fought to the end with the keys and the field is held (in %d drums)" % int(pots.drums))
+			tap(KEY_ESCAPE)
+		elif Time.get_ticks_msec() > int(pots.clock) + 180000:
+			expect(false, "a field battle can be fought to the end")
+			print("failures: ", fails)
+			quit(1)
+	elif pots.has("done") and frame == int(pots.done) + 20:
+		expect(main.top_name() == "menu" and main.menu.ids.has("feats") and main.menu.ids.has("songs") and main.menu.ids.has("host"), "the menu has its three new pages: the Host, Songs and Feats")
+		main.menu.cursor = main.menu.ids.find("songs")
+		tap(KEY_ENTER)
+	elif pots.has("done") and frame == int(pots.done) + 40:
+		expect(str(main.menu.mode) == "songs" and main.menu.labels.size() == Music.count() + 1, "Enter opens the songbook: every tune, and a way back")
+		g.heard["title"] = true
+		main.menu._build()
+		main.menu.cursor = 0
+		tap(KEY_ENTER)
+	elif pots.has("done") and frame == int(pots.done) + 60:
+		expect(Music.asked() == "title" and int(g.songs_played) == 1, "Enter on a tune that has been heard asks for it")
+		tap(KEY_ESCAPE)
+		tap(KEY_ESCAPE)
+	elif pots.has("done") and frame == int(pots.done) + 80:
+		expect(main.top_name() == "world" and Music.asked() == "", "and leaving the menu lets the land's own tune come back")
+		print("failures: ", fails)
+		quit(1 if fails > 0 else 0)
+
 func _process(_d: float) -> bool:
 	frame += 1
+	if not pots.is_empty():
+		pots_step()
+		return false
 	if not cave.is_empty() and int(cave.stage) == 5:
 		high_step()
 		return false

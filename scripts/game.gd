@@ -160,10 +160,60 @@ var arm := "sword"
 var arm_xp := {}
 var arm_switches := 0
 
+## ---- the Thundering Pots release
+## Yue Ling's dresses and the one she wears (fashion.gd YUE_OUTFITS); every outfit the hero has had on
+var yue_outfits := {"lotus": true}
+var yue_outfit := "lotus"
+var worn := {"sweeper": true}
+## feats (feats.gd: id -> the play time it was done at) and what was found that nobody was told to
+## look for (eggs.gd)
+var feats := {}
+var eggs := {}
+## the tunes heard (music.gd) and the airs of the land learned (id -> true), and how many times a
+## tune was asked for in the songbook
+var heard := {}
+var airs := {}
+var songs_played := 0
+## the host (war.gd): the companies raised, the field battles won (id -> drums it took) and lost, the
+## orders given (order -> times) and how many drums running the host has given ground
+var host := {}
+var war_won := {}
+var war_lost := 0
+var war_orders := {}
+var war_feints := 0
+var war_tries := {}
+var songs_asked := {}
+## Old Du's mat (gamble.gd): the throws so far (every throw is drawn from this count), and how it has gone
+var gamble_n := 0
+var gamble_rounds := 0
+var gamble_wins := 0
+var gamble_won := 0
+var gamble_lost := 0
+var gamble_best := 0
+var gamble_streak := 0
+var gamble_triples := 0
+## the commissions of the notice board (jobs.gd): id -> "taken" or "done", and what each was at when
+## it was taken (to count from)
+var jobs := {}
+var job_base := {}
+## how many times each named person has been spoken to (eggs.gd), and the foes felled by kind
+var npc_talks := {}
+var felled_kind := {}
+## what was said when something was found (eggs.gd), waiting to be shown
+var egg_pending: Array = []
+var _feat_t := 0.0
+
 func _process(d: float) -> void:
 	if started and not finished:
 		playtime += d
 		Clock.advance(self, d)
+		# feats, finds and the dresses the journey has earned are looked for now and then (cheap: a
+		# few dozen comparisons)
+		_feat_t -= d
+		if _feat_t <= 0.0:
+			_feat_t = 1.5
+			poll_wardrobe()
+			Feats.poll(self)
 
 func reset() -> void:
 	started = true
@@ -270,6 +320,34 @@ func reset() -> void:
 	arm = "sword"
 	arm_xp = {}
 	arm_switches = 0
+	yue_outfits = {"lotus": true}
+	yue_outfit = "lotus"
+	worn = {"sweeper": true}
+	feats = {}
+	eggs = {}
+	heard = {}
+	airs = {}
+	songs_played = 0
+	host = {}
+	war_won = {}
+	war_lost = 0
+	war_orders = {}
+	war_feints = 0
+	war_tries = {}
+	songs_asked = {}
+	gamble_n = 0
+	gamble_rounds = 0
+	gamble_wins = 0
+	gamble_won = 0
+	gamble_lost = 0
+	gamble_best = 0
+	gamble_streak = 0
+	gamble_triples = 0
+	jobs = {}
+	job_base = {}
+	npc_talks = {}
+	felled_kind = {}
+	egg_pending = []
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -291,18 +369,19 @@ func member_name(i: int) -> String:
 
 func max_hp(i: int) -> int:
 	# (his origin and outfit build his body only, not Yue Ling's: Fashion.gear)
-	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else 1.0) * Works.mod(self, "hp"))
+	# (and her dress hers: Fashion.yue_gear)
+	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else 1.0 + Fashion.yue_gear(self, "hp")) * Works.mod(self, "hp"))
 
 func max_qi(i: int) -> int:
 	# (his origin and his outfit may widen or narrow his dantian: Fashion.gear)
-	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * ((1.0 + talent_mod("qi")) * (1.0 + Fashion.gear(self, "qi")) if i == 0 else 1.0))
+	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * ((1.0 + talent_mod("qi")) * (1.0 + Fashion.gear(self, "qi")) if i == 0 else 1.0 + Fashion.yue_gear(self, "qi")))
 
 func fighter(i: int) -> Dictionary:
 	var a := float(Data.atk(level)) * (1.0 + 0.12 * temper) * boon("atk", 1.0)
 	if i == 1:
-		a = float(Data.atk(level)) * 0.75
+		a = float(Data.atk(level)) * 0.75 * (1.0 + Fashion.yue_gear(self, "atk"))
 	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
-	var spd: int = Data.speed(level) + (2 if i == 1 else 0)
+	var spd: int = Data.speed(level) + (2 + int(Fashion.yue_gear(self, "spd")) if i == 1 else 0)
 	if i == 0:
 		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd") + Arms.mod(self, "spd", 0.0))
 	return {
@@ -587,6 +666,9 @@ func add_exp(x: float) -> bool:
 	return gained
 
 func record_kills(a: String, n: int, ids: Array = []) -> void:
+	# (what falls is counted by kind: jobs.gd)
+	for kid in ids:
+		felled_kind[str(kid)] = int(felled_kind.get(str(kid), 0)) + 1
 	var s := cur_step()
 	# (a hunt in a cave, Part XX, counts what is brought down in that cave)
 	if not s.is_empty() and s.kind == "hunt" and s.area == a and (not s.has("cave") or layer == Caves.fid(a, int(s.cave))):
@@ -738,6 +820,15 @@ func poll_steps() -> void:
 			"glide":
 				# Part XXII: one flight under the cloud-kite of so many tiles, made since the step began
 				ok = step_glide >= int(s.n)
+			"jobs":
+				# Part XXIII: so many commissions of the notice board done, any of them (jobs.gd)
+				ok = Jobs.done_count(self) >= int(s.n)
+			"airs":
+				# Part XXIII: so many airs of the hearths learned (music.gd)
+				ok = airs.size() >= int(s.n)
+			"host":
+				# Part XXIII: so many companies in the host (war.gd)
+				ok = War.companies(self).size() >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -994,10 +1085,45 @@ func wear(id: String) -> bool:
 	var hp_r: float = hp[0] / float(max_hp(0))
 	var qi_r: float = qi[0] / float(max_qi(0))
 	outfit = id
+	worn[id] = true
 	hp[0] = minf(float(max_hp(0)), float(max_hp(0)) * hp_r)
 	qi[0] = minf(float(max_qi(0)), float(max_qi(0)) * qi_r)
 	note("Dressed in the " + str(Fashion.OUTFITS[id].n))
 	return true
+
+## The Thundering Pots release: a dress for Yue Ling (fashion.gd YUE_OUTFITS).
+func grant_yue_outfit(id: String) -> void:
+	if yue_outfits.has(id) or not Fashion.YUE_OUTFITS.has(id):
+		return
+	yue_outfits[id] = true
+	toast("A new dress for Yue Ling: %s (Esc > Wardrobe)" % Fashion.YUE_OUTFITS[id].n)
+	note("Yue Ling was given the " + str(Fashion.YUE_OUTFITS[id].n))
+
+func wear_yue(id: String) -> bool:
+	if not yue_outfits.has(id) or id == yue_outfit:
+		return false
+	var hp_r: float = hp[1] / maxf(1.0, float(max_hp(1)))
+	var qi_r: float = qi[1] / maxf(1.0, float(max_qi(1)))
+	yue_outfit = id
+	hp[1] = float(max_hp(1)) * hp_r
+	qi[1] = float(max_qi(1)) * qi_r
+	note("Yue Ling wears the " + str(Fashion.YUE_OUTFITS[id].n))
+	return true
+
+## The dresses of hers the journey has earned (how close the two are, the steps of the story done).
+func poll_wardrobe() -> void:
+	if not companion:
+		return
+	for id in Fashion.yue_earned(self):
+		grant_yue_outfit(str(id))
+
+## What a feat, a commission or a find gives to wear (fashion.gd `feat`, `job`, `egg`).
+func grant_earned(kind: String, id: String) -> void:
+	for rw in Fashion.earned_by(kind, id):
+		if str(rw[0]) == "outfit":
+			grant_outfit(str(rw[1]))
+		else:
+			grant_yue_outfit(str(rw[1]))
 
 # ---------------------------------------------------------------- the Eight Arms (arms.gd)
 func grant_arm(id: String) -> void:

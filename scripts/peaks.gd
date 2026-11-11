@@ -322,6 +322,19 @@ static func _stand(grid: PackedByteArray, W: int, pk: Dictionary, how: String, i
 		# (spread by the thing's own name, so that three things of a kind lie on three sides)
 		var start := absi(hash(id)) % maxi(cands.size(), 1)
 		cands = cands.slice(start) + cands.slice(0, start)
+	# (not beside anything already stood here, if that can be helped: two things side by side at the foot
+	# of a crag, with somebody above them and a wood behind, shut the second in where nobody could get
+	# at it: the banners of Chu, the Thundering Pots release)
+	if how != "top":
+		for q0 in cands:
+			if used.has(q0) or not MapGen.is_walkable_tile(grid[q0.y * W + q0.x]):
+				continue
+			var crowded := false
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					crowded = crowded or used.has(q0 + Vector2i(dx, dy))
+			if not crowded:
+				return q0
 	for q in cands:
 		if not used.has(q) and MapGen.is_walkable_tile(grid[q.y * W + q.x]):
 			return q

@@ -50,7 +50,7 @@ const ORDER := ["valley", "steppe", "sand", "river", "forge", "dawn"]
 
 const HEARTHS := {
 	"valley": {"n": "the Rice Hearth", "people": "the Valley Folk", "short": "of the Rice Hearth", "col": Color("7ab85a"),
-		"home": "Qingshi Village", "towns": ["qingshi", "cloudfoot", "sect"], "areas": ["village", "mountain", "sect", "bamboo", "terraces", "silk", "mirror"],
+		"home": "Qingshi Village", "towns": ["qingshi", "drumtower", "cloudfoot", "sect"], "areas": ["village", "mountain", "sect", "bamboo", "terraces", "silk", "mirror"],
 		"keeper": "granny_wen", "keeper_area": "village", "kin": ["granny_wen", "noodle_he", "tofu_sun", "farmer_lao", "tea_master"],
 		"hail": ["Eaten yet?", "Have you eaten?", "Come in, come in!"], "greet": "Have you eaten?", "gesture": "nod",
 		"dish": "rice gruel with pickled mustard and a salted duck egg", "drink": "green tea from the terraces",

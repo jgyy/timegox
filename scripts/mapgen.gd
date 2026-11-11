@@ -218,6 +218,11 @@ static func build(id: String, size := Vector2i.ZERO, spec_over: Dictionary = {})
 				if maxi(absi(f.x - c.x), absi(f.y - c.y)) < 6:
 					ok = false
 					break
+			# (ground the region's packs keep off, "clear": where something stands that is put there after
+			# the map is made; Qingshi's kiln, since the Drum Tower quarter took the open ground to the east)
+			for cl in spec.get("clear", []):
+				if maxi(absi(cl.x - c.x), absi(cl.y - c.y)) < 5:
+					ok = false
 			if ok:
 				for q in placed:
 					if maxi(absi(q.x - c.x), absi(q.y - c.y)) < 5:

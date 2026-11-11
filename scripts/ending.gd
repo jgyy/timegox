@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths", "works": "the Works", "arms": "the Hand", "delve": "the Dark", "heights": "the Heights"}
+const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths", "works": "the Works", "arms": "the Hand", "delve": "the Dark", "heights": "the Heights", "host": "the Host", "song": "the Song"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)

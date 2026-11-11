@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 28.0 * 3600.0
+var max_time := 31.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -98,6 +98,10 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXII: up on its hands to the shanxiao, the Earl's own knot handed back to him, four tops told
 	# to the Mountain Spirit, and nine summits with nothing to report to the Lord of the Eastern Peak
 	"shanxiao": "heights", "fei_lian": "relic", "shan_gui": "heights", "dongyue": "heights",
+	# Part XXIII: seven companies that were asked for to the general who only ever obeyed, a planting song to the lute
+	# with lead in it, eight hundred who will all go home to the king who could not face their fathers, and a potter's
+	# hands to the first pot
+	"meng_tian": "host", "gao_jianli": "song", "xiang_yu": "host", "wafu": "works",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -130,7 +134,10 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# their dead, and a school is founded where the broom is learned first
 	"the_pupils": ["sweep"], "the_three_thousand": ["home"], "the_arms": ["school", "rack"],
 	# Part XXII: a place at the fires for the shanxiao, the air asked for, and a stone on the cairn
-	"the_voices": ["fire"], "the_kites": ["ask"], "the_tops": ["cairn"]}
+	"the_voices": ["fire"], "the_kites": ["ask"], "the_tops": ["cairn"],
+	# Part XXIII: the clay soldiers carried home by the names in their collars, the lead melted out of the lute, and
+	# the song kept when the spears go home
+	"the_clay": ["home"], "the_lute": ["melt"], "the_host": ["band"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -263,6 +270,26 @@ func _apply_start() -> void:
 				pick = fo if not fo.is_empty() else pick.follow.options[0]
 			if not pick.is_empty():
 				Fate.take(Game, Fate.thread_of_step(str(st2.id)), pick)
+	# Part XXIII: the levy, the airs, the notices and the fields a player would have behind them by then
+	for st4 in Data.STEPS.slice(0, idx):
+		if bool(st4.get("levy", false)):
+			for ln in st4.npcs:
+				Game.host[War.levy_of(str(ln))] = true
+		if str(st4.kind) == "airs":
+			for an in (st4.npcs as Array).slice(0, int(st4.n)):
+				Game.airs[Cultures.of_npc(str(an))] = true
+		if str(st4.kind) == "war":
+			Game.war_won[str(st4.battle)] = 8
+		if str(st4.kind) == "jobs":
+			for jid in ["job_tally", "job_mill"]:
+				Game.jobs[jid] = "done"
+	if idx > Data.step_index("s_p19_home"):
+		for wid in ["well_sweep", "fire_kit", "cords", "sling", "trip_hammer", "water_bellows", "crossbow", "chariot"]:
+			Game.works[wid] = true
+	if idx > Data.step_index("s_p21_home"):
+		for aid in Arms.ORDER:
+			Game.arms[aid] = true
+			Game.arm_xp[aid] = 20
 	# the heart-to-hearts Yue Ling would have had by then, answered as the plan answers them (bonds.gd)
 	for tk in Bonds.TALKS:
 		if Data.step_index(str(tk.after)) < idx:
@@ -350,6 +377,8 @@ func _process(d: float) -> void:
 			_meditate()
 		"choice":
 			_choice()
+		"field":
+			_field()
 		"ending":
 			cool = 2.0
 			await _shot("ending")
@@ -526,6 +555,8 @@ func _world(d: float) -> void:
 		_press("ride", 0.35)
 		return
 	var fit := _want_outfit()
+	if fit == "":
+		fit = _want_yue_outfit()
 	if fit != "":
 		menu_goal = "wardrobe"
 		world.move_dir = Vector2i.ZERO
@@ -677,6 +708,22 @@ func _world(d: float) -> void:
 		"try":
 			# Part XX: the nearest thing of the cave still to be done (props.gd)
 			_try_step(s)
+		"war":
+			# Part XXIII: a field battle, begun by a word with whoever commands on that field: go to it rested
+			if _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity(str(s.area), str(s.npc))
+		"airs":
+			# Part XXIII: the next of the people who still sing their hearth's air
+			for an in s.npcs:
+				if not Game.airs.has(Cultures.of_npc(str(an))):
+					_goto_entity(Trials.npc_area(str(an)), str(an))
+					break
+		"jobs", "host":
+			# Part XXIII: the notice board of Qingshi: Clerk Bai, by the Drum Tower (the choice takes down
+			# what can be reported at once, _choice)
+			_goto_entity("village", Jobs.CLERK)
 		"summit":
 			# Part XXII: the top of the peak the step names, or of the nearest it has not stood on (peaks.gd)
 			_summit_step(s)
@@ -1020,6 +1067,48 @@ func _want_outfit() -> String:
 			best = id
 	return best if best != Game.outfit else ""
 
+## Whether a notice of the board asks for something the journey has done already (jobs.gd).
+func _job_done_already(id: String) -> bool:
+	var nd: Array = Jobs.JOBS[id].need
+	match str(nd[0]):
+		"reach":
+			return Feats.value(Game, [str(nd[1]), 0]) >= float(nd[2])
+		"have":
+			for k in nd[1]:
+				if int(Game.inv.get(k, 0)) < int(nd[1][k]) + 2:
+					return false
+			return true
+		"war":
+			return Game.war_won.has(str(nd[1]))
+	return false
+
+## The field of war (field.gd): the order Master Sun would give (War.best), a drum at a time.
+func _field() -> void:
+	var f = main.field
+	match str(f.state):
+		"order":
+			var want: int = f.ids.find(War.best(f.st))
+			if want < 0 or not f.enabled[want]:
+				want = f.ids.find("hold")
+			if f.cursor == want:
+				_press("confirm", 0.9)
+			else:
+				_nav(f.labels.size(), f.cursor, want)
+		"result":
+			_press("confirm", 1.6)
+		_:
+			cool = 0.3
+
+## The newest dress Yue Ling has that she is not wearing ("" if she wears it).
+func _want_yue_outfit() -> String:
+	if not Game.companion:
+		return ""
+	var best := ""
+	for id in Fashion.YUE_ORDER:
+		if Game.yue_outfits.has(id):
+			best = id
+	return best if best != Game.yue_outfit else ""
+
 ## The Eight Arms (arms.gd): the weapon the bot should have in its hand, "" if it already has.  The
 ## one a step of the story asks for; else it learns each weapon it owns in turn, to Adept and then to
 ## Master (the way a player who wants every technique would), and ends with the jian in its hand.
@@ -1076,16 +1165,38 @@ func _choice() -> void:
 				want = k0
 		_nav(ids.size(), c.cursor, maxi(want, 0))
 		return
+	if str(c.title) == Jobs.ASK:
+		# the notice board (jobs.gd): report what is done; else take down a notice that is done already
+		# (it is reported in the same breath); else leave it
+		want = -1
+		for kj in ids.size():
+			if want < 0 and str(ids[kj]).begins_with("report:"):
+				want = kj
+		for kj2 in ids.size():
+			if want < 0 and str(ids[kj2]).begins_with("take:") and _job_done_already(str(ids[kj2]).get_slice(":", 1)):
+				want = kj2
+		_nav(ids.size(), c.cursor, want if want >= 0 else ids.find("later"))
+		return
+	if str(c.title) == main.DRILL_ASK or str(c.title) == main.TAILOR_ASK or str(c.title) == Gamble.ASK:
+		_nav(ids.size(), c.cursor, ids.find("later"))
+		return
 	if str(c.title) == main.ARMS_ASK:
 		want = ids.find(_want_arm())
 		if want < 0:
 			want = ids.find(Arms.held(Game))
 		_nav(ids.size(), c.cursor, want)
 		return
-	if str(c.title).begins_with("The wardrobe"):
+	if str(c.title) == main.WARDROBE_ASK:
 		want = ids.find(_want_outfit())
 		if want < 0:
-			want = ids.find(Game.outfit)
+			# (his own is on: hers next, if she has something newer to put on)
+			want = ids.find("yue") if _want_yue_outfit() != "" else ids.find(Game.outfit)
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title) == main.YUE_WARDROBE_ASK:
+		want = ids.find(_want_yue_outfit())
+		if want < 0:
+			want = ids.find(Game.yue_outfit)
 		_nav(ids.size(), c.cursor, want)
 		return
 	for pk in PICK_PLAN:
@@ -1332,6 +1443,10 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 			"summits":
 				# the High Roads release: a summit can be climbed whenever it likes (_summit_step)
 				pass
+			"companies", "airs":
+				# the Thundering Pots release: the host and the airs are what the story has given by then
+				if not Trials.need_met(n, Game) and Game.done("s_p23_levy"):
+					return false
 			_:
 				return false
 	return true
@@ -2244,6 +2359,8 @@ func _finish(reason: String) -> void:
 		"time_by_area_seconds": areas,
 		"meditation_by_purpose_seconds": time_by_med,
 		"timeline": Game.timeline,
+		"feats": Game.feats.keys(), "feat_points": Feats.points(Game), "finds": Game.eggs.keys(), "companies": War.companies(Game), "fields_held": Game.war_won, "fields_lost": Game.war_lost,
+		"tunes_heard": Game.heard.keys(), "airs": Game.airs.keys(), "commissions": Jobs.done_count(Game), "outfits": Game.outfits.keys(), "yue_outfits": Game.yue_outfits.keys(),
 	}
 	var dir := report_path.get_base_dir()
 	if dir != "":
@@ -2278,6 +2395,16 @@ func _finish(reason: String) -> void:
 	print("                  " + ", ".join(arm_parts))
 	print("crossroads      : %d answered, %d echoes heard; mercy %+d, new works %+d, wide world %+d%s" % [Game.picks.size(), Game.echoed.size(), Echoes.scale(Game, "heart"), Echoes.scale(Game, "craft"), Echoes.scale(Game, "reach"),
 		(": " + Echoes.names(Game)) if Echoes.names(Game) != "" else ""])
+	var m := War.muster(Game)
+	print("the host        : %d companies (foot %d, bows %d, horse %d, drums %d); fields held %d of %d %s, driven off %d" % [War.companies(Game).size(), int(m.foot), int(m.bow), int(m.horse), int(m.drum),
+		Game.war_won.size(), War.BATTLE_ORDER.size(), JSON.stringify(Game.war_won), Game.war_lost])
+	print("the song        : %d of %d tunes heard, %d airs of the hearths learned" % [Game.heard.size(), Music.count(), Game.airs.size()])
+	print("the board       : %d of %d commissions done" % [Jobs.done_count(Game), Jobs.ORDER.size()])
+	print("the mat         : %s" % Gamble.summary(Game))
+	print("the wardrobe    : %d of %d outfits (wearing the %s), %d of %d dresses for Yue Ling (wearing %s)" % [Game.outfits.size(), Fashion.OUTFIT_ORDER.size(), str(Fashion.OUTFITS[Game.outfit].n),
+		Game.yue_outfits.size(), Fashion.YUE_ORDER.size(), str(Fashion.YUE_OUTFITS[Game.yue_outfit].n)])
+	print("feats           : %d of %d (%d of %d points): %s; found unasked: %d of %d %s" % [Game.feats.size(), Feats.FEATS.size(), Feats.points(Game), Feats.total(), Feats.title(Game), Game.eggs.size(), Eggs.ORDER.size(),
+		JSON.stringify(Game.eggs.keys())])
 	print("the hero        : %s, a young %s, kin %s; guest of %d hearths %s" % [Game.hero_name(), "woman" if Game.fem() else "man", str(Cultures.HEARTHS[Cultures.own(Game)].short), Cultures.guests(Game), JSON.stringify(Game.hearth)])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":

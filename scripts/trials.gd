@@ -57,8 +57,11 @@ const KINDS := {
 	"arms": {"n": "By the hand", "col": Color("dce8ff"), "what": "the weapons whose Dao you have learned"},
 	# the High Roads release (peaks.gd): the summits stood on
 	"heights": {"n": "By the heights", "col": Color("f4f8ff"), "what": "the summits you have stood on"},
+	# the Thundering Pots release: the host that was raised (war.gd), and the airs of the land (music.gd)
+	"host": {"n": "By the host", "col": Color("e0705a"), "what": "the companies that came when they were asked"},
+	"song": {"n": "By the song", "col": Color("c8a0e8"), "what": "the airs of the land you have learned"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -1191,6 +1194,60 @@ const TRIALS := {
 				"desc": "Late Sheathed Edge and a sword tempered eight times. Yu Gong meant to move two mountains with a basket, and Heaven sent giants to do it for him. This is the eldest of the five, and there are no giants.",
 				"line": "Lin Feng draws. The Lord of the Eastern Peak writes it down."},
 		]},
+	# ---- Part XXIII (the Thundering Pots release): the general who obeyed, the lute with lead in it, the king who never
+	# lost a charge, and the first pot
+	"meng_tian": {"might": [2.6, 1.3],
+		"why": "Meng Tian built the Wall with three hundred thousand men and never marched without the tally. When a forged letter told him to die he asked only whether the seal was true. Fired in clay and buried with the army, he has half a tally and is keeping the vanguard ready, for an order that is not coming.",
+		"paths": [
+			{"id": "host", "kind": "host", "n": "A host nobody ordered", "needs": [["companies", 7]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "Seven companies in the host, every one of them asked for and none commanded. Let him look down the slope at it. He has led three hundred thousand, and not one of them ever came because he wanted to.",
+				"line": "Lady Hao raises one hand, and seven companies who were asked nicely ground their spears. Meng Tian looks for the tally that brought them. There is none."},
+			{"id": "relic", "kind": "relic", "n": "Four left halves", "needs": [["item", "tiger_tally", 4]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "The four halves of tiger tallies from the field. Every one is a left half: the half a general keeps. Show him that nobody, anywhere, is holding the right.",
+				"line": "Lin Feng lays four bronze half-tigers on the rock, nose to nose. Meng Tian tries each against his own. None of them finishes the writing."},
+			{"id": "might", "kind": "might", "n": "Break the Wall", "needs": [["lv", 82], ["temper", 8]], "boon": {},
+				"desc": "Middle Leaning on Nothing and a sword tempered eight times. He is six hundred plates of fired clay with a general inside. It has been done to a wall before.",
+				"line": "Lin Feng draws. The general of clay orders the left wing to advance, and nobody does."},
+		]},
+	"gao_jianli": {"might": [2.6, 1.3],
+		"why": "Gao Jianli played at the River Yi when Jing Ke went to kill the King of Qin. The king had his eyes put out, kept him to play, and was struck at with a lute full of lead. He missed. He has played the leaded lute ever since, and eight thousand feet keep its time.",
+		"paths": [
+			{"id": "song", "kind": "song", "n": "A fourth above", "needs": [["airs", 3]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Three airs of the land, learned and sung. He has kept every tune out of that lute for two thousand years because the man he hated liked them. Sing him one the man never heard.",
+				"line": "Lin Feng sings the planting song, badly, bent over as it is sung. The rod stops over the strings. \"That is flat,\" says Gao Jianli. \"...Go on.\""},
+			{"id": "hearth", "kind": "hearth", "n": "Those who wept at the Yi", "needs": [["hearths", 4]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Four hearths of the land call you a guest. Everybody at the River Yi wept when he played, and he has never forgiven them for letting Jing Ke go. Tell him who is listening now.",
+				"line": "Lin Feng names four fires and who sits at them. \"And they would weep?\" asks the blind man. \"They would ask you to supper,\" says Yue Ling."},
+			{"id": "might", "kind": "might", "n": "Cut the strings", "needs": [["lv", 83], ["temper", 8]], "boon": {},
+				"desc": "Late Leaning on Nothing and a sword tempered eight times. The lute weighs what a mill-stone weighs, and he swings it by ear.",
+				"line": "Lin Feng draws. Gao Jianli tilts his head, and says the sword is a fifth sharp."},
+		]},
+	"xiang_yu": {"might": [2.7, 1.3],
+		"why": "Xiang Yu crossed the river with eight thousand sons of Chu and never lost a charge. At Gaixia he heard the songs of Chu on four sides in the night, and by morning stood in front of nobody. He would not cross the Wu River alone. He has fought the field a thousand times since, and has only ever lost it once.",
+		"paths": [
+			{"id": "song", "kind": "song", "n": "The songs of Chu", "needs": [["airs", 5]], "boon": {"foe_hp": 0.65, "weak_k": 1.9},
+				"desc": "Five airs of the land. There is no beating him and there never was. Sing what was sung the first time: not to his soldiers, who have gone, but to him.",
+				"line": "Five airs, one song. The Hegemon-King listens to the end. \"The boatman said I could still be a king there,\" he says. \"He did not say I could go home.\""},
+			{"id": "host", "kind": "host", "n": "Somebody to look at their fathers", "needs": [["companies", 8]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Eight companies in the host, and every man of them to be sent home alive. He could not face the fathers of eight thousand. Stand in front of him with eight hundred whose fathers you will look in the eye.",
+				"line": "\"How many did you bring over?\" asks the Hegemon-King. Eight hundred. \"And how many go back?\" Lady Hao answers: \"I have the roll. All of them.\""},
+			{"id": "might", "kind": "might", "n": "Meet the charge", "needs": [["lv", 83], ["temper", 9]], "boon": {},
+				"desc": "Late Leaning on Nothing and a sword tempered nine times. His strength plucked up the hills. Nobody has ever stood in front of it and been there afterwards.",
+				"line": "Lin Feng draws. The Hegemon-King lets go of the bridle."},
+		]},
+	"wafu": {"might": [2.8, 1.3],
+		"why": "The first thing anybody made was a pot, and the first music was somebody beating on it with a bone to say supper. Then Ling Lun cut a pipe, and a bell was cast to the pipe, and the pot was thrown away as noise. It has been calling for four thousand years. It struck the Yellow Bell once, with its own foot, to be heard.",
+		"paths": [
+			{"id": "song", "kind": "song", "n": "Answer it", "needs": [["airs", 6]], "boon": {"foe_hp": 0.65, "foe_atk": 0.8},
+				"desc": "All six airs of the land. Every one of them was first sung over a pot, to a beat. Sing all six to the beat it is making, and let it find out that it has had a tune the whole time.",
+				"line": "Six airs, sung in time to the thunder, and the thunder under them like a keel. The great pot stops, the way a man stops who has just heard his name."},
+			{"id": "works", "kind": "works", "n": "A potter's hands", "needs": [["works", "hand", 3]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Three works of the Hand built: the oldest school, fire and clay and cord. It was made by somebody who needed it. Come as somebody who makes things because they are needed.",
+				"line": "Lin Feng lays a hand on the cracked rim, as a potter does, to feel where it is thin. Nobody has touched it since it was thrown away."},
+			{"id": "might", "kind": "might", "n": "Break the pot", "needs": [["lv", 83], ["temper", 9]], "boon": {},
+				"desc": "Late Leaning on Nothing and a sword tempered nine times. It is cracked already. It has been cracked since the Xia, and it is still here.",
+				"line": "Lin Feng draws. BOOM, says the pot."},
+		]},
 	# ---- Part XVIII (the New Fire release): the Lord of the Southern Fire, and the fire nobody sat up with
 	"zhurong": {"might": [2.3, 1.3],
 		"why": "Zhurong has opened every summer for ten thousand years by giving the land new fire from Suiren's drill, to hearths put out to receive it. Lin Feng has come with six that would not be put out, and asks him to bless the pot.",
@@ -1344,6 +1401,12 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"summits":
 			# the High Roads release: summits stood on (peaks.gd)
 			return g.summits.size() >= int(n[1])
+		"companies":
+			# the Thundering Pots release: companies in the host (war.gd)
+			return War.companies(g).size() >= int(n[1])
+		"airs":
+			# the airs of the hearths learned (music.gd)
+			return g.airs.size() >= int(n[1])
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1421,6 +1484,10 @@ static func need_text(n: Array, g) -> String:
 			return "%d Daos of arms learned to Adept (now %d: win battles with a weapon in hand; Esc > Arms)" % [int(n[1]), Arms.adept(g)]
 		"summits":
 			return "%d summits stood on (now %d; every region has peaks, marked on the map)" % [int(n[1]), g.summits.size()]
+		"companies":
+			return "%d companies in the host (now %d: the levy of the hearths, the works, the notice board; Esc > The Host)" % [int(n[1]), War.companies(g).size()]
+		"airs":
+			return "%d airs of the hearths learned (now %d: somebody at each hearth still sings its own)" % [int(n[1]), g.airs.size()]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1521,7 +1588,7 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	# went through most trials side by side or by the people had a script error for a title)
 	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire",
 	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave", "arms": "Whose Hand Is Open",
-	"heights": "Who Stood on the Tops"}
+	"heights": "Who Stood on the Tops", "host": "Whom They Came For", "song": "Who Sang Them Home"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

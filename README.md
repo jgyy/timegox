@@ -1,44 +1,130 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Leaning on Nothing, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has **mountains in every region, 139 peaks that are climbed hand over hand and come down from under a cloud-kite**, 241 bosses, twenty-seven Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns lived in by **219 townsfolk with days of their own**, 45 camps out in the wild where **315 people of the road** keep theirs, things in the streets that really break, and 86 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (twelve ways, bright, bitter and dark), answer at **twenty-five crossroads** that the whole story remembers, carry the **Eight Arms**, each struck with in its own way and each a Dao of its own, go down into a **cave under every region**, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **every face shows what it feels**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
+Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Great Sound, Rarely Heard, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has **mountains in every region, 139 peaks that are climbed hand over hand and come down from under a cloud-kite**, 245 bosses, twenty-eight Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns (Qingshi now in two quarters) lived in by **245 townsfolk with days of their own**, 45 camps out in the wild where **315 people of the road** keep theirs, things in the streets that really break, and 94 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twenty-six outfits** (and dress Yue Ling in ten of her own), ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (twelve ways, bright, bitter and dark), answer at **twenty-eight crossroads** that the whole story remembers, raise **a host** from the six hearths and fight **field battles by drums**, hear **thirty-four tunes** made wholly from code, take down the **eighteen commissions** of a notice board, do **81 feats**, stake spirit stones at **Old Du's mat**, carry the **Eight Arms**, each struck with in its own way and each a Dao of its own, go down into a **cave under every region**, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **every face shows what it feels**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
 
-> **Total gameplay duration: about 27 hours 9 minutes** (27:08:59 of game time for the end-to-end bot run, seed 1234), **1 hour 13 minutes more than the last release** (25:56:01). **Mountains in the whole open world**: every region has peaks of its own, crags of bare rock nine to forty-five metres high with snow on the high heads and a cairn on every summit, 139 of them, added to the height field itself, so that the ground goes up and whoever is on it goes up with it. **Climbing**: a step that rises more than a stride is climbed, hand over hand, on a clip of its own, anywhere there is rock; the very top of a peak is a summit stood on, and it is told. **Gliding**: V opens the cloud-kite, a swallow of paper and bamboo built from code, and a flight from a summit carries the hero (and Yue Ling, on his wing, under one of her own) seventy metres down to wherever somebody can stand. **The land between the towns is lived in**: a camp at the foot of the highest peak of 45 regions, and in each a woodcutter, a gatherer of herbs, an angler, a pedlar, a hunter, a pilgrim who climbs to the summit every morning and a hermit who never comes down from it, each with a day of their own by the clock. **Part XXII, "The High Roads", plays in about 1 hour 13 minutes**: nobody has come down the mountain road in nine days, something with one leg is calling the woodcutters by name, the Earl of the Wind has drawn his bag shut on every kite in his sky, a scholar has climbed to the top to see the view and cannot get down, a lady in fig leaves is keeping every summit in cloud for somebody who is late, and what the top of a mountain is for is asked of the mountain; a new realm, **Leaning on Nothing**, and a new way through trials, **By the heights**. Bugs were found and fixed.
+> **Total gameplay duration: about 28 hours 22 minutes** (28:22:25 of game time for the end-to-end bot run, seed 1234), **1 hour 13 minutes more than the last release** (27:08:59). **Music**: thirty-four tunes, one for the title, the sect, each of the six hearths, ten kinds of country, the night, a cave, the kite, battles, lords and war, every one written in the numbered notes of the land and **every sound made from code**: there is not an audio file in the repository. **Warfare**: a host raised from the six hearths, a company at a time, and **field battles fought by drums**, one order to a drum against a host whose intent the scouts can read. **More to wear**: fourteen new outfits for the hero (twenty-six in all), and **a wardrobe for Yue Ling**, who has had one dress for twenty-two chapters. **Feats**: 81 things a journey is remembered for, and **twelve things nobody is told to look for**. **A bigger town**: Qingshi has grown a second quarter round a Drum Tower, with twenty-six more people in it, a tailor, a stage, **a notice board with eighteen commissions** and **Old Du's gambling mat**. And **Part XXIII, "The Thundering Pots"**: the Yellow Bell is broken, eight thousand soldiers of fired clay are marching by the count, and the war is ended by a song.
 
 | | |
 |---|---|
-| ![a peak of Azure Cloud Mountain from below: bare rock, snow on its head, a cairn and a line of flags on the summit](docs/screenshots/peak_mountain_far.webp) | ![on the summit of Sun-Viewing Peak at dusk, the sect's roofs far below](docs/screenshots/summit_mountain.webp) |
-| ![climbing the rock face hand over hand, twenty-one metres up](docs/screenshots/climb_mountain.webp) | ![off the top under the cloud-kite, Yue Ling on his wing under one of her own](docs/screenshots/glide_mountain.webp) |
-| ![the flight from the side: a swallow of paper and bamboo, both hands on the bar](docs/screenshots/glide_mountain_side.webp) | ![a camp of the people of the road at dusk: everybody come in to the fire](docs/screenshots/camp_mountain_dusk.webp) |
-| ![the hermit on his summit, who never comes down](docs/screenshots/road_mountain_hermit.webp) | ![the Lord of the Eastern Peak at his desk on the very top of Sun-Viewing Peak](docs/screenshots/dongyue_on_the_peak.webp) |
-| ![fourteen faces on one head: at rest, a smile, joy, tenderness, sorrow, anger, a battle cry, resolve, surprise, fear, pain, doubt, stillness and sleep, each a pose of six bones sculpted into the head](docs/screenshots/faces_hero_f.webp) | ![the same fourteen on Yue Ling](docs/screenshots/faces_yue_ling.webp) |
-| ![the same fourteen on the hero as a young man](docs/screenshots/faces_hero.webp) | ![and on the Elder: every one of the 219 people has them](docs/screenshots/faces_elder.webp) |
-| ![the Eight Arms in the hand: the jian, the staff, the sabre, the spear, the iron fan, the bow, the chain whip and the judge's brush](docs/screenshots/arms_rack.webp) | ![the arms rack (Esc > Arms): each weapon, its Dao and rank, what it does now, and its technique; the one under the cursor is shown in the hand](docs/screenshots/arms_page.webp) |
-| ![each weapon is struck with in its own way: six moments of the plain blow of the jian, staff, sabre, spear, fan, bow, whip and brush](docs/screenshots/arms_blows.webp) | ![the technique of each weapon's Dao: One Line, Sweeping the Thousand Steps, the Tiger Comes Down the Mountain, the Dragon Leaves the Sea, the Wind Unfolds, the Shot Not Shot, Nine Bends, One Stroke](docs/screenshots/arms_arts.webp) |
-| ![a battle in the Crimson Marsh with the spear in hand](docs/screenshots/battle_arm_spear.webp) | ![a trial passed by the hand: the king who loved swords, shown four weapons each put down when it is done](docs/screenshots/trial_by_the_hand.webp) |
-| ![the sky is held: twelve ends, the ones the journey earned open, and a dark end says that it is one](docs/screenshots/ending_choice_dark.webp) | ![a dark end: the Jade Throne](docs/screenshots/ending_throne.webp) |
-| ![a bright end: the School of the Eight Arms](docs/screenshots/ending_school.webp) | ![a bitter end: the Far Shore](docs/screenshots/ending_far.webp) |
-| ![the people of Part XXI: Ou Yezi the swordsmith, the Maiden of Yue, Ji Chang the archer, the swordsman in scholar's dress, King Wen of Zhao and Wuzhu, the Masterless Edge](docs/screenshots/part21_people.webp) | ![the four lords of Part XXI: Yuan Gong the White Ape, the Paired Dragons Gan Jiang and Mo Ye, King Wen of Zhao and Wuzhu](docs/screenshots/part21_lords.webp) |
-| ![the foes of Part XXI: sword-reeds, white gibbons, hook-bill herons, stray arrows, the louse as big as a cartwheel, bow-shadow snakes, swordsmen of the gate, fighting cocks, broken edges, blades of the Sword Pool, the white tiger of the mound and humming swords](docs/screenshots/part21_foes.webp) | ![the last crossroads of Part XXI: what is done with the arms of the land](docs/screenshots/crossroads_arms.webp) |
-| ![King Wen of Zhao, who loved swords, met with a fan](docs/screenshots/battle_boss_king_zhao.webp) | ![Wuzhu, the Masterless Edge: four thousand blades with no hand, in the shape of somebody](docs/screenshots/battle_boss_wuzhu.webp) |
-| ![the machines of the Wheel, built from code: the well-sweep, a water-wheel, the water trip-hammer, the water-bellows, the repeating crossbow, the south-pointing chariot and the wooden ox](docs/screenshots/works_wheel.webp) | ![the Works page: eighteen works in three schools, what each does and costs, and the know-how learned by looking](docs/screenshots/works_page.webp) |
-| ![the oldest tools (the fire-drill, knotted cords, the sling, the kiln, the stone adze, the hide coat)](docs/screenshots/works_hand.webp) | ![the arts of the Dao worked into things (the spirit-gathering array, cinnabar talismans, the eight-trigram furnace, paper servants, the heaven-watching mirror, formation flags)](docs/screenshots/works_art.webp) |
-| ![the last crossroads of Part XIX: what the land does with its machines, which only a maker of a school may answer for it](docs/screenshots/crossroads_choice.webp) | ![the Crossroads page: the three scales, and what was asked, chosen and heard of each answer](docs/screenshots/crossroads_page.webp) |
-| ![the wild at noon: a pack of bamboo wolves asleep where it stood](docs/screenshots/wild_noon_asleep.webp) | ![the same pack at dawn, hunting](docs/screenshots/wild_dawn_hunting.webp) |
-| ![Gongshu Ban's water-wheel in the mill-race below Qingshi](docs/screenshots/works_ban_wheel.webp) | ![the people of Part XIX: Gongshu Ban, Mozi, the Gardener of Hanyin, Yan Shi the Artificer and the Player](docs/screenshots/part19_people.webp) |
-| ![the Player, the dancer Yan Shi made, who has built itself a heart](docs/screenshots/battle_boss_the_player.webp) | ![Jixin, the Machine Heart, in the oldest pit at Tushan](docs/screenshots/battle_boss_jixin.webp) |
-| ![the foes of Part XIX: wheel-mites, treadle imps, idle shuttles, the Cloud Ladder, cog-crabs, bellows wraiths, trip-hammer golems, the Player, wooden kites, stray oxen, paper servants, the Machine Heart, and the Engine's children](docs/screenshots/part19_foes.webp) | ![the bestiary says when a creature is abroad, when it sleeps and what it is doing now](docs/screenshots/bestiary_hours.webp) |
-| ![the faces before (above) and after (below) this release: the lower jaw wider down to its corners and the chin broader, the eyes smaller with a round iris the lid covers, one highlight and a thin lash line](docs/screenshots/sculpt_before_after.webp) | ![the cast after the re-sculpt: Yue Ling, Lin Feng as a young woman and as a young man, Chang'e, the Elder, Ah Mei, Granny Wen, Grandmother Sarnai of the horse-folk and Zhurong, Lord of the Southern Fire](docs/screenshots/sculpt_cast.webp) |
-| ![the hero as a young woman from every side: the same robe, sword and clips on a woman's frame](docs/screenshots/turnaround_lin_feng_f.webp) | ![the four looks on a woman's frame and on a man's](docs/screenshots/hero_women_and_men.webp) |
-| ![character creation: a young woman, the Wanderer, the old hunter's apprentice, kin of the Felt Hearth, and where the story will begin](docs/screenshots/create_hearth.webp) | ![the Hearths page: six cultures of the land, how each greets, eats and keeps its fire, what nobody does there, and whether they call you a stranger, a guest or kin](docs/screenshots/hearths_page.webp) |
-| ![one of six beginnings: three years ago, the last morning in the tents of the horse-folk below Thunder Valley](docs/screenshots/prologue_steppe.webp) | ![the farewell at the Felt Hearth: Grandmother Sarnai, who keeps the fire for the people who fly](docs/screenshots/prologue_steppe_farewell.webp) |
-| ![the people and the dress of the hearths: Grandmother Sarnai and Batu, a herder woman and man, a woman of the oasis, a boat-wife, a founder and a lantern-maker's girl](docs/screenshots/hearth_people.webp) | ![Part XVIII: clinker, the crust a tired fire leaves, on the mouth of a casting pit at Tushan](docs/screenshots/part18_clinker.webp) |
-| ![Zhurong, Lord of the Southern Fire, who keeps Suiren's fire-drill and will not bless six hearths that would not empty](docs/screenshots/battle_boss_zhurong.webp) | ![Huilu, the fire nobody sat up with: six bonfires in one skin](docs/screenshots/battle_boss_huilu.webp) |
-| ![the sky is held: where will you keep your own fire? Five ends, the ones the journey earned open](docs/screenshots/ending_choice.webp) | ![one of five endings: the Road of Six Fires, and the hero's own fire on the lotus](docs/screenshots/ending_road.webp) |
+| ![a field battle under Mount Li: the levy of six hearths on the left, the clay host on the right, the scouts' word and the seven orders](docs/screenshots/field_lishan_orders.webp) | ![Gaixia: the airs of the land sounded on four sides, and it is the other host's heart that is struck at](docs/screenshots/field_gaixia_songs.webp) |
+| ![a volley in the air: the Camel Archers of the Well and the Founders' Crossbows of Tushan](docs/screenshots/field_lishan_volley.webp) | ![the horse-folk go in round the flank](docs/screenshots/field_lishan_charge.webp) |
+| ![seven of the fourteen new outfits: the Straw Rain-Cape, Examination Blue, New Year Red, the Steppe Fur Coat, Pilgrim's White, the Swallow-Tail Jacket and the Lamp-Black Delver's Coat](docs/screenshots/outfits_new_1.webp) | ![and seven more: the Broom Immortal's Patches, the Fox-Fire Festival Robe, the Painted Face of the Pear Garden, the Levy Captain's Lamellar, the Robe of the Twelve Pipes, the Grand Marshal's Crimson and the Clay Soldier's Tunic](docs/screenshots/outfits_new_2.webp) |
+| ![Yue Ling's own wardrobe: the Lotus Rose she woke in, Healer's White, Plum Blossom in Snow, Moon-Palace Silver and Willow Green](docs/screenshots/yue_dresses_1.webp) | ![and Festival Scarlet, Snow-Country Furs, Field Surgeon's Blue, the Pear Garden Dancer's Sleeves and Her Own Star](docs/screenshots/yue_dresses_2.webp) |
+| ![the songbook (Esc > Songs): a tune of the land, what it is played on, and its notes as a roll; every sound is made from code](docs/screenshots/songs_page.webp) | ![the Feats page: what the journey is remembered for, by kind, and how far along each is](docs/screenshots/feats_page.webp) |
+| ![Qingshi has grown: the Drum Tower quarter, with its street, the Hall of the Twelve Pipes, the tailor's, the levy's barracks and the Pear Garden stage](docs/screenshots/quarter_above.webp) | ![the people of Part XXIII: Ling Lun who cut the pipes, Master Sun, Lady Hao, Music-Master Kuang, Gao Jianli of the leaded lute and the Hegemon-King](docs/screenshots/part23_people.webp) |
+| ![the Hegemon-King of Western Chu, on the height at Gaixia, in front of nobody](docs/screenshots/battle_boss_xiang_yu.webp) | ![a peak of Azure Cloud Mountain from below: bare rock, snow on its head, a cairn and a line of flags on the summit](docs/screenshots/peak_mountain_far.webp) |
+| ![on the summit of Sun-Viewing Peak at dusk, the sect's roofs far below](docs/screenshots/summit_mountain.webp) | ![climbing the rock face hand over hand, twenty-one metres up](docs/screenshots/climb_mountain.webp) |
+| ![off the top under the cloud-kite, Yue Ling on his wing under one of her own](docs/screenshots/glide_mountain.webp) | ![the flight from the side: a swallow of paper and bamboo, both hands on the bar](docs/screenshots/glide_mountain_side.webp) |
+| ![a camp of the people of the road at dusk: everybody come in to the fire](docs/screenshots/camp_mountain_dusk.webp) | ![the hermit on his summit, who never comes down](docs/screenshots/road_mountain_hermit.webp) |
+| ![the Lord of the Eastern Peak at his desk on the very top of Sun-Viewing Peak](docs/screenshots/dongyue_on_the_peak.webp) | ![fourteen faces on one head: at rest, a smile, joy, tenderness, sorrow, anger, a battle cry, resolve, surprise, fear, pain, doubt, stillness and sleep, each a pose of six bones sculpted into the head](docs/screenshots/faces_hero_f.webp) |
+| ![the same fourteen on Yue Ling](docs/screenshots/faces_yue_ling.webp) | ![the same fourteen on the hero as a young man](docs/screenshots/faces_hero.webp) |
+| ![and on the Elder: every one of the 219 people has them](docs/screenshots/faces_elder.webp) | ![the Eight Arms in the hand: the jian, the staff, the sabre, the spear, the iron fan, the bow, the chain whip and the judge's brush](docs/screenshots/arms_rack.webp) |
+| ![the arms rack (Esc > Arms): each weapon, its Dao and rank, what it does now, and its technique; the one under the cursor is shown in the hand](docs/screenshots/arms_page.webp) | ![each weapon is struck with in its own way: six moments of the plain blow of the jian, staff, sabre, spear, fan, bow, whip and brush](docs/screenshots/arms_blows.webp) |
+| ![the technique of each weapon's Dao: One Line, Sweeping the Thousand Steps, the Tiger Comes Down the Mountain, the Dragon Leaves the Sea, the Wind Unfolds, the Shot Not Shot, Nine Bends, One Stroke](docs/screenshots/arms_arts.webp) | ![a battle in the Crimson Marsh with the spear in hand](docs/screenshots/battle_arm_spear.webp) |
+| ![a trial passed by the hand: the king who loved swords, shown four weapons each put down when it is done](docs/screenshots/trial_by_the_hand.webp) | ![the sky is held: twelve ends, the ones the journey earned open, and a dark end says that it is one](docs/screenshots/ending_choice_dark.webp) |
+| ![a dark end: the Jade Throne](docs/screenshots/ending_throne.webp) | ![a bright end: the School of the Eight Arms](docs/screenshots/ending_school.webp) |
+| ![a bitter end: the Far Shore](docs/screenshots/ending_far.webp) | ![the people of Part XXI: Ou Yezi the swordsmith, the Maiden of Yue, Ji Chang the archer, the swordsman in scholar's dress, King Wen of Zhao and Wuzhu, the Masterless Edge](docs/screenshots/part21_people.webp) |
+| ![the four lords of Part XXI: Yuan Gong the White Ape, the Paired Dragons Gan Jiang and Mo Ye, King Wen of Zhao and Wuzhu](docs/screenshots/part21_lords.webp) | ![the foes of Part XXI: sword-reeds, white gibbons, hook-bill herons, stray arrows, the louse as big as a cartwheel, bow-shadow snakes, swordsmen of the gate, fighting cocks, broken edges, blades of the Sword Pool, the white tiger of the mound and humming swords](docs/screenshots/part21_foes.webp) |
+| ![the last crossroads of Part XXI: what is done with the arms of the land](docs/screenshots/crossroads_arms.webp) | ![King Wen of Zhao, who loved swords, met with a fan](docs/screenshots/battle_boss_king_zhao.webp) |
+| ![Wuzhu, the Masterless Edge: four thousand blades with no hand, in the shape of somebody](docs/screenshots/battle_boss_wuzhu.webp) | ![the machines of the Wheel, built from code: the well-sweep, a water-wheel, the water trip-hammer, the water-bellows, the repeating crossbow, the south-pointing chariot and the wooden ox](docs/screenshots/works_wheel.webp) |
+| ![the Works page: eighteen works in three schools, what each does and costs, and the know-how learned by looking](docs/screenshots/works_page.webp) | ![the oldest tools (the fire-drill, knotted cords, the sling, the kiln, the stone adze, the hide coat)](docs/screenshots/works_hand.webp) |
+| ![the arts of the Dao worked into things (the spirit-gathering array, cinnabar talismans, the eight-trigram furnace, paper servants, the heaven-watching mirror, formation flags)](docs/screenshots/works_art.webp) | ![the last crossroads of Part XIX: what the land does with its machines, which only a maker of a school may answer for it](docs/screenshots/crossroads_choice.webp) |
+| ![the Crossroads page: the three scales, and what was asked, chosen and heard of each answer](docs/screenshots/crossroads_page.webp) | ![the wild at noon: a pack of bamboo wolves asleep where it stood](docs/screenshots/wild_noon_asleep.webp) |
+| ![the same pack at dawn, hunting](docs/screenshots/wild_dawn_hunting.webp) | ![Gongshu Ban's water-wheel in the mill-race below Qingshi](docs/screenshots/works_ban_wheel.webp) |
+| ![the people of Part XIX: Gongshu Ban, Mozi, the Gardener of Hanyin, Yan Shi the Artificer and the Player](docs/screenshots/part19_people.webp) | ![the Player, the dancer Yan Shi made, who has built itself a heart](docs/screenshots/battle_boss_the_player.webp) |
 
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph MU[Music: music.gd]
+    NT[a tune is numbered notes:<br/>1 2 3 5 6, a dash to hold,<br/>a line under to hurry] --> SY[instruments made of arithmetic:<br/>plucked strings, flutes, a fiddle,<br/>bronze bells, stone chimes,<br/>drums, gongs, clay pots]
+    SY --> PL[34 tunes: the place, the hour<br/>and the screen choose one,<br/>and they cross-fade]
+    PL --> SB[the songbook: every tune heard,<br/>its notes as a roll,<br/>played when asked]
+    NT -.->|no audio file<br/>in the repository| SY
+    end
+    subgraph WR[Warfare: war.gd, field.gd]
+    LV[the levy: a company from each<br/>of the six hearths, asked for] --> HO[the host: foot, bows,<br/>horse and drums]
+    WK[two of the Hundred Works<br/>and two commissions] --> HO
+    HO --> FD[a field battle: a dozen drums,<br/>one order to a drum]
+    SC[the scouts say what the other<br/>host means to do, unless<br/>the dust hides it] --> FD
+    FD --> OR[advance, volley, charge, hold,<br/>give ground, sound the airs,<br/>go in front]
+    OR --> BR[a host breaks when<br/>its heart does]
+    end
+    subgraph TW[Qingshi grown: the Drum Tower quarter]
+    Q8[eight new buildings,<br/>26 more people:<br/>the levy and the players] --> NB[the notice board:<br/>18 commissions]
+    Q8 --> TQ[Tailor Qiao:<br/>outfits for two]
+    Q8 --> OD[Old Du's mat: dice,<br/>fan-tan, crickets]
+    end
+    subgraph WD[Wardrobe and feats]
+    O14[14 new outfits: the story, the tailor,<br/>feats, commissions, a find] --> W26[26 for the hero]
+    Y10[10 dresses for Yue Ling:<br/>by how close the two are,<br/>the story, the tailor, a feat]
+    FT[81 feats, told the moment<br/>each is true] --> O14
+    EG[12 things nobody is<br/>told to look for]
+    end
+    subgraph P23[Part XXIII: the Thundering Pots]
+    B0[every bell in the land<br/>rings flat at dawn] --> LL[Ling Lun: the Yellow<br/>Bell is broken] --> SW[Master Sun and<br/>Lady Hao: the levy] --> F1{{the field under<br/>Mount Li}} --> MT{Meng Tian:<br/>a trial}
+    MT --> KU[Music-Master Kuang:<br/>learn the airs] --> F2{{the bank at Longmen,<br/>the river behind}} --> GJ{Gao Jianli of the<br/>leaded lute: a trial}
+    GJ --> F3{{Gaixia: songs<br/>on four sides}} --> XY{the Hegemon-King:<br/>a trial} --> WF{Wafu, the Thundering<br/>Pot: a trial} --> YB[the Yellow Bell<br/>is cast again] --> GS((Great Sound,<br/>Rarely Heard))
+    end
+    HO -.->|By the host| P23
+    SB -.->|the airs: By the song| P23
+    NB -.->|a step asks for two| P23
+```
+
+- **Music, and all of it from code** (`scripts/music.gd`, new). The game was silent for twenty-two chapters. It now has **thirty-four tunes**, and **there is still not one audio file in the repository**: the art rule (every model, texture and animation is reproducible by running code here) is kept for sound.
+  - **A tune is written the way the tunes of the land have always been written**: in numbered notes (jianpu), `1 2 3 5 6` for the five tones of the pentatonic scale, a dash to hold a note for another beat, a line under to halve it, a tick or a comma for the octave above or below, a bar every four beats. `"3_ 5_ 6 5 3_ 2_ | 1 2 3 - | ..."` is the first two bars of the planting song of the Rice Hearth. A tune has a key, a tempo and up to five voices; a voice may be a pattern that repeats under the melody (a qin's broken chords, a drum).
+  - **Every instrument is arithmetic.** The **qin**, the **zheng** and the **pipa** are a burst of noise going round a delay line and averaged each time round, so that the high part dies first (the Karplus-Strong string; a silk string is the same thing smoothed more before it starts). The **bamboo flute**, the **xiao**, the **two-stringed fiddle** and the **reed horn** are one cycle of a few harmonics, with a soft attack, a vibrato that comes in late and a little dulled breath. **Bronze bells** and **stone chimes** are partials that are not quite harmonics, each dying at its own rate. **Drums**, **gongs** and **clay pots** are a falling sine and a burst of noise. A tune is brought to the same average level as every other and is exactly one loop long: what rings past the end is folded back into the beginning, so the loop has no seam.
+  - **What plays is chosen by the place, the hour and the screen**, and cross-fades: the title; the sect; the mountain; in a town of one of the six hearths, **that hearth's own air** (a planting song in Qingshi, a long song over a drone among the felt tents, a caravan tune with a half-step in it at Shazhou, the haulers' call at Longmen, a hammer song at Tushan, the Lantern Dragon's tune at Yanggu); one of ten tunes for the kind of country (green, wet, cold, loud, dry, the heavens, the springs below, the sea, the unfinished places); the night, and the watchman's round in a town after dark; a cave; indoors; under the cloud-kite; battle, a lord, a tribulation; a field of war; sitting still; the ending. Three short stings mark a step done, a feat and a breakthrough.
+  - **The songbook** (Esc > Songs) keeps every tune heard, says what it is played on and where, draws its notes as a roll (time across, pitch up, a colour for each voice) and plays it when asked. A tune is synthesised the first time it is wanted, on a worker thread (about a second), and kept. With no window (the bot in CI, the tests) nothing is synthesised, and what would be playing is still worked out, so the songbook fills as it would.
+- **Warfare** (`scripts/war.gd`, `scripts/field.gd`, new). Until now every fight in the game was the party's own. Now there is **a host**, and **field battles**.
+  - **A host is raised, not hired.** A company of a hundred comes in from each of the **six hearths** when whoever keeps its fire is asked (ploughmen with rehafted hoes, the horse-folk, camel archers from Shazhou who are paid in water, the haulers of Longmen, Tushan's crossbows, and from Yanggu, which has no soldiers, the band); the sect sends its outer disciples; **two of the Hundred Works put a company in the field by themselves** (the repeating crossbow, the south-pointing chariot), and two commissions of the notice board bring the hunters of the road, who scout, and the players of the Pear Garden, who drum. Four arms: **foot, bows, horse and drums**.
+  - **A field battle is fought by drums, a dozen at most, one order to a drum.** The scouts say what the other host means to do (unless the dust hides it, and nothing hides anything from the hunters). **Advance**: good against bows and a host standing to listen. **Volley**: finds a spear wall, and horse coming on. **Charge**: ruinous to bows, ruined by a wall. **Hold**: a charge and an advance break on it. **Give ground**: an advance strikes air, and the next drum everything of yours tells half as much again. **Sound the airs**: no blow at all; the other host's heart is struck at, by every air of the land the host has learned and every drum it has to sound them on. **Go in front**: the hero himself, twice a battle, and it costs him. A host breaks when its heart does.
+
+    | | their advance | their volley | their charge | their hold | their feint | their song |
+    |---|---|---|---|---|---|---|
+    | **advance** | even | tells | even | breaks on it | strikes air | tells |
+    | **volley** | less | even | tells | tells | even | tells |
+    | **charge** | even | ruinous | even | ruined | strikes air | tells |
+    | **sound the airs** | lost in the shouting | less | lost | heard | heard | even |
+
+  - **Nothing is random.** A battle is a function of the orders given (`War.step`), so the bot, the tests and the screen fight the same field; the tests lead the levy well and badly over every field of the story, and it must win the first way and lose the second (a host that only ever holds, or only ever goes in, loses all three). A field lost is come back to, and the other host is the wearier for it.
+  - **The field is seen from a hill**: a figure for every five men, built from code and drawn by the hundred (a MultiMesh a company, in its own colours under its own flag), the foot in front, bows behind, horse on the flank, the drums at the back with the banner, the hero and Yue Ling. Blocks go forward and come back, arrows go over, the horse sweeps round, rings of sound go out from the drums, and the fallen are gone from the ranks. Three of Master Sun's lessons can be fought on the drill ground at Qingshi for practice.
+- **More to wear, for two** (`scripts/fashion.gd`, `scripts/models.gd`). **Fourteen new outfits** for the hero, twenty-six in all, and eighteen new things they hang on him, every one built from code: a lamellar coat and a helmet with a pheasant's tail, a straw rain-cape, an official's black gauze cap with its two wings, a collar of fox, a pilgrim's hundred and eight beads, a swallow's tail of ribbon, a delver's brow-lamp, four flags at the back as stage generals wear them, a painted face, a fox mask pushed up on the side of the head, and the old broom slung where other men carry a sword. They are earned in new ways: from **Tailor Qiao** in Qingshi, for **feats**, for **commissions**, and one by finding something. And **Yue Ling has a wardrobe of her own** (Esc > Wardrobe > hers): ten dresses, given as the two grow close, by the story, by the tailor ("It has pockets. Lin Feng. It has pockets") and for a feat, each with a small passive that is hers.
+- **Feats** (`scripts/feats.gd`, new; Esc > Feats). **81 things a journey is remembered for**, of nine kinds (the road, the sword, the people, the land, the hand, the host, the song, the wardrobe, and the unasked), each told the moment it is true and kept on a page that shows how far along the others are. A few are not shown until they are done; some give something to wear. 835 points in all, and a name for the journey by how many it has (from Unsung to The Tale Itself).
+- **Twelve things nobody is told to look for** (`scripts/eggs.gd`, new). No step of the story names one and no notice asks for one; the page shows a question mark and half a hint until each is found. They are not listed here.
+- **Qingshi is bigger.** East of Lao's farm the village has grown **a second quarter round a Drum Tower**: a street from the tower to the Hall of the Twelve Pipes, the tailor's and the levy's barracks across it, the Pear Garden stage, the potter's kiln, and two houses in Drum Tower Row. **Eight new buildings** (nineteen in the village), each with its cellar and upper storey, and **twenty-six more people with days of their own**, among them two new kinds: **levy-men**, who drill on the open ground at dawn with spear and bow, stand the gate and drink in the evening, and **players**, who rehearse in the square and are heard all down the street. There are 245 townsfolk now.
+- **Even more quests: the notice board** (`scripts/jobs.gd`, new). Clerk Bai, by the Drum Tower, keeps **eighteen commissions**, posted as the story goes on: firewood for the kiln, moths in the silk, news for the road, three summits for a mapmaker who has drawn a hundred and thirty-nine and stood on none, three flights "where we can see" for the children ("we have nine coppers and a frog"), fox masks for the fifteenth night, a general for the stage, word to the hunters of the road, Master Sun's lessons. Each is taken down, done out in the land and reported for what it pays: spirit stones, renown, and now and then an outfit or a company for the host.
+- **Gambling: Old Du's mat** (`scripts/gamble.gd`, new), in the lane by the Pear Garden. **Big and Small** (three dice under a bowl; three of a kind is the house's), **fan-tan** (beads counted off by fours), and **the crickets** (two fighting crickets with names and records; the favourite pays less). Staked in spirit stones. Every throw is drawn from the journey's own count of throws, so the same journey throws the same dice; the dice are fair, and the house keeps a small edge on every bet (the tests throw ten thousand rounds to see that it does). "Nine of ten who gamble lose. I have it painted over the door, and nobody reads it." Yue Ling has opinions.
+- **Part XXIII, "The Thundering Pots"** plays in about 1 hour 14 minutes (see [below](#part-xxiii-the-thundering-pots)) and the whole game is **1 hour 13 minutes longer** than the last release, verified by the playthrough bot; CI still requires **16 hours**. A new realm, **Great Sound, Rarely Heard**, four lords guarded by trials, three field battles, three crossroads (and three older ones that echo in it), twelve new foes that keep hours, six new people built in Blender, four new kinds of quest step (**hold a field**; **learn so many airs**; **do so many commissions**; **bring the host to so many companies**), and two new ways through trials, **By the host** and **By the song**.
+- **The bot** raises the levy from hearth to hearth, reads the notice board and takes down what it can report, learns four airs, gives the order Master Sun would give on every drum of three fields, dresses Yue Ling as well as itself, passes Meng Tian and the Hegemon-King by the host, Gao Jianli by the song and the Thundering Pot with a potter's hands, answers the three crossroads, and walks away from Old Du's mat. Its report lists the host, the fields, the tunes, the commissions, the wardrobes, the feats and the finds.
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+- **Code**: the game's GDScript grew to 63,607 lines (`music.gd`, `war.gd`, `field.gd`, `feats.gd`, `eggs.gd`, `jobs.gd` and `gamble.gd` are new) and the Blender Python to 24,770; all 307 assets (231 people, 41 monsters, a mount, 26 props and 8 weapons) rebuild from their scripts. The tests now make 38,598 checks.
+
+**Where the chapter comes from.** "The Yellow Bell is broken and thrown away, and the clay pots thunder; slanderers are raised up, and the worthy have no name" is Qu Yuan's, in the *Divination* of the *Chu ci*; the Yellow Bell (huangzhong) is the first of the twelve pitch-pipes, and the *Lüshi chunqiu* tells how Ling Lun cut them for the Yellow Emperor from the bamboo of Xiexi, to the song of the phoenixes, six to the cock's and six to the hen's. That the length of that pipe is the root of the foot, the peck and the pound is the *Han shu*'s treatise on the pitch-pipes and the calendar. That the true music of Qin was "beating on jars and thumping on pots" is Li Si's memorial against the expulsion of foreigners. Sun Wu drilling the King of Wu's palace ladies, and Meng Tian asking only whether the seal was true, and Gao Jianli at the River Yi and afterwards with lead in his lute, and Xiang Yu at Julu with the cauldrons broken and the boats sunk, and at Gaixia with the songs of Chu on four sides, and at the Wu River with the boatman, are all in Sima Qian. Fu Hao is in the oracle bones of Anyang, which record her thirteen thousand, and in her own tomb, which had the axes in it. Shi Kuang hearing in the airs of the south that Chu would lose is the *Zuo zhuan*, Duke Xiang's eighteenth year; his candle is the *Shuo yuan*. Han Xin's levies with the river at their backs are the *Shi ji* again. "The great note is rarely sounded" is the forty-first chapter of the *Laozi*. The soldiers of Mount Li, each with a face of his own and the potter's name stamped where it would not show, are in the ground at Lintong.
+
+| | |
+|---|---|
+| ![a field battle under Mount Li: the levy of six hearths, the clay host, the scouts' word and the orders](docs/screenshots/field_lishan_orders.webp) | ![the field as a battle begins: what the other host is](docs/screenshots/field_lishan_intro.webp) |
+| ![a volley in the air](docs/screenshots/field_lishan_volley.webp) | ![the foot go in](docs/screenshots/field_lishan_advance.webp) |
+| ![the horse go in round the flank](docs/screenshots/field_lishan_charge.webp) | ![Gaixia: the airs sounded](docs/screenshots/field_gaixia_songs.webp) |
+| ![Gaixia held: eight thousand have gone home](docs/screenshots/field_gaixia_held.webp) | ![the figures of the field, built from code: the levy's foot, bows, horse and drums, and the clay host's three arms](docs/screenshots/field_figures.webp) |
+| ![the Host page: the companies that have come in, and the fields held](docs/screenshots/host_page.webp) | ![a trial passed by the song: a planting song, to the lute with lead in it](docs/screenshots/trial_by_the_song.webp) |
+| ![the songbook: the air of the Rice Hearth, as a roll of notes](docs/screenshots/songs_page.webp) | ![the songbook: the war piece, with its drums](docs/screenshots/songs_page_war.webp) |
+| ![the Feats page](docs/screenshots/feats_page.webp) | ![things nobody is told to look for: a name once found, half a hint until then](docs/screenshots/finds_page.webp) |
+| ![seven of the new outfits](docs/screenshots/outfits_new_1.webp) | ![seven more](docs/screenshots/outfits_new_2.webp) |
+| ![the new outfits on a woman's frame](docs/screenshots/outfits_new_f.webp) | ![close to: the gauze cap, the helmet, the painted face; plum blossom and the moon pin](docs/screenshots/outfits_new_faces.webp) |
+| ![Yue Ling's dresses, the first five](docs/screenshots/yue_dresses_1.webp) | ![and the other five](docs/screenshots/yue_dresses_2.webp) |
+| ![the Drum Tower quarter of Qingshi from above](docs/screenshots/quarter_above.webp) | ![the people of Part XXIII](docs/screenshots/part23_people.webp) |
+| ![the four lords: Meng Tian, Gao Jianli, the Hegemon-King and the Thundering Pot](docs/screenshots/part23_lords.webp) | ![the foes of Part XXIII: pot-drummers, flat notes, kiln-wasps, clay spearmen, kneeling archers, saddle-horses of Mount Li, leaded strings, cracked reed-pipes, drowned drums, halberdiers of the eight thousand, riderless black steeds and cauldron-breakers](docs/screenshots/part23_foes.webp) |
+| ![the last crossroads of Part XXIII: what becomes of a host](docs/screenshots/crossroads_host.webp) | ![Meng Tian, General of the Clay Host](docs/screenshots/battle_boss_meng_tian.webp) |
+| ![Gao Jianli of the Leaded Lute](docs/screenshots/battle_boss_gao_jianli.webp) | ![the Hegemon-King of Western Chu](docs/screenshots/battle_boss_xiang_yu.webp) |
+
+### Previous release: mountains in every region, climbing, the cloud-kite, the people of the road and Part XXII
+
 
 ```mermaid
 flowchart LR
@@ -113,7 +199,7 @@ flowchart LR
 | ![the foes of Part XXII: salt-thieves, false echoes, night-fire crabs, stray gusts, kite-hawks, leaking wind-bags, red leopards, fig-leaf creepers, rain-calling gibbons, steles of somebody's merit, smokes of announcement and serpents of the eighteen bends](docs/screenshots/part22_foes.webp) | ![a trial passed by the heights: nine summits, and nothing to report to the Lord of the Eastern Peak](docs/screenshots/trial_by_the_heights.webp) |
 | ![the last crossroads of Part XXII: what a summit is for](docs/screenshots/crossroads_tops.webp) | ![the Lord of the Eastern Peak at his desk on the very top of Sun-Viewing Peak](docs/screenshots/dongyue_on_the_peak.webp) |
 
-### Previous release: faces that show what they feel, the Eight Arms, twelve ends and Part XXI
+### Two releases ago: faces that show what they feel, the Eight Arms, twelve ends and Part XXI
 
 
 ```mermaid
@@ -189,7 +275,7 @@ flowchart LR
 
 **Where the chapter comes from.** Ou Yezi and the five swords he cast for the King of Yue (Zhanlu, which left an unjust king in the night and went by water to another) are in the *Yuejue shu*; Gan Jiang and Mo Ye, the pair of swords named for a smith and the wife who went into the furnace, are in the *Wu Yue Chunqiu*, and the *Book of Jin* has them leap from a belt into the river at Yanping Ford as two dragons. The Maiden of Yue, who taught an army ("inside, be full of spirit; outside, show calm: look like a mild woman, strike like a frightened tiger") and met the old man in white who went up a tree an ape, is in the *Wu Yue Chunqiu* too. Ji Chang, who lay under a loom to learn not to blink, looked at a louse until it was a cartwheel, tried to kill his teacher and met his arrows in the air, is in the *Liezi*; that he ended by forgetting what a bow was is Nakajima Atsushi's telling of it. King Wen of Zhao, his three thousand swordsmen and the three swords are the *Zhuangzi*'s Discourse on Swords, whose last line is that the swordsmen all killed themselves, which the chapter declines to take for a happy ending; the cock of wood is the *Zhuangzi*'s as well. King Helu's three thousand swords under Tiger Hill and the white tiger on the mound are the *Yuejue shu* again, and the snake in the cup that was the shadow of a bow is the *Fengsu tongyi*. "Arms are instruments of ill omen" and "the best fighter is not angry" are the *Daodejing*, 31 and 68.
 
-### Two releases ago: voxel caves under every region, twice the room indoors and Part XX
+### Three releases ago: voxel caves under every region, twice the room indoors and Part XX
 
 *(This release's notes were not written into the README at the time; they are summarised here from its commit.)*
 
@@ -203,7 +289,7 @@ flowchart LR
 |---|---|
 | ![the Cave of Ten Thousand Echoes](docs/screenshots/cave_karst_chamber.webp) | ![a trial passed by the dark](docs/screenshots/trial_by_the_dark.webp) |
 
-### Three releases ago: smaller and faster, crossroads that echo, the Hundred Works, the hours of the wild and Part XIX
+### Four releases ago: smaller and faster, crossroads that echo, the Hundred Works, the hours of the wild and Part XIX
 
 ```mermaid
 flowchart LR
@@ -317,7 +403,7 @@ flowchart LR
 
 **Where the chapter comes from.** The old gardener is in the *Zhuangzi* (the chapter Heaven and Earth): Zigong, travelling south of the Han, sees an old man watering his garden with a pitcher carried up out of a tunnel, tells him of the well-sweep that waters a hundred plots a day, and is told: where there are machines there will be machine affairs, and where there are machine affairs there will be a machine heart; "it is not that I do not know of it: I would be ashamed to use it." Gongshu Ban (Lu Ban) and Mozi are in the *Mozi*: the cloud ladder built for Chu to take Song, the ten days and nights' walk, the belt for a wall and the slips of wood, nine assaults turned on a tabletop; and the wooden magpie that flew three days, of which Mozi said a linchpin was worth more. Yan Shi and the dancer who winked at King Mu's ladies, taken apart to show it was leather, wood, glue and lacquer with a heart that made it speak, are in the *Liezi*. Cook Ding, whose knife was not sharpened in nineteen years ("what your servant cares about is the Way, which goes beyond skill"), and Wheelwright Pian, who could not teach his son the trick of it, are in the *Zhuangzi* again. The chapter does not decide between them: the last question has four answers, and the makers are still arguing at the end.
 
-### Four releases ago: faces towards life, six hearths, a hero of either sex and Part XVIII
+### Five releases ago: faces towards life, six hearths, a hero of either sex and Part XVIII
 
 ```mermaid
 flowchart LR
@@ -382,7 +468,7 @@ flowchart LR
 
 **What the hearths are made from.** None of the six is one living people. Each is put together from old customs of the lands the story's myths come from: *zuan sui gai huo*, the changing of the fire with the seasons recorded in the Zhou li and the Analects (elm and willow in spring, jujube and apricot in summer, mulberry at the turn, oak in autumn, sophora in winter), and the cold food that went with it; "have you eaten?" as a greeting, and chopsticks never stood in the rice; the boat-dwelling families of the southern rivers, the fire that goes aboard with the bride and the fish that is never turned over; the hearth-ring of the felt tent, the threshold not stepped on, the bowl taken with the right hand and the youngest son as keeper of the fire; bread torn and never cut, and water before words, along the oasis roads; and "the firewood burns out, the fire is passed on" from the Zhuangzi, which gives the new realm its name. Suiren, Zhurong and Huilu are the Fire-Driller, the Fire Regulator and the fire that visits uninvited of the old books.
 
-### Five releases ago: anime faces and bodies, the sword's wake and Part XVII
+### Six releases ago: anime faces and bodies, the sword's wake and Part XVII
 
 ```mermaid
 flowchart LR
@@ -456,7 +542,7 @@ The anime look was researched from published material on gacha-game characters (
 - **Physics**: a felled tree falls as a rod pivoting on its base (the physical pendulum, I = mL^2/3), integrated once per tree; Godot's rigid bodies and height-field shapes for the pieces.
 - **Part XVII**: [Lichun](https://en.wikipedia.org/wiki/Lichun) and the whipping of the Spring Ox; [Gou Mang](https://en.wikipedia.org/wiki/Goumang), god of spring and wood; [Jingzhe](https://en.wikipedia.org/wiki/Jingzhe), the Waking of Insects, and the beating of the petty people under bridges ([Da Siu Yan](https://en.wikipedia.org/wiki/Villain_hitting)); [Longtaitou](https://en.wikipedia.org/wiki/Zhonghe_Festival), the day the dragon raises its head, and its haircuts; [Leigong](https://en.wikipedia.org/wiki/Leigong); [Qingnü](https://zh.wikipedia.org/wiki/%E9%9D%92%E5%A5%B3), goddess of frost and snow; [Taisui](https://en.wikipedia.org/wiki/Tai_Sui) and asking his pardon before digging; the five poisons ([Wu Du](https://en.wikipedia.org/wiki/Five_poisons)); [Mingqian tea](https://en.wikipedia.org/wiki/Longjing_tea) picked before Qingming; [Qingming](https://en.wikipedia.org/wiki/Qingming_Festival), its willow, its tomb-sweeping and its kites.
 
-### Six releases ago: day and night, the people of the towns, things that break and Part XVI
+### Seven releases ago: day and night, the people of the towns, things that break and Part XVI
 
 ```mermaid
 flowchart LR
@@ -508,7 +594,7 @@ flowchart LR
 - **Code**: the game's GDScript grew from 44,004 to 47,498 lines (`scripts/clock.gd`, `scripts/folk.gd` and `scripts/havoc.gd` are new) and the Blender Python from 21,542 to 21,984 lines: 22 commoners, the Kitchen God and the two door gods are new characters, six new clips, and Lin Feng (all four looks) and Yue Ling are rebuilt with them. The tests grew from 1,879 to 2,132 lines (22,603 checks).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### Seven releases ago: Yue Ling's own story, more to do and Part XV
+### Eight releases ago: Yue Ling's own story, more to do and Part XV
 
 ```mermaid
 flowchart LR
@@ -570,7 +656,7 @@ flowchart LR
 | ![the hermitage's moon gate](docs/screenshots/hermitage_gate.webp) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.webp) |
 | ![the moths that eat forgetting](docs/screenshots/battle_forgetting.webp) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.webp) |
 
-### Eight releases ago: fates and faces, outfits, rides and Part XIV
+### Nine releases ago: fates and faces, outfits, rides and Part XIV
 
 ```mermaid
 flowchart LR
@@ -646,7 +732,7 @@ flowchart LR
 
 ![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.webp)
 
-### Nine releases ago: many roads, crafting, renown and Part XIII
+### Ten releases ago: many roads, crafting, renown and Part XIII
 
 ```mermaid
 flowchart LR
@@ -769,7 +855,7 @@ Background for that release (the Eight Gates, Chiyou and the war at Zhuolu):
 - **The Eight Gates**: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death of [Qimen Dunjia](https://en.wikipedia.org/wiki/Qimen_Dunjia), taught to the Yellow Emperor by the Mysterious Lady of the Nine Heavens, laid on the eight trigrams ([Bagua](https://en.wikipedia.org/wiki/Bagua)); the "Eight Gates Golden Lock" formation of the *Romance of the Three Kingdoms*, which falls when it is entered by the right gate.
 - **Wang and Liang, Chi and Mei**: the goblins of the mountains, old things and waters that fought in Chiyou's host.
 
-### Ten releases ago: realms and talents that matter, cutscenes and Part XII
+### Eleven releases ago: realms and talents that matter, cutscenes and Part XII
 
 ```mermaid
 flowchart LR
@@ -849,7 +935,7 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 - **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
 - **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
 
-### Eleven releases ago: three realms, six Daos, six peoples and Part XI
+### Twelve releases ago: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -948,7 +1034,7 @@ Background for this release (the myths of the Jianmu and the realms, the Daos an
 - **The peoples**: the Feathered People, the Deathless (black-skinned people who eat of the immortal tree) and the dragon-kin in the *Classic of Mountains and Seas*; the Jiaoren, whose tears turn to pearls, in the *Bowuzhi* and Gan Bao's *Soushen Ji*; celestial foxes who climb to heaven at a thousand years ([huli jing](https://en.wikipedia.org/wiki/Huli_jing)).
 - **The bosses**: [Leigong](https://en.wikipedia.org/wiki/Leigong), Duke of Thunder; Feilian, Earl of the Wind; Kui, the one-legged thunder ox of the *Classic of Mountains and Seas*; Jiufeng, the nine-headed bird of Chu; [Pixiu](https://en.wikipedia.org/wiki/Pixiu); Shentu and Yulei, the door gods under the peach tree ([Menshen](https://en.wikipedia.org/wiki/Menshen)); [Zhulong](https://en.wikipedia.org/wiki/Zhulong_(mythology)), the Torch Dragon whose open eye is day; Wangxiang, the water goblin; [Heibai Wuchang](https://en.wikipedia.org/wiki/Heibai_Wuchang), Black and White Impermanence.
 
-### Twelve releases ago: an organic continent, four towns and Part X
+### Thirteen releases ago: an organic continent, four towns and Part X
 
 ```mermaid
 flowchart LR
@@ -1005,7 +1091,7 @@ Background for this release (the techniques behind the new map, cartography and 
 - **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
 - **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
 
-### Thirteen releases ago: hanfu characters, five-colour monsters and Part IX
+### Fourteen releases ago: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -1085,7 +1171,7 @@ Researched for that release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Fourteen releases ago: rebuilt models and Part VIII
+### Fifteen releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -1138,7 +1224,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Fifteen releases ago: one open world and Part VII
+### Sixteen releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -1172,7 +1258,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Sixteen releases ago: natural landscapes and Part VI
+### Seventeen releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -1367,6 +1453,9 @@ Walk into NPCs, enemies, pickups, stairs and bosses to interact with them; walk 
 - **Day and night**: a clock of twelve double-hours (the dial under the minimap); dawn, day, dusk and a moonlit night, lanterns and windows lit after dark, a bed after dark sleeps till six, and a story that can hold the hour.
 - **The people of the towns**: 219 townsfolk with homes, work, meals and a night watch, who walk to their work, do it, greet the hero, step aside and talk (Enter); the named townsfolk work at their own places and doze there at night.
 - **Things that break**: F at a jar, a crate or a haystack (or a gallop through it) and it comes apart into pieces that fly, tumble and get kicked about; the owner is paid or has words; battles scorch the ground.
+- **Music**: every place, hour and screen has a tune (`scripts/music.gd`), made from numbered notes by instruments built of arithmetic; **Esc > Songs** is the songbook, and Enter plays the tune under the cursor. `--no-music` runs silent; `--music-vol=-6` turns it down (dB).
+- **The host and the field**: from Part XXIII a host can be raised (Esc > The Host) and **field battles** fought: read what the scouts say, choose one order a drum (advance, volley, charge, hold, give ground, sound the airs, go in front), and break the other host's heart before it breaks yours. Master Sun, on the drill ground in Qingshi, sets three lessons for practice.
+- **The notice board, the tailor and the mat**: in the Drum Tower quarter of Qingshi, Clerk Bai keeps the commissions, Tailor Qiao sells outfits for the hero and for Yue Ling, and Old Du keeps a gambling mat (dice, fan-tan, crickets). **Esc > Feats** is what the journey is remembered for; **Esc > Wardrobe** now ends with Yue Ling's own.
 - **The high roads**: every region has mountains (`scripts/peaks.gd`). Walk at rock too steep to walk and Lin Feng **climbs it, hand over hand**, Yue Ling beside him; the very top of a peak, by its cairn, is a **summit** stood on (the minimap marks every one, gold until it has been). **V opens the cloud-kite** anywhere under the open sky: from a summit a flight carries the two of them seventy metres down, turned with the arrow keys, to wherever somebody can stand. Out between the towns, at the foot of the highest peak of most regions, there is a **camp of the people of the road** (a woodcutter, a gatherer of herbs, an angler, a pedlar, a hunter, a pilgrim and, up on the summit, a hermit), each about their own day by the clock and each with something to say.
 - **The sword's wake**: F (or G, the sword qi) at the land itself: a tree at the forest's edge falls about its stump and breaks into logs that roll, bushes and reeds are cut, rocks shatter, the grass is mown and grows back, water splashes, and a pack of monsters struck first is thrown back and fights the battle reeling (each has lost a fifth of its health, and the party moves first). Felled trees and broken rocks grow back by dawn. In Part XVII the story's obstacles (fallen trunks, rockfalls, ice jams, chains of black ice, the clay Spring Ox) are cleared this way, and a new way through trials, **By the land**, counts them.
 - **Yue Ling** (T to talk, Esc > Yue Ling): 30 heart-to-hearts across the journey, each ending in a reply that leans her heart towards one of three futures; 15 wishes of hers to grant by doing things together; a closeness that grows from Companion to Heart's Companion and opens the **Side by side** way through the trials; and in Part XV a story of her own.
@@ -1610,6 +1699,30 @@ Each region is still generated from its own seed by `mapgen.gd` (so every boss, 
 **The realms above and below** (Part XI) are built by the same `Atlas._build`, one realm at a time (`Atlas.world_of(layer)`): `STRATA` gives each its own 260 x 200 grid, the sites of its regions, how far land reaches from a site (land runs out into open sky or into the abyss instead of the sea) and how many holes to open in the wild ground between regions (gaps of sky between the islands, chasms between the caverns). `layer_origin` lays each grid over the land's so that the Jianmu's crown in the Nine Heavens floats straight above its trunk on the mountain and its roots in the Nine Springs hang straight below. The ends of a ladder are two linked entities, one in each realm; walking onto one lifts or lowers Lin Feng and puts him on the free tile beside the other end. The Nine Heavens are drawn 96 m above the land and the Nine Springs 64 m below it, and `world.gd` keeps a bundle per realm (its land, its streamed regions, its sea of cloud or glowing abyss) and shows only the one Lin Feng is in. A **floor** (`Atlas.floor_id`, `f:<region>:<building>:<level>`) is a world of its own the size of its building, holding the people and things that live on it and the stairs back.
 
 The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part XXIII: The Thundering Pots
+
+The tops are open, and all that summer the people of the road go up and come down again with nothing to report. On the first morning of the tenth month the sect's great bell is struck for the dawn, as it has been every dawn for nine hundred years, and it rings flat. Not cracked: flat, by a hair, like a word said by somebody who has stopped meaning it. And when it has died away, something goes on, under the ground, a long way west, in time. "Pots," says the Elder. "I should know it anywhere; I was a potter's son. No tune. Not a note of tune in it. I find I mind that more than the noise."
+
+```mermaid
+flowchart LR
+    H[every bell rings flat,<br/>and something keeps time] --> LL[Ling Lun at the Hall of the<br/>Twelve Pipes: the Yellow Bell<br/>is broken] --> PD[pot-drummers, flat notes,<br/>kiln-wasps] --> SH[four pieces of<br/>the Yellow Bell] --> SW[Master Sun on<br/>the drill ground]
+    SW --> LV[the levy: a company asked<br/>of each of six hearths] --> FH[Lady Hao, who led<br/>thirteen thousand] --> NB[two commissions of<br/>the notice board]
+    NB --> CS[clay spearmen, kneeling<br/>archers, saddle-horses] --> TT[four halves of<br/>tiger tallies] --> F1{{the field under Mount Li:<br/>the vanguard of the left}} --> MT{Meng Tian: by the host,<br/>four left halves, or might}
+    MT --> Q1{{what is done with the clay:<br/>left standing, carried home,<br/>or back to the kiln}}
+    Q1 --> SK[Music-Master Kuang: the airs<br/>of the south are not strong] --> AI[learn four airs of the<br/>six hearths] --> LS[leaded strings, cracked<br/>reed-pipes, drowned drums] --> PP[four pitch-pipes] --> F2{{the bank at Longmen:<br/>the river at the levy's back}} --> GJ{Gao Jianli: by the song,<br/>by the hearths, or might}
+    GJ --> Q2{{the lute with lead in it:<br/>melted out, left as it is,<br/>or broken}}
+    Q2 --> PL[three players teach<br/>the levy to sing] --> E8[an eighth company] --> CH[halberdiers, black steeds,<br/>cauldron-breakers] --> BN[five banners of Chu,<br/>left standing] --> F3{{Gaixia: sound the airs<br/>on four sides}} --> XY{the Hegemon-King: by the song,<br/>by the host, or might}
+    XY --> WF{Wafu, the Thundering Pot,<br/>in the First Kiln: by the song,<br/>a potter's hands, or might} --> YB[the Yellow Bell cast again,<br/>with a boat-hook in it] --> Q3{{what becomes of a host:<br/>home by the roll, a standing host,<br/>or the song without the spears}} --> GS((Great Sound,<br/>Rarely Heard))
+```
+
+- **The trouble.** The Yellow Bell is the first of the twelve pitch-pipes, and every measure in the land was once cut to its length: the foot, the peck, the pound, what a day's work is. It hung on the height above Qingshi, where nobody knew what it was, and last night it broke. "And when the measure breaks, young man," says Ling Lun, who cut the pipe, "whatever was made by rule and has no heart of its own gets up and walks." Under Mount Li a king buried eight thousand soldiers of fired clay to go on being obeyed. They are marching, by the count, on half an order.
+- **A host that would rather be home.** Master Sun, who drilled the King of Wu's palace ladies, has forty outer disciples forming a square on the drill ground and has not, it appears, said anything for some time. The clay host is the perfect army, he says: it obeys, it does not eat, it does not wonder. "And they have exactly one fault, sweeper, which is the same thing. Nobody in those ranks has a home he would rather be in. A host that would rather be home fights to end the war. It is not in the book." So the levy is asked for, hearth by hearth, of whoever keeps each fire, and Lady Hao of Shang, who was buried with her axe, takes six companies who do not share a word for left.
+- **Three fields.** Under **Mount Li** the vanguard comes on, and comes on, and stands, and sends its horse: it does everything by the count, so count. At **Longmen** Master Sun draws the levy up with the river at its back, where no book says to, his own included; the host cannot give ground there, and a line that holds with water behind it does not break. And at **Gaixia** the eight thousand of the Hegemon-King cannot be broken by killing them at all. "But they were men of Chu before they were clay, and Chu is south of the river, and it is the airs of the south that are not strong. They are not strong because they are about going home."
+- **The airs.** Music-Master Kuang, who put out his own eyes to hear better, listens to both hosts and hears no song in either. Each of the six hearths has an air, and somebody at each still sings it: a tofu seller, a horse-herd, a well-keeper, a boatwright ("it is not a song. It is a way of being forty men"), a tuner of bells, a seller of tea. Carried into one room they turn out to be one song. Three players of the Drum Tower quarter teach it to eleven companies in a week of evenings; the horse-folk decline to learn the planting song on the ground that it is about standing in mud, but they hum it.
+- **Four lords, four trials.** **Meng Tian**, who built the Wall and asked of the forged letter only whether the seal was true: show him seven companies nobody ordered (by the host), four left halves of tallies that nobody holds the right of, or break the Wall. **Gao Jianli**, blinded by the king who liked his playing, who filled his lute with lead: sing him the planting song, badly (by the song); tell him who is listening now; or cut the strings. **The Hegemon-King**, who never lost a charge: the songs of Chu again, to him this time; eight hundred who will all go home, to the man who could not face the fathers of eight thousand; or meet the charge. And **Wafu**, the first thing anybody made, which was beaten with a bone to say supper before there was a bell, and has been calling ever since: answer it with all six airs, lay a potter's hand on the cracked rim, or break what has been cracked since the Xia.
+- **Three crossroads.** What is done with four hundred clay soldiers standing in a good field, each with somebody's face; what is done with a lute that has only ever kept time for an army; and what becomes of a host when nothing is coming: home, every one, by the roll; a standing host that marches only on a whole tally, whose other half lies in six pieces at six hearths; or the song kept and the spears sent home. The last tips all three scales the ends of the story ask about.
+- **Great Sound, Rarely Heard.** The bell is cast again from the four pieces and bronze given by every hearth, a ploughshare, a stirrup, a boat-hook, and rings a hair warm of true. Under the hill something very old answers it, once, softly. "I have sat on this mountain seventy years listening for the note that is not sounded," says the Elder. "I took that to mean it was high up and hard to reach. I believe I have had it the wrong way about. I believe it is the one underneath, that everything else is in tune with or not."
 
 ## Part XXII: The High Roads
 
@@ -2294,7 +2407,21 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Bugs found and fixed
 
-Found in this release by putting mountains under a land that had always been flat, by the new tests, by the bot's logs and by screenshots, each confirmed before it was fixed:
+Found in this release by growing a town on land that had other uses, by the new tests, by the bot's logs and by screenshots, each confirmed before it was fixed:
+
+| Bug | Fix |
+|---|---|
+| **A region that filled up lost its cave.** A cave mouth stood only on open ground six tiles from anybody and anything. Qingshi's new quarter took the open ground to the east, the region's packs were drawn into what was left, and no tile of the region qualified any longer: Yu Gong's Adit, which Part XX is played in, silently ceased to exist (the test that every region has a cave caught it) | a cave of the story (`Caves.OWN`) whose region has no such ground left stands its mouth a little nearer its neighbours (`Caves._mouths`), instead of nowhere |
+| **Two towns in one region shared every doorstep.** A town's people looked for homes, tea-houses and workshops among all the buildings of their region within thirty-two tiles. No region had had two towns before. The people of the new quarter went home to an abandoned house in the old village and to tea across the river, and were still walking back at half past two in the morning: eleven of twenty-six out of doors in the dead of night | a quarter has a `reach`, and keeps to its own streets (`Folk._spots`); a watchman is the only one abroad at night there, as in every other town |
+| **Things stood at the foot of a peak could shut each other in.** What the story puts on a peak took the first free tiles of a list that runs along the rows of the map, so three things of a kind stood side by side; with somebody standing above them and a wood behind, the middle one could not be reached from any side. The bot stood in the desert for three minutes looking at a banner of Chu (and was credited, correctly, with the find for doing nothing) | a thing stood at a foot or on a flank is not put beside one already there, if that can be helped (`Peaks._stand`), and the tests ask that each of the chapter's things can be walked up to |
+| **A pack could be drawn on ground a work would later stand on.** The clay kiln of the Hundred Works stands at a fixed place in Qingshi, put there after the map is made; with less open ground, a pack was drawn two tiles from it | a region may list ground its packs keep off (`"clear"`, `MapGen.build`) |
+| **Part XXII's tests said the game ends at Leaning on Nothing**, as Part XXI's had said it ends at Sheathed Edge: two checks compared the last step of the story and the number of realms with constants | they ask that Part XXII is there, in its place, and is followed |
+| **The bot would have been stopped as lost at twenty-eight hours.** Its own limit on a run was 28 hours of game time, and the game is now longer than that | the limit is 31 hours (`--max-time` as before) |
+| Caught in this release's own new code before it shipped: **a feat that was done before the journey began** (it asked for a step of the story by a name that no step has, and a step that does not exist is never ahead; the tests now ask that every step a feat names is real); **a field that could be won by standing still** (a wall takes heart each drum, so twelve drums of holding ended with the levy the less shaken of the two, and it was given the field: a field is now held at the last drum only if the other host is all but broken, and the tests fight every field by only holding and by only going in, and require both to lose); **flutes that hissed** (the breath in a blown note was white noise, and outweighed the note: it is dulled before it is added); **tunes of very different loudness** (a qin alone was a quarter as loud as a flute over a drum: every tune is brought to one average level); and **a tailor's shop with no room for its own stairs** |
+
+### Bugs fixed in the Part XXII release
+
+Found in that release by putting mountains under a land that had always been flat, by the new tests, by the bot's logs and by screenshots, each confirmed before it was fixed:
 
 | Bug | Fix |
 |---|---|
@@ -2661,36 +2788,30 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --hero=f --hearth=
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234). The last release took 25:56:01, and the same bot now reaches the end of Part XXI at 25:55:49. Part XXII is 1:13:10. The run stands on 9 summits, climbs 1069 metres of rock with its hands and makes 4 flights under the cloud-kite (208 metres in the air, the longest 52); it runs four errands among the people of the road, passes three of the four trials of Part XXII by the heights and the Earl of the Wind with his own knotted cord, and answers its three crossroads.
+Latest result (seed 1234). The last release took 27:08:59, and the same bot now reaches the end of Part XXII at 27:08:45. Part XXIII is 1:13:40. The run raises a host of nine companies (the levy of six hearths, the sect's outer disciples, and the two the works put in the field), holds the three fields of the story in five, five and six drums without being driven from one, learns four airs, does two commissions, ends in the sixteenth of its outfits with Yue Ling in the sixth of hers, does 55 of 81 feats, and finds three things nobody told it to look for (it stopped to listen to somebody twelve times; it was abroad on the fifteenth night; it flew in the small hours). It never sits down at Old Du's mat.
 
 ```
-game play time  : 27:08:59 (97740 s)
-wall clock      : 37 min 16 s (headless)
-final realm     : Early Leaning on Nothing
-battles / kills : 2083 / 4023   deaths: 1
-time by screen  : dialogue 31693 s, battle 27400 s, world 24425 s, meditate 13246 s, menu 1145 s, choice 117 s, shop 30 s, ending 0 s
-meditation for  : rest 12762 s, children 424 s, grind 41 s, respawn 19 s
-trials passed   : 55   renown: 879   deeds: 2   gates: 4
-the sword       : 150 strikes, 122 packs struck first, 40 sword qi, 46 obstacles cleared
-works           : 16 built (hand 5, wheel 6, art 5): Grand Master of The Wheel; know-how 766 earned, 730 spent
+game play time  : 28:22:25 (102146 s)
+wall clock      : about 38 min (headless)
+final realm     : Early Great Sound, Rarely Heard
+battles / kills : 2119 / 4112   deaths: 1
+time by screen  : dialogue 33729 s, battle 28304 s, world 25603 s, meditate 13421 s, menu 1193 s, choice 148 s, field 58 s, shop 30 s, ending 0 s
+meditation for  : rest 12944 s, children 421 s, grind 52 s, respawn 5 s
+trials passed   : 59   renown: 926   deeds: 2   gates: 4
+the sword       : 148 strikes, 123 packs struck first, 43 sword qi, 46 obstacles cleared
+works           : 16 built (hand 5, wheel 6, art 5): Grand Master of The Wheel; know-how 786 earned, 730 spent
 the dark        : 4 caves gone to the very back of
-the heights     : 9 summits stood on, 1069 m of rock climbed, 4 flights under the cloud-kite (208 m flown, the longest 52 m)
+the heights     : 13 summits stood on, 1515 m of rock climbed, 4 flights under the cloud-kite (208 m flown, the longest 52 m)
 the eight arms  : 8 owned, 8 Daos of arms at Adept, 8 mastered, in hand sword
-                  sword Master (2076), staff Master (103), sabre Master (98), spear Master (99), fan Master (102), bow Master (99), whip Master (98), brush Master (97)
-crossroads      : 26 answered, 60 echoes heard; mercy +23, new works +16, wide world +18: Merciful, and known for it, of the New Works, and known for it, of the Wide World, and known for it
+crossroads      : 29 answered, 69 echoes heard; mercy +26, new works +20, wide world +21
+the host        : 9 companies (foot 300, bows 300, horse 200, drums 100); fields held 3 of 6 {"gaixia":6,"lishan":5,"river":5}, driven off 0
+the song        : 29 of 33 tunes heard, 4 airs of the hearths learned
+the board       : 2 of 18 commissions done
+the mat         : Never sat down at Old Du's mat.
+the wardrobe    : 16 of 26 outfits (wearing the Clay Soldier's Tunic), 6 of 10 dresses for Yue Ling (wearing Pear Garden Dancer's Sleeves)
+feats           : 55 of 81 (480 of 835 points): Carved on a Stele; found unasked: 3 of 12
 the hero        : Lin Feng, a young man, kin of the Rice Hearth; guest of 6 hearths
 the ending      : The School of the Eight Arms
-time by area    : sect 5583, mountain 8677
-                  bamboo 3077, marsh 2302, frost 2445, thunder 2139, palace 1754
-                  dragon 942, volcano 1673, void 806, celestial 1547, mirror 1000
-                  grave 2213, time 824, origin 1250, cloudsea 1334, court 802
-                  forge 1232, garden 1350, dunes 2155, fungal 902, aurora 1363
-                  chaos 1190, maple 2825, karst 2317, springs 1345, wheel 1683
-                  village 4979, terraces 1804, silk 1946, loom 1199, starferry 1188
-                  magpie 1163, starpalace 1016, jasper 1214, yanggu 2284, millet 1855
-                  fusang 1387, guanghan 1238, longmen 3501, drowned 1843, tushan 4885
-                  buzhou 1490, juntian 1479, changhe 1117, ninesprings 1451, youdu 1316
-                  penglai 1322, fangzhang 1232, yingzhou 1161, guixu 1252
 result          : PASS (needs >= 57600 s)
 ```
 
@@ -2725,6 +2846,13 @@ scripts/machines.gd  the machines of the works, built from code and animated fro
 scripts/faces.gd     fourteen faces as poses of the six bones of expression; what each gesture, action, busy body and line of dialogue is said with
 scripts/peaks.gd     the mountains: where each region's peaks stand, how far each lifts the ground (a term of the height field), what the story stands on them, the cairn
 scripts/glider.gd    the cloud-kite, built from code
+scripts/music.gd     the music: thirty-four tunes in numbered notes, the instruments that play them (all arithmetic), what plays where, the songbook
+scripts/war.gd       warfare: the companies of the host, the orders, the fields, and one drum of a battle as a pure function
+scripts/field.gd     the field of war: the two hosts as figures built from code, an order chosen each drum, and what it does
+scripts/jobs.gd      the notice board of Qingshi: eighteen commissions
+scripts/feats.gd     feats: what a journey is remembered for, as comparisons
+scripts/eggs.gd      twelve things nobody is told to look for
+scripts/gamble.gd    Old Du's mat: Big and Small, fan-tan and the crickets, every throw drawn from the journey's count of throws
 scripts/arms.gd      the Eight Arms: weapons, the Dao of each (ranks, what only that weapon does, its technique), how each hangs in the hand
 scripts/habits.gd    the hours of the wild: every monster's habit, what it is doing by the clock, what that changes in the land and in battle
 scripts/bench.gd     developer tool: times the opening of the world, counts what a frame draws, lists the scene's triangles by kind

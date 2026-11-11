@@ -2129,6 +2129,10 @@ func _run() -> void:
 		# the High Roads release (--high, or --high=a,b): the mountains, climbing, the cloud-kite, the
 		# people of the road and Part XXII
 		await _high_shots(str(main.args.high))
+	if main.args.has("pots"):
+		# the Thundering Pots release (--pots, or --pots=a,b): the wardrobe, the field of war, the pages of
+		# feats, songs and the host, the Drum Tower quarter, Old Du's mat and Part XXIII
+		await _pots_shots(str(main.args.pots))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -3501,3 +3505,241 @@ func _bestiary_shots(prefix: String = "1") -> void:
 			for sh3 in row:
 				ms.append(_foe(str(by_shape[sh3]), bool(Data.ENEMIES[by_shape[sh3]].get("boss", false))))
 			await _gallery("%s%s_%d" % [pre, str(view[0]), i / per + 1], ms, float(main.args.get("spacing", "1.9")), float(view[1]))
+
+
+# ---------------------------------------------------------------- the Thundering Pots release
+## A journey at the end of Part XXIII: the host raised, the airs learned, a good many feats done.
+func _pots_state() -> void:
+	_high_state()
+	Game.level = 83
+	Game.step = Data.step_index("s_p23_xiang")
+	Game.companion = true
+	Game.host = {}
+	for cid in ["sect", "valley", "steppe", "sand", "river", "forge", "dawn"]:
+		Game.host[cid] = true
+	Game.works["crossbow"] = true
+	Game.works["chariot"] = true
+	Game.airs = {"valley": true, "steppe": true, "sand": true, "river": true, "forge": true}
+	Game.heard = {}
+	for tid in Music.ORDER.slice(0, 27):
+		Game.heard[tid] = true
+	Game.war_won = {"lishan": 7, "river": 5, "drill1": 3}
+	Game.jobs = {"job_firewood": "done", "job_brine": "done", "job_tally": "done", "job_stage": "done", "job_letters": "taken"}
+	Game.job_base = {"job_letters": {"v": float(Game.folk_talk.size())}}
+	Game.outfits = {}
+	for oid in Fashion.OUTFIT_ORDER.slice(0, 22):
+		Game.outfits[oid] = true
+	Game.worn = Game.outfits.duplicate()
+	Game.yue_outfits = {}
+	for yid in Fashion.YUE_ORDER.slice(0, 8):
+		Game.yue_outfits[yid] = true
+	Game.bond = 50
+	Game.stones = 184000
+	Game.kills = 4100
+	Game.summits = {}
+	for k in 12:
+		Game.summits["s%d" % k] = true
+	Game.glide_best = 52
+	Game.glides = 14
+	Game.eggs = {"old_code": 3600.0, "good_listener": 41000.0, "midnight_summit": 90000.0, "bell_nine": 12000.0}
+	Game.feats = {}
+	Game.playtime = 100800.0
+	for fid in Feats.FEATS:
+		if Feats.met(Game, fid):
+			Game.feats[fid] = Game.playtime * (0.2 + 0.7 * Terrain3D.hash2(fid.length(), fid.hash() % 97, 3.0))
+	Game.toasts.clear()
+
+func _pots_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_pots_state()
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("outfits"):
+		# the fourteen new outfits, on a man's frame and a woman's, and Yue Ling's ten dresses
+		var rows := [["rain", "exam", "newyear", "fur", "pilgrim", "swallow", "delver"], ["broom", "fox", "opera", "levy", "pipes", "marshal", "clay"]]
+		for ri in rows.size():
+			var outs: Array = []
+			for oid in rows[ri]:
+				Game.outfit = oid
+				outs.append(Models.hero({"outfit": oid, "cols": Fashion.hero_colors(Game), "fem": ri == 1 and false}))
+			await _gallery("outfits_new_%d" % (ri + 1), outs, 0.66)
+		var fouts: Array = []
+		for oid2 in ["rain", "exam", "fur", "swallow", "fox", "levy", "marshal"]:
+			Game.outfit = oid2
+			fouts.append(Models.hero({"outfit": oid2, "cols": Fashion.hero_colors(Game), "fem": true}))
+		await _gallery("outfits_new_f", fouts, 0.66)
+		Game.outfit = "sweeper"
+		for yi in 2:
+			var ys: Array = []
+			for yid in Fashion.YUE_ORDER.slice(yi * 5, yi * 5 + 5):
+				ys.append(Models.yue_ling({"outfit": yid}))
+			await _gallery("yue_dresses_%d" % (yi + 1), ys, 0.66)
+		await _portraits("outfits_new_faces", [Models.hero({"outfit": "exam", "cols": {}}), Models.hero({"outfit": "levy", "cols": {}}), Models.hero({"outfit": "opera", "cols": {}}), Models.yue_ling({"outfit": "plum"}), Models.yue_ling({"outfit": "moon"})], 0.8, 1.66, 2.1)
+	if want.call("people"):
+		await _gallery("part23_people", [Assets.person("ling_lun"), Assets.person("sun_wu"), Assets.person("fu_hao"), Assets.person("shi_kuang"), Assets.person("gao_jianli"), Assets.person("xiang_yu")], 0.76, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["pot_drummer", "flat_note", "kiln_wasp", "clay_spearman", "clay_archer", "clay_horse", "lead_string", "reed_pipe", "drowned_drum", "chu_halberd", "black_steed", "cauldron_breaker"]:
+			fs.append(_foe(fid))
+		await _gallery("part23_foes", fs, 1.0, 0.25)
+		await _gallery("part23_lords", [_foe("meng_tian", true), _foe("gao_jianli", true), _foe("xiang_yu", true), _foe("wafu", true)], 2.2, 0.25)
+		# the figures of the field, built from code: the levy's four arms and the clay host's three
+		var figs: Array = []
+		for fg in [["foot", Color("6a9a4a"), false], ["bow", Color("c8a050"), false], ["horse", Color("8a2a3a"), false], ["drum", Color("e87a2a"), false], ["foot", Color("b0785a"), true], ["bow", Color("b0785a"), true], ["horse", Color("b0785a"), true]]:
+			var n3 := Node3D.new()
+			MB.mesh_node(n3, load("res://scripts/field.gd").figure(str(fg[0]), fg[1], bool(fg[2])))
+			n3.rotation.y = -PI / 2.0
+			figs.append(n3)
+		await _gallery("field_figures", figs, 1.3, 0.5)
+	if want.call("bosses"):
+		for bid in ["meng_tian", "gao_jianli", "xiang_yu", "wafu"]:
+			var ba := Trials.boss_area(bid)
+			main.world.load_area(ba, MapGen.arrival_tiles(ba)[0] if not MapGen.arrival_tiles(ba).is_empty() else Vector2i(20, 20))
+			main.battle.start([{"id": bid, "lv": 83}], {"boss": true, "enemy": bid, "theme": str(Data.AREAS[ba].theme)})
+			main.push("battle")
+			await _wait(2.8)
+			await _shot("battle_boss_" + bid)
+			main.set_stack(["world"])
+	if want.call("field"):
+		# a field battle: the scouts' word and the orders; a volley in the air; the airs sounded; the end
+		main.world.load_area("millet", MapGen.arrival_tiles("millet")[0])
+		main.start_war("lishan", {})
+		var f = main.field
+		await _wait(0.4)
+		await _shot("field_lishan_intro")
+		f.state = "order"
+		f.cursor = f.ids.find("hold")
+		await _wait(0.6)
+		await _shot("field_lishan_orders")
+		f._give("volley")
+		await _wait(f.RESOLVE * 0.5)
+		await _shot("field_lishan_volley")
+		await _wait(f.RESOLVE * 0.6)
+		f._give("advance")
+		await _wait(f.RESOLVE * 0.5)
+		await _shot("field_lishan_advance")
+		await _wait(f.RESOLVE * 0.6)
+		f._give("charge")
+		await _wait(f.RESOLVE * 0.45)
+		await _shot("field_lishan_charge")
+		await _wait(f.RESOLVE * 0.65)
+		main.pop()
+		main.world.load_area("dunes", MapGen.arrival_tiles("dunes")[0])
+		Game.airs["dawn"] = true
+		main.start_war("gaixia", {})
+		f.state = "order"
+		f._give("hold")
+		await _wait(f.RESOLVE * 1.1)
+		f._give("sound")
+		await _wait(f.RESOLVE * 0.5)
+		await _shot("field_gaixia_songs")
+		await _wait(f.RESOLVE * 0.6)
+		while str(f.st.over) == "":
+			War.step(f.st, War.best(f.st))
+		f._thin()
+		f.state = "result"
+		await _wait(0.8)
+		await _shot("field_gaixia_held")
+		main.pop()
+		Game.war_won["gaixia"] = int(f.st.drum)
+	if want.call("pages"):
+		main.world.load_area("sect", Vector2i(20, 12))
+		main.open_menu()
+		main.menu.cursor = main.menu.ids.find("feats")
+		await _wait(0.6)
+		await _shot("menu_pots_root")
+		for pg in [["feats", Feats.order().find("summits_nine"), "feats_page"], ["feats", Feats.order().size() + 2, "finds_page"], ["songs", Music.ORDER.find("valley"), "songs_page"], ["songs", Music.ORDER.find("war"), "songs_page_war"],
+				["host", War.ORDER.find("steppe"), "host_page"]]:
+			main.menu.mode = str(pg[0])
+			main.menu._build()
+			main.menu.cursor = int(pg[1])
+			if str(pg[0]) == "songs":
+				Music.ask(str(Music.ORDER[int(pg[1])]))
+				main.menu.t = 9.0
+			await _wait(0.6)
+			await _shot(str(pg[2]))
+		Music.ask("")
+		main.pop()
+	if want.call("town"):
+		# the Drum Tower quarter of Qingshi: from above at nine in the morning, the street, the levy at
+		# drill, the players, the notice board, the tailor's and Old Du's mat
+		w.open_world()
+		w.enter_layer("surface")
+		# (--pots-town=a,b: only those of the town's shots)
+		var tonly: PackedStringArray = str(main.args.get("pots-town", "")).split(",", false)
+		for sh in [["quarter_above", Vector2i(79, 20), Vector3(-26.0, 30.0, 34.0), Vector3(0.0, 0.0, -2.0), 9.0], ["quarter_street", Vector2i(79, 19), Vector3(-9.0, 9.0, 0.5), Vector3(8.0, 0.5, 0.0), 9.5],
+				["quarter_dusk", Vector2i(79, 20), Vector3(22.0, 16.0, 28.0), Vector3(0.0, 1.0, -3.0), 18.4], ["quarter_drill", Vector2i(68, 27), Vector3(-9.0, 5.0, 9.0), Vector3(3.0, 1.0, -1.0), 6.2],
+				["qingshi_whole", Vector2i(52, 26), Vector3(-10.0, 78.0, 62.0), Vector3(4.0, 0.0, -4.0), 10.0]]:
+			if not tonly.is_empty() and not tonly.has(str(sh[0])):
+				continue
+			var at: Vector2i = Atlas.to_world("village", sh[1])
+			_high_put(Atlas.to_world("village", Vector2i(79, 19)), Vector2i(0, 1), float(sh[4]))
+			await _wait(2.6)
+			var c3: Vector3 = w.wpos(at)
+			w.cam_override = Transform3D(Basis.IDENTITY, c3 + (sh[2] as Vector3)).looking_at(c3 + (sh[3] as Vector3), Vector3.UP)
+			await _wait(1.0)
+			await _shot(str(sh[0]))
+			w.cam_override = null
+		for sp in [["clerk_bai", "notice_board"], ["tailor_qiao", "tailor_shop"], ["dicer_du", "gamble_mat"]]:
+			if not tonly.is_empty() and not tonly.has(str(sp[1])):
+				continue
+			var ne: Dictionary = {}
+			for e in w.ents:
+				if str(e.id) == str(sp[0]):
+					ne = e
+			if ne.is_empty():
+				continue
+			_high_put(ne.pos + Vector2i(0, 1), Vector2i(0, -1), 10.0)
+			await _wait(2.0)
+			if str(sp[0]) == "clerk_bai":
+				main.offer_jobs(ne)
+				main.choice.cursor = 2
+			elif str(sp[0]) == "tailor_qiao":
+				Game.outfits.erase("rain")
+				Game.yue_outfits.erase("willow")
+				main.offer_outfits({"id": "tailor_qiao", "n": "Tailor Qiao"})
+			else:
+				main.offer_gamble()
+				main.choice.cursor = 2
+			await _wait(0.9)
+			await _shot(str(sp[1]))
+			main.pop()
+		main.set_stack(["world"])
+		_high_put(Atlas.to_world("village", Vector2i(79, 24)), Vector2i(0, 1), 20.5)
+		await _wait(2.0)
+		Game.gamble_n = 3
+		var res := Gamble.play(Game, "dice", "big", 1000)
+		main.say(res.lines)
+		await _wait(0.8)
+		await _shot("gamble_throw")
+		main.pop()
+		# her wardrobe, in the world
+		_high_put(Atlas.to_world("village", Vector2i(79, 19)), Vector2i(0, 1), 10.0)
+		await _wait(1.5)
+		main.open_yue_wardrobe()
+		main.choice.cursor = Fashion.YUE_ORDER.find("plum")
+		main.choice.preview.call("plum")
+		await _wait(1.2)
+		await _shot("yue_wardrobe")
+		main.choice.preview.call("")
+		main.pop()
+	if want.call("page"):
+		Game.step = Data.step_index("s_p23_gao")
+		Game.trials = {}
+		main.set_stack(["world"])
+		main.open_trial({"enemy": "gao_jianli", "lv": 83, "req": 82, "id": "boss_gao_jianli", "pos": Vector2i.ZERO})
+		await _wait(0.8)
+		await _shot("trial_by_the_song")
+		main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.step = Data.step_index("s_p23_end")
+		Game.cross_pending = ["the_host"]
+		main.ask_crossroads()
+		main.choice.cursor = 2
+		await _wait(1.0)
+		await _shot("crossroads_host")
+		main.pop()
+		Game.cross_pending = []

@@ -76,8 +76,11 @@ const OWN := {
 		"lower": {"n": "The Hollow of the Mountain", "size": Vector2i(40, 30), "rooms": 6, "things": ["cave_painting"],
 			"foes": {"pool": [["kept_voice", 73, 74], ["hollow_one", 73, 74]], "n": 8, "vis": "s_p20_wang"}}},
 	# the North Mountain diggings above Qingshi: Yu Gong's adit, which has broken into something older
+	# (Part XXIII: and under the adit, down a shaft the old man's sons boarded over, the First Kiln)
 	"village": {"n": "Yu Gong's Adit", "size": Vector2i(42, 30), "rooms": 7, "at": Vector2i(49, 11),
-		"foes": {"pool": [["dig_mole", 72, 73], ["blind_newt", 72, 73], ["stone_bat", 72, 73]], "n": 8, "vis": "s_p20_gong"}},
+		"foes": {"pool": [["dig_mole", 72, 73], ["blind_newt", 72, 73], ["stone_bat", 72, 73]], "n": 8, "vis": "s_p20_gong"},
+		"lower": {"n": "The First Kiln", "size": Vector2i(36, 26), "rooms": 5,
+			"foes": {"pool": [["pot_drummer", 82, 83], ["kiln_wasp", 82, 83]], "n": 6, "vis": "s_p23_xiang"}}},
 	# the mines of Tushan: the casters' old workings, gone deeper than anybody signed for
 	"tushan": {"n": "The Old Workings of Tushan", "size": Vector2i(44, 32), "rooms": 8, "at": Vector2i(54, 50),
 		"foes": {"pool": [["ore_gnawer", 73, 74], ["dig_mole", 73, 74], ["lamp_ghost", 73, 74]], "n": 8, "vis": "s_p20_tushan"},
@@ -572,12 +575,10 @@ static func world(area: String, layer: String, mouth: Vector2i, ents: Array, lev
 		"w": w, "h": h, "origin": origin, "realm_mouth": mouth if level == -1 else top_mouth, "grid": grid, "owner": owner, "sea": PackedByteArray(), "ids": [area], "idx": {area: 0},
 		"ents": fents, "buildings": [], "start": lay.arrive, "floors": {}, "y": 0.0, "props": [], "stairs": lay.entry, "style": "cave"}
 
-## Stand a cave mouth in every region of realm `layer` and add the caves under them to `floors`.  A
-## mouth stands on open ground of its region that can be reached (`reach`), six tiles from anybody and
-## anything, with open ground on all eight sides (it closes no way) and three tiles of it to the south,
-## where the way in is: a seeded draw, so the same every time; a cave of the story stands as near its
-## `at` (a tile of the region's own map) as it can.
-static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, floors: Dictionary) -> void:
+## The tiles of each region (by its number) a cave mouth could stand on: open ground that can be
+## reached, `far_small` tiles from any pack, thing or spring and `far` from anybody and anything else,
+## with open ground on all eight sides and three tiles of it to the south.
+static func _mouths(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ents: Array, reach: Dictionary, far_small: int, far: int) -> Dictionary:
 	var near := {}
 	for e in ents:
 		if e.kind == "seal":
@@ -588,7 +589,7 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 			continue
 		if not e.has("pos"):
 			continue
-		var rr := 3 if e.kind in ["enemy", "prop", "spring"] else 5
+		var rr := far_small if e.kind in ["enemy", "prop", "spring"] else far
 		for dy in range(-rr, rr + 1):
 			for dx in range(-rr, rr + 1):
 				near[e.pos + Vector2i(dx, dy)] = true
@@ -611,9 +612,25 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 		if not by_region.has(o):
 			by_region[o] = []
 		by_region[o].append(p)
+	return by_region
+
+## Stand a cave mouth in every region of realm `layer` and add the caves under them to `floors`.  A
+## mouth stands on open ground of its region that can be reached (`reach`), six tiles from anybody and
+## anything, with open ground on all eight sides (it closes no way) and three tiles of it to the south,
+## where the way in is: a seeded draw, so the same every time; a cave of the story stands as near its
+## `at` (a tile of the region's own map) as it can.
+static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, floors: Dictionary) -> void:
+	var by_region := _mouths(grid, W, H, owner, ents, reach, 3, 5)
+	# (a region grown so full that nothing is six tiles from anything, Qingshi since the Drum Tower
+	# quarter, still has the cave the story gave it: its mouth only stands a little nearer to its neighbours)
+	var by_close := {}
 	for k in ids.size():
 		var area: String = ids[k]
 		var cands: Array = by_region.get(k, [])
+		if cands.is_empty() and OWN.has(area):
+			if by_close.is_empty():
+				by_close = _mouths(grid, W, H, owner, ents, reach, 1, 3)
+			cands = by_close.get(k, [])
 		if cands.is_empty() or spec(area).is_empty():
 			continue
 		cands.sort()

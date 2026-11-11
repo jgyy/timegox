@@ -162,7 +162,11 @@ static func clean_name(s: String) -> String:
 # ---------------------------------------------------------------- outfits
 ## What can hang on the hero (Models.accessory builds each, on the bone named here).
 const ACCESSORY_BONES := {"straw_hat": "head", "jade_crown": "head", "phoenix_crest": "head", "veil_hat": "head",
-	"pauldrons": "chest", "feather_mantle": "chest", "star_cloak": "chest", "ink_mask": "head", "dragon_horns": "head"}
+	"pauldrons": "chest", "feather_mantle": "chest", "star_cloak": "chest", "ink_mask": "head", "dragon_horns": "head",
+	# the Thundering Pots release: what the new outfits (and Yue Ling's) hang on them
+	"war_helm": "head", "lamellar": "chest", "flute_sash": "chest", "clay_knot": "head", "back_banners": "chest", "rain_cape": "chest",
+	"scholar_cap": "head", "fur_collar": "chest", "prayer_beads": "chest", "kite_tails": "chest", "head_lamp": "head", "back_broom": "chest",
+	"opera_mask": "head", "fox_mask": "head", "flower_wreath": "head", "hair_ribbons": "head", "moon_pin": "head", "healer_satchel": "chest"}
 
 ## `cols`: robe, trousers/sash/cape and trims ("" keeps the colours chosen at creation); `acc` what it
 ## hangs on him; `how` how it is earned (a quest step done, a fated encounter, a deed, or bought).
@@ -191,8 +195,113 @@ const OUTFITS := {
 		"desc": "A navy sailor's coat over white trousers, a red sash and a sun hat, sewn by the Thousand Children of Landfall from the first sailcloth they wove in two thousand years.", "how": "Sewn by the Thousand Children of Landfall when the sea comes home.", "step": "s_p12_end"},
 	"conclave": {"n": "Robe of the Many Peoples", "cols": ["f0ece0", "5a3a8a", "e8b040"], "acc": ["jade_crown", "feather_mantle"], "fx": {"hp": 0.04, "qi": 0.04, "atk": 0.03},
 		"desc": "Every people of the realms added something: Yumin feathers at the shoulders, dragon-silk, fox-fire embroidery, a pearl from Tearwater, a shade's black thread, a Landfall sailor's knot. It should not look good. It does.", "how": "From the Conclave of the Realms, when it meets at last.", "step": "s_p13_end"},
+	# ---- the Thundering Pots release: fourteen more, earned by the story (`step`), bought of Tailor Qiao in
+	# Qingshi (`buy`, `at`), or given for a feat (`feat`, feats.gd), a commission of the notice board
+	# (`job`, jobs.gd) or something found that nobody was told to look for (`egg`, eggs.gd)
+	"levy": {"n": "Levy Captain's Lamellar", "cols": ["7a2a22", "2a2420", "c8a050"], "acc": ["war_helm", "lamellar"], "fx": {"hp": 0.05, "taken": -0.03},
+		"desc": "Six hundred small plates of lacquered hide laced with red cord, a helmet with a pheasant's tail in it, and under them a farmer's jacket. Lady Hao had it laced the night the six hearths came in. It creaks. She says a host should hear its captain coming.", "how": "Laced for you by Lady Hao, when the levy of the six hearths has come in.", "step": "s_p23_levy"},
+	"pipes": {"n": "Robe of the Twelve Pipes", "cols": ["d8c890", "5a4a2a", "3a7a5a"], "acc": ["flute_sash"], "fx": {"qi": 0.06, "cost": 0.03},
+		"desc": "Bamboo-yellow silk with a green hem, and a flute of the valley of Xiexi thrust through the sash where a sword ought to go. Ling Lun cut the cloth the way a pipe is cut: to a length that is right, and cannot be argued with.", "how": "Cut for you by Ling Lun, when you can sing the airs of the land back to him.", "step": "s_p23_airs"},
+	"clay": {"n": "Clay Soldier's Tunic", "cols": ["a8765a", "5a4032", "d8c8b0"], "acc": ["clay_knot"], "fx": {"taken": -0.05},
+		"desc": "The long belted tunic of the foot of Mount Li, in the colours they were painted before the paint flaked: madder, and a neckcloth of bone white, and the topknot tied to the right as the ranks tied theirs. One of the eight thousand left it folded on the field. Inside the collar somebody has scratched a name, which the First Emperor's foremen made every potter do.", "how": "Left folded on the field for you, when the pots are quiet.", "step": "s_p23_end"},
+	"marshal": {"n": "Grand Marshal's Crimson", "cols": ["a81e22", "1e1a1a", "e8c050"], "acc": ["war_helm", "pauldrons", "back_banners"], "fx": {"atk": 0.05, "hp": 0.04},
+		"desc": "A crimson surcoat over black, gilded shoulders, and four small flags at the back as generals wear them on the stage, so that the hindmost rank can see which way the general is facing. Master Sun says that is all a general's dress is for.", "how": "For the feat The Field Is Held: win three field battles.", "feat": "war_three"},
+	"rain": {"n": "Straw Rain-Cape", "cols": ["8a7a4a", "3a4a3a", "d8c080"], "acc": ["straw_hat", "rain_cape"], "fx": {"heal": 0.06},
+		"desc": "A cape of layered rice straw and a hat to match, what the ploughmen of the valley wear from the Grain Rain to the Great Heat. Water runs off it into the boots. \"A bamboo staff and straw sandals beat a horse,\" says the song; \"in a cape of straw, in mist and rain, let a life go by.\"", "how": "Sold by Tailor Qiao in Qingshi.", "buy": 4000, "after": "s_vl_intro", "at": "tailor_qiao"},
+	"exam": {"n": "Examination Blue", "cols": ["2a4a8a", "e8e4d8", "1a1a2a"], "acc": ["scholar_cap"], "fx": {"exp": 0.04},
+		"desc": "The round-collared blue gown of a candidate, and the black gauze cap with two stiff wings that he hopes to be allowed to keep. Scholar Wang wore one like it into the examination hall nine times. Tailor Qiao has let this one out at the shoulders, for a candidate who carries a sword.", "how": "Sold by Tailor Qiao in Qingshi.", "buy": 6000, "after": "s_vl_intro", "at": "tailor_qiao"},
+	"newyear": {"n": "New Year Red", "cols": ["c8281e", "3a1410", "f0c850"], "acc": [], "fx": {"stones": 0.06},
+		"desc": "Red from collar to hem, with the character for good fortune in gold on the back, upside down, so that fortune has arrived. Nobody who sees it can bring himself to give short weight.", "how": "Sold by Tailor Qiao in Qingshi.", "buy": 8000, "after": "s_vl_intro", "at": "tailor_qiao"},
+	"fur": {"n": "Steppe Fur Coat", "cols": ["8a6a4a", "4a3424", "e8e0d0"], "acc": ["fur_collar"], "fx": {"hp": 0.04, "taken": -0.02},
+		"desc": "Sheepskin with the wool inside and a collar of fox, cut long for the saddle and belted with a rope of horsehair, as the horse-folk below Thunder Valley wear from the first frost. It smells of smoke and of horse, and no wind has yet found the way in.", "how": "Sold by Tailor Qiao in Qingshi.", "buy": 12000, "after": "s_vl_intro", "at": "tailor_qiao"},
+	"pilgrim": {"n": "Pilgrim's White", "cols": ["ece8dc", "8a8478", "b88a3a"], "acc": ["prayer_beads", "straw_hat"], "fx": {"qi": 0.05, "heal": 0.04},
+		"desc": "Undyed hemp, a string of a hundred and eight wooden beads worn smooth, and the broad hat that is all the roof a pilgrim owns. Every temple on the way up stamps the hem in red. His has nine stamps, one for each top he has stood on.", "how": "For the feat Nine Cairns: stand on nine summits.", "feat": "summits_nine"},
+	"swallow": {"n": "Swallow-Tail Jacket", "cols": ["2a2a3a", "e8e8f0", "c83a2a"], "acc": ["kite_tails"], "fx": {"spd": 1, "miss": 0.02},
+		"desc": "A short black jacket with a white breast and two long tails of ribbon at the back that stream in any air at all. The children who fly kites below Qingshi sewed it for him, to match the kite. From the ground, they say, nobody can tell which is which.", "how": "For the feat Master Lie Nods: fly a hundred metres in one flight.", "feat": "glide_far"},
+	"delver": {"n": "Lamp-Black Delver's Coat", "cols": ["3a3630", "1a1816", "e8a040"], "acc": ["head_lamp"], "fx": {"taken": -0.03, "stones": 0.04},
+		"desc": "Oiled leather the colour of a lamp's own smoke, and a small brass lamp strapped to the brow in the way of the salt-well men of the south. Xu Xiake wore out two of these. It keeps off the drip, and it finds what was dropped.", "how": "For the feat The Ground Is Hollow: go to the very back of six caves.", "feat": "delve_six"},
+	"broom": {"n": "The Broom Immortal's Patches", "cols": ["6a7a8a", "4a3a2a", "c8b070"], "acc": ["back_broom"], "fx": {"exp": 0.03, "spd": 1},
+		"desc": "The robe he swept the steps in, kept, and patched until there is more patch than robe, with the old broom slung across the back where other men carry a sword. Nobody gave it to him. It was in the cupboard the whole time.", "how": "Not earned. Remembered.", "egg": "old_code"},
+	"opera": {"n": "Painted Face of the Pear Garden", "cols": ["1e6a5a", "c8a030", "f0f0f0"], "acc": ["opera_mask", "back_banners"], "fx": {"atk": 0.04, "miss": 0.02},
+		"desc": "The green and gold of a stage general, four flags at the back, and the face painted on a mask of lacquered paper: red for the loyal, black for the upright, white for the ones to watch. This one is red. The players of Qingshi's stage insisted.", "how": "From the players of the Pear Garden stage in Qingshi, for a commission of the notice board.", "job": "job_stage"},
+	"fox": {"n": "Fox-Fire Festival Robe", "cols": ["e87a2a", "f4f0e8", "2a2a2a"], "acc": ["fox_mask"], "fx": {"miss": 0.04},
+		"desc": "Persimmon orange over white, and a fox's face in painted wood, worn pushed up on the side of the head as the Tianhu's children wear theirs on festival nights. In it he is a little hard to look at straight, the way a thing seen from the corner of the eye is.", "how": "From Tailor Qiao, for a commission of the notice board.", "job": "job_masks"},
 }
-const OUTFIT_ORDER := ["sweeper", "inner", "hunter", "dragon", "phoenix", "celestial", "immortal", "ink", "brocade", "starlit", "sea", "conclave"]
+const OUTFIT_ORDER := ["sweeper", "inner", "hunter", "dragon", "phoenix", "celestial", "immortal", "ink", "brocade", "starlit", "sea", "conclave",
+	"rain", "exam", "newyear", "fur", "pilgrim", "swallow", "delver", "broom", "fox", "opera", "levy", "pipes", "marshal", "clay"]
+
+# ---------------------------------------------------------------- Yue Ling's wardrobe
+## The Thundering Pots release: Yue Ling has clothes of her own (Esc > Wardrobe > hers).  `cols` her
+## dress, its sash and skirt, and its trims ("" keeps the rose she woke in); `acc` what hangs on her;
+## `fx` a small passive of her own (hp, qi, atk, spd, heal: Game.yue_gear).  `bond` how close the two
+## must be before she will wear it for him (bonds.gd), `step` the step of the story that gives it,
+## `buy` Tailor Qiao's price, `feat` the feat that earns it.
+const YUE_OUTFITS := {
+	"lotus": {"n": "Lotus Rose", "cols": ["", "", ""], "acc": [], "fx": {},
+		"desc": "The rose dress she woke in beside the pond, with the ribbon in her hair. She has mended the hem eleven times and will not hear of another.", "how": "Hers from the start."},
+	"healer": {"n": "Healer's White", "cols": ["f2f0ea", "5a8a7a", "c83a3a"], "acc": ["healer_satchel"], "fx": {"heal": 0.06},
+		"desc": "White linen that shows every stain, on purpose, a green apron, and the satchel of the wandering physicians with its red cord. Granny Wen cut it down from her own.", "how": "Granny Wen's, once the two of you are friends.", "bond": 10},
+	"plum": {"n": "Plum Blossom in Snow", "cols": ["f4f0f4", "8a2a4a", "e86a8a"], "acc": ["flower_wreath"], "fx": {"qi": 0.05},
+		"desc": "White with a wine-red skirt and a sprig of winter plum in the hair: the flower that opens in the snow, before any leaf. She says it is only a dress. She wore it the first morning she did not look over her shoulder.", "how": "She wears it once the two of you are close.", "bond": 25},
+	"moon": {"n": "Moon-Palace Silver", "cols": ["d8e0f0", "6a78a8", "f4f6ff"], "acc": ["moon_pin"], "fx": {"qi": 0.04, "spd": 1},
+		"desc": "Silver-grey gauze over blue, and a crescent of white jade in the hair. Chang'e sent it down by the Jade Rabbit with a note: it has not been worn in four thousand years, and it would like to dance.", "how": "Sent down by Chang'e, when the two of you are closer than close.", "bond": 45},
+	"willow": {"n": "Willow Green", "cols": ["8ac878", "3a5a3a", "f0e8a0"], "acc": ["hair_ribbons"], "fx": {"hp": 0.05},
+		"desc": "The green of the first week of spring, with long yellow ribbons that do what the wind tells them. The colour, she says, of something that has decided to come back.", "how": "Sold by Tailor Qiao in Qingshi.", "buy": 5000, "after": "s_vl_intro"},
+	"redbride": {"n": "Festival Scarlet", "cols": ["c82a2a", "5a1418", "f0c850"], "acc": ["flower_wreath", "hair_ribbons"], "fx": {"atk": 0.05},
+		"desc": "Scarlet and gold for the fifteenth night, flowers in the hair, ribbons to the knee. Little Hua of Qingshi says it is a bride's dress. Yue Ling says it is not, and has gone the colour of it.", "how": "Sold by Tailor Qiao in Qingshi.", "buy": 9000, "after": "s_vl_intro"},
+	"snowfur": {"n": "Snow-Country Furs", "cols": ["e8e4dc", "7a6a5a", "b8c8d8"], "acc": ["fur_collar"], "fx": {"hp": 0.04, "heal": 0.03},
+		"desc": "Quilted white with a collar of hare, what the women of Frostpeak wear to break the ice on the well. A thing of the pond has no business being cold, she says, and pulls the collar up.", "how": "Sold by Tailor Qiao in Qingshi.", "buy": 11000, "after": "s_vl_intro"},
+	"surgeon": {"n": "Field Surgeon's Blue", "cols": ["3a5a8a", "e8e4d8", "c83a3a"], "acc": ["healer_satchel", "hair_ribbons"], "fx": {"heal": 0.08, "hp": 0.03},
+		"desc": "Indigo cotton with the sleeves tied back, a white apron and the satchel: what she wore behind the levy's centre, where they carried the hurt of both hosts. She did not ask which side a man had stood on. Clay mends with rice glue, it turns out, and patience.", "how": "Hers when the levy of the six hearths has come in.", "step": "s_p23_levy"},
+	"dancer": {"n": "Pear Garden Dancer's Sleeves", "cols": ["f0a8c0", "6a3a8a", "f4f0ff"], "acc": ["flower_wreath"], "fx": {"spd": 2},
+		"desc": "Water sleeves three times the length of an arm, made to be thrown and caught, in peach and violet. Ling Lun says a dancer is the only instrument that tunes itself.", "how": "Cut for her by Ling Lun, with the Robe of the Twelve Pipes.", "step": "s_p23_airs"},
+	"star": {"n": "Her Own Star", "cols": ["2a2a5c", "0e1030", "f0e8a0"], "acc": ["moon_pin", "hair_ribbons"], "fx": {"qi": 0.06, "atk": 0.04},
+		"desc": "Midnight blue with one small gold star embroidered over the heart, the one the Archivist wrote into the Annals under her name. She sewed the star herself. It is a little crooked, and she will not have it straightened.", "how": "For the feat Two Under One Kite: fly thirty flights together.", "feat": "glide_thirty"},
+}
+const YUE_ORDER := ["lotus", "healer", "plum", "moon", "willow", "redbride", "snowfur", "surgeon", "dancer", "star"]
+
+## The colours Yue Ling is drawn in ({"robe", "sec", "trim"}; empty for the dress she woke in).
+static func yue_colors(g) -> Dictionary:
+	var out := {}
+	var o: Dictionary = YUE_OUTFITS.get(str(g.yue_outfit), YUE_OUTFITS.lotus)
+	var keys := ["robe", "sec", "trim"]
+	for k in 3:
+		if str(o.cols[k]) != "":
+			out[keys[k]] = Color(str(o.cols[k]))
+	return out
+
+## One passive of the dress Yue Ling wears.
+static func yue_gear(g, key: String) -> float:
+	return float(YUE_OUTFITS.get(str(g.yue_outfit), YUE_OUTFITS.lotus).fx.get(key, 0.0))
+
+## The dresses of hers the journey has earned so far that she does not yet have: by how close the two
+## are, and by the steps of the story done (Game.poll_wardrobe gives them).
+static func yue_earned(g) -> Array:
+	var out: Array = []
+	for id in YUE_ORDER:
+		var o: Dictionary = YUE_OUTFITS[id]
+		if g.yue_outfits.has(id):
+			continue
+		if (o.has("bond") and g.bond >= int(o.bond)) or (o.has("step") and g.done(str(o.step))):
+			out.append(id)
+	return out
+
+## What Tailor Qiao has for Yue Ling now.
+static func yue_for_sale(id: String, g) -> bool:
+	var o: Dictionary = YUE_OUTFITS[id]
+	return o.has("buy") and not g.yue_outfits.has(id) and g.companion and g.reached(str(o.get("after", "")))
+
+## The outfits a feat, a commission or a find gives (`kind`: "feat", "job" or "egg"): [["outfit", id]]
+## for his, [["yue", id]] for hers.
+static func earned_by(kind: String, id: String) -> Array:
+	var out: Array = []
+	for oid in OUTFIT_ORDER:
+		if str(OUTFITS[oid].get(kind, "")) == id:
+			out.append(["outfit", oid])
+	for yid in YUE_ORDER:
+		if str(YUE_OUTFITS[yid].get(kind, "")) == id:
+			out.append(["yue", yid])
+	return out
 
 # ---------------------------------------------------------------- rides
 ## `kind`: "mount" (ridden astride: "ride"/"ride_idle") or "vehicle" (stood on: "ride_stand");
@@ -271,6 +380,10 @@ static func fx_text(fx: Dictionary) -> String:
 static func outfit_for_sale(id: String, g) -> bool:
 	var o: Dictionary = OUTFITS[id]
 	return o.has("buy") and not g.outfits.has(id) and g.reached(str(o.get("after", "")))
+
+## Who sells an outfit that is sold (Dyer Su at the Dawn Market, or Tailor Qiao in Qingshi).
+static func seller(id: String) -> String:
+	return str(OUTFITS[id].get("at", "dyer_su"))
 
 ## The outfits and rides the quest steps done so far have earned (Game.advance grants them as each
 ## step is done; Game.reset the origin's own).

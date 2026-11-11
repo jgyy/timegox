@@ -170,7 +170,7 @@ func _build3d() -> void:
 	hero_light.omni_range = 9.0
 	hero_light.position = Vector3(0, 2.2, 0)
 	player.add_child(hero_light)
-	comp = Models.person(Color("e86a9a"), Color("402030"), YUE_OPTS)
+	comp = Models.yue_ling({"glow": YUE_OPTS.glow})
 	comp.add_child(Models.shadow_disc(0.5))
 	comp.visible = false
 	scene3d.add_child(comp)
@@ -1733,7 +1733,31 @@ func preview_weapon(id: String) -> void:
 	preview_arm = id if Game.arms.has(id) else ""
 	refresh_hero()
 
+## The Thundering Pots release: Yue Ling in the dress she wears, or the one under the wardrobe's cursor.
+var preview_yue := ""
+var yue_sig := "lotus"
+
+func preview_yue_outfit(id: String) -> void:
+	preview_yue = id if Game.yue_outfits.has(id) else ""
+	refresh_yue()
+
+func refresh_yue() -> void:
+	var oid: String = preview_yue if preview_yue != "" else Game.yue_outfit
+	if oid == yue_sig or comp == null:
+		return
+	yue_sig = oid
+	var at := comp.transform
+	var vis := comp.visible
+	var old := comp
+	comp = Models.yue_ling({"glow": YUE_OPTS.glow, "outfit": oid})
+	comp.add_child(Models.shadow_disc(0.5))
+	scene3d.add_child(comp)
+	comp.transform = at
+	comp.visible = vis
+	old.queue_free()
+
 func refresh_hero() -> void:
+	refresh_yue()
 	var oid := preview_id if preview_id != "" else Game.outfit
 	var keep: String = Game.outfit
 	Game.outfit = oid
