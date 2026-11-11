@@ -2121,6 +2121,10 @@ func _run() -> void:
 		# the Hundred Arms release (--arms, or --arms=a,b): the faces, the Eight Arms and their forms, the
 		# Arms page, the ends of the story and Part XXI
 		await _arms_shots(str(main.args.arms))
+	if main.args.has("bestiary"):
+		# every monster model, one foe of each shape in its own palette, seven to a sheet (developer tool,
+		# and the "before and after" of a release that reworks them): --bestiary, or --bestiary=<prefix>
+		await _bestiary_shots(str(main.args.bestiary))
 	if main.args.has("high"):
 		# the High Roads release (--high, or --high=a,b): the mountains, climbing, the cloud-kite, the
 		# people of the road and Part XXII
@@ -3468,3 +3472,32 @@ func _high_shots(which: String = "1") -> void:
 			await _wait(0.8)
 			await _shot(str(sp[3]))
 			w.cam_override = null
+
+## One foe of every shape the monsters come in (the first, not a lord, that Data.ENEMIES gives each),
+## seven to a sheet, from a quarter in front and from the side: `prefix`_1 .. and `prefix`_side_1 ..
+func _bestiary_shots(prefix: String = "1") -> void:
+	var pre := "bestiary" if prefix == "1" else prefix
+	var by_shape := {}
+	for id in Data.ENEMIES:
+		var sh := str(Data.ENEMIES[id].get("shape", ""))
+		if sh == "" or sh.begins_with("person") or by_shape.has(sh) or bool(Data.ENEMIES[id].get("boss", false)):
+			continue
+		by_shape[sh] = id
+	for id2 in Data.ENEMIES:
+		var sh2 := str(Data.ENEMIES[id2].get("shape", ""))
+		if sh2 != "" and not sh2.begins_with("person") and not by_shape.has(sh2):
+			by_shape[sh2] = id2
+	var shapes: Array = by_shape.keys()
+	shapes.sort()
+	var only: PackedStringArray = str(main.args.get("shapes", "")).split(",", false)
+	if not only.is_empty():
+		shapes = shapes.filter(func(x): return only.has(str(x)))
+	var per := int(main.args.get("per", "6"))
+	for i in range(0, shapes.size(), per):
+		var row: Array = shapes.slice(i, i + per)
+		print("[tour] sheet ", i / per + 1, ": ", row)
+		for view in [["", 0.45], ["_side", 1.45]]:
+			var ms: Array = []
+			for sh3 in row:
+				ms.append(_foe(str(by_shape[sh3]), bool(Data.ENEMIES[by_shape[sh3]].get("boss", false))))
+			await _gallery("%s%s_%d" % [pre, str(view[0]), i / per + 1], ms, float(main.args.get("spacing", "1.9")), float(view[1]))
