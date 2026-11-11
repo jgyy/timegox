@@ -17,7 +17,9 @@ const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon
 	# Part XVIII: the Lord of the Southern Fire, in his own model
 	"person:zhurong",
 	# Part XIX: the Player, Yan Shi's dancer, in its own model
-	"person:the_player"]
+	"person:the_player",
+	# Part XX: the Valley Spirit, in her own model
+	"person:xuanpin"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font

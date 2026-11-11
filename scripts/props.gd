@@ -181,6 +181,62 @@ const KINDS := {
 		"lines": ["Hot cedar and steam. Every ache the road ever gave him floats up and away.", "The water smells of pine and something floral the Founder must have liked.", "He soaks until Yue Ling knocks on the screen and asks if he has drowned."]},
 	"nest": {"n": "Nest", "verb": "Look into the nest", "clip": "touch", "dur": 2.2, "at": "face", "fx": "", "effect": "lore", "comp": "watch",
 		"lines": ["Woven of cloud-silk and feathers, and still warm.", "A Feathered Folk nest, swept clean and waiting.", "Three blue feathers left as a gift. He leaves them."]},
+	# ---- the Hollow Hills release (Part XX): what is done under the ground (caves.gd stands these in
+	# niches of the cave walls; cavethings.gd builds them, the rock of them in voxels), each on a clip of
+	# its own
+	"ore_vein": {"n": "Seam of ore", "verb": "Swing a pick at the seam", "clip": "mine", "dur": 4.8, "at": "face", "hold": "pickaxe", "fx": "sparks", "effect": "ore", "comp": "watch",
+		"lines": ["Chank. Chank. The rock gives up a piece the size of a fist, heavy for its size and bright where it broke.", "Whoever worked this seam last left the pick leaning on it, as if stepping out for a moment. The handle is polished by hands.", "Yue Ling holds the lamp and says he swings it like a broom. The seam does not seem to mind."]},
+	"drip_pool": {"n": "Drip pool", "verb": "Wash in the drip pool", "clip": "wash", "dur": 3.2, "at": "face", "fx": "splash", "effect": "rest", "comp": "wash",
+		"lines": ["One drop every nine heartbeats, for longer than the sect has stood. The pool it has filled is so clear the bottom looks dry.", "The water is cold enough to stop the breath, and tastes of stone and of nothing else at all.", "He washes the road off his face and it comes away grey. Yue Ling says there was a person under there after all."]},
+	"cave_painting": {"n": "Painting on the rock", "verb": "Follow the painting with a finger", "clip": "trace", "dur": 4.0, "at": "face", "fx": "glow", "effect": "lore", "comp": "watch",
+		"lines": ["Red ochre, older than writing: deer, a river, people holding hands in a row. One of them is waving.", "A hand, stencilled in red: somebody held it to the rock and blew paint round it. His own fits it exactly.", "Hunters, and a great beast, and over them a sun with nine little suns beside it. Nobody has seen that sky for a long time."]},
+	"glow_shrooms": {"n": "Foxfire mushrooms", "verb": "Pick the foxfire caps", "clip": "gather", "dur": 2.8, "at": "face", "fx": "sparkle", "effect": "herb", "comp": "gather",
+		"lines": ["They go on glowing in the hand, a cold green light with no warmth in it at all.", "He leaves the small ones. Down here a mushroom may be a hundred years getting to the size of a thumb.", "Yue Ling says they are good for fevers and bad for soup. She does not say how she knows about the soup."]},
+	"crystal": {"n": "Spirit crystals", "verb": "Lay a hand on the crystals", "clip": "touch", "dur": 2.4, "at": "face", "fx": "glow", "effect": "qi", "comp": "watch",
+		"lines": ["The crystals hum under his palm, one note, very low: the note the hill hums when nobody is in it.", "Each one took ten thousand years to grow a finger's length. He takes his hand away rather carefully.", "The light in them moves towards his hand like fish to the side of a pond."]},
+	"echo_stone": {"n": "Ringing stone", "verb": "Knock and listen", "clip": "knock", "dur": 2.8, "at": "face", "fx": "ring", "effect": "lore", "comp": "watch",
+		"lines": ["Three knocks, and the pillar rings like a bell under water. Something a long way down rings back, a beat late.", "Stone chimes were the first music, they say: somebody knocked on a cave to see if it was hollow, and it sang.", "He lays his ear to it. The hill is full of small sounds: water, settling, and far off something that might be digging."]},
+	"squeeze": {"n": "Squeeze in the rock", "verb": "Sidle into the crack", "clip": "squeeze", "dur": 4.8, "at": "face", "fx": "dust", "effect": "find", "comp": "laugh",
+		"lines": ["Breath out, belly in, one ear to the rock. At the far end there is a pocket the size of a cupboard, and somebody has been here before.", "The crack takes him as far as the shoulder and then thinks better of it. He comes out backwards, grey to the eyebrows.", "Yue Ling says she could go through there easily. She does not offer to."]},
+	"stream_bank": {"n": "Underground stream", "verb": "Pan the gravel", "clip": "pan", "dur": 4.8, "at": "face", "hold": "pan", "fx": "splash", "effect": "luck", "comp": "watch",
+		"lines": ["Swirl, tip, swirl. At the bottom of the pan, among the black sand, three flakes the colour of late sun.", "The stream comes out of the dark and goes back into it, and has never once seen the sky. It sounds perfectly content.", "A blind white fish noses the pan, finds it is not food, and goes away without hurrying."]},
+	"fossil": {"n": "Shell in the stone", "verb": "Chip round the shell", "clip": "carve", "dur": 3.6, "at": "face", "hold": "chisel", "fx": "dust", "effect": "lore", "comp": "watch",
+		"lines": ["A coiled shell as wide as a cartwheel, turned to stone, a week's walk under a mountain. This was the bottom of a sea once.", "\"The sea becomes mulberry fields,\" the old saying goes. Here is the sea, still in the hill, keeping its shape.", "He frees one more turn of the spiral and stops. It has waited this long; the rest can wait for somebody patient."]},
+	"dig_spot": {"n": "Soft earth", "verb": "Dig", "clip": "dig", "dur": 4.4, "at": "face", "hold": "spade", "fx": "dust", "effect": "find", "comp": "watch",
+		"lines": ["Somebody buried something here in a hurry and marked the place with three stones. Whoever it was never came back for it.", "A spade's depth down: a clay jar, and in the jar, wrapped in oiled silk, what a family thought worth hiding.", "He fills the hole in again afterwards and treads it flat. A hole in a cave floor is a mean thing to leave for the next lamp."]},
+	"bat_roost": {"n": "Bat roost", "verb": "Peer up at the roost", "clip": "peer", "dur": 3.2, "at": "face", "fx": "", "effect": "lore", "comp": "watch",
+		"lines": ["Hundreds of them, hung up like dark fruit, shifting and muttering in their sleep. One opens an eye and closes it again.", "The word for bat sounds like the word for good fortune, which is why they are carved on every door. These ones have not been told.", "At dusk they will pour out of the hill like smoke. For now it is the middle of their night, and he keeps his voice down."]},
+	"miner_niche": {"n": "Lamp niche", "verb": "Hang a lamp in the niche", "clip": "hang", "dur": 3.0, "at": "face", "fx": "light", "effect": "lore", "comp": "watch",
+		"lines": ["A hook, a soot mark above it the shape of a flame, and under it a tally scratched in the rock: somebody's shifts, in fives.", "The lamp takes, and the dark goes back about as far as a man can throw a stone. It has been a long time since this gallery was lit.", "Miners leave a light burning for the one who comes after. He trims the wick, as one should."]},
+	"cave_weiqi": {"n": "Stone weiqi board", "verb": "Watch the game", "clip": "think", "dur": 2.4, "at": "face", "fx": "", "effect": "lore", "comp": "think",
+		"lines": ["Black to play. It has been Black to play for some time: there is moss on the stones.", "He looks for only a moment. When he looks up, the lamp has burned a finger lower than it should have.", "Two cups beside the board, both empty, both dusty. Whoever was playing did not finish, or has not finished yet."]},
+	# ---- and in the houses, which have twice the room now (rooms.gd): twelve new pieces of furniture
+	"chest": {"n": "Camphor chest", "verb": "Open the chest", "clip": "open_chest", "dur": 3.0, "at": "face", "fx": "", "effect": "find", "comp": "watch",
+		"lines": ["Winter quilts, a wedding robe folded in paper, and under them a string of cash somebody saved a coin at a time.", "The lid comes up on a smell of camphor and thirty winters. He puts everything back the way it lay.", "A child's first shoes, kept. He shuts the lid quietly."]},
+	"mirror": {"n": "Bronze mirror", "verb": "Tidy your hair at the mirror", "clip": "comb", "dur": 3.0, "at": "face", "hold": "comb", "fx": "glow", "effect": "luck", "comp": "laugh",
+		"lines": ["The bronze shows him a little yellower and a good deal more travelled than he remembers being.", "Three strokes of the comb and the topknot sits straight for the first time in a month.", "Yue Ling watches him fuss and says the road has not cured him of vanity. He says it is respect for the mirror."]},
+	"mortar": {"n": "Stone mortar", "verb": "Pound the mortar", "clip": "pound", "dur": 4.0, "at": "face", "hold": "pestle", "fx": "dust", "effect": "herb", "comp": "watch",
+		"lines": ["Thump, thump, thump: the sound of every kitchen and every pharmacy in the land, and of the rabbit on the moon.", "Dried root to coarse meal to powder fine as flour. His shoulders will know about it tomorrow.", "Yue Ling says the Jade Rabbit keeps better time. The Jade Rabbit has had longer to practise."]},
+	"spinning_wheel": {"n": "Spinning wheel", "verb": "Spin a length of thread", "clip": "spin", "dur": 4.8, "at": "before", "off": 0.55, "fx": "", "effect": "qi", "comp": "watch",
+		"lines": ["The wheel hums, the thread runs out between finger and thumb, and for a while there is nothing else in the world.", "His thread comes out thick and thin by turns, like a road through hills. The spinner will smile and use it for a hem.", "One hand turns, the other draws. It is harder than the sword and nobody ever wrote a manual for it."]},
+	"abacus": {"n": "Abacus", "verb": "Tot up a column", "clip": "count", "dur": 4.8, "at": "face", "fx": "", "effect": "lore", "comp": "watch",
+		"lines": ["Click, click, click. The ledger says the house is owed nine strings of cash by a man who died in the spring.", "He adds the column three times and gets three sums. The beads are not at fault.", "Rice, salt, lamp oil, a doctor's fee, a red envelope for a wedding: a year of somebody's life, in a column."]},
+	"cradle": {"n": "Cradle", "verb": "Rock the cradle", "clip": "rock", "dur": 4.8, "at": "face", "fx": "", "effect": "lore", "comp": "watch",
+		"lines": ["Empty just now, and still warm. He rocks it anyway, and finds he is humming.", "A tiger-head cap on the rail, to frighten off whatever comes for babies in the night. It would frighten him.", "Granny Wen rocked one like this with her foot while she shelled peas. He remembers the sound of the peas."]},
+	"wine_jar": {"n": "Wine jar", "verb": "Pour a measure", "clip": "pour", "dur": 3.0, "at": "face", "hold": "jug", "fx": "", "effect": "drink", "comp": "laugh",
+		"lines": ["Yellow wine, three winters old, laid down the year somebody's daughter was born.", "He pours a measure and leaves a coin on the lid, which is the custom, and a good one.", "The jar is sealed with clay and red paper, and the paper says: for the day she marries. He pours from the one beside it."]},
+	"clothes_stand": {"n": "Clothes stand", "verb": "Hang up your cloak a while", "clip": "hang", "dur": 3.0, "at": "face", "fx": "", "effect": "rest", "comp": "watch",
+		"lines": ["The cloak comes off his shoulders and takes the last three days of road with it.", "A robe hung up properly is half way to mended, Granny Wen used to say. She meant people too.", "There is a hat on the other horn that has not been worn for a long while. He does not move it."]},
+	"washstand": {"n": "Washstand", "verb": "Wash your face", "clip": "wash", "dur": 3.2, "at": "face", "fx": "splash", "effect": "rest", "comp": "watch",
+		"lines": ["Cold water, a rough towel, and the world is a degree more possible.", "Somebody fills this basin every morning for whoever comes. He pours it out on the plants afterwards, as a guest should.", "He comes up out of the towel to find Yue Ling has tied his sleeves in a knot behind him."]},
+	"workbench": {"n": "Carver's bench", "verb": "Carve a little", "clip": "carve", "dur": 3.6, "at": "face", "hold": "chisel", "fx": "dust", "effect": "train", "comp": "watch",
+		"lines": ["The figure in the vice is half a horse and half still a block. He takes off a curl of wood where the neck will be, and no more.", "Push, turn, blow the dust away, look. The blade goes where the grain lets it; arguing with the grain is how fingers are lost.", "Cook Ding's knife and a carver's chisel are the same tool. He is not Cook Ding yet."]},
+	"wall_panel": {"n": "Hollow panel", "verb": "Knock on the panel", "clip": "knock", "dur": 2.8, "at": "face", "fx": "dust", "effect": "find", "comp": "watch",
+		"lines": ["Knock, knock, knock: and one of the three sounds like a drum. Behind it, a space a hand deep, and in the space, a purse.", "Every old house has a board that sounds wrong. Most of them are only where the carpenter ran short of timber.", "He listens with his ear to the wood. Mice, and behind the mice, nothing; and behind the nothing, something."]},
+	"grain_bin": {"n": "Grain bin", "verb": "Look into the grain bin", "clip": "peer", "dur": 3.2, "at": "face", "fx": "", "effect": "lore", "comp": "watch",
+		"lines": ["Full to the second hoop. A house with its bin this full after midwinter has had a good year, and knows it.", "Millet, and a line scratched inside the bin for every harvest. The lines go up a long way.", "A mouse looks back at him from the grain, weighs the odds, and goes on eating."]},
+	"window": {"n": "Lattice window", "verb": "Stretch at the window", "clip": "stretch", "dur": 3.2, "at": "face", "fx": "", "effect": "rest", "comp": "watch",
+		"lines": ["Up on his toes, fingers laced, every joint from heel to wrist saying its name. Outside, somebody is beating a quilt.", "Roofs, smoke, a kite, the hills. From up here the town looks as if somebody had thought about it.", "He yawns until his jaw cracks. Down in the lane a dog looks up, yawns too, and lies down again."]},
 }
 
 ## The furniture the game makes usable: the kind of thing it is (KINDS) by the kind of furniture
@@ -190,7 +246,10 @@ const KINDS := {
 const FURNITURE := {"altar": "altar", "statue": "statue", "cushion": "cushion", "scroll": "scroll", "bookshelf": "bookshelf", "shelf": "shelf",
 	"table": "table", "desk": "desk", "counter": "counter", "stool": "stool", "cauldron": "cauldron", "herbs": "herbs", "hearth": "hearth",
 	"stove": "stove", "anvil": "anvil", "rack": "rack", "barrel": "barrel", "bed": "bed", "cabinet": "cabinet", "loom": "loom",
-	"lantern": "lantern", "nest": "nest", "tub": "tub"}
+	"lantern": "lantern", "nest": "nest", "tub": "tub",
+	# the Hollow Hills release (rooms.gd)
+	"chest": "chest", "mirror": "mirror", "mortar": "mortar", "spinning_wheel": "spinning_wheel", "abacus": "abacus", "cradle": "cradle", "wine_jar": "wine_jar",
+	"clothes_stand": "clothes_stand", "washstand": "washstand", "workbench": "workbench", "wall_panel": "wall_panel", "grain_bin": "grain_bin", "window": "window"}
 
 ## The outdoor things to look for in a region by its theme (the first found a place get one); where
 ## a theme is not listed, the region takes the common list turned round by its own name.
@@ -280,13 +339,17 @@ const LOTUS_PER := 3
 const FEW_TILES := 18
 
 ## the clips played once (the rest loop for as long as the thing takes)
-const ONCE := ["drink", "strike", "gather", "lift", "toss", "touch", "bow", "think", "attack", "offer", "archery", "release", "float_lantern", "clap", "wave", "laugh"]
+const ONCE := ["drink", "strike", "gather", "lift", "toss", "touch", "bow", "think", "attack", "offer", "archery", "release", "float_lantern", "clap", "wave", "laugh",
+	# the Hollow Hills release
+	"wash", "open_chest", "stretch", "knock", "pour", "peer", "hang"]
 ## what the hero holds for a clip that needs something in his hand (built in held(), the Lotus
 ## release's in Structures.held; the bow goes in the left hand)
-const HELD := ["dipper", "cup", "rod", "broom", "hammer", "ladle", "book", "stone_lock", "flute", "reel", "sky_lantern", "brush", "bow"]
+const HELD := ["dipper", "cup", "rod", "broom", "hammer", "ladle", "book", "stone_lock", "flute", "reel", "sky_lantern", "brush", "bow",
+	# the Hollow Hills release (cavethings.gd)
+	"pickaxe", "spade", "pan", "chisel", "pestle", "jug", "comb"]
 const LEFT_HAND := ["bow"]
 ## the effects (use())
-const EFFECTS := ["rest", "drink", "qi", "lore", "fish", "luck", "herb", "train", "find", "sleep"]
+const EFFECTS := ["rest", "drink", "qi", "lore", "fish", "luck", "herb", "train", "find", "sleep", "ore"]
 ## how the things answer while used (drawn by World._prop_fx; the swing's is the swing going)
 const FX := ["splash", "smoke", "ring", "boom", "notes", "ripple", "ribbon", "glow", "sparkle", "sparks", "embers", "dust",
 	"leaves", "steam", "chime", "light", "koi", "qi", "zzz", "swing",
@@ -520,6 +583,12 @@ static func use(e: Dictionary, g) -> Array:
 			if _ready(g, pid, 600.0):
 				g.add_item("ess_wood")
 				out.append("Gathered a Wood Essence")
+		"ore":
+			# a seam gives a piece now and then (earth from one, metal from the next)
+			if _ready(g, pid, 600.0):
+				var ore := "ess_earth" if absi(hash(pid)) % 2 == 0 else "ess_metal"
+				g.add_item(ore)
+				out.append("Broke out %s" % ("an Earth Essence" if ore == "ess_earth" else "a Metal Essence"))
 		"train":
 			# (nothing to teach at the peak of a realm, and the stones' time is not spent then; what they
 			# teach counts like any other cultivation, so a stage reached is reached)
@@ -533,8 +602,12 @@ static func use(e: Dictionary, g) -> Array:
 				var st := 5 + absi(hash(pid)) % 26
 				g.stones += st
 				out.append("Found %d spirit stones" % st)
-	# with Yue Ling there: a wish of hers granted, and a little closer for doing it together (bonds.gd)
 	var kind := str(e.prop)
+	# the Hollow Hills release: a thing of the caves done while the story asks for them (Part XX)
+	if CaveThings.KINDS.has(kind):
+		g.step_uses[kind] = true
+		g.poll_steps()
+	# with Yue Ling there: a wish of hers granted, and a little closer for doing it together (bonds.gd)
 	if g.companion:
 		out.append_array(Bonds.did_together(g, kind, str(k.get("comp", "watch")) != "watch" or bool(k.get("pair", false))))
 	# the first time Lin Feng does each kind of thing, the world hears of it
@@ -581,6 +654,8 @@ const BRONZE := Color("8a7038")
 static func model(kind: String, theme: String) -> Node3D:
 	if is_structure(kind):
 		return Structures.model(kind, theme)
+	if CaveThings.KINDS.has(kind):
+		return CaveThings.model(kind, theme)
 	var root := Node3D.new()
 	var b := MB.new()
 	var g := MB.new()
@@ -794,6 +869,9 @@ static func model(kind: String, theme: String) -> Node3D:
 ## wrist down to the fingers along -y; the palm faces +x for the right hand).
 static func held(what: String) -> Node3D:
 	var more := Structures.held(what)
+	if more != null:
+		return more
+	more = CaveThings.held(what)
 	if more != null:
 		return more
 	var root := Node3D.new()

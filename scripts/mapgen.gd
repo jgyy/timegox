@@ -88,7 +88,8 @@ static func build(id: String, size := Vector2i.ZERO, spec_over: Dictionary = {})
 	# enterable buildings: walls round the edge, a door, planks inside, furniture that blocks
 	var buildings: Array = []
 	for bd in spec.get("buildings", []):
-		buildings.append(stamp_building(grid, w, bd))
+		# (with every floor it has: its own, and the cellar and the storey rooms.gd lays out for it)
+		buildings.append(stamp_building(grid, w, Rooms.complete(bd, Rooms.busy_of(id, bd))))
 
 	var ents: Array = []
 	var fixed: Array = []

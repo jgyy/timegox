@@ -35,7 +35,9 @@ SET_PIECES = {"props/magpiebridge": (2000, 24000)}
 PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "hand.R", "fingers.L", "fingers.R",
                 "thumb.L", "thumb.R", "sleeve.L", "sleeve.R", "foot.L", "foot.R", "toe.L", "toe.R", "hair_tail2", "cape3")
 PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "hurt", "victory", "die",
-                "nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock")
+                "nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock",
+                # the Hollow Hills release (Part XX): five more gestures everybody has
+                "shrug", "cheer", "beckon", "refuse", "shiver")
 MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
 MOUNT_CLIPS = ("idle", "walk", "run")
 # the party does things with the world's props and furniture (art/lib/person.py INTERACT) and rides
@@ -47,7 +49,10 @@ PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
                "play_flute", "dance", "kite", "stargaze", "release", "float_lantern", "write", "archery", "soak", "push",
                "climb", "gaze", "clap", "sword_dance",
                # the Living Land release: the work of the towns, which every townsperson borrows (scripts/folk.gd)
-               "hoe", "chop", "carry", "bang", "call", "eat")
+               "hoe", "chop", "carry", "bang", "call", "eat",
+               # the Hollow Hills release (Part XX): what is done under the ground and in the bigger houses
+               "mine", "dig", "wash", "trace", "open_chest", "comb", "pound", "spin", "count", "stretch", "knock", "pour",
+               "peer", "hang", "rock", "carve", "pan", "squeeze", "duck")
 MATERIALS = {"toon", "plain", "glow"}
 
 

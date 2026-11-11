@@ -566,18 +566,19 @@ static func _build(layer: String = "surface") -> Dictionary:
 		# and the people, lords and things to find that came later in the story ("late": mapgen.gd leaves
 		# them out of the region's own map), stood in the finished world in the same way
 		var spec2: Dictionary = Data.AREAS[id2]
+		# (all but those the story put in a cave: caves.gd stands them there)
 		for n2 in spec2.get("npcs", []):
-			if n2.get("late", false):
+			if n2.get("late", false) and not n2.has("cave"):
 				var ne := {"kind": "npc", "id": n2.id, "n": n2.n, "pos": to_world(id2, n2.pos), "col": n2.col, "vis": n2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true}
 				for k2 in ["asset", "race", "hide", "fate"]:
 					if n2.has(k2):
 						ne[k2] = n2[k2]
 				ents.append(ne)
 		for b2 in spec2.get("bosses", []):
-			if b2.get("late", false):
+			if b2.get("late", false) and not b2.has("cave"):
 				ents.append({"kind": "boss", "id": "boss_" + str(b2.id), "enemy": b2.id, "pos": to_world(id2, b2.pos), "lv": b2.lv, "req": b2.req, "vis": b2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true})
 		for pk2 in spec2.get("pickups", []):
-			if pk2.get("late", false):
+			if pk2.get("late", false) and not pk2.has("cave"):
 				var pe := {"kind": "pickup", "id": pk2.id, "item": pk2.item, "pos": to_world(id2, pk2.pos), "vis": pk2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true}
 				if pk2.has("n"):
 					pe["n"] = pk2.n
@@ -624,6 +625,10 @@ static func _build(layer: String = "surface") -> Dictionary:
 			for dy6 in range(-4, 5):
 				for dx6 in range(-4, 5):
 					near[c5 + Vector2i(dx6, dy6)] = true
+	# ---- the Hollow Hills (caves.gd): a cave under every region, its mouth on open ground of the region
+	# that the sect can reach, with open ground all round it (so that it stands in nobody's way), added
+	# after everything else, so no older map moves
+	Caves.place(grid, W, H, owner, ids, ents, layer, reach_e, floors)
 	# ---- each region's cell: the bounding box of the land it owns
 	var lo: Array = []
 	var hi: Array = []

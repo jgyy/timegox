@@ -2113,6 +2113,10 @@ func _run() -> void:
 		# the Hundred Works release (--works, or --works=a,b): the machines, the Works and Crossroads
 		# pages, a crossroads being asked, the wild by the hour, and Part XIX
 		await _works_shots(str(main.args.works))
+	if main.args.has("hollow"):
+		# the Hollow Hills release (--hollow, or --hollow=a,b): the caves, the bigger houses, the new
+		# things to do and Part XX
+		await _hollow_shots(str(main.args.hollow))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -2517,6 +2521,168 @@ func _ent_shot(ent_id: String, n: String, hour: float, dist: float = 4.6, hgt: f
 ## The Hundred Works release (works.gd, machines.gd, echoes.gd, habits.gd): the machines of the three
 ## schools, the people and the foes of Part XIX, the Works and Crossroads pages, the last question of
 ## Part XIX being asked, machines standing in the land, and a pack of the wild at noon and at dawn.
+## The Hollow Hills release (--hollow, or --hollow=a,b to pick): caves made of voxels (their mouths on
+## the land, their chambers, shafts, pools and lower galleries: "caves", for the regions of
+## --cave-areas=a,b), the things of the caves ("things"), the houses with twice the room ("rooms"),
+## the people, foes and lords of Part XX ("people", "foes", "bosses"), a crossroads being asked
+## ("choice"), the Journal's new way through a trial ("page") and the eyes before and after ("eyes").
+func _hollow_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_spring_state("s_p19_end")
+	Game.level = 72
+	Game.step = Data.step_index("s_p20_hollow")
+	for cid in BOT.CROSS_PLAN:
+		if Data.step_index(str(Echoes.CROSSROADS[cid].step)) < Game.step:
+			Echoes.take(Game, cid, str(BOT.CROSS_PLAN[cid][0]))
+	Game.toasts.clear()
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.world.banner_t = 0.0
+	var w = main.world
+	if want.call("things"):
+		for half in 2:
+			var ms: Array = []
+			for k in CaveThings.KINDS.slice(half * 7, half * 7 + 7):
+				ms.append(CaveThings.model(str(k), "bamboo" if CaveThings.KINDS.find(k) % 2 == 0 else "frost"))
+			await _gallery("cave_things_%d" % (half + 1), ms, 2.4, 0.0)
+	if want.call("people"):
+		await _gallery("part20_people", [Assets.person("xu_xiake"), Assets.person("yu_gong"), Assets.person("zhi_sou"), Assets.person("wang_zhi"), Assets.person("xuanpin")], 0.7, 0.2)
+		await _portraits("part20_faces", [Assets.person("xu_xiake"), Assets.person("yu_gong"), Assets.person("wang_zhi"), Assets.person("xuanpin")], 0.66, 1.68, 2.1)
+	if want.call("foes"):
+		await _gallery("part20_foes", [_foe("cave_cricket"), _foe("blind_newt"), _foe("drip_wisp"), _foe("fen_yang", true), _foe("stone_bat"), _foe("dig_mole"), _foe("ore_gnawer"), _foe("white_rat", true),
+			_foe("lamp_ghost"), _foe("kept_voice"), _foe("hollow_one"), _foe("wangliang", true), _foe("burrow_marmot"), _foe("sink_toad"), _foe("karst_crawler"), _foe("xuanpin", true)], 1.2, 0.25)
+	if want.call("eyes"):
+		# the same four faces as docs/screenshots/sculpt_faces.webp showed before the eyes were made larger
+		await _portraits("eyes_faces", [Assets.person("yue_ling"), Models.hero({"glow": Color(0.4, 0.7, 1.0), "look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false}), Assets.person("chang_e"), Assets.person("hu_qingyi")], 0.62, 1.68, 1.9)
+		var after: Image = last_img.duplicate()
+		var before := Image.load_from_file(ProjectSettings.globalize_path("res://docs/screenshots/sculpt_faces.webp"))
+		if before != null and not before.is_empty():
+			before.resize(after.get_width(), after.get_height(), Image.INTERPOLATE_LANCZOS)
+			var sheet := Image.create(after.get_width(), after.get_height() * 2, false, after.get_format())
+			before.convert(after.get_format())
+			sheet.blit_rect(before, Rect2i(0, 0, after.get_width(), after.get_height()), Vector2i(0, 0))
+			sheet.blit_rect(after, Rect2i(0, 0, after.get_width(), after.get_height()), Vector2i(0, after.get_height()))
+			sheet.save_webp("%s/eyes_before_after.webp" % dir, true, 0.9)
+			print("[tour] eyes_before_after")
+	if want.call("caves"):
+		for area in str(main.args.get("cave-areas", "bamboo,frost,volcano,karst,cloudsea,tushan")).split(",", false):
+			var cw: Dictionary = Atlas.world_of(Caves.fid(area))
+			if cw.is_empty():
+				continue
+			var lay := Caves.layout(area)
+			# the mouth, from the land
+			var le: Array = w.locate_ent("cave:" + area)
+			if not le.is_empty():
+				w.teleport(le[1].pos + Vector2i(0, 3), str(le[0]))
+				w.facing = Vector2i(0, -1)
+				w.cam_q = 0
+				w._snap_cam()
+				w.banner_t = 0.0
+				await _wait(1.0)
+				await _shot("cave_mouth_" + area)
+			# inside: looking back at the way out, then the chambers in turn, deepest last
+			await _cave_shot(area, -1, lay.arrive + Vector2i(0, -2), Vector2i(0, 1), "cave_%s_in" % area)
+			var rooms: Array = (lay.rooms as Array).duplicate()
+			rooms.sort_custom(func(a, b): return int(a.far) < int(b.far))
+			var n := 0
+			for r in rooms.slice(1):
+				n += 1
+				await _cave_shot(area, -1, r.c, Vector2i(0, -1) if n % 2 == 1 else Vector2i(1, 0), "cave_%s_%d" % [area, n])
+			if not Caves.spec(area, -2).is_empty():
+				var lay2 := Caves.layout(area, -2)
+				await _cave_shot(area, -2, lay2.rooms[int(lay2.far_room)].c, Vector2i(0, -1), "cave_%s_lower" % area)
+	if want.call("rooms"):
+		# a storey and a cellar that rooms.gd laid out, in Qingshi and at Tushan
+		var sw: Dictionary = Atlas.world_of("surface")
+		var shot_n := {}
+		for fid in sw.floors:
+			var fw: Dictionary = sw.floors[fid]
+			if fw.get("cave", false) or not str(fw.area) in ["village", "tushan", "longmen"]:
+				continue
+			var key := "%s_%s" % [fw.area, "upper" if int(fw.level) > 0 else "cellar"]
+			if int(shot_n.get(key, 0)) >= 2:
+				continue
+			var made := false
+			for bd in Data.AREAS[str(fw.area)].get("buildings", []):
+				if str(bd.id) == str(fw.bld):
+					made = not bd.has("upper" if int(fw.level) > 0 else "cellar")
+			if not made:
+				continue
+			shot_n[key] = int(shot_n.get(key, 0)) + 1
+			w.teleport(fw.start, fid)
+			var mid := Vector2(fw.w, fw.h) * 0.5
+			var dv := mid - Vector2(fw.start)
+			var fdir := Vector2i(signi(int(dv.x)), 0) if absf(dv.x) > absf(dv.y) else Vector2i(0, signi(int(dv.y)))
+			if fdir == Vector2i.ZERO:
+				fdir = Vector2i(0, 1)
+			w.facing = fdir
+			w.cam_q = w.FWD.find(fdir)
+			w._snap_cam()
+			w.banner_t = 0.0
+			await _wait(0.8)
+			await _shot("rooms_%s_%d" % [key, int(shot_n[key])])
+		w.load_area("sect", Vector2i(20, 9))
+	if want.call("bosses"):
+		for bid in ["fen_yang", "white_rat", "wangliang", "xuanpin"]:
+			var ba := Trials.boss_area(bid)
+			w.load_area(ba, MapGen.arrival_tiles(ba)[0] if not MapGen.arrival_tiles(ba).is_empty() else Vector2i(20, 20))
+			main.battle.start([{"id": bid, "lv": 74}], {"boss": true, "enemy": bid, "theme": "ninesprings"})
+			main.push("battle")
+			await _wait(2.8)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		Game.cross_pending = ["the_hollow"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_hollow")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("page"):
+		Game.delved = {"f:bamboo:cave:-1": true, "f:tushan:cave:-1": true, "f:karst:cave:-1": true}
+		main.open_trial({"enemy": "white_rat", "lv": 74, "req": 73, "id": "boss_white_rat", "pos": Vector2i.ZERO})
+		await _wait(0.8)
+		await _shot("trial_by_the_dark")
+		main.pop()
+	main.world.load_area("sect", Vector2i(20, 9))
+
+## One look inside a cave: the hero on the free tile nearest `at` of gallery `level` of the cave of
+## `area`, facing `dir`.
+func _cave_shot(area: String, level: int, at: Vector2i, dir: Vector2i, name: String) -> void:
+	var w = main.world
+	var fid := Caves.fid(area, level)
+	var fw: Dictionary = Atlas.world_of(fid)
+	if fw.is_empty():
+		return
+	w.enter_layer(fid)
+	var best := Vector2i(-1, -1)
+	var bd := 1 << 30
+	for y in int(fw.h):
+		for x in int(fw.w):
+			var t := Vector2i(x, y)
+			if fw.grid[y * int(fw.w) + x] != MapGen.INTERIOR or w.ent_at(t) != null:
+				continue
+			# (with open floor ahead, so that there is something to look along)
+			var ahead: Vector2i = t + dir * 2
+			if ahead.x < 0 or ahead.y < 0 or ahead.x >= int(fw.w) or ahead.y >= int(fw.h) or fw.grid[ahead.y * int(fw.w) + ahead.x] != MapGen.INTERIOR:
+				continue
+			var dd: int = (t - at).length_squared()
+			if dd < bd:
+				bd = dd
+				best = t
+	if best.x < 0:
+		return
+	w.teleport(best, fid)
+	w.facing = dir
+	w.cam_q = maxi(0, w.FWD.find(dir))
+	w._snap_cam()
+	w.banner_t = 0.0
+	await _wait(0.7)
+	await _shot(name)
+
 func _works_shots(which: String = "1") -> void:
 	var only := which.split(",", false) if which != "1" else PackedStringArray()
 	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)

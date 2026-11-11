@@ -554,7 +554,7 @@ func _init() -> void:
 		check(Look.THEMES.has(a10) and Look.EXTRA.has(a10) and Scatter.ECO.has(a10) and Fauna.KINDS.has(a10) and MapGen.DENSITY.has(a10) and Arch.SETTLE.has(a10), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a10)
 		# (the keepsakes and caches upstairs and in cellars, Part XI, are not what the quest asks for)
 		# (Part XIII's Gate Generals only visit, `vis`: they are not the region's own)
-		check(Data.AREAS[a10].bosses.filter(func(b): return not b.has("vis")).size() == 5 and Data.AREAS[a10].pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a10 + ": five bosses and four things to find")
+		check(Data.AREAS[a10].bosses.filter(func(b): return not b.has("vis")).size() == 5 and Data.AREAS[a10].pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave")).size() == 4, a10 + ": five bosses and four things to find")
 		var lm10: Dictionary = Atlas.layout()[a10]
 		check(int(lm10.site.y) < int(Atlas.layout()[Atlas.HUB].site.y), a10 + " lies north of the mountain, up the river road")
 	for st10 in ["s_p10_archive", "s_p10_road", "s_dg_intro", "s_df_intro", "s_ts_intro", "s_bz_intro"]:
@@ -586,7 +586,7 @@ func _init() -> void:
 	for a11 in p11:
 		var sp11: Dictionary = Data.AREAS[a11]
 		check(Look.THEMES.has(sp11.theme) and Look.EXTRA.has(sp11.theme) and Scatter.ECO.has(sp11.theme) and Fauna.KINDS.has(sp11.theme) and MapGen.DENSITY.has(sp11.theme) and Arch.SETTLE.has(sp11.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a11)
-		check(sp11.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a11 + ": four bosses and four things to find")
+		check(sp11.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave")).size() == 4, a11 + ": four bosses and four things to find")
 		check(Data.layer_of(a11) in ["heaven", "under"], a11 + " lies in a realm above or below the land")
 		for n11 in sp11.npcs:
 			if n11.get("fate", false):
@@ -662,6 +662,11 @@ func _init() -> void:
 				if fe.kind == "ladder" and fe.to_layer == lid2:
 					back = true
 					check(MapGen.is_walkable_tile(fw0.grid[fe.to_tile.y * fw0.w + fe.to_tile.x]), "%s: the stairs come out on the floor below (or above)" % fid)
+				elif fe.kind == "ladder" and int(fw.level) == -2 and str(fe.to_layer) == str(fw.up):
+					# (the lower gallery of a cave comes out in the cave above it: caves.gd)
+					back = true
+					var uw: Dictionary = fw0.floors[fw.up]
+					check(MapGen.is_walkable_tile(uw.grid[fe.to_tile.y * uw.w + fe.to_tile.x]), "%s: the climb comes out on the floor of the cave above" % fid)
 			check(fcut == 0 and back, "%s: stairs back, and everyone and everything on it can be reached (%d cut off)" % [fid, fcut])
 			var walls := true
 			for xx2 in fw.w:
@@ -778,7 +783,7 @@ func _init() -> void:
 		var sp12: Dictionary = Data.AREAS[a12]
 		check(Data.layer_of(a12) == "sea" and Atlas.STRATA.sea.sites.has(a12), a12 + " lies in the Eastern Sea")
 		check(Look.THEMES.has(sp12.theme) and Look.EXTRA.has(sp12.theme) and Scatter.ECO.has(sp12.theme) and Fauna.KINDS.has(sp12.theme) and MapGen.DENSITY.has(sp12.theme) and Arch.SETTLE.has(sp12.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a12)
-		check(sp12.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false)).size() == 4, a12 + ": four bosses and four things to find")
+		check(sp12.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave")).size() == 4, a12 + ": four bosses and four things to find")
 		for n12 in sp12.npcs:
 			if n12.get("fate", false):
 				continue
@@ -871,7 +876,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -880,6 +885,10 @@ func _init() -> void:
 		par.add_string(text, dfont2, 22)
 		par.width = 1100
 		return par.get_line_count() <= 4
+	var n_caves := 0
+	for ca in Data.AREAS:
+		if not Atlas.world_of(Caves.fid(ca)).is_empty():
+			n_caves += 1
 	for tid in Trials.TRIALS:
 		var tr: Dictionary = Trials.TRIALS[tid]
 		check(Data.ENEMIES.has(tid) and Data.ENEMIES[tid].get("boss", false) and Trials.boss_area(tid) != "", "trial %s guards a boss placed in the world" % tid)
@@ -932,6 +941,10 @@ func _init() -> void:
 					"works":
 						# the Hundred Works release: works there are to build (works.gd), of any school, of one, or of the one most built
 						ok = ok and n.size() == 3 and (str(n[1]) in ["", "best"] or Works.SCHOOLS.has(str(n[1]))) and int(n[2]) >= 1 and int(n[2]) <= (Works.ORDER.size() if str(n[1]) == "" else Works.TIERS)
+					"delved":
+						# the Hollow Hills release: caves there are to go to the back of (caves.gd), and no more
+						# than a fifth of them asked for
+						ok = ok and int(n[1]) >= 1 and int(n[1]) * 5 <= n_caves
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1084,7 +1097,7 @@ func _init() -> void:
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis) and str(e6.get("area", a6)) == a6)
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 24, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, Part XVII's cold in Frostpeak and poisons in the millet, Part XVIII's damp at Longmen, and Part XIX's mites at Qingshi, engines at Tushan, strays in the dunes, counters in Heaven's Forge, looms in the Silkworm Woods and kites over the Sea of Clouds, cinders on the volcano and wildfire on the mountain" % p13_bands)
+	check(p13_bands == 8 and bands == 26, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, Part XVII's cold in Frostpeak and poisons in the millet, Part XVIII's damp at Longmen, and Part XIX's mites at Qingshi, engines at Tushan, strays in the dunes, counters in Heaven's Forge, looms in the Silkworm Woods and kites over the Sea of Clouds, cinders on the volcano and wildfire on the mountain, and Part XX's burrowers on the pasture below Thunder Valley and what came out of the karst's caves" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1100,11 +1113,14 @@ func _init() -> void:
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
 			var band8: Dictionary = Data.AREAS[st8.area].get("warband", {})
+			# (a hunt in a cave, Part XX, is for what lives in that cave: caves.gd)
+			if st8.has("cave"):
+				band8 = Caves.spec(str(st8.area), int(st8.cave)).get("foes", {})
 			var marching8 := {}
 			for pe8 in band8.get("pool", []):
 				marching8[pe8[0]] = true
@@ -1741,6 +1757,7 @@ func _fates_and_faces() -> void:
 	_spring()
 	_new_fire()
 	_hundred_works()
+	_hollow_hills()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -2830,10 +2847,10 @@ func _hundred_works() -> void:
 	check(odd2.is_empty(), "nobody who speaks at a crossroads has their own words changed when the hero is a woman (%s)" % str(odd2.slice(0, 4)))
 	HWG.free()
 	print("== Part XIX: the Machine Heart ==")
-	check(Data.REALMS.size() == 25 and Data.REALMS[24] == "Skill Become Dao" and Data.MAX_LEVEL == 72 and Data.level_name(72).ends_with("Skill Become Dao") and Data.REALM_INFO.size() == 25 and Data.EXP_NEED.size() == Data.MAX_LEVEL
+	check(Data.REALMS.size() >= 25 and Data.REALMS[24] == "Skill Become Dao" and Data.MAX_LEVEL >= 72 and Data.level_name(72).ends_with("Skill Become Dao") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL
 		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XIX adds the Skill Become Dao realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break24" and Data.DIALOGUE.has("recall17") and msrc2.contains("\"s_break23\": \"recall17\"") and Data.DIALOGUE.has("pre:s_break24") and Data.DIALOGUE.has("post:s_break24"),
-		"Part XIX follows Fire Passed On (recall17) and ends the game")
+	check(Data.step_index("s_break24") == Data.step_index("s_p20_home") - 1 and Data.DIALOGUE.has("recall17") and msrc2.contains("\"s_break23\": \"recall17\"") and Data.DIALOGUE.has("pre:s_break24") and Data.DIALOGUE.has("post:s_break24"),
+		"Part XIX follows Fire Passed On (recall17) and ends with a tribulation swept aside")
 	for tid in ["cloud_ladder", "the_player", "jixin", "wooden_magpie"]:
 		check(Trials.TRIALS.has(tid) and Lore.BOSS.has(tid) and Data.DIALOGUE.has("pre:" + tid) and Data.DIALOGUE.has("post:" + tid), "%s is a trial, with a story and words before and after" % tid)
 		check((Trials.TRIALS[tid].paths as Array).any(func(pth): return str(pth.kind) == "works"), "%s can be passed by the works" % tid)
@@ -2895,9 +2912,325 @@ func _hundred_works() -> void:
 	var bsrc3 := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bsrc3.contains("\"cloud_ladder\": \"craft\"") and bsrc3.contains("\"jixin\": \"works\"") and bsrc3.contains("\"wooden_magpie\": \"relic\"") and bsrc3.contains("CROSS_PLAN") and bsrc3.contains("WORKS_PLAN") and bsrc3.contains("\"s_p19_rest\""),
 		"the bot builds works, answers at every crossroads, and has a way through the three trials")
-	var plan_src := bsrc3.substr(bsrc3.find("const CROSS_PLAN"), 1400)
+	var plan_src := bsrc3.substr(bsrc3.find("const CROSS_PLAN"), 2000)
 	for cid4 in Echoes.ORDER:
 		check(plan_src.contains("\"%s\": [" % cid4), "the bot has an answer for the crossroads %s" % cid4)
+
+## The Hollow Hills release: voxels (voxel.gd), a cave under every region (caves.gd), twice the room in
+## the houses (rooms.gd), the new things to do and the clips they are done on (props.gd, cavethings.gd),
+## and Part XX.
+func _hollow_hills() -> void:
+	print("== voxels (voxel.gd) ==")
+	var pal := Voxel.palette()
+	check(pal.size() == Voxel.N_MAT, "every material has a colour and a surface (%d)" % pal.size())
+	var v1 := Voxel.make(5, 5, 5)
+	Voxel.carve(v1, 2, 2, 2, 3)
+	var m1 := Voxel.mesh(v1, pal)
+	check(int(m1.faces) == 6 and Voxel.at(v1, 2, 2, 2) == 0 and Voxel.at(v1, 2, 1, 2) != 0 and v1.lo[2 * 5 + 2] == 2 and v1.hi[2 * 5 + 2] == 3, "one cell hollowed out of rock is a room with six walls")
+	# every face looks into the hollow: its normal points at the middle of the cell of air, and its
+	# triangles are wound to be seen from there
+	var arr1 := (m1.mesh as ArrayMesh).surface_get_arrays(0)
+	var vs1: PackedVector3Array = arr1[Mesh.ARRAY_VERTEX]
+	var ns1: PackedVector3Array = arr1[Mesh.ARRAY_NORMAL]
+	var ix1: PackedInt32Array = arr1[Mesh.ARRAY_INDEX]
+	var mid1 := Vector3(2.5, 2.5, 2.5) * Voxel.S
+	var inward := true
+	for t1 in ix1.size() / 3:
+		var a1 := vs1[ix1[t1 * 3]]
+		var b1 := vs1[ix1[t1 * 3 + 1]]
+		var c1 := vs1[ix1[t1 * 3 + 2]]
+		var cen := (a1 + b1 + c1) / 3.0
+		# (front faces are clockwise: the geometric normal of a face seen from the air points away from it)
+		inward = inward and ns1[ix1[t1 * 3]].dot(mid1 - cen) > 0.0 and (b1 - a1).cross(c1 - a1).dot(mid1 - cen) < 0.0
+	check(inward and vs1.size() == 24, "its faces look inward, and are wound to be seen from inside")
+	Voxel.carve(v1, 3, 2, 2, 3)
+	check(int(Voxel.mesh(v1, pal).faces) == 10, "two cells side by side share no wall between them (ten faces)")
+	Voxel.fill(v1, 3, 2, 2, 3, Voxel.GEM)
+	check(Voxel.at(v1, 3, 2, 2) == Voxel.GEM + 1 and int(Voxel.mesh(v1, pal).faces) == 6, "a cell filled again is solid, of what it was filled with")
+	check(Voxel.floor_under(v1, 2, 2, 4) == 5 and Voxel.floor_under(v1, 2, 2, 2) == 2, "the floor under a point is the top of the first solid cell below it")
+	var vm := Voxel.model([[Vector3i(0, 0, 0), Voxel.ROCK], [Vector3i(0, 1, 0), Voxel.ORE]], pal)
+	check(vm.mesh != null and vm.mesh.get_faces().size() / 3 == 18, "a thing of two voxels standing in the open has nine faces to see (its foot is on the ground)")
+	vm.free()
+	print("== the Hollow Hills: a cave under every region (caves.gd) ==")
+	var n_caves := 0
+	var no_cave: Array = []
+	var cave_tiles := 0
+	for lid in ["surface", "heaven", "under", "sea"]:
+		var lw: Dictionary = Atlas.world_of(lid)
+		for area in lw.ids:
+			var fid := Caves.fid(area)
+			if not lw.floors.has(fid):
+				no_cave.append(area)
+				continue
+			n_caves += 1
+			var fw: Dictionary = lw.floors[fid]
+			var lay := Caves.layout(area)
+			var mouths: Array = lw.ents.filter(func(e): return str(e.id) == "cave:" + area)
+			check(mouths.size() == 1 and str(mouths[0].to_layer) == fid and mouths[0].to_tile == lay.arrive and str(mouths[0].area) == area, "%s: one cave mouth, leading into its cave" % area)
+			var mp: Vector2i = mouths[0].pos
+			var open8: bool = Atlas.owner_id(lw, mp) == area
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					open8 = open8 and MapGen.is_walkable_tile(lw.grid[(mp.y + dy) * lw.w + mp.x + dx])
+			check(open8 and fw.ents[0].kind == "ladder" and fw.ents[0].to_tile == mp + Vector2i(0, 1), "%s: the mouth stands in its own region with open ground all round, and the way out comes up before it" % area)
+			# the lay of it: every tile of floor can be walked to, no step is higher than half a metre, and
+			# there is room to stand
+			var open_n := 0
+			var steps_ok := true
+			var roofs_ok := true
+			for i in int(lay.w) * int(lay.h):
+				if lay.grid[i] != MapGen.INTERIOR:
+					continue
+				open_n += 1
+				roofs_ok = roofs_ok and lay.ceil[i] >= Caves.LOW
+				for dn in [1, int(lay.w)]:
+					if lay.grid[i + dn] == MapGen.INTERIOR and absi(lay.lv[i] - lay.lv[i + dn]) > 1:
+						steps_ok = false
+			cave_tiles += open_n
+			var cr := MapGen.flood(fw.grid, fw.w, fw.h, fw.start)
+			# (the tile of the way out is floor that the way out stands on)
+			check(cr.size() == open_n and (lay.rooms as Array).size() >= 4 and steps_ok and roofs_ok, "%s: %d chambers, all of its floor joined (%d tiles), no step over half a metre, room to stand" % [area, (lay.rooms as Array).size(), open_n])
+			var things: Array = fw.ents.filter(func(e): return e.kind == "prop")
+			var niche_ok := true
+			for th in things:
+				niche_ok = niche_ok and CaveThings.KINDS.has(str(th.prop)) and Props.KINDS.has(str(th.prop)) and fw.grid[th.pos.y * fw.w + th.pos.x] == MapGen.BUILDING and cr.has(th.pos + (th.face as Vector2i))
+			check(things.size() >= 4 and niche_ok and fw.ents.filter(func(e): return str(e.id) == "cave_cache:%s:-1" % area).size() == 1, "%s: %d things to do in niches of its walls, and something left at the very back" % [area, things.size()])
+	check(n_caves >= Data.AREAS.size() - 1 and no_cave == ["sect"], "every region but the sect's own courtyard has a cave (%d; none under %s)" % [n_caves, str(no_cave)])
+	check(cave_tiles > 6000 and Caves.total_tiles() >= cave_tiles, "the caves have %d tiles of floor to walk on" % Caves.total_tiles())
+	# the same cave every time
+	var lay_a: Dictionary = Caves.layout("frost")
+	var grid_a: PackedByteArray = (lay_a.grid as PackedByteArray).duplicate()
+	var lv_a: PackedInt32Array = (lay_a.lv as PackedInt32Array).duplicate()
+	Caves._layouts.erase(Caves.fid("frost"))
+	var lay_b: Dictionary = Caves.layout("frost")
+	check(grid_a == lay_b.grid and lay_a.entry == lay_b.entry and (lay_b.rooms as Array).size() == (lay_a.rooms as Array).size(), "a cave is laid out the same every time")
+	Atlas.world_of(Caves.fid("frost"))
+	# the rock itself: over every tile that is walked on there is air to stand in, the floor is where the
+	# game says it is, the sides of the volume are closed, and the mesher draws exactly the faces of
+	# rock that touch air
+	Caves.world("frost", "surface", Vector2i(10, 10), [])
+	var vol := Caves.volume("frost")
+	var lay_f := Caves.layout("frost")
+	var stand_ok := true
+	var floor_ok := true
+	for ty in int(lay_f.h):
+		for tx in int(lay_f.w):
+			if lay_f.grid[ty * int(lay_f.w) + tx] != MapGen.INTERIOR or Vector2i(tx, ty) == lay_f.entry:
+				continue
+			for sub in [Vector2i(1, 1), Vector2i(2, 2)]:
+				var cx: int = tx * Caves.P + sub.x
+				var cz: int = ty * Caves.P + sub.y
+				var c: int = cz * int(vol.nx) + cx
+				stand_ok = stand_ok and int(vol.hi[c]) - int(vol.lo[c]) >= Caves.LOW
+				floor_ok = floor_ok and is_equal_approx(Caves.floor_y(lay_f, (cx + 0.5) * Caves.V, (cz + 0.5) * Caves.V), float(vol.lo[c]) * Caves.V)
+	check(stand_ok and floor_ok, "over every tile of a cave's floor there is room to stand, and the floor is where the game stands people")
+	var closed := true
+	for z in int(vol.nz):
+		for x in [0, int(vol.nx) - 1]:
+			closed = closed and int(vol.hi[z * int(vol.nx) + x]) <= int(vol.lo[z * int(vol.nx) + x])
+	for x2 in int(vol.nx):
+		for z2 in [0, int(vol.nz) - 1]:
+			closed = closed and int(vol.hi[z2 * int(vol.nx) + x2]) <= int(vol.lo[z2 * int(vol.nx) + x2])
+	check(closed, "the sides of a cave's volume are rock")
+	var part := Rect2i(int(lay_f.arrive.x) * Caves.P - 12, int(lay_f.arrive.y) * Caves.P - 16, 24, 24)
+	var brute := 0
+	for z3 in range(part.position.y, part.end.y):
+		for x3 in range(part.position.x, part.end.x):
+			for y3 in int(vol.ny):
+				if Voxel.at(vol, x3, y3, z3) != 0:
+					continue
+				for dv in [Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 1, 0), Vector3i(0, -1, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1)]:
+					if Voxel.at(vol, x3 + dv.x, y3 + dv.y, z3 + dv.z) != 0:
+						brute += 1
+	var mpart := Voxel.mesh(vol, Voxel.palette(Caves.look_of("frost")), null, part)
+	check(brute > 200 and int(mpart.faces) == brute, "the mesher draws every face of rock that touches air, and no other (%d in a piece of the cave)" % brute)
+	var real3d := 0
+	for c2 in int(vol.nx) * int(vol.nz):
+		if int(vol.hi[c2]) > int(vol.lo[c2]):
+			var base: int = c2 * int(vol.ny)
+			var runs := 0
+			var was_air := false
+			for y4 in range(int(vol.lo[c2]), int(vol.hi[c2])):
+				var air: bool = vol.d[base + y4] == 0
+				if air and not was_air:
+					runs += 1
+				was_air = air
+			if runs >= 2 or int(vol.hi[c2]) < int(vol.ny) - 2:
+				real3d += 1
+	check(real3d > 1000, "a cave is a real hollow: rock over the floor in %d of its columns (a height field has none)" % real3d)
+	Caves.drop()
+	print("== the caves of the story ==")
+	for st in [["tushan", "white_rat"], ["mountain", "xuanpin"]]:
+		var up: Dictionary = Atlas.world_of(Caves.fid(st[0]))
+		var low: Dictionary = Atlas.world_of(Caves.fid(st[0], -2))
+		var down: Array = up.ents.filter(func(e): return str(e.id) == "cave:%s:-1:down" % st[0])
+		check(not low.is_empty() and down.size() == 1 and str(down[0].to_layer) == str(low.layer) and down[0].to_tile == low.start and low.ents[0].to_tile == down[0].pos + Vector2i(0, 1)
+			and MapGen.is_walkable_tile(up.grid[(down[0].pos.y + 1) * up.w + down[0].pos.x]), "%s: a shaft down to a lower gallery, and the climb back comes up beside it" % up.bld_n)
+		check(low.ents.filter(func(e): return str(e.id) == "boss_" + str(st[1])).size() == 1, "%s waits in %s" % [st[1], low.bld_n])
+	for cb in [["village", "fen_yang"], ["karst", "wangliang"]]:
+		check(Atlas.world_of(Caves.fid(cb[0])).ents.filter(func(e): return str(e.id) == "boss_" + str(cb[1])).size() == 1, "%s waits at the back of %s" % [cb[1], Atlas.world_of(Caves.fid(cb[0])).bld_n])
+	var rot: Dictionary = Atlas.world_of(Caves.fid("mountain"))
+	check(rot.ents.filter(func(e): return str(e.id) == "wang_zhi").size() == 1 and rot.ents.filter(func(e): return e.kind == "prop" and str(e.prop) == "cave_weiqi").size() == 1 and str(rot.bld_n) == "Rotten-Axe Cave",
+		"Wang Zhi and the stone weiqi board are in Rotten-Axe Cave")
+	for cs in Data.STEPS:
+		if not str(cs.id).begins_with("s_p20_") or not cs.has("cave"):
+			continue
+		var cw: Dictionary = Atlas.world_of(Caves.fid(str(cs.area), int(cs.cave)))
+		check(not cw.is_empty(), "%s is done in a cave that is there" % cs.id)
+		match str(cs.kind):
+			"collect":
+				check(cw.ents.filter(func(e): return e.kind == "pickup" and str(e.get("item", "")) == str(cs.item)).size() >= int(cs.n), "%s: the %s are in the cave (%d of them)" % [cs.id, cs.item, int(cs.n)])
+			"hunt":
+				var packs: Array = cw.ents.filter(func(e): return e.kind == "enemy")
+				check(packs.size() * 2 >= int(cs.n) and Data.step_index(str(packs[0].vis[0])) < Data.step_index(str(cs.id)) and not cs.get("first", false), "%s: enough packs in the cave (%d), there before it" % [cs.id, packs.size()])
+			"try":
+				var has: int = cw.ents.filter(func(e): return e.kind == "prop" and (not cs.has("things") or str(e.prop) in cs.things)).size()
+				check(has >= int(cs.n), "%s: the things it asks for are in the cave (%d)" % [cs.id, has])
+	var HG = load("res://scripts/game.gd").new()
+	HG.reset()
+	HG.step = Data.step_index("s_p20_things")
+	Props.use({"kind": "prop", "id": "t:1", "prop": "ore_vein", "pos": Vector2i.ZERO, "cave": true}, HG)
+	Props.use({"kind": "prop", "id": "t:2", "prop": "bench", "pos": Vector2i.ZERO}, HG)
+	Props.use({"kind": "prop", "id": "t:1", "prop": "ore_vein", "pos": Vector2i.ZERO, "cave": true}, HG)
+	check(HG.cur_step().id == "s_p20_things" and HG.objective_text().contains("(1/3)") and int(HG.inv.get("ess_earth", 0)) + int(HG.inv.get("ess_metal", 0)) == 1, "a thing of the caves done counts once, a bench not at all; a seam gives a piece of ore, now and then")
+	Props.use({"kind": "prop", "id": "t:3", "prop": "drip_pool", "pos": Vector2i.ZERO, "cave": true}, HG)
+	Props.use({"kind": "prop", "id": "t:4", "prop": "squeeze", "pos": Vector2i.ZERO, "cave": true}, HG)
+	check(HG.cur_step().id == "s_p20_crickets" and HG.step_uses.is_empty(), "three things of a cave done, and the story goes on")
+	HG.area = "bamboo"
+	HG.layer = "surface"
+	HG.record_kills("bamboo", 2, ["cave_cricket", "drip_wisp"])
+	var h0: int = HG.hunt
+	HG.layer = Caves.fid("bamboo")
+	HG.record_kills("bamboo", 3, ["cave_cricket", "bamboo_wolf", "blind_newt"])
+	check(h0 == 0 and HG.hunt == 2, "a hunt in a cave counts what is brought down in the cave, of the creatures named")
+	HG.step = Data.step_index("s_p20_delve")
+	var r0: int = HG.renown
+	HG.delve("f:frost:cave:-1", "a cave")
+	HG.delve("f:frost:cave:-1", "a cave")
+	HG.delve("f:marsh:cave:-1", "a cave")
+	HG.delve("f:bamboo:cave:-1", "a cave")
+	check(HG.delved.size() == 3 and HG.renown == r0 + 3 and HG.objective_text().contains("(3/4)") and HG.cur_step().id == "s_p20_delve", "a cave gone to the back of is news once")
+	check(Trials.need_met(["delved", 3], HG) and not Trials.need_met(["delved", 4], HG) and Trials.need_text(["delved", 4], HG).contains("now 3"), "the way through a trial by the dark counts them")
+	HG.delve("f:volcano:cave:-1", "a cave")
+	check(HG.cur_step().id == "s_p20_elders", "four caves gone to the back of, and the story goes on")
+	HG.free()
+	print("== twice the room indoors (rooms.gd) ==")
+	var ft := Rooms.floor_tiles()
+	check(int(ft[1]) >= int(ft[0]) * 2, "the buildings have twice the floor to walk on (%d tiles, from %d)" % [int(ft[1]), int(ft[0])])
+	var n_bd := 0
+	var n_made := 0
+	var new_furn := {}
+	for a in Data.AREAS:
+		for bd in Data.AREAS[a].get("buildings", []):
+			n_bd += 1
+			var full := Rooms.complete(bd, Rooms.busy_of(a, bd))
+			check(full.has("cellar") and full.has("down") and (full.has("upper") or str(bd.get("style", "house")) in Rooms.NO_UPPER), "%s: a cellar, and an upper storey unless its roof takes none" % bd.n)
+			var r: Rect2i = bd.rect
+			for key in [["up", "upper"], ["down", "cellar"]]:
+				if not full.has(key[1]) or not full[key[1]].get("made", false):
+					check(not full.has(key[1]) or full[key[1]] == bd[key[1]], "%s: a floor written by hand is left as it was" % bd.n)
+					continue
+				n_made += 1
+				var st2: Vector2i = full[key[0]]
+				var on_floor := r.grow(-1).has_point(st2) and absi(st2.x - bd.door.x) + absi(st2.y - bd.door.y) > 1
+				for pr in bd.get("props", []):
+					on_floor = on_floor and pr[1] != st2
+				for bt in Rooms.busy_of(a, bd):
+					on_floor = on_floor and bt != st2
+				check(on_floor and str(full[key[1]].n) != "" and (full[key[1]].props as Array).size() >= 3, "%s: %s, by stairs on a free tile of the floor, with %d things in it" % [bd.n, full[key[1]].n, (full[key[1]].props as Array).size()])
+				for pr2 in full[key[1]].props:
+					new_furn[str(pr2[0])] = true
+					check(Props.FURNITURE.has(str(pr2[0])) and r.grow(-1).has_point(pr2[1]) and pr2[1] != st2, "%s: the %s in %s can be used, and stands on its floor" % [bd.n, pr2[0], full[key[1]].n])
+			check(Rooms.complete(bd, Rooms.busy_of(a, bd)) == full, "%s: laid out the same every time" % bd.n)
+	check(n_made >= 120, "%d floors laid out for %d buildings" % [n_made, n_bd])
+	for nf in ["chest", "mirror", "mortar", "spinning_wheel", "abacus", "cradle", "wine_jar", "clothes_stand", "washstand", "workbench", "wall_panel", "grain_bin", "window"]:
+		check(new_furn.has(nf) and Props.FURNITURE.has(nf), "the new furniture %s stands in a building somewhere" % nf)
+		var fb := MB.new()
+		var fg := MB.new()
+		var frng := RandomNumberGenerator.new()
+		check(Rooms.furnish(fb, fg, nf, Vector3.ZERO, Vector3(0, 0, -0.75), Vector3(0, 0, -1), Vector3(1, 0, 0), frng, []) and fb.tri_count() > 20, "the %s is built (%d triangles)" % [nf, fb.tri_count()])
+	print("== new things to do, and the clips they are done on ==")
+	var hero := Assets.person("lin_feng")
+	var hap: AnimationPlayer = hero.get_meta("ap")
+	var used_clips := {}
+	for pk in Props.KINDS:
+		used_clips[str(Props.KINDS[pk].clip)] = true
+	for cl in ["mine", "dig", "wash", "trace", "open_chest", "comb", "pound", "spin", "count", "stretch", "knock", "pour", "peer", "hang", "rock", "carve", "pan", "squeeze"]:
+		check(hap.has_animation(cl) and used_clips.has(cl), "the hero can %s, and something in the world is done that way" % cl)
+	check(hap.has_animation("duck"), "and goes bent under a low roof")
+	hero.free()
+	for ck in CaveThings.KINDS:
+		var cm := CaveThings.model(ck, "frost")
+		check(Props.KINDS.has(ck) and cm.get_child_count() >= 1, "the %s of the caves is built" % ck)
+		cm.free()
+	for hk in ["pickaxe", "spade", "pan", "chisel", "pestle", "jug", "comb"]:
+		var hn := Props.held(hk)
+		check(hn.get_child_count() >= 1 and Props.HELD.has(hk), "a %s can be held" % hk)
+		hn.free()
+	for gs in ["shrug", "cheer", "beckon", "refuse", "shiver"]:
+		check(Data.EMOTES.has(gs), "everybody can %s" % gs)
+	check(Props.KINDS.size() >= 82, "eighty-two things to do in the world, twenty-six of them new (%d)" % Props.KINDS.size())
+	check(FileAccess.get_file_as_string("res://art/lib/face.py").contains("EYE_K = 0.86"), "every eye is a little larger (art/lib/face.py)")
+	print("== Part XX: the Hollow Hills ==")
+	check(Data.REALMS.size() == 26 and Data.REALMS[25] == "Hollow Vessel" and Data.MAX_LEVEL == 75 and Data.level_name(75).ends_with("Hollow Vessel") and Data.REALM_INFO.size() == 26 and Data.EXP_NEED.size() == Data.MAX_LEVEL
+		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XX adds the Hollow Vessel realm")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break25" and Data.DIALOGUE.has("recall18") and msrc.contains("\"s_break24\": \"recall18\"") and Data.DIALOGUE.has("pre:s_break25") and Data.DIALOGUE.has("post:s_break25"),
+		"Part XX follows Skill Become Dao (recall18) and ends the game")
+	for tid in ["fen_yang", "white_rat", "wangliang", "xuanpin"]:
+		check(Trials.TRIALS.has(tid) and Lore.BOSS.has(tid) and Data.DIALOGUE.has("pre:" + tid) and Data.DIALOGUE.has("post:" + tid), "%s is a trial, with a story and words before and after" % tid)
+		check((Trials.TRIALS[tid].paths as Array).any(func(pth): return str(pth.kind) == "delve"), "%s can be passed by the dark" % tid)
+		check(_kill_step(tid) > Data.step_index("s_p20_home"), "%s is faced in Part XX" % tid)
+	check(Trials.KINDS.has("delve") and Trials.EPITHETS.has("delve") and Assets.PEOPLE.has("xuanpin") and "person:xuanpin" in UI.SHAPES and Data.BOSS_DROPS.get("wangliang", "") == "borrowed_shadow" and Data.ITEMS.has("borrowed_shadow")
+		and (Trials.TRIALS.xuanpin.paths as Array).any(func(pm): return str(pm.kind) == "relic" and pm.needs == [["item", "borrowed_shadow", 1]]) and _kill_step("xuanpin") > _kill_step("wangliang"),
+		"the Valley Spirit is Blender-built, and what the Penumbra leaves is what she is shown")
+	for mon in ["cave_cricket", "blind_newt", "drip_wisp", "stone_bat", "dig_mole", "ore_gnawer", "lamp_ghost", "kept_voice", "hollow_one", "burrow_marmot", "sink_toad", "karst_crawler"]:
+		check(Data.ENEMIES.has(mon) and Lore.BEAST.has(mon) and Habits.HABITS.has(Habits.habit(mon)), "%s has a story, and keeps hours" % mon)
+	for who in ["xu_xiake", "yu_gong", "zhi_sou", "wang_zhi"]:
+		check(Assets.PEOPLE.has(who) and FileAccess.file_exists("res://art/characters/%s.py" % who) and Data.CHAT.has(who) and Trials.npc_area(who) != "", "%s is Blender-built, lives somewhere and has things to say" % who)
+	check(FileAccess.get_file_as_string("res://art/characters/xuanpin.py").contains("\"fem\": True") and Voice.WOMEN.has("Xuanpin"), "the Valley Spirit is a woman, in the art and in the telling")
+	var wsurf: Dictionary = Atlas.world_of("surface")
+	for lid2 in ["xu_xiake", "yu_gong", "zhi_sou"]:
+		check(wsurf.ents.filter(func(e3): return str(e3.id) == lid2).size() == 1, "%s stands in the world once (late: no older map moved for it)" % lid2)
+	for lid3 in ["wang_zhi", "boss_fen_yang", "boss_white_rat", "boss_wangliang", "boss_xuanpin", "p20_milk1", "p20_bask5", "p20_lamp4", "p20_rub5"]:
+		check(wsurf.ents.filter(func(e3): return str(e3.id) == lid3).is_empty(), "%s is under the ground, not on it" % lid3)
+	for sid2 in ["s_p20_tea", "s_p20_fire"]:
+		var sp: Dictionary = Data.STEPS[Data.step_index(sid2)]
+		check(Bonds.SHARES.has(sid2) and not Bonds.find_spot(wsurf.ents, str(sp.spot)).is_empty() and Bonds.share_place(sid2) != "side by side", "%s: a scene with Yue Ling, at a place that is there" % sid2)
+	for sid3 in ["s_p20_milk", "s_p20_things", "s_p20_crickets", "s_p20_carry", "s_p20_baskets", "s_p20_moles", "s_p20_shore", "s_p20_lamps", "s_p20_gnawers", "s_p20_pasture", "s_p20_towers", "s_p20_rubbings", "s_p20_shades",
+			"s_p20_delve", "s_p20_board", "s_p20_hollow", "s_p20_wells", "s_p20_boats"]:
+		check(Data.DIALOGUE.has("done:" + sid3), "%s has its word to say when it is done" % sid3)
+	for hs in ["s_p20_pasture", "s_p20_towers"]:
+		var hst: Dictionary = Data.STEPS[Data.step_index(hs)]
+		var band: Dictionary = Data.AREAS[str(hst.area)].get("warband", {})
+		check(bool(hst.get("first", false)) and bool(band.get("late", false)) and Data.step_index(str(band.vis)) < Data.step_index(hs) and int(band.n) * 2 >= int(hst.n), "%s: the packs are there before it, enough of them, and it asks for the first strike" % hs)
+	var el: Dictionary = Data.STEPS[Data.step_index("s_p20_elders")]
+	for nid in el.npcs:
+		check(Data.DIALOGUE.has("visit:s_p20_elders:" + str(nid)), "%s has an answer to what an empty place is for" % nid)
+	for fs in ["s_p20_carry", "s_p20_shore", "s_p20_wells", "s_p20_boats"]:
+		var fst: Dictionary = Data.STEPS[Data.step_index(fs)]
+		check(str(fst.kind) == "folk" and Folk.ERRANDS.has(fs) and fst.has("hearth") and fst.has("town") and Cultures.HEARTHS.has(str(fst.hearth)) and str(fst.town) in Cultures.HEARTHS[str(fst.hearth)].towns, "%s is an errand among a hearth's own townsfolk" % fs)
+	var hearths_met := {}
+	for st3 in Data.STEPS:
+		if str(st3.id).begins_with("s_p20_") and st3.has("hearth"):
+			hearths_met[str(st3.hearth)] = true
+	check(hearths_met.size() >= 5, "Part XX does something for five hearths (%s)" % str(hearths_met.keys()))
+	for cid3 in ["the_mountain", "the_echoes", "the_hollow"]:
+		check(Data.step_index(str(Echoes.CROSSROADS[cid3].step)) > Data.step_index("s_p20_home") and str(Echoes.CROSSROADS[cid3].part) == "XX", "the crossroads %s is in Part XX" % cid3)
+	var heard := 0
+	for cid5 in Echoes.ORDER:
+		if str(Echoes.CROSSROADS[cid5].part) == "XX":
+			continue
+		for ek in Echoes.CROSSROADS[cid5].echo:
+			var ks := str(ek).trim_prefix("done:")
+			if ks.begins_with("s_p20_") or ks in ["pre:xuanpin", "pre:white_rat", "pre:wangliang", "pre:fen_yang"]:
+				heard += 1
+	check(heard >= 4, "earlier crossroads echo in the conversations of Part XX (%d of them)" % heard)
+	check(Trials.RECIPES.has("lamb_bell") and Trials.RECIPES.has("pine_torch") and Data.ITEMS.has("lamb_bell") and Data.ITEMS.has("pine_torch") and Data.ITEMS.has("stone_milk") and Data.ITEMS.has("miner_lamp"),
+		"a bell for the Lamb of the Earth, the traveller's torch, stone-milk and miners' lamps")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bsrc.contains("\"fen_yang\": \"craft\"") and bsrc.contains("\"white_rat\": \"delve\"") and bsrc.contains("\"wangliang\": \"heart\"") and bsrc.contains("\"xuanpin\": \"relic\"") and bsrc.contains("\"s_p20_fire\"")
+		and bsrc.contains("func _delve_step") and bsrc.contains("func _try_step"), "the bot has a way through the four trials, goes down caves, and does what is done in them")
 
 ## Whether `s` has one of `words` as a whole word (any case).
 func _has_word(s: String, words: Array) -> bool:

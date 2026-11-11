@@ -17,6 +17,8 @@ const VIEW := Vector2(1280, 720)
 ## follow camera: behind and a little above the hero, looking past him down the road
 const CAM_DIST := 6.8
 const CAM_H := 4.3
+const CAVE_CAM_DIST := 5.0
+const CAVE_CAM_H := 2.7
 const FWD := [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]
 const RIGHT := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]
 const HERO_OPTS := {"asset": "lin_feng", "sword": true, "glow": Color(0.4, 0.7, 1.0), "hair": "topknot", "trim": Color("e8f0ff"), "cape": Color("2a5aa8")}
@@ -94,6 +96,12 @@ var off := Vector3.ZERO
 var trip := {}
 var banner_text := ""
 var cellar_env: Environment = null
+## the air of the caves, by the look of the region over them (caves.gd)
+var cave_envs := {}
+## the hero's feet in a cave: the floor is steps of half a metre, taken smoothly
+var cave_y := 0.0
+var cave_goal := 0.0
+var cave_snap := true
 ## Part XII cutscenes: the line of dialogue last acted out, the last person who spoke to Lin Feng, and
 ## the conversation camera (how far it has blended in from the chase camera, where it is, its slow
 ## drift during narration)
@@ -225,6 +233,9 @@ func _bundle(lid: String) -> Dictionary:
 	if floor:
 		var pb := _bundle(str(lw.parent))
 		b.off = pb.off + Vector3(lw.origin.x * TS, 0.0, lw.origin.y * TS)
+		if Caves.is_cave(lw) and not headless():
+			# a cave has a map of its own (caves.gd)
+			b.mini = Caves.minimap(lw)
 	else:
 		var o: Vector2i = lw.get("origin", Vector2i.ZERO)
 		b.off = Vector3(o.x * TS, float(lw.get("y", 0.0)), o.y * TS)
@@ -275,12 +286,16 @@ func _use(lid: String) -> void:
 	off = b.off
 	mini_tex = b.mini
 	if is_floor():
-		mini_tex = _bundle(str(wd.parent)).mini
+		mini_tex = b.mini if is_cave() else _bundle(str(wd.parent)).mini
 		_place_floor(b)
 	Game.layer = lid
 
 func is_floor() -> bool:
 	return wd.get("kind", "") == "floor"
+
+## In one of the caves under the land (caves.gd: a floor of its own, made of voxels)?
+func is_cave() -> bool:
+	return wd.get("cave", false)
 
 ## Switch to realm (or floor) `lid` without moving the hero (the screenshot tour looks for a free tile
 ## in it before teleporting there).
@@ -299,6 +314,15 @@ func _place_floor(b: Dictionary) -> void:
 	var pb := _bundle(str(fw.parent))
 	var po: Vector3 = pb.off
 	var c := po + Vector3((fw.origin.x + fw.w * 0.5) * TS, 0.0, (fw.origin.y + fw.h * 0.5) * TS)
+	if Caves.is_cave(fw):
+		# a cave lies under its mouth: its volume hangs below the ground there (and a lower gallery
+		# below the cave above it)
+		var m: Vector2i = fw.realm_mouth
+		var gm := _ground(pb, po + Terrain3D.world_pos(m))
+		b.off.y = gm - Caves.NY * Caves.V * float(-int(fw.level)) - 3.0
+		off = b.off
+		b.placed = true
+		return
 	var gy := _ground(pb, c)
 	b.off.y = gy + (Arch.STOREY_Y if int(fw.level) > 0 else Arch.CELLAR_Y)
 	off = b.off
@@ -330,6 +354,7 @@ func teleport(at: Vector2i, lid: String = "") -> void:
 	if lid == "":
 		lid = layer
 	_use(lid)
+	cave_snap = true
 	ptile = at
 	target = at
 	move_t = -1.0
@@ -450,6 +475,20 @@ func _announce(quiet: bool) -> void:
 func _apply_look() -> void:
 	if headless():
 		return
+	if is_cave():
+		if not cave_envs.has(theme_name):
+			cave_envs[theme_name] = Caves.environment(theme_name)
+		cam.environment = cave_envs[theme_name]
+		Fx3D.configure_weather(weather, "none")
+		# no sun comes down here: the cave's own lamps and crystals, and the light the hero carries
+		sun.visible = false
+		fill.visible = false
+		hero_light.light_energy = 3.0
+		hero_light.omni_range = 15.0
+		MB.set_night(0.75)
+		return
+	sun.visible = true
+	fill.visible = true
 	if is_floor() and int(wd.level) < 0:
 		if cellar_env == null:
 			cellar_env = Look.cellar_environment()
@@ -559,6 +598,9 @@ func _stream(all_now: bool) -> void:
 ## Ground height at a point of realm bundle `bb` (world coordinates).
 func _ground(bb: Dictionary, p: Vector3) -> float:
 	var bw: Dictionary = bb.wd
+	if bw.get("cave", false):
+		# the floor of a cave is the top of the voxels under the point (caves.gd)
+		return Caves.floor_y(Caves.layout(str(bw.area), int(bw.level)), p.x - bb.off.x, p.z - bb.off.z) + bb.off.y
 	return Terrain3D.sample(bb.hm, bw.w, bw.h, p.x - bb.off.x, p.z - bb.off.z) + bb.off.y
 
 ## The height of the floorboards under a tile inside a building of realm bundle `bb` (or -INF if the
@@ -712,12 +754,14 @@ func _floor_view(fid: String) -> void:
 	root.name = "floor_" + fid
 	root.position = bb.off
 	scene3d.add_child(root)
-	if int(fw.level) < 0:
+	if Caves.is_cave(fw):
+		Caves.build(root, fw)
+	elif int(fw.level) < 0:
 		Terrain3D.cellar(root, fw)
 	var nodes := {}
 	for i in fw.ents.size():
 		var n := _make_ent(fw.ents[i], bb.off)
-		n.position.y = bb.off.y
+		n.position.y = _ground(bb, n.position) if Caves.is_cave(fw) else bb.off.y
 		scene3d.add_child(n)
 		nodes[i] = n
 	views[fid] = {"root": root, "nodes": nodes, "shown": true, "roofs": {}, "uppers": {}, "layer": fid, "ents": fw.ents, "bundle": fid}
@@ -994,7 +1038,7 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"ladder":
 			# the way up or down the Jianmu, or a flight of stairs (the building draws the stairs; a
 			# glowing mark on the floor shows where they are)
-			var lm := Models.ladder(str(e.get("style", "")), int(e.get("dir", 1)))
+			var lm: Node3D = Caves.mouth_model(str(e.get("theme", ""))) if str(e.get("style", "")) == "cave" else Models.ladder(str(e.get("style", "")), int(e.get("dir", 1)))
 			n.add_child(lm)
 			n.set_meta("model", lm)
 			var ll := _label(n, str(e.get("n", "")), 2.6 if str(e.get("style", "")) == "climb" else 1.6, Color("a8e0ff") if int(e.get("dir", 1)) < 0 else UI.C_GOLD, 30 if str(e.get("style", "")) == "climb" else 24)
@@ -1448,6 +1492,20 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 				mo.rotation.x = sin(t * 1.1 + e.pos.x) * 0.03
 		"lantern_st":
 			mo.visible = Game.prop_uses.has(e.id) or (since > 0.8 and since < 60.0)
+		# ---- the Hollow Hills release (cavethings.gd)
+		"miner_niche":
+			# the lamp burns once somebody has hung one there
+			mo.visible = Game.prop_uses.has(e.id) or (since > 1.6 and since < 60.0)
+			mo.scale = Vector3(1.0, 1.0 + 0.12 * sin(t * 11.0 + e.pos.x), 1.0)
+		"drip_pool":
+			# one drop, falling from the stalactite into the pool, again and again
+			var fall := fmod(t * 0.45 + e.pos.x * 0.37, 1.0)
+			mo.visible = fall < 0.5
+			mo.position.y = 2.4 - fall * fall * 8.2
+		"stream_bank":
+			mo.visible = since > 0.6 and since < 5.4
+			var rk := 1.0 + fmod(t * 1.4, 1.0) * 1.6
+			mo.scale = Vector3(rk, 1.0, rk)
 		# ---- the Lotus release (structures.gd)
 		"armillary":
 			mo.rotation.y = t * (0.08 + (0.6 if since > 0.0 and since < 9.0 else 0.0))
@@ -1705,6 +1763,8 @@ func face_entity():
 
 # ---------------------------------------------------------------- 3D view update
 func ground_y(p: Vector3) -> float:
+	if is_cave():
+		return _ground(bundles[layer], p)
 	return Terrain3D.sample(hm, w, h, p.x - off.x, p.z - off.z) + off.y
 
 func _player_pos() -> Vector3:
@@ -1716,11 +1776,22 @@ func _player_pos() -> Vector3:
 	var iy0 := _indoor_y(ptile, bb)
 	var iy1 := _indoor_y(target, bb) if move_t >= 0.0 else iy0
 	var gy := ground_y(pp)
+	if is_cave():
+		# up and down the half-metre steps of a cave's floor: the feet follow them a moment behind
+		cave_goal = gy
+		if cave_snap:
+			cave_y = gy
+			cave_snap = false
+		pp.y = cave_y + _trip_lift()
+		return pp
 	pp.y = lerpf(maxf(iy0, gy) if iy0 > -INF else gy, maxf(iy1, gy) if iy1 > -INF else gy, clampf(move_t, 0.0, 1.0)) + _trip_lift()
 	return pp
 
 func _cam_goal(pp: Vector3, a: float) -> Array:
 	var fwd := Vector3(sin(a), 0, -cos(a))
+	if is_cave():
+		# under a roof the camera comes in close and low behind the hero, and looks along the cave
+		return [pp - fwd * CAVE_CAM_DIST + Vector3(0, CAVE_CAM_H, 0), pp + Vector3(0, 1.3, 0) + fwd * 3.4]
 	var cp := pp - fwd * CAM_DIST + Vector3(0, CAM_H, 0)
 	# keep the camera above hills behind the hero
 	cp.y = maxf(cp.y, ground_y(cp) + 2.5)
@@ -1747,6 +1818,8 @@ const ENT_BIG := ["boss", "prop", "machine", "seal", "ladder", "abode", "stele",
 var frame_n := 0
 
 func _update_view(d: float) -> void:
+	if is_cave():
+		cave_y = lerpf(cave_y, cave_goal, 1.0 - exp(-d * 18.0))
 	var pp := _player_pos()
 	if not using.is_empty():
 		# doing something (props.gd): the hero and Yue Ling are placed and moved by it
@@ -1762,7 +1835,11 @@ func _update_view(d: float) -> void:
 		var walking := move_t >= 0.0
 		# on the road the hero runs (the light-body dash; the old walk cycle slid along at 12 m/s); in a
 		# conversation whoever is speaking talks with their hands and mouth
-		Models.anim_person(player, t, walking, false, "run" if walking else ("talk" if speaker() == "Lin Feng" else ""))
+		# (and under a low roof, in a cave, bent double with a hand up before the brow: caves.gd)
+		var gait := "run"
+		if walking and is_cave() and mini(Caves.headroom(Caves.layout(area_id, int(wd.level)), ptile), Caves.headroom(Caves.layout(area_id, int(wd.level)), target)) <= Caves.LOW:
+			gait = "duck"
+		Models.anim_person(player, t, walking, false, gait if walking else ("talk" if speaker() == "Lin Feng" else ""))
 		# a puff of dust at each footfall
 		var sp := fmod(t * 9.0 / PI, 2.0)
 		if walking and int(sp) != step_side:
@@ -1779,7 +1856,7 @@ func _update_view(d: float) -> void:
 			comp.position = comp_pos
 			comp_run = cs[2]
 			comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
-			Models.anim_person(comp, t + 1.0, comp_run, false, "run" if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
+			Models.anim_person(comp, t + 1.0, comp_run, false, gait if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
 	# entities of the regions on show
 	frame_n += 1
 	var seen_from: Vector3 = pp if cam_override == null else cam.global_position
@@ -2759,6 +2836,9 @@ func _draw_hud() -> void:
 			"ladder":
 				var lst := str(fe.get("style", ""))
 				hint = ("Climb" if lst == "climb" else ("Board the boat" if lst == "sail" else "Take the stairs")) if ladder_open(fe) else "Look"
+				# the Hollow Hills release: the mouth of a cave, the way out of one, and the shaft between its galleries
+				if lst in ["cave", "cave_out", "cave_up", "cave_down"]:
+					hint = {"cave": "Go down into the cave", "cave_out": "Climb out into the daylight", "cave_up": "Climb back up the rope", "cave_down": "Climb down the shaft"}[lst]
 			"abode":
 				hint = "Open the sealed cave" if Game.level >= int(fe.req) and not Game.abodes.has(fe.id) else "Look"
 			"stele":
@@ -2828,10 +2908,15 @@ func _draw_minimap() -> void:
 	# a window of the world map centred on the player (upstairs or in a cellar: the map of the realm
 	# outside, centred on the building)
 	var vb: Dictionary = bundles[_view_layer() if _view_layer() != "" else str(wd.get("parent", layer))]
-	var mw_t: int = vb.wd.w
-	var mh_t: int = vb.wd.h
 	var vt := view_tile()
 	var span := Vector2(96, 96 * mh / mw)
+	if is_cave():
+		# a cave is drawn from its own map, in its own tiles, a little closer
+		vb = bundles[layer]
+		vt = ptile
+		span = Vector2(minf(38.0, float(vb.wd.w)), minf(38.0, float(vb.wd.w)) * mh / mw)
+	var mw_t: int = vb.wd.w
+	var mh_t: int = vb.wd.h
 	var o := Vector2(vt) - span * 0.5
 	o.x = clampf(o.x, 0.0, mw_t - span.x)
 	o.y = clampf(o.y, 0.0, mh_t - span.y)
@@ -2854,7 +2939,9 @@ func _draw_minimap() -> void:
 			"pickup":
 				col = Color("ffffff")
 			"ladder":
-				col = Color("a8e0ff") if str(e.get("style", "")) == "climb" else Color(0, 0, 0, 0)
+				col = Color("a8e0ff") if str(e.get("style", "")) in ["climb", "cave", "cave_out", "cave_up", "cave_down"] else Color(0, 0, 0, 0)
+			"enemy":
+				col = Color("ff8a60") if is_cave() else Color(0, 0, 0, 0)
 			"stele":
 				col = UI.C_JADE
 			"abode":
@@ -2865,7 +2952,9 @@ func _draw_minimap() -> void:
 	draw_circle(pp, 4.5 + sin(t * 5.0), Color(1, 1, 1, 0.35))
 	draw_circle(pp, 2.6, Color("5aa9ff"))
 	var here := area_name
-	if is_floor():
+	if is_cave():
+		here = str(wd.bld_n)
+	elif is_floor():
 		here = "%s, %s" % [wd.bld_n, "upstairs" if int(wd.level) > 0 else "below"]
 	elif inside != "":
 		here = building_at(ptile).get("n", area_name)

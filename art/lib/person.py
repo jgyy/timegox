@@ -1035,7 +1035,9 @@ def clip_shock(t):
 
 
 ## the gestures a conversation can call for (Data.EMOTES in the game lists the same names)
-GESTURES = ("nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock")
+GESTURES = ("nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock",
+            # the Hollow Hills release (Part XX)
+            "shrug", "cheer", "beckon", "refuse", "shiver")
 
 CLIPS = {
     "idle": (IDLE_T, clip_idle),
@@ -2128,6 +2130,646 @@ def clip_eat(t):
     return p
 
 
+# ---------------------------------------------------------------- the Hollow Hills release (Part XX)
+# What is done under the ground and in the bigger houses: swinging a pick at an ore vein, digging,
+# washing in an underground stream, tracing an old painting on the rock, opening a chest, combing at a
+# mirror, pounding in a mortar, turning a spinning wheel, working an abacus, stretching at a window,
+# knocking on a wall and listening, pouring from a jar, peering into a crack, hanging something up,
+# rocking a cradle, carving, panning gravel, sidling through a squeeze and going bent under a low roof.
+
+MINE_T = 1.6
+
+
+def clip_mine(t):
+    """Swinging a pick at a rock face: both hands on the haft, drawn back over the right shoulder with
+    a turn of the hips, swung round and into the rock in front at chest height, a jolt, and back."""
+    k = (t % MINE_T) / MINE_T
+    p = clip_idle(0.0)
+    back = smooth(0.0, 0.42, k) * (1.0 - smooth(0.5, 0.6, k))
+    blow = smooth(0.5, 0.6, k) * (1.0 - smooth(0.82, 1.0, k))
+    jolt = _hold(k, 0.58, 0.62, 0.66, 0.74)
+    p["upper_arm.R"] = ((-0.9 - 1.3 * back - 0.25 * blow, 0.0, -0.35 - 0.3 * back + 0.35 * blow), (0, 0, 0))
+    p["forearm.R"] = ((-0.9 - 0.9 * back + 0.5 * blow, 0.25, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.2 - 0.4 * back + 0.3 * blow, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-1.0 - 0.9 * back - 0.3 * blow, 0.0, -0.45 - 0.35 * back + 0.2 * blow), (0, 0, 0))
+    p["forearm.L"] = ((-0.7 - 0.8 * back + 0.4 * blow, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.15, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.1, 1.1)
+    p["hips"] = ((0.08 + 0.08 * blow, -0.35 * back + 0.2 * blow, 0.0), (0.0, -0.07 - 0.03 * blow + 0.012 * jolt, 0.0))
+    _add(p, "spine", 0.06 + 0.14 * blow - 0.06 * back, -0.2 * back + 0.12 * blow)
+    _add(p, "chest", 0.04 + 0.1 * blow - 0.08 * back, -0.22 * back + 0.14 * blow)
+    _add(p, "head", 0.1 + 0.08 * blow, 0.3 * back - 0.1 * blow, 0.03 * jolt)
+    _add(p, "sleeve.R", 0.5 + 0.6 * back)
+    _add(p, "sleeve.L", 0.5 + 0.4 * back)
+    _add(p, "thigh.L", -0.3)
+    _add(p, "shin.L", 0.36)
+    _add(p, "foot.L", -0.06)
+    _add(p, "thigh.R", 0.14)
+    _add(p, "shin.R", 0.2)
+    _add(p, "foot.R", -0.3)
+    return p
+
+
+DIG_T = 2.2
+
+
+def clip_dig(t):
+    """Digging: the spade driven down in front with both hands and the weight of the right foot,
+    levered back with a bend of the knees, and the load swung up and away to the left."""
+    k = (t % DIG_T) / DIG_T
+    p = clip_idle(0.0)
+    drive = _hold(k, 0.0, 0.2, 0.3, 0.42)
+    lever = _hold(k, 0.3, 0.44, 0.5, 0.62)
+    throw = _hold(k, 0.52, 0.68, 0.78, 0.96)
+    p["upper_arm.R"] = ((-0.55 - 0.35 * drive - 0.3 * lever - 0.85 * throw, 0.0, -0.2 + 0.5 * throw), (0, 0, 0))
+    p["forearm.R"] = ((-0.75 + 0.3 * drive - 0.5 * lever - 0.4 * throw, 0.3, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.2, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.7 - 0.25 * drive - 0.15 * lever - 0.9 * throw, 0.0, -0.15 + 0.55 * throw), (0, 0, 0))
+    p["forearm.L"] = ((-0.35 + 0.15 * drive - 0.6 * lever - 0.3 * throw, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.1, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.1, 1.1)
+    p["hips"] = ((0.14 + 0.16 * drive + 0.05 * lever - 0.08 * throw, 0.35 * throw, 0.0), (0.0, -0.06 - 0.1 * lever - 0.04 * drive, 0.0))
+    _add(p, "spine", 0.14 + 0.2 * drive - 0.1 * throw, 0.2 * throw)
+    _add(p, "chest", 0.1 + 0.14 * drive - 0.1 * throw, 0.25 * throw)
+    _add(p, "head", 0.25 + 0.1 * drive - 0.25 * throw, 0.3 * throw)
+    _add(p, "sleeve.R", 0.5 + 0.5 * throw)
+    _add(p, "sleeve.L", 0.4 + 0.5 * throw)
+    _add(p, "thigh.R", -0.5 * drive - 0.2 - 0.25 * lever)
+    _add(p, "shin.R", 0.75 * drive + 0.3 + 0.45 * lever)
+    _add(p, "foot.R", -0.2 * drive - 0.1 - 0.2 * lever)
+    _add(p, "thigh.L", 0.1 - 0.3 * lever)
+    _add(p, "shin.L", 0.12 + 0.5 * lever)
+    _add(p, "foot.L", -0.2 - 0.2 * lever)
+    return p
+
+
+WASH_T = 3.2
+
+
+def clip_wash(t):
+    """Washing at running water: down on one knee, both hands cupped into the stream, brought up to
+    the face twice, the head shaken once, and up."""
+    k = t / WASH_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.18, 0.84, 1.0)
+    dip = _hold(k, 0.14, 0.24, 0.3, 0.38) + _hold(k, 0.46, 0.54, 0.58, 0.66)
+    face = _hold(k, 0.3, 0.4, 0.44, 0.52) + _hold(k, 0.6, 0.7, 0.76, 0.86)
+    _crouch(p, e)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.75 * dip - 0.95 * face - 0.2 * e, 0.0, -0.3 * s * (dip + face)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.35 * dip - 1.95 * face - 0.2, -0.3 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.3 * dip - 0.2 * face, 0.0, 0.3 * s * e), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.7 * face)
+    _hands(p, 0.25, 0.25, 0.05)
+    _add(p, "spine", 0.3 * dip + 0.08 * face)
+    _add(p, "chest", 0.28 * dip + 0.06 * face)
+    shake = math.sin(k * math.pi * 36.0) * _hold(k, 0.78, 0.8, 0.86, 0.9)
+    _add(p, "head", 0.35 * dip + 0.3 * face, 0.22 * shake, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.9 * min(1.0, face), 1))
+    return p
+
+
+TRACE_T = 4.0
+
+
+def clip_trace(t):
+    """Following an old painting on a rock wall with the fingertips: the left hand holds the light up
+    and to the side, the right moves along the lines in slow arcs at the height of the eyes, the head
+    following the hand."""
+    w = 2 * math.pi / TRACE_T
+    p = clip_idle(t)
+    a = math.sin(t * w)
+    c = math.cos(t * w * 2)
+    p["upper_arm.R"] = ((-1.45 + 0.22 * c, 0.0, 0.1 + 0.3 * a), (0, 0, 0))
+    p["forearm.R"] = ((-0.55 - 0.18 * c, 0.0, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.35, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-1.2, 0.0, 0.55), (0, 0, 0))
+    p["forearm.L"] = ((-1.1, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.2, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.0, 0.1, 0.3)
+    _add(p, "sleeve.R", 1.0)
+    _add(p, "sleeve.L", 0.9)
+    _add(p, "chest", -0.03, 0.08 * a)
+    p["head"] = ((-0.14 + 0.08 * c, -0.2 * a, 0.0), (0, 0, 0))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.3 * max(0.0, c), 1))
+    return p
+
+
+CHEST_T = 3.0
+
+
+def clip_open_chest(t):
+    """Opening a chest: down on one knee before it, both hands under the lid and up with it, a look
+    inside, the right hand going in and coming out with something, and the lid let down."""
+    k = t / CHEST_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.16, 0.86, 1.0)
+    lid = _hold(k, 0.16, 0.34, 0.74, 0.88)
+    take = _hold(k, 0.42, 0.52, 0.58, 0.7)
+    _crouch(p, e)
+    p["upper_arm.L"] = ((-0.7 * e - 0.75 * lid, 0.0, -0.1 * e), (0, 0, 0))
+    p["forearm.L"] = ((-0.7 * e - 0.4 * lid - 0.2, -0.3 * e, 0.0), (0, 0, 0))
+    p["hand.L"] = ((-0.5 * lid, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.7 * e - 0.75 * lid * (1 - take) - 0.2 * take, 0.0, 0.1 * e), (0, 0, 0))
+    p["forearm.R"] = ((-0.7 * e - 0.4 * lid * (1 - take) + 0.3 * take - 0.2, 0.3 * e, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.5 * lid * (1 - take) + 0.4 * take, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.6, 0.5 + 0.6 * smooth(0.5, 0.56, k), 0.2)
+    _add(p, "spine", 0.12 * e + 0.2 * take)
+    _add(p, "chest", 0.1 * e + 0.15 * take)
+    _add(p, "head", 0.28 * e + 0.12 * take - 0.2 * _hold(k, 0.66, 0.74, 0.8, 0.88))
+    _add(p, "sleeve.L", 0.5 * lid)
+    _add(p, "sleeve.R", 0.5 * lid)
+    return p
+
+
+COMB_T = 3.0
+
+
+def clip_comb(t):
+    """At a mirror: leaning a little towards it with the head tipped, the right hand drawing a comb
+    down through the hair by the temple three times, the left holding the hair out of the way."""
+    k = (t % COMB_T) / COMB_T
+    p = clip_idle(t)
+    st = (k * 3.0) % 1.0
+    down = smooth(0.1, 0.8, st)
+    p["upper_arm.R"] = ((-1.5 + 0.5 * down, 0.0, -0.75), (0, 0, 0))
+    p["forearm.R"] = ((-2.0 + 0.35 * down, 0.5, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.1, 0.0, 0.4), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.9, 0.0, 0.5), (0, 0, 0))
+    p["forearm.L"] = ((-2.0, -0.5, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.0, 0.0, -0.4), (0, 0, 0))
+    _hands(p, 0.7, 1.0)
+    _add(p, "sleeve.R", 1.1)
+    _add(p, "sleeve.L", 0.9)
+    _add(p, "spine", 0.06)
+    p["head"] = ((0.06, 0.12, 0.16 - 0.04 * down), (0, 0, 0))
+    return p
+
+
+POUND_T = 1.0
+
+
+def clip_pound(t):
+    """Pounding in a mortar: both hands round the long pestle before the chest, lifted to the chin and
+    driven down, with a dip of the knees on the stroke."""
+    k = (t % POUND_T) / POUND_T
+    p = clip_idle(0.0)
+    up = smooth(0.0, 0.5, k) * (1.0 - smooth(0.56, 0.68, k))
+    hit = _hold(k, 0.6, 0.68, 0.74, 0.96)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.6 - 0.55 * up + 0.1 * hit, 0.0, -0.3 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-1.1 - 0.75 * up + 0.3 * hit, -0.4 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.1 + 0.2 * hit, 0.0, 0.35 * s), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.5 + 0.4 * up)
+        _add(p, "thigh." + sd, -0.1 - 0.1 * hit)
+        _add(p, "shin." + sd, 0.2 + 0.2 * hit)
+        _add(p, "foot." + sd, -0.1 - 0.1 * hit)
+    _hands(p, 1.1, 1.1)
+    p["hips"] = ((0.08 + 0.05 * hit, 0.0, 0.0), (0.0, -0.04 - 0.05 * hit, 0.0))
+    _add(p, "spine", 0.08 + 0.08 * hit - 0.04 * up)
+    _add(p, "head", 0.24)
+    return p
+
+
+SPIN_T = 1.6
+
+
+def clip_spin(t):
+    """At the spinning wheel, seated: the right hand goes round with the wheel's crank, the left draws
+    the thread out and back at arm's length, the eyes on the thread."""
+    w = 2 * math.pi / SPIN_T
+    p = clip_idle(0.0)
+    _seated(p, t, w / 2, drop=0.46)
+    a = t * w
+    p["upper_arm.R"] = ((-0.75 + 0.22 * math.sin(a), 0.0, -0.35), (0, 0, 0))
+    p["forearm.R"] = ((-0.9 + 0.3 * math.cos(a), 0.2, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.15 * math.sin(a), 0.0, 0.0), (0, 0, 0))
+    draw = 0.5 + 0.5 * math.sin(a * 0.5)
+    p["upper_arm.L"] = ((-0.6 - 0.5 * draw, 0.0, 0.25 + 0.55 * draw), (0, 0, 0))
+    p["forearm.L"] = ((-1.2 + 0.7 * draw, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.1, 0.0, -0.2), (0, 0, 0))
+    _hands(p, 0.9, 0.9, 0.5)
+    _add(p, "sleeve.R", 0.5)
+    _add(p, "sleeve.L", 0.5 + 0.4 * draw)
+    _add(p, "chest", 0.04, 0.1 * draw)
+    p["head"] = ((0.14, 0.3 * draw, 0.0), (0, 0, 0))
+    return p
+
+
+COUNT_T = 2.4
+
+
+def clip_count(t):
+    """Working an abacus on a counter: bent a little over it, the left hand steadying the frame, the
+    right flicking beads along a rod, moving to the next rod and flicking again; a nod at the sum."""
+    k = (t % COUNT_T) / COUNT_T
+    p = clip_idle(0.0)
+    flick = math.sin(k * math.pi * 16.0)
+    along = math.sin(k * math.pi * 2.0)
+    p["upper_arm.R"] = ((-0.7, 0.0, 0.05 + 0.2 * along), (0, 0, 0))
+    p["forearm.R"] = ((-0.95 + 0.05 * flick, 0.25, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.25 + 0.14 * flick, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.6, 0.0, -0.2), (0, 0, 0))
+    p["forearm.L"] = ((-0.9, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.3, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.25, 0.3 + 0.3 * max(0.0, flick), 0.2)
+    p["hips"] = ((0.1, 0.0, 0.0), (0.0, -0.02, 0.0))
+    _add(p, "spine", 0.1)
+    _add(p, "chest", 0.08)
+    _add(p, "sleeve.R", 0.5)
+    _add(p, "sleeve.L", 0.5)
+    p["head"] = ((0.3 + 0.1 * _hold(k, 0.86, 0.9, 0.94, 1.0), 0.12 * along, 0.0), (0, 0, 0))
+    return p
+
+
+STRETCH_T = 3.2
+
+
+def clip_stretch(t):
+    """Stretching: the fingers laced and pushed up over the head, up onto the toes, the back arched
+    and the mouth wide in a yawn, then the arms let fall and the shoulders rolled."""
+    k = t / STRETCH_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.3, 0.62, 0.82)
+    roll = _hold(k, 0.78, 0.86, 0.9, 1.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-2.75 * e + 0.2 * roll, 0.0, 0.2 * s * e - 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.35 * e - 0.22 * (1 - e), -0.3 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.6 * e, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 1.3 * e)
+        _add(p, "foot." + sd, 0.35 * e)
+        _add(p, "toe." + sd, -0.4 * e)
+    _hands(p, 0.1 + 0.3 * (1 - e), 0.1 + 0.3 * (1 - e))
+    p["hips"] = ((-0.03 * e, 0.0, 0.0), (0.0, 0.04 * e, 0.0))
+    _add(p, "spine", -0.1 * e)
+    _add(p, "chest", -0.14 * e + 0.05 * roll)
+    _add(p, "head", -0.25 * e)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 1.6 * _hold(k, 0.2, 0.34, 0.5, 0.64), 1))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.9 * _hold(k, 0.22, 0.34, 0.54, 0.66), 1))
+    return p
+
+
+KNOCK_T = 2.8
+
+
+def clip_knock(t):
+    """Knocking and listening: three raps of the right knuckles on what stands in front, then the head
+    turned and the ear laid close to it, quite still, and away."""
+    k = t / KNOCK_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.12, 0.4, 0.5)
+    rap = max(0.0, math.sin(k * math.pi * 16.0)) * _hold(k, 0.1, 0.14, 0.38, 0.42)
+    ear = _hold(k, 0.44, 0.58, 0.86, 1.0)
+    p["upper_arm.R"] = ((-1.15 * e - 0.4 * ear, 0.0, 0.1 * e), (0, 0, 0))
+    p["forearm.R"] = ((-1.0 * e + 0.3 * rap - 0.9 * ear - 0.22 * (1 - e - ear), 0.0, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.2 * e - 0.3 * rap, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.9 * ear, 0.0, -0.2 * ear + 0.035), (0, 0, 0))
+    p["forearm.L"] = ((-1.0 * ear - 0.2, 0.12, 0.0), (0, 0, 0))
+    p["hand.L"] = ((-0.5 * ear, 0.2, 0.0), (0, 0, 0))
+    _hands(p, 0.38 - 0.3 * ear, 0.4 + 0.7 * e)
+    _add(p, "spine", 0.1 * ear)
+    _add(p, "chest", 0.08 * ear, -0.3 * ear)
+    _add(p, "head", 0.0, -0.75 * ear, 0.2 * ear)
+    _add(p, "sleeve.R", 0.8 * e)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.5 * ear, 1))
+    return p
+
+
+POUR_T = 3.0
+
+
+def clip_pour(t):
+    """Pouring from a jar: taken up in both hands from before the knees, tipped slowly out in front
+    at the height of the waist, righted, and set down."""
+    k = t / POUR_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.8, 1.0)
+    tip = _hold(k, 0.26, 0.42, 0.62, 0.76)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.7 * e - 0.25 * tip * (1 if sd == "R" else 0.3), 0.0, -0.22 * s * e - 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.95 * e - 0.22 * (1 - e) - 0.2 * tip * (1 if sd == "R" else -0.6), -0.3 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.1 * e, 0.0, (0.3 + 0.7 * tip) * e if sd == "R" else -0.3 * e - 0.3 * tip), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.5 * e)
+    _hands(p, 0.7, 0.7, 0.3)
+    dip = _hold(k, 0.0, 0.1, 0.14, 0.24) + _hold(k, 0.78, 0.88, 0.9, 1.0)
+    p["hips"] = ((0.25 * dip, 0.0, 0.0), (0.0, -0.1 * dip, 0.0))
+    _add(p, "spine", 0.2 * dip + 0.05 * tip)
+    _add(p, "head", 0.22 * e + 0.1 * dip, 0.0, 0.06 * tip)
+    return p
+
+
+PEER_T = 3.2
+
+
+def clip_peer(t):
+    """Peering into a crack, a tube or a dark place: bent forward from the hips, the hands cupped
+    either side of the eyes, the head turning a little as it looks; then straightening, blinking."""
+    k = t / PEER_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.78, 0.94)
+    look = math.sin(k * math.pi * 4.0) * e
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-1.0 * e, 0.0, 0.5 * s * e - 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-2.15 * e - 0.22 * (1 - e), -0.3 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.0, 0.0, -0.3 * s * e), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.9 * e)
+        _add(p, "thigh." + sd, -0.2 * e)
+        _add(p, "shin." + sd, 0.28 * e)
+        _add(p, "foot." + sd, -0.08 * e)
+    _hands(p, 0.6, 0.6, 0.2)
+    p["hips"] = ((0.3 * e, 0.0, 0.0), (0.0, -0.05 * e, -0.05 * e))
+    _add(p, "spine", 0.16 * e)
+    _add(p, "chest", 0.1 * e)
+    _add(p, "head", -0.3 * e, 0.12 * look, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, _blink(t, (2.7, 2.95)) * (1.0 - 0.3 * e), 1))
+    return p
+
+
+HANG_T = 3.0
+
+
+def clip_hang(t):
+    """Hanging something up: taken in both hands, lifted high in front, up on the toes to hook it over,
+    the hands let go one after the other, a step back in the heels and a look up at it."""
+    k = t / HANG_T
+    p = clip_idle(0.0)
+    up = _hold(k, 0.08, 0.36, 0.56, 0.74)
+    lookup = _hold(k, 0.3, 0.4, 0.86, 1.0)
+    for sd, s, late in (("L", 1, 0.0), ("R", -1, 0.06)):
+        u = _hold(k, 0.08, 0.36, 0.56 + late, 0.74 + late)
+        p["upper_arm." + sd] = ((-2.45 * u, 0.0, 0.1 * s * u - 0.035 * s * (1 - u)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.45 * u - 0.22 * (1 - u), -0.2 * s * u, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.3 * u, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 1.3 * u)
+        _add(p, "foot." + sd, 0.4 * _hold(k, 0.3, 0.4, 0.5, 0.6))
+        _add(p, "toe." + sd, -0.45 * _hold(k, 0.3, 0.4, 0.5, 0.6))
+    _hands(p, 0.7 - 0.4 * smooth(0.56, 0.64, k), 0.7 - 0.4 * smooth(0.62, 0.7, k))
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, 0.035 * _hold(k, 0.3, 0.4, 0.5, 0.6), 0.0))
+    _add(p, "chest", -0.08 * up)
+    _add(p, "head", -0.32 * lookup)
+    return p
+
+
+ROCK_T = 2.4
+
+
+def clip_rock(t):
+    """Rocking a cradle: bent over it with the left hand on the knee, the right on the rail pushing it
+    away and letting it come back, the head on one side, humming."""
+    w = 2 * math.pi / ROCK_T
+    p = clip_idle(0.0)
+    a = math.sin(t * w)
+    p["hips"] = ((0.3, 0.0, 0.0), (0.0, -0.1, -0.04))
+    for sd in ("L", "R"):
+        _add(p, "thigh." + sd, -0.42)
+        _add(p, "shin." + sd, 0.5)
+        _add(p, "foot." + sd, -0.1)
+    p["upper_arm.R"] = ((-0.75 - 0.14 * a, 0.0, -0.1), (0, 0, 0))
+    p["forearm.R"] = ((-0.5 + 0.2 * a, 0.2, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.35, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.3, 0.0, -0.1), (0, 0, 0))
+    p["forearm.L"] = ((-0.6, -0.4, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.5, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.5, 0.7)
+    _add(p, "spine", 0.14 + 0.02 * a)
+    _add(p, "chest", 0.1)
+    p["head"] = ((0.2, 0.0, 0.16 + 0.05 * a), (0, 0, 0))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.25 * (0.5 + 0.5 * math.sin(t * w * 2)), 1))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 0.55, 1))
+    return p
+
+
+CARVE_T = 1.8
+
+
+def clip_carve(t):
+    """Carving: the work held in the left hand before the chest, the right pushing a small blade along
+    it in short strokes away from the body; the work turned, blown on, and the strokes go on."""
+    k = (t % CARVE_T) / CARVE_T
+    p = clip_idle(0.0)
+    st = max(0.0, math.sin(k * math.pi * 8.0)) * (1.0 - smooth(0.7, 0.76, k))
+    blow = _hold(k, 0.74, 0.82, 0.9, 1.0)
+    p["upper_arm.L"] = ((-0.55 - 0.2 * blow, 0.0, -0.3), (0, 0, 0))
+    p["forearm.L"] = ((-1.5 - 0.35 * blow, -0.35, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.1, 0.5 * blow, -0.3), (0, 0, 0))
+    p["upper_arm.R"] = ((-0.5 - 0.1 * st, 0.0, 0.32), (0, 0, 0))
+    p["forearm.R"] = ((-1.5 + 0.22 * st, 0.35, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.1 + 0.15 * st, 0.0, 0.3), (0, 0, 0))
+    _hands(p, 0.8, 1.0, 0.4)
+    _add(p, "sleeve.L", 0.6)
+    _add(p, "sleeve.R", 0.6)
+    _add(p, "chest", 0.05)
+    p["head"] = ((0.34 - 0.12 * blow, -0.08, 0.0), (0, 0, 0))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1.0 - 0.3 * blow, 1.0 + 0.5 * blow, 1))
+    return p
+
+
+PAN_T = 2.4
+
+
+def clip_pan(t):
+    """Panning gravel at the water's edge: squatting on both heels with a shallow pan held out over
+    the stream in both hands, swirled round and round and tipped, the eyes down for a glint."""
+    w = 2 * math.pi / PAN_T
+    p = clip_idle(0.0)
+    a = t * w * 2
+    p["hips"] = ((0.3, 0.0, 0.0), (0.0, -0.5, -0.1))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.75, 0.0, 0.3 * s), (0, 0, 0))
+        p["shin." + sd] = ((2.25, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.75, 0.0, 0.0), (0, 0, 0))
+        p["upper_arm." + sd] = ((-0.95 + 0.07 * math.sin(a + s), 0.0, -0.22 * s + 0.07 * math.cos(a)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.55 + 0.07 * math.cos(a + s), -0.3 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.2, 0.0, 0.3 * s + 0.12 * math.sin(a)), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.5)
+    _hands(p, 0.8, 0.8, 0.3)
+    _add(p, "spine", 0.12)
+    _add(p, "chest", 0.1, 0.0, 0.03 * math.sin(a))
+    p["head"] = ((0.36, 0.05 * math.sin(a * 0.5), 0.0), (0, 0, 0))
+    return p
+
+
+SQUEEZE_T = 1.6
+
+
+def clip_squeeze(t):
+    """Sidling through a squeeze in the rock: the body turned side on with the back and the palms flat
+    to the wall, the breath held, the leading foot feeling out and the other drawn up to it."""
+    w = 2 * math.pi / SQUEEZE_T
+    p = clip_idle(0.0)
+    a = math.sin(t * w)
+    step = max(0.0, a)
+    draw = max(0.0, -a)
+    p["root"] = ((0, 1.35, 0), (0, 0, 0))
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, -0.04 - 0.02 * abs(a), 0.0))
+    p["thigh.L"] = ((0.0, 0.0, 0.3 * step), (0, 0, 0))
+    p["shin.L"] = ((0.12 * step, 0.0, 0.0), (0, 0, 0))
+    p["foot.L"] = ((-0.05, 0.0, -0.3 * step), (0, 0, 0))
+    p["thigh.R"] = ((0.0, 0.0, 0.22 * step - 0.05 * draw), (0, 0, 0))
+    p["shin.R"] = ((0.3 * draw, 0.0, 0.0), (0, 0, 0))
+    p["foot.R"] = ((-0.2 * draw, 0.0, 0.0), (0, 0, 0))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((0.12, 0.0, 0.5 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.12, 0.6 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.2, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.05, 0.05, 0.05)
+    _add(p, "chest", -0.05)
+    p["head"] = ((-0.03, -1.0, 0.0), (0, 0, 0))
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (0.8, 0.8, 1))
+    return p
+
+
+DUCK_T = 1.3
+
+
+def clip_duck(t):
+    """Going bent under a low roof: knees deep, the back and the head down and forward, one hand up
+    before the brow to find the rock first, short quick steps."""
+    w = 2 * math.pi / (DUCK_T / 2)
+    p = clip_idle(0.0)
+    a = math.sin(t * w)
+    p["hips"] = ((0.45, 0.06 * a, 0.0), (0.0, -0.24 + 0.012 * abs(a), 0.0))
+    for sd, sg in (("L", 1.0), ("R", -1.0)):
+        sw = a * sg
+        p["thigh." + sd] = ((-0.95 - 0.38 * sw, 0.0, 0.0), (0, 0, 0))
+        p["shin." + sd] = ((1.15 + 0.3 * max(0.0, sw), 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.6 + 0.1 * sw, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((-1.5, 0.0, 0.25), (0, 0, 0))
+    p["forearm.R"] = ((-1.5, -0.2, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.5, 0.0, -0.3), (0, 0, 0))
+    p["upper_arm.L"] = ((-0.2 + 0.2 * a, 0.0, 0.12), (0, 0, 0))
+    p["forearm.L"] = ((-0.7, 0.12, 0.0), (0, 0, 0))
+    _hands(p, 0.4, 0.15)
+    _add(p, "spine", 0.2)
+    _add(p, "chest", 0.16)
+    p["head"] = ((-0.42, 0.0, 0.0), (0, 0, 0))
+    _secondary(p, t, True, False, (0.3 * a, -0.3 * a), a, (0.3, 1.0))
+    return p
+
+
+# ---- gestures everybody has, for the conversations of Part XX (Data.EMOTES in the game)
+SHRUG_T = 1.4
+
+
+def clip_shrug(t):
+    """A shrug: both shoulders up, the palms turned out at the hips, the head on one side, and down."""
+    k = t / SHRUG_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.25, 0.6, 1.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.12 * e, 0.0, 0.3 * s * e + 0.035 * s * (1 - e) * (1 if sd == "L" else 1)), (0.0, 0.022 * e, 0.0))
+        p["forearm." + sd] = ((-0.75 * e - 0.22 * (1 - e), 0.9 * s * e + 0.12 * s * (1 - e), 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.35 * e, 0.2 * s, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.4 * e)
+    _hands(p, 0.38 - 0.3 * e, 0.4 - 0.3 * e, 0.1)
+    _add(p, "chest", -0.03 * e)
+    _add(p, "head", 0.0, 0.0, 0.14 * e)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.12 * e, 1))
+    return p
+
+
+CHEER_T = 1.6
+
+
+def clip_cheer(t):
+    """A cheer: both fists thrown up over the head twice with a spring off the toes, the mouth wide."""
+    k = t / CHEER_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.16, 0.74, 1.0)
+    pump = abs(math.sin(k * math.pi * 2.0)) * e
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-1.5 * e - 1.0 * pump, 0.0, 0.3 * s * e - 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-1.3 * e + 0.9 * pump - 0.22 * (1 - e), 0.0, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.0, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 1.2 * e)
+        _add(p, "foot." + sd, 0.3 * pump)
+        _add(p, "toe." + sd, -0.3 * pump)
+    _hands(p, 0.38 + 0.7 * e, 0.4 + 0.7 * e)
+    p["hips"] = ((0.0, 0.0, 0.0), (0.0, 0.04 * pump, 0.0))
+    _add(p, "chest", -0.08 * pump)
+    _add(p, "head", -0.12 * e)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 + 0.9 * e, 1))
+    return p
+
+
+BECKON_T = 1.6
+
+
+def clip_beckon(t):
+    """Come here: the right arm out in front with the palm down, the fingers and the hand scooping
+    towards the body twice (the way it is done in the east), a small nod with it."""
+    k = t / BECKON_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.78, 1.0)
+    sc = max(0.0, math.sin(k * math.pi * 5.0 - 0.6)) * e
+    p["upper_arm.R"] = ((-1.05 * e, 0.0, -0.12 * e - 0.035 * (1 - e)), (0, 0, 0))
+    p["forearm.R"] = ((-0.5 * e - 0.25 * sc - 0.24 * (1 - e), -0.12, 0.0), (0, 0, 0))
+    p["hand.R"] = ((0.75 * sc + 0.1 * e, -0.2 * (1 - e), 0.0), (0, 0, 0))
+    _hands(p, 0.38, 0.1 + 0.9 * sc, 0.2)
+    _add(p, "sleeve.R", 0.8 * e)
+    _add(p, "head", 0.08 * sc, 0.0, 0.0)
+    _add(p, "chest", 0.0, 0.06 * e)
+    return p
+
+
+REFUSE_T = 1.6
+
+
+def clip_refuse(t):
+    """No, and no further: the right hand up before the chest with the palm out, the head turned away
+    from it and the weight going back onto the heels."""
+    k = t / REFUSE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.72, 1.0)
+    p["upper_arm.R"] = ((-0.95 * e, 0.0, 0.1 * e - 0.035 * (1 - e)), (0, 0, 0))
+    p["forearm.R"] = ((-1.25 * e - 0.24 * (1 - e), 0.0, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.85 * e, -0.2 * (1 - e), 0.0), (0, 0, 0))
+    _hands(p, 0.38, 0.4 - 0.36 * e, 0.1)
+    _add(p, "sleeve.R", 0.9 * e)
+    p["hips"] = ((-0.04 * e, 0.0, 0.0), (0.0, 0.0, -0.025 * e))
+    _add(p, "chest", -0.05 * e, 0.14 * e)
+    _add(p, "head", 0.05 * e, 0.42 * e, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.45 * e, 1))
+    return p
+
+
+SHIVER_T = 1.8
+
+
+def clip_shiver(t):
+    """Cold, or afraid of the dark: the arms hugged across the chest, the shoulders up round the ears
+    and the whole body shaking, the knees a little bent."""
+    k = t / SHIVER_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.8, 1.0)
+    sh = math.sin(k * math.pi * 30.0) * e
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.55 * e, 0.15 * s * e, -0.5 * s * e + 0.035 * s * (1 - e)), (0.0, 0.016 * e, 0.0))
+        p["forearm." + sd] = ((-1.85 * e - 0.22 * (1 - e), -0.4 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.2 * e, 0.0, 0.3 * s * e), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.5 * e)
+        _add(p, "thigh." + sd, -0.14 * e)
+        _add(p, "shin." + sd, 0.26 * e)
+        _add(p, "foot." + sd, -0.12 * e)
+    _hands(p, 0.8, 0.8)
+    p["hips"] = ((0.05 * e, 0.012 * sh, 0.0), (0.004 * sh, -0.03 * e, 0.0))
+    _add(p, "spine", 0.08 * e, 0.015 * sh)
+    _add(p, "chest", 0.08 * e, -0.015 * sh)
+    _add(p, "head", 0.14 * e, 0.03 * sh, 0.0)
+    p["mouth"] = ((0, 0, 0), (0, 0, 0), (0.85, 1.0 - 0.2 * e, 1))
+    return p
+
+
+# the five gestures of the Hollow Hills release belong to everybody
+CLIPS.update({
+    "shrug": (SHRUG_T, lambda t: _stow(clip_shrug(t))),
+    "cheer": (CHEER_T, lambda t: _stow(clip_cheer(t))),
+    "beckon": (BECKON_T, lambda t: _stow(clip_beckon(t))),
+    "refuse": (REFUSE_T, lambda t: _stow(clip_refuse(t))),
+    "shiver": (SHIVER_T, lambda t: _stow(clip_shiver(t))),
+})
+
+
 def _stowing(fn):
     return lambda t: _stow(fn(t))
 
@@ -2173,6 +2815,26 @@ INTERACT = {
     "bang": (BANG_T, clip_bang),
     "call": (CALL_T, clip_call),
     "eat": (EAT_T, clip_eat),
+    # the Hollow Hills release (Part XX): what is done under the ground and in the bigger houses
+    "mine": (MINE_T, clip_mine),
+    "dig": (DIG_T, clip_dig),
+    "wash": (WASH_T, clip_wash),
+    "trace": (TRACE_T, clip_trace),
+    "open_chest": (CHEST_T, clip_open_chest),
+    "comb": (COMB_T, clip_comb),
+    "pound": (POUND_T, clip_pound),
+    "spin": (SPIN_T, clip_spin),
+    "count": (COUNT_T, clip_count),
+    "stretch": (STRETCH_T, clip_stretch),
+    "knock": (KNOCK_T, clip_knock),
+    "pour": (POUR_T, clip_pour),
+    "peer": (PEER_T, clip_peer),
+    "hang": (HANG_T, clip_hang),
+    "rock": (ROCK_T, clip_rock),
+    "carve": (CARVE_T, clip_carve),
+    "pan": (PAN_T, clip_pan),
+    "squeeze": (SQUEEZE_T, clip_squeeze),
+    "duck": (DUCK_T, clip_duck),
 }
 INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
 # the sword form on the stage is the one thing done with the blade out

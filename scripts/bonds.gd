@@ -856,6 +856,29 @@ const SHARES := {
 			{"id": "slow", "label": "\"Because it took all evening.\"", "lean": "wander", "after": [["Lin Feng", "Because it took the whole evening, and nobody was waiting for it, and there was nowhere else we had to be."], ["Yue Ling", "We have saved the world a great many times in a hurry. I do not think we have ever before ground rice."]]},
 		],
 		"end": [["Narrator", "They carry the flour up the hill in a twist of cloth. It makes two small cakes, slightly burnt. Auntie Zhou eats one, and says nothing, and puts the other on the stove god's shelf."]]},
+	# ---- Part XX (the Hollow Hills release)
+	"s_p20_tea": {"lines": [
+		["Narrator", "The tea table under the wall at Tushan, at the end of the day the forty came up. The town is very quiet: every house has somebody back in it who was not there at breakfast, and nobody quite knows what to say to him. Yue Ling pours two bowls and then does not drink hers. She is looking into it."],
+		["Yue Ling", "A bowl. Clay, and then no clay, and it is the no clay you pour the tea in. I have drunk out of bowls every day since I woke up and I never once looked at the part that is not there."],
+		["Yue Ling", "I was woven, Lin Feng. Every thread of me was put in on purpose. I have been wondering all day whether whoever did it left anything out. On purpose. Whether there is a place in me that is for nothing."]],
+		"ask": "The tea is going cold, and she is waiting. What do you say?",
+		"options": [
+			{"id": "room", "label": "\"There is. I have sat in it.\"", "lean": "companion", "after": [["Lin Feng", "There is. It is where I go when I have had enough of everybody, me included. You have never once asked me to wipe my feet."], ["Yue Ling", "...You sit in me. Like a pavilion. That is the strangest thing anybody has ever said to me and I am going to keep it for ever."]]},
+			{"id": "pond", "label": "\"The pond you woke by. That is yours.\"", "lean": "lotus", "after": [["Lin Feng", "You woke by a pond with nobody near, and nothing you had to be. I think that was left in on purpose. I think it is still there."], ["Yue Ling", "It is. When I am very quiet I can hear the frogs. I thought everybody had frogs."]]},
+			{"id": "find", "label": "\"Let us go and look for it.\"", "lean": "wander", "after": [["Lin Feng", "I do not know. I have not been everywhere in you. Neither have you. Xu Xiake would say that is no state to leave a country in."], ["Yue Ling", "Three hundred and fifty-seven caves and he has come out of every one. All right. But you are holding the rope."]]},
+		],
+		"end": [["Narrator", "She drinks the tea then, cold, to the bottom, and turns the empty bowl over twice in her hands before she sets it down, as if it were a thing somebody had given her."]]},
+	"s_p20_fire": {"lines": [
+		["Narrator", "The campfire by the mountain road, a little way below the mouth of Rotten-Axe Cave. Above them is the sect, with its lamps lit; below them, they now know, is a room larger than the sect, with nothing in it but all the water in the land and somebody standing on it. Wang Zhi is asleep on the far side of the fire with his axe-head for a pillow."],
+		["Yue Ling", "He lost four hundred years watching one game, and his wife's pot boiled dry, and when he understood, the first thing he said was that she would be cross. Not that he was sorry for himself. That she would be cross."],
+		["Yue Ling", "If I went into a cave and looked at a weiqi board, Lin Feng, and came out, and it was all gone. You. The sect. Cook Zhou's rice. What would you want me to do?"]],
+		"ask": "The fire settles. What do you tell her?",
+		"options": [
+			{"id": "live", "label": "\"Find a handle for the axe.\"", "lean": "companion", "after": [["Lin Feng", "What he is going to do. Find a handle for the axe. Somebody will want firewood, in any century."], ["Yue Ling", "And you? If it were you that came out?"], ["Lin Feng", "I would look for a broom. And then I would look for you, in case you had only gone into the next cave along."]]},
+			{"id": "wait", "label": "\"I would not be gone. I would wait.\"", "lean": "lotus", "after": [["Lin Feng", "You would not find it all gone. I would be sitting outside. However long. Somebody would have to tell you what had happened to the rice."], ["Yue Ling", "Four hundred years on a rock. You would, too. You would sweep round yourself. ...Do not laugh, I am trying not to cry."]]},
+			{"id": "go", "label": "\"Then we go in together.\"", "lean": "wander", "after": [["Lin Feng", "It will not happen, because we are not going into any more caves except side by side. If we lose four hundred years, we lose the same four hundred."], ["Yue Ling", "And come out together into a world full of strangers and no rice. Yes. I could do that. I think I could do almost anything, that way round."]]},
+		],
+		"end": [["Narrator", "Across the fire Wang Zhi turns over in his sleep and says a woman's name, quite clearly, and then: only a moment more. Yue Ling gets up and puts her own blanket over him."]]},
 	"s_p18_feast": {"lines": [
 		["Narrator", "Six tables in the square at Cloudfoot, by the stage, and nobody can agree which is the head, so they have been set in a ring with the new fire in the middle. Gruel and pickled mustard; mutton off the knife; flatbread, torn; a river fish with its bone lifted out; millet cakes burnt on one side; sesame cakes and sweet rice balls."],
 		["Narrator", "The horse-folk eat on the left of the fire and will not be moved. A founder is teaching a boat-child to whistle and being told very firmly by Auntie Rong where he may not do it. Granny Wen has asked forty people whether they have eaten."],
@@ -1025,7 +1048,8 @@ const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the 
 	"s_p17_haircut": "on the day the dragon raised its head", "s_p17_thunder": "drumming the first thunder", "s_p17_teacup": "over the first tea of spring",
 	"s_p17_graves": "at the graves on Qingming", "s_p17_kite": "flying the Qingming kite",
 	"s_p18_drill": "drilling the new fire", "s_p18_feast": "at the feast of six tables",
-	"s_p19_campfire": "at the caravan fire before the dunes", "s_p19_rest": "grinding rice by hand at the old millstone"}
+	"s_p19_campfire": "at the caravan fire before the dunes", "s_p19_rest": "grinding rice by hand at the old millstone",
+	"s_p20_tea": "over a bowl of tea at Tushan", "s_p20_fire": "at the campfire below Rotten-Axe Cave"}
 
 static func share_place(sid: String) -> String:
 	return str(SHARE_PLACES.get(sid, "side by side"))

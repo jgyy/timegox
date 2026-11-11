@@ -2,7 +2,8 @@ extends SceneTree
 ## Feeds real keyboard events (no bot) into the game: title -> character creation (a name typed, a
 ## look and an origin changed) -> dialogue -> walk -> menu -> a thing to do (props.gd): face it, Enter,
 ## he does it, Enter again finishes it; T to Yue Ling; F swings the sword and G throws the sword qi;
-## a key held into somebody talks to them once.
+## a key held into somebody talks to them once; and (the Hollow Hills release) a key held into the mouth
+## of a cave goes down into it, a step is walked on its floor, and the way out comes up into the daylight.
 ## Run: godot --headless --path . --script tests/manual_input_test.gd
 
 var main
@@ -12,6 +13,8 @@ var start_y := 0
 ## the thing to do tried at the end, and the frame the wait for it began
 var prop := {}
 var wait_from := 0
+## the walk into a cave and out again: its stage, and the frame the stage began
+var cave := {}
 
 func key(code: int, down: bool) -> void:
 	var e := InputEventKey.new()
@@ -33,8 +36,81 @@ func _initialize() -> void:
 	main = load("res://scenes/main.tscn").instantiate()
 	root.add_child(main)
 
+## The key that walks the hero the way `dir` now (the keys follow the camera).
+func key_for(dir: Vector2i) -> int:
+	var w = main.world
+	var f: Vector2i = w.FWD[w.cam_q]
+	var r: Vector2i = w.RIGHT[w.cam_q]
+	return [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN][[-r, r, f, -f].find(dir)]
+
+## Down into the cave under the Bamboo Forest by its mouth, a step on its floor, and out again.
+func cave_step() -> void:
+	var w = main.world
+	var lay := Caves.layout("bamboo")
+	var since: int = frame - int(cave.at)
+	match int(cave.stage):
+		0:
+			var hit: Array = w.locate_ent("cave:bamboo")
+			expect(not hit.is_empty() and str(hit[0]) == "surface", "there is a cave mouth in the Bamboo Forest")
+			if hit.is_empty():
+				print("failures: ", fails)
+				quit(1)
+				return
+			cave["mouth"] = hit[1].pos
+			w.teleport(hit[1].pos + Vector2i(0, 1), "surface")
+			cave["key"] = key_for(Vector2i(0, -1))
+			key(int(cave.key), true)
+			cave.stage = 1
+			cave.at = frame
+		1:
+			if w.is_cave() and not w.traveling():
+				key(int(cave.key), false)
+				expect(str(w.layer) == Caves.fid("bamboo") and w.ptile == lay.arrive and main.top_name() == "world", "a key held into the cave mouth goes down into the cave (%s)" % str(w.wd.bld_n))
+				expect(absf(w._player_pos().y - w.ground_y(w.wpos(w.ptile))) < 0.01, "and he stands on its floor")
+				cave.stage = 2
+				cave.at = frame
+			elif since > 400:
+				expect(false, "a key held into the cave mouth goes down into the cave")
+				print("failures: ", fails)
+				quit(1)
+		2:
+			# (the key must be let go before he will walk again: he arrives facing the way he came)
+			if since == 10:
+				var ahead: Vector2i = lay.arrive + Vector2i(0, -1)
+				if w.tile_free(ahead) and w.ent_at(ahead) == null:
+					cave["key"] = key_for(Vector2i(0, -1))
+					key(int(cave.key), true)
+				else:
+					cave.stage = 3
+					cave.at = frame
+			elif since > 10 and w.ptile != lay.arrive:
+				key(int(cave.key), false)
+				expect(w.ptile.x == lay.arrive.x and w.ptile.y < lay.arrive.y and w.is_cave() and w.tile_free(w.ptile), "he walks on the cave's floor like any other")
+				cave.stage = 3
+				cave.at = frame
+			elif since > 300:
+				expect(false, "he walks on the cave's floor like any other")
+				cave.stage = 3
+				cave.at = frame
+		3:
+			if since == 10:
+				cave["key"] = key_for(Vector2i(0, 1))
+				key(int(cave.key), true)
+			elif since > 10 and not w.is_cave() and not w.traveling():
+				key(int(cave.key), false)
+				expect(str(w.layer) == "surface" and w.ptile == (cave.mouth as Vector2i) + Vector2i(0, 1), "and the way out comes up into the daylight, in front of the mouth")
+				print("failures: ", fails)
+				quit(1 if fails > 0 else 0)
+			elif since > 500:
+				expect(false, "the way out of the cave comes up into the daylight")
+				print("failures: ", fails)
+				quit(1)
+
 func _process(_d: float) -> bool:
 	frame += 1
+	if not cave.is_empty():
+		cave_step()
+		return false
 	if frame > 2400:
 		printerr("  FAIL smoke test did not finish (script error?)")
 		quit(1)
@@ -220,8 +296,8 @@ func _process(_d: float) -> bool:
 			elif prop.has("closed") and frame == int(prop.closed) + 32:
 				expect(main.top_name() == "world", "Esc while a pack struck first is flying back does not open the menu over its battle")
 				main.world.ambush_t = -1.0
-				print("failures: ", fails)
-				quit(1 if fails > 0 else 0)
+				# and last, down a cave and out again (the Hollow Hills release)
+				cave = {"stage": 0, "at": frame}
 		elif not u.is_empty() and bool(u.started):
 			prop["started"] = true
 			expect(not bool(u.ended), "he steps up to it and does it")

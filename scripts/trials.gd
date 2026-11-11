@@ -51,8 +51,10 @@ const KINDS := {
 	"hearth": {"n": "By the hearths", "col": Color("f0a060"), "what": "the hearths of the land that call you a guest"},
 	# the Hundred Works release (Part XIX): what Lin Feng has built with his own hands (works.gd)
 	"works": {"n": "By the works", "col": Color("7ab8d8"), "what": "what you have built with your own hands"},
+	# the Hollow Hills release (Part XX): the caves Lin Feng has gone to the very back of (caves.gd)
+	"delve": {"n": "By the dark", "col": Color("8ad0c8"), "what": "the caves you have gone to the very back of"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -137,6 +139,9 @@ const RECIPES := {
 	# the New Fire release (Part XVIII): a drill of summer wood, made the way Suiren made his
 	# the Hundred Works release (Part XIX): the belt and nine sticks Mozi laid in front of a king
 	"defence_models": {"at": "smith", "in": {"ess_wood": 8, "ess_metal": 6, "catalpa_timber": 1}, "stones": 360000, "after": "s_p19_cogs", "for": "cloud_ladder"},
+	# the Hollow Hills release (Part XX): a clay bell for the Lamb of the Earth, and the traveller's torch
+	"lamb_bell": {"at": "alchemist", "in": {"ess_earth": 8, "ess_water": 6, "earth_basket": 1}, "stones": 240000, "after": "s_p20_moles", "for": "fen_yang"},
+	"pine_torch": {"at": "smith", "in": {"ess_fire": 6, "ess_wood": 6, "cave_rubbing": 1}, "stones": 240000, "after": "s_p20_shades", "for": "wangliang"},
 	"fire_drill": {"at": "smith", "in": {"ess_wood": 8, "ess_fire": 6, "apricot_wood": 2}, "stones": 340000, "after": "s_p18_valley", "for": "zhurong"},
 	# the Spring Thunder release (Part XVII)
 	"warm_brazier": {"at": "alchemist", "in": {"ess_fire": 8, "ess_wood": 6}, "stones": 300000, "after": "s_p17_ice", "for": "qing_nu"},
@@ -1002,6 +1007,66 @@ const TRIALS := {
 				"desc": "Middle Skill Become Dao and a sword tempered eight times: a blade to put between the teeth of a wheel as wide as the pit, and an arm to hold it there.",
 				"line": "Lin Feng walks down the ramp alone, and sets the flat of his sword against the turning rim."},
 		]},
+	# ---- Part XX (the Hollow Hills release): what was asleep in the earth, the lady of the Bottomless
+	# Cave, the edge of a shadow that asked a question, and what is in a hollow when nothing is
+	"fen_yang": {"might": [2.4, 1.3],
+		"why": "When the men of Lu dug a well they found a thing like a sheep in an earthen jar, and Confucius said: what is in the earth is the Fenyang. Yu Gong's sons dug one up by accident, with picks, and it is the size of a barn, half awake, and has never seen a light before.",
+		"paths": [
+			{"id": "craft", "kind": "craft", "n": "A bell it knows", "needs": [["item", "lamb_bell", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Alchemist Mo can fire a bellwether's bell of the mountain's own clay, with a basket of its earth in the slip. It does not ring; it knocks, like a knuckle on a jar. Every lamb knows the bell it was born behind. This one was born behind the hill.",
+				"line": "Lin Feng shakes the clay bell once. It knocks, dull and low, and the Lamb of the Earth turns its great head towards the sound like a ewe that has heard her name."},
+			{"id": "delve", "kind": "delve", "n": "One who knocks first", "needs": [["delved", 2]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Two caves gone to the very back of. Somebody who has walked into the dark on his own feet, and out again, comes into a room under a hill the way a guest does: slowly, with the light held low, and saying who he is.",
+				"line": "Lin Feng lowers the torch, stands where it can see him, and says his name to the dark, as Xu Xiake does at the mouth of every cave."},
+			{"id": "might", "kind": "might", "n": "Hold it by the horns", "needs": [["lv", 72], ["temper", 8]], "boon": {},
+				"desc": "Early Hollow Vessel in the making and a sword tempered eight times: strength to take a thing the weight of a barn by the horns and stand there until it stops being frightened.",
+				"line": "Lin Feng sheathes his sword, walks in under the horns, and takes hold."},
+		]},
+	"white_rat": {"might": [2.4, 1.3],
+		"why": "The Rat of the Bottomless Cave has a gold nose, white hair and three hundred years of cultivation, and kept a tablet to her adopted father in her parlour. The casters of Tushan dug through her ceiling after ore. She has their forty miners, their lamps, and a grievance about plaster.",
+		"paths": [
+			{"id": "delve", "kind": "delve", "n": "A guest who knows the way in", "needs": [["delved", 3]], "boon": {"foe_hp": 0.7, "taken": 0.85},
+				"desc": "Three caves gone to the very back of. She has had forty men drop through her roof. Somebody who comes down the shaft a rung at a time, wipes his feet, and remarks on the dripstone is another matter, and will be heard out before anything is thrown.",
+				"line": "Lin Feng comes down the last of the rope, wipes his boots on the rock, and says what a fine hall it is. The White-Haired Rat's whiskers go forward."},
+			{"id": "hearth", "kind": "hearth", "n": "Whose soup is it", "needs": [["hearths", 6]], "boon": {"assist": 0.04, "foe_hp": 0.8},
+				"desc": "All six hearths of the land call you a guest. She fed her prisoners, which makes them guests, which makes her a hostess, which has rules. You know the rules of six tables by now, and exactly what a hostess owes somebody who has eaten at hers.",
+				"line": "Lin Feng takes a bowl from the nearest miner, tastes it, and thanks her for it by name. The forty men of Tushan, catching on, all do the same."},
+			{"id": "might", "kind": "might", "n": "Faster than a rat", "needs": [["lv", 73], ["temper", 8]], "boon": {},
+				"desc": "Middle Hollow Vessel in the making and a sword tempered eight times: quick enough for a creature that has never once been where the blow landed.",
+				"line": "Lin Feng draws. The White-Haired Rat sighs, as a lady sighs who had hoped for conversation."},
+		]},
+	"wangliang": {"might": [2.5, 1.3],
+		"why": "Penumbra asked Shadow why it had no will of its own, and Shadow said it waited on something, which waited on something else. The asker is Wangliang: the edge of a shadow, in the deepest hall of a cave that kept every word ever shouted into it. It is so full of other people's voices that it has not heard its own in a thousand years.",
+		"paths": [
+			{"id": "heart", "kind": "heart", "n": "One voice it has not got", "needs": [["heart", 3]], "boon": {"assist": 0.04, "foe_atk": 0.85},
+				"desc": "Lin Feng and Yue Ling are kindred spirits at least. She was woven; nobody ever shouted her name into a cave before she had one. She will stand in front of it and say something that is not an echo of anything, and it will have to stop and listen.",
+				"line": "Yue Ling walks out into the middle of the hall and sings one line, of a song she is making up as she goes. For the first time in a thousand years, nothing answers."},
+			{"id": "craft", "kind": "craft", "n": "A light that does not flicker", "needs": [["item", "pine_torch", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Smith Tie can make Xu Xiake's own torch: pine heartwood, wire and essence, six hours without a waver. A penumbra is the part of a shadow where the light is not sure. Give it a light that is sure.",
+				"line": "Lin Feng holds the torch up at arm's length, and its flame stands as still as a painted one, and the grey edge on the wall draws in, and in, and is a line."},
+			{"id": "delve", "kind": "delve", "n": "Count the paces", "needs": [["delved", 4]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Four caves gone to the very back of. You know by now that a cave has an end, however it sounds. So does a voice. Count your paces aloud, as the traveller does, and do not stop counting whatever answers.",
+				"line": "Lin Feng walks towards it counting, four hundred and seven, four hundred and eight, and the echoes, having nothing of his to give back but numbers, fall into step."},
+			{"id": "might", "kind": "might", "n": "Cut the edge from the shadow", "needs": [["lv", 73], ["temper", 8]], "boon": {},
+				"desc": "Middle Hollow Vessel in the making and a sword tempered eight times: an edge fine enough to pass between a shadow and its own border.",
+				"line": "Lin Feng draws, and for a moment there are two shadows on the wall with nothing to cast them."},
+		]},
+	"xuanpin": {"might": [2.6, 1.3],
+		"why": "The valley spirit never dies; it is called the dark female. She is what is in a hollow when nothing is: the use of the jar, the room, the well. The land has filled its hollow places one at a time, all meaning well, and she has gone down to the last of them and taken the water with her. She is not angry. That is the difficulty.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "What everything leans on", "needs": [["item", "borrowed_shadow", 1]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "The shadow's shadow that Wangliang left. Held up, it shows what a thing depends on: the penumbra on the shadow, the shadow on the body. Hold it up to a land. Every village, wheel and furnace in it is leaning on a place where there is nothing. She asked to be shown you know what she is for.",
+				"line": "Lin Feng unfolds the grey edge and holds it up, and on the black water, behind the picture of every lit window in the land, there is a second, fainter outline: the well under it."},
+			{"id": "delve", "kind": "delve", "n": "Somebody who came to see", "needs": [["delved", 6]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Six caves gone to the very back of, for no better reason than to know how far in they went. She has been dug into, tipped into, walled up and drawn from. Nobody has come down merely to look, and written it down the same night, since a man from Jiangyin with a pine torch.",
+				"line": "Lin Feng takes out Xu Xiake's little book and reads her the six entries, paces and all. Xuanpin listens to the end. 'He counted the drips,' she says."},
+			{"id": "works", "kind": "works", "n": "A maker of vessels", "needs": [["works", "", 8]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Eight works built with your own hands. Whoever has made a kiln, a furnace or a bellows has made a hollow on purpose and knows it is the hollow that does the work. Say so, as a maker, to the one it is true of.",
+				"line": "Lin Feng holds up his hands. 'A furnace is a hole with a wall round it,' he says. 'I built one. I should have known you then.'"},
+			{"id": "might", "kind": "might", "n": "Draw the water by force", "needs": [["lv", 74], ["temper", 8]], "boon": {},
+				"desc": "Late Hollow Vessel in the making and a sword tempered eight times. She said: take it from me, if you can. It can be done. She also said what would happen to it afterwards.",
+				"line": "Lin Feng steps out on to the black water, and it bears him, and he draws."},
+		]},
 	# ---- Part XVIII (the New Fire release): the Lord of the Southern Fire, and the fire nobody sat up with
 	"zhurong": {"might": [2.3, 1.3],
 		"why": "Zhurong has opened every summer for ten thousand years by giving the land new fire from Suiren's drill, to hearths put out to receive it. Lin Feng has come with six that would not be put out, and asks him to bless the pot.",
@@ -1146,6 +1211,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 			# the Hundred Works release: works built (works.gd), of any school (""), of one, or of the
 			# school most built ("best")
 			return works_n(g, str(n[1])) >= int(n[2])
+		"delved":
+			# the Hollow Hills release: caves gone to the very back of (caves.gd)
+			return g.delved.size() >= int(n[1])
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1217,6 +1285,8 @@ static func need_text(n: Array, g) -> String:
 		"works":
 			var what := "works built" if str(n[1]) == "" else ("works of one school" if str(n[1]) == "best" else "works of %s" % str(Works.SCHOOLS[n[1]].n))
 			return "%d %s with your own hands (now %d; Esc > Works)" % [int(n[2]), what, works_n(g, str(n[1]))]
+		"delved":
+			return "%d caves gone to the very back of (now %d; a cave mouth stands in almost every region)" % [int(n[1]), g.delved.size()]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1316,7 +1386,7 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	# (the roads added since had none, and the ending's title read a key that was not there: a player who
 	# went through most trials side by side or by the people had a script error for a title)
 	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire",
-	"works": "Whose Hands Made It"}
+	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))
