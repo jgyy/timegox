@@ -325,6 +325,11 @@ const CROSSROADS := {
 			"leave": [["Wu Gang, Woodcutter of the Moon", "Yes. Let the tree have it. Three thousand years it has been trying to swallow that axe a little at a time. It has earned it."]],
 		},
 		"echo": {
+			# Part XX (the Hollow Hills release)
+			"s_p20_wang": {
+				"give": [["Lin Feng", "Wang Zhi. There is an axe among the woodcutters of the valley that came down from the moon; it has felled one tree for ten thousand years and never dulled. I gave it to them myself. I think they would lend it to a man who has waited as long as the tree."]],
+				"leave": [["Lin Feng", "I knew a man once who chopped at one tree for ten thousand years, and I left him his axe, because the chopping was all he had. You have a better thing than he has, Wang Zhi. You can stop."]],
+			},
 			"s_p16_home": {
 				"give": [["Elder Qing Xuan", "The woodcutters ask me to tell you the Moon Axe has gone round every house in Qingshi twice this winter, and there is firewood stacked to the eaves. They have cut nothing they did not need. I asked. They looked at me as if I were simple."]],
 				"leave": [["Elder Qing Xuan", "It has been a hard winter for firewood in Qingshi. The woodcutters broke four axe-heads on the frozen oak. They say nothing, but I think they have heard there was once an axe that would not have broken."]],
@@ -351,6 +356,11 @@ const CROSSROADS := {
 			"keep": [["Narrator", "The founders lower the great lid back over the ninth cauldron, all six of them on the chain, and the map goes into the dark it has been in since Yu."], ["Yue Ling", "Some things are safer as a secret. ...I only wish safe and useful were the same thing more often."]],
 		},
 		"echo": {
+			# Part XX (the Hollow Hills release)
+			"done:s_p20_rubbings": {
+				"copy": [["Yue Ling", "Rubbings. Like the ones you had taken from the Nine Cauldrons for every town in the land. He will not need his hand held about paper going where it is wanted."]],
+				"keep": [["Yue Ling", "Rubbings. You would not let them take any from the Nine Cauldrons, do you remember? You said some things should be gone to. I think he would agree with you, and then take one anyway."]],
+			},
 			"s_p13_home": {
 				"copy": [["Elder Qing Xuan", "One thing in our favour. Every town in the land has Yu's map on its wall now, thanks to you, and so every town knows where the Eight Gates have opened and which road is still clear. The news is three days ahead of the war."]],
 				"keep": [["Elder Qing Xuan", "The Gates have opened in eight places, and no town knows where the other seven are. There is one map that would show them, and it is under a bronze lid at Tushan, where you and the founders agreed it should stay."]],
@@ -404,6 +414,12 @@ const CROSSROADS := {
 			"down": [["Farmer Lao", "Down. After a month of white rice by noon. ...No, you are right. My father ground by hand and so did his. I only wish I had never found out how long it took."], ["Narrator", "It takes the whole village until dawn. The wheel comes out of the race in eight pieces and is stacked against the mill wall, where it looks like nothing but good timber."]],
 		},
 		"echo": {
+			# Part XX (the Hollow Hills release)
+			"s_p20_home": {
+				"run": [["Elder Qing Xuan", "And the wheel at Qingshi has not stopped since the day you said it need not. I do not blame it for the wells. I only notice that a thing which never rests wants feeding, and that what it is fed is dug."]],
+				"hours": [["Elder Qing Xuan", "The wheels stand at night, as you settled it, and I had thought that was the end of the matter. But a wheel that rests still eats by day, and what it eats is dug. We gave the machines hours. We forgot to give the spades any."]],
+				"down": [["Elder Qing Xuan", "You had the wheel at Qingshi taken down, and I thought the valley would dig less for it. It digs more: they pound by hand again, and want new pestles, new mortars, a new kiln to fire them. It was never the wheel, Lin Feng. It is us."]],
+			},
 			"s_p19_tushan": {
 				"run": [["Auntie Rong of the Smelting Pits", "And you told Qingshi to let theirs run all night, I hear. So you will not be telling me to stop mine. Good. Then tell me instead why my founders have forgotten how to sit down."]],
 				"hours": [["Auntie Rong of the Smelting Pits", "I hear Qingshi shuts its wheel at dusk now, by hand, on your say. Hm. Mine have no gate. Nobody thought a hammer would need to be told when to go to bed."]],
@@ -437,6 +453,12 @@ const CROSSROADS := {
 			"still": [["Narrator", "It comes out in Lin Feng's two hands, still ticking, and then, piece by piece, not. The Player's painted eyes stay open. They are very well painted."], ["Yue Ling", "..."], ["Yue Ling", "I know why. I know every reason why. Do not ask me to talk about it tonight."]],
 		},
 		"echo": {
+			# Part XX (the Hollow Hills release)
+			"pre:xuanpin": {
+				"keep": [["Yue Ling", "Lin Feng. The Player had a hollow in its chest where a heart was meant to go, and it filled it itself, and you said: keep it. I thought that was the whole of the lesson. I think she is the other half. Some hollows are not waiting for anything."]],
+				"maker": [["Yue Ling", "You told the Player its heart was for its maker to say. Who made her? Nobody. There is nobody to send her to. This time it really is ours to answer."]],
+				"still": [["Yue Ling", "You took the heart out of the Player and left it hollow, and I did not speak to you for a day. I have been wrong about that for a month and I only now see how. Look at her. That is what a hollow is, when it is let be."]],
+			},
 			"pre:jixin": {
 				"keep": [["Narrator", "At the edge of the firelight a slight lacquered figure has come up the hill by itself, and stands with one hand flat on its own chest, listening, as the great thing in the pit turns towards it."]],
 				"maker": [["Narrator", "Yan Shi has come up the hill behind them, an old man out of breath, with the Player carrying his tool-roll and steadying him by the elbow."]],
@@ -469,6 +491,13 @@ const CROSSROADS := {
 			"ask": [["The Gardener of Hanyin", "Me? I carry a pitcher. I have never built so much as a gate. ...Sit down, all of you. If I am to talk to carpenters I shall want tea, and it will take as long as it takes."], ["Narrator", "They are still talking when the moon comes up: a gardener, a carpenter, a man in straw sandals and five tired makers, and nobody has yet agreed with anybody."]],
 		},
 		"echo": {
+			# Part XX (the Hollow Hills release)
+			"s_p20_tushan": {
+				"hand": [["Auntie Rong of the Smelting Pits", "You told us: nothing by machine that we cannot still do by hand. So I had them sink this shaft by hand, to remember how. They remembered the digging. Nobody remembered the shoring. That part was always the old men's, and I did not think to ask one."]],
+				"wheel": [["Auntie Rong of the Smelting Pits", "A keeper, a gate and hours, you said, for every engine. There is a keeper on every hammer in this town with her name on it. Nobody put a name on the mine. A hole is not an engine, we thought. Well. It has been working day and night without a gate, like the worst of them."]],
+				"dao": [["Auntie Rong of the Smelting Pits", "Follow, do not cut: you had us all saying it. And the casters follow the bronze now, I will give you that. But down there they were not following the seam. They were chasing it. I know the difference in a man's back from across a yard, and I said nothing, because the ore was good."]],
+				"ask": [["Auntie Rong of the Smelting Pits", "Nine days the makers argued with that old gardener, and do you know the one thing he said that nobody wrote down? He asked where it all came from. The bronze. Nobody answered him. We thought it was a gardener's question."]],
+			},
 			"s_p19_silk": {
 				"hand": [["Silk Farmer Can Niang", "The hand first, they tell me you said. Then you have spoken for every woman who ever threw a shuttle, whether you knew it or not. I shall weave you a sash. By hand. It will take a month and you will wait for it."]],
 				"wheel": [["Silk Farmer Can Niang", "A keeper, a gate and hours. Well, a loom has always had a keeper: she is sitting at it. It is only that nobody ever wrote her name on the beam. I shall write mine tonight."]],
@@ -490,9 +519,101 @@ const CROSSROADS := {
 		},
 		"end": {"hand": "The land keeps its machines as helpers to people who do not need them, and every founder blows a pit by lung once a year.", "wheel": "Every engine in the land has a keeper with a name, a gate that shuts, and hours.",
 			"dao": "The makers of the land are taught to follow and not to cut, and their tools take nothing from them.", "ask": "The makers and the Gardener of Hanyin are still arguing about machines, and have never enjoyed anything so much."}},
+	# ---- Part XX (the Hollow Hills release): what an empty place is for, asked three times
+	"the_mountain": {"step": "s_p20_fen", "part": "XX", "n": "Yu Gong's mountains",
+		"ask": "The Lamb of the Earth is asleep again in its round room, and Yu Gong has stopped the whole line of baskets to hear you. Two mountains stand between his door and the south road. He has ninety years, sons without end, and half the valley's afternoons. What would you do, if they were yours?",
+		"options": [
+			{"id": "road", "label": "Cut a road through, and leave the mountain", "tilt": {"reach": 3, "craft": 1},
+				"desc": "He never wanted the mountains gone; he wanted to stop going round them. A tunnel the width of a cart is a hollow made on purpose and kept open by everybody who uses it. Dig that, and carry what comes out all the way to the sea.",
+				"log": "Told Yu Gong to cut a road through his mountains, and leave them standing."},
+			{"id": "dig", "label": "Dig on. You said you would", "tilt": {"craft": 2, "heart": -1}, "gain": {"renown": 4},
+				"desc": "He gave his word to two mountains in front of his whole family, and a thing done every day by people who do not stop is done. Let him finish. But every basket goes to the sea of Bo again, a year there and back, and never into a hole (renown).",
+				"log": "Told Yu Gong to dig on, and carry every basket to the sea."},
+			{"id": "leave", "label": "Leave them. Somebody lives there", "tilt": {"craft": -2, "heart": 2},
+				"desc": "There was a room in the mountain and something asleep in it, and seven hundred li of hill he has never seen the inside of. Put the baskets down. A man of ninety may go round a mountain a few more times.",
+				"log": "Asked Yu Gong to leave his mountains where they are."},
+		],
+		"after": {
+			"road": [["Yu Gong, the Foolish Old Man", "A hole through it. The size of a cart. ...Ninety years, and I was trying to take away the whole of a thing when all I wanted was a piece of nothing in the middle of it. Do not tell the man at the river bend. No. Tell him. He has waited long enough to be right about something."]],
+			"dig": [["Yu Gong, the Foolish Old Man", "To the sea of Bo. Every basket. A year there and back, as my grandfather did it. Yes. I let them hurry me, and it was my own mountain. We dig on, lads! And the first one I catch tipping into a swallow-hole carries double."]],
+			"leave": [["Yu Gong, the Foolish Old Man", "Put them down. Put the baskets down. ...I never thought to hear myself say it. It is very quiet, is it not, with nobody walking. I shall have to have the gatepost recarved. I do not know what to. Give me a day or two."]],
+		},
+		"echo": {
+			"s_p20_gong2": {
+				"road": [["Yu Gong, the Foolish Old Man", "The heading is forty paces in already. We found two more rooms and went round both, and my eldest knocked first each time. He says it is manners. I say it is sense. We are both pleased."]],
+				"dig": [["Yu Gong, the Foolish Old Man", "The first baskets will be at the sea by midsummer. It is slow. It was always meant to be slow; that was the part the story was about, and I was the one who forgot it."]],
+				"leave": [["Yu Gong, the Foolish Old Man", "I had the gatepost recarved. It says: Yu Gong, who went round. The children think it is very dull. I walked round the west mountain yesterday, the long way, and saw a valley I had not known was there."]],
+			},
+		},
+		"end": {"road": "Yu Gong's grandsons walk to the south road through a tunnel a cart wide, and the two mountains stand where they stood.", "dig": "Yu Gong digs on, and every basket of his mountains goes to the sea of Bo, a year there and back.",
+			"leave": "Yu Gong's gatepost reads: who went round. He has seen three valleys he did not know were there."}},
+	"the_echoes": {"step": "s_p20_wangliang", "part": "XX", "n": "The ten thousand echoes",
+		"ask": "The Penumbra is folded in your hand, and the Cave of Ten Thousand Echoes is filling again, gently, with every word that was ever shouted into it: names, prices, songs, a mother calling a child in. Each of them was somebody. Xu Xiake says he only measures. What is to be done with them?",
+		"options": [
+			{"id": "home", "label": "Let them go home", "tilt": {"heart": 3, "reach": 1},
+				"desc": "Stand in the mouth of the cave and let them out, a voice at a time, into the wind over the karst. A word that has waited a hundred years to be heard should be heard by somebody, even if it is only a fisherman who hears his father call him in to supper.",
+				"log": "Let the ten thousand echoes out of the cave, to go home."},
+			{"id": "keep", "label": "Let the cave keep them", "tilt": {"reach": -2, "heart": 1},
+				"desc": "This is what the cave is for. It has kept them safe longer than any family keeps a name. Clear the passages so that it has room again, ask the karst folk to shout a little less, and leave ten thousand voices where they were put.",
+				"log": "Left the ten thousand echoes in the keeping of their cave."},
+			{"id": "write", "label": "Write them down", "tilt": {"craft": 2, "reach": 2}, "gain": {"renown": 5},
+				"desc": "A traveller with a brush is sitting right there. Let Xu Xiake stay a season and write down every one that will say itself slowly enough, and send the book to the Scripture Library. A cave you did not write down, you did not go into (renown).",
+				"log": "Set Xu Xiake to write down the ten thousand echoes."},
+		],
+		"after": {
+			"home": [["Narrator", "They go out past him like swallows at dusk, each one saying itself once. Down on the shingle, an old man with a cormorant on his arm puts down his pole, and turns his head, and answers."], ["Yue Ling", "He said: coming. Lin Feng. He said: coming, Father."]],
+			"keep": [["Xu Xiake the Traveller", "Leave them. Yes. I have taken a rubbing off every wall I ever found, and never once thought the wall might prefer to keep it. I shall mark this one on my map with a circle, which means: go in quietly."]],
+			"write": [["Xu Xiake the Traveller", "All of them? Ten thousand? ...I have paper for four hundred. Fisherman! Have you a boy who can run to Longmen for paper? And ink. And a lamp. And tell my wife, if anyone is going as far as Jiangyin, that it will be the spring after next."]],
+		},
+		"echo": {
+			"done:s_p20_delve": {
+				"home": [["Xu Xiake the Traveller", "It echoes again, the big one. I went back to hear. You shout your name and it gives you your name, an afternoon long, and nothing else. I had not known how much I wanted that."]],
+				"keep": [["Xu Xiake the Traveller", "The karst folk have put a rope across the big mouth with red rags on it, and they take their hats off going past. It is the best-kept cave in the land now, and nobody goes into it at all. I am trying to decide how I feel."]],
+				"write": [["Xu Xiake the Traveller", "Six hundred and twelve so far. The boy holds the lamp and I write. Most of them are people calling other people to come and eat. I have begun to think that is what most of everything is."]],
+			},
+			"pre:xuanpin": {
+				"home": [["Xuanpin, the Valley Spirit", "You let the voices out of the cave in the karst. I felt it empty. It was the first room in the land to be given back to me in a year, and you did it only to be kind to them. You did not know I was in it."]],
+				"keep": [["Xuanpin, the Valley Spirit", "You left the voices in the cave in the karst, and cleared it so they had room. That was nearly right. A full thing given room is not an empty thing. But it was nearer than anybody else has come."]],
+				"write": [["Xuanpin, the Valley Spirit", "You are having the voices in the karst cave written down, one by one, so that the cave may be emptied without anything being lost. It is a maker's answer. I do not despise it. It is how a jar would be emptied by somebody who loved the wine."]],
+			},
+		},
+		"end": {"home": "The Cave of Ten Thousand Echoes gives back one voice at a time again, and an old fisherman of the karst heard his father call him in.", "keep": "The karst folk take their hats off passing the Cave of Ten Thousand Echoes, where every voice is still kept.",
+			"write": "Xu Xiake's Book of Ten Thousand Echoes is in the Scripture Library; most of it is people calling each other to come and eat."}},
+	"the_hollow": {"step": "s_p20_spirit", "part": "XX", "n": "The Hollow of the Mountain",
+		"ask": "The Valley Spirit has gone back up into the wells and caves of the land, and left you the hall she waited in: a hollow under Azure Cloud Mountain larger than the sect that stands on it, dry now, dark, and perfectly still. It is the biggest empty place in the world. She said: say what it is to be.",
+		"options": [
+			{"id": "empty", "label": "Nothing. Shut the door and leave it", "tilt": {"craft": -3, "reach": -1},
+				"desc": "It is to be empty. That is the whole of what it is for. Wall up the shaft beside the weiqi board with one loose stone, tell the Elder and nobody else, and let there be one place in the land that is not for anything.",
+				"log": "Left the Hollow of the Mountain empty, and shut the door."},
+			{"id": "open", "label": "A place anybody may come and be quiet in", "tilt": {"reach": 2, "heart": 2},
+				"desc": "Cut the steps wider, hang one lamp at the bottom, and let it be known in six towns that under the mountain there is a hall where nobody will ask you for anything. Bring nothing down. Take nothing up. Wang Zhi can keep the door; he is used to waiting.",
+				"log": "Opened the Hollow of the Mountain to anybody who needs a quiet place."},
+			{"id": "cistern", "label": "A cistern for the land's dry years", "tilt": {"craft": 3, "heart": -1}, "gain": {"renown": 5},
+				"desc": "A hollow that size, under the highest ground in the province, with a channel cut to each of six towns: the land need never have a dry autumn again. Gongshu Ban would have it lined by the spring. It would be full, of course. That is what a cistern is (renown).",
+				"log": "Gave the Hollow of the Mountain to the land for a cistern."},
+		],
+		"after": {
+			"empty": [["Yue Ling", "Nothing. You, who cannot pass a leaf on a step. ...Yes. Shut it. I will help you carry the stone. And then I want you to promise me you will never, ever go down to see whether it needs sweeping."], ["Lin Feng", "I promise. It is going to be very hard."]],
+			"open": [["Wang Zhi the Woodcutter", "Keep a door, and let folk in to sit and do nothing? I have had some practice at sitting and doing nothing, I am told. Four hundred years of it. I will do it. I had rather keep a door than have nowhere to go through one."]],
+			"cistern": [["Yue Ling", "It is a good answer. The towns will bless you. ...It will be full, Lin Feng. She gave you the one empty place and you have thought of something to put in it. No, I am not angry. I only wanted somebody to have said it."]],
+		},
+		"echo": {
+			"s_p20_end": {
+				"empty": [["Elder Qing Xuan", "And you have shut it, and left it empty, and told only me. I shall tell my successor on my deathbed, and he will think I am wandering. Good. It is the only secret this sect has that is worth keeping, and it is the secret that there is nothing there."]],
+				"open": [["Elder Qing Xuan", "And it is to be open: a hall to be quiet in, for anybody. There were eleven people on the steps this morning, Lin Feng, from four towns. A founder. A woman with a baby. They went down, and came up an hour later, and not one of them could tell me what they had done."]],
+				"cistern": [["Elder Qing Xuan", "And it is to be a cistern. Ban was here before breakfast with an ink-line. It is wise; I cannot fault it; the land will drink for a thousand years. I only find that I keep walking over to the well-head and listening, as if there were something I had meant to ask it first."]],
+			},
+			"post:s_break25": {
+				"empty": [["Narrator", "And under the well-head, under the courtyard, under the whole weight of the mountain, there is a great dark room with nothing in it, and the door shut; and it holds the sect up as a breath holds up a singer."]],
+				"open": [["Narrator", "And far below them a lamp is burning at the foot of a stair, and a woodcutter is asleep beside it with his new axe across his knees, and somebody from a town three days off is sitting in the dark beyond the light, not doing anything at all."]],
+				"cistern": [["Narrator", "And far below them the water of six towns lies in the dark, deep and still and safe, lined with Gongshu Ban's best stone; and it is hard to say, from the well-head, whether what one hears down there is fullness or only the place where an emptiness was."]],
+			},
+		},
+		"end": {"empty": "Under Azure Cloud Mountain there is a hall larger than the sect, with nothing in it, and the door shut.", "open": "Anybody may go down under Azure Cloud Mountain and be quiet; Wang Zhi the woodcutter keeps the door.",
+			"cistern": "The Hollow of the Mountain is the cistern of six towns, and the land has not had a dry autumn since."}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
-	"the_wheel", "the_player", "the_works"]
+	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

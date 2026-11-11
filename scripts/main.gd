@@ -227,7 +227,8 @@ func _done_scene() -> void:
 	if Game.done_pending.is_empty() or top_name() != "world" or not world.using.is_empty() or world.traveling() or world.ambush_t >= 0.0:
 		return
 	var sid: String = str(Game.done_pending.pop_front())
-	say(Data.DIALOGUE.get("done:" + sid, []))
+	# (with what the crossroads behind it add: echoes.gd)
+	say(Echoes.told(Game, "done:" + sid, Data.DIALOGUE.get("done:" + sid, [])))
 
 func say(lines: Array, cb: Callable = Callable()) -> void:
 	# an empty conversation used to push an empty dialogue box that Enter could never close
@@ -440,6 +441,11 @@ func end_prologue() -> void:
 func origin_lines(key: String) -> Array:
 	return Fashion.ORIGIN_LINES.get(key, {}).get(str(Game.hero.get("origin", "foundling")), []).duplicate()
 
+## The stage a battle is fought on: the region's own, or under the ground (in a cave, caves.gd) the
+## cavern country's.
+func battle_theme() -> String:
+	return "ninesprings" if world.is_cave() else world.theme_name
+
 func interact(e: Dictionary) -> void:
 	match e.kind:
 		"npc":
@@ -463,6 +469,10 @@ func interact(e: Dictionary) -> void:
 				# a cache of spirit stones somebody hid upstairs or in a cellar
 				Game.stones += int(e.get("n", 0))
 				Game.toast("Found a cache of %d spirit stones" % int(e.get("n", 0)))
+				# the Hollow Hills release: what is left at the very back of a cave (caves.gd): he has been
+				# all the way in
+				if str(e.id).begins_with("cave_cache:") and world.is_cave():
+					Game.delve(str(world.layer), str(world.wd.bld_n))
 			else:
 				Game.add_item(e.item)
 				Game.toast("Obtained %s" % Data.ITEMS[e.item].n)
@@ -708,7 +718,7 @@ func fate_battle(sid: String, o: Dictionary) -> void:
 	for f in o.battle:
 		foes.append({"id": str(f[0]), "lv": int(f[1])})
 		boss = boss or Data.ENEMIES[str(f[0])].get("boss", false)
-	battle.start(foes, {"boss": boss, "fate": sid, "fate_opt": o, "theme": world.theme_name})
+	battle.start(foes, {"boss": boss, "fate": sid, "fate_opt": o, "theme": battle_theme()})
 	push("battle")
 
 ## The fight of a chapter is won: its follow-up choice, if it has one, or the end of the chapter.
@@ -867,7 +877,7 @@ func memory_scene(e: Dictionary) -> void:
 		if foes.is_empty():
 			_memory_won(mid)
 			return
-		battle.start(foes, {"boss": false, "memory": mid, "theme": world.theme_name})
+		battle.start(foes, {"boss": false, "memory": mid, "theme": battle_theme()})
 		push("battle")
 	)
 
@@ -1065,7 +1075,7 @@ func open_abode(e: Dictionary) -> void:
 func start_encounter(e: Dictionary, ambush: bool = false) -> void:
 	# (`ambush`: the pack was struck first in the land, impact.gd, and opens the battle reeling)
 	# (and the hour it was met at decides what it was doing: asleep, hunting, resting, habits.gd)
-	battle.start(e.group, {"entity": e, "boss": false, "theme": world.theme_name, "ambush": ambush, "habit": Habits.act_of_group(Game, e.group)})
+	battle.start(e.group, {"entity": e, "boss": false, "theme": battle_theme(), "ambush": ambush, "habit": Habits.act_of_group(Game, e.group)})
 	push("battle")
 
 func boss_interact(e: Dictionary) -> void:
@@ -1104,7 +1114,7 @@ func boss_interact(e: Dictionary) -> void:
 			# a grudge does not listen until it has spent itself: it fights as hard as a trial's boss
 			foe["mult"] = float(Grudges.MIGHT[0])
 			foe["atk"] = float(Grudges.MIGHT[1])
-		battle.start([foe], {"entity": e, "boss": true, "enemy": e.enemy, "theme": world.theme_name})
+		battle.start([foe], {"entity": e, "boss": true, "enemy": e.enemy, "theme": battle_theme()})
 		push("battle")
 	)
 
@@ -1152,7 +1162,7 @@ func trial_battle(e: Dictionary, p: Dictionary) -> void:
 	elif tid == "nie":
 		# every grudge left to the Wheel feeds Nie, every one laid to rest takes something off it (grudges.gd)
 		bn["foe_hp"] = float(bn.get("foe_hp", 1.0)) * Grudges.nie_mult(Game)
-	battle.start([{"id": tid, "lv": e.lv, "mult": mt[0], "atk": mt[1]}], {"entity": e, "boss": true, "enemy": tid, "theme": world.theme_name,
+	battle.start([{"id": tid, "lv": e.lv, "mult": mt[0], "atk": mt[1]}], {"entity": e, "boss": true, "enemy": tid, "theme": battle_theme(),
 		"trial": tid, "path": str(p.id), "boon": bn, "path_n": str(p.n), "path_kind": str(Trials.KINDS[p.kind].n)})
 	push("battle")
 
@@ -1173,7 +1183,8 @@ func start_breakthrough() -> void:
 ## The breakthroughs that close a chapter and the dialogue that brings Lin Feng home after them.
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
-	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17"}
+	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
+	"s_break24": "recall18"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

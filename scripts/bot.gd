@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 26.0 * 3600.0
+var max_time := 28.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -86,6 +86,11 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"cloud_ladder": "craft", "the_player": "heart", "jixin": "works",
 	# and the stopped escapement the Machine Heart left, held up to the Wooden Magpie
 	"wooden_magpie": "relic",
+	# Part XX: a clay bell from the alchemist for the Lamb of the Earth; the caves it has gone to the back
+	# of (three by then) for the White-Haired Rat, who hears out a guest who knows the way in; Yue Ling's
+	# one voice that is not an echo for the Penumbra; and the shadow's shadow it left, held up to the
+	# Valley Spirit
+	"fen_yang": "craft", "white_rat": "delve", "wangliang": "heart", "xuanpin": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -111,7 +116,9 @@ const PICK_PLAN := {"qilin": "ride"}
 ## wheel's answer, as a builder of engines, if it has built three of them.
 const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatch"], "palace": ["open"], "dragon_boon": ["sea"], "drawings": ["keep"], "nineteen": ["wind"],
 	"ancestor": ["strike"], "widow": ["truth"], "crows": ["pardon"], "axe": ["give"], "cauldron_map": ["copy"], "furnace": ["return"],
-	"the_wheel": ["hours"], "the_player": ["keep"], "the_works": ["wheel", "hand", "dao", "ask"]}
+	"the_wheel": ["hours"], "the_player": ["keep"], "the_works": ["wheel", "hand", "dao", "ask"],
+	# Part XX: a road through Yu Gong's mountains, the echoes let go home, and the Hollow left open
+	"the_mountain": ["road"], "the_echoes": ["home"], "the_hollow": ["open"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -143,7 +150,8 @@ const MEMORY_PLAN := {"mem_lanterns": "two", "mem_flute": "forest", "mem_spring"
 const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feast": "her", "s_p16_sweep": "fear", "s_p16_eve": "with", "s_p16_vigil": "mine", "s_p16_dawn": "us", "s_p16_lanterns": "her", "s_p16_couplets": "together",
 	"s_p17_haircut": "trust", "s_p17_thunder": "us", "s_p17_teacup": "home", "s_p17_graves": "her", "s_p17_kite": "road",
 	"s_p18_drill": "both", "s_p18_feast": "seventh",
-	"s_p19_campfire": "both", "s_p19_rest": "us",}
+	"s_p19_campfire": "both", "s_p19_rest": "us",
+	"s_p20_tea": "room", "s_p20_fire": "live",}
 ## the end of the story the bot chooses (cultures.gd ENDINGS), rarest first, of those its journey earned
 const ENDING_PLAN := ["open", "road", "lotus", "home", "azure"]
 var route := "peoples"
@@ -547,13 +555,23 @@ func _world(d: float) -> void:
 			if not _cult_met():
 				_grind()
 		"collect":
-			if Game.area != s.area or world.layer != Data.layer_of(s.area):
+			if s.has("cave"):
+				# Part XX: the things to find are down in the region's cave (caves.gd): the nearest of them,
+				# by way of the cave mouth
+				_fetch(str(s.item))
+			elif Game.area != s.area or world.layer != Data.layer_of(s.area):
 				# (upstairs or in a cellar of the region: the things to find are out in it, Part XI)
 				_travel(s.area)
 			else:
 				_goto_nearest("pickup", s.item)
 		"hunt":
-			if Game.area != s.area or world.layer != Data.layer_of(s.area):
+			if s.has("cave") and world.layer != Caves.fid(str(s.area), int(s.cave)):
+				# Part XX: a hunt in a cave: down by the cave mouth (and the shaft, for the lower gallery)
+				if _hp_ratio() < 0.6 or _qi_ratio() < 0.3:
+					_start_meditate("rest")
+				else:
+					_goto_layer(Caves.fid(str(s.area), int(s.cave)))
+			elif not s.has("cave") and (Game.area != s.area or world.layer != Data.layer_of(s.area)):
 				_travel(s.area)
 			elif _hp_ratio() < 0.6:
 				_start_meditate("rest")
@@ -626,6 +644,12 @@ func _world(d: float) -> void:
 			# Part XIX: works are built from the menu (1b above builds as soon as one can be); if none
 			# can be yet, there is know-how and there are spirit stones to be had from the wild
 			_grind()
+		"delve":
+			# Part XX: the nearest cave it has not been to the back of (caves.gd)
+			_delve_step()
+		"try":
+			# Part XX: the nearest thing of the cave still to be done (props.gd)
+			_try_step(s)
 		"grudges":
 			# Part XIV: the next of the grudges that stayed (all six, in any order), each a boss
 			var gr := _next_grudge()
@@ -1235,6 +1259,9 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 				# the Hundred Works release: works are built as the plan affords them (WORKS_PLAN); a path
 				# that asks for more than stand is not one to wait for
 				return false
+			"delved":
+				# the Hollow Hills release: caves can be gone to the back of whenever it likes (_delve_step)
+				pass
 			_:
 				return false
 	return true
@@ -1270,10 +1297,65 @@ func _prepare_trial() -> bool:
 				return _fetch(id)
 			"renown":
 				return _deed_step(tt)
+			"delved":
+				# the Hollow Hills release: go to the back of another cave
+				return _delve_step()
 			_:
 				# levels: the quest's own grinding (_cult_target); a Dao: the stele (_planned_dao)
 				return false
 	return false
+
+## Part XX (caves.gd): head for what is left at the very back of the nearest cave the bot has not been
+## to the back of (in this realm; once chosen, that one until it is done).  False if none is left.
+var delve_id := ""
+
+func _delve_step() -> bool:
+	if _hp_ratio() < 0.6 or _qi_ratio() < 0.3:
+		_start_meditate("rest")
+		return true
+	if delve_id != "" and (Game.taken.has(delve_id) or world.locate_ent(delve_id).is_empty()):
+		delve_id = ""
+	if delve_id == "":
+		var realm: String = str(world.wd.parent) if world.is_floor() else str(world.layer)
+		var lw: Dictionary = Atlas.world_of(realm)
+		var me: Vector2i = world.ptile + (Vector2i(world.wd.origin) if world.is_floor() else Vector2i.ZERO)
+		var bd := 1 << 30
+		for fid in lw.floors:
+			var fw: Dictionary = lw.floors[fid]
+			if not fw.get("cave", false) or int(fw.level) != -1 or Game.delved.has(fid):
+				continue
+			# (a cave in a region the journey has been through, before one it has not: the roads there
+			# are known to be open)
+			var mouth: Vector2i = fw.realm_mouth
+			var dd: int = absi(mouth.x - me.x) + absi(mouth.y - me.y) + (0 if Game.seen.has(str(fw.area)) else 100000)
+			if dd < bd:
+				bd = dd
+				delve_id = "cave_cache:%s:-1" % str(fw.area)
+	if delve_id == "":
+		return false
+	_goto_entity(delve_id.get_slice(":", 1), delve_id)
+	return true
+
+## Part XX: do the nearest thing of the step's cave that has not been done for it yet.
+func _try_step(s: Dictionary) -> void:
+	var fid := Caves.fid(str(s.area), int(s.get("cave", -1)))
+	var fw: Dictionary = Atlas.world_of(fid)
+	if fw.is_empty():
+		return
+	var best = null
+	var bd := 1 << 30
+	for e in fw.ents:
+		if e.kind != "prop" or Game.step_uses.has(str(e.prop)):
+			continue
+		if s.has("things") and not str(e.prop) in s.things:
+			continue
+		var dd: int = (absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)) if world.layer == fid else (absi(e.pos.x - int(fw.start.x)) + absi(e.pos.y - int(fw.start.y)))
+		if dd < bd:
+			bd = dd
+			best = e
+	if best == null:
+		return
+	_goto_entity(str(s.area), str(best.id))
 
 ## Make something for a trial: hunt the essences it needs, earn the stones, then take it all to the
 ## alchemist or the smith (the shop crafts it, _shop).
@@ -1967,6 +2049,8 @@ func _finish(reason: String) -> void:
 		"know_how": {"earned": Works.know_earned(Game), "spent": Works.know_spent(Game)}, "maker": Works.title(Game),
 		"crossroads": Game.picks, "scales": {"heart": Echoes.scale(Game, "heart"), "craft": Echoes.scale(Game, "craft"), "reach": Echoes.scale(Game, "reach")},
 		"known_as": Echoes.names(Game), "echoes_heard": Game.echoed.size(),
+		# the Hollow Hills release: the caves gone to the very back of (caves.gd)
+		"caves_delved": Game.delved.keys(),
 		"trials": Game.trials,
 		"gates": Game.gates_open.keys(),
 		"time_by_screen_seconds": breakdown,
@@ -1997,6 +2081,7 @@ func _finish(reason: String) -> void:
 	print("the sword       : %d strikes, %d packs struck first, %d sword qi, %d obstacles cleared" % [Game.strikes, Game.ambushes, Game.waves, Game.cleared.size()])
 	print("works           : %d built (hand %d, wheel %d, art %d): %s; know-how %d earned, %d spent" % [Works.count(Game), Works.count(Game, "hand"), Works.count(Game, "wheel"), Works.count(Game, "dao"), Works.title(Game),
 		Works.know_earned(Game), Works.know_spent(Game)])
+	print("the dark        : %d caves gone to the very back of" % Game.delved.size())
 	print("crossroads      : %d answered, %d echoes heard; mercy %+d, new works %+d, wide world %+d%s" % [Game.picks.size(), Game.echoed.size(), Echoes.scale(Game, "heart"), Echoes.scale(Game, "craft"), Echoes.scale(Game, "reach"),
 		(": " + Echoes.names(Game)) if Echoes.names(Game) != "" else ""])
 	print("the hero        : %s, a young %s, kin %s; guest of %d hearths %s" % [Game.hero_name(), "woman" if Game.fem() else "man", str(Cultures.HEARTHS[Cultures.own(Game)].short), Cultures.guests(Game), JSON.stringify(Game.hearth)])

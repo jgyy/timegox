@@ -29,6 +29,10 @@ var battles := 0
 var deaths := 0
 var meditated := 0.0
 var hunt := 0
+## the Hollow Hills release (caves.gd): the caves Lin Feng has been to the very back of (the id of the
+## cave's floor -> true), and the things of a cave done during the step that asks for them (their kind)
+var delved := {}
+var step_uses := {}
 var timeline: Array = []
 var toasts: Array = []
 ## regions Lin Feng has set foot in (their histories go into the Annals)
@@ -168,6 +172,8 @@ func reset() -> void:
 	deaths = 0
 	meditated = 0.0
 	hunt = 0
+	delved = {}
+	step_uses = {}
 	timeline = []
 	toasts = []
 	seen = {"sect": true}
@@ -525,7 +531,8 @@ func add_exp(x: float) -> bool:
 
 func record_kills(a: String, n: int, ids: Array = []) -> void:
 	var s := cur_step()
-	if not s.is_empty() and s.kind == "hunt" and s.area == a:
+	# (a hunt in a cave, Part XX, counts what is brought down in that cave)
+	if not s.is_empty() and s.kind == "hunt" and s.area == a and (not s.has("cave") or layer == Caves.fid(a, int(s.cave))):
 		# a hunt for particular foes (Part XIII: Chiyou's war-band) counts only those
 		if s.has("of") and not ids.is_empty():
 			n = ids.filter(func(id): return str(id) in s.of).size()
@@ -594,6 +601,7 @@ func advance() -> void:
 			grant_ride(str(rw[1]))
 	step += 1
 	hunt = 0
+	step_uses = {}
 	# a step that asks for visits starts with nobody visited: somebody called on in an earlier chapter
 	# (Smith Tie at the New Year, Auntie Rong with the new fire) is called on again
 	var ns := cur_step()
@@ -650,11 +658,37 @@ func poll_steps() -> void:
 			"works":
 				# Part XIX: so many works built with his own hands, any of them (works.gd)
 				ok = Works.count(self) >= int(s.n)
+			"delve":
+				# Part XX: so many caves gone to the very back of, any of them (caves.gd)
+				ok = delved.size() >= int(s.n)
+			"try":
+				# Part XX: so many of the things of a cave done (props.gd), any of them or those named
+				ok = tried_count(s) >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
 			return # handled explicitly by main after the cutscene
 		advance()
+
+## Part XX: how many of the things a "try" step asks for have been done since it began (any of the
+## things of a cave, or the kinds it names).
+func tried_count(s: Dictionary) -> int:
+	var n := 0
+	for k in step_uses:
+		if (s.has("things") and str(k) in s.things) or (not s.has("things") and CaveThings.KINDS.has(str(k))):
+			n += 1
+	return n
+
+## Part XX: Lin Feng has been to the very back of a cave (he found what was left there): it is
+## remembered, and it is news the first time.
+func delve(fid: String, cave_name: String) -> void:
+	if delved.has(fid):
+		return
+	delved[fid] = true
+	note("Went to the very back of %s" % cave_name)
+	toast("To the back of %s (%d caves)" % [cave_name, delved.size()])
+	add_renown(1)
+	poll_steps()
 
 func objective_text() -> String:
 	# the beginning (cultures.gd): the farewell at the hero's own hearth
@@ -685,6 +719,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(cleared_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "works":
 		t += "  (%d/%d)" % [mini(Works.count(self), int(s.n)), int(s.n)]
+	elif s.kind == "delve":
+		t += "  (%d/%d)" % [mini(delved.size(), int(s.n)), int(s.n)]
+	elif s.kind == "try":
+		t += "  (%d/%d)" % [mini(tried_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":

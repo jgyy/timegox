@@ -54,6 +54,9 @@ const PEOPLE := {
 	# the Hundred Works release (Part XIX): the master of carpenters, the man in straw sandals, the old
 	# gardener who will not use a well-sweep, the artificer of King Mu's court, and the dancer he made
 	"gongshu_ban": "characters/gongshu_ban", "mo_di": "characters/mo_di", "gardener_hanyin": "characters/gardener_hanyin", "yan_shi": "characters/yan_shi", "the_player": "characters/the_player",
+	# the Hollow Hills release (Part XX): the traveller who measures caves, the Foolish Old Man and the Wise
+	# one, the woodcutter of Rotten-Axe Mountain, and the Valley Spirit
+	"xu_xiake": "characters/xu_xiake", "yu_gong": "characters/yu_gong", "zhi_sou": "characters/zhi_sou", "wang_zhi": "characters/wang_zhi", "xuanpin": "characters/xuanpin",
 	"folk_herder": "characters/folk_herder", "folk_herder_f": "characters/folk_herder_f", "folk_oasis_f": "characters/folk_oasis_f",
 	"folk_boatwoman": "characters/folk_boatwoman", "folk_founder": "characters/folk_founder", "folk_lantern_f": "characters/folk_lantern_f",
 	"lin_feng_f": "characters/lin_feng_f", "lin_feng_f_wanderer": "characters/lin_feng_f_wanderer", "lin_feng_f_wild": "characters/lin_feng_f_wild", "lin_feng_f_scholar": "characters/lin_feng_f_scholar",
@@ -516,10 +519,13 @@ static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
 ## does not have (a swordsman's sword) are left out.  Each model's lent clips are made once.
 const LEND := ["sit_bench", "doze", "drink", "strike", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir", "hammer",
 	"sweep", "weave", "lift", "toss", "touch", "play_flute", "dance", "kite", "stargaze", "release", "write", "archery", "push", "gaze",
-	"clap", "sword_dance", "hoe", "chop", "carry", "bang", "call", "eat"]
+	"clap", "sword_dance", "hoe", "chop", "carry", "bang", "call", "eat",
+	# the Hollow Hills release: the new work of the towns and the mines
+	"mine", "dig", "wash", "pound", "spin", "count", "stretch", "pour", "hang", "carve", "pan", "comb", "rock", "knock", "peer", "trace"]
 ## the lent clips that go round and round (the rest are one-shots, played again when they end)
 const LEND_LOOPS := ["sit_bench", "doze", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir", "hammer", "sweep",
-	"weave", "play_flute", "dance", "push", "gaze", "hoe", "chop", "carry", "bang", "eat", "write", "stargaze"]
+	"weave", "play_flute", "dance", "push", "gaze", "hoe", "chop", "carry", "bang", "eat", "write", "stargaze",
+	"mine", "dig", "pound", "spin", "count", "carve", "pan", "comb", "rock"]
 static var _donor_lib: AnimationLibrary = null
 static var _donor_hips := 0.92
 static var _lent := {}

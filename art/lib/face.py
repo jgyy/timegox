@@ -62,7 +62,7 @@ NOSE_Y = -0.05
 MOUTH_Y = -0.078
 CHIN_Y = -RY * LOW
 # every eye's size against what its script asks for (Face.eye_r)
-EYE_K = 0.8
+EYE_K = 0.86   # (0.8 until the Hollow Hills release: every eye a little larger again, about a fourteenth)
 # the lower jaw (Face.skull): how much the face narrows from the cheeks to the chin, and how far the
 # corners of the jaw (the angle of the mandible, below and in front of the ears) stand out
 JAW_TAPER = 0.22
