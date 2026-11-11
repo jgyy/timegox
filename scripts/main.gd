@@ -29,6 +29,10 @@ func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		var kv: PackedStringArray = a.trim_prefix("--").split("=", true, 1)
 		args[kv[0]] = kv[1] if kv.size() > 1 else "1"
+	# on a laptop with a discrete card the game starts again on it (gpu.gd); this copy stops here
+	if Gpu.prefer_discrete(args):
+		get_tree().quit()
+		return
 	world = _make("world")
 	battle = _make("battle")
 	meditate = _make("meditate")
