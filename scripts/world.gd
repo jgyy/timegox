@@ -3149,6 +3149,15 @@ func _draw_hud() -> void:
 	UI.text(self, Vector2(26, 112), "QI %d/%d" % [Game.qi[0], Game.max_qi(0)], 14)
 	UI.bar(self, Rect2(140, 100, 186, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
 	UI.text(self, Vector2(26, 126), "Stones: %d" % Game.stones, 13, UI.C_DIM)
+	# survival (needs.gd): the seven needs, small, under the panel; a low one is red
+	if Game.survival:
+		UI.panel(self, Rect2(12, 144, 330, 30))
+		for ni in Needs.ORDER.size():
+			var nk: String = Needs.ORDER[ni]
+			var nv := Needs.value(Game, nk)
+			var nx := 22.0 + ni * 46.0
+			UI.text(self, Vector2(nx, 164), str(Needs.NEEDS[nk].n).substr(0, 2), 11, UI.C_DIM if nv >= Needs.LOW else UI.C_RED.lightened(0.3))
+			UI.bar(self, Rect2(nx + 17, 156, 22, 7), nv / 100.0, Needs.NEEDS[nk].col if nv >= Needs.LOW else UI.C_RED)
 	# objective: long quest titles (one in eight runs past the panel, up to 770 px of text) used to be
 	# cut off mid-sentence; they now wrap onto a second line in place of the heading
 	UI.panel(self, Rect2(VIEW.x - 520, 12, 508, 58))

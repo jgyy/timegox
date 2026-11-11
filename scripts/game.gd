@@ -183,6 +183,15 @@ var war_orders := {}
 var war_feints := 0
 var war_tries := {}
 var songs_asked := {}
+## survival (needs.gd): whether the body is asked after at all, the seven needs, the water gourd, the
+## clock they were last reckoned at, and how often each has had its way
+var survival := false
+var needs := {}
+var gourd := 0
+var needs_clock := 0.0
+var needs_fell := {}
+## courtship (romance.gd): the stage, the gifts given, the hours had together, and the tone taken
+var romance := {}
 ## Old Du's mat (gamble.gd): the throws so far (every throw is drawn from this count), and how it has gone
 var gamble_n := 0
 var gamble_rounds := 0
@@ -214,6 +223,9 @@ func _process(d: float) -> void:
 			_feat_t = 1.5
 			poll_wardrobe()
 			Feats.poll(self)
+			# (needs.gd: the body follows the land's clock; the night wears comfort faster)
+			if survival and prologue == "":
+				Needs.tick(self, 1.6 if Clock.is_night(Clock.hour(self)) else 1.0)
 
 func reset() -> void:
 	started = true
@@ -335,6 +347,12 @@ func reset() -> void:
 	war_feints = 0
 	war_tries = {}
 	songs_asked = {}
+	survival = false
+	needs = {}
+	gourd = 0
+	needs_clock = 0.0
+	needs_fell = {}
+	romance = {}
 	gamble_n = 0
 	gamble_rounds = 0
 	gamble_wins = 0
@@ -370,20 +388,25 @@ func member_name(i: int) -> String:
 func max_hp(i: int) -> int:
 	# (his origin and outfit build his body only, not Yue Ling's: Fashion.gear)
 	# (and her dress hers: Fashion.yue_gear)
-	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else 1.0 + Fashion.yue_gear(self, "hp")) * Works.mod(self, "hp"))
+	# (and what being promised, or wed, gives her: romance.gd)
+	return int(Data.max_hp(level) * (1.0 if i == 0 else 0.85) * boon("hp", 1.0) * ((1.0 + talent_mod("hp")) * (1.0 + Fashion.gear(self, "hp")) if i == 0 else (1.0 + Fashion.yue_gear(self, "hp")) * Romance.mod(self)) * Works.mod(self, "hp"))
 
 func max_qi(i: int) -> int:
 	# (his origin and his outfit may widen or narrow his dantian: Fashion.gear)
-	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * ((1.0 + talent_mod("qi")) * (1.0 + Fashion.gear(self, "qi")) if i == 0 else 1.0 + Fashion.yue_gear(self, "qi")))
+	# (a body that is parched or filthy holds less: needs.gd; nothing with survival off)
+	return int(Data.max_qi(level) * (1.0 if i == 0 else 1.1) * ((1.0 + talent_mod("qi")) * (1.0 + Fashion.gear(self, "qi")) if i == 0 else 1.0 + Fashion.yue_gear(self, "qi")) * Needs.mod(self, "qi"))
 
 func fighter(i: int) -> Dictionary:
 	var a := float(Data.atk(level)) * (1.0 + 0.12 * temper) * boon("atk", 1.0)
 	if i == 1:
 		a = float(Data.atk(level)) * 0.75 * (1.0 + Fashion.yue_gear(self, "atk"))
+	# (needs.gd: the famished and the worn out strike less hard; 1 with survival off)
+	a *= Needs.mod(self, "atk")
 	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
 	var spd: int = Data.speed(level) + (2 + int(Fashion.yue_gear(self, "spd")) if i == 1 else 0)
 	if i == 0:
 		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd") + Arms.mod(self, "spd", 0.0))
+	spd += int(Needs.mod(self, "spd"))
 	return {
 		"id": "pc%d" % i, "name": member_name(i), "side": "party", "idx": i, "lv": level, "boss": false,
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),

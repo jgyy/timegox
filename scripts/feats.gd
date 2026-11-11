@@ -112,6 +112,12 @@ const FEATS := {
 	"egg_one": {"n": "Nobody Told You To", "kind": "odd", "pts": 5, "test": ["eggs", 1], "desc": "Find something nobody told you to look for."},
 	"egg_six": {"n": "A Habit of Looking", "kind": "odd", "pts": 10, "test": ["eggs", 6], "desc": "Find six such things."},
 	"egg_all": {"n": "The Mapmaker's Friend", "kind": "odd", "pts": 20, "test": ["eggs", 12], "desc": "Find all twelve.", "hide": true},
+	"body_week": {"n": "Seven Needs, Seven Days", "kind": "odd", "pts": 10, "test": ["survived", 7], "desc": "With survival on, see seven days go by and never once let the body have its own way."},
+	"courting": {"n": "Said in a Voice", "kind": "people", "pts": 10, "test": ["romance", 1], "desc": "Say to Yue Ling what there is to say."},
+	"promised": {"n": "In the Book", "kind": "people", "pts": 10, "test": ["romance", 2], "desc": "Exchange tokens with Yue Ling."},
+	"wed": {"n": "Three Bows", "kind": "people", "pts": 20, "test": ["romance", 3], "desc": "One to heaven and earth, one to those who raised you, one to each other."},
+	"gifts_six": {"n": "It Was a Lovely Thought", "kind": "people", "pts": 5, "test": ["gifts", 6], "desc": "Give Yue Ling six things, whether or not she knows what to do with them."},
+	"hours_all": {"n": "Ten Hours", "kind": "people", "pts": 20, "test": ["outings", 10], "desc": "Spend all ten hours with Yue Ling: each has its own place, and its own time of day."},
 	"gamble_first": {"n": "Nine of Ten", "kind": "odd", "pts": 5, "test": ["gamble_rounds", 1], "desc": "Sit down at Old Du's mat in Qingshi, and stake something."},
 	"gamble_ten": {"n": "The Tenth", "kind": "odd", "pts": 10, "test": ["gamble_wins", 10], "desc": "Win ten rounds at Old Du's mat."},
 	"gamble_streak": {"n": "Luck Unpacks", "kind": "odd", "pts": 10, "test": ["gamble_streak", 4], "desc": "Win four rounds running at Old Du's mat."},
@@ -256,6 +262,15 @@ static func value(g, t: Array) -> float:
 			return float(g.yue_outfits.size())
 		"eggs":
 			return float(g.eggs.size())
+		"survived":
+			# (days seen with survival on and nothing given way: nothing once the body has had its way)
+			return float(g.day - int(g.needs.get("since", g.day))) if g.survival and g.needs_fell.is_empty() else 0.0
+		"romance":
+			return float(Romance.stage(g))
+		"gifts":
+			return float(Romance.gifts_given(g))
+		"outings":
+			return float(Romance.outings_had(g))
 		"gamble_rounds":
 			return float(g.gamble_rounds)
 		"gamble_wins":

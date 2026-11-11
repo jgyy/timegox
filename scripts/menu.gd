@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Songs", "Feats", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "songs", "feats", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Songs", "Feats", "The Body", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "songs", "feats", "body", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -40,6 +40,18 @@ func _build() -> void:
 			labels.append(e[1])
 			ids.append(e[0])
 			enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "body":
+		# needs.gd: survival: the seven needs, and what can be done about them here
+		labels = []
+		ids = []
+		enabled = []
+		for a in Needs.actions(Game, main.body_ctx()):
+			labels.append(str(a.label))
+			ids.append("body:" + str(a.id))
+			enabled.append(bool(a.enabled))
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
@@ -117,9 +129,13 @@ func _build() -> void:
 	elif mode == "yue":
 		# the Lotus release (bonds.gd): a heart-to-heart she is waiting to have can be had from here
 		var tid := Bonds.talk_ready(Game)
-		labels = ["Talk with her (T)" if tid != "" else "Nothing to talk about yet", "Back"]
-		ids = ["talk", "back"]
-		enabled = [tid != "", true]
+		# (romance.gd: something to give her, an hour to spend with her, and what there is to say)
+		var ask_id := Romance.next_ask(Game)
+		var here_n: int = Romance.outings_here(Game, main.body_ctx()).size()
+		labels = ["Talk with her (T)" if tid != "" else "Nothing to talk about yet", "Give her something...", "Spend this hour with her (%d here)" % here_n,
+			(str(Romance.ASKS[ask_id].n) + "...") if ask_id != "" else "Nothing left unsaid", "Back"]
+		ids = ["talk", "gift", "outing", "ask", "back"]
+		enabled = [tid != "", Game.companion, Game.companion, ask_id != "" and Romance.ask_blocked(Game, ask_id) == "", true]
 	elif mode == "cultivation":
 		# Part XII: the realm and the branches of the root; an awakening not yet spent can be spent here
 		labels = ["Wake a branch (%d)" % Game.talent_pts, "Back"]
@@ -166,7 +182,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -227,7 +243,16 @@ func press(act: String) -> void:
 					mode = "hearths"
 					cursor = 0
 					_build()
-				"works", "roads", "feats", "songs", "host":
+				"gift":
+					main.pop()
+					main.open_gifts()
+				"outing":
+					main.pop()
+					main.open_outings()
+				"ask":
+					main.pop()
+					main.open_ask()
+				"works", "roads", "feats", "songs", "host", "body":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -260,6 +285,11 @@ func press(act: String) -> void:
 						var wid2 := id.trim_prefix("work:")
 						if Works.build(Game, wid2):
 							msg = "Built: %s." % str(Works.WORKS[wid2].n)
+						_build()
+						return
+					if mode == "body":
+						# survival: do what the line under the cursor says (needs.gd)
+						msg = Needs.act(Game, id.trim_prefix("body:"), main.body_ctx())
 						_build()
 						return
 					if mode == "songs":
@@ -336,6 +366,38 @@ func _draw_bestiary() -> void:
 		UI.wrapped(self, r.position + Vector2(24, ty), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
+
+## The Body (needs.gd): survival, on or off; the seven needs as bars; what low ones cost and what
+## can be done about each here.
+func _draw_body() -> void:
+	UI.text(self, Vector2(60, 70), "The Body", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	if not Needs.on(Game):
+		UI.text(self, r.position + Vector2(24, 44), "Survival is off", 24, UI.C_DIM)
+		UI.wrapped(self, r.position + Vector2(24, 84), "The story as it was first told asks nothing of the stomach. Turned on, Lin Feng and Yue Ling have seven needs that run down by the clock of the land: rest, hunger, thirst, bladder, bowels, comfort and cleanliness. A bed, a meal, a well, a tree to step behind, a fire, a bath. A need that is low costs something in battle; one that reaches nothing takes matters into its own hands. Nobody dies of it, and a cultivator needs less with every realm. It can be turned off again at any time.", 17, UI.C_TEXT, r.size.x - 48)
+		return
+	UI.text(self, r.position + Vector2(24, 40), "Day %d      %s" % [Game.day, Clock.text(Game)], 15, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	var y := r.position.y + 76.0
+	for k in Needs.ORDER:
+		var v := Needs.value(Game, k)
+		var nd: Dictionary = Needs.NEEDS[k]
+		UI.text(self, Vector2(r.position.x + 24, y + 4), str(nd.n), 17, UI.C_TEXT if v >= Needs.LOW else UI.C_RED.lightened(0.3))
+		UI.bar(self, Rect2(r.position.x + 170, y - 9, 380, 12), v / 100.0, nd.col if v >= Needs.LOW else UI.C_RED)
+		UI.text(self, Vector2(r.position.x + 566, y + 4), "%d   %s" % [int(round(v)), str(nd.low) if v < Needs.LOW else str(nd.ok)], 15, UI.C_DIM.lightened(0.3) if v >= Needs.LOW else UI.C_RED.lightened(0.3))
+		y += 34.0
+	UI.text(self, Vector2(r.position.x + 24, y + 12), "The body is %s." % Needs.state(Game), 16, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	UI.text(self, Vector2(r.position.x + 24, y + 36), "A cultivator of this realm needs %d%% of what a mortal does." % int(round(Needs.pace(Game) * 100.0)), 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	var low := Needs.lowest(Game)
+	if Game.companion and Needs.value(Game, low) < 45.0:
+		UI.wrapped(self, Vector2(r.position.x + 24, y + 70), "Yue Ling: \"%s\"" % str(Needs.YUE_LOW[low]), 16, Color("ff9ac0"), r.size.x - 48)
+	# why the line under the cursor cannot be done, or what was just done
+	var acts := Needs.actions(Game, main.body_ctx())
+	if cursor < acts.size() and not bool(acts[cursor].enabled):
+		UI.wrapped(self, Vector2(r.position.x + 24, r.end.y - 96), str(acts[cursor].why), 15, UI.C_DIM.lightened(0.2), r.size.x - 48)
+	if msg != "":
+		UI.wrapped(self, Vector2(r.position.x + 24, r.end.y - 52), UI.named(msg), 16, UI.C_JADE, r.size.x - 48)
 
 ## The Feats page (feats.gd, eggs.gd): what the journey is remembered for, by kind, how far along each
 ## is, and under them the things nobody was told to look for.
@@ -606,7 +668,12 @@ func _draw_yue() -> void:
 			UI.text(self, Vector2(x2 + 300, y2), ("given back" if got else str(menu_place(str(m.area)))), 14, UI.C_JADE if got else UI.C_DIM)
 	else:
 		UI.wrapped(self, Vector2(x2, y2), "Woke beside a lotus pond with her name and nothing else. A healer whose hands remember more than she does.", 16, UI.C_DIM.lightened(0.2), 540)
-	UI.menu_list(self, Rect2(r.position.x + 24, r.end.y - 120, 360, 96), labels, cursor, enabled, 18)
+	# courtship (romance.gd): where the two of them stand
+	UI.text(self, Vector2(r.position.x + 24, r.end.y - 196), Romance.summary(Game), 15, pink, HORIZONTAL_ALIGNMENT_LEFT, 1160)
+	var ask_now := Romance.next_ask(Game)
+	if ask_now != "" and Romance.ask_blocked(Game, ask_now) != "":
+		UI.text(self, Vector2(r.position.x + 420, r.end.y - 60), "%s: %s" % [str(Romance.ASKS[ask_now].n), Romance.ask_blocked(Game, ask_now)], 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 780)
+	UI.menu_list(self, Rect2(r.position.x + 24, r.end.y - 172, 380, 152), labels, cursor, enabled, 17)
 
 ## Where a region is, for the Yue Ling page.
 static func menu_place(area: String) -> String:
@@ -1035,6 +1102,9 @@ func _draw() -> void:
 		return
 	if mode == "feats":
 		_draw_feats()
+		return
+	if mode == "body":
+		_draw_body()
 		return
 	if mode == "songs":
 		_draw_songs()

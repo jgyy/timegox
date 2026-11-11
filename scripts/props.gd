@@ -563,6 +563,7 @@ static func use(e: Dictionary, g) -> Array:
 	var n: int = int(g.prop_uses.get(pid, 0))
 	g.prop_uses[pid] = n + 1
 	Eggs.used(g, str(e.get("prop", "")), n + 1)
+	Needs.used(g, str(e.get("prop", "")), str(k.get("effect", "")))
 	var out: Array = [line_for(e, n)]
 	match str(k.get("effect", "")):
 		"rest":

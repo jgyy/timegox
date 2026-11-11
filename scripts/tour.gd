@@ -3708,6 +3708,52 @@ func _pots_shots(which: String = "1") -> void:
 			await _shot(str(sp[1]))
 			main.pop()
 		main.set_stack(["world"])
+	if want.call("body"):
+		# survival and courtship: The Body's page a day and a half in, her page with the two of them
+		# promised, and an hour together being chosen (in the sect's own courts: the steps)
+		main.world.load_area("sect", Vector2i(20, 12))
+		Needs.begin(Game)
+		Game.needs = {"rest": 62.0, "hunger": 38.0, "thirst": 71.0, "bladder": 19.0, "bowels": 55.0, "comfort": 44.0, "clean": 67.0, "since": Game.day}
+		Game.gourd = 3
+		Game.inv["noodle_bowl"] = 1
+		main.open_menu()
+		main.menu.mode = "body"
+		main.menu._build()
+		main.menu.cursor = 6
+		await _wait(0.6)
+		await _shot("body_page")
+		main.pop()
+		main.set_stack(["world"])
+		await _wait(0.4)
+		await _shot("body_hud")
+		Needs.end(Game)
+		Game.romance = {"stage": 2, "gifts": {"haws": "love", "socks": "love", "ribbon": "like", "rouge": "meh", "needles": "love"}, "outings": {"tea": "quiet", "market": "playful", "lanterns": "tender", "water": "tender"},
+			"tone": {"tender": 4, "playful": 2, "quiet": 1}}
+		Game.future = "companion"
+		Game.bond = 58
+		main.open_menu()
+		main.menu.mode = "yue"
+		main.menu._build()
+		main.menu.cursor = 2
+		await _wait(0.6)
+		await _shot("yue_courtship_page")
+		main.pop()
+		main.open_gifts()
+		main.choice.cursor = Romance.GIFT_ORDER.find("kite")
+		await _wait(0.6)
+		await _shot("gifts_choice")
+		main.pop()
+		Game.clock = 10.0 * 60.0
+		main.open_outings()
+		main.choice.cursor = 0
+		await _wait(0.6)
+		await _shot("outings_choice")
+		main.pop()
+		main.say(Romance.OUTINGS.steps.lines)
+		main.dialogue.shown = 999.0
+		await _wait(1.2)
+		await _shot("outing_steps")
+		main.set_stack(["world"])
 	if want.call("page"):
 		Game.step = Data.step_index("s_p23_gao")
 		Game.trials = {}

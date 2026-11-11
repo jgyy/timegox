@@ -415,6 +415,9 @@ func new_game(h: Dictionary = {}) -> void:
 	yue_chat = 0
 	world.clear_cache()
 	world.refresh_hero()
+	# (--survival: the journey begins with the body asked after, needs.gd)
+	if args.has("survival"):
+		Needs.begin(Game)
 	# the New Fire release (cultures.gd): the story begins three years earlier, on the last morning at
 	# the hearth where the hero spent the year away: a different town, keeper and farewell for each.
 	# (`h` empty: a game begun without the creation screen, by the tests and the tools, begins at the
@@ -716,6 +719,9 @@ func talk_npc(e: Dictionary) -> void:
 	if str(e.id) in ["dyer_su", "tailor_qiao"] and _dyer_stock(str(e.id)).size() > 0 and deed == "":
 		# Dyer Su of the Dawn Market sells outfits (fashion.gd), and Tailor Qiao of Qingshi
 		after = func(): offer_outfits(e)
+	elif Game.survival and str(e.id) in Needs.COOKS and deed == "" and not (race != "" and Game.inv.get(str(Data.RACES[race].gift), 0) > 0):
+		# with survival on, the cooks and innkeepers of the land sell food for the road (needs.gd)
+		after = func(): offer_food(e)
 	elif str(e.id) == Gamble.DEALER and deed == "":
 		# Old Du's mat (gamble.gd)
 		after = func(): offer_gamble()
@@ -1167,6 +1173,96 @@ func offer_jobs(e: Dictionary) -> void:
 				return
 		if Jobs.finish(Game, jid):
 			say([[str(e.n), "\"%s.\" Done, and witnessed. I shall take it down." % str(Jobs.JOBS[jid].n)], [str(Jobs.JOBS[jid].by).capitalize() if not str(Jobs.JOBS[jid].by).begins_with("the ") else "Narrator", str(Jobs.JOBS[jid].thanks)]])
+	)
+
+# ---------------------------------------------------------------- the body (needs.gd) and courtship (romance.gd)
+## Where the hero stands, as the body and an hour with Yue Ling care about it: under a roof or the
+## ground, in a town or out in the country, beside water, on a summit, in the cold, and the hour.
+func body_ctx() -> Dictionary:
+	var indoors: bool = str(world.layer).begins_with("f:")
+	var cave: bool = world.is_cave()
+	var town: bool = Music.town_at(Game.area, world.ptile) != "" or Game.area == "sect"
+	var water := false
+	var wd: Dictionary = world.wd
+	if wd.has("grid") and wd.has("w"):
+		for dy in range(-1, 2):
+			for dx in range(-1, 2):
+				var q: Vector2i = world.ptile + Vector2i(dx, dy)
+				if q.x >= 0 and q.y >= 0 and q.x < int(wd.w) and q.y < int(wd.h) and wd.grid[q.y * int(wd.w) + q.x] == MapGen.WATER:
+					water = true
+	return {"indoors": indoors, "cave": cave, "town": town and not cave, "wild": (not town and not indoors) or cave, "privy": indoors and not cave, "water": water,
+		"summit": not indoors and not Peaks.summit_at(wd, world.ptile).is_empty(), "cold": str(world.theme_name) in ["frost", "aurora", "guanghan"], "hour": Clock.hour(Game), "area": Game.area}
+
+## What a cook or an innkeeper has for the road (needs.gd), with survival on.
+func offer_food(e: Dictionary) -> void:
+	var opts: Array = []
+	for fid in Needs.FOOD_ORDER:
+		var price := int(Needs.FOOD[fid].price)
+		opts.append({"id": fid, "label": "%s (%d stones)" % [str(Data.ITEMS[fid].n), price], "note": "have %d" % int(Game.inv.get(fid, 0)), "desc": str(Data.ITEMS[fid].desc) + ".", "col": UI.C_GOLD, "enabled": Game.stones >= price})
+	opts.append({"id": "later", "label": "Nothing, thank you", "desc": "The gourd fills itself wherever you drink: a well, a tea table, a spring.", "col": UI.C_DIM})
+	choose(Needs.FOOD_ASK, opts, func(fid: String):
+		if fid == "" or fid == "later":
+			return
+		Game.stones -= int(Needs.FOOD[fid].price)
+		Game.add_item(fid)
+		Game.toast("Bought: %s" % str(Data.ITEMS[fid].n))
+		offer_food(e)
+	)
+
+const GIFT_ASK := "Something for Yue Ling: what will you give her?"
+const OUTING_ASK := "An hour with Yue Ling: which?"
+
+## Give Yue Ling something (romance.gd GIFTS): what can be given now, and what she makes of it.
+func open_gifts() -> void:
+	var opts: Array = []
+	for id in Romance.GIFT_ORDER:
+		var gf: Dictionary = Romance.GIFTS[id]
+		var why := Romance.gift_blocked(Game, id)
+		var given: bool = (Game.romance.get("gifts", {}) as Dictionary).has(id)
+		opts.append({"id": id, "label": told(str(gf.n)), "note": {"love": "she loved it", "like": "she liked it", "meh": "a lovely thought"}[str(Game.romance.gifts[id])] if given else ("%d stones" % int(gf.cost) if gf.has("cost") else ""),
+			"desc": told(str(gf.desc)) + ("\n\n" + why if why != "" else ""), "col": Color("ff9ac0"), "enabled": why == ""})
+	choose(GIFT_ASK, opts, func(id: String):
+		if id != "":
+			say(Romance.give(Game, id))
+	)
+
+## Spend an hour with her (romance.gd OUTINGS): the ones that can be had here and now; the rest say where.
+func open_outings() -> void:
+	var ctx := body_ctx()
+	var here: Array = Romance.outings_here(Game, ctx)
+	var opts: Array = []
+	for id in Romance.OUTING_ORDER:
+		var o: Dictionary = Romance.OUTINGS[id]
+		var had: bool = (Game.romance.get("outings", {}) as Dictionary).has(id)
+		opts.append({"id": id, "label": str(o.n), "note": "had" if had else ("" if here.has(id) else "not here"), "desc": str(o.hint) + (" It was had, and is kept." if had else ""), "col": Color("ff9ac0"), "enabled": here.has(id)})
+	choose(OUTING_ASK, opts, func(id: String):
+		if id == "":
+			return
+		var o2: Dictionary = Romance.OUTINGS[id]
+		say(o2.lines, func():
+			var replies: Array = []
+			for op in o2.options:
+				replies.append({"id": str(op[0]), "label": str(op[2]), "desc": "", "col": Color("ff9ac0")})
+			choose(str(o2.n), replies, func(oid: String):
+				say(Romance.take_outing(Game, id, oid))
+			, false)
+		)
+	)
+
+## Say what there is to say (romance.gd ASKS): the next of the three questions, if the two are close enough.
+func open_ask() -> void:
+	var id := Romance.next_ask(Game)
+	if id == "" or Romance.ask_blocked(Game, id) != "":
+		return
+	var a: Dictionary = Romance.ASKS[id]
+	var opts: Array = []
+	for op in a.options:
+		opts.append({"id": str(op[0]), "label": str(op[2]), "desc": "", "col": Color("ff9ac0")})
+	opts.append({"id": "wait", "label": "Not today", "desc": "It will keep. It has kept this long.", "col": UI.C_DIM})
+	choose(told(str(a.ask)), opts, func(oid: String):
+		if oid == "" or oid == "wait":
+			return
+		say(Romance.take_ask(Game, id, oid), func(): world.refresh_yue())
 	)
 
 ## Old Du's mat (gamble.gd): the game, what is staked on, and how much; then the bowl is lifted, and

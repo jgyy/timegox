@@ -1114,6 +1114,9 @@ static func epilogues(g) -> Array:
 	var out: Array = []
 	if future(g) != "":
 		out.append(str(FUTURES[future(g)].epilogue))
+	# (romance.gd: what was said between the two of them, if anything was)
+	for rl in Romance.epilogue(g):
+		out.append(str(rl[1]))
 	if g.memories.size() >= MEMORIES.size():
 		out.append("Every one of the seven memories the Founder pressed was given back. Yue Ling can name all twenty bearers she walked beside, and does, every year, on the night of the lotus lanterns.")
 	return out

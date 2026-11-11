@@ -4184,6 +4184,164 @@ func _thundering_pots() -> void:
 	check(GG2.feats.has("gamble_first") and not GG2.feats.has("gamble_ten"), "sitting down at the mat is a feat; winning ten is another")
 	GG2.free()
 	check(bsrc.contains("Gamble.ASK"), "the bot does not gamble: it walks away from the mat")
+	print("== survival: the body (needs.gd) ==")
+	var NG = load("res://scripts/game.gd").new()
+	NG.reset()
+	check(not NG.survival and Needs.mod(NG, "atk") == 1.0 and Needs.mod(NG, "qi") == 1.0 and Needs.mod(NG, "spd") == 0.0 and Needs.value(NG, "hunger") == 100.0 and Needs.pass_time(NG, 50.0).is_empty(),
+		"survival is off unless it is turned on, and off it asks nothing and costs nothing")
+	var atk0: float = NG.fighter(0).atk
+	var qi0: int = NG.max_qi(0)
+	check(Needs.ORDER.size() == 7 and Needs.ORDER == ["rest", "hunger", "thirst", "bladder", "bowels", "comfort", "clean"], "seven needs: rest, hunger, thirst, bladder, bowels, comfort and cleanliness")
+	for nk in Needs.ORDER:
+		check(Needs.NEEDS.has(nk) and float(Needs.NEEDS[nk].rate) > 0.0 and str(Needs.NEEDS[nk].low) != "" and Needs.YUE_LOW.has(nk) and fits.call(str(Needs.YUE_LOW[nk])), "the need %s runs down, has a word for when it is low, and Yue Ling has something to say about it" % nk)
+	check(Needs.act(NG, "toggle", {}) != "" and NG.survival and int(NG.inv.steamed_bun) == 3 and NG.gourd == Needs.GOURD and Needs.value(NG, "rest") == 85.0, "turned on: every need content, three buns and a full gourd")
+	check(is_equal_approx(NG.fighter(0).atk, atk0 * 1.03) and NG.max_qi(0) == qi0 and Needs.state(NG).begins_with("well kept"), "a body that is well kept, all seven, strikes a little harder for it")
+	Needs.pass_time(NG, 4.0)
+	check(Needs.value(NG, "bladder") < Needs.value(NG, "thirst") and Needs.value(NG, "thirst") < Needs.value(NG, "hunger") and Needs.value(NG, "hunger") < Needs.value(NG, "clean"), "by the clock: the bladder first, then thirst, then hunger, and cleanliness last")
+	var mortal := 85.0 - Needs.value(NG, "hunger")
+	NG.level = 60
+	var before_h := Needs.value(NG, "hunger")
+	Needs.pass_time(NG, 4.0)
+	check(before_h - Needs.value(NG, "hunger") < mortal * 0.65 and Needs.pace(NG) >= Needs.FLOOR and Needs.pace(NG) < 1.0, "a cultivator needs less with every realm (%d%% of a mortal's at the twentieth)" % int(Needs.pace(NG) * 100.0))
+	NG.level = 0
+	NG.needs["hunger"] = 20.0
+	NG.needs["rest"] = 20.0
+	NG.needs["thirst"] = 20.0
+	check(NG.fighter(0).atk < atk0 * 0.82 and NG.max_qi(0) < qi0 and Needs.mod(NG, "spd") <= -2.0 and Needs.state(NG).contains("famished"), "famished, parched and worn out: he strikes less hard, holds less qi and is slower")
+	var wild := {"wild": true, "water": true}
+	var street := {"town": true}
+	var inn := {"indoors": true, "privy": true, "town": true}
+	check(Needs.act(NG, "eat:steamed_bun", wild) != "" and int(NG.inv.steamed_bun) == 2 and Needs.value(NG, "hunger") == 50.0, "a bun is eaten, and answers hunger")
+	check(Needs.act(NG, "drink", wild) != "" and NG.gourd == Needs.GOURD - 1 and Needs.value(NG, "thirst") == 65.0, "a pull at the gourd answers thirst")
+	NG.needs["bladder"] = 10.0
+	NG.needs["bowels"] = 10.0
+	check(Needs.act(NG, "relieve", street) == "" and Needs.value(NG, "bladder") == 10.0, "not in the street")
+	check(Needs.act(NG, "relieve", inn) != "" and Needs.value(NG, "bladder") == 100.0 and Needs.value(NG, "bowels") == 100.0, "an inn has a privy out the back")
+	NG.needs["bladder"] = 10.0
+	var cl := Needs.value(NG, "clean")
+	check(Needs.act(NG, "relieve", wild) != "" and Needs.value(NG, "bladder") == 100.0 and Needs.value(NG, "clean") < cl, "and out in the country there is always a tree")
+	check(Needs.act(NG, "wash", street) == "" and Needs.act(NG, "wash", wild) != "" and Needs.value(NG, "clean") > cl, "washing wants water")
+	check(Needs.act(NG, "sleep", inn) == "" and Needs.act(NG, "sleep", wild) != "" and Needs.value(NG, "rest") >= 90.0 and is_equal_approx(Clock.hour(NG), 6.0), "sleeping rough fills most of rest, and it is morning")
+	var hg := Needs.value(NG, "hunger")
+	check(Needs.act(NG, "forage", street) == "" and Needs.act(NG, "forage", wild) != "" and Needs.value(NG, "hunger") > hg, "there is always something to forage in the wild: nobody can be left with nothing to eat")
+	# what the things of the land do for the body
+	NG.needs["clean"] = 5.0
+	NG.needs["thirst"] = 5.0
+	NG.gourd = 0
+	Needs.used(NG, "hot_spring", "rest")
+	Needs.used(NG, "well", "drink")
+	check(Needs.value(NG, "clean") == 100.0 and Needs.value(NG, "thirst") == 100.0 and NG.gourd == Needs.GOURD, "a hot spring washes, a well waters, and the gourd is filled wherever one drinks")
+	NG.needs["rest"] = 30.0
+	Needs.used(NG, "bed", "sleep")
+	check(Needs.value(NG, "rest") == 100.0, "a bed is a night's rest")
+	for pk in Needs.BY_KIND:
+		check(Props.KINDS.has(pk), "the thing %s that does something for the body is a thing of the land" % pk)
+	for fid in Needs.FOOD_ORDER:
+		check(Data.ITEMS.has(fid) and float(Needs.FOOD[fid].hunger) > 0.0 and int(Needs.FOOD[fid].price) > 0, "%s can be bought and eaten" % fid)
+	for ck in Needs.COOKS:
+		check(Trials.npc_area(ck) != "", "%s, who sells food for the road, lives somewhere" % ck)
+	# a need at nothing takes matters into its own hands; nobody dies of it
+	NG.egg_pending.clear()
+	NG.needs["bladder"] = 1.0
+	NG.needs["rest"] = 90.0
+	var fell: Array = Needs.pass_time(NG, 1.0)
+	check(fell == ["bladder"] and Needs.value(NG, "bladder") == 100.0 and Needs.value(NG, "clean") < 60.0 and NG.egg_pending.size() == 1 and int(NG.needs_fell.bladder) == 1, "he does not, quite, reach the tree: it is told, and he wants a wash")
+	NG.needs["hunger"] = 0.5
+	NG.hp[0] = 50.0
+	Needs.pass_time(NG, 1.0)
+	check(NG.hp[0] >= 1.0 and Needs.value(NG, "hunger") >= 25.0, "nobody dies of hunger: it costs health, and Yue Ling's last bun")
+	for ck2 in Needs.COLLAPSE:
+		for l in Needs.COLLAPSE[ck2]:
+			check(fits.call(str(l[1])) and (l.size() < 3 or Data.EMOTES.has(str(l[2]))), "what is said when %s gives way fits the dialogue box" % ck2)
+	# somebody careful never lets it come to that: a fortnight in the wild, tended as the bot tends it
+	var CG2 = load("res://scripts/game.gd").new()
+	CG2.reset()
+	Needs.begin(CG2)
+	for hour in 24 * 14:
+		Needs.pass_time(CG2, 1.0, 1.3)
+		for _n in 4:
+			var adv := Needs.advice(CG2, wild)
+			if adv != "":
+				Needs.act(CG2, adv, wild)
+	check(CG2.needs_fell.is_empty() and Needs.value(CG2, "hunger") > 20.0 and Needs.value(CG2, "thirst") > 20.0, "a fortnight in the wild, tended with care, and the body never once has its own way")
+	check(Needs.act(NG, "toggle", {}) != "" and not NG.survival and is_equal_approx(NG.fighter(0).atk, atk0), "and it can be turned off again at any time")
+	NG.free()
+	CG2.free()
+
+	print("== courtship (romance.gd) ==")
+	var RG = load("res://scripts/game.gd").new()
+	RG.reset()
+	RG.companion = true
+	check(Romance.stage(RG) == 0 and Romance.stage_name(RG) == "Walking together" and Romance.tone(RG) == "" and Romance.epilogue(RG).is_empty() and Romance.mod(RG) == 1.0, "nothing is said until it is said")
+	check(Romance.GIFT_ORDER.size() == 12 and Romance.GIFTS.size() == 12 and Romance.OUTING_ORDER.size() == 10 and Romance.OUTINGS.size() == 10 and Romance.ASK_ORDER == ["confess", "tokens", "wed"], "twelve gifts, ten hours together, three questions")
+	var tastes := {}
+	for gid in Romance.GIFT_ORDER:
+		var gf: Dictionary = Romance.GIFTS[gid]
+		tastes[str(gf.taste)] = true
+		var srcs := (1 if gf.has("cost") else 0) + (1 if gf.has("item") else 0) + (1 if gf.has("need") else 0)
+		check(srcs == 1 and str(gf.taste) in ["love", "like", "meh"] and str(gf.desc).length() > 40 and fits.call(str(gf.line)) and (not gf.has("item") or Data.ITEMS.has(str(gf.item))), "the gift %s: one way to come by it, a taste, and what she says" % gid)
+		check(not _has_word(Voice.her(str(gf.desc)), ["he", "him", "his"]), "the gift %s is told of whoever the hero is" % gid)
+	check(tastes.size() == 3, "she loves some, likes some, and does not know what to do with one or two")
+	var wheres := {}
+	for oid in Romance.OUTING_ORDER:
+		var o: Dictionary = Romance.OUTINGS[oid]
+		wheres[str(o.where)] = true
+		var tones := {}
+		var ok_o: bool = (o.options as Array).size() == 3 and (o.lines as Array).size() >= 2 and str(o.hint) != ""
+		for op in o.options:
+			tones[str(op[1])] = true
+			ok_o = ok_o and fits.call(str(op[3])) and str(op[2]).length() > 8
+		for l in o.lines:
+			ok_o = ok_o and fits.call(str(l[1]))
+		check(ok_o and tones.size() == 3, "the hour %s: a scene, and something tender, something playful and something quiet to say" % oid)
+	check(wheres.size() == 10, "every hour has a place and a time of its own")
+	check(Romance.here("town_night", {"town": true, "hour": 21.0}) and not Romance.here("town_night", {"town": true, "hour": 12.0}) and Romance.here("town_day", {"town": true, "hour": 12.0}) and Romance.here("summit", {"summit": true})
+		and Romance.here("wild_dawn", {"wild": true, "hour": 6.0}) and not Romance.here("wild_dawn", {"wild": true, "hour": 9.0}) and Romance.here("cave", {"cave": true, "indoors": true}) and not Romance.here("indoors", {"cave": true, "indoors": true})
+		and Romance.here("sect", {"area": "sect"}) and Romance.here("cold", {"cold": true}) and Romance.here("water", {"water": true}) and Romance.here("wild_night", {"wild": true, "hour": 23.0}) and Romance.here("indoors", {"indoors": true}),
+		"an hour is had only where and when it belongs")
+	check(Romance.outings_here(RG, {"town": true, "hour": 21.0}) == ["lanterns"] and Romance.outings_here(RG, {"area": "sect", "town": true, "hour": 10.0}) == ["steps", "market"], "what can be had here and now is offered, and nothing else")
+	for aid in Romance.ASK_ORDER:
+		var a: Dictionary = Romance.ASKS[aid]
+		var ok_a: bool = (a.options as Array).size() == 3 and str(a.ask).length() > 60
+		for op2 in a.options:
+			ok_a = ok_a and a.reply.has(str(op2[0]))
+			for l2 in a.reply[str(op2[0])]:
+				ok_a = ok_a and fits.call(str(l2[1])) and (l2.size() < 3 or Data.EMOTES.has(str(l2[2])))
+		check(ok_a and int(a.bond) <= Bonds.LEVELS[Bonds.LEVELS.size() - 1], "the question %s: three ways to ask, an answer to each, and a closeness that can be reached" % aid)
+	# she is not asked before the two are close enough, and the questions come in order
+	check(Romance.next_ask(RG) == "confess" and Romance.ask_blocked(RG, "confess") != "" and Romance.take_ask(RG, "confess", "plain").is_empty() and Romance.ask_blocked(RG, "wed") != "", "it cannot be said before the two are close")
+	RG.stones = 10000
+	var b0: int = RG.bond
+	var said: Array = Romance.give(RG, "haws")
+	check(said.size() == 2 and RG.stones == 10000 - 60 and RG.bond == b0 + Romance.LOVE and Romance.gifts_given(RG) == 1 and Romance.give(RG, "haws").is_empty(), "a gift she loves: paid for, given once, and it brings them closer")
+	Romance.give(RG, "rouge")
+	check(RG.bond == b0 + Romance.LOVE + Romance.MEH and str(RG.romance.gifts.rouge) == "meh", "one she does not know what to do with brings them a little closer all the same")
+	check(Romance.gift_blocked(RG, "flowers") != "" and Romance.gift_blocked(RG, "duck") != "" and Romance.gift_blocked(RG, "cricket") != "", "what grows on a summit, lies in a cave or is won at the mat has to be come by first")
+	RG.summits = {"a": true}
+	RG.inv["clay_duck"] = 1
+	check(Romance.give(RG, "flowers").size() == 2 and Romance.give(RG, "duck").size() == 2 and int(RG.inv.clay_duck) == 1, "and then it can be given (the duck is still theirs)")
+	var r1: Array = Romance.take_outing(RG, "steps", "tender")
+	var r2: Array = Romance.take_outing(RG, "tea", "tender")
+	Romance.take_outing(RG, "market", "playful")
+	check(r1.size() == 1 and r2.size() == 1 and Romance.outings_had(RG) == 3 and Romance.tone(RG) == "tender" and not Romance.outings_here(RG, {"area": "sect", "town": true, "hour": 10.0}).has("steps"), "an hour is had once; what is said most often is how they are with each other")
+	RG.bond = 24
+	check(Romance.ask_blocked(RG, "confess") == "" and Romance.take_ask(RG, "confess", "hand").size() >= 2 and Romance.stage(RG) == 1 and Romance.stage_name(RG) == "Courting" and Romance.next_ask(RG) == "tokens", "close enough, and two hours had: it is said, and they are courting")
+	check(Romance.ask_blocked(RG, "tokens") != "", "tokens want more closeness yet")
+	RG.bond = 42
+	check(Romance.ask_blocked(RG, "tokens") == "" and Romance.take_ask(RG, "tokens", "thread").size() >= 2 and Romance.stage(RG) == 2 and Romance.mod(RG) > 1.0, "tokens exchanged: they are promised, and she is the stronger for it")
+	RG.bond = 64
+	check(Romance.ask_blocked(RG, "wed").contains("thread on the Wheel"), "she cannot be wed before she has a thread on the Wheel (Part XV)")
+	RG.future = "wander"
+	check(Romance.ask_blocked(RG, "wed").contains("Ask me then") and Romance.take_ask(RG, "wed", "moon").is_empty() and Romance.stage(RG) == 2, "if the road she chose is her own, she is promised, and will not be wed until she is back from it")
+	RG.future = "companion"
+	var hp1: int = RG.max_hp(1)
+	check(Romance.ask_blocked(RG, "wed") == "" and Romance.take_ask(RG, "wed", "moon").size() >= 3 and Romance.stage(RG) == 3 and Romance.next_ask(RG) == "" and RG.yue_outfits.has("redbride") and RG.max_hp(1) > hp1, "three bows: they are wed, and she has the scarlet")
+	check(Romance.epilogue(RG).size() == 1 and str(Romance.epilogue(RG)[0][1]).contains("three bows") and Bonds.epilogues(RG).any(func(x): return str(x).contains("three bows")) and Romance.summary(RG).begins_with("Wed"), "and the last page says so")
+	Feats.poll(RG)
+	check(RG.feats.has("courting") and RG.feats.has("promised") and RG.feats.has("wed") and not RG.feats.has("hours_all"), "each of the three is a feat")
+	check(Feats.need(Feats.FEATS.hours_all.test) == Romance.OUTING_ORDER.size() and Feats.need(Feats.FEATS.gifts_six.test) <= Romance.GIFT_ORDER.size() and Feats.need(Feats.FEATS.wed.test) == Romance.STAGES.size() - 1, "no feat asks for more of the two of them than there is")
+	check(not bsrc.contains("open_gifts") and not bsrc.contains("open_ask"), "the bot leaves courtship alone: it is the player's to do or not")
+	RG.free()
 	check(Folk.TOWNS.has("drumtower") and Cultures.of_town("drumtower") == "valley" and str(Folk.TOWNS.drumtower.area) == "village" and Data.AREAS.village.buildings.size() == 19, "Qingshi has a second quarter, of the Rice Hearth: nineteen buildings in all")
 	var dt_people: Array = Folk.people(wsurf, "drumtower")
 	var dt_roles := {}

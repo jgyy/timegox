@@ -538,6 +538,12 @@ func _world(d: float) -> void:
 	if _hp_ratio() < 0.5 or _qi_ratio() < 0.15:
 		_start_meditate("rest")
 		return
+	# 1') survival (needs.gd, with --survival): tend the body as somebody careful would, from The Body's page
+	if Game.survival and Needs.advice(Game, main.body_ctx()) != "":
+		menu_goal = "body"
+		world.move_dir = Vector2i.ZERO
+		_press("cancel", 0.4)
+		return
 	# 1b) the Lotus release: Yue Ling has something to say; hear her out (T)
 	if Bonds.talk_ready(Game) != "" and world.using.is_empty():
 		world.move_dir = Vector2i.ZERO
@@ -1176,6 +1182,15 @@ func _choice() -> void:
 			if want < 0 and str(ids[kj2]).begins_with("take:") and _job_done_already(str(ids[kj2]).get_slice(":", 1)):
 				want = kj2
 		_nav(ids.size(), c.cursor, want if want >= 0 else ids.find("later"))
+		return
+	if str(c.title) == Needs.FOOD_ASK:
+		# a cook, with survival on: keep four buns and two boxes of noodles in the pack
+		want = ids.find("later")
+		for fw in [["noodle_bowl", 2], ["steamed_bun", 4]]:
+			var kf: int = ids.find(str(fw[0]))
+			if want == ids.find("later") and kf >= 0 and c.options[kf].get("enabled", true) and int(Game.inv.get(str(fw[0]), 0)) < int(fw[1]):
+				want = kf
+		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title) == main.DRILL_ASK or str(c.title) == main.TAILOR_ASK or str(c.title) == Gamble.ASK:
 		_nav(ids.size(), c.cursor, ids.find("later"))
@@ -2097,6 +2112,22 @@ func _menu() -> void:
 	if menu_goal == "":
 		_press("cancel", 0.3)
 		return
+	if menu_goal == "body":
+		# The Body: the line somebody careful would choose, then out
+		var adv := Needs.advice(Game, main.body_ctx())
+		if m.mode == "body":
+			if adv == "":
+				menu_goal = ""
+				_press("cancel", 0.3)
+			else:
+				_nav(m.labels.size(), m.cursor, m.ids.find("body:" + adv))
+			return
+		if m.mode == "root" and adv != "":
+			_nav(m.labels.size(), m.cursor, m.ids.find("body"))
+			return
+		menu_goal = ""
+		_press("cancel", 0.3)
+		return
 	if menu_goal == "works":
 		# the Works page: down to the work wanted and Enter builds it; out again when there is no more
 		var ww := _want_work()
@@ -2401,6 +2432,8 @@ func _finish(reason: String) -> void:
 	print("the song        : %d of %d tunes heard, %d airs of the hearths learned" % [Game.heard.size(), Music.count(), Game.airs.size()])
 	print("the board       : %d of %d commissions done" % [Jobs.done_count(Game), Jobs.ORDER.size()])
 	print("the mat         : %s" % Gamble.summary(Game))
+	print("the body        : survival %s%s" % ["on" if Game.survival else "off", (": " + Needs.state(Game) + "; gave way " + JSON.stringify(Game.needs_fell)) if Game.survival else ""])
+	print("the two of them : %s" % Romance.summary(Game))
 	print("the wardrobe    : %d of %d outfits (wearing the %s), %d of %d dresses for Yue Ling (wearing %s)" % [Game.outfits.size(), Fashion.OUTFIT_ORDER.size(), str(Fashion.OUTFITS[Game.outfit].n),
 		Game.yue_outfits.size(), Fashion.YUE_ORDER.size(), str(Fashion.YUE_OUTFITS[Game.yue_outfit].n)])
 	print("feats           : %d of %d (%d of %d points): %s; found unasked: %d of %d %s" % [Game.feats.size(), Feats.FEATS.size(), Feats.points(Game), Feats.total(), Feats.title(Game), Game.eggs.size(), Eggs.ORDER.size(),
