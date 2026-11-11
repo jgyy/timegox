@@ -30,3 +30,6 @@ build/
 # Python bytecode from the Blender scripts
 __pycache__/
 *.pyc
+
+# Worktrees of helper sessions
+.claude/worktrees/
