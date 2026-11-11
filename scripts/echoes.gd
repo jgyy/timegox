@@ -738,6 +738,12 @@ const CROSSROADS := {
 			"bury": [["Gravekeeper Mu Gu", "Four thousand. I have a chisel and a good eye and perhaps thirty years. I shall not finish. But I shall name one a day, and say it aloud, and the apprentice I have not got yet can do the rest. You have given me a reason to find one."]],
 		},
 		"echo": {
+			"s_p23_hao": {
+				"melt": [["Lady Hao", "They tell me you melted the arms of the land into ploughshares. Then I am to make a host of ploughmen holding ploughshares. Hm. I have done it with less. Bronze was dear, in my day."]],
+				"rack": [["Lady Hao", "There is a rack at every hearth, they tell me, and a keeper for it. Good. Then every company comes with one man who knows which end of a spear is which. I shall make him a sergeant."]],
+				"school": [["Lady Hao", "Your school sent me six instructors this morning. Every one of them began by sweeping my drill ground. I do not understand it, but the ground has never been so level."]],
+				"bury": [["Lady Hao", "You buried the arms of the land with names on them, I hear, and now you want a host. I shall not dig them up. A thing buried with a name should stay. We shall rehaft the hoes."]],
+			},
 			"s_p22_home": {
 				"melt": [["Elder Qing Xuan", "The ploughs you had made of all those blades are in the ground by now, and the valley sown. A good spring for the roads to shut, with every hand wanted in a field. Nobody has had time to be frightened."]],
 				"rack": [["Elder Qing Xuan", "Every hearth has its one rack now, and its keeper. The keeper at Cloudfoot tells me nobody has asked for so much as a spear. Whatever is on the mountain, the people of the road do not think it is a thing one takes a spear to."]],
@@ -785,6 +791,11 @@ const CROSSROADS := {
 			"drive": [["Zhong Ziqi the Woodcutter", "Over the ridge. ...I heard what it called as it went. It called my name, the way my mother never did. It had practised. I shall not tell the others that. Take your stones, cultivator. The road is safe."]],
 		},
 		"echo": {
+			"s_p23_kuang": {
+				"fire": [["Music-Master Kuang", "There is something at the camp fire by the ferry that sings along in other people's voices, a little out. One leg, they say. It has the haulers' call nearly right. I have been correcting it. It is a quick study."]],
+				"bamboo": [["Music-Master Kuang", "They burn green bamboo at the camp by the ferry every night. Crack, crack. It keeps something off, they say. It keeps me awake. But it is in time, I will give them that."]],
+				"drive": [["Music-Master Kuang", "A pedlar told me you gave a great many people back their own voices, up in the silk woods. I should like to know how. I have been trying to give one man back his for a week."]],
+			},
 			"done:s_p22_hermits": {
 				"fire": [["Yue Ling", "The second hermit had a bell hung on his cairn. He says something small with one leg brought it up last week, set it down, said, quite clearly, in nobody's voice at all, for the top, and went away again on its hands and its foot."]],
 				"bamboo": [["Yue Ling", "The second hermit hears bamboo cracking at every camp below him at dusk. He says it is a comfortable sound, like a village. He also says something sits on its own height across the valley and listens to it, every evening, until the last fire is out."]],
@@ -865,6 +876,11 @@ const CROSSROADS := {
 				"steps": [["Elder Qing Xuan", "And nine thousand steps going up Sun-Viewing Peak. I hope the Duke knows who is going to be asked to sweep them. ...No. I shall send novices. You have swept enough."]],
 				"shut": [["Elder Qing Xuan", "And a gate on the great peak. Well. He is an old thing and has earned his quiet. But I notice, Lin Feng, that you gave a mountain what you would not have taken for yourself."]],
 			},
+			"s_p23_home": {
+				"cairn": [["Elder Qing Xuan", "The pilgrims who were on the tops this morning say the cairns hummed. Every one of them, all at once, a hair flat. Stones nobody signed, and they have an ear."]],
+				"steps": [["Elder Qing Xuan", "There were four hundred people on Duke Xie's steps at dawn when it rang. They say the chain sang with it, the whole nine thousand, flat, like a string on a bad lute."]],
+				"shut": [["Elder Qing Xuan", "The Lord of the Eastern Peak has sent down, through his gate, for the first time since you gave it him. One line: which of you has moved my note?"]],
+			},
 			"post:s_break27": {
 				"cairn": [["Narrator", "On the cairn of the Lookout, that evening, there is one stone more. It has no broom scratched on it. It has nothing scratched on it at all."]],
 				"steps": [["Narrator", "From the fork of the pine he can see them already, a pale line going up the great peak: the first three hundred steps, and on the lowest a very small figure sitting down to rest."]],
@@ -876,11 +892,119 @@ const CROSSROADS := {
 			"steps": "Nine thousand steps go up Sun-Viewing Peak, with a chain, and at dawn there are grandmothers on the top, and children asleep on their fathers' backs. The Lord of the Eastern Peak is said to receive the six-year-olds in person.",
 			"shut": "There is a gate at the last of the eighteen bends, and it is not often opened. The Lord of the Eastern Peak watches the sun rise alone, and has let it be known that he is entirely content.",
 		}},
+	# ---- Part XXIII (the Thundering Pots release): what is done with what was made to obey, with a thing made
+	# out of hatred, and with a host that has nothing left to fight
+	"the_clay": {"step": "s_p23_meng", "part": "XXIII", "n": "What is done with the clay",
+		"ask": "Four hundred soldiers of fired clay are standing in the millet where they stopped, and the general who kept them ready has put down his arm. Every one of them has somebody's face. The ploughmen of the levy want to know what is to be done with them before the spring sowing; they are standing in a good field. Meng Tian has said he will give the order, whatever it is. It is the last one he means to give.",
+		"options": [
+			{"id": "stand", "label": "Leave them standing, and sow round them", "tilt": {"heart": 2, "craft": -1}, "gain": {"renown": 4},
+				"desc": "They were men's faces before they were a king's army. Let them stand in the millet with the crop coming up round their knees, facing every way, and let whoever ploughs there learn to go round. In a generation the children will have names for them (renown).",
+				"log": "Left the soldiers of Mount Li standing in the millet, to be sown round."},
+			{"id": "home", "label": "Carry each to the village its face came from", "tilt": {"reach": 2, "heart": 1}, "gain": {"stones": 800},
+				"desc": "The potters scratched a name inside every collar; the foremen made them. Read the names. Somewhere in the land there is a village for each, and a shrine with room in it. It will take the levy a season of carting, and nobody will be paid (the carters' thanks).",
+				"log": "Had the soldiers of Mount Li carried, each to the village named in his collar."},
+			{"id": "kiln", "label": "Back to the kiln: tiles, jars and bricks", "tilt": {"craft": 2, "heart": -2}, "gain": {"items": {"ess_earth": 5}},
+				"desc": "It is good clay, well fired, and the land wants roofs. Break them, grind them for grog, and fire them again as something a living person can use. The faces go. A face that was only ever a king's copy of somebody is not that somebody (essences, from the grinding).",
+				"log": "Had the soldiers of Mount Li broken up and fired again as tiles and jars."},
+		],
+		"after": {
+			"stand": [["Meng Tian, General of the Clay Host", "Stand easy. ...I have never given that order. I did not know it was one. Stand easy, all of you, and let the millet come up. I shall stand with them. It is a better wall than the one I built; it keeps nothing out."]],
+			"home": [["Meng Tian, General of the Clay Host", "By name. To his village. Three hundred thousand men built my Wall and I do not know the name of one. You will find them inside the collar, on the left. The potters were made to sign, so that a bad one could be traced and punished. Use it for this instead."]],
+			"kiln": [["Meng Tian, General of the Clay Host", "Tiles. ...Yes. It is sound. A roof is more use than a rank. I ask only that mine be the first broken, and that somebody make a brush-pot of it. I invented the brush, you know. I should like to hold one that is used for letters home."]],
+		},
+		"echo": {
+			"s_p23_river": {
+				"stand": [["Lady Hao", "The ploughmen have a song about the clay men in the millet already. It is not respectful. It has eleven verses. I have had to forbid it on the march, and I hum it myself."]],
+				"home": [["Lady Hao", "Nine carts went out yesterday with clay men lying in straw, each to a village. The carters argued over who should take the one with the scar through his eyebrow. They have all decided he is from their own."]],
+				"kiln": [["Lady Hao", "The barracks has a new roof. The men look up at it, at night. Nobody says anything. It keeps the rain off. I notice that nobody has asked to sleep under the corner tile, the one with part of an ear on it."]],
+			},
+			"s_p23_hao2": {
+				"stand": [["Master Sun", "I walked through your millet field on the way here. Four hundred sentries, and a sparrow nesting in one helmet. It is the only army I have ever seen that improved a landscape."]],
+				"home": [["Master Sun", "A village on my road has a clay soldier in its shrine now, with incense in front of him and a name-board. They have the wrong name, I am fairly sure. They are very happy with him."]],
+				"kiln": [["Master Sun", "I drank from a jar on the road that had, in the glaze, the mark of a thumb. Some potter's, two thousand years ago, or some soldier's. One cannot tell any more. That was, I take it, the point."]],
+			},
+		},
+		"end": {
+			"stand": "Four hundred soldiers of clay stand in the millet under Mount Li, facing every way, and the plough goes round them. Each has a name the children gave it. The sparrows have the helmets.",
+			"home": "In four hundred villages of the land there is a soldier of fired clay in the shrine, with a name-board and a bowl of rice. Some of the names are right.",
+			"kiln": "The roofs of the Drum Tower quarter are tiled with what was once the vanguard of the left. They keep the rain off. Nobody remembers a face.",
+		}},
+	"the_lute": {"step": "s_p23_gao", "part": "XXIII", "n": "The lute with lead in it",
+		"ask": "The lute lies on the rock between two blind men. It is a good instrument, of paulownia, five strings, and it has a bar of lead run into the belly that Gao Jianli put there to kill a king with. It has not carried a tune in two thousand years; it has only kept time for an army. He says it is the one thing he has ever made that was entirely his. Music-Master Kuang has his hand on it and is waiting, and has turned his face towards you.",
+		"options": [
+			{"id": "melt", "label": "Melt the lead out, and let him play", "tilt": {"heart": 2, "craft": 1}, "gain": {"renown": 4},
+				"desc": "A little heat, carefully, through the sound-hole, and the lead runs out like water. What is left is a lute that has been ill for a long time. Kuang will sit with him while it learns to speak again. It will take a winter, and the first tunes will be bad (renown).",
+				"log": "Had the lead melted out of Gao Jianli's lute, and left him with Music-Master Kuang to learn it again."},
+			{"id": "keep", "label": "Leave it as it is. It is his", "tilt": {"craft": -2, "reach": 1}, "gain": {"stones": 600},
+				"desc": "He made it, and he has a right to what he made, and a right to his anger: the king is dead, but the eyes are still out. Let it be a lute that will not sing. Only let it keep time for something else. The haulers of Longmen want a drum for the tow-path (the haulers' thanks).",
+				"log": "Left Gao Jianli his leaded lute as it was, and found it work on the tow-path at Longmen."},
+			{"id": "break", "label": "Break it, and cut him another", "tilt": {"craft": 2, "heart": -1}, "gain": {"items": {"ess_wood": 5}},
+				"desc": "Some things cannot be mended because they were never broken: they were made for one purpose and it was a killing. Break it on the rock. There is paulownia at Longmen, and Boatwright Gao knows wood. A new lute owes nothing to anybody (essences, from the old wood).",
+				"log": "Had Gao Jianli's leaded lute broken on the rock, and a new one cut for him at Longmen."},
+		],
+		"after": {
+			"melt": [["Gao Jianli of the Leaded Lute", "It is light. I had forgotten it was light. ...It sounds like a sick child. Do not tell me it will mend; I can hear that it will. That is the trouble with ears. One cannot go on not knowing things."]],
+			"keep": [["Gao Jianli of the Leaded Lute", "Mine. Yes. And they want it on the tow-path, to pull to? Forty men, hauling a boat up a river, to MY beat. ...I have kept time for eight thousand who could not hear me. Forty who can. I find I am afraid of it."]],
+			"break": [["Gao Jianli of the Leaded Lute", "Break it, then. No. Give it here. I shall. ...There. It made its best sound going. Paulownia wants ten years to season, sweeper. I have the time. I am surprised to find I have the time."]],
+		},
+		"echo": {
+			"s_p23_gaixia": {
+				"melt": [["Music-Master Kuang", "He is behind the east company with the lute across his knees. He will not play; it is not well yet. He says he will listen, and tell them afterwards what they did wrong. He means it kindly."]],
+				"keep": [["Music-Master Kuang", "Hear that, under the east company? That is the leaded lute, on a cart, keeping their time. He asked to come. It cannot carry the tune. It carries everything else."]],
+				"break": [["Music-Master Kuang", "He is with the east company, with nothing in his hands at all, singing. Badly. A man who has only ever played has no notion how to breathe. I have never heard anything I liked so much."]],
+			},
+			"s_p23_bell": {
+				"melt": [["Ling Lun, Who Cut the Pipes", "There is a small bar of lead on my bench that came out of a lute. I have been asked to put it in the bell. I shall not; lead sours bronze. I have put it under the bell-frame, where it can hear."]],
+				"keep": [["Ling Lun, Who Cut the Pipes", "The haulers of Longmen have sent word that they are pulling to a new beat, and making a third better time upriver. They did not say whose. I know whose. I can hear it from here, and it is exactly on the count."]],
+				"break": [["Ling Lun, Who Cut the Pipes", "A blind man came to my door for the length of a lute's string. I gave it him in millet grains, laid end to end. He counted them twice with his fingers and said I was a grain out. He was right."]],
+			},
+		},
+		"end": {
+			"melt": "On the height above Longmen two blind men play in the evenings, a qin and a lute. The lute has only this year stopped sounding like something getting over an illness. The ferrymen rest their poles to listen.",
+			"keep": "The haulers of Longmen pull to the beat of a lute with lead in it, struck by a blind man on the bank who has never once played them a tune and never once missed the count.",
+			"break": "There is a lute seasoning in Boatwright Gao's loft at Longmen that will not be ready for ten years. A blind man comes every week to knock on it and listen. He says it is coming on.",
+		}},
+	"the_host": {"step": "s_p23_hao2", "part": "XXIII", "n": "What becomes of a host",
+		"ask": "Eleven companies stand on the drill ground at Qingshi: ploughmen, horse-folk, camel archers, haulers, founders, the band. They have held three fields. They can form a square, and they can sing six airs that are one song, and they have not been home since the tenth month. Lady Hao has the roll in her hand, every name on it, and Master Sun has closed his book. The Yellow Bell is hung. Nothing is coming. What becomes of a host?",
+		"options": [
+			{"id": "home", "label": "Home, every one, by the roll", "tilt": {"reach": -3, "heart": 2}, "gain": {"renown": 6},
+				"desc": "Read the roll aloud, each name and each village, and let each man answer and go. The banners to the hearths that sent them; the spears rehafted as hoes. A land that keeps no host must be asked again next time, and may say no. That is what makes it a land worth asking (renown).",
+				"log": "Read the roll and sent the levy home, every one, to the hearths that sent them."},
+			{"id": "keep", "label": "A standing host, quartered at the Drum Tower", "tilt": {"reach": 3, "heart": -2}, "gain": {"stones": 1500},
+				"desc": "The clay was not the last thing that will ever march. Keep a company of each arm under the Drum Tower, paid, drilled, and led by somebody who knows the roll by heart. It will be there when it is wanted. It will also be there when it is not, and a host with nothing to do finds something (the Drum Tower's first tithe).",
+				"log": "Kept a standing host at the Drum Tower of Qingshi."},
+			{"id": "band", "label": "Keep the song, not the spears", "tilt": {"craft": 3, "reach": 1}, "gain": {"items": {"ess_metal": 4, "ess_wood": 4}},
+				"desc": "What won at Gaixia was not a spear. Send the spears home and keep the band: let the eleven companies meet at the Pear Garden every year on the day the bell was hung, from all six hearths, and sing. A thing that has learned to sing together can be asked to stand together (what the companies left at the stage door).",
+				"log": "Sent the spears home and kept the song: the six hearths to sing together at Qingshi every year."},
+		],
+		"after": {
+			"home": [["Lady Hao", "By the roll. Yes. I shall read it myself; I know how each is said. It will take until dark. Sweeper: thirteen thousand of mine went home from the Qiang campaign and nobody read their names. I have wanted to do this for three thousand years. Stand there and listen to all of it."]],
+			"keep": [["Lady Hao", "A standing host. I led one; I know what it is for and what it turns into. Then it shall have a rule: it marches on a whole tally, and the other half is held by the six hearths together, not by any king. I will see to that before I go back under my hill."]],
+			"band": [["Lady Hao", "Hah! Keep the band. My husband's generals would have had a fit. ...Do it. I took the Tu-fang with drums and never told them how. Let them come once a year and sing, and let anybody who means the land harm come and count how many know the words."]],
+		},
+		"echo": {
+			"s_p23_end": {
+				"home": [["Elder Qing Xuan", "The outer disciples came up the steps last night, forty of them, in step, and fell out of it on the third flight without anybody telling them. I was glad to see it. They had been soldiers quite long enough."]],
+				"keep": [["Elder Qing Xuan", "I hear there is a host at the Drum Tower now, with a rule and half a tally. Forty of them are mine. I have asked for them back at the turn of each season, to sweep. A soldier who has never swept is a danger to everybody."]],
+				"band": [["Elder Qing Xuan", "The outer disciples came home singing something with a boat-haul in it and a camel. They have been forbidden it in the library. They sing it on the steps; it is, I admit, a good rhythm for a broom."]],
+			},
+			"post:s_break28": {
+				"home": [["Narrator", "On the roads below the mountain that evening there are small parties going six ways, with hoes on their shoulders that have been spears. None of them is in step. From high enough up, it looks like a hand opening."]],
+				"keep": [["Narrator", "From the pine the Drum Tower of Qingshi can just be seen, with a watch-fire on it, and a figure walking the wall with a roll under one arm, reading it over, as some people say their prayers."]],
+				"band": [["Narrator", "From the pine, on the evening wind, something comes up out of the valley that might be six songs or one. It is ragged. It is a quarter-tone warm of true, like the bell. It goes on a long time."]],
+			},
+		},
+		"end": {
+			"home": "The land keeps no host. When it wants one it asks, hearth by hearth, and the keepers of the six fires say yes or no as they see fit. So far they have said yes.",
+			"keep": "A host stands at the Drum Tower of Qingshi, a company of each arm, and marches on a whole tally whose other half lies in six pieces at six hearths. It has not marched. It drills, and it grumbles, and it is there.",
+			"band": "Every year on the day the Yellow Bell was hung, eleven companies come in to the Pear Garden from six hearths without a spear among them, and sing. It can be heard at the sect. People who mean the land harm are said to have come to listen, and gone home thoughtful.",
+		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
 	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow",
 	"the_pupils", "the_three_thousand", "the_arms",
-	"the_voices", "the_kites", "the_tops"]
+	"the_voices", "the_kites", "the_tops",
+	"the_clay", "the_lute", "the_host"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

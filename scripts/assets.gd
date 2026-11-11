@@ -61,6 +61,13 @@ const PEOPLE := {
 	# Part XXII (the High Roads release)
 	"xie_lingyun": "characters/xie_lingyun", "liezi": "characters/liezi", "zhong_ziqi": "characters/zhong_ziqi", "han_yu": "characters/han_yu",
 	"shan_gui": "characters/shan_gui", "dongyue": "characters/dongyue",
+	# Part XXIII (the Thundering Pots release)
+	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
+	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
+	# (the people of the Drum Tower quarter who wear the bodies of the towns)
+	"dicer_du": "characters/folk_grandpa", "clerk_bai": "characters/folk_scholar", "tailor_qiao": "characters/folk_merchant",
+	# (Lady Hao with the levy on each of its three fields: the same person)
+	"hao_millet": "characters/fu_hao", "hao_longmen": "characters/fu_hao", "hao_dunes": "characters/fu_hao",
 	# the Hollow Hills release (Part XX): the traveller who measures caves, the Foolish Old Man and the Wise
 	# one, the woodcutter of Rotten-Axe Mountain, and the Valley Spirit
 	"xu_xiake": "characters/xu_xiake", "yu_gong": "characters/yu_gong", "zhi_sou": "characters/zhi_sou", "wang_zhi": "characters/wang_zhi", "xuanpin": "characters/xuanpin",

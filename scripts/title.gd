@@ -97,6 +97,9 @@ func creating() -> bool:
 	return main.top_name() == "create"
 
 func press(act: String) -> void:
+	# (eggs.gd: the old code, keyed before anything begins)
+	if Eggs.title_key(act):
+		main.fx_flash(Color(0.8, 0.9, 1.0), 0.35)
 	match act:
 		"up", "down":
 			cursor = (cursor + 1) % 2
@@ -132,4 +135,6 @@ func _draw() -> void:
 	draw_line(Vector2(380, 228), Vector2(900, 228), Color(UI.C_GOLD.r, UI.C_GOLD.g, UI.C_GOLD.b, 0.6), 2.0)
 	Gfx.diamond(self, Vector2(640, 228), 7.0, UI.C_GOLD)
 	UI.menu_list(self, Rect2(520, 380, 240, 110), labels, cursor, enabled, 24)
+	if Eggs.code_done:
+		UI.text(self, Vector2(0, 520), "Somewhere under a stair, a cupboard door has come open.", 16, UI.C_JADE, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)
 	UI.text(self, Vector2(0, 700), "Arrows/WASD move  -  Q/E camera  -  R ride  -  T talk to Yue Ling  -  Enter/Z confirm  -  Esc menu", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)

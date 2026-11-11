@@ -210,6 +210,23 @@ def build(o):
             bones = [{"head": 1.0}, {"head": 0.5, "hair_tail": 0.5}, {"hair_tail": 1.0}, {"hair_tail": 1.0}]
             b.ribbon(pts, [0.02, 0.022, 0.018, 0.006], (1, 0, 0), rc, bones=bones, col_end=lighten(rc, 0.3))
 
+    # ---------------- a cloth bound over the eyes (the Thundering Pots release: Music-Master Kuang, Gao Jianli):
+    # a flat band round the head at the eye line, knotted behind, with two short ends
+    if o.get("blindfold") is not None:
+        import math as _m
+        bc = rgb(o["blindfold"])
+        ey = facelib.HC.y + facelib.EYE_Y + 0.004
+        ring = []
+        for k in range(17):
+            a = _m.tau * k / 16.0
+            rz = (facelib.RZF + 0.012) if _m.cos(a) > 0 else (facelib.RZB + 0.01)
+            ring.append(V(_m.sin(a) * (facelib.RX + 0.012), ey, facelib.HC.z + _m.cos(a) * rz))
+        b.tube(ring, [(0.006, 0.02)] * 17, bc, cls=CLOTH, bone="head", seg=6, cap0=False, cap1=False, up=(0, 1, 0))
+        knot = V(0.0, ey, facelib.HC.z - facelib.RZB - 0.016)
+        b.ellipsoid(knot, (0.018, 0.016, 0.012), bc, cls=CLOTH, bone="head", seg=8, rings=5)
+        for s3 in (1, -1):
+            b.ribbon([knot, knot + V(0.025 * s3, -0.07, -0.02), knot + V(0.035 * s3, -0.15, -0.025)], [0.016, 0.018, 0.006], (1, 0, 0), bc, bones=[{"head": 1.0}] * 3, col_end=darken(bc, 0.2))
+
     # ---------------- cape, armour, weapons
     if o.get("cape") is not None:
         b.cur_pal = 0.5

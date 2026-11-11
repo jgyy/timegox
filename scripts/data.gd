@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 81
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing"]
+const MAX_LEVEL := 84
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -77,6 +77,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Does Not Draw", "note": "Arms are instruments of ill omen, says the old book, and not the tools of the gentleman, who takes them up only when he cannot do otherwise. The best soldier is not soldierly; the best fighter is not angry. Every weapon you carry knows it is carried by somebody who would rather not, and is the sharper for it."},
 	# Part XXII (the High Roads release): what is left to stand on
 	{"life": 0, "title": "Who Leans on Nothing", "note": "Master Lie rode the wind, cool and light, and came back after fifteen days; and still, says the old book, he had something to lean on. One who mounts on what is true of heaven and earth, and rides the changes of the six breaths, leans on nothing. You go up by your hands and come down by the air, and need neither. Paths are a little easier behind you, and nobody who walks them knows why."},
+	# Part XXIII (the Thundering Pots release): what is left when the noise stops
+	{"life": 0, "title": "Who Hears the Note Not Sounded", "note": "The great square has no corners, says the old book; the great vessel is late in finishing; the great note is rarely sounded; the great image has no shape. Ling Lun cut twelve pipes to the phoenix's song and has spent four thousand years listening for the one the phoenix did not sing. You have heard a field of eight thousand go quiet all at once. Where you walk, bells are in tune that have not been tuned, and nobody quarrels in the hour before supper."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -783,6 +785,23 @@ const ENEMIES := {
 	"fei_lian": {"n": "Fei Lian, Earl of the Wind", "elem": "thunder", "weak": "earth", "col": Color("d8e4ec"), "shape": "qilin", "boss": true, "pal": {"sec": Color("8aa0b4"), "acc": Color("3a4a5a"), "mark": Color("f0d080")}},
 	"shan_gui": {"n": "The Mountain Spirit, Who Is Still Waiting", "elem": "wood", "weak": "fire", "col": Color("4a7a4a"), "shape": "person:shan_gui", "boss": true},
 	"dongyue": {"n": "The Lord of the Eastern Peak", "elem": "earth", "weak": "wood", "col": Color("8a8a96"), "shape": "person:dongyue", "boss": true},
+	# ---- Part XXIII: The Thundering Pots (the Thundering Pots release): what marches when the Yellow Bell is broken
+	"pot_drummer": {"n": "Pot-Drummer", "elem": "earth", "weak": "water", "col": Color("b0785a"), "shape": "ape", "pal": {"sec": Color("6a4634"), "acc": Color("e8d8c0")}},
+	"flat_note": {"n": "Flat Note", "elem": "dark", "weak": "thunder", "col": Color("7a7a9a"), "shape": "wisp", "pal": {"sec": Color("3a3a5a"), "acc": Color("d8d0ff")}},
+	"kiln_wasp": {"n": "Kiln-Wasp", "elem": "fire", "weak": "water", "col": Color("c86a2a"), "shape": "mantis", "pal": {"sec": Color("4a2a1a"), "acc": Color("ffc060")}},
+	"clay_spearman": {"n": "Clay Spearman of the Left", "elem": "earth", "weak": "water", "col": Color("a8765a"), "shape": "humanoid", "pal": {"sec": Color("5a4032"), "acc": Color("d8c8b0")}},
+	"clay_archer": {"n": "Kneeling Archer", "elem": "phys", "weak": "thunder", "col": Color("9a7a62"), "shape": "humanoid", "pal": {"sec": Color("4a5a3a"), "acc": Color("c8b090")}},
+	"clay_horse": {"n": "Saddle-Horse of Mount Li", "elem": "earth", "weak": "wood", "col": Color("8a5a40"), "shape": "beast", "pal": {"sec": Color("3a2a22"), "acc": Color("c8a888")}},
+	"lead_string": {"n": "Leaded String", "elem": "phys", "weak": "fire", "col": Color("6a7078"), "shape": "serpent", "pal": {"sec": Color("3a3e44"), "acc": Color("d8dce4")}},
+	"reed_pipe": {"n": "Cracked Reed-Pipe", "elem": "wood", "weak": "fire", "col": Color("b8a860"), "shape": "plant", "pal": {"sec": Color("5a5230"), "acc": Color("e8e0a0")}},
+	"drowned_drum": {"n": "Drowned Drum", "elem": "water", "weak": "thunder", "col": Color("5a7a8a"), "shape": "tortoise", "pal": {"sec": Color("7a2a22"), "acc": Color("d8c8a0")}},
+	"chu_halberd": {"n": "Halberdier of the Eight Thousand", "elem": "phys", "weak": "earth", "col": Color("7a3a32"), "shape": "humanoid", "pal": {"sec": Color("2a1a1a"), "acc": Color("c8a050")}},
+	"black_steed": {"n": "Riderless Black Steed", "elem": "thunder", "weak": "earth", "col": Color("2a2a34"), "shape": "beast", "pal": {"sec": Color("14141a"), "acc": Color("c8ccd8")}},
+	"cauldron_breaker": {"n": "Cauldron-Breaker", "elem": "fire", "weak": "water", "col": Color("6a5a4a"), "shape": "golem", "pal": {"sec": Color("3a302a"), "acc": Color("e87a3a")}},
+	"meng_tian": {"n": "Meng Tian, General of the Clay Host", "elem": "earth", "weak": "water", "col": Color("a8765a"), "shape": "golem", "boss": true, "pal": {"sec": Color("5a4032"), "acc": Color("d8c8b0"), "mark": Color("b83a2a")}},
+	"gao_jianli": {"n": "Gao Jianli of the Leaded Lute", "elem": "dark", "weak": "fire", "col": Color("4a4a5a"), "shape": "person:gao_jianli", "boss": true},
+	"xiang_yu": {"n": "The Hegemon-King of Western Chu", "elem": "phys", "weak": "wood", "col": Color("7a2a2a"), "shape": "person:xiang_yu", "boss": true},
+	"wafu": {"n": "Wafu, the Thundering Pot", "elem": "earth", "weak": "thunder", "col": Color("9a6a4a"), "shape": "blob", "boss": true, "pal": {"sec": Color("4a3020"), "acc": Color("e8c080"), "mark": Color("2a1a12")}},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -1430,6 +1449,8 @@ const AREAS := {
 	},
 	# ---- Part V: The Falling Sky
 	"dunes": {
+		# Part XXIII: the eight thousand who crossed the river with the Hegemon-King, and what they left behind them
+		"warband2": {"pool": [["chu_halberd", 83, 83], ["black_steed", 83, 83], ["cauldron_breaker", 83, 83]], "n": 16, "vis": "s_p23_songs", "late": true},
 		# Part XIX: what the makers made that has walked off into the sand
 		"warband": {"pool": [["wooden_kite", 70, 71], ["stray_ox", 70, 71], ["paper_servant", 70, 71]], "n": 15, "vis": "s_p19_yanshi", "late": true},
 		"n": "Desert of Fallen Stars", "w": 96, "h": 58, "seed": 191, "theme": "dunes", "enemies": 20,
@@ -1447,7 +1468,9 @@ const AREAS := {
 			{"id": "star_reader_kumar", "n": "Star-Reader Kumar", "pos": Vector2i(20, 38), "col": Color("2e2e6a")},
 			{"id": "camel_boy_temur", "n": "Temur the Camel-Boy", "pos": Vector2i(19, 52), "col": Color("8a6a4a")},
 			# Part XIX: the artificer who once showed a king a dancer
-			{"id": "yan_shi", "n": "Yan Shi the Artificer", "pos": Vector2i(26, 44), "col": Color("5a4a7a"), "vis": ["s_p19_ladder", ""], "late": true}
+			{"id": "yan_shi", "n": "Yan Shi the Artificer", "pos": Vector2i(26, 44), "col": Color("5a4a7a"), "vis": ["s_p19_ladder", ""], "late": true},
+			# Part XXIII: Lady Hao with the levy at Gaixia, under the one height of the sands
+			{"id": "hao_dunes", "n": "Lady Hao", "pos": Vector2i.ZERO, "col": Color("8a2a2a"), "asset": "fu_hao", "vis": ["s_p23_songs", "s_p23_bell"], "late": true, "peak": 0, "stand": "foot"}
 		],
 		"bosses": [
 			{"id": "glass_scorpion", "pos": Vector2i(30, 40), "lv": 27, "req": 27},
@@ -1455,13 +1478,19 @@ const AREAS := {
 			{"id": "star_colossus", "pos": Vector2i(60, 40), "lv": 27, "req": 27},
 			{"id": "white_tiger", "pos": Vector2i(86, 28), "lv": 27, "req": 27},
 			# Part XIX: the Player, Yan Shi's dancer, in the dunes west of Shazhou
-			{"id": "the_player", "pos": Vector2i(30, 28), "lv": 71, "req": 70, "vis": ["s_p19_campfire", ""], "late": true}
+			{"id": "the_player", "pos": Vector2i(30, 28), "lv": 71, "req": 70, "vis": ["s_p19_campfire", ""], "late": true},
+			# Part XXIII: the Hegemon-King, on the height, in front of nobody
+			{"id": "xiang_yu", "pos": Vector2i.ZERO, "lv": 84, "req": 83, "vis": ["s_p23_gaixia", ""], "late": true, "peak": 0, "stand": "top"}
 		],
 		"pickups": [
 			{"id": "fstar1", "item": "fallen_star", "pos": Vector2i(22, 12)}, {"id": "fstar2", "item": "fallen_star", "pos": Vector2i(40, 46)},
 			{"id": "fstar3", "item": "fallen_star", "pos": Vector2i(64, 30)}, {"id": "fstar4", "item": "fallen_star", "pos": Vector2i(76, 10)},
 			# Part XIX: pieces of the Player that it shed and outgrew, lacquer and leather in the sand
-			{"id": "p19_part1", "item": "player_part", "pos": Vector2i(11, 18), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part2", "item": "player_part", "pos": Vector2i(30, 18), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part3", "item": "player_part", "pos": Vector2i(44, 38), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part4", "item": "player_part", "pos": Vector2i(33, 47), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part5", "item": "player_part", "pos": Vector2i(55, 20), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part6", "item": "player_part", "pos": Vector2i(41, 11), "vis": ["s_p19_yanshi", ""], "late": true}
+			{"id": "p19_part1", "item": "player_part", "pos": Vector2i(11, 18), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part2", "item": "player_part", "pos": Vector2i(30, 18), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part3", "item": "player_part", "pos": Vector2i(44, 38), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part4", "item": "player_part", "pos": Vector2i(33, 47), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part5", "item": "player_part", "pos": Vector2i(55, 20), "vis": ["s_p19_yanshi", ""], "late": true}, {"id": "p19_part6", "item": "player_part", "pos": Vector2i(41, 11), "vis": ["s_p19_yanshi", ""], "late": true},
+			# Part XXIII: the banners of Chu, left standing in the sand where each company went home
+			{"id": "p23_banner1", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p23_banner2", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "p23_banner3", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p23_banner4", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p23_banner5", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "flank"}
 		],
 		"pickup_vis": "s_du_collect",
 		# Shazhou Oasis: a caravan town round a sweet well, where the west road comes in off the sand
@@ -1646,6 +1675,10 @@ const AREAS := {
 	},
 	# ---- Part VII: The Unbroken Land
 	"village": {
+		# (the Thundering Pots release: the packs keep off the ground the clay kiln of the Hundred Works stands on)
+		"clear": [Vector2i(45, 47)],
+		# Part XXIII: what keeps time on the pots round Qingshi since the bells went flat
+		"warband2": {"pool": [["pot_drummer", 81, 81], ["flat_note", 81, 81], ["kiln_wasp", 81, 81]], "n": 16, "vis": "s_p23_home", "late": true},
 		# Part XIX: what gets into a wheel that turns all night with nobody at it
 		"warband": {"pool": [["wheel_mite", 69, 70], ["treadle_imp", 69, 70], ["idle_shuttle", 69, 70]], "n": 14, "vis": "s_p19_gardener", "late": true},
 		"n": "Qingshi Village Below the Mountain", "w": 96, "h": 58, "seed": 271, "theme": "village", "enemies": 18,
@@ -1680,7 +1713,16 @@ const AREAS := {
 			{"id": "gongshu_ban", "n": "Gongshu Ban", "pos": Vector2i(5, 38), "col": Color("7a5a38"), "vis": ["s_p19_home", ""], "late": true},
 			{"id": "gardener_hanyin", "n": "The Gardener of Hanyin", "pos": Vector2i(6, 27), "col": Color("6a8a5a"), "vis": ["s_p19_home", ""], "late": true},
 			# Part XX: the Foolish Old Man, carrying the North Mountain away in baskets
-			{"id": "yu_gong", "n": "Yu Gong, the Foolish Old Man", "pos": Vector2i(45, 5), "col": Color("8a7450"), "vis": ["s_p20_things", ""], "late": true}
+			{"id": "yu_gong", "n": "Yu Gong, the Foolish Old Man", "pos": Vector2i(45, 5), "col": Color("8a7450"), "vis": ["s_p20_things", ""], "late": true},
+			# the Thundering Pots release: the Drum Tower quarter of Qingshi: the clerk of the notice board (jobs.gd) and the tailor (fashion.gd)
+			{"id": "clerk_bai", "n": "Clerk Bai of the Notice Board", "pos": Vector2i(77, 19), "col": Color("4a5a7a"), "asset": "folk_scholar"},
+			{"id": "tailor_qiao", "n": "Tailor Qiao", "pos": Vector2i(75, 22), "col": Color("8a3a5a"), "asset": "folk_merchant"},
+			# Part XXIII: Ling Lun at the door of the Hall of the Twelve Pipes; Master Sun and Lady Hao on the drill ground
+			{"id": "ling_lun", "n": "Ling Lun, Who Cut the Pipes", "pos": Vector2i(83, 19), "col": Color("c8b468"), "vis": ["s_p23_home", ""], "late": true},
+			{"id": "sun_wu", "n": "Master Sun", "pos": Vector2i(68, 27), "col": Color("3a4a5a"), "vis": ["s_p23_lun", ""], "late": true},
+			{"id": "fu_hao", "n": "Lady Hao", "pos": Vector2i(66, 26), "col": Color("8a2a2a"), "vis": ["s_p23_sun", ""], "late": true},
+			# (gamble.gd) Old Du and his mat, in the lane between the barracks and the Pear Garden stage
+			{"id": "dicer_du", "n": "Old Du of the Three Dice", "pos": Vector2i(79, 25), "col": Color("5a3a6a"), "asset": "folk_grandpa", "vis": ["s_vl_intro", ""], "late": true}
 		],
 		"bosses": [
 			# Part XVI: the Year Beast, down out of the mountains at midnight
@@ -1692,14 +1734,21 @@ const AREAS := {
 			# Part XVII: the lord of the year under the earth, woken by the whole land broken open at once
 			{"id": "taisui", "pos": Vector2i(55, 8), "lv": 65, "req": 64, "vis": ["s_p17_taisui", ""], "late": true},
 			# Part XX: the Lamb of the Earth, at the end of Yu Gong's Adit
-			{"id": "fen_yang", "pos": Vector2i.ZERO, "lv": 73, "req": 72, "vis": ["s_p20_gong", ""], "late": true, "cave": -1, "stand": "deep"}
+			{"id": "fen_yang", "pos": Vector2i.ZERO, "lv": 73, "req": 72, "vis": ["s_p20_gong", ""], "late": true, "cave": -1, "stand": "deep"},
+			# Part XXIII: the Thundering Pot, in the First Kiln under Yu Gong's Adit (caves.gd stands it at the back)
+			{"id": "wafu", "pos": Vector2i.ZERO, "lv": 84, "req": 83, "vis": ["s_p23_xiang", ""], "late": true, "cave": -2, "stand": "deep"}
 		],
 		"pickups": [{"id": "sthread1", "item": "silver_thread", "pos": Vector2i(22, 12)}, {"id": "sthread2", "item": "silver_thread", "pos": Vector2i(40, 46)}, {"id": "sthread3", "item": "silver_thread", "pos": Vector2i(64, 30)}, {"id": "sthread4", "item": "silver_thread", "pos": Vector2i(76, 10)},
 			{"id": "cur_wutong2", "item": "wutong_seed", "pos": Vector2i(11, 23), "floor": ["wen_house", -1], "always": true},
 			# Part XVIII: apricot and jujube wood, the wood of summer, for the fire-drill
 			{"id": "p18_wood1", "item": "apricot_wood", "pos": Vector2i(41, 20), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood2", "item": "apricot_wood", "pos": Vector2i(41, 41), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood3", "item": "apricot_wood", "pos": Vector2i(20, 27), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood4", "item": "apricot_wood", "pos": Vector2i(26, 17), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood5", "item": "apricot_wood", "pos": Vector2i(59, 33), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood6", "item": "apricot_wood", "pos": Vector2i(24, 40), "vis": ["s_p18_wood", ""], "late": true},
 			# Part XX: the baskets Yu Gong's sons dropped in the adit
-			{"id": "p20_bask1", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_bask2", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_bask3", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_bask4", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_bask5", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "deep"}
+			{"id": "p20_bask1", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_bask2", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_bask3", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_bask4", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_bask5", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "deep"},
+			# Part XXIII: the pieces of the Yellow Bell, which fell on the heights above Qingshi
+			{"id": "p23_shard1", "item": "bell_shard", "pos": Vector2i.ZERO, "vis": ["s_p23_pots", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p23_shard2", "item": "bell_shard", "pos": Vector2i.ZERO, "vis": ["s_p23_pots", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "p23_shard3", "item": "bell_shard", "pos": Vector2i.ZERO, "vis": ["s_p23_pots", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p23_shard4", "item": "bell_shard", "pos": Vector2i.ZERO, "vis": ["s_p23_pots", ""], "late": true, "peak": 0, "stand": "flank"},
+			# (eggs.gd: something yellow, in the First Kiln, that nobody is told to look for)
+			{"id": "egg_duck", "item": "clay_duck", "pos": Vector2i.ZERO, "vis": ["s_vl_intro", ""], "late": true, "cave": -2, "stand": "any"}
 		],
 		"pickup_vis": "s_vl_collect",
 		"springs": [Vector2i(30, 22)],
@@ -1727,6 +1776,25 @@ const AREAS := {
 				"props": [["desk", Vector2i(49, 36), true], ["bookshelf", Vector2i(45, 37), true], ["scroll", Vector2i(50, 38), false], ["lantern", Vector2i(45, 35), false]]},
 			{"id": "granary", "n": "Village Granary", "style": "farmhouse", "rect": Rect2i(76, 34, 7, 6), "door": Vector2i(79, 34),
 				"props": [["barrel", Vector2i(77, 35), true], ["barrel", Vector2i(81, 35), true], ["barrel", Vector2i(77, 38), true], ["barrel", Vector2i(81, 38), true]]},
+			# ---- the Thundering Pots release: Qingshi has grown.  The Drum Tower quarter, east of Lao's farm: a
+			# street from the Drum Tower to the Hall of the Twelve Pipes, the tailor's and the levy's barracks
+			# across it, the Pear Garden stage and the potter's kiln beyond
+			{"id": "drum_row1", "n": "A House in Drum Tower Row", "style": "house", "rect": Rect2i(72, 6, 7, 6), "door": Vector2i(75, 11),
+				"props": [["bed", Vector2i(73, 7), true], ["stove", Vector2i(77, 7), true], ["table", Vector2i(76, 9), true], ["cabinet", Vector2i(73, 10), false]]},
+			{"id": "drum_row2", "n": "The Players' Lodging", "style": "house", "rect": Rect2i(80, 6, 7, 6), "door": Vector2i(83, 11),
+				"props": [["bed", Vector2i(81, 7), true], ["bed", Vector2i(85, 7), true], ["table", Vector2i(83, 9), true], ["lantern", Vector2i(81, 10), false]]},
+			{"id": "drum_tower", "n": "The Drum Tower", "style": "hall", "rect": Rect2i(72, 13, 7, 6), "door": Vector2i(75, 18),
+				"props": [["altar", Vector2i(75, 14), true], ["rack", Vector2i(73, 14), true], ["rack", Vector2i(77, 14), true], ["cushion", Vector2i(75, 16), false], ["lantern", Vector2i(73, 17), false], ["lantern", Vector2i(77, 17), false]]},
+			{"id": "pipes_hall", "n": "The Hall of the Twelve Pipes", "style": "library", "rect": Rect2i(80, 13, 7, 6), "door": Vector2i(83, 18),
+				"props": [["bookshelf", Vector2i(81, 14), true], ["bookshelf", Vector2i(85, 14), true], ["desk", Vector2i(83, 15), true], ["scroll", Vector2i(81, 17), false], ["cushion", Vector2i(84, 17), false], ["lantern", Vector2i(85, 17), false]]},
+			{"id": "tailor_shop", "n": "Qiao's Needle and Thread", "style": "shop", "rect": Rect2i(71, 20, 7, 6), "door": Vector2i(74, 20),
+				"props": [["counter", Vector2i(73, 22), true], ["loom", Vector2i(76, 24), true], ["cabinet", Vector2i(72, 24), false]]},
+			{"id": "levy_barracks", "n": "The Levy's Barracks", "style": "dorm", "rect": Rect2i(79, 20, 8, 5), "door": Vector2i(83, 20),
+				"props": [["bed", Vector2i(80, 21), true], ["bed", Vector2i(80, 23), true], ["bed", Vector2i(85, 21), true], ["bed", Vector2i(85, 23), true], ["rack", Vector2i(83, 23), true], ["lantern", Vector2i(82, 22), false]]},
+			{"id": "pear_garden", "n": "The Pear Garden Stage", "style": "teahouse", "rect": Rect2i(77, 26, 9, 5), "door": Vector2i(81, 26),
+				"props": [["table", Vector2i(79, 28), true], ["stool", Vector2i(78, 28), false], ["table", Vector2i(83, 28), true], ["stool", Vector2i(84, 28), false], ["counter", Vector2i(81, 29), true], ["lantern", Vector2i(78, 27), false], ["lantern", Vector2i(84, 27), false]]},
+			{"id": "potter_kiln", "n": "Potter Tao's Kiln", "style": "smithy", "rect": Rect2i(88, 20, 6, 5), "door": Vector2i(88, 22),
+				"props": [["stove", Vector2i(92, 21), true], ["barrel", Vector2i(92, 23), true], ["shelf", Vector2i(90, 23), false], ["table", Vector2i(90, 21), true]]},
 		],
 	},
 	"terraces": {
@@ -1949,6 +2017,8 @@ const AREAS := {
 	},
 	# cracked drought farmland and withered millet along a dry river, a wayside shrine of Hou Ji
 	"millet": {
+		# Part XXIII: the vanguard of the clay host, come down off Mount Li by the count
+		"warband2": {"pool": [["clay_spearman", 81, 82], ["clay_archer", 81, 82], ["clay_horse", 81, 82]], "n": 16, "vis": "s_p23_jobs", "late": true},
 		"n": "The Scorched Millet Plains", "w": 100, "h": 52, "seed": 361, "theme": "millet", "enemies": 20,
 		# Part XVII: the five poisons the first thunder woke in the plains
 		"warband": {"pool": [["waking_scorpion", 64, 65], ["waking_centipede", 64, 65], ["waking_toad", 64, 65]], "n": 10, "vis": "s_p17_thunder", "late": true},
@@ -1959,16 +2029,25 @@ const AREAS := {
 		],
 		"npcs": [
 			# a fated encounter (fate.gd): there while the story has them there
-			{"id": "tala_plains", "n": "Tala of the Horse-Folk", "pos": Vector2i(17, 22), "col": Color("d8a04a"), "asset": "tala", "fate": true},{"id": "farmer_tian", "n": "Old Farmer Tian", "pos": Vector2i(15, 21), "col": Color("8a7a4a"), "vis": ["s_mf_intro", ""]}],
+			{"id": "tala_plains", "n": "Tala of the Horse-Folk", "pos": Vector2i(17, 22), "col": Color("d8a04a"), "asset": "tala", "fate": true},{"id": "farmer_tian", "n": "Old Farmer Tian", "pos": Vector2i(15, 21), "col": Color("8a7a4a"), "vis": ["s_mf_intro", ""]},
+			# Part XXIII: Lady Hao with the levy, drawn up at the foot of the one height of the plain
+			{"id": "hao_millet", "n": "Lady Hao", "pos": Vector2i.ZERO, "col": Color("8a2a2a"), "asset": "fu_hao", "vis": ["s_p23_jobs", "s_p23_kuang"], "late": true, "peak": 0, "stand": "foot"}
+		],
 		"bosses": [
 			{"id": "locust_marquis", "pos": Vector2i(34, 10), "lv": 39, "req": 39},
 			{"id": "dust_devil", "pos": Vector2i(46, 43), "lv": 40, "req": 40},
 			{"id": "well_tortoise", "pos": Vector2i(70, 15), "lv": 40, "req": 40},
 			{"id": "bifang", "pos": Vector2i(88, 33), "lv": 40, "req": 40},
 			# Part XVII: the mother of everything poisonous the first thunder woke under the millet
-			{"id": "poison_mother", "pos": Vector2i(47, 40), "lv": 65, "req": 64, "vis": ["s_p17_mother", ""], "late": true}
+			{"id": "poison_mother", "pos": Vector2i(47, 40), "lv": 65, "req": 64, "vis": ["s_p17_mother", ""], "late": true},
+			# Part XXIII: the general the First Emperor buried with his army, on the height where a general stands
+			{"id": "meng_tian", "pos": Vector2i.ZERO, "lv": 82, "req": 81, "vis": ["s_p23_lishan", ""], "late": true, "peak": 0, "stand": "top"}
 		],
-		"pickups": [{"id": "rstone1", "item": "rain_stone", "pos": Vector2i(20, 42)}, {"id": "rstone2", "item": "rain_stone", "pos": Vector2i(50, 22)}, {"id": "rstone3", "item": "rain_stone", "pos": Vector2i(66, 44)}, {"id": "rstone4", "item": "rain_stone", "pos": Vector2i(84, 8)}],
+		"pickups": [{"id": "rstone1", "item": "rain_stone", "pos": Vector2i(20, 42)}, {"id": "rstone2", "item": "rain_stone", "pos": Vector2i(50, 22)}, {"id": "rstone3", "item": "rain_stone", "pos": Vector2i(66, 44)}, {"id": "rstone4", "item": "rain_stone", "pos": Vector2i(84, 8)},
+			# Part XXIII: the halves of the tiger tallies, dropped where the ranks stopped
+			{"id": "p23_tally1", "item": "tiger_tally", "pos": Vector2i.ZERO, "vis": ["s_p23_scouts", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p23_tally2", "item": "tiger_tally", "pos": Vector2i.ZERO, "vis": ["s_p23_scouts", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "p23_tally3", "item": "tiger_tally", "pos": Vector2i.ZERO, "vis": ["s_p23_scouts", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p23_tally4", "item": "tiger_tally", "pos": Vector2i.ZERO, "vis": ["s_p23_scouts", ""], "late": true, "peak": 0, "stand": "flank"}
+		],
 		"pickup_vis": "s_mf_collect",
 		# the farm track from the west gate past the shrine, and the dyke road east
 		"lanes": [Rect2i(2, 24, 22, 2), Rect2i(12, 19, 2, 5), Rect2i(56, 30, 42, 2)],
@@ -2038,6 +2117,8 @@ const AREAS := {
 	# ---- Part X: The Nine Cauldrons
 	# a ferry town on the river below the Dragon Gate, where the golden carp leap to become dragons
 	"longmen": {
+		# Part XXIII: what a blind man's anger has done to every instrument on the river
+		"warband2": {"pool": [["lead_string", 82, 83], ["reed_pipe", 82, 83], ["drowned_drum", 82, 83]], "n": 16, "vis": "s_p23_kuang", "late": true},
 		# Part XVIII: the damp that gets into a tired fire, come up out of the bilges of the river boats
 		"warband": {"pool": [["damp_smoke", 66, 67], ["bilge_imp", 66, 67], ["drowned_ember", 66, 67]], "n": 9, "vis": "s_p18_aysha", "late": true},
 		"n": "Longmen, the Dragon Gate Ferry", "w": 100, "h": 60, "seed": 391, "theme": "longmen", "enemies": 22,
@@ -2064,7 +2145,10 @@ const AREAS := {
 			{"id": "carp_boy_yu", "n": "Little Yu, Who Feeds the Carp", "pos": Vector2i(45, 25), "col": Color("e0a040")},
 			{"id": "innkeeper_dong", "n": "Innkeeper Dong of the Leaping Carp", "pos": Vector2i(11, 23), "col": Color("a85a3a")},
 			# Part XX: the Wise Old Man of the River Bend, who laughed at him
-			{"id": "zhi_sou", "n": "Zhi Sou, the Wise Old Man of the River Bend", "pos": Vector2i(26, 27), "col": Color("6a8078"), "vis": ["s_p20_gong", ""], "late": true}
+			{"id": "zhi_sou", "n": "Zhi Sou, the Wise Old Man of the River Bend", "pos": Vector2i(26, 27), "col": Color("6a8078"), "vis": ["s_p20_gong", ""], "late": true},
+			# Part XXIII: Music-Master Kuang, listening to the wind at the foot of the height above the ferry; and Lady Hao with the levy
+			{"id": "shi_kuang", "n": "Music-Master Kuang", "pos": Vector2i.ZERO, "col": Color("6a5a7a"), "vis": ["s_p23_meng", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "hao_longmen", "n": "Lady Hao", "pos": Vector2i.ZERO, "col": Color("8a2a2a"), "asset": "fu_hao", "vis": ["s_p23_reeds", "s_p23_songs"], "late": true, "peak": 0, "stand": "foot"}
 		],
 		"bosses": [
 			{"id": "sulking_carp", "pos": Vector2i(62, 13), "lv": 42, "req": 42},
@@ -2073,12 +2157,19 @@ const AREAS := {
 			{"id": "stone_lion", "pos": Vector2i(82, 14), "lv": 42, "req": 42},
 			{"id": "he_bo", "pos": Vector2i(90, 30), "lv": 42, "req": 42},
 			# Part XXI: the two swords that went into the river at the ford, in the Sword Pool under the Dragon Gate
-			{"id": "sword_dragons", "pos": Vector2i.ZERO, "lv": 76, "req": 76, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "deep"}],
+			{"id": "sword_dragons", "pos": Vector2i.ZERO, "lv": 76, "req": 76, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "deep"},
+			# Part XXIII: the lute-player the First Emperor blinded, on the height, playing to nobody
+			{"id": "gao_jianli", "pos": Vector2i.ZERO, "lv": 83, "req": 82, "vis": ["s_p23_river", ""], "late": true, "peak": 0, "stand": "top"}
+		],
 		"pickups": [{"id": "cscale1", "item": "carp_scale", "pos": Vector2i(66, 6)}, {"id": "cscale2", "item": "carp_scale", "pos": Vector2i(76, 22)}, {"id": "cscale3", "item": "carp_scale", "pos": Vector2i(84, 44)}, {"id": "cscale4", "item": "carp_scale", "pos": Vector2i(20, 52)},
 			{"id": "cur_pearl3", "item": "night_pearl", "pos": Vector2i(13, 24), "floor": ["carp_inn", 1], "always": true},
 			{"id": "cache_lm1", "item": "stones", "n": 1800, "pos": Vector2i(38, 47), "floor": ["harbour_office", -1], "always": true},
 			# Part XXI: hilts with no blades in them, on the floor of the Sword Pool
-			{"id": "p21_hilt1", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p21_hilt2", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p21_hilt3", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_hilt4", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_hilt5", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "any"}],
+			{"id": "p21_hilt1", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p21_hilt2", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p21_hilt3", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_hilt4", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_hilt5", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "any"},
+			# Part XXIII: Ling Lun's pipes, carried off down the river and lodged in the rock
+			{"id": "p23_pipe1", "item": "pitch_pipe", "pos": Vector2i.ZERO, "vis": ["s_p23_reeds", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p23_pipe2", "item": "pitch_pipe", "pos": Vector2i.ZERO, "vis": ["s_p23_reeds", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "p23_pipe3", "item": "pitch_pipe", "pos": Vector2i.ZERO, "vis": ["s_p23_reeds", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p23_pipe4", "item": "pitch_pipe", "pos": Vector2i.ZERO, "vis": ["s_p23_reeds", ""], "late": true, "peak": 0, "stand": "flank"}
+		],
 		"pickup_vis": "s_dg_collect",
 		"springs": [Vector2i(25, 46)],
 		# the river comes down from the Dragon Gate falls and runs past the quay; the main street
@@ -3586,6 +3677,43 @@ const STEPS := [
 	{"id": "s_p22_xie2", "kind": "talk", "npc": "xie_lingyun", "area": "mountain", "t": "Tell Duke Xie what was decided about the tops of mountains, before he cuts anything"},
 	{"id": "s_p22_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The mountain is the shape he left it: tell Elder Qing Xuan"},
 	{"id": "s_break27", "kind": "breakthrough", "to": 81, "t": "What a man stands on when it is nothing: Leaning on Nothing"},
+	# ---- Part XXIII: The Thundering Pots (the Thundering Pots release): the Yellow Bell, the clay host, the levy of the six hearths and the songs on four sides
+	{"id": "s_p23_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Every bell in the land rang flat at dawn, and something under the ground is keeping time: speak to Elder Qing Xuan", "stones": 36800},
+	{"id": "s_p23_lun", "kind": "talk", "npc": "ling_lun", "area": "village", "t": "Qingshi has a drum tower now, and a hall with twelve pipes in it: find the man who cut them, Ling Lun, at the Hall of the Twelve Pipes"},
+	{"id": "s_p23_pots", "kind": "hunt", "area": "village", "n": 20, "of": ["pot_drummer", "flat_note", "kiln_wasp"],
+		"t": "Something is beating on pots in the fields round Qingshi, exactly in time and with no tune at all: silence 20 pot-drummers, flat notes and kiln-wasps"},
+	{"id": "s_p23_shards", "kind": "collect", "item": "bell_shard", "n": 4, "area": "village", "t": "The Yellow Bell broke in four and fell on the height above the village: bring Ling Lun its 4 pieces"},
+	{"id": "s_p23_sun", "kind": "talk", "npc": "sun_wu", "area": "village", "hearth": "valley", "t": "Eight thousand of fired clay are marching by the count, and the land has no host: find Master Sun on the drill ground south of the Drum Tower"},
+	{"id": "s_p23_levy", "kind": "visits", "npcs": ["granny_wen", "sarnai", "cook_aysha", "fishwife_lu", "auntie_rong", "lantern_xi"], "n": 6, "area": "village", "levy": true, "did": "%s sends a company to the host",
+		"t": "A host is raised, not hired: ask a company of each of the six hearths, of whoever keeps its fire", "stones": 37200},
+	{"id": "s_p23_hao", "kind": "talk", "npc": "fu_hao", "area": "village", "hearth": "valley", "t": "Six companies who have never stood in one line: take them to Lady Hao, who has commanded thirteen thousand"},
+	{"id": "s_p23_jobs", "kind": "jobs", "n": 2, "area": "village", "t": "A host eats, and the board is full: do 2 commissions of the notice board in Qingshi (Clerk Bai, by the Drum Tower)"},
+	{"id": "s_p23_scouts", "kind": "hunt", "area": "millet", "n": 22, "of": ["clay_spearman", "clay_archer", "clay_horse"],
+		"t": "The vanguard is on the Scorched Millet Plains, in ranks of four: break up 22 of its spearmen, kneeling archers and saddle-horses before the levy comes up"},
+	{"id": "s_p23_tallies", "kind": "collect", "item": "tiger_tally", "n": 4, "area": "millet", "t": "A clay soldier marches for whoever holds both halves of the tally: find 4 halves of tiger tallies under the height"},
+	{"id": "s_p23_lishan", "kind": "war", "battle": "lishan", "npc": "hao_millet", "area": "millet", "t": "The levy is drawn up under the height: speak to Lady Hao, and hold the field against the vanguard of the clay host", "stones": 37600},
+	{"id": "s_p23_meng", "kind": "kill", "boss": "meng_tian", "area": "millet", "t": "On the height a general of clay is still giving orders to a vanguard that has stopped: go up to Meng Tian"},
+	{"id": "s_p23_kuang", "kind": "talk", "npc": "shi_kuang", "area": "longmen", "hearth": "river", "t": "A blind man at Longmen says he can hear which host will lose: find Music-Master Kuang under the height above the ferry"},
+	{"id": "s_p23_airs", "kind": "airs", "npcs": ["tofu_sun", "batu", "well_keeper_zhaya", "boatwright_gao", "bell_tuner_gong", "tea_seller_pan"], "n": 4, "area": "longmen",
+		"t": "\"The airs of the south are not strong,\" says Master Kuang: learn the airs of 4 hearths of the land, of somebody at each who still sings it", "stones": 38000},
+	{"id": "s_p23_reeds", "kind": "hunt", "area": "longmen", "n": 22, "of": ["lead_string", "reed_pipe", "drowned_drum"],
+		"t": "Every instrument on the river has gone sour and heavy: put down 22 leaded strings, cracked reed-pipes and drowned drums at Longmen"},
+	{"id": "s_p23_pipes", "kind": "collect", "item": "pitch_pipe", "n": 4, "area": "longmen", "t": "Four of Ling Lun's twelve pipes went down the river with the flood: find the 4 pitch-pipes lodged in the rock above the ferry"},
+	{"id": "s_p23_river", "kind": "war", "battle": "river", "npc": "hao_longmen", "area": "longmen", "t": "The chariots of the centre have reached the ferry, and Master Sun has put the river at the levy's back: speak to Lady Hao", "stones": 38400},
+	{"id": "s_p23_gao", "kind": "kill", "boss": "gao_jianli", "area": "longmen", "t": "On the height a blind man is playing a lute with lead in it, and eight thousand feet keep his time: climb to Gao Jianli"},
+	{"id": "s_p23_songs", "kind": "folk", "role": "musician", "n": 3, "area": "village", "town": "drumtower",
+		"t": "The levy can march to a song and cannot sing one: ask 3 musicians of the Drum Tower quarter to teach the companies the airs"},
+	{"id": "s_p23_eighth", "kind": "host", "n": 8, "area": "village", "t": "The Hegemon-King has eight thousand: bring the host to 8 companies (the works put two in the field; the notice board has two more)"},
+	{"id": "s_p23_clay", "kind": "hunt", "area": "dunes", "n": 24, "of": ["chu_halberd", "black_steed", "cauldron_breaker"],
+		"t": "They sank their own boats, to have nowhere to go back to: wear down 24 halberdiers, black steeds and cauldron-breakers in the Desert of Fallen Stars", "stones": 38800},
+	{"id": "s_p23_banners", "kind": "collect", "item": "chu_banner", "n": 5, "area": "dunes", "t": "A company that goes home leaves its banner standing: gather 5 banners of Chu from the sand, to know how many are left"},
+	{"id": "s_p23_gaixia", "kind": "war", "battle": "gaixia", "npc": "hao_dunes", "area": "dunes", "t": "Gaixia: no host can break this one by killing it. Speak to Lady Hao, and sound the airs on four sides"},
+	{"id": "s_p23_xiang", "kind": "kill", "boss": "xiang_yu", "area": "dunes", "t": "A king stands on the height in front of nobody, and has not noticed: go up to the Hegemon-King", "stones": 39200},
+	{"id": "s_p23_wafu", "kind": "kill", "boss": "wafu", "area": "village", "t": "The host is quiet and the beat goes on: under Yu Gong's Adit, in the First Kiln, something is still being struck. Go down to the Thundering Pot"},
+	{"id": "s_p23_bell", "kind": "talk", "npc": "ling_lun", "area": "village", "hearth": "valley", "t": "Four pieces, four pipes, and bronze from every hearth: bring Ling Lun what is needed to cast the Yellow Bell again"},
+	{"id": "s_p23_hao2", "kind": "talk", "npc": "fu_hao", "area": "village", "t": "Eleven companies are standing on the drill ground with nothing to fight: ask Lady Hao what becomes of a host"},
+	{"id": "s_p23_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The sect's bell rang true at dawn: tell Elder Qing Xuan what it cost"},
+	{"id": "s_break28", "kind": "breakthrough", "to": 84, "t": "The great note is rarely sounded: Great Sound, Rarely Heard"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -3770,6 +3898,18 @@ const ITEMS := {
 	"merit_slip": {"n": "Jade Slip of Announcement", "desc": "A tablet of white jade bound with gold cord, as the kings buried them on the mountain: to Heaven, from the undersigned, reporting that all under it is at peace and that he has succeeded. Five reigns left five, and the sentence is the same in every one"},
 	"crackle_bamboo": {"n": "Green Bamboo for the Fire", "desc": "Three joints of green bamboo, sealed at both ends, packed by Alchemist Mo with a little earth essence so that they burst in the fire like a string of thunder. It is what grandmothers burned at the New Year to keep the one-legged thing from the door. It does it no harm. It only cannot bear to be startled"},
 	"blank_slip": {"n": "Jade Slip with Nothing on It", "desc": "One of the old kings' slips, ground smooth again by Smith Tie until no stroke of the report is left, and bound with plain cord. It announces nothing. Nobody has ever handed the Lord of the Eastern Peak one of these"},
+	# ---- Part XXIII: The Thundering Pots
+	"bell_shard": {"n": "Piece of the Yellow Bell", "desc": "A quarter of a small bronze bell, no bigger than a rice bowl whole, green with four thousand years and yellow where it broke. Struck with a fingernail it still gives the note, a quarter of it. Every measure in the land was once cut to the length of the pipe that sounds this: the foot, the peck, the pound"},
+	"tiger_tally": {"n": "Half of a Tiger Tally", "desc": "A bronze tiger the length of a hand, split nose to tail, inlaid with gold writing that stops in the middle of each character. The general holds one half and the king the other, and an army marches only when the two are fitted together and the writing reads. These are all left halves"},
+	"pitch_pipe": {"n": "Pitch-Pipe of Xiexi Bamboo", "desc": "A joint of bamboo from the valley of Xiexi, of even bore and thickness, cut between two nodes, closed at one end. Blown across, it gives one note and no other. Ling Lun cut twelve, six to the cock phoenix's song and six to the hen's, and the first of them is three inches and nine tenths long"},
+	"chu_banner": {"n": "Banner of Chu", "desc": "Red silk gone the colour of dust, on a pole stuck upright in the sand, with a company's number and a village's name. Nothing on the ground near it but footprints, all going the same way: south, across the river, home"},
+	"clay_duck": {"n": "Small Clay Duck", "desc": "A duck of fired clay, glazed yellow, that fits in the palm. Pressed, it squeaks. Under the base, in a potter's scratch: for the bath of the Son of Heaven. Reject. Nobody knows what it was rejected for. It is a perfectly good duck"},
+	"thirteen_chapters": {"n": "The Thirteen Chapters", "desc": "Master Sun's book on bamboo strips, bound with cord worn through twice and retied: laying plans, waging war, attack by stratagem, and ten more. In the margin of the first, in a different hand: he drilled the king's ladies with this, and beheaded two, and the king lost his appetite. The last chapter is on the use of spies"},
+	# ---- survival (needs.gd): what the cooks and innkeepers of the land sell for the road
+	"steamed_bun": {"n": "Steamed Bun", "desc": "Plain wheat, the size of a fist, still a little warm in its leaf. Cook Zhou makes four hundred before dawn and has opinions about people who eat them walking"},
+	"tea_egg": {"n": "Tea Egg", "desc": "Boiled, cracked all over and stewed in tea and soy until the white is marbled brown. Sold from a pot at every ferry and gate in the land, three for the price of two if one looks hungry"},
+	"dried_meat": {"n": "Strip of Dried Meat", "desc": "Salted, smoked over fruit wood and hard as a roof tile. It keeps for a year and takes about that long to chew. It makes one thirsty"},
+	"noodle_bowl": {"n": "Box of Noodles", "desc": "Hand-pulled, in a lacquer box with a lid, the broth in a gourd beside it. A meal one sits down for, even on a rock"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
@@ -3918,6 +4058,32 @@ const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
+	# ---- Part XXIII: the people of the Thundering Pots, and of the Drum Tower quarter
+	"ling_lun": ["The first pipe is nine nines of millet grains long, laid end to end, of the black millet of Shangdang, middling grains. Not the fat ones. People always choose the fat ones, and then their foot is too long and their whole dynasty is out of tune.",
+		"Six for the cock's song and six for the hen's. I stood under the tree and wrote down what they sang. People say I invented music. I took dictation.",
+		"A third part taken away gives the next pipe up, and a third part added gives the next below, and after twelve you are very nearly where you began. Very nearly. That little bit left over has kept me awake for four thousand years."],
+	"sun_wu": ["A hundred victories in a hundred battles is not the highest skill. To subdue the other without fighting is the highest skill. I wrote that in the third chapter and have been asked about the other twelve ever since.",
+		"Know the other and know yourself: a hundred battles, no peril. Know yourself and not the other: one won, one lost. Know neither, and you are a king.",
+		"Speed is the essence. I have heard of stupid haste in war. I have never seen cleverness that lasted a long time. Go and do whatever it is; you are standing here."],
+	"fu_hao": ["I bore the king children, led his armies, held land of my own and took the auguries when he was away. They scratched all of it on ox bones and tortoise shell, and that is the only reason anybody believes it.",
+		"Thirteen thousand against the Qiang. The largest host the bones record. It was mostly a matter of feeding them. Everything is.",
+		"He asked the bones whether I should have an easy childbirth more often than he asked whether we should win. I thought that was a fault in a king, then."],
+	"hao_millet": ["The left is ploughmen. I have put them where the ground is soft; they know soft ground.", "Count the dust, not the men. Dust in a line is foot. Dust in a cloud is horse. No dust at all is the thing to fear.", "I shall be beside the drum. If I fall, the drum goes on. See to it."],
+	"hao_longmen": ["A river at one's back. My husband would have had my head. He would have been wrong, as it turns out, and he hated that.", "The haulers will not go back. I asked one why. He said: back is where the rope pulls from. I did not follow it, and I believe him.", "When the chariots come, look at the horses' ears, not the drivers. A horse decides before the man does."],
+	"hao_dunes": ["Eight thousand. I have faced more. I have never faced any that had already lost and knew it and came on.", "The companies are a long way out, on four sides. They cannot see each other. They will have to listen.", "Do not look for the king in the line. He is in front of it. He always was. It is the whole of what was wrong with him."],
+	"shi_kuang": ["The duke said: I am seventy, I should like to study, and I fear it is too late. I said: why not light a candle? He thought I mocked him. Study in youth is the sun at dawn. In old age it is a candle. But a candle is better than walking in the dark, I said, and I should know.",
+		"I once played him the tune he asked for, which no ruler of small virtue should hear. Black cranes came and danced. Then the tiles flew off the palace and Jin had three years of drought. He had asked. One should not ask a musician for his best unless one is ready for it.",
+		"Listen. Somebody two streets off has put on a kettle and forgotten it. ...There. Now she has remembered. People think it is a gift. It is only that I have nothing else to do with the time."],
+	"dicer_du": ["Sit, sit. Dice, beads or crickets. I do not cheat; I have never needed to. The sums cheat for me, a little, every throw, and they are in nobody's pay.",
+		"Emperor Wu of Han kept a man only to play liubo with him. The man let him win, and was made a marquis. I let nobody win. I am not a marquis. You see the trouble with honesty.",
+		"A good cricket is caught at the Autumn Equinox, in a graveyard, after midnight, and fed on boiled chestnut and a little crab. A bad one is the same. Nobody knows which he has until the straw comes away.",
+		"The levy plays here on pay night. I send half of it home to their mothers by the carter and tell them they lost it. Do not look at me so. Somebody has to run a mat; better that it is somebody who knows when a boy has had enough."],
+	"clerk_bai": ["Everything that wants doing in Qingshi is on this board, and a good deal that only wants complaining about. I take down the second sort at dusk.",
+		"I failed the examinations the same year as Scholar Wang. He went home to teach. I stayed for the paperwork. I have never regretted it; somebody must know where everything is.",
+		"A notice is a promise with a date on it. Take one down and it is yours. I have had the same sheet of paper for the tofu since spring; the request renews itself."],
+	"tailor_qiao": ["I cut for the body that walks in, not for the one it would like to be. People thank me for it later. Not at the time.",
+		"Your friend has had one dress since I opened. One. I have said nothing. I say a great deal of nothing about it, daily, to anybody who comes in.",
+		"A robe should look as though you had always had it. If somebody says that is new, I have failed. If somebody says you look well, I have done my work, and they will never know it was mine."],
 	# ---- Part XXII: the people of the High Roads
 	"xie_lingyun": ["The clogs? Pear wood. Two teeth to each, pegged, not glued. Front out going up, back out coming down. My servants think I am mad. My servants are carrying the wine, so I let them think.",
 		"I write the poem at the top, always, while I am still out of breath. A poem written at the bottom is a poem about a mountain. One written at the top is a poem about lungs. Readers prefer the second and do not know why.",
@@ -7756,6 +7922,229 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "The old book says arms are instruments of ill omen, and that the gentleman lives with them on his left and does not make them his delight. I read that for sixty years as a warning about swords. It is about the left hand. It says: keep them where the heart is."],
 		["Yue Ling", "He swept the steps this morning, Elder. With the staff. I watched. It took him twice as long as it used to, and he did not look pleased with himself once."],
 		["Elder Qing Xuan", "Then he has it. Go and sit under the pine, Lin Feng. There is a thing left to put down, and I think it is not any of the eight.", "nod"],
+	],
+	# ---- Part XXIII: The Thundering Pots (the Thundering Pots release)
+	"recall21": [
+		["Narrator", "The tops are open, and all that summer the people of the road go up and come down again with nothing to report. In the autumn the mountain is quieter than anybody remembers. It is so quiet that on the first morning of the tenth month everybody on it hears the same thing at once."],
+		["Narrator", "The sect's great bell is struck for the dawn, as it has been every dawn for nine hundred years. It rings flat. Not cracked: flat, by a hair, like a word said by somebody who has stopped meaning it. And when it has died away, something goes on. Under the ground, a long way west. In time."],
+	],
+	"s_p23_home": [
+		["Elder Qing Xuan", "You heard it. Old Shen has been sitting under the bell since dawn with his hands in his lap. He says it is not the bell. He says the bell is where it was and the note has moved. I have known Shen fifty years and he has never before said anything I did not understand."],
+		["Lin Feng", "And the other sound? The beat, after."],
+		["Elder Qing Xuan", "Pots. I should know it anywhere; I was a potter's son. Somebody is striking fired clay with a stick. A great many somebodies, and every one of them exactly on the count. No tune. Not a note of tune in it. I find I mind that more than the noise.", "grieve"],
+		["Yue Ling", "There is a line in the old songs. The Yellow Bell is broken and thrown away, and the clay pots thunder. I always thought it was only a way of saying that fools are listened to and good men are not."],
+		["Elder Qing Xuan", "Most sayings were a thing that happened, once. Go down to Qingshi. They have built a drum tower there since the spring, and a hall beside it, and the man who keeps the hall is said to have cut the first pipe that ever gave a true note. If the note has moved, he will know where from.", "point"],
+	],
+	"s_p23_lun": [
+		["Narrator", "Qingshi has grown. East of Lao's farm there is a street now, from a drum tower to a hall with a green roof, and across it a tailor's, and a barracks nobody has slept in. At the door of the hall an old man in bamboo-yellow is holding a joint of bamboo to his ear, as one listens to a shell."],
+		["Ling Lun, Who Cut the Pipes", "Three inches and nine tenths. I cut it in the valley of Xiexi for the Yellow Emperor, from a bamboo of even bore, between two nodes, and I blew it, and it was the note the cock phoenix sang first. Then eleven more by thirds, up and down. All measure comes from that pipe. The foot. The peck. The pound. What a day's work is."],
+		["Lin Feng", "And the bell?"],
+		["Ling Lun, Who Cut the Pipes", "The Yellow Bell was cast to the pipe, so that the note should not depend on an old man's breath. It hung on the height above this village, where nobody knew what it was. Last night it broke. I have the sound of it still in my teeth. And when the measure breaks, young man, whatever was made by rule and has no heart of its own gets up and walks.", "grieve"],
+		["Ling Lun, Who Cut the Pipes", "There are small ones in the fields already, beating time on anything that will ring. Quiet them. Then find me the pieces. Four; I heard four strike the rock. A bell can be cast again. A note that has been forgotten cannot, and they are forgetting it by the hour.", "point"],
+	],
+	"done:s_p23_pots": [
+		["Narrator", "Twenty. Each falls apart, when it falls, into something that was never alive: a cracked jar, a kiln-brick, a bad note somebody whistled and did not mean. And every one of them, to the last, is beating the same count. One. Two. One, two, three. Nobody taught it to them. It is simply what there is, with the tune taken out."],
+		["Yue Ling", "That is a march. I do not know how I know. I have never heard an army. That is feet."],
+	],
+	"done:s_p23_shards": [
+		["Ling Lun, Who Cut the Pipes", "Four. Yes. Lay them so. You see: no bigger than a rice bowl. People expect it to be large. The thing a land is measured by ought not to be large; it ought to be right. ...Somebody struck it, young man. This is not frost. Look at the bruise. Somebody found the one bell in the land that mattered and hit it with something made of clay."],
+		["Ling Lun, Who Cut the Pipes", "I cannot cast it today. It wants the four pipes that went down the river in the flood, to tune by, and bronze given, not bought. And meanwhile there is the thing that march is for. Under Mount Li, in the west, a king buried eight thousand soldiers of fired clay to go on being obeyed. There is a man on the drill ground who knows about that sort of king.", "point"],
+	],
+	"s_p23_sun": [
+		["Narrator", "South of the Drum Tower, on trodden ground, a spare man in grey is watching forty outer disciples of the Azure Cloud Sect attempt to form a square. He is not shouting. He has not, it appears, said anything for some time. The square is forming with great speed."],
+		["Master Sun", "I am Sun Wu. The King of Wu asked whether my book could be tried on anybody, and gave me his palace ladies to drill, a hundred and eighty of them. They laughed. I explained again. They laughed. I beheaded the two he liked best, and after that they drilled like the Guard. He did not thank me. One is not thanked.", "shrug"],
+		["Lin Feng", "Eight thousand of clay are coming, and they do not laugh."],
+		["Master Sun", "No. They are the perfect army: they obey, they do not eat, they do not wonder. Every king wants one. And they have exactly one fault, sweeper, which is the same thing. Nobody in those ranks has a home he would rather be in. A host that would rather be home fights to end the war. Remember that. It is not in the book."],
+		["Master Sun", "These forty will do; your Elder has lent them. But a host is not hired. It is raised. There are six hearths in this land, and you have eaten at all of them. Go to whoever keeps each fire and ask. Do not order. Somebody who is ordered sends you his worst.", "point"],
+	],
+	"visit:s_p23_levy:granny_wen": [
+		["Granny Wen the Midwife", "A company. Of ploughmen. Feng'er, I delivered every one of those boys, I know exactly what they are worth, and it is more than you think and less than they do. Take them. Tian's eldest can count; put him in front. And they are to wear their straw capes. I do not care what the general says."],
+	],
+	"visit:s_p23_levy:sarnai": [
+		["Grandmother Sarnai", "You ask. Good. A khan would have sent a rider with a tally. A hundred, then, and they bring their own horses and their own opinion of spearmen. Batu leads. He is too young. So was his grandfather. Send them home fat, or do not come to my tent again."],
+	],
+	"visit:s_p23_levy:cook_aysha": [
+		["Auntie Aysha of the Caravanserai", "The caravan guards are sitting in my yard eating my bread with no caravans to guard, because of your clay men on the road. Take them, by all means. They shoot from a kneeling camel, and they are paid in water, in advance. I have told them you are good for it."],
+	],
+	"visit:s_p23_levy:fishwife_lu": [
+		["Fishwife Lu", "The haulers? You want the haulers? Hah. They cannot march, they cannot salute, and there is not one of them will take an order from anybody who has not pulled a rope. But they pull together. It is the only way they have ever done anything. Mind, when that lot push, it is the same."],
+	],
+	"visit:s_p23_levy:auntie_rong": [
+		["Auntie Rong of the Smelting Pits", "Crossbows. We cast the locks ourselves, in bronze, each to the same pattern, so that a part from one fits any other. The soldiers of Mount Li were armed that way too, you know. It was Tushan men who cast for that king. We have never been proud of it. Take a hundred, and let them make it right."],
+	],
+	"visit:s_p23_levy:lantern_xi": [
+		["Lantern-Maker Xi", "We have no soldiers in Yanggu. We have a band. Drums, gongs, a reed horn, the lot that plays the Lantern Dragon down the street. They have never been to a war. They have been to forty festivals, mind, and the fifteenth night here is not a quiet thing. Will noise do? ...Then take the noise."],
+	],
+	"done:s_p23_levy": [
+		["Narrator", "They come in to Qingshi over three days: ploughmen in straw, horse-folk who will not dismount inside a wall, camels, tow-path men with boat-hooks, casters carrying crossbows like new-born children, and last of all, heard a full hour before they are seen, the band."],
+		["Master Sun", "Six companies who have never stood in one line and do not share a word for left. Excellent. A host that begins as one thing has only one way to break. This one will have to be broken six times. There is a lady coming in with the Tushan men who will know what to do with them. I only write books."],
+	],
+	"s_p23_hao": [
+		["Narrator", "She arrives on a chariot she is driving herself, in bronze the colour of an old bell, with an axe across her knees that has an owl on the blade. Three thousand years ago she led thirteen thousand for the king her husband, and was buried with the axe. She has, it seems, been asked nicely."],
+		["Lady Hao", "Fu Hao. The oracle bones call me that; the soldiers called me other things, mostly fond. You are the one who raised these? Then stand here and learn their faces. I will not have a man die in my line whose name his captain has to ask afterwards."],
+		["Lin Feng", "They have never fought, Lady."],
+		["Lady Hao", "Nobody has, the first time. Listen. On the field I give one order to a drum. Not three. One, and everybody knows it. Foot go in. Bows loose. Horse charge. Hold. Give ground. Or the drums sound, and nobody strikes at all. That last one my husband's generals never understood. It won me the Tu-fang campaign.", "point"],
+		["Lady Hao", "The scouts will tell you what the other host means to do, when the dust lets them. Then you choose. A spear wall stops horse. Arrows find a spear wall. Horse ride down bows. It is a child's game with men in it. There is laced armour for you in the barracks. Wear it; they should see their captain coming."],
+	],
+	"done:s_p23_jobs": [
+		["Clerk Bai of the Notice Board", "Two down, witnessed and paid. You would be surprised how much of a war is notices. Firewood. Fodder. Somebody to say where the well is. I had a general through here in the spring who could take a city and could not find his own baggage. I have put the levy's wants on the board; they go under the tofu."],
+	],
+	"done:s_p23_scouts": [
+		["Narrator", "They do not break like the small ones. A spearman of Mount Li struck down goes over in one piece, and lies in the millet stubble with his face to the sky, and it is a face. No two are alike. Somebody, two thousand years ago, was made to stand still while a potter looked at him."],
+		["Yue Ling", "This one has a scar through the eyebrow. That one is laughing at something. Lin Feng, they are portraits. Every single one of them was somebody, and the somebody went home, or did not, and this is what the king kept.", "grieve"],
+	],
+	"done:s_p23_tallies": [
+		["Narrator", "Four halves of bronze tigers, each split from nose to tail, the gold writing stopping in the middle of every word. All four are left halves. The right halves, the halves a king keeps, are nowhere on the field."],
+		["Lady Hao", "Tiger tallies. A general holds one half, the palace the other, and an army marches when the two are fitted and the writing reads. Nobody has fitted these. They are marching on half an order. Whatever is on that height has decided the king would have wished it. I have known generals like that. They are the dangerous kind.", "think"],
+	],
+	"s_p23_lishan": [
+		["Narrator", "Under the one height of the plain the levy is drawn up: foot in front, bows behind, the horse out on the flank arguing, and at the back, by the banner, the band. Across a mile of stubble the dust is coming on in a straight line. Under the dust, something is keeping time."],
+		["Lady Hao", "There they are. Six hundred, the vanguard of the left; mostly foot. They will come on, and come on, and then stand, and then send what horse they have. They do everything by the count. So count. I shall be beside the drum. The order is yours.", "point"],
+		["Yue Ling", "I will be behind the centre with the stretcher-bearers. Both hosts' hurt, Lin Feng. I asked Lady Hao and she looked at me for a while and said yes."],
+	],
+	"done:s_p23_lishan": [
+		["Narrator", "When the last drum has been beaten there are four hundred men of clay standing in the stubble exactly where they stopped, between one step and the next. The levy walks among them, slowly, the way people walk among graves. A ploughman from Qingshi takes off his straw cape and puts it round one."],
+		["Master Sun", "Your first field. Notice what you are feeling. It is not triumph; you are too tired, and you have seen what was done to win it. Good generals feel like that every time. The other kind do not last, or else they last a great while, which is worse. Their general is on the height. He has not stopped."],
+	],
+	"pre:meng_tian": [
+		["Narrator", "On the top of the height, where a general stands, stands a general: half as tall again as a man, in clay armour of six hundred painted plates, with a brush in his belt where another would carry a second sword. He is giving orders. Down the slope, nobody is carrying them out. He gives them again."],
+		["Meng Tian, General of the Clay Host", "Left wing, advance. ...Left wing. I built the Wall with three hundred thousand of you, ten thousand li, from Lintao to Liaodong. I made the first brush out of rabbit hair so that the returns could be written faster. I have never once marched without the tally. I am not marching without it now. I am only keeping them ready."],
+		["Lady Hao", "You have half a tally, General, and so have they. I have held the other half, in my time. It does not say what you think it says."],
+		["Meng Tian, General of the Clay Host", "It says obey. It is all it has ever said. When his letter came telling me to die I had three hundred thousand men and I asked only whether the seal was true. It was true. So. Left wing!", "refuse"],
+	],
+	"post:meng_tian": [
+		["Narrator", "The general of clay stands with his arm out, pointing down the slope at four hundred men in straw capes and wreaths of millet, who are not going to advance. He looks at them for some time. Then he lowers the arm, and it is plain that it is the first thing he has done in two thousand years that nobody told him to."],
+		["Meng Tian, General of the Clay Host", "The seal was false. I knew. Everybody knew; the eunuch wrote that letter, and the First Emperor was three weeks dead in a cart of salt fish. I had the men to march on the capital and I asked whether the seal was true. ...I cut the veins of the earth, building that Wall. I have always said that was my crime. It was easier to say."],
+	],
+	"s_p23_kuang": [
+		["Narrator", "At the foot of the height above the ferry a blind man is sitting with a qin across his knees which he is not playing. He has his face turned to the south, into the wind, and now and then he sings a few notes back at it, the way one answers somebody across a room."],
+		["Music-Master Kuang", "I put my own eyes out with mugwort smoke, so as to hear better. It worked. Before a battle the Duke of Jin would ask me which side would lose, and I sang the airs of the north and then the airs of the south, and listened. The southern air is not strong, I said: it has many sounds of dying in it. Chu will have no success. And Chu had none."],
+		["Lin Feng", "And now? Which host?"],
+		["Music-Master Kuang", "Theirs has no air at all. Pots. One cannot sing a pot. Yours: I hear ploughmen and horse-herds and boat-haulers, and not one of them is singing either. You have taught them to march. A host that marches and does not sing is clay with a pulse, sweeper. Six hearths. Each has an air. Somebody at each still knows it. Go and be taught.", "point"],
+		["Music-Master Kuang", "And there is another blind man on that height, above us. He plays. Every string he has is weighted with lead. I hear him at night, keeping their time for them. I should like to talk to him. We have a thing in common, and he chose his no more than I chose not to choose mine."],
+	],
+	"air:valley": [
+		["Tofu Seller Sun", "The planting song? Everybody knows the planting song. ...Nobody has sung it to you? You swept steps; of course. It goes bent over, see, so the phrases are short. You breathe when you straighten. Three and five and six, like that. No, lower. You are not calling an ox. There. That is Qingshi, that is. That is every spring I ever had."],
+	],
+	"air:steppe": [
+		["Batu the Horse-Herd", "A long song. Grandmother says a short song is for people with walls. You hold the note till the breath is gone, or the horizon, whichever is first. It is about a horse. They are all about a horse. ...No, do not hurry it. Nothing out here is in a hurry but the weather."],
+	],
+	"air:sand": [
+		["Well-Keeper Zhaya", "This one has a step in it that your valley tunes do not. Half a step. It came down the road from west of where the maps stop, on the back of a camel, and nobody here ever knew the words, so we put in our own. They are about water. Ours always are."],
+	],
+	"air:river": [
+		["Boatwright Gao", "The haulers' call. One sings, then all. The first half is the reach and the second is the rope coming in, and if you sing the second half without pulling something you will feel a fool, so here: take the end of this. Now. Hey-ya. PULL. You see. It is not a song. It is a way of being forty men."],
+	],
+	"air:forge": [
+		["Bell-Tuner Gong", "Two hammers, one song, so that neither comes down on the other man's hand. Every line starts with the same note twice. That is where they fall. I tune bells by it; a bell that will not sit with the hammer song I send back to the pit. ...Sir. Every bell I own is a hair flat this month. I have been telling myself it is my ears."],
+	],
+	"air:dawn": [
+		["Old Pan the Tea Seller", "The Lantern Dragon's tune! Quick, mind, the tail has to run. Flute and a small gong. We played it nine days running when the sun stuck at noon, to keep our spirits up, and by the ninth day we hated it. Now I cannot hear it without crying. Sing it badly. That is how it is done."],
+	],
+	"done:s_p23_airs": [
+		["Narrator", "Four airs, from four people who were surprised to be asked. None of them is long. Sung one after another on the road back to Longmen they turn out, oddly, to fit: the planting song's last note is the long song's first, and the haulers' call sits under both like a keel."],
+		["Music-Master Kuang", "Ah. There. You hear it too. They are one song, sweeper. They were always one song. The land had it whole once, before there were six hearths to keep a piece each. I have been waiting sixty years for somebody to carry the pieces into the same room. Now teach it to something that can make a noise."],
+	],
+	"done:s_p23_reeds": [
+		["Narrator", "Strings that hang like plumb-lines. Flutes split down the grain. A festival drum, waterlogged, that gives one note like something dropped down a well. Every instrument on the river has gone to the same sour weight, and when the last of them is quiet the ferry bell rings the hour, flat."],
+		["Yue Ling", "He did not mean to. Whoever is up there. You cannot do this to a flute by meaning to; I think you can only do it by not being able to bear the sound of one."],
+	],
+	"done:s_p23_pipes": [
+		["Narrator", "Four pipes of bamboo, lodged in the rock where the flood left them, each closed at one end, each a third part shorter than the last. Lin Feng blows across the longest. It gives one note, and the flat bell at the ferry, a quarter of a mile off, hums with it for a moment like something remembering its own name."],
+		["Lady Hao", "Put them somewhere they will not be trodden on. The chariots of the centre are at the ferry. And Master Sun has done a thing I should have had a captain flogged for: he has drawn us up with the river at our backs."],
+	],
+	"s_p23_river": [
+		["Narrator", "The levy stands on the shingle with the Dragon Gate river running fast and brown behind it. There is no bridge. The boats have been sent across. In front, over the flood-plain, come chariots four abreast with crossbowmen kneeling in them, and they are in no hurry at all."],
+		["Master Sun", "Every book says: never fight with water behind you. I wrote one of the books. But put men where they cannot run, and they will not; throw them where there is no way out, and they will find one through the enemy. Han Xin did it at the Jing Pass with raw levies, and afterwards his captains asked which chapter it was in.", "shrug"],
+		["Lady Hao", "You cannot give ground here. Do not try. But a line that holds with the river behind it does not break, whatever its heart is doing; I have seen it. They will shoot, and then the chariots will come. You know what stops a chariot.", "point"],
+	],
+	"done:s_p23_river": [
+		["Narrator", "The chariots of Mount Li stand axle-deep in the shallows, pointing every way but south. The haulers of the Boat Hearth are sitting on the shingle with their boat-hooks across their knees, quite silent. Then one of them, a big man, starts the call, very low. Reach. And forty answer him. Rope."],
+		["Music-Master Kuang", "There. That I can hear from a mile. THAT host will not lose. ...The other blind man has stopped playing. He heard it too. Go up to him now, while he is still listening. He will start again, and it will be worse."],
+	],
+	"pre:gao_jianli": [
+		["Narrator", "On the height sits a man with a cloth over his eyes and a long lute across his knees, struck with a bamboo rod. Every string sags. When he strikes one, eight thousand feet somewhere in the west come down together. He turns his head at the first footstep on the rock, exactly, the way the blind do."],
+		["Gao Jianli of the Leaded Lute", "I played at the River Yi the day Jing Ke went to kill the King of Qin. The wind soughs, the Yi is cold; the brave man goes and does not come back. Everybody wept. He did not come back. So the king had my eyes burned out with horse dung, because he liked my playing and did not like my friends."],
+		["Yue Ling", "And you put lead in the lute."],
+		["Gao Jianli of the Leaded Lute", "I put lead in the lute and I swung it at his head, and I missed, because I could not see. Since then I play it as it is. It will not carry a tune with lead in it. Good. He does not deserve a tune. None of them do. They shall have the beat, and nothing else, for ever.", "refuse"],
+	],
+	"post:gao_jianli": [
+		["Narrator", "The lute lies on the rock between them. Music-Master Kuang has come up the height on Yue Ling's arm, and sits down opposite the other blind man without a word, and after a while reaches over and touches one of the sagging strings. It gives a dull note. He hums the note it should have been."],
+		["Gao Jianli of the Leaded Lute", "...A fourth. It should be a fourth above. I had forgotten there was an above. Who is that? You cannot see either. You did it to yourself? To HEAR? Old man, you are a fool. ...Sing me that again."],
+	],
+	"done:s_p23_songs": [
+		["Narrator", "Three musicians of the Drum Tower quarter, a week of evenings, and eleven companies who can now very nearly sing. The ploughmen have the long song wrong and prefer it so. The horse-folk have declined to learn the planting song on the ground that it is about standing in mud. But they hum it."],
+		["Lady Hao", "Listen to that. A month ago they could not agree which foot was left. I had thirteen thousand once who would die for me and could not have got through a chorus. I am not certain, now, which was the better host."],
+	],
+	"done:s_p23_eighth": [
+		["Master Sun", "Eight companies. The Hegemon-King has eight thousand, so he is ten to one, and has never in his life lost a field; he broke his own cauldrons and sank his own boats before Julu so that his men should have nothing to go back to. Do not try to beat him. Nobody ever has. He was beaten, in the end, by something else."],
+	],
+	"done:s_p23_clay": [
+		["Narrator", "These are not the soldiers of Mount Li. Under the clay there is something else: a halberd held too tightly, a way of looking south. Eight thousand sons of the land east of the river crossed it with a young king and never went back, and somebody has fired their shapes into the First Emperor's ranks, where they least belong."],
+		["Yue Ling", "They are on the wrong side. Lin Feng, do you see? These fought AGAINST Mount Li. They burned it. Whoever is beating the pots does not care whose soldiers it wears. It only wants things that march."],
+	],
+	"done:s_p23_banners": [
+		["Narrator", "Five banners, standing alone in the sand, each with a company's number and a village's name. Round every one the footprints go the same way: south. On the ground by the last is a helmet, set down carefully, as one sets down something one means to come back for and knows one will not."],
+		["Lady Hao", "So they have begun to go. Not from fear; these are not men who fear. Something has reminded them. Five companies out of eighty. It is the right medicine, sweeper. We want a great deal more of it, and tonight."],
+	],
+	"s_p23_gaixia": [
+		["Narrator", "Gaixia, at dusk. The sands run flat to a height with one figure on it, and between the levy and the height stand the eight thousand, in the dress of Chu, with a king's black horse before them. They do not beat pots. They have no need to keep time. They have fought this field a thousand times, and lost it once."],
+		["Lady Hao", "Hear me. You will not break that host by killing it. I would not try with thirteen thousand. But I have put the companies on four sides of him, a long way out, and every one of them now knows six airs that are one song. Hold when he comes. Give ground if you must. And when he stands: sound.", "point"],
+		["Music-Master Kuang", "Sing the old one first. The one under the others. They were men of Chu before they were clay, and Chu is south of the river, and it is the airs of the south that are not strong. They are not strong because they are about going home."],
+	],
+	"done:s_p23_gaixia": [
+		["Narrator", "It comes from the east first, a hundred voices, raggedly. Then the north takes it up, and the west. By the time the south joins, the eight thousand of Mount Li have stopped where they stand and turned their heads, every one, the way a man does who has just smelled his mother's kitchen."],
+		["Narrator", "They ground their halberds. They do not run. They walk, by companies, in good order, south. In an hour there is nobody on the sand of Gaixia but the levy of the six hearths, which has not struck a blow since the third drum, and is still singing, because nobody has thought to tell it to stop."],
+	],
+	"pre:xiang_yu": [
+		["Narrator", "On the height stands a very tall man in black armour with a double pupil in each eye, holding the bridle of a black horse. He has not looked behind him. He is looking at the levy, and through it, at something a long way back."],
+		["The Hegemon-King of Western Chu", "My strength plucked up the hills. My spirit covered the age. The times were against me, and Dapple would not run. Do you know how many times I have fought this field? I win the charge. Every time. I have never once lost the charge. And then there is the singing."],
+		["Lin Feng", "They have gone home, King. All of them."],
+		["The Hegemon-King of Western Chu", "They went the first time too. I heard the songs of Chu on four sides in the night and I thought: has Han taken the whole of Chu, that there are so many of my people over there? It was a trick. It was the best trick ever played, and it was only the truth. ...You have played it again. With ploughmen. Come up here, then, sweeper. I still have the charge.", "refuse"],
+	],
+	"post:xiang_yu": [
+		["Narrator", "The Hegemon-King sits down on the rock, heavily, with the bridle still in his hand. Below, a long way south, eight thousand small lights are crossing a river that is not there. He watches them the whole way over. He does not go with them."],
+		["The Hegemon-King of Western Chu", "There was a boatman at the Wu River. One boat. He said: east of the river you could still be a king. And I said: I brought eight thousand of their sons over and not one goes back with me. How should I look at their fathers? ...Two thousand years, and I have no better answer. Take the horse. He has carried me five years, and I cannot bear to kill him."],
+	],
+	"done:s_p23_xiang": [
+		["Narrator", "The field is quiet. The levy is quiet. On the road home the six companies fall, one after another, out of step, and nobody shouts at them for it. And under all of it, a long way off and deep, the beat goes on. One. Two. One, two, three."],
+		["Ling Lun, Who Cut the Pipes", "I told you it was struck. Not by the general; he only obeyed. Not by the lute; he only hated. Not by the king. Something set the first pot going, young man, and it is under this village, where the first pot was ever fired. Yu Gong's sons broke into it digging. I should have asked what they found.", "grieve"],
+	],
+	"pre:wafu": [
+		["Narrator", "Under the adit, down a shaft the old man's sons had boarded over and not spoken of, there is a kiln: the first, older than bronze, a hollow in burnt earth. In the middle of it squats a cooking pot the size of a house, three-legged, cracked from lip to foot, with nothing in it. Nothing strikes it. It thunders."],
+		["Wafu, the Thundering Pot", "BOOM. I was the first thing anybody made. Before the bell. Before the pipe. Somebody was hungry and put mud in a fire, and there I was, and they beat on me with a bone to say SUPPER, and everybody came. BOOM. Everybody. Then that one cut his little pipe and said mine was not a NOTE."],
+		["Yue Ling", "So you broke the bell."],
+		["Wafu, the Thundering Pot", "I HIT it. Once. With my own foot. I only wanted them to come when I called, as they used. I do not have a tune. I never said I had a tune! I have ONE THING, and it is LOUD, and it means come here, and nobody has come for four thousand years but things that cannot hear. BOOM.", "refuse"],
+	],
+	"post:wafu": [
+		["Narrator", "The great pot has stopped. In the quiet there is a small sound, which is Yue Ling, who has picked up the bone that lies beside it and struck the rim, once, not hard. It is not a note. It is a dull, wide, friendly noise, like a door, and anybody who has ever been called in from a field knows what it means."],
+		["Yue Ling", "Supper. That is all it says. Lin Feng, that is the oldest word there is. We built a bell to keep the measure and forgot what we used to call each other home with. Nobody was listening to it. It was not wrong to be angry.", "grieve"],
+		["Wafu, the Thundering Pot", "...boom. You came. Two of you. That is not everybody. But it is two more than since the Xia. Do it again. No, softer. I am cracked, you know. It is all right. I was always cracked. It is how you can tell me from the others."],
+	],
+	"s_p23_bell": [
+		["Narrator", "Four pieces of the old bell. Four pipes to tune by. And bronze: a ploughshare from Qingshi, a stirrup, a caravan bell, a boat-hook, a crossbow lock, a lantern frame, one from each hearth, given. Ling Lun weighs each in his hand and says nothing, and Auntie Rong of Tushan, who has come to pour, says nothing either."],
+		["Ling Lun, Who Cut the Pipes", "It will not be the same bell. I should say so now. The old one was cast to my pipe and to nothing else; it was right, and it hung where nobody heard it. This one has a boat-hook in it. It will ring a hair warm of true. I find, at four thousand, that I can bear that. Pour, mistress.", "nod"],
+		["Narrator", "They pour at dusk. It is struck for the first time at dawn, by Old Shen the bell-ringer, who has walked down from the sect in the night to do it. One note. In Qingshi a baby stops crying. In the Drum Tower quarter a tailor looks up from a hem. Under the hill, a long way down, something very old answers, once, softly: boom."],
+		["Ling Lun, Who Cut the Pipes", "There. Now there are two again, as there were at the first fire: one to keep the measure and one to call them in. I threw the second away. I thought it was noise. Young man: where is this bell to hang? It is your land's, not mine. I only know its length."],
+	],
+	"s_p23_hao2": [
+		["Narrator", "On the drill ground the companies of the levy are standing in a line that is very nearly straight, with nothing in front of them. Lady Hao is walking down it with her hands behind her back. She stops at each captain, and says the captain's name, and the captain's village."],
+		["Lady Hao", "I was buried with sixteen people who had not asked to come, four hundred bronzes and an axe. Nobody buried my soldiers with me. I have always been glad. Now. You raised this host. It has held three fields and lost fewer than I should have thought possible, and it can sing. What is to become of it?"],
+		["Master Sun", "The book says: there has never been a state that profited from a long war. It does not say what to do with the army afterwards. I thought that was somebody else's chapter."],
+	],
+	"s_p23_end": [
+		["Elder Qing Xuan", "I heard it. Shen rang it and I heard it from my bed, and I thought: that is not our bell, that is better than our bell. Then I listened again. It was our bell. It was only in tune with something."],
+		["Lin Feng", "With a cooking pot, Elder. The oldest one there is."],
+		["Elder Qing Xuan", "Hm. Yes. I have sat on this mountain seventy years listening for the note that is not sounded. The Old Master says the great note is rare. I took that to mean it was high up and hard to reach. I believe I have had it the wrong way about. I believe it is the one underneath, that everything else is in tune with or not.", "nod"],
+		["Yue Ling", "He led eleven companies and gave one order to a drum, Elder, and at the end he gave none. He stood there. And eight thousand people went home."],
+		["Elder Qing Xuan", "Then he has it. Go and sit under the pine, Lin Feng. Do not listen for anything. It will be there when you stop.", "nod"],
+	],
+	"pre:s_break28": [
+		["Narrator", "Lin Feng sits under the pine and does what the Elder said, which is nothing. For a long time there is the wind, and a novice sweeping two terraces down, badly. Then even the listening stops. What is left is not a sound. It is what the sounds were in."],
+		["Yue Ling", "I shall not hum. I want it noted that I am not humming."],
+	],
+	"post:s_break28": [
+		["Narrator", "Under the pine above the sect Lin Feng sits, and does not listen for anything. The bell is struck for the evening. It is a quarter-tone warm of true. A long way down and to the east, in the hour before supper, something very old says the one thing it knows how to say, and in six countries people look up from what they are doing and go in."],
 	],
 	# ---- Part XXII: The High Roads (the High Roads release)
 	"recall20": [

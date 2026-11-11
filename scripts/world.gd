@@ -170,7 +170,7 @@ func _build3d() -> void:
 	hero_light.omni_range = 9.0
 	hero_light.position = Vector3(0, 2.2, 0)
 	player.add_child(hero_light)
-	comp = Models.person(Color("e86a9a"), Color("402030"), YUE_OPTS)
+	comp = Models.yue_ling({"glow": YUE_OPTS.glow})
 	comp.add_child(Models.shadow_disc(0.5))
 	comp.visible = false
 	scene3d.add_child(comp)
@@ -1733,7 +1733,31 @@ func preview_weapon(id: String) -> void:
 	preview_arm = id if Game.arms.has(id) else ""
 	refresh_hero()
 
+## The Thundering Pots release: Yue Ling in the dress she wears, or the one under the wardrobe's cursor.
+var preview_yue := ""
+var yue_sig := "lotus"
+
+func preview_yue_outfit(id: String) -> void:
+	preview_yue = id if Game.yue_outfits.has(id) else ""
+	refresh_yue()
+
+func refresh_yue() -> void:
+	var oid: String = preview_yue if preview_yue != "" else Game.yue_outfit
+	if oid == yue_sig or comp == null:
+		return
+	yue_sig = oid
+	var at := comp.transform
+	var vis := comp.visible
+	var old := comp
+	comp = Models.yue_ling({"glow": YUE_OPTS.glow, "outfit": oid})
+	comp.add_child(Models.shadow_disc(0.5))
+	scene3d.add_child(comp)
+	comp.transform = at
+	comp.visible = vis
+	old.queue_free()
+
 func refresh_hero() -> void:
+	refresh_yue()
 	var oid := preview_id if preview_id != "" else Game.outfit
 	var keep: String = Game.outfit
 	Game.outfit = oid
@@ -3125,6 +3149,15 @@ func _draw_hud() -> void:
 	UI.text(self, Vector2(26, 112), "QI %d/%d" % [Game.qi[0], Game.max_qi(0)], 14)
 	UI.bar(self, Rect2(140, 100, 186, 10), Game.qi[0] / float(Game.max_qi(0)), UI.C_BLUE)
 	UI.text(self, Vector2(26, 126), "Stones: %d" % Game.stones, 13, UI.C_DIM)
+	# survival (needs.gd): the seven needs, small, under the panel; a low one is red
+	if Game.survival:
+		UI.panel(self, Rect2(12, 144, 330, 30))
+		for ni in Needs.ORDER.size():
+			var nk: String = Needs.ORDER[ni]
+			var nv := Needs.value(Game, nk)
+			var nx := 22.0 + ni * 46.0
+			UI.text(self, Vector2(nx, 164), str(Needs.NEEDS[nk].n).substr(0, 2), 11, UI.C_DIM if nv >= Needs.LOW else UI.C_RED.lightened(0.3))
+			UI.bar(self, Rect2(nx + 17, 156, 22, 7), nv / 100.0, Needs.NEEDS[nk].col if nv >= Needs.LOW else UI.C_RED)
 	# objective: long quest titles (one in eight runs past the panel, up to 770 px of text) used to be
 	# cut off mid-sentence; they now wrap onto a second line in place of the heading
 	UI.panel(self, Rect2(VIEW.x - 520, 12, 508, 58))

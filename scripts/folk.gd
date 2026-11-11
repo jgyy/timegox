@@ -35,6 +35,10 @@ const TOWNS := {
 		"roles": {"merchant": 4, "porter": 4, "farmer": 3, "child": 3, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "lamplighter": 1, "youth": 2, "scholar": 1}},
 	"qingshi": {"n": "Qingshi Village", "area": "village", "at": Vector2i(30, 28), "race": "human",
 		"roles": {"farmer": 7, "child": 4, "elder": 3, "washer": 2, "fisher": 1, "monk": 1, "cook": 1, "youth": 2, "watchman": 1, "merchant": 2}},
+	# the Thundering Pots release: Qingshi has grown a second quarter, east of Lao's farm, round the Drum Tower:
+	# the levy's barracks, the Hall of the Twelve Pipes, the tailor's, the Pear Garden stage and the kiln
+	"drumtower": {"n": "the Drum Tower quarter of Qingshi", "area": "village", "at": Vector2i(79, 19), "race": "human", "reach": 14,
+		"roles": {"soldier": 6, "musician": 4, "merchant": 3, "porter": 2, "child": 2, "elder": 2, "guard": 1, "watchman": 1, "lamplighter": 1, "cook": 1, "scholar": 1, "youth": 2}},
 	"yanggu": {"n": "Yanggu", "area": "yanggu", "at": Vector2i(34, 30), "race": "human",
 		"roles": {"merchant": 6, "porter": 3, "cook": 2, "child": 3, "elder": 2, "monk": 1, "guard": 2, "watchman": 1, "lamplighter": 2, "youth": 3, "scholar": 1, "washer": 2}},
 	"shazhou": {"n": "Shazhou Oasis", "area": "dunes", "at": Vector2i(12, 40), "race": "desert",
@@ -65,7 +69,9 @@ const BODIES := {
 		# the people of the road (the High Roads release)
 		"woodcutter": ["folk_porter", "folk_youth", "folk_farmer"], "herbalist": ["folk_farmwife", "folk_maiden", "folk_grandma"], "angler": ["folk_fisher", "folk_grandpa"],
 		"pedlar": ["folk_merchant", "folk_porter", "folk_shopwife"], "hunter": ["folk_guard", "folk_youth"], "pilgrim": ["folk_monk", "folk_grandma", "folk_scholar"],
-		"hermit": ["folk_grandpa", "folk_monk", "folk_scholar"]},
+		"hermit": ["folk_grandpa", "folk_monk", "folk_scholar"],
+		# the levy and the players (the Thundering Pots release)
+		"soldier": ["folk_guard", "folk_youth", "folk_farmer", "folk_porter"], "musician": ["folk_scholar", "folk_maiden", "folk_youth", "folk_grandpa"]},
 	"desert": {"merchant": ["folk_nomad", "folk_shopwife"], "porter": ["folk_nomad", "folk_porter"], "guard": ["folk_guard", "folk_nomad"],
 		"child": ["folk_boy", "folk_girl"], "elder": ["folk_grandpa", "folk_grandma"], "cook": ["folk_cook"], "washer": ["folk_maiden", "folk_farmwife"],
 		"watchman": ["folk_nomad"], "_": ["folk_nomad"]},
@@ -116,6 +122,15 @@ const ROLES := {
 	"servant": {"day": [[5.0, "kitchen", "chop|stir", "axe"], [8.0, "square", "sweep", "broom"], [10.5, "well", "lift", ""], [12.0, "kitchen", "stir", "ladle"],
 			[15.0, "yard", "sweep|toss", "broom"], [18.0, "kitchen", "stir|eat", "ladle"], [21.0, "home", "in", ""]], "go_hold": "pole", "walk": "carry",
 		"dye": [[0.08, 0.1, 0.55], [0.06, 0.6], 0.3, 1.0]},
+	# ---- the Thundering Pots release: the levy at drill on the open ground (spear and bow on the clips the
+	# sect's disciples drill with), on the gate by turns, in the barracks at night; and the players of the
+	# Pear Garden, who rehearse in the square, play at the tea-house and are heard all down the street
+	"soldier": {"day": [[5.4, "yard", "sword_dance|stretch|archery", ""], [8.2, "gate", "idle|look", ""], [11.4, "inn", "eat", "bowl"], [12.6, "yard", "archery|sword_dance|lift", ""], [16.4, "square", "talk|laugh|clap", ""],
+			[18.4, "inn", "drink|laugh", "cup"], [20.8, "home", "in", ""]],
+		"dye": [[0.0, 0.02, 0.98], [0.08, 0.06], 0.5, 0.85]},
+	"musician": {"day": [[6.8, "square", "play_flute|strike|clap", ""], [9.6, "tea", "play_flute|think", ""], [11.8, "tea", "eat", "bowl"], [13.0, "square", "strike|dance|play_flute", ""], [16.6, "bench", "play_flute|write", "book"],
+			[18.6, "tea", "play_flute|drink|laugh", "cup"], [21.4, "home", "in", ""]],
+		"dye": [[0.45, 0.12, 0.85, 0.95], [0.12, 0.6], 0.5, 1.0]},
 	# ---- the people of the road (the High Roads release): nobody goes indoors, for there is no indoors;
 	# at night they sit by the camp's fire and sleep sitting up
 	"woodcutter": {"day": [[5.4, "wood", "chop", "axe"], [11.4, "camp", "eat", "bowl"], [12.7, "wood", "chop|lift|stretch", "axe"], [17.2, "camp", "chop|lift", "axe"], [18.8, "camp", "warm|drink|laugh", "cup"], [21.6, "camp", "doze", ""]],
@@ -185,7 +200,8 @@ const TITLES := {"farmer": ["Farmer", "Farmer"], "fisher": ["Fisherman", "Fisher
 	"washer": ["Brother", "Auntie"], "youth": ["Brother", "Sister"], "lamplighter": ["Lamplighter", "Lamplighter"], "smith": ["Caster", "Caster"],
 	"disciple": ["Disciple", "Disciple"], "servant": ["Steward", "Steward"],
 	"woodcutter": ["Woodcutter", "Woodcutter"], "herbalist": ["Herb-Gatherer", "Herb-Gatherer"], "angler": ["Old Angler", "Angler"], "pedlar": ["Pedlar", "Pedlar"],
-	"hunter": ["Hunter", "Huntress"], "pilgrim": ["Pilgrim", "Pilgrim"], "hermit": ["Hermit", "Hermit"]}
+	"hunter": ["Hunter", "Huntress"], "pilgrim": ["Pilgrim", "Pilgrim"], "hermit": ["Hermit", "Hermit"],
+	"soldier": ["Levy-Man", "Levy-Woman"], "musician": ["Player", "Player"]}
 
 ## the bodies that are women and girls (for names and words)
 const FEM := ["folk_farmwife", "folk_shopwife", "folk_girl", "folk_grandma", "folk_maiden", "folk_disciple_f", "folk_jiaoren",
@@ -541,7 +557,8 @@ static func _spots(wd: Dictionary, tid: String, kind: String) -> Array:
 				if str(bd.area) != area or str(bd.get("style", "")) != s:
 					continue
 				var door: Vector2i = bd.door
-				if maxi(absi(door.x - c.x), absi(door.y - c.y)) > RADIUS + 8:
+				# (a quarter of a larger town keeps to its own streets: `reach`)
+				if maxi(absi(door.x - c.x), absi(door.y - c.y)) > int(town(tid).get("reach", RADIUS + 8)):
 					continue
 				for d4 in MapGen.DIRS:
 					var q3: Vector2i = door + d4
@@ -884,6 +901,13 @@ const LINES := {
 	"pilgrim": ["Up before the sun, to the top by the time it is over the ridge, down by noon. Every day. The mountain has not noticed yet.", "It is not the top one goes for. It is the going. But I notice everybody stops at the top.",
 		"I am walking to all the great mountains before I die. I have done one. It was this one.", "The cairn up there? Put a stone on it when you pass. Nobody knows who put the first.",
 		"My knees pray on the way up and curse on the way down. Heaven, I am told, hears both."],
+	"soldier": ["Left foot. They say left foot and forty of us put down forty different feet. Lady Hao has stopped shouting about it. That is worse.", "I came with a hoe and they put a point on it. It is still a hoe. I have told nobody. It digs a very fine latrine.",
+		"Master Sun says the best battle is the one nobody fights. I said, then why are we up before the cocks? He wrote that down. I do not know if it was a compliment, %s.",
+		"The camel men will not march behind the horse-folk and the horse-folk will not march in front of the haulers. We go out in a ring now. It turns out a ring has a name, and it is in the book.",
+		"My mother sent a straw cape and a note. Wear it. The note is longer than that, but that is what it says."],
+	"musician": ["Six airs, and they are all one song. I have played forty years and never noticed. The blind master heard it in a breath. I was a little put out.", "A drum is honest. You cannot play a drum flat. You can only play it late, and I have never been late in my life, whatever the stage manager tells you.",
+		"We have died in a hundred battles on that stage, %s, nightly, and got up for the next act. I mean to tell the clay ones how it is done.", "The bell was a hair flat for a month and I retuned everything I own to it, out of politeness. Now it is right again and I am a hair flat. That is a musician's life.",
+		"Somebody under the hill is keeping time with us in the evenings. One beat, on the first of the bar. It is never wrong. The flautist wants to know if it is in the guild."],
 	"hermit": ["Somebody came up. Well. Sit, since you have. The view is not mine to charge for.", "I came up for a season, forty years ago. It has been a long season.",
 		"Below they ask what I do all day. I look. It takes all day.", "The clouds come to me now. When I was young I went to them.",
 		"You climbed with your hands, %s? Good. Those who fly up never see what the mountain is made of."],
@@ -1019,6 +1043,12 @@ static func hongbao_line(p: Dictionary) -> String:
 ## and what it costs (Part XVI: red paper from the merchants, a fish for the reunion table, red envelopes for the
 ## children, the lantern riddles).
 const ERRANDS := {
+	# Part XXIII: the players of the Drum Tower quarter, asked to teach the levy the airs of the land
+	"s_p23_songs": {"ask": "The levy can march to a song and cannot sing one. Will you teach the companies the airs of the six hearths, of an evening?", "price": 0, "toast": "%s will teach the levy to sing",
+		"lines": ["Teach ploughmen to sing? They sing already. They sing like a gate. ...Yes, very well. I have taught worse. I have taught an examiner's nephew.",
+			"The airs, all six, to eleven companies. In a week. Do you know how long it took me to learn to breathe? Never mind. Tell them to bring their own tea.",
+			"I shall want the horse-folk at the front, where I can see them. They hum. One cannot stop a hummer; one can only aim him.",
+			"For the host? Of course. Nobody ever asked a player to help win a war. They ask us afterwards to say who won it. I should like, once, to have been there."]},
 	"s_p16_paper": {"ask": "Red paper, for the New Year couplets on the sect's doors. As much as you can spare.", "price": 120, "toast": "Red paper bought from %s",
 		"lines": ["Red paper! The first anybody has asked for all year. Take the whole roll. No, take two. Somebody should have a New Year.", "Red paper, gold edges, the good stuff from Tushan. For the sweeper who swept the sky, a third off.",
 			"For couplets? Then you'll want this too: a sheet of gold paper for the Fu on the door. Upside down, mind. The luck's arrived, see?", "I'd forgotten I had it. It was under the jars of nothing we've been selling all year. Here. Happy new year, early."]},

@@ -319,6 +319,24 @@ static func hero(o: Dictionary = {}) -> Node3D:
 	root.scale = Vector3(sc, sc, sc)
 	return root
 
+## Yue Ling as she is dressed (Fashion.YUE_OUTFITS, the Thundering Pots release): her model in the
+## dress she wears now, or the one a preview asks for (`o.outfit`), with what it hangs on her.
+static func yue_ling(o: Dictionary = {}) -> Node3D:
+	var ml := Engine.get_main_loop() as SceneTree
+	var g = ml.root.get_node_or_null("Game") if ml != null and ml.root != null else null
+	var oid: String = str(o.get("outfit", g.yue_outfit if g != null else "lotus"))
+	var fit: Dictionary = Fashion.YUE_OUTFITS.get(oid, Fashion.YUE_OUTFITS.lotus)
+	var cols := {}
+	var keys := ["robe", "sec", "trim"]
+	for k in 3:
+		if str(fit.cols[k]) != "":
+			cols[keys[k]] = Color(str(fit.cols[k]))
+	var opts := {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "hair": "long", "eyes": Color("c04080"), "cols": cols, "acc": fit.acc,
+		"trim": cols.get("trim", Color("ffb0cc"))}
+	if o.has("glow"):
+		opts["glow"] = o.glow
+	return person(Color("e86a9a"), Color("402030"), opts)
+
 ## Hang accessory `id` (Fashion.ACCESSORY_BONES) on a person model's bone; `col` tints its trims.
 ## Returns false if the model has no skeleton with that bone.
 static func dress(m: Node3D, id: String, col: Color = Color("f0c850")) -> bool:
@@ -418,6 +436,146 @@ static func accessory(id: String, col: Color, side: float = 1.0) -> Node3D:
 			for k4 in 9:
 				var a4 := -PI * 0.8 + PI * 1.6 * k4 / 8.0
 				g.ball(Vector3(sin(a4) * 0.17, 1.445 + 0.01 * sin(k4 * 2.0), cos(a4) * 0.15 - 0.02), 0.011, Color(0.85, 0.9, 1.0, 0.95))
+		# ---- the Thundering Pots release: what the new outfits hang on the hero, and on Yue Ling
+		"war_helm":
+			# a helmet of lacquered plates with a brow band, a neck guard of scales and a pheasant's tail
+			var lacq := MB.tag(Color("5a1e1a"), MB.METAL)
+			b.hemi(Vector3(0, 1.8, -0.01), Vector3(0.2, 0.17, 0.21), lacq)
+			b.torus(Vector3(0, 1.8, -0.01), 0.2, 0.016, gold)
+			b.cyl(Vector3(0, 1.975, -0.01), 0.022, 0.05, gold, Vector3.ZERO, 8)
+			for k5 in 9:
+				var a5 := PI * 0.5 + PI * (k5 - 4) / 6.5
+				b.box(Vector3(cos(a5) * 0.19, 1.71, -sin(a5) * 0.19 - 0.02), Vector3(0.085, 0.16, 0.014), MB.tag(Color("3a1614") if k5 % 2 == 0 else Color("6a2a22"), MB.METAL), Vector3(0, a5 - PI / 2.0, 0))
+			for k6 in 3:
+				var bend := (k6 - 1) * 0.16
+				b.leaf(Vector3(0, 1.99, -0.01), Vector3(bend, 2.3 - absf(bend) * 0.3, -0.2 - 0.04 * k6), 0.03, MB.tag(Color("8a5a2a"), MB.HAIR), Vector3(1, 0, 0), MB.tag(Color("2a1a12"), MB.HAIR))
+		"lamellar":
+			# rows of small lacquered plates over the breast and back, laced with cord in the trim's colour
+			for row in 4:
+				var y5 := 1.42 - row * 0.085
+				var rr5 := 0.2 + row * 0.006
+				for k7 in 12:
+					var a7 := TAU * (k7 + 0.5 * (row % 2)) / 12.0
+					b.box(Vector3(sin(a7) * rr5, y5, cos(a7) * rr5 * 0.72 - 0.01), Vector3(0.1, 0.095, 0.014), MB.tag(Color("6a2420") if (k7 + row) % 2 == 0 else Color("7a2e26"), MB.METAL), Vector3(0, a7, 0))
+				b.torus(Vector3(0, y5 + 0.04, -0.01), rr5 * 0.86, 0.006, MB.tag(col, MB.CLOTH), Vector3.ZERO)
+		"flute_sash":
+			# a bamboo flute thrust through the sash at the back, with a red tassel
+			var bam := MB.tag(Color("c8b468"), MB.WOOD)
+			b.limb(Vector3(-0.2, 1.02, -0.14), Vector3(0.24, 1.3, -0.17), 0.013, 0.012, bam, 6)
+			for k8 in 3:
+				var f8 := 0.25 + k8 * 0.25
+				b.torus(Vector3(-0.2, 1.02, -0.14).lerp(Vector3(0.24, 1.3, -0.17), f8), 0.014, 0.003, MB.tag(Color("7a6a34"), MB.WOOD), Vector3(0, 0, -1.0))
+			b.limb(Vector3(-0.2, 1.02, -0.14), Vector3(-0.23, 0.86, -0.13), 0.006, 0.012, MB.tag(Color("c83030"), MB.CLOTH), 5)
+		"clay_knot":
+			# the flat braided topknot of the ranks of Mount Li, tied over to the right, with its red cord
+			b.sph(Vector3(0.07, 1.93, -0.03), Vector3(0.055, 0.045, 0.06), MB.tag(Color("3a2a22"), MB.HAIR), Vector3(0, 0, -0.4))
+			b.torus(Vector3(0.06, 1.9, -0.03), 0.04, 0.008, MB.tag(Color("b83a2a"), MB.CLOTH), Vector3(0, 0, -0.4))
+			b.limb(Vector3(0.09, 1.9, -0.05), Vector3(0.12, 1.8, -0.1), 0.006, 0.004, MB.tag(Color("b83a2a"), MB.CLOTH), 4)
+		"back_banners":
+			# four small flags on poles behind the shoulders, as stage generals wear them
+			for k9 in 4:
+				var s9 := -1.0 if k9 < 2 else 1.0
+				var out9 := 0.09 + 0.1 * (k9 % 2)
+				var foot := Vector3(s9 * 0.07, 1.36, -0.13)
+				var top := Vector3(s9 * (0.12 + out9 * 1.6), 1.86 + 0.05 * (k9 % 2), -0.22)
+				b.limb(foot, top, 0.007, 0.005, MB.tag(Color("3a2a1a"), MB.WOOD), 5)
+				var fc := MB.tag(col if k9 % 2 == 0 else col.darkened(0.2), MB.CLOTH)
+				b.quad4(top, top + Vector3(s9 * 0.15, -0.03, -0.01), top.lerp(foot, 0.42) + Vector3(s9 * 0.12, 0, -0.01), top.lerp(foot, 0.42), fc, fc, fc, fc)
+				b.quad4(top.lerp(foot, 0.42), top.lerp(foot, 0.42) + Vector3(s9 * 0.12, 0, -0.01), top + Vector3(s9 * 0.15, -0.03, -0.01), top, fc, fc, fc, fc)
+		"rain_cape":
+			# layers of rice straw over the shoulders and down the back
+			var straw2 := MB.tag(Color("a8946a"), MB.CLOTH)
+			for tier in 3:
+				for k10 in 16:
+					var a10 := -PI * 0.9 + PI * 1.8 * k10 / 15.0
+					var r10 := 0.2 + tier * 0.03
+					var base10 := Vector3(sin(a10) * r10, 1.46 - tier * 0.13, cos(a10) * r10 * 0.75 - 0.02)
+					var tip10 := base10 + Vector3(sin(a10) * 0.07, -0.2, cos(a10) * 0.05 - 0.02)
+					b.leaf(base10, tip10, 0.045, straw2 if (k10 + tier) % 2 == 0 else MB.tag(Color("96825a"), MB.CLOTH), Vector3(cos(a10), 0, -sin(a10)), MB.tag(Color("b8a47a"), MB.CLOTH))
+		"scholar_cap":
+			# the black gauze cap of an official: a low crown, a raised back and two stiff wings
+			var gauze := MB.tag(Color("17151c"), MB.CLOTH)
+			b.cyl(Vector3(0, 1.9, 0.0), 0.15, 0.09, gauze, Vector3.ZERO, 14)
+			b.box(Vector3(0, 1.96, -0.07), Vector3(0.22, 0.12, 0.1), gauze)
+			for s11 in [-1.0, 1.0]:
+				b.box(Vector3(0.27 * s11, 1.9, -0.1), Vector3(0.26, 0.035, 0.008), gauze)
+				b.sph(Vector3(0.4 * s11, 1.9, -0.1), Vector3(0.03, 0.03, 0.006), gauze)
+			b.box(Vector3(0, 1.89, 0.15), Vector3(0.03, 0.03, 0.006), MB.tag(Color("6ad8a8"), MB.CRYSTAL))
+		"fur_collar":
+			# a deep collar of fur round the neck and over the shoulders
+			var furc := MB.tag(col.lerp(Color("e8e0d0"), 0.6), MB.HAIR)
+			for k12 in 14:
+				var a12 := TAU * k12 / 14.0
+				b.sph(Vector3(sin(a12) * 0.16, 1.47 + 0.012 * sin(k12 * 3.0), cos(a12) * 0.125 - 0.015), Vector3(0.065, 0.05, 0.06), furc if k12 % 3 != 0 else MB.tag(Color("b8a890"), MB.HAIR))
+		"prayer_beads":
+			# a long string of wooden beads round the neck, hanging to the breastbone, and its tassel
+			for k13 in 22:
+				var a13 := TAU * k13 / 22.0
+				var down := maxf(0.0, cos(a13))
+				b.ball(Vector3(sin(a13) * 0.115, 1.46 - down * 0.2, 0.02 + cos(a13) * 0.11 + down * 0.035), 0.013, MB.tag(Color("7a4a2a") if k13 % 5 != 0 else Color("c89a50"), MB.WOOD), true)
+			b.limb(Vector3(0, 1.25, 0.17), Vector3(0, 1.16, 0.175), 0.004, 0.014, MB.tag(Color("c83030"), MB.CLOTH), 5)
+		"kite_tails":
+			# two long ribbons from the back of the collar: a swallow's tail
+			for s14 in [-1.0, 1.0]:
+				b.ribbon([Vector3(0.05 * s14, 1.44, -0.13), Vector3(0.11 * s14, 1.12, -0.24), Vector3(0.2 * s14, 0.78, -0.38), Vector3(0.26 * s14, 0.5, -0.46)], [0.035, 0.045, 0.035, 0.008], Vector3(1, 0, 0), MB.tag(col, MB.CLOTH), MB.tag(Color("1e1e2a"), MB.CLOTH))
+		"head_lamp":
+			# a small brass lamp strapped to the brow, alight
+			b.torus(Vector3(0, 1.82, 0.0), 0.2, 0.012, MB.tag(Color("3a2a1e"), MB.WOOD), Vector3(0.1, 0, 0))
+			b.cyl(Vector3(0, 1.83, 0.2), 0.03, 0.045, MB.tag(Color("c8a040"), MB.METAL), Vector3(PI / 2.0, 0, 0), 8)
+			g.ball(Vector3(0, 1.83, 0.235), 0.022, Color(1.0, 0.8, 0.4, 0.95))
+		"back_broom":
+			# the old broom, slung across the back where other men carry a sword
+			var hb5 := Vector3(0.24, 1.58, -0.17)
+			var he5 := Vector3(-0.2, 0.86, -0.15)
+			b.limb(hb5, he5, 0.014, 0.014, MB.tag(Color("8a6a40"), MB.WOOD), 6)
+			for k15 in 9:
+				var sp := Vector3((k15 - 4) * 0.012, -0.02, (k15 % 3 - 1) * 0.012)
+				b.limb(he5 + sp * 0.4, he5 + Vector3(-0.1, -0.17, 0.0) + sp * 2.4, 0.01, 0.003, MB.tag(Color("c8a858") if k15 % 2 == 0 else Color("a88840"), MB.WOOD), 4)
+			b.torus(he5 + Vector3(-0.012, -0.02, 0), 0.022, 0.006, MB.tag(Color("b83030"), MB.CLOTH), Vector3(0, 0, 0.55))
+			b.ribbon([Vector3(0.15, 1.45, 0.1), Vector3(0.0, 1.3, 0.165), Vector3(-0.14, 1.12, 0.12)], [0.02, 0.022, 0.02], Vector3(0.7, 0.7, 0), MB.tag(Color("5a4a34"), MB.CLOTH))
+		"opera_mask":
+			# a painted face of lacquered paper over the whole face: red, with black brows and white round the eyes
+			b.sph(Vector3(0, 1.715, 0.1), Vector3(0.112, 0.135, 0.045), MB.tag(Color("c0282a"), MB.WOOD))
+			for s16 in [-1.0, 1.0]:
+				b.sph(Vector3(0.043 * s16, 1.728, 0.137), Vector3(0.03, 0.018, 0.012), MB.tag(Color("f4f0e8"), MB.WOOD))
+				b.sph(Vector3(0.043 * s16, 1.727, 0.146), Vector3(0.012, 0.008, 0.005), MB.tag(Color("141216"), MB.WOOD))
+				b.box(Vector3(0.05 * s16, 1.762, 0.135), Vector3(0.06, 0.012, 0.01), MB.tag(Color("141216"), MB.WOOD), Vector3(0, 0, 0.45 * s16))
+			b.box(Vector3(0, 1.648, 0.138), Vector3(0.05, 0.01, 0.008), MB.tag(Color("141216"), MB.WOOD))
+			b.box(Vector3(0, 1.79, 0.128), Vector3(0.014, 0.05, 0.01), MB.tag(Color("e8c050"), MB.METAL))
+		"fox_mask":
+			# a fox's face in painted wood, pushed up on the side of the head
+			var fm := Vector3(0.15, 1.84, 0.06)
+			b.sph(fm, Vector3(0.07, 0.085, 0.03), MB.tag(Color("f4f0e8"), MB.WOOD), Vector3(-0.3, 0.9, 0))
+			b.cone(fm + Vector3(0.05, -0.045, 0.045), 0.028, 0.07, MB.tag(Color("f4f0e8"), MB.WOOD), Vector3(1.9, 0.9, 0), 6)
+			for s17 in [-1.0, 1.0]:
+				b.cone(fm + Vector3(0.0, 0.085, 0.045 * s17 - 0.005), 0.026, 0.07, MB.tag(Color("e8702a"), MB.WOOD), Vector3(0, 0, -0.15), 5)
+				b.sph(fm + Vector3(0.045, 0.012, 0.03 * s17 + 0.02), Vector3(0.006, 0.01, 0.018), MB.tag(Color("c0282a"), MB.WOOD), Vector3(0, 0.9, 0))
+		"flower_wreath":
+			# blossom in the hair over one ear, and a few buds along the parting
+			for k18 in 5:
+				var a18 := TAU * k18 / 5.0
+				b.sph(Vector3(-0.17 + cos(a18) * 0.025, 1.83 + sin(a18) * 0.025, 0.06), Vector3(0.02, 0.02, 0.01), MB.tag(col.lerp(Color("f8d0dc"), 0.5), MB.CLOTH))
+			g.ball(Vector3(-0.17, 1.83, 0.068), 0.008, Color(1.0, 0.9, 0.5, 0.9))
+			for k19 in 4:
+				b.ball(Vector3(-0.12 + k19 * 0.035, 1.93 + 0.01 * (k19 % 2), 0.07 - k19 * 0.01), 0.013, MB.tag(col.lerp(Color("ffffff"), 0.35), MB.CLOTH), true)
+			b.leaf(Vector3(-0.17, 1.82, 0.05), Vector3(-0.22, 1.78, 0.0), 0.02, MB.tag(Color("4a8a4a"), MB.FOLIAGE))
+		"hair_ribbons":
+			# two long ribbons tied at the back of the head
+			b.sph(Vector3(0, 1.84, -0.19), Vector3(0.05, 0.03, 0.02), MB.tag(col, MB.CLOTH))
+			for s20 in [-1.0, 1.0]:
+				b.ribbon([Vector3(0.03 * s20, 1.84, -0.2), Vector3(0.09 * s20, 1.6, -0.25), Vector3(0.13 * s20, 1.3, -0.24), Vector3(0.16 * s20, 1.06, -0.27)], [0.03, 0.035, 0.03, 0.01], Vector3(1, 0, 0), MB.tag(col, MB.CLOTH), MB.tag(col.darkened(0.25), MB.CLOTH))
+		"moon_pin":
+			# a crescent of white jade on a long pin through the hair
+			b.torus(Vector3(0.08, 1.95, -0.04), 0.045, 0.011, MB.tag(Color("f0f4ff"), MB.CRYSTAL), Vector3(PI / 2.0, 0, 0))
+			b.sph(Vector3(0.105, 1.965, -0.04), Vector3(0.04, 0.04, 0.02), MB.tag(Color("1a1a2a"), MB.HAIR))
+			b.cyl(Vector3(0.0, 1.93, -0.04), 0.005, 0.2, MB.tag(Color("d8dcec"), MB.METAL), Vector3(0, 0, PI / 2.0), 6)
+			g.ball(Vector3(0.05, 1.975, -0.03), 0.012, Color(0.85, 0.92, 1.0, 0.9))
+		"healer_satchel":
+			# a physician's satchel at the hip on a strap across the body, tied with a red cord
+			b.ribbon([Vector3(0.14, 1.46, 0.08), Vector3(0.0, 1.3, 0.16), Vector3(-0.16, 1.08, 0.12)], [0.018, 0.02, 0.018], Vector3(0.7, 0.7, 0), MB.tag(Color("6a4a30"), MB.CLOTH))
+			b.box(Vector3(-0.21, 0.98, 0.05), Vector3(0.09, 0.15, 0.18), MB.tag(Color("8a6a44"), MB.CLOTH))
+			b.box(Vector3(-0.215, 1.045, 0.05), Vector3(0.1, 0.05, 0.19), MB.tag(Color("6a4a30"), MB.CLOTH))
+			b.torus(Vector3(-0.26, 1.0, 0.05), 0.02, 0.005, MB.tag(Color("c83030"), MB.CLOTH), Vector3(0, 0, PI / 2.0))
 	if not b.is_empty():
 		_mi(root, b)
 	if not g.is_empty():
@@ -600,7 +758,12 @@ static func _body_rise(m: Node3D) -> Vector3:
 
 ## A Blender-built character (art/characters/*.py) with the same glow pool as procedural people.
 static func _glb_person(o: Dictionary) -> Node3D:
-	var root := Assets.person(o.asset)
+	# (the Thundering Pots release: somebody dressed, "cols": the dress recoloured like the hero's robe,
+	# Assets.hero_instance; "acc": what hangs on them, with "trim" its colour)
+	var root: Node3D = Assets.person(o.asset) if (o.get("cols", {}) as Dictionary).is_empty() else Assets.hero_instance(Assets.PEOPLE[o.asset], o.cols)
+	root.set_meta("kind", "person")
+	for acc_id in o.get("acc", []):
+		dress(root, str(acc_id), o.get("trim", Color("ffb0cc")))
 	# (the hero's own model carries no blade of its own: the story's Lin Feng has his jian)
 	if str(o.asset).begins_with("lin_feng"):
 		Arms.attach(root, str(o.get("arm", "sword")))
@@ -1941,7 +2104,8 @@ static func _humanoid_monster(shape: String, col: Color, boss: bool) -> Node3D:
 			# Lin Feng as the player made and dressed him (character creation, the wardrobe)
 			n = hero({"glow": Color(0.4, 0.7, 1.0)})
 		"healer":
-			n = person(Color("e86a9a"), Color("402030"), {"asset": "yue_ling", "ribbon": Color("ffb0cc"), "glow": Color(1.0, 0.6, 0.8), "hair": "long", "eyes": Color("c04080")})
+			# (in the dress she wears: Fashion.YUE_OUTFITS)
+			n = yue_ling({"glow": Color(1.0, 0.6, 0.8)})
 		"demon":
 			n = person(col.darkened(0.45), Color("200010"), {"horns": true, "red_eyes": true, "sword": true, "glow": col, "scale": 1.35, "hair": "wild", "armor": true, "metal": Color("4a3a48"), "cape": col.darkened(0.2)})
 		_:

@@ -13,6 +13,7 @@ var title
 var ending
 var choice
 var create
+var field
 var bot = null
 var bot_active := false
 var args := {}
@@ -43,6 +44,7 @@ func _ready() -> void:
 	shop = _make("shop")
 	choice = _make("choice")
 	create = _make("create")
+	field = _make("field")
 	if DisplayServer.get_name() != "headless" and not args.has("no-post"):
 		post = PostFX.new()
 		post.name = "post"
@@ -208,9 +210,23 @@ func press(act: String) -> void:
 	elif top != "":
 		screens[top].press(act)
 
+var _amb_t := 0.0
+
 func _process(d: float) -> void:
 	_talk_hint()
 	_done_scene()
+	# the Thundering Pots release: what the finds (eggs.gd) need to know of the world, what was said
+	# when one was found, and the tune the hour and the place call for (music.gd)
+	var in_world: bool = top_name() == "world"
+	_amb_t -= d
+	if _amb_t <= 0.0:
+		_amb_t = 0.5
+		Eggs.busy = not in_world or not world.using.is_empty() or world.traveling() or Game.prologue != ""
+		Eggs.gliding = in_world and world.gliding()
+		Eggs.on_summit = in_world and not world.gliding() and not Peaks.summit_at(world.wd, world.ptile).is_empty()
+	if not Game.egg_pending.is_empty() and Game.done_pending.is_empty() and in_world and world.using.is_empty() and not world.traveling() and not world.gliding() and world.ambush_t < 0.0:
+		say(Game.egg_pending.pop_front())
+	Music.tick(self, d)
 	# a crossroads of the road reached out in the land (echoes.gd) is asked once nothing else is going on
 	if not Game.cross_pending.is_empty() and Game.done_pending.is_empty() and top_name() == "world" and world.using.is_empty() and not world.traveling() and world.ambush_t < 0.0 and Game.prologue == "":
 		ask_picks()
@@ -399,6 +415,9 @@ func new_game(h: Dictionary = {}) -> void:
 	yue_chat = 0
 	world.clear_cache()
 	world.refresh_hero()
+	# (--survival: the journey begins with the body asked after, needs.gd)
+	if args.has("survival"):
+		Needs.begin(Game)
 	# the New Fire release (cultures.gd): the story begins three years earlier, on the last morning at
 	# the hearth where the hero spent the year away: a different town, keeper and farewell for each.
 	# (`h` empty: a game begun without the creation screen, by the tests and the tools, begins at the
@@ -529,6 +548,7 @@ func talk_folk(e: Dictionary) -> void:
 	if hid != "" and not Game.folk_talk.has(str(fp.id)) and Game.prologue == "":
 		Game.add_hearth(hid, Cultures.TALK)
 	Game.folk_talk[str(fp.id)] = int(Game.folk_talk.get(str(fp.id), 0)) + 1
+	Jobs.folk_talked(Game, fp)
 	world.folk_talking = str(fp.id)
 	# Part XVI: a step's errand with the people of the towns (red paper from the merchants, red envelopes
 	# for the children on New Year's Day, folk.gd ERRANDS)
@@ -559,6 +579,8 @@ func talk_npc(e: Dictionary) -> void:
 		return
 	# the first time the hero sits down with one of a hearth's own people (cultures.gd)
 	Game.sit_with(str(e.id))
+	# (eggs.gd: somebody who is listened to all the way through; the Elder, who notices a robe)
+	Eggs.talked(Game, str(e.id))
 	var s := Game.cur_step()
 	var race: String = str(e.get("race", ""))
 	if race != "":
@@ -592,6 +614,23 @@ func talk_npc(e: Dictionary) -> void:
 				# Part XVII: spring's own whip, from the first willow that ever came into leaf
 				Game.add_item("willow_switch", 1)
 				Game.toast("Obtained %s" % Data.ITEMS.willow_switch.n)
+		)
+		return
+	# Part XXIII (war.gd): a field battle, begun by a word with whoever commands on that field
+	if not s.is_empty() and s.kind == "war" and str(s.npc) == str(e.id) and str(s.area) == str(e.get("area", Game.area)):
+		say(Echoes.told(Game, str(s.id), Data.DIALOGUE.get(str(s.id), [])), func(): start_war(str(s.battle), {"step": str(s.id)}))
+		return
+	# Part XXIII: the airs of the hearths, learned of whoever keeps each (music.gd), in any order
+	# (and after that step, of any of them, whenever: music.gd TEACHERS)
+	if Music.TEACHERS.has(str(e.id)) and not Game.airs.has(Cultures.of_npc(str(e.id))) and ((not s.is_empty() and s.kind == "airs") or Game.done("s_p23_airs")):
+		var hid2 := Cultures.of_npc(str(e.id))
+		say(Data.DIALOGUE.get("air:" + hid2, []), func():
+			Game.airs[hid2] = true
+			Game.heard[str(Music.AIRS[hid2])] = true
+			Game.add_hearth(hid2, Cultures.SIT)
+			Game.toast("Learned the air of %s (%d of 6)" % [str(Cultures.HEARTHS[hid2].n), Game.airs.size()])
+			Game.note("Learned the air of %s: %s" % [str(Cultures.HEARTHS[hid2].n), str(Music.TUNES[str(Music.AIRS[hid2])].n)])
+			Game.poll_steps()
 		)
 		return
 	# a fated encounter (fate.gd): a chapter of somebody's story, and a choice in it
@@ -636,6 +675,9 @@ func talk_npc(e: Dictionary) -> void:
 			else:
 				Game.toast("Invitation delivered (%d of %d)" % [Game.visits_done(s), int(s.n)])
 				Game.note("Invited " + str(e.n))
+			# (Part XXIII: the levy; whoever keeps a hearth sends its company to the host, war.gd)
+			if bool(s.get("levy", false)):
+				War.raise(Game, War.levy_of(str(e.id)))
 			if race != "":
 				Game.race_gain(race, 5)
 			Game.poll_steps()
@@ -674,9 +716,21 @@ func talk_npc(e: Dictionary) -> void:
 	if e.id == "elder":
 		lines.append([e.n, "Your task: " + Game.objective_text()])
 	var after := Callable()
-	if e.id == "dyer_su" and _dyer_stock().size() > 0 and deed == "":
-		# Dyer Su of the Dawn Market sells outfits (fashion.gd)
+	if str(e.id) in ["dyer_su", "tailor_qiao"] and _dyer_stock(str(e.id)).size() > 0 and deed == "":
+		# Dyer Su of the Dawn Market sells outfits (fashion.gd), and Tailor Qiao of Qingshi
 		after = func(): offer_outfits(e)
+	elif Game.survival and str(e.id) in Needs.COOKS and deed == "" and not (race != "" and Game.inv.get(str(Data.RACES[race].gift), 0) > 0):
+		# with survival on, the cooks and innkeepers of the land sell food for the road (needs.gd)
+		after = func(): offer_food(e)
+	elif str(e.id) == Gamble.DEALER and deed == "":
+		# Old Du's mat (gamble.gd)
+		after = func(): offer_gamble()
+	elif str(e.id) == Jobs.CLERK and deed == "":
+		# the notice board of Qingshi (jobs.gd)
+		after = func(): offer_jobs(e)
+	elif str(e.id) == "sun_wu" and deed == "" and not _drills().is_empty():
+		# Master Sun's lessons on the drill ground (war.gd)
+		after = func(): offer_drill(e)
 	elif e.id == "alchemist":
 		after = func(): shop.open("alchemist"); push("shop")
 	elif e.id == "smith":
@@ -972,12 +1026,40 @@ func open_wardrobe() -> void:
 		var col := Color(str(o.cols[0])) if str(o.cols[0]) != "" else UI.C_GOLD
 		opts.append({"id": id, "label": str(o.n) if have else "? " + str(o.n), "note": "wearing" if id == Game.outfit else ("" if have else "not yet"),
 			"desc": told(str(o.desc)) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.outfit})
-	choice.preview = func(id: String): world.preview_outfit(id)
-	choose("The wardrobe: what will you wear?", opts, func(id: String):
+	# (the Thundering Pots release: Yue Ling has a wardrobe of her own, behind the last line of his)
+	if Game.companion:
+		opts.append({"id": "yue", "label": "Yue Ling's dresses...", "note": "%d of %d" % [Game.yue_outfits.size(), Fashion.YUE_ORDER.size()],
+			"desc": "What Yue Ling wears: the rose dress she woke in, and what the road, the tailor and the people who love her have given her since.", "col": Color("ff9ac0")})
+	choice.preview = func(id: String): world.preview_outfit(id if id != "yue" else "")
+	choose(WARDROBE_ASK, opts, func(id: String):
 		world.preview_outfit("")
+		if id == "yue":
+			open_yue_wardrobe()
+			return
 		if id != "" and Game.wear(id):
 			Game.toast("You wear the %s" % Fashion.OUTFITS[id].n)
 		world.refresh_hero()
+	)
+
+const WARDROBE_ASK := "The wardrobe: what will you wear?"
+const YUE_WARDROBE_ASK := "Yue Ling's wardrobe: what will she wear?"
+
+## The Thundering Pots release: Yue Ling's dresses (fashion.gd YUE_OUTFITS); she changes in the world
+## as the cursor moves.
+func open_yue_wardrobe() -> void:
+	var opts: Array = []
+	for id in Fashion.YUE_ORDER:
+		var o: Dictionary = Fashion.YUE_OUTFITS[id]
+		var have: bool = Game.yue_outfits.has(id)
+		var col := Color(str(o.cols[0])) if str(o.cols[0]) != "" else Color("ff9ac0")
+		opts.append({"id": id, "label": str(o.n) if have else "? " + str(o.n), "note": "wearing" if id == Game.yue_outfit else ("" if have else "not yet"),
+			"desc": str(o.desc) + "\n\nWhile she wears it: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.yue_outfit})
+	choice.preview = func(id: String): world.preview_yue_outfit(id)
+	choose(YUE_WARDROBE_ASK, opts, func(id: String):
+		world.preview_yue_outfit("")
+		if id != "" and Game.wear_yue(id):
+			Game.toast("Yue Ling wears the %s" % Fashion.YUE_OUTFITS[id].n)
+		world.refresh_yue()
 	)
 
 ## The arms rack (arms.gd): the weapons owned and the ones still to be won; choosing one takes it in
@@ -1024,30 +1106,232 @@ func open_stable() -> void:
 	)
 
 ## What Dyer Su has for sale now (fashion.gd outfits with a price).
-func _dyer_stock() -> Array:
+## (`who`: the seller; the Thundering Pots release: Tailor Qiao of Qingshi sells too, and for Yue Ling)
+func _dyer_stock(who: String = "dyer_su") -> Array:
 	var out: Array = []
 	for id in Fashion.OUTFIT_ORDER:
-		if Fashion.outfit_for_sale(id, Game):
+		if Fashion.outfit_for_sale(id, Game) and Fashion.seller(id) == who:
 			out.append(id)
+	if who == "tailor_qiao":
+		for yid in Fashion.YUE_ORDER:
+			if Fashion.yue_for_sale(yid, Game):
+				out.append("yue:" + str(yid))
 	return out
+
+const TAILOR_ASK := "Tailor Qiao's shop: something to wear?"
 
 func offer_outfits(e: Dictionary) -> void:
 	var opts: Array = []
-	for id in _dyer_stock():
-		var o: Dictionary = Fashion.OUTFITS[id]
-		opts.append({"id": id, "label": "%s (%d stones)" % [o.n, int(o.buy)], "desc": told(str(o.desc)) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
+	var tailor := str(e.id) == "tailor_qiao"
+	for id in _dyer_stock(str(e.id)):
+		var hers: bool = str(id).begins_with("yue:")
+		var o: Dictionary = Fashion.YUE_OUTFITS[str(id).trim_prefix("yue:")] if hers else Fashion.OUTFITS[id]
+		opts.append({"id": id, "label": "%s%s (%d stones)" % ["For Yue Ling: " if hers else "", o.n, int(o.buy)],
+			"desc": (str(o.desc) if hers else told(str(o.desc))) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
 			"col": Color(str(o.cols[0])), "enabled": Game.stones >= int(o.buy)})
-	opts.append({"id": "later", "label": "Not today", "desc": "Dyer Su will keep it for you. She says that to everyone.", "col": UI.C_DIM})
-	choose("Dyer Su's stall: something to wear?", opts, func(id: String):
+	opts.append({"id": "later", "label": "Not today", "desc": "Tailor Qiao will put it by. He has put by a great deal." if tailor else "Dyer Su will keep it for you. She says that to everyone.", "col": UI.C_DIM})
+	choose(TAILOR_ASK if tailor else "Dyer Su's stall: something to wear?", opts, func(id: String):
 		if id == "" or id == "later":
 			return
-		var o: Dictionary = Fashion.OUTFITS[id]
+		var hers2: bool = id.begins_with("yue:")
+		var o: Dictionary = Fashion.YUE_OUTFITS[id.trim_prefix("yue:")] if hers2 else Fashion.OUTFITS[id]
 		if Game.stones < int(o.buy):
 			return
 		Game.stones -= int(o.buy)
-		Game.grant_outfit(id)
-		say([[str(e.n), "It suits you. I would say that anyway, but this time it is true."]])
+		if hers2:
+			Game.grant_yue_outfit(id.trim_prefix("yue:"))
+			say([[str(e.n), "I cut it to her measure a month ago. One hopes. Tell her the hem is generous; she walks like somebody who mends her own."], ["Yue Ling", "...It has pockets. Lin Feng. It has pockets.", "cheer"]])
+		else:
+			Game.grant_outfit(id)
+			say([[str(e.n), "Stand straight. No, as you usually stand; I cut for the man, not for the mirror. There. It will do, and so will you." if tailor else "It suits you. I would say that anyway, but this time it is true."]])
 	)
+
+# ---------------------------------------------------------------- the notice board, the drill ground, the field (jobs.gd, war.gd)
+## The notice board of Qingshi: the notices posted now; one not yet taken is taken down, one that is
+## done is reported and paid, one in hand says how far along it is.
+func offer_jobs(e: Dictionary) -> void:
+	var opts: Array = []
+	for id in Jobs.ORDER:
+		if not Jobs.posted(Game, id):
+			continue
+		var st := Jobs.state(Game, id)
+		var rdy := Jobs.ready(Game, id)
+		var p := Jobs.progress(Game, id)
+		opts.append({"id": ("report:" if rdy else ("take:" if st == "" else "have:")) + id, "label": Jobs.label(Game, id),
+			"note": "" if st == "" else ("done: report it" if rdy else "%d of %d" % [int(p[0]), int(p[1])]),
+			"desc": Jobs.text(Game, id), "col": UI.C_JADE if rdy else (UI.C_GOLD if st == "" else UI.C_DIM), "enabled": st == "" or rdy})
+	opts.append({"id": "later", "label": "Nothing today", "desc": "The board will be here. %d of %d notices done so far." % [Jobs.done_count(Game), Jobs.ORDER.size()], "col": UI.C_DIM})
+	choose(Jobs.ASK, opts, func(id: String):
+		if id == "" or id == "later":
+			return
+		var jid := id.get_slice(":", 1)
+		if id.begins_with("take:"):
+			Jobs.take(Game, jid)
+			Game.toast("Taken down: %s" % str(Jobs.JOBS[jid].n))
+			# (a notice that was already done when it was taken is reported in the same breath)
+			if not Jobs.ready(Game, jid):
+				return
+		if Jobs.finish(Game, jid):
+			say([[str(e.n), "\"%s.\" Done, and witnessed. I shall take it down." % str(Jobs.JOBS[jid].n)], [str(Jobs.JOBS[jid].by).capitalize() if not str(Jobs.JOBS[jid].by).begins_with("the ") else "Narrator", str(Jobs.JOBS[jid].thanks)]])
+	)
+
+# ---------------------------------------------------------------- the body (needs.gd) and courtship (romance.gd)
+## Where the hero stands, as the body and an hour with Yue Ling care about it: under a roof or the
+## ground, in a town or out in the country, beside water, on a summit, in the cold, and the hour.
+func body_ctx() -> Dictionary:
+	var indoors: bool = str(world.layer).begins_with("f:")
+	var cave: bool = world.is_cave()
+	var town: bool = Music.town_at(Game.area, world.ptile) != "" or Game.area == "sect"
+	var water := false
+	var wd: Dictionary = world.wd
+	if wd.has("grid") and wd.has("w"):
+		for dy in range(-1, 2):
+			for dx in range(-1, 2):
+				var q: Vector2i = world.ptile + Vector2i(dx, dy)
+				if q.x >= 0 and q.y >= 0 and q.x < int(wd.w) and q.y < int(wd.h) and wd.grid[q.y * int(wd.w) + q.x] == MapGen.WATER:
+					water = true
+	return {"indoors": indoors, "cave": cave, "town": town and not cave, "wild": (not town and not indoors) or cave, "privy": indoors and not cave, "water": water,
+		"summit": not indoors and not Peaks.summit_at(wd, world.ptile).is_empty(), "cold": str(world.theme_name) in ["frost", "aurora", "guanghan"], "hour": Clock.hour(Game), "area": Game.area}
+
+## What a cook or an innkeeper has for the road (needs.gd), with survival on.
+func offer_food(e: Dictionary) -> void:
+	var opts: Array = []
+	for fid in Needs.FOOD_ORDER:
+		var price := int(Needs.FOOD[fid].price)
+		opts.append({"id": fid, "label": "%s (%d stones)" % [str(Data.ITEMS[fid].n), price], "note": "have %d" % int(Game.inv.get(fid, 0)), "desc": str(Data.ITEMS[fid].desc) + ".", "col": UI.C_GOLD, "enabled": Game.stones >= price})
+	opts.append({"id": "later", "label": "Nothing, thank you", "desc": "The gourd fills itself wherever you drink: a well, a tea table, a spring.", "col": UI.C_DIM})
+	choose(Needs.FOOD_ASK, opts, func(fid: String):
+		if fid == "" or fid == "later":
+			return
+		Game.stones -= int(Needs.FOOD[fid].price)
+		Game.add_item(fid)
+		Game.toast("Bought: %s" % str(Data.ITEMS[fid].n))
+		offer_food(e)
+	)
+
+const GIFT_ASK := "Something for Yue Ling: what will you give her?"
+const OUTING_ASK := "An hour with Yue Ling: which?"
+
+## Give Yue Ling something (romance.gd GIFTS): what can be given now, and what she makes of it.
+func open_gifts() -> void:
+	var opts: Array = []
+	for id in Romance.GIFT_ORDER:
+		var gf: Dictionary = Romance.GIFTS[id]
+		var why := Romance.gift_blocked(Game, id)
+		var given: bool = (Game.romance.get("gifts", {}) as Dictionary).has(id)
+		opts.append({"id": id, "label": told(str(gf.n)), "note": {"love": "she loved it", "like": "she liked it", "meh": "a lovely thought"}[str(Game.romance.gifts[id])] if given else ("%d stones" % int(gf.cost) if gf.has("cost") else ""),
+			"desc": told(str(gf.desc)) + ("\n\n" + why if why != "" else ""), "col": Color("ff9ac0"), "enabled": why == ""})
+	choose(GIFT_ASK, opts, func(id: String):
+		if id != "":
+			say(Romance.give(Game, id))
+	)
+
+## Spend an hour with her (romance.gd OUTINGS): the ones that can be had here and now; the rest say where.
+func open_outings() -> void:
+	var ctx := body_ctx()
+	var here: Array = Romance.outings_here(Game, ctx)
+	var opts: Array = []
+	for id in Romance.OUTING_ORDER:
+		var o: Dictionary = Romance.OUTINGS[id]
+		var had: bool = (Game.romance.get("outings", {}) as Dictionary).has(id)
+		opts.append({"id": id, "label": str(o.n), "note": "had" if had else ("" if here.has(id) else "not here"), "desc": str(o.hint) + (" It was had, and is kept." if had else ""), "col": Color("ff9ac0"), "enabled": here.has(id)})
+	choose(OUTING_ASK, opts, func(id: String):
+		if id == "":
+			return
+		var o2: Dictionary = Romance.OUTINGS[id]
+		say(o2.lines, func():
+			var replies: Array = []
+			for op in o2.options:
+				replies.append({"id": str(op[0]), "label": str(op[2]), "desc": "", "col": Color("ff9ac0")})
+			choose(str(o2.n), replies, func(oid: String):
+				say(Romance.take_outing(Game, id, oid))
+			, false)
+		)
+	)
+
+## Say what there is to say (romance.gd ASKS): the next of the three questions, if the two are close enough.
+func open_ask() -> void:
+	var id := Romance.next_ask(Game)
+	if id == "" or Romance.ask_blocked(Game, id) != "":
+		return
+	var a: Dictionary = Romance.ASKS[id]
+	var opts: Array = []
+	for op in a.options:
+		opts.append({"id": str(op[0]), "label": str(op[2]), "desc": "", "col": Color("ff9ac0")})
+	opts.append({"id": "wait", "label": "Not today", "desc": "It will keep. It has kept this long.", "col": UI.C_DIM})
+	choose(told(str(a.ask)), opts, func(oid: String):
+		if oid == "" or oid == "wait":
+			return
+		say(Romance.take_ask(Game, id, oid), func(): world.refresh_yue())
+	)
+
+## Old Du's mat (gamble.gd): the game, what is staked on, and how much; then the bowl is lifted, and
+## the mat is there again.
+func offer_gamble() -> void:
+	var opts: Array = []
+	for gid in Gamble.GAME_ORDER:
+		opts.append({"id": gid, "label": str(Gamble.GAMES[gid].n), "desc": str(Gamble.GAMES[gid].desc) + "\n\n" + Gamble.summary(Game), "col": UI.C_GOLD, "enabled": Game.stones > 0})
+	opts.append({"id": "later", "label": "Walk away", "desc": "Nine of ten who gamble lose. It is painted over the door. You carry %d spirit stones." % Game.stones, "col": UI.C_DIM})
+	choose(Gamble.ASK, opts, func(gid: String):
+		if gid == "" or gid == "later":
+			return
+		var bets: Array = []
+		for b in Gamble.bets(Game, gid):
+			bets.append({"id": str(b[0]), "label": str(b[1]), "note": "pays %.2f to 1" % float(b[2]), "desc": str(Gamble.GAMES[gid].desc), "col": UI.C_JADE})
+		choose(Gamble.BET_ASK, bets, func(bid: String):
+			if bid == "":
+				offer_gamble()
+				return
+			var stk: Array = []
+			for sv in Gamble.stakes(Game):
+				stk.append({"id": str(sv), "label": "%d spirit stones" % int(sv), "desc": "You carry %d. If it comes, the mat pays you; if it does not, these are the mat's." % Game.stones, "col": UI.C_GOLD})
+			choose(Gamble.STAKE_ASK, stk, func(sid: String):
+				if sid == "":
+					offer_gamble()
+					return
+				var res := Gamble.play(Game, gid, bid, int(sid))
+				say(res.lines, func(): offer_gamble())
+			)
+		)
+	)
+
+## Master Sun's lessons that can be fought now (war.gd: the drill ground).
+func _drills() -> Array:
+	var out: Array = []
+	for id in War.BATTLE_ORDER:
+		if not bool(War.BATTLES[id].story) and War.open(Game, id) and not War.companies(Game).is_empty():
+			out.append(id)
+	return out
+
+const DRILL_ASK := "The drill ground: which lesson?"
+
+func offer_drill(_e: Dictionary) -> void:
+	var opts: Array = []
+	for id in _drills():
+		var b: Dictionary = War.BATTLES[id]
+		opts.append({"id": id, "label": str(b.n), "note": "held in %d drums" % int(Game.war_won[id]) if Game.war_won.has(id) else "", "desc": str(b.desc), "col": UI.C_GOLD})
+	opts.append({"id": "later", "label": "Not today", "desc": "\"The general who does not fight today,\" says Master Sun, \"has not lost today. It is a beginning.\"", "col": UI.C_DIM})
+	choose(DRILL_ASK, opts, func(id: String):
+		if id != "" and id != "later":
+			start_war(id, {})
+	)
+
+## A field battle (war.gd, field.gd).
+func start_war(id: String, ctx: Dictionary) -> void:
+	field.start(id, ctx)
+	push("field")
+
+## It is over: a field of the story won moves the story on; a field lost is come back to.
+func war_done(st: Dictionary, ctx: Dictionary) -> void:
+	pop()
+	var won := str(st.over) == "won"
+	if won:
+		Game.toast("The field is held: %s" % str(War.BATTLES[str(st.id)].n))
+	else:
+		Game.toast("Driven from the field. The host will be ready again when you are.")
+	var s := Game.cur_step()
+	if won and ctx.has("step") and not s.is_empty() and str(s.id) == str(ctx.step):
+		Game.advance()
 
 ## A townsperson's request (trials.gd DEEDS): give them what they asked for, or come back later.
 func offer_deed(e: Dictionary, id: String) -> void:
@@ -1218,7 +1502,7 @@ func start_breakthrough() -> void:
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
-	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20"}
+	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
