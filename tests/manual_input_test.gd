@@ -3,7 +3,9 @@ extends SceneTree
 ## look and an origin changed) -> dialogue -> walk -> menu -> a thing to do (props.gd): face it, Enter,
 ## he does it, Enter again finishes it; T to Yue Ling; F swings the sword and G throws the sword qi;
 ## a key held into somebody talks to them once; and (the Hollow Hills release) a key held into the mouth
-## of a cave goes down into it, a step is walked on its floor, and the way out comes up into the daylight.
+## of a cave goes down into it, a step is walked on its floor, and the way out comes up into the daylight;
+## and (the High Roads release) a key held up a crag climbs it to the top, V opens the cloud-kite there,
+## and the flight comes down on open ground.
 ## Run: godot --headless --path . --script tests/manual_input_test.gd
 
 var main
@@ -130,19 +132,83 @@ func cave_step() -> void:
 				tap(KEY_F)
 			elif cave.has("racked") and frame == int(cave.racked) + 13:
 				expect(str(w.player.get_meta("act", "")) == "arm_staff" and Faces.worn(w.player) == "shout", "F strikes with the staff's own blow, and it shows in his face")
-				print("failures: ", fails)
-				quit(1 if fails > 0 else 0)
+				# and last of all, up a crag on his hands and down again under the cloud-kite (the High Roads release)
+				cave.stage = 5
+				cave.at = frame
 			elif since > 400:
 				expect(false, "the arms rack opens from the menu")
 				print("failures: ", fails)
 				quit(1)
 
+## The High Roads release (peaks.gd): a key held up a rock face climbs it to the summit, V opens the
+## cloud-kite there, and the flight ends on open ground.
+func high_step() -> void:
+	var w = main.world
+	var g = root.get_node("Game")
+	var since: int = frame - int(cave.at)
+	if since == 20:
+		var pk: Dictionary = Peaks.by_id(w.wd, "peak:mountain:1")
+		expect(not pk.is_empty() and float(pk.h) > 10.0, "the mountain has a second peak, and it is a real one (%s m)" % str(pk.get("h", 0)))
+		cave["peak"] = pk
+		# three tiles down its south side, facing up
+		var c: Vector2i = pk.c
+		w.teleport(c + Vector2i(0, 3), "surface")
+		cave["key"] = key_for(Vector2i(0, -1))
+		cave["rock"] = Peaks.at(w.wd, c) - Peaks.at(w.wd, c + Vector2i(0, 3))
+		key(int(cave.key), true)
+	elif since > 20 and not cave.has("top"):
+		if int(w.climb) > 0:
+			cave["climbed"] = true
+		# (a held key goes straight on over the top: the summit is his the moment he stands on it)
+		if g.summits.has(str(cave.peak.id)):
+			key(int(cave.key), false)
+			cave["top"] = frame
+			expect(cave.has("climbed") and float(g.climbed) > 3.0 and float(cave.rock) > 3.0, "a key held up the rock climbs it, hand over hand (%.1f m of %.1f)" % [float(g.climbed), float(cave.rock)])
+			expect(g.summits.has(str(cave.peak.id)), "and standing on the very top is a summit stood on")
+		elif since > 900:
+			print("    (at %s of %s, top %s, moving %s, climb %d, prologue '%s', key lock %s, free ahead %s)" % [str(w.ptile), str(cave.peak.c), main.top_name(), str(w.move_dir), int(w.climb), str(g.prologue), str(w.key_lock), str(w.tile_free(w.ptile + Vector2i(0, -1)))])
+			expect(false, "a key held up the rock reaches the top")
+			print("failures: ", fails)
+			quit(1)
+	elif cave.has("top") and frame == int(cave.top) + 40:
+		# the way the air is clear for longest, as somebody on a summit would look round
+		var best := Vector2i(0, 1)
+		var bn := 0
+		for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+			if int(w.glide_reach(d)) > bn:
+				bn = int(w.glide_reach(d))
+				best = d
+		cave["reach"] = bn
+		w.facing = best
+		tap(KEY_V)
+	elif cave.has("top") and frame > int(cave.top) + 40 and not cave.has("air"):
+		# (the kite opens at his next footfall, if he is still finishing a step)
+		if w.gliding():
+			cave["air"] = frame
+			expect(int(g.glides) == 1 and int(cave.reach) >= 6, "V at the top opens the cloud-kite, and he is in the air (%d tiles of it ahead)" % int(cave.reach))
+		elif frame > int(cave.top) + 400:
+			expect(false, "V at the top opens the cloud-kite")
+			print("failures: ", fails)
+			quit(1)
+	elif cave.has("air") and not w.gliding():
+		expect(int(g.glided) >= 6 and int(g.glide_best) == int(g.glided) and w.tile_free(w.ptile) and w.ent_at(w.ptile) == null and Peaks.at(w.wd, w.ptile) < float(cave.peak.h) * 0.5 and main.top_name() == "world",
+			"the flight ends on open ground lower down (%d tiles flown)" % int(g.glided))
+		print("failures: ", fails)
+		quit(1 if fails > 0 else 0)
+	elif cave.has("top") and frame > int(cave.top) + 1500:
+		expect(false, "the flight comes down")
+		print("failures: ", fails)
+		quit(1)
+
 func _process(_d: float) -> bool:
 	frame += 1
+	if not cave.is_empty() and int(cave.stage) == 5:
+		high_step()
+		return false
 	if not cave.is_empty():
 		cave_step()
 		return false
-	if frame > 2400:
+	if frame > 5200:
 		printerr("  FAIL smoke test did not finish (script error?)")
 		quit(1)
 	match frame:

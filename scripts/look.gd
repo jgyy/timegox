@@ -191,6 +191,8 @@ const PICKUP_COLORS := {
 	"catalpa_timber": Color("d8b070"), "player_part": Color("f0e8d8"),
 	# Part XXI: an unasked blank, a bamboo switch, a spent arrow, an empty hilt, a tally, a name-tablet
 	"sword_blank": Color("5a5e6a"), "bamboo_switch": Color("7ac060"), "spent_arrow": Color("e8dcc0"), "old_hilt": Color("b89a50"), "challenge_tally": Color("c8a070"), "saint_tablet": Color("d8d0b8"),
+	# Part XXII: road salt, the Earl's knotted cords, a scholar's farewells and the kings' jade slips
+	"salt_bag": Color("e8e4dc"), "wind_knot": Color("9aa8b8"), "thrown_letter": Color("f0e8d0"), "merit_slip": Color("d8ecd8"),
 	# Part XX: stone-milk, a basket of the mountain, a miner's lamp, a rubbing from a cave wall
 	"stone_milk": Color("f0f4f8"), "earth_basket": Color("b89858"), "miner_lamp": Color("ffc860"), "cave_rubbing": Color("3a3a44"),
 	"herb": Color("6fe08a"), "lotus": Color("ff7aa8"), "jade": Color("7affe0"), "shard": Color("f6e85c"), "pearl": Color("e8f4ff"),

@@ -131,6 +131,27 @@ var mount: Node3D = null
 var mount_id := ""
 var ride_clk := 0.0
 var hero_sig := ""
+## the High Roads release (peaks.gd): climbing and gliding.  A step that rises more than a stride is
+## climbed, hand over hand (`climb`: +1 up, -1 down, 0 walking); V opens the glider, and `glide` is
+## the flight: {alt (metres above the plain at the tile he is over), from, n (tiles flown), fold}.
+## seconds a climbed step takes: so much, and more for every metre it rises, between these (and three
+## quarters of it coming down)
+const CLIMB_T := [0.25, 0.16, 0.4, 1.2]
+var climb_t := 0.4
+const GLIDE_T := 0.13
+## metres lost for each tile flown, and when the glider is folded in the air
+const GLIDE_SINK := 0.8
+const GLIDE_DIVE := 3.0
+## the leap a flight begins with, and how far above a thing, a wood or a roof one must be to pass over it
+const GLIDE_LEAP := 1.7
+const GLIDE_OVER := {"ent": 2.6, "wood": 4.5, "roof": 8.0}
+var climb := 0
+var climb_clk := 0.0
+var scale_in := 0.0
+var glide := {}
+var glide_want := false
+var air_y := 0.0
+var kites := {}
 
 func _build3d() -> void:
 	opaque = false
@@ -350,6 +371,10 @@ func load_area(id: String, at: Vector2i) -> void:
 	teleport(Atlas.to_world(id, at), Data.layer_of(id))
 
 func teleport(at: Vector2i, lid: String = "") -> void:
+	glide = {}
+	glide_want = false
+	climb = 0
+	air_y = 0.0
 	open_world()
 	if lid == "":
 		lid = layer
@@ -716,6 +741,19 @@ func _build_view(id: String) -> void:
 			n.position.y = bb.off.y
 		scene3d.add_child(n)
 		nodes[i] = n
+	# the High Roads (peaks.gd): a cairn and a line of flags on every summit, and its name over it
+	for pk in Peaks.of_area(lw, id):
+		var kp: Vector3 = Terrain3D.world_pos(pk.c) + bb.off
+		var cn := Peaks.cairn(int(pk.i) * 31 + 7, Color("c83a3a"))
+		cn.position = Vector3(kp.x + 0.75, _ground(bb, kp + Vector3(0.75, 0, 0.75)) - 0.05, kp.z + 0.75) - root.position
+		root.add_child(cn)
+		_label(cn, "%s  %d m" % [str(pk.n), int(round(float(pk.h)))], 3.3, Color("f4ecd8"), 26).visibility_range_end = 60.0
+	# ... and the camp of the people of the road at the foot of the highest (folk.gd)
+	if (lw.get("camps", {}) as Dictionary).has(id):
+		var cp: Vector3 = Terrain3D.world_pos(lw.camps[id]) + bb.off
+		var cm := Structures.camp(int(spec.seed))
+		cm.position = Vector3(cp.x, _ground(bb, cp), cp.z) - root.position
+		root.add_child(cm)
 	if id == "sect":
 		var pg := Atlas.to_world("sect", Vector2i(-5, 3))
 		var pp := Terrain3D.world_pos(pg)
@@ -1650,10 +1688,17 @@ func _read_keys() -> Vector2i:
 func riding_here() -> bool:
 	if not Game.riding or Game.ride == "" or is_floor() or not trip.is_empty() or not using.is_empty():
 		return false
+	# (nothing with hooves goes up a crag, and nobody glides in the saddle: the ride waits at the foot)
+	if not glide.is_empty() or air_y > 0.3 or Peaks.at(wd, ptile) > 1.2 or (move_t >= 0.0 and Peaks.at(wd, target) > 1.2):
+		return false
 	return building_at(ptile).is_empty() and (move_t < 0.0 or building_at(target).is_empty())
 
 ## Seconds to cross one tile: running, or faster in the saddle (Fashion.RIDES speed).
 func step_time() -> float:
+	if not glide.is_empty():
+		return GLIDE_T * float(glide.get("span", 1.0))
+	if climb != 0:
+		return climb_t
 	if riding_here():
 		return STEP_T / float(Fashion.RIDES[Game.ride].speed)
 	return STEP_T
@@ -1711,48 +1756,235 @@ func refresh_hero() -> void:
 
 func _move(d: float) -> void:
 	var budget := d
-	var st := step_time()
 	while budget > 0.0001:
 		if move_t < 0.0:
-			if move_dir == Vector2i.ZERO:
-				return
-			facing = move_dir
-			var nt := ptile + move_dir
-			var e = ent_at(nt)
-			if e != null:
-				move_dir = Vector2i.ZERO
-				main.interact(e)
-				# the key still held must be let go first, or the conversation opens again the moment
-				# it closes, for ever (as on the stairs)
-				key_lock = true
-				return
-			if not tile_free(nt):
-				return
-			# the beginning (cultures.gd): nobody leaves before the farewell is said
-			if Game.prologue != "" and leash.x >= 0 and maxi(absi(nt.x - leash.x), absi(nt.y - leash.y)) > LEASH:
-				move_dir = Vector2i.ZERO
-				key_lock = true
-				Game.toast("Not yet. There is a goodbye to say first.")
-				return
-			target = nt
-			move_t = 0.0
-			# third-person follow: the camera swings round behind the direction of travel
-			var q := FWD.find(facing)
-			if q >= 0:
-				cam_q = q
+			if glide_want:
+				glide_want = false
+				_glide_start()
+			if not glide.is_empty():
+				if not _glide_pick():
+					return
+			else:
+				if move_dir == Vector2i.ZERO:
+					return
+				facing = move_dir
+				var nt := ptile + move_dir
+				var e = ent_at(nt)
+				if e != null:
+					move_dir = Vector2i.ZERO
+					main.interact(e)
+					# the key still held must be let go first, or the conversation opens again the moment
+					# it closes, for ever (as on the stairs)
+					key_lock = true
+					return
+				if not tile_free(nt):
+					return
+				# the beginning (cultures.gd): nobody leaves before the farewell is said
+				if Game.prologue != "" and leash.x >= 0 and maxi(absi(nt.x - leash.x), absi(nt.y - leash.y)) > LEASH:
+					move_dir = Vector2i.ZERO
+					key_lock = true
+					Game.toast("Not yet. There is a goodbye to say first.")
+					return
+				target = nt
+				move_t = 0.0
+				# the High Roads (peaks.gd): a step up or down a crag is climbed
+				climb = 0 if is_floor() else Peaks.climb(wd, ptile, nt)
+				if climb != 0:
+					var dz := absf(Peaks.at(wd, nt) - Peaks.at(wd, ptile))
+					Game.climbed += dz
+					climb_t = clampf(float(CLIMB_T[0]) + float(CLIMB_T[1]) * dz, float(CLIMB_T[2]), float(CLIMB_T[3])) * (1.0 if climb > 0 else 0.75)
+				# third-person follow: the camera swings round behind the direction of travel
+				var q := FWD.find(facing)
+				if q >= 0:
+					cam_q = q
+		var st := step_time()
 		var need := (1.0 - move_t) * st
 		if budget >= need:
 			budget -= need
 			ptile = target
 			move_t = -1.0
 			Game.tile = ptile
-			_trample(ptile)
+			if not glide.is_empty():
+				_glide_arrive()
+			else:
+				_trample(ptile)
+				_summit_check()
 			var rid := Atlas.owner_id(wd, ptile)
 			if rid != area_id:
 				_enter_region(rid)
 		else:
 			move_t += budget / st
 			budget = 0.0
+
+# ---------------------------------------------------------------- the High Roads: summits and the glider
+## He has come to the very top of a peak: the first time, it is told.
+func _summit_check() -> void:
+	if is_floor():
+		return
+	var pk := Peaks.summit_at(wd, ptile)
+	if not pk.is_empty():
+		Game.summit(str(pk.id), str(pk.n), float(pk.h))
+
+## V: open the glider (at the next footfall, if he is running), or fold it in the air and come down.
+func toggle_glide() -> void:
+	if not glide.is_empty():
+		glide.fold = true
+		return
+	if is_floor():
+		Game.toast("There is no sky to glide in under a roof.")
+		return
+	if not trip.is_empty() or not using.is_empty() or Game.prologue != "":
+		return
+	glide_want = true
+
+func gliding() -> bool:
+	return not glide.is_empty()
+
+## How many tiles a flight from where he stands would go in direction `dir` if nothing were steered
+## (0 if it could not begin, or would end where nobody can stand): what somebody on a summit judges
+## by eye before he leaps, and the bot by counting.
+func glide_reach(dir: Vector2i) -> int:
+	if is_floor():
+		return 0
+	var at := ptile
+	var alt := Peaks.at(wd, ptile) + GLIDE_LEAP
+	var n := 0
+	while n < 400:
+		var nt := at + dir
+		var nalt := alt - GLIDE_SINK
+		if not _glide_over(nt, nalt):
+			return n if _landable(at) else 0
+		if nalt <= Peaks.at(wd, nt) + 0.25:
+			return (n + 1) if _landable(nt) else (n if _landable(at) else 0)
+		at = nt
+		alt = nalt
+		n += 1
+	return n
+
+func _glide_start() -> void:
+	if is_floor() or not trip.is_empty() or not using.is_empty():
+		return
+	var base := Peaks.at(wd, ptile)
+	glide = {"alt": base + GLIDE_LEAP, "from": ptile, "n": 0, "fold": false, "top": base}
+	climb = 0
+	Game.glides += 1
+
+## Whether the glider can pass over tile `nt` at height `alt` (above the plain): never out over the
+## open sea or off the map, never into a region he has not walked into (the seals keep what they
+## kept), never through a closed seal, and over a wood, a roof or anybody standing only with air to spare.
+func _glide_over(nt: Vector2i, alt: float) -> bool:
+	if nt.x < 1 or nt.y < 1 or nt.x >= w - 1 or nt.y >= h - 1:
+		return false
+	var g := grid[nt.y * w + nt.x]
+	if g == MapGen.VOID or Atlas.is_sea(wd, nt) or not Game.seen.has(Atlas.owner_id(wd, nt)):
+		return false
+	var clear := alt - Peaks.at(wd, nt)
+	var e = tile_ents.get(nt)
+	if e != null and ent_visible(e):
+		if e.kind == "seal":
+			if not seal_open(e):
+				return false
+		elif clear < float(GLIDE_OVER.ent):
+			return false
+	if g == MapGen.WALL and clear < float(GLIDE_OVER.wood):
+		return false
+	if (g == MapGen.BUILDING or g == MapGen.INTERIOR) and clear < float(GLIDE_OVER.roof):
+		return false
+	return true
+
+## Whether a flight can end on tile `tl`: open ground nobody stands on, out of doors, with room to
+## walk away from (never a pocket shut in by trees).
+func _landable(tl: Vector2i) -> bool:
+	if not tile_free(tl) or grid[tl.y * w + tl.x] == MapGen.INTERIOR or ent_at(tl) != null or not Game.seen.has(Atlas.owner_id(wd, tl)):
+		return false
+	var seen := {tl: true}
+	var q: Array = [tl]
+	var i := 0
+	while i < q.size() and q.size() < 140:
+		var c: Vector2i = q[i]
+		i += 1
+		for dd in FWD:
+			var n: Vector2i = c + dd
+			if not seen.has(n) and tile_free(n) and ent_at(n) == null:
+				seen[n] = true
+				q.append(n)
+	return q.size() >= 140
+
+## The next tile of a flight (true), or its end (false).  The arrow keys turn it; back folds it.
+func _glide_pick() -> bool:
+	if move_dir != Vector2i.ZERO:
+		if move_dir == -facing:
+			glide.fold = true
+		elif move_dir != facing:
+			facing = move_dir
+			var q := FWD.find(facing)
+			if q >= 0:
+				cam_q = q
+	glide.erase("span")
+	var nt := ptile + facing
+	var nalt := float(glide.alt) - GLIDE_SINK
+	if bool(glide.fold) or not _glide_over(nt, nalt):
+		_glide_down()
+		return false
+	if nalt <= Peaks.at(wd, nt) + 0.25:
+		# the ground comes up to meet him: he lands on it, if anybody could stand there
+		if not _landable(nt):
+			_glide_down()
+			return false
+		glide.touch = true
+	target = nt
+	move_t = 0.0
+	return true
+
+func _glide_arrive() -> void:
+	glide.alt = float(glide.alt) - GLIDE_SINK * float(glide.get("span", 1.0))
+	glide.n = int(glide.n) + 1
+	Game.glided += 1
+	if glide.get("touch", false):
+		_glide_end()
+
+## The flight can go no further: he comes down where he is, or on the nearest ground that will have
+## him (and if there is none, the wind takes him back where he leapt from).
+func _glide_down() -> void:
+	if _landable(ptile):
+		_glide_end()
+		return
+	var best := Vector2i(-1, -1)
+	for r in range(1, 9):
+		var bd := 1 << 30
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				if maxi(absi(dx), absi(dy)) != r:
+					continue
+				var c := ptile + Vector2i(dx, dy)
+				if dx * dx + dy * dy < bd and _landable(c):
+					bd = dx * dx + dy * dy
+					best = c
+		if best.x >= 0:
+			break
+	if best.x < 0:
+		best = glide.from
+	if best == ptile:
+		_glide_end()
+		return
+	glide.span = clampf(Vector2(best - ptile).length(), 1.0, 8.0)
+	glide.alt = maxf(float(glide.alt), Peaks.at(wd, best) + GLIDE_SINK * float(glide.span))
+	glide.touch = true
+	glide.fold = false
+	target = best
+	move_t = 0.0
+
+func _glide_end() -> void:
+	var n := int(glide.n)
+	air_y = maxf(float(glide.alt) - Peaks.at(wd, ptile), 0.0)
+	var fell := float(glide.top) - Peaks.at(wd, ptile)
+	glide = {}
+	move_dir = Vector2i.ZERO
+	key_lock = true
+	Game.glide_done(n, fell)
+	_summit_check()
+	if not headless():
+		Fx3D.dust(scene3d, wpos(ptile) + Vector3(0, ground_y(wpos(ptile)) - off.y, 0), Color(Look.theme(theme_name).path))
 
 func face_entity():
 	var e = ent_at(ptile + facing)
@@ -1793,6 +2025,15 @@ func _player_pos() -> Vector3:
 		pp.y = cave_y + _trip_lift()
 		return pp
 	pp.y = lerpf(maxf(iy0, gy) if iy0 > -INF else gy, maxf(iy1, gy) if iy1 > -INF else gy, clampf(move_t, 0.0, 1.0)) + _trip_lift()
+	if not glide.is_empty():
+		# in the air (peaks.gd): as far above the ground as the flight is above the rock under it, the
+		# leap it began with eased in over its first tile
+		var k := clampf(move_t, 0.0, 1.0) if move_t >= 0.0 else 0.0
+		var a := float(glide.alt) - GLIDE_SINK * float(glide.get("span", 1.0)) * k
+		a -= GLIDE_LEAP * clampf(1.0 - (float(glide.n) + k) * 1.5, 0.0, 1.0)
+		pp.y += maxf(a - Peaks.rise(wd, (pp.x - off.x) / TS, (pp.z - off.z) / TS), 0.0)
+	else:
+		pp.y += air_y
 	return pp
 
 func _cam_goal(pp: Vector3, a: float) -> Array:
@@ -1838,33 +2079,72 @@ func _update_view(d: float) -> void:
 		if mount != null:
 			mount.visible = false
 		player.position = pp
-		var want_yaw := atan2(float(facing.x), float(facing.y))
-		player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
+		# the High Roads (peaks.gd): in the air under the kite, or on a rock face hand over hand
+		var flying := not glide.is_empty() or air_y > 0.45
+		if glide.is_empty():
+			air_y = lerpf(air_y, 0.0, 1.0 - exp(-d * 13.0))
 		var walking := move_t >= 0.0
+		var scaling := not flying and climb != 0 and (walking or _steep_here())
+		if not scaling:
+			scale_in = 0.0
+		# (a climber faces the rock, on the way down as on the way up)
+		var face_dir := -facing if scaling and climb < 0 else facing
+		var want_yaw := atan2(float(face_dir.x), float(face_dir.y))
+		player.rotation.y = lerp_angle(player.rotation.y, want_yaw, 1.0 - exp(-d * 14.0))
+		player.rotation.x = lerpf(player.rotation.x, 0.24 if scaling else 0.0, 1.0 - exp(-d * 10.0))
 		# on the road the hero runs (the light-body dash; the old walk cycle slid along at 12 m/s); in a
 		# conversation whoever is speaking talks with their hands and mouth
 		# (and under a low roof, in a cave, bent double with a hand up before the brow: caves.gd)
 		var gait := "run"
 		if walking and is_cave() and mini(Caves.headroom(Caves.layout(area_id, int(wd.level)), ptile), Caves.headroom(Caves.layout(area_id, int(wd.level)), target)) <= Caves.LOW:
 			gait = "duck"
-		Models.anim_person(player, t, walking, false, gait if walking else ("talk" if speaker() == "Lin Feng" else ""))
+		if flying:
+			Models.anim_person(player, t, true, false, "glide")
+		elif scaling:
+			# (hand over hand while he moves; hanging still, he only shifts his weight)
+			scale_in += d
+			climb_clk += d * (1.0 if walking or scale_in < 0.25 else 0.08)
+			Models.anim_person(player, climb_clk, true, false, "scale")
+		else:
+			Models.anim_person(player, t, walking, false, gait if walking else ("talk" if speaker() == "Lin Feng" else ""))
+		_kite(player, "hero", not glide.is_empty(), d, Color(HERO_OPTS.cape), Color(HERO_OPTS.trim))
 		# a puff of dust at each footfall
 		var sp := fmod(t * 9.0 / PI, 2.0)
-		if walking and int(sp) != step_side:
+		if walking and not flying and not scaling and int(sp) != step_side:
 			step_side = int(sp)
 			Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path))
 		# companion trails the hero
 		comp.visible = Game.companion
 		if Game.companion:
-			# off the hero's shoulder rather than straight behind, so she never stands between the
-			# follow camera and him
-			var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
-			comp_pos = cs[0]
-			comp_pos.y = _stand_y(bundles[layer], comp_pos)
-			comp.position = comp_pos
-			comp_run = cs[2]
-			comp.rotation.y = lerp_angle(comp.rotation.y, cs[1], 1.0 - exp(-d * 10.0))
-			Models.anim_person(comp, t + 1.0, comp_run, false, gait if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
+			if flying:
+				# she flies off his wing, a little behind and a little above
+				var fw := Vector3(facing.x, 0, facing.y)
+				var wing := pp - fw * 1.5 + Vector3(-facing.y, 0, facing.x) * 2.3 + Vector3(0, 0.35 + sin(t * 1.3) * 0.15, 0)
+				comp_pos = comp_pos.lerp(wing, 1.0 - exp(-d * 6.0))
+				comp_pos.y = maxf(comp_pos.y, _stand_y(bundles[layer], comp_pos))
+				comp.position = comp_pos
+				comp.rotation.y = lerp_angle(comp.rotation.y, want_yaw, 1.0 - exp(-d * 10.0))
+				comp.rotation.x = 0.0
+				comp_run = true
+				Models.anim_person(comp, t + 1.0, true, false, "glide")
+			else:
+				# off the hero's shoulder rather than straight behind, so she never stands between the
+				# follow camera and him
+				var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
+				comp_pos = cs[0]
+				var cy := _stand_y(bundles[layer], comp_pos)
+				# (she comes down out of the air as he does, and never hangs in it)
+				comp_pos.y = cy if comp.position.y - cy < 0.3 else lerpf(comp.position.y, cy, 1.0 - exp(-d * 13.0))
+				comp.position = comp_pos
+				comp_run = cs[2]
+				var c_scale := (comp_run or scaling) and _steep_at(comp_pos)
+				comp.rotation.y = lerp_angle(comp.rotation.y, want_yaw if c_scale else cs[1], 1.0 - exp(-d * 10.0))
+				comp.rotation.x = lerpf(comp.rotation.x, 0.24 if c_scale else 0.0, 1.0 - exp(-d * 10.0))
+				if c_scale:
+					Models.anim_person(comp, (t if comp_run else climb_clk) + 0.65, true, false, "scale")
+				else:
+					Models.anim_person(comp, t + 1.0, comp_run, false, gait if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
+			_kite(comp, "comp", not glide.is_empty(), d, Color("e86a9a"), Color(YUE_OPTS.ribbon))
 	# entities of the regions on show
 	frame_n += 1
 	var seen_from: Vector3 = pp if cam_override == null else cam.global_position
@@ -1929,6 +2209,41 @@ func _update_view(d: float) -> void:
 	_cutscene(d, pp)
 	if cam_override != null:
 		cam.global_transform = cam_override
+
+## Whether the rock under the hero is too steep to stand on (so that he hangs on it, not stands).
+func _steep_here() -> bool:
+	return _steep_tile(ptile)
+
+func _steep_tile(tl: Vector2i) -> bool:
+	if is_floor():
+		return false
+	var a := Peaks.at(wd, tl)
+	if a < 0.5:
+		return false
+	for dd in FWD:
+		if absf(Peaks.at(wd, tl + dd) - a) > Peaks.STEEP * 1.7:
+			return true
+	return false
+
+func _steep_at(p: Vector3) -> bool:
+	return _steep_tile(Vector2i(floori((p.x - off.x) / TS), floori((p.z - off.z) / TS)))
+
+## The cloud-kite over the head of model `m` (glider.gd): made the first time it is opened, and
+## opened and folded by growing and shrinking, as paper and bamboo do in the stories.
+func _kite(m: Node3D, key: String, on: bool, d: float, col: Color, trim: Color) -> void:
+	var k: Node3D = kites.get(key)
+	if k == null or not is_instance_valid(k) or k.get_parent() != m:
+		if not on:
+			return
+		k = Glider.build(col, trim)
+		k.scale = Vector3.ONE * 0.05
+		m.add_child(k)
+		kites[key] = k
+	var sc := lerpf(k.scale.x, 1.0 if on else 0.0, 1.0 - exp(-d * (9.0 if on else 16.0)))
+	k.visible = sc > 0.04
+	k.scale = Vector3.ONE * maxf(sc, 0.01)
+	k.position = Vector3(0.0, 2.04, 0.1)
+	k.rotation = Vector3(-0.1 + sin(t * 2.3) * 0.03, 0.0, sin(t * 1.7) * 0.05)
 
 ## In the saddle: the ride stands where the hero would, turned the way he goes, galloping or standing;
 ## he sits on it (astride a beast, standing on a vehicle) and Yue Ling behind him, both moving with it.
@@ -2635,7 +2950,7 @@ func _keep_down(id: String) -> void:
 var folk_nodes := {}
 var folk_talking := ""
 ## lines called out over the street (a hawker's wares, the watch) while a townsperson calls
-const FOLK_CALLS := {"merchant": ["Silk! Tea! Needles!", "Fresh today!", "Two for one!"], "fisher": ["Fish! Fresh fish!", "Carp from the river!"],
+const FOLK_CALLS := {"pedlar": ["Needles! Thread! Salt!", "Combs and mirrors!", "News from the next valley, free with a needle!"], "merchant": ["Silk! Tea! Needles!", "Fresh today!", "Two for one!"], "fisher": ["Fish! Fresh fish!", "Carp from the river!"],
 	"cook": ["Hot buns!", "Noodles! Hot noodles!", "Dumplings!"], "watchman": ["Mind your fires!", "All is well!", "Lock your doors!"],
 	"porter": ["Make way!", "Coming through!"], "lamplighter": ["Lamps lit!"], "monk": ["Amituofo."], "fishwife": ["Fish!"]}
 
@@ -2661,13 +2976,13 @@ func _update_folk(d: float, pp: Vector3) -> void:
 			var v: Dictionary = views[k]
 			if not v.shown or str(v.layer) != layer:
 				continue
-			for tid in Folk.towns_in(str(k)):
+			for tid in Folk.homes_in(wd, str(k)):
 				var hc := wpos(Folk.heart(tid))
 				if Vector2(hc.x - pp.x, hc.z - pp.z).length() > Folk.RADIUS * TS + Folk.SEE:
 					continue
 				near[tid] = true
 				# Part XVI: a town practising the old ways, or out all the long last night of the year
-				var noise: bool = (str(Folk.TOWNS[tid].area) == drill_area and t - drill_t < 30.0) or Folk.noisy(Game, tid)
+				var noise: bool = not Folk.is_camp(tid) and ((str(Folk.TOWNS[tid].area) == drill_area and t - drill_t < 30.0) or Folk.noisy(Game, tid))
 				for fp in Folk.people(wd, tid):
 					var st := Folk.state(wd, fp, m)
 					if noise:
@@ -2739,9 +3054,14 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 	m.rotation.y = lerp_angle(m.rotation.y, yaw, 1.0 - exp(-d * (8.0 if st.walk else 4.0)))
 	if clip != "" and not Assets.has_clip(m, clip):
 		clip = "walk" if st.walk else ""
+	# (the High Roads: on a rock face a pilgrim goes up hand over hand like anybody)
+	var on_rock: bool = st.walk and _steep_at(fn.position) and Assets.has_clip(m, "scale")
+	if on_rock:
+		clip = "scale"
+	m.rotation.x = lerpf(m.rotation.x, 0.24 if on_rock else 0.0, 1.0 - exp(-d * 8.0))
 	Models.anim_person(m, t + float(fp.seed), false, false, clip)
 	# what is in their hands: their work's tool, the load on the road, a lantern after dark
-	var hold: String = st.hold if clip != "" and clip != "talk" else ""
+	var hold: String = st.hold if clip != "" and clip != "talk" and not on_rock else ""
 	if st.walk and dark and hold == "":
 		hold = "lantern"
 	elif dark and fp.role in ["watchman", "lamplighter"] and hold == "":
@@ -2819,7 +3139,7 @@ func _draw_hud() -> void:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
 	# end was cut off, "Esc men")
-	UI.text(self, Vector2(VIEW.x - 712, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 700.0)
+	UI.text(self, Vector2(VIEW.x - 772, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   V glide   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 760.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:
@@ -2858,6 +3178,16 @@ func _draw_hud() -> void:
 			"stele":
 				hint = "Choose your Dao"
 		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + hint, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
+	# the High Roads (peaks.gd): what the heights offer
+	if not is_floor() and using.is_empty() and trip.is_empty() and not wd.is_empty():
+		var hint2 := ""
+		if not glide.is_empty():
+			hint2 = "V: fold the kite    Left/Right: turn    %d m up" % int(maxf(float(glide.alt) - Peaks.at(wd, ptile), 0.0))
+		elif Peaks.at(wd, ptile) >= 4.0:
+			var pk2 := Peaks.of_tile(wd, ptile)
+			hint2 = "V: open the cloud-kite    %s, %d m up" % [str(pk2.get("n", "")), int(Peaks.at(wd, ptile))]
+		if hint2 != "":
+			UI.text(self, Vector2(VIEW.x * 0.5 - 260, VIEW.y - 34), hint2, 16, Color("cfe8ff"), HORIZONTAL_ALIGNMENT_CENTER, 520)
 	# a trip up or down the Jianmu (or the stairs) fades through white going up, dark going down
 	var fade := trip_fade()
 	if fade > 0.0:
@@ -2962,6 +3292,13 @@ func _draw_minimap() -> void:
 				col = Color("ffc860") if not Game.abodes.has(e.id) else Color(0, 0, 0, 0)
 		if col.a > 0.0:
 			draw_circle(r.position + (Vector2(e.pos) - o + Vector2(0.5, 0.5)) * sc, 2.4, col)
+	# the High Roads (peaks.gd): a mark on every summit, gold until he has stood on it
+	for pk in vb.wd.get("peaks", []):
+		if src.has_point(Vector2(pk.c)):
+			var sp := r.position + (Vector2(pk.c) - o + Vector2(0.5, 0.5)) * sc
+			var pc := Color("f4f4f8") if Game.summits.has(str(pk.id)) else UI.C_GOLD
+			draw_colored_polygon(PackedVector2Array([sp + Vector2(0, -4.5), sp + Vector2(4, 3), sp + Vector2(-4, 3)]), Color(0, 0, 0, 0.7))
+			draw_colored_polygon(PackedVector2Array([sp + Vector2(0, -3.2), sp + Vector2(2.8, 2.2), sp + Vector2(-2.8, 2.2)]), pc)
 	var pp := r.position + (Vector2(vt) - o + Vector2(0.5, 0.5)) * sc
 	draw_circle(pp, 4.5 + sin(t * 5.0), Color(1, 1, 1, 0.35))
 	draw_circle(pp, 2.6, Color("5aa9ff"))

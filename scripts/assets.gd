@@ -19,7 +19,7 @@ extends RefCounted
 ## and the bot stay deterministic.
 
 const DIR := "res://assets/"
-const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim", "ride", "ride_idle", "ride_stand"]
+const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim", "ride", "ride_idle", "ride_stand", "scale", "glide"]
 ## the animals the party rides (fashion.gd RIDES; art/mounts)
 const MOUNTS := {"horse": "mounts/horse"}
 ## shape -> asset path for monsters that have a Blender model
@@ -58,6 +58,9 @@ const PEOPLE := {
 	# his bow, the swordsman in scholar's dress, the king who loved swords and the Masterless Edge
 	"ou_yezi": "characters/ou_yezi", "yue_maiden": "characters/yue_maiden", "ji_chang": "characters/ji_chang", "zhuang_envoy": "characters/zhuang_envoy",
 	"king_zhao": "characters/king_zhao", "wuzhu": "characters/wuzhu",
+	# Part XXII (the High Roads release)
+	"xie_lingyun": "characters/xie_lingyun", "liezi": "characters/liezi", "zhong_ziqi": "characters/zhong_ziqi", "han_yu": "characters/han_yu",
+	"shan_gui": "characters/shan_gui", "dongyue": "characters/dongyue",
 	# the Hollow Hills release (Part XX): the traveller who measures caves, the Foolish Old Man and the Wise
 	# one, the woodcutter of Rotten-Axe Mountain, and the Valley Spirit
 	"xu_xiake": "characters/xu_xiake", "yu_gong": "characters/yu_gong", "zhi_sou": "characters/zhi_sou", "wang_zhi": "characters/wang_zhi", "xuanpin": "characters/xuanpin",
@@ -525,11 +528,13 @@ const LEND := ["sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
 	"sweep", "weave", "lift", "toss", "touch", "play_flute", "dance", "kite", "stargaze", "release", "write", "archery", "push", "gaze",
 	"clap", "sword_dance", "hoe", "chop", "carry", "bang", "call", "eat",
 	# the Hollow Hills release: the new work of the towns and the mines
-	"mine", "dig", "wash", "pound", "spin", "count", "stretch", "pour", "hang", "carve", "pan", "comb", "rock", "knock", "peer", "trace"]
+	"mine", "dig", "wash", "pound", "spin", "count", "stretch", "pour", "hang", "carve", "pan", "comb", "rock", "knock", "peer", "trace",
+	# the High Roads release: the people of the road go up rock like anybody
+	"scale"]
 ## the lent clips that go round and round (the rest are one-shots, played again when they end)
 const LEND_LOOPS := ["sit_bench", "doze", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir", "hammer", "sweep",
 	"weave", "play_flute", "dance", "push", "gaze", "hoe", "chop", "carry", "bang", "eat", "write", "stargaze",
-	"mine", "dig", "pound", "spin", "count", "carve", "pan", "comb", "rock"]
+	"mine", "dig", "pound", "spin", "count", "carve", "pan", "comb", "rock", "scale"]
 static var _donor_lib: AnimationLibrary = null
 static var _donor_hips := 0.92
 static var _lent := {}

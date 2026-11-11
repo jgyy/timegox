@@ -2773,6 +2773,116 @@ CLIPS.update({
 })
 
 
+# ---------------------------------------------------------------- the High Roads: rock and air
+# What the party does on a mountain (scripts/world.gd, peaks.gd): goes up bare rock hand over hand
+# ("scale"), hangs under a kite of paper and bamboo on the way down ("glide") and comes to ground
+# again ("alight").  The game turns the figure to face the rock and leans it in; the clips do the rest.
+SCALE_T = 1.3
+
+
+def clip_scale(t):
+    """Climbing a rock face: spread against it, one hand reaching high for a hold while the other is
+    pulled down to the shoulder, the opposite knee drawn up and turned out for a foothold while the
+    other leg pushes straight; the hips swing over the standing foot and rise with every pull, and
+    the head looks up for the next hold."""
+    w = 2 * math.pi / SCALE_T
+    a = math.sin(t * w)
+    c = math.cos(t * w)
+    p = clip_idle(0.0)
+    for sd, s, sg in (("L", 1, 1.0), ("R", -1, -1.0)):
+        reach = 0.5 + 0.5 * a * sg                       # 1: this hand at full stretch above
+        p["upper_arm." + sd] = ((-1.75 - 1.15 * reach, 0.0, (0.62 - 0.3 * reach) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-1.45 + 1.2 * reach, 0.25 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.45 - 0.2 * reach, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 1.0 + 0.4 * reach, 0.0, 0.0)
+        step = 0.5 - 0.5 * a * sg                        # 1: this knee drawn up (the other hand reaches)
+        p["thigh." + sd] = ((-0.22 - 1.2 * step, 0.0, (0.16 + 0.42 * step) * s), (0, 0, 0))
+        p["shin." + sd] = ((0.3 + 1.45 * step, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.35 + 0.2 * step, 0.0, 0.0), (0, 0, 0))
+        p["toe." + sd] = ((-0.3, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.85, 0.85, 0.3)
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.2, 0.1 * a, 0.07 * a), (0.03 * a, -0.1 + 0.05 * abs(c), -0.05))
+    p["spine"] = ((0.1, -0.06 * a, -0.05 * a), (0, 0, 0))
+    p["chest"] = ((0.04, -0.1 * a, -0.04 * a), (0, 0, 0))
+    p["neck"] = ((-0.2, 0.0, 0.0), (0, 0, 0))
+    p["head"] = ((-0.38, 0.12 * a, 0.0), (0, 0, 0))
+    p["robe_f"] = ((-0.5, 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.12, 0, 0), (0, 0, 0))
+    p["cape"] = ((0.1 + 0.04 * a, 0.03 * a, 0), (0, 0, 0))
+    p["hair_tail"] = ((0.28, 0, 0.08 * a), (0, 0, 0))
+    return p
+
+
+GLIDE_T = 3.2
+
+
+def clip_glide(t):
+    """Hanging under the cloud-kite: both hands on the bar over the head, the body let hang and
+    swung back by the air, legs trailing together with the toes pointed, the head up and looking
+    where the wind is going; robe, sleeves, cape and hair all streaming behind, and the whole
+    figure rocking a little as the kite finds the air."""
+    w = 2 * math.pi / GLIDE_T
+    a = math.sin(t * w)
+    b = math.sin(t * w * 2 + 0.8)
+    p = clip_idle(0.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-2.72 + 0.03 * b, 0.0, 0.3 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.32 - 0.04 * b, 0.0, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.3, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 1.3 + 0.1 * b, 0.0, 0.0)
+    _hands(p, 1.05, 1.05, 0.45)
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.42 + 0.04 * a, 0.0, 0.05 * a), (0.0, 0.02 * b, -0.1))
+    p["spine"] = ((0.05, 0.0, -0.02 * a), (0, 0, 0))
+    p["chest"] = ((-0.08, 0.0, -0.02 * a), (0, 0, 0))
+    p["neck"] = ((-0.18, 0.0, 0.0), (0, 0, 0))
+    p["head"] = ((-0.36, 0.06 * a, 0.0), (0, 0, 0))
+    p["thigh.L"] = ((0.34 + 0.07 * a, 0.0, 0.04), (0, 0, 0))
+    p["thigh.R"] = ((0.12 - 0.07 * a, 0.0, -0.04), (0, 0, 0))
+    p["shin.L"] = ((0.3 + 0.08 * b, 0.0, 0.0), (0, 0, 0))
+    p["shin.R"] = ((0.62 - 0.08 * b, 0.0, 0.0), (0, 0, 0))
+    for sd in ("L", "R"):
+        p["foot." + sd] = ((0.55, 0.0, 0.0), (0, 0, 0))
+        p["toe." + sd] = ((0.25, 0.0, 0.0), (0, 0, 0))
+    p["robe_f"] = ((-0.15, 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.75 + 0.1 * b, 0, 0), (0, 0, 0))
+    p["robe_l"] = ((0.3, 0, -0.1 - 0.05 * b), (0, 0, 0))
+    p["robe_r"] = ((0.3, 0, 0.1 + 0.05 * b), (0, 0, 0))
+    p["cape"] = ((1.1 + 0.12 * b, 0.05 * a, 0), (0, 0, 0))
+    p["cape2"] = ((0.34 + 0.14 * math.sin(t * w * 2 - 0.2), 0, 0.06 * a), (0, 0, 0))
+    p["cape3"] = ((0.22 + 0.12 * math.sin(t * w * 2 - 1.1), 0, 0.08 * a), (0, 0, 0))
+    p["hair_tail"] = ((0.85 + 0.1 * b, 0, 0.1 * a), (0, 0, 0))
+    p["hair_tail2"] = ((0.4 + 0.14 * math.sin(t * w * 2 - 0.6), 0, 0.12 * a), (0, 0, 0))
+    return p
+
+
+ALIGHT_T = 0.8
+
+
+def clip_alight(t):
+    """Coming to ground: the knees take it, deep, with the arms thrown out for balance and the
+    head down, and then he stands up out of it."""
+    k = t / ALIGHT_T
+    e = math.sin(min(1.0, k / 0.3) * math.pi / 2) if k < 0.3 else 0.5 + 0.5 * math.cos((k - 0.3) / 0.7 * math.pi)
+    p = clip_idle(0.0)
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    p["hips"] = ((0.3 * e, 0.0, 0.0), (0.0, -0.36 * e, -0.05 * e))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-1.15 * e, 0.0, 0.14 * e * s), (0, 0, 0))
+        p["shin." + sd] = ((1.75 * e, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.55 * e, 0.0, 0.0), (0, 0, 0))
+        p["upper_arm." + sd] = ((-0.3 * e, 0.0, (0.1 + 0.95 * e) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.35 - 0.3 * e, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.5 * e, 0.0, 0.0)
+    _add(p, "spine", 0.12 * e, 0.0, 0.0)
+    p["head"] = ((0.18 * e, 0.0, 0.0), (0, 0, 0))
+    p["cape"] = ((0.5 * e, 0, 0), (0, 0, 0))
+    p["hair_tail"] = ((0.4 * e, 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.4 * e, 0, 0), (0, 0, 0))
+    return p
+
+
 def _stowing(fn):
     return lambda t: _stow(fn(t))
 
@@ -2838,6 +2948,10 @@ INTERACT = {
     "pan": (PAN_T, clip_pan),
     "squeeze": (SQUEEZE_T, clip_squeeze),
     "duck": (DUCK_T, clip_duck),
+    # the High Roads release (Part XXII): up a rock face, down under a kite, and to ground again
+    "scale": (SCALE_T, clip_scale),
+    "glide": (GLIDE_T, clip_glide),
+    "alight": (ALIGHT_T, clip_alight),
 }
 INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
 # the sword form on the stage is the one thing done with the blade out

@@ -612,6 +612,23 @@ static func build(grid: PackedByteArray, w: int, h: int, theme_name: String, see
 		for cx in w + 1:
 			ccol[cz * rw + cx] = _corner_col(grid, w, h, cx, cz, th)
 			cnrm[cz * rw + cx] = _corner_normal(hm, w, h, cx, cz)
+	# the High Roads (peaks.gd): the heads of the high peaks are white, and the rock under the snow line
+	# greyer the higher it goes (the shader turns whatever is steep to bare rock by itself)
+	if aux.has("rise"):
+		var rise_a: PackedFloat32Array = aux.rise
+		var snow_y := Peaks.SNOW_COLD if Peaks.snowy(theme_name, Peaks.SNOW_COLD) else (Peaks.SNOW_ANY if Peaks.snowy(theme_name, Peaks.SNOW_ANY) else 1.0e9)
+		var grey := Color(th.g1).lerp(Color("8c8a86"), 0.7)
+		for ci in rise_a.size():
+			var rv := rise_a[ci]
+			if rv <= 0.3:
+				continue
+			var cc: Color = ccol[ci]
+			var a0 := cc.a
+			cc = cc.lerp(grey, clampf(rv / 14.0, 0.0, 0.75))
+			var wob := hash2(ci % rw, ci / rw, 3.0) * 3.0
+			cc = cc.lerp(Color("f2f6fb"), smoothstep(snow_y - 2.0, snow_y + 3.0, rv + wob))
+			cc.a = maxf(a0, 0.9)
+			ccol[ci] = cc
 	# shore tiles (water and its banks) are subdivided so the waterline can curve through them
 	var sh := {}
 	var fine := aux.has("land") and aux.has("wf")
@@ -815,6 +832,10 @@ static func world_heights(wd: Dictionary, r: Rect2i, aux: Dictionary = {}) -> Pa
 	var land_a := PackedFloat32Array()
 	land_a.resize(out.size())
 	var ghm: PackedFloat32Array = wd.get("hm", PackedFloat32Array())
+	var has_peaks: bool = not (wd.get("peak_blk", {}) as Dictionary).is_empty()
+	var rise_a := PackedFloat32Array()
+	if has_peaks:
+		rise_a.resize(out.size())
 	for j in r.size.y + 1:
 		for i in r.size.x + 1:
 			var cx := r.position.x + i
@@ -863,12 +884,21 @@ static func world_heights(wd: Dictionary, r: Rect2i, aux: Dictionary = {}) -> Pa
 			var land := bank(hv, wf)
 			land_a[ii] = land
 			hv = shore_h(land, wf, cx, cz)
+			# the High Roads (peaks.gd): the mountains stand on the land
+			if has_peaks:
+				var pr := Peaks.rise(wd, float(cx), float(cz))
+				if pr > 0.0:
+					hv += pr
+					land_a[ii] = land + pr
+					rise_a[ii] = pr
 			out[ii] = hv
 			if not ghm.is_empty():
 				ghm[cz * (W + 1) + cx] = hv
 	aux["land"] = land_a
 	aux["wf"] = wfield
 	aux["origin"] = r.position
+	if has_peaks:
+		aux["rise"] = rise_a
 	return out
 
 ## Rolling hills beyond the edge of the world and distant mountains on the horizon.

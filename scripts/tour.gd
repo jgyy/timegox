@@ -2121,6 +2121,10 @@ func _run() -> void:
 		# the Hundred Arms release (--arms, or --arms=a,b): the faces, the Eight Arms and their forms, the
 		# Arms page, the ends of the story and Part XXI
 		await _arms_shots(str(main.args.arms))
+	if main.args.has("high"):
+		# the High Roads release (--high, or --high=a,b): the mountains, climbing, the cloud-kite, the
+		# people of the road and Part XXII
+		await _high_shots(str(main.args.high))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -3240,3 +3244,227 @@ func _arms_shots(which: String = "1") -> void:
 		Game.finished = false
 		Game.ending = ""
 
+
+# ---------------------------------------------------------------- the High Roads release
+func _high_state() -> void:
+	_arms_state()
+	Game.seen = {}
+	for id in Data.AREAS:
+		Game.seen[id] = true
+	Game.toasts.clear()
+
+## The hero put on tile `tl` of the land facing `dir`, the camera behind.
+func _high_put(tl: Vector2i, dir: Vector2i, hour: float) -> void:
+	var w = main.world
+	Game.clock = hour * 60.0
+	w.teleport(tl, "surface")
+	w.facing = dir
+	w.cam_q = _quarter(Vector2(dir))
+	w._snap_cam()
+	w.banner_t = 0.0
+
+## The High Roads (--high, or --high=a,b): a peak from its foot and from far off ("peaks", for the
+## regions of --high-areas=a,b), the climb ("climb"), a summit ("summit"), the cloud-kite ("glide"),
+## the clips ("clips").
+func _high_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_high_state()
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	w.open_world()
+	w.enter_layer("surface")
+	var lw: Dictionary = Atlas.world_of("surface")
+	var areas: PackedStringArray = str(main.args.get("high-areas", "mountain")).split(",", false)
+	for area in areas:
+		var pks := Peaks.of_area(lw, area)
+		if pks.is_empty():
+			continue
+		var pk: Dictionary = pks[0]
+		var c: Vector2i = pk.c
+		var r: int = pk.r
+		if want.call("peaks"):
+			# from the open ground at its foot, wherever that is widest
+			var best := c + Vector2i(0, r + 5)
+			var bn := -1
+			for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+				var at: Vector2i = c + d * (r + 7)
+				var n := 0
+				for k in range(r, r + 12):
+					if w.tile_free(c + d * k):
+						n += 1
+				if n > bn and w.tile_free(_nearest_free(at)):
+					bn = n
+					best = at
+			var foot := _nearest_free(best)
+			var to_c := Vector2(c - foot)
+			var dir := Vector2i(int(signf(to_c.x)), 0) if absf(to_c.x) > absf(to_c.y) else Vector2i(0, int(signf(to_c.y)))
+			# (at the hour that lights the side he is looking at: the sun is in the east before noon, in the
+			# south at noon and in the west after it)
+			var lit_hr := 12.5
+			if absf(to_c.x) > absf(to_c.y):
+				lit_hr = 15.6 if to_c.x > 0.0 else 8.6
+			_high_put(foot, dir, lit_hr)
+			await _wait(1.6)
+			await _shot("peak_%s_foot" % area)
+			var pp: Vector3 = w._player_pos()
+			var mid: Vector3 = w.wpos(c) + Vector3(0, float(pk.h) * 0.45, 0)
+			var back := (pp - mid)
+			back.y = 0.0
+			back = back.normalized()
+			w.cam_override = Transform3D(Basis.IDENTITY, pp + back * 16.0 + Vector3(0, 9.0, 0)).looking_at(mid, Vector3.UP)
+			await _wait(0.6)
+			await _shot("peak_%s_far" % area)
+			w.cam_override = null
+		if want.call("climb"):
+			# half way up its steepest side
+			var dirs := [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]
+			var at2 := c
+			var d2: Vector2i = dirs[0]
+			var steep := 0.0
+			for d in dirs:
+				for k in range(2, r):
+					var a: Vector2i = c + d * k
+					var dz := Peaks.at(lw, a - d) - Peaks.at(lw, a)
+					if dz > steep and Peaks.at(lw, a) > float(pk.h) * 0.3:
+						steep = dz
+						at2 = a
+						d2 = d
+			_high_put(at2 + d2, -d2, 12.5)
+			w.climb = 1
+			await _wait(0.9)
+			await _shot("climb_%s" % area)
+			# six moments of the climb itself, from beside and below (the bot's hand on the keys, so that
+			# a direction stays held)
+			var fwd := Vector3(-d2.x, 0, -d2.y)
+			var side := fwd.cross(Vector3.UP)
+			var frames: Array = []
+			_high_put(at2 + d2 * 2, -d2, 12.5)
+			await _wait(0.6)
+			main.bot_active = true
+			w.move_dir = -d2
+			for i in 6:
+				await _wait(0.22)
+				var pp2: Vector3 = w._player_pos()
+				w.cam_override = Transform3D(Basis.IDENTITY, pp2 - fwd * 4.4 - side * 2.6 + Vector3(0, 0.6, 0)).looking_at(pp2 + side * 0.7 + Vector3(0, 1.2, 0), Vector3.UP)
+				await _shot("climb_%s_%d" % [area, i], false)
+				frames.append(last_img)
+			w.move_dir = Vector2i.ZERO
+			main.bot_active = false
+			_sheet("climb_%s_strip" % area, frames, 0.3)
+			w.cam_override = null
+			w.climb = 0
+		if want.call("summit"):
+			_high_put(c, Vector2i(0, 1), 17.6)
+			await _wait(1.2)
+			await _shot("summit_%s" % area)
+		if want.call("glide"):
+			_high_put(c, Vector2i(0, 1), 10.5)
+			await _wait(0.8)
+			w.toggle_glide()
+			await _wait(0.75)
+			await _shot("glide_%s" % area)
+			var pp3: Vector3 = w._player_pos()
+			var f3 := Vector3(w.facing.x, 0, w.facing.y)
+			var s3 := f3.cross(Vector3.UP)
+			w.cam_override = Transform3D(Basis.IDENTITY, pp3 + f3 * 5.2 + s3 * 4.4 + Vector3(0, 0.9, 0)).looking_at(pp3 + f3 * 1.2 + Vector3(0, 1.3, 0), Vector3.UP)
+			await _shot("glide_%s_side" % area)
+			w.cam_override = null
+			await _wait(4.0)
+			await _shot("glide_%s_landed" % area)
+	if want.call("camp"):
+		# a camp of the people of the road: at work in the morning, and round the fire after dark
+		var ca: String = str(main.args.get("high-camp", "mountain"))
+		if (lw.camps as Dictionary).has(ca):
+			var heart: Vector2i = lw.camps[ca]
+			for hr in [[18.9, "camp_%s_dusk"], [21.9, "camp_%s_night"]]:
+				_high_put(_nearest_free(heart + Vector2i(0, 4)), Vector2i(0, -1), float(hr[0]))
+				await _wait(2.5)
+				var pp4: Vector3 = w._player_pos()
+				var hc: Vector3 = w.wpos(heart)
+				hc.y = pp4.y
+				w.cam_override = Transform3D(Basis.IDENTITY, hc + Vector3(3.6, 3.0, 6.6)).looking_at(hc + Vector3(0, 0.9, -0.5), Vector3.UP)
+				await _wait(1.0)
+				await _shot(str(hr[1]) % ca)
+				w.cam_override = null
+			# each of them at their work, at ten in the morning (and the hermit and the pilgrim on the top)
+			for fp in Folk.people(lw, "camp_" + ca):
+				Game.clock = 10.0 * 60.0
+				var st: Dictionary = Folk.state(lw, fp, Game.clock)
+				if not st.vis:
+					continue
+				var ft := Vector2i(int(floor((st.at as Vector2).x)), int(floor((st.at as Vector2).y)))
+				var stand := Vector2i(-1, -1)
+				for d in [Vector2i(0, 3), Vector2i(3, 0), Vector2i(-3, 0), Vector2i(0, -3), Vector2i(2, 3), Vector2i(-2, 3), Vector2i(0, 2), Vector2i(2, 0), Vector2i(-2, 0), Vector2i(0, -2)]:
+					if w.tile_free(ft + d) and stand.x < 0:
+						stand = ft + d
+				if stand.x < 0:
+					continue
+				var dv := Vector2(ft - stand)
+				_high_put(stand, Vector2i(int(signf(dv.x)), 0) if absf(dv.x) > absf(dv.y) else Vector2i(0, int(signf(dv.y))), 10.0)
+				await _wait(2.4)
+				var fpos: Vector3 = w.wpos(ft)
+				fpos.y = w._player_pos().y + (Peaks.at(lw, ft) - Peaks.at(lw, stand))
+				var hp: Vector3 = w._player_pos()
+				var away := (hp - fpos)
+				away.y = 0.0
+				away = away.normalized()
+				var sd := away.cross(Vector3.UP)
+				w.cam_override = Transform3D(Basis.IDENTITY, fpos + away * 3.9 + sd * 0.9 + Vector3(0, 1.7, 0)).looking_at(fpos + Vector3(0, 1.0, 0), Vector3.UP)
+				await _wait(0.8)
+				await _shot("road_%s_%s" % [ca, str(fp.role)])
+				w.cam_override = null
+	if want.call("people"):
+		await _gallery("part22_people", [Assets.person("xie_lingyun"), Assets.person("zhong_ziqi"), Assets.person("liezi"), Assets.person("han_yu"), Assets.person("shan_gui"), Assets.person("dongyue")], 0.74, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["salt_thief", "false_echo", "fire_crab", "stray_gust", "kite_hawk", "wind_bag", "red_leopard", "fig_creeper", "rain_gibbon", "merit_stele", "report_smoke", "bends_serpent"]:
+			fs.append(_foe(fid))
+		await _gallery("part22_foes", fs, 1.0, 0.25)
+		await _gallery("part22_lords", [_foe("shanxiao", true), _foe("fei_lian", true), _foe("shan_gui", true), _foe("dongyue", true)], 2.2, 0.25)
+	if want.call("bosses"):
+		for bid in ["shanxiao", "fei_lian", "shan_gui", "dongyue"]:
+			var ba := Trials.boss_area(bid)
+			main.world.load_area(ba, MapGen.arrival_tiles(ba)[0] if not MapGen.arrival_tiles(ba).is_empty() else Vector2i(20, 20))
+			main.battle.start([{"id": bid, "lv": 80}], {"boss": true, "enemy": bid, "theme": str(Data.AREAS[ba].theme)})
+			main.push("battle")
+			await _wait(2.8)
+			await _shot("battle_boss_" + bid)
+			main.set_stack(["world"])
+	if want.call("page"):
+		Game.level = 80
+		Game.step = Data.step_index("s_p22_yue")
+		Game.summits = {}
+		for pk in (lw.peaks as Array).slice(0, 9):
+			Game.summits[str(pk.id)] = true
+		Game.trials = {}
+		main.set_stack(["world"])
+		main.open_trial({"enemy": "dongyue", "lv": 80, "req": 80, "id": "boss_dongyue", "pos": Vector2i.ZERO})
+		await _wait(0.8)
+		await _shot("trial_by_the_heights")
+		main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.step = Data.step_index("s_p22_pilgrims")
+		Game.cross_pending = ["the_tops"]
+		main.ask_crossroads()
+		main.choice.cursor = 0
+		await _wait(1.0)
+		await _shot("crossroads_tops")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("story"):
+		# the lords of Part XXII where the story stands them: on the tops
+		for sp in [["s_p22_xiao", "silk", 1, "shanxiao_on_the_height"], ["s_p22_yue", "mountain", 0, "dongyue_on_the_peak"], ["s_p22_lian", "thunder", 0, "liezi_and_the_earl"]]:
+			Game.step = Data.step_index(str(sp[0]))
+			var pk3: Dictionary = Peaks.by_id(lw, "peak:%s:%d" % [str(sp[1]), int(sp[2])])
+			if pk3.is_empty():
+				continue
+			_high_put(pk3.c, Vector2i(0, -1), 9.0)
+			await _wait(2.0)
+			var p5: Vector3 = w._player_pos()
+			w.cam_override = Transform3D(Basis.IDENTITY, p5 + Vector3(2.6, 2.6, 5.6)).looking_at(p5 + Vector3(-0.4, 1.2, -1.6), Vector3.UP)
+			await _wait(0.8)
+			await _shot(str(sp[3]))
+			w.cam_override = null

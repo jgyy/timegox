@@ -52,7 +52,9 @@ PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
                "hoe", "chop", "carry", "bang", "call", "eat",
                # the Hollow Hills release (Part XX): what is done under the ground and in the bigger houses
                "mine", "dig", "wash", "trace", "open_chest", "comb", "pound", "spin", "count", "stretch", "knock", "pour",
-               "peer", "hang", "rock", "carve", "pan", "squeeze", "duck")
+               "peer", "hang", "rock", "carve", "pan", "squeeze", "duck",
+               # the High Roads release (Part XXII): rock and air
+               "scale", "glide", "alight")
 MATERIALS = {"toon", "plain", "glow"}
 
 

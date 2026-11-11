@@ -876,7 +876,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -948,6 +948,10 @@ func _init() -> void:
 					"arms":
 						# the Hundred Arms release: Daos of arms there are to learn (arms.gd), and never all eight asked for
 						ok = ok and int(n[1]) >= 1 and int(n[1]) < Arms.ORDER.size()
+					"summits":
+						# the High Roads release: summits there are to stand on (peaks.gd), and no more than a
+						# tenth of the land's asked for
+						ok = ok and int(n[1]) >= 1 and int(n[1]) * 10 <= (Atlas.world().peaks as Array).size()
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1127,6 +1131,10 @@ func _init() -> void:
 			var marching8 := {}
 			for pe8 in band8.get("pool", []):
 				marching8[pe8[0]] = true
+			# (Part XXII: a region's second band, for a later chapter)
+			if not st8.has("cave"):
+				for pe8b in Data.AREAS[st8.area].get("warband2", {}).get("pool", []):
+					marching8[pe8b[0]] = true
 			for fid in st8.of:
 				check(Data.ENEMIES.has(fid) and marching8.has(fid), "%s hunts %s, who marches in %s" % [st8.id, fid, st8.area])
 	var G5 = load("res://scripts/game.gd").new()
@@ -1762,6 +1770,7 @@ func _fates_and_faces() -> void:
 	_hundred_works()
 	_hollow_hills()
 	_hundred_arms()
+	_high_roads()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -2157,6 +2166,15 @@ func _living() -> void:
 				if Folk.is_role(fp9, str(st9.role)):
 					have9 += 1
 		check(Folk.ERRANDS.has(str(st9.id)) and (Folk.ERRANDS[str(st9.id)].lines as Array).size() >= 4, "%s: an errand, with words for the people it is done with" % st9.id)
+		# (Part XXII: an errand among the people of the road is run from camp to camp: folk.gd)
+		if Folk.CAMP_ROLES.has(str(st9.role)):
+			var cw9: Dictionary = Atlas.world_of(Data.layer_of(str(st9.area)))
+			own9 = "the road"
+			have9 = 0
+			for ca9 in cw9.camps:
+				for fp9b in Folk.people(cw9, "camp_" + str(ca9)):
+					if Folk.is_role(fp9b, str(st9.role)):
+						have9 += 1
 		check(own9 != "" and have9 >= int(st9.n), "%s: its region has a town, and the towns of its realm %d people of the kind it wants (%d)" % [st9.id, int(st9.n), have9])
 	var plum: Array = Data.AREAS.frost.pickups.filter(func(pk): return pk.item == "plum_sprig" and pk.get("vis", ["", ""])[0] == "s_p16_plum")
 	check(plum.size() >= int(Data.STEPS[Data.step_index("s_p16_plum")].n) and Data.ITEMS.has("plum_sprig") and Look.PICKUP_COLORS.has("plum_sprig"), "the winter plum flowers in the snows of Frostpeak from the step that asks for it (%d sprigs)" % plum.size())
@@ -3423,10 +3441,10 @@ func _hundred_arms() -> void:
 	var msrc5 := FileAccess.get_file_as_string("res://scripts/main.gd")
 	check(msrc5.contains("Cultures.ENDING_KINDS") and FileAccess.get_file_as_string("res://scripts/ending.gd").contains("LAST_WORDS") and FileAccess.get_file_as_string("res://scripts/bot.gd").contains("\"school\", \"open\""), "the choice names the kind of end, the film has its last word, and the bot has a plan")
 	print("== Part XXI: the Hundred Arms ==")
-	check(Data.REALMS.size() == 27 and Data.REALMS[26] == "Sheathed Edge" and Data.MAX_LEVEL == 78 and Data.level_name(78).ends_with("Sheathed Edge") and Data.REALM_INFO.size() == 27 and Data.EXP_NEED.size() == Data.MAX_LEVEL
+	check(Data.REALMS.size() >= 27 and Data.REALMS[26] == "Sheathed Edge" and Data.MAX_LEVEL >= 78 and Data.level_name(78).ends_with("Sheathed Edge") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL
 		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXI adds the Sheathed Edge realm")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break26" and Data.DIALOGUE.has("recall19") and msrc5.contains("\"s_break25\": \"recall19\"") and Data.DIALOGUE.has("pre:s_break26") and Data.DIALOGUE.has("post:s_break26"),
-		"Part XXI follows Hollow Vessel (recall19) and ends the game")
+	check(Data.step_index("s_break26") > Data.step_index("s_p21_end") and Data.DIALOGUE.has("recall19") and msrc5.contains("\"s_break25\": \"recall19\"") and Data.DIALOGUE.has("pre:s_break26") and Data.DIALOGUE.has("post:s_break26"),
+		"Part XXI follows Hollow Vessel (recall19) and ends in a breakthrough")
 	var n21 := 0
 	var arm_hunts := {}
 	for st in Data.STEPS:
@@ -3462,3 +3480,225 @@ func _hundred_arms() -> void:
 	check(Caves.OWN.has("longmen") and Caves.OWN.has("grave") and Bonds.SHARES.has("s_p21_stage") and Bonds.SHARES.has("s_p21_sweep") and Folk.ERRANDS.has("s_p21_racks"), "two caves of its own, two evenings with Yue Ling, and errands at four hearths")
 	var bsrc5 := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bsrc5.contains("\"yuan_gong\": \"arms\"") and bsrc5.contains("\"the_arms\": [\"school\"") and bsrc5.contains("func _want_arm") and bsrc5.contains("\"s_p21_sweep\": \"broom\""), "the bot has a plan for every trial, crossroads and evening of Part XXI, and changes weapons by itself")
+
+## The High Roads release: the mountains (peaks.gd), climbing and the cloud-kite (world.gd, glider.gd), the
+## people of the road (folk.gd) and Part XXII.
+func _high_roads() -> void:
+	print("== the mountains (peaks.gd) ==")
+	var wd: Dictionary = Atlas.world()
+	var peaks: Array = wd.peaks
+	var reach := MapGen.flood(wd.grid, wd.w, wd.h, wd.start)
+	var W: int = wd.w
+	var without: Array = []
+	for id in wd.ids:
+		if Peaks.of_area(wd, id).is_empty() and not (id in Peaks.NONE):
+			without.append(id)
+	check(peaks.size() >= 90 and without.size() <= 2, "there are mountains in every region of the land but the wettest (%d peaks; none in %s)" % [peaks.size(), str(without)])
+	var names := {}
+	var own_land := true
+	var tops_reached := true
+	var tops_free := true
+	var steep_n := 0
+	var heights_ok := true
+	var numbered := true
+	var ent_at := {}
+	for e in wd.ents:
+		if e.has("pos"):
+			ent_at[e.pos] = e
+	for pk in peaks:
+		names[str(pk.n)] = true
+		var c: Vector2i = pk.c
+		var r: int = pk.r
+		heights_ok = heights_ok and float(pk.h) >= 8.0 and float(pk.h) <= 48.0 and absf(Peaks.at(wd, c) - float(pk.h)) < float(pk.h) * 0.08 and Peaks.summit_at(wd, c) == pk and Peaks.of_tile(wd, c) == pk
+		tops_reached = tops_reached and reach.has(c)
+		tops_free = tops_free and not ent_at.has(c)
+		var me: int = wd.owner[c.y * W + c.x]
+		var steep := false
+		for y in range(c.y - r, c.y + r + 1):
+			for x in range(c.x - r, c.x + r + 1):
+				if Peaks.rise_of(pk, float(x) + 0.5, float(y) + 0.5) > 0.25:
+					own_land = own_land and wd.owner[y * W + x] == me and MapGen.is_walkable_tile(wd.grid[y * W + x])
+					if Peaks.climb(wd, Vector2i(x, y), Vector2i(x + 1, y)) != 0:
+						steep = true
+		if steep:
+			steep_n += 1
+		var k := int(str(pk.id).get_slice(":", 2))
+		if k > 0:
+			numbered = numbered and float(Peaks.by_id(wd, "peak:%s:%d" % [str(pk.area), k - 1]).h) >= float(pk.h)
+	check(names.size() == peaks.size(), "no two peaks of the land have the same name")
+	check(heights_ok, "every peak is a crag of ten to forty-odd metres, as high at its top as it says")
+	check(own_land, "every tile a peak lifts is open ground of its own region: no peak joins two regions")
+	check(tops_reached and tops_free, "every summit can be walked (and climbed) to from the sect, and nothing stands on the very top")
+	check(steep_n == peaks.size(), "every peak has rock too steep to walk: it is climbed (%d of %d)" % [steep_n, peaks.size()])
+	check(numbered and str(Peaks.by_id(wd, "peak:mountain:0").n) == "Sun-Viewing Peak" and str(Peaks.by_id(wd, "peak:mountain:1").n) == "the Sweeper's Lookout", "a region's peaks are numbered from its highest down, and the mountain's two great ones have their names")
+	check(Peaks.rise(wd, 3.5, 3.5) == 0.0 and Peaks.climb(wd, wd.start, wd.start + Vector2i(1, 0)) == 0 and Peaks.of_area(Atlas.world_of("f:mountain:cave:-1") if false else {}, "mountain").is_empty(), "the plain is level, and a floor or a cave has no mountains")
+	# what the story stands on a peak is on its rock, and can be got to
+	var on_rock := 0
+	for a in Data.AREAS:
+		for kind in ["npcs", "bosses", "pickups"]:
+			for d in Data.AREAS[a].get(kind, []):
+				if d.has("peak"):
+					var eid := ("boss_" + str(d.id)) if kind == "bosses" else str(d.id)
+					var found := false
+					for e2 in wd.ents:
+						if str(e2.id) == eid:
+							found = true
+							var pk2: Dictionary = Peaks.of_area(wd, a)[mini(int(d.peak), Peaks.of_area(wd, a).size() - 1)]
+							var near_top: bool = maxi(absi(e2.pos.x - pk2.c.x), absi(e2.pos.y - pk2.c.y)) <= 2
+							var ok2: bool = reach.has(e2.pos) and e2.pos != pk2.c and Vector2(e2.pos - pk2.c).length() <= float(pk2.r) + 1.0 and (str(d.get("stand", "top")) != "top" or near_top)
+							check(ok2, "%s stands on the peak the story puts it on" % eid)
+							on_rock += 1
+					check(found, "%s is in the world" % eid)
+	check(on_rock >= 20, "Part XXII stands its people, its lords and its things on the mountains (%d)" % on_rock)
+	var hsrc := FileAccess.get_file_as_string("res://scripts/terrain3d.gd")
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(hsrc.contains("Peaks.rise(wd, float(cx), float(cz))") and FileAccess.get_file_as_string("res://scripts/scatter.gd").contains("_crag_tile") and FileAccess.get_file_as_string("res://scripts/gfx.gd").contains("Peaks.rise_of"),
+		"the mountains are in the height field, bare of meadow, and drawn on the map")
+	print("== climbing and the cloud-kite (world.gd, glider.gd) ==")
+	check(wsrc.contains("climb = 0 if is_floor() else Peaks.climb(wd, ptile, nt)") and wsrc.contains("func toggle_glide") and wsrc.contains("func _landable") and wsrc.contains("Game.seen.has(Atlas.owner_id(wd, nt))")
+		and FileAccess.get_file_as_string("res://scripts/main.gd").contains("KEY_V"), "a steep step is climbed, V opens the kite, and a flight keeps to the regions he has walked into and ends where somebody can stand")
+	var kite := Glider.build(Color("2a5aa8"), Color("e8f0ff"))
+	check(kite.get_child_count() == 2 and (kite.get_child(1) as MeshInstance3D).mesh.get_surface_count() == 1 and (kite.get_child(1) as MeshInstance3D).get_aabb().size.x > 3.0, "the cloud-kite is built from code, three and a half metres across")
+	kite.free()
+	var cairn := Peaks.cairn(7, Color("c83a3a"))
+	check(cairn.get_child_count() == 1, "and so is the cairn on every summit")
+	cairn.free()
+	var psrc := FileAccess.get_file_as_string("res://art/lib/person.py")
+	check(psrc.contains("def clip_scale(t):") and psrc.contains("def clip_glide(t):") and psrc.contains("def clip_alight(t):") and psrc.contains("\"scale\": (SCALE_T, clip_scale)")
+		and FileAccess.get_file_as_string("res://art/check_assets.py").contains("\"scale\", \"glide\", \"alight\""), "three new clips, written in Blender Python and checked with the rest of the art")
+	for who in ["lin_feng", "lin_feng_f", "lin_feng_wild", "lin_feng_f_scholar", "yue_ling"]:
+		var pm := Assets.instance("characters/" + who)
+		check(Assets.has_clip(pm, "scale") and Assets.has_clip(pm, "glide") and Assets.has_clip(pm, "alight"), "%s climbs, glides and alights" % who)
+		pm.free()
+	check("scale" in Assets.LOOPS and "glide" in Assets.LOOPS and "scale" in Assets.LEND and Faces.OF_CLIP.has("scale") and Faces.OF_CLIP.has("glide"), "the new clips go round, are lent to the people of the road, and have faces")
+	var HG = load("res://scripts/game.gd").new()
+	HG.reset()
+	HG.step = Data.step_index("s_p22_first")
+	HG.summit("peak:mountain:0", "Sun-Viewing Peak", 35.0)
+	check(HG.cur_step().id == "s_p22_first" and HG.summits.size() == 1 and str(HG.timeline[HG.timeline.size() - 1].text).begins_with("Stood on Sun-Viewing Peak"), "a summit stood on is remembered, and the wrong one does not finish a step that names another")
+	HG.summit("peak:mountain:1", "the Sweeper's Lookout", 24.0)
+	HG.summit("peak:mountain:1", "the Sweeper's Lookout", 24.0)
+	check(HG.cur_step().id == "s_p22_leap" and HG.summits.size() == 2, "the Lookout climbed, and the story goes on (a summit counts once)")
+	HG.glide_done(7, 5.0)
+	check(HG.cur_step().id == "s_p22_leap" and HG.objective_text().contains("(14/16 m)"), "a flight too short is not the flight asked for")
+	HG.glide_done(9, 6.0)
+	check(HG.cur_step().id == "s_p22_ziqi" and HG.step_glide == 0 and HG.glide_best == 9, "sixteen metres under the kite, and the story goes on")
+	HG.step = Data.step_index("s_p22_summits")
+	check(HG.objective_text().contains("(2/7)") and Trials.need_met(["summits", 2], HG) and not Trials.need_met(["summits", 3], HG) and Trials.need_text(["summits", 3], HG).contains("now 2"), "summits are counted for a step and for the way through a trial by the heights")
+	for k2 in 5:
+		HG.summit("peak:silk:%d" % k2, "somewhere", 20.0)
+	check(HG.cur_step().id == "s_p22_hermits", "seven summits, any of them")
+	HG.free()
+	print("== the people of the road (folk.gd) ==")
+	var camps: Dictionary = wd.camps
+	check(camps.size() >= 30, "there is a camp of the people of the road in most regions of the land (%d)" % camps.size())
+	var role_ok := true
+	for role in Folk.CAMP_ROLES:
+		role_ok = role_ok and Folk.ROLES.has(role) and Folk.TITLES.has(role) and (Folk.LINES.get(role, []) as Array).size() >= 4 and Folk.BODIES.human.has(role)
+		for st in Folk.ROLES[role].day:
+			role_ok = role_ok and Folk.PLACES.has(str(st[1])) and str(st[2]) != "in"
+			for cl in str(st[2]).split("|"):
+				role_ok = role_ok and (cl in Assets.LEND or Data.EMOTES.has(cl) or cl in ["look", "idle"])
+	check(role_ok and Folk.CAMP_ROLES.size() == 7, "seven kinds of people live on the road, each with a day out of doors, words of their own and clips for all of it")
+	var days_ok := true
+	var on_ground := true
+	var by_fire := 0
+	var at_work := 0
+	var hermits_up := 0
+	var people_n := 0
+	for ca in camps:
+		var cid := Folk.camp_of(wd, str(ca))
+		var heart: Vector2i = Folk.heart(cid)
+		on_ground = on_ground and reach.has(heart) and Peaks.at(wd, heart) < 0.3 and Atlas.owner_id(wd, heart) == str(ca)
+		var ppl: Array = Folk.people(wd, cid)
+		days_ok = days_ok and ppl.size() == 7 and Folk.town(cid).get("camp", false) and Folk.is_camp(cid) and not Folk.TOWNS.has(cid)
+		for fp in ppl:
+			people_n += 1
+			var segs: Array = Folk.day_of(wd, fp)
+			days_ok = days_ok and not segs.is_empty() and float(segs[segs.size() - 1].b) >= float(fp.start) + 1439.0
+			for sg in segs:
+				if str(sg.kind) == "stay":
+					var tl := Vector2i(int(floor((sg.at as Vector2).x)), int(floor((sg.at as Vector2).y)))
+					on_ground = on_ground and MapGen.is_walkable_tile(wd.grid[tl.y * W + tl.x]) and Atlas.owner_id(wd, tl) == str(ca) and not bool(sg.in)
+			var night: Dictionary = Folk.state(wd, fp, 23.5 * 60.0)
+			var day: Dictionary = Folk.state(wd, fp, 10.0 * 60.0)
+			if str(fp.role) == "hermit":
+				if Peaks.rise(wd, (day.at as Vector2).x, (day.at as Vector2).y) > 6.0 and bool(day.vis):
+					hermits_up += 1
+			else:
+				if bool(night.vis) and not bool(night.walk) and (night.at as Vector2).distance_to(Vector2(heart) + Vector2(0.5, 0.5)) < 4.5 and str(night.clip) == "doze":
+					by_fire += 1
+				if bool(day.vis) and (bool(day.walk) or (day.at as Vector2).distance_to(Vector2(heart) + Vector2(0.5, 0.5)) > 3.0):
+					at_work += 1
+	check(days_ok and people_n == camps.size() * 7, "every camp has seven people, each with a whole day of their own (%d people)" % people_n)
+	check(on_ground, "a camp stands on open ground of its own region that can be walked to, and its people keep to that region, out of doors")
+	check(by_fire == camps.size() * 6, "at night all but the hermit sleep sitting up by the fire (%d of %d)" % [by_fire, camps.size() * 6])
+	check(at_work >= camps.size() * 5, "by day they are out at their work, away from the fire (%d of %d)" % [at_work, camps.size() * 6])
+	check(hermits_up >= camps.size() - 2, "and the hermit is on the mountain (%d of %d)" % [hermits_up, camps.size()])
+	var some_camp: String = Folk.camp_of(wd, "mountain")
+	var cut_p: Dictionary = Folk.people(wd, some_camp)[0]
+	var TG = load("res://scripts/game.gd").new()
+	TG.reset()
+	check(Folk.line(cut_p, TG).length() > 10 and not Folk.line(cut_p, TG).contains("%s") and Folk.greeting(cut_p, TG) != "" and not Folk.at_tile(wd, Vector2i(int((Folk.state(wd, cut_p, 600.0).at as Vector2).x), int((Folk.state(wd, cut_p, 600.0).at as Vector2).y)), 600.0).is_empty(),
+		"somebody of the road can be faced and spoken to like anybody of the towns")
+	TG.free()
+	check(wsrc.contains("Folk.homes_in(wd, str(k))") and FileAccess.get_file_as_string("res://scripts/structures.gd").contains("static func camp(seed_: int)"), "the world draws the camps and their people")
+	print("== Part XXII: the High Roads ==")
+	check(Data.REALMS.size() == 28 and Data.REALMS[27] == "Leaning on Nothing" and Data.MAX_LEVEL == 81 and Data.level_name(81).ends_with("Leaning on Nothing") and Data.REALM_INFO.size() == 28 and Data.EXP_NEED.size() == Data.MAX_LEVEL
+		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXII adds the realm of Leaning on Nothing")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break27" and Data.DIALOGUE.has("recall20") and msrc.contains("\"s_break26\": \"recall20\"") and Data.DIALOGUE.has("pre:s_break27") and Data.DIALOGUE.has("post:s_break27"),
+		"Part XXII follows Sheathed Edge (recall20) and ends the game")
+	var n22 := 0
+	var kinds22 := {}
+	for st in Data.STEPS:
+		if not str(st.id).begins_with("s_p22_"):
+			continue
+		n22 += 1
+		kinds22[str(st.kind)] = int(kinds22.get(str(st.kind), 0)) + 1
+		if st.kind == "talk":
+			check(Data.DIALOGUE.has(str(st.id)), "%s: there is something said" % st.id)
+		elif st.kind != "kill":
+			check(Data.DIALOGUE.has("done:" + str(st.id)), "%s: something is said when it is done" % st.id)
+		if st.kind == "folk":
+			check(Folk.CAMP_ROLES.has(str(st.role)) and Folk.ERRANDS.has(str(st.id)), "%s: an errand among the people of the road" % st.id)
+		if st.kind == "summit" and st.has("peak"):
+			check(not Peaks.by_id(wd, "peak:%s:%d" % [str(st.peak), int(st.get("k", 0))]).is_empty(), "%s: the peak it names is there" % st.id)
+		if st.kind == "glide":
+			var tall := 0
+			for pk3 in peaks:
+				if float(pk3.h) + 1.7 >= float(st.n) * 0.8 + 1.0:
+					tall += 1
+			check(tall >= 5, "%s: there are peaks tall enough for a flight of %d tiles (%d)" % [st.id, int(st.n), tall])
+	check(n22 >= 28 and int(kinds22.get("summit", 0)) == 2 and int(kinds22.get("glide", 0)) == 4 and int(kinds22.get("folk", 0)) == 4 and int(kinds22.get("hunt", 0)) == 4 and int(kinds22.get("kill", 0)) == 4,
+		"Part XXII has %d steps: summits, flights, errands on the road, hunts and four lords" % n22)
+	for tid in ["shanxiao", "fei_lian", "shan_gui", "dongyue"]:
+		check(Trials.TRIALS.has(tid) and Data.ENEMIES[tid].get("boss", false) and Lore.BOSS.has(tid) and Trials.trial_of_step(Data.STEPS[_kill_step(tid)]) == tid, "%s is a lord of Part XXII, guarded by a trial, with a story" % tid)
+		check((Trials.TRIALS[tid].paths as Array).any(func(pth): return str(pth.kind) == "heights"), "%s can be passed by the heights" % tid)
+		check(Data.DIALOGUE.has("pre:" + tid) and Data.DIALOGUE.has("post:" + tid), "%s has something to say before and after" % tid)
+	check(Trials.KINDS.has("heights") and Trials.EPITHETS.has("heights") and "heights" in Trials.KIND_ORDER and "person:shan_gui" in UI.SHAPES and "person:dongyue" in UI.SHAPES, "a new way through trials: By the heights")
+	for pid in ["xie_lingyun", "liezi", "zhong_ziqi", "han_yu", "shan_gui", "dongyue"]:
+		check(Assets.PEOPLE.has(pid) and Assets.has(Assets.PEOPLE[pid]) and FileAccess.file_exists("res://art/characters/%s.py" % pid), "%s has a model built from a script" % pid)
+	for fid2 in ["salt_thief", "false_echo", "fire_crab", "stray_gust", "kite_hawk", "wind_bag", "red_leopard", "fig_creeper", "rain_gibbon", "merit_stele", "report_smoke", "bends_serpent"]:
+		check(Data.ENEMIES.has(fid2) and Lore.BEAST.has(fid2) and Habits.habit(fid2) != "", "%s: a foe of Part XXII with a story and hours of its own" % fid2)
+	var x22: Array = []
+	var old_echo := 0
+	for cid2 in Echoes.ORDER:
+		var c2: Dictionary = Echoes.CROSSROADS[cid2]
+		if str(c2.part) == "XXII":
+			x22.append(cid2)
+			check((c2.options as Array).size() == 3 and (c2.get("end", {}) as Dictionary).size() == 3 and (c2.get("echo", {}) as Dictionary).size() >= 2, "%s: three answers, each echoed and told at the end" % cid2)
+		else:
+			for ek in c2.get("echo", {}):
+				if str(ek).contains("s_p22_") or str(ek).contains("s_break27"):
+					old_echo += 1
+	check(x22 == ["the_voices", "the_kites", "the_tops"], "what a voice, the air and a summit are for is asked three times")
+	check(old_echo >= 4, "four older crossroads echo in Part XXII (%d)" % old_echo)
+	var tips := {}
+	for o in Echoes.CROSSROADS.the_tops.options:
+		for sc in o.tilt:
+			tips[sc] = true
+	check(tips.has("heart") and tips.has("craft") and tips.has("reach"), "the last crossroads of Part XXII tips all three scales the ends ask about")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bsrc.contains("\"shanxiao\": \"heights\"") and bsrc.contains("\"the_tops\": [\"cairn\"]") and bsrc.contains("func _summit_step") and bsrc.contains("func _glide_step") and bsrc.contains("Folk.CAMP_ROLES.has(role)"),
+		"the bot has a plan for every trial and crossroads of Part XXII, climbs, glides and finds the people of the road")

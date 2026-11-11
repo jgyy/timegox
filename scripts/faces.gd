@@ -57,6 +57,7 @@ const OF_CLIP := {
 	"stargaze": "tender", "gaze": "tender", "kite": "smile", "float_lantern": "tender", "release": "tender", "rock": "tender", "comb": "tender",
 	"dance": "smile", "play_flute": "serene", "play_qin": "serene", "eat": "smile", "drink": "smile", "clap": "joy", "warm": "smile",
 	"hammer": "resolve", "chop": "resolve", "mine": "resolve", "dig": "resolve", "hoe": "resolve", "lift": "resolve", "push": "resolve",
+	"scale": "resolve", "glide": "smile", "alight": "resolve",
 	"climb": "resolve", "archery": "resolve", "sword_dance": "resolve", "pound": "resolve", "carve": "resolve", "squeeze": "resolve",
 	"peer": "doubt", "count": "doubt", "trace": "doubt", "read": "calm", "duck": "fear",
 }

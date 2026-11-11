@@ -568,17 +568,17 @@ static func _build(layer: String = "surface") -> Dictionary:
 		var spec2: Dictionary = Data.AREAS[id2]
 		# (all but those the story put in a cave: caves.gd stands them there)
 		for n2 in spec2.get("npcs", []):
-			if n2.get("late", false) and not n2.has("cave"):
+			if n2.get("late", false) and not n2.has("cave") and not n2.has("peak"):
 				var ne := {"kind": "npc", "id": n2.id, "n": n2.n, "pos": to_world(id2, n2.pos), "col": n2.col, "vis": n2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true}
 				for k2 in ["asset", "race", "hide", "fate"]:
 					if n2.has(k2):
 						ne[k2] = n2[k2]
 				ents.append(ne)
 		for b2 in spec2.get("bosses", []):
-			if b2.get("late", false) and not b2.has("cave"):
+			if b2.get("late", false) and not b2.has("cave") and not b2.has("peak"):
 				ents.append({"kind": "boss", "id": "boss_" + str(b2.id), "enemy": b2.id, "pos": to_world(id2, b2.pos), "lv": b2.lv, "req": b2.req, "vis": b2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true})
 		for pk2 in spec2.get("pickups", []):
-			if pk2.get("late", false) and not pk2.has("cave"):
+			if pk2.get("late", false) and not pk2.has("cave") and not pk2.has("peak"):
 				var pe := {"kind": "pickup", "id": pk2.id, "item": pk2.item, "pos": to_world(id2, pk2.pos), "vis": pk2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true}
 				if pk2.has("n"):
 					pe["n"] = pk2.n
@@ -591,8 +591,15 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# and the war-bands that came later in the story: packs of two or three on open ground of their
 	# region that the sect can reach, four tiles from anybody and anything (a seeded draw, so the same
 	# every time)
-	for id3 in ids:
-		var band: Dictionary = Data.AREAS[id3].get("warband", {})
+	# (Part XXII: a region may have a second band, "warband2", for a later chapter)
+	var band_slots: Array = []
+	for id0 in ids:
+		band_slots.append([id0, "warband", "w"])
+	for id0 in ids:
+		band_slots.append([id0, "warband2", "x"])
+	for bs in band_slots:
+		var id3: String = bs[0]
+		var band: Dictionary = Data.AREAS[id3].get(str(bs[1]), {})
 		if band.is_empty() or not band.get("late", false):
 			continue
 		var near := {}
@@ -608,7 +615,7 @@ static func _build(layer: String = "surface") -> Dictionary:
 				cands.append(p5)
 		cands.sort()
 		var rng5 := RandomNumberGenerator.new()
-		rng5.seed = int(Data.AREAS[id3].seed) * 977 + 31
+		rng5.seed = int(Data.AREAS[id3].seed) * 977 + (31 if str(bs[2]) == "w" else 77)
 		var made := 0
 		var tries := 0
 		while made < int(band.n) and tries < 4000 and not cands.is_empty():
@@ -621,7 +628,7 @@ static func _build(layer: String = "surface") -> Dictionary:
 			for _k5 in rng5.randi_range(2, 3):
 				var pe5: Array = band.pool[rng5.randi() % (band.pool as Array).size()]
 				group5.append({"id": pe5[0], "lv": rng5.randi_range(int(pe5[1]), int(pe5[2]))})
-			ents.append({"kind": "enemy", "id": "%s:w%d" % [id3, made], "pos": c5, "group": group5, "vis": [str(band.vis), ""], "area": id3, "layer": layer, "late": true})
+			ents.append({"kind": "enemy", "id": "%s:%s%d" % [id3, str(bs[2]), made], "pos": c5, "group": group5, "vis": [str(band.vis), ""], "area": id3, "layer": layer, "late": true})
 			for dy6 in range(-4, 5):
 				for dx6 in range(-4, 5):
 					near[c5 + Vector2i(dx6, dy6)] = true
@@ -629,6 +636,16 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# that the sect can reach, with open ground all round it (so that it stands in nobody's way), added
 	# after everything else, so no older map moves
 	Caves.place(grid, W, H, owner, ids, ents, layer, reach_e, floors)
+	# ---- the High Roads (peaks.gd): mountains in every region, on ground nothing else stands on, added
+	# last of all; their rock is open ground, climbed where it is steep
+	var pk_t0 := Time.get_ticks_usec()
+	var pks := Peaks.place(grid, W, H, owner, sea, ids, ents, layer, reach_e)
+	# (what the story puts on a peak is stood there now: `"peak": k` in Data.AREAS)
+	Peaks.world(grid, W, pks.peaks, ents, layer, ids)
+	# ... and the camps of the people of the road, at the feet of the highest (folk.gd)
+	var camps := Folk.place_camps(grid, W, H, owner, ids, ents, reach_e, pks.peaks)
+	if OS.has_environment("AZ_PROFILE"):
+		print("[profile] realm %s: %d peaks and %d camps placed in %d ms" % [layer, (pks.peaks as Array).size(), camps.size(), (Time.get_ticks_usec() - pk_t0) / 1000])
 	# ---- each region's cell: the bounding box of the land it owns
 	var lo: Array = []
 	var hi: Array = []
@@ -652,7 +669,8 @@ static func _build(layer: String = "surface") -> Dictionary:
 		if hi[o2].x >= 0:
 			L[id].cell = Rect2i(lo[o2], hi[o2] - lo[o2] + Vector2i.ONE)
 	return {"w": W, "h": H, "grid": grid, "owner": owner, "sea": sea, "ids": ids, "idx": idx, "ents": ents, "buildings": buildings,
-		"start": start, "layout": L, "maps": maps, "layer": layer, "floors": floors, "origin": layer_origin(layer), "y": layer_y(layer)}
+		"start": start, "layout": L, "maps": maps, "layer": layer, "floors": floors, "origin": layer_origin(layer), "y": layer_y(layer),
+		"peaks": pks.peaks, "peak_blk": pks.blk, "camps": camps}
 
 ## A building's upper storey (`lv` 1) or cellar (-1) as a small world of its own, the size of the
 ## building's rectangle (its own tiles start at the rectangle's corner), with the people and things
