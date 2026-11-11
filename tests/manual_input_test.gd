@@ -99,10 +99,41 @@ func cave_step() -> void:
 			elif since > 10 and not w.is_cave() and not w.traveling():
 				key(int(cave.key), false)
 				expect(str(w.layer) == "surface" and w.ptile == (cave.mouth as Vector2i) + Vector2i(0, 1), "and the way out comes up into the daylight, in front of the mouth")
-				print("failures: ", fails)
-				quit(1 if fails > 0 else 0)
+				# and last of all, the arms rack (the Hundred Arms release): Esc > Arms, down to the staff, Enter
+				cave.stage = 4
+				cave.at = frame
 			elif since > 500:
 				expect(false, "the way out of the cave comes up into the daylight")
+				print("failures: ", fails)
+				quit(1)
+		4:
+			if since == 20:
+				expect(Arms.held(root.get_node("Game")) == "sword" and Arms.attached(w.player) == "sword", "he comes out of the cave with the jian in his hand")
+				tap(KEY_ESCAPE)
+			elif since > 22 and since < 200 and main.top_name() == "menu" and main.menu.mode == "root":
+				var want: int = main.menu.ids.find("arms")
+				if since == 24:
+					expect(want >= 0 and main.menu.enabled.size() == main.menu.ids.size() and main.menu.enabled[want], "the menu has the arms rack, and knows which of its entries can be chosen")
+				if main.menu.cursor != want:
+					tap(KEY_DOWN)
+				elif since % 2 == 0:
+					tap(KEY_ENTER)
+			elif since > 22 and since < 260 and main.top_name() == "choice" and not cave.has("racked"):
+				cave["racked"] = frame
+				expect(str(main.choice.title) == main.ARMS_ASK and main.choice.ids() == Arms.ORDER, "Enter on Arms opens the rack, with all eight on it")
+				tap(KEY_DOWN)
+			elif cave.has("racked") and frame == int(cave.racked) + 4:
+				expect(main.top_name() == "choice" and Arms.attached(w.player) == "staff" and Arms.held(root.get_node("Game")) == "sword", "the weapon under the cursor is shown in his hand before it is chosen")
+				tap(KEY_ENTER)
+			elif cave.has("racked") and frame == int(cave.racked) + 10:
+				expect(main.top_name() == "world" and Arms.held(root.get_node("Game")) == "staff" and Arms.attached(w.player) == "staff", "Enter takes the staff in hand")
+				tap(KEY_F)
+			elif cave.has("racked") and frame == int(cave.racked) + 13:
+				expect(str(w.player.get_meta("act", "")) == "arm_staff" and Faces.worn(w.player) == "shout", "F strikes with the staff's own blow, and it shows in his face")
+				print("failures: ", fails)
+				quit(1 if fails > 0 else 0)
+			elif since > 400:
+				expect(false, "the arms rack opens from the menu")
 				print("failures: ", fails)
 				quit(1)
 

@@ -328,10 +328,70 @@ class Face:
         return c
 
 
+# ---------------------------------------------------------------- expression (the Hundred Arms release)
+# A face that is to show what it feels needs more than a blink and a jaw.  Six bones are sculpted into
+# every human head: one under each eyebrow (raised in surprise, drawn down and together in anger,
+# tilted up at the inner end in sorrow), one at each corner of the mouth (up and out for a smile, down
+# for grief), "lids" over the eye bone (the eyes narrow, widen or close into the arcs of a laugh) and
+# "jaw" over the mouth bone (the mouth opens or thins).  No clip moves them: scripts/faces.gd poses
+# them at runtime, over whatever the body is doing, so that every clip can be played with every face.
+# The brows and the lips are weighted to them wholly, the skin beneath them partly: the cheek lifts
+# with the corner of the mouth and the forehead follows the brow, the way a sculpted face would.
+BROW_DY = (0.0265, 0.0225)     # brow line above the eye line (a woman's, a man's)
+LIP_X = 0.0145
+FACE_BONES = ("brow.L", "brow.R", "lip.L", "lip.R", "lids", "jaw")
+
+
+def brow_y_of(o):
+    return eye_y_of(o) + (BROW_DY[0] if o is not None and o.get("fem") else BROW_DY[1])
+
+
+def expression_bones(r, o, parent="head"):
+    """Add the six bones of expression to rig `r` (the eye and mouth bones hang from "lids" and
+    "jaw": make them after this)."""
+    ey = HC.y + eye_y_of(o)
+    by = HC.y + brow_y_of(o)
+    my = HC.y + MOUTH_Y
+    for s, sd in ((1, "L"), (-1, "R")):
+        r.bone("brow." + sd, (EYE_X * s, by, 0.094), (EYE_X * s, by + 0.03, 0.094), parent)
+        r.bone("lip." + sd, (LIP_X * s, my, 0.092), (LIP_X * s, my + 0.03, 0.092), parent)
+    r.bone("lids", (0, ey, 0.08), (0, ey + 0.05, 0.08), parent)
+    r.bone("jaw", (0, my + 0.001, 0.09), (0, my + 0.03, 0.09), parent)
+
+
+def expression_weights(f, bone="head"):
+    """Weights for the skin of the head: mostly the head bone, and under each brow and round each
+    corner of the mouth a share of that bone, falling off smoothly so nothing creases."""
+    by = f.eye_y + (BROW_DY[0] if f.fem else BROW_DY[1])
+
+    def fn(p):
+        lp = p - HC
+        if lp.z < 0.02:
+            return {bone: 1.0}
+        w = {}
+        front = smooth(0.02, 0.06, lp.z)
+        for s, sd in ((1, "L"), (-1, "R")):
+            if lp.x * s < -0.004:
+                continue
+            kb = math.exp(-(((lp.x - EYE_X * s) / 0.024) ** 2 + ((lp.y - by - 0.004) / 0.013) ** 2)) * 0.5 * front
+            kl = math.exp(-(((lp.x - (LIP_X + 0.008) * s) / 0.021) ** 2 + ((lp.y - MOUTH_Y - 0.004) / 0.019) ** 2)) * 0.55 * front
+            side = smooth(-0.004, 0.006, lp.x * s)
+            if kb * side > 0.02:
+                w["brow." + sd] = kb * side
+            if kl * side > 0.02:
+                w["lip." + sd] = kl * side
+        w[bone] = max(0.0, 1.0 - sum(w.values()))
+        return w
+
+    return fn
+
+
 def head(b, o, bone="head", eye_bone="eyes"):
     """Build the head, neck excluded.  Returns the Face (for hair and hats to fit onto)."""
     f = Face(o)
-    skin = morph_sphere(b, HC, f.shape, f.colour, cls=SKIN, bone=bone, seg=34, rings=26)
+    # (the Hundred Arms release: the skin under the brows and round the corners of the mouth is
+    # sculpted on to the bones of expression, so a cheek rises with a smile: see expression_weights)
+    skin = morph_sphere(b, HC, f.shape, f.colour, cls=SKIN, bone=bone, bone_fn=expression_weights(f) if bone == "head" else None, seg=34, rings=26)
     # the face, nose and lips are lit as one smooth shape (an elder's a little less: the age shows)
     b.set_normals(skin, f.shade_normal, 0.92 - 0.3 * (1.0 - f.soft))
     tip = nose(b, f, bone)
@@ -386,10 +446,22 @@ def mouth(b, f, o, bone):
         line.append(HC + sp + Vector((0, 0.0004 + 0.0018 * (2 * t) ** 2 * smile, 0.0036)))
     ur = [r * (0.8 if f.fem else 0.6) for r in (0.0008, 0.0012, 0.0016, 0.0018, 0.0017, 0.0018, 0.0016, 0.0012, 0.0008)]
     lr = [r * (1.0 if f.fem else 0.6) for r in (0.0008, 0.0015, 0.0021, 0.0026, 0.0028, 0.0026, 0.0021, 0.0015, 0.0008)]
-    out = b.tube(upper, ur, mix(lip, f.skin, 0.45), cls=SKIN, bone=bone, seg=6, flat=0.5, up=(0, 0, 1), mat=MAT_PLAIN)
-    out += b.tube(lower, lr, mix(lip, f.skin, 0.2) if f.fem else mix(lip, f.skin, 0.45), cls=SKIN, bone=bone, seg=6, flat=0.55, up=(0, 0, 1), mat=MAT_PLAIN)
+    # the corners of the mouth ride on the lip bones (the Hundred Arms release): drawn up and out they
+    # smile, drawn down they grieve, and the middle of the lips follows them part of the way
+    lip_b = line_b = None
+    if bone == "head":
+        lip_b = []
+        line_b = []
+        for i in range(9):
+            u = i / 4 - 1.0
+            c = smooth(0.15, 1.0, abs(u)) * 0.92
+            side = "lip.L" if u > 0 else "lip.R"
+            lip_b.append({bone: 1.0 - c, side: c} if c > 0.0 else {bone: 1.0})
+            line_b.append({"mouth": 1.0 - c, side: c} if c > 0.0 else {"mouth": 1.0})
+    out = b.tube(upper, ur, mix(lip, f.skin, 0.45), cls=SKIN, bone=bone, bones=lip_b, seg=6, flat=0.5, up=(0, 0, 1), mat=MAT_PLAIN)
+    out += b.tube(lower, lr, mix(lip, f.skin, 0.2) if f.fem else mix(lip, f.skin, 0.45), cls=SKIN, bone=bone, bones=lip_b, seg=6, flat=0.55, up=(0, 0, 1), mat=MAT_PLAIN)
     # the parting line rides on the mouth bone: scaling it tall opens the mouth when speaking
-    b.tube(line, [0.0007, 0.0009, 0.001, 0.001, 0.001, 0.001, 0.001, 0.0009, 0.0007], darken(lip, 0.66), cls=SKIN, bone="mouth" if bone == "head" else bone, seg=5, mat=MAT_PLAIN)
+    b.tube(line, [0.0007, 0.0009, 0.001, 0.001, 0.001, 0.001, 0.001, 0.0009, 0.0007], darken(lip, 0.66), cls=SKIN, bone="mouth" if bone == "head" else bone, bones=line_b, seg=5, mat=MAT_PLAIN)
     return out
 
 
@@ -501,7 +573,7 @@ def eyes(b, f, o, eye_bone, bone):
             y = f.eye_y + (0.0265 if f.fem else 0.0225) + 0.005 * math.sin(math.pi * t) - (0.007 * (1.0 - t) if stern else 0.0) - 0.004 * t
             sp2 = f.surface(x, y)
             bp.append(HC + sp2 + f.normal(x, y) * 0.0018)
-        b.tube(bp, [r * (1.0 if f.fem else 1.35) for r in (0.0019, 0.0024, 0.0023, 0.002, 0.0016, 0.0011, 0.0005)], brow_col, cls=HAIR, bone=bone, seg=6, flat=0.45, up=(0, 0, 1), mat=MAT_PLAIN)
+        b.tube(bp, [r * (1.0 if f.fem else 1.35) for r in (0.0019, 0.0024, 0.0023, 0.002, 0.0016, 0.0011, 0.0005)], brow_col, cls=HAIR, bone=("brow.L" if s > 0 else "brow.R") if bone == "head" else bone, seg=6, flat=0.45, up=(0, 0, 1), mat=MAT_PLAIN)
 
 
 def wrinkles(b, f, bone):

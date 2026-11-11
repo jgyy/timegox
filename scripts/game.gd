@@ -142,6 +142,12 @@ var echoed := {}
 ## crossroads reached in play and not yet answered (asked by Main once nothing else is going on)
 var cross_pending: Array = []
 var ending := ""
+## the Hundred Arms release (arms.gd): the weapons he owns, the one in his hand, the battles each has
+## won (its Dao's mastery), and how often he has changed from one to another
+var arms := {"sword": true, "staff": true}
+var arm := "sword"
+var arm_xp := {}
+var arm_switches := 0
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -240,6 +246,12 @@ func reset() -> void:
 	sat = {}
 	prologue = ""
 	ending = ""
+	arms = {}
+	for aid in Arms.FIRST:
+		arms[aid] = true
+	arm = "sword"
+	arm_xp = {}
+	arm_switches = 0
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -274,13 +286,13 @@ func fighter(i: int) -> Dictionary:
 	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
 	var spd: int = Data.speed(level) + (2 if i == 1 else 0)
 	if i == 0:
-		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd"))
+		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd") + Arms.mod(self, "spd", 0.0))
 	return {
 		"id": "pc%d" % i, "name": member_name(i), "side": "party", "idx": i, "lv": level, "boss": false,
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
 		"atk": a, "def": float(Data.defense(level)) * (1.0 if i == 0 else 0.9), "spd": spd,
 		"elem": "phys", "weak": "none", "col": Color("7ec8ff") if i == 0 else Color("ff9ac0"),
-		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step) + dao_skills(i),
+		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step) + dao_skills(i) + (Arms.skills(self) if i == 0 else []),
 		"turns": 0, "flash": 0.0, "shake": 0.0, "dead": false, "fade": 1.0,
 	}
 
@@ -337,9 +349,36 @@ func dao_skills(i: int) -> Array:
 		return []
 	return [Data.DAOS[dao].skill]
 
+## A technique as it stands now.  Most are what Data.SKILLS says; the technique of a weapon's Dao
+## (arms.gd) is measured against the strongest technique of the same reach Lin Feng knows, so that a
+## weapon picked up at Qi Condensation is still worth carrying at Hollow Vessel.
+var _skill_now := {}
+
+func skill_of(id: String) -> Dictionary:
+	var s: Dictionary = Data.SKILLS[id]
+	if not s.has("arm"):
+		return s
+	var key := "%s|%d|%d" % [id, level, step]
+	if _skill_now.has(key):
+		return _skill_now[key]
+	var bm := 1.3 if str(s.tgt) == "one" else 1.0
+	var bc := 6.0
+	for sid in Data.known_skills(0, level, step):
+		var o: Dictionary = Data.SKILLS[sid]
+		if str(o.tgt) == str(s.tgt) and not o.has("heal") and float(o.mult) > bm:
+			bm = float(o.mult)
+			bc = float(o.cost)
+	var out := s.duplicate()
+	out["mult"] = bm * float(s.k)
+	out["cost"] = int(ceil(bc * float(s.ck)))
+	if _skill_now.size() > 64:
+		_skill_now.clear()
+	_skill_now[key] = out
+	return out
+
 ## What a technique costs to use (the Cauldron's Dao makes them cheaper).
 func skill_cost(id: String) -> float:
-	var c := float(Data.SKILLS[id].cost) * dao_mod("qi", 1.0) * (1.0 - talent_mod("cost")) * (1.0 - Fashion.gear(self, "cost")) * Works.mod(self, "cost")
+	var c := float(skill_of(id).cost) * dao_mod("qi", 1.0) * Arms.mod(self, "qi", 1.0) * (1.0 - talent_mod("cost")) * (1.0 - Fashion.gear(self, "cost")) * Works.mod(self, "cost")
 	# the crown of the Five-Phase Root: techniques that strike every foe cost a fifth less
 	if talent_crown("five_phase") and str(Data.SKILLS[id].tgt) == "all":
 		c *= 0.8
@@ -534,7 +573,10 @@ func record_kills(a: String, n: int, ids: Array = []) -> void:
 	# (a hunt in a cave, Part XX, counts what is brought down in that cave)
 	if not s.is_empty() and s.kind == "hunt" and s.area == a and (not s.has("cave") or layer == Caves.fid(a, int(s.cave))):
 		# a hunt for particular foes (Part XIII: Chiyou's war-band) counts only those
-		if s.has("of") and not ids.is_empty():
+		# (the Hundred Arms release: a hunt that asks for a weapon counts what falls while it is in the hand)
+		if s.has("arm") and str(s.arm) != Arms.held(self):
+			n = 0
+		elif s.has("of") and not ids.is_empty():
 			n = ids.filter(func(id): return str(id) in s.of).size()
 		elif s.has("of"):
 			n = 0
@@ -599,6 +641,9 @@ func advance() -> void:
 			grant_outfit(str(rw[1]))
 		else:
 			grant_ride(str(rw[1]))
+	# and a weapon (arms.gd): Iron Fang's sabre, the Empress's fan
+	for aid in Arms.step_rewards(str(s.id)):
+		grant_arm(str(aid))
 	step += 1
 	hunt = 0
 	step_uses = {}
@@ -664,6 +709,9 @@ func poll_steps() -> void:
 			"try":
 				# Part XX: so many of the things of a cave done (props.gd), any of them or those named
 				ok = tried_count(s) >= int(s.n)
+			"arms":
+				# Part XXI: so many Daos of arms learned to Adept (arms.gd)
+				ok = Arms.adept(self) >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -723,6 +771,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(delved.size(), int(s.n)), int(s.n)]
 	elif s.kind == "try":
 		t += "  (%d/%d)" % [mini(tried_count(s), int(s.n)), int(s.n)]
+	elif s.kind == "arms":
+		t += "  (%d/%d)" % [mini(Arms.adept(self), int(s.n)), int(s.n)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":
@@ -898,6 +948,40 @@ func wear(id: String) -> bool:
 	qi[0] = minf(float(max_qi(0)), float(max_qi(0)) * qi_r)
 	note("Dressed in the " + str(Fashion.OUTFITS[id].n))
 	return true
+
+# ---------------------------------------------------------------- the Eight Arms (arms.gd)
+func grant_arm(id: String) -> void:
+	if arms.has(id) or not Arms.WEAPONS.has(id):
+		return
+	arms[id] = true
+	toast("New weapon: %s (Esc > Arms)" % Arms.WEAPONS[id].n)
+	note("Took up " + str(Arms.WEAPONS[id].n).trim_prefix("The ").insert(0, "the ") if str(Arms.WEAPONS[id].n).begins_with("The ") else "Took up " + str(Arms.WEAPONS[id].n))
+
+## Take a weapon he owns into his hand: its own blow, its own Dao and that Dao's passives, at once.
+func wield(id: String) -> bool:
+	if not arms.has(id) or id == arm or not Arms.WEAPONS.has(id):
+		return false
+	arm = id
+	arm_switches += 1
+	arm_xp[id] = int(arm_xp.get(id, 0))
+	note("Took %s in hand" % str(Arms.WEAPONS[id].zh))
+	quest_changed.emit()
+	return true
+
+## A battle won with a weapon in the hand deepens that weapon's Dao (a lord four times as much).
+func arm_battle_won(boss: bool) -> void:
+	var id := Arms.held(self)
+	var before := Arms.tier(self, id)
+	arm_xp[id] = int(arm_xp.get(id, 0)) + (4 if boss else 1)
+	var after := Arms.tier(self, id)
+	if after > before:
+		var w: Dictionary = Arms.WEAPONS[id]
+		toast("%s of the %s" % [Data.DAO_RANKS[after], w.dao.n])
+		note("Became %s of the %s" % [Data.DAO_RANKS[after], w.dao.n])
+		add_renown(1)
+		if after == 1:
+			toast("New technique: %s" % Data.SKILLS[str(w.skill)].n)
+		poll_steps()
 
 func grant_ride(id: String) -> void:
 	if rides.has(id) or not Fashion.RIDES.has(id):

@@ -20,6 +20,9 @@ var ids: Array = []
 var enabled: Array = []
 var cursor := 0
 var pending := {"skill": "", "item": ""}
+## what the blow being struck carries besides its strength (the Eight Arms, arms.gd): "pierce" the
+## share of a guard it ignores, "true" a blow that cannot but land true
+var blow := {}
 var targets: Array = []
 var log_lines: Array = []
 var fx: Array = []
@@ -511,7 +514,8 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	# the Daos (Part XI): a party member may slip the blow (Free Wandering, and Lin Feng's Spirit Sense)
 	# or the foe may strike a reflection (the Mirror, and the celestial foxes' friendship)
 	if tgt.side == "party" and a.side == "foe":
-		var slip := Game.dao_mod("evade", 0.0) + (Game.talent_mod("evade") if tgt.idx == 0 else 0.0)
+		# (and the Dao of the Folding Wind, with the fan in the hand: arms.gd)
+		var slip := Game.dao_mod("evade", 0.0) + (Game.talent_mod("evade") if tgt.idx == 0 else 0.0) + Arms.mod(Game, "evade", 0.0)
 		var miss := Game.dao_mod("miss", 0.0) + Game.boon("miss", 0.0) + (0.04 if Game.talent_crown("spirit_sense") else 0.0)
 		if slip > 0.0 and randf() < slip:
 			fx.append({"text": "slips it", "p": head3(tgt), "t": 1.0, "col": Color("b8f0d0"), "slash": ""})
@@ -526,7 +530,13 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	if a.side == "party" and boon.has("weak_k"):
 		weak_k = maxf(weak_k, float(boon.weak_k))
 	var em := weak_k if tgt.weak == elem and elem != "phys" else 1.0
-	var raw: float = a.atk * mult * randf_range(0.9, 1.1) * em - tgt.def * 0.5
+	var lf: bool = a.side == "party" and a.idx == 0
+	# the Eight Arms (arms.gd): a spear goes through part of a guard, and a foe the brush has marked is
+	# open to everything that follows
+	var guard := 1.0 - clampf(float(blow.get("pierce", 0.0)), 0.0, 1.0) if lf else 1.0
+	var raw: float = a.atk * mult * randf_range(0.9, 1.1) * em - tgt.def * 0.5 * guard
+	if a.side == "party" and tgt.has("marked"):
+		raw *= float(tgt.marked)
 	# realm suppression (Part XII): a realm above weighs on a realm below; a tribulation is heaven
 	# itself and weighs on everyone the same
 	if not ctx.get("tribulation", false):
@@ -536,11 +546,14 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0)) * Works.mod(Game, "taken")
 		# and a formation or allies a trial's path brought
 		raw *= float(boon.get("taken", 1.0))
-	var lf: bool = a.side == "party" and a.idx == 0
-	var crit := randf() < 0.08 + (Game.talent_mod("crit") if lf else 0.0)
+	var crit := randf() < 0.08 + ((Game.talent_mod("crit") + Arms.mod(Game, "crit", 0.0)) if lf else 0.0)
+	if lf and blow.get("true", false):
+		crit = true
 	# the crown of the Sword Bone: Lin Feng's first blow of the battle always lands true
 	if lf and first_blow:
 		first_blow = false
+		# (the Dao of the Unloosed Arrow: the bow's first arrow is the one that counts)
+		raw *= Arms.mod(Game, "first", 1.0)
 		if Game.talent_crown("sword_bone"):
 			crit = true
 	if crit:
@@ -605,7 +618,7 @@ func _heal(tgt: Dictionary, amount: float) -> void:
 		Fx3D.heal(scene3d, pos3(tgt) + Vector3(0, 1.0, 0))
 
 func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
-	var s: Dictionary = Data.SKILLS[skill_id]
+	var s: Dictionary = Game.skill_of(skill_id)
 	actor.qi -= Game.skill_cost(skill_id)
 	if s.has("heal"):
 		say("%s casts %s." % [actor.name, s.n])
@@ -621,7 +634,11 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 				say("%s is raised by %s!" % [tg.name, s.n])
 			_heal(tg, tg.maxhp * s.heal)
 	else:
-		say("%s uses %s." % [actor.name, s.n])
+		# (the plain blow is struck with whatever is in his hand: arms.gd)
+		if actor.side == "party" and actor.idx == 0 and skill_id == "strike":
+			say("%s strikes with %s." % [actor.name, str(Arms.WEAPONS[Arms.held(Game)].zh)])
+		else:
+			say("%s uses %s." % [actor.name, s.n])
 		if not headless() and actor.has("model"):
 			Fx3D.charge(scene3d, pos3(actor) + Vector3(0, 1.2, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
 			for tg in tgts:
@@ -631,16 +648,30 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 		# branches of his root he has woken strengthen the techniques of their element (Part XII)
 		var dm := 1.0
 		var lf: bool = actor.side == "party" and actor.idx == 0
+		blow = {}
 		if lf:
 			if skill_id == "strike":
-				dm = Game.dao_mod("strike", 1.0)
+				dm = Game.dao_mod("strike", 1.0) * Arms.mod(Game, "strike", 1.0)
+				blow = {"pierce": Arms.mod(Game, "pierce", 0.0)}
 			elif s.tgt == "one":
-				dm = Game.dao_mod("one", 1.0)
+				dm = Game.dao_mod("one", 1.0) * Arms.mod(Game, "one", 1.0)
+				blow = {"pierce": maxf(Arms.mod(Game, "pierce", 0.0), float(s.get("pierce", 0.0))), "true": s.get("true", false)}
 			dm *= Game.talent_power(skill_id)
 		for tg in tgts:
 			var done := _hit(actor, tg, s.mult * dm, s.elem, false)
 			if not lf or done <= 0:
 				continue
+			# the Eight Arms (arms.gd): what the weapon in his hand does besides
+			if skill_id == "strike":
+				var sweep := Arms.mod(Game, "sweep", 0.0)
+				if sweep > 0.0:
+					for other in alive(foes):
+						if other != tg:
+							_hit(actor, other, s.mult * dm * sweep, s.elem, true)
+				_arm_touch(tg, Arms.mod(Game, "bind", 1.0), Arms.mod(Game, "mark", 1.0))
+			elif s.has("arm"):
+				var w: Dictionary = Arms.WEAPONS[str(s.arm)]
+				_arm_touch(tg, float(w.mods.bind[Arms.tier(Game)]) if s.get("bind", false) else 1.0, float(w.mods.mark[Arms.tier(Game)]) if s.get("mark", false) else 1.0)
 			# the crown of the Thunder Root: lightning answers lightning on a weakness
 			if s.elem == "thunder" and tg.weak == "thunder" and not tg.dead and Game.talent_crown("thunder_root"):
 				say("Thunder answers thunder!")
@@ -648,9 +679,29 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 			# the crown of the Yin Root: the dark keeps a tenth of what it takes
 			if s.elem == "dark" and Game.talent_crown("yin_root"):
 				actor.hp = minf(actor.maxhp, actor.hp + done * 0.1)
+		blow = {}
 		if not headless() and actor.has("model"):
-			Models.act(actor.model, "cast", t)
+			# each weapon is struck with in its own way, and the technique of its Dao has a form of its own
+			var clip := "cast"
+			if lf and skill_id == "strike":
+				clip = Arms.strike_clip(actor.model)
+			elif lf and s.has("arm") and Assets.has_clip(actor.model, Arms.art_of(skill_id)):
+				clip = Arms.art_of(skill_id)
+			Models.act(actor.model, clip, t)
 	_end_action()
+
+## A foe the whip has struck is bound (its attack weakened, once) and one the brush has struck is
+## marked (everything after cuts deeper, once): arms.gd.
+func _arm_touch(tg: Dictionary, bind: float, mark: float) -> void:
+	if tg.dead:
+		return
+	if bind < 1.0 and not tg.has("bound"):
+		tg["bound"] = true
+		tg.atk = float(tg.atk) * bind
+		fx.append({"text": "bound", "p": head3(tg) + Vector3(0, 0.3, 0), "t": 1.0, "col": Color("d0a0ff"), "slash": ""})
+	if mark > 1.0 and not tg.has("marked"):
+		tg["marked"] = mark
+		fx.append({"text": "marked", "p": head3(tg) + Vector3(0, 0.3, 0), "t": 1.0, "col": Color("ff7a7a"), "slash": ""})
 
 func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	Game.inv[item] -= 1
@@ -687,6 +738,8 @@ func _win() -> void:
 	# (and the scales, echoes.gd: a beaten pack gives up what it guarded to somebody known to spare)
 	stones = int(stones * Works.mod(Game, "stones") * (Echoes.lean_mod(Game, "stones") if not boss else 1.0))
 	if not ctx.get("tribulation", false):
+		# (and the Dao of the weapon it was won with: arms.gd)
+		Game.arm_battle_won(boss)
 		Game.dao_battle_won(boss)
 		if Game.talent_crown("insight"):
 			Game.dao_battle_won(boss)

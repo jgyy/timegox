@@ -13,6 +13,6 @@ kit.reset()
 person.export_person("characters/lin_feng_scholar.glb", {
     "fem": False, "age": 0.0, "build": 1.03,
     "robe": "3a8ae8", "trim": "e8f0ff", "inner": "f4f6ff", "hair": "1a1a2a",
-    "eyes": "3a7ae8", "sash": "1c3a78", "cape": "2a5aa8", "sword": True, "boots": "232838", "pants": "1e2c50",
+    "eyes": "3a7ae8", "sash": "1c3a78", "cape": "2a5aa8", "sword": True, "arms": True, "boots": "232838", "pants": "1e2c50",
     "hair_style": "short", "jaw": 0.93, "brow": 0.92, "chin": 0.96,
 }, clips=person.HERO_CLIPS)

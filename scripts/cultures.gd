@@ -268,8 +268,54 @@ const ENDINGS := {
 		"needs": [["heart", 3]], "sky": Color(1.0, 0.82, 0.9),
 		"lines": [["Narrator", "By the lotus pond below the mountain there is a house with one room and one stove, built by somebody who can hold up the sky and still got the chimney wrong twice."],
 			["Narrator", "Yue Ling lights the fire in the mornings. Lin Feng banks it at night. It is the smallest hearth in the Unbroken Land, and on a clear evening its smoke goes straight up, and every other fire in the land can see it."]]},
+	# ---- the Hundred Arms release: not every road ends by the fire.  Seven more ends, two of them bright,
+	# one bitter and four dark, each open only to the journey that walked towards it: the scales of the
+	# crossroads (echoes.gd), the Daos of arms (arms.gd), the works built (works.gd), and what was never
+	# done at all.  `kind`: "bright" | "bitter" | "dark" (a dark end is said to be one before it is
+	# chosen); `face`: what the hero's face shows on the lotus (faces.gd); `hearth`: false when the
+	# hero's own hearth has nothing kind to add
+	"school": {"n": "The School of the Eight Arms", "label": "Open a school", "sub": "Every weapon, and when to put it down", "kind": "bright", "face": "smile",
+		"desc": "Four Daos of arms learned to Adept. Open a school in the lower courtyard where a child of any hearth may learn any weapon, and where the first year is spent with a broom.",
+		"needs": [["arms", 4]], "sky": Color(0.92, 0.96, 1.0),
+		"lines": [["Narrator", "In the lower courtyard of the Azure Cloud Sect there are eight racks, and beside the first of them a row of brooms. The horse-folk send their sons to learn the spear and their daughters the bow, and the founders of Tushan send children who already know what a blade costs to make."],
+			["Narrator", "Every one of them sweeps the nine hundred steps for a year before touching steel. Lin Feng says it is to learn the stance. Yue Ling says it is so that they know what the mountain looks like when nobody is fighting on it, and she is the one the children believe."]]},
+	"broom": {"n": "The Broom", "label": "Give it back", "sub": "A mortal life, swept clean", "kind": "bright", "face": "tender",
+		"desc": "You have kept the old ways at every crossroads. Give the Nine Heavens root back to the land it was lent from, let the sky be held by the people who chose to hold it, and grow old as what you were: the one who sweeps the steps.",
+		"needs": [["lean", "craft", -1]], "sky": Color(1.0, 0.92, 0.78),
+		"lines": [["Narrator", "Lin Feng sits down under the old pine and lets the Nine Heavens root go, the way a held breath is let go. It runs down into the mountain like rain. In the spring the pine flowers, which it has not done in the Elder's lifetime."],
+			["Narrator", "He sweeps the steps for sixty years more and dies an old man with a good broom, on a morning in autumn, with the leaves half done. The sky does not fall. It had been taught, by then, how to be held by many hands, and that was the last thing he taught it."]]},
+	"far": {"n": "The Far Shore", "label": "Ascend, and do not look back", "sub": "Beyond the ninth heaven, alone", "kind": "bitter", "face": "sorrow",
+		"desc": "A bitter end. You have belonged to the wide world at every crossroads, and the world has one more door in it. Go up through the ninth heaven to wherever the old immortals went, from which no letter has ever come down.",
+		"needs": [["lean", "reach", 1]], "sky": Color(0.8, 0.86, 1.0), "hearth": false,
+		"lines": [["Narrator", "Lin Feng goes up. Past the cloud sea, past the Gate, past the place where the Court's lamps used to be, to a shore the colour of the inside of a shell, where nothing is wrong and nobody asks whether he has eaten."],
+			["Narrator", "On Azure Cloud Mountain a bowl is set out for him at every New Year, and Auntie Zhou turns it over herself when the night is done. Yue Ling waits by the lotus pond for one year exactly. Then she ties up her hair and takes the road, and does not say where."],
+			["Narrator", "They call it ascension in the books. The sweepers of the sect, who are taught the story in their first week, are told what the Elder called it: the day the mountain lost a broom."]]},
+	"throne": {"n": "The Jade Throne", "label": "Take the empty seat", "sub": "Somebody must keep the ledger", "kind": "dark", "face": "anger",
+		"desc": "A dark end. You have been unbending, and you belong to no hearth. The seat of the Heavenly Court is empty, the Ledger of Fates is shut, and the world is full of people doing as they please. Sit down. Open the book. It will only be until things are in order.",
+		"needs": [["lean", "heart", -1], ["lean", "reach", 1]], "sky": Color(1.0, 0.78, 0.62), "hearth": false,
+		"lines": [["Narrator", "Lin Feng sits down in the Jade Emperor's seat, which fits. The Ledger of Fates opens at a clean page, and he writes in it, the first evening, only what is fair: who is to have rain, and which robber is to be caught on which road."],
+			["Narrator", "It is all quite fair. That is the horror of it. In a hundred years there is a Court again, with lamps and registrars and a Lightning Magistrate, and a rule about ascending without leave, and on Azure Cloud Mountain the disciples lower their voices when they sweep."],
+			["Narrator", "And somewhere below, in a village at the foot of some other mountain, an orphan with an odd root in him looks up at the red light in the sky, and picks up a broom."]]},
+	"blade": {"n": "The Blade That Would Not Sheathe", "label": "Go looking for an equal", "sub": "The weapon chooses the road now", "kind": "dark", "face": "resolve",
+		"desc": "A dark end. Two Daos of arms mastered, and no mercy learned beside them. There is nobody left in three realms who can stand before you for the length of a breath. The hand wants to know whether that is true. Go and find out.",
+		"needs": [["masters", 2], ["lean", "heart", -1]], "sky": Color(0.86, 0.84, 0.92), "hearth": false,
+		"lines": [["Narrator", "Lin Feng goes down the mountain with eight weapons on his back, to find somebody worth the drawing of one. He finds a great many people who are not. He is very courteous about it, and leaves them alive, mostly."],
+			["Narrator", "Yue Ling follows as far as the crossroads below Qingshi, and there she stops, and he does not notice for three days. In the tea-houses they tell of a swordsman who comes at dusk, asks who is the best hand in the town, and looks so tired when he is told."],
+			["Narrator", "Zhuangzi said the sword of the common man cuts throats in front and livers behind, and that its user is no different from a fighting cock. He said it to a king, and the king stayed in his palace for three months. Nobody has yet got near enough to this one to say it."]]},
+	"engine": {"n": "The Wheel That Never Stops", "label": "Let the works keep it", "sub": "A sky held up by machinery", "kind": "dark", "face": "calm",
+		"desc": "A dark end. Nine works built, and the new ways chosen at every crossroads. A sky held up by a person falls when the person tires. Build the last work: an engine under the mountain to hold it for you, for everybody, for ever, and never need anybody to sit up with it again.",
+		"needs": [["works", 9], ["lean", "craft", 1]], "sky": Color(0.84, 0.9, 0.86), "hearth": false,
+		"lines": [["Narrator", "Under Azure Cloud Mountain a wheel is set turning that does not stop at night, and the sky is hung from it on five chains. It works. It works perfectly. Nobody has had to hold anything up since, and the hearths of the land are lit by a spark that comes down a wire."],
+			["Narrator", "Nobody sits up with a fire that cannot go out. Granny Wen's kitchen is warm and empty. The children of Tushan have never seen a casting, and the gardener of Hanyin was right, and is dead, and his pitcher is in a case."],
+			["Narrator", "Lin Feng goes down to the wheel every morning to see that it is turning. It always is. He sweeps round it, for something to do."]]},
+	"cold": {"n": "The Cold Hearth", "label": "Hold it alone", "sub": "Nobody was asked, and nobody came", "kind": "dark", "face": "sorrow",
+		"desc": "A dark end. No hearth but your own knows your name, and the one who walked beside you hardly knows you. The sky is held, and that was the task. Stand under it. There is nobody to tell.",
+		"needs": [["alone"]], "sky": Color(0.72, 0.78, 0.9), "hearth": false,
+		"lines": [["Narrator", "The sky is held. It is held by one person, on a peak with snow on it, who came up the whole road without sitting down at anybody's table, and so has nobody's table to go down to."],
+			["Narrator", "In the valleys they know that the sky stopped falling, as they know that the river rose once and went down again. They do not know who. Yue Ling brings rice up the mountain for a while. The fire it is cooked on is the only one he ever kept, and he lets it go out between her visits."]]},
 }
-const ENDING_ORDER := ["azure", "home", "road", "open", "lotus"]
+const ENDING_ORDER := ["azure", "home", "road", "open", "lotus", "school", "broom", "far", "throne", "blade", "engine", "cold"]
+const ENDING_KINDS := {"bright": "a bright end", "bitter": "a bitter end", "dark": "a dark end"}
 
 # ---------------------------------------------------------------- lookups
 ## The hearth a region belongs to ("" for the wild places and the other realms).
@@ -429,6 +475,17 @@ static func ending_need_met(n: Array, g) -> bool:
 			return Trials.friends(g) >= int(n[1])
 		"heart":
 			return Bonds.level(g) >= int(n[1])
+		# ---- the Hundred Arms release
+		"arms":
+			return Arms.adept(g) >= int(n[1])
+		"masters":
+			return Arms.masters(g) >= int(n[1])
+		"lean":
+			return Echoes.lean(g, str(n[1])) == int(n[2])
+		"works":
+			return Works.count(g) >= int(n[1])
+		"alone":
+			return guests(g) <= 1 and Bonds.level(g) <= 1
 	return false
 
 static func ending_need_text(n: Array, g) -> String:
@@ -439,6 +496,17 @@ static func ending_need_text(n: Array, g) -> String:
 			return "%d peoples of the realms that call you friend (yours: %d)" % [int(n[1]), Trials.friends(g)]
 		"heart":
 			return "You and Yue Ling: %s at least (now %s)" % [Bonds.TITLES[int(n[1])], Bonds.title(g)]
+		"arms":
+			return "%d Daos of arms learned to Adept (yours: %d; Esc > Arms)" % [int(n[1]), Arms.adept(g)]
+		"masters":
+			return "%d Daos of arms mastered (yours: %d)" % [int(n[1]), Arms.masters(g)]
+		"lean":
+			var sc: Dictionary = Echoes.SCALES[str(n[1])]
+			return "Known at the crossroads as %s (you: %s)" % [str(sc.pos if int(n[2]) > 0 else sc.neg), Echoes.name_of(g, str(n[1])) if Echoes.lean(g, str(n[1])) != 0 else "neither"]
+		"works":
+			return "%d works built (yours: %d)" % [int(n[1]), Works.count(g)]
+		"alone":
+			return "A guest at no hearth but your own, and a stranger still to Yue Ling (hearths: %d; she calls you %s)" % [guests(g), Bonds.title(g)]
 	return ""
 
 static func ending_open(id: String, g) -> bool:
@@ -462,5 +530,11 @@ static func ending_lines(g) -> Array:
 	var home := str(HEARTHS[own(g)].home)
 	for ln in ENDINGS[ending_of(g)].lines:
 		out.append([str(ln[0]), str(ln[1]).replace("%home%", home)])
-	out.append_array(HEARTHS[own(g)].ending)
+	# (a dark end is not followed by the kind word the hero's own hearth had ready)
+	if ENDINGS[ending_of(g)].get("hearth", true):
+		out.append_array(HEARTHS[own(g)].ending)
 	return out
+
+## "bright", "bitter" or "dark": what kind of end the one chosen is.
+static func ending_kind(g) -> String:
+	return str(ENDINGS[ending_of(g)].get("kind", "bright"))

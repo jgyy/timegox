@@ -28,8 +28,8 @@ import sys
 
 ART = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(ART)
-GROUPS = ("characters", "monsters", "mounts", "props")
-BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "mounts": (3000, 90000), "props": (200, 5000)}
+GROUPS = ("characters", "monsters", "mounts", "props", "weapons")
+BUDGET = {"characters": (5000, 50000), "monsters": (3000, 90000), "mounts": (3000, 90000), "props": (200, 5000), "weapons": (300, 3000)}
 # one-off set pieces shown once (ending screen), not scattered across maps
 SET_PIECES = {"props/magpiebridge": (2000, 24000)}
 PERSON_BONES = ("hips", "chest", "neck", "head", "eyes", "mouth", "hand.L", "hand.R", "fingers.L", "fingers.R",
@@ -120,7 +120,7 @@ def check_asset(group, name, path):
     tris = triangles(js)
     if not lo <= tris <= hi:
         problems.append("%s: %d triangles, budget %d-%d" % (tag, tris, lo, hi))
-    if group == "props":
+    if group in ("props", "weapons"):
         return problems
     skins = js.get("skins", [])
     if not skins:

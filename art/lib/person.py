@@ -63,9 +63,11 @@ def make_rig(o=None):
     r.bone("neck", (0, 1.47, 0.0), (0, 1.56, 0.01), "chest")
     r.bone("head", (0, 1.56, 0.01), (0, 1.88, 0.0), "neck")
     ey = facelib.HC.y + facelib.eye_y_of(o)
-    r.bone("eyes", (0, ey, 0.08), (0, ey + 0.05, 0.08), "head")
+    # the bones of expression (face.py: brows, corners of the mouth, lids and jaw), posed at runtime
+    facelib.expression_bones(r, o)
+    r.bone("eyes", (0, ey, 0.08), (0, ey + 0.05, 0.08), "lids")
     mouth_y = facelib.HC.y + facelib.MOUTH_Y
-    r.bone("mouth", (0, mouth_y + 0.001, 0.09), (0, mouth_y + 0.03, 0.09), "head")
+    r.bone("mouth", (0, mouth_y + 0.001, 0.09), (0, mouth_y + 0.03, 0.09), "jaw")
     r.bone("hair_tail", (0, 1.78, -0.1), (0, 1.4, -0.18), "head")
     r.bone("hair_tail2", (0, 1.4, -0.18), (0, 1.05, -0.2), "hair_tail")
     for s, sd in ((1, "L"), (-1, "R")):
@@ -216,7 +218,8 @@ def build(o):
     if o.get("armor", False):
         G.armour(b, o, tor, metal)
     hand_r = WRI * V(-1, 1, 1) + V(-0.004, -0.075, 0.02)
-    if o.get("sword", False):
+    # (the hero's blade is one of the Eight Arms, hung on the sword bone by the game: "arms")
+    if o.get("sword", False) and not o.get("arms", False):
         G.sword(b, "sword", hand_r, rgb(o.get("blade", "dce8ff")), rgb(o.get("hilt", "3a3048")))
         G.scabbard(b, rgb(o.get("scabbard", "2a2a40")))
     if o.get("staff", False):
@@ -260,8 +263,8 @@ def build(o):
     hk = o.get("head_scale", 1.0 if o.get("beast_head") is not None else (1.13 if o.get("fem") else 1.08))
     if hk != 1.0:
         pivot = V(0, 1.58, 0.0)
-        b.scale_where(lambda w: w.get("head", 0.0) + w.get("eyes", 0.0) + w.get("mouth", 0.0) + w.get("hair_tail", 0.0) >= 0.5, pivot, hk)
-        for nm in ("eyes", "mouth", "hair_tail"):
+        b.scale_where(lambda w: sum(w.get(nm, 0.0) for nm in ("head", "eyes", "mouth", "hair_tail") + facelib.FACE_BONES) >= 0.5, pivot, hk)
+        for nm in ("eyes", "mouth", "hair_tail") + facelib.FACE_BONES:
             h0, t0, par = rig.bones[nm]
             rig.bones[nm] = (pivot + (V(h0) - pivot) * hk, pivot + (V(t0) - pivot) * hk, par)
         h0, t0, par = rig.bones["head"]
@@ -272,7 +275,7 @@ def build(o):
     # the head down to it rather than scale the head
     drop = o.get("neck_drop", NECK_DROP if o.get("beast_head") is None else 0.0)
     if drop != 0.0:
-        heads = ("head", "eyes", "mouth", "hair_tail", "hair_tail2")
+        heads = ("head", "eyes", "mouth", "hair_tail", "hair_tail2") + facelib.FACE_BONES
         b.shift_where(lambda w: min(1.0, sum(w.get(nm, 0.0) for nm in heads)), V(0, -drop, 0))
         for nm in heads:
             h0, t0, par = rig.bones[nm]
@@ -2964,12 +2967,180 @@ def clip_ride_stand(t):
     return _stow(p)
 
 
+# ---------------------------------------------------------------- the Eight Arms (the Hundred Arms release)
+# The hero carries one of eight weapons (art/lib/arms.py, scripts/arms.gd), hung on the sword bone, and
+# each is used in its own way: a clip for its plain blow ("arm_<id>") and one for the technique of its
+# Dao ("art_<id>").  They are written as a few held poses with the time each is reached; `_keyed`
+# eases from one to the next, lets cloth and hair lag behind, and turns the whole figure where a form
+# spins.  A pose names bones -> (x, y, z) Godot Euler angles as everywhere here, plus "loc" (the hips'
+# offset), "hands" (the curl of the left and right fingers) and "spin" (turns of the whole body).
+def _keyed(keys, secs):
+    keys = [(0.0, {})] + list(keys) + [(1.0, {})]
+
+    def clip(t):
+        k = clamp(t / secs)
+        i = 0
+        while i < len(keys) - 2 and k >= keys[i + 1][0]:
+            i += 1
+        k0, a = keys[i]
+        k1, c = keys[i + 1]
+        u = smooth(0.0, 1.0, (k - k0) / max(1e-6, k1 - k0))
+        # a blow lands fast and settles slowly
+        u = u * u * (3.0 - 2.0 * u) if c.get("fast") else u
+        p = _base_for_act()
+        e = env(k)
+        names = set(a) | set(c)
+        for nm in names:
+            if nm in ("fast",):
+                continue
+            va = a.get(nm, None)
+            vc = c.get(nm, None)
+            if nm == "hands":
+                va = va or (0.35, 1.1)
+                vc = vc or (0.35, 1.1)
+                _hands(p, va[0] + (vc[0] - va[0]) * u, va[1] + (vc[1] - va[1]) * u)
+                continue
+            if nm == "spin":
+                va = va or 0.0
+                vc = vc if vc is not None else va
+                p["root"] = ((0, 2.0 * math.pi * (va + (vc - va) * u), 0), (0, 0, 0))
+                continue
+            if nm == "loc":
+                va = va or (0.0, 0.0, 0.0)
+                vc = vc or (0.0, 0.0, 0.0)
+                rot = p.get("hips", ((0, 0, 0), (0, 0, 0)))[0]
+                p["hips"] = (rot, tuple(va[j] + (vc[j] - va[j]) * u for j in range(3)))
+                continue
+            va = va or (0.0, 0.0, 0.0)
+            vc = vc or (0.0, 0.0, 0.0)
+            rot = tuple(va[j] + (vc[j] - va[j]) * u for j in range(3))
+            loc = p.get(nm, ((0, 0, 0), (0, 0, 0)))[1] if nm == "hips" else (0, 0, 0)
+            p[nm] = (rot, loc)
+        if "hands" not in names:
+            _hands(p, 0.35, 1.1)
+        lx = p.get("thigh.L", ((0, 0, 0),))[0][0]
+        rx = p.get("thigh.R", ((0, 0, 0),))[0][0]
+        ax = p.get("upper_arm.R", ((0, 0, 0),))[0][0]
+        al = p.get("upper_arm.L", ((0, 0, 0),))[0][0]
+        root = p.get("root")
+        _secondary(p, t, False, False, (lx, rx), e, (0.25 * e + 1.2 * smooth(-0.6, -2.2, al), 0.25 * e + 1.2 * smooth(-0.6, -2.2, ax)))
+        if root is not None:
+            p["root"] = root
+            # cloth and hair stream out behind a turn
+            sp = math.sin(math.pi * clamp((k - k0) / max(1e-6, k1 - k0))) if (a.get("spin", 0.0) != c.get("spin", a.get("spin", 0.0))) else 0.0
+            for nm, amt in (("cape", 0.5), ("cape2", 0.3), ("hair_tail", 0.5), ("hair_tail2", 0.3), ("robe_b", 0.35)):
+                rot, loc = p[nm][0], p[nm][1]
+                p[nm] = ((rot[0] + amt * sp, rot[1], rot[2] + 0.3 * amt * sp), loc)
+        return p
+
+    return clip
+
+
+ARM_T = 0.7
+ART_T = 1.3
+
+# the lunge most blows end in: the left foot forward and bent, the right leg long behind
+_LUNGE = {"thigh.L": (-0.95, 0, 0.05), "shin.L": (0.95, 0, 0), "thigh.R": (0.5, 0, -0.05), "shin.R": (0.2, 0, 0), "foot.R": (0.35, 0, 0), "toe.R": (-0.4, 0, 0)}
+_SET = {"thigh.L": (-0.35, 0, 0.1), "shin.L": (0.5, 0, 0), "thigh.R": (-0.2, 0, -0.1), "shin.R": (0.5, 0, 0)}
+
+# the sabre: both hands take it up behind the head, and the whole weight comes down with it
+_SABRE_W = dict(_SET, **{"upper_arm.R": (-2.7, 0, -0.3), "forearm.R": (-0.9, 0, 0), "upper_arm.L": (-2.45, 0, 0.45), "forearm.L": (-1.1, 0, 0), "chest": (-0.22, 0.35, 0),
+                         "hips": (-0.05, 0.3, 0), "loc": (0, -0.05, -0.06), "head": (0.12, -0.3, 0), "hands": (1.0, 1.15)})
+_SABRE_H = dict(_LUNGE, **{"upper_arm.R": (-0.8, 0, 0.3), "forearm.R": (-0.15, 0, 0), "hand.R": (0.55, 0, 0), "upper_arm.L": (-0.85, 0, -0.3), "forearm.L": (-0.55, 0, 0),
+                           "chest": (0.42, -0.4, 0), "spine": (0.15, -0.2, 0), "hips": (0.15, -0.35, 0), "loc": (0, -0.14, 0.2), "head": (-0.2, 0.3, 0), "hands": (1.0, 1.15), "fast": True})
+# the spear: drawn back to the hip in both hands, then the whole body goes out along it
+_SPEAR_W = dict(_SET, **{"hips": (0, 0.75, 0), "loc": (0, -0.08, -0.06), "chest": (0.05, 0.35, 0), "head": (0, -0.9, 0), "upper_arm.R": (0.55, 0, -0.35), "forearm.R": (-1.5, 0, 0),
+                         "hand.R": (0.38, 0, 0), "upper_arm.L": (-1.05, -0.5, 0.1), "forearm.L": (-0.5, 0, 0), "hands": (0.9, 1.15)})
+_SPEAR_H = dict(_LUNGE, **{"hips": (0.1, -0.25, 0), "loc": (0, -0.15, 0.3), "chest": (0.25, -0.3, 0), "head": (-0.1, 0.4, 0), "upper_arm.R": (-1.4, 0, 0.1), "forearm.R": (-0.05, 0, 0),
+                           "hand.R": (0.2, 0, 0), "upper_arm.L": (-1.2, 0, -0.25), "forearm.L": (-0.45, 0, 0), "hands": (0.9, 1.15), "fast": True})
+# the staff: level, in both hands, swept from one side of the body right round to the other
+_STAFF_W = dict(_SET, **{"hips": (0, 0.9, 0), "loc": (0, -0.06, 0), "chest": (0, 0.5, 0), "head": (0, -1.1, 0), "upper_arm.R": (-0.9, 0, -1.1), "forearm.R": (-0.7, 0, 0),
+                         "upper_arm.L": (-1.2, 0, -0.6), "forearm.L": (-1.2, 0, 0), "hands": (1.0, 1.15)})
+_STAFF_H = {"hips": (0, -0.8, 0), "loc": (0, -0.1, 0.1), "chest": (0.1, -0.6, 0), "head": (0, 1.0, 0), "upper_arm.R": (-1.2, 0, 0.7), "forearm.R": (-0.3, 0, 0), "hand.R": (0.15, 0, 0),
+            "upper_arm.L": (-0.9, 0, 0.5), "forearm.L": (-1.0, 0, 0), "thigh.L": (-0.5, 0, 0.1), "shin.L": (0.6, 0, 0), "thigh.R": (0.3, 0, -0.1), "shin.R": (0.3, 0, 0), "hands": (1.0, 1.15), "fast": True}
+# the fan: closed across the body, then flicked open at arm's length, the other hand behind the back
+_FAN_BACK = {"upper_arm.L": (0.5, 0, 0.3), "forearm.L": (-1.25, 0, 0)}
+_FAN_W = dict(_FAN_BACK, **{"upper_arm.R": (-0.9, 0, 0.9), "forearm.R": (-1.6, 0, 0), "hand.R": (0, 0, 0.5), "chest": (0, 0.5, 0), "hips": (0, 0.3, 0), "loc": (0, 0.03, 0),
+                            "head": (0, -0.4, 0.1), "foot.L": (0.25, 0, 0), "foot.R": (0.25, 0, 0)})
+_FAN_H = dict(_FAN_BACK, **{"upper_arm.R": (-1.3, 0, -0.9), "forearm.R": (-0.15, 0, 0), "hand.R": (0.3, 0, -0.4), "chest": (0, -0.5, 0.05), "hips": (0, -0.3, 0), "loc": (0, 0, 0.1),
+                            "head": (0, 0.3, -0.1), "thigh.L": (-0.4, 0, 0), "shin.L": (0.3, 0, 0), "fast": True})
+# the bow: side on, the bow arm out along the line of the shot, the string hand drawn to the ear, loosed
+_BOW_UP = {"hips": (0, 0.8, 0), "chest": (0, 0.4, 0), "head": (0, -1.1, 0), "upper_arm.R": (0, 0, -1.5), "hand.R": (0, 0, 0), "upper_arm.L": (-0.2, 0, -1.35), "forearm.L": (-0.3, 0, 0),
+           "thigh.L": (0, 0, 0.2), "thigh.R": (0, 0, -0.2), "hands": (0.9, 1.15)}
+_BOW_DRAW = dict(_BOW_UP, **{"chest": (-0.08, 0.5, 0), "upper_arm.L": (-0.15, 0, -1.2), "forearm.L": (-2.2, 0, 0), "hands": (1.1, 1.15)})
+_BOW_LOOSE = dict(_BOW_UP, **{"chest": (-0.05, 0.55, 0), "upper_arm.L": (0, 0, 0.75), "forearm.L": (-0.9, 0, 0), "hands": (0.05, 1.15), "fast": True})
+# the chain whip: whirled once overhead, and thrown out to its full length
+_WHIP_W = {"upper_arm.R": (-2.8, 0, -0.6), "forearm.R": (-1.2, 0, 0), "hand.R": (-0.5, 0, 0), "chest": (-0.15, 0.4, 0), "hips": (0, 0.3, 0), "upper_arm.L": (-0.6, 0, 0.7),
+           "forearm.L": (-0.5, 0, 0), "head": (0.05, -0.3, 0)}
+_WHIP_H = {"upper_arm.R": (-1.2, 0, 0.3), "forearm.R": (-0.1, 0, 0), "hand.R": (0.38, 0, 0), "chest": (0.3, -0.45, 0), "hips": (0.05, -0.3, 0), "loc": (0, -0.05, 0.15),
+           "upper_arm.L": (0.4, 0, 0.5), "forearm.L": (-0.4, 0, 0), "thigh.L": (-0.6, 0, 0), "shin.L": (0.6, 0, 0), "thigh.R": (0.35, 0, 0), "head": (-0.1, 0.3, 0), "fast": True}
+# the judge's brush: written with, not struck with: a dot, a lift and a second dot, the off hand at the back
+_BRUSH_BACK = {"upper_arm.L": (0.45, 0, 0.25), "forearm.L": (-1.3, 0, 0)}
+_BRUSH_UP = dict(_BRUSH_BACK, **{"upper_arm.R": (-1.2, 0, -0.4), "forearm.R": (-1.3, 0, 0), "hand.R": (0.15, 0, 0), "chest": (0, 0.2, 0)})
+_BRUSH_DOT = dict(_BRUSH_BACK, **{"upper_arm.R": (-1.5, 0, 0.1), "forearm.R": (-0.1, 0, 0), "hand.R": (0.23, 0, 0), "loc": (0, -0.04, 0.12), "thigh.L": (-0.5, 0, 0), "shin.L": (0.5, 0, 0),
+                                  "chest": (0.1, -0.2, 0), "fast": True})
+_BRUSH_DOT2 = dict(_BRUSH_DOT, **{"upper_arm.R": (-1.2, 0, 0.45), "forearm.R": (-0.2, 0, 0), "hand.R": (0.38, 0, 0), "chest": (0.2, -0.35, 0)})
+
+
+def _but(pose, **kw):
+    return dict(pose, **kw)
+
+
+ARMS = {
+    "arm_sabre": (ARM_T, _keyed([(0.32, _SABRE_W), (0.5, _SABRE_H), (0.72, _SABRE_H)], ARM_T)),
+    "arm_spear": (ARM_T, _keyed([(0.32, _SPEAR_W), (0.48, _SPEAR_H), (0.7, _SPEAR_H)], ARM_T)),
+    "arm_staff": (ARM_T, _keyed([(0.3, _STAFF_W), (0.52, _STAFF_H), (0.72, _STAFF_H)], ARM_T)),
+    "arm_fan": (ARM_T, _keyed([(0.3, _FAN_W), (0.46, _FAN_H), (0.72, _FAN_H)], ARM_T)),
+    "arm_bow": (ARM_T + 0.2, _keyed([(0.2, _BOW_UP), (0.55, _BOW_DRAW), (0.63, _BOW_LOOSE), (0.82, _BOW_LOOSE)], ARM_T + 0.2)),
+    "arm_whip": (ARM_T, _keyed([(0.36, _WHIP_W), (0.54, _WHIP_H), (0.74, _WHIP_H)], ARM_T)),
+    "arm_brush": (ARM_T + 0.1, _keyed([(0.2, _BRUSH_UP), (0.34, _BRUSH_DOT), (0.5, _BRUSH_UP), (0.64, _BRUSH_DOT2), (0.8, _BRUSH_DOT2)], ARM_T + 0.1)),
+    # ---- the technique of each weapon's Dao
+    # One Line: the jian drawn back along the forearm, and then nothing is out of line from heel to point
+    "art_jian": (ART_T, _keyed([
+        (0.28, dict(_SET, **{"hips": (0, 0.6, 0), "loc": (0, -0.12, -0.1), "chest": (0, 0.3, 0), "head": (0, -0.8, 0), "upper_arm.R": (0.4, 0, -0.3), "forearm.R": (-1.6, 0, 0),
+                             "hand.R": (0.18, 0, 0), "upper_arm.L": (-1.3, 0, -0.2), "forearm.L": (-0.2, 0, 0), "hands": (0.1, 1.15)})),
+        (0.5, dict(_LUNGE, **{"hips": (0.2, -0.3, 0), "loc": (0, 0.08, 0.5), "chest": (0.3, -0.3, 0), "head": (-0.3, 0.4, 0), "upper_arm.R": (-1.5, 0, 0.05), "forearm.R": (0, 0, 0),
+                              "hand.R": (0.2, 0, 0), "upper_arm.L": (0.9, 0, 0.3), "forearm.L": (-0.1, 0, 0), "hands": (0.1, 1.15), "fast": True})),
+        (0.78, dict(_LUNGE, **{"hips": (0.2, -0.3, 0), "loc": (0, -0.14, 0.42), "chest": (0.3, -0.3, 0), "head": (-0.3, 0.4, 0), "upper_arm.R": (-1.5, 0, 0.05), "hand.R": (0.2, 0, 0),
+                               "upper_arm.L": (0.9, 0, 0.3), "hands": (0.1, 1.15)}))], ART_T)),
+    # The Tiger Comes Down the Mountain: one whole turn to gather the weight, and the chop
+    "art_sabre": (ART_T, _keyed([(0.18, _but(_SABRE_W, spin=0.0)), (0.52, _but(_SABRE_W, spin=1.0, loc=(0, 0.16, 0.1))), (0.66, _but(_SABRE_H, spin=1.0)), (0.84, _but(_SABRE_H, spin=1.0))], ART_T)),
+    # The Dragon Leaves the Sea: down on one knee with the point trailing, and up through the guard
+    "art_spear": (ART_T, _keyed([
+        (0.3, _but(_SPEAR_W, loc=(0, -0.42, -0.1), **{"thigh.L": (-1.3, 0, 0.1), "shin.L": (1.5, 0, 0), "thigh.R": (-0.2, 0, -0.1), "shin.R": (1.6, 0, 0)})),
+        (0.5, _but(_SPEAR_H, loc=(0, 0.22, 0.35), **{"upper_arm.R": (-2.1, 0, 0.1), "upper_arm.L": (-1.8, 0, -0.25), "chest": (-0.1, -0.3, 0), "head": (-0.45, 0.4, 0)})),
+        (0.76, _but(_SPEAR_H, **{"upper_arm.R": (-1.75, 0, 0.1), "upper_arm.L": (-1.5, 0, -0.25)}))], ART_T)),
+    # Sweeping the Thousand: the staff held level and the sweeper turning under it, twice
+    "art_staff": (ART_T, _keyed([(0.14, _but(_STAFF_W, spin=0.0)), (0.72, _but(_STAFF_H, spin=2.0, fast=False)), (0.86, _but(_STAFF_H, spin=2.0, loc=(0, -0.2, 0.15)))], ART_T)),
+    # The Wind Unfolds: a turn on the toes with the fan out, and the flick that sends the wind off it
+    "art_fan": (ART_T, _keyed([(0.16, _but(_FAN_W, spin=0.0)), (0.56, _but(_FAN_H, spin=1.0, loc=(0, 0.06, 0.0), fast=False)),
+                               (0.68, _but(_FAN_W, spin=1.0)), (0.8, _but(_FAN_H, spin=1.0)), (0.9, _but(_FAN_H, spin=1.0))], ART_T)),
+    # The Shot Not Shot: kneeling, a long draw held until the breath is out, and the string let go
+    "art_bow": (ART_T, _keyed([
+        (0.2, _but(_BOW_UP, loc=(0, -0.4, 0), **{"thigh.L": (-1.4, 0, 0.2), "shin.L": (1.5, 0, 0), "thigh.R": (0.1, 0, -0.2), "shin.R": (1.5, 0, 0)})),
+        (0.42, _but(_BOW_DRAW, loc=(0, -0.4, 0), **{"thigh.L": (-1.4, 0, 0.2), "shin.L": (1.5, 0, 0), "thigh.R": (0.1, 0, -0.2), "shin.R": (1.5, 0, 0)})),
+        (0.7, _but(_BOW_DRAW, loc=(0, -0.4, 0), **{"chest": (-0.12, 0.55, 0), "thigh.L": (-1.4, 0, 0.2), "shin.L": (1.5, 0, 0), "thigh.R": (0.1, 0, -0.2), "shin.R": (1.5, 0, 0)})),
+        (0.76, _but(_BOW_LOOSE, loc=(0, -0.4, 0), **{"thigh.L": (-1.4, 0, 0.2), "shin.L": (1.5, 0, 0), "thigh.R": (0.1, 0, -0.2), "shin.R": (1.5, 0, 0)})),
+        (0.9, _but(_BOW_LOOSE, loc=(0, -0.4, 0), **{"thigh.L": (-1.4, 0, 0.2), "shin.L": (1.5, 0, 0), "thigh.R": (0.1, 0, -0.2), "shin.R": (1.5, 0, 0)}))], ART_T)),
+    # Nine Bends: the chain whirled round a turning body, and let out at the last
+    "art_whip": (ART_T, _keyed([(0.16, _but(_WHIP_W, spin=0.0)), (0.6, _but(_WHIP_W, spin=1.0, hips=(0, -0.3, 0), chest=(-0.15, -0.4, 0))), (0.72, _but(_WHIP_H, spin=1.0)), (0.88, _but(_WHIP_H, spin=1.0))], ART_T)),
+    # One Stroke: the character for "one", written in the air from left to right at full arm, and its dot
+    "art_brush": (ART_T, _keyed([
+        (0.2, dict(_BRUSH_BACK, **{"upper_arm.R": (-1.75, 0, 0.75), "forearm.R": (-0.5, 0, 0), "hand.R": (0.15, 0, 0), "chest": (-0.1, 0.45, 0), "head": (-0.15, -0.3, 0), "loc": (0, 0.03, 0)})),
+        (0.5, dict(_BRUSH_BACK, **{"upper_arm.R": (-1.55, 0, -1.0), "forearm.R": (-0.1, 0, 0), "hand.R": (0.15, 0, 0), "chest": (0.05, -0.5, 0), "head": (0, 0.35, 0), "loc": (0, -0.05, 0.08),
+                                   "thigh.L": (-0.3, 0, 0.15), "thigh.R": (0, 0, -0.2)})),
+        (0.62, _BRUSH_UP), (0.72, _BRUSH_DOT), (0.88, _BRUSH_DOT)], ART_T)),
+}
+
+
 RIDE = {
     "ride": (RIDE_T, clip_ride),
     "ride_idle": (RIDE_IDLE_T, clip_ride_idle),
     "ride_stand": (RIDE_STAND_T, clip_ride_stand),
 }
-HERO_CLIPS = dict(CLIPS, **INTERACT, **RIDE)
+PARTY_CLIPS = dict(CLIPS, **INTERACT, **RIDE)
+# (only the hero bears arms: Yue Ling keeps to her needle)
+HERO_CLIPS = dict(PARTY_CLIPS, **ARMS)
 
 
 def _with_posture(fn, age):

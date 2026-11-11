@@ -554,7 +554,7 @@ func _init() -> void:
 		check(Look.THEMES.has(a10) and Look.EXTRA.has(a10) and Scatter.ECO.has(a10) and Fauna.KINDS.has(a10) and MapGen.DENSITY.has(a10) and Arch.SETTLE.has(a10), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a10)
 		# (the keepsakes and caches upstairs and in cellars, Part XI, are not what the quest asks for)
 		# (Part XIII's Gate Generals only visit, `vis`: they are not the region's own)
-		check(Data.AREAS[a10].bosses.filter(func(b): return not b.has("vis")).size() == 5 and Data.AREAS[a10].pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave")).size() == 4, a10 + ": five bosses and four things to find")
+		check(Data.AREAS[a10].bosses.filter(func(b): return not b.has("vis")).size() == 5 and Data.AREAS[a10].pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave") and not pk.get("late", false)).size() == 4, a10 + ": five bosses and four things to find")
 		var lm10: Dictionary = Atlas.layout()[a10]
 		check(int(lm10.site.y) < int(Atlas.layout()[Atlas.HUB].site.y), a10 + " lies north of the mountain, up the river road")
 	for st10 in ["s_p10_archive", "s_p10_road", "s_dg_intro", "s_df_intro", "s_ts_intro", "s_bz_intro"]:
@@ -586,7 +586,7 @@ func _init() -> void:
 	for a11 in p11:
 		var sp11: Dictionary = Data.AREAS[a11]
 		check(Look.THEMES.has(sp11.theme) and Look.EXTRA.has(sp11.theme) and Scatter.ECO.has(sp11.theme) and Fauna.KINDS.has(sp11.theme) and MapGen.DENSITY.has(sp11.theme) and Arch.SETTLE.has(sp11.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a11)
-		check(sp11.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave")).size() == 4, a11 + ": four bosses and four things to find")
+		check(sp11.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp11.pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave") and not pk.get("late", false)).size() == 4, a11 + ": four bosses and four things to find")
 		check(Data.layer_of(a11) in ["heaven", "under"], a11 + " lies in a realm above or below the land")
 		for n11 in sp11.npcs:
 			if n11.get("fate", false):
@@ -783,7 +783,7 @@ func _init() -> void:
 		var sp12: Dictionary = Data.AREAS[a12]
 		check(Data.layer_of(a12) == "sea" and Atlas.STRATA.sea.sites.has(a12), a12 + " lies in the Eastern Sea")
 		check(Look.THEMES.has(sp12.theme) and Look.EXTRA.has(sp12.theme) and Scatter.ECO.has(sp12.theme) and Fauna.KINDS.has(sp12.theme) and MapGen.DENSITY.has(sp12.theme) and Arch.SETTLE.has(sp12.theme), "theme, terrain extras, ecology, wildlife, density and dwellings for " + a12)
-		check(sp12.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave")).size() == 4, a12 + ": four bosses and four things to find")
+		check(sp12.bosses.filter(func(b): return not b.has("vis")).size() == 4 and sp12.pickups.filter(func(pk): return not pk.get("always", false) and not pk.has("cave") and not pk.get("late", false)).size() == 4, a12 + ": four bosses and four things to find")
 		for n12 in sp12.npcs:
 			if n12.get("fate", false):
 				continue
@@ -876,7 +876,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -945,6 +945,9 @@ func _init() -> void:
 						# the Hollow Hills release: caves there are to go to the back of (caves.gd), and no more
 						# than a fifth of them asked for
 						ok = ok and int(n[1]) >= 1 and int(n[1]) * 5 <= n_caves
+					"arms":
+						# the Hundred Arms release: Daos of arms there are to learn (arms.gd), and never all eight asked for
+						ok = ok and int(n[1]) >= 1 and int(n[1]) < Arms.ORDER.size()
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1097,7 +1100,7 @@ func _init() -> void:
 		var marching: Array = mw.ents.filter(func(e6): return e6.kind == "enemy" and e6.get("vis", ["", ""])[0] == str(band.vis) and str(e6.get("area", a6)) == a6)
 		check(marching.size() == int(band.n), "%s: %d war-band packs placed" % [a6, marching.size()])
 	var p13_bands := Data.AREAS.keys().filter(func(a7): return str(Data.AREAS[a7].get("warband", {}).get("vis", "")) == "s_p13_home").size()
-	check(p13_bands == 8 and bands == 26, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, Part XVII's cold in Frostpeak and poisons in the millet, Part XVIII's damp at Longmen, and Part XIX's mites at Qingshi, engines at Tushan, strays in the dunes, counters in Heaven's Forge, looms in the Silkworm Woods and kites over the Sea of Clouds, cinders on the volcano and wildfire on the mountain, and Part XX's burrowers on the pasture below Thunder Valley and what came out of the karst's caves" % p13_bands)
+	check(p13_bands == 8 and bands == 29, "the war-bands march in every gate's region, the heart's among them (%d), Part XIV's grudges round the Wheel, Part XV's moths among the graves, Part XVI's hunger on the terraces, moths in the market and Nian's cubs in the bamboo, Part XVII's cold in Frostpeak and poisons in the millet, Part XVIII's damp at Longmen, and Part XIX's mites at Qingshi, engines at Tushan, strays in the dunes, counters in Heaven's Forge, looms in the Silkworm Woods and kites over the Sea of Clouds, cinders on the volcano and wildfire on the mountain, and Part XX's burrowers on the pasture below Thunder Valley and what came out of the karst's caves" % p13_bands)
 	check(Data.ITEMS.has("homing_elixir") and Trials.RECIPES.homing_elixir.in.has("autumn_leaf"), "the Road of the Cauldron needs an elixir made with an autumn leaf, from Chiyou's own maples")
 	# the Conclave's invitations: any four of eight leaders, in any order
 	var visits_steps := 0
@@ -1113,7 +1116,7 @@ func _init() -> void:
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -1758,6 +1761,7 @@ func _fates_and_faces() -> void:
 	_new_fire()
 	_hundred_works()
 	_hollow_hills()
+	_hundred_arms()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -2526,14 +2530,15 @@ func _new_fire() -> void:
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	check(UI.named("Lin Feng lifts his broom.") == "Lin Feng lifts his broom.", "and the story's own sweeper is told as he was written")
 	print("== the ends of the story (cultures.gd) ==")
-	check(Cultures.ENDING_ORDER.size() == 5 and Cultures.ENDINGS.size() == 5, "five ends")
+	check(Cultures.ENDING_ORDER.size() == 12 and Cultures.ENDINGS.size() == 12, "twelve ends: the five of the New Fire, and seven more that are not all kept by a fire")
 	HG.reset()
-	check(Cultures.endings_open(HG) == ["azure", "home"] and Cultures.ending_of(HG) == "azure", "the mountain and the way home are always open; the others are earned")
+	# (somebody who has sat at nobody's table and hardly knows the one beside him may also hold the sky alone)
+	check(Cultures.endings_open(HG) == ["azure", "home", "cold"] and Cultures.ending_of(HG) == "azure", "the mountain and the way home are always open; the others are earned (and the cold hearth is what nothing earns)")
 	for eid in Cultures.ENDING_ORDER:
 		var en: Dictionary = Cultures.ENDINGS[eid]
 		check(str(en.n) != "" and str(en.label) != "" and str(en.desc).length() > 60 and (en.lines as Array).size() >= 2 and en.sky is Color, "the ending %s has a name, a choice, and its own last words" % eid)
 		for nd in en.needs:
-			check(str(nd[0]) in ["home", "guests", "peoples", "heart"] and (str(nd[0]) == "home" or Cultures.ending_need_text(nd, HG) != ""), "%s: what it asks is something the journey can earn" % eid)
+			check(str(nd[0]) in ["home", "guests", "peoples", "heart", "arms", "masters", "lean", "works", "alone"] and (str(nd[0]) == "home" or Cultures.ending_need_text(nd, HG) != ""), "%s: what it asks is something the journey can earn" % eid)
 	for hid4 in ["steppe", "sand", "river", "forge"]:
 		Cultures.earn(HG, hid4, Cultures.GUEST)
 	check(Cultures.ending_open("road", HG) and not Cultures.ending_open("open", HG), "five hearths open the road; the open door wants the peoples of the realms as well")
@@ -2751,7 +2756,8 @@ func _hundred_works() -> void:
 			if Data.step_index(who) >= 0:
 				return Data.step_index(who)
 			return _kill_step(who)
-		if key.begins_with("done:"):
+		if key.begins_with("done:") or key.begins_with("visit:"):
+			# (a call paid on somebody for a step of visits is heard during that step)
 			return Data.step_index(key.get_slice(":", 1))
 		return Data.step_index(key)
 	for cid in Echoes.ORDER:
@@ -2801,7 +2807,7 @@ func _hundred_works() -> void:
 	Echoes.take(HWG, "bandits", "drive")
 	check(Echoes.chosen(HWG, "bandits") == "mend" and Echoes.scale(HWG, "heart") == 2, "a crossroads is answered once")
 	var gw: Array = Echoes.told(HWG, "s_vl_intro", Data.DIALOGUE.s_vl_intro)
-	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 2],
+	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 3],
 		"six parts later Granny Wen speaks of the road-menders, and the echo is kept")
 	check(Echoes.told(HWG, "s_intro", Data.DIALOGUE.s_intro) == Data.DIALOGUE.s_intro, "a conversation with no crossroads behind it is as it was")
 	check(not Echoes.merciful(HWG), "one kindness is not yet a name")
@@ -2818,7 +2824,7 @@ func _hundred_works() -> void:
 	check(Echoes.lean(HWG, "craft") == 1 and Echoes.lean_mod(HWG, "works_stones") == Echoes.WORKS_STONES and Works.cost_stones(HWG, "wooden_ox") < int(Works.TIER_STONES[5]), "of the new works: the makers ask less")
 	Echoes.take(HWG, "cauldron_map", "keep")
 	check(Echoes.lean(HWG, "reach") == -1 and Echoes.lean_mod(HWG, "renown") == float(Echoes.RENOWN_MORE) and Echoes.lean_mod(HWG, "regard") == 1.0, "of the home fire: his name comes back larger")
-	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 2") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
+	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 3") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
 	# the last question of Part XIX can only be answered for a school by somebody who has built three works of it
 	HWG.works = {}
 	var lastq: Dictionary = Echoes.CROSSROADS.the_works
@@ -3172,11 +3178,11 @@ func _hollow_hills() -> void:
 	check(Props.KINDS.size() >= 82, "eighty-two things to do in the world, twenty-six of them new (%d)" % Props.KINDS.size())
 	check(FileAccess.get_file_as_string("res://art/lib/face.py").contains("EYE_K = 0.86"), "every eye is a little larger (art/lib/face.py)")
 	print("== Part XX: the Hollow Hills ==")
-	check(Data.REALMS.size() == 26 and Data.REALMS[25] == "Hollow Vessel" and Data.MAX_LEVEL == 75 and Data.level_name(75).ends_with("Hollow Vessel") and Data.REALM_INFO.size() == 26 and Data.EXP_NEED.size() == Data.MAX_LEVEL
+	check(Data.REALMS.size() >= 26 and Data.REALMS[25] == "Hollow Vessel" and Data.MAX_LEVEL >= 75 and Data.level_name(75).ends_with("Hollow Vessel") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL
 		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XX adds the Hollow Vessel realm")
 	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break25" and Data.DIALOGUE.has("recall18") and msrc.contains("\"s_break24\": \"recall18\"") and Data.DIALOGUE.has("pre:s_break25") and Data.DIALOGUE.has("post:s_break25"),
-		"Part XX follows Skill Become Dao (recall18) and ends the game")
+	check(Data.step_index("s_break25") == Data.step_index("s_p21_home") - 1 and Data.DIALOGUE.has("recall18") and msrc.contains("\"s_break24\": \"recall18\"") and Data.DIALOGUE.has("pre:s_break25") and Data.DIALOGUE.has("post:s_break25"),
+		"Part XX follows Skill Become Dao (recall18) and ends with a tribulation that finds nothing to fill")
 	for tid in ["fen_yang", "white_rat", "wangliang", "xuanpin"]:
 		check(Trials.TRIALS.has(tid) and Lore.BOSS.has(tid) and Data.DIALOGUE.has("pre:" + tid) and Data.DIALOGUE.has("post:" + tid), "%s is a trial, with a story and words before and after" % tid)
 		check((Trials.TRIALS[tid].paths as Array).any(func(pth): return str(pth.kind) == "delve"), "%s can be passed by the dark" % tid)
@@ -3237,3 +3243,222 @@ func _has_word(s: String, words: Array) -> bool:
 	var r := RegEx.new()
 	r.compile("(?i)\\b(" + "|".join(words) + ")\\b")
 	return r.search(s) != null
+
+
+## The Hundred Arms release: faces that show what they feel (faces.gd), the Eight Arms and the Dao of
+## each (arms.gd), twelve ends of the story, bright, bitter and dark (cultures.gd), and Part XXI.
+func _hundred_arms() -> void:
+	print("== faces (faces.gd) ==")
+	check(Faces.ORDER.size() == 14 and Faces.EXPRESSIONS.size() == Faces.ORDER.size(), "fourteen faces (%d)" % Faces.ORDER.size())
+	var calm := Faces.vector_of("calm")
+	var differ := true
+	for fid in Faces.ORDER:
+		check(Faces.EXPRESSIONS.has(fid) and Faces.vector_of(fid).size() == 13, "the face %s is a pose of the six bones" % fid)
+		for other in Faces.ORDER:
+			if other != fid and Faces.vector_of(other) == Faces.vector_of(fid):
+				differ = false
+	check(differ and calm[10] == 1.0 and calm[11] == 1.0 and calm[0] == 0.0, "no two faces are the same, and a calm one is the head as it was sculpted")
+	for g in Data.EMOTES:
+		check(Faces.OF_ACT.has(g) and Faces.EXPRESSIONS.has(str(Faces.OF_ACT[g][0])), "the gesture %s is made with a face" % g)
+	for ak in Faces.OF_ACT:
+		check(Faces.EXPRESSIONS.has(str(Faces.OF_ACT[ak][0])) and float(Faces.OF_ACT[ak][1]) >= 0.0, "%s: a real face, for a while" % ak)
+	for ck in Faces.OF_CLIP:
+		check(Faces.EXPRESSIONS.has(str(Faces.OF_CLIP[ck])), "a body busy with %s keeps a real face" % ck)
+	check(Faces.for_line(["Elder Qing Xuan", "Hahaha! Splendid."]) == "joy" and Faces.for_line(["Narrator", "Hahaha!"]) == "" and Faces.for_line(["Yue Ling", "It is nothing.", "nod", "sorrow"]) == "sorrow"
+		and Faces.for_line(["Lin Feng", "Who told you that?"]) == "doubt" and Faces.for_line(["Lin Feng", "The rice is cooked."]) == "", "a line of dialogue is read for a face: its cue, or its words, and the narrator has none")
+	var fsrc := FileAccess.get_file_as_string("res://art/lib/face.py")
+	check(fsrc.contains("def expression_bones") and fsrc.contains("def expression_weights") and FileAccess.get_file_as_string("res://art/lib/person.py").contains("facelib.expression_bones(r, o)"),
+		"the bones of expression are sculpted into every head by the art scripts")
+	for who in ["lin_feng", "lin_feng_f", "yue_ling", "elder_qing", "granny_wen", "ou_yezi"]:
+		var fm := Assets.person(who)
+		check(Faces.has_face(fm), "%s has a face that can move" % who)
+		if Faces.has_face(fm):
+			var sk := fm.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
+			for bn in Faces.BONES:
+				check(sk.find_bone(bn) >= 0, "%s: the bone %s" % [who, bn])
+			check(sk.get_bone_parent(sk.find_bone("eyes")) == sk.find_bone("lids") and sk.get_bone_parent(sk.find_bone("mouth")) == sk.find_bone("jaw"), "%s: a blink is inside the lids and speech inside the jaw" % who)
+			var lids := sk.find_bone("lids")
+			var brow := sk.find_bone("brow.L")
+			var rest_y: float = sk.get_bone_pose_position(brow).y
+			Faces.wear(fm, "joy")
+			for k in 40:
+				Faces.tick(fm, 0.05)
+			var shut: float = sk.get_bone_pose_scale(lids).y
+			Faces.wear(fm, "surprise")
+			for k2 in 40:
+				Faces.tick(fm, 0.05)
+			check(shut < 0.3 and sk.get_bone_pose_scale(lids).y > 1.1 and sk.get_bone_pose(brow).origin.distance_to(sk.get_bone_rest(brow).origin) > 0.003 and Faces.worn(fm) == "surprise",
+				"%s: eyes shut with joy, open wide in surprise with the brows up" % who)
+			Faces.wear(fm, "anger", 0.5)
+			for k3 in 60:
+				Faces.tick(fm, 0.05)
+			check(Faces.worn(fm) == "calm" and absf(sk.get_bone_pose_scale(lids).y - 1.0) < 0.01 and absf(sk.get_bone_pose_position(brow).y - rest_y) < 0.0005, "%s: a face worn for a while goes back to the one kept" % who)
+			Models.act(fm, "hurt", 0.0)
+			check(Faces.worn(fm) == "pain", "%s: a blow shows in the face" % who)
+		fm.free()
+	print("== the Eight Arms (arms.gd) ==")
+	check(Arms.ORDER.size() == 8 and Arms.WEAPONS.size() == 8 and Arms.TIERS.size() == Data.DAO_RANKS.size(), "eight weapons, each with a Dao of three ranks")
+	var clips := {}
+	var arts := {}
+	var daos := {}
+	var skills := {}
+	var hero8 := Models.hero({})
+	for aid in Arms.ORDER:
+		var w: Dictionary = Arms.WEAPONS[aid]
+		check(Assets.has("weapons/" + str(w.model)) and FileAccess.file_exists("res://art/weapons/%s.py" % str(w.model)), "%s: a model built from its script" % aid)
+		check(Assets.has_clip(hero8, str(w.clip)) and Assets.has_clip(hero8, str(w.art)), "%s: the hero has a clip for its blow and one for its technique" % aid)
+		clips[str(w.clip)] = true
+		arts[str(w.art)] = true
+		daos[str(w.dao.n)] = true
+		skills[str(w.skill)] = true
+		check(str(w.dao.n).begins_with("Dao of") and str(w.dao.motto).length() > 10 and str(w.dao.desc).length() > 30 and str(w.desc).length() > 80 and str(w.how) != "", "%s: a Dao with a name and a motto, and a story" % aid)
+		check(Data.SKILLS.has(str(w.skill)) and str(Data.SKILLS[str(w.skill)].get("arm", "")) == aid and float(Data.SKILLS[str(w.skill)].k) >= 1.0, "%s: a technique of its own" % aid)
+		var mods_ok := not (w.mods as Dictionary).is_empty()
+		for mk in w.mods:
+			mods_ok = mods_ok and (w.mods[mk] as Array).size() == Arms.TIERS.size()
+		check(mods_ok and Arms.mods_text(aid, 0) != "" and Arms.mods_text(aid, 2) != Arms.mods_text(aid, 0), "%s: its Dao does something at every rank, and more as a Master" % aid)
+		check(aid in Arms.FIRST or (Data.step_index(str(w.get("step", ""))) >= 0 and Data.step_index(str(w.step)) < Data.step_index("s_break5")), "%s: his from the first morning, or won early on the road" % aid)
+		check(Arms.attach(hero8, aid) and Arms.attached(hero8) == aid and hero8.find_children("arm_model", "", true, false).size() == 1 and hero8.has_meta("arm_carry") == w.has("carry"), "%s: hangs on the sword bone, one at a time" % aid)
+		check(Arms.strike_clip(hero8) == str(w.clip), "%s: is struck with in its own way" % aid)
+	check(clips.size() == 8 and arts.size() == 8 and daos.size() == 8 and skills.size() == 8, "eight blows, eight techniques, eight Daos, no two alike")
+	hero8.free()
+	var story_hero := Models.person(Color("3a8ae8"), Color("1a1a2a"), {"asset": "lin_feng", "sword": true})
+	check(Arms.attached(story_hero) == "sword" and Arms.strike_clip(story_hero) == "attack", "the story's own Lin Feng carries his jian")
+	story_hero.free()
+	var yl := Assets.person("yue_ling")
+	check(not Arms.attach(yl, "sabre") and not Assets.has_clip(yl, "arm_sabre") and Arms.strike_clip(yl) == "attack", "only the hero bears arms: Yue Ling keeps to her needle")
+	yl.free()
+	check(FileAccess.get_file_as_string("res://art/lib/person.py").contains("ARMS = {") and FileAccess.get_file_as_string("res://art/check_assets.py").contains("\"weapons\""), "the clips and the models are checked with the rest of the art")
+	var AG = load("res://scripts/game.gd").new()
+	AG.reset()
+	check(AG.arms.keys() == Arms.FIRST and Arms.held(AG) == "sword" and Arms.tier(AG) == 0 and Arms.adept(AG) == 0 and Arms.skills(AG).is_empty(), "the first morning: a jian, a broom handle, and nothing learned")
+	check(not AG.wield("sabre") and AG.wield("staff") and Arms.held(AG) == "staff" and not AG.wield("staff") and AG.arm_switches == 1, "a weapon owned can be taken in hand; one not owned cannot")
+	AG.step = Data.step_index("s_ironfang")
+	AG.advance()
+	check(AG.arms.has("sabre") and AG.wield("sabre"), "Iron Fang's sabre is taken from him")
+	var spd0: int = AG.fighter(0).spd
+	AG.wield("bow") # not owned
+	AG.grant_arm("bow")
+	AG.wield("bow")
+	check(AG.fighter(0).spd == spd0 + 2 + 3 and Arms.mod(AG, "first", 1.0) > 1.3 and Arms.mod(AG, "sweep", 0.0) == 0.0, "the weapon in the hand changes the fight: the bow is quick, and it is not a staff")
+	var r1: int = AG.renown
+	for k4 in int(Arms.TIERS[1]) - 1:
+		AG.arm_battle_won(false)
+	check(Arms.tier(AG) == 0 and not AG.fighter(0).skills.has("arm_unshot"), "a Novice has not the technique yet")
+	AG.arm_battle_won(false)
+	check(Arms.tier(AG) == 1 and Arms.adept(AG) == 1 and AG.fighter(0).skills.has("arm_unshot") and AG.renown == r1 + 1 and Arms.mod(AG, "spd", 0.0) == 5.0, "an Adept of the bow is taught the Shot Not Shot, and it is news")
+	AG.wield("sabre")
+	check(not AG.fighter(0).skills.has("arm_unshot") and Arms.tier(AG) == 0 and Arms.tier(AG, "bow") == 1, "each weapon keeps its own mastery, and its technique goes with it")
+	AG.arm_battle_won(true)
+	check(int(AG.arm_xp.sabre) == 4, "a lord counts four")
+	AG.wield("bow")
+	var low: Dictionary = AG.skill_of("arm_unshot")
+	AG.level = 50
+	AG.step = Data.step_index("s_p13_home")
+	var high: Dictionary = AG.skill_of("arm_unshot")
+	check(float(low.mult) > 1.5 and float(high.mult) > float(low.mult) * 10.0 and int(high.cost) > int(low.cost) and AG.skill_cost("arm_unshot") > 0.0 and AG.skill_of("strike") == Data.SKILLS.strike,
+		"a weapon's technique grows with what he knows (x%.1f at the start, x%.1f at Dao Ancestor)" % [float(low.mult), float(high.mult)])
+	check(not Data.known_skills(0, 78).has("arm_unshot"), "techniques of arms come only from the weapon in the hand")
+	check(Trials.need_met(["arms", 1], AG) and not Trials.need_met(["arms", 2], AG) and Trials.need_text(["arms", 2], AG).contains("now 1"), "the way through a trial by the hand counts the Daos of arms learned")
+	# a hunt that asks for a weapon counts what falls while it is in the hand
+	AG.step = Data.step_index("s_p21_reeds")
+	AG.area = "marsh"
+	AG.layer = "surface"
+	AG.hunt = 0
+	AG.record_kills("marsh", 2, ["sword_reed", "white_gibbon"])
+	var h_bow: int = AG.hunt
+	AG.wield("staff")
+	AG.record_kills("marsh", 3, ["sword_reed", "white_gibbon", "mire_toad"])
+	check(h_bow == 0 and AG.hunt == 2, "a hunt with the staff counts what the staff brings down, of the creatures named")
+	AG.step = Data.step_index("s_p21_adept")
+	AG.poll_steps()
+	check(AG.cur_step().id == "s_p21_adept" and AG.objective_text().contains("(1/3)"), "three Daos of arms are asked for, and one is not three")
+	for aid2 in ["staff", "sabre"]:
+		AG.wield(aid2)
+		while Arms.tier(AG, aid2) < 1:
+			AG.arm_battle_won(false)
+	check(AG.cur_step().id == "s_p21_grave", "three Adepts, and the story goes on")
+	AG.free()
+	var bt := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	check(bt.contains("Arms.strike_clip(actor.model)") and bt.contains("Game.arm_battle_won(boss)") and bt.contains("_arm_touch") and FileAccess.get_file_as_string("res://scripts/world.gd").contains("Arms.strike_clip(player)")
+		and FileAccess.get_file_as_string("res://scripts/menu.gd").contains("\"arms\""), "the battle, the open land and the menu all know what is in his hand")
+	print("== twelve ends (cultures.gd) ==")
+	var EG = load("res://scripts/game.gd").new()
+	EG.reset()
+	var kinds := {}
+	# (ending.gd uses the Game autoload and cannot be compiled from here: its text is read)
+	var ending_txt := FileAccess.get_file_as_string("res://scripts/ending.gd")
+	for eid in Cultures.ENDING_ORDER:
+		var en: Dictionary = Cultures.ENDINGS[eid]
+		var kind := str(en.get("kind", "bright"))
+		kinds[kind] = int(kinds.get(kind, 0)) + 1
+		check(Cultures.ENDING_KINDS.has(kind) and Faces.EXPRESSIONS.has(str(en.get("face", "smile"))), "%s: a bright, a bitter or a dark end, with a face for it" % eid)
+		if kind != "bright":
+			check(str(en.desc).begins_with("A %s end." % kind) and not en.get("hearth", true) and (en.lines as Array).size() >= 2 and ending_txt.contains("\t\"%s\": \"Lin Feng, once a sweeper of steps" % eid), "%s: said to be a %s end before it is chosen, and it has its own last word" % [eid, kind])
+		for ln in en.lines:
+			var par := TextParagraph.new()
+			par.width = 1100.0
+			par.add_string(str(ln[1]), UI.font(), 22)
+			check(par.get_line_count() <= 4, "%s: its last words fit the dialogue box" % eid)
+	check(int(kinds.get("dark", 0)) == 4 and int(kinds.get("bitter", 0)) == 1 and int(kinds.get("bright", 0)) == 7, "seven bright ends, one bitter and four dark")
+	check(ending_txt.contains("const HEADLINES") and ["school", "broom", "throne", "blade", "engine", "cold"].all(func(h2): return ending_txt.contains("\"%s\": \"" % h2)) and ending_txt.contains("HEADLINES.get(Cultures.ending_of(Game), \"ASCENSION\")"),
+		"the results are headed ASCENSION only for the ends that are one")
+	check(Cultures.ending_open("cold", EG) and not Cultures.ending_open("school", EG) and not Cultures.ending_open("throne", EG), "a journey that sat at nobody's table may hold the sky alone, and has earned no school and no throne")
+	for hid5 in ["steppe", "sand"]:
+		Cultures.earn(EG, hid5, Cultures.GUEST)
+	check(not Cultures.ending_open("cold", EG), "two hearths that call him a guest, and the cold hearth is shut")
+	EG.arm_xp = {"sword": Arms.TIERS[2], "staff": Arms.TIERS[2], "sabre": Arms.TIERS[1], "bow": Arms.TIERS[1]}
+	check(Cultures.ending_open("school", EG) and not Cultures.ending_open("blade", EG), "four Daos of arms open the school; two mastered do not unsheathe the blade in a merciful hand")
+	EG.scales = {"heart": -Echoes.LEAN, "reach": Echoes.LEAN, "craft": Echoes.LEAN}
+	check(Cultures.ending_open("blade", EG) and Cultures.ending_open("throne", EG) and Cultures.ending_open("far", EG) and not Cultures.ending_open("broom", EG) and not Cultures.ending_open("engine", EG),
+		"unbending and of the wide world: the blade, the throne and the far shore; the engine wants works built, and the broom the old ways")
+	EG.scales["craft"] = -Echoes.LEAN
+	check(Cultures.ending_open("broom", EG), "the old ways open the broom")
+	EG.ending = "throne"
+	var tl: Array = Cultures.ending_lines(EG)
+	check(Cultures.ending_kind(EG) == "dark" and tl.size() == 3 and str(tl[2][1]).contains("picks up a broom"), "a dark end is told in its own words, without the kind word of the hearth")
+	EG.ending = "school"
+	check(Cultures.ending_kind(EG) == "bright" and Cultures.ending_lines(EG).size() == 3, "a bright one ends with the hero's own hearth")
+	EG.free()
+	var msrc5 := FileAccess.get_file_as_string("res://scripts/main.gd")
+	check(msrc5.contains("Cultures.ENDING_KINDS") and FileAccess.get_file_as_string("res://scripts/ending.gd").contains("LAST_WORDS") and FileAccess.get_file_as_string("res://scripts/bot.gd").contains("\"school\", \"open\""), "the choice names the kind of end, the film has its last word, and the bot has a plan")
+	print("== Part XXI: the Hundred Arms ==")
+	check(Data.REALMS.size() == 27 and Data.REALMS[26] == "Sheathed Edge" and Data.MAX_LEVEL == 78 and Data.level_name(78).ends_with("Sheathed Edge") and Data.REALM_INFO.size() == 27 and Data.EXP_NEED.size() == Data.MAX_LEVEL
+		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXI adds the Sheathed Edge realm")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break26" and Data.DIALOGUE.has("recall19") and msrc5.contains("\"s_break25\": \"recall19\"") and Data.DIALOGUE.has("pre:s_break26") and Data.DIALOGUE.has("post:s_break26"),
+		"Part XXI follows Hollow Vessel (recall19) and ends the game")
+	var n21 := 0
+	var arm_hunts := {}
+	for st in Data.STEPS:
+		if not str(st.id).begins_with("s_p21_"):
+			continue
+		n21 += 1
+		if str(st.kind) == "talk":
+			check(Data.DIALOGUE.has(str(st.id)), "%s: there is something said" % st.id)
+		if st.has("arm"):
+			arm_hunts[str(st.arm)] = true
+			check(str(st.kind) == "hunt" and Arms.WEAPONS.has(str(st.arm)) and str(st.t).to_lower().contains(str(st.arm)),
+				"%s: a hunt with a weapon says which" % st.id)
+	check(n21 >= 34 and arm_hunts.size() == 7 and not arm_hunts.has("sword"), "Part XXI has %d steps, and a hunt for each of the seven weapons that are not the jian" % n21)
+	for tid in ["yuan_gong", "sword_dragons", "king_zhao", "wuzhu"]:
+		check(Trials.TRIALS.has(tid) and Data.ENEMIES[tid].get("boss", false) and Lore.BOSS.has(tid) and Trials.trial_of_step(Data.STEPS[_kill_step(tid)]) == tid, "%s is a lord of Part XXI, guarded by a trial, with a story" % tid)
+	check(["yuan_gong", "king_zhao", "wuzhu"].all(func(t2): return (Trials.TRIALS[t2].paths as Array).any(func(pth): return str(pth.kind) == "arms")), "three of them can be passed by the hand")
+	check(Trials.KINDS.has("arms") and Trials.EPITHETS.has("arms") and ending_txt.contains("\"arms\": \"the Hand\"") and Data.BOSS_DROPS.get("king_zhao", "") == "three_swords" and "person:king_zhao" in UI.SHAPES and "person:wuzhu" in UI.SHAPES,
+		"by the hand is a way of its own, and the king leaves his scroll")
+	for pid in ["ou_yezi", "yue_maiden", "ji_chang", "zhuang_envoy", "king_zhao", "wuzhu"]:
+		check(Assets.PEOPLE.has(pid) and Assets.has(Assets.PEOPLE[pid]) and FileAccess.file_exists("res://art/characters/%s.py" % pid), "%s has a model built from a script" % pid)
+	for fid2 in ["sword_reed", "white_gibbon", "hook_heron", "stray_arrow", "wheel_louse", "cup_snake", "gate_swordsman", "fighting_cock", "broken_edge", "pool_blade", "mound_tiger", "humming_sword"]:
+		check(Data.ENEMIES.has(fid2) and Lore.BEAST.has(fid2) and Habits.habit(fid2) != "", "%s: a foe of Part XXI with a story and hours of its own" % fid2)
+	var x21: Array = Echoes.ORDER.filter(func(c2): return str(Echoes.CROSSROADS[c2].part) == "XXI")
+	check(x21 == ["the_pupils", "the_three_thousand", "the_arms"], "what a weapon is for is asked three times")
+	var old_echo := 0
+	for cid in Echoes.ORDER:
+		if str(Echoes.CROSSROADS[cid].part) == "XXI":
+			continue
+		for ek in Echoes.CROSSROADS[cid].echo:
+			if str(ek).contains("p21_") or str(ek) in ["pre:wuzhu", "pre:king_zhao", "pre:yuan_gong", "pre:sword_dragons"]:
+				old_echo += 1
+	check(old_echo >= 4, "four older crossroads echo in Part XXI (%d)" % old_echo)
+	check(Caves.OWN.has("longmen") and Caves.OWN.has("grave") and Bonds.SHARES.has("s_p21_stage") and Bonds.SHARES.has("s_p21_sweep") and Folk.ERRANDS.has("s_p21_racks"), "two caves of its own, two evenings with Yue Ling, and errands at four hearths")
+	var bsrc5 := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	check(bsrc5.contains("\"yuan_gong\": \"arms\"") and bsrc5.contains("\"the_arms\": [\"school\"") and bsrc5.contains("func _want_arm") and bsrc5.contains("\"s_p21_sweep\": \"broom\""), "the bot has a plan for every trial, crossroads and evening of Part XXI, and changes weapons by itself")

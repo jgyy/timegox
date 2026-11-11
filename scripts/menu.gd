@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -197,6 +197,9 @@ func press(act: String) -> void:
 				"talk":
 					main.pop()
 					main.talk_yue()
+				"arms":
+					main.pop()
+					main.open_arms()
 				"wardrobe":
 					main.pop()
 					main.open_wardrobe()
@@ -856,7 +859,7 @@ func _draw() -> void:
 	if mode == "yue":
 		_draw_yue()
 		return
-	UI.menu_list(self, Rect2(60, 80, 300, 470 if mode != "root" else 506), labels, cursor, enabled, 22 if mode != "root" else 18)
+	UI.menu_list(self, Rect2(60, 80, 300, 470 if mode != "root" else 506), labels, cursor, enabled, 22 if mode != "root" else 17)
 	UI.text(self, Vector2(60, 70), "Menu" if mode == "root" else "Items", 22, UI.C_GOLD)
 	# status panel
 	var r := Rect2(400, 80, 820, 560)

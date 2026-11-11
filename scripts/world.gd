@@ -1681,19 +1681,27 @@ func preview_outfit(id: String) -> void:
 	preview_id = id
 	refresh_hero()
 
+## The arms rack (Esc > Arms) shows the weapon under the cursor in his hand before it is chosen.
+var preview_arm := ""
+
+func preview_weapon(id: String) -> void:
+	preview_arm = id if Game.arms.has(id) else ""
+	refresh_hero()
+
 func refresh_hero() -> void:
 	var oid := preview_id if preview_id != "" else Game.outfit
 	var keep: String = Game.outfit
 	Game.outfit = oid
 	var cols := Fashion.hero_colors(Game)
 	Game.outfit = keep
-	var sig := "%s|%s|%s" % [str(Game.hero), oid, str(cols)]
+	var aid := preview_arm if preview_arm != "" else Arms.held(Game)
+	var sig := "%s|%s|%s|%s" % [str(Game.hero), oid, str(cols), aid]
 	if sig == hero_sig or player == null:
 		return
 	hero_sig = sig
 	var at := player.transform
 	var old := player
-	player = Models.hero({"glow": HERO_OPTS.glow, "outfit": oid, "cols": cols})
+	player = Models.hero({"glow": HERO_OPTS.glow, "outfit": oid, "cols": cols, "arm": aid})
 	player.add_child(Models.shadow_disc(0.55))
 	scene3d.add_child(player)
 	player.transform = at
@@ -2011,11 +2019,16 @@ func _cue_line(line: Array) -> void:
 	var g: String = ec[1]
 	if who != "Lin Feng" and who != "Yue Ling" and who != "Narrator":
 		cue_npc = who
+	var a := _actor(who)
+	if g != "" and not a.is_empty() and Assets.has_clip(a[0], g):
+		Models.act(a[0], g, t + float(a[1]))
+	# the face the line is said with (faces.gd): its own cue or what its words sound like, worn for as
+	# long as a line is usually read; a gesture's own face otherwise
+	var fc := Faces.for_line(line)
+	if fc != "" and not a.is_empty():
+		Faces.wear(a[0], fc, 4.5)
 	if g == "":
 		return
-	var a := _actor(who)
-	if not a.is_empty() and Assets.has_clip(a[0], g):
-		Models.act(a[0], g, t + float(a[1]))
 	var reply: String = Data.EMOTE_REPLY.get(g, "")
 	if reply == "":
 		return
@@ -2331,7 +2344,8 @@ func strike() -> void:
 		return
 	strike_t = t
 	Game.strikes += 1
-	Models.act(player, "attack", t)
+	# (each of the Eight Arms is struck with in its own way: arms.gd)
+	Models.act(player, Arms.strike_clip(player), t)
 	var fwd := Vector3(facing.x, 0, facing.y)
 	if not is_floor() and not wd.is_empty():
 		var tiles: Array = []
