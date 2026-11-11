@@ -787,7 +787,7 @@ const CROSSROADS := {
 		"echo": {
 			"done:s_p22_hermits": {
 				"fire": [["Yue Ling", "The second hermit had a bell hung on his cairn. He says something small with one leg brought it up last week, set it down, said, quite clearly, in nobody's voice at all, for the top, and went away again on its hands and its foot."]],
-				"bamboo": [["Yue Ling", "The second hermit hears bamboo cracking at every camp below him at dusk. He says it is a comfortable sound, like a village. He also says something sits on the lesser height across the valley and listens to it, every evening, until the last fire is out."]],
+				"bamboo": [["Yue Ling", "The second hermit hears bamboo cracking at every camp below him at dusk. He says it is a comfortable sound, like a village. He also says something sits on its own height across the valley and listens to it, every evening, until the last fire is out."]],
 				"drive": [["Yue Ling", "The second hermit asked what the torches were for, the other night. I told him. He said nothing for a while. Then he said a mountain with nothing on it that calls your name is a quieter mountain, and went back to looking."]],
 			},
 			"s_p22_xie2": {
@@ -798,7 +798,7 @@ const CROSSROADS := {
 		},
 		"end": {
 			"fire": "There is a flat stone by every fire on the south road with a pinch of salt on it, and no woodcutter under fifty can tell you why. The wood comes down from the heights by itself.",
-			"bamboo": "Bamboo cracks at dusk at every camp of the south road, as it did in the grandmothers' time, and on the lesser height something keeps a bell and a wall of salt and comes no nearer.",
+			"bamboo": "Bamboo cracks at dusk at every camp of the south road, as it did in the grandmothers' time, and on its own height something keeps a bell and a wall of salt and comes no nearer.",
 			"drive": "Nothing calls anybody by name in the Mulberry Silk Woods now. The cutters say the nights are longer for it.",
 		}},
 	"the_kites": {"step": "s_p22_lian", "part": "XXII", "n": "Whose the air is",

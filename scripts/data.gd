@@ -1783,7 +1783,7 @@ const AREAS := {
 			# Part XV: the queen of the moths that eat forgetting
 			{"id": "forgetting_queen", "pos": Vector2i(49, 18), "lv": 58, "req": 57, "vis": ["s_p15_moth", ""]},
 			{"id": "mulberry_ent", "pos": Vector2i(60, 40), "lv": 34, "req": 34},
-			# Part XXII: the shanxiao, in its ring of salt on the lesser height
+			# Part XXII: the shanxiao, in its ring of salt on a height of the woods (its second, where there are two)
 			{"id": "shanxiao", "pos": Vector2i.ZERO, "lv": 79, "req": 78, "vis": ["s_p22_thieves", ""], "late": true, "peak": 1, "stand": "top"},
 			{"id": "thousand_hands", "pos": Vector2i(86, 28), "lv": 34, "req": 34},
 		],
@@ -3557,8 +3557,8 @@ const STEPS := [
 		"t": "Something calls them by name from above the fire: ask 3 woodcutters, at the camps of the road, whose voice they heard"},
 	{"id": "s_p22_thieves", "kind": "hunt", "area": "silk", "n": 20, "of": ["salt_thief", "false_echo", "fire_crab"], "first": true,
 		"t": "There is not a grain of salt left at any fire on the road: strike first and scatter 20 of the salt-thieves, false echoes and night-fire crabs of the Mulberry Silk Woods"},
-	{"id": "s_p22_salt", "kind": "collect", "item": "salt_bag", "n": 4, "area": "silk", "t": "It has all been carried up the rock: bring down 4 bags of road salt from the two heights of the Mulberry Silk Woods"},
-	{"id": "s_p22_xiao", "kind": "kill", "boss": "shanxiao", "area": "silk", "t": "On the lesser height something with one leg is trying on other people's voices: face the Shanxiao"},
+	{"id": "s_p22_salt", "kind": "collect", "item": "salt_bag", "n": 4, "area": "silk", "t": "It has all been carried up the rock: bring down 4 bags of road salt from the rock of the Mulberry Silk Woods"},
+	{"id": "s_p22_xiao", "kind": "kill", "boss": "shanxiao", "area": "silk", "t": "On the height itself something with one leg is trying on other people's voices: face the Shanxiao"},
 	{"id": "s_p22_lie", "kind": "talk", "npc": "liezi", "area": "thunder", "t": "The wind has stopped, all of it, from here to the sea: climb the one height of Thunder Valley to Master Lie, who used to ride it", "stones": 35200},
 	{"id": "s_p22_gusts", "kind": "hunt", "area": "thunder", "n": 20, "of": ["stray_gust", "kite_hawk", "wind_bag"],
 		"t": "A wind with nowhere to go turns round and bites: still 20 of the stray gusts, kite-hawks and leaking wind-bags loose in Thunder Valley"},
@@ -7797,14 +7797,14 @@ const DIALOGUE := {
 		["Zhong Ziqi the Woodcutter", "One foot. Then I know what it is, and so did my grandmother, who burned green bamboo in the fire every New Year to keep it off. A shanxiao. They are not wicked. They are lonely, and they like salt, and roast crab, and somebody else's fire. But a man who answers one goes up into the cloud after it."],
 	],
 	"done:s_p22_thieves": [
-		["Zhong Ziqi the Woodcutter", "Hear that? Quieter. The small ones only carry; it is the old one who does the voices. He is on the lesser height, across the saddle, with every bag of salt on this road, and he has not eaten a grain. He stacks it. I think he believes it is what makes people come back to a fire."],
+		["Zhong Ziqi the Woodcutter", "Hear that? Quieter. The small ones only carry; it is the old one who does the voices. He is on the height itself, across the saddle, with every bag of salt on this road, and he has not eaten a grain. He stacks it. I think he believes it is what makes people come back to a fire."],
 	],
 	"done:s_p22_salt": [
 		["Narrator", "Four bags, damp, each tied with the knot of a different camp. Under the last is a heap of things that are not salt: a child's shoe, a pedlar's bell, a comb, a tally stick. Everything somebody on the road once turned round to look for."],
 		["Yue Ling", "He has been keeping them safe. Look how they are laid out. Nothing on top of anything."],
 	],
 	"pre:shanxiao": [
-		["Narrator", "On the lesser height, in a ring of salt bags laid like a wall, sits something the size of a child of ten, with one leg, a face like a worried old man's and the wrong number of fingers. It looks at Lin Feng. Then it says, in Elder Qing Xuan's voice, very nearly: Lin Feng. Supper."],
+		["Narrator", "On the height itself, in a ring of salt bags laid like a wall, sits something the size of a child of ten, with one leg, a face like a worried old man's and the wrong number of fingers. It looks at Lin Feng. Then it says, in Elder Qing Xuan's voice, very nearly: Lin Feng. Supper."],
 		["Shanxiao, the One-Legged Thief of Voices", "Lin Feng. Supper. ...No? Lin Feng, the steps want sweeping. No. Wait. I had a good one. A girl's. You have flown over this a hundred times."],
 		["Yue Ling", "That is mine. That was this morning. Give it back."],
 		["Shanxiao, the One-Legged Thief of Voices", "Mine now. I keep them. Nobody keeps them as I do. They come up for their names, and then they stay by the fire. That is how it is done. I have watched.", "refuse"],
