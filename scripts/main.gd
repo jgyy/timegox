@@ -617,7 +617,8 @@ func talk_npc(e: Dictionary) -> void:
 	if not s.is_empty() and s.kind == "visits" and str(e.id) in s.npcs and not Game.visited.has(str(e.id)):
 		# (a later chapter may call on somebody an earlier one called on: its own words for them, if it has any)
 		var vkey := "visit:%s:%s" % [str(s.id), str(e.id)]
-		say(Data.DIALOGUE.get(vkey, Data.DIALOGUE.get("visit:" + str(e.id), [])), func():
+		# (through the crossroads, like every conversation: an echo may land in a call paid on somebody)
+		say(Echoes.told(Game, vkey, Data.DIALOGUE[vkey]) if Data.DIALOGUE.has(vkey) else Data.DIALOGUE.get("visit:" + str(e.id), []), func():
 			Game.visited[str(e.id)] = true
 			# (the Conclave's invitations, Part XIII; a step may say what a visit is instead: Part XVI's New Year calls)
 			if s.has("did"):
@@ -970,6 +971,30 @@ func open_wardrobe() -> void:
 		world.refresh_hero()
 	)
 
+## The arms rack (arms.gd): the weapons owned and the ones still to be won; choosing one takes it in
+## hand, with its own blow, its own Dao and that Dao's rank.
+const ARMS_ASK := "The arms rack: what will you carry?"
+
+func open_arms() -> void:
+	var opts: Array = []
+	for id in Arms.ORDER:
+		var w: Dictionary = Arms.WEAPONS[id]
+		var have: bool = Game.arms.has(id)
+		var tr := Arms.tier(Game, id)
+		var xp := int(Game.arm_xp.get(id, 0))
+		var nxt := "" if tr >= Arms.TIERS.size() - 1 else "  (%d of %d battles to %s)" % [xp, int(Arms.TIERS[tr + 1]), Data.DAO_RANKS[tr + 1]]
+		var desc := told(str(w.desc)) + "\n\n%s: \"%s\"\n%s. %s%s\nNow: %s." % [str(w.dao.n), str(w.dao.motto), Data.DAO_RANKS[tr], told(str(w.dao.desc)), nxt, Arms.mods_text(id, tr)]
+		desc += "\nIts technique, from Adept on: %s.\n%s" % [Data.SKILLS[str(w.skill)].n, told(str(w.how))]
+		opts.append({"id": id, "label": str(w.n) if have else "? " + str(w.n), "note": "in hand" if id == Arms.held(Game) else (Data.DAO_RANKS[tr] if have else "not yet"),
+			"desc": desc, "col": w.col, "enabled": have, "current": id == Arms.held(Game)})
+	choice.preview = func(id: String): world.preview_weapon(id)
+	choose(ARMS_ASK, opts, func(id: String):
+		world.preview_weapon("")
+		if id != "" and Game.wield(id):
+			Game.toast("You take up %s: the %s" % [str(Arms.WEAPONS[id].zh), str(Arms.WEAPONS[id].dao.n)])
+		world.refresh_hero()
+	)
+
 ## The stable: the rides owned (and the ones still to be earned); choosing one saddles it and mounts.
 func open_stable() -> void:
 	var opts: Array = []
@@ -1184,7 +1209,7 @@ func start_breakthrough() -> void:
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
-	"s_break24": "recall18"}
+	"s_break24": "recall18", "s_break25": "recall19"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -1199,10 +1224,10 @@ func choose_ending() -> void:
 			var nt := Cultures.ending_need_text(n, Game)
 			if nt != "":
 				desc += "\n%s %s" % ["+" if Cultures.ending_need_met(n, Game) else "-", nt]
-		opts.append({"id": id, "label": str(en.label), "sub": str(en.sub), "desc": desc, "note": str(en.n) if open else "not earned", "col": Color(en.sky).darkened(0.25), "enabled": open})
+		opts.append({"id": id, "label": str(en.label), "sub": str(en.sub), "desc": desc, "note": (str(en.n) if not en.has("kind") or str(en.kind) == "bright" else "%s, %s" % [str(en.n), str(en.kind)]) if open else "not earned", "col": Color(en.sky).darkened(0.25), "enabled": open})
 	choose(ENDING_ASK, opts, func(id: String):
 		Game.ending = id if Cultures.ENDINGS.has(id) and Cultures.ending_open(id, Game) else "azure"
-		Game.note("Ending reached: %s" % str(Cultures.ENDINGS[Game.ending].n))
+		Game.note("Ending reached: %s (%s)" % [str(Cultures.ENDINGS[Game.ending].n), str(Cultures.ENDING_KINDS[Cultures.ending_kind(Game)])])
 		say(Cultures.ending_lines(Game), func(): push("ending"))
 	, false)
 const ENDING_ASK := "The sky is held. Where will you keep your own fire?"

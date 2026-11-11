@@ -53,8 +53,10 @@ const KINDS := {
 	"works": {"n": "By the works", "col": Color("7ab8d8"), "what": "what you have built with your own hands"},
 	# the Hollow Hills release (Part XX): the caves Lin Feng has gone to the very back of (caves.gd)
 	"delve": {"n": "By the dark", "col": Color("8ad0c8"), "what": "the caves you have gone to the very back of"},
+	# the Hundred Arms release (Part XXI): the Daos of arms Lin Feng has learned to Adept (arms.gd)
+	"arms": {"n": "By the hand", "col": Color("dce8ff"), "what": "the weapons whose Dao you have learned"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -141,6 +143,10 @@ const RECIPES := {
 	"defence_models": {"at": "smith", "in": {"ess_wood": 8, "ess_metal": 6, "catalpa_timber": 1}, "stones": 360000, "after": "s_p19_cogs", "for": "cloud_ladder"},
 	# the Hollow Hills release (Part XX): a clay bell for the Lamb of the Earth, and the traveller's torch
 	"lamb_bell": {"at": "alchemist", "in": {"ess_earth": 8, "ess_water": 6, "earth_basket": 1}, "stones": 240000, "after": "s_p20_moles", "for": "fen_yang"},
+	# the Hundred Arms release (Part XXI): peaches for an ape, one scabbard for two swords, and a cock of wood
+	"ape_fruit": {"at": "alchemist", "in": {"ess_wood": 8, "ess_water": 6, "bamboo_switch": 1}, "stones": 250000, "after": "s_p21_ape", "for": "yuan_gong"},
+	"mated_scabbard": {"at": "smith", "in": {"ess_water": 8, "ess_metal": 6, "old_hilt": 1}, "stones": 250000, "after": "s_p21_dragons", "for": "sword_dragons"},
+	"wooden_cock": {"at": "smith", "in": {"ess_wood": 8, "ess_fire": 6, "challenge_tally": 1}, "stones": 250000, "after": "s_p21_zhao", "for": "king_zhao"},
 	"pine_torch": {"at": "smith", "in": {"ess_fire": 6, "ess_wood": 6, "cave_rubbing": 1}, "stones": 240000, "after": "s_p20_shades", "for": "wangliang"},
 	"fire_drill": {"at": "smith", "in": {"ess_wood": 8, "ess_fire": 6, "apricot_wood": 2}, "stones": 340000, "after": "s_p18_valley", "for": "zhurong"},
 	# the Spring Thunder release (Part XVII)
@@ -1067,6 +1073,66 @@ const TRIALS := {
 				"desc": "Late Hollow Vessel in the making and a sword tempered eight times. She said: take it from me, if you can. It can be done. She also said what would happen to it afterwards.",
 				"line": "Lin Feng steps out on to the black water, and it bears him, and he draws."},
 		]},
+	# ---- Part XXI (the Hundred Arms release): the first pupil nobody asked for, a pair that cannot find
+	# each other, a king who would rather watch than rule, and four thousand blades with no hand
+	"yuan_gong": {"might": [2.4, 1.3],
+		"why": "The old man in white asked to see the Maiden's sword, broke a bamboo to test her, and went up a tree an ape. He saw one stroke, two thousand years ago, and has made a whole school out of it. He is faster than anything in the marsh and has never once been shown anything else.",
+		"paths": [
+			{"id": "arms", "kind": "arms", "n": "Something he has not seen", "needs": [["arms", 2]], "boon": {"foe_hp": 0.7, "weak_k": 1.9},
+				"desc": "Two Daos of arms learned to Adept. He knows one stroke of one weapon perfectly, and has been waiting two thousand years for somebody to show him a second. An ape that is watching closely is an ape that has stopped moving.",
+				"line": "Lin Feng changes hands in the middle of the bow, and the White Ape, who has never seen that done, sits down on his branch to see it done again."},
+			{"id": "craft", "kind": "craft", "n": "Peaches before lessons", "needs": [["item", "ape_fruit", 1]], "boon": {"foe_hp": 0.75, "no_heavy": true},
+				"desc": "Alchemist Mo can ripen a basket of mountain peaches in an hour and weave the basket of the Maiden's own bamboo. A swordsman of two thousand years is still an ape for as long as it takes to eat one, and a pupil with his mouth full does not strike first.",
+				"line": "Lin Feng sets the basket down between them. The old man in white looks at it, and at him, with great dignity, and then is not an old man at all."},
+			{"id": "might", "kind": "might", "n": "Quicker than the ape", "needs": [["lv", 75], ["temper", 8]], "boon": {},
+				"desc": "Early Hollow Vessel and a sword tempered eight times: the Maiden caught him with the butt of a switch before its tip touched the ground. It can be done. She was sixteen.",
+				"line": "Lin Feng draws. Forty gibbons draw forty reeds."},
+		]},
+	"sword_dragons": {"might": [2.5, 1.3],
+		"why": "Gan Jiang cast a pair of swords for the King of Wu, and the metal would not run until Mo Ye, his wife, went into the furnace. The swords were named for them. At the ford they leapt into the river as two dragons, and have gone round each other in the dark under the Gate ever since: each still a sword, and cutting whatever it turns towards.",
+		"paths": [
+			{"id": "heart", "kind": "heart", "n": "Two who know the way of it", "needs": [["heart", 3]], "boon": {"assist": 0.04, "foe_atk": 0.85},
+				"desc": "You and Yue Ling are kindred spirits. Go into the water together, one to each, and walk them in towards one another the way two people carry a long thing through a door: by watching the other end, not your own.",
+				"line": "Yue Ling wades in on the red dragon's side without being asked. 'You take him,' she says. 'I know what she is looking for.'"},
+			{"id": "craft", "kind": "craft", "n": "One scabbard, two mouths", "needs": [["item", "mated_scabbard", 1]], "boon": {"foe_hp": 0.7, "no_heavy": true},
+				"desc": "Smith Tie can make a double scabbard, lined with water essence and bound with a hilt out of the pool itself. A sword that sees its own sheath comes to it. Two that see one sheath made for both may remember what they were made as.",
+				"line": "Lin Feng holds the double scabbard out over the water, mouths down, and both dragons turn at once."},
+			{"id": "might", "kind": "might", "n": "Part the pair", "needs": [["lv", 76], ["temper", 8]], "boon": {},
+				"desc": "Middle Hollow Vessel and a sword tempered eight times: strength to stand between a husband and a wife who have been looking for each other for two thousand years. It is not recommended.",
+				"line": "Lin Feng steps into the deep water between the red and the blue."},
+		]},
+	"king_zhao": {"might": [2.5, 1.3],
+		"why": "King Wen of Zhao loved swords. Three thousand swordsmen ate at his gate and fought before him day and night, and a hundred and more died of it each year, and he never tired of watching. He was told about the three swords once, and stayed in his palace three months. Then he forgot. He has had three years to forget in.",
+		"paths": [
+			{"id": "craft", "kind": "craft", "n": "A cock of wood", "needs": [["item", "wooden_cock", 1]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "Smith Tie can carve Ji Xingzi's fighting cock, forty days in training, which in the end stood like a bird of wood, and no other cock would face it. Set it on the mat in front of a man who has watched three thousand fights. It is the only fighter in his hall that is not trying to win.",
+				"line": "Lin Feng sets the wooden cock on the mat. The two men fighting stop of themselves. The king leans forward, for the first time in a year."},
+			{"id": "arms", "kind": "arms", "n": "All three swords", "needs": [["arms", 4]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Four Daos of arms learned to Adept. He asked to be shown the lowest sword. Show him four weapons, each perfectly, and put each one down when it is done. By the third he will have begun to see that the putting down is the part he has never watched.",
+				"line": "Lin Feng lays the sabre on the mat beside the fan, and takes up the third. King Wen is counting on his fingers, and has gone pale."},
+			{"id": "hearth", "kind": "hearth", "n": "Whose sons they are", "needs": [["hearths", 6]], "boon": {"assist": 0.04, "foe_hp": 0.8},
+				"desc": "All six hearths of the land call you a guest. Every man at his gate came from one of them. Say the names of the towns, and what is eaten there in winter, and who is sitting up tonight beside a fire with one place empty at it.",
+				"line": "Lin Feng begins with Shazhou, and the bread from the wall of the clay oven. Somewhere at the back of the hall, a swordsman puts his hand over his eyes."},
+			{"id": "might", "kind": "might", "n": "The sword he already has", "needs": [["lv", 76], ["temper", 8]], "boon": {},
+				"desc": "Middle Hollow Vessel and a sword tempered eight times. He asked for the sword of the common man: the one that cuts throats in front and livers behind. He has three thousand of them. Be one more, and the best, and he will have learned nothing.",
+				"line": "Lin Feng puts away the fan, and draws."},
+		]},
+	"wuzhu": {"might": [2.6, 1.3],
+		"why": "Every blade the pits poured unasked, and every sword that walked off its rack to join them, in one figure in the long barrow: four thousand edges that nobody made and nobody owns. It has built itself a hand out of what it had, and put Lin Feng's face on it, and wants to be shown everything a hand does. It will know if anything is left out.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Read it the three swords", "needs": [["item", "three_swords", 1]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "King Wen's scroll, in his own hand. It was never asked what kind of sword it is. Read it the three, slowly: the one whose edge is mountains, the one whose point is brave men, and the one that is no different from a fighting cock. Let four thousand blades hear that there was a choice.",
+				"line": "Lin Feng unrolls King Wen's scroll and reads it aloud, in the dark, to four thousand swords. At the sword of the Son of Heaven, the humming stops to listen."},
+			{"id": "arms", "kind": "arms", "n": "Everything a hand does", "needs": [["arms", 6]], "boon": {"foe_hp": 0.7, "weak_k": 1.9},
+				"desc": "Six Daos of arms learned to Adept. It asked to be shown all of it. Show it: the jian, the staff, the sabre, the spear, whatever you have made your own. And between each and the next, the thing it has never seen, and is made of blades because it has never seen: an open hand.",
+				"line": "Lin Feng lays down the sixth weapon and holds up both hands, empty, in front of the polished flat where its face should be."},
+			{"id": "hearth", "kind": "hearth", "n": "A rack by every door-flap", "needs": [["hearths", 5]], "boon": {"assist": 0.04, "foe_hp": 0.8},
+				"desc": "Five hearths of the land call you a guest. Each has a place where its one weapon hangs: by the door-flap, over the oven, in the boat's locker. Tell four thousand blades that there are that many pegs in the world, and somebody's grandmother watching each.",
+				"line": "Lin Feng says: there is a peg by a door-flap on the steppe with nothing on it. It turns its bright flat towards him, slowly."},
+			{"id": "might", "kind": "might", "n": "A better edge", "needs": [["lv", 77], ["temper", 8]], "boon": {},
+				"desc": "Late Hollow Vessel and a sword tempered eight times. It asked what a hand does. One answer is: this. It is the answer it expects, and the only one that will teach it nothing it does not know.",
+				"line": "Lin Feng draws the jian. Four thousand blades turn their points to him, pleased."},
+		]},
 	# ---- Part XVIII (the New Fire release): the Lord of the Southern Fire, and the fire nobody sat up with
 	"zhurong": {"might": [2.3, 1.3],
 		"why": "Zhurong has opened every summer for ten thousand years by giving the land new fire from Suiren's drill, to hearths put out to receive it. Lin Feng has come with six that would not be put out, and asks him to bless the pot.",
@@ -1214,6 +1280,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"delved":
 			# the Hollow Hills release: caves gone to the very back of (caves.gd)
 			return g.delved.size() >= int(n[1])
+		"arms":
+			# the Hundred Arms release: Daos of arms learned to Adept (arms.gd)
+			return Arms.adept(g) >= int(n[1])
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1287,6 +1356,8 @@ static func need_text(n: Array, g) -> String:
 			return "%d %s with your own hands (now %d; Esc > Works)" % [int(n[2]), what, works_n(g, str(n[1]))]
 		"delved":
 			return "%d caves gone to the very back of (now %d; a cave mouth stands in almost every region)" % [int(n[1]), g.delved.size()]
+		"arms":
+			return "%d Daos of arms learned to Adept (now %d: win battles with a weapon in hand; Esc > Arms)" % [int(n[1]), Arms.adept(g)]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1386,7 +1457,7 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	# (the roads added since had none, and the ending's title read a key that was not there: a player who
 	# went through most trials side by side or by the people had a script error for a title)
 	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire",
-	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave"}
+	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave", "arms": "Whose Hand Is Open"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

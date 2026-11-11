@@ -13,6 +13,6 @@ kit.reset()
 person.export_person("characters/lin_feng_wild.glb", {
     "fem": False, "age": 0.0, "build": 1.03,
     "robe": "3a8ae8", "trim": "e8f0ff", "inner": "f4f6ff", "hair": "1a1a2a",
-    "eyes": "3a7ae8", "sash": "1c3a78", "cape": "2a5aa8", "sword": True, "boots": "232838", "pants": "1e2c50",
+    "eyes": "3a7ae8", "sash": "1c3a78", "cape": "2a5aa8", "sword": True, "arms": True, "boots": "232838", "pants": "1e2c50",
     "hair_style": "wild", "smile": True, "ahoge": True, "jaw": 0.98, "brow": 1.1,
 }, clips=person.HERO_CLIPS)

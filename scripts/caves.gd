@@ -83,6 +83,12 @@ const OWN := {
 		"foes": {"pool": [["ore_gnawer", 73, 74], ["dig_mole", 73, 74], ["lamp_ghost", 73, 74]], "n": 8, "vis": "s_p20_tushan"},
 		"lower": {"n": "The Bottomless Gallery", "size": Vector2i(38, 28), "rooms": 5,
 			"foes": {"pool": [["ore_gnawer", 73, 74], ["lamp_ghost", 73, 74], ["stone_bat", 73, 74]], "n": 5, "vis": "s_p20_tushan"}}},
+	# Part XXI (the Hundred Arms release): the pool under the Dragon Gate where a king was buried with three
+	# thousand swords, and the long barrow of the first sword saint
+	"longmen": {"n": "The Sword Pool", "size": Vector2i(42, 30), "rooms": 7,
+		"foes": {"pool": [["pool_blade", 75, 76], ["mound_tiger", 75, 76], ["hook_heron", 75, 76]], "n": 8, "vis": "s_p21_longmen"}},
+	"grave": {"n": "The Barrow of the Unburied Blade", "size": Vector2i(42, 30), "rooms": 7,
+		"foes": {"pool": [["humming_sword", 76, 77], ["broken_edge", 76, 77], ["gate_swordsman", 76, 77]], "n": 8, "vis": "s_p21_grave"}},
 	# the karst country: the longest cave Xu Xiake ever measured, and what answers in it
 	"karst": {"n": "The Cave of Ten Thousand Echoes", "size": Vector2i(46, 32), "rooms": 8, "at": Vector2i(39, 29),
 		"foes": {"pool": [["kept_voice", 73, 74], ["stone_bat", 73, 74], ["drip_wisp", 73, 74]], "n": 8, "vis": "s_p20_karst"}},

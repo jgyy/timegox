@@ -91,6 +91,10 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# one voice that is not an echo for the Penumbra; and the shadow's shadow it left, held up to the
 	# Valley Spirit
 	"fen_yang": "craft", "white_rat": "delve", "wangliang": "heart", "xuanpin": "relic",
+	# Part XXI: two Daos of arms for the White Ape, who has only ever seen one stroke; Yue Ling to walk the
+	# Paired Dragons in to one another; a cock of wood from the smith for the king who loved swords; and
+	# the scroll the king left, read aloud to the Masterless Edge
+	"yuan_gong": "arms", "sword_dragons": "heart", "king_zhao": "craft", "wuzhu": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -118,7 +122,10 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"ancestor": ["strike"], "widow": ["truth"], "crows": ["pardon"], "axe": ["give"], "cauldron_map": ["copy"], "furnace": ["return"],
 	"the_wheel": ["hours"], "the_player": ["keep"], "the_works": ["wheel", "hand", "dao", "ask"],
 	# Part XX: a road through Yu Gong's mountains, the echoes let go home, and the Hollow left open
-	"the_mountain": ["road"], "the_echoes": ["home"], "the_hollow": ["open"]}
+	"the_mountain": ["road"], "the_echoes": ["home"], "the_hollow": ["open"],
+	# Part XXI: the Maiden teaches those who have swept a year, the three thousand go home by way of
+	# their dead, and a school is founded where the broom is learned first
+	"the_pupils": ["sweep"], "the_three_thousand": ["home"], "the_arms": ["school", "rack"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -151,9 +158,10 @@ const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feas
 	"s_p17_haircut": "trust", "s_p17_thunder": "us", "s_p17_teacup": "home", "s_p17_graves": "her", "s_p17_kite": "road",
 	"s_p18_drill": "both", "s_p18_feast": "seventh",
 	"s_p19_campfire": "both", "s_p19_rest": "us",
-	"s_p20_tea": "room", "s_p20_fire": "live",}
+	"s_p20_tea": "room", "s_p20_fire": "live",
+	"s_p21_stage": "none", "s_p21_sweep": "broom",}
 ## the end of the story the bot chooses (cultures.gd ENDINGS), rarest first, of those its journey earned
-const ENDING_PLAN := ["open", "road", "lotus", "home", "azure"]
+const ENDING_PLAN := ["school", "open", "road", "lotus", "home", "azure"]
 var route := "peoples"
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
@@ -514,6 +522,12 @@ func _world(d: float) -> void:
 		world.move_dir = Vector2i.ZERO
 		_press("cancel", 0.4)
 		return
+	# 1a') the Eight Arms (arms.gd): the weapon the step asks for, or the next whose Dao is to be learned
+	if _want_arm() != "":
+		menu_goal = "arms"
+		world.move_dir = Vector2i.ZERO
+		_press("cancel", 0.4)
+		return
 	# 1b) the Hundred Works (works.gd): build the next work of the plan when it can be afforded
 	if _want_work() != "":
 		menu_goal = "works"
@@ -647,6 +661,10 @@ func _world(d: float) -> void:
 		"delve":
 			# Part XX: the nearest cave it has not been to the back of (caves.gd)
 			_delve_step()
+		"arms":
+			# Part XXI: Daos of arms are learned by winning with the weapon in hand (1a' above changes to
+			# the next one to learn); there are battles to be had in the wild
+			_grind()
 		"try":
 			# Part XX: the nearest thing of the cave still to be done (props.gd)
 			_try_step(s)
@@ -987,6 +1005,30 @@ func _want_outfit() -> String:
 			best = id
 	return best if best != Game.outfit else ""
 
+## The Eight Arms (arms.gd): the weapon the bot should have in its hand, "" if it already has.  The
+## one a step of the story asks for; else it learns each weapon it owns in turn, to Adept and then to
+## Master (the way a player who wants every technique would), and ends with the jian in its hand.
+func _want_arm() -> String:
+	var st := Game.cur_step()
+	var want := ""
+	if st.has("arm") and Game.arms.has(str(st.arm)):
+		want = str(st.arm)
+	else:
+		for goal in [1, 2]:
+			if want != "":
+				break
+			# (the one in hand is kept until it reaches the rank, so it is not put down half learned)
+			if Arms.tier(Game) < goal:
+				want = Arms.held(Game)
+				break
+			for id in Arms.ORDER:
+				if Game.arms.has(id) and Arms.tier(Game, id) < goal:
+					want = id
+					break
+		if want == "":
+			want = "sword"
+	return want if want != Arms.held(Game) else ""
+
 ## The option of a fated encounter's choice the plan prefers (the first in FATE_PLAN that can be taken).
 func _fate_pick(c, ids: Array) -> int:
 	var sid: String = str(main.fate_sid)
@@ -1018,6 +1060,12 @@ func _choice() -> void:
 			if want < 0 and k0 >= 0 and c.options[k0].get("enabled", true):
 				want = k0
 		_nav(ids.size(), c.cursor, maxi(want, 0))
+		return
+	if str(c.title) == main.ARMS_ASK:
+		want = ids.find(_want_arm())
+		if want < 0:
+			want = ids.find(Arms.held(Game))
+		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title).begins_with("The wardrobe"):
 		want = ids.find(_want_outfit())
@@ -1262,6 +1310,10 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 			"delved":
 				# the Hollow Hills release: caves can be gone to the back of whenever it likes (_delve_step)
 				pass
+			"arms":
+				# the Hundred Arms release: a Dao of arms is learned by fighting with the weapon in hand,
+				# which the bot does all along (_want_arm)
+				pass
 			_:
 				return false
 	return true
@@ -1300,6 +1352,10 @@ func _prepare_trial() -> bool:
 			"delved":
 				# the Hollow Hills release: go to the back of another cave
 				return _delve_step()
+			"arms":
+				# the Hundred Arms release: more battles with the weapon it is learning in hand
+				_grind()
+				return true
 			_:
 				# levels: the quest's own grinding (_cult_target); a Dao: the stele (_planned_dao)
 				return false
@@ -1942,7 +1998,7 @@ func _plan(b) -> Dictionary:
 		best = {"top": "attack", "target": _weakest(foes, "wood")}
 	best_score = 1.0
 	for sid in me.skills:
-		var sk: Dictionary = Data.SKILLS[sid]
+		var sk: Dictionary = Game.skill_of(sid)
 		if sk.has("heal") or me.qi < Game.skill_cost(sid) or sk.cost == 0:
 			continue
 		var tgt: Dictionary = _weakest(foes, sk.elem)
@@ -2049,6 +2105,9 @@ func _finish(reason: String) -> void:
 		"know_how": {"earned": Works.know_earned(Game), "spent": Works.know_spent(Game)}, "maker": Works.title(Game),
 		"crossroads": Game.picks, "scales": {"heart": Echoes.scale(Game, "heart"), "craft": Echoes.scale(Game, "craft"), "reach": Echoes.scale(Game, "reach")},
 		"known_as": Echoes.names(Game), "echoes_heard": Game.echoed.size(),
+		# the Hundred Arms release: the weapons owned, the one in hand, the Daos of arms and their mastery
+		"arms": Game.arms.keys(), "arm": Arms.held(Game), "arm_xp": Game.arm_xp, "arms_adept": Arms.adept(Game), "arms_master": Arms.masters(Game),
+		"arm_switches": Game.arm_switches, "ending_kind": Cultures.ending_kind(Game),
 		# the Hollow Hills release: the caves gone to the very back of (caves.gd)
 		"caves_delved": Game.delved.keys(),
 		"trials": Game.trials,
@@ -2082,6 +2141,12 @@ func _finish(reason: String) -> void:
 	print("works           : %d built (hand %d, wheel %d, art %d): %s; know-how %d earned, %d spent" % [Works.count(Game), Works.count(Game, "hand"), Works.count(Game, "wheel"), Works.count(Game, "dao"), Works.title(Game),
 		Works.know_earned(Game), Works.know_spent(Game)])
 	print("the dark        : %d caves gone to the very back of" % Game.delved.size())
+	var arm_parts: Array = []
+	for aid in Arms.ORDER:
+		if Game.arms.has(aid):
+			arm_parts.append("%s %s (%d)" % [aid, Data.DAO_RANKS[Arms.tier(Game, aid)], int(Game.arm_xp.get(aid, 0))])
+	print("the eight arms  : %d owned, %d Daos of arms at Adept, %d mastered, in hand %s" % [Game.arms.size(), Arms.adept(Game), Arms.masters(Game), Arms.held(Game)])
+	print("                  " + ", ".join(arm_parts))
 	print("crossroads      : %d answered, %d echoes heard; mercy %+d, new works %+d, wide world %+d%s" % [Game.picks.size(), Game.echoed.size(), Echoes.scale(Game, "heart"), Echoes.scale(Game, "craft"), Echoes.scale(Game, "reach"),
 		(": " + Echoes.names(Game)) if Echoes.names(Game) != "" else ""])
 	print("the hero        : %s, a young %s, kin %s; guest of %d hearths %s" % [Game.hero_name(), "woman" if Game.fem() else "man", str(Cultures.HEARTHS[Cultures.own(Game)].short), Cultures.guests(Game), JSON.stringify(Game.hearth)])

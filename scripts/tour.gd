@@ -2117,6 +2117,10 @@ func _run() -> void:
 		# the Hollow Hills release (--hollow, or --hollow=a,b): the caves, the bigger houses, the new
 		# things to do and Part XX
 		await _hollow_shots(str(main.args.hollow))
+	if main.args.has("arms"):
+		# the Hundred Arms release (--arms, or --arms=a,b): the faces, the Eight Arms and their forms, the
+		# Arms page, the ends of the story and Part XXI
+		await _arms_shots(str(main.args.arms))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -2930,3 +2934,309 @@ func _fire_shots(which: String = "1") -> void:
 		main.pop()
 		UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 		Game.reset()
+
+
+# ---------------------------------------------------------------- the Hundred Arms release
+## A bare stage for figures: [stage, camera].
+func _bare_stage(at_y: float, fov: float, floor_r: float = 0.0) -> Array:
+	main.world.hide()
+	var stage := Node3D.new()
+	stage.position = Vector3(0, at_y, 0)
+	main.add_child(stage)
+	var cam := Camera3D.new()
+	cam.fov = fov
+	cam.environment = Look.environment("garden", 0.1)
+	cam.environment.tonemap_exposure = 0.8
+	stage.add_child(cam)
+	stage.add_child(Look.sun("garden"))
+	stage.add_child(Look.fill("garden"))
+	var key := OmniLight3D.new()
+	key.position = Vector3(1.5, 2.4, 4.0)
+	key.omni_range = 12.0
+	key.light_energy = 0.3
+	stage.add_child(key)
+	if floor_r > 0.0:
+		var fl := MB.new()
+		fl.disc(Vector3.ZERO, floor_r, MB.tag(Color("8a9a88"), MB.STONE), 48, MB.tag(Color("6a7a6a"), MB.STONE))
+		MB.mesh_node(stage, fl.build(MB.mat_plain()))
+	return [stage, cam]
+
+func _caption(parent: Node3D, at: Vector3, text: String, size: float = 0.0016) -> void:
+	var lb := Label3D.new()
+	lb.text = text
+	lb.font_size = 48
+	lb.pixel_size = size
+	lb.outline_size = 12
+	lb.modulate = Color("fff4d8")
+	lb.outline_modulate = Color("201810")
+	lb.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	lb.no_depth_test = true
+	lb.position = at
+	parent.add_child(lb)
+
+## Images of the same width stacked into one.
+func _stack(n: String, rows: Array) -> void:
+	if rows.is_empty():
+		return
+	var w: int = rows[0].get_width()
+	var h := 0
+	for im in rows:
+		h += int(im.get_height() * float(w) / im.get_width())
+	var out := Image.create(w, h, false, Image.FORMAT_RGB8)
+	var y := 0
+	for im2 in rows:
+		var im: Image = im2
+		im.convert(Image.FORMAT_RGB8)
+		var hh := int(im.get_height() * float(w) / im.get_width())
+		if im.get_width() != w:
+			im.resize(w, hh, Image.INTERPOLATE_LANCZOS)
+		out.blit_rect(im, Rect2i(0, 0, w, hh), Vector2i(0, y))
+		y += hh
+	out.save_webp("%s/%s.webp" % [dir, n], true, 0.9)
+	print("[tour] ", n)
+
+## A row of heads, each wearing one face (faces.gd), with its name under it: returns the image.
+func _face_row(make: Callable, ids: Array, height: float, spacing: float = 0.36) -> Image:
+	var sc := _bare_stage(460.0, 22.0)
+	var stage: Node3D = sc[0]
+	var cam: Camera3D = sc[1]
+	var models: Array = []
+	for i in ids.size():
+		var m: Node3D = make.call()
+		m.position = Vector3((i - (ids.size() - 1) * 0.5) * spacing, 0.0, 0.0)
+		m.rotation.y = 0.18 if i % 2 == 0 else -0.18
+		stage.add_child(m)
+		Faces.wear(m, str(ids[i]))
+		_caption(stage, m.position + Vector3(0, height - 0.215, 0.2), str(Faces.EXPRESSIONS[ids[i]].get("n", "At rest")), 0.00056)
+		models.append(m)
+	cam.position = Vector3(0, height + 0.02, 0.5 + ids.size() * spacing * 1.28)
+	cam.look_at(stage.global_position + Vector3(0, height - 0.035, 0), Vector3.UP)
+	cam.make_current()
+	var t0 := 0.0
+	for k in 36:
+		t0 += 1.0 / 30.0
+		for m2 in models:
+			# (the idle clip from just after a blink, so no eye is caught shut by chance)
+			Models.anim_person(m2, 1.6 + t0, false)
+		await get_tree().process_frame
+	await _shot("face_row", false)
+	var img: Image = last_img
+	var crop := img.get_region(Rect2i(0, int(img.get_height() * 0.3), img.get_width(), int(img.get_height() * 0.37)))
+	stage.queue_free()
+	main.world.show()
+	return crop
+
+func _arms_state() -> void:
+	_spring_state("s_p19_end")
+	Game.level = 74
+	for id in Arms.ORDER:
+		Game.arms[id] = true
+	Game.arm_xp = {"sword": 96, "staff": 90, "sabre": 41, "spear": 22, "fan": 6, "bow": 37, "whip": 15, "brush": 2}
+	Game.toasts.clear()
+
+func _arms_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_arms_state()
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	main.world.load_area("sect", Vector2i(20, 9))
+	main.world.banner_t = 0.0
+	if want.call("faces"):
+		# fourteen faces on four heads: the hero as a young man and as a young woman, Yue Ling, the Elder
+		var makers := {
+			"hero": func(): return Models.hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false}),
+			"hero_f": func(): return Models.hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": true}),
+			"yue_ling": func(): return Assets.person("yue_ling"),
+			"elder": func(): return Assets.person("elder_qing"),
+		}
+		for who in makers:
+			var rows: Array = []
+			rows.append(await _face_row(makers[who], Faces.ORDER.slice(0, 7), 1.6 if who != "elder" else 1.58))
+			rows.append(await _face_row(makers[who], Faces.ORDER.slice(7, 14), 1.6 if who != "elder" else 1.58))
+			_stack("faces_%s" % who, rows)
+	if want.call("rack"):
+		# the Eight Arms in the hand
+		var sc := _bare_stage(480.0, 30.0, 9.0)
+		var stage: Node3D = sc[0]
+		var cam: Camera3D = sc[1]
+		var hs: Array = []
+		for i in Arms.ORDER.size():
+			var id: String = Arms.ORDER[i]
+			var h := Models.hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": i % 2 == 1, "arm": id})
+			h.position = Vector3((i - 3.5) * 1.02, 0, 0)
+			h.rotation.y = 0.5
+			stage.add_child(h)
+			h.add_child(Models.shadow_disc(0.6))
+			_caption(stage, h.position + Vector3(0.0 if id != "spear" else 0.42, 2.02, 0), str(Arms.WEAPONS[id].zh).trim_prefix("the "), 0.0024)
+			hs.append(h)
+		cam.position = Vector3(0, 1.45, 9.7)
+		cam.look_at(stage.global_position + Vector3(0, 1.12, 0), Vector3.UP)
+		cam.make_current()
+		for k in 30:
+			for h2 in hs:
+				Models.anim_person(h2, 1.6 + k / 30.0, false)
+			await get_tree().process_frame
+		await _shot("arms_rack")
+		stage.queue_free()
+		main.world.show()
+	for kind in ["clip", "art"]:
+		if not want.call("forms") and not want.call(kind):
+			continue
+		# each weapon's own blow (and the technique of its Dao), six moments of it from the side
+		var rows2: Array = []
+		for id2 in Arms.ORDER:
+			if main.args.has("arm") and not str(main.args.arm).split(",").has(id2):
+				continue
+			var sc2 := _bare_stage(500.0, 30.0, 5.0)
+			var stage2: Node3D = sc2[0]
+			var cam2: Camera3D = sc2[1]
+			var m := Models.hero({"look": "sweeper", "cols": {}, "outfit": "sweeper", "fem": false, "arm": id2})
+			stage2.add_child(m)
+			m.add_child(Models.shadow_disc(0.6))
+			m.rotation.y = float(main.args.get("yaw", "1.1"))
+			cam2.position = Vector3(0, 1.3, 6.4)
+			cam2.look_at(stage2.global_position + Vector3(0, 1.0, 0), Vector3.UP)
+			cam2.make_current()
+			var ap: AnimationPlayer = m.get_meta("ap", null)
+			var clip := str(Arms.WEAPONS[id2][kind])
+			if ap == null or not ap.has_animation(clip):
+				print("[tour] no clip ", clip)
+				stage2.queue_free()
+				continue
+			var ln: float = ap.get_animation(clip).length
+			Faces.wear(m, "shout")
+			Arms.tick(m, 1.0, clip)
+			ap.play(clip)
+			var strip: Array = []
+			var moments := [0.12, 0.3, 0.44, 0.54, 0.64, 0.84] if kind == "clip" else [0.14, 0.3, 0.46, 0.6, 0.72, 0.86]
+			for f in moments:
+				ap.seek(ln * float(f), true)
+				Faces.tick(m, 0.2)
+				await get_tree().process_frame
+				await get_tree().process_frame
+				await _shot("form", false)
+				strip.append(last_img)
+			var fw: int = strip[0].get_width()
+			var fh: int = strip[0].get_height()
+			var cw := int(fw * 0.42)
+			var row := Image.create(cw * strip.size(), int(fh * 0.72), false, Image.FORMAT_RGB8)
+			for i2 in strip.size():
+				var im: Image = strip[i2]
+				im.convert(Image.FORMAT_RGB8)
+				row.blit_rect(im, Rect2i((fw - cw) / 2, int(fh * 0.2), cw, int(fh * 0.72)), Vector2i(i2 * cw, 0))
+			row.resize(1920, int(row.get_height() * 1920.0 / row.get_width()), Image.INTERPOLATE_LANCZOS)
+			if main.args.has("each"):
+				row.save_webp("%s/arms_%s_%s.webp" % [dir, kind, id2], true, 0.9)
+			rows2.append(row)
+			stage2.queue_free()
+			main.world.show()
+		_stack("arms_blows" if kind == "clip" else "arms_arts", rows2)
+	if want.call("people"):
+		await _gallery("part21_people", [Assets.person("ou_yezi"), Assets.person("yue_maiden"), Assets.person("ji_chang"), Assets.person("zhuang_envoy"), Assets.person("king_zhao"), Assets.person("wuzhu")], 0.72, 0.2)
+		var cast: Array = [Assets.person("ou_yezi"), Assets.person("yue_maiden"), Assets.person("ji_chang"), Assets.person("king_zhao")]
+		var moods := ["resolve", "joy", "doubt", "sorrow"]
+		for i in cast.size():
+			Faces.wear(cast[i], moods[i])
+		await _portraits("part21_faces", cast, 0.66, 1.68, 2.1)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["sword_reed", "white_gibbon", "hook_heron", "stray_arrow", "wheel_louse", "cup_snake", "gate_swordsman", "fighting_cock", "broken_edge", "pool_blade", "mound_tiger", "humming_sword"]:
+			fs.append(_foe(fid))
+		await _gallery("part21_foes", fs, 1.0, 0.25)
+		await _gallery("part21_lords", [_foe("yuan_gong", true), _foe("sword_dragons", true), _foe("king_zhao", true), _foe("wuzhu", true)], 2.2, 0.25)
+	if want.call("bosses"):
+		var arms_for := {"yuan_gong": "staff", "sword_dragons": "spear", "king_zhao": "fan", "wuzhu": "sword"}
+		for bid in arms_for:
+			var ba := Trials.boss_area(bid)
+			Game.arm = str(arms_for[bid])
+			main.world.load_area(ba, MapGen.arrival_tiles(ba)[0] if not MapGen.arrival_tiles(ba).is_empty() else Vector2i(20, 20))
+			main.battle.start([{"id": bid, "lv": 77}], {"boss": true, "enemy": bid, "theme": str(Data.AREAS[ba].theme)})
+			main.push("battle")
+			await _wait(2.8)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+		Game.arm = "sword"
+	if want.call("battle"):
+		# a blow with each of four weapons, in the middle of a battle
+		for aid in ["spear", "staff", "bow", "whip"]:
+			Game.arm = aid
+			main.world.load_area("marsh", MapGen.arrival_tiles("marsh")[0])
+			main.battle.start([{"id": "sword_reed", "lv": 75}, {"id": "white_gibbon", "lv": 75}, {"id": "hook_heron", "lv": 75}], {"theme": "marsh"})
+			main.push("battle")
+			await _wait(1.6)
+			var b = main.battle
+			for tries in 40:
+				if b.state == "menu" and b.cur.get("idx", -1) == 0:
+					break
+				if b.state == "menu":
+					b._perform(b.cur, "needle", [b.alive(b.foes)[0]])
+				await _wait(0.3)
+			if b.state == "menu":
+				b._perform(b.cur, "strike", [b.alive(b.foes)[0]])
+				await _wait(0.2 + float(main.args.get("blow-at", "0.22")))
+				await _shot("battle_arm_" + aid)
+			main.pop()
+		Game.arm = "sword"
+	if want.call("page"):
+		main.world.load_area("sect", Vector2i(20, 9))
+		main.world.banner_t = 0.0
+		main.open_arms()
+		main.choice.cursor = 3
+		main.choice.preview.call("spear")
+		await _wait(1.0)
+		await _shot("arms_page")
+		main.choice.cursor = 5
+		main.choice.preview.call("bow")
+		await _wait(0.8)
+		await _shot("arms_page_bow")
+		main.pop()
+		main.world.preview_weapon("")
+		Game.arm_xp["sabre"] = 15
+		Game.trials = {}
+		main.open_trial({"enemy": "king_zhao", "lv": 77, "req": 76, "id": "boss_king_zhao", "pos": Vector2i.ZERO})
+		await _wait(0.8)
+		await _shot("trial_by_the_hand")
+		main.pop()
+	if want.call("choice"):
+		Game.step = Data.step_index("s_p21_racks")
+		Game.cross_pending = ["the_arms"]
+		main.ask_crossroads()
+		main.choice.cursor = 2
+		await _wait(1.0)
+		await _shot("crossroads_arms")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("ends"):
+		# the twelve ends as the choice shows them: a journey that earned most of them, and a dark one chosen
+		_ending_state()
+		Game.finished = false
+		Game.hearth = {"valley": 12, "steppe": 10, "sand": 12, "river": 7, "forge": 4, "dawn": 12}
+		Game.scales = {"heart": -4, "reach": 5, "craft": 4}
+		Game.fates = {}
+		for wid in Works.ORDER.slice(0, 10):
+			Game.works[wid] = 1
+		main.set_stack(["world"])
+		main.choose_ending()
+		main.choice.cursor = 5
+		await _wait(1.0)
+		await _shot("ending_choice_twelve")
+		main.choice.cursor = 8
+		await _wait(0.6)
+		await _shot("ending_choice_dark")
+		main.pop()
+		for eid in ["throne", "school", "far"]:
+			_ending_state()
+			Game.ending = eid
+			main.set_stack(["world"])
+			main.push("ending")
+			await _wait(1.0)
+			var e = main.ending
+			e.t = 4.0
+			main.press("confirm")
+			await _wait(3.5)
+			await _shot("ending_" + eid)
+			main.pop()
+		Game.finished = false
+		Game.ending = ""
+
