@@ -983,7 +983,7 @@ func open_arms() -> void:
 		var tr := Arms.tier(Game, id)
 		var xp := int(Game.arm_xp.get(id, 0))
 		var nxt := "" if tr >= Arms.TIERS.size() - 1 else "  (%d of %d battles to %s)" % [xp, int(Arms.TIERS[tr + 1]), Data.DAO_RANKS[tr + 1]]
-		var desc := told(str(w.desc)) + "\n\n%s: \"%s\"\n%s %s%s\nNow: %s." % [str(w.dao.n), str(w.dao.motto), Data.DAO_RANKS[tr], told(str(w.dao.desc)), nxt, Arms.mods_text(id, tr)]
+		var desc := told(str(w.desc)) + "\n\n%s: \"%s\"\n%s. %s%s\nNow: %s." % [str(w.dao.n), str(w.dao.motto), Data.DAO_RANKS[tr], told(str(w.dao.desc)), nxt, Arms.mods_text(id, tr)]
 		desc += "\nIts technique, from Adept on: %s.\n%s" % [Data.SKILLS[str(w.skill)].n, told(str(w.how))]
 		opts.append({"id": id, "label": str(w.n) if have else "? " + str(w.n), "note": "in hand" if id == Arms.held(Game) else (Data.DAO_RANKS[tr] if have else "not yet"),
 			"desc": desc, "col": w.col, "enabled": have, "current": id == Arms.held(Game)})
@@ -1224,7 +1224,7 @@ func choose_ending() -> void:
 			var nt := Cultures.ending_need_text(n, Game)
 			if nt != "":
 				desc += "\n%s %s" % ["+" if Cultures.ending_need_met(n, Game) else "-", nt]
-		opts.append({"id": id, "label": str(en.label), "sub": str(en.sub), "desc": desc, "note": (str(en.n) if not en.has("kind") or str(en.kind) == "bright" else "%s: %s" % [str(en.n), str(Cultures.ENDING_KINDS[str(en.kind)])]) if open else "not earned", "col": Color(en.sky).darkened(0.25), "enabled": open})
+		opts.append({"id": id, "label": str(en.label), "sub": str(en.sub), "desc": desc, "note": (str(en.n) if not en.has("kind") or str(en.kind) == "bright" else "%s, %s" % [str(en.n), str(en.kind)]) if open else "not earned", "col": Color(en.sky).darkened(0.25), "enabled": open})
 	choose(ENDING_ASK, opts, func(id: String):
 		Game.ending = id if Cultures.ENDINGS.has(id) and Cultures.ending_open(id, Game) else "azure"
 		Game.note("Ending reached: %s (%s)" % [str(Cultures.ENDINGS[Game.ending].n), str(Cultures.ENDING_KINDS[Cultures.ending_kind(Game)])])

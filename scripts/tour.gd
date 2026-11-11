@@ -3068,9 +3068,9 @@ func _arms_shots(which: String = "1") -> void:
 			h.rotation.y = 0.5
 			stage.add_child(h)
 			h.add_child(Models.shadow_disc(0.6))
-			_caption(stage, h.position + Vector3(0, 2.32 if id in ["spear"] else 2.02, 0), str(Arms.WEAPONS[id].zh).trim_prefix("the "), 0.0024)
+			_caption(stage, h.position + Vector3(0.0 if id != "spear" else 0.42, 2.02, 0), str(Arms.WEAPONS[id].zh).trim_prefix("the "), 0.0024)
 			hs.append(h)
-		cam.position = Vector3(0, 1.45, 8.3)
+		cam.position = Vector3(0, 1.45, 9.7)
 		cam.look_at(stage.global_position + Vector3(0, 1.12, 0), Vector3.UP)
 		cam.make_current()
 		for k in 30:

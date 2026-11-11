@@ -163,6 +163,9 @@ func _refresh_ending() -> void:
 			if c is OmniLight3D:
 				(c as OmniLight3D).light_color = Color(1.0, 0.62, 0.3) * sky
 
+## what the results are headed with, for the ends that are not an ascension
+const HEADLINES := {"school": "THE SCHOOL", "broom": "A MORTAL LIFE", "throne": "THE THRONE", "blade": "UNSHEATHED", "engine": "THE ENGINE", "cold": "ALONE"}
+
 ## the last line of the film for the ends that are not kept by a fire (cultures.gd: the bitter and the dark)
 const LAST_WORDS := {
 	"broom": "Lin Feng, once a sweeper of steps, gave back what Heaven lent him, and was a sweeper of steps.",
@@ -995,7 +998,9 @@ func _card(a: float) -> void:
 	Gfx.hgrad(self, Rect2(VIEW.x * 0.5, 0, VIEW.x * 0.5, VIEW.y), Color(0.02, 0.02, 0.06, 0.0), Color(0.02, 0.02, 0.06, 0.4 * a))
 	var lc := 400.0
 	var ta := smoothstep(tf - 0.2, tf + 1.0, t)
-	_caps(Vector2(lc, 96.0), "ASCENSION", 58, Color("ffe6a0").lerp(Color("fff6d8"), 0.5 + 0.5 * sin(t * 1.2)), ta, 14.0, 0.85)
+	# (the Hundred Arms release: not every end is an ascension, and the results say which this was)
+	var headline := str(HEADLINES.get(Cultures.ending_of(Game), "ASCENSION"))
+	_caps(Vector2(lc, 96.0), headline, 58 if headline.length() <= 10 else 44, Color("ffe6a0").lerp(Color("fff6d8"), 0.5 + 0.5 * sin(t * 1.2)), ta, 14.0, 0.85)
 	var fav := Trials.favourite_kind(Game)
 	var who := "Lin Feng, %s" % str(Trials.EPITHETS.get(fav, "")) if Trials.EPITHETS.has(fav) else "Lin Feng of the Azure Cloud"
 	var ncol: Color = Trials.KINDS[fav].col if fav != "" else UI.C_GOLD

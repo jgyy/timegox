@@ -1,12 +1,22 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Skill Become Dao, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 224 bosses, twenty-four Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns lived in by **219 townsfolk with days of their own**, things in the streets that really break, and 86 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (five ways), answer at **sixteen crossroads** that the whole story remembers, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
+Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Sheathed Edge, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has 237 bosses, twenty-six Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns lived in by **219 townsfolk with days of their own**, things in the streets that really break, and 86 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **eight peoples** of the realms, change into **twelve outfits**, ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (twelve ways, bright, bitter and dark), answer at **twenty-two crossroads** that the whole story remembers, carry the **Eight Arms**, each struck with in its own way and each a Dao of its own, go down into a **cave under every region**, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted after the **3D anime characters of gacha games**, and **every face shows what it feels**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet.
 
-> **Total gameplay duration: about 22 hours 46 minutes** (22:45:41 of game time for the end-to-end bot run, seed 1234), **1 hour 3 minutes more than the last release** (21:42:46). **Smaller and faster**: the assets directory is a third smaller (526 MB to 352 MB, every model packed as it is exported, the same in the game), the world opens ten seconds sooner (the land is generated behind the title screen), and a frame in a town draws a fraction of what it did (40 million triangles to 6 million at Qingshi: every figure keeps its levels of detail, heavy scenery has a far mesh, nothing is drawn past where it can be made out). **Choices matter to the whole story**: sixteen **crossroads**, one in almost every part, each asked once; every answer tips one of three scales that change how the world meets you, **echoes** in later conversations (68 sets of lines only ever said to somebody who chose that way, up to fifteen parts later), and is told at the end. **Technology**: the **Hundred Works**, eighteen things to build in three schools (the Hand, the Wheel, the Art) from know-how learned by looking, each standing in the land as a machine and changing how the game plays; a journey builds about two schools of the three. **Monsters keep hours**: asleep, foraging, hunting, resting in the heat or gathered by the clock, seen in the land and felt in the battle. **Part XIX, "The Machine Heart", plays in about 1 hour 39 minutes**: Gongshu Ban builds a wheel that never stops, an old gardener will not use a well-sweep, a dancer taken apart in front of a king has built itself a heart, a wooden magpie has been on the wind for two thousand years, and what the land is to do with its machines is asked three times; a new realm, **Skill Become Dao**, and a new way through trials, **By the works**. Bugs were found and fixed.
+> **Total gameplay duration: about 25 hours 56 minutes** (25:56:01 of game time for the end-to-end bot run, seed 1234), **1 hour 49 minutes more than the last release** (24:07:25). **Faces that show what they feel**: six bones of expression are sculpted into every one of the 225 human heads (brows, the corners of the mouth, lids and jaw, with the skin beneath weighted to them), and fourteen faces are worn over whatever the body is doing: in battle, in every gesture, and read from the words of a conversation. **The Eight Arms**: the jian, the sweeper's own staff, a sabre, a spear, an iron fan, a bow, a chain whip and a judge's brush, eight models built from code, **each struck with in its own way** (fifteen new clips) and **each a Dao of its own**, learned by fighting with it, with something only that weapon does and a technique of its own for an Adept. **Twelve ends, and not all of them are kind**: seven bright, one bitter and four dark (the Jade Throne, the Blade That Would Not Sheathe, the Wheel That Never Stops, the Cold Hearth), each open only to the journey that walked towards it. **Part XXI, "The Hundred Arms", plays in about 1 hour 28 minutes**: the racks of the armoury are empty and it was not thieves, the pits of Tushan are pouring blades nobody ordered, an old white ape has been teaching the one stroke he ever saw, the best archer under heaven cannot think what a bow is for, a king keeps three thousand swordsmen fighting at his gate, and what a weapon is for is asked three times; a new realm, **Sheathed Edge**, and a new way through trials, **By the hand**. Bugs were found and fixed.
 
 | | |
 |---|---|
+| ![fourteen faces on one head: at rest, a smile, joy, tenderness, sorrow, anger, a battle cry, resolve, surprise, fear, pain, doubt, stillness and sleep, each a pose of six bones sculpted into the head](docs/screenshots/faces_hero_f.webp) | ![the same fourteen on Yue Ling](docs/screenshots/faces_yue_ling.webp) |
+| ![the same fourteen on the hero as a young man](docs/screenshots/faces_hero.webp) | ![and on the Elder: every one of the 225 people has them](docs/screenshots/faces_elder.webp) |
+| ![the Eight Arms in the hand: the jian, the staff, the sabre, the spear, the iron fan, the bow, the chain whip and the judge's brush](docs/screenshots/arms_rack.webp) | ![the arms rack (Esc > Arms): each weapon, its Dao and rank, what it does now, and its technique; the one under the cursor is shown in the hand](docs/screenshots/arms_page.webp) |
+| ![each weapon is struck with in its own way: six moments of the plain blow of the jian, staff, sabre, spear, fan, bow, whip and brush](docs/screenshots/arms_blows.webp) | ![the technique of each weapon's Dao: One Line, Sweeping the Thousand Steps, the Tiger Comes Down the Mountain, the Dragon Leaves the Sea, the Wind Unfolds, the Shot Not Shot, Nine Bends, One Stroke](docs/screenshots/arms_arts.webp) |
+| ![a battle in the Crimson Marsh with the spear in hand](docs/screenshots/battle_arm_spear.webp) | ![a trial passed by the hand: the king who loved swords, shown four weapons each put down when it is done](docs/screenshots/trial_by_the_hand.webp) |
+| ![the sky is held: twelve ends, the ones the journey earned open, and a dark end says that it is one](docs/screenshots/ending_choice_dark.webp) | ![a dark end: the Jade Throne](docs/screenshots/ending_throne.webp) |
+| ![a bright end: the School of the Eight Arms](docs/screenshots/ending_school.webp) | ![a bitter end: the Far Shore](docs/screenshots/ending_far.webp) |
+| ![the people of Part XXI: Ou Yezi the swordsmith, the Maiden of Yue, Ji Chang the archer, the swordsman in scholar's dress, King Wen of Zhao and Wuzhu, the Masterless Edge](docs/screenshots/part21_people.webp) | ![the four lords of Part XXI: Yuan Gong the White Ape, the Paired Dragons Gan Jiang and Mo Ye, King Wen of Zhao and Wuzhu](docs/screenshots/part21_lords.webp) |
+| ![the foes of Part XXI: sword-reeds, white gibbons, hook-bill herons, stray arrows, the louse as big as a cartwheel, bow-shadow snakes, swordsmen of the gate, fighting cocks, broken edges, blades of the Sword Pool, the white tiger of the mound and humming swords](docs/screenshots/part21_foes.webp) | ![the last crossroads of Part XXI: what is done with the arms of the land](docs/screenshots/crossroads_arms.webp) |
+| ![King Wen of Zhao, who loved swords, met with a fan](docs/screenshots/battle_boss_king_zhao.webp) | ![Wuzhu, the Masterless Edge: four thousand blades with no hand, in the shape of somebody](docs/screenshots/battle_boss_wuzhu.webp) |
 | ![the machines of the Wheel, built from code: the well-sweep, a water-wheel, the water trip-hammer, the water-bellows, the repeating crossbow, the south-pointing chariot and the wooden ox](docs/screenshots/works_wheel.webp) | ![the Works page: eighteen works in three schools, what each does and costs, and the know-how learned by looking](docs/screenshots/works_page.webp) |
 | ![the oldest tools (the fire-drill, knotted cords, the sling, the kiln, the stone adze, the hide coat)](docs/screenshots/works_hand.webp) | ![the arts of the Dao worked into things (the spirit-gathering array, cinnabar talismans, the eight-trigram furnace, paper servants, the heaven-watching mirror, formation flags)](docs/screenshots/works_art.webp) |
 | ![the last crossroads of Part XIX: what the land does with its machines, which only a maker of a school may answer for it](docs/screenshots/crossroads_choice.webp) | ![the Crossroads page: the three scales, and what was asked, chosen and heard of each answer](docs/screenshots/crossroads_page.webp) |
@@ -25,6 +35,95 @@ Play Lin Feng, **a young man or a young woman** (or whoever you make them: name,
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph FC[Faces that show what they feel: art/lib/face.py, faces.gd]
+    SC[six bones sculpted into every head:<br/>two brows, two corners of the mouth,<br/>lids, jaw] --> EX[fourteen faces, each a pose<br/>of the six, worn over any clip]
+    EX --> GS[gestures and battle actions<br/>set one by themselves]
+    EX --> DL[a line of dialogue is read for one:<br/>its cue, or its words]
+    EX --> BZ[a body busy with something keeps one:<br/>asleep, at peace, set to the work]
+    end
+    subgraph AR[The Eight Arms: art/lib/arms.py, arms.gd]
+    W8[jian, staff, sabre, spear,<br/>fan, bow, chain whip, judge's brush:<br/>eight models built from code] --> HB[hung on the sword bone:<br/>a clip that stows the sword stows any]
+    HB --> BL[each struck with in its own way:<br/>seven new clips for the plain blow]
+    HB --> DA[each a Dao of its own:<br/>Novice, Adept, Master, by battles<br/>won with it in the hand]
+    DA --> MD[what only that weapon does:<br/>sweep, pierce, bind, mark,<br/>slip, loose first]
+    DA --> TQ[an Adept learns its technique:<br/>eight new clips]
+    DA -.->|By the hand| TR[a new way through trials]
+    end
+    subgraph EN[Twelve ends: cultures.gd]
+    J[what the journey earned:<br/>hearths, peoples, Yue Ling,<br/>Daos of arms, works, the three scales] --> BR[seven bright ends]
+    J --> BI[one bitter: the Far Shore]
+    J --> DK[four dark: the Jade Throne,<br/>the Blade That Would Not Sheathe,<br/>the Wheel That Never Stops,<br/>the Cold Hearth]
+    end
+    subgraph P21[Part XXI: the Hundred Arms]
+    A0[the racks of the armoury<br/>are empty] --> OU[Ou Yezi: blades<br/>nobody ordered] --> YU{the White Ape:<br/>a trial} --> X1{{crossroads:<br/>who is to be taught?}}
+    X1 --> JI[Ji Chang, who forgot<br/>what a bow is] --> GM{the Paired Dragons:<br/>a trial} --> KZ{the king who<br/>loved swords: a trial} --> X2{{crossroads:<br/>the three thousand}}
+    X2 --> WZ{Wuzhu, the Masterless<br/>Edge: a trial} --> X3{{crossroads: the arms<br/>of the land}} --> SE((Sheathed<br/>Edge))
+    end
+    DA -.-> P21
+    X3 -.-> J
+```
+
+- **Faces that show what they feel** (`art/lib/face.py`, `scripts/faces.gd`, new). Until now a face could blink and open its mouth, and that was all: a lord laughed, grieved and died with the same expression. Now **six bones of expression are sculpted into every human head**: one under each eyebrow, one at each corner of the mouth, `lids` over the eye bone and `jaw` over the mouth bone. The brows and the lips are weighted to them wholly and **the skin beneath them partly** (a share that falls off smoothly from the bone), so a cheek lifts with the corner of a smile and the forehead follows a frown: the face is one sculpted surface that moves, not features sliding on a mask. All 225 people were rebuilt from their scripts.
+  - **Fourteen faces**, each a pose of the six bones written in the head's own measures (millimetres and radians): at rest, a smile, joy (the eyes shut into arcs, the mouth open), tenderness, sorrow (the inner ends of the brows up, the corners of the mouth down), anger, a battle cry, resolve, surprise, fear, pain, doubt (one brow up, one corner of the mouth), stillness and sleep. A blend of two faces is a blend of their numbers, so a face is about a fifth of a second in changing.
+  - **No clip moves the six bones**, so every face can be worn over every clip: the eye bone hangs from `lids` and the mouth bone from `jaw`, and a blink still blinks inside narrowed eyes and a mouth still talks inside a smile. Nothing was added to any clip, and the assets grew by a thousandth.
+  - **Faces come by themselves.** Every gesture and battle action has one (`Faces.OF_ACT`: a blow is struck with a battle cry, taken with pain, a victory is joy, a bow is tender, a shrug is doubt), so does whatever a body is busy with (`Faces.OF_CLIP`: asleep on a bench, at peace in meditation, set at the anvil, a smile over a bowl), and **a line of dialogue is read for one**: a cue as its fourth element, or else its words ("Hahaha!", "I am sorry", "How dare you", a question). The hero's face on the lotus at the end is the face of the end that was chosen.
+- **The Eight Arms: weapons to carry, each used in its own way, each a Dao of its own** (`scripts/arms.gd`, `art/lib/arms.py`, new; Esc > **Arms**). A sweeper came up the mountain with a broom and was given a sword, and for twenty parts that was all he fought with. The old books give every weapon a temper: the jian is the gentleman of arms, the sabre their courage, the spear their king, the staff their grandfather.
+
+  | Weapon | Won | Its own blow | Its Dao (Novice, Adept, Master) | Its technique, from Adept |
+  |---|---|---|---|---|
+  | **The Jian** | the first morning | the diagonal cut | *the Straight Edge*: true blows 5, 8, 12% more often, the plain blow keener | One Line: always lands true |
+  | **The Sweeper's Staff** (his own broom handle) | the first morning | a level sweep in both hands | *the Level Staff*: the plain blow sweeps on through every other foe for 34, 44, 55% | Sweeping the Thousand Steps: two turns under a level staff |
+  | **Iron Fang's Sabre** | from the bandit chief | both hands up behind the head, and the whole weight down | *the Single Stroke*: the plain blow 32, 46, 60% heavier, a little slower to act | The Tiger Comes Down the Mountain |
+  | **The Armoury Spear** | the Elder's leave, at Golden Core | drawn back to the hip, and the body out along it | *the Long Reach*: the plain blow and single techniques ignore 40, 65, 90% of a guard | The Dragon Leaves the Sea: through the whole guard |
+  | **The Empress's Fan** | left on the ice at Frostpeak | closed across the body, flicked open at arm's length | *the Folding Wind*: the party slips 5, 8, 11% of blows, techniques cost less | The Wind Unfolds: every foe, for less qi |
+  | **The Roc-Sinew Bow** | strung by the horse-folk | side on, drawn to the ear, loosed | *the Unloosed Arrow*: speed +3, 5, 7, the first blow of a battle 40, 65, 90% harder | The Shot Not Shot: kneeling, a long draw |
+  | **The Nine-Link Whip** | chains of the Blood Moon Palace | whirled once overhead and thrown out | *the Nine Bends*: a struck foe is bound, its attack 10, 14, 18% weaker | Nine Bends: binds every foe |
+  | **The Judge's Brush** | the Dragon King's thanks | a dot, a lift and a second dot | *the Written Stroke*: a struck foe is marked, and takes 10, 15, 20% more from everything after | One Stroke: marks what it strikes |
+
+  - **Eight models built from code**, each standing on its grip (`art/weapons/<id>.py`, 900 to 1,900 triangles), and **hung on the hero's sword bone** by the game. The hero's eight models (four looks, a man's frame and a woman's) no longer carry a blade of their own, so whatever is in the hand is put away by every clip that needs both hands, exactly as the sword always was, and comes back out afterwards. A spear and a staff stand upright beside their bearer and a bow hangs by the leg until an action begins (`Arms.tick` eases between the way a weapon is carried and the way it is used).
+  - **Fifteen new clips**: a plain blow for each of the seven weapons that are not the jian, and the technique of all eight (`person.ARMS`, written as a few held poses with the time each is reached; `_keyed` eases between them, lets cloth and hair lag, and turns the whole figure where a form spins). They are played in battle and in the open land (F).
+  - **Each weapon is a Dao**, walked beside the Dao of the road and not instead of it: a battle won with a weapon in the hand deepens that weapon's Dao (a lord's four times as much), 15 battles to Adept and 90 to Master, each weapon keeping its own mastery. A weapon's technique is measured against what Lin Feng already knows (`Game.skill_of`: a share more than the strongest technique of the same reach he has), so a sabre taken off a bandit at Qi Condensation is still worth carrying at Hollow Vessel.
+  - **By the hand**: a new way through trials, for the Daos of arms learned. **Part XXI asks for battles won with particular weapons** (a hunt with `"arm"` counts what falls while that weapon is in the hand), and two of the ends of the story are open only to somebody who has learned several.
+- **Twelve ends, and not every one of them is kind** (`scripts/cultures.gd`). The story had five ends, all of them by a fire. Now it has twelve: **seven bright, one bitter and four dark**, each open only to the journey that walked towards it, and a bitter or a dark end says what it is before it is chosen.
+
+  | End | Kind | Open to |
+  |---|---|---|
+  | The Azure Cloud, the Fire at Home, the Road of Six Fires, the Open Door, the Lotus Hearth | bright | as before: always, five hearths, four hearths and four peoples, a kindred spirit |
+  | **The School of the Eight Arms**: every weapon, and a year with a broom first | bright | four Daos of arms learned to Adept |
+  | **The Broom**: the root given back, and sixty years more on the steps | bright | known at the crossroads as of the Old Ways |
+  | **The Far Shore**: up past the ninth heaven, from which no letter comes down | bitter | of the Wide World |
+  | **The Jade Throne**: the empty seat, the Ledger opened at a clean page, and all quite fair | dark | Unbending, and of the Wide World |
+  | **The Blade That Would Not Sheathe**: down the mountain to find an equal | dark | two Daos of arms mastered, and Unbending |
+  | **The Wheel That Never Stops**: an engine to hold the sky, and nobody to sit up with a fire | dark | nine works built, and of the New Works |
+  | **The Cold Hearth**: the sky held alone, by somebody nobody knows | dark | a guest at no hearth but his own, and a stranger still to Yue Ling |
+
+  - The scales of the crossroads, which until now only changed how the world met Lin Feng, **decide which ends are there to choose**; so do the works, the arms, and what was never done at all. The Cold Hearth is open on the first morning and shut by the second hearth that calls him a guest.
+  - A dark end is told in three lines of its own, without the kind word his own hearth had ready, has its own last line over the film (`Ending.LAST_WORDS`), its own light and its own face on the lotus, and the results name it for what it is. The Jade Throne ends: *and somewhere below, in a village at the foot of some other mountain, an orphan with an odd root in him looks up at the red light in the sky, and picks up a broom.*
+- **Part XXI, "The Hundred Arms"** plays in about 1 hour 28 minutes (see [below](#part-xxi-the-hundred-arms)) and the whole game is **1 hour 49 minutes longer** than the last release, verified by the playthrough bot; CI still requires **16 hours**. (The twenty older parts play 21 minutes longer than they did: a hero who learns eight weapons in turn spends a while as a Novice of each, and goes to the arms rack twenty-nine times.) A new realm, **Sheathed Edge**, four lords guarded by trials, three crossroads (and four older ones that echo in it), twelve new foes that keep hours, six new people built in Blender, two caves of the story (the Sword Pool under the Dragon Gate and the Barrow of the Unburied Blade), a new kind of quest step (so many Daos of arms learned) and hunts that ask for a weapon.
+- **The bot** changes weapons by itself as a player who wanted every technique would (`_want_arm`: the weapon a step asks for; else each weapon it owns in turn to Adept and then to Master), through the menu and the arms rack like a player; passes the White Ape by the hand, the Paired Dragons side by side with Yue Ling, the king with a cock of wood from the smith and the Masterless Edge with the scroll the king left; answers the three crossroads; and at the end founds the school. Its report lists the weapons, each Dao's rank and battles, and the kind of end.
+- **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
+- **Code**: the game's GDScript grew to 56,987 lines (`scripts/faces.gd` and `arms.gd` are new) and the Blender Python to 24,466 (`art/lib/arms.py` and `art/weapons/` are new); all 295 assets (225 people, 41 monsters, a mount, 26 props and 8 weapons) rebuild from their scripts. The tests now make 34,189 checks.
+
+**Where the chapter comes from.** Ou Yezi and the five swords he cast for the King of Yue (Zhanlu, which left an unjust king in the night and went by water to another) are in the *Yuejue shu*; Gan Jiang and Mo Ye, the pair of swords named for a smith and the wife who went into the furnace, are in the *Wu Yue Chunqiu*, and the *Book of Jin* has them leap from a belt into the river at Yanping Ford as two dragons. The Maiden of Yue, who taught an army ("inside, be full of spirit; outside, show calm: look like a mild woman, strike like a frightened tiger") and met the old man in white who went up a tree an ape, is in the *Wu Yue Chunqiu* too. Ji Chang, who lay under a loom to learn not to blink, looked at a louse until it was a cartwheel, tried to kill his teacher and met his arrows in the air, is in the *Liezi*; that he ended by forgetting what a bow was is Nakajima Atsushi's telling of it. King Wen of Zhao, his three thousand swordsmen and the three swords are the *Zhuangzi*'s Discourse on Swords, whose last line is that the swordsmen all killed themselves, which the chapter declines to take for a happy ending; the cock of wood is the *Zhuangzi*'s as well. King Helu's three thousand swords under Tiger Hill and the white tiger on the mound are the *Yuejue shu* again, and the snake in the cup that was the shadow of a bow is the *Fengsu tongyi*. "Arms are instruments of ill omen" and "the best fighter is not angry" are the *Daodejing*, 31 and 68.
+
+### Previous release: voxel caves under every region, twice the room indoors and Part XX
+
+*(This release's notes were not written into the README at the time; they are summarised here from its commit.)*
+
+- **The ground is hollow** (`scripts/voxel.gd`, `scripts/caves.gd`, `scripts/cavethings.gd`): a voxel volume (cells half a metre a side, four to a tile) with a mesher that walks only the air and draws the rock that touches it, and **a real cave under 50 of the 51 regions** (two with a lower gallery): chambers with roofs, passages that climb and fork, pillars, shafts open to the sky, pools, low roofs gone under bent double. A cave is laid out in tiles from its region's seed when the world is built; the rock is made and meshed when somebody walks in. Thirteen things to do in the caves, each on a clip of its own.
+- **Twice the room indoors** (`scripts/rooms.gd`): every building has a cellar and all but three an upper storey, 255 floors where there were 116, with thirteen new kinds of usable furniture.
+- **Animations and faces**: nineteen new clips for the party, sixteen of them lent to the townsfolk for their work, five new gestures for everybody, and every eye about a fourteenth larger.
+- **Part XX, "The Hollow Hills"**: Xu Xiake, Yu Gong, Zhi Sou, Wang Zhi and Xuanpin, four lords guarded by trials, three crossroads, twelve new foes, a new realm (**Hollow Vessel**), two new kinds of quest step (go to the back of caves; do the things of a cave) and a new way through trials, **By the dark**. The bot played the whole game in 24 hours 7 minutes.
+- Bug fixed: a crossroads could never echo in what is said when a step is done.
+
+| | |
+|---|---|
+| ![the Cave of Ten Thousand Echoes](docs/screenshots/cave_karst_chamber.webp) | ![a trial passed by the dark](docs/screenshots/trial_by_the_dark.webp) |
+
+### Two releases ago: smaller and faster, crossroads that echo, the Hundred Works, the hours of the wild and Part XIX
 
 ```mermaid
 flowchart LR
@@ -138,7 +237,7 @@ flowchart LR
 
 **Where the chapter comes from.** The old gardener is in the *Zhuangzi* (the chapter Heaven and Earth): Zigong, travelling south of the Han, sees an old man watering his garden with a pitcher carried up out of a tunnel, tells him of the well-sweep that waters a hundred plots a day, and is told: where there are machines there will be machine affairs, and where there are machine affairs there will be a machine heart; "it is not that I do not know of it: I would be ashamed to use it." Gongshu Ban (Lu Ban) and Mozi are in the *Mozi*: the cloud ladder built for Chu to take Song, the ten days and nights' walk, the belt for a wall and the slips of wood, nine assaults turned on a tabletop; and the wooden magpie that flew three days, of which Mozi said a linchpin was worth more. Yan Shi and the dancer who winked at King Mu's ladies, taken apart to show it was leather, wood, glue and lacquer with a heart that made it speak, are in the *Liezi*. Cook Ding, whose knife was not sharpened in nineteen years ("what your servant cares about is the Way, which goes beyond skill"), and Wheelwright Pian, who could not teach his son the trick of it, are in the *Zhuangzi* again. The chapter does not decide between them: the last question has four answers, and the makers are still arguing at the end.
 
-### Previous release: faces towards life, six hearths, a hero of either sex and Part XVIII
+### Three releases ago: faces towards life, six hearths, a hero of either sex and Part XVIII
 
 ```mermaid
 flowchart LR
@@ -203,7 +302,7 @@ flowchart LR
 
 **What the hearths are made from.** None of the six is one living people. Each is put together from old customs of the lands the story's myths come from: *zuan sui gai huo*, the changing of the fire with the seasons recorded in the Zhou li and the Analects (elm and willow in spring, jujube and apricot in summer, mulberry at the turn, oak in autumn, sophora in winter), and the cold food that went with it; "have you eaten?" as a greeting, and chopsticks never stood in the rice; the boat-dwelling families of the southern rivers, the fire that goes aboard with the bride and the fish that is never turned over; the hearth-ring of the felt tent, the threshold not stepped on, the bowl taken with the right hand and the youngest son as keeper of the fire; bread torn and never cut, and water before words, along the oasis roads; and "the firewood burns out, the fire is passed on" from the Zhuangzi, which gives the new realm its name. Suiren, Zhurong and Huilu are the Fire-Driller, the Fire Regulator and the fire that visits uninvited of the old books.
 
-### Two releases ago: anime faces and bodies, the sword's wake and Part XVII
+### Four releases ago: anime faces and bodies, the sword's wake and Part XVII
 
 ```mermaid
 flowchart LR
@@ -277,7 +376,7 @@ The anime look was researched from published material on gacha-game characters (
 - **Physics**: a felled tree falls as a rod pivoting on its base (the physical pendulum, I = mL^2/3), integrated once per tree; Godot's rigid bodies and height-field shapes for the pieces.
 - **Part XVII**: [Lichun](https://en.wikipedia.org/wiki/Lichun) and the whipping of the Spring Ox; [Gou Mang](https://en.wikipedia.org/wiki/Goumang), god of spring and wood; [Jingzhe](https://en.wikipedia.org/wiki/Jingzhe), the Waking of Insects, and the beating of the petty people under bridges ([Da Siu Yan](https://en.wikipedia.org/wiki/Villain_hitting)); [Longtaitou](https://en.wikipedia.org/wiki/Zhonghe_Festival), the day the dragon raises its head, and its haircuts; [Leigong](https://en.wikipedia.org/wiki/Leigong); [Qingnü](https://zh.wikipedia.org/wiki/%E9%9D%92%E5%A5%B3), goddess of frost and snow; [Taisui](https://en.wikipedia.org/wiki/Tai_Sui) and asking his pardon before digging; the five poisons ([Wu Du](https://en.wikipedia.org/wiki/Five_poisons)); [Mingqian tea](https://en.wikipedia.org/wiki/Longjing_tea) picked before Qingming; [Qingming](https://en.wikipedia.org/wiki/Qingming_Festival), its willow, its tomb-sweeping and its kites.
 
-### Three releases ago: day and night, the people of the towns, things that break and Part XVI
+### Five releases ago: day and night, the people of the towns, things that break and Part XVI
 
 ```mermaid
 flowchart LR
@@ -329,7 +428,7 @@ flowchart LR
 - **Code**: the game's GDScript grew from 44,004 to 47,498 lines (`scripts/clock.gd`, `scripts/folk.gd` and `scripts/havoc.gd` are new) and the Blender Python from 21,542 to 21,984 lines: 22 commoners, the Kitchen God and the two door gods are new characters, six new clips, and Lin Feng (all four looks) and Yue Ling are rebuilt with them. The tests grew from 1,879 to 2,132 lines (22,603 checks).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### Four releases ago: Yue Ling's own story, more to do and Part XV
+### Six releases ago: Yue Ling's own story, more to do and Part XV
 
 ```mermaid
 flowchart LR
@@ -391,7 +490,7 @@ flowchart LR
 | ![the hermitage's moon gate](docs/screenshots/hermitage_gate.webp) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.webp) |
 | ![the moths that eat forgetting](docs/screenshots/battle_forgetting.webp) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.webp) |
 
-### Five releases ago: fates and faces, outfits, rides and Part XIV
+### Seven releases ago: fates and faces, outfits, rides and Part XIV
 
 ```mermaid
 flowchart LR
@@ -467,7 +566,7 @@ flowchart LR
 
 ![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.webp)
 
-### Six releases ago: many roads, crafting, renown and Part XIII
+### Eight releases ago: many roads, crafting, renown and Part XIII
 
 ```mermaid
 flowchart LR
@@ -590,7 +689,7 @@ Background for that release (the Eight Gates, Chiyou and the war at Zhuolu):
 - **The Eight Gates**: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death of [Qimen Dunjia](https://en.wikipedia.org/wiki/Qimen_Dunjia), taught to the Yellow Emperor by the Mysterious Lady of the Nine Heavens, laid on the eight trigrams ([Bagua](https://en.wikipedia.org/wiki/Bagua)); the "Eight Gates Golden Lock" formation of the *Romance of the Three Kingdoms*, which falls when it is entered by the right gate.
 - **Wang and Liang, Chi and Mei**: the goblins of the mountains, old things and waters that fought in Chiyou's host.
 
-### Seven releases ago: realms and talents that matter, cutscenes and Part XII
+### Nine releases ago: realms and talents that matter, cutscenes and Part XII
 
 ```mermaid
 flowchart LR
@@ -670,7 +769,7 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 - **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
 - **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
 
-### Eight releases ago: three realms, six Daos, six peoples and Part XI
+### Ten releases ago: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -769,7 +868,7 @@ Background for this release (the myths of the Jianmu and the realms, the Daos an
 - **The peoples**: the Feathered People, the Deathless (black-skinned people who eat of the immortal tree) and the dragon-kin in the *Classic of Mountains and Seas*; the Jiaoren, whose tears turn to pearls, in the *Bowuzhi* and Gan Bao's *Soushen Ji*; celestial foxes who climb to heaven at a thousand years ([huli jing](https://en.wikipedia.org/wiki/Huli_jing)).
 - **The bosses**: [Leigong](https://en.wikipedia.org/wiki/Leigong), Duke of Thunder; Feilian, Earl of the Wind; Kui, the one-legged thunder ox of the *Classic of Mountains and Seas*; Jiufeng, the nine-headed bird of Chu; [Pixiu](https://en.wikipedia.org/wiki/Pixiu); Shentu and Yulei, the door gods under the peach tree ([Menshen](https://en.wikipedia.org/wiki/Menshen)); [Zhulong](https://en.wikipedia.org/wiki/Zhulong_(mythology)), the Torch Dragon whose open eye is day; Wangxiang, the water goblin; [Heibai Wuchang](https://en.wikipedia.org/wiki/Heibai_Wuchang), Black and White Impermanence.
 
-### Nine releases ago: an organic continent, four towns and Part X
+### Eleven releases ago: an organic continent, four towns and Part X
 
 ```mermaid
 flowchart LR
@@ -826,7 +925,7 @@ Background for this release (the techniques behind the new map, cartography and 
 - **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
 - **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
 
-### Ten releases ago: hanfu characters, five-colour monsters and Part IX
+### Twelve releases ago: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -906,7 +1005,7 @@ Researched for that release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Eleven releases ago: rebuilt models and Part VIII
+### Thirteen releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -959,7 +1058,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Twelve releases ago: one open world and Part VII
+### Fourteen releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -993,7 +1092,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Thirteen releases ago: natural landscapes and Part VI
+### Fifteen releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -1191,6 +1290,9 @@ Walk into NPCs, enemies, pickups, stairs and bosses to interact with them; walki
 - **Yue Ling** (T to talk, Esc > Yue Ling): 30 heart-to-hearts across the journey, each ending in a reply that leans her heart towards one of three futures; 15 wishes of hers to grant by doing things together; a closeness that grows from Companion to Heart's Companion and opens the **Side by side** way through the trials; and in Part XV a story of her own.
 - **Character creation**: name the sweeper (or keep the story's name), choose his look, hair, eyes and robe, and his origin in Qingshi Village, which gives him a small strength, a small weakness, a keepsake and lines of his own in the story.
 - **Fated encounters** (Esc > Fates): five people met in Part I and again and again until Part XIV, a choice at every meeting; each choice decides the next chapter, can open a way through a trial (**by an old bond**), and decides who stands with Lin Feng at the end and who is fought.
+- **The Eight Arms** (Esc > Arms): eight weapons to carry, each struck with in its own way (in battle and with F in the open land) and each a Dao of its own, learned by winning battles with it in the hand: Novice, Adept (15 battles; its technique) and Master (90). The staff sweeps every foe, the sabre falls heavier, the spear goes through a guard, the fan slips blows, the bow looses first, the whip binds, the brush marks, and the jian lands true. The jian and the staff are his from the first morning; the rest are won on the road by the end of the Dragon Palace.
+- **Faces**: everybody's face shows what they feel: in battle, with every gesture, in what they are busy with, and in what they say.
+- **Twelve ends**: when the sky is held, the ends the journey earned are open, and not all of them are kind (see [what changed](#what-changed-in-this-release)).
 - **Outfits and rides**: twelve outfits (Esc > Wardrobe) with their own colours, hats, crowns and armour and a small passive each; six rides (R to ride, Esc > Stable): a horse, a qilin, a white tiger, a flying sword, a cloud and a sky-barque, faster than running over open ground.
 - **Every foe has a story**: the first battle against a kind of monster tells its story over the opening, every boss's story is told before the fight, and the Bestiary (Esc > Bestiary) keeps them all. In Part XIV six of the foes put down on the road come back as **grudges**, each asking what it was owed: pay it, let a friend answer it, or leave it to feed Nie.
 - **Cultivation**: gain cultivation by meditating (Esc, Meditate) and winning battles. 67 stages across twenty-three realms (up to Myriad Things Awake); at the end of each realm you must pass a **Heavenly Tribulation** boss fight to break through. **Realms matter**: a whole realm between two fighters is felt in every blow (realm suppression, x1.2 a realm, up to three), beasts two realms below you scatter, the Founder's nine caves on the mountain open only at their realm, and the world notices the realm you have reached (Esc > Cultivation).
@@ -1426,6 +1528,29 @@ Each region is still generated from its own seed by `mapgen.gd` (so every boss, 
 **The realms above and below** (Part XI) are built by the same `Atlas._build`, one realm at a time (`Atlas.world_of(layer)`): `STRATA` gives each its own 260 x 200 grid, the sites of its regions, how far land reaches from a site (land runs out into open sky or into the abyss instead of the sea) and how many holes to open in the wild ground between regions (gaps of sky between the islands, chasms between the caverns). `layer_origin` lays each grid over the land's so that the Jianmu's crown in the Nine Heavens floats straight above its trunk on the mountain and its roots in the Nine Springs hang straight below. The ends of a ladder are two linked entities, one in each realm; walking onto one lifts or lowers Lin Feng and puts him on the free tile beside the other end. The Nine Heavens are drawn 96 m above the land and the Nine Springs 64 m below it, and `world.gd` keeps a bundle per realm (its land, its streamed regions, its sea of cloud or glowing abyss) and shows only the one Lin Feng is in. A **floor** (`Atlas.floor_id`, `f:<region>:<building>:<level>`) is a world of its own the size of its building, holding the people and things that live on it and the stairs back.
 
 The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part XXI: The Hundred Arms
+
+Winter comes in with water in the wells. The spades have been given their hours and the hollow places are left hollow, and what was dug before anybody thought to stop is lying in the yards of Tushan, in heaps, waiting to be something. Ore does not wait long. On the first morning of the frost a disciple goes to the armoury for a practice sword, and comes back to say that the racks are empty, and that the door was barred from the inside.
+
+```mermaid
+flowchart LR
+    H[the racks are empty,<br/>and it was not thieves] --> OU[Ou Yezi: four hundred blades<br/>a week, and no hand on the ladle] --> BL[five unasked<br/>sword-blanks] --> CA[Casting: watch what<br/>four casters' hands do]
+    CA --> YU[the Maiden of Yue will<br/>not talk to a sword] --> ST[the staff: sword-reeds,<br/>gibbons, herons] --> SW[four bamboo<br/>switches] --> AP{the White Ape: by the hand,<br/>peaches or might}
+    AP --> Q1{{who is to be taught:<br/>whoever asks, whoever has<br/>swept a year, or nobody}}
+    Q1 --> SA[Felt: a hole in a hat] --> JI[Ji Chang, who cannot<br/>think what a bow is for] --> BO[the bow: stray arrows, the louse,<br/>the snake in the cup] --> AR[five spent<br/>arrows] --> WH[the whip: what is left<br/>on the winter ground]
+    WH --> SG[the stage at dusk:<br/>which of the eight is you?] --> LU[Boat: the nets come<br/>up cut] --> NE[mend three nets] --> SP[the spear: down into<br/>the Sword Pool] --> HI[five empty hilts] --> GM{the Paired Dragons: side by side,<br/>one scabbard or might}
+    GM --> AY[Sweet-Well: the guards have<br/>gone to a king's gate] --> PO[load three camels] --> EN[a thin man in a<br/>scholar's robe] --> FA[the fan: through<br/>the gate] --> TA[five tallies<br/>of challenge] --> SB[the sabre:<br/>one stroke] --> KZ{the king who loved swords:<br/>a cock of wood, by the hand,<br/>the hearths or might}
+    KZ --> Q2{{the three thousand: home,<br/>to the caravans, or judged}} --> MA[ask five what a<br/>weapon is for] --> AD[three Daos of arms<br/>to Adept] --> GV[the swords have got up<br/>without their saints] --> BR[the brush: a name<br/>for each blade] --> TB[four fallen<br/>name-tablets]
+    TB --> SS[sweep the nine hundred<br/>steps with Yue Ling] --> WZ{Wuzhu, the Masterless Edge:<br/>the king's scroll, by the hand,<br/>the hearths or might} --> Q3{{the arms of the land: melt,<br/>a rack at every hearth,<br/>a school, or bury them}} --> RK[Rice: a blade down<br/>out of the thatch] --> O2[Ou Yezi puts his<br/>mark on one] --> SE((Sheathed<br/>Edge))
+```
+
+- **The trouble.** What was dug in Part XX was smelted, what was smelted was cast, and nobody ordered what came out of the moulds. Ou Yezi, who cast the five great swords for the King of Yue, has come back to the oldest pit in Tushan to watch bronze run by itself into the shape of a blade: "an edge is the easiest thing in the world for metal to be; leave bronze alone with a quarrel anywhere in the land, and it will find its own way to the mould." Every caster's hand turns the ladle a little without being asked, because every one of them has a neighbour he would like to be safe from. A blade without a hand goes looking for one.
+- **Seven weapons, seven lessons.** Lin Feng has carried eight weapons since the Dragon Palace, and Part XXI is the first time the story asks which is in his hand: seven hunts each count only what falls to one weapon. The Maiden of Yue will not talk to a sword ("a staff has no edge, so it cannot mean more than you do"); Ji Chang, the best archer under heaven, is sitting in the snow unable to think what a bow is for, and asks for the arrows the boys loosed at nothing to be finished with one and what is left driven off with a whip, which "only reaches as far as you are willing to go yourself"; the Sword Pool wants a spear, a king's gate a fan, his champions one stroke of a sabre, and the swords of the saints a brush that writes each its name.
+- **Four lords, four trials.** The **White Ape** saw one stroke two thousand years ago and has made a school of it: show him a second weapon (by the hand), feed him, or be quicker. The **Paired Dragons**, Gan Jiang and Mo Ye, have gone round each other in the dark under the Dragon Gate since they leapt into the river, each still a sword: walk them in to one another with Yue Ling, hold out one scabbard with two mouths, or stand between a husband and a wife. **King Wen of Zhao**, in the Demon Lord's empty hall, asks to be shown the lowest of the three swords, the one he already has: set a cock of wood in front of him, show him four weapons each put down when it is done, say whose sons his swordsmen are, or be one more of them. And **Wuzhu, the Masterless Edge**, four thousand blades nobody made, has built itself a hand with Lin Feng's face on it and wants to be shown everything a hand does: read it the king's scroll, show it six weapons and then an open hand, tell it how many pegs there are by how many door-flaps, or give it the one answer it expects.
+- **Three crossroads.** Who is to be taught what the Maiden taught an army; what becomes of the king's three thousand swordsmen, who in the old book went to their quarters and killed themselves; and what is done with the arms of the land. The answers echo at Sarnai's tent, under Aysha's awning, in the barrow and on the last page, and the scales they tip are the ones the ends of the story now ask about.
+- **Nobody says: for winning.** A smith, a girl, an archer and three keepers of hearths are asked what a weapon is for. To be hung up. A gate. For looking. By the door-flap, where the grandmother sees who takes it down. Four hundred fish. Paid the same if he does not draw.
+- **Sheathed Edge.** The last tribulation comes as an edge, with no thunder in it, and looks for whatever in him will rise to meet it. Nothing rises. He puts the eight away, and takes the broom.
 
 ## Part XIX: The Machine Heart
 
@@ -2064,6 +2189,17 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Bugs found and fixed
 
+Found in this release by writing a chapter whose people are called on in any order, by the bot's logs and by screenshots, each confirmed before it was fixed:
+
+| Bug | Fix |
+|---|---|
+| **A call paid on somebody never heard an echo.** A step of visits ("ask five of them, in any order") read each conversation straight from `Data.DIALOGUE`, not through `Echoes.told`, so a crossroads could never echo there, though the tests would have accepted one. Part XXI is the first chapter to put an echo in a visit (the Maiden of Yue on who came to be taught, Auntie Aysha on what became of the three thousand) | visits are fetched through `Echoes.told` like every other conversation, and the test that places echoes knows when a visit is heard |
+| **A crossroads answer that needed anything but works did not say so.** `Echoes.option_text` listed only what an answer needed of the Hundred Works; an answer with any other need (the school of Part XXI wants three Daos of arms) was greyed out with no word of why | every need is written out in the trials' own words, ticked or not |
+| **The README stopped at Part XIX.** The Hollow Hills release (Part XX) never wrote its notes into it | summarised from its commit, [above](#previous-release-voxel-caves-under-every-region-twice-the-room-indoors-and-part-xx) |
+| Caught in this release's own new code before it shipped: the hero's models no longer carry a blade of their own, and the title screen and the galleries, which build the story's Lin Feng as an ordinary person, would have shown him empty-handed (`Models._glb_person` hangs the jian on any of the hero's models); the menu gained an entry (Arms) and its list of which entries can be chosen did not, so everything below it was enabled by the wrong rule and the bot, sent to the wardrobe, stood in the menu until its watchdog fired at the thirteenth step; a spear held on the line a jian is held on stood with its head in the ground (a spear and a staff are now carried upright and turned to the hand as an action begins); the thrusts bent the wrist the wrong way and drove every long weapon at the floor (measured by printing where the hand bone pointed, frame by frame); weapons were mastered in the first forty minutes (15 and 90 battles now, not 8 and 26); and a weapon called by its Chinese name told the player he had "taken the gun in hand" | |
+
+### Bugs fixed in the Part XIX release
+
 Found in this release by counting what a frame draws (the new `--bench` and its census), by timing the opening of the world, by writing a chapter that calls on people an earlier chapter had called on, by screenshots and by the bot's logs, each confirmed before it was fixed:
 
 | Bug | Fix |
@@ -2410,33 +2546,35 @@ godot --headless --fixed-fps 30 --path . -- --bot --seed=1234 --hero=f --hearth=
 
 **Is the game sped up?** No. `--fixed-fps 30` makes each frame advance the game clock by exactly 1/30 s regardless of how fast the machine renders it. All movement, typing, battle animation and meditation run off that same frame time, so a full hour of *game time* is simulated in under a minute of *wall-clock* time. `Game.playtime` is the game clock, and it is the number reported. Drop `--fixed-fps` (and optionally pass `--timescale=N`) to watch the bot in real time.
 
-Latest result (seed 1234). The last release took 21:42:46. The same bot now reaches the end of Part XVIII at 21:06:38, thirty-six minutes sooner than it did: it rests twelve minutes less (a maker with a hide coat, sealed jars and a hot meal every night takes less harm), the errand of Part XVI that waits for the children of the towns to come out fell nine minutes luckier by the clock, and the later lords fall a little sooner to somebody whose works lean on their weaknesses. Part XIX is 1:39:03. The run answers at all sixteen crossroads and the qilin, hears 29 echoes of its answers on the way, builds fifteen works (all six of the Wheel), and is known by the end as merciful, of the new works and of the wide world.
+Latest result (seed 1234). The last release took 24:07:25, and the same bot now reaches the end of Part XX at 24:28:29. Part XXI is 1:27:33. The run changes weapons 29 times through the arms rack, learns the Dao of each of the eight, passes the four trials of Part XXI by the hand, side by side, by craft and by a relic, answers at every crossroads, and ends by founding the School of the Eight Arms.
 
 ```
-game play time  : 22:45:41 (81941 s)
-wall clock      : 26 min 31 s (headless)
-final realm     : Early Skill Become Dao
-battles / kills : 1882 / 3549   deaths: 1
-time by screen  : battle 23764 s, meditate 12115 s, dialogue 26607 s, world 18675 s, menu 904 s, shop 28 s, choice 85 s
-meditation for  : rest 11859 s, children 192 s, grind 41 s, respawn 22 s
-trials passed   : 43 (might 4, craft 11, wealth 4, respect 5, dao 4, peoples 1, relic 3, bond 4, side by side 2, by the people 2, by the land 1, by the hearths 1, by the works 1), renown 792, deeds 4, gates 4
-the sword       : 122 strikes, 83 packs struck first, 26 sword qi, 46 obstacles cleared
-works           : 15 built (the Hand 5, the Wheel 6, the Art 4): Grand Master of The Wheel; know-how 710 earned, 640 spent
-crossroads      : 17 answered (the qilin among them), 29 echoes heard; mercy +8, new works +17, the wide world +12
-                  Merciful, and known for it, of the New Works, and known for it, of the Wide World, and known for it
-the hero        : Lin Feng, a young man, kin of the Rice Hearth; guest of 6 hearths (kin of all six)
-the ending      : The Open Door
-time by area    : sect 4915, mountain 5729
-                  bamboo 2572, marsh 1597, frost 2166, thunder 1185, palace 1034
-                  dragon 910, volcano 1604, void 745, celestial 1486, mirror 983
-                  grave 1607, time 738, origin 1240, cloudsea 1349, court 832
-                  forge 1261, garden 1359, dunes 1799, fungal 797, aurora 852
-                  chaos 1148, maple 2701, karst 1012, springs 1254, wheel 1624
-                  village 3683, terraces 1677, silk 1441, loom 1196, starferry 1173
-                  magpie 1128, starpalace 998, jasper 1171, yanggu 2092, millet 1663
-                  fusang 1372, guanghan 1214, longmen 2432, drowned 1651, tushan 3040
-                  buzhou 1467, juntian 1480, changhe 1142, ninesprings 1381, youdu 1304
-                  penglai 1305, fangzhang 1206, yingzhou 1139, guixu 1302
+game play time  : 25:56:01 (93362 s)
+wall clock      : 35 min 24 s (headless)
+final realm     : Early Sheathed Edge
+battles / kills : 2044 / 3928   deaths: 1
+time by screen  : dialogue 30189 s, battle 26774 s, world 22334 s, meditate 13068 s, menu 1139 s, choice 114 s, shop 30 s, ending 0 s
+meditation for  : rest 12608 s, children 399 s, grind 41 s, respawn 19 s
+trials passed   : 51   renown: 846   deeds: 2   gates: 4
+the sword       : 146 strikes, 115 packs struck first, 37 sword qi, 46 obstacles cleared
+works           : 16 built (hand 5, wheel 6, art 5): Grand Master of The Wheel; know-how 746 earned, 730 spent
+the dark        : 4 caves gone to the very back of
+the eight arms  : 8 owned, 8 Daos of arms at Adept, 8 mastered, in hand sword
+                  sword Master (2026), staff Master (103), sabre Master (98), spear Master (99), fan Master (102), bow Master (99), whip Master (98), brush Master (97)
+crossroads      : 23 answered, 49 echoes heard; mercy +17, new works +20, wide world +17: Merciful, and known for it, of the New Works, and known for it, of the Wide World, and known for it
+the hero        : Lin Feng, a young man, kin of the Rice Hearth; guest of 6 hearths
+the ending      : The School of the Eight Arms
+time by area    : sect 5330, mountain 7217
+                  bamboo 2984, marsh 2210, frost 2343, thunder 1649, palace 1754
+                  dragon 942, volcano 1673, void 806, celestial 1547, mirror 1001
+                  grave 2213, time 824, origin 1250, cloudsea 1334, court 802
+                  forge 1232, garden 1350, dunes 2155, fungal 902, aurora 1363
+                  chaos 1190, maple 2732, karst 1744, springs 1275, wheel 1629
+                  village 4738, terraces 1680, silk 1445, loom 1199, starferry 1188
+                  magpie 1164, starpalace 1016, jasper 1214, yanggu 2122, millet 1719
+                  fusang 1387, guanghan 1238, longmen 3510, drowned 1843, tushan 4886
+                  buzhou 1490, juntian 1479, changhe 1117, ninesprings 1445, youdu 1316
+                  penglai 1323, fangzhang 1219, yingzhou 1165, guixu 1297
 result          : PASS (needs >= 57600 s)
 ```
 
@@ -2468,9 +2606,11 @@ scripts/fashion.gd   who Lin Feng is (character creation: names, a young man or 
 scripts/echoes.gd    crossroads and their echoes: sixteen questions, three scales, what each answer gives, the lines later conversations gain, the ending's epilogue
 scripts/works.gd     the Hundred Works: eighteen works in three schools, know-how, what each changes, where each stands
 scripts/machines.gd  the machines of the works, built from code and animated from the world's clock
+scripts/faces.gd     fourteen faces as poses of the six bones of expression; what each gesture, action, busy body and line of dialogue is said with
+scripts/arms.gd      the Eight Arms: weapons, the Dao of each (ranks, what only that weapon does, its technique), how each hangs in the hand
 scripts/habits.gd    the hours of the wild: every monster's habit, what it is doing by the clock, what that changes in the land and in battle
 scripts/bench.gd     developer tool: times the opening of the world, counts what a frame draws, lists the scene's triangles by kind
-scripts/cultures.gd  the Six Hearths of the land: peoples, greetings, tables, fires, customs, standing, the six beginnings and the five ends
+scripts/cultures.gd  the Six Hearths of the land: peoples, greetings, tables, fires, customs, standing, the six beginnings and the twelve ends (bright, bitter and dark)
 scripts/voice.gd     the story told of a young woman: whose "he" is whose, clause by clause, and the lines written out by hand
 scripts/create.gd    the character creation screen over the title's cliff
 scripts/fate.gd      fated encounters: the five threads, their chapters and states, bonds, presence, rewards
@@ -2501,12 +2641,13 @@ art/lib/person.py    character builder shared by every person asset, and its 21 
                      and the party's 18 interaction clips
 art/lib/face.py, hair.py, garment.py, accessory.py   heads, hair, clothes, hand props
 art/lib/race.py      wings, crests, fox and fin ears, tails, antlers, scales, whiskers
+art/lib/arms.py      the eight weapons, each built standing on its grip; art/weapons/<id>.py exports one
 art/lib/sculpt.py    lofts, profiles, noise, splines, strands
 art/lib/clay.py      metaball sculpting with bone weights (creature bodies)
 art/lib/anatomy.py   animal heads, bodies, legs, fur, feathers, scales; canine.py, feline.py, bird.py
 art/lib/creature.py  monster rigs, leg IK, gaits and the shared motion clips
 art/check_assets.py  validator for the exported GLBs
-art/characters, art/monsters, art/mounts, art/props   one Blender script per asset (art/mounts: the horse)
+art/characters, art/monsters, art/mounts, art/props, art/weapons   one Blender script per asset (art/mounts: the horse)
 art/build_all.py     rebuild every asset
 assets/              generated .glb files (never edited by hand)
 scripts/screen.gd    ScreenBase: 3D scene + 2D overlay

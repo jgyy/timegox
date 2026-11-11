@@ -634,7 +634,11 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 				say("%s is raised by %s!" % [tg.name, s.n])
 			_heal(tg, tg.maxhp * s.heal)
 	else:
-		say("%s uses %s." % [actor.name, s.n])
+		# (the plain blow is struck with whatever is in his hand: arms.gd)
+		if actor.side == "party" and actor.idx == 0 and skill_id == "strike":
+			say("%s strikes with %s." % [actor.name, str(Arms.WEAPONS[Arms.held(Game)].zh)])
+		else:
+			say("%s uses %s." % [actor.name, s.n])
 		if not headless() and actor.has("model"):
 			Fx3D.charge(scene3d, pos3(actor) + Vector3(0, 1.2, 0), Data.ELEM_COLORS.get(s.elem, Color.WHITE))
 			for tg in tgts:

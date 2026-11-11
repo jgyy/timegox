@@ -3401,6 +3401,8 @@ func _hundred_arms() -> void:
 			par.add_string(str(ln[1]), UI.font(), 22)
 			check(par.get_line_count() <= 4, "%s: its last words fit the dialogue box" % eid)
 	check(int(kinds.get("dark", 0)) == 4 and int(kinds.get("bitter", 0)) == 1 and int(kinds.get("bright", 0)) == 7, "seven bright ends, one bitter and four dark")
+	check(ending_txt.contains("const HEADLINES") and ["school", "broom", "throne", "blade", "engine", "cold"].all(func(h2): return ending_txt.contains("\"%s\": \"" % h2)) and ending_txt.contains("HEADLINES.get(Cultures.ending_of(Game), \"ASCENSION\")"),
+		"the results are headed ASCENSION only for the ends that are one")
 	check(Cultures.ending_open("cold", EG) and not Cultures.ending_open("school", EG) and not Cultures.ending_open("throne", EG), "a journey that sat at nobody's table may hold the sky alone, and has earned no school and no throne")
 	for hid5 in ["steppe", "sand"]:
 		Cultures.earn(EG, hid5, Cultures.GUEST)
