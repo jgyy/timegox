@@ -189,6 +189,8 @@ const PICKUP_COLORS := {
 	"apricot_wood": Color("e0a060"), "argal": Color("b8a070"),
 	# Part XIX: the carpenters' wood, and the pieces the Player shed
 	"catalpa_timber": Color("d8b070"), "player_part": Color("f0e8d8"),
+	# Part XX: stone-milk, a basket of the mountain, a miner's lamp, a rubbing from a cave wall
+	"stone_milk": Color("f0f4f8"), "earth_basket": Color("b89858"), "miner_lamp": Color("ffc860"), "cave_rubbing": Color("3a3a44"),
 	"herb": Color("6fe08a"), "lotus": Color("ff7aa8"), "jade": Color("7affe0"), "shard": Color("f6e85c"), "pearl": Color("e8f4ff"),
 	"ember": Color("ff8a3a"), "star": Color("c8a0ff"), "sigil": Color("ffe890"),
 	"echo": Color("9ae8ff"), "relic": Color("d8e0f0"), "sand": Color("ffd060"), "rune": Color("ffb0f0"),

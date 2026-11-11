@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 72
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao"]
+const MAX_LEVEL := 75
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -71,6 +71,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Bearer of the Fire", "note": "The firewood burns out; the fire is passed on, and nobody knows where it ends. Every flame you light has a little of every hearth in the land in it, and no fire you have sat beside ever quite goes cold."},
 	# Part XIX (the Hundred Works release): what Cook Ding cared about, which goes beyond skill
 	{"life": 0, "title": "Whose Hand Follows", "note": "What I care about is the Way, said Cook Ding, which goes beyond skill. Whatever you take up, a sword, a broom, a pitcher, a lever, you no longer use: you follow it to where it was already going, and it is never dull, and it takes nothing from you."},
+	# Part XX (the Hollow Hills release): the use of what is not there
+	{"life": 0, "title": "Keeper of the Empty Place", "note": "Thirty spokes share one hub: where there is nothing, there is the use of the cart. Clay is shaped into a jar: where there is nothing, there is the use of the jar. You no longer fill what you find. Rooms are quieter where you have been, wells deeper, and people find they have somewhere to put things down."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -712,6 +714,24 @@ const ENEMIES := {
 	"cloud_ladder": {"n": "The Cloud Ladder", "elem": "earth", "weak": "thunder", "col": Color("7a5a38"), "shape": "golem", "boss": true, "pal": {"sec": Color("b8863a"), "acc": Color("e8e0c0"), "mark": Color("2a1a14")}},
 	"the_player": {"n": "The Player", "elem": "phys", "weak": "thunder", "col": Color("e8dcc8"), "shape": "person:the_player", "boss": true},
 	"jixin": {"n": "Jixin, the Machine Heart", "elem": "thunder", "weak": "water", "col": Color("b8863a"), "shape": "warden", "boss": true, "pal": {"sec": Color("3a3a40"), "acc": Color("ffe080"), "mark": Color("7a2a1a")}},
+	# ---- Part XX (the Hollow Hills release): what lived in the hollow places of the land and has been
+	# pushed out of them, what the digging woke, and the four lords of the dark
+	"cave_cricket": {"n": "Cave Cricket", "elem": "wood", "weak": "fire", "col": Color("c8b890"), "shape": "mantis", "pal": {"sec": Color("7a6a4a"), "acc": Color("f0e8c0")}},
+	"blind_newt": {"n": "Blind Newt", "elem": "water", "weak": "thunder", "col": Color("e8d0d0"), "shape": "serpent", "pal": {"sec": Color("c89aa0"), "acc": Color("ff8a9a")}},
+	"drip_wisp": {"n": "Drip-Wisp", "elem": "water", "weak": "earth", "col": Color("8ad0e8"), "shape": "wisp", "pal": {"sec": Color("3a6a8a"), "acc": Color("e0f8ff")}},
+	"stone_bat": {"n": "Stone Bat", "elem": "dark", "weak": "thunder", "col": Color("4a4650"), "shape": "bird", "pal": {"sec": Color("2a2830"), "acc": Color("c8b0d8")}},
+	"dig_mole": {"n": "Digging Mole", "elem": "earth", "weak": "wood", "col": Color("5a4a3a"), "shape": "beast", "pal": {"sec": Color("3a2e24"), "acc": Color("e8a0a0")}},
+	"ore_gnawer": {"n": "Ore-Gnawer", "elem": "phys", "weak": "thunder", "col": Color("7a7a84"), "shape": "crab", "pal": {"sec": Color("3a3a44"), "acc": Color("e0a040")}},
+	"lamp_ghost": {"n": "Lamp Ghost", "elem": "fire", "weak": "water", "col": Color("c89a50"), "shape": "wraith", "pal": {"sec": Color("3a2a1a"), "acc": Color("ffd070")}},
+	"kept_voice": {"n": "Kept Voice", "elem": "dark", "weak": "fire", "col": Color("5a5a7a"), "shape": "wraith", "pal": {"sec": Color("2a2a44"), "acc": Color("b8c8ff")}},
+	"hollow_one": {"n": "Hollow One", "elem": "dark", "weak": "thunder", "col": Color("8a8a94"), "shape": "humanoid", "pal": {"sec": Color("3a3a48"), "acc": Color("60d8c8")}},
+	"burrow_marmot": {"n": "Burrow Marmot", "elem": "earth", "weak": "wood", "col": Color("b8905a"), "shape": "beast", "pal": {"sec": Color("7a5a34"), "acc": Color("f0d8a0")}},
+	"sink_toad": {"n": "Sink-Toad", "elem": "water", "weak": "thunder", "col": Color("6a8a5a"), "shape": "blob", "pal": {"sec": Color("3a5a3a"), "acc": Color("e8e060")}},
+	"karst_crawler": {"n": "Karst Crawler", "elem": "earth", "weak": "wood", "col": Color("a8a498"), "shape": "spider", "pal": {"sec": Color("5a584e"), "acc": Color("80e0c0")}},
+	"fen_yang": {"n": "Fenyang, the Lamb of the Earth", "elem": "earth", "weak": "wood", "col": Color("b89a6a"), "shape": "qilin", "boss": true, "pal": {"sec": Color("6a5234"), "acc": Color("f0e0b0"), "mark": Color("3a2a1a")}},
+	"white_rat": {"n": "The White-Haired Rat of the Bottomless Cave", "elem": "phys", "weak": "fire", "col": Color("f0ece8"), "shape": "fox", "boss": true, "pal": {"sec": Color("c8c0c0"), "acc": Color("e8c040"), "mark": Color("c83a4a")}},
+	"wangliang": {"n": "Wangliang, the Penumbra", "elem": "dark", "weak": "fire", "col": Color("6a6a8a"), "shape": "wraith", "boss": true, "pal": {"sec": Color("1e1e30"), "acc": Color("d0d8ff"), "mark": Color("3a3a5a")}},
+	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
 ## How many branches of the Nine Heavens root a cultivator who has kept up with the world will have
@@ -857,7 +877,9 @@ const AREAS := {
 			# Part XVIII: the fire nobody sat up with, on the road above Cloudfoot
 			{"id": "huilu", "pos": Vector2i(85, 25), "lv": 68, "req": 67, "vis": ["s_p18_huilu", ""], "late": true},
 			# Part XIX: the Cloud Ladder, building itself up the mountain above Cloudfoot
-			{"id": "cloud_ladder", "pos": Vector2i(78, 14), "lv": 70, "req": 69, "vis": ["s_p19_mo", ""], "late": true}
+			{"id": "cloud_ladder", "pos": Vector2i(78, 14), "lv": 70, "req": 69, "vis": ["s_p19_mo", ""], "late": true},
+			# Part XX: the Valley Spirit, in the Hollow of the Mountain under Rotten-Axe Cave
+			{"id": "xuanpin", "pos": Vector2i.ZERO, "lv": 74, "req": 74, "vis": ["s_p20_wang", ""], "late": true, "cave": -2, "stand": "deep"}
 		],
 		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 		# trails that join the mountain's people start just north of the sect's north wall
@@ -878,6 +900,8 @@ const AREAS := {
 			{"id": "stableboy_shitou", "n": "Shitou the Stable-Boy", "pos": Vector2i(104, 32), "col": Color("8a6a4a")},
 			# Part XI: a messenger of the Feathered Folk, come down the Jianmu to see who regrew it
 			{"id": "ling_yu", "n": "Ling Yu of the Feathered Folk", "pos": Vector2i(32, 62), "col": Color("8ac0e8"), "race": "yumin", "vis": ["s_p11_archive", "s_p11_tree"]},
+			# Part XX: in Rotten-Axe Cave (caves.gd stands him at the back of it)
+			{"id": "wang_zhi", "n": "Wang Zhi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("7a5a3a"), "vis": ["s_p20_delve", ""], "late": true, "cave": -1, "stand": "deep"}
 		],
 		"pickups": [{"id": "cur_leaf3", "item": "autumn_leaf", "pos": Vector2i(74, 26), "floor": ["post_station", 1], "always": true},
 			{"id": "cur_wine2", "item": "peach_wine", "pos": Vector2i(74, 40), "floor": ["tale_teahouse", 1], "always": true}],
@@ -938,7 +962,10 @@ const AREAS := {
 		],
 		"npcs": [
 			# a fated encounter (fate.gd): there while the story has them there
-			{"id": "little_hu", "n": "Little Hu", "pos": Vector2i(41, 10), "col": Color("6a4a30"), "fate": true},{"id": "yue_ling", "n": "Yue Ling", "pos": Vector2i(43, 12), "col": Color("f08ab0"), "vis": ["s_ironfang", "s_yue"]}],
+			{"id": "little_hu", "n": "Little Hu", "pos": Vector2i(41, 10), "col": Color("6a4a30"), "fate": true},{"id": "yue_ling", "n": "Yue Ling", "pos": Vector2i(43, 12), "col": Color("f08ab0"), "vis": ["s_ironfang", "s_yue"]},
+			# Part XX: the traveller who measures caves, at the mouth of the Bamboo-Root Hollow
+			{"id": "xu_xiake", "n": "Xu Xiake the Traveller", "pos": Vector2i(32, 17), "col": Color("4a5a7a"), "vis": ["s_p20_home", ""], "late": true}
+		],
 		"bosses": [
 			{"id": "jade_mantis", "pos": Vector2i(32, 30), "lv": 1, "req": 1},
 			{"id": "iron_fang", "pos": Vector2i(44, 12), "lv": 1, "req": 1},
@@ -953,7 +980,9 @@ const AREAS := {
 			{"id": "p16_bamboo1", "item": "thunder_bamboo", "pos": Vector2i(20, 10), "vis": ["s_p16_bamboo", ""]}, {"id": "p16_bamboo2", "item": "thunder_bamboo", "pos": Vector2i(34, 30), "vis": ["s_p16_bamboo", ""]},
 			{"id": "p16_bamboo3", "item": "thunder_bamboo", "pos": Vector2i(48, 12), "vis": ["s_p16_bamboo", ""]}, {"id": "p16_bamboo4", "item": "thunder_bamboo", "pos": Vector2i(58, 34), "vis": ["s_p16_bamboo", ""]},
 			# Part XIX: catalpa, the carpenters' wood, seasoned where it fell
-			{"id": "p19_tim1", "item": "catalpa_timber", "pos": Vector2i(15, 13), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim2", "item": "catalpa_timber", "pos": Vector2i(32, 21), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim3", "item": "catalpa_timber", "pos": Vector2i(53, 33), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim4", "item": "catalpa_timber", "pos": Vector2i(5, 20), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim5", "item": "catalpa_timber", "pos": Vector2i(35, 5), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim6", "item": "catalpa_timber", "pos": Vector2i(6, 13), "vis": ["s_p19_ban", ""], "late": true}
+			{"id": "p19_tim1", "item": "catalpa_timber", "pos": Vector2i(15, 13), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim2", "item": "catalpa_timber", "pos": Vector2i(32, 21), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim3", "item": "catalpa_timber", "pos": Vector2i(53, 33), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim4", "item": "catalpa_timber", "pos": Vector2i(5, 20), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim5", "item": "catalpa_timber", "pos": Vector2i(35, 5), "vis": ["s_p19_ban", ""], "late": true}, {"id": "p19_tim6", "item": "catalpa_timber", "pos": Vector2i(6, 13), "vis": ["s_p19_ban", ""], "late": true},
+			# Part XX: stone-milk, in the Bamboo-Root Hollow
+			{"id": "p20_milk1", "item": "stone_milk", "pos": Vector2i.ZERO, "vis": ["s_p20_xu", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_milk2", "item": "stone_milk", "pos": Vector2i.ZERO, "vis": ["s_p20_xu", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_milk3", "item": "stone_milk", "pos": Vector2i.ZERO, "vis": ["s_p20_xu", ""], "late": true, "cave": -1, "stand": "deep"}, {"id": "p20_milk4", "item": "stone_milk", "pos": Vector2i.ZERO, "vis": ["s_p20_xu", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_milk5", "item": "stone_milk", "pos": Vector2i.ZERO, "vis": ["s_p20_xu", ""], "late": true, "cave": -1, "stand": "any"}
 		],
 		"pickup_vis": "s_herbs",
 		# Part XVI: the cubs that followed Nian down, hiding in the bamboo on New Year's morning
@@ -1003,6 +1032,8 @@ const AREAS := {
 		"pickup_vis": "s_jade",
 	},
 	"thunder": {
+		# Part XX: the pasture below Thunder Valley, falling into holes
+		"warband": {"pool": [["burrow_marmot", 73, 74], ["sink_toad", 73, 74], ["stone_bat", 73, 74]], "n": 15, "vis": "s_p20_rat", "late": true},
 		"n": "Thunder Valley", "w": 90, "h": 50, "seed": 51, "theme": "thunder", "enemies": 15,
 		"pool": [["storm_hawk", 9, 10], ["thunder_ape", 10, 11], ["spark_wisp", 9, 11]],
 		"portals": [
@@ -1449,6 +1480,8 @@ const AREAS := {
 		"pickup_vis": "s_mp_collect",
 	},
 	"karst": {
+		# Part XX: what lived in the Cave of Ten Thousand Echoes, out among the towers
+		"warband": {"pool": [["stone_bat", 73, 74], ["karst_crawler", 73, 74], ["kept_voice", 73, 74]], "n": 15, "vis": "s_p20_tea", "late": true},
 		"n": "Stone Forest of the Nine Bends", "w": 96, "h": 58, "seed": 241, "theme": "karst", "enemies": 20,
 		"pool": [["river_carp", 30, 31], ["stone_macaque", 30, 31], ["mist_heron", 30, 31]],
 		"portals": [
@@ -1461,8 +1494,13 @@ const AREAS := {
 			{"id": "karst_jiao", "pos": Vector2i(46, 16), "lv": 31, "req": 31},
 			{"id": "stone_sentinel", "pos": Vector2i(60, 40), "lv": 31, "req": 31},
 			{"id": "horse_face", "pos": Vector2i(86, 28), "lv": 31, "req": 31},
+			# Part XX: the Penumbra, at the back of the Cave of Ten Thousand Echoes
+			{"id": "wangliang", "pos": Vector2i.ZERO, "lv": 74, "req": 73, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "deep"}
 		],
-		"pickups": [{"id": "mpearl1", "item": "memory_pearl", "pos": Vector2i(22, 12)}, {"id": "mpearl2", "item": "memory_pearl", "pos": Vector2i(40, 46)}, {"id": "mpearl3", "item": "memory_pearl", "pos": Vector2i(64, 30)}, {"id": "mpearl4", "item": "memory_pearl", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "mpearl1", "item": "memory_pearl", "pos": Vector2i(22, 12)}, {"id": "mpearl2", "item": "memory_pearl", "pos": Vector2i(40, 46)}, {"id": "mpearl3", "item": "memory_pearl", "pos": Vector2i(64, 30)}, {"id": "mpearl4", "item": "memory_pearl", "pos": Vector2i(76, 10)},
+			# Part XX: Xu Xiake's rubbings, in the Cave of Ten Thousand Echoes
+			{"id": "p20_rub1", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_rub2", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_rub3", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_rub4", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_rub5", "item": "cave_rubbing", "pos": Vector2i.ZERO, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "deep"}
+		],
 		"pickup_vis": "s_kr_collect",
 	},
 	"springs": {
@@ -1538,7 +1576,9 @@ const AREAS := {
 			{"id": "gou_mang", "n": "Gou Mang, Lord of Spring", "pos": Vector2i(38, 35), "col": Color("4a9a5a"), "vis": ["s_p17_home", "s_p17_kites"], "late": true},
 			# Part XIX: the master of carpenters at the mill-race below Qingshi, and the old gardener of Hanyin
 			{"id": "gongshu_ban", "n": "Gongshu Ban", "pos": Vector2i(5, 38), "col": Color("7a5a38"), "vis": ["s_p19_home", ""], "late": true},
-			{"id": "gardener_hanyin", "n": "The Gardener of Hanyin", "pos": Vector2i(6, 27), "col": Color("6a8a5a"), "vis": ["s_p19_home", ""], "late": true}
+			{"id": "gardener_hanyin", "n": "The Gardener of Hanyin", "pos": Vector2i(6, 27), "col": Color("6a8a5a"), "vis": ["s_p19_home", ""], "late": true},
+			# Part XX: the Foolish Old Man, carrying the North Mountain away in baskets
+			{"id": "yu_gong", "n": "Yu Gong, the Foolish Old Man", "pos": Vector2i(45, 5), "col": Color("8a7450"), "vis": ["s_p20_things", ""], "late": true}
 		],
 		"bosses": [
 			# Part XVI: the Year Beast, down out of the mountains at midnight
@@ -1548,12 +1588,16 @@ const AREAS := {
 			{"id": "well_spider", "pos": Vector2i(60, 40), "lv": 33, "req": 33},
 			{"id": "needle_general", "pos": Vector2i(86, 28), "lv": 33, "req": 33},
 			# Part XVII: the lord of the year under the earth, woken by the whole land broken open at once
-			{"id": "taisui", "pos": Vector2i(55, 8), "lv": 65, "req": 64, "vis": ["s_p17_taisui", ""], "late": true}
+			{"id": "taisui", "pos": Vector2i(55, 8), "lv": 65, "req": 64, "vis": ["s_p17_taisui", ""], "late": true},
+			# Part XX: the Lamb of the Earth, at the end of Yu Gong's Adit
+			{"id": "fen_yang", "pos": Vector2i.ZERO, "lv": 73, "req": 72, "vis": ["s_p20_gong", ""], "late": true, "cave": -1, "stand": "deep"}
 		],
 		"pickups": [{"id": "sthread1", "item": "silver_thread", "pos": Vector2i(22, 12)}, {"id": "sthread2", "item": "silver_thread", "pos": Vector2i(40, 46)}, {"id": "sthread3", "item": "silver_thread", "pos": Vector2i(64, 30)}, {"id": "sthread4", "item": "silver_thread", "pos": Vector2i(76, 10)},
 			{"id": "cur_wutong2", "item": "wutong_seed", "pos": Vector2i(11, 23), "floor": ["wen_house", -1], "always": true},
 			# Part XVIII: apricot and jujube wood, the wood of summer, for the fire-drill
-			{"id": "p18_wood1", "item": "apricot_wood", "pos": Vector2i(41, 20), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood2", "item": "apricot_wood", "pos": Vector2i(41, 41), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood3", "item": "apricot_wood", "pos": Vector2i(20, 27), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood4", "item": "apricot_wood", "pos": Vector2i(26, 17), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood5", "item": "apricot_wood", "pos": Vector2i(59, 33), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood6", "item": "apricot_wood", "pos": Vector2i(24, 40), "vis": ["s_p18_wood", ""], "late": true}
+			{"id": "p18_wood1", "item": "apricot_wood", "pos": Vector2i(41, 20), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood2", "item": "apricot_wood", "pos": Vector2i(41, 41), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood3", "item": "apricot_wood", "pos": Vector2i(20, 27), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood4", "item": "apricot_wood", "pos": Vector2i(26, 17), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood5", "item": "apricot_wood", "pos": Vector2i(59, 33), "vis": ["s_p18_wood", ""], "late": true}, {"id": "p18_wood6", "item": "apricot_wood", "pos": Vector2i(24, 40), "vis": ["s_p18_wood", ""], "late": true},
+			# Part XX: the baskets Yu Gong's sons dropped in the adit
+			{"id": "p20_bask1", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_bask2", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_bask3", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_bask4", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_bask5", "item": "earth_basket", "pos": Vector2i.ZERO, "vis": ["s_p20_zhi", ""], "late": true, "cave": -1, "stand": "deep"}
 		],
 		"pickup_vis": "s_vl_collect",
 		"springs": [Vector2i(30, 22)],
@@ -1908,6 +1952,8 @@ const AREAS := {
 			{"id": "scholar_cen", "n": "Scholar Cen, Who Failed at the Dragon Gate", "pos": Vector2i(22, 12), "col": Color("6a5a8a")},
 			{"id": "carp_boy_yu", "n": "Little Yu, Who Feeds the Carp", "pos": Vector2i(45, 25), "col": Color("e0a040")},
 			{"id": "innkeeper_dong", "n": "Innkeeper Dong of the Leaping Carp", "pos": Vector2i(11, 23), "col": Color("a85a3a")},
+			# Part XX: the Wise Old Man of the River Bend, who laughed at him
+			{"id": "zhi_sou", "n": "Zhi Sou, the Wise Old Man of the River Bend", "pos": Vector2i(26, 27), "col": Color("6a8078"), "vis": ["s_p20_gong", ""], "late": true}
 		],
 		"bosses": [
 			{"id": "sulking_carp", "pos": Vector2i(62, 13), "lv": 42, "req": 42},
@@ -2010,10 +2056,15 @@ const AREAS := {
 			{"id": "tushan_fox", "pos": Vector2i(58, 24), "lv": 44, "req": 44},
 			{"id": "taotie", "pos": Vector2i(88, 30), "lv": 44, "req": 44},
 			# Part XIX: the Machine Heart, in the oldest casting pit
-			{"id": "jixin", "pos": Vector2i(37, 18), "lv": 71, "req": 70, "vis": ["s_p19_makers", ""], "late": true}
+			{"id": "jixin", "pos": Vector2i(37, 18), "lv": 71, "req": 70, "vis": ["s_p19_makers", ""], "late": true},
+			# Part XX: the White-Haired Rat, in the Bottomless Gallery under the Old Workings
+			{"id": "white_rat", "pos": Vector2i.ZERO, "lv": 74, "req": 73, "vis": ["s_p20_tushan", ""], "late": true, "cave": -2, "stand": "deep"}
 		],
 		"pickups": [{"id": "cshard1", "item": "cauldron_shard", "pos": Vector2i(56, 6)}, {"id": "cshard2", "item": "cauldron_shard", "pos": Vector2i(70, 52)}, {"id": "cshard3", "item": "cauldron_shard", "pos": Vector2i(82, 12)}, {"id": "cshard4", "item": "cauldron_shard", "pos": Vector2i(52, 40)},
-			{"id": "cur_wine3", "item": "peach_wine", "pos": Vector2i(41, 39), "floor": ["late_inn", -1], "always": true}],
+			{"id": "cur_wine3", "item": "peach_wine", "pos": Vector2i(41, 39), "floor": ["late_inn", -1], "always": true},
+			# Part XX: miners' lamps, still burning, in the Old Workings
+			{"id": "p20_lamp1", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_lamp2", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_lamp3", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_lamp4", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "deep"}
+		],
 		"pickup_vis": "s_ts_collect",
 		"springs": [Vector2i(16, 47)],
 		"roads": [[Vector2i(2, 30), Vector2i(14, 31), Vector2i(30, 29), Vector2i(46, 31), Vector2i(58, 30)], [Vector2i(30, 29), Vector2i(30, 17)]],
@@ -3254,6 +3305,71 @@ const STEPS := [
 	{"id": "s_p19_rest", "kind": "share", "spot": "kind:village:millstone", "area": "village", "t": "Grind one measure of rice by hand with Yue Ling, at the old millstone of Qingshi"},
 	{"id": "s_p19_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan what the land has decided about its machines"},
 	{"id": "s_break24", "kind": "breakthrough", "to": 72, "t": "Not using the tool; following it: Skill Become Dao"},
+	# ---- Part XX: The Hollow Hills (the Hollow Hills release).  The works of Part XIX eat ore, coal and
+	# clay, and the land digs for them everywhere; what it digs out it tips into the nearest hole.  The
+	# wells go dry (a well is a hollow that water comes to), the hills ring when they are struck, and
+	# what lived in the hollow places is pushed out of them.  A traveller who has been down every cave
+	# in the land comes to measure them before they are gone; an old man is carrying two mountains away
+	# in baskets; a woodcutter has been watching one game of weiqi for longer than the sect has stood;
+	# and under Azure Cloud Mountain itself the Valley Spirit, who is what is in a hollow when nothing
+	# is, has taken the water of the land down with her.  Most of it is played under the ground, in the
+	# caves (caves.gd): a step with "cave" is done in the cave of its region (-1) or the gallery under
+	# that (-2).  What an empty place is for is asked three times (echoes.gd)
+	{"id": "s_p20_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The kitchen well has gone dry, and the mountain rings like a jar: speak to Elder Qing Xuan", "stones": 29600},
+	{"id": "s_p20_xu", "kind": "talk", "npc": "xu_xiake", "area": "bamboo", "t": "A traveller with a pine torch is measuring a hole in the Bamboo Forest: find Xu Xiake by the mouth of the Bamboo-Root Hollow"},
+	{"id": "s_p20_milk", "kind": "collect", "item": "stone_milk", "n": 5, "area": "bamboo", "cave": -1,
+		"t": "Go down into the Bamboo-Root Hollow (face the cave mouth and press Enter) and bring Xu Xiake 5 cups of stone-milk from its dripstones"},
+	{"id": "s_p20_things", "kind": "try", "n": 3, "area": "bamboo", "cave": -1,
+		"t": "A cave is known by what is done in it, says Xu Xiake: do any 3 of the things of the Bamboo-Root Hollow (face one in the wall and press Enter)"},
+	{"id": "s_p20_crickets", "kind": "hunt", "area": "bamboo", "cave": -1, "n": 14, "of": ["cave_cricket", "blind_newt", "drip_wisp"],
+		"t": "Something has been pushed up out of the deep places: clear the Cave Crickets, Blind Newts and Drip-Wisps out of the Bamboo-Root Hollow"},
+	{"id": "s_p20_gong", "kind": "talk", "npc": "yu_gong", "area": "village", "t": "The hollows are being filled, and Xu Xiake knows by whom: find Yu Gong, the Foolish Old Man, on the North Mountain above Qingshi", "stones": 30000},
+	{"id": "s_p20_carry", "kind": "folk", "role": "farmer", "town": "qingshi", "n": 4, "area": "village", "hearth": "valley",
+		"t": "The Rice Hearth: half Qingshi is carrying the mountain away for him. Take a basket with four of its farmers and hear why (face one and press Enter)"},
+	{"id": "s_p20_zhi", "kind": "talk", "npc": "zhi_sou", "area": "longmen", "t": "One man told him it could not be done: hear Zhi Sou, the Wise Old Man of the River Bend, at Longmen"},
+	{"id": "s_p20_baskets", "kind": "collect", "item": "earth_basket", "n": 5, "area": "village", "cave": -1,
+		"t": "The adit has broken into something older, and Yu Gong's sons will not go back in: bring out the 5 baskets they dropped in Yu Gong's Adit, on the North Mountain"},
+	{"id": "s_p20_moles", "kind": "hunt", "area": "village", "cave": -1, "n": 16, "of": ["dig_mole", "blind_newt", "stone_bat"],
+		"t": "The digging has woken what digs: drive the Digging Moles, Blind Newts and Stone Bats out of Yu Gong's Adit"},
+	{"id": "s_p20_fen", "kind": "kill", "boss": "fen_yang", "area": "village", "t": "At the end of the adit, something that was asleep in the earth has been dug up: face Fenyang, the Lamb of the Earth"},
+	{"id": "s_p20_tushan", "kind": "talk", "npc": "auntie_rong", "area": "tushan", "hearth": "forge", "t": "Three shifts have not come up at Tushan: go to Auntie Rong at the casting pits", "stones": 30400},
+	{"id": "s_p20_shore", "kind": "folk", "role": "smith", "town": "tushan", "n": 4, "area": "tushan", "hearth": "forge",
+		"t": "The Casting Hearth: nobody goes down until the pit-head is safe. Set a prop with four of Tushan's casters (face one and press Enter)"},
+	{"id": "s_p20_lamps", "kind": "collect", "item": "miner_lamp", "n": 4, "area": "tushan", "cave": -1,
+		"t": "A lamp left burning means a man meant to come back for it: bring up the 4 lamps from the Old Workings of Tushan"},
+	{"id": "s_p20_gnawers", "kind": "hunt", "area": "tushan", "cave": -1, "n": 16, "of": ["ore_gnawer", "dig_mole", "lamp_ghost"],
+		"t": "Something is eating the seams faster than the miners can: clear the Ore-Gnawers, Digging Moles and Lamp Ghosts out of the Old Workings"},
+	{"id": "s_p20_rat", "kind": "kill", "boss": "white_rat", "area": "tushan", "t": "The workings go down further than anybody dug them: climb down into the Bottomless Gallery and face the White-Haired Rat"},
+	{"id": "s_p20_tea", "kind": "share", "spot": "kind:tushan:tea", "area": "tushan", "t": "The miners are up, and nobody is saying much: drink a bowl of tea with Yue Ling at the tea table at Tushan"},
+	{"id": "s_p20_sarnai", "kind": "talk", "npc": "sarnai", "area": "thunder", "hearth": "steppe", "t": "A horse has gone through the ground below Thunder Valley: ride to Grandmother Sarnai's tent", "stones": 30800},
+	{"id": "s_p20_pasture", "kind": "hunt", "area": "thunder", "n": 26, "of": ["burrow_marmot", "sink_toad", "stone_bat"], "first": true, "hearth": "steppe",
+		"t": "The Felt Hearth: the pasture is falling into holes. Drive the Burrow Marmots, Sink-Toads and Stone Bats off it for the horse-folk (strike a pack first: F or G)"},
+	{"id": "s_p20_karst", "kind": "talk", "npc": "fisher", "area": "karst", "t": "Xu Xiake has gone ahead to the longest cave he ever measured: ask the old fisherman of the karst river where he went in"},
+	{"id": "s_p20_towers", "kind": "hunt", "area": "karst", "n": 26, "of": ["stone_bat", "karst_crawler", "kept_voice"], "first": true,
+		"t": "What lived in the Cave of Ten Thousand Echoes is out among the towers: bring down the Stone Bats, Karst Crawlers and Kept Voices (strike first: F or G)"},
+	{"id": "s_p20_rubbings", "kind": "collect", "item": "cave_rubbing", "n": 5, "area": "karst", "cave": -1,
+		"t": "Xu Xiake dropped his rubbings and ran, which is not like him: gather the 5 sheets in the Cave of Ten Thousand Echoes"},
+	{"id": "s_p20_shades", "kind": "hunt", "area": "karst", "cave": -1, "n": 16, "of": ["kept_voice", "stone_bat", "drip_wisp"],
+		"t": "Every word ever shouted into the cave is walking about in it: still the Kept Voices, Stone Bats and Drip-Wisps in the Cave of Ten Thousand Echoes"},
+	{"id": "s_p20_wangliang", "kind": "kill", "boss": "wangliang", "area": "karst", "t": "Something at the back of the cave is answering in every voice at once: face Wangliang, the Penumbra"},
+	{"id": "s_p20_delve", "kind": "delve", "n": 4, "area": "mountain", "stones": 31200,
+		"t": "Xu Xiake wants the hollow places counted before they are gone: go to the very back of 4 caves, anywhere in the land (a cave mouth stands in almost every region)"},
+	{"id": "s_p20_elders", "kind": "visits", "npcs": ["granny_wen", "sarnai", "cook_aysha", "fishwife_lu", "yu_gong", "zhi_sou"], "n": 5, "area": "village", "did": "Asked %s what an empty place is for",
+		"t": "Nobody under seventy will know: ask five of the old people of the land what an empty place is for, in any order"},
+	{"id": "s_p20_wang", "kind": "talk", "npc": "wang_zhi", "area": "mountain", "t": "There is a cave on the mountain the Elder has not been in since he was a boy: go into Rotten-Axe Cave and find who is still in it"},
+	{"id": "s_p20_board", "kind": "try", "n": 1, "things": ["cave_weiqi"], "area": "mountain", "cave": -1,
+		"t": "Look at the game Wang Zhi has been watching: the stone weiqi board in Rotten-Axe Cave (face it and press Enter)"},
+	{"id": "s_p20_hollow", "kind": "hunt", "area": "mountain", "cave": -2, "n": 14, "of": ["kept_voice", "hollow_one"],
+		"t": "Beside the board there is a way down, and the mountain is hollow: climb down into the Hollow of the Mountain and still its Kept Voices and Hollow Ones"},
+	{"id": "s_p20_fire", "kind": "share", "spot": "kind:mountain:campfire", "area": "mountain", "t": "Before the last climb down: sit with Yue Ling at the campfire on the mountain road"},
+	{"id": "s_p20_spirit", "kind": "kill", "boss": "xuanpin", "area": "mountain", "t": "In the lowest hall of the mountain, where the water of every dry well has gone: stand before Xuanpin, the Valley Spirit", "stones": 31600},
+	{"id": "s_p20_wells", "kind": "folk", "role": "porter", "town": "shazhou", "n": 3, "area": "dunes", "hearth": "sand",
+		"t": "The Sweet-Well Hearth: the well at Shazhou has water in it again. Draw the first of it with three of the oasis's porters (face one and press Enter)"},
+	{"id": "s_p20_boats", "kind": "folk", "role": "fisher", "town": "longmen", "n": 3, "area": "longmen", "hearth": "river",
+		"t": "The Boat Hearth: the river is back up to its mark. Bail out a boat with three of Longmen's fishers (face one and press Enter)"},
+	{"id": "s_p20_gong2", "kind": "talk", "npc": "yu_gong", "area": "village", "t": "Tell Yu Gong what was said in the Hollow of the Mountain"},
+	{"id": "s_p20_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan there is water in the kitchen well"},
+	{"id": "s_break25", "kind": "breakthrough", "to": 75, "t": "Where it is empty, there is the use of it: Hollow Vessel"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -3409,6 +3525,15 @@ const ITEMS := {
 	"player_part": {"n": "Cast-Off Piece of the Player", "desc": "A finger of lacquered leather, jointed with glue and silk cord, far too well made. Yan Shi built the Player a body once. It has been making itself a better one, and leaving the old in the sand like a snake's skin"},
 	"defence_models": {"n": "Mozi's Belt and Nine Sticks", "desc": "Smith Tie's copy of the models Mozi laid on a table in front of a king: a belt for a city wall, and nine slips of catalpa for nine engines of defence. Nine times the cloud ladder came against them, and nine times it was turned"},
 	"still_heart": {"n": "The Stopped Escapement", "desc": "A wheel of bronze teeth and a little rocking anchor, the piece that makes a machine tick instead of run away: the first one, from the oldest pit at Tushan. It is not turning. Held to the ear, it sounds as if it is thinking about it"},
+	# Part XX (the Hollow Hills release): what drips from the roof of a cave, what was dropped in an adit,
+	# what a miner leaves burning, what a traveller takes away from a wall, and three things made or left
+	"stone_milk": {"n": "Cup of Stone-Milk", "desc": "The white water that drips from a stalactite, caught in a cup: stone that has not yet made up its mind to be stone. The old books call it the marrow of the hills and say an immortal lives on nothing else. It tastes of chalk and cold"},
+	"earth_basket": {"n": "Basket of the Mountain", "desc": "A carrying-basket of split bamboo, full of the North Mountain: yellow earth and a few stones. Yu Gong's sons carry these to the edge of the sea of Bo, a year there and back, and have been doing it since before anybody was counting"},
+	"miner_lamp": {"n": "Miner's Lamp", "desc": "A little iron lamp with a hook, the wick still burning low. A miner hangs it where he is working and takes it with him when he goes; one left behind and alight means he went in a hurry and meant to come back"},
+	"cave_rubbing": {"n": "Rubbing from a Cave Wall", "desc": "Thin paper laid on a carved wall and patted with an ink pad until the carving comes through white on black. Xu Xiake takes one from every inscription he finds, and writes on the back how many paces in it was and what the weather was doing"},
+	"pine_torch": {"n": "Xu Xiake's Pine Torch", "desc": "Smith Tie's copy of the traveller's own: a bundle of resinous pine heartwood bound with wire and steeped in fire and wood essence, with a guard to keep the drips off the hand. It burns for six hours and does not go out when it is dropped, which is the important thing"},
+	"lamb_bell": {"n": "Bell for the Lamb of the Earth", "desc": "A small bell of unglazed clay, the kind hung round the neck of a bellwether, fired in Alchemist Mo's furnace with earth essence and the mountain's own soil in the slip. It does not ring so much as knock, like a knuckle on a jar. Something under the ground knows that sound"},
+	"borrowed_shadow": {"n": "A Shadow's Shadow", "desc": "What Wangliang left: the faint edge that goes round a shadow, folded like a grey silk handkerchief. It weighs nothing and is cold. A penumbra depends on a shadow, which depends on a body, which depends on something else again; held up, this shows what a thing is leaning on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
@@ -3417,7 +3542,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"jixin": "still_heart", "zhurong": "suiren_drill", "thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
+const BOSS_DROPS := {"wangliang": "borrowed_shadow", "jixin": "still_heart", "zhurong": "suiren_drill", "thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -3557,6 +3682,23 @@ const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
+	# Part XX (the Hollow Hills release)
+	"xu_xiake": ["Three hundred and fifty-seven caves, and I have come up out of every one of them, which is the only number that matters. I write it all down the same night, however tired. A cave you did not write down, you did not go into.",
+		"People ask what I am looking for. I am not looking for anything. I want to know how far in it goes. That is a different thing, and much less trouble to one's family.",
+		"A pine torch, a rope, a servant to hold the rope, and a monk to say it cannot be done. The servant ran away at the Xiang River and the monk died at Nanning, and I carried him the rest of the way, because he had wanted to see Chicken-Foot Mountain.",
+		"Paces. I measure in paces. Li are for officials. When I say a cave is four hundred paces I have walked them, counting, with my shins."],
+	"yu_gong": ["Ninety next spring. The mountains are seven hundred li round and ten thousand fathoms high. I have done the sum. It comes out. It is only a long sum.",
+		"My wife said: you could not level a hillock, old man, and where will you put the earth? That was a sound question, the second one. In the sea of Bo, I said. She packed me a dinner.",
+		"The neighbour's widow sent her boy to help, seven years old and just losing his milk teeth. He has carried his basket to the sea and back once. He is very proud. He should be.",
+		"People call me foolish. It is on the gatepost; I had it carved. A man who knows what he is called is saved a deal of argument."],
+	"zhi_sou": ["I said: how unwise you are. With the strength of your last years you could not pull up a blade of grass from that mountain. That is what I said. It was true. It has been read aloud to schoolchildren for two thousand years as an example of being wrong.",
+		"He answered that his sons would have sons, and they would have sons, and the mountain would get no higher. I had nothing to say. The book is careful to record that I had nothing to say.",
+		"Wise. It is my name, Zhi Sou: the wise old man. In that story it is not a compliment. I have thought of changing it, but one is known by now.",
+		"I live at the bend of the river because a bend is where a river thinks twice. It is the only place on it worth living."],
+	"wang_zhi": ["Only a moment more. The boy in the blue jacket is about to lose the corner and has not seen it. ...No, you may not tell him. Neither may I. We are only watching.",
+		"I came up for firewood after breakfast. My wife wants the big pot going by noon; her mother is coming. I will catch it if I am late. What time is it, would you say?",
+		"One of them gave me a thing like a date stone to suck, and I have not been hungry since. Good-natured lads. Odd about the eyes.",
+		"There is something wrong with my axe. The head is all right. I must have left the handle out in the rain."],
 	# Part XIX (the Hundred Works release)
 	"gongshu_ban": ["Measure twice, cut once. My mother said it. Then she invented the ink-line so I would stop asking her to hold the other end of the string.", "A plane, a drill, a saw. I am told I invented the saw after cutting my hand on a blade of grass. I did cut my hand. I was already holding the saw.",
 		"I built a wooden magpie once that flew three days without coming down. Master Mo told me a linchpin was worth more. I have been angry about it for two thousand years, because he was right."],
@@ -6919,6 +7061,243 @@ const DIALOGUE := {
 		["Lin Feng", "Here. Take some."],
 		["Narrator", "And when Yue Ling takes Lin Feng's hands, a little of the gold goes across, as easily as that, and neither of them has any less."],
 	],
+	# ---- Part XX: The Hollow Hills (the Hollow Hills release)
+	"recall18": [
+		["Narrator", "Autumn comes in dry. The wheels turn by day and are let stand at night, as was agreed, and the land goes on making things, and everything it makes is made of something that was dug up."],
+		["Narrator", "The first sign on the mountain is small again. Cook Zhou lets the bucket down the kitchen well, as it has been let down every morning for three hundred years, and it comes up with a bang, empty, with a dent in it."],
+		["Yue Ling", "She has sent Xiao Qing to the lotus pond with two pails and a look. And Lin Feng: stamp your foot. No, here, on the flags."],
+		["Lin Feng", "...It rings."],
+		["Yue Ling", "Like a jar. It did not ring last year. I would have noticed; I was dancing on it."],
+	],
+	"s_p20_home": [
+		["Elder Qing Xuan", "You have heard it. Good; then I am not merely old. Three wells on this mountain are dry since the new moon, and the bell-tower has a crack in its footing that Old Shen says he could put his pipe in."],
+		["Elder Qing Xuan", "It is the digging. I do not say it against anybody. Tushan wants ore, the kilns want clay, the wheels want coal for the nights they stand still. Every village has a pit behind it now, and what comes out of a pit must be put somewhere.", "think"],
+		["Lin Feng", "And where is it put, Elder?"],
+		["Elder Qing Xuan", "In the nearest hole. Where else? A sinkhole, a dry gully, a cave the children were told to keep out of. It is tidy. I should have done the same. And yet a well is only a hole that water comes to, and I find I cannot say what else a hole may be for."],
+		["Yue Ling", "Somebody must know."],
+		["Elder Qing Xuan", "Somebody does. A man came through the gate at dawn with a pine torch and a coil of rope, asked Gatekeeper Wu how deep the mountain went, wrote down the answer, which was that Wu did not know, and went off to the Bamboo Forest to find out for himself. Go after him. He walks fast.", "point"],
+	],
+	"s_p20_xu": [
+		["Narrator", "There is a shoulder of grey rock among the bamboo with a slot in it no wider than a door, and a cold breath coming out. A lean man in a straw hat is lying on his stomach with his head inside it, counting aloud."],
+		["Xu Xiake the Traveller", "...forty-one, forty-two. Forty-two paces to the first turn, by the echo. Ah! Feet. Whose feet? Do not tell me; I will look. A swordsman and a healer. Good. I am Xu, called Xiake, of Jiangyin. I go into caves.", "wave"],
+		["Lin Feng", "The Elder says you asked how deep our mountain goes."],
+		["Xu Xiake the Traveller", "And nobody knew! Three hundred years they have lived on it. I have walked this whole land for thirty years, sweeper, and I will tell you what I have found: everybody knows how high their mountain is and nobody knows what is in it. And now they are filling it in. Two caves on my list were gone when I got to them. Gone! Level. A man was growing cabbages."],
+		["Yue Ling", "Is that so bad? A cave is only a hole."],
+		["Xu Xiake the Traveller", "Only a hole. Hm. Come down this one and then say that to me again. There is stone-milk dripping in the second chamber, the white water that makes the pillars: bring me five cups from five dripstones and I can tell how fast this hill is growing inside. And do what there is to do down there. A cave is known by what is done in it.", "beckon"],
+		["Xu Xiake the Traveller", "Take the torch. Mind your head where the roof comes down; go bent, with a hand up before your brow. The rock is in no hurry and will not move for you."],
+	],
+	"done:s_p20_milk": [
+		["Narrator", "Five cups of stone-milk, each caught a drop at a time, each a little cloudier than water and a great deal colder. Xu Xiake holds them up to the torch one after another and writes five numbers in a book the size of his hand."],
+		["Xu Xiake the Traveller", "A finger's breadth in four hundred years. So the pillar in the big chamber was begun about the time people learned to plant rice. And somebody wants to tip a slag-heap on it by Thursday."],
+	],
+	"done:s_p20_things": [
+		["Yue Ling", "You have rock dust in your eyebrows, ochre on your fingers and you smell of bat. And you are grinning.", "laugh"],
+		["Lin Feng", "There is a hand on the wall down there. Somebody blew paint round their hand, before there was a sect, before there was writing. Mine fits it."],
+		["Yue Ling", "...Show me. No, do not tell me about it. Show me."],
+	],
+	"done:s_p20_crickets": [
+		["Narrator", "The last of the pale crickets goes back down a crack too narrow to follow, and the Bamboo-Root Hollow is quiet again, except for the drip."],
+		["Xu Xiake the Traveller", "Those are not creatures of the first chamber. Blind things live deep, where it never changes. They have been pushed up. Something is taking their room below, and I think I know what, and he is ninety years old and has never done a wrong thing in his life. Go to Qingshi. Ask for the Foolish Old Man. Everybody knows him; he had it carved on his gatepost.", "think"],
+	],
+	"s_p20_gong": [
+		["Narrator", "On the North Mountain above Qingshi a path has been worn a foot deep by baskets. At the top of it an old man, broad as a door and bent like a hoe, is filling one more, and a line of his sons, grandsons and neighbours is going away down the hill with the rest."],
+		["Yu Gong, the Foolish Old Man", "Mind the edge. You are the sweeper. I knew your Granny Wen when she was a girl with a stick. I am Yu Gong. Foolish. It is on the gatepost. These two mountains stand between my door and the south road, and every journey of my life has gone round them. So I am taking them away.", "bow"],
+		["Lin Feng", "Two mountains. In baskets."],
+		["Yu Gong, the Foolish Old Man", "In baskets. When I die there are my sons, and they will have sons, and those will have sons, sons and grandsons without end; and the mountains will get no higher. Why should they not be levelled? A clever man at the river bend laughed at me for it. He has not laughed since I answered him."],
+		["Yue Ling", "Grandfather: where does the earth go?"],
+		["Yu Gong, the Foolish Old Man", "It used to go to the sea of Bo. A year there and back. Now there is so much, with half the valley helping since the wheel gave them their afternoons, that the lads have been tipping it down the old holes. Much nearer. ...Why do you look at each other? What is the matter with a hole?", "shrug"],
+		["Yu Gong, the Foolish Old Man", "And I will say this too, since you have honest faces. We cut an adit into the hill this month to come at it from inside. It broke through into something that was there before us, and my sons came out without their baskets and will not go back. They are not cowards. Carry a load with the valley first and hear them, and then, if you will, go in."],
+	],
+	"done:s_p20_carry": [
+		["Narrator", "Four baskets down the hill with four farmers, and at the bottom each of them tips the North Mountain, a basket at a time, into the round dark mouth of a sinkhole that used to have swallows in it."],
+		["Yue Ling", "They are so pleased. They have their afternoons, and they are spending them on an old man's mountain because he asked nicely. I cannot be angry with any of them."],
+		["Lin Feng", "No. That is what makes it hard. Let us hear the one who laughed."],
+	],
+	"s_p20_zhi": [
+		["Narrator", "Where the river turns below Longmen there is a small neat house with its back to the road, and a small neat old gentleman on the step with his hands inside his sleeves, watching the water think."],
+		["Zhi Sou, the Wise Old Man of the River Bend", "You have come from him. They all come from him. I am Zhi Sou: the wise old man, in the story of the foolish one. I said it could not be done, he said his grandsons would do it, and I had nothing to say. It is written down exactly so. Children recite it.", "bow"],
+		["Lin Feng", "Was he right?"],
+		["Zhi Sou, the Wise Old Man of the River Bend", "Of course he was right! That is the unbearable part. A thing done every day by people who do not stop will be done. I counted the baskets; he counted the grandsons. But I asked him the wrong question, sweeper. For two thousand years I have known the right one, and nobody has come to hear it, because I am the fool of that story and he is the hero."],
+		["Yue Ling", "We have come to hear it."],
+		["Zhi Sou, the Wise Old Man of the River Bend", "Not whether he can move the mountain. Whether, when he has, there will be anything where it was. He thinks he is making a road. A road is a place where nothing is, kept so, on purpose, by everybody. And he is paying for it by filling every other place of that kind in the province. Ask him what he thinks the swallows were doing in that hole.", "point"],
+		["Zhi Sou, the Wise Old Man of the River Bend", "No, do not ask him. He would only answer, and be right again. Go into his adit and see what was there first. I should go myself, but I am wise, and it is dark."],
+	],
+	"done:s_p20_baskets": [
+		["Narrator", "Five baskets, dropped where the men who carried them turned and ran: each still full, each with its carrying-pole snapped clean in the middle, as if something had leaned on it out of curiosity."],
+		["Yue Ling", "The earth in them is warm. Lin Feng, feel. It is warm like bread."],
+	],
+	"done:s_p20_moles": [
+		["Narrator", "The moles go down, the bats go up, and the newts go wherever newts go. Past the last of the timbering the adit stops being an adit. The walls are smooth, and old, and nobody cut them."],
+		["Lin Feng", "This was here before he started. He did not dig a hole. He dug into one."],
+	],
+	"pre:fen_yang": [
+		["Narrator", "The chamber at the end is round, like the inside of a jar, and in the middle of it something the colour of the hill is getting to its feet. It has a ram's horns, and wool like clods of earth, and the eyes of a creature that has been woken up in the dark by somebody with a spade."],
+		["Narrator", "When the men of Lu dug a well and found a thing like a sheep in an earthen jar, they asked Confucius, and he said: what is in the earth is the Fenyang. He did not say what to do with one. Nobody had dug one up on purpose before."],
+		["Yue Ling", "It is not angry. Look at it. It is frightened, and it weighs as much as a house.", "shock"],
+	],
+	"post:fen_yang": [
+		["Narrator", "The Lamb of the Earth folds its legs under it like any sheep, and the round chamber settles round it like a jar being put back on a shelf. Above them, very far off, the sound of the baskets has stopped: the whole line has stood still to listen."],
+		["Yu Gong, the Foolish Old Man", "I heard that from the top. Is it hurt? ...Good. I would not hurt a sheep. So. There was a room in my mountain, and somebody living in it. Seven hundred li round, and I never once thought to knock.", "grieve"],
+		["Yu Gong, the Foolish Old Man", "Do not tell me what I should do. I am too old to be told and too stubborn to listen. Tell me what you would do, sweeper, if they were yours: the mountains, and the baskets, and all these good people with their afternoons."],
+	],
+	"s_p20_tushan": [
+		["Auntie Rong of the Smelting Pits", "You, and thank the fire for it. Sit; no, do not sit, there is not time. Three shifts went down the Old Workings since the day before yesterday and three shifts have not come up. Forty men. I have their tallies here on the nail and I am not taking them down."],
+		["Lin Feng", "A fall of rock?"],
+		["Auntie Rong of the Smelting Pits", "I would know a fall. I have heard twenty. This is something else: the ropes come up gnawed, and the men who ran say the gallery goes on now where it used to stop, down, and down, with lamps hanging all along it that none of ours lit. We wanted ore for your friend Ban's wheels. We went after it faster than we shored. That is mine to answer for and I will, afterwards.", "grieve"],
+		["Yue Ling", "Then we go down now."],
+		["Auntie Rong of the Smelting Pits", "You go down when the pit-head will hold you, girl, and not before; I am not hanging two more tallies on that nail. Set the props with my casters first. Then bring me their lamps. A lamp left burning is a man who meant to come back, and I want every one of them where I can see it."],
+	],
+	"done:s_p20_shore": [
+		["Narrator", "Four props of seasoned oak, set and wedged, each with a caster of Tushan on the other end of the maul; and when the last wedge goes home the pit-head stops ticking, which is the first anybody had noticed that it was."],
+	],
+	"done:s_p20_lamps": [
+		["Narrator", "Four lamps, each hung on its hook at a different working, each burned down to a blue bead and still alight. Auntie Rong takes them one at a time, reads the mark scratched on the base, and says a name."],
+		["Auntie Rong of the Smelting Pits", "Old Fu. Fu's boy. Tian the Ox. Little Qi's father. ...They are alive. A dead man's lamp goes out; ask any miner. Somebody is keeping them down there, and feeding the wicks."],
+	],
+	"done:s_p20_gnawers": [
+		["Narrator", "The last of the grey gnawers drops its mouthful of ore and goes down a hole the size of a bucket. Where the Old Workings used to end in a blank face of rock there is a shaft, quite round, with a rope of plaited straw hanging in it and no bottom that a dropped stone will admit to."],
+		["Yue Ling", "I counted to thirty and I did not hear it land.", "shiver"],
+	],
+	"pre:white_rat": [
+		["Narrator", "The Bottomless Gallery is lit from end to end with miners' lamps, hundreds of them, all burning. Forty men of Tushan are sitting in a row along one wall with bowls of something hot, looking sheepish. In front of them, on a heap of ore taller than a house, sits a white rat the size of a pony, with a gold nose and a lady's manners."],
+		["Narrator", "In the old tale the Rat of the Bottomless Cave stole a monk for a husband and was let off because she had burned incense to the right people. This is her cave. The casters dug into the roof of it."],
+		["Yue Ling", "She has given them soup. Lin Feng, she kidnapped forty miners and gave them soup. I do not know what to do with that.", "laugh"],
+	],
+	"post:white_rat": [
+		["Narrator", "The White-Haired Rat sits down on her ore with great dignity and begins to wash her whiskers, which is how a rat says that the matter is closed. One by one, without anybody telling them to, the forty men of Tushan put down their bowls, take a lamp each from the wall, and start up the rope."],
+		["Narrator", "The last of them, a boy with his father's lamp, stops at the bottom and bows to her. She pretends not to see. Her nose twitches."],
+		["Lin Feng", "They came through her ceiling. I think the soup was so that somebody would stay long enough to be told."],
+	],
+	"done:s_p20_pasture": [
+		["Narrator", "The marmots are driven back to the hills and the toads to the wet, and the horse-folk walk the pasture in a line, an arm's length apart, prodding with lance-butts, and plant a horsehair tuft by every hole they find. By evening there are sixty tufts."],
+		["Grandmother Sarnai", "Sixty. When I was a bride there were three, and we knew their names, and the swallows nested in them, and the herds drank at the one with the spring. A land needs a few holes. This is not a few. Something is leaving, underneath, and the roof is coming down after it."],
+	],
+	"s_p20_sarnai": [
+		["Grandmother Sarnai", "Are your horses fat? I ask, and I have just lost one. A good mare, four years old. The ground opened under her on the south pasture as if it were a mouth, and shut again. We got the foal out. Sit down, both of you; you have ridden, and I will not talk to people who are still breathing hard."],
+		["Lin Feng", "A sinkhole. On grass?"],
+		["Grandmother Sarnai", "We do not dig, sweeper. You know that. We do not put a spade in her; it is the first thing a child here learns. So I asked myself who has been digging, and then I asked what has come up, because the pasture is all over little hills this month and none of them are ours.", "refuse"],
+		["Yue Ling", "The valley people are filling their holes, Grandmother, and yours are opening."],
+		["Grandmother Sarnai", "Ha. Yes. You push a felt down in one place and it rises in another. Drive off what has come up, and strike first when you do, so the herds do not run; and then go and find whoever is pushing."],
+	],
+	"s_p20_karst": [
+		["Cormorant Fisher Old Yu", "The traveller with the rope? Three days ago. He went in at the big mouth under the leaning tower, the one my grandfather called Ten Thousand Echoes, because you shout your name into it and it comes back all afternoon. He said he would be out by supper. He writes very quick, that one."],
+		["Lin Feng", "And he has not come out."],
+		["Cormorant Fisher Old Yu", "He came out this morning. Running. With no hat. He is under my boat at this moment and I would thank you to take him away; he is frightening the birds. But I will tell you a thing, since you are going in whatever I say. It does not echo any more. I shouted my name in last night. It answered with my father's.", "shiver"],
+		["Yue Ling", "Your father's name?"],
+		["Cormorant Fisher Old Yu", "In my father's voice. He has been dead thirty years. And the towers are crawling with things that used to keep inside. Clear those first; they have had two of my birds."],
+	],
+	"done:s_p20_towers": [
+		["Narrator", "The bats are brought down and the pale crawlers scattered, and from under an upturned boat on the shingle a lean man in no hat at all puts out his head."],
+		["Xu Xiake the Traveller", "It called me by a name my mother used. Nobody alive knows it. I have been down three hundred and fifty-seven caves and I have never run before, and I left my rubbings, eleven years of them, in a heap on the floor. I am ashamed. I am also not going back in. Will you?", "grieve"],
+	],
+	"done:s_p20_rubbings": [
+		["Narrator", "Five sheets of thin paper, white characters on black, each one patted off a wall by a man who walked in to find it. On the back of the last, in a hurried hand: four hundred and six paces. It speaks. I do not think it means harm. I am going to run now."],
+	],
+	"done:s_p20_shades": [
+		["Narrator", "They come apart like breath on a cold day, and each one, going, says a word: a child's name, a price, the first line of a song. The cave has kept everything that was ever shouted into it. For a long time it only gave things back. Now it has no room, and they have begun to walk."],
+		["Yue Ling", "That one said my name. Not the way you say it. Lin Feng, who was in here that knew my name?"],
+	],
+	"pre:wangliang": [
+		["Narrator", "At four hundred and six paces the cave opens into a hall where the torch does not reach the roof. On the far wall is a shadow with nobody casting it, and round the shadow, a little paler, a second edge."],
+		["Narrator", "In the book of the Master of the Lacquer Garden, Penumbra asks Shadow: a moment ago you walked and now you stand; why have you no will of your own? And Shadow says: I wait on something to be as I am, and what I wait on waits on something else. This is the one who asked. It is still waiting for a better answer."],
+		["Lin Feng", "It is answering us before we speak."],
+		["Yue Ling", "No. It is answering everybody who ever spoke in here. All at once. It cannot hear itself think, if it thinks. Oh, the poor thing: it is full.", "grieve"],
+	],
+	"post:wangliang": [
+		["Narrator", "The grey edge comes off the wall like a scarf slipping from a peg and folds itself, very small, into Lin Feng's hand. The hall is quiet. Then, from every side, quite gently, the echoes begin to come back in again, to see whether there is room."],
+		["Xu Xiake the Traveller", "Four hundred and six. I said so. I came back in behind you; I could not have it said that I did not. Now. Listen to that. Ten thousand echoes, and every one of them was somebody. What is to be done with them is not a traveller's question. I only measure. You had better say."],
+	],
+	"done:s_p20_delve": [
+		["Narrator", "Four more caves, each walked to its very back, each written down the same night because Xu Xiake stood over Lin Feng until it was. In every one the last chamber was the same: dry, where the walls said there had been water, and with a draught going down."],
+		["Xu Xiake the Traveller", "Down. All of them. I have the figures here and they agree, which figures of mine very seldom do. Whatever keeps a hollow hollow is leaving the land, cave by cave, and going one way. Follow the draught on a map and the lines meet. I will give you one guess where.", "point"],
+		["Lin Feng", "Under Azure Cloud Mountain."],
+		["Xu Xiake the Traveller", "Under your own kitchen. But first ask the old ones what an empty place is for. I have been in more of them than any man alive and I find I cannot tell you. I only know I feel better for having been."],
+	],
+	"visit:s_p20_elders:granny_wen": [
+		["Granny Wen the Midwife", "What is an empty place for. Child, I have been a midwife sixty years: I know exactly what an empty place is for. You keep a cradle before there is anything to put in it. You do not fill it with turnips because it is standing idle.", "laugh"],
+		["Granny Wen the Midwife", "And the room your mother had is still swept. Nobody sleeps in it. I am not being sentimental; I am being ready. Tell that to Yu Gong and his baskets."],
+	],
+	"visit:s_p20_elders:sarnai": [
+		["Grandmother Sarnai", "Look up. The smoke-hole. Take the roof-ring out of a tent and you have a heap of felt and a family that cannot breathe. The whole tent is built round the one place where there is none of it."],
+		["Grandmother Sarnai", "We say the sky looks in there to see if we are behaving. A house with no hole in it, nobody looks into. I should not care to live in one."],
+	],
+	"visit:s_p20_elders:cook_aysha": [
+		["Auntie Aysha of the Caravanserai", "Have you drunk? Drink, then I will answer. ...A well, mountain friend. A well is nothing with a wall round it, and this whole town is here because of ours. Forty days of sand in every direction, and one hole.", "offer"],
+		["Auntie Aysha of the Caravanserai", "It has been low since the autumn. I let the bucket down further every week and I say nothing to the caravans. If you know where our water has gone, I will cook for you until you are both too fat to ride."],
+	],
+	"visit:s_p20_elders:fishwife_lu": [
+		["Fishwife Lu", "The hold of a boat. A boat is a hole in the river that you keep the river out of, and you would be surprised how much work that is. The day you fill her right up is the day she goes down, fish and all."],
+		["Fishwife Lu", "My husband wanted the gunwales lower, to carry more. I said, carry it to the bottom, then. We have the gunwales where they were."],
+	],
+	"visit:s_p20_elders:yu_gong": [
+		["Yu Gong, the Foolish Old Man", "You ask me? I have spent my life getting rid of a thing that was in the way. I should have said an empty place was what you were left with when the work was done. That was before I broke into somebody's house with a pick.", "think"],
+		["Yu Gong, the Foolish Old Man", "My baskets. Look at one. Split bamboo, and the rest of it is air, and it is the air that carries the mountain. Ninety years I have had one on my back and I never looked inside."],
+	],
+	"visit:s_p20_elders:zhi_sou": [
+		["Zhi Sou, the Wise Old Man of the River Bend", "Thirty spokes share one hub. It is where there is nothing that the cart is of use. Clay is kneaded into a pot: it is where there is nothing that the pot is of use. Cut doors and windows for a room: it is where there is nothing that the room is of use."],
+		["Zhi Sou, the Wise Old Man of the River Bend", "So what is there is for profit, and what is not there is for use. I did not say it. A better man did. But I have been quoting it at the wrong mountain for two thousand years, and I am obliged to you for the chance to say it once where it applies.", "bow"],
+	],
+	"s_p20_wang": [
+		["Narrator", "Rotten-Axe Cave runs back into Azure Cloud Mountain further than a cave that size should. In its last chamber there is a flat stone with a board cut in it, two stone seats with nobody on them, and a young man in a red headband squatting on his heels, watching the empty board with his whole face."],
+		["Wang Zhi the Woodcutter", "Ssh. Blue is thinking. ...Oh. You are not them. Have you seen two boys? They were here a moment ago. I only stopped to watch one game; my wife wants the pot on by noon. I am Wang Zhi, from the village under the ridge. What have you done with the daylight?", "wave"],
+		["Lin Feng", "Wang Zhi. How long have you been watching?"],
+		["Wang Zhi the Woodcutter", "No time at all. Since breakfast. One of them gave me a thing like a date stone to suck and I have not even been hungry. ...Why do you look at my axe?"],
+		["Narrator", "The axe is leaning where he left it. The head is whole. The handle is a line of brown dust on the floor, in the shape of a handle."],
+		["Yue Ling", "There is no village under the ridge, Wang Zhi. There is a sect. It has been there three hundred years, and it was built on the foundations of something older.", "grieve"],
+		["Wang Zhi the Woodcutter", "...Then the pot has boiled dry. She will be so cross. She... Oh. Oh, I see. All of them? The baby too? ...Look at the board, will you, while I sit down. It is still Black to play. I do not think they finished. I think they are waiting for somebody, underneath."],
+	],
+	"done:s_p20_board": [
+		["Narrator", "Lin Feng looks at the board for what feels like a breath. When he looks up, the torch has burned down a hand's breadth, Yue Ling has both fists in his sleeve, and there is a square of the floor beside the stone table that is not floor: a shaft, with steps cut in it, and a draught going down."],
+		["Yue Ling", "You were gone. You were standing there and you were gone. Do not do that again. ...It is the way down, is it not. Every cave in the land has been breathing towards this."],
+	],
+	"done:s_p20_hollow": [
+		["Narrator", "The Hollow of the Mountain is larger than the sect that stands on it. The Hollow Ones are only its dust got up and walking, in the shapes of whoever was here last, and they lie down again willingly. It is not empty. It is brimming. Every dry well in the land is here, and every stopped spring, standing in the dark, waiting."],
+		["Lin Feng", "She has gathered it. All of it. Not to keep it from us. To keep it."],
+	],
+	"pre:xuanpin": [
+		["Narrator", "In the lowest hall there is black water to the walls, without a ripple, and standing on it a tall woman the colour of the water, her hair unbound to the knee and her eyes very pale. She does not look as though she has been waiting. She looks as though waiting were a thing other people did."],
+		["Narrator", "The valley spirit never dies, says the old book; it is called the dark female, and the gate of the dark female is the root of heaven and earth. It is there within us all the while; draw on it as you will, it never runs dry."],
+		["Xuanpin, the Valley Spirit", "It never ran dry. You stopped it up. A gully here, a cave there. A well with a slag-heap on it. I am what is in a hollow when nothing is, and you left me fewer and fewer places to be. So I came to the last one, and brought what was mine."],
+		["Lin Feng", "The land is thirsty. People who never held a spade are thirsty."],
+		["Xuanpin, the Valley Spirit", "Yes. I am sorry for it. I am not angry; a hollow is not angry. But I will not go up to be filled. Show me you know what I am for, sweeper, you who filled your own days so full of steps. Or take the water from me, if you can, and see how long it stays in a land with nowhere to hold it."],
+	],
+	"post:xuanpin": [
+		["Narrator", "She does not fall. She steps back, and the black water comes up to her knees, her waist, and then there is only the water, and it is moving. Somewhere far overhead a bucket goes down a well and comes up heavy."],
+		["Xuanpin, the Valley Spirit", "Enough. You stand like somebody with room in him. I had not thought there was one left. Then hear me, both of you. I will go back up into the land: into the wells, the caves, the gullies, whatever you have left me. But this hall I cannot keep and be everywhere else as well. It is yours. Say what it is to be."],
+		["Yue Ling", "It is the biggest empty place in the world, Lin Feng. And she has just handed it to a man who cannot see a floor without sweeping it.", "laugh"],
+	],
+	"done:s_p20_wells": [
+		["Narrator", "The bucket goes down the well of Shazhou on the old length of rope, the length it was last year, and comes up so full it slops. Three porters and a swordsman haul it, and the first dipper goes on the ground, for the well, and the second to a camel."],
+		["Auntie Aysha of the Caravanserai", "Sweet. Sweeter than before; it has been somewhere cold. I said I would cook for you. Sit down. You will not get up again before dark."],
+	],
+	"done:s_p20_boats": [
+		["Narrator", "The river at Longmen stands at the mark the grandfathers cut, and every boat that sat on the mud all autumn is afloat and needs bailing. It is wet, cold, back-breaking work, and the whole waterfront is doing it and singing."],
+	],
+	"s_p20_gong2": [
+		["Yu Gong, the Foolish Old Man", "They say the wells are up. I knew before they told me: the swallows are back in the big sinkhole, and my eldest, who is seventy, cried. So. You have been to the bottom of things. What did she say, the lady under the hill?"],
+		["Lin Feng", "That she is what is in a hollow when nothing is. That we stopped her up, a hole at a time, all meaning well."],
+		["Yu Gong, the Foolish Old Man", "All meaning well. Yes. That is how I have done everything.", "nod"],
+		["Yu Gong, the Foolish Old Man", "I had a thought while you were gone. I am slow, but I get there. A road is an empty place too. That is all I ever wanted: a place where the mountain is not, so that my grandsons could walk through. I do not need the mountain gone. I need a hole in it the size of a cart. And I have just learned who to ask about holes."],
+		["Yue Ling", "And the earth out of it?"],
+		["Yu Gong, the Foolish Old Man", "To the sea of Bo. A year there and back. It was good enough for the first thousand years; I do not know what possessed me to hurry. Sons and grandsons without end, girl. There is no shortage of time. It turns out what we were short of was room.", "laugh"],
+	],
+	"s_p20_end": [
+		["Elder Qing Xuan", "Cook Zhou let the bucket down this morning and it came up full, and she looked at it for some time, and then she cooked the rice. I gather that is the highest praise the kitchen awards. Sit. Tell me what is under my floor."],
+		["Lin Feng", "A hall, Elder. Bigger than the sect. The mountain is built round it, the way a jar is built round the place the water goes."],
+		["Elder Qing Xuan", "And I have sat on top of it for seventy years saying wise things about emptiness to disciples. Qing Lian knew. Of course she knew. She cut nine caves in this mountain and I thought they were for meditating in. They were windows.", "laugh"],
+		["Yue Ling", "The woodcutter is at the gate, Elder. Wang Zhi. He says he has nowhere to go and he is good with an axe, if somebody will find him a handle."],
+		["Elder Qing Xuan", "Then he shall have a handle, and the room over the wood-store, which has been standing empty since before I was born. I used to wonder what it was for. Go and rest, both of you. You have the look of people who have put something down."],
+	],
+	"pre:s_break25": [
+		["Narrator", "The tribulation finds Lin Feng in the courtyard at dusk, doing nothing. Not meditating; not sweeping; sitting on the well-head with his hands open on his knees, listening to the water a long way down."],
+		["Yue Ling", "It is gathering. Lin Feng. Are you not going to get ready?"],
+		["Lin Feng", "I think this is ready. There is a great deal of room in me tonight. Let it come in and see."],
+	],
+	"post:s_break25": [
+		["Narrator", "The lightning comes down into him the way water comes down into a well: all of it, and there is still room. It does not strike anything. There is nothing in the way for it to strike. After a while it has all gone in, and the sky, having nothing left, clears."],
+		["Yue Ling", "You did not even stand up."],
+		["Lin Feng", "No. It turns out there was no need. Come and sit. The stone is still warm, and there is nothing at all that we have to do."],
+	],
 	# ---- Part XIX: The Machine Heart (the Hundred Works release)
 	"recall17": [
 		["Narrator", "Summer goes on. The new fire cooks, casts and lights as no fire has in sixty years, and the land, which had forgotten what it was to have strength to spare, begins to make things with it."],
@@ -7596,7 +7975,9 @@ const DAO_LINES := {
 ## bow they already had).  A line of dialogue may name one as a third element: ["Speaker", "text",
 ## "kneel"]; a narrator's line may direct somebody present: ["Narrator", "text", "Speaker:offer"].
 ## Otherwise emote_for reads one from the words, and most lines are only talk.
-const EMOTES := ["nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock", "bow"]
+const EMOTES := ["nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock", "bow",
+	# the Hollow Hills release (Part XX): five more that everybody has
+	"shrug", "cheer", "beckon", "refuse", "shiver"]
 ## what whoever is listening does when the speaker makes a gesture
 const EMOTE_REPLY := {"offer": "bow", "wave": "wave", "kneel": "bow", "grieve": "nod", "laugh": "nod", "bow": "bow"}
 

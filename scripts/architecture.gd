@@ -1282,7 +1282,9 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 				b.sph(p + Vector3(cos(a11) * 0.2, 0.3, sin(a11) * 0.2), Vector3(0.12, 0.16, 0.12), MB.tag(Color("f4f0e4").darkened(rng.randf() * 0.1), MB.STONE))
 			g.ball(p + Vector3(0, 0.35, 0), 0.6, Color(1.0, 0.85, 0.6, 0.12), true)
 		_:
-			b.box(p + Vector3(0, 0.3, 0), Vector3(0.6, 0.6, 0.6), wood)
+			# the Hollow Hills release: the twelve new pieces (rooms.gd)
+			if not Rooms.furnish(b, g, kind, p, wallp, back, side, rng, lights):
+				b.box(p + Vector3(0, 0.3, 0), Vector3(0.6, 0.6, 0.6), wood)
 
 
 ## An open railing along the floor from `a` to `e`: a post at each end, a top rail, a middle rail and
