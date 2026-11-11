@@ -3669,8 +3669,9 @@ func _pots_shots(which: String = "1") -> void:
 		w.enter_layer("surface")
 		# (--pots-town=a,b: only those of the town's shots)
 		var tonly: PackedStringArray = str(main.args.get("pots-town", "")).split(",", false)
-		for sh in [["quarter_above", Vector2i(79, 20), Vector3(-26.0, 30.0, 34.0), Vector3(0.0, 0.0, -2.0), 9.0], ["quarter_street", Vector2i(79, 19), Vector3(-9.0, 9.0, 0.5), Vector3(8.0, 0.5, 0.0), 9.5],
-				["quarter_dusk", Vector2i(79, 20), Vector3(22.0, 16.0, 28.0), Vector3(0.0, 1.0, -3.0), 18.4], ["quarter_drill", Vector2i(68, 27), Vector3(-9.0, 5.0, 9.0), Vector3(3.0, 1.0, -1.0), 6.2],
+		for sh in [["quarter_above", Vector2i(79, 20), Vector3(-26.0, 30.0, 34.0), Vector3(0.0, 0.0, -2.0), 9.0], ["quarter_dusk", Vector2i(79, 20), Vector3(22.0, 30.0, 28.0), Vector3(0.0, 1.0, -3.0), 18.4],
+				# (from high up only: a region is turned on the continent, so an offset in the world's axes that
+				# is a street's length puts a low camera inside somebody's house)
 				["qingshi_whole", Vector2i(52, 26), Vector3(-10.0, 78.0, 62.0), Vector3(4.0, 0.0, -4.0), 10.0]]:
 			if not tonly.is_empty() and not tonly.has(str(sh[0])):
 				continue
@@ -3707,24 +3708,6 @@ func _pots_shots(which: String = "1") -> void:
 			await _shot(str(sp[1]))
 			main.pop()
 		main.set_stack(["world"])
-		_high_put(Atlas.to_world("village", Vector2i(79, 24)), Vector2i(0, 1), 20.5)
-		await _wait(2.0)
-		Game.gamble_n = 3
-		var res := Gamble.play(Game, "dice", "big", 1000)
-		main.say(res.lines)
-		await _wait(0.8)
-		await _shot("gamble_throw")
-		main.pop()
-		# her wardrobe, in the world
-		_high_put(Atlas.to_world("village", Vector2i(79, 19)), Vector2i(0, 1), 10.0)
-		await _wait(1.5)
-		main.open_yue_wardrobe()
-		main.choice.cursor = Fashion.YUE_ORDER.find("plum")
-		main.choice.preview.call("plum")
-		await _wait(1.2)
-		await _shot("yue_wardrobe")
-		main.choice.preview.call("")
-		main.pop()
 	if want.call("page"):
 		Game.step = Data.step_index("s_p23_gao")
 		Game.trials = {}

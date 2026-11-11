@@ -33,6 +33,7 @@ Play Lin Feng, **a young man or a young woman** (or whoever you make them: name,
 | ![the Crossroads page: the three scales, and what was asked, chosen and heard of each answer](docs/screenshots/crossroads_page.webp) | ![the wild at noon: a pack of bamboo wolves asleep where it stood](docs/screenshots/wild_noon_asleep.webp) |
 | ![the same pack at dawn, hunting](docs/screenshots/wild_dawn_hunting.webp) | ![Gongshu Ban's water-wheel in the mill-race below Qingshi](docs/screenshots/works_ban_wheel.webp) |
 | ![the people of Part XIX: Gongshu Ban, Mozi, the Gardener of Hanyin, Yan Shi the Artificer and the Player](docs/screenshots/part19_people.webp) | ![the Player, the dancer Yan Shi made, who has built itself a heart](docs/screenshots/battle_boss_the_player.webp) |
+| ![the notice board of Qingshi: eighteen commissions to take down](docs/screenshots/notice_board.webp) | ![Old Du's mat: Big and Small, fan-tan and the crickets](docs/screenshots/gamble_mat.webp) |
 
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
@@ -122,6 +123,8 @@ flowchart LR
 | ![the four lords: Meng Tian, Gao Jianli, the Hegemon-King and the Thundering Pot](docs/screenshots/part23_lords.webp) | ![the foes of Part XXIII: pot-drummers, flat notes, kiln-wasps, clay spearmen, kneeling archers, saddle-horses of Mount Li, leaded strings, cracked reed-pipes, drowned drums, halberdiers of the eight thousand, riderless black steeds and cauldron-breakers](docs/screenshots/part23_foes.webp) |
 | ![the last crossroads of Part XXIII: what becomes of a host](docs/screenshots/crossroads_host.webp) | ![Meng Tian, General of the Clay Host](docs/screenshots/battle_boss_meng_tian.webp) |
 | ![Gao Jianli of the Leaded Lute](docs/screenshots/battle_boss_gao_jianli.webp) | ![the Hegemon-King of Western Chu](docs/screenshots/battle_boss_xiang_yu.webp) |
+| ![the notice board](docs/screenshots/notice_board.webp) | ![Tailor Qiao's shop: something for each of them](docs/screenshots/tailor_shop.webp) |
+| ![Old Du's mat: what will you play?](docs/screenshots/gamble_mat.webp) | ![Wafu, the Thundering Pot, in the First Kiln](docs/screenshots/battle_boss_wafu.webp) |
 
 ### Previous release: mountains in every region, climbing, the cloud-kite, the people of the road and Part XXII
 
