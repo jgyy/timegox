@@ -54,6 +54,10 @@ const PEOPLE := {
 	# the Hundred Works release (Part XIX): the master of carpenters, the man in straw sandals, the old
 	# gardener who will not use a well-sweep, the artificer of King Mu's court, and the dancer he made
 	"gongshu_ban": "characters/gongshu_ban", "mo_di": "characters/mo_di", "gardener_hanyin": "characters/gardener_hanyin", "yan_shi": "characters/yan_shi", "the_player": "characters/the_player",
+	# the Hundred Arms release (Part XXI): the swordsmith of Yue, the Maiden of Yue, the archer who forgot
+	# his bow, the swordsman in scholar's dress, the king who loved swords and the Masterless Edge
+	"ou_yezi": "characters/ou_yezi", "yue_maiden": "characters/yue_maiden", "ji_chang": "characters/ji_chang", "zhuang_envoy": "characters/zhuang_envoy",
+	"king_zhao": "characters/king_zhao", "wuzhu": "characters/wuzhu",
 	# the Hollow Hills release (Part XX): the traveller who measures caves, the Foolish Old Man and the Wise
 	# one, the woodcutter of Rotten-Axe Mountain, and the Valley Spirit
 	"xu_xiake": "characters/xu_xiake", "yu_gong": "characters/yu_gong", "zhi_sou": "characters/zhi_sou", "wang_zhi": "characters/wang_zhi", "xuanpin": "characters/xuanpin",
@@ -594,6 +598,11 @@ static func animate(n: Node3D, t: float, base: String, phase: float = 0.0) -> vo
 	var last: float = n.get_meta("anim_t", t)
 	var dt := clampf(t - last, 0.0, 0.25)
 	n.set_meta("anim_t", t)
+	# the face is worn over whatever the body does (faces.gd): no clip moves the bones of expression
+	Faces.tick(n, dt, base)
+	# and a spear or a staff stands upright beside its bearer until it is used (arms.gd)
+	if n.has_meta("arm_carry"):
+		Arms.tick(n, dt, str(n.get_meta("act", "")))
 	var act: String = n.get_meta("act", "")
 	if act != "":
 		# a battle action a model has no clip for falls back on its attack; a gesture it cannot make

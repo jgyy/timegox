@@ -67,6 +67,11 @@ const CROSSROADS := {
 			"drive": [["Narrator", "They go up the pass in a line, not looking back, with their hands empty. At the top one of them stops, as if he might say something. Then he goes on."], ["Yue Ling", "It is fair. I only wonder where a man goes, who has nothing and has just been shown he cannot take it."]],
 		},
 		"echo": {
+			# Part XXI (the Hundred Arms release)
+			"s_p21_home": {
+				"mend": [["Elder Qing Xuan", "One thing more. Iron Fang's men, the forty you set to mend the forest road. The morning the racks emptied, they came up the mountain in a body and laid forty knives on the gate-step, and asked to have them melted. They said they had felt them move in the night."]],
+				"drive": [["Elder Qing Xuan", "One thing more. Iron Fang's men, the forty you drove out of the valley. I am told they are at a king's gate in the east, with a place at his table, and that the best of them has killed eleven. I do not say it to reproach you. I say it because you will meet them."]],
+			},
 			"s_vl_intro": {
 				"mend": [["Granny Wen the Midwife", "Those road-menders of yours finished the bamboo road years ago and never went home. Six of them farm the terraces above my house now. One married my niece. He still holds a mallet by the wrong end."]],
 				"drive": [["Granny Wen the Midwife", "We had hungry men through here the winter after you cleared the bamboo. Knives, no shoes. We fed three and buried two. I never did learn who turned them out with nothing."]],
@@ -453,6 +458,12 @@ const CROSSROADS := {
 			"still": [["Narrator", "It comes out in Lin Feng's two hands, still ticking, and then, piece by piece, not. The Player's painted eyes stay open. They are very well painted."], ["Yue Ling", "..."], ["Yue Ling", "I know why. I know every reason why. Do not ask me to talk about it tonight."]],
 		},
 		"echo": {
+			# Part XXI (the Hundred Arms release)
+			"pre:wuzhu": {
+				"keep": [["Yue Ling", "It has made itself a hand, Lin Feng, the way the Player made itself a heart. You told the Player: it is yours, you made it. I do not think this one wants to be told that. It wants to be told what to do with it."]],
+				"maker": [["Yue Ling", "You sent the Player to its maker with the heart it built, to ask if it might keep it. This one has built a hand, and there is nobody to send it to. It came to you because you are the nearest thing to a maker it could find."]],
+				"still": [["Yue Ling", "You took out the heart the Player made for itself. I have never quite forgiven that. Do not take this hand off it, Lin Feng. Show it what the hand is for. That is harder, and it is what was owed the last time."]],
+			},
 			# Part XX (the Hollow Hills release)
 			"pre:xuanpin": {
 				"keep": [["Yue Ling", "Lin Feng. The Player had a hollow in its chest where a heart was meant to go, and it filled it itself, and you said: keep it. I thought that was the whole of the lesson. I think she is the other half. Some hollows are not waiting for anything."]],
@@ -491,6 +502,13 @@ const CROSSROADS := {
 			"ask": [["The Gardener of Hanyin", "Me? I carry a pitcher. I have never built so much as a gate. ...Sit down, all of you. If I am to talk to carpenters I shall want tea, and it will take as long as it takes."], ["Narrator", "They are still talking when the moon comes up: a gardener, a carpenter, a man in straw sandals and five tired makers, and nobody has yet agreed with anybody."]],
 		},
 		"echo": {
+			# Part XXI (the Hundred Arms release)
+			"s_p21_ou": {
+				"hand": [["Ou Yezi the Swordsmith", "They tell me you ruled that nothing be made by engine that a hand cannot still make. Good. It was a hand that turned each of those ladles. If it had been a wheel I could have stopped the wheel. I do not know how to stop a wrist."]],
+				"wheel": [["Ou Yezi the Swordsmith", "They tell me every engine in this town has a keeper, a gate and hours, by your ruling. So I looked for the keeper of this. There is none. It runs when it likes. It is the first thing I have seen here that nobody put a name on."]],
+				"dao": [["Ou Yezi the Swordsmith", "Follow, do not cut: they have it carved over the yard gate, and say it was your ruling. Well. The bronze is being followed. That is what you are looking at. It was never said where it might want to go."]],
+				"ask": [["Ou Yezi the Swordsmith", "They tell me you would not rule on the machines, and sent the makers to an old gardener who would not use a well-sweep. I should like to have met him. He would have looked at this heap and said: I told you. And he would have been ashamed to be right."]],
+			},
 			# Part XX (the Hollow Hills release)
 			"s_p20_tushan": {
 				"hand": [["Auntie Rong of the Smelting Pits", "You told us: nothing by machine that we cannot still do by hand. So I had them sink this shaft by hand, to remember how. They remembered the digging. Nobody remembered the shoring. That part was always the old men's, and I did not think to ask one."]],
@@ -598,6 +616,12 @@ const CROSSROADS := {
 			"cistern": [["Yue Ling", "It is a good answer. The towns will bless you. ...It will be full, Lin Feng. She gave you the one empty place and you have thought of something to put in it. No, I am not angry. I only wanted somebody to have said it."]],
 		},
 		"echo": {
+			# Part XXI (the Hundred Arms release)
+			"s_p21_end": {
+				"empty": [["Elder Qing Xuan", "You shut the door on the hall under the mountain and left it empty, and I thought it hard of you at the time. I have just hung forty swords on forty pegs and shut the armoury. It is the same act. I see that now."]],
+				"open": [["Elder Qing Xuan", "The hall under the mountain that you left open for anybody to be quiet in: three of the king's swordsmen are down there now. They came up the road last night. They have not said anything, and nobody has asked them to."]],
+				"cistern": [["Elder Qing Xuan", "The hall under the mountain is filling, as you meant it to, against the dry years. I went down to look. It is very still, and deep, and useful, and nobody needs it today. I thought: that is what the armoury ought to be."]],
+			},
 			"s_p20_end": {
 				"empty": [["Elder Qing Xuan", "And you have shut it, and left it empty, and told only me. I shall tell my successor on my deathbed, and he will think I am wandering. Good. It is the only secret this sect has that is worth keeping, and it is the secret that there is nothing there."]],
 				"open": [["Elder Qing Xuan", "And it is to be open: a hall to be quiet in, for anybody. There were eleven people on the steps this morning, Lin Feng, from four towns. A founder. A woman with a baby. They went down, and came up an hour later, and not one of them could tell me what they had done."]],
@@ -611,9 +635,119 @@ const CROSSROADS := {
 		},
 		"end": {"empty": "Under Azure Cloud Mountain there is a hall larger than the sect, with nothing in it, and the door shut.", "open": "Anybody may go down under Azure Cloud Mountain and be quiet; Wang Zhi the woodcutter keeps the door.",
 			"cistern": "The Hollow of the Mountain is the cistern of six towns, and the land has not had a dry autumn since."}},
+	# ---- Part XXI (the Hundred Arms release): what a weapon is for, asked three times
+	"the_pupils": {"step": "s_p21_ape", "part": "XXI", "n": "The Maiden's method",
+		"ask": "The White Ape is in his banyan, forty gibbons have put down forty reeds, and a runner has come from Qingshi: with a blade in every thatch, will the Maiden come north and teach the valley what she taught an army? She says it is yours to answer. You have just shown her first pupil the rest of the lesson. Who is to be taught?",
+		"options": [
+			{"id": "all", "label": "Whoever asks", "tilt": {"reach": 3, "craft": 1}, "gain": {"renown": 4},
+				"desc": "A method that is small and easy should not be a secret. If every hand in the land is going to have a blade in it this winter, let every hand know where the edge is, and how to stop. An untaught sword is the dangerous kind (renown).",
+				"log": "Asked the Maiden of Yue to teach whoever asks."},
+			{"id": "sweep", "label": "Whoever has swept a year first", "tilt": {"reach": -2, "heart": 1},
+				"desc": "She learned in a forest, striking at things because she liked it. He learned on nine hundred steps with a broom. Let her teach anybody who has first done a year of some plain work with a long handle, in their own town, where their grandmother can watch.",
+				"log": "Asked the Maiden of Yue to teach those who have swept a year."},
+			{"id": "none", "label": "Nobody. Let it end with the ape", "tilt": {"craft": -2, "heart": 2},
+				"desc": "She taught an army once and saw what was done with it. The old ape had it two thousand years and it only made him lonely. Let the method stay in the marsh with the one pupil who has finally understood it, and let the valley take its blades down.",
+				"log": "Asked the Maiden of Yue to teach nobody more."},
+		],
+		"after": {
+			"all": [["The Maiden of Yue", "Whoever asks. Very well. I shall start with stopping, this time, and get to striking in the second year, if any of them are still there. The army had it the other way about. It was the king's idea."]],
+			"sweep": [["The Maiden of Yue", "A year with a broom. Ha. He has been sitting up there since noon being wise, and you have just told forty gibbons to sweep the marsh. I should like to see that. Yes. Send me the ones who have blisters in the right place."]],
+			"none": [["The Maiden of Yue", "Nobody. ...I have wanted somebody to say that to me since the summer the army marched. I could not say it to myself; it felt like meanness. Tell them in Qingshi that I am a girl who likes hitting things, and that it is not a trade."]],
+		},
+		"echo": {
+			"visit:s_p21_masters:yue_maiden": {
+				"all": [["The Maiden of Yue", "Sixty came, the first week. I had them stand still holding a switch until noon. Forty came back the next day, and those I shall teach. The twenty were the ones I was afraid of."]],
+				"sweep": [["The Maiden of Yue", "The first one came yesterday: a ferry-boy from Longmen who has poled a boat since he was nine. He said, is a pole a broom? I said it was a better one. He already knows where his feet are."]],
+				"none": [["The Maiden of Yue", "They have stopped sending. The old one teaches the small ones to peel fruit now, with great ceremony. It is the same stroke. I have decided not to tell him."]],
+			},
+			"s_p21_sarnai": {
+				"all": [["Grandmother Sarnai", "And I hear a girl in the south is to teach the sword to anyone who asks. Hm. Well. Better taught than not, with boys. But I would want to see who does the asking."]],
+				"sweep": [["Grandmother Sarnai", "And I hear a girl in the south will teach nobody who has not done a year's plain work first. Now that is a woman who has raised boys, or ought to."]],
+				"none": [["Grandmother Sarnai", "And I hear a girl in the south was asked to teach the valley the sword, and you told her no. Good. I wish somebody had said it to the archer before he got as far as us."]],
+			},
+		},
+		"end": {"all": "The Maiden of Yue teaches whoever asks, and begins with a year of standing still.", "sweep": "The Maiden of Yue teaches those who have done a year of plain work with a long handle; a ferry-boy of Longmen was the first.",
+			"none": "The Maiden's method stays in the marsh, with an old white ape who teaches the young ones to peel fruit."}},
+	"the_three_thousand": {"step": "s_p21_zhao", "part": "XXI", "n": "The three thousand",
+		"ask": "King Wen has put his crown down on the mat beside five broken tallies, and in the yards of the red palace three thousand swordsmen are waiting to hear what they are now. In the old book they went to their quarters and killed themselves, and the book thought that the end of it. What becomes of them?",
+		"options": [
+			{"id": "home", "label": "Home, each with a tally to return", "tilt": {"heart": 3, "reach": -1},
+				"desc": "Every one of them is somebody's. Give each a broken tally from the sand and send him to find the family of the man it was cut for, and say what happened, and stay as long as he is let. Then he may go to his own.",
+				"log": "Sent the three thousand home, each with a dead man's tally to return."},
+			{"id": "guard", "label": "To the caravans: paid the same if they never draw", "tilt": {"reach": 2, "craft": 1}, "gain": {"renown": 5},
+				"desc": "Eleven caravans went out of Shazhou this month with no guard. Here are three thousand who know one end of a sword from the other. Auntie Aysha's bargain: a guard is paid the same whether he draws or not, and thought more of if he does not (renown).",
+				"log": "Hired the three thousand to guard the caravans, paid the same if they never draw."},
+			{"id": "judge", "label": "Each answers for the men he killed", "tilt": {"heart": -3}, "gain": {"renown": 4},
+				"desc": "A hundred and more a year, for three years, for a king's amusement and a place at his table. Nobody held their hands. Count the tallies, name the dead, and let each man be judged in the town of the man he killed (renown).",
+				"log": "Sent each of the three thousand to be judged where his dead came from."},
+		],
+		"after": {
+			"home": [["Narrator", "It takes three days to give out the tallies. The swordsmen take them without a word, each looking for a mark he knows. The one with the horse cut on it is taken by a big scarred man who looks at it, and sits down in the sand, and cannot be got up for an hour."]],
+			"guard": [["The Swordsman in Scholar's Dress", "Paid the same if they never draw. Now that is better than my ending. I only made a king ashamed. You have made three thousand men useful, which lasts longer. I shall put it in the book. I shall say I thought of it."]],
+			"judge": [["King Wen of Zhao, Who Loved Swords", "And I? They fought because I liked to see it. If each of them answers for his dead, then I answer for all three hundred. ...Yes. Write my name first. I had thought the worst of it was that I was bored."]],
+		},
+		"echo": {
+			"visit:s_p21_masters:cook_aysha": {
+				"home": [["Auntie Aysha of the Caravanserai", "My porter's boy came back, the one of fifteen. He had a slip of wood, and went on through to a village past the salt flats with it, and was gone a month. He does not talk about it. He does not touch his grandfather's sword either."]],
+				"guard": [["Auntie Aysha of the Caravanserai", "I have forty of the king's men on my caravans now. The masters complained they were paying for swords that never came out. I said: yes. That is what you are paying for. Count your camels."]],
+				"judge": [["Auntie Aysha of the Caravanserai", "They held the judging here for the Shazhou dead, under my awning. Seven men. I gave them water first, the accused too. Water is not a verdict. But I will say the town slept that night, for the first time since the boys left."]],
+			},
+			"pre:wuzhu": {
+				"home": [["Wuzhu, the Masterless Edge", "You sent three thousand men home with the tallies of the dead. We heard it; edges hear such things. Each of those men had a hand, and you found a use for it that was not us. Find us one."]],
+				"guard": [["Wuzhu, the Masterless Edge", "You sent three thousand swords to walk beside camels and be paid for staying in the sheath. We heard it. We did not understand it. A sword that is paid not to cut. Explain it to us. We have time."]],
+				"judge": [["Wuzhu, the Masterless Edge", "You had three thousand men judged for what their swords did. We heard it. Nobody judged the swords. Nobody ever does. We should like to be judged. It would mean somebody thought we had done it."]],
+			},
+		},
+		"end": {"home": "Three thousand swordsmen went home by way of the families of the men they killed, each with half a tally.", "guard": "The caravans of the sand road are guarded by the king's three thousand, who are paid the same whether they draw or not.",
+			"judge": "The three thousand were judged in the towns their dead came from, and King Wen's name was written first."}},
+	"the_arms": {"step": "s_p21_wuzhu", "part": "XXI", "n": "The arms of the land",
+		"ask": "Four thousand blades lie on the floor of the long barrow with their points to the wall, and there is a sword in every thatch from Qingshi to the sand. Ou Yezi will do with them whatever he is told; the six hearths have each sent somebody to hear it. What is done with the arms of the land?",
+		"options": [
+			{"id": "melt", "label": "Melt them: ploughshares, bells and pots", "tilt": {"craft": -3, "heart": 2},
+				"desc": "It was good bronze before it was an edge. Let the pits of Tushan run the other way for a winter: every blade nobody made goes back to the mould and comes out as a thing with a use on an ordinary day. The sect keeps its forty, on their pegs.",
+				"log": "Had the unasked blades of the land melted into ploughshares, bells and pots."},
+			{"id": "rack", "label": "One rack at every hearth, and a keeper", "tilt": {"reach": -3, "craft": 1},
+				"desc": "The horse-folk have always done it: one bow to a tent, by the door-flap, where the grandmother sees who takes it down. Give every hearth in the land one rack, in the open, and a keeper with a name. What does not fit on the rack goes back to the fire.",
+				"log": "Gave every hearth one rack for its arms, in the open, and a keeper."},
+			{"id": "school", "label": "A school: every weapon, and the broom first", "tilt": {"reach": 2, "craft": 2}, "need": [["arms", 3]], "gain": {"renown": 6},
+				"desc": "They got up because nobody had told them what they were for. Then tell them, and tell the hands too: a yard on the mountain where anybody may learn any of the eight, after a year with a broom. Only somebody who has learned three himself can promise that (renown).",
+				"log": "Founded a school of arms on the mountain, where the broom is learned first."},
+			{"id": "bury", "label": "Bury them, each with a name", "tilt": {"heart": 1, "craft": -1},
+				"desc": "The sword saints were laid down with their blades and a tablet over each, and their swords lay quiet for a thousand years. Give every one of the four thousand a name and a place in the ground. It will take Mu Gu the rest of his life. He has already said yes.",
+				"log": "Had the four thousand blades buried, each under a name."},
+		],
+		"after": {
+			"melt": [["Narrator", "The first of them goes into the crucible at Tushan before the week is out. It comes out a bell. Bell-Caster Wei strikes it once, in the yard, and every caster in the town puts down what he is holding to listen to something that was going to be a sword."]],
+			"rack": [["Narrator", "The racks go up within the month: over Auntie Aysha's oven, in the stern locker of the ferry, under the lantern-row at Yanggu. Each has one weapon on it and a name cut beside it, and the name is never a young man's."]],
+			"school": [["Narrator", "The yard is marked out below the kitchen, eight racks along the wall and a row of brooms by the gate. The first to ask for a place is a big scarred man from the east, who holds his broom at first exactly as if it were a sword, and is told so, kindly, by a girl of ten."]],
+			"bury": [["Gravekeeper Mu Gu", "Four thousand. I have a chisel and a good eye and perhaps thirty years. I shall not finish. But I shall name one a day, and say it aloud, and the apprentice I have not got yet can do the rest. You have given me a reason to find one."]],
+		},
+		"echo": {
+			"done:s_p21_racks": {
+				"melt": [["Narrator", "The three blades go into Granny Wen's handcart, to be taken to Tushan with the rest. One farmer asks if his might come back as a hoe. He is told it will come back as whatever the valley is short of, and he says: then a hoe."]],
+				"rack": [["Narrator", "One of the three is hung on the new rack by the well, with Granny Wen's name cut beside it. The other two go in the cart for the fire. The farmer whose blade was kept looks rather proud, and is told to stop."]],
+				"school": [["Narrator", "The three blades are wrapped in straw for the mountain, and each farmer is given a broom in exchange, which they take for a joke until Granny Wen explains that it is not one. Her grandson has already asked how old one must be."]],
+				"bury": [["Narrator", "The three blades are laid in the cart for the Graveyard, and Granny Wen has each farmer say a name for his before it goes. One calls his after his ox. Nobody laughs. It is written down as given."]],
+			},
+			"s_p21_ou2": {
+				"melt": [["Ou Yezi the Swordsmith", "Ploughshares. I have unmade more this month than I made in my life, and every one came out of the mould glad. I did not know bronze could be glad. Forty years I have been a smith, and I am only now learning the trade from the other end."]],
+				"rack": [["Ou Yezi the Swordsmith", "One to a hearth, and a keeper. I cast the pegs for the racks myself. Plain work. A peg is a thing made to have a weapon hung on it and not taken down, and I find I am better at pegs than I ever was at swords."]],
+				"school": [["Ou Yezi the Swordsmith", "A school, and brooms first. I shall come up and see it. I never once met the people my swords were for; I met kings. I should like to stand at the back of a yard and watch a child be told she is holding it wrong."]],
+				"bury": [["Ou Yezi the Swordsmith", "Named and buried. That is how they did it with mine, in the end: Zhanlu has a grave somewhere, I am told, and a tablet. I have sent Mu Gu my small chisel. It cuts a clean character, and I shall not need it for marks any more."]],
+			},
+			"post:s_break26": {
+				"melt": [["Narrator", "Down in the valley, a bell that was nearly a sword rings the hour from the gate of Qingshi, and is a little flat, and nobody would have it otherwise."]],
+				"rack": [["Narrator", "Down in the valley, by the well at Qingshi, one blade hangs on one peg in the open, and Granny Wen, shelling beans in her doorway, can see it from where she sits."]],
+				"school": [["Narrator", "Below the kitchen, in the new yard, somebody has left a broom leaning on the first of the eight racks. It is the right way up. That is the only rule the school has written down so far."]],
+				"bury": [["Narrator", "In the Graveyard of Sword Saints, Mu Gu cuts the day's name, says it aloud over a new small mound, and listens. Nothing hums. He goes in to his tea."]],
+			},
+		},
+		"end": {"melt": "The unasked blades of the land were melted, and the first of them is a bell at Tushan.", "rack": "Every hearth has one rack for its arms, in the open, and the name beside it is never a young man's.",
+			"school": "There is a school of arms below the kitchen of the Azure Cloud Sect, where the broom is learned first.", "bury": "Gravekeeper Mu Gu names one unmade sword a day and buries it, and has taken an apprentice."}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
-	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow"]
+	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow",
+	"the_pupils", "the_three_thousand", "the_arms"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:
@@ -650,6 +784,9 @@ static func option_text(g, o: Dictionary) -> String:
 	for n in o.get("need", []):
 		if str(n[0]) == "works":
 			parts.append("%s %d works of %s (you have %d)" % ["[x]" if option_ok(g, o) else "[ ]", int(n[2]), str(Works.SCHOOLS[n[1]].n), Works.count(g, str(n[1]))])
+		else:
+			# (the Hundred Arms release: any other need a trial's path could have, in the trials' own words)
+			parts.append("%s %s" % ["[x]" if Trials.need_met(n, g) else "[ ]", Trials.need_text(n, g)])
 	var tips: Array = []
 	for sc in o.get("tilt", {}):
 		var v := int(o.tilt[sc])

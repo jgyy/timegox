@@ -38,7 +38,7 @@ const HER_TITLES := ["Granny", "Auntie", "Madam", "Maiden", "Maid", "Sister", "L
 ## the women of the story who are named without such a word (art/characters: every model with "fem")
 const WOMEN := ["Yue Ling", "Ah Mei", "Chang'e", "Ao Qing", "Dong Shuang", "Qing Lian", "Nuwa", "Egg-Warden Luan", "Farida", "Yu Hua", "Jiang Yao", "He Xiangu", "Xu Qian", "Houtu", "Hu Mei'er", "Hu Qingyi",
 	"Innkeeper Bao", "Innkeeper Lou", "Jingwei", "Lan Jing", "Lan Caihe", "Ling Fei", "Little Bei", "Little Hua", "Little Lan", "Liu Ying", "Mazu", "Meng Po", "Ah Shui", "Ba Yin", "Xiao Qing", "Tao Yao", "Yu Lan", "Shui Lian",
-	"Roll-Clerk Ning", "Can Niang", "Silk-Diver Yao", "Mo Gu", "A Lan", "Tala", "Tu Lan", "Weaver Liu", "Zhaya", "Xia", "Xiao Lan", "Xu Lan", "Zhi Nu", "Zhi", "Su Wan", "Sarnai", "Qing Nu", "Xihe", "Su Chun", "Xuanpin",
+	"Roll-Clerk Ning", "Can Niang", "Silk-Diver Yao", "Mo Gu", "A Lan", "Tala", "Tu Lan", "Weaver Liu", "Zhaya", "Xia", "Xiao Lan", "Xu Lan", "Zhi Nu", "Zhi", "Su Wan", "Sarnai", "Qing Nu", "Xihe", "Su Chun", "Xuanpin", "The Maiden of Yue",
 	"Xiwangmu", "Chang Sheng", "Hai Ruo", "He Bo's Bride", "Cook Zhou", "Zhou the Cook"]
 ## men the story names who stand in no region's list of people (fathers, gods, the dead)
 const MEN := ["Lin Shan", "Elder", "Qiu Ye", "Fang Hu", "Iron Fang", "Chiyou", "Yu", "Gun", "Kang", "Geng", "Wang", "Zao Jun", "Hundun", "Xu Fu", "Emperor", "King", "Lord", "Duke", "Patriarch",

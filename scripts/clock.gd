@@ -97,7 +97,9 @@ const STORY_HOURS := {"s_gh_xihe": 18.6, "s_p16_eve": 21.2, "s_p16_vigil": 23.8,
 	"s_p19_gardener": 23.2, "s_p19_kites": 20.4, "s_p19_campfire": 5.2, "s_p19_makers": 21.0, "s_p19_gardener2": 16.5,
 	# Part XX: the pasture is walked at dusk, the tea is drunk when the day's shift is up, and the fire
 	# below Rotten-Axe Cave is sat at after dark
-	"s_p20_sarnai": 17.4, "s_p20_rat": 18.6, "s_p20_hollow": 20.6}
+	"s_p20_sarnai": 17.4, "s_p20_rat": 18.6, "s_p20_hollow": 20.6,
+	# Part XXI: the forms are shown on the stage at dusk, and the steps are swept at first light
+	"s_p21_herd": 17.6, "s_p21_tablets": 5.4}
 
 static func story_hour(g, sid: String) -> void:
 	if STORY_HOURS.has(sid):

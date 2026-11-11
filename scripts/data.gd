@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 75
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel"]
+const MAX_LEVEL := 78
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -73,6 +73,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Whose Hand Follows", "note": "What I care about is the Way, said Cook Ding, which goes beyond skill. Whatever you take up, a sword, a broom, a pitcher, a lever, you no longer use: you follow it to where it was already going, and it is never dull, and it takes nothing from you."},
 	# Part XX (the Hollow Hills release): the use of what is not there
 	{"life": 0, "title": "Keeper of the Empty Place", "note": "Thirty spokes share one hub: where there is nothing, there is the use of the cart. Clay is shaped into a jar: where there is nothing, there is the use of the jar. You no longer fill what you find. Rooms are quieter where you have been, wells deeper, and people find they have somewhere to put things down."},
+	# Part XXI (the Hundred Arms release): the edge that is kept
+	{"life": 0, "title": "Who Does Not Draw", "note": "Arms are instruments of ill omen, says the old book, and not the tools of the gentleman, who takes them up only when he cannot do otherwise. The best soldier is not soldierly; the best fighter is not angry. Every weapon you carry knows it is carried by somebody who would rather not, and is the sharper for it."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -205,6 +207,19 @@ const SKILLS := {
 	"isles_rain": {"n": "Rain over the Five Isles", "cost": 410, "mult": 10.2, "elem": "wood", "tgt": "all", "lv": 49, "who": 0},
 	"jingwei_stone": {"n": "Jingwei's Stone Sword", "cost": 560, "mult": 70.0, "elem": "earth", "tgt": "one", "lv": 50, "who": 0, "after": "s_yz_return"},
 	# the Dao techniques (Part XI): each Dao teaches one once its walker is an Adept (see DAOS)
+	# ---- the Hundred Arms release (arms.gd): the technique of each weapon's Dao, for an Adept of it with
+	# that weapon in his hand.  A weapon is carried from the first morning to the last, so these are
+	# measured against what Lin Feng already knows (Game.skill_of): `k` times the strongest technique of
+	# the same reach he has, at `ck` times its cost.  true: always a true blow; pierce: the share of the
+	# foe's guard it ignores; bind, mark: it binds or marks whatever it strikes (arms.gd)
+	"arm_one_line": {"n": "One Line", "cost": 1, "mult": 1.0, "elem": "phys", "tgt": "one", "lv": 0, "who": 0, "arm": "sword", "k": 1.0, "ck": 1.05, "true": true},
+	"arm_sweep": {"n": "Sweeping the Thousand Steps", "cost": 1, "mult": 1.0, "elem": "earth", "tgt": "all", "lv": 0, "who": 0, "arm": "staff", "k": 1.22, "ck": 1.1},
+	"arm_tiger": {"n": "The Tiger Comes Down the Mountain", "cost": 1, "mult": 1.0, "elem": "fire", "tgt": "one", "lv": 0, "who": 0, "arm": "sabre", "k": 1.3, "ck": 1.3},
+	"arm_dragon": {"n": "The Dragon Leaves the Sea", "cost": 1, "mult": 1.0, "elem": "water", "tgt": "one", "lv": 0, "who": 0, "arm": "spear", "k": 1.1, "ck": 1.1, "pierce": 1.0},
+	"arm_wind": {"n": "The Wind Unfolds", "cost": 1, "mult": 1.0, "elem": "wood", "tgt": "all", "lv": 0, "who": 0, "arm": "fan", "k": 1.12, "ck": 0.9},
+	"arm_unshot": {"n": "The Shot Not Shot", "cost": 1, "mult": 1.0, "elem": "thunder", "tgt": "one", "lv": 0, "who": 0, "arm": "bow", "k": 1.2, "ck": 1.15},
+	"arm_bends": {"n": "Nine Bends", "cost": 1, "mult": 1.0, "elem": "dark", "tgt": "all", "lv": 0, "who": 0, "arm": "whip", "k": 1.05, "ck": 1.1, "bind": true},
+	"arm_stroke": {"n": "One Stroke", "cost": 1, "mult": 1.0, "elem": "dark", "tgt": "one", "lv": 0, "who": 0, "arm": "brush", "k": 1.08, "ck": 1.05, "mark": true},
 	"myriad_swords": {"n": "Ten Thousand Swords Return to One", "cost": 440, "mult": 54.0, "elem": "phys", "tgt": "one", "lv": 45, "who": 0, "dao": "sword"},
 	"peng_wind": {"n": "Peng's Wind of Ninety Thousand Li", "cost": 350, "mult": 9.0, "elem": "wood", "tgt": "all", "lv": 45, "who": 0, "dao": "wander"},
 	"lotus_heart": {"n": "Lotus Heart Sutra", "cost": 160, "heal": 0.8, "elem": "water", "tgt": "allies", "lv": 45, "who": 0, "dao": "heart", "revive": true},
@@ -241,7 +256,7 @@ static func known_skills(who: int, level: int, step: int = 1 << 20) -> Array:
 	for id in SKILLS:
 		var s = SKILLS[id]
 		# (a Dao's technique comes from walking that Dao: Game.dao_skills)
-		if s.has("dao"):
+		if s.has("dao") or s.has("arm"):
 			continue
 		if s.who == who and s.lv <= level:
 			if s.has("after") and step <= step_index(s.after):
@@ -731,6 +746,24 @@ const ENEMIES := {
 	"fen_yang": {"n": "Fenyang, the Lamb of the Earth", "elem": "earth", "weak": "wood", "col": Color("b89a6a"), "shape": "qilin", "boss": true, "pal": {"sec": Color("6a5234"), "acc": Color("f0e0b0"), "mark": Color("3a2a1a")}},
 	"white_rat": {"n": "The White-Haired Rat of the Bottomless Cave", "elem": "phys", "weak": "fire", "col": Color("f0ece8"), "shape": "fox", "boss": true, "pal": {"sec": Color("c8c0c0"), "acc": Color("e8c040"), "mark": Color("c83a4a")}},
 	"wangliang": {"n": "Wangliang, the Penumbra", "elem": "dark", "weak": "fire", "col": Color("6a6a8a"), "shape": "wraith", "boss": true, "pal": {"sec": Color("1e1e30"), "acc": Color("d0d8ff"), "mark": Color("3a3a5a")}},
+	# ---- Part XXI (the Hundred Arms release): weapons that have got up without a hand, what learned to
+	# fight by watching, and the four lords of the edge
+	"sword_reed": {"n": "Sword-Reed", "elem": "wood", "weak": "fire", "col": Color("8ab86a"), "shape": "plant", "pal": {"sec": Color("4a6a3a"), "acc": Color("e0f0ff")}},
+	"white_gibbon": {"n": "White Gibbon", "elem": "wood", "weak": "thunder", "col": Color("f0ece0"), "shape": "ape", "pal": {"sec": Color("b8b0a0"), "acc": Color("6a8a4a")}},
+	"hook_heron": {"n": "Hook-Bill Heron", "elem": "water", "weak": "thunder", "col": Color("9ab0c8"), "shape": "bird", "pal": {"sec": Color("4a5a70"), "acc": Color("e0c060")}},
+	"stray_arrow": {"n": "Stray Arrow", "elem": "phys", "weak": "earth", "col": Color("d8c090"), "shape": "wisp", "pal": {"sec": Color("7a5a34"), "acc": Color("f04a3a")}},
+	"wheel_louse": {"n": "Louse as Big as a Cartwheel", "elem": "dark", "weak": "fire", "col": Color("6a5a50"), "shape": "spider", "pal": {"sec": Color("3a302a"), "acc": Color("e8d8b0")}},
+	"cup_snake": {"n": "Bow-Shadow Snake", "elem": "thunder", "weak": "earth", "col": Color("b84a3a"), "shape": "serpent", "pal": {"sec": Color("5a1e1a"), "acc": Color("f0e0a0")}},
+	"gate_swordsman": {"n": "Swordsman of the Gate", "elem": "phys", "weak": "thunder", "col": Color("5a4a6a"), "shape": "humanoid", "pal": {"sec": Color("2a2438"), "acc": Color("d8dce8")}},
+	"fighting_cock": {"n": "Fighting Cock", "elem": "fire", "weak": "water", "col": Color("c8502a"), "shape": "bird", "pal": {"sec": Color("3a2a1e"), "acc": Color("f0c040")}},
+	"broken_edge": {"n": "Broken Edge", "elem": "dark", "weak": "fire", "col": Color("7a8498"), "shape": "wraith", "pal": {"sec": Color("2e3444"), "acc": Color("e8f0ff")}},
+	"pool_blade": {"n": "Blade of the Sword Pool", "elem": "water", "weak": "thunder", "col": Color("7ac0d0"), "shape": "wisp", "pal": {"sec": Color("2a5a6a"), "acc": Color("f0ffff")}},
+	"mound_tiger": {"n": "White Tiger of the Mound", "elem": "phys", "weak": "fire", "col": Color("ecece4"), "shape": "tiger", "pal": {"sec": Color("b0b0a8"), "acc": Color("3a3a44")}},
+	"humming_sword": {"n": "Humming Sword", "elem": "phys", "weak": "earth", "col": Color("c8d8f0"), "shape": "wisp", "pal": {"sec": Color("5a6a8a"), "acc": Color("ffe8a0")}},
+	"yuan_gong": {"n": "Yuan Gong, the White Ape", "elem": "wood", "weak": "fire", "col": Color("f4f0e6"), "shape": "ape", "boss": true, "pal": {"sec": Color("c0b8a8"), "acc": Color("5a8a3a"), "mark": Color("3a2a22")}},
+	"sword_dragons": {"n": "Gan Jiang and Mo Ye, the Paired Dragons", "elem": "water", "weak": "thunder", "col": Color("5a9ab8"), "shape": "dragon", "boss": true, "pal": {"sec": Color("b84a5a"), "acc": Color("f0f4ff"), "mark": Color("2a3a4a")}},
+	"king_zhao": {"n": "King Wen of Zhao, Who Loved Swords", "elem": "phys", "weak": "wood", "col": Color("6a2a3a"), "shape": "person:king_zhao", "boss": true},
+	"wuzhu": {"n": "Wuzhu, the Masterless Edge", "elem": "phys", "weak": "earth", "col": Color("b0bcd0"), "shape": "person:wuzhu", "boss": true},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -989,9 +1022,13 @@ const AREAS := {
 		"warband": {"pool": [["nian_cub", 61, 62]], "n": 10, "vis": "s_p16_dawn"},
 	},
 	"marsh": {
+		# Part XXI: the reeds of the south country, grown into blades, and the pupils of the White Ape
+		"warband": {"pool": [["sword_reed", 75, 76], ["white_gibbon", 75, 76], ["hook_heron", 75, 76]], "n": 15, "vis": "s_p21_cast", "late": true},
 		"n": "Crimson Marsh", "w": 80, "h": 48, "seed": 31, "theme": "marsh", "enemies": 14,
 		# a fated encounter (fate.gd): there while the story has them there
-		"npcs": [{"id": "liu_ying", "n": "Liu Ying", "pos": Vector2i(38, 27), "col": Color("6a7a5a"), "fate": true}, {"id": "liu_ying_end", "n": "Liu Ying", "pos": Vector2i(45, 32), "col": Color("6a7a5a"), "asset": "liu_ying", "fate": true}],
+		"npcs": [{"id": "liu_ying", "n": "Liu Ying", "pos": Vector2i(38, 27), "col": Color("6a7a5a"), "fate": true}, {"id": "liu_ying_end", "n": "Liu Ying", "pos": Vector2i(45, 32), "col": Color("6a7a5a"), "asset": "liu_ying", "fate": true},
+			# Part XXI: the girl of the south country who taught an army with a bamboo switch
+			{"id": "yue_maiden", "n": "The Maiden of Yue", "pos": Vector2i(23, 23), "col": Color("5a8a5a"), "vis": ["s_p21_cast", ""], "late": true}],
 		"pool": [["mire_toad", 3, 4], ["bog_wraith", 4, 5], ["poison_vine", 3, 5]],
 		"portals": [
 			{"to": "bamboo", "pos": Vector2i(1, 24), "dest": Vector2i(66, 22), "open": ""},
@@ -999,11 +1036,14 @@ const AREAS := {
 		],
 		"bosses": [
 			{"id": "bog_colossus", "pos": Vector2i(40, 28), "lv": 4, "req": 4},{"id": "marsh_hag", "pos": Vector2i(66, 10), "lv": 5, "req": 5},
-			{"id": "grudge_marsh_hag", "pos": Vector2i(68, 11), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]}],
+			{"id": "grudge_marsh_hag", "pos": Vector2i(68, 11), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
+			# Part XXI: the old white ape who tested her, and has been teaching what he learned
+			{"id": "yuan_gong", "pos": Vector2i(56, 22), "lv": 76, "req": 75, "vis": ["s_p21_yue", ""], "late": true}],
 		"pickups": [
 			{"id": "lotus1", "item": "lotus", "pos": Vector2i(20, 38)}, {"id": "lotus2", "item": "lotus", "pos": Vector2i(38, 8)},
 			{"id": "lotus3", "item": "lotus", "pos": Vector2i(54, 40)}, {"id": "lotus4", "item": "lotus", "pos": Vector2i(70, 30)},
-		],
+			# Part XXI: bamboo switches the Maiden cut and the gibbons carried off
+			{"id": "p21_switch1", "item": "bamboo_switch", "pos": Vector2i(26, 15), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch2", "item": "bamboo_switch", "pos": Vector2i(34, 34), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch3", "item": "bamboo_switch", "pos": Vector2i(45, 16), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch4", "item": "bamboo_switch", "pos": Vector2i(63, 33), "vis": ["s_p21_reeds", ""], "late": true}],
 		"pickup_vis": "s_lotus",
 	},
 	"frost": {
@@ -1063,9 +1103,15 @@ const AREAS := {
 		"pickup_vis": "s_shards",
 	},
 	"palace": {
+		# Part XXI: the three thousand at the king's gate, their fighting cocks, and the edges they have broken
+		"warband": {"pool": [["gate_swordsman", 76, 77], ["fighting_cock", 76, 77], ["broken_edge", 76, 77]], "n": 16, "vis": "s_p21_porters", "late": true},
+		# Part XXI: tallies of challenge, one for every man killed at the gate this year
+		"pickups": [{"id": "p21_tally1", "item": "challenge_tally", "pos": Vector2i(20, 20), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally2", "item": "challenge_tally", "pos": Vector2i(30, 38), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally3", "item": "challenge_tally", "pos": Vector2i(42, 15), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally4", "item": "challenge_tally", "pos": Vector2i(49, 36), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally5", "item": "challenge_tally", "pos": Vector2i(62, 20), "vis": ["s_p21_gate", ""], "late": true}],
 		"n": "Blood Moon Palace", "w": 90, "h": 56, "seed": 61, "theme": "palace", "enemies": 16,
 		# a fated encounter (fate.gd): there while the story has them there
-		"npcs": [{"id": "xu_lan", "n": "Xu Lan", "pos": Vector2i(50, 23), "col": Color("7a1a2a"), "fate": true}, {"id": "xu_lan_end", "n": "Xu Lan", "pos": Vector2i(46, 23), "col": Color("7a1a2a"), "asset": "xu_lan", "fate": true}],
+		"npcs": [{"id": "xu_lan", "n": "Xu Lan", "pos": Vector2i(50, 23), "col": Color("7a1a2a"), "fate": true}, {"id": "xu_lan_end", "n": "Xu Lan", "pos": Vector2i(46, 23), "col": Color("7a1a2a"), "asset": "xu_lan", "fate": true},
+			# Part XXI: somebody waiting at the gate of the Blood Moon Palace, where a king keeps three thousand swordsmen
+			{"id": "zhuang_envoy", "n": "The Swordsman in Scholar's Dress", "pos": Vector2i(15, 32), "col": Color("4a5a6a"), "vis": ["s_p21_porters", ""], "late": true}],
 		"pool": [["blood_acolyte", 11, 11], ["bone_soldier", 11, 11], ["shadow_fiend", 11, 11]],
 		"portals": [
 			{"to": "thunder", "pos": Vector2i(1, 28), "dest": Vector2i(84, 25), "open": ""},
@@ -1076,7 +1122,8 @@ const AREAS := {
 			{"id": "general_blood", "pos": Vector2i(32, 12), "lv": 11, "req": 11},
 			{"id": "general_shadow", "pos": Vector2i(56, 44), "lv": 11, "req": 11},
 			{"id": "demon_lord", "pos": Vector2i(80, 28), "lv": 12, "req": 11},
-		],
+			# Part XXI: the king who loved swords, holding court in the Demon Lord's empty hall
+			{"id": "king_zhao", "pos": Vector2i(70, 30), "lv": 77, "req": 76, "vis": ["s_p21_gate", ""], "late": true}],
 	},
 	"dragon": {
 		"n": "Sunken Dragon Palace", "w": 92, "h": 56, "seed": 71, "theme": "abyss", "enemies": 18,
@@ -1206,11 +1253,13 @@ const AREAS := {
 			{"id": "grudge_headless_saint", "pos": Vector2i(50, 23), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			{"id": "grave_empress", "pos": Vector2i(60, 12), "lv": 20, "req": 20},
 			{"id": "founder_qing", "pos": Vector2i(82, 30), "lv": 20, "req": 20},
-		],
+			# Part XXI: every blade that has no hand, in one figure, in the Barrow of the Unburied Blade
+			{"id": "wuzhu", "pos": Vector2i.ZERO, "lv": 77, "req": 77, "vis": ["s_p21_grave", ""], "late": true, "cave": -1, "stand": "deep"}],
 		"pickups": [
 			{"id": "relic1", "item": "relic", "pos": Vector2i(20, 12)}, {"id": "relic2", "item": "relic", "pos": Vector2i(42, 46)},
 			{"id": "relic3", "item": "relic", "pos": Vector2i(66, 30)}, {"id": "relic4", "item": "relic", "pos": Vector2i(76, 10)},
-		],
+			# Part XXI: the name-tablets of the sword saints, knocked down in the barrow
+			{"id": "p21_tablet1", "item": "saint_tablet", "pos": Vector2i.ZERO, "vis": ["s_p21_grave", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p21_tablet2", "item": "saint_tablet", "pos": Vector2i.ZERO, "vis": ["s_p21_grave", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_tablet3", "item": "saint_tablet", "pos": Vector2i.ZERO, "vis": ["s_p21_grave", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_tablet4", "item": "saint_tablet", "pos": Vector2i.ZERO, "vis": ["s_p21_grave", ""], "late": true, "cave": -1, "stand": "any"}],
 		"pickup_vis": "s_gv_collect",
 		# Part XV: the things that eat forgetting, unpicking the Founder's weave among the graves
 		"warband": {"pool": [["loose_thread", 57, 58], ["forgetting_moth", 57, 58], ["unweaver_shuttle", 57, 58]], "n": 8, "vis": "s_p15_judge"},
@@ -1415,6 +1464,8 @@ const AREAS := {
 		"pickup_vis": "s_fu_collect",
 	},
 	"aurora": {
+		# Part XXI: every arrow the horse-folk boys loosed at nothing, still looking for something to hit
+		"warband": {"pool": [["stray_arrow", 75, 76], ["wheel_louse", 75, 76], ["cup_snake", 75, 76]], "n": 16, "vis": "s_p21_ape", "late": true},
 		"n": "Aurora Steppe", "w": 96, "h": 58, "seed": 211, "theme": "aurora", "enemies": 20,
 		"pool": [["frost_yak", 28, 28], ["aurora_wisp", 28, 28], ["ice_lynx", 28, 29]],
 		"portals": [
@@ -1423,7 +1474,9 @@ const AREAS := {
 		],
 		"npcs": [
 			# a fated encounter (fate.gd): there while the story has them there
-			{"id": "tala_steppe", "n": "Tala of the Horse-Folk", "pos": Vector2i(8, 24), "col": Color("d8a04a"), "asset": "tala", "fate": true},{"id": "steppe_shaman", "n": "Steppe Shaman A Lan", "pos": Vector2i(10, 26), "col": Color("d0f0ff"), "vis": ["s_au_intro", ""]}],
+			{"id": "tala_steppe", "n": "Tala of the Horse-Folk", "pos": Vector2i(8, 24), "col": Color("d8a04a"), "asset": "tala", "fate": true},{"id": "steppe_shaman", "n": "Steppe Shaman A Lan", "pos": Vector2i(10, 26), "col": Color("d0f0ff"), "vis": ["s_au_intro", ""]},
+			# Part XXI: the archer who learned to see a louse as a cartwheel, gone north to learn to stop
+			{"id": "ji_chang", "n": "Ji Chang the Archer", "pos": Vector2i(40, 26), "col": Color("6a5a3a"), "vis": ["s_p21_ape", ""], "late": true}],
 		"bosses": [
 			{"id": "mammoth_ancestor", "pos": Vector2i(30, 40), "lv": 28, "req": 28},
 			{"id": "aurora_serpent", "pos": Vector2i(46, 16), "lv": 28, "req": 28},
@@ -1433,7 +1486,8 @@ const AREAS := {
 		"pickups": [
 			{"id": "ashard1", "item": "aurora_shard", "pos": Vector2i(22, 12)}, {"id": "ashard2", "item": "aurora_shard", "pos": Vector2i(40, 46)},
 			{"id": "ashard3", "item": "aurora_shard", "pos": Vector2i(64, 30)}, {"id": "ashard4", "item": "aurora_shard", "pos": Vector2i(76, 10)},
-		],
+			# Part XXI: arrows loosed at nothing, standing in the snow
+			{"id": "p21_arrow1", "item": "spent_arrow", "pos": Vector2i(25, 18), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow2", "item": "spent_arrow", "pos": Vector2i(36, 37), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow3", "item": "spent_arrow", "pos": Vector2i(50, 19), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow4", "item": "spent_arrow", "pos": Vector2i(62, 44), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow5", "item": "spent_arrow", "pos": Vector2i(70, 23), "vis": ["s_p21_ji", ""], "late": true}],
 		"pickup_vis": "s_au_collect",
 	},
 	"chaos": {
@@ -1961,10 +2015,13 @@ const AREAS := {
 			{"id": "drowned_bell", "pos": Vector2i(64, 37), "lv": 42, "req": 42},
 			{"id": "stone_lion", "pos": Vector2i(82, 14), "lv": 42, "req": 42},
 			{"id": "he_bo", "pos": Vector2i(90, 30), "lv": 42, "req": 42},
-		],
+			# Part XXI: the two swords that went into the river at the ford, in the Sword Pool under the Dragon Gate
+			{"id": "sword_dragons", "pos": Vector2i.ZERO, "lv": 76, "req": 76, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "deep"}],
 		"pickups": [{"id": "cscale1", "item": "carp_scale", "pos": Vector2i(66, 6)}, {"id": "cscale2", "item": "carp_scale", "pos": Vector2i(76, 22)}, {"id": "cscale3", "item": "carp_scale", "pos": Vector2i(84, 44)}, {"id": "cscale4", "item": "carp_scale", "pos": Vector2i(20, 52)},
 			{"id": "cur_pearl3", "item": "night_pearl", "pos": Vector2i(13, 24), "floor": ["carp_inn", 1], "always": true},
-			{"id": "cache_lm1", "item": "stones", "n": 1800, "pos": Vector2i(38, 47), "floor": ["harbour_office", -1], "always": true}],
+			{"id": "cache_lm1", "item": "stones", "n": 1800, "pos": Vector2i(38, 47), "floor": ["harbour_office", -1], "always": true},
+			# Part XXI: hilts with no blades in them, on the floor of the Sword Pool
+			{"id": "p21_hilt1", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p21_hilt2", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p21_hilt3", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_hilt4", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p21_hilt5", "item": "old_hilt", "pos": Vector2i.ZERO, "vis": ["s_p21_longmen", ""], "late": true, "cave": -1, "stand": "any"}],
 		"pickup_vis": "s_dg_collect",
 		"springs": [Vector2i(25, 46)],
 		# the river comes down from the Dragon Gate falls and runs past the quay; the main street
@@ -2046,8 +2103,9 @@ const AREAS := {
 			{"id": "innkeeper_lou", "n": "Innkeeper Lou of the Late Arrival", "pos": Vector2i(41, 38), "col": Color("a86a5a")},
 			{"id": "little_qi", "n": "Little Qi", "pos": Vector2i(18, 32), "col": Color("c8803a")},
 			# Part XIX: Mozi, who has walked ten days and ten nights
-			{"id": "mo_di", "n": "Mozi", "pos": Vector2i(33, 46), "col": Color("3a3a3a"), "vis": ["s_p19_hammer", ""], "late": true}
-		],
+			{"id": "mo_di", "n": "Mozi", "pos": Vector2i(33, 46), "col": Color("3a3a3a"), "vis": ["s_p19_hammer", ""], "late": true},
+			# Part XXI: the swordsmith of Yue, come back to a furnace that is pouring by itself
+			{"id": "ou_yezi", "n": "Ou Yezi the Swordsmith", "pos": Vector2i(42, 28), "col": Color("7a4a2a"), "vis": ["s_p21_home", ""], "late": true}],
 		"bosses": [
 			{"id": "slag_serpent", "pos": Vector2i(64, 12), "lv": 43, "req": 43},
 			{"id": "stone_mother", "pos": Vector2i(62, 48), "lv": 43, "req": 43},
@@ -2063,8 +2121,9 @@ const AREAS := {
 		"pickups": [{"id": "cshard1", "item": "cauldron_shard", "pos": Vector2i(56, 6)}, {"id": "cshard2", "item": "cauldron_shard", "pos": Vector2i(70, 52)}, {"id": "cshard3", "item": "cauldron_shard", "pos": Vector2i(82, 12)}, {"id": "cshard4", "item": "cauldron_shard", "pos": Vector2i(52, 40)},
 			{"id": "cur_wine3", "item": "peach_wine", "pos": Vector2i(41, 39), "floor": ["late_inn", -1], "always": true},
 			# Part XX: miners' lamps, still burning, in the Old Workings
-			{"id": "p20_lamp1", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_lamp2", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_lamp3", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_lamp4", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "deep"}
-		],
+			{"id": "p20_lamp1", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "near"}, {"id": "p20_lamp2", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "mid"}, {"id": "p20_lamp3", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "any"}, {"id": "p20_lamp4", "item": "miner_lamp", "pos": Vector2i.ZERO, "vis": ["s_p20_tushan", ""], "late": true, "cave": -1, "stand": "deep"},
+			# Part XXI: blades nobody ordered, cooling round the pits
+			{"id": "p21_blank1", "item": "sword_blank", "pos": Vector2i(41, 17), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank2", "item": "sword_blank", "pos": Vector2i(52, 28), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank3", "item": "sword_blank", "pos": Vector2i(14, 33), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank4", "item": "sword_blank", "pos": Vector2i(54, 23), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank5", "item": "sword_blank", "pos": Vector2i(47, 54), "vis": ["s_p21_ou", ""], "late": true}],
 		"pickup_vis": "s_ts_collect",
 		"springs": [Vector2i(16, 47)],
 		"roads": [[Vector2i(2, 30), Vector2i(14, 31), Vector2i(30, 29), Vector2i(46, 31), Vector2i(58, 30)], [Vector2i(30, 29), Vector2i(30, 17)]],
@@ -3370,6 +3429,66 @@ const STEPS := [
 	{"id": "s_p20_gong2", "kind": "talk", "npc": "yu_gong", "area": "village", "t": "Tell Yu Gong what was said in the Hollow of the Mountain"},
 	{"id": "s_p20_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Tell Elder Qing Xuan there is water in the kitchen well"},
 	{"id": "s_break25", "kind": "breakthrough", "to": 75, "t": "Where it is empty, there is the use of it: Hollow Vessel"},
+	# ---- Part XXI: The Hundred Arms (the Hundred Arms release).  What was dug in Part XX was smelted, and
+	# what was smelted has been cast, and nobody ordered what came out of the moulds: blades.  The racks
+	# of the sect's armoury are empty; the horse-folk boys shoot at each other's hats; a king who loves
+	# swords keeps three thousand men fighting at his gate in the Demon Lord's old hall; and in the
+	# Graveyard of Sword Saints the swords have got up without their saints.  Lin Feng, who has carried
+	# eight weapons since the Dragon Palace (arms.gd), goes to the ones who knew what each was for: the
+	# smith who made the five great swords, the girl who taught an army with a bamboo switch, the archer
+	# whose last lesson was not to shoot.  A hunt with "arm" counts what falls while that weapon is in
+	# his hand; "arms" asks for so many Daos of arms learned to Adept.  What a weapon is for is asked
+	# three times (echoes.gd), and the answers open and close the ends of the story (cultures.gd)
+	{"id": "s_p21_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The racks of the armoury are empty, and it was not thieves: speak to Elder Qing Xuan", "stones": 32000},
+	{"id": "s_p21_ou", "kind": "talk", "npc": "ou_yezi", "area": "tushan", "hearth": "forge", "t": "Every blade in the land was poured somewhere: find the old smith who has come back to his furnace at Tushan, Ou Yezi"},
+	{"id": "s_p21_blanks", "kind": "collect", "item": "sword_blank", "n": 5, "area": "tushan",
+		"t": "The pits are pouring blades nobody ordered: bring Ou Yezi 5 of the blanks lying cooling round the casting pits of Tushan"},
+	{"id": "s_p21_cast", "kind": "folk", "role": "smith", "town": "tushan", "n": 4, "area": "tushan", "hearth": "forge",
+		"t": "The Casting Hearth: somebody's hands poured them. Stand at the mould with four of Tushan's casters and watch what theirs do (face one and press Enter)"},
+	{"id": "s_p21_yue", "kind": "talk", "npc": "yue_maiden", "area": "marsh", "t": "A girl of the south country once taught an army with a bamboo switch: find the Maiden of Yue in the Crimson Marsh", "stones": 32400},
+	{"id": "s_p21_reeds", "kind": "hunt", "area": "marsh", "n": 22, "of": ["sword_reed", "white_gibbon", "hook_heron"], "arm": "staff", "first": true,
+		"t": "She will not talk to a sword: take the staff (Esc > Arms) and beat down the marsh's Sword-Reeds, White Gibbons and Hook-Bill Herons (strike first: F or G)"},
+	{"id": "s_p21_bamboo", "kind": "collect", "item": "bamboo_switch", "n": 4, "area": "marsh", "t": "The gibbons have carried off every switch she cut: bring back 4 of the Maiden's bamboo switches"},
+	{"id": "s_p21_ape", "kind": "kill", "boss": "yuan_gong", "area": "marsh", "t": "An old man in white asked to see her sword, and has been teaching what he saw ever since: face Yuan Gong, the White Ape"},
+	{"id": "s_p21_sarnai", "kind": "talk", "npc": "sarnai", "area": "thunder", "hearth": "steppe", "t": "The horse-folk's boys are shooting at each other's hats: ride to Grandmother Sarnai's tent", "stones": 32800},
+	{"id": "s_p21_ji", "kind": "talk", "npc": "ji_chang", "area": "aurora", "t": "The man who taught them has gone north to learn something harder: find Ji Chang the Archer on the Aurora Steppe"},
+	{"id": "s_p21_louse", "kind": "hunt", "area": "aurora", "n": 22, "of": ["stray_arrow", "wheel_louse", "cup_snake"], "arm": "bow", "first": true, "hearth": "steppe",
+		"t": "The Felt Hearth: arrows loosed at nothing are still flying. Bow in hand, bring down the Stray Arrows, Lice and Bow-Shadow Snakes (strike first: F or G)"},
+	{"id": "s_p21_arrows", "kind": "collect", "item": "spent_arrow", "n": 5, "area": "aurora", "t": "An arrow that hit nothing belongs to whoever loosed it: gather 5 spent arrows standing in the snow of the steppe"},
+	{"id": "s_p21_herd", "kind": "hunt", "area": "aurora", "n": 16, "of": ["stray_arrow", "wheel_louse", "cup_snake"], "arm": "whip",
+		"t": "Ji Chang has put his bow down, and says so must you: take the nine-link whip and drive what is left off the herds' winter ground"},
+	{"id": "s_p21_stage", "kind": "share", "spot": "kind:mountain:stage", "area": "mountain", "t": "Yue Ling has asked to see all eight: show her a form with each on the open-air stage on the mountain road"},
+	{"id": "s_p21_longmen", "kind": "talk", "npc": "fishwife_lu", "area": "longmen", "hearth": "river", "t": "Two swords went into the river at the ford, and the nets are coming up cut: go to Fishwife Lu at Longmen", "stones": 33200},
+	{"id": "s_p21_nets", "kind": "folk", "role": "fisher", "town": "longmen", "n": 3, "area": "longmen", "hearth": "river",
+		"t": "The Boat Hearth: a cut net is mended before anything is said about it. Mend one with three of Longmen's fishers (face one and press Enter)"},
+	{"id": "s_p21_pool", "kind": "hunt", "area": "longmen", "cave": -1, "n": 16, "of": ["pool_blade", "mound_tiger", "hook_heron"], "arm": "spear",
+		"t": "A king lies under the Dragon Gate with three thousand swords: go down into the Sword Pool, spear in hand, and clear its Blades, Tigers and Herons"},
+	{"id": "s_p21_hilts", "kind": "collect", "item": "old_hilt", "n": 5, "area": "longmen", "cave": -1, "t": "The blades have walked out of their hilts: bring up 5 of the empty hilts from the floor of the Sword Pool"},
+	{"id": "s_p21_dragons", "kind": "kill", "boss": "sword_dragons", "area": "longmen", "t": "At the back of the Sword Pool a husband and a wife are still looking for each other: face Gan Jiang and Mo Ye, the Paired Dragons"},
+	{"id": "s_p21_aysha", "kind": "talk", "npc": "cook_aysha", "area": "dunes", "hearth": "sand", "t": "The caravans' guards are leaving to be swordsmen at a king's gate: go to Auntie Aysha at Shazhou", "stones": 33600},
+	{"id": "s_p21_porters", "kind": "folk", "role": "porter", "town": "shazhou", "n": 3, "area": "dunes", "hearth": "sand",
+		"t": "The Sweet-Well Hearth: a caravan with no guards still has to go. Load a camel with three of the oasis's porters and hear who left (face one and press Enter)"},
+	{"id": "s_p21_envoy", "kind": "talk", "npc": "zhuang_envoy", "area": "palace", "t": "Somebody in a scholar's robe is waiting outside the Blood Moon Palace, where the king holds court: speak to him"},
+	{"id": "s_p21_gate", "kind": "hunt", "area": "palace", "n": 24, "of": ["gate_swordsman", "fighting_cock", "broken_edge"], "arm": "fan", "first": true,
+		"t": "Go in to the king with a fan in hand, through his Swordsmen of the Gate, Fighting Cocks and Broken Edges (strike first: F or G)"},
+	{"id": "s_p21_tallies", "kind": "collect", "item": "challenge_tally", "n": 5, "area": "palace", "t": "One tally is cut for every man killed at the gate, and nobody has counted them: gather 5 tallies of challenge from the palace yards"},
+	{"id": "s_p21_yard", "kind": "hunt", "area": "palace", "n": 18, "of": ["gate_swordsman", "fighting_cock", "broken_edge"], "arm": "sabre",
+		"t": "The king's champions want to see a stroke before they will stand aside: take Iron Fang's sabre and show the inner yard one"},
+	{"id": "s_p21_zhao", "kind": "kill", "boss": "king_zhao", "area": "palace", "t": "He has three swords to hear about, and has not left his hall in three years: stand before King Wen of Zhao"},
+	{"id": "s_p21_masters", "kind": "visits", "npcs": ["ou_yezi", "yue_maiden", "ji_chang", "sarnai", "fishwife_lu", "cook_aysha"], "n": 5, "area": "tushan", "did": "Asked %s what a weapon is for", "stones": 34000,
+		"t": "A smith, a girl, an archer and three keepers of hearths: ask five of them what a weapon is for, in any order"},
+	{"id": "s_p21_adept", "kind": "arms", "n": 3, "area": "sect", "t": "Nobody can answer for arms he has not carried: learn three Daos of arms to Adept (win battles with a weapon in hand; Esc > Arms)"},
+	{"id": "s_p21_grave", "kind": "talk", "npc": "grave_keeper", "area": "grave", "t": "In the Graveyard of Sword Saints the swords have got up without their saints: find Gravekeeper Mu Gu"},
+	{"id": "s_p21_barrow", "kind": "hunt", "area": "grave", "cave": -1, "n": 16, "of": ["humming_sword", "broken_edge", "gate_swordsman"], "arm": "brush",
+		"t": "A sword in a grave has a name: go down into the Barrow of the Unburied Blade with the judge's brush and still the Humming Swords and what follows them"},
+	{"id": "s_p21_tablets", "kind": "collect", "item": "saint_tablet", "n": 4, "area": "grave", "cave": -1, "t": "Their names have been knocked down in the dark: stand the 4 fallen name-tablets of the sword saints up again in the barrow"},
+	{"id": "s_p21_sweep", "kind": "share", "spot": "kind:sect:broom", "area": "sect", "t": "Before the last of it: sweep the steps of the sect with Yue Ling, the way it used to be done"},
+	{"id": "s_p21_wuzhu", "kind": "kill", "boss": "wuzhu", "area": "grave", "t": "At the back of the barrow stands every blade that has no hand, in the shape of somebody: face Wuzhu, the Masterless Edge", "stones": 34400},
+	{"id": "s_p21_racks", "kind": "folk", "role": "farmer", "town": "qingshi", "n": 3, "area": "village", "hearth": "valley",
+		"t": "The Rice Hearth: Qingshi has a blade in every thatch and wants to be told what to do with it. Do it with three of its farmers (face one and press Enter)"},
+	{"id": "s_p21_ou2", "kind": "talk", "npc": "ou_yezi", "area": "tushan", "hearth": "forge", "t": "Tell Ou Yezi what was decided about the things he makes"},
+	{"id": "s_p21_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The racks of the armoury have something on them again: tell Elder Qing Xuan what it is"},
+	{"id": "s_break26", "kind": "breakthrough", "to": 78, "t": "The best fighter is not angry: Sheathed Edge"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -3534,6 +3653,19 @@ const ITEMS := {
 	"pine_torch": {"n": "Xu Xiake's Pine Torch", "desc": "Smith Tie's copy of the traveller's own: a bundle of resinous pine heartwood bound with wire and steeped in fire and wood essence, with a guard to keep the drips off the hand. It burns for six hours and does not go out when it is dropped, which is the important thing"},
 	"lamb_bell": {"n": "Bell for the Lamb of the Earth", "desc": "A small bell of unglazed clay, the kind hung round the neck of a bellwether, fired in Alchemist Mo's furnace with earth essence and the mountain's own soil in the slip. It does not ring so much as knock, like a knuckle on a jar. Something under the ground knows that sound"},
 	"borrowed_shadow": {"n": "A Shadow's Shadow", "desc": "What Wangliang left: the faint edge that goes round a shadow, folded like a grey silk handkerchief. It weighs nothing and is cold. A penumbra depends on a shadow, which depends on a body, which depends on something else again; held up, this shows what a thing is leaning on"},
+	# Part XXI (the Hundred Arms release): what the pits poured, what a girl cut, what was loosed at nothing,
+	# what a blade walked out of, what a death at a gate is counted with, a name in a barrow, and four things
+	# made or left
+	"sword_blank": {"n": "Unasked Sword-Blank", "desc": "A blade as it comes from the mould, black with scale, no edge on it yet and no tang drilled. Nobody at Tushan ordered it and nobody will say he poured it. It is good bronze, evenly run. Whoever did not make it knew what he was not doing"},
+	"bamboo_switch": {"n": "The Maiden's Bamboo Switch", "desc": "A length of green bamboo as thick as a thumb, cut on the slant, with the leaves still on the thin end. The old ape broke off the tip of one like it and she caught him with the butt. An army of Yue learned from her, and she never once picked up anything heavier"},
+	"spent_arrow": {"n": "Spent Arrow", "desc": "A reed arrow with a goose-feather flight, standing where it came down. It was loosed at nothing by a boy who wanted to see how far. An arrow that has hit nothing has not finished being shot, the horse-folk say, and somebody has to go and tell it so"},
+	"old_hilt": {"n": "Empty Hilt", "desc": "A hilt of bronze bound with rotted silk, from the grave-goods of a king who was buried with three thousand swords. There is no blade in it. The slot it sat in is clean and bright, the way the inside of a thing is that has only just been left"},
+	"challenge_tally": {"n": "Tally of Challenge", "desc": "A slip of wood notched at one end and broken across: one half to the challenger, one to the gate. At the court of the king who loved swords a hundred and more of these were cut in a year. Each is a man. They were swept up with the sand"},
+	"saint_tablet": {"n": "Name-Tablet of a Sword Saint", "desc": "A narrow tablet of cypress with a name cut in it and a line beneath: who swore to guard the Seal, and was laid down with the blade. The swords in the barrow went quiet when the first of these was stood up again"},
+	"ape_fruit": {"n": "Basket of Mountain Peaches", "desc": "Alchemist Mo's peaches, ripened in an hour with wood essence, in a basket woven of the Maiden's own bamboo. An ape that has been a swordsman for two thousand years is still an ape for as long as it takes to eat one"},
+	"mated_scabbard": {"n": "The Double Scabbard", "desc": "Smith Tie's work: one scabbard of lacquered wood with two mouths, lined with water essence so that nothing kept in it rusts, and bound with a hilt from the Sword Pool. Two swords made as a pair were never meant to be kept in two places"},
+	"wooden_cock": {"n": "The Wooden Fighting Cock", "desc": "Smith Tie's carving after Ji Xingzi's bird, which was forty days in training: at ten it was still vain and quick to anger, at forty it stood like a cock of wood, and no other bird would face it. Set down in front of a fighter, it is a question"},
+	"three_swords": {"n": "Scroll of the Three Swords", "desc": "What King Wen left: the discourse he was given, in his own hand. The sword of the Son of Heaven, whose point is the northern mountains and whose edge is the eastern sea; the sword of the lord, whose point is men of courage; and the sword of the common man, which is no different from a fighting cock"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
@@ -3542,7 +3674,7 @@ const ITEMS := {
 }
 const TEMPER_COST := [250, 700, 1500, 2800, 4500, 6500, 9000, 12000]
 ## keepsakes dropped by particular bosses (so later dialogue can point at them)
-const BOSS_DROPS := {"wangliang": "borrowed_shadow", "jixin": "still_heart", "zhurong": "suiren_drill", "thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
+const BOSS_DROPS := {"king_zhao": "three_swords", "wangliang": "borrowed_shadow", "jixin": "still_heart", "zhurong": "suiren_drill", "thunder_roc": "feather", "dragon_king": "scale", "registrar_siming": "brush", "ox_head": "bell", "needle_general": "needle", "crow_marshal": "magpie_badge", "jinwu": "tenth_arrow", "he_bo": "river_tablet", "taotie": "cauldron_map", "chong": "heaven_tablet", "li": "earth_weight", "longbo_giant": "longbo_hook", "yu_qiang": "shift_horn", "xu_fu": "half_fruit"}
 
 static func pill_price(kind: String, level: int) -> int:
 	return (24 + 5 * level) if kind == "hp_pill" else (20 + 4 * level)
@@ -3682,6 +3814,23 @@ const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
+	# Part XXI (the Hundred Arms release)
+	"ou_yezi": ["Five swords for the King of Yue: Zhanlu, Chunjun, Shengxie, Yuchang, Juque. The mountain of Chijin split to give the tin, and the stream of Ruoye dried to give the copper. I have not been easy about either since.",
+		"Zhanlu left the King of Wu in the night and went by water to the King of Chu, because Wu was unjust. A sword that walks out on a king. I made that. I have never decided whether to be proud of it.",
+		"The smith does not make the edge. The edge is in the bronze already, as the grain is in the wood. He takes away what is not edge. A fool can do it, given forty years.",
+		"A blade wants a hand the way a cup wants water. That is not wickedness in the blade. But I notice that nobody is ever afraid of a cup."],
+	"yue_maiden": ["I was born in the southern forest and had no teacher. I liked striking at things, and one day found I could. The King sent a minister to ask my method. I told him: it is very small and easy, and its meaning is very deep.",
+		"Inside, be full of spirit. Outside, show calm. Look like a mild woman; strike like a frightened tiger. I said that to an army. They wrote it on their shields and understood the second half.",
+		"The old man in white asked to see my sword. He pulled down a bamboo, and it broke, and I had the butt end before the tip touched the ground. He went up a tree and was an ape. I have liked him ever since.",
+		"A switch is enough. If a switch is not enough, a sword will not be either, and you had better run."],
+	"ji_chang": ["Fei Wei said: first learn not to blink. I lay under my wife's loom for two years with the treadle going past my eye. After that he said: now learn to see. Small as large.",
+		"I hung a louse in the window on a hair from a yak's tail and looked at it for three years. It grew to the size of a cartwheel. Then I looked at other things, and they were all hills. I shot it through the heart and the hair did not break.",
+		"When I knew everything he knew, I tried to kill him, so that there would be only one. Our arrows met point to point in the air and dropped without raising dust. We threw down our bows and wept in the road. That was the lesson. It took me twenty years to notice.",
+		"What is this thing you are carrying? Bent, with a string. I knew once. No, do not tell me; it will come back, and I would rather it did not."],
+	"zhuang_envoy": ["Thirty pieces of gold he sent me to stop his father fighting. I gave it back. If I fail, the king kills me, and what use is gold then? And if I succeed, what in Zhao could I not have for the asking?",
+		"My sword cuts down one man every ten paces, and for a thousand li it does not stop. I said that to him. It is true, in a way he did not ask about.",
+		"He has gone thin with it, you know. The three thousand eat at his table, and he watches them the way a man watches a fire he is not sure he lit.",
+		"I dreamed I was a swordsman, last night. Before that it was a butterfly. One wakes up tired either way."],
 	# Part XX (the Hollow Hills release)
 	"xu_xiake": ["Three hundred and fifty-seven caves, and I have come up out of every one of them, which is the only number that matters. I write it all down the same night, however tired. A cave you did not write down, you did not go into.",
 		"People ask what I am looking for. I am not looking for anything. I want to know how far in it goes. That is a different thing, and much less trouble to one's family.",
@@ -7287,6 +7436,217 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "And I have sat on top of it for seventy years saying wise things about emptiness to disciples. Qing Lian knew. Of course she knew. She cut nine caves in this mountain and I thought they were for meditating in. They were windows.", "laugh"],
 		["Yue Ling", "The woodcutter is at the gate, Elder. Wang Zhi. He says he has nowhere to go and he is good with an axe, if somebody will find him a handle."],
 		["Elder Qing Xuan", "Then he shall have a handle, and the room over the wood-store, which has been standing empty since before I was born. I used to wonder what it was for. Go and rest, both of you. You have the look of people who have put something down."],
+	],
+	# ---- Part XXI: The Hundred Arms (the Hundred Arms release)
+	"recall19": [
+		["Narrator", "Winter comes in with water in the wells. The spades have been given their hours, the hollow places are left hollow, and what was dug before anybody thought to stop is in the yards of Tushan, in heaps, waiting to be something."],
+		["Narrator", "Ore does not wait long. On the first morning of the frost a disciple goes to the armoury for a practice sword, and comes back to say that the racks are empty, and that the door was barred from the inside."],
+	],
+	"s_p21_home": [
+		["Elder Qing Xuan", "Forty jian, twelve spears and the old halberd nobody could lift. Gone in a night, and the bar still in its brackets. They were not taken, Lin Feng. I have looked at the dust. They walked."],
+		["Elder Qing Xuan", "And they are not the only ones. Qingshi has a blade in every thatch. The horse-folk's boys are shooting at each other's hats. Somebody is casting them faster than hands can be found, and a blade without a hand goes looking for one."],
+		["Lin Feng", "I have eight of my own. The sabre came off a bandit and the fan off an empress. None of them has ever gone anywhere without me."],
+		["Elder Qing Xuan", "No. I have wondered why. Ask them, if you can. And ask at Tushan: the oldest smith there is has come back to his furnace, they say, and will not leave it and will not light it.", "point"],
+		["Yue Ling", "Take the broom handle. I mean it. It is the only one of the eight I have never seen you look pleased with yourself for holding."],
+	],
+	"s_p21_ou": [
+		["Narrator", "At the oldest pit in Tushan an old man with forearms like bridge-cables is sitting on an upturned mould, watching bronze run down a channel nobody opened into a shape nobody cut. It comes out a sword. He picks it up, looks along it, and puts it on a heap."],
+		["Ou Yezi the Swordsmith", "Good metal. Even. I could not have poured it better, and I am the best there has been. That is the four hundredth this week, and no hand on the ladle. Sit down, boy. You have a jian on your back that I did not make and would not be ashamed of."],
+		["Lin Feng", "Who is making them?"],
+		["Ou Yezi the Swordsmith", "Nobody. That is the trouble with it. You dug the hills and filled the yards, and an edge is the easiest thing in the world for metal to be. Leave bronze alone with a quarrel anywhere in the land, and it will find its own way to the mould."],
+		["Ou Yezi the Swordsmith", "I made five for a king, on purpose, and I knew every hand they would be in. Bring me what the pits have thrown up this morning. I want to see whether a single one of them was meant.", "think"],
+	],
+	"done:s_p21_blanks": [
+		["Ou Yezi the Swordsmith", "Five. Not a flaw in them, and not a thought. Look: no maker's mark, no balance cut, the same sword five times. A weapon somebody made tells you what he was afraid of. These are afraid of nothing, because nobody was there."],
+		["Yue Ling", "I was made, and somebody was there, and it still took me a long time to find out what I was for. I should not like to have had to guess."],
+	],
+	"done:s_p21_cast": [
+		["Narrator", "Four casters, four moulds, and at each of them the same thing: the bronze is poured for a bell, a ploughshare, a cauldron, and the caster's hands, without being asked, turn the ladle a little, and it runs long and thin."],
+		["Ou Yezi the Swordsmith", "There. Did you see her wrist? She did not. Every one of them has a neighbour he would like to be safe from. The hand knows it before the head does. Go south, boy. There is a girl in the wet country who taught an army and never forged a thing."],
+	],
+	"s_p21_yue": [
+		["Narrator", "In the Crimson Marsh a girl of perhaps sixteen is standing on a root above the water with a green bamboo switch in her hand, entirely still. Round her, at a respectful distance, forty white gibbons are standing in exactly the same way, each with a reed."],
+		["The Maiden of Yue", "You have a sword on. Take it off, or go away. I do not say it to be rude. They copy whatever comes into the marsh, and I have had enough trouble since they saw a sabre.", "refuse"],
+		["Lin Feng", "They said you taught the army of Yue."],
+		["The Maiden of Yue", "For one summer. The method is small and easy. Then the army went and did what armies do with it, and I came home. He taught these. The old man in white. He saw me once, two thousand years ago, and has been showing everybody ever since.", "shrug"],
+		["The Maiden of Yue", "Have you a stick? ...That will do. That is a very good stick. Somebody has swept with it. Go and knock down what he has taught, gently, and then I will talk to you about him."],
+	],
+	"done:s_p21_reeds": [
+		["The Maiden of Yue", "You hit them where they were going to be. Good. And you did not hit the small one twice. Better. A staff has no edge, so it cannot mean more than you do. That is why I asked for it."],
+		["The Maiden of Yue", "They have run off with my switches, every one. I cut them myself and I know each by the joint. Bring them back and I will take you to him.", "point"],
+	],
+	"done:s_p21_bamboo": [
+		["The Maiden of Yue", "This one he broke, the day we met. See, the tip is gone. I have kept it. He is up there in the big banyan, pretending to be a venerable old gentleman. He will ask to see your sword. They always start by asking to see it."],
+	],
+	"pre:yuan_gong": [
+		["Narrator", "An old man in white comes down out of the banyan hand over hand, rather faster than an old man should, and bows. He has a bamboo in his fist that he has not bothered to trim. The forty gibbons arrange themselves to watch."],
+		["Yuan Gong, the White Ape", "I hear you are good with all eight. I should like to see. I only ever saw the one, and I have made such a great deal out of it. Forgive an old man. It is not often anything new comes into the marsh."],
+		["Yue Ling", "He is not wicked, Lin Feng. Look at him. He is the first pupil anybody ever had who was not asked.", "think"],
+	],
+	"post:yuan_gong": [
+		["Narrator", "The old man in white goes back up the banyan in one movement and is an ape, and sits in the fork scratching, and looks down with great satisfaction. Below him, forty gibbons put down forty reeds."],
+		["Yuan Gong, the White Ape", "Yes. That was it. That was what she had, and I never got: you stopped. Three times you could have, and did not. I have been teaching the stroke for two thousand years and it was never the stroke."],
+		["The Maiden of Yue", "He will be unbearable now. He will sit up there being wise at them. ...It is better than the sabres. Thank you. Go north; there is a man there who learned a harder thing than I ever did, and learned it too late."],
+	],
+	"s_p21_sarnai": [
+		["Grandmother Sarnai", "Come in, eat first. Then look at this. That is my grandson's hat. That hole is an arrow. He was wearing it. He thinks it is the finest thing that ever happened to him.", "offer"],
+		["Grandmother Sarnai", "A man came through in the autumn who could hit a willow leaf at a hundred paces, and every boy on the steppe has been a hundred paces from another boy ever since. He would not stay to teach them the rest. He said he had not learned it yet himself."],
+		["Lin Feng", "Where did he go?"],
+		["Grandmother Sarnai", "North, to the cold grass, where there is nothing to aim at. Find him. And take a bow: he will not talk to you about it otherwise. Our own, the one we strung for you when the Roc fell. It has been waiting to be asked.", "point"],
+	],
+	"s_p21_ji": [
+		["Narrator", "On the Aurora Steppe a lean man is sitting in the snow with a bow across his knees, looking at it with polite puzzlement, as at a stranger's child. All round him, as far as can be seen, arrows are standing in the drifts. None of them is in anything."],
+		["Ji Chang the Archer", "Ah. A visitor. You will know: what is this? I have had it since I was a boy. I lay under a loom for it. I looked at a louse for three years for it. And this morning I picked it up and could not think what it was for."],
+		["Yue Ling", "It is a bow. You are Ji Chang. You are the best archer under heaven.", "shock"],
+		["Ji Chang the Archer", "Am I? I tried to kill my teacher to be that. Our arrows met in the air. ...Yes. It is coming back. Do not let it all come back. The boys are shooting at hats because I showed them how to hit, and left before I knew how not to."],
+		["Ji Chang the Archer", "Those out there are theirs: every shot loosed to see how far it would go. An arrow that lands in nothing has not finished. Take that bow of yours and finish them for me. I dare not. If I pick this up again I shall remember everything."],
+	],
+	"done:s_p21_louse": [
+		["Ji Chang the Archer", "I watched. You looked for a long time and loosed late. Fei Wei would have liked you. He used to say that archery is the only art in which a man who misses has nobody to be angry with."],
+		["Ji Chang the Archer", "Now gather what they left standing. An arrow belongs to whoever loosed it, hit or miss. I am going to carry these back to the tents myself, and give each boy his own, and say whose hat it nearly was.", "nod"],
+	],
+	"done:s_p21_arrows": [
+		["Ji Chang the Archer", "Five. And there are five hundred. It will take me the winter. Good. Now put the bow down. No, down. On the snow. You see? Your hand does not know what to do. That is the beginning of the second half."],
+		["Ji Chang the Archer", "The herds want this ground and there are still a few things on it. Drive them off with something that cannot kill at a hundred paces. The horse-folk use a whip. A whip only reaches as far as you are willing to go yourself."],
+	],
+	"done:s_p21_herd": [
+		["Ji Chang the Archer", "The supreme speech is to give up speaking. The supreme action is to give up acting. The supreme shooting is not to shoot. My teacher's teacher said it on a cliff edge with his heels over nothing, and I thought he was showing off."],
+		["Lin Feng", "And the boys?"],
+		["Ji Chang the Archer", "I shall teach them the loom first this time. Two years under a loom cures a great deal. Go on, both of you. She has been wanting to ask you something since the marsh, and is too proud to do it in front of me.", "wave"],
+	],
+	"s_p21_longmen": [
+		["Fishwife Lu", "Look at that. Hemp as thick as my thumb, and cut as if with a razor, all in one line. That is the ninth net this month. Have you eaten? Sit. There is fish. There is always fish; it is the nets we are short of.", "offer"],
+		["Fishwife Lu", "It is at the ford. My grandmother told it: a man carried two swords across, an old pair, man and wife, and they jumped out of the scabbard into the river and went down as two dragons. Nobody has put a net in that reach since. Until the water dropped."],
+		["Yue Ling", "The wells. When the water went down into the mountain, the river fell, and people fished where they never had."],
+		["Fishwife Lu", "And then it came back up, and so did something else. There is a pool under the Gate with a way in at low water. I am not asking you to go. I am telling you where it is, and that there is fish when you come out."],
+	],
+	"done:s_p21_nets": [
+		["Narrator", "Three nets are mended on the shingle with nobody saying anything about swords at all. When the last knot is drawn, the oldest of the fishers spits in the river and says the pool was a king's grave once: three thousand swords were put in with him, and a white tiger came and sat on the mound."],
+	],
+	"done:s_p21_pool": [
+		["Narrator", "The Sword Pool goes back under the Dragon Gate like the inside of a bell. The water is a hand deep and perfectly clear, and the floor under it is hilts: bronze hilts by the hundred, in rows, each with a clean bright slot where a blade was this year and is not now."],
+		["Yue Ling", "They were buried with him so that nobody would ever use them. Three thousand. It is the kindest thing I ever heard of a king doing, and it lasted exactly until somebody dug the hills.", "grieve"],
+	],
+	"done:s_p21_hilts": [
+		["Narrator", "The fifth hilt is not like the others. It is double: two grips on one guard, worn smooth on the inside of each, as the handles of a thing are worn that two people carry between them."],
+	],
+	"pre:sword_dragons": [
+		["Narrator", "At the back of the pool the water is deep, and in it two long shapes are going round each other and never touching: one the blue of quenched steel, one the red of the fire before it. Where either passes, the rock of the wall is cut as a net is cut."],
+		["Lin Feng", "Gan Jiang and Mo Ye. He was the smith. She went into the furnace so that the metal would run."],
+		["Yue Ling", "And they have been in the same river ever since and cannot find each other, because each of them is still a sword. Oh, be careful. They are not angry. They are looking.", "grieve"],
+	],
+	"post:sword_dragons": [
+		["Narrator", "The red dragon and the blue lie still at last, side by side on the floor of the pool, and are two swords: an old pair, plain, the same length to a hair. Lin Feng lays them in together. The water of the Sword Pool, which had been singing very faintly, stops."],
+		["Lin Feng", "They do not want a hand. They wanted to be put down next to each other."],
+		["Narrator", "Up at the ferry, Fishwife Lu's tenth net comes up whole, with a carp in it the length of a man's arm, and she is so surprised that she lets it go."],
+	],
+	"s_p21_aysha": [
+		["Auntie Aysha of the Caravanserai", "Water first. Then tea. Then I will tell you that eleven caravans went out this month with no guard on them, because every man in Shazhou who can hold a sword the right way up has gone east to be looked at by a king.", "offer"],
+		["Auntie Aysha of the Caravanserai", "He pays in gold and feeds them at his own table, they say, and all he asks is that they fight each other in front of him until one is dead. A hundred and more in a year. He has set up in that red palace the demon had. It suits him."],
+		["Lin Feng", "A king of where?"],
+		["Auntie Aysha of the Caravanserai", "Of Zhao, he says, wherever that was. It is long gone. So is he, I think, only nobody has liked to tell him while he has three thousand swordsmen. Help my people load, and they will tell you who went. Each of them is somebody's.", "grieve"],
+	],
+	"done:s_p21_porters": [
+		["Narrator", "A camel is loaded three times, and three names are said over it: a brother, a husband, a boy of fifteen who took his grandfather's sword off the wall while the old man slept. The last porter says there is somebody else on the east road, a thin man in a scholar's robe, who has been turned away from the palace gate every day for a week."],
+	],
+	"s_p21_envoy": [
+		["The Swordsman in Scholar's Dress", "Ah. You are armed like a porcupine and walk like a man carrying eggs. Good. I have been waiting for somebody to go in on my behalf. They will not have me: the king sees only swordsmen, and I came as I am."],
+		["The Swordsman in Scholar's Dress", "His son sent for me. The father has loved swords for three years, the state is going to ruin, and the neighbours are looking at the border. I have a thing to say to him about three swords. It needs saying by somebody he cannot have thrown out."],
+		["Lin Feng", "Why not put on a short coat and go in yourself?"],
+		["The Swordsman in Scholar's Dress", "I did, once, in the book. It worked. He stayed in his palace three months, and all his swordsmen killed themselves, which the book puts in as if it were a happy ending. I should like it to come out better this time. Take a fan. He respects a fan; he does not know why.", "shrug"],
+	],
+	"done:s_p21_gate": [
+		["Narrator", "They let him through in the end out of bewilderment. A man who comes through three ranks of swordsmen with a fan, and has not once opened it all the way, is either a fool or the best they have seen, and nobody at that gate has ever been sure which they would rather meet."],
+		["Yue Ling", "Look at the yard. The slips of wood. They are everywhere, Lin Feng, in the sand, in the gutters. Each one is broken in the same place."],
+	],
+	"done:s_p21_tallies": [
+		["Narrator", "Five tallies: five men. On the back of one somebody has cut a small horse, as a child would. Lin Feng puts them inside his robe. The champions of the inner yard, who have been watching him pick splinters out of the sand, send word that they wish to see a stroke."],
+	],
+	"done:s_p21_yard": [
+		["Narrator", "One stroke. It takes the tassel off the first champion's sword and stops. The inner yard is entirely silent. Then the man laughs, a short astonished bark, bows from the waist, and stands away from the door of the hall."],
+	],
+	"pre:king_zhao": [
+		["Narrator", "The Demon Lord's hall, hung with swords from the roof-tree to the floor. Under them, on a plain mat, sits a thin grey king with his chin in his hand, who has not looked up. Two men are fighting in front of him. He says: stop. They stop."],
+		["King Wen of Zhao, Who Loved Swords", "A fan. They told me. What do you want to teach me, that you get my son to send you? ...No matter. I am told your sword cuts down a man in ten paces and does not stop for a thousand li. Good. I have not seen anything good in a year. Show me."],
+		["Lin Feng", "I have three swords. The king may choose which he will see."],
+		["King Wen of Zhao, Who Loved Swords", "Three. ...Somebody has said that to me before. I do not remember when. I remember I did not eat for three days after. Show me the lowest, then. Show me the one I already have.", "think"],
+	],
+	"post:king_zhao": [
+		["Narrator", "The king sits down on the mat among his fallen swords, and Lin Feng lays in front of him five broken slips of wood. He looks at them for a long time. He turns over the one with the horse."],
+		["King Wen of Zhao, Who Loved Swords", "The sword of the Son of Heaven: its point is the valley of Yan and the stone wall, its edge is Qi and Mount Tai. The sword of a lord: its point is men of wisdom. And mine. Which cuts throats in front and livers behind, and is no different from a fighting cock."],
+		["King Wen of Zhao, Who Loved Swords", "He told me. The thin man. I walked round the table three times and could not sit. And then I forgot it, and went on, because it was easier to watch than to rule. Who was the boy with the horse?", "grieve"],
+		["Yue Ling", "We do not know. Nobody wrote it down. That is what the tally is instead of.", "grieve"],
+	],
+	"visit:s_p21_masters:ou_yezi": [
+		["Ou Yezi the Swordsmith", "What is it for? Ask me what a furnace is for. To be put out, in the end, with the work done. I made five that were perfect, and the best thing any of them ever did was leave a bad king in the night. A weapon is for not being needed. It is the only tool I know that is finished when it is hung up."],
+	],
+	"visit:s_p21_masters:yue_maiden": [
+		["The Maiden of Yue", "For being quicker than what is coming at you. That is all. I told a minister so and he looked for the rest of it. When the gate is shut, it is shut; when it is open, it is open. A weapon is a gate. People want it to be a road."],
+	],
+	"visit:s_p21_masters:ji_chang": [
+		["Ji Chang the Archer", "For looking. I mean it. I learned to see a louse as a cartwheel so as to hit it, and found that I had learned to see. The hitting was what I paid for the lessons with. If I had known, I would have asked to pay in something else."],
+	],
+	"visit:s_p21_masters:sarnai": [
+		["Grandmother Sarnai", "For the wolf. We have always had bows; a herd without a bow is a wolf's dinner. But there is one bow to a tent, and it hangs by the door-flap where the grandmother can see who takes it down. That is all the law we ever needed about it."],
+	],
+	"visit:s_p21_masters:fishwife_lu": [
+		["Fishwife Lu", "I have a gutting knife. Thirty years. It has never been anything but a gutting knife, because every morning it has four hundred fish to do. Give a blade enough honest work and it has not the time to be a weapon. That is my whole opinion."],
+	],
+	"visit:s_p21_masters:cook_aysha": [
+		["Auntie Aysha of the Caravanserai", "For the road. A guard walks beside the camels with a sword he hopes all the way to Shazhou he will not draw, and if he does not draw it I pay him the same. That is the only bargain about swords I ever heard of that an honest person could keep."],
+	],
+	"done:s_p21_masters": [
+		["Yue Ling", "Hung up. A gate. For looking. By the door-flap. Four hundred fish. Paid the same if he does not draw. ...Lin Feng, not one of them said: for winning."],
+		["Lin Feng", "No. I noticed. I have been trying to remember whether I ever did."],
+	],
+	"done:s_p21_adept": [
+		["Narrator", "Three weapons that he no longer has to think about, and what each of them wants is quite plain to him now, as the wish of a horse is plain to somebody who has ridden it a year. None of them wants blood. They want, like anything, to be used well."],
+	],
+	"s_p21_grave": [
+		["Gravekeeper Mu Gu", "You hear it. They have always hummed when a bearer of the Seal walked by; I used to find it company. This is not that. This is every blade in the ground at once, and it has not stopped in nine days.", "shiver"],
+		["Gravekeeper Mu Gu", "The barrows are open. Nothing broke in. They came up by themselves, and the saints are lying there with their hands folded on nothing. The new ones have come to them, do you see, the ones with no maker. A sword with no hand goes to where swords are."],
+		["Lin Feng", "And the old ones went with them."],
+		["Gravekeeper Mu Gu", "Down into the long barrow, where the first of the saints was laid before the sect had a name. Take a brush, if you have one. Their tablets are down. A blade whose name is standing will lie still. I have seen it. It is the only thing I know about them.", "point"],
+	],
+	"done:s_p21_barrow": [
+		["Narrator", "Each time the judge's brush touches steel, a name comes up bright along the flat of it, in the hand of whoever cut the tablet, and the sword lowers its point like a guest who has been recognised at a door."],
+		["Yue Ling", "They only wanted somebody to know which one they were. Three thousand in a pool with no names, four hundred in a week with no maker. Of course they got up."],
+	],
+	"done:s_p21_tablets": [
+		["Narrator", "Four tablets stand again in their niches. The fourth is the Founder's. Under her name is cut, small, in a different hand: she swept the steps first. The humming in the barrow drops by half, and what is left of it is all coming from one place."],
+	],
+	"pre:wuzhu": [
+		["Narrator", "At the back of the long barrow stands a figure the height of a man, made of blades as a pine-cone is made of scales: every sword that walked off a rack this winter, and every one the pits poured unasked. Where its face should be there is a polished flat, and Lin Feng's own is in it."],
+		["Wuzhu, the Masterless Edge", "You have eight. You have never once been cut by any of them. We watched. We have come to ask how it is done. We are four thousand, and not one of us was made by anybody, and we do not know what we are for."],
+		["Wuzhu, the Masterless Edge", "So we have made a hand. Look. It is the best we could do. It has your face on it because yours was the only one we were sure of. Show us what a hand does. All of it. We will know, if you leave any out."],
+		["Yue Ling", "It is not asking to fight you, Lin Feng. It is asking to be held, and it only knows the one way to ask.", "grieve"],
+	],
+	"post:wuzhu": [
+		["Narrator", "The figure comes apart quietly, blade by blade, each one laying itself down on the floor of the barrow with its point to the wall. The flat that was its face is the last. It lies at Lin Feng's feet, an unmarked jian, the four hundredth of a week, and does not move."],
+		["Lin Feng", "That is all of it. That is what a hand does. It puts you down, when it is over, and picks you up again when it has to, and in between it sweeps the steps."],
+		["Narrator", "Far away, on Azure Cloud Mountain, forty jian, twelve spears and the old halberd nobody could lift are back on their racks when the disciples come in the morning. The bar of the door is in its brackets. Nobody saw them come."],
+	],
+	"done:s_p21_racks": [
+		["Narrator", "In Qingshi three farmers take three blades down out of three thatches, and it is done as was decided, in front of the whole street, with Granny Wen watching from her doorway to see that nobody keeps one back."],
+	],
+	"s_p21_ou2": [
+		["Ou Yezi the Swordsmith", "It has stopped. Yesterday at noon. The channel ran a bell, as it was cut to, and the girl at the ladle wept, and did not know why. So. You found whose hand it was."],
+		["Lin Feng", "Everybody's. Each of them a little. And nobody had told the blades what they were for, so they went to ask."],
+		["Ou Yezi the Swordsmith", "Hm. I should have liked to tell Zhanlu that, before it left. I made a sword too good for the man who owned it, and it had to work out the rest alone. Give me that one. The blank. I shall put a mark on it. Mine. It is time something of this winter's was meant.", "nod"],
+	],
+	"s_p21_end": [
+		["Elder Qing Xuan", "They are back. Every one, on its own peg. And there is a forty-first jian on the rack that I have never seen, with a maker's mark on the tang that has not been cut in two thousand years. I shall not ask."],
+		["Elder Qing Xuan", "The old book says arms are instruments of ill omen, and that the gentleman lives with them on his left and does not make them his delight. I read that for sixty years as a warning about swords. It is about the left hand. It says: keep them where the heart is."],
+		["Yue Ling", "He swept the steps this morning, Elder. With the staff. I watched. It took him twice as long as it used to, and he did not look pleased with himself once."],
+		["Elder Qing Xuan", "Then he has it. Go and sit under the pine, Lin Feng. There is a thing left to put down, and I think it is not any of the eight.", "nod"],
+	],
+	"pre:s_break26": [
+		["Narrator", "Under the old pine Lin Feng lays out the eight in a row on the grass: the jian, the staff, the sabre, the spear, the fan, the bow, the whip, the brush. Then he sits down with his hands empty, and the sky above the mountain goes the grey of a drawn blade."],
+		["Narrator", "The tribulation comes as an edge. There is no thunder in it. It comes down the way a cut comes, thin and exact, and looks for whatever in him will rise to meet it."],
+	],
+	"post:s_break26": [
+		["Narrator", "Nothing rises. The edge passes through an open hand and finds nothing to part, and goes out over the valley like light off water, and is gone. On the grass, eight weapons lie exactly where they were put."],
+		["Narrator", "Lin Feng becomes a cultivator of the Sheathed Edge: the best soldier is not soldierly, the best fighter is not angry, and the one who best overcomes an enemy does not join issue. He gets up, in a while, and puts the eight away, and takes the broom."],
 	],
 	"pre:s_break25": [
 		["Narrator", "The tribulation finds Lin Feng in the courtyard at dusk, doing nothing. Not meditating; not sweeping; sitting on the well-head with his hands open on his knees, listening to the water a long way down."],

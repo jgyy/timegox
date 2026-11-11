@@ -856,6 +856,29 @@ const SHARES := {
 			{"id": "slow", "label": "\"Because it took all evening.\"", "lean": "wander", "after": [["Lin Feng", "Because it took the whole evening, and nobody was waiting for it, and there was nowhere else we had to be."], ["Yue Ling", "We have saved the world a great many times in a hurry. I do not think we have ever before ground rice."]]},
 		],
 		"end": [["Narrator", "They carry the flour up the hill in a twist of cloth. It makes two small cakes, slightly burnt. Auntie Zhou eats one, and says nothing, and puts the other on the stove god's shelf."]]},
+	# ---- Part XXI (the Hundred Arms release)
+	"s_p21_stage": {"lines": [
+		["Narrator", "The open-air stage on the mountain road, at dusk, with the lanterns not yet lit. Lin Feng goes through all eight for her, one after another: the jian, the staff, the sabre, the spear, the fan, the bow, the whip, the brush. Yue Ling sits on the edge of the boards with her chin on her knees and does not clap."],
+		["Yue Ling", "The sabre frightened me. Not the sabre. Your face, with it. And the staff did not, and you were hitting just as hard. I have a needle, Lin Feng. One. It mends and it wounds, and I have never known which of those my face is doing."],
+		["Yue Ling", "Which of the eight is you? I am asking properly. I should like to know which one to be glad to see in your hand."]],
+		"ask": "The first lantern is lit below. What do you tell her?",
+		"options": [
+			{"id": "staff", "label": "\"The broom handle. It always was.\"", "lean": "lotus", "after": [["Lin Feng", "The broom handle. It was in my hand four years before anybody gave me a sword, and it is the only one I ever used on something that was not in the way of anybody."], ["Yue Ling", "Then that is the one. I shall be glad of it. And I shall try to look, when I pick up the needle, the way you look when you pick up that."]]},
+			{"id": "none", "label": "\"None of them. The hand is.\"", "lean": "companion", "after": [["Lin Feng", "None of them. They are eight things I can put down. Look."], ["Narrator", "He lays the brush on the boards beside the other seven and holds his hands out to her, open, and after a moment she puts her own in them, needle and all."], ["Yue Ling", "...Then I am glad to see that. Empty. I had not thought to say so before. Mind the point."]]},
+			{"id": "all", "label": "\"Whichever the day wants.\"", "lean": "wander", "after": [["Lin Feng", "Whichever the road wants that morning. A spear for a narrow place, a fan for a king. I do not think I am any of them. I think I am the one choosing."], ["Yue Ling", "Then choose in front of me, when you can. I should like to see the choosing. It is the only part of fighting I have ever thought was beautiful."]]},
+		],
+		"end": [["Narrator", "They walk down in the dark with the eight weapons shared between them, four and four, which is awkward, and neither of them suggests any other way of carrying them."]]},
+	"s_p21_sweep": {"lines": [
+		["Narrator", "First light on the nine hundred steps. Two brooms. It is the wrong season for leaves and there is nothing much to sweep, and they sweep it anyway, from the gate down, a step at a time, the way he did it every morning for four years before anybody knew his name."],
+		["Yue Ling", "You are slower than you used to be. Auntie Zhou says you could do the whole stair before the rice was on. I have watched you this morning. You look at each step."],
+		["Yue Ling", "When this is over, the last of it, down in the barrow. If it comes out badly. If you come up and you are somebody who cannot put it down. What am I to do?"]],
+		"ask": "The broom has stopped. What do you say?",
+		"options": [
+			{"id": "broom", "label": "\"Hand me a broom.\"", "lean": "lotus", "after": [["Lin Feng", "Hand me a broom. Do not argue with me and do not say my name. Put a broom in my hand and stand on the step below. It will come back. It is in the wrists."], ["Yue Ling", "A broom. Yes. I can do that. I shall keep one by the door, wherever the door is."]]},
+			{"id": "leave", "label": "\"Go. I would want you to.\"", "lean": "wander", "after": [["Lin Feng", "Go. Take the south road and do not wait a year by any pond. I should not want to be a thing you sat beside out of duty. I have seen what that does, in a king's hall."], ["Yue Ling", "I would go. I think I would. And I would come back in a year to see whether you had found the broom by yourself. You may count on both."]]},
+			{"id": "stay", "label": "\"It will not. You will be there.\"", "lean": "companion", "after": [["Lin Feng", "It will not come out badly, because you will be standing behind me with that look, and I have never yet done a thing I was ashamed of with that look on the back of my neck."], ["Yue Ling", "That is not an answer. ...It is rather a good one, though. Very well. I shall look."]]},
+		],
+		"end": [["Narrator", "They finish the stair. At the bottom Yue Ling turns round and looks back up nine hundred clean steps, and says that she sees now why nobody could ever get him to stop."]]},
 	# ---- Part XX (the Hollow Hills release)
 	"s_p20_tea": {"lines": [
 		["Narrator", "The tea table under the wall at Tushan, at the end of the day the forty came up. The town is very quiet: every house has somebody back in it who was not there at breakfast, and nobody quite knows what to say to him. Yue Ling pours two bowls and then does not drink hers. She is looking into it."],
@@ -1049,7 +1072,8 @@ const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the 
 	"s_p17_graves": "at the graves on Qingming", "s_p17_kite": "flying the Qingming kite",
 	"s_p18_drill": "drilling the new fire", "s_p18_feast": "at the feast of six tables",
 	"s_p19_campfire": "at the caravan fire before the dunes", "s_p19_rest": "grinding rice by hand at the old millstone",
-	"s_p20_tea": "over a bowl of tea at Tushan", "s_p20_fire": "at the campfire below Rotten-Axe Cave"}
+	"s_p20_tea": "over a bowl of tea at Tushan", "s_p20_fire": "at the campfire below Rotten-Axe Cave",
+	"s_p21_stage": "on the open-air stage, with eight weapons", "s_p21_sweep": "sweeping the nine hundred steps"}
 
 static func share_place(sid: String) -> String:
 	return str(SHARE_PLACES.get(sid, "side by side"))

@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths", "works": "the Works", "delve": "the Dark"}
+const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths", "works": "the Works", "arms": "the Hand", "delve": "the Dark"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)
@@ -143,6 +143,7 @@ func _refresh_hero() -> void:
 	hero.transform = xf
 	parent.add_child(hero)
 	hero_sig = sig
+	Faces.keep(hero, str(Cultures.ENDINGS[Cultures.ending_of(Game)].get("face", "smile")))
 
 ## The end the player chose (cultures.gd ENDINGS): its light over the whole film and the colour of the
 ## hero's own fire.
@@ -152,12 +153,25 @@ func _refresh_ending() -> void:
 		return
 	ending_sig = id
 	var sky: Color = Cultures.ENDINGS[id].sky
+	# what the hero's face shows on the lotus, for the end chosen (faces.gd)
+	if hero != null and is_instance_valid(hero):
+		Faces.keep(hero, str(Cultures.ENDINGS[id].get("face", "smile")))
 	if sun_light != null:
 		sun_light.light_color = Color(1.0, 0.84, 0.66) * sky
 	if hearth_fire != null:
 		for c in hearth_fire.get_children():
 			if c is OmniLight3D:
 				(c as OmniLight3D).light_color = Color(1.0, 0.62, 0.3) * sky
+
+## the last line of the film for the ends that are not kept by a fire (cultures.gd: the bitter and the dark)
+const LAST_WORDS := {
+	"broom": "Lin Feng, once a sweeper of steps, gave back what Heaven lent him, and was a sweeper of steps.",
+	"far": "Lin Feng, once a sweeper of steps, went up past the ninth heaven. No letter has come down.",
+	"throne": "Lin Feng, once a sweeper of steps, sits where the Jade Emperor sat, and keeps the ledger, fairly.",
+	"blade": "Lin Feng, once a sweeper of steps, is still on the road, looking for somebody worth the drawing of a blade.",
+	"engine": "Lin Feng, once a sweeper of steps, built a wheel to hold up the sky, and sweeps round it.",
+	"cold": "Lin Feng, once a sweeper of steps, holds up the sky. Nobody was asked to help, and nobody knows.",
+}
 
 ## The film's last line and its caption for the end chosen.
 static func hero_shot() -> Dictionary:
@@ -169,6 +183,9 @@ static func hero_shot() -> Dictionary:
 		s["place"] = str(en.n)
 		var sub: String = str(en.sub)
 		s["line"] = "Lin Feng, once a sweeper of steps, holds up the sky by choice, and keeps a fire: %s." % (sub.substr(0, 1).to_lower() + sub.substr(1))
+		# (the Hundred Arms release: not every end keeps a fire, and those say their own last word)
+		if LAST_WORDS.has(str(g.ending)):
+			s["line"] = str(LAST_WORDS[str(g.ending)])
 	return s
 
 func _build3d() -> void:
@@ -987,7 +1004,8 @@ func _card(a: float) -> void:
 	# the end the player chose for the hero's own fire (cultures.gd ENDINGS)
 	var en: Dictionary = Cultures.ENDINGS[Cultures.ending_of(Game)]
 	_caps(Vector2(lc, 184.0), str(en.n).to_upper(), 15, Color("ffd9a0").lerp(Color(en.sky), 0.5), ta, 5.0)
-	_say(Vector2(lc - 380.0, 208.0), str(en.sub), 16, Color("f4ecd8"), ta, HORIZONTAL_ALIGNMENT_CENTER, 760.0)
+	var kind_word := str(Cultures.ENDING_KINDS.get(str(en.get("kind", "bright")), ""))
+	_say(Vector2(lc - 380.0, 208.0), "%s  (%s)" % [str(en.sub), kind_word] if en.has("kind") else str(en.sub), 16, Color("f4ecd8"), ta, HORIZONTAL_ALIGNMENT_CENTER, 760.0)
 	# how the war god's story ended, at the foot of the frame
 	var road := str(Game.trials.get("chiyou", ""))
 	if ROAD_ENDS.has(road):

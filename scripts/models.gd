@@ -301,6 +301,8 @@ static func hero(o: Dictionary = {}) -> Node3D:
 	var root := Assets.hero_instance(Assets.PEOPLE[asset], cols)
 	root.set_meta("kind", "person")
 	root.set_meta("hero", true)
+	# the weapon in his hand (arms.gd): the one he wields, or the one a preview asks for
+	Arms.attach(root, str(o.get("arm", Arms.held(g) if g != null else "sword")))
 	if o.has("glow"):
 		var gc: Color = o.glow
 		var gd := MB.new()
@@ -599,6 +601,9 @@ static func _body_rise(m: Node3D) -> Vector3:
 ## A Blender-built character (art/characters/*.py) with the same glow pool as procedural people.
 static func _glb_person(o: Dictionary) -> Node3D:
 	var root := Assets.person(o.asset)
+	# (the hero's own model carries no blade of its own: the story's Lin Feng has his jian)
+	if str(o.asset).begins_with("lin_feng"):
+		Arms.attach(root, str(o.get("arm", "sword")))
 	if o.has("glow"):
 		var gc: Color = o.glow
 		var gd := MB.new()
@@ -649,6 +654,8 @@ static func act(n: Node3D, kind: String, now: float) -> void:
 		return
 	n.set_meta("act", kind)
 	n.set_meta("act_t", now)
+	# and the face it is done with (faces.gd)
+	Faces.act(n, kind)
 
 static func _act_k(n: Node3D, t: float, dur: float = 0.55) -> Array:
 	## [kind, 0..1 envelope] for the current action pose
