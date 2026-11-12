@@ -3897,7 +3897,7 @@ func _horse_shots(which: String = "1") -> void:
 		await _wait(2.5)
 		if mo2.x >= 0:
 			var jp2: Vector3 = main.world.wpos(mo2)
-			main.world.cam_override = Transform3D(Basis.IDENTITY, jp2 + Vector3(17.0, 9.0, 15.0)).looking_at(jp2 + Vector3(0, 4.0, 0), Vector3.UP)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, jp2 + Vector3(7.0, 17.0, 13.0)).looking_at(jp2 + Vector3(0, 3.0, 0), Vector3.UP)
 			await _wait(0.8)
 			await _shot("sea_junk")
 			main.world.cam_override = null
