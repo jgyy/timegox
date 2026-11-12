@@ -2343,9 +2343,16 @@ func _ride_view(d: float, pp: Vector3) -> void:
 	mount.position = pp
 	mount.rotation.y = lerp_angle(mount.rotation.y, want_yaw, 1.0 - exp(-d * 10.0))
 	var rise := Models.anim_ride(mount, ride_clk, moving)
+	var basis := Basis(Vector3.UP, mount.rotation.y)
+	if str(r.kind) == "carriage":
+		# (the Lost Horse release: a carriage is sat in: the hero and Yue Ling on its first two seats, and
+		# whoever is being carried on the rest; a seated clip lowers the hips itself, so each stands
+		# where their feet would be under the seat)
+		_carriage_view(r, pp, basis)
+		return
+	_drop_passengers()
 	var standing := str(r.kind) == "vehicle"
 	var clip := "ride_stand" if standing else ("ride" if moving else "ride_idle")
-	var basis := Basis(Vector3.UP, mount.rotation.y)
 	# the hips go to the seat (astride, the clip keeps them 0.88 m over the model's feet); standing on
 	# a deck, the feet do
 	var lift := 0.9 if not standing else 0.0
@@ -2364,6 +2371,50 @@ func _ride_view(d: float, pp: Vector3) -> void:
 	if moving and int(sp) != step_side:
 		step_side = int(sp)
 		Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path) if not standing else Color("e8f0ff"))
+
+## Who sits where in a carriage (fashion.gd `seats`): the hero, Yue Ling, and the passengers being
+## carried for a fare (offices.gd), each a model of their own that rides with it.
+var pass_nodes: Array = []
+var pass_key := ""
+const SEAT_DROP := 0.46
+
+func _carriage_view(r: Dictionary, pp: Vector3, basis: Basis) -> void:
+	var seats: Array = r.seats
+	player.position = pp + basis * (seats[0] as Vector3) - Vector3(0, SEAT_DROP, 0)
+	player.rotation = Vector3(0, mount.rotation.y, 0)
+	Models.anim_person(player, t, false, false, "sit_bench")
+	comp.visible = Game.companion
+	if Game.companion:
+		Assets.lend_clips(comp)
+		comp.position = pp + basis * (seats[1] as Vector3) - Vector3(0, SEAT_DROP, 0)
+		comp.rotation = Vector3(0, mount.rotation.y, 0)
+		comp_pos = comp.position
+		comp_run = false
+		Models.anim_person(comp, t + 1.0, false, false, "sit_bench")
+	var key := ",".join(Game.passengers.map(func(p): return str(p.id)))
+	if key != pass_key:
+		_drop_passengers()
+		pass_key = key
+		for p in Game.passengers:
+			var pn: Node3D = Assets.person(str(p.asset)) if Assets.PEOPLE.has(str(p.asset)) and Assets.has(Assets.PEOPLE[str(p.asset)]) else Models.person(Color("8a7a6a"), Color("2a2a3a"), {})
+			Assets.lend_clips(pn)
+			scene3d.add_child(pn)
+			pass_nodes.append(pn)
+	for i in pass_nodes.size():
+		if i + 2 >= seats.size():
+			(pass_nodes[i] as Node3D).visible = false
+			continue
+		var pn2: Node3D = pass_nodes[i]
+		pn2.visible = true
+		pn2.position = pp + basis * (seats[i + 2] as Vector3) - Vector3(0, SEAT_DROP, 0)
+		pn2.rotation = Vector3(0, mount.rotation.y, 0)
+		Models.anim_person(pn2, t + 2.0 + i, false, false, "sit_bench")
+
+func _drop_passengers() -> void:
+	for pn in pass_nodes:
+		(pn as Node3D).queue_free()
+	pass_nodes = []
+	pass_key = ""
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:

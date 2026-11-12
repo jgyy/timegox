@@ -1613,11 +1613,56 @@ func _fates_and_faces() -> void:
 	for rid in Fashion.RIDE_ORDER:
 		var rd: Dictionary = Fashion.RIDES[rid]
 		kinds[rd.kind] = true
-		check(float(rd.speed) > 1.0 and (rd.has("step") or rd.has("pick") or rid == "pony") and (not rd.has("step") or Data.step_index(str(rd.step)) >= 0), "ride %s: faster than running and earned somewhere" % rid)
+		check(float(rd.speed) > 1.0 and (rd.has("step") or rd.has("pick") or rd.has("buy") or rid == "pony") and (not rd.has("step") or Data.step_index(str(rd.step)) >= 0), "ride %s: faster than running and earned somewhere" % rid)
 		var rn := Models.ride(rid)
 		check(rn.get_child_count() > 0, "ride %s builds" % rid)
 		rn.free()
 	check(kinds.has("mount") and kinds.has("vehicle"), "mounts to sit astride and vehicles to stand on")
+	# carriages (the Lost Horse release): driven, seat more than two, sold by whoever answers for a town
+	var cars := 0
+	for rid in Fashion.RIDE_ORDER:
+		var rd2: Dictionary = Fashion.RIDES[rid]
+		if str(rd2.kind) != "carriage":
+			check(Fashion.seats(rid) == 2, "ride %s seats the hero and one behind" % rid)
+			continue
+		cars += 1
+		check(Fashion.seats(rid) >= 4 and rd2.seats[0] == rd2.seat and rd2.seats[1] == rd2.pillion, "carriage %s seats four or more, the hero and Yue Ling first" % rid)
+		var apart := true
+		for i in Fashion.seats(rid):
+			for j in i:
+				apart = apart and (rd2.seats[i] as Vector3).distance_to(rd2.seats[j]) > 0.5
+		check(apart, "carriage %s: nobody sits in anybody's lap" % rid)
+		check(int(rd2.buy) > 0 and Offices.OFFICES.has(str(rd2.at)), "carriage %s is sold by somebody who answers for a town" % rid)
+		var cn := Models.ride(rid)
+		check(cn.has_meta("wheels") and (cn.get_meta("wheels") as Array).size() >= 2, "carriage %s has wheels that turn" % rid)
+		check(Models.anim_ride(cn, 1.0, true) == Vector3.ZERO, "carriage %s does not bob" % rid)
+		cn.free()
+	check(cars >= 3, "three carriages")
+	var fg = load("res://scripts/game.gd").new()
+	fg.reset()
+	var lodger := {"id": "res:village:inn:0", "n": "Lodger Wu", "asset": "folk_youth", "area": "village", "trade": "inn"}
+	check(Offices.fare_offer(fg, lodger).is_empty(), "nobody asks a rider on a pony for a lift")
+	fg.rides["ox_cart"] = true
+	fg.ride = "ox_cart"
+	var fare := Offices.fare_offer(fg, lodger)
+	check(not fare.is_empty() and str(fare.to) != "village" and Data.AREAS.has(str(fare.to)) and int(fare.pay) > 0, "a lodger asks a cart with a seat free for a lift to another town")
+	check(Offices.fare_offer(fg, {"id": "x", "n": "Smith", "area": "village", "trade": "workshop"}).is_empty(), "a smith at his anvil is going nowhere")
+	Offices.take_fare(fg, fare)
+	check(fg.passengers.size() == 1 and Offices.fare_offer(fg, lodger).is_empty(), "taken up once")
+	Offices.take_fare(fg, Offices.fare_offer(fg, {"id": "res:village:inn:1", "n": "Lodger Hu", "asset": "folk_maiden", "area": "village", "trade": "inn"}))
+	check(fg.passengers.size() == 2 and Offices.fare_offer(fg, {"id": "res:village:inn:2", "n": "Lodger Ma", "area": "village", "trade": "inn"}).is_empty(), "a cart of four is full with two carried")
+	var st0: int = fg.stones
+	fg.riding = true
+	fg.area = "village"
+	check(Offices.arrive(fg).is_empty() and fg.stones == st0, "nobody pays to be driven round the village")
+	fg.area = str(fare.to)
+	fg.riding = false
+	check(Offices.arrive(fg).is_empty(), "nobody is set down by somebody on foot")
+	fg.riding = true
+	var said := Offices.arrive(fg)
+	check(said.size() >= 1 and fg.stones >= st0 + int(fare.pay) and fg.fares >= 1 and fg.passengers.size() <= 1, "set down where they were going, and paid")
+	check(int(fare.pay) * 20 < int(Fashion.RIDES.ox_cart.buy) * 10, "a fare does not pay for the cart in a day")
+	fg.free()
 	check(Assets.has(Assets.MOUNTS.horse), "the horse is Blender-built")
 	var horse := Assets.mount("horse")
 	var hap2: AnimationPlayer = horse.get_meta("ap", null)

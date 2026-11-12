@@ -1219,6 +1219,15 @@ func _fates_shots() -> void:
 	# a chapter: Xu Lan in the inner sanctum, and the choice it ends in
 	await _fates_chapter_shots()
 
+## (the carriages' gallery: everybody aboard put in the seated pose once they are in the tree)
+func _seat_all(holder: Node3D) -> void:
+	for c in holder.get_children():
+		if c.has_meta("pose_ap"):
+			var pap: AnimationPlayer = c.get_meta("pose_ap")
+			pap.play("sit_bench")
+			pap.seek(1.0, true)
+			pap.pause()
+
 ## The Fates page and the Bestiary.
 func _fates_pages() -> void:
 	Game.bestiary = {"bamboo_wolf": 12, "bandit": 9, "leaf_sprite": 7, "mire_toad": 5, "bog_wraith": 4, "thunder_ape": 3}
@@ -3845,6 +3854,43 @@ func _horse_shots(which: String = "1") -> void:
 	var w = main.world
 	if want.call("people"):
 		await _gallery("part24_people", [Assets.person("sai_weng"), Assets.person("weng_son"), Assets.person("qian_liu")], 0.76, 0.2)
+	if want.call("carriages"):
+		# the three carriages, every seat taken: the hero, Yue Ling, and whoever is being carried
+		for rid in ["ox_cart", "wagon", "carriage"]:
+			var r: Dictionary = Fashion.RIDES[rid]
+			var holder := Node3D.new()
+			var rn := Models.ride(rid)
+			holder.add_child(rn)
+			Models.anim_ride(rn, 0.3, false)
+			var bodies := ["", "yue_ling", "folk_scholar", "folk_maiden", "folk_youth", "folk_scholar"]
+			for i in (r.seats as Array).size():
+				var pm: Node3D = Models.person(Color("3a6ac8"), Color("202030"), {"asset": "lin_feng"}) if i == 0 else Models.person(Color("888888"), Color("222222"), {"asset": bodies[i]})
+				pm.position = Vector3(r.seats[i]) - Vector3(0, 0.46, 0)
+				holder.add_child(pm)
+				Assets.lend_clips(pm)
+				for k in 8:
+					Assets.animate(pm, k * 0.2, "sit_bench", 0.0)
+				var pap: AnimationPlayer = pm.get_meta("ap", null)
+				if pap != null and pap.has_animation("sit_bench"):
+					pm.set_meta("pose_ap", pap)
+			holder.rotation.y = PI / 2.0
+			holder.set_meta("kind", "ride_group")
+			_seat_all.call_deferred(holder)
+			await _gallery("carriage_" + rid, [holder], 3.3, 0.9)
+		# and on the road: the wagon with every seat taken, below the sect's north gate
+		main.world.load_area("sect", Vector2i(20, 9))
+		Game.rides["wagon"] = true
+		Game.ride = "wagon"
+		Game.riding = true
+		Game.companion = true
+		Game.passengers = [{"id": "a", "n": "Lodger Wu", "asset": "folk_merchant", "to": "dunes", "pay": 300}, {"id": "b", "n": "Lodger Hu", "asset": "folk_shopwife", "to": "dunes", "pay": 300},
+			{"id": "c", "n": "Lodger Ma", "asset": "folk_youth", "to": "tushan", "pay": 300}, {"id": "d", "n": "Lodger An", "asset": "folk_porter", "to": "tushan", "pay": 300}]
+		main.world.teleport(Atlas.to_world("mountain", Vector2i(82, 48)))
+		main.world.facing = Vector2i(1, 0)
+		await _wait(1.5)
+		await _shot("carriage_road")
+		Game.passengers = []
+		Game.riding = false
 	if want.call("foes"):
 		var fs: Array = []
 		for fid in ["slipped_halter", "burr_sprite", "hoof_echo", "wrack_crab", "salt_gull", "drift_log", "silt_ape", "weir_eel", "mired_ox", "outrider", "remount", "camp_hound"]:

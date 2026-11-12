@@ -41,6 +41,8 @@ const FEATS := {
 	"day_wage": {"n": "A Day's Wage", "kind": "people", "pts": 5, "test": ["shifts", 1], "desc": "Work a shift at a trade of a town."},
 	"journeyman": {"n": "A Hook for Your Coat", "kind": "people", "pts": 10, "test": ["trade_rank", 2], "desc": "Be raised twice at a trade of the towns."},
 	"trade_master": {"n": "A Sign with Your Name on It", "kind": "people", "pts": 20, "test": ["trade_rank", 4], "desc": "Reach the highest place there is at a trade."},
+	"first_fare": {"n": "Room for One More", "kind": "people", "pts": 5, "test": ["fares", 1], "desc": "Carry somebody to another town in a carriage, for the fare."},
+	"ten_fares": {"n": "The Regular Coach", "kind": "people", "pts": 10, "test": ["fares", 10], "desc": "Set down ten passengers where they were going."},
 	"six_trades": {"n": "Jack of Six Trades", "kind": "people", "pts": 10, "test": ["trades", 6], "desc": "Work a shift at six different trades."},
 	"marks_twelve": {"n": "Gone Back to Look", "kind": "road", "pts": 10, "test": ["marks", 12], "desc": "Look at twelve of the things your choices left standing in the land."},
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
@@ -264,6 +266,8 @@ static func value(g, t: Array) -> float:
 			return float(g.airs.size())
 		"shifts":
 			return float(Offices.worked(g)[0])
+		"fares":
+			return float(g.fares)
 		"trade_rank":
 			return float(maxi(0, Offices.best_rank(g)))
 		"trades":

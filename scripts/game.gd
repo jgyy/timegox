@@ -199,6 +199,9 @@ var marks_seen := {}
 ## (offices.gd: shifts worked at the trades of the towns, and the day the last one was worked in each town)
 ## (reckon.gd: the last lords of the story that were faced)
 var reckoned := {}
+## (carriages: who is being carried for a fare, offices.gd: {id, n, asset, to, pay}; and how many have been)
+var passengers: Array = []
+var fares := 0
 var shifts := {}
 var shift_day := {}
 ## (careers: the day the last shift was worked at each trade in each town, for the salary; all wages earned)
@@ -369,6 +372,8 @@ func reset() -> void:
 	romance = {}
 	marks_seen = {}
 	reckoned = {}
+	passengers = []
+	fares = 0
 	shifts = {}
 	shift_day = {}
 	salary_day = {}

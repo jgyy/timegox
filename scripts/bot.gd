@@ -240,6 +240,11 @@ func _apply_start() -> void:
 	Game.exp = 0.0
 	Game.companion = true
 	Game.step = idx
+	# (and he has walked into every region the story has sent him to so far: the camps of the road and
+	# the cloud-kite ask where he has been)
+	for i3 in idx:
+		if Data.STEPS[i3].has("area") and Data.AREAS.has(str(Data.STEPS[i3].area)):
+			Game.seen[str(Data.STEPS[i3].area)] = true
 	# about what a player would have saved by then (quest rewards and half as much again from battles)
 	var saved := 0
 	for i2 in idx:
@@ -641,11 +646,11 @@ func _world(d: float) -> void:
 				# Part XX: the things to find are down in the region's cave (caves.gd): the nearest of them,
 				# by way of the cave mouth
 				_fetch(str(s.item))
-			elif Game.area != s.area or world.layer != Data.layer_of(s.area):
+			elif world.layer != Data.layer_of(s.area):
 				# (upstairs or in a cellar of the region: the things to find are out in it, Part XI)
 				_travel(s.area)
-			else:
-				_goto_nearest("pickup", s.item)
+			elif not _goto_nearest("pickup", s.item, str(s.area)):
+				_travel(s.area)
 		"hunt", "falls":
 			# (Part XXIV, "falls": the packs that cannot be beaten, dooms.gd, are walked up to like any
 			# others, fought as the bot fights anything, and lost to)
@@ -983,17 +988,24 @@ func _any_enemy(area: String, fights: bool = false, of: Array = []):
 			best = e
 	return best
 
-func _goto_nearest(kind: String, item: String) -> void:
+## Walk to the nearest thing of `kind` and `item` that can be seen (in region `area`, if one is named:
+## the road to it may cross a corner of another region, so it is the thing that is headed for and
+## not the region; the one already being walked to is kept to).  False if there is none.
+func _goto_nearest(kind: String, item: String, area: String = "") -> bool:
 	var best = null
 	var bd := 1 << 30
 	for e in world.ents:
-		if e.kind == kind and e.get("item", "") == item and world.ent_visible(e):
+		if e.kind == kind and e.get("item", "") == item and world.ent_visible(e) and (area == "" or str(e.get("area", area)) == area):
 			var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+			if path_key == "pickup:" + str(e.id):
+				dd = -1
 			if dd < bd:
 				bd = dd
 				best = e
-	if best != null:
-		_walk_to(best.pos, "pickup:" + best.id)
+	if best == null:
+		return false
+	_walk_to(best.pos, "pickup:" + best.id)
+	return true
 
 func _goto_entity(area: String, id: String) -> void:
 	var e = world.find_ent(id)
@@ -2550,7 +2562,7 @@ func _finish(reason: String) -> void:
 		stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
 	print("the reckoning   : %s" % (", ".join(Game.reckoned.keys().map(func(id): return str(Data.ENEMIES[id].n))) if not Game.reckoned.is_empty() else "nobody met"))
 	print("trades          : %d shifts at %d trades, %d spirit stones in wages%s" % [int(Offices.worked(Game)[0]), int(Offices.worked(Game)[1]), Game.wages, (": " + Offices.careers(Game)) if Offices.careers(Game) != "" else ""])
-	print("what stands     : %d things stand in the land for what was chosen and what the scales lean to (of %d that could), %d looked at" % [stood, int(Marks.totals()[1]), Game.marks_seen.size()])
+	print("what stands     : %d things stand in the land for what was chosen and what the scales lean to (the answers of all the crossroads would stand %d between them), %d looked at" % [stood, int(Marks.totals()[1]), Game.marks_seen.size()])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)

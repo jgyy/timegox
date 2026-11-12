@@ -616,7 +616,117 @@ static func ride(id: String) -> Node3D:
 			root.add_child(_cloud_ride())
 		"barque":
 			root.add_child(_sky_barque())
+		"ox_cart", "wagon", "carriage":
+			_carriage(root, str(r.model))
 	return root
+
+## A carriage (the Lost Horse release): the body, wheels that turn (meta "wheels"), shafts, and what
+## draws it: an ox built here for the cart, the Blender horse for the wagon and the post-carriage.
+static func _carriage(root: Node3D, kind: String) -> void:
+	var b := MB.new()
+	var g := MB.new()
+	var wood := MB.tag(Color("7a5a38"), MB.WOOD)
+	var wood_d := MB.tag(Color("4a3626"), MB.WOOD)
+	var wood_p := MB.tag(Color("b89868"), MB.WOOD)
+	var iron := MB.tag(Color("4a4a52"), MB.METAL)
+	var wheels: Array = []
+	var axles: Array = []      # [z, radius]
+	var half_w := 0.72
+	match kind:
+		"ox_cart":
+			axles = [[0.0, 0.62]]
+			b.box(Vector3(0, 0.78, 0.0), Vector3(1.2, 0.08, 2.0), wood)
+			for s in [-1.0, 1.0]:
+				b.box(Vector3(s * 0.6, 1.0, -0.1), Vector3(0.05, 0.4, 1.8), wood_d)
+				for k in 5:
+					b.box(Vector3(s * 0.6, 1.0, -0.9 + k * 0.42), Vector3(0.07, 0.44, 0.06), wood_p)
+				b.limb(Vector3(s * 0.42, 0.76, 0.9), Vector3(s * 0.42, 0.9, 3.1), 0.045, 0.035, wood_d, 5)
+			b.box(Vector3(0, 1.0, -1.0), Vector3(1.2, 0.4, 0.05), wood_d)
+			b.box(Vector3(0, 1.24, 0.55), Vector3(1.1, 0.07, 0.34), wood_p)
+			for s9 in [-1.0, 1.0]:
+				for bz in [0.55, -0.45]:
+					b.box(Vector3(s9 * 0.5, 1.02, bz), Vector3(0.06, 0.4, 0.3), wood_d)
+			b.box(Vector3(0, 1.24, -0.45), Vector3(1.1, 0.07, 0.34), wood_p)
+			b.limb(Vector3(-0.5, 0.92, 3.05), Vector3(0.5, 0.92, 3.05), 0.05, 0.05, wood_d, 5)
+			for k2 in 3:
+				b.sph(Vector3(-0.25 + k2 * 0.25, 0.92, -0.82), Vector3(0.12, 0.1, 0.12), MB.tag(Color("d8c8e0"), MB.FOLIAGE), Vector3.ZERO, true)
+			# the ox
+			var ox := MB.tag(Color("9a7450"), MB.HAIR)
+			b.sph(Vector3(0, 1.0, 2.2), Vector3(0.42, 0.42, 0.8), ox, Vector3.ZERO, true)
+			b.sph(Vector3(0, 1.12, 3.05), Vector3(0.22, 0.22, 0.3), ox, Vector3.ZERO, true)
+			b.sph(Vector3(0, 1.34, 2.7), Vector3(0.28, 0.24, 0.3), ox, Vector3.ZERO, true)
+			for s2 in [-1.0, 1.0]:
+				b.limb(Vector3(s2 * 0.14, 1.28, 3.1), Vector3(s2 * 0.42, 1.5, 3.2), 0.045, 0.015, MB.tag(Color("e8e0c8"), MB.STONE), 5)
+				for lz in [1.7, 2.7]:
+					b.limb(Vector3(s2 * 0.26, 0.75, lz), Vector3(s2 * 0.26, 0.0, lz), 0.1, 0.07, ox, 6)
+			b.ribbon([Vector3(0, 1.15, 1.42), Vector3(0, 0.8, 1.3), Vector3(0, 0.45, 1.34)], [0.04, 0.05, 0.08], Vector3(1, 0, 0), MB.tag(Color("2a1c14"), MB.HAIR))
+		"wagon":
+			axles = [[0.95, 0.5], [-0.85, 0.56]]
+			half_w = 0.8
+			b.box(Vector3(0, 0.82, 0.0), Vector3(1.4, 0.1, 2.9), wood)
+			for s3 in [-1.0, 1.0]:
+				b.box(Vector3(s3 * 0.7, 1.2, -0.2), Vector3(0.06, 0.76, 2.4), wood_d)
+				b.box(Vector3(s3 * 0.79, 1.72, -0.275), Vector3(0.02, 0.3, 1.75), MB.tag(Color("8a2a20"), MB.CLOTH))
+				for k3 in 3:
+					b.sph(Vector3(s3 * 0.78, 0.95, -0.9 + k3 * 0.7), Vector3(0.12, 0.2, 0.14), MB.tag(Color("8a6a4a"), MB.CLOTH), Vector3.ZERO, true)
+				b.limb(Vector3(s3 * 0.4, 0.8, 1.4), Vector3(s3 * 0.4, 0.95, 3.4), 0.045, 0.035, wood_d, 5)
+			b.box(Vector3(0, 1.3, 1.0), Vector3(1.3, 0.07, 0.36), wood_p)
+			for bz2 in [1.0, 0.1, -0.75]:
+				b.box(Vector3(0, 1.08, bz2), Vector3(1.2, 0.4, 0.08), wood_d)
+			b.box(Vector3(0, 1.3, 0.1), Vector3(1.3, 0.07, 0.36), wood_p)
+			b.box(Vector3(0, 1.3, -0.75), Vector3(1.3, 0.07, 0.36), wood_p)
+			# the hooped tilt of red felt over the two benches behind
+			for k4 in 4:
+				var hzp := 0.55 - k4 * 0.55
+				b.arc(Vector3(0, 1.85, hzp), 0.78, 0.05, 0.0, PI, wood_p, 10, Vector3(PI * 0.5, 0, 0))
+			for k5 in 7:
+				var a0 := PI * k5 / 7.0
+				var a1 := PI * (k5 + 1) / 7.0
+				b.quad4(Vector3(cos(a0) * 0.8, 1.85 + sin(a0) * 0.8, 0.6), Vector3(cos(a1) * 0.8, 1.85 + sin(a1) * 0.8, 0.6), Vector3(cos(a1) * 0.8, 1.85 + sin(a1) * 0.8, -1.15), Vector3(cos(a0) * 0.8, 1.85 + sin(a0) * 0.8, -1.15),
+					MB.tag(Color("b03a2a"), MB.CLOTH), MB.tag(Color("b03a2a"), MB.CLOTH), MB.tag(Color("8a2a20"), MB.CLOTH), MB.tag(Color("8a2a20"), MB.CLOTH))
+		_:
+			axles = [[0.85, 0.46], [-0.8, 0.56]]
+			half_w = 0.74
+			var lac := MB.tag(Color("5a2420"), MB.WOOD)
+			var gilt := MB.tag(Color("c8a050"), MB.METAL)
+			b.box(Vector3(0, 0.72, 0.0), Vector3(1.2, 0.1, 2.5), wood_d)
+			b.box(Vector3(0, 1.5, -0.3), Vector3(1.3, 1.5, 1.5), lac)
+			b.box(Vector3(0, 2.3, -0.3), Vector3(1.5, 0.1, 1.8), MB.tag(Color("2a3a5a"), MB.CLOTH))
+			for s4 in [-1.0, 1.0]:
+				b.box(Vector3(s4 * 0.66, 1.65, -0.3), Vector3(0.02, 0.6, 0.7), MB.tag(Color("3a5a9a"), MB.CLOTH))
+				b.limb(Vector3(s4 * 0.38, 0.72, 1.2), Vector3(s4 * 0.38, 0.95, 3.3), 0.04, 0.03, wood_d, 5)
+				for cz in [0.45, -1.05]:
+					g.ball(Vector3(s4 * 0.72, 2.42, cz), 0.09, Color(1.0, 0.75, 0.4, 0.8), true)
+					b.limb(Vector3(s4 * 0.72, 2.34, cz), Vector3(s4 * 0.72, 2.56, cz), 0.015, 0.015, iron, 4)
+			b.box(Vector3(0, 1.34, 0.95), Vector3(1.1, 0.08, 0.4), wood_p)
+			b.box(Vector3(0, 0.88, 1.3), Vector3(1.0, 0.06, 0.5), wood_d)
+			b.box(Vector3(0, 2.22, -0.3), Vector3(1.34, 0.06, 1.54), gilt)
+			b.box(Vector3(0, 0.8, -0.3), Vector3(1.34, 0.06, 1.54), gilt)
+			b.box(Vector3(0, 0.95, 0.75), Vector3(1.1, 0.5, 0.1), lac)
+	_mi(root, b)
+	if not g.is_empty():
+		_mi(root, g, MB.mat_glow()).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for ax in axles:
+		b = MB.new()
+		b.limb(Vector3(-half_w, float(ax[1]), float(ax[0])), Vector3(half_w, float(ax[1]), float(ax[0])), 0.05, 0.05, iron, 5)
+		_mi(root, b)
+		for s5 in [-1.0, 1.0]:
+			var wb := MB.new()
+			var wr := float(ax[1])
+			wb.torus(Vector3.ZERO, wr, 0.05, wood_d, Vector3(0, 0, PI * 0.5), true)
+			for k6 in 6:
+				var a6 := PI * k6 / 6.0
+				wb.limb(Vector3(0, -cos(a6) * wr * 0.92, -sin(a6) * wr * 0.92), Vector3(0, cos(a6) * wr * 0.92, sin(a6) * wr * 0.92), 0.022, 0.022, wood, 4)
+			wb.sph(Vector3.ZERO, Vector3(0.09, 0.1, 0.1), iron, Vector3.ZERO, true)
+			var wn := _mi(root, wb, null, Vector3(s5 * (half_w + 0.02), wr, float(ax[0])))
+			wn.set_meta("r", wr)
+			wheels.append(wn)
+	root.set_meta("wheels", wheels)
+	if kind != "ox_cart" and Assets.has(Assets.MOUNTS.horse):
+		var hm := Assets.mount("horse", Assets.palette(Color("5a3a26") if kind == "wagon" else Color("2a2a30"), "", {"sec": Color("1c1612"), "acc": Color("b83a30"), "mark": Color("3a2a1a")}))
+		hm.position = Vector3(0, 0, 2.5 if kind == "wagon" else 2.4)
+		root.add_child(hm)
+		root.set_meta("anim", hm)
 
 ## A saddle for a beast that was never meant to wear one: a cloth over the back, a leather seat with a
 ## high pommel, and stirrups.
@@ -722,6 +832,14 @@ static func _sky_barque() -> Node3D:
 ## vehicle's hover (a slow bob, and a lean into the turn).  Returns how far the seat has risen or
 ## fallen with it (the riders move with it).
 static func anim_ride(n: Node3D, clk: float, moving: bool) -> Vector3:
+	# (a carriage: its wheels turn with the road, and whoever sits in it does not bob with the horse)
+	if n.has_meta("wheels"):
+		for wn in n.get_meta("wheels"):
+			(wn as Node3D).rotation.x = (clk * 2.4 / maxf(0.2, float((wn as Node3D).get_meta("r", 0.5)))) if moving else (wn as Node3D).rotation.x
+		if n.has_meta("anim"):
+			var hm: Node3D = n.get_meta("anim")
+			Assets.animate(hm, clk, ("walk" if Assets.has_clip(hm, "walk") else "idle") if moving else "idle", 0.0)
+		return Vector3.ZERO
 	if n.has_meta("anim"):
 		var m: Node3D = n.get_meta("anim")
 		var clip := "idle"

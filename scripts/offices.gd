@@ -254,6 +254,61 @@ static func work(g, use: String, town: String) -> String:
 		said += "\n\n" + str(RAISED[now - 1])
 	return said
 
+# ---------------------------------------------------------------- fares (carriages: fashion.gd)
+## the towns of the land somebody may want carrying to
+const FARE_TOWNS := ["village", "mountain", "dunes", "longmen", "tushan", "yanggu"]
+## who asks: travellers are found where travellers wait
+const FARE_USES := ["inn", "teahouse", "shop"]
+
+## How many regions lie between `from` and `to` by the roads (at least 1).
+static func hops(from: String, to: String) -> int:
+	var n := 0
+	var at := from
+	while at != to and n < 40:
+		var nx := Data.next_hop(at, to)
+		if nx == at or nx == "":
+			break
+		at = nx
+		n += 1
+	return maxi(1, n)
+
+## The fare somebody found indoors (`e`: one of rooms.gd's residents) would pay to be carried, if they
+## want carrying at all and the carriage in use has a seat free: {id, n, asset, from, to, pay}, or {}.
+static func fare_offer(g, e: Dictionary) -> Dictionary:
+	var area := str(e.get("area", ""))
+	if not str(e.get("trade", "")) in FARE_USES or not area in FARE_TOWNS or Fashion.seats(str(g.ride)) < 3:
+		return {}
+	if g.passengers.size() + 2 >= Fashion.seats(str(g.ride)) or g.passengers.any(func(p): return str(p.id) == str(e.id)):
+		return {}
+	var others: Array = FARE_TOWNS.filter(func(a): return a != area)
+	var to := str(others[absi(hash(str(e.id))) % others.size()])
+	return {"id": str(e.id), "n": str(e.n), "asset": str(e.get("asset", "")), "from": area, "to": to, "pay": int(round((50.0 + 12.0 * float(g.level)) * float(hops(area, to))))}
+
+static func take_fare(g, fare: Dictionary) -> void:
+	if fare.is_empty():
+		return
+	g.passengers.append(fare)
+	g.note("Took up %s for %s" % [str(fare.n), str(Data.AREAS[str(fare.to)].n)])
+
+## Whoever is being carried to where the hero now is gets down and pays (the carriage must be the one
+## in use, and driven: nobody is carried pillion on a tiger).  Returns what is said of each.
+static func arrive(g) -> Array:
+	var out: Array = []
+	if not g.riding or Fashion.seats(str(g.ride)) < 3:
+		return out
+	var keep: Array = []
+	for p in g.passengers:
+		if str(p.to) == str(g.area):
+			g.stones += int(p.pay)
+			g.wages += int(p.pay)
+			g.fares += 1
+			g.note("Set down %s at %s (%d spirit stones)" % [str(p.n), str(Data.AREAS[str(p.to)].n), int(p.pay)])
+			out.append("%s climbs down at %s: +%d spirit stones" % [str(p.n), str(Data.AREAS[str(p.to)].n), int(p.pay)])
+		else:
+			keep.append(p)
+	g.passengers = keep
+	return out
+
 ## How many shifts have been worked, and at how many trades.
 static func worked(g) -> Array:
 	var n := 0

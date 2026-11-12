@@ -221,6 +221,10 @@ func _process(d: float) -> void:
 	_amb_t -= d
 	if _amb_t <= 0.0:
 		_amb_t = 0.5
+		# (offices.gd: somebody carried for a fare gets down when the carriage comes into their town)
+		if in_world and not Game.passengers.is_empty():
+			for fl in Offices.arrive(Game):
+				Game.toast(str(fl))
 		Eggs.busy = not in_world or not world.using.is_empty() or world.traveling() or Game.prologue != ""
 		Eggs.gliding = in_world and world.gliding()
 		Eggs.on_summit = in_world and not world.gliding() and not Peaks.summit_at(world.wd, world.ptile).is_empty()
@@ -706,6 +710,12 @@ func talk_npc(e: Dictionary) -> void:
 		return
 	# somebody found indoors in a town (rooms.gd): a word, and then, if there is work to be had here
 	# today, the offer of a shift at their trade (offices.gd)
+	# whoever answers for a town (offices.gd): a word, and then, if they have a carriage to sell, the offer of it
+	if e.has("office") and e.has("lines"):
+		var oi: int = chat_idx.get(e.id, 0)
+		chat_idx[e.id] = oi + 1
+		say([[e.n, str(e.lines[oi % (e.lines as Array).size()])]], func(): offer_carriage(e))
+		return
 	if e.has("trade") and e.has("lines"):
 		var ti: int = chat_idx.get(e.id, 0)
 		chat_idx[e.id] = ti + 1
@@ -866,6 +876,27 @@ func ask_picks() -> void:
 		return
 	ask_crossroads()
 
+## A carriage for sale (fashion.gd RIDES `buy`, `at`), offered by whoever answers for the town it is
+## built in.  "Not today" is the first line.
+func offer_carriage(e: Dictionary) -> void:
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
+	for rid in Fashion.RIDE_ORDER:
+		var r: Dictionary = Fashion.RIDES[rid]
+		if str(r.get("at", "")) == str(e.office) and not Game.rides.has(rid):
+			opts.append({"id": rid, "label": "Buy the %s" % str(r.n), "note": "%d stones" % int(r.buy), "desc": "%s\n\nDriven, seats %d, %d%% faster than running. %d spirit stones (you have %d)." % [told(str(r.desc)), Fashion.seats(rid), int(round((float(r.speed) - 1.0) * 100.0)), int(r.buy), Game.stones],
+				"col": UI.C_GOLD, "enabled": Game.stones >= int(r.buy)})
+	if opts.size() < 2 or Game.prologue != "":
+		return
+	choose("%s has something on wheels to sell." % str(e.n), opts, func(oid: String):
+		if not Fashion.RIDES.has(oid) or Game.stones < int(Fashion.RIDES[oid].buy):
+			return
+		Game.stones -= int(Fashion.RIDES[oid].buy)
+		Game.grant_ride(oid)
+		Game.ride = oid
+		Feats.poll(Game)
+		say([[str(e.n), "She pulls a little to the left. They all pull a little to the left. Keep the axles greased and do not let anybody tell you how many it seats: it seats %d." % Fashion.seats(oid)]])
+	)
+
 ## A shift at a trade of the town (offices.gd), offered by somebody found indoors.  "Not today" is the
 ## first line: nobody is put to work by leaning on a key.
 func offer_shift(e: Dictionary) -> void:
@@ -874,11 +905,22 @@ func offer_shift(e: Dictionary) -> void:
 	if Offices.blocked(Game, use, town) != "" or Game.prologue != "":
 		return
 	var t: Dictionary = Offices.TRADES[use]
+	# (somebody at an inn, a tea-house or a shop who wants carrying to another town, if there is a seat
+	# in the carriage: offices.gd `fares`)
+	var fare := Offices.fare_offer(Game, e)
 	var opts: Array = [
 		{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM},
 		{"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), Offices.wage(Game, use),
 			(", and %d of salary for the days away" % Offices.salary_due(Game, use, town)) if Offices.salary_due(Game, use, town) > 0 else "", Offices.career_text(Game, use)], "col": UI.C_GOLD}]
+	if not fare.is_empty():
+		opts.append({"id": "fare", "label": "Carry %s to %s" % [str(e.n), str(Data.AREAS[str(fare.to)].n)], "note": "%d stones" % int(fare.pay),
+			"desc": "%s has business in %s and no way of getting there. There is a seat in the %s (%d of %d taken). The fare is paid on arrival: %d spirit stones." % [str(e.n), str(Data.AREAS[str(fare.to)].n),
+				str(Fashion.RIDES[Game.ride].n), 2 + Game.passengers.size(), Fashion.seats(Game.ride), int(fare.pay)], "col": UI.C_JADE})
 	choose("%s could use a pair of hands." % str(e.n), opts, func(oid: String):
+		if oid == "fare":
+			Offices.take_fare(Game, fare)
+			say([[str(e.n), "To %s? I shall get my bundle. I do not mind which seat. I mind a little which seat." % str(Data.AREAS[str(fare.to)].n)]])
+			return
 		if oid != "work":
 			return
 		var told := Offices.work(Game, use, town)
@@ -1145,7 +1187,7 @@ func open_stable() -> void:
 		var r: Dictionary = Fashion.RIDES[id]
 		var have: bool = Game.rides.has(id)
 		opts.append({"id": id, "label": str(r.n) if have else "? " + str(r.n), "note": ("riding" if Game.riding else "saddled") if id == Game.ride else ("" if have else "not yet"),
-			"desc": told(str(r.desc)) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else "Stood on", int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
+			"desc": told(str(r.desc)) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else (("Driven, seats %d" % Fashion.seats(id)) if str(r.kind) == "carriage" else "Stood on"), int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
 			"col": UI.C_JADE, "enabled": have, "current": id == Game.ride})
 	opts.append({"id": "off", "label": "Go on foot", "desc": "Send the ride away and walk (R mounts again).", "col": UI.C_DIM, "enabled": Game.riding})
 	choose("The stable: what will you ride?", opts, func(id: String):
