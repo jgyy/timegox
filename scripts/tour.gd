@@ -268,6 +268,96 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 	stage.queue_free()
 	main.world.show()
 
+## A sheet of one monster shape framed from its own bounds (developer tool, --beasts=tiger,ape,...):
+## three-quarter front, side, three-quarter back and a close-up of the head (found from its "head"
+## bone), so the sculpt can be judged from every side.  Writes beast_<shape>.webp; with --beasts-tag=x
+## writes beast_<shape>_x.webp, for before-and-after comparisons.
+func _beast_sheet(shape: String, tint: Color) -> Image:
+	var sc := _bare_stage(480.0, 30.0, 9.0)
+	var stage: Node3D = sc[0]
+	var cam: Camera3D = sc[1]
+	var m: Node3D = _foe(shape) if Data.ENEMIES.has(shape) else Models.monster(shape, tint)
+	stage.add_child(m)
+	m.add_child(Models.shadow_disc(0.8))
+	var ab := AABB()
+	var first := true
+	for mi in m.find_children("*", "MeshInstance3D", true, false):
+		var mm := mi as MeshInstance3D
+		if mm.mesh == null or not mm.visible:
+			continue
+		var bb: AABB = mm.transform * mm.get_aabb()
+		ab = bb if first else ab.merge(bb)
+		first = false
+	var ctr := ab.get_center()
+	var rad := maxf(0.3, ab.size.length() * 0.5)
+	var dist := rad / sin(deg_to_rad(cam.fov * 0.5)) * 0.92
+	var sk: Skeleton3D = Assets._skeleton(m)
+	var views := [["three", 0.7, false], ["side", PI * 0.5, false], ["back", PI + 0.75, false], ["head", 0.45, true]]
+	var shots: Array = []
+	var t0 := 0.0
+	for v in views:
+		m.rotation.y = -float(v[1])
+		for k in 24:
+			t0 += 1.0 / 30.0
+			Models.anim_monster(m, t0 + 0.5, 0.0)
+			await get_tree().process_frame
+		if bool(v[2]):
+			var hp := ctr + Vector3(0, ab.size.y * 0.3, ab.size.z * 0.3)
+			if sk != null and sk.find_bone("head") >= 0:
+				var hb := sk.find_bone("head")
+				# (the middle of the head bone: its head is the back of the skull, its tail the snout)
+				var gp: Transform3D = sk.global_transform * sk.get_bone_global_pose(hb)
+				var tail_l := Vector3.ZERO
+				for cb in sk.get_bone_children(hb):
+					tail_l = sk.get_bone_rest(cb).origin
+					break
+				hp = stage.to_local(gp * (tail_l * 0.5))
+			var fwd := Vector3(sin(m.rotation.y), 0, cos(m.rotation.y))
+			var hd := clampf(rad * 0.7, 0.45, 3.2)
+			cam.position = hp + (fwd.rotated(Vector3.UP, 0.5)) * hd + Vector3(0, hd * 0.12, 0)
+			cam.look_at(stage.to_global(hp), Vector3.UP)
+		else:
+			cam.position = ctr + Vector3(0, rad * 0.32, dist)
+			cam.look_at(stage.to_global(ctr), Vector3.UP)
+		cam.make_current()
+		await get_tree().process_frame
+		await _shot("beast_view", false)
+		shots.append(last_img)
+	stage.queue_free()
+	main.world.show()
+	var fw: int = shots[0].get_width()
+	var fh: int = shots[0].get_height()
+	var cw := int(fw * 0.62)
+	var out := Image.create(cw * 2, fh * 2, false, Image.FORMAT_RGB8)
+	for i in shots.size():
+		var im: Image = shots[i]
+		im.convert(Image.FORMAT_RGB8)
+		out.blit_rect(im, Rect2i((fw - cw) / 2, 0, cw, fh), Vector2i((i % 2) * cw, (i / 2) * fh))
+	out.resize(int(out.get_width() * 0.75), int(out.get_height() * 0.75), Image.INTERPOLATE_LANCZOS)
+	return out
+
+func _beast_sheets(list: String) -> void:
+	var tint := Color(main.args.get("tint", "a87a52"))
+	var tag := str(main.args.get("beasts-tag", ""))
+	# (a shape is shown as the first foe of the land that wears it, in that foe's own colours, unless
+	# --beasts-tint asks for the plain tint: the way the bestiary picks its pages)
+	var as_foe: bool = not main.args.has("beasts-tint")
+	var foe_of := {}
+	for pass_i in 2:
+		for id in Data.ENEMIES:
+			var sh := str(Data.ENEMIES[id].get("shape", ""))
+			if sh == "" or foe_of.has(sh) or (pass_i == 0 and bool(Data.ENEMIES[id].get("boss", false))):
+				continue
+			foe_of[sh] = id
+	for shape in list.split(",", false):
+		var who: String = shape
+		if as_foe and not Data.ENEMIES.has(shape) and foe_of.has(shape):
+			who = str(foe_of[shape])
+		var img := await _beast_sheet(who, tint)
+		var n := "beast_%s%s" % [shape, ("_" + tag) if tag != "" else ""]
+		img.save_webp("%s/%s.webp" % [dir, n], true, 0.9)
+		print("[tour] ", n)
+
 ## The hero runs down the longest free line of tiles with Yue Ling at his shoulder, then stops; a
 ## camera on her side tracks them (--follow writes follow_<id>.webp).  Both should face the way they
 ## run, and she should stop running once she has caught up.
@@ -1660,6 +1750,13 @@ func _grid(n: String, frames: Array, cols: int) -> void:
 
 func _run() -> void:
 	await _wait(1.0)
+	if main.args.has("beasts") and main.args.has("no-extras"):
+		# (the monster sheets need no world: shot straight from the title, and the tour ends)
+		main.set_stack(["world"])
+		main.world.set_process(false)
+		await _beast_sheets(str(main.args.beasts))
+		get_tree().quit(0)
+		return
 	await _shot("01_title")
 	var only: PackedStringArray = str(main.args.get("areas", "")).split(",", false)
 	var skip_bosses: bool = main.args.has("no-bosses")
