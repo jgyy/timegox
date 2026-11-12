@@ -830,6 +830,9 @@ func ent_visible(e: Dictionary) -> bool:
 				return false
 			# a boss who only appears later in the story (the Gate Generals and Chiyou, Part XIII)
 			var bv = e.get("vis", ["", ""])
+			# (Part XXIV: a lord that cannot be beaten is gone from the land when the losing is done)
+			if bv.size() > 1 and str(bv[1]) != "" and Game.done(str(bv[1])):
+				return false
 			return bv[0] == "" or Game.reached(bv[0])
 		"pickup":
 			if Game.taken.has(e.id):

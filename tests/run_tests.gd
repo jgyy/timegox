@@ -3862,6 +3862,39 @@ func _lost_horse() -> void:
 	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
 	check(wsrc.contains("func _mark_model") and wsrc.contains("Marks.stands(Game, e)") and wsrc.contains("Marks.who_stands(Game, e)"), "the world shows what stands, builds it when it first does, and shows who stands by it")
 
+	print("== more room indoors (rooms.gd let_out) ==")
+	var b_n := 0
+	var b_grew := 0
+	var t_before := 0
+	var t_after := 0
+	for a9 in Data.AREAS:
+		var raw9: Array = Data.AREAS[a9].get("buildings", [])
+		if raw9.is_empty():
+			continue
+		var m9 := MapGen.build(a9)
+		var reach9 := MapGen.flood(m9.grid, m9.w, m9.h, m9.start)
+		for i9 in raw9.size():
+			var r0: Rect2i = raw9[i9].rect
+			var r1: Rect2i = m9.buildings[i9].rect
+			b_n += 1
+			t_before += (r0.size.x - 2) * (r0.size.y - 2)
+			t_after += (r1.size.x - 2) * (r1.size.y - 2)
+			if r1 != r0:
+				b_grew += 1
+			var dr: Vector2i = raw9[i9].door
+			var on_edge := dr.x == r1.position.x or dr.x == r1.end.x - 1 or dr.y == r1.position.y or dr.y == r1.end.y - 1
+			check(r1.encloses(r0) and m9.buildings[i9].door == dr and on_edge and m9.grid[dr.y * int(m9.w) + dr.x] == MapGen.INTERIOR and reach9.has(dr),
+				"%s/%s: let out round what it was, its door where it was, in the wall, and walked to" % [a9, raw9[i9].id])
+			for j9 in raw9.size():
+				if j9 != i9:
+					# (two houses written wall to wall stay wall to wall)
+					check(not r1.grow(1).intersects(m9.buildings[j9].rect) or r0.grow(1).intersects(raw9[j9].rect), "%s/%s: there is still a way between it and the next house" % [a9, raw9[i9].id])
+	check(b_grew * 2 >= b_n and t_after * 100 >= t_before * 130, "%d of %d buildings have more room: %d tiles of ground floor where there were %d" % [b_grew, b_n, t_after, t_before])
+	var wsrc9 := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(wsrc9.contains("a lord that cannot be beaten is gone from the land when the losing is done"), "a doom of the story leaves the land when its step is done")
+	var asrc9 := FileAccess.get_file_as_string("res://scripts/architecture.gd")
+	check(asrc9.contains("static func _facade") and asrc9.contains("static func _border") and Arch.HIP_RISE > 1.6 and Arch.GABLE_RISE > 1.3, "the houses have facades, flowers at the foot of the wall, and roofs that rise")
+
 	print("== what cannot be beaten (dooms.gd) ==")
 	var dooms: Array = []
 	for eid in Data.ENEMIES:

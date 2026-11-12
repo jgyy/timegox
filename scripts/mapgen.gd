@@ -267,6 +267,10 @@ static func build(id: String, size := Vector2i.ZERO, spec_over: Dictionary = {})
 					var pe2: Array = bpool[rng.randi() % bpool.size()]
 					group2.append({"id": pe2[0], "lv": rng.randi_range(pe2[1], pe2[2])})
 				ents.append({"kind": "enemy", "id": "w%d" % bplaced, "pos": c2, "group": group2, "vis": [str(band.vis), ""]})
+	# ---- the Lost Horse release: more room indoors.  Last of all, when everybody and everything of the
+	# region's own map stands where it stands, every building is let out into whatever ground it has to
+	# spare (rooms.gd `let_out`)
+	Rooms.let_out(id, spec, grid, w, h, buildings, ents, start)
 	return {"w": w, "h": h, "grid": grid, "ents": ents, "theme": spec.theme, "name": spec.n, "start": start, "buildings": buildings, "floor_ents": floor_ents}
 
 ## The ladders (Data.LADDERS) with an end in region `id`: [[tile, out, ladder, end ("a" or "b")], ...]

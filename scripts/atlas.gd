@@ -309,7 +309,9 @@ static func _build(layer: String = "surface") -> Dictionary:
 					if q.x >= 0 and q.y >= 0 and q.x < W and q.y < H and pin[q.y * W + q.x] < 0:
 						pin[q.y * W + q.x] = idx[id]
 		for bd in maps[id].buildings:
-			var br := rect_to_world(id, (bd.rect as Rect2i).grow(2))
+			# (by the rectangle the building was written with, not the one it was let out to, rooms.gd `grown`:
+			# whose land is whose does not move because a house has more room in it)
+			var br := rect_to_world(id, (bd.get("rect0", bd.rect) as Rect2i).grow(2))
 			for yy in range(br.position.y, br.end.y):
 				for xx in range(br.position.x, br.end.x):
 					if xx >= 0 and yy >= 0 and xx < W and yy < H:
@@ -680,7 +682,7 @@ static func _place_bands(slots: Array, grid: PackedByteArray, W: int, H: int, ow
 		var cands: Array = []
 		for p5 in reach_e:
 			var g5: int = grid[p5.y * W + p5.x]
-			if (g5 == MapGen.FLOOR or g5 == MapGen.PATH or g5 == MapGen.DECOR) and owner_id({"owner": owner, "w": W, "h": H, "ids": ids}, p5) == id3 and not near.has(p5):
+			if (g5 == MapGen.FLOOR or g5 == MapGen.PATH or g5 == MapGen.DECOR) and str(ids[owner[p5.y * W + p5.x]]) == id3 and not near.has(p5):
 				cands.append(p5)
 		cands.sort()
 		var rng5 := RandomNumberGenerator.new()

@@ -214,6 +214,14 @@ func _apply_start() -> void:
 	var idx := Data.step_index(str(main.args["bot-start"]))
 	if idx < 0:
 		return
+	# (the crossroads behind the start are answered as the plan answers them: what a journey that far
+	# along has left standing in the land stands, marks.gd)
+	for cid in Echoes.ORDER:
+		if Data.step_index(str(Echoes.CROSSROADS[cid].step)) < idx and not Game.picks.has(cid):
+			for oid in CROSS_PLAN.get(cid, []):
+				if Echoes.option_ok(Game, Echoes.option(cid, str(oid))):
+					Echoes.take(Game, cid, str(oid))
+					break
 	var lv := 0
 	for i in idx:
 		var st: Dictionary = Data.STEPS[i]
@@ -888,7 +896,7 @@ func _grind() -> void:
 ## Whether region `area` has a pack that will stand and fight Lin Feng now.
 func _fights_in(area: String) -> bool:
 	for e in Atlas.world_of(Data.layer_of(area)).ents:
-		if e.kind != "enemy" or str(e.get("area", "")) != area or not world.ent_visible(e) or Game.scatters(e.group):
+		if e.kind != "enemy" or str(e.get("area", "")) != area or not world.ent_visible(e) or Game.scatters(e.group) or Dooms.in_group(e.group):
 			continue
 		var mx := 0
 		for g in e.group:
@@ -1568,20 +1576,26 @@ func _delve_step() -> bool:
 var mark_id := ""
 
 func _marks_step() -> void:
-	if mark_id != "" and Game.marks_seen.has(Marks.seen_key(mark_id)):
-		mark_id = ""
+	if mark_id != "":
+		var hit: Array = world.locate_ent(mark_id)
+		if Game.marks_seen.has(Marks.seen_key(mark_id)) or hit.is_empty() or not Marks.stands(Game, hit[1]):
+			mark_id = ""
 	if mark_id == "":
-		var lw: Dictionary = Atlas.world_of("surface")
-		var here: Vector2i = world.ptile if world.layer == "surface" else Atlas.to_world("sect", Vector2i(20, 8))
 		var bd := 1 << 30
-		for e in lw.ents:
-			if e.kind != "mark" or not Marks.stands(Game, e) or Game.marks_seen.has(Marks.seen_key(str(e.id))):
-				continue
-			var dd: int = absi(e.pos.x - here.x) + absi(e.pos.y - here.y) + (0 if Game.seen.has(str(e.area)) else 100000)
-			if dd < bd:
-				bd = dd
-				mark_id = str(e.id)
+		for lid in ["surface", "heaven", "under", "sea"]:
+			var lw: Dictionary = Atlas.world_of(lid)
+			var here: Vector2i = world.ptile if world.layer == lid else Vector2i(-100000, 0)
+			for e in lw.ents:
+				if e.kind != "mark" or not Marks.stands(Game, e) or Game.marks_seen.has(Marks.seen_key(str(e.id))):
+					continue
+				var dd: int = (absi(e.pos.x - here.x) + absi(e.pos.y - here.y) if world.layer == lid else 200000) + (0 if Game.seen.has(str(e.area)) else 100000)
+				if dd < bd:
+					bd = dd
+					mark_id = str(e.id)
 	if mark_id == "":
+		# (nothing left standing that has not been looked at: a journey cannot get here that way, but a
+		# run that is lost should say so and stop)
+		_finish("nothing stands in the land that has not been looked at")
 		return
 	_goto_entity(mark_id.get_slice(":", 1) if mark_id.begins_with("sign:") else mark_id.get_slice(":", 2), mark_id)
 
@@ -1716,7 +1730,7 @@ func _farm(ek: String, tt: Dictionary) -> bool:
 	var bd := 1 << 30
 	if not world.is_floor():
 		for e in world.ents:
-			if e.kind != "enemy" or not world.ent_visible(e) or Game.scatters(e.group):
+			if e.kind != "enemy" or not world.ent_visible(e) or Game.scatters(e.group) or Dooms.in_group(e.group):
 				continue
 			var mx := 0
 			var has := false

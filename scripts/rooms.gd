@@ -118,6 +118,150 @@ static func _edge(r: Rect2i) -> Array:
 			out.append(Vector2i(x0, y2))
 	return out
 
+## The tiles of region `id` (its own tiles) that a building must not grow over or up against: wherever
+## the story stands somebody or something, where travellers arrive, where a work or a ladder stands,
+## the heart of a town.
+static func keep_off(id: String, spec: Dictionary) -> Dictionary:
+	var out := {}
+	var pts: Array = []
+	for key in ["npcs", "bosses", "pickups", "portals", "obstacles", "abodes", "steles"]:
+		for e in spec.get(key, []):
+			if e is Dictionary and e.has("pos") and not e.has("floor") and (e.pos as Vector2i) != Vector2i.ZERO:
+				pts.append(e.pos)
+			elif e is Vector2i:
+				pts.append(e)
+	for p in spec.get("portals", []):
+		pts.append((p.pos as Vector2i) + Vector2i(1, 0))
+	for key2 in ["springs", "clear"]:
+		for q in spec.get(key2, []):
+			if q is Vector2i:
+				pts.append(q)
+	for a in MapGen.arrival_tiles(id):
+		pts.append(a)
+	for le in MapGen.ladder_ends(id):
+		pts.append(le[0])
+		pts.append((le[0] as Vector2i) + (le[1] as Vector2i))
+	for ms in Works.sites():
+		if str(ms[2]) == id:
+			pts.append(ms[3])
+	for tid in Folk.TOWNS:
+		if str(Folk.TOWNS[tid].area) == id:
+			pts.append(Folk.TOWNS[tid].at)
+	if spec.has("start"):
+		pts.append(spec.start)
+	for bd in spec.get("buildings", []):
+		# (the ground outside every door)
+		var r: Rect2i = bd.rect
+		var d: Vector2i = bd.door
+		pts.append(d + Vector2i(0, -1 if d.y == r.position.y else (1 if d.y == r.end.y - 1 else 0)) + Vector2i(-1 if d.x == r.position.x else (1 if d.x == r.end.x - 1 else 0), 0))
+	for pt in pts:
+		for dy in range(-1, 2):
+			for dx in range(-1, 2):
+				out[(pt as Vector2i) + Vector2i(dx, dy)] = true
+	return out
+
+## More room indoors (the Lost Horse release): every building of a region let out by a tile, or two,
+## on each side that has ground to spare, once the region's own map is made (so that nothing on it
+## moves: the packs, the people and the roads are where they were, and whose land is whose does not
+## change).  A side is let out only if it is not the side the door is in; the new row of wall stands on
+## open ground or where the wood was, with somewhere to walk (or wood) beyond it; nobody and nothing
+## stands there or beside it (`keep_off`, and every entity of the map `ents`); the map's edge is three
+## tiles away; no other building is within a tile of the new wall; and **everything that could be
+## walked to before can still be walked to** (the map is flooded from `start` again for every row).
+## Everything written by hand inside a building stays where it was; the floors rooms.gd lays out are
+## laid out again for the larger room.  `buildings` (the stamped buildings of the map) is changed in place.
+static func let_out(id: String, spec: Dictionary, grid: PackedByteArray, w: int, h: int, buildings: Array, ents: Array, start: Vector2i) -> void:
+	var raw: Array = spec.get("buildings", [])
+	var rounds := int(spec.get("grow", 2))
+	if raw.is_empty() or rounds <= 0:
+		return
+	var off := keep_off(id, Data.AREAS[id] if Data.AREAS.has(id) else spec)
+	for e in ents:
+		if e.has("pos"):
+			var er := 2 if str(e.kind) == "enemy" else 1
+			for dy in range(-er, er + 1):
+				for dx in range(-er, er + 1):
+					off[(e.pos as Vector2i) + Vector2i(dx, dy)] = true
+	var now: Array = []
+	for bd in raw:
+		now.append(bd.rect)
+	var reach := MapGen.flood(grid, w, h, start)
+	for i in raw.size():
+		var bd0: Dictionary = raw[i]
+		var r: Rect2i = bd0.rect
+		if r.size.x < 5 or r.size.y < 4 or bool(bd0.get("fixed", false)):
+			continue
+		var door: Vector2i = bd0.door
+		var nr := r
+		for _round in rounds:
+			for side in 4:
+				if (side == 0 and door.x == r.position.x) or (side == 1 and door.x == r.end.x - 1) or (side == 2 and door.y == r.position.y) or (side == 3 and door.y == r.end.y - 1):
+					continue
+				var wall_row: Rect2i
+				var beyond: Rect2i
+				var cand: Rect2i
+				match side:
+					0:
+						wall_row = Rect2i(nr.position.x - 1, nr.position.y, 1, nr.size.y)
+						beyond = Rect2i(nr.position.x - 2, nr.position.y - 1, 1, nr.size.y + 2)
+						cand = Rect2i(nr.position.x - 1, nr.position.y, nr.size.x + 1, nr.size.y)
+					1:
+						wall_row = Rect2i(nr.end.x, nr.position.y, 1, nr.size.y)
+						beyond = Rect2i(nr.end.x + 1, nr.position.y - 1, 1, nr.size.y + 2)
+						cand = Rect2i(nr.position.x, nr.position.y, nr.size.x + 1, nr.size.y)
+					2:
+						wall_row = Rect2i(nr.position.x, nr.position.y - 1, nr.size.x, 1)
+						beyond = Rect2i(nr.position.x - 1, nr.position.y - 2, nr.size.x + 2, 1)
+						cand = Rect2i(nr.position.x, nr.position.y - 1, nr.size.x, nr.size.y + 1)
+					_:
+						wall_row = Rect2i(nr.position.x, nr.end.y, nr.size.x, 1)
+						beyond = Rect2i(nr.position.x - 1, nr.end.y + 1, nr.size.x + 2, 1)
+						cand = Rect2i(nr.position.x, nr.position.y, nr.size.x, nr.size.y + 1)
+				var both := wall_row.merge(beyond)
+				if both.position.x < 3 or both.position.y < 3 or both.end.x > w - 3 or both.end.y > h - 3:
+					continue
+				var ok := true
+				for y in range(wall_row.position.y, wall_row.end.y):
+					for x in range(wall_row.position.x, wall_row.end.x):
+						var t: int = grid[y * w + x]
+						if (t != MapGen.FLOOR and t != MapGen.DECOR and t != MapGen.WALL) or off.has(Vector2i(x, y)):
+							ok = false
+				for y2 in range(beyond.position.y, beyond.end.y):
+					for x2 in range(beyond.position.x, beyond.end.x):
+						var t2: int = grid[y2 * w + x2]
+						if t2 == MapGen.BUILDING or t2 == MapGen.INTERIOR or t2 == MapGen.WATER:
+							ok = false
+				for j in now.size():
+					if j != i and (now[j] as Rect2i).grow(1).intersects(wall_row):
+						ok = false
+				if not ok:
+					continue
+				# try it: is everything that could be walked to still walked to?
+				var g2 := grid.duplicate()
+				var tb: Dictionary = bd0.duplicate(true)
+				tb.rect = cand
+				MapGen.stamp_building(g2, w, tb)
+				var reach2 := MapGen.flood(g2, w, h, start)
+				if reach2.size() < reach.size() - (cand.get_area() - nr.get_area()) - 1:
+					continue
+				var lost := false
+				for q in reach:
+					if not reach2.has(q) and not cand.has_point(q):
+						lost = true
+						break
+				if lost:
+					continue
+				nr = cand
+				now[i] = nr
+				for k in g2.size():
+					grid[k] = g2[k]
+				reach = reach2
+		if nr != r:
+			var gb: Dictionary = bd0.duplicate(true)
+			gb.rect = nr
+			gb["rect0"] = r
+			buildings[i] = MapGen.stamp_building(grid, w, complete(gb, busy_of(id, bd0)))
+
 ## Building `bd` (an entry of Data.AREAS[..].buildings, in its region's own tiles) with every floor it
 ## has: its own, and the ones laid out here.  `busy` are tiles of its ground floor that somebody or
 ## something of the story stands on (nothing is put there or cut off from the door).

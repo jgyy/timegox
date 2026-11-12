@@ -44,43 +44,43 @@ const ASH := Color("3a3632")
 const MARKS := {
 	"bandits": {
 		"mend": {"area": "bamboo", "m": ["road"], "k": 5, "n": "The Menders' Road", "desc": "Split logs laid side by side across the soft ground, pegged at both ends, with a mallet left on the last of them by somebody who meant to come back for it. Forty men who robbed this road built it. It is not straight, and it has not sunk.",
-			"who": ["Road-Mender Hou", "folk_farmer", Color("6a5a3a"), "Forty of us threw our knives in the bamboo. Thirty-one are still in the valley. You count the ones who stayed; I count the logs.", "A road wants mending every spring. I used to think that was a reason not to build one."]},
+			"who": ["Road-Mender Hou", "folk_farmer", Color("6a5a3a"), "Forty of us threw our knives in the bamboo. All forty are still in the valley. You count the ones who stayed; I count the logs.", "A road wants mending every spring. I used to think that was a reason not to build one."]},
 		"drive": {"area": "bamboo", "m": ["fire", false], "k": 3, "n": "A Cold Camp", "desc": "A ring of stones with wet ash in it, and bamboo cut for a lean-to that was never finished. They stopped here one night on the way to the pass. Whoever swept the ash together afterwards did it with his hands."},
 	},
 	"garden": {
-		"study": {"area": "marsh", "m": ["beds", Color("7a4a8a")], "k": 4, "n": "Mo's Physic Garden", "desc": "The Hag's poisons, lifted root and all and set out in rows with a slip of bamboo by each: what it is, what it does, how much of it is medicine. Alchemist Mo's hand. The last slip in every row says: not yet known."},
+		"study": {"area": "marsh", "m": ["beds", Color("7a4a8a")], "k": 4, "n": "The Lifted Beds", "desc": "The beds the Hag's poisons were lifted from, root and all, with a slip of bamboo left in each and a cutting or two coming up again: what it was, what it does, how much of it is medicine. Alchemist Mo's hand. The plants are in pots on his windowsill. The last slip in every row says: not yet known."},
 		"burn": {"area": "marsh", "m": ["fire", false, true], "k": 4, "n": "The Salted Ground", "desc": "Black stalks and white salt. Nothing has grown here since the garden was burned, not even marsh-grass, and the frogs go round it."},
 	},
 	"roc_egg": {
-		"hatch": {"area": "aurora", "m": ["nest", Color("f0e0a0")], "n": "The Roc's Perch", "desc": "A post as thick as a man, driven in beside the tents, with the bark worn off the top by something heavy that lands on it. The horse-folk hang a strip of meat on it at dusk. By morning it is gone, and there is a feather a yard long in the grass.",
+		"hatch": {"area": "thunder", "m": ["nest", Color("f0e0a0")], "n": "The Roc's Perch", "desc": "A post as thick as a man, driven in beside the tents, with the bark worn off the top by something heavy that lands on it. The horse-folk hang a strip of meat on it at dusk. By morning it is gone, and there is a feather a yard long in the grass.",
 			"who": ["Egg-Mother Oyun", "folk_grandma", Color("b06a3a"), "It hatched in my coat. It thinks I am a roc. I have stopped arguing.", "She comes back when it thunders. The children run out, not in."]},
 		"leave": {"area": "thunder", "m": ["nest", Color("c8d8e8")], "n": "The Storm's Nest", "desc": "The nest, where it was, on the scorched rock. The shell is in pieces, from the inside. Whatever came out of it learned the storm from the storm."},
-		"sell": {"area": "mountain", "m": ["frame", "cage"], "n": "The Collector's Cage", "desc": "A cage of gilt bamboo on a stand at the edge of Cloudfoot, big enough for an ox, with the door open and the bars bent outward. The collector has not been seen since the night it thundered. He had paid in full."},
+		"sell": {"area": "mountain", "m": ["frame", "cage"], "n": "The Collector's Cage", "desc": "A cage of gilt bamboo on a stand at the edge of Cloudfoot, big enough for an ox, empty: the collector had it made before he knew the egg would never hatch. The egg sits on his shelf and stopped ticking long ago. No roc flies in the valley."},
 	},
 	"palace": {
-		"seal": {"area": "palace", "m": ["gate", false, Color("5a2a2a")], "k": 1, "n": "The Nine Seals", "desc": "A gate of black timber, barred, with nine strips of yellow paper across the bar and a stele beside it in the Elder's own hand: here was the Blood Moon Palace. Let it be nothing else. The paper has not weathered at all."},
+		"seal": {"area": "palace", "m": ["gate", false, Color("5a2a2a")], "k": 1, "n": "The Nine Seals", "desc": "A gate of black timber, barred, with nine lotus seals across the bar and a stele beside it in the Elder's own hand: here was the Blood Moon Palace. Let it be nothing else. The seals have not weathered at all."},
 		"open": {"area": "palace", "m": ["gate", true, Color("a83a2a")], "k": 1, "n": "The Open Palace", "desc": "The same gate with the bar taken off and burned, a lantern on each post, and a line of washing strung from the left one to a pillar of the hall. Somebody has chalked a hopscotch on the flagstones where the altar was.",
 			"who": ["Widow Tao of the Palace", "folk_farmwife", Color("8a4a5a"), "Eleven families in the east wing, and a goat. The goat has the throne room. Nobody else wanted it.", "They say blood was spilled here. I say I have scrubbed it, and it came up."]},
 	},
 	"dragon_boon": {
 		"rain": {"area": "village", "m": ["frame", "dragon"], "n": "The Rain Pole", "desc": "A carved dragon on a pole in the fields, facing east, with a bowl under its chin. Every spring the bowl is found full on the morning the planting begins, and nobody has seen the rain that filled it."},
-		"sea": {"area": "longmen", "m": ["beacon"], "n": "The Dragon's Sea-Mark", "desc": "A tower of stacked stone with a pearl-coloured light at the top that burns with no oil. Ships steer by it from the river-mouth out, and the boatmen say the water under its beam lies flat in any weather."},
+		"sea": {"area": "longmen", "m": ["beacon"], "n": "The Dragon's Sea-Mark", "desc": "A tower of stacked stone with a pearl-coloured light at the top that burns with no oil. Boats steer by it down the gorge to the sea, and the boatmen say the water under its beam lies flat in any weather."},
 	},
 	"drawings": {
-		"keep": {"area": "village", "m": ["bench"], "n": "Smith Tie's Spider", "desc": "A bench under an awning with the drawings pinned to a board, grey with thumb-marks, and beside it eight brass legs and no body yet. Smith Tie has built it four times. It walked the fourth time, into the pond."},
+		"keep": {"area": "village", "m": ["bench"], "n": "The Spider on the Bench", "desc": "A bench under an awning with the drawings pinned to a board, grey with thumb-marks, and beside it eight brass legs and no body yet. Gongshu Ban has built it four times. It walked the fourth time, into the pond."},
 		"burn": {"area": "forge", "m": ["fire", false], "n": "Where the Drawings Burned", "desc": "A scorch on Heaven's own floor, in the shape of a sheet of paper, that the forge's smiths step round. One corner did not burn. It shows a single joint, and nobody has been able to say what it joined."},
 	},
 	"nineteen": {
-		"stele": {"area": "mountain", "m": ["stele", STONE, false], "n": "The Stele of the Nineteen", "desc": "Nineteen names, cut deep, in the order they went. The stone stands where the road comes up to the sect, so that nobody arrives without passing them. Disciples touch the last name for luck before the examinations. It is worn smooth."},
-		"wind": {"area": "garden", "m": ["flags", 9], "n": "The Nineteen Strips", "desc": "Nineteen strips of white silk on a cord at the edge of the Garden, with nothing written on them. The names were said aloud once, into the wind, and the silk was hung so that there would be something to see moving."},
+		"stele": {"area": "mountain", "m": ["stele", STONE, false], "n": "The Stele of the Nineteen", "desc": "Nineteen names, in the order they went, copied in stone from the jade strips in the wall of the ancestral hall. The stone stands where the road comes up to the sect, so that nobody arrives without passing them. Disciples touch the last name for luck before the examinations. It is worn smooth."},
+		"wind": {"area": "garden", "m": ["flags", 9], "n": "The Nineteen Strips", "desc": "Nineteen strips of white silk on a cord at the edge of the Garden, with nothing written on them. The jade went over the edge, into the wind, and the silk was hung so that there would be something to see moving."},
 	},
 	"ancestor": {
-		"strike": {"area": "grave", "m": ["stele", STONE_DARK, true], "n": "The Struck Tablet", "desc": "A tablet of the lineage with the name chiselled out so deep the stone has cracked across. The place is still swept. Nobody can say why, or by whom."},
-		"truth": {"area": "grave", "m": ["stele", STONE, false, true], "n": "The Tablet and What Is Under It", "desc": "His name, his dates, his titles; and under them, in smaller characters newly cut, what he took and from whom. It is the only tablet in the row that tells the truth, and the only one visitors stop at."},
+		"strike": {"area": "grave", "m": ["stele", STONE_DARK, true], "n": "The Struck Tablet", "desc": "A stone in the row of the lineage, cracked across, with nothing on it. The lacquered tablet in the hall was planed smooth and taken down; this is the gap, kept among the dead. The place is still swept. Nobody can say why, or by whom."},
+		"truth": {"area": "grave", "m": ["stele", STONE, false, true], "n": "The Tablet and What Is Under It", "desc": "His name, his dates, his titles, copied from the tablet in the hall; and under them, in a sweeper's wandering hand, what he took and from whom. It is the only tablet in the row that tells the truth, and the only one visitors stop at."},
 	},
 	"widow": {
-		"truth": {"area": "maple", "m": ["tree", Color("9aa86a"), false], "n": "The Bare Willow", "desc": "The willow on the bank, with no ribbons on it. She untied every one the day she was told, folded them, and left them on the stone. They are still there, under a pebble, dry."},
-		"kind": {"area": "maple", "m": ["tree", Color("9aa86a"), true], "n": "The Waiting Willow", "desc": "The willow on the bank, red with ribbons, one for every year. There is a new one. Somebody is still tying them, on the far bank or this, and the knots are a woman's knots."},
+		"truth": {"area": "maple", "m": ["tree", Color("9aa86a"), false], "n": "The Bare Willow", "desc": "The willow on the bank, with no ribbon on it and no lamp under it. She put the light out the day she was told, and left the lamp on the stone. It is still there, dry."},
+		"kind": {"area": "maple", "m": ["tree", Color("9aa86a"), true], "n": "The Waiting Willow", "desc": "The willow on the bank, hung with red, and a lamp lit under it every dusk. She crossed long ago. Somebody on this bank lights it for her still, and does not say who."},
 	},
 	"crows": {
 		"pardon": {"area": "magpie", "m": ["bridge", Color("2a2a34")], "n": "The Crows' Span", "desc": "One arch of the bridge is black. The crows built it beside the magpies, feather laid on feather, and it is the arch that does not sway. Lovers crossing step on it first, for luck, and the crows pretend not to see."},
@@ -93,7 +93,7 @@ const MARKS := {
 	"cauldron_map": {
 		"copy": {"area": "longmen", "m": ["board", Color("2a2a2a")], "n": "The Map Board", "desc": "A board under a little roof with a rubbing pasted to it: black, with the rivers and roads of the whole land in white. Yu's map. Children put their finger on Longmen and trace the way to the sea. There is one of these in every town now.",
 			"who": ["Carter Shen", "folk_merchant", Color("5a6a4a"), "I used to ask the way at every ferry and be lied to at half. Now I look at the board. The ferrymen are sour about it.", "Tushan is further than I thought, and the sea is nearer. A map is a rude thing."]},
-		"keep": {"area": "tushan", "m": ["gate", false, BRONZE], "n": "The Founders' Screen", "desc": "A screen of bronze lattice the founders of Tushan have set before the Nine Cauldrons. One may look at the map through it. One may not take a rubbing. The founders say a map that everybody has is a road that every army has."},
+		"keep": {"area": "tushan", "m": ["gate", false, BRONZE], "n": "The Founders' Screen", "desc": "A screen of bronze lattice the founders of Tushan have set before the Nine Cauldrons. Behind it the cauldrons stand under their great lid, in the dark. One may know the map is there. One may not take a rubbing. The founders say a map that everybody has is a road that every army has."},
 	},
 	"furnace": {
 		"free": {"area": "fangzhang", "m": ["furnace", true], "n": "Three Footprints", "desc": "Three scorched prints in the turf, a pace apart, going down to the shore and not coming back. Grass will not grow in them. A hermit says he saw it on the sand at dawn, facing the water, as if deciding."},
@@ -106,51 +106,51 @@ const MARKS := {
 	},
 	"the_player": {
 		"keep": {"area": "dunes", "m": ["figure", Color("c8a070"), 1, true], "n": "The Player's Stage", "desc": "Six boards on trestles in the sand and a curtain on a string. It plays at dusk to whoever comes: one dancer, lacquer and leather, who bows to the caravans as they pass and is bowed to."},
-		"maker": {"area": "dunes", "m": ["bench"], "n": "Yan Shi's Bench", "desc": "A bench in the lee of a dune, with a figure of lacquer and leather lying on it under a cloth, and tools laid out in a row. The cloth rises and falls. Yan Shi has not yet decided, and works on the hands."},
-		"still": {"area": "dunes", "m": ["mound", Color("c8a070")], "n": "Where the Player Lies", "desc": "A low mound in the sand with a wooden hand set upright at the head of it, the fingers a little curled. No one buries a machine. Somebody did."},
+		"maker": {"area": "dunes", "m": ["bench"], "n": "Yan Shi's Bench", "desc": "A bench in the lee of a dune, with a figure of lacquer and leather lying on it under a cloth, and tools laid out in a row. The cloth rises and falls. Yan Shi said keep it, at once, and has been mending its hands ever since."},
+		"still": {"area": "dunes", "m": ["mound", Color("c8a070")], "n": "Where the Player Stands", "desc": "A heap of sand against a long box stood on end at the caravan halt, and a wooden hand set upright before it, the fingers a little curled. What is in the box has its painted eyes open. Nobody plays it."},
 	},
 	"the_works": {
 		"hand": {"area": "tushan", "m": ["stele", STONE, false, true], "n": "The Rule of the Hand", "desc": "Cut in stone at the gate of Tushan: let no engine do what nobody here can still do without it. Under it, a row of hand-tools on pegs, oiled, for anybody to prove it by."},
 		"wheel": {"area": "tushan", "m": ["frame", "bell"], "n": "The Keepers' Bell", "desc": "The bell that gives every engine in the land its hours. It is rung at Tushan, and answered from town to town down the roads, and the wheels stop one after another like lamps going out along a street."},
 		"dao": {"area": "tushan", "m": ["stele", Color("7ac8a0"), false], "n": "The Stone of the Whole Heart", "desc": "A plain green stone with one line on it: the cook's knife, nineteen years, never sharpened. Apprentices are sat in front of it on their first day and asked what it means, and on their last."},
-		"ask": {"area": "terraces", "m": ["beds", Color("6a9a4a")], "k": 3, "n": "The Gardener's Rows", "desc": "Melon rows on a terrace, watered by hand from a jar, as the old man of Hanyin waters his. The makers come out from Tushan to ask him things. He goes on watering. Some of them stay a season."},
+		"ask": {"area": "terraces", "m": ["beds", Color("6a9a4a")], "k": 3, "n": "The Gardener's Rows", "desc": "Cabbage rows on a terrace, watered by hand from a pitcher, as the old man of Hanyin waters his in Qingshi. The makers come out from Tushan to ask him things. He goes on watering. Some of them stay a season."},
 	},
 	"the_mountain": {
-		"road": {"area": "village", "m": ["road"], "k": 2, "n": "Yu Gong's Road", "desc": "A cart-road cut through the shoulder of the North Mountain, with the mountain left standing on either hand. Yu Gong's sons keep it. There is a stone at the top of the cut where the old man sits and looks at what he did not move."},
-		"dig": {"area": "village", "m": ["stack", true], "k": 2, "n": "The Baskets Going By", "desc": "A heap of spoil and a line of baskets on poles, waiting for the next pair of shoulders. The North Mountain is lower than it was, by a hand's breadth. The sons of the sons are born already."},
-		"leave": {"area": "village", "m": ["cairn", Color("6a9a4a")], "n": "The Last Basket", "desc": "One basket of earth, set down at the foot of the North Mountain and never emptied. Grass has seeded in it. Yu Gong lifts his hat to the mountain when he passes, and something up among the rocks is seen to nod."},
+		"road": {"area": "village", "m": ["road"], "n": "Yu Gong's Road", "desc": "The road to a tunnel a cart wide, cut through the first of Yu Gong's two mountains, with both left standing. Yu Gong's sons keep it. There is a stone at the top of the cut where the old man sits and looks at what he did not move."},
+		"dig": {"area": "village", "m": ["stack", true], "n": "The Baskets Going By", "desc": "A heap of loose rock and a line of baskets on poles, waiting for the next pair of shoulders to carry them to the sea. The nearer mountain is lower than it was, by a hand's breadth. The sons of the sons are born already."},
+		"leave": {"area": "village", "m": ["cairn", Color("6a9a4a")], "n": "The Last Basket", "desc": "One basket of earth, set down at the foot of the nearer mountain and never emptied. Grass has seeded in it. Yu Gong lifts his hat to the mountain when he passes, and something up among the rocks is seen to nod."},
 	},
 	"the_echoes": {
-		"home": {"area": "karst", "m": ["flags", 7], "n": "The Quiet Mouth", "desc": "The cave mouth, with nothing in it. Shout, and nothing comes back. The echoes went home, each to the voice that lost it, and all over the land that year people woke saying something they had forgotten they once said."},
-		"keep": {"area": "karst", "m": ["gate", false, STONE_DARK], "n": "The Listening Door", "desc": "A slab across the cave mouth with one hole in it at the height of an ear. Put yours to it. Ten thousand voices, all at once, very far off, like a market heard from a hill."},
+		"home": {"area": "karst", "m": ["flags", 7], "n": "The Quiet Mouth", "desc": "The cave mouth, with one echo in it. Shout your name, and it gives you your name, once. The ten thousand others went home, each to the voice that lost it, and all over the land that year people woke saying something they had forgotten they once said."},
+		"keep": {"area": "karst", "m": ["flags", 5, RED], "n": "The Listening Rope", "desc": "A rope across the cave mouth, hung with red rags, and beyond it the dark. Stand at the rope and listen. Ten thousand voices, all at once, very far off, like a market heard from a hill."},
 		"write": {"area": "karst", "m": ["board", PAPER], "k": 3, "n": "Xu Xiake's Leaves", "desc": "Sheets pinned up to dry on a board at the cave mouth, every one covered edge to edge: a child calling a dog, a man selling pears, somebody's last word. Xu Xiake is on the nine-thousandth. He has started to recognise voices."},
 	},
 	"the_hollow": {
-		"empty": {"area": "mountain", "m": ["gate", false, STONE], "n": "The Shut Hollow", "desc": "A door of dressed stone in the mountainside, shut, with no handle on the outside. There is nothing behind it. That is what it is for."},
+		"empty": {"area": "mountain", "m": ["gate", false, STONE], "n": "A Blank Stone", "desc": "A face of dressed stone in the mountainside that might be a door, with no handle and no name on it. Nobody who passes knows what is behind it. Nothing is. That is what it is for."},
 		"open": {"area": "mountain", "m": ["gate", true, STONE], "n": "The Quiet Door", "desc": "A door in the mountainside standing open, and a row of shoes outside it: straw sandals, a soldier's boots, a child's slippers. Inside nobody speaks. People come out looking as if they have slept.",
-			"who": ["Doorkeeper Jing", "folk_monk", Color("8a8a78"), "I mind the shoes. Nobody has ever taken the wrong pair. Sit as long as you like.", "A magistrate came, and a thief, the same morning. They went in. They came out. I did not ask."]},
+			"who": ["Shoe-Minder Jing", "folk_monk", Color("8a8a78"), "Wang Zhi keeps the door. I mind the shoes. Nobody has ever taken the wrong pair.", "A magistrate came, and a thief, the same morning. They went in. They came out. I did not ask."]},
 		"cistern": {"area": "mountain", "m": ["well"], "k": 2, "n": "The Mountain's Cistern", "desc": "A stone head-work and a sluice where the Hollow has been filled, with a mark cut for each dry year and how far the water fell. Three marks. The fields below were green in all three."},
 	},
 	"the_pupils": {
 		"all": {"area": "marsh", "m": ["posts", 7], "n": "The Open Yard", "desc": "Bamboo stakes driven in a ring in the marsh, each cut a hundred times at a hundred heights. Anybody may come. A fisherman's girl is the best of them this year, and nobody will say so to her face."},
-		"sweep": {"area": "marsh", "m": ["rack", "broom"], "n": "The Year of Sweeping", "desc": "A rack of brooms at the edge of the Maiden's yard, each with a name and a date burned into the handle. A pupil takes one down on the first day. On the last day of the year it is exchanged for a bamboo switch, and most ask to keep the broom."},
-		"none": {"area": "marsh", "m": ["mound", Color("9a9a8a")], "n": "The Ape's Bamboo", "desc": "One stalk of bamboo, split from top to bottom by a single stroke, standing over a mound of marsh earth. The Maiden's method is under it with the old white ape who taught it. She comes on his day and cuts nothing."},
+		"sweep": {"area": "marsh", "m": ["rack", "broom"], "n": "The Year of Sweeping", "desc": "A rack of brooms at the edge of the Maiden's yard, each with a name and a date burned into the handle. A pupil sweeps a year in their own town, and hangs the broom here on the first day. It is exchanged for a bamboo switch, and most ask to have the broom back."},
+		"none": {"area": "marsh", "m": ["mound", Color("9a9a8a")], "n": "The Ape's Bamboo", "desc": "One stalk of bamboo, split from top to bottom by a single stroke, standing over a mound of marsh earth. The Maiden's method is under it. In a banyan above, an old white ape, her last pupil, shows the small ones how to peel fruit. She comes and cuts nothing."},
 	},
 	"the_three_thousand": {
-		"home": {"area": "palace", "m": ["board", RED], "n": "The Tally Wall", "desc": "Three thousand pegs in a wall, and on each a wooden tally with a dead man's name and village. Fewer every month. A swordsman takes one down, and walks, and gives it to a mother, and stays to mend her roof."},
-		"guard": {"area": "dunes", "m": ["rack", "sword"], "n": "The Peace-Bonded Rack", "desc": "A rack at the caravan halt where the guards hang their swords, each tied into its sheath with a red cord. A cord unbroken at the end of the road is a full wage. There is a tally of broken cords. It has four marks on it."},
+		"home": {"area": "palace", "m": ["board", RED], "n": "The Tally Wall", "desc": "Three hundred pegs in a wall, where three hundred tallies hung, each with a dead man's name and village. Every one was taken down in three days. A swordsman took one, and walked, and gave it to a mother, and stayed to mend her roof."},
+		"guard": {"area": "dunes", "m": ["rack", "sword"], "n": "The Peace-Bonded Rack", "desc": "A rack at the caravan halt where the guards hang their swords, each tied into its sheath with a red cord. The wage is the same whether a cord is broken or not. There is a tally of broken cords all the same. It has four marks on it."},
 		"judge": {"area": "palace", "m": ["frame", "cangue"], "k": 3, "n": "The Judgement Posts", "desc": "A post with a wooden collar hung on it, and under the collar a paper: who, whom, where, what was awarded. Some of the papers say pardoned. Most do not. The posts go on down the road to every village that lost somebody."},
 	},
 	"the_arms": {
-		"melt": {"area": "grave", "m": ["frame", "bell"], "n": "The Bell of Four Thousand Blades", "desc": "A bell cast from swords, hung in the Graveyard of the Sword Saints. Its note is a little sharp. The ploughshares went to the valleys and the pots to the kitchens; the bell stayed, because it was agreed the dead should hear what became of their trade."},
-		"rack": {"area": "silk", "m": ["rack", "spear"], "n": "The Mulberry Woods' Rack", "desc": "One rack, in the open, by the well, with the hamlet's arms on it and a keeper's name on a board above. Seven spears, two bows, a boar-fork. Everybody knows how many there are, and so does everybody's neighbour."},
+		"melt": {"area": "tushan", "m": ["frame", "bell"], "n": "The Bell of Four Thousand Blades", "desc": "A bell cast from swords, hung at the gate of Tushan; its twin is at the gate of Qingshi. Its note is a little flat. The ploughshares went to the valleys and the pots to the kitchens; the bell stayed where it was cast, because it was agreed the founders should hear what became of their trade."},
+		"rack": {"area": "silk", "m": ["rack", "spear"], "n": "The Mulberry Woods' Rack", "desc": "One rack, in the open, by the well, with the hamlet's arms on it and a keeper's name on a board above. One spear. Everybody knows it is there, and whose turn it is to oil it, and so does everybody's neighbour."},
 		"school": {"area": "mountain", "m": ["posts", 5, true], "n": "The School of the Broom", "desc": "A yard on the mountain with eight weapons on its racks and a row of brooms before them. The first year is the broom. The masters say the stroke is the same; the pupils say the masters want the yard swept."},
-		"bury": {"area": "grave", "m": ["mound", IRON], "k": 8, "n": "The Field of Names", "desc": "A small mound with a wooden slip in it, and on the slip a name: not of a man, of a sword. Frost-on-the-River. Third Brother. The One My Father Carried. Four thousand of them, in rows, and every one visited."},
+		"bury": {"area": "grave", "m": ["mound", IRON], "k": 8, "n": "The Field of Names", "desc": "A small mound with a wooden slip in it, and on the slip a name: not of a man, of a sword. Frost-on-the-River. Third Brother. The One My Father Carried. One is buried a day. The rows are getting long, and every one is visited."},
 	},
 	"the_voices": {
 		"fire": {"area": "silk", "m": ["fire", true], "n": "The Place Kept at the Fire", "desc": "A camp fire with one flat stone more round it than there are people, and a dish of salt on the stone. Late, something one-legged sits there with its back to the light and listens to the talk, and says nothing in anybody's voice but its own."},
 		"bamboo": {"area": "silk", "m": ["stack"], "k": 3, "n": "Green Bamboo for the Fire", "desc": "Green bamboo cut in joints and stacked by the path, as the grandmothers stacked it. It bursts in the fire like thunder. On the height, something that cannot bear to be startled keeps its distance, and its hunger."},
-		"drive": {"area": "silk", "m": ["lamp_post", true], "k": 5, "n": "The Torch Line", "desc": "A burned-out torch on a stake, one of a line that goes up over the ridge. It went, that night, ahead of the fire. The voices came back in the morning. Beyond the ridge the camps say they hear children calling, and do not answer."},
+		"drive": {"area": "silk", "m": ["lamp_post", true], "k": 5, "n": "The Torch Line", "desc": "A burned-out torch on a stake, one of a line that goes up over the ridge. It went, that night, ahead of the fire. The voices came back in the morning. Beyond the ridge, where there are no fires, travellers say they hear children calling, and do not answer."},
 	},
 	"the_kites": {
 		"ask": {"area": "thunder", "m": ["frame", "chime"], "n": "The Asking Chimes", "desc": "A frame of wind-chimes on the launching-rock. A flier rings them and waits. If they ring back, the Earl of the Wind has said yes. Some days they hang dead still in a gale, and nobody flies."},
@@ -158,7 +158,7 @@ const MARKS := {
 		"climbers": {"area": "thunder", "m": ["cairn", Color("60a8d8")], "n": "The Climbers' Mark", "desc": "A cairn at the foot of the rock with a blue rag on it. The wind bears up whoever has climbed to where he leaps from, and drops whoever was carried. Fliers add a stone on the way up, for the hands they came by."},
 	},
 	"the_tops": {
-		"cairn": {"area": "mountain", "m": ["cairn", Color("d8d8d8")], "k": 2, "n": "The Nameless Cairn", "desc": "A heap of stones, each carried up by somebody. No name on any. The five emperors' steles were taken back down and are in a shed at the foot, where children read them to practise their characters."},
+		"cairn": {"area": "mountain", "m": ["cairn", Color("d8d8d8")], "k": 2, "n": "The Nameless Cairn", "desc": "A heap of stones, each carried up by somebody. No name on any. The seventy-two kings' steles were taken back down and stand at the foot, where children read them to practise their characters."},
 		"steps": {"area": "mountain", "m": ["steps"], "k": 5, "n": "Duke Xie's Steps", "desc": "A flight of the nine thousand, cut square, with a chain for the hand. Grandmothers go up it now in the fourth month, a few steps a day, and sell tea to each other at the landings."},
 		"shut": {"area": "mountain", "m": ["gate", false, Color("6a6a7a")], "n": "The Gate at the Last Bend", "desc": "A gate across the path where it turns for the summit. It has no lock. Nobody opens it. The Lord of the Eastern Peak sends for whom he wants, and it has been a long time."},
 	},
@@ -168,9 +168,9 @@ const MARKS := {
 		"kiln": {"area": "millet", "m": ["stack", false, CLAY], "k": 4, "n": "Tiles of Mount Li", "desc": "Stacks of roof-tile and brick the colour of the clay host, and jars in rows. Good clay, well fired twice. On the underside of one tile in a hundred there is still the print of an eyebrow."},
 	},
 	"the_lute": {
-		"melt": {"area": "longmen", "m": ["frame", "lute"], "n": "The Lightened Lute", "desc": "A lute on a stand under an awning on the quay, and a blind man's stool. He plays in the evening. It is not good yet. The boatmen stop poling to listen anyway, and drift, and are late."},
+		"melt": {"area": "longmen", "m": ["frame", "lute"], "n": "The Lightened Lute", "desc": "A lute on a stand under an awning on the height above the ferry, and a blind man's stool. He plays in the evening. It is not good yet. The boatmen stop poling to listen anyway, and drift, and are late."},
 		"keep": {"area": "longmen", "m": ["frame", "towrope"], "n": "The Tow-Path Beat", "desc": "A post on the tow-path, grooved by rope, where the haulers rest. They pull to the beat of a leaded lute now, one note a step, and the boats come up the Dragon Gate a day sooner. Nobody would call it music. Nobody is out of time."},
-		"break": {"area": "longmen", "m": ["mound", IRON], "n": "The Broken Lute", "desc": "Splinters of a lute and a lump of lead on a rock above the ferry, left where they fell. He has the new one. He comes up some evenings with it under his arm and sits by the old, and plays to it."},
+		"break": {"area": "longmen", "m": ["mound", IRON], "n": "The Broken Lute", "desc": "Splinters of a lute and a lump of lead on a rock above the ferry, left where they fell. The new one is seasoning, and will not be ready for ten years. He comes up some evenings and sits by the old one, and hums."},
 	},
 	"the_host": {
 		"home": {"area": "village", "m": ["board", PAPER], "n": "The Roll, Read and Nailed Up", "desc": "The roll of the levy, every name with a stroke through it, nailed to a board on the drill ground: gone home. The stroke is in Lady Hao's hand. There is not one name without it."},
@@ -179,19 +179,19 @@ const MARKS := {
 	},
 	# ---- Part XXIV (the Lost Horse release)
 	"the_tide": {
-		"wall": {"area": "yanggu", "m": ["wall", STONE], "k": 8, "n": "King Qian's Sea-Wall", "desc": "Baskets of bamboo filled with stone, stacked and staked, a wall as high as a house between the market and the bore. The tide breaks on it every eighth month and goes back. Behind it the low fields have been sown for the first time in a hundred years."},
+		"wall": {"area": "yanggu", "m": ["wall", STONE], "k": 6, "n": "King Qian's Sea-Wall", "desc": "Baskets of bamboo filled with stone, stacked and staked, a wall as high as a house between the market and the bore. The tide breaks on it every eighth month and goes back. Behind it the low fields have been sown for the first time in a hundred years."},
 		"yield": {"area": "yanggu", "m": ["hut", true], "k": 6, "n": "Houses That Stand Up to Be Counted", "desc": "A house on legs, with a boat tied to one of them. When the bore comes the low ground is the tide's, as it always was, and the families sit on their own doorsteps with their feet drawn up and watch their fields being salted, and fish out of the window."},
 		"arrows": {"area": "yanggu", "m": ["butt"], "k": 6, "n": "The Three Thousand Arrows", "desc": "An iron arrow the length of a man, shot into the mud of the foreshore and rusted there. The crossbowmen stand to every eighth month and loose at the crest. The tide has not been seen to notice. The crossbowmen have become very good."},
 	},
 	"the_ape": {
 		"chain": {"area": "drowned", "m": ["pillar"], "k": 1, "n": "The Pillar under Turtle Mountain", "desc": "An iron pillar sunk in the rock, and from it a chain, each link the size of a millstone, going down into the water. At the end of it is a bell, and the bell is through his nose. On still nights it rings, once, as something turns over."},
-		"dredge": {"area": "drowned", "m": ["channel"], "k": 5, "n": "The New Cut of the Huai", "desc": "A straight channel with a sluice of timber, and clear water going down it to the sea. Nine of these, where Gun built nine dams. The fields either side are drowning less every year. Something long-armed was seen going down the cut at dawn, with the current, not looking back."},
+		"dredge": {"area": "drowned", "m": ["channel"], "k": 5, "n": "The New Cut of the Huai", "desc": "A straight channel with a sluice of timber, and clear water going down it to the sea. Nine of these, one for each year Gun's wall stood. The fields either side are drowning less every year. Something long-armed was seen going down the cut at dawn, with the current, not looking back."},
 		"boats": {"area": "drowned", "m": ["boat"], "k": 5, "n": "The Floating Village", "desc": "A flat boat with a house on it, a hen-coop on the house, and a bed of beans in a trough along the gunwale. The river is the ape's. The people live on top of it, and rise when he rises, and tell their children he is the reason they can all swim."},
 	},
 	"the_horse": {
-		"keep": {"area": "aurora", "m": ["paddock", true], "n": "The Lame Horse's Paddock", "desc": "A paddock of birch rails by the old man's tent, and in it a horse that will never be ridden to war, cropping grass. The boy with the stiff leg brings it water. Neither of them was taken when the riders came for the others."},
+		"keep": {"area": "aurora", "m": ["paddock", true], "n": "The Black Horse's Paddock", "desc": "A paddock of birch rails by the old man's tent, and in it a horse that will never be ridden to war, cropping grass. The boy with the stiff leg brings it water. Neither of them was taken when the riders came for the others."},
 		"loose": {"area": "aurora", "m": ["paddock", false], "n": "The Open Rails", "desc": "A paddock with its rails taken down and stacked. The herd runs where it runs. Some years it comes back with strangers in it, and some years fewer, and the old man says the same thing either way."},
-		"breed": {"area": "aurora", "m": ["board", WOOD_PALE], "n": "The Stud Book of the Frontier", "desc": "A board under a felt roof with the lines of every horse of the frontier painted on it: sire, dam, foal. Fortune is to be bred for, the young men say. The old man has added, at the bottom, in charcoal: and the leg?"},
+		"breed": {"area": "aurora", "m": ["board", WOOD_PALE], "n": "The Stud Book of the Frontier", "desc": "A board under a felt roof with the lines of every horse of the frontier painted on it: sire, dam, foal. Fortune is to be bred for, the fathers say. The old man has added, at the bottom, in charcoal: so far."},
 	},
 }
 
@@ -199,7 +199,7 @@ const MARKS := {
 ## and what is read on it.
 const SIGNS := {
 	"heart": {
-		1: {"m": ["shrine"], "n": "A Wayside Table", "desc": "A table under a little roof with a jar of water on it, a ladle, and a bowl of something left for whoever is hungrier than whoever left it. It was not here before. People do this now, on roads he has walked, as if it were the custom."},
+		1: {"m": ["shrine"], "n": "A Wayside Table", "desc": "A table under a little roof with a jar of water on it, a ladle, and a bowl of something left for whoever is hungrier than whoever left it. It was not here before. People do this now, on roads Lin Feng has walked, as if it were the custom."},
 		-1: {"m": ["frame", "cangue"], "n": "A Board of Edicts", "desc": "A post with a board of edicts and a wooden collar hung on it, ready. Nothing is posted that was not always the law. It is only that everybody along this road has heard what is done to those who break it, and by whom."},
 	},
 	"craft": {
@@ -208,7 +208,7 @@ const SIGNS := {
 	},
 	"reach": {
 		1: {"m": ["flags", 5], "n": "A Milestone of Many Colours", "desc": "A milestone with the distances to places nobody here has been, and tied to it the colours of the peoples who pass: a feather of the winged, a scale, a strip of fox-silk, a cord of pearl-thread. Strangers leave them. They are not strangers long."},
-		-1: {"m": ["fire", true], "n": "A Hearth-Cairn", "desc": "A ring of stones with a fire in it that somebody from the nearest house keeps in. It burns for a man from one valley whose name went out and came back larger. Travellers warm their hands and are told, at length, whose fire it is."},
+		-1: {"m": ["fire", true], "n": "A Hearth-Cairn", "desc": "A ring of stones with a fire in it that somebody from the nearest house keeps in. It burns for somebody from one valley whose name went out and came back larger. Travellers warm their hands and are told, at length, whose fire it is."},
 	},
 }
 
@@ -301,6 +301,14 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 			_claim(near, et, 3)
 	for area in camps:
 		_claim(near, camps[area], 7)
+	# (the tiles that can be walked to, region by region, once: not the whole realm again for each)
+	var mine: Array = []
+	for _k0 in ids.size():
+		mine.append([])
+	for p0 in reach:
+		var q0: Vector2i = p0
+		if q0.x >= 2 and q0.y >= 2 and q0.x < W - 2 and q0.y < H - 2:
+			(mine[owner[q0.y * W + q0.x]] as Array).append(q0)
 	for k in ids.size():
 		var area: String = ids[k]
 		var want: Array = []
@@ -317,10 +325,10 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 						who.append([oid, MARKS[cid][oid].who])
 				want.append({"id": "mark:%s:%s" % [cid, area], "cross": cid, "k": int(st[area]), "who": who})
 		var cset := {}
-		for p in reach:
+		if want.is_empty():
+			continue
+		for p in mine[k]:
 			var q: Vector2i = p
-			if q.x < 2 or q.y < 2 or q.x >= W - 2 or q.y >= H - 2 or owner[q.y * W + q.x] != k:
-				continue
 			var g0: int = grid[q.y * W + q.x]
 			if g0 != MapGen.FLOOR and g0 != MapGen.DECOR:
 				continue

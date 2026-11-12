@@ -428,7 +428,11 @@ func _next_turn() -> void:
 			# (dooms.gd: it mends, it comes on harder, and on the round it crests it goes over them)
 			if doomed:
 				if round_no > crest:
-					say("%s." % str(Dooms.DOOMS.get(str(foes[0].id), {}).get("crest", "It comes down")))
+					var cf: Dictionary = foes[0]
+					for f in foes:
+						if Dooms.rounds(str(f.id)) < Dooms.rounds(str(cf.id)):
+							cf = f
+					say("%s." % str(Dooms.DOOMS.get(str(cf.id), {}).get("crest", "It comes down")))
 					_fall(false)
 					return
 				for f in alive(foes):
@@ -953,7 +957,7 @@ func _select() -> void:
 				"items":
 					_open_items()
 				"yield":
-					say("%s puts up the sword, and stands aside." % cur.name if cur.idx == 0 else "%s lowers her hands, and stands aside." % cur.name)
+					say("%s puts up the sword, and stands aside." % cur.name if cur.idx == 0 else "%s lowers both hands, and stands aside." % cur.name)
 					_fall(true)
 				"flee":
 					say("%s tries to flee..." % cur.name)

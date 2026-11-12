@@ -40,8 +40,8 @@ const LEFT := 0.35
 const DOOMS := {
 	"tide_horse": {"rounds": 3, "crest": "The crest comes down", "exp": 1.5,
 		"passes": ["The white horse goes over them and on up the shore, and does not look round. When Lin Feng can see again he is forty paces inland, sitting down, with a crab in his sleeve.",
-			"It breaks, and for a moment there is no up. Then there is sand under his hands, and Yue Ling beside him wringing out her hair, and the wave a long way off, going where it was always going.",
-			"The sword goes through it like a hand through rain. The tide takes no notice of having been cut. It sets them both down, quite gently, on the wrack-line with the driftwood."]},
+			"It breaks, and for a moment there is no up. Then there is sand under Lin Feng's hands, and Yue Ling beside him wringing out her hair, and the wave a long way off, going where it was always going.",
+			"It goes through them like rain through a hand. The tide takes no notice of anybody having stood there. It sets them both down, quite gently, on the wrack-line with the driftwood."]},
 	"tide_mare": {"rounds": 3, "crest": "The crest comes down", "exp": 1.5,
 		"passes": ["The grey mare of the tide shoulders past. It is not anger. A cart-horse does not hate the gate it leans on."]},
 	"spring_colt": {"rounds": 4, "crest": "The undertow takes their feet", "exp": 1.5,
@@ -98,8 +98,10 @@ static func fell(g, ids: Array, lv: int, how: String, round_n: int) -> String:
 		g.scales[TILT[how][0]] = int(g.scales.get(TILT[how][0], 0)) + int(TILT[how][1])
 	for i in g.party_size():
 		g.hp[i] = maxf(g.hp[i], float(g.max_hp(i)) * LEFT)
-	var xp := int(Data.enemy_exp(lv, false) * float(DOOMS.get(first, {}).get("exp", 1.0)))
-	g.add_exp(xp)
+	# (what it teaches is learned the first time: standing in front of the same tide again teaches nothing,
+	# and nobody grows strong by giving way to it all afternoon)
+	if fresh:
+		g.add_exp(int(Data.enemy_exp(lv, false) * float(DOOMS.get(first, {}).get("exp", 1.0))))
 	g.note("Lost to %s (%s), and went on" % [str(Data.ENEMIES[first].n), str(HOW[how])])
 	var lines: Array = DOOMS.get(first, {}).get("passes", [])
 	return "" if lines.is_empty() else str(lines[(g.fallen - 1) % lines.size()])
@@ -126,7 +128,7 @@ static func epilogue(g) -> String:
 			top = hw2
 	match top:
 		"kept":
-			return "Of the things that could not be beaten, it is told that the two of them were seen holding each other up in front of every one, long after it was any use."
+			return "Of the things that could not be beaten, it is told that Lin Feng and Yue Ling were seen holding each other up in front of every one, long after it was any use."
 		"gave":
-			return "Of the things that could not be beaten, it is told that he looked at each, and put up his sword, and stood aside; and that it was the first time anybody had seen him do it."
-	return "Of the things that could not be beaten, it is told that he fought every one of them to the last round, and lost every time, and was not smaller for it."
+			return "Of the things that could not be beaten, it is told that Lin Feng looked at each, and put up his sword, and stood aside; and that it was the first time anybody had seen him do it."
+	return "Of the things that could not be beaten, it is told that Lin Feng fought every one of them to the last round, and lost every time, and was not smaller for it."

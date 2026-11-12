@@ -135,7 +135,7 @@ const CROSSROADS := {
 		"echo": {
 			# Part XXIV (the Lost Horse release)
 			"s_p24_weng": {
-				"hatch": [["Sai Weng", "You are the one who brought the roc's egg down to the tents. It hatched in Oyun's coat. It takes a lamb a month and it has kept the wolves off four winters. The neighbours called that luck, and bad luck, by turns, depending on whose lamb."]],
+				"hatch": [["Sai Weng", "You are the one who brought the roc's egg down to the tents. It sits on a tent in Thunder Valley and hunts as far as this. It takes a lamb a month and it has kept the wolves off ever since. The neighbours called that luck, and bad luck, by turns, depending on whose lamb."]],
 				"leave": [["Sai Weng", "You are the one who left the roc's egg to the storm. It hatched. Something flies over this steppe now that was taught by nobody, and the herds look up. I do not say you were wrong. I say I look up too."]],
 				"sell": [["Sai Weng", "You are the one who sold the roc's egg at Cloudfoot. We heard. The horse-folk do not sell a thing that is not yet born. I mention it only so that you know I know, and we can leave it there."]],
 			},
@@ -1002,7 +1002,7 @@ const CROSSROADS := {
 			# Part XXIV (the Lost Horse release)
 			"pre:the_riders": {
 				"home": [["Narrator", "The levy of the six hearths went home by the roll, every one. There is no host to send for. Lin Feng finds, standing in the grass, that he would not send for it if there were."]],
-				"keep": [["Narrator", "The standing host is at the Drum Tower of Qingshi, nineteen days' march from here. Eleven hundred, well drilled. Lin Feng looks at what is coming, and does the sum, and is glad for the first time that they are nineteen days away."]],
+				"keep": [["Narrator", "The standing host is at the Drum Tower of Qingshi, nineteen days' march from here. A company of each arm, well drilled. Lin Feng looks at what is coming, and does the sum, and is glad for the first time that they are nineteen days away."]],
 				"band": [["Narrator", "Somewhere a long way south the six hearths are singing together, as they do now once a year. A rider in the third rank is humming. It is not one of theirs. It is near enough that Lin Feng wonders who taught whom, and when."]],
 			},
 			"s_p23_end": {
@@ -1038,7 +1038,7 @@ const CROSSROADS := {
 		],
 		"after": {
 			"wall": [["King Qian", "Baskets. Yes. I thought so, the third time, and did not trust it, because it was not grand. A king wants one great stone. Very well: every household weaves ten. I shall weave the first, badly, where they can see me do it."]],
-			"yield": [["King Qian", "Give it the fields. I have held this shore for thirty years and nobody has ever said that to my face. My engineers will weep. My fishermen have been building on stilts behind my back since my father's time, and they will say nothing at all, very loudly."]],
+			"yield": [["King Qian", "Give it the fields. I have held the shore below this market for thirty years and nobody has ever said that to my face. My engineers will weep. My fishermen have been building on stilts behind my back since my father's time, and they will say nothing at all, very loudly."]],
 			"arrows": [["King Qian", "Ha! Again. And again next year. It is perfectly useless and I have never in my life wanted anything so much. Sound the drum. If we cannot be the stronger we shall at least not be the politer."]],
 		},
 		"echo": {
@@ -1050,7 +1050,7 @@ const CROSSROADS := {
 			"s_p24_end": {
 				"wall": [["Elder Qing Xuan", "They tell me there is a new sea-wall at Yanggu that gives when it is pushed. I have been trying for forty years to teach disciples that, with a broom. I shall send them to look at a wall."]],
 				"yield": [["Elder Qing Xuan", "They tell me a whole shore at Yanggu has stood up on stilts and let the sea in under it, on your word. Lin Feng: you. I should have liked to see your face when you said it."]],
-				"arrows": [["Elder Qing Xuan", "They tell me five hundred crossbows shoot the sea every autumn at Yanggu, on your word. That does not sound to me like a man who has learned to lose. It sounds like you. I find I am not sorry."]],
+				"arrows": [["Elder Qing Xuan", "They tell me five hundred crossbows shoot the sea every autumn at Yanggu, on your word. That does not sound to me like somebody who has learned to lose. It sounds like you. I find I am not sorry."]],
 			},
 		},
 		"end": {
@@ -1065,7 +1065,7 @@ const CROSSROADS := {
 				"desc": "It held for four thousand years. Forge the links, put the bell through his nose, and set the pillar back under Turtle Mountain. It is what the old books say was done, and every town on the river will sleep (renown).",
 				"log": "Had Wuzhiqi chained again under Turtle Mountain, with a bell through his nose, as Yu did."},
 			{"id": "dredge", "label": "Cut the river a road, and let him go to the sea", "tilt": {"heart": 2, "craft": 2}, "gain": {"hearth": {"river": 3}},
-				"desc": "Yu did not beat the flood either; he gave it somewhere to go. Cut nine channels where Gun built nine dams, with the iron for sluices, and leave the ape his river all the way down to the sea. The Boat Hearth will dig with you (regard of the River Folk).",
+				"desc": "Yu did not beat the flood either; he gave it somewhere to go. Cut nine channels, one for each year Gun's wall stood, with the iron for sluices, and leave the ape his river all the way down to the sea. The Boat Hearth will dig with you (regard of the River Folk).",
 				"log": "Had nine channels cut for the Huai with the iron of the chain, and let Wuzhiqi go down to the sea."},
 			{"id": "boats", "label": "It is his river. Learn to float", "tilt": {"reach": 2, "craft": -1}, "gain": {"stones": 2000},
 				"desc": "He was here before the river had a name. Let the Drowned Fields be drowned, and put every house on a hull. Bo Yi can sell the iron (spirit stones). People have lived on water before, and travelled further for it.",
@@ -1073,8 +1073,8 @@ const CROSSROADS := {
 		],
 		"after": {
 			"chain": [["Bo Yi of the Dykes", "As Yu did. Well, it is what I asked the iron for. He will let us, you know. That is the worst of it. He let Gengchen. He holds his neck out like an ox, and looks at you while you do it."]],
-			"dredge": [["Bo Yi of the Dykes", "Channels. With my chain-iron for sluice gates. Gun is turning over on Feather Hill, and Yu, I think, is laughing. Nine cuts. I shall need every boat-hand on the river and I shall not have to ask twice."]],
-			"boats": [["Bo Yi of the Dykes", "I have spent four thousand years keeping water off land, and you tell me to let go of the land. Hm. My knees have been saying it for some time. Very well. I shall want a boat with a proper bed in it."]],
+			"dredge": [["Bo Yi of the Dykes", "Channels. With my chain-iron for sluice gates. Yu said it so often I hear it in my sleep. Gun would say: of course. Nine cuts. I shall need every boat-hand on the river and I shall not have to ask twice."]],
+			"boats": [["Bo Yi of the Dykes", "Four thousand years I have given water somewhere to go, and you tell me to give it everything. Hm. My knees have been saying it for some time. Very well. I shall want a boat with a proper bed in it."]],
 		},
 		"echo": {
 			"s_p24_boyi2": {
@@ -1103,7 +1103,7 @@ const CROSSROADS := {
 				"desc": "It was never his. It came over the frontier and it may go back over it, and bring what it brings. A people who shut nothing in will be heard of a long way off (renown).",
 				"log": "Told Sai Weng to take down his rails and let the black horse run."},
 			{"id": "breed", "label": "Breed from it, and write down the lines", "tilt": {"craft": 3, "heart": -1}, "gain": {"stones": 2600},
-				"desc": "Luck that walks in can be kept in the blood. Put it to the frontier mares, keep a stud book, and in ten years let every tent have a horse like it. The young men will pay well to be first (spirit stones).",
+				"desc": "Luck that walks in can be kept in the blood. Put it to the frontier mares, keep a stud book, and in ten years let every tent have a horse like it. The tents will pay well to be first (spirit stones).",
 				"log": "Told Sai Weng to breed from the black horse, and keep a stud book of the frontier."},
 		],
 		"after": {
@@ -1113,7 +1113,7 @@ const CROSSROADS := {
 		},
 		"echo": {
 			"s_p24_end": {
-				"keep": [["Elder Qing Xuan", "And the horse stays at the old man's door, unridden. A sweeper's answer. I kept you on this mountain nine years for no better reason than that you had come to it."]],
+				"keep": [["Elder Qing Xuan", "And the horse stays at the old man's door, unridden. A sweeper's answer. I kept you three years with a broom for no better reason than that you had come to it."]],
 				"loose": [["Elder Qing Xuan", "And the horse runs loose. The old man will have enjoyed that. He has wanted for forty years to not know what happens next, and been too sensible to arrange it."]],
 				"breed": [["Elder Qing Xuan", "And the frontier is to breed from it, by the book. You have never liked leaving a good thing to chance. I only say: the old man is right about the bottom of the page."]],
 			},
