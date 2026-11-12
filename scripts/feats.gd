@@ -47,6 +47,7 @@ const FEATS := {
 	"ten_letters": {"n": "A Full Satchel", "kind": "people", "pts": 10, "test": ["letters", 10], "desc": "Open ten letters."},
 	"post_bags": {"n": "Neither Snow Nor Rain", "kind": "people", "pts": 10, "test": ["bags", 5], "desc": "Carry five bags of the post to the counters they were sealed for."},
 	"first_coach": {"n": "Inside, If You Please", "kind": "people", "pts": 5, "test": ["coaches", 1], "desc": "Take the post-coach along the high road from one town to another."},
+	"first_voyage": {"n": "Out of Sight of Land", "kind": "people", "pts": 5, "test": ["voyages", 1], "desc": "Take ship from one harbour to another."},
 	"six_trades": {"n": "Jack of Six Trades", "kind": "people", "pts": 10, "test": ["trades", 6], "desc": "Work a shift at six different trades."},
 	"marks_twelve": {"n": "Gone Back to Look", "kind": "road", "pts": 10, "test": ["marks", 12], "desc": "Look at twelve of the things your choices left standing in the land."},
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
@@ -276,6 +277,8 @@ static func value(g, t: Array) -> float:
 			return float(g.mail_read.size())
 		"coaches":
 			return float(g.coaches)
+		"voyages":
+			return float(g.voyages)
 		"bags":
 			return float(g.bags_done)
 		"trade_rank":

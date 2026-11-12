@@ -3886,6 +3886,26 @@ func _horse_shots(which: String = "1") -> void:
 		await _wait(0.5)
 		await _shot("road_map")
 		main.pop()
+	if want.call("sea"):
+		# the sea lanes (ships.gd): the junk at her mooring off Longmen, and the counter of the harbour
+		main.world.load_area("longmen", Vector2i(28, 30))
+		for sa2 in ["longmen", "yanggu", "penglai"]:
+			Game.seen[sa2] = true
+		var mo2 := Ships.mooring(Atlas.world_of("surface"), "longmen")
+		print("[tour] mooring ", mo2, " quay ", Ships.quay("longmen"))
+		main.world.teleport(Ships.quay("longmen"))
+		await _wait(2.5)
+		if mo2.x >= 0:
+			var jp2: Vector3 = main.world.wpos(mo2)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, jp2 + Vector3(17.0, 9.0, 15.0)).looking_at(jp2 + Vector3(0, 4.0, 0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("sea_junk")
+			main.world.cam_override = null
+		main.offer_carriage({"id": "harbour_longmen", "n": str(Offices.OFFICES.harbour_longmen.n), "office": "harbour_longmen"})
+		await _wait(0.5)
+		main.choice.cursor = 1 if "cursor" in main.choice else 0
+		await _shot("sea_counter")
+		main.pop()
 	if want.call("beasts"):
 		# beasts with hides instead of paint (assets.gd NATURAL)
 		var bs: Array = []

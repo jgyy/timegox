@@ -754,6 +754,16 @@ func _build_view(id: String) -> void:
 		cn.position = Vector3(kp.x + 0.75, _ground(bb, kp + Vector3(0.75, 0, 0.75)) - 0.05, kp.z + 0.75) - root.position
 		root.add_child(cn)
 		_label(cn, "%s  %d m" % [str(pk.n), int(round(float(pk.h)))], 3.3, Color("f4ecd8"), 26).visibility_range_end = 60.0
+	# a junk at her mooring in every harbour (ships.gd): drawn with the region, standing on no tile
+	for hid in Ships.ORDER:
+		if str(Ships.HARBOURS[hid].area) == id:
+			var mo := Ships.mooring(lw, hid)
+			if mo.x >= 0:
+				var jk := Models.junk()
+				var jp: Vector3 = Terrain3D.world_pos(mo) + bb.off
+				jk.position = Vector3(jp.x, bb.off.y + Terrain3D.WATER_Y, jp.z) - root.position
+				jk.rotation.y = Terrain3D.hash2(mo.x, mo.y, 5.0) * TAU
+				root.add_child(jk)
 	# the high road between the towns (roads.gd), paved where it crosses this region
 	var rdm := Roads.mesh(lid, r, func(x: float, z: float) -> float: return _ground(bb, Vector3(x, 0.0, z) + Vector3(bb.off.x, 0.0, bb.off.z)) - bb.off.y)
 	if rdm != null:

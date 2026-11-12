@@ -849,6 +849,97 @@ static func _carriage(root: Node3D, kind: String) -> void:
 			anims.append(hm)
 	root.set_meta("anims", anims)
 
+## A junk of the coast trade (ships.gd), lying at her mooring: a deep hull with a high stern and a
+## bluff bow with an eye painted on it, three masts with batten sails of tanned cloth, a deckhouse aft,
+## a sweep of a rudder, lanterns at the stern and a pennon at the main.  Her length lies along +Z and
+## the waterline is at y = 0.
+static func junk() -> Node3D:
+	var root := Node3D.new()
+	root.name = "junk"
+	var b := MB.new()
+	var g := MB.new()
+	var plank := MB.tag(Color("6e4a30"), MB.WOOD)
+	var plank_d := MB.tag(Color("4a3222"), MB.WOOD)
+	var wale := MB.tag(Color("8a2e24"), MB.WOOD)
+	var deck := MB.tag(Color("a08660"), MB.WOOD)
+	var sail := MB.tag(Color("9a5a3a"), MB.CLOTH)
+	var sail_d := MB.tag(Color("84482e"), MB.CLOTH)
+	var rope := MB.tag(Color("b8a070"), MB.CLOTH)
+	# the hull: sections from stern to bow (z, half-breadth at the rail, height of the rail, keel depth)
+	var secs := [[-7.0, 1.5, 3.4, -0.2], [-6.0, 2.1, 3.0, -0.8], [-4.0, 2.5, 2.3, -1.0], [-1.0, 2.7, 1.9, -1.1], [2.0, 2.6, 1.9, -1.0], [4.5, 2.2, 2.2, -0.8], [6.2, 1.5, 2.7, -0.4], [7.2, 0.7, 3.0, 0.2]]
+	for i in secs.size() - 1:
+		var s0: Array = secs[i]
+		var s1: Array = secs[i + 1]
+		for sd: float in [-1.0, 1.0]:
+			var r0 := Vector3(sd * float(s0[1]), float(s0[2]), float(s0[0]))
+			var r1 := Vector3(sd * float(s1[1]), float(s1[2]), float(s1[0]))
+			var m0 := Vector3(sd * float(s0[1]) * 0.86, 0.4, float(s0[0]))
+			var m1 := Vector3(sd * float(s1[1]) * 0.86, 0.4, float(s1[0]))
+			var k0 := Vector3(0, float(s0[3]), float(s0[0]))
+			var k1 := Vector3(0, float(s1[3]), float(s1[0]))
+			b.quad4(r0, r1, m1, m0, plank, plank, plank_d, plank_d)
+			b.quad4(m0, m1, k1, k0, plank_d, plank_d, plank_d, plank_d)
+			# the red wale under the rail, and the rail
+			b.limb(r0 - Vector3(0, 0.35, 0), r1 - Vector3(0, 0.35, 0), 0.07, 0.07, wale, 5)
+			b.limb(r0, r1, 0.06, 0.06, plank_d, 5)
+		# the deck
+		b.quad4(Vector3(-float(s0[1]) * 0.96, float(s0[2]) - 0.5, float(s0[0])), Vector3(float(s0[1]) * 0.96, float(s0[2]) - 0.5, float(s0[0])),
+			Vector3(float(s1[1]) * 0.96, float(s1[2]) - 0.5, float(s1[0])), Vector3(-float(s1[1]) * 0.96, float(s1[2]) - 0.5, float(s1[0])), deck, deck, deck, deck)
+	# the flat stern, painted, and the bow with its eye
+	b.quad4(Vector3(-1.5, 3.4, -7.0), Vector3(1.5, 3.4, -7.0), Vector3(1.3, 0.4, -7.0), Vector3(-1.3, 0.4, -7.0), wale, wale, plank_d, plank_d)
+	b.quad4(Vector3(-0.7, 3.0, 7.2), Vector3(0.7, 3.0, 7.2), Vector3(0.5, 0.6, 7.2), Vector3(-0.5, 0.6, 7.2), plank, plank, plank_d, plank_d)
+	for sd2: float in [-1.0, 1.0]:
+		b.sph(Vector3(sd2 * 1.25, 2.3, 6.3), Vector3(0.04, 0.2, 0.26), MB.tag(Color("f0ead8"), MB.STONE))
+		b.sph(Vector3(sd2 * 1.29, 2.3, 6.34), Vector3(0.03, 0.1, 0.12), MB.tag(Color("1a1410"), MB.STONE))
+	# the deckhouse aft, with a curved roof, and the great rudder
+	b.box(Vector3(0, 3.3, -5.2), Vector3(3.0, 1.3, 2.6), plank)
+	_canopy(b, Vector3(0, 3.95, -5.2), 1.8, 1.6, 0.4, 0.12, MB.tag(Color("3e6676"), MB.STONE), MB.tag(Color("345a68"), MB.STONE), plank_d)
+	for sd3: float in [-1.0, 1.0]:
+		b.box(Vector3(sd3 * 1.51, 3.4, -5.2), Vector3(0.03, 0.6, 1.2), MB.tag(Color("e8d8a8"), MB.CLOTH))
+		_lantern(b, g, Vector3(sd3 * 1.2, 4.3, -7.1), 0.16, Color("d84a30"))
+	b.box(Vector3(0, 0.6, -7.5), Vector3(0.12, 2.6, 1.3), plank_d)
+	b.limb(Vector3(0, 1.9, -7.4), Vector3(0, 3.6, -6.4), 0.07, 0.06, plank_d, 5)
+	# three masts, each with a batten sail (panels between bamboo battens, a little bellied)
+	for mst in [[4.6, 6.5, 2.3, 4.2, 0.25], [0.2, 9.5, 3.2, 6.4, 0.0], [-3.2, 6.0, 2.0, 3.8, -0.2]]:
+		var mz: float = mst[0]
+		var mh: float = mst[1]
+		var sw: float = mst[2]
+		var sh: float = mst[3]
+		var yaw: float = mst[4]
+		b.limb(Vector3(0, 1.4, mz), Vector3(0, 1.4 + mh, mz), 0.14, 0.08, plank_d, 8)
+		var ax := Vector3(cos(yaw), 0, sin(yaw))
+		var fw := Vector3(-sin(yaw), 0, cos(yaw))
+		var top := 1.4 + mh - 0.5
+		var nb := 6
+		for k in nb:
+			var y0 := top - sh * k / float(nb)
+			var y1 := top - sh * (k + 1) / float(nb)
+			var w0 := sw * (0.72 + 0.28 * k / float(nb))
+			var w1 := sw * (0.72 + 0.28 * (k + 1) / float(nb))
+			var c0 := Vector3(0, y0, mz) + fw * 0.2
+			var c1 := Vector3(0, y1, mz) + fw * 0.2
+			var belly := fw * 0.18
+			var sc: Color = sail if k % 2 == 0 else sail_d
+			b.quad4(c0 - ax * w0 * 0.35, c0 + ax * w0 * 0.65, c1 + ax * w1 * 0.65 + belly * 0.0, c1 - ax * w1 * 0.35, sc, sc, sc, sc)
+			b.limb(c0 - ax * w0 * 0.37, c0 + ax * w0 * 0.67, 0.035, 0.035, MB.tag(Color("b8a868"), MB.WOOD), 4)
+			if k == nb - 1:
+				b.limb(c1 - ax * w1 * 0.37, c1 + ax * w1 * 0.67, 0.05, 0.05, MB.tag(Color("b8a868"), MB.WOOD), 4)
+				# the sheets from the leech down to the deck
+				b.limb(c1 + ax * w1 * 0.67, Vector3(0, 2.0, mz - 1.6), 0.012, 0.012, rope, 3)
+		# stays fore and aft
+		b.limb(Vector3(0, 1.4 + mh, mz), Vector3(0, 2.3, mz + 2.4), 0.012, 0.012, rope, 3)
+		b.limb(Vector3(0, 1.4 + mh, mz), Vector3(0, 2.3, mz - 2.4), 0.012, 0.012, rope, 3)
+	# the pennon at the main, a few bales and jars on deck, and the anchor cable over the bow
+	b.ribbon([Vector3(0, 10.9, 0.2), Vector3(0.1, 10.85, -0.5), Vector3(-0.05, 10.9, -1.1), Vector3(0.05, 10.82, -1.7)], [0.34, 0.3, 0.22, 0.04], Vector3(0, 1, 0), MB.tag(Color("c8322a"), MB.CLOTH))
+	for kb in 4:
+		b.box(Vector3(-1.2 + kb * 0.8, 1.75, 2.4), Vector3(0.6, 0.5, 0.7), MB.tag(Color("b8a070") if kb % 2 == 0 else Color("8a6a4a"), MB.CLOTH))
+	for kj in 3:
+		b.lathe(Vector3(-0.8 + kj * 0.8, 1.45, -1.6), [Vector2(0.14, 0.0), Vector2(0.26, 0.2), Vector2(0.24, 0.42), Vector2(0.12, 0.52)], MB.tag(Color("6a4a3a"), MB.STONE), 8)
+	b.limb(Vector3(0.5, 2.7, 7.0), Vector3(1.4, -0.4, 10.0), 0.03, 0.03, rope, 4)
+	_mi(root, b)
+	_mi(root, g, MB.mat_glow()).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return root
+
 ## A wheel in the plane of YZ about `at`: a felloe of wood shod with an iron tyre, spokes and a hub with a
 ## brass cap (`flat`: lashed against a tailboard, in the plane of XY).
 static func _wheel_mb(wb: MB, wr: float, spokes: int, dark: Color, pale: Color, iron: Color, at: Vector3, flat: bool) -> void:

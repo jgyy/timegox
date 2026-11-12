@@ -747,11 +747,11 @@ static func _wing(b: MB, g: MB, roof: MB, roof_g: MB, wr: Rect2, side: int, core
 		var hi: float = float(rn[3]) + th * 0.5
 		var pc := Vector3((lo + hi) * 0.5, 0, at) if hz else Vector3(at, 0, (lo + hi) * 0.5)
 		var sz := Vector3(hi - lo, wall_h, th) if hz else Vector3(th, wall_h, hi - lo)
-		b.box(pc + Vector3(0, ph + wall_h * 0.5, 0), sz, wall)
+		_wall(b, hz, at, lo, hi, ph, wall_h, th, wall, true, seed_ + int(at))
 		b.box(pc + Vector3(0, ph + 0.22, 0), sz * Vector3(1, 0, 1) + Vector3(0.06 if not hz else 0.0, 0.44, 0.06 if hz else 0.0), stone)
 		b.box(pc + Vector3(0, ph + 1.05, 0), sz * Vector3(1, 0, 1) + Vector3(0.05 if not hz else 0.0, 0.08, 0.05 if hz else 0.0), column)
 		b.box(pc + Vector3(0, ph + wall_h - 0.1, 0), sz * Vector3(1, 0, 1) + Vector3(0.08 if not hz else 0.0, 0.2, 0.08 if hz else 0.0), beam)
-		_facade(b, g, hz, at, lo, hi, ph, wall_h, th, float(rn[4]), column, beam, trim, wall, true, seed_ + int(at), 0.44)
+		_facade(b, g, hz, at, lo, hi, ph, wall_h, th, float(rn[4]), column, beam, trim, wall, true, seed_ + int(at), 0.44, true)
 		_border(b, hz, at, lo + 0.4, hi - 0.4, ph, th, float(rn[4]), seed_ + int(hi))
 	for uu: float in [u0, u1]:
 		b.cyl((Vector3(oc, 0, uu) if ew else Vector3(uu, 0, oc)) + Vector3(0, ph + wall_h * 0.5, 0), 0.2, wall_h * 0.5 + 0.05, column, Vector3.ZERO, 10)
@@ -789,7 +789,44 @@ static func _wing(b: MB, g: MB, roof: MB, roof_g: MB, wr: Rect2, side: int, core
 ## bracket and a painted band under the eave, and in every other bay (`windows`) a wide lattice window
 ## with a sill and shutters, glowing faintly.  The wall runs from `lo` to `hi` along X (`horiz`) or Z at
 ## `at`, from `y0` up `hgt`; `out` is the side the weather is on (+1 or -1); `dado` the foot of the panels.
-static func _facade(m: MB, g: MB, horiz: bool, at: float, lo: float, hi: float, y0: float, hgt: float, th: float, out: float, column: Color, beam: Color, trim: Color, wall: Color, windows: bool, k0: int, dado: float) -> void:
+## Where the windows of a run of wall are (the Lost Horse release: a window is a hole in the wall, and
+## the room is seen through it): [[middle along the wall, width, middle height above y0, height], ...],
+## the same for `_wall`, which leaves them open, and `_facade`, which frames them.
+static func _window_bays(lo: float, hi: float, hgt: float, windows: bool, k0: int) -> Array:
+	var out: Array = []
+	var ln := hi - lo
+	if ln < 0.9 or not windows:
+		return out
+	var nbay := maxi(1, int(round(ln / 2.1)))
+	var bw := ln / nbay
+	for k2 in nbay:
+		if bw < 1.5 or (nbay > 2 and (k2 + k0) % 2 != 0):
+			continue
+		out.append([lo + (k2 + 0.5) * bw, minf(1.3, bw - 0.62), hgt * 0.63, minf(1.0, hgt * 0.38)])
+	return out
+
+## A run of wall from `lo` to `hi` along x (`horiz`) or z at `at`, `hgt` high on `y0`, with its windows
+## left open: whole between them, a breast under each and a head over it.
+static func _wall(m: MB, horiz: bool, at: float, lo: float, hi: float, y0: float, hgt: float, th: float, wall: Color, windows: bool, k0: int) -> void:
+	var from := lo
+	for wb in _window_bays(lo, hi, hgt, windows, k0):
+		var u: float = wb[0]
+		var ww: float = wb[1]
+		var yc: float = wb[2]
+		var wh: float = wb[3]
+		var a := u - ww * 0.5
+		var e := u + ww * 0.5
+		if a - from > 0.01:
+			m.box(Vector3((from + a) * 0.5, y0 + hgt * 0.5, at) if horiz else Vector3(at, y0 + hgt * 0.5, (from + a) * 0.5), Vector3(a - from, hgt, th) if horiz else Vector3(th, hgt, a - from), wall)
+		var bot := yc - wh * 0.5
+		var top := yc + wh * 0.5
+		m.box(Vector3(u, y0 + bot * 0.5, at) if horiz else Vector3(at, y0 + bot * 0.5, u), Vector3(ww, bot, th) if horiz else Vector3(th, bot, ww), wall)
+		m.box(Vector3(u, y0 + (top + hgt) * 0.5, at) if horiz else Vector3(at, y0 + (top + hgt) * 0.5, u), Vector3(ww, hgt - top, th) if horiz else Vector3(th, hgt - top, ww), wall)
+		from = e
+	if hi - from > 0.01:
+		m.box(Vector3((from + hi) * 0.5, y0 + hgt * 0.5, at) if horiz else Vector3(at, y0 + hgt * 0.5, (from + hi) * 0.5), Vector3(hi - from, hgt, th) if horiz else Vector3(th, hgt, hi - from), wall)
+
+static func _facade(m: MB, g: MB, horiz: bool, at: float, lo: float, hi: float, y0: float, hgt: float, th: float, out: float, column: Color, beam: Color, trim: Color, wall: Color, windows: bool, k0: int, dado: float, open: bool = false) -> void:
 	var ln := hi - lo
 	if ln < 0.9:
 		return
@@ -820,14 +857,23 @@ static func _facade(m: MB, g: MB, horiz: bool, at: float, lo: float, hi: float, 
 		var ww := minf(1.3, bw - 0.62)
 		var wh := minf(1.0, hgt * 0.38)
 		var yc := y0 + hgt * 0.63
-		m.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww + 0.16, wh + 0.16, th + 0.06) if horiz else Vector3(th + 0.06, wh + 0.16, ww + 0.16), column)
-		g.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww, wh, th + 0.08) if horiz else Vector3(th + 0.08, wh, ww), win_glow)
-		for q2 in 4:
-			var lu := wpos + (q2 - 1.5) * ww / 4.0
-			m.box(Vector3(lu, yc, at) if horiz else Vector3(at, yc, lu), Vector3(0.035, wh, th + 0.12) if horiz else Vector3(th + 0.12, wh, 0.035), column)
-		for q3 in 3:
-			var ly := yc + (q3 - 1) * wh / 3.2
-			m.box(Vector3(wpos, ly, at) if horiz else Vector3(at, ly, wpos), Vector3(ww, 0.035, th + 0.12) if horiz else Vector3(th + 0.12, 0.035, ww), column)
+		if open:
+			# an open window: a frame of four timbers round the hole in the wall (`_wall`), nothing across
+			# it, and the room seen through it
+			for fs: float in [-1.0, 1.0]:
+				var fu2 := wpos + fs * (ww * 0.5 + 0.04)
+				m.box(Vector3(fu2, yc, at) if horiz else Vector3(at, yc, fu2), Vector3(0.08, wh + 0.16, th + 0.06) if horiz else Vector3(th + 0.06, wh + 0.16, 0.08), column)
+				var fy := yc + fs * (wh * 0.5 + 0.04)
+				m.box(Vector3(wpos, fy, at) if horiz else Vector3(at, fy, wpos), Vector3(ww + 0.16, 0.08, th + 0.06) if horiz else Vector3(th + 0.06, 0.08, ww + 0.16), column)
+		else:
+			m.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww + 0.16, wh + 0.16, th + 0.06) if horiz else Vector3(th + 0.06, wh + 0.16, ww + 0.16), column)
+			g.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww, wh, th + 0.08) if horiz else Vector3(th + 0.08, wh, ww), win_glow)
+			for q2 in 4:
+				var lu := wpos + (q2 - 1.5) * ww / 4.0
+				m.box(Vector3(lu, yc, at) if horiz else Vector3(at, yc, lu), Vector3(0.035, wh, th + 0.12) if horiz else Vector3(th + 0.12, wh, 0.035), column)
+			for q3 in 3:
+				var ly := yc + (q3 - 1) * wh / 3.2
+				m.box(Vector3(wpos, ly, at) if horiz else Vector3(at, ly, wpos), Vector3(ww, 0.035, th + 0.12) if horiz else Vector3(th + 0.12, 0.035, ww), column)
 		var so := out * (th * 0.5 + 0.09)
 		m.box(Vector3(wpos, yc - wh * 0.5 - 0.11, at + so) if horiz else Vector3(at + so, yc - wh * 0.5 - 0.11, wpos), Vector3(ww + 0.34, 0.07, 0.2) if horiz else Vector3(0.2, 0.07, ww + 0.34), beam)
 		for s: float in [-1.0, 1.0]:
@@ -1027,7 +1073,8 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			var ln := hi - lo
 			var pc := Vector3(mid, 0, a.z) if horiz else Vector3(a.x, 0, mid)
 			var sz := Vector3(ln, wall_h, th) if horiz else Vector3(th, wall_h, ln)
-			b.box(pc + Vector3(0, ph + wall_h * 0.5, 0), sz, wall)
+			var open_w: bool = not st.get("moon_gate", false)
+			_wall(b, horiz, a.z if horiz else a.x, lo, hi, ph, wall_h, th, wall, open_w, seed_ + int(lo * 3.0))
 			# stone plinth and a timber rail at waist and eave height
 			b.box(pc + Vector3(0, ph + 0.22, 0), sz * Vector3(1, 0, 1) + Vector3(0.06 if not horiz else 0.0, 0.44, 0.06 if horiz else 0.0), stone)
 			b.box(pc + Vector3(0, ph + 1.05, 0), sz * Vector3(1, 0, 1) + Vector3(0.05 if not horiz else 0.0, 0.08, 0.05 if horiz else 0.0), column)
@@ -1036,7 +1083,7 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			# band under the eave, and in every other bay a wide lattice window with a sill and shutters,
 			# glowing faintly from inside; flowers along the foot of the wall
 			var outw := (-1.0 if a.z < cz else 1.0) if horiz else (-1.0 if a.x < cx else 1.0)
-			_facade(b, g, horiz, a.z if horiz else a.x, lo, hi, ph, wall_h, th, outw, column, beam, trim, wall, not st.get("moon_gate", false), seed_ + int(lo * 3.0), 0.44)
+			_facade(b, g, horiz, a.z if horiz else a.x, lo, hi, ph, wall_h, th, outw, column, beam, trim, wall, open_w, seed_ + int(lo * 3.0), 0.44, true)
 			if not on_door:
 				_border(b, horiz, a.z if horiz else a.x, lo + 0.5, hi - 0.5, ph, th, outw, seed_ + int(hi))
 			if st.get("lanterns", false):
@@ -1145,11 +1192,11 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			var ln2 := hi2 - lo2
 			var pc2 := Vector3(mid2, 0, a2.z) if horiz2 else Vector3(a2.x, 0, mid2)
 			var sz2 := Vector3(ln2, wall2, th) if horiz2 else Vector3(th, wall2, ln2)
-			up.box(pc2 + Vector3(0, floor_y + wall2 * 0.5, 0), sz2, wall)
+			_wall(up, horiz2, a2.z if horiz2 else a2.x, lo2, hi2, floor_y, wall2, th, wall, true, seed_ + 7 + int(lo2 * 3.0))
 			up.box(pc2 + Vector3(0, floor_y + 0.05, 0), sz2 * Vector3(1, 0, 1) + Vector3(0.06 if not horiz2 else 0.0, 0.14, 0.06 if horiz2 else 0.0), beam)
 			up.box(pc2 + Vector3(0, floor_y + wall2 - 0.1, 0), sz2 * Vector3(1, 0, 1) + Vector3(0.08 if not horiz2 else 0.0, 0.2, 0.08 if horiz2 else 0.0), beam)
 			var outw2 := (-1.0 if a2.z < cz else 1.0) if horiz2 else (-1.0 if a2.x < cx else 1.0)
-			_facade(up, up_g, horiz2, a2.z if horiz2 else a2.x, lo2, hi2, floor_y, wall2, th, outw2, column, beam, trim, wall, true, seed_ + 7 + int(lo2 * 3.0), 0.12)
+			_facade(up, up_g, horiz2, a2.z if horiz2 else a2.x, lo2, hi2, floor_y, wall2, th, outw2, column, beam, trim, wall, true, seed_ + 7 + int(lo2 * 3.0), 0.12, true)
 			for pnt2 in [a2, e2]:
 				up.cyl(pnt2 + Vector3(0, floor_y + wall2 * 0.5, 0), 0.2, wall2 + 0.1, column, Vector3.ZERO, 10)
 		var lup := Vector3(cx, floor_y + wall2 - 0.7, cz)

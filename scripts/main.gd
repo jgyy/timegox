@@ -922,6 +922,12 @@ func offer_carriage(e: Dictionary) -> void:
 			opts.append({"id": "coach:" + str(co.to), "label": "Take the post-coach to %s" % str(co.n), "note": "%d stones" % int(co.fare),
 				"desc": "The coach of the post leaves when it has a passenger. By the high road to %s: about %s hours, %d spirit stones (you have %d)." % [str(co.n), str(co.hours), int(co.fare), Game.stones],
 				"enabled": Game.stones >= int(co.fare)})
+	# (ships.gd: a passage by sea from a harbour to the others the journey has been to)
+	var ships: Array = Ships.offers(Game, office) if not world.is_floor() else []
+	for so in ships:
+		opts.append({"id": "ship:" + str(so.to), "label": "Take ship to %s" % str(so.n), "note": "%d stones" % int(so.fare),
+			"desc": "A junk of the coast trade, three masts and batten sails, lying at the quay with her lines singled up. To %s: %d leagues, about %s hours, %d spirit stones (you have %d)." % [str(so.n), int(so.leagues), str(so.hours), int(so.fare), Game.stones],
+			"col": UI.C_JADE, "enabled": Game.stones >= int(so.fare)})
 	for rid in Fashion.RIDE_ORDER:
 		var r: Dictionary = Fashion.RIDES[rid]
 		if str(r.get("at", "")) == office and not Game.rides.has(rid):
@@ -943,6 +949,21 @@ func offer_carriage(e: Dictionary) -> void:
 						world.teleport(at)
 						Feats.poll(Game)
 						Game.toast("The post-coach sets you down at %s" % str(co2.n))
+		elif oid.begins_with("ship:"):
+			for so2 in ships:
+				if "ship:" + str(so2.to) == oid and Ships.sail(Game, so2):
+					var lines: Array = []
+					for tl in Ships.tale(so2, Game.voyages - 1):
+						lines.append(["", str(tl)])
+					var q: Vector2i = Ships.quay(str(so2.to))
+					var to_layer := Data.layer_of(str(Ships.HARBOURS[str(so2.to)].area))
+					Game.riding = false
+					say(lines, func():
+						if q.x >= 0:
+							world.teleport(q, to_layer)
+						Feats.poll(Game)
+						Game.toast("The junk ties up at %s" % str(so2.n))
+					)
 		elif oid == "mail:read":
 			read_letter(str(Mail.waiting(Game)[0]), e)
 		elif oid == "mail:satchel":

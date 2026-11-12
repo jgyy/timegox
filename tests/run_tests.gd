@@ -1810,6 +1810,46 @@ func _fates_and_faces() -> void:
 	cg.stones = 0
 	check(Roads.ride_coach(cg, cof[1]).x < 0, "nobody rides the coach on credit")
 	cg.free()
+	# the sea lanes (ships.gd): two lands, harbours, and a passage between them
+	for hid9 in Ships.ORDER:
+		var hb: Dictionary = Ships.HARBOURS[hid9]
+		check(Mail.is_post(str(hb.office)) and Data.AREAS.has(str(hb.area)) and str(Offices.OFFICES[str(hb.office)].area) == str(hb.area), "the harbour %s has a counter in its own town" % hid9)
+		check(Ships.quay(hid9).x >= 0, "the harbour %s has a quay" % hid9)
+		for hid8 in Ships.ORDER:
+			check(hid8 == hid9 or Ships.leagues(hid9, hid8) > 0, "it is known how far %s is from %s" % [hid9, hid8])
+	check(Data.layer_of(str(Ships.HARBOURS.landfall.area)) != Data.layer_of(str(Ships.HARBOURS.longmen.area)), "the harbours are in two lands")
+	var vg = load("res://scripts/game.gd").new()
+	vg.reset()
+	vg.level = 40
+	vg.stones = 2000
+	check(Ships.offers(vg, "harbour_longmen").is_empty(), "no ship goes where the journey has not been")
+	vg.seen["longmen"] = true
+	vg.seen["yanggu"] = true
+	vg.seen["penglai"] = true
+	var vo: Array = Ships.offers(vg, "harbour_longmen")
+	check(vo.size() == 1 and str(vo[0].to) == "yanggu" and str(vo[0].kind) == "river", "before the sea is opened the junk goes down the river to Yanggu and no further")
+	check(Ships.offers(vg, "reeve_landfall").is_empty() and Ships.offers(vg, "head_qingshi").is_empty(), "no ship from the Isles before then, and none from a village in the hills")
+	vg.step = Data.step_index("s_p12_shore") + 1
+	vo = Ships.offers(vg, "harbour_longmen")
+	check(vo.size() == 2 and str(vo[1].to) == "landfall" and str(vo[1].kind) == "open" and int(vo[1].fare) > int(vo[0].fare), "once it is, she goes out to Landfall, for more")
+	check(Ships.tale(vo[1], 0).size() == 2 and Ships.tale(vo[0], 3).size() == 1, "the river and then the open sea are told of")
+	var vfont := ThemeDB.fallback_font
+	for tk9 in Ships.TALES:
+		for tl9 in Ships.TALES[tk9]:
+			var vp := TextParagraph.new()
+			vp.add_string(str(tl9), vfont, 22)
+			vp.width = 1100
+			check(vp.get_line_count() <= 4, "a tale of the %s fits the dialogue box" % tk9)
+	var vs0: int = vg.stones
+	var vc0: float = vg.clock
+	check(Ships.sail(vg, vo[1]) and vg.stones == vs0 - int(vo[1].fare) and vg.voyages == 1 and vg.clock != vc0, "the passage is paid for and takes its days")
+	vg.stones = 0
+	check(not Ships.sail(vg, vo[0]), "nobody sails on credit")
+	check(Ships.offers(vg, "reeve_landfall").size() == 2, "and from Landfall she sails home to either harbour")
+	vg.free()
+	var jn := Models.junk()
+	check(jn.get_child_count() == 2, "the junk is built from code")
+	jn.free()
 	check(Assets.has(Assets.MOUNTS.horse), "the horse is Blender-built")
 	var horse := Assets.mount("horse")
 	var hap2: AnimationPlayer = horse.get_meta("ap", null)
