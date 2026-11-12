@@ -620,113 +620,304 @@ static func ride(id: String) -> Node3D:
 			_carriage(root, str(r.model))
 	return root
 
-## A carriage (the Lost Horse release): the body, wheels that turn (meta "wheels"), shafts, and what
-## draws it: an ox built here for the cart, the Blender horse for the wagon and the post-carriage.
+## A carriage (the Lost Horse release): a body big enough to sit four or six in, spoked wheels that turn
+## (meta "wheels"), shafts or a pole, and what draws it: an ox built here for the cart, a pair of the
+## Blender horse for the wagon and the post-carriage (meta "anims").
 static func _carriage(root: Node3D, kind: String) -> void:
 	var b := MB.new()
 	var g := MB.new()
-	var wood := MB.tag(Color("7a5a38"), MB.WOOD)
-	var wood_d := MB.tag(Color("4a3626"), MB.WOOD)
-	var wood_p := MB.tag(Color("b89868"), MB.WOOD)
-	var iron := MB.tag(Color("4a4a52"), MB.METAL)
+	var wood := MB.tag(Color("8a6238"), MB.WOOD)
+	var wood_d := MB.tag(Color("4e3422"), MB.WOOD)
+	var wood_p := MB.tag(Color("a08660"), MB.WOOD)
+	var iron := MB.tag(Color("3c3c44"), MB.METAL)
+	var gilt := MB.tag(Color("b8985a"), MB.METAL)
+	var rope := MB.tag(Color("b8a070"), MB.CLOTH)
 	var wheels: Array = []
-	var axles: Array = []      # [z, radius]
-	var half_w := 0.72
+	var axles: Array = []      # [z, radius, half the track]
+	var team: Array = []       # [x, z, coat]
 	match kind:
 		"ox_cart":
-			axles = [[0.0, 0.62]]
-			b.box(Vector3(0, 0.78, 0.0), Vector3(1.2, 0.08, 2.0), wood)
+			axles = [[-0.15, 0.82, 1.0]]
+			# the bed: planks on two long beams that run on forward as the shafts
+			b.box(Vector3(0, 0.98, -0.15), Vector3(1.6, 0.08, 2.9), wood)
+			for k in 6:
+				b.box(Vector3(-0.66 + k * 0.265, 1.025, -0.15), Vector3(0.24, 0.02, 2.86), wood_p if k % 2 == 0 else wood)
 			for s in [-1.0, 1.0]:
-				b.box(Vector3(s * 0.6, 1.0, -0.1), Vector3(0.05, 0.4, 1.8), wood_d)
-				for k in 5:
-					b.box(Vector3(s * 0.6, 1.0, -0.9 + k * 0.42), Vector3(0.07, 0.44, 0.06), wood_p)
-				b.limb(Vector3(s * 0.42, 0.76, 0.9), Vector3(s * 0.42, 0.9, 3.1), 0.045, 0.035, wood_d, 5)
-			b.box(Vector3(0, 1.0, -1.0), Vector3(1.2, 0.4, 0.05), wood_d)
-			b.box(Vector3(0, 1.24, 0.55), Vector3(1.1, 0.07, 0.34), wood_p)
-			for s9 in [-1.0, 1.0]:
-				for bz in [0.55, -0.45]:
-					b.box(Vector3(s9 * 0.5, 1.02, bz), Vector3(0.06, 0.4, 0.3), wood_d)
-			b.box(Vector3(0, 1.24, -0.45), Vector3(1.1, 0.07, 0.34), wood_p)
-			b.limb(Vector3(-0.5, 0.92, 3.05), Vector3(0.5, 0.92, 3.05), 0.05, 0.05, wood_d, 5)
-			for k2 in 3:
-				b.sph(Vector3(-0.25 + k2 * 0.25, 0.92, -0.82), Vector3(0.12, 0.1, 0.12), MB.tag(Color("d8c8e0"), MB.FOLIAGE), Vector3.ZERO, true)
-			# the ox
-			var ox := MB.tag(Color("9a7450"), MB.HAIR)
-			b.sph(Vector3(0, 1.0, 2.2), Vector3(0.42, 0.42, 0.8), ox, Vector3.ZERO, true)
-			b.sph(Vector3(0, 1.12, 3.05), Vector3(0.22, 0.22, 0.3), ox, Vector3.ZERO, true)
-			b.sph(Vector3(0, 1.34, 2.7), Vector3(0.28, 0.24, 0.3), ox, Vector3.ZERO, true)
-			for s2 in [-1.0, 1.0]:
-				b.limb(Vector3(s2 * 0.14, 1.28, 3.1), Vector3(s2 * 0.42, 1.5, 3.2), 0.045, 0.015, MB.tag(Color("e8e0c8"), MB.STONE), 5)
-				for lz in [1.7, 2.7]:
-					b.limb(Vector3(s2 * 0.26, 0.75, lz), Vector3(s2 * 0.26, 0.0, lz), 0.1, 0.07, ox, 6)
-			b.ribbon([Vector3(0, 1.15, 1.42), Vector3(0, 0.8, 1.3), Vector3(0, 0.45, 1.34)], [0.04, 0.05, 0.08], Vector3(1, 0, 0), MB.tag(Color("2a1c14"), MB.HAIR))
+				b.limb(Vector3(s * 0.62, 0.9, -1.65), Vector3(s * 0.62, 0.9, 1.3), 0.07, 0.07, wood_d, 6)
+				b.limb(Vector3(s * 0.62, 0.9, 1.3), Vector3(s * 0.5, 1.42, 3.95), 0.065, 0.045, wood_d, 6)
+				# the sides: posts, two rails and a woven panel between them
+				for k2 in 7:
+					var pz := -1.55 + k2 * 0.46
+					b.limb(Vector3(s * 0.78, 1.0, pz), Vector3(s * 0.8, 1.72, pz), 0.035, 0.03, wood_d, 5)
+				b.limb(Vector3(s * 0.8, 1.72, -1.6), Vector3(s * 0.8, 1.72, 1.26), 0.04, 0.04, wood, 6)
+				b.limb(Vector3(s * 0.79, 1.36, -1.6), Vector3(s * 0.79, 1.36, 1.26), 0.03, 0.03, wood, 6)
+				b.box(Vector3(s * 0.785, 1.19, -0.15), Vector3(0.025, 0.3, 2.8), MB.tag(Color("a89a78"), MB.CLOTH))
+				# a guard bowed over each wheel
+				for k3 in 8:
+					var a0 := PI * k3 / 8.0
+					var a1 := PI * (k3 + 1) / 8.0
+					b.limb(Vector3(s * 0.98, 0.9 + sin(a0) * 0.86, -0.15 + cos(a0) * 0.95), Vector3(s * 0.98, 0.9 + sin(a1) * 0.86, -0.15 + cos(a1) * 0.95), 0.03, 0.03, wood_d, 5)
+				# four poles of bamboo for the awning
+				for pz2 in [1.2, -1.55]:
+					b.limb(Vector3(s * 0.8, 1.0, pz2), Vector3(s * 0.8, 2.82, pz2), 0.04, 0.035, MB.tag(Color("8a8a5a"), MB.WOOD), 6)
+			b.box(Vector3(0, 1.36, -1.62), Vector3(1.6, 0.74, 0.05), wood)
+			# two benches with backs
+			for bz in [0.7, -0.5]:
+				b.box(Vector3(0, 1.44, bz), Vector3(1.5, 0.07, 0.42), wood_p)
+				b.box(Vector3(0, 1.24, bz - 0.1), Vector3(1.4, 0.36, 0.06), wood_d)
+				b.box(Vector3(0, 1.74, bz - 0.24), Vector3(1.5, 0.3, 0.05), wood)
+				b.box(Vector3(0, 1.49, bz), Vector3(1.3, 0.04, 0.34), MB.tag(Color("a83c30"), MB.CLOTH))
+			# the awning: a bowed mat of straw with a red hem
+			_canopy(b, Vector3(0, 2.8, -0.18), 0.98, 1.6, 0.22, 0.0, MB.tag(Color("b8aa88"), MB.CLOTH), MB.tag(Color("a09472"), MB.CLOTH), MB.tag(Color("8a3228"), MB.CLOTH))
+			# what is going to market: sacks, a basket of turnips, a jar
+			b.sph(Vector3(-0.4, 1.22, -1.25), Vector3(0.24, 0.2, 0.2), MB.tag(Color("c0a878"), MB.CLOTH))
+			b.sph(Vector3(-0.1, 1.2, -1.3), Vector3(0.22, 0.18, 0.2), MB.tag(Color("b09868"), MB.CLOTH))
+			b.sph(Vector3(-0.28, 1.5, -1.28), Vector3(0.22, 0.16, 0.18), MB.tag(Color("c8b080"), MB.CLOTH))
+			b.lathe(Vector3(0.42, 1.02, -1.25), [Vector2(0.16, 0.0), Vector2(0.24, 0.16), Vector2(0.26, 0.34), Vector2(0.24, 0.36)], MB.tag(Color("a88848"), MB.WOOD), 10)
+			for k4 in 5:
+				b.sph(Vector3(0.42 + cos(k4 * 1.3) * 0.11, 1.4, -1.25 + sin(k4 * 1.3) * 0.11), Vector3(0.07, 0.06, 0.07), MB.tag(Color("e8e0f0"), MB.FOLIAGE))
+				b.cone(Vector3(0.42 + cos(k4 * 1.3) * 0.11, 1.5, -1.25 + sin(k4 * 1.3) * 0.11), 0.04, 0.12, MB.tag(Color("5a9a48"), MB.FOLIAGE))
+			# a lantern on a crook at the front
+			b.limb(Vector3(0.8, 2.5, 1.2), Vector3(0.8, 2.5, 1.5), 0.02, 0.02, wood_d, 4)
+			_lantern(b, g, Vector3(0.8, 2.26, 1.5), 0.13, Color("d84a30"))
+			# the yoke, and the ox under it
+			b.limb(Vector3(-0.58, 1.46, 3.9), Vector3(0.58, 1.46, 3.9), 0.06, 0.06, wood_d, 6)
+			b.sph(Vector3(0, 1.5, 3.9), Vector3(0.2, 0.09, 0.09), wood_d)
+			_ox(b, 3.0)
 		"wagon":
-			axles = [[0.95, 0.5], [-0.85, 0.56]]
-			half_w = 0.8
-			b.box(Vector3(0, 0.82, 0.0), Vector3(1.4, 0.1, 2.9), wood)
+			axles = [[1.35, 0.66, 1.1], [-1.25, 0.84, 1.1]]
+			team = [[-0.48, 3.75, Color("8a5a36")], [0.48, 3.75, Color("b08a5a")]]
+			var felt := MB.tag(Color("a23a2e"), MB.CLOTH)
+			var felt_d := MB.tag(Color("903228"), MB.CLOTH)
+			var band := MB.tag(Color("cfc4a8"), MB.CLOTH)
+			# the bed and its panelled box
+			b.box(Vector3(0, 1.02, 0.0), Vector3(1.9, 0.1, 4.2), wood_d)
+			b.box(Vector3(0, 1.075, 0.0), Vector3(1.8, 0.02, 4.1), wood)
+			for s2 in [-1.0, 1.0]:
+				b.box(Vector3(s2 * 0.93, 1.42, -0.35), Vector3(0.06, 0.7, 3.4), wood)
+				b.box(Vector3(s2 * 0.96, 1.76, -0.35), Vector3(0.08, 0.07, 3.46), wood_d)
+				b.box(Vector3(s2 * 0.96, 1.1, -0.35), Vector3(0.08, 0.07, 3.46), wood_d)
+				for k5 in 6:
+					b.box(Vector3(s2 * 0.965, 1.42, -2.0 + k5 * 0.66), Vector3(0.05, 0.7, 0.09), wood_d)
+				# water-skins and a barrel slung along the side, as on the sand road
+				for k6 in 3:
+					b.sph(Vector3(s2 * 1.04, 1.36, -1.3 + k6 * 0.66), Vector3(0.11, 0.2, 0.15), MB.tag(Color("7a5a3a"), MB.CLOTH))
+					b.limb(Vector3(s2 * 1.0, 1.72, -1.3 + k6 * 0.66), Vector3(s2 * 1.04, 1.52, -1.3 + k6 * 0.66), 0.012, 0.012, rope, 4)
+				b.lathe(Vector3(s2 * 1.13, 1.1, 0.72), [Vector2(0.13, 0.0), Vector2(0.18, 0.14), Vector2(0.18, 0.34), Vector2(0.13, 0.48)], wood, 10)
+				b.torus(Vector3(s2 * 1.13, 1.24, 0.72), 0.18, 0.012, iron)
+				b.torus(Vector3(s2 * 1.13, 1.44, 0.72), 0.18, 0.012, iron)
+				# a lantern on a pole at each front corner
+				b.limb(Vector3(s2 * 0.93, 1.08, 1.98), Vector3(s2 * 0.93, 2.75, 1.98), 0.03, 0.025, wood_d, 5)
+				b.limb(Vector3(s2 * 0.93, 2.72, 1.98), Vector3(s2 * 0.93, 2.72, 2.22), 0.018, 0.018, wood_d, 4)
+				_lantern(b, g, Vector3(s2 * 0.93, 2.48, 2.22), 0.13, Color("e8a040"))
+			b.box(Vector3(0, 1.42, -2.06), Vector3(1.9, 0.7, 0.06), wood)
+			b.box(Vector3(0, 1.3, 2.06), Vector3(1.9, 0.5, 0.06), wood)
+			b.box(Vector3(0, 0.95, 2.42), Vector3(1.5, 0.06, 0.7), wood_d)
+			# three benches: the driver's in the open, two under the tilt
+			for bz2 in [1.5, 0.3, -0.9]:
+				b.box(Vector3(0, 1.5, bz2), Vector3(1.7, 0.07, 0.44), wood_p)
+				b.box(Vector3(0, 1.3, bz2 - 0.12), Vector3(1.6, 0.36, 0.06), wood_d)
+				b.box(Vector3(0, 1.55, bz2), Vector3(1.5, 0.04, 0.36), MB.tag(Color("3a6a8a"), MB.CLOTH))
+			b.box(Vector3(0, 1.82, 1.26), Vector3(1.7, 0.34, 0.05), wood)
+			# the tilt: hoops of bent willow and red felt over them, banded in ochre at both ends
+			var z0 := 0.86
+			var z1 := -2.05
+			var seg := 12
+			for k7 in seg:
+				var a2 := PI * k7 / float(seg)
+				var a3 := PI * (k7 + 1) / float(seg)
+				var p0 := Vector3(cos(a2) * 0.99, 1.78 + sin(a2) * 1.2, 0.0)
+				var p1 := Vector3(cos(a3) * 0.99, 1.78 + sin(a3) * 1.2, 0.0)
+				var fc := felt if k7 % 2 == 0 else felt_d
+				b.quad4(p0 + Vector3(0, 0, z0 - 0.22), p1 + Vector3(0, 0, z0 - 0.22), p1 + Vector3(0, 0, z1 + 0.22), p0 + Vector3(0, 0, z1 + 0.22), fc, fc, fc, fc)
+				b.quad4(p0 + Vector3(0, 0, z0), p1 + Vector3(0, 0, z0), p1 + Vector3(0, 0, z0 - 0.22), p0 + Vector3(0, 0, z0 - 0.22), band, band, band, band)
+				b.quad4(p0 + Vector3(0, 0, z1 + 0.22), p1 + Vector3(0, 0, z1 + 0.22), p1 + Vector3(0, 0, z1), p0 + Vector3(0, 0, z1), band, band, band, band)
+				for hz in [z0, (z0 + z1) * 0.5, z1]:
+					b.limb(p0 * Vector3(1.01, 1.0, 1.0) + Vector3(0, 0.01, hz), p1 * Vector3(1.01, 1.0, 1.0) + Vector3(0, 0.01, hz), 0.028, 0.028, wood_p, 5)
+			# the back of the tilt is laced half shut, and a spare wheel is lashed under it
 			for s3 in [-1.0, 1.0]:
-				b.box(Vector3(s3 * 0.7, 1.2, -0.2), Vector3(0.06, 0.76, 2.4), wood_d)
-				b.box(Vector3(s3 * 0.79, 1.72, -0.275), Vector3(0.02, 0.3, 1.75), MB.tag(Color("8a2a20"), MB.CLOTH))
-				for k3 in 3:
-					b.sph(Vector3(s3 * 0.78, 0.95, -0.9 + k3 * 0.7), Vector3(0.12, 0.2, 0.14), MB.tag(Color("8a6a4a"), MB.CLOTH), Vector3.ZERO, true)
-				b.limb(Vector3(s3 * 0.4, 0.8, 1.4), Vector3(s3 * 0.4, 0.95, 3.4), 0.045, 0.035, wood_d, 5)
-			b.box(Vector3(0, 1.3, 1.0), Vector3(1.3, 0.07, 0.36), wood_p)
-			for bz2 in [1.0, 0.1, -0.75]:
-				b.box(Vector3(0, 1.08, bz2), Vector3(1.2, 0.4, 0.08), wood_d)
-			b.box(Vector3(0, 1.3, 0.1), Vector3(1.3, 0.07, 0.36), wood_p)
-			b.box(Vector3(0, 1.3, -0.75), Vector3(1.3, 0.07, 0.36), wood_p)
-			# the hooped tilt of red felt over the two benches behind
-			for k4 in 4:
-				var hzp := 0.55 - k4 * 0.55
-				b.arc(Vector3(0, 1.85, hzp), 0.78, 0.05, 0.0, PI, wood_p, 10, Vector3(PI * 0.5, 0, 0))
-			for k5 in 7:
-				var a0 := PI * k5 / 7.0
-				var a1 := PI * (k5 + 1) / 7.0
-				b.quad4(Vector3(cos(a0) * 0.8, 1.85 + sin(a0) * 0.8, 0.6), Vector3(cos(a1) * 0.8, 1.85 + sin(a1) * 0.8, 0.6), Vector3(cos(a1) * 0.8, 1.85 + sin(a1) * 0.8, -1.15), Vector3(cos(a0) * 0.8, 1.85 + sin(a0) * 0.8, -1.15),
-					MB.tag(Color("b03a2a"), MB.CLOTH), MB.tag(Color("b03a2a"), MB.CLOTH), MB.tag(Color("8a2a20"), MB.CLOTH), MB.tag(Color("8a2a20"), MB.CLOTH))
+				b.quad4(Vector3(s3 * 0.98, 1.78, z1), Vector3(s3 * 0.3, 1.78, z1), Vector3(s3 * 0.22, 2.9, z1), Vector3(s3 * 0.7, 2.62, z1), felt_d, felt_d, felt_d, felt_d)
+			_wheel_mb(b, 0.5, 10, wood_d, wood_p, iron, Vector3(0, 1.4, -2.14), true)
+			# a row of little brass bells along the dash
+			for k8 in 7:
+				g.ball(Vector3(-0.72 + k8 * 0.24, 1.5, 2.1), 0.035, Color(0.95, 0.75, 0.3, 0.6), true)
+			# the pole between the pair
+			b.limb(Vector3(0, 0.95, 2.1), Vector3(0, 1.05, 5.0), 0.06, 0.045, wood_d, 6)
+			b.limb(Vector3(-0.95, 1.18, 4.5), Vector3(0.95, 1.18, 4.5), 0.045, 0.045, wood_d, 6)
 		_:
-			axles = [[0.85, 0.46], [-0.8, 0.56]]
-			half_w = 0.74
-			var lac := MB.tag(Color("5a2420"), MB.WOOD)
-			var gilt := MB.tag(Color("c8a050"), MB.METAL)
-			b.box(Vector3(0, 0.72, 0.0), Vector3(1.2, 0.1, 2.5), wood_d)
-			b.box(Vector3(0, 1.5, -0.3), Vector3(1.3, 1.5, 1.5), lac)
-			b.box(Vector3(0, 2.3, -0.3), Vector3(1.5, 0.1, 1.8), MB.tag(Color("2a3a5a"), MB.CLOTH))
+			axles = [[1.15, 0.62, 0.98], [-1.05, 0.84, 0.98]]
+			team = [[-0.46, 3.55, Color("26262c")], [0.46, 3.55, Color("e8e2d8")]]
+			var lac := MB.tag(Color("7a1f1c"), MB.WOOD)
+			var lac_d := MB.tag(Color("2a1a1c"), MB.WOOD)
+			var silk := MB.tag(Color("3f5f96"), MB.CLOTH)
+			# the frame, hung on two long springs of leather
+			b.box(Vector3(0, 0.98, 0.1), Vector3(1.5, 0.1, 3.9), lac_d)
 			for s4 in [-1.0, 1.0]:
-				b.box(Vector3(s4 * 0.66, 1.65, -0.3), Vector3(0.02, 0.6, 0.7), MB.tag(Color("3a5a9a"), MB.CLOTH))
-				b.limb(Vector3(s4 * 0.38, 0.72, 1.2), Vector3(s4 * 0.38, 0.95, 3.3), 0.04, 0.03, wood_d, 5)
-				for cz in [0.45, -1.05]:
-					g.ball(Vector3(s4 * 0.72, 2.42, cz), 0.09, Color(1.0, 0.75, 0.4, 0.8), true)
-					b.limb(Vector3(s4 * 0.72, 2.34, cz), Vector3(s4 * 0.72, 2.56, cz), 0.015, 0.015, iron, 4)
-			b.box(Vector3(0, 1.34, 0.95), Vector3(1.1, 0.08, 0.4), wood_p)
-			b.box(Vector3(0, 0.88, 1.3), Vector3(1.0, 0.06, 0.5), wood_d)
-			b.box(Vector3(0, 2.22, -0.3), Vector3(1.34, 0.06, 1.54), gilt)
-			b.box(Vector3(0, 0.8, -0.3), Vector3(1.34, 0.06, 1.54), gilt)
-			b.box(Vector3(0, 0.95, 0.75), Vector3(1.1, 0.5, 0.1), lac)
+				b.limb(Vector3(s4 * 0.8, 1.0, -1.75), Vector3(s4 * 0.8, 0.86, 0.0), 0.04, 0.04, MB.tag(Color("5a3a26"), MB.CLOTH), 5)
+				b.limb(Vector3(s4 * 0.8, 0.86, 0.0), Vector3(s4 * 0.8, 1.0, 1.75), 0.04, 0.04, MB.tag(Color("5a3a26"), MB.CLOTH), 5)
+			# the body: a floor, four posts, a panelled lower wall and an open window band with a lattice
+			var bz0 := -1.55
+			var bz1 := 0.75
+			var bx := 0.86
+			b.box(Vector3(0, 1.06, (bz0 + bz1) * 0.5), Vector3(bx * 2.0, 0.08, bz1 - bz0), lac_d)
+			for s5 in [-1.0, 1.0]:
+				for pz3 in [bz0, bz1]:
+					b.box(Vector3(s5 * bx, 1.9, pz3), Vector3(0.1, 1.7, 0.1), lac_d)
+					b.sph(Vector3(s5 * bx, 1.12, pz3), Vector3(0.07, 0.07, 0.07), gilt)
+				# lower wall: three red panels framed in black, a gilt boss on each
+				b.box(Vector3(s5 * bx, 1.45, (bz0 + bz1) * 0.5), Vector3(0.05, 0.7, bz1 - bz0), lac)
+				b.box(Vector3(s5 * (bx + 0.01), 1.8, (bz0 + bz1) * 0.5), Vector3(0.07, 0.06, bz1 - bz0), gilt)
+				b.box(Vector3(s5 * (bx + 0.01), 1.1, (bz0 + bz1) * 0.5), Vector3(0.07, 0.06, bz1 - bz0), lac_d)
+				for k9 in 4:
+					b.box(Vector3(s5 * (bx + 0.01), 1.45, bz0 + k9 * (bz1 - bz0) / 3.0), Vector3(0.07, 0.7, 0.06), lac_d)
+				for k10 in 3:
+					b.sph(Vector3(s5 * (bx + 0.035), 1.45, bz0 + (k10 + 0.5) * (bz1 - bz0) / 3.0), Vector3(0.02, 0.09, 0.09), gilt)
+				# the window: a lattice of thin bars, and a blue curtain drawn half across
+				b.box(Vector3(s5 * bx, 2.7, (bz0 + bz1) * 0.5), Vector3(0.07, 0.1, bz1 - bz0), lac_d)
+				for k11 in 5:
+					b.box(Vector3(s5 * bx, 2.25, bz0 + (k11 + 1) * (bz1 - bz0) / 6.0), Vector3(0.03, 0.84, 0.03), lac_d)
+				b.box(Vector3(s5 * bx, 2.42, (bz0 + bz1) * 0.5), Vector3(0.03, 0.03, bz1 - bz0), lac_d)
+				b.box(Vector3(s5 * (bx - 0.03), 2.25, bz0 + 0.42), Vector3(0.02, 0.82, 0.7), silk)
+				b.box(Vector3(s5 * (bx - 0.03), 2.6, (bz0 + bz1) * 0.5), Vector3(0.025, 0.14, bz1 - bz0 - 0.1), MB.tag(Color("b8985a"), MB.CLOTH))
+				# a step to climb in by, and a lantern hung from each corner of the eaves
+				b.box(Vector3(s5 * (bx + 0.2), 0.72, -0.2), Vector3(0.3, 0.05, 0.5), lac_d)
+				b.limb(Vector3(s5 * (bx + 0.05), 0.98, -0.2), Vector3(s5 * (bx + 0.2), 0.72, -0.2), 0.02, 0.02, iron, 4)
+				for cz in [bz1 + 0.3, bz0 - 0.3]:
+					_lantern(b, g, Vector3(s5 * (bx + 0.28), 2.5, cz), 0.12, Color("e8a040"))
+					b.limb(Vector3(s5 * (bx + 0.28), 2.66, cz), Vector3(s5 * (bx + 0.28), 2.86, cz), 0.008, 0.008, iron, 4)
+			b.box(Vector3(0, 1.9, bz0), Vector3(bx * 2.0, 1.6, 0.05), lac)
+			b.box(Vector3(0, 1.45, bz1), Vector3(bx * 2.0, 0.7, 0.05), lac)
+			b.box(Vector3(0, 2.7, bz1), Vector3(bx * 2.0, 0.1, 0.07), lac_d)
+			b.sph(Vector3(0, 1.95, bz0 - 0.03), Vector3(0.3, 0.3, 0.02), gilt)
+			b.sph(Vector3(0, 1.95, bz0 - 0.045), Vector3(0.2, 0.2, 0.02), lac)
+			# the bench inside, cushioned
+			b.box(Vector3(0, 1.5, -0.95), Vector3(bx * 2.0 - 0.1, 0.08, 0.5), wood_p)
+			b.box(Vector3(0, 1.3, -1.05), Vector3(bx * 2.0 - 0.1, 0.4, 0.06), lac_d)
+			b.box(Vector3(0, 1.56, -0.95), Vector3(bx * 2.0 - 0.2, 0.05, 0.42), silk)
+			# the roof: bowed, wide in the eaves and turned up at the corners, a gilt ridge and a finial
+			_canopy(b, Vector3(0, 2.78, (bz0 + bz1) * 0.5), bx + 0.36, (bz1 - bz0) * 0.5 + 0.42, 0.6, 0.26, MB.tag(Color("4a7484"), MB.STONE), MB.tag(Color("3e6676"), MB.STONE), MB.tag(Color("2a4a58"), MB.STONE))
+			b.limb(Vector3(0, 3.4, bz0 - 0.2), Vector3(0, 3.4, bz1 + 0.2), 0.05, 0.05, gilt, 6)
+			b.lathe(Vector3(0, 3.42, (bz0 + bz1) * 0.5), [Vector2(0.1, 0.0), Vector2(0.14, 0.08), Vector2(0.05, 0.16), Vector2(0.09, 0.24), Vector2(0.0, 0.36)], gilt, 10)
+			for s6 in [-1.0, 1.0]:
+				for cz2 in [bz1 + 0.4, bz0 - 0.4]:
+					# a red tassel under each corner
+					b.limb(Vector3(s6 * (bx + 0.34), 2.92, cz2), Vector3(s6 * (bx + 0.34), 2.74, cz2), 0.012, 0.012, gilt, 4)
+					b.cone(Vector3(s6 * (bx + 0.34), 2.64, cz2), 0.05, 0.2, MB.tag(Color("c8322a"), MB.CLOTH))
+			# the driver's box: a high seat, a footboard and a dash
+			b.box(Vector3(0, 1.66, 1.3), Vector3(1.5, 0.08, 0.5), wood_p)
+			b.box(Vector3(0, 1.72, 1.3), Vector3(1.4, 0.05, 0.42), silk)
+			b.box(Vector3(0, 1.36, 1.12), Vector3(1.5, 0.6, 0.12), lac)
+			b.box(Vector3(0, 1.22, 1.72), Vector3(1.4, 0.06, 0.56), lac_d)
+			b.box(Vector3(0, 1.45, 2.0), Vector3(1.4, 0.5, 0.05), lac, Vector3(-0.3, 0, 0))
+			for s7 in [-1.0, 1.0]:
+				b.limb(Vector3(s7 * 0.74, 1.7, 1.08), Vector3(s7 * 0.74, 2.0, 1.08), 0.02, 0.02, gilt, 4)
+				b.limb(Vector3(s7 * 0.74, 2.0, 1.08), Vector3(s7 * 0.74, 2.0, 1.5), 0.02, 0.02, gilt, 4)
+			# the boot: two trunks strapped on behind, and the blue pennon of the post
+			b.box(Vector3(0, 1.08, -1.95), Vector3(1.4, 0.06, 0.7), lac_d)
+			b.box(Vector3(-0.3, 1.33, -1.95), Vector3(0.7, 0.44, 0.5), MB.tag(Color("6a4a30"), MB.WOOD))
+			b.box(Vector3(0.36, 1.26, -1.95), Vector3(0.5, 0.3, 0.46), MB.tag(Color("3a4a3a"), MB.WOOD))
+			b.box(Vector3(-0.3, 1.33, -1.95), Vector3(0.72, 0.05, 0.52), iron)
+			b.limb(Vector3(0.8, 1.0, -1.7), Vector3(0.8, 3.75, -1.7), 0.025, 0.02, wood_d, 5)
+			b.ribbon([Vector3(0.8, 3.6, -1.72), Vector3(0.8, 3.56, -2.1), Vector3(0.8, 3.62, -2.45), Vector3(0.8, 3.55, -2.75)], [0.3, 0.28, 0.22, 0.04], Vector3(0, 1, 0), silk)
+			# the pole between the pair
+			b.limb(Vector3(0, 0.95, 2.0), Vector3(0, 1.05, 4.8), 0.055, 0.04, lac_d, 6)
+			b.limb(Vector3(-0.92, 1.18, 4.3), Vector3(0.92, 1.18, 4.3), 0.04, 0.04, lac_d, 6)
 	_mi(root, b)
 	if not g.is_empty():
 		_mi(root, g, MB.mat_glow()).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for ax in axles:
+		var wr := float(ax[1])
+		var hw := float(ax[2])
 		b = MB.new()
-		b.limb(Vector3(-half_w, float(ax[1]), float(ax[0])), Vector3(half_w, float(ax[1]), float(ax[0])), 0.05, 0.05, iron, 5)
+		b.limb(Vector3(-hw, wr, float(ax[0])), Vector3(hw, wr, float(ax[0])), 0.06, 0.06, iron, 6)
 		_mi(root, b)
-		for s5 in [-1.0, 1.0]:
+		for s8 in [-1.0, 1.0]:
 			var wb := MB.new()
-			var wr := float(ax[1])
-			wb.torus(Vector3.ZERO, wr, 0.05, wood_d, Vector3(0, 0, PI * 0.5), true)
-			for k6 in 6:
-				var a6 := PI * k6 / 6.0
-				wb.limb(Vector3(0, -cos(a6) * wr * 0.92, -sin(a6) * wr * 0.92), Vector3(0, cos(a6) * wr * 0.92, sin(a6) * wr * 0.92), 0.022, 0.022, wood, 4)
-			wb.sph(Vector3.ZERO, Vector3(0.09, 0.1, 0.1), iron, Vector3.ZERO, true)
-			var wn := _mi(root, wb, null, Vector3(s5 * (half_w + 0.02), wr, float(ax[0])))
+			_wheel_mb(wb, wr, 12 if wr > 0.7 else 10, wood_d, wood_p, iron, Vector3.ZERO, false)
+			var wn := _mi(root, wb, null, Vector3(s8 * hw, wr, float(ax[0])))
 			wn.set_meta("r", wr)
 			wheels.append(wn)
 	root.set_meta("wheels", wheels)
-	if kind != "ox_cart" and Assets.has(Assets.MOUNTS.horse):
-		var hm := Assets.mount("horse", Assets.palette(Color("5a3a26") if kind == "wagon" else Color("2a2a30"), "", {"sec": Color("1c1612"), "acc": Color("b83a30"), "mark": Color("3a2a1a")}))
-		hm.position = Vector3(0, 0, 2.5 if kind == "wagon" else 2.4)
-		root.add_child(hm)
-		root.set_meta("anim", hm)
+	var anims: Array = []
+	if Assets.has(Assets.MOUNTS.horse):
+		for tm in team:
+			var coat: Color = tm[2]
+			var hm := Assets.mount("horse", Assets.palette(coat, "", {"sec": coat.darkened(0.55), "acc": Color("b83a30") if kind == "wagon" else Color("2f5aa8"), "mark": coat.darkened(0.3)}))
+			hm.position = Vector3(float(tm[0]), 0, float(tm[1]))
+			root.add_child(hm)
+			anims.append(hm)
+	root.set_meta("anims", anims)
+
+## A wheel in the plane of YZ about `at`: a felloe of wood shod with an iron tyre, spokes and a hub with a
+## brass cap (`flat`: lashed against a tailboard, in the plane of XY).
+static func _wheel_mb(wb: MB, wr: float, spokes: int, dark: Color, pale: Color, iron: Color, at: Vector3, flat: bool) -> void:
+	var rot := Vector3(PI * 0.5, 0, 0) if flat else Vector3(0, 0, PI * 0.5)
+	wb.torus(at, wr - 0.05, 0.05, dark, rot, true)
+	wb.torus(at, wr, 0.016, iron, rot, true)
+	for k in spokes:
+		var a := TAU * k / float(spokes)
+		var d := Vector3(cos(a), sin(a), 0) if flat else Vector3(0, cos(a), sin(a))
+		wb.limb(at + d * 0.1, at + d * (wr - 0.07), 0.034, 0.024, pale, 5)
+	var ax := Vector3(0, 0, 1) if flat else Vector3(1, 0, 0)
+	wb.limb(at - ax * 0.13, at + ax * 0.13, 0.13, 0.11, dark, 8)
+	wb.limb(at + ax * 0.13, at + ax * 0.2, 0.07, 0.05, MB.tag(Color("b8985a"), MB.METAL), 6)
+	wb.limb(at - ax * 0.13, at - ax * 0.2, 0.07, 0.05, MB.tag(Color("b8985a"), MB.METAL), 6)
+
+## A bowed roof over `c` (half-widths `hx`, `hz`; `rise` in the middle, `curl` up at the four corners),
+## with a hem of another colour all round.
+static func _canopy(b: MB, c: Vector3, hx: float, hz: float, rise: float, curl: float, col: Color, col2: Color, hem: Color) -> void:
+	var nx := 10
+	var nz := 6
+	var at := func(i: int, j: int) -> Vector3:
+		var u := -1.0 + 2.0 * i / float(nx)
+		var w := -1.0 + 2.0 * j / float(nz)
+		return c + Vector3(u * hx, rise * cos(u * PI * 0.5) * (1.0 - 0.15 * w * w) + curl * pow(absf(u), 3.0) * (0.35 + 0.65 * w * w), w * hz)
+	for i in nx:
+		for j in nz:
+			var edge := i == 0 or i == nx - 1 or j == 0 or j == nz - 1
+			var cc := hem if edge else (col if (i + j) % 2 == 0 else col2)
+			b.quad4(at.call(i, j), at.call(i + 1, j), at.call(i + 1, j + 1), at.call(i, j + 1), cc, cc, cc, cc)
+			var dn := Vector3(0, -0.035, 0)
+			b.quad4(at.call(i, j) + dn, at.call(i, j + 1) + dn, at.call(i + 1, j + 1) + dn, at.call(i + 1, j) + dn, col2, col2, col2, col2)
+
+## A paper lantern hung at `at` (its middle): caps of dark wood, a glowing belly, a tassel.
+static func _lantern(b: MB, g: MB, at: Vector3, r: float, col: Color) -> void:
+	var cap := MB.tag(Color("2a1c18"), MB.WOOD)
+	b.sph(at, Vector3(r, r * 1.15, r), MB.tag(col, MB.CLOTH))
+	g.ball(at, r * 0.8, Color(1.0, 0.8, 0.45, 0.55), true)
+	b.limb(at + Vector3(0, r * 1.05, 0), at + Vector3(0, r * 1.3, 0), r * 0.55, r * 0.45, cap, 6)
+	b.limb(at - Vector3(0, r * 1.05, 0), at - Vector3(0, r * 1.3, 0), r * 0.55, r * 0.45, cap, 6)
+	b.limb(at - Vector3(0, r * 1.3, 0), at - Vector3(0, r * 2.2, 0), 0.02, 0.008, MB.tag(Color("c8322a"), MB.CLOTH), 4)
+
+## The ox of the cart, standing with its shoulders at `z`: a barrel of a body, a hump, a dewlap, a broad
+## head with a pale muzzle and a brass ring, horns that sweep back, and a red rosette for market day.
+static func _ox(b: MB, z: float) -> void:
+	var hide := MB.tag(Color("9a6a42"), MB.HAIR)
+	var hide_d := MB.tag(Color("6e4a2e"), MB.HAIR)
+	var pale := MB.tag(Color("d8c0a0"), MB.HAIR)
+	var horn := MB.tag(Color("e8e0c8"), MB.STONE)
+	var hoof := MB.tag(Color("2a2220"), MB.STONE)
+	b.sph_hi(Vector3(0, 1.12, z - 0.35), Vector3(0.5, 0.52, 0.95), hide)
+	b.sph_hi(Vector3(0, 1.0, z - 0.35), Vector3(0.44, 0.42, 0.85), pale)
+	b.sph_hi(Vector3(0, 1.5, z + 0.25), Vector3(0.3, 0.26, 0.4), hide_d)
+	b.sph_hi(Vector3(0, 1.22, z + 0.62), Vector3(0.3, 0.36, 0.42), hide, Vector3(-0.5, 0, 0))
+	b.sph(Vector3(0, 0.88, z + 0.6), Vector3(0.1, 0.22, 0.26), pale)
+	b.sph_hi(Vector3(0, 1.3, z + 1.08), Vector3(0.25, 0.25, 0.34), hide)
+	b.sph_hi(Vector3(0, 1.2, z + 1.36), Vector3(0.18, 0.16, 0.16), pale)
+	b.torus(Vector3(0, 1.13, z + 1.5), 0.05, 0.008, MB.tag(Color("d8b050"), MB.METAL), Vector3(PI * 0.5, 0, 0))
+	b.sph(Vector3(0, 1.5, z + 1.14), Vector3(0.09, 0.09, 0.04), MB.tag(Color("c8322a"), MB.CLOTH))
+	for s in [-1.0, 1.0]:
+		b.sph(Vector3(s * 0.11, 1.38, z + 1.3), Vector3(0.035, 0.035, 0.03), MB.tag(Color("1a1410"), MB.STONE))
+		b.sph(Vector3(s * 0.07, 1.16, z + 1.5), Vector3(0.025, 0.02, 0.02), MB.tag(Color("3a2a22"), MB.STONE))
+		b.sph(Vector3(s * 0.3, 1.4, z + 0.98), Vector3(0.12, 0.05, 0.07), hide_d, Vector3(0, 0, s * 0.4))
+		b.limb(Vector3(s * 0.16, 1.5, z + 1.02), Vector3(s * 0.42, 1.62, z + 0.92), 0.055, 0.04, horn, 6)
+		b.limb(Vector3(s * 0.42, 1.62, z + 0.92), Vector3(s * 0.5, 1.82, z + 0.74), 0.04, 0.012, horn, 6)
+		for lz in [z + 0.3, z - 0.95]:
+			b.limb(Vector3(s * 0.28, 0.95, lz), Vector3(s * 0.27, 0.5, lz + 0.03), 0.15, 0.09, hide, 8)
+			b.limb(Vector3(s * 0.27, 0.5, lz + 0.03), Vector3(s * 0.27, 0.12, lz), 0.085, 0.075, hide_d, 8)
+			b.limb(Vector3(s * 0.27, 0.12, lz), Vector3(s * 0.27, 0.0, lz + 0.02), 0.085, 0.095, hoof, 8)
+	b.limb(Vector3(0, 1.4, z - 1.25), Vector3(0, 0.75, z - 1.42), 0.035, 0.02, hide_d, 5)
+	b.sph(Vector3(0, 0.66, z - 1.43), Vector3(0.05, 0.12, 0.05), MB.tag(Color("2a1c14"), MB.HAIR))
 
 ## A saddle for a beast that was never meant to wear one: a cloth over the back, a leather seat with a
 ## high pommel, and stirrups.
@@ -836,9 +1027,8 @@ static func anim_ride(n: Node3D, clk: float, moving: bool) -> Vector3:
 	if n.has_meta("wheels"):
 		for wn in n.get_meta("wheels"):
 			(wn as Node3D).rotation.x = (clk * 2.4 / maxf(0.2, float((wn as Node3D).get_meta("r", 0.5)))) if moving else (wn as Node3D).rotation.x
-		if n.has_meta("anim"):
-			var hm: Node3D = n.get_meta("anim")
-			Assets.animate(hm, clk, ("walk" if Assets.has_clip(hm, "walk") else "idle") if moving else "idle", 0.0)
+		for hm in n.get_meta("anims", []):
+			Assets.animate(hm, clk + float((hm as Node3D).position.x), ("walk" if Assets.has_clip(hm, "walk") else "idle") if moving else "idle", 0.0)
 		return Vector3.ZERO
 	if n.has_meta("anim"):
 		var m: Node3D = n.get_meta("anim")

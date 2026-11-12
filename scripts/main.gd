@@ -225,6 +225,12 @@ func _process(d: float) -> void:
 		if in_world and not Game.passengers.is_empty():
 			for fl in Offices.arrive(Game):
 				Game.toast(str(fl))
+		# (mail.gd: word that a letter has come, once for each)
+		if in_world and Game.prologue == "":
+			var mw := Mail.waiting(Game).size()
+			if mw > Game.mail_told:
+				Game.toast("A letter has come for you: ask at any counter of the post")
+			Game.mail_told = mw
 		Eggs.busy = not in_world or not world.using.is_empty() or world.traveling() or Game.prologue != ""
 		Eggs.gliding = in_world and world.gliding()
 		Eggs.on_summit = in_world and not world.gliding() and not Peaks.summit_at(world.wd, world.ptile).is_empty()
@@ -876,25 +882,101 @@ func ask_picks() -> void:
 		return
 	ask_crossroads()
 
-## A carriage for sale (fashion.gd RIDES `buy`, `at`), offered by whoever answers for the town it is
-## built in.  "Not today" is the first line.
+## What whoever answers for a town has at the counter (offices.gd, mail.gd): a carriage for sale
+## (fashion.gd RIDES `buy`, `at`), the letters that have come, the satchel of those already read, the
+## post-bag to carry and the ones to hand over.  "Not today" is the first line.
 func offer_carriage(e: Dictionary) -> void:
+	if Game.prologue != "":
+		return
+	var office := str(e.office)
 	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
+	if Mail.is_post(office):
+		var here: Array = Mail.bags_for(Game, office)
+		if not here.is_empty():
+			var due := 0
+			for b in here:
+				due += int(b.pay)
+			opts.append({"id": "mail:deliver", "label": "Hand over the post", "note": "%d stones" % due, "desc": "%d sealed bag%s for this counter, carried in from the road. The road pays on arrival: %d spirit stones." % [here.size(), "" if here.size() == 1 else "s", due], "col": UI.C_GOLD})
+		var wait: Array = Mail.waiting(Game)
+		if not wait.is_empty():
+			opts.append({"id": "mail:read", "label": "Ask for your letters", "note": "%d waiting" % wait.size(), "desc": "The oldest is from %s." % str(Mail.LETTERS[wait[0]].from), "col": UI.C_JADE})
+		for lid in Mail.kept(Game):
+			if Mail.owes_reply(Game, lid):
+				opts.append({"id": "mail:reply:" + lid, "label": "Write back to %s" % str(Mail.LETTERS[lid].from), "desc": str(Mail.LETTERS[lid].reply.ask), "col": UI.C_JADE})
+		if not Mail.kept(Game).is_empty():
+			opts.append({"id": "mail:satchel", "label": "Open the satchel", "note": "%d kept" % Mail.kept(Game).size(), "desc": "The letters already opened, to read again."})
+		var bag := Mail.bag_offer(Game, office)
+		if not bag.is_empty():
+			opts.append({"id": "mail:bag", "label": "Carry the post-bag to %s" % str(Data.AREAS[Mail.area_of(str(bag.to))].n), "note": "%d stones" % int(bag.pay),
+				"desc": "A sealed bag for %s. No hurry is asked for and no seat is needed: hand it over the counter there, and the road pays %d spirit stones. (%d of %d bags carried.)" % [str(Offices.OFFICES[str(bag.to)].n), int(bag.pay), Game.mail_bags.size(), Mail.BAGS]})
 	for rid in Fashion.RIDE_ORDER:
 		var r: Dictionary = Fashion.RIDES[rid]
-		if str(r.get("at", "")) == str(e.office) and not Game.rides.has(rid):
+		if str(r.get("at", "")) == office and not Game.rides.has(rid):
 			opts.append({"id": rid, "label": "Buy the %s" % str(r.n), "note": "%d stones" % int(r.buy), "desc": "%s\n\nDriven, seats %d, %d%% faster than running. %d spirit stones (you have %d)." % [told(str(r.desc)), Fashion.seats(rid), int(round((float(r.speed) - 1.0) * 100.0)), int(r.buy), Game.stones],
 				"col": UI.C_GOLD, "enabled": Game.stones >= int(r.buy)})
-	if opts.size() < 2 or Game.prologue != "":
+	if opts.size() < 2:
 		return
-	choose("%s has something on wheels to sell." % str(e.n), opts, func(oid: String):
-		if not Fashion.RIDES.has(oid) or Game.stones < int(Fashion.RIDES[oid].buy):
-			return
-		Game.stones -= int(Fashion.RIDES[oid].buy)
-		Game.grant_ride(oid)
-		Game.ride = oid
+	choose("At the counter of %s" % str(e.n), opts, func(oid: String):
+		if oid == "mail:deliver":
+			var paid := Mail.deliver(Game, office)
+			Feats.poll(Game)
+			say([[str(e.n), "Seals whole, and dry. You would be surprised how seldom I say both. The road pays %d." % paid]])
+		elif oid == "mail:read":
+			read_letter(str(Mail.waiting(Game)[0]), e)
+		elif oid == "mail:satchel":
+			open_satchel(e)
+		elif oid.begins_with("mail:reply:"):
+			write_back(oid.trim_prefix("mail:reply:"))
+		elif oid == "mail:bag":
+			var bg := Mail.bag_offer(Game, office)
+			Mail.take_bag(Game, bg)
+			say([[str(e.n), "For %s. Do not open it, do not sit on it, and if it rains, it is more important than you are." % str(Offices.OFFICES[str(bg.to)].n)]])
+		elif Fashion.RIDES.has(oid) and Game.stones >= int(Fashion.RIDES[oid].buy):
+			Game.stones -= int(Fashion.RIDES[oid].buy)
+			Game.grant_ride(oid)
+			Game.ride = oid
+			Feats.poll(Game)
+			say([[str(e.n), "She pulls a little to the left. They all pull a little to the left. Keep the axles greased and do not let anybody tell you how many it seats: it seats %d." % Fashion.seats(oid)]])
+	)
+
+## A letter is read out (mail.gd): what is in it is taken, and if it can be answered, it is asked how.
+func read_letter(lid: String, e: Dictionary = {}) -> void:
+	var fresh: bool = not Game.mail_read.has(lid)
+	var lines: Array = Mail.lines_of(lid)
+	say(lines, func():
+		var got := Mail.open(Game, lid)
+		if got != "":
+			Game.toast(got)
+		Game.mail_told = Mail.waiting(Game).size()
 		Feats.poll(Game)
-		say([[str(e.n), "She pulls a little to the left. They all pull a little to the left. Keep the axles greased and do not let anybody tell you how many it seats: it seats %d." % Fashion.seats(oid)]])
+		if fresh and Mail.owes_reply(Game, lid):
+			write_back(lid)
+		elif fresh and not e.is_empty() and not Mail.waiting(Game).is_empty():
+			offer_carriage(e)
+	)
+
+## The answering of a letter: two things that could be written.
+func write_back(lid: String) -> void:
+	var rp: Dictionary = Mail.LETTERS[lid].reply
+	var opts: Array = []
+	for op in rp.options:
+		opts.append({"id": str(op.id), "label": str(op.label), "desc": str(op.desc), "col": UI.C_JADE})
+	choose(str(rp.ask), opts, func(oid: String):
+		Mail.reply(Game, lid, oid)
+		if Game.mail_replies.has(lid):
+			Game.toast("It will go by the next carrier.")
+	)
+
+## The satchel: the letters already opened, the newest first, to read again.
+func open_satchel(e: Dictionary) -> void:
+	var opts: Array = [{"id": "later", "label": "Shut the satchel", "desc": "", "col": UI.C_DIM}]
+	var kept: Array = Mail.kept(Game)
+	kept.reverse()
+	for lid in kept.slice(0, 9):
+		opts.append({"id": str(lid), "label": str(Mail.LETTERS[lid].from), "desc": str(Mail.LETTERS[lid].lines[0])})
+	choose("The satchel", opts, func(oid: String):
+		if Mail.LETTERS.has(oid):
+			read_letter(oid)
 	)
 
 ## A shift at a trade of the town (offices.gd), offered by somebody found indoors.  "Not today" is the

@@ -202,6 +202,14 @@ var reckoned := {}
 ## (carriages: who is being carried for a fare, offices.gd: {id, n, asset, to, pay}; and how many have been)
 var passengers: Array = []
 var fares := 0
+## (the post, mail.gd: letters opened, answers written, bags carried {from, to, pay, day}, the day a
+## counter last gave one, bags handed over, and how many waiting letters he has been told of)
+var mail_read := {}
+var mail_replies := {}
+var mail_bags: Array = []
+var bag_day := {}
+var bags_done := 0
+var mail_told := 0
 var shifts := {}
 var shift_day := {}
 ## (careers: the day the last shift was worked at each trade in each town, for the salary; all wages earned)
@@ -374,6 +382,12 @@ func reset() -> void:
 	reckoned = {}
 	passengers = []
 	fares = 0
+	mail_read = {}
+	mail_replies = {}
+	mail_bags = []
+	bag_day = {}
+	bags_done = 0
+	mail_told = 0
 	shifts = {}
 	shift_day = {}
 	salary_day = {}

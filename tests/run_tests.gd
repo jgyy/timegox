@@ -1663,6 +1663,65 @@ func _fates_and_faces() -> void:
 	check(said.size() >= 1 and fg.stones >= st0 + int(fare.pay) and fg.fares >= 1 and fg.passengers.size() <= 1, "set down where they were going, and paid")
 	check(int(fare.pay) * 20 < int(Fashion.RIDES.ox_cart.buy) * 10, "a fare does not pay for the cart in a day")
 	fg.free()
+	# the post (mail.gd): letters that come as the story goes, to the journey that chose a thing; bags to carry
+	check(Mail.ORDER.size() == Mail.LETTERS.size() and Mail.LETTERS.size() >= 36, "every letter is in the order of the post (%d)" % Mail.LETTERS.size())
+	var mfont := ThemeDB.fallback_font
+	var by_cross := {}
+	for lid in Mail.ORDER:
+		var lt: Dictionary = Mail.LETTERS[lid]
+		check(str(lt.from) != "" and (lt.lines as Array).size() >= 1 and Data.step_index(Mail.after_of(lid)) >= 0, "letter %s: from somebody, about something, after a real step" % lid)
+		for ln in lt.lines:
+			var mp := TextParagraph.new()
+			mp.add_string(str(ln), mfont, 22)
+			mp.width = 1100
+			check(mp.get_line_count() <= 4, "letter %s fits the dialogue box" % lid)
+		if lt.has("needs"):
+			var copts: Array = Echoes.CROSSROADS[str(lt.needs[0])].options
+			check(copts.any(func(o): return str(o.id) == str(lt.needs[1])), "letter %s answers a real answer of a real crossroads" % lid)
+			by_cross[str(lt.needs[0])] = int(by_cross.get(str(lt.needs[0]), 0)) + 1
+		if lt.has("on"):
+			var ro: Array = Mail.LETTERS[str(lt.on[0])].reply.options
+			check(ro.any(func(o): return str(o.id) == str(lt.on[1])) and Mail.ORDER.find(str(lt.on[0])) < Mail.ORDER.find(lid), "letter %s follows a real answer to an earlier letter" % lid)
+		if lt.has("reply"):
+			check((lt.reply.options as Array).size() == 2, "letter %s can be answered two ways" % lid)
+			for ro2 in lt.reply.options:
+				check(Mail.LETTERS.values().any(func(l2): return l2.has("on") and str(l2.on[0]) == lid and str(l2.on[1]) == str(ro2.id)), "letter %s: the answer %s brings a letter back" % [lid, ro2.id])
+		var gf: Dictionary = lt.get("gift", {})
+		check(gf.is_empty() or gf.has("stones") or Data.ITEMS.has(str(gf.get("item", ""))), "letter %s encloses a real thing" % lid)
+	check(by_cross.size() >= 12, "a dozen crossroads write back (%d)" % by_cross.size())
+	for po in Mail.POSTS:
+		check(Offices.OFFICES.has(po), "the counter %s is somebody's" % po)
+	var mg = load("res://scripts/game.gd").new()
+	mg.reset()
+	check(Mail.waiting(mg).is_empty(), "no letters before the story has begun")
+	mg.step = Data.step_index("s_ironfang") + 8
+	check(Mail.waiting(mg).has("ge_satchel") and Mail.waiting(mg).has("wen_first") and not Mail.waiting(mg).has("bandits_mend"), "the first letters come after Iron Fang, and none about a choice not made")
+	var hp0 := int(mg.inv.get("hp_pill", 0))
+	check(Mail.open(mg, "wen_first") != "" and int(mg.inv.get("hp_pill", 0)) == hp0 + 2 and Mail.open(mg, "wen_first") == "" and int(mg.inv.get("hp_pill", 0)) == hp0 + 2, "what is in a letter is taken once")
+	check(Mail.owes_reply(mg, "wen_first") and not Mail.waiting(mg).has("wen_first") and Mail.kept(mg).has("wen_first"), "opened, it is in the satchel and wants an answer")
+	Mail.reply(mg, "wen_first", "truth")
+	Mail.reply(mg, "wen_first", "eaten")
+	check(str(mg.mail_replies.wen_first) == "truth" and not Mail.owes_reply(mg, "wen_first"), "a letter is answered once")
+	mg.step = Data.step_index("s_roc") + Mail.WAIT + 1
+	check(Mail.waiting(mg).has("wen_truth") and not Mail.waiting(mg).has("wen_eaten"), "and the answer given is the one answered")
+	var sc0: Dictionary = mg.scales.duplicate()
+	check(mg.scales == sc0, "the post tips no scale")
+	# the bags
+	mg.level = 20
+	var bg := Mail.bag_offer(mg, "head_qingshi")
+	check(not bg.is_empty() and Mail.is_post(str(bg.to)) and str(bg.to) != "head_qingshi" and Data.layer_of(Mail.area_of(str(bg.to))) == "surface" and int(bg.pay) > 0, "Qingshi has a bag for another counter of the land")
+	check(Mail.bag_offer(mg, "emperor").is_empty(), "the court keeps no counter")
+	Mail.take_bag(mg, bg)
+	check(mg.mail_bags.size() == 1 and Mail.bag_offer(mg, "head_qingshi").is_empty(), "one bag a day from a counter")
+	var ms0: int = mg.stones
+	check(Mail.deliver(mg, "head_qingshi") == 0 and mg.stones == ms0, "nothing is paid for carrying it nowhere")
+	check(Mail.deliver(mg, str(bg.to)) == int(bg.pay) and mg.stones == ms0 + int(bg.pay) and mg.mail_bags.is_empty() and mg.bags_done == 1, "handed over where it was sealed for, and paid")
+	mg.day += 1
+	for k in 5:
+		Mail.take_bag(mg, Mail.bag_offer(mg, Mail.POSTS[k]))
+	check(mg.mail_bags.size() == Mail.BAGS, "three bags is a load")
+	check(Mail.bag_pay(20, "head_qingshi", "post_cloudfoot") * 3 <= Data.enemy_stones(20, false) * 40, "a bag is worth less than the road")
+	mg.free()
 	check(Assets.has(Assets.MOUNTS.horse), "the horse is Blender-built")
 	var horse := Assets.mount("horse")
 	var hap2: AnimationPlayer = horse.get_meta("ap", null)

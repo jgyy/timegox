@@ -3854,6 +3854,25 @@ func _horse_shots(which: String = "1") -> void:
 	var w = main.world
 	if want.call("people"):
 		await _gallery("part24_people", [Assets.person("sai_weng"), Assets.person("weng_son"), Assets.person("qian_liu")], 0.76, 0.2)
+	if want.call("post"):
+		# the post (mail.gd): the counter of Headman Luo with letters waiting and a bag to carry, and a letter being read
+		main.world.load_area("sect", Vector2i(20, 9))
+		Game.picks["bandits"] = "mend"
+		Game.mail_read = {"ge_satchel": true}
+		var luo := {"id": "head_qingshi", "n": str(Offices.OFFICES.head_qingshi.n), "office": "head_qingshi"}
+		main.offer_carriage(luo)
+		await _wait(0.5)
+		await _shot("post_counter")
+		main.pop()
+		main.read_letter("bandits_mend")
+		await _wait(0.8)
+		await _shot("post_letter")
+		main.pop()
+		main.write_back("wen_first")
+		await _wait(0.5)
+		await _shot("post_reply")
+		main.pop()
+		Game.mail_read = {}
 	if want.call("carriages"):
 		# the three carriages, every seat taken: the hero, Yue Ling, and whoever is being carried
 		for rid in ["ox_cart", "wagon", "carriage"]:
@@ -3876,7 +3895,7 @@ func _horse_shots(which: String = "1") -> void:
 			holder.rotation.y = PI / 2.0
 			holder.set_meta("kind", "ride_group")
 			_seat_all.call_deferred(holder)
-			await _gallery("carriage_" + rid, [holder], 3.3, 0.9)
+			await _gallery("carriage_" + rid, [holder], 4.4, 0.9)
 		# and on the road: the wagon with every seat taken, below the sect's north gate
 		main.world.load_area("sect", Vector2i(20, 9))
 		Game.rides["wagon"] = true

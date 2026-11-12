@@ -43,6 +43,9 @@ const FEATS := {
 	"trade_master": {"n": "A Sign with Your Name on It", "kind": "people", "pts": 20, "test": ["trade_rank", 4], "desc": "Reach the highest place there is at a trade."},
 	"first_fare": {"n": "Room for One More", "kind": "people", "pts": 5, "test": ["fares", 1], "desc": "Carry somebody to another town in a carriage, for the fare."},
 	"ten_fares": {"n": "The Regular Coach", "kind": "people", "pts": 10, "test": ["fares", 10], "desc": "Set down ten passengers where they were going."},
+	"first_letter": {"n": "Somebody Wrote", "kind": "people", "pts": 5, "test": ["letters", 1], "desc": "Ask for your letters at a counter of the post, and open one."},
+	"ten_letters": {"n": "A Full Satchel", "kind": "people", "pts": 10, "test": ["letters", 10], "desc": "Open ten letters."},
+	"post_bags": {"n": "Neither Snow Nor Rain", "kind": "people", "pts": 10, "test": ["bags", 5], "desc": "Carry five bags of the post to the counters they were sealed for."},
 	"six_trades": {"n": "Jack of Six Trades", "kind": "people", "pts": 10, "test": ["trades", 6], "desc": "Work a shift at six different trades."},
 	"marks_twelve": {"n": "Gone Back to Look", "kind": "road", "pts": 10, "test": ["marks", 12], "desc": "Look at twelve of the things your choices left standing in the land."},
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
@@ -268,6 +271,10 @@ static func value(g, t: Array) -> float:
 			return float(Offices.worked(g)[0])
 		"fares":
 			return float(g.fares)
+		"letters":
+			return float(g.mail_read.size())
+		"bags":
+			return float(g.bags_done)
 		"trade_rank":
 			return float(maxi(0, Offices.best_rank(g)))
 		"trades":
