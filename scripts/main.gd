@@ -336,6 +336,15 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 			lines.append(["Narrator", " ".join(ce.slice(k0, k0 + 4))])
 		if Echoes.names(Game) != "":
 			lines.append(["Narrator", "And the land, which had watched every one of those choices, had its own names for Lin Feng by the end: %s." % Echoes.names(Game)])
+		# (the Lost Horse release: how he lost to what could not be beaten, dooms.gd, and what his choices left
+		# standing, marks.gd)
+		if Dooms.epilogue(Game) != "":
+			lines.append(["Narrator", Dooms.epilogue(Game)])
+		var stood := 0
+		for lid9 in ["surface", "heaven", "under", "sea"]:
+			stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
+		if stood > 0:
+			lines.append(["Narrator", "%d things stand in the land that were not there before Lin Feng was asked a question: roads, walls, graves, a bell, a tree. Nobody who passes them knows whose word put them there." % stood])
 		if Works.count(Game) > 0:
 			lines.append(["Narrator", "%d works stand in the land that Lin Feng built with his own hands, and the makers call him %s." % [Works.count(Game), Works.title(Game)]])
 		lines.append_array(origin_lines("ending"))
@@ -515,6 +524,16 @@ func interact(e: Dictionary) -> void:
 		"machine":
 			# the Hundred Works (works.gd): what it is and what it does
 			say([["Narrator", Works.site_desc(str(e.work))]])
+		"mark":
+			# the Lost Horse release (marks.gd): what a choice left standing; looked at, it is remembered
+			var first_look := not Game.marks_seen.has(Marks.seen_key(str(e.id)))
+			if first_look:
+				Game.marks_seen[Marks.seen_key(str(e.id))] = true
+				Game.note("Looked at %s" % Marks.name_of(Game, e))
+			say([["Narrator", Marks.desc_of(Game, e)]], func():
+				if first_look:
+					Game.poll_steps()
+			)
 		"obstacle":
 			# Part XVII (impact.gd): it stands in the way until the sword clears it
 			Game.toast(str(Impact.OBSTACLES.get(str(e.what), {}).get("hint", "Something stands in the way (F)")))
@@ -684,6 +703,9 @@ func talk_npc(e: Dictionary) -> void:
 		)
 		return
 	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
+	# somebody a choice left standing somewhere (marks.gd) has their own words
+	if e.has("lines"):
+		chats = (e.lines as Array).duplicate()
 	# somebody met on the road (fate.gd) has their own words for afterwards
 	if e.get("fate", false):
 		chats = FateText.CHAT.get(str(e.id), ["..."]).duplicate()
@@ -848,7 +870,7 @@ func ask_crossroads() -> void:
 	var opts: Array = []
 	for o in c.options:
 		var ok := Echoes.option_ok(Game, o)
-		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yours to say", "desc": Echoes.option_text(Game, o), "col": Color("e8d090"), "enabled": ok})
+		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yours to say", "desc": Echoes.option_text(Game, o) + ("\nIt will stand in the land: %s." % Echoes.stands_text(cid, str(o.id)) if Echoes.stands_text(cid, str(o.id)) != "" else ""), "col": Color("e8d090"), "enabled": ok})
 	choose(str(c.ask), opts, func(oid: String):
 		if oid == "" or not Echoes.option_ok(Game, Echoes.option(cid, oid)):
 			return
@@ -1409,7 +1431,7 @@ func boss_interact(e: Dictionary) -> void:
 		if s.is_empty() or s.kind != "grudges" or Game.grudges.has(e.enemy):
 			say([["Narrator", "%s stands where its owner fell, muttering a sum nobody ever paid. It does not see you yet." % d.n]])
 			return
-	elif s.is_empty() or s.kind != "kill" or s.boss != e.enemy:
+	elif s.is_empty() or not (s.kind == "kill" or s.kind == "fall") or s.boss != e.enemy:
 		say([["Narrator", "%s looms before you, but this is not the time. Finish your current objective first." % d.n]])
 		return
 	if Game.level < e.req:
@@ -1502,7 +1524,8 @@ func start_breakthrough() -> void:
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
-	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21"}
+	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
+	"s_break28": "recall22"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -1598,6 +1621,32 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				world.battle_mark(e2, false)
 				Game.defeated[e2.id] = Game.playtime
 				Game.record_kills(e2.get("area", Game.area), e2.group.size(), e2.group.map(func(g): return g.id))
+		"fall":
+			# the Lost Horse release (dooms.gd): a battle that could not be won has been lost, and the
+			# story goes on from the losing: nothing is taken, nobody is carried home
+			var how := str(ctx.get("how", "struck"))
+			var f_ids: Array = battle.foes.map(func(f): return str(f.id))
+			var f_lv := int(battle.foes[0].lv)
+			if ctx.get("boss", false):
+				Dooms.fell(Game, [str(ctx.enemy)], f_lv, how, int(ctx.get("rounds", 0)))
+				var fkey := "fall:" + str(ctx.enemy)
+				var flines: Array = Data.DIALOGUE.get(fkey, []).duplicate()
+				flines.append_array(Data.DIALOGUE.get(fkey + ":" + how, []))
+				say(Echoes.told(Game, fkey, flines), func():
+					var fs := Game.cur_step()
+					if not fs.is_empty() and str(fs.kind) == "fall" and str(fs.boss) == str(ctx.enemy):
+						Game.advance()
+					ask_picks()
+				)
+			else:
+				var fe: Dictionary = ctx.entity
+				Game.defeated[fe.id] = Game.playtime
+				var passed := Dooms.fell(Game, f_ids, f_lv, how, int(ctx.get("rounds", 0)))
+				var fs2 := Game.cur_step()
+				if not fs2.is_empty() and str(fs2.kind) == "falls" and f_ids.any(func(x): return x in fs2.of):
+					Game.hunt += 1
+					Game.toast("It went over you, and on (%d of %d)" % [mini(Game.hunt, int(fs2.n)), int(fs2.n)])
+				say([["Narrator", passed]] if passed != "" else [], func(): Game.poll_steps())
 		"lose":
 			Game.respawn()
 			world.load_area("sect", Vector2i(20, 8))

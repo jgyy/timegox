@@ -811,7 +811,7 @@ func ent_visible(e: Dictionary) -> bool:
 	if Game.prologue != "":
 		if e.kind == "npc" and str(e.id) == str(Cultures.HEARTHS[Game.prologue].keeper):
 			return true
-		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode", "machine"] or e.get("fate", false):
+		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode", "machine", "mark"] or e.get("fate", false) or e.has("pick"):
 			return false
 	match e.kind:
 		"enemy":
@@ -819,6 +819,9 @@ func ent_visible(e: Dictionary) -> bool:
 				return false
 			# the war-bands of the Eight Gates (Part XIII) only march once the formation wakes
 			var ev = e.get("vis", ["", ""])
+			# (Part XXIV: a band may stop marching when a step is done: the bore of the eighth month)
+			if ev.size() > 1 and str(ev[1]) != "" and Game.done(str(ev[1])):
+				return false
 			return ev[0] == "" or Game.reached(ev[0])
 		"seal", "ladder", "abode":
 			return true
@@ -843,6 +846,12 @@ func ent_visible(e: Dictionary) -> bool:
 		"machine":
 			# the Hundred Works (works.gd): a machine stands once it has been built
 			return Works.stands(Game, str(e.work))
+		"mark":
+			# the Lost Horse release (marks.gd): what a crossroads answer left standing, or a leaning scale
+			return Marks.stands(Game, e)
+	# somebody who is only in the world of whoever chose that way (marks.gd)
+	if e.has("pick") and not Marks.who_stands(Game, e):
+		return false
 	# somebody met on the road (fate.gd): there while the story has them there
 	if e.get("fate", false) and not Fate.present(Game, str(e.id)):
 		return false
@@ -856,6 +865,27 @@ func ent_visible(e: Dictionary) -> bool:
 	if not hd.is_empty() and Game.reached(hd[0]) and not Game.done(hd[1]):
 		return false
 	return true
+
+## The Lost Horse release (marks.gd): build what stands at mark `e` for the answer given (or the way the
+## scale leans now), in place of whatever stood there before.
+func _mark_model(e: Dictionary, n: Node3D) -> void:
+	if n.has_meta("model"):
+		(n.get_meta("model") as Node3D).queue_free()
+	var mm := Marks.model(Marks.spec(Game, e), int(e.get("i", 0)))
+	# (one thing alone stands any way round; the things of a row stand along it, and a road is laid end to end)
+	var msp := Marks.spec(Game, e)
+	var mline: Vector2i = e.get("line", Vector2i.ZERO)
+	if int(msp.get("k", 1)) == 1 or mline == Vector2i.ZERO:
+		mm.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y, 11.0) * TAU
+	else:
+		mm.rotation.y = 0.0 if mline.x != 0 else PI * 0.5
+		if str(msp.m[0]) == "road":
+			mm.rotation.y += PI * 0.5
+			mm.scale.z = 2.0
+	n.add_child(mm)
+	n.set_meta("model", mm)
+	n.set_meta("key", Marks.key(Game, e))
+	(n.get_meta("label") as Label3D).text = Marks.name_of(Game, e) if int(e.get("i", 0)) == 0 else ""
 
 func ent_at(tile: Vector2i):
 	var e = tile_ents.get(tile)
@@ -1071,6 +1101,13 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			var ml := _label(n, Works.site_name(str(e.work)), 3.0, Color("e8d090"), 26)
 			n.set_meta("label", ml)
 			n.set_meta("model", mm)
+		"mark":
+			# the Lost Horse release (marks.gd): built when it first stands (_mark_model), so that the
+			# answers never given are never built
+			n.add_child(Models.shadow_disc(1.2, 0.3))
+			var kl := _label(n, "", 3.2, Color("f0c8a0"), 26)
+			n.set_meta("label", kl)
+			n.set_meta("key", "")
 		"spring":
 			n.add_child(Models.spring_basin())
 		"ladder":
@@ -2087,7 +2124,7 @@ func _snap_cam() -> void:
 ## how far off the people, packs and things of the land are drawn (metres), and the big ones
 const ENT_SHOW := 92.0
 const ENT_SHOW_BIG := 150.0
-const ENT_BIG := ["boss", "prop", "machine", "seal", "ladder", "abode", "stele", "portal"]
+const ENT_BIG := ["boss", "prop", "machine", "mark", "seal", "ladder", "abode", "stele", "portal"]
 var frame_n := 0
 
 func _update_view(d: float) -> void:
@@ -2196,6 +2233,8 @@ func _update_view(d: float) -> void:
 			n.visible = vis
 			if not vis:
 				continue
+			if e.kind == "mark" and str(n.get_meta("key", "")) != Marks.key(Game, e):
+				_mark_model(e, n)
 			dist = n.position.distance_to(pp)
 			if dist > 46.0:
 				continue
@@ -2587,6 +2626,10 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0))
 		"machine":
 			Machines.animate(n.get_meta("model"), t + float(e.pos.x))
+			(n.get_meta("label") as Label3D).visible = dist < 12.0
+		"mark":
+			if n.has_meta("model"):
+				Machines.animate(n.get_meta("model"), t + float(e.pos.x))
 			(n.get_meta("label") as Label3D).visible = dist < 12.0
 		"abode":
 			var opened: bool = Game.abodes.has(e.id)
@@ -3191,9 +3234,9 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk"]:
+	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark"]:
 		var hint := "Talk" if fe.kind != "folk" else "Talk to %s" % str(fe.n)
-		if fe.kind == "machine":
+		if fe.kind == "machine" or fe.kind == "mark":
 			hint = "Look"
 		match fe.kind:
 			"prop":

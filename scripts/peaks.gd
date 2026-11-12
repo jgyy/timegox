@@ -45,6 +45,8 @@ const NONE := ["sect"]
 ## largest place the region has is kept for it; `at`: the place nearest a tile of the region's own map).
 const OWN := {
 	"mountain": [{"n": "Sun-Viewing Peak", "big": true}, {"n": "the Sweeper's Lookout"}],
+	# Part XXIV: the height Great Yu set down on the Ape of the Huai, in the Drowned Fields
+	"drowned": [{"n": "Turtle Mountain"}],
 }
 
 const NAME_A := ["Crane", "Listening", "Cloud-Gate", "Old Man", "Jade Maiden", "Nine Pines", "Wind-Rest", "Lonely", "Returning Goose", "Sleeping Ox",

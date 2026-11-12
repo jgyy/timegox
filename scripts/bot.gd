@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 31.0 * 3600.0
+var max_time := 33.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -102,6 +102,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# with lead in it, eight hundred who will all go home to the king who could not face their fathers, and a potter's
 	# hands to the first pot
 	"meng_tian": "host", "gao_jianli": "song", "xiang_yu": "host", "wafu": "works",
+	# Part XXIV: the old mare's four cast shoes to the horse that followed her, and three losses in the red
+	# column to the keeper of the book
+	"hu_steed": "relic", "huofu": "loss",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -137,7 +140,10 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_voices": ["fire"], "the_kites": ["ask"], "the_tops": ["cairn"],
 	# Part XXIII: the clay soldiers carried home by the names in their collars, the lead melted out of the lute, and
 	# the song kept when the spears go home
-	"the_clay": ["home"], "the_lute": ["melt"], "the_host": ["band"]}
+	"the_clay": ["home"], "the_lute": ["melt"], "the_host": ["band"],
+	# Part XXIV: a sea-wall of ten thousand baskets, nine channels for the Huai and the ape let go to the sea,
+	# and the black horse kept by the tent
+	"the_tide": ["wall"], "the_ape": ["dredge"], "the_horse": ["keep"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -175,6 +181,7 @@ const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feas
 ## the end of the story the bot chooses (cultures.gd ENDINGS), rarest first, of those its journey earned
 const ENDING_PLAN := ["school", "open", "road", "lotus", "home", "azure"]
 var route := "peoples"
+var give_way := false
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
 var tt_frame := -1
@@ -192,6 +199,8 @@ func _ready() -> void:
 		max_time = float(main.args["max-time"])
 	if main.args.has("route"):
 		route = str(main.args.route)
+	# (dooms.gd: with --yield the bot gives way to what cannot be beaten instead of fighting it to the end)
+	give_way = main.args.has("yield")
 
 ## Developer shortcut: --bot-start=<step id> drops a fresh game straight at that quest step with
 ## the level, companion, techniques and boss kills a player would have by then (the reported play
@@ -453,7 +462,7 @@ func _cult_target() -> Dictionary:
 	match s.kind:
 		"level":
 			return {"lv": s.lv, "full": false}
-		"kill":
+		"kill", "fall":
 			for b in Data.AREAS[s.area].get("bosses", []):
 				if b.id == s.boss:
 					tg = {"lv": b.req, "full": false}
@@ -624,7 +633,9 @@ func _world(d: float) -> void:
 				_travel(s.area)
 			else:
 				_goto_nearest("pickup", s.item)
-		"hunt":
+		"hunt", "falls":
+			# (Part XXIV, "falls": the packs that cannot be beaten, dooms.gd, are walked up to like any
+			# others, fought as the bot fights anything, and lost to)
 			if s.has("cave") and world.layer != Caves.fid(str(s.area), int(s.cave)):
 				# Part XX: a hunt in a cave: down by the cave mouth (and the shaft, for the lower gallery)
 				if _hp_ratio() < 0.6 or _qi_ratio() < 0.3:
@@ -651,13 +662,17 @@ func _world(d: float) -> void:
 					_walk_to(e.pos, "enemy:" + e.id)
 				else:
 					_start_meditate("respawn")
-		"kill":
+		"kill", "fall":
+			# (Part XXIV, "fall": a lord that cannot be beaten, dooms.gd: gone to rested all the same)
 			if not _cult_met():
 				_grind()
 			elif _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
 				_start_meditate("rest")
 			else:
 				_goto_entity(s.area, "boss_" + s.boss)
+		"marks":
+			# Part XXIV: the nearest thing a choice left standing that has not been looked at (marks.gd)
+			_marks_step()
 		"breakthrough":
 			if not _cult_met():
 				_grind()
@@ -904,6 +919,9 @@ func _nearest_enemy(area: String, fights: bool = false, of: Array = []):
 			mx = maxi(mx, g.lv)
 		if mx > Game.level + 2 or (fights and Game.scatters(e.group)) or (not of.is_empty() and not e.group.any(func(g): return of.has(g.id))):
 			continue
+		# (dooms.gd: nobody goes looking for what cannot be beaten unless the step asks for it)
+		if of.is_empty() and Dooms.in_group(e.group):
+			continue
 		var ed := 9999
 		for dd in DIRS:
 			var n: Vector2i = e.pos + dd
@@ -932,6 +950,8 @@ func _any_enemy(area: String, fights: bool = false, of: Array = []):
 		for g in e.group:
 			mx = maxi(mx, g.lv)
 		if mx > Game.level + 2 or (fights and Game.scatters(e.group)) or (not of.is_empty() and not e.group.any(func(g): return of.has(g.id))):
+			continue
+		if of.is_empty() and Dooms.in_group(e.group):
 			continue
 		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
 		if dd < bd:
@@ -1542,6 +1562,28 @@ func _delve_step() -> bool:
 		return false
 	_goto_entity(delve_id.get_slice(":", 1), delve_id)
 	return true
+
+## Part XXIV (marks.gd): walk up to the nearest thing a choice left standing in this realm that has not
+## been looked at yet (in a region the journey has been through before one it has not), and look at it.
+var mark_id := ""
+
+func _marks_step() -> void:
+	if mark_id != "" and Game.marks_seen.has(Marks.seen_key(mark_id)):
+		mark_id = ""
+	if mark_id == "":
+		var lw: Dictionary = Atlas.world_of("surface")
+		var here: Vector2i = world.ptile if world.layer == "surface" else Atlas.to_world("sect", Vector2i(20, 8))
+		var bd := 1 << 30
+		for e in lw.ents:
+			if e.kind != "mark" or not Marks.stands(Game, e) or Game.marks_seen.has(Marks.seen_key(str(e.id))):
+				continue
+			var dd: int = absi(e.pos.x - here.x) + absi(e.pos.y - here.y) + (0 if Game.seen.has(str(e.area)) else 100000)
+			if dd < bd:
+				bd = dd
+				mark_id = str(e.id)
+	if mark_id == "":
+		return
+	_goto_entity(mark_id.get_slice(":", 1) if mark_id.begins_with("sign:") else mark_id.get_slice(":", 2), mark_id)
 
 ## Part XXII (peaks.gd): climb to the very top of the peak step `s` names (the highest of a region), or
 ## of the nearest peak of this realm it has not stood on, as a player with the map open would: there is
@@ -2238,6 +2280,8 @@ func _battle_menu(b) -> void:
 
 func _plan(b) -> Dictionary:
 	var me: Dictionary = b.cur
+	if b.doomed and give_way:
+		return {"top": "yield"}
 	var allies: Array = b.alive(b.party)
 	var foes: Array = b.alive(b.foes)
 	var low: Dictionary = allies[0]
@@ -2439,6 +2483,15 @@ func _finish(reason: String) -> void:
 	print("feats           : %d of %d (%d of %d points): %s; found unasked: %d of %d %s" % [Game.feats.size(), Feats.FEATS.size(), Feats.points(Game), Feats.total(), Feats.title(Game), Game.eggs.size(), Eggs.ORDER.size(),
 		JSON.stringify(Game.eggs.keys())])
 	print("the hero        : %s, a young %s, kin %s; guest of %d hearths %s" % [Game.hero_name(), "woman" if Game.fem() else "man", str(Cultures.HEARTHS[Cultures.own(Game)].short), Cultures.guests(Game), JSON.stringify(Game.hearth)])
+	# (the Lost Horse release: dooms.gd, marks.gd)
+	var how_n := {}
+	for fid in Game.falls:
+		how_n[str(Game.falls[fid].how)] = int(how_n.get(str(Game.falls[fid].how), 0)) + 1
+	print("what was lost   : %d battles that could not be won (%d given way to), %d of 3 dooms of the story stood in front of %s" % [Game.fallen, Game.yielded, int(Feats.value(Game, ["dooms", 3])), str(how_n)])
+	var stood := 0
+	for lid9 in ["surface", "heaven", "under", "sea"]:
+		stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
+	print("what stands     : %d things stand in the land for what was chosen and what the scales lean to (of %d that could), %d looked at" % [stood, int(Marks.totals()[1]), Game.marks_seen.size()])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)

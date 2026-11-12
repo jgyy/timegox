@@ -597,41 +597,7 @@ static func _build(layer: String = "surface") -> Dictionary:
 		band_slots.append([id0, "warband", "w"])
 	for id0 in ids:
 		band_slots.append([id0, "warband2", "x"])
-	for bs in band_slots:
-		var id3: String = bs[0]
-		var band: Dictionary = Data.AREAS[id3].get(str(bs[1]), {})
-		if band.is_empty() or not band.get("late", false):
-			continue
-		var near := {}
-		for e5 in ents:
-			if str(e5.get("area", "")) == id3:
-				for dy5 in range(-4, 5):
-					for dx5 in range(-4, 5):
-						near[e5.pos + Vector2i(dx5, dy5)] = true
-		var cands: Array = []
-		for p5 in reach_e:
-			var g5: int = grid[p5.y * W + p5.x]
-			if (g5 == MapGen.FLOOR or g5 == MapGen.PATH or g5 == MapGen.DECOR) and owner_id({"owner": owner, "w": W, "h": H, "ids": ids}, p5) == id3 and not near.has(p5):
-				cands.append(p5)
-		cands.sort()
-		var rng5 := RandomNumberGenerator.new()
-		rng5.seed = int(Data.AREAS[id3].seed) * 977 + (31 if str(bs[2]) == "w" else 77)
-		var made := 0
-		var tries := 0
-		while made < int(band.n) and tries < 4000 and not cands.is_empty():
-			tries += 1
-			var c5: Vector2i = cands[rng5.randi() % cands.size()]
-			if near.has(c5):
-				continue
-			made += 1
-			var group5: Array = []
-			for _k5 in rng5.randi_range(2, 3):
-				var pe5: Array = band.pool[rng5.randi() % (band.pool as Array).size()]
-				group5.append({"id": pe5[0], "lv": rng5.randi_range(int(pe5[1]), int(pe5[2]))})
-			ents.append({"kind": "enemy", "id": "%s:%s%d" % [id3, str(bs[2]), made], "pos": c5, "group": group5, "vis": [str(band.vis), ""], "area": id3, "layer": layer, "late": true})
-			for dy6 in range(-4, 5):
-				for dx6 in range(-4, 5):
-					near[c5 + Vector2i(dx6, dy6)] = true
+	_place_bands(band_slots, grid, W, H, owner, ids, ents, layer, reach_e, [], {})
 	# ---- the Hollow Hills (caves.gd): a cave under every region, its mouth on open ground of the region
 	# that the sect can reach, with open ground all round it (so that it stands in nobody's way), added
 	# after everything else, so no older map moves
@@ -644,6 +610,18 @@ static func _build(layer: String = "surface") -> Dictionary:
 	Peaks.world(grid, W, pks.peaks, ents, layer, ids)
 	# ... and the camps of the people of the road, at the feet of the highest (folk.gd)
 	var camps := Folk.place_camps(grid, W, H, owner, ids, ents, reach_e, pks.peaks)
+	# ---- Part XXIV: a region's third and fourth bands ("warband3", "warband4") are placed now, after the
+	# caves, the peaks and the camps, off the rock and away from the camp fires, so that no cave mouth,
+	# peak or camp of an older map moves for them (a band may stop marching when a step is done: "until")
+	var late_slots: Array = []
+	for id0 in ids:
+		late_slots.append([id0, "warband3", "y"])
+	for id0 in ids:
+		late_slots.append([id0, "warband4", "z"])
+	_place_bands(late_slots, grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps)
+	# ---- the Lost Horse release (marks.gd): what the crossroads leave standing, and what the scales
+	# stand in every region, on open ground nothing else is on; added last of all, so no older map moves
+	Marks.place(grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps)
 	if OS.has_environment("AZ_PROFILE"):
 		print("[profile] realm %s: %d peaks and %d camps placed in %d ms" % [layer, (pks.peaks as Array).size(), camps.size(), (Time.get_ticks_usec() - pk_t0) / 1000])
 	# ---- each region's cell: the bounding box of the land it owns
@@ -671,6 +649,58 @@ static func _build(layer: String = "surface") -> Dictionary:
 	return {"w": W, "h": H, "grid": grid, "owner": owner, "sea": sea, "ids": ids, "idx": idx, "ents": ents, "buildings": buildings,
 		"start": start, "layout": L, "maps": maps, "layer": layer, "floors": floors, "origin": layer_origin(layer), "y": layer_y(layer),
 		"peaks": pks.peaks, "peak_blk": pks.blk, "camps": camps}
+
+
+## The war-bands that came later in the story (`slots`: [region, key, letter]): packs of two or three
+## on open ground of their region that the sect can reach, four tiles from anybody and anything (and
+## off the `peaks` and away from the `camps`, for the bands placed after those).  A seeded draw.
+static func _place_bands(slots: Array, grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach_e: Dictionary, peaks: Array, camps: Dictionary) -> void:
+	for bs in slots:
+		var id3: String = bs[0]
+		var band: Dictionary = Data.AREAS[id3].get(str(bs[1]), {})
+		if band.is_empty() or not band.get("late", false):
+			continue
+		var near := {}
+		for e5 in ents:
+			if str(e5.get("area", "")) == id3 and e5.has("pos"):
+				for dy5 in range(-4, 5):
+					for dx5 in range(-4, 5):
+						near[e5.pos + Vector2i(dx5, dy5)] = true
+		if camps.has(id3):
+			for dy7 in range(-7, 8):
+				for dx7 in range(-7, 8):
+					near[(camps[id3] as Vector2i) + Vector2i(dx7, dy7)] = true
+		for pk5 in peaks:
+			if str(pk5.area) == id3:
+				var pr5 := int(pk5.r) + 2
+				for dy8 in range(-pr5, pr5 + 1):
+					for dx8 in range(-pr5, pr5 + 1):
+						if dx8 * dx8 + dy8 * dy8 <= pr5 * pr5:
+							near[(pk5.c as Vector2i) + Vector2i(dx8, dy8)] = true
+		var cands: Array = []
+		for p5 in reach_e:
+			var g5: int = grid[p5.y * W + p5.x]
+			if (g5 == MapGen.FLOOR or g5 == MapGen.PATH or g5 == MapGen.DECOR) and owner_id({"owner": owner, "w": W, "h": H, "ids": ids}, p5) == id3 and not near.has(p5):
+				cands.append(p5)
+		cands.sort()
+		var rng5 := RandomNumberGenerator.new()
+		rng5.seed = int(Data.AREAS[id3].seed) * 977 + {"w": 31, "x": 77, "y": 131, "z": 173}[str(bs[2])]
+		var made := 0
+		var tries := 0
+		while made < int(band.n) and tries < 4000 and not cands.is_empty():
+			tries += 1
+			var c5: Vector2i = cands[rng5.randi() % cands.size()]
+			if near.has(c5):
+				continue
+			made += 1
+			var group5: Array = []
+			for _k5 in rng5.randi_range(2, 3):
+				var pe5: Array = band.pool[rng5.randi() % (band.pool as Array).size()]
+				group5.append({"id": pe5[0], "lv": rng5.randi_range(int(pe5[1]), int(pe5[2]))})
+			ents.append({"kind": "enemy", "id": "%s:%s%d" % [id3, str(bs[2]), made], "pos": c5, "group": group5, "vis": [str(band.vis), str(band.get("until", ""))], "area": id3, "layer": layer, "late": true})
+			for dy6 in range(-4, 5):
+				for dx6 in range(-4, 5):
+					near[c5 + Vector2i(dx6, dy6)] = true
 
 ## A building's upper storey (`lv` 1) or cellar (-1) as a small world of its own, the size of the
 ## building's rectangle (its own tiles start at the rectangle's corner), with the people and things

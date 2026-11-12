@@ -60,8 +60,11 @@ const KINDS := {
 	# the Thundering Pots release: the host that was raised (war.gd), and the airs of the land (music.gd)
 	"host": {"n": "By the host", "col": Color("e0705a"), "what": "the companies that came when they were asked"},
 	"song": {"n": "By the song", "col": Color("c8a0e8"), "what": "the airs of the land you have learned"},
+	# the Lost Horse release: what was lost to and gone on from (dooms.gd), and what the choices left standing (marks.gd)
+	"loss": {"n": "By the loss", "col": Color("9ab8c8"), "what": "the things that could not be beaten, which you lost to and went on from"},
+	"mark": {"n": "By what stands", "col": Color("f0c8a0"), "what": "the things your choices left standing in the land, gone and looked at"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -1196,6 +1199,36 @@ const TRIALS := {
 		]},
 	# ---- Part XXIII (the Thundering Pots release): the general who obeyed, the lute with lead in it, the king who never
 	# lost a charge, and the first pot
+	# ---- Part XXIV (the Lost Horse release): the horse nobody was meant to own, and the keeper of both columns
+	"hu_steed": {"might": [2.8, 1.3],
+		"why": "It is of the line the Hu do not sell. It has thrown nine riders in its own country, and it followed an old mare over the frontier because it was tired of people who were sure of it. It will stand for nobody who comes up the height certain of bringing it down.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four cast shoes", "needs": [["item", "cast_shoe", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "The four shoes the old mare cast on the way. Lay them down in front of it. It knows that iron: it walked beside it for three hundred li, of its own will, and was not once led.",
+				"line": "Lin Feng lays four worn shoes on the rock and steps back from them. The red ear comes round. It has not been offered a thing with no hand on it before."},
+			{"id": "loss", "kind": "loss", "n": "Somebody the tide has moved", "needs": [["falls", 3]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Three battles that could not be won, lost and gone on from. It has thrown nine riders, and every one of them came up the height never having been thrown by anything. Go up as somebody who has.",
+				"line": "It breathes him in: salt, and wrack, and the particular quiet of a man who has lately been picked up and put down. It has not smelled that on a rider before."},
+			{"id": "mark", "kind": "mark", "n": "What he left standing", "needs": [["marks", 3]], "boon": {"foe_hp": 0.8, "weak_k": 1.8},
+				"desc": "Three things your choices left standing, gone and looked at. A horse knows whether whoever is coming up to it has ever gone back to see what became of a thing after he had done with it.",
+				"line": "Lin Feng tells it, as one tells a horse anything, about a road and a wall and a tree. The red ear stays on him to the end."},
+			{"id": "might", "kind": "might", "n": "Break it", "needs": [["lv", 85], ["temper", 9]], "boon": {},
+				"desc": "Middle Great Sound and a sword tempered nine times. Horses are broken. That is the word for it, and nine good riders have tried.",
+				"line": "Lin Feng draws. The horse looks at the north, and then, as if it could put it off no longer, at him."},
+		]},
+	"huofu": {"might": [2.9, 1.3],
+		"why": "Huofu has kept the book since there was first something to gain and something to lose: red for the one, black for the other, a line down the middle. Twenty-three in a row in your black column. It has been waiting to see the page turn, and it does not believe a man with that page can come up the hill meaning anything but to add to it.",
+		"paths": [
+			{"id": "loss", "kind": "loss", "n": "Three in the red", "needs": [["falls", 3]], "boon": {"foe_hp": 0.65, "foe_atk": 0.8},
+				"desc": "Three battles that could not be won, lost and gone on from. Show it the red column. Then ask it to put its brush on the place where your losing ended and your choosing began, and watch it try.",
+				"line": "\"Three,\" says Lin Feng, \"and here is what came of each.\" The red brush stops over the page. It cannot find where to put the line."},
+			{"id": "mark", "kind": "mark", "n": "What stands", "needs": [["marks", 6]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "Six things your choices left standing, gone and looked at. None of them is a gain or a loss. They are only there. Name them to something that has two columns and nowhere to write a thing that is only there.",
+				"line": "A road. A bell. A row of houses on legs. Huofu writes each one down, and then sits with both brushes lifted, because neither column will take them."},
+			{"id": "might", "kind": "might", "n": "Add to the black column", "needs": [["lv", 86], ["temper", 9]], "boon": {},
+				"desc": "Late Great Sound and a sword tempered nine times. It expects exactly this of you. It has the brush wet already.",
+				"line": "Lin Feng draws. \"Twenty-four, then,\" says Huofu, with both mouths, and dips the black brush."},
+		]},
 	"meng_tian": {"might": [2.6, 1.3],
 		"why": "Meng Tian built the Wall with three hundred thousand men and never marched without the tally. When a forged letter told him to die he asked only whether the seal was true. Fired in clay and buried with the army, he has half a tally and is keeping the vanguard ready, for an order that is not coming.",
 		"paths": [
@@ -1407,6 +1440,12 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"airs":
 			# the airs of the hearths learned (music.gd)
 			return g.airs.size() >= int(n[1])
+		"falls":
+			# the Lost Horse release: battles that could not be won, lost and gone on from (dooms.gd)
+			return g.fallen >= int(n[1])
+		"marks":
+			# what the choices left standing, looked at (marks.gd)
+			return g.marks_seen.size() >= int(n[1])
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1488,6 +1527,10 @@ static func need_text(n: Array, g) -> String:
 			return "%d companies in the host (now %d: the levy of the hearths, the works, the notice board; Esc > The Host)" % [int(n[1]), War.companies(g).size()]
 		"airs":
 			return "%d airs of the hearths learned (now %d: somebody at each hearth still sings its own)" % [int(n[1]), g.airs.size()]
+		"falls":
+			return "%d battles that could not be won, lost and gone on from (now %d)" % [int(n[1]), g.fallen]
+		"marks":
+			return "%d things your choices left standing, gone and looked at (now %d: Esc > Crossroads says where each stands)" % [int(n[1]), g.marks_seen.size()]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).
@@ -1588,7 +1631,8 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	# went through most trials side by side or by the people had a script error for a title)
 	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire",
 	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave", "arms": "Whose Hand Is Open",
-	"heights": "Who Stood on the Tops", "host": "Whom They Came For", "song": "Who Sang Them Home"}
+	"heights": "Who Stood on the Tops", "host": "Whom They Came For", "song": "Who Sang Them Home",
+	"loss": "Who Lost and Went On", "mark": "Whose Word Stayed Where It Was Put"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

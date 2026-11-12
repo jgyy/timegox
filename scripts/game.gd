@@ -193,6 +193,12 @@ var needs_fell := {}
 ## courtship (romance.gd): the stage, the gifts given, the hours had together, and the tone taken
 var romance := {}
 ## Old Du's mat (gamble.gd): the throws so far (every throw is drawn from this count), and how it has gone
+## the Lost Horse release: what the choices left standing that has been looked at (marks.gd); and the
+## things that could not be beaten (dooms.gd): how each was lost, how often, how often by giving way
+var marks_seen := {}
+var falls := {}
+var fallen := 0
+var yielded := 0
 var gamble_n := 0
 var gamble_rounds := 0
 var gamble_wins := 0
@@ -353,6 +359,10 @@ func reset() -> void:
 	needs_clock = 0.0
 	needs_fell = {}
 	romance = {}
+	marks_seen = {}
+	falls = {}
+	fallen = 0
+	yielded = 0
 	gamble_n = 0
 	gamble_rounds = 0
 	gamble_wins = 0
@@ -570,6 +580,9 @@ func address() -> String:
 
 ## A pack this far below Lin Feng scatters before his aura rather than fight (Main.interact).
 func scatters(group: Array) -> bool:
+	# (dooms.gd: what cannot be beaten does not run from anybody's realm)
+	if Dooms.in_group(group):
+		return false
 	var top := 0
 	for g in group:
 		top = maxi(top, int(g.lv))
@@ -852,6 +865,12 @@ func poll_steps() -> void:
 			"host":
 				# Part XXIII: so many companies in the host (war.gd)
 				ok = War.companies(self).size() >= int(s.n)
+			"falls":
+				# Part XXIV: so many packs of what cannot be beaten stood in front of, and lost to (dooms.gd)
+				ok = hunt >= int(s.n)
+			"marks":
+				# Part XXIV: so many of the things his choices left standing gone and looked at (marks.gd)
+				ok = marks_seen.size() >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -909,8 +928,10 @@ func objective_text() -> String:
 	var t: String = s.t
 	if s.kind == "collect":
 		t += "  (%d/%d)" % [mini(inv.get(s.item, 0), s.n), s.n]
-	elif s.kind == "hunt":
+	elif s.kind == "hunt" or s.kind == "falls":
 		t += "  (%d/%d)" % [mini(hunt, s.n), s.n]
+	elif s.kind == "marks":
+		t += "  (%d/%d)" % [mini(marks_seen.size(), int(s.n)), int(s.n)]
 	elif s.kind == "gates":
 		t += "  (%d/%d)" % [mini(gates_open.size(), int(s.n)), int(s.n)]
 	elif s.kind == "visits" or s.kind == "fates":

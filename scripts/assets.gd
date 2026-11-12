@@ -61,6 +61,8 @@ const PEOPLE := {
 	# Part XXII (the High Roads release)
 	"xie_lingyun": "characters/xie_lingyun", "liezi": "characters/liezi", "zhong_ziqi": "characters/zhong_ziqi", "han_yu": "characters/han_yu",
 	"shan_gui": "characters/shan_gui", "dongyue": "characters/dongyue",
+	# Part XXIV (the Lost Horse release): the old man of the frontier, his son, and the king of the sea-wall
+	"sai_weng": "characters/sai_weng", "weng_son": "characters/weng_son", "qian_liu": "characters/qian_liu",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
@@ -71,6 +73,8 @@ const PEOPLE := {
 	# the Hollow Hills release (Part XX): the traveller who measures caves, the Foolish Old Man and the Wise
 	# one, the woodcutter of Rotten-Axe Mountain, and the Valley Spirit
 	"xu_xiake": "characters/xu_xiake", "yu_gong": "characters/yu_gong", "zhi_sou": "characters/zhi_sou", "wang_zhi": "characters/wang_zhi", "xuanpin": "characters/xuanpin",
+	# (the Lost Horse release: the bodies of the towns worn by whoever a choice left standing somewhere, marks.gd)
+	"folk_farmer": "characters/folk_farmer", "folk_grandma": "characters/folk_grandma", "folk_farmwife": "characters/folk_farmwife", "folk_monk": "characters/folk_monk", "folk_merchant": "characters/folk_merchant",
 	"folk_herder": "characters/folk_herder", "folk_herder_f": "characters/folk_herder_f", "folk_oasis_f": "characters/folk_oasis_f",
 	"folk_boatwoman": "characters/folk_boatwoman", "folk_founder": "characters/folk_founder", "folk_lantern_f": "characters/folk_lantern_f",
 	"lin_feng_f": "characters/lin_feng_f", "lin_feng_f_wanderer": "characters/lin_feng_f_wanderer", "lin_feng_f_wild": "characters/lin_feng_f_wild", "lin_feng_f_scholar": "characters/lin_feng_f_scholar",

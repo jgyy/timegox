@@ -2133,6 +2133,10 @@ func _run() -> void:
 		# the Thundering Pots release (--pots, or --pots=a,b): the wardrobe, the field of war, the pages of
 		# feats, songs and the host, the Drum Tower quarter, Old Du's mat and Part XXIII
 		await _pots_shots(str(main.args.pots))
+	if main.args.has("horse"):
+		# the Lost Horse release (--horse, or --horse=a,b): what the choices left standing, the battles that
+		# cannot be won, and Part XXIV
+		await _horse_shots(str(main.args.horse))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -3772,3 +3776,195 @@ func _pots_shots(which: String = "1") -> void:
 		await _shot("crossroads_host")
 		main.pop()
 		Game.cross_pending = []
+
+
+# ================================================================ the Lost Horse release
+func _horse_state() -> void:
+	_pots_state()
+	Game.level = 86
+	Game.step = Data.step_index("s_p24_marks")
+	Game.picks = {}
+	Game.scales = {}
+	Game.falls = {}
+	Game.fallen = 0
+	Game.marks_seen = {}
+	Game.toasts.clear()
+
+## Put the party a little way off mark `id` of the land (on open ground beside it), at `hour`, and look
+## down at the whole row of it from `dist` metres off and `up` metres above, from whichever quarter
+## has open ground under the camera (a region is turned on the continent, and a wood may be anywhere).
+func _mark_view(id: String, hour: float, dist: float, up: float) -> bool:
+	var w = main.world
+	var row: Array = []
+	for e in Atlas.world_of("surface").ents:
+		if str(e.id) == id or str(e.id).begins_with(id + ":"):
+			row.append(e)
+	if row.is_empty():
+		return false
+	var me: Dictionary = row[0]
+	var at: Vector2i = me.pos
+	for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]:
+		if w.tile_free(me.pos + d) and w.ent_at(me.pos + d) == null:
+			at = me.pos + d
+			break
+	_high_put(at, me.pos - at if at != me.pos else Vector2i(0, 1), hour)
+	await _wait(0.5)
+	var c := Vector3.ZERO
+	for e2 in row:
+		c += w.wpos(e2.pos)
+	c /= float(row.size())
+	c.y = w.ground_y(c)
+	var best := Vector2(-1, 1)
+	var bs := -1
+	for az in [Vector2(-1, 1), Vector2(1, 1), Vector2(1, -1), Vector2(-1, -1), Vector2(0, 1), Vector2(1, 0), Vector2(0, -1), Vector2(-1, 0)]:
+		# open ground all the way from the camera to the thing looked at
+		var sc := 0
+		for k in range(1, 9):
+			var q: Vector2i = me.pos + Vector2i(roundi(az.normalized().x * dist * 0.5 * k / 6.0), roundi(az.normalized().y * dist * 0.5 * k / 6.0))
+			# (a roof between the camera and the thing is no better than a wood)
+			if q.x >= 0 and q.y >= 0 and q.x < int(w.w) and q.y < int(w.h) and int(w.grid[q.y * int(w.w) + q.x]) in [MapGen.FLOOR, MapGen.PATH, MapGen.DECOR]:
+				sc += 1
+		if sc > bs:
+			bs = sc
+			best = az
+	var off := Vector3(best.normalized().x * dist, up, best.normalized().y * dist)
+	w.cam_override = Transform3D(Basis.IDENTITY, c + off).looking_at(c + Vector3(0, 0.8, 0), Vector3.UP)
+	await _wait(0.4)
+	return true
+
+## The Lost Horse (--horse, or --horse=a,b): the people ("people"), the foes, the dooms and the lords
+## ("foes"), what stands as a row of models ("marks"), the same ground under each answer in the land
+## ("world"), the battles that cannot be won ("battle"), the choice and the scene after ("choice"),
+## and the pages ("page").
+func _horse_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_horse_state()
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("people"):
+		await _gallery("part24_people", [Assets.person("sai_weng"), Assets.person("weng_son"), Assets.person("qian_liu")], 0.76, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["slipped_halter", "burr_sprite", "hoof_echo", "wrack_crab", "salt_gull", "drift_log", "silt_ape", "weir_eel", "mired_ox", "outrider", "remount", "camp_hound"]:
+			fs.append(_foe(fid))
+		await _gallery("part24_foes", fs, 1.0, 0.25)
+		await _gallery("part24_dooms", [_foe("spring_colt"), _foe("tide_horse"), _foe("tide_mare"), _foe("wuzhiqi", true), _foe("the_riders", true)], 2.0, 0.25)
+		await _gallery("part24_lords", [_foe("hu_steed", true), _foe("huofu", true)], 2.2, 0.25)
+	if want.call("marks"):
+		# what stands, as the game builds it: each crossroads' answers side by side
+		var rows := [["marks_part1", [["bandits", "mend"], ["bandits", "drive"], ["palace", "seal"], ["palace", "open"], ["widow", "truth"], ["widow", "kind"]]],
+			["marks_makers", [["drawings", "keep"], ["the_wheel", "hours"], ["the_wheel", "down"], ["furnace", "return"], ["the_player", "keep"], ["the_lute", "melt"], ["the_host", "band"]]],
+			["marks_tide", [["the_tide", "wall"], ["the_tide", "yield"], ["the_tide", "arrows"]]],
+			["marks_ape", [["the_ape", "chain"], ["the_ape", "dredge"], ["the_ape", "boats"]]],
+			["marks_horse", [["the_horse", "keep"], ["the_horse", "loose"], ["the_horse", "breed"]]]]
+		for rw in rows:
+			var ms: Array = []
+			for pr in rw[1]:
+				ms.append(Marks.model(Marks.MARKS[pr[0]][pr[1]], 0))
+			await _gallery(str(rw[0]), ms, 1.5, 0.3)
+		var sg: Array = []
+		for sc in Echoes.SCALE_ORDER:
+			for l in [1, -1]:
+				var sm := Marks.model(Marks.SIGNS[sc][l], 0)
+				Machines.animate(sm, 1.3)
+				sg.append(sm)
+		await _gallery("marks_signs", sg, 1.5, 0.3)
+	if want.call("world"):
+		# the same ground under each answer: the shore at Yanggu, the Drowned Fields, the frontier, and
+		# two of the oldest crossroads
+		w.open_world()
+		w.enter_layer("surface")
+		# (--horse-world=a,b: only those crossroads)
+		var wonly: PackedStringArray = str(main.args.get("horse-world", "")).split(",", false)
+		for sh in [["the_tide", "yanggu", ["wall", "yield", "arrows"], [17.0, 11.0], 10.0], ["the_ape", "drowned", ["chain", "dredge", "boats"], [15.0, 10.0], 15.0],
+				["the_horse", "aurora", ["keep", "loose", "breed"], [8.0, 4.5], 17.0], ["bandits", "bamboo", ["mend", "drive"], [13.0, 8.0], 9.0],
+				["palace", "palace", ["seal", "open"], [8.0, 4.5], 19.0], ["the_clay", "millet", ["stand", "kiln"], [12.0, 7.0], 16.0]]:
+			if not wonly.is_empty() and not wonly.has(str(sh[0])):
+				continue
+			var frames: Array = []
+			for oid in sh[2]:
+				Game.picks = {str(sh[0]): str(oid)}
+				if not await _mark_view("mark:%s:%s" % [str(sh[0]), str(sh[1])], float(sh[4]), float(sh[3][0]), float(sh[3][1])):
+					continue
+				await _shot("mark_%s_%s" % [str(sh[0]).trim_prefix("the_"), str(oid)])
+				frames.append(last_img)
+				w.cam_override = null
+			_sheet("mark_%s_answers" % str(sh[0]).trim_prefix("the_"), frames, 0.62 if frames.size() == 2 else 0.48)
+		# and what the scales stand in a region: mercy and rigour on the same spot, the new works and the old ways
+		for sv in [["heart", 6, "sign_mercy"], ["heart", -6, "sign_rigour"], ["craft", 6, "sign_new_works"], ["craft", -6, "sign_old_ways"], ["reach", 6, "sign_wide_world"], ["reach", -6, "sign_home_fire"]]:
+			Game.picks = {}
+			Game.scales = {str(sv[0]): int(sv[1])}
+			if not wonly.is_empty() and not wonly.has("signs"):
+				continue
+			if await _mark_view("sign:bamboo:%s" % str(sv[0]), 10.0, 7.0, 3.6):
+				await _shot(str(sv[2]))
+				w.cam_override = null
+		Game.scales = {}
+		# somebody who is only there for one answer
+		Game.picks = {"bandits": "mend"}
+		if (wonly.is_empty() or wonly.has("who")) and await _mark_view("who:bandits:mend", 9.5, 5.5, 2.8):
+			await _shot("mark_who_road_mender")
+			w.cam_override = null
+		Game.picks = {}
+	if want.call("battle"):
+		main.set_stack(["world"])
+		Game.level = 85
+		main.battle.start([{"id": "tide_horse", "lv": 85}, {"id": "tide_mare", "lv": 85}, {"id": "spring_colt", "lv": 85}], {"entity": {"id": "tour:tide", "group": []}, "boss": false, "theme": "yanggu"})
+		main.push("battle")
+		await _wait(3.4)
+		await _shot("battle_doom_tide")
+		main.battle.round_no = 3
+		main.battle.acts = {"blows": 6, "mends": 1}
+		main.battle._fall(false)
+		await _wait(1.0)
+		await _shot("battle_doom_overwhelmed")
+		main.pop()
+		Game.level = 86
+		main.battle.start([{"id": "wuzhiqi", "lv": 86}], {"entity": {"id": "boss_wuzhiqi"}, "boss": true, "enemy": "wuzhiqi", "theme": "drowned"})
+		main.push("battle")
+		await _wait(3.6)
+		await _shot("battle_boss_wuzhiqi")
+		main.pop()
+		main.battle.start([{"id": "the_riders", "lv": 87}], {"entity": {"id": "boss_the_riders"}, "boss": true, "enemy": "the_riders", "theme": "aurora"})
+		main.push("battle")
+		await _wait(3.6)
+		await _shot("battle_boss_the_riders")
+		main.pop()
+		for bid in ["hu_steed", "huofu"]:
+			var bm: Array = Trials.TRIALS[bid].might
+			main.battle.start([{"id": bid, "lv": 86, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": "aurora" if bid == "hu_steed" else "yanggu",
+				"trial": bid, "path": "loss", "boon": Trials.path(bid, "loss").boon, "path_n": str(Trials.path(bid, "loss").n), "path_kind": str(Trials.KINDS.loss.n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		main.say(Data.DIALOGUE["fall:wuzhiqi"] + Data.DIALOGUE["fall:wuzhiqi:gave"])
+		main.dialogue.shown = 999.0
+		await _wait(1.2)
+		await _shot("fall_wuzhiqi")
+		main.set_stack(["world"])
+		for cc in [["the_tide", "s_p24_wrack", 1, "crossroads_tide"], ["the_ape", "s_p24_lost", 1, "crossroads_ape"], ["the_horse", "s_p24_end", 0, "crossroads_horse"]]:
+			Game.step = Data.step_index(str(cc[1]))
+			Game.picks = {}
+			Game.cross_pending = [str(cc[0])]
+			main.ask_crossroads()
+			main.choice.cursor = int(cc[2])
+			await _wait(1.0)
+			await _shot(str(cc[3]))
+			main.pop()
+			Game.cross_pending = []
+	if want.call("page"):
+		Game.step = Data.step_index("s_p24_twin")
+		Game.trials = {}
+		Game.fallen = 5
+		Game.marks_seen = {"a": true, "b": true, "c": true, "d": true}
+		main.set_stack(["world"])
+		main.open_trial({"enemy": "huofu", "lv": 87, "req": 86, "id": "boss_huofu", "pos": Vector2i.ZERO})
+		await _wait(0.8)
+		await _shot("trial_by_the_loss")
+		main.pop()
+	get_tree().quit(0)

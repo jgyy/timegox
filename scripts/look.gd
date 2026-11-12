@@ -192,6 +192,7 @@ const PICKUP_COLORS := {
 	# Part XXI: an unasked blank, a bamboo switch, a spent arrow, an empty hilt, a tally, a name-tablet
 	"sword_blank": Color("5a5e6a"), "bamboo_switch": Color("7ac060"), "spent_arrow": Color("e8dcc0"), "old_hilt": Color("b89a50"), "challenge_tally": Color("c8a070"), "saint_tablet": Color("d8d0b8"),
 	# Part XXII: road salt, the Earl's knotted cords, a scholar's farewells and the kings' jade slips
+	"cast_shoe": Color("8a8a94"), "bore_shell": Color("f0d8c8"), "chain_link": Color("4a4a52"), "muster_slip": Color("e8dcc0"),
 	"bell_shard": Color("d8c060"), "tiger_tally": Color("c8a050"), "pitch_pipe": Color("c8d080"), "chu_banner": Color("c84a3a"), "clay_duck": Color("f0d040"),
 	"salt_bag": Color("e8e4dc"), "wind_knot": Color("9aa8b8"), "thrown_letter": Color("f0e8d0"), "merit_slip": Color("d8ecd8"),
 	# Part XX: stone-milk, a basket of the mountain, a miner's lamp, a rubbing from a cave wall

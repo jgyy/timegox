@@ -526,6 +526,9 @@ func _init() -> void:
 	var folk9 := 0
 	for n9 in Data.AREAS.yanggu.npcs:
 		check(Data.CHAT.has(n9.id) and Data.CHAT[n9.id].size() >= 3, "%s has at least three things to say" % n9.id)
+		# (somebody who came to the shore in a later chapter, "late", is not one of the market's own)
+		if n9.get("late", false):
+			continue
 		check(n9.get("vis", ["", ""])[0] == "s_yg_intro" and n9.get("vis", ["", ""])[1] == "", "%s stays in the market for the rest of the game once its road opens" % n9.id)
 		if n9.id != "ah_mei":
 			folk9 += 1
@@ -876,7 +879,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -959,6 +962,13 @@ func _init() -> void:
 					"airs":
 						# the airs of the six hearths (music.gd)
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Music.AIRS.size()
+					"falls":
+						# the Lost Horse release: battles that cannot be won (dooms.gd): no more than the
+						# story itself puts in the way before the trial
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 3
+					"marks":
+						# what the choices left standing (marks.gd): fewer than there are crossroads behind him
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 8
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1127,7 +1137,7 @@ func _init() -> void:
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -1142,6 +1152,10 @@ func _init() -> void:
 			if not st8.has("cave"):
 				for pe8b in Data.AREAS[st8.area].get("warband2", {}).get("pool", []):
 					marching8[pe8b[0]] = true
+				# (Part XXIV: and a third and a fourth)
+				for bk8 in ["warband3", "warband4"]:
+					for pe8c in Data.AREAS[st8.area].get(bk8, {}).get("pool", []):
+						marching8[pe8c[0]] = true
 			for fid in st8.of:
 				check(Data.ENEMIES.has(fid) and marching8.has(fid), "%s hunts %s, who marches in %s" % [st8.id, fid, st8.area])
 	var G5 = load("res://scripts/game.gd").new()
@@ -1789,6 +1803,7 @@ func _fates_and_faces() -> void:
 	_hundred_arms()
 	_high_roads()
 	_thundering_pots()
+	_lost_horse()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -2791,6 +2806,11 @@ func _hundred_works() -> void:
 			var who := key.get_slice(":", 1)
 			if Data.step_index(who) >= 0:
 				return Data.step_index(who)
+			# (Part XXIV: a lord that cannot be beaten is a step of kind "fall")
+			if _kill_step(who) < 0:
+				for fi in Data.STEPS.size():
+					if str(Data.STEPS[fi].kind) == "fall" and str(Data.STEPS[fi].boss) == who:
+						return fi
 			return _kill_step(who)
 		if key.begins_with("done:") or key.begins_with("visit:"):
 			# (a call paid on somebody for a step of visits is heard during that step)
@@ -2843,7 +2863,7 @@ func _hundred_works() -> void:
 	Echoes.take(HWG, "bandits", "drive")
 	check(Echoes.chosen(HWG, "bandits") == "mend" and Echoes.scale(HWG, "heart") == 2, "a crossroads is answered once")
 	var gw: Array = Echoes.told(HWG, "s_vl_intro", Data.DIALOGUE.s_vl_intro)
-	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 3],
+	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 4],
 		"six parts later Granny Wen speaks of the road-menders, and the echo is kept")
 	check(Echoes.told(HWG, "s_intro", Data.DIALOGUE.s_intro) == Data.DIALOGUE.s_intro, "a conversation with no crossroads behind it is as it was")
 	check(not Echoes.merciful(HWG), "one kindness is not yet a name")
@@ -2860,7 +2880,7 @@ func _hundred_works() -> void:
 	check(Echoes.lean(HWG, "craft") == 1 and Echoes.lean_mod(HWG, "works_stones") == Echoes.WORKS_STONES and Works.cost_stones(HWG, "wooden_ox") < int(Works.TIER_STONES[5]), "of the new works: the makers ask less")
 	Echoes.take(HWG, "cauldron_map", "keep")
 	check(Echoes.lean(HWG, "reach") == -1 and Echoes.lean_mod(HWG, "renown") == float(Echoes.RENOWN_MORE) and Echoes.lean_mod(HWG, "regard") == 1.0, "of the home fire: his name comes back larger")
-	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 3") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
+	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 4") and Echoes.text(HWG, "bandits").contains("It stands in the land: The Menders' Road") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
 	# the last question of Part XIX can only be answered for a school by somebody who has built three works of it
 	HWG.works = {}
 	var lastq: Dictionary = Echoes.CROSSROADS.the_works
@@ -3721,6 +3741,291 @@ func _high_roads() -> void:
 	check(bsrc.contains("\"shanxiao\": \"heights\"") and bsrc.contains("\"the_tops\": [\"cairn\"]") and bsrc.contains("func _summit_step") and bsrc.contains("func _glide_step") and bsrc.contains("Folk.CAMP_ROLES.has(role)"),
 		"the bot has a plan for every trial and crossroads of Part XXII, climbs, glides and finds the people of the road")
 
+# ================================================================ the Lost Horse release
+## What the choices left standing (marks.gd), what cannot be beaten (dooms.gd), and Part XXIV.
+func _lost_horse() -> void:
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var btsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	print("== what the choices left standing (marks.gd) ==")
+	var answers := 0
+	var who_n := 0
+	for cid in Echoes.ORDER:
+		check(Marks.MARKS.has(cid), "%s: every answer leaves something standing" % cid)
+		for o in Echoes.CROSSROADS[cid].options:
+			answers += 1
+			var mk: Dictionary = Marks.MARKS.get(cid, {}).get(str(o.id), {})
+			check(not mk.is_empty() and Data.AREAS.has(str(mk.get("area", ""))) and str(mk.get("n", "")).length() > 3 and fits.call(str(mk.get("desc", ""))) and str(mk.get("desc", "")).length() > 60,
+				"%s/%s stands somewhere real, with a name and something to read that fits the box" % [cid, o.id])
+			check(Echoes.stands_text(cid, str(o.id)).contains(str(Data.AREAS[str(mk.area)].n)), "%s/%s: the choice screen says where it will stand" % [cid, o.id])
+			var mm := Marks.model(mk, 0)
+			check(mm.get_child_count() >= 1, "%s/%s: what stands is built from code" % [cid, o.id])
+			mm.free()
+			if mk.has("who"):
+				who_n += 1
+				var wh: Array = mk.who
+				check(wh.size() >= 5 and Assets.PEOPLE.has(str(wh[1])) and Assets.has(Assets.PEOPLE[str(wh[1])]) and fits.call(str(wh[3])) and fits.call(str(wh[4])), "%s/%s: somebody stands by it, in a body of the towns, with two things to say" % [cid, o.id])
+		for oid in Marks.MARKS.get(cid, {}):
+			check(not Echoes.option(cid, str(oid)).is_empty(), "%s: the mark %s is of a real answer" % [cid, oid])
+	check(Marks.MARKS.size() == Echoes.ORDER.size() and Marks.totals()[0] == answers and answers >= 80 and Marks.totals()[1] >= 150 and who_n >= 5,
+		"%d answers of %d crossroads leave %d things standing, and %d of them somebody beside it" % [answers, Echoes.ORDER.size(), Marks.totals()[1], who_n])
+	for sc in Echoes.SCALE_ORDER:
+		for l in [1, -1]:
+			var sg: Dictionary = Marks.SIGNS[sc].get(l, {})
+			check(not sg.is_empty() and fits.call(str(sg.desc)), "a scale that leans (%s %d) stands something in every region" % [sc, l])
+			var sm := Marks.model(sg, 0)
+			check(sm.get_child_count() >= 1, "and it is built from code")
+			sm.free()
+	# where they stand: on open ground of their own region, walked to from where the realm is entered,
+	# with open ground all round (so nothing is shut in or cut off), and no two on one tile
+	var placed := {}
+	var signs := 0
+	var sign_areas := {}
+	var whos := 0
+	for lid in ["surface", "heaven", "under", "sea"]:
+		var lw: Dictionary = Atlas.world_of(lid)
+		var reach := MapGen.flood(lw.grid, lw.w, lw.h, lw.start)
+		var at := {}
+		for e in lw.ents:
+			if e.has("pos") and e.kind != "mark":
+				at[e.pos] = true
+		for e in lw.ents:
+			if e.kind == "npc" and e.has("pick"):
+				whos += 1
+				check(e.has("lines") and (e.lines as Array).size() >= 2 and not Echoes.option(str(e.pick[0]), str(e.pick[1])).is_empty() and MapGen.is_walkable_tile(lw.grid[e.pos.y * int(lw.w) + e.pos.x]), "%s stands beside what was chosen, with words of their own" % e.id)
+			if e.kind != "mark":
+				continue
+			var okk := not at.has(e.pos) and Atlas.owner_id(lw, e.pos) == str(e.area)
+			for dy in range(-1, 2):
+				for dx in range(-1, 2):
+					var q: Vector2i = e.pos + Vector2i(dx, dy)
+					okk = okk and MapGen.is_walkable_tile(lw.grid[q.y * int(lw.w) + q.x]) and (reach.has(q) or (dx == 0 and dy == 0))
+			check(okk, "%s stands on open ground of %s, with open ground all round" % [e.id, e.area])
+			at[e.pos] = true
+			if e.has("scale"):
+				signs += 1
+				sign_areas[str(e.area)] = true
+			else:
+				var bk := Marks.seen_key(str(e.id))
+				placed[bk] = int(placed.get(bk, 0)) + 1
+				check(Marks.sites(str(e.cross)).has(str(e.area)), "%s is in a region one of its answers touched" % e.id)
+	for cid2 in Marks.MARKS:
+		for oid2 in Marks.MARKS[cid2]:
+			var want_k := int(Marks.MARKS[cid2][oid2].get("k", 1))
+			var got_k := int(placed.get(Marks.id_of(cid2, oid2), 0))
+			check(got_k >= want_k, "%s/%s: it found room to stand (%d of %d)" % [cid2, oid2, got_k, want_k])
+	check(sign_areas.size() == Atlas.all_region_ids().size() - 1 and signs == sign_areas.size() * 3 and whos == who_n, "the scales stand their signs in %d regions (%d signs), and %d people stand by what was chosen" % [sign_areas.size(), signs, whos])
+	var KG = load("res://scripts/game.gd").new()
+	KG.reset()
+	var ws: Dictionary = Atlas.world_of("surface")
+	check(Marks.standing(KG, ws.ents) == 0, "before anything is chosen, nothing stands")
+	Echoes.take(KG, "bandits", "mend")
+	var mend_e: Dictionary = {}
+	var drive_e: Dictionary = {}
+	var hou: Dictionary = {}
+	for e2 in ws.ents:
+		if str(e2.id) == "mark:bandits:bamboo":
+			mend_e = e2
+		elif str(e2.id) == "mark:bandits:bamboo:4":
+			drive_e = e2
+		elif str(e2.id) == "who:bandits:mend":
+			hou = e2
+	check(not mend_e.is_empty() and Marks.stands(KG, mend_e) and Marks.stands(KG, drive_e) and Marks.name_of(KG, mend_e) == "The Menders' Road" and Marks.answer(KG, mend_e) == "mend"
+		and not hou.is_empty() and Marks.who_stands(KG, hou) and Marks.standing(KG, ws.ents) == int(Marks.MARKS.bandits.mend.k) and Marks.id_of("bandits", "mend") == "mark:bandits:bamboo",
+		"the forty set to mend the road leave five lengths of road in the Bamboo Forest, and a road-mender beside it")
+	var KG2 = load("res://scripts/game.gd").new()
+	KG2.reset()
+	Echoes.take(KG2, "bandits", "drive")
+	check(Marks.stands(KG2, mend_e) and not Marks.stands(KG2, drive_e) and Marks.name_of(KG2, mend_e) == "A Cold Camp" and not Marks.who_stands(KG2, hou) and Marks.standing(KG2, ws.ents) == int(Marks.MARKS.bandits.drive.k)
+		and Marks.key(KG2, mend_e) != Marks.key(KG, mend_e),
+		"the forty driven out leave three cold camps on the same ground, and nobody: the same place is another place")
+	KG2.free()
+	check(Marks.seen_key("mark:bandits:bamboo:3") == "mark:bandits:bamboo" and Marks.seen_key("sign:bamboo:heart") == "sign:bamboo:heart", "every length of one road is one thing looked at")
+	var sign_e: Dictionary = {}
+	for e3 in ws.ents:
+		if str(e3.id) == "sign:bamboo:heart":
+			sign_e = e3
+	check(not sign_e.is_empty() and not Marks.stands(KG, sign_e), "a scale that does not lean yet stands nothing")
+	Echoes.take(KG, "widow", "kind")
+	var k_pos := Marks.key(KG, sign_e)
+	check(Echoes.lean(KG, "heart") == 1 and Marks.stands(KG, sign_e) and Marks.name_of(KG, sign_e) == "A Wayside Table", "mercy that the land knows him by sets a table by the road in every region")
+	KG.scales["heart"] = -6
+	check(Marks.name_of(KG, sign_e) == "A Board of Edicts" and Marks.key(KG, sign_e) != k_pos, "and rigour a board of edicts in the same place: the world builds it again")
+	check(Echoes.text(KG, "bandits").contains("It stands in the land") and msrc.contains("It will stand in the land") and msrc.contains("Game.marks_seen"), "the Crossroads page and the choice itself say what will stand, and looking at it is remembered")
+	KG.free()
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(wsrc.contains("func _mark_model") and wsrc.contains("Marks.stands(Game, e)") and wsrc.contains("Marks.who_stands(Game, e)"), "the world shows what stands, builds it when it first does, and shows who stands by it")
+
+	print("== what cannot be beaten (dooms.gd) ==")
+	var dooms: Array = []
+	for eid in Data.ENEMIES:
+		if Dooms.is_doom(str(eid)):
+			dooms.append(str(eid))
+			check(Dooms.DOOMS.has(str(eid)) and Dooms.rounds(str(eid)) >= 2 and Dooms.rounds(str(eid)) <= 6 and str(Dooms.DOOMS[eid].crest).length() > 5, "%s cannot be beaten: it crests in a few rounds" % eid)
+			check(not Trials.TRIALS.has(str(eid)), "%s: no road through a trial leads past it" % eid)
+			if bool(Data.ENEMIES[eid].get("boss", false)):
+				check(Lore.BOSS.has(str(eid)) and not Dooms.DOOMS[eid].has("passes"), "%s is a doom of the story, with a story" % eid)
+			else:
+				check(Lore.BEAST.has(str(eid)) and (Dooms.DOOMS[eid].passes as Array).size() >= 1 and Habits.habit(str(eid)) == "tide", "%s roams, keeps the tide's hours, and has words for when it has passed" % eid)
+				for pl in Dooms.DOOMS[eid].passes:
+					check(fits.call(str(pl)), "%s: what is said when it passes fits the box" % eid)
+	for did in Dooms.DOOMS:
+		check(Dooms.is_doom(str(did)), "%s is one of the land's foes" % did)
+	check(dooms.size() == 5 and Dooms.FLOOR > 0.0 and Dooms.MEND > 0.0 and Dooms.RISE > 1.0 and Dooms.LEFT > 0.0, "five things cannot be beaten: three shapes of the tide, the Ape of the Huai and the Riders of the North")
+	check(Dooms.manner(true, 9, 0) == "gave" and Dooms.manner(false, 5, 2) == "struck" and Dooms.manner(false, 2, 5) == "kept" and Dooms.HOW.size() == 3 and Dooms.TILT.size() == 3, "how it was lost: gave way, struck, kept")
+	check(btsrc.contains("func _fall") and btsrc.contains("Dooms.FLOOR") and btsrc.contains("\"yield\"") and btsrc.contains("Give way") and msrc.contains("\"fall\":") and not msrc.substr(msrc.find("\"fall\":"), msrc.find("\"lose\":") - msrc.find("\"fall\":")).contains("respawn"),
+		"the battle has a fourth end: its harm closes, it crests, it can be given way to, and nobody is carried home for it")
+	var DG = load("res://scripts/game.gd").new()
+	DG.reset()
+	DG.level = 85
+	DG.companion = true
+	DG.hp = [1.0, 1.0]
+	var stones0: int = DG.stones
+	var heart0 := Echoes.scale(DG, "heart")
+	check(not DG.scatters([{"id": "tide_horse", "lv": 1}]) and DG.scatters([{"id": "bamboo_wolf", "lv": 1}]), "what cannot be beaten does not run from anybody's realm")
+	var line1 := Dooms.fell(DG, ["tide_horse", "tide_mare"], 85, "struck", 4)
+	check(line1 != "" and DG.fallen == 1 and DG.yielded == 0 and DG.falls.has("tide_horse") and DG.falls.has("tide_mare") and str(DG.falls.tide_horse.how) == "struck" and DG.deaths == 0 and DG.stones == stones0
+		and DG.hp[0] >= float(DG.max_hp(0)) * Dooms.LEFT - 0.5 and DG.exp > 0.0 and Echoes.scale(DG, "heart") == heart0 - 1,
+		"a pack of the tide goes over him: remembered, nothing taken, no death counted, something learned, and the scale tipped by how he lost")
+	Dooms.fell(DG, ["tide_horse"], 85, "gave", 1)
+	check(DG.fallen == 2 and DG.yielded == 1 and str(DG.falls.tide_horse.how) == "struck" and Echoes.scale(DG, "heart") == heart0 - 1, "the first time is the one that is told; a second tips nothing")
+	check(Dooms.fell(DG, ["wuzhiqi"], 86, "kept", 5) == "" and Dooms.met(DG) == 3 and Echoes.scale(DG, "heart") == heart0 and Dooms.epilogue(DG).contains("fought every one"), "a doom of the story is told by the story; the ending says how most were lost")
+	Feats.poll(DG)
+	check(DG.feats.has("first_fall") and DG.feats.has("gave_way") and not DG.feats.has("three_dooms") and Trials.need_met(["falls", 3], DG) and not Trials.need_met(["marks", 1], DG), "losing is a feat, and a way through a trial")
+	Dooms.fell(DG, ["the_riders"], 87, "gave", 1)
+	Feats.poll(DG)
+	check(DG.feats.has("three_dooms"), "the tide, the ape and the riders: all three stood in front of")
+	# the steps: a doom of the story, the dooms that roam, and going to look
+	DG.step = Data.step_index("s_p24_tide")
+	DG.hunt = 2
+	DG.poll_steps()
+	check(DG.cur_step().id == "s_p24_tide" and DG.objective_text().contains("(2/3)"), "two packs of the tide are not three")
+	DG.hunt = 3
+	DG.poll_steps()
+	check(DG.done("s_p24_tide") and DG.cross_pending.has("the_tide"), "three are: and what the shore is to do about it is asked")
+	DG.step = Data.step_index("s_p24_marks")
+	DG.marks_seen = {"mark:bandits:bamboo": true, "mark:garden:marsh": true, "sign:bamboo:heart": true, "sign:marsh:heart": true, "mark:the_tide:yanggu": true}
+	DG.poll_steps()
+	check(DG.cur_step().id == "s_p24_marks" and DG.objective_text().contains("(5/6)"), "five things looked at are not six")
+	DG.marks_seen["mark:the_ape:drowned"] = true
+	DG.poll_steps()
+	check(DG.done("s_p24_marks") and Trials.need_met(["marks", 6], DG), "six are")
+	DG.free()
+
+	print("== Part XXIV: the Lost Horse ==")
+	check(Data.REALMS.size() == 30 and Data.REALMS[29] == "Soft as Water" and Data.MAX_LEVEL == 87 and Data.level_name(87).ends_with("Soft as Water") and Data.REALM_INFO.size() == 30
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXIV adds the realm of Soft as Water")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break29" and Data.DIALOGUE.has("recall22") and msrc.contains("\"s_break28\": \"recall22\"") and Data.DIALOGUE.has("pre:s_break29") and Data.DIALOGUE.has("post:s_break29"),
+		"Part XXIV follows Great Sound, Rarely Heard (recall22) and ends the game")
+	var n24 := 0
+	var kinds24 := {}
+	var doom_bands := {}
+	for a24 in Data.AREAS:
+		for bk24 in ["warband", "warband2", "warband3", "warband4"]:
+			var bd24: Dictionary = Data.AREAS[a24].get(bk24, {})
+			if bd24.is_empty():
+				continue
+			var dn := 0
+			for pe24 in bd24.pool:
+				if Dooms.is_doom(str(pe24[0])):
+					dn += 1
+					doom_bands[str(pe24[0])] = a24
+			check(dn == 0 or (dn == (bd24.pool as Array).size() and str(bd24.get("until", "")) != "" and Data.step_index(str(bd24.until)) > Data.step_index(str(bd24.vis))),
+				"%s/%s: a band of what cannot be beaten is nothing else, and stops marching when its chapter has done with it" % [a24, bk24])
+			if bk24 in ["warband3", "warband4"]:
+				var lw24: Dictionary = Atlas.world_of(Data.layer_of(a24))
+				var marching24: Array = lw24.ents.filter(func(e6): return e6.kind == "enemy" and str(e6.id).begins_with(a24 + (":y" if bk24 == "warband3" else ":z")))
+				check(marching24.size() == int(bd24.n) and Data.step_index(str(bd24.vis)) >= 0, "%s: %d packs of its %s placed" % [a24, marching24.size(), bk24])
+				# (placed after the peaks and the camps: never on the rock, never at a camp fire)
+				var off_rock := true
+				for e7 in marching24:
+					for pk7 in lw24.peaks:
+						off_rock = off_rock and (str(pk7.area) != a24 or Vector2(e7.pos - (pk7.c as Vector2i)).length() > float(pk7.r))
+				check(off_rock, "%s: the packs of its %s keep off the rock of the peaks" % [a24, bk24])
+	for st24 in Data.STEPS:
+		if not str(st24.id).begins_with("s_p24_"):
+			continue
+		n24 += 1
+		kinds24[str(st24.kind)] = int(kinds24.get(str(st24.kind), 0)) + 1
+		if st24.kind == "talk":
+			check(Data.DIALOGUE.has(str(st24.id)), "%s: there is something said" % st24.id)
+		if not st24.kind in ["kill", "talk", "fall"]:
+			check(Data.DIALOGUE.has("done:" + str(st24.id)), "%s: something is said when it is done" % st24.id)
+		if st24.kind == "fall":
+			var fb := str(st24.boss)
+			var placed_b: Array = Data.AREAS[str(st24.area)].bosses.filter(func(b): return str(b.id) == fb)
+			check(Dooms.is_doom(fb) and bool(Data.ENEMIES[fb].get("boss", false)) and placed_b.size() == 1 and str(placed_b[0].vis[1]) == str(st24.id), "%s: a lord that cannot be beaten, who is gone when the losing is done" % st24.id)
+			check(Data.DIALOGUE.has("pre:" + fb) and Data.DIALOGUE.has("fall:" + fb) and not Data.DIALOGUE.has("post:" + fb), "%s: something is said before, and after the losing; there is no winning to speak of" % fb)
+			for hw in Dooms.HOW_ORDER:
+				check(Data.DIALOGUE.has("fall:%s:%s" % [fb, hw]), "%s: the scene after is told its own way for one who %s" % [fb, str(Dooms.HOW[hw])])
+				for fl in Data.DIALOGUE.get("fall:%s:%s" % [fb, hw], []) + Data.DIALOGUE.get("fall:" + fb, []):
+					check(fits.call(str(fl[1])), "fall:%s: a line that fits the box" % fb)
+		if st24.kind == "falls":
+			for fo in st24.of:
+				check(Dooms.is_doom(str(fo)) and not bool(Data.ENEMIES[fo].get("boss", false)) and str(doom_bands.get(str(fo), "")) == str(st24.area), "%s: %s cannot be beaten, and roams %s" % [st24.id, fo, st24.area])
+		if st24.kind == "marks":
+			check(int(st24.n) >= 3 and int(st24.n) * 4 <= Echoes.ORDER.size(), "%s: no more than a quarter of what a journey leaves standing" % st24.id)
+	check(n24 >= 24 and int(kinds24.get("fall", 0)) == 2 and int(kinds24.get("falls", 0)) == 1 and int(kinds24.get("kill", 0)) == 2 and int(kinds24.get("hunt", 0)) == 4 and int(kinds24.get("collect", 0)) == 4 and kinds24.has("marks") and kinds24.has("visits"),
+		"Part XXIV: %d steps: three things that cannot be beaten, two lords, four hunts, four searches, the six hearths and going to look" % n24)
+	for tid24 in ["hu_steed", "huofu"]:
+		check(Trials.TRIALS.has(tid24) and Data.ENEMIES[tid24].get("boss", false) and not Dooms.is_doom(tid24) and Lore.BOSS.has(tid24) and Trials.trial_of_step(Data.STEPS[_kill_step(tid24)]) == tid24, "%s is a lord of Part XXIV, guarded by a trial" % tid24)
+		check((Trials.TRIALS[tid24].paths as Array).any(func(pth): return str(pth.kind) == "loss") and (Trials.TRIALS[tid24].paths as Array).any(func(pth): return str(pth.kind) == "mark"), "%s can be passed by the loss or by what stands" % tid24)
+		check(Data.DIALOGUE.has("pre:" + tid24) and Data.DIALOGUE.has("post:" + tid24), "%s has something to say before and after" % tid24)
+	check(Trials.KINDS.has("loss") and Trials.KINDS.has("mark") and Trials.EPITHETS.has("loss") and Trials.EPITHETS.has("mark") and "loss" in Trials.KIND_ORDER and "mark" in Trials.KIND_ORDER,
+		"two new ways through trials: by the loss and by what stands")
+	for pid24 in ["sai_weng", "weng_son", "qian_liu"]:
+		check(Assets.PEOPLE.has(pid24) and Assets.has(Assets.PEOPLE[pid24]) and FileAccess.file_exists("res://art/characters/%s.py" % pid24) and Data.CHAT.has(pid24) and Data.CHAT[pid24].size() >= 3, "%s has a model built from a script, and things to say" % pid24)
+	for fid24 in ["slipped_halter", "burr_sprite", "hoof_echo", "wrack_crab", "salt_gull", "drift_log", "silt_ape", "weir_eel", "mired_ox", "outrider", "remount", "camp_hound"]:
+		check(Data.ENEMIES.has(fid24) and Lore.BEAST.has(fid24) and Habits.habit(fid24) != "" and not Dooms.is_doom(fid24), "%s: a foe of Part XXIV with a story and hours of its own" % fid24)
+	var x24: Array = []
+	var old_echo24 := 0
+	for cid24 in Echoes.ORDER:
+		var c24: Dictionary = Echoes.CROSSROADS[cid24]
+		if str(c24.part) == "XXIV":
+			x24.append(cid24)
+			check((c24.options as Array).size() == 3 and (c24.get("end", {}) as Dictionary).size() == 3 and (c24.get("echo", {}) as Dictionary).size() >= 1, "%s: three answers, each echoed and told at the end" % cid24)
+			var st_c: Dictionary = Data.STEPS[Data.step_index(str(c24.step))]
+			check(str(st_c.kind) in ["fall", "falls", "talk"], "%s is asked after a losing, or of the old man" % cid24)
+			for o24 in c24.options:
+				check(int(Marks.MARKS[cid24][str(o24.id)].get("k", 1)) >= 1 and str(Marks.MARKS[cid24][str(o24.id)].area) in ["yanggu", "drowned", "aurora"], "%s/%s changes the shape of its own country" % [cid24, o24.id])
+		else:
+			for ek24 in c24.get("echo", {}):
+				if str(ek24).contains("s_p24_") or str(ek24).contains("s_break29") or str(ek24) == "pre:the_riders":
+					old_echo24 += 1
+	check(x24 == ["the_tide", "the_ape", "the_horse"], "what is done about the tide, the ape and the horse is asked three times")
+	check(old_echo24 >= 4, "four older crossroads echo in Part XXIV (%d)" % old_echo24)
+	var tips24 := {}
+	for o25 in Echoes.CROSSROADS.the_horse.options:
+		for sc25 in o25.tilt:
+			tips24[sc25] = true
+	check(tips24.has("heart") and tips24.has("craft") and tips24.has("reach"), "the last crossroads of Part XXIV tips all three scales the ends ask about")
+	check(bsrc.contains("\"hu_steed\": \"relic\"") and bsrc.contains("\"huofu\": \"loss\"") and bsrc.contains("\"the_horse\": [\"keep\"]") and bsrc.contains("func _marks_step") and bsrc.contains("\"hunt\", \"falls\"") and bsrc.contains("\"kill\", \"fall\""),
+		"the bot has a plan for every trial and crossroads of Part XXIV, walks up to what cannot be beaten, and goes to look at what stands")
+	# what the chapter stands in the land can be walked up to
+	var wsurf: Dictionary = Atlas.world_of("surface")
+	var at_tile := {}
+	for e23 in wsurf.ents:
+		if e23.has("pos") and e23.kind != "enemy":
+			at_tile[e23.pos] = true
+	var found24 := 0
+	for e24 in wsurf.ents:
+		if not ((e24.kind == "pickup" and str(e24.id).begins_with("p24_")) or (e24.kind == "boss" and str(e24.enemy) in ["hu_steed", "wuzhiqi", "the_riders", "huofu"]) or (e24.kind == "npc" and str(e24.id) in ["sai_weng", "weng_son", "qian_liu"])):
+			continue
+		found24 += 1
+		var ways := 0
+		for d24 in MapGen.DIRS:
+			var q24: Vector2i = e24.pos + d24
+			if MapGen.is_walkable_tile(wsurf.grid[q24.y * int(wsurf.w) + q24.x]) and not at_tile.has(q24):
+				ways += 1
+		check(ways >= 1 and Atlas.owner_id(wsurf, e24.pos) == str(e24.area), "%s can be walked up to, in its own region (%d ways)" % [e24.id, ways])
+	check(found24 == 17 + 4 + 3, "seventeen things to find, four lords and three people of Part XXIV stand in the land (%d)" % found24)
+
 # ================================================================ the Thundering Pots release
 func _thundering_pots() -> void:
 	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
@@ -3733,10 +4038,10 @@ func _thundering_pots() -> void:
 		par.width = 1100
 		return par.get_line_count() <= 4
 	print("== Part XXIII: the Thundering Pots ==")
-	check(Data.REALMS.size() == 29 and Data.REALMS[28] == "Great Sound, Rarely Heard" and Data.MAX_LEVEL == 84 and Data.level_name(84).ends_with("Great Sound, Rarely Heard") and Data.REALM_INFO.size() == 29
+	check(Data.REALMS.size() >= 29 and Data.REALMS[28] == "Great Sound, Rarely Heard" and Data.MAX_LEVEL >= 84 and Data.level_name(84).ends_with("Great Sound, Rarely Heard") and Data.REALM_INFO.size() >= 29
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXIII adds the realm of Great Sound, Rarely Heard")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break28" and Data.DIALOGUE.has("recall21") and msrc.contains("\"s_break27\": \"recall21\"") and Data.DIALOGUE.has("pre:s_break28") and Data.DIALOGUE.has("post:s_break28"),
-		"Part XXIII follows Leaning on Nothing (recall21) and ends the game")
+	check(Data.step_index("s_break28") == Data.step_index("s_p24_home") - 1 and Data.DIALOGUE.has("recall21") and msrc.contains("\"s_break27\": \"recall21\"") and Data.DIALOGUE.has("pre:s_break28") and Data.DIALOGUE.has("post:s_break28"),
+		"Part XXIII follows Leaning on Nothing (recall21), and Part XXIV follows it")
 	var n23 := 0
 	var kinds23 := {}
 	for st23 in Data.STEPS:
@@ -3959,7 +4264,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.great_sound.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.soft_water.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()

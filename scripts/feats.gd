@@ -32,7 +32,13 @@ const FEATS := {
 	"golden_core": {"n": "A Pill of One's Own", "kind": "road", "pts": 5, "test": ["level", 6], "desc": "Form a Golden Core."},
 	"immortal": {"n": "No Dust on the Robe", "kind": "road", "pts": 10, "test": ["level", 24], "desc": "Ascend as a True Immortal."},
 	"half_way": {"n": "Fourteen Realms Up", "kind": "road", "pts": 10, "test": ["level", 42], "desc": "Reach the fourteenth great realm."},
-	"great_sound": {"n": "The Great Note", "kind": "road", "pts": 20, "test": ["level", 84], "desc": "Reach Great Sound, Rarely Heard: the last realm there is."},
+	"great_sound": {"n": "The Great Note", "kind": "road", "pts": 20, "test": ["level", 84], "desc": "Reach Great Sound, Rarely Heard."},
+	# the Lost Horse release: the last realm, what was lost to, and what was left standing
+	"soft_water": {"n": "Soft as Water", "kind": "road", "pts": 20, "test": ["level", 87], "desc": "Reach Soft as Water: the last realm there is."},
+	"first_fall": {"n": "Set Down Somewhere Else", "kind": "road", "pts": 5, "test": ["fallen", 1], "desc": "Lose a battle that could not be won, and go on."},
+	"three_dooms": {"n": "The Tide, the Ape and the Riders", "kind": "road", "pts": 10, "test": ["dooms", 3], "desc": "Stand in front of all three of the things that are not beaten."},
+	"gave_way": {"n": "Who Put Up the Sword", "kind": "road", "pts": 10, "test": ["yielded", 1], "desc": "Give way to something that cannot be fought, standing."},
+	"marks_twelve": {"n": "Gone Back to Look", "kind": "road", "pts": 10, "test": ["marks", 12], "desc": "Look at twelve of the things your choices left standing in the land."},
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
 	"sky_held": {"n": "The Sky Is Held", "kind": "road", "pts": 10, "test": ["step", "s_ch_hundun"], "desc": "End the Falling Sky."},
 	"tribulations": {"n": "Struck Twenty Times", "kind": "road", "pts": 10, "test": ["realm", 20], "desc": "Come through twenty Heavenly Tribulations."},
@@ -252,6 +258,15 @@ static func value(g, t: Array) -> float:
 			return float(g.heard.size())
 		"airs":
 			return float(g.airs.size())
+		"fallen":
+			return float(g.fallen)
+		"yielded":
+			return float(g.yielded)
+		"dooms":
+			# (dooms.gd: the tide, in any of its three shapes, is one of them)
+			return float((1 if g.falls.has("tide_horse") or g.falls.has("tide_mare") or g.falls.has("spring_colt") else 0) + (1 if g.falls.has("wuzhiqi") else 0) + (1 if g.falls.has("the_riders") else 0))
+		"marks":
+			return float(g.marks_seen.size())
 		"songs_played":
 			return float(g.songs_played)
 		"outfits":

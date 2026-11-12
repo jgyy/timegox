@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 84
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard"]
+const MAX_LEVEL := 87
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -79,6 +79,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Leans on Nothing", "note": "Master Lie rode the wind, cool and light, and came back after fifteen days; and still, says the old book, he had something to lean on. One who mounts on what is true of heaven and earth, and rides the changes of the six breaths, leans on nothing. You go up by your hands and come down by the air, and need neither. Paths are a little easier behind you, and nobody who walks them knows why."},
 	# Part XXIII (the Thundering Pots release): what is left when the noise stops
 	{"life": 0, "title": "Who Hears the Note Not Sounded", "note": "The great square has no corners, says the old book; the great vessel is late in finishing; the great note is rarely sounded; the great image has no shape. Ling Lun cut twelve pipes to the phoenix's song and has spent four thousand years listening for the one the phoenix did not sing. You have heard a field of eight thousand go quiet all at once. Where you walk, bells are in tune that have not been tuned, and nobody quarrels in the hour before supper."},
+	# Part XXIV (the Lost Horse release): what is left when he has lost
+	{"life": 0, "title": "Who Yields and Is Whole", "note": "Nothing under heaven is softer or weaker than water, says the old book, and for attacking what is hard and strong nothing can surpass it. Bend, and be whole; be low, and be filled. You have stood in front of three things no sword turns, and lost to all three, and are still here, and the land is a different shape for what you did afterwards. Whoever does not contend, nobody under heaven can contend with."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -802,6 +804,28 @@ const ENEMIES := {
 	"gao_jianli": {"n": "Gao Jianli of the Leaded Lute", "elem": "dark", "weak": "fire", "col": Color("4a4a5a"), "shape": "person:gao_jianli", "boss": true},
 	"xiang_yu": {"n": "The Hegemon-King of Western Chu", "elem": "phys", "weak": "wood", "col": Color("7a2a2a"), "shape": "person:xiang_yu", "boss": true},
 	"wafu": {"n": "Wafu, the Thundering Pot", "elem": "earth", "weak": "thunder", "col": Color("9a6a4a"), "shape": "blob", "boss": true, "pal": {"sec": Color("4a3020"), "acc": Color("e8c080"), "mark": Color("2a1a12")}},
+	# ---- Part XXIV: The Lost Horse (the Lost Horse release): what follows a lost horse, what the tide leaves, what
+	# the Huai carries, who rides ahead of ten thousand; and three things that cannot be beaten (dooms.gd)
+	"slipped_halter": {"n": "Slipped Halter", "elem": "wood", "weak": "fire", "col": Color("9a7a4a"), "shape": "serpent", "pal": {"sec": Color("5a4428"), "acc": Color("d8c090")}},
+	"burr_sprite": {"n": "Burr-Sprite", "elem": "earth", "weak": "wood", "col": Color("8a8a4a"), "shape": "plant", "pal": {"sec": Color("4a4a28"), "acc": Color("e0d890")}},
+	"hoof_echo": {"n": "Hoofbeat with Nothing in It", "elem": "thunder", "weak": "earth", "col": Color("b8c8d8"), "shape": "wisp", "pal": {"sec": Color("5a6a7a"), "acc": Color("f0f4ff")}},
+	"wrack_crab": {"n": "Wrack-Crab", "elem": "water", "weak": "thunder", "col": Color("7a6a5a"), "shape": "crab", "pal": {"sec": Color("3a4a3a"), "acc": Color("d8c8a0")}},
+	"salt_gull": {"n": "Salt-Gull", "elem": "thunder", "weak": "earth", "col": Color("e8e8e0"), "shape": "bird", "pal": {"sec": Color("7a8a9a"), "acc": Color("f0c060")}},
+	"drift_log": {"n": "Drift-Log", "elem": "wood", "weak": "fire", "col": Color("8a7a6a"), "shape": "golem", "pal": {"sec": Color("4a4238"), "acc": Color("c8d8c0")}},
+	"silt_ape": {"n": "Silt-Ape", "elem": "earth", "weak": "wood", "col": Color("7a6a50"), "shape": "ape", "pal": {"sec": Color("4a4030"), "acc": Color("c8c0a0")}},
+	"weir_eel": {"n": "Weir-Eel", "elem": "water", "weak": "thunder", "col": Color("3a5a5a"), "shape": "serpent", "pal": {"sec": Color("1a2a2a"), "acc": Color("a0d8c8")}},
+	"mired_ox": {"n": "Mired Ox", "elem": "earth", "weak": "water", "col": Color("5a4a3a"), "shape": "beast", "pal": {"sec": Color("2a221a"), "acc": Color("c8b890")}},
+	"outrider": {"n": "Outrider of the Ten Thousand", "elem": "phys", "weak": "earth", "col": Color("6a5a4a"), "shape": "humanoid", "pal": {"sec": Color("3a2a22"), "acc": Color("c85a3a")}},
+	"remount": {"n": "Led Remount", "elem": "thunder", "weak": "earth", "col": Color("9a8a6a"), "shape": "beast", "pal": {"sec": Color("4a3a2a"), "acc": Color("e8e0c8")}},
+	"camp_hound": {"n": "Hound of the Wagons", "elem": "phys", "weak": "fire", "col": Color("4a4238"), "shape": "fox", "pal": {"sec": Color("2a241c"), "acc": Color("d8d0b8")}},
+	# (what cannot be beaten: `doom`)
+	"tide_horse": {"n": "White Horse of the Tide", "elem": "water", "weak": "earth", "col": Color("e8f0f4"), "shape": "beast", "doom": true, "pal": {"sec": Color("8ab8d0"), "acc": Color("ffffff")}},
+	"tide_mare": {"n": "Grey Mare of the Bore", "elem": "water", "weak": "earth", "col": Color("9ab0bc"), "shape": "beast", "doom": true, "pal": {"sec": Color("4a6a80"), "acc": Color("e8f4ff")}},
+	"spring_colt": {"n": "Colt of the Spring Tide", "elem": "water", "weak": "thunder", "col": Color("c8e0e8"), "shape": "qilin", "doom": true, "pal": {"sec": Color("6a9ab0"), "acc": Color("ffffff"), "mark": Color("a0d0e8")}},
+	"hu_steed": {"n": "The Horse That Came Back With It", "elem": "thunder", "weak": "earth", "col": Color("2a2a30"), "shape": "qilin", "boss": true, "pal": {"sec": Color("14141a"), "acc": Color("e8d8a0"), "mark": Color("c8302a")}},
+	"wuzhiqi": {"n": "Wuzhiqi, the Ape of the Huai", "elem": "water", "weak": "earth", "col": Color("3a5a6a"), "shape": "ape", "boss": true, "doom": true, "pal": {"sec": Color("e8ecf0"), "acc": Color("e8c84a"), "mark": Color("6a4a3a")}},
+	"the_riders": {"n": "The Ten Thousand Riders of the North", "elem": "phys", "weak": "earth", "col": Color("5a4a3a"), "shape": "mammoth", "boss": true, "doom": true, "pal": {"sec": Color("2a2018"), "acc": Color("c85a3a"), "mark": Color("e8e0c8")}},
+	"huofu": {"n": "Huofu, Who Keeps Both Columns", "elem": "dark", "weak": "thunder", "col": Color("e8e4d8"), "shape": "warden", "boss": true, "pal": {"sec": Color("1a1a1e"), "acc": Color("c8302a"), "mark": Color("e8c84a")}},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -1531,6 +1555,9 @@ const AREAS := {
 		"pickup_vis": "s_fu_collect",
 	},
 	"aurora": {
+		# Part XXIV: what follows a lost horse over the steppe; and, later, who rides ahead of the ten thousand
+		"warband3": {"pool": [["slipped_halter", 84, 84], ["burr_sprite", 84, 84], ["hoof_echo", 84, 84]], "n": 16, "vis": "s_p24_weng", "late": true},
+		"warband4": {"pool": [["outrider", 86, 86], ["remount", 86, 86], ["camp_hound", 86, 86]], "n": 16, "vis": "s_p24_boyi2", "late": true},
 		# Part XXI: every arrow the horse-folk boys loosed at nothing, still looking for something to hit
 		"warband": {"pool": [["stray_arrow", 75, 76], ["wheel_louse", 75, 76], ["cup_snake", 75, 76]], "n": 16, "vis": "s_p21_ape", "late": true},
 		"n": "Aurora Steppe", "w": 96, "h": 58, "seed": 211, "theme": "aurora", "enemies": 20,
@@ -1543,18 +1570,32 @@ const AREAS := {
 			# a fated encounter (fate.gd): there while the story has them there
 			{"id": "tala_steppe", "n": "Tala of the Horse-Folk", "pos": Vector2i(8, 24), "col": Color("d8a04a"), "asset": "tala", "fate": true},{"id": "steppe_shaman", "n": "Steppe Shaman A Lan", "pos": Vector2i(10, 26), "col": Color("d0f0ff"), "vis": ["s_au_intro", ""]},
 			# Part XXI: the archer who learned to see a louse as a cartwheel, gone north to learn to stop
-			{"id": "ji_chang", "n": "Ji Chang the Archer", "pos": Vector2i(40, 26), "col": Color("6a5a3a"), "vis": ["s_p21_ape", ""], "late": true}],
+			{"id": "ji_chang", "n": "Ji Chang the Archer", "pos": Vector2i(40, 26), "col": Color("6a5a3a"), "vis": ["s_p21_ape", ""], "late": true},
+			# Part XXIV: the old man of the frontier and his son, at the foot of the one height of the steppe
+			{"id": "sai_weng", "n": "Sai Weng", "pos": Vector2i.ZERO, "col": Color("8a7a5a"), "vis": ["s_p24_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "weng_son", "n": "Weng the Younger", "pos": Vector2i.ZERO, "col": Color("6a7a8a"), "vis": ["s_p24_qian2", ""], "late": true, "peak": 0, "stand": "foot"}
+		],
 		"bosses": [
 			{"id": "mammoth_ancestor", "pos": Vector2i(30, 40), "lv": 28, "req": 28},
 			{"id": "aurora_serpent", "pos": Vector2i(46, 16), "lv": 28, "req": 28},
 			{"id": "lynx_matriarch", "pos": Vector2i(60, 40), "lv": 29, "req": 29},
 			{"id": "black_tortoise", "pos": Vector2i(86, 28), "lv": 29, "req": 29},
+			# Part XXIV: the horse the lost horse brought back, on the height where nobody can get a hand on it; and
+			# the ten thousand, who come past the foot of it
+			{"id": "hu_steed", "pos": Vector2i.ZERO, "lv": 85, "req": 84, "vis": ["s_p24_son", ""], "late": true, "peak": 0, "stand": "top"},
+			{"id": "the_riders", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_tokens", "s_p24_riders"], "late": true, "peak": 0, "stand": "flank"}
 		],
 		"pickups": [
 			{"id": "ashard1", "item": "aurora_shard", "pos": Vector2i(22, 12)}, {"id": "ashard2", "item": "aurora_shard", "pos": Vector2i(40, 46)},
 			{"id": "ashard3", "item": "aurora_shard", "pos": Vector2i(64, 30)}, {"id": "ashard4", "item": "aurora_shard", "pos": Vector2i(76, 10)},
 			# Part XXI: arrows loosed at nothing, standing in the snow
-			{"id": "p21_arrow1", "item": "spent_arrow", "pos": Vector2i(25, 18), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow2", "item": "spent_arrow", "pos": Vector2i(36, 37), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow3", "item": "spent_arrow", "pos": Vector2i(50, 19), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow4", "item": "spent_arrow", "pos": Vector2i(62, 44), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow5", "item": "spent_arrow", "pos": Vector2i(70, 23), "vis": ["s_p21_ji", ""], "late": true}],
+			{"id": "p21_arrow1", "item": "spent_arrow", "pos": Vector2i(25, 18), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow2", "item": "spent_arrow", "pos": Vector2i(36, 37), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow3", "item": "spent_arrow", "pos": Vector2i(50, 19), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow4", "item": "spent_arrow", "pos": Vector2i(62, 44), "vis": ["s_p21_ji", ""], "late": true}, {"id": "p21_arrow5", "item": "spent_arrow", "pos": Vector2i(70, 23), "vis": ["s_p21_ji", ""], "late": true},
+			# Part XXIV: the shoes the lost horse cast, and the muster-slips the outriders nailed to every tent pole
+			{"id": "p24_shoe1", "item": "cast_shoe", "pos": Vector2i.ZERO, "vis": ["s_p24_strays", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p24_shoe2", "item": "cast_shoe", "pos": Vector2i.ZERO, "vis": ["s_p24_strays", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p24_shoe3", "item": "cast_shoe", "pos": Vector2i.ZERO, "vis": ["s_p24_strays", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p24_shoe4", "item": "cast_shoe", "pos": Vector2i.ZERO, "vis": ["s_p24_strays", ""], "late": true, "peak": 1, "stand": "foot"},
+			{"id": "p24_slip1", "item": "muster_slip", "pos": Vector2i.ZERO, "vis": ["s_p24_outriders", ""], "late": true, "peak": 1, "stand": "foot"}, {"id": "p24_slip2", "item": "muster_slip", "pos": Vector2i.ZERO, "vis": ["s_p24_outriders", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p24_slip3", "item": "muster_slip", "pos": Vector2i.ZERO, "vis": ["s_p24_outriders", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p24_slip4", "item": "muster_slip", "pos": Vector2i.ZERO, "vis": ["s_p24_outriders", ""], "late": true, "peak": 1, "stand": "foot"}
+		],
 		"pickup_vis": "s_au_collect",
 	},
 	"chaos": {
@@ -1965,6 +2006,9 @@ const AREAS := {
 	# "lanes" are paved strips laid over the ground before the buildings go up (see MapGen.build);
 	# the townsfolk are visible for the rest of the game from the moment the road to Yanggu opens.
 	"yanggu": {
+		# Part XXIV: the bore of the eighth month, which cannot be beaten (dooms.gd), and what it leaves on the shore
+		"warband3": {"pool": [["tide_horse", 85, 85], ["tide_mare", 85, 85], ["spring_colt", 85, 85]], "n": 10, "vis": "s_p24_qian", "until": "s_p24_qian2", "late": true},
+		"warband4": {"pool": [["wrack_crab", 85, 85], ["salt_gull", 85, 85], ["drift_log", 85, 85]], "n": 16, "vis": "s_p24_tide", "late": true},
 		"n": "Yanggu, the Dawn Market", "w": 104, "h": 60, "seed": 351, "theme": "yanggu", "enemies": 22,
 		"pool": [["noon_cur", 39, 39], ["noon_cicada", 39, 39], ["clay_toad", 39, 39]],
 		# Part XVI: Xi's candle-moths, eating the lanterns of the Dawn Market on New Year's Eve
@@ -1985,6 +2029,8 @@ const AREAS := {
 			{"id": "granny_gu", "n": "Granny Gu, Keeper of the Granary", "pos": Vector2i(57, 18), "col": Color("8a7a6a"), "vis": ["s_yg_intro", ""]},
 			{"id": "porter_niu", "n": "Big Niu the Porter", "pos": Vector2i(54, 22), "col": Color("8a6a4a"), "vis": ["s_yg_intro", ""]},
 			{"id": "little_dou", "n": "Little Dou", "pos": Vector2i(55, 34), "col": Color("f0a060"), "vis": ["s_yg_intro", ""]},
+			# Part XXIV: the king who built the sea-wall three times, under the height above the market
+			{"id": "qian_liu", "n": "King Qian", "pos": Vector2i.ZERO, "col": Color("3a5a8a"), "vis": ["s_p24_shoes", ""], "late": true, "peak": 0, "stand": "foot"}
 		],
 		"bosses": [
 			# Part XVI: the Last Night, coiled round the lantern-maker's pole at the crossroads
@@ -1993,8 +2039,14 @@ const AREAS := {
 			{"id": "sundial_golem", "pos": Vector2i(59, 30), "lv": 39, "req": 39},
 			{"id": "lantern_dragon", "pos": Vector2i(12, 47), "lv": 39, "req": 39},
 			{"id": "hanba", "pos": Vector2i(92, 22), "lv": 39, "req": 39},
+			# Part XXIV: who keeps both columns of the book, on the height above the market
+			{"id": "huofu", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_marks", ""], "late": true, "peak": 0, "stand": "top"}
 		],
-		"pickups": [{"id": "nember1", "item": "noon_ember", "pos": Vector2i(24, 9)}, {"id": "nember2", "item": "noon_ember", "pos": Vector2i(30, 52)}, {"id": "nember3", "item": "noon_ember", "pos": Vector2i(76, 42)}, {"id": "nember4", "item": "noon_ember", "pos": Vector2i(80, 11)}],
+		"pickups": [{"id": "nember1", "item": "noon_ember", "pos": Vector2i(24, 9)}, {"id": "nember2", "item": "noon_ember", "pos": Vector2i(30, 52)}, {"id": "nember3", "item": "noon_ember", "pos": Vector2i(76, 42)}, {"id": "nember4", "item": "noon_ember", "pos": Vector2i(80, 11)},
+			# Part XXIV: what the bore carried up and left under the height
+			{"id": "p24_shell1", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p24_shell2", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "p24_shell3", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p24_shell4", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "flank"}
+		],
 		"pickup_vis": "s_yg_collect",
 		# the main street, the crossroads lane, the market square, the east road and three alleys
 		"lanes": [Rect2i(2, 29, 64, 2), Rect2i(33, 9, 2, 42), Rect2i(52, 24, 14, 13), Rect2i(66, 25, 36, 2), Rect2i(60, 37, 2, 10), Rect2i(41, 24, 2, 5), Rect2i(57, 22, 2, 2)],
@@ -2199,6 +2251,8 @@ const AREAS := {
 	},
 	# a slow flood over the old rice fields, crossed by Yu's dykes; Gun's walls of growing earth
 	"drowned": {
+		# Part XXIV: what the Huai carries now that the chain under Turtle Mountain has rusted through
+		"warband3": {"pool": [["silt_ape", 85, 86], ["weir_eel", 85, 86], ["mired_ox", 85, 86]], "n": 16, "vis": "s_p24_boyi", "late": true},
 		"n": "The Drowned Fields of Gun", "w": 96, "h": 58, "seed": 401, "theme": "drowned", "enemies": 20,
 		"pool": [["flood_toad", 42, 43], ["mud_heron", 42, 43], ["rice_wraith", 42, 43]],
 		"portals": [
@@ -2212,8 +2266,15 @@ const AREAS := {
 			{"id": "mud_dragon", "pos": Vector2i(62, 40), "lv": 43, "req": 43},
 			{"id": "carrier_turtle", "pos": Vector2i(30, 16), "lv": 43, "req": 43},
 			{"id": "gun", "pos": Vector2i(86, 22), "lv": 43, "req": 43},
+			# Part XXIV: the Ape of the Huai, at the foot of Turtle Mountain (peaks.gd OWN), with nine links of chain still on him
+			{"id": "wuzhiqi", "pos": Vector2i.ZERO, "lv": 86, "req": 85, "vis": ["s_p24_links", "s_p24_ape"], "late": true, "peak": 0, "stand": "foot"}
 		],
-		"pickups": [{"id": "xirang1", "item": "xirang", "pos": Vector2i(18, 10)}, {"id": "xirang2", "item": "xirang", "pos": Vector2i(42, 24)}, {"id": "xirang3", "item": "xirang", "pos": Vector2i(70, 14)}, {"id": "xirang4", "item": "xirang", "pos": Vector2i(78, 50)}],
+		"pickups": [{"id": "xirang1", "item": "xirang", "pos": Vector2i(18, 10)}, {"id": "xirang2", "item": "xirang", "pos": Vector2i(42, 24)}, {"id": "xirang3", "item": "xirang", "pos": Vector2i(70, 14)}, {"id": "xirang4", "item": "xirang", "pos": Vector2i(78, 50)},
+			# Part XXIV: links of Yu's chain, each the size of a millstone, where the river dropped them
+			{"id": "p24_link1", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p24_link2", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "p24_link3", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p24_link4", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p24_link5", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "flank"}
+		],
 		"pickup_vis": "s_df_collect",
 		# the dyke road winds across the flood from the ferry road to the hills
 		"roads": [[Vector2i(2, 29), Vector2i(18, 27), Vector2i(34, 32), Vector2i(42, 42), Vector2i(58, 46), Vector2i(70, 37), Vector2i(82, 30), Vector2i(93, 29)]],
@@ -3714,6 +3775,39 @@ const STEPS := [
 	{"id": "s_p23_hao2", "kind": "talk", "npc": "fu_hao", "area": "village", "t": "Eleven companies are standing on the drill ground with nothing to fight: ask Lady Hao what becomes of a host"},
 	{"id": "s_p23_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The sect's bell rang true at dawn: tell Elder Qing Xuan what it cost"},
 	{"id": "s_break28", "kind": "breakthrough", "to": 84, "t": "The great note is rarely sounded: Great Sound, Rarely Heard"},
+	# ---- Part XXIV: The Lost Horse (the Lost Horse release): three things that cannot be beaten, what is done after
+	# losing to each, and what the land looks like for it
+	{"id": "s_p24_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "A horse has come in at the sect gate with nobody on it, and the Elder wants a word about winning: speak to Elder Qing Xuan", "stones": 39600},
+	{"id": "s_p24_weng", "kind": "talk", "npc": "sai_weng", "area": "aurora", "hearth": "steppe", "t": "The horse belongs to an old man on the Aurora Steppe who was not sorry to lose it: take it back to Sai Weng, under the height"},
+	{"id": "s_p24_strays", "kind": "hunt", "area": "aurora", "n": 20, "of": ["slipped_halter", "burr_sprite", "hoof_echo"],
+		"t": "Things follow a lost horse over the steppe, and stay when it has gone: clear 20 slipped halters, burr-sprites and hoofbeats with nothing in them"},
+	{"id": "s_p24_shoes", "kind": "collect", "item": "cast_shoe", "n": 4, "area": "aurora", "t": "A horse that runs that far casts its shoes: find the 4 it dropped, to know which way it went and what it met"},
+	{"id": "s_p24_qian", "kind": "talk", "npc": "qian_liu", "area": "yanggu", "hearth": "dawn", "t": "\"Three things are coming that are not beaten,\" said the old man. The first is at Yanggu: find King Qian, who built a wall against it three times"},
+	{"id": "s_p24_tide", "kind": "falls", "area": "yanggu", "n": 3, "of": ["tide_horse", "tide_mare", "spring_colt"],
+		"t": "The bore of the eighth month comes up the shore on white horses: stand in front of it 3 times. It cannot be beaten. Stand anyway, or give way", "stones": 40400},
+	{"id": "s_p24_wrack", "kind": "hunt", "area": "yanggu", "n": 22, "of": ["wrack_crab", "salt_gull", "drift_log"],
+		"t": "What a tide leaves is hungrier than the tide: clear 22 wrack-crabs, salt-gulls and drift-logs off the shore at Yanggu"},
+	{"id": "s_p24_shells", "kind": "collect", "item": "bore_shell", "n": 4, "area": "yanggu", "t": "King Qian reads the next bore from what the last one carried up: bring him 4 shells from the foot of the height"},
+	{"id": "s_p24_qian2", "kind": "talk", "npc": "qian_liu", "area": "yanggu", "hearth": "dawn", "t": "The shore is the shape you chose for it: tell King Qian, and ask him what comes down the rivers"},
+	{"id": "s_p24_son", "kind": "talk", "npc": "weng_son", "area": "aurora", "hearth": "steppe", "t": "A rider from the frontier: the old man's horse ran off again, and has come back, and not alone. Hear it from his son", "stones": 40000},
+	{"id": "s_p24_steed", "kind": "kill", "boss": "hu_steed", "area": "aurora", "t": "On the height stands the finest horse the frontier has seen, and nobody can get a hand on it: go up to it"},
+	{"id": "s_p24_boyi", "kind": "talk", "npc": "bo_yi", "area": "drowned", "hearth": "river", "t": "The boy's leg is set. The second thing is in the Drowned Fields of Gun, and has got out: ask Bo Yi of the Dykes what was chained under Turtle Mountain", "stones": 40800},
+	{"id": "s_p24_silt", "kind": "hunt", "area": "drowned", "n": 22, "of": ["silt_ape", "weir_eel", "mired_ox"],
+		"t": "The Huai is up, and it has brought its household with it: clear 22 silt-apes, weir-eels and mired oxen from the Drowned Fields"},
+	{"id": "s_p24_links", "kind": "collect", "item": "chain_link", "n": 5, "area": "drowned", "t": "Yu's chain went with the flood, a link at a time: find 5 links, each the size of a millstone, under Turtle Mountain"},
+	{"id": "s_p24_ape", "kind": "fall", "boss": "wuzhiqi", "area": "drowned", "t": "Great Yu himself only chained him: stand in front of Wuzhiqi, the Ape of the Huai, under Turtle Mountain. It cannot be won", "stones": 41200},
+	{"id": "s_p24_lost", "kind": "visits", "npcs": ["granny_wen", "sarnai", "cook_aysha", "fishwife_lu", "auntie_rong", "lantern_xi"], "n": 4, "area": "village", "did": "%s tells what was lost, and what came of it",
+		"t": "\"Ask anybody old,\" says Bo Yi: ask 4 of those who keep the six hearths what they once lost, and what came of it"},
+	{"id": "s_p24_boyi2", "kind": "talk", "npc": "bo_yi", "area": "drowned", "hearth": "river", "t": "The Huai is doing what you said it should: go back to Bo Yi, and hear what is coming over the frontier"},
+	{"id": "s_p24_outriders", "kind": "hunt", "area": "aurora", "n": 24, "of": ["outrider", "remount", "camp_hound"],
+		"t": "The third thing sends its scouts ahead: scatter 24 outriders, led remounts and hounds of the wagons on the Aurora Steppe", "stones": 41600},
+	{"id": "s_p24_tokens", "kind": "collect", "item": "muster_slip", "n": 4, "area": "aurora", "t": "Every sound man of the frontier has a slip nailed to his tent pole: take down 4 muster-slips, and read who is to be taken"},
+	{"id": "s_p24_riders", "kind": "fall", "boss": "the_riders", "area": "aurora", "t": "Ten thousand riders are coming past the height at a walk, and two people are standing in the way: stand in front of the Riders of the North. It cannot be won"},
+	{"id": "s_p24_marks", "kind": "marks", "n": 6, "area": "village", "t": "\"You have lost three times. Now go and look at what you have done,\" says the old man: look at 6 things that stand in the land because of what you chose", "stones": 42000},
+	{"id": "s_p24_twin", "kind": "kill", "boss": "huofu", "area": "yanggu", "t": "Somebody keeps the book of who won and who lost: on the height above the sea at Yanggu, go up to Huofu"},
+	{"id": "s_p24_weng2", "kind": "talk", "npc": "sai_weng", "area": "aurora", "hearth": "steppe", "t": "The book is shut: go back to the old man of the frontier, who has one more thing to ask about a horse"},
+	{"id": "s_p24_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "You have lost three fights, and the mountain is still there: tell Elder Qing Xuan"},
+	{"id": "s_break29", "kind": "breakthrough", "to": 87, "t": "Nothing is softer, and nothing overcomes it: Soft as Water"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -3910,6 +4004,11 @@ const ITEMS := {
 	"tea_egg": {"n": "Tea Egg", "desc": "Boiled, cracked all over and stewed in tea and soy until the white is marbled brown. Sold from a pot at every ferry and gate in the land, three for the price of two if one looks hungry"},
 	"dried_meat": {"n": "Strip of Dried Meat", "desc": "Salted, smoked over fruit wood and hard as a roof tile. It keeps for a year and takes about that long to chew. It makes one thirsty"},
 	"noodle_bowl": {"n": "Box of Noodles", "desc": "Hand-pulled, in a lacquer box with a lid, the broth in a gourd beside it. A meal one sits down for, even on a rock"},
+	# ---- Part XXIV: The Lost Horse
+	"cast_shoe": {"n": "Cast Horseshoe", "desc": "A shoe of frontier iron, worn thin on the outside edge, with three nails still in it. The old man's horse has always gone a little wide on the off fore. Whatever it ran from, it ran from at a gallop: the nails are bent back like hooks"},
+	"bore_shell": {"n": "Shell from the Bore", "desc": "A whelk the size of two fists, from water deeper than any net of Yanggu goes, carried a mile inland and set down unbroken. Held to the ear it does not give the sea. It gives hooves"},
+	"chain_link": {"n": "Link of Yu's Chain", "desc": "A link of black iron as big as a millstone, rusted through at one place and bright as a mirror on the inside curve, where for four thousand years something pulled. Great Yu had it forged after three other chains had failed. It took nine men to lift, when there were men like that"},
+	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
 	"hearth_lantern": {"n": "Lantern of Ten Thousand Doors", "desc": "Smith Tie's great red lantern of bronze and thunder bamboo, hot with fire and hard with metal: red, fire and noise in one light"},
@@ -4059,6 +4158,17 @@ const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
 	# ---- Part XXIII: the people of the Thundering Pots, and of the Drum Tower quarter
+	# ---- Part XXIV: the people of the Lost Horse
+	"sai_weng": ["My neighbours came to say they were sorry about the horse. I said: how do you know it is not good fortune? They went away thinking I was hard. I am only slow. I like to see the end of a thing before I name it.",
+		"I have been congratulated nine times in my life and condoled with eleven. I was wrong to be pleased four times and wrong to be sorry seven. I keep the count on that tent pole. You may look.",
+		"A man who has never lost is a jar that has never been filled past the brim. He does not know what he holds. He only knows he has not spilled.",
+		"The frontier teaches one thing. Whatever is coming is bigger than you, and it is not coming for you. Stand a little to one side."],
+	"weng_son": ["He says who knows to everything. I asked him once if he was glad I was born. He thought about it for a day, and then he said yes, so far.",
+		"It is a good leg. It only does not bend. I can still do everything but ride and run, and it turns out those are the two things they wanted me for.",
+		"Every boy I grew up with went north behind the riders. I mend their mothers' tents now. It is a great many tents."],
+	"qian_liu": ["I had five hundred crossbowmen shoot the bore, six iron arrows a man, at the crest, on the eighteenth day of the eighth month. It was the finest volley of my reign. The tide came in. I have thought about that every day since.",
+		"Baskets of bamboo, filled with stone, staked. Not a wall of one piece: the tide breaks one piece. A thing made of many small things that each give a little will stand where a strong thing will not.",
+		"They made a god of Wu Zixu for riding the tide in on a white horse. He rests now. The horses did not need him. They never did; it was we who needed somebody to be angry at."],
 	"ling_lun": ["The first pipe is nine nines of millet grains long, laid end to end, of the black millet of Shangdang, middling grains. Not the fat ones. People always choose the fat ones, and then their foot is too long and their whole dynasty is out of tune.",
 		"Six for the cock's song and six for the hen's. I stood under the tree and wrote down what they sang. People say I invented music. I took dictation.",
 		"A third part taken away gives the next pipe up, and a third part added gives the next below, and after twelve you are very nearly where you began. Very nearly. That little bit left over has kept me awake for four thousand years."],
@@ -4174,7 +4284,8 @@ const CHAT := {
 	"scholar_cen": ["To pass the examinations is to leap the Dragon Gate, they say. I have failed seven times. I am beginning to sympathise with the carp.", "There is no emperor now and no Court, so there are no examinations. I am studying harder than ever. It is the principle of the thing.", "My essay this year was on the virtue of rivers that bend. The examiners would have hated it. I think it is my best."],
 	"carp_boy_yu": ["I feed the carp every morning so they are strong enough to jump! This one is Pudding. He is going to be a dragon.", "My name is Yu, like Yu the Great! I have not tamed any floods yet. I tamed a goose.", "When the carp become dragons do they remember me? Ma says a dragon never forgets a free lunch."],
 	"innkeeper_dong": ["The Leaping Carp Inn: every room faces the river, and this spring the river faces every room. Mind the buckets.", "Scholars on their way to the examinations used to stay here for luck. Now it is boatmen, and the occasional god.", "The best room is the one at the top. It has been dry for a whole week. I charge extra."],
-	"bo_yi": ["Channels, not walls. Yu said it so often I hear it in my sleep. I sleep in a boat.", "I was with him when he passed his own door three times and did not go in. He waved at it. His wife waved back, the first time.", "The fields will be dry by harvest. Not because we stopped the water: because we let it go."],
+	"bo_yi": ["Gun dammed it for nine years and it broke him. Yu cut it a road to the sea for thirteen, and passed his own door three times without going in. I was with the son. I should have liked the father. He meant as well.",
+		"Channels, not walls. Yu said it so often I hear it in my sleep. I sleep in a boat.", "I was with him when he passed his own door three times and did not go in. He waved at it. His wife waved back, the first time.", "The fields will be dry by harvest. Not because we stopped the water: because we let it go."],
 	# ---- Tushan, the cauldron-casters' town
 	"tu_lan": ["A cauldron is a bowl with a duty. It holds the meat for the ancestors and the map for the living.", "Bronze is copper that has made friends with tin. Remember that, when you are lonely.", "My clan has cast here since Yu. The pits never go cold, and neither do the arguments."],
 	"caster_wei": ["I cast bells for every temple from Longmen to the Jasper Pool. A good bell is cast once and rings for ever. A bad bell is cast once and argues for ever.", "The secret of a bell is in the cooling. Hurry it and it cracks. The same is true of apprentices.", "When Tu Lan recasts the Ninth Cauldron the whole mountain will ring. I am cutting earplugs for everybody."],
@@ -7924,6 +8035,193 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "Then he has it. Go and sit under the pine, Lin Feng. There is a thing left to put down, and I think it is not any of the eight.", "nod"],
 	],
 	# ---- Part XXIII: The Thundering Pots (the Thundering Pots release)
+	# ---- Part XXIV: The Lost Horse (the Lost Horse release)
+	"recall22": [
+		["Narrator", "The Yellow Bell is cast again, and the land sings in tune for a year. It is a good year. Nothing comes down off any mountain that Lin Feng cannot put back, and by the autumn the younger disciples have begun to tell each other that the sweeper has never lost a fight."],
+		["Narrator", "They are nearly right, and Elder Qing Xuan, who has heard them at it, has not slept well since. On a morning in the eighth month a horse walks in at the sect gate: a shaggy frontier horse, lathered to the ears, with a halter and no rider. It goes straight to the trough, as if it had been told where it was."],
+	],
+	"s_p24_home": [
+		["Elder Qing Xuan", "Twenty-three times something has come out of the ground or the sky or the old books, and twenty-three times you have gone and stood in front of it and it has stopped. The boys in the outer court think that is what you are for. I have begun to be afraid you think so too.", "think"],
+		["Lin Feng", "I have been beaten, Elder. Iron Fang put me on my back twice before I ever touched him."],
+		["Elder Qing Xuan", "You have been delayed. It is not the same. Everything you ever lost to, you went back to and won. I am asking what you will do the day you go back and it is still bigger than you. I do not know the answer. I did not teach you one, because I have not got one.", "grieve"],
+		["Yue Ling", "The horse has a mark cut in its off ear. That is a frontier cut, from the Aurora Steppe. Somebody up there is short a horse."],
+		["Elder Qing Xuan", "An old man. I knew him when he was only middle-aged. When his neighbours came to say they were sorry about the horse he asked them how they knew it was not good fortune, and they have not forgiven him. Take it home. And ask him what he knows. He has lost more than anybody I ever met, and he is the least beaten man alive.", "point"],
+	],
+	"s_p24_weng": [
+		["Sai Weng", "So it went all the way to the mountain. It never did like the wind up here. You have brought it back; now the neighbours will come and say how lucky I am, and I shall have to ask them how they know it is not a misfortune. They hate that.", "laugh"],
+		["Lin Feng", "My Elder says you know something he could not teach me. He says I have never lost."],
+		["Sai Weng", "Then you are in luck, and how do we know it is not bad luck? Sit. Three things are coming this season that are not beaten. I do not mean hard. I mean that the sword is the wrong kind of thing, as a spoon is the wrong kind of thing for a fire."],
+		["Sai Weng", "The tide of the eighth month, at Yanggu. The ape Great Yu chained under Turtle Mountain, whose chain has rusted. And ten thousand riders out of the north, who will come past this tent before the snow. You will stand in front of all three, because you are that sort. You will lose to all three.", "point"],
+		["Yue Ling", "You say it as if it were the weather."],
+		["Sai Weng", "It is the weather. What you do the morning after is not; that part is yours, and it is the only part that ever was. But first: something followed my horse home across the grass, and it has not gone away. Be useful while you wait to be humbled.", "nod"],
+	],
+	"done:s_p24_strays": [
+		["Narrator", "The last empty hoofbeat goes out over the grass and does not come back. What is left is a halter with a slipped knot, a handful of burrs, and the particular quiet of a place a horse has just left."],
+		["Yue Ling", "They were not chasing it. They were only what comes loose when something runs away. I did not know a thing could leave so much behind by leaving."],
+	],
+	"done:s_p24_shoes": [
+		["Narrator", "Four shoes, laid in a row on the old man's felt. He turns each one over with a finger. North, then east, then north again, a long way: the nails are worn on the side that takes the weight in a turn."],
+		["Sai Weng", "It went to the Hu, then. Right over the frontier and in among their herds, and you fetched it back from your mountain. It will go again; it has the taste now. Who knows what it will bring? Leave it. The first of the three does not wait for a horse: go to Yanggu. There is a king there who has lost to the tide three times, and is the better for it."],
+	],
+	"s_p24_son": [
+		["Weng the Younger", "It did not come back alone. Go and look up at the height. There: black, with the red ear. That is a horse of the Hu, of the line they do not sell, and it followed our old mare home like a dog. Every tent on the frontier has been here to say what luck. Do you know what my father said?", "point"],
+		["Lin Feng", "How do you know it is not a misfortune."],
+		["Weng the Younger", "To their faces! Old Batu had brought a cheese. I am going to ride that horse. I have wanted one thing my whole life and it has walked into our camp by itself. Only nobody can get a hand on it. It stands up there and looks at the north.", "laugh"],
+		["Yue Ling", "And if it throws you?"],
+		["Weng the Younger", "Then I shall have been thrown by the best horse on the frontier. Bring it down for me, sweeper. They say there is nothing you cannot bring down."],
+	],
+	"pre:hu_steed": [
+		["Narrator", "Close to, it is not black. It is the colour of the hour before a storm, and its red ear turns to follow them while the rest of it does not move at all. It has thrown nine riders in its own country. It did not follow the mare. It came because it was tired of being owned by people who were sure of it."],
+	],
+	"post:hu_steed": [
+		["Narrator", "It stands, blowing, and lets the halter be put on. The boy rides it that same evening, the whole camp watching, and for the length of one gallop he is the happiest person on the frontier. At the turn by the birch it stops as a wall stops. He goes on."],
+		["Weng the Younger", "It is the thigh. I heard it. Do not look like that, sweeper, you did what I asked. Father. Father, say it. You are going to say it anyway.", "grieve"],
+		["Sai Weng", "The neighbours will be here by morning to tell us how sorry they are. And I shall say: how do you know it is not good fortune? I shall say it, and I shall mean it, and I shall want to bite through the tent pole. Set the bone, girl. You have the hands for it.", "grieve"],
+		["Yue Ling", "It will knit. It will not bend again."],
+		["Sai Weng", "Then that is what we know so far. Go on to the Drowned Fields. The Huai will not wait for a boy's leg, and the second thing is worse than the first: the tide at least goes out again. Ask for Bo Yi of the Dykes. He dug for Great Yu, and he has not been surprised since."],
+	],
+	"s_p24_qian": [
+		["King Qian", "From the old man of the frontier? Then you have come to be beaten by my tide. Everybody should be, once. I was a salt-smuggler before I was a king, and I thought there was nothing I could not get past, and then I tried to hold this shore.", "laugh"],
+		["King Qian", "On the eighteenth day of the eighth month the sea comes up the estuary in one wave, as high as a city wall, and the people here say it is white horses and that they can see the manes. I built a wall. It took the wall. I built it again. I had five hundred crossbowmen put three thousand arrows into it at the crest."],
+		["Lin Feng", "And?"],
+		["King Qian", "And I have five hundred very good crossbowmen. Go down to the foreshore and stand in front of it. Draw, if you like. Then come and tell me what you want done with this coast, because I have tried my three ways, and I am told you are a man whose choices stay where they are put.", "point"],
+	],
+	"done:s_p24_tide": [
+		["Narrator", "Three times the white horses come up the shore, and three times Lin Feng is somewhere else when they have gone: up the beach, in the reeds, once sitting in a fishing boat that had been a good way off. He is not hurt. He has only been moved, like a thing on a table."],
+		["Yue Ling", "You are smiling."],
+		["Lin Feng", "I hit it as hard as I have ever hit anything. I do not think it knew I was there. I have never been so little in the way of anything in my life."],
+	],
+	"done:s_p24_wrack": [
+		["Narrator", "The shore is clean to the wrack-line. What the bore left has gone back into the mud, and the gulls that are only gulls come down again and walk about as if they had driven it off themselves."],
+	],
+	"done:s_p24_shells": [
+		["Narrator", "Four shells from water no net of Yanggu has ever reached, carried a mile inland and set down without a chip. King Qian holds one to his ear for a long time, like a man listening at a door."],
+	],
+	"s_p24_qian2": [
+		["King Qian", "Deeper water than last year, and a full day earlier. It is not angry. People always want it to be angry; it is easier to be beaten by a thing that hates you. It is only very large, and going somewhere.", "think"],
+		["Lin Feng", "The old man said three things. This was one."],
+		["King Qian", "The second comes down the rivers, not up them. The Huai is in flood without rain, and old Bo Yi in the Drowned Fields has sent to me for iron. A great deal of iron. But go by the frontier. A rider came in this morning asking for you: the old man's horse ran off again, and has come back, and not alone.", "point"],
+	],
+	"s_p24_boyi": [
+		["Bo Yi of the Dykes", "Iron, yes. For a chain. Sit down, and do not put your feet in that; it was a field yesterday. When Yu cut the Huai its road to the sea, the river would not go. Wind and thunder at Tongbai Mountain, the stones crying out. Three times. There was a thing in it."],
+		["Bo Yi of the Dykes", "An ape. Blue body, white head, eyes like gold, teeth like snow. Strength of nine elephants, and a neck that comes out a hundred feet when he wants to see over something. Wuzhiqi. Yu set three captains on him and he threw them. The fourth, Gengchen, got a chain on his neck and a bell through his nose, and we put him under Turtle Mountain.", "grieve"],
+		["Yue Ling", "And the chain has rusted."],
+		["Bo Yi of the Dykes", "Four thousand years, girl, in a river. I am surprised at the bell. He is out, and he is sitting at the foot of the mountain with nine links still on him, and the Huai goes where he goes. Yu could not beat him. Yu only held him. And I have not got a Gengchen.", "think"],
+		["Bo Yi of the Dykes", "Clear what he has brought up with him, and find me what links you can. Then go and look at him. I will not ask you to win. I dug for the man who did not."],
+	],
+	"done:s_p24_silt": [
+		["Narrator", "The fields are quiet, and under water, and quiet. An ox stands to its belly in what was millet and has stopped trying to get out. It is only an ox now. Yue Ling leads it up on to the dyke by one horn."],
+	],
+	"done:s_p24_links": [
+		["Narrator", "Five links, rolled up out of the silt on poles, each as big as a millstone. Every one is rusted through at the same place, and on the inside curve every one is worn as bright as a mirror."],
+		["Lin Feng", "He pulled. For four thousand years, at the same place in every link. He never once stopped pulling."],
+		["Yue Ling", "Then I do not think a new chain is a thing we should be proud of making. I do not say we should not make it."],
+	],
+	"pre:wuzhiqi": [
+		["Narrator", "He is sitting with his back to Turtle Mountain and his feet in the river, picking rust out of the fur of his neck, and the water stands up round him like a crowd round a man who is about to speak. He looks at the sword, and then at the two of them, and something that is nearly disappointment goes over the white face."],
+		["Narrator", "Three of Great Yu's captains went up to him with weapons. He has been waiting four thousand years to see whether anybody had thought of anything else."],
+	],
+	"fall:wuzhiqi": [
+		["Narrator", "When Lin Feng can count again he is on the top of the dyke, a quarter of a mile off, lying across Yue Ling's knees, with river weed in his collar. Below them the Huai is going back into its bed by itself, slowly, like a hand unclenching. The ape has not moved from the foot of the mountain."],
+	],
+	"fall:wuzhiqi:struck": [
+		["Yue Ling", "You hit him forty times. I counted, because there was nothing else I could do. On the fortieth he picked you up. Gently. Like a man moving a child that is in the way of the door."],
+		["Lin Feng", "Yu could not do it either. I find that is no comfort at all. I had thought it would be."],
+	],
+	"fall:wuzhiqi:kept": [
+		["Lin Feng", "You were mending me the whole time. I felt it. Every blow of his, and then your hands, and then his, and then yours."],
+		["Yue Ling", "And you me. He stopped, at the end, and watched us do it. I do not think he had seen that before. Then the river came. But he watched first."],
+	],
+	"fall:wuzhiqi:gave": [
+		["Yue Ling", "You put up your sword. I have never seen you do that. He had his hand raised, and you looked at him, and you stepped out of the river and stood on the bank."],
+		["Lin Feng", "He put his hand down. And then the water did what it was always going to do. But he put his hand down first. I should like to know what that was worth, some day."],
+	],
+	"visit:s_p24_lost:granny_wen": [
+		["Granny Wen the Midwife", "Lost? My first husband, to the river, when I was nineteen. I thought I would die of it. I took up the midwifing to have something to do with my hands at night. Four hundred and six children, since. Do not ask me to say it was lucky. Ask the four hundred and six.", "think"],
+	],
+	"visit:s_p24_lost:sarnai": [
+		["Grandmother Sarnai", "The whole herd, the white winter. Every head. We ate the dogs. And because we had nothing, the Black Tents let us through their grazing without a fight, and that is how my daughter met her man. I have nine grandchildren out of a dead herd. I still dream about the horses. Sit. Eat."],
+	],
+	"visit:s_p24_lost:cook_aysha": [
+		["Auntie Aysha of the Caravanserai", "A caravan. Forty camels and my father's whole stake, to one sandstorm. So we stayed where the well was, because we could not afford to leave, and I learned to cook for the caravans that could. You are standing in what came of it. It wants salt. Everything he ever did wanted salt.", "laugh"],
+	],
+	"visit:s_p24_lost:fishwife_lu": [
+		["Fishwife Lu", "My boat. On the Dragon Gate rocks, with the season's catch in her. I was two years on the quay gutting other people's fish. Know every fish in this river by the feel now, and every cheat by the smell. They do not short-weigh me. I would have the boat back tomorrow, mind."],
+	],
+	"visit:s_p24_lost:auntie_rong": [
+		["Auntie Rong of the Smelting Pits", "The big casting, the year I was made forewoman. A bell for a king. It cracked in the cooling, top to bottom, and I wanted the ground to open. We broke it up and poured forty ploughshares out of it, because there was a famine and no time. Nobody remembers that king. They are still ploughing.", "think"],
+	],
+	"visit:s_p24_lost:lantern_xi": [
+		["Lantern-Maker Xi", "My eyes, mostly. I cannot do the fine painting now; Ah Mei does it. So I do frames, and I do them by hand, in the dark, and they are the best frames on the coast. I did not choose it. I should like to be clear about that. One is not obliged to be grateful to a thing for being survivable."],
+	],
+	"done:s_p24_lost": [
+		["Narrator", "Four fires, four losses, and not one of them told as a lucky thing. Each was only told all the way to the end, which took in every case some thirty years. Yue Ling is quiet on the road back to the Drowned Fields."],
+		["Yue Ling", "None of them said it was for the best. They said what came after. I think that is a different thing, and I think the old man knows it is."],
+	],
+	"s_p24_boyi2": [
+		["Bo Yi of the Dykes", "Well. It is done as you said, and the river has taken it as it takes everything, without remark. I have been wrong about this water so often that I have stopped keeping the tally; Gun kept one, and look.", "think"],
+		["Lin Feng", "King Qian says the tide is not angry. Is he?"],
+		["Bo Yi of the Dykes", "Wuzhiqi? He was here before the river had a name. We are the flood, from where he sits. Now listen. The cranes have come south a month early and there is dust on the north wind. I have seen that twice. It means horses, and I do not mean a herd.", "point"],
+		["Bo Yi of the Dykes", "Go back to your old man on the frontier. That is where it will come through. And, sweeper: it will not be looking for you, either. Nothing that size ever is."],
+	],
+	"done:s_p24_outriders": [
+		["Narrator", "The scouts fall back northward, not beaten, only recalled, the way a hand is drawn back into a sleeve. From the height the dust is plain now: a brown wall from one side of the sky to the other, and under it a sound like rain on felt."],
+	],
+	"done:s_p24_tokens": [
+		["Narrator", "Four slips of birch bark, each with a notch for a man, a notch for a horse and a notch for a bow. Every tent on the frontier with a sound son has one nailed to its pole. The old man's pole has a nail-hole, and no slip."],
+		["Weng the Younger", "He rode up, and looked at my leg, and pulled it down again with two fingers. He did not say a word. I have never been so ashamed in my life, and my mother's sister has not stopped crying for joy since.", "grieve"],
+	],
+	"pre:the_riders": [
+		["Narrator", "They come past the foot of the height at a walk. There is no front to it and no end. They are not an army in a hurry; they are a people moving, with their herds and wagons and their gods on poles, and every sound man of the frontier is being gathered up into them as a river gathers up a stream."],
+		["Narrator", "Two people are standing in the grass in the way. A captain of a hundred lifts his hand, not to them, to the rank behind him: go round."],
+	],
+	"fall:the_riders": [
+		["Narrator", "It takes until dusk for all of them to pass. When the dust comes down Lin Feng is where he was, on one knee, with the grass trodden flat for a mile on either hand of him and not a mark on the ground where he stands. They went round. Ten thousand riders went round, as water goes round a stone, and did not slow."],
+		["Narrator", "Every tent on the frontier has lost its sons. Nine in ten of them will not come back from whatever war the north is riding to. At the old man's tent a boy with a stiff leg is standing in the doorway, holding the black horse by its halter, watching them go."],
+	],
+	"fall:the_riders:struck": [
+		["Sai Weng", "You fought the front rank until they stopped sending anybody at you. That was the insult, I think. Not the losing. That it cost them nothing to leave you standing there.", "think"],
+	],
+	"fall:the_riders:kept": [
+		["Sai Weng", "You two held each other up for half a day in the middle of that. I watched from the door. Some of them looked down at you as they passed. I do not know what they will make of it, in the north, by their fires. Something, I think.", "think"],
+	],
+	"fall:the_riders:gave": [
+		["Sai Weng", "You stood aside. You, of all people, stood in the grass with your sword put up and let them by, and you looked every one of them in the face. I have seen a great many brave things on this frontier. That is the first I should not have known how to do.", "think"],
+	],
+	"done:s_p24_marks": [
+		["Narrator", "Six things, in six places, that were not there before he chose. None of them is as he pictured it when he gave the answer. People have leaned things against them. Birds have found them. One has been mended already, by somebody who did not know whose it was."],
+		["Yue Ling", "You lost three times this season, and the land has not moved an inch for it. And you said a few words, here and there, over the years, and look."],
+	],
+	"pre:huofu": [
+		["Narrator", "On the height above the sea-road a figure sits at a low desk with a book open in front of it, and it has two faces, one looking at each page. On the left page it writes with a red brush and on the right with a black, and it has done so, without lifting either, since there was first something to gain and something to lose."],
+		["Narrator", "\"Lin Feng,\" it says, with both mouths, not quite together. \"Twenty-three in the black column. Three in the red, this season, and I am obliged to you: I had begun to think your page was a mistake of the copyist's. Shall we see which column today goes in?\""],
+	],
+	"post:huofu": [
+		["Narrator", "The book lies shut. Both brushes have rolled off the desk. Huofu looks at them with both faces, and does not pick them up, and for the first time since there was a first time the two mouths say different things."],
+		["Huofu, Who Keeps Both Columns", "Misfortune is what fortune leans upon. Fortune is where misfortune hides. Who knows where it ends? I wrote that myself, in the margin, and I have been drawing a line down the middle of the page ever since, as if I had not."],
+		["Yue Ling", "What will you do without the book?"],
+		["Huofu, Who Keeps Both Columns", "Wait and see, I suppose. I am told there is an old man on the frontier who has made a whole life of it. I should like to meet him. I think I have been spelling his name wrong."],
+	],
+	"s_p24_weng2": [
+		["Sai Weng", "So the book is shut. I felt it: I was sorry about something this morning, and then I thought, how do I know, and nobody wrote it down. It is very restful.", "laugh"],
+		["Lin Feng", "I lost three times. To the tide, to the ape, to the riders. I did not go back and win. There was no going back."],
+		["Sai Weng", "And? Look round you. A shore is one shape instead of another because of what you said the morning after. A river. You did more to this land by losing and choosing than you ever did by winning. Winning leaves things as they were. That is what it is for.", "nod"],
+		["Weng the Younger", "Father. Tell him about the horse."],
+		["Sai Weng", "Yes. The black horse. It broke my son and it saved my son, and it is standing behind my tent eating my hay, and the whole frontier wants to know what I mean to do with it. They will do as I do; they always have, grumbling. And I find I would rather it were you who said. You have had the practice.", "point"],
+	],
+	"s_p24_end": [
+		["Elder Qing Xuan", "You look different. Not older. You look like a man who has been set down somewhere by something and had to walk back.", "think"],
+		["Lin Feng", "Three times, Elder. The sea, a river and ten thousand horsemen. None of them was looking for me. I think that was the lesson, though the old man would say it is too soon to tell."],
+		["Elder Qing Xuan", "He would. I asked you what you would do the day you went back and it was still bigger than you. Well?"],
+		["Lin Feng", "I did not go back. I looked at what was left and I said what should be done with it, and went on. It is a smaller thing than winning. It seems to last longer."],
+		["Elder Qing Xuan", "Then you know something I do not, and I am too old to be anything but glad of it. The boys in the outer court will be disappointed. Go and sit under the pine. There is a realm that is only reached by people who have stopped needing to be the hardest thing in the valley.", "bow"],
+	],
+	"pre:s_break29": [
+		["Narrator", "Under the pine Lin Feng sits, and for once does not gather himself. He lets the qi go where it goes: down, as water does, to the lowest place, the place everybody disdains. The sky does what it has always done when he sits here. It gathers. It has never yet been asked to strike something that does not mean to stand."],
+	],
+	"post:s_break29": [
+		["Narrator", "The tribulation passes over the mountain as the riders passed over the steppe, and when it has gone the pine is standing and so is he, and neither of them is marked. It did not miss. It went round. Far down in the valley somebody is leading a horse to water, in no hurry, and nobody at all is keeping the score."],
+	],
 	"recall21": [
 		["Narrator", "The tops are open, and all that summer the people of the road go up and come down again with nothing to report. In the autumn the mountain is quieter than anybody remembers. It is so quiet that on the first morning of the tenth month everybody on it hears the same thing at once."],
 		["Narrator", "The sect's great bell is struck for the dawn, as it has been every dawn for nine hundred years. It rings flat. Not cracked: flat, by a hair, like a word said by somebody who has stopped meaning it. And when it has died away, something goes on. Under the ground, a long way west. In time."],

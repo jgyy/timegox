@@ -67,6 +67,11 @@ const CROSSROADS := {
 			"drive": [["Narrator", "They go up the pass in a line, not looking back, with their hands empty. At the top one of them stops, as if he might say something. Then he goes on."], ["Yue Ling", "It is fair. I only wonder where a man goes, who has nothing and has just been shown he cannot take it."]],
 		},
 		"echo": {
+			# Part XXIV (the Lost Horse release)
+			"s_p24_home": {
+				"mend": [["Elder Qing Xuan", "Iron Fang's road-menders, do you remember? You did not beat them into it. You beat Iron Fang, and then you said a thing about a road, and it is the thing you said that is still there. I have been thinking about that."]],
+				"drive": [["Elder Qing Xuan", "Iron Fang's men, do you remember? You beat them, and you drove them out, and that was the end of it as far as the valley knew. I have wondered since whether a thing is finished because one has won it."]],
+			},
 			# Part XXI (the Hundred Arms release)
 			"s_p21_home": {
 				"mend": [["Elder Qing Xuan", "One thing more. Iron Fang's men, the forty you set to mend the forest road. The morning the racks emptied, they came up the mountain in a body and laid forty knives on the gate-step, and asked to have them melted. They said they had felt them move in the night."]],
@@ -128,6 +133,12 @@ const CROSSROADS := {
 			"sell": [["Narrator", "The collector weighs it in both hands, holds it to a candle, and counts out four hundred stones without a word. He has a shelf of such things. None of them tick."], ["Yue Ling", "...It was warm, Lin Feng."]],
 		},
 		"echo": {
+			# Part XXIV (the Lost Horse release)
+			"s_p24_weng": {
+				"hatch": [["Sai Weng", "You are the one who brought the roc's egg down to the tents. It hatched in Oyun's coat. It takes a lamb a month and it has kept the wolves off four winters. The neighbours called that luck, and bad luck, by turns, depending on whose lamb."]],
+				"leave": [["Sai Weng", "You are the one who left the roc's egg to the storm. It hatched. Something flies over this steppe now that was taught by nobody, and the herds look up. I do not say you were wrong. I say I look up too."]],
+				"sell": [["Sai Weng", "You are the one who sold the roc's egg at Cloudfoot. We heard. The horse-folk do not sell a thing that is not yet born. I mention it only so that you know I know, and we can leave it there."]],
+			},
 			"s_p22_lie": {
 				"hatch": [["Master Lie, Who Rode the Wind", "There is a young roc over this valley most mornings, hatched by somebody's patience, the horse-folk say. It has been walking, this week. Walking! It looks at the sky the way I do."]],
 				"leave": [["Master Lie, Who Rode the Wind", "There was an egg on this height once that somebody had the sense to leave alone. It hatched by itself and the bird is grown. It sits on the far rim now with its wings shut, waiting, as I am."]],
@@ -187,6 +198,11 @@ const CROSSROADS := {
 			"sea": [["Azure Dragon King", "Not for yourself, and not for your own. For strangers in boats. Hm. Granted, and gladly: I was growing tired of wrecks. They get into the coral."]],
 		},
 		"echo": {
+			# Part XXIV (the Lost Horse release)
+			"s_p24_qian": {
+				"rain": [["King Qian", "They say the Dragon King owed you a boon and you spent it on rain for one valley. A farmer's wish. I do not sneer; I was a salt-boiler's son. But do not look to him for help with my tide. You have been paid."]],
+				"sea": [["King Qian", "They say the Dragon King owed you a boon and you spent it on a safe road for every ship. My captains bless you. It is his sea-road, mind, and this is his tide; do not think the one is any use against the other. He keeps his accounts apart."]],
+			},
 			"s_mf_intro": {
 				"rain": [["Old Farmer Tian", "They say that even in this, with the sun nailed up, it rained on Qingshi at the setting of the rice. One valley in the whole land. Somebody there has a friend in the water."]],
 				"sea": [["Old Farmer Tian", "My son went for a sailor rather than starve here. He writes that in all this drought not one ship has been lost on the sea-roads. Not one. He says the sailors pour wine over the side for a sweeper nobody has met."]],
@@ -983,6 +999,12 @@ const CROSSROADS := {
 			"band": [["Lady Hao", "Hah! Keep the band. My husband's generals would have had a fit. ...Do it. I took the Tu-fang with drums and never told them how. Let them come once a year and sing, and let anybody who means the land harm come and count how many know the words."]],
 		},
 		"echo": {
+			# Part XXIV (the Lost Horse release)
+			"pre:the_riders": {
+				"home": [["Narrator", "The levy of the six hearths went home by the roll, every one. There is no host to send for. Lin Feng finds, standing in the grass, that he would not send for it if there were."]],
+				"keep": [["Narrator", "The standing host is at the Drum Tower of Qingshi, nineteen days' march from here. Eleven hundred, well drilled. Lin Feng looks at what is coming, and does the sum, and is glad for the first time that they are nineteen days away."]],
+				"band": [["Narrator", "Somewhere a long way south the six hearths are singing together, as they do now once a year. A rider in the third rank is humming. It is not one of theirs. It is near enough that Lin Feng wonders who taught whom, and when."]],
+			},
 			"s_p23_end": {
 				"home": [["Elder Qing Xuan", "The outer disciples came up the steps last night, forty of them, in step, and fell out of it on the third flight without anybody telling them. I was glad to see it. They had been soldiers quite long enough."]],
 				"keep": [["Elder Qing Xuan", "I hear there is a host at the Drum Tower now, with a rule and half a tally. Forty of them are mine. I have asked for them back at the turn of each season, to sweep. A soldier who has never swept is a danger to everybody."]],
@@ -999,12 +1021,120 @@ const CROSSROADS := {
 			"keep": "A host stands at the Drum Tower of Qingshi, a company of each arm, and marches on a whole tally whose other half lies in six pieces at six hearths. It has not marched. It drills, and it grumbles, and it is there.",
 			"band": "Every year on the day the Yellow Bell was hung, eleven companies come in to the Pear Garden from six hearths without a spear among them, and sing. It can be heard at the sect. People who mean the land harm are said to have come to listen, and gone home thoughtful.",
 		}},
+	# ---- Part XXIV (the Lost Horse release): three questions asked after losing, each of which changes the
+	# shape of a country (marks.gd: what the answer leaves standing is walked up to)
+	"the_tide": {"step": "s_p24_tide", "part": "XXIV", "n": "The shore at Yanggu",
+		"ask": "The bore cannot be beaten; it has gone over you three times. King Qian has tried a wall, and arrows, and waits to hear it from you: what is the shore at Yanggu to do about a tide that cannot be stopped?",
+		"options": [
+			{"id": "wall", "label": "A wall of many baskets", "tilt": {"craft": 3}, "gain": {"renown": 4},
+				"desc": "Not one wall: ten thousand bamboo baskets of stone, staked, each giving a little. Build it a fourth time, the way he has learned to. The low fields behind it could be sown (renown).",
+				"log": "Had the sea-wall at Yanggu built a fourth time, of bamboo baskets filled with stone."},
+			{"id": "yield", "label": "Give it the low fields", "tilt": {"reach": -2, "heart": 2}, "gain": {"hearth": {"dawn": 3}},
+				"desc": "The foreshore is the tide's and always was. Move the houses up on to legs, tie a boat to every one, and let the bore have what it comes for. The Lantern Hearth will remember who said they need not fight it (regard of the Dawn-Market Folk).",
+				"log": "Gave the low fields of Yanggu to the tide, and had the houses of the shore put up on legs."},
+			{"id": "arrows", "label": "Shoot it, every year", "tilt": {"heart": -3}, "gain": {"stones": 2400},
+				"desc": "It cannot be beaten. It can be defied. Let the five hundred stand to at every bore and loose their three thousand arrows at the crest, so that nobody on this shore ever learns to kneel to it. The king pays for a second volley out of his own chest (spirit stones).",
+				"log": "Had the crossbows of Yanggu shoot three thousand arrows into the tide at the crest, every eighth month."},
+		],
+		"after": {
+			"wall": [["King Qian", "Baskets. Yes. I thought so, the third time, and did not trust it, because it was not grand. A king wants one great stone. Very well: every household weaves ten. I shall weave the first, badly, where they can see me do it."]],
+			"yield": [["King Qian", "Give it the fields. I have held this shore for thirty years and nobody has ever said that to my face. My engineers will weep. My fishermen have been building on stilts behind my back since my father's time, and they will say nothing at all, very loudly."]],
+			"arrows": [["King Qian", "Ha! Again. And again next year. It is perfectly useless and I have never in my life wanted anything so much. Sound the drum. If we cannot be the stronger we shall at least not be the politer."]],
+		},
+		"echo": {
+			"s_p24_qian2": {
+				"wall": [["King Qian", "The first hundred paces of wall are up. A child pushed on it yesterday and it moved, and I nearly had him flogged, and then I understood that it is supposed to. I am learning my own shore at sixty."]],
+				"yield": [["King Qian", "Nine houses are up on their legs already. An old woman has asked whether the bore might be persuaded to come a little further and do her cabbage bed; she says it has never had salt on it and is nothing but slugs."]],
+				"arrows": [["King Qian", "The crossbowmen have asked for a banner. I said, what device? They said: a wave, with an arrow in it. Not through it. In it. I have never been prouder of anything so foolish."]],
+			},
+			"s_p24_end": {
+				"wall": [["Elder Qing Xuan", "They tell me there is a new sea-wall at Yanggu that gives when it is pushed. I have been trying for forty years to teach disciples that, with a broom. I shall send them to look at a wall."]],
+				"yield": [["Elder Qing Xuan", "They tell me a whole shore at Yanggu has stood up on stilts and let the sea in under it, on your word. Lin Feng: you. I should have liked to see your face when you said it."]],
+				"arrows": [["Elder Qing Xuan", "They tell me five hundred crossbows shoot the sea every autumn at Yanggu, on your word. That does not sound to me like a man who has learned to lose. It sounds like you. I find I am not sorry."]],
+			},
+		},
+		"end": {
+			"wall": "At Yanggu the sea-wall of ten thousand baskets gave a hand's breadth to every bore, and stood.",
+			"yield": "At Yanggu the houses stand on legs, and the tide comes in under them and is thanked for the salt.",
+			"arrows": "At Yanggu they shoot the tide every year. It has never been turned. Nobody born there has ever knelt.",
+		}},
+	"the_ape": {"step": "s_p24_ape", "part": "XXIV", "n": "The Ape of the Huai",
+		"ask": "Wuzhiqi cannot be beaten: Great Yu could only chain him. He sits at the foot of Turtle Mountain with the Huai round his feet, and Bo Yi has the iron for a new chain, and is waiting. What is to be done about the Ape of the Huai?",
+		"options": [
+			{"id": "chain", "label": "Chain him again, as Yu did", "tilt": {"heart": -2, "craft": -2}, "gain": {"renown": 5},
+				"desc": "It held for four thousand years. Forge the links, put the bell through his nose, and set the pillar back under Turtle Mountain. It is what the old books say was done, and every town on the river will sleep (renown).",
+				"log": "Had Wuzhiqi chained again under Turtle Mountain, with a bell through his nose, as Yu did."},
+			{"id": "dredge", "label": "Cut the river a road, and let him go to the sea", "tilt": {"heart": 2, "craft": 2}, "gain": {"hearth": {"river": 3}},
+				"desc": "Yu did not beat the flood either; he gave it somewhere to go. Cut nine channels where Gun built nine dams, with the iron for sluices, and leave the ape his river all the way down to the sea. The Boat Hearth will dig with you (regard of the River Folk).",
+				"log": "Had nine channels cut for the Huai with the iron of the chain, and let Wuzhiqi go down to the sea."},
+			{"id": "boats", "label": "It is his river. Learn to float", "tilt": {"reach": 2, "craft": -1}, "gain": {"stones": 2000},
+				"desc": "He was here before the river had a name. Let the Drowned Fields be drowned, and put every house on a hull. Bo Yi can sell the iron (spirit stones). People have lived on water before, and travelled further for it.",
+				"log": "Left the Huai to Wuzhiqi, and had the people of the Drowned Fields build their houses on boats."},
+		],
+		"after": {
+			"chain": [["Bo Yi of the Dykes", "As Yu did. Well, it is what I asked the iron for. He will let us, you know. That is the worst of it. He let Gengchen. He holds his neck out like an ox, and looks at you while you do it."]],
+			"dredge": [["Bo Yi of the Dykes", "Channels. With my chain-iron for sluice gates. Gun is turning over on Feather Hill, and Yu, I think, is laughing. Nine cuts. I shall need every boat-hand on the river and I shall not have to ask twice."]],
+			"boats": [["Bo Yi of the Dykes", "I have spent four thousand years keeping water off land, and you tell me to let go of the land. Hm. My knees have been saying it for some time. Very well. I shall want a boat with a proper bed in it."]],
+		},
+		"echo": {
+			"s_p24_boyi2": {
+				"chain": [["Bo Yi of the Dykes", "The bell is in. He did not make a sound. On still nights now it rings once, and every dog in the Drowned Fields lies down. I have done this twice. I do not wish to live long enough to do it a third time."]],
+				"dredge": [["Bo Yi of the Dykes", "The first cut was opened at dawn. He went down it. He did not hurry; he looked at the sluice as he passed, the way a man looks at a gate somebody has at last thought to put in a wall. The fields are draining."]],
+				"boats": [["Bo Yi of the Dykes", "Thirty hulls afloat, and a hen-coop on every one. He came and looked, with his neck right out, over the roofs. A child threw him a bean-cake. I am told he ate it. I am told many things, lately."]],
+			},
+			"s_p24_end": {
+				"chain": [["Elder Qing Xuan", "And the ape is chained again. It is what I should have done. I say so because I notice you do not look as if you thought that settled it."]],
+				"dredge": [["Elder Qing Xuan", "And you let the ape go, and gave the river a road. Yu's own answer, to a thing Yu did not dare apply it to. I shall be thinking about that after you are an Immortal and I am a tablet."]],
+				"boats": [["Elder Qing Xuan", "And a whole country has gone to live on boats, with an ape for a landlord. I do not understand it. I am told they are cheerful. I have stopped expecting to understand what you leave behind you."]],
+			},
+		},
+		"end": {
+			"chain": "Under Turtle Mountain the Ape of the Huai is chained again, and his bell rings once on still nights.",
+			"dredge": "The Huai runs to the sea by nine channels, and the Drowned Fields of Gun are called the New Fields.",
+			"boats": "In the Drowned Fields a village floats, and its children say the ape is why they can all swim.",
+		}},
+	"the_horse": {"step": "s_p24_weng2", "part": "XXIV", "n": "The old man's horse",
+		"ask": "The black horse broke Sai Weng's son and saved him from the riders. It stands behind the tent, and the whole frontier will do with its luck as the old man does with his. He has asked you to say. What is to be done with a horse like that?",
+		"options": [
+			{"id": "keep", "label": "Keep it by the tent, and never ride it", "tilt": {"reach": -3, "heart": 1}, "gain": {"hearth": {"steppe": 3}},
+				"desc": "It came, and it is here. Put rails round it by the old man's door, and let the boy water it. Whatever is home is to be kept, lame or dangerous or neither. The Felt Hearth will understand that at once (regard of the Horse-Folk).",
+				"log": "Told Sai Weng to keep the black horse by his tent, unridden."},
+			{"id": "loose", "label": "Take down the rails. Let it run", "tilt": {"reach": 3, "craft": -1}, "gain": {"renown": 5},
+				"desc": "It was never his. It came over the frontier and it may go back over it, and bring what it brings. A people who shut nothing in will be heard of a long way off (renown).",
+				"log": "Told Sai Weng to take down his rails and let the black horse run."},
+			{"id": "breed", "label": "Breed from it, and write down the lines", "tilt": {"craft": 3, "heart": -1}, "gain": {"stones": 2600},
+				"desc": "Luck that walks in can be kept in the blood. Put it to the frontier mares, keep a stud book, and in ten years let every tent have a horse like it. The young men will pay well to be first (spirit stones).",
+				"log": "Told Sai Weng to breed from the black horse, and keep a stud book of the frontier."},
+		],
+		"after": {
+			"keep": [["Sai Weng", "By the tent. Where I can see it and it can see the north. Good. A thing need not be of any use to be one's own. My son will spoil it."], ["Weng the Younger", "I have already begun."]],
+			"loose": [["Sai Weng", "Rails down. Yes. It will go, and the neighbours will come and say what a loss, and I shall say: how do you know? And for once, sweeper, I shall not know either. I am looking forward to it."]],
+			"breed": [["Sai Weng", "A stud book. Sire, dam, foal. You want to write luck down and get more of it. I shall keep your book. And I shall write at the bottom of every page: so far."], ["Weng the Younger", "He will, too."]],
+		},
+		"echo": {
+			"s_p24_end": {
+				"keep": [["Elder Qing Xuan", "And the horse stays at the old man's door, unridden. A sweeper's answer. I kept you on this mountain nine years for no better reason than that you had come to it."]],
+				"loose": [["Elder Qing Xuan", "And the horse runs loose. The old man will have enjoyed that. He has wanted for forty years to not know what happens next, and been too sensible to arrange it."]],
+				"breed": [["Elder Qing Xuan", "And the frontier is to breed from it, by the book. You have never liked leaving a good thing to chance. I only say: the old man is right about the bottom of the page."]],
+			},
+			"post:s_break29": {
+				"keep": [["Narrator", "On the frontier a black horse stands in a paddock of birch rails with its red ear turned to the north, and a boy with a stiff leg is carrying it water it does not need."]],
+				"loose": [["Narrator", "On the frontier a paddock stands with its rails down, and some nights there are hoofbeats past the old man's tent, and some mornings a strange foal in the herd."]],
+				"breed": [["Narrator", "On the frontier there is a board with the lines of forty horses painted on it, and at the foot of it, in an old man's charcoal: so far."]],
+			},
+		},
+		"end": {
+			"keep": "On the frontier a black horse grew old in a paddock by a tent, never ridden, and the paddock is kept.",
+			"loose": "On the frontier the herds run without rails, and the horse-folk have stopped calling it luck either way.",
+			"breed": "On the frontier every tent has a horse of the black one's line, and at the foot of each stud book: so far.",
+		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
 	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow",
 	"the_pupils", "the_three_thousand", "the_arms",
 	"the_voices", "the_kites", "the_tops",
-	"the_clay", "the_lute", "the_host"]
+	"the_clay", "the_lute", "the_host",
+	"the_tide", "the_ape", "the_horse"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:
@@ -1051,6 +1181,13 @@ static func option_text(g, o: Dictionary) -> String:
 	if not tips.is_empty():
 		parts.append("Leans towards: " + ", ".join(tips) + ".")
 	return "\n".join(parts)
+
+## What answer `oid` of crossroads `id` leaves standing in the land (marks.gd), in words ("" if nothing).
+static func stands_text(id: String, oid: String) -> String:
+	var mk: Dictionary = Marks.MARKS.get(id, {}).get(oid, {})
+	if mk.is_empty():
+		return ""
+	return "%s, in %s" % [str(mk.n), str(Data.AREAS[str(mk.area)].n)]
 
 ## Take option `oid` at crossroads `id`: remembered, its scales tipped, what it gives given.
 static func take(g, id: String, oid: String) -> void:
@@ -1202,6 +1339,9 @@ static func text(g, id: String) -> String:
 	if int(h[1]) > 0:
 		parts.append("")
 		parts.append("Echoes heard: %d of %d." % [int(h[0]), int(h[1])])
+	if stands_text(id, ch) != "":
+		parts.append("")
+		parts.append("It stands in the land: %s." % stands_text(id, ch))
 	parts.append("")
 	parts.append("In the end: " + str(c.get("end", {}).get(ch, "")))
 	return "\n".join(parts)

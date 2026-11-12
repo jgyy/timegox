@@ -41,6 +41,12 @@ var habit := ""
 var vajra_used := false
 var tide_used := false
 var suppress_note := ""
+## the Lost Horse release (dooms.gd): a battle that cannot be won: the round its foe crests on, what
+## the party did in it (blows and mendings), and whether the harm has been seen to close yet
+var doomed := false
+var crest := 99
+var acts := {"blows": 0, "mends": 0}
+var closed_said := false
 ## Many roads (trials.gd): what the path taken through a trial does in this battle (its boon), and
 ## whether the trial's boss has been brought low enough to be enraged
 var boon := {}
@@ -290,6 +296,15 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		for f in foes:
 			if not f.boss:
 				f.hp = maxf(1.0, float(f.hp) * Echoes.FEAR_HP)
+	# the Lost Horse release (dooms.gd): a foe that cannot be beaten, and the round it crests on
+	doomed = Dooms.in_group(foes)
+	crest = Dooms.crest_round(foes)
+	acts = {"blows": 0, "mends": 0}
+	closed_said = false
+	for f in foes:
+		f["doom"] = Dooms.is_doom(str(f.id))
+		if f.doom:
+			f.hp = float(f.maxhp)
 	first_blow = true
 	vajra_used = false
 	tide_used = false
@@ -360,6 +375,8 @@ func start(foe_list: Array, c: Dictionary) -> void:
 			say(suppress_note)
 	if str(c.get("path_n", "")) != "":
 		say("%s: %s" % [str(c.get("path_kind", "")), str(c.path_n)])
+	if doomed:
+		say("This is not a thing that is beaten. (Give way, or stand as long as can be stood.)")
 
 func say(s: String) -> void:
 	log_lines.append(s)
@@ -401,10 +418,25 @@ func _next_turn() -> void:
 			_win()
 			return
 		if alive(party).is_empty():
-			_lose()
+			if doomed:
+				_fall(false)
+			else:
+				_lose()
 			return
 		if order.is_empty():
 			round_no += 1
+			# (dooms.gd: it mends, it comes on harder, and on the round it crests it goes over them)
+			if doomed:
+				if round_no > crest:
+					say("%s." % str(Dooms.DOOMS.get(str(foes[0].id), {}).get("crest", "It comes down")))
+					_fall(false)
+					return
+				for f in alive(foes):
+					if f.get("doom", false) and round_no > 1:
+						f.hp = minf(float(f.maxhp), float(f.hp) + float(f.maxhp) * Dooms.MEND)
+						f.atk = float(f.atk) * Dooms.RISE
+				if round_no == crest:
+					say("It is still rising.")
 			var all := alive(party) + alive(foes)
 			all.shuffle()
 			all.sort_custom(func(a, b): return a.spd > b.spd)
@@ -600,6 +632,12 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		enraged = true
 		tgt.atk = float(tgt.atk) * Trials.ENRAGE
 		say("%s is enraged!" % tgt.name)
+	# (dooms.gd: the harm closes like water; it cannot be brought under a tenth of itself)
+	if tgt.get("doom", false) and tgt.hp < float(tgt.maxhp) * Dooms.FLOOR:
+		tgt.hp = float(tgt.maxhp) * Dooms.FLOOR
+		if not closed_said:
+			closed_said = true
+			say("The blow goes through %s, and the wound closes behind it like water." % tgt.name)
 	if tgt.hp <= 0.0:
 		tgt.dead = true
 		if tgt.has("model"):
@@ -620,6 +658,8 @@ func _heal(tgt: Dictionary, amount: float) -> void:
 func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 	var s: Dictionary = Game.skill_of(skill_id)
 	actor.qi -= Game.skill_cost(skill_id)
+	if actor.side == "party":
+		acts["mends" if s.has("heal") else "blows"] = int(acts["mends" if s.has("heal") else "blows"]) + 1
 	if s.has("heal"):
 		say("%s casts %s." % [actor.name, s.n])
 		if not headless() and actor.has("model"):
@@ -705,6 +745,7 @@ func _arm_touch(tg: Dictionary, bind: float, mark: float) -> void:
 
 func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	Game.inv[item] -= 1
+	acts.mends = int(acts.mends) + 1
 	# the Cauldron's Dao: pills do far more good
 	var pk := Game.dao_mod("pill", 1.0) * Works.mod(Game, "pill")
 	if item == "hp_pill":
@@ -789,6 +830,21 @@ func _lose() -> void:
 	state = "result"
 	result_lines = ["DEFEAT", "Your vision fades... You will be carried back to the sect."]
 
+## The Lost Horse release (dooms.gd): a battle that could not be won is over.  `gave`: he gave way,
+## standing.  It is not a defeat: nothing is taken, nobody is carried home, and the story goes on.
+func _fall(gave: bool) -> void:
+	outcome = "fall"
+	state = "result"
+	var how := Dooms.manner(gave, int(acts.blows), int(acts.mends))
+	ctx["how"] = how
+	ctx["rounds"] = round_no
+	result_lines = ["GIVEN WAY" if gave else "OVERWHELMED", "This was never a thing to be won.", "You %s. What comes of it is not the end." % str(Dooms.HOW[how])]
+	_writeback()
+	if not headless():
+		for p in alive(party):
+			if p.has("model") and not gave:
+				Models.act(p.model, "die", t)
+
 func _writeback() -> void:
 	for p in party:
 		Game.hp[p.idx] = maxf(1.0, p.hp)
@@ -807,6 +863,11 @@ func _open_main() -> void:
 	labels = ["Attack", "Skills", "Items", "Flee"]
 	ids = ["attack", "skills", "items", "flee"]
 	enabled = [true, true, true, not ctx.get("boss", false)]
+	# (dooms.gd: what cannot be beaten can be given way to)
+	if doomed:
+		labels.append("Give way")
+		ids.append("yield")
+		enabled.append(true)
 	cursor = 0
 
 func _open_skills() -> void:
@@ -891,6 +952,9 @@ func _select() -> void:
 					_open_skills()
 				"items":
 					_open_items()
+				"yield":
+					say("%s puts up the sword, and stands aside." % cur.name if cur.idx == 0 else "%s lowers her hands, and stands aside." % cur.name)
+					_fall(true)
 				"flee":
 					say("%s tries to flee..." % cur.name)
 					if randf() < 0.6:
