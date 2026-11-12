@@ -3906,6 +3906,27 @@ func _horse_shots(which: String = "1") -> void:
 		main.choice.cursor = 1 if "cursor" in main.choice else 0
 		await _shot("sea_counter")
 		main.pop()
+	if want.call("fame"):
+		# fame (fame.gd): the street behind somebody known everywhere, in Qingshi
+		Game.level = Data.MAX_LEVEL
+		Game.riding = false
+		var fq: Vector2i = Roads.of("surface").at["qingshi"]
+		var fl: Dictionary = {}
+		for ln3 in Roads.of("surface").lines:
+			if str(ln3.b) == "qingshi" or str(ln3.a) == "qingshi":
+				fl = ln3
+		var fpts: Array = (fl.pts as Array).duplicate()
+		if str(fl.a) != "qingshi":
+			fpts.reverse()
+		main.world.teleport(fpts[26])
+		await _wait(1.0)
+		# (he walks into town along the road, and they fall in behind him)
+		for k4 in range(25, 3, -1):
+			main.world.move_dir = fpts[k4] - main.world.ptile
+			await _wait(0.2)
+		main.world.move_dir = Vector2i.ZERO
+		await _wait(7.0)
+		await _shot("fame_street")
 	if want.call("beasts"):
 		# beasts with hides instead of paint (assets.gd NATURAL)
 		var bs: Array = []

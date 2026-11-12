@@ -1662,8 +1662,87 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 						sn.transform = Transform3D(Basis(xv, yv * ln, zv), mo.position)
 
 # ---------------------------------------------------------------- update
+## The people who walk up to him in a town (fame.gd): drawn, not stood in the land.  They come along the
+## way he came (so through no wall), fall in behind him, stop when he stops, and say what people say.
+var fans: Array = []           # {n: Node3D, pos: Vector3, k: int}
+var fan_trail: Array = []      # where he has been (Vector3), the newest last
+var fan_say_t := 3.0
+var fan_said := 0
+var fan_label: Label3D = null
+const FAN_BODIES := ["folk_youth", "folk_maiden", "folk_scholar", "folk_merchant", "folk_shopwife", "folk_porter", "folk_farmwife"]
+
+func fan_near() -> bool:
+	for f in fans:
+		if (f.pos as Vector3).distance_to(player.position) < 3.2 and float(f.get("fade", 1.0)) > 0.8:
+			return true
+	return false
+
+func _fans_tick(d: float) -> void:
+	var pp: Vector3 = player.position
+	var here := "" if is_floor() or main.top_name() != "world" else Fame.town_near(str(layer), ptile)
+	var want := Fame.crowd(Game) if here != "" and building_at(ptile).is_empty() and glide.is_empty() else 0
+	if fan_trail.is_empty() or (fan_trail[fan_trail.size() - 1] as Vector3).distance_to(pp) > 0.7:
+		fan_trail.append(pp)
+		if fan_trail.size() > 80:
+			fan_trail.pop_front()
+	# somebody new notices him: from as far back along his own way as is remembered
+	if fans.size() < want and fan_trail.size() >= 14 and (fans.is_empty() or float(fans[fans.size() - 1].get("fade", 1.0)) > 0.6):
+		var bodies: Array = Rooms.INDOOR_BODIES.get(area_id, FAN_BODIES)
+		var k := fans.size() + int(Game.day) * 3
+		var body := str(bodies[k % bodies.size()])
+		if Assets.PEOPLE.has(body) and Assets.has(Assets.PEOPLE[body]):
+			var fnode: Node3D = Assets.person(body)
+			scene3d.add_child(fnode)
+			fans.append({"n": fnode, "pos": fan_trail[0], "k": k, "fade": 0.0, "gone": false})
+	for i in range(fans.size() - 1, -1, -1):
+		var f: Dictionary = fans[i]
+		var fn: Node3D = f.n
+		if i >= want:
+			f.gone = true
+		f.fade = clampf(float(f.fade) + (-d * 1.5 if f.gone else d * 1.2), 0.0, 1.0)
+		if f.gone and float(f.fade) <= 0.0:
+			fn.queue_free()
+			fans.remove_at(i)
+			continue
+		# his place: a few paces back along the way, a little to one side
+		var back := mini(fan_trail.size() - 1, 4 + i * 2)
+		var goal: Vector3 = fan_trail[fan_trail.size() - 1 - back]
+		var side := Vector3(-float(facing.y), 0, float(facing.x)) * (0.55 if i % 2 == 0 else -0.55)
+		goal += side
+		var to := goal - (f.pos as Vector3)
+		to.y = 0.0
+		var dist := to.length()
+		var walking := dist > 0.25
+		if walking:
+			var sp := (TS / STEP_T) * (1.25 if dist > 3.0 else 0.9)
+			f.pos = (f.pos as Vector3) + to.normalized() * minf(dist, sp * d)
+			fn.rotation.y = lerp_angle(fn.rotation.y, atan2(to.x, to.z), 1.0 - exp(-d * 10.0))
+		else:
+			var look := pp - (f.pos as Vector3)
+			fn.rotation.y = lerp_angle(fn.rotation.y, atan2(look.x, look.z), 1.0 - exp(-d * 6.0))
+		f.pos.y = ground_y(f.pos)
+		fn.position = f.pos
+		fn.scale = Vector3.ONE * (0.92 + 0.08 * float(i % 3)) * float(f.fade)
+		Models.anim_person(fn, t + i * 0.37, walking)
+	# what is said behind him
+	fan_say_t -= d
+	if fan_label != null and fan_say_t < 3.5:
+		fan_label.queue_free()
+		fan_label = null
+	if fan_say_t <= 0.0 and not fans.is_empty():
+		fan_say_t = 6.5
+		fan_said += 1
+		var sf: Dictionary = fans[fan_said % fans.size()]
+		var ln := Fame.line(Game, fan_said + int(Game.day))
+		if Fame.gift_due(Game, here) and fan_near() and fan_said % 2 == 0:
+			ln = "For you. Please. (Enter)"
+		if ln != "" and float(sf.fade) > 0.8:
+			fan_label = _label(sf.n, ln, 2.15, Color("f4ecd8"), 26)
+
 func _process(d: float) -> void:
 	t += d
+	if not headless() and player != null:
+		_fans_tick(d)
 	if banner_t > 0.0:
 		banner_t -= d
 	# a region is announced once he has stayed in it a moment (see _enter_region)

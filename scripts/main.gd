@@ -207,6 +207,12 @@ func press(act: String) -> void:
 			var e = world.face_entity()
 			if e != null:
 				interact(e)
+			elif world.fan_near():
+				# (fame.gd: somebody who has walked up to him is holding something out)
+				var gt := Fame.gift(Game, Fame.town_near(str(world.layer), world.ptile))
+				if not gt.is_empty():
+					Feats.poll(Game)
+					say([["", "%s %s." % [str(gt.who), str(gt.how)]]], func(): Game.toast("Given: %s" % str(gt.what)))
 	elif top != "":
 		screens[top].press(act)
 
@@ -225,6 +231,12 @@ func _process(d: float) -> void:
 		if in_world and not Game.passengers.is_empty():
 			for fl in Offices.arrive(Game):
 				Game.toast(str(fl))
+		# (fame.gd: his standing is said when it rises with his cultivation)
+		if in_world and Game.prologue == "" and Fame.rank(Game) != Game.fame_told:
+			if Fame.rank(Game) > Game.fame_told:
+				Game.toast("Fame: %s" % Fame.name_of(Game))
+				Game.note("Fame: %s. %s" % [Fame.name_of(Game), str(Fame.RISES[Fame.rank(Game)])])
+			Game.fame_told = Fame.rank(Game)
 		# (mail.gd: word that a letter has come, once for each)
 		if in_world and Game.prologue == "":
 			var mw := Mail.waiting(Game).size()

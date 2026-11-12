@@ -48,6 +48,8 @@ const FEATS := {
 	"post_bags": {"n": "Neither Snow Nor Rain", "kind": "people", "pts": 10, "test": ["bags", 5], "desc": "Carry five bags of the post to the counters they were sealed for."},
 	"first_coach": {"n": "Inside, If You Please", "kind": "people", "pts": 5, "test": ["coaches", 1], "desc": "Take the post-coach along the high road from one town to another."},
 	"first_voyage": {"n": "Out of Sight of Land", "kind": "people", "pts": 5, "test": ["voyages", 1], "desc": "Take ship from one harbour to another."},
+	"known_face": {"n": "A Known Face", "kind": "people", "pts": 5, "test": ["fame", 3], "desc": "Be known in every town."},
+	"street_gift": {"n": "Only What Was in the House", "kind": "people", "pts": 5, "test": ["fan_gifts", 1], "desc": "Take what somebody in the street holds out to you."},
 	"six_trades": {"n": "Jack of Six Trades", "kind": "people", "pts": 10, "test": ["trades", 6], "desc": "Work a shift at six different trades."},
 	"marks_twelve": {"n": "Gone Back to Look", "kind": "road", "pts": 10, "test": ["marks", 12], "desc": "Look at twelve of the things your choices left standing in the land."},
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
@@ -279,6 +281,10 @@ static func value(g, t: Array) -> float:
 			return float(g.coaches)
 		"voyages":
 			return float(g.voyages)
+		"fame":
+			return float(Fame.rank(g))
+		"fan_gifts":
+			return float(g.fan_gifts)
 		"bags":
 			return float(g.bags_done)
 		"trade_rank":

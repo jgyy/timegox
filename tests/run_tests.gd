@@ -1850,6 +1850,37 @@ func _fates_and_faces() -> void:
 	var jn := Models.junk()
 	check(jn.get_child_count() == 2, "the junk is built from code")
 	jn.free()
+	# fame (fame.gd): the higher he climbs the more people know his face, and come up to him
+	check(Fame.REALMS.size() == Fame.NAMES.size() and Fame.NAMES.size() == Fame.CROWD.size() and Fame.CROWD.size() == Fame.LINES.size() and Fame.LINES.size() == Fame.GIFTS.size() and Fame.RISES.size() == Fame.NAMES.size(), "every standing has a name, a crowd, its words and its gifts")
+	var fg9 = load("res://scripts/game.gd").new()
+	fg9.reset()
+	var last_rank := -1
+	var last_crowd := -1
+	var ranks_seen := {}
+	for lv9 in range(0, Data.MAX_LEVEL + 1):
+		fg9.level = lv9
+		check(Fame.rank(fg9) >= last_rank and Fame.crowd(fg9) >= last_crowd, "fame never falls as he climbs (level %d)" % lv9)
+		last_rank = Fame.rank(fg9)
+		last_crowd = Fame.crowd(fg9)
+		ranks_seen[last_rank] = true
+	check(ranks_seen.size() == Fame.NAMES.size() and last_crowd >= 5, "a whole journey goes through every standing, and ends with a street behind him")
+	fg9.level = 0
+	check(Fame.crowd(fg9) == 0 and Fame.line(fg9, 3) == "" and not Fame.gift_due(fg9, "qingshi") and Fame.gift(fg9, "qingshi").is_empty(), "nobody follows a sweeper, and nobody gives him anything")
+	for rk9 in range(1, Fame.LINES.size()):
+		check((Fame.LINES[rk9] as Array).size() >= 3, "standing %d has things said of it" % rk9)
+		for fl9 in Fame.LINES[rk9]:
+			check(str(fl9).length() <= 64, "said in the street, not a speech: %s" % str(fl9))
+	check(Fame.town_near("surface", Atlas.to_world("village", Vector2i(30, 28))) == "qingshi" and Fame.town_near("surface", Atlas.to_world("bamboo", Vector2i(30, 30))) == "", "a crowd is a thing of towns")
+	fg9.level = Data.MAX_LEVEL
+	var fs0: int = fg9.stones
+	var fh0 := int(fg9.inv.get("hp_pill", 0))
+	var gft := Fame.gift(fg9, "qingshi")
+	check(not gft.is_empty() and fg9.stones > fs0 and int(fg9.inv.get("hp_pill", 0)) > fh0 and fg9.fan_gifts == 1, "somebody known everywhere is given something in the street")
+	check(Fame.gift(fg9, "qingshi").is_empty() and not Fame.gift(fg9, "tushan").is_empty(), "once a day a town")
+	fg9.day += 1
+	check(Fame.gift_due(fg9, "qingshi"), "and again tomorrow")
+	check(fg9.stones - fs0 < Data.enemy_stones(Data.MAX_LEVEL, false) * 12, "a gift in the street is not a living")
+	fg9.free()
 	check(Assets.has(Assets.MOUNTS.horse), "the horse is Blender-built")
 	var horse := Assets.mount("horse")
 	var hap2: AnimationPlayer = horse.get_meta("ap", null)

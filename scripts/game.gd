@@ -214,6 +214,10 @@ var mail_told := 0
 var coaches := 0
 ## (ships.gd: how many passages by sea have been taken)
 var voyages := 0
+## (fame.gd: the standing he has been told of, the day each town last gave him something, and how often)
+var fame_told := 0
+var fan_day := {}
+var fan_gifts := 0
 var shifts := {}
 var shift_day := {}
 ## (careers: the day the last shift was worked at each trade in each town, for the salary; all wages earned)
@@ -394,6 +398,9 @@ func reset() -> void:
 	mail_told = 0
 	coaches = 0
 	voyages = 0
+	fame_told = 0
+	fan_day = {}
+	fan_gifts = 0
 	shifts = {}
 	shift_day = {}
 	salary_day = {}

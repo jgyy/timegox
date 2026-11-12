@@ -1137,6 +1137,7 @@ func _draw() -> void:
 	UI.panel(self, r)
 	UI.text(self, Vector2(430, 120), "Lin Feng", 28, UI.C_GOLD)
 	UI.text(self, Vector2(430, 150), Data.level_name(Game.level), 20)
+	UI.text(self, Vector2(830, 150), "Fame: %s" % Fame.name_of(Game), 15, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, 380)
 	if Game.level < Data.MAX_LEVEL:
 		UI.bar(self, Rect2(430, 162, 400, 12), Game.exp / float(Game.exp_need()), UI.C_GOLD)
 		UI.text(self, Vector2(840, 174), "%d/%d" % [Game.exp, Game.exp_need()], 14, UI.C_DIM)
