@@ -3907,34 +3907,28 @@ func _horse_shots(which: String = "1") -> void:
 		await _shot("sea_counter")
 		main.pop()
 	if want.call("fame"):
-		# fame (fame.gd): the street behind somebody known everywhere, in Qingshi
+		# fame (fame.gd): the street behind somebody known everywhere, outside the Green Stone Inn of Qingshi
 		Game.level = Data.MAX_LEVEL
 		Game.riding = false
-		var fq: Vector2i = Roads.of("surface").at["qingshi"]
-		var fl: Dictionary = {}
-		for ln3 in Roads.of("surface").lines:
-			if str(ln3.b) == "qingshi" or str(ln3.a) == "qingshi":
-				fl = ln3
-		var fpts: Array = (fl.pts as Array).duplicate()
-		if str(fl.a) != "qingshi":
-			fpts.reverse()
-		main.world.teleport(fpts[26])
-		await _wait(1.0)
-		# (he walks into town along the road, and they fall in behind him)
-		for k4 in range(25, 3, -1):
-			var stp: Vector2i = fpts[k4] - main.world.ptile
-			if absi(stp.x) + absi(stp.y) != 1:
-				continue
-			main.world.move_dir = stp
-			for _w in 12:
-				await _wait(0.05)
-				if main.world.ptile == fpts[k4] and main.world.move_t < 0.0:
-					break
-		main.world.move_dir = Vector2i.ZERO
-		print("[tour] fans ", main.world.fans.size(), " trail ", main.world.fan_trail.size())
-		await _wait(7.0)
-		print("[tour] fans ", main.world.fans.size())
-		await _shot("fame_street")
+		for fb in Atlas.world_of("surface").buildings:
+			if str(fb.area) == "village" and str(fb.id) == "inn":
+				var fr: Rect2i = fb.rect
+				var fd9: Vector2i = fb.door
+				var fov := Vector2(fd9) - Vector2(fr.get_center())
+				var fod := Vector2i(signi(int(fov.x)), 0) if absf(fov.x) / fr.size.x > absf(fov.y) / fr.size.y else Vector2i(0, signi(int(fov.y)))
+				main.world.teleport(fd9 + fod * 4)
+				main.world.facing = fod
+				await _wait(2.0)
+				# (the way he came: up the street to where he stands, so that they come up it behind him)
+				var fpp: Vector3 = main.world.player.position
+				var trail9: Array = []
+				for k4 in 24:
+					trail9.append(fpp - Vector3(fod.x, 0, fod.y) * (23 - k4) * 0.0 + Vector3(-fod.y, 0, fod.x) * (23 - k4) * 0.75)
+				main.world.fan_trail = trail9
+				await _wait(9.0)
+				print("[tour] fans ", main.world.fans.size())
+				await _shot("fame_street")
+				break
 	if want.call("windows"):
 		# open windows (architecture.gd _wall): the Green Stone Inn of Qingshi from the street, the room seen through them
 		var wsw: Dictionary = Atlas.world_of("surface")
