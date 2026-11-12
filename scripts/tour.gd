@@ -3927,6 +3927,27 @@ func _horse_shots(which: String = "1") -> void:
 		main.world.move_dir = Vector2i.ZERO
 		await _wait(7.0)
 		await _shot("fame_street")
+	if want.call("windows"):
+		# open windows (architecture.gd _wall): the Green Stone Inn of Qingshi from the street, the room seen through them
+		var wsw: Dictionary = Atlas.world_of("surface")
+		for wb in wsw.buildings:
+			if str(wb.area) == "village" and str(wb.id) == "inn":
+				var wr: Rect2i = wb.rect
+				var wd9: Vector2i = wb.door
+				var wc := Vector2(wr.get_center())
+				var outv := (Vector2(wd9) - wc)
+				var outd := Vector2i(signi(int(outv.x)), 0) if absf(outv.x) / wr.size.x > absf(outv.y) / wr.size.y else Vector2i(0, signi(int(outv.y)))
+				main.world.teleport(wd9 + outd * 3)
+				main.world.facing = -outd
+				await _wait(2.5)
+				var wp: Vector3 = main.world.wpos(wd9)
+				var o3 := Vector3(outd.x, 0, outd.y)
+				var side3 := Vector3(-outd.y, 0, outd.x)
+				main.world.cam_override = Transform3D(Basis.IDENTITY, wp + o3 * 9.0 + side3 * 5.0 + Vector3(0, 2.6, 0)).looking_at(wp - o3 * 2.0 + side3 * 2.0 + Vector3(0, 2.0, 0), Vector3.UP)
+				await _wait(0.8)
+				await _shot("windows_inn")
+				main.world.cam_override = null
+				break
 	if want.call("beasts"):
 		# beasts with hides instead of paint (assets.gd NATURAL)
 		var bs: Array = []
