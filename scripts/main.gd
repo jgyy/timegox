@@ -907,7 +907,7 @@ func offer_carriage(e: Dictionary) -> void:
 			opts.append({"id": "mail:satchel", "label": "Open the satchel", "note": "%d kept" % Mail.kept(Game).size(), "desc": "The letters already opened, to read again."})
 		var bag := Mail.bag_offer(Game, office)
 		if not bag.is_empty():
-			opts.append({"id": "mail:bag", "label": "Carry the post-bag to %s" % str(Data.AREAS[Mail.area_of(str(bag.to))].n), "note": "%d stones" % int(bag.pay),
+			opts.append({"id": "mail:bag", "label": "Carry the post-bag to %s" % str(Data.AREAS[Mail.area_of(str(bag.to))].n).split(",")[0], "note": "%d stones" % int(bag.pay),
 				"desc": "A sealed bag for %s. No hurry is asked for and no seat is needed: hand it over the counter there, and the road pays %d spirit stones. (%d of %d bags carried.)" % [str(Offices.OFFICES[str(bag.to)].n), int(bag.pay), Game.mail_bags.size(), Mail.BAGS]})
 	# (roads.gd: the post-coach, along the high road to the towns already walked into)
 	var coach: Array = []
