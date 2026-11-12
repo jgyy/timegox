@@ -1,9 +1,14 @@
-"""Blob: the slimes, oozes and formless spawn.  One sculpted drop of gel that sags outwards under
-its own weight into a puddle rim, with a softer bulb on top and runnels dripping down its sides
-into droplets; the gel is paler and clearer at the top and edges and murkier round the middle
-where its core sits, its surface wobbles and wet highlights glint on it.  Swallowed things are
-half sunk in it - a skull, coins, a pebble, a sword hilt jutting from the top - with bubbles
-welling up through the surface; big glossy eyes and a gaping mouth.  Tinted by the game per enemy.
+"""Blob: the slimes, oozes and formless spawn (Mire Toads, Magma Slimes, Bog Colossi, Taisui ...).
+
+Designed silhouette first, after the slime of Dragon Quest (one feature that names it even when
+it is small: Toriyama's teardrop): a drop of gel that sags outwards under its own weight into a
+puddle rim, its top drawn up into a curled drip-tip.  The game has no transparent material, so
+the gel is an opaque, glossy drop that *reads* as clear by its values: lit and pale on top, a
+murky core band low in the middle where the light does not reach, the thin edge and the puddle
+lighter again where light passes through, crisp white glints where it is wet, bubbles welling
+up under the skin, and swallowed things - Chinese cash coins with square holes, a skull - only
+half sunk, tinted by the gel they sit in.  Big simple eyes and a wide D-shaped grin painted on
+the surface (not a hole).  Tinted by the game per enemy.
 Run: blender --background --python art/monsters/blob.py  ->  assets/monsters/blob.glb"""
 import math
 import os
@@ -13,87 +18,129 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import kit  # noqa: E402
 import creature  # noqa: E402
 import anatomy as A  # noqa: E402
-from creature import zero_pose  # noqa: E402
-from kit import CRYSTAL, MAT_GLOW, METAL, SKIN, STONE, WOOD, V, Builder, Rig, env  # noqa: E402
-from sculpt import fbm3, smooth  # noqa: E402
 from clay import Clay  # noqa: E402
-from creature import add  # noqa: E402
+from creature import add, zero_pose  # noqa: E402
+from elemental import decal  # noqa: E402
+from kit import CLOTH, MAT_GLOW, MAT_PLAIN, METAL, SKIN, V, Builder, Rig, env  # noqa: E402
+from sculpt import fbm3, smooth  # noqa: E402
 
 kit.reset()
 creature.realtime()
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
 r.bone("body", (0, 0.0, 0), (0, 0.55, 0), "root")
+r.bone("head", (0, 0.5, 0.3), (0, 0.7, 0.45), "body")
 r.bone("top", (0, 0.55, 0), (0, 1.0, 0), "body")
 b = Builder("blob")
 
 
 def bw(p):
-    k = max(0.0, min(1.0, (p.y - 0.35) / 0.4))
+    k = max(0.0, min(1.0, (p.y - 0.42) / 0.4))
     return {"body": 1.0 - k, "top": k}
 
 
-# body: one sculpted drop of slime sagging outwards under its own weight into a puddle rim, a
-# softer bulb on top, and runnels of slime dripping down its sides into droplets; the gel is
-# paler and clearer at the top and towards its edges, deeper and murkier round its middle where
-# the core sits, and its surface wobbles
-cl = Clay(0.026, "blob_body")
-cl.ellipsoid(V(0, 0.42, 0), (0.62, 0.42, 0.6), bones=lambda p, t: bw(p), tag="body")
-cl.ellipsoid(V(0.02, 0.7, -0.02), (0.42, 0.3, 0.4), bones=lambda p, t: bw(p), tag="body")
-cl.ellipsoid(V(0, 0.1, 0), (0.8, 0.1, 0.78), bones={"body": 1.0}, tag="puddle")
-for k in range(8):
-    a = 2 * math.pi * k / 8 + 0.35
+# ---------------------------------------------------------------- the drop of gel
+cl = Clay(0.024, "blob_body")
+cl.ellipsoid(V(0, 0.38, 0), (0.62, 0.38, 0.6), bones=lambda p, t: bw(p), tag="body")
+cl.ellipsoid(V(0.0, 0.64, -0.02), (0.42, 0.3, 0.4), bones=lambda p, t: bw(p), tag="body")
+# the drip-tip drawn up from the top and curling back: the one shape that names it
+cl.chain([V(0.0, 0.84, -0.03), V(0.01, 0.98, -0.05), V(-0.02, 1.08, -0.12), V(-0.06, 1.1, -0.2)], [0.16, 0.1, 0.06, 0.035],
+         bones=lambda p, t: {"top": 1.0}, tag="tip")
+cl.ellipsoid(V(0, 0.07, 0), (0.8, 0.08, 0.78), bones={"body": 1.0}, tag="puddle")
+# a few runnels hugging the flanks down into the puddle (on the surface, so they leave no dark gaps)
+for k in range(6):
+    a = 2 * math.pi * k / 6 + 0.6
     ca, sa = math.cos(a), math.sin(a)
-    top = V(ca * 0.5, 0.62 - 0.05 * (k % 3), sa * 0.48)
-    bot = V(ca * 0.68, 0.16, sa * 0.66)
-    cl.chain([top, top.lerp(bot, 0.5) + V(ca * 0.05, 0, sa * 0.05), bot], [0.07, 0.06, 0.075], bones=lambda p, t: bw(p), tag="drip")
-    if k % 2:
-        cl.ball(V(ca * 0.86, 0.09, sa * 0.84), 0.07, bones={"body": 1.0}, tag="puddle")
+    cl.chain([V(ca * 0.5, 0.5, sa * 0.48), V(ca * 0.6, 0.3, sa * 0.58), V(ca * 0.7, 0.12, sa * 0.68)], [0.05, 0.06, 0.07], bones=lambda p, t: bw(p), tag="drip")
+    cl.ball(V(ca * 0.86, 0.06, sa * 0.84), 0.06, bones={"body": 1.0}, tag="puddle")
 
 
 def slime_col(p, info):
-    h = smooth(0.1, 0.95, p.y)
+    # lit and pale on top, a murky core band low in the middle, lighter again at the thin edge
+    # and in the puddle, where light passes through the gel
     rr = math.hypot(p.x, p.z)
-    murk = smooth(0.3, 0.0, abs(p.y - 0.4)) * smooth(0.75, 0.4, rr)
-    v = 0.78 + 0.2 * h - 0.18 * murk
-    if info.tag in ("drip", "puddle"):
+    top = smooth(0.45, 1.0, p.y)
+    core = math.exp(-((p.y - 0.3) / 0.14) ** 2) * smooth(0.72, 0.35, rr)
+    edge = smooth(0.5, 0.75, rr) * smooth(0.3, 0.1, p.y)
+    v = 0.86 + 0.14 * top - 0.16 * core + 0.1 * edge
+    if info.tag == "puddle":
         v = 0.9
+    elif info.tag == "drip":
+        v = max(v, 0.84)
+    elif info.tag == "tip":
+        v = 0.96
+    g = fbm3((p.x * 4.0, p.y * 4.0, p.z * 4.0), 2, 3)
+    v *= 0.96 + 0.08 * g
     return (v, v, v)
 
 
 def slime_wobble(p, info):
     w = fbm3((p.x * 3.0, p.y * 3.0, p.z * 3.0), 2, 6) - 0.5
-    return info.n * (0.025 * w)
+    return info.n * (0.022 * w)
 
 
 cl.build(b, slime_col, cls=SKIN, tint_fn=lambda p, info: 1.0, post=slime_wobble)
-# wet highlights across the top
-b.ellipsoid(V(-0.18, 0.95, 0.2), (0.12, 0.035, 0.07), "ffffff", cls=CRYSTAL, bone="top", seg=10, rings=5, rot=(0.6, 0.4, 0.3), mat=MAT_GLOW, tint=0.2)
-b.ellipsoid(V(0.2, 0.86, 0.3), (0.05, 0.02, 0.03), "ffffff", cls=CRYSTAL, bone="top", seg=8, rings=4, rot=(0.7, -0.4, -0.3), mat=MAT_GLOW, tint=0.2)
-# swallowed things half sunk in the gel: a skull, coins, a pebble and a sword hilt jutting from the
-# top, all darkened by the slime, and bubbles welling up through the surface
+hit = A.surface(b)
+
+
+def on_gel(x, y, z_dir=1.0):
+    h = hit(V(x, y, 2.0 * z_dir), V(0, 0, -z_dir), 4.0)
+    return (h[0], h[1]) if h is not None else (V(x, y, 0.5 * z_dir), V(0, 0, z_dir))
+
+
+def on_gel_dir(o, d):
+    h = hit(o, d, 4.0)
+    return (h[0], h[1]) if h is not None else (o, -V(d))
+
+
+# ---------------------------------------------------------------- wet glints: crisp white highlights on the lit top
+for (x, y, z, rx, rz, rot) in ((-0.22, 0.8, 0.3, 0.15, 0.06, (0.6, 0.5, 0.3)), (0.2, 0.78, 0.33, 0.06, 0.025, (0.7, -0.4, -0.3)),
+                               (-0.05, 1.0, 0.02, 0.05, 0.02, (0.2, 0.0, 0.4))):
+    p, n = on_gel_dir(V(x, y + 0.6, z) + V(x, 0, z) * 0.5, (V(0, -1, 0) - V(x, 0, z) * 0.6).normalized())
+    b.ellipsoid(p + n * 0.006, (rx, 0.012, rz), "ffffff", cls=CLOTH, bone=bw(p), rot=(math.atan2(n.z, n.y), math.atan2(x, z) * 0.0 + rot[1], -math.atan2(n.x, n.y)),
+                seg=12, rings=5, mat=MAT_GLOW, tint=0.15)
+# ---------------------------------------------------------------- bubbles welling up under the skin
 b.cur_pal = 0.0
-A.skull(b, V(-0.33, 0.3, 0.42), 0.9, "body", col="c8c0b0", fwd=V(-0.5, 0.2, 1.0))
-for k, (x, y, z, rx) in enumerate(((0.52, 0.28, 0.25, 1.2), (0.58, 0.36, 0.1, 0.5), (0.45, 0.18, 0.42, 1.6))):
-    b.lathe(V(x, y, z), [(0.06, -0.008), (0.06, 0.008)], "d8b048", cls=METAL, bone="body", seg=14, rot=(rx, 0, 0.3 * k + 0.8))
-b.ball(V(-0.5, 0.22, -0.3), 0.07, "5a5a60", cls=STONE, bone="body", seg=10, rings=6)
-b.tube([V(0.15, 0.82, -0.25), V(0.24, 1.08, -0.36)], [0.022, 0.02], "4a3020", cls=WOOD, bone="top", seg=6)
-b.ellipsoid(V(0.17, 0.86, -0.27), (0.09, 0.018, 0.025), "c8a048", cls=METAL, bone="top", seg=8, rings=4, rot=(0, 0.6, 0.5))
-b.ball(V(0.25, 1.1, -0.37), 0.03, "c8a048", cls=METAL, bone="top", seg=8, rings=5)
-b.cur_pal = 0.5
-for k in range(12):
-    a = k * 2.4
-    rr = 0.3 + 0.25 * ((k * 7) % 5) / 5
-    y = 0.3 + 0.05 * (k % 9)
-    q = V(math.cos(a) * rr, y, math.sin(a) * rr)
-    q = q + V(q.x, 0, q.z).normalized() * (0.6 * math.sqrt(max(0.0, 1.0 - ((y - 0.42) / 0.42) ** 2)) - rr)
-    b.ball(q, 0.025 + 0.012 * (k % 3), (1.0, 1.0, 1.0), cls=SKIN, bone=bw(q), tint=0.6, seg=8, rings=5)
-b.cur_pal = 0.0
-# face: big glossy eyes and a gaping mouth with a tongue
+for k in range(8):
+    a = k * 2.4 + 0.3
+    y = 0.22 + 0.06 * (k % 7)
+    d = V(math.cos(a), (y - 0.38) * 1.2, math.sin(a)).normalized()
+    p, n = on_gel_dir(V(0, 0.38, 0) + d * 1.5, -d)
+    rad = 0.03 + 0.014 * (k % 3)
+    b.ball(p - n * rad * 0.45, rad, (1.0, 1.0, 1.0), cls=SKIN, bone=bw(p), tint=0.88, seg=10, rings=6)
+    b.ball(p - n * rad * 0.35 + n * rad * 0.7 + V(-0.3, 0.5, 0.2).normalized() * rad * 0.35, rad * 0.28, "ffffff", cls=CLOTH, bone=bw(p),
+           seg=6, rings=4, mat=MAT_GLOW, tint=0.0)
+# ---------------------------------------------------------------- swallowed things, half sunk in the gel
+p, n = on_gel(-0.33, 0.27)
+A.skull(b, p - n * 0.035, 1.25, "body", col="c4bca8", fwd=(n + V(-0.2, 0.3, 0.1)).normalized())
+for k, (x, y, ang) in enumerate(((0.3, 0.22, 0.9), (0.4, 0.3, 0.35), (0.22, 0.15, 1.4))):
+    p, n = on_gel(x, y)
+    c = p - n * 0.025
+    rot = (math.atan2(n.y, n.z) + ang * 0.3, math.atan2(n.x, n.z), ang)
+    b.lathe(c, [(0.07, -0.009), (0.07, 0.009)], "d8b050", cls=METAL, bone="body", seg=18, rot=(math.pi / 2 + rot[0], rot[1], rot[2]))
+    # the square hole of a cash coin
+    b.box(c + n * 0.01, (0.028, 0.028, 0.022), "2a1a10", bone="body", rot=(math.pi / 2 + rot[0], rot[1], rot[2]), cls=METAL)
+
+# ---------------------------------------------------------------- face: big simple eyes and a wide D-shaped grin
 for s in (1, -1):
-    b.eye(V(0.17 * s, 0.62, 0.5), 0.085, "1a2030", side=s, bone=bw(V(0, 0.6, 0)), rot_y=0.25, h=1.25, accent=True)
-b.ellipsoid(V(0, 0.42, 0.58), (0.11, 0.075, 0.04), "401828", cls=SKIN, bone="body", seg=12, rings=6)
-b.ellipsoid(V(0, 0.4, 0.6), (0.055, 0.03, 0.02), "e05068", cls=SKIN, bone="body", seg=10, rings=5)
+    p, n = on_gel(0.17 * s, 0.6)
+    rot = (math.atan2(-n.y, n.z) * 0.5, math.atan2(n.x, n.z), 0)
+    b.ellipsoid(p + n * 0.006, (0.065, 0.092, 0.03), "141018", cls=SKIN, bone="head", rot=rot, seg=16, rings=10, mat=MAT_PLAIN)
+    b.ellipsoid(p + n * 0.03 + V(-0.02 * s, 0.035, 0), (0.022, 0.026, 0.01), "ffffff", cls=CLOTH, bone="head", rot=rot, seg=10, rings=6, mat=MAT_GLOW)
+    b.ellipsoid(p + n * 0.03 + V(0.018 * s, -0.035, 0), (0.01, 0.01, 0.006), "ffffff", cls=CLOTH, bone="head", seg=8, rings=5, mat=MAT_GLOW)
+mouth = []
+for i in range(17):
+    a = math.pi * i / 16
+    mouth.append((math.cos(a) * 0.13, -math.sin(a) * 0.1 + 0.01 * math.sin(a * 2.0)))
+mouth.append((-0.13, 0.008))
+mouth.append((0.0, 0.016))
+mouth.append((0.13, 0.008))
+mouth = list(reversed(mouth))
+mp, mn = on_gel(0.0, 0.43)
+decal(b, hit, mp, mn, mouth, "3a1020", "head", lift=0.004, cols=("2a0c18", "4a1424"))
+# the tongue in the lower half of the grin
+tongue = [(math.cos(a) * 0.075, -0.09 + 0.045 * math.sin(a)) for a in [math.pi * i / 12 for i in range(13)]]
+decal(b, hit, mp, mn, tongue, "e05a78", "head", lift=0.007, cols=("c84a68", "f07890"))
 
 
 T_IDLE = 1.6
@@ -165,5 +212,8 @@ def die(t):
     p["top"] = ((0.2 * f, 0, 0.1 * f), (0, -0.15 * f, 0), (1.0 + 0.3 * f, 1.0 - 0.6 * f, 1.0 + 0.3 * f))
     return p
 
+
 print("[art] blob: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "monsters/blob.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=12, dist=0.25, strength=0.35, floor_y=0.0)
+# the gel carries its own values (lit top, murky core, bright rim): no coat split
+kit.finish_rigged(b, r, "monsters/blob.glb", {"idle": (T_IDLE, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)},
+                  coat=False, samples=10, dist=0.14, strength=0.18, floor_y=0.0)
