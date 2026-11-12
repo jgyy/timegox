@@ -640,7 +640,7 @@ func _indoor_y(tile: Vector2i, bb: Dictionary) -> float:
 		return -INF
 	for bd in bw.buildings:
 		var r: Rect2i = bd.rect
-		if r.has_point(tile):
+		if Rooms.inside(bd, tile):
 			var o: Vector3 = bb.off
 			var c := o + Vector3((r.position.x + r.size.x * 0.5) * TS, 0.0, (r.position.y + r.size.y * 0.5) * TS)
 			return _ground(bb, c) + Arch.FLOOR_Y
@@ -689,6 +689,12 @@ func _build_view(id: String) -> void:
 			var lb: Dictionary = bd.duplicate(true)
 			lb.rect = Rect2i(bd.rect.position - r.position, bd.rect.size)
 			lb.door = bd.door - r.position
+			# (the wings built out from it, rooms.gd, in the slice's own tiles too)
+			if bd.has("wings"):
+				var lws: Array = []
+				for wg in bd.wings:
+					lws.append({"rect": Rect2i((wg.rect as Rect2i).position - r.position, (wg.rect as Rect2i).size), "side": int(wg.side)})
+				lb["wings"] = lws
 			var props: Array = []
 			for pr in bd.props:
 				props.append([pr[0], pr[1] - r.position, pr[2]])
@@ -748,6 +754,20 @@ func _build_view(id: String) -> void:
 		cn.position = Vector3(kp.x + 0.75, _ground(bb, kp + Vector3(0.75, 0, 0.75)) - 0.05, kp.z + 0.75) - root.position
 		root.add_child(cn)
 		_label(cn, "%s  %d m" % [str(pk.n), int(round(float(pk.h)))], 3.3, Color("f4ecd8"), 26).visibility_range_end = 60.0
+	# a junk at her mooring in every harbour (ships.gd): drawn with the region, standing on no tile
+	for hid in Ships.ORDER:
+		if str(Ships.HARBOURS[hid].area) == id:
+			var mo := Ships.mooring(lw, hid)
+			if mo.x >= 0:
+				var jk := Models.junk()
+				var jp: Vector3 = Terrain3D.world_pos(mo) + bb.off
+				jk.position = Vector3(jp.x, bb.off.y + Terrain3D.WATER_Y, jp.z) - root.position
+				jk.rotation.y = Terrain3D.hash2(mo.x, mo.y, 5.0) * TAU
+				root.add_child(jk)
+	# the high road between the towns (roads.gd), paved where it crosses this region
+	var rdm := Roads.mesh(lid, r, func(x: float, z: float) -> float: return _ground(bb, Vector3(x, 0.0, z) + Vector3(bb.off.x, 0.0, bb.off.z)) - bb.off.y)
+	if rdm != null:
+		root.add_child(rdm)
 	# ... and the camp of the people of the road at the foot of the highest (folk.gd)
 	if (lw.get("camps", {}) as Dictionary).has(id):
 		var cp: Vector3 = Terrain3D.world_pos(lw.camps[id]) + bb.off
@@ -811,7 +831,7 @@ func ent_visible(e: Dictionary) -> bool:
 	if Game.prologue != "":
 		if e.kind == "npc" and str(e.id) == str(Cultures.HEARTHS[Game.prologue].keeper):
 			return true
-		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode", "machine"] or e.get("fate", false):
+		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode", "machine", "mark"] or e.get("fate", false) or e.has("pick"):
 			return false
 	match e.kind:
 		"enemy":
@@ -819,6 +839,9 @@ func ent_visible(e: Dictionary) -> bool:
 				return false
 			# the war-bands of the Eight Gates (Part XIII) only march once the formation wakes
 			var ev = e.get("vis", ["", ""])
+			# (Part XXIV: a band may stop marching when a step is done: the bore of the eighth month)
+			if ev.size() > 1 and str(ev[1]) != "" and Game.done(str(ev[1])):
+				return false
 			return ev[0] == "" or Game.reached(ev[0])
 		"seal", "ladder", "abode":
 			return true
@@ -826,7 +849,13 @@ func ent_visible(e: Dictionary) -> bool:
 			if Game.boss_done.has(e.enemy):
 				return false
 			# a boss who only appears later in the story (the Gate Generals and Chiyou, Part XIII)
+			# (the reckoning, reckon.gd: only the lords this journey's choices made stand on the mountain)
+			if Reckon.is_lord(str(e.enemy)):
+				return Reckon.stands(Game, str(e.enemy))
 			var bv = e.get("vis", ["", ""])
+			# (Part XXIV: a lord that cannot be beaten is gone from the land when the losing is done)
+			if bv.size() > 1 and str(bv[1]) != "" and Game.done(str(bv[1])):
+				return false
 			return bv[0] == "" or Game.reached(bv[0])
 		"pickup":
 			if Game.taken.has(e.id):
@@ -843,6 +872,12 @@ func ent_visible(e: Dictionary) -> bool:
 		"machine":
 			# the Hundred Works (works.gd): a machine stands once it has been built
 			return Works.stands(Game, str(e.work))
+		"mark":
+			# the Lost Horse release (marks.gd): what a crossroads answer left standing, or a leaning scale
+			return Marks.stands(Game, e)
+	# somebody who is only in the world of whoever chose that way (marks.gd)
+	if e.has("pick") and not Marks.who_stands(Game, e):
+		return false
 	# somebody met on the road (fate.gd): there while the story has them there
 	if e.get("fate", false) and not Fate.present(Game, str(e.id)):
 		return false
@@ -856,6 +891,27 @@ func ent_visible(e: Dictionary) -> bool:
 	if not hd.is_empty() and Game.reached(hd[0]) and not Game.done(hd[1]):
 		return false
 	return true
+
+## The Lost Horse release (marks.gd): build what stands at mark `e` for the answer given (or the way the
+## scale leans now), in place of whatever stood there before.
+func _mark_model(e: Dictionary, n: Node3D) -> void:
+	if n.has_meta("model"):
+		(n.get_meta("model") as Node3D).queue_free()
+	var mm := Marks.model(Marks.spec(Game, e), int(e.get("i", 0)))
+	# (one thing alone stands any way round; the things of a row stand along it, and a road is laid end to end)
+	var msp := Marks.spec(Game, e)
+	var mline: Vector2i = e.get("line", Vector2i.ZERO)
+	if int(msp.get("k", 1)) == 1 or mline == Vector2i.ZERO:
+		mm.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y, 11.0) * TAU
+	else:
+		mm.rotation.y = 0.0 if mline.x != 0 else PI * 0.5
+		if str(msp.m[0]) == "road":
+			mm.rotation.y += PI * 0.5
+			mm.scale.z = 2.0
+	n.add_child(mm)
+	n.set_meta("model", mm)
+	n.set_meta("key", Marks.key(Game, e))
+	(n.get_meta("label") as Label3D).text = Marks.name_of(Game, e) if int(e.get("i", 0)) == 0 else ""
 
 func ent_at(tile: Vector2i):
 	var e = tile_ents.get(tile)
@@ -878,7 +934,7 @@ func building_at(tile: Vector2i) -> Dictionary:
 	if grid.is_empty() or grid[tile.y * w + tile.x] != MapGen.INTERIOR:
 		return {}
 	for bd in wd.buildings:
-		if bd.rect.has_point(tile):
+		if Rooms.inside(bd, tile):
 			return bd
 	return {}
 
@@ -1071,6 +1127,13 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			var ml := _label(n, Works.site_name(str(e.work)), 3.0, Color("e8d090"), 26)
 			n.set_meta("label", ml)
 			n.set_meta("model", mm)
+		"mark":
+			# the Lost Horse release (marks.gd): built when it first stands (_mark_model), so that the
+			# answers never given are never built
+			n.add_child(Models.shadow_disc(1.2, 0.3))
+			var kl := _label(n, "", 3.2, Color("f0c8a0"), 26)
+			n.set_meta("label", kl)
+			n.set_meta("key", "")
 		"spring":
 			n.add_child(Models.spring_basin())
 		"ladder":
@@ -1599,8 +1662,87 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 						sn.transform = Transform3D(Basis(xv, yv * ln, zv), mo.position)
 
 # ---------------------------------------------------------------- update
+## The people who walk up to him in a town (fame.gd): drawn, not stood in the land.  They come along the
+## way he came (so through no wall), fall in behind him, stop when he stops, and say what people say.
+var fans: Array = []           # {n: Node3D, pos: Vector3, k: int}
+var fan_trail: Array = []      # where he has been (Vector3), the newest last
+var fan_say_t := 3.0
+var fan_said := 0
+var fan_label: Label3D = null
+const FAN_BODIES := ["folk_youth", "folk_maiden", "folk_scholar", "folk_merchant", "folk_shopwife", "folk_porter", "folk_farmwife"]
+
+func fan_near() -> bool:
+	for f in fans:
+		if (f.pos as Vector3).distance_to(player.position) < 3.2 and float(f.get("fade", 1.0)) > 0.8:
+			return true
+	return false
+
+func _fans_tick(d: float) -> void:
+	var pp: Vector3 = player.position
+	var here := "" if is_floor() or main.top_name() != "world" else Fame.town_near(str(layer), ptile)
+	var want := Fame.crowd(Game) if here != "" and building_at(ptile).is_empty() and glide.is_empty() else 0
+	if fan_trail.is_empty() or (fan_trail[fan_trail.size() - 1] as Vector3).distance_to(pp) > 0.7:
+		fan_trail.append(pp)
+		if fan_trail.size() > 80:
+			fan_trail.pop_front()
+	# somebody new notices him: from as far back along his own way as is remembered
+	if fans.size() < want and fan_trail.size() >= 14 and (fans.is_empty() or float(fans[fans.size() - 1].get("fade", 1.0)) > 0.6):
+		var bodies: Array = Rooms.INDOOR_BODIES.get(area_id, FAN_BODIES)
+		var k := fans.size() + int(Game.day) * 3
+		var body := str(bodies[k % bodies.size()])
+		if Assets.PEOPLE.has(body) and Assets.has(Assets.PEOPLE[body]):
+			var fnode: Node3D = Assets.person(body)
+			scene3d.add_child(fnode)
+			fans.append({"n": fnode, "pos": fan_trail[0], "k": k, "fade": 0.0, "gone": false})
+	for i in range(fans.size() - 1, -1, -1):
+		var f: Dictionary = fans[i]
+		var fn: Node3D = f.n
+		if i >= want:
+			f.gone = true
+		f.fade = clampf(float(f.fade) + (-d * 1.5 if f.gone else d * 1.2), 0.0, 1.0)
+		if f.gone and float(f.fade) <= 0.0:
+			fn.queue_free()
+			fans.remove_at(i)
+			continue
+		# his place: a few paces back along the way, a little to one side
+		var back := mini(fan_trail.size() - 1, 4 + i * 2)
+		var goal: Vector3 = fan_trail[fan_trail.size() - 1 - back]
+		var side := Vector3(-float(facing.y), 0, float(facing.x)) * (0.55 if i % 2 == 0 else -0.55)
+		goal += side
+		var to := goal - (f.pos as Vector3)
+		to.y = 0.0
+		var dist := to.length()
+		var walking := dist > 0.25
+		if walking:
+			var sp := (TS / STEP_T) * (1.25 if dist > 3.0 else 0.9)
+			f.pos = (f.pos as Vector3) + to.normalized() * minf(dist, sp * d)
+			fn.rotation.y = lerp_angle(fn.rotation.y, atan2(to.x, to.z), 1.0 - exp(-d * 10.0))
+		else:
+			var look := pp - (f.pos as Vector3)
+			fn.rotation.y = lerp_angle(fn.rotation.y, atan2(look.x, look.z), 1.0 - exp(-d * 6.0))
+		f.pos.y = ground_y(f.pos)
+		fn.position = f.pos
+		fn.scale = Vector3.ONE * (0.92 + 0.08 * float(i % 3)) * float(f.fade)
+		Models.anim_person(fn, t + i * 0.37, walking)
+	# what is said behind him
+	fan_say_t -= d
+	if fan_label != null and fan_say_t < 3.5:
+		fan_label.queue_free()
+		fan_label = null
+	if fan_say_t <= 0.0 and not fans.is_empty():
+		fan_say_t = 6.5
+		fan_said += 1
+		var sf: Dictionary = fans[fan_said % fans.size()]
+		var ln := Fame.line(Game, fan_said + int(Game.day))
+		if Fame.gift_due(Game, here) and fan_near() and fan_said % 2 == 0:
+			ln = "For you. Please. (Enter)"
+		if ln != "" and float(sf.fade) > 0.8:
+			fan_label = _label(sf.n, ln, 2.15, Color("f4ecd8"), 26)
+
 func _process(d: float) -> void:
 	t += d
+	if not headless() and player != null:
+		_fans_tick(d)
 	if banner_t > 0.0:
 		banner_t -= d
 	# a region is announced once he has stayed in it a moment (see _enter_region)
@@ -1700,7 +1842,9 @@ func step_time() -> float:
 	if climb != 0:
 		return climb_t
 	if riding_here():
-		return STEP_T / float(Fashion.RIDES[Game.ride].speed)
+		# (roads.gd: a thing on wheels is quicker on a road or a path, and slower off one)
+		var rd: Dictionary = Fashion.RIDES[Game.ride]
+		return STEP_T / (float(rd.speed) * Roads.pace(wd, str(rd.kind), target if move_t >= 0.0 else ptile))
 	return STEP_T
 
 ## R (or the bot's "ride"): whistle up the ride and get on, or get off and send it away.
@@ -2087,7 +2231,7 @@ func _snap_cam() -> void:
 ## how far off the people, packs and things of the land are drawn (metres), and the big ones
 const ENT_SHOW := 92.0
 const ENT_SHOW_BIG := 150.0
-const ENT_BIG := ["boss", "prop", "machine", "seal", "ladder", "abode", "stele", "portal"]
+const ENT_BIG := ["boss", "prop", "machine", "mark", "seal", "ladder", "abode", "stele", "portal"]
 var frame_n := 0
 
 func _update_view(d: float) -> void:
@@ -2196,6 +2340,8 @@ func _update_view(d: float) -> void:
 			n.visible = vis
 			if not vis:
 				continue
+			if e.kind == "mark" and str(n.get_meta("key", "")) != Marks.key(Game, e):
+				_mark_model(e, n)
 			dist = n.position.distance_to(pp)
 			if dist > 46.0:
 				continue
@@ -2222,6 +2368,11 @@ func _update_view(d: float) -> void:
 			for uid in ups:
 				for un in ups[uid]:
 					(un as Node3D).visible = not (uid == bid and lv == 0)
+		# (the Lost Horse release: coming in at a door says what the house is, storey by storey: rooms.gd)
+		if key != "" and lv == 0 and not is_floor() and not key.begins_with(str(inside).get_slice("#", 0) + "#"):
+			var bd9 := building_at(ptile if move_t < 0.0 or move_t > 0.5 else target)
+			if not bd9.is_empty() and Rooms.uses_text(bd9) != "":
+				Game.toast("%s: %s" % [str(bd9.n), Rooms.uses_text(bd9)])
 		inside = key
 	weather.global_position = Vector3(pp.x, pp.y + weather_y(), pp.z)
 	# chase camera
@@ -2287,9 +2438,16 @@ func _ride_view(d: float, pp: Vector3) -> void:
 	mount.position = pp
 	mount.rotation.y = lerp_angle(mount.rotation.y, want_yaw, 1.0 - exp(-d * 10.0))
 	var rise := Models.anim_ride(mount, ride_clk, moving)
+	var basis := Basis(Vector3.UP, mount.rotation.y)
+	if str(r.kind) == "carriage":
+		# (the Lost Horse release: a carriage is sat in: the hero and Yue Ling on its first two seats, and
+		# whoever is being carried on the rest; a seated clip lowers the hips itself, so each stands
+		# where their feet would be under the seat)
+		_carriage_view(r, pp, basis)
+		return
+	_drop_passengers()
 	var standing := str(r.kind) == "vehicle"
 	var clip := "ride_stand" if standing else ("ride" if moving else "ride_idle")
-	var basis := Basis(Vector3.UP, mount.rotation.y)
 	# the hips go to the seat (astride, the clip keeps them 0.88 m over the model's feet); standing on
 	# a deck, the feet do
 	var lift := 0.9 if not standing else 0.0
@@ -2308,6 +2466,50 @@ func _ride_view(d: float, pp: Vector3) -> void:
 	if moving and int(sp) != step_side:
 		step_side = int(sp)
 		Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path) if not standing else Color("e8f0ff"))
+
+## Who sits where in a carriage (fashion.gd `seats`): the hero, Yue Ling, and the passengers being
+## carried for a fare (offices.gd), each a model of their own that rides with it.
+var pass_nodes: Array = []
+var pass_key := ""
+const SEAT_DROP := 0.46
+
+func _carriage_view(r: Dictionary, pp: Vector3, basis: Basis) -> void:
+	var seats: Array = r.seats
+	player.position = pp + basis * (seats[0] as Vector3) - Vector3(0, SEAT_DROP, 0)
+	player.rotation = Vector3(0, mount.rotation.y, 0)
+	Models.anim_person(player, t, false, false, "sit_bench")
+	comp.visible = Game.companion
+	if Game.companion:
+		Assets.lend_clips(comp)
+		comp.position = pp + basis * (seats[1] as Vector3) - Vector3(0, SEAT_DROP, 0)
+		comp.rotation = Vector3(0, mount.rotation.y, 0)
+		comp_pos = comp.position
+		comp_run = false
+		Models.anim_person(comp, t + 1.0, false, false, "sit_bench")
+	var key := ",".join(Game.passengers.map(func(p): return str(p.id)))
+	if key != pass_key:
+		_drop_passengers()
+		pass_key = key
+		for p in Game.passengers:
+			var pn: Node3D = Assets.person(str(p.asset)) if Assets.PEOPLE.has(str(p.asset)) and Assets.has(Assets.PEOPLE[str(p.asset)]) else Models.person(Color("8a7a6a"), Color("2a2a3a"), {})
+			Assets.lend_clips(pn)
+			scene3d.add_child(pn)
+			pass_nodes.append(pn)
+	for i in pass_nodes.size():
+		if i + 2 >= seats.size():
+			(pass_nodes[i] as Node3D).visible = false
+			continue
+		var pn2: Node3D = pass_nodes[i]
+		pn2.visible = true
+		pn2.position = pp + basis * (seats[i + 2] as Vector3) - Vector3(0, SEAT_DROP, 0)
+		pn2.rotation = Vector3(0, mount.rotation.y, 0)
+		Models.anim_person(pn2, t + 2.0 + i, false, false, "sit_bench")
+
+func _drop_passengers() -> void:
+	for pn in pass_nodes:
+		(pn as Node3D).queue_free()
+	pass_nodes = []
+	pass_key = ""
 
 func weather_y() -> float:
 	match Look.theme(theme_name).weather:
@@ -2587,6 +2789,10 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0))
 		"machine":
 			Machines.animate(n.get_meta("model"), t + float(e.pos.x))
+			(n.get_meta("label") as Label3D).visible = dist < 12.0
+		"mark":
+			if n.has_meta("model"):
+				Machines.animate(n.get_meta("model"), t + float(e.pos.x))
 			(n.get_meta("label") as Label3D).visible = dist < 12.0
 		"abode":
 			var opened: bool = Game.abodes.has(e.id)
@@ -3191,9 +3397,9 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk"]:
+	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark"]:
 		var hint := "Talk" if fe.kind != "folk" else "Talk to %s" % str(fe.n)
-		if fe.kind == "machine":
+		if fe.kind == "machine" or fe.kind == "mark":
 			hint = "Look"
 		match fe.kind:
 			"prop":

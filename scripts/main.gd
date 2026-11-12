@@ -207,6 +207,12 @@ func press(act: String) -> void:
 			var e = world.face_entity()
 			if e != null:
 				interact(e)
+			elif world.fan_near():
+				# (fame.gd: somebody who has walked up to him is holding something out)
+				var gt := Fame.gift(Game, Fame.town_near(str(world.layer), world.ptile))
+				if not gt.is_empty():
+					Feats.poll(Game)
+					say([["", "%s %s." % [str(gt.who), str(gt.how)]]], func(): Game.toast("Given: %s" % str(gt.what)))
 	elif top != "":
 		screens[top].press(act)
 
@@ -221,6 +227,22 @@ func _process(d: float) -> void:
 	_amb_t -= d
 	if _amb_t <= 0.0:
 		_amb_t = 0.5
+		# (offices.gd: somebody carried for a fare gets down when the carriage comes into their town)
+		if in_world and not Game.passengers.is_empty():
+			for fl in Offices.arrive(Game):
+				Game.toast(str(fl))
+		# (fame.gd: his standing is said when it rises with his cultivation)
+		if in_world and Game.prologue == "" and Fame.rank(Game) != Game.fame_told:
+			if Fame.rank(Game) > Game.fame_told:
+				Game.toast("Fame: %s" % Fame.name_of(Game))
+				Game.note("Fame: %s. %s" % [Fame.name_of(Game), str(Fame.RISES[Fame.rank(Game)])])
+			Game.fame_told = Fame.rank(Game)
+		# (mail.gd: word that a letter has come, once for each)
+		if in_world and Game.prologue == "":
+			var mw := Mail.waiting(Game).size()
+			if mw > Game.mail_told:
+				Game.toast("A letter has come for you: ask at any counter of the post")
+			Game.mail_told = mw
 		Eggs.busy = not in_world or not world.using.is_empty() or world.traveling() or Game.prologue != ""
 		Eggs.gliding = in_world and world.gliding()
 		Eggs.on_summit = in_world and not world.gliding() and not Peaks.summit_at(world.wd, world.ptile).is_empty()
@@ -336,6 +358,17 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 			lines.append(["Narrator", " ".join(ce.slice(k0, k0 + 4))])
 		if Echoes.names(Game) != "":
 			lines.append(["Narrator", "And the land, which had watched every one of those choices, had its own names for Lin Feng by the end: %s." % Echoes.names(Game)])
+		# (the Lost Horse release: how he lost to what could not be beaten, dooms.gd, and what his choices left
+		# standing, marks.gd)
+		if Dooms.epilogue(Game) != "":
+			lines.append(["Narrator", Dooms.epilogue(Game)])
+		for rl9 in Reckon.epilogue(Game):
+			lines.append(["Narrator", str(rl9)])
+		var stood := 0
+		for lid9 in ["surface", "heaven", "under", "sea"]:
+			stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
+		if stood > 0:
+			lines.append(["Narrator", "%d things stand in the land that were not there before Lin Feng was asked a question: roads, walls, graves, a bell, a tree. Nobody who passes them knows whose word put them there." % stood])
 		if Works.count(Game) > 0:
 			lines.append(["Narrator", "%d works stand in the land that Lin Feng built with his own hands, and the makers call him %s." % [Works.count(Game), Works.title(Game)]])
 		lines.append_array(origin_lines("ending"))
@@ -515,6 +548,16 @@ func interact(e: Dictionary) -> void:
 		"machine":
 			# the Hundred Works (works.gd): what it is and what it does
 			say([["Narrator", Works.site_desc(str(e.work))]])
+		"mark":
+			# the Lost Horse release (marks.gd): what a choice left standing; looked at, it is remembered
+			var first_look := not Game.marks_seen.has(Marks.seen_key(str(e.id)))
+			if first_look:
+				Game.marks_seen[Marks.seen_key(str(e.id))] = true
+				Game.note("Looked at %s" % Marks.name_of(Game, e))
+			say([["Narrator", Marks.desc_of(Game, e)]], func():
+				if first_look:
+					Game.poll_steps()
+			)
 		"obstacle":
 			# Part XVII (impact.gd): it stands in the way until the sword clears it
 			Game.toast(str(Impact.OBSTACLES.get(str(e.what), {}).get("hint", "Something stands in the way (F)")))
@@ -683,7 +726,23 @@ func talk_npc(e: Dictionary) -> void:
 			Game.poll_steps()
 		)
 		return
+	# somebody found indoors in a town (rooms.gd): a word, and then, if there is work to be had here
+	# today, the offer of a shift at their trade (offices.gd)
+	# whoever answers for a town (offices.gd): a word, and then, if they have a carriage to sell, the offer of it
+	if e.has("office") and e.has("lines"):
+		var oi: int = chat_idx.get(e.id, 0)
+		chat_idx[e.id] = oi + 1
+		say([[e.n, str(e.lines[oi % (e.lines as Array).size()])]], func(): offer_carriage(e))
+		return
+	if e.has("trade") and e.has("lines"):
+		var ti: int = chat_idx.get(e.id, 0)
+		chat_idx[e.id] = ti + 1
+		say([[e.n, str(e.lines[ti % (e.lines as Array).size()])]], func(): offer_shift(e))
+		return
 	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
+	# somebody a choice left standing somewhere (marks.gd) has their own words
+	if e.has("lines"):
+		chats = (e.lines as Array).duplicate()
 	# somebody met on the road (fate.gd) has their own words for afterwards
 	if e.get("fate", false):
 		chats = FateText.CHAT.get(str(e.id), ["..."]).duplicate()
@@ -835,6 +894,178 @@ func ask_picks() -> void:
 		return
 	ask_crossroads()
 
+## What whoever answers for a town has at the counter (offices.gd, mail.gd): a carriage for sale
+## (fashion.gd RIDES `buy`, `at`), the letters that have come, the satchel of those already read, the
+## post-bag to carry and the ones to hand over.  "Not today" is the first line.
+func offer_carriage(e: Dictionary) -> void:
+	if Game.prologue != "":
+		return
+	var office := str(e.office)
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
+	if Mail.is_post(office):
+		var here: Array = Mail.bags_for(Game, office)
+		if not here.is_empty():
+			var due := 0
+			for b in here:
+				due += int(b.pay)
+			opts.append({"id": "mail:deliver", "label": "Hand over the post", "note": "%d stones" % due, "desc": "%d sealed bag%s for this counter, carried in from the road. The road pays on arrival: %d spirit stones." % [here.size(), "" if here.size() == 1 else "s", due], "col": UI.C_GOLD})
+		var wait: Array = Mail.waiting(Game)
+		if not wait.is_empty():
+			opts.append({"id": "mail:read", "label": "Ask for your letters", "note": "%d waiting" % wait.size(), "desc": "The oldest is from %s." % str(Mail.LETTERS[wait[0]].from), "col": UI.C_JADE})
+		for lid in Mail.kept(Game):
+			if Mail.owes_reply(Game, lid):
+				opts.append({"id": "mail:reply:" + lid, "label": "Write back to %s" % str(Mail.LETTERS[lid].from), "desc": str(Mail.LETTERS[lid].reply.ask), "col": UI.C_JADE})
+		if not Mail.kept(Game).is_empty():
+			opts.append({"id": "mail:satchel", "label": "Open the satchel", "note": "%d kept" % Mail.kept(Game).size(), "desc": "The letters already opened, to read again."})
+		var bag := Mail.bag_offer(Game, office)
+		if not bag.is_empty():
+			opts.append({"id": "mail:bag", "label": "Carry the post-bag to %s" % str(Data.AREAS[Mail.area_of(str(bag.to))].n).split(",")[0], "note": "%d stones" % int(bag.pay),
+				"desc": "A sealed bag for %s. No hurry is asked for and no seat is needed: hand it over the counter there, and the road pays %d spirit stones. (%d of %d bags carried.)" % [str(Offices.OFFICES[str(bag.to)].n), int(bag.pay), Game.mail_bags.size(), Mail.BAGS]})
+	# (roads.gd: the post-coach, along the high road to the towns already walked into)
+	var coach: Array = []
+	if Mail.is_post(office) and not world.is_floor():
+		var shut := {}
+		for se in world.ents:
+			if se.kind == "seal" and not world.seal_open(se):
+				for st in se.tiles:
+					shut[st] = true
+		coach = Roads.coach_offers(Game, Mail.area_of(office), shut)
+		for co in coach.slice(0, 4):
+			opts.append({"id": "coach:" + str(co.to), "label": "Take the post-coach to %s" % str(co.n), "note": "%d stones" % int(co.fare),
+				"desc": "The coach of the post leaves when it has a passenger. By the high road to %s: about %s hours, %d spirit stones (you have %d)." % [str(co.n), str(co.hours), int(co.fare), Game.stones],
+				"enabled": Game.stones >= int(co.fare)})
+	# (ships.gd: a passage by sea from a harbour to the others the journey has been to)
+	var ships: Array = Ships.offers(Game, office) if not world.is_floor() else []
+	for so in ships:
+		opts.append({"id": "ship:" + str(so.to), "label": "Take ship to %s" % str(so.n), "note": "%d stones" % int(so.fare),
+			"desc": "A junk of the coast trade, three masts and batten sails, lying at the quay with her lines singled up. To %s: %d leagues, about %s hours, %d spirit stones (you have %d)." % [str(so.n), int(so.leagues), str(so.hours), int(so.fare), Game.stones],
+			"col": UI.C_JADE, "enabled": Game.stones >= int(so.fare)})
+	for rid in Fashion.RIDE_ORDER:
+		var r: Dictionary = Fashion.RIDES[rid]
+		if str(r.get("at", "")) == office and not Game.rides.has(rid):
+			opts.append({"id": rid, "label": "Buy the %s" % str(r.n), "note": "%d stones" % int(r.buy), "desc": "%s\n\nDriven, seats %d, %d%% faster than running. %d spirit stones (you have %d)." % [told(str(r.desc)), Fashion.seats(rid), int(round((float(r.speed) - 1.0) * 100.0)), int(r.buy), Game.stones],
+				"col": UI.C_GOLD, "enabled": Game.stones >= int(r.buy)})
+	if opts.size() < 2:
+		return
+	choose("At the counter of %s" % str(e.n), opts, func(oid: String):
+		if oid == "mail:deliver":
+			var paid := Mail.deliver(Game, office)
+			Feats.poll(Game)
+			say([[str(e.n), "Seals whole, and dry. You would be surprised how seldom I say both. The road pays %d." % paid]])
+		elif oid.begins_with("coach:"):
+			for co2 in coach:
+				if "coach:" + str(co2.to) == oid:
+					var at: Vector2i = Roads.ride_coach(Game, co2)
+					if at.x >= 0:
+						Game.riding = false
+						world.teleport(at)
+						Feats.poll(Game)
+						Game.toast("The post-coach sets you down at %s" % str(co2.n))
+		elif oid.begins_with("ship:"):
+			for so2 in ships:
+				if "ship:" + str(so2.to) == oid and Ships.sail(Game, so2):
+					var lines: Array = []
+					for tl in Ships.tale(so2, Game.voyages - 1):
+						lines.append(["", str(tl)])
+					var q: Vector2i = Ships.quay(str(so2.to))
+					var to_layer := Data.layer_of(str(Ships.HARBOURS[str(so2.to)].area))
+					Game.riding = false
+					say(lines, func():
+						if q.x >= 0:
+							world.teleport(q, to_layer)
+						Feats.poll(Game)
+						Game.toast("The junk ties up at %s" % str(so2.n))
+					)
+		elif oid == "mail:read":
+			read_letter(str(Mail.waiting(Game)[0]), e)
+		elif oid == "mail:satchel":
+			open_satchel(e)
+		elif oid.begins_with("mail:reply:"):
+			write_back(oid.trim_prefix("mail:reply:"))
+		elif oid == "mail:bag":
+			var bg := Mail.bag_offer(Game, office)
+			Mail.take_bag(Game, bg)
+			say([[str(e.n), "For %s. Do not open it, do not sit on it, and if it rains, it is more important than you are." % str(Offices.OFFICES[str(bg.to)].n)]])
+		elif Fashion.RIDES.has(oid) and Game.stones >= int(Fashion.RIDES[oid].buy):
+			Game.stones -= int(Fashion.RIDES[oid].buy)
+			Game.grant_ride(oid)
+			Game.ride = oid
+			Feats.poll(Game)
+			say([[str(e.n), "She pulls a little to the left. They all pull a little to the left. Keep the axles greased and do not let anybody tell you how many it seats: it seats %d." % Fashion.seats(oid)]])
+	)
+
+## A letter is read out (mail.gd): what is in it is taken, and if it can be answered, it is asked how.
+func read_letter(lid: String, e: Dictionary = {}) -> void:
+	var fresh: bool = not Game.mail_read.has(lid)
+	var lines: Array = Mail.lines_of(lid)
+	say(lines, func():
+		var got := Mail.open(Game, lid)
+		if got != "":
+			Game.toast(got)
+		Game.mail_told = Mail.waiting(Game).size()
+		Feats.poll(Game)
+		if fresh and Mail.owes_reply(Game, lid):
+			write_back(lid)
+		elif fresh and not e.is_empty() and not Mail.waiting(Game).is_empty():
+			offer_carriage(e)
+	)
+
+## The answering of a letter: two things that could be written.
+func write_back(lid: String) -> void:
+	var rp: Dictionary = Mail.LETTERS[lid].reply
+	var opts: Array = []
+	for op in rp.options:
+		opts.append({"id": str(op.id), "label": str(op.label), "desc": str(op.desc), "col": UI.C_JADE})
+	choose(str(rp.ask), opts, func(oid: String):
+		Mail.reply(Game, lid, oid)
+		if Game.mail_replies.has(lid):
+			Game.toast("It will go by the next carrier.")
+	)
+
+## The satchel: the letters already opened, the newest first, to read again.
+func open_satchel(e: Dictionary) -> void:
+	var opts: Array = [{"id": "later", "label": "Shut the satchel", "desc": "", "col": UI.C_DIM}]
+	var kept: Array = Mail.kept(Game)
+	kept.reverse()
+	for lid in kept.slice(0, 9):
+		opts.append({"id": str(lid), "label": str(Mail.LETTERS[lid].from), "desc": str(Mail.LETTERS[lid].lines[0])})
+	choose("The satchel", opts, func(oid: String):
+		if Mail.LETTERS.has(oid):
+			read_letter(oid)
+	)
+
+## A shift at a trade of the town (offices.gd), offered by somebody found indoors.  "Not today" is the
+## first line: nobody is put to work by leaning on a key.
+func offer_shift(e: Dictionary) -> void:
+	var use := str(e.trade)
+	var town := str(e.get("area", Game.area))
+	if Offices.blocked(Game, use, town) != "" or Game.prologue != "":
+		return
+	var t: Dictionary = Offices.TRADES[use]
+	# (somebody at an inn, a tea-house or a shop who wants carrying to another town, if there is a seat
+	# in the carriage: offices.gd `fares`)
+	var fare := Offices.fare_offer(Game, e)
+	var opts: Array = [
+		{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM},
+		{"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), Offices.wage(Game, use),
+			(", and %d of salary for the days away" % Offices.salary_due(Game, use, town)) if Offices.salary_due(Game, use, town) > 0 else "", Offices.career_text(Game, use)], "col": UI.C_GOLD}]
+	if not fare.is_empty():
+		opts.append({"id": "fare", "label": "Carry %s to %s" % [str(e.n), str(Data.AREAS[str(fare.to)].n)], "note": "%d stones" % int(fare.pay),
+			"desc": "%s has business in %s and no way of getting there. There is a seat in the %s (%d of %d taken). The fare is paid on arrival: %d spirit stones." % [str(e.n), str(Data.AREAS[str(fare.to)].n),
+				str(Fashion.RIDES[Game.ride].n), 2 + Game.passengers.size(), Fashion.seats(Game.ride), int(fare.pay)], "col": UI.C_JADE})
+	choose("%s could use a pair of hands." % str(e.n), opts, func(oid: String):
+		if oid == "fare":
+			Offices.take_fare(Game, fare)
+			say([[str(e.n), "To %s? I shall get my bundle. I do not mind which seat. I mind a little which seat." % str(Data.AREAS[str(fare.to)].n)]])
+			return
+		if oid != "work":
+			return
+		var told := Offices.work(Game, use, town)
+		if told != "":
+			Feats.poll(Game)
+			say([["Narrator", told]])
+	)
+
 ## A crossroads of the road (echoes.gd): asked once, after the step it follows, with no way out of
 ## answering.  Every answer says what it does and which way it leans; the last question of Part XIX
 ## can only be answered for a school of the works by somebody who has built three of it.
@@ -848,7 +1079,7 @@ func ask_crossroads() -> void:
 	var opts: Array = []
 	for o in c.options:
 		var ok := Echoes.option_ok(Game, o)
-		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yours to say", "desc": Echoes.option_text(Game, o), "col": Color("e8d090"), "enabled": ok})
+		opts.append({"id": str(o.id), "label": str(o.label), "note": "" if ok else "not yours to say", "desc": Echoes.option_text(Game, o) + ("\nIt will stand in the land: %s." % Echoes.stands_text(cid, str(o.id)) if Echoes.stands_text(cid, str(o.id)) != "" else ""), "col": Color("e8d090"), "enabled": ok})
 	choose(str(c.ask), opts, func(oid: String):
 		if oid == "" or not Echoes.option_ok(Game, Echoes.option(cid, oid)):
 			return
@@ -1093,7 +1324,7 @@ func open_stable() -> void:
 		var r: Dictionary = Fashion.RIDES[id]
 		var have: bool = Game.rides.has(id)
 		opts.append({"id": id, "label": str(r.n) if have else "? " + str(r.n), "note": ("riding" if Game.riding else "saddled") if id == Game.ride else ("" if have else "not yet"),
-			"desc": told(str(r.desc)) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else "Stood on", int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
+			"desc": told(str(r.desc)) + "\n\n%s, %d%% faster than running. %s" % ["Ridden" if str(r.kind) == "mount" else (("Driven, seats %d" % Fashion.seats(id)) if str(r.kind) == "carriage" else "Stood on"), int(round((float(r.speed) - 1.0) * 100.0)), str(r.how)],
 			"col": UI.C_JADE, "enabled": have, "current": id == Game.ride})
 	opts.append({"id": "off", "label": "Go on foot", "desc": "Send the ride away and walk (R mounts again).", "col": UI.C_DIM, "enabled": Game.riding})
 	choose("The stable: what will you ride?", opts, func(id: String):
@@ -1409,7 +1640,11 @@ func boss_interact(e: Dictionary) -> void:
 		if s.is_empty() or s.kind != "grudges" or Game.grudges.has(e.enemy):
 			say([["Narrator", "%s stands where its owner fell, muttering a sum nobody ever paid. It does not see you yet." % d.n]])
 			return
-	elif s.is_empty() or s.kind != "kill" or s.boss != e.enemy:
+	elif Reckon.is_lord(str(e.enemy)):
+		# the reckoning (reckon.gd): one of the last lords, made of what was chosen
+		if s.is_empty() or s.kind != "reckon" or not Reckon.stands(Game, str(e.enemy)):
+			return
+	elif s.is_empty() or not (s.kind == "kill" or s.kind == "fall") or s.boss != e.enemy:
 		say([["Narrator", "%s looms before you, but this is not the time. Finish your current objective first." % d.n]])
 		return
 	if Game.level < e.req:
@@ -1426,8 +1661,18 @@ func boss_interact(e: Dictionary) -> void:
 		return
 	var pre: Array = boss_story(e.enemy)
 	pre.append_array(Echoes.told(Game, "pre:" + str(e.enemy), Data.DIALOGUE.get("pre:" + e.enemy, [])))
+	if Reckon.is_lord(str(e.enemy)):
+		pre.append(["Narrator", Reckon.word(Game, str(e.enemy))])
 	say(pre, func():
 		var foe := {"id": e.enemy, "lv": e.lv}
+		if Reckon.is_lord(str(e.enemy)):
+			# (as strong as the habit that made it, and cracked by every time the other answer was given)
+			var rm: Array = Reckon.might(Game, str(e.enemy))
+			foe["mult"] = float(rm[0])
+			foe["atk"] = float(rm[1])
+			battle.start([foe], {"entity": e, "boss": true, "enemy": e.enemy, "theme": battle_theme(), "boon": Reckon.boon(Game, str(e.enemy)), "path_kind": "The reckoning", "path_n": "%d cracks" % Reckon.cracks(Game, str(e.enemy))})
+			push("battle")
+			return
 		if Grudges.is_grudge(e.enemy):
 			# a grudge does not listen until it has spent itself: it fights as hard as a trial's boss
 			foe["mult"] = float(Grudges.MIGHT[0])
@@ -1502,7 +1747,8 @@ func start_breakthrough() -> void:
 const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "recall3", "s_break10": "recall4", "s_break11": "recall5",
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
-	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21"}
+	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
+	"s_break28": "recall22"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -1580,6 +1826,10 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					Game.toast("%s stands open (%d of 8)" % [gn.substr(0, 1).to_upper() + gn.substr(1), Game.gates_open.size()])
 					Game.note("Opened " + str(Trials.GATE_NAMES[ctx.enemy]))
 					Game.poll_steps()
+				elif Reckon.is_lord(str(ctx.enemy)):
+					# (the reckoning: the step is done when nobody the journey made is left standing)
+					Game.reckoned[str(ctx.enemy)] = true
+					Game.poll_steps()
 				elif not Grudges.is_grudge(ctx.enemy):
 					Game.advance()
 				var post: Array = dao_dialogue("post:" + ctx.enemy)
@@ -1598,6 +1848,32 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				world.battle_mark(e2, false)
 				Game.defeated[e2.id] = Game.playtime
 				Game.record_kills(e2.get("area", Game.area), e2.group.size(), e2.group.map(func(g): return g.id))
+		"fall":
+			# the Lost Horse release (dooms.gd): a battle that could not be won has been lost, and the
+			# story goes on from the losing: nothing is taken, nobody is carried home
+			var how := str(ctx.get("how", "struck"))
+			var f_ids: Array = battle.foes.map(func(f): return str(f.id))
+			var f_lv := int(battle.foes[0].lv)
+			if ctx.get("boss", false):
+				Dooms.fell(Game, [str(ctx.enemy)], f_lv, how, int(ctx.get("rounds", 0)))
+				var fkey := "fall:" + str(ctx.enemy)
+				var flines: Array = Data.DIALOGUE.get(fkey, []).duplicate()
+				flines.append_array(Data.DIALOGUE.get(fkey + ":" + how, []))
+				say(Echoes.told(Game, fkey, flines), func():
+					var fs := Game.cur_step()
+					if not fs.is_empty() and str(fs.kind) == "fall" and str(fs.boss) == str(ctx.enemy):
+						Game.advance()
+					ask_picks()
+				)
+			else:
+				var fe: Dictionary = ctx.entity
+				Game.defeated[fe.id] = Game.playtime
+				var passed := Dooms.fell(Game, f_ids, f_lv, how, int(ctx.get("rounds", 0)))
+				var fs2 := Game.cur_step()
+				if not fs2.is_empty() and str(fs2.kind) == "falls" and f_ids.any(func(x): return x in fs2.of):
+					Game.hunt += 1
+					Game.toast("It went over you, and on (%d of %d)" % [mini(Game.hunt, int(fs2.n)), int(fs2.n)])
+				say([["Narrator", passed]] if passed != "" else [], func(): Game.poll_steps())
 		"lose":
 			Game.respawn()
 			world.load_area("sect", Vector2i(20, 8))

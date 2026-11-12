@@ -63,6 +63,8 @@ const BY_SHAPE := {
 const WISP_BY_ELEM := {"dark": "night", "fire": "day", "thunder": "day", "wood": "day", "water": "tide", "earth": "tide", "phys": "tide"}
 ## species that keep hours of their own, against their shape
 const OWN := {
+	# (the Lost Horse release: the tide keeps the tide's hours)
+	"tide_horse": "tide", "tide_mare": "tide", "spring_colt": "tide",
 	"bamboo_wolf": "dusk", "bandit": "tide", "ash_moth": "dusk", "spark_swallow": "day", "smoke_hound": "night",
 	"drowned_ember": "night", "damp_smoke": "night", "wildfire_sprite": "tide",
 }

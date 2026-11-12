@@ -21,7 +21,7 @@ extends RefCounted
 const DIR := "res://assets/"
 const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim", "ride", "ride_idle", "ride_stand", "scale", "glide"]
 ## the animals the party rides (fashion.gd RIDES; art/mounts)
-const MOUNTS := {"horse": "mounts/horse"}
+const MOUNTS := {"horse": "mounts/horse", "ox": "mounts/ox"}
 ## shape -> asset path for monsters that have a Blender model
 const MONSTERS := {
 	"beast": "monsters/beast", "dragon": "monsters/dragon", "phoenix": "monsters/phoenix", "bird": "monsters/phoenix",
@@ -61,6 +61,8 @@ const PEOPLE := {
 	# Part XXII (the High Roads release)
 	"xie_lingyun": "characters/xie_lingyun", "liezi": "characters/liezi", "zhong_ziqi": "characters/zhong_ziqi", "han_yu": "characters/han_yu",
 	"shan_gui": "characters/shan_gui", "dongyue": "characters/dongyue",
+	# Part XXIV (the Lost Horse release): the old man of the frontier, his son, and the king of the sea-wall
+	"sai_weng": "characters/sai_weng", "weng_son": "characters/weng_son", "qian_liu": "characters/qian_liu",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
@@ -71,6 +73,12 @@ const PEOPLE := {
 	# the Hollow Hills release (Part XX): the traveller who measures caves, the Foolish Old Man and the Wise
 	# one, the woodcutter of Rotten-Axe Mountain, and the Valley Spirit
 	"xu_xiake": "characters/xu_xiake", "yu_gong": "characters/yu_gong", "zhi_sou": "characters/zhi_sou", "wang_zhi": "characters/wang_zhi", "xuanpin": "characters/xuanpin",
+	# (the Lost Horse release: the bodies of the towns worn by whoever a choice left standing somewhere, marks.gd)
+	"folk_farmer": "characters/folk_farmer", "folk_grandma": "characters/folk_grandma", "folk_farmwife": "characters/folk_farmwife", "folk_monk": "characters/folk_monk", "folk_merchant": "characters/folk_merchant",
+	# (and by whoever is found indoors: rooms.gd `residents`)
+	"folk_grandpa": "characters/folk_grandpa", "folk_maiden": "characters/folk_maiden", "folk_youth": "characters/folk_youth", "folk_scholar": "characters/folk_scholar", "folk_shopwife": "characters/folk_shopwife",
+	"folk_porter": "characters/folk_porter", "folk_boy": "characters/folk_boy", "folk_guard": "characters/folk_guard", "folk_yumin": "characters/folk_yumin", "folk_jiaoren": "characters/folk_jiaoren",
+	"folk_shade": "characters/folk_shade", "folk_nomad": "characters/folk_nomad", "folk_fisher": "characters/folk_fisher",
 	"folk_herder": "characters/folk_herder", "folk_herder_f": "characters/folk_herder_f", "folk_oasis_f": "characters/folk_oasis_f",
 	"folk_boatwoman": "characters/folk_boatwoman", "folk_founder": "characters/folk_founder", "folk_lantern_f": "characters/folk_lantern_f",
 	"lin_feng_f": "characters/lin_feng_f", "lin_feng_f_wanderer": "characters/lin_feng_f_wanderer", "lin_feng_f_wild": "characters/lin_feng_f_wild", "lin_feng_f_scholar": "characters/lin_feng_f_scholar",
@@ -517,9 +525,34 @@ static func person(id: String) -> Node3D:
 
 ## A monster in an enemy's colours: `enemy` (an id in Data.ENEMIES) brings its element's accent
 ## and any palette it pins; without one the palette comes from the colour alone.
+## Shapes of flesh, fur, shell and scale: a beast is not painted one bright colour all over.  Its
+## body is the colour it was given taken down to what a hide can be (`natural`), and the brightness
+## goes where a painter would put it: the eyes, the markings, the glow (the accent keeps the hue).
+## Spirits, flames, jellies and the like are as bright as they were.
+const NATURAL := ["beast", "ape", "tiger", "fox", "mammoth", "qilin", "kaiming", "tortoise", "crab", "scorpion", "spider", "mantis", "serpent",
+	"moth", "oxhead", "horseface", "mushroom", "plant", "golem", "ray", "jade_rabbit", "bifang"]
+
+## The colour of a hide that is, in a painter's eye, colour `c`: two-fifths less saturated (never more
+## than half), drawn a sixth of the way towards the brown of an animal, and kept out of the deepest dark.
+static func natural(c: Color) -> Color:
+	if c.s < 0.14:
+		return c
+	var to_earth := fposmod(0.075 - c.h + 0.5, 1.0) - 0.5
+	return Color.from_hsv(fposmod(c.h + to_earth * 0.16, 1.0), minf(c.s * 0.6, 0.5), clampf(c.v * 0.92 + 0.06, 0.24, 0.9), c.a)
+
 static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
 	var d: Dictionary = Data.ENEMIES.get(enemy, {})
-	var n := instance(MONSTERS[shape], col, palette(col, d.get("elem", ""), d.get("pal", {})))
+	var over: Dictionary = d.get("pal", {})
+	if NATURAL.has(shape) and not d.get("bright", false):
+		# (the markings and the accent keep the colour it was given: that is where the eye reads its kind)
+		var vivid := col
+		col = natural(col)
+		over = over.duplicate()
+		if not over.has("mark"):
+			over["mark"] = Color.from_hsv(vivid.h, clampf(vivid.s * 0.9, 0.0, 0.8), clampf(vivid.v * 0.5, 0.16, 0.42))
+		if not over.has("sec"):
+			over["sec"] = palette(vivid)[3]
+	var n := instance(MONSTERS[shape], col, palette(col, d.get("elem", ""), over))
 	n.set_meta("kind", "monster")
 	n.set_meta("shape", shape)
 	return n

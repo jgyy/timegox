@@ -32,7 +32,26 @@ const FEATS := {
 	"golden_core": {"n": "A Pill of One's Own", "kind": "road", "pts": 5, "test": ["level", 6], "desc": "Form a Golden Core."},
 	"immortal": {"n": "No Dust on the Robe", "kind": "road", "pts": 10, "test": ["level", 24], "desc": "Ascend as a True Immortal."},
 	"half_way": {"n": "Fourteen Realms Up", "kind": "road", "pts": 10, "test": ["level", 42], "desc": "Reach the fourteenth great realm."},
-	"great_sound": {"n": "The Great Note", "kind": "road", "pts": 20, "test": ["level", 84], "desc": "Reach Great Sound, Rarely Heard: the last realm there is."},
+	"great_sound": {"n": "The Great Note", "kind": "road", "pts": 20, "test": ["level", 84], "desc": "Reach Great Sound, Rarely Heard."},
+	# the Lost Horse release: the last realm, what was lost to, and what was left standing
+	"soft_water": {"n": "Soft as Water", "kind": "road", "pts": 20, "test": ["level", 87], "desc": "Reach Soft as Water: the last realm there is."},
+	"first_fall": {"n": "Set Down Somewhere Else", "kind": "road", "pts": 5, "test": ["fallen", 1], "desc": "Lose a battle that could not be won, and go on."},
+	"three_dooms": {"n": "The Tide, the Ape and the Riders", "kind": "road", "pts": 10, "test": ["dooms", 3], "desc": "Stand in front of all three of the things that are not beaten."},
+	"gave_way": {"n": "Who Put Up the Sword", "kind": "road", "pts": 10, "test": ["yielded", 1], "desc": "Give way to something that cannot be fought, standing."},
+	"day_wage": {"n": "A Day's Wage", "kind": "people", "pts": 5, "test": ["shifts", 1], "desc": "Work a shift at a trade of a town."},
+	"journeyman": {"n": "A Hook for Your Coat", "kind": "people", "pts": 10, "test": ["trade_rank", 2], "desc": "Be raised twice at a trade of the towns."},
+	"trade_master": {"n": "A Sign with Your Name on It", "kind": "people", "pts": 20, "test": ["trade_rank", 4], "desc": "Reach the highest place there is at a trade."},
+	"first_fare": {"n": "Room for One More", "kind": "people", "pts": 5, "test": ["fares", 1], "desc": "Carry somebody to another town in a carriage, for the fare."},
+	"ten_fares": {"n": "The Regular Coach", "kind": "people", "pts": 10, "test": ["fares", 10], "desc": "Set down ten passengers where they were going."},
+	"first_letter": {"n": "Somebody Wrote", "kind": "people", "pts": 5, "test": ["letters", 1], "desc": "Ask for your letters at a counter of the post, and open one."},
+	"ten_letters": {"n": "A Full Satchel", "kind": "people", "pts": 10, "test": ["letters", 10], "desc": "Open ten letters."},
+	"post_bags": {"n": "Neither Snow Nor Rain", "kind": "people", "pts": 10, "test": ["bags", 5], "desc": "Carry five bags of the post to the counters they were sealed for."},
+	"first_coach": {"n": "Inside, If You Please", "kind": "people", "pts": 5, "test": ["coaches", 1], "desc": "Take the post-coach along the high road from one town to another."},
+	"first_voyage": {"n": "Out of Sight of Land", "kind": "people", "pts": 5, "test": ["voyages", 1], "desc": "Take ship from one harbour to another."},
+	"known_face": {"n": "A Known Face", "kind": "people", "pts": 5, "test": ["fame", 3], "desc": "Be known in every town."},
+	"street_gift": {"n": "Only What Was in the House", "kind": "people", "pts": 5, "test": ["fan_gifts", 1], "desc": "Take what somebody in the street holds out to you."},
+	"six_trades": {"n": "Jack of Six Trades", "kind": "people", "pts": 10, "test": ["trades", 6], "desc": "Work a shift at six different trades."},
+	"marks_twelve": {"n": "Gone Back to Look", "kind": "road", "pts": 10, "test": ["marks", 12], "desc": "Look at twelve of the things your choices left standing in the land."},
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
 	"sky_held": {"n": "The Sky Is Held", "kind": "road", "pts": 10, "test": ["step", "s_ch_hundun"], "desc": "End the Falling Sky."},
 	"tribulations": {"n": "Struck Twenty Times", "kind": "road", "pts": 10, "test": ["realm", 20], "desc": "Come through twenty Heavenly Tribulations."},
@@ -252,6 +271,35 @@ static func value(g, t: Array) -> float:
 			return float(g.heard.size())
 		"airs":
 			return float(g.airs.size())
+		"shifts":
+			return float(Offices.worked(g)[0])
+		"fares":
+			return float(g.fares)
+		"letters":
+			return float(g.mail_read.size())
+		"coaches":
+			return float(g.coaches)
+		"voyages":
+			return float(g.voyages)
+		"fame":
+			return float(Fame.rank(g))
+		"fan_gifts":
+			return float(g.fan_gifts)
+		"bags":
+			return float(g.bags_done)
+		"trade_rank":
+			return float(maxi(0, Offices.best_rank(g)))
+		"trades":
+			return float(Offices.worked(g)[1])
+		"fallen":
+			return float(g.fallen)
+		"yielded":
+			return float(g.yielded)
+		"dooms":
+			# (dooms.gd: the tide, in any of its three shapes, is one of them)
+			return float((1 if g.falls.has("tide_horse") or g.falls.has("tide_mare") or g.falls.has("spring_colt") else 0) + (1 if g.falls.has("wuzhiqi") else 0) + (1 if g.falls.has("the_riders") else 0))
+		"marks":
+			return float(g.marks_seen.size())
 		"songs_played":
 			return float(g.songs_played)
 		"outfits":

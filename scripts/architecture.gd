@@ -46,6 +46,57 @@ const STYLES := {
 	"bathhouse": {"roof": "5a6a78", "roof2": "46545e", "column": "7a4a32", "wall": "ece4d4", "beam": "5a7a7a", "trim": "c8b890", "double": false, "kind": "gable",
 		"louver": true, "moon_gate": true},
 }
+## How the towns of each people build (the Lost Horse release): over a building's own style, the colours
+## of the country it stands in (blended most of the way towards them, so that a shop is still told from
+## a shrine), the kind of roof where the country has one of its own (`kind`: "flat" for the mud-brick
+## roofs of the sand road, with a parapet and a dome), and what else it hangs on a house.  A town is
+## known from the road by its roofs before anybody in it has said a word.
+const DRESS := {
+	# Shazhou, the Sweet-Well Hearth: sun-dried brick the colour of the dunes, flat roofs to sleep on, a
+	# turquoise dome, blue doors
+	"sand": {"wall": "d9b98a", "roof": "c8a878", "roof2": "a8875c", "column": "2a6a8a", "beam": "8a5a34", "trim": "3ab0a8", "kind": "flat", "dome": "3aa8a0", "k": 0.8},
+	# Longmen, the Boat Hearth: whitewash over black-tarred timber, blue-grey tiles, gabled against the river wind
+	"river": {"wall": "e6ece8", "roof": "3a5866", "roof2": "2a4450", "column": "2c3a3c", "beam": "34505a", "trim": "c8dcd8", "kind": "gable", "k": 0.75},
+	# Tushan, the Casting Hearth: fired brick, black tiles, bronze on everything, a chimney on every roof
+	"forge": {"wall": "b4603f", "roof": "2a2a30", "roof2": "1c1c22", "column": "3a2a22", "beam": "5a3a2a", "trim": "d89a3a", "chimney": true, "k": 0.75},
+	# Yanggu, the Lantern Hearth: pale gold plaster, vermilion posts, red roofs, a row of lanterns under every eave
+	"dawn": {"wall": "f6e4b4", "roof": "a8322a", "roof2": "7e2420", "column": "c8302a", "beam": "8a2a24", "trim": "f0c040", "lanterns": true, "k": 0.75},
+	# Featherfall and Changhe, the Feathered Folk: white walls, sky-blue tiles, gilt
+	"sky": {"wall": "f6f4ec", "roof": "4a78b8", "roof2": "3a5f98", "column": "e8e4d8", "beam": "5a90c0", "trim": "f0d070", "k": 0.7},
+	# Tearwater, the Pearl-Weavers: sea-green plaster, coral posts, tiles like the inside of a shell
+	"pearl": {"wall": "bfe0d2", "roof": "6a8fa8", "roof2": "557790", "column": "d86a5a", "beam": "4a8a84", "trim": "f0e8f0", "glow": Color(0.6, 0.95, 0.9, 0.4), "k": 0.75},
+	# Youdu, the Dark Capital: slate walls, black roofs, bone-white trim, windows lit a cold blue
+	"shade": {"wall": "8c8c9a", "roof": "20202a", "roof2": "16161e", "column": "3c3c4a", "beam": "2c2c38", "trim": "d8dce8", "glow": Color(0.55, 0.7, 1.0, 0.45), "k": 0.8},
+	# Landfall and the Isles: whitewash, weathered blue-grey tiles, coral-red posts, gabled against the sea
+	"sea": {"wall": "f2f0ea", "roof": "3e5c7c", "roof2": "2c4660", "column": "c8503a", "beam": "3a6a7a", "trim": "e0d0a0", "kind": "gable", "k": 0.6},
+}
+## which country builds which way
+const DRESS_OF := {"dunes": "sand", "longmen": "river", "karst": "river", "tushan": "forge", "volcano": "forge", "yanggu": "dawn", "fusang": "dawn",
+	"juntian": "sky", "changhe": "sky", "ninesprings": "pearl", "youdu": "shade", "penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea"}
+## styles that keep their own roof whatever country they stand in
+const OWN_ROOF := ["shrine", "hall", "hermitage", "aerie", "bathhouse"]
+## what a window is lit with (set by `house` for the building being built)
+static var win_glow := Color(1.0, 0.85, 0.55, 0.35)
+
+## A building style as it is built in country `area`.
+static func dressed(style: String, area: String) -> Dictionary:
+	var st: Dictionary = (STYLES.get(style, STYLES.house) as Dictionary).duplicate()
+	var dr: Dictionary = DRESS.get(str(DRESS_OF.get(area, "")), {})
+	if dr.is_empty():
+		return st
+	var k := float(dr.get("k", 0.7))
+	for key in ["wall", "roof", "roof2", "column", "beam", "trim"]:
+		st[key] = _c(str(st[key])).lerp(_c(str(dr[key])), k).to_html(false)
+	if dr.has("kind") and not style in OWN_ROOF:
+		st["kind"] = str(dr.kind)
+		st["double"] = false
+		st.erase("horsehead")
+	for key2 in ["chimney", "lanterns", "dome", "glow"]:
+		if dr.has(key2):
+			st[key2] = dr[key2]
+	st["dress"] = str(DRESS_OF.get(area, ""))
+	return st
+
 ## Part XI: how high an upper storey's floor stands above the building's ground (the top of the ground
 ## floor's walls), and how deep a cellar's floor lies below it
 const STOREY_Y := 2.96
@@ -53,6 +104,10 @@ const CELLAR_Y := -3.0
 ## the top of a ground floor's planks above the ground under the building (the platform `ph` is
 ## 0.3 m, the planks on it a few centimetres more): people indoors stand on this
 const FLOOR_Y := 0.31
+## (the Lost Horse release) how high a roof rises over its eaves before the building's own breadth is
+## counted: steeper than it was, so that a house reads as a house from the road and not as a lid
+const HIP_RISE := 2.1
+const GABLE_RISE := 1.7
 
 static func _c(hex: String) -> Color:
 	return Color(hex)
@@ -602,27 +657,247 @@ static func dwelling(b: MB, g: MB, kind: String, seed_: int) -> void:
 
 ## A gabled roof: two sloping planes meeting at a ridge along x, with overhanging eaves, gable
 ## boards and (for thatch) a thick, ragged edge.
-static func _gable(b: MB, top: Vector3, hx: float, hz: float, rise: float, col: Color, thatch: bool) -> void:
+static func _gable(b: MB, top: Vector3, hx: float, hz: float, rise: float, col: Color, thatch: bool, trim: Color = Color(0, 0, 0, -1), rib: Color = Color(0, 0, 0, -1)) -> void:
+	var ribc := col.darkened(0.2) if rib.a < 0.0 else rib
+	var nv := 5
 	for s: float in [-1.0, 1.0]:
-		var e0 := top + Vector3(-hx, 0, hz * s)
-		var e1 := top + Vector3(hx, 0, hz * s)
-		var r0 := top + Vector3(-hx, rise, 0)
-		var r1 := top + Vector3(hx, rise, 0)
-		var n := (e1 - e0).cross(r0 - e0).normalized()
-		if n.y < 0:
-			n = -n
-		var quad := [e0, e1, r1, r0]
-		Arch._quad(b, quad, [n, n, n, n], col, n)
-		Arch._quad(b, [e0 - Vector3(0, 0.05, 0), e1 - Vector3(0, 0.05, 0), r1 - Vector3(0, 0.05, 0), r0 - Vector3(0, 0.05, 0)], [-n, -n, -n, -n], col.darkened(0.35), -n)
+		# the slope in courses, concave like a tiled roof: shallow at the eave, steep at the ridge, the
+		# eave lifting a little towards both ends
+		var rows: Array = []
+		for j in nv + 1:
+			var v := j / float(nv)
+			var yy := rise * pow(v, 1.45)
+			var zz := hz * (1.0 - v) * s
+			rows.append([top + Vector3(-hx, yy + 0.16 * (1.0 - v), zz), top + Vector3(-hx * 0.5, yy, zz), top + Vector3(hx * 0.5, yy, zz), top + Vector3(hx, yy + 0.16 * (1.0 - v), zz)])
+		for j in nv:
+			for i in 3:
+				var q := [rows[j][i], rows[j][i + 1], rows[j + 1][i + 1], rows[j + 1][i]]
+				var n := ((q[1] as Vector3) - (q[0] as Vector3)).cross((q[3] as Vector3) - (q[0] as Vector3)).normalized()
+				if n.y < 0:
+					n = -n
+				var cc := col.darkened(0.07 if j % 2 == 1 else 0.0)
+				Arch._quad(b, q, [n, n, n, n], cc, n)
+				var qd: Array = []
+				for qq in q:
+					qd.append((qq as Vector3) - Vector3(0, 0.05, 0))
+				Arch._quad(b, qd, [-n, -n, -n, -n], col.darkened(0.4), -n)
 		if thatch:
-			b.limb(e0 + Vector3(0, -0.05, 0), e1 + Vector3(0, -0.05, 0), 0.09, 0.09, col.darkened(0.15), 6)
+			b.limb((rows[0][0] as Vector3) + Vector3(0, -0.05, 0), (rows[0][3] as Vector3) + Vector3(0, -0.05, 0), 0.11, 0.11, col.darkened(0.15), 6)
+			for j2 in range(1, nv):
+				b.limb((rows[j2][0] as Vector3) + Vector3(0, 0.02, 0), (rows[j2][3] as Vector3) + Vector3(0, 0.02, 0), 0.05, 0.05, col.darkened(0.1), 4)
 		else:
-			for k in int(hx * 2.0 / 0.3):
-				var x := -hx + 0.15 + k * 0.3
-				b.limb(top + Vector3(x, 0.04, hz * s), top + Vector3(x, rise + 0.04, 0), 0.035, 0.035, col.darkened(0.2), 4)
-	b.limb(top + Vector3(-hx - 0.1, rise + 0.05, 0), top + Vector3(hx + 0.1, rise + 0.05, 0), 0.08, 0.08, col.darkened(0.3), 6)
+			for k in int(hx * 2.0 / 0.42):
+				var x := -hx + 0.21 + k * 0.42
+				for j3 in nv:
+					var v0 := j3 / float(nv)
+					var v1 := (j3 + 1) / float(nv)
+					b.limb(top + Vector3(x, rise * pow(v0, 1.45) + 0.04, hz * (1.0 - v0) * s), top + Vector3(x, rise * pow(v1, 1.45) + 0.04, hz * (1.0 - v1) * s), 0.04, 0.04, ribc, 4)
+			if trim.a >= 0.0:
+				b.limb((rows[0][0] as Vector3) + Vector3(0, 0.02, 0), (rows[0][1] as Vector3) + Vector3(0, 0.02, 0), 0.05, 0.05, trim, 5)
+				b.limb((rows[0][1] as Vector3) + Vector3(0, 0.02, 0), (rows[0][2] as Vector3) + Vector3(0, 0.02, 0), 0.05, 0.05, trim, 5)
+				b.limb((rows[0][2] as Vector3) + Vector3(0, 0.02, 0), (rows[0][3] as Vector3) + Vector3(0, 0.02, 0), 0.05, 0.05, trim, 5)
+		# barge boards down the verge at both ends
+		for sx0: float in [-1.0, 1.0]:
+			for j4 in nv:
+				var w0 := j4 / float(nv)
+				var w1 := (j4 + 1) / float(nv)
+				b.limb(top + Vector3(sx0 * hx, rise * pow(w0, 1.45) + 0.16 * (1.0 - w0), hz * (1.0 - w0) * s), top + Vector3(sx0 * hx, rise * pow(w1, 1.45) + 0.16 * (1.0 - w1), hz * (1.0 - w1) * s), 0.06, 0.06, col.darkened(0.45), 4)
+	# the ridge: a pale band, a dark cap, and an upturned end at each gable
+	var rdg := Color("e8e2d4") if not thatch else col.darkened(0.3)
+	rdg.a = col.a
+	b.box(top + Vector3(0, rise + 0.06, 0), Vector3(hx * 2.0 + 0.1, 0.16, 0.2), rdg)
+	b.limb(top + Vector3(-hx - 0.1, rise + 0.16, 0), top + Vector3(hx + 0.1, rise + 0.16, 0), 0.07, 0.07, col.darkened(0.3), 6)
 	for sx: float in [-1.0, 1.0]:
-		b.ball(top + Vector3(sx * (hx + 0.12), rise + 0.12, 0), 0.08, col.darkened(0.3), true)
+		b.limb(top + Vector3(sx * (hx - 0.1), rise + 0.14, 0), top + Vector3(sx * (hx + 0.25), rise + 0.5, 0), 0.09, 0.03, col.darkened(0.3) if trim.a < 0.0 else trim, 5)
+
+## A wing (the Lost Horse release): a side room built out from one wall of a house.  `wr` is its
+## rectangle on the ground (its own walls stand on the centre line of its outer tiles), `side` the wall
+## of the house it stands against (0 west, 1 east, 2 north, 3 south) and `core` the house's own walls.
+static func _wing(b: MB, g: MB, roof: MB, roof_g: MB, wr: Rect2, side: int, core: Rect2, ph: float, wall_h: float, th: float, st: Dictionary, style: String, seed_: int, lights: Array) -> void:
+	var T := Terrain3D.T
+	var column := MB.tag(_c(st.column), MB.WOOD)
+	var wall := MB.tag(_c(st.wall), MB.CLOTH)
+	var beam := MB.tag(_c(st.beam), MB.WOOD)
+	var trim := MB.tag(_c(st.trim), MB.METAL)
+	var stone := MB.tag(Color("a8a4ac"), MB.STONE)
+	var stone_d := MB.tag(Color("848088"), MB.STONE)
+	var plank := MB.tag(Color("9a6a42"), MB.WOOD)
+	var ew := side < 2          # the wing runs out along X, its outer wall along Z
+	var sgn := -1.0 if side == 0 or side == 2 else 1.0
+	# along the house's wall: between the wing's two end walls; out from it: from the house's wall to the wing's
+	var u0 := (wr.position.y if ew else wr.position.x) + T * 0.5
+	var u1 := (wr.end.y if ew else wr.end.x) - T * 0.5
+	var ic := (core.position.x if side == 0 else (core.end.x if side == 1 else (core.position.y if side == 2 else core.end.y)))
+	var oc := ((wr.position.x if side == 0 else wr.end.x) if ew else (wr.position.y if side == 2 else wr.end.y)) - sgn * T * 0.5
+	var um := (u0 + u1) * 0.5
+	var om := (ic + oc) * 0.5
+	var mid := Vector3(om, 0, um) if ew else Vector3(um, 0, om)
+	var deep := absf(oc - ic)
+	# the podium and the planks
+	b.box(mid + Vector3(0, ph * 0.5 - 0.15, 0), Vector3(deep + T * 0.5 + 0.2, ph + 0.3, u1 - u0 + T + 0.4) if ew else Vector3(u1 - u0 + T + 0.4, ph + 0.3, deep + T * 0.5 + 0.2), stone_d)
+	b.box(mid + Vector3(0, ph - 0.06, 0), Vector3(deep + T * 0.5 + 0.3, 0.09, u1 - u0 + T + 0.52) if ew else Vector3(u1 - u0 + T + 0.52, 0.09, deep + T * 0.5 + 0.3), stone)
+	b.box(mid + Vector3(0, ph - 0.02, 0), Vector3(deep + th, 0.06, u1 - u0) if ew else Vector3(u1 - u0, 0.06, deep + th), plank)
+	b.box(mid + Vector3(0, ph + 0.02, 0), Vector3(deep * 0.55, 0.012, (u1 - u0) * 0.6) if ew else Vector3((u1 - u0) * 0.6, 0.012, deep * 0.55), MB.tag(Color("4a6a5a") if style in ["house", "huizhou", "farmhouse", "seahouse", "dorm"] else Color("7a3a3a"), MB.CLOTH))
+	# three walls: the outer one, and the two ends
+	var runs := [[not ew, oc, u0, u1, sgn], [ew, u0, minf(ic, oc), maxf(ic, oc), -1.0], [ew, u1, minf(ic, oc), maxf(ic, oc), 1.0]]
+	for rn in runs:
+		var hz: bool = rn[0]
+		var at: float = rn[1]
+		var lo: float = float(rn[2]) - th * 0.5
+		var hi: float = float(rn[3]) + th * 0.5
+		var pc := Vector3((lo + hi) * 0.5, 0, at) if hz else Vector3(at, 0, (lo + hi) * 0.5)
+		var sz := Vector3(hi - lo, wall_h, th) if hz else Vector3(th, wall_h, hi - lo)
+		_wall(b, hz, at, lo, hi, ph, wall_h, th, wall, true, seed_ + int(at))
+		b.box(pc + Vector3(0, ph + 0.22, 0), sz * Vector3(1, 0, 1) + Vector3(0.06 if not hz else 0.0, 0.44, 0.06 if hz else 0.0), stone)
+		b.box(pc + Vector3(0, ph + 1.05, 0), sz * Vector3(1, 0, 1) + Vector3(0.05 if not hz else 0.0, 0.08, 0.05 if hz else 0.0), column)
+		b.box(pc + Vector3(0, ph + wall_h - 0.1, 0), sz * Vector3(1, 0, 1) + Vector3(0.08 if not hz else 0.0, 0.2, 0.08 if hz else 0.0), beam)
+		_facade(b, g, hz, at, lo, hi, ph, wall_h, th, float(rn[4]), column, beam, trim, wall, true, seed_ + int(at), 0.44, true)
+		_border(b, hz, at, lo + 0.4, hi - 0.4, ph, th, float(rn[4]), seed_ + int(hi))
+	for uu: float in [u0, u1]:
+		b.cyl((Vector3(oc, 0, uu) if ew else Vector3(uu, 0, oc)) + Vector3(0, ph + wall_h * 0.5, 0), 0.2, wall_h * 0.5 + 0.05, column, Vector3.ZERO, 10)
+	# a lantern under its ceiling, a cushion or two and a scroll on the far wall
+	var lp := mid + Vector3(0, ph + wall_h - 0.75, 0)
+	_lantern(b, g, lp, trim)
+	lights.append([lp, Color(1.0, 0.72, 0.45)])
+	for cq: float in [-1.0, 1.0]:
+		b.sph(mid + (Vector3(0, ph + 0.07, cq * 0.7) if ew else Vector3(cq * 0.7, ph + 0.07, 0)), Vector3(0.3, 0.08, 0.3), MB.tag(Color("c88a4a") if cq < 0.0 else Color("8a4a6a"), MB.CLOTH), Vector3.ZERO, true)
+	var sp := (Vector3(oc - sgn * (th * 0.5 + 0.02), ph + 1.7, um) if ew else Vector3(um, ph + 1.7, oc - sgn * (th * 0.5 + 0.02)))
+	b.box(sp, Vector3(0.02, 1.1, 0.5) if ew else Vector3(0.5, 1.1, 0.02), MB.tag(Color("f0e6cc"), MB.CLOTH))
+	b.box(sp + Vector3(0, 0.57, 0), Vector3(0.04, 0.05, 0.6) if ew else Vector3(0.6, 0.05, 0.04), column)
+	# its own roof (it lifts away with the house's): a gable whose ridge runs out from the house, so that
+	# from the road the house has a wing and not a lean-to
+	for s2: float in [-1.0, 1.0]:
+		roof.box((Vector3(om, ph + wall_h + 0.1, um + s2 * (u1 - u0) * 0.5) if ew else Vector3(um + s2 * (u1 - u0) * 0.5, ph + wall_h + 0.1, om)), Vector3(deep + 0.5, 0.26, 0.22) if ew else Vector3(0.22, 0.26, deep + 0.5), beam)
+	roof.box((Vector3(oc, ph + wall_h + 0.1, um) if ew else Vector3(um, ph + wall_h + 0.1, oc)), Vector3(0.22, 0.26, u1 - u0 + 0.5) if ew else Vector3(u1 - u0 + 0.5, 0.26, 0.22), beam)
+	var thatch: bool = str(st.get("kind", "hip")) == "thatch"
+	var half_w := (u1 - u0) * 0.5
+	if str(st.get("kind", "hip")) == "flat":
+		roof.box(mid + Vector3(0, ph + wall_h + 0.4, 0), Vector3(deep + 0.6, 0.3, u1 - u0 + 0.6) if ew else Vector3(u1 - u0 + 0.6, 0.3, deep + 0.6), MB.tag(_c(st.wall).darkened(0.06), MB.STONE))
+		roof.box((Vector3(oc, ph + wall_h + 0.8, um) if ew else Vector3(um, ph + wall_h + 0.8, oc)), Vector3(0.26, 0.5, u1 - u0 + 0.6) if ew else Vector3(u1 - u0 + 0.6, 0.5, 0.26), wall)
+		return
+	var rise := 1.1 + half_w * 0.34
+	var tmp := MB.new()
+	_gable(tmp, Vector3.ZERO, deep * 0.5 + 1.0, half_w + 0.7, rise, MB.tag(_c(st.roof), MB.WOOD if thatch else MB.STONE), thatch, trim, MB.tag(_c(st.roof2), MB.STONE))
+	# the gable end over the outer wall, filled
+	for k in 6:
+		var f := (k + 0.5) / 6.0
+		tmp.box(Vector3((sgn if ew else -sgn) * (deep * 0.5 + 0.6), rise * f * 0.98 - rise / 12.0, 0), Vector3(0.24, rise / 6.0 + 0.02, half_w * (1.0 - pow(f, 0.69)) * 2.0), wall)
+	var rc := (Vector3(om - sgn * 0.6, ph + wall_h + 0.25, um) if ew else Vector3(um, ph + wall_h + 0.25, om - sgn * 0.6))
+	roof.merge(tmp, Transform3D(Basis.IDENTITY if ew else Basis(Vector3.UP, PI * 0.5), rc))
+
+## A stretch of wall as a facade (the Lost Horse release): a post at every bay, a panelled dado, a
+## bracket and a painted band under the eave, and in every other bay (`windows`) a wide lattice window
+## with a sill and shutters, glowing faintly.  The wall runs from `lo` to `hi` along X (`horiz`) or Z at
+## `at`, from `y0` up `hgt`; `out` is the side the weather is on (+1 or -1); `dado` the foot of the panels.
+## Where the windows of a run of wall are (the Lost Horse release: a window is a hole in the wall, and
+## the room is seen through it): [[middle along the wall, width, middle height above y0, height], ...],
+## the same for `_wall`, which leaves them open, and `_facade`, which frames them.
+static func _window_bays(lo: float, hi: float, hgt: float, windows: bool, k0: int) -> Array:
+	var out: Array = []
+	var ln := hi - lo
+	if ln < 0.9 or not windows:
+		return out
+	var nbay := maxi(1, int(round(ln / 2.1)))
+	var bw := ln / nbay
+	for k2 in nbay:
+		if bw < 1.5 or (nbay > 2 and (k2 + k0) % 2 != 0):
+			continue
+		out.append([lo + (k2 + 0.5) * bw, minf(1.3, bw - 0.62), hgt * 0.63, minf(1.0, hgt * 0.38)])
+	return out
+
+## A run of wall from `lo` to `hi` along x (`horiz`) or z at `at`, `hgt` high on `y0`, with its windows
+## left open: whole between them, a breast under each and a head over it.
+static func _wall(m: MB, horiz: bool, at: float, lo: float, hi: float, y0: float, hgt: float, th: float, wall: Color, windows: bool, k0: int) -> void:
+	var from := lo
+	for wb in _window_bays(lo, hi, hgt, windows, k0):
+		var u: float = wb[0]
+		var ww: float = wb[1]
+		var yc: float = wb[2]
+		var wh: float = wb[3]
+		var a := u - ww * 0.5
+		var e := u + ww * 0.5
+		if a - from > 0.01:
+			m.box(Vector3((from + a) * 0.5, y0 + hgt * 0.5, at) if horiz else Vector3(at, y0 + hgt * 0.5, (from + a) * 0.5), Vector3(a - from, hgt, th) if horiz else Vector3(th, hgt, a - from), wall)
+		var bot := yc - wh * 0.5
+		var top := yc + wh * 0.5
+		m.box(Vector3(u, y0 + bot * 0.5, at) if horiz else Vector3(at, y0 + bot * 0.5, u), Vector3(ww, bot, th) if horiz else Vector3(th, bot, ww), wall)
+		m.box(Vector3(u, y0 + (top + hgt) * 0.5, at) if horiz else Vector3(at, y0 + (top + hgt) * 0.5, u), Vector3(ww, hgt - top, th) if horiz else Vector3(th, hgt - top, ww), wall)
+		from = e
+	if hi - from > 0.01:
+		m.box(Vector3((from + hi) * 0.5, y0 + hgt * 0.5, at) if horiz else Vector3(at, y0 + hgt * 0.5, (from + hi) * 0.5), Vector3(hi - from, hgt, th) if horiz else Vector3(th, hgt, hi - from), wall)
+
+static func _facade(m: MB, g: MB, horiz: bool, at: float, lo: float, hi: float, y0: float, hgt: float, th: float, out: float, column: Color, beam: Color, trim: Color, wall: Color, windows: bool, k0: int, dado: float, open: bool = false) -> void:
+	var ln := hi - lo
+	if ln < 0.9:
+		return
+	var nbay := maxi(1, int(round(ln / 2.1)))
+	var bw := ln / nbay
+	var panel := Color(column.r, column.g, column.b, column.a).lerp(Color(wall.r, wall.g, wall.b, column.a), 0.3)
+	for k in nbay + 1:
+		var u := lo + k * bw
+		if k > 0 and k < nbay:
+			m.box(Vector3(u, y0 + hgt * 0.5, at) if horiz else Vector3(at, y0 + hgt * 0.5, u), Vector3(0.14, hgt, th + 0.08) if horiz else Vector3(th + 0.08, hgt, 0.14), column)
+		# a bracket under the eave beam, on the weather side
+		var bo := out * (th * 0.5 + 0.14)
+		m.box(Vector3(u, y0 + hgt - 0.3, at + bo) if horiz else Vector3(at + bo, y0 + hgt - 0.3, u), Vector3(0.12, 0.14, 0.3) if horiz else Vector3(0.3, 0.14, 0.12), beam)
+		m.box(Vector3(u, y0 + hgt - 0.2, at + bo + out * 0.14) if horiz else Vector3(at + bo + out * 0.14, y0 + hgt - 0.2, u), Vector3(0.16, 0.1, 0.1) if horiz else Vector3(0.1, 0.1, 0.16), trim)
+	for k2 in nbay:
+		var wpos := lo + (k2 + 0.5) * bw
+		# the dado: a wooden panel through the wall, with a raised field
+		m.box(Vector3(wpos, y0 + dado + 0.3, at) if horiz else Vector3(at, y0 + dado + 0.3, wpos), Vector3(bw - 0.24, 0.5, th + 0.04) if horiz else Vector3(th + 0.04, 0.5, bw - 0.24), panel)
+		m.box(Vector3(wpos, y0 + dado + 0.3, at) if horiz else Vector3(at, y0 + dado + 0.3, wpos), Vector3(bw - 0.6, 0.3, th + 0.07) if horiz else Vector3(th + 0.07, 0.3, bw - 0.6), panel.darkened(0.14))
+		# the painted band under the beam, on the weather side
+		for q in 3:
+			var fo := out * (th * 0.5 + 0.012)
+			var fu := wpos + (q - 1) * bw * 0.29
+			var fc: Color = [trim, beam.lightened(0.25), column][(q + k2) % 3]
+			m.box(Vector3(fu, y0 + hgt - 0.36, at + fo) if horiz else Vector3(at + fo, y0 + hgt - 0.36, fu), Vector3(bw * 0.2, 0.1, 0.02) if horiz else Vector3(0.02, 0.1, bw * 0.2), fc)
+		if not windows or bw < 1.5 or (nbay > 2 and (k2 + k0) % 2 != 0):
+			continue
+		var ww := minf(1.3, bw - 0.62)
+		var wh := minf(1.0, hgt * 0.38)
+		var yc := y0 + hgt * 0.63
+		if open:
+			# an open window: a frame of four timbers round the hole in the wall (`_wall`), nothing across
+			# it, and the room seen through it
+			for fs: float in [-1.0, 1.0]:
+				var fu2 := wpos + fs * (ww * 0.5 + 0.04)
+				m.box(Vector3(fu2, yc, at) if horiz else Vector3(at, yc, fu2), Vector3(0.08, wh + 0.16, th + 0.06) if horiz else Vector3(th + 0.06, wh + 0.16, 0.08), column)
+				var fy := yc + fs * (wh * 0.5 + 0.04)
+				m.box(Vector3(wpos, fy, at) if horiz else Vector3(at, fy, wpos), Vector3(ww + 0.16, 0.08, th + 0.06) if horiz else Vector3(th + 0.06, 0.08, ww + 0.16), column)
+		else:
+			m.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww + 0.16, wh + 0.16, th + 0.06) if horiz else Vector3(th + 0.06, wh + 0.16, ww + 0.16), column)
+			g.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww, wh, th + 0.08) if horiz else Vector3(th + 0.08, wh, ww), win_glow)
+			for q2 in 4:
+				var lu := wpos + (q2 - 1.5) * ww / 4.0
+				m.box(Vector3(lu, yc, at) if horiz else Vector3(at, yc, lu), Vector3(0.035, wh, th + 0.12) if horiz else Vector3(th + 0.12, wh, 0.035), column)
+			for q3 in 3:
+				var ly := yc + (q3 - 1) * wh / 3.2
+				m.box(Vector3(wpos, ly, at) if horiz else Vector3(at, ly, wpos), Vector3(ww, 0.035, th + 0.12) if horiz else Vector3(th + 0.12, 0.035, ww), column)
+		var so := out * (th * 0.5 + 0.09)
+		m.box(Vector3(wpos, yc - wh * 0.5 - 0.11, at + so) if horiz else Vector3(at + so, yc - wh * 0.5 - 0.11, wpos), Vector3(ww + 0.34, 0.07, 0.2) if horiz else Vector3(0.2, 0.07, ww + 0.34), beam)
+		for s: float in [-1.0, 1.0]:
+			var su := wpos + s * (ww * 0.5 + 0.22)
+			var sho := out * (th * 0.5 + 0.045)
+			m.box(Vector3(su, yc, at + sho) if horiz else Vector3(at + sho, yc, su), Vector3(0.26, wh + 0.06, 0.04) if horiz else Vector3(0.04, wh + 0.06, 0.26), beam.darkened(0.12))
+			m.box(Vector3(su, yc, at + sho + out * 0.025) if horiz else Vector3(at + sho + out * 0.025, yc, su), Vector3(0.16, wh * 0.36, 0.02) if horiz else Vector3(0.02, wh * 0.36, 0.16), trim)
+
+## Flowers and low shrubs along the foot of a wall, on the podium's lip (the Lost Horse release).
+static func _border(m: MB, horiz: bool, at: float, lo: float, hi: float, y0: float, th: float, out: float, seed_: int) -> void:
+	var n := int((hi - lo) / 1.1)
+	var blooms := [Color("e86a8a"), Color("f0d060"), Color("f4f0e8"), Color("c88ae0"), Color("f09a50")]
+	for k in n:
+		var hsh := Terrain3D.hash2(k, seed_ % 251, 3.0)
+		if hsh < 0.3:
+			continue
+		var u := lo + (k + 0.5) * (hi - lo) / n
+		var o := out * (th * 0.5 + 0.42)
+		var p := Vector3(u, y0 - 0.02, at + o) if horiz else Vector3(at + o, y0 - 0.02, u)
+		m.sph(p + Vector3(0, 0.16, 0), Vector3(0.3, 0.2, 0.24), MB.tag(Color("4a7a44").darkened(0.15 * hsh), MB.FOLIAGE), Vector3.ZERO, true)
+		if hsh > 0.55:
+			var bc: Color = blooms[int(hsh * 97.0) % blooms.size()]
+			for q in 3:
+				m.ball(p + Vector3(0.14 * (q - 1) if horiz else 0.05 * (q - 1), 0.32 + 0.04 * (q % 2), 0.05 * (q - 1) if horiz else 0.14 * (q - 1)), 0.06, MB.tag(bc, MB.FOLIAGE), true)
 
 ## A nomad tent / steppe yurt: a felt drum with a domed roof, a coloured band and a smoke hole.
 static func tent(b: MB, g: MB, seed_: int, yurt: bool) -> void:
@@ -721,8 +996,9 @@ static func settlement_mesh(kind: String, variant: int, theme_name: String) -> A
 ## ground floor's walls (open at the stairs, `hole`), walls with windows, its own furniture
 ## (`upper_props`) in `up`/`up_g` (so the world can lift the storey away while the hero is on the
 ## ground floor), and its roof a storey higher.
-static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, style: String, props: Array, seed_: int, up: MB = null, up_g: MB = null, upper_props: Array = [], hole: Vector3 = Vector3(-9999, 0, -9999)) -> Array:
-	var st: Dictionary = STYLES.get(style, STYLES.house)
+static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, style: String, props: Array, seed_: int, up: MB = null, up_g: MB = null, upper_props: Array = [], hole: Vector3 = Vector3(-9999, 0, -9999), wings: Array = [], storeys: int = 2, area: String = "") -> Array:
+	var st: Dictionary = dressed(style, area)
+	win_glow = st.get("glow", Color(1.0, 0.85, 0.55, 0.35))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
 	var T := Terrain3D.T
@@ -747,6 +1023,11 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 	# platform and plank floor (planks run along the long side)
 	b.box(Vector3(cx, ph * 0.5 - 0.15, cz), Vector3(r.size.x + 0.4, ph + 0.3, r.size.y + 0.4), stone_d)
 	b.box(Vector3(cx, ph - 0.02, cz), Vector3(x1 - x0, 0.06, z1 - z0), plank)
+	# (the Lost Horse release) a pale lip round the podium, a dark border round the planks
+	b.box(Vector3(cx, ph - 0.06, cz), Vector3(r.size.x + 0.52, 0.09, r.size.y + 0.52), stone)
+	for sb: float in [-1.0, 1.0]:
+		b.box(Vector3(cx, ph + 0.014, cz + sb * ((z1 - z0) * 0.5 - 0.3)), Vector3(x1 - x0 - 0.4, 0.012, 0.16), plank_d)
+		b.box(Vector3(cx + sb * ((x1 - x0) * 0.5 - 0.3), ph + 0.014, cz), Vector3(0.16, 0.012, z1 - z0 - 0.4), plank_d)
 	var along_x := r.size.x >= r.size.y
 	var n_pl := int((z1 - z0) / 0.5) if along_x else int((x1 - x0) / 0.5)
 	for i in n_pl:
@@ -759,17 +1040,32 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 	b.box(Vector3((door.x + cx) * 0.5, ph + 0.02, (door.z + cz) * 0.5), Vector3(maxf(absf(door.x - cx), 1.2) if absf(door.x - cx) > 0.5 else 1.2, 0.01, maxf(absf(door.z - cz), 1.2) if absf(door.z - cz) > 0.5 else 1.2), rug)
 	# walls: four runs on the centre line of the wall ring, one with a doorway
 	var sides := [[Vector3(x0, 0, z0), Vector3(x1, 0, z0)], [Vector3(x0, 0, z1), Vector3(x1, 0, z1)], [Vector3(x0, 0, z0), Vector3(x0, 0, z1)], [Vector3(x1, 0, z0), Vector3(x1, 0, z1)]]
-	for sd in sides:
+	for si in sides.size():
+		var sd: Array = sides[si]
 		var a: Vector3 = sd[0]
 		var e: Vector3 = sd[1]
 		var horiz := absf(a.z - e.z) < 0.01
 		var on_door := (horiz and absf(door.z - a.z) < T * 0.6) or (not horiz and absf(door.x - a.x) < T * 0.6)
-		var cuts: Array = []
+		# what is left of the wall once the doorway, and the opening into any wing built out from this
+		# side (the Lost Horse release), are taken out of it
+		var gaps: Array = []
 		if on_door:
 			var dc := door.x if horiz else door.z
-			cuts = [[minf(a.x, e.x) if horiz else minf(a.z, e.z), dc - 0.85], [dc + 0.85, maxf(a.x, e.x) if horiz else maxf(a.z, e.z)]]
-		else:
-			cuts = [[minf(a.x, e.x) if horiz else minf(a.z, e.z), maxf(a.x, e.x) if horiz else maxf(a.z, e.z)]]
+			gaps.append([dc - 0.85, dc + 0.85])
+		for wg0 in wings:
+			if int(wg0.side) == [2, 3, 0, 1][si]:
+				var wr0: Rect2 = wg0.rect
+				gaps.append([(wr0.position.x if horiz else wr0.position.y) + T * 0.5 + th * 0.5, (wr0.end.x if horiz else wr0.end.y) - T * 0.5 - th * 0.5])
+		gaps.sort_custom(func(p0, p1): return float(p0[0]) < float(p1[0]))
+		var cuts: Array = []
+		var from := minf(a.x, e.x) if horiz else minf(a.z, e.z)
+		var upto := maxf(a.x, e.x) if horiz else maxf(a.z, e.z)
+		for gp in gaps:
+			if float(gp[0]) - from > 0.3:
+				cuts.append([from, float(gp[0])])
+			from = maxf(from, float(gp[1]))
+		if upto - from > 0.3:
+			cuts.append([from, upto])
 		for c in cuts:
 			var lo: float = c[0] - th * 0.5
 			var hi: float = c[1] + th * 0.5
@@ -777,22 +1073,27 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			var ln := hi - lo
 			var pc := Vector3(mid, 0, a.z) if horiz else Vector3(a.x, 0, mid)
 			var sz := Vector3(ln, wall_h, th) if horiz else Vector3(th, wall_h, ln)
-			b.box(pc + Vector3(0, ph + wall_h * 0.5, 0), sz, wall)
+			var open_w: bool = not st.get("moon_gate", false)
+			_wall(b, horiz, a.z if horiz else a.x, lo, hi, ph, wall_h, th, wall, open_w, seed_ + int(lo * 3.0))
 			# stone plinth and a timber rail at waist and eave height
 			b.box(pc + Vector3(0, ph + 0.22, 0), sz * Vector3(1, 0, 1) + Vector3(0.06 if not horiz else 0.0, 0.44, 0.06 if horiz else 0.0), stone)
 			b.box(pc + Vector3(0, ph + 1.05, 0), sz * Vector3(1, 0, 1) + Vector3(0.05 if not horiz else 0.0, 0.08, 0.05 if horiz else 0.0), column)
 			b.box(pc + Vector3(0, ph + wall_h - 0.1, 0), sz * Vector3(1, 0, 1) + Vector3(0.08 if not horiz else 0.0, 0.2, 0.08 if horiz else 0.0), beam)
-			# lattice windows on longer stretches, glowing faintly from inside
-			var nwin := int(ln / 2.6)
-			for k in nwin:
-				var wpos := lo + (k + 0.5) * ln / nwin
-				var wc := Vector3(wpos, ph + 1.75, a.z) if horiz else Vector3(a.x, ph + 1.75, wpos)
-				var wsz := Vector3(0.9, 0.7, th + 0.04) if horiz else Vector3(th + 0.04, 0.7, 0.9)
-				b.box(wc, wsz + Vector3(0.1 if horiz else 0.0, 0.1, 0.0 if horiz else 0.1), column)
-				g.box(wc, wsz * Vector3(0.85 if horiz else 1.02, 0.8, 1.02 if horiz else 0.85), Color(1.0, 0.85, 0.55, 0.35))
-				for q in 3:
-					var off := (q - 1) * 0.25
-					b.box(wc + (Vector3(off, 0, 0) if horiz else Vector3(0, 0, off)), Vector3(0.04 if horiz else th + 0.06, 0.7, th + 0.06 if horiz else 0.04), column)
+			# the facade (the Lost Horse release): a post every bay, a panelled dado, brackets and a painted
+			# band under the eave, and in every other bay a wide lattice window with a sill and shutters,
+			# glowing faintly from inside; flowers along the foot of the wall
+			var outw := (-1.0 if a.z < cz else 1.0) if horiz else (-1.0 if a.x < cx else 1.0)
+			_facade(b, g, horiz, a.z if horiz else a.x, lo, hi, ph, wall_h, th, outw, column, beam, trim, wall, open_w, seed_ + int(lo * 3.0), 0.44, true)
+			if not on_door:
+				_border(b, horiz, a.z if horiz else a.x, lo + 0.5, hi - 0.5, ph, th, outw, seed_ + int(hi))
+			if st.get("lanterns", false):
+				# (the Lantern Hearth: a row of small red lanterns under the eave)
+				for k9 in int(ln / 1.4):
+					var lu := lo + (k9 + 0.5) * ln / maxf(1.0, float(int(ln / 1.4)))
+					var lo9 := outw * (th * 0.5 + 0.45)
+					var lq := Vector3(lu, ph + wall_h - 0.5, a.z + lo9) if horiz else Vector3(a.x + lo9, ph + wall_h - 0.5, lu)
+					b.lathe(lq - Vector3(0, 0.12, 0), [Vector2(0.03, 0.0), Vector2(0.09, 0.06), Vector2(0.09, 0.18), Vector2(0.03, 0.24)], MB.tag(Color("d8302a"), MB.CLOTH), 6)
+					g.ball(lq, 0.07, Color(1.0, 0.6, 0.3, 0.7), true)
 		# columns at the ends of each run
 		for pnt in [a, e]:
 			b.cyl(pnt + Vector3(0, ph + wall_h * 0.5, 0), 0.2, wall_h + 0.1, column, Vector3.ZERO, 10)
@@ -815,10 +1116,31 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			# a threshold step and a pair of lanterns outside
 			var outside := Vector3(0, 0, -inward) if horiz else Vector3(-inward, 0, 0)
 			b.box(Vector3(door.x, ph * 0.4, door.z) + outside * 1.1, Vector3(1.8, ph * 0.8, 0.6) if horiz else Vector3(0.6, ph * 0.8, 1.8), stone)
+			# (the Lost Horse release) a second, wider step, a porch on two posts with a little tiled roof of
+			# its own (it lifts away with the roof), and a potted pine either side of the door
+			b.box(Vector3(door.x, ph * 0.2, door.z) + outside * 1.5, Vector3(2.6, ph * 0.4, 0.5) if horiz else Vector3(0.5, ph * 0.4, 2.6), stone_d)
+			if not st.has("awning") and not st.get("moon_gate", false):
+				for s4: float in [-1.0, 1.0]:
+					var pp := Vector3(door.x, 0, door.z) + outside * 1.55 + (Vector3(s4 * 1.3, 0, 0) if horiz else Vector3(0, 0, s4 * 1.3))
+					b.box(pp + Vector3(0, 0.14, 0), Vector3(0.36, 0.28, 0.36), stone)
+					b.limb(pp + Vector3(0, 0.28, 0), pp + Vector3(0, ph + wall_h - 0.3, 0), 0.1, 0.09, column, 8)
+					b.box(pp + Vector3(0, ph + wall_h - 0.42, 0) - outside * 0.75, Vector3(0.1, 0.14, 1.5) if horiz else Vector3(1.5, 0.14, 0.1), beam)
+				b.box(Vector3(door.x, ph + wall_h - 0.3, door.z) + outside * 1.55, Vector3(2.9, 0.16, 0.14) if horiz else Vector3(0.14, 0.16, 2.9), beam)
+				hip_roof(roof, roof_g, Vector3(door.x, ph + wall_h - 0.18, door.z) + outside * 0.95, 1.5 if horiz else 0.75, 0.75 if horiz else 1.5, 0.35, 0.6, st, false)
+			for s5: float in [-1.0, 1.0]:
+				var pot := Vector3(door.x, ph * 0.4, door.z) + outside * 0.75 + (Vector3(s5 * 1.75, 0, 0) if horiz else Vector3(0, 0, s5 * 1.75))
+				b.lathe(pot, [Vector2(0.16, 0.0), Vector2(0.24, 0.22), Vector2(0.2, 0.36), Vector2(0.23, 0.4)], MB.tag(Color("3a5a7a") if style in ["hall", "library", "shrine", "aerie"] else Color("8a5a3a"), MB.STONE), 8)
+				b.limb(pot + Vector3(0, 0.36, 0), pot + Vector3(0.03 * s5, 0.95, 0.02), 0.035, 0.02, MB.tag(Color("4a3626"), MB.WOOD), 5)
+				for q5 in 3:
+					b.sph(pot + Vector3(0.1 * s5 * (q5 - 1), 0.75 + q5 * 0.2, 0.06 * (q5 - 1)), Vector3(0.3 - q5 * 0.06, 0.1, 0.26 - q5 * 0.05), MB.tag(Color("3a6a44").lightened(0.06 * q5), MB.FOLIAGE), Vector3.ZERO, true)
 			for s3: float in [-1.0, 1.0]:
 				var lp := Vector3(door.x, ph + 2.1, door.z) + outside * 0.45 + (Vector3(s3 * 1.15, 0, 0) if horiz else Vector3(0, 0, s3 * 1.15))
 				_lantern(b, g, lp, trim)
 				lights.append([lp + outside * 0.4, Color(1.0, 0.6, 0.3)])
+	# ---- wings (the Lost Horse release): a side room built out from a wall, with its own three walls,
+	# its own floor and a lower roof of its own leaning on the house
+	for wg in wings:
+		_wing(b, g, roof, roof_g, wg.rect, int(wg.side), Rect2(x0, z0, x1 - x0, z1 - z0), ph, wall_h, th, st, style, seed_ + int(wg.side) * 17, lights)
 	# ceiling beams and hanging lanterns inside (seen once the roof lifts away)
 	var top := ph + wall_h
 	var nbeam := maxi(1, int((x1 - x0) / 2.4))
@@ -870,16 +1192,11 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			var ln2 := hi2 - lo2
 			var pc2 := Vector3(mid2, 0, a2.z) if horiz2 else Vector3(a2.x, 0, mid2)
 			var sz2 := Vector3(ln2, wall2, th) if horiz2 else Vector3(th, wall2, ln2)
-			up.box(pc2 + Vector3(0, floor_y + wall2 * 0.5, 0), sz2, wall)
+			_wall(up, horiz2, a2.z if horiz2 else a2.x, lo2, hi2, floor_y, wall2, th, wall, true, seed_ + 7 + int(lo2 * 3.0))
 			up.box(pc2 + Vector3(0, floor_y + 0.05, 0), sz2 * Vector3(1, 0, 1) + Vector3(0.06 if not horiz2 else 0.0, 0.14, 0.06 if horiz2 else 0.0), beam)
 			up.box(pc2 + Vector3(0, floor_y + wall2 - 0.1, 0), sz2 * Vector3(1, 0, 1) + Vector3(0.08 if not horiz2 else 0.0, 0.2, 0.08 if horiz2 else 0.0), beam)
-			var nwin2 := int(ln2 / 2.2)
-			for k5 in nwin2:
-				var wp2 := lo2 + (k5 + 0.5) * ln2 / nwin2
-				var wc2 := Vector3(wp2, floor_y + 1.35, a2.z) if horiz2 else Vector3(a2.x, floor_y + 1.35, wp2)
-				var ws2 := Vector3(0.8, 0.8, th + 0.04) if horiz2 else Vector3(th + 0.04, 0.8, 0.8)
-				up.box(wc2, ws2 + Vector3(0.1 if horiz2 else 0.0, 0.1, 0.0 if horiz2 else 0.1), column)
-				up_g.box(wc2, ws2 * Vector3(0.85 if horiz2 else 1.02, 0.8, 1.02 if horiz2 else 0.85), Color(1.0, 0.85, 0.55, 0.35))
+			var outw2 := (-1.0 if a2.z < cz else 1.0) if horiz2 else (-1.0 if a2.x < cx else 1.0)
+			_facade(up, up_g, horiz2, a2.z if horiz2 else a2.x, lo2, hi2, floor_y, wall2, th, outw2, column, beam, trim, wall, true, seed_ + 7 + int(lo2 * 3.0), 0.12, true)
 			for pnt2 in [a2, e2]:
 				up.cyl(pnt2 + Vector3(0, floor_y + wall2 * 0.5, 0), 0.2, wall2 + 0.1, column, Vector3.ZERO, 10)
 		var lup := Vector3(cx, floor_y + wall2 - 0.7, cz)
@@ -888,6 +1205,35 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		for pr3 in upper_props:
 			_furnish(up, up_g, str(pr3[0]), pr3[1] + Vector3(0, floor_y + 0.07, 0), Rect2(x0, z0, x1 - x0, z1 - z0), st, rng, lights)
 		top = floor_y + wall2
+	# ---- more storeys (the Lost Horse release): above the storey that is walked in, as many again as
+	# the house stands (rooms.gd `storeys`): each set back a little behind a skirt of tiled eave, with the
+	# same bays and lit windows; they lift away with the roof
+	if up != null:
+		for _k9 in maxi(0, storeys - 2):
+			if x1 - x0 < 4.6 or z1 - z0 < 4.6:
+				break
+			if str(st.get("kind", "hip")) == "flat":
+				roof.box(Vector3(cx, top + 0.2, cz), Vector3(x1 - x0 + 0.7, 0.4, z1 - z0 + 0.7), MB.tag(_c(st.wall).darkened(0.08), MB.STONE))
+			else:
+				hip_roof(roof, roof_g, Vector3(cx, top + 0.1, cz), (x1 - x0) * 0.5 + 0.25, (z1 - z0) * 0.5 + 0.25, 0.8, 0.5, st, false)
+			x0 += 0.32
+			x1 -= 0.32
+			z0 += 0.32
+			z1 -= 0.32
+			var y9 := top + 0.42
+			var h9 := 2.3
+			for sd9 in [[true, z0, x0, x1, -1.0], [true, z1, x0, x1, 1.0], [false, x0, z0, z1, -1.0], [false, x1, z0, z1, 1.0]]:
+				var hz9: bool = sd9[0]
+				var at9: float = sd9[1]
+				var lo9: float = float(sd9[2]) - th * 0.5
+				var hi9: float = float(sd9[3]) + th * 0.5
+				roof.box(Vector3((lo9 + hi9) * 0.5, y9 + h9 * 0.5, at9) if hz9 else Vector3(at9, y9 + h9 * 0.5, (lo9 + hi9) * 0.5), Vector3(hi9 - lo9, h9, th) if hz9 else Vector3(th, h9, hi9 - lo9), wall)
+				roof.box(Vector3((lo9 + hi9) * 0.5, y9 + h9 - 0.1, at9) if hz9 else Vector3(at9, y9 + h9 - 0.1, (lo9 + hi9) * 0.5), Vector3(hi9 - lo9, 0.2, th + 0.08) if hz9 else Vector3(th + 0.08, 0.2, hi9 - lo9), beam)
+				_facade(roof, roof_g, hz9, at9, lo9, hi9, y9, h9, th, float(sd9[4]), column, beam, trim, wall, true, seed_ + 3 * _k9 + int(lo9), 0.12)
+			for cx9: float in [x0, x1]:
+				for cz9: float in [z0, z1]:
+					roof.cyl(Vector3(cx9, y9 + h9 * 0.5, cz9), 0.18, h9 * 0.5 + 0.05, column, Vector3.ZERO, 8)
+			top = y9 + h9
 	# ---- the roof: eave beams, bracket sets at the corners and a curved hip roof
 	var ry := top + 0.25
 	for s4: float in [-1.0, 1.0]:
@@ -896,16 +1242,54 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		roof.box(Vector3(cx, top - 0.1, cz + s4 * ((z1 - z0) * 0.5 + 0.13)), Vector3(x1 - x0 + 0.6, 0.05, 0.04), trim)
 	for c2 in [Vector3(x0, 0, z0), Vector3(x1, 0, z0), Vector3(x0, 0, z1), Vector3(x1, 0, z1)]:
 		_dougong(roof, (c2 as Vector3) + Vector3(0, top + 0.2, 0), trim, beam, column)
+	# (the Lost Horse release) rafter tails under the eaves, their ends painted
+	var raf := MB.tag(_c(st.column).darkened(0.15), MB.WOOD)
+	for s12: float in [-1.0, 1.0]:
+		for k12 in int((x1 - x0) / 0.8) + 1:
+			var rx := x0 + k12 * (x1 - x0) / maxf(1.0, float(int((x1 - x0) / 0.8)))
+			roof.box(Vector3(rx, top + 0.27, cz + s12 * ((z1 - z0) * 0.5 + 0.38)), Vector3(0.09, 0.1, 0.62), raf)
+			roof.box(Vector3(rx, top + 0.27, cz + s12 * ((z1 - z0) * 0.5 + 0.7)), Vector3(0.1, 0.11, 0.03), trim)
+		for k13 in int((z1 - z0) / 0.8) + 1:
+			var rz := z0 + k13 * (z1 - z0) / maxf(1.0, float(int((z1 - z0) / 0.8)))
+			roof.box(Vector3(cx + s12 * ((x1 - x0) * 0.5 + 0.38), top + 0.27, rz), Vector3(0.62, 0.1, 0.09), raf)
+			roof.box(Vector3(cx + s12 * ((x1 - x0) * 0.5 + 0.7), top + 0.27, rz), Vector3(0.03, 0.11, 0.1), trim)
 	var hx := (x1 - x0) * 0.5
 	var hz := (z1 - z0) * 0.5
 	var kind: String = st.get("kind", "hip")
-	if kind == "gable" or kind == "thatch":
+	if kind == "flat":
+		# (the sand road: a flat roof of beaten earth on poles whose ends stand out of the wall, a parapet
+		# with a gap at each corner post, a turquoise dome, and an awning on poles to sleep under)
+		var fw := MB.tag(_c(st.wall).darkened(0.06), MB.STONE)
+		roof.box(Vector3(cx, ry + 0.05, cz), Vector3(x1 - x0 + 0.5, 0.3, z1 - z0 + 0.5), fw)
+		for s14: float in [-1.0, 1.0]:
+			roof.box(Vector3(cx, ry + 0.5, cz + s14 * ((z1 - z0) * 0.5 + 0.1)), Vector3(x1 - x0 + 0.5, 0.6, 0.26), wall)
+			roof.box(Vector3(cx + s14 * ((x1 - x0) * 0.5 + 0.1), ry + 0.5, cz), Vector3(0.26, 0.6, z1 - z0 + 0.5), wall)
+			for k15 in int((x1 - x0) / 1.2) + 1:
+				var vx := x0 + k15 * (x1 - x0) / maxf(1.0, float(int((x1 - x0) / 1.2)))
+				roof.limb(Vector3(vx, ry - 0.12, cz + s14 * (z1 - z0) * 0.5), Vector3(vx, ry - 0.12, cz + s14 * ((z1 - z0) * 0.5 + 0.55)), 0.07, 0.07, beam, 5)
+				if k15 % 2 == 0:
+					roof.box(Vector3(vx, ry + 0.9, cz + s14 * ((z1 - z0) * 0.5 + 0.1)), Vector3(0.5, 0.22, 0.26), wall)
+			for cz15: float in [-1.0, 1.0]:
+				roof.box(Vector3(cx + s14 * ((x1 - x0) * 0.5 + 0.1), ry + 1.0, cz + cz15 * ((z1 - z0) * 0.5 + 0.1)), Vector3(0.4, 0.5, 0.4), wall)
+				roof.ball(Vector3(cx + s14 * ((x1 - x0) * 0.5 + 0.1), ry + 1.34, cz + cz15 * ((z1 - z0) * 0.5 + 0.1)), 0.16, trim, true)
+		var dr0 := minf(hx, hz) * 0.5
+		var dc0 := Vector3(cx, ry + 0.2, cz) + (Vector3(hx * 0.35, 0, 0) if hx >= hz else Vector3(0, 0, hz * 0.35))
+		roof.cyl(dc0 + Vector3(0, 0.25, 0), dr0, 0.5, wall, Vector3.ZERO, 14)
+		roof.hemi(dc0 + Vector3(0, 0.5, 0), Vector3(dr0, dr0 * 0.95, dr0), MB.tag(_c(str(st.get("dome", "3aa8a0"))), MB.STONE))
+		roof.limb(dc0 + Vector3(0, 0.5 + dr0 * 0.9, 0), dc0 + Vector3(0, 0.5 + dr0 * 0.9 + 0.6, 0), 0.03, 0.02, trim, 5)
+		roof.ball(dc0 + Vector3(0, 0.5 + dr0 * 0.9 + 0.66, 0), 0.08, trim, true)
+		var ac0 := Vector3(cx, ry + 0.2, cz) - (Vector3(hx * 0.45, 0, 0) if hx >= hz else Vector3(0, 0, hz * 0.45))
+		for ax0: float in [-1.0, 1.0]:
+			for az0: float in [-1.0, 1.0]:
+				roof.limb(ac0 + Vector3(ax0 * 1.1, 0, az0 * 1.1), ac0 + Vector3(ax0 * 1.1, 1.9, az0 * 1.1), 0.04, 0.04, beam, 5)
+		roof.box(ac0 + Vector3(0, 1.92, 0), Vector3(2.6, 0.04, 2.6), MB.tag(Color("c8502a") if seed_ % 2 == 0 else Color("2a6a9a"), MB.CLOTH), Vector3(0.06, 0, 0.04))
+	elif kind == "gable" or kind == "thatch":
 		# a gabled roof with its ridge along the long side
 		var along := hx >= hz
-		var rise := 1.3 + minf(hx, hz) * 0.22
+		var rise := GABLE_RISE + minf(hx, hz) * 0.3
 		var rc := MB.tag(_c(st.roof), MB.WOOD if kind == "thatch" else MB.STONE)
 		var tmp := MB.new()
-		_gable(tmp, Vector3.ZERO, (hx if along else hz) + 0.5, (hz if along else hx) + 0.55, rise, rc, kind == "thatch")
+		_gable(tmp, Vector3.ZERO, (hx if along else hz) + 0.6, (hz if along else hx) + 0.8, rise, rc, kind == "thatch", MB.tag(_c(st.trim), MB.METAL), MB.tag(_c(st.roof2), MB.STONE))
 		var xf := Transform3D(Basis.IDENTITY if along else Basis(Vector3.UP, PI * 0.5), Vector3(cx, ry, cz))
 		roof.merge(tmp, xf)
 		# gable ends filled with wall
@@ -913,7 +1297,7 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			var gt := MB.new()
 			for k in 6:
 				var f := (k + 0.5) / 6.0
-				var wv := (hz if along else hx) * (1.0 - f)
+				var wv := (hz if along else hx) * (1.0 - pow(f, 0.69))
 				gt.box(Vector3(0, rise * f * 0.98 - rise / 12.0, 0), Vector3(0.24, rise / 6.0 + 0.02, wv * 2.0), wall)
 			roof.merge(gt, Transform3D(Basis.IDENTITY if along else Basis(Vector3.UP, PI * 0.5), Vector3(cx, ry, cz) + (Vector3(s5 * hx, 0, 0) if along else Vector3(0, 0, s5 * hz))))
 		if st.get("horsehead", false):
@@ -939,9 +1323,15 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			roof.box(chp + Vector3(0, rise * 0.6, 0), Vector3(0.6, rise * 1.2 + 0.6, 0.6), MB.tag(Color("8a7a6a"), MB.STONE))
 			roof_g.ball(chp + Vector3(0, rise * 1.25 + 0.4, 0), 0.3, Color(0.85, 0.85, 0.9, 0.18), true)
 	elif st.double:
-		hip_roof(roof, roof_g, Vector3(cx, ry + 0.2, cz), hx + 0.45, hz + 0.5, 0.9, 0.55, st, false)
-		roof.box(Vector3(cx, ry + 0.75, cz), Vector3(x1 - x0 - 0.8, 0.9, z1 - z0 - 0.6), wall)
-		hip_roof(roof, roof_g, Vector3(cx, ry + 1.25, cz), hx - 0.2, hz - 0.1, 0.95, 1.8, st)
+		hip_roof(roof, roof_g, Vector3(cx, ry + 0.2, cz), hx + 0.45, hz + 0.5, 1.0, 0.6, st, false)
+		roof.box(Vector3(cx, ry + 0.85, cz), Vector3(x1 - x0 - 0.8, 1.1, z1 - z0 - 0.6), wall)
+		# (a band of little lit windows between the two eaves)
+		for s13: float in [-1.0, 1.0]:
+			for k14 in maxi(1, int((x1 - x0 - 1.2) / 1.4)):
+				var lx := x0 + 0.9 + k14 * (x1 - x0 - 1.8) / maxf(1.0, float(maxi(1, int((x1 - x0 - 1.2) / 1.4)) - 1)) if int((x1 - x0 - 1.2) / 1.4) > 1 else cx
+				roof.box(Vector3(lx, ry + 0.95, cz + s13 * ((z1 - z0 - 0.6) * 0.5 + 0.01)), Vector3(0.7, 0.5, 0.04), column)
+				roof_g.box(Vector3(lx, ry + 0.95, cz + s13 * ((z1 - z0 - 0.6) * 0.5 + 0.03)), Vector3(0.56, 0.36, 0.02), Color(1.0, 0.85, 0.55, 0.4))
+		hip_roof(roof, roof_g, Vector3(cx, ry + 1.45, cz), hx - 0.2, hz - 0.1, 1.0, HIP_RISE + 0.3 + minf(hx, hz) * 0.2, st)
 		if st.get("balcony", false):
 			# a gallery round the upper storey: a rail on posts just inside the lower eave
 			for s7: float in [-1.0, 1.0]:
@@ -950,7 +1340,7 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 				for k2 in int((x1 - x0) / 0.6):
 					roof.box(Vector3(x0 + 0.3 + k2 * 0.6, ry + 0.75, cz + s7 * (hz - 0.05)), Vector3(0.04, 0.4, 0.04), column)
 	else:
-		hip_roof(roof, roof_g, Vector3(cx, ry + 0.1, cz), hx + 0.4, hz + 0.45, 0.95, 1.6 + minf(hx, hz) * 0.15, st)
+		hip_roof(roof, roof_g, Vector3(cx, ry + 0.1, cz), hx + 0.4, hz + 0.45, 1.05, HIP_RISE + minf(hx, hz) * 0.2, st)
 	if st.get("spire", false):
 		# the Feathered Folk's tower (Part XI): a lantern turret rising out of the roof, with its own
 		# little roof, a golden finial, and nests on the ridge where the eldest roost
@@ -969,7 +1359,7 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 	if st.get("louver", false) and (kind == "gable" or kind == "thatch"):
 		# a raised louver along the ridge: a little roof on posts over a gap, and the steam coming out
 		var alongl := hx >= hz
-		var risel := 1.3 + minf(hx, hz) * 0.22
+		var risel := GABLE_RISE + minf(hx, hz) * 0.3
 		var lv := MB.new()
 		var ll := (hx if alongl else hz) * 0.55
 		for k5 in 4:
@@ -982,7 +1372,7 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			roof_g.ball(Vector3(cx, ry + risel + 1.3 + k6 * 0.45, cz) + (Vector3((k6 - 1) * ll * 0.6, 0, 0) if alongl else Vector3(0, 0, (k6 - 1) * ll * 0.6)), 0.35 + k6 * 0.12, Color(0.92, 0.92, 0.95, 0.16), true)
 	if st.get("lotus_finial", false):
 		# a bronze lotus bud on the ridge, its petals opening, on a little drum
-		var fy := ry + 1.6 + minf(hx, hz) * 0.15 + 0.05
+		var fy := ry + HIP_RISE + minf(hx, hz) * 0.2 + 0.05
 		var fc := Vector3(cx, fy, cz) + (Vector3(hx * 0.45, 0, 0) if hx >= hz else Vector3(0, 0, hz * 0.45))
 		roof.cyl(fc + Vector3(0, 0.15, 0), 0.16, 0.3, trim, Vector3.ZERO, 10)
 		for k7 in 8:

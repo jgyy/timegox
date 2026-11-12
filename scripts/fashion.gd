@@ -320,8 +320,24 @@ const RIDES := {
 		"desc": "A cub of Bai Hu's own litter, grown in a season to the size of a horse, white as the moon on sand. It purrs like a landslide and is afraid of moths.", "how": "Bai Hu's cub follows you out of the Desert of Fallen Stars.", "step": "s_du_tiger"},
 	"barque": {"n": "Sky-Barque of Landfall", "kind": "vehicle", "model": "barque", "speed": 1.45, "seat": Vector3(0, 0.9, 0.5), "pillion": Vector3(0, 0.9, -0.5), "scale": 1.0,
 		"desc": "The first keel Landfall laid in two thousand years, finished with Yumin feathers for a sail and Mazu's blessing on the bow, so that it sails on the wind over the land as well as on the sea.", "how": "Built for you by the Thousand Children when the sea comes home.", "step": "s_p12_end"},
+	# ---- carriages (the Lost Horse release): `kind` "carriage": driven sitting down, with `seats` (where
+	# each sitter's seat is: the hero's, Yue Ling's, and then whoever is being carried, offices.gd `fares`);
+	# bought (`buy`: spirit stones) of whoever answers for a town (`at`: an office)
+	"ox_cart": {"n": "Two-Wheeled Ox-Cart", "kind": "carriage", "model": "ox_cart", "speed": 1.08, "scale": 1.0, "seat": Vector3(-0.38, 1.48, 0.7), "pillion": Vector3(0.38, 1.48, 0.7),
+		"seats": [Vector3(-0.38, 1.48, 0.7), Vector3(0.38, 1.48, 0.7), Vector3(-0.38, 1.48, -0.5), Vector3(0.38, 1.48, -0.5)], "buy": 6000, "at": "head_qingshi",
+		"desc": "Two wheels as high as a man's chest, a bed of elm planks, a bench across the front and an ox who has done this road every market day for eleven years and sees no reason to hurry now. It seats four, if two of them do not mind the turnips.", "how": "Headman Luo of Qingshi will sell you the village's second-best."},
+	"wagon": {"n": "Caravan Wagon of the Sand Road", "kind": "carriage", "model": "wagon", "speed": 1.2, "scale": 1.0, "seat": Vector3(-0.45, 1.54, 1.5), "pillion": Vector3(0.45, 1.54, 1.5),
+		"seats": [Vector3(-0.45, 1.54, 1.5), Vector3(0.45, 1.54, 1.5), Vector3(-0.45, 1.54, 0.3), Vector3(0.45, 1.54, 0.3), Vector3(-0.45, 1.54, -0.9), Vector3(0.45, 1.54, -0.9)], "buy": 25000, "at": "reeve_well",
+		"desc": "Four wheels, a hooped tilt of red felt against the sun, water-skins slung along both sides and two benches under the cover. Built at Shazhou for a road with nothing on it for nine days. It seats six, and the last caravan to use it left a dried fig in every crack.", "how": "Samira, Reeve of the Sweet Well, sells them at Shazhou."},
+	"carriage": {"n": "Post-Carriage of Cloudfoot", "kind": "carriage", "model": "carriage", "speed": 1.3, "scale": 1.0, "seat": Vector3(-0.38, 1.7, 1.3), "pillion": Vector3(0.38, 1.7, 1.3),
+		"seats": [Vector3(-0.38, 1.7, 1.3), Vector3(0.38, 1.7, 1.3), Vector3(-0.4, 1.56, -0.95), Vector3(0.4, 1.56, -0.95)], "buy": 40000, "at": "post_cloudfoot",
+		"desc": "A closed body of black lacquer on leather springs, a blue curtain, a lantern at each corner of the roof and a box for the driver. The post runs one to the capital that is not there any more. It seats four: two on the box, and two inside who will tell you they are not being sick.", "how": "Postmaster Ge of Cloudfoot will part with one, for a price."},
 }
-const RIDE_ORDER := ["pony", "sword", "qilin", "cloud", "tiger", "barque"]
+const RIDE_ORDER := ["pony", "sword", "qilin", "cloud", "tiger", "barque", "ox_cart", "wagon", "carriage"]
+
+## How many a ride seats (two for a beast, a sword or a cloud: the hero and one behind).
+static func seats(id: String) -> int:
+	return (RIDES.get(id, {}).get("seats", [0, 0]) as Array).size()
 
 # ---------------------------------------------------------------- lookups
 static func look_of(g) -> Dictionary:

@@ -267,6 +267,10 @@ static func build(id: String, size := Vector2i.ZERO, spec_over: Dictionary = {})
 					var pe2: Array = bpool[rng.randi() % bpool.size()]
 					group2.append({"id": pe2[0], "lv": rng.randi_range(pe2[1], pe2[2])})
 				ents.append({"kind": "enemy", "id": "w%d" % bplaced, "pos": c2, "group": group2, "vis": [str(band.vis), ""]})
+	# ---- the Lost Horse release: more room indoors.  Last of all, when everybody and everything of the
+	# region's own map stands where it stands, every building is let out into whatever ground it has to
+	# spare (rooms.gd `let_out`)
+	Rooms.let_out(id, spec, grid, w, h, buildings, ents, start)
 	return {"w": w, "h": h, "grid": grid, "ents": ents, "theme": spec.theme, "name": spec.n, "start": start, "buildings": buildings, "floor_ents": floor_ents}
 
 ## The ladders (Data.LADDERS) with an end in region `id`: [[tile, out, ladder, end ("a" or "b")], ...]
@@ -304,6 +308,18 @@ static func stamp_building(grid: PackedByteArray, w: int, bd: Dictionary) -> Dic
 			grid[y * w + x] = BUILDING if edge else INTERIOR
 	var door: Vector2i = bd.door
 	grid[door.y * w + door.x] = INTERIOR
+	# (the Lost Horse release: wings, rooms.gd `let_out`: a side room built out from one wall, its own
+	# walls round three sides, and the wall it stands against opened along it)
+	for wg in bd.get("wings", []):
+		var wr: Rect2i = wg.rect
+		var side := int(wg.side)
+		for y in range(wr.position.y, wr.end.y):
+			for x in range(wr.position.x, wr.end.x):
+				var end_wall := (y == wr.position.y or y == wr.end.y - 1) if side < 2 else (x == wr.position.x or x == wr.end.x - 1)
+				var outer := (x == wr.position.x if side == 0 else x == wr.end.x - 1) if side < 2 else (y == wr.position.y if side == 2 else y == wr.end.y - 1)
+				grid[y * w + x] = BUILDING if end_wall or outer else INTERIOR
+		for jt in Rooms.wing_gap(bd, wg):
+			grid[jt.y * w + jt.x] = INTERIOR
 	for pr in bd.get("props", []):
 		var pt: Vector2i = pr[1]
 		if pr.size() > 2 and pr[2]:

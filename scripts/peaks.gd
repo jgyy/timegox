@@ -23,6 +23,7 @@ const STEEP := 0.95
 ## radius of a peak's footprint (tiles), smallest and largest
 const R_MIN := 5
 const R_TIGHT := 4
+const R_LEAST := 3
 const R_MAX := 14
 ## clear ground kept round a footprint when a place is chosen (tiles)
 const MARGIN := 2
@@ -45,6 +46,8 @@ const NONE := ["sect"]
 ## largest place the region has is kept for it; `at`: the place nearest a tile of the region's own map).
 const OWN := {
 	"mountain": [{"n": "Sun-Viewing Peak", "big": true}, {"n": "the Sweeper's Lookout"}],
+	# Part XXIV: the height Great Yu set down on the Ape of the Huai, in the Drowned Fields
+	"drowned": [{"n": "Turtle Mountain"}],
 }
 
 const NAME_A := ["Crane", "Listening", "Cloud-Gate", "Old Man", "Jade Maiden", "Nine Pines", "Wind-Rest", "Lonely", "Returning Goose", "Sleeping Ox",
@@ -71,6 +74,22 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 		for k1 in more:
 			if not cands.has(k1):
 				cands[k1] = more[k1]
+	# (the Lost Horse release: and a region that has grown fuller still, its houses let out and its ponds
+	# drawn back from them, is looked at a third time for the smallest height that is still a height)
+	var still := false
+	for k2 in ids.size():
+		if not cands.has(k2) and not (ids[k2] in NONE):
+			still = true
+	if still:
+		var least := _cands(grid, W, H, owner, sea, ids, ents, reach, R_LEAST, 1, 1, 2)
+		for k3 in least:
+			# (only where the story stands something on a height: the wettest regions stay as flat as they were)
+			var wanted := false
+			for key in ["npcs", "bosses", "pickups"]:
+				for e0 in Data.AREAS[ids[k3]].get(key, []):
+					wanted = wanted or (e0 is Dictionary and e0.has("peak"))
+			if not cands.has(k3) and wanted:
+				cands[k3] = least[k3]
 	var area_n := PackedInt32Array()
 	area_n.resize(ids.size())
 	for i0 in W * H:

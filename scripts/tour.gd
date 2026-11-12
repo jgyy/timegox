@@ -1219,6 +1219,15 @@ func _fates_shots() -> void:
 	# a chapter: Xu Lan in the inner sanctum, and the choice it ends in
 	await _fates_chapter_shots()
 
+## (the carriages' gallery: everybody aboard put in the seated pose once they are in the tree)
+func _seat_all(holder: Node3D) -> void:
+	for c in holder.get_children():
+		if c.has_meta("pose_ap"):
+			var pap: AnimationPlayer = c.get_meta("pose_ap")
+			pap.play("sit_bench")
+			pap.seek(1.0, true)
+			pap.pause()
+
 ## The Fates page and the Bestiary.
 func _fates_pages() -> void:
 	Game.bestiary = {"bamboo_wolf": 12, "bandit": 9, "leaf_sprite": 7, "mire_toad": 5, "bog_wraith": 4, "thunder_ape": 3}
@@ -2133,6 +2142,10 @@ func _run() -> void:
 		# the Thundering Pots release (--pots, or --pots=a,b): the wardrobe, the field of war, the pages of
 		# feats, songs and the host, the Drum Tower quarter, Old Du's mat and Part XXIII
 		await _pots_shots(str(main.args.pots))
+	if main.args.has("horse"):
+		# the Lost Horse release (--horse, or --horse=a,b): what the choices left standing, the battles that
+		# cannot be won, and Part XXIV
+		await _horse_shots(str(main.args.horse))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -3772,3 +3785,398 @@ func _pots_shots(which: String = "1") -> void:
 		await _shot("crossroads_host")
 		main.pop()
 		Game.cross_pending = []
+
+
+# ================================================================ the Lost Horse release
+func _horse_state() -> void:
+	_pots_state()
+	Game.level = 86
+	Game.step = Data.step_index("s_p24_marks")
+	Game.picks = {}
+	Game.scales = {}
+	Game.falls = {}
+	Game.fallen = 0
+	Game.marks_seen = {}
+	Game.toasts.clear()
+
+## Put the party a little way off mark `id` of the land (on open ground beside it), at `hour`, and look
+## down at the whole row of it from `dist` metres off and `up` metres above, from whichever quarter
+## has open ground under the camera (a region is turned on the continent, and a wood may be anywhere).
+func _mark_view(id: String, hour: float, dist: float, up: float) -> bool:
+	var w = main.world
+	var row: Array = []
+	for e in Atlas.world_of("surface").ents:
+		if str(e.id) == id or str(e.id).begins_with(id + ":"):
+			row.append(e)
+	if row.is_empty():
+		return false
+	var me: Dictionary = row[0]
+	var at: Vector2i = me.pos
+	for d in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]:
+		if w.tile_free(me.pos + d) and w.ent_at(me.pos + d) == null:
+			at = me.pos + d
+			break
+	_high_put(at, me.pos - at if at != me.pos else Vector2i(0, 1), hour)
+	await _wait(0.5)
+	var c := Vector3.ZERO
+	for e2 in row:
+		c += w.wpos(e2.pos)
+	c /= float(row.size())
+	c.y = w.ground_y(c)
+	var best := Vector2(-1, 1)
+	var bs := -1
+	for az in [Vector2(-1, 1), Vector2(1, 1), Vector2(1, -1), Vector2(-1, -1), Vector2(0, 1), Vector2(1, 0), Vector2(0, -1), Vector2(-1, 0)]:
+		# open ground all the way from the camera to the thing looked at
+		var sc := 0
+		for k in range(1, 9):
+			var q: Vector2i = me.pos + Vector2i(roundi(az.normalized().x * dist * 0.5 * k / 6.0), roundi(az.normalized().y * dist * 0.5 * k / 6.0))
+			# (a roof between the camera and the thing is no better than a wood)
+			if q.x >= 0 and q.y >= 0 and q.x < int(w.w) and q.y < int(w.h) and int(w.grid[q.y * int(w.w) + q.x]) in [MapGen.FLOOR, MapGen.PATH, MapGen.DECOR]:
+				sc += 1
+		if sc > bs:
+			bs = sc
+			best = az
+	var off := Vector3(best.normalized().x * dist, up, best.normalized().y * dist)
+	w.cam_override = Transform3D(Basis.IDENTITY, c + off).looking_at(c + Vector3(0, 0.8, 0), Vector3.UP)
+	await _wait(0.4)
+	return true
+
+## The Lost Horse (--horse, or --horse=a,b): the people ("people"), the foes, the dooms and the lords
+## ("foes"), what stands as a row of models ("marks"), the same ground under each answer in the land
+## ("world"), the battles that cannot be won ("battle"), the choice and the scene after ("choice"),
+## and the pages ("page").
+func _horse_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_horse_state()
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("people"):
+		await _gallery("part24_people", [Assets.person("sai_weng"), Assets.person("weng_son"), Assets.person("qian_liu")], 0.76, 0.2)
+	if want.call("roads"):
+		# the high road (roads.gd): the wagon on it between Cloudfoot and Longmen, and the map of the land
+		main.world.load_area("sect", Vector2i(20, 9))
+		var rl: Dictionary = Roads.of("surface").lines[0]
+		var rk: int = (rl.pts as Array).size() / 2
+		for k in range(8, (rl.pts as Array).size() - 8):
+			# (a straight stretch, to stand the wagon along)
+			if rl.pts[k + 4] - rl.pts[k - 4] == (rl.pts[k + 1] - rl.pts[k]) * 8:
+				rk = k
+				break
+		Game.rides["wagon"] = true
+		Game.ride = "wagon"
+		Game.riding = true
+		Game.companion = true
+		for sa in Data.AREAS:
+			Game.seen[sa] = true
+		main.world.teleport(rl.pts[rk])
+		main.world.facing = rl.pts[rk + 1] - rl.pts[rk]
+		await _wait(2.0)
+		var rpp: Vector3 = main.world.player.global_position
+		var rdir := Vector3(main.world.facing.x, 0, main.world.facing.y)
+		main.world.cam_override = Transform3D(Basis.IDENTITY, rpp - rdir * 9.0 + Vector3(rdir.z, 0, -rdir.x) * 4.5 + Vector3(0, 5.5, 0)).looking_at(rpp + rdir * 6.0 + Vector3(0, 0.8, 0), Vector3.UP)
+		await _wait(0.6)
+		await _shot("road_wagon")
+		main.world.cam_override = null
+		Game.riding = false
+		main.open_menu()
+		main.menu.mode = "map"
+		main.menu._build()
+		await _wait(0.5)
+		await _shot("road_map")
+		main.pop()
+	if want.call("sea"):
+		# the sea lanes (ships.gd): the junk at her mooring off Longmen, and the counter of the harbour
+		main.world.load_area("longmen", Vector2i(28, 30))
+		for sa2 in ["longmen", "yanggu", "penglai"]:
+			Game.seen[sa2] = true
+		var mo2 := Ships.mooring(Atlas.world_of("surface"), "longmen")
+		print("[tour] mooring ", mo2, " quay ", Ships.quay("longmen"))
+		main.world.teleport(Ships.quay("longmen"))
+		await _wait(2.5)
+		if mo2.x >= 0:
+			var jp2: Vector3 = main.world.wpos(mo2)
+			main.world.cam_override = Transform3D(Basis.IDENTITY, jp2 + Vector3(7.0, 17.0, 13.0)).looking_at(jp2 + Vector3(0, 3.0, 0), Vector3.UP)
+			await _wait(0.8)
+			await _shot("sea_junk")
+			main.world.cam_override = null
+		main.offer_carriage({"id": "harbour_longmen", "n": str(Offices.OFFICES.harbour_longmen.n), "office": "harbour_longmen"})
+		await _wait(0.5)
+		main.choice.cursor = 1 if "cursor" in main.choice else 0
+		await _shot("sea_counter")
+		main.pop()
+	if want.call("fame"):
+		# fame (fame.gd): the street behind somebody known everywhere, outside the Green Stone Inn of Qingshi
+		Game.level = Data.MAX_LEVEL
+		Game.riding = false
+		for fb in Atlas.world_of("surface").buildings:
+			if str(fb.area) == "village" and str(fb.id) == "inn":
+				var fr: Rect2i = fb.rect
+				var fd9: Vector2i = fb.door
+				var fov := Vector2(fd9) - Vector2(fr.get_center())
+				var fod := Vector2i(signi(int(fov.x)), 0) if absf(fov.x) / fr.size.x > absf(fov.y) / fr.size.y else Vector2i(0, signi(int(fov.y)))
+				main.world.teleport(fd9 + fod * 4)
+				main.world.facing = fod
+				await _wait(2.0)
+				# (the way he came: up the street to where he stands, so that they come up it behind him)
+				var fpp: Vector3 = main.world.player.position
+				var trail9: Array = []
+				for k4 in 24:
+					trail9.append(fpp - Vector3(fod.x, 0, fod.y) * (23 - k4) * 0.0 + Vector3(-fod.y, 0, fod.x) * (23 - k4) * 0.75)
+				main.world.fan_trail = trail9
+				await _wait(9.0)
+				print("[tour] fans ", main.world.fans.size())
+				await _shot("fame_street")
+				break
+	if want.call("windows"):
+		# open windows (architecture.gd _wall): the Green Stone Inn of Qingshi from the street, the room seen through them
+		var wsw: Dictionary = Atlas.world_of("surface")
+		for wb in wsw.buildings:
+			if str(wb.area) == "village" and str(wb.id) == "inn":
+				var wr: Rect2i = wb.rect
+				var wd9: Vector2i = wb.door
+				var wc := Vector2(wr.get_center())
+				var outv := (Vector2(wd9) - wc)
+				var outd := Vector2i(signi(int(outv.x)), 0) if absf(outv.x) / wr.size.x > absf(outv.y) / wr.size.y else Vector2i(0, signi(int(outv.y)))
+				main.world.teleport(wd9 + outd * 3)
+				main.world.facing = -outd
+				await _wait(2.5)
+				var wp: Vector3 = main.world.wpos(wd9)
+				var o3 := Vector3(outd.x, 0, outd.y)
+				var side3 := Vector3(-outd.y, 0, outd.x)
+				main.world.cam_override = Transform3D(Basis.IDENTITY, wp + o3 * 9.0 + side3 * 5.0 + Vector3(0, 2.6, 0)).looking_at(wp - o3 * 2.0 + side3 * 2.0 + Vector3(0, 2.0, 0), Vector3.UP)
+				await _wait(0.8)
+				await _shot("windows_inn")
+				main.world.cam_override = null
+				break
+	if want.call("beasts"):
+		# beasts with hides instead of paint (assets.gd NATURAL)
+		var bs: Array = []
+		for fid in ["bamboo_wolf", "thunder_ape", "wrack_crab", "mired_ox", "silt_ape"]:
+			if Data.ENEMIES.has(fid):
+				bs.append(_foe(fid))
+		await _gallery("beasts_natural", bs, 1.5, 0.5)
+	if want.call("shapes"):
+		# one foe of every shape, three to a picture, close enough to look at
+		var seen_shape := {}
+		var row: Array = []
+		var k9 := 0
+		for fid in Data.ENEMIES:
+			var sh := str(Data.ENEMIES[fid].shape)
+			if seen_shape.has(sh):
+				continue
+			seen_shape[sh] = true
+			row.append(_foe(fid))
+			if row.size() == 3:
+				await _gallery("shapes_%02d" % k9, row, 1.7, 0.5)
+				row = []
+				k9 += 1
+		if not row.is_empty():
+			await _gallery("shapes_%02d" % k9, row, 1.7, 0.5)
+	if want.call("post"):
+		# the post (mail.gd): the counter of Headman Luo with letters waiting and a bag to carry, and a letter being read
+		main.world.load_area("sect", Vector2i(20, 9))
+		Game.picks["bandits"] = "mend"
+		Game.mail_read = {"ge_satchel": true}
+		var luo := {"id": "head_qingshi", "n": str(Offices.OFFICES.head_qingshi.n), "office": "head_qingshi"}
+		main.offer_carriage(luo)
+		await _wait(0.5)
+		await _shot("post_counter")
+		main.pop()
+		main.read_letter("bandits_mend")
+		await _wait(0.8)
+		await _shot("post_letter")
+		main.pop()
+		main.write_back("wen_first")
+		await _wait(0.5)
+		await _shot("post_reply")
+		main.pop()
+		Game.mail_read = {}
+	if want.call("carriages"):
+		var oxm := Assets.mount("ox", Assets.palette(Color("b4a290"), "", {"sec": Color("a83c30"), "acc": Color("3a2416"), "mark": Color("6a5a4c")}))
+		oxm.rotation.y = PI / 2.0
+		oxm.set_meta("kind", "ride_group")
+		await _gallery("ox", [oxm], 1.5, 0.9)
+		# the three carriages, every seat taken: the hero, Yue Ling, and whoever is being carried
+		for rid in ["ox_cart", "wagon", "carriage"]:
+			var r: Dictionary = Fashion.RIDES[rid]
+			var holder := Node3D.new()
+			var rn := Models.ride(rid)
+			holder.add_child(rn)
+			Models.anim_ride(rn, 0.3, false)
+			var bodies := ["", "yue_ling", "folk_scholar", "folk_maiden", "folk_youth", "folk_scholar"]
+			for i in (r.seats as Array).size():
+				var pm: Node3D = Models.person(Color("3a6ac8"), Color("202030"), {"asset": "lin_feng"}) if i == 0 else Models.person(Color("888888"), Color("222222"), {"asset": bodies[i]})
+				pm.position = Vector3(r.seats[i]) - Vector3(0, 0.46, 0)
+				holder.add_child(pm)
+				Assets.lend_clips(pm)
+				for k in 8:
+					Assets.animate(pm, k * 0.2, "sit_bench", 0.0)
+				var pap: AnimationPlayer = pm.get_meta("ap", null)
+				if pap != null and pap.has_animation("sit_bench"):
+					pm.set_meta("pose_ap", pap)
+			holder.rotation.y = PI / 2.0
+			holder.set_meta("kind", "ride_group")
+			_seat_all.call_deferred(holder)
+			await _gallery("carriage_" + rid, [holder], 4.4, 0.9)
+		# and on the road: the wagon with every seat taken, below the sect's north gate
+		main.world.load_area("sect", Vector2i(20, 9))
+		Game.rides["wagon"] = true
+		Game.ride = "wagon"
+		Game.riding = true
+		Game.companion = true
+		Game.passengers = [{"id": "a", "n": "Lodger Wu", "asset": "folk_merchant", "to": "dunes", "pay": 300}, {"id": "b", "n": "Lodger Hu", "asset": "folk_shopwife", "to": "dunes", "pay": 300},
+			{"id": "c", "n": "Lodger Ma", "asset": "folk_youth", "to": "tushan", "pay": 300}, {"id": "d", "n": "Lodger An", "asset": "folk_porter", "to": "tushan", "pay": 300}]
+		main.world.teleport(Atlas.to_world("mountain", Vector2i(82, 48)))
+		main.world.facing = Vector2i(1, 0)
+		await _wait(1.5)
+		await _shot("carriage_road")
+		Game.passengers = []
+		Game.riding = false
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["slipped_halter", "burr_sprite", "hoof_echo", "wrack_crab", "salt_gull", "drift_log", "silt_ape", "weir_eel", "mired_ox", "outrider", "remount", "camp_hound"]:
+			fs.append(_foe(fid))
+		await _gallery("part24_foes", fs, 1.0, 0.25)
+		await _gallery("part24_dooms", [_foe("spring_colt"), _foe("tide_horse"), _foe("tide_mare"), _foe("wuzhiqi", true), _foe("the_riders", true)], 2.0, 0.25)
+		await _gallery("part24_lords", [_foe("hu_steed", true), _foe("huofu", true)], 2.2, 0.25)
+	if want.call("marks"):
+		# what stands, as the game builds it: each crossroads' answers side by side
+		var rows := [["marks_part1", [["bandits", "mend"], ["bandits", "drive"], ["palace", "seal"], ["palace", "open"], ["widow", "truth"], ["widow", "kind"]]],
+			["marks_makers", [["drawings", "keep"], ["the_wheel", "hours"], ["the_wheel", "down"], ["furnace", "return"], ["the_player", "keep"], ["the_lute", "melt"], ["the_host", "band"]]],
+			["marks_tide", [["the_tide", "wall"], ["the_tide", "yield"], ["the_tide", "arrows"]]],
+			["marks_ape", [["the_ape", "chain"], ["the_ape", "dredge"], ["the_ape", "boats"]]],
+			["marks_horse", [["the_horse", "keep"], ["the_horse", "loose"], ["the_horse", "breed"]]]]
+		for rw in rows:
+			var ms: Array = []
+			for pr in rw[1]:
+				ms.append(Marks.model(Marks.MARKS[pr[0]][pr[1]], 0))
+			await _gallery(str(rw[0]), ms, 1.5, 0.3)
+		var sg: Array = []
+		for sc in Echoes.SCALE_ORDER:
+			for l in [1, -1]:
+				var sm := Marks.model(Marks.SIGNS[sc][l], 0)
+				Machines.animate(sm, 1.3)
+				sg.append(sm)
+		await _gallery("marks_signs", sg, 1.5, 0.3)
+	if want.call("world"):
+		# the same ground under each answer: the shore at Yanggu, the Drowned Fields, the frontier, and
+		# two of the oldest crossroads
+		w.open_world()
+		w.enter_layer("surface")
+		# (--horse-world=a,b: only those crossroads)
+		var wonly: PackedStringArray = str(main.args.get("horse-world", "")).split(",", false)
+		for sh in [["the_tide", "yanggu", ["wall", "yield", "arrows"], [17.0, 11.0], 10.0], ["the_ape", "drowned", ["chain", "dredge", "boats"], [15.0, 10.0], 15.0],
+				["the_horse", "aurora", ["keep", "loose", "breed"], [8.0, 4.5], 17.0], ["bandits", "bamboo", ["mend", "drive"], [13.0, 8.0], 9.0],
+				["palace", "palace", ["seal", "open"], [8.0, 4.5], 19.0], ["the_clay", "millet", ["stand", "kiln"], [12.0, 7.0], 16.0]]:
+			if not wonly.is_empty() and not wonly.has(str(sh[0])):
+				continue
+			var frames: Array = []
+			for oid in sh[2]:
+				Game.picks = {str(sh[0]): str(oid)}
+				if not await _mark_view("mark:%s:%s" % [str(sh[0]), str(sh[1])], float(sh[4]), float(sh[3][0]), float(sh[3][1])):
+					continue
+				await _shot("mark_%s_%s" % [str(sh[0]).trim_prefix("the_"), str(oid)])
+				frames.append(last_img)
+				w.cam_override = null
+			_sheet("mark_%s_answers" % str(sh[0]).trim_prefix("the_"), frames, 0.62 if frames.size() == 2 else 0.48)
+		# and what the scales stand in a region: mercy and rigour on the same spot, the new works and the old ways
+		for sv in [["heart", 6, "sign_mercy"], ["heart", -6, "sign_rigour"], ["craft", 6, "sign_new_works"], ["craft", -6, "sign_old_ways"], ["reach", 6, "sign_wide_world"], ["reach", -6, "sign_home_fire"]]:
+			Game.picks = {}
+			Game.scales = {str(sv[0]): int(sv[1])}
+			if not wonly.is_empty() and not wonly.has("signs"):
+				continue
+			if await _mark_view("sign:bamboo:%s" % str(sv[0]), 10.0, 7.0, 3.6):
+				await _shot(str(sv[2]))
+				w.cam_override = null
+		Game.scales = {}
+		# somebody who is only there for one answer
+		Game.picks = {"bandits": "mend"}
+		if (wonly.is_empty() or wonly.has("who")) and await _mark_view("who:bandits:mend", 9.5, 5.5, 2.8):
+			await _shot("mark_who_road_mender")
+			w.cam_override = null
+		Game.picks = {}
+	if want.call("houses"):
+		# houses that are not boxes: the ones with wings built out from them, and the tall ones, in three towns
+		w.open_world()
+		w.enter_layer("surface")
+		for hv in [["village", 4], ["mountain", 3], ["longmen", 3], ["yanggu", 3], ["tushan", 2]]:
+			var shown := 0
+			for bd in Atlas.world_of("surface").buildings:
+				if str(bd.area) != str(hv[0]) or shown >= int(hv[1]) or (bd.get("wings", []) as Array).is_empty():
+					continue
+				var rr: Rect2i = bd.rect
+				var door: Vector2i = bd.door
+				var outv := Vector2i(-1 if door.x == rr.position.x else (1 if door.x == rr.end.x - 1 else 0), -1 if door.y == rr.position.y else (1 if door.y == rr.end.y - 1 else 0))
+				_high_put(door + outv * 2, -outv, 10.0)
+				await _wait(0.5)
+				var c: Vector3 = w.wpos(rr.position + rr.size / 2)
+				c.y = w.ground_y(w.wpos(door + outv * 2))
+				var wsd: Vector2i = [Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(0, 1)][int(bd.wings[0].side)]
+				var dirv := (Vector3(outv.x, 0, outv.y) * 0.8 + Vector3(wsd.x, 0, wsd.y)).normalized()
+				w.cam_override = Transform3D(Basis.IDENTITY, c + dirv * 9.0 + Vector3(0, 40.0, 0)).looking_at(c + Vector3(0, 2.0, 0), Vector3.UP)
+				await _wait(0.4)
+				await _shot("house_%s_%s" % [str(hv[0]), str(bd.id)])
+				w.cam_override = null
+				shown += 1
+	if want.call("battle"):
+		main.set_stack(["world"])
+		Game.level = 85
+		main.battle.start([{"id": "tide_horse", "lv": 85}, {"id": "tide_mare", "lv": 85}, {"id": "spring_colt", "lv": 85}], {"entity": {"id": "tour:tide", "group": []}, "boss": false, "theme": "yanggu"})
+		main.push("battle")
+		await _wait(3.4)
+		await _shot("battle_doom_tide")
+		main.battle.round_no = 3
+		main.battle.acts = {"blows": 6, "mends": 1}
+		main.battle._fall(false)
+		await _wait(1.0)
+		await _shot("battle_doom_overwhelmed")
+		main.pop()
+		Game.level = 86
+		main.battle.start([{"id": "wuzhiqi", "lv": 86}], {"entity": {"id": "boss_wuzhiqi"}, "boss": true, "enemy": "wuzhiqi", "theme": "drowned"})
+		main.push("battle")
+		await _wait(3.6)
+		await _shot("battle_boss_wuzhiqi")
+		main.pop()
+		main.battle.start([{"id": "the_riders", "lv": 87}], {"entity": {"id": "boss_the_riders"}, "boss": true, "enemy": "the_riders", "theme": "aurora"})
+		main.push("battle")
+		await _wait(3.6)
+		await _shot("battle_boss_the_riders")
+		main.pop()
+		for bid in ["hu_steed", "huofu"]:
+			var bm: Array = Trials.TRIALS[bid].might
+			main.battle.start([{"id": bid, "lv": 86, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": "aurora" if bid == "hu_steed" else "yanggu",
+				"trial": bid, "path": "loss", "boon": Trials.path(bid, "loss").boon, "path_n": str(Trials.path(bid, "loss").n), "path_kind": str(Trials.KINDS.loss.n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		main.say(Data.DIALOGUE["fall:wuzhiqi"] + Data.DIALOGUE["fall:wuzhiqi:gave"])
+		main.dialogue.shown = 999.0
+		await _wait(1.2)
+		await _shot("fall_wuzhiqi")
+		main.set_stack(["world"])
+		for cc in [["the_tide", "s_p24_wrack", 1, "crossroads_tide"], ["the_ape", "s_p24_lost", 1, "crossroads_ape"], ["the_horse", "s_p24_end", 0, "crossroads_horse"]]:
+			Game.step = Data.step_index(str(cc[1]))
+			Game.picks = {}
+			Game.cross_pending = [str(cc[0])]
+			main.ask_crossroads()
+			main.choice.cursor = int(cc[2])
+			await _wait(1.0)
+			await _shot(str(cc[3]))
+			main.pop()
+			Game.cross_pending = []
+	if want.call("page"):
+		Game.step = Data.step_index("s_p24_twin")
+		Game.trials = {}
+		Game.fallen = 5
+		Game.marks_seen = {"a": true, "b": true, "c": true, "d": true}
+		main.set_stack(["world"])
+		main.open_trial({"enemy": "huofu", "lv": 87, "req": 86, "id": "boss_huofu", "pos": Vector2i.ZERO})
+		await _wait(0.8)
+		await _shot("trial_by_the_loss")
+		main.pop()
+	get_tree().quit(0)

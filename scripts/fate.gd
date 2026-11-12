@@ -209,6 +209,9 @@ static func gain(g, o: Dictionary) -> void:
 	for k in gv.get("items", {}):
 		g.add_item(str(k), int(gv.items[k]))
 		g.toast("Obtained %d %s" % [int(gv.items[k]), Data.ITEMS[k].n])
+	# (the Lost Horse release: a hearth of the land that will remember what was said for it)
+	for hk in gv.get("hearth", {}):
+		g.add_hearth(str(hk), int(gv.hearth[hk]))
 
 ## Take option `o` in thread `thread`: its state, a line on the Fates page, what it gives.
 static func take(g, thread: String, o: Dictionary) -> void:

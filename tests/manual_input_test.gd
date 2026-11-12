@@ -20,6 +20,8 @@ var wait_from := 0
 var cave := {}
 ## the field battle and the pages at the very end
 var pots := {}
+## and after them (the Lost Horse release): two battles that cannot be won, fought with the keys
+var doom := {}
 
 func key(code: int, down: bool) -> void:
 	var e := InputEventKey.new()
@@ -260,11 +262,67 @@ func pots_step() -> void:
 		tap(KEY_ESCAPE)
 	elif pots.has("done") and frame == int(pots.done) + 80:
 		expect(main.top_name() == "world" and Music.asked() == "", "and leaving the menu lets the land's own tune come back")
+		# and last (the Lost Horse release): a pack of the tide, which cannot be beaten, fought with the keys
+		doom = {"stage": 0, "clock": Time.get_ticks_msec(), "deaths": int(g.deaths), "stones": int(g.stones), "area": str(g.area), "tile": main.world.ptile}
+		pots = {}
+		_doom_battle()
+
+func _doom_battle() -> void:
+	var g = root.get_node("Game")
+	main.start_encounter({"kind": "enemy", "id": "test:tide%d" % int(doom.stage), "area": str(g.area), "pos": Vector2i.ZERO,
+		"group": [{"id": "tide_horse", "lv": int(g.level)}, {"id": "spring_colt", "lv": int(g.level)}]})
+
+## The Lost Horse release (dooms.gd): the tide is fought to the end with Enter, and lost, and nothing is
+## taken for it; then met again and given way to (Up from Attack wraps to the last line of the menu).
+func doom_step() -> void:
+	var g = root.get_node("Game")
+	if frame % 6 != 0:
+		return
+	var b = main.battle
+	if Time.get_ticks_msec() > int(doom.clock) + 240000:
+		expect(false, "a battle that cannot be won comes to an end")
 		print("failures: ", fails)
-		quit(1 if fails > 0 else 0)
+		quit(1)
+		return
+	if main.top_name() == "battle" and str(b.state) == "menu":
+		if not doom.has("seen%d" % int(doom.stage)):
+			doom["seen%d" % int(doom.stage)] = true
+			expect(bool(b.doomed) and b.ids.has("yield") and b.labels[b.ids.find("yield")] == "Give way" and bool(b.enabled[b.ids.find("flee")]), "what cannot be beaten: the menu has a fifth line, Give way")
+		if int(doom.stage) == 1 and str(b.menu_kind) == "main" and not doom.has("up"):
+			doom["up"] = true
+			tap(KEY_UP)
+		elif int(doom.stage) == 1 and str(b.menu_kind) == "main":
+			expect(str(b.ids[b.cursor]) == "yield", "Up from Attack is Give way")
+			tap(KEY_ENTER)
+		else:
+			# (Attack, and Enter again on whoever is first in the list)
+			tap(KEY_ENTER)
+	elif main.top_name() == "battle" and str(b.state) == "result":
+		if not doom.has("out%d" % int(doom.stage)):
+			doom["out%d" % int(doom.stage)] = str(b.outcome)
+			doom["how%d" % int(doom.stage)] = str(b.ctx.get("how", ""))
+			doom["rounds%d" % int(doom.stage)] = int(b.round_no)
+			doom["floor%d" % int(doom.stage)] = b.foes.all(func(f): return float(f.hp) >= float(f.maxhp) * Dooms.FLOOR - 0.01 and not bool(f.dead))
+		tap(KEY_ENTER)
+	elif main.top_name() == "dialogue":
+		tap(KEY_ENTER)
+	elif main.top_name() == "world" and doom.has("out%d" % int(doom.stage)):
+		if int(doom.stage) == 0:
+			expect(str(doom.out0) == "fall" and str(doom.how0) in ["struck", "kept"] and int(doom.rounds0) <= Dooms.rounds("tide_horse") + 1 and bool(doom.floor0), "the tide is fought with the keys and lost in %d rounds: nothing in it could be killed" % int(doom.rounds0))
+			expect(int(g.deaths) == int(doom.deaths) and int(g.stones) == int(doom.stones) and str(g.area) == str(doom.area) and main.world.ptile == doom.tile and int(g.fallen) == 1 and g.falls.has("tide_horse") and g.hp[0] >= 1.0,
+				"and it is not a defeat: no fall counted, no stones to the healers, nobody carried home; he is where he stood")
+			doom.stage = 1
+			_doom_battle()
+		else:
+			expect(str(doom.out1) == "fall" and str(doom.how1) == "gave" and int(doom.rounds1) == 1 and int(g.fallen) == 2 and int(g.yielded) == 1 and int(g.deaths) == int(doom.deaths), "met again, it is given way to at once, standing")
+			print("failures: ", fails)
+			quit(1 if fails > 0 else 0)
 
 func _process(_d: float) -> bool:
 	frame += 1
+	if not doom.is_empty():
+		doom_step()
+		return false
 	if not pots.is_empty():
 		pots_step()
 		return false

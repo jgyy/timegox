@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 31.0 * 3600.0
+var max_time := 33.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -102,6 +102,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# with lead in it, eight hundred who will all go home to the king who could not face their fathers, and a potter's
 	# hands to the first pot
 	"meng_tian": "host", "gao_jianli": "song", "xiang_yu": "host", "wafu": "works",
+	# Part XXIV: the old mare's four cast shoes to the horse that followed her, and three losses in the red
+	# column to the keeper of the book
+	"hu_steed": "relic", "huofu": "loss",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -137,7 +140,10 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_voices": ["fire"], "the_kites": ["ask"], "the_tops": ["cairn"],
 	# Part XXIII: the clay soldiers carried home by the names in their collars, the lead melted out of the lute, and
 	# the song kept when the spears go home
-	"the_clay": ["home"], "the_lute": ["melt"], "the_host": ["band"]}
+	"the_clay": ["home"], "the_lute": ["melt"], "the_host": ["band"],
+	# Part XXIV: a sea-wall of ten thousand baskets, nine channels for the Huai and the ape let go to the sea,
+	# and the black horse kept by the tent
+	"the_tide": ["wall"], "the_ape": ["dredge"], "the_horse": ["keep"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -175,6 +181,7 @@ const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feas
 ## the end of the story the bot chooses (cultures.gd ENDINGS), rarest first, of those its journey earned
 const ENDING_PLAN := ["school", "open", "road", "lotus", "home", "azure"]
 var route := "peoples"
+var give_way := false
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
 var tt_cache := {}
 var tt_frame := -1
@@ -192,19 +199,68 @@ func _ready() -> void:
 		max_time = float(main.args["max-time"])
 	if main.args.has("route"):
 		route = str(main.args.route)
+	# (dooms.gd: with --yield the bot gives way to what cannot be beaten instead of fighting it to the end)
+	give_way = main.args.has("yield")
 
 ## Developer shortcut: --bot-start=<step id> drops a fresh game straight at that quest step with
 ## the level, companion, techniques and boss kills a player would have by then (the reported play
 ## time then covers only the rest of the game).  Used to iterate on late chapters quickly.
 var start_applied := false
+var stones_mark := 0
+
+## Developer shortcuts for a stall late in a long run: `--bot-keep=<dir>` writes the whole of the
+## journey (every variable of Game, and where he stands) to <dir>/<step id>.sav each time a step is
+## done, keeping the last few; `--bot-load=<file>` begins from one.  A run begun from a file reports
+## only the play time since, like --bot-start.
+func _keep(step_id: String) -> void:
+	if not main.args.has("bot-keep") or world.is_floor():
+		return
+	var dir := str(main.args["bot-keep"])
+	DirAccess.make_dir_recursive_absolute(dir)
+	var d := {}
+	for p in Game.get_property_list():
+		if int(p.usage) & PROPERTY_USAGE_SCRIPT_VARIABLE and not int(p.type) in [TYPE_OBJECT, TYPE_CALLABLE, TYPE_SIGNAL, TYPE_RID]:
+			d[str(p.name)] = Game.get(str(p.name))
+	d["__layer"] = str(world.layer)
+	d["__tile"] = world.ptile
+	var f := FileAccess.open("%s/%04d_%s.sav" % [dir, Game.step, step_id], FileAccess.WRITE)
+	if f != null:
+		f.store_string(var_to_str(d))
+		f.close()
+	kept.append("%s/%04d_%s.sav" % [dir, Game.step, step_id])
+	while kept.size() > 12:
+		DirAccess.remove_absolute(str(kept.pop_front()))
+var kept: Array = []
+
+func _load_kept(path: String) -> void:
+	var d = str_to_var(FileAccess.get_file_as_string(path))
+	if typeof(d) != TYPE_DICTIONARY:
+		return
+	for k in d:
+		if not str(k).begins_with("__"):
+			Game.set(str(k), d[k])
+	if str(d.get("__layer", "surface")) == str(world.layer):
+		world.teleport(d.get("__tile", world.ptile))
+	Game.note("bot-load: %s (step %d, %d spirit stones)" % [path.get_file(), Game.step, Game.stones])
 
 func _apply_start() -> void:
 	start_applied = true
+	if main.args.has("bot-load"):
+		_load_kept(str(main.args["bot-load"]))
+		return
 	if not main.args.has("bot-start"):
 		return
 	var idx := Data.step_index(str(main.args["bot-start"]))
 	if idx < 0:
 		return
+	# (the crossroads behind the start are answered as the plan answers them: what a journey that far
+	# along has left standing in the land stands, marks.gd)
+	for cid in Echoes.ORDER:
+		if Data.step_index(str(Echoes.CROSSROADS[cid].step)) < idx and not Game.picks.has(cid):
+			for oid in CROSS_PLAN.get(cid, []):
+				if Echoes.option_ok(Game, Echoes.option(cid, str(oid))):
+					Echoes.take(Game, cid, str(oid))
+					break
 	var lv := 0
 	for i in idx:
 		var st: Dictionary = Data.STEPS[i]
@@ -223,11 +279,19 @@ func _apply_start() -> void:
 	Game.exp = 0.0
 	Game.companion = true
 	Game.step = idx
+	# (and he has walked into every region the story has sent him to so far: the camps of the road and
+	# the cloud-kite ask where he has been)
+	for i3 in idx:
+		if Data.STEPS[i3].has("area") and Data.AREAS.has(str(Data.STEPS[i3].area)):
+			Game.seen[str(Data.STEPS[i3].area)] = true
 	# about what a player would have saved by then (quest rewards and half as much again from battles)
 	var saved := 0
 	for i2 in idx:
 		saved += int(Data.STEPS[i2].get("stones", 0))
 	Game.stones = maxi(20000, int(saved * 1.5))
+	# (--bot-stones=N: start with that purse, to try a chapter short of money)
+	if main.args.has("bot-stones"):
+		Game.stones = int(main.args["bot-stones"])
 	Game.inv["hp_pill"] = 6
 	Game.inv["qi_pill"] = 4
 	# (and the essences, renown, standing and Dao mastery a player would have gathered by then)
@@ -323,11 +387,22 @@ func _process(d: float) -> void:
 		if Game.step != last_step:
 			last_step = Game.step
 			last_progress = Game.playtime
+			_keep(str(Game.cur_step().get("id", "end")))
+		# (a purse that is growing towards what a trial's recipe asks is progress too: the forge's prices late
+		# in the story are more than three quarters of an hour of fighting pays, and a bot that was
+		# nine-tenths of the way to the Cloud Ladder's was called stuck.  The whole run is still bounded.)
+		if Game.stones >= stones_mark + 4000:
+			stones_mark = Game.stones
+			if not _trial_target().is_empty():
+				last_progress = Game.playtime
+		elif Game.stones < stones_mark - 4000:
+			stones_mark = Game.stones
 		if Game.playtime > max_time:
 			_finish("timeout: exceeded max game time")
 			return
 		if Game.playtime - last_progress > 2700.0:
-			_finish("stuck: no quest progress for 45 game-minutes at step %d (%s)" % [Game.step, Game.cur_step().get("id", "?")])
+			_finish("stuck: no quest progress for 45 game-minutes at step %d (%s): level %d, %d spirit stones, in %s on %s, going to %s, trial %s, deaths %d" % [Game.step, Game.cur_step().get("id", "?"),
+				Game.level, Game.stones, Game.area, top, path_key, str(_trial_target()), Game.deaths])
 			return
 	if Game.area != last_area:
 		last_area = Game.area
@@ -352,7 +427,7 @@ func _process(d: float) -> void:
 	if cool > 0.0:
 		return
 	if main.args.has("bot-trace") and Game.playtime >= float(main.args["bot-trace"]):
-		print("[trace] %.2f top=%s area=%s step=%s tile=%s path=%d goal=%s trial=%s" % [Game.playtime, top, Game.area, Game.cur_step().get("id", "-"), world.ptile, path.size(), path_key, str(_trial_target())])
+		print("[trace] %.2f stones=%d lv=%d top=%s area=%s step=%s tile=%s path=%d goal=%s trial=%s" % [Game.playtime, Game.stones, Game.level, top, Game.area, Game.cur_step().get("id", "-"), world.ptile, path.size(), path_key, str(_trial_target())])
 	_shots(top, d)
 	match top:
 		"title":
@@ -453,7 +528,9 @@ func _cult_target() -> Dictionary:
 	match s.kind:
 		"level":
 			return {"lv": s.lv, "full": false}
-		"kill":
+		"reckon":
+			return {"lv": 86, "full": false}
+		"kill", "fall":
 			for b in Data.AREAS[s.area].get("bosses", []):
 				if b.id == s.boss:
 					tg = {"lv": b.req, "full": false}
@@ -619,12 +696,14 @@ func _world(d: float) -> void:
 				# Part XX: the things to find are down in the region's cave (caves.gd): the nearest of them,
 				# by way of the cave mouth
 				_fetch(str(s.item))
-			elif Game.area != s.area or world.layer != Data.layer_of(s.area):
+			elif world.layer != Data.layer_of(s.area):
 				# (upstairs or in a cellar of the region: the things to find are out in it, Part XI)
 				_travel(s.area)
-			else:
-				_goto_nearest("pickup", s.item)
-		"hunt":
+			elif not _goto_nearest("pickup", s.item, str(s.area)):
+				_travel(s.area)
+		"hunt", "falls":
+			# (Part XXIV, "falls": the packs that cannot be beaten, dooms.gd, are walked up to like any
+			# others, fought as the bot fights anything, and lost to)
 			if s.has("cave") and world.layer != Caves.fid(str(s.area), int(s.cave)):
 				# Part XX: a hunt in a cave: down by the cave mouth (and the shaft, for the lower gallery)
 				if _hp_ratio() < 0.6 or _qi_ratio() < 0.3:
@@ -651,13 +730,28 @@ func _world(d: float) -> void:
 					_walk_to(e.pos, "enemy:" + e.id)
 				else:
 					_start_meditate("respawn")
-		"kill":
+		"kill", "fall":
+			# (Part XXIV, "fall": a lord that cannot be beaten, dooms.gd: gone to rested all the same)
 			if not _cult_met():
 				_grind()
 			elif _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
 				_start_meditate("rest")
 			else:
 				_goto_entity(s.area, "boss_" + s.boss)
+		"marks":
+			# Part XXIV: the nearest thing a choice left standing that has not been looked at (marks.gd)
+			_marks_step()
+		"reckon":
+			# the reckoning (reckon.gd): whoever the journey's choices made, one after another, each gone to rested
+			var rl: Array = Reckon.left(Game)
+			if rl.is_empty():
+				return
+			if not _cult_met():
+				_grind()
+			elif _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity("mountain", "boss_" + str(rl[0]))
 		"breakthrough":
 			if not _cult_met():
 				_grind()
@@ -873,7 +967,7 @@ func _grind() -> void:
 ## Whether region `area` has a pack that will stand and fight Lin Feng now.
 func _fights_in(area: String) -> bool:
 	for e in Atlas.world_of(Data.layer_of(area)).ents:
-		if e.kind != "enemy" or str(e.get("area", "")) != area or not world.ent_visible(e) or Game.scatters(e.group):
+		if e.kind != "enemy" or str(e.get("area", "")) != area or not world.ent_visible(e) or Game.scatters(e.group) or Dooms.in_group(e.group):
 			continue
 		var mx := 0
 		for g in e.group:
@@ -904,6 +998,9 @@ func _nearest_enemy(area: String, fights: bool = false, of: Array = []):
 			mx = maxi(mx, g.lv)
 		if mx > Game.level + 2 or (fights and Game.scatters(e.group)) or (not of.is_empty() and not e.group.any(func(g): return of.has(g.id))):
 			continue
+		# (dooms.gd: nobody goes looking for what cannot be beaten unless the step asks for it)
+		if of.is_empty() and Dooms.in_group(e.group):
+			continue
 		var ed := 9999
 		for dd in DIRS:
 			var n: Vector2i = e.pos + dd
@@ -933,23 +1030,36 @@ func _any_enemy(area: String, fights: bool = false, of: Array = []):
 			mx = maxi(mx, g.lv)
 		if mx > Game.level + 2 or (fights and Game.scatters(e.group)) or (not of.is_empty() and not e.group.any(func(g): return of.has(g.id))):
 			continue
+		if of.is_empty() and Dooms.in_group(e.group):
+			continue
 		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		# (the pack already being walked to is kept to while there is a way to it: the nearest in a
+		# straight line changes with every step round a wall, and a bot between two packs went to neither)
+		if path_key == "enemy:" + str(e.id) and not path.is_empty():
+			dd = -1
 		if dd < bd:
 			bd = dd
 			best = e
 	return best
 
-func _goto_nearest(kind: String, item: String) -> void:
+## Walk to the nearest thing of `kind` and `item` that can be seen (in region `area`, if one is named:
+## the road to it may cross a corner of another region, so it is the thing that is headed for and
+## not the region; the one already being walked to is kept to).  False if there is none.
+func _goto_nearest(kind: String, item: String, area: String = "") -> bool:
 	var best = null
 	var bd := 1 << 30
 	for e in world.ents:
-		if e.kind == kind and e.get("item", "") == item and world.ent_visible(e):
+		if e.kind == kind and e.get("item", "") == item and world.ent_visible(e) and (area == "" or str(e.get("area", area)) == area):
 			var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+			if path_key == "pickup:" + str(e.id):
+				dd = -1
 			if dd < bd:
 				bd = dd
 				best = e
-	if best != null:
-		_walk_to(best.pos, "pickup:" + best.id)
+	if best == null:
+		return false
+	_walk_to(best.pos, "pickup:" + best.id)
+	return true
 
 func _goto_entity(area: String, id: String) -> void:
 	var e = world.find_ent(id)
@@ -1420,6 +1530,13 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 					var r: Dictionary = Trials.RECIPES[id]
 					if not Game.reached(str(r.after)):
 						return false
+					# (the Lost Horse release: nor is a thing made that the purse is nowhere near: what the
+					# forge asks late in the story is more than a day of fighting pays, and a bot that had
+					# lost a seventh of its purse to the healers once waited at the Cloud Ladder for ever.
+					# It takes another road through the trial)
+					# (short by no more than a hundred beaten foes pay: that much it will go and earn)
+					if int(Game.inv.get(id, 0)) < int(n[2]) and Game.stones + Data.enemy_stones(Game.level, false) * 100 < Trials.recipe_stones(id, Game):
+						return false
 					for k in r.in:
 						# (a keepsake in a recipe can be picked up where one lies)
 						if not str(k).begins_with("ess_") and int(Game.inv.get(k, 0)) + _pickups_of(str(k)) < int(r.in[k]):
@@ -1458,6 +1575,11 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 			"summits":
 				# the High Roads release: a summit can be climbed whenever it likes (_summit_step)
 				pass
+			"falls", "marks":
+				# the Lost Horse release: what was lost to is what the story has put in the way by then; what
+				# stands can be gone and looked at whenever it likes (_marks_step does, when a step asks)
+				if str(n[0]) == "falls":
+					return false
 			"companies", "airs":
 				# the Thundering Pots release: the host and the airs are what the story has given by then
 				if not Trials.need_met(n, Game) and Game.done("s_p23_levy"):
@@ -1542,6 +1664,34 @@ func _delve_step() -> bool:
 		return false
 	_goto_entity(delve_id.get_slice(":", 1), delve_id)
 	return true
+
+## Part XXIV (marks.gd): walk up to the nearest thing a choice left standing in this realm that has not
+## been looked at yet (in a region the journey has been through before one it has not), and look at it.
+var mark_id := ""
+
+func _marks_step() -> void:
+	if mark_id != "":
+		var hit: Array = world.locate_ent(mark_id)
+		if Game.marks_seen.has(Marks.seen_key(mark_id)) or hit.is_empty() or not Marks.stands(Game, hit[1]):
+			mark_id = ""
+	if mark_id == "":
+		var bd := 1 << 30
+		for lid in ["surface", "heaven", "under", "sea"]:
+			var lw: Dictionary = Atlas.world_of(lid)
+			var here: Vector2i = world.ptile if world.layer == lid else Vector2i(-100000, 0)
+			for e in lw.ents:
+				if e.kind != "mark" or not Marks.stands(Game, e) or Game.marks_seen.has(Marks.seen_key(str(e.id))):
+					continue
+				var dd: int = (absi(e.pos.x - here.x) + absi(e.pos.y - here.y) if world.layer == lid else 200000) + (0 if Game.seen.has(str(e.area)) else 100000)
+				if dd < bd:
+					bd = dd
+					mark_id = str(e.id)
+	if mark_id == "":
+		# (nothing left standing that has not been looked at: a journey cannot get here that way, but a
+		# run that is lost should say so and stop)
+		_finish("nothing stands in the land that has not been looked at")
+		return
+	_goto_entity(mark_id.get_slice(":", 1) if mark_id.begins_with("sign:") else mark_id.get_slice(":", 2), mark_id)
 
 ## Part XXII (peaks.gd): climb to the very top of the peak step `s` names (the highest of a region), or
 ## of the nearest peak of this realm it has not stood on, as a player with the map open would: there is
@@ -1674,7 +1824,7 @@ func _farm(ek: String, tt: Dictionary) -> bool:
 	var bd := 1 << 30
 	if not world.is_floor():
 		for e in world.ents:
-			if e.kind != "enemy" or not world.ent_visible(e) or Game.scatters(e.group):
+			if e.kind != "enemy" or not world.ent_visible(e) or Game.scatters(e.group) or Dooms.in_group(e.group):
 				continue
 			var mx := 0
 			var has := false
@@ -1704,7 +1854,22 @@ func _earn(tt: Dictionary) -> void:
 	var e = null if world.is_floor() else _any_enemy(Game.area, true)
 	if e != null:
 		_walk_to(e.pos, "enemy:" + e.id)
-	elif Game.area != str(tt.area) or world.is_floor():
+		return
+	# (the Lost Horse release: nothing here will fight.  The trial's own region, if anything there will;
+	# else the latest region back along the story where something does.  The bot once came to the Cloud
+	# Ladder short of what the forge asked, a fall having cost it a seventh of its purse, and sat down on
+	# the mountain, whose beasts all scatter, to wait for packs that would never stand)
+	var where := str(tt.area)
+	if not _fights_in(where):
+		where = ""
+		for i in range(Game.step - 1, maxi(-1, Game.step - 16), -1):
+			var pa: String = str(Data.STEPS[i].get("area", ""))
+			if pa != "" and pa != "sect" and pa != Atlas.HUB and _fights_in(pa):
+				where = pa
+				break
+	if where != "" and (Game.area != where or world.is_floor()):
+		_travel(where)
+	elif Game.area != str(tt.area) and where == "":
 		_travel(str(tt.area))
 	else:
 		_start_meditate("respawn_any")
@@ -2238,6 +2403,8 @@ func _battle_menu(b) -> void:
 
 func _plan(b) -> Dictionary:
 	var me: Dictionary = b.cur
+	if b.doomed and give_way:
+		return {"top": "yield"}
 	var allies: Array = b.alive(b.party)
 	var foes: Array = b.alive(b.foes)
 	var low: Dictionary = allies[0]
@@ -2439,6 +2606,17 @@ func _finish(reason: String) -> void:
 	print("feats           : %d of %d (%d of %d points): %s; found unasked: %d of %d %s" % [Game.feats.size(), Feats.FEATS.size(), Feats.points(Game), Feats.total(), Feats.title(Game), Game.eggs.size(), Eggs.ORDER.size(),
 		JSON.stringify(Game.eggs.keys())])
 	print("the hero        : %s, a young %s, kin %s; guest of %d hearths %s" % [Game.hero_name(), "woman" if Game.fem() else "man", str(Cultures.HEARTHS[Cultures.own(Game)].short), Cultures.guests(Game), JSON.stringify(Game.hearth)])
+	# (the Lost Horse release: dooms.gd, marks.gd)
+	var how_n := {}
+	for fid in Game.falls:
+		how_n[str(Game.falls[fid].how)] = int(how_n.get(str(Game.falls[fid].how), 0)) + 1
+	print("what was lost   : %d battles that could not be won (%d given way to), %d of 3 dooms of the story stood in front of %s" % [Game.fallen, Game.yielded, int(Feats.value(Game, ["dooms", 3])), str(how_n)])
+	var stood := 0
+	for lid9 in ["surface", "heaven", "under", "sea"]:
+		stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
+	print("the reckoning   : %s" % (", ".join(Game.reckoned.keys().map(func(id): return str(Data.ENEMIES[id].n))) if not Game.reckoned.is_empty() else "nobody met"))
+	print("trades          : %d shifts at %d trades, %d spirit stones in wages%s" % [int(Offices.worked(Game)[0]), int(Offices.worked(Game)[1]), Game.wages, (": " + Offices.careers(Game)) if Offices.careers(Game) != "" else ""])
+	print("what stands     : %d things stand in the land for what was chosen and what the scales lean to (the answers of all the crossroads would stand %d between them), %d looked at" % [stood, int(Marks.totals()[1]), Game.marks_seen.size()])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)

@@ -193,6 +193,39 @@ var needs_fell := {}
 ## courtship (romance.gd): the stage, the gifts given, the hours had together, and the tone taken
 var romance := {}
 ## Old Du's mat (gamble.gd): the throws so far (every throw is drawn from this count), and how it has gone
+## the Lost Horse release: what the choices left standing that has been looked at (marks.gd); and the
+## things that could not be beaten (dooms.gd): how each was lost, how often, how often by giving way
+var marks_seen := {}
+## (offices.gd: shifts worked at the trades of the towns, and the day the last one was worked in each town)
+## (reckon.gd: the last lords of the story that were faced)
+var reckoned := {}
+## (carriages: who is being carried for a fare, offices.gd: {id, n, asset, to, pay}; and how many have been)
+var passengers: Array = []
+var fares := 0
+## (the post, mail.gd: letters opened, answers written, bags carried {from, to, pay, day}, the day a
+## counter last gave one, bags handed over, and how many waiting letters he has been told of)
+var mail_read := {}
+var mail_replies := {}
+var mail_bags: Array = []
+var bag_day := {}
+var bags_done := 0
+var mail_told := 0
+## (roads.gd: how many times the post-coach has been taken)
+var coaches := 0
+## (ships.gd: how many passages by sea have been taken)
+var voyages := 0
+## (fame.gd: the standing he has been told of, the day each town last gave him something, and how often)
+var fame_told := 0
+var fan_day := {}
+var fan_gifts := 0
+var shifts := {}
+var shift_day := {}
+## (careers: the day the last shift was worked at each trade in each town, for the salary; all wages earned)
+var salary_day := {}
+var wages := 0
+var falls := {}
+var fallen := 0
+var yielded := 0
 var gamble_n := 0
 var gamble_rounds := 0
 var gamble_wins := 0
@@ -353,6 +386,28 @@ func reset() -> void:
 	needs_clock = 0.0
 	needs_fell = {}
 	romance = {}
+	marks_seen = {}
+	reckoned = {}
+	passengers = []
+	fares = 0
+	mail_read = {}
+	mail_replies = {}
+	mail_bags = []
+	bag_day = {}
+	bags_done = 0
+	mail_told = 0
+	coaches = 0
+	voyages = 0
+	fame_told = 0
+	fan_day = {}
+	fan_gifts = 0
+	shifts = {}
+	shift_day = {}
+	salary_day = {}
+	wages = 0
+	falls = {}
+	fallen = 0
+	yielded = 0
 	gamble_n = 0
 	gamble_rounds = 0
 	gamble_wins = 0
@@ -570,6 +625,9 @@ func address() -> String:
 
 ## A pack this far below Lin Feng scatters before his aura rather than fight (Main.interact).
 func scatters(group: Array) -> bool:
+	# (dooms.gd: what cannot be beaten does not run from anybody's realm)
+	if Dooms.in_group(group):
+		return false
 	var top := 0
 	for g in group:
 		top = maxi(top, int(g.lv))
@@ -852,6 +910,15 @@ func poll_steps() -> void:
 			"host":
 				# Part XXIII: so many companies in the host (war.gd)
 				ok = War.companies(self).size() >= int(s.n)
+			"reckon":
+				# the reckoning (reckon.gd): everybody the journey's choices made has been met
+				ok = Reckon.left(self).is_empty()
+			"falls":
+				# Part XXIV: so many packs of what cannot be beaten stood in front of, and lost to (dooms.gd)
+				ok = hunt >= int(s.n)
+			"marks":
+				# Part XXIV: so many of the things his choices left standing gone and looked at (marks.gd)
+				ok = marks_seen.size() >= int(s.n)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -909,8 +976,10 @@ func objective_text() -> String:
 	var t: String = s.t
 	if s.kind == "collect":
 		t += "  (%d/%d)" % [mini(inv.get(s.item, 0), s.n), s.n]
-	elif s.kind == "hunt":
+	elif s.kind == "hunt" or s.kind == "falls":
 		t += "  (%d/%d)" % [mini(hunt, s.n), s.n]
+	elif s.kind == "marks":
+		t += "  (%d/%d)" % [mini(marks_seen.size(), int(s.n)), int(s.n)]
 	elif s.kind == "gates":
 		t += "  (%d/%d)" % [mini(gates_open.size(), int(s.n)), int(s.n)]
 	elif s.kind == "visits" or s.kind == "fates":
