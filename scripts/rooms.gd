@@ -15,6 +15,165 @@ extends RefCounted
 ## `MapGen.stamp_building` asks for the whole building (`complete`), so everything that reads a
 ## realm's buildings (the atlas, the world, the people of the towns) sees the same floors.
 
+## how many tiles of dry ground there are between any water and a building's walls
+const WATER_OFF := 2
+
+## Who is at home (the Lost Horse release): what somebody found indoors is called, by what the ground
+## floor of the house is used for, the bodies they may have, and what they say (one line of these, and
+## the greeting of the town's own hearth).  A town has people in its houses, not only in its streets.
+const INDOORS := {
+	"home": [["Grandmother", "Grandfather", "Aunt", "Uncle", "Young"], ["folk_grandma", "folk_grandpa", "folk_farmwife", "folk_farmer", "folk_maiden"],
+		["Mind the step. Everybody minds it after the first time.", "Three generations under this roof and one stove. We manage. We shout, but we manage.", "The young ones are upstairs and are meant to be asleep. Listen. Not one of them is.",
+		"Sit, if you can find a place the cat has not got to first.", "My mother swept this floor and her mother laid it. I only complain about it."]],
+	"office": [["Clerk", "Scribe", "Registrar", "Under-Clerk"], ["folk_scholar", "folk_youth", "folk_maiden"],
+		["Everything in this town is written down twice, and one of the two is always wrong. I am paid to find out which.", "Leave it on the pile. No, the other pile. That one is the pile for things left on the wrong pile.",
+		"I have copied the same register for eleven years. I know who was born, who died and who owes. I am very good company at weddings.", "Ink is dear this year. Write small, they tell me. So I write small, and then they cannot read it."]],
+	"shop": [["Shop-Hand", "Counter-Girl", "Apprentice"], ["folk_youth", "folk_maiden", "folk_shopwife"],
+		["The master is out the back. I may tell you the price. I may not tell you the real price.", "Everything on that shelf is the last one. It has been the last one since the spring.", "If you break it you have bought it, and if you buy it I get a twentieth. Do be careful. Or do not."]],
+	"inn": [["Lodger", "Pot-Boy", "Chambermaid"], ["folk_porter", "folk_boy", "folk_maiden", "folk_merchant"],
+		["Four to a room and the one by the wall snores. I am the one by the wall, I am told.", "Hot water is at dusk. If you want it at any other hour you want cold water.", "I came for one night in the third month. The road keeps being about to be dry."]],
+	"teahouse": [["Tea-Boy", "Old Regular", "Storyteller's Girl"], ["folk_boy", "folk_grandpa", "folk_maiden"],
+		["He has told the one about the fox-wife every night this week. We have begun to side with the fox.", "First pot is for washing the cups, second pot is for drinking, third pot is for talking. You look like a third-pot person.", "That table is the old men's. Nobody says so. Sit at it and see."]],
+	"hall": [["Door-Ward", "Usher", "Steward"], ["folk_guard", "folk_scholar", "folk_youth"],
+		["Wipe your feet. The hall has stood four hundred years and the floor is the only part that is original.", "They meet on the first and the fifteenth. The rest of the month I guard some very well-behaved chairs.", "You may look at anything. You may touch what is nailed down."]],
+	"library": [["Shelf-Keeper", "Copyist", "Reader"], ["folk_scholar", "folk_maiden", "folk_grandpa"],
+		["Third shelf, on the left, behind the one you would expect. Everything here is behind the one you would expect.", "Hush. Not for the books. For him: he has been on that page since noon and he is nearly at the bottom of it.", "A book lent is a book gone, and a book not lent is a brick. I lend them. I keep a list. I do not sleep."]],
+	"workshop": [["Journeyman", "Bellows-Boy", "Apprentice"], ["folk_porter", "folk_boy", "folk_youth"],
+		["Seven years to learn it and then they let you sweep up somewhere else.", "Do not touch that. Nor that. That one you may touch, it is the broom.", "The master says a thing made twice is made once properly. So everything here is made three times, to be sure."]],
+	"shrine": [["Acolyte", "Lamp-Tender", "Pilgrim"], ["folk_monk", "folk_maiden", "folk_grandma"],
+		["One stick of incense is a prayer. Three is a conversation. A whole bundle is somebody who has done something.", "I trim the lamps at dusk and at midnight and at dawn. In between I am very holy and mostly asleep.", "I walked nine days to stand here, and now that I am here I cannot think what I meant to ask."]],
+	"bath": [["Bath-Attendant"], ["folk_youth", "folk_maiden"], ["Hot is to the left. Very hot is to the right. There is no third thing.", "Leave your troubles with your sandals. We lose a pair of each every day."]],
+}
+const SURNAMES := ["Chen", "Wu", "Li", "Fang", "Ma", "Zhao", "Qin", "Jing", "He", "Song", "Tang", "Luo", "Ye", "Bao", "Cui", "Deng", "Min", "Shi", "Yan", "Zou"]
+## the bodies of the towns of other peoples (whoever is found indoors there wears one of these)
+const INDOOR_BODIES := {"juntian": ["folk_yumin"], "changhe": ["folk_yumin"], "ninesprings": ["folk_jiaoren"], "youdu": ["folk_shade"],
+	"dunes": ["folk_nomad", "folk_oasis_f", "folk_shopwife"], "longmen": ["folk_fisher", "folk_boatwoman", "folk_porter"], "tushan": ["folk_founder", "folk_porter", "folk_farmwife"],
+	"yanggu": ["folk_lantern_f", "folk_merchant", "folk_youth"], "thunder": ["folk_herder", "folk_herder_f"], "millet": ["folk_herder", "folk_herder_f"]}
+
+## The people found indoors in the buildings `buildings` of a realm (in the realm's own tiles): one to
+## three a house, by how much room it has, on floor nobody needs to get past (every tile of the house
+## can still be walked to with them standing there).  `ents` are the realm's entities so far (nobody
+## stands where somebody stands); returns the new ones (kind "npc", with `lines` of their own).
+static func residents(buildings: Array, grid: PackedByteArray, W: int, ents: Array, layer: String) -> Array:
+	var out: Array = []
+	var held := {}
+	for e in ents:
+		if e.has("pos") and str(e.get("layer", layer)) == layer:
+			held[e.pos] = true
+	var names := {}
+	for bd in buildings:
+		var use := str(uses(bd)[0])
+		if not INDOORS.has(use):
+			continue
+		var r: Rect2i = bd.rect
+		var area := str(bd.get("area", ""))
+		var cells: Array = []
+		var rects: Array = [r]
+		for wg in bd.get("wings", []):
+			rects.append(wg.rect)
+		var wing_cell := {}
+		for ri in rects.size():
+			var rr: Rect2i = rects[ri]
+			for y in range(rr.position.y, rr.end.y):
+				for x in range(rr.position.x, rr.end.x):
+					if grid[y * W + x] == MapGen.INTERIOR and not cells.has(Vector2i(x, y)):
+						cells.append(Vector2i(x, y))
+						if ri > 0:
+							wing_cell[Vector2i(x, y)] = true
+		var door: Vector2i = bd.door
+		var taken := {door: true}
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			taken[door + d] = true
+		for pr in bd.get("props", []):
+			taken[pr[1]] = true
+		for sk in ["up", "down"]:
+			if bd.has(sk):
+				taken[bd[sk]] = true
+				for d2 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					taken[(bd[sk] as Vector2i) + d2] = true
+		var want := 1 + (1 if cells.size() >= 28 else 0) + (1 if not wing_cell.is_empty() and cells.size() >= 40 else 0)
+		var rng := RandomNumberGenerator.new()
+		rng.seed = r.position.x * 7001 + r.position.y * 331 + r.size.x
+		# (somebody in the wing first, then by a wall: a tile with a wall or a piece of furniture beside it)
+		var order: Array = []
+		for c in cells:
+			var by_wall := 0
+			for d3 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				if grid[(c.y + d3.y) * W + c.x + d3.x] == MapGen.BUILDING:
+					by_wall += 1
+			order.append([(0 if wing_cell.has(c) else 10) - by_wall + rng.randf() * 0.9, c])
+		order.sort_custom(func(p0, p1): return float(p0[0]) < float(p1[0]))
+		var stood: Array = []
+		var info: Array = INDOORS[use]
+		for oc in order:
+			if stood.size() >= want:
+				break
+			var c2: Vector2i = oc[1]
+			if taken.has(c2) or held.has(c2):
+				continue
+			var near_other := false
+			for s0 in stood:
+				near_other = near_other or maxi(absi(s0.x - c2.x), absi(s0.y - c2.y)) < 3
+			if near_other:
+				continue
+			# everything indoors is still walked to from the door with them standing there
+			var blocked := {c2: true}
+			for s1 in stood:
+				blocked[s1] = true
+			var seen := {door: true}
+			var q: Array = [door]
+			var qi := 0
+			while qi < q.size():
+				var cur: Vector2i = q[qi]
+				qi += 1
+				for d4 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var nx: Vector2i = cur + d4
+					if not seen.has(nx) and not blocked.has(nx) and not held.has(nx) and nx.x >= 0 and nx.y >= 0 and grid[nx.y * W + nx.x] == MapGen.INTERIOR and inside(bd, nx):
+						seen[nx] = true
+						q.append(nx)
+			var all_ok := true
+			for c3 in cells:
+				if not seen.has(c3) and not blocked.has(c3) and not held.has(c3):
+					all_ok = false
+					break
+			# (and whoever of the story stands indoors can still be walked up to)
+			for hp in held:
+				if inside(bd, hp) and grid[(hp as Vector2i).y * W + (hp as Vector2i).x] == MapGen.INTERIOR:
+					var reach_h := false
+					for d5 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+						reach_h = reach_h or seen.has((hp as Vector2i) + d5)
+					all_ok = all_ok and reach_h
+			if not all_ok:
+				continue
+			stood.append(c2)
+			var k := stood.size() - 1
+			var titles: Array = info[0]
+			var title := str(titles[rng.randi() % titles.size()])
+			var nm := ""
+			for _t in 12:
+				nm = "%s %s" % [title, SURNAMES[rng.randi() % SURNAMES.size()]]
+				if not names.has(nm):
+					break
+			names[nm] = true
+			var bodies: Array = INDOOR_BODIES.get(area, info[1])
+			var body := str(bodies[rng.randi() % bodies.size()])
+			if use == "home" and not INDOOR_BODIES.has(area):
+				body = str(info[1][titles.find(title) % (info[1] as Array).size()])
+			var lines: Array = []
+			var pool: Array = info[2]
+			var li := rng.randi() % pool.size()
+			lines.append(str(pool[li]))
+			lines.append(str(pool[(li + 1 + k) % pool.size()]) if pool.size() > 2 else str(pool[(li + 1) % pool.size()]))
+			var hid := Cultures.of_area(area)
+			if hid != "":
+				lines.append("%s That is how we say it here. You are among %s." % [str(Cultures.HEARTHS[hid].greet), str(Cultures.HEARTHS[hid].people)])
+			var ut := uses_text(bd)
+			lines.append("This is %s. %s." % [str(bd.n), ut.left(1).to_upper() + ut.substr(1)] if ut != "" else "This is %s." % str(bd.n))
+			out.append({"kind": "npc", "id": "res:%s:%s:%d" % [area, str(bd.id), k], "n": nm, "asset": body, "col": Color.from_hsv(rng.randf(), 0.35, 0.6), "pos": c2,
+				"area": area, "layer": layer, "late": true, "vis": ["", ""], "lines": lines, "indoor": true})
+			held[c2] = true
+	return out
+
 ## styles that stay a plain rectangle: a shrine, a hermit's room and a tower are the shape they are
 const NO_WINGS := ["shrine", "hermitage", "aerie", "bathhouse", "kitchen"]
 
@@ -264,7 +423,10 @@ static func keep_off(id: String, spec: Dictionary) -> Dictionary:
 static func let_out(id: String, spec: Dictionary, grid: PackedByteArray, w: int, h: int, buildings: Array, ents: Array, start: Vector2i) -> void:
 	var raw: Array = spec.get("buildings", [])
 	var rounds := int(spec.get("grow", 2))
-	if raw.is_empty() or rounds <= 0:
+	if raw.is_empty():
+		return
+	dry(grid, w, h, buildings)
+	if rounds <= 0:
 		return
 	var off := keep_off(id, Data.AREAS[id] if Data.AREAS.has(id) else spec)
 	for e in ents:
@@ -445,6 +607,26 @@ static func let_out(id: String, spec: Dictionary, grid: PackedByteArray, w: int,
 			if not wings.is_empty():
 				gb["wings"] = wings
 			buildings[i] = MapGen.stamp_building(grid, w, complete(gb, busy_of(id, bd0)))
+	dry(grid, w, h, buildings)
+
+## Water keeps off the houses (the Lost Horse release): a pond or a river bank within two tiles of a
+## building's walls, or of a wing's, is dry ground (a pond lapped at the Green Stone Inn's podium, and
+## came through the floor of a house or two).  Dry ground is only ever added: nothing that could be
+## walked to is cut off by it.
+static func dry(grid: PackedByteArray, w: int, h: int, buildings: Array) -> int:
+	var n := 0
+	for bd in buildings:
+		var rs: Array = [bd.rect]
+		for wg in bd.get("wings", []):
+			rs.append(wg.rect)
+		for r0 in rs:
+			var rr: Rect2i = (r0 as Rect2i).grow(WATER_OFF)
+			for y in range(maxi(1, rr.position.y), mini(h - 1, rr.end.y)):
+				for x in range(maxi(1, rr.position.x), mini(w - 1, rr.end.x)):
+					if grid[y * w + x] == MapGen.WATER:
+						grid[y * w + x] = MapGen.FLOOR
+						n += 1
+	return n
 
 ## Building `bd` (an entry of Data.AREAS[..].buildings, in its region's own tiles) with every floor it
 ## has: its own, and the ones laid out here.  `busy` are tiles of its ground floor that somebody or

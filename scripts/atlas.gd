@@ -634,6 +634,9 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# ---- the Lost Horse release (marks.gd): what the crossroads leave standing, and what the scales
 	# stand in every region, on open ground nothing else is on; added last of all, so no older map moves
 	Marks.place(grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps)
+	# ---- and who is at home (rooms.gd `residents`): people indoors in the houses of every town, stood
+	# after everything else on floor nobody needs to get past
+	ents.append_array(Rooms.residents(buildings, grid, W, ents, layer))
 	if OS.has_environment("AZ_PROFILE"):
 		print("[profile] realm %s: %d peaks and %d camps placed in %d ms" % [layer, (pks.peaks as Array).size(), camps.size(), (Time.get_ticks_usec() - pk_t0) / 1000])
 	# ---- each region's cell: the bounding box of the land it owns

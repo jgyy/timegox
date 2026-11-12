@@ -75,6 +75,10 @@ const PEOPLE := {
 	"xu_xiake": "characters/xu_xiake", "yu_gong": "characters/yu_gong", "zhi_sou": "characters/zhi_sou", "wang_zhi": "characters/wang_zhi", "xuanpin": "characters/xuanpin",
 	# (the Lost Horse release: the bodies of the towns worn by whoever a choice left standing somewhere, marks.gd)
 	"folk_farmer": "characters/folk_farmer", "folk_grandma": "characters/folk_grandma", "folk_farmwife": "characters/folk_farmwife", "folk_monk": "characters/folk_monk", "folk_merchant": "characters/folk_merchant",
+	# (and by whoever is found indoors: rooms.gd `residents`)
+	"folk_grandpa": "characters/folk_grandpa", "folk_maiden": "characters/folk_maiden", "folk_youth": "characters/folk_youth", "folk_scholar": "characters/folk_scholar", "folk_shopwife": "characters/folk_shopwife",
+	"folk_porter": "characters/folk_porter", "folk_boy": "characters/folk_boy", "folk_guard": "characters/folk_guard", "folk_yumin": "characters/folk_yumin", "folk_jiaoren": "characters/folk_jiaoren",
+	"folk_shade": "characters/folk_shade", "folk_nomad": "characters/folk_nomad", "folk_fisher": "characters/folk_fisher",
 	"folk_herder": "characters/folk_herder", "folk_herder_f": "characters/folk_herder_f", "folk_oasis_f": "characters/folk_oasis_f",
 	"folk_boatwoman": "characters/folk_boatwoman", "folk_founder": "characters/folk_founder", "folk_lantern_f": "characters/folk_lantern_f",
 	"lin_feng_f": "characters/lin_feng_f", "lin_feng_f_wanderer": "characters/lin_feng_f_wanderer", "lin_feng_f_wild": "characters/lin_feng_f_wild", "lin_feng_f_scholar": "characters/lin_feng_f_scholar",

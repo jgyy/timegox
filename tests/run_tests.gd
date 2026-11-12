@@ -1416,7 +1416,8 @@ func _init() -> void:
 		var outs: Array = []
 		var others: Array = []
 		for pe in plw.ents:
-			if pe.kind != "prop":
+			# (somebody found indoors, rooms.gd `residents`, is behind a wall from anything out of doors)
+			if pe.kind != "prop" and not pe.get("indoor", false):
 				others.append(pe.pos)
 		for pe2 in plw.ents:
 			if pe2.kind != "prop":
@@ -3934,6 +3935,65 @@ func _lost_horse() -> void:
 				check(inner8 >= 2 and not gap8.is_empty() and gap8.all(func(q): return m8.grid[q.y * int(m8.w) + q.x] == MapGen.INTERIOR) and apart and not (bd8.rect as Rect2i).intersects(wr8)
 					and Rooms.inside(bd8, wr8.position) and not Rooms.inside(bd8, wr8.position - Vector2i(9, 9)),
 					"%s/%s: a wing built out from a wall, walked into through it, a tile clear of the next house (%d tiles of floor)" % [a8, bd8.id, inner8])
+	# water keeps off the houses
+	var wet := 0
+	for a7 in Data.AREAS:
+		if Data.AREAS[a7].get("buildings", []).is_empty():
+			continue
+		var m7 := MapGen.build(a7)
+		for bd7 in m7.buildings:
+			var rs7: Array = [bd7.rect]
+			for wg7 in bd7.get("wings", []):
+				rs7.append(wg7.rect)
+			for r7 in rs7:
+				var g7: Rect2i = (r7 as Rect2i).grow(Rooms.WATER_OFF)
+				for y7 in range(maxi(0, g7.position.y), mini(int(m7.h), g7.end.y)):
+					for x7 in range(maxi(0, g7.position.x), mini(int(m7.w), g7.end.x)):
+						if m7.grid[y7 * int(m7.w) + x7] == MapGen.WATER:
+							wet += 1
+	check(wet == 0 and Rooms.WATER_OFF >= 2, "no water within two tiles of any building's walls, or of a wing's (%d wet tiles)" % wet)
+	# who is at home
+	var res_n := 0
+	var res_areas := {}
+	var res_names := {}
+	for lid7 in ["surface", "heaven", "under", "sea"]:
+		var lw7: Dictionary = Atlas.world_of(lid7)
+		var at7 := {}
+		for e7 in lw7.ents:
+			if e7.has("pos") and not e7.get("indoor", false):
+				at7[e7.pos] = true
+		for e7 in lw7.ents:
+			if not e7.get("indoor", false):
+				continue
+			res_n += 1
+			res_areas[str(e7.area)] = true
+			var in_b := false
+			for bd6 in lw7.buildings:
+				in_b = in_b or (str(bd6.area) == str(e7.area) and Rooms.inside(bd6, e7.pos))
+			var ways7 := 0
+			for d7 in MapGen.DIRS:
+				var q7: Vector2i = e7.pos + d7
+				if lw7.grid[q7.y * int(lw7.w) + q7.x] == MapGen.INTERIOR and not at7.has(q7):
+					ways7 += 1
+			check(in_b and lw7.grid[e7.pos.y * int(lw7.w) + e7.pos.x] == MapGen.INTERIOR and not at7.has(e7.pos) and not res_names.has(str(e7.id)) and ways7 >= 1
+				and (e7.lines as Array).size() >= 3 and (e7.lines as Array).all(func(ln): return fits.call(str(ln))) and Assets.PEOPLE.has(str(e7.asset)) and Assets.has(Assets.PEOPLE[str(e7.asset)]),
+				"%s is at home in %s: indoors, on a tile of their own, with a body and things to say" % [e7.n, e7.area])
+			res_names[str(e7.id)] = true
+			at7[e7.pos] = true
+	check(res_n >= 150 and res_areas.size() >= 15, "%d people are found indoors, in the houses of %d regions" % [res_n, res_areas.size()])
+	for use7 in Rooms.INDOORS:
+		check(Rooms.USE_WORDS.has(str(use7)) and (Rooms.INDOORS[use7][2] as Array).size() >= 2, "whoever is found in %s has something to say" % str(Rooms.USE_WORDS[use7]))
+	# how the towns of each people build
+	var looks := {}
+	for tid7 in Folk.TOWNS:
+		var ta := str(Folk.TOWNS[tid7].area)
+		var dst := Arch.dressed("house", ta)
+		looks["%s|%s|%s" % [str(dst.wall), str(dst.roof), str(dst.get("kind", "hip"))]] = true
+	for da in Arch.DRESS_OF:
+		check(Data.AREAS.has(str(da)) and Arch.DRESS.has(str(Arch.DRESS_OF[da])), "%s builds in a way of its own" % da)
+	check(looks.size() >= 9 and str(Arch.dressed("house", "dunes").kind) == "flat" and str(Arch.dressed("shrine", "dunes").get("kind", "hip")) != "flat" and Arch.dressed("house", "village") == Arch.STYLES.house
+		and bool(Arch.dressed("shop", "tushan").get("chimney", false)) and bool(Arch.dressed("inn", "yanggu").get("lanterns", false)) and Arch.dressed("house", "youdu").has("glow"),
+		"the twelve towns build %d ways: flat roofs and a dome on the sand road, chimneys at Tushan, lanterns under the eaves at Yanggu, cold light in Youdu's windows; a shrine keeps its own roof" % looks.size())
 	var cen := Rooms.census()
 	var cen_n := 0
 	for ck in cen:

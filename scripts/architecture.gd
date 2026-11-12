@@ -46,6 +46,57 @@ const STYLES := {
 	"bathhouse": {"roof": "5a6a78", "roof2": "46545e", "column": "7a4a32", "wall": "ece4d4", "beam": "5a7a7a", "trim": "c8b890", "double": false, "kind": "gable",
 		"louver": true, "moon_gate": true},
 }
+## How the towns of each people build (the Lost Horse release): over a building's own style, the colours
+## of the country it stands in (blended most of the way towards them, so that a shop is still told from
+## a shrine), the kind of roof where the country has one of its own (`kind`: "flat" for the mud-brick
+## roofs of the sand road, with a parapet and a dome), and what else it hangs on a house.  A town is
+## known from the road by its roofs before anybody in it has said a word.
+const DRESS := {
+	# Shazhou, the Sweet-Well Hearth: sun-dried brick the colour of the dunes, flat roofs to sleep on, a
+	# turquoise dome, blue doors
+	"sand": {"wall": "d9b98a", "roof": "c8a878", "roof2": "a8875c", "column": "2a6a8a", "beam": "8a5a34", "trim": "3ab0a8", "kind": "flat", "dome": "3aa8a0", "k": 0.8},
+	# Longmen, the Boat Hearth: whitewash over black-tarred timber, blue-grey tiles, gabled against the river wind
+	"river": {"wall": "e6ece8", "roof": "3a5866", "roof2": "2a4450", "column": "2c3a3c", "beam": "34505a", "trim": "c8dcd8", "kind": "gable", "k": 0.75},
+	# Tushan, the Casting Hearth: fired brick, black tiles, bronze on everything, a chimney on every roof
+	"forge": {"wall": "b4603f", "roof": "2a2a30", "roof2": "1c1c22", "column": "3a2a22", "beam": "5a3a2a", "trim": "d89a3a", "chimney": true, "k": 0.75},
+	# Yanggu, the Lantern Hearth: pale gold plaster, vermilion posts, red roofs, a row of lanterns under every eave
+	"dawn": {"wall": "f6e4b4", "roof": "a8322a", "roof2": "7e2420", "column": "c8302a", "beam": "8a2a24", "trim": "f0c040", "lanterns": true, "k": 0.75},
+	# Featherfall and Changhe, the Feathered Folk: white walls, sky-blue tiles, gilt
+	"sky": {"wall": "f6f4ec", "roof": "4a78b8", "roof2": "3a5f98", "column": "e8e4d8", "beam": "5a90c0", "trim": "f0d070", "k": 0.7},
+	# Tearwater, the Pearl-Weavers: sea-green plaster, coral posts, tiles like the inside of a shell
+	"pearl": {"wall": "bfe0d2", "roof": "6a8fa8", "roof2": "557790", "column": "d86a5a", "beam": "4a8a84", "trim": "f0e8f0", "glow": Color(0.6, 0.95, 0.9, 0.4), "k": 0.75},
+	# Youdu, the Dark Capital: slate walls, black roofs, bone-white trim, windows lit a cold blue
+	"shade": {"wall": "8c8c9a", "roof": "20202a", "roof2": "16161e", "column": "3c3c4a", "beam": "2c2c38", "trim": "d8dce8", "glow": Color(0.55, 0.7, 1.0, 0.45), "k": 0.8},
+	# Landfall and the Isles: whitewash, weathered blue-grey tiles, coral-red posts, gabled against the sea
+	"sea": {"wall": "f2f0ea", "roof": "3e5c7c", "roof2": "2c4660", "column": "c8503a", "beam": "3a6a7a", "trim": "e0d0a0", "kind": "gable", "k": 0.6},
+}
+## which country builds which way
+const DRESS_OF := {"dunes": "sand", "longmen": "river", "karst": "river", "tushan": "forge", "volcano": "forge", "yanggu": "dawn", "fusang": "dawn",
+	"juntian": "sky", "changhe": "sky", "ninesprings": "pearl", "youdu": "shade", "penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea"}
+## styles that keep their own roof whatever country they stand in
+const OWN_ROOF := ["shrine", "hall", "hermitage", "aerie", "bathhouse"]
+## what a window is lit with (set by `house` for the building being built)
+static var win_glow := Color(1.0, 0.85, 0.55, 0.35)
+
+## A building style as it is built in country `area`.
+static func dressed(style: String, area: String) -> Dictionary:
+	var st: Dictionary = (STYLES.get(style, STYLES.house) as Dictionary).duplicate()
+	var dr: Dictionary = DRESS.get(str(DRESS_OF.get(area, "")), {})
+	if dr.is_empty():
+		return st
+	var k := float(dr.get("k", 0.7))
+	for key in ["wall", "roof", "roof2", "column", "beam", "trim"]:
+		st[key] = _c(str(st[key])).lerp(_c(str(dr[key])), k).to_html(false)
+	if dr.has("kind") and not style in OWN_ROOF:
+		st["kind"] = str(dr.kind)
+		st["double"] = false
+		st.erase("horsehead")
+	for key2 in ["chimney", "lanterns", "dome", "glow"]:
+		if dr.has(key2):
+			st[key2] = dr[key2]
+	st["dress"] = str(DRESS_OF.get(area, ""))
+	return st
+
 ## Part XI: how high an upper storey's floor stands above the building's ground (the top of the ground
 ## floor's walls), and how deep a cellar's floor lies below it
 const STOREY_Y := 2.96
@@ -720,6 +771,10 @@ static func _wing(b: MB, g: MB, roof: MB, roof_g: MB, wr: Rect2, side: int, core
 	roof.box((Vector3(oc, ph + wall_h + 0.1, um) if ew else Vector3(um, ph + wall_h + 0.1, oc)), Vector3(0.22, 0.26, u1 - u0 + 0.5) if ew else Vector3(u1 - u0 + 0.5, 0.26, 0.22), beam)
 	var thatch: bool = str(st.get("kind", "hip")) == "thatch"
 	var half_w := (u1 - u0) * 0.5
+	if str(st.get("kind", "hip")) == "flat":
+		roof.box(mid + Vector3(0, ph + wall_h + 0.4, 0), Vector3(deep + 0.6, 0.3, u1 - u0 + 0.6) if ew else Vector3(u1 - u0 + 0.6, 0.3, deep + 0.6), MB.tag(_c(st.wall).darkened(0.06), MB.STONE))
+		roof.box((Vector3(oc, ph + wall_h + 0.8, um) if ew else Vector3(um, ph + wall_h + 0.8, oc)), Vector3(0.26, 0.5, u1 - u0 + 0.6) if ew else Vector3(u1 - u0 + 0.6, 0.5, 0.26), wall)
+		return
 	var rise := 1.1 + half_w * 0.34
 	var tmp := MB.new()
 	_gable(tmp, Vector3.ZERO, deep * 0.5 + 1.0, half_w + 0.7, rise, MB.tag(_c(st.roof), MB.WOOD if thatch else MB.STONE), thatch, trim, MB.tag(_c(st.roof2), MB.STONE))
@@ -766,7 +821,7 @@ static func _facade(m: MB, g: MB, horiz: bool, at: float, lo: float, hi: float, 
 		var wh := minf(1.0, hgt * 0.38)
 		var yc := y0 + hgt * 0.63
 		m.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww + 0.16, wh + 0.16, th + 0.06) if horiz else Vector3(th + 0.06, wh + 0.16, ww + 0.16), column)
-		g.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww, wh, th + 0.08) if horiz else Vector3(th + 0.08, wh, ww), Color(1.0, 0.85, 0.55, 0.35))
+		g.box(Vector3(wpos, yc, at) if horiz else Vector3(at, yc, wpos), Vector3(ww, wh, th + 0.08) if horiz else Vector3(th + 0.08, wh, ww), win_glow)
 		for q2 in 4:
 			var lu := wpos + (q2 - 1.5) * ww / 4.0
 			m.box(Vector3(lu, yc, at) if horiz else Vector3(at, yc, lu), Vector3(0.035, wh, th + 0.12) if horiz else Vector3(th + 0.12, wh, 0.035), column)
@@ -895,8 +950,9 @@ static func settlement_mesh(kind: String, variant: int, theme_name: String) -> A
 ## ground floor's walls (open at the stairs, `hole`), walls with windows, its own furniture
 ## (`upper_props`) in `up`/`up_g` (so the world can lift the storey away while the hero is on the
 ## ground floor), and its roof a storey higher.
-static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, style: String, props: Array, seed_: int, up: MB = null, up_g: MB = null, upper_props: Array = [], hole: Vector3 = Vector3(-9999, 0, -9999), wings: Array = [], storeys: int = 2) -> Array:
-	var st: Dictionary = STYLES.get(style, STYLES.house)
+static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, style: String, props: Array, seed_: int, up: MB = null, up_g: MB = null, upper_props: Array = [], hole: Vector3 = Vector3(-9999, 0, -9999), wings: Array = [], storeys: int = 2, area: String = "") -> Array:
+	var st: Dictionary = dressed(style, area)
+	win_glow = st.get("glow", Color(1.0, 0.85, 0.55, 0.35))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_
 	var T := Terrain3D.T
@@ -983,6 +1039,14 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 			_facade(b, g, horiz, a.z if horiz else a.x, lo, hi, ph, wall_h, th, outw, column, beam, trim, wall, not st.get("moon_gate", false), seed_ + int(lo * 3.0), 0.44)
 			if not on_door:
 				_border(b, horiz, a.z if horiz else a.x, lo + 0.5, hi - 0.5, ph, th, outw, seed_ + int(hi))
+			if st.get("lanterns", false):
+				# (the Lantern Hearth: a row of small red lanterns under the eave)
+				for k9 in int(ln / 1.4):
+					var lu := lo + (k9 + 0.5) * ln / maxf(1.0, float(int(ln / 1.4)))
+					var lo9 := outw * (th * 0.5 + 0.45)
+					var lq := Vector3(lu, ph + wall_h - 0.5, a.z + lo9) if horiz else Vector3(a.x + lo9, ph + wall_h - 0.5, lu)
+					b.lathe(lq - Vector3(0, 0.12, 0), [Vector2(0.03, 0.0), Vector2(0.09, 0.06), Vector2(0.09, 0.18), Vector2(0.03, 0.24)], MB.tag(Color("d8302a"), MB.CLOTH), 6)
+					g.ball(lq, 0.07, Color(1.0, 0.6, 0.3, 0.7), true)
 		# columns at the ends of each run
 		for pnt in [a, e]:
 			b.cyl(pnt + Vector3(0, ph + wall_h * 0.5, 0), 0.2, wall_h + 0.1, column, Vector3.ZERO, 10)
@@ -1101,7 +1165,10 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		for _k9 in maxi(0, storeys - 2):
 			if x1 - x0 < 4.6 or z1 - z0 < 4.6:
 				break
-			hip_roof(roof, roof_g, Vector3(cx, top + 0.1, cz), (x1 - x0) * 0.5 + 0.25, (z1 - z0) * 0.5 + 0.25, 0.8, 0.5, st, false)
+			if str(st.get("kind", "hip")) == "flat":
+				roof.box(Vector3(cx, top + 0.2, cz), Vector3(x1 - x0 + 0.7, 0.4, z1 - z0 + 0.7), MB.tag(_c(st.wall).darkened(0.08), MB.STONE))
+			else:
+				hip_roof(roof, roof_g, Vector3(cx, top + 0.1, cz), (x1 - x0) * 0.5 + 0.25, (z1 - z0) * 0.5 + 0.25, 0.8, 0.5, st, false)
 			x0 += 0.32
 			x1 -= 0.32
 			z0 += 0.32
@@ -1142,7 +1209,34 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 	var hx := (x1 - x0) * 0.5
 	var hz := (z1 - z0) * 0.5
 	var kind: String = st.get("kind", "hip")
-	if kind == "gable" or kind == "thatch":
+	if kind == "flat":
+		# (the sand road: a flat roof of beaten earth on poles whose ends stand out of the wall, a parapet
+		# with a gap at each corner post, a turquoise dome, and an awning on poles to sleep under)
+		var fw := MB.tag(_c(st.wall).darkened(0.06), MB.STONE)
+		roof.box(Vector3(cx, ry + 0.05, cz), Vector3(x1 - x0 + 0.5, 0.3, z1 - z0 + 0.5), fw)
+		for s14: float in [-1.0, 1.0]:
+			roof.box(Vector3(cx, ry + 0.5, cz + s14 * ((z1 - z0) * 0.5 + 0.1)), Vector3(x1 - x0 + 0.5, 0.6, 0.26), wall)
+			roof.box(Vector3(cx + s14 * ((x1 - x0) * 0.5 + 0.1), ry + 0.5, cz), Vector3(0.26, 0.6, z1 - z0 + 0.5), wall)
+			for k15 in int((x1 - x0) / 1.2) + 1:
+				var vx := x0 + k15 * (x1 - x0) / maxf(1.0, float(int((x1 - x0) / 1.2)))
+				roof.limb(Vector3(vx, ry - 0.12, cz + s14 * (z1 - z0) * 0.5), Vector3(vx, ry - 0.12, cz + s14 * ((z1 - z0) * 0.5 + 0.55)), 0.07, 0.07, beam, 5)
+				if k15 % 2 == 0:
+					roof.box(Vector3(vx, ry + 0.9, cz + s14 * ((z1 - z0) * 0.5 + 0.1)), Vector3(0.5, 0.22, 0.26), wall)
+			for cz15: float in [-1.0, 1.0]:
+				roof.box(Vector3(cx + s14 * ((x1 - x0) * 0.5 + 0.1), ry + 1.0, cz + cz15 * ((z1 - z0) * 0.5 + 0.1)), Vector3(0.4, 0.5, 0.4), wall)
+				roof.ball(Vector3(cx + s14 * ((x1 - x0) * 0.5 + 0.1), ry + 1.34, cz + cz15 * ((z1 - z0) * 0.5 + 0.1)), 0.16, trim, true)
+		var dr0 := minf(hx, hz) * 0.5
+		var dc0 := Vector3(cx, ry + 0.2, cz) + (Vector3(hx * 0.35, 0, 0) if hx >= hz else Vector3(0, 0, hz * 0.35))
+		roof.cyl(dc0 + Vector3(0, 0.25, 0), dr0, 0.5, wall, Vector3.ZERO, 14)
+		roof.hemi(dc0 + Vector3(0, 0.5, 0), Vector3(dr0, dr0 * 0.95, dr0), MB.tag(_c(str(st.get("dome", "3aa8a0"))), MB.STONE))
+		roof.limb(dc0 + Vector3(0, 0.5 + dr0 * 0.9, 0), dc0 + Vector3(0, 0.5 + dr0 * 0.9 + 0.6, 0), 0.03, 0.02, trim, 5)
+		roof.ball(dc0 + Vector3(0, 0.5 + dr0 * 0.9 + 0.66, 0), 0.08, trim, true)
+		var ac0 := Vector3(cx, ry + 0.2, cz) - (Vector3(hx * 0.45, 0, 0) if hx >= hz else Vector3(0, 0, hz * 0.45))
+		for ax0: float in [-1.0, 1.0]:
+			for az0: float in [-1.0, 1.0]:
+				roof.limb(ac0 + Vector3(ax0 * 1.1, 0, az0 * 1.1), ac0 + Vector3(ax0 * 1.1, 1.9, az0 * 1.1), 0.04, 0.04, beam, 5)
+		roof.box(ac0 + Vector3(0, 1.92, 0), Vector3(2.6, 0.04, 2.6), MB.tag(Color("c8502a") if seed_ % 2 == 0 else Color("2a6a9a"), MB.CLOTH), Vector3(0.06, 0, 0.04))
+	elif kind == "gable" or kind == "thatch":
 		# a gabled roof with its ridge along the long side
 		var along := hx >= hz
 		var rise := GABLE_RISE + minf(hx, hz) * 0.3
