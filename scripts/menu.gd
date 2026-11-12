@@ -718,6 +718,18 @@ func _draw_map() -> void:
 	if tex != null:
 		draw_texture_rect(tex, Rect2(o, sz), false)
 	draw_rect(Rect2(o, sz), UI.C_BORDER.darkened(0.4), false, 1.0)
+	# the high roads between the towns (roads.gd): a dark line with a pale one down the middle of it
+	for ln in Roads.of(map_layer).lines:
+		var pl := PackedVector2Array()
+		for k in range(0, (ln.pts as Array).size(), 2):
+			pl.append(o + (Vector2(ln.pts[k]) + Vector2(0.5, 0.5)) * scale)
+		pl.append(o + (Vector2(ln.pts[(ln.pts as Array).size() - 1]) + Vector2(0.5, 0.5)) * scale)
+		if pl.size() >= 2 and ln.get("lane", false):
+			draw_polyline(pl, Color(0.16, 0.12, 0.08, 0.7), 2.2, true)
+			draw_polyline(pl, Color("c8b890"), 0.8, true)
+		elif pl.size() >= 2:
+			draw_polyline(pl, Color(0.16, 0.12, 0.08, 0.9), 4.0, true)
+			draw_polyline(pl, Color("e8d8a8"), 1.6, true)
 	var town_at := {}
 	for tw in Data.TOWNS:
 		if Data.layer_of(tw.area) == map_layer:
@@ -773,6 +785,9 @@ func _draw_map() -> void:
 	UI.text(self, Vector2(cx, r.position.y + 90), w.area_name, 19, UI.C_GOLD, HORIZONTAL_ALIGNMENT_LEFT, cw)
 	UI.wrapped(self, Vector2(cx, r.position.y + 122), Data.REGION_LORE.get(w.area_id, ""), 14, UI.C_TEXT, cw)
 	var ly := r.end.y - 112
+	draw_line(Vector2(cx - 2, ly - 25), Vector2(cx + 12, ly - 25), Color(0.16, 0.12, 0.08, 0.9), 4.0)
+	draw_line(Vector2(cx - 2, ly - 25), Vector2(cx + 12, ly - 25), Color("e8d8a8"), 1.6)
+	UI.text(self, Vector2(cx + 18, ly - 20), "the high road between the towns, and the lanes off it", 13, UI.C_DIM)
 	draw_rect(Rect2(cx, ly - 8, 10, 10), UI.C_GOLD)
 	UI.text(self, Vector2(cx + 18, ly + 2), "town", 13, UI.C_DIM)
 	draw_circle(Vector2(cx + 5, ly + 19), 3.0, Color("ff5050"))

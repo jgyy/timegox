@@ -210,6 +210,8 @@ var mail_bags: Array = []
 var bag_day := {}
 var bags_done := 0
 var mail_told := 0
+## (roads.gd: how many times the post-coach has been taken)
+var coaches := 0
 var shifts := {}
 var shift_day := {}
 ## (careers: the day the last shift was worked at each trade in each town, for the salary; all wages earned)
@@ -388,6 +390,7 @@ func reset() -> void:
 	bag_day = {}
 	bags_done = 0
 	mail_told = 0
+	coaches = 0
 	shifts = {}
 	shift_day = {}
 	salary_day = {}

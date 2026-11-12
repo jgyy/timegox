@@ -3854,6 +3854,38 @@ func _horse_shots(which: String = "1") -> void:
 	var w = main.world
 	if want.call("people"):
 		await _gallery("part24_people", [Assets.person("sai_weng"), Assets.person("weng_son"), Assets.person("qian_liu")], 0.76, 0.2)
+	if want.call("roads"):
+		# the high road (roads.gd): the wagon on it between Cloudfoot and Longmen, and the map of the land
+		main.world.load_area("sect", Vector2i(20, 9))
+		var rl: Dictionary = Roads.of("surface").lines[0]
+		var rk: int = (rl.pts as Array).size() / 2
+		for k in range(8, (rl.pts as Array).size() - 8):
+			# (a straight stretch, to stand the wagon along)
+			if rl.pts[k + 4] - rl.pts[k - 4] == (rl.pts[k + 1] - rl.pts[k]) * 8:
+				rk = k
+				break
+		Game.rides["wagon"] = true
+		Game.ride = "wagon"
+		Game.riding = true
+		Game.companion = true
+		for sa in Data.AREAS:
+			Game.seen[sa] = true
+		main.world.teleport(rl.pts[rk])
+		main.world.facing = rl.pts[rk + 1] - rl.pts[rk]
+		await _wait(2.0)
+		var rpp: Vector3 = main.world.player.global_position
+		var rdir := Vector3(main.world.facing.x, 0, main.world.facing.y)
+		main.world.cam_override = Transform3D(Basis.IDENTITY, rpp - rdir * 9.0 + Vector3(rdir.z, 0, -rdir.x) * 4.5 + Vector3(0, 5.5, 0)).looking_at(rpp + rdir * 6.0 + Vector3(0, 0.8, 0), Vector3.UP)
+		await _wait(0.6)
+		await _shot("road_wagon")
+		main.world.cam_override = null
+		Game.riding = false
+		main.open_menu()
+		main.menu.mode = "map"
+		main.menu._build()
+		await _wait(0.5)
+		await _shot("road_map")
+		main.pop()
 	if want.call("beasts"):
 		# beasts with hides instead of paint (assets.gd NATURAL)
 		var bs: Array = []

@@ -754,6 +754,10 @@ func _build_view(id: String) -> void:
 		cn.position = Vector3(kp.x + 0.75, _ground(bb, kp + Vector3(0.75, 0, 0.75)) - 0.05, kp.z + 0.75) - root.position
 		root.add_child(cn)
 		_label(cn, "%s  %d m" % [str(pk.n), int(round(float(pk.h)))], 3.3, Color("f4ecd8"), 26).visibility_range_end = 60.0
+	# the high road between the towns (roads.gd), paved where it crosses this region
+	var rdm := Roads.mesh(lid, r, func(x: float, z: float) -> float: return _ground(bb, Vector3(x, 0.0, z) + Vector3(bb.off.x, 0.0, bb.off.z)) - bb.off.y)
+	if rdm != null:
+		root.add_child(rdm)
 	# ... and the camp of the people of the road at the foot of the highest (folk.gd)
 	if (lw.get("camps", {}) as Dictionary).has(id):
 		var cp: Vector3 = Terrain3D.world_pos(lw.camps[id]) + bb.off
@@ -1749,7 +1753,9 @@ func step_time() -> float:
 	if climb != 0:
 		return climb_t
 	if riding_here():
-		return STEP_T / float(Fashion.RIDES[Game.ride].speed)
+		# (roads.gd: a thing on wheels is quicker on a road or a path, and slower off one)
+		var rd: Dictionary = Fashion.RIDES[Game.ride]
+		return STEP_T / (float(rd.speed) * Roads.pace(wd, str(rd.kind), target if move_t >= 0.0 else ptile))
 	return STEP_T
 
 ## R (or the bot's "ride"): whistle up the ride and get on, or get off and send it away.

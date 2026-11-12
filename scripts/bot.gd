@@ -206,6 +206,7 @@ func _ready() -> void:
 ## the level, companion, techniques and boss kills a player would have by then (the reported play
 ## time then covers only the rest of the game).  Used to iterate on late chapters quickly.
 var start_applied := false
+var stones_mark := 0
 
 ## Developer shortcuts for a stall late in a long run: `--bot-keep=<dir>` writes the whole of the
 ## journey (every variable of Game, and where he stands) to <dir>/<step id>.sav each time a step is
@@ -387,6 +388,15 @@ func _process(d: float) -> void:
 			last_step = Game.step
 			last_progress = Game.playtime
 			_keep(str(Game.cur_step().get("id", "end")))
+		# (a purse that is growing towards what a trial's recipe asks is progress too: the forge's prices late
+		# in the story are more than three quarters of an hour of fighting pays, and a bot that was
+		# nine-tenths of the way to the Cloud Ladder's was called stuck.  The whole run is still bounded.)
+		if Game.stones >= stones_mark + 4000:
+			stones_mark = Game.stones
+			if not _trial_target().is_empty():
+				last_progress = Game.playtime
+		elif Game.stones < stones_mark - 4000:
+			stones_mark = Game.stones
 		if Game.playtime > max_time:
 			_finish("timeout: exceeded max game time")
 			return

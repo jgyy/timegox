@@ -909,6 +909,19 @@ func offer_carriage(e: Dictionary) -> void:
 		if not bag.is_empty():
 			opts.append({"id": "mail:bag", "label": "Carry the post-bag to %s" % str(Data.AREAS[Mail.area_of(str(bag.to))].n), "note": "%d stones" % int(bag.pay),
 				"desc": "A sealed bag for %s. No hurry is asked for and no seat is needed: hand it over the counter there, and the road pays %d spirit stones. (%d of %d bags carried.)" % [str(Offices.OFFICES[str(bag.to)].n), int(bag.pay), Game.mail_bags.size(), Mail.BAGS]})
+	# (roads.gd: the post-coach, along the high road to the towns already walked into)
+	var coach: Array = []
+	if Mail.is_post(office) and not world.is_floor():
+		var shut := {}
+		for se in world.ents:
+			if se.kind == "seal" and not world.seal_open(se):
+				for st in se.tiles:
+					shut[st] = true
+		coach = Roads.coach_offers(Game, Mail.area_of(office), shut)
+		for co in coach.slice(0, 4):
+			opts.append({"id": "coach:" + str(co.to), "label": "Take the post-coach to %s" % str(co.n), "note": "%d stones" % int(co.fare),
+				"desc": "The coach of the post leaves when it has a passenger. By the high road to %s: about %s hours, %d spirit stones (you have %d)." % [str(co.n), str(co.hours), int(co.fare), Game.stones],
+				"enabled": Game.stones >= int(co.fare)})
 	for rid in Fashion.RIDE_ORDER:
 		var r: Dictionary = Fashion.RIDES[rid]
 		if str(r.get("at", "")) == office and not Game.rides.has(rid):
@@ -921,6 +934,15 @@ func offer_carriage(e: Dictionary) -> void:
 			var paid := Mail.deliver(Game, office)
 			Feats.poll(Game)
 			say([[str(e.n), "Seals whole, and dry. You would be surprised how seldom I say both. The road pays %d." % paid]])
+		elif oid.begins_with("coach:"):
+			for co2 in coach:
+				if "coach:" + str(co2.to) == oid:
+					var at: Vector2i = Roads.ride_coach(Game, co2)
+					if at.x >= 0:
+						Game.riding = false
+						world.teleport(at)
+						Feats.poll(Game)
+						Game.toast("The post-coach sets you down at %s" % str(co2.n))
 		elif oid == "mail:read":
 			read_letter(str(Mail.waiting(Game)[0]), e)
 		elif oid == "mail:satchel":

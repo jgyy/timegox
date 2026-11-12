@@ -1733,6 +1733,83 @@ func _fates_and_faces() -> void:
 	check(mg.mail_bags.size() == Mail.BAGS, "three bags is a load")
 	check(Mail.bag_pay(20, "head_qingshi", "post_cloudfoot") * 3 <= Data.enemy_stones(20, false) * 40, "a bag is worth less than the road")
 	mg.free()
+	# the high roads (roads.gd): the towns of a realm joined by a road that moves nothing
+	var sw: Dictionary = Atlas.world_of("surface")
+	check(not sw.has("roads"), "the road is not written into the world")
+	Roads.forget()
+	var rn: Dictionary = Roads.of("surface")
+	var stowns: Array = []
+	for tw9 in Data.TOWNS:
+		if Data.layer_of(str(tw9.area)) == "surface":
+			stowns.append(str(tw9.id))
+	check(rn.at.size() == stowns.size() and (rn.lines as Array).size() >= stowns.size() - 1, "every town of the land is on the road (%d towns, %d roads)" % [rn.at.size(), (rn.lines as Array).size()])
+	var lanes9 := 0
+	for ln8 in rn.lines:
+		if ln8.get("lane", false):
+			lanes9 += 1
+	check(lanes9 >= 20, "and lanes go off it to the regions round about (%d)" % lanes9)
+	for tid9 in stowns:
+		check(not Roads.route("surface", str(stowns[0]), tid9).is_empty() or tid9 == stowns[0], "the road goes from %s to %s" % [stowns[0], tid9])
+	var rthings := {}
+	for e9 in sw.ents:
+		if e9.has("pos") and e9.kind != "enemy" and e9.kind != "seal":
+			rthings[e9.pos] = true
+	var rbad := 0
+	var rsteep := 0
+	for rp in rn.tiles:
+		if not Roads._roadable(sw.grid[rp.y * int(sw.w) + rp.x]) or rthings.has(rp):
+			rbad += 1
+		if Peaks.at(sw, rp) > Peaks.STEEP * 3.0:
+			rsteep += 1
+	check(rbad == 0, "no road through a house, a pond, a wood or anything that stands (%d)" % rbad)
+	check(rsteep == 0, "no road up a crag (%d)" % rsteep)
+	for ln9 in rn.lines:
+		var whole := true
+		for k9 in range(1, (ln9.pts as Array).size()):
+			whole = whole and absi(ln9.pts[k9].x - ln9.pts[k9 - 1].x) + absi(ln9.pts[k9].y - ln9.pts[k9 - 1].y) == 1
+		if ln9.get("lane", false):
+			check(whole and rn.tiles.has(ln9.pts[0]) and Data.AREAS.has(str(ln9.b)), "the lane to %s is one lane, off a road" % ln9.b)
+		else:
+			check(whole and ln9.pts[0] == rn.at[str(ln9.a)] and ln9.pts[(ln9.pts as Array).size() - 1] == rn.at[str(ln9.b)], "the road from %s to %s is one road" % [ln9.a, ln9.b])
+	var rn2: Dictionary = Roads.of("surface")
+	Roads.forget()
+	check(Roads.of("surface").tiles.size() == rn2.tiles.size(), "the same road every time")
+	var onr: Vector2i = rn.lines[0].pts[5]
+	check(is_equal_approx(Roads.pace(sw, "carriage", onr), Roads.ON_ROAD) and is_equal_approx(Roads.pace(sw, "mount", onr), 1.0) and is_equal_approx(Roads.pace(sw, "vehicle", onr), 1.0), "a road is for wheels: a horse goes as it always did")
+	var offr := Vector2i(-1, -1)
+	for dy9 in range(-12, 13):
+		for dx9 in range(-12, 13):
+			var q9 := onr + Vector2i(dx9, dy9)
+			if offr.x < 0 and sw.grid[q9.y * int(sw.w) + q9.x] == MapGen.FLOOR and not rn.tiles.has(q9):
+				offr = q9
+	check(offr.x >= 0 and is_equal_approx(Roads.pace(sw, "carriage", offr), Roads.OFF_ROAD), "and wheels are slow on grass")
+	check(Roads.mesh("surface", Rect2i(0, 0, 4, 4), func(_x, _z): return 0.0) == null, "no paving where no road goes")
+	var rm := Roads.mesh("surface", Rect2i(onr - Vector2i(8, 8), Vector2i(16, 16)), func(_x, _z): return 0.0)
+	check(rm != null and rm.get_child_count() == 1, "paved where it does")
+	if rm != null:
+		rm.free()
+	# the post-coach
+	var cg = load("res://scripts/game.gd").new()
+	cg.reset()
+	cg.level = 30
+	cg.stones = 5000
+	check(Roads.coach_offers(cg, "village").is_empty(), "the coach goes nowhere he has not walked to")
+	cg.seen["mountain"] = true
+	cg.seen["longmen"] = true
+	var cof: Array = Roads.coach_offers(cg, "village")
+	check(cof.size() == 2 and int(cof[0].tiles) <= int(cof[1].tiles) and int(cof[0].fare) > 0, "from Qingshi the coach goes to the towns he has seen, nearest first")
+	check(Roads.coach_offers(cg, "bamboo").is_empty(), "no coach from where there is no town")
+	var shut9 := {}
+	for sp9 in Roads.route("surface", "qingshi", "cloudfoot"):
+		shut9[sp9] = true
+	check(Roads.coach_offers(cg, "village", shut9).is_empty(), "nor past a seal that is shut")
+	var cs0: int = cg.stones
+	var cl0: float = cg.clock
+	var cat := Roads.ride_coach(cg, cof[0])
+	check(cat == rn.at[str(cof[0].to)] and cg.stones == cs0 - int(cof[0].fare) and cg.coaches == 1 and cg.clock != cl0, "the coach is paid for, takes its time and sets him down in the town")
+	cg.stones = 0
+	check(Roads.ride_coach(cg, cof[1]).x < 0, "nobody rides the coach on credit")
+	cg.free()
 	check(Assets.has(Assets.MOUNTS.horse), "the horse is Blender-built")
 	var horse := Assets.mount("horse")
 	var hap2: AnimationPlayer = horse.get_meta("ap", null)
