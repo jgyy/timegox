@@ -427,7 +427,7 @@ func _process(d: float) -> void:
 	if cool > 0.0:
 		return
 	if main.args.has("bot-trace") and Game.playtime >= float(main.args["bot-trace"]):
-		print("[trace] %.2f top=%s area=%s step=%s tile=%s path=%d goal=%s trial=%s" % [Game.playtime, top, Game.area, Game.cur_step().get("id", "-"), world.ptile, path.size(), path_key, str(_trial_target())])
+		print("[trace] %.2f stones=%d lv=%d top=%s area=%s step=%s tile=%s path=%d goal=%s trial=%s" % [Game.playtime, Game.stones, Game.level, top, Game.area, Game.cur_step().get("id", "-"), world.ptile, path.size(), path_key, str(_trial_target())])
 	_shots(top, d)
 	match top:
 		"title":
@@ -1033,6 +1033,10 @@ func _any_enemy(area: String, fights: bool = false, of: Array = []):
 		if of.is_empty() and Dooms.in_group(e.group):
 			continue
 		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		# (the pack already being walked to is kept to while there is a way to it: the nearest in a
+		# straight line changes with every step round a wall, and a bot between two packs went to neither)
+		if path_key == "enemy:" + str(e.id) and not path.is_empty():
+			dd = -1
 		if dd < bd:
 			bd = dd
 			best = e
