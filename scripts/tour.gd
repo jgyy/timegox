@@ -3854,6 +3854,13 @@ func _horse_shots(which: String = "1") -> void:
 	var w = main.world
 	if want.call("people"):
 		await _gallery("part24_people", [Assets.person("sai_weng"), Assets.person("weng_son"), Assets.person("qian_liu")], 0.76, 0.2)
+	if want.call("beasts"):
+		# beasts with hides instead of paint (assets.gd NATURAL)
+		var bs: Array = []
+		for fid in ["bamboo_wolf", "thunder_ape", "wrack_crab", "mired_ox", "silt_ape"]:
+			if Data.ENEMIES.has(fid):
+				bs.append(_foe(fid))
+		await _gallery("beasts_natural", bs, 1.5, 0.5)
 	if want.call("shapes"):
 		# one foe of every shape, three to a picture, close enough to look at
 		var seen_shape := {}

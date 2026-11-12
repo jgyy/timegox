@@ -207,8 +207,46 @@ func _ready() -> void:
 ## time then covers only the rest of the game).  Used to iterate on late chapters quickly.
 var start_applied := false
 
+## Developer shortcuts for a stall late in a long run: `--bot-keep=<dir>` writes the whole of the
+## journey (every variable of Game, and where he stands) to <dir>/<step id>.sav each time a step is
+## done, keeping the last few; `--bot-load=<file>` begins from one.  A run begun from a file reports
+## only the play time since, like --bot-start.
+func _keep(step_id: String) -> void:
+	if not main.args.has("bot-keep") or world.is_floor():
+		return
+	var dir := str(main.args["bot-keep"])
+	DirAccess.make_dir_recursive_absolute(dir)
+	var d := {}
+	for p in Game.get_property_list():
+		if int(p.usage) & PROPERTY_USAGE_SCRIPT_VARIABLE and not int(p.type) in [TYPE_OBJECT, TYPE_CALLABLE, TYPE_SIGNAL, TYPE_RID]:
+			d[str(p.name)] = Game.get(str(p.name))
+	d["__layer"] = str(world.layer)
+	d["__tile"] = world.ptile
+	var f := FileAccess.open("%s/%04d_%s.sav" % [dir, Game.step, step_id], FileAccess.WRITE)
+	if f != null:
+		f.store_string(var_to_str(d))
+		f.close()
+	kept.append("%s/%04d_%s.sav" % [dir, Game.step, step_id])
+	while kept.size() > 12:
+		DirAccess.remove_absolute(str(kept.pop_front()))
+var kept: Array = []
+
+func _load_kept(path: String) -> void:
+	var d = str_to_var(FileAccess.get_file_as_string(path))
+	if typeof(d) != TYPE_DICTIONARY:
+		return
+	for k in d:
+		if not str(k).begins_with("__"):
+			Game.set(str(k), d[k])
+	if str(d.get("__layer", "surface")) == str(world.layer):
+		world.teleport(d.get("__tile", world.ptile))
+	Game.note("bot-load: %s (step %d, %d spirit stones)" % [path.get_file(), Game.step, Game.stones])
+
 func _apply_start() -> void:
 	start_applied = true
+	if main.args.has("bot-load"):
+		_load_kept(str(main.args["bot-load"]))
+		return
 	if not main.args.has("bot-start"):
 		return
 	var idx := Data.step_index(str(main.args["bot-start"]))
@@ -348,11 +386,13 @@ func _process(d: float) -> void:
 		if Game.step != last_step:
 			last_step = Game.step
 			last_progress = Game.playtime
+			_keep(str(Game.cur_step().get("id", "end")))
 		if Game.playtime > max_time:
 			_finish("timeout: exceeded max game time")
 			return
 		if Game.playtime - last_progress > 2700.0:
-			_finish("stuck: no quest progress for 45 game-minutes at step %d (%s)" % [Game.step, Game.cur_step().get("id", "?")])
+			_finish("stuck: no quest progress for 45 game-minutes at step %d (%s): level %d, %d spirit stones, in %s on %s, going to %s, trial %s, deaths %d" % [Game.step, Game.cur_step().get("id", "?"),
+				Game.level, Game.stones, Game.area, top, path_key, str(_trial_target()), Game.deaths])
 			return
 	if Game.area != last_area:
 		last_area = Game.area
