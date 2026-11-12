@@ -831,7 +831,7 @@ func ent_visible(e: Dictionary) -> bool:
 	if Game.prologue != "":
 		if e.kind == "npc" and str(e.id) == str(Cultures.HEARTHS[Game.prologue].keeper):
 			return true
-		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode", "machine", "mark"] or e.get("fate", false) or e.has("pick"):
+		if e.kind in ["enemy", "boss", "pickup", "obstacle", "portal", "abode", "machine", "mark", "hold"] or e.get("fate", false) or e.has("pick") or e.has("hold"):
 			return false
 	match e.kind:
 		"enemy":
@@ -875,6 +875,12 @@ func ent_visible(e: Dictionary) -> bool:
 		"mark":
 			# the Lost Horse release (marks.gd): what a crossroads answer left standing, or a leaning scale
 			return Marks.stands(Game, e)
+		"hold":
+			# the Three Burrows release (hold.gd): a plot of the hero's own town, once it is built
+			return Hold.stands(Game, e)
+	# (and whoever has come to live there, once it has that many households)
+	if e.has("hold") and not Hold.stands(Game, e):
+		return false
 	# somebody who is only in the world of whoever chose that way (marks.gd)
 	if e.has("pick") and not Marks.who_stands(Game, e):
 		return false
@@ -912,6 +918,17 @@ func _mark_model(e: Dictionary, n: Node3D) -> void:
 	n.set_meta("model", mm)
 	n.set_meta("key", Marks.key(Game, e))
 	(n.get_meta("label") as Label3D).text = Marks.name_of(Game, e) if int(e.get("i", 0)) == 0 else ""
+
+## The Three Burrows release (hold.gd): build what stands on plot `e` of the hero's own town as the town
+## is now (its rank changes the roofs, its sect the banner), in place of whatever stood there before.
+func _hold_model(e: Dictionary, n: Node3D) -> void:
+	if n.has_meta("model"):
+		(n.get_meta("model") as Node3D).queue_free()
+	var hm := Hold.model_of(e, Hold.rank(Game), Hold.sect(Game))
+	n.add_child(hm)
+	n.set_meta("model", hm)
+	n.set_meta("key", Hold.key(Game, e))
+	(n.get_meta("label") as Label3D).text = Hold.name_of(e)
 
 func ent_at(tile: Vector2i):
 	var e = tile_ents.get(tile)
@@ -1133,6 +1150,13 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			n.add_child(Models.shadow_disc(1.2, 0.3))
 			var kl := _label(n, "", 3.2, Color("f0c8a0"), 26)
 			n.set_meta("label", kl)
+			n.set_meta("key", "")
+		"hold":
+			# the Three Burrows release (hold.gd): a plot of the town, built when it first stands (_hold_model)
+			if not e.has("seg"):
+				n.add_child(Models.shadow_disc(1.6, 0.3))
+			var hl := _label(n, "", 4.4 if not e.has("seg") else 5.6, Color("f0e0b0"), 26)
+			n.set_meta("label", hl)
 			n.set_meta("key", "")
 		"spring":
 			n.add_child(Models.spring_basin())
@@ -2231,7 +2255,7 @@ func _snap_cam() -> void:
 ## how far off the people, packs and things of the land are drawn (metres), and the big ones
 const ENT_SHOW := 92.0
 const ENT_SHOW_BIG := 150.0
-const ENT_BIG := ["boss", "prop", "machine", "mark", "seal", "ladder", "abode", "stele", "portal"]
+const ENT_BIG := ["boss", "prop", "machine", "mark", "hold", "seal", "ladder", "abode", "stele", "portal"]
 var frame_n := 0
 
 func _update_view(d: float) -> void:
@@ -2342,6 +2366,8 @@ func _update_view(d: float) -> void:
 				continue
 			if e.kind == "mark" and str(n.get_meta("key", "")) != Marks.key(Game, e):
 				_mark_model(e, n)
+			if e.kind == "hold" and str(n.get_meta("key", "")) != Hold.key(Game, e):
+				_hold_model(e, n)
 			dist = n.position.distance_to(pp)
 			if dist > 46.0:
 				continue
@@ -2790,7 +2816,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 		"machine":
 			Machines.animate(n.get_meta("model"), t + float(e.pos.x))
 			(n.get_meta("label") as Label3D).visible = dist < 12.0
-		"mark":
+		"mark", "hold":
 			if n.has_meta("model"):
 				Machines.animate(n.get_meta("model"), t + float(e.pos.x))
 			(n.get_meta("label") as Label3D).visible = dist < 12.0
@@ -3397,9 +3423,9 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark"]:
+	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark", "hold"]:
 		var hint := "Talk" if fe.kind != "folk" else "Talk to %s" % str(fe.n)
-		if fe.kind == "machine" or fe.kind == "mark":
+		if fe.kind == "machine" or fe.kind == "mark" or fe.kind == "hold":
 			hint = "Look"
 		match fe.kind:
 			"prop":

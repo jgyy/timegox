@@ -54,8 +54,11 @@ const COMPANIES := {
 		"how": "For a commission of the notice board in Qingshi.", "desc": "The hunters of the camps of the road, forty-five of them, who came in by themselves when they heard. They do not stand in ranks. They are, however, somewhere ahead of the host, and no dust hides anything from them."},
 	"players": {"n": "The Pear Garden Players", "arm": "drum", "col": Color("1e6a5a"), "job": "job_stage",
 		"how": "For a commission of the notice board in Qingshi.", "desc": "The stage company of Qingshi in full paint, with the big drum off the stage cart. They have died in a hundred battles, nightly, and got up for the next act. They find the real thing under-rehearsed."},
+	# the Three Burrows release (hold.gd): `hold`: comes when the hero's own town has a wall and a drill ground
+	"guiyun": {"n": "The Watch of Guiyun", "arm": "foot", "col": Color("d8c8a0"), "hold": true,
+		"how": "Comes of itself, when Guiyun has a wall and a drill ground (Esc > Town).", "desc": "A hundred who were woodcutters, pedlars and tea-pickers the year before, with spears from their own smithy. They are not well drilled. They chose who stands on either side of them, and no drill-master has ever found a way to put that in."},
 }
-const ORDER := ["sect", "valley", "steppe", "sand", "river", "forge", "dawn", "crossbows", "chariots", "hunters", "players"]
+const ORDER := ["sect", "valley", "steppe", "sand", "river", "forge", "dawn", "crossbows", "chariots", "hunters", "players", "guiyun"]
 
 ## the orders: `need` what the host must have to give it
 const ORDERS := {
@@ -148,7 +151,7 @@ static func companies(g) -> Array:
 	var out: Array = []
 	for id in ORDER:
 		var c: Dictionary = COMPANIES[id]
-		if g.host.has(id) or (c.has("work") and Works.has(g, str(c.work))) or (c.has("step") and g.done(str(c.step))) or (c.has("job") and Jobs.is_done(g, str(c.job))):
+		if g.host.has(id) or (c.has("work") and Works.has(g, str(c.work))) or (c.has("step") and g.done(str(c.step))) or (c.has("job") and Jobs.is_done(g, str(c.job))) or (c.has("hold") and Hold.watch(g)):
 			out.append(id)
 	return out
 

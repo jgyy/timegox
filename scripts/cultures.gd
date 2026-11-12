@@ -279,6 +279,30 @@ const ENDINGS := {
 		"needs": [["arms", 4]], "sky": Color(0.92, 0.96, 1.0),
 		"lines": [["Narrator", "In the lower courtyard of the Azure Cloud Sect there are eight racks, and beside the first of them a row of brooms. The horse-folk send their sons to learn the spear and their daughters the bow, and the founders of Tushan send children who already know what a blade costs to make."],
 			["Narrator", "Every one of them sweeps the nine hundred steps for a year before touching steel. Lin Feng says it is to learn the stance. Yue Ling says it is so that they know what the mountain looks like when nobody is fighting on it, and she is the one the children believe."]]},
+	# ---- the Three Burrows release: four more ends, for the journey that answered for a town (hold.gd) and
+	# said what was to be done with its debts and its seat (echoes.gd): two bright, one bitter, one dark
+	"guiyun": {"n": "The Hundred Households", "label": "Go down to Guiyun", "sub": "A town that says it built itself", "kind": "bright", "face": "smile",
+		"desc": "Guiyun has a hundred households and a wall, and its debts were never called in to the notch. Go down to the town that says it built itself, take the last door in the Third Row, and be the one they barely know is there.",
+		"needs": [["hold_rank", 3], ["chose", "the_tallies", ["burn", "shares"]]], "sky": Color(1.0, 0.92, 0.76),
+		"lines": [["Narrator", "Lin Feng goes down the east shoulder of the mountain to Guiyun and takes the last door in the Third Row, under the persimmon. The steward enters it in the book: one household, from the sect, trade: sweeper. In the column for what is owed he writes nothing, and looks at it for a while, and leaves it."],
+			["Narrator", "The street is swept before dawn by somebody. The town has stopped wondering who. When strangers ask whose town it is, they are told: ours, we built it; and Yue Ling, who is drawing water, does not correct them. It is the highest thing anybody has ever said of him, and he hears it most days through the wall."]]},
+	"founder": {"n": "The Returning Cloud", "label": "Keep your own gate", "sub": "A sect whose first lesson is a street", "kind": "bright", "face": "resolve",
+		"desc": "You raised a gate of your own at Guiyun, and the town is a town. Leave the Elder's seat to whoever the Elder chooses, and be the first master of the Returning Cloud: the youngest sect in the land, and the only one that begins with a broom.",
+		"needs": [["chose", "the_seat", ["found"]], ["hold_rank", 2]], "sky": Color(0.94, 0.96, 1.0),
+		"lines": [["Narrator", "The Returning Cloud Sect has one hall, nine brooms and no history. Its founder teaches in the street, because that is where the first lesson is, and holds up the sky on the days it needs holding, between the second lesson and supper."],
+			["Narrator", "On Azure Cloud Mountain the old Elder has a seat brought out to the east terrace every morning, where he can see the smoke of a hundred hearths and a gate that is not his. The disciples say he is keeping an eye on a rival. Auntie Zhou says he has never in his life looked so pleased, and she is the one who brings the tea."]]},
+	"pine": {"n": "The Borrowed Seat", "label": "Go up to Frostpeak", "sub": "Three hundred who kneel to whoever won", "kind": "bitter", "face": "sorrow",
+		"desc": "A bitter end. You took the Cold Pine's seat because it was there to be taken. Three hundred are waiting on Frostpeak for their Patriarch, exactly as they waited sixty years for somebody good enough. Go up. Somebody must teach them to look up, and it will take the rest of your life.",
+		"needs": [["chose", "the_seat", ["take"]]], "sky": Color(0.82, 0.9, 0.92), "hearth": false,
+		"lines": [["Narrator", "Lin Feng goes up to Frostpeak and sits in Han Song's seat, which is cold, and looks out over three hundred bowed heads in the snow. He tells them to get up. They get up, all at once, to the same height. He tells them to ask him something. Nobody does. It is a week before anybody does, and the question is whether they may kneel again."],
+			["Narrator", "Guiyun goes on below, a hundred hearths, and the steward sends the accounts up the mountain every autumn with a note that says only: when you have time. Yue Ling comes for the winters. She says the snow suits her. She sweeps the kneeling ground herself, in front of all of them, every morning, and waits to see who will be the first to take the broom out of her hands."],
+			["Narrator", "In the gatehouse an old man who was Patriarch once watches the new one try, year after year, to give away what he took in an evening. He does not say anything. Some mornings he comes out and holds the other end of the bench."]]},
+	"granary": {"n": "The Tiger at the Granary", "label": "Keep the chest", "sub": "Everything owed, and everything paid", "kind": "dark", "face": "calm",
+		"desc": "A dark end. You called in every debt of Guiyun to the notch, and Guiyun has a hundred households and a wall. The chest is full. A full chest wants a strong lid, and a lid wants a seal, and somebody to keep count behind it. Sit down at the steward's table. It will only be until the books are straight.",
+		"needs": [["chose", "the_tallies", ["collect"]], ["hold_rank", 3]], "sky": Color(0.9, 0.8, 0.62), "hearth": false,
+		"lines": [["Narrator", "Lin Feng sits down at the steward's table, and the accounts of Guiyun are kept as they have never been kept: hearth, head and road, to the grain, on the day. Nobody is cheated. The wall is raised a storey, to guard what is in the chest. The gate is shut an hour earlier. It is all quite reasonable, and each thing follows from the last."],
+			["Narrator", "Feng Xuan stays a year, to hand over the books. On his last evening he takes his long plain sword down from its peg and is heard, at the gate, singing the first verse of an old song about going home. Nobody asks him to stay. There is a column for what a steward costs, and it has been looked at."],
+			["Narrator", "On the Cloud-Tea Terraces a woman in undyed hemp hears that the town on the mountain has a seal now, with a cloud on it, and that the bills are very fair. She does not weep. She has done her weeping. She only moves her stool round a little, so as to sit with her back to the east."]]},
 	"broom": {"n": "The Broom", "label": "Give it back", "sub": "A mortal life, swept clean", "kind": "bright", "face": "tender",
 		"desc": "You have kept the old ways at every crossroads. Give the Nine Heavens root back to the land it was lent from, let the sky be held by the people who chose to hold it, and grow old as what you were: the one who sweeps the steps.",
 		"needs": [["lean", "craft", -1]], "sky": Color(1.0, 0.92, 0.78),
@@ -314,7 +338,7 @@ const ENDINGS := {
 		"lines": [["Narrator", "The sky is held. It is held by one person, on a peak with snow on it, who came up the whole road without sitting down at anybody's table, and so has nobody's table to go down to."],
 			["Narrator", "In the valleys they know that the sky stopped falling, as they know that the river rose once and went down again. They do not know who. Yue Ling brings rice up the mountain for a while. The fire it is cooked on is the only one he ever kept, and he lets it go out between her visits."]]},
 }
-const ENDING_ORDER := ["azure", "home", "road", "open", "lotus", "school", "broom", "far", "throne", "blade", "engine", "cold"]
+const ENDING_ORDER := ["azure", "home", "road", "open", "lotus", "school", "guiyun", "founder", "broom", "far", "pine", "throne", "blade", "engine", "granary", "cold"]
 const ENDING_KINDS := {"bright": "a bright end", "bitter": "a bitter end", "dark": "a dark end"}
 
 # ---------------------------------------------------------------- lookups
@@ -486,6 +510,11 @@ static func ending_need_met(n: Array, g) -> bool:
 			return Works.count(g) >= int(n[1])
 		"alone":
 			return guests(g) <= 1 and Bonds.level(g) <= 1
+		# ---- the Three Burrows release
+		"hold_rank":
+			return Hold.rank(g) >= int(n[1])
+		"chose":
+			return Echoes.chosen(g, str(n[1])) in (n[2] as Array)
 	return false
 
 static func ending_need_text(n: Array, g) -> String:
@@ -505,6 +534,14 @@ static func ending_need_text(n: Array, g) -> String:
 			return "Known at the crossroads as %s (you: %s)" % [str(sc.pos if int(n[2]) > 0 else sc.neg), Echoes.name_of(g, str(n[1])) if Echoes.lean(g, str(n[1])) != 0 else "neither"]
 		"works":
 			return "%d works built (yours: %d)" % [int(n[1]), Works.count(g)]
+		"hold_rank":
+			return "Guiyun %s (now: %s)" % [str(Hold.RANK_WORDS[int(n[1])]), str(Hold.RANK_WORDS[Hold.rank(g)]) if Hold.rank(g) > 0 else "not founded"]
+		"chose":
+			var want: Array = []
+			for oid in n[2]:
+				want.append("\"%s\"" % str(Echoes.option(str(n[1]), str(oid)).get("label", oid)))
+			var got := Echoes.chosen(g, str(n[1]))
+			return "At the crossroads of %s, answered %s (you: %s)" % [str(Echoes.CROSSROADS[str(n[1])].n).to_lower(), " or ".join(want), ("\"%s\"" % str(Echoes.option(str(n[1]), got).get("label", got))) if got != "" else "not yet asked"]
 		"alone":
 			return "A guest at no hearth but your own, and a stranger still to Yue Ling (hearths: %d; she calls you %s)" % [guests(g), Bonds.title(g)]
 	return ""

@@ -34,7 +34,16 @@ const FEATS := {
 	"half_way": {"n": "Fourteen Realms Up", "kind": "road", "pts": 10, "test": ["level", 42], "desc": "Reach the fourteenth great realm."},
 	"great_sound": {"n": "The Great Note", "kind": "road", "pts": 20, "test": ["level", 84], "desc": "Reach Great Sound, Rarely Heard."},
 	# the Lost Horse release: the last realm, what was lost to, and what was left standing
-	"soft_water": {"n": "Soft as Water", "kind": "road", "pts": 20, "test": ["level", 87], "desc": "Reach Soft as Water: the last realm there is."},
+	"soft_water": {"n": "Soft as Water", "kind": "road", "pts": 20, "test": ["level", 87], "desc": "Reach Soft as Water."},
+	# the Three Burrows release: the last realm, and the town that is the hero's own (hold.gd)
+	"scarcely_known": {"n": "Barely Known to Be There", "kind": "road", "pts": 20, "test": ["level", 90], "desc": "Reach Scarcely Known: the last realm there is."},
+	"hamlet": {"n": "Four Posts and an Argument", "kind": "people", "pts": 5, "test": ["hold_rank", 1], "desc": "Found a town of your own."},
+	"town": {"n": "A Place to Be Cheated In", "kind": "people", "pts": 10, "test": ["hold_rank", 2], "desc": "See Guiyun become a town: fifty households and a market."},
+	"hundred_households": {"n": "The Hundred Households", "kind": "people", "pts": 20, "test": ["hold_rank", 3], "desc": "See Guiyun become a city: a hundred households and a wall."},
+	"asked_ten": {"n": "A Lord Is Known by His Guests", "kind": "people", "pts": 10, "test": ["settlers", 10], "desc": "Ask ten families to come and live at Guiyun, and have them come."},
+	"every_plot": {"n": "Nothing Left on the Drawing-Board", "kind": "craft", "pts": 10, "test": ["plots", 12], "desc": "Build everything that was drawn up for Guiyun."},
+	"dues": {"n": "Counted Twice", "kind": "people", "pts": 5, "test": ["dues", 5000], "desc": "Take five thousand spirit stones of dues from the steward's chest."},
+	"own_gate": {"n": "A Name over a Door", "kind": "road", "pts": 10, "test": ["step", "s_p25_seat"], "desc": "Say whose name goes over the Hall of the Broom."},
 	"first_fall": {"n": "Set Down Somewhere Else", "kind": "road", "pts": 5, "test": ["fallen", 1], "desc": "Lose a battle that could not be won, and go on."},
 	"three_dooms": {"n": "The Tide, the Ape and the Riders", "kind": "road", "pts": 10, "test": ["dooms", 3], "desc": "Stand in front of all three of the things that are not beaten."},
 	"gave_way": {"n": "Who Put Up the Sword", "kind": "road", "pts": 10, "test": ["yielded", 1], "desc": "Give way to something that cannot be fought, standing."},
@@ -300,6 +309,15 @@ static func value(g, t: Array) -> float:
 			return float((1 if g.falls.has("tide_horse") or g.falls.has("tide_mare") or g.falls.has("spring_colt") else 0) + (1 if g.falls.has("wuzhiqi") else 0) + (1 if g.falls.has("the_riders") else 0))
 		"marks":
 			return float(g.marks_seen.size())
+		# the Three Burrows release (hold.gd)
+		"hold_rank":
+			return float(Hold.rank(g))
+		"settlers":
+			return float(Hold.settlers(g))
+		"plots":
+			return float(Hold.built_count(g))
+		"dues":
+			return float(int(g.hold.get("dues", 0)))
 		"songs_played":
 			return float(g.songs_played)
 		"outfits":

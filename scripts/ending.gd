@@ -57,7 +57,7 @@ const ROAD_ENDS := {
 	"peoples": ["the Road of the Many Peoples", "The war god of the Nine Li took a seat at the Conclave, and argued with everybody."],
 	"cauldron": ["the Road of the Cauldron", "Chiyou went home to the plains of the Nine Li as autumn leaves, smiling."],
 }
-const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths", "works": "the Works", "arms": "the Hand", "delve": "the Dark", "heights": "the Heights", "host": "the Host", "song": "the Song", "loss": "the Loss", "mark": "What Stands"}
+const KIND_WORD := {"folk": "the People", "might": "Might", "craft": "Craft", "wealth": "Wealth", "respect": "Respect", "dao": "Dao", "peoples": "Friendship", "relic": "Relic", "bond": "Bonds", "heart": "Side by side", "land": "the Land", "hearth": "the Hearths", "works": "the Works", "arms": "the Hand", "delve": "the Dark", "heights": "the Heights", "host": "the Host", "song": "the Song", "loss": "the Loss", "mark": "What Stands", "town": "the Town"}
 ## where the camera rests while the results are read: the two of them on the lotus at the left of
 ## the frame, the Jianmu far off beyond them and the gates on the clouds towards the setting sun
 const REST_EYE := Vector3(2.4, 1.55, 6.6)
@@ -164,7 +164,8 @@ func _refresh_ending() -> void:
 				(c as OmniLight3D).light_color = Color(1.0, 0.62, 0.3) * sky
 
 ## what the results are headed with, for the ends that are not an ascension
-const HEADLINES := {"school": "THE SCHOOL", "broom": "A MORTAL LIFE", "throne": "THE THRONE", "blade": "UNSHEATHED", "engine": "THE ENGINE", "cold": "ALONE"}
+const HEADLINES := {"school": "THE SCHOOL", "broom": "A MORTAL LIFE", "throne": "THE THRONE", "blade": "UNSHEATHED", "engine": "THE ENGINE", "cold": "ALONE",
+	"guiyun": "A HUNDRED HOUSEHOLDS", "founder": "THE GATE", "pine": "THE SEAT", "granary": "THE CHEST"}
 
 ## the last line of the film for the ends that are not kept by a fire (cultures.gd: the bitter and the dark)
 const LAST_WORDS := {
@@ -174,6 +175,8 @@ const LAST_WORDS := {
 	"blade": "Lin Feng, once a sweeper of steps, is still on the road, looking for somebody worth the drawing of a blade.",
 	"engine": "Lin Feng, once a sweeper of steps, built a wheel to hold up the sky, and sweeps round it.",
 	"cold": "Lin Feng, once a sweeper of steps, holds up the sky. Nobody was asked to help, and nobody knows.",
+	"pine": "Lin Feng, once a sweeper of steps, sits in a seat he took in an evening, and is teaching three hundred to stand.",
+	"granary": "Lin Feng, once a sweeper of steps, keeps the chest of a hundred households, to the grain, behind a seal.",
 }
 
 ## The film's last line and its caption for the end chosen.

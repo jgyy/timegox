@@ -63,6 +63,8 @@ const PEOPLE := {
 	"shan_gui": "characters/shan_gui", "dongyue": "characters/dongyue",
 	# Part XXIV (the Lost Horse release): the old man of the frontier, his son, and the king of the sea-wall
 	"sai_weng": "characters/sai_weng", "weng_son": "characters/weng_son", "qian_liu": "characters/qian_liu",
+	# Part XXV: the steward who burned the tallies, the widow of Mount Tai and the Patriarch of the Cold Pine
+	"feng_xuan": "characters/feng_xuan", "tai_widow": "characters/tai_widow", "han_song": "characters/han_song",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",

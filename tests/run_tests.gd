@@ -899,7 +899,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "households"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -989,6 +989,10 @@ func _init() -> void:
 					"marks":
 						# what the choices left standing (marks.gd): fewer than there are crossroads behind him
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 8
+					"households":
+						# the Three Burrows release: households of the hero's own town (hold.gd): no more than
+						# the story has brought there by the trial, nor than a city has
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= int(Hold.RANKS[3][0])
 				check(ok, "%s/%s: requirement %s is well formed" % [tid, p.id, str(n)])
 				if str(n[0]) in ["item", "give"] and Trials.RECIPES.has(str(n[1])):
 					check(str(Trials.RECIPES[str(n[1])].get("for", "")) == tid, "%s/%s: the recipe for %s says what it is for" % [tid, p.id, n[1]])
@@ -1157,7 +1161,7 @@ func _init() -> void:
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost", "s_p25_guests"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -1173,7 +1177,8 @@ func _init() -> void:
 				for pe8b in Data.AREAS[st8.area].get("warband2", {}).get("pool", []):
 					marching8[pe8b[0]] = true
 				# (Part XXIV: and a third and a fourth)
-				for bk8 in ["warband3", "warband4"]:
+				# (Part XXV: and a fifth and a sixth, placed after the marks)
+				for bk8 in ["warband3", "warband4", "warband5", "warband6"]:
 					for pe8c in Data.AREAS[st8.area].get(bk8, {}).get("pool", []):
 						marching8[pe8c[0]] = true
 			for fid in st8.of:
@@ -2077,6 +2082,7 @@ func _fates_and_faces() -> void:
 	_high_roads()
 	_thundering_pots()
 	_lost_horse()
+	_three_burrows()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -2854,7 +2860,7 @@ func _new_fire() -> void:
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	check(UI.named("Lin Feng lifts his broom.") == "Lin Feng lifts his broom.", "and the story's own sweeper is told as he was written")
 	print("== the ends of the story (cultures.gd) ==")
-	check(Cultures.ENDING_ORDER.size() == 12 and Cultures.ENDINGS.size() == 12, "twelve ends: the five of the New Fire, and seven more that are not all kept by a fire")
+	check(Cultures.ENDING_ORDER.size() == 16 and Cultures.ENDINGS.size() == 16, "sixteen ends: the five of the New Fire, seven more that are not all kept by a fire, and four for whoever answered for a town")
 	HG.reset()
 	# (somebody who has sat at nobody's table and hardly knows the one beside him may also hold the sky alone)
 	check(Cultures.endings_open(HG) == ["azure", "home", "cold"] and Cultures.ending_of(HG) == "azure", "the mountain and the way home are always open; the others are earned (and the cold hearth is what nothing earns)")
@@ -2862,7 +2868,7 @@ func _new_fire() -> void:
 		var en: Dictionary = Cultures.ENDINGS[eid]
 		check(str(en.n) != "" and str(en.label) != "" and str(en.desc).length() > 60 and (en.lines as Array).size() >= 2 and en.sky is Color, "the ending %s has a name, a choice, and its own last words" % eid)
 		for nd in en.needs:
-			check(str(nd[0]) in ["home", "guests", "peoples", "heart", "arms", "masters", "lean", "works", "alone"] and (str(nd[0]) == "home" or Cultures.ending_need_text(nd, HG) != ""), "%s: what it asks is something the journey can earn" % eid)
+			check(str(nd[0]) in ["home", "guests", "peoples", "heart", "arms", "masters", "lean", "works", "alone", "hold_rank", "chose"] and (str(nd[0]) == "home" or Cultures.ending_need_text(nd, HG) != ""), "%s: what it asks is something the journey can earn" % eid)
 	for hid4 in ["steppe", "sand", "river", "forge"]:
 		Cultures.earn(HG, hid4, Cultures.GUEST)
 	check(Cultures.ending_open("road", HG) and not Cultures.ending_open("open", HG), "five hearths open the road; the open door wants the peoples of the realms as well")
@@ -3136,7 +3142,7 @@ func _hundred_works() -> void:
 	Echoes.take(HWG, "bandits", "drive")
 	check(Echoes.chosen(HWG, "bandits") == "mend" and Echoes.scale(HWG, "heart") == 2, "a crossroads is answered once")
 	var gw: Array = Echoes.told(HWG, "s_vl_intro", Data.DIALOGUE.s_vl_intro)
-	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 4],
+	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 5],
 		"six parts later Granny Wen speaks of the road-menders, and the echo is kept")
 	check(Echoes.told(HWG, "s_intro", Data.DIALOGUE.s_intro) == Data.DIALOGUE.s_intro, "a conversation with no crossroads behind it is as it was")
 	check(not Echoes.merciful(HWG), "one kindness is not yet a name")
@@ -3153,7 +3159,7 @@ func _hundred_works() -> void:
 	check(Echoes.lean(HWG, "craft") == 1 and Echoes.lean_mod(HWG, "works_stones") == Echoes.WORKS_STONES and Works.cost_stones(HWG, "wooden_ox") < int(Works.TIER_STONES[5]), "of the new works: the makers ask less")
 	Echoes.take(HWG, "cauldron_map", "keep")
 	check(Echoes.lean(HWG, "reach") == -1 and Echoes.lean_mod(HWG, "renown") == float(Echoes.RENOWN_MORE) and Echoes.lean_mod(HWG, "regard") == 1.0, "of the home fire: his name comes back larger")
-	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 4") and Echoes.text(HWG, "bandits").contains("It stands in the land: The Menders' Road") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
+	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 5") and Echoes.text(HWG, "bandits").contains("It stands in the land: The Menders' Road") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
 	# the last question of Part XIX can only be answered for a school by somebody who has built three works of it
 	HWG.works = {}
 	var lastq: Dictionary = Echoes.CROSSROADS.the_works
@@ -3729,7 +3735,7 @@ func _hundred_arms() -> void:
 			par.width = 1100.0
 			par.add_string(str(ln[1]), UI.font(), 22)
 			check(par.get_line_count() <= 4, "%s: its last words fit the dialogue box" % eid)
-	check(int(kinds.get("dark", 0)) == 4 and int(kinds.get("bitter", 0)) == 1 and int(kinds.get("bright", 0)) == 7, "seven bright ends, one bitter and four dark")
+	check(int(kinds.get("dark", 0)) == 5 and int(kinds.get("bitter", 0)) == 2 and int(kinds.get("bright", 0)) == 9, "nine bright ends, two bitter and five dark")
 	check(ending_txt.contains("const HEADLINES") and ["school", "broom", "throne", "blade", "engine", "cold"].all(func(h2): return ending_txt.contains("\"%s\": \"" % h2)) and ending_txt.contains("HEADLINES.get(Cultures.ending_of(Game), \"ASCENSION\")"),
 		"the results are headed ASCENSION only for the ends that are one")
 	check(Cultures.ending_open("cold", EG) and not Cultures.ending_open("school", EG) and not Cultures.ending_open("throne", EG), "a journey that sat at nobody's table may hold the sky alone, and has earned no school and no throne")
@@ -4453,15 +4459,15 @@ func _lost_horse() -> void:
 	check(Data.step_index(Reckon.STEP) == Data.step_index("s_p24_end") - 1 and Data.DIALOGUE.has("done:" + Reckon.STEP) and msrc.contains("Reckon.might(Game") and bsrc.contains("Reckon.left(Game)"),
 		"the reckoning comes before the last word with the Elder; the battle is as the journey made it, and the bot goes up to whoever is due")
 	print("== Part XXIV: the Lost Horse ==")
-	check(Data.REALMS.size() == 30 and Data.REALMS[29] == "Soft as Water" and Data.MAX_LEVEL == 87 and Data.level_name(87).ends_with("Soft as Water") and Data.REALM_INFO.size() == 30
+	check(Data.REALMS.size() >= 30 and Data.REALMS[29] == "Soft as Water" and Data.MAX_LEVEL >= 87 and Data.level_name(87).ends_with("Soft as Water") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXIV adds the realm of Soft as Water")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break29" and Data.DIALOGUE.has("recall22") and msrc.contains("\"s_break28\": \"recall22\"") and Data.DIALOGUE.has("pre:s_break29") and Data.DIALOGUE.has("post:s_break29"),
-		"Part XXIV follows Great Sound, Rarely Heard (recall22) and ends the game")
+	check(Data.step_index("s_break29") == Data.step_index("s_p24_end") + 1 and Data.DIALOGUE.has("recall22") and msrc.contains("\"s_break28\": \"recall22\"") and Data.DIALOGUE.has("pre:s_break29") and Data.DIALOGUE.has("post:s_break29"),
+		"Part XXIV follows Great Sound, Rarely Heard (recall22) and ends with a breakthrough")
 	var n24 := 0
 	var kinds24 := {}
 	var doom_bands := {}
 	for a24 in Data.AREAS:
-		for bk24 in ["warband", "warband2", "warband3", "warband4"]:
+		for bk24 in ["warband", "warband2", "warband3", "warband4", "warband5", "warband6"]:
 			var bd24: Dictionary = Data.AREAS[a24].get(bk24, {})
 			if bd24.is_empty():
 				continue
@@ -4472,9 +4478,10 @@ func _lost_horse() -> void:
 					doom_bands[str(pe24[0])] = a24
 			check(dn == 0 or (dn == (bd24.pool as Array).size() and str(bd24.get("until", "")) != "" and Data.step_index(str(bd24.until)) > Data.step_index(str(bd24.vis))),
 				"%s/%s: a band of what cannot be beaten is nothing else, and stops marching when its chapter has done with it" % [a24, bk24])
-			if bk24 in ["warband3", "warband4"]:
+			if bk24 in ["warband3", "warband4", "warband5", "warband6"]:
 				var lw24: Dictionary = Atlas.world_of(Data.layer_of(a24))
-				var marching24: Array = lw24.ents.filter(func(e6): return e6.kind == "enemy" and str(e6.id).begins_with(a24 + (":y" if bk24 == "warband3" else ":z")))
+				var pre24: String = a24 + ":" + str({"warband3": "y", "warband4": "z", "warband5": "u", "warband6": "v"}[bk24])
+				var marching24: Array = lw24.ents.filter(func(e6): return e6.kind == "enemy" and str(e6.id).begins_with(pre24) and str(e6.id).substr(pre24.length()).is_valid_int())
 				check(marching24.size() == int(bd24.n) and Data.step_index(str(bd24.vis)) >= 0, "%s: %d packs of its %s placed" % [a24, marching24.size(), bk24])
 				# (placed after the peaks and the camps: never on the rock, never at a camp fire)
 				var off_rock := true
@@ -4559,6 +4566,380 @@ func _lost_horse() -> void:
 				ways += 1
 		check(ways >= 1 and Atlas.owner_id(wsurf, e24.pos) == str(e24.area), "%s can be walked up to, in its own region (%d ways)" % [e24.id, ways])
 	check(found24 == 17 + 4 + 3, "seventeen things to find, four lords and three people of Part XXIV stand in the land (%d)" % found24)
+
+# ================================================================ the Three Burrows release
+## A town that is the hero's own (hold.gd): its plots, people, dues, rank and power; three crossroads
+## and what each leaves standing; four more ends of the story; and Part XXV.
+func _three_burrows() -> void:
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	var asrc := FileAccess.get_file_as_string("res://scripts/atlas.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	print("== a town of one's own (hold.gd) ==")
+	check(Hold.ORDER.size() == 12 and Hold.PLOTS.size() == 12 and Hold.ORDER[0] == "hall" and int(Hold.PLOTS.hall.cost) == 0, "twelve plots drawn up, and the hall stands from the founding")
+	var at_seen := {}
+	var total_cost := 0
+	var total_room := 0
+	var total_homes := 0
+	for pid in Hold.ORDER:
+		var p: Dictionary = Hold.PLOTS[pid]
+		var pa: Vector2i = p.at
+		check(str(p.n).length() > 3 and fits.call(str(p.desc)) and str(p.desc).length() > 80 and str(p.ask).length() > 10 and int(p.cost) >= 0 and int(p.room) >= 0 and int(p.homes) >= 0,
+			"plot %s: a name, something to read that fits the box, what the steward says it is for, a price" % pid)
+		# (the wall is the ring of the ground: its own plot is the length beside the Cloud Gate)
+		check((pid == "wall" and pa.y == Hold.SIZE.y - 1 and Hold.GATES.has(pa + Vector2i(-1, 0))) or (pa.x % 2 == 1 and pa.y % 2 == 1 and pa.x > 0 and pa.y > 0 and pa.x < Hold.SIZE.x - 1 and pa.y < Hold.SIZE.y - 1 and not at_seen.has(pa)), "plot %s: a place of its own, with a lane on every side" % pid)
+		at_seen[pa] = true
+		total_cost += int(p.cost)
+		total_room += int(p.room)
+		total_homes += int(p.homes)
+		for r in [1, 2, 3]:
+			var pm := Hold.model(pid, r, "found" if r == 3 else "")
+			check(pm.get_child_count() >= 1, "plot %s: built from code (rank %d)" % [pid, r])
+			pm.free()
+	check(total_room >= int(Hold.RANKS[3][0]) and total_homes < int(Hold.RANKS[3][0]), "there is room for a city (%d), and a city is not had by building alone (%d households come with the plots)" % [total_room, total_homes])
+	check(Hold.SETTLERS.size() >= 6, "six people come to live there as it fills")
+	for sv in Hold.SETTLERS:
+		check(int(sv[0]) <= int(Hold.RANKS[3][0]) and Assets.PEOPLE.has(str(sv[2])) and Assets.has(Assets.PEOPLE[str(sv[2])]) and sv.size() >= 8 and fits.call(str(sv[5])) and fits.call(str(sv[6])) and fits.call(str(sv[7]))
+			and not at_seen.has(sv[4]) and ((sv[4] as Vector2i).x % 2 == 0 or (sv[4] as Vector2i).y % 2 == 0), "%s: a body of the towns, three things to say, and a place in a lane" % str(sv[1]))
+	# where it stands: on open ground of the mountain, every plot walked up to, nobody shut in when all is built
+	var ws: Dictionary = Atlas.world_of("surface")
+	var W := int(ws.w)
+	var plots := {}
+	var people: Array = []
+	var others := {}
+	var walled := {}
+	var segs := 0
+	for e in ws.ents:
+		if e.kind == "hold":
+			walled[e.pos] = true
+			if e.has("seg"):
+				segs += 1
+			# (a plot: what is built in the town, and of the wall the length that carries the gate)
+			if not e.has("seg") or bool(e.seg[2]):
+				plots[e.pos] = e
+		elif e.has("hold") or str(e.id) == Hold.STEWARD:
+			people.append(e)
+		elif e.has("pos"):
+			others[e.pos] = e
+	check(plots.size() == Hold.ORDER.size() and people.size() == Hold.SETTLERS.size() + 1, "all twelve plots, the steward and the settlers stand in the world (%d, %d)" % [plots.size(), people.size()])
+	# the wall is the ring of the ground, less its three gates, every length on open ground
+	var ring := Hold.wall_tiles()
+	check(ring.size() == 2 * (Hold.SIZE.x + Hold.SIZE.y) - 4 - Hold.GATES.size() and segs == ring.size() and Hold.GATES.size() == 3, "the wall is %d lengths round the ground, with three ways through it" % ring.size())
+	for gt in Hold.GATES:
+		var gq := Atlas.to_world(Hold.AREA, Hold.tile(gt))
+		check(not walled.has(gq) and MapGen.is_walkable_tile(ws.grid[gq.y * W + gq.x]), "the gate at %s is open ground, and nothing stands in it" % str(gt))
+	var seen0 := MapGen.flood(ws.grid, W, int(ws.h), ws.start)
+	# (a flood of the realm with every plot built and the wall up: what can still be walked to)
+	var seen := {ws.start: true}
+	var queue: Array = [ws.start]
+	while not queue.is_empty():
+		var c: Vector2i = queue.pop_back()
+		for d in MapGen.DIRS:
+			var nq: Vector2i = c + d
+			if nq.x < 0 or nq.y < 0 or nq.x >= W or nq.y >= int(ws.h) or seen.has(nq) or walled.has(nq) or not MapGen.is_walkable_tile(ws.grid[nq.y * W + nq.x]):
+				continue
+			seen[nq] = true
+			queue.append(nq)
+	for q1 in plots:
+		var pe: Dictionary = plots[q1]
+		var ways := 0
+		for d1 in MapGen.DIRS:
+			if seen.has(q1 + d1) and not others.has(q1 + d1):
+				ways += 1
+		check(Atlas.owner_id(ws, q1) == Hold.AREA and MapGen.is_walkable_tile(ws.grid[q1.y * W + q1.x]) and not others.has(q1) and ways >= 2 and q1 == Atlas.to_world(Hold.AREA, Hold.tile(Hold.PLOTS[str(pe.plot)].at)),
+			"%s stands on open ground of the mountain, where it was drawn, and can be walked up to (%d ways)" % [pe.id, ways])
+	check(seen0.size() - seen.size() == walled.size(), "with everything built and the wall up, nothing in the realm is cut off but the ground the town stands on (%d tiles, %d built on)" % [seen0.size() - seen.size(), walled.size()])
+	for pp in people:
+		check(seen.has(pp.pos) and not walled.has(pp.pos) and not others.has(pp.pos), "%s stands in a lane, and is shut in by nothing that can be built" % pp.id)
+		if str(pp.id) == Hold.STEWARD:
+			check(pp.pos == Atlas.to_world(Hold.AREA, Hold.tile(Hold.STEWARD_AT)) and str(pp.vis[0]) == "s_p25_home", "the steward sits where the hall will go, from the step that sends for him")
+	# (nothing else stands within three tiles of the ground: it was found empty)
+	var crowd := 0
+	var g0 := Atlas.to_world(Hold.AREA, Hold.AT)
+	for op in others:
+		var oq: Vector2i = op
+		if oq.x >= g0.x - 2 and oq.y >= g0.y - 2 and oq.x < g0.x + Hold.SIZE.x + 2 and oq.y < g0.y + Hold.SIZE.y + 2:
+			crowd += 1
+	check(crowd == 0, "nothing else stands on the ground of Guiyun or beside it (%d)" % crowd)
+	check(asrc.find("Hold.place(") > 0 and asrc.find("Hold.place(") < asrc.find("Marks.place(") and asrc.find("Hold.place(") < asrc.find("late_slots, grid"), "the ground is taken before the late bands and the marks, so that they keep off it")
+	# ---- the rules
+	var HG = load("res://scripts/game.gd").new()
+	HG.reset()
+	check(not Hold.founded(HG) and Hold.households(HG) == 0 and Hold.rank(HG) == 0 and Hold.power(HG) == 0 and Hold.chest(HG) == 0 and not Hold.stands(HG, plots.values()[0]) and not Hold.stands(HG, people[0]) and Hold.epilogue(HG).is_empty(),
+		"before the story comes to it there is no town: nothing stands, nobody lives there, nothing is owed")
+	check(Hold.blocked(HG, "well") != "" and not Hold.build(HG, "well") and not Hold.settle(HG, "x", "X") and Hold.text(HG).contains("no town yet"), "and nothing can be built or asked")
+	HG.step = Data.step_index(Hold.FOUND_STEP)
+	HG.stones = 0
+	HG.advance()
+	check(Hold.founded(HG) and Hold.built(HG, "hall") and Hold.built_count(HG) == 1 and Hold.households(HG) == int(Hold.PLOTS.hall.homes) and Hold.rank(HG) == 1 and Hold.rank_name(HG) == "Guiyun Hamlet" and HG.hold.has("day0"),
+		"the steward heard out, the town is founded: a hall, four households, a hamlet")
+	var purse := int(HG.stones)
+	HG.stones = 100
+	check(Hold.blocked(HG, "well").contains("spirit stones") and not Hold.build(HG, "well") and Hold.next(HG) == "", "nothing is built on credit")
+	HG.stones = 5000
+	check(Hold.next(HG) == "well" and Hold.build(HG, "well") and HG.stones == 5000 - int(Hold.PLOTS.well.cost) and Hold.built(HG, "well") and Hold.blocked(HG, "well") != "" and Hold.room(HG) == int(Hold.PLOTS.hall.room) + int(Hold.PLOTS.well.room),
+		"a well is built at the steward's table, paid for, and makes room")
+	check(Hold.blocked(HG, "market").contains("households") and Hold.wanted(HG, ["plot", "market"]) == "" and Hold.wanted(HG, ["built", 3]) == "homes1", "a market waits for thirty households; the next thing to build is the first row")
+	HG.stones = purse
+	# people: asked one family at a time, while there is room
+	var h0 := Hold.households(HG)
+	check(Hold.can_settle(HG, "a") and Hold.settle(HG, "a", "Woodcutter A") and Hold.households(HG) == h0 + Hold.PER_SETTLER and not Hold.settle(HG, "a", "Woodcutter A") and Hold.settlers(HG) == 1 and Hold.can_settle(HG, "b"), "a family asked brings four households, once")
+	Hold.settle(HG, "b", "B")
+	Hold.settle(HG, "c", "C")
+	Hold.settle(HG, "c2", "C2")
+	check(Hold.wanting(HG) >= Hold.room(HG) and not Hold.can_settle(HG, "d") and not Hold.settle(HG, "d", "D") and Hold.full_text(HG).contains("build first") and Hold.households(HG) == Hold.room(HG),
+		"when every roof is full nobody more can be asked: build first")
+	check(Hold.settle(HG, "d", "D", true) and Hold.households(HG) == Hold.room(HG), "the story's own settlers come whether or not there is a roof yet, and wait for one")
+	check(Hold.may_ask({"role": "pedlar", "kid": false}) and not Hold.may_ask({"role": "farmer", "kid": true}) and not Hold.may_ask({"role": "guard", "kid": false}) and Hold.yes_line({"role": "hermit"}) != Hold.yes_line({"role": "farmer"}),
+		"anybody grown with no post to keep may be asked, and answers after their own trade")
+	# dues: a little a day into a chest that holds five days
+	HG.hold["taken"] = int(HG.day)
+	var due0 := Hold.due(HG)
+	check(due0 == Hold.households(HG) * Hold.DUE and Hold.chest(HG) == 0, "every household pays a little a day (%d), and the chest begins empty" % due0)
+	HG.day += 2
+	check(Hold.chest(HG) == 2 * Hold.due(HG), "two days: two days' dues in the chest")
+	HG.day += 30
+	check(Hold.chest(HG) == Hold.CHEST_DAYS * Hold.due(HG), "left a month, the chest holds five days and no more")
+	var s0 := int(HG.stones)
+	var took := Hold.take(HG)
+	check(took > 0 and HG.stones == s0 + took and Hold.chest(HG) == 0 and int(HG.hold.dues) == took, "emptied, it is in the purse, and the chest begins again")
+	check(Hold.grown(HG) == Hold.GROW_MAX, "and the town has grown of itself, a couple of households a day, thirty at the most")
+	# built out: a town, a city, a watch, a hall with disciples
+	HG.stones = 1000000
+	HG.hold["day0"] = int(HG.day)
+	var ranks_seen := {}
+	var guard := 0
+	var k9 := 0
+	while not Hold.unbuilt(HG).is_empty() and guard < 80:
+		guard += 1
+		if Hold.next(HG) != "":
+			Hold.build(HG, Hold.next(HG))
+		else:
+			k9 += 1
+			Hold.settle(HG, "s%d" % k9, "S", true)
+		ranks_seen[Hold.rank(HG)] = true
+	check(Hold.unbuilt(HG).is_empty() and ranks_seen.has(2) and Hold.built_count(HG) == 12, "with people asked as it grows, everything drawn up can be built (%d families asked)" % Hold.settlers(HG))
+	while Hold.households(HG) < 100 and guard < 200:
+		guard += 1
+		k9 += 1
+		Hold.settle(HG, "s%d" % k9, "S", true)
+	check(Hold.rank(HG) == 3 and Hold.rank_name(HG).contains("Hundred Households") and Hold.rank_lack(HG, 3) == "" and Hold.watch(HG) and War.has(HG, "guiyun") and Trials.need_met(["households", 100], HG) and Hold.disciples(HG) >= 10 and Hold.power(HG) >= 20,
+		"a hundred households and a wall: a city, with a watch in the host and disciples in the Hall of the Broom (power %d)" % Hold.power(HG))
+	check(Hold.need_met(HG, ["rank", 3]) and Hold.need_met(HG, ["built", 12]) and Hold.need_met(HG, ["plot", "wall"]) and Hold.need_met(HG, ["households", 100]) and Hold.need_progress(HG, ["rank", 3]) == [100, 100], "and whatever a step of the story could ask of it is so")
+	for pe2 in plots.values():
+		check(Hold.stands(HG, pe2) and Hold.key(HG, pe2) != "" and Hold.name_of(pe2) != "" and fits.call(Hold.desc_of(HG, pe2)), "%s stands, and can be read" % pe2.id)
+	var up := 0
+	var seg_m: Node3D = null
+	for e9 in ws.ents:
+		if e9.kind == "hold" and e9.has("seg"):
+			up += 1 if Hold.stands(HG, e9) else 0
+			if seg_m == null and not bool(e9.seg[2]):
+				seg_m = Hold.model_of(e9, 3, "")
+				check(Hold.name_of(e9) == "" and seg_m.get_child_count() >= 1, "a length of the wall is built from code, and has no name of its own")
+	if seg_m != null:
+		seg_m.free()
+	check(up == segs, "and every length of the wall stands (%d)" % up)
+	for pp2 in people:
+		if pp2.has("hold"):
+			check(Hold.stands(HG, pp2), "%s has come to live there" % str(pp2.n))
+	check(Hold.epilogue(HG).size() == 1 and fits.call(str(Hold.epilogue(HG)[0])) and Hold.text(HG).contains("Watch of Guiyun") and Hold.summary(HG).contains("12 of 12"), "the ending tells of the town, and the Town page keeps it")
+	# the three crossroads change its numbers, its banner and what the land calls it
+	var k_hall: String = Hold.key(HG, plots[Atlas.to_world(Hold.AREA, Hold.tile(Hold.PLOTS.hall.at))])
+	var due1 := Hold.due(HG)
+	var pw1 := Hold.power(HG)
+	var dis1 := Hold.disciples(HG)
+	Echoes.take(HG, "the_tallies", "collect")
+	check(Hold.due(HG) > due1 and Hold.mod(HG, "grow") < 1.0, "debts collected to the notch: more in the chest, and fewer come of themselves")
+	Echoes.take(HG, "the_door", "all")
+	check(Hold.mod(HG, "room") > 1.0 and Hold.room(HG) > total_room, "whoever knocks: room for more")
+	Echoes.take(HG, "the_seat", "take")
+	check(Hold.sect(HG) == "take" and Hold.sect_name(HG).contains("Cold Pine") and Hold.sect_title(HG).contains("Patriarch") and Hold.power(HG) > pw1 and Hold.disciples(HG) > dis1
+		and Hold.key(HG, plots[Atlas.to_world(Hold.AREA, Hold.tile(Hold.PLOTS.hall.at))]) != k_hall and Hold.epilogue(HG).size() == 2, "the Cold Pine's seat taken: a title, more disciples, more power, another banner over the hall, and a second line at the end")
+	check(Cultures.ending_open("pine", HG) and Cultures.ending_open("granary", HG) and not Cultures.ending_open("founder", HG) and not Cultures.ending_open("guiyun", HG), "that journey may end in the borrowed seat or at the granary, and not otherwise")
+	HG.picks.erase("the_seat")
+	HG.picks.erase("the_tallies")
+	Echoes.take(HG, "the_seat", "found")
+	Echoes.take(HG, "the_tallies", "burn")
+	check(Hold.sect_name(HG).contains("Returning Cloud") and Cultures.ending_open("founder", HG) and Cultures.ending_open("guiyun", HG) and not Cultures.ending_open("pine", HG) and not Cultures.ending_open("granary", HG)
+		and Hold.mod(HG, "settler") > 1.0 and Hold.mod(HG, "due") < 1.0, "debts burned and a gate of his own: the hundred households, or the Returning Cloud")
+	for eid in ["guiyun", "founder", "pine", "granary"]:
+		for nd in Cultures.ENDINGS[eid].needs:
+			check(Cultures.ending_need_text(nd, HG) != "" and Cultures.ending_need_text(nd, HG).length() < 200, "%s: what it asks is said plainly" % eid)
+	Feats.poll(HG)
+	check(HG.feats.has("hamlet") and HG.feats.has("town") and HG.feats.has("hundred_households") and HG.feats.has("every_plot") and HG.feats.has("asked_ten") and not HG.feats.has("dues"), "founding, growing and building out are feats; five thousand in dues is another")
+	HG.free()
+	# the story never asks of the town more than its own steps have brought there, whatever was answered,
+	# and never more than its own rewards have paid for
+	var first25 := Data.step_index("s_p25_home")
+	for answers in [{}, {"the_tallies": "collect"}, {"the_tallies": "burn", "the_door": "all"}, {"the_tallies": "shares", "the_door": "sweep"}]:
+		var SG = load("res://scripts/game.gd").new()
+		SG.reset()
+		var paid := 0
+		var spent := 0
+		for i in range(first25, Data.STEPS.size()):
+			var st: Dictionary = Data.STEPS[i]
+			SG.step = i
+			if i > Data.step_index(Hold.FOUND_STEP):
+				Hold._day0(SG)
+			for cid in answers:
+				if str(Echoes.CROSSROADS[cid].step) == str(Data.STEPS[i - 1].id):
+					SG.picks[cid] = answers[cid]
+			if str(st.kind) == "hold":
+				SG.stones = 10000000
+				var tries := 0
+				while not Hold.need_met(SG, st.need) and Hold.wanted(SG, st.need) != "" and tries < 20:
+					tries += 1
+					spent += Hold.cost(SG, Hold.wanted(SG, st.need))
+					Hold.build(SG, Hold.wanted(SG, st.need))
+				check(Hold.need_met(SG, st.need), "%s can be done with the people the story has brought, and no waiting (answers %s: %d households, room for %d)" % [st.id, str(answers.values()), Hold.households(SG), Hold.room(SG)])
+				check(spent <= paid, "%s: what it takes to build (%d) is no more than the chapter has paid by then (%d)" % [st.id, spent, paid])
+			if str(st.kind) == "folk" and bool(Folk.ERRANDS.get(str(st.id), {}).get("settle", false)):
+				for k in int(st.n):
+					Hold.settle(SG, "%s:%d" % [st.id, k], "S", true)
+			if str(st.kind) == "visits" and bool(st.get("settle", false)):
+				for k2 in int(st.n):
+					Hold.settle(SG, "%s:%d" % [st.id, k2], "S", true)
+			if str(st.kind) == "kill" and Trials.TRIALS.has(str(st.boss)):
+				for pth in Trials.TRIALS[str(st.boss)].paths:
+					if str(pth.kind) == "town":
+						check(Trials.need_met(pth.needs[0], SG), "%s: by the time he is met, the town is what his trial asks (%d households)" % [st.boss, Hold.households(SG)])
+			if str(st.kind) == "host":
+				check(Hold.watch(SG), "%s: the watch stands to by then" % st.id)
+			paid += int(st.get("stones", 0))
+		check(Hold.rank(SG) == 3 and Hold.unbuilt(SG).is_empty(), "the chapter leaves a city (answers %s)" % str(answers.values()))
+		SG.free()
+	# a journey begun past the founding
+	var CG = load("res://scripts/game.gd").new()
+	CG.reset()
+	Hold.catch_up(CG, Data.step_index("s_p25_home"))
+	check(not CG.hold.has("day0"), "a journey begun before the town has none")
+	CG.step = Data.step_index("s_p25_envoy")
+	Hold.catch_up(CG, CG.step)
+	check(Hold.founded(CG) and Hold.rank(CG) == 3 and Hold.settlers(CG) == 13, "a journey begun late in the chapter has the town its steps would have left (%s)" % Hold.summary(CG))
+	CG.free()
+	check(msrc.contains("func offer_hold") and msrc.contains("func offer_home") and msrc.contains("\"id\": \"later\", \"label\": \"Not today\"") and msrc.contains("Hold.settle(Game, str(fp.id), str(fp.n), true)") and msrc.contains("Hold.epilogue(Game)"),
+		"the steward keeps a table, anybody may be asked home (\"Not today\" first), the story's errands settle people, and the ending tells of it")
+	check(wsrc.contains("func _hold_model") and wsrc.contains("Hold.stands(Game, e)") and bsrc.contains("main.HOLD_ASK") and bsrc.contains("Hold.wanted(Game, s.need)") and bsrc.contains("Hold.catch_up(Game, idx)"),
+		"the world draws a plot when it is built, and the bot builds at the steward's table what the step is waiting for")
+	check(War.COMPANIES.guiyun.get("hold", false) and War.ORDER.has("guiyun") and Trials.KINDS.has("town") and "town" in Trials.KIND_ORDER and Trials.EPITHETS.has("town"), "a watch for the host, and a way through trials: by the town")
+	print("== Part XXV: the Three Burrows ==")
+	check(Data.REALMS.size() == 31 and Data.REALMS[30] == "Scarcely Known" and Data.MAX_LEVEL == 90 and Data.level_name(90).ends_with("Scarcely Known") and Data.REALM_INFO.size() == 31
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXV adds the realm of Scarcely Known")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break30" and Data.DIALOGUE.has("recall23") and msrc.contains("\"s_break29\": \"recall23\"") and Data.DIALOGUE.has("pre:s_break30") and Data.DIALOGUE.has("post:s_break30"),
+		"Part XXV follows Soft as Water (recall23) and ends the game")
+	var n25 := 0
+	var kinds25 := {}
+	var settled := 0
+	for st25 in Data.STEPS:
+		if not str(st25.id).begins_with("s_p25_"):
+			continue
+		n25 += 1
+		kinds25[str(st25.kind)] = int(kinds25.get(str(st25.kind), 0)) + 1
+		if st25.kind == "talk":
+			check(Data.DIALOGUE.has(str(st25.id)), "%s: there is something said" % st25.id)
+		if not st25.kind in ["kill", "talk"]:
+			check(Data.DIALOGUE.has("done:" + str(st25.id)), "%s: something is said when it is done" % st25.id)
+		if st25.kind == "hold":
+			check(str(st25.need[0]) in ["built", "plot", "rank", "households"] and str(st25.area) == Hold.AREA, "%s asks something of the town that the town can be" % st25.id)
+		if st25.kind == "folk":
+			var er: Dictionary = Folk.ERRANDS.get(str(st25.id), {})
+			check(bool(er.get("settle", false)) and Folk.CAMP_ROLES.has(str(st25.role)) and (er.lines as Array).size() >= 4 and int(er.price) == 0, "%s: people of the road asked to come and live there, each with an answer" % st25.id)
+			for el in er.lines:
+				check(fits.call(str(el)), "%s: an answer that fits the box" % st25.id)
+			settled += int(st25.n)
+		if st25.kind == "visits":
+			check(bool(st25.get("settle", false)), "%s: whoever is called on sends a household" % st25.id)
+			settled += int(st25.n)
+		if st25.kind == "marks":
+			check(int(st25.n) >= 3 and int(st25.n) * 4 <= Echoes.ORDER.size(), "%s: no more than a quarter of what a journey leaves standing" % st25.id)
+	check(n25 >= 26 and int(kinds25.get("hold", 0)) == 3 and int(kinds25.get("folk", 0)) == 4 and int(kinds25.get("kill", 0)) == 3 and int(kinds25.get("hunt", 0)) == 4 and int(kinds25.get("collect", 0)) == 3 and kinds25.has("marks") and kinds25.has("visits") and kinds25.has("host") and settled >= 13,
+		"Part XXV: %d steps: three things asked of the town, four askings of people to come (%d families), three lords, four hunts, three searches" % [n25, settled])
+	for k25 in Data.DIALOGUE:
+		if str(k25).contains("s_p25_") or str(k25) in ["recall23", "pre:s_break30", "post:s_break30", "pre:shuo_shu", "post:shuo_shu", "pre:ke_zheng", "post:ke_zheng", "pre:han_song", "post:han_song"]:
+			for ln25 in Data.DIALOGUE[k25]:
+				check(fits.call(str(ln25[1])), "%s: a line that fits the box" % k25)
+	for tid25 in ["shuo_shu", "ke_zheng", "han_song"]:
+		check(Trials.TRIALS.has(tid25) and Data.ENEMIES[tid25].get("boss", false) and Lore.BOSS.has(tid25) and Trials.trial_of_step(Data.STEPS[_kill_step(tid25)]) == tid25, "%s is a lord of Part XXV, guarded by a trial" % tid25)
+		check((Trials.TRIALS[tid25].paths as Array).any(func(pth): return str(pth.kind) == "town") and (Trials.TRIALS[tid25].paths as Array).any(func(pth): return str(pth.kind) == "relic") and (Trials.TRIALS[tid25].paths as Array).size() >= 3, "%s can be passed by the town, or by what was found on the way" % tid25)
+		check(Data.DIALOGUE.has("pre:" + tid25) and Data.DIALOGUE.has("post:" + tid25), "%s has something to say before and after" % tid25)
+	for pid25 in ["feng_xuan", "tai_widow", "han_song"]:
+		check(Assets.PEOPLE.has(pid25) and Assets.has(Assets.PEOPLE[pid25]) and FileAccess.file_exists("res://art/characters/%s.py" % pid25), "%s has a model built from a script" % pid25)
+	for cid25 in ["feng_xuan", "tai_widow"]:
+		check(Data.CHAT.has(cid25) and Data.CHAT[cid25].size() >= 3 and Data.CHAT_LATER.has(cid25), "%s has things to say, and more once it has happened" % cid25)
+	check(Voice.HER_TITLES.has("Widow") and UI.SHAPES.has("person:han_song"), "the widow is told of as a woman, and the Patriarch fights in his own body")
+	for fid25 in ["granary_rat", "seed_sparrow", "thatch_moth", "writ_wasp", "tally_crow", "corvee_ox", "cock_crower", "dog_thief", "gate_crasher", "pine_swordsman", "needle_sprite", "frost_crane"]:
+		check(Data.ENEMIES.has(fid25) and Lore.BEAST.has(fid25) and Habits.habit(fid25) != "" and not Dooms.is_doom(fid25), "%s: a foe of Part XXV with a story and hours of its own" % fid25)
+	var x25: Array = []
+	var old_echo25 := 0
+	var lettered := {}
+	for lid in Mail.ORDER:
+		var lt: Dictionary = Mail.LETTERS[lid]
+		if lt.has("needs"):
+			lettered[str(lt.needs[0])] = int(lettered.get(str(lt.needs[0]), 0)) + 1
+	for cid in Echoes.ORDER:
+		var c25: Dictionary = Echoes.CROSSROADS[cid]
+		if str(c25.part) == "XXV":
+			x25.append(cid)
+			check((c25.options as Array).size() == 3 and (c25.get("end", {}) as Dictionary).size() == 3 and (c25.get("echo", {}) as Dictionary).size() >= 2 and (c25.get("after", {}) as Dictionary).size() == 3, "%s: three answers, each answered, echoed twice and told at the end" % cid)
+			check(str(Data.STEPS[Data.step_index(str(c25.step))].npc) == Hold.STEWARD, "%s is asked at the steward's table" % cid)
+			check(int(lettered.get(cid, 0)) == 3, "%s: somebody writes about each of its answers" % cid)
+			for o25 in c25.options:
+				check(str(Marks.MARKS[cid][str(o25.id)].area) in [Hold.AREA, "frost"], "%s/%s changes the look of its own country" % [cid, o25.id])
+		else:
+			for ek25 in c25.get("echo", {}):
+				if str(ek25).contains("s_p25_") or str(ek25).contains("s_break30"):
+					old_echo25 += 1
+	check(x25 == ["the_tallies", "the_door", "the_seat"], "what is done with a town's debts, its gate and the seat over its hall is asked three times")
+	check(old_echo25 >= 5, "five older crossroads echo in Part XXV (%d)" % old_echo25)
+	var tips25 := {}
+	for o26 in Echoes.CROSSROADS.the_seat.options:
+		for sc26 in o26.tilt:
+			tips25[sc26] = true
+	check(tips25.has("heart") and tips25.has("craft") and tips25.has("reach"), "the last crossroads of Part XXV tips all three scales the ends ask about")
+	check(bsrc.contains("\"shuo_shu\": \"relic\"") and bsrc.contains("\"han_song\": \"town\"") and bsrc.contains("\"the_seat\": [\"found\"]") and bsrc.contains("\"founder\"") and bsrc.contains("\"hold\":"),
+		"the bot has a plan for every trial and crossroads of Part XXV, builds the town, and takes the end it earned")
+	# its bands are the fifth and sixth (placed after the marks), and keep off the town
+	var bands25 := 0
+	for a25 in Data.AREAS:
+		for bk25 in ["warband5", "warband6"]:
+			var bd25: Dictionary = Data.AREAS[a25].get(bk25, {})
+			if bd25.is_empty():
+				continue
+			bands25 += 1
+			check(str(bd25.vis).begins_with("s_p25_") and bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
+	for bk26 in ["warband3", "warband4"]:
+		for a26 in ["mountain", "terraces", "frost"]:
+			check(not str(Data.AREAS[a26].get(bk26, {}).get("vis", "")).begins_with("s_p25_"), "%s: no band of Part XXV is placed before the marks" % a26)
+	var g1 := Atlas.to_world(Hold.AREA, Hold.AT)
+	var in_town := 0
+	for e28 in ws.ents:
+		if e28.kind == "enemy" and e28.pos.x >= g1.x and e28.pos.y >= g1.y and e28.pos.x < g1.x + Hold.SIZE.x and e28.pos.y < g1.y + Hold.SIZE.y:
+			in_town += 1
+	check(bands25 == 4 and in_town == 0 and asrc.find("\"warband5\"") > asrc.find("Marks.place("), "four bands march for the chapter, placed after the marks, and none of them in the streets of Guiyun")
+	# what the chapter stands in the land can be walked up to
+	var at_tile := {}
+	for e25 in ws.ents:
+		if e25.has("pos") and e25.kind != "enemy":
+			at_tile[e25.pos] = true
+	var found25 := 0
+	for e26 in ws.ents:
+		if not ((e26.kind == "pickup" and str(e26.id).begins_with("p25_")) or (e26.kind == "boss" and str(e26.enemy) in ["ke_zheng", "han_song"]) or (e26.kind == "npc" and str(e26.id) in ["feng_xuan", "tai_widow"])):
+			continue
+		found25 += 1
+		var ways26 := 0
+		for d26 in MapGen.DIRS:
+			var q26: Vector2i = e26.pos + d26
+			if MapGen.is_walkable_tile(ws.grid[q26.y * W + q26.x]) and not at_tile.has(q26):
+				ways26 += 1
+		check(ways26 >= 1 and Atlas.owner_id(ws, e26.pos) == str(e26.area), "%s can be walked up to, in its own region (%d ways)" % [e26.id, ways26])
+	var rat: Array = (ws.floors[Caves.fid("mountain", -1)].ents as Array).filter(func(e27): return e27.kind == "boss" and str(e27.enemy) == "shuo_shu")
+	check(found25 == 13 + 2 + 2 and rat.size() == 1, "thirteen things to find, two lords and two people of Part XXV stand in the land, and the Great Rat under it (%d)" % found25)
 
 # ================================================================ the Thundering Pots release
 func _thundering_pots() -> void:
@@ -4657,7 +5038,7 @@ func _thundering_pots() -> void:
 		var c: Dictionary = War.COMPANIES[cid]
 		arms23[str(c.arm)] = true
 		var srcs := 0
-		for k in ["levy", "step", "work", "job"]:
+		for k in ["levy", "step", "work", "job", "hold"]:
 			srcs += 1 if c.has(k) else 0
 		check(srcs == 1 and str(c.desc).length() > 60 and str(c.how).length() > 20 and str(c.arm) in ["foot", "bow", "horse", "drum"], "company %s: one arm, one way of coming, and a word about it" % cid)
 		if c.has("levy"):
@@ -4798,7 +5179,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.soft_water.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.scarcely_known.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()

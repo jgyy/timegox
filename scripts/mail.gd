@@ -125,11 +125,31 @@ const LETTERS := {
 		"lines": ["We took the rails down. It was gone by morning, and my neighbours were sorry for me. Nine days later it came back over the ridge with eleven wild mares behind it. My neighbours are now pleased for me. I have asked them to stop keeping count on my behalf."]},
 	"horse_breed": {"from": "Sai Weng", "needs": ["the_horse", "breed"], "wait": 2,
 		"lines": ["The first foal stood up inside the hour. My son has a book now with lines in it, sire and dam, back to a horse that wandered off. Buyers come from three valleys. He is happier than I have seen him and busier than is good for him. Who is to say."]},
+	# ---- Part XXV (the Three Burrows release): letters from Guiyun
+	"tally_burn": {"from": "Sawyer Bo of Guiyun", "needs": ["the_tallies", "burn"], "wait": 3,
+		"lines": ["The steward wrote this for me; I told him what to put. My tally went in the fire with the rest. I owed for forty posts of pine. I have cut forty more and stacked them behind the hall and told nobody. You are not to tell the steward. He is writing this, so he knows. He says he has not heard."]},
+	"tally_collect": {"from": "Goodwife Suyin of Guiyun", "needs": ["the_tallies", "collect"], "wait": 3,
+		"lines": ["We paid, Lin Feng. To the notch, at the harvest, as was written. I do not complain of it. It was owed. I write only to say that my boy asked me why the steward counts at our door and not at his own table, and I had no answer for him. Perhaps you have one."]},
+	"tally_shares": {"from": "Old Pedlar Jin of Guiyun", "needs": ["the_tallies", "shares"], "wait": 3,
+		"lines": ["Forty years on the road and I have never owned anything I could not carry. Now I own a seventy-third part of a mill. I go and look at my part of it most evenings. It is the part that squeaks. I have told them not to oil it."]},
+	"door_all": {"from": "A shade, on the wall of Guiyun", "needs": ["the_door", "all"], "wait": 3,
+		"lines": ["We keep the night watch, my brother and I. Nobody else can see in the dark, and nobody else wanted it. The living bring us tea we cannot drink and leave it on the wall to go cold. It is the kindest thing that has been done to us since we died. Do not tell them we cannot drink it."]},
+	"door_hearth": {"from": "Granny Wen", "needs": ["the_door", "hearth"], "wait": 3,
+		"lines": ["Child, I have answered for eleven families at your gate this month, and walked up your mountain for four of them, at my age. You asked the hearths to speak. Very well: we are speaking. Next time build your town at the bottom of a hill."]},
+	"door_sweep": {"from": "A cock-crower of Guiyun", "needs": ["the_door", "sweep"], "wait": 3,
+		"lines": ["I swept my season. Gate to well, well to gate. Nobody asked what I had been, and I had my answer all ready, and it has gone to waste. They have given me the keys of the gate. I open it at cock-crow. I thought you would like to know that I am the cock."]},
+	"seat_found": {"from": "First Disciple Ren of the Returning Cloud", "needs": ["the_seat", "found"], "wait": 3,
+		"lines": ["Founder: forty-one of us from the Cold Pine have stayed. The others went home to Frostpeak to look for somebody to kneel to. We have swept the street every dawn. The children correct our grip. A sect with no history is a strange thing to be in. Nobody can tell us we are doing it wrong."]},
+	"seat_take": {"from": "Han Song", "needs": ["the_seat", "take"], "wait": 3,
+		"lines": ["So you sat in it. I did not think you would. I am living in the gatehouse; nobody has told me to go. They kneel to you as they knelt to me, to the same depth. I used to think that depth was respect. Come up some time, Patriarch, and stand where I stood, and tell me what you think it is."]},
+	"seat_serve": {"from": "Auntie Zhou", "needs": ["the_seat", "serve"], "wait": 3,
+		"lines": ["Eleven of yours came up the steps this spring with their bedding. I asked each of them had they eaten, and every one said yes, Auntie, the steward saw to it. So I fed them again. The Elder goes and reads the roster where their names are. He does not think I see him."]},
 }
 const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_mend", "bandits_drive", "garden_study", "garden_burn", "egg_hatch", "egg_sell",
 	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "yue_write", "yue_say",
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
-	"horse_keep", "horse_loose", "horse_breed", "wen_last"]
+	"horse_keep", "horse_loose", "horse_breed",
+	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

@@ -2146,6 +2146,10 @@ func _run() -> void:
 		# the Lost Horse release (--horse, or --horse=a,b): what the choices left standing, the battles that
 		# cannot be won, and Part XXIV
 		await _horse_shots(str(main.args.horse))
+	if main.args.has("burrows"):
+		# the Three Burrows release (--burrows, or --burrows=a,b): the town that is the hero's own, its plots,
+		# its people, the three crossroads and Part XXV
+		await _burrows_shots(str(main.args.burrows))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -4178,5 +4182,194 @@ func _horse_shots(which: String = "1") -> void:
 		main.open_trial({"enemy": "huofu", "lv": 87, "req": 86, "id": "boss_huofu", "pos": Vector2i.ZERO})
 		await _wait(0.8)
 		await _shot("trial_by_the_loss")
+		main.pop()
+	get_tree().quit(0)
+
+
+# ================================================================ the Three Burrows release
+func _burrows_state() -> void:
+	_horse_state()
+	Game.level = 89
+	Game.step = Data.step_index("s_p25_marks")
+	Game.picks = {}
+	Game.scales = {}
+	Game.hold = {}
+	Game.stones = 96000
+	# (nothing is news while the pictures are taken)
+	for fid in Feats.FEATS:
+		Game.feats[fid] = true
+	Game.toasts.clear()
+	main.toast_list.clear()
+
+## The town built as far as `n` plots, with `fam` families asked to come.
+func _burrows_town(n: int, fam: int) -> void:
+	Game.hold = {"built": {}, "settlers": {}, "day0": int(Game.day), "taken": int(Game.day) - 3}
+	for k in mini(n, Hold.ORDER.size()):
+		Game.hold.built[Hold.ORDER[k]] = true
+	for k2 in fam:
+		Game.hold.settlers["t%d" % k2] = "A family"
+
+## Look down on Guiyun from `dist` metres south of its middle and `up` metres above, at `hour`.
+func _burrows_view(hour: float, dist: float, up: float, side: float = 0.0) -> void:
+	var w = main.world
+	_high_put(Atlas.to_world(Hold.AREA, Hold.tile(Vector2i(5, 8))), Vector2i(0, -1), hour)
+	await _wait(0.6)
+	var c: Vector3 = w.wpos(Atlas.to_world(Hold.AREA, Hold.tile(Vector2i(5, 4))))
+	c.y = w.ground_y(c)
+	w.cam_override = Transform3D(Basis.IDENTITY, c + Vector3(side, up, dist)).looking_at(c + Vector3(0, 0.6, 0), Vector3.UP)
+	await _wait(0.5)
+
+## The Three Burrows (--burrows, or --burrows=a,b): the people ("people"), the foes and the lords
+## ("foes"), the plots as models ("plots"), what the three crossroads leave standing ("marks"), the
+## town in the land as it grows ("world"), the lords' battles ("battle"), the crossroads and the
+## steward's table ("choice"), and the pages ("page").
+func _burrows_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("people"):
+		await _gallery("part25_people", [Assets.person("feng_xuan"), Assets.person("tai_widow"), Assets.person("han_song")], 0.76, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["granary_rat", "seed_sparrow", "thatch_moth", "writ_wasp", "tally_crow", "corvee_ox", "cock_crower", "dog_thief", "gate_crasher", "pine_swordsman", "needle_sprite", "frost_crane"]:
+			fs.append(_foe(fid))
+		await _gallery("part25_foes", fs, 1.0, 0.25)
+		await _gallery("part25_lords", [_foe("shuo_shu", true), _foe("ke_zheng", true), _foe("han_song", true)], 2.2, 0.25)
+	if want.call("plots"):
+		for half in [["hold_plots_1", Hold.ORDER.slice(0, 6), 1], ["hold_plots_2", Hold.ORDER.slice(6), 3]]:
+			var ms: Array = []
+			for pid in half[1]:
+				var pm := Hold.model(str(pid), int(half[2]), "found")
+				Machines.animate(pm, 0.9)
+				ms.append(pm)
+			await _gallery(str(half[0]), ms, 1.8, 0.3)
+		var rk: Array = []
+		for r in [1, 2, 3]:
+			rk.append(Hold.model("homes2", r, ""))
+		for r2 in [1, 2, 3]:
+			rk.append(Hold.model("hall", r2, ["", "serve", "found"][r2 - 1]))
+		await _gallery("hold_ranks", rk, 1.9, 0.3)
+	if want.call("marks"):
+		for rw in [["marks_tallies", [["the_tallies", "burn"], ["the_tallies", "collect"], ["the_tallies", "shares"]]],
+				["marks_door", [["the_door", "all"], ["the_door", "hearth"], ["the_door", "sweep"]]],
+				["marks_seat", [["the_seat", "found"], ["the_seat", "take"], ["the_seat", "serve"]]]]:
+			var mm: Array = []
+			for pr in rw[1]:
+				var m1 := Marks.model(Marks.MARKS[pr[0]][pr[1]], 0)
+				Machines.animate(m1, 1.3)
+				mm.append(m1)
+			await _gallery(str(rw[0]), mm, 1.7, 0.3)
+	if want.call("world"):
+		w.open_world()
+		w.enter_layer("surface")
+		var frames: Array = []
+		# the ground before the town, a hamlet, a town and a city, from the same place
+		for st in [[0, 0, "s_p25_home", "guiyun_ground"], [4, 3, "s_p25_marks", "guiyun_hamlet"], [8, 9, "s_p25_marks", "guiyun_town"], [12, 16, "s_p25_marks", "guiyun_city"]]:
+			Game.step = Data.step_index(str(st[2]))
+			Game.picks = {} if int(st[0]) < 12 else {"the_tallies": "burn", "the_door": "all", "the_seat": "found"}
+			_burrows_town(int(st[0]), int(st[1]))
+			if int(st[0]) == 0:
+				Game.hold = {}
+			await _burrows_view(10.5, 16.0, 12.0)
+			await _wait(0.8)
+			await _shot(str(st[3]))
+			frames.append(last_img)
+			w.cam_override = null
+		_grid("guiyun_grows", frames, 2)
+		# the city from the street, in the evening, and from high above
+		await _burrows_view(18.4, 5.2, 2.8, 2.4)
+		await _shot("guiyun_street")
+		w.cam_override = null
+		await _burrows_view(9.0, 26.0, 22.0)
+		await _shot("guiyun_above")
+		w.cam_override = null
+		# what the three answers left standing beside it
+		for sh in [["the_tallies", ["burn", "collect", "shares"], 9.0, 5.0], ["the_door", ["all", "hearth", "sweep"], 13.0, 7.5], ["the_seat", ["found", "serve"], 9.0, 5.0]]:
+			var fr: Array = []
+			for oid in sh[1]:
+				Game.picks = {str(sh[0]): str(oid)}
+				if not await _mark_view("mark:%s:mountain" % str(sh[0]), 16.0, float(sh[2]), float(sh[3])):
+					continue
+				await _shot("mark_%s_%s" % [str(sh[0]).trim_prefix("the_"), str(oid)])
+				fr.append(last_img)
+				w.cam_override = null
+			_sheet("mark_%s_answers" % str(sh[0]).trim_prefix("the_"), fr, 0.62 if fr.size() == 2 else 0.48)
+		Game.picks = {}
+	if want.call("battle"):
+		main.set_stack(["world"])
+		for bb in [["shuo_shu", "ninesprings", "relic"], ["ke_zheng", "tea", "town"], ["han_song", "frost", "town"]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			var pth: Dictionary = Trials.path(bid, str(bb[2]))
+			main.battle.start([{"id": bid, "lv": 89, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": str(bb[1]),
+				"trial": bid, "path": str(bb[2]), "boon": pth.boon, "path_n": str(pth.n), "path_kind": str(Trials.KINDS[str(pth.kind)].n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		_burrows_town(8, 9)
+		for cc in [["the_tallies", "s_p25_town", 0, "crossroads_tallies"], ["the_door", "s_p25_herbs", 0, "crossroads_door"], ["the_seat", "s_p25_hermits", 0, "crossroads_seat"]]:
+			Game.step = Data.step_index(str(cc[1]))
+			Game.picks = {}
+			Game.cross_pending = [str(cc[0])]
+			main.ask_crossroads()
+			main.choice.cursor = int(cc[2])
+			await _wait(1.0)
+			await _shot(str(cc[3]))
+			main.pop()
+			Game.cross_pending = []
+		# the steward's table: what is in the chest, and what is drawn up
+		Game.step = Data.step_index("s_p25_city")
+		main.set_stack(["world"])
+		main.offer_hold({"id": Hold.STEWARD, "n": "Feng Xuan"})
+		main.choice.cursor = 2
+		await _wait(1.0)
+		await _shot("hold_table")
+		main.pop()
+		# somebody of the road asked to come
+		main.set_stack(["world"])
+		main.offer_home({"id": "tour:pedlar", "n": "Pedlar Yuan", "role": "pedlar", "kid": false})
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("hold_ask_home")
+		main.pop()
+		# and the ends the town opens
+		_burrows_town(12, 16)
+		Game.picks = {"the_tallies": "burn", "the_door": "all", "the_seat": "found"}
+		Game.step = Data.STEPS.size() - 1
+		main.set_stack(["world"])
+		main.choose_ending()
+		var ek: int = main.choice.ids().find("founder")
+		main.choice.cursor = maxi(ek, 0)
+		await _wait(1.0)
+		await _shot("ending_choice_founder")
+		main.pop()
+	if want.call("page"):
+		_burrows_town(9, 12)
+		Game.picks = {"the_tallies": "shares", "the_door": "sweep"}
+		Game.step = Data.step_index("s_p25_city")
+		main.set_stack(["world"])
+		main.open_menu()
+		main.menu.mode = "town"
+		main.menu.cursor = 4
+		main.menu._build()
+		await _wait(0.8)
+		await _shot("town_page")
+		main.menu.cursor = Hold.ORDER.size()
+		await _wait(0.4)
+		await _shot("town_page_all")
+		main.pop()
+		Game.step = Data.step_index("s_p25_han")
+		_burrows_town(12, 16)
+		Game.trials = {}
+		main.set_stack(["world"])
+		main.open_trial({"enemy": "han_song", "lv": 90, "req": 89, "id": "boss_han_song", "pos": Vector2i.ZERO})
+		await _wait(0.8)
+		await _shot("trial_by_the_town")
 		main.pop()
 	get_tree().quit(0)

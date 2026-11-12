@@ -105,6 +105,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXIV: the old mare's four cast shoes to the horse that followed her, and three losses in the red
 	# column to the keeper of the book
 	"hu_steed": "relic", "huofu": "loss",
+	# Part XXV: the other halves of the tallies to the Great Rat, and the households of Guiyun to the tiger
+	# with a seal and to the Patriarch of the Cold Pine
+	"shuo_shu": "relic", "ke_zheng": "town", "han_song": "town",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -143,7 +146,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_clay": ["home"], "the_lute": ["melt"], "the_host": ["band"],
 	# Part XXIV: a sea-wall of ten thousand baskets, nine channels for the Huai and the ape let go to the sea,
 	# and the black horse kept by the tent
-	"the_tide": ["wall"], "the_ape": ["dredge"], "the_horse": ["keep"]}
+	"the_tide": ["wall"], "the_ape": ["dredge"], "the_horse": ["keep"],
+	# Part XXV: the tallies burned in the square, the gate open to whoever knocks, and a gate of his own
+	"the_tallies": ["burn"], "the_door": ["all"], "the_seat": ["found"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -179,7 +184,7 @@ const SHARE_PLAN := {"s_p15_pond": "remember", "s_p15_loom": "both", "s_p15_feas
 	"s_p20_tea": "room", "s_p20_fire": "live",
 	"s_p21_stage": "none", "s_p21_sweep": "broom",}
 ## the end of the story the bot chooses (cultures.gd ENDINGS), rarest first, of those its journey earned
-const ENDING_PLAN := ["school", "open", "road", "lotus", "home", "azure"]
+const ENDING_PLAN := ["founder", "guiyun", "school", "open", "road", "lotus", "home", "azure"]
 var route := "peoples"
 var give_way := false
 ## the trial ahead (cached for the frame: it is asked for many times a frame)
@@ -347,6 +352,8 @@ func _apply_start() -> void:
 		if str(st4.kind) == "jobs":
 			for jid in ["job_tally", "job_mill"]:
 				Game.jobs[jid] = "done"
+	# Part XXV: the town that is his own, as far along as the steps behind would have left it (hold.gd)
+	Hold.catch_up(Game, idx)
 	if idx > Data.step_index("s_p19_home"):
 		for wid in ["well_sweep", "fire_kit", "cords", "sling", "trip_hammer", "water_bellows", "crossbow", "chariot"]:
 			Game.works[wid] = true
@@ -741,6 +748,14 @@ func _world(d: float) -> void:
 		"marks":
 			# Part XXIV: the nearest thing a choice left standing that has not been looked at (marks.gd)
 			_marks_step()
+		"hold":
+			# Part XXV: the town that is his own (hold.gd): to the steward's table when there is something
+			# to build that can be paid for (the choice builds it, _choice); else there are spirit stones
+			# to be had from the wild, and the town grows a little every day by itself
+			if Hold.wanted(Game, s.need) != "":
+				_goto_entity(Hold.AREA, Hold.STEWARD)
+			else:
+				_grind()
 		"reckon":
 			# the reckoning (reckon.gd): whoever the journey's choices made, one after another, each gone to rested
 			var rl: Array = Reckon.left(Game)
@@ -1300,6 +1315,16 @@ func _choice() -> void:
 			var kf: int = ids.find(str(fw[0]))
 			if want == ids.find("later") and kf >= 0 and c.options[kf].get("enabled", true) and int(Game.inv.get(str(fw[0]), 0)) < int(fw[1]):
 				want = kf
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title) == main.HOLD_ASK:
+		# the steward's table at Guiyun (hold.gd): build what the step is waiting for; else empty the
+		# chest; else leave it
+		want = ids.find("later")
+		if not st.is_empty() and st.kind == "hold" and Hold.wanted(Game, st.need) != "":
+			want = ids.find("build:" + Hold.wanted(Game, st.need))
+		elif ids.has("take"):
+			want = ids.find("take")
 		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title) == main.DRILL_ASK or str(c.title) == main.TAILOR_ASK or str(c.title) == Gamble.ASK:
@@ -2617,6 +2642,9 @@ func _finish(reason: String) -> void:
 	print("the reckoning   : %s" % (", ".join(Game.reckoned.keys().map(func(id): return str(Data.ENEMIES[id].n))) if not Game.reckoned.is_empty() else "nobody met"))
 	print("trades          : %d shifts at %d trades, %d spirit stones in wages%s" % [int(Offices.worked(Game)[0]), int(Offices.worked(Game)[1]), Game.wages, (": " + Offices.careers(Game)) if Offices.careers(Game) != "" else ""])
 	print("what stands     : %d things stand in the land for what was chosen and what the scales lean to (the answers of all the crossroads would stand %d between them), %d looked at" % [stood, int(Marks.totals()[1]), Game.marks_seen.size()])
+	# (the Three Burrows release: the town that is his own, hold.gd)
+	print("the town        : %s; %d families asked to come, %d grown of itself; dues %d a day, %d taken; %d disciples%s" % [Hold.summary(Game), Hold.settlers(Game), Hold.grown(Game), Hold.due(Game), int(Game.hold.get("dues", 0)), Hold.disciples(Game),
+		("; " + Hold.sect_name(Game)) if Hold.sect(Game) != "" else ""])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)
