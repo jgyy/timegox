@@ -196,6 +196,9 @@ var romance := {}
 ## the Lost Horse release: what the choices left standing that has been looked at (marks.gd); and the
 ## things that could not be beaten (dooms.gd): how each was lost, how often, how often by giving way
 var marks_seen := {}
+## (offices.gd: shifts worked at the trades of the towns, and the day the last one was worked in each town)
+var shifts := {}
+var shift_day := {}
 var falls := {}
 var fallen := 0
 var yielded := 0
@@ -360,6 +363,8 @@ func reset() -> void:
 	needs_fell = {}
 	romance = {}
 	marks_seen = {}
+	shifts = {}
+	shift_day = {}
 	falls = {}
 	fallen = 0
 	yielded = 0

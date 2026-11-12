@@ -702,6 +702,13 @@ func talk_npc(e: Dictionary) -> void:
 			Game.poll_steps()
 		)
 		return
+	# somebody found indoors in a town (rooms.gd): a word, and then, if there is work to be had here
+	# today, the offer of a shift at their trade (offices.gd)
+	if e.has("trade") and e.has("lines"):
+		var ti: int = chat_idx.get(e.id, 0)
+		chat_idx[e.id] = ti + 1
+		say([[e.n, str(e.lines[ti % (e.lines as Array).size()])]], func(): offer_shift(e))
+		return
 	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
 	# somebody a choice left standing somewhere (marks.gd) has their own words
 	if e.has("lines"):
@@ -856,6 +863,26 @@ func ask_picks() -> void:
 		, false)
 		return
 	ask_crossroads()
+
+## A shift at a trade of the town (offices.gd), offered by somebody found indoors.  "Not today" is the
+## first line: nobody is put to work by leaning on a key.
+func offer_shift(e: Dictionary) -> void:
+	var use := str(e.trade)
+	var town := str(e.get("area", Game.area))
+	if Offices.blocked(Game, use, town) != "" or Game.prologue != "":
+		return
+	var t: Dictionary = Offices.TRADES[use]
+	var opts: Array = [
+		{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM},
+		{"id": "work", "label": str(t.n), "note": "%d hours" % int(t.hours), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones. One shift a day in a town." % [str(e.n), int(t.hours), Offices.wage(Game, use)], "col": UI.C_GOLD}]
+	choose("%s could use a pair of hands." % str(e.n), opts, func(oid: String):
+		if oid != "work":
+			return
+		var told := Offices.work(Game, use, town)
+		if told != "":
+			Feats.poll(Game)
+			say([["Narrator", told]])
+	)
 
 ## A crossroads of the road (echoes.gd): asked once, after the step it follows, with no way out of
 ## answering.  Every answer says what it does and which way it leans; the last question of Part XIX

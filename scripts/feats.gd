@@ -38,6 +38,8 @@ const FEATS := {
 	"first_fall": {"n": "Set Down Somewhere Else", "kind": "road", "pts": 5, "test": ["fallen", 1], "desc": "Lose a battle that could not be won, and go on."},
 	"three_dooms": {"n": "The Tide, the Ape and the Riders", "kind": "road", "pts": 10, "test": ["dooms", 3], "desc": "Stand in front of all three of the things that are not beaten."},
 	"gave_way": {"n": "Who Put Up the Sword", "kind": "road", "pts": 10, "test": ["yielded", 1], "desc": "Give way to something that cannot be fought, standing."},
+	"day_wage": {"n": "A Day's Wage", "kind": "people", "pts": 5, "test": ["shifts", 1], "desc": "Work a shift at a trade of a town."},
+	"six_trades": {"n": "Jack of Six Trades", "kind": "people", "pts": 10, "test": ["trades", 6], "desc": "Work a shift at six different trades."},
 	"marks_twelve": {"n": "Gone Back to Look", "kind": "road", "pts": 10, "test": ["marks", 12], "desc": "Look at twelve of the things your choices left standing in the land."},
 	"companion": {"n": "Two on the Road", "kind": "road", "pts": 5, "test": ["step", "s_yue"], "desc": "Wake the girl by the lotus pond."},
 	"sky_held": {"n": "The Sky Is Held", "kind": "road", "pts": 10, "test": ["step", "s_ch_hundun"], "desc": "End the Falling Sky."},
@@ -258,6 +260,10 @@ static func value(g, t: Array) -> float:
 			return float(g.heard.size())
 		"airs":
 			return float(g.airs.size())
+		"shifts":
+			return float(Offices.worked(g)[0])
+		"trades":
+			return float(Offices.worked(g)[1])
 		"fallen":
 			return float(g.fallen)
 		"yielded":

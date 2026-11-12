@@ -3983,6 +3983,49 @@ func _lost_horse() -> void:
 	check(res_n >= 150 and res_areas.size() >= 15, "%d people are found indoors, in the houses of %d regions" % [res_n, res_areas.size()])
 	for use7 in Rooms.INDOORS:
 		check(Rooms.USE_WORDS.has(str(use7)) and (Rooms.INDOORS[use7][2] as Array).size() >= 2, "whoever is found in %s has something to say" % str(Rooms.USE_WORDS[use7]))
+	# who answers for what, and what there is to do for a wage (offices.gd)
+	var seated := {}
+	for lid6 in ["surface", "heaven", "under", "sea"]:
+		for e6 in Atlas.world_of(lid6).ents:
+			if e6.has("office"):
+				seated[str(e6.office)] = e6
+	for oid6 in Offices.ORDER:
+		var of6: Dictionary = Offices.OFFICES[oid6]
+		var has_b := false
+		for bd5 in Data.AREAS[str(of6.area)].get("buildings", []):
+			has_b = has_b or str(bd5.id) == str(of6["in"])
+		check(has_b and seated.has(oid6) and str(seated[oid6].area) == str(of6.area) and (of6.lines as Array).size() >= 3 and (of6.lines as Array).all(func(ln): return fits.call(str(ln)))
+			and Assets.PEOPLE.has(str(of6.asset)) and Assets.has(Assets.PEOPLE[str(of6.asset)]) and not seated[oid6].has("trade"),
+			"%s sits in the %s of %s, with three things to say" % [of6.n, of6["in"], of6.area])
+	var towns_led := {}
+	for oid7 in Offices.ORDER:
+		towns_led[str(Offices.OFFICES[oid7].area)] = true
+	check(Offices.OFFICES.size() == Offices.ORDER.size() and Offices.ORDER.size() >= 15 and towns_led.size() >= 10 and Offices.seated("tushan", "cauldron_hall") == ["emperor", "empress"] and Offices.seated("sect", "hall") == ["treasurer"],
+		"%d people answer for the sect and the towns of %d regions; the Son of Heaven and the Empress keep court where the Nine Cauldrons are" % [Offices.ORDER.size(), towns_led.size()])
+	for tr6 in Offices.TRADE_ORDER:
+		check(Offices.TRADES.has(tr6) and Rooms.USE_WORDS.has(tr6) and Rooms.INDOORS.has(tr6) and fits.call(str(Offices.TRADES[tr6].done)) and int(Offices.TRADES[tr6].hours) >= 1 and float(Offices.TRADES[tr6].pay) > 0.0, "a shift can be worked at %s" % str(Rooms.USE_WORDS[tr6]))
+	var TG = load("res://scripts/game.gd").new()
+	TG.reset()
+	TG.level = 30
+	TG.clock = 9.0 * 60.0
+	var st0: int = TG.stones
+	var hv0 := int(TG.hearth.get("valley", 0))
+	check(Offices.blocked(TG, "inn", "village") == "" and Offices.wage(TG, "office") > Offices.wage(TG, "home") and Offices.wage(TG, "inn") < Data.enemy_stones(30, false) * 12, "there is work at the inn by day, an office pays more than a woodpile, and a shift is no fortune")
+	var said := Offices.work(TG, "inn", "village")
+	check(said != "" and TG.stones == st0 + Offices.wage(TG, "inn") and Clock.hour(TG) >= 11.9 and int(TG.hearth.get("valley", 0)) >= hv0 and Offices.worked(TG) == [1, 1], "a shift at the inn: three hours gone, the wage paid, and the shift counted")
+	check(Offices.blocked(TG, "shop", "village") != "" and Offices.work(TG, "shop", "village") == "" and Offices.blocked(TG, "shop", "yanggu") == "", "one shift a day in a town; another town is another matter")
+	TG.clock = 22.0 * 60.0
+	check(Offices.blocked(TG, "shop", "yanggu") != "", "nobody is hiring at night")
+	Feats.poll(TG)
+	check(TG.feats.has("day_wage") and not TG.feats.has("six_trades") and Feats.need(Feats.FEATS.six_trades.test) < Offices.TRADE_ORDER.size(), "a day's wage is a feat; six trades is another, and there are more than six")
+	TG.free()
+	var trade_n := 0
+	for lid5 in ["surface", "heaven", "under", "sea"]:
+		for e5 in Atlas.world_of(lid5).ents:
+			if e5.has("trade"):
+				trade_n += 1
+				check(Offices.TRADES.has(str(e5.trade)), "%s has a trade to offer" % e5.n)
+	check(trade_n >= 150 and msrc.contains("func offer_shift") and msrc.contains("\"id\": \"later\", \"label\": \"Not today\"") and not bsrc.contains("offer_shift"), "%d people indoors will take a pair of hands; not today is the first answer, and the bot gives it" % trade_n)
 	# how the towns of each people build
 	var looks := {}
 	for tid7 in Folk.TOWNS:

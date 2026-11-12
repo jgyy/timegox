@@ -63,10 +63,12 @@ static func residents(buildings: Array, grid: PackedByteArray, W: int, ents: Arr
 	var names := {}
 	for bd in buildings:
 		var use := str(uses(bd)[0])
-		if not INDOORS.has(use):
+		var area := str(bd.get("area", ""))
+		# (whoever answers for the town, or the sect, sits here first: offices.gd)
+		var seats: Array = Offices.seated(area, str(bd.id))
+		if not INDOORS.has(use) and seats.is_empty():
 			continue
 		var r: Rect2i = bd.rect
-		var area := str(bd.get("area", ""))
 		var cells: Array = []
 		var rects: Array = [r]
 		for wg in bd.get("wings", []):
@@ -91,7 +93,7 @@ static func residents(buildings: Array, grid: PackedByteArray, W: int, ents: Arr
 				taken[bd[sk]] = true
 				for d2 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
 					taken[(bd[sk] as Vector2i) + d2] = true
-		var want := 1 + (1 if cells.size() >= 28 else 0) + (1 if not wing_cell.is_empty() and cells.size() >= 40 else 0)
+		var want := (1 + (1 if cells.size() >= 28 else 0) + (1 if not wing_cell.is_empty() and cells.size() >= 40 else 0) if INDOORS.has(use) else 0) + seats.size()
 		var rng := RandomNumberGenerator.new()
 		rng.seed = r.position.x * 7001 + r.position.y * 331 + r.size.x
 		# (somebody in the wing first, then by a wall: a tile with a wall or a piece of furniture beside it)
@@ -103,11 +105,25 @@ static func residents(buildings: Array, grid: PackedByteArray, W: int, ents: Arr
 					by_wall += 1
 			order.append([(0 if wing_cell.has(c) else 10) - by_wall + rng.randf() * 0.9, c])
 		order.sort_custom(func(p0, p1): return float(p0[0]) < float(p1[0]))
+		# (an official sits at the back of the house, as far from the door as the room goes)
+		var back: Array = []
+		for c0 in cells:
+			if not wing_cell.has(c0):
+				back.append([-(absi(c0.x - door.x) + absi(c0.y - door.y)) + rng.randf() * 0.5, c0])
+		back.sort_custom(func(p0, p1): return float(p0[0]) < float(p1[0]))
 		var stood: Array = []
-		var info: Array = INDOORS[use]
-		for oc in order:
+		var info: Array = INDOORS.get(use, [[], [], []])
+		var tries: Array = back + order + order
+		var ti := 0
+		while ti < tries.size():
+			var oc: Array = tries[ti]
+			ti += 1
 			if stood.size() >= want:
 				break
+			# (the back of the room is for the officials only)
+			if ti <= back.size() and stood.size() >= seats.size():
+				ti = back.size()
+				continue
 			var c2: Vector2i = oc[1]
 			if taken.has(c2) or held.has(c2):
 				continue
@@ -147,6 +163,12 @@ static func residents(buildings: Array, grid: PackedByteArray, W: int, ents: Arr
 				continue
 			stood.append(c2)
 			var k := stood.size() - 1
+			if k < seats.size():
+				var of: Dictionary = Offices.OFFICES[seats[k]]
+				out.append({"kind": "npc", "id": str(seats[k]), "n": str(of.n), "asset": str(of.asset), "col": Color("c8a050"), "pos": c2,
+					"area": area, "layer": layer, "late": true, "vis": ["", ""], "lines": (of.lines as Array).duplicate(), "indoor": true, "office": str(seats[k])})
+				held[c2] = true
+				continue
 			var titles: Array = info[0]
 			var title := str(titles[rng.randi() % titles.size()])
 			var nm := ""
@@ -170,7 +192,7 @@ static func residents(buildings: Array, grid: PackedByteArray, W: int, ents: Arr
 			var ut := uses_text(bd)
 			lines.append("This is %s. %s." % [str(bd.n), ut.left(1).to_upper() + ut.substr(1)] if ut != "" else "This is %s." % str(bd.n))
 			out.append({"kind": "npc", "id": "res:%s:%s:%d" % [area, str(bd.id), k], "n": nm, "asset": body, "col": Color.from_hsv(rng.randf(), 0.35, 0.6), "pos": c2,
-				"area": area, "layer": layer, "late": true, "vis": ["", ""], "lines": lines, "indoor": true})
+				"area": area, "layer": layer, "late": true, "vis": ["", ""], "lines": lines, "indoor": true, "trade": use})
 			held[c2] = true
 	return out
 
