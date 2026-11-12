@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Songs", "Feats", "The Body", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "songs", "feats", "body", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -82,6 +82,18 @@ func _build() -> void:
 			labels.append(Music.label(Game, tid))
 			ids.append("song:" + tid)
 			enabled.append(Game.heard.has(tid))
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "town":
+		# hold.gd: the plots of the town that is the hero's own
+		labels = []
+		ids = []
+		enabled = []
+		for pid in Hold.ORDER:
+			labels.append(str(Hold.PLOTS[pid].n))
+			ids.append("plot:" + pid)
+			enabled.append(Hold.built(Game, pid))
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
@@ -182,7 +194,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -252,7 +264,7 @@ func press(act: String) -> void:
 				"ask":
 					main.pop()
 					main.open_ask()
-				"works", "roads", "feats", "songs", "host", "body":
+				"works", "roads", "feats", "songs", "host", "body", "town":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -297,7 +309,7 @@ func press(act: String) -> void:
 						Music.play_from_book(Game, id.trim_prefix("song:"))
 						_build()
 						return
-					if mode == "annals" or mode == "bestiary" or mode == "roads" or mode == "feats" or mode == "host":
+					if mode == "annals" or mode == "bestiary" or mode == "roads" or mode == "feats" or mode == "host" or mode == "town":
 						return
 					msg = Game.use_item_field(id)
 					_build()
@@ -528,6 +540,29 @@ func _draw_host() -> void:
 		var won: bool = Game.war_won.has(bid)
 		UI.text(self, Vector2(r.position.x + 24, y), "%s%s" % [str(War.BATTLES[bid].n), ", in %d drums" % int(Game.war_won[bid]) if won else ""], 14, UI.C_JADE if won else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
 		y += 19.0
+
+## The Town page (hold.gd, the Three Burrows release): the town that is the hero's own: its households,
+## its dues, its power, and each plot: what stands, and what is only drawn up.
+func _draw_town() -> void:
+	UI.text(self, Vector2(60, 70), "The Town", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 15)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	if not Hold.founded(Game):
+		UI.wrapped(self, r.position + Vector2(24, 100), Hold.text(Game), 18, UI.C_TEXT, r.size.x - 48)
+		return
+	UI.text(self, r.position + Vector2(24, 36), Hold.summary(Game), 15, UI.C_JADE, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+	if cursor < Hold.ORDER.size():
+		var pid: String = Hold.ORDER[cursor]
+		var p: Dictionary = Hold.PLOTS[pid]
+		var has: bool = Hold.built(Game, pid)
+		draw_rect(Rect2(r.position + Vector2(24, 70), Vector2(8, 40)), UI.C_GOLD if has else UI.C_DIM)
+		UI.text(self, r.position + Vector2(44, 100), str(p.n), 24, UI.C_GOLD if has else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 68)
+		var why := Hold.blocked(Game, pid)
+		UI.wrapped(self, r.position + Vector2(24, 140), (str(p.desc) if has else "Drawn up, not built: %d spirit stones, at the steward's table.%s\n\n\"%s\"" % [Hold.cost(Game, pid), "" if why == "" else "  " + why, str(p.ask)])
+			+ "\n\nIt brings %d households, and makes room for %d." % [int(p.homes), int(p.room)], 18, UI.C_TEXT, r.size.x - 48)
+	else:
+		UI.wrapped(self, r.position + Vector2(24, 100), Hold.text(Game), 16, UI.C_TEXT, r.size.x - 48)
 
 ## The Works page (works.gd, the Hundred Works release): the eighteen works in their three schools,
 ## what each does, what it costs in know-how and spirit stones, and what stands already.
@@ -1126,6 +1161,9 @@ func _draw() -> void:
 		return
 	if mode == "host":
 		_draw_host()
+		return
+	if mode == "town":
+		_draw_town()
 		return
 	if mode == "yue":
 		_draw_yue()

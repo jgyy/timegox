@@ -196,6 +196,9 @@ var romance := {}
 ## the Lost Horse release: what the choices left standing that has been looked at (marks.gd); and the
 ## things that could not be beaten (dooms.gd): how each was lost, how often, how often by giving way
 var marks_seen := {}
+## the Three Burrows release (hold.gd): the town that is the hero's own: `built` (plots), `settlers`
+## (who was asked and came), `day0` (the day it was founded), `taken` (the day the chest was last emptied)
+var hold := {}
 ## (offices.gd: shifts worked at the trades of the towns, and the day the last one was worked in each town)
 ## (reckon.gd: the last lords of the story that were faced)
 var reckoned := {}
@@ -387,6 +390,7 @@ func reset() -> void:
 	needs_fell = {}
 	romance = {}
 	marks_seen = {}
+	hold = {}
 	reckoned = {}
 	passengers = []
 	fares = 0
@@ -826,6 +830,9 @@ func advance() -> void:
 	for aid in Arms.step_rewards(str(s.id)):
 		grant_arm(str(aid))
 	step += 1
+	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
+	if str(s.id) == Hold.FOUND_STEP:
+		Hold.found(self)
 	hunt = 0
 	step_uses = {}
 	step_glide = 0
@@ -919,6 +926,10 @@ func poll_steps() -> void:
 			"marks":
 				# Part XXIV: so many of the things his choices left standing gone and looked at (marks.gd)
 				ok = marks_seen.size() >= int(s.n)
+			"hold":
+				# Part XXV: the town that is his own has what the step asks of it (hold.gd): so many plots
+				# built, a plot, a rank, so many households
+				ok = Hold.need_met(self, s.need)
 		if not ok:
 			return
 		if s.kind == "breakthrough":
@@ -980,6 +991,9 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(hunt, s.n), s.n]
 	elif s.kind == "marks":
 		t += "  (%d/%d)" % [mini(marks_seen.size(), int(s.n)), int(s.n)]
+	elif s.kind == "hold":
+		var hp: Array = Hold.need_progress(self, s.need)
+		t += "  (%d/%d)" % [int(hp[0]), int(hp[1])]
 	elif s.kind == "gates":
 		t += "  (%d/%d)" % [mini(gates_open.size(), int(s.n)), int(s.n)]
 	elif s.kind == "visits" or s.kind == "fates":

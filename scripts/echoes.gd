@@ -67,6 +67,11 @@ const CROSSROADS := {
 			"drive": [["Narrator", "They go up the pass in a line, not looking back, with their hands empty. At the top one of them stops, as if he might say something. Then he goes on."], ["Yue Ling", "It is fair. I only wonder where a man goes, who has nothing and has just been shown he cannot take it."]],
 		},
 		"echo": {
+			# Part XXV (the Three Burrows release)
+			"done:s_p25_cutters": {
+				"mend": [["Narrator", "Behind the woodcutters, unasked, come nine of Road-Mender Hou's forty with mallets over their shoulders. They lay the lane from the hall to where the well will be in one afternoon. They know how a place begins, they say: they have been one."]],
+				"drive": [["Feng Xuan", "There was a camp of forty on the bamboo road once, I am told, who might have known how to raise a roof-beam. They went over the pass. We shall manage with three."]],
+			},
 			# Part XXIV (the Lost Horse release)
 			"s_p24_home": {
 				"mend": [["Elder Qing Xuan", "Iron Fang's road-menders, do you remember? You did not beat them into it. You beat Iron Fang, and then you said a thing about a road, and it is the thing you said that is still there. I have been thinking about that."]],
@@ -172,6 +177,11 @@ const CROSSROADS := {
 			"open": [["Narrator", "The first family comes up the road at dusk with a handcart, stops at the gate, and stands there. A child goes in first. Children always go in first."], ["Yue Ling", "Somebody will have to tell them which rooms not to open. I will make a list. It will be a long list."]],
 		},
 		"echo": {
+			# Part XXV (the Three Burrows release)
+			"s_p25_door": {
+				"open": [["Yue Ling", "You opened the Blood Moon Palace to whoever had nowhere. There are children playing hopscotch where its altar was. It is the same question, Lin Feng. Only this time you will be living next door to the answer."]],
+				"seal": [["Yue Ling", "You sealed the Blood Moon Palace with nine seals, and it has stayed sealed. That was a door kept shut on something. This is a door to be opened to somebody. I do not think the one tells you about the other."]],
+			},
 			"pre:echo_xumo": {
 				"seal": [["Echo of Xu Mo", "You sealed my house. Nine seals. I felt each one. It is very tidy of you, sweeper. You people have always preferred a locked door to an answered question."]],
 				"open": [["Echo of Xu Mo", "There are children in my house. I can hear them from here: they have found the echo in the long gallery. In nine hundred years it never occurred to me that the gallery was for that."]],
@@ -686,6 +696,12 @@ const CROSSROADS := {
 			"none": [["The Maiden of Yue", "Nobody. ...I have wanted somebody to say that to me since the summer the army marched. I could not say it to myself; it felt like meanness. Tell them in Qingshi that I am a girl who likes hitting things, and that it is not a trade."]],
 		},
 		"echo": {
+			# Part XXV (the Three Burrows release)
+			"s_p25_seat": {
+				"all": [["Yue Ling", "The Maiden of Yue teaches whoever asks, because you said she should. Now there are three hundred asking, and it is you they are asking."]],
+				"sweep": [["Yue Ling", "The Maiden of Yue takes nobody who has not swept a year. You said that. I notice what you called the hall."]],
+				"none": [["Yue Ling", "You let the Maiden's art end with her. And here are three hundred who want teaching, and a hall with no name on it. It is the same question, come back larger."]],
+			},
 			"visit:s_p21_masters:yue_maiden": {
 				"all": [["The Maiden of Yue", "Sixty came, the first week. I had them stand still holding a switch until noon. Forty came back the next day, and those I shall teach. The twenty were the ones I was afraid of."]],
 				"sweep": [["The Maiden of Yue", "The first one came yesterday: a ferry-boy from Longmen who has poled a boat since he was nine. He said, is a pole a broom? I said it was a better one. He already knows where his feet are."]],
@@ -718,6 +734,12 @@ const CROSSROADS := {
 			"judge": [["King Wen of Zhao, Who Loved Swords", "And I? They fought because I liked to see it. If each of them answers for his dead, then I answer for all three hundred. ...Yes. Write my name first. I had thought the worst of it was that I was bored."]],
 		},
 		"echo": {
+			# Part XXV (the Three Burrows release)
+			"s_p25_tally": {
+				"home": [["Yue Ling", "The three thousand went home each with a tally to give back at a grave. You did not burn those, and you did not collect on them. You had them carried."]],
+				"guard": [["Yue Ling", "The three thousand are paid the same whether they draw or not. You have never been somebody who thought a debt was only a sum."]],
+				"judge": [["Yue Ling", "You had the three thousand answer each for his own dead, one at a time. You have counted to the notch before now."]],
+			},
 			"visit:s_p21_masters:cook_aysha": {
 				"home": [["Auntie Aysha of the Caravanserai", "My porter's boy came back, the one of fifteen. He had a slip of wood, and went on through to a village past the salt flats with it, and was gone a month. He does not talk about it. He does not touch his grandfather's sword either."]],
 				"guard": [["Auntie Aysha of the Caravanserai", "I have forty of the king's men on my caravans now. The masters complained they were paying for swords that never came out. I said: yes. That is what you are paying for. Count your camels."]],
@@ -999,6 +1021,12 @@ const CROSSROADS := {
 			"band": [["Lady Hao", "Hah! Keep the band. My husband's generals would have had a fit. ...Do it. I took the Tu-fang with drums and never told them how. Let them come once a year and sing, and let anybody who means the land harm come and count how many know the words."]],
 		},
 		"echo": {
+			# Part XXV (the Three Burrows release)
+			"done:s_p25_watch": {
+				"home": [["Fu Hao", "I sent the levy home by the roll, on your word, and was sorry to. This is the first hundred I have seen since that I should have been sorrier to send."]],
+				"keep": [["Fu Hao", "I have eleven companies at the Drum Tower who stand guard because they are paid to. Bring these down some day and let mine look at them. It might shame them. I should enjoy that."]],
+				"band": [["Fu Hao", "The host kept its song and put up its spears. These have spears and no song. I shall send up a drum-major with nothing to do, who would walk up a mountain for a hundred people that can keep step."]],
+			},
 			# Part XXIV (the Lost Horse release)
 			"pre:the_riders": {
 				"home": [["Narrator", "The levy of the six hearths went home by the roll, every one. There is no host to send for. Lin Feng finds, standing in the grass, that he would not send for it if there were."]],
@@ -1128,13 +1156,125 @@ const CROSSROADS := {
 			"loose": "On the frontier the herds run without rails, and the horse-folk have stopped calling it luck either way.",
 			"breed": "On the frontier every tent has a horse of the black one's line, and at the foot of each stud book: so far.",
 		}},
+	# ---- Part XXV (the Three Burrows release): a town's debts, a town's gate, and whose name is over its hall
+	"the_tallies": {"step": "s_p25_tally", "part": "XXV", "n": "The tallies of Guiyun",
+		"ask": "Every household of Guiyun owes the chest for seed, timber and its first winter. The Great Rat kept the tallies better than the town did, and now they lie in a basket in the square with everybody looking at them. What is to be done with the debts?",
+		"options": [
+			{"id": "burn", "label": "Burn them, here, where they can see", "tilt": {"heart": 3}, "gain": {"renown": 6, "hearth": {"valley": 3}},
+				"desc": "As Feng Xuan did at Xue. Nobody in Guiyun owes anybody for having come. The chest will be the poorer for it every day, for good; and people who hear what was done with the basket will walk a long way to live behind such a gate (renown; a family asked brings more of its kin and the town grows faster; lower dues).",
+				"log": "Had the tallies of Guiyun burned in the square."},
+			{"id": "collect", "label": "Collect them, to the last notch", "tilt": {"heart": -3, "reach": -1}, "gain": {"stones": 9000},
+				"desc": "A debt is a debt, and a town that begins by forgiving one will be asked to forgive everything after. Every tally is called in at the harvest, in full. The chest fills. Fewer will come to a town that is known to count (spirit stones now, and higher dues; the town grows more slowly of itself).",
+				"log": "Had every debt of Guiyun collected to the notch."},
+			{"id": "shares", "label": "Make each debt a share in a mill", "tilt": {"craft": 3}, "gain": {"stones": 3000},
+				"desc": "Neither forgiven nor called in: turned. Each household's tally becomes its share in a mill on the windy shoulder above the well, built with what is owed, whose toll pays the chest for ever. Nobody is the poorer, nobody is let off, and there is a wheel going round (some spirit stones now; steadier dues).",
+				"log": "Turned the debts of Guiyun into shares in a mill."},
+		],
+		"after": {
+			"burn": [["Narrator", "The basket goes up in the middle of the square like dry reeds. Nobody cheers. An old woman at the back says, quite loudly, that it is a waste of good bamboo, and then sits down on the well-kerb and cries."], ["Feng Xuan", "I have now done this twice. The first time I was sure. This time I watched somebody else be sure, and it is a better fire. I shall enter it: forgiven, in full. I shall leave the column blank where the sum should go."]],
+			"collect": [["Feng Xuan", "To the notch. Very well. I shall do it myself, door by door, with the half-tally in my hand. I shall be civil, and they will pay. They will also stop telling me things. I say so only that it may be in the accounts."], ["Yue Ling", "Nobody in the square is looking at us any more. They are looking at their own doors."]],
+			"shares": [["Feng Xuan", "A mill. Their debt, going round. Forty years of books, and I never once thought to make a thing out of a sum. It is neither mercy nor rigour. It is carpentry. I shall want a new kind of column."], ["Narrator", "The half-tallies are nailed in a row along the mill-house wall before there is a mill-house. Children learn their own family's notches by counting from the left."]],
+		},
+		"echo": {
+			"done:s_p25_town": {
+				"burn": [["Feng Xuan", "One thing more, for the books. Eleven households have paid what they owed. Nobody asked; the tallies are ash. They left it on my table at night, in grain, with no name. I have had to open a column for it. I have called it: the other half."]],
+				"collect": [["Feng Xuan", "One thing more, for the books. The chest is full. They pay on the day, to the grain, and wait while I count. Nobody has asked me in to tea since the harvest. I had not known that I should miss being asked."]],
+				"shares": [["Feng Xuan", "One thing more, for the books. The mill ground its first sack this morning, and every household came out to watch its own debt go round. Sawyer Bo has worked out that he owns one tooth of the great wheel. He has marked it."]],
+			},
+			"s_p25_end": {
+				"burn": [["Elder Qing Xuan", "I hear there was a fire in your square, early on, and that the whole town's debts went up in it. The steward's old trick. It is not a trick when the one who does it could have used the money."]],
+				"collect": [["Elder Qing Xuan", "I hear your chest is full, and every door paid to the notch. It is honest. I only say that I have sat seventy years under a roof nobody paid for by the notch, and it has not leaked more than other roofs."]],
+				"shares": [["Elder Qing Xuan", "I hear your people's debts go round in a mill and grind their own flour. You never could leave a thing as either one or the other. I stopped thinking that a fault some years ago."]],
+			},
+		},
+		"end": {
+			"burn": "In Guiyun there is a bare place in the square where nothing is built, and the old tell the young what was burned there, and the young do not quite believe it.",
+			"collect": "In Guiyun every debt was paid to the notch, and the chest has never wanted for anything, and the steward takes his tea alone.",
+			"shares": "In Guiyun a mill turns above the well, and every household can show you the tooth of the wheel that is its own.",
+		}},
+	"the_door": {"step": "s_p25_door", "part": "XXV", "n": "The gate of Guiyun",
+		"ask": "The terraces are coming up the road, and behind them people of every hearth and of none: Feathered Folk with a hand-cart, shades who walk at night. The Cloud Gate is not built yet, and something must be cut over it. Who may live at Guiyun?",
+		"options": [
+			{"id": "all", "label": "Whoever knocks", "tilt": {"reach": 3}, "gain": {"renown": 5},
+				"desc": "No question at the gate but the kitchen's: have you eaten? The winged, the scaled, the dead who walk at night, the one nobody will speak for. It will be a strange town, and a loud one, and there will be more of it (renown; room for more households, and the town grows faster of itself).",
+				"log": "Had it cut over the gate of Guiyun: whoever knocks."},
+			{"id": "hearth", "label": "Whoever a hearth will answer for", "tilt": {"reach": -3, "heart": 1}, "gain": {"hearth": {"valley": 3, "river": 2, "steppe": 2}},
+				"desc": "Anybody may come whom one of the six hearths of the land will speak for: a keeper's word, a neighbour's. Every village in the valley has always done it so. Those nobody will speak for go on up the road. The hearths will not forget having been asked (regard of three hearths).",
+				"log": "Had it cut over the gate of Guiyun: whoever a hearth will answer for."},
+			{"id": "sweep", "label": "Whoever sweeps the street a season", "tilt": {"craft": -3, "heart": 1}, "gain": {"renown": 3},
+				"desc": "The sect's own way, older than its walls: nobody is asked where they come from, and nobody is given a door until they have swept the street from the gate to the well for one season. Most stay. Whoever will not hold a broom was not coming here to live (renown; the town counts for more in the land).",
+				"log": "Had it cut over the gate of Guiyun: whoever sweeps the street a season."},
+		],
+		"after": {
+			"all": [["Feng Xuan", "\"Whoever knocks.\" Two words. The carver is pleased. I am less so, being the one who must find them all a roof; but I notice I have already begun to count beds."], ["Narrator", "The two shades of Youdu come out from under their tarpaulin at dusk and are given the night watch on the unfinished wall, which nobody else wanted. They are the best at it that Guiyun will ever have."]],
+			"hearth": [["Feng Xuan", "A word from a hearth. The old way, then. I shall write to the six keepers tonight and tell them their word is good at our gate. They will like that more than they will say."], ["Narrator", "The Feathered Folk wait three days on the road beside their hand-cart. On the fourth Granny Wen comes up from Qingshi herself, out of breath, looks them over, says she delivered a child with shoulders like that once, and that they will do."]],
+			"sweep": [["Feng Xuan", "A broom. Naturally. I ought to have known what you would hang over a gate. I shall order forty, and find somebody to make more."], ["Narrator", "By the first frost the street of Guiyun is the cleanest road in the Unbroken Land, swept twice a day by tea-pickers, two shades, a family with wings, and one very old cock-crower who will not be told that it is not his turn."]],
+		},
+		"echo": {
+			"done:s_p25_rogues": {
+				"all": [["Feng Xuan", "As for these: the gate says whoever knocks. They did not knock. They came over the wall. I have told them to go out and come in again properly, and they are standing in a line."]],
+				"hearth": [["Feng Xuan", "As for these: who will answer for them? ...I shall. Do not look at me so. I stood at a lord's gate once with a sword and no fish, and nobody spoke for me. I am a hearth of one."]],
+				"sweep": [["Feng Xuan", "As for these: there are brooms. The dog-thief has asked for the one by the granary. I have said yes, and that I shall count the grain every night; and he said he would think the less of me if I did not."]],
+			},
+			"done:s_p25_city": {
+				"all": [["Narrator", "On the gate-tower, over the arch, in characters a hand high: WHOEVER KNOCKS. The knocker is worn bright already."]],
+				"hearth": [["Narrator", "On the gate-tower, over the arch, hang six small boards, one from each hearth of the land. Room has been left for a seventh."]],
+				"sweep": [["Narrator", "On the gate-tower, over the arch, where another town would have its name, somebody has hung a broom."]],
+			},
+		},
+		"end": {
+			"all": "Over the gate of Guiyun it says: whoever knocks. Nobody now remembers that it was once a question.",
+			"hearth": "Over the gate of Guiyun hang the boards of six hearths, and anybody one of them will speak for is let in, and a great many letters are written.",
+			"sweep": "Over the gate of Guiyun hangs a broom. Its street is the cleanest in the land, and nobody who lives on it was ever asked where they came from.",
+		}},
+	"the_seat": {"step": "s_p25_seat", "part": "XXV", "n": "The seat over the hall",
+		"ask": "Han Song is beaten, and three hundred disciples of the Cold Pine stand at the Cloud Gate with no master. The Hall of the Broom has a bare lintel. A sect is a name over a door and somebody who answers to it. Whose name goes over the door?",
+		"options": [
+			{"id": "found", "label": "A gate of your own: the Returning Cloud", "tilt": {"craft": 3, "reach": 1}, "gain": {"renown": 8},
+				"desc": "A new name that nobody has heard: the Returning Cloud Sect, founded at Guiyun, whose first lesson is a street. The three hundred may stay if they will begin again at the beginning, with a broom. Some will. The youngest sect in the land, and yours from the first stone (renown; more of the town sends its children to the hall).",
+				"log": "Founded the Returning Cloud Sect at Guiyun."},
+			{"id": "take", "label": "Take the Cold Pine's seat", "tilt": {"heart": -3, "reach": 2}, "gain": {"stones": 8000},
+				"desc": "He said it himself: they follow whoever beat the master. Take his seat, his name, his mountain and his three hundred, all in one evening: an old sect with halls on Frostpeak and sixty years of discipline in its hands, and a patriarch nobody asked for (spirit stones from its treasury; the most disciples; the town counts for much more in the land).",
+				"log": "Took the seat of the Cold Pine Sect."},
+			{"id": "serve", "label": "Hang the Azure Cloud's board", "tilt": {"craft": -3, "reach": -2, "heart": 1}, "gain": {"hearth": {"valley": 4}},
+				"desc": "There is a name over you already, and you have never stepped out from under it. The Hall of the Broom becomes a hall of the Azure Cloud Sect, and its children go up the nine hundred and ninety-nine steps in the spring. The three hundred are sent home to choose a master of their own. You stay what you were (regard of the Rice Hearth).",
+				"log": "Hung the board of the Azure Cloud over the Hall of the Broom."},
+		],
+		"after": {
+			"found": [["Narrator", "The board is cut that night from a plank of persimmon. THE RETURNING CLOUD. The paint is still wet when the first of the three hundred takes off his pine-green coat, folds it, and asks where the brooms are kept."], ["Feng Xuan", "A sect with no history. I shall begin one. Volume one, page one: on the first day the founder was asked what the first lesson was, and pointed at the street."]],
+			"take": [["Narrator", "Three hundred kneel in the rain, all to the same depth. It is done in a breath. Lin Feng stands before them holding four tablets of black lacquer and feels the weight of each. None of them is heavy. That is the worst of it."], ["Yue Ling", "They did not look up. Not one. Lin Feng, they would have knelt to anybody who came down that mountain. I do not think they have seen yet who it was."]],
+			"serve": [["Narrator", "A disciple is sent up the nine hundred and ninety-nine steps for a board, and comes down with the oldest the sect has: grey, split, taken off a gate two rebuildings ago. The Elder has sent no message with it. He has only had it dusted."], ["Feng Xuan", "A branch hall. Then there is somebody over you still, and my accounts go up the mountain once a year to be looked at. I find I do not mind. I was never easy keeping the books of somebody nobody could ask."]],
+		},
+		"echo": {
+			"done:s_p25_hermits": {
+				"found": [["Feng Xuan", "One of them asked what the Returning Cloud teaches. I said: we have not found out. He said it was the first honest answer he had had from a sect, and unpacked."]],
+				"take": [["Feng Xuan", "One of them looked at the three hundred drilling in the square and asked whose they were. I said: the Patriarch's. He asked where the Patriarch was. I pointed at you. He looked for some time."]],
+				"serve": [["Feng Xuan", "One of them was a disciple of the Azure Cloud forty years ago, and left over a quarrel about a broom. He has read the board over the door twice. He says he will stay until he has won the quarrel."]],
+			},
+			"s_p25_end": {
+				"found": [["Elder Qing Xuan", "And a sect of your own. I had the gate disciples bring me word the hour the board went up. I am not hurt, child. I am an old man whose pupil has a gate; there is nothing better to be. Only teach them to sweep before you teach them anything, or I shall come down there."]],
+				"take": [["Elder Qing Xuan", "And Patriarch of the Cold Pine. I knew Han Song when we were young and he was only proud. Three hundred who kneel to whoever won. Be careful of that, child. It is very quiet in front of people who are kneeling. One begins to take the quiet for agreement."]],
+				"serve": [["Elder Qing Xuan", "And you sent up for a board. I gave you the old one, from the first gate. I sent no message with it, because I could not think of one that an old man can say aloud. It is said now. The board says it."]],
+			},
+			"post:s_break30": {
+				"found": [["Narrator", "In the Hall of the Broom a child of the Returning Cloud Sect, six years old, is showing a hermit of ninety how to hold the short broom. The hermit is taking it very well."]],
+				"take": [["Narrator", "On Frostpeak three hundred in pine-green are sweeping the snow off a courtyard that will be white again by noon, because the new Patriarch said to; and for the first time in sixty years one of them has asked why."]],
+				"serve": [["Narrator", "Up the nine hundred and ninety-nine steps go eleven children of Guiyun with their bedding on their backs. At the top the gate disciple asks each of them the one question, and each of them has."]],
+			},
+		},
+		"end": {
+			"found": "At Guiyun there is a sect called the Returning Cloud, which has no history yet and a very clean street.",
+			"take": "On Frostpeak the Cold Pine has a patriarch who beat the last one, and three hundred who are learning, slowly, to look up.",
+			"serve": "At Guiyun the Hall of the Broom hangs the Azure Cloud's oldest board, and sends its children up the steps every spring.",
+		}},
 }
 const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawings", "nineteen", "ancestor", "widow", "crows", "axe", "cauldron_map", "furnace",
 	"the_wheel", "the_player", "the_works", "the_mountain", "the_echoes", "the_hollow",
 	"the_pupils", "the_three_thousand", "the_arms",
 	"the_voices", "the_kites", "the_tops",
 	"the_clay", "the_lute", "the_host",
-	"the_tide", "the_ape", "the_horse"]
+	"the_tide", "the_ape", "the_horse",
+	"the_tallies", "the_door", "the_seat"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 87
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water"]
+const MAX_LEVEL := 90
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -81,6 +81,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Hears the Note Not Sounded", "note": "The great square has no corners, says the old book; the great vessel is late in finishing; the great note is rarely sounded; the great image has no shape. Ling Lun cut twelve pipes to the phoenix's song and has spent four thousand years listening for the one the phoenix did not sing. You have heard a field of eight thousand go quiet all at once. Where you walk, bells are in tune that have not been tuned, and nobody quarrels in the hour before supper."},
 	# Part XXIV (the Lost Horse release): what is left when he has lost
 	{"life": 0, "title": "Who Yields and Is Whole", "note": "Nothing under heaven is softer or weaker than water, says the old book, and for attacking what is hard and strong nothing can surpass it. Bend, and be whole; be low, and be filled. You have stood in front of three things no sword turns, and lost to all three, and are still here, and the land is a different shape for what you did afterwards. Whoever does not contend, nobody under heaven can contend with."},
+	# Part XXV (the Three Burrows release): what is left when others are answered for
+	{"life": 0, "title": "Whom They Barely Know Is There", "note": "Of the best of those who are over others, says the old book, the people only know that he exists; the next best they love and praise, the next they fear, the next they despise. When his work is done and things have gone well, the hundred families all say: we did it ourselves. A hundred households on the east shoulder of the mountain say it every morning."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -834,6 +836,23 @@ const ENEMIES := {
 	"doorless_road": {"n": "The Road With No Door", "elem": "thunder", "weak": "earth", "col": Color("9ad870"), "shape": "dragon", "boss": true, "pal": {"sec": Color("5a6a4a"), "acc": Color("e8e0c0"), "mark": Color("60a8d8")}},
 	"valley_wall": {"n": "The Wall Round the Valley", "elem": "earth", "weak": "water", "col": Color("a8a4ac"), "shape": "mammoth", "boss": true, "pal": {"sec": Color("5a564e"), "acc": Color("f0c860"), "mark": Color("7a5a38")}},
 	"the_unchosen": {"n": "The Unchosen", "elem": "dark", "weak": "thunder", "col": Color("b0b8c8"), "shape": "hundun", "boss": true, "pal": {"sec": Color("5a6070"), "acc": Color("f4f4ff"), "mark": Color("8a8fa8")}},
+	# ---- Part XXV (the Three Burrows release): what comes to a new granary, what a harsh assessor sends ahead
+	# of him, who turns up at a town that turns nobody away, and the outer hall of a sect that was there first
+	"granary_rat": {"n": "Granary Rat", "elem": "earth", "weak": "fire", "col": Color("7a6a5a"), "shape": "fox", "pal": {"sec": Color("4a3e34"), "acc": Color("d8c8a0")}},
+	"seed_sparrow": {"n": "Seed-Sparrow", "elem": "thunder", "weak": "earth", "col": Color("9a7a52"), "shape": "bird", "pal": {"sec": Color("5a4630"), "acc": Color("e8dcc0")}},
+	"thatch_moth": {"n": "Thatch-Moth", "elem": "wood", "weak": "fire", "col": Color("c8b070"), "shape": "moth", "pal": {"sec": Color("7a6a40"), "acc": Color("f0e8c8")}},
+	"writ_wasp": {"n": "Seal-Wasp of the Assessor", "elem": "fire", "weak": "water", "col": Color("b83a2a"), "shape": "moth", "pal": {"sec": Color("2a1a18"), "acc": Color("f0d890")}},
+	"tally_crow": {"n": "Tally-Crow", "elem": "dark", "weak": "thunder", "col": Color("2e2e3a"), "shape": "bird", "pal": {"sec": Color("16161e"), "acc": Color("c8a050")}},
+	"corvee_ox": {"n": "Ox of the Corvee", "elem": "earth", "weak": "water", "col": Color("6a5444"), "shape": "beast", "pal": {"sec": Color("3a2c22"), "acc": Color("b83a2a")}},
+	"cock_crower": {"n": "Cock-Crower", "elem": "thunder", "weak": "earth", "col": Color("c85a2a"), "shape": "bird", "pal": {"sec": Color("2a3a2a"), "acc": Color("f0d060")}},
+	"dog_thief": {"n": "Dog-Thief", "elem": "dark", "weak": "fire", "col": Color("5a5248"), "shape": "fox", "pal": {"sec": Color("2a2622"), "acc": Color("e8e0d0")}},
+	"gate_crasher": {"n": "Guest Nobody Asked", "elem": "phys", "weak": "wood", "col": Color("7a5a6a"), "shape": "humanoid", "pal": {"sec": Color("3a2a32"), "acc": Color("d8c090")}},
+	"pine_swordsman": {"n": "Outer Disciple of the Cold Pine", "elem": "phys", "weak": "fire", "col": Color("2e5a4a"), "shape": "humanoid", "pal": {"sec": Color("1a2e28"), "acc": Color("d0d8e0")}},
+	"needle_sprite": {"n": "Pine-Needle Sprite", "elem": "wood", "weak": "fire", "col": Color("3a6a4a"), "shape": "plant", "pal": {"sec": Color("1e3a2a"), "acc": Color("c8e0d0")}},
+	"frost_crane": {"n": "Crane of the Cold Pine", "elem": "water", "weak": "thunder", "col": Color("e8ecf0"), "shape": "bird", "pal": {"sec": Color("2a3a3a"), "acc": Color("c83a3a")}},
+	"shuo_shu": {"n": "Shuo Shu, the Great Rat of the Granary", "elem": "earth", "weak": "fire", "col": Color("8a7a68"), "shape": "fox", "boss": true, "pal": {"sec": Color("4a4036"), "acc": Color("e8c860"), "mark": Color("2a221c")}},
+	"ke_zheng": {"n": "The Tiger of Mount Tai, Who Wears a Seal", "elem": "thunder", "weak": "water", "col": Color("c87a2a"), "shape": "tiger", "boss": true, "pal": {"sec": Color("1e1a18"), "acc": Color("c8302a"), "mark": Color("1a1614")}},
+	"han_song": {"n": "Han Song, Patriarch of the Cold Pine", "elem": "water", "weak": "fire", "col": Color("24483c"), "shape": "person:han_song", "boss": true},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -974,6 +993,9 @@ const AREAS := {
 		"warband": {"pool": [["wildfire_sprite", 67, 68], ["spark_swallow", 67, 68], ["smoke_hound", 67, 68]], "n": 10, "vis": "s_p18_drill", "late": true},
 		# Part XXII: what came up Sun-Viewing Peak the night the tops were opened
 		"warband2": {"pool": [["merit_stele", 80, 80], ["report_smoke", 80, 80], ["bends_serpent", 80, 80]], "n": 16, "vis": "s_p22_hermits", "late": true},
+		# Part XXV: what comes to a new granary; and who turns up at a town that turns nobody away
+		"warband5": {"pool": [["granary_rat", 87, 87], ["seed_sparrow", 87, 87], ["thatch_moth", 87, 87]], "n": 16, "vis": "s_p25_feng", "late": true},
+		"warband6": {"pool": [["cock_crower", 88, 89], ["dog_thief", 88, 89], ["gate_crasher", 88, 89]], "n": 16, "vis": "s_p25_door", "late": true},
 		"n": "Azure Cloud Mountain", "w": 180, "h": 160, "seed": 7, "theme": "sect", "enemies": 0, "hill": 2.2,
 		"portals": [],
 		# Part XV: the Warden of the Lock, under the Founder's Last Cave, where the mountain goes down to
@@ -995,7 +1017,9 @@ const AREAS := {
 			{"id": "unturned_stone", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 2, "stand": "foot"},
 			{"id": "doorless_road", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 3, "stand": "top"},
 			{"id": "valley_wall", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 3, "stand": "foot"},
-			{"id": "the_unchosen", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 4, "stand": "top"}
+			{"id": "the_unchosen", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 4, "stand": "top"},
+			# Part XXV: the Great Rat, in the hollow under the mountain where the town's grain has been going
+			{"id": "shuo_shu", "pos": Vector2i.ZERO, "lv": 88, "req": 87, "vis": ["s_p25_sticks", ""], "late": true, "cave": -1, "stand": "mid", "last": true}
 		],
 		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 		# trails that join the mountain's people start just north of the sect's north wall
@@ -1020,13 +1044,21 @@ const AREAS := {
 			{"id": "wang_zhi", "n": "Wang Zhi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("7a5a3a"), "vis": ["s_p20_delve", ""], "late": true, "cave": -1, "stand": "deep"},
 			# Part XXII: Duke Xie of the toothed clogs, camped at the foot of Sun-Viewing Peak
 			{"id": "xie_lingyun", "n": "Duke Xie of the Toothed Clogs", "pos": Vector2i.ZERO, "col": Color("3a6a5a"), "vis": ["s_p22_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXV (hold.gd): the steward of Guiyun, on the ground the town will stand on, in front of where its hall
+			# goes (`hold`: stood there with the town's plots by Hold.place, after the peaks, so that no peak moves for him)
+			{"id": "feng_xuan", "n": "Feng Xuan", "pos": Vector2i(158, 90), "col": Color("6e6c5c"), "vis": ["s_p25_home", ""], "late": true, "hold": true},
 		],
 		"pickups": [{"id": "cur_leaf3", "item": "autumn_leaf", "pos": Vector2i(74, 26), "floor": ["post_station", 1], "always": true},
 			{"id": "cur_wine2", "item": "peach_wine", "pos": Vector2i(74, 40), "floor": ["tale_teahouse", 1], "always": true},
 			# Part XXII: the jade slips the old kings buried on the way up, on the rock of the two great peaks
 			{"id": "p22_slip1", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p22_slip2", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 0, "stand": "flank"},
 			{"id": "p22_slip3", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_slip4", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 1, "stand": "flank"},
-			{"id": "p22_slip5", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 1, "stand": "foot"}],
+			{"id": "p22_slip5", "item": "merit_slip", "pos": Vector2i.ZERO, "vis": ["s_p22_steles", ""], "late": true, "peak": 1, "stand": "foot"},
+			# Part XXV: the tallies of Guiyun, carried off from the steward's chest and dropped about the heights
+			{"id": "p25_tally1", "item": "tally_stick", "pos": Vector2i.ZERO, "vis": ["s_p25_pedlars", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p25_tally2", "item": "tally_stick", "pos": Vector2i.ZERO, "vis": ["s_p25_pedlars", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p25_tally3", "item": "tally_stick", "pos": Vector2i.ZERO, "vis": ["s_p25_pedlars", ""], "late": true, "peak": 2, "stand": "flank"}, {"id": "p25_tally4", "item": "tally_stick", "pos": Vector2i.ZERO, "vis": ["s_p25_pedlars", ""], "late": true, "peak": 3, "stand": "flank"},
+			{"id": "p25_tally5", "item": "tally_stick", "pos": Vector2i.ZERO, "vis": ["s_p25_pedlars", ""], "late": true, "peak": 4, "stand": "flank"},
+		],
 		# Part XII: the Founder's nine sealed caves round the sect, each opening only to a cultivator of
 		# the realm carved on its door; inside, her words (DIALOGUE "abode:<id>"), spirit stones and an
 		# awakening of the Nine Heavens root
@@ -1139,6 +1171,8 @@ const AREAS := {
 		"n": "Frostpeak Caverns", "w": 80, "h": 50, "seed": 41, "theme": "frost", "enemies": 14,
 		# Part XVII: the things of the high snow, come down with the cold that comes back
 		"warband": {"pool": [["rime_wisp", 63, 64], ["hoarfrost_hare", 63, 64], ["late_frost", 63, 64]], "n": 10, "vis": "s_p17_rockfall", "late": true},
+		# Part XXV: the outer hall of the Cold Pine Sect, come down off Frostpeak to see who has been building
+		"warband5": {"pool": [["pine_swordsman", 89, 89], ["needle_sprite", 89, 89], ["frost_crane", 89, 89]], "n": 16, "vis": "s_p25_envoy", "late": true},
 		"pool": [["frost_wolf", 6, 7], ["ice_golem", 7, 8], ["snow_wraith", 6, 8]],
 		"portals": [
 			{"to": "marsh", "pos": Vector2i(1, 25), "dest": Vector2i(74, 24), "open": ""},
@@ -1147,9 +1181,14 @@ const AREAS := {
 		"bosses": [
 			{"id": "ice_empress", "pos": Vector2i(36, 22), "lv": 7, "req": 7},{"id": "frost_wyrm", "pos": Vector2i(66, 40), "lv": 8, "req": 8},
 			# Part XVII: the Maiden of Frost, who will not take her frost back
-			{"id": "qing_nu", "pos": Vector2i(9, 25), "lv": 64, "req": 63, "vis": ["s_p17_qingnu", ""], "late": true}
+			{"id": "qing_nu", "pos": Vector2i(9, 25), "lv": 64, "req": 63, "vis": ["s_p17_qingnu", ""], "late": true},
+			# Part XXV: the Patriarch of the Cold Pine, on the height he has not come down from in sixty winters
+			{"id": "han_song", "pos": Vector2i.ZERO, "lv": 90, "req": 89, "vis": ["s_p25_seats", ""], "late": true, "peak": 0, "stand": "top"}
 		],
 		"pickups": [
+			# Part XXV: the seat-tokens of the Cold Pine's four halls, left where their masters last sat
+			{"id": "p25_token1", "item": "pine_token", "pos": Vector2i.ZERO, "vis": ["s_p25_pines", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p25_token2", "item": "pine_token", "pos": Vector2i.ZERO, "vis": ["s_p25_pines", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p25_token3", "item": "pine_token", "pos": Vector2i.ZERO, "vis": ["s_p25_pines", ""], "late": true, "peak": 2, "stand": "flank"}, {"id": "p25_token4", "item": "pine_token", "pos": Vector2i.ZERO, "vis": ["s_p25_pines", ""], "late": true, "peak": 3, "stand": "flank"},
 			{"id": "jade1", "item": "jade", "pos": Vector2i(18, 10)}, {"id": "jade2", "item": "jade", "pos": Vector2i(34, 42)},
 			{"id": "jade3", "item": "jade", "pos": Vector2i(52, 8)}, {"id": "jade4", "item": "jade", "pos": Vector2i(70, 16)},
 			# Part XVI: winter plum for the reunion table, flowering in the snow
@@ -1867,11 +1906,15 @@ const AREAS := {
 		"pool": [["tea_beetle", 33, 34], ["terrace_serpent", 33, 34], ["hill_sprite", 33, 34]],
 		# Part XVI: the hunger that runs before Nian, coming down the terraces towards the villages
 		"warband": {"pool": [["lean_month", 60, 61], ["candle_moth", 60, 61], ["nian_cub", 60, 61]], "n": 8, "vis": "s_p16_rally"},
+		# Part XXV: what an assessor sends ahead of him up the terraces
+		"warband5": {"pool": [["writ_wasp", 88, 88], ["tally_crow", 88, 88], ["corvee_ox", 88, 88]], "n": 16, "vis": "s_p25_widow", "late": true},
 		"portals": [
 			{"to": "village", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "silk", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_te_matron"},
 		],
-		"npcs": [{"id": "tea_master", "n": "Tea Master Lu Yu", "pos": Vector2i(9, 25), "col": Color("6ab07a"), "vis": ["s_te_intro", ""]}],
+		"npcs": [{"id": "tea_master", "n": "Tea Master Lu Yu", "pos": Vector2i(9, 25), "col": Color("6ab07a"), "vis": ["s_te_intro", ""]},
+			# Part XXV: the woman who weeps at the foot of the height, and will not leave it
+			{"id": "tai_widow", "n": "The Widow of Mount Tai", "pos": Vector2i.ZERO, "col": Color("e4dfd0"), "vis": ["s_p25_guests", ""], "late": true, "peak": 0, "stand": "foot"}],
 		"bosses": [
 			{"id": "wind_kite", "pos": Vector2i(30, 40), "lv": 33, "req": 33},
 			{"id": "terrace_dragon", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
@@ -1879,12 +1922,17 @@ const AREAS := {
 			{"id": "thread_matron", "pos": Vector2i(86, 28), "lv": 34, "req": 34},
 			# Part XVI: the king of the hungry months, driving them down towards the villages
 			{"id": "lean_king", "pos": Vector2i(59, 30), "lv": 61, "req": 60, "vis": ["s_p16_lean", ""]},
+			# Part XXV: the government fiercer than a tiger, on the height above the tea
+			{"id": "ke_zheng", "pos": Vector2i.ZERO, "lv": 89, "req": 88, "vis": ["s_p25_bills", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		"pickups": [{"id": "teabud1", "item": "tea_bud", "pos": Vector2i(22, 12)}, {"id": "teabud2", "item": "tea_bud", "pos": Vector2i(40, 46)}, {"id": "teabud3", "item": "tea_bud", "pos": Vector2i(64, 30)}, {"id": "teabud4", "item": "tea_bud", "pos": Vector2i(76, 10)},
 			# Part XVII: Mingqian tea, the first buds of the year, picked before Qingming
 			{"id": "p17_tea1", "item": "spring_tea", "pos": Vector2i(24, 27), "vis": ["s_p17_tea", ""], "late": true}, {"id": "p17_tea2", "item": "spring_tea", "pos": Vector2i(90, 26), "vis": ["s_p17_tea", ""], "late": true},
 			{"id": "p17_tea3", "item": "spring_tea", "pos": Vector2i(57, 3), "vis": ["s_p17_tea", ""], "late": true}, {"id": "p17_tea4", "item": "spring_tea", "pos": Vector2i(56, 51), "vis": ["s_p17_tea", ""], "late": true},
-			{"id": "p17_tea5", "item": "spring_tea", "pos": Vector2i(65, 27), "vis": ["s_p17_tea", ""], "late": true}, {"id": "p17_tea6", "item": "spring_tea", "pos": Vector2i(31, 50), "vis": ["s_p17_tea", ""], "late": true}
+			{"id": "p17_tea5", "item": "spring_tea", "pos": Vector2i(65, 27), "vis": ["s_p17_tea", ""], "late": true}, {"id": "p17_tea6", "item": "spring_tea", "pos": Vector2i(31, 50), "vis": ["s_p17_tea", ""], "late": true},
+			# Part XXV: the assessor's bills, nailed to the doors of the terraces
+			{"id": "p25_bill1", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p25_bill2", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p25_bill3", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p25_bill4", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "foot"},
 		],
 		"pickup_vis": "s_te_collect",
 		"buildings": [
@@ -3829,6 +3877,50 @@ const STEPS := [
 	{"id": "s_p24_reckon", "kind": "reckon", "area": "mountain", "t": "On the heights above the sect something is waiting that is made of everything you chose: go up, and meet what the journey made", "stones": 42400},
 	{"id": "s_p24_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "You have lost three fights, and the mountain is still there: tell Elder Qing Xuan"},
 	{"id": "s_break29", "kind": "breakthrough", "to": 87, "t": "Nothing is softer, and nothing overcomes it: Soft as Water"},
+	# ---- Part XXV: The Three Burrows (the Three Burrows release): a town that is his own to answer for, the
+	# people asked to live in it, what it owes and is owed, who may come in at its gate, and whose seat is
+	# over its hall
+	{"id": "s_p25_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "There are more people camped on the road below the sect than there are beds in it, and they did not come for the sect: speak to Elder Qing Xuan", "stones": 43000},
+	{"id": "s_p25_feng", "kind": "talk", "npc": "feng_xuan", "area": "mountain", "hearth": "valley", "t": "On the east shoulder of the mountain there is open ground the sect has never used, and a man sitting on it singing to his sword: find Feng Xuan", "stones": 43200},
+	{"id": "s_p25_cutters", "kind": "folk", "role": "woodcutter", "n": 3, "area": "mountain",
+		"t": "A roof begins with somebody who knows timber: ask 3 woodcutters of the camps of the road to come and live at Guiyun (face one, press Enter)"},
+	{"id": "s_p25_vermin", "kind": "hunt", "area": "mountain", "n": 20, "of": ["granary_rat", "seed_sparrow", "thatch_moth"],
+		"t": "Seed-grain has gone up the mountain, and what eats it has followed: clear 20 granary rats, seed-sparrows and thatch-moths off Azure Cloud Mountain"},
+	{"id": "s_p25_build", "kind": "hold", "need": ["built", 4], "area": "mountain",
+		"t": "Guiyun has a hall and nothing else: at the steward's table, build until four things stand (a well, a row of houses, a granary)", "stones": 43600},
+	{"id": "s_p25_pedlars", "kind": "folk", "role": "pedlar", "n": 3, "area": "mountain",
+		"t": "A town is a place somebody from somewhere else has a reason to walk to: ask 3 pedlars of the road to lay their mats at Guiyun"},
+	{"id": "s_p25_sticks", "kind": "collect", "item": "tally_stick", "n": 5, "area": "mountain", "t": "The steward's chest has been gnawed open from below, and the tallies of what Guiyun owes are gone: find 5 tally-sticks dropped about the heights"},
+	{"id": "s_p25_rat", "kind": "kill", "boss": "shuo_shu", "area": "mountain", "t": "The teeth-marks go down: under the mountain, in its hollow, something has been eating a town's first harvest. Go down to the Great Rat", "stones": 44000},
+	{"id": "s_p25_tally", "kind": "talk", "npc": "feng_xuan", "area": "mountain", "hearth": "valley", "t": "The tallies are in a basket in the square, and all Guiyun is looking at the basket: speak to Feng Xuan about the debts"},
+	{"id": "s_p25_town", "kind": "hold", "need": ["rank", 2], "area": "mountain",
+		"t": "In two years, says the old book, a town: build at the steward's table until Guiyun has fifty households and a market", "stones": 44400},
+	{"id": "s_p25_guests", "kind": "visits", "npcs": ["tofu_sun", "batu", "well_keeper_zhaya", "boatwright_gao", "bell_tuner_gong", "tea_seller_pan"], "n": 4, "area": "village", "settle": true, "did": "%s will send a household to Guiyun",
+		"t": "\"A lord is known by his guests,\" says the steward: ask 4 of those who know everybody in the six hearths to send one household each"},
+	{"id": "s_p25_widow", "kind": "talk", "npc": "tai_widow", "area": "terraces", "hearth": "valley", "t": "The household from the Cloud-Tea Terraces has not come, and nobody will say why: find the woman who weeps at the foot of the height there"},
+	{"id": "s_p25_assess", "kind": "hunt", "area": "terraces", "n": 22, "of": ["writ_wasp", "tally_crow", "corvee_ox"],
+		"t": "An assessor sends his seals ahead of him: break 22 seal-wasps, tally-crows and oxen of the corvee on the Cloud-Tea Terraces", "stones": 44800},
+	{"id": "s_p25_bills", "kind": "collect", "item": "tiger_bill", "n": 4, "area": "terraces", "t": "Every door of the terraces has a bill nailed to it for more than the house is worth: take down 4, to know whose seal is on them"},
+	{"id": "s_p25_tiger", "kind": "kill", "boss": "ke_zheng", "area": "terraces", "t": "\"Harsh government is fiercer than a tiger,\" said the Master, and went on. On the height above the tea, go up to the one that is both"},
+	{"id": "s_p25_door", "kind": "talk", "npc": "feng_xuan", "area": "mountain", "hearth": "valley", "t": "The terraces are free of the seal, and half of them are on the road to Guiyun with their beds on their backs: go back to Feng Xuan, who has a question about the gate", "stones": 45200},
+	{"id": "s_p25_herbs", "kind": "folk", "role": "herbalist", "n": 3, "area": "mountain",
+		"t": "Sixty households and nobody to set a bone: ask 3 herbalists of the road to come and live at Guiyun"},
+	{"id": "s_p25_rogues", "kind": "hunt", "area": "mountain", "n": 22, "of": ["cock_crower", "dog_thief", "gate_crasher"],
+		"t": "Word has gone round that Guiyun turns nobody away: see off 22 cock-crowers, dog-thieves and guests nobody asked, without being too hard on them"},
+	{"id": "s_p25_city", "kind": "hold", "need": ["rank", 3], "area": "mountain",
+		"t": "In three years, a capital: build until Guiyun has a hundred households and a wall with a gate in it", "stones": 45600},
+	{"id": "s_p25_watch", "kind": "host", "n": 9, "area": "mountain", "t": "A wall wants a watch on it: see the Watch of Guiyun stand to with the host (9 companies)"},
+	{"id": "s_p25_envoy", "kind": "talk", "npc": "feng_xuan", "area": "mountain", "hearth": "valley", "t": "A man in pine-green has left a letter on the steward's table and would not sit down: ask Feng Xuan what the Cold Pine Sect wants"},
+	{"id": "s_p25_pines", "kind": "hunt", "area": "frost", "n": 24, "of": ["pine_swordsman", "needle_sprite", "frost_crane"],
+		"t": "The Cold Pine's outer hall is out on the snow in ranks, waiting to be impressed: put down 24 of its disciples, needle-sprites and cranes in the Frostpeak Caverns", "stones": 46000},
+	{"id": "s_p25_seats", "kind": "collect", "item": "pine_token", "n": 4, "area": "frost", "t": "The Cold Pine had four halls once, each with a master. Find the 4 seat-tokens they left on the heights of Frostpeak, and count who sits in them now"},
+	{"id": "s_p25_han", "kind": "kill", "boss": "han_song", "area": "frost", "t": "On the highest of the Frostpeak heights an old man has not come down in sixty winters: go up to Han Song, Patriarch of the Cold Pine"},
+	{"id": "s_p25_seat", "kind": "talk", "npc": "feng_xuan", "area": "mountain", "hearth": "valley", "t": "Three hundred of the Cold Pine stand at the Cloud Gate with no master, and the Hall of the Broom has no board over its door: go back to Feng Xuan", "stones": 46400},
+	{"id": "s_p25_hermits", "kind": "folk", "role": "hermit", "n": 3, "area": "mountain",
+		"t": "Whatever hangs over the door, somebody must teach inside it: ask 3 hermits of the road to come down and teach at the Hall of the Broom"},
+	{"id": "s_p25_marks", "kind": "marks", "n": 8, "area": "mountain", "t": "\"A cunning hare has three burrows,\" says the steward. \"Go and look at yours\": look at 8 things that stand in the land because of what you chose"},
+	{"id": "s_p25_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "From the Elder's window the smoke of a hundred hearths can be seen on the east shoulder: tell Elder Qing Xuan whose town it is", "stones": 46800},
+	{"id": "s_break30", "kind": "breakthrough", "to": 90, "t": "The best of them, the people barely know is there: Scarcely Known"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -4029,6 +4121,9 @@ const ITEMS := {
 	"cast_shoe": {"n": "Cast Horseshoe", "desc": "A shoe of frontier iron, worn thin on the outside edge, with three nails still in it. The old man's horse has always gone a little wide on the off fore. Whatever it ran from, it ran from at a gallop: the nails are bent back like hooks"},
 	"bore_shell": {"n": "Shell from the Bore", "desc": "A whelk the size of two fists, from water deeper than any net of Yanggu goes, carried a mile inland and set down unbroken. Held to the ear it does not give the sea. It gives hooves"},
 	"chain_link": {"n": "Link of Yu's Chain", "desc": "A link of black iron as big as a millstone, rusted through at one place and bright as a mirror on the inside curve, where for four thousand years something pulled. Great Yu had it forged at Tongbai, when nothing else would hold. It took nine men to lift, when there were men like that"},
+	"tally_stick": {"n": "Tally-Stick of Guiyun", "desc": "Half of a split bamboo with notches cut across the split: so much seed, so much timber, a winter's millet. The household keeps the other half, and the two are laid together when the debt is paid. This half has been carried in something's mouth. The notches are all still there"},
+	"tiger_bill": {"n": "Assessor's Bill", "desc": "A sheet of yellow paper nailed to a door: land tax, head tax, a tax on the hearth, a levy for the road, a levy for the men who collect the levy, and at the foot a red seal with a tiger's face. The sum is more than the house would fetch. It is the third this year"},
+	"pine_token": {"n": "Seat-Token of the Cold Pine", "desc": "A tablet of old pine heartwood the length of a hand, lacquered black, with the name of a hall cut into it and filled with silver: North, South, Root, Crown. Whoever holds it sits in that hall's seat. There is sixty years of frost in the cut of the characters, and nobody's thumb has worn the lacquer"},
 	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
@@ -4187,6 +4282,13 @@ const CHAT := {
 	"weng_son": ["He says who knows to everything. I asked him once if he was glad I was born. He thought about it for a day, and then he said yes, so far.",
 		"There are forty-one horses in our herd and I can tell you the dam of every one. Ask me. Nobody ever asks me.",
 		"The steppe is flat until you have lived on it. Then it is all hollows. A whole herd can stand in one and you ride past."],
+	"feng_xuan": ["\"Long sword, let us go home.\" I sing it still, some evenings. There is fish now, and a cart, and a roof. I find the tune does not need a grievance. It was only ever a tune.",
+		"People think accounts are about money. Accounts are about who can look whom in the eye. I have never lost a copper, and I have burned a fortune, and I should be hard put to say which made the better books.",
+		"My lord kept three thousand at his table and could not have told you the names of thirty. You know the name of every dog in Guiyun. I do not say it is better. I say it is the size a person can answer for.",
+		"A cunning hare has three burrows and may at last lie down. I told my lord that. I did not tell him the rest: that the hare digs them all itself, and that nobody has ever seen one lie down."],
+	"tai_widow": ["Three graves. I talk to them in order of age, so that nobody is put out. They were all men who minded about that.",
+		"The Master asked his question and rode on. They always ride on. I do not blame him. He had it written down, which is more than anybody else did.",
+		"People ask whether I am not afraid of the tiger. I was afraid of the tiger for thirty years. Then it learned to write, and I found out what I had been saving the fear for."],
 	"qian_liu": ["I had five hundred crossbowmen shoot the bore, six iron arrows a man, at the crest, on the eighteenth day of the eighth month. It was the finest volley of my reign. The tide came in. I have thought about that every day since.",
 		"I was a salt-boiler's son and a salt-smuggler, and then I was a king. The salt was the honest work. A pan of brine does what it will do, and no decree hurries it.",
 		"They made a god of Wu Zixu for riding the tide in on a white horse. He rides at the head of it again, since the sea came back. The horses do not need him. They never did; it was we who needed somebody to be angry at."],
@@ -4452,6 +4554,11 @@ const CHAT := {
 ## about falling stars and Jade Emperors on Lin Feng's first morning): [quest step, line], added to their
 ## chat once that step is done.
 const CHAT_LATER := {
+	# Part XXV: what the steward and the widow only say once it has happened
+	"feng_xuan": [["s_p25_tally", "They come and look at the place in the square where the basket stood. They do not say anything. I have left the place swept and empty. One should not build on that sort of ground for a year or two."],
+		["s_p25_city", "A hundred doors. I walk past all of them at dusk and count the ones with a light in. It is always a hundred. I count them anyway. It is the only sum I do for pleasure."],
+		["s_p25_seat", "There is a board over the Hall of the Broom now. I pass under it forty times a day and read it every time. A steward should know what he is steward of."]],
+	"tai_widow": [["s_p25_tiger", "It came down to the spring last night to drink, like any tiger, and looked at me, and went back up. We know where we are with each other again."]],
 	# Part XXIV: what the old man's son only says once it has happened
 	"weng_son": [["s_p24_steed", "It is a good leg. It only does not bend. I can still do everything but ride and run."], ["s_p24_riders", "Every boy I grew up with went north behind the riders. I mend their mothers' tents now. It is a great many tents."]],
 	"archivist": [["s_p7_home", "The old maps drew every realm as its own island, stitched to the next by a gate. Look out of the window now: the roads simply run on."]],
@@ -8290,6 +8397,183 @@ const DIALOGUE := {
 	],
 	"post:s_break29": [
 		["Narrator", "The tribulation passes over the mountain as the riders passed over the steppe, and when it has gone the pine is standing and so is Lin Feng, and neither of them is marked. It did not miss. It went round. Far down in the valley somebody is leading a horse to water, in no hurry, and nobody at all is keeping the score."],
+	],
+	# ---- Part XXV: The Three Burrows (the Three Burrows release)
+	"recall23": [
+		["Narrator", "The story of the three losses goes down the mountain faster than any victory ever did. A sweeper who stood in front of the sea and lost, and then said what should be done with the shore, and it was done: people who have never trusted a hero find they can trust that."],
+		["Narrator", "They begin to arrive in the spring. Not disciples: families, with a cart, a grandmother and a crate of hens. By midsummer there are fires along the road below the nine hundred and ninety-nine steps from the gate to the second bend, and none of them has asked to be let in."],
+	],
+	"s_p25_home": [
+		["Elder Qing Xuan", "Count the fires on the road tonight. I have. A hundred and six. They are not pilgrims; a pilgrim goes home again. These have brought their hens.", "point"],
+		["Lin Feng", "They want to enter the sect?"],
+		["Elder Qing Xuan", "They want to live near you, which is not the same and is a great deal more trouble. A sect may shut its gate. Somebody people have made up their minds to trust has no gate to shut. Where Shun ploughed, says the old book, in a year there was a hamlet, in two a town, in three a capital. Nobody asked Shun.", "think"],
+		["Yue Ling", "They cannot winter on a road. The first snow comes down that slope like a door."],
+		["Elder Qing Xuan", "No. The east shoulder of the mountain is ours by a deed nine hundred years old, and nothing has ever been done with it but look at it. I am giving it to you. Not to the sect: to you, so that when it goes wrong it is yours. That is all that owning a thing has ever meant.", "nod"],
+		["Elder Qing Xuan", "There is a man sitting on it already. He came up a month ago, asked for nothing, and has been singing to his sword. I think he is a steward in want of a house. Go and see whether you are one."],
+	],
+	"s_p25_feng": [
+		["Feng Xuan", "\"Long sword, let us go home! Here there is no fish to eat.\" That is the first verse. In the second there is no carriage, and in the third no way to keep a house. I sang all three at Lord Mengchang's gate. He gave me the fish and the carriage and my mother's keep, and never asked what I was good for.", "laugh"],
+		["Lin Feng", "What are you good for?"],
+		["Feng Xuan", "Nothing; I told him so. I can keep accounts. He sent me to Xue to collect his debts, and to buy with them whatever his house was short of. I burned the tallies in the market-place and went back and told him I had bought him righteousness. He was not pleased. A year later he lost his post, and all Xue came a hundred li down the road to meet him.", "think"],
+		["Yue Ling", "And you have come to do it again?"],
+		["Feng Xuan", "I have come to find out whether it can be done from the beginning instead of the end. You have a hundred fires on a road and a piece of ground. I have looked at the ground. The hall goes here, where I am sitting. A cunning hare has three burrows, I told my lord, and you have only one. You have none. Shall we dig?", "point"],
+		["Narrator", "By evening there are four posts in the ground and an argument about the roof. Somebody chalks a name on a board and props it against the nearest post: Guiyun, Where the Cloud Comes Home."],
+	],
+	"done:s_p25_cutters": [
+		["Narrator", "Three woodcutters come up the east shoulder with their saws on their backs and their brothers behind them, look at the four posts, and say nothing for some time. Then the eldest moves one of the posts a hand's breadth to the left, and after that it is a hall."],
+		["Feng Xuan", "Write down what each of them brings and what each is lent. Not to hold it over them. So that in a year, when somebody says he built this town with his own hands, there is a piece of bamboo to say that he did."],
+	],
+	"done:s_p25_vermin": [
+		["Narrator", "The last thatch-moth goes up off the roof like a spark and does not come down. What is left of the seed-grain is under a mat in the hall, with Sawyer Bo sitting on it holding a mallet, where he has been since the night before last."],
+		["Yue Ling", "They did not come because of us. They came because there is grain here now. Everything will. I had not thought of a town as a thing that smells of food from a long way off."],
+	],
+	"done:s_p25_build": [
+		["Narrator", "A well, a row of doors, a granary on stone feet. From the sect's upper terrace it looks like something a child has laid out with pebbles. From inside it, at dusk, with smoke going up from six chimneys at once, it looks like the only lit place on the mountain."],
+		["Feng Xuan", "Four roofs. Good. A hamlet is where people sleep. A town is where somebody else comes to buy salt. Find me the ones who carry salt."],
+	],
+	"done:s_p25_pedlars": [
+		["Narrator", "The pedlars come in one behind the other, as they walk the roads, and each lays down his mat exactly where he would have laid it in any market in the land: a little too near the next man's. By noon there is a quarrel about a steelyard. Feng Xuan listens to it with his eyes shut, smiling."],
+		["Feng Xuan", "Do you hear that? Somebody thinks he has been cheated. Nobody thinks that in a place he means to leave tomorrow. Now: the tallies. I shall want them for the first market day. They are in the chest."],
+		["Narrator", "They are not in the chest. There is a hole in the bottom of the chest, and in the floor under it, and the edges of both are chewed."],
+	],
+	"done:s_p25_sticks": [
+		["Narrator", "Five tally-sticks, dropped along the heights like crumbs. Every one has been carried in a mouth. Seed, timber, a winter's millet: the notches are all there. Whatever took them did not take them to destroy them."],
+		["Yue Ling", "It was keeping them. Look at how they were laid: in order, by household. Lin Feng, something under this mountain is keeping our accounts."],
+		["Feng Xuan", "And eating the grain while it waits to be paid. I know the song. Everybody knows the song. I had hoped not to meet whoever it was written to."],
+	],
+	"pre:shuo_shu": [
+		["Narrator", "It is the size of an ox, and it sits on a heap of millet as on a throne. Round it, in neat bundles tied with straw, is every tally in Guiyun. \"Big rat, big rat, do not eat our millet. Three years we have served you, and you have never cared for us.\" It has heard the song for three thousand years. It has always taken it for a petition."],
+		["Shuo Shu", "They owe. I have it in writing: their own. I do not steal. I hold what is owed, and I eat while I wait. Every granary has had me under it. You have only built yours very quickly, and I have had to hurry."],
+	],
+	"post:shuo_shu": [
+		["Narrator", "It does not die. It gets down off the millet, which nobody has seen it do, and goes away into the dark on four feet like any rat, only larger. The song ends: we will leave you, and go to that happy land. They did leave. This is the happy land. It followed them here in the first cart."],
+		["Yue Ling", "The tallies are dry. It kept them better than we did."],
+		["Lin Feng", "It kept them as somebody keeps a thing he means to use. Bring them up. The town should see them in the light before anybody says what they are for."],
+	],
+	"s_p25_tally": [
+		["Feng Xuan", "Here they are. Seed, timber, the first winter: every household in Guiyun owes the chest, and the chest is yours. I know what I did at Xue. I shall not tell you it was right. It was right for a lord who had too much of everything but friends.", "offer"],
+		["Feng Xuan", "You have a town with nothing. A chest that is empty digs no well. And a chest that is full, in a town where every door owes it, is a rat with a roof on. I have kept accounts for forty years and I have never been sure which of those is the worse.", "think"],
+		["Yue Ling", "They are all in the square. Nobody is even pretending to be drawing water."],
+		["Feng Xuan", "No. They know what is in the basket. Say what is to be done with it, and say it where they can hear. I shall do whichever you say, and keep the books of it for ever."],
+	],
+	"done:s_p25_town": [
+		["Narrator", "The awning of the Morning Market goes up on a day of wind, and takes six men to hold. Under it a steelyard is hung from the middle beam, and the first thing weighed on it, by common consent, is the steward. He comes to a hundred and nine catties. It is entered."],
+		["Feng Xuan", "Fifty households and a place to be cheated in. That is a town. In two years, the book says; we have been quicker than Shun, and I do not trust it. A lord is known by his guests. Yours are all people who came because they had nowhere else. Go and ask for some who have."],
+	],
+	"visit:s_p25_guests:tofu_sun": [
+		["Tofu Seller Sun", "A household for the mountain? My wife's cousin Dou has pressed tofu in my yard for nine years and looked at my grindstone the whole of that time. Take him. Take him with my blessing, and a stone of his own, and tell him the water up there is sweeter. It is true, too, which is the worst of it."]],
+	"visit:s_p25_guests:batu": [
+		["Batu the Horse-Herd", "One of us, in a house? ...Uncle Temur's knees are finished for the saddle, and he would sooner die than say so. Tell him your town has no horse-doctor. Do not tell him it has walls. He will find the walls out for himself, and by then he will have a patient."]],
+	"visit:s_p25_guests:well_keeper_zhaya": [
+		["Well-Keeper Zhaya", "Is the well sweet? Then I shall send my second daughter and hers. She can taste a well and tell you what the mountain over it had for supper. A town wants one of those before it wants a wall. You will not thank me until the first dry summer."]],
+	"visit:s_p25_guests:boatwright_gao": [
+		["Boatwright Gao", "No river? Then what would you do with a boatwright's nephew? ...Carts. He can build you carts. A cart is only a boat that has given up. Yes, he will come; he has been saying for years that Longmen has more boats than fish."]],
+	"visit:s_p25_guests:bell_tuner_gong": [
+		["Bell-Tuner Gong", "A town with no bell does not know what time it is, and so it is never the same time for two people in it, and so they quarrel. I shall send my apprentice with a small bronze. She is better than I am. I have not told her. You may."]],
+	"visit:s_p25_guests:tea_seller_pan": [
+		["Old Pan the Tea Seller", "My sister's boy makes lanterns in a town where everybody makes lanterns. Up a mountain with no lantern-maker he would be a great man. Guiyun, you say? He will think it is a tea. Let him. He will be half-way there before he asks."]],
+	"done:s_p25_guests": [
+		["Feng Xuan", "Four households, sent by people who had a choice in the matter. That is worth forty who had none. And a fifth I did not ask for and have not got: a family of tea-pickers set out for us from the Cloud-Tea Terraces a month ago with their beds on their backs. They did not arrive.", "think"],
+		["Feng Xuan", "They did not get as far as their own gate. I am told there is a woman who sits at the foot of the height there, and that she knows why, and that she will tell anybody who can bear to stand and hear it. I keep accounts. Go, and be the other kind of person."],
+	],
+	"s_p25_widow": [
+		["Narrator", "At the foot of the height a woman in undyed hemp is weeping beside three graves. She does it as somebody does who has had the practice: steadily, without hurry, getting on with it."],
+		["The Widow of Mount Tai", "My husband's father was killed here by the tiger. Then my husband. Now my son. A Master came by once with his disciples and asked me why I did not leave this place. I said: there is no harsh government here. He told them to remember it.", "grieve"],
+		["Lin Feng", "And now?"],
+		["The Widow of Mount Tai", "Now the tiger has learned to write. It wears a seal. It taxes the hearth and the head and the road, and the bill is nailed to the door, and when my neighbours packed for your town they found a second bill beside the first: for leaving. It need not come down any more. We pay it to be let stay and be eaten.", "point"],
+		["Yue Ling", "Then why are you still here?"],
+		["The Widow of Mount Tai", "Because the Master was right, and somebody should be here when it is proved. Start with its seals. They fly ahead of it. You will know them by the wax."],
+	],
+	"done:s_p25_assess": [
+		["Narrator", "The last seal-wasp breaks like a stick of wax, and the oxen of the corvee stand in the tea rows with their heads down, as oxen do when the cart has gone. On every door of the terraces a square of yellow paper lifts and settles in the wind."],
+		["Yue Ling", "They were only what it sent. A thing that sends its paper ahead of it does not expect to be met."],
+	],
+	"done:s_p25_bills": [
+		["Narrator", "Four bills, from four doors. Hearth, head, road, the levy for the men who collect the levy. At the foot of each is the same red seal, and it is not a stamp cut to look like a tiger's face. It is a paw, pressed in cinnabar. The claws have gone through the paper."],
+		["The Widow of Mount Tai", "It learned the sums from my husband's father, who kept the village book. It ate him last of all that year. I have always thought it wanted him to finish the page."],
+	],
+	"pre:ke_zheng": [
+		["Narrator", "It is a tiger: old, heavy in the shoulder, with one eye gone white. Round its neck on a red cord hangs an assessor's seal the size of a rice-bowl. It is lying on a ledger. It does not get up."],
+		["The Tiger of Mount Tai", "I ate them one at a time, and they stayed. Then I learned to send a bill, and now they pay me for leave to stay. I have not come down the hill in a year. Tell me, sweeper, you who are building a town with a chest in it: which of us did the Master mean was the fiercer? I or the paper?"],
+	],
+	"post:ke_zheng": [
+		["Narrator", "The cord breaks. The seal goes down the height end over end and cracks across on a tea-terrace wall. What is left gets up, shakes itself, and goes off up the rock: an ordinary tiger, which is terror enough, and honest."],
+		["The Widow of Mount Tai", "A tiger I can live beside. I have done it thirty years. You will have a chest in your town, sweeper, and somebody to keep it. Come and look at this hill sometimes. Not to be frightened. Only to remember what a seal weighs.", "nod"],
+	],
+	"s_p25_door": [
+		["Feng Xuan", "They are on the road with their beds on their backs. Tea-pickers, and behind them people who heard it from tea-pickers. Some are of the six hearths. Some are of nowhere: there is a family of the Feathered Folk with a hand-cart, and two shades of Youdu who walk at night and sit under a tarpaulin all day.", "point"],
+		["Feng Xuan", "The gate is not built. I am being asked, forty times a day, whom it will be for. I have said: the lord will say. I have enjoyed saying it. It cannot go on."],
+		["Yue Ling", "At the sect they ask one thing of whoever comes: have you eaten?"],
+		["Feng Xuan", "A good question for a kitchen. A town must ask a second: and who answers for you? Or it must make up its mind never to ask it. Either is a town. They are not the same town. Say which, and I shall have it cut over the gate before there is a gate.", "think"],
+	],
+	"done:s_p25_herbs": [
+		["Narrator", "The herbalists come last and separately, as they do everything, and each walks the north slope above the town for a whole day before agreeing to anything. On the second day there are three drying-racks behind the Second Row, and a queue."],
+		["Feng Xuan", "Sixty households, and until this morning the nearest person who could set a bone was a day's walk down. I did not put that in the accounts. There is no column for what did not happen."],
+	],
+	"done:s_p25_rogues": [
+		["Narrator", "The last of them goes over the unfinished wall with a hen under each arm, puts the hens down when shouted at, and comes back to ask whether there is any work. He can crow like a cock. He does it. Three real cocks answer him, and a gate two valleys off is heard to open."],
+		["Feng Xuan", "Lord Mengchang kept a man at his table who could only steal like a dog, and one who could only crow like a cock, and was laughed at for it. Then came a night at the Hangu Pass, with a king's riders behind him, when a fur had to be stolen and a gate crowed open before dawn. Do not be hard on them. Ask what else they can do.", "laugh"],
+	],
+	"done:s_p25_city": [
+		["Narrator", "The wall goes up a hand's breadth a day, each household its own length of it, and where two lengths meet there is a seam that will show for a hundred years. On the day the Cloud Gate is hung, Feng Xuan counts the doors of Guiyun twice and then sits down on the steps of the hall and says nothing for an hour."],
+		["Feng Xuan", "A hundred. In three years, a capital, says the book. I have checked. We are not a capital. We are a hundred households behind a wall that has a man on it who crows. But I have kept the accounts of a lord with three thousand guests, and I was never once as rich as this.", "bow"],
+	],
+	"done:s_p25_watch": [
+		["Narrator", "The Watch of Guiyun stands to on the drill ground at dawn: a hundred who were woodcutters and pedlars a year ago. Lady Hao comes up from Qingshi to look at them, walks down the front rank once without speaking, and at the end of it turns to Lin Feng."],
+		["Fu Hao", "They chose who stands either side of them. I have drilled levies for thirty years and I cannot teach that; I can only find it or not find it. Keep them on the wall. If the host is ever called out again, send them to me last. I shall want something to hold with."],
+	],
+	"s_p25_envoy": [
+		["Feng Xuan", "A man in pine-green left this on my table and would not sit. I shall read it as written. \"From Han Song, Patriarch of the Cold Pine Sect of Frostpeak. A hall in which cultivation is taught, standing within a hundred li of an older gate, is a branch of that gate or it is a weed. Bring me the board from over its door, or I shall come down for it.\"", "think"],
+		["Lin Feng", "It is one room with nine brooms in it."],
+		["Feng Xuan", "It is a room children go into in order to become somebody. That is a sect, whatever is in the rack. He is right about what it is. He is only wrong about whose. He has three hundred disciples and has not taken a pupil of his own in sixty years: nobody was good enough.", "point"],
+		["Yue Ling", "Then who has been teaching the three hundred?"],
+		["Feng Xuan", "Each other, I should think, and the cold. They are out on the snow below Frostpeak now, in ranks. They have been told to be impressed by nothing. I should go and see what that looks like from in front."],
+	],
+	"done:s_p25_pines": [
+		["Narrator", "They go down in their ranks and get up in their ranks and bow, all three hundred, to exactly the same depth. Not one of them has asked who he is. They have been taught the forms of everything, and it has not occurred to anybody to teach them a question."],
+		["Yue Ling", "Their hands are split with frost. All of them. He has had them out here every dawn for sixty years, getting ready for somebody good enough to arrive."],
+	],
+	"done:s_p25_seats": [
+		["Narrator", "Four tablets of black lacquer: North, South, Root, Crown. Each lay on a mat in an empty hall with the door frozen shut. The Cold Pine had four masters under its patriarch once. He let them die one after another, and looked at their pupils, and found nobody fit to follow them."],
+		["Lin Feng", "He is not keeping the seats. He is keeping them empty. It is the only thing left on this mountain that he is sure he does well."],
+	],
+	"pre:han_song": [
+		["Han Song", "\"Only when the year turns cold do we see that the pine and the cypress are the last to wither.\" I have been the last for sixty winters. Everything else on this mountain was promising, and froze. And you come up to me with a town at your back. A town! Do you know how long a town lasts?", "point"],
+		["Lin Feng", "Longer than a master with no pupils."],
+		["Han Song", "I have three hundred."],
+		["Lin Feng", "You have three hundred people standing in the snow. I counted the seat-tokens, Patriarch. Nobody has held one in my lifetime. I have a room with brooms in it and a child of four who is rude about the well. One of us has a sect."],
+	],
+	"post:han_song": [
+		["Narrator", "He sits down in the snow, which he has not done in sixty winters, and finds that it is only cold."],
+		["Han Song", "Sixty years I looked for somebody fit for the seat. All that time I thought the seat was the thing to be fit for. ...They will be at your gate by tomorrow. Three hundred. They follow whoever has beaten the master; it is the one lesson I ever finished teaching. Do as you like with them. Do it better. That should not be hard.", "grieve"],
+	],
+	"s_p25_seat": [
+		["Feng Xuan", "Three hundred in pine-green outside the Cloud Gate, in ranks, in the rain. They have no master, and they were taught that whoever beats the master is the master. The Elder has sent down to say it is no affair of his, by which I understand that he is at his window.", "point"],
+		["Feng Xuan", "And the Hall of the Broom has a bare lintel, and the children have begun to ask what it is the hall of. This is the third burrow, and it is the one my lord slept soundest in: a seat nobody can take away, because of how it was come by."],
+		["Yue Ling", "There are three boards the carpenter could cut. I have seen him looking at the wood."],
+		["Feng Xuan", "A new name, that nobody has heard. An old name, that three hundred will kneel to by nightfall. Or the name that is over your own Elder's gate, which you have never yet stepped out from under. I keep accounts. I do not know what a thing is worth until somebody has chosen it. Choose.", "bow"],
+	],
+	"done:s_p25_hermits": [
+		["Narrator", "Three hermits come down off three different heights, look at one another with the dislike of people who each believed they were the only one, and are shown the Hall of the Broom. The eldest picks up the shortest broom, weighs it in his hand, and nods."],
+		["Feng Xuan", "They will not agree about anything they teach. Good. I have seen what a hall looks like where everybody agrees. It was on a mountain, in the snow, in ranks."],
+	],
+	"done:s_p25_marks": [
+		["Feng Xuan", "Three burrows. The goodwill of a town that knows what you did about its debts. A gate, and a word over it about who may come in. And a seat. My lord slept without a care after the third. I notice you do not sleep well. Good. A lord who sleeps well is being robbed by somebody; often it is by himself.", "nod"],
+		["Yue Ling", "You have never once called him a lord before today."],
+		["Feng Xuan", "He was not one before today. He had built things. Today he went round and looked at them again. That is the whole of the difference, and I have waited forty years to keep the books of somebody who knew it."],
+	],
+	"s_p25_end": [
+		["Elder Qing Xuan", "I can see it from this window. A hundred smokes. I counted them at dawn; I count them every dawn, and I have told nobody, so do not you. What do they say down there, when they are asked whose town it is?", "think"],
+		["Lin Feng", "They say: ours. They say they built it themselves. They did, Elder. I only stood about and was asked things."],
+		["Elder Qing Xuan", "Then you did it properly. Of the best of those who are over others, the people know only that he is there. I have been over this sect for seventy years and they know a great deal more of me than that; I have always talked too much.", "laugh"],
+		["Yue Ling", "The steward says he has three burrows now, and still does not sleep."],
+		["Elder Qing Xuan", "Nor should he. Go and sit under the pine, child. There is a realm for people who have been answered for all their lives and have turned round and begun to answer for others. I do not know what it is like. I only know that from outside it looks like nothing at all.", "bow"],
+	],
+	"pre:s_break30": [
+		["Narrator", "Under the pine Lin Feng sits, and does not gather the qi, and does not let it go. He leaves it where it is, as a steward leaves a chest: counted, and not his. On the east shoulder a hundred hearths are being banked for the night by people who are not thinking of him at all. The sky gathers, as it always has, and looks for somebody to strike."],
+	],
+	"post:s_break30": [
+		["Narrator", "The tribulation comes down on the mountain and cannot find the middle of him. There is a town where the middle used to be, and a gate, and a room with brooms in it. It strikes the pine, which has been struck before and does not mind. In the morning a cock crows at Guiyun, and then a man, and the gate opens."],
 	],
 	"recall21": [
 		["Narrator", "The tops are open, and all that summer the people of the road go up and come down again with nothing to report. In the autumn the mountain is quieter than anybody remembers. It is so quiet that on the first morning of the tenth month everybody on it hears the same thing at once."],

@@ -364,6 +364,9 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 			lines.append(["Narrator", Dooms.epilogue(Game)])
 		for rl9 in Reckon.epilogue(Game):
 			lines.append(["Narrator", str(rl9)])
+		# (the Three Burrows release: the town that is his own, and whose name is over its hall, hold.gd)
+		if not Hold.epilogue(Game).is_empty():
+			lines.append(["Narrator", " ".join(Hold.epilogue(Game))])
 		var stood := 0
 		for lid9 in ["surface", "heaven", "under", "sea"]:
 			stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
@@ -548,6 +551,9 @@ func interact(e: Dictionary) -> void:
 		"machine":
 			# the Hundred Works (works.gd): what it is and what it does
 			say([["Narrator", Works.site_desc(str(e.work))]])
+		"hold":
+			# the Three Burrows release (hold.gd): a plot of the hero's own town: what it is
+			say([["Narrator", Hold.desc_of(Game, e)]])
 		"mark":
 			# the Lost Horse release (marks.gd): what a choice left standing; looked at, it is remembered
 			var first_look := not Game.marks_seen.has(Marks.seen_key(str(e.id)))
@@ -603,13 +609,43 @@ func talk_folk(e: Dictionary) -> void:
 		Game.stones = maxi(0, Game.stones - int(er.price))
 		done = true
 		lines = [["Lin Feng", str(er.ask)], [str(fp.n), Folk.errand_line(str(s.id), fp)]]
+		# (Part XXV, hold.gd: an errand that asks people to come and live in the hero's own town)
+		if bool(er.get("settle", false)):
+			Hold.settle(Game, str(fp.id), str(fp.n), true)
+	# the Three Burrows release (hold.gd): with a town of his own and room in it, anybody grown who has no
+	# post to keep may be asked to come ("Not today" first, as with everything that is not the story's)
+	var ask_home: bool = not done and Game.prologue == "" and Hold.may_ask(fp) and Hold.can_settle(Game, str(fp.id))
 	say(lines, func():
-		world.folk_talking = ""
 		if done:
+			world.folk_talking = ""
 			var er2: Dictionary = Folk.ERRANDS[str(s.id)]
 			Game.toast(("%s (%d of %d)" % [str(er2.toast), Game.folk_count(s), int(s.n)]) % str(fp.n))
 			Game.note(str(er2.toast) % str(fp.n))
 			Game.poll_steps()
+		elif ask_home:
+			offer_home(fp)
+		else:
+			world.folk_talking = ""
+	)
+
+const HOME_ASK := "There is room at Guiyun. Ask %s to come and live there?"
+
+## The Three Burrows release (hold.gd): ask one of the people of the towns or the road to come and live
+## in the hero's own town (a family and its kin, while there is room for them).
+func offer_home(fp: Dictionary) -> void:
+	var opts: Array = [
+		{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM},
+		{"id": "come", "label": "There is a roof for you at Guiyun", "note": "+%d households" % int(round(Hold.PER_SETTLER * Hold.mod(Game, "settler"))),
+			"desc": "%s, and whoever of their kin will follow: a door of their own on the east shoulder of the mountain, dues written small, and a street to sweep. %s." % [str(fp.n), Hold.summary(Game)], "col": UI.C_JADE}]
+	choose(HOME_ASK % str(fp.n), opts, func(oid: String):
+		world.folk_talking = ""
+		if oid != "come":
+			return
+		if Hold.settle(Game, str(fp.id), str(fp.n)):
+			Game.toast("%s will come to Guiyun (%d households, room for %d)" % [str(fp.n), Hold.households(Game), Hold.room(Game)])
+			Feats.poll(Game)
+			Game.poll_steps()
+			say([[str(fp.n), Hold.yes_line(fp)]])
 	)
 
 func talk_npc(e: Dictionary) -> void:
@@ -721,6 +757,9 @@ func talk_npc(e: Dictionary) -> void:
 			# (Part XXIII: the levy; whoever keeps a hearth sends its company to the host, war.gd)
 			if bool(s.get("levy", false)):
 				War.raise(Game, War.levy_of(str(e.id)))
+			# (Part XXV: whoever is called on sends a household to the hero's own town, hold.gd)
+			if bool(s.get("settle", false)):
+				Hold.settle(Game, "npc:" + str(e.id), "A household sent by %s" % str(e.n), true)
 			if race != "":
 				Game.race_gain(race, 5)
 			Game.poll_steps()
@@ -787,6 +826,9 @@ func talk_npc(e: Dictionary) -> void:
 	elif str(e.id) == Jobs.CLERK and deed == "":
 		# the notice board of Qingshi (jobs.gd)
 		after = func(): offer_jobs(e)
+	elif str(e.id) == Hold.STEWARD and deed == "" and Hold.founded(Game):
+		# the steward's table at Guiyun (hold.gd)
+		after = func(): offer_hold(e)
 	elif str(e.id) == "sun_wu" and deed == "" and not _drills().is_empty():
 		# Master Sun's lessons on the drill ground (war.gd)
 		after = func(): offer_drill(e)
@@ -1406,6 +1448,31 @@ func offer_jobs(e: Dictionary) -> void:
 			say([[str(e.n), "\"%s.\" Done, and witnessed. I shall take it down." % str(Jobs.JOBS[jid].n)], [str(Jobs.JOBS[jid].by).capitalize() if not str(Jobs.JOBS[jid].by).begins_with("the ") else "Narrator", str(Jobs.JOBS[jid].thanks)]])
 	)
 
+const HOLD_ASK := "The steward's table at Guiyun: what is to be done?"
+
+## The Three Burrows release (hold.gd): the steward's table: what is in the chest, and what is drawn up
+## and not yet built ("Not today" first).
+func offer_hold(e: Dictionary) -> void:
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "%s.\n\n%s" % [Hold.summary(Game), "Dues: %d spirit stones a day. The chest holds %d days of them and no more." % [Hold.due(Game), Hold.CHEST_DAYS]], "col": UI.C_DIM}]
+	var c := Hold.chest(Game)
+	if c > 0:
+		opts.append({"id": "take", "label": "Take what is in the chest", "note": "%d stones" % c, "desc": "The dues of %d households since the chest was last emptied. The steward has counted them twice and will count them again in front of you." % Hold.households(Game), "col": UI.C_GOLD})
+	for id in Hold.unbuilt(Game):
+		var why := Hold.blocked(Game, id)
+		var p: Dictionary = Hold.PLOTS[id]
+		opts.append({"id": "build:" + id, "label": "Build " + str(p.n), "note": "%d stones" % Hold.cost(Game, id),
+			"desc": "%s\n\nIt brings %d households, and makes room for %d.%s" % [str(p.ask), int(p.homes), int(p.room), "" if why == "" else "\n\n" + why], "col": UI.C_JADE if why == "" else UI.C_DIM, "enabled": why == ""})
+	choose(HOLD_ASK, opts, func(oid: String):
+		if oid == "take":
+			Hold.take(Game)
+			say([[str(e.n), "Counted, and counted. It is all there. It is always all there: that is what I am for."]])
+		elif oid.begins_with("build:"):
+			var pid := oid.get_slice(":", 1)
+			if Hold.build(Game, pid):
+				Feats.poll(Game)
+				say([["Narrator", str(Hold.PLOTS[pid].desc)]])
+	)
+
 # ---------------------------------------------------------------- the body (needs.gd) and courtship (romance.gd)
 ## Where the hero stands, as the body and an hour with Yue Ling care about it: under a roof or the
 ## ground, in a town or out in the country, beside water, on a summit, in the cold, and the hour.
@@ -1748,7 +1815,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22"}
+	"s_break28": "recall22", "s_break29": "recall23"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

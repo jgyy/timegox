@@ -40,7 +40,8 @@ const ASH := Color("3a3632")
 
 ## What each answer of each crossroads leaves standing: `area`, `m` (the model and what it is made
 ## with), `n` (its name over it), `desc` (what is read there), `k` (how many of it; 1 if not given)
-## and `who` (somebody who stands by it: [name, a body of the towns, colour, what they say...]).
+## and `who` (somebody who stands by it: [name, a body of the towns, colour, what they say...]); `near`
+## (a tile of the region: it stands on the open ground nearest that, not wherever the draw falls).
 const MARKS := {
 	"bandits": {
 		"mend": {"area": "bamboo", "m": ["road"], "k": 5, "n": "The Menders' Road", "desc": "Split logs laid side by side across the soft ground, pegged at both ends, with a mallet left on the last of them by somebody who meant to come back for it. Forty men who robbed this road built it. It is not straight, and it has not sunk.",
@@ -193,6 +194,25 @@ const MARKS := {
 		"loose": {"area": "aurora", "m": ["paddock", false], "n": "The Open Rails", "desc": "A paddock with its rails taken down and stacked. The herd runs where it runs. Some years it comes back with strangers in it, and some years fewer, and the old man says the same thing either way."},
 		"breed": {"area": "aurora", "m": ["board", WOOD_PALE], "n": "The Stud Book of the Frontier", "desc": "A board under a felt roof with the lines of every horse of the frontier painted on it: sire, dam, foal. Fortune is to be bred for, the fathers say. The old man has added, at the bottom, in charcoal: so far."},
 	},
+	# ---- Part XXV (the Three Burrows release): the three answers that made Guiyun what it is, on the mountain
+	# round it (and one on Frostpeak)
+	"the_tallies": {
+		"burn": {"area": "mountain", "near": Hold.AT + Vector2i(-5, 4), "m": ["fire", false], "n": "Where the Tallies Burned", "desc": "A ring of stones with wet ash in it, a stone's throw from the town, swept round and left. Every debt of Guiyun's first winter went up here in a basket. Nobody has built on the place. In the ash, some mornings, there is a handful of millet that was not there the night before.",
+			"who": ["Old Mother Qiu", "folk_grandma", Color("8a6a5a"), "I said it was a waste of good bamboo. I say it still. I come and say it to the ashes every morning, so that they do not think themselves too fine.", "My tally was the longest in the basket. Nine notches. I had counted on being in debt to somebody till I died; it is a kind of company. Now I owe nobody, and I have had to make friends."]},
+		"collect": {"area": "mountain", "near": Hold.AT + Vector2i(-5, 4), "m": ["board", PAPER], "n": "The Posted Accounts", "desc": "A board under a little roof with the accounts of Guiyun pasted to it, household by household: owed, paid, the day. Every line has a stroke through it. The paper is renewed each harvest, in the same hand, and there has never been a line without its stroke. People pass it on the other side of the road."},
+		"shares": {"area": "mountain", "near": Hold.AT + Vector2i(-5, 4), "m": ["pump"], "n": "The Mill of Shares", "desc": "Six sails of matting on a frame of poles, turning in the wind off the sea of clouds, and under them a stone that grinds the town's millet. Along the mill-house wall is a row of half-tallies, nailed up: each household's debt, become its share. The toll is a handful in the hundred, and the miller is whoever's turn it is."},
+	},
+	"the_door": {
+		"all": {"area": "mountain", "near": Hold.AT + Vector2i(5, 13), "m": ["lamp_post"], "k": 5, "n": "Lanterns on the Road In", "desc": "A red lantern on a post, one of a line that runs down the mountain from the Cloud Gate, lit at dusk by whoever came in last. They are for those still on the road: the winged, the scaled, the ones who walk at night and would rather not be seen arriving. The oil is paid for out of the chest, under the heading: guests."},
+		"hearth": {"area": "mountain", "near": Hold.AT + Vector2i(5, 13), "m": ["flags", 6], "n": "The Stone of Six Sureties", "desc": "A milestone on the road in, and over it a cord hung with six strips of cloth, one in the colour of each hearth of the land. Whoever comes with the word of a hearth ties a thread to that hearth's strip and goes up. The strips are thick with threads. Beside the stone, in the grass, somebody has slept."},
+		"sweep": {"area": "mountain", "near": Hold.AT + Vector2i(5, 13), "m": ["rack", "broom"], "k": 3, "n": "Brooms at the Road's End", "desc": "A rack of brooms where the road reaches the town, for whoever has just arrived. One is taken, and the street is swept from the gate to the well, and after a season of it there is a door. Nobody is asked anything. The brooms are worn to different lengths, and the shortest is always gone first."},
+	},
+	"the_seat": {
+		"found": {"area": "mountain", "near": Hold.AT + Vector2i(16, 4), "m": ["gate", true, Color("d8d0c0")], "n": "The Gate of the Returning Cloud", "desc": "Two posts and a lintel of new timber on the path above the town, with a lantern on each and a line of washing between: the gate of a sect that has no wall yet to put it in. Three hundred pine-green coats were folded and left here in one night. Most were collected. A few are still on the line, bleaching.",
+			"who": ["First Disciple Ren", "folk_youth", Color("d8d0c0"), "I was eleven years in the Cold Pine and never once asked a question. Here I asked where the brooms were, and somebody told me. It was like being handed a cup of water.", "The founder says the first lesson is a street. I have swept it four hundred times. I think the second lesson is also the street. I have not asked. I am saving the question."]},
+		"take": {"area": "frost", "m": ["posts", 7], "k": 3, "n": "The Kneeling Ground of the Cold Pine", "desc": "A ring of practice stakes in the snow below Frostpeak, each worn smooth at the height of a man's hands. Three hundred stand here at dawn, as they have for sixty years, and face south now, toward a town they have never seen, where the Patriarch is. The snow inside the ring is trodden to ice. Nobody has yet thought to sweep it."},
+		"serve": {"area": "mountain", "near": Hold.AT + Vector2i(16, 4), "m": ["board", Color("2a2a2a")], "n": "The Board of the First Gate", "desc": "A board under a little roof where the path from Guiyun meets the nine hundred and ninety-nine steps: black, split with age, and across it in one stroke of white the character for cloud, as the sect's founder wrote it. It hung over the first gate. The Elder had it dusted and sent down, and has not spoken of it."},
+	},
 }
 
 ## What a leaning scale stands in every region: for each scale, for the way it leans, a model, a name
@@ -320,10 +340,16 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 			var st := sites(cid)
 			if st.has(area):
 				var who: Array = []
+				var wme := {"id": "mark:%s:%s" % [cid, area], "cross": cid, "k": int(st[area])}
 				for oid in MARKS[cid]:
 					if str(MARKS[cid][oid].area) == area and MARKS[cid][oid].has("who"):
 						who.append([oid, MARKS[cid][oid].who])
-				want.append({"id": "mark:%s:%s" % [cid, area], "cross": cid, "k": int(st[area]), "who": who})
+					# (the Three Burrows release: an answer may say whereabouts in its region it stands, `near`,
+					# a tile of the region: the open ground nearest it is taken, and nothing is drawn by lot)
+					if str(MARKS[cid][oid].area) == area and MARKS[cid][oid].has("near"):
+						wme["near"] = Atlas.to_world(area, MARKS[cid][oid].near)
+				wme["who"] = who
+				want.append(wme)
 		var cset := {}
 		if want.is_empty():
 			continue
@@ -375,6 +401,26 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 			var dir := Vector2i.ZERO
 			# a row of n, every other tile, in one of the four directions, if the region has room for one
 			var tries := 0
+			if wm.has("near"):
+				# the nearest open ground to where it was asked to stand, a row in whichever direction fits
+				var by_d: Array = cands.duplicate()
+				var nr: Vector2i = wm.near
+				by_d.sort_custom(func(a, b2): return (a - nr).length_squared() < (b2 - nr).length_squared() or ((a - nr).length_squared() == (b2 - nr).length_squared() and a < b2))
+				for c0 in by_d:
+					for d0 in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
+						var ok0 := true
+						for i0 in n:
+							var q0b: Vector2i = (c0 as Vector2i) + d0 * (i0 * 2)
+							if near.has(q0b) or not cset.has(q0b):
+								ok0 = false
+								break
+						if ok0:
+							for i1 in n:
+								row.append((c0 as Vector2i) + d0 * (i1 * 2))
+							dir = d0
+							break
+					if not row.is_empty():
+						break
 			while row.is_empty() and tries < 900:
 				tries += 1
 				var in_wide: bool = tries <= 500 and not wcands.is_empty()

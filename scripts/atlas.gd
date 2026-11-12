@@ -580,7 +580,7 @@ static func _build(layer: String = "surface") -> Dictionary:
 		var spec2: Dictionary = Data.AREAS[id2]
 		# (all but those the story put in a cave: caves.gd stands them there)
 		for n2 in spec2.get("npcs", []):
-			if n2.get("late", false) and not n2.has("cave") and not n2.has("peak"):
+			if n2.get("late", false) and not n2.has("cave") and not n2.has("peak") and not n2.has("hold"):
 				var ne := {"kind": "npc", "id": n2.id, "n": n2.n, "pos": to_world(id2, n2.pos), "col": n2.col, "vis": n2.get("vis", ["", ""]), "area": id2, "layer": layer, "late": true}
 				for k2 in ["asset", "race", "hide", "fate"]:
 					if n2.has(k2):
@@ -625,6 +625,10 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# ---- Part XXIV: a region's third and fourth bands ("warband3", "warband4") are placed now, after the
 	# caves, the peaks and the camps, off the rock and away from the camp fires, so that no cave mouth,
 	# peak or camp of an older map moves for them (a band may stop marching when a step is done: "until")
+	# ---- the Three Burrows release (hold.gd): the plots, the steward and the settlers of the town that
+	# is the hero's own, on ground that was found open with nothing near it; stood before the late bands
+	# and the marks so that those keep off it, and no older map moves
+	Hold.place(grid, W, ids, ents, layer)
 	var late_slots: Array = []
 	for id0 in ids:
 		late_slots.append([id0, "warband3", "y"])
@@ -634,6 +638,15 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# ---- the Lost Horse release (marks.gd): what the crossroads leave standing, and what the scales
 	# stand in every region, on open ground nothing else is on; added last of all, so no older map moves
 	Marks.place(grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps)
+	# ---- the Three Burrows release: a region's fifth and sixth bands ("warband5", "warband6") are placed
+	# after the marks, on what open ground is left, so that nothing a choice left standing moves for them
+	# (a band placed before the marks takes ground a mark of an older release stood on)
+	var last_slots: Array = []
+	for id0 in ids:
+		last_slots.append([id0, "warband5", "u"])
+	for id0 in ids:
+		last_slots.append([id0, "warband6", "v"])
+	_place_bands(last_slots, grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps)
 	# ---- and who is at home (rooms.gd `residents`): people indoors in the houses of every town, stood
 	# after everything else on floor nobody needs to get past
 	ents.append_array(Rooms.residents(buildings, grid, W, ents, layer))
@@ -699,7 +712,7 @@ static func _place_bands(slots: Array, grid: PackedByteArray, W: int, H: int, ow
 				cands.append(p5)
 		cands.sort()
 		var rng5 := RandomNumberGenerator.new()
-		rng5.seed = int(Data.AREAS[id3].seed) * 977 + {"w": 31, "x": 77, "y": 131, "z": 173}[str(bs[2])]
+		rng5.seed = int(Data.AREAS[id3].seed) * 977 + {"w": 31, "x": 77, "y": 131, "z": 173, "u": 211, "v": 251}[str(bs[2])]
 		var made := 0
 		var tries := 0
 		while made < int(band.n) and tries < 4000 and not cands.is_empty():

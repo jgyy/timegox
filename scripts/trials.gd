@@ -63,8 +63,10 @@ const KINDS := {
 	# the Lost Horse release: what was lost to and gone on from (dooms.gd), and what the choices left standing (marks.gd)
 	"loss": {"n": "By the loss", "col": Color("9ab8c8"), "what": "the things that could not be beaten, which you lost to and went on from"},
 	"mark": {"n": "By what stands", "col": Color("f0c8a0"), "what": "the things your choices left standing in the land, gone and looked at"},
+	# the Three Burrows release: the households of the town that is the hero's own (hold.gd)
+	"town": {"n": "By the town", "col": Color("e8d090"), "what": "the households of Guiyun, the town you answer for"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark", "town"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -1229,6 +1231,53 @@ const TRIALS := {
 				"desc": "Late Great Sound and a sword tempered nine times. It expects exactly this of you. It has the brush wet already.",
 				"line": "Lin Feng draws. \"Twenty-four, then,\" says Huofu, with both mouths, and dips the black brush."},
 		]},
+	# ---- Part XXV (the Three Burrows release): the rat under every granary, the government fiercer than a
+	# tiger, and the patriarch who found nobody good enough
+	"shuo_shu": {"might": [2.9, 1.3],
+		"why": "There has been a great rat under every granary since the first was built, and no farmer has ever done more than sing at it. It does not think of itself as a thief. It holds the tallies; it is owed; it eats while it waits. Come down to it as somebody who has only come to kill a rat, and it will show you the notches, and you will find you have nothing to say.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "The other halves", "needs": [["item", "tally_stick", 5]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "Five tally-sticks, found on the heights. A tally is two halves, and a debt is only owed when they are laid together. It has one half of each. Show it that somebody else holds the other, and means to do the laying.",
+				"line": "Lin Feng holds up five half-tallies, notched edge out. The Great Rat's whiskers go still. In three thousand years nobody has come down with the other half."},
+			{"id": "town", "kind": "town", "n": "A granary with many eyes on it", "needs": [["households", 30]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Thirty households at Guiyun. A rat grows great under a granary nobody is watching: a lord's, a temple's, a king's. This one is watched by thirty families who each know to the handful what they put in it.",
+				"line": "\"Thirty households,\" says Lin Feng, \"and every one of them counts the sacks at dusk.\" The Great Rat looks up at the roof of its hollow, as if it could hear them counting."},
+			{"id": "might", "kind": "might", "n": "Kill a rat", "needs": [["lv", 88], ["temper", 9]], "boon": {},
+				"desc": "Middle Soft as Water and a sword tempered nine times. It is a rat. It is the size of an ox, and it has eaten the harvests of three thousand years, but it is a rat.",
+				"line": "Lin Feng draws. The Great Rat sighs, as a creditor sighs, and gets down off the millet."},
+		]},
+	"ke_zheng": {"might": [3.0, 1.3],
+		"why": "It ate three generations of one family, and from the last of them it learned what a ledger is. Now it does not hunt. It assesses. A village will stand against a tiger with torches and gongs; nobody has ever worked out how to stand against a bill. Climb to it with nothing but a sword and it will ask, quite reasonably, to see your own accounts.",
+		"paths": [
+			{"id": "town", "kind": "town", "n": "A town where the dues are written small", "needs": [["households", 50]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
+				"desc": "Fifty households at Guiyun, and a market with an honest steelyard. It asks which of them the Master meant was fiercer. Answer it with a place where there is a chest, and a seal, and people still walk toward it.",
+				"line": "\"Fifty households,\" says Lin Feng. \"They pay. They came anyway. They are still coming.\" The one good eye narrows. It has never had to account for that."},
+			{"id": "relic", "kind": "relic", "n": "Its own bills", "needs": [["item", "tiger_bill", 4]], "boon": {"foe_hp": 0.7, "weak_k": 1.8},
+				"desc": "Four of the assessor's bills, taken down from four doors. Lay them in front of it and add them up aloud. No tiger has ever had its own sums read back to it.",
+				"line": "Lin Feng reads the four bills out, line by line, and at the foot of each says the sum. It is more than the house. It is more than the hill. The tiger's tail has begun to move."},
+			{"id": "hearth", "kind": "hearth", "n": "Four hearths that call you a guest", "needs": [["hearths", 4]], "boon": {"foe_hp": 0.8, "taken": 0.85},
+				"desc": "A guest at four hearths of the land. It taxes the hearth first of all, because that is the one thing nobody will let go out. Go up with the smoke of four of them in your coat.",
+				"line": "It scents him: rice-straw, dung-fire, driftwood, charcoal. Four hearths, and none of them its own to tax. It gets slowly to its feet."},
+			{"id": "might", "kind": "might", "n": "Hunt a tiger", "needs": [["lv", 89], ["temper", 9]], "boon": {},
+				"desc": "Late Soft as Water and a sword tempered nine times. Under the seal it is still a tiger, and tigers have been hunted.",
+				"line": "Lin Feng draws. The tiger looks at the blade, and then down at its ledger, with what in an assessor would be regret."},
+		]},
+	"han_song": {"might": [3.1, 1.35],
+		"why": "He has outlasted every rival, every friend and every pupil he ever thought worth teaching, and he has taken that for proof. Sixty winters on one height have made him exactly as hard as the height. He will not be moved by somebody who comes up it to show that he, too, is hard.",
+		"paths": [
+			{"id": "town", "kind": "town", "n": "A hundred households behind you", "needs": [["households", 100]], "boon": {"foe_hp": 0.65, "foe_atk": 0.8},
+				"desc": "A hundred households at Guiyun. He asks how long a town lasts. Tell him how many were born in it this year. He has three hundred disciples, and nobody has been born on Frostpeak in sixty winters.",
+				"line": "\"A hundred households,\" says Lin Feng. \"Nine children since the spring. Not one of them is fit for anything yet.\" Han Song's hand, on the hilt, is not quite still."},
+			{"id": "relic", "kind": "relic", "n": "Four empty seats", "needs": [["item", "pine_token", 4]], "boon": {"foe_hp": 0.75, "weak_k": 1.9},
+				"desc": "The four seat-tokens of the Cold Pine's halls, found where their last masters left them. Set them down in the snow before him, one by one, and ask him to say the name of whoever sits in each.",
+				"line": "North. South. Root. Crown. Lin Feng lays them in the snow in the order of the halls, and waits to be told who holds them. The Patriarch looks at the four tablets for a long time."},
+			{"id": "arms", "kind": "arms", "n": "A hand that has learned from others", "needs": [["arms", 3]], "boon": {"foe_hp": 0.8, "taken": 0.85},
+				"desc": "Three Daos of arms learned to Adept. He has one sword and one way of using it, perfected alone. Come up as somebody who has been taught, by three different weapons, how much there was to learn.",
+				"line": "Lin Feng takes a stance that is not the Cold Pine's, and then another that is not the Azure Cloud's either. Han Song has not seen a thing he could not name in sixty years."},
+			{"id": "might", "kind": "might", "n": "Outlast him", "needs": [["lv", 89], ["temper", 9]], "boon": {},
+				"desc": "Late Soft as Water and a sword tempered nine times. He has been the last one standing on this mountain for sixty winters. Be the sixty-first.",
+				"line": "Lin Feng draws. \"Promising,\" says Han Song, as he has said of a great many who froze, and draws too."},
+		]},
 	"meng_tian": {"might": [2.6, 1.3],
 		"why": "Meng Tian built the Wall with three hundred thousand men and never marched without the tally. When a forged letter told him to die he asked only whether the seal was true. Fired in clay and buried with the army, he has half a tally and is keeping the vanguard ready, for an order that is not coming.",
 		"paths": [
@@ -1443,6 +1492,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"falls":
 			# the Lost Horse release: battles that could not be won, lost and gone on from (dooms.gd)
 			return g.fallen >= int(n[1])
+		"households":
+			# the Three Burrows release: the households of the town that is the hero's own (hold.gd)
+			return Hold.households(g) >= int(n[1])
 		"marks":
 			# what the choices left standing, looked at (marks.gd)
 			return g.marks_seen.size() >= int(n[1])
@@ -1529,6 +1581,8 @@ static func need_text(n: Array, g) -> String:
 			return "%d airs of the hearths learned (now %d: somebody at each hearth still sings its own)" % [int(n[1]), g.airs.size()]
 		"falls":
 			return "%d battles that could not be won, lost and gone on from (now %d)" % [int(n[1]), g.fallen]
+		"households":
+			return "%d households at Guiyun (now %d: build at the steward's table, and ask people to come; Esc > Town)" % [int(n[1]), Hold.households(g)]
 		"marks":
 			return "%d things your choices left standing, gone and looked at (now %d: Esc > Crossroads says where each stands)" % [int(n[1]), g.marks_seen.size()]
 	return str(n)
@@ -1632,7 +1686,7 @@ const EPITHETS := {"might": "the Unbending Sword", "craft": "Master of Cauldron 
 	"heart": "Who Never Walked Alone", "folk": "Whom the Towns Remember", "land": "Who Opened the Land", "hearth": "Guest of Every Fire",
 	"works": "Whose Hands Made It", "delve": "Who Went to the Back of the Cave", "arms": "Whose Hand Is Open",
 	"heights": "Who Stood on the Tops", "host": "Whom They Came For", "song": "Who Sang Them Home",
-	"loss": "Who Lost and Went On", "mark": "Whose Word Stayed Where It Was Put"}
+	"loss": "Who Lost and Went On", "mark": "Whose Word Stayed Where It Was Put", "town": "Whom a Hundred Households Followed"}
 
 static func _num(n: int) -> String:
 	var s := str(absi(n))

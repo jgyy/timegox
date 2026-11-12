@@ -491,7 +491,9 @@ static func world(area: String, layer: String, mouth: Vector2i, ents: Array, lev
 		if nt.x >= 0:
 			fents.append({"kind": "npc", "id": n.id, "n": n.n, "pos": nt, "col": n.col, "vis": n.get("vis", ["", ""]), "area": area, "layer": id, "late": true})
 	for b in here.get("bosses", []):
-		if int(b.get("cave", 0)) != level:
+		# (a lord the story stood here in a later release, `"last": true`, is stood after everything
+		# else below, so that nothing that was already in the cave moves for him)
+		if int(b.get("cave", 0)) != level or b.get("last", false):
 			continue
 		var bt := _take(lay, taken, str(b.get("stand", "deep")))
 		if bt.x >= 0:
@@ -569,6 +571,13 @@ static func world(area: String, layer: String, mouth: Vector2i, ents: Array, lev
 				var pe2: Array = foes.pool[rng.randi() % (foes.pool as Array).size()]
 				group.append({"id": pe2[0], "lv": rng.randi_range(int(pe2[1]), int(pe2[2]))})
 			fents.append({"kind": "enemy", "id": "cave:%s:%d:e%d" % [area, level, fi], "pos": ft, "group": group, "vis": [str(foes.get("vis", "")), ""], "area": area, "layer": id, "late": true})
+	# (the Three Burrows release: and the lords who came last, on what ground is left)
+	for b2 in here.get("bosses", []):
+		if int(b2.get("cave", 0)) != level or not b2.get("last", false):
+			continue
+		var bt2 := _take(lay, taken, str(b2.get("stand", "deep")))
+		if bt2.x >= 0:
+			fents.append({"kind": "boss", "id": "boss_" + str(b2.id), "enemy": b2.id, "pos": bt2, "lv": b2.lv, "req": b2.req, "vis": b2.get("vis", ["", ""]), "area": area, "layer": id, "late": true})
 	var owner := PackedByteArray()
 	owner.resize(w * h)
 	return {"layer": id, "kind": "floor", "cave": true, "parent": layer, "up": from_layer, "bld": "cave", "bld_n": str(sp.n), "floor_n": "", "level": level, "area": area,

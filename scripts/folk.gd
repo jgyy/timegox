@@ -1043,6 +1043,28 @@ static func hongbao_line(p: Dictionary) -> String:
 ## and what it costs (Part XVI: red paper from the merchants, a fish for the reunion table, red envelopes for the
 ## children, the lantern riddles).
 const ERRANDS := {
+	# Part XXV (hold.gd): the people of the road asked to come and live in the town that is the hero's own
+	# (`settle`: whoever is asked comes, with their kin)
+	"s_p25_cutters": {"ask": "There is open ground on the east shoulder of Azure Cloud Mountain, and four posts in it. It wants somebody who knows timber. Will you come and live there?", "price": 0, "toast": "%s will come to Guiyun", "settle": true,
+		"lines": ["Four posts? Who set them? ...Never mind. I can see from here they are wrong. Yes. I shall bring my brother and the long saw. Somebody must.",
+			"Live in a house. I have built forty and slept in none. Is it true there are no debts written yet? Then I shall come before they think of some.",
+			"On the sect's mountain? That is good pine, the east shoulder. Nobody has been let cut it in nine hundred years. ...You are letting me. I shall be there before you are.",
+			"A town with nothing in it yet. Then whoever comes first says where the lane goes. I have opinions about lanes. I shall come."]},
+	"s_p25_pedlars": {"ask": "There is a town called Guiyun on the east shoulder of the mountain, with a well and a granary and nobody to buy salt from. Will you lay your mat there?", "price": 0, "toast": "%s will lay a mat at Guiyun", "settle": true,
+		"lines": ["A town with no pedlar in it? There is no such thing. There is only a town that the pedlars have not found. Where did you say?",
+			"I have walked past ten thousand doors and nobody ever offered me one. Say the name again, slowly. I want to hear what it sounds like when it is where I live.",
+			"Is there a steelyard? Whose? ...The steward's, and he lets it be checked? I shall come and check it. I shall come and check it every morning for the rest of my life.",
+			"Salt, needles, thread, a little news. That is a town, that is: it is only that the houses hold still. Yes. My knees will thank you."]},
+	"s_p25_herbs": {"ask": "Guiyun has sixty households now and nobody who can set a bone. There is a north slope above it that has never been picked over. Will you come?", "price": 0, "toast": "%s will come to Guiyun", "settle": true,
+		"lines": ["Never picked over? On a mountain with a sect on it? They gather nothing but dew up there. ...I shall want a drying-rack facing south and to be left alone. Yes.",
+			"Sixty households. That is four broken bones a year, a difficult birth, and somebody who has eaten the wrong mushroom. You have been lucky so far. I shall come before the luck goes.",
+			"Is there water? Good water? Then I can make most of what they will need. The rest is telling them to lie down, and nobody listens to that from a neighbour. They may from a stranger.",
+			"I have been watching your smoke from here. More of it every month. I wondered when somebody would come and ask. I have had my basket packed since the spring."]},
+	"s_p25_hermits": {"ask": "There is a hall at Guiyun with nine brooms in it and a board over the door, and children in it wanting to be taught. Will you come down?", "price": 0, "toast": "%s will teach at the Hall of the Broom", "settle": true,
+		"lines": ["Come down. To a town. With children in it. ...What do they want to be taught? Everything? Hm. That is at least the right thing to want. One season. I shall see.",
+			"I came up here forty years ago because nobody would listen. You say there is a room full of people who have asked to. I do not believe you. I shall come and look.",
+			"Brooms. I heard about the brooms. It is the only sensible thing I have heard of a school in my lifetime. Who thought of it? No, do not tell me. I shall come and disagree with him.",
+			"A hall. With a door, that I could shut? And nobody minds if I say nothing for a week? Then yes. The young learn most from somebody who is plainly not trying to teach them."]},
 	# Part XXIII: the players of the Drum Tower quarter, asked to teach the levy the airs of the land
 	"s_p23_songs": {"ask": "The levy can march to a song and cannot sing one. Will you teach the companies the airs of the six hearths, of an evening?", "price": 0, "toast": "%s will teach the levy to sing",
 		"lines": ["Teach ploughmen to sing? They sing already. They sing like a gate. ...Yes, very well. I have taught worse. I have taught an examiner's nephew.",
