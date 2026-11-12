@@ -835,6 +835,9 @@ func ent_visible(e: Dictionary) -> bool:
 			if Game.boss_done.has(e.enemy):
 				return false
 			# a boss who only appears later in the story (the Gate Generals and Chiyou, Part XIII)
+			# (the reckoning, reckon.gd: only the lords this journey's choices made stand on the mountain)
+			if Reckon.is_lord(str(e.enemy)):
+				return Reckon.stands(Game, str(e.enemy))
 			var bv = e.get("vis", ["", ""])
 			# (Part XXIV: a lord that cannot be beaten is gone from the land when the losing is done)
 			if bv.size() > 1 and str(bv[1]) != "" and Game.done(str(bv[1])):

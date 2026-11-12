@@ -340,6 +340,8 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		# standing, marks.gd)
 		if Dooms.epilogue(Game) != "":
 			lines.append(["Narrator", Dooms.epilogue(Game)])
+		for rl9 in Reckon.epilogue(Game):
+			lines.append(["Narrator", str(rl9)])
 		var stood := 0
 		for lid9 in ["surface", "heaven", "under", "sea"]:
 			stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
@@ -1459,6 +1461,10 @@ func boss_interact(e: Dictionary) -> void:
 		if s.is_empty() or s.kind != "grudges" or Game.grudges.has(e.enemy):
 			say([["Narrator", "%s stands where its owner fell, muttering a sum nobody ever paid. It does not see you yet." % d.n]])
 			return
+	elif Reckon.is_lord(str(e.enemy)):
+		# the reckoning (reckon.gd): one of the last lords, made of what was chosen
+		if s.is_empty() or s.kind != "reckon" or not Reckon.stands(Game, str(e.enemy)):
+			return
 	elif s.is_empty() or not (s.kind == "kill" or s.kind == "fall") or s.boss != e.enemy:
 		say([["Narrator", "%s looms before you, but this is not the time. Finish your current objective first." % d.n]])
 		return
@@ -1476,8 +1482,18 @@ func boss_interact(e: Dictionary) -> void:
 		return
 	var pre: Array = boss_story(e.enemy)
 	pre.append_array(Echoes.told(Game, "pre:" + str(e.enemy), Data.DIALOGUE.get("pre:" + e.enemy, [])))
+	if Reckon.is_lord(str(e.enemy)):
+		pre.append(["Narrator", Reckon.word(Game, str(e.enemy))])
 	say(pre, func():
 		var foe := {"id": e.enemy, "lv": e.lv}
+		if Reckon.is_lord(str(e.enemy)):
+			# (as strong as the habit that made it, and cracked by every time the other answer was given)
+			var rm: Array = Reckon.might(Game, str(e.enemy))
+			foe["mult"] = float(rm[0])
+			foe["atk"] = float(rm[1])
+			battle.start([foe], {"entity": e, "boss": true, "enemy": e.enemy, "theme": battle_theme(), "boon": Reckon.boon(Game, str(e.enemy)), "path_kind": "The reckoning", "path_n": "%d cracks" % Reckon.cracks(Game, str(e.enemy))})
+			push("battle")
+			return
 		if Grudges.is_grudge(e.enemy):
 			# a grudge does not listen until it has spent itself: it fights as hard as a trial's boss
 			foe["mult"] = float(Grudges.MIGHT[0])
@@ -1630,6 +1646,10 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 					var gn: String = str(Trials.GATE_NAMES[ctx.enemy])
 					Game.toast("%s stands open (%d of 8)" % [gn.substr(0, 1).to_upper() + gn.substr(1), Game.gates_open.size()])
 					Game.note("Opened " + str(Trials.GATE_NAMES[ctx.enemy]))
+					Game.poll_steps()
+				elif Reckon.is_lord(str(ctx.enemy)):
+					# (the reckoning: the step is done when nobody the journey made is left standing)
+					Game.reckoned[str(ctx.enemy)] = true
 					Game.poll_steps()
 				elif not Grudges.is_grudge(ctx.enemy):
 					Game.advance()

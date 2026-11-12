@@ -197,6 +197,8 @@ var romance := {}
 ## things that could not be beaten (dooms.gd): how each was lost, how often, how often by giving way
 var marks_seen := {}
 ## (offices.gd: shifts worked at the trades of the towns, and the day the last one was worked in each town)
+## (reckon.gd: the last lords of the story that were faced)
+var reckoned := {}
 var shifts := {}
 var shift_day := {}
 ## (careers: the day the last shift was worked at each trade in each town, for the salary; all wages earned)
@@ -366,6 +368,7 @@ func reset() -> void:
 	needs_fell = {}
 	romance = {}
 	marks_seen = {}
+	reckoned = {}
 	shifts = {}
 	shift_day = {}
 	salary_day = {}
@@ -875,6 +878,9 @@ func poll_steps() -> void:
 			"host":
 				# Part XXIII: so many companies in the host (war.gd)
 				ok = War.companies(self).size() >= int(s.n)
+			"reckon":
+				# the reckoning (reckon.gd): everybody the journey's choices made has been met
+				ok = Reckon.left(self).is_empty()
 			"falls":
 				# Part XXIV: so many packs of what cannot be beaten stood in front of, and lost to (dooms.gd)
 				ok = hunt >= int(s.n)

@@ -826,6 +826,14 @@ const ENEMIES := {
 	"wuzhiqi": {"n": "Wuzhiqi, the Ape of the Huai", "elem": "water", "weak": "earth", "col": Color("3a5a6a"), "shape": "ape", "boss": true, "doom": true, "pal": {"sec": Color("e8ecf0"), "acc": Color("e8c84a"), "mark": Color("6a4a3a")}},
 	"the_riders": {"n": "The Ten Thousand Riders of the North", "elem": "phys", "weak": "earth", "col": Color("5a4a3a"), "shape": "mammoth", "boss": true, "doom": true, "pal": {"sec": Color("2a2018"), "acc": Color("c85a3a"), "mark": Color("e8e0c8")}},
 	"huofu": {"n": "Huofu, Who Keeps Both Columns", "elem": "dark", "weak": "thunder", "col": Color("e8e4d8"), "shape": "warden", "boss": true, "pal": {"sec": Color("1a1a1e"), "acc": Color("c8302a"), "mark": Color("e8c84a")}},
+	# (the reckoning, reckon.gd: the last lords of the story, made of the way the journey's choices lean)
+	"debt_mercy": {"n": "The Debt of Mercy", "elem": "wood", "weak": "fire", "col": Color("f0a8c0"), "shape": "queen", "boss": true, "pal": {"sec": Color("7a3a5a"), "acc": Color("f4f0e8"), "mark": Color("c8302a")}},
+	"iron_judge": {"n": "The Iron Judge", "elem": "phys", "weak": "wood", "col": Color("4a4a56"), "shape": "warden", "boss": true, "pal": {"sec": Color("1a1a22"), "acc": Color("c8302a"), "mark": Color("e8e0c8")}},
+	"unkept_engine": {"n": "The Engine Without a Keeper", "elem": "fire", "weak": "water", "col": Color("b8863a"), "shape": "golem", "boss": true, "pal": {"sec": Color("4a3626"), "acc": Color("ff9a40"), "mark": Color("7ab8d8")}},
+	"unturned_stone": {"n": "The Unturned Stone", "elem": "earth", "weak": "thunder", "col": Color("6a7a60"), "shape": "tortoise", "boss": true, "pal": {"sec": Color("3a4236"), "acc": Color("c8c0a0"), "mark": Color("5a7a48")}},
+	"doorless_road": {"n": "The Road With No Door", "elem": "thunder", "weak": "earth", "col": Color("9ad870"), "shape": "dragon", "boss": true, "pal": {"sec": Color("5a6a4a"), "acc": Color("e8e0c0"), "mark": Color("60a8d8")}},
+	"valley_wall": {"n": "The Wall Round the Valley", "elem": "earth", "weak": "water", "col": Color("a8a4ac"), "shape": "mammoth", "boss": true, "pal": {"sec": Color("5a564e"), "acc": Color("f0c860"), "mark": Color("7a5a38")}},
+	"the_unchosen": {"n": "The Unchosen", "elem": "dark", "weak": "thunder", "col": Color("b0b8c8"), "shape": "hundun", "boss": true, "pal": {"sec": Color("5a6070"), "acc": Color("f4f4ff"), "mark": Color("8a8fa8")}},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -978,7 +986,16 @@ const AREAS := {
 			# Part XX: the Valley Spirit, in the Hollow of the Mountain under Rotten-Axe Cave
 			{"id": "xuanpin", "pos": Vector2i.ZERO, "lv": 74, "req": 74, "vis": ["s_p20_wang", ""], "late": true, "cave": -2, "stand": "deep"},
 			# Part XXII: the Lord of the Eastern Peak, at his desk on the very top of Sun-Viewing Peak (peaks.gd stands him there)
-			{"id": "dongyue", "pos": Vector2i.ZERO, "lv": 80, "req": 80, "vis": ["s_p22_slips", ""], "late": true, "peak": 0, "stand": "top"}
+			{"id": "dongyue", "pos": Vector2i.ZERO, "lv": 80, "req": 80, "vis": ["s_p22_slips", ""], "late": true, "peak": 0, "stand": "top"},
+			# the reckoning (reckon.gd): the last lords, on the other heights of the mountain; only those the
+			# journey made are there
+			{"id": "debt_mercy", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 1, "stand": "top"},
+			{"id": "iron_judge", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 1, "stand": "foot"},
+			{"id": "unkept_engine", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 2, "stand": "top"},
+			{"id": "unturned_stone", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "doorless_road", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 3, "stand": "top"},
+			{"id": "valley_wall", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 3, "stand": "foot"},
+			{"id": "the_unchosen", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_reckon", "s_p24_reckon"], "late": true, "peak": 4, "stand": "top"}
 		],
 		"springs": [Vector2i(36, 104), Vector2i(146, 40)],
 		# trails that join the mountain's people start just north of the sect's north wall
@@ -3809,6 +3826,7 @@ const STEPS := [
 	{"id": "s_p24_marks", "kind": "marks", "n": 6, "area": "village", "t": "The old man has one errand for somebody who has lost three times: go and look at 6 things that stand in the land because of what you chose", "stones": 42000},
 	{"id": "s_p24_twin", "kind": "kill", "boss": "huofu", "area": "yanggu", "t": "Somebody keeps the book of who won and who lost: on the height above the sea at Yanggu, go up to Huofu"},
 	{"id": "s_p24_weng2", "kind": "talk", "npc": "sai_weng", "area": "aurora", "hearth": "steppe", "t": "The book is shut: go back to the old man of the frontier, who has one more thing to ask about a horse"},
+	{"id": "s_p24_reckon", "kind": "reckon", "area": "mountain", "t": "On the heights above the sect something is waiting that is made of everything you chose: go up, and meet what the journey made", "stones": 42400},
 	{"id": "s_p24_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "You have lost three fights, and the mountain is still there: tell Elder Qing Xuan"},
 	{"id": "s_break29", "kind": "breakthrough", "to": 87, "t": "Nothing is softer, and nothing overcomes it: Soft as Water"},
 ]
@@ -8214,6 +8232,52 @@ const DIALOGUE := {
 		["Weng the Younger", "Father. Tell them about the horse."],
 		["Sai Weng", "Yes. The black horse. It broke my son and it saved my son, and it is standing behind my tent eating my hay, and the whole frontier wants to know what I mean to do with it. They will do as I do; they always have, grumbling. And I find I would rather it were you who said. You have had the practice.", "point"],
 	],
+	"pre:debt_mercy": [
+		["Narrator", "It has a great many faces and they are all grateful. Forty road-menders, a widow, a flock of crows, a made thing with a heart: everyone Lin Feng ever let go, and behind each of them, smaller, somebody they went on to hurt. It does not accuse. It holds out a hand, palm up, as a person does who has come for what is owed."],
+		["The Debt of Mercy", "You were kind to us. All of us. We have come to say so, and to ask who paid."]],
+	"post:debt_mercy": [
+		["Narrator", "The faces go out one at a time, like lamps along a street, and each one, going, says a name. Not Lin Feng's. Their own. It takes a long while."],
+		["Yue Ling", "You would let every one of them go again. I watched your face. Every one."],
+		["Lin Feng", "Yes. But I shall ask, next time, where they mean to go."]],
+	"pre:iron_judge": [
+		["Narrator", "It sits behind a table of black iron with a list in front of it, and it has Lin Feng's way of holding its shoulders. Everything he ever drove out, struck off, banished or broke is entered on the list in his own hand, and at the foot of it there is one line left blank, with his name against it."],
+		["The Iron Judge", "You never once asked what it had been like for them. Neither shall I. Stand there. This will not take long; you taught me to be quick."]],
+	"post:iron_judge": [
+		["Narrator", "The table is in two pieces. The list has blown open at the first page, and the judge, with nothing to sit behind, turns out to be no taller than a sweeper."],
+		["The Iron Judge", "Read it, then. All of it. Aloud. That is the sentence: only that."],
+		["Narrator", "Lin Feng reads until the light goes. Yue Ling holds the pages down against the wind."]],
+	"pre:unkept_engine": [
+		["Narrator", "It has a wheel from Qingshi in it, and the legs of a brass spider, and a furnace that walked, and a ladder that built itself, all turning, all fed, nobody at any of it. It is not angry. It is on time. It has been on time for so long that there is no longer anywhere in it for a hand to go."],
+		["Narrator", "Somewhere inside, very small, a bell that was meant to say when to stop rings and rings, and is not heard above the work."]],
+	"post:unkept_engine": [
+		["Narrator", "It stops the way a wheel stops when somebody lets the gate down: all at once, and then a long time running on. In the quiet the little bell is very loud. Lin Feng reaches in and stills it with two fingers."],
+		["Yue Ling", "It was only ever waiting to be told it could. Nobody builds that part. You have to stand there."]],
+	"pre:unturned_stone": [
+		["Narrator", "It is a stone the size of a hall, with moss on it a hand deep, and carved into every face of it, over and over, in the oldest writing there is: as it was done, so do. Under it something is growing, pale, bent double, that has never seen the sun. The stone knows. It has decided that this, too, is as it was done."]],
+	"post:unturned_stone": [
+		["Narrator", "It does not break. Nothing that old breaks. It is lifted, one corner, the width of a hand, by two people with their backs against it, long enough to see what is underneath; and then, because some of it was holding the hill up, it is set down again an inch to the left."],
+		["Lin Feng", "It was right about most things. I only wanted to know which."]],
+	"pre:doorless_road": [
+		["Narrator", "It comes up the mountain in every direction at once: a road, the width of a cart, going everywhere, with nobody's door on it. Rubbings of a map blow along it. Kites go over. Everything Lin Feng ever opened, lent, copied or let fly is somewhere on it, travelling, and none of it has been home in years."],
+		["The Road With No Door", "Come with us. You always said it was the wide world. We have looked. It is very wide. We cannot find where it stops."]],
+	"post:doorless_road": [
+		["Narrator", "It lies down across the mountain like a thing that has been walking for a long time, and where its head rests there is, for no reason anybody can give, a gate-post; and against the gate-post, a broom."],
+		["Yue Ling", "It only wanted somewhere to arrive. You can go everywhere and still be expected for supper. People do."]],
+	"pre:valley_wall": [
+		["Narrator", "It is a wall, well built, of everything Lin Feng ever kept at home: names set in stone, a map under a lid, a method taught to nobody, a horse behind rails. Inside it there is one valley, warm, lit, quite safe. Outside it a great many people are standing in the dark with their hands on the stones, and it has never occurred to the wall that they are cold."]],
+	"post:valley_wall": [
+		["Narrator", "Nobody pulls it down. A wall is a good thing to have at one's back. Lin Feng takes eleven stones out of it, at the height of a cart, and Yue Ling hangs a lantern in the gap; and that is a gate."],
+		["Lin Feng", "It is still the home fire. It only has a door, now, that opens from both sides."]],
+	"pre:the_unchosen": [
+		["Narrator", "It has no face, because it never settled on one. It is the size of everything that was nearly said: every crossroads walked past with half an answer, every scale left level because both pans were heavy. It is very gentle. It agrees with whoever spoke last. Standing near it, Lin Feng finds that he cannot remember what he thinks about anything."]],
+	"post:the_unchosen": [
+		["Narrator", "It does not fall. It turns, slowly, as a crowd turns when somebody at last says a thing plainly, and for one moment it has a face. Nobody afterwards agrees whose. Then it is only mist on a mountain, going where the wind goes, which is at least a direction."],
+		["Yue Ling", "What did you tell it?"],
+		["Lin Feng", "What I wanted. It was the first time I had said it aloud. I think that is all it needed anybody to do."]],
+	"done:s_p24_reckon": [
+		["Narrator", "The heights are empty. Below them the sect's roofs are where they were, and the nine hundred and ninety-nine steps, and somebody small is sweeping them from the top down."],
+		["Yue Ling", "That was you. Not something that happened to you: you. Every piece of it."],
+		["Lin Feng", "I know. I should like to say I would do it all differently. I find I would do about a third of it differently, and I know which third."]],
 	"s_p24_end": [
 		["Elder Qing Xuan", "You look different. Not older. You look like somebody who has been set down somewhere by something and had to walk back.", "think"],
 		["Lin Feng", "Three times, Elder. The sea, a river and ten thousand horsemen. None of them was looking for me. I think that was the lesson, though the old man would say it is too soon to tell."],

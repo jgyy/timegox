@@ -4149,6 +4149,46 @@ func _lost_horse() -> void:
 	check(DG.done("s_p24_marks") and Trials.need_met(["marks", 6], DG), "six are")
 	DG.free()
 
+	print("== the reckoning (reckon.gd) ==")
+	var wm: Dictionary = Atlas.world_of("surface")
+	for rid in Reckon.ALL:
+		var re: Array = wm.ents.filter(func(e): return e.kind == "boss" and str(e.enemy) == rid)
+		check(Data.ENEMIES.has(rid) and bool(Data.ENEMIES[rid].boss) and Lore.BOSS.has(rid) and Data.DIALOGUE.has("pre:" + rid) and Data.DIALOGUE.has("post:" + rid) and Reckon.WHAT.has(rid) and Reckon.END.has(rid)
+			and re.size() == 1 and str(re[0].area) == "mountain" and not Trials.TRIALS.has(rid) and not Dooms.is_doom(rid),
+			"%s is a last lord: a story, something said before and after, a sentence for the ending, and a height of the mountain to stand on" % rid)
+		for ln in Data.DIALOGUE.get("pre:" + rid, []) + Data.DIALOGUE.get("post:" + rid, []):
+			check(fits.call(str(ln[1])), "%s: a line that fits the box" % rid)
+	var RG = load("res://scripts/game.gd").new()
+	RG.reset()
+	RG.step = Data.step_index(Reckon.STEP)
+	check(Reckon.due(RG) == ["the_unchosen"] and Reckon.stands(RG, "the_unchosen") and not Reckon.stands(RG, "debt_mercy") and float(Reckon.boon(RG, "the_unchosen").foe_hp) == 1.0,
+		"a journey that never leaned meets the Unchosen, and nobody else; with no answer given there is not a crack in it")
+	RG.scales = {"heart": 4}
+	check(Reckon.due(RG) == ["debt_mercy"] and fits.call(Reckon.word(RG, "debt_mercy")), "mercy the land knows him by: the Debt of Mercy")
+	RG.scales = {"heart": -9, "craft": 7, "reach": 4}
+	check(Reckon.due(RG) == ["iron_judge", "unkept_engine"] and Reckon.left(RG).size() == 2, "rigour first, and the new works he is known for with it: two lords; a scale that only leans brings none of its own")
+	RG.scales = {"heart": 6, "craft": -8, "reach": -12}
+	check(Reckon.due(RG) == ["valley_wall", "unturned_stone", "debt_mercy"], "three habits he is known for: three lords, the strongest first")
+	var m_lo: Array = Reckon.might(RG, "debt_mercy")
+	var m_hi: Array = Reckon.might(RG, "valley_wall")
+	check(float(m_hi[0]) > float(m_lo[0]) and float(m_lo[0]) >= float(Reckon.MIGHT[0]), "each is as strong as the habit that made it")
+	RG.scales = {}
+	RG.picks = {}
+	Echoes.take(RG, "bandits", "mend")
+	Echoes.take(RG, "widow", "kind")
+	Echoes.take(RG, "ancestor", "truth")
+	var c0 := Reckon.cracks(RG, "debt_mercy")
+	Echoes.take(RG, "crows", "banish")
+	Echoes.take(RG, "garden", "burn")
+	check(Reckon.due(RG)[0] == "debt_mercy" and c0 == 0 and Reckon.cracks(RG, "debt_mercy") == 1 and is_equal_approx(float(Reckon.boon(RG, "debt_mercy").foe_hp), 1.0 - Reckon.CRACK) and Reckon.word(RG, "debt_mercy").contains("1 times"),
+		"every time the other answer was given is a crack in it: one banishment among the mercies takes a twentieth of the Debt")
+	RG.boss_done["debt_mercy"] = true
+	RG.reckoned["debt_mercy"] = true
+	RG.poll_steps()
+	check(RG.done(Reckon.STEP) and not Reckon.stands(RG, "debt_mercy") and Reckon.epilogue(RG).size() == 1, "met and beaten, the step is done, nobody is left on the heights, and the ending tells it")
+	RG.free()
+	check(Data.step_index(Reckon.STEP) == Data.step_index("s_p24_end") - 1 and Data.DIALOGUE.has("done:" + Reckon.STEP) and msrc.contains("Reckon.might(Game") and bsrc.contains("Reckon.left(Game)"),
+		"the reckoning comes before the last word with the Elder; the battle is as the journey made it, and the bot goes up to whoever is due")
 	print("== Part XXIV: the Lost Horse ==")
 	check(Data.REALMS.size() == 30 and Data.REALMS[29] == "Soft as Water" and Data.MAX_LEVEL == 87 and Data.level_name(87).ends_with("Soft as Water") and Data.REALM_INFO.size() == 30
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXIV adds the realm of Soft as Water")

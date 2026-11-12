@@ -473,6 +473,8 @@ func _cult_target() -> Dictionary:
 	match s.kind:
 		"level":
 			return {"lv": s.lv, "full": false}
+		"reckon":
+			return {"lv": 86, "full": false}
 		"kill", "fall":
 			for b in Data.AREAS[s.area].get("bosses", []):
 				if b.id == s.boss:
@@ -684,6 +686,17 @@ func _world(d: float) -> void:
 		"marks":
 			# Part XXIV: the nearest thing a choice left standing that has not been looked at (marks.gd)
 			_marks_step()
+		"reckon":
+			# the reckoning (reckon.gd): whoever the journey's choices made, one after another, each gone to rested
+			var rl: Array = Reckon.left(Game)
+			if rl.is_empty():
+				return
+			if not _cult_met():
+				_grind()
+			elif _hp_ratio() < 0.85 or _qi_ratio() < 0.6:
+				_start_meditate("rest")
+			else:
+				_goto_entity("mountain", "boss_" + str(rl[0]))
 		"breakthrough":
 			if not _cult_met():
 				_grind()
@@ -1455,7 +1468,8 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 					# forge asks late in the story is more than a day of fighting pays, and a bot that had
 					# lost a seventh of its purse to the healers once waited at the Cloud Ladder for ever.
 					# It takes another road through the trial)
-					if int(Game.inv.get(id, 0)) < int(n[2]) and Game.stones < int(Trials.recipe_stones(id, Game) * 0.85):
+					# (short by no more than a hundred beaten foes pay: that much it will go and earn)
+					if int(Game.inv.get(id, 0)) < int(n[2]) and Game.stones + Data.enemy_stones(Game.level, false) * 100 < Trials.recipe_stones(id, Game):
 						return false
 					for k in r.in:
 						# (a keepsake in a recipe can be picked up where one lies)
@@ -2534,6 +2548,7 @@ func _finish(reason: String) -> void:
 	var stood := 0
 	for lid9 in ["surface", "heaven", "under", "sea"]:
 		stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
+	print("the reckoning   : %s" % (", ".join(Game.reckoned.keys().map(func(id): return str(Data.ENEMIES[id].n))) if not Game.reckoned.is_empty() else "nobody met"))
 	print("trades          : %d shifts at %d trades, %d spirit stones in wages%s" % [int(Offices.worked(Game)[0]), int(Offices.worked(Game)[1]), Game.wages, (": " + Offices.careers(Game)) if Offices.careers(Game) != "" else ""])
 	print("what stands     : %d things stand in the land for what was chosen and what the scales lean to (of %d that could), %d looked at" % [stood, int(Marks.totals()[1]), Game.marks_seen.size()])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
