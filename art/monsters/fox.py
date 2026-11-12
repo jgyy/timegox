@@ -1,8 +1,10 @@
 """Fox: the nine-tailed fox spirit of the Maple Gorge (Part VI) and the Hounds of the Ten Courts.
-A slender fox from art/lib/canine.py, sculpted in clay: a light body on long legs in black
-stockings, a long narrow muzzle, slit-pupilled eyes, big ears with black backs, white cheeks,
-throat and belly, and nine bushy tails fanned behind it - each its own four-bone chain so the fan
-ripples like flames - every one tipped in white with a wisp of fox-fire.  Tinted by the game per
+A slender red fox from art/lib/canine.py, sculpted in clay: a light body on long legs in black
+stockings, a narrow muzzle with a flat bridge and the mouth closed along a black lip line,
+slit-pupilled eyes with a dark tear line, big ears with black backs, white cheeks, throat and
+belly, and - as the Classic of Mountains and Seas has it - nine tails, fanned behind it like a
+train: smooth bushy brushes (each its own clay and four-bone chain, so the fan ripples like
+flames), every one tipped in white with a tongue of fox-fire.  Tinted by the game per
 enemy; the white, the black points and the fox-fire keep their own colours.
 Clips: idle, walk, attack (a lunging bite with the tails flaring), hurt, die and cast (the tails
 fan out into fox-fire).

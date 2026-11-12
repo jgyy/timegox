@@ -2,10 +2,12 @@
 Lions, the Paper Tiger of Qingshi, Kaiming of the Nine Gates).
 
 Feline anatomy (art/lib/feline.py, sculpted in clay over the muscle masses), distinct from the
-canine ``beast``: a long, low body hung between heavy forequarters and powerful haunches, the
-shoulder blades riding above the spine, the head right in front of the shoulders on a short thick
-neck; a broad round skull with wide cheekbones, a short muzzle with fat whisker pads, small round
-ears set to the sides and a white cheek ruff; thick forearms on broad paws with hooked claws; the
+canine ``beast``: a long body hung between heavy forequarters and powerful haunches on legs long
+enough that the chest floor is at the elbows, the shoulder blades riding above the spine, the
+head right in front of the shoulders on a short thick neck; a broad round skull with wide
+cheekbones, a long broad nose bridge, the muzzle a box with whisker pads either side of a wide
+nose leather and the mouth closed under them, high forward-looking eyes, small round ears set to
+the sides and a white cheek ruff; thick forearms tapering to the wrist, broad paws; the
 coat painted into the greys - stripes that wrap the flanks and narrow towards a white belly,
 rings on the legs and tail, the "king" mark on the brow, white eye spots and muzzle, black ear
 backs with a white spot and a black tail tip - so every recolour still reads as a tiger.
