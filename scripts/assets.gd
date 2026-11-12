@@ -21,7 +21,7 @@ extends RefCounted
 const DIR := "res://assets/"
 const LOOPS := ["idle", "walk", "run", "sit", "talk", "fly", "swim", "ride", "ride_idle", "ride_stand", "scale", "glide"]
 ## the animals the party rides (fashion.gd RIDES; art/mounts)
-const MOUNTS := {"horse": "mounts/horse"}
+const MOUNTS := {"horse": "mounts/horse", "ox": "mounts/ox"}
 ## shape -> asset path for monsters that have a Blender model
 const MONSTERS := {
 	"beast": "monsters/beast", "dragon": "monsters/dragon", "phoenix": "monsters/phoenix", "bird": "monsters/phoenix",
@@ -525,9 +525,34 @@ static func person(id: String) -> Node3D:
 
 ## A monster in an enemy's colours: `enemy` (an id in Data.ENEMIES) brings its element's accent
 ## and any palette it pins; without one the palette comes from the colour alone.
+## Shapes of flesh, fur, shell and scale: a beast is not painted one bright colour all over.  Its
+## body is the colour it was given taken down to what a hide can be (`natural`), and the brightness
+## goes where a painter would put it: the eyes, the markings, the glow (the accent keeps the hue).
+## Spirits, flames, jellies and the like are as bright as they were.
+const NATURAL := ["beast", "ape", "tiger", "fox", "mammoth", "qilin", "kaiming", "tortoise", "crab", "scorpion", "spider", "mantis", "serpent",
+	"moth", "oxhead", "horseface", "mushroom", "plant", "golem", "ray", "jade_rabbit", "bifang"]
+
+## The colour of a hide that is, in a painter's eye, colour `c`: two-fifths less saturated (never more
+## than half), drawn a sixth of the way towards the brown of an animal, and kept out of the deepest dark.
+static func natural(c: Color) -> Color:
+	if c.s < 0.14:
+		return c
+	var to_earth := fposmod(0.075 - c.h + 0.5, 1.0) - 0.5
+	return Color.from_hsv(fposmod(c.h + to_earth * 0.16, 1.0), minf(c.s * 0.6, 0.5), clampf(c.v * 0.92 + 0.06, 0.24, 0.9), c.a)
+
 static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
 	var d: Dictionary = Data.ENEMIES.get(enemy, {})
-	var n := instance(MONSTERS[shape], col, palette(col, d.get("elem", ""), d.get("pal", {})))
+	var over: Dictionary = d.get("pal", {})
+	if NATURAL.has(shape) and not d.get("bright", false):
+		# (the markings and the accent keep the colour it was given: that is where the eye reads its kind)
+		var vivid := col
+		col = natural(col)
+		over = over.duplicate()
+		if not over.has("mark"):
+			over["mark"] = Color.from_hsv(vivid.h, clampf(vivid.s * 0.9, 0.0, 0.8), clampf(vivid.v * 0.5, 0.16, 0.42))
+		if not over.has("sec"):
+			over["sec"] = palette(vivid)[3]
+	var n := instance(MONSTERS[shape], col, palette(col, d.get("elem", ""), over))
 	n.set_meta("kind", "monster")
 	n.set_meta("shape", shape)
 	return n

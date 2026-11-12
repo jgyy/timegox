@@ -303,6 +303,17 @@ func _init() -> void:
 				if u2[i2].x > 0.99 and c2[i2].v > 0.05:
 					huesets[int(c2[i2].h * 12.0)] = true
 	check(huesets.size() >= 3, "palette: a tinted dragon shows several hues (%d)" % huesets.size())
+	# a beast is not painted one bright colour all over (assets.gd NATURAL): its hide is the colour it was
+	# given taken down, and the brightness is kept for its markings
+	var loud := Color("30c040")
+	check(Assets.natural(loud).s <= 0.5 and Assets.natural(loud).s < loud.s and absf(Assets.natural(loud).h - loud.h) < 0.08, "a green wolf's hide is a green-grey, not a green")
+	check(Assets.natural(Color("808080")) == Color("808080"), "a grey beast stays grey")
+	for nsh in Assets.NATURAL:
+		check(Assets.MONSTERS.has(nsh), "the natural shape %s is a shape" % nsh)
+	check(not Assets.NATURAL.has("wisp") and not Assets.NATURAL.has("phoenix") and not Assets.NATURAL.has("dragon"), "spirits, flames and dragons are as bright as they were")
+	var oxn := Assets.mount("ox")
+	check(Assets.has_clip(oxn, "walk") and Assets.has_clip(oxn, "idle"), "the ox of the cart is Blender-built and walks")
+	oxn.free()
 	dragon.free()
 	# the same shape in two colours shares nothing but the source mesh
 	var ma := Assets.monster("beast", Color("ff0000"))

@@ -3854,6 +3854,23 @@ func _horse_shots(which: String = "1") -> void:
 	var w = main.world
 	if want.call("people"):
 		await _gallery("part24_people", [Assets.person("sai_weng"), Assets.person("weng_son"), Assets.person("qian_liu")], 0.76, 0.2)
+	if want.call("shapes"):
+		# one foe of every shape, three to a picture, close enough to look at
+		var seen_shape := {}
+		var row: Array = []
+		var k9 := 0
+		for fid in Data.ENEMIES:
+			var sh := str(Data.ENEMIES[fid].shape)
+			if seen_shape.has(sh):
+				continue
+			seen_shape[sh] = true
+			row.append(_foe(fid))
+			if row.size() == 3:
+				await _gallery("shapes_%02d" % k9, row, 1.7, 0.5)
+				row = []
+				k9 += 1
+		if not row.is_empty():
+			await _gallery("shapes_%02d" % k9, row, 1.7, 0.5)
 	if want.call("post"):
 		# the post (mail.gd): the counter of Headman Luo with letters waiting and a bag to carry, and a letter being read
 		main.world.load_area("sect", Vector2i(20, 9))
@@ -3874,6 +3891,10 @@ func _horse_shots(which: String = "1") -> void:
 		main.pop()
 		Game.mail_read = {}
 	if want.call("carriages"):
+		var oxm := Assets.mount("ox", Assets.palette(Color("b4a290"), "", {"sec": Color("a83c30"), "acc": Color("3a2416"), "mark": Color("6a5a4c")}))
+		oxm.rotation.y = PI / 2.0
+		oxm.set_meta("kind", "ride_group")
+		await _gallery("ox", [oxm], 1.5, 0.9)
 		# the three carriages, every seat taken: the hero, Yue Ling, and whoever is being carried
 		for rid in ["ox_cart", "wagon", "carriage"]:
 			var r: Dictionary = Fashion.RIDES[rid]

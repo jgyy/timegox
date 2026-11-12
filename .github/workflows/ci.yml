@@ -12,7 +12,7 @@ jobs:
   art:
     name: Rebuild Blender assets from art/
     runs-on: ubuntu-latest
-    timeout-minutes: 45  # 310 assets with four workers: about 20 minutes on a hosted runner (the party's nine models carry three more clips each)
+    timeout-minutes: 45  # 311 assets with four workers: about 20 minutes on a hosted runner (the party's nine models carry three more clips each)
     steps:
       - uses: actions/checkout@v4
 

@@ -638,13 +638,14 @@ static func _carriage(root: Node3D, kind: String) -> void:
 	match kind:
 		"ox_cart":
 			axles = [[-0.15, 0.82, 1.0]]
+			team = [[0.0, 2.55, Color("b4a290")]]
 			# the bed: planks on two long beams that run on forward as the shafts
 			b.box(Vector3(0, 0.98, -0.15), Vector3(1.6, 0.08, 2.9), wood)
 			for k in 6:
 				b.box(Vector3(-0.66 + k * 0.265, 1.025, -0.15), Vector3(0.24, 0.02, 2.86), wood_p if k % 2 == 0 else wood)
 			for s in [-1.0, 1.0]:
 				b.limb(Vector3(s * 0.62, 0.9, -1.65), Vector3(s * 0.62, 0.9, 1.3), 0.07, 0.07, wood_d, 6)
-				b.limb(Vector3(s * 0.62, 0.9, 1.3), Vector3(s * 0.5, 1.42, 3.95), 0.065, 0.045, wood_d, 6)
+				b.limb(Vector3(s * 0.62, 0.9, 1.3), Vector3(s * 0.47, 0.98, 3.22), 0.065, 0.045, wood_d, 6)
 				# the sides: posts, two rails and a woven panel between them
 				for k2 in 7:
 					var pz := -1.55 + k2 * 0.46
@@ -680,10 +681,6 @@ static func _carriage(root: Node3D, kind: String) -> void:
 			# a lantern on a crook at the front
 			b.limb(Vector3(0.8, 2.5, 1.2), Vector3(0.8, 2.5, 1.5), 0.02, 0.02, wood_d, 4)
 			_lantern(b, g, Vector3(0.8, 2.26, 1.5), 0.13, Color("d84a30"))
-			# the yoke, and the ox under it
-			b.limb(Vector3(-0.58, 1.46, 3.9), Vector3(0.58, 1.46, 3.9), 0.06, 0.06, wood_d, 6)
-			b.sph(Vector3(0, 1.5, 3.9), Vector3(0.2, 0.09, 0.09), wood_d)
-			_ox(b, 3.0)
 		"wagon":
 			axles = [[1.35, 0.66, 1.1], [-1.25, 0.84, 1.1]]
 			team = [[-0.48, 3.75, Color("8a5a36")], [0.48, 3.75, Color("b08a5a")]]
@@ -839,10 +836,14 @@ static func _carriage(root: Node3D, kind: String) -> void:
 			wheels.append(wn)
 	root.set_meta("wheels", wheels)
 	var anims: Array = []
-	if Assets.has(Assets.MOUNTS.horse):
+	if Assets.has(Assets.MOUNTS.horse) and Assets.has(Assets.MOUNTS.ox):
 		for tm in team:
 			var coat: Color = tm[2]
-			var hm := Assets.mount("horse", Assets.palette(coat, "", {"sec": coat.darkened(0.55), "acc": Color("b83a30") if kind == "wagon" else Color("2f5aa8"), "mark": coat.darkened(0.3)}))
+			var pal: Array = Assets.palette(coat, "", {"sec": coat.darkened(0.55), "acc": Color("3f5f96") if kind == "carriage" else Color("a83c30"), "mark": coat.darkened(0.3)})
+			if kind == "ox_cart":
+				# (the ox: its blanket is the secondary colour, its eyes the accent)
+				pal = Assets.palette(coat, "", {"sec": Color("a83c30"), "acc": Color("3a2416"), "mark": coat.darkened(0.3)})
+			var hm := Assets.mount("ox" if kind == "ox_cart" else "horse", pal)
 			hm.position = Vector3(float(tm[0]), 0, float(tm[1]))
 			root.add_child(hm)
 			anims.append(hm)
@@ -888,36 +889,6 @@ static func _lantern(b: MB, g: MB, at: Vector3, r: float, col: Color) -> void:
 	b.limb(at + Vector3(0, r * 1.05, 0), at + Vector3(0, r * 1.3, 0), r * 0.55, r * 0.45, cap, 6)
 	b.limb(at - Vector3(0, r * 1.05, 0), at - Vector3(0, r * 1.3, 0), r * 0.55, r * 0.45, cap, 6)
 	b.limb(at - Vector3(0, r * 1.3, 0), at - Vector3(0, r * 2.2, 0), 0.02, 0.008, MB.tag(Color("c8322a"), MB.CLOTH), 4)
-
-## The ox of the cart, standing with its shoulders at `z`: a barrel of a body, a hump, a dewlap, a broad
-## head with a pale muzzle and a brass ring, horns that sweep back, and a red rosette for market day.
-static func _ox(b: MB, z: float) -> void:
-	var hide := MB.tag(Color("9a6a42"), MB.HAIR)
-	var hide_d := MB.tag(Color("6e4a2e"), MB.HAIR)
-	var pale := MB.tag(Color("d8c0a0"), MB.HAIR)
-	var horn := MB.tag(Color("e8e0c8"), MB.STONE)
-	var hoof := MB.tag(Color("2a2220"), MB.STONE)
-	b.sph_hi(Vector3(0, 1.12, z - 0.35), Vector3(0.5, 0.52, 0.95), hide)
-	b.sph_hi(Vector3(0, 1.0, z - 0.35), Vector3(0.44, 0.42, 0.85), pale)
-	b.sph_hi(Vector3(0, 1.5, z + 0.25), Vector3(0.3, 0.26, 0.4), hide_d)
-	b.sph_hi(Vector3(0, 1.22, z + 0.62), Vector3(0.3, 0.36, 0.42), hide, Vector3(-0.5, 0, 0))
-	b.sph(Vector3(0, 0.88, z + 0.6), Vector3(0.1, 0.22, 0.26), pale)
-	b.sph_hi(Vector3(0, 1.3, z + 1.08), Vector3(0.25, 0.25, 0.34), hide)
-	b.sph_hi(Vector3(0, 1.2, z + 1.36), Vector3(0.18, 0.16, 0.16), pale)
-	b.torus(Vector3(0, 1.13, z + 1.5), 0.05, 0.008, MB.tag(Color("d8b050"), MB.METAL), Vector3(PI * 0.5, 0, 0))
-	b.sph(Vector3(0, 1.5, z + 1.14), Vector3(0.09, 0.09, 0.04), MB.tag(Color("c8322a"), MB.CLOTH))
-	for s in [-1.0, 1.0]:
-		b.sph(Vector3(s * 0.11, 1.38, z + 1.3), Vector3(0.035, 0.035, 0.03), MB.tag(Color("1a1410"), MB.STONE))
-		b.sph(Vector3(s * 0.07, 1.16, z + 1.5), Vector3(0.025, 0.02, 0.02), MB.tag(Color("3a2a22"), MB.STONE))
-		b.sph(Vector3(s * 0.3, 1.4, z + 0.98), Vector3(0.12, 0.05, 0.07), hide_d, Vector3(0, 0, s * 0.4))
-		b.limb(Vector3(s * 0.16, 1.5, z + 1.02), Vector3(s * 0.42, 1.62, z + 0.92), 0.055, 0.04, horn, 6)
-		b.limb(Vector3(s * 0.42, 1.62, z + 0.92), Vector3(s * 0.5, 1.82, z + 0.74), 0.04, 0.012, horn, 6)
-		for lz in [z + 0.3, z - 0.95]:
-			b.limb(Vector3(s * 0.28, 0.95, lz), Vector3(s * 0.27, 0.5, lz + 0.03), 0.15, 0.09, hide, 8)
-			b.limb(Vector3(s * 0.27, 0.5, lz + 0.03), Vector3(s * 0.27, 0.12, lz), 0.085, 0.075, hide_d, 8)
-			b.limb(Vector3(s * 0.27, 0.12, lz), Vector3(s * 0.27, 0.0, lz + 0.02), 0.085, 0.095, hoof, 8)
-	b.limb(Vector3(0, 1.4, z - 1.25), Vector3(0, 0.75, z - 1.42), 0.035, 0.02, hide_d, 5)
-	b.sph(Vector3(0, 0.66, z - 1.43), Vector3(0.05, 0.12, 0.05), MB.tag(Color("2a1c14"), MB.HAIR))
 
 ## A saddle for a beast that was never meant to wear one: a cloth over the back, a leather seat with a
 ## high pommel, and stirrups.
