@@ -3922,10 +3922,18 @@ func _horse_shots(which: String = "1") -> void:
 		await _wait(1.0)
 		# (he walks into town along the road, and they fall in behind him)
 		for k4 in range(25, 3, -1):
-			main.world.move_dir = fpts[k4] - main.world.ptile
-			await _wait(0.2)
+			var stp: Vector2i = fpts[k4] - main.world.ptile
+			if absi(stp.x) + absi(stp.y) != 1:
+				continue
+			main.world.move_dir = stp
+			for _w in 12:
+				await _wait(0.05)
+				if main.world.ptile == fpts[k4] and main.world.move_t < 0.0:
+					break
 		main.world.move_dir = Vector2i.ZERO
+		print("[tour] fans ", main.world.fans.size(), " trail ", main.world.fan_trail.size())
 		await _wait(7.0)
+		print("[tour] fans ", main.world.fans.size())
 		await _shot("fame_street")
 	if want.call("windows"):
 		# open windows (architecture.gd _wall): the Green Stone Inn of Qingshi from the street, the room seen through them
