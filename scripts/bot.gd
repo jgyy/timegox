@@ -245,6 +245,9 @@ func _apply_start() -> void:
 	for i2 in idx:
 		saved += int(Data.STEPS[i2].get("stones", 0))
 	Game.stones = maxi(20000, int(saved * 1.5))
+	# (--bot-stones=N: start with that purse, to try a chapter short of money)
+	if main.args.has("bot-stones"):
+		Game.stones = int(main.args["bot-stones"])
 	Game.inv["hp_pill"] = 6
 	Game.inv["qi_pill"] = 4
 	# (and the essences, renown, standing and Dao mastery a player would have gathered by then)
@@ -1448,6 +1451,12 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 					var r: Dictionary = Trials.RECIPES[id]
 					if not Game.reached(str(r.after)):
 						return false
+					# (the Lost Horse release: nor is a thing made that the purse is nowhere near: what the
+					# forge asks late in the story is more than a day of fighting pays, and a bot that had
+					# lost a seventh of its purse to the healers once waited at the Cloud Ladder for ever.
+					# It takes another road through the trial)
+					if int(Game.inv.get(id, 0)) < int(n[2]) and Game.stones < int(Trials.recipe_stones(id, Game) * 0.85):
+						return false
 					for k in r.in:
 						# (a keepsake in a recipe can be picked up where one lies)
 						if not str(k).begins_with("ess_") and int(Game.inv.get(k, 0)) + _pickups_of(str(k)) < int(r.in[k]):
@@ -1486,6 +1495,11 @@ func _feasible(tid: String, p: Dictionary) -> bool:
 			"summits":
 				# the High Roads release: a summit can be climbed whenever it likes (_summit_step)
 				pass
+			"falls", "marks":
+				# the Lost Horse release: what was lost to is what the story has put in the way by then; what
+				# stands can be gone and looked at whenever it likes (_marks_step does, when a step asks)
+				if str(n[0]) == "falls":
+					return false
 			"companies", "airs":
 				# the Thundering Pots release: the host and the airs are what the story has given by then
 				if not Trials.need_met(n, Game) and Game.done("s_p23_levy"):
@@ -1760,7 +1774,22 @@ func _earn(tt: Dictionary) -> void:
 	var e = null if world.is_floor() else _any_enemy(Game.area, true)
 	if e != null:
 		_walk_to(e.pos, "enemy:" + e.id)
-	elif Game.area != str(tt.area) or world.is_floor():
+		return
+	# (the Lost Horse release: nothing here will fight.  The trial's own region, if anything there will;
+	# else the latest region back along the story where something does.  The bot once came to the Cloud
+	# Ladder short of what the forge asked, a fall having cost it a seventh of its purse, and sat down on
+	# the mountain, whose beasts all scatter, to wait for packs that would never stand)
+	var where := str(tt.area)
+	if not _fights_in(where):
+		where = ""
+		for i in range(Game.step - 1, maxi(-1, Game.step - 16), -1):
+			var pa: String = str(Data.STEPS[i].get("area", ""))
+			if pa != "" and pa != "sect" and pa != Atlas.HUB and _fights_in(pa):
+				where = pa
+				break
+	if where != "" and (Game.area != where or world.is_floor()):
+		_travel(where)
+	elif Game.area != str(tt.area) and where == "":
 		_travel(str(tt.area))
 	else:
 		_start_meditate("respawn_any")
