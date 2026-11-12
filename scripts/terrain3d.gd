@@ -1746,7 +1746,12 @@ static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int,
 		for pr2 in bd.upper.get("props", []):
 			uprops.append([pr2[0], Vector3((pr2[1].x + 0.5) * T, 0, (pr2[1].y + 0.5) * T)])
 		hole = Vector3((bd.up.x + 0.5) * T, 0, (bd.up.y + 0.5) * T)
-	var lights := Arch.house(b, g, roof, roof_g, rr, door, str(bd.get("style", "house")), props, int(r.position.x * 7 + r.position.y), up, up_g, uprops, hole)
+	# (the Lost Horse release: the wings built out from it, and how many storeys it stands: rooms.gd)
+	var wings: Array = []
+	for wg in bd.get("wings", []):
+		var wr: Rect2i = wg.rect
+		wings.append({"rect": Rect2(wr.position.x * T, wr.position.y * T, wr.size.x * T, wr.size.y * T), "side": int(wg.side)})
+	var lights := Arch.house(b, g, roof, roof_g, rr, door, str(bd.get("style", "house")), props, int(r.position.x * 7 + r.position.y), up, up_g, uprops, hole, wings, Rooms.storeys(bd))
 	var mi := MB.mesh_node(root, b.build(MB.mat_scenery()))
 	mi.position.y = gy
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON

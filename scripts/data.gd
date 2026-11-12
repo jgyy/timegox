@@ -1722,6 +1722,9 @@ const AREAS := {
 		"warband2": {"pool": [["pot_drummer", 81, 81], ["flat_note", 81, 81], ["kiln_wasp", 81, 81]], "n": 16, "vis": "s_p23_home", "late": true},
 		# Part XIX: what gets into a wheel that turns all night with nobody at it
 		"warband": {"pool": [["wheel_mite", 69, 70], ["treadle_imp", 69, 70], ["idle_shuttle", 69, 70]], "n": 14, "vis": "s_p19_gardener", "late": true},
+		# (the Lost Horse release: Qingshi is full: only so many of its houses have room for a wing, or
+		# the one height above the village, where the Yellow Bell fell, would have nowhere to stand)
+		"wing_max": 3,
 		"n": "Qingshi Village Below the Mountain", "w": 96, "h": 58, "seed": 271, "theme": "village", "enemies": 18,
 		# Part XVII (impact.gd): the clay Spring Ox, and the paper petty men the village beats on the
 		# day of the first thunder

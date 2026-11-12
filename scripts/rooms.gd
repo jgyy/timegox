@@ -15,6 +15,97 @@ extends RefCounted
 ## `MapGen.stamp_building` asks for the whole building (`complete`), so everything that reads a
 ## realm's buildings (the atlas, the world, the people of the towns) sees the same floors.
 
+## styles that stay a plain rectangle: a shrine, a hermit's room and a tower are the shape they are
+const NO_WINGS := ["shrine", "hermitage", "aerie", "bathhouse", "kitchen"]
+
+## How many storeys a building of each style may stand, from the least to the most (the ground floor
+## and the storey above it are walked in; what is above those is seen from the street), and what each
+## storey is used for, from the ground up (the last use is that of every storey above).  Most of a
+## town is somebody's home, or somebody's office.
+const STOREYS := {"house": [2, 3], "huizhou": [3, 3], "farmhouse": [2, 2], "seahouse": [2, 3], "dorm": [3, 4], "shop": [3, 4], "inn": [3, 4], "teahouse": [3, 3],
+	"hall": [3, 4], "library": [4, 5], "alchemist": [3, 3], "smithy": [2, 3], "shrine": [2, 3]}
+const USES := {"house": ["home", "home"], "huizhou": ["home", "home"], "farmhouse": ["home", "store"], "seahouse": ["home", "home"], "dorm": ["home", "home"],
+	"shop": ["shop", "office", "home"], "inn": ["inn", "rooms", "home"], "teahouse": ["teahouse", "office", "home"], "hall": ["hall", "office", "office", "home"],
+	"library": ["library", "office", "office", "store"], "alchemist": ["workshop", "office", "home"], "smithy": ["workshop", "home"], "shrine": ["shrine", "office", "home"],
+	"kitchen": ["workshop"], "bathhouse": ["bath"], "hermitage": ["home"], "aerie": ["hall", "home"]}
+const USE_WORDS := {"home": "somebody's home", "office": "offices", "shop": "a shop", "inn": "an inn", "rooms": "rooms to let", "teahouse": "a tea-house", "hall": "a hall",
+	"library": "a library", "workshop": "a workshop", "shrine": "a shrine", "store": "a store-room", "bath": "a bath-house"}
+
+## How many storeys building `bd` stands (the cellar is not one): its own `storeys` if it is written
+## with one, else a draw from its style's range by where it stands; one, if its roof takes no storey.
+static func storeys(bd: Dictionary) -> int:
+	var style := str(bd.get("style", "house"))
+	if not bd.has("upper") and (style in NO_UPPER or not STOREYS.has(style)):
+		return 1
+	if bd.has("storeys"):
+		return int(bd.storeys)
+	var rg: Array = STOREYS.get(style, [2, 2])
+	var r: Rect2i = bd.get("rect0", bd.rect)
+	return int(rg[0]) + (r.position.x * 13 + r.position.y * 7 + r.size.x) % (int(rg[1]) - int(rg[0]) + 1)
+
+## What each storey of building `bd` is used for, from the ground up.
+static func uses(bd: Dictionary) -> Array:
+	var u: Array = USES.get(str(bd.get("style", "house")), ["home"])
+	var out: Array = []
+	for k in storeys(bd):
+		out.append(str(u[mini(k, u.size() - 1)]))
+	return out
+
+## "three storeys: a shop, offices above it, somebody's home at the top".
+static func uses_text(bd: Dictionary) -> String:
+	var u := uses(bd)
+	if u.size() <= 1:
+		return ""
+	var parts: Array = [str(USE_WORDS[u[0]])]
+	for k in range(1, u.size()):
+		var wd := str(USE_WORDS[u[k]])
+		if u[k] == u[k - 1]:
+			continue
+		parts.append(wd + (" at the top" if k == u.size() - 1 else " above"))
+	if parts.size() == 1:
+		parts[0] = str(parts[0]) + " on every floor"
+	return "%s storeys: %s" % [["no", "one", "two", "three", "four", "five", "six"][u.size()], ", ".join(parts)]
+
+## How the storeys of every building of the land are used: {use: how many storeys}.
+static func census() -> Dictionary:
+	var out := {}
+	for a in Data.AREAS:
+		for bd in Data.AREAS[a].get("buildings", []):
+			for u in uses(complete(bd, busy_of(a, bd))):
+				out[u] = int(out.get(u, 0)) + 1
+	return out
+
+## Whether tile `t` is inside building `bd` (its rectangle, or a wing built out from it).
+static func inside(bd: Dictionary, t: Vector2i) -> bool:
+	if (bd.rect as Rect2i).has_point(t):
+		return true
+	for wg in bd.get("wings", []):
+		if (wg.rect as Rect2i).has_point(t):
+			return true
+	return false
+
+## The tiles of the wall of building `bd` that are opened where wing `wg` stands against it: the wall
+## along the wing between the wing's own end walls, but for a tile a piece of furniture stands on.
+static func wing_gap(bd: Dictionary, wg: Dictionary) -> Array:
+	var r: Rect2i = bd.rect
+	var wr: Rect2i = wg.rect
+	var out: Array = []
+	var taken := {}
+	for pr in bd.get("props", []):
+		taken[pr[1]] = true
+	match int(wg.side):
+		0, 1:
+			var x := r.position.x if int(wg.side) == 0 else r.end.x - 1
+			for y in range(wr.position.y + 1, wr.end.y - 1):
+				if y > r.position.y and y < r.end.y - 1 and not taken.has(Vector2i(x, y)):
+					out.append(Vector2i(x, y))
+		_:
+			var y2 := r.position.y if int(wg.side) == 2 else r.end.y - 1
+			for x2 in range(wr.position.x + 1, wr.end.x - 1):
+				if x2 > r.position.x and x2 < r.end.x - 1 and not taken.has(Vector2i(x2, y2)):
+					out.append(Vector2i(x2, y2))
+	return out
+
 ## styles whose roof does not take a storey
 const NO_UPPER := ["kitchen", "bathhouse", "hermitage", "aerie"]
 
@@ -185,6 +276,8 @@ static func let_out(id: String, spec: Dictionary, grid: PackedByteArray, w: int,
 	var now: Array = []
 	for bd in raw:
 		now.append(bd.rect)
+	# (the wings already built out from other houses)
+	var claimed: Array = []
 	var reach := MapGen.flood(grid, w, h, start)
 	for i in raw.size():
 		var bd0: Dictionary = raw[i]
@@ -234,6 +327,9 @@ static func let_out(id: String, spec: Dictionary, grid: PackedByteArray, w: int,
 				for j in now.size():
 					if j != i and (now[j] as Rect2i).grow(1).intersects(wall_row):
 						ok = false
+				for cw0 in claimed:
+					if (cw0 as Rect2i).grow(1).intersects(wall_row):
+						ok = false
 				if not ok:
 					continue
 				# try it: is everything that could be walked to still walked to?
@@ -256,10 +352,98 @@ static func let_out(id: String, spec: Dictionary, grid: PackedByteArray, w: int,
 				for k in g2.size():
 					grid[k] = g2[k]
 				reach = reach2
-		if nr != r:
+		# ---- wings: a side room built out from a wall, so that not every house is a box.  Tried on each
+		# side but the door's (a seeded draw says which, how long and where along the wall), two tiles
+		# deep inside if the ground allows it and one if not, under the same rules as the rest
+		var wings: Array = []
+		if bool(spec.get("wings", true)) and claimed.size() < int(spec.get("wing_max", 99)) and not str(bd0.get("style", "house")) in NO_WINGS:
+			var wrng := RandomNumberGenerator.new()
+			wrng.seed = r.position.x * 7919 + r.position.y * 104729 + r.size.x * 31 + int(Data.AREAS[id].seed if Data.AREAS.has(id) else 0)
+			for side in 4:
+				if (side == 0 and door.x == r.position.x) or (side == 1 and door.x == r.end.x - 1) or (side == 2 and door.y == r.position.y) or (side == 3 and door.y == r.end.y - 1):
+					continue
+				var roll := wrng.randf()
+				var where := wrng.randi() % 3
+				if roll > 0.7 or wings.size() >= 2:
+					continue
+				var along: int = nr.size.y if side < 2 else nr.size.x
+				var span := clampi(int(along / 2) + 1, 4, 8)
+				if span > along - 1:
+					continue
+				var o0: int = [0, (along - span) / 2, along - span][where]
+				var done := false
+				for depth in [5, 4, 3, 2]:
+					if done:
+						break
+					for off_try in [o0, 0, along - span, (along - span) / 2]:
+						var wr: Rect2i
+						match side:
+							0:
+								wr = Rect2i(nr.position.x - depth, nr.position.y + off_try, depth, span)
+							1:
+								wr = Rect2i(nr.end.x, nr.position.y + off_try, depth, span)
+							2:
+								wr = Rect2i(nr.position.x + off_try, nr.position.y - depth, span, depth)
+							_:
+								wr = Rect2i(nr.position.x + off_try, nr.end.y, span, depth)
+						var wg := {"rect": wr, "side": side}
+						var around := wr.grow(1)
+						if around.position.x < 3 or around.position.y < 3 or around.end.x > w - 3 or around.end.y > h - 3:
+							continue
+						var okw := true
+						for y3 in range(around.position.y, around.end.y):
+							for x3 in range(around.position.x, around.end.x):
+								var q3 := Vector2i(x3, y3)
+								if nr.has_point(q3):
+									continue
+								var t3: int = grid[y3 * w + x3]
+								if wr.has_point(q3):
+									if (t3 != MapGen.FLOOR and t3 != MapGen.DECOR and t3 != MapGen.WALL) or off.has(q3):
+										okw = false
+								elif t3 == MapGen.BUILDING or t3 == MapGen.INTERIOR or t3 == MapGen.WATER:
+									okw = false
+						for j2 in now.size():
+							if j2 != i and (now[j2] as Rect2i).grow(1).intersects(wr):
+								okw = false
+						for cw in claimed:
+							if (cw as Rect2i).grow(1).intersects(wr):
+								okw = false
+						if not okw:
+							continue
+						var tb2: Dictionary = bd0.duplicate(true)
+						tb2.rect = nr
+						tb2["wings"] = wings + [wg]
+						if wing_gap(tb2, wg).is_empty():
+							continue
+						var g3 := grid.duplicate()
+						MapGen.stamp_building(g3, w, tb2)
+						var reach3 := MapGen.flood(g3, w, h, start)
+						var lostw := false
+						for q4 in reach:
+							if not reach3.has(q4) and not wr.has_point(q4):
+								lostw = true
+								break
+						# (and the room itself is walked into)
+						var inner_ok := false
+						for y5 in range(wr.position.y, wr.end.y):
+							for x5 in range(wr.position.x, wr.end.x):
+								if g3[y5 * w + x5] == MapGen.INTERIOR and reach3.has(Vector2i(x5, y5)):
+									inner_ok = true
+						if lostw or not inner_ok:
+							continue
+						wings.append(wg)
+						claimed.append(wr)
+						for k3 in g3.size():
+							grid[k3] = g3[k3]
+						reach = reach3
+						done = true
+						break
+		if nr != r or not wings.is_empty():
 			var gb: Dictionary = bd0.duplicate(true)
 			gb.rect = nr
 			gb["rect0"] = r
+			if not wings.is_empty():
+				gb["wings"] = wings
 			buildings[i] = MapGen.stamp_building(grid, w, complete(gb, busy_of(id, bd0)))
 
 ## Building `bd` (an entry of Data.AREAS[..].buildings, in its region's own tiles) with every floor it

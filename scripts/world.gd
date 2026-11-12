@@ -640,7 +640,7 @@ func _indoor_y(tile: Vector2i, bb: Dictionary) -> float:
 		return -INF
 	for bd in bw.buildings:
 		var r: Rect2i = bd.rect
-		if r.has_point(tile):
+		if Rooms.inside(bd, tile):
 			var o: Vector3 = bb.off
 			var c := o + Vector3((r.position.x + r.size.x * 0.5) * TS, 0.0, (r.position.y + r.size.y * 0.5) * TS)
 			return _ground(bb, c) + Arch.FLOOR_Y
@@ -689,6 +689,12 @@ func _build_view(id: String) -> void:
 			var lb: Dictionary = bd.duplicate(true)
 			lb.rect = Rect2i(bd.rect.position - r.position, bd.rect.size)
 			lb.door = bd.door - r.position
+			# (the wings built out from it, rooms.gd, in the slice's own tiles too)
+			if bd.has("wings"):
+				var lws: Array = []
+				for wg in bd.wings:
+					lws.append({"rect": Rect2i((wg.rect as Rect2i).position - r.position, (wg.rect as Rect2i).size), "side": int(wg.side)})
+				lb["wings"] = lws
 			var props: Array = []
 			for pr in bd.props:
 				props.append([pr[0], pr[1] - r.position, pr[2]])
@@ -911,7 +917,7 @@ func building_at(tile: Vector2i) -> Dictionary:
 	if grid.is_empty() or grid[tile.y * w + tile.x] != MapGen.INTERIOR:
 		return {}
 	for bd in wd.buildings:
-		if bd.rect.has_point(tile):
+		if Rooms.inside(bd, tile):
 			return bd
 	return {}
 
@@ -2264,6 +2270,11 @@ func _update_view(d: float) -> void:
 			for uid in ups:
 				for un in ups[uid]:
 					(un as Node3D).visible = not (uid == bid and lv == 0)
+		# (the Lost Horse release: coming in at a door says what the house is, storey by storey: rooms.gd)
+		if key != "" and lv == 0 and not is_floor() and not key.begins_with(str(inside).get_slice("#", 0) + "#"):
+			var bd9 := building_at(ptile if move_t < 0.0 or move_t > 0.5 else target)
+			if not bd9.is_empty() and Rooms.uses_text(bd9) != "":
+				Game.toast("%s: %s" % [str(bd9.n), Rooms.uses_text(bd9)])
 		inside = key
 	weather.global_position = Vector3(pp.x, pp.y + weather_y(), pp.z)
 	# chase camera

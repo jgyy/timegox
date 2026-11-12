@@ -509,6 +509,16 @@ static func _build(layer: String = "surface") -> Dictionary:
 			gb2.rect = rect_to_world(id, bd.rect)
 			gb2.door = to_world(id, bd.door)
 			gb2["area"] = id
+			# (the Lost Horse release: the rectangle as written, and the wings built out from it, turned
+			# with the region: rooms.gd `let_out`)
+			if bd.has("rect0"):
+				gb2["rect0"] = rect_to_world(id, bd.rect0)
+			if bd.has("wings"):
+				var gws: Array = []
+				var sides4 := [Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(0, 1)]
+				for wg in bd.wings:
+					gws.append({"rect": rect_to_world(id, wg.rect), "side": sides4.find(dir_to_world(id, sides4[int(wg.side)]))})
+				gb2["wings"] = gws
 			var props: Array = []
 			for pr in bd.get("props", []):
 				props.append([pr[0], to_world(id, pr[1]), pr.size() > 2 and pr[2]])

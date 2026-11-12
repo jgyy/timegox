@@ -308,6 +308,18 @@ static func stamp_building(grid: PackedByteArray, w: int, bd: Dictionary) -> Dic
 			grid[y * w + x] = BUILDING if edge else INTERIOR
 	var door: Vector2i = bd.door
 	grid[door.y * w + door.x] = INTERIOR
+	# (the Lost Horse release: wings, rooms.gd `let_out`: a side room built out from one wall, its own
+	# walls round three sides, and the wall it stands against opened along it)
+	for wg in bd.get("wings", []):
+		var wr: Rect2i = wg.rect
+		var side := int(wg.side)
+		for y in range(wr.position.y, wr.end.y):
+			for x in range(wr.position.x, wr.end.x):
+				var end_wall := (y == wr.position.y or y == wr.end.y - 1) if side < 2 else (x == wr.position.x or x == wr.end.x - 1)
+				var outer := (x == wr.position.x if side == 0 else x == wr.end.x - 1) if side < 2 else (y == wr.position.y if side == 2 else y == wr.end.y - 1)
+				grid[y * w + x] = BUILDING if end_wall or outer else INTERIOR
+		for jt in Rooms.wing_gap(bd, wg):
+			grid[jt.y * w + jt.x] = INTERIOR
 	for pr in bd.get("props", []):
 		var pt: Vector2i = pr[1]
 		if pr.size() > 2 and pr[2]:

@@ -457,13 +457,18 @@ func _init() -> void:
 		check(wd.grid[bd.door.y * wd.w + bd.door.x] == MapGen.INTERIOR, "%s: has a door" % bd.n)
 		var edge_closed := true
 		var r: Rect2i = bd.rect
+		# (the Lost Horse release: but where a wing is built out from a wall, the wall is open along it)
+		var open_to_wing := {}
+		for wg0 in bd.get("wings", []):
+			for q0 in Rooms.wing_gap(bd, wg0):
+				open_to_wing[q0] = true
 		for xx in range(r.position.x, r.end.x):
 			for yy in [r.position.y, r.end.y - 1]:
-				if Vector2i(xx, yy) != bd.door and MapGen.is_walkable_tile(wd.grid[yy * wd.w + xx]):
+				if Vector2i(xx, yy) != bd.door and not open_to_wing.has(Vector2i(xx, yy)) and MapGen.is_walkable_tile(wd.grid[yy * wd.w + xx]):
 					edge_closed = false
 		for yy in range(r.position.y, r.end.y):
 			for xx in [r.position.x, r.end.x - 1]:
-				if Vector2i(xx, yy) != bd.door and MapGen.is_walkable_tile(wd.grid[yy * wd.w + xx]):
+				if Vector2i(xx, yy) != bd.door and not open_to_wing.has(Vector2i(xx, yy)) and MapGen.is_walkable_tile(wd.grid[yy * wd.w + xx]):
 					edge_closed = false
 		check(edge_closed, "%s: walls all round except the door" % bd.n)
 		var b0 := MB.new()
@@ -625,9 +630,13 @@ func _init() -> void:
 		for bd11 in lw.buildings:
 			var r11: Rect2i = bd11.rect
 			var closed := true
+			var open11 := {}
+			for wg11 in bd11.get("wings", []):
+				for q11 in Rooms.wing_gap(bd11, wg11):
+					open11[q11] = true
 			for xx in range(r11.position.x, r11.end.x):
 				for yy in [r11.position.y, r11.end.y - 1]:
-					if Vector2i(xx, yy) != bd11.door and MapGen.is_walkable_tile(lw.grid[yy * lw.w + xx]):
+					if Vector2i(xx, yy) != bd11.door and not open11.has(Vector2i(xx, yy)) and MapGen.is_walkable_tile(lw.grid[yy * lw.w + xx]):
 						closed = false
 			check(closed and lw.grid[bd11.door.y * lw.w + bd11.door.x] == MapGen.INTERIOR, "%s: walls all round and a door" % bd11.n)
 	var sw2 := Atlas.world()
@@ -3889,11 +3898,55 @@ func _lost_horse() -> void:
 				if j9 != i9:
 					# (two houses written wall to wall stay wall to wall)
 					check(not r1.grow(1).intersects(m9.buildings[j9].rect) or r0.grow(1).intersects(raw9[j9].rect), "%s/%s: there is still a way between it and the next house" % [a9, raw9[i9].id])
+	# wings, storeys and what each storey is for
+	var winged := 0
+	var tall := 0
+	for a8 in Data.AREAS:
+		var raw8: Array = Data.AREAS[a8].get("buildings", [])
+		if raw8.is_empty():
+			continue
+		var m8 := MapGen.build(a8)
+		var reach8 := MapGen.flood(m8.grid, m8.w, m8.h, m8.start)
+		for i8 in raw8.size():
+			var bd8: Dictionary = m8.buildings[i8]
+			var st8 := Rooms.storeys(bd8)
+			if st8 >= 3:
+				tall += 1
+			check(st8 >= 1 and st8 <= 5 and Rooms.uses(bd8).size() == st8 and (st8 == 1 or Rooms.uses_text(bd8).length() > 12) and (st8 >= 2) == bd8.has("upper"), "%s/%s stands %d storeys, each with a use" % [a8, bd8.id, st8])
+			for u8 in Rooms.uses(bd8):
+				check(Rooms.USE_WORDS.has(str(u8)), "%s/%s: a storey is used as %s" % [a8, bd8.id, u8])
+			if not bd8.has("wings"):
+				continue
+			winged += 1
+			check(not str(bd8.style) in Rooms.NO_WINGS and (bd8.wings as Array).size() <= 2, "%s/%s: a house of a style that takes wings, and no more than two" % [a8, bd8.id])
+			for wg8 in bd8.wings:
+				var wr8: Rect2i = wg8.rect
+				var inner8 := 0
+				for y8 in range(wr8.position.y, wr8.end.y):
+					for x8 in range(wr8.position.x, wr8.end.x):
+						if m8.grid[y8 * int(m8.w) + x8] == MapGen.INTERIOR and reach8.has(Vector2i(x8, y8)):
+							inner8 += 1
+				var gap8 := Rooms.wing_gap(bd8, wg8)
+				var apart := true
+				for j8 in raw8.size():
+					if j8 != i8 and wr8.grow(1).intersects(m8.buildings[j8].rect):
+						apart = false
+				check(inner8 >= 2 and not gap8.is_empty() and gap8.all(func(q): return m8.grid[q.y * int(m8.w) + q.x] == MapGen.INTERIOR) and apart and not (bd8.rect as Rect2i).intersects(wr8)
+					and Rooms.inside(bd8, wr8.position) and not Rooms.inside(bd8, wr8.position - Vector2i(9, 9)),
+					"%s/%s: a wing built out from a wall, walked into through it, a tile clear of the next house (%d tiles of floor)" % [a8, bd8.id, inner8])
+	var cen := Rooms.census()
+	var cen_n := 0
+	for ck in cen:
+		cen_n += int(cen[ck])
+	check(winged * 3 >= b_n and tall * 2 >= b_n and (int(cen.get("home", 0)) + int(cen.get("office", 0))) * 10 >= cen_n * 6 and int(cen.get("home", 0)) * 3 >= cen_n,
+		"%d of %d houses have a wing, %d stand three storeys or more, and of %d storeys %d are homes and %d offices" % [winged, b_n, tall, cen_n, int(cen.get("home", 0)), int(cen.get("office", 0))])
+	check(Rooms.storeys({"style": "kitchen", "rect": Rect2i(0, 0, 6, 5)}) == 1 and Rooms.uses_text({"style": "shop", "rect": Rect2i(3, 4, 7, 6), "upper": {}, "storeys": 3}) == "three storeys: a shop, offices above, somebody's home at the top",
+		"a kitchen is one storey; a shop is a shop, with offices over it and a home over those")
 	check(b_grew * 2 >= b_n and t_after * 100 >= t_before * 130, "%d of %d buildings have more room: %d tiles of ground floor where there were %d" % [b_grew, b_n, t_after, t_before])
 	var wsrc9 := FileAccess.get_file_as_string("res://scripts/world.gd")
 	check(wsrc9.contains("a lord that cannot be beaten is gone from the land when the losing is done"), "a doom of the story leaves the land when its step is done")
 	var asrc9 := FileAccess.get_file_as_string("res://scripts/architecture.gd")
-	check(asrc9.contains("static func _facade") and asrc9.contains("static func _border") and Arch.HIP_RISE > 1.6 and Arch.GABLE_RISE > 1.3, "the houses have facades, flowers at the foot of the wall, and roofs that rise")
+	check(asrc9.contains("static func _facade") and asrc9.contains("static func _border") and asrc9.contains("static func _wing") and asrc9.contains("more storeys (the Lost Horse release)") and Arch.HIP_RISE > 1.6 and Arch.GABLE_RISE > 1.3, "the houses have facades, flowers at the foot of the wall, and roofs that rise")
 
 	print("== what cannot be beaten (dooms.gd) ==")
 	var dooms: Array = []

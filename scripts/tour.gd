@@ -3908,6 +3908,29 @@ func _horse_shots(which: String = "1") -> void:
 			await _shot("mark_who_road_mender")
 			w.cam_override = null
 		Game.picks = {}
+	if want.call("houses"):
+		# houses that are not boxes: the ones with wings built out from them, and the tall ones, in three towns
+		w.open_world()
+		w.enter_layer("surface")
+		for hv in [["village", 4], ["mountain", 3], ["longmen", 3], ["yanggu", 3], ["tushan", 2]]:
+			var shown := 0
+			for bd in Atlas.world_of("surface").buildings:
+				if str(bd.area) != str(hv[0]) or shown >= int(hv[1]) or (bd.get("wings", []) as Array).is_empty():
+					continue
+				var rr: Rect2i = bd.rect
+				var door: Vector2i = bd.door
+				var outv := Vector2i(-1 if door.x == rr.position.x else (1 if door.x == rr.end.x - 1 else 0), -1 if door.y == rr.position.y else (1 if door.y == rr.end.y - 1 else 0))
+				_high_put(door + outv * 2, -outv, 10.0)
+				await _wait(0.5)
+				var c: Vector3 = w.wpos(rr.position + rr.size / 2)
+				c.y = w.ground_y(w.wpos(door + outv * 2))
+				var wsd: Vector2i = [Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(0, 1)][int(bd.wings[0].side)]
+				var dirv := (Vector3(outv.x, 0, outv.y) * 0.8 + Vector3(wsd.x, 0, wsd.y)).normalized()
+				w.cam_override = Transform3D(Basis.IDENTITY, c + dirv * 9.0 + Vector3(0, 40.0, 0)).looking_at(c + Vector3(0, 2.0, 0), Vector3.UP)
+				await _wait(0.4)
+				await _shot("house_%s_%s" % [str(hv[0]), str(bd.id)])
+				w.cam_override = null
+				shown += 1
 	if want.call("battle"):
 		main.set_stack(["world"])
 		Game.level = 85
