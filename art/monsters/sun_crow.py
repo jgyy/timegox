@@ -1,10 +1,14 @@
-"""Sun crow (new in Part IX): Jinwu, the three-legged golden crow that lives in the sun.  The bird
-anatomy of art/lib/bird.py as a big crow - a stout golden beak, bright plumage that takes the
-enemy's colour (gold for the crow of the sun), the primaries a shade deeper - with its three
-legs, each ending in golden scaled toes and hooked talons; its wings and tail edged in tongues
-of sun-fire and a ring of fire blazing behind it.  The flames keep their own colour.
+"""Sun crow (new in Part IX): Jinwu, the three-legged golden crow that lives in the sun, as the Han
+pictures show it (the crow standing in the sun's disc).  The bird anatomy of art/lib/bird.py as a
+raven: a heavy, slightly hooked bill under its nasal bristles, a flat forehead, a shaggy throat of
+hackles laid on the neck, a wedge-shaped tail and broad fingered wings whose primaries end in tongues
+of flame (the accent colour); golden plumage that takes the enemy's colour, the wings deeper; three
+legs, the third behind the other two, each with golden scaled toes and hooked talons; and behind it
+the sun - a faint disc of light inside a ring of fire with flames licking out and back - on a bone of
+its own, so that when the crow dies the sun falls with it and lies guttering round it on the ground.
+The flames keep their own colour.
 Clips: idle (hovering on slow wingbeats), walk (flying forward), attack (a talon dive), hurt, die
-(falls from the air) and cast (wings raised in a blaze).
+(falls out of the air into its fallen sun) and cast (wings raised in a blaze).
 Run: blender --background --python art/monsters/sun_crow.py  ->  assets/monsters/sun_crow.glb"""
 import os
 import sys
