@@ -199,6 +199,9 @@ var marks_seen := {}
 ## (offices.gd: shifts worked at the trades of the towns, and the day the last one was worked in each town)
 var shifts := {}
 var shift_day := {}
+## (careers: the day the last shift was worked at each trade in each town, for the salary; all wages earned)
+var salary_day := {}
+var wages := 0
 var falls := {}
 var fallen := 0
 var yielded := 0
@@ -365,6 +368,8 @@ func reset() -> void:
 	marks_seen = {}
 	shifts = {}
 	shift_day = {}
+	salary_day = {}
+	wages = 0
 	falls = {}
 	fallen = 0
 	yielded = 0

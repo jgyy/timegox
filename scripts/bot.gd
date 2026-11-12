@@ -2534,6 +2534,7 @@ func _finish(reason: String) -> void:
 	var stood := 0
 	for lid9 in ["surface", "heaven", "under", "sea"]:
 		stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
+	print("trades          : %d shifts at %d trades, %d spirit stones in wages%s" % [int(Offices.worked(Game)[0]), int(Offices.worked(Game)[1]), Game.wages, (": " + Offices.careers(Game)) if Offices.careers(Game) != "" else ""])
 	print("what stands     : %d things stand in the land for what was chosen and what the scales lean to (of %d that could), %d looked at" % [stood, int(Marks.totals()[1]), Game.marks_seen.size()])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":

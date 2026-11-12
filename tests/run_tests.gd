@@ -4018,6 +4018,48 @@ func _lost_horse() -> void:
 	check(Offices.blocked(TG, "shop", "yanggu") != "", "nobody is hiring at night")
 	Feats.poll(TG)
 	check(TG.feats.has("day_wage") and not TG.feats.has("six_trades") and Feats.need(Feats.FEATS.six_trades.test) < Offices.TRADE_ORDER.size(), "a day's wage is a feat; six trades is another, and there are more than six")
+	# a career: five ranks a trade, reached by shifts; the work quicker from the third, a salary from the fourth
+	var CG = load("res://scripts/game.gd").new()
+	CG.reset()
+	CG.level = 30
+	for tr7 in Offices.TRADE_ORDER:
+		var names7: Array = Offices.CAREERS.get(tr7, [])
+		var uniq7 := {}
+		for nm7 in names7:
+			uniq7[nm7] = true
+		check(names7.size() == Offices.RANKS.size() and uniq7.size() == names7.size(), "%s has a career of five places, each with a name" % tr7)
+	for k7 in range(1, Offices.RANKS.size()):
+		check(int(Offices.RANKS[k7][0]) > int(Offices.RANKS[k7 - 1][0]) and float(Offices.RANKS[k7][1]) > float(Offices.RANKS[k7 - 1][1]), "rank %d takes more shifts and pays more than the one before" % (k7 + 1))
+	check(Offices.RAISED.size() == Offices.RANKS.size() - 1 and Offices.RAISED.all(func(ln): return fits.call(str(ln))), "something is said at every rise")
+	var w0 := Offices.wage(CG, "office")
+	check(Offices.rank(CG, "office") == 0 and Offices.rank_name(CG, "office") == "Copy-Hand" and Offices.to_next(CG, "office") == 3 and Offices.hours(CG, "office") == 4 and Offices.career_text(CG, "office").contains("start as Copy-Hand") and Offices.best_rank(CG) == -1,
+		"a stranger starts at the bottom: a copy-hand, four hours a shift, three shifts from the first rise")
+	var rose := ""
+	for d7 in 3:
+		CG.day = 10 + d7
+		CG.clock = 9.0 * 60.0
+		rose = Offices.work(CG, "office", "village")
+	check(Offices.rank(CG, "office") == 1 and Offices.rank_name(CG, "office") == "Under-Clerk" and rose.contains(str(Offices.RAISED[0])) and Offices.wage(CG, "office") > w0 and Offices.salary_due(CG, "office", "village") == 0,
+		"three shifts: an under-clerk, paid more, and told so; no salary yet")
+	for d8 in 13:
+		CG.day = 20 + d8
+		CG.clock = 9.0 * 60.0
+		Offices.work(CG, "office", "village")
+	check(Offices.rank(CG, "office") == 3 and Offices.rank_name(CG, "office") == "Senior Clerk" and Offices.hours(CG, "office") == 3 and Offices.career_text(CG, "office").contains("Registrar after 14 more"), "sixteen shifts: a senior clerk, an hour quicker, on the books")
+	CG.day = 36
+	check(Offices.salary_due(CG, "office", "village") == int(round(Offices.wage(CG, "office") * Offices.SALARY * 3)) and Offices.salary_due(CG, "office", "yanggu") == 0, "three days away: three half-days of salary waiting, where he is on the books and nowhere else")
+	CG.day = 60
+	var due7 := Offices.salary_due(CG, "office", "village")
+	var st7: int = CG.stones
+	CG.clock = 9.0 * 60.0
+	Offices.work(CG, "office", "village")
+	check(due7 == int(round(Offices.wage(CG, "office") * Offices.SALARY * Offices.SALARY_DAYS)) and CG.stones == st7 + due7 + Offices.wage(CG, "office") and Offices.salary_due(CG, "office", "village") == 0 and CG.wages > 0,
+		"a month away: five days of salary and no more, collected with the shift")
+	CG.shifts["office"] = 30
+	Feats.poll(CG)
+	check(Offices.rank(CG, "office") == 4 and Offices.to_next(CG, "office") == 0 and Offices.career_text(CG, "office").contains("no higher place") and CG.feats.has("journeyman") and CG.feats.has("trade_master") and Offices.careers(CG) == "Registrar"
+		and Offices.wage(CG, "office") < Data.enemy_stones(30, false) * 20, "thirty shifts: a registrar, and a shift at the top of it still pays less than twenty beaten foes")
+	CG.free()
 	TG.free()
 	var trade_n := 0
 	for lid5 in ["surface", "heaven", "under", "sea"]:

@@ -874,7 +874,8 @@ func offer_shift(e: Dictionary) -> void:
 	var t: Dictionary = Offices.TRADES[use]
 	var opts: Array = [
 		{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM},
-		{"id": "work", "label": str(t.n), "note": "%d hours" % int(t.hours), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones. One shift a day in a town." % [str(e.n), int(t.hours), Offices.wage(Game, use)], "col": UI.C_GOLD}]
+		{"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), Offices.wage(Game, use),
+			(", and %d of salary for the days away" % Offices.salary_due(Game, use, town)) if Offices.salary_due(Game, use, town) > 0 else "", Offices.career_text(Game, use)], "col": UI.C_GOLD}]
 	choose("%s could use a pair of hands." % str(e.n), opts, func(oid: String):
 		if oid != "work":
 			return

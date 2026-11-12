@@ -112,6 +112,90 @@ const TRADES := {
 }
 const TRADE_ORDER := ["home", "inn", "shop", "office", "workshop", "teahouse", "library", "shrine", "hall", "bath"]
 
+## A career (the Lost Horse release): every trade has five ranks, reached by shifts worked at it, in
+## any town.  `RANKS`: [shifts needed, how much more a shift pays].  From the third rank the work goes
+## quicker (an hour less, never under one); from the fourth the hero is **on the books**: paid a
+## salary for the days since the last shift there (SALARY of a day's wage a day, for at most
+## SALARY_DAYS days), collected on turning up.  The last rank is the trade's own mastery.
+const RANKS := [[0, 1.0], [3, 1.25], [8, 1.6], [16, 2.0], [30, 2.6]]
+const QUICK_RANK := 2
+const SALARY_RANK := 3
+const SALARY := 0.5
+const SALARY_DAYS := 5
+## what each rank of each trade is called
+const CAREERS := {
+	"inn": ["Pot-Washer", "Pot-Boy of the House", "Tapster", "Under-Innkeeper", "Keeper of the House"],
+	"shop": ["Counter-Hand", "Shop-Hand", "Salesman of the Front", "Buyer", "Partner in the Shop"],
+	"office": ["Copy-Hand", "Under-Clerk", "Clerk", "Senior Clerk", "Registrar"],
+	"workshop": ["Bellows-Hand", "Apprentice", "Journeyman", "Foreman", "Master of the Craft"],
+	"teahouse": ["Pot-Carrier", "Tea-Hand", "Server of the Second Pot", "Master of the Kettle", "Tea Master"],
+	"library": ["Duster", "Shelf-Hand", "Under-Librarian", "Keeper of a Shelf", "Librarian"],
+	"shrine": ["Sweeper of the Court", "Lamp-Trimmer", "Lay Attendant", "Warden of the Lamps", "Steward of the Shrine"],
+	"hall": ["Door-Hand", "Runner", "Usher", "Under-Steward", "Steward of the Hall"],
+	"home": ["Odd-Job Hand", "Hired Hand", "Handyman", "Trusted Hand", "Friend of the House"],
+	"bath": ["Towel-Carrier", "Stoker", "Bath-Hand", "Keeper of the Hot Side", "Bath-Master"],
+}
+## what is said on being raised to each rank (the second to the fifth)
+const RAISED := ["They have stopped watching your hands. From today you are paid as somebody who knows where things are kept.",
+	"You are given your own hook for your coat. The work goes quicker now: you no longer have to be told any of it.",
+	"Your name is written in the book. You are on the books now: paid by the day, whether or not the road lets you come.",
+	"There is nothing left here that anybody can teach you, and three people who expect you to teach them. They have had a small sign painted. It has your name on it, spelled wrong."]
+
+## The rank the hero holds at trade `use` (0 to 4).
+static func rank(g, use: String) -> int:
+	var n := int(g.shifts.get(use, 0))
+	var r := 0
+	for k in RANKS.size():
+		if n >= int(RANKS[k][0]):
+			r = k
+	return r
+
+static func rank_name(g, use: String) -> String:
+	return str(CAREERS.get(use, ["Hand"])[mini(rank(g, use), (CAREERS.get(use, ["Hand"]) as Array).size() - 1)])
+
+## Shifts still to work before the next rank at `use` (0 at the top).
+static func to_next(g, use: String) -> int:
+	var r := rank(g, use)
+	return 0 if r >= RANKS.size() - 1 else int(RANKS[r + 1][0]) - int(g.shifts.get(use, 0))
+
+## How many hours a shift at `use` takes the hero now.
+static func hours(g, use: String) -> int:
+	var h := int(TRADES.get(use, {}).get("hours", 2))
+	return maxi(1, h - 1) if rank(g, use) >= QUICK_RANK else h
+
+## The salary waiting for the hero at trade `use` in `town`: for each day since the last shift there
+## (not today's), half a day's wage, for at most five days; nothing below the fourth rank.
+static func salary_due(g, use: String, town: String) -> int:
+	if rank(g, use) < SALARY_RANK or not g.salary_day.has(use + "|" + town):
+		return 0
+	var days := clampi(int(g.day) - int(g.salary_day[use + "|" + town]) - 1, 0, SALARY_DAYS)
+	return int(round(wage(g, use) * SALARY * days))
+
+## "Clerk (9 shifts; Senior Clerk after 7 more)".
+static func career_text(g, use: String) -> String:
+	var n := int(g.shifts.get(use, 0))
+	if n == 0:
+		return "You have not worked here before: you would start as %s." % rank_name(g, use)
+	var nx := to_next(g, use)
+	if nx == 0:
+		return "You are %s (%d shifts): there is no higher place." % [rank_name(g, use), n]
+	return "You are %s (%d shifts); %s after %d more." % [rank_name(g, use), n, str(CAREERS[use][rank(g, use) + 1]), nx]
+
+## Every trade the hero has worked at, with the rank held: "Clerk; Tea-Hand".
+static func careers(g) -> String:
+	var out: Array = []
+	for use in TRADE_ORDER:
+		if int(g.shifts.get(use, 0)) > 0:
+			out.append(rank_name(g, use))
+	return "; ".join(out)
+
+## The highest rank held at any trade (-1 if none has been worked at).
+static func best_rank(g) -> int:
+	var b := -1
+	for use in g.shifts:
+		b = maxi(b, rank(g, str(use)))
+	return b
+
 ## The officials found in building `bld` of region `area`, in the order they are stood.
 static func seated(area: String, bld: String) -> Array:
 	var out: Array = []
@@ -123,7 +207,7 @@ static func seated(area: String, bld: String) -> Array:
 ## What a shift is worth to a town: more for a hero of a higher realm (a cultivator's hour is dear),
 ## never a fortune (a day of shifts is a fraction of what an hour of the road pays).
 static func wage(g, use: String) -> int:
-	return int(round((30.0 + 14.0 * float(g.level)) * float(TRADES.get(use, {}).get("pay", 1.0))))
+	return int(round((30.0 + 14.0 * float(g.level)) * float(TRADES.get(use, {}).get("pay", 1.0)) * float(RANKS[rank(g, use)][1])))
 
 ## Why a shift of trade `use` cannot be worked in town `town` just now ("" if it can).
 static func blocked(g, use: String, town: String) -> String:
@@ -142,18 +226,33 @@ static func work(g, use: String, town: String) -> String:
 	if blocked(g, use, town) != "":
 		return ""
 	var t: Dictionary = TRADES[use]
-	Clock.set_hour(g, minf(23.5, Clock.hour(g) + float(t.hours)))
+	var back := salary_due(g, use, town)
+	Clock.set_hour(g, minf(23.5, Clock.hour(g) + float(hours(g, use))))
 	var pay := wage(g, use)
-	g.stones += pay
+	var before := rank(g, use)
+	g.stones += pay + back
 	g.shift_day[town] = int(g.day)
+	g.salary_day[use + "|" + town] = int(g.day)
 	var first: bool = not g.shifts.has(use)
 	g.shifts[use] = int(g.shifts.get(use, 0)) + 1
+	g.wages += pay + back
 	var hid := Cultures.of_area(town)
 	if first and hid != "":
 		g.add_hearth(hid, 1)
 	g.toast("A shift worked: +%d spirit stones" % pay)
-	g.note("Worked a shift: %s (%d spirit stones)" % [str(t.n).to_lower(), pay])
-	return str(t.done)
+	if back > 0:
+		g.toast("Salary for the days away: +%d spirit stones" % back)
+	g.note("Worked a shift: %s (%d spirit stones)" % [str(t.n).to_lower(), pay + back])
+	var said := str(t.done)
+	var now := rank(g, use)
+	if now > before:
+		# raised: it is news, the town's hearth hears of it, and something is said
+		g.toast("Raised to %s" % rank_name(g, use))
+		g.note("Raised to %s" % rank_name(g, use))
+		if hid != "":
+			g.add_hearth(hid, 1)
+		said += "\n\n" + str(RAISED[now - 1])
+	return said
 
 ## How many shifts have been worked, and at how many trades.
 static func worked(g) -> Array:
