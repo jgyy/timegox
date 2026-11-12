@@ -42,7 +42,7 @@ const SCHOOLS := {
 const SCHOOL_ORDER := ["hand", "wheel", "dao"]
 const TIERS := 6
 ## what each tier costs: know-how, and spirit stones
-const TIER_KNOW := [6, 16, 32, 56, 90, 130]
+const TIER_KNOW := [6, 16, 32, 56, 90, 134]
 const TIER_STONES := [60, 500, 3000, 15000, 60000, 150000]
 ## the story step each tier waits for (the first is there from the first hunt)
 const TIER_AFTER := ["s_hunt1", "s_p3_home", "s_p5_home", "s_p9_home", "s_p13_home", "s_p17_home"]

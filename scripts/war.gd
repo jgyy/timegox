@@ -33,13 +33,13 @@ const LEADS := 2
 ## (a commission of the notice board done)
 const COMPANIES := {
 	"sect": {"n": "Outer Disciples of Azure Cloud", "arm": "foot", "col": Color("3a8ae8"), "step": "s_p23_sun",
-		"how": "The Elder sends the outer disciples, when Master Sun has seen them drill.", "desc": "Sixty who have swept and forty who have not, in blue, with practice spears. They keep their dressing better than any company in the host, having been shouted at about straight lines since they were twelve."},
+		"how": "The Elder sends the outer disciples, when Master Sun has seen them drill.", "desc": "Forty outer disciples in blue, and sixty sweepers and gate-boys who begged to be let come and were lent practice spears. They keep their dressing better than any company in the host, having been shouted at about straight lines since they were twelve."},
 	"valley": {"n": "Ploughmen of the Rice Hearth", "arm": "foot", "col": Color("6a9a4a"), "levy": "granny_wen",
 		"how": "Asked of Granny Wen, at the Rice Hearth.", "desc": "The men of Qingshi and Cloudfoot with hoes rehafted as spears, and straw capes against arrows, which do not help, and which nobody can persuade them to take off."},
 	"steppe": {"n": "Riders of the Felt Hearth", "arm": "horse", "col": Color("8a2a3a"), "levy": "sarnai",
 		"how": "Asked of Grandmother Sarnai, at the Felt Hearth.", "desc": "A hundred of the horse-folk on the dun horses that bite. They consider a battle on foot a kind of accident, and a spear wall an act of bad manners."},
 	"sand": {"n": "Camel Archers of the Well", "arm": "bow", "col": Color("c8a050"), "levy": "cook_aysha",
-		"how": "Asked of Cook Aysha, at the Sweet-Well Hearth.", "desc": "Caravan guards from Shazhou, who shoot from the saddle of a kneeling camel and are paid, by old custom, in water. They have asked for it in advance."},
+		"how": "Asked of Auntie Aysha of the Caravanserai, at the Sweet-Well Hearth.", "desc": "Caravan guards from Shazhou, who shoot from the saddle of a kneeling camel and are paid, by old custom, in water. They have asked for it in advance."},
 	"river": {"n": "Haulers of the Boat Hearth", "arm": "foot", "col": Color("3a6a8a"), "levy": "fishwife_lu",
 		"how": "Asked of Fishwife Lu, at the Boat Hearth.", "desc": "Tow-path men from Longmen with boat-hooks, who pull together because that is the only way they have ever done anything. When they push, the same."},
 	"forge": {"n": "Founders' Crossbows of Tushan", "arm": "bow", "col": Color("8a4a2a"), "levy": "auntie_rong",
@@ -120,7 +120,7 @@ const BATTLES := {
 		"foe": {"foot": 480, "bow": 160, "horse": 260}, "heart": 130.0, "deaf": 1.9,
 		"plan": ["charge", "advance", "charge", "hold", "advance", "charge", "volley", "hold", "charge", "advance", "hold", "hold"], "dust": [1, 4, 8],
 		"desc": "Eight thousand of clay with a king of flesh in front, who has never lost a charge and has lost every war. No host in the land can break this one by killing it: it is the last field of somebody who has fought it a thousand times. But they were men of Chu before they were clay, and the levy knows six airs.",
-		"won": "From four sides, in the dusk, six airs that are all the same song. One by one the eight thousand of Mount Li ground their halberds, the way a man does who has just heard his mother's kitchen. By the third verse the Hegemon-King stands in front of nobody."},
+		"won": "From four sides, in the dusk, the airs of the hearths, which are all the same song. One by one the eight thousand of Mount Li ground their halberds, the way a man does who has just heard his mother's kitchen. By the third verse the Hegemon-King stands in front of nobody."},
 	# ---- the drill ground at Qingshi: Master Sun's three lessons, fought with blunted spears
 	"drill1": {"n": "First Lesson: the Spear Wall", "foe_n": "Master Sun's Blue Flags", "story": false, "after": "s_p23_sun", "tune": "war",
 		"foe": {"foot": 120, "bow": 0, "horse": 240}, "heart": 70.0, "deaf": 1.0,

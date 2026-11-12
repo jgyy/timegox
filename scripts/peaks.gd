@@ -308,7 +308,9 @@ static func world(grid: PackedByteArray, W: int, peaks: Array, ents: Array, laye
 		for pk in peaks:
 			if str(pk.area) == area:
 				mine.append(pk)
-		for kind in ["npcs", "bosses", "pickups"]:
+		# (the Underclothes release: and things to do, "props", such as the hot spring at Glowcap Vale that
+		# Part XXVI soaks in: a region's own were drawn by lot, and the vale's lot drew none)
+		for kind in ["npcs", "bosses", "pickups", "props"]:
 			for d in spec.get(kind, []):
 				if not d.has("peak") or mine.is_empty():
 					continue
@@ -322,6 +324,22 @@ static func world(grid: PackedByteArray, W: int, peaks: Array, ents: Array, laye
 						ents.append({"kind": "boss", "id": "boss_" + str(d.id), "enemy": d.id, "pos": at, "lv": d.lv, "req": d.req, "vis": d.get("vis", ["", ""]), "area": area, "layer": layer, "late": true})
 					"pickups":
 						ents.append({"kind": "pickup", "id": d.id, "item": d.item, "pos": at, "vis": d.get("vis", ["", ""]), "area": area, "layer": layer, "late": true})
+					"props":
+						# (on the rock of the peak like the story's people there, not on the edge of the open
+						# ground as the region's own things are: a peak is laid where nothing stands, so it has
+						# no edge)
+						# (the open side most nearly away from the peak)
+						var away := Vector2(at - (pk2.c as Vector2i))
+						var face := Vector2i(0, 1)
+						var best := -2.0
+						for fd in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+							var q: Vector2i = at + fd
+							if MapGen.is_walkable_tile(grid[q.y * W + q.x]) and not used.has(q):
+								var dot := Vector2(fd).dot(away.normalized()) if away.length() > 0.0 else 0.0
+								if dot > best:
+									best = dot
+									face = fd
+						ents.append({"kind": "prop", "id": d.id, "prop": d.prop, "pos": at, "face": face, "area": area, "layer": layer, "late": true, "peak": int(d.peak)})
 
 static func _stand(grid: PackedByteArray, W: int, pk: Dictionary, how: String, id: String, used: Dictionary) -> Vector2i:
 	var c: Vector2i = pk.c

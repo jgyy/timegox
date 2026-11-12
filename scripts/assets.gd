@@ -42,6 +42,9 @@ const MONSTERS := {
 	"bifang": "monsters/bifang",
 	# the Spring Thunder release (Part XVII): Qing Nu, the Maiden of Frost, built with the anime re-sculpt
 	"frost_maiden": "monsters/frost_maiden",
+	# the Underclothes release: the ox of the land as an ox (the draught ox of the cart, without its yoke), for the
+	# oxen of the corvee and the Whole Ox of Part XXVI, which were drawn as wolves and nothing
+	"ox": "monsters/ox",
 }
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
@@ -65,6 +68,10 @@ const PEOPLE := {
 	"sai_weng": "characters/sai_weng", "weng_son": "characters/weng_son", "qian_liu": "characters/qian_liu",
 	# Part XXV: the steward who burned the tallies, the widow of Mount Tai and the Patriarch of the Cold Pine
 	"feng_xuan": "characters/feng_xuan", "tai_widow": "characters/tai_widow", "han_song": "characters/han_song",
+	# Part XXVI (the Underclothes release): the physician of the hot springs and his pupil who kept his teeth, the cook
+	# who goes where the gaps are, the duke who was not ill, the lord with the wind in his head, and the jailer's wife
+	"hua_tuo": "characters/hua_tuo", "wu_pu": "characters/wu_pu", "pao_ding": "characters/pao_ding", "duke_huan": "characters/duke_huan",
+	"cao_cao": "characters/cao_cao", "jailer_wife": "characters/jailer_wife",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
@@ -347,6 +354,10 @@ static func instance(rel: String, tint: Color = Color(0, 0, 0, 0), pal: Array = 
 	for mi in meshes:
 		var m: MeshInstance3D = mi
 		m.mesh = prepare_mesh(m.mesh, pal, "%s|%s|%s" % [rel, m.name, sig], is_actor(rel))
+		# (the Underclothes release: a person's body in its underclothes is drawn only when they are
+		# undressed, Models.undress)
+		if str(m.name).begins_with("bare"):
+			m.visible = false
 	var aps: Array = []
 	_walk(inst, aps, "AnimationPlayer")
 	var root := Node3D.new()
@@ -427,6 +438,11 @@ static func hero_instance(rel: String, cols: Dictionary) -> Node3D:
 		sig += (cols[k] as Color).to_html(false) if cols.has(k) else "-"
 	for mi in meshes:
 		var m: MeshInstance3D = mi
+		if str(m.name).begins_with("bare"):
+			# (no dye reaches the underclothes: they keep the colour of undyed linen)
+			m.mesh = prepare_mesh(m.mesh, [], "%s|%s|-" % [rel, m.name], true)
+			m.visible = false
+			continue
 		m.mesh = _hero_mesh(m.mesh, cols, "%s|%s|hero:%s" % [rel, m.name, sig])
 	var aps: Array = []
 	_walk(inst, aps, "AnimationPlayer")
@@ -532,7 +548,7 @@ static func person(id: String) -> Node3D:
 ## goes where a painter would put it: the eyes, the markings, the glow (the accent keeps the hue).
 ## Spirits, flames, jellies and the like are as bright as they were.
 const NATURAL := ["beast", "ape", "tiger", "fox", "mammoth", "qilin", "kaiming", "tortoise", "crab", "scorpion", "spider", "mantis", "serpent",
-	"moth", "oxhead", "horseface", "mushroom", "plant", "golem", "ray", "jade_rabbit", "bifang"]
+	"moth", "oxhead", "horseface", "mushroom", "plant", "golem", "ray", "jade_rabbit", "bifang", "ox"]
 
 ## The colour of a hide that is, in a painter's eye, colour `c`: two-fifths less saturated (never more
 ## than half), drawn a sixth of the way towards the brown of an animal, and kept out of the deepest dark.

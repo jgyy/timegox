@@ -36,7 +36,12 @@ const FEATS := {
 	# the Lost Horse release: the last realm, what was lost to, and what was left standing
 	"soft_water": {"n": "Soft as Water", "kind": "road", "pts": 20, "test": ["level", 87], "desc": "Reach Soft as Water."},
 	# the Three Burrows release: the last realm, and the town that is the hero's own (hold.gd)
-	"scarcely_known": {"n": "Barely Known to Be There", "kind": "road", "pts": 20, "test": ["level", 90], "desc": "Reach Scarcely Known: the last realm there is."},
+	"scarcely_known": {"n": "Barely Known to Be There", "kind": "road", "pts": 20, "test": ["level", 90], "desc": "Reach Scarcely Known."},
+	# the Underclothes release: the last realm, and the frolics, the knife and the book (Part XXVI)
+	"room_blade": {"n": "Room and More for the Blade", "kind": "road", "pts": 20, "test": ["level", 93], "desc": "Reach Room for the Blade: the last realm there is."},
+	"five_frolics": {"n": "The Tiger, the Deer, the Bear, the Ape and the Bird", "kind": "road", "pts": 10, "test": ["step", "s_p26_tablets"], "desc": "Find the five frolics on the heights round Qingshi."},
+	"whole_ox": {"n": "Never Again a Whole Ox", "kind": "road", "pts": 10, "test": ["step", "s_p26_ox"], "desc": "Go where the gaps are, on the height above Tushan."},
+	"blue_bag": {"n": "The Blue Bag Book", "kind": "road", "pts": 10, "test": ["step", "s_p26_book"], "desc": "Say what becomes of Hua Tuo's book."},
 	"hamlet": {"n": "Four Posts and an Argument", "kind": "people", "pts": 5, "test": ["hold_rank", 1], "desc": "Found a town of your own."},
 	"town": {"n": "A Place to Be Cheated In", "kind": "people", "pts": 10, "test": ["hold_rank", 2], "desc": "See Guiyun become a town: fifty households and a market."},
 	"hundred_households": {"n": "The Hundred Households", "kind": "people", "pts": 20, "test": ["hold_rank", 3], "desc": "See Guiyun become a city: a hundred households and a wall."},

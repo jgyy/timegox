@@ -62,7 +62,8 @@ NOSE_Y = -0.05
 MOUTH_Y = -0.078
 CHIN_Y = -RY * LOW
 # every eye's size against what its script asks for (Face.eye_r)
-EYE_K = 0.86   # (0.8 until the Hollow Hills release: every eye a little larger again, about a fourteenth)
+EYE_K = 0.66   # (0.8 until the Hollow Hills release, 0.86 until the Underclothes release: eyes of a real size now,
+               # an eye's width about a fifth of the face's, the opening a third as tall as it is wide)
 # the lower jaw (Face.skull): how much the face narrows from the cheeks to the chin, and how far the
 # corners of the jaw (the angle of the mandible, below and in front of the ears) stand out
 JAW_TAPER = 0.22
@@ -338,7 +339,7 @@ class Face:
 # The brows and the lips are weighted to them wholly, the skin beneath them partly: the cheek lifts
 # with the corner of the mouth and the forehead follows the brow, the way a sculpted face would.
 BROW_DY = (0.0265, 0.0225)     # brow line above the eye line (a woman's, a man's)
-LIP_X = 0.0145
+LIP_X = 0.021   # the corners of the mouth: a mouth as wide as the pupils are apart (0.0145 until the Underclothes release)
 FACE_BONES = ("brow.L", "brow.R", "lip.L", "lip.R", "lids", "jaw")
 
 
@@ -393,11 +394,13 @@ def head(b, o, bone="head", eye_bone="eyes"):
     # sculpted on to the bones of expression, so a cheek rises with a smile: see expression_weights)
     skin = morph_sphere(b, HC, f.shape, f.colour, cls=SKIN, bone=bone, bone_fn=expression_weights(f) if bone == "head" else None, seg=34, rings=26)
     # the face, nose and lips are lit as one smooth shape (an elder's a little less: the age shows)
-    b.set_normals(skin, f.shade_normal, 0.92 - 0.3 * (1.0 - f.soft))
+    # (the Underclothes release: less of the smooth shape and more of the face's own, so the bones of
+    # the face, the nose and the lips take the light as they do in life)
+    b.set_normals(skin, f.shade_normal, 0.62 - 0.25 * (1.0 - f.soft))
     tip = nose(b, f, bone)
-    b.set_normals(tip, f.shade_normal, 0.85)
+    b.set_normals(tip, f.shade_normal, 0.5)
     lips = mouth(b, f, o, bone)
-    b.set_normals(lips, f.shade_normal, 0.8)
+    b.set_normals(lips, f.shade_normal, 0.5)
     ears(b, f, bone)
     eyes(b, f, o, eye_bone, bone)
     if f.age > 0.3:
@@ -406,21 +409,32 @@ def head(b, o, bone="head", eye_bone="eyes"):
 
 
 def nose(b, f, bone):
-    """The anime nose: hardly a nose at all.  A low soft bridge running into a small tip with a touch
-    of warmth on it, and a little shadow under it where the nostrils would be (no nostrils).  An
-    elder's nose is a little stronger.  Returns the vertices (head() gives them the face's normals,
-    so the nose shades with the face and shows as its tip and its shadow)."""
+    """A nose (the Underclothes release; until then the anime nose, hardly a nose at all): a bridge
+    rising low between the eyes and running down to a rounded tip that stands out from the face, the
+    wings of the nostrils either side of it and the nostrils under it, a little warmth on the tip.
+    The bridge is low and the wings broad (the noses of the peoples of the land); a man's longer and
+    stronger, an elder's more so.  Returns the vertices (head() lights them partly with the face's
+    smooth shape and partly with their own, so the side of the nose takes a shadow)."""
     sk = f.skin
-    k = 1.0 + 0.5 * (1.0 - f.soft)
-    top = f.surface(0.0, f.eye_y - 0.01)
-    tip = f.surface(0.0, NOSE_Y + 0.004)
-    tip = tip + Vector((0, 0.0, (0.006 if not f.fem else 0.0045) * k))
-    mid = top.lerp(tip, 0.6) + Vector((0, 0, 0.0012 * k))
-    pts = [HC + top + Vector((0, 0, -0.004)), HC + mid, HC + tip]
-    tipc = mix(sk, "f0a090", 0.22)
-    out = b.tube(pts, [(0.003, 0.003), (0.004, 0.0036), (0.0058 * k, 0.005)], sk, cls=SKIN, bone=bone, seg=8, cap0=False, cols=[sk, sk, tipc], mat=MAT_PLAIN)
-    # the shadow under the tip
-    out += b.ellipsoid(HC + tip + Vector((0.0, -0.0062, -0.003)), (0.0062, 0.0016, 0.004), mix(sk, "b07068", 0.5), cls=SKIN, bone=bone, seg=10, rings=4, mat=MAT_PLAIN)
+    k = (1.0 if f.fem else 1.12) * (1.0 + 0.3 * (1.0 - f.soft))
+    top = f.surface(0.0, f.eye_y - 0.006)
+    base = f.surface(0.0, NOSE_Y + 0.002)
+    tip = base + Vector((0, -0.0015, 0.0105 * k))
+    mid = top.lerp(tip, 0.6) + Vector((0, 0, 0.0024 * k))
+    # (the bridge rises out of the face between the eyes, so it starts sunk in it)
+    pts = [HC + top + Vector((0, 0, -0.0035)), HC + top.lerp(mid, 0.5) + Vector((0, 0, 0.0004)), HC + mid, HC + tip.lerp(mid, 0.3), HC + tip]
+    tipc = mix(sk, "e89888", 0.16)
+    out = b.tube(pts, [(0.0026, 0.0024), (0.0032, 0.0028), (0.0042 * k, 0.0036), (0.0054 * k, 0.0048), (0.0062 * k, 0.0056)], sk, cls=SKIN, bone=bone, seg=10, cap0=False,
+                 cols=[sk, sk, sk, mix(sk, tipc, 0.5), tipc], mat=MAT_PLAIN)
+    out += b.ellipsoid(HC + tip + Vector((0.0, -0.0014, -0.0012)), (0.0062 * k, 0.0055 * k, 0.0052 * k), tipc, cls=SKIN, bone=bone, seg=12, rings=8, mat=MAT_PLAIN)
+    for s in (1, -1):
+        # the wings of the nostrils, and the nostrils under the tip
+        wing = HC + f.surface(0.0102 * k * s, NOSE_Y - 0.001) + Vector((0, 0, 0.0028 * k))
+        out += b.ellipsoid(wing, (0.0048 * k, 0.0046, 0.0052 * k), mix(sk, "d88a7c", 0.1), cls=SKIN, bone=bone, rot=(0, 0.35 * s, 0), seg=10, rings=6, mat=MAT_PLAIN)
+        out += b.ellipsoid(HC + base + Vector((0.0052 * s, -0.0072, 0.0088 * k)), (0.0034, 0.0014, 0.0032), mix(sk, "3a2220", 0.72), cls=SKIN, bone=bone,
+                           rot=(0, 0.4 * s, 0), seg=8, rings=4, mat=MAT_PLAIN)
+    # the shadow under the nose on the upper lip
+    out += b.ellipsoid(HC + base + Vector((0.0, -0.0105, 0.003)), (0.0085, 0.0018, 0.004), mix(sk, "b07068", 0.35), cls=SKIN, bone=bone, seg=10, rings=4, mat=MAT_PLAIN)
     return out
 
 
@@ -429,7 +443,8 @@ def mouth(b, f, o, bone):
     smiling, a thin upper lip and a lower lip that is mostly a hint of colour (fuller and rosier for
     women).  Returns the lip vertices (they shade with the face)."""
     lip = rgb(o.get("lip", "e0868a" if f.fem else mix(f.skin, "c07a74", 0.45)))
-    w = (0.0135 if f.fem else 0.0155) * (1.0 + 0.2 * (1.0 - f.soft))
+    # (the Underclothes release: a mouth as wide as the pupils are apart, with lips that have some body)
+    w = (0.0195 if f.fem else 0.021) * (1.0 + 0.12 * (1.0 - f.soft))
     y = MOUTH_Y
     upper = []
     lower = []
@@ -444,8 +459,8 @@ def mouth(b, f, o, bone):
         upper.append(HC + sp + Vector((0, 0.0018 + curve * 0.4 + bow, 0.0028)))
         lower.append(HC + f.surface(x * 0.85, y - 0.0045) + Vector((0, -0.0006 - curve * 0.35, 0.0032)))
         line.append(HC + sp + Vector((0, 0.0004 + 0.0018 * (2 * t) ** 2 * smile, 0.0036)))
-    ur = [r * (0.8 if f.fem else 0.6) for r in (0.0008, 0.0012, 0.0016, 0.0018, 0.0017, 0.0018, 0.0016, 0.0012, 0.0008)]
-    lr = [r * (1.0 if f.fem else 0.6) for r in (0.0008, 0.0015, 0.0021, 0.0026, 0.0028, 0.0026, 0.0021, 0.0015, 0.0008)]
+    ur = [r * (1.25 if f.fem else 1.0) for r in (0.0008, 0.0014, 0.002, 0.0023, 0.0022, 0.0023, 0.002, 0.0014, 0.0008)]
+    lr = [r * (1.3 if f.fem else 1.0) for r in (0.0009, 0.0018, 0.0026, 0.0031, 0.0033, 0.0031, 0.0026, 0.0018, 0.0009)]
     # the corners of the mouth ride on the lip bones (the Hundred Arms release): drawn up and out they
     # smile, drawn down they grieve, and the middle of the lips follows them part of the way
     lip_b = line_b = None
@@ -495,7 +510,8 @@ def eyes(b, f, o, eye_bone, bone):
     brow_col = rgb(o.get("brow_col", darken(hair, 0.15) if sum(hair) < 2.2 else mix(hair, "8a8070", 0.35)))
     k = f.eye_r
     # an almond opening well under half as tall as it is wide (a woman's a little more open)
-    ew, eh = 0.0222 * k, (0.0128 if f.fem else 0.0116) * k
+    # (the Underclothes release: an opening a third as tall as it is wide, as in life)
+    ew, eh = 0.0222 * k, (0.0108 if f.fem else 0.0096) * k
     # everything drawn round the eye (lids, lashes, the depth of the ball) is in proportion to it
     u_ = ew / 0.026
     glow = o.get("glow_eyes", False)
@@ -517,7 +533,8 @@ def eyes(b, f, o, eye_bone, bone):
         b.ellipsoid(c, (ew, eh, 0.0065 * u_), "d0d4e2", cls=SKIN, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=10, mat=MAT_PLAIN, col2="fbfbff")
         # iris: tall, a darker rim, dark under the lid and bright at the bottom
         # (round, as an iris is: the upper lid covers its top, and the white shows on both sides of it)
-        ir = eh * 0.97
+        # (a real iris is about two fifths of the eye's width: the white shows either side of it, and the lids cover its top and bottom)
+        ir = min(eh * 0.97, ew * 0.46)
         icen = at(0.0, eh * 0.03, 0.0056 * u_)
         b.ellipsoid(icen, (ir * 0.98, ir, 0.0022), darken(iris, 0.66), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=8, mat=MAT_PLAIN)
         b.ellipsoid(icen + R @ Vector((0, -ir * 0.04, 0.0006)), (ir * 0.86, ir * 0.88, 0.0022), darken(iris, 0.42), cls=CRYSTAL, bone=eye_bone, rot=(0, yaw, 0), seg=18, rings=8,
@@ -548,8 +565,8 @@ def eyes(b, f, o, eye_bone, bone):
             y = eh * (0.78 - 0.36 * u * u) + eh * 0.16 * u
             ul.append(at(x, y, (0.0066 - 0.002 * u * u) * u_))
             # (a line, not a wing: thin at the inner corner, a little heavier over the outer half)
-            rad.append((0.0009 + 0.0009 * math.sin(math.pi * clamp(t * 0.85 + 0.12)) + (0.0005 * smooth(0.6, 1.0, t) if f.fem else 0.0001 * smooth(0.6, 1.0, t))) * u_)
-        flick = (0.0032 if f.fem else 0.0012) * u_
+            rad.append((0.0007 + 0.0006 * math.sin(math.pi * clamp(t * 0.85 + 0.12)) + (0.0004 * smooth(0.6, 1.0, t) if f.fem else 0.0001 * smooth(0.6, 1.0, t))) * u_)
+        flick = (0.0018 if f.fem else 0.0008) * u_
         ul.append(at(ew * 1.2 * s, eh * 0.3 + flick * 0.55, 0.0042 * u_))
         rad.append(0.0005 * u_)
         b.tube(ul, rad, lash, cls=HAIR, bone=eye_bone, seg=6, flat=0.62, up=(0, 0, 1), mat=MAT_PLAIN)

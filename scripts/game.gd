@@ -165,6 +165,9 @@ var arm_switches := 0
 var yue_outfits := {"lotus": true}
 var yue_outfit := "lotus"
 var worn := {"sweeper": true}
+## the Underclothes release: down to what is worn under any robe (Esc > Wardrobe; Models.undress), and
+## not an outfit of its own: it is under all of them
+var underclothes := false
 ## feats (feats.gd: id -> the play time it was done at) and what was found that nobody was told to
 ## look for (eggs.gd)
 var feats := {}
@@ -259,6 +262,9 @@ func _process(d: float) -> void:
 			_feat_t = 1.5
 			poll_wardrobe()
 			Feats.poll(self)
+			# (the Underclothes release: the town that is his own grows overnight, and a step waiting on it
+			# hears of it without anything else having to happen first, hold.gd)
+			Hold.tick(self)
 			# (needs.gd: the body follows the land's clock; the night wears comfort faster)
 			if survival and prologue == "":
 				Needs.tick(self, 1.6 if Clock.is_night(Clock.hour(self)) else 1.0)
@@ -371,6 +377,7 @@ func reset() -> void:
 	yue_outfits = {"lotus": true}
 	yue_outfit = "lotus"
 	worn = {"sweeper": true}
+	underclothes = false
 	feats = {}
 	eggs = {}
 	heard = {}

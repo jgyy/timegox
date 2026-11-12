@@ -1003,7 +1003,7 @@ const CROSSROADS := {
 			"break": "There is a lute seasoning in Boatwright Gao's loft at Longmen that will not be ready for ten years. A blind man comes every week to knock on it and listen. He says it is coming on.",
 		}},
 	"the_host": {"step": "s_p23_hao2", "part": "XXIII", "n": "What becomes of a host",
-		"ask": "Eleven companies stand on the drill ground at Qingshi: ploughmen, horse-folk, camel archers, haulers, founders, the band. They have held three fields. They can form a square, and they can sing six airs that are one song, and they have not been home since the tenth month. Lady Hao has the roll in her hand, every name on it, and Master Sun has closed his book. The Yellow Bell is hung. Nothing is coming. What becomes of a host?",
+		"ask": "The companies of the host stand on the drill ground at Qingshi: ploughmen, horse-folk, camel archers, haulers, founders, the band. They have held three fields. They can form a square, and they can sing six airs that are one song, and they have not been home since the tenth month. Lady Hao has the roll in her hand, every name on it, and Master Sun has closed his book. The Yellow Bell is hung. Nothing is coming. What becomes of a host?",
 		"options": [
 			{"id": "home", "label": "Home, every one, by the roll", "tilt": {"reach": -3, "heart": 2}, "gain": {"renown": 6},
 				"desc": "Read the roll aloud, each name and each village, and let each man answer and go. The banners to the hearths that sent them; the spears rehafted as hoes. A land that keeps no host must be asked again next time, and may say no. That is what makes it a land worth asking (renown).",
@@ -1012,7 +1012,7 @@ const CROSSROADS := {
 				"desc": "The clay was not the last thing that will ever march. Keep a company of each arm under the Drum Tower, paid, drilled, and led by somebody who knows the roll by heart. It will be there when it is wanted. It will also be there when it is not, and a host with nothing to do finds something (the Drum Tower's first tithe).",
 				"log": "Kept a standing host at the Drum Tower of Qingshi."},
 			{"id": "band", "label": "Keep the song, not the spears", "tilt": {"craft": 3, "reach": 1}, "gain": {"items": {"ess_metal": 4, "ess_wood": 4}},
-				"desc": "What won at Gaixia was not a spear. Send the spears home and keep the band: let the eleven companies meet at the Pear Garden every year on the day the bell was hung, from all six hearths, and sing. A thing that has learned to sing together can be asked to stand together (what the companies left at the stage door).",
+				"desc": "What won at Gaixia was not a spear. Send the spears home and keep the band: let the companies meet at the Pear Garden every year on the day the bell was hung, from all six hearths, and sing. A thing that has learned to sing together can be asked to stand together (what the companies left at the stage door).",
 				"log": "Sent the spears home and kept the song: the six hearths to sing together at Qingshi every year."},
 		],
 		"after": {
@@ -1023,9 +1023,9 @@ const CROSSROADS := {
 		"echo": {
 			# Part XXV (the Three Burrows release)
 			"done:s_p25_watch": {
-				"home": [["Fu Hao", "I sent the levy home by the roll, on your word, and was sorry to. This is the first hundred I have seen since that I should have been sorrier to send."]],
-				"keep": [["Fu Hao", "I have eleven companies at the Drum Tower who stand guard because they are paid to. Bring these down some day and let mine look at them. It might shame them. I should enjoy that."]],
-				"band": [["Fu Hao", "The host kept its song and put up its spears. These have spears and no song. I shall send up a drum-major with nothing to do, who would walk up a mountain for a hundred people that can keep step."]],
+				"home": [["Lady Hao", "I sent the levy home by the roll, on your word, and was sorry to. This is the first hundred I have seen since that I should have been sorrier to send."]],
+				"keep": [["Lady Hao", "I have a company of each arm at the Drum Tower who stand guard because they are paid to. Bring these down some day and let mine look at them. It might shame them. I should enjoy that."]],
+				"band": [["Lady Hao", "The host kept its song and put up its spears. These have spears and no song. I shall send up a drum-major with nothing to do, who would walk up a mountain for a hundred people that can keep step."]],
 			},
 			# Part XXIV (the Lost Horse release)
 			"pre:the_riders": {
@@ -1047,7 +1047,7 @@ const CROSSROADS := {
 		"end": {
 			"home": "The land keeps no host. When it wants one it asks, hearth by hearth, and the keepers of the six fires say yes or no as they see fit. So far they have said yes.",
 			"keep": "A host stands at the Drum Tower of Qingshi, a company of each arm, and marches on a whole tally whose other half lies in six pieces at six hearths. It has not marched. It drills, and it grumbles, and it is there.",
-			"band": "Every year on the day the Yellow Bell was hung, eleven companies come in to the Pear Garden from six hearths without a spear among them, and sing. It can be heard at the sect. People who mean the land harm are said to have come to listen, and gone home thoughtful.",
+			"band": "Every year on the day the Yellow Bell was hung, the companies come in to the Pear Garden from six hearths without a spear among them, and sing. It can be heard at the sect. People who mean the land harm are said to have come to listen, and gone home thoughtful.",
 		}},
 	# ---- Part XXIV (the Lost Horse release): three questions asked after losing, each of which changes the
 	# shape of a country (marks.gd: what the answer leaves standing is walked up to)
@@ -1157,6 +1157,42 @@ const CROSSROADS := {
 			"breed": "On the frontier every tent has a horse of the black one's line, and at the foot of each stud book: so far.",
 		}},
 	# ---- Part XXV (the Three Burrows release): a town's debts, a town's gate, and whose name is over its hall
+	# ---- Part XXVI (the Underclothes release): what becomes of the book of a physician who was put in chains for it
+	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
+		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
+		"options": [
+			{"id": "copy", "label": "Copy it out for every counter of the post", "tilt": {"craft": 3, "reach": 2}, "gain": {"renown": 6},
+				"desc": "A copy on the counter of every post office in the land, for whoever can read and wants to. Some hands will be clumsy and some will be wicked, and a great many will be a grandmother's at midnight with nobody else to ask (renown).",
+				"log": "Had the Blue Bag Book copied out for every counter of the post."},
+			{"id": "keep", "label": "Keep it at the Hall of the Broom, for whoever sweeps", "tilt": {"craft": -2, "reach": -3}, "gain": {"hearth": {"valley": 3}},
+				"desc": "One copy, in Guiyun, where it can be watched over. Whoever wants it must come and sweep the street a season, and then sit with it and be taught it by somebody who knows. Slower and safer, and one fire away from ashes (the regard of the Rice Hearth).",
+				"log": "Kept the Blue Bag Book at the Hall of the Broom, for whoever sweeps."},
+			{"id": "burn", "label": "Let her burn it", "tilt": {"heart": 3, "craft": -2}, "gain": {"renown": 2},
+				"desc": "As she said: what did it do for him? Let what he knows stay in him, and pass from hand to hand the old way, from somebody to somebody. No physician will be put in chains for a page again. A great deal will be lost (a little renown).",
+				"log": "Let the jailer's wife burn the Blue Bag Book."},
+		],
+		"after": {
+			"copy": [["Hua Tuo", "Every counter of the post. Some fool in a river town will read the page on the knife and try it on his brother. And some grandmother will read the page on the frolics and still be going to the well at ninety. I have done the sum all night. It comes out on the grandmother's side."], ["Narrator", "Mistress Wu puts the book into Lin Feng's hands, and then, after a moment, puts her own hand flat on the cover, as if to keep it warm."]],
+			"keep": [["Hua Tuo", "A street to sweep first. Good. Anybody who will sweep a street for a season to learn how to set a bone is somebody I should have liked to teach. It will be slow. Medicine is slow. Only sickness is in a hurry."], ["Narrator", "The book goes up the mountain in its blue bag on Yue Ling's back. At Guiyun the steward clears a shelf for it, and then a room, and then, without being asked, enters it in the accounts as the most valuable thing the town owns."]],
+			"burn": [["Narrator", "The blue bag goes into the brazier first, and then the book, a handful of pages at a time. Hua Tuo watches from the step. When the page on the frolics goes in he says, quite quietly, the tiger, the deer, the bear, the ape, the bird, and that is all."], ["Mistress Wu, the Jailer's Wife", "He is not angry. That is the worst of it. He says he will have to teach it all again, to people, one at a time, the old way. He says it as if it were good news."]],
+		},
+		"echo": {
+			"done:s_p26_herbs": {
+				"copy": [["Hua Tuo", "One of them has a copy already: it came to the counter at Longmen, and she read the page on the needle on the boat. She has it wrong in three places. I am delighted. Nobody gets anything wrong that they have not read."]],
+				"keep": [["Hua Tuo", "They asked where the book was. I said: at Guiyun, behind a broom. One of them went straight there and is sweeping. The other two are staying here, to see whether I am worth the sweeping."]],
+				"burn": [["Hua Tuo", "They asked where the book was. I said: in me, and now in you, a little. It is a smaller book than it was. It is the only kind that has never been taken off anybody at a gate."]],
+			},
+			"s_p26_end": {
+				"copy": [["Elder Qing Xuan", "There is a copy of a physician's book on the post counter in Qingshi, they tell me, with a stone on it against the wind. The postmaster says it is the most borrowed thing he has ever had on the counter, and the only one ever brought back."]],
+				"keep": [["Elder Qing Xuan", "And the book is at Guiyun, behind a broom. Good. A thing that must be swept for is a thing that will be read properly. I have nine hundred years of scriptures here that nobody ever had to sweep for, and you see what they taught me about sitting."]],
+				"burn": [["Elder Qing Xuan", "I hear the book was burned, and that he did not mind. I mind, a little. But I am a librarian's son, and I have also seen what a book can be made to say by somebody who has only read it. Let it be taught, then, the old way."]],
+			},
+		},
+		"end": {
+			"copy": "On the counter of every post office in the land there is a book in a blue bag, held down with a stone against the wind, and it is the most borrowed thing in any town.",
+			"keep": "At Guiyun there is a room with a book in a blue bag in it, and a broom by the door, and anybody who has swept the street a season may come and sit with it.",
+			"burn": "Hua Tuo's book was burned at the door of a jail, and everything in it is taught still, by somebody to somebody, in the old way, and nobody has ever been put in chains for a page.",
+		}},
 	"the_tallies": {"step": "s_p25_tally", "part": "XXV", "n": "The tallies of Guiyun",
 		"ask": "Every household of Guiyun owes the chest for seed, timber and its first winter. The Great Rat kept the tallies better than the town did, and now they lie in a basket in the square with everybody looking at them. What is to be done with the debts?",
 		"options": [
@@ -1176,6 +1212,12 @@ const CROSSROADS := {
 			"shares": [["Feng Xuan", "A mill. Their debt, going round. Forty years of books, and I never once thought to make a thing out of a sum. It is neither mercy nor rigour. It is carpentry. I shall want a new kind of column."], ["Narrator", "The half-tallies are nailed in a row along the mill-house wall before there is a mill-house. Children learn their own family's notches by counting from the left."]],
 		},
 		"echo": {
+			# Part XXVI (the Underclothes release)
+			"s_p26_book": {
+				"burn": [["Yue Ling", "You burned the tallies of Guiyun once, in the square, and it was a better fire than anybody expected. This is a different fire, Lin Feng. A tally is a debt. This is a cure."]],
+				"collect": [["Yue Ling", "You collected the tallies of Guiyun to the notch. Everything owed, everything paid. She is asking you whether a cure can be owed too."]],
+				"shares": [["Yue Ling", "You turned the tallies of Guiyun into a mill, once: neither burned nor called in. Perhaps there is a third thing to do with a book, too."]],
+			},
 			"done:s_p25_town": {
 				"burn": [["Feng Xuan", "One thing more, for the books. Eleven households have paid what they owed. Nobody asked; the tallies are ash. They left it on my table at night, in grain, with no name. I have had to open a column for it. I have called it: the other half."]],
 				"collect": [["Feng Xuan", "One thing more, for the books. The chest is full. They pay on the day, to the grain, and wait while I count. Nobody has asked me in to tea since the harvest. I had not known that I should miss being asked."]],
@@ -1211,6 +1253,12 @@ const CROSSROADS := {
 			"sweep": [["Feng Xuan", "A broom. Naturally. I ought to have known what you would hang over a gate. I shall order forty, and find somebody to make more."], ["Narrator", "By the first frost the street of Guiyun is the cleanest road in the Unbroken Land, swept twice a day by tea-pickers, two shades, a family with wings, and one very old cock-crower who will not be told that it is not his turn."]],
 		},
 		"echo": {
+			# Part XXVI (the Underclothes release)
+			"done:s_p26_dawn": {
+				"all": [["Wu Pu", "And at Guiyun, they tell me, the two shades on the wall do the bird at midnight, where nobody can see them, because the gate says whoever knocks and they did not like to knock on the morning."]],
+				"hearth": [["Wu Pu", "And at Guiyun every hearth that answered for a family sends somebody to the square at dawn, so as not to be outdone by the other five. It is the best-attended frolic in the land, and the most competitive."]],
+				"sweep": [["Wu Pu", "And at Guiyun they sweep the street first, and then do the bear with the brooms still in their hands. The master says it is the first improvement anybody has made to his frolics in forty years."]],
+			},
 			"done:s_p25_rogues": {
 				"all": [["Feng Xuan", "As for these: the gate says whoever knocks. They did not knock. They came over the wall. I have told them to go out and come in again properly, and they are standing in a line."]],
 				"hearth": [["Feng Xuan", "As for these: who will answer for them? ...I shall. Do not look at me so. I stood at a lord's gate once with a sword and no fish, and nobody spoke for me. I am a hearth of one."]],
@@ -1243,12 +1291,18 @@ const CROSSROADS := {
 		"after": {
 			"found": [["Narrator", "The board is cut that night from a plank of persimmon. THE RETURNING CLOUD. The paint is still wet when the first of the three hundred takes off his pine-green coat, folds it, and asks where the brooms are kept."], ["Feng Xuan", "A sect with no history. I shall begin one. Volume one, page one: on the first day the founder was asked what the first lesson was, and pointed at the street."]],
 			"take": [["Narrator", "Three hundred kneel in the rain, all to the same depth. It is done in a breath. Lin Feng stands before them holding four tablets of black lacquer and feels the weight of each. None of them is heavy. That is the worst of it."], ["Yue Ling", "They did not look up. Not one. Lin Feng, they would have knelt to anybody who came down that mountain. I do not think they have seen yet who it was."]],
-			"serve": [["Narrator", "A disciple is sent up the nine hundred and ninety-nine steps for a board, and comes down with the oldest the sect has: grey, split, taken off a gate two rebuildings ago. The Elder has sent no message with it. He has only had it dusted."], ["Feng Xuan", "A branch hall. Then there is somebody over you still, and my accounts go up the mountain once a year to be looked at. I find I do not mind. I was never easy keeping the books of somebody nobody could ask."]],
+			"serve": [["Narrator", "A disciple is sent up the nine hundred and ninety-nine steps for a board, and comes down with the oldest the sect has: black, split, taken off a gate two rebuildings ago. The Elder has sent no message with it. He has only had it dusted."], ["Feng Xuan", "A branch hall. Then there is somebody over you still, and my accounts go up the mountain once a year to be looked at. I find I do not mind. I was never easy keeping the books of somebody nobody could ask."]],
 		},
 		"echo": {
+			# Part XXVI (the Underclothes release)
+			"s_p26_end": {
+				"found": [["Elder Qing Xuan", "And at the Returning Cloud they do the frolics before the first lesson, I hear, in the street. A sect of yours that begins by getting up. I wish I had thought of it nine hundred years ago."]],
+				"take": [["Elder Qing Xuan", "And on Frostpeak, I hear, three hundred who stood in the snow for sixty years are being taught to look behind them like a deer. Han Song comes out of the gatehouse to watch. He says nothing. He has started doing the bear."]],
+				"serve": [["Elder Qing Xuan", "And your hall at Guiyun sends its children up the steps to us in the spring, and this spring they did the frolics in our courtyard before they had put their bedding down. I watched from the window. I did the bird."]],
+			},
 			"done:s_p25_hermits": {
 				"found": [["Feng Xuan", "One of them asked what the Returning Cloud teaches. I said: we have not found out. He said it was the first honest answer he had had from a sect, and unpacked."]],
-				"take": [["Feng Xuan", "One of them looked at the three hundred drilling in the square and asked whose they were. I said: the Patriarch's. He asked where the Patriarch was. I pointed at you. He looked for some time."]],
+				"take": [["Feng Xuan", "One of them asked whose the three hundred drilling on Frostpeak were. I said: the Patriarch's. He asked where the Patriarch was. I pointed at you. He looked for some time."]],
 				"serve": [["Feng Xuan", "One of them was a disciple of the Azure Cloud forty years ago, and left over a quarrel about a broom. He has read the board over the door twice. He says he will stay until he has won the quarrel."]],
 			},
 			"s_p25_end": {
@@ -1274,7 +1328,8 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_voices", "the_kites", "the_tops",
 	"the_clay", "the_lute", "the_host",
 	"the_tide", "the_ape", "the_horse",
-	"the_tallies", "the_door", "the_seat"]
+	"the_tallies", "the_door", "the_seat",
+	"the_book"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

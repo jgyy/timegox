@@ -576,6 +576,11 @@ static func use(e: Dictionary, g) -> Array:
 			g.heal_full()
 			# after dark a bed is a night's sleep (clock.gd): he wakes at six with the cocks crowing
 			if Clock.sleep(g):
+				# (the Underclothes release: the hours slept are not then charged to the body as hours awake,
+				# survival.gd: a night's own small thirst and hunger, as under the sky)
+				if Needs.on(g):
+					g.needs_clock = float(g.clock) + float(g.day) * 1440.0
+					Needs.give(g, {"hunger": -18.0, "thirst": -20.0, "bladder": -30.0})
 				out.append("Slept the night through: woke at the Hour of the Rabbit, health and qi restored")
 			else:
 				out.append("Slept: health and qi restored")
@@ -606,7 +611,10 @@ static func use(e: Dictionary, g) -> Array:
 				out.append("Found %d spirit stones" % st)
 	var kind := str(e.prop)
 	# the Hollow Hills release: a thing of the caves done while the story asks for them (Part XX)
-	if CaveThings.KINDS.has(kind):
+	# (the Underclothes release: and a thing of the open land that a "try" step names, the hot spring
+	# of Part XXVI; it used to count only the things of the caves, and the step could never be done)
+	var cs: Dictionary = g.cur_step() if g.has_method("cur_step") else {}
+	if CaveThings.KINDS.has(kind) or (str(cs.get("kind", "")) == "try" and kind in cs.get("things", [])):
 		g.step_uses[kind] = true
 		g.poll_steps()
 	# with Yue Ling there: a wish of hers granted, and a little closer for doing it together (bonds.gd)

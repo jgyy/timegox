@@ -196,6 +196,15 @@ const MARKS := {
 	},
 	# ---- Part XXV (the Three Burrows release): the three answers that made Guiyun what it is, on the mountain
 	# round it (and one on Frostpeak)
+	# Part XXVI (the Underclothes release): what becomes of the Blue Bag Book
+	"the_book": {
+		"copy": {"area": "village", "m": ["board", PAPER], "k": 2, "n": "The Book on the Counter", "desc": "A board under a little roof beside the road, with pages of Hua Tuo's book pasted to it under oiled paper: the five frolics drawn in five strokes each, the place for the needle in a headache, how to set a wrist. Somebody has written beside the page on the knife, in another hand: ask first.",
+			"who": ["Granny Lou the Bonesetter", "folk_grandma", Color("8a7a6a"), "I set my grandson's wrist by the page on the left, at midnight, with nobody else to ask. It has healed straight. I come and read the page on the right every morning so that I shall be ready for whatever he breaks next.", "People say a book of physic in every town is a danger. I say they have never been alone with a child screaming and a page to read by the lamp."]},
+		"keep": {"area": "mountain", "near": Hold.AT + Vector2i(14, 9), "m": ["shrine"], "n": "The Shelf of the Blue Bag Book", "desc": "A little roofed stand by the Hall of the Broom with a book in a blue bag on it, a broom leaning against one post and a bench in front. Whoever has swept the street of Guiyun for a season may sit on the bench and read, and somebody who knows will come and sit beside them.",
+			"who": ["Novice Tang of the Hall of the Broom", "folk_youth", Color("6a8aa8"), "I swept for a season to be allowed to sit here. I thought it was a test. It was not. By the end of the season I knew where every crack in the street was, and that is the first thing the book says: know the ground before you touch it.", "I have read as far as the bear. I am not allowed to read the page on the knife until somebody has watched me set a bone. That is fair. I would not let me either."]},
+		"burn": {"area": "millet", "m": ["fire", false], "n": "The Brazier at the Jail Door", "desc": "A ring of stones on the plain where the camp of Wei stood, with the ash of a book in it that nobody has swept away. The jail is gone. Herbalists come past on their way to somewhere and stand here a moment, as at a grave, and then go on, and teach somebody something.",
+			"who": ["Old Turnkey Wu", "folk_grandpa", Color("6a5a4a"), "I would not take the book. The law said whoever kept a prisoner's writing was a party to his crime. So I said no, through the bars, and my wife said yes, and then she burned it. Between us we did the worst thing either of us could have done alone.", "He forgave us both before the ashes were cold. I have not forgiven myself. That is the difference between a physician and a turnkey."]},
+	},
 	"the_tallies": {
 		"burn": {"area": "mountain", "near": Hold.AT + Vector2i(-5, 4), "m": ["fire", false], "n": "Where the Tallies Burned", "desc": "A ring of stones with wet ash in it, a stone's throw from the town, swept round and left. Every debt of Guiyun's first winter went up here in a basket. Nobody has built on the place. In the ash, some mornings, there is a handful of millet that was not there the night before.",
 			"who": ["Old Mother Qiu", "folk_grandma", Color("8a6a5a"), "I said it was a waste of good bamboo. I say it still. I come and say it to the ashes every morning, so that they do not think themselves too fine.", "My tally was the longest in the basket. Nine notches. I had counted on being in debt to somebody till I died; it is a kind of company. Now I owe nobody, and I have had to make friends."]},
@@ -210,7 +219,7 @@ const MARKS := {
 	"the_seat": {
 		"found": {"area": "mountain", "near": Hold.AT + Vector2i(16, 4), "m": ["gate", true, Color("d8d0c0")], "n": "The Gate of the Returning Cloud", "desc": "Two posts and a lintel of new timber on the path above the town, with a lantern on each and a line of washing between: the gate of a sect that has no wall yet to put it in. Three hundred pine-green coats were folded and left here in one night. Most were collected. A few are still on the line, bleaching.",
 			"who": ["First Disciple Ren", "folk_youth", Color("d8d0c0"), "I was eleven years in the Cold Pine and never once asked a question. Here I asked where the brooms were, and somebody told me. It was like being handed a cup of water.", "The founder says the first lesson is a street. I have swept it four hundred times. I think the second lesson is also the street. I have not asked. I am saving the question."]},
-		"take": {"area": "frost", "m": ["posts", 7], "k": 3, "n": "The Kneeling Ground of the Cold Pine", "desc": "A ring of practice stakes in the snow below Frostpeak, each worn smooth at the height of a man's hands. Three hundred stand here at dawn, as they have for sixty years, and face south now, toward a town they have never seen, where the Patriarch is. The snow inside the ring is trodden to ice. Nobody has yet thought to sweep it."},
+		"take": {"area": "frost", "m": ["posts", 7], "k": 3, "n": "The Kneeling Ground of the Cold Pine", "desc": "A ring of practice stakes in the snow below Frostpeak, each worn smooth at the height of a man's hands. Three hundred stand here at dawn, as they have for sixty years, and face south now, toward the town at whose gate they knelt, where the Patriarch is. The snow inside the ring is trodden to ice. Nobody has yet thought to sweep it."},
 		"serve": {"area": "mountain", "near": Hold.AT + Vector2i(16, 4), "m": ["board", Color("2a2a2a")], "n": "The Board of the First Gate", "desc": "A board under a little roof where the path from Guiyun meets the nine hundred and ninety-nine steps: black, split with age, and across it in one stroke of white the character for cloud, as the sect's founder wrote it. It hung over the first gate. The Elder had it dusted and sent down, and has not spoken of it."},
 	},
 }
@@ -314,7 +323,12 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## them ever stands), and an answer that is several things stands in a row where there is room for
 ## one (every other tile, so the row can be walked through).  A seeded draw, so the same every time;
 ## added to `ents`.
-static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary) -> void:
+## The crossroads of a later release whose marks are stood after the late bands of an older one
+## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
+## ground a band of an older map stood on, and the band would move.
+const AFTER_BANDS := ["the_book"]
+
+static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
 	for e in ents:
 		for et in (e.tiles if e.kind == "seal" else ([e.pos] if e.has("pos") else [])):
@@ -333,10 +347,12 @@ static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray,
 		var area: String = ids[k]
 		var want: Array = []
 		# (the signs of the scales first: one of each in every region, whatever else is crowded out)
-		if area != Atlas.HUB:
+		if area != Atlas.HUB and not after_bands:
 			for sc in Echoes.SCALE_ORDER:
 				want.append({"id": "sign:%s:%s" % [area, sc], "scale": sc, "k": 1, "who": []})
 		for cid in Echoes.ORDER:
+			if AFTER_BANDS.has(cid) != after_bands:
+				continue
 			var st := sites(cid)
 			if st.has(area):
 				var who: Array = []
