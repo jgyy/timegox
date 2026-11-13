@@ -429,10 +429,14 @@ static func record(g, st: Dictionary, given: Dictionary) -> void:
 		g.war_orders[o] = int(g.war_orders.get(o, 0)) + int(given[o])
 	var id := str(st.id)
 	if str(st.over) == "won":
-		if not g.war_won.has(id) or int(st.drum) < int(g.war_won[id]):
+		# (the Answering Land release: a field is renown the first time it is held; a drill fought again and
+		# again used to pay it every time, without end)
+		var first: bool = not g.war_won.has(id)
+		if first or int(st.drum) < int(g.war_won[id]):
 			g.war_won[id] = int(st.drum)
 		g.note("Held the field: %s, in %d drums" % [str(BATTLES[id].n), int(st.drum)])
-		g.add_renown(4 if bool(BATTLES[id].story) else 2)
+		if first:
+			g.add_renown(4 if bool(BATTLES[id].story) else 2)
 	else:
 		g.war_lost += 1
 		g.war_tries[id] = int(g.war_tries.get(id, 0)) + 1

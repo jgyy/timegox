@@ -109,7 +109,7 @@ const OUTINGS := {
 			["quiet", "quiet", "Find her hand in the dark. Say nothing.", "...There. Good. You did not ask if I was all right. Everybody asks. Then one has to be."]]},
 	"market": {"n": "Through the market", "where": "town_day", "hint": "In a town, by day.",
 		"lines": [["Narrator", "A street of stalls, and Yue Ling going down it like a magistrate. She has picked up, weighed and put down a melon, a bolt of blue cloth and somebody's baby. The baby has been pronounced sound."],
-			["Yue Ling", "I never want any of it. I only like that it is here, and that they shout. Nine hundred years by a pond, Lin Feng. Nobody shouts by a pond. Buy something. Anything. I want to watch you haggle."]],
+			["Yue Ling", "I never want any of it. I only like that it is here, and that they shout. Three hundred years by a pond, Lin Feng. Nobody shouts by a pond. Buy something. Anything. I want to watch you haggle."]],
 		"options": [["tender", "tender", "Buy the blue cloth. Give it to her.", "You paid what he asked. You did not haggle at all; you only looked at me and paid. He will dine out on that for a month. ...It is the blue of the roofs at home. You saw me put it down slowly."],
 			["playful", "playful", "Haggle for the melon. Lose badly.", "He has sold you one melon for the price of four and thrown in a compliment to your wife. I am not your... he was not to know. Carry the melon. Carry it with dignity. Dearest."],
 			["quiet", "quiet", "Walk beside her and carry what she picks up.", "You have a melon, a cabbage and a goose, and you have not asked why. ...Neither have I. I think I only wanted to see my things in somebody's arms."]]},

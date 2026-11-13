@@ -196,6 +196,7 @@ const PICKUP_COLORS := {
 	"tally_stick": Color("c8b070"), "tiger_bill": Color("e8d060"), "pine_token": Color("2a3a34"),
 	"datura_flower": Color("f4f0e4"), "frolic_tablet": Color("8a8a80"), "whetstone": Color("6a6a70"), "silver_needle": Color("d8dce8"),
 	"tao_brick": Color("8a8a84"), "red_gauze": Color("d83a3a"), "scroll_case": Color("6a2a2a"), "pagoda_tile": Color("4a9a8a"),
+	"grass_knot": Color("9aa850"), "jade_ring": Color("f0f4ec"), "jiao_scale": Color("5a8a80"),
 	"bell_shard": Color("d8c060"), "tiger_tally": Color("c8a050"), "pitch_pipe": Color("c8d080"), "chu_banner": Color("c84a3a"), "clay_duck": Color("f0d040"),
 	"salt_bag": Color("e8e4dc"), "wind_knot": Color("9aa8b8"), "thrown_letter": Color("f0e8d0"), "merit_slip": Color("d8ecd8"),
 	# Part XX: stone-milk, a basket of the mountain, a miner's lamp, a rubbing from a cave wall

@@ -259,10 +259,18 @@ static func fetch(g, id: String) -> int:
 
 # ---------------------------------------------------------------- buying, selling, the pouch
 ## What a pedlar gives for everything of the land's goods on his back: [stones, pieces].
+## (the Answering Land release: what the step in hand asks him to carry to somebody is not for sale. Eight sacks of
+## charcoal could be sold to a pedlar in one word, and the story then waited for ever for charcoal nobody makes.)
+static func for_sale(g, id: String) -> bool:
+	var s: Dictionary = g.cur_step()
+	return not (not s.is_empty() and str(s.kind) == "haul" and str(s.get("good", "")) == id)
+
 static func sale(g) -> Array:
 	var st := 0
 	var n := 0
 	for id in GOOD_ORDER:
+		if not for_sale(g, id):
+			continue
 		var c := carried(g, id)
 		st += c * int(GOODS[id].sell)
 		n += c
@@ -271,7 +279,7 @@ static func sale(g) -> Array:
 static func sell_all(g) -> Array:
 	var s := sale(g)
 	for id in GOOD_ORDER:
-		if carried(g, id) > 0:
+		if carried(g, id) > 0 and for_sale(g, id):
 			g.inv[id] = 0
 	g.stones += int(s[0])
 	g.sold += int(s[1])

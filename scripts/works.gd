@@ -42,7 +42,7 @@ const SCHOOLS := {
 const SCHOOL_ORDER := ["hand", "wheel", "dao"]
 const TIERS := 6
 ## what each tier costs: know-how, and spirit stones
-const TIER_KNOW := [6, 16, 32, 56, 90, 142]
+const TIER_KNOW := [6, 16, 32, 56, 90, 148]
 const TIER_STONES := [60, 500, 3000, 15000, 60000, 150000]
 ## the story step each tier waits for (the first is there from the first hunt)
 const TIER_AFTER := ["s_hunt1", "s_p3_home", "s_p5_home", "s_p9_home", "s_p13_home", "s_p17_home"]
@@ -246,7 +246,8 @@ static func add(g, key: String) -> float:
 
 ## What a pill costs with the works that stand (Data.pill_price is the price without them).
 static func pill_price(g, kind: String, level: int) -> int:
-	return maxi(1, int(round(Data.pill_price(kind, level) * mod(g, "price"))))
+	# (the Answering Land release, weal.gd: and with how the sect stands, whose counters these are)
+	return maxi(1, int(round(Data.pill_price(kind, level) * mod(g, "price") * Weal.mod(g, "sect", "price"))))
 
 ## What the next tempering of the sword costs.
 static func temper_cost(g) -> int:

@@ -40,10 +40,15 @@ const FEATS := {
 	# the Underclothes release: the last realm, and the frolics, the knife and the book (Part XXVI)
 	"room_blade": {"n": "Room and More for the Blade", "kind": "road", "pts": 20, "test": ["level", 93], "desc": "Reach Room for the Blade."},
 	# the Heavy Road release: the last realm, the timber, the cart and the sack (Part XXVII), and what a back is for
-	"sumeru_seed": {"n": "A Mountain in a Seed", "kind": "road", "pts": 20, "test": ["level", 96], "desc": "Reach Sumeru in a Seed: the last realm there is."},
+	"sumeru_seed": {"n": "A Mountain in a Seed", "kind": "road", "pts": 20, "test": ["level", 96], "desc": "Reach Sumeru in a Seed."},
 	"eight_stems": {"n": "Butts to the East", "kind": "road", "pts": 10, "test": ["step", "s_p27_timber"], "desc": "Carry eight stems of timber to Tao Kan on your own back."},
 	"thousand_jin": {"n": "A Thousand Jin, and Half a Bolt of Gauze", "kind": "road", "pts": 10, "test": ["step", "s_p27_buyer"], "desc": "Go up the south slope after an old man's cart."},
 	"set_down": {"n": "What Comes After", "kind": "road", "pts": 10, "test": ["step", "s_p27_sack"], "desc": "Say what is to be done with the sack."},
+	# the Answering Land release: the last realm, the grass, the rings and the third scourge (Part XXVIII)
+	"rings_returned": {"n": "Four Rings in a Beak", "kind": "road", "pts": 20, "test": ["level", 99], "desc": "Reach Rings Returned: the last realm there is."},
+	"knotted_grass": {"n": "Over a Weed", "kind": "road", "pts": 10, "test": ["step", "s_p28_duhui"], "desc": "See the man who cannot be thrown go down."},
+	"third_scourge": {"n": "There Were Three", "kind": "road", "pts": 10, "test": ["step", "s_p28_third"], "desc": "Stand in front of the third scourge, who asked."},
+	"what_is_owed": {"n": "What Is Owed", "kind": "road", "pts": 10, "test": ["step", "s_p28_knot"], "desc": "Answer the old man in the grass."},
 	"five_frolics": {"n": "The Tiger, the Deer, the Bear, the Ape and the Bird", "kind": "road", "pts": 10, "test": ["step", "s_p26_tablets"], "desc": "Find the five frolics on the heights round Qingshi."},
 	"whole_ox": {"n": "Never Again a Whole Ox", "kind": "road", "pts": 10, "test": ["step", "s_p26_ox"], "desc": "Go where the gaps are, on the height above Tushan."},
 	"blue_bag": {"n": "The Blue Bag Book", "kind": "road", "pts": 10, "test": ["step", "s_p26_book"], "desc": "Say what becomes of Hua Tuo's book."},
@@ -96,7 +101,7 @@ const FEATS := {
 	"kin_all": {"n": "Six Fires", "kind": "people", "pts": 20, "test": ["kin", 6], "desc": "Be called kin at all six hearths."},
 	"friends": {"n": "The Peoples of the Realms", "kind": "people", "pts": 10, "test": ["races", 6], "desc": "Be a friend to six peoples of the realms."},
 	"deeds_ten": {"n": "Ten Deeds", "kind": "people", "pts": 5, "test": ["deeds", 10], "desc": "Do ten deeds for the people of the towns."},
-	"deeds_all": {"n": "Nobody Left Wanting", "kind": "people", "pts": 20, "test": ["deeds", 27], "desc": "Do every deed anybody asks."},
+	"deeds_all": {"n": "Nobody Left Wanting", "kind": "people", "pts": 20, "test": ["deeds", 28], "desc": "Do every deed anybody asks."},
 	"renowned": {"n": "Whom the World Respects", "kind": "people", "pts": 10, "test": ["renown", 280], "desc": "Become Famed in the eyes of the world."},
 	"talker": {"n": "A Word with Everybody", "kind": "people", "pts": 5, "test": ["folk_talk", 40], "desc": "Speak with forty of the people of the towns and the road."},
 	"heart": {"n": "Kindred Spirit", "kind": "people", "pts": 10, "test": ["bond", 45], "desc": "Grow as close to Yue Ling as two people on one road can."},

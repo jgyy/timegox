@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -64,6 +64,18 @@ func _build() -> void:
 			labels.append(str(a.label))
 			ids.append("body:" + str(a.id))
 			enabled.append(bool(a.enabled))
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "land":
+		# weal.gd: the eleven towns, each with how it stands
+		labels = []
+		ids = []
+		enabled = []
+		for tid in Weal.ORDER:
+			labels.append("%s  (%s)" % [str(Weal.TOWNS[tid].n).trim_prefix("the "), str(Weal.STATES[Weal.state(Game, tid)].n).to_lower()])
+			ids.append("town:" + tid)
+			enabled.append(true)
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
@@ -206,7 +218,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -279,7 +291,7 @@ func press(act: String) -> void:
 				"store":
 					main.pop()
 					main.offer_store()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -393,6 +405,53 @@ func _draw_bestiary() -> void:
 		UI.wrapped(self, r.position + Vector2(24, ty), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
+
+## The Land (weal.gd): how each town stands, its three measures, and everything he chose or did that it felt.
+func _draw_land() -> void:
+	UI.text(self, Vector2(60, 70), "The Land", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.wrapped(self, r.position + Vector2(24, 36), main.told(Weal.summary(Game) + " What he chose at the crossroads and did in their streets is weighed town by town: plenty, peace, and what they think of him."), 14, UI.C_DIM.lightened(0.3), r.size.x - 48)
+	var id := str(ids[clampi(cursor, 0, ids.size() - 1)])
+	if not id.begins_with("town:"):
+		return
+	var tid := id.trim_prefix("town:")
+	var st := Weal.state(Game, tid)
+	var col: Color = Weal.STATES[st].col
+	UI.text(self, r.position + Vector2(24, 104), str(Weal.TOWNS[tid].n).trim_prefix("the "), 24, UI.C_GOLD)
+	UI.text(self, r.position + Vector2(420, 102), str(Weal.STATES[st].n), 22, col)
+	UI.wrapped(self, r.position + Vector2(24, 126), str(Weal.STATES[st].desc), 15, UI.C_TEXT, r.size.x - 48)
+	var y := r.position.y + 196.0
+	for m in Weal.MEASURES:
+		var v := Weal.measure(Game, tid, m)
+		UI.text(self, Vector2(r.position.x + 24, y + 12), str(Weal.MEASURE_NAMES[m]), 16, UI.C_TEXT)
+		# a bar from the middle: to the right what is good, to the left what is not
+		var mid := r.position.x + 330.0
+		UI.panel(self, Rect2(mid - 180.0, y, 360.0, 14.0), Color(0.1, 0.12, 0.18, 0.9), UI.C_BORDER)
+		var w := 180.0 * float(absi(v)) / float(Weal.CAP)
+		if v > 0:
+			draw_rect(Rect2(mid, y + 2.0, w, 10.0), UI.C_JADE)
+		elif v < 0:
+			draw_rect(Rect2(mid - w, y + 2.0, w, 10.0), UI.C_RED)
+		draw_rect(Rect2(mid - 1.0, y - 2.0, 2.0, 18.0), UI.C_DIM)
+		UI.text(self, Vector2(mid + 200.0, y + 12), "%+d" % v, 16, UI.C_JADE if v > 0 else (UI.C_RED if v < 0 else UI.C_DIM))
+		y += 30.0
+	y += 14.0
+	UI.text(self, Vector2(r.position.x + 24, y), "Why", 17, UI.C_GOLD)
+	y += 8.0
+	var cs := Weal.causes(Game, tid)
+	if cs.is_empty():
+		UI.wrapped(self, Vector2(r.position.x + 24, y + 18.0), "Nothing he has done has reached here yet.", 14, UI.C_DIM, r.size.x - 48)
+	for i in mini(cs.size(), 9):
+		var c: Dictionary = cs[i]
+		var good: bool = int(c.d) > 0
+		UI.text(self, Vector2(r.position.x + 24, y + 20.0), "%s %+d" % [str(Weal.MEASURE_NAMES[str(c.m)]).to_lower(), int(c.d)], 14, UI.C_JADE if good else UI.C_RED)
+		UI.text(self, Vector2(r.position.x + 130, y + 20.0), main.told(str(c.why)), 14, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 160)
+		y += 24.0
+	if cs.size() > 9:
+		UI.text(self, Vector2(r.position.x + 24, y + 20.0), "and %d things more" % (cs.size() - 9), 13, UI.C_DIM)
+	UI.wrapped(self, Vector2(r.position.x + 24, r.end.y - 44.0), "Whoever answers for a town will tell you how it stands, and its chest takes gifts. A shift worked, the post carried, an errand run and a road cleared are all felt; so is a jar broken and not paid for.", 13, UI.C_DIM, r.size.x - 48)
 
 ## The Load (load.gd): what is on his back in jin, how much of what he can bear it is and what that
 ## costs, what he bears it with, and how far he has carried things.
@@ -1210,6 +1269,9 @@ func _draw() -> void:
 		return
 	if mode == "load":
 		_draw_load()
+		return
+	if mode == "land":
+		_draw_land()
 		return
 	if mode == "body":
 		_draw_body()

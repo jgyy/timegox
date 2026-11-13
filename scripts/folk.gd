@@ -32,21 +32,21 @@ const TOWNS := {
 	"sect": {"n": "the Azure Cloud Sect", "area": "sect", "at": Vector2i(20, 12), "race": "human",
 		"roles": {"disciple": 10, "servant": 2, "lamplighter": 1, "watchman": 1}},
 	"cloudfoot": {"n": "Cloudfoot", "area": "mountain", "at": Vector2i(82, 34), "race": "human",
-		"roles": {"merchant": 4, "porter": 4, "farmer": 3, "child": 3, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "lamplighter": 1, "youth": 2, "scholar": 1}},
+		"roles": {"merchant": 4, "porter": 4, "farmer": 3, "child": 3, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "lamplighter": 1, "youth": 2, "scholar": 1, "waiter": 1, "huntsman": 1}},
 	"qingshi": {"n": "Qingshi Village", "area": "village", "at": Vector2i(30, 28), "race": "human",
-		"roles": {"farmer": 7, "child": 4, "elder": 3, "washer": 2, "fisher": 1, "monk": 1, "cook": 1, "youth": 2, "watchman": 1, "merchant": 2}},
+		"roles": {"farmer": 7, "child": 4, "elder": 3, "washer": 2, "fisher": 1, "monk": 1, "cook": 1, "youth": 2, "watchman": 1, "merchant": 2, "waiter": 1, "huntsman": 1}},
 	# the Thundering Pots release: Qingshi has grown a second quarter, east of Lao's farm, round the Drum Tower:
 	# the levy's barracks, the Hall of the Twelve Pipes, the tailor's, the Pear Garden stage and the kiln
 	"drumtower": {"n": "the Drum Tower quarter of Qingshi", "area": "village", "at": Vector2i(79, 19), "race": "human", "reach": 14,
 		"roles": {"soldier": 6, "musician": 4, "merchant": 3, "porter": 2, "child": 2, "elder": 2, "guard": 1, "watchman": 1, "lamplighter": 1, "cook": 1, "scholar": 1, "youth": 2}},
 	"yanggu": {"n": "Yanggu", "area": "yanggu", "at": Vector2i(34, 30), "race": "human",
-		"roles": {"merchant": 6, "porter": 3, "cook": 2, "child": 3, "elder": 2, "monk": 1, "guard": 2, "watchman": 1, "lamplighter": 2, "youth": 3, "scholar": 1, "washer": 2}},
+		"roles": {"merchant": 6, "porter": 3, "cook": 2, "child": 3, "elder": 2, "monk": 1, "guard": 2, "watchman": 1, "lamplighter": 2, "youth": 3, "scholar": 1, "washer": 2, "waiter": 2}},
 	"shazhou": {"n": "Shazhou Oasis", "area": "dunes", "at": Vector2i(12, 40), "race": "desert",
-		"roles": {"merchant": 4, "porter": 4, "child": 2, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "washer": 2}},
+		"roles": {"merchant": 4, "porter": 4, "child": 2, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "washer": 2, "waiter": 1}},
 	"longmen": {"n": "Longmen", "area": "longmen", "at": Vector2i(28, 30), "race": "human",
-		"roles": {"fisher": 6, "porter": 3, "merchant": 3, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "washer": 2}},
+		"roles": {"fisher": 6, "porter": 3, "merchant": 3, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "washer": 2, "waiter": 1}},
 	"tushan": {"n": "Tushan", "area": "tushan", "at": Vector2i(28, 28), "race": "human",
-		"roles": {"smith": 6, "merchant": 2, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "farmer": 2, "monk": 1}},
+		"roles": {"smith": 6, "merchant": 2, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "farmer": 2, "monk": 1, "waiter": 1, "huntsman": 1}},
 	"featherfall": {"n": "Featherfall", "area": "juntian", "at": Vector2i(38, 31), "race": "yumin",
 		"roles": {"merchant": 3, "youth": 4, "child": 3, "elder": 2, "scholar": 2, "watchman": 1, "cook": 1}},
 	"tearwater": {"n": "Tearwater", "area": "ninesprings", "at": Vector2i(38, 26), "race": "jiaoren",
@@ -54,7 +54,7 @@ const TOWNS := {
 	"youdu_city": {"n": "Youdu", "area": "youdu", "at": Vector2i(38, 30), "race": "shade", "night": true,
 		"roles": {"merchant": 4, "scholar": 3, "porter": 3, "elder": 2, "monk": 2, "guard": 2, "lamplighter": 2}},
 	"landfall": {"n": "Landfall", "area": "penglai", "at": Vector2i(40, 30), "race": "human",
-		"roles": {"fisher": 6, "washer": 3, "child": 4, "elder": 2, "merchant": 2, "youth": 2, "watchman": 1}},
+		"roles": {"fisher": 6, "washer": 3, "child": 4, "elder": 2, "merchant": 2, "youth": 2, "watchman": 1, "waiter": 1}},
 }
 
 ## The bodies of each people for each kind of person (art/characters/folk_*.py); a kind missing
@@ -71,7 +71,9 @@ const BODIES := {
 		"pedlar": ["folk_merchant", "folk_porter", "folk_shopwife"], "hunter": ["folk_guard", "folk_youth"], "pilgrim": ["folk_monk", "folk_grandma", "folk_scholar"],
 		"hermit": ["folk_grandpa", "folk_monk", "folk_scholar"],
 		# the levy and the players (the Thundering Pots release)
-		"soldier": ["folk_guard", "folk_youth", "folk_farmer", "folk_porter"], "musician": ["folk_scholar", "folk_maiden", "folk_youth", "folk_grandpa"]},
+		"soldier": ["folk_guard", "folk_youth", "folk_farmer", "folk_porter"], "musician": ["folk_scholar", "folk_maiden", "folk_youth", "folk_grandpa"],
+		# the Answering Land release
+		"waiter": ["folk_youth", "folk_maiden"], "huntsman": ["folk_guard", "folk_youth", "folk_farmer"]},
 	"desert": {"merchant": ["folk_nomad", "folk_shopwife"], "porter": ["folk_nomad", "folk_porter"], "guard": ["folk_guard", "folk_nomad"],
 		"child": ["folk_boy", "folk_girl"], "elder": ["folk_grandpa", "folk_grandma"], "cook": ["folk_cook"], "washer": ["folk_maiden", "folk_farmwife"],
 		"watchman": ["folk_nomad"], "_": ["folk_nomad"]},
@@ -87,14 +89,14 @@ const BODIES := {
 ## their clothes come in ([robe hues], [secondary hues], saturation, value): empty keeps the model's
 ## own colours (the sect's blue, a monk's grey, a guard's red).
 const ROLES := {
-	"farmer": {"day": [[5.3, "field", "hoe|dig", "hoe"], [11.3, "home", "in", ""], [12.8, "field", "gather|hoe", "hoe"], [17.3, "well", "drink|wash", "dipper"], [18.2, "home", "in", ""]],
+	"farmer": {"day": [[5.3, "field", "hoe|dig", "hoe"], [11.3, "home", "in", ""], [12.8, "field", "gather|hoe|reap", "hoe"], [17.3, "well", "drink|scrub|wash", "dipper"], [18.2, "home", "in", ""]],
 		"go_hold": "hoe", "dye": [[0.08, 0.1, 0.22, 0.28, 0.33], [0.06, 0.1, 0.55, 0.6], 0.35, 1.0]},
-	"fisher": {"day": [[4.8, "shore", "fish", "rod"], [10.6, "market", "call|offer|talk", "basket"], [13.2, "shore", "fish", "rod"], [18.0, "inn", "drink|laugh", "cup"], [19.6, "home", "in", ""]],
+	"fisher": {"day": [[4.8, "shore", "fish", "rod"], [10.6, "market", "flay|call|offer|weigh", "basket"], [13.2, "shore", "fish|sew", "rod"], [18.0, "inn", "drink|laugh", "cup"], [19.6, "home", "in", ""]],
 		"go_hold": "rod", "dye": [[0.52, 0.56, 0.6, 0.08], [0.1, 0.12, 0.58], 0.35, 1.0]},
-	"merchant": {"day": [[6.5, "market", "call|talk|offer|wave|count", ""], [11.9, "tea", "eat", "bowl"], [12.9, "market", "talk|call|point|think|count", ""], [18.3, "tea", "drink|laugh", "cup"], [20.5, "home", "in", ""]],
+	"merchant": {"day": [[6.5, "market", "arrange|call|weigh|offer|count|talk", ""], [11.9, "tea", "eat", "bowl"], [12.9, "market", "weigh|call|point|arrange|count|talk", ""], [18.3, "tea", "drink|laugh", "cup"], [20.5, "home", "in", ""]],
 		"dye": [[0.0, 0.97, 0.75, 0.6, 0.85, 0.05], [0.12, 0.55, 0.6, 0.0], 0.55, 1.0]},
 	"porter": {"day": [[5.7, "market", "lift", ""], [7.1, "gate", "lift", ""], [8.5, "market", "lift", ""], [9.9, "workshop", "lift", ""], [11.5, "inn", "eat", "bowl"],
-			[12.5, "gate", "lift", ""], [14.1, "market", "lift", ""], [15.7, "gate", "lift", ""], [17.3, "inn", "sit_bench|drink", "cup"], [19.0, "home", "in", ""]],
+			[12.5, "gate", "lift", ""], [14.1, "market", "lift", ""], [15.7, "gate", "lift", ""], [16.9, "bath", "scrub|wash", "cloth"], [17.8, "inn", "sit_bench|drink", "cup"], [19.0, "home", "in", ""]],
 		"walk": "carry", "go_hold": "pole", "dye": [[0.08, 0.1, 0.12, 0.55], [0.06, 0.08], 0.3, 1.0]},
 	"child": {"day": [[7.1, "school", "read", "book"], [11.1, "home", "in", ""], [13.1, "square", "dance|clap|laugh", ""], [15.8, "field", "kite|clap|dance", ""], [18.0, "home", "in", ""]],
 		"walk": "run", "dye": [[0.0, 0.08, 0.15, 0.3, 0.55, 0.62, 0.9], [0.12, 0.15, 0.95], 0.6, 1.05]},
@@ -106,20 +108,20 @@ const ROLES := {
 	"watchman": {"day": [[5.1, "home", "in", ""], [18.7, "patrol", "bang|call", "gong"]], "round": "patrol", "go_hold": "lantern", "dye": []},
 	"scholar": {"day": [[6.7, "school", "read|write", "book"], [11.7, "tea", "eat", "bowl"], [12.9, "square", "write|read|think", "book"], [17.4, "tea", "drink|play_flute", "cup"], [20.3, "home", "in", ""]],
 		"dye": [[0.58, 0.62, 0.66, 0.5], [0.6, 0.62, 0.0], 0.35, 1.0]},
-	"cook": {"day": [[5.1, "kitchen", "stir|chop|pound", "ladle"], [10.4, "market", "call|offer", "basket"], [11.4, "kitchen", "stir|pour", "ladle"], [15.0, "kitchen", "chop|stir", "axe"], [21.3, "home", "in", ""]],
+	"cook": {"day": [[5.1, "kitchen", "knead|fan|stir|chop|pound", "ladle"], [10.4, "market", "weigh|call|offer", "basket"], [11.4, "kitchen", "stir|serve|pour|fan", "ladle"], [15.0, "kitchen", "chop|knead|stir|flay", "axe"], [21.3, "home", "in", ""]],
 		"dye": []},
-	"washer": {"day": [[6.3, "shore", "gather", ""], [9.5, "home", "in", ""], [10.7, "square", "weave|toss", ""], [13.4, "shore", "gather", ""], [16.4, "market", "talk|laugh", "basket"], [18.3, "home", "in", ""]],
+	"washer": {"day": [[6.3, "shore", "wash|wring|gather", "cloth"], [9.5, "home", "in", ""], [10.7, "square", "hang|sew|weave", ""], [13.4, "shore", "wash|wring|scrub", "cloth"], [16.4, "market", "talk|laugh", "basket"], [18.3, "home", "in", ""]],
 		"go_hold": "basket", "dye": [[0.0, 0.05, 0.85, 0.92, 0.3, 0.55], [0.55, 0.6, 0.1], 0.45, 1.05]},
-	"youth": {"day": [[6.1, "woodpile", "chop", "axe"], [8.9, "workshop", "hammer|lift", "hammer"], [11.9, "inn", "eat", "bowl"], [13.1, "field", "hoe|gather", "hoe"], [16.7, "square", "talk|laugh|archery", ""],
+	"youth": {"day": [[6.1, "woodpile", "chop", "axe"], [8.9, "workshop", "hammer|lift", "hammer"], [11.9, "inn", "eat", "bowl"], [13.1, "field", "hoe|gather|reap", "hoe"], [16.7, "square", "talk|laugh|archery", ""], [18.2, "bath", "scrub|wash", "cloth"],
 			[19.1, "inn", "drink|laugh", "cup"], [21.5, "home", "in", ""]],
 		"dye": [[0.3, 0.35, 0.55, 0.6, 0.08, 0.95], [0.1, 0.6, 0.05], 0.45, 1.0]},
 	"lamplighter": {"day": [[4.8, "lamps", "touch", "taper"], [6.3, "home", "in", ""], [17.7, "lamps", "touch|release", "taper"], [20.1, "home", "in", ""]],
 		"round": "lamps", "go_hold": "lantern", "dye": [[0.05, 0.08, 0.95], [0.1, 0.12], 0.55, 1.0]},
-	"smith": {"day": [[5.9, "forge", "hammer", "hammer"], [11.7, "inn", "eat", "bowl"], [12.9, "forge", "hammer|lift", "hammer"], [18.5, "inn", "drink|laugh", "cup"], [20.4, "home", "in", ""]],
+	"smith": {"day": [[5.9, "forge", "hammer|fan", "hammer"], [11.7, "inn", "eat", "bowl"], [12.9, "forge", "hammer|lift|fan", "hammer"], [17.7, "bath", "scrub|wash", "cloth"], [18.5, "inn", "drink|laugh", "cup"], [20.4, "home", "in", ""]],
 		"dye": [[0.05, 0.07, 0.6], [0.06, 0.08], 0.3, 0.9]},
 	"disciple": {"day": [[5.1, "square", "sweep", "broom"], [6.7, "yard", "sword_dance", ""], [11.3, "kitchen", "eat", "bowl"], [12.5, "library", "read|write", "book"],
 			[14.9, "yard", "sword_dance|archery", ""], [17.7, "kitchen", "eat", "bowl"], [18.9, "hall", "pray|meditate", ""], [20.3, "home", "in", ""]], "dye": []},
-	"servant": {"day": [[5.0, "kitchen", "chop|stir", "axe"], [8.0, "square", "sweep", "broom"], [10.5, "well", "lift", ""], [12.0, "kitchen", "stir", "ladle"],
+	"servant": {"day": [[5.0, "kitchen", "chop|knead|fan", "axe"], [8.0, "square", "sweep", "broom"], [10.5, "well", "lift|wring", ""], [12.0, "kitchen", "stir|serve", "ladle"],
 			[15.0, "yard", "sweep|toss", "broom"], [18.0, "kitchen", "stir|eat", "ladle"], [21.0, "home", "in", ""]], "go_hold": "pole", "walk": "carry",
 		"dye": [[0.08, 0.1, 0.55], [0.06, 0.6], 0.3, 1.0]},
 	# ---- the Thundering Pots release: the levy at drill on the open ground (spear and bow on the clips the
@@ -131,18 +133,27 @@ const ROLES := {
 	"musician": {"day": [[6.8, "square", "play_flute|strike|clap", ""], [9.6, "tea", "play_flute|think", ""], [11.8, "tea", "eat", "bowl"], [13.0, "square", "strike|dance|play_flute", ""], [16.6, "bench", "play_flute|write", "book"],
 			[18.6, "tea", "play_flute|drink|laugh", "cup"], [21.4, "home", "in", ""]],
 		"dye": [[0.45, 0.12, 0.85, 0.95], [0.12, 0.6], 0.5, 1.0]},
+	# ---- the Answering Land release: somebody who waits at table (in and out of the inn's door with a tray all day,
+	# to the market for what the kitchen is short of), and a huntsman who is out in the fields before light, sells
+	# what he took in the market at noon and dresses the rest by the woodpile
+	"waiter": {"day": [[5.6, "inn", "sweep|arrange", "broom"], [7.0, "inn", "serve|pour|call", "tray"], [10.2, "market", "weigh|talk|count", "basket"], [11.2, "inn", "serve|pour|serve", "tray"], [14.4, "well", "wring|wash", "cloth"],
+			[15.4, "tea", "serve|pour|laugh", "tray"], [20.6, "inn", "sweep|count", "broom"], [21.8, "home", "in", ""]],
+		"go_hold": "tray", "dye": [[0.58, 0.08, 0.3], [0.1, 0.0], 0.3, 1.0]},
+	"huntsman": {"day": [[4.3, "field", "stalk|peer|archery", ""], [10.4, "market", "flay|call|offer|weigh", "knife"], [12.2, "inn", "eat", "bowl"], [13.4, "field", "stalk|trace|archery", ""], [17.0, "woodpile", "flay|stretch", "knife"],
+			[18.6, "bath", "scrub|wash", "cloth"], [19.4, "inn", "drink|laugh", "cup"], [21.2, "home", "in", ""]],
+		"dye": [[0.08, 0.3, 0.1], [0.07, 0.3], 0.3, 0.85]},
 	# ---- the people of the road (the High Roads release): nobody goes indoors, for there is no indoors;
 	# at night they sit by the camp's fire and sleep sitting up
 	"woodcutter": {"day": [[5.4, "wood", "chop", "axe"], [11.4, "camp", "eat", "bowl"], [12.7, "wood", "chop|lift|stretch", "axe"], [17.2, "camp", "chop|lift", "axe"], [18.8, "camp", "warm|drink|laugh", "cup"], [21.6, "camp", "doze", ""]],
 		"walk": "carry", "go_hold": "pole", "dye": [[0.08, 0.1, 0.3], [0.06, 0.08], 0.3, 0.95]},
-	"herbalist": {"day": [[5.0, "meadow", "gather|dig", ""], [9.4, "crag", "gather|peer", ""], [12.0, "camp", "eat", "bowl"], [13.2, "wood", "gather|peer", ""], [17.4, "camp", "pound|count", ""], [19.4, "camp", "warm|drink", "cup"],
+	"herbalist": {"day": [[5.0, "meadow", "reap|gather|dig", ""], [9.4, "crag", "gather|peer", ""], [12.0, "camp", "eat", "bowl"], [13.2, "wood", "gather|peer", ""], [17.4, "camp", "pound|count", ""], [19.4, "camp", "warm|drink", "cup"],
 			[21.2, "camp", "doze", ""]],
 		"go_hold": "basket", "dye": [[0.3, 0.35, 0.28, 0.12], [0.1, 0.55], 0.35, 1.0]},
-	"angler": {"day": [[4.7, "water", "fish", "rod"], [11.6, "camp", "eat|stir", "bowl"], [13.4, "water", "fish", "rod"], [18.4, "camp", "warm|drink|laugh", "cup"], [21.0, "camp", "doze", ""]],
+	"angler": {"day": [[4.7, "water", "fish", "rod"], [11.6, "camp", "flay|stir|eat", "bowl"], [13.4, "water", "fish", "rod"], [18.4, "camp", "warm|drink|laugh", "cup"], [21.0, "camp", "doze", ""]],
 		"go_hold": "rod", "dye": [[0.52, 0.56, 0.6, 0.08], [0.1, 0.12, 0.58], 0.3, 1.0]},
 	"pedlar": {"day": [[6.0, "road", "call|offer|count", ""], [12.0, "camp", "eat", "bowl"], [13.0, "road", "call|wave|count", ""], [18.2, "camp", "count|drink|laugh", "cup"], [21.3, "camp", "doze", ""]],
 		"round": "road", "walk": "carry", "go_hold": "pole", "dye": [[0.0, 0.97, 0.75, 0.6, 0.05], [0.12, 0.55, 0.0], 0.5, 1.0]},
-	"hunter": {"day": [[4.4, "meadow", "archery|peer|look", ""], [9.8, "wood", "trace|peer|look", ""], [12.4, "camp", "eat", "bowl"], [13.8, "meadow", "archery|look|stretch", ""], [18.6, "camp", "warm|laugh|drink", "cup"],
+	"hunter": {"day": [[4.4, "meadow", "stalk|archery|peer", ""], [9.8, "wood", "trace|stalk|peer", ""], [12.4, "camp", "eat", "bowl"], [13.8, "meadow", "stalk|archery|look", ""], [17.4, "camp", "flay|stretch", "knife"], [18.6, "camp", "warm|laugh|drink", "cup"],
 			[21.8, "camp", "doze", ""]],
 		"dye": [[0.08, 0.3, 0.1], [0.07, 0.3], 0.3, 0.85]},
 	"pilgrim": {"day": [[5.2, "camp", "pray", ""], [6.4, "peak", "pray|gaze|stretch", ""], [11.4, "camp", "eat", "bowl"], [12.8, "road", "pray|think", ""], [16.2, "crag", "touch|pray", ""], [19.0, "camp", "warm|drink", "cup"],
@@ -175,6 +186,8 @@ const PLACES := {
 	"woodpile": ["farmhouse", "house", "open:6-14"],
 	"bench": ["prop:bench", "prop:weiqi", "prop:tea", "prop:swing", "prop:campfire", "open:0-8"],
 	"well": ["prop:well", "shore", "open:0-6"],
+	# (the Answering Land release: where a day's dust is washed off: the bath-house door, the well, the water's edge)
+	"bath": ["bathhouse", "prop:well", "shore", "open:2-8"],
 	"shore": ["shore", "open:8-20"],
 	"patrol": ["path:8-16", "open:6-14"],
 	"lamps": ["prop:lantern_st", "path:3-12", "open:3-10"],
@@ -201,7 +214,8 @@ const TITLES := {"farmer": ["Farmer", "Farmer"], "fisher": ["Fisherman", "Fisher
 	"disciple": ["Disciple", "Disciple"], "servant": ["Steward", "Steward"],
 	"woodcutter": ["Woodcutter", "Woodcutter"], "herbalist": ["Herb-Gatherer", "Herb-Gatherer"], "angler": ["Old Angler", "Angler"], "pedlar": ["Pedlar", "Pedlar"],
 	"hunter": ["Hunter", "Huntress"], "pilgrim": ["Pilgrim", "Pilgrim"], "hermit": ["Hermit", "Hermit"],
-	"soldier": ["Levy-Man", "Levy-Woman"], "musician": ["Player", "Player"]}
+	"soldier": ["Levy-Man", "Levy-Woman"], "musician": ["Player", "Player"],
+	"waiter": ["Pot-Boy", "Serving-Girl"], "huntsman": ["Hunter", "Huntress"]}
 
 ## the bodies that are women and girls (for names and words)
 const FEM := ["folk_farmwife", "folk_shopwife", "folk_girl", "folk_grandma", "folk_maiden", "folk_disciple_f", "folk_jiaoren",
@@ -755,7 +769,7 @@ static func day_of(wd: Dictionary, p: Dictionary) -> Array:
 			while true:
 				var pause := 7.0 + float(int(p.seed) % 5)
 				var stay := {"a": t, "b": t + pause, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5), "yaw": Terrain3D.hash2(cur.x, cur.y, 9.0) * TAU,
-					"clip": st2.clip, "hold": st2.hold, "in": false}
+					"clip": st2.clip, "hold": st2.hold, "in": false, "place": st2.kind}
 				segs.append(stay)
 				t += pause
 				var nk := (k2 + 1) % wps2.size()
@@ -775,9 +789,9 @@ static func day_of(wd: Dictionary, p: Dictionary) -> Array:
 		var w2 := walk_minutes(l2, next_m - l2 / SPEED)
 		var depart := maxf(t + MIN_STAY, next_m - w2)
 		if not st2.has("round"):
-			segs.append({"a": t, "b": depart, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5) + (st2.nudge as Vector2), "yaw": float(st2.yaw), "clip": st2.clip, "hold": st2.hold, "in": at_in})
+			segs.append({"a": t, "b": depart, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5) + (st2.nudge as Vector2), "yaw": float(st2.yaw), "clip": st2.clip, "hold": st2.hold, "in": at_in, "place": st2.kind})
 		elif depart > t:
-			segs.append({"a": t, "b": depart, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5), "yaw": 0.0, "clip": st2.clip, "hold": st2.hold, "in": false})
+			segs.append({"a": t, "b": depart, "kind": "stay", "at": Vector2(cur) + Vector2(0.5, 0.5), "yaw": 0.0, "clip": st2.clip, "hold": st2.hold, "in": false, "place": st2.kind})
 		if cur != nx.tile:
 			segs.append({"a": depart, "b": depart + w2, "kind": "walk", "pts": pts2, "len": l2, "in": pts2.size() < 2})
 			t = depart + w2
@@ -908,6 +922,17 @@ const LINES := {
 	"musician": ["Six airs, and they are all one song. I have played forty years and never noticed. The blind master heard it in a breath. I was a little put out.", "A drum is honest. You cannot play a drum flat. You can only play it late, and I have never been late in my life, whatever the stage manager tells you.",
 		"We have died in a hundred battles on that stage, %s, nightly, and got up for the next act. I mean to tell the clay ones how it is done.", "The bell was a hair flat for a month and I retuned everything I own to it, out of politeness. Now it is right again and I am a hair flat. That is a musician's life.",
 		"Somebody under the hill is keeping time with us in the evenings. One beat, on the first of the bar. It is never wrong. The flautist wants to know if it is in the guild."],
+	# ---- the Answering Land release
+	"waiter": ["Four tables, nine bowls, and the one in the corner has been nursing the same cup since noon. I have my eye on him. I have my eye on all of them.",
+		"Hot, mind. I say that forty times a day and somebody burns a tongue forty times a day. I do not know why I say it.",
+		"You learn a town by what it orders. Thin soup, they are saving. Wine at noon, somebody has died or been born. Today is %s's usual, I take it?",
+		"My feet stopped hurting in the second year. I asked the cook if that was good. She said it means they have given up.",
+		"The tray goes on the left hand so that the right is free for the door, the coins, and anybody's wandering fingers."],
+	"huntsman": ["Out before light and back by noon, or there is nothing worth carrying. The hare gets up early. So must whoever wants the hare.",
+		"Downwind, slow, and never look at the thing you are walking up to. Look beside it. Everything alive can feel a stare.",
+		"I take what the pot wants and no more. My father took more, one year. The hill was empty for three after.",
+		"A hide wants salting inside the hour or it is only fit for the dog. That is why I am doing it in the street, %s, and not to offend you.",
+		"You cultivators clear out the big things, and the small things come back to the fields. I have not had a season like it. I ought to send you a haunch."],
 	"hermit": ["Somebody came up. Well. Sit, since you have. The view is not mine to charge for.", "I came up for a season, forty years ago. It has been a long season.",
 		"Below they ask what I do all day. I look. It takes all day.", "The clouds come to me now. When I was young I went to them.",
 		"You climbed with your hands, %s? Good. Those who fly up never see what the mountain is made of."],
@@ -1082,6 +1107,17 @@ const ERRANDS := {
 			"The fat monk with the sack? He has had three of my fish this month and I have never once seen him eat one. I wondered where they went. Yes. I will come.",
 			"Nine of them. Then I shall want nine hooks, and I have four. ...A bent pin will take a carp if the child is patient, and if the child is not patient it will not matter what the hook is. I will come.",
 			"I do not talk when I fish. That is why I fish. ...But a thing that is not taught is a thing that dies with the one who knew it. One day. I will talk for one day."]},
+	# Part XXVIII (the Answering Land release): who ties the grass, asked of the hunters; and the hollow stems, of the woodcutters
+	"s_p28_hunters": {"ask": "You are out in the valley before light. Have you seen who walks the general's field at night with his hands in the grass?", "price": 0, "toast": "%s has seen the old man in the field",
+		"lines": ["An old one. Bent. He comes with the dew and goes with it, and he bows to the general's tent before he starts. I took him for a herb-gatherer the first night. Herb-gatherers do not tie what they find.",
+			"I have seen him. My dog has not. The dog looks straight through where he is and wags, as it does at my father's grave. I do not hunt that side of the field any more. It seems rude.",
+			"Seen him? I have nearly fallen over his work. Knots, a hand high, all down the slope where the big one from Qin stands. I thought, there is a man with a grudge. Then I saw his face. It is not a grudge. It is the other thing.",
+			"He asked me the way to the tanner's house, the first night. I told him the tanner was dead these two years. He said he knew; he only wanted to see that the roof was sound. Then he went back to his grass."]},
+	"s_p28_woodcutters": {"ask": "A dead bamboo with a hole in it is somebody's house. There is a boy below the height who would be glad if you left the hollow stems standing. Will you?", "price": 0, "toast": "%s will leave the hollow stems standing",
+		"lines": ["The hollow ones burn best. ...They do. And I have green enough to last. Very well: the ones with holes may stand. I shall tell my wife the wood is bad this year and she will believe me, for it always is.",
+			"For the birds? I have cut this forest thirty years and never asked what lived in it. I only asked how thick. Leave me think. ...I heard a great deal of singing when I was a boy. I hear less now. It may be my ears.",
+			"The boy with the box. He stopped me in the spring and asked me, very politely, to mind where I put my feet. Nobody has ever asked me that. I minded. I have been minding ever since, and it is a nuisance, and I shall go on.",
+			"A stem with a hole in it is no use for a pole anyway. I have been cutting them from habit. Forty years of habit, and it takes a stranger to ask what for. They stand."]},
 	"s_p26_herbs": {"ask": "There is a physician at the hot springs of Glowcap Vale who opens people without hurting them, and he is old. Will you go and learn from him while there is time?", "price": 0, "toast": "%s will go to the springs to learn",
 		"lines": ["Hua Tuo? At the springs? I walked three hundred li to see him once and he had gone the day before. ...I am going now. Do not stop me to talk.",
 			"Opens them without hurting them. I have heard that. I have also heard a great many things about a great many physicians. I shall go and see whether this one sweats when he works. The good ones do.",
@@ -1341,7 +1377,55 @@ const POSTS := {
 	"courier_ma": ["lift", "", "doze"], "zao_jun": ["drink", "cup", "drink"], "ox_herd_niu": ["toss|gather", "", "doze"], "lantern_xi": ["weave", "", "touch"], "examiner_fan": ["read|write", "book", "doze"],
 	"xia_cormorant": ["fish", "rod", "doze"], "bell_tuner_gong": ["strike|hammer", "hammer", "doze"], "shipwright_ban": ["hammer", "hammer", "doze"],
 	"furnace_boy": ["lift|hammer", "hammer", "doze"], "stableboy_shitou": ["sweep|toss", "broom", "doze"],
+	# ---- the Answering Land release: nobody with a name stands idle at their own door any more
+	"budai": ["doze|laugh|sit_bench", "", "doze"], "charcoal_seller": ["chop|fan|haul_idle", "axe", "doze"], "tao_kan": ["lift|haul_idle|write", "", "read"], "zhichang": ["sweep|meditate", "broom", "meditate"],
+	"clerk_bai": ["write|count|arrange", "", "doze"], "dicer_du": ["toss|count|laugh", "", "doze"], "tailor_qiao": ["sew|weave|arrange", "needle", "doze"], "feng_xuan": ["count|write", "", "read"],
+	"gongshu_ban": ["carve|hammer", "hammer", "doze"], "ou_yezi": ["hammer|fan", "hammer", "doze"], "pao_ding": ["flay|chop", "knife", "doze"], "hua_tuo": ["pound|gather|write", "", "read"],
+	"wu_pu": ["stretch|dance", "", "meditate"], "sun_wu": ["point|write|think", "", "read"], "shi_kuang": ["play_qin", "", "play_qin"], "ling_lun": ["play_flute|carve", "", "doze"],
+	"sai_weng": ["gaze|sit_bench", "", "doze"], "weng_son": ["comb|toss", "", "doze"], "xie_lingyun": ["write|gaze", "book", "stargaze"], "han_yu": ["write|gaze", "book", "doze"],
+	"zhong_ziqi": ["chop|gaze", "axe", "doze"], "liezi": ["gaze|meditate", "", "meditate"], "ji_chang": ["archery|peer", "", "doze"], "feng_meng": ["archery|stalk", "", "doze"],
+	"yue_maiden": ["sword_dance|stretch", "", "meditate"], "mo_di": ["carve|write", "", "read"], "yan_shi": ["carve|hammer", "hammer", "doze"], "farmer_tian": ["hoe|reap|gather", "hoe", "doze"],
+	"gardener_hanyin": ["pour|dig|gather", "", "doze"], "lockkeeper_qian": ["push|peer", "", "doze"], "harbour_yao": ["count|write|point", "", "doze"], "pilot_zheng": ["peer|point", "", "doze"],
+	"steersman_hong": ["push|peer", "", "doze"], "ship_boy_ah_fu": ["sweep|lift|wring", "broom", "doze"], "caravan_kang": ["count|lift|weigh", "", "doze"], "sarnai": ["stir|knead|spin", "ladle", "doze"],
+	"batu": ["comb|toss|archery", "", "doze"], "steppe_shaman": ["pray|bang", "", "pray"], "tea_master": ["pour|serve|drink", "cup", "meditate"], "grave_keeper": ["sweep|pray", "broom", "pray"],
+	"lake_keeper": ["fish|gaze", "rod", "doze"], "mist_fisher": ["fish", "rod", "fish"], "peach_keeper": ["gather|pour", "", "doze"], "lantern_monk": ["pray|touch", "", "pray"],
+	"spore_witch": ["stir|gather|fan", "ladle", "stir"], "diver_yulan": ["sew|stretch|wring", "needle", "doze"], "can_niang": ["spin|weave", "", "doze"], "yao_silk": ["weave|count|arrange", "", "doze"],
+	"zhi_nu": ["weave|spin", "", "weave"], "niu_lang": ["toss|gather", "", "doze"], "meng_po": ["stir|pour|serve", "ladle", "stir"], "judge_cui": ["write|read", "book", "write"],
+	"court_scribe": ["write|count", "", "write"], "roll_clerk_ning": ["write|count", "", "doze"], "egg_warden_luan": ["rock|peer", "", "doze"], "forge_master": ["hammer|fan", "hammer", "doze"],
+	"apprentice_zhi": ["hammer|lift|fan", "hammer", "doze"], "priestess_yun": ["pray|pour", "", "pray"], "fire_sage": ["warm|meditate", "", "meditate"], "hai_ge": ["sew|fish", "needle", "doze"],
+	"navid": ["weigh|count|offer", "steelyard", "doze"], "farida": ["weave|pour|knead", "", "doze"], "nomad": ["comb|toss", "", "doze"], "jailer_wife": ["sew|sweep", "needle", "doze"],
+	"scholar_cen": ["read|write", "book", "read"], "ah_mei": ["wash|wring|hang", "cloth", "doze"], "ah_shui": ["fish|sew", "rod", "doze"], "little_bei": ["dance|clap", "", "doze"],
+	"little_qi": ["kite|clap", "", "doze"], "little_hu": ["dance|clap", "", "doze"], "little_haibao": ["toss|clap", "", "doze"], "que_lao": ["sit_bench|think", "", "doze"],
+	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }
+
+## the Answering Land release: what whoever is found indoors does there, by what the ground floor of the house is
+## for (rooms.gd INDOORS): the day's work by turns, and the night.  A shop-hand weighs and shelves, a pot-boy carries a
+## tray, a clerk writes; whoever answers for a town (offices.gd) is at the registers.
+const TRADE_POSTS := {
+	"home": ["sweep|knead|stir|sew|rock", "doze"], "office": ["write|count|read", "doze"], "shop": ["weigh|arrange|count", "doze"], "inn": ["serve|pour|sweep|arrange", "doze"],
+	"teahouse": ["pour|serve|drink", "doze"], "hall": ["think|sweep|count", "doze"], "library": ["read|arrange|write", "read"], "workshop": ["hammer|carve|fan|lift", "doze"],
+	"shrine": ["pray|sweep|touch", "pray"], "bath": ["scrub|wring|pour", "doze"], "official": ["write|count|read|think", "read"],
+}
+## what goes in the hand with a clip, for somebody whose work is read from their trade
+const HOLD_OF := {"serve": "tray", "weigh": "steelyard", "fan": "fan", "scrub": "cloth", "wring": "cloth", "flay": "knife", "sew": "needle", "sweep": "broom", "hammer": "hammer",
+	"stir": "ladle", "read": "book", "drink": "cup", "carve": "chisel"}
+
+## What entity `e` (a named person, somebody found indoors, whoever answers for a town) is doing at hour `h`:
+## [clip, what they hold], or [] if they keep still.
+static func post_of(e: Dictionary, h: float) -> Array:
+	var own := post(str(e.get("asset", e.get("id", ""))), h)
+	if own.is_empty():
+		own = post(str(e.get("id", "")), h)
+	if not own.is_empty():
+		return own
+	var key := "official" if e.has("office") else str(e.get("trade", ""))
+	if not TRADE_POSTS.has(key):
+		return []
+	var night := h >= 21.5 or h < 5.0
+	var clips := str(TRADE_POSTS[key][1 if night else 0]).split("|")
+	var ci := int(h * 60.0 / 11.0 + float(hash(str(e.get("id", ""))) % 7)) % clips.size()
+	return [clips[ci], "" if night else str(HOLD_OF.get(clips[ci], ""))]
 
 ## What named townsperson `id` is doing at hour `h`: [clip, what they hold], or [] if they keep still.
 static func post(id: String, h: float) -> Array:
@@ -1358,7 +1442,7 @@ static func post(id: String, h: float) -> Array:
 ## runs from the wrist down to the fingers along -y, the palm faces +x for the right hand).
 static func held(what: String) -> Node3D:
 	match what:
-		"hoe", "axe", "pole", "basket", "bowl", "lantern", "gong", "taper":
+		"hoe", "axe", "pole", "basket", "bowl", "lantern", "gong", "taper", "tray", "steelyard", "fan", "cloth", "knife", "needle":
 			pass
 		_:
 			return Props.held(what)
@@ -1398,6 +1482,39 @@ static func held(what: String) -> Node3D:
 			# a small gong in the left hand (the stick is the right hand's: taper)
 			b.cyl(Vector3(0.05, -0.12, 0.0), 0.16, 0.025, MB.tag(Color("c8a040"), MB.METAL), Vector3(0, 0, PI * 0.5), 14)
 			b.limb(Vector3(0, -0.06, 0.0), Vector3(0.05, 0.02, 0.0), 0.006, 0.006, MB.tag(Color("8a3a2a"), MB.CLOTH), 3)
+		# ---- the Answering Land release: what the new work of the towns is done with
+		"tray":
+			# a round lacquer tray carried flat on the left palm, with a pot and two cups
+			b.cyl(Vector3(0.02, -0.1, 0.08), 0.2, 0.02, MB.tag(Color("7a2a22"), MB.WOOD), Vector3.ZERO, 14)
+			b.torus(Vector3(0.02, -0.085, 0.08), 0.195, 0.012, MB.tag(Color("3a1a16"), MB.WOOD), Vector3(PI * 0.5, 0, 0))
+			b.lathe(Vector3(-0.03, -0.085, 0.1), [Vector2(0.045, 0.0), Vector2(0.065, 0.05), Vector2(0.05, 0.1), Vector2(0.02, 0.115)], MB.tag(Color("d8d4c4"), MB.STONE), 10)
+			for cx in [0.1, 0.07]:
+				b.lathe(Vector3(cx, -0.085, 0.0 if cx > 0.08 else 0.17), [Vector2(0.018, 0.0), Vector2(0.028, 0.035)], MB.tag(Color("e8e4d8"), MB.STONE), 8)
+		"steelyard":
+			# a merchant's steelyard held up by its loop: the beam, the pan on three cords, the sliding weight
+			b.limb(Vector3(0, -0.08, -0.34), Vector3(0, -0.08, 0.2), 0.008, 0.006, light, 5)
+			for k in 3:
+				var ang := TAU * float(k) / 3.0
+				b.limb(Vector3(0, -0.08, 0.18), Vector3(cos(ang) * 0.09, -0.36, 0.18 + sin(ang) * 0.09), 0.002, 0.002, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
+			b.lathe(Vector3(0, -0.39, 0.18), [Vector2(0.02, 0.0), Vector2(0.09, 0.02), Vector2(0.1, 0.035)], MB.tag(Color("c8a040"), MB.METAL), 10)
+			b.limb(Vector3(0, -0.08, -0.2), Vector3(0, -0.2, -0.2), 0.002, 0.002, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
+			b.cyl(Vector3(0, -0.23, -0.2), 0.022, 0.05, MB.tag(Color("4a4a52"), MB.METAL), Vector3.ZERO, 8)
+		"fan":
+			# a palm-leaf fan for the stove
+			b.limb(Vector3(0, -0.08, 0.0), Vector3(0, -0.08, -0.16), 0.008, 0.008, light, 4)
+			b.disc(Vector3(0, -0.08, -0.3), 0.16, MB.tag(Color("c8b070"), MB.FOLIAGE), 12, MB.tag(Color("a89050"), MB.FOLIAGE), Vector3(0, 0, PI * 0.5))
+			b.disc(Vector3(0.002, -0.08, -0.3), 0.16, MB.tag(Color("c8b070"), MB.FOLIAGE), 12, MB.tag(Color("a89050"), MB.FOLIAGE), Vector3(0, 0, -PI * 0.5))
+		"cloth":
+			# a wet washcloth, hanging from the fist
+			b.ribbon([Vector3(0, -0.07, 0.0), Vector3(0.01, -0.2, 0.01), Vector3(0.0, -0.34, -0.01)], [0.09, 0.11, 0.08], Vector3(0, 0, 1), MB.tag(Color("e0dccc"), MB.CLOTH), MB.tag(Color("b8b4a4"), MB.CLOTH))
+		"knife":
+			# a short skinning knife, the edge down
+			b.limb(Vector3(0, -0.08, 0.05), Vector3(0, -0.08, -0.05), 0.012, 0.012, wood, 5)
+			b.box(Vector3(0, -0.09, -0.14), Vector3(0.006, 0.035, 0.18), MB.tag(Color("b8b8c0"), MB.METAL))
+		"needle":
+			# a needle is too small to see: what is seen is the thread drawn out from it
+			b.limb(Vector3(0, -0.08, 0.0), Vector3(0, -0.08, -0.05), 0.003, 0.001, MB.tag(Color("c8c8d0"), MB.METAL), 3)
+			b.limb(Vector3(0, -0.08, 0.0), Vector3(-0.04, -0.3, 0.06), 0.0015, 0.0015, MB.tag(Color("c83a3a"), MB.CLOTH), 3)
 		"taper":
 			b.limb(Vector3(0, -0.08, -0.05), Vector3(0, -0.08, 0.6), 0.008, 0.006, light, 4)
 			g.ball(Vector3(0, -0.08, 0.64), 0.06, Color(1.0, 0.7, 0.3, 0.7), true)
@@ -1411,7 +1528,7 @@ static func held(what: String) -> Node3D:
 
 ## Which hand a thing is held in.
 static func hand_of(what: String) -> String:
-	return "hand.L" if what in ["lantern", "gong", "basket", "bowl"] else "hand.R"
+	return "hand.L" if what in ["lantern", "gong", "basket", "bowl", "tray", "steelyard"] else "hand.R"
 
 # ---------------------------------------------------------------- their bodies
 ## A townsperson's model: their body (art/characters/folk_*), dyed, with the party's clips lent.

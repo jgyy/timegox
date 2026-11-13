@@ -730,10 +730,13 @@ func _build_view(id: String) -> void:
 						clear[ct] = true
 	# (and no house or pavilion of the wilds is built beside one, facing it)
 	Scatter.clearings = clear
+	# (the Answering Land release: and nothing is scattered through whoever, or whatever, stands on open ground)
+	Scatter.stood = Clash.stood(lw, id, r)
 	var prof_t0 := Time.get_ticks_usec()
 	var root := Terrain3D.build(vg, r.size.x, r.size.y, spec.theme, spec.seed, {"hm": shm, "shore": shore, "open": true, "buildings": bl, "area": id})
 	var prof_t1 := Time.get_ticks_usec()
 	Scatter.clearings = {}
+	Scatter.stood = {}
 	root.position = Vector3(r.position.x * TS, 0.0, r.position.y * TS) + bb.off
 	scene3d.add_child(root)
 	var nodes := {}
@@ -900,6 +903,30 @@ func ent_visible(e: Dictionary) -> bool:
 
 ## The Lost Horse release (marks.gd): build what stands at mark `e` for the answer given (or the way the
 ## scale leans now), in place of whatever stood there before.
+## The Answering Land release (weal.gd): what the houses of a town hang at their doors, by how the town
+## stands now (lanterns and pennants, a talisman, an empty measure, a bar).  Looked at once a second; a
+## door is only touched when its town's state has changed.
+var _weal_t := 0.0
+func _weal_doors(d: float) -> void:
+	_weal_t -= d
+	if _weal_t > 0.0:
+		return
+	_weal_t = 1.0
+	var by_area := {}
+	for dn in get_tree().get_nodes_in_group("weal_doors"):
+		var area := str(dn.get_meta("area", ""))
+		if not by_area.has(area):
+			by_area[area] = Weal.state(Game, Weal.town_of(area)) if Game.prologue == "" else "easy"
+		var st: String = by_area[area]
+		if str(dn.get_meta("st", "easy")) == st:
+			continue
+		dn.set_meta("st", st)
+		for c in dn.get_children():
+			c.queue_free()
+		var hung := Weal.dress(st, 1.1, int(dn.get_meta("seed", 0)))
+		if hung != null:
+			dn.add_child(hung)
+
 func _mark_model(e: Dictionary, n: Node3D) -> void:
 	if n.has_meta("model"):
 		(n.get_meta("model") as Node3D).queue_free()
@@ -1029,7 +1056,9 @@ func _npc_opts(id: String) -> Dictionary:
 
 func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 	var n := Node3D.new()
-	n.position = Terrain3D.world_pos(e.pos) + at
+	# (the Answering Land release, clash.gd: somebody who stands in the footprint of something bigger is drawn a
+	# step aside; the tile they stand on, and are spoken to on, is the same)
+	n.position = Terrain3D.world_pos(e.pos) + at + Clash.nudge(layer, ents, e)
 	n.visible = false
 	ent_nodes[e.id] = n
 	match e.kind:
@@ -1416,7 +1445,10 @@ func _hold_in_hand(m: Node3D, what: String, bone: String = "hand.R") -> Node3D:
 	var ba := BoneAttachment3D.new()
 	ba.bone_name = bone
 	sk.add_child(ba)
-	ba.add_child(Props.held(what))
+	# (the Answering Land release: what the people of the towns work with is folk.gd's to build, the hoe, the
+	# shoulder pole, the basket, the bowl, the watchman's lantern and gong among them; this asked props.gd,
+	# which knows none of those, and they had been carrying nothing since the Living Land)
+	ba.add_child(Folk.held(what))
 	return ba
 
 ## Where the hero and Yue Ling are and what they do while he does something.
@@ -1825,6 +1857,7 @@ func _process(d: float) -> void:
 	t += d
 	if not headless() and player != null:
 		_fans_tick(d)
+		_weal_doors(d)
 	if banner_t > 0.0:
 		banner_t -= d
 	# a region is announced once he has stayed in it a moment (see _enter_region)
@@ -2855,7 +2888,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			n.set_meta("near", near)
 			# the Living Land release: at work at their place by day, asleep at it late at night, until the
 			# hero comes close (folk.gd POSTS); the thing in their hands goes with the work
-			var job: Array = [] if talking or dist < 4.5 else Folk.post(str(e.get("asset", e.id)), Clock.hour(Game))
+			var job: Array = [] if talking or dist < 4.5 else Folk.post_of(e, Clock.hour(Game))
 			if not job.is_empty() and not Assets.has_clip(m, str(job[0])):
 				job = []
 			_post_hold(n, m, "" if job.is_empty() else str(job[1]))
@@ -3323,6 +3356,7 @@ func _update_folk(d: float, pp: Vector3) -> void:
 				near[tid] = true
 				# Part XVI: a town practising the old ways, or out all the long last night of the year
 				var noise: bool = not Folk.is_camp(tid) and ((str(Folk.TOWNS[tid].area) == drill_area and t - drill_t < 30.0) or Folk.noisy(Game, tid))
+				var wst := Weal.state(Game, Weal.of_folk(tid)) if Game.prologue == "" else "easy"
 				for fp in Folk.people(wd, tid):
 					var st := Folk.state(wd, fp, m)
 					if noise:
@@ -3331,6 +3365,14 @@ func _update_folk(d: float, pp: Vector3) -> void:
 						st.walk = false
 						st.clip = "bang" if int(fp.seed) % 4 != 0 else "clap"
 						st.hold = "gong" if st.clip == "bang" else ""
+					elif st.vis and not st.walk and wst != "easy":
+						# (the Answering Land release, weal.gd: what a town's people do with their hands
+						# by how the town stands; where they are is the day's own)
+						var mc := Weal.mood_clip(wst, str(st.seg.get("place", "")), m / 60.0, int(fp.seed) + int(m / 9.0), str(st.clip))
+						if mc != "":
+							st = st.duplicate()
+							st.clip = mc
+							st.hold = ""
 					var at: Vector2 = st.at
 					var goal := Vector3(at.x * TS, 0.0, at.y * TS) + off
 					var id: String = fp.id
@@ -3407,6 +3449,11 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 	elif dark and fp.role in ["watchman", "lamplighter"] and hold == "":
 		hold = "lantern"
 	_post_hold(fn, m, hold)
+	# (the Answering Land release: somebody washing off the day's dust at the bath-house door or the water's
+	# edge is down to the underclothes for as long as it takes)
+	var bathing: bool = clip == "scrub" and not bool(fp.kid)
+	if Models.undressed(m) != bathing:
+		Models.undress(m, bathing)
 	# New Year's Day: the children in new red clothes (folk.gd), and a mark over every child still
 	# to be given a red envelope while that is what the day asks
 	var dy := Folk.dye_now(fp, Game)
@@ -3527,6 +3574,11 @@ func _draw_hud() -> void:
 			"stele":
 				hint = "Choose your Dao"
 		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + hint, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
+		# (the Answering Land release, weal.gd: what has become of somebody with a name, by what was chosen)
+		if fe.kind == "npc":
+			var wtag := Weal.tag(Game, fe)
+			if wtag != "":
+				UI.text(self, Vector2(VIEW.x * 0.5 - 300, VIEW.y - 36), "%s, %s" % [str(fe.n), wtag], 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 600)
 	# the High Roads (peaks.gd): what the heights offer
 	if not is_floor() and using.is_empty() and trip.is_empty() and not wd.is_empty():
 		var hint2 := ""

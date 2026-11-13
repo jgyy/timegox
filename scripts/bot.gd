@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 35.0 * 3600.0
+var max_time := 37.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -114,6 +114,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXVII: the price four times over to the buyer in yellow, five empty cases to the ten thousand scrolls,
 	# and the tiles that fell to the king who cannot set his pagoda down
 	"palace_buyer": "relic", "wan_juan": "relic", "li_jing": "relic",
+	# Part XXVIII: five knots somebody tied to the man who cannot be thrown, four rings to the owl, four scales to the
+	# jiao, and to the third scourge somebody who has been beaten
+	"du_hui": "relic", "night_owl": "relic", "bridge_jiao": "relic", "zhou_chu": "loss",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -158,7 +161,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXVI: the Blue Bag Book copied out for every counter of the post
 	"the_book": ["copy"],
 	# Part XXVII: the sack picked up again, all of it
-	"the_sack": ["carry"]}
+	"the_sack": ["carry"],
+	# Part XXVIII: a kindness is owed onward, to the next stranger
+	"the_knot": ["onward"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -764,6 +769,14 @@ func _world(d: float) -> void:
 		"marks":
 			# Part XXIV: the nearest thing a choice left standing that has not been looked at (marks.gd)
 			_marks_step()
+		"weal":
+			# Part XXVIII (weal.gd): towns left the better for his coming.  To whoever answers for the next town
+			# that will take a gift (the choice gives it, _choice); with no stones for one, to the wild
+			var weal_t := Weal.wanted(Game)
+			if weal_t == "" or Game.stones < Weal.gift_cost(Game):
+				_grind()
+			else:
+				_goto_entity(str(Weal.TOWNS[weal_t].area), str(Weal.TOWNS[weal_t].office))
 		"hold":
 			# Part XXV: the town that is his own (hold.gd): to the steward's table when there is something
 			# to build that can be paid for (the choice builds it, _choice); else there are spirit stones
@@ -1407,6 +1420,16 @@ func _choice() -> void:
 			var kf: int = ids.find(str(fw[0]))
 			if want == ids.find("later") and kf >= 0 and c.options[kf].get("enabled", true) and int(Game.inv.get(str(fw[0]), 0)) < int(fw[1]):
 				want = kf
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title).begins_with("At the counter of "):
+		# whoever answers for a town (weal.gd): a gift to its chest while a step asks that towns be left
+		# the better and this one is not yet; else "Not today"
+		want = ids.find("later")
+		if not st.is_empty() and st.kind == "weal" and ids.has("weal:give") and c.options[ids.find("weal:give")].get("enabled", true):
+			for wt2 in Weal.ORDER:
+				if ("At the counter of " + str(Offices.OFFICES[str(Weal.TOWNS[wt2].office)].n)) == str(c.title) and not Weal.is_bettered(Game, wt2):
+					want = ids.find("weal:give")
 		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title) == main.HOLD_ASK:

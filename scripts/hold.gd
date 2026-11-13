@@ -434,6 +434,9 @@ static func settle(g, who: String, name: String, force: bool = false) -> bool:
 	g.hold.settlers[who] = name
 	g.note("%s came to live at %s" % [name, NAME])
 	_risen(g, was)
+	# (the Answering Land release: and the rank is told once: the next day's reckoning used to tell it again,
+	# and pay the renown of it twice)
+	g.hold["told"] = rank(g)
 	return true
 
 ## Who of the people of the towns and the road may be asked: anybody grown who has no post to keep.

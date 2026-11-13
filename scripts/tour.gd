@@ -2330,6 +2330,11 @@ func _run() -> void:
 		# the Heavy Road release (--heavy, or --heavy=a,b): what a load looks like, the work of the hands,
 		# the people, foes and lords of Part XXVII, its crossroads and the page of the load
 		await _heavy_shots(str(main.args.heavy))
+	if main.args.has("answer"):
+		# the Answering Land release (--answer, or --answer=a,b): the ten clips of the work of the towns, a town
+		# festive, afraid and cold with what it hangs at its doors, the page of the land, the people, foes and
+		# lords of Part XXVIII, its crossroads and what each answer leaves standing
+		await _answer_shots(str(main.args.answer))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -4915,5 +4920,177 @@ func _heavy_shots(which: String = "1") -> void:
 			fr2.append(last_img)
 			w.cam_override = null
 		_sheet("mark_sack_answers", fr2, 0.48)
+		Game.picks = {}
+	get_tree().quit(0)
+
+
+## The Answering Land (--answer, or --answer=a,b): "clips" (the work of the towns), "people", "foes", "towns" (a
+## street of Qingshi festive at dusk, afraid, and cold, and a door of each), "page" (Esc > The Land), "battle",
+## "choice", "marks".
+func _answer_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 98
+	Game.step = Data.step_index("s_p28_knot")
+	Game.companion = true
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("clips"):
+		for row in [["work_of_the_towns_1", [["serve", 2.3, "tray"], ["knead", 0.6, ""], ["weigh", 1.6, "steelyard"], ["arrange", 0.9, ""], ["sew", 1.4, "needle"]]],
+				["work_of_the_towns_2", [["scrub", 3.3, "cloth"], ["wring", 1.0, "cloth"], ["fan", 0.4, "fan"], ["stalk", 2.6, ""], ["flay", 0.7, "knife"]]]]:
+			var cm: Array = []
+			var cp: Array = []
+			var bodies := ["folk_maiden", "folk_cook", "folk_merchant", "folk_shopwife", "folk_grandma", "folk_porter", "folk_farmwife", "folk_cook", "folk_guard", "folk_fisher"]
+			for cw in row[1]:
+				var fp := {"body": bodies[(cm.size() + (5 if str(row[0]).ends_with("2") else 0)) % bodies.size()], "dye": []}
+				var m4: Node3D = Folk.model(fp)
+				if str(cw[2]) != "":
+					w._hold_in_hand(m4, str(cw[2]), Folk.hand_of(str(cw[2])))
+				if str(cw[0]) == "scrub":
+					Models.undress(m4, true)
+				cm.append(m4)
+				cp.append([str(cw[0]), float(cw[1])])
+			await _pose_gallery(str(row[0]), cm, cp, 0.6, 0.6)
+	if want.call("people"):
+		await _gallery("part28_people", [Assets.person("wei_ke"), Assets.person("grass_elder"), Assets.person("yang_bao"), Assets.person("zhou_chu")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["trip_grass", "qin_footman", "field_dust", "nest_robber", "owl_shadow", "forgetful_fox", "white_brow", "hill_roar", "bridge_eel", "early_drum"]:
+			fs.append(_foe(fid))
+		await _gallery("part28_foes", fs, 1.0, 0.25)
+		await _gallery("part28_lords", [_foe("du_hui", true), _foe("night_owl", true), _foe("bridge_jiao", true), _foe("zhou_chu", true)], 1.05, 0.25)
+	if want.call("towns"):
+		# one street, three ways: what Qingshi looks like festive at dusk, afraid, and cold to him
+		var ws: Dictionary = Atlas.world_of("surface")
+		var heart: Vector2i = Folk.heart("qingshi")
+		var door := Vector2i(-1, -1)
+		var out_d := Vector2i(0, 1)
+		var bdist := 1 << 30
+		for bd in ws.buildings:
+			if str(bd.get("area", "")) != "village" or not str(bd.get("style", "house")) in ["house", "shop", "inn", "teahouse", "farmhouse"]:
+				continue
+			var r: Rect2i = bd.rect
+			var dd: Vector2i = bd.door
+			var od := Vector2i(0, 1)
+			if dd.y >= r.end.y - 1:
+				od = Vector2i(0, 1)
+			elif dd.y <= r.position.y:
+				od = Vector2i(0, -1)
+			elif dd.x >= r.end.x - 1:
+				od = Vector2i(1, 0)
+			else:
+				od = Vector2i(-1, 0)
+			var dist: int = absi(dd.x - heart.x) + absi(dd.y - heart.y)
+			if od == Vector2i(0, 1) and dist < bdist and w.tile_free(dd + od * 2):
+				bdist = dist
+				door = dd
+				out_d = od
+		var fr: Array = []
+		var fr2: Array = []
+		var placed := false
+		for st in [["festive", 19.2], ["thriving", 10.0], ["afraid", 18.6], ["lean", 10.0], ["cold", 10.0]]:
+			Game.weal = {}
+			Game.picks = {}
+			Game.boss_done = {}
+			match str(st[0]):
+				"festive":
+					Game.weal = {"qingshi|gift": 3, "qingshi|shift": 4, "qingshi|fare": 4, "qingshi|bag": 4, "qingshi|errand": 12, "kills|village": 200, "kills|bamboo": 200}
+					Game.war_won = {"a": 3, "b": 3}
+				"thriving":
+					Game.weal = {"qingshi|gift": 3, "qingshi|shift": 4, "qingshi|errand": 8}
+					Game.war_won = {}
+				"afraid":
+					Game.falls = {}
+					Game.weal = {}
+					Game.war_won = {}
+					Game.war_lost = 9
+					Game.weal_force = {"qingshi": "afraid"}
+				"lean":
+					Game.weal_force = {"qingshi": "lean"}
+				"cold":
+					Game.weal_force = {}
+					Game.war_lost = 0
+					Game.weal = {"qingshi|broke": 9}
+			Game.weal_n += 1
+			Game.toasts.clear()
+			main.toast_list.clear()
+			if door.x < 0:
+				continue
+			# (he stands once, two tiles out from one door, for all five: only the hour and the town change)
+			if not placed:
+				_high_put(door + out_d * 2, -out_d, float(st[1]))
+				placed = true
+				await _wait(2.0)
+			Game.clock = float(st[1]) * 60.0
+			w._weal_t = 0.0
+			await _wait(1.5)
+			var dp: Vector3 = Terrain3D.world_pos(door)
+			dp.y = w._player_pos().y
+			var fw := Vector3(out_d.x, 0.0, out_d.y)
+			w.cam_override = Transform3D(Basis.IDENTITY, dp + fw * 5.2 + Vector3(1.4, 2.2, 0)).looking_at(dp + Vector3(0, 1.7, 0), Vector3.UP)
+			Game.toasts.clear()
+			main.toast_list.clear()
+			await _wait(0.2)
+			await _shot("door_%s" % str(st[0]), false)
+			fr2.append(last_img)
+			if str(st[0]) in ["festive", "afraid", "cold"]:
+				# the street from above and behind him
+				w.cam_override = Transform3D(Basis.IDENTITY, dp + fw * 15.0 + Vector3(7.0, 9.5, 0)).looking_at(dp + fw * 2.0 + Vector3(0, 1.2, 0), Vector3.UP)
+				await _wait(0.3)
+				await _shot("town_%s" % str(st[0]))
+				fr.append(last_img)
+			w.cam_override = null
+		Game.weal_force = {}
+		_sheet("towns_three_ways", fr, 0.5)
+		_sheet("doors_by_state", fr2, 0.36)
+	if want.call("page"):
+		main.set_stack(["world"])
+		Game.weal_force = {}
+		Game.war_lost = 0
+		Game.picks = {"bandits": "mend", "drawings": "keep", "the_wheel": "hours", "dragon_boon": "sea", "the_tide": "wall", "the_sack": "share", "garden": "study", "widow": "kind", "cauldron_map": "copy"}
+		Game.weal = {"qingshi|gift": 2, "qingshi|shift": 4, "qingshi|errand": 8, "yanggu|broke": 8, "longmen|bag": 4, "kills|village": 170}
+		Game.weal_n += 1
+		main.open_menu()
+		main.menu.mode = "land"
+		main.menu.cursor = 2
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("land_page")
+		main.pop()
+	if want.call("battle"):
+		main.set_stack(["world"])
+		for bb in [["du_hui", "fusang", "relic"], ["night_owl", "bamboo", "relic"], ["bridge_jiao", "mirror", "relic"], ["zhou_chu", "mirror", "towns"]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			var pth: Dictionary = Trials.path(bid, str(bb[2]))
+			main.battle.start([{"id": bid, "lv": 98, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": str(bb[1]),
+				"trial": bid, "path": str(bb[2]), "boon": pth.boon, "path_n": str(pth.n), "path_kind": str(Trials.KINDS[str(pth.kind)].n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_knot"]
+		main.ask_crossroads()
+		main.choice.cursor = 2
+		await _wait(1.0)
+		await _shot("crossroads_knot")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("marks"):
+		var fr3: Array = []
+		for oa in [["nothing", "fusang"], ["ledger", "village"], ["onward", "bamboo"]]:
+			Game.picks = {"the_knot": str(oa[0])}
+			main.set_stack(["world"])
+			if not await _mark_view("mark:the_knot:%s" % str(oa[1]), 15.0, 9.0, 5.0):
+				continue
+			await _shot("mark_knot_%s" % str(oa[0]), false)
+			fr3.append(last_img)
+			w.cam_override = null
+		_sheet("mark_knot_answers", fr3, 0.48)
 		Game.picks = {}
 	get_tree().quit(0)

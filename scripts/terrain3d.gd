@@ -1758,6 +1758,25 @@ static func _house(root: Node3D, bd: Dictionary, hm: PackedFloat32Array, w: int,
 	if not g.is_empty():
 		var gi := MB.mesh_node(root, g.build(MB.mat_glow()))
 		gi.position.y = gy
+	# (the Answering Land release, weal.gd: where a house of a town hangs what the town's state calls for:
+	# a point on the wall at its door, looking out; the world hangs things there and takes them down)
+	if Weal.town_of(str(bd.get("area", ""))) != "":
+		var out_d := Vector2i(0, 1)
+		if int(bd.door.y) >= r.end.y - 1:
+			out_d = Vector2i(0, 1)
+		elif int(bd.door.y) <= r.position.y:
+			out_d = Vector2i(0, -1)
+		elif int(bd.door.x) >= r.end.x - 1:
+			out_d = Vector2i(1, 0)
+		else:
+			out_d = Vector2i(-1, 0)
+		var dd := Node3D.new()
+		dd.position = Vector3(door.x + out_d.x * 0.26, gy + Arch.FLOOR_Y, door.z + out_d.y * 0.26)
+		dd.rotation.y = atan2(float(out_d.x), float(out_d.y))
+		dd.set_meta("area", str(bd.get("area", "")))
+		dd.set_meta("seed", int(r.position.x * 7 + r.position.y))
+		dd.add_to_group("weal_doors")
+		root.add_child(dd)
 	var out: Array = []
 	var ri := MB.mesh_node(root, roof.build(MB.mat_scenery()))
 	ri.position.y = gy

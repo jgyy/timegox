@@ -91,5 +91,5 @@ static func gift(g, town: String) -> Dictionary:
 		else:
 			g.inv[str(gf[0])] = int(g.inv.get(str(gf[0]), 0)) + int(gf[1])
 			what.append("%s x%d" % [str(Data.ITEMS[str(gf[0])].n), int(gf[1])])
-	g.note("Given something in the street at %s" % town)
+	g.note("Given something in the street at %s" % str(Roads.town(town).get("n", town)))
 	return {"who": str(GIVERS[k % GIVERS.size()]), "how": str(GIVES[(k / 7) % GIVES.size()]), "what": ", ".join(what)}

@@ -172,13 +172,19 @@ static func smash(g, wd: Dictionary, b: Dictionary, why: String) -> Array:
 	var k: Dictionary = KINDS[str(b.kind)]
 	var ow := owner_of(wd, b)
 	var who: String = str(ow.get("n", "Somebody"))
+	# (the Answering Land release, weal.gd: a town remembers what is broken in its streets, and a town
+	# that is cold to him asks double for it)
+	var area := str(b.get("area", ""))
+	var wtid := Weal.town_of(area)
 	match why:
 		"strike":
-			var price: int = PRICE + PRICE_REALM * int(g.realm())
+			var price: int = maxi(1, int(round(float(PRICE + PRICE_REALM * int(g.realm())) * Weal.mod(g, area, "mend"))))
+			Weal.act(g, wtid, "broke")
 			if g.stones >= price:
 				g.stones -= price
 				out.append("%s's %s: you pay %d spirit stones for it" % [who, str(k.n), price])
 			else:
+				Weal.act(g, wtid, "unpaid")
 				out.append("%s: \"My %s! And not a stone to pay for it, %s?\"" % [who, str(k.n), str(g.address())])
 		"ride":
 			out.append("%s: \"Mind where you ride, %s! My %s!\"" % [who, str(g.address()), str(k.n)])

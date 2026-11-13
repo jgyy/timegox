@@ -65,8 +65,10 @@ const KINDS := {
 	"mark": {"n": "By what stands", "col": Color("f0c8a0"), "what": "the things your choices left standing in the land, gone and looked at"},
 	# the Three Burrows release: the households of the town that is the hero's own (hold.gd)
 	"town": {"n": "By the town", "col": Color("e8d090"), "what": "the households of Guiyun, the town you answer for"},
+	# the Answering Land release: the towns of the land that are the better for his passing (weal.gd)
+	"towns": {"n": "By the towns", "col": Color("ffb040"), "what": "the towns of the land that thrive because you passed through them"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark", "town"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark", "town", "towns"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -1350,6 +1352,66 @@ const TRIALS := {
 				"desc": "Late Room for the Blade and a sword tempered nine times. He has fought one-handed since before the mountain had a name. Press him until he needs the other.",
 				"line": "Lin Feng draws. The Heavenly King sighs, and shifts his feet, and does not shift his left arm at all."},
 		]},
+	# ---- Part XXVIII (the Answering Land release): the man who cannot be thrown, the owl with a claim, the jiao nobody
+	# ever held on to, and the third scourge, who asks to be put down
+	"du_hui": {"might": [3.8, 1.45],
+		"why": "He has never been off his feet in his life, and so he fights like a wall: he need not win, only stand. Forty men have gone up to him and come down like sheaves. He will stand there until the grass grows through his boots, unless something takes his footing.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Five knots that somebody tied", "needs": [["item", "grass_knot", 5]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Five knots of grass found on the heights. Somebody is tying them for the general. Tie these five again where he will set his heel, and let a dead man's thanks do what forty spears could not.",
+				"line": "Lin Feng stoops as he comes up the hill, five times, as if to settle a sandal. Du Hui watches his hands. He does not think to watch the grass."},
+			{"id": "heights", "kind": "heights", "n": "From above him", "needs": [["summits", 12]], "boon": {"foe_hp": 0.8, "taken": 0.85},
+				"desc": "Twelve summits stood on. He is a wall, and a wall is only tall from in front. Come at him as somebody who has looked down on higher things than a strong man on a hill.",
+				"line": "Lin Feng comes down on him from the rocks behind, where no charge would. Du Hui turns his whole body to face it, which takes a wall some time."},
+			{"id": "might", "kind": "might", "n": "Throw him", "needs": [["lv", 96], ["temper", 9]], "boon": {},
+				"desc": "Early Sumeru in a Seed and a sword tempered nine times. Forty men could not. It has never been tried by one who weighs a mountain.",
+				"line": "Lin Feng draws. \"Forty-one,\" says Du Hui, and spreads his feet a hand wider."},
+		]},
+	"night_owl": {"might": [3.9, 1.45],
+		"why": "It is not cruel. It struck its prey fairly and was robbed by a boy with a stick, and it has the law of the air on its side. It will not be argued out of a just claim; it can only be shown a greater one.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four rings, for a hundred days", "needs": [["item", "jade_ring", 4]], "boon": {"foe_hp": 0.7, "weak_k": 1.8},
+				"desc": "Four rings of white jade found on the heights. This is what the sparrow thought a hundred days of yellow flowers was worth. Show them to the owl, and ask what it paid for its claim.",
+				"line": "Lin Feng holds up four rings of white jade on one finger. The owl counts them, twice, turning its head. It has never been given anything, and it knows it."},
+			{"id": "peoples", "kind": "peoples", "n": "The Feathered Folk speak for the small", "needs": [["standing", "yumin", 60]], "boon": {"foe_hp": 0.8, "taken": 0.85},
+				"desc": "A friend of the Yumin. The Feathered Folk hold that whoever mends a wing has a claim on the bird before whoever broke it. Say it in their own speech, which an owl must hear out.",
+				"line": "Lin Feng says nine words in the speech of Featherfall. The owl's ear-tufts go flat. It has been cited, and it knows the court."},
+			{"id": "might", "kind": "might", "n": "Argue it in the air", "needs": [["lv", 97], ["temper", 9]], "boon": {},
+				"desc": "Middle Sumeru in a Seed and a sword tempered nine times. The old court is the one with talons in it.",
+				"line": "Lin Feng draws. \"Hoo,\" says the owl, not displeased. \"A litigant.\""},
+		]},
+	"bridge_jiao": {"might": [3.9, 1.5],
+		"why": "It breaks boats to find out whether it is a dragon, and nobody has ever answered it. Blows only tell it what it knows already: that it is strong, and has no horns. It has a man on its neck who will not let go, and it does not know what that means.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four scales it never missed", "needs": [["item", "jiao_scale", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four scales rubbed off on the piles of the long bridge. It has been shedding for a year and has not noticed. A thing that sheds is a thing that is growing. Show it.",
+				"line": "Lin Feng lays four scales on the water, and they float. The jiao looks at them, and then along its own side, where the new ones are a darker green."},
+			{"id": "hearth", "kind": "hearth", "n": "The Boat Hearth knows a river", "needs": [["hearths", 6]], "boon": {"foe_hp": 0.8, "taken": 0.85},
+				"desc": "A guest at all six hearths of the land. The people of the boats have a word for a jiao that has stopped breaking them. Go up as somebody who may say it.",
+				"line": "Lin Feng calls it by the name the boat people keep for a river that has let them through. The jiao has never been called anything but a scourge."},
+			{"id": "towns", "kind": "towns", "n": "Three towns that stopped being afraid", "needs": [["weal", 3]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Three towns of the land thriving or festive. It has only ever been looked at by people running away. Go up as somebody towns are glad to see come, and look at it the same way.",
+				"line": "Lin Feng looks at the jiao the way three towns look at him now when he comes up the road. Nothing has ever looked at it like that. It forgets to thrash."},
+			{"id": "might", "kind": "might", "n": "Hold on as he does", "needs": [["lv", 97], ["temper", 9]], "boon": {},
+				"desc": "Middle Sumeru in a Seed and a sword tempered nine times. One man has been on its neck three days. Make it two.",
+				"line": "Lin Feng draws, and goes into the white water up to the chest. Zhou Chu, from the jiao's neck, shouts something cheerful that the river takes."},
+		]},
+	"zhou_chu": {"might": [4.0, 1.5],
+		"why": "He has asked to be put down, and he has never done anything by halves. He will fight as he broke the doors: without malice and without any notion of his own weight. Nobody can beat the third scourge for the town. The town has to see somebody stand in front of him who was once thought a scourge too.",
+		"paths": [
+			{"id": "towns", "kind": "towns", "n": "Four towns that are glad of him", "needs": [["weal", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four towns of the land thriving or festive. He thinks a strong man can only be a scourge. Go up as somebody whose strength four towns hang lanterns for, and let him see it can be otherwise.",
+				"line": "\"Four towns,\" says Lin Feng, \"where they light a lantern when I come. I broke things in every one of them first.\" Zhou Chu's hands, which were fists, come open."},
+			{"id": "loss", "kind": "loss", "n": "Somebody who has been beaten", "needs": [["falls", 2]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Two battles lost that could not be won. He has never lost, and so he has never learned anything. Tell him what it is like, before he finds out.",
+				"line": "\"I have been beaten twice,\" says Lin Feng, \"by things I could not have beaten. I got up.\" Zhou Chu looks at him as at a man who has been to a country he has only heard of."},
+			{"id": "mark", "kind": "mark", "n": "What a strong hand can leave", "needs": [["marks", 8]], "boon": {"foe_hp": 0.8, "foe_atk": 0.85},
+				"desc": "Eight things your choices left standing, gone and looked at. He has left forty broken doors. Tell him what else can be left.",
+				"line": "Lin Feng names eight things that stand in the land because of him, and where. Zhou Chu counts on his fingers what stands because of himself. He does not need a second hand."},
+			{"id": "might", "kind": "might", "n": "Put the third down", "needs": [["lv", 98], ["temper", 9]], "boon": {},
+				"desc": "Late Sumeru in a Seed and a sword tempered nine times. He gave his word there would be three. Help him keep it, and stop short.",
+				"line": "Lin Feng draws. \"Good,\" says Zhou Chu, and means it, and comes on like a door falling."},
+		]},
 	"cao_cao": {"might": [3.4, 1.4],
 		"why": "He has been awake for a month and in pain for twenty years, and he has decided that both are somebody else's fault. He trusts nobody who could hurt him, which is everybody. Climb to him as somebody who has come to win, and you will only be one more reason not to sleep.",
 		"paths": [
@@ -1586,6 +1648,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"marks":
 			# what the choices left standing, looked at (marks.gd)
 			return g.marks_seen.size() >= int(n[1])
+		"weal":
+			# the Answering Land release: the towns that thrive, or better (weal.gd)
+			return Weal.count(g, "thriving") >= int(n[1])
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1673,6 +1738,8 @@ static func need_text(n: Array, g) -> String:
 			return "%d households at Guiyun (now %d: build at the steward's table, and ask people to come; Esc > Town)" % [int(n[1]), Hold.households(g)]
 		"marks":
 			return "%d things your choices left standing, gone and looked at (now %d: Esc > Crossroads says where each stands)" % [int(n[1]), g.marks_seen.size()]
+		"weal":
+			return "%d towns of the land thriving or festive (now %d: Esc > The Land says how each stands, and why)" % [int(n[1]), Weal.count(g, "thriving")]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).

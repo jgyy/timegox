@@ -19,7 +19,7 @@ const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon
 	# Part XIX: the Player, Yan Shi's dancer, in its own model
 	"person:the_player",
 	# the Underclothes release: the oxen of the land as oxen; and Part XXVI's duke and lord of Wei in their own models
-	"ox", "person:duke_huan", "person:cao_cao", "person:palace_buyer", "person:li_jing", "person:palace_buyer", "person:li_jing",
+	"ox", "person:duke_huan", "person:cao_cao", "person:palace_buyer", "person:li_jing", "person:palace_buyer", "person:li_jing", "person:du_hui", "person:zhou_chu",
 	# Part XX: the Valley Spirit, in her own model
 	"person:xuanpin",
 	# Part XXI: the king who loved swords and the Masterless Edge, in their own models

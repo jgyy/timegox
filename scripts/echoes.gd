@@ -67,6 +67,10 @@ const CROSSROADS := {
 			"drive": [["Narrator", "They go up the pass in a line, not looking back, with their hands empty. At the top one of them stops, as if he might say something. Then he goes on."], ["Yue Ling", "It is fair. I only wonder where a man goes, who has nothing and has just been shown he cannot take it."]],
 		},
 		"echo": {
+			"s_p28_home": {
+				"mend": [["Elder Qing Xuan", "The eggs are from the Bamboo Forest. The man who left them mends the road there. He was a bandit once, he told Old Shen, and somebody gave him a mattock instead of a beating. He would not say who. He did not need to."]],
+				"drive": [["Elder Qing Xuan", "And there is a note from over the ridge, unsigned, in a rough hand: 'We have a village now. No thanks to you. Tell the sweeper we remember which way he pointed.' I do not know what to make of it. I think they are proud."]],
+			},
 			# Part XXVII (the Heavy Road release)
 			"s_p27_tao": {
 				"mend": [["Tao Kan, Who Carries Bricks", "They tell me you once set forty bandits to mending a road with their own hands, when you were hardly more than a boy. Then you knew this already, and forgot it when you learned to fly. Most do."]],
@@ -1135,7 +1139,7 @@ const CROSSROADS := {
 	"the_horse": {"step": "s_p24_weng2", "part": "XXIV", "n": "The old man's horse",
 		"ask": "The black horse broke Sai Weng's son and saved him from the riders. It stands behind the tent, and the whole frontier will do with its luck as the old man does with his. He has asked you to say. What is to be done with a horse like that?",
 		"options": [
-			{"id": "keep", "label": "Keep it by the tent, and never ride it", "tilt": {"reach": -3, "heart": 1}, "gain": {"hearth": {"steppe": 3}},
+			{"id": "keep", "label": "Keep it by the tent, and never ride it", "tilt": {"reach": -3, "heart": 1}, "gain": {"hearth": {"dawn": 3}},
 				"desc": "It came, and it is here. Put rails round it by the old man's door, and let the boy water it. Whatever is home is to be kept, lame or dangerous or neither. The Felt Hearth will understand that at once (regard of the Horse-Folk).",
 				"log": "Told Sai Weng to keep the black horse by his tent, unridden."},
 			{"id": "loose", "label": "Take down the rails. Let it run", "tilt": {"reach": 3, "craft": -1}, "gain": {"renown": 5},
@@ -1183,11 +1187,16 @@ const CROSSROADS := {
 				"log": "Left the sack hanging empty by the gate, and went in to supper."},
 		],
 		"after": {
-			"carry": [["Narrator", "Lin Feng bends his knees, as Tao Kan taught him, gets a shoulder under the sack and stands up. It is exactly as heavy as it was. Budai claps his hands like a child at a conjuror."], ["Budai, the Cloth-Sack Monk", "Hah! And he walks off with it! That is the other half of the teaching, and nobody ever waits to see it. Here: a seed, for your smith's ring. It will hold all that, and you will carry it anyway. I know your kind. I am your kind."]],
+			"carry": [["Narrator", "Lin Feng bends his knees, as Tao Kan taught him, gets a shoulder under the sack and stands up. It is exactly as heavy as it was. Budai claps his hands like a child at a conjuror."], ["Budai, the Cloth-Sack Monk", "Hah! And off it goes, on a back! That is the other half of the teaching, and nobody ever waits to see it. Here: a seed, for your smith's ring. It will hold all that, and you will carry it anyway. I know your kind. I am your kind."]],
 			"share": [["Narrator", "Lin Feng takes the cord off the neck of the sack and begins to plait it into straps: two, four, a great many. Budai watches with his head on one side, and then starts handing him more cord out of the sack, which seems to have a good deal."], ["Budai, the Cloth-Sack Monk", "I never thought of that. Three hundred years with one sack and one shoulder, and I never once thought of that. Take a seed for your smith's ring, clever sweeper. And put a strap on the ring too, if you can find where."]],
 			"down": [["Narrator", "Lin Feng looks into the sack a long time. Then he tips it up. What falls out is nothing: every thing in it has gone home already, and had only been waiting to be let. He folds the sack over his arm, like a cloak on a warm day."], ["Budai, the Cloth-Sack Monk", "Ahh. Most people need to be very old before they find it was empty. Here is the seed for your smith's ring. It holds everything, so naturally it is only given to somebody with nothing left to put in it. Go home. Eat something."]],
 		},
 		"echo": {
+			"s_p28_wei": {
+				"carry": [["Wei Ke, General of Jin", "They say you are the one who picked up a monk's sack and has not put it down. Then you will understand a general. I carry four thousand men, and I may not set one of them down either."]],
+				"share": [["Wei Ke, General of Jin", "They say you are the one who put a strap on a load for every shoulder. I should like that done with a battle. Mine has one shoulder under it, and the shoulder is tired."]],
+				"down": [["Wei Ke, General of Jin", "They say you are the one who set a great load down at his own gate and went in to supper. I envy you. A general sets nothing down until somebody takes it from him."]],
+			},
 			"s_p27_end": {
 				"carry": [["Elder Qing Xuan", "And I hear you picked the monk's sack up again. Of course you did. I have watched you pick up everything that was ever put down near you since you were thirteen. I used to think it a fault. I think now it is simply what you weigh."]],
 				"share": [["Elder Qing Xuan", "And I hear there is a board in the Silk Woods with a name against every strap. Smith Tie has put his on it, for charcoal, and so, I am told, has Auntie Zhou, for forty buckets. I have been wondering what an Elder might decently carry."]],
@@ -1198,6 +1207,37 @@ const CROSSROADS := {
 			"carry": "On the roads of the land there are posts at the height of a shoulder, and a sweeper who carries what he is handed and knows what it weighs, and has never yet said that it was too much.",
 			"share": "In every town of the south there is a board with the loads of the day on it, and a name against every strap, and nobody in that country has carried anything alone since.",
 			"down": "By the gate of the Whispering Bamboo an old hemp sack hangs empty, and whoever comes home along that road looks into it, and goes on lighter.",
+		}},
+	# ---- Part XXVIII (the Answering Land release): what is owed for a kindness
+	"the_knot": {"step": "s_p28_knot", "part": "XXVIII", "n": "The Knotted Grass",
+		"ask": "An old man has tied grass in the dark for four nights to pay a general who has forgotten what he did. A sparrow carried four rings across the sky. The dead cannot rest for owing. What is owed for a kindness?",
+		"options": [
+			{"id": "nothing", "label": "Nothing. It was finished when it was done", "tilt": {"heart": 2, "reach": -2}, "gain": {"renown": 6},
+				"desc": "A kindness is not a loan. Whoever did it has forgotten, and was right to. Let the old man straighten his back and go home, and let nobody in the land lie awake for what they were given (renown).",
+				"log": "Said that a kindness is finished when it is done, and sent the old man home."},
+			{"id": "ledger", "label": "Write it down, so that it can be paid", "tilt": {"craft": 3, "heart": -1}, "gain": {"stones": 9500},
+				"desc": "Thanks that have nowhere to go turn into grass tied in the dark. A book in every town, then: what was done, by whom, for whom, and a line to strike it through when it is answered. Something new (spirit stones).",
+				"log": "Had the kindnesses of the land written in a book, each with a line to strike it through."},
+			{"id": "onward", "label": "It is owed to the next stranger", "tilt": {"reach": 3, "heart": 2}, "gain": {"hearth": {"dawn": 3}},
+				"desc": "The general cannot be paid; he does not know he is owed. So pay somebody else, who will not know why either, and let it go on down the road until nobody can find where it began (the regard of the Lantern Hearth).",
+				"log": "Said that a kindness is owed onward, to the next stranger on the road."},
+		],
+		"after": {
+			"nothing": [["Narrator", "The old man's hands stop. He looks at the knot he has half made for a long moment, and then, very slowly, he pulls the stems apart and smooths them straight. It is the first knot he has untied that had tripped nobody."], ["The Old Man in the Grass", "Finished when it was done. Eleven years I have been owing, and nobody thought to tell me the account was closed the day it was opened. Help me up. My daughter's children are waiting, and I have been a long time in this field."]],
+			"ledger": [["Narrator", "Lin Feng takes out a brush. The old man watches him write it down: a concubine, a father's two orders, the one that was followed, a bolt of cloth, four nights of grass. When it is on the page he reads it over twice, moving his lips."], ["The Old Man in the Grass", "There. It is somewhere. I may stop carrying it about in my hands. Draw the line through it, sweeper, where it says paid. No: give me the brush. I should like to draw that line myself."]],
+			"onward": [["Narrator", "The old man laughs, a dry sound like grass in wind. He finishes the knot he is tying, and then walks ten paces down the field, to a place where no army has ever stood or will, and ties another, for nobody."], ["The Old Man in the Grass", "Somebody will come along this row one day in trouble, and something will trip whatever is after him, and he will never know. That is better than a general. Go on, sweeper. I have a deal of field to do, and it is all for strangers now."]],
+		},
+		"echo": {
+			"s_p28_end": {
+				"nothing": [["Elder Qing Xuan", "And I hear you told a dead man that nothing was owed. I went and told the woman with the persimmons the same. She said: then I shall send them because I like to. I had no answer to that. I do not think there is one."]],
+				"ledger": [["Elder Qing Xuan", "And I hear there is to be a book in every town with the kindnesses in it. Old Shen has begun ours. My name is on the first page, against a thing I did forty years ago for the wrong reason. He has left a very long line for the answer."]],
+				"onward": [["Elder Qing Xuan", "And I hear you told a dead man to pay a stranger. I carried the persimmons down to the outer court and gave them to forty disciples who had not earned them. They will owe somebody. Let them find out whom."]],
+			},
+		},
+		"end": {
+			"nothing": "In the Valley of Sunrise there is a field where the grass stands straight, and a cairn where an old man put down what he owed. People who pass it sleep that night as they have not since they were children.",
+			"ledger": "In every town of the land there is a book of what was done for whom, and most of its lines are struck through, and people read it on winter evenings the way they used to read the almanac.",
+			"onward": "Along the roads of the land the grass is tied here and there in knots, at the height of an ankle, by nobody anybody has seen. Now and then something that was chasing somebody falls over.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1231,8 +1271,8 @@ const CROSSROADS := {
 			},
 			"s_p26_end": {
 				"copy": [["Elder Qing Xuan", "There is a copy of a physician's book on the post counter in Qingshi, they tell me, with a stone on it against the wind. The postmaster says it is the most borrowed thing he has ever had on the counter, and the only one ever brought back."]],
-				"keep": [["Elder Qing Xuan", "And the book is at Guiyun, behind a broom. Good. A thing that must be swept for is a thing that will be read properly. I have nine hundred years of scriptures here that nobody ever had to sweep for, and you see what they taught me about sitting."]],
-				"burn": [["Elder Qing Xuan", "I hear the book was burned, and that he did not mind. I mind, a little. But I am a librarian's son, and I have also seen what a book can be made to say by somebody who has only read it. Let it be taught, then, the old way."]],
+				"keep": [["Elder Qing Xuan", "And the book is at Guiyun, behind a broom. Good. A thing that must be swept for is a thing that will be read properly. I have three hundred years of scriptures here that nobody ever had to sweep for, and you see what they taught me about sitting."]],
+				"burn": [["Elder Qing Xuan", "I hear the book was burned, and that he did not mind. I mind, a little. But I have kept a library for seventy years, and I have also seen what a book can be made to say by somebody who has only read it. Let it be taught, then, the old way."]],
 			},
 		},
 		"end": {
@@ -1349,7 +1389,7 @@ const CROSSROADS := {
 		"echo": {
 			# Part XXVI (the Underclothes release)
 			"s_p26_end": {
-				"found": [["Elder Qing Xuan", "And at the Returning Cloud they do the frolics before the first lesson, I hear, in the street. A sect of yours that begins by getting up. I wish I had thought of it nine hundred years ago."]],
+				"found": [["Elder Qing Xuan", "And at the Returning Cloud they do the frolics before the first lesson, I hear, in the street. A sect of yours that begins by getting up. I wish I had thought of it seventy years ago."]],
 				"take": [["Elder Qing Xuan", "And on Frostpeak, I hear, three hundred who stood in the snow for sixty years are being taught to look behind them like a deer. Han Song comes out of the gatehouse to watch. He says nothing. He has started doing the bear."]],
 				"serve": [["Elder Qing Xuan", "And your hall at Guiyun sends its children up the steps to us in the spring, and this spring they did the frolics in our courtyard before they had put their bedding down. I watched from the window. I did the bird."]],
 			},
@@ -1383,7 +1423,8 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_tide", "the_ape", "the_horse",
 	"the_tallies", "the_door", "the_seat",
 	"the_book",
-	"the_sack"]
+	"the_sack",
+	"the_knot"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:
@@ -1457,6 +1498,8 @@ static func take(g, id: String, oid: String) -> void:
 			var nm := str(SCALES[sc].pos if now > 0 else SCALES[sc].neg)
 			g.toast("The land knows you now: %s" % nm)
 			g.note("Known as %s: %s" % [nm, str(SCALES[sc].pos_text if now > 0 else SCALES[sc].neg_text)])
+	# (the Answering Land release, weal.gd: the towns that hear of the answer are changed by it)
+	Weal.poll(g)
 
 # ---------------------------------------------------------------- the scales
 ## Where scale `sc` stands: what the crossroads tipped, and what the five fated encounters added

@@ -449,6 +449,12 @@ static func _settle_ok(tx: int, ty: int) -> bool:
 ## sets them for a region's view and clears them after, and nothing built crowds them.
 static var clearings: Dictionary = {}
 
+## The tiles of the grid being populated that something stands on (the Answering Land release): a person, a
+## lord, a thing to find, a thing a choice left standing, a plot of the hero's town, a machine, something that
+## breaks, and the ground a big one of them covers.  world.gd sets them for a region's view and clears them
+## after; grass grows there as anywhere, and no rock, bush, log or stump is scattered through whoever stands.
+static var stood: Dictionary = {}
+
 static func _by_clearing(tx: int, ty: int, r: int) -> bool:
 	if clearings.is_empty():
 		return false
@@ -472,7 +478,7 @@ static func _floor_tile(layers: Dictionary, tx: int, ty: int, to_wall: int, to_w
 				if h(tx, ty, 21.0 + k) < 0.7:
 					var ts := 0.7 + h(tx, ty, 28.0 + k) * 0.7
 					_add(layers, "tuft", func(): return tp, _xf(gx.call(0.1 + h(tx, ty, 22.0 + k) * 0.8, 0.1 + h(tx, ty, 25.0 + k) * 0.8), h(tx, ty, 31.0 + k) * TAU, ts), _tint(tx, ty, 34.0 + k, 0.2), false, 40.0)
-	if to_path == 0:
+	if to_path == 0 or stood.has(Vector2i(tx, ty)):
 		return
 	# forest-edge undergrowth spills onto open ground
 	if to_wall == 1 and not under.is_empty() and h(tx, ty, 81.0) < 0.28:
@@ -507,6 +513,8 @@ static func _floor_tile(layers: Dictionary, tx: int, ty: int, to_wall: int, to_w
 ## A tile of a mountain's flank: bare rock, with a boulder lodged on it now and then and, where the
 ## slope allows, one of the region's own trees holding on (smaller the steeper it stands).
 static func _crag_tile(layers: Dictionary, tx: int, ty: int, gx: Callable, theme_name: String, canopy: Array, rocks: Array, groves: Array, drop: float) -> void:
+	if stood.has(Vector2i(tx, ty)):
+		return
 	var r := h(tx, ty, 131.0)
 	if r < 0.1 and not rocks.is_empty():
 		var rv := int(h(tx, ty, 132.0) * Rocks.VARIANTS)

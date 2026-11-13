@@ -48,7 +48,7 @@ const LETTERS := {
 		"lines": ["Not since yesterday! Then here is today, and tomorrow, and the day after, wrapped in a lotus leaf, and the carrier has been told what happens to him if it arrives squashed. Thank you for telling me the truth. Do it again."]},
 	# ---- Part XXVI (the Underclothes release): letters about a physician's book, and from the physician
 	"book_copy": {"from": "Granny Lou of Qingshi", "needs": ["the_book", "copy"], "wait": 3,
-		"lines": ["Lin Feng, the book came to the counter in a blue bag with a stone on it. I cannot read, so the postmaster reads it to me, a page a night. We are at the bear. My knees are at the bear too. I wanted you to know there is an old woman going to the well again who had stopped."]},
+		"lines": ["Lin Feng, the book came to the counter in a blue bag with a stone on it. My eyes are not what they were, so Headman Luo reads it to me, a page a night, a page a night. We are at the bear. My knees are at the bear too. I wanted you to know there is an old woman going to the well again who had stopped."]},
 	"book_keep": {"from": "Feng Xuan, Steward of Guiyun", "needs": ["the_book", "keep"], "wait": 3,
 		"lines": ["For the books: one book, in a blue bag, kept on a shelf by the Hall of the Broom. Value: I have not entered one. Nineteen have swept for it so far. The street has never been cleaner, and two of them set a bone last week, correctly, by lamplight. I find I have opened a new column."]},
 	"book_burn": {"from": "Mistress Wu, the Jailer's Wife", "needs": ["the_book", "burn"], "wait": 3,
@@ -65,6 +65,16 @@ const LETTERS := {
 		"lines": ["There is an old sack hanging by the bamboo gate that you had no business leaving there, child, and I walk past it every market day and it is always empty and I am always glad. You carried enough. Come and eat. I have made too much, as usual, and there is nobody to carry it away."]},
 	"tao_last": {"from": "Tao Kan", "after": "s_p27_sack", "wait": 4,
 		"lines": ["Sweeper: the granary is roofed. It was your eight stems and my bricks and somebody's sawdust. I hear you have a ring now that holds everything. Good. Take out one thing every morning and carry it a hundred paces, and put it back at night. I will know if you do not. I shall not know how, but I will."]},
+	# ---- Part XXVIII (the Answering Land release): letters about what is owed, and from a man mending doors
+	"knot_nothing": {"from": "Tanner Hou's Widow", "needs": ["the_knot", "nothing"], "wait": 3,
+		"lines": ["Lin Feng, my father sleeps at night now. He says you told him the account was closed the day it was opened. He has taken up whittling, badly. I enclose the price of a spoon. It is the fourth he has made and the first that would hold soup, and somebody bought it, owing you nothing."],
+		"gift": {"stones": 300}},
+	"knot_ledger": {"from": "Book-Keeper Mu of Qingshi", "needs": ["the_knot", "ledger"], "wait": 3,
+		"lines": ["The book has four hundred entries and three hundred and sixty lines drawn through. There are eleven against your name that you have never answered, child, because nobody told you of them. I enclose the list. Do not hurry. They have waited years, and found the waiting had a use."]},
+	"knot_onward": {"from": "Yang Bao, Aged Nine", "needs": ["the_knot", "onward"], "wait": 3,
+		"lines": ["I put my box by the road for strangers like you said the old man said. Somebody left a goat in it. Not in it. Tied to it. Mother says we are to keep the goat until a stranger wants one. I have named it Stranger so that it will know when it is wanted. I am ten now."]},
+	"chu_doors": {"from": "Zhou Chu of Yixing", "after": "s_p28_third", "wait": 4,
+		"lines": ["Sweeper: I have hung thirty-one doors. They do not all shut. Old Tan says a door hung by me that does not shut is better than a door broken by me that does not open. I go to Wu in the spring to find the one who knows about mornings. I have bought a book. I am reading it. It is about doors."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -169,7 +179,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:
@@ -257,7 +267,9 @@ static func bag_offer(g, office: String) -> Dictionary:
 		return {}
 	var others: Array = []
 	for o in POSTS:
-		if o != office and Data.layer_of(area_of(o)) == Data.layer_of(area_of(office)) and not g.mail_bags.any(func(b): return str(b.from) == office and str(b.to) == o):
+		# (the Answering Land release: only to a counter in a region he has walked into: three bags for towns
+		# behind closed seals used to fill his hands for chapters)
+		if o != office and Data.layer_of(area_of(o)) == Data.layer_of(area_of(office)) and (g.seen.has(area_of(o)) or g.seen.is_empty()) and not g.mail_bags.any(func(b): return str(b.from) == office and str(b.to) == o):
 			others.append(o)
 	if others.is_empty():
 		return {}
@@ -282,6 +294,7 @@ static func deliver(g, office: String) -> int:
 		if str(b.to) == office:
 			paid += int(b.pay)
 			g.bags_done += 1
+			Weal.act(g, Weal.of_office(office), "bag")
 		else:
 			keep.append(b)
 	g.mail_bags = keep

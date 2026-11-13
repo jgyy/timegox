@@ -372,6 +372,9 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		# (the Three Burrows release: the town that is his own, and whose name is over its hall, hold.gd)
 		if not Hold.epilogue(Game).is_empty():
 			lines.append(["Narrator", " ".join(Hold.epilogue(Game))])
+		# (the Answering Land release, weal.gd: and what became of the towns)
+		if not Weal.epilogue(Game).is_empty():
+			lines.append(["Narrator", " ".join(Weal.epilogue(Game))])
 		var stood := 0
 		for lid9 in ["surface", "heaven", "under", "sea"]:
 			stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
@@ -600,6 +603,12 @@ func interact(e: Dictionary) -> void:
 func talk_folk(e: Dictionary) -> void:
 	var fp: Dictionary = e.p
 	var lines := [[str(fp.n), Folk.line(fp, Game)]]
+	# (the Answering Land release, weal.gd: every other word is about how their town stands, and why)
+	var wn := int(Game.folk_talk.get(str(fp.id), 0))
+	if wn % 2 == 1 and Game.prologue == "" and not Folk.new_year(Game):
+		var wl := Weal.line(Game, str(fp.town), int(fp.seed) + wn / 2)
+		if wl != "":
+			lines = [[str(fp.n), wl.replace("%s", Game.address())]]
 	# a first word with one of a hearth's people (cultures.gd) is a step towards being its guest
 	var hid := Cultures.of_town(str(fp.town))
 	if hid != "" and not Game.folk_talk.has(str(fp.id)) and Game.prologue == "":
@@ -614,6 +623,7 @@ func talk_folk(e: Dictionary) -> void:
 	if not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and Folk.in_town(fp, s) and not Game.folk_has(s, str(fp.id)) and Folk.ERRANDS.has(str(s.id)):
 		var er: Dictionary = Folk.ERRANDS[str(s.id)]
 		Game.folk_mark(s, str(fp.id))
+		Weal.act(Game, Weal.of_folk(str(fp.town)), "errand")
 		Game.stones = maxi(0, Game.stones - int(er.price))
 		done = true
 		lines = [["Lin Feng", str(er.ask)], [str(fp.n), Folk.errand_line(str(s.id), fp)]]
@@ -664,6 +674,9 @@ func offer_pedlar(fp: Dictionary, ask_home: bool = false) -> void:
 		world.folk_talking = ""
 		if oid == "sell":
 			var got: Array = Load.sell_all(Game)
+			# (weal.gd: what the land gave, sold on the road, is felt in the town that road leads to)
+			for wt in Weal.hears(Game.area).slice(0, 1):
+				Weal.act(Game, str(wt), "sold", int(got[1]) if got.size() > 1 else 1)
 			Feats.poll(Game)
 			say([[str(fp.n), "Good stuff, honestly come by. %d stones, and I am robbing myself." % int(got[0])]])
 		elif oid.begins_with("buy:"):
@@ -688,7 +701,7 @@ func offer_store() -> void:
 	var where := Load.at_home(Game, Game.area, world.ptile)
 	if where == "":
 		return
-	var opts: Array = [{"id": "later", "label": "Leave it as it is", "desc": "%s. %s" % [where.capitalize(), Load.text(Game)], "col": UI.C_DIM}]
+	var opts: Array = [{"id": "later", "label": "Leave it as it is", "desc": "%s. %s" % [(where.substr(0, 1).to_upper() + where.substr(1)), Load.text(Game)], "col": UI.C_DIM}]
 	for sid in Load.stowable(Game):
 		opts.append({"id": "stow:" + str(sid), "label": "Leave: %s x%d" % [str(Data.ITEMS[sid].n), Load.carried(Game, sid)], "note": "%d jin" % int(round(Load.weight_of(sid) * Load.carried(Game, sid))), "desc": str(Data.ITEMS[sid].desc) + ".", "col": UI.C_GOLD})
 	for tid in Game.stash:
@@ -862,7 +875,12 @@ func talk_npc(e: Dictionary) -> void:
 	if e.has("office") and e.has("lines"):
 		var oi: int = chat_idx.get(e.id, 0)
 		chat_idx[e.id] = oi + 1
-		say([[e.n, str(e.lines[oi % (e.lines as Array).size()])]], func(): offer_carriage(e))
+		var olines := [[e.n, str(e.lines[oi % (e.lines as Array).size()])]]
+		# (the Answering Land release, weal.gd: whoever answers for a town receives him as the town stands)
+		var ow := Weal.word(Game, Weal.of_office(str(e.office)), oi)
+		if ow != "" and Game.prologue == "":
+			olines.push_front([e.n, ow])
+		say(olines, func(): offer_carriage(e))
 		return
 	if e.has("trade") and e.has("lines"):
 		var ti: int = chat_idx.get(e.id, 0)
@@ -1035,6 +1053,16 @@ func offer_carriage(e: Dictionary) -> void:
 		return
 	var office := str(e.office)
 	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
+	# (the Answering Land release, weal.gd: how the town stands, a gift to its chest, and its thanks)
+	var wtid := Weal.of_office(office)
+	if wtid != "":
+		if Weal.thanks_due(Game, wtid):
+			opts.append({"id": "weal:thanks", "label": "Be thanked by the town", "desc": "There are lanterns either side of every door, and a purse on the counter with a ribbon round it that everybody in the room is pretending not to look at.", "col": UI.C_GOLD})
+		var gb := Weal.gift_blocked(Game, wtid)
+		opts.append({"id": "weal:give", "label": "Give to the town's chest", "note": "%d stones" % Weal.gift_cost(Game),
+			"desc": "For the granary, the well-rope and the watch's lamp-oil: %d spirit stones (you have %d). A town is the better for it, a little, for good. A chest takes three gifts of one giver and no more (%d given here).%s" % [Weal.gift_cost(Game), Game.stones, Weal.acts(Game, wtid, "gift"), "" if gb == "" else "\n\n" + gb],
+			"col": UI.C_JADE if gb == "" else UI.C_DIM, "enabled": gb == ""})
+		opts.append({"id": "weal:ask", "label": "Ask how the town stands", "note": str(Weal.STATES[Weal.state(Game, wtid)].n), "desc": "%s\n\n%s" % [str(Weal.STATES[Weal.state(Game, wtid)].desc), Weal.town_text(Game, wtid)]})
 	if Mail.is_post(office):
 		var here: Array = Mail.bags_for(Game, office)
 		if not here.is_empty():
@@ -1081,7 +1109,18 @@ func offer_carriage(e: Dictionary) -> void:
 	if opts.size() < 2:
 		return
 	choose("At the counter of %s" % str(e.n), opts, func(oid: String):
-		if oid == "mail:deliver":
+		if oid == "weal:give":
+			if Weal.give(Game, wtid):
+				Feats.poll(Game)
+				Game.poll_steps()
+				say([[str(e.n), "Into the chest, and written against your name, which you will tell me not to do and I shall do anyway. Somebody's roof will not leak this winter because of it. They will never know whose doing it was. I shall."]])
+		elif oid == "weal:thanks":
+			var got := Weal.thank(Game, wtid)
+			Feats.poll(Game)
+			say([["Narrator", "The purse is heavier than a town of this size should be able to make it, and there is a slip of red paper in it with every household's mark, even the ones who cannot write. The ribbon has been tied by somebody small."], [str(e.n), "%d spirit stones. Do not count it here. And do not, I beg you, try to give it back: they have already spent a week being pleased with themselves." % got]])
+		elif oid == "weal:ask":
+			say([["Narrator", Weal.town_text(Game, wtid)]])
+		elif oid == "mail:deliver":
 			var paid := Mail.deliver(Game, office)
 			Feats.poll(Game)
 			say([[str(e.n), "Seals whole, and dry. You would be surprised how seldom I say both. The road pays %d." % paid]])
@@ -1187,7 +1226,7 @@ func offer_shift(e: Dictionary) -> void:
 		return
 	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
 	if shift_ok:
-		opts.append({"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), Offices.wage(Game, use),
+		opts.append({"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), int(round(float(Offices.wage(Game, use)) * Weal.mod(Game, town, "wage"))),
 			(", and %d of salary for the days away" % Offices.salary_due(Game, use, town)) if Offices.salary_due(Game, use, town) > 0 else "", Offices.career_text(Game, use)], "col": UI.C_GOLD})
 	if not fare.is_empty():
 		opts.append({"id": "fare", "label": "Carry %s to %s" % [str(e.n), str(Data.AREAS[str(fare.to)].n)], "note": "%d stones" % int(fare.pay),
@@ -1942,7 +1981,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
