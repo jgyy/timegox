@@ -443,14 +443,14 @@ func _draw_land() -> void:
 	var cs := Weal.causes(Game, tid)
 	if cs.is_empty():
 		UI.wrapped(self, Vector2(r.position.x + 24, y + 18.0), "Nothing he has done has reached here yet.", 14, UI.C_DIM, r.size.x - 48)
-	for i in mini(cs.size(), 9):
+	for i in mini(cs.size(), 8):
 		var c: Dictionary = cs[i]
 		var good: bool = int(c.d) > 0
 		UI.text(self, Vector2(r.position.x + 24, y + 20.0), "%s %+d" % [str(Weal.MEASURE_NAMES[str(c.m)]).to_lower(), int(c.d)], 14, UI.C_JADE if good else UI.C_RED)
 		UI.text(self, Vector2(r.position.x + 130, y + 20.0), main.told(str(c.why)), 14, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 160)
 		y += 24.0
-	if cs.size() > 9:
-		UI.text(self, Vector2(r.position.x + 24, y + 20.0), "and %d things more" % (cs.size() - 9), 13, UI.C_DIM)
+	if cs.size() > 8:
+		UI.text(self, Vector2(r.position.x + 24, y + 20.0), "and %d things more" % (cs.size() - 8), 13, UI.C_DIM)
 	UI.wrapped(self, Vector2(r.position.x + 24, r.end.y - 44.0), "Whoever answers for a town will tell you how it stands, and its chest takes gifts. A shift worked, the post carried, an errand run and a road cleared are all felt; so is a jar broken and not paid for.", 13, UI.C_DIM, r.size.x - 48)
 
 ## The Load (load.gd): what is on his back in jin, how much of what he can bear it is and what that
