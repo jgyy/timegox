@@ -5696,8 +5696,21 @@ func _five_frolics() -> void:
 				check(fits.call(str(el)), "%s: an answer that fits the box" % st26.id)
 		if st26.kind == "marks":
 			check(int(st26.n) >= 3 and int(st26.n) * 4 <= Echoes.ORDER.size(), "%s: no more than a quarter of what a journey leaves standing" % st26.id)
-	check(n26 >= 26 and int(kinds26.get("kill", 0)) == 3 and int(kinds26.get("hunt", 0)) == 3 and int(kinds26.get("collect", 0)) == 4 and kinds26.has("try") and kinds26.has("visits") and kinds26.has("summit") and kinds26.has("glide") and int(kinds26.get("folk", 0)) == 2 and kinds26.has("marks"),
-		"Part XXVI: %d steps: a soak, three lords, three hunts, four searches, two errands of the road, a summit and a flight" % n26)
+	check(n26 >= 26 and int(kinds26.get("kill", 0)) == 3 and int(kinds26.get("hunt", 0)) == 3 and int(kinds26.get("collect", 0)) == 4 and kinds26.has("try") and kinds26.has("visits") and kinds26.has("summit") and kinds26.has("glide") and int(kinds26.get("folk", 0)) == 3 and kinds26.has("marks"),
+		"Part XXVI: %d steps: a soak, three lords, three hunts, four searches, three errands of the road, a summit and a flight" % n26)
+	# its "go and look" asks for things looked at since it began: by then a journey has looked at as many
+	# as it asks, and a step that counted from the beginning was done the moment it was given
+	var MG = load("res://scripts/game.gd").new()
+	MG.reset()
+	MG.step = Data.step_index("s_p26_glide")
+	for mk in 9:
+		MG.marks_seen["mark:test:%d" % mk] = true
+	MG.advance()
+	var ms26: Dictionary = MG.cur_step()
+	check(str(ms26.id) == "s_p26_marks" and bool(ms26.get("new", false)) and MG.marks_count(ms26) == 0 and not MG.objective_text().contains("(8/8)"), "s_p26_marks: what was looked at before it began does not count")
+	MG.marks_seen["mark:test:new"] = true
+	check(MG.marks_count(ms26) == 1 and MG.step == Data.step_index("s_p26_marks"), "s_p26_marks: what is looked at after it began does")
+	MG.free()
 	for k26 in Data.DIALOGUE:
 		if str(k26).contains("s_p26_") or str(k26) in ["recall24", "pre:s_break31", "post:s_break31", "pre:duke_huan", "post:duke_huan", "pre:quan_niu", "post:quan_niu", "pre:cao_cao", "post:cao_cao"]:
 			for ln26 in Data.DIALOGUE[k26]:

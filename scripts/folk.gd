@@ -1056,6 +1056,11 @@ const ERRANDS := {
 			"Is there a steelyard? Whose? ...The steward's, and he lets it be checked? I shall come and check it. I shall come and check it every morning for the rest of my life.",
 			"Salt, needles, thread, a little news. That is a town, that is: it is only that the houses hold still. Yes. My knees will thank you."]},
 	# Part XXVI: the herbalists of the road, asked to go and learn from the physician at the springs while there is time
+	"s_p26_pilgrims": {"ask": "An old man below Qingshi teaches five beasts at dawn, the tiger, the deer, the bear, the ape and the bird, so that the body does not rust. Will you carry them to the shrines you pass?", "price": 0, "toast": "%s will carry the five frolics along the road",
+		"lines": ["Five beasts at every shrine? I walk a thousand li a year and my knees have filed a complaint at each of them. ...The bear, you say. Show me the bear again.",
+			"I carry the sutras, the incense and my grandmother's bones. Five animals weigh less than any of those. Yes. I shall do the deer at the Western Peak and see who joins in.",
+			"A pilgrim who stops walking is a man sitting in a temple. I know that one already. The ape I like: you reach for what is not there and it turns out to be the next step.",
+			"At the shrines they ask us to pray for the sick. Now I shall be able to tell them to stand up first. They will be offended, and better by the spring."]},
 	"s_p26_fish": {"ask": "The cook of the court at Tushan is to feed the keepers of all six hearths at one table, and an ox is not enough. Will you take him your catch?", "price": 0, "toast": "%s will take the catch to Tushan",
 		"lines": ["Six hearths at one table? They will argue about the fish. They always argue about the fish. ...Tell him to cook it plainly and they will argue less. I shall bring the carp.",
 			"The cook who cut the ox without touching a bone? Then he will not waste my fish. I have never once given a fish to a man who would not waste it. I shall go and watch him.",
