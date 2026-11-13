@@ -46,6 +46,24 @@ const MONSTERS := {
 	# oxen of the corvee and the Whole Ox of Part XXVI, which were drawn as wolves and nothing
 	"ox": "monsters/ox",
 }
+## The Underclothes release: foes of the "bird" shape that are not birds of prey are drawn from the bird
+## nearest them in kind (the shape, and so the habits and the battle, stay as they were): the waders on
+## the crane's long legs and neck, the crows and the small birds of the fields with the magpie's crow-head.
+## The rest (hawks, kites, the roc, the fighting cock) keep the raptor-headed bird.
+const BIRD_OF := {
+	"garden_crane": "monsters/bifang", "crane_matriarch": "monsters/bifang", "mist_heron": "monsters/bifang",
+	"silver_crane": "monsters/bifang", "mud_heron": "monsters/bifang", "heron_lord": "monsters/bifang",
+	"elixir_crane": "monsters/bifang", "hook_heron": "monsters/bifang", "frost_crane": "monsters/bifang",
+	"paper_crow": "monsters/magpie", "tally_crow": "monsters/magpie", "headache_crow": "monsters/magpie",
+	"seed_sparrow": "monsters/magpie", "spark_swallow": "monsters/magpie", "salt_gull": "monsters/magpie",
+}
+
+## Whether a foe is drawn a little off the ground in the land: its kind flies or floats, and it is not
+## drawn on a model that stands (the crane's).
+static func hovers(enemy: String) -> bool:
+	var shape := str(Data.ENEMIES.get(enemy, {}).get("shape", ""))
+	return shape in ["wisp", "jelly", "bird", "storm", "ray"] and str(BIRD_OF.get(enemy, "")) != "monsters/bifang"
+
 const PEOPLE := {
 	"lin_feng": "characters/lin_feng", "yue_ling": "characters/yue_ling", "elder_qing": "characters/elder_qing",
 	# the hero's other looks (character creation, fashion.gd LOOKS)
@@ -570,7 +588,8 @@ static func monster(shape: String, col: Color, enemy: String = "") -> Node3D:
 			over["mark"] = Color.from_hsv(vivid.h, clampf(vivid.s * 0.9, 0.0, 0.8), clampf(vivid.v * 0.5, 0.16, 0.42))
 		if not over.has("sec"):
 			over["sec"] = palette(vivid)[3]
-	var n := instance(MONSTERS[shape], col, palette(col, d.get("elem", ""), over))
+	var path: String = str(BIRD_OF.get(enemy, MONSTERS[shape])) if shape == "bird" else str(MONSTERS[shape])
+	var n := instance(path, col, palette(col, d.get("elem", ""), over))
 	n.set_meta("kind", "monster")
 	n.set_meta("shape", shape)
 	return n

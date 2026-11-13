@@ -5743,6 +5743,11 @@ func _five_frolics() -> void:
 	# its bands take the last slots, and what it stands in the land can be walked up to
 	for a26 in ["fungal", "tushan", "millet"]:
 		check(str(Data.AREAS[a26].get("warband5", {}).get("vis", "")).begins_with("s_p26_") and not Data.AREAS[a26].has("warband6"), "%s: the chapter's band takes the last slot" % a26)
+	# the birds that are not birds of prey are drawn from the bird nearest them in kind, and keep the
+	# shape (and so the habits) they had; a wader stands on the ground in the land
+	for bid in Assets.BIRD_OF:
+		check(str(Data.ENEMIES.get(bid, {}).get("shape", "")) == "bird" and ResourceLoader.exists("res://assets/%s.glb" % str(Assets.BIRD_OF[bid])), "%s: drawn on a bird nearer its kind, and still a bird" % bid)
+	check(not Assets.hovers("garden_crane") and Assets.hovers("tally_crow") and Assets.hovers("storm_hawk"), "a crane stands in the land; a crow and a hawk are off the ground")
 	# and its crossroads' marks are stood after the late bands of the Three Burrows (which share the
 	# mountain with one of them), so that none of those moves
 	var asrc26 := FileAccess.get_file_as_string("res://scripts/atlas.gd")

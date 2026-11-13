@@ -364,7 +364,13 @@ void fragment() {
 	} else if (is_cls(cls, 0.6)) {
 		// skin: smooth, light, warm rose shadows (an anime face's shadow is a pinker shade of the skin,
 		// never a dark one: #FDE7DA in the light, #EBBCAA in the shade) with a softer edge
-		shade_tint = vec3(1.42, 1.18, 1.16);
+		// (the Underclothes release: the rose push is for a pale face; a tan or dark skin keeps its own
+		// colour in the shade and a little less saturation in the light, or a whole body in its
+		// underclothes goes orange)
+		float skin_lum = dot(col, vec3(0.299, 0.587, 0.114));
+		float pale = smoothstep(0.62, 0.82, skin_lum);
+		col = mix(vec3(skin_lum), col, mix(0.8, 1.0, pale));
+		shade_tint = mix(vec3(1.2, 1.1, 1.08), vec3(1.42, 1.18, 1.16), pale);
 		soft_k = 1.0;
 		rim_k = 0.45;
 	} else if (is_cls(cls, 0.2)) {

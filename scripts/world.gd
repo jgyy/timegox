@@ -2830,7 +2830,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			var base_y := _ground(vb, n.position) if not vb.is_empty() else ground_y(n.position)
 			# (a pack asleep, habits.gd, neither bobs nor hovers)
 			var asleep: bool = e.kind == "enemy" and str(n.get_meta("act", "")) == "sleep"
-			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0))
+			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Assets.hovers(str(e.group[0].id)) else 0.0))
 		"machine":
 			Machines.animate(n.get_meta("model"), t + float(e.pos.x))
 			(n.get_meta("label") as Label3D).visible = dist < 12.0

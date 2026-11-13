@@ -4566,19 +4566,19 @@ func _frolics_shots(which: String = "1") -> void:
 	if want.call("people"):
 		await _gallery("part26_people", [Assets.person("hua_tuo"), Assets.person("wu_pu"), Assets.person("pao_ding"), Assets.person("jailer_wife")], 0.76, 0.2)
 	if want.call("bare"):
-		# the same six, dressed and then down to their underclothes
-		var cast := ["disciple_han", "disciple_mei", "batu", "auntie_rong", "elder_qing", "child_hua"]
-		var rows: Array = []
-		for bare in [false, true]:
-			var ms: Array = []
-			for pid in cast:
-				var m: Node3D = Assets.person(pid)
-				if bare:
-					Models.undress(m, true)
-				ms.append(m)
-			await _gallery("cast_underclothes" if bare else "cast_dressed", ms, 0.62, 0.15)
-			rows.append(last_img)
-		_grid("cast_dressed_and_bare", rows, 1)
+		# six of the people of the land, three at a time, dressed and then down to their underclothes
+		var frames: Array = []
+		for trio in [["disciple_han", "disciple_mei", "elder_qing"], ["batu", "auntie_rong", "child_hua"]]:
+			for bare in [false, true]:
+				var ms: Array = []
+				for pid in trio:
+					var m: Node3D = Assets.person(str(pid))
+					if bare:
+						Models.undress(m, true)
+					ms.append(m)
+				await _gallery("cast_%s_%s" % [str(trio[0]), "bare" if bare else "dressed"], ms, 0.42, 0.15)
+				frames.append(last_img)
+		_grid("cast_dressed_and_bare", frames, 2)
 	if want.call("foes"):
 		var fs: Array = []
 		for fid in ["rust_beetle", "still_toad", "idle_spore", "gristle_hound", "locked_joint", "hacking_butcher", "tiger_guard", "headache_crow", "sleepless_drum"]:
