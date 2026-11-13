@@ -109,7 +109,9 @@ static func story_hour(g, sid: String) -> void:
 ## morning.  Returns whether the night went by.
 static func sleep(g) -> bool:
 	var h := hour(g)
-	if h < DUSK - 1.0 and h >= 4.0:
+	# (the Answering Land release: while the story holds the hour, the noon of nine suns or the night that will
+	# not end, a bed does not move it: lying down used to end the longest night of the year)
+	if (h < DUSK - 1.0 and h >= 4.0) or frozen(g) != "":
 		return false
 	set_hour(g, 6.0)
 	return true

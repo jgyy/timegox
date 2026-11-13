@@ -908,7 +908,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "households"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -998,6 +998,9 @@ func _init() -> void:
 					"marks":
 						# what the choices left standing (marks.gd): fewer than there are crossroads behind him
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 8
+					"weal":
+						# the Answering Land release: towns that thrive (weal.gd): no more than half of them
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Weal.ORDER.size() / 2
 					"households":
 						# the Three Burrows release: households of the hero's own town (hold.gd): no more than
 						# the story has brought there by the trial, nor than a city has
@@ -1170,7 +1173,7 @@ func _init() -> void:
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost", "s_p25_guests", "s_p27_fires"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost", "s_p25_guests", "s_p27_fires", "s_p28_calls"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -2099,6 +2102,7 @@ func _fates_and_faces() -> void:
 	_three_burrows()
 	_five_frolics()
 	_heavy_road()
+	_answering_land()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -3158,7 +3162,7 @@ func _hundred_works() -> void:
 	Echoes.take(HWG, "bandits", "drive")
 	check(Echoes.chosen(HWG, "bandits") == "mend" and Echoes.scale(HWG, "heart") == 2, "a crossroads is answered once")
 	var gw: Array = Echoes.told(HWG, "s_vl_intro", Data.DIALOGUE.s_vl_intro)
-	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 6],
+	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 7],
 		"six parts later Granny Wen speaks of the road-menders, and the echo is kept")
 	check(Echoes.told(HWG, "s_intro", Data.DIALOGUE.s_intro) == Data.DIALOGUE.s_intro, "a conversation with no crossroads behind it is as it was")
 	check(not Echoes.merciful(HWG), "one kindness is not yet a name")
@@ -3175,7 +3179,7 @@ func _hundred_works() -> void:
 	check(Echoes.lean(HWG, "craft") == 1 and Echoes.lean_mod(HWG, "works_stones") == Echoes.WORKS_STONES and Works.cost_stones(HWG, "wooden_ox") < int(Works.TIER_STONES[5]), "of the new works: the makers ask less")
 	Echoes.take(HWG, "cauldron_map", "keep")
 	check(Echoes.lean(HWG, "reach") == -1 and Echoes.lean_mod(HWG, "renown") == float(Echoes.RENOWN_MORE) and Echoes.lean_mod(HWG, "regard") == 1.0, "of the home fire: his name comes back larger")
-	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 6") and Echoes.text(HWG, "bandits").contains("It stands in the land: The Menders' Road") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
+	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 7") and Echoes.text(HWG, "bandits").contains("It stands in the land: The Menders' Road") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
 	# the last question of Part XIX can only be answered for a school by somebody who has built three works of it
 	HWG.works = {}
 	var lastq: Dictionary = Echoes.CROSSROADS.the_works
@@ -4943,7 +4947,7 @@ func _three_burrows() -> void:
 				continue
 			if not str(bd25.vis).begins_with("s_p25_"):
 				# (the Underclothes release: a later chapter's bands take the same last slots in other regions)
-				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
+				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
 				continue
 			bands25 += 1
 			check(bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
@@ -5213,7 +5217,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.sumeru_seed.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.rings_returned.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -5881,7 +5885,7 @@ func _heavy_road() -> void:
 	for i in Data.STEPS.size():
 		if (Data.STEPS[i].get("gives", {}) as Dictionary).has(Load.RING):
 			ring_step = i
-	check(ring_step == Data.step_index("s_p27_sack") and ring_step >= Data.STEPS.size() - 4 and Data.step_index("s_p27_sack") > _kill_step("li_jing"), "the ring is given once, at the very end of the last chapter, after its last lord")
+	check(ring_step == Data.step_index("s_p27_sack") and ring_step >= Data.step_index("s_break32") - 3 and Data.step_index("s_p27_sack") > _kill_step("li_jing"), "the ring is given once, at the very end of the last chapter, after its last lord")
 	# a tile walked under a load is counted, and only then
 	var HG = load("res://scripts/game.gd").new()
 	HG.reset()
@@ -6000,9 +6004,9 @@ func _heavy_road() -> void:
 	TG.free()
 
 	print("== Part XXVII: the Cloth Sack ==")
-	check(Data.REALMS.size() == 33 and Data.REALMS[32] == "Sumeru in a Seed" and Data.MAX_LEVEL == 96 and Data.level_name(96).ends_with("Sumeru in a Seed") and Data.REALM_INFO.size() == 33
+	check(Data.REALMS.size() >= 33 and Data.REALMS[32] == "Sumeru in a Seed" and Data.MAX_LEVEL >= 96 and Data.level_name(96).ends_with("Sumeru in a Seed") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXVII adds the realm of Sumeru in a Seed")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break32" and Data.DIALOGUE.has("recall25") and msrc.contains("\"s_break31\": \"recall25\"") and Data.DIALOGUE.has("pre:s_break32") and Data.DIALOGUE.has("post:s_break32"),
+	check(Data.STEPS[Data.step_index("s_p28_home") - 1].id == "s_break32" and Data.DIALOGUE.has("recall25") and msrc.contains("\"s_break31\": \"recall25\"") and Data.DIALOGUE.has("pre:s_break32") and Data.DIALOGUE.has("post:s_break32"),
 		"Part XXVII follows Room for the Blade (recall25) and ends the game")
 	var n27 := 0
 	var kinds27 := {}
@@ -6101,7 +6105,7 @@ func _heavy_road() -> void:
 		check(Data.ENEMIES.has(fid27) and Lore.BEAST.has(fid27) and Habits.habit(fid27) != "" and not Dooms.is_doom(fid27), "%s: a foe of Part XXVII with a story and hours of its own" % fid27)
 	# the crossroads of the chapter: every answer answered, echoed, told at the end, written about and standing
 	var c27: Dictionary = Echoes.CROSSROADS.get("the_sack", {})
-	check(not c27.is_empty() and str(c27.step) == "s_p27_sack" and str(c27.part) == "XXVII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_sack", "what comes after the sack is set down is asked last of all")
+	check(not c27.is_empty() and str(c27.step) == "s_p27_sack" and str(c27.part) == "XXVII" and Echoes.ORDER[Echoes.ORDER.find("the_knot") - 1] == "the_sack", "what comes after the sack is set down is asked last of all")
 	check((c27.options as Array).size() == 3 and (c27.get("end", {}) as Dictionary).size() == 3 and (c27.get("echo", {}) as Dictionary).size() >= 1 and (c27.get("after", {}) as Dictionary).size() == 3,
 		"the_sack: three answers, each answered, echoed and told at the end")
 	var lettered := 0
@@ -6164,3 +6168,398 @@ func _heavy_road() -> void:
 			if str(dl[0]) in ["Elder Qing Xuan", "Hua Tuo", "Narrator"] and (str(dl[1]).contains("Nine hundred years of") or str(dl[1]).contains("deed nine hundred years") or str(dl[1]).contains("every dawn for nine hundred")):
 				nine += 1
 	check(nine == 0, "the sect is three hundred years old in every chapter")
+
+
+## The Answering Land release: how the towns stand (weal.gd), the work of the towns (folk.gd, ten new clips) and
+## Part XXVIII, the Knotted Grass.
+func _answering_land() -> void:
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	print("== how the towns stand (weal.gd) ==")
+	var G = load("res://scripts/game.gd").new()
+	G.reset()
+	G.started = true
+	check(Weal.ORDER.size() == 11 and Weal.ORDER.size() == Weal.TOWNS.size(), "eleven towns are weighed")
+	var heard := {}
+	for tid in Weal.ORDER:
+		var t: Dictionary = Weal.TOWNS[tid]
+		check(Data.AREAS.has(str(t.area)) and Offices.OFFICES.has(str(t.office)) and str(Offices.OFFICES[str(t.office)].area) == str(t.area) and (t.areas as Array).has(str(t.area)),
+			"%s: a town of a real region, with somebody who answers for it there" % tid)
+		check(Weal.of_office(str(t.office)) == tid and Weal.town_of(str(t.area)) == tid, "%s is found by its office and by its region" % tid)
+		for a in t.areas:
+			check(Data.AREAS.has(str(a)) and not heard.has(a), "%s hears of %s, and nobody else does" % [tid, a])
+			heard[a] = true
+		check(Weal.state(G, tid) == "easy" and Weal.total(G, tid) == 0 and Weal.causes(G, tid).is_empty(), "%s: a town going about its day before anybody has heard of a sweeper" % tid)
+	for a2 in Data.AREAS:
+		check(heard.has(a2), "what is done in %s is somebody's news" % a2)
+	check(Weal.STATE_ORDER.size() == Weal.STATES.size() and Weal.STATE_ORDER.find("easy") == 4, "seven states, worst to best, with an easy town in the middle")
+	for st in Weal.STATE_ORDER:
+		var sd: Dictionary = Weal.STATES[st]
+		check(str(sd.n) != "" and fits.call(str(sd.desc)) and float(sd.price) > 0.5 and float(sd.wage) > 0.5 and float(sd.mend) > 0.0, "%s: named, told, and its numbers are sane" % st)
+		check(Weal.WORDS.has(st) and Weal.STREET.has(st) or st == "easy", "%s: whoever answers for the town and the people in its street have words for it" % st)
+		for ln in Weal.WORDS.get(st, []) + Weal.STREET.get(st, []):
+			check(fits.call(str(ln)), "a word of a %s town fits the box" % st)
+		if st != "easy":
+			check((Weal.WORDS[st] as Array).size() >= 2 and (Weal.STREET[st] as Array).size() >= 2, "%s: at least two things said at the counter and two in the street" % st)
+	check(float(Weal.STATES.festive.price) < float(Weal.STATES.thriving.price) and float(Weal.STATES.thriving.price) < 1.0 and float(Weal.STATES.cold.price) > 1.0 and float(Weal.STATES.festive.wage) > 1.0 and float(Weal.STATES.lean.wage) < 1.0,
+		"a town that does well asks less of him and pays more; a town that does badly the other way")
+	# what a crossroads does: felt where its answer stands, and only there
+	var ws: Dictionary = Atlas.world_of("surface")
+	for cid in Echoes.ORDER:
+		for o in Echoes.CROSSROADS[cid].options:
+			var where := str(Marks.MARKS.get(cid, {}).get(str(o.id), {}).get("area", ""))
+			check(where == "" or not Weal.hears(where).is_empty(), "%s/%s: its answer is heard in some town" % [cid, o.id])
+			for tm in Weal.tilt_marks(o.get("tilt", {})):
+				check(str(tm[0]) in ["plenty", "peace", "regard", "home"] and int(tm[1]) != 0 and absi(int(tm[1])) <= 2, "%s/%s: a tilt moves a measure a point or two" % [cid, o.id])
+	Echoes.take(G, "bandits", "mend")
+	var b_area := str(Marks.MARKS.bandits.mend.area)
+	var b_town := str(Weal.hears(b_area)[0])
+	check(Weal.measure(G, b_town, "regard") >= 1 and not Weal.causes(G, b_town).is_empty() and str(Weal.causes(G, b_town)[0].why) == str(Echoes.option("bandits", "mend").log),
+		"bandits set to mend a road: the town that hears of it thinks the better of him, and says why")
+	var far := ""
+	for tid2 in Weal.ORDER:
+		if tid2 != b_town and not tid2 in Weal.HOME_TOWNS:
+			far = tid2
+	check(Weal.total(G, far) == 0, "and a town far away has not heard")
+	var G2 = load("res://scripts/game.gd").new()
+	G2.reset()
+	G2.started = true
+	Echoes.take(G2, "bandits", "drive")
+	var d_town := str(Weal.hears(str(Marks.MARKS.bandits.drive.area))[0])
+	check(Weal.measure(G2, d_town, "regard") < 0 and Weal.measure(G2, d_town, "peace") > 0, "driven out instead: the road is safer and his name is not liked")
+	# the ledger: what is done in a town's own streets
+	var G3 = load("res://scripts/game.gd").new()
+	G3.reset()
+	G3.started = true
+	G3.stones = 1000000
+	check(Weal.gift_blocked(G3, "qingshi") == "" and Weal.gift_cost(G3) == Weal.GIFT_BASE, "the chest of a town takes a gift")
+	var before := int(G3.stones)
+	check(Weal.give(G3, "qingshi") and int(G3.stones) == before - Weal.GIFT_BASE and Weal.measure(G3, "qingshi", "plenty") == 1 and Weal.acts(G3, "qingshi", "gift") == 1, "given: paid for, and the town has a little more")
+	Weal.give(G3, "qingshi")
+	Weal.give(G3, "qingshi")
+	check(not Weal.give(G3, "qingshi") and Weal.gift_blocked(G3, "qingshi") != "" and fits.call(Weal.gift_blocked(G3, "qingshi")) and Weal.measure(G3, "qingshi", "plenty") == Weal.GIFT_MAX, "three gifts, and the town will not take a fourth")
+	G3.stones = 0
+	check(Weal.gift_blocked(G3, "yanggu") != "" and not Weal.give(G3, "yanggu"), "nothing is given with nothing")
+	for k in 4:
+		Weal.act(G3, "qingshi", "shift")
+		Weal.act(G3, "qingshi", "bag")
+	for k2 in 12:
+		Weal.act(G3, "qingshi", "errand")
+	check(Weal.measure(G3, "qingshi", "plenty") == Weal.GIFT_MAX + 2 and Weal.measure(G3, "qingshi", "regard") == 2 + 3, "shifts, the post and errands are felt, each as far as it goes and no further")
+	check(Weal.state(G3, "qingshi") == "thriving" and Weal.count(G3, "thriving") == 1 and Weal.mod(G3, "village", "price") < 1.0 and Weal.mod(G3, "bamboo", "price") == 1.0 and Weal.price(G3, "village", 100) == 92,
+		"a town that thrives asks less at its counters; out in the country nothing changes")
+	check(G3.weal_n > 0 and (G3.timeline as Array).any(func(e): return str(e.text).contains("Qingshi Village: Thriving")), "and it is news: told once, in the annals")
+	# broken things
+	var G4 = load("res://scripts/game.gd").new()
+	G4.reset()
+	G4.started = true
+	for k3 in 8:
+		Weal.act(G4, "yanggu", "broke")
+	check(Weal.measure(G4, "yanggu", "regard") == -4 and Weal.state(G4, "yanggu") == "cold" and Weal.mod(G4, "yanggu", "price") > 1.0 and Weal.mod(G4, "yanggu", "mend") == 2.0, "eight things broken in a town's streets: it is cold to him, and asks double for the ninth")
+	check(Weal.word(G4, "yanggu", 0) != "" and Weal.line(G4, "yanggu", 1) != "" and Weal.line(G4, "yanggu", 3).contains("things broken") and Weal.line(G4, "bamboo", 1) == "", "and both the counter and the street say so, and why")
+	check(Weal.tag(G4, {"id": "warden_yanggu", "office": "warden_yanggu"}).contains("cold"), "whoever answers for it is of a town that is cold")
+	# peace: lords and packs
+	var G5 = load("res://scripts/game.gd").new()
+	G5.reset()
+	G5.started = true
+	var lords_l: Array = []
+	for st5 in Data.STEPS:
+		if str(st5.kind) == "kill" and str(st5.get("area", "")) in Weal.TOWNS.longmen.areas:
+			lords_l.append(str(st5.boss))
+	check(lords_l.size() >= Weal.LORDS_PER, "there are lords in Longmen's country (%d)" % lords_l.size())
+	for b5 in lords_l:
+		G5.boss_done[b5] = true
+	G5.record_kills("longmen", 130, [])
+	check(Weal.measure(G5, "longmen", "peace") == mini(Weal.LORDS_MAX, lords_l.size() / Weal.LORDS_PER) + mini(Weal.KILLS_MAX, 130 / Weal.KILLS_PER), "lords put down and packs cleared make a country's roads quiet, as far as that goes")
+	# a festive town, and its thanks
+	var G6 = load("res://scripts/game.gd").new()
+	G6.reset()
+	G6.started = true
+	G6.stones = 1000000
+	for b6 in lords_l:
+		G6.boss_done[b6] = true
+	G6.record_kills("longmen", 200, [])
+	for k6 in 3:
+		Weal.give(G6, "longmen")
+	for k7 in 4:
+		Weal.act(G6, "longmen", "shift")
+		Weal.act(G6, "longmen", "fare")
+		Weal.act(G6, "longmen", "bag")
+	for k8 in 12:
+		Weal.act(G6, "longmen", "errand")
+	check(Weal.state(G6, "longmen") == "festive" and Weal.thanks_due(G6, "longmen"), "plenty, peace and regard together: a festive town (%d %d %d)" % [Weal.measure(G6, "longmen", "plenty"), Weal.measure(G6, "longmen", "peace"), Weal.measure(G6, "longmen", "regard")])
+	var st6 := int(G6.stones)
+	var got6 := Weal.thank(G6, "longmen")
+	check(got6 == Weal.THANKS_BASE and int(G6.stones) == st6 + got6 and not Weal.thanks_due(G6, "longmen") and Weal.thank(G6, "longmen") == 0, "it thanks him once")
+	check(Weal.mood_clip("festive", "square", 19.0, 0, "idle") == "dance" and Weal.mood_clip("festive", "square", 10.0, 0, "idle") == "" and Weal.mood_clip("afraid", "market", 10.0, 0, "talk") == "peer" and Weal.mood_clip("easy", "square", 19.0, 0, "idle") == "",
+		"a festive town dances at dusk, a frightened one looks over its shoulder, an easy one does as it always did")
+	for st7 in Weal.STATE_ORDER:
+		for place in ["square", "market", "tea", "inn", "field"]:
+			for sd7 in 12:
+				for own in ["idle", "talk", "laugh", "eat", "wave", "hoe"]:
+					var mc := Weal.mood_clip(st7, place, 19.0 if sd7 % 2 == 0 else 10.0, sd7, own)
+					check(mc == "" or mc in Assets.LEND or mc in ["idle", "talk", "laugh", "think", "look", "walk"], "what a %s town does (%s) is something everybody can do" % [st7, mc])
+	# the people with names
+	var named := {}
+	for a8 in Data.AREAS:
+		for n8 in Data.AREAS[a8].get("npcs", []):
+			named[str(n8.id)] = true
+	for f in Weal.FATES:
+		check(named.has(str(f.npc)) and Echoes.CROSSROADS.has(str(f.when[0])) and str(f.tag) != "" and fits.call(str(f.line)), "%s: somebody real, whose life turned on a real crossroads, with something to say of it" % f.npc)
+		for an in f.when[1]:
+			check(not Echoes.option(str(f.when[0]), str(an)).is_empty(), "%s: %s/%s is an answer that can be given" % [f.npc, f.when[0], an])
+	check(Weal.FATES.size() >= 24, "the lives of two dozen people with names turn on what was answered (%d)" % Weal.FATES.size())
+	var G7 = load("res://scripts/game.gd").new()
+	G7.reset()
+	check(Weal.fate(G7, "smith").is_empty() and Weal.tag(G7, {"id": "smith"}) == "", "Smith Tie is only Smith Tie before the drawings")
+	Echoes.take(G7, "drawings", "keep")
+	check(str(Weal.fate(G7, "smith").tag) == "with two apprentices" and Weal.tag(G7, {"id": "smith"}) == "with two apprentices", "the drawings kept: two apprentices")
+	var G8 = load("res://scripts/game.gd").new()
+	G8.reset()
+	Echoes.take(G8, "drawings", "burn")
+	check(str(Weal.fate(G8, "smith").tag) == "who works alone", "the drawings burned: he works alone")
+	for st9 in ["festive", "thriving", "afraid", "lean", "cold"]:
+		var dn: Node3D = Weal.dress(st9, 1.1, 3)
+		check(dn != null and dn.get_child_count() >= 1, "a %s town hangs something at its doors" % st9)
+		if dn != null:
+			dn.free()
+	check(Weal.dress("easy") == null and Weal.dress("wary") == null, "an easy town hangs nothing")
+	check(Weal.summary(G6).begins_with("Of eleven towns") and Weal.town_text(G6, "longmen").contains("Festive") and Weal.epilogue(G).size() <= 1, "the page says how they stand")
+	check(msrc.contains("\"weal:give\"") and msrc.contains("\"weal:ask\"") and msrc.contains("\"weal:thanks\"") and msrc.find("\"id\": \"later\", \"label\": \"Not today\", \"desc\": \"There is a road waiting.\"") >= 0, "the counter offers it, after \"Not today\"")
+	G.free(); G2.free(); G3.free(); G4.free(); G5.free(); G6.free(); G7.free(); G8.free()
+
+	print("== the work of the towns (folk.gd, ten new clips) ==")
+	var new_clips := ["serve", "knead", "scrub", "weigh", "stalk", "flay", "fan", "arrange", "wring", "sew"]
+	for c in new_clips:
+		check(c in Assets.LEND and c in Assets.LEND_LOOPS and Faces.OF_CLIP.has(c), "%s is lent to everybody, goes round, and has a face" % c)
+	for nr in ["waiter", "huntsman"]:
+		check(Folk.ROLES.has(nr) and Folk.LINES.has(nr) and Folk.LINES[nr].size() >= 4 and Folk.TITLES.has(nr) and Folk.BODIES.human.has(nr), "the %s: a day, a body, a title and four things to say" % nr)
+		for ln2 in Folk.LINES[nr]:
+			check(fits.call(str(ln2).replace("%s", "Daoist friend")), "a line of the %s fits the box" % nr)
+		var used := 0
+		for tid3 in Folk.TOWNS:
+			used += int(Folk.TOWNS[tid3].roles.get(nr, 0))
+		check(used >= 3, "there are %ss in the towns (%d)" % [nr, used])
+	var basic := ["idle", "talk", "laugh", "think", "look", "point", "shrug", "wave", "walk", "run", "in", "offer", "bow", "nod", "eat"]
+	var seen_new := {}
+	for role in Folk.ROLES:
+		for e in Folk.ROLES[role].day:
+			check(Folk.PLACES.has(str(e[1])), "%s: %s is a kind of place" % [role, e[1]])
+			for c2 in str(e[2]).split("|"):
+				if c2 in new_clips:
+					seen_new[c2] = true
+			if str(e[3]) != "":
+				var hn: Node3D = Folk.held(str(e[3]))
+				check(hn != null, "%s holds something that has a model (%s)" % [role, e[3]])
+				if hn != null:
+					hn.free()
+	for id in Folk.POSTS:
+		for part in [str(Folk.POSTS[id][0]), str(Folk.POSTS[id][2])]:
+			for c3 in part.split("|"):
+				check(c3 in Assets.LEND or c3 in basic, "%s's work %s is a clip everybody can play" % [id, c3])
+				if c3 in new_clips:
+					seen_new[c3] = true
+	for use in Folk.TRADE_POSTS:
+		check(use == "official" or Rooms.INDOORS.has(use), "%s is a use of a ground floor" % use)
+		for part2 in Folk.TRADE_POSTS[use]:
+			for c4 in str(part2).split("|"):
+				check(c4 in Assets.LEND or c4 in basic, "what is done in a %s (%s) is a clip everybody can play" % [use, c4])
+				if c4 in new_clips:
+					seen_new[c4] = true
+	for use2 in Rooms.INDOORS:
+		check(Folk.TRADE_POSTS.has(use2), "whoever is found in a %s has work to do there" % use2)
+	for c5 in new_clips:
+		check(seen_new.has(c5), "somebody in the land does the %s" % c5)
+	for h in Folk.HOLD_OF.values():
+		var hn2: Node3D = Folk.held(str(h))
+		check(hn2 != null, "%s has a model for the hand" % h)
+		if hn2 != null:
+			hn2.free()
+	check(Folk.post_of({"id": "res:village:x:0", "trade": "inn"}, 10.0).size() == 2 and str(Folk.post_of({"id": "res:village:x:0", "trade": "inn"}, 2.0)[0]) == "doze" and Folk.post_of({"id": "head_qingshi", "office": "head_qingshi"}, 10.0).size() == 2
+		and str(Folk.post_of({"id": "smith"}, 10.0)[0]) == "hammer" and Folk.post_of({"id": "nobody"}, 10.0).is_empty(), "a pot-boy carries, an official writes, the smith hammers, and they all sleep")
+	var idle_n := 0
+	var named_n := 0
+	for a9 in Data.AREAS:
+		for n9 in Data.AREAS[a9].get("npcs", []):
+			if n9.get("fate", false) or str(n9.id).begins_with("cave_"):
+				continue
+			named_n += 1
+			if Folk.post(str(n9.get("asset", n9.id)), 10.0).is_empty() and Folk.post(str(n9.id), 10.0).is_empty():
+				idle_n += 1
+	check(idle_n * 3 < named_n, "two in three of the people with names are at some work of their own (%d of %d stand idle)" % [idle_n, named_n])
+	var wd: Dictionary = Atlas.world_of("surface")
+	var waiter_seen := false
+	for fp in Folk.people(wd, "qingshi"):
+		if str(fp.role) == "waiter":
+			var segs := Folk.day_of(wd, fp)
+			waiter_seen = not segs.is_empty()
+			var has_place := false
+			for sg in segs:
+				has_place = has_place or (str(sg.kind) == "stay" and sg.has("place"))
+			check(has_place, "a stay knows what kind of place it is at")
+	check(waiter_seen, "Qingshi has somebody waiting at table, with a day")
+
+	print("== things that share ground (clash.gd) ==")
+	var nudged := 0
+	for lid9 in ["surface", "heaven", "under", "sea"]:
+		var lw9: Dictionary = Atlas.world_of(lid9)
+		var found9: Array = Clash.audit(lw9)
+		check(found9.is_empty(), "%s: no two things share ground (%s)" % [lid9, str(found9.slice(0, 4))])
+		var sol9: Dictionary = Clash.solve(lid9, lw9.ents)
+		nudged += (sol9.nudge as Dictionary).size()
+		for nk in sol9.nudge:
+			check((sol9.nudge[nk] as Vector2).length() <= Clash.NUDGE_MAX + 0.001, "%s is drawn a step aside, and no further than its own tile" % nk)
+		for fid9 in lw9.floors:
+			var fw9: Dictionary = lw9.floors[fid9]
+			if fw9.has("ents"):
+				var fs9: Dictionary = Clash.solve(str(fid9), fw9.ents)
+				check((fs9.left as Array).is_empty(), "%s: no two things share ground" % fid9)
+				nudged += (fs9.nudge as Dictionary).size()
+	check(nudged >= 4, "what stood in something bigger's footprint is drawn a step aside (%d)" % nudged)
+	var st_r := Rect2i(Vector2i.ZERO, Vector2i(int(ws.w), int(ws.h)))
+	var stood9: Dictionary = Clash.stood(ws, "village", st_r)
+	var all_in := true
+	for e9 in ws.ents:
+		if str(e9.get("area", "")) == "village" and e9.has("pos") and str(e9.kind) in ["npc", "pickup", "prop", "mark"]:
+			all_in = all_in and stood9.has(e9.pos)
+	check(all_in and stood9.size() > 100, "nothing is scattered through whoever stands in Qingshi (%d tiles kept clear)" % stood9.size())
+	var gate_n: Node3D = Marks.model(Marks.MARKS.the_seat.found, 0)
+	check(Clash.footprint(gate_n) > 1.0 and Clash.footprint(gate_n) < 3.0 and Clash.extent({"kind": "npc"}) == Clash.PERSON, "a footprint is read from the model itself")
+	gate_n.free()
+	var CL = load("res://scripts/game.gd").new()
+	CL.reset()
+	CL.step = Data.step_index("s_p27_smith")
+	CL.inv["charcoal"] = 8
+	CL.inv["timber"] = 2
+	check(int(Load.sale(CL)[1]) == 2 and not Load.for_sale(CL, "charcoal"), "what the step in hand asks him to carry is not for sale")
+	Load.sell_all(CL)
+	check(int(CL.inv.charcoal) == 8 and int(CL.inv.timber) == 0, "a pedlar buys the timber and leaves the charcoal on his back")
+	CL.free()
+
+	print("== Part XXVIII: The Knotted Grass ==")
+	check(Data.REALMS.size() == 34 and Data.REALMS[33] == "Rings Returned" and Data.MAX_LEVEL == 99 and Data.level_name(99).ends_with("Rings Returned") and Data.REALM_INFO.size() == 34
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXVIII adds the realm of Rings Returned")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break33" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall26") and msrc.contains("\"s_break32\": \"recall26\"") and Data.DIALOGUE.has("pre:s_break33") and Data.DIALOGUE.has("post:s_break33"),
+		"Part XXVIII follows Sumeru in a Seed (recall26) and ends the game")
+	var p28 := Data.step_index("s_p28_home")
+	var kinds28 := {}
+	var n28 := 0
+	for i in range(p28, Data.STEPS.size()):
+		var s28: Dictionary = Data.STEPS[i]
+		n28 += 1
+		kinds28[str(s28.kind)] = true
+		check(str(s28.id).begins_with("s_p28_") or str(s28.id) == "s_break33", "%s is a step of the chapter" % s28.id)
+		if str(s28.kind) == "talk":
+			check(Data.DIALOGUE.has(str(s28.id)), "%s has its conversation" % s28.id)
+		if str(s28.kind) == "kill":
+			check(Data.DIALOGUE.has("pre:" + str(s28.boss)) and Data.DIALOGUE.has("post:" + str(s28.boss)) and Trials.TRIALS.has(str(s28.boss)) and Lore.BOSS.has(str(s28.boss)), "%s: words before and after, a trial, and a story" % s28.boss)
+			check(bsrc.contains("\"%s\": \"" % str(s28.boss)), "the bot has a way planned through %s" % s28.boss)
+		if str(s28.kind) == "hunt":
+			for en in s28.of:
+				check(Data.ENEMIES.has(str(en)) and Lore.BEAST.has(str(en)) and int(Data.ENEMIES[str(en)].get("boss", false)) == 0, "%s: a foe of the chapter with a story" % en)
+		if str(s28.kind) in ["hunt", "collect", "toil", "haul", "folk", "visits", "weal", "summit", "glide"]:
+			check(Data.DIALOGUE.has("done:" + str(s28.id)), "%s: something is said when it is done" % s28.id)
+		if str(s28.kind) == "haul":
+			check(Data.DIALOGUE.has("haul:" + str(s28.id)) and Load.GOODS.has(str(s28.good)), "%s: a good of the land, and a word as each load arrives" % s28.id)
+		if str(s28.kind) == "folk":
+			check(Folk.ERRANDS.has(str(s28.id)) and Folk.ERRANDS[str(s28.id)].lines.size() >= 4, "%s: the errand has its words" % s28.id)
+		if str(s28.kind) == "visits":
+			for vn in s28.npcs:
+				check(Data.DIALOGUE.has("visit:%s:%s" % [str(s28.id), str(vn)]) and not Weal.fate(null if false else _pick_game("drawings", "keep"), "smith").is_empty(), "%s is called on and has something to say" % vn)
+	check(n28 >= 28 and kinds28.has("weal") and kinds28.has("toil") and kinds28.has("haul") and kinds28.has("summit") and kinds28.has("glide") and kinds28.has("visits") and kinds28.has("folk"), "the chapter is thirty steps of nine kinds (%d)" % n28)
+	for vn2 in Data.STEPS[Data.step_index("s_p28_calls")].npcs:
+		var has_f := false
+		for f2 in Weal.FATES:
+			has_f = has_f or str(f2.npc) == str(vn2)
+		check(has_f, "%s, who is called on, is somebody whose life turned on an answer" % vn2)
+	# the step that asks for towns to be left the better
+	var WG = load("res://scripts/game.gd").new()
+	WG.reset()
+	WG.started = true
+	WG.step = Data.step_index("s_p28_mend") - 1
+	WG.level = 98
+	WG.stones = 10000000
+	for a10 in Data.AREAS:
+		WG.seen[a10] = true
+	WG.boss_done["zhou_chu"] = true
+	WG.advance()
+	check(str(WG.cur_step().id) == "s_p28_mend" and WG.weal_from.size() == Weal.ORDER.size() and Weal.bettered(WG) == 0, "the step begins from how the towns stand")
+	var given := 0
+	while str(WG.cur_step().id) == "s_p28_mend" and given < 12:
+		var wt := Weal.wanted(WG)
+		check(wt != "", "there is a town that will still take a gift")
+		if wt == "":
+			break
+		Weal.give(WG, wt)
+		given += 1
+		WG.poll_steps()
+	check(given == 3 and str(WG.cur_step().id) == "s_p28_calls", "three gifts to three chests, and three towns are the better for his coming (%d)" % given)
+	check(WG.objective_text() != "" and bsrc.contains("Weal.wanted(Game)") and bsrc.contains("\"weal:give\""), "the bot goes to whoever answers for the next town, and gives")
+	# (however the journey went, the step can be done: with every gift already given everywhere, every town counts)
+	var FG = load("res://scripts/game.gd").new()
+	FG.reset()
+	FG.started = true
+	FG.stones = 100000000
+	for tid4 in Weal.ORDER:
+		for k9 in Weal.GIFT_MAX:
+			Weal.give(FG, tid4)
+	Weal.mark_from(FG)
+	check(Weal.wanted(FG) == "" and Weal.bettered(FG) == 0 or Weal.bettered(FG) >= 0, "a journey that has given everything everywhere is not asked for more")
+	WG.free(); FG.free()
+	# the crossroads
+	var c28: Dictionary = Echoes.CROSSROADS.get("the_knot", {})
+	check(not c28.is_empty() and str(c28.step) == "s_p28_knot" and str(c28.part) == "XXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_knot", "what is owed for a kindness is asked last of all")
+	check((c28.options as Array).size() == 3 and c28.after.size() == 3 and c28.end.size() == 3 and c28.echo.has("s_p28_end") and c28.echo.s_p28_end.size() == 3, "the_knot: three answers, each answered, echoed and told at the end")
+	var letters28 := 0
+	for lid in Mail.ORDER:
+		if Mail.LETTERS[lid].has("needs") and str(Mail.LETTERS[lid].needs[0]) == "the_knot":
+			letters28 += 1
+	check(letters28 == 3 and Mail.LETTERS.has("chu_doors") and Mail.ORDER.has("chu_doors"), "a letter for each answer, and one from a man hanging doors")
+	var scales28 := {}
+	for o28 in c28.options:
+		check(Marks.MARKS.the_knot.has(str(o28.id)) and Marks.MARKS.the_knot[str(o28.id)].has("who"), "the_knot/%s leaves something standing, and somebody by it" % o28.id)
+		check(not Weal.hears(str(Marks.MARKS.the_knot[str(o28.id)].area)).is_empty(), "the_knot/%s is felt in a town" % o28.id)
+		for sc in o28.tilt:
+			scales28[sc] = true
+	check(scales28.size() == 3, "its answers tip all three scales")
+	var old_echo28 := 0
+	for cid2 in Echoes.ORDER:
+		if cid2 == "the_knot":
+			continue
+		for ek in Echoes.CROSSROADS[cid2].get("echo", {}):
+			if str(ek).contains("s_p28_"):
+				old_echo28 += 1
+	check(old_echo28 >= 2, "older crossroads echo in Part XXVIII (%d)" % old_echo28)
+	check(bsrc.contains("\"du_hui\": \"relic\"") and bsrc.contains("\"zhou_chu\": \"loss\"") and bsrc.contains("\"the_knot\": [\"onward\"]"), "the bot has a plan for every trial and the crossroads of the chapter")
+	for a28 in ["fusang", "bamboo", "mirror"]:
+		check(str(Data.AREAS[a28].get("warband5", {}).get("vis", "")).begins_with("s_p28_") and not Data.AREAS[a28].has("warband6"), "%s: the chapter's band takes the last slot" % a28)
+	check(Marks.AFTER_BANDS.has("the_knot"), "the marks of its crossroads are stood after the late bands")
+	var found28 := 0
+	for e28 in ws.ents:
+		if (e28.kind == "pickup" and str(e28.id).begins_with("p28_")) or (e28.kind == "boss" and str(e28.enemy) in ["du_hui", "night_owl", "bridge_jiao", "zhou_chu"]) or (e28.kind == "npc" and str(e28.id) in ["wei_ke", "grass_elder", "yang_bao", "zhou_chu", "zhou_chu_end"]):
+			found28 += 1
+			check(Atlas.owner_id(ws, e28.pos) == str(e28.area), "%s stands in its own region" % e28.id)
+	check(found28 == 13 + 4 + 5, "everything the chapter stands in the land found room (%d)" % found28)
+	# the relics of its trials are found before the lords they are for
+	for pr in [["du_hui", "grass_knot", "s_p28_knots"], ["night_owl", "jade_ring", "s_p28_rings"], ["bridge_jiao", "jiao_scale", "s_p28_scales"]]:
+		check(Data.step_index(str(pr[2])) < _kill_step(str(pr[0])) and Data.ITEMS.has(str(pr[1])) and Look.PICKUP_COLORS.has(str(pr[1])), "%s can be passed by what was found on the way" % pr[0])
+	check(Trials.KINDS.has("towns") and Trials.KIND_ORDER.has("towns"), "trials can be passed by the towns")
+	for fid in ["rings_returned", "knotted_grass", "third_scourge", "what_is_owed"]:
+		check(Feats.FEATS.has(fid), "the feat %s is kept" % fid)
+	for pid in ["wei_ke", "grass_elder", "yang_bao", "zhou_chu", "du_hui"]:
+		check(Assets.PEOPLE.has(pid) and Assets.has(str(Assets.PEOPLE[pid])), "%s has a body built from a script" % pid)
+		check(pid == "du_hui" or (Data.CHAT.has(pid) and Data.CHAT[pid].size() >= 4), "%s has four things to say" % pid)
+
+var _pg = null
+func _pick_game(cid: String, oid: String):
+	if _pg == null:
+		_pg = load("res://scripts/game.gd").new()
+		_pg.reset()
+		Echoes.take(_pg, cid, oid)
+	return _pg

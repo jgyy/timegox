@@ -93,6 +93,8 @@ const PEOPLE := {
 	# Part XXVII (the Heavy Road release)
 	"tao_kan": "characters/tao_kan", "charcoal_seller": "characters/charcoal_seller", "zhichang": "characters/zhichang", "budai": "characters/budai",
 	"palace_buyer": "characters/palace_buyer", "li_jing": "characters/li_jing",
+	# Part XXVIII (the Answering Land release)
+	"wei_ke": "characters/wei_ke", "grass_elder": "characters/grass_elder", "yang_bao": "characters/yang_bao", "zhou_chu": "characters/zhou_chu", "du_hui": "characters/du_hui",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
@@ -612,11 +614,15 @@ const LEND := ["sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
 	# the High Roads release: the people of the road go up rock like anybody
 	"scale",
 	# the Heavy Road release: the people of the road fell, cut stone, reap and walk under a load like anybody
-	"fell", "quarry", "reap", "haul", "haul_idle"]
+	"fell", "quarry", "reap", "haul", "haul_idle",
+	# the Answering Land release: waiting at table, kneading, washing, weighing, stalking, dressing a kill,
+	# fanning a stove, shelving, wringing and sewing
+	"serve", "knead", "scrub", "weigh", "stalk", "flay", "fan", "arrange", "wring", "sew"]
 ## the lent clips that go round and round (the rest are one-shots, played again when they end)
 const LEND_LOOPS := ["sit_bench", "doze", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir", "hammer", "sweep",
 	"weave", "play_flute", "dance", "push", "gaze", "hoe", "chop", "carry", "bang", "eat", "write", "stargaze",
-	"mine", "dig", "pound", "spin", "count", "carve", "pan", "comb", "rock", "scale", "fell", "quarry", "reap", "haul", "haul_idle"]
+	"mine", "dig", "pound", "spin", "count", "carve", "pan", "comb", "rock", "scale", "fell", "quarry", "reap", "haul", "haul_idle",
+	"serve", "knead", "scrub", "weigh", "stalk", "flay", "fan", "arrange", "wring", "sew"]
 static var _donor_lib: AnimationLibrary = null
 static var _donor_hips := 0.92
 static var _lent := {}

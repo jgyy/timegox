@@ -244,6 +244,14 @@ var shift_day := {}
 var salary_day := {}
 var wages := 0
 var falls := {}
+## the Answering Land release (weal.gd): what was done in each town's own streets ("<town>|<act>" -> times;
+## "kills|<region>" -> what fell there; "<town>|thanked"), a counter that moves whenever it changes, and the
+## state each town was last told to be in
+var weal := {}
+var weal_n := 0
+var weal_state := {}
+var weal_from := {}
+var weal_force := {}
 var fallen := 0
 var yielded := 0
 var gamble_n := 0
@@ -440,6 +448,11 @@ func reset() -> void:
 	salary_day = {}
 	wages = 0
 	falls = {}
+	weal = {}
+	weal_n = 0
+	weal_state = {}
+	weal_from = {}
+	weal_force = {}
 	fallen = 0
 	yielded = 0
 	gamble_n = 0
@@ -784,6 +797,8 @@ func record_kills(a: String, n: int, ids: Array = []) -> void:
 	# (what falls is counted by kind: jobs.gd)
 	for kid in ids:
 		felled_kind[str(kid)] = int(felled_kind.get(str(kid), 0)) + 1
+	# (the Answering Land release, weal.gd: what is cleared out of a country is felt in its towns)
+	weal["kills|" + a] = int(weal.get("kills|" + a, 0)) + maxi(n, ids.size())
 	var s := cur_step()
 	# (a hunt in a cave, Part XX, counts what is brought down in that cave)
 	if not s.is_empty() and s.kind == "hunt" and s.area == a and (not s.has("cave") or layer == Caves.fid(a, int(s.cave))):
@@ -882,9 +897,14 @@ func advance() -> void:
 	# at from now on: by Part XXVI a journey has looked at as many as it asks, and the step was done at once)
 	if not ns.is_empty() and str(ns.kind) == "marks" and bool(ns.get("new", false)):
 		marks_from = marks_seen.size()
+	# (weal.gd: a step that asks for towns to be left the better counts from how they stand as it begins)
+	if not ns.is_empty() and str(ns.kind) == "weal":
+		Weal.mark_from(self)
 	if step >= Data.STEPS.size():
 		finished = true
 		note("Ascended")
+	# (the Answering Land release, weal.gd: a town whose state the story has just changed is news)
+	Weal.poll(self)
 	quest_changed.emit()
 	poll_steps()
 
@@ -972,6 +992,10 @@ func poll_steps() -> void:
 			"haul":
 				# Part XXVII: so many of a good of the land brought to somebody (toil.gd, load.gd)
 				ok = step_haul >= int(s.n)
+			"weal":
+				# Part XXVIII: so many towns of the land left the better for his coming since the step
+				# began (weal.gd)
+				ok = Weal.bettered(self) >= int(s.n)
 			"hold":
 				# Part XXV: the town that is his own has what the step asks of it (hold.gd): so many plots
 				# built, a plot, a rank, so many households
@@ -1042,6 +1066,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(hunt, s.n), s.n]
 	elif s.kind == "marks":
 		t += "  (%d/%d)" % [mini(marks_count(s), int(s.n)), int(s.n)]
+	elif s.kind == "weal":
+		t += "  (%d/%d)" % [mini(Weal.bettered(self), int(s.n)), int(s.n)]
 	elif s.kind == "hold":
 		var hp: Array = Hold.need_progress(self, s.need)
 		t += "  (%d/%d)" % [int(hp[0]), int(hp[1])]

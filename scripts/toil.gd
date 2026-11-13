@@ -42,7 +42,11 @@ const WORKS := {
 		"none": "Rock: with a pick a block could be cut from it.",
 		"lines": ["He finds the bed of the stone and works along it, and a block comes away almost square.",
 			"Sparks, grit in the teeth, and at last the dull note that means it has let go.",
-			"Forty-five jin of mountain. He gets his knees under it, and it comes up."]},
+			"Forty-five jin of mountain. He gets his knees under it, and it comes up."],
+		# (the Answering Land release: at the wall of a cave it is ore that comes away, and it is told so)
+		"cave_lines": ["He follows the dull red of the seam with the point, and a lump works loose and drops at his feet.",
+			"Sparks in the dark, grit in the teeth, and a piece of the wall heavier than it has any right to be.",
+			"Twenty jin of something a smith will know the name of. It is cold, and it smells of rain."]},
 	"reap": {"n": "Cut herbs", "tool": "sickle", "hold": "sickle", "clip": "reap", "dur": 3.2, "good": "herb_bundle", "fx": "reaped", "comp": "gather",
 		"none": "Open ground: with a sickle there are herbs to be cut here.",
 		"lines": ["A sweep of the sickle and a handful of what grows low: plantain, mugwort, a sprig of something bitter.",
@@ -110,12 +114,15 @@ static func done(g, id: String, layer: String, tile: Vector2i, cave: bool = fals
 	g.toil[id] = n + 1
 	var out: Array = []
 	var got := true
-	if id == "angle" and int(g.toil_n) % 3 == 0:
+	# (the Answering Land release: every third cast, counted in casts: counted in all the work of the hands, a
+	# reaping between casts used to make sure no cast ever missed)
+	if id == "angle" and (n + 1) % 3 == 0:
 		# (two casts in three catch: counted, never thrown for)
 		got = false
 		out.append(str(wk.miss[n % (wk.miss as Array).size()]))
 	else:
-		out.append(str(wk.lines[n % (wk.lines as Array).size()]))
+		var told: Array = wk.cave_lines if (cave and wk.has("cave_lines")) else wk.lines
+		out.append(str(told[n % told.size()]))
 	if got:
 		var good := good_of(id, cave)
 		g.add_item(good)

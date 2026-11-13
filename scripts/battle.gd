@@ -579,7 +579,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		raw *= Data.suppression(int(a.lv), int(tgt.lv))
 	if tgt.side == "party":
 		# Formations and the Heart (and the shades' friendship) soften every blow; so does a Vajra Body
-		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0)) * Works.mod(Game, "taken")
+		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0)) * Works.mod(Game, "taken") * Needs.mod(Game, "taken")
 		# and a formation or allies a trial's path brought
 		raw *= float(boon.get("taken", 1.0))
 	var crit := randf() < 0.08 + ((Game.talent_mod("crit") + Arms.mod(Game, "crit", 0.0)) if lf else 0.0)

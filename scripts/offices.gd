@@ -228,7 +228,8 @@ static func work(g, use: String, town: String) -> String:
 	var t: Dictionary = TRADES[use]
 	var back := salary_due(g, use, town)
 	Clock.set_hour(g, minf(23.5, Clock.hour(g) + float(hours(g, use))))
-	var pay := wage(g, use)
+	# (the Answering Land release, weal.gd: a thriving town pays more for a pair of hands, a lean one less)
+	var pay := int(round(float(wage(g, use)) * Weal.mod(g, town, "wage")))
 	var before := rank(g, use)
 	g.stones += pay + back
 	g.shift_day[town] = int(g.day)
@@ -236,6 +237,7 @@ static func work(g, use: String, town: String) -> String:
 	var first: bool = not g.shifts.has(use)
 	g.shifts[use] = int(g.shifts.get(use, 0)) + 1
 	g.wages += pay + back
+	Weal.act(g, Weal.town_of(town), "shift")
 	var hid := Cultures.of_area(town)
 	if first and hid != "":
 		g.add_hearth(hid, 1)
@@ -302,6 +304,7 @@ static func arrive(g) -> Array:
 			g.stones += int(p.pay)
 			g.wages += int(p.pay)
 			g.fares += 1
+			Weal.act(g, Weal.town_of(str(p.to)), "fare")
 			g.note("Set down %s at %s (%d spirit stones)" % [str(p.n), str(Data.AREAS[str(p.to)].n), int(p.pay)])
 			out.append("%s climbs down at %s: +%d spirit stones" % [str(p.n), str(Data.AREAS[str(p.to)].n), int(p.pay)])
 		else:

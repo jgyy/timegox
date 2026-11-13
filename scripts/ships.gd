@@ -85,7 +85,8 @@ static func tale(offer: Dictionary, n: int) -> Array:
 
 ## The passage is taken: the fare is paid and the hours pass.  True if he could pay.
 static func sail(g, offer: Dictionary) -> bool:
-	if offer.is_empty() or g.stones < int(offer.fare):
+	# (the Answering Land release: no fare is taken for a harbour with no quay to be set down on)
+	if offer.is_empty() or g.stones < int(offer.fare) or quay(str(offer.to)).x < 0:
 		return false
 	g.stones -= int(offer.fare)
 	g.voyages += 1

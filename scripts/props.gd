@@ -563,6 +563,7 @@ static func use(e: Dictionary, g) -> Array:
 	var n: int = int(g.prop_uses.get(pid, 0))
 	g.prop_uses[pid] = n + 1
 	Eggs.used(g, str(e.get("prop", "")), n + 1)
+	var rest0: float = float(g.needs.get("rest", 0.0)) if Needs.on(g) else 0.0
 	Needs.used(g, str(e.get("prop", "")), str(k.get("effect", "")))
 	var out: Array = [line_for(e, n)]
 	match str(k.get("effect", "")):
@@ -583,6 +584,10 @@ static func use(e: Dictionary, g) -> Array:
 					Needs.give(g, {"hunger": -18.0, "thirst": -20.0, "bladder": -30.0})
 				out.append("Slept the night through: woke at the Hour of the Rabbit, health and qi restored")
 			else:
+				# (the Answering Land release, needs.gd: a bed by daylight is a rest and not a night: it used to
+				# fill a night's rest at noon, with no hours gone)
+				if Needs.on(g):
+					g.needs["rest"] = minf(float(g.needs.get("rest", 100.0)), rest0 + 30.0)
 				out.append("Slept: health and qi restored")
 		"fish":
 			out.append(_restore(g, 0.15, 0.2, "A quiet hour"))
