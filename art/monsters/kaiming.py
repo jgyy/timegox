@@ -87,7 +87,11 @@ for i, (t, big) in enumerate(LEAVES):
     fc = base.lerp(tip, 0.45) + out * 0.012 * KF
     mask_face(b, fc, (out + lean * 0.08).normalized(), 0.46 * KF * big, "head", up=lean, brow_tilt=0.3 + 0.3 * (i % 2), seg=18, rings=12)
     # a jewel at the foot of each leaf
-    b.ball(base + out * 0.012, 0.01 * KF, "d03a2a" if i % 2 == 0 else "2a8a6a", cls=METAL, bone="head", seg=8, rings=6)
+    # (the jewels take the foe's accent: the one colour of a guardian of the gates that is its own)
+    old_pal = b.cur_pal
+    b.cur_pal = 1.0
+    b.ball(base + out * 0.012, 0.01 * KF, "d03a2a" if i % 2 == 0 else "2a8a6a", cls=METAL, bone="head", seg=8, rings=6, tint=0.8)
+    b.cur_pal = old_pal
 
 # ---------------------------------------------------------------- gilded plates on the shoulders
 for sd, s in (("L", 1), ("R", -1)):

@@ -117,7 +117,10 @@ for k, (x, y, ang) in enumerate(((0.3, 0.22, 0.9), (0.4, 0.3, 0.35), (0.22, 0.15
     p, n = on_gel(x, y)
     c = p - n * 0.025
     rot = (math.atan2(n.y, n.z) + ang * 0.3, math.atan2(n.x, n.z), ang)
-    b.lathe(c, [(0.07, -0.009), (0.07, 0.009)], "d8b050", cls=METAL, bone="body", seg=18, rot=(math.pi / 2 + rot[0], rot[1], rot[2]))
+    # (the coins catch the foe's accent: a slime of fire swallowed gold, one of the marsh bronze gone green)
+    b.cur_pal = 1.0
+    b.lathe(c, [(0.07, -0.009), (0.07, 0.009)], "d8b050", cls=METAL, bone="body", seg=18, rot=(math.pi / 2 + rot[0], rot[1], rot[2]), tint=0.4)
+    b.cur_pal = 0.0
     # the square hole of a cash coin
     b.box(c + n * 0.01, (0.028, 0.028, 0.022), "2a1a10", bone="body", rot=(math.pi / 2 + rot[0], rot[1], rot[2]), cls=METAL)
 
