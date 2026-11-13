@@ -233,12 +233,37 @@ static func room(g) -> int:
 
 ## How many households the town has grown by of itself since it was founded: a couple a day while
 ## there is somewhere to put them (twice that with a granary), and no more than thirty in all.
+## (the Underclothes release: what it grows by is added day by day at the rate of that day, granary and
+## answers as they stood then; it used to be every day since the founding at today's rate, so that a
+## granary built late doubled the past, and collecting the tallies took households back off the town)
 static func grown(g) -> int:
 	if not founded(g):
 		return 0
-	var days := maxi(0, int(g.day) - _day0(g))
-	var rate := GROW * (2.0 if built(g, "granary") else 1.0) * mod(g, "grow")
-	return mini(GROW_MAX, int(floor(days * rate)))
+	_accrue(g)
+	return mini(GROW_MAX, int(floor(float(g.hold.get("grown_f", 0.0)))))
+
+static func _accrue(g) -> void:
+	var d0 := int(g.hold.get("grow_day", _day0(g)))
+	var today := int(g.day)
+	if today > d0:
+		var rate := GROW * (2.0 if built(g, "granary") else 1.0) * mod(g, "grow")
+		g.hold["grown_f"] = minf(float(GROW_MAX), float(g.hold.get("grown_f", 0.0)) + float(today - d0) * rate)
+	if today != d0 or not g.hold.has("grow_day"):
+		g.hold["grow_day"] = today
+
+## The town has grown overnight, or been built on: its rank is news when it rises, and a step of the
+## town that is waiting on it is looked at again (game.gd asks every second and a half).
+static func tick(g) -> void:
+	if not founded(g):
+		return
+	var was := int(g.hold.get("told", rank(g)))
+	var now := rank(g)
+	if now != was:
+		g.hold["told"] = now
+		_risen(g, was)
+		var st: Dictionary = g.cur_step()
+		if not st.is_empty() and str(st.kind) == "hold":
+			g.poll_steps()
 
 ## The households that would live there if there were room for all of them.
 static func wanting(g) -> int:
@@ -370,6 +395,7 @@ static func build(g, id: String) -> bool:
 	g.toast("Built at %s: %s (%d households, room for %d)" % [NAME, str(PLOTS[id].n), households(g), room(g)])
 	g.note("Built %s at %s" % [str(PLOTS[id].n), NAME])
 	_risen(g, was)
+	g.hold["told"] = rank(g)
 	g.poll_steps()
 	return true
 
@@ -478,7 +504,14 @@ static func need_progress(g, need: Array) -> Array:
 		"plot":
 			return [1 if built(g, str(need[1])) else 0, 1]
 		"rank":
-			return [mini(households(g), int(RANKS[int(need[1])][0])), int(RANKS[int(need[1])][0])]
+			# (the Underclothes release: a rank wants its plot too, so the count stops one short of the
+			# households until the market or the wall stands: it used to read 50/50 with no market)
+			var want := int(RANKS[int(need[1])][0])
+			var have := mini(households(g), want)
+			var plot := str(RANKS[int(need[1])][1]) if (RANKS[int(need[1])] as Array).size() > 1 else ""
+			if plot != "" and not built(g, plot):
+				have = mini(have, want - 1)
+			return [have, want]
 		"households":
 			return [mini(households(g), int(need[1])), int(need[1])]
 	return [0, 1]

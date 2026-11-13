@@ -1,11 +1,14 @@
 """Beast: the wolves and hounds (Bamboo Wolf, Frost Wolf, Gale Wolf of the Heights, Grave Hound,
 the Crimson Hellhound, the Mossback Boar's pack).  Canine anatomy from art/lib/canine.py, sculpted
-in clay: a deep keel of a chest, a tucked waist, long legs with the stifle forward and the hock
-high behind, four-toed paws with claws; a domed skull with a clear stop, a long tapering muzzle
-with a black nose, almond eyes and tall ears; a heavy ruff of broad fur locks round the neck, a
-pale bib, elbow and thigh tufts and a brush of a tail.  The coat is painted into the greys - a
-dark grizzled saddle, pale cheeks, underside and inner legs, a dark muzzle top and tail tip - so
-every recolour still reads as a wolf.
+in clay after the grey wolf: lean and long-legged, a deep narrow keel of a chest with the ground
+further below it than the chest is deep, a tucked waist, the stifle forward and the hock high
+behind; a broad skull with a flat forehead and a gentle stop, a muzzle as long as the skull with
+the mouth closed at rest along a dark lip line (the jaw fitted under the lip, so it opens only
+to bite or howl), oblique almond eyes under a brow, pointed ears set wide; a collar of soft fur
+tufts making the neck as wide as the head, cheek ruffs, and a brush of a tail hanging straight
+to the hocks.  The coat is painted into the greys - dark guard hairs over the back and the top of
+the tail, a darker crown and muzzle bridge, pale cheeks, lips, eyebrow spots, throat, belly and
+inner legs, a black tail tip - so every recolour still reads as a wolf.
 Clips: idle (panting, ears flicking), walk (four-beat with planted paws), attack (a lunging bite),
 hurt, die and a howl (cast).
 Run: blender --background --python art/monsters/beast.py  ->  assets/monsters/beast.glb"""

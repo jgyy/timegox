@@ -165,6 +165,8 @@ static func _collapse(g, k: String) -> void:
 			g.needs["rest"] = 55.0
 			give(g, {"comfort": -30.0, "clean": -8.0})
 			Clock.set_hour(g, fposmod(Clock.hour(g) + 6.0, 24.0))
+			# (the six hours asleep are not then charged again as six hours awake)
+			g.needs_clock = float(g.clock) + float(g.day) * 1440.0
 		"hunger":
 			g.needs["hunger"] = 30.0
 			g.hp[0] = maxf(1.0, g.hp[0] * 0.5)

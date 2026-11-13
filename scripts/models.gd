@@ -315,6 +315,9 @@ static func hero(o: Dictionary = {}) -> Node3D:
 	var trim: Color = cols.get("trim", Color("e8f0ff"))
 	for acc_id in outfit.acc:
 		dress(root, str(acc_id), trim)
+	# (the Underclothes release: down to what is under the robe, if that is what is asked)
+	if bool(o.get("underclothes", g.underclothes if g != null else false)):
+		undress(root, true)
 	var sc: float = o.get("scale", 1.0)
 	root.scale = Vector3(sc, sc, sc)
 	return root
@@ -337,6 +340,55 @@ static func yue_ling(o: Dictionary = {}) -> Node3D:
 		opts["glow"] = o.glow
 	return person(Color("e86a9a"), Color("402030"), opts)
 
+## The Underclothes release: a person in what they wear under their clothes.  Every person of the land
+## carries the body under the clothes as a mesh of its own (art/lib/body.py, "bare": the drawers of
+## undyed linen, and for a woman the band round her chest), drawn instead of the clothes ("dress") while
+## `on`; the face, hair and hands ("own") are the same either way, and whatever an outfit hangs on them
+## or the weapon in their hand is put away with the clothes.  Returns false for a model with no body
+## under its clothes (a monster, or a person of the procedural kind).
+static func undress(m: Node3D, on: bool = true) -> bool:
+	var meshes: Array = m.get_meta("meshes", [])
+	var has_bare := false
+	for mi in meshes:
+		if str((mi as MeshInstance3D).name).begins_with("bare"):
+			has_bare = true
+	if not has_bare:
+		return false
+	for mi in meshes:
+		var mm := mi as MeshInstance3D
+		var nm := str(mm.name)
+		if nm.begins_with("bare"):
+			mm.visible = on
+		elif nm.begins_with("dress"):
+			mm.visible = not on
+	for ba in m.find_children("acc_*", "BoneAttachment3D", true, false):
+		(ba as Node3D).visible = not on
+	for ba2 in m.find_children("arm_in_hand", "BoneAttachment3D", true, false):
+		(ba2 as Node3D).visible = not on
+	m.set_meta("undressed", on)
+	return true
+
+static func undressed(m: Node3D) -> bool:
+	return m != null and bool(m.get_meta("undressed", false))
+
+## Where a person's head is scaled about (art/lib/person.py: the pivot 1.58 m up, less the neck's drop),
+## and the scale of the head that the outfits' headwear was drawn for.
+const HEAD_PIVOT_Y := 1.552
+const HEAD_DRAWN_FOR := 1.08
+
+## How much bigger or smaller a person's head is than the head the headwear was drawn for, read off
+## the skeleton: the hair's tail bone starts 0.2 m above the pivot of the head's scale (person.py).
+static func head_k(sk: Skeleton3D) -> float:
+	var hb := sk.find_bone("hair_tail")
+	var hp := sk.find_bone("hips")
+	if hb < 0 or hp < 0:
+		return 1.0
+	var sc := sk.get_bone_global_rest(hp).origin.y / 0.92
+	if sc <= 0.01:
+		return 1.0
+	var y := sk.get_bone_global_rest(hb).origin.y / sc
+	return clampf((y + 0.028 - 1.58) / 0.2 / HEAD_DRAWN_FOR, 0.6, 1.4)
+
 ## Hang accessory `id` (Fashion.ACCESSORY_BONES) on a person model's bone; `col` tints its trims.
 ## Returns false if the model has no skeleton with that bone.
 static func dress(m: Node3D, id: String, col: Color = Color("f0c850")) -> bool:
@@ -358,6 +410,12 @@ static func dress(m: Node3D, id: String, col: Color = Color("f0c850")) -> bool:
 		# built in model space round the bone's rest, then carried into the bone's frame
 		var rest := sk.get_bone_global_rest(bi)
 		var node := accessory(id, col, 1.0 if bn.ends_with(".L") else -1.0)
+		if bn == "head":
+			# (headwear was drawn for a man's head as it was before the Underclothes release: a head of
+			# another size takes it scaled about the chin, where the head's own scale is pivoted)
+			var k := head_k(sk)
+			var piv := Vector3(0.0, HEAD_PIVOT_Y, 0.0)
+			node.transform = Transform3D(Basis.from_scale(Vector3(k, k, k)), piv - piv * k) * node.transform
 		node.transform = rest.affine_inverse() * node.transform
 		ba.add_child(node)
 	m.set_meta("dressed", true)

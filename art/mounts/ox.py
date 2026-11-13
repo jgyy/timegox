@@ -29,6 +29,9 @@ from kit import CLOTH, HAIR, MAT_PLAIN, METAL, SKIN, WOOD, V, Builder  # noqa: E
 
 kit.reset()
 creature.realtime()
+# (the Underclothes release: art/monsters/ox.py runs this script with OX_WILD set: the same ox with nothing on it,
+# for the oxen of the land the party fights)
+WILD = bool(globals().get("OX_WILD", False))
 H = 1.12
 hip_z, sh_z = -0.6, 0.5
 neck0 = V(0, H + 0.02, sh_z + 0.1)
@@ -149,29 +152,30 @@ for sd, s in (("L", 1), ("R", -1)):
 # ---------------------------------------------------------------- what it wears: a blanket, the yoke, a nose-rope, a rosette
 BACK = V(0, H + 0.1, -0.12)
 b.cur_pal = 0.5
-for s in (1, -1):
+for s in ((1, -1) if not WILD else ()):
     rows = []
     for i in range(5):
         z = BACK.z - 0.3 + i * 0.15
         rows.append([V(0.0, H + 0.17 + 0.015 * math.sin(math.pi * i / 4), z), V(0.2 * s, H + 0.14, z), V(0.36 * s, H + 0.0, z), V(0.43 * s, H - 0.3, z)])
     b.sheet(rows, "c8c8c8", cls=CLOTH, bone="body", tint=1.0, thickness=0.012)
 # the rosette of market day between the horns
-b.lathe(hp(0, 0.085, -0.02), [(0.0, 0.0), (0.045, 0.004), (0.03, 0.02), (0.0, 0.024)], "c8c8c8", cls=CLOTH, bone="head", seg=10)
-b.cur_pal = 0.0
-# the yoke: a bow of wood lying on the neck in front of the hump, its ends turned down for the shafts
-YZ = sh_z + 0.2
-yoke = [V(-0.44, H - 0.14, YZ), V(-0.36, H + 0.04, YZ), V(-0.2, H + 0.16, YZ), V(0.0, H + 0.2, YZ), V(0.2, H + 0.16, YZ), V(0.36, H + 0.04, YZ), V(0.44, H - 0.14, YZ)]
-b.tube(yoke, [0.035, 0.045, 0.05, 0.055, 0.05, 0.045, 0.035], "7a5230", cls=WOOD, bone={"neck0": 0.5, "chest": 0.5}, seg=8)
-for s in (1, -1):
-    b.ball(V(0.44 * s, H - 0.16, YZ), 0.045, "5a3a22", cls=WOOD, bone={"neck0": 0.5, "chest": 0.5}, seg=8, rings=6)
-    # a strap under the throat holds it on
-    b.tube([V(0.34 * s, H + 0.04, YZ), V(0.26 * s, H - 0.3, YZ + 0.02), V(0.0, H - 0.5, YZ + 0.03)], [0.014, 0.014, 0.014], "4a2a16", cls=WOOD, bone={"neck0": 0.5, "chest": 0.5}, seg=4, flat=0.4)
-# the nose-ring of brass and the rope from it back to the yoke
-ring = [hp(math.cos(a) * 0.022, -0.035 + math.sin(a) * 0.022, 0.235) for a in [i / 10 * 2 * math.pi for i in range(11)]]
-b.tube(ring, [0.006] * 11, "d8b050", cls=METAL, bone="head", seg=5, cap0=False, cap1=False)
-nose = hp(0.0, -0.055, 0.235)
-b.tube([nose, nose.lerp(V(0.2, H + 0.1, YZ), 0.4) + V(0.1, -0.12, 0), nose.lerp(V(0.2, H + 0.1, YZ), 0.75) + V(0.08, -0.08, 0), V(0.22, H + 0.15, YZ)], [0.008] * 4, "b8a070", cls=CLOTH,
-       bone={"neck1": 0.5, "neck0": 0.5}, seg=4)
+if not WILD:
+    b.lathe(hp(0, 0.085, -0.02), [(0.0, 0.0), (0.045, 0.004), (0.03, 0.02), (0.0, 0.024)], "c8c8c8", cls=CLOTH, bone="head", seg=10)
+    b.cur_pal = 0.0
+    # the yoke: a bow of wood lying on the neck in front of the hump, its ends turned down for the shafts
+    YZ = sh_z + 0.2
+    yoke = [V(-0.44, H - 0.14, YZ), V(-0.36, H + 0.04, YZ), V(-0.2, H + 0.16, YZ), V(0.0, H + 0.2, YZ), V(0.2, H + 0.16, YZ), V(0.36, H + 0.04, YZ), V(0.44, H - 0.14, YZ)]
+    b.tube(yoke, [0.035, 0.045, 0.05, 0.055, 0.05, 0.045, 0.035], "7a5230", cls=WOOD, bone={"neck0": 0.5, "chest": 0.5}, seg=8)
+    for s in (1, -1):
+        b.ball(V(0.44 * s, H - 0.16, YZ), 0.045, "5a3a22", cls=WOOD, bone={"neck0": 0.5, "chest": 0.5}, seg=8, rings=6)
+        # a strap under the throat holds it on
+        b.tube([V(0.34 * s, H + 0.04, YZ), V(0.26 * s, H - 0.3, YZ + 0.02), V(0.0, H - 0.5, YZ + 0.03)], [0.014, 0.014, 0.014], "4a2a16", cls=WOOD, bone={"neck0": 0.5, "chest": 0.5}, seg=4, flat=0.4)
+    # the nose-ring of brass and the rope from it back to the yoke
+    ring = [hp(math.cos(a) * 0.022, -0.035 + math.sin(a) * 0.022, 0.235) for a in [i / 10 * 2 * math.pi for i in range(11)]]
+    b.tube(ring, [0.006] * 11, "d8b050", cls=METAL, bone="head", seg=5, cap0=False, cap1=False)
+    nose = hp(0.0, -0.055, 0.235)
+    b.tube([nose, nose.lerp(V(0.2, H + 0.1, YZ), 0.4) + V(0.1, -0.12, 0), nose.lerp(V(0.2, H + 0.1, YZ), 0.75) + V(0.08, -0.08, 0), V(0.22, H + 0.15, YZ)], [0.008] * 4, "b8a070", cls=CLOTH,
+           bone={"neck1": 0.5, "neck0": 0.5}, seg=4)
 
 # ---------------------------------------------------------------- motion
 qm = QuadMotion(r, legs, T_walk=1.7, stride=0.4, lift=0.09, duty=0.68, bob=0.014, roll=0.03, yaw=0.03, head_nod=0.09, head_low=0.06,
@@ -182,4 +186,4 @@ hm = QuadMotion(r, legs, T_walk=1.05, stride=0.55, lift=0.12, duty=0.6, bob=0.02
                 neck_up=-0.04, tail_amp=0.3, tail_lift=0.15, tail_droop=0.0, T_idle=5.0, front_flex=1.6, hind_flex=0.9, rest_h=0.2)
 
 print("[art] ox: %d triangles" % b.tri_count())
-kit.finish_rigged(b, r, "mounts/ox.glb", qm.clips({"run": (1.05, hm.walk)}), samples=16, dist=0.3, strength=0.5, floor_y=0.0)
+kit.finish_rigged(b, r, "monsters/ox.glb" if WILD else "mounts/ox.glb", qm.clips({"run": (1.05, hm.walk)}), samples=16, dist=0.3, strength=0.5, floor_y=0.0)

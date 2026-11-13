@@ -108,6 +108,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXV: the other halves of the tallies to the Great Rat, and the households of Guiyun to the tiger
 	# with a seal and to the Patriarch of the Cold Pine
 	"shuo_shu": "relic", "ke_zheng": "town", "han_song": "town",
+	# Part XXVI: the powder to the duke who was not ill, the cook's untouched whetstones to the Whole Ox, and the
+	# physician's own needles to the lord with the wind in his head
+	"duke_huan": "relic", "quan_niu": "relic", "cao_cao": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -148,7 +151,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# and the black horse kept by the tent
 	"the_tide": ["wall"], "the_ape": ["dredge"], "the_horse": ["keep"],
 	# Part XXV: the tallies burned in the square, the gate open to whoever knocks, and a gate of his own
-	"the_tallies": ["burn"], "the_door": ["all"], "the_seat": ["found"]}
+	"the_tallies": ["burn"], "the_door": ["all"], "the_seat": ["found"],
+	# Part XXVI: the Blue Bag Book copied out for every counter of the post
+	"the_book": ["copy"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -1805,6 +1810,11 @@ func _glide_step(s: Dictionary) -> void:
 
 ## Part XX: do the nearest thing of the step's cave that has not been done for it yet.
 func _try_step(s: Dictionary) -> void:
+	if not s.has("cave") and s.has("things"):
+		# (the Underclothes release: a thing of the open land, not of a cave: the nearest of its kind in
+		# the step's region, a hot spring to soak in)
+		_try_land(s)
+		return
 	var fid := Caves.fid(str(s.area), int(s.get("cave", -1)))
 	var fw: Dictionary = Atlas.world_of(fid)
 	if fw.is_empty():
@@ -1823,6 +1833,25 @@ func _try_step(s: Dictionary) -> void:
 	if best == null:
 		return
 	_goto_entity(str(s.area), str(best.id))
+
+func _try_land(s: Dictionary) -> void:
+	var area := str(s.area)
+	if world.is_floor() or Data.layer_of(area) != world.layer:
+		_travel(area)
+		return
+	var best = null
+	var bd := 1 << 30
+	for e in world.ents:
+		if e.kind != "prop" or e.has("furn") or str(e.get("area", "")) != area or not str(e.prop) in s.things:
+			continue
+		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		if dd < bd:
+			bd = dd
+			best = e
+	if best == null:
+		_travel(area)
+		return
+	_goto_entity(area, str(best.id))
 
 ## Make something for a trial: hunt the essences it needs, earn the stones, then take it all to the
 ## alchemist or the smith (the shop crafts it, _shop).

@@ -30,6 +30,7 @@ claws, claw_col, claw_len, fangs, tail, beads, badge, bracers, props (accessory.
 import math
 
 import accessory as acc
+import body as bodylib
 import face as facelib
 import garment as G
 import hair as hairlib
@@ -46,6 +47,8 @@ EYE_Y = facelib.HC.y + facelib.EYE_Y
 # how much lower the head sits on a shorter neck (see build): the chin about a third of a head above
 # the collar, not half of one
 NECK_DROP = 0.028
+# the scale of the head against the face library's (a man's, a woman's): see build
+HEAD_K = (0.95, 0.97)
 
 
 def make_rig(o=None):
@@ -127,6 +130,16 @@ def build(o):
         o["fem"] = o.get("hair_style") == "long" and not o.get("beard", False) and not o.get("stern", False)
 
     tor = G.Torso(o)
+    # the Underclothes release: which of the geometry is the person's own (hands, neck, head, hair, what
+    # grows on them) and which is clothes, as ranges of vertex indices (geometry is only ever appended),
+    # so the export can keep the clothes apart from the body under them (export_person, body.py)
+    own = []
+
+    def mine(fn, *a, **kw):
+        n0 = len(b.bm.verts)
+        r = fn(*a, **kw)
+        own.append((n0, len(b.bm.verts)))
+        return r
     # costumes painted at full saturation read as neon under the cel shading: calm them a little
     robe, sleeve_col, sash_col = soften(robe), soften(sleeve_col), soften(sash_col, 0.42, 0.88)
     # palette slots (used when the cloth is tinted, i.e. recolourable enemies): trousers, sash and
@@ -156,17 +169,22 @@ def build(o):
     # ---------------- arms
     for s in (1, -1):
         G.sleeve(b, o, s, sleeve_col, trim, inner, gold)
-        G.hand(b, o, s, skin)
+        mine(G.hand, b, o, s, skin)
 
     # ---------------- neck and head
     f = s = None
+    n_head = len(b.bm.verts)
     if o.get("beast_head") is not None:
         b.tube([V(0, 1.46, 0.0), V(0, 1.6, 0.01)], [0.06, 0.055], o.get("head_col", "6a4a3a"), cls=CLOTH, bones=[{"neck": 0.6, "chest": 0.4}, {"neck": 0.5, "head": 0.5}], seg=14)
         beast_head(b, o)
         top = facelib.HC.y + 0.16
     else:
         f = facelib.Face(o)
+        # (the neck goes with the clothes: the body under them has a neck of its own that runs on
+        # unbroken into the shoulders, body.py)
+        own.append((n_head, len(b.bm.verts)))
         facelib.neck(b, f, o, [{"chest": 0.6, "neck": 0.4}, "neck", {"neck": 0.5, "head": 0.5}, "head"])
+        n_head = len(b.bm.verts)
         if race.hides_ears(o):
             race.head(b, o, "head", "eyes")
         else:
@@ -177,12 +195,14 @@ def build(o):
             facelib.beard(b, f, o)
         if o.get("marks"):
             G.scars(b, f, facelib.HC, o["marks"])
+    own.append((n_head, len(b.bm.verts)))
     if o.get("crown", False):
-        G.crown(b, o, top)
+        mine(G.crown, b, o, top)
     if o.get("hat"):
         G.hat(b, o, o["hat"], top)
     if o.get("talisman", False):
-        G.talisman(b, facelib.HC)
+        mine(G.talisman, b, facelib.HC)
+    n_horn = len(b.bm.verts)
     if o.get("horns") == "antler":
         race.antlers(b, o, top)
     elif o.get("horns", False):
@@ -227,6 +247,8 @@ def build(o):
         for s3 in (1, -1):
             b.ribbon([knot, knot + V(0.025 * s3, -0.07, -0.02), knot + V(0.035 * s3, -0.15, -0.025)], [0.016, 0.018, 0.006], (1, 0, 0), bc, bones=[{"head": 1.0}] * 3, col_end=darken(bc, 0.2))
 
+    # (horns, the features of a people, the ribbons in the hair and a cloth over the eyes are the person's own)
+    own.append((n_horn, len(b.bm.verts)))
     # ---------------- cape, armour, weapons
     if o.get("cape") is not None:
         b.cur_pal = 0.5
@@ -251,15 +273,15 @@ def build(o):
         G.rank_badge(b, tor, *([o["badge"]] if isinstance(o["badge"], str) else []))
     for s2 in (1, -1):
         if o.get("claws"):
-            G.claw_nails(b, s2, o.get("claw_col", "1a1418"), o.get("claw_len", 0.05))
+            mine(G.claw_nails, b, s2, o.get("claw_col", "1a1418"), o.get("claw_len", 0.05))
         if o.get("bracers"):
             G.bracers(b, s2, rgb(o["bracers"]))
     if o.get("tail"):
-        G.demon_tail(b, rgb(o["tail"]), o.get("tail_tip", "ff4020"))
+        mine(G.demon_tail, b, rgb(o["tail"]), o.get("tail_tip", "ff4020"))
     if o.get("fangs") and o.get("beast_head") is None:
         for s2 in (1, -1):
             tip = facelib.HC + V(0.012 * s2, facelib.MOUTH_Y - 0.004, facelib.RZF * 0.86)
-            b.cone(tip, 0.0035, 0.012, "f8f4e8", cls=STONE, bone="head", seg=5, rot=(math.pi, 0, 0))
+            mine(b.cone, tip, 0.0035, 0.012, "f8f4e8", cls=STONE, bone="head", seg=5, rot=(math.pi, 0, 0))
     # signature props (art/lib/accessory.py): names, or (name, {kwargs}) pairs
     for pr in o.get("props", []):
         name, kw = (pr, {}) if isinstance(pr, str) else pr
@@ -273,14 +295,26 @@ def build(o):
         for v in b.bm.verts:
             if v[b.cl][3] > 0.94:
                 v[b.tl] = 1.0
+    # the body under the clothes, in its underclothes (body.py): a second mesh the game shows in
+    # place of the clothes.  Characters only (export_person asks for it); built on the same bones, and
+    # its neck takes the head's scale and drop below like the clothed neck does.
+    bare = None
+    if o.get("_bare"):
+        bare = Builder("bare")
+        bodylib.build(bare, o)
     # a slightly larger head than life (about 6.6 heads tall) reads better at game distance, the
     # usual stylised proportion (references: anime proportion guides; Genshin model evolution)
     # (the Spring Thunder release: a woman's head a little bigger again, about 6.5 heads tall like the
     # gacha games' adult women, a man's about 7)
-    hk = o.get("head_scale", 1.0 if o.get("beast_head") is not None else (1.13 if o.get("fem") else 1.08))
+    # (the Underclothes release: a head of a real size, about seven and a half to the figure: what was
+    # 1.08 for a man and 1.13 for a woman is now HEAD_K; a child's own head_scale is kept, a child's head
+    # being big for its body in life too)
+    hk = o.get("head_scale", 1.0 if o.get("beast_head") is not None else (HEAD_K[1] if o.get("fem") else HEAD_K[0]))
     if hk != 1.0:
         pivot = V(0, 1.58, 0.0)
         b.scale_where(lambda w: sum(w.get(nm, 0.0) for nm in ("head", "eyes", "mouth", "hair_tail") + facelib.FACE_BONES) >= 0.5, pivot, hk)
+        if bare is not None:
+            bare.scale_where(lambda w: sum(w.get(nm, 0.0) for nm in ("head", "eyes", "mouth", "hair_tail") + facelib.FACE_BONES) >= 0.5, pivot, hk)
         for nm in ("eyes", "mouth", "hair_tail") + facelib.FACE_BONES:
             h0, t0, par = rig.bones[nm]
             rig.bones[nm] = (pivot + (V(h0) - pivot) * hk, pivot + (V(t0) - pivot) * hk, par)
@@ -294,6 +328,8 @@ def build(o):
     if drop != 0.0:
         heads = ("head", "eyes", "mouth", "hair_tail", "hair_tail2") + facelib.FACE_BONES
         b.shift_where(lambda w: min(1.0, sum(w.get(nm, 0.0) for nm in heads)), V(0, -drop, 0))
+        if bare is not None:
+            bare.shift_where(lambda w: min(1.0, sum(w.get(nm, 0.0) for nm in heads)), V(0, -drop, 0))
         for nm in heads:
             h0, t0, par = rig.bones[nm]
             rig.bones[nm] = (V(h0) + V(0, -drop, 0), V(t0) + V(0, -drop, 0), par)
@@ -303,9 +339,14 @@ def build(o):
     if sc != 1.0:
         for v in b.bm.verts:
             v.co *= sc
+        if bare is not None:
+            for v in bare.bm.verts:
+                v.co *= sc
         for nm in list(rig.bones):
             h, t, p = rig.bones[nm]
             rig.bones[nm] = (h * sc, t * sc, p)
+    b.own_ranges = own
+    b.bare = bare
     return b, rig
 
 
@@ -3316,7 +3357,78 @@ def _with_pose(fn, pose):
     return clip
 
 
+def _part_of(b, ranges):
+    """A copy of Builder b holding only the faces whose every vertex is (own) or is not (clothes) in
+    one of the index `ranges`: (own builder, clothes builder)."""
+    import bmesh
+    from kit import Builder as _B
+    b.bm.verts.ensure_lookup_table()
+    b.bm.verts.index_update()
+    mine = bytearray(len(b.bm.verts))
+    for a, z in ranges:
+        for i in range(a, z):
+            mine[i] = 1
+    over = {v.index: n for v, n in b.nover if v.is_valid}
+    out = []
+    for want in (1, 0):
+        nb = _B(b.name)
+        nb.bm.free()
+        nb.bm = b.bm.copy()
+        nb.cl = nb.bm.verts.layers.float_color["Col"]
+        nb.tl = nb.bm.verts.layers.float["tint"]
+        nb.pl = nb.bm.verts.layers.float["pal"]
+        nb.dl = nb.bm.verts.layers.deform.verify()
+        nb.groups = list(b.groups)
+        nb.gidx = dict(b.gidx)
+        nb.bm.verts.ensure_lookup_table()
+        nb.nover = [(nb.bm.verts[i], n) for i, n in over.items() if mine[i] == want]
+        drop = [f for f in nb.bm.faces if any(mine[v.index] != want for v in f.verts)]
+        bmesh.ops.delete(nb.bm, geom=drop, context="FACES_ONLY")
+        loose = [v for v in nb.bm.verts if not v.link_faces]
+        nb.nover = [(v, n) for v, n in nb.nover if v.is_valid and v.link_faces]
+        bmesh.ops.delete(nb.bm, geom=loose, context="VERTS")
+        out.append(nb)
+    return out[0], out[1]
+
+
+def finish_person(b, rig, rel, clips, **ao_kw):
+    """Bake, bind and export a person.  With a bare body (body.py) the export carries three meshes on
+    one skeleton: "own" (the face, hair and hands, always shown), "dress" (the clothes) and "bare" (the
+    body in its underclothes, shown instead of the clothes when the game undresses somebody)."""
+    import kit as _kit
+    bare = getattr(b, "bare", None)
+    if bare is None:
+        return finish_rigged(b, rig, rel, clips, coat=False, **ao_kw)
+    b.bake_ao(**ao_kw)
+    bare.bake_ao(**ao_kw)
+    own_b, dress_b = _part_of(b, getattr(b, "own_ranges", []))
+    own_n, dress_n = own_b.tri_count(), dress_b.tri_count()
+    print("[art] %s: own %d, dress %d, bare %d triangles" % (rel, own_n, dress_n, bare.tri_count()))
+    arm = rig.build()
+    objs = [arm, own_b.to_object("own", parent=arm), dress_b.to_object("dress", parent=arm), bare.to_object("bare", parent=arm)]
+    # (the body is drawn only when somebody is undressed: a lighter mesh does the work)
+    _kit.decimate(objs[3], BARE_TRIS)
+    # (and a person drawn dressed stays under the hero-asset budget: a long beard and a robe sewn with
+    # stars came to a little over it once the faces were drawn at life size, so the clothes give way)
+    if own_n + dress_n > DRESSED_TRIS:
+        _kit.decimate(objs[2], DRESSED_TRIS - own_n)
+    for nm, (secs, fn) in clips.items():
+        _kit.bake_action(rig, nm, secs, fn)
+    _kit.export(_kit.out_path(rel), objs)
+    return objs[1]
+
+
+# triangles of the body in its underclothes (without the head and hands, which are the person's own)
+BARE_TRIS = 11000
+# triangles of a person drawn dressed (the head, hair and hands with the clothes), with room under the
+# 50,000 the tests allow for the float differences between machines
+DRESSED_TRIS = 48500
+
+
 def export_person(rel, opts, clips=None):
+    opts = dict(opts)
+    # (the body under the clothes is built for the people of the land, not for the person-shaped monsters)
+    opts.setdefault("_bare", rel.startswith("characters/"))
     b, rig = build(opts)
     clips = clips or CLIPS
     if opts.get("age", 0.0) > 0.5:
@@ -3327,5 +3439,5 @@ def export_person(rel, opts, clips=None):
         clips = {nm: (secs, _with_pose(fn, pose) if nm in ("idle", "walk", "sit", "talk") else fn) for nm, (secs, fn) in clips.items()}
     print("[art] %s: %d triangles" % (rel, b.tri_count()))
     # robes are not coats: person-shaped monsters keep their dominant/secondary/accent cut
-    return finish_rigged(b, rig, rel, clips, coat=False, samples=16, dist=0.22, strength=0.5, floor_y=0.0, floor_k=0.2)
+    return finish_person(b, rig, rel, clips, samples=16, dist=0.22, strength=0.5, floor_y=0.0, floor_k=0.2)
 

@@ -1,10 +1,17 @@
-"""Tortoise (Eon Tortoise, Moss-Backed Tortoise, Xuan Wu): a high domed carapace of scutes - five
-vertebrals, four costals a side and a serrated ring of marginals, each raised to a pale areola,
-ringed with growth lines and split by deep seams - over a pale, plated plastron.  The neck, head,
-legs and tail are sculpted in one piece of clay: loose folds round the neck, a heavy head with a
-horny hooked beak and lidded eyes, thick elephantine legs armoured with big raised scales on
-round pads with blunt nails, a short tapering tail.  Moss and crystals grow on the shell.  The
-shell takes the enemy's colour, the skin its secondary colour.
+"""Tortoise (Eon Tortoise, Moss-Backed Tortoise, Xuan Wu the Black Tortoise, the Guardian of the Six
+Paths).
+
+After tortoise anatomy: a high-domed carapace of keratin scutes laid out as in life - five
+vertebrals down the spine, four costals either side, a ring of marginals with the nuchal over the
+neck and the supracaudal over the tail - each a raised plate stepped with concentric growth
+annuli round a pale areola and parted from its neighbours by deep seams (the scutes come from a
+weighted Voronoi diagram of hand-placed centres, so the seams run straight between them); the
+marginals flare over the neck and the hind legs and are notched at the back; a flat, pale
+plastron of paired plates underneath.  The skin (the secondary colour) is one sculpted piece of
+clay: a long neck in loose folds; a small reptile head, flat on top under big head scales, with a
+heavy-lidded eye and a hooked horny beak over the lower bill; columnar, elephantine hind legs and
+flattened forelegs armoured in front with big overlapping scales, on round feet with blunt nails;
+a short tail.  Moss grows in the seams and crystals of the enemy's accent colour push up through it.
 Run: blender --background --python art/monsters/tortoise.py  ->  assets/monsters/tortoise.glb"""
 import math
 import os
@@ -15,11 +22,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import kit  # noqa: E402
 import creature  # noqa: E402
 import anatomy as A  # noqa: E402
-from creature import zero_pose  # noqa: E402
+import arthropod as X  # noqa: E402
+from creature import Walker, add, euler_yxz, zero_pose  # noqa: E402
 from clay import Clay, limb_weights  # noqa: E402
-from sculpt import morph_sphere, smooth  # noqa: E402
-from kit import CRYSTAL, FOLIAGE, SCALE, SKIN, STONE, V, Builder, Rig, env  # noqa: E402
-from creature import Walker, add  # noqa: E402
+from sculpt import fbm3, morph_sphere, smooth  # noqa: E402
+from kit import CRYSTAL, FOLIAGE, SKIN, V, Builder, Rig, env  # noqa: E402
 
 kit.reset()
 creature.realtime()
@@ -27,182 +34,246 @@ rnd = random.Random(9)
 r = Rig("rig")
 r.bone("root", (0, 0, 0), (0, 0.3, 0))
 r.bone("shell", (0, 0.55, -0.3), (0, 0.6, 0.3), "root")
-r.bone("neck", (0, 0.6, 0.55), (0, 0.72, 0.85), "shell")
-r.bone("head", (0, 0.72, 0.85), (0, 0.74, 1.1), "neck")
-r.bone("jaw", (0, 0.66, 0.9), (0, 0.64, 1.1), "head")
-r.bone("tail", (0, 0.5, -0.7), (0, 0.4, -0.95), "shell")
-for fz, nm in ((0.42, "f"), (-0.42, "h")):
+r.bone("neck", (0, 0.52, 0.62), (0, 0.68, 1.06), "shell")
+r.bone("head", (0, 0.68, 1.06), (0, 0.69, 1.38), "neck")
+r.bone("jaw", (0, 0.64, 1.12), (0, 0.62, 1.32), "head")
+r.bone("tail", (0, 0.42, -0.82), (0, 0.32, -1.02), "shell")
+for fz, nm in ((0.46, "f"), (-0.46, "h")):
     for s, sd in ((1, "L"), (-1, "R")):
-        r.bone("%s_up.%s" % (nm, sd), (0.45 * s, 0.5, fz), (0.6 * s, 0.3, fz + 0.05), "shell")
-        r.bone("%s_lo.%s" % (nm, sd), (0.6 * s, 0.3, fz + 0.05), (0.62 * s, 0.03, fz + 0.08), "%s_up.%s" % (nm, sd))
-
-def cells(p, scale, seed=0):
-    """Worley noise: distances (in cell units) to the nearest two jittered points of a 3D grid,
-    for scale and scute patterns."""
-    x, y, z = p[0] * scale, p[1] * scale, p[2] * scale
-    ix, iy, iz = math.floor(x), math.floor(y), math.floor(z)
-    f1 = f2 = 9.0
-    for dx in (-1, 0, 1):
-        for dy in (-1, 0, 1):
-            for dz in (-1, 0, 1):
-                cx, cy, cz = ix + dx, iy + dy, iz + dz
-                h = ((cx * 73856093) ^ (cy * 19349663) ^ (cz * 83492791) ^ (seed * 2654435761)) & 0xFFFFFFFF
-                jx = (h & 1023) / 1023.0
-                jy = ((h >> 10) & 1023) / 1023.0
-                jz = ((h >> 20) & 1023) / 1023.0
-                d = (cx + jx - x) ** 2 + (cy + jy - y) ** 2 + (cz + jz - z) ** 2
-                if d < f1:
-                    f1, f2 = d, f1
-                elif d < f2:
-                    f2 = d
-    return math.sqrt(f1), math.sqrt(f2)
-
+        r.bone("%s_up.%s" % (nm, sd), (0.46 * s, 0.48, fz), (0.66 * s, 0.27, fz + 0.04), "shell")
+        r.bone("%s_lo.%s" % (nm, sd), (0.66 * s, 0.27, fz + 0.04), (0.67 * s, 0.03, fz + 0.06), "%s_up.%s" % (nm, sd))
 
 b = Builder("tortoise")
-# carapace: a high dome whose scutes are a Voronoi pattern over its surface - five vertebral
-# scutes down the spine, four costals either side and a ring of marginals - each raised towards
-# a pale areola, ringed with growth lines and split from its neighbours by deep seams
+
+# ---------------------------------------------------------------- the carapace
 SC = V(0, 0.42, 0)
+RX, RY, RZ = 0.86, 0.8, 0.98
+
+
+def unit(x, y, z):
+    v = V(x, y, z)
+    return v.normalized()
+
+
+# scute centres on the unit sphere of directions and their weights (a power diagram: a bigger
+# weight claims a bigger scute)
 CENTRES = []
-for k in range(5):
-    CENTRES.append(V(0, 1.0, 0.62 - k * 0.31).normalized())
-for s2 in (1, -1):
-    for k in range(4):
-        CENTRES.append(V(0.62 * s2, 0.72, 0.5 - k * 0.33).normalized())
-for k in range(22):
-    a = k / 22 * 2 * math.pi
-    CENTRES.append(V(math.sin(a), 0.12, math.cos(a)).normalized())
+for phi in (-60.0, -30.0, 0.0, 30.0, 58.0):                                  # vertebrals
+    a = math.radians(phi)
+    CENTRES.append((unit(0.0, math.cos(a), -math.sin(a)), 0.4, "v"))
+for s in (1, -1):                                                            # costals
+    for phi in (-46.0, -16.0, 15.0, 44.0):
+        a, c = math.radians(phi), math.radians(52.0)
+        CENTRES.append((unit(math.sin(c) * s, math.cos(c) * math.cos(a), -math.cos(c) * math.sin(a)), 0.42, "c"))
+for k in range(24):                                                          # marginals, nuchal at 0
+    th = math.radians(k * 15.0)
+    e = math.radians(5.0)
+    CENTRES.append((unit(math.sin(th) * math.cos(e), math.sin(e), math.cos(th) * math.cos(e)), 0.1 if k else 0.06, "m"))
 
 
 def scute(d):
-    best = 9.0
-    second = 9.0
-    for c in CENTRES:
-        dd = (d - c).length
-        if dd < best:
-            best, second = dd, best
-        elif dd < second:
-            second = dd
-    return best, second - best
+    """(index, distance to the scute's edge, kind) of direction d in the power diagram."""
+    best = None
+    pw = []
+    for i, (c, w, kind) in enumerate(CENTRES):
+        q = (d - c).length_squared - w * w
+        pw.append(q)
+        if best is None or q < pw[best]:
+            best = i
+    ci = CENTRES[best][0]
+    dist = 9.0
+    for j, (c, w, kind) in enumerate(CENTRES):
+        if j == best:
+            continue
+        den = 2.0 * (c - ci).length
+        if den < 1e-6:
+            continue
+        dist = min(dist, (pw[j] - pw[best]) / den)
+    return best, dist, CENTRES[best][2]
 
 
-def shell_shape(d):
+def base_point(d):
     if d.y < 0.0:
-        # the flat underside (plastron) sits inside the rim
-        return V(d.x * 0.74, d.y * 0.12, d.z * 0.86)
-    p = V(d.x * 0.84, d.y * 0.84, d.z * 0.96)
-    best, gap = scute(d)
-    seam = smooth(0.09, 0.0, gap)
-    # each scute rises to a low pyramid at its areola; deep grooves between scutes
-    p = p * (1.0 + 0.05 * smooth(0.45, 0.0, best) - 0.035 * seam)
-    # the rim flares out and is serrated at the back
-    if d.y < 0.18:
-        flare = smooth(0.18, 0.02, d.y)
-        teeth = 0.03 * max(0.0, -d.z) * abs(math.sin(math.atan2(d.x, d.z) * 11.0))
-        p = p + V(d.x, 0, d.z) * (0.07 * flare + teeth * flare)
+        # the plastron: flat underneath, inside the rim
+        return V(d.x * RX * 0.86, d.y * 0.13, d.z * RZ * 0.88)
+    p = V(d.x * RX, d.y * RY, d.z * RZ)
+    # the marginals flare out over the neck and the hind legs
+    if d.y < 0.3:
+        th = math.atan2(d.x, d.z)
+        flare = 0.05 + 0.05 * (math.cos(th) ** 2)
+        p += V(d.x, 0.0, d.z) * (flare * smooth(0.3, 0.02, d.y))
     return p
 
 
-def shell_col(p, d):
+def ring_spacing(kind):
+    return 0.045 if kind == "m" else 0.06
+
+
+def shell_shape(d):
+    p = base_point(d)
     if d.y < 0.0:
-        # plastron: pale, split into paired plates
-        grid = smooth(0.02, 0.0, abs(math.sin(p.z * 6.0))) + smooth(0.015, 0.0, abs(p.x))
-        return ((0.97 - 0.3 * min(1.0, grid)),) * 3
-    best, gap = scute(d)
-    seam = smooth(0.07, 0.0, gap)
-    rings = 0.5 + 0.5 * math.cos(best * 34.0)
-    areola = smooth(0.14, 0.04, best)
-    v = 0.7 + 0.22 * areola + 0.1 * rings * smooth(0.06, 0.16, best) + 0.08 * smooth(0.2, 0.45, best)
-    v *= 1.0 - 0.75 * seam
-    return (v, v, v)
+        return p
+    i, dist, kind = scute(d)
+    sp = ring_spacing(kind)
+    nrm = V(d.x / RX, d.y / RY, d.z / RZ).normalized()
+    # each scute is a pillow: it rises from deep seams through two broad growth annuli (steps) to
+    # a flat areola.  (Everything here is wider than the mesh spacing, so it reads, not aliases.)
+    rise = 0.03 * smooth(0.0, sp * 2.4, dist)
+    steps = 0.006 * (smooth(sp * 0.9, sp * 1.1, dist) + smooth(sp * 1.9, sp * 2.1, dist))
+    seam = 0.014 * smooth(0.04, 0.0, dist)
+    off = rise + steps - seam
+    # the rim is notched between the hind marginals
+    if kind == "m" and d.z < -0.3 and d.y < 0.14:
+        off -= 0.03 * smooth(0.03, 0.0, dist) * smooth(0.14, 0.03, d.y)
+    return p + nrm * off
+
+
+def shell_col(lp, d):
+    if d.y < 0.0:
+        # plastron: pale paired plates, dark seams down the middle and across
+        x, z = lp.x, lp.z
+        seam = max(smooth(0.012, 0.0, abs(x)), max(smooth(0.012, 0.0, abs(z - zz)) for zz in (0.5, 0.25, -0.05, -0.35, -0.6)))
+        return X.grey(0.9 - 0.4 * seam)
+    i, dist, kind = scute(d)
+    sp = ring_spacing(kind)
+    # dark in the seams, the annuli a step paler each, the areola palest (horn weathers that way)
+    v = 0.42 + 0.2 * smooth(0.0, sp * 0.9, dist) + 0.08 * smooth(sp * 1.0, sp * 1.2, dist) + 0.12 * smooth(sp * 2.0, sp * 2.6, dist)
+    v *= 0.95 + 0.1 * fbm3((lp.x * 8.0, lp.y * 8.0, lp.z * 8.0), 2, 3)
+    return X.grey(v)
 
 
 # horn, not wet scales: the carapace takes the matte horn surface class
-morph_sphere(b, SC, shell_shape, shell_col, cls=STONE, bone="shell", seg=96, rings=48, tint_fn=lambda p, d: 1.0)
-# moss in the seams and on the crown, crystals pushing up through it
-rnd = random.Random(9)
-for k in range(18):
+morph_sphere(b, SC, shell_shape, shell_col, cls=0.9, bone="shell", seg=112, rings=52, tint_fn=lambda p, d: 1.0)
+# moss in the seams of the crown, and crystals of the accent colour pushing up through it
+for k in range(16):
     a = rnd.uniform(0, 2 * math.pi)
-    rr = rnd.uniform(0.05, 0.62)
-    d = V(math.sin(a) * rr, 1.0, math.cos(a) * rr).normalized()
+    rr = rnd.uniform(0.05, 0.55)
+    d = V(math.sin(a) * rr, 1.0, math.cos(a) * rr - 0.05).normalized()
     root = SC + shell_shape(d) - d * 0.01
-    b.leaf(root, root + d * 0.13 + V(rnd.uniform(-0.06, 0.06), 0.03, rnd.uniform(-0.06, 0.06)), 0.045, "5a8a3a", cls=FOLIAGE, bone="shell", col_tip="9ac860")
-for k in range(5):
-    a = k * 1.7
-    d = V(math.sin(a) * 0.35, 1.0, math.cos(a) * 0.35 - 0.1).normalized()
-    b.crystal(SC + shell_shape(d) - d * 0.03, 0.05 + 0.01 * (k % 2), 0.24 + 0.06 * (k % 3), "a0f0ff", cls=CRYSTAL, bone="shell", rot=(0.4 * d.z, 0, -0.4 * d.x))
+    b.leaf(root, root + d * 0.1 + V(rnd.uniform(-0.05, 0.05), 0.03, rnd.uniform(-0.05, 0.05)), 0.04, "4a7a34", cls=FOLIAGE, bone="shell", col_tip="8ab858")
+b.cur_pal = 1.0
+for k, (a, rr) in enumerate(((0.6, 0.32), (2.4, 0.38), (4.3, 0.26))):
+    d = V(math.sin(a) * rr, 1.0, math.cos(a) * rr - 0.1).normalized()
+    b.crystal(SC + shell_shape(d) - d * 0.03, 0.04 + 0.01 * (k % 2), 0.11 + 0.03 * k, (0.92, 0.92, 0.92), cls=CRYSTAL, bone="shell", rot=(0.4 * d.z, 0, -0.4 * d.x),
+              tint=1.0)
+b.cur_pal = 0.0
 
-# skin: the neck, head, legs and tail sculpted in one family of clay, in the skin palette slot
-SKIN_GREY = 0.86
+# ---------------------------------------------------------------- skin: neck, head, legs, tail
+SKIN_GREY = 0.8
+HC = V(0, 0.71, 1.22)
 
 
 def skin_col(p, info):
     tag = info.tag
-    if tag == "beak":
-        return (0.86, 0.84, 0.78)
-    f1, f2 = cells(p, 14.0 if tag in ("leg", "foot") else 22.0, 3)
-    edge = smooth(0.0, 0.2, f2 - f1)
-    v = SKIN_GREY * (0.7 + 0.32 * edge)
+    v = SKIN_GREY
     if tag == "neck":
-        v = SKIN_GREY * (0.86 + 0.1 * (0.5 + 0.5 * math.sin(info.t * 40.0)))
-    if tag == "head" and info.n.y > 0.3:
-        v *= 0.9 + 0.1 * edge
-    return (v, v, v)
+        v *= 0.86 + 0.14 * (0.5 + 0.5 * math.sin(info.t * 38.0))
+        v = v + (0.95 - v) * 0.6 * smooth(-0.2, -0.8, info.n.y)        # a pale throat
+    elif tag in ("leg", "foot"):
+        v *= 0.92 + 0.1 * fbm3((p.x * 18.0, p.y * 18.0, p.z * 18.0), 2, 5)
+        v = v + (0.94 - v) * 0.4 * smooth(-0.1, -0.7, info.n.y)
+    elif tag in ("head", "jaw"):
+        v *= 0.9 + 0.12 * smooth(-0.6, 0.4, info.n.y)
+        v = v + (0.95 - v) * 0.5 * smooth(-0.2, -0.8, info.n.y)
+    return X.grey(min(1.0, v))
 
 
 def skin_post(p, info):
-    tag = info.tag
-    nn = info.n
-    if tag == "neck":
+    if info.tag == "neck":
         # loose folds of skin round the neck
-        return nn * (0.012 * math.sin(info.t * 40.0) - 0.004)
-    if tag in ("leg", "foot", "tail") or (tag == "head" and nn.y > 0.2):
-        f1, f2 = cells(p, 14.0 if tag in ("leg", "foot") else 22.0, 3)
-        # big, raised scales: domed in the middle of each cell, grooved at the edges
-        return nn * (0.02 * smooth(0.0, 0.35, f2 - f1) - 0.007)
+        return info.n * (0.011 * math.sin(info.t * 38.0) - 0.004)
+    if info.tag in ("leg", "foot", "tail"):
+        return info.n * (0.008 * (fbm3((p.x * 22.0, p.y * 22.0, p.z * 22.0), 2, 7) - 0.5))
     return None
 
 
-sk = Clay(0.02, "tortoise_skin")
-neck = [V(0, 0.52, 0.48), V(0, 0.6, 0.66), V(0, 0.7, 0.84)]
-sk.chain(neck, [0.16, 0.13, 0.11], bones=lambda p, t: {"shell": max(0.0, 0.7 - t * 1.4), "neck": min(1.0, 0.3 + t * 1.4)} if t < 0.5 else ({"neck": 1.0} if t < 0.85 else {"neck": 1.0 - (t - 0.85) / 0.3, "head": (t - 0.85) / 0.3}), tag="neck")
-HC = V(0, 0.77, 0.99)
-sk.ellipsoid(HC + V(0, 0.0, -0.03), (0.16, 0.13, 0.19), bones={"head": 1.0}, tag="head")
-sk.ellipsoid(HC + V(0, 0.035, 0.08), (0.12, 0.095, 0.12), bones={"head": 1.0}, tag="head")
-sk.ellipsoid(HC + V(0, -0.08, 0.05), (0.12, 0.05, 0.14), bones={"jaw": 1.0}, tag="jaw")
-for s in (1, -1):
-    sk.ellipsoid(HC + V(0.11 * s, 0.0, 0.02), (0.06, 0.07, 0.08), bones={"head": 1.0}, tag="head")
-# legs: thick, elephant-like columns of big scales, the forelegs bowed outwards, ending in round
-# pads; the upper legs disappear under the rim of the shell
+sk = Clay(0.0185, "tortoise_skin")
+neck = [V(0, 0.5, 0.56), V(0, 0.58, 0.8), V(0, 0.66, 1.0), V(0, 0.7, 1.13)]
+
+
+def neck_w(p, t):
+    if t < 0.4:
+        return {"shell": 1.0 - t / 0.4, "neck": t / 0.4}
+    if t < 0.85:
+        return {"neck": 1.0}
+    return {"neck": 1.0 - (t - 0.85) / 0.3, "head": (t - 0.85) / 0.3}
+
+
+sk.chain(neck, [0.15, 0.118, 0.088, 0.068], bones=neck_w, tag="neck")
+# the head: a flat-topped skull, the snout narrowing to the beak, the cheeks behind the eyes
+hf = A.HeadFrame(HC, V(0, -0.05, 1.0))
+A.head_clay(sk, hf, 1.0, [
+    ("ell", (0, 0.012, -0.03), (0.085, 0.072, 0.1), "head", False, False),
+    ("ell", (0, 0.0, 0.045), (0.066, 0.056, 0.065), "head", False, False),
+    ("ell", (0.055, -0.02, -0.03), (0.05, 0.052, 0.058), "head", True, False),
+    ("ell", (0.045, 0.045, 0.02), (0.03, 0.02, 0.04), "head", True, False),
+    ("ell", (0, 0.062, -0.01), (0.07, 0.02, 0.085), "head", False, False),
+])
+sk.ellipsoid(hf.at(0, -0.052, 0.035), (0.062, 0.028, 0.075), rot=hf.M, bones={"jaw": 1.0}, tag="jaw")
+# legs: the forelegs bow out and are flattened front to back; the hind legs are columns
 for nm in ("f", "h"):
     for sd, s2 in (("L", 1), ("R", -1)):
-        up = "%s_up.%s" % (nm, sd)
-        lo = "%s_lo.%s" % (nm, sd)
+        up, lo = "%s_up.%s" % (nm, sd), "%s_lo.%s" % (nm, sd)
         h0, k0, f0 = r.head(up), r.tail(up), r.tail(lo)
-        sk.chain([h0 + V(-0.1 * s2, -0.08, 0.0), k0 + V(0.03 * s2, 0.0, 0.0), f0 + V(0, 0.05, 0)], [0.12, 0.15, 0.15], bones=limb_weights([up, lo]), tag="leg", t0=0.0, t1=2.0)
-        sk.ellipsoid(f0 + V(0, 0.04, 0.03), (0.17, 0.06, 0.18), bones={lo: 1.0}, tag="foot")
-# a short, tapering tail
-sk.chain([V(0, 0.48, -0.76), V(0, 0.43, -0.86), V(0, 0.37, -0.97)], [0.07, 0.05, 0.02], bones={"tail": 1.0}, tag="tail")
+        if nm == "f":
+            sk.chain([h0 + V(-0.12 * s2, 0.02, -0.02), k0 + V(0.02 * s2, 0.0, 0.0), f0 + V(0, 0.07, 0.01)], [0.12, 0.12, 0.11], bones=limb_weights([up, lo]),
+                     tag="leg", t0=0.0, t1=2.0)
+            sk.ellipsoid(k0.lerp(f0, 0.45) + V(0.0, 0.0, 0.02), (0.12, 0.13, 0.09), bones={lo: 1.0}, tag="leg")
+        else:
+            sk.chain([h0 + V(-0.12 * s2, 0.02, 0.0), k0 + V(0.01 * s2, 0.0, 0.0), f0 + V(0, 0.07, 0)], [0.13, 0.14, 0.13], bones=limb_weights([up, lo]),
+                     tag="leg", t0=0.0, t1=2.0)
+        # the round, flat-soled foot
+        sk.ellipsoid(f0 + V(0, 0.045, 0.02), (0.14, 0.055, 0.15), bones={lo: 1.0}, tag="foot")
+sk.chain([V(0, 0.44, -0.78), V(0, 0.38, -0.9), V(0, 0.31, -1.02)], [0.075, 0.05, 0.02], bones={"tail": 1.0}, tag="tail")
 b.cur_pal = 0.5  # palette slot (kit.py): the skin is naturally another colour than the shell
-sk.build(b, skin_col, cls=SCALE, tint_fn=lambda p, info: 0.0 if info.tag == "beak" else 0.55, post=skin_post)
+sk.build(b, skin_col, cls=X.CHITIN, tint_fn=lambda p, info: 0.8, post=skin_post)
+
+# head scales: the big plates over the crown and the scales of the cheek
+b.cur_pal = 0.5
+for x, z, rx, rz in ((0.0, 0.05, 0.045, 0.035), (0.032, -0.012, 0.032, 0.04), (-0.032, -0.012, 0.032, 0.04), (0.0, -0.07, 0.055, 0.035)):
+    c = hf.at(x, 0.075 - 0.004 * abs(x) / 0.035, z)
+    b.ellipsoid(c, (rx, 0.012, rz), X.grey(0.72), cls=0.9, bone="head", rot=A.euler_of(hf.M), seg=12, rings=6, tint=0.8)
 b.cur_pal = 0.0
-# a horny, hooked beak over a hinged lower bill, heavy-lidded eyes, nostrils
-upper = [HC + V(0, 0.05, 0.16), HC + V(0, 0.025, 0.22), HC + V(0, -0.025, 0.25), HC + V(0, -0.08, 0.23)]
-A.horn(b, upper, 0.07, "d8c8a0", "8a7858", "head", r1=0.01, cls=STONE, seg=12, flat=0.75, up=(1, 0, 0), tint=0.0)
-lower = [HC + V(0, -0.09, 0.12), HC + V(0, -0.1, 0.18), HC + V(0, -0.09, 0.225)]
-A.horn(b, lower, 0.055, "d8c8a0", "8a7858", "jaw", r1=0.01, cls=STONE, seg=10, flat=0.7, up=(1, 0, 0), tint=0.0)
+# the horny beak: a hooked upper sheath over the lower bill (horn-coloured, not tinted)
+up_beak = [hf.at(0, 0.03, 0.075), hf.at(0, 0.012, 0.11), hf.at(0, -0.022, 0.122), hf.at(0, -0.048, 0.11)]
+A.horn(b, up_beak, 0.042, "8a7a5c", "2e261c", "head", r1=0.008, cls=0.9, seg=12, flat=0.72, up=(1, 0, 0), tint=0.0)
+lo_beak = [hf.at(0, -0.055, 0.045), hf.at(0, -0.066, 0.085), hf.at(0, -0.056, 0.105)]
+A.horn(b, lo_beak, 0.036, "8a7a5c", "2e261c", "jaw", r1=0.008, cls=0.9, seg=10, flat=0.65, up=(1, 0, 0), tint=0.0)
 for s in (1, -1):
-    A.animal_eye(b, HC + V(0.1 * s, 0.04, 0.1), V(0.8 * s, 0.1, 0.6), 0.032, "c09020", "head", pupil="round", almond=0.62, lid="3a3028", lid_w=0.2, side=s)
-    b.ball(HC + V(0.026 * s, 0.035, 0.225), 0.009, "201810", cls=SKIN, bone="head", seg=6, rings=4)
-# claws: four blunt, horny nails on every foot
+    A.animal_eye(b, hf.at(0.071 * s, 0.026, 0.032), hf.r * (0.85 * s) + hf.f * 0.55 + hf.u * 0.05, 0.029, "c09020", "head", pupil="round", almond=0.66,
+                 lid="2a2018", lid_w=0.24, side=s)
+    # a heavy upper lid over each eye
+    b.cur_pal = 0.5
+    b.ellipsoid(hf.at(0.066 * s, 0.054, 0.03), (0.032, 0.012, 0.034), X.grey(0.74), cls=X.CHITIN, bone="head", rot=A.euler_of(hf.M), seg=10, rings=6, tint=0.8)
+    b.cur_pal = 0.0
+    b.ball(hf.at(0.014 * s, 0.022, 0.118), 0.006, "201810", cls=SKIN, bone="head", seg=6, rings=4)
+
+# ---------------------------------------------------------------- scales and nails
+b.cur_pal = 0.5
+for sd, s2 in (("L", 1), ("R", -1)):
+    # the front of each foreleg is armoured with big overlapping scales, in rows
+    up, lo = "f_up.%s" % sd, "f_lo.%s" % sd
+    k0, f0 = r.tail(up), r.tail(lo)
+    fwd = V(0.25 * s2, 0.0, 1.0).normalized()
+    side = V(1.0, 0.0, 0.0)
+    for row in range(5):
+        t = 0.08 + row * 0.18
+        c = k0.lerp(f0 + V(0, 0.08, 0), t) + V(0.015 * s2, 0.0, 0.0)
+        for col in range(4 if row % 2 == 0 else 3):
+            u = (col - (1.5 if row % 2 == 0 else 1.0)) * 0.058
+            p = c + side * u + fwd * (0.105 - 0.25 * u * u)
+            nrm = (fwd + side * (u * 3.0)).normalized()
+            rot = euler_yxz(X.rot_to(nrm, V(0, 1, 0)))
+            b.ellipsoid(p, (0.036, 0.032, 0.013), X.grey(0.68 + 0.04 * ((row + col) % 2)), cls=0.9, bone=lo, rot=rot, seg=10, rings=6, tint=0.8)
+b.cur_pal = 0.0
 for nm in ("f", "h"):
     for sd, s2 in (("L", 1), ("R", -1)):
         lo = "%s_lo.%s" % (nm, sd)
         f0 = r.tail(lo)
-        for k in range(4):
-            u = (k / 3 - 0.5) * 2
-            A.claw(b, f0 + V(u * 0.08, 0.035, 0.17 - abs(u) * 0.04), V(u * 0.3, -0.25, 1.0), 0.06, 0.02, lo, hook=0.4, col0="4a4038", col1="d8ccb0")
-
+        for k in range(5 if nm == "f" else 4):
+            n_ = 5 if nm == "f" else 4
+            u = (k / (n_ - 1) - 0.5) * 2
+            A.claw(b, f0 + V(u * 0.09, 0.04, 0.13 - abs(u) * 0.04), V(u * 0.35, -0.2, 1.0), 0.05, 0.022, lo, hook=0.25, col0="4a4038", col1="c8bca0")
 
 T = 4.0
 
@@ -213,7 +284,7 @@ def idle(t):
     p["shell"] = ((math.sin(t * w) * 0.015, 0, math.sin(t * w + 0.9) * 0.01), (0, math.sin(t * w * 2) * 0.008, 0))
     p["neck"] = ((math.sin(t * w) * 0.08, math.sin(t * w + 0.5) * 0.25, 0), (0, 0, 0))
     p["head"] = ((math.sin(t * w + 1) * 0.06, math.sin(t * w + 0.9) * 0.15, 0), (0, 0, 0))
-    p["jaw"] = ((0.05 + 0.05 * abs(math.sin(t * w)), 0, 0), (0, 0, 0))
+    p["jaw"] = ((0.04 + 0.04 * abs(math.sin(t * w)), 0, 0), (0, 0, 0))
     p["tail"] = ((0, math.sin(t * w * 2) * 0.2, 0), (0, 0, 0))
     return p
 
@@ -283,6 +354,7 @@ def die(t):
             add(p, "%s_lo.%s" % (fr, nm), (0.0, 0.0, -1.3 * s_ * w))
     add(p, "tail", (0.4 * w, 0, 0))
     return p
+
 
 print("[art] tortoise: %d triangles" % b.tri_count())
 kit.finish_rigged(b, r, "monsters/tortoise.glb", {"idle": (T, idle), "walk": (T_WALK, walk), "attack": (0.55, attack), "hurt": (0.55, hurt), "die": (1.2, die), "cast": (0.6, cast)}, samples=14, dist=0.3, strength=0.5, floor_y=0.0)

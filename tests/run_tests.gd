@@ -170,13 +170,22 @@ func _init() -> void:
 		for bone in ["sleeve.L", "sleeve.R", "fingers.L", "thumb.R", "toe.L", "mouth", "hair_tail2", "cape3"]:
 			check(not skels.is_empty() and skels[0].find_bone(bone) >= 0, "%s: rig has %s" % [rel, bone])
 		var tris := 0
+		var bare_tris := 0
+		var dress_tris := 0
 		for mi in pm.get_meta("meshes"):
 			for si in mi.mesh.get_surface_count():
-				tris += mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_INDEX].size() / 3
+				var n: int = mi.mesh.surface_get_arrays(si)[Mesh.ARRAY_INDEX].size() / 3
+				tris += n
+				if str(mi.name).begins_with("bare"):
+					bare_tris += n
+				elif str(mi.name).begins_with("dress"):
+					dress_tris += n
 				var mat: Material = mi.mesh.surface_get_material(si)
 				check(mat == MB.mat_actor() or mat == MB.mat_actor_plain() or mat == MB.mat_glow(), "%s: surface %d uses the actor shading" % [rel, si])
-		# sculpted faces, strand hair and layered hanfu: a hero-asset budget, still well under 50k
-		check(tris > 5000 and tris < 50000, "%s: sensible triangle count (%d)" % [rel, tris])
+		# sculpted faces, strand hair and layered hanfu: a hero-asset budget, still well under 50k (the
+		# Underclothes release: drawn dressed or in the underclothes, never both at once)
+		check(tris - bare_tris > 5000 and tris - bare_tris < 50000, "%s: sensible triangle count (%d)" % [rel, tris - bare_tris])
+		check(bare_tris == 0 or (tris - dress_tris > 5000 and tris - dress_tris < 50000), "%s: sensible triangle count in the underclothes (%d)" % [rel, tris - dress_tris])
 		pm.free()
 	for shape in Assets.MONSTERS:
 		var mrel: String = Assets.MONSTERS[shape]
@@ -1446,6 +1455,11 @@ func _init() -> void:
 				continue
 			n_out += 1
 			var fn: Vector2i = pe2.pos + pe2.face
+			# (a thing the story stands on the rock of a peak, the hot spring of Part XXVI, stands there like
+			# the story's people: a peak is laid where nothing stands and has no edge; the chapter's tests
+			# see that it can be walked up to)
+			if pe2.has("peak"):
+				tv = MapGen.WALL
 			if not (tv == MapGen.WALL or tv == MapGen.WATER) or not MapGen.is_walkable_tile(plw.grid[fn.y * plw.w + fn.x]) or Atlas.owner_id(plw, pe2.pos) != str(pe2.area):
 				bad_tile += 1
 			for op in others:
@@ -2083,6 +2097,7 @@ func _fates_and_faces() -> void:
 	_thundering_pots()
 	_lost_horse()
 	_three_burrows()
+	_five_frolics()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -3511,7 +3526,8 @@ func _hollow_hills() -> void:
 	for gs in ["shrug", "cheer", "beckon", "refuse", "shiver"]:
 		check(Data.EMOTES.has(gs), "everybody can %s" % gs)
 	check(Props.KINDS.size() >= 82, "eighty-two things to do in the world, twenty-six of them new (%d)" % Props.KINDS.size())
-	check(FileAccess.get_file_as_string("res://art/lib/face.py").contains("EYE_K = 0.86"), "every eye is a little larger (art/lib/face.py)")
+	# (the Underclothes release: and since then, every eye of the size of a real one)
+	check(FileAccess.get_file_as_string("res://art/lib/face.py").contains("EYE_K = 0.66"), "every eye is the size of a real one (art/lib/face.py)")
 	print("== Part XX: the Hollow Hills ==")
 	check(Data.REALMS.size() >= 26 and Data.REALMS[25] == "Hollow Vessel" and Data.MAX_LEVEL >= 75 and Data.level_name(75).ends_with("Hollow Vessel") and Data.REALM_INFO.size() == Data.REALMS.size() and Data.EXP_NEED.size() == Data.MAX_LEVEL
 		and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XX adds the Hollow Vessel realm")
@@ -4710,9 +4726,22 @@ func _three_burrows() -> void:
 	var took := Hold.take(HG)
 	check(took > 0 and HG.stones == s0 + took and Hold.chest(HG) == 0 and int(HG.hold.dues) == took, "emptied, it is in the purse, and the chest begins again")
 	check(Hold.grown(HG) == Hold.GROW_MAX, "and the town has grown of itself, a couple of households a day, thirty at the most")
+	# (the Underclothes release: and what it has grown by stays grown, whatever is answered or built after)
+	var HG2 = load("res://scripts/game.gd").new()
+	HG2.reset()
+	HG2.step = Data.step_index(Hold.FOUND_STEP)
+	HG2.advance()
+	HG2.day += 4
+	var g4 := Hold.grown(HG2)
+	Echoes.take(HG2, "the_tallies", "collect")
+	check(g4 > 0 and Hold.grown(HG2) == g4, "what the town grew by before the tallies were collected is not taken back off it (%d)" % g4)
+	HG2.free()
 	# built out: a town, a city, a watch, a hall with disciples
 	HG.stones = 1000000
 	HG.hold["day0"] = int(HG.day)
+	# (the Underclothes release: what the town has grown by is kept day by day, hold.gd; begun again here too)
+	HG.hold.erase("grown_f")
+	HG.hold.erase("grow_day")
 	var ranks_seen := {}
 	var guard := 0
 	var k9 := 0
@@ -4829,10 +4858,10 @@ func _three_burrows() -> void:
 		"the world draws a plot when it is built, and the bot builds at the steward's table what the step is waiting for")
 	check(War.COMPANIES.guiyun.get("hold", false) and War.ORDER.has("guiyun") and Trials.KINDS.has("town") and "town" in Trials.KIND_ORDER and Trials.EPITHETS.has("town"), "a watch for the host, and a way through trials: by the town")
 	print("== Part XXV: the Three Burrows ==")
-	check(Data.REALMS.size() == 31 and Data.REALMS[30] == "Scarcely Known" and Data.MAX_LEVEL == 90 and Data.level_name(90).ends_with("Scarcely Known") and Data.REALM_INFO.size() == 31
+	check(Data.REALMS.size() >= 31 and Data.REALMS[30] == "Scarcely Known" and Data.MAX_LEVEL >= 90 and Data.level_name(90).ends_with("Scarcely Known") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXV adds the realm of Scarcely Known")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break30" and Data.DIALOGUE.has("recall23") and msrc.contains("\"s_break29\": \"recall23\"") and Data.DIALOGUE.has("pre:s_break30") and Data.DIALOGUE.has("post:s_break30"),
-		"Part XXV follows Soft as Water (recall23) and ends the game")
+	check(Data.step_index("s_break30") > Data.step_index("s_p25_end") and Data.DIALOGUE.has("recall23") and msrc.contains("\"s_break29\": \"recall23\"") and Data.DIALOGUE.has("pre:s_break30") and Data.DIALOGUE.has("post:s_break30"),
+		"Part XXV follows Soft as Water (recall23) and ends at Scarcely Known")
 	var n25 := 0
 	var kinds25 := {}
 	var settled := 0
@@ -4858,8 +4887,8 @@ func _three_burrows() -> void:
 			settled += int(st25.n)
 		if st25.kind == "marks":
 			check(int(st25.n) >= 3 and int(st25.n) * 4 <= Echoes.ORDER.size(), "%s: no more than a quarter of what a journey leaves standing" % st25.id)
-	check(n25 >= 26 and int(kinds25.get("hold", 0)) == 3 and int(kinds25.get("folk", 0)) == 4 and int(kinds25.get("kill", 0)) == 3 and int(kinds25.get("hunt", 0)) == 4 and int(kinds25.get("collect", 0)) == 3 and kinds25.has("marks") and kinds25.has("visits") and kinds25.has("host") and settled >= 13,
-		"Part XXV: %d steps: three things asked of the town, four askings of people to come (%d families), three lords, four hunts, three searches" % [n25, settled])
+	check(n25 >= 26 and int(kinds25.get("hold", 0)) == 4 and int(kinds25.get("folk", 0)) == 4 and int(kinds25.get("kill", 0)) == 3 and int(kinds25.get("hunt", 0)) == 4 and int(kinds25.get("collect", 0)) == 3 and kinds25.has("marks") and kinds25.has("visits") and kinds25.has("host") and settled >= 13,
+		"Part XXV: %d steps: four things asked of the town (the Hall of the Broom since the Underclothes release), four askings of people to come (%d families), three lords, four hunts, three searches" % [n25, settled])
 	for k25 in Data.DIALOGUE:
 		if str(k25).contains("s_p25_") or str(k25) in ["recall23", "pre:s_break30", "post:s_break30", "pre:shuo_shu", "post:shuo_shu", "pre:ke_zheng", "post:ke_zheng", "pre:han_song", "post:han_song"]:
 			for ln25 in Data.DIALOGUE[k25]:
@@ -4911,8 +4940,12 @@ func _three_burrows() -> void:
 			var bd25: Dictionary = Data.AREAS[a25].get(bk25, {})
 			if bd25.is_empty():
 				continue
+			if not str(bd25.vis).begins_with("s_p25_"):
+				# (the Underclothes release: a later chapter's bands take the same last slots in other regions)
+				check(str(bd25.vis).begins_with("s_p26_") and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
+				continue
 			bands25 += 1
-			check(str(bd25.vis).begins_with("s_p25_") and bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
+			check(bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
 	for bk26 in ["warband3", "warband4"]:
 		for a26 in ["mountain", "terraces", "frost"]:
 			check(not str(Data.AREAS[a26].get(bk26, {}).get("vis", "")).begins_with("s_p25_"), "%s: no band of Part XXV is placed before the marks" % a26)
@@ -5179,7 +5212,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.scarcely_known.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.room_blade.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -5573,3 +5606,170 @@ func _thundering_pots() -> void:
 	for bid3 in ["drum_tower", "pipes_hall", "tailor_shop", "levy_barracks", "pear_garden", "potter_kiln"]:
 		check(Data.AREAS.village.buildings.any(func(bd): return str(bd.id) == bid3), "the Drum Tower quarter has its %s" % bid3)
 	MG.free()
+
+
+# ================================================================ the Underclothes release
+func _five_frolics() -> void:
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	print("== the body under the clothes (art/lib/body.py) ==")
+	check(FileAccess.file_exists("res://art/lib/body.py") and FileAccess.get_file_as_string("res://art/lib/person.py").contains("bodylib.build(bare, o)"), "every person is sculpted from the skeleton out, under the clothes")
+	var bare_n := 0
+	var people := 0
+	for pid in Assets.PEOPLE:
+		var rel: String = Assets.PEOPLE[pid]
+		if not Assets.has(rel) or rel != "characters/" + str(pid):
+			continue
+		people += 1
+		var pm := Assets.person(str(pid))
+		var names := {}
+		for mi in pm.get_meta("meshes", []):
+			names[str((mi as MeshInstance3D).name).get_slice("_", 0)] = (mi as MeshInstance3D).visible
+		if names.has("bare") and names.has("own") and names.has("dress"):
+			bare_n += 1
+			check(not bool(names.bare) and bool(names.dress) and bool(names.own), "%s: dressed until somebody undresses them" % pid)
+		pm.free()
+	check(people > 200 and bare_n == people, "every person of the land has a body under the clothes, in underclothes (%d of %d)" % [bare_n, people])
+	var lf := Assets.person("lin_feng")
+	check(Models.undress(lf, true) and Models.undressed(lf), "the hero can be undressed to the underclothes")
+	var shown := {}
+	for mi2 in lf.get_meta("meshes", []):
+		shown[str((mi2 as MeshInstance3D).name).get_slice("_", 0)] = (mi2 as MeshInstance3D).visible
+	check(bool(shown.get("bare", false)) and not bool(shown.get("dress", true)) and bool(shown.get("own", false)), "undressed: the body in its underclothes, the face and hands the same, the clothes put away")
+	Models.undress(lf, false)
+	check(not Models.undressed(lf), "and dressed again")
+	lf.free()
+	check(not Models.undress(Models.monster("beast", Color("8a7a6a")), true), "a monster has no underclothes to be undressed to")
+	check(wsrc.contains("if clip == \"soak\":") and wsrc.contains("Models.undress(player, true)") and msrc.contains("world.UNDER_ID") and FileAccess.get_file_as_string("res://scripts/game.gd").contains("var underclothes := false"),
+		"nobody gets into a hot spring in their robes, and the wardrobe has a line for the underclothes")
+	check(FileAccess.get_file_as_string("res://art/lib/face.py").contains("EYE_K = 0.66") and FileAccess.get_file_as_string("res://art/lib/person.py").contains("HEAD_K = (0.95, 0.97)"),
+		"heads and eyes of a real size: about seven and a half heads to the figure")
+	print("== Part XXVI: the Five Frolics ==")
+	check(Data.REALMS.size() == 32 and Data.REALMS[31] == "Room for the Blade" and Data.MAX_LEVEL == 93 and Data.level_name(93).ends_with("Room for the Blade") and Data.REALM_INFO.size() == 32
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXVI adds the realm of Room for the Blade")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break31" and Data.DIALOGUE.has("recall24") and msrc.contains("\"s_break30\": \"recall24\"") and Data.DIALOGUE.has("pre:s_break31") and Data.DIALOGUE.has("post:s_break31"),
+		"Part XXVI follows Scarcely Known (recall24) and ends the game")
+	var n26 := 0
+	var kinds26 := {}
+	for st26 in Data.STEPS:
+		if not str(st26.id).begins_with("s_p26_"):
+			continue
+		n26 += 1
+		kinds26[str(st26.kind)] = int(kinds26.get(str(st26.kind), 0)) + 1
+		if st26.kind == "talk":
+			check(Data.DIALOGUE.has(str(st26.id)), "%s: there is something said" % st26.id)
+		if not st26.kind in ["kill", "talk"]:
+			check(Data.DIALOGUE.has("done:" + str(st26.id)), "%s: something is said when it is done" % st26.id)
+		if st26.kind == "try":
+			check(not st26.has("cave") and (st26.things as Array) == ["hot_spring"] and Props.KINDS.has("hot_spring"), "%s: a hot spring of the open land to soak in" % st26.id)
+			# and a soak is counted for it (only the things of the caves used to be, and the step could not be done)
+			var TG = load("res://scripts/game.gd").new()
+			TG.reset()
+			TG.step = Data.step_index(str(st26.id))
+			check(TG.tried_count(st26) == 0, "%s: nothing tried before it begins" % st26.id)
+			Props.use({"kind": "prop", "id": "test:spring", "prop": "hot_spring", "pos": Vector2i.ZERO, "area": str(st26.area)}, TG)
+			check(TG.step == Data.step_index(str(st26.id)) + 1, "%s: a soak in the hot spring is counted for it, and it is done" % st26.id)
+			TG.free()
+			# and there is a hot spring in its region to soak in, that can be walked up to (the vale's own
+			# things are drawn by lot, and its lot drew none: one stands at the foot of its highest peak)
+			var sw: Dictionary = Atlas.world_of("surface")
+			var sreach := MapGen.flood(sw.grid, sw.w, sw.h, sw.start)
+			var springs26 := 0
+			for se in sw.ents:
+				if se.kind == "prop" and str(se.get("prop", "")) in st26.things and str(se.get("area", "")) == str(st26.area):
+					for sd in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+						if sreach.has((se.pos as Vector2i) + sd):
+							springs26 += 1
+							break
+			check(springs26 >= 1, "%s: a hot spring stands in %s, and can be walked up to" % [st26.id, st26.area])
+		if st26.kind == "folk":
+			var er: Dictionary = Folk.ERRANDS.get(str(st26.id), {})
+			check(Folk.CAMP_ROLES.has(str(st26.role)) and (er.lines as Array).size() >= 4 and int(er.price) == 0, "%s: people of the road asked, each with an answer" % st26.id)
+			for el in er.lines:
+				check(fits.call(str(el)), "%s: an answer that fits the box" % st26.id)
+		if st26.kind == "marks":
+			check(int(st26.n) >= 3 and int(st26.n) * 4 <= Echoes.ORDER.size(), "%s: no more than a quarter of what a journey leaves standing" % st26.id)
+	check(n26 >= 26 and int(kinds26.get("kill", 0)) == 3 and int(kinds26.get("hunt", 0)) == 3 and int(kinds26.get("collect", 0)) == 4 and kinds26.has("try") and kinds26.has("visits") and kinds26.has("summit") and kinds26.has("glide") and int(kinds26.get("folk", 0)) == 3 and kinds26.has("marks"),
+		"Part XXVI: %d steps: a soak, three lords, three hunts, four searches, three errands of the road, a summit and a flight" % n26)
+	# its "go and look" asks for things looked at since it began: by then a journey has looked at as many
+	# as it asks, and a step that counted from the beginning was done the moment it was given
+	var MG = load("res://scripts/game.gd").new()
+	MG.reset()
+	MG.step = Data.step_index("s_p26_glide")
+	for mk in 9:
+		MG.marks_seen["mark:test:%d" % mk] = true
+	MG.advance()
+	var ms26: Dictionary = MG.cur_step()
+	check(str(ms26.id) == "s_p26_marks" and bool(ms26.get("new", false)) and MG.marks_count(ms26) == 0 and not MG.objective_text().contains("(8/8)"), "s_p26_marks: what was looked at before it began does not count")
+	MG.marks_seen["mark:test:new"] = true
+	check(MG.marks_count(ms26) == 1 and MG.step == Data.step_index("s_p26_marks"), "s_p26_marks: what is looked at after it began does")
+	MG.free()
+	for k26 in Data.DIALOGUE:
+		if str(k26).contains("s_p26_") or str(k26) in ["recall24", "pre:s_break31", "post:s_break31", "pre:duke_huan", "post:duke_huan", "pre:quan_niu", "post:quan_niu", "pre:cao_cao", "post:cao_cao"]:
+			for ln26 in Data.DIALOGUE[k26]:
+				check(fits.call(str(ln26[1])), "%s: a line that fits the box" % k26)
+	for tid26 in ["duke_huan", "quan_niu", "cao_cao"]:
+		check(Trials.TRIALS.has(tid26) and Data.ENEMIES[tid26].get("boss", false) and Lore.BOSS.has(tid26) and Trials.trial_of_step(Data.STEPS[_kill_step(tid26)]) == tid26, "%s is a lord of Part XXVI, guarded by a trial" % tid26)
+		check((Trials.TRIALS[tid26].paths as Array).any(func(pth): return str(pth.kind) == "relic") and (Trials.TRIALS[tid26].paths as Array).size() >= 3, "%s can be passed by what was found on the way" % tid26)
+		check(Data.DIALOGUE.has("pre:" + tid26) and Data.DIALOGUE.has("post:" + tid26), "%s has something to say before and after" % tid26)
+	for pid26 in ["hua_tuo", "wu_pu", "pao_ding", "duke_huan", "cao_cao", "jailer_wife"]:
+		check(Assets.PEOPLE.has(pid26) and Assets.has(Assets.PEOPLE[pid26]) and FileAccess.file_exists("res://art/characters/%s.py" % pid26), "%s has a model built from a script" % pid26)
+	for cid26 in ["hua_tuo", "wu_pu", "pao_ding", "jailer_wife"]:
+		check(Data.CHAT.has(cid26) and Data.CHAT[cid26].size() >= 3, "%s has things to say" % cid26)
+	check(Assets.MONSTERS.has("ox") and Assets.has_monster("ox") and Assets.NATURAL.has("ox") and Habits.BY_SHAPE.has("ox") and str(Data.ENEMIES.corvee_ox.shape) == "ox" and str(Data.ENEMIES.quan_niu.shape) == "ox",
+		"the oxen of the land are oxen (the Whole Ox, and the oxen of the corvee that were drawn as wolves)")
+	for fid26 in ["rust_beetle", "still_toad", "idle_spore", "gristle_hound", "locked_joint", "hacking_butcher", "tiger_guard", "headache_crow", "sleepless_drum"]:
+		check(Data.ENEMIES.has(fid26) and Lore.BEAST.has(fid26) and Habits.habit(fid26) != "" and not Dooms.is_doom(fid26), "%s: a foe of Part XXVI with a story and hours of its own" % fid26)
+	# the crossroads of the chapter: every answer answered, echoed, told at the end, written about and standing
+	var c26: Dictionary = Echoes.CROSSROADS.get("the_book", {})
+	check(not c26.is_empty() and str(c26.step) == "s_p26_book" and str(c26.part) == "XXVI" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_book", "what becomes of Hua Tuo's book is asked last of all")
+	check((c26.options as Array).size() == 3 and (c26.get("end", {}) as Dictionary).size() == 3 and (c26.get("echo", {}) as Dictionary).size() >= 2 and (c26.get("after", {}) as Dictionary).size() == 3,
+		"the_book: three answers, each answered, echoed twice and told at the end")
+	var lettered := 0
+	for lid in Mail.ORDER:
+		if Mail.LETTERS[lid].has("needs") and str(Mail.LETTERS[lid].needs[0]) == "the_book":
+			lettered += 1
+	check(lettered == 3 and Mail.LETTERS.has("hua_last"), "somebody writes about each answer, and the physician writes once")
+	var tips26 := {}
+	for o26 in c26.options:
+		check(Marks.MARKS.the_book.has(str(o26.id)), "the_book/%s leaves something standing" % o26.id)
+		for sc26 in o26.tilt:
+			tips26[sc26] = true
+	check(tips26.has("heart") and tips26.has("craft") and tips26.has("reach"), "the crossroads of Part XXVI tips all three scales the ends ask about")
+	var old_echo26 := 0
+	for cid in Echoes.ORDER:
+		if cid == "the_book":
+			continue
+		for ek26 in Echoes.CROSSROADS[cid].get("echo", {}):
+			if str(ek26).contains("s_p26_"):
+				old_echo26 += 1
+	check(old_echo26 >= 3, "three older crossroads echo in Part XXVI (%d)" % old_echo26)
+	check(bsrc.contains("\"duke_huan\": \"relic\"") and bsrc.contains("\"cao_cao\": \"relic\"") and bsrc.contains("\"the_book\": [\"copy\"]") and bsrc.contains("func _try_land"),
+		"the bot has a plan for every trial and the crossroads of Part XXVI, and soaks in a spring of the open land")
+	# its bands take the last slots, and what it stands in the land can be walked up to
+	for a26 in ["fungal", "tushan", "millet"]:
+		check(str(Data.AREAS[a26].get("warband5", {}).get("vis", "")).begins_with("s_p26_") and not Data.AREAS[a26].has("warband6"), "%s: the chapter's band takes the last slot" % a26)
+	# the birds that are not birds of prey are drawn from the bird nearest them in kind, and keep the
+	# shape (and so the habits) they had; a wader stands on the ground in the land
+	for bid in Assets.BIRD_OF:
+		check(str(Data.ENEMIES.get(bid, {}).get("shape", "")) == "bird" and ResourceLoader.exists("res://assets/%s.glb" % str(Assets.BIRD_OF[bid])), "%s: drawn on a bird nearer its kind, and still a bird" % bid)
+	check(not Assets.hovers("garden_crane") and Assets.hovers("tally_crow") and Assets.hovers("storm_hawk"), "a crane stands in the land; a crow and a hawk are off the ground")
+	# and its crossroads' marks are stood after the late bands of the Three Burrows (which share the
+	# mountain with one of them), so that none of those moves
+	var asrc26 := FileAccess.get_file_as_string("res://scripts/atlas.gd")
+	check(Marks.AFTER_BANDS.has("the_book") and asrc26.rfind("Marks.place(") > asrc26.find("_place_bands(last_slots"), "the marks of a later crossroads are stood after the bands of an older release")
+	var ws: Dictionary = Atlas.world_of("surface")
+	var found26 := 0
+	for e26 in ws.ents:
+		if (e26.kind == "pickup" and str(e26.id).begins_with("p26_")) or (e26.kind == "boss" and str(e26.enemy) in ["quan_niu", "cao_cao"]) or (e26.kind == "npc" and str(e26.id) in ["hua_tuo", "wu_pu", "pao_ding", "jailer_wife"]):
+			found26 += 1
+			check(Atlas.owner_id(ws, e26.pos) == str(e26.area), "%s stands in its own region" % e26.id)
+	var duke: Array = (ws.floors[Caves.fid("fungal", -1)].ents as Array).filter(func(e27): return e27.kind == "boss" and str(e27.enemy) == "duke_huan")
+	check(found26 == 18 + 2 + 4 and duke.size() == 1, "eighteen things to find, two lords and four people of Part XXVI stand in the land, and the duke in the cave under the vale (%d)" % found26)

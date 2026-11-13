@@ -268,6 +268,168 @@ func _inspect(id: String, m: Node3D, height: float) -> void:
 	stage.queue_free()
 	main.world.show()
 
+## A sheet of one monster shape framed from its own bounds (developer tool, --beasts=tiger,ape,...):
+## three-quarter front, side, three-quarter back and a close-up of the head (found from its "head"
+## bone), so the sculpt can be judged from every side.  Writes beast_<shape>.webp; with --beasts-tag=x
+## writes beast_<shape>_x.webp, for before-and-after comparisons.
+func _beast_sheet(shape: String, tint: Color) -> Image:
+	var m: Node3D = _foe(shape) if Data.ENEMIES.has(shape) else Models.monster(shape, tint)
+	return await _model_sheet(m)
+
+## The same sheet for any model (a person, a test export: --people=yue_ling,characters/zz_test).
+func _model_sheet(m: Node3D) -> Image:
+	var sc := _bare_stage(480.0, 30.0, 9.0)
+	var stage: Node3D = sc[0]
+	var cam: Camera3D = sc[1]
+	stage.add_child(m)
+	m.add_child(Models.shadow_disc(0.8))
+	var ab := AABB()
+	var first := true
+	for mi in m.find_children("*", "MeshInstance3D", true, false):
+		var mm := mi as MeshInstance3D
+		if mm.mesh == null or not mm.visible:
+			continue
+		var bb: AABB = mm.transform * mm.get_aabb()
+		ab = bb if first else ab.merge(bb)
+		first = false
+	var ctr := ab.get_center()
+	var rad := maxf(0.3, ab.size.length() * 0.5)
+	var dist := rad / sin(deg_to_rad(cam.fov * 0.5)) * 0.92
+	var sk: Skeleton3D = Assets._skeleton(m)
+	var views := [["three", 0.7, false], ["side", PI * 0.5, false], ["back", PI + 0.75, false], ["head", 0.45, true]]
+	var shots: Array = []
+	var t0 := 0.0
+	for v in views:
+		m.rotation.y = -float(v[1])
+		for k in 24:
+			t0 += 1.0 / 30.0
+			Models.anim_monster(m, t0 + 0.5, 0.0)
+			await get_tree().process_frame
+		if bool(v[2]):
+			var hp := ctr + Vector3(0, ab.size.y * 0.3, ab.size.z * 0.3)
+			if sk != null and sk.find_bone("head") >= 0:
+				var hb := sk.find_bone("head")
+				# (the middle of the head bone: its head is the back of the skull, its tail the snout)
+				var gp: Transform3D = sk.global_transform * sk.get_bone_global_pose(hb)
+				var tail_l := Vector3.ZERO
+				for cb in sk.get_bone_children(hb):
+					tail_l = sk.get_bone_rest(cb).origin
+					break
+				hp = stage.to_local(gp * (tail_l * 0.5))
+			var fwd := Vector3(sin(m.rotation.y), 0, cos(m.rotation.y))
+			var hd := clampf(rad * 0.7, 0.45, 3.2)
+			cam.position = hp + (fwd.rotated(Vector3.UP, 0.5)) * hd + Vector3(0, hd * 0.12, 0)
+			cam.look_at(stage.to_global(hp), Vector3.UP)
+		else:
+			cam.position = ctr + Vector3(0, rad * 0.32, dist)
+			cam.look_at(stage.to_global(ctr), Vector3.UP)
+		cam.make_current()
+		await get_tree().process_frame
+		await _shot("beast_view", false)
+		shots.append(last_img)
+	stage.queue_free()
+	main.world.show()
+	var fw: int = shots[0].get_width()
+	var fh: int = shots[0].get_height()
+	var cw := int(fw * 0.62)
+	var out := Image.create(cw * 2, fh * 2, false, Image.FORMAT_RGB8)
+	for i in shots.size():
+		var im: Image = shots[i]
+		im.convert(Image.FORMAT_RGB8)
+		out.blit_rect(im, Rect2i((fw - cw) / 2, 0, cw, fh), Vector2i((i % 2) * cw, (i / 2) * fh))
+	out.resize(int(out.get_width() * 0.75), int(out.get_height() * 0.75), Image.INTERPOLATE_LANCZOS)
+	return out
+
+## A person's turnaround at full height (front, three-quarter, side, back) and two close views of the
+## body (chest to knee from the front and the three-quarter), in one strip.
+func _person_turn(m: Node3D) -> Image:
+	var sc := _bare_stage(500.0, 30.0, 9.0)
+	var stage: Node3D = sc[0]
+	var cam: Camera3D = sc[1]
+	stage.add_child(m)
+	m.add_child(Models.shadow_disc(0.6))
+	var views := [[0.0, false], [0.7, false], [PI * 0.5, false], [PI, false], [0.0, true], [0.75, true]]
+	if main.args.has("faces"):
+		# (--faces: the head close, from the front, the three-quarter and the side)
+		views = [[0.0, 2], [0.55, 2], [PI * 0.5, 2], [-0.4, 2]]
+	var shots: Array = []
+	var t0 := 0.0
+	for v in views:
+		m.rotation.y = -float(v[0])
+		for k in 20:
+			t0 += 1.0 / 30.0
+			Models.anim_person(m, t0 + 0.4, false)
+			await get_tree().process_frame
+		if typeof(v[1]) == TYPE_INT:
+			var sk2: Skeleton3D = Assets._skeleton(m)
+			var hy := 1.68
+			if sk2 != null and sk2.find_bone("eyes") >= 0:
+				hy = (sk2.global_transform * sk2.get_bone_global_pose(sk2.find_bone("eyes"))).origin.y - stage.global_position.y
+			cam.fov = 18.0
+			cam.position = Vector3(0, hy + 0.01, 1.05)
+			cam.look_at(stage.to_global(Vector3(0, hy - 0.04, 0)), Vector3.UP)
+		elif bool(v[1]):
+			cam.fov = 22.0
+			cam.position = Vector3(0, 1.08, 2.6)
+			cam.look_at(stage.to_global(Vector3(0, 1.0, 0)), Vector3.UP)
+		else:
+			cam.fov = 30.0
+			cam.position = Vector3(0, 1.05, 3.9)
+			cam.look_at(stage.to_global(Vector3(0, 0.93, 0)), Vector3.UP)
+		cam.make_current()
+		await get_tree().process_frame
+		await _shot("person_view", false)
+		shots.append(last_img)
+	stage.queue_free()
+	main.world.show()
+	var fw: int = shots[0].get_width()
+	var fh: int = shots[0].get_height()
+	var cw := int(fw * 0.3)
+	var out := Image.create(cw * shots.size(), fh, false, Image.FORMAT_RGB8)
+	for i in shots.size():
+		var im: Image = shots[i]
+		im.convert(Image.FORMAT_RGB8)
+		out.blit_rect(im, Rect2i((fw - cw) / 2, 0, cw, fh), Vector2i(i * cw, 0))
+	return out
+
+func _people_sheets(list: String) -> void:
+	var tag := str(main.args.get("beasts-tag", ""))
+	for id in list.split(",", false):
+		var m: Node3D
+		if Assets.PEOPLE.has(id):
+			m = Assets.person(id)
+		else:
+			m = Assets.instance(id)
+			m.set_meta("kind", "person")
+		if main.args.has("bare"):
+			Models.undress(m, true)
+		var img := await _person_turn(m)
+		var n := "person_%s%s" % [id.get_file(), ("_" + tag) if tag != "" else ""]
+		img.save_webp("%s/%s.webp" % [dir, n], true, 0.9)
+		print("[tour] ", n)
+
+func _beast_sheets(list: String) -> void:
+	var tint := Color(main.args.get("tint", "a87a52"))
+	var tag := str(main.args.get("beasts-tag", ""))
+	# (a shape is shown as the first foe of the land that wears it, in that foe's own colours, unless
+	# --beasts-tint asks for the plain tint: the way the bestiary picks its pages)
+	var as_foe: bool = not main.args.has("beasts-tint")
+	var foe_of := {}
+	for pass_i in 2:
+		for id in Data.ENEMIES:
+			var sh := str(Data.ENEMIES[id].get("shape", ""))
+			if sh == "" or foe_of.has(sh) or (pass_i == 0 and bool(Data.ENEMIES[id].get("boss", false))):
+				continue
+			foe_of[sh] = id
+	for shape in list.split(",", false):
+		var who: String = shape
+		if as_foe and not Data.ENEMIES.has(shape) and foe_of.has(shape):
+			who = str(foe_of[shape])
+		var img := await _beast_sheet(who, tint)
+		var n := "beast_%s%s" % [shape, ("_" + tag) if tag != "" else ""]
+		img.save_webp("%s/%s.webp" % [dir, n], true, 0.9)
+		print("[tour] ", n)
+
 ## The hero runs down the longest free line of tiles with Yue Ling at his shoulder, then stops; a
 ## camera on her side tracks them (--follow writes follow_<id>.webp).  Both should face the way they
 ## run, and she should stop running once she has caught up.
@@ -1660,6 +1822,16 @@ func _grid(n: String, frames: Array, cols: int) -> void:
 
 func _run() -> void:
 	await _wait(1.0)
+	if (main.args.has("beasts") or main.args.has("people")) and main.args.has("no-extras"):
+		# (the monster sheets need no world: shot straight from the title, and the tour ends)
+		main.set_stack(["world"])
+		main.world.set_process(false)
+		if main.args.has("beasts"):
+			await _beast_sheets(str(main.args.beasts))
+		if main.args.has("people"):
+			await _people_sheets(str(main.args.people))
+		get_tree().quit(0)
+		return
 	await _shot("01_title")
 	var only: PackedStringArray = str(main.args.get("areas", "")).split(",", false)
 	var skip_bosses: bool = main.args.has("no-bosses")
@@ -2150,6 +2322,10 @@ func _run() -> void:
 		# the Three Burrows release (--burrows, or --burrows=a,b): the town that is the hero's own, its plots,
 		# its people, the three crossroads and Part XXV
 		await _burrows_shots(str(main.args.burrows))
+	if main.args.has("frolics"):
+		# the Underclothes release (--frolics, or --frolics=a,b): the people in their underclothes, the
+		# physician's chapter, its lords, its crossroads and what each answer leaves standing (Part XXVI)
+		await _frolics_shots(str(main.args.frolics))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -4372,4 +4548,115 @@ func _burrows_shots(which: String = "1") -> void:
 		await _wait(0.8)
 		await _shot("trial_by_the_town")
 		main.pop()
+	get_tree().quit(0)
+
+## The Five Frolics (--frolics, or --frolics=a,b): the people of Part XXVI ("people"), the cast dressed
+## and in their underclothes ("bare"), the chapter's foes and lords ("foes"), the lords' battles
+## ("battle"), the crossroads and the wardrobe ("choice"), what each answer of the crossroads leaves
+## standing ("marks"), and a soak in the hot springs of Glowcap Vale ("soak").
+func _frolics_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 92
+	Game.step = Data.step_index("s_p26_marks")
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("people"):
+		await _gallery("part26_people", [Assets.person("hua_tuo"), Assets.person("wu_pu"), Assets.person("pao_ding"), Assets.person("jailer_wife")], 0.5, 0.2)
+	if want.call("bare"):
+		# six of the people of the land, three at a time, dressed and then down to their underclothes
+		var frames: Array = []
+		for trio in [["disciple_han", "disciple_mei", "elder_qing"], ["batu", "auntie_rong", "child_hua"]]:
+			for bare in [false, true]:
+				var ms: Array = []
+				for pid in trio:
+					var m: Node3D = Assets.person(str(pid))
+					if bare:
+						Models.undress(m, true)
+					ms.append(m)
+				await _gallery("cast_%s_%s" % [str(trio[0]), "bare" if bare else "dressed"], ms, 0.42, 0.15)
+				frames.append(last_img)
+		_grid("cast_dressed_and_bare", frames, 2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["rust_beetle", "still_toad", "idle_spore", "gristle_hound", "locked_joint", "hacking_butcher", "tiger_guard", "headache_crow", "sleepless_drum"]:
+			fs.append(_foe(fid))
+		await _gallery("part26_foes", fs, 1.0, 0.25)
+		await _gallery("part26_lords", [_foe("duke_huan", true), _foe("quan_niu", true), _foe("cao_cao", true)], 1.05, 0.25)
+	if want.call("battle"):
+		main.set_stack(["world"])
+		for bb in [["duke_huan", "fungal", "relic"], ["quan_niu", "tushan", "arms"], ["cao_cao", "millet", "host"]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			var pth: Dictionary = Trials.path(bid, str(bb[2]))
+			main.battle.start([{"id": bid, "lv": 92, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": str(bb[1]),
+				"trial": bid, "path": str(bb[2]), "boon": pth.boon, "path_n": str(pth.n), "path_kind": str(Trials.KINDS[str(pth.kind)].n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.step = Data.step_index("s_p26_herbs")
+		Game.picks = {}
+		Game.cross_pending = ["the_book"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_book")
+		main.pop()
+		Game.cross_pending = []
+		# the wardrobe, with the cursor on the underclothes and the hero in them
+		main.set_stack(["world"])
+		main.world.teleport(Atlas.to_world("sect", Vector2i(20, 12)))
+		main.world.facing = Vector2i(0, 1)
+		await _wait(0.6)
+		main.open_wardrobe()
+		main.choice.cursor = Fashion.OUTFIT_ORDER.size()
+		main.choice._show()
+		await _wait(0.8)
+		await _shot("wardrobe_underclothes")
+		main.choice.press("cancel")
+		Game.step = Data.step_index("s_p26_marks")
+	if want.call("marks"):
+		# what each answer of the crossroads leaves standing, each in its own country
+		var fr: Array = []
+		for oa in [["copy", "village"], ["keep", "mountain"], ["burn", "millet"]]:
+			Game.picks = {"the_book": str(oa[0])}
+			main.set_stack(["world"])
+			if not await _mark_view("mark:the_book:%s" % str(oa[1]), 15.0, 9.0, 5.0):
+				continue
+			await _shot("mark_book_%s" % str(oa[0]))
+			fr.append(last_img)
+			w.cam_override = null
+		_sheet("mark_book_answers", fr, 0.48)
+		Game.picks = {}
+	if want.call("soak"):
+		# Lin Feng and Yue Ling in the hot springs of Glowcap Vale, in their underclothes
+		main.set_stack(["world"])
+		var spring = null
+		for e in Atlas.world_of("surface").ents:
+			if e.kind == "prop" and str(e.get("prop", "")) == "hot_spring" and str(e.get("area", "")) == "fungal":
+				spring = e
+				break
+		if spring != null:
+			Game.companion = true
+			_high_put(spring.pos + Vector2i(0, 1), Vector2i(0, -1), 17.5)
+			await _wait(0.8)
+			w.start_scene_use(spring)
+			await _wait(3.0)
+			var c: Vector3 = w.wpos(spring.pos)
+			c.y = w.ground_y(c)
+			# (from the open side it is come up to, a little above: the screen of the spring is behind it)
+			var fd: Vector2i = spring.get("face", Vector2i(0, 1))
+			var out := Vector3(fd.x, 0.0, fd.y)
+			var side := Vector3(-out.z, 0.0, out.x)
+			w.cam_override = Transform3D(Basis.IDENTITY, c + out * 3.1 + side * 1.2 + Vector3(0, 2.3, 0)).looking_at(c + Vector3(0, 0.3, 0), Vector3.UP)
+			await _wait(0.6)
+			await _shot("soak_fungal")
+			w.cam_override = null
+			w.end_use()
+			await _wait(1.0)
 	get_tree().quit(0)

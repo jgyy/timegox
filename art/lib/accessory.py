@@ -150,6 +150,22 @@ def hammer(b, head="5a5a64", handle="6a4a2a"):
     b.superquad(hd + V(0, 0, -0.08), (0.03, 0.012, 0.02), head, e=0.4, cls=METAL, bone="hand.R", seg=8, rings=5)
 
 
+def cleaver(b, blade="c8ccd4", handle="5a3a20"):
+    """A cook's cleaver, held edge-down at the side (the Underclothes release: Cook Ding's, nineteen years
+    old and as if it had just come from the stone): a broad square blade, its spine a little darker, and a
+    round handle of wood bound with cord."""
+    h = HAND_R
+    b.tube([h + V(0, 0.06, 0.012), h + V(0, -0.07, 0.016)], [0.014, 0.013], handle, cls=WOOD, bone="hand.R", seg=8)
+    for k in range(3):
+        q = h + V(0, 0.03 - k * 0.035, 0.013)
+        b.tube([q + V(0, 0.004, 0), q - V(0, 0.004, 0)], [0.0155, 0.0155], "b03020", cls=CLOTH, bone="hand.R", seg=8, cap0=False, cap1=False)
+    # (the blade hangs below the fist and reaches forward: its spine on top, its edge below)
+    bc = h + V(0, -0.12, 0.06)
+    b.box(bc, (0.006, 0.09, 0.17), blade, cls=METAL, bone="hand.R")
+    b.box(bc + V(0, 0.046, 0.0), (0.009, 0.01, 0.17), darken(blade, 0.35), cls=METAL, bone="hand.R")
+    b.box(bc + V(0, -0.045, 0.0), (0.002, 0.006, 0.168), lighten(blade, 0.4), cls=METAL, bone="hand.R")
+
+
 def hoe(b, col="7a5a38", blade="6a6a70"):
     """A farmer's hoe on the shoulder."""
     h = HAND_R

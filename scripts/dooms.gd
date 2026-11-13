@@ -90,7 +90,11 @@ static func fell(g, ids: Array, lv: int, how: String, round_n: int) -> String:
 	g.fallen += 1
 	if how == "gave":
 		g.yielded += 1
-	var fresh: bool = not g.falls.has(first)
+	# (the Underclothes release: any doom in the pack not met before makes it the first time, whichever of them
+	# led it; until then a doom first met behind another never tipped its scale nor taught anything)
+	var fresh := false
+	for id0 in ids:
+		fresh = fresh or not g.falls.has(str(id0))
 	for id in ids:
 		if not g.falls.has(str(id)):
 			g.falls[str(id)] = {"how": how, "rounds": round_n}

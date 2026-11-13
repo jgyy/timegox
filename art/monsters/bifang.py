@@ -1,13 +1,15 @@
 """Bifang (new in Part IX): the bird of the Classic of Mountains and Seas whose appearance is an
-omen of fire - a crane with a single leg, blue-green with red markings and a white beak (after
-Strassberg, A Chinese Bestiary).  The bird anatomy of art/lib/bird.py as a crane: a long S-curved
-neck, a long straight white beak, red bars down the neck and a red crown, a short tail, and one
-long scaled leg standing under its centre of balance; tongues of fire run along the trailing
-edges of its half-open wings and its tail.  The body takes the enemy's colour; the red, the white
-beak and the flames keep theirs.
-Clips: idle (standing, wings half open, the flames stirring), walk (hops on its one leg, wings
-beating for balance), attack (a stabbing beak), hurt, die (the leg buckles and it topples) and
-cast (head thrown back, wings spread).
+omen of fire - like a crane, with a single leg, red markings on a blue-green body and a white beak
+(after Strassberg, A Chinese Bestiary).  The bird anatomy of art/lib/bird.py as a crane (the
+red-crowned crane): a long, slender S-curved neck, a small head with a long white dagger of a bill and
+a red crown, a level body with its wings folded along it (each flight feather turned on its own bone
+to lie back along the flank), a red bar across the coverts, a bustle of long drooping tertials over
+the short tail, and one long scaled leg standing under its centre of balance; flames lick off the
+bustle and the primaries.  The body takes the enemy's colour; the red markings, the white beak and
+the flames keep theirs.
+Clips: idle (standing, wings folded, the bustle and the flames stirring), walk (hops on its one leg,
+the wings opening and beating once each hop), attack (a stabbing beak), hurt, die (the leg buckles
+and it topples onto its side) and cast (head thrown back, wings spread wide).
 Run: blender --background --python art/monsters/bifang.py  ->  assets/monsters/bifang.glb"""
 import os
 import sys

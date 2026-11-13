@@ -56,7 +56,7 @@ const BY_SHAPE := {
 	"jade_rabbit": "night", "jelly": "night",
 	"beast": "dusk", "tiger": "dusk", "serpent": "dusk", "scorpion": "dusk", "crab": "dusk", "dragon": "dusk",
 	"golem": "tide", "blob": "tide", "humanoid": "tide", "storm": "tide", "tome": "tide", "hundun": "tide", "wisp": "tide",
-	"warden": "tide", "queen": "tide", "oxhead": "night", "horseface": "night", "bifang": "day", "kaiming": "day",
+	"warden": "tide", "queen": "tide", "oxhead": "night", "horseface": "night", "bifang": "day", "kaiming": "day", "ox": "day",
 }
 ## an element decides for the shapes that could be anything: a wisp of the dark is a thing of the
 ## night, a wisp of fire one of the day

@@ -165,6 +165,9 @@ var arm_switches := 0
 var yue_outfits := {"lotus": true}
 var yue_outfit := "lotus"
 var worn := {"sweeper": true}
+## the Underclothes release: down to what is worn under any robe (Esc > Wardrobe; Models.undress), and
+## not an outfit of its own: it is under all of them
+var underclothes := false
 ## feats (feats.gd: id -> the play time it was done at) and what was found that nobody was told to
 ## look for (eggs.gd)
 var feats := {}
@@ -196,6 +199,8 @@ var romance := {}
 ## the Lost Horse release: what the choices left standing that has been looked at (marks.gd); and the
 ## things that could not be beaten (dooms.gd): how each was lost, how often, how often by giving way
 var marks_seen := {}
+## (the Underclothes release: how many had been looked at when a step asking for more began, `"new": true`)
+var marks_from := 0
 ## the Three Burrows release (hold.gd): the town that is the hero's own: `built` (plots), `settlers`
 ## (who was asked and came), `day0` (the day it was founded), `taken` (the day the chest was last emptied)
 var hold := {}
@@ -259,6 +264,9 @@ func _process(d: float) -> void:
 			_feat_t = 1.5
 			poll_wardrobe()
 			Feats.poll(self)
+			# (the Underclothes release: the town that is his own grows overnight, and a step waiting on it
+			# hears of it without anything else having to happen first, hold.gd)
+			Hold.tick(self)
 			# (needs.gd: the body follows the land's clock; the night wears comfort faster)
 			if survival and prologue == "":
 				Needs.tick(self, 1.6 if Clock.is_night(Clock.hour(self)) else 1.0)
@@ -371,6 +379,7 @@ func reset() -> void:
 	yue_outfits = {"lotus": true}
 	yue_outfit = "lotus"
 	worn = {"sweeper": true}
+	underclothes = false
 	feats = {}
 	eggs = {}
 	heard = {}
@@ -390,6 +399,7 @@ func reset() -> void:
 	needs_fell = {}
 	romance = {}
 	marks_seen = {}
+	marks_from = 0
 	hold = {}
 	reckoned = {}
 	passengers = []
@@ -842,6 +852,10 @@ func advance() -> void:
 	if not ns.is_empty() and str(ns.kind) == "visits":
 		for vn in ns.get("npcs", []):
 			visited.erase(vn)
+	# (a step that asks to go and look at things that stand counts, if it says "new", only what is looked
+	# at from now on: by Part XXVI a journey has looked at as many as it asks, and the step was done at once)
+	if not ns.is_empty() and str(ns.kind) == "marks" and bool(ns.get("new", false)):
+		marks_from = marks_seen.size()
 	if step >= Data.STEPS.size():
 		finished = true
 		note("Ascended")
@@ -925,7 +939,7 @@ func poll_steps() -> void:
 				ok = hunt >= int(s.n)
 			"marks":
 				# Part XXIV: so many of the things his choices left standing gone and looked at (marks.gd)
-				ok = marks_seen.size() >= int(s.n)
+				ok = marks_count(s) >= int(s.n)
 			"hold":
 				# Part XXV: the town that is his own has what the step asks of it (hold.gd): so many plots
 				# built, a plot, a rank, so many households
@@ -935,6 +949,11 @@ func poll_steps() -> void:
 		if s.kind == "breakthrough":
 			return # handled explicitly by main after the cutscene
 		advance()
+
+## Part XXIV: how many things that stand a "marks" step has seen looked at (since it began, if it says
+## "new").
+func marks_count(s: Dictionary) -> int:
+	return marks_seen.size() - (marks_from if bool(s.get("new", false)) else 0)
 
 ## Part XX: how many of the things a "try" step asks for have been done since it began (any of the
 ## things of a cave, or the kinds it names).
@@ -990,7 +1009,7 @@ func objective_text() -> String:
 	elif s.kind == "hunt" or s.kind == "falls":
 		t += "  (%d/%d)" % [mini(hunt, s.n), s.n]
 	elif s.kind == "marks":
-		t += "  (%d/%d)" % [mini(marks_seen.size(), int(s.n)), int(s.n)]
+		t += "  (%d/%d)" % [mini(marks_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "hold":
 		var hp: Array = Hold.need_progress(self, s.need)
 		t += "  (%d/%d)" % [int(hp[0]), int(hp[1])]

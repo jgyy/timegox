@@ -1,9 +1,12 @@
 """Magpie (new in Part VIII): the magpies of the bridge over the River of Heaven - the Lost Bridge
 Magpies, the Storm-Crowned Magpie and Que Lao's scattered flock.  The bird anatomy of
-art/lib/bird.py in the magpie's plumage: a black head, back and wings that take the enemy's
-colour, a white belly and white wing patches that keep theirs, white-tipped primaries, a stout
-crow's beak and a long graduated tail of stiff feathers with a blue-green sheen; no crest.
-Clips: idle (hovering), walk (flying forward), attack (a talon dive), hurt, die and cast.
+art/lib/bird.py as the magpie (Pica pica): a crow's compact body with the head sitting on it, a
+flat crown and a stout slate bill under its nasal bristles; a black hood, breast and back (the enemy's
+dark colour) over a white belly, white scapulars laid along the back at the root of each wing and
+white flashes on the primaries (they take the palette's pale underside colour), glossy secondaries in
+the secondary colour, and a long graduated tail held nearly closed, the central pair longest.
+Clips: idle (hovering), walk (flying forward), attack (a talon dive), hurt, die (drops and lies on
+the ground, wings spread) and cast.
 Run: blender --background --python art/monsters/magpie.py  ->  assets/monsters/magpie.glb"""
 import os
 import sys

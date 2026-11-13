@@ -118,7 +118,12 @@ static func word(g, id: String) -> String:
 	var c := cracks(g, id)
 	var o := of(id)
 	if str(o[0]) == "":
-		return "It is %s. Every question you did answer is a place where it is not: %d of them." % [str(WHAT[id]), cracks(g, id) * 4]
+		# (the Underclothes release: the questions really answered, not a quarter of them times four)
+		var answered := 0
+		for cid in Echoes.ORDER:
+			if Echoes.chosen(g, cid) != "":
+				answered += 1
+		return "It is %s. Every question you did answer is a place where it is not: %d of them." % [str(WHAT[id]), answered]
 	var nm := str(Echoes.SCALES[str(o[0])].pos if int(o[1]) > 0 else Echoes.SCALES[str(o[0])].neg).to_lower()
 	if c == 0:
 		return "It is %s. You are known as %s, and you never once chose otherwise: there is not a crack in it." % [str(WHAT[id]), nm]

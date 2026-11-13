@@ -1323,6 +1323,11 @@ func _use_begin() -> void:
 		sb.cyl(Vector3(0, 0.2, 0), 0.2, 0.4, MB.tag(Props.WOOD, MB.WOOD), Vector3.ZERO, 10)
 		var sn := MB.mesh_node(scene3d, sb.build(MB.mat_plain()), Vector3(using.to.x, float(using.to.y), using.to.z) - Vector3(using.dir.x, 0, using.dir.z) * 0.1)
 		using.stool = sn
+	# (the Underclothes release: nobody gets into a hot spring or a bath in their robes)
+	if clip == "soak":
+		Models.undress(player, true)
+		if Game.companion and str(k.get("comp", "")) == "soak":
+			Models.undress(comp, true)
 	# Yue Ling joins in or reacts
 	if Game.companion:
 		var cc := str(k.get("comp", "watch"))
@@ -1352,6 +1357,11 @@ func _use_clear() -> void:
 			(hn2 as Node).queue_free()
 	comp_pos = player.position if not Game.companion else comp.position
 	player.rotation.x = 0.0
+	# (out of the water and dressed again: as dressed as the wardrobe says)
+	if str(using.k.get("clip", "")) == "soak" and not headless():
+		Models.undress(player, Game.underclothes)
+		if comp != null:
+			Models.undress(comp, false)
 	# and a gesture for it that is still going ends with it (only when he is hurried on)
 	player.set_meta("act", "")
 	using = {}
@@ -1758,6 +1768,9 @@ func _fans_tick(d: float) -> void:
 		fan_said += 1
 		var sf: Dictionary = fans[fan_said % fans.size()]
 		var ln := Fame.line(Game, fan_said + int(Game.day))
+		# (the Underclothes release: what a heroine's crowd says is said of her, voice.gd)
+		if Fashion.fem(Game.hero):
+			ln = Voice.her(ln)
 		if Fame.gift_due(Game, here) and fan_near() and fan_said % 2 == 0:
 			ln = "For you. Please. (Enter)"
 		if ln != "" and float(sf.fade) > 0.8:
@@ -1890,6 +1903,9 @@ func toggle_ride() -> void:
 ## `preview_id` shows another outfit for a moment (the wardrobe's cursor); "" goes back to his own.
 var preview_id := ""
 
+## the wardrobe's line for going down to the underclothes, or dressing again (main.open_wardrobe)
+const UNDER_ID := "underclothes"
+
 func preview_outfit(id: String) -> void:
 	preview_id = id
 	refresh_hero()
@@ -1926,19 +1942,21 @@ func refresh_yue() -> void:
 
 func refresh_hero() -> void:
 	refresh_yue()
-	var oid := preview_id if preview_id != "" else Game.outfit
+	# (the wardrobe's "underclothes" line previews the other way of being dressed)
+	var under: bool = Game.underclothes != (preview_id == UNDER_ID)
+	var oid := preview_id if preview_id != "" and preview_id != UNDER_ID else Game.outfit
 	var keep: String = Game.outfit
 	Game.outfit = oid
 	var cols := Fashion.hero_colors(Game)
 	Game.outfit = keep
 	var aid := preview_arm if preview_arm != "" else Arms.held(Game)
-	var sig := "%s|%s|%s|%s" % [str(Game.hero), oid, str(cols), aid]
+	var sig := "%s|%s|%s|%s|%s" % [str(Game.hero), oid, str(cols), aid, str(under)]
 	if sig == hero_sig or player == null:
 		return
 	hero_sig = sig
 	var at := player.transform
 	var old := player
-	player = Models.hero({"glow": HERO_OPTS.glow, "outfit": oid, "cols": cols, "arm": aid})
+	player = Models.hero({"glow": HERO_OPTS.glow, "outfit": oid, "cols": cols, "arm": aid, "underclothes": under})
 	player.add_child(Models.shadow_disc(0.55))
 	scene3d.add_child(player)
 	player.transform = at
@@ -2812,7 +2830,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			var base_y := _ground(vb, n.position) if not vb.is_empty() else ground_y(n.position)
 			# (a pack asleep, habits.gd, neither bobs nor hovers)
 			var asleep: bool = e.kind == "enemy" and str(n.get_meta("act", "")) == "sleep"
-			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Data.ENEMIES[e.group[0].id].shape in ["wisp", "jelly", "bird", "storm", "ray"] else 0.0))
+			n.position.y = base_y + (0.0 if asleep else sin(t * 2.2 + e.pos.x) * 0.06 + (0.35 if e.kind == "enemy" and Assets.hovers(str(e.group[0].id)) else 0.0))
 		"machine":
 			Machines.animate(n.get_meta("model"), t + float(e.pos.x))
 			(n.get_meta("label") as Label3D).visible = dist < 12.0

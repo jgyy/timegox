@@ -31,7 +31,7 @@ const LINES := [
 	["Is that the sweeper from the sect?", "I heard he fights. He doesn't look it.", "My cousin says he put down Iron Fang."],
 	["It's him. I'm nearly sure it's him.", "Go on, ask him. You ask him.", "He's shorter than they said.", "Walk behind him a bit. Just to say we did."],
 	["Master Lin! Master Lin, over here!", "My mother will never believe this.", "Would you look at my boy's arm? He fell out of a tree.", "Is the lady with him the healer? It is. It is!", "I named the ox after you. I hope that's all right."],
-	["Don't crowd him. I said don't crowd him. I'm not crowding him.", "They say he lost to the sea and came back the same day.", "Touch his sleeve for luck. Not like that.", "I walked from Tushan to see this.", "He looked at me. Did you see? He looked."],
+	["Don't crowd him. I said don't crowd him. I'm not crowding him.", "They say he stood on a lake once and never got his feet wet.", "Touch his sleeve for luck. Not like that.", "I walked from Tushan to see this.", "He looked at me. Did you see? He looked."],
 	["I'm being him. You're the monster.", "Grandfather wants a shrine built. He's picked the hill.", "Say something. Anything. We'll write it down.", "Is it true you sweep your own step still?", "The whole street's out. Somebody mind the shop.", "Bless the baby? Just hold her a moment, then."],
 ]
 ## what they hold out, by standing: [item or "stones", how many (stones: a factor of what a foe of his level pays)]

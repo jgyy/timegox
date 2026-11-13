@@ -1081,16 +1081,20 @@ func open_satchel(e: Dictionary) -> void:
 func offer_shift(e: Dictionary) -> void:
 	var use := str(e.trade)
 	var town := str(e.get("area", Game.area))
-	if Offices.blocked(Game, use, town) != "" or Game.prologue != "":
+	if Game.prologue != "":
 		return
 	var t: Dictionary = Offices.TRADES[use]
 	# (somebody at an inn, a tea-house or a shop who wants carrying to another town, if there is a seat
-	# in the carriage: offices.gd `fares`)
+	# in the carriage: offices.gd `fares`; the Underclothes release: also on a day the shift itself
+	# cannot be worked, which used to hide the fare too)
 	var fare := Offices.fare_offer(Game, e)
-	var opts: Array = [
-		{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM},
-		{"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), Offices.wage(Game, use),
-			(", and %d of salary for the days away" % Offices.salary_due(Game, use, town)) if Offices.salary_due(Game, use, town) > 0 else "", Offices.career_text(Game, use)], "col": UI.C_GOLD}]
+	var shift_ok := Offices.blocked(Game, use, town) == ""
+	if not shift_ok and fare.is_empty():
+		return
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
+	if shift_ok:
+		opts.append({"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), Offices.wage(Game, use),
+			(", and %d of salary for the days away" % Offices.salary_due(Game, use, town)) if Offices.salary_due(Game, use, town) > 0 else "", Offices.career_text(Game, use)], "col": UI.C_GOLD})
 	if not fare.is_empty():
 		opts.append({"id": "fare", "label": "Carry %s to %s" % [str(e.n), str(Data.AREAS[str(fare.to)].n)], "note": "%d stones" % int(fare.pay),
 			"desc": "%s has business in %s and no way of getting there. There is a seat in the %s (%d of %d taken). The fare is paid on arrival: %d spirit stones." % [str(e.n), str(Data.AREAS[str(fare.to)].n),
@@ -1299,6 +1303,10 @@ func open_wardrobe() -> void:
 		var col := Color(str(o.cols[0])) if str(o.cols[0]) != "" else UI.C_GOLD
 		opts.append({"id": id, "label": str(o.n) if have else "? " + str(o.n), "note": "wearing" if id == Game.outfit else ("" if have else "not yet"),
 			"desc": told(str(o.desc)) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".\n" + str(o.how), "col": col, "enabled": have, "current": id == Game.outfit})
+	# (the Underclothes release: and under every one of them, the underclothes: a line that undresses
+	# him to them, or dresses him again)
+	opts.append({"id": world.UNDER_ID, "label": "Dress again" if Game.underclothes else "Down to the underclothes", "note": "wearing" if Game.underclothes else "",
+		"desc": told(UNDERCLOTHES_DESC), "col": Color("cdbf9f")})
 	# (the Thundering Pots release: Yue Ling has a wardrobe of her own, behind the last line of his)
 	if Game.companion:
 		opts.append({"id": "yue", "label": "Yue Ling's dresses...", "note": "%d of %d" % [Game.yue_outfits.size(), Fashion.YUE_ORDER.size()],
@@ -1309,12 +1317,20 @@ func open_wardrobe() -> void:
 		if id == "yue":
 			open_yue_wardrobe()
 			return
+		if id == world.UNDER_ID:
+			Game.underclothes = not Game.underclothes
+			Game.toast("Down to the underclothes." if Game.underclothes else "Dressed again.")
+			world.refresh_hero()
+			return
 		if id != "" and Game.wear(id):
 			Game.toast("You wear the %s" % Fashion.OUTFITS[id].n)
+			# (an outfit chosen goes on over the underclothes)
+			Game.underclothes = false
 		world.refresh_hero()
 	)
 
 const WARDROBE_ASK := "The wardrobe: what will you wear?"
+const UNDERCLOTHES_DESC := "What is worn under any robe: drawers of undyed hemp to the middle of the thigh, tied at the waist with a cord, and for a woman a band of the same cloth round the chest. Cool on the road, quick to dry, and nobody's idea of a cultivator. Whatever outfit is chosen goes back on over them."
 const YUE_WARDROBE_ASK := "Yue Ling's wardrobe: what will she wear?"
 
 ## The Thundering Pots release: Yue Ling's dresses (fashion.gd YUE_OUTFITS); she changes in the world
@@ -1815,7 +1831,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

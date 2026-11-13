@@ -87,6 +87,22 @@ def read_glb(path):
     return js
 
 
+def mesh_triangles(js):
+    """Triangles of each named mesh."""
+    out = {}
+    for mesh in js.get("meshes", []):
+        n = 0
+        for prim in mesh.get("primitives", []):
+            if prim.get("mode", 4) != 4:
+                continue
+            if "indices" in prim:
+                n += js["accessors"][prim["indices"]]["count"] // 3
+            else:
+                n += js["accessors"][prim["attributes"]["POSITION"]]["count"] // 3
+        out[mesh.get("name", "")] = out.get(mesh.get("name", ""), 0) + n
+    return out
+
+
 def triangles(js):
     tris = 0
     for mesh in js.get("meshes", []):
@@ -120,7 +136,18 @@ def check_asset(group, name, path):
                 problems.append("%s: a mesh has no tint UV" % tag)
     lo, hi = SET_PIECES.get(tag, BUDGET[group])
     tris = triangles(js)
-    if not lo <= tris <= hi:
+    # (the Underclothes release: a person carries the body under the clothes as a mesh of its own,
+    # "bare", drawn instead of "dress", never with it: each way of drawing them keeps to the budget)
+    by_mesh = mesh_triangles(js)
+    if "bare" in by_mesh:
+        dressed = tris - by_mesh["bare"]
+        undressed = tris - by_mesh.get("dress", 0)
+        for way, n in (("dressed", dressed), ("in underclothes", undressed)):
+            if not lo <= n <= hi:
+                problems.append("%s %s: %d triangles, budget %d-%d" % (tag, way, n, lo, hi))
+        if group == "characters" and "own" not in by_mesh:
+            problems.append("%s: a body under the clothes but no own mesh (face, hair, hands)" % tag)
+    elif not lo <= tris <= hi:
         problems.append("%s: %d triangles, budget %d-%d" % (tag, tris, lo, hi))
     if group in ("props", "weapons"):
         return problems
