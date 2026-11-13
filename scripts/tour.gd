@@ -4990,8 +4990,9 @@ func _answer_shots(which: String = "1") -> void:
 		var fr: Array = []
 		var fr2: Array = []
 		var placed := false
-		# (in the order of the day: the clock is only ever put forward)
-		for st in [["thriving", 10.0], ["lean", 10.2], ["cold", 10.4], ["afraid", 18.6], ["festive", 19.2]]:
+		# (at dusk and after, when the lanterns are lit and the street is nearly empty: a town at noon, with
+		# thirty people in it, takes a software renderer minutes a frame.  The clock is only ever put forward.)
+		for st in [["festive", 19.2], ["thriving", 21.7], ["afraid", 21.8], ["lean", 21.9], ["cold", 22.0]]:
 			Game.weal = {}
 			Game.picks = {}
 			Game.boss_done = {}
@@ -5037,7 +5038,7 @@ func _answer_shots(which: String = "1") -> void:
 			await _shot("door_%s" % str(st[0]), false)
 			print("[tour] (door ", st[0], ")")
 			fr2.append(last_img)
-			if str(st[0]) in ["festive", "afraid", "cold"]:
+			if str(st[0]) in ["festive"]:
 				# the street from above and behind him
 				w.cam_override = Transform3D(Basis.IDENTITY, dp + fw * 15.0 + Vector3(7.0, 9.5, 0)).looking_at(dp + fw * 2.0 + Vector3(0, 1.2, 0), Vector3.UP)
 				await _wait(0.1)
