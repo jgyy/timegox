@@ -1170,7 +1170,7 @@ func _init() -> void:
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost", "s_p25_guests"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost", "s_p25_guests", "s_p27_fires"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -2098,6 +2098,7 @@ func _fates_and_faces() -> void:
 	_lost_horse()
 	_three_burrows()
 	_five_frolics()
+	_heavy_road()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -3157,7 +3158,7 @@ func _hundred_works() -> void:
 	Echoes.take(HWG, "bandits", "drive")
 	check(Echoes.chosen(HWG, "bandits") == "mend" and Echoes.scale(HWG, "heart") == 2, "a crossroads is answered once")
 	var gw: Array = Echoes.told(HWG, "s_vl_intro", Data.DIALOGUE.s_vl_intro)
-	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 5],
+	check(gw.size() == (Data.DIALOGUE.s_vl_intro as Array).size() + 1 and str(gw[gw.size() - 1][1]).contains("road-menders") and HWG.echoed.has("bandits|s_vl_intro") and Echoes.heard(HWG, "bandits") == [1, 6],
 		"six parts later Granny Wen speaks of the road-menders, and the echo is kept")
 	check(Echoes.told(HWG, "s_intro", Data.DIALOGUE.s_intro) == Data.DIALOGUE.s_intro, "a conversation with no crossroads behind it is as it was")
 	check(not Echoes.merciful(HWG), "one kindness is not yet a name")
@@ -3174,7 +3175,7 @@ func _hundred_works() -> void:
 	check(Echoes.lean(HWG, "craft") == 1 and Echoes.lean_mod(HWG, "works_stones") == Echoes.WORKS_STONES and Works.cost_stones(HWG, "wooden_ox") < int(Works.TIER_STONES[5]), "of the new works: the makers ask less")
 	Echoes.take(HWG, "cauldron_map", "keep")
 	check(Echoes.lean(HWG, "reach") == -1 and Echoes.lean_mod(HWG, "renown") == float(Echoes.RENOWN_MORE) and Echoes.lean_mod(HWG, "regard") == 1.0, "of the home fire: his name comes back larger")
-	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 5") and Echoes.text(HWG, "bandits").contains("It stands in the land: The Menders' Road") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
+	check(Echoes.epilogue(HWG).size() == 6 and Echoes.names(HWG).contains("of the New Works") and Echoes.text(HWG, "bandits").contains("Echoes heard: 1 of 6") and Echoes.text(HWG, "bandits").contains("It stands in the land: The Menders' Road") and Echoes.text(HWG, "the_works").contains("ahead"), "the ending tells what came of each answer, and the page keeps them")
 	# the last question of Part XIX can only be answered for a school by somebody who has built three works of it
 	HWG.works = {}
 	var lastq: Dictionary = Echoes.CROSSROADS.the_works
@@ -4942,7 +4943,7 @@ func _three_burrows() -> void:
 				continue
 			if not str(bd25.vis).begins_with("s_p25_"):
 				# (the Underclothes release: a later chapter's bands take the same last slots in other regions)
-				check(str(bd25.vis).begins_with("s_p26_") and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
+				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
 				continue
 			bands25 += 1
 			check(bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
@@ -5212,7 +5213,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.room_blade.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.sumeru_seed.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -5474,7 +5475,13 @@ func _thundering_pots() -> void:
 	var cl := Needs.value(NG, "clean")
 	check(Needs.act(NG, "relieve", wild) != "" and Needs.value(NG, "bladder") == 100.0 and Needs.value(NG, "clean") < cl, "and out in the country there is always a tree")
 	check(Needs.act(NG, "wash", street) == "" and Needs.act(NG, "wash", wild) != "" and Needs.value(NG, "clean") > cl, "washing wants water")
-	check(Needs.act(NG, "sleep", inn) == "" and Needs.act(NG, "sleep", wild) != "" and Needs.value(NG, "rest") >= 90.0 and is_equal_approx(Clock.hour(NG), 6.0), "sleeping rough fills most of rest, and it is morning")
+	# (the Heavy Road release: by daylight it is two hours under a tree, and the day is the same day)
+	var day0: int = NG.day
+	NG.needs["rest"] = 20.0
+	Clock.set_hour(NG, 10.0)
+	var day1: int = NG.day
+	check(Needs.act(NG, "sleep", {"wild": true, "hour": 10.0}).contains("Two hours") and NG.day == day1 and is_equal_approx(Clock.hour(NG), 12.0) and Needs.value(NG, "rest") == 50.0 and day1 - day0 <= 1, "sleeping rough by daylight is two hours under a tree, not a day gone")
+	check(Needs.act(NG, "sleep", inn) == "" and Needs.act(NG, "sleep", {"wild": true, "water": true, "hour": 22.0}) != "" and Needs.value(NG, "rest") >= 90.0 and is_equal_approx(Clock.hour(NG), 6.0), "sleeping rough after dusk fills most of rest, and it is morning")
 	var hg := Needs.value(NG, "hunger")
 	check(Needs.act(NG, "forage", street) == "" and Needs.act(NG, "forage", wild) != "" and Needs.value(NG, "hunger") > hg, "there is always something to forage in the wild: nobody can be left with nothing to eat")
 	# what the things of the land do for the body
@@ -5652,10 +5659,10 @@ func _five_frolics() -> void:
 	check(FileAccess.get_file_as_string("res://art/lib/face.py").contains("EYE_K = 0.66") and FileAccess.get_file_as_string("res://art/lib/person.py").contains("HEAD_K = (0.95, 0.97)"),
 		"heads and eyes of a real size: about seven and a half heads to the figure")
 	print("== Part XXVI: the Five Frolics ==")
-	check(Data.REALMS.size() == 32 and Data.REALMS[31] == "Room for the Blade" and Data.MAX_LEVEL == 93 and Data.level_name(93).ends_with("Room for the Blade") and Data.REALM_INFO.size() == 32
+	check(Data.REALMS.size() >= 32 and Data.REALMS[31] == "Room for the Blade" and Data.MAX_LEVEL >= 93 and Data.level_name(93).ends_with("Room for the Blade") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXVI adds the realm of Room for the Blade")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break31" and Data.DIALOGUE.has("recall24") and msrc.contains("\"s_break30\": \"recall24\"") and Data.DIALOGUE.has("pre:s_break31") and Data.DIALOGUE.has("post:s_break31"),
-		"Part XXVI follows Scarcely Known (recall24) and ends the game")
+	check(Data.step_index("s_break31") > Data.step_index("s_p26_end") and Data.DIALOGUE.has("recall24") and msrc.contains("\"s_break30\": \"recall24\"") and Data.DIALOGUE.has("pre:s_break31") and Data.DIALOGUE.has("post:s_break31"),
+		"Part XXVI follows Scarcely Known (recall24) and ends at Room for the Blade")
 	var n26 := 0
 	var kinds26 := {}
 	for st26 in Data.STEPS:
@@ -5729,7 +5736,7 @@ func _five_frolics() -> void:
 		check(Data.ENEMIES.has(fid26) and Lore.BEAST.has(fid26) and Habits.habit(fid26) != "" and not Dooms.is_doom(fid26), "%s: a foe of Part XXVI with a story and hours of its own" % fid26)
 	# the crossroads of the chapter: every answer answered, echoed, told at the end, written about and standing
 	var c26: Dictionary = Echoes.CROSSROADS.get("the_book", {})
-	check(not c26.is_empty() and str(c26.step) == "s_p26_book" and str(c26.part) == "XXVI" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_book", "what becomes of Hua Tuo's book is asked last of all")
+	check(not c26.is_empty() and str(c26.step) == "s_p26_book" and str(c26.part) == "XXVI" and Echoes.ORDER.find("the_book") > Echoes.ORDER.find("the_seat"), "what becomes of Hua Tuo's book is asked after the seat")
 	check((c26.options as Array).size() == 3 and (c26.get("end", {}) as Dictionary).size() == 3 and (c26.get("echo", {}) as Dictionary).size() >= 2 and (c26.get("after", {}) as Dictionary).size() == 3,
 		"the_book: three answers, each answered, echoed twice and told at the end")
 	var lettered := 0
@@ -5773,3 +5780,387 @@ func _five_frolics() -> void:
 			check(Atlas.owner_id(ws, e26.pos) == str(e26.area), "%s stands in its own region" % e26.id)
 	var duke: Array = (ws.floors[Caves.fid("fungal", -1)].ents as Array).filter(func(e27): return e27.kind == "boss" and str(e27.enemy) == "duke_huan")
 	check(found26 == 18 + 2 + 4 and duke.size() == 1, "eighteen things to find, two lords and four people of Part XXVI stand in the land, and the duke in the cave under the vale (%d)" % found26)
+
+## The Heavy Road release: what things weigh and who carries them (load.gd), the work of the hands
+## (toil.gd), what a load looks like (burden.gd), and Part XXVII: The Cloth Sack.
+func _heavy_road() -> void:
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	print("== the load (load.gd) ==")
+	var LG = load("res://scripts/game.gd").new()
+	LG.reset()
+	check(is_equal_approx(Load.cap(LG), Load.BASE) and Load.tier(LG) == 0 and Load.pace(LG) == 1.0 and Load.look(LG)[0] == "" and not Load.grounded(LG), "a sweeper can carry sixty jin, and sets out with next to nothing")
+	LG.add_item("timber", 1)
+	check(is_equal_approx(Load.weight(LG), 30.0) and Load.tier(LG) == 0 and Load.pace(LG) == 1.0, "one stem of timber is thirty jin: half his back, and no slower")
+	LG.add_item("timber", 1)
+	check(Load.tier(LG) == 1 and Load.pace(LG) == 1.0 and not Load.grounded(LG) and Load.look(LG)[0] == "logs", "two are all his back was made for: laden, drawn as logs, and no slower")
+	LG.add_item("timber", 1)
+	check(Load.tier(LG) == 2 and Load.pace(LG) == 1.5 and Load.grounded(LG) and Load.refuses(LG, "timber") == "", "three are more: heavy, half as slow again, off the sword and under no kite")
+	LG.add_item("timber", 1)
+	check(Load.tier(LG) == 3 and Load.pace(LG) > 2.0 and Load.refuses(LG, "timber") != "", "four, and he staggers, and can take up nothing more that the land gives")
+	LG.companion = true
+	check(is_equal_approx(Load.cap(LG), Load.BASE * (1.0 + Load.WITH_YUE)) and Load.tier(LG) == 2, "Yue Ling takes her share")
+	LG.add_item("pack_frame", 1)
+	check(is_equal_approx(Load.cap(LG), Load.BASE * (1.0 + Load.WITH_YUE) + Load.FRAME), "a pack-frame bears forty jin more")
+	LG.ride = "pony"
+	check(Load.cap(LG, true) > Load.cap(LG) + 100.0 and Load.tier(LG, true) <= 1, "a horse bears what he cannot, while he rides it")
+	LG.ride = "sword"
+	check(is_equal_approx(Load.cap(LG, true), Load.cap(LG)), "a flying sword is his own qi, and lifts no more than he can")
+	check(wsrc.contains("Load.grounded(Game) and str(Fashion.RIDES[Game.ride].kind) == \"vehicle\"") and wsrc.contains("STEP_T * Load.pace(Game)") and wsrc.contains("The kite will not lift him"), "a heavy load slows the step, grounds the sword and keeps the kite shut")
+	LG.level = 30
+	check(is_equal_approx(Load.cap(LG), (Load.BASE + Load.PER_REALM * 10.0) * 1.4 + Load.FRAME), "a great realm is two jin more on the back")
+	# what has no bulk has no weight, however much of it a journey gathers: thirty hours of the road
+	# leave thousands of essences, hundreds of pills and every keepsake there is in the bag, and the
+	# first cut of this release weighed each a little, so that by Part XXI nobody could fly
+	var BG = load("res://scripts/game.gd").new()
+	BG.reset()
+	var asked := {}
+	for st0 in Data.STEPS:
+		if st0.kind == "collect":
+			asked[str(st0.item)] = true
+	for iid in Data.ITEMS:
+		if Load.GOODS.has(iid) or Load.WARES.has(iid) or Needs.FOOD.has(iid) or asked.has(iid):
+			continue
+		BG.inv[iid] = 999
+		check(Load.weight_of(str(iid)) == 0.0, "%s has no bulk, and weighs nothing" % iid)
+	check(Load.gross(BG) == 0.0 and Load.tier(BG) == 0, "a bag of nine hundred of everything that has no bulk is a light bag")
+	# and what the searches of the whole story found is handed over as each is done: at the end, nothing
+	BG.step = Data.STEPS.size()
+	for iid2 in asked:
+		BG.inv[iid2] = 99
+	check(Load.gross(BG) == 0.0, "what every finished search asked for was handed over")
+	BG.free()
+	# the storehouse
+	check(Load.at_home(LG, "sect", Vector2i.ZERO) != "" and Load.at_home(LG, "bamboo", Vector2i.ZERO) == "" and Load.at_home(LG, Hold.AREA, Atlas.to_world(Hold.AREA, Hold.AT)) == "", "things can be left at the sect, and at Guiyun only once it stands")
+	var stw: Array = Load.stowable(LG)
+	check(stw.has("timber") and not stw.has("hp_pill") and not stw.has("pack_frame") and not stw.has("axe"), "what can be left: the load, not the pills, the frame or the tools")
+	check(Load.stow(LG, "timber") == 4 and Load.carried(LG, "timber") == 0 and int(LG.stash.timber) == 4 and Load.tier(LG) == 0 and Load.fetch(LG, "timber") == 4 and Load.carried(LG, "timber") == 4 and LG.stash.is_empty(), "left in the storehouse it weighs nothing, and is there to take up again")
+	# selling, and the wares
+	var st0: int = LG.stones
+	var sale: Array = Load.sell_all(LG)
+	check(int(sale[0]) == 4 * int(Load.GOODS.timber.sell) and LG.stones == st0 + int(sale[0]) and Load.carried(LG, "timber") == 0 and LG.sold == 4, "a pedlar pays what a pedlar pays, and the back is empty")
+	for wid in Load.WARE_ORDER:
+		check(Data.ITEMS.has(wid) and Load.WARES.has(wid) and str(Data.ITEMS[wid].desc).length() > 30, "%s is sold, and said what it is for" % wid)
+	for gid in Load.GOOD_ORDER:
+		check(Data.ITEMS.has(gid) and float(Load.GOODS[gid].jin) > 0.0 and Burden.KINDS.has(str(Load.GOODS[gid].bulk)) and int(Load.GOODS[gid].sell) * 40 < Data.enemy_stones(1, false) * 4000, "%s: a good of the land with a weight, a look on the back and a pedlar's price" % gid)
+	LG.stones = 10
+	check(Load.buy(LG, "axe") != "" and int(LG.inv.get("axe", 0)) == 0, "nothing is sold on credit")
+	LG.stones = 100
+	check(Load.buy(LG, "axe") == "" and int(LG.inv.axe) == 1 and LG.stones == 100 - int(Load.WARES.axe.price) and Load.buy(LG, "axe") != "", "an axe is bought once")
+	# what a day of the hands is worth: less than the road
+	check(int(Load.GOODS.stone_block.sell) * 30 < Data.enemy_stones(10, false) * 30, "a day of cutting stone is worth less than a day of the road")
+	# the pouch is hard to come by, and the ring is not for sale
+	LG.level = 3
+	LG.stones = 99999999
+	LG.inv["ess_metal"] = 99
+	LG.inv["ess_dark"] = 99
+	check(Load.pouch_blocked(LG).contains("realm") and Load.pouch_blocked(LG).contains("carried a league") and not Load.sew_pouch(LG), "no pouch for somebody who has not the realm for it, nor carried enough to know what it is for")
+	LG.level = 30
+	check(Load.pouch_blocked(LG).contains("carried a league") and not Load.pouch_blocked(LG).contains("realm"), "the realm alone does not buy it")
+	LG.hauled = float(Load.POUCH_NEEDS.hauled)
+	LG.stones = 100
+	check(Load.pouch_blocked(LG).contains("spirit stones"), "nor does the carrying alone")
+	LG.stones = int(Load.POUCH_NEEDS.stones) + 5
+	check(Load.pouch_blocked(LG) == "" and Load.sew_pouch(LG) and int(LG.inv.qiankun_pouch) == 1 and LG.stones == 5 and int(LG.inv.ess_metal) == 99 - 30 and Load.pouch_blocked(LG) != "", "realm, the leagues, the essences and the stones: a pouch is sewn, once")
+	LG.inv["stone_block"] = 4
+	var g0: float = Load.gross(LG)
+	check(g0 > 180.0 and is_equal_approx(Load.weight(LG), g0 * Load.POUCH_K), "what goes into the pouch weighs a tenth")
+	LG.inv["stone_block"] = 10
+	check(is_equal_approx(Load.weight(LG), Load.POUCH_HOLDS * Load.POUCH_K + (Load.gross(LG) - Load.POUCH_HOLDS)), "and it holds three hundred jin, no more")
+	LG.inv["mustard_ring"] = 1
+	check(Load.weight(LG) == 0.0 and Load.tier(LG) == 0 and Load.look(LG)[0] == "" and Load.refuses(LG, "stone_block") == "", "with the Mustard-Seed Ring on, nothing weighs anything")
+	check(not Load.WARES.has(Load.RING) and not Load.WARES.has(Load.POUCH) and int(Load.POUCH_NEEDS.hauled) >= 2000 and int(Load.POUCH_NEEDS.stones) >= 20000 and int(Load.POUCH_NEEDS.realm) >= 3, "neither is on anybody's counter, and the pouch asks a great deal")
+	var ring_step := -1
+	for i in Data.STEPS.size():
+		if (Data.STEPS[i].get("gives", {}) as Dictionary).has(Load.RING):
+			ring_step = i
+	check(ring_step == Data.step_index("s_p27_sack") and ring_step >= Data.STEPS.size() - 4 and Data.step_index("s_p27_sack") > _kill_step("li_jing"), "the ring is given once, at the very end of the last chapter, after its last lord")
+	# a tile walked under a load is counted, and only then
+	var HG = load("res://scripts/game.gd").new()
+	HG.reset()
+	Load.walked(HG, false)
+	check(HG.hauled == 0.0, "an empty back hauls nothing")
+	HG.add_item("timber", 1)
+	Load.walked(HG, true)
+	check(HG.hauled == 0.0, "nor does a load the horse carries")
+	for _i in 500:
+		Load.walked(HG, false)
+	check(Load.hauled(HG) == 30, "thirty jin walked five hundred tiles is thirty jin carried a league")
+	HG.free()
+	# the story never asks more than a back can bear at its own pace before Part XXVII: every road the
+	# bot walked in an older release is walked at the pace it was
+	var WG = load("res://scripts/game.gd").new()
+	WG.reset()
+	var worst := 0.0
+	var worst_at := ""
+	var p27 := Data.step_index("s_p27_home")
+	var lv_w := 0
+	for i2 in p27:
+		var s2: Dictionary = Data.STEPS[i2]
+		WG.step = i2
+		if s2.kind == "breakthrough":
+			lv_w = int(s2.to)
+		WG.level = lv_w
+		WG.companion = i2 > Data.step_index("s_yue")
+		if s2.kind == "collect":
+			WG.inv[str(s2.item)] = int(s2.n)
+			var r2 := Load.ratio(WG)
+			if r2 > worst:
+				worst = r2
+				worst_at = str(s2.id)
+		check(not s2.has("gives") and not str(s2.kind) in ["toil", "haul"], "%s: no older step works the land or hands out a tool" % s2.id)
+	check(worst <= 1.0, "no search of an older chapter loads him past laden (the most: %.2f of his back at %s)" % [worst, worst_at])
+	WG.free()
+	LG.free()
+
+	print("== the work of the hands (toil.gd) ==")
+	check(Toil.ORDER.size() == 4 and Toil.WORKS.size() == 4, "four kinds of work: fell, angle, quarry, reap")
+	var pap: AnimationPlayer = Assets.instance("characters/lin_feng").get_meta("ap")
+	var yap: AnimationPlayer = Assets.instance("characters/yue_ling").get_meta("ap")
+	var clips_w := {}
+	for wk in Toil.ORDER:
+		var w: Dictionary = Toil.WORKS[wk]
+		check(Load.WARES.has(str(w.tool)) and Load.GOODS.has(str(w.good)) and pap.has_animation(str(w.clip)) and not clips_w.has(str(w.clip)) and (w.lines as Array).size() >= 3 and Props.held(str(w.hold)) != null,
+			"%s: a tool that is sold, a good that is carried, a clip of its own, something in the hand and three lines" % wk)
+		clips_w[str(w.clip)] = true
+		check(float(w.dur) >= pap.get_animation(str(w.clip)).length - 0.01 and Faces.OF_CLIP.has(str(w.clip)), "%s: done for at least one whole swing, with a face for it" % wk)
+		for ln in w.lines + w.get("miss", []):
+			check(fits.call(str(ln)), "%s: a line that fits" % wk)
+		check(pap.get_animation(str(w.clip)).find_track(NodePath("%GeneralSkeleton:brow.L"), Animation.TYPE_ROTATION_3D) < 0, "%s: its clip leaves the face alone" % wk)
+	for hc in ["haul", "haul_idle"]:
+		check(pap.has_animation(hc) and yap.has_animation(hc) and Assets.LOOPS.has(hc) and Assets.LEND.has(hc), "%s: the two of them walk and stand under a load, and can lend it to the towns" % hc)
+	check(wsrc.contains("Burden.wear(player") and wsrc.contains("Burden.wear(comp") and wsrc.contains("gait = \"haul\""), "a load is drawn on his back and on hers, and bends the walk")
+	for bk in Burden.KINDS:
+		var bm := Burden.model(bk, 1.0)
+		var tris := 0
+		for mi in bm.find_children("*", "MeshInstance3D", true, false):
+			for sf in (mi as MeshInstance3D).mesh.get_surface_count():
+				tris += ((mi as MeshInstance3D).mesh.surface_get_arrays(sf)[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
+		check(tris > 60 and tris < 6000, "%s: a load built from code (%d triangles)" % [bk, tris])
+		bm.free()
+	# what a place can be worked at is read from the tiles and the heights alone
+	var ws: Dictionary = Atlas.world_of("surface")
+	var reach := MapGen.flood(ws.grid, ws.w, ws.h, ws.start)
+	var cnt := {}
+	for a in ["silk", "volcano", "karst", "maple"]:
+		cnt[a] = {"fell": 0, "angle": 0, "quarry": 0, "reap": 0}
+	for t in reach:
+		var own := Atlas.owner_id(ws, t)
+		if not cnt.has(own):
+			continue
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var wk2 := Toil.work_at(ws, t, t + d)
+			if wk2 != "":
+				cnt[own][wk2] += 1
+	check(int(cnt.silk.fell) >= 100 and int(cnt.volcano.quarry) >= 30 and int(cnt.volcano.fell) >= 100 and int(cnt.karst.reap) >= 100 and int(cnt.maple.angle) >= 20, "there is forest to fell in the Silk Woods, rock to cut and wood on the volcano, open ground in the Stone Forest and water in the Maple Gorge")
+	check(Toil.work_at(ws, ws.start, ws.start + Vector2i(1, 0), false, true) == "" and Toil.work_at({}, Vector2i.ZERO, Vector2i.ONE) == "", "nothing is worked at under a roof")
+	# doing it
+	var TG = load("res://scripts/game.gd").new()
+	TG.reset()
+	var tile := Vector2i(5, 5)
+	check(Toil.blocked(TG, "fell", "surface", tile).contains("axe"), "no felling without an axe: it is said who sells one")
+	TG.add_item("axe", 1)
+	check(Toil.blocked(TG, "fell", "surface", tile) == "", "with an axe it can be done")
+	var got: Array = Toil.done(TG, "fell", "surface", tile)
+	check(got.size() == 2 and int(TG.inv.timber) == 1 and int(TG.toil.fell) == 1 and Toil.spent(TG, "surface", tile) and Toil.blocked(TG, "fell", "surface", tile) != "", "a tree is felled: a stem on his back, and that piece of the land has given for the day")
+	TG.day += 1
+	check(not Toil.spent(TG, "surface", tile), "and gives again after the next dawn")
+	TG.add_item("fishing_rod", 1)
+	var caught := 0
+	for k in 9:
+		Toil.done(TG, "angle", "surface", Vector2i(10 + k, 5))
+	caught = int(TG.inv.get("carp", 0))
+	check(caught == 6, "two casts in three catch, counted and never thrown for (%d of 9)" % caught)
+	check(Toil.good_of("quarry", true) == "ore_lump" and Toil.good_of("quarry", false) == "stone_block", "a cave wall gives ore, a crag dressed stone")
+	# the steps of the story that ask for it
+	TG.step = Data.step_index("s_p27_fell")
+	TG.step_toil = 0
+	for k2 in 3:
+		check(TG.step == Data.step_index("s_p27_fell"), "the felling is not done before it is done")
+		Toil.done(TG, "fell", "surface", Vector2i(30 + k2, 5))
+	check(TG.step == Data.step_index("s_p27_timber") and TG.step_toil == 0, "three trees felled since it was asked: the step is done")
+	var hs: Dictionary = TG.cur_step()
+	var on_me := Toil.on_hand(TG, hs)
+	check(on_me == 4 and Toil.wanted(TG, hs) == 8 and TG.objective_text().contains("(0/8, 4 carried)") and int(TG.inv.get("pick", 0)) == 0, "what he felled is on his back, and none of it is brought yet")
+	check(Toil.hand_over(TG, hs) == 4 and TG.step_haul == 4 and Load.carried(TG, "timber") == 0 and Toil.hand_over(TG, hs) == 0, "set down in front of whoever it is for: four of eight, and his back is empty")
+	TG.add_item("timber", 9)
+	check(Toil.hand_over(TG, hs) == 4 and Load.carried(TG, "timber") == 5, "no more is taken than was asked")
+	TG.poll_steps()
+	check(TG.step == Data.step_index("s_p27_footing") and TG.done_pending.has("s_p27_timber") and int(TG.inv.get("pick", 0)) == 1, "eight stems brought: the step is done, something is said, and a pick is put into his hands")
+	check(msrc.contains("Toil.hand_over(Game, s)") and msrc.contains("KEY_C") and msrc.contains("func offer_pedlar") and msrc.contains("func offer_store") and bsrc.contains("func _toil_step") and bsrc.contains("func _haul_step"),
+		"C works the land, a load is handed over by walking up, pedlars trade and the storehouse opens; and the bot does the work itself")
+	check(msrc.find("{\"id\": \"later\", \"label\": \"Not today\", \"desc\": \"There is a road waiting. %s\" % Load.text(Game)") > 0, "\"Not today\" is the pedlar's first line")
+	TG.free()
+
+	print("== Part XXVII: the Cloth Sack ==")
+	check(Data.REALMS.size() == 33 and Data.REALMS[32] == "Sumeru in a Seed" and Data.MAX_LEVEL == 96 and Data.level_name(96).ends_with("Sumeru in a Seed") and Data.REALM_INFO.size() == 33
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXVII adds the realm of Sumeru in a Seed")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break32" and Data.DIALOGUE.has("recall25") and msrc.contains("\"s_break31\": \"recall25\"") and Data.DIALOGUE.has("pre:s_break32") and Data.DIALOGUE.has("post:s_break32"),
+		"Part XXVII follows Room for the Blade (recall25) and ends the game")
+	var n27 := 0
+	var kinds27 := {}
+	for st in Data.STEPS:
+		if not str(st.id).begins_with("s_p27_"):
+			continue
+		n27 += 1
+		kinds27[str(st.kind)] = int(kinds27.get(str(st.kind), 0)) + 1
+		if st.kind == "talk":
+			check(Data.DIALOGUE.has(str(st.id)), "%s: there is something said" % st.id)
+		if not st.kind in ["kill", "talk"]:
+			check(Data.DIALOGUE.has("done:" + str(st.id)), "%s: something is said when it is done" % st.id)
+		if st.kind == "haul":
+			check(Load.GOODS.has(str(st.good)) and Data.DIALOGUE.has("haul:" + str(st.id)) and int(st.n) >= 4, "%s: a good of the land, carried to somebody with something to say about it" % st.id)
+			# whoever it is for stands where the step says, by then
+			var where := ""
+			for a2 in Data.AREAS:
+				for np in Data.AREAS[a2].get("npcs", []):
+					if str(np.id) == str(st.npc):
+						where = a2
+						check(Data.step_index(str((np.get("vis", ["", ""]) as Array)[0])) <= Data.step_index(str(st.id)), "%s: %s is there by then" % [st.id, st.npc])
+			check(where == str(st.area), "%s: carried to %s in %s" % [st.id, st.npc, st.area])
+		if st.kind == "toil":
+			check(Toil.WORKS.has(str(st.work)) and int(st.n) >= 3, "%s: the work of the hands, so many times" % st.id)
+		if st.kind == "folk":
+			var er: Dictionary = Folk.ERRANDS.get(str(st.id), {})
+			check(Folk.CAMP_ROLES.has(str(st.role)) and (er.lines as Array).size() >= 4 and int(er.price) == 0, "%s: people of the road asked, each with an answer" % st.id)
+			for el in er.lines:
+				check(fits.call(str(el)), "%s: an answer that fits the box" % st.id)
+		if st.kind == "visits":
+			for vn in st.npcs:
+				check(Data.DIALOGUE.has("visit:%s:%s" % [str(st.id), str(vn)]) and fits.call(str(Data.DIALOGUE["visit:%s:%s" % [str(st.id), str(vn)]][0][1])), "%s: %s has something to say of it" % [st.id, vn])
+		if st.kind == "marks":
+			check(bool(st.get("new", false)) and int(st.n) >= 3 and int(st.n) * 4 <= Echoes.ORDER.size(), "%s: things looked at since it began, and no more than a quarter of what a journey leaves standing" % st.id)
+	check(n27 >= 34 and int(kinds27.get("kill", 0)) == 3 and int(kinds27.get("hunt", 0)) == 4 and int(kinds27.get("collect", 0)) == 4 and int(kinds27.get("haul", 0)) == 6 and int(kinds27.get("toil", 0)) == 2 and int(kinds27.get("folk", 0)) == 3
+		and kinds27.has("visits") and kinds27.has("marks"),
+		"Part XXVII: %d steps: six loads carried, two works of the hands, three lords, four hunts, four searches, three errands of the road, a round of the hearths and a look at what stands" % n27)
+	# the charcoal for the smith is more than his back was made for at that realm, with Yue Ling's share: it is walked
+	var CG = load("res://scripts/game.gd").new()
+	CG.reset()
+	CG.level = 95
+	CG.companion = true
+	CG.ride = "barque"
+	CG.inv["charcoal"] = int(Data.STEPS[Data.step_index("s_p27_cart")].gives.charcoal)
+	check(Load.tier(CG) == 2 and Load.grounded(CG) and int(Data.STEPS[Data.step_index("s_p27_smith")].n) == int(CG.inv.charcoal), "eight sacks of charcoal are more than any sword will lift: they go up the mountain on foot")
+	CG.free()
+	# every tool is put into his hands before the step that needs it, and the chapter's loads can be borne
+	var have := {}
+	for st2 in Data.STEPS:
+		for gk in st2.get("gives", {}):
+			have[str(gk)] = true
+			check(Data.ITEMS.has(str(gk)), "%s gives something there is" % st2.id)
+		var need_work := ""
+		if st2.kind == "toil":
+			need_work = str(st2.work)
+		elif st2.kind == "haul":
+			for wk3 in Toil.ORDER:
+				if str(Toil.WORKS[wk3].good) == str(st2.good):
+					need_work = wk3
+			check(need_work != "" or have.has(str(st2.good)), "%s: its good is worked for, or was given" % st2.id)
+		if need_work != "":
+			check(have.has(str(Toil.WORKS[need_work].tool)), "%s: the %s was put into his hands first" % [st2.id, Toil.WORKS[need_work].tool])
+	for k27 in Data.DIALOGUE:
+		if str(k27).contains("s_p27_") or str(k27) in ["recall25", "pre:s_break32", "post:s_break32", "pre:palace_buyer", "post:palace_buyer", "pre:wan_juan", "post:wan_juan", "pre:li_jing", "post:li_jing"]:
+			for ln27 in Data.DIALOGUE[k27]:
+				check(fits.call(str(ln27[1])), "%s: a line that fits the box" % k27)
+				check(not str(ln27[1]).contains("—"), "%s: no dash in the story's text" % k27)
+	for tid27 in ["palace_buyer", "wan_juan", "li_jing"]:
+		check(Trials.TRIALS.has(tid27) and Data.ENEMIES[tid27].get("boss", false) and Lore.BOSS.has(tid27) and Trials.trial_of_step(Data.STEPS[_kill_step(tid27)]) == tid27, "%s is a lord of Part XXVII, guarded by a trial" % tid27)
+		check((Trials.TRIALS[tid27].paths as Array).any(func(pth): return str(pth.kind) == "relic") and (Trials.TRIALS[tid27].paths as Array).size() >= 3, "%s can be passed by what was found on the way" % tid27)
+		check(Data.DIALOGUE.has("pre:" + tid27) and Data.DIALOGUE.has("post:" + tid27), "%s has something to say before and after" % tid27)
+		# (what a way through asks for was found before it, in a step of the chapter)
+		for pth2 in Trials.TRIALS[tid27].paths:
+			for nd in pth2.needs:
+				if str(nd[0]) == "item":
+					var found_at := -1
+					for i3 in Data.STEPS.size():
+						if Data.STEPS[i3].kind == "collect" and str(Data.STEPS[i3].item) == str(nd[1]) and int(Data.STEPS[i3].n) >= int(nd[2]):
+							found_at = i3
+					check(found_at >= 0 and found_at < _kill_step(tid27), "%s: its relic is found before it" % tid27)
+				if str(nd[0]) == "lv":
+					check(Data.level_name(int(nd[1])).contains("Room for the Blade") == str(pth2.desc).contains("Room for the Blade") and str(pth2.desc).begins_with(str(Data.STAGES[int(nd[1]) % 3])), "%s: its way of might names the realm it asks" % tid27)
+	# (the Heavy Road release: the ways of might of Part XXVI named a realm that was not the one they asked)
+	for tid26 in ["duke_huan", "quan_niu", "cao_cao"]:
+		for pth3 in Trials.TRIALS[tid26].paths:
+			for nd3 in pth3.needs:
+				if str(nd3[0]) == "lv":
+					check(str(pth3.desc).begins_with(Data.level_name(int(nd3[1]))), "%s: its way of might names the realm it asks (%s)" % [tid26, Data.level_name(int(nd3[1]))])
+	for pid27 in ["tao_kan", "charcoal_seller", "zhichang", "budai", "palace_buyer", "li_jing"]:
+		check(Assets.PEOPLE.has(pid27) and Assets.has(Assets.PEOPLE[pid27]) and FileAccess.file_exists("res://art/characters/%s.py" % pid27), "%s has a model built from a script" % pid27)
+	for cid27 in ["tao_kan", "charcoal_seller", "zhichang", "budai"]:
+		check(Data.CHAT.has(cid27) and Data.CHAT[cid27].size() >= 3, "%s has things to say" % cid27)
+		for cl in Data.CHAT[cid27]:
+			check(fits.call(str(cl)), "%s: chatter that fits the box" % cid27)
+	for fid27 in ["ease_moth", "sedan_shade", "waste_golem", "yellow_runner", "white_shirt", "gauze_ox", "loose_scroll", "ivory_tag", "book_worm", "clenched_fist", "old_grudge", "heirloom_crab"]:
+		check(Data.ENEMIES.has(fid27) and Lore.BEAST.has(fid27) and Habits.habit(fid27) != "" and not Dooms.is_doom(fid27), "%s: a foe of Part XXVII with a story and hours of its own" % fid27)
+	# the crossroads of the chapter: every answer answered, echoed, told at the end, written about and standing
+	var c27: Dictionary = Echoes.CROSSROADS.get("the_sack", {})
+	check(not c27.is_empty() and str(c27.step) == "s_p27_sack" and str(c27.part) == "XXVII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_sack", "what comes after the sack is set down is asked last of all")
+	check((c27.options as Array).size() == 3 and (c27.get("end", {}) as Dictionary).size() == 3 and (c27.get("echo", {}) as Dictionary).size() >= 1 and (c27.get("after", {}) as Dictionary).size() == 3,
+		"the_sack: three answers, each answered, echoed and told at the end")
+	var lettered := 0
+	for lid in Mail.ORDER:
+		if Mail.LETTERS[lid].has("needs") and str(Mail.LETTERS[lid].needs[0]) == "the_sack":
+			lettered += 1
+			for ll in Mail.LETTERS[lid].lines:
+				check(fits.call(str(ll)), "%s: a letter that fits the box" % lid)
+	check(lettered == 3 and Mail.LETTERS.has("tao_last") and Mail.ORDER.has("tao_last"), "somebody writes about each answer, and the governor writes once")
+	var tips27 := {}
+	for o27 in c27.options:
+		check(Marks.MARKS.the_sack.has(str(o27.id)), "the_sack/%s leaves something standing" % o27.id)
+		for sc27 in o27.tilt:
+			tips27[sc27] = true
+	check(tips27.has("heart") and tips27.has("craft") and tips27.has("reach"), "the crossroads of Part XXVII tips all three scales the ends ask about")
+	var old_echo27 := 0
+	for cid in Echoes.ORDER:
+		if cid == "the_sack":
+			continue
+		for ek27 in Echoes.CROSSROADS[cid].get("echo", {}):
+			if str(ek27).contains("s_p27_"):
+				old_echo27 += 1
+	check(old_echo27 >= 3, "three older crossroads echo in Part XXVII (%d)" % old_echo27)
+	check(bsrc.contains("\"palace_buyer\": \"relic\"") and bsrc.contains("\"li_jing\": \"relic\"") and bsrc.contains("\"the_sack\": [\"carry\"]"), "the bot has a plan for every trial and the crossroads of Part XXVII")
+	for a27 in ["silk", "volcano", "karst", "maple"]:
+		check(str(Data.AREAS[a27].get("warband5", {}).get("vis", "")).begins_with("s_p27_") and not Data.AREAS[a27].has("warband6"), "%s: the chapter's band takes the last slot" % a27)
+	check(Marks.AFTER_BANDS.has("the_sack"), "the marks of its crossroads are stood after the late bands")
+	var found27 := 0
+	for e27 in ws.ents:
+		if (e27.kind == "pickup" and str(e27.id).begins_with("p27_")) or (e27.kind == "boss" and str(e27.enemy) in ["palace_buyer", "li_jing"]) or (e27.kind == "npc" and str(e27.id) in ["tao_kan", "charcoal_seller", "zhichang", "budai"]):
+			found27 += 1
+			check(Atlas.owner_id(ws, e27.pos) == str(e27.area), "%s stands in its own region" % e27.id)
+			var near := false
+			for d27 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				near = near or reach.has((e27.pos as Vector2i) + d27)
+			check(near, "%s can be walked up to" % e27.id)
+	var scrolls: Array = (ws.floors[Caves.fid("karst", -1)].ents as Array).filter(func(e28): return e28.kind == "boss" and str(e28.enemy) == "wan_juan")
+	check(found27 == 18 + 2 + 4 and scrolls.size() == 1, "eighteen things to find, two lords and four people of Part XXVII stand in the land, and the ten thousand scrolls in the cave under the towers (%d)" % found27)
+	# (the Heavy Road release: what the audits found and what was mended)
+	print("== mended in the Heavy Road release ==")
+	var NG2 = load("res://scripts/game.gd").new()
+	NG2.reset()
+	Needs.begin(NG2)
+	var buns: int = int(NG2.inv.steamed_bun)
+	NG2.needs["hunger"] = 40.0
+	Needs.end(NG2)
+	Needs.begin(NG2)
+	check(int(NG2.inv.steamed_bun) == buns and Needs.value(NG2, "hunger") == 40.0, "survival turned off and on again gives no second bag of buns and feeds nobody")
+	NG2.free()
+	var bt := FileAccess.get_file_as_string("res://scripts/battle.gd")
+	check(bt.contains("elif not ctx.get(\"tribulation\", false) and randf() < 0.25"), "lightning leaves no pills behind it")
+	check(msrc.contains("func _drop_fares") and msrc.count("_drop_fares()") >= 3, "whoever was being carried for a fare gets down when the carriage is left for the coach or a junk")
+	check(msrc.contains("Game.seen = {\"sect\": true}"), "the morning three years ago is not a region walked into")
+	check(msrc.contains("\"enabled\": not Gamble.stakes(Game).is_empty()"), "Old Du's mat is shut to somebody with nothing he can stake")
+	check(str(Data.DIALOGUE.s_yue[(Data.DIALOGUE.s_yue as Array).size() - 1][0]) == "Narrator" or (Data.DIALOGUE.s_yue as Array).any(func(l): return str(l[0]) == "Narrator" and str(l[1]).contains("joins Lin Feng")), "Yue Ling does not announce herself in the third person")
+	check(Echoes.CROSSROADS.palace.echo.has("s_p21_aysha") and Mail.LETTERS.values().any(func(l): return str(l.lines[0]).contains("Nine lotus seals")), "the Blood Moon Palace has nine seals in every telling, and somebody says how a king came to be in it")
+	var nine := 0
+	for dk in Data.DIALOGUE:
+		for dl in Data.DIALOGUE[dk]:
+			if str(dl[0]) in ["Elder Qing Xuan", "Hua Tuo", "Narrator"] and (str(dl[1]).contains("Nine hundred years of") or str(dl[1]).contains("deed nine hundred years") or str(dl[1]).contains("every dawn for nine hundred")):
+				nine += 1
+	check(nine == 0, "the sect is three hundred years old in every chapter")

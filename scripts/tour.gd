@@ -2326,6 +2326,10 @@ func _run() -> void:
 		# the Underclothes release (--frolics, or --frolics=a,b): the people in their underclothes, the
 		# physician's chapter, its lords, its crossroads and what each answer leaves standing (Part XXVI)
 		await _frolics_shots(str(main.args.frolics))
+	if main.args.has("heavy"):
+		# the Heavy Road release (--heavy, or --heavy=a,b): what a load looks like, the work of the hands,
+		# the people, foes and lords of Part XXVII, its crossroads and the page of the load
+		await _heavy_shots(str(main.args.heavy))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -4659,4 +4663,257 @@ func _frolics_shots(which: String = "1") -> void:
 			w.cam_override = null
 			w.end_use()
 			await _wait(1.0)
+	get_tree().quit(0)
+
+## A showroom shot like _gallery, of people each held on a clip of their own at a moment of it
+## (`poses`: [clip, seconds into it]), seen from `yaw` round them (the Heavy Road release).
+func _pose_gallery(n: String, models: Array, poses: Array, spacing: float, yaw: float = 0.5) -> void:
+	main.world.hide()
+	var stage := Node3D.new()
+	stage.position = Vector3(0, 400, 0)
+	main.add_child(stage)
+	var cam := Camera3D.new()
+	cam.fov = 40.0
+	cam.environment = Look.environment("garden", 0.2)
+	cam.environment.tonemap_exposure = 0.85
+	stage.add_child(cam)
+	stage.add_child(Look.sun("garden"))
+	stage.add_child(Look.fill("garden"))
+	var key := OmniLight3D.new()
+	key.position = Vector3(0, 4, 7)
+	key.omni_range = 16.0
+	key.light_energy = 0.5
+	stage.add_child(key)
+	var fl := MB.new()
+	fl.disc(Vector3.ZERO, 14.0, MB.tag(Color("8a9a88"), MB.STONE), 48, MB.tag(Color("6a7a6a"), MB.STONE))
+	MB.mesh_node(stage, fl.build(MB.mat_plain()))
+	var w := spacing * 2.2
+	for i in models.size():
+		var m: Node3D = models[i]
+		m.position = Vector3((i - (models.size() - 1) * 0.5) * w, 0.0, 0.0)
+		m.rotation.y = yaw
+		stage.add_child(m)
+		m.add_child(Models.shadow_disc(0.8))
+	var span := models.size() * w
+	cam.position = Vector3(0, 1.7 + spacing * 0.6, span * 0.8 + 1.5)
+	cam.look_at(stage.global_position + Vector3(0, 1.05 + spacing * 0.25, 0), Vector3.UP)
+	cam.make_current()
+	for k in 6:
+		await get_tree().process_frame
+	for i2 in models.size():
+		var m2: Node3D = models[i2]
+		var ap: AnimationPlayer = m2.get_meta("ap") if m2.has_meta("ap") else null
+		if ap != null and ap.has_animation(str(poses[i2][0])):
+			ap.play(str(poses[i2][0]), 0.0)
+			ap.seek(float(poses[i2][1]), true)
+			ap.pause()
+	for k2 in 4:
+		await get_tree().process_frame
+	await _shot(n)
+	stage.queue_free()
+	main.world.show()
+	if main.world.cam != null:
+		main.world.cam.make_current()
+
+## The Heavy Road (--heavy, or --heavy=a,b): the loads on a back ("loads"), the clips of the work of
+## the hands ("clips"), the work done out in the land ("work"), walking under timber ("haul"), the page
+## of the load ("page"), the people, foes and lords of Part XXVII ("people", "foes"), the lords'
+## battles ("battle"), the crossroads ("choice") and what each answer leaves standing ("marks").
+func _heavy_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 95
+	Game.step = Data.step_index("s_p27_sack")
+	Game.companion = true
+	for tl in ["axe", "fishing_rod", "pick", "sickle"]:
+		Game.inv[tl] = 1
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("loads"):
+		# what a load looks like: the six kinds on Lin Feng's back, and Yue Ling with her share
+		var ms: Array = []
+		var poses: Array = []
+		for bk in ["pack", "logs", "stone", "sacks", "fish", "herbs"]:
+			var m: Node3D = Models.hero({"glow": w.HERO_OPTS.glow})
+			Burden.wear(m, bk, 1.1)
+			ms.append(m)
+			poses.append(["haul_idle", 0.4])
+		var y: Node3D = Models.yue_ling({})
+		Burden.wear(y, "basket", 1.0)
+		ms.append(y)
+		poses.append(["haul_idle", 1.2])
+		await _pose_gallery("loads_on_the_back", ms, poses, 0.42, 2.5)
+		var ms2: Array = []
+		var poses2: Array = []
+		for bk2 in ["logs", "stone", "sacks"]:
+			var m3: Node3D = Models.hero({"glow": w.HERO_OPTS.glow})
+			Burden.wear(m3, bk2, 1.5)
+			ms2.append(m3)
+			poses2.append(["haul", 0.3 + 0.25 * ms2.size()])
+		await _pose_gallery("loads_walking", ms2, poses2, 0.5, 1.2)
+	if want.call("clips"):
+		# the clips of the work of the hands, each at the moment of the blow, with its tool
+		var cm: Array = []
+		var cp: Array = []
+		for cw in [["fell", 0.82, "felling_axe"], ["quarry", 0.7, "pickaxe"], ["reap", 0.75, "sickle"], ["angle", 3.9, "rod"]]:
+			var m4: Node3D = Models.hero({"glow": w.HERO_OPTS.glow, "arm": ""})
+			w._hold_in_hand(m4, str(cw[2]))
+			cm.append(m4)
+			cp.append([str(cw[0]), float(cw[1])])
+		await _pose_gallery("clips_of_the_hands", cm, cp, 0.6, 0.9)
+		var cm2: Array = []
+		var cp2: Array = []
+		for cw2 in [["fell", 0.5, "felling_axe"], ["quarry", 0.5, "pickaxe"], ["reap", 0.3, "sickle"], ["angle", 0.4, "rod"]]:
+			var m5: Node3D = Models.hero({"glow": w.HERO_OPTS.glow, "arm": ""})
+			w._hold_in_hand(m5, str(cw2[2]))
+			cm2.append(m5)
+			cp2.append([str(cw2[0]), float(cw2[1])])
+		await _pose_gallery("clips_of_the_hands_back", cm2, cp2, 0.6, 0.9)
+	if want.call("people"):
+		await _gallery("part27_people", [Assets.person("tao_kan"), Assets.person("charcoal_seller"), Assets.person("zhichang"), Assets.person("budai")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["ease_moth", "sedan_shade", "waste_golem", "yellow_runner", "white_shirt", "gauze_ox", "loose_scroll", "ivory_tag", "book_worm", "clenched_fist", "old_grudge", "heirloom_crab"]:
+			fs.append(_foe(fid))
+		await _gallery("part27_foes", fs, 1.0, 0.25)
+		await _gallery("part27_lords", [_foe("palace_buyer", true), _foe("wan_juan", true), _foe("li_jing", true)], 1.05, 0.25)
+	if want.call("work") or want.call("haul"):
+		# out in the land: the nearest piece of a region that can be worked at each way, and the work done
+		var ws: Dictionary = Atlas.world_of("surface")
+		var reach := MapGen.flood(ws.grid, ws.w, ws.h, ws.start)
+		var fr: Array = []
+		for wk in [["fell", "silk"], ["quarry", "volcano"], ["reap", "karst"], ["angle", "maple"]]:
+			if not want.call("work"):
+				break
+			var arr: Vector2i = Atlas.to_world(str(wk[1]), MapGen.arrival_tiles(str(wk[1]))[0])
+			var best := Vector2i(-1, -1)
+			var bdir := Vector2i.ZERO
+			var bd := 1 << 30
+			for oy in range(-70, 71):
+				for ox in range(-70, 71):
+					var t := arr + Vector2i(ox, oy)
+					var dd: int = absi(ox) + absi(oy)
+					if dd >= bd or not reach.has(t) or Atlas.owner_id(ws, t) != str(wk[1]):
+						continue
+					for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+						if Toil.work_at(ws, t, t + d) == str(wk[0]) and reach.has(t - d) and reach.has(t - d * 2):
+							best = t
+							bdir = d
+							bd = dd
+			if best.x < 0:
+				continue
+			Game.inv["timber"] = 0
+			Game.toiled = {}
+			# (he is alone at it: Yue Ling would stand between him and the camera)
+			Game.companion = false
+			_high_put(best, bdir, 10.5)
+			await _wait(0.5)
+			Game.toasts.clear()
+			main.toast_list.clear()
+			w.work()
+			var wkd: Dictionary = Toil.WORKS[str(wk[0])]
+			await _wait(w.USE_STEP + float(w.FX_AT[str(wkd.clip)]) + 0.12)
+			var pp: Vector3 = w.player.position
+			var fw := Vector3(bdir.x, 0.0, bdir.y)
+			var sd := Vector3(-fw.z, 0.0, fw.x)
+			w.cam_override = Transform3D(Basis.IDENTITY, pp - fw * 1.2 + sd * 4.2 + Vector3(0, 1.7, 0)).looking_at(pp + fw * 0.7 + Vector3(0, 1.05, 0), Vector3.UP)
+			await _wait(0.05)
+			Game.toasts.clear()
+			main.toast_list.clear()
+			await _shot("work_%s" % str(wk[0]))
+			fr.append(last_img)
+			w.cam_override = null
+			# (the rest of the work is not waited for: the picture is taken)
+			w.using.dur = 0.1
+			await _wait(1.2)
+			Game.toasts.clear()
+			main.toast_list.clear()
+		_grid("work_of_the_hands", fr, 2)
+		if want.call("haul"):
+			# walking under five stems of timber, Yue Ling with her share behind
+			var arr2: Vector2i = Atlas.to_world("silk", MapGen.arrival_tiles("silk")[0])
+			Game.inv["timber"] = 6
+			Game.companion = true
+			Game.riding = false
+			_high_put(arr2, Vector2i(1, 0), 16.5)
+			await _wait(0.8)
+			var go := Vector2i(1, 0)
+			for d2 in [Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(0, -1)]:
+				var ok := true
+				for k in range(1, 9):
+					ok = ok and w.tile_free(arr2 + d2 * k)
+				if ok:
+					go = d2
+					break
+			main.bot_active = true
+			w.move_dir = go
+			await _wait(1.9)
+			var pp2: Vector3 = w._player_pos()
+			var fw2 := Vector3(go.x, 0.0, go.y)
+			var sd2 := Vector3(-fw2.z, 0.0, fw2.x)
+			w.cam_override = Transform3D(Basis.IDENTITY, pp2 + fw2 * 3.4 + sd2 * 3.0 + Vector3(0, 1.7, 0)).looking_at(pp2 - fw2 * 0.4 + Vector3(0, 1.1, 0), Vector3.UP)
+			Game.toasts.clear()
+			main.toast_list.clear()
+			await _wait(0.12)
+			await _shot("haul_timber")
+			w.move_dir = Vector2i.ZERO
+			main.bot_active = false
+			w.cam_override = null
+			await _wait(0.6)
+			var pp3: Vector3 = w._player_pos()
+			w.cam_override = Transform3D(Basis.IDENTITY, pp3 + fw2 * 3.6 - sd2 * 2.4 + Vector3(0, 1.6, 0)).looking_at(pp3 - fw2 * 0.3 + Vector3(0, 1.1, 0), Vector3.UP)
+			await _wait(0.3)
+			await _shot("haul_standing")
+			w.cam_override = null
+	if want.call("page"):
+		main.set_stack(["world"])
+		Game.inv["timber"] = 4
+		Game.inv["carp"] = 3
+		Game.inv["herb_bundle"] = 2
+		Game.inv["pack_frame"] = 1
+		Game.hauled = 1240.0
+		main.open_menu()
+		main.menu.mode = "load"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("load_page")
+		main.pop()
+		Game.inv["timber"] = 0
+	if want.call("battle"):
+		main.set_stack(["world"])
+		for bb in [["palace_buyer", "volcano", "relic"], ["wan_juan", "karst", "relic"], ["li_jing", "maple", "relic"]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			var pth: Dictionary = Trials.path(bid, str(bb[2]))
+			main.battle.start([{"id": bid, "lv": 95, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": str(bb[1]),
+				"trial": bid, "path": str(bb[2]), "boon": pth.boon, "path_n": str(pth.n), "path_kind": str(Trials.KINDS[str(pth.kind)].n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_sack"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_sack")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("marks"):
+		var fr2: Array = []
+		for oa in [["carry", "maple"], ["share", "silk"], ["down", "bamboo"]]:
+			Game.picks = {"the_sack": str(oa[0])}
+			main.set_stack(["world"])
+			if not await _mark_view("mark:the_sack:%s" % str(oa[1]), 15.0, 9.0, 5.0):
+				continue
+			await _shot("mark_sack_%s" % str(oa[0]))
+			fr2.append(last_img)
+			w.cam_override = null
+		_sheet("mark_sack_answers", fr2, 0.48)
+		Game.picks = {}
 	get_tree().quit(0)

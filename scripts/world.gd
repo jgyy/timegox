@@ -1193,9 +1193,11 @@ const USE_STEP := 0.45
 ## when a thing answers, seconds into the clip (by clip), and how often a long one answers again (by
 ## what it does)
 const FX_AT := {"strike": 0.95, "toss": 0.62, "drink": 0.9, "gather": 1.0, "lift": 1.45, "touch": 0.8, "bow": 0.6, "attack": 0.3, "hammer": 0.82,
-	"archery": 1.68, "release": 2.0, "float_lantern": 1.45, "sword_dance": 0.4, "kite": 0.3, "stargaze": 0.8, "write": 0.6, "push": 0.5, "dance": 0.3}
+	"archery": 1.68, "release": 2.0, "float_lantern": 1.45, "sword_dance": 0.4, "kite": 0.3, "stargaze": 0.8, "write": 0.6, "push": 0.5, "dance": 0.3,
+	# the Heavy Road release (toil.gd): the axe bites, the pick lands, the sickle sweeps, the float goes under
+	"fell": 0.8, "quarry": 0.62, "reap": 0.9, "angle": 3.6}
 const FX_EVERY := {"notes": 1.1, "steam": 1.3, "smoke": 1.5, "sparks": 1.2, "embers": 0.9, "ripple": 1.7, "leaves": 1.8, "qi": 1.6, "chime": 1.4, "koi": 1.5, "zzz": 2.0,
-	"blade": 0.8, "flour": 1.1, "petals": 1.0, "stars": 1.4, "ink": 1.2}
+	"blade": 0.8, "flour": 1.1, "petals": 1.0, "stars": 1.4, "ink": 1.2, "chips": 1.5, "reaped": 1.6}
 ## Yue Ling's part, by what she does: the ones she keeps doing for as long as he does
 const COMP_LOOP := ["pray", "warm", "read", "meditate", "sit_bench", "gather", "play_flute", "dance", "soak", "stargaze"]
 ## the Lotus release: how long the watchtower's ladder takes, each way (seconds of the time it takes)
@@ -1222,7 +1224,8 @@ func end_use() -> void:
 ## Lin Feng uses thing `e`: he steps up to it (or onto it, to sit), does it, and steps back; what comes
 ## of it is shown when he is done.
 func start_use(e: Dictionary) -> void:
-	if not using.is_empty() or not trip.is_empty():
+	# (the Heavy Road release: nor in the air: a bench passed over under the kite used to be sat on there)
+	if not using.is_empty() or not trip.is_empty() or not glide.is_empty():
 		return
 	var k := Props.kind_of(e)
 	if k.is_empty():
@@ -1274,11 +1277,39 @@ func start_use(e: Dictionary) -> void:
 	if nd != null and is_instance_valid(nd):
 		(nd as Node3D).set_meta("used_t", t + USE_STEP)
 
+## C (the Heavy Road release, toil.gd): the work of the hands.  He does what the piece of the land in
+## front of him can be worked at (fell a tree, cast a line, cut stone, cut herbs), with the tool for it
+## in his hands, and what comes of it goes on his back; or it is said why not.
+func work() -> void:
+	if not using.is_empty() or not trip.is_empty() or ambush_t >= 0.0 or move_t >= 0.0 or not glide.is_empty() or Game.prologue != "" or wd.is_empty():
+		return
+	var tl := ptile + facing
+	if ent_at(tl) != null or walk_props.has(tl):
+		return
+	var id := Toil.work_at(wd, ptile, tl, is_cave(), is_floor() and not is_cave())
+	if id == "":
+		Game.toast("There is nothing here to work at.")
+		return
+	var why := Toil.blocked(Game, id, layer, tl)
+	if why != "":
+		Game.toast(why)
+		return
+	var wk: Dictionary = Toil.WORKS[id]
+	var from := _player_pos()
+	var dir := Vector3(facing.x, 0.0, facing.y)
+	var c := wpos(tl)
+	var e := {"id": "toil:" + id, "kind": "toil", "work": id, "pos": tl, "n": str(wk.n)}
+	var k := {"clip": str(wk.clip), "dur": float(wk.dur), "at": "face", "hold": str(wk.hold), "fx": str(wk.fx), "comp": str(wk.comp), "n": str(wk.n)}
+	using = {"e": e, "k": k, "t0": t, "dur": float(wk.dur), "from": from, "to": from + dir * 0.3, "yaw": atan2(dir.x, dir.z), "yaw0": player.rotation.y if player != null else 0.0,
+		"c": c, "dir": dir, "side": Vector3(dir.z, 0.0, -dir.x), "started": false, "ended": false, "fx_n": 0, "held": null, "stool": null, "comp_sit": false,
+		"comp_from": comp_pos, "comp_held": null, "base_y": from.y}
+	move_dir = Vector2i.ZERO
+
 ## Enter or Esc while doing something long: finish now (what comes of it still comes).
 func press_use(_act: String) -> void:
 	if using.is_empty() or not bool(using.started) or bool(using.ended):
 		return
-	if Props.ONCE.has(str(using.k.clip)):
+	if Props.ONCE.has(str(using.k.clip)) or using.e.has("work"):
 		return
 	using.dur = maxf(0.6, t - float(using.t0) - USE_STEP)
 
@@ -1335,7 +1366,14 @@ func _use_begin() -> void:
 			Models.act(comp, cc, t + 1.0)
 
 func _use_finish() -> void:
-	var lines := Props.use(using.e, Game)
+	var lines: Array = []
+	if using.e.has("work"):
+		# (the Heavy Road release, toil.gd: the work of the hands is done; the tree goes over, on screen)
+		lines = Toil.done(Game, str(using.e.work), layer, using.e.pos, is_cave())
+		if str(using.e.work) == "fell" and not headless() and not is_floor():
+			_nature_blow(using.e.pos, Vector3(using.dir.x, 0, using.dir.z))
+	else:
+		lines = Props.use(using.e, Game)
 	for ln in lines:
 		Game.toast(str(ln))
 	var hn = using.held
@@ -1530,6 +1568,13 @@ func _prop_fx(fx: String, e: Dictionary) -> void:
 			Fx3D.drift(scene3d, c + Vector3(0, 0.45, 0), Color(1.0, 0.62, 0.25), "glow", 6, 0.12, 1.1, 1.5, 0.3)
 		"dust":
 			Fx3D.dust(scene3d, player.position, Color(0.75, 0.68, 0.55))
+		"chips":
+			# (toil.gd: the axe in the trunk: chips of pale wood fly back towards him)
+			Fx3D.dust(scene3d, player.position - to_hero * 0.9 + Vector3(0, 0.7, 0), Color(0.86, 0.74, 0.52))
+			Fx3D.leaf_spiral(scene3d, player.position - to_hero * 0.9 + Vector3(0, 0.6, 0), Color(0.8, 0.66, 0.42), 0.5)
+		"reaped":
+			Fx3D.leaf_spiral(scene3d, player.position - to_hero * 0.7 + Vector3(0, 0.2, 0), Color(Look.theme(theme_name).g2).lightened(0.15), 0.7)
+			Impact.mow(player.position - to_hero * 0.9, 1.2, t)
 		"leaves":
 			Fx3D.leaf_spiral(scene3d, player.position - to_hero * 0.8, Color(0.85, 0.45, 0.2), 1.2)
 		"steam":
@@ -1870,6 +1915,9 @@ func riding_here() -> bool:
 	# (nothing with hooves goes up a crag, and nobody glides in the saddle: the ride waits at the foot)
 	if not glide.is_empty() or air_y > 0.3 or Peaks.at(wd, ptile) > 1.2 or (move_t >= 0.0 and Peaks.at(wd, target) > 1.2):
 		return false
+	# (the Heavy Road release, load.gd: a flying sword or a cloud is his own qi, and lifts no more than he can)
+	if Load.grounded(Game) and str(Fashion.RIDES[Game.ride].kind) == "vehicle":
+		return false
 	return building_at(ptile).is_empty() and (move_t < 0.0 or building_at(target).is_empty())
 
 ## Seconds to cross one tile: running, or faster in the saddle (Fashion.RIDES speed).
@@ -1881,8 +1929,9 @@ func step_time() -> float:
 	if riding_here():
 		# (roads.gd: a thing on wheels is quicker on a road or a path, and slower off one)
 		var rd: Dictionary = Fashion.RIDES[Game.ride]
-		return STEP_T / (float(rd.speed) * Roads.pace(wd, str(rd.kind), target if move_t >= 0.0 else ptile))
-	return STEP_T
+		return STEP_T / (float(rd.speed) * Roads.pace(wd, str(rd.kind), target if move_t >= 0.0 else ptile)) * Load.pace(Game, true)
+	# (the Heavy Road release: on his own feet, under what he carries, load.gd)
+	return STEP_T * Load.pace(Game)
 
 ## R (or the bot's "ride"): whistle up the ride and get on, or get off and send it away.
 func toggle_ride() -> void:
@@ -2019,6 +2068,8 @@ func _move(d: float) -> void:
 			else:
 				_trample(ptile)
 				_summit_check()
+				# (load.gd: a tile walked under a load is counted, for whoever sews the pouch)
+				Load.walked(Game, riding_here())
 			var rid := Atlas.owner_id(wd, ptile)
 			if rid != area_id:
 				_enter_region(rid)
@@ -2044,6 +2095,10 @@ func toggle_glide() -> void:
 		Game.toast("There is no sky to glide in under a roof.")
 		return
 	if not trip.is_empty() or not using.is_empty() or Game.prologue != "":
+		return
+	# (the Heavy Road release, load.gd: the kite lifts him, not him and a cord of timber)
+	if Load.grounded(Game):
+		Game.toast("The kite will not lift him and what he carries. Set some of it down first.")
 		return
 	glide_want = true
 
@@ -2308,6 +2363,13 @@ func _update_view(d: float) -> void:
 		var gait := "run"
 		if walking and is_cave() and mini(Caves.headroom(Caves.layout(area_id, int(wd.level)), ptile), Caves.headroom(Caves.layout(area_id, int(wd.level)), target)) <= Caves.LOW:
 			gait = "duck"
+		# (the Heavy Road release, load.gd: what he carries is on his back, and bends it)
+		var ld: Array = Load.look(Game)
+		var heavy: bool = Load.tier(Game, riding_here()) >= 2
+		Burden.wear(player, "" if flying or riding_here() else str(ld[0]), float(ld[1]))
+		if str(ld[0]) != "" and not flying and not riding_here():
+			gait = "haul" if (heavy or float(ld[1]) >= 0.75) and Assets.has_clip(player, "haul") else gait
+		var stand := "haul_idle" if str(ld[0]) != "" and float(ld[1]) >= 0.75 and not riding_here() and Assets.has_clip(player, "haul_idle") else ""
 		if flying:
 			Models.anim_person(player, t, true, false, "glide")
 		elif scaling:
@@ -2316,7 +2378,8 @@ func _update_view(d: float) -> void:
 			climb_clk += d * (1.0 if walking or scale_in < 0.25 else 0.08)
 			Models.anim_person(player, climb_clk, true, false, "scale")
 		else:
-			Models.anim_person(player, t, walking, false, gait if walking else ("talk" if speaker() == "Lin Feng" else ""))
+			# (a laden step is slower: the clip keeps time with the feet)
+			Models.anim_person(player, t / (Load.pace(Game) if gait == "haul" else 1.0), walking, false, gait if walking else ("talk" if speaker() == "Lin Feng" else stand))
 		_kite(player, "hero", not glide.is_empty(), d, Color(HERO_OPTS.cape), Color(HERO_OPTS.trim))
 		# a puff of dust at each footfall
 		var sp := fmod(t * 9.0 / PI, 2.0)
@@ -2326,6 +2389,8 @@ func _update_view(d: float) -> void:
 		# companion trails the hero
 		comp.visible = Game.companion
 		if Game.companion:
+			# (she takes her share of a load, and is drawn carrying it)
+			Burden.wear(comp, "basket" if str(ld[0]) != "" and not flying and not riding_here() else "", float(ld[1]))
 			if flying:
 				# she flies off his wing, a little behind and a little above
 				var fw := Vector3(facing.x, 0, facing.y)
@@ -2353,7 +2418,8 @@ func _update_view(d: float) -> void:
 				if c_scale:
 					Models.anim_person(comp, (t if comp_run else climb_clk) + 0.65, true, false, "scale")
 				else:
-					Models.anim_person(comp, t + 1.0, comp_run, false, gait if comp_run else ("talk" if speaker() == "Yue Ling" else ""))
+					var cgait: String = gait if gait != "haul" or Assets.has_clip(comp, "haul") else "run"
+					Models.anim_person(comp, (t / (Load.pace(Game) if cgait == "haul" else 1.0)) + 1.0, comp_run, false, cgait if comp_run else ("talk" if speaker() == "Yue Ling" else (stand if Assets.has_clip(comp, stand) else "")))
 			_kite(comp, "comp", not glide.is_empty(), d, Color("e86a9a"), Color(YUE_OPTS.ribbon))
 	# entities of the regions on show
 	frame_n += 1
@@ -3422,7 +3488,7 @@ func _draw_hud() -> void:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
 	# end was cut off, "Esc men")
-	UI.text(self, Vector2(VIEW.x - 772, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   V glide   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 760.0)
+	UI.text(self, Vector2(VIEW.x - 832, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   V glide   C work   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 820.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:

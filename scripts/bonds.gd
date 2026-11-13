@@ -217,7 +217,7 @@ const TALKS := [
 			{"id": "make", "label": "\"Make a village. Start it.\"", "lean": "wander", "bond": 2, "after": [["Lin Feng", "Then start one. Somebody started every village there is."], ["Yue Ling", "A village of one healer and whatever stray dogs follow her. I have seen worse villages."]]}]},
 	{"id": "t_mother", "after": "s_p7_home", "lines": [
 		["Yue Ling", "We are going to Qingshi Village, Lin Feng. Your village. You never talk about it."],
-		["Lin Feng", "There is not much to say. A river, some mulberries, a temple with a leaking roof. My mother hummed while she worked. I was six when the fever came."],
+		["Lin Feng", "There is not much to say. A river, some mulberries, a temple with a leaking roof. A woman of the village took me from Granny Wen, and I called her mother. She hummed while she worked. I was six when the fever came."],
 		["Yue Ling", "What did she hum?"],
 		["Lin Feng", "I do not know. Something about a boat. I have tried for years to remember the rest."],
 		["Yue Ling", "...Something about a boat. Lin Feng, I think I know it."]],

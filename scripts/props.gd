@@ -878,6 +878,10 @@ static func model(kind: String, theme: String) -> Node3D:
 ## Something in the hero's hand for a clip, in the hand bone's own space (the bone runs from the
 ## wrist down to the fingers along -y; the palm faces +x for the right hand).
 static func held(what: String) -> Node3D:
+	# (the Heavy Road release: the felling axe and the sickle, burden.gd)
+	var tool := Burden.held(what)
+	if tool != null:
+		return tool
 	var more := Structures.held(what)
 	if more != null:
 		return more

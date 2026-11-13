@@ -10,7 +10,8 @@ Props: fly-whisk, gourd, lantern, oar, fishing rod and creel, a cormorant on the
 teapot, soup bowl, ledger and brush, scroll, smith's hammer and apron, folding fan, bamboo flute,
 herdsman's whip, weaving shuttle, mulberry basket, hand drum, spectacles, abacus, peach branch,
 dragon pearl, five-colour stone, hoe, cowherd's straw cape, magpie-feather cloak, star crown and
-floating spirit swords.
+floating spirit swords; and (the Heavy Road release) a cloth sack over the shoulder, a pagoda on the
+palm, a brick in the hand, and a shoulder yoke with two sacks of charcoal.
 """
 
 import math
@@ -411,3 +412,52 @@ def cormorant(b, col="1a1a20", beak="e0c040"):
     for k in range(5):
         b.leaf(c + V(0, 0.01, -0.08), c + V((k - 2) * 0.02, -0.02, -0.2), 0.015, col, cls=HAIR, bone=bone, n=3)
 
+
+
+# ---------------------------------------------------------------- the Heavy Road release (Part XXVII)
+def cloth_sack(b, col="b8a888", cord="6a5a40"):
+    """Budai's sack: a great bag of patched hemp slung over the left shoulder and hanging down the
+    back to the hips, its neck gathered in the left hand in front of the chest."""
+    neck = V(0.13, 1.42, 0.12)
+    top = V(0.15, 1.5, -0.05)
+    b.tube([held_l() + V(0.0, 0.1, 0.02), neck, top, V(0.1, 1.4, -0.2)], [0.02, 0.028, 0.04, 0.07], col, cls=CLOTH, bone="chest", seg=8)
+    belly = V(0.04, 1.08, -0.3)
+    b.ellipsoid(belly, (0.26, 0.32, 0.21), col, cls=CLOTH, bone={"chest": 0.6, "spine": 0.4}, seg=16, rings=10)
+    b.ball(belly + V(-0.1, -0.12, -0.06), 0.14, darken(col, 0.08), cls=CLOTH, bone={"chest": 0.5, "spine": 0.5}, seg=10, rings=6)
+    for k, (dx, dy) in enumerate(((0.1, 0.1), (-0.12, 0.02), (0.02, -0.2))):
+        b.superquad(belly + V(dx, dy, -0.2), (0.06, 0.05, 0.012), lighten(col, 0.12) if k % 2 else darken(col, 0.18), e=0.4, cls=CLOTH, bone="chest", seg=6, rings=4)
+    b.tube([neck + V(0.02 * math.sin(a), 0.0, 0.02 * math.cos(a)) + V(0, 0.01, 0) for a in [i / 10 * 2 * math.pi for i in range(11)]], [0.005] * 11, cord, cls=CLOTH, bone="chest", seg=4, cap0=False, cap1=False)
+
+
+def pagoda(b, col="c8a040", roof="3a5a8a", glow="ffe8a0"):
+    """A seven-storeyed pagoda a forearm high, standing on the left palm: the thing the Heavenly King
+    Li has not set down."""
+    base = held_l() + V(0.0, 0.04, 0.03)
+    y = 0.0
+    for k in range(7):
+        w = 0.05 - 0.005 * k
+        h = 0.034 - 0.002 * k
+        b.superquad(base + V(0, y + h * 0.5, 0), (w, h * 0.5, w), col, e=0.25, cls=METAL, bone="hand.L", seg=8, rings=4)
+        b.lathe(base + V(0, y + h, 0), [(w * 1.7, 0.0), (w * 1.1, 0.008), (w * 0.9, 0.012)], roof, cls=STONE, bone="hand.L", seg=8)
+        y += h + 0.012
+    b.tube([base + V(0, y, 0), base + V(0, y + 0.06, 0)], [0.006, 0.001], col, cls=METAL, bone="hand.L", seg=5)
+    b.ball(base + V(0, y + 0.03, 0), 0.012, glow, cls=CRYSTAL, bone="hand.L", seg=8, rings=5, mat=MAT_GLOW)
+
+
+def brick(b, col="8a8a84"):
+    """A grey brick carried in the left hand, one corner worn round: Tao Kan's."""
+    c = held_l() + V(0.0, -0.01, 0.04)
+    b.superquad(c, (0.055, 0.03, 0.115), col, e=0.18, cls=STONE, bone="hand.L", seg=8, rings=5)
+    b.superquad(c + V(0.0, 0.062, 0.0), (0.055, 0.03, 0.115), darken(col, 0.08), e=0.18, cls=STONE, bone="hand.L", seg=8, rings=5, rot=(0, 0.12, 0))
+
+
+def charcoal_yoke(b, pole="7a5a38", sack="6a5e4c", coal="1e1c22"):
+    """A carrying pole across the shoulders with a sack of charcoal hung from each end."""
+    b.tube([V(-0.62, 1.5, -0.06), V(0.0, 1.53, -0.09), V(0.62, 1.5, -0.06)], [0.016, 0.02, 0.016], pole, cls=WOOD, bone="chest", seg=6)
+    for s in (-1, 1):
+        end = V(0.6 * s, 1.5, -0.06)
+        c = end + V(0, -0.5, 0)
+        for d in (-0.05, 0.05):
+            b.tube([end, c + V(d, 0.2, 0)], [0.004, 0.004], "8a7a5a", cls=CLOTH, bone="chest", seg=3)
+        b.ellipsoid(c, (0.16, 0.21, 0.16), sack, cls=CLOTH, bone="chest", seg=12, rings=8)
+        b.ball(c + V(0, 0.2, 0), 0.07, coal, cls=STONE, bone="chest", seg=8, rings=5)

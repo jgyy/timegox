@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -39,6 +39,18 @@ func _build() -> void:
 		for e in bestiary():
 			labels.append(e[1])
 			ids.append(e[0])
+			enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "load":
+		# load.gd: what is on his back, and (at home) the storehouse
+		labels = []
+		ids = []
+		enabled = []
+		if Load.at_home(Game, Game.area, main.world.ptile) != "":
+			labels.append("The storehouse: leave and take up")
+			ids.append("store")
 			enabled.append(true)
 		labels.append("Back")
 		ids.append("back")
@@ -194,7 +206,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -264,7 +276,10 @@ func press(act: String) -> void:
 				"ask":
 					main.pop()
 					main.open_ask()
-				"works", "roads", "feats", "songs", "host", "body", "town":
+				"store":
+					main.pop()
+					main.offer_store()
+				"works", "roads", "feats", "songs", "host", "body", "town", "load":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -378,6 +393,46 @@ func _draw_bestiary() -> void:
 		UI.wrapped(self, r.position + Vector2(24, ty), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
+
+## The Load (load.gd): what is on his back in jin, how much of what he can bear it is and what that
+## costs, what he bears it with, and how far he has carried things.
+func _draw_load() -> void:
+	UI.text(self, Vector2(60, 70), "The Load", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var riding: bool = main.world.riding_here()
+	var tier := Load.tier(Game, riding)
+	var tcol: Color = [UI.C_JADE, UI.C_GOLD, UI.C_RED.lightened(0.3), UI.C_RED][tier]
+	UI.text(self, r.position + Vector2(24, 40), "%d of %d jin" % [int(round(Load.weight(Game))), int(round(Load.cap(Game, riding)))], 24, tcol)
+	UI.bar(self, Rect2(r.position.x + 250, r.position.y + 22, 380, 14), clampf(Load.ratio(Game, riding) / 1.6, 0.0, 1.0), tcol)
+	UI.text(self, r.position + Vector2(650, 38), str(Load.TIERS[tier]), 17, tcol)
+	UI.wrapped(self, r.position + Vector2(24, 62), main.told(str(Load.TIER_TEXT[tier]) if int(Game.inv.get(Load.RING, 0)) <= 0 else Load.text(Game)), 15, UI.C_DIM.lightened(0.3), r.size.x - 48)
+	var with: Array = ["his own back (%d jin, and %d more for every great realm)" % [int(Load.BASE), int(Load.PER_REALM)]]
+	if Game.companion:
+		with.append("Yue Ling's share")
+	if int(Game.inv.get(Load.FRAME_ITEM, 0)) > 0:
+		with.append("a pack-frame")
+	if riding:
+		with.append(str(Fashion.RIDES[Game.ride].n))
+	if int(Game.inv.get(Load.POUCH, 0)) > 0:
+		with.append("a pouch of heaven and earth")
+	UI.wrapped(self, r.position + Vector2(24, 100), main.told("Borne with: " + ", ".join(with) + "."), 14, UI.C_TEXT, r.size.x - 48)
+	var y := r.position.y + 158.0
+	var rows := Load.rows(Game)
+	for i in mini(rows.size(), 14):
+		var row: Array = rows[i]
+		UI.text(self, Vector2(r.position.x + 24, y), "%s x%d" % [str(row[0]), int(row[1])], 15, UI.C_TEXT)
+		UI.text(self, Vector2(r.position.x + 520, y), ("%.1f jin" % float(row[2])) if float(row[2]) < 10.0 else ("%d jin" % int(round(float(row[2])))), 15, UI.C_GOLD if float(row[2]) >= 20.0 else UI.C_DIM.lightened(0.3))
+		y += 22.0
+	if rows.size() > 14:
+		UI.text(self, Vector2(r.position.x + 24, y), "and %d lighter things" % (rows.size() - 14), 14, UI.C_DIM)
+		y += 22.0
+	var st := 0.0
+	for sid in Game.stash:
+		st += Load.weight_of(str(sid)) * float(Game.stash[sid])
+	UI.wrapped(self, Vector2(r.position.x + 24, r.end.y - 118), "Carried a league on your own back: %d jin.   Left in the storehouse: %d jin.   Sold to the pedlars: %d pieces." % [Load.hauled(Game), int(round(st)), int(Game.sold)], 14, UI.C_JADE, r.size.x - 48)
+	UI.wrapped(self, Vector2(r.position.x + 24, r.end.y - 84), "C works the land in front of you: an axe to a tree, a rod to water, a pick to a crag or a cave wall, a sickle to open ground. Things can be left at the sect and at Guiyun. A horse bears 160 jin while you ride it and a carriage 600; a flying sword lifts no more than you can.", 13, UI.C_DIM.lightened(0.2), r.size.x - 48)
 
 ## The Body (needs.gd): survival, on or off; the seven needs as bars; what low ones cost and what
 ## can be done about each here.
@@ -1152,6 +1207,9 @@ func _draw() -> void:
 		return
 	if mode == "feats":
 		_draw_feats()
+		return
+	if mode == "load":
+		_draw_load()
 		return
 	if mode == "body":
 		_draw_body()

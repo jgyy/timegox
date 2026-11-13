@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 93
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade"]
+const MAX_LEVEL := 96
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -85,6 +85,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Whom They Barely Know Is There", "note": "Of the best of those who are over others, says the old book, the people only know that he exists; the next best they love and praise, the next they fear, the next they despise. When his work is done and things have gone well, the hundred families all say: we did it ourselves. A hundred households on the east shoulder of the mountain say it every morning."},
 	# Part XXVI (the Underclothes release): what is left when the body is listened to
 	{"life": 0, "title": "Whose Knife Is Still New", "note": "The joints have spaces, says the old book, and the edge of the knife has no thickness: put what has no thickness where there is space, and there is room and more for the blade to play. Cook Ding has used one knife for nineteen years. You have soaked with the sick, done the five frolics at dawn, and carried a book out of a jail, and the edge of you is as if it had just come from the stone."},
+	# Part XXVII (the Heavy Road release): what is left when the load is known for what it weighs
+	{"life": 0, "title": "Who Knows What Things Weigh", "note": "Mount Sumeru can be put into a mustard seed, says the sutra, and neither is the worse for it. You have carried timber on your shoulder and stone on your back, and charcoal down a mountain for a smith, and stood in front of a king who could not set a thing down. The ring was given you after that, and not before. It holds everything, and you could do without it."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -869,6 +871,23 @@ const ENEMIES := {
 	"duke_huan": {"n": "Duke Huan of Cai, Who Was Not Ill", "elem": "water", "weak": "fire", "col": Color("8a6a3a"), "shape": "person:duke_huan", "boss": true},
 	"quan_niu": {"n": "The Whole Ox", "elem": "earth", "weak": "thunder", "col": Color("6a5444"), "shape": "ox", "boss": true, "pal": {"sec": Color("3a2c22"), "acc": Color("e8d8b0"), "mark": Color("2a221c")}},
 	"cao_cao": {"n": "Cao Cao, with the Wind in His Head", "elem": "thunder", "weak": "earth", "col": Color("2a2a3a"), "shape": "person:cao_cao", "boss": true},
+	# ---- Part XXVII (the Heavy Road release): what comes of ease, what takes a load for nothing, what was read
+	# and never carried, and a king who cannot put a thing down
+	"ease_moth": {"n": "Moth of the Soft Cushion", "elem": "wood", "weak": "fire", "col": Color("c8b8a0"), "shape": "moth", "pal": {"sec": Color("7a6a58"), "acc": Color("e8d8f0")}},
+	"sedan_shade": {"n": "Sedan-Chair Shade", "elem": "dark", "weak": "thunder", "col": Color("5a4a6a"), "shape": "wraith", "pal": {"sec": Color("2a2236"), "acc": Color("d8a040")}},
+	"waste_golem": {"n": "Golem of What Was Thrown Away", "elem": "earth", "weak": "wood", "col": Color("9a8a68"), "shape": "golem", "pal": {"sec": Color("5a4e38"), "acc": Color("e8d8a0")}},
+	"yellow_runner": {"n": "Runner in Yellow", "elem": "fire", "weak": "water", "col": Color("c8a030"), "shape": "humanoid", "pal": {"sec": Color("6a2a22"), "acc": Color("f4f0e0")}},
+	"white_shirt": {"n": "Boy in the White Shirt", "elem": "phys", "weak": "earth", "col": Color("e0dcd0"), "shape": "humanoid", "pal": {"sec": Color("8a8478"), "acc": Color("c83a2a")}},
+	"gauze_ox": {"n": "Ox with Gauze on Its Horn", "elem": "earth", "weak": "water", "col": Color("5a4a3e"), "shape": "ox", "pal": {"sec": Color("2e2620"), "acc": Color("d83a3a")}},
+	"loose_scroll": {"n": "Scroll That Was Only Read", "elem": "wood", "weak": "fire", "col": Color("d8c8a0"), "shape": "tome", "pal": {"sec": Color("6a2a2a"), "acc": Color("f0e8d0")}},
+	"ivory_tag": {"n": "Ivory Tag", "elem": "thunder", "weak": "earth", "col": Color("f0ead8"), "shape": "wisp", "pal": {"sec": Color("b8a888"), "acc": Color("c84a4a")}},
+	"book_worm": {"n": "Worm of Ten Thousand Scrolls", "elem": "dark", "weak": "fire", "col": Color("a89a78"), "shape": "serpent", "pal": {"sec": Color("5a4e3a"), "acc": Color("e8e0c8")}},
+	"clenched_fist": {"n": "Fist That Will Not Open", "elem": "earth", "weak": "water", "col": Color("8a7a6a"), "shape": "golem", "pal": {"sec": Color("4a4038"), "acc": Color("d8c0a0")}},
+	"old_grudge": {"n": "Grudge Carried Thirty Years", "elem": "dark", "weak": "fire", "col": Color("4a3a4a"), "shape": "wraith", "pal": {"sec": Color("241c26"), "acc": Color("c84a4a")}},
+	"heirloom_crab": {"n": "Crab with the Family Chest", "elem": "water", "weak": "thunder", "col": Color("9a5a3a"), "shape": "crab", "pal": {"sec": Color("5a3220"), "acc": Color("e8c860")}},
+	"palace_buyer": {"n": "The Buyer in Yellow, by Order", "elem": "fire", "weak": "water", "col": Color("d8b030"), "shape": "person:palace_buyer", "boss": true},
+	"wan_juan": {"n": "Ten Thousand Scrolls, Unshelved", "elem": "wood", "weak": "fire", "col": Color("c8b890"), "shape": "tome", "boss": true, "pal": {"sec": Color("6a2a2a"), "acc": Color("f8f0d8")}},
+	"li_jing": {"n": "Li Jing, Who Cannot Set It Down", "elem": "thunder", "weak": "earth", "col": Color("c8a040"), "shape": "person:li_jing", "boss": true},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -1057,7 +1076,7 @@ const AREAS := {
 			# Part XI: a messenger of the Feathered Folk, come down the Jianmu to see who regrew it
 			{"id": "ling_yu", "n": "Ling Yu of the Feathered Folk", "pos": Vector2i(32, 62), "col": Color("8ac0e8"), "race": "yumin", "vis": ["s_p11_archive", "s_p11_tree"]},
 			# Part XX: in Rotten-Axe Cave (caves.gd stands him at the back of it)
-			{"id": "wang_zhi", "n": "Wang Zhi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("7a5a3a"), "vis": ["s_p20_delve", ""], "late": true, "cave": -1, "stand": "deep"},
+			{"id": "wang_zhi", "n": "Wang Zhi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("7a5a3a"), "vis": ["s_p20_delve", "s_p20_end"], "late": true, "cave": -1, "stand": "deep"},
 			# Part XXII: Duke Xie of the toothed clogs, camped at the foot of Sun-Viewing Peak
 			{"id": "xie_lingyun", "n": "Duke Xie of the Toothed Clogs", "pos": Vector2i.ZERO, "col": Color("3a6a5a"), "vis": ["s_p22_home", ""], "late": true, "peak": 0, "stand": "foot"},
 			# Part XXV (hold.gd): the steward of Guiyun, on the ground the town will stand on, in front of where its hall
@@ -1304,24 +1323,33 @@ const AREAS := {
 	"volcano": {
 		# Part XVIII: the cinders of the mountain where the first fire is kept
 		"warband": {"pool": [["ash_moth", 66, 67], ["cinder_imp", 66, 67], ["clinker_crab", 66, 67]], "n": 9, "vis": "s_p18_sage", "late": true},
+		# Part XXVII: the palace market, come up the south slope after an old man's cart
+		"warband5": {"pool": [["yellow_runner", 94, 94], ["white_shirt", 94, 94], ["gauze_ox", 94, 94]], "n": 16, "vis": "s_p27_wood", "late": true},
 		"n": "Ashen Volcano", "w": 94, "h": 56, "seed": 81, "theme": "volcano", "enemies": 18,
 		"pool": [["magma_slime", 13, 14], ["ash_salamander", 13, 14], ["ember_sprite", 13, 14]],
 		"portals": [
 			{"to": "dragon", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
 			{"to": "void", "pos": Vector2i(92, 28), "dest": Vector2i(4, 28), "open": "s_break5"},
 		],
-		"npcs": [{"id": "fire_sage", "n": "Sage Huo Rong", "pos": Vector2i(10, 26), "col": Color("ff9a5a"), "vis": ["s_vo_intro", ""]}],
+		"npcs": [{"id": "fire_sage", "n": "Sage Huo Rong", "pos": Vector2i(10, 26), "col": Color("ff9a5a"), "vis": ["s_vo_intro", ""]},
+			# Part XXVII: the old man who burns charcoal on the south slope, at the foot of the height
+			{"id": "charcoal_seller", "n": "The Charcoal Seller", "pos": Vector2i.ZERO, "col": Color("6a665e"), "vis": ["s_p27_snow", ""], "late": true, "peak": 0, "stand": "foot"}],
 		"bosses": [
 			{"id": "lava_titan", "pos": Vector2i(36, 40), "lv": 13, "req": 13},
 			{"id": "cinder_behemoth", "pos": Vector2i(48, 24), "lv": 13, "req": 13},
 			{"id": "ash_phoenix", "pos": Vector2i(58, 12), "lv": 14, "req": 14},
 			{"id": "inferno_lord", "pos": Vector2i(82, 30), "lv": 14, "req": 14},
 			# Part XVIII: Zhurong, Lord of the Southern Fire, who keeps Suiren's fire-drill
-			{"id": "zhurong", "pos": Vector2i(39, 24), "lv": 67, "req": 66, "vis": ["s_p18_zhurong", ""], "late": true}
+			{"id": "zhurong", "pos": Vector2i(39, 24), "lv": 67, "req": 66, "vis": ["s_p18_zhurong", ""], "late": true},
+			# Part XXVII: the buyer in yellow, on the height with the old man's cart
+			{"id": "palace_buyer", "pos": Vector2i.ZERO, "lv": 94, "req": 93, "vis": ["s_p27_gauze", ""], "late": true, "peak": 0, "stand": "top"}
 		],
 		"pickups": [
 			{"id": "ember1", "item": "ember", "pos": Vector2i(20, 12)}, {"id": "ember2", "item": "ember", "pos": Vector2i(42, 46)},
 			{"id": "ember3", "item": "ember", "pos": Vector2i(64, 28)}, {"id": "ember4", "item": "ember", "pos": Vector2i(76, 10)},
+			# Part XXVII: the price of a thousand jin of charcoal, blown off four oxen's horns
+			{"id": "p27_gauze1", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p27_gauze2", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p27_gauze3", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 1, "stand": "foot"}, {"id": "p27_gauze4", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 2, "stand": "flank"},
 		],
 		"pickup_vis": "s_vo_collect",
 	},
@@ -1703,13 +1731,17 @@ const AREAS := {
 	},
 	# ---- Part VI: The Turning Wheel
 	"maple": {
+		# Part XXVII: everything in the gorge that was picked up once and never set down
+		"warband5": {"pool": [["clenched_fist", 95, 95], ["old_grudge", 95, 95], ["heirloom_crab", 95, 95]], "n": 16, "vis": "s_p27_anglers", "late": true},
 		"n": "Maple Gorge of Returning Souls", "w": 96, "h": 58, "seed": 231, "theme": "maple", "enemies": 20,
 		"pool": [["maple_fox", 30, 30], ["lost_lantern", 30, 30], ["mossback_boar", 30, 30]],
 		"portals": [
 			{"to": "sect", "pos": Vector2i(1, 28), "dest": Vector2i(3, 22), "open": ""},
 			{"to": "karst", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_mp_ox"},
 		],
-		"npcs": [{"id": "lantern_monk", "n": "Lantern Monk Jing Kong", "pos": Vector2i(10, 26), "col": Color("e8c070"), "vis": ["s_mp_intro", ""]}],
+		"npcs": [{"id": "lantern_monk", "n": "Lantern Monk Jing Kong", "pos": Vector2i(10, 26), "col": Color("e8c070"), "vis": ["s_mp_intro", ""]},
+			# Part XXVII: the Cloth-Sack Monk, asleep on his sack at the foot of the gorge's height
+			{"id": "budai", "n": "Budai, the Cloth-Sack Monk", "pos": Vector2i.ZERO, "col": Color("8a8478"), "vis": ["s_p27_seed", ""], "late": true, "peak": 0, "stand": "foot"}],
 		"bosses": [
 			{"id": "nine_tail_fox", "pos": Vector2i(30, 40), "lv": 30, "req": 30},
 			{"id": "waterfall_koi", "pos": Vector2i(46, 16), "lv": 30, "req": 30},
@@ -1719,10 +1751,15 @@ const AREAS := {
 			{"id": "fetter_maple", "pos": Vector2i(74, 17), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 			# Part XIII: the heart of the Eight Gates, where Chiyou waits
 			{"id": "chiyou", "pos": Vector2i(50, 30), "lv": 53, "req": 53, "vis": ["s_p13_chiyou", ""]},
+			# Part XXVII: the Heavenly King with the pagoda on his palm, on the height above the gorge
+			{"id": "li_jing", "pos": Vector2i.ZERO, "lv": 96, "req": 95, "vis": ["s_p27_tiles", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
 		"warband": {"pool": [["fetter_sapling", 51, 53], ["jiuli_warrior", 51, 53], ["banner_ember", 51, 53], ["bronze_brow", 51, 53], ["zhuolu_fog", 51, 53]], "n": 8, "vis": "s_p13_home"},
-		"pickups": [{"id": "slant1", "item": "soul_lantern", "pos": Vector2i(22, 12)}, {"id": "slant2", "item": "soul_lantern", "pos": Vector2i(40, 46)}, {"id": "slant3", "item": "soul_lantern", "pos": Vector2i(64, 30)}, {"id": "slant4", "item": "soul_lantern", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "slant1", "item": "soul_lantern", "pos": Vector2i(22, 12)}, {"id": "slant2", "item": "soul_lantern", "pos": Vector2i(40, 46)}, {"id": "slant3", "item": "soul_lantern", "pos": Vector2i(64, 30)}, {"id": "slant4", "item": "soul_lantern", "pos": Vector2i(76, 10)},
+			# Part XXVII: tiles worked loose from a pagoda that has not been set down in three thousand years
+			{"id": "p27_tile1", "item": "pagoda_tile", "pos": Vector2i.ZERO, "vis": ["s_p27_held", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p27_tile2", "item": "pagoda_tile", "pos": Vector2i.ZERO, "vis": ["s_p27_held", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p27_tile3", "item": "pagoda_tile", "pos": Vector2i.ZERO, "vis": ["s_p27_held", ""], "late": true, "peak": 1, "stand": "top"}, {"id": "p27_tile4", "item": "pagoda_tile", "pos": Vector2i.ZERO, "vis": ["s_p27_held", ""], "late": true, "peak": 2, "stand": "flank"}],
 		"pickup_vis": "s_mp_collect",
 	},
 	"karst": {
@@ -1730,6 +1767,8 @@ const AREAS := {
 		"warband": {"pool": [["stone_bat", 73, 74], ["karst_crawler", 73, 74], ["kept_voice", 73, 74]], "n": 15, "vis": "s_p20_tea", "late": true},
 		# Part XXII: what keeps the path clear for whoever the Mountain Spirit is waiting for
 		"warband2": {"pool": [["red_leopard", 79, 80], ["fig_creeper", 79, 80], ["rain_gibbon", 79, 80]], "n": 16, "vis": "s_p22_lian", "late": true},
+		# Part XXVII: ten thousand scrolls that were read and never carried, loose among the towers
+		"warband5": {"pool": [["loose_scroll", 95, 95], ["ivory_tag", 95, 95], ["book_worm", 95, 95]], "n": 16, "vis": "s_p27_reap", "late": true},
 		"n": "Stone Forest of the Nine Bends", "w": 96, "h": 58, "seed": 241, "theme": "karst", "enemies": 20,
 		"pool": [["river_carp", 30, 31], ["stone_macaque", 30, 31], ["mist_heron", 30, 31]],
 		"portals": [
@@ -1738,7 +1777,9 @@ const AREAS := {
 		],
 		"npcs": [{"id": "fisher", "n": "Cormorant Fisher Old Yu", "pos": Vector2i(10, 26), "col": Color("a0b0a0"), "vis": ["s_kr_intro", ""]},
 			# Part XXII: the scholar who went up to see the view, and saw it (he is carried down; after that he is by the water)
-			{"id": "han_yu", "n": "Han Yu, Who Cannot Get Down", "pos": Vector2i.ZERO, "col": Color("3a4a6a"), "vis": ["s_p22_anglers", "s_p22_down"], "late": true, "peak": 0, "stand": "top"}],
+			{"id": "han_yu", "n": "Han Yu, Who Cannot Get Down", "pos": Vector2i.ZERO, "col": Color("3a4a6a"), "vis": ["s_p22_anglers", "s_p22_down"], "late": true, "peak": 0, "stand": "top"},
+			# Part XXVII: the Chan master of Guizong, sweeping his own yard below the towers
+			{"id": "zhichang", "n": "Chan Master Zhichang", "pos": Vector2i.ZERO, "col": Color("7a7a78"), "vis": ["s_p27_smith", ""], "late": true, "peak": 1, "stand": "foot"}],
 		"bosses": [
 			{"id": "cormorant_king", "pos": Vector2i(30, 40), "lv": 30, "req": 30},
 			{"id": "karst_jiao", "pos": Vector2i(46, 16), "lv": 31, "req": 31},
@@ -1747,7 +1788,9 @@ const AREAS := {
 			# Part XX: the Penumbra, at the back of the Cave of Ten Thousand Echoes
 			{"id": "wangliang", "pos": Vector2i.ZERO, "lv": 74, "req": 73, "vis": ["s_p20_karst", ""], "late": true, "cave": -1, "stand": "deep"},
 			# Part XXII: the Mountain Spirit of the Nine Songs, in the thick of her own cloud
-			{"id": "shan_gui", "pos": Vector2i.ZERO, "lv": 80, "req": 79, "vis": ["s_p22_down", ""], "late": true, "peak": 0, "stand": "top"}
+			{"id": "shan_gui", "pos": Vector2i.ZERO, "lv": 80, "req": 79, "vis": ["s_p22_down", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXVII: everything a prefect read, gone down into the Cave of Ten Thousand Echoes to be said over
+			{"id": "wan_juan", "pos": Vector2i.ZERO, "lv": 95, "req": 94, "vis": ["s_p27_cases", ""], "late": true, "cave": -1, "stand": "mid", "last": true}
 		],
 		"pickups": [{"id": "mpearl1", "item": "memory_pearl", "pos": Vector2i(22, 12)}, {"id": "mpearl2", "item": "memory_pearl", "pos": Vector2i(40, 46)}, {"id": "mpearl3", "item": "memory_pearl", "pos": Vector2i(64, 30)}, {"id": "mpearl4", "item": "memory_pearl", "pos": Vector2i(76, 10)},
 			# Part XX: Xu Xiake's rubbings, in the Cave of Ten Thousand Echoes
@@ -1756,6 +1799,10 @@ const AREAS := {
 			{"id": "p22_letter1", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_letter2", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "p22_letter3", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_letter4", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "flank"},
 			{"id": "p22_letter5", "item": "thrown_letter", "pos": Vector2i.ZERO, "vis": ["s_p22_han", ""], "late": true, "peak": 0, "stand": "flank"},
+			# Part XXVII: the cases the ten thousand scrolls came out of, left on the towers
+			{"id": "p27_case1", "item": "scroll_case", "pos": Vector2i.ZERO, "vis": ["s_p27_scrolls", ""], "late": true, "peak": 1, "stand": "flank"}, {"id": "p27_case2", "item": "scroll_case", "pos": Vector2i.ZERO, "vis": ["s_p27_scrolls", ""], "late": true, "peak": 1, "stand": "top"},
+			{"id": "p27_case3", "item": "scroll_case", "pos": Vector2i.ZERO, "vis": ["s_p27_scrolls", ""], "late": true, "peak": 2, "stand": "flank"}, {"id": "p27_case4", "item": "scroll_case", "pos": Vector2i.ZERO, "vis": ["s_p27_scrolls", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p27_case5", "item": "scroll_case", "pos": Vector2i.ZERO, "vis": ["s_p27_scrolls", ""], "late": true, "peak": 1, "stand": "flank"},
 		],
 		"pickup_vis": "s_kr_collect",
 	},
@@ -1981,6 +2028,8 @@ const AREAS := {
 		"warband": {"pool": [["idle_shuttle", 70, 71], ["treadle_imp", 70, 71], ["paper_servant", 70, 71]], "n": 16, "vis": "s_p19_heart", "late": true},
 		# Part XXII: what has been calling the woodcutters by name
 		"warband2": {"pool": [["salt_thief", 78, 79], ["false_echo", 78, 79], ["fire_crab", 78, 79]], "n": 15, "vis": "s_p22_ziqi", "late": true},
+		# Part XXVII: what comes of ease, settled on the woods where a governor carries bricks
+		"warband5": {"pool": [["ease_moth", 93, 93], ["sedan_shade", 93, 93], ["waste_golem", 93, 93]], "n": 16, "vis": "s_p27_fell", "late": true},
 		"n": "Mulberry Silk Woods", "w": 96, "h": 58, "seed": 291, "theme": "silk", "enemies": 20,
 		"pool": [["silkworm", 34, 34], ["silk_moth", 34, 34], ["cocoon_wraith", 34, 34]],
 		"portals": [
@@ -1989,7 +2038,9 @@ const AREAS := {
 		],
 		"npcs": [{"id": "can_niang", "n": "Silk Farmer Can Niang", "pos": Vector2i(9, 25), "col": Color("e8d8b0"), "vis": ["s_sk_intro", ""]},
 			# Part XXII: the woodcutter who hears what is meant, at the foot of the mulberry heights
-			{"id": "zhong_ziqi", "n": "Zhong Ziqi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("6a5a3a"), "vis": ["s_p22_leap", ""], "late": true, "peak": 0, "stand": "foot"}],
+			{"id": "zhong_ziqi", "n": "Zhong Ziqi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("6a5a3a"), "vis": ["s_p22_leap", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXVII: the governor who carries a hundred bricks out of his study every morning
+			{"id": "tao_kan", "n": "Tao Kan, Who Carries Bricks", "pos": Vector2i.ZERO, "col": Color("3e5a48"), "vis": ["s_p27_home", ""], "late": true, "peak": 2, "stand": "foot"}],
 		"bosses": [
 			{"id": "silkworm_queen", "pos": Vector2i(30, 40), "lv": 34, "req": 34},
 			{"id": "moth_empress", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
@@ -2003,7 +2054,11 @@ const AREAS := {
 		"pickups": [{"id": "cocoon1", "item": "cocoon", "pos": Vector2i(22, 12)}, {"id": "cocoon2", "item": "cocoon", "pos": Vector2i(40, 46)}, {"id": "cocoon3", "item": "cocoon", "pos": Vector2i(64, 30)}, {"id": "cocoon4", "item": "cocoon", "pos": Vector2i(76, 10)},
 			# Part XXII: the salt of every camp on the road, carried up the heights
 			{"id": "p22_salt1", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 1, "stand": "flank"}, {"id": "p22_salt2", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 1, "stand": "foot"},
-			{"id": "p22_salt3", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p22_salt4", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 0, "stand": "foot"}],
+			{"id": "p22_salt3", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p22_salt4", "item": "salt_bag", "pos": Vector2i.ZERO, "vis": ["s_p22_thieves", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXVII: the bricks of Tao Kan's study, carried up the heights by something that thought it a joke
+			{"id": "p27_brick1", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 2, "stand": "flank"}, {"id": "p27_brick2", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 2, "stand": "top"},
+			{"id": "p27_brick3", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 3, "stand": "flank"}, {"id": "p27_brick4", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 3, "stand": "foot"},
+			{"id": "p27_brick5", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 2, "stand": "flank"}],
 		"pickup_vis": "s_sk_collect",
 		"buildings": [
 			{"id": "silk_house", "n": "Silkworm House", "style": "house", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
@@ -3852,7 +3907,7 @@ const STEPS := [
 		"t": "Somebody has been on the tops the whole time: climb to 3 hermits on their summits and ask what they have seen go by"},
 	{"id": "s_p22_steles", "kind": "hunt", "area": "mountain", "n": 24, "of": ["merit_stele", "report_smoke", "bends_serpent"],
 		"t": "The first thing up an open mountain is a row of names: knock down 24 steles, smokes and serpents of the bends on Azure Cloud Mountain"},
-	{"id": "s_p22_slips", "kind": "collect", "item": "merit_slip", "n": 5, "area": "mountain", "t": "Every king who came up left Heaven a note: dig out 5 jade slips of announcement from the rock of the two great peaks"},
+	{"id": "s_p22_slips", "kind": "collect", "item": "merit_slip", "n": 5, "area": "mountain", "t": "Every king who came up left Heaven a note: dig out 5 jade slips of announcement from the rock of the great peak and the Lookout beside it"},
 	{"id": "s_p22_long", "kind": "glide", "n": 24, "area": "mountain", "t": "Before the last climb, Master Lie's lesson to the end: forty-eight metres in one flight, leaning on nothing"},
 	{"id": "s_p22_yue", "kind": "kill", "boss": "dongyue", "area": "mountain", "t": "On Sun-Viewing Peak somebody has been receiving reports for two thousand years: climb to the Lord of the Eastern Peak", "stones": 36400},
 	{"id": "s_p22_pilgrims", "kind": "folk", "role": "pilgrim", "n": 3, "area": "mountain",
@@ -4019,6 +4074,67 @@ const STEPS := [
 	{"id": "s_p26_marks", "kind": "marks", "n": 8, "new": true, "area": "fungal", "t": "A body is known by what it does every morning, says Wu Pu: go and look at 8 more things your choices left standing"},
 	{"id": "s_p26_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The three disciples are walking again, stiffly, and complaining: tell Elder Qing Xuan what the physician said about sitting still", "stones": 50200},
 	{"id": "s_break31", "kind": "breakthrough", "to": 93, "t": "What has no thickness, entering where there is room: Room for the Blade"},
+	# ---- Part XXVII: The Cloth Sack (the Heavy Road release): a land that has forgotten what things weigh, a
+	# governor who carries bricks, an old man whose cart is taken for half a bolt of gauze, ten thousand scrolls
+	# in a head the size of a coconut, a king who cannot set a pagoda down, and a monk with a sack
+	{"id": "s_p27_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Smith Tie's forge has been cold for a week: there is no charcoal on the mountain, and nobody who can fly will carry any. Speak to Elder Qing Xuan", "stones": 50600},
+	{"id": "s_p27_tao", "kind": "talk", "npc": "tao_kan", "area": "silk", "gives": {"axe": 1},
+		"t": "In the Mulberry Silk Woods a governor of the south carries a hundred bricks out of his study every morning and in again at night: find Tao Kan below the far heights", "stones": 50800},
+	{"id": "s_p27_fell", "kind": "toil", "work": "fell", "n": 3, "area": "silk",
+		"t": "\"You have an axe. I should like to see what you do with it\": fell 3 trees at the forest's edge in the Mulberry Silk Woods (face the trees, press C)"},
+	{"id": "s_p27_timber", "kind": "haul", "good": "timber", "n": 8, "npc": "tao_kan", "area": "silk", "gives": {"pick": 1},
+		"t": "Tao Kan is raising a granary: fell 8 stems of timber (C) and carry them to him on your own back, as many at a time as you can bear"},
+	{"id": "s_p27_footing", "kind": "haul", "good": "stone_block", "n": 6, "npc": "tao_kan", "area": "silk",
+		"t": "A frame stands on something: cut 6 blocks of stone from the crags of the Silk Woods (C) and carry them to Tao Kan for footings"},
+	{"id": "s_p27_idle", "kind": "hunt", "area": "silk", "n": 32, "of": ["ease_moth", "sedan_shade", "waste_golem"],
+		"t": "What comes of ease has settled on the woods like dust on a shelf: clear 32 moths of the soft cushion, sedan-chair shades and golems of what was thrown away", "stones": 51000},
+	{"id": "s_p27_bricks", "kind": "collect", "item": "tao_brick", "n": 5, "area": "silk", "t": "Something has carried five of the governor's hundred bricks up the far heights for a joke: find 5 bricks of Tao Kan's study"},
+	{"id": "s_p27_ends", "kind": "folk", "role": "woodcutter", "n": 4, "area": "silk",
+		"t": "\"The sawdust and the butt-ends: whoever throws them away will want them by the spring\": ask 4 woodcutters of the road to keep theirs for Tao Kan"},
+	{"id": "s_p27_nails", "kind": "folk", "role": "pedlar", "n": 4, "area": "silk",
+		"t": "A butt-end of bamboo, cut so, is a nail, and there is a fleet building on the river: ask 4 pedlars of the road to carry Tao Kan's nails down to the yards"},
+	{"id": "s_p27_snow", "kind": "talk", "npc": "tao_kan", "area": "silk", "t": "The thaw has come, the yard is mud to the ankle, and the governor is standing in it looking pleased: speak to Tao Kan"},
+	{"id": "s_p27_weng", "kind": "talk", "npc": "charcoal_seller", "area": "volcano",
+		"t": "On the south slope of the Ashen Volcano an old man burns the only charcoal for a hundred li, in one thin jacket, hoping for cold weather: find the Charcoal Seller", "stones": 51400},
+	{"id": "s_p27_kiln", "kind": "haul", "good": "stone_block", "n": 4, "npc": "charcoal_seller", "area": "volcano",
+		"t": "His kiln has cracked from mouth to flue: cut 4 blocks of stone (face the rock of a height, press C) and carry them to him"},
+	{"id": "s_p27_wood", "kind": "haul", "good": "timber", "n": 8, "npc": "charcoal_seller", "area": "volcano",
+		"t": "A kiln is only a hole until there is wood in it: fell 8 stems on the slopes of the volcano and carry them to the Charcoal Seller for the burn"},
+	{"id": "s_p27_buyers", "kind": "hunt", "area": "volcano", "n": 34, "of": ["yellow_runner", "white_shirt", "gauze_ox"],
+		"t": "Two riders came up the slope with a paper, one in yellow, one in white: see off 34 runners, boys in white shirts and oxen with gauze on their horns", "stones": 51600},
+	{"id": "s_p27_gauze", "kind": "collect", "item": "red_gauze", "n": 4, "area": "volcano", "t": "Half a bolt of red gauze was the price of a thousand jin, and the wind has had it off the oxen's horns: find 4 half-bolts on the heights of the volcano"},
+	{"id": "s_p27_buyer", "kind": "kill", "boss": "palace_buyer", "area": "volcano", "t": "The old man's cart is on the height, turned north, and beside it a man in yellow is reading from a paper: go up to the Buyer in Yellow", "stones": 52000},
+	{"id": "s_p27_cart", "kind": "talk", "npc": "charcoal_seller", "area": "volcano", "gives": {"charcoal": 8},
+		"t": "The ox has turned itself south again without being told: speak to the Charcoal Seller about what was in the cart"},
+	{"id": "s_p27_smith", "kind": "haul", "good": "charcoal", "n": 8, "npc": "smith", "area": "sect",
+		"t": "Eight sacks of charcoal, two hundred jin: more than any sword will lift. Carry them on your own feet to Smith Tie on Azure Cloud Mountain", "stones": 52200},
+	{"id": "s_p27_fires", "kind": "visits", "npcs": ["granny_wen", "sarnai", "cook_aysha", "fishwife_lu", "auntie_rong", "lantern_xi"], "n": 5, "area": "village", "did": "%s has charcoal for the winter",
+		"t": "The old man's ox has come up the mountain behind you with the rest of the cart: take a sack of the south slope's charcoal to 5 of the six hearths of the land"},
+	{"id": "s_p27_chan", "kind": "talk", "npc": "zhichang", "area": "karst", "gives": {"sickle": 1},
+		"t": "Smith Tie has a ring he will not finish: \"Ask the monk under the stone towers what goes in it.\" Find Chan Master Zhichang in the Stone Forest of the Nine Bends", "stones": 52400},
+	{"id": "s_p27_reap", "kind": "toil", "work": "reap", "n": 5, "area": "karst",
+		"t": "\"Before the question, the pot\": cut 5 bundles of herbs in the open country of the Stone Forest for the temple's supper (face open ground, press C)"},
+	{"id": "s_p27_scrolls", "kind": "hunt", "area": "karst", "n": 34, "of": ["loose_scroll", "ivory_tag", "book_worm"],
+		"t": "A prefect read ten thousand scrolls and carried none, and they have got out: clear 34 scrolls that were only read, ivory tags and worms of ten thousand scrolls", "stones": 52600},
+	{"id": "s_p27_cases", "kind": "collect", "item": "scroll_case", "n": 5, "area": "karst", "t": "The cases the scrolls came out of are lying open on the towers, rattling: find 5 cases of scrolls on the heights of the Stone Forest"},
+	{"id": "s_p27_wanjuan", "kind": "kill", "boss": "wan_juan", "area": "karst", "cave": -1, "t": "Everything the prefect read has gone down into the Cave of Ten Thousand Echoes to hear itself said: go down to the Ten Thousand Scrolls", "stones": 53000},
+	{"id": "s_p27_seed", "kind": "talk", "npc": "zhichang", "area": "karst", "t": "The cave is quiet, and a prefect is sitting at its mouth with an empty case on his knees: ask Chan Master Zhichang about the mustard seed"},
+	{"id": "s_p27_budai", "kind": "talk", "npc": "budai", "area": "maple", "gives": {"fishing_rod": 1},
+		"t": "\"The seed is with a fat man who sleeps on a sack. Do not wake him; he is never asleep.\" Find the Cloth-Sack Monk in the Maple Gorge of Returning Souls", "stones": 53400},
+	{"id": "s_p27_fish", "kind": "haul", "good": "carp", "n": 5, "npc": "budai", "area": "maple",
+		"t": "\"Today there are children and no fish\": catch 5 carp in the waters of the Maple Gorge (face the water, press C) and bring them to Budai"},
+	{"id": "s_p27_anglers", "kind": "folk", "role": "angler", "n": 4, "area": "maple",
+		"t": "Five carp is one supper: ask 4 anglers of the road to show the children of the gorge how a line is cast, so that there is a supper after it"},
+	{"id": "s_p27_held", "kind": "hunt", "area": "maple", "n": 30, "of": ["clenched_fist", "old_grudge", "heirloom_crab"],
+		"t": "What was never set down is coming down the gorge: get through 30 fists that will not open, grudges carried thirty years and crabs with the family chest", "stones": 53600},
+	{"id": "s_p27_tiles", "kind": "collect", "item": "pagoda_tile", "n": 4, "area": "maple", "t": "Glazed tiles keep falling out of a clear sky on the heights of the gorge, warm on one side: find 4 tiles of the pagoda"},
+	{"id": "s_p27_king", "kind": "kill", "boss": "li_jing", "area": "maple", "t": "On the height above the gorge a king of heaven has stood three thousand years with a pagoda on his palm: go up to Li Jing", "stones": 53800},
+	{"id": "s_p27_sack", "kind": "talk", "npc": "budai", "area": "maple", "gives": {"mustard_ring": 1},
+		"t": "The pagoda is standing on a rock by itself, and the king is flexing his fingers: speak to Budai, who has put his sack down"},
+	{"id": "s_p27_marks", "kind": "marks", "n": 6, "new": true, "area": "maple",
+		"t": "\"You know what each of them weighed. Go and see where you set them down\": go and look at 6 more things your choices left standing"},
+	{"id": "s_p27_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The forge is lit, and Smith Tie is asking what became of his ring: tell Elder Qing Xuan what things weigh", "stones": 54200},
+	{"id": "s_break32", "kind": "breakthrough", "to": 96, "t": "Mount Sumeru put into a mustard seed, and neither the worse for it: Sumeru in a Seed"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -4226,6 +4342,24 @@ const ITEMS := {
 	"frolic_tablet": {"n": "Tablet of the Five Frolics", "desc": "A flat stone with a figure cut into it in five strokes: a tiger crouched to spring, a deer looking back, a bear swaying, an ape reaching or a bird with its wings up. Hua Tuo left one of each where the climb to it would be the first lesson"},
 	"whetstone": {"n": "Cook Ding's Whetstone", "desc": "A grey stone of the river Luo, hollowed in the middle by somebody else's knife long before Cook Ding was born. He has not touched it in nineteen years. He keeps four, out of politeness to the stones"},
 	"silver_needle": {"n": "Silver Needle of Hua Tuo", "desc": "A needle of silver as long as a finger, with a coil of fine wire for a handle. The guard who took it at the gate was afraid of it, and right to be: it goes in at five places, and a headache of twenty years goes out at a sixth"},
+	# ---- the Heavy Road release: what is carried with, what the hands work with, and what the land gives (load.gd, toil.gd)
+	"axe": {"n": "Felling Axe", "desc": "A long haft of ash and a bearded head with the edge kept bright. Facing the forest's edge, C fells a tree with it, and a stem of timber goes on the back: thirty jin"},
+	"fishing_rod": {"n": "Fishing Rod", "desc": "Three joints of bamboo, a line of twisted silk, a float cut from a reed and a hook that somebody has sharpened with love. Facing water, C casts it, and two times in three there is a carp"},
+	"pick": {"n": "Quarryman's Pick", "desc": "A pick with one point and one flat, for finding the bed of a stone and working along it. Facing the rock of a crag, C cuts a dressed block with it, forty-five jin; facing the wall of a cave, a lump of ore"},
+	"sickle": {"n": "Sickle", "desc": "A crescent of iron on a short handle, the inside of the curve toothed like a saw. Facing open ground out in the country, C cuts a bundle of herbs with it"},
+	"pack_frame": {"n": "Pack-Frame", "desc": "Two uprights of old bamboo, three rungs, a shelf and two straps of plaited hemp, made by somebody who carries for a living. Forty jin more can be borne on it than on a bare back, and it weighs nothing that anybody notices"},
+	"qiankun_pouch": {"n": "Pouch of Heaven and Earth", "desc": "A pouch the size of a fist with no bottom that a hand can find. Three hundred jin go into it and weigh thirty. The pedlars of the road sew one only for somebody who has carried enough on his own back to know what it is for, and only once his spirit can open it"},
+	"mustard_ring": {"n": "Mustard-Seed Ring", "desc": "A ring of grey iron with a single seed set in it where a stone should be. Mount Sumeru can be put into a mustard seed, says the sutra, and neither is the worse for it. Everything he has goes into it and weighs nothing, and it was not given to him until he had stopped needing it"},
+	"timber": {"n": "Stem of Timber", "desc": "The trunk of a tree of the forest's edge, trimmed of its branches: bamboo, pine or whatever grows there. Thirty jin on the shoulder, and longer than is convenient in a doorway"},
+	"stone_block": {"n": "Block of Dressed Stone", "desc": "A block cut from the bed of a crag, almost square, with the marks of the pick on five faces. Forty-five jin. Walls are made of these, and backs are unmade by them"},
+	"ore_lump": {"n": "Lump of Ore", "desc": "A lump broken out of a cave wall, heavy for its size and dull red where it is scratched. Twenty jin. A smith will know what it is"},
+	"carp": {"n": "Carp", "desc": "A river carp as long as a forearm, strung through the gills on a twist of grass. Three jin, and good for one day"},
+	"herb_bundle": {"n": "Bundle of Herbs", "desc": "Plantain, mugwort and whatever else grows low in open country, tied with a stem of its own grass. A jin, if it has rained"},
+	"charcoal": {"n": "Sack of Charcoal", "desc": "A sack of charcoal burned on the south slope of the mountain, each stick still ringing when it is knocked. Twenty-five jin, and the black of it comes through the cloth onto whoever carries it"},
+	"tao_brick": {"n": "Brick of Tao Kan's Study", "desc": "A grey brick with one corner worn round by a hand. A governor of the south carried a hundred of these out of his study every morning and in again every evening for years, so that ease should not unfit him for work. Twelve jin"},
+	"red_gauze": {"n": "Half a Bolt of Red Gauze", "desc": "Half a bolt of thin red silk and ten feet of damask, of the kind the palace buyers tie to an ox's horn as the price of whatever is in the cart. It has never been worth a thousand jin of anything"},
+	"scroll_case": {"n": "Case of Scrolls", "desc": "A lacquered case of the ten thousand scrolls a prefect of Jiangzhou read, each with its ribbon and its ivory tag. Three jin, and it rattles as if most of what was in it had been left behind in his head"},
+	"pagoda_tile": {"n": "Tile of the Pagoda", "desc": "A glazed tile off the roof of a pagoda small enough to stand on a palm, warm on one side. The Heavenly King who carries the pagoda has not set it down in three thousand years, and the tiles work loose"},
 	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
 	"thunder_cracker": {"n": "Thunder-Bamboo Crackers", "desc": "Alchemist Mo's string of crackers: two stalks of thunder bamboo packed with fire essence. A hundred bangs in a row, loud enough to drive a night off"},
@@ -4388,10 +4522,27 @@ const CHAT := {
 		"People think accounts are about money. Accounts are about who can look whom in the eye. I have never lost a copper, and I have burned a fortune, and I should be hard put to say which made the better books.",
 		"My lord kept three thousand at his table and could not have told you the names of thirty. You know the name of every dog in Guiyun. I do not say it is better. I say it is the size a person can answer for.",
 		"A cunning hare has three burrows and may at last lie down. I told my lord that. I did not tell him the rest: that the hare digs them all itself, and that nobody has ever seen one lie down."],
+	# ---- Part XXVII (the Heavy Road release)
+	"tao_kan": ["A hundred out in the morning and a hundred in at night. People ask what the bricks are for. They are not for anything. I am for something, and the bricks keep me fit for it.",
+		"The sage-king Yu grudged an inch of the shadow on the dial. Ordinary people like us should grudge a tenth of an inch. I say that to my clerks, and take their dice away, and throw the dice in the river.",
+		"I was a clerk at a fish-weir once, and sent my mother a jar of the pickled fish. She sent it back sealed. You are an officer, she wrote, and you send me what is the government's. I have counted every nail since.",
+		"Nothing that has been carried is ever wasted. The weight goes into the back and stays there. It is the one tax that is paid to the payer."],
+	"charcoal_seller": ["What do I get for the charcoal? The clothes on my back and the food in my mouth. Look at the clothes. Now you know about the food.",
+		"A thin jacket, and I pray for snow. That is the trade. When it is cold they buy; when it is warm I am only an old man with black hands.",
+		"I cut on the south slope and burn on the south slope, and take the cart down at night so as to be at the gate when it opens. The ox knows the ruts. I sleep the last ten li.",
+		"My fingers have been black for forty years. My wife said she could find me in the dark by the smell of smoke. She said it as if it were a good thing, and so it was."],
+	"zhichang": ["Guizong is a small temple. One hall, one bell, one pot. People come up to ask me large questions, and I put a broom in their hands, and most of them go away again.",
+		"A prefect asked me how Sumeru goes into a mustard seed. I asked him where he kept ten thousand scrolls. He was angry for a year and came back to sweep. He is not a bad sweeper.",
+		"You carry a great deal for a young person, and none of it on your back that I can see. That is the kind that is heaviest. Sit. No, not there, that is the cat's.",
+		"The ring? Smith Tie makes a good ring. He does not know what goes in the place for the stone. Neither do I. I know who is sitting on it."],
+	"budai": ["Hah! A coin? A fish? A sandal with no fellow? Anything. Into the sack. Everything is good for something, and I have not yet found what a sandal with no fellow is good for, so I keep it.",
+		"The children pull the sack open and climb inside. There is always room. I do not know how. I have never looked. If I looked there might not be.",
+		"They ask: monk, what is the teaching? I put the sack down. They ask: and after that? I pick it up and go. They write it in books. It is only what my back wanted.",
+		"I sleep in the snow and wake dry. I wear straw sandals before rain and wooden clogs before drought. People think it is a wonder. I only ask my feet."],
 	"hua_tuo": ["Move, and the food is digested and the blood goes round, and sickness has nowhere to settle. A door-hinge that turns is never eaten by worms. That is the whole of my art. The knife is only for when nobody listened.",
 		"I learned the powder from a drunkard who fell in a fire and did not wake. I asked myself what was in his jar. Most of medicine is asking that of something nobody else will look at.",
 		"The frolics are not for the strong. The strong will run up a hill anyway. They are for the grandmother who has stopped going to the well. Five minutes of the bear, and she is going to the well.",
-		"Do not sit so long, cultivator. I have seen your Hall of Stillness. Nine hundred years of a door that nobody opens. I was not rude to your Elder. I was counting the worms."],
+		"Do not sit so long, cultivator. I have seen your Hall of Stillness. Three hundred years of a door that nobody opens. I was not rude to your Elder. I was counting the worms."],
 	"wu_pu": ["Ninety-one this spring, and I can still bite through a walnut. People ask the secret. I show them the bear. They go away disappointed. The ones who come back the next morning are the ones who live.",
 		"The master said: when the body is heavy, do one beast until you sweat. Then wash and powder yourself, and you will be light, and want your dinner. I have never once not wanted my dinner.",
 		"The tiger is for the spine, the deer for the waist, the bear for the belly, the ape for the feet and the bird for the arms. I do not know if that is true. It is what he told me, and I am ninety-one."],
@@ -4775,7 +4926,7 @@ const DIALOGUE := {
 		["Yue Ling", "I remember little before three winters ago, when I woke beside a lotus pond with only my name. Healing is the one thing my hands never forgot."],
 		["Yue Ling", "The bamboo grove is wailing. Something ancient has been twisted by demonic qi."],
 		["Lin Feng", "Then let us calm it together."],
-		["Yue Ling", "Yue Ling joins your party. Her Spring Rain mends the wounded."],
+		["Narrator", "Yue Ling joins Lin Feng. Her Spring Rain mends the wounded."],
 	],
 	"pre:bamboo_spirit": [
 		["Bamboo Spirit", "Shhhhh... the roots remember the red moon... they command me to crush you..."],
@@ -8529,7 +8680,7 @@ const DIALOGUE := {
 		["Lin Feng", "They want to enter the sect?"],
 		["Elder Qing Xuan", "They want to live near you, which is not the same and is a great deal more trouble. A sect may shut its gate. Somebody people have made up their minds to trust has no gate to shut. Where Shun ploughed, says the old book, in a year there was a hamlet, in two a town, in three a capital. Nobody asked Shun.", "think"],
 		["Yue Ling", "They cannot winter on a road. The first snow comes down that slope like a door."],
-		["Elder Qing Xuan", "No. The east shoulder of the mountain is ours by a deed nine hundred years old, and nothing has ever been done with it but look at it. I am giving it to you. Not to the sect: to you, so that when it goes wrong it is yours. That is all that owning a thing has ever meant.", "nod"],
+		["Elder Qing Xuan", "No. The east shoulder of the mountain is ours by a deed three hundred years old, and nothing has ever been done with it but look at it. I am giving it to you. Not to the sect: to you, so that when it goes wrong it is yours. That is all that owning a thing has ever meant.", "nod"],
 		["Elder Qing Xuan", "There is a man sitting on it already. He came up a month ago, asked for nothing, and has been singing to his sword. I think he is a steward in want of a house. Go and see whether you are one."],
 	],
 	"s_p25_feng": [
@@ -8701,12 +8852,230 @@ const DIALOGUE := {
 		["Narrator", "The tribulation comes down on the mountain and cannot find the middle of Lin Feng. There is a town where the middle used to be, and a gate, and a room with brooms in it. It strikes the pine, which has been struck before and does not mind. In the morning a cock crows at Guiyun, and then a man, and the gate opens."],
 	],
 	# ---- Part XXVI: The Five Frolics (the Underclothes release)
+	# ---- Part XXVII: The Cloth Sack (the Heavy Road release)
+	"recall25": [
+		["Narrator", "The summer after the physician went north, Azure Cloud Mountain is busier than it has ever been, and lighter. Everybody on it who has reached the Golden Core flies. Nobody has walked the nine hundred and ninety-nine steps with anything in his hands since the spring."],
+		["Narrator", "In the autumn Smith Tie's forge goes out. There is no charcoal. There is charcoal a hundred li south, as there has always been; there is nobody to carry it. A flying sword lifts its rider and his robe. It has never lifted a sack."],
+	],
+	"s_p27_home": [
+		["Elder Qing Xuan", "The forge has been cold a week. I asked forty disciples to bring charcoal. Forty disciples told me, very politely, that a sword will not lift it. They are right. I asked them to walk. They looked at me as if I had asked them to grow gills.", "grieve"],
+		["Lin Feng", "I carried water up those steps for three years. Two buckets. Nobody thought it worth remarking."],
+		["Elder Qing Xuan", "You were a sweeper. It was not remarked because it was beneath remark, and that was my fault as much as anybody's. We have made a mountain of people who can put the sky in a sleeve and cannot say what a bucket weighs.", "think"],
+		["Yue Ling", "There is a governor in the Silk Woods who carries bricks. A hundred out of his study every morning and a hundred back at night. The woodcutters think he is mad. They also say his granary is the only full one in the south."],
+		["Elder Qing Xuan", "Tao Kan. Go and carry something for him, child, and come back and tell me what it weighed. And while you are about it: Smith Tie has a ring on his bench he will not finish. He says there is nothing to put in it yet. Find out what he means."],
+	],
+	"s_p27_tao": [
+		["Narrator", "Below the far heights of the Mulberry Silk Woods there is a yard, a study with its door open, and a path between them worn a hand deep. A broad old man in a green robe with the sleeves tied back is walking it with two bricks under each arm. He does not stop."],
+		["Tao Kan, Who Carries Bricks", "Ninety-six. Do not speak to me until a hundred; I lose count, and then I must begin again, and I am sixty-one. ...A hundred. Now. You are the one who put the sky back. You flew here, I suppose.", "nod"],
+		["Lin Feng", "I flew here."],
+		["Tao Kan, Who Carries Bricks", "So does everybody. I mean to give my strength to the Central Plain before I die, and a man who has sat easy for a year is not fit to lift a writing-brush, never mind a province. So: bricks. Take this axe. I am raising a granary. Show me you can fell a tree without your sword doing it for you.", "offer"],
+		["Yue Ling", "He has given you an axe and an insult, in that order. I like him."],
+	],
+	"done:s_p27_fell": [
+		["Narrator", "Three trees down along the forest's edge, the third a good deal cleaner than the first. The stems are trimmed and on Lin Feng's shoulder before he has thought about it, and then he does think about it: ninety jin, and the yard is a long way off."],
+		["Tao Kan, Who Carries Bricks", "You stood too close to the first, and you know it. Good. Eight stems I need for the frame. Bring them as you can carry them. If you bring them all at once I shall know you are showing off, and if you bring them one at a time I shall know you are lazy."],
+	],
+	"haul:s_p27_timber": [
+		["Tao Kan, Who Carries Bricks", "Lay them there, butts to the east. Do not drop them. A dropped stem is a split stem."],
+		["Tao Kan, Who Carries Bricks", "Your shoulder is red. Change shoulders. Nobody ever tells the young to change shoulders."],
+		["Tao Kan, Who Carries Bricks", "Slower than flying, is it not. You saw the woods this time, I expect. Most people have not seen them since they learned to go over them."],
+	],
+	"done:s_p27_timber": [
+		["Narrator", "Eight stems lie in the yard with their butts to the east. Lin Feng's robe is dark between the shoulders, and Yue Ling has pine resin in her hair and has not yet been told. Tao Kan walks down the row and puts his palm flat on each, as a man counts his children."],
+		["Tao Kan, Who Carries Bricks", "That is a frame. It is also the first thing that has come into this yard on a cultivator's back in my lifetime. A frame stands on something. Here is a pick: six blocks, from the crag, each on its bed. Stone is heavier than wood, and you will find it is more honest."],
+	],
+	"haul:s_p27_footing": [
+		["Tao Kan, Who Carries Bricks", "At the corner, and the next a pace along. Do not slide it. Lift it and set it. A footing that was slid remembers."],
+		["Tao Kan, Who Carries Bricks", "You are breathing through your mouth. Good. A man who has never been out of breath has never been of use to anybody."],
+	],
+	"done:s_p27_footing": [
+		["Narrator", "Six blocks stand in two rows of three, and the eight stems go up on them by evening with the help of the yamen's clerks, who have never lifted anything heavier than a seal and say so repeatedly. Tao Kan sights along the ridge-pole with one eye shut."],
+		["Tao Kan, Who Carries Bricks", "It will hold grain for four hundred households, and I did not carry one piece of it. That is new, and I do not altogether like it. Now clear my woods. Something has moved in since everybody stopped walking through them, and it is not woodcutters."],
+	],
+	"done:s_p27_idle": [
+		["Narrator", "The last sedan-chair shade sets itself down with a sigh, since there is nobody left to carry it, and comes apart like a paper lantern in rain. The moths go up off the cushions of the whole south in one grey cloud, and the wind has them."],
+		["Yue Ling", "They were not wicked. They were only what gathers on anything that is not used. I have seen the same on a loom."],
+	],
+	"done:s_p27_bricks": [
+		["Narrator", "Five grey bricks, each with one corner worn round by the same hand. They are twelve jin apiece and feel like more; forty years of mornings have gone into them. Lin Feng carries them down the height in his arms, like something that might wake."],
+	],
+	"done:s_p27_ends": [
+		["Narrator", "Four woodcutters of the road agree to keep what they have always thrown on the fire: the sawdust in sacks, the butt-ends of the bamboo in a heap by the door. None of them can say what a governor wants with it. All of them have noticed that his granary is full."],
+	],
+	"done:s_p27_nails": [
+		["Narrator", "Four pedlars of the road shoulder a sack each of bamboo butts cut to a point, and go off down the river road bent a little further than usual. A pedlar carries a whole street on one shoulder as it is. None of them asks to be paid for the other."],
+	],
+	"s_p27_snow": [
+		["Narrator", "The thaw has come in a night. The yard below the heights is mud to the ankle, and across it, from the gate to the study door, runs a dry yellow path a pace wide. Tao Kan is standing on it. It is sawdust."],
+		["Tao Kan, Who Carries Bricks", "Every clerk in the yamen laughed when I had it stored. Now they walk on it to their desks with dry feet and say nothing. And the butt-ends of the bamboo: there is a fleet building on the river, and they are short of nails. A bamboo butt, cut so, is a nail.", "laugh"],
+		["Lin Feng", "You did not know that when you kept them."],
+		["Tao Kan, Who Carries Bricks", "I knew that a thing has weight, and that whatever has weight has a use, and that whoever has never carried it will not find the use. That is all I have ever known. It has been enough for a province.", "nod"],
+		["Tao Kan, Who Carries Bricks", "You want charcoal for your mountain. There is one man burning it for a hundred li, on the south slope of the volcano, and he is old, and nobody helps him because nobody walks there. Go and be of use. Take your axe.", "point"],
+	],
+	"s_p27_weng": [
+		["Narrator", "On the south slope of the Ashen Volcano there is a hump of clay with smoke coming out of the wrong end of it, and an old man on his knees looking into the crack. His face is the colour of ash. His ten fingers are black. He is wearing one thin jacket, and it is snowing."],
+		["The Charcoal Seller", "Cracked from the mouth to the flue. Forty years she has burned for me. ...You are cultivators. You will have come about the smoke. I am sorry for the smoke.", "grieve"],
+		["Yue Ling", "We have come about the charcoal. And you are shaking. Lin Feng, give him your cloak. No: he will not take it. Give it to me, and I will make him."],
+		["The Charcoal Seller", "Charcoal? There is none. A kiln is stone before it is anything, and I cannot lift stone any more. You have a pick on your back, I see. I found the bed of the stone up on the crag in my father's time. If a person could cut four blocks and bring them down...", "point"],
+		["Lin Feng", "A person could."],
+	],
+	"haul:s_p27_kiln": [
+		["The Charcoal Seller", "Here, against the crack. Set it on its bed, the way it lay in the hill. Stone remembers which way up it was."],
+		["The Charcoal Seller", "Forty-five jin, and you carried it down a crag. I carried those when I was your age. I did not think then that it was the best I would ever be."],
+	],
+	"done:s_p27_kiln": [
+		["Narrator", "Four blocks are set in the crack and packed with wet clay, and the old man lays his black hand on the kiln's side and listens, as to a chest. Yue Ling has got him into the cloak after all, by the simple means of putting it on him while he was listening."],
+		["The Charcoal Seller", "She will hold. Now she wants feeding. Eight stems for a burn; green oak if there is any, anything if there is not. I would cut them. I would have cut them yesterday."],
+	],
+	"haul:s_p27_wood": [
+		["The Charcoal Seller", "On end, in a ring, the thick ones in the middle. Leave a hand's width. Fire wants to breathe a little and not much, like a sleeper."],
+		["The Charcoal Seller", "Good wood. You cut it low. People cut high because it is easier on the back, and leave the best of the tree in the ground."],
+	],
+	"done:s_p27_wood": [
+		["Narrator", "The kiln is stacked and sealed and lit from the top. For a night and a day it burns without flame, and the old man does not sleep; he walks round it with a wet finger held up, reading the smoke. On the second morning he breaks the door, and what comes out rings like a bell when it is knocked."],
+		["Narrator", "A thousand jin and more, loaded on the cart by dark. He is harnessing the ox when two riders come up the slope out of the south, one in yellow, one in a white shirt, with a paper held up between them like a lantern."],
+	],
+	"done:s_p27_buyers": [
+		["Narrator", "The last boy in a white shirt runs for his horse and cannot find it; the oxen with gauze on their horns stand about on the slope looking embarrassed. The cart is gone from the kiln. The ruts go up, not down: north, towards the height."],
+		["The Charcoal Seller", "By order, they said. They read it out. I cannot read. A cart of charcoal, a thousand jin and more, and they turned the ox and shouted it north, and tied this to its horn. Half a bolt of red gauze. That is the price. It says so on the paper.", "grieve"],
+	],
+	"done:s_p27_gauze": [
+		["Narrator", "Four half-bolts of thin red silk, off four oxen's horns, each with ten feet of damask folded in it. Together they would not buy the wood that went into the kiln. Lin Feng rolls them tight and carries them up the height in one hand. They weigh nothing at all, which is the whole of the matter."],
+	],
+	"pre:palace_buyer": [
+		["Narrator", "On the height the cart stands with its shafts pointing north. Beside it a smooth man in imperial yellow is reading a paper aloud to nobody, in a pleasant voice, and tying something red to the ox's horn. The ox is looking south."],
+		["The Buyer in Yellow, by Order", "By order. A cart of charcoal, to the palace market, at the price set. The price is here. It is a generous price; I set it myself. Who are you, and what is that in your hand?", "point"],
+		["Lin Feng", "The price. Four times over. I have come to give it back."],
+		["The Buyer in Yellow, by Order", "One does not give it back. That is the beauty of the thing. Everything is paid for, and nothing is bought. I have never carried anything in my life, young man, and I own a great deal.", "laugh"],
+	],
+	"post:palace_buyer": [
+		["Narrator", "The Buyer in Yellow sits down on the ground, which he has never done, with his paper in his lap. He tries to lift one sack off the cart to see what he has been buying for thirty years. He cannot move it. He looks at the old man, who is half his size, for a long time."],
+		["The Buyer in Yellow, by Order", "A thousand jin. He cut it and burned it and loaded it. And I... tied a ribbon to it. I think I should like to walk back. I do not know the way. I have never needed to know it.", "grieve"],
+	],
+	"s_p27_cart": [
+		["Narrator", "The ox has turned the cart south by itself and is waiting. The old man walks round the load twice, counting sacks with a black finger, and then takes eight down, one at a time, and sets them at Lin Feng's feet."],
+		["The Charcoal Seller", "For your smith. Do not tell me a price. You mended her, and you fed her, and you went up the hill for the cart. I have been paid by the palace and I have been paid by you, and I know which of them I could lift.", "offer"],
+		["Lin Feng", "Two hundred jin. No sword will lift that. It is a long way to Azure Cloud Mountain on foot."],
+		["The Charcoal Seller", "It is. I do it every market day, and I am seventy. The ox and I will come up behind you with the rest, slowly. You will smell of smoke for a week. Somebody told me once it was a good smell.", "laugh"],
+	],
+	"haul:s_p27_smith": [
+		["Smith Tie", "Charcoal. South-slope charcoal, and it rings. Put it by the bellows. ...You carried this. On your back. Up the steps."],
+	],
+	"done:s_p27_smith": [
+		["Narrator", "Smith Tie has the forge lit before the eighth sack is down. He does not say thank you; he puts a hand on Lin Feng's shoulder where the strap has been, presses once, and nods, as one tradesman to another. Then he takes a ring of grey iron off the bench and turns it in the light."],
+		["Smith Tie", "A ring to hold what a person owns. The disciples all want one. I have made the band a dozen times and thrown it back. There is a seat here for a stone, and nothing I put in it will stay. Ask the monk under the stone towers. He sent me the iron.", "think"],
+	],
+	"visit:s_p27_fires:granny_wen": [
+		["Granny Wen the Midwife", "Charcoal? For me? I have burned rice-straw for seventy years and coughed for sixty. ...It rings. Listen to that. Sit down, child, you are black to the elbows. No: wash first, then sit. Then eat."]],
+	"visit:s_p27_fires:sarnai": [
+		["Grandmother Sarnai", "We burn argal, valley sweeper, and it is good enough for the Sky. But the smith's fire wants this, for the bits and the stirrups, and he has been grumbling since the first snow. Put it by the door-flap. Not there. There."]],
+	"visit:s_p27_fires:cook_aysha": [
+		["Auntie Aysha of the Caravanserai", "Wood-charcoal, in the sand! Do you know what a camel-load of this costs at Shazhou? And you walked it here on your back like a hired man. Sit, hired man. The bread is hot, and for once so is the oven."]],
+	"visit:s_p27_fires:fishwife_lu": [
+		["Fishwife Lu", "For the smoke-house? Driftwood makes the fish taste of the river, and I will not hear a word against it. ...But for the lamp under the pot on a wet night, yes. Yes. Leave it. And take an eel; nobody leaves my door lighter than they came."]],
+	"visit:s_p27_fires:auntie_rong": [
+		["Auntie Rong of the Smelting Pits", "South-slope charcoal. I can tell by the ring. We burn a hill of this a year and I have not seen a sack so well made since my mother's time. Who burned it? One old man? Then one old man knows more than my forty."]],
+	"visit:s_p27_fires:lantern_xi": [
+		["Lantern-Maker Xi", "For the glue-pot! You cannot make a lantern over a wood fire, it spits, and a spark in the paper is a week's work gone. I have been making do with dung. Do not tell the customers. Bless you, and bless whoever's back that was."]],
+	"done:s_p27_fires": [
+		["Narrator", "Five hearths have a sack apiece, and at every one of them somebody has looked at the black on Lin Feng's hands before they looked at his face. On the way back up the mountain he passes the old man's ox coming down, the cart empty, the old man asleep on the box."],
+	],
+	"s_p27_chan": [
+		["Narrator", "Under the stone towers of the Nine Bends there is one hall, one bell and one pot, and an old monk with a shaven head sweeping a yard that is already clean. He looks at Lin Feng's shoulders before he looks at his face."],
+		["Chan Master Zhichang", "Somebody has been carrying. Timber, by the lean of you, and then something black. Good. The last cultivator who came up here had not carried so much as a cup in forty years, and wanted to know about emptiness.", "nod"],
+		["Lin Feng", "Smith Tie has a ring with a place for a stone, and nothing will stay in it. He says you sent the iron."],
+		["Chan Master Zhichang", "I did. And you would like to know what goes in the place. So would he. Before the question, the pot. There are nine of us tonight and a prefect who eats for three. Here is a sickle. The open ground below the towers is full of good bitter things.", "offer"],
+	],
+	"done:s_p27_reap": [
+		["Narrator", "Five bundles of plantain, mugwort and something Yue Ling will not let him put in with the rest, each tied with a stem of its own grass. They weigh five jin and it has taken an hour on his haunches. The pot at Guizong is very large and the monk does not look at it once."],
+		["Chan Master Zhichang", "The prefect is Li Bo. He read ten thousand scrolls and they call him Li of the Ten Thousand. He came to ask how Mount Sumeru can go into a mustard seed, and I asked where in his head he had put the scrolls. They have been getting out ever since. Listen."],
+	],
+	"done:s_p27_scrolls": [
+		["Narrator", "The last scroll rolls itself shut with a snap and lies still among the towers. All over the Stone Forest ivory tags are dropping out of the air like hail, each with a title on it in a small neat hand, and not one of them attached to anything."],
+		["Yue Ling", "They were all true, Lin Feng. Every one. He read them and they were true and he put them on a shelf in his head. I do not think anything is more dangerous than a true thing that nobody has ever had to carry anywhere."],
+	],
+	"done:s_p27_cases": [
+		["Narrator", "Five lacquered cases, open, rattling a little when they are moved, as if most of what was in them had been left somewhere else. From the mouth of the Cave of Ten Thousand Echoes below comes a sound like a very large library being read aloud by one voice, all at once."],
+	],
+	"pre:wan_juan": [
+		["Narrator", "In the middle gallery of the cave the scrolls have made themselves a body: ten thousand of them, turning slowly in the dark, every one unrolled and every one speaking. The echo gives each sentence back. It has been listening to itself for a year."],
+		["Ten Thousand Scrolls, Unshelved", "Mount Sumeru is eighty-four thousand yojanas high. A mustard seed is the smallest of seeds. The one goes into the other. It is written. It is written. Where is the difficulty? We have read it. We have read everything."],
+		["Lin Feng", "What does Mount Sumeru weigh?"],
+		["Ten Thousand Scrolls, Unshelved", "...That is not written.", "shock"],
+	],
+	"post:wan_juan": [
+		["Narrator", "The scrolls come down out of the air one by one and roll themselves shut. They lie on the cave floor in a great drift, and for the first time in a year the Cave of Ten Thousand Echoes has nothing to repeat. At its mouth a stout man in a prefect's robe is waiting with an empty case on his knees."],
+		["Narrator", "He gets up when he sees them, goes down past them into the dark without a word, and comes back with one scroll. One. He holds it as if it were heavy. It takes him the rest of the day to carry it up to the hall, and he will not let anybody help."],
+	],
+	"s_p27_seed": [
+		["Chan Master Zhichang", "He has gone back for a second. At that rate he will have them all up in thirty years, and know every one of them by the feel. I have told him he may have the room over the bell.", "laugh"],
+		["Lin Feng", "And Sumeru, and the seed?"],
+		["Chan Master Zhichang", "You have carried eight stems of timber and ten blocks of stone and two hundred jin of charcoal up a mountain. Where are they now? Not on your back. And yet you have them, do you not: you could tell me to the jin what each of them was. That is where Sumeru goes.", "think"],
+		["Chan Master Zhichang", "The ring is only iron. What sits in it is a seed, and the seed is with a fat man who sleeps on a sack in the Maple Gorge. He will give it to you, or he will not. Do not wake him. He is never asleep.", "point"],
+	],
+	"s_p27_budai": [
+		["Narrator", "At the foot of the height in the Maple Gorge of Returning Souls a very fat monk is lying on a hemp sack as big as himself, with his robe open and his hands behind his head, in the middle of the road. Nine children are sitting on him. He appears to be asleep and is laughing."],
+		["Budai, the Cloth-Sack Monk", "Hah! Shoulders! Look, children, a cultivator with shoulders, there has not been one of those since your grandmothers. Have you a fish? A coin? A sandal? No? Then you are the first person today I can give something to.", "laugh"],
+		["Narrator", "He reaches into the sack up to the armpit, and then a little further than that, and brings out a fishing rod in three joints with the line already on it."],
+		["Budai, the Cloth-Sack Monk", "I beg for whatever there is, and today there are nine children and no fish. The gorge is full of carp. Five would do. They like the deep side, under the red trees. Go on. I shall be here. I am always here; it is the road that moves.", "offer"],
+	],
+	"haul:s_p27_fish": [
+		["Budai, the Cloth-Sack Monk", "Into the sack! No, not the sack, the pot. I forget. Children, which is the pot? Hah!"],
+		["Budai, the Cloth-Sack Monk", "A fine fish. He is cross. So would I be. Thank him, somebody; it is the least we can do before we eat him."],
+	],
+	"done:s_p27_fish": [
+		["Narrator", "Five carp go into a pot that comes out of the sack with the water already in it. Nine children eat, and then three more who were not there before, and a dog. There is enough. The monk has none himself, and looks fatter."],
+		["Budai, the Cloth-Sack Monk", "You hear that? No, up. There is a king on the top of this hill who has been holding something for three thousand years, and bits keep falling off it onto my road. One nearly hit the dog. Go and see whether he would not like to put it down."],
+	],
+	"done:s_p27_anglers": [
+		["Narrator", "Four old anglers of the road sit down along the bank under the red trees with a child at each elbow. By dusk there are nine lines in the water, most of them tangled, and one small girl has caught a carp nearly as long as herself and will not let anybody else carry it."],
+	],
+	"done:s_p27_held": [
+		["Narrator", "The last fist opens, and there is nothing in it; there never was. The crabs set down their chests at the water's edge and go in sideways, lighter. Down the whole length of the gorge things that were being carried are found lying in the road, where they were let go of."],
+		["Yue Ling", "Thirty years, that grudge. She told me whose it was while you were fighting the crab. Do you know, she could not remember what it was about. Only that it was heavy and it was hers."],
+	],
+	"done:s_p27_tiles": [
+		["Narrator", "Four glazed tiles, blue-green, each small enough to lie on a fingertip and each as heavy as a roof-tile ought to be. They are warm on one side, where a palm has been under them, and cold on the other, where three thousand years of sky have."],
+	],
+	"pre:li_jing": [
+		["Narrator", "On the height above the gorge a tall man in gilded armour stands with his left arm out and a seven-storeyed pagoda on his palm. He has stood so long that the maples have grown round his feet. His arm does not shake. Everything else about him does."],
+		["Li Jing, Who Cannot Set It Down", "Do not come nearer. If I am jostled it may slip. My son tore the flesh from his bones and gave it back to me, and came again made of lotus, and the first thing he did was reach for a spear. The Buddha put this in my hand. While I hold it he is my son.", "point"],
+		["Lin Feng", "For three thousand years."],
+		["Li Jing, Who Cannot Set It Down", "And every day of them. I have forgotten what my left hand is for. I have won wars with the right. Have you come to take it from me? Many have. I had rather you fought me for it than asked me, sweeper. I do not know what I should say if I were asked.", "grieve"],
+	],
+	"post:li_jing": [
+		["Narrator", "The Heavenly King is down on one knee, and still his left arm is out and level, and the pagoda has not moved a hair. Lin Feng lays four small tiles on the rock in front of him, one at a time, where he can see them."],
+		["Lin Feng", "These fell off. It has been coming apart for a long while. Whatever it was holding shut, it is not holding it now, and nothing has happened. I think he stopped being angry about a thousand years ago and nobody told you."],
+		["Narrator", "Li Jing looks at the tiles. Then, very slowly, as a man lowers a sleeping child, he sets the pagoda down on a flat rock, and takes his hand away, and stands looking at his own palm. Far off over the gorge something bright on two wheels of fire turns once in the air, and goes on about its business."],
+	],
+	"s_p27_sack": [
+		["Narrator", "Budai has come up the height, which nobody saw him do, and is sitting on a root with the sack on the ground between his feet. It is the first time Lin Feng has seen it off his shoulder. Put down, it is only a sack: hemp, patched, a cord round the neck."],
+		["Budai, the Cloth-Sack Monk", "There. That is all the teaching I have, and you have just watched a king do it better. Now look in.", "laugh"],
+		["Narrator", "Lin Feng looks. There is a broom in it, and two buckets, and a red-string seal. Eight stems of timber. A basket of the North Mountain. A physician's book in a blue bag, or its ashes. A town of a hundred households. The sky, patched. He knows every one of them to the jin."],
+		["Budai, the Cloth-Sack Monk", "Everybody gives me something to carry, and I never ask what. You have been doing the same since you were six. It is a good sack. It is also only a sack. So, sweeper: there it is on the ground. What comes after?", "think"],
+	],
+	"done:s_p27_marks": [
+		["Narrator", "Six things that stand in the land because he once said a word: he walks up to each and looks at it, and this time he knows what it weighed to say. None of them is on his back any more. All of them are still his."],
+	],
+	"s_p27_end": [
+		["Narrator", "The forge on Azure Cloud Mountain is lit, and has been for a month. On the nine hundred and ninety-nine steps there are disciples walking, some of them with buckets, most of them badly, one of them with a stem of pine on her shoulder and an expression of outrage."],
+		["Elder Qing Xuan", "Forty of them asked to be taught to carry. I said I could not teach it; I have not carried anything since I was made Elder. I sent them to Auntie Zhou. She has them on the water-buckets. She says the Golden Cores are the worst, and cry.", "laugh"],
+		["Lin Feng", "Smith Tie's ring is finished. There is a seed in it. Everything I own goes into it and weighs nothing. I was given it after I had stopped wanting it."],
+		["Elder Qing Xuan", "That is the only time such a thing is ever safely given. Wear it, child, and now and then take something out and carry it up the steps yourself, so as not to forget. Now tell me what a bucket weighs. I find, at my age, that I should like to know.", "nod"],
+		["Yue Ling", "Thirty jin, full. He told me in the bamboo forest, the first week. I thought it was a strange thing to be proud of. I do not think so now."],
+	],
+	"pre:s_break32": [
+		["Narrator", "Under the pine Lin Feng sits with the grey ring on his finger and everything he has ever carried inside it, and does not reach for any of it. He knows what each thing weighed. That is enough to hold them by. The sky gathers, as it always has, over a man with his hands empty."],
+	],
+	"post:s_break32": [
+		["Narrator", "The tribulation comes down on the mountain like a load let fall, and he takes it as he took the timber: on the shoulder, knees bent, and then up. It is heavy. It is exactly as heavy as it is. When it has passed, a seed in a ring of iron holds one mountain more than it did, and is no larger."],
+	],
 	"recall24": [
 		["Narrator", "The winter after the wall of Guiyun went up is the stillest anybody on the mountain can remember. No wind; snow that comes straight down and stays where it falls. People sit by their fires. By the spring a great many of them find that they cannot get up."],
 		["Narrator", "In Qingshi the tofu-seller's wife wakes and cannot lift her arm to the press. At the sect, three disciples who sat down in the Hall of Stillness at the winter solstice are still sitting there at the equinox, perfectly calm, and cannot stand."],
 	],
 	"s_p26_home": [
-		["Elder Qing Xuan", "Three of them. I went in and told them to get up, and they smiled at me, which was worse. We teach sitting here, child. Nine hundred years of sitting. I find I have never once asked whether it can be overdone.", "grieve"],
+		["Elder Qing Xuan", "Three of them. I went in and told them to get up, and they smiled at me, which was worse. We teach sitting here, child. Three hundred years of sitting. I find I have never once asked whether it can be overdone.", "grieve"],
 		["Lin Feng", "Qingshi is the same. The tofu-seller's wife cannot lift her arm to the press."],
 		["Elder Qing Xuan", "There was a physician at the gate in the autumn. He asked to see the Hall of Stillness, stood in the door of it for a long time, and went away down the mountain shaking his head. I took it for rudeness. I should like to have it explained to me.", "think"],
 		["Yue Ling", "Hua Tuo. The healers of the river towns say that name the way the swordsmen say yours. He opens people and closes them again, and they wake and do not remember the knife."],
@@ -8716,7 +9085,7 @@ const DIALOGUE := {
 		["Narrator", "In the hot springs of Glowcap Vale a dozen people are sitting in the water to the chin, and on the rock above them an old man in a hemp shirt, with a gourd at his belt, is telling them very cheerfully that they are all going to die."],
 		["Hua Tuo", "Not today! Not of this! Of sitting. The body wants to be used, though never used up. Move it, and the food is digested and the blood goes round, and sickness has nowhere to settle: a door-hinge that turns is never eaten by worms.", "laugh"],
 		["Lin Feng", "The disciples at the sect have been sitting since the solstice."],
-		["Hua Tuo", "I know. I stood in the door. Nine hundred years of a hinge nobody turns. I was not being rude to your Elder; I was counting the worms. Now: into the water, down to your underclothes. Everybody here is in theirs, and nobody is looking at yours.", "point"],
+		["Hua Tuo", "I know. I stood in the door. Three hundred years of a hinge nobody turns. I was not being rude to your Elder; I was counting the worms. Now: into the water, down to your underclothes. Everybody here is in theirs, and nobody is looking at yours.", "point"],
 		["Yue Ling", "He means it, Lin Feng. Healers always mean it."],
 	],
 	"done:s_p26_soak": [
@@ -8847,8 +9216,8 @@ const DIALOGUE := {
 		["Cook Ding", "A fish has no joints to speak of. It has a grain. Go with the grain and the flesh comes off the bone in one piece; go against it and you have soup. ...Tell them their fish will be eaten by six hearths at one table. They will want to have been asked."],
 	],
 	"done:s_p26_herbs": [
-		["Narrator", "Three herbalists of the road come to the springs, look at the old man on his rock, and are put into the water at once, down to their underclothes, with everybody else. By evening they have stopped arguing with him. By the third evening they are arguing with each other, which he says is how you know they have begun to learn."],
-		["Hua Tuo", "Three more. I shall not live to see all of what they will do, and nobody will thank me for any of it, and that is quite right. A physician thanked is a physician who was too late."],
+		["Narrator", "Five herbalists of the road come to the springs, look at the old man on his rock, and are put into the water at once, down to their underclothes, with everybody else. By evening they have stopped arguing with him. By the third evening they are arguing with each other, which he says is how you know they have begun to learn."],
+		["Hua Tuo", "Five more. I shall not live to see all of what they will do, and nobody will thank me for any of it, and that is quite right. A physician thanked is a physician who was too late."],
 	],
 	"done:s_p26_summit": [
 		["Narrator", "On the very top of the highest height of Glowcap Vale, where the wind comes straight off the snow, Lin Feng does the five frolics as Wu Pu showed him: the tiger, the deer, the bear, the ape and the bird. Yue Ling does them beside him, badly, laughing. Below, steam goes up from the springs."],
@@ -8878,7 +9247,7 @@ const DIALOGUE := {
 	],
 	"recall21": [
 		["Narrator", "The tops are open, and all that summer the people of the road go up and come down again with nothing to report. In the autumn the mountain is quieter than anybody remembers. It is so quiet that on the first morning of the tenth month everybody on it hears the same thing at once."],
-		["Narrator", "The sect's great bell is struck for the dawn, as it has been every dawn for nine hundred years. It rings flat. Not cracked: flat, by a hair, like a word said by somebody who has stopped meaning it. And when it has died away, something goes on. Under the ground, a long way west. In time."],
+		["Narrator", "The sect's great bell is struck for the dawn, as it has been every dawn for three hundred years. It rings flat. Not cracked: flat, by a hair, like a word said by somebody who has stopped meaning it. And when it has died away, something goes on. Under the ground, a long way west. In time."],
 	],
 	"s_p23_home": [
 		["Elder Qing Xuan", "You heard it. Old Shen has been sitting under the bell since dawn with his hands in his lap. He says it is not the bell. He says the bell is where it was and the note has moved. I have known Shen fifty years and he has never before said anything I did not understand."],
@@ -9059,7 +9428,7 @@ const DIALOGUE := {
 		["The Hegemon-King of Western Chu", "There was a boatman at the Wu River. One boat. He said: east of the river you could still be a king. And I said: I brought eight thousand of their sons over and not one goes back with me. How should I look at their fathers? ...Two thousand years, and I have no better answer. Take the horse. He has carried me five years, and I cannot bear to kill him."],
 	],
 	"done:s_p23_xiang": [
-		["Narrator", "The field is quiet. The levy is quiet. On the road home the six companies fall, one after another, out of step, and nobody shouts at them for it. And under all of it, a long way off and deep, the beat goes on. One. Two. One, two, three."],
+		["Narrator", "The field is quiet. The levy is quiet. On the road home the companies fall, one after another, out of step, and nobody shouts at them for it. And under all of it, a long way off and deep, the beat goes on. One. Two. One, two, three."],
 		["Ling Lun, Who Cut the Pipes", "I told you it was struck. Not by the general; he only obeyed. Not by the lute; he only hated. Not by the king. Something set the first pot going, young man, and it is under this village, where the first pot was ever fired. Yu Gong's sons broke into it digging. I should have asked what they found.", "grieve"],
 	],
 	"pre:wafu": [
@@ -9147,7 +9516,7 @@ const DIALOGUE := {
 	"pre:shanxiao": [
 		["Narrator", "On the height itself, in a ring of salt bags laid like a wall, sits something the size of a child of ten, with one leg, a face like a worried old man's and the wrong number of fingers. It looks at Lin Feng. Then it says, in Elder Qing Xuan's voice, very nearly: Lin Feng. Supper."],
 		["Shanxiao, the One-Legged Thief of Voices", "Lin Feng. Supper. ...No? Lin Feng, the steps want sweeping. No. Wait. I had a good one. A girl's. You have flown over this a hundred times."],
-		["Yue Ling", "That is mine. That was this morning. Give it back."],
+		["Yue Ling", "That is mine. I said that on the Lookout. Give it back. Give it back."],
 		["Shanxiao, the One-Legged Thief of Voices", "Mine now. I keep them. Nobody keeps them as I do. They come up for their names, and then they stay by the fire. That is how it is done. I have watched.", "refuse"],
 	],
 	"post:shanxiao": [

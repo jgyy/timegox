@@ -196,6 +196,15 @@ const MARKS := {
 	},
 	# ---- Part XXV (the Three Burrows release): the three answers that made Guiyun what it is, on the mountain
 	# round it (and one on Frostpeak)
+	# Part XXVII (the Heavy Road release): what is done with the sack
+	"the_sack": {
+		"carry": {"area": "maple", "m": ["posts", 5], "k": 3, "n": "Rest-Posts of the Gorge Road", "desc": "Posts of maple set along the gorge road, each with a crosspiece at the height of a shoulder, so that somebody under a load can rest it without setting it down. The tops are worn pale already. Nobody has carved a name on any of them, and every porter who uses one says the same one.",
+			"who": ["Porter Geng", "folk_porter", Color("7a6a50"), "You lean back, so, and the post takes it, and you stand there with your hands free like a lord. Thirty years I carried salt up this gorge and never once had my hands free on the road. I did not know what to do with them the first time. I scratched my nose.", "They say whoever had these set carries everybody's load and would not put it down when a monk told him to. Then he is a fool, and I hope he lives for ever."]},
+		"share": {"area": "silk", "m": ["board", WOOD_PALE], "k": 2, "n": "The Carriers' Board", "desc": "A board of pale wood under a little roof at the edge of the Silk Woods, ruled in columns: the load, where it is going, what it weighs, and a row of names against each, one to a strap. At the bottom, in a governor's square hand, a hundred bricks, daily, one name.",
+			"who": ["Mistress Ruan of the Carriers' Hall", "folk_shopwife", Color("8a6a4a"), "Every load on the board has four names or six, never one. That was the rule he gave us: no strap without a shoulder, no shoulder without its name written. People read down it to see who carried what for whom. It is the most honest thing in the south, and I keep it.", "A boy came last week with his grandmother's whole house on a barrow and nobody to help. He had nine names against it by noon. He cannot read. He stood and looked at them all the same."]},
+		"down": {"area": "bamboo", "m": ["shrine"], "n": "The Sack by the Gate", "desc": "A little roofed stand by the road into the Whispering Bamboo, with an old hemp sack hanging in it by its cord, empty, and a bench in front. Whoever comes home along this road stops and looks into it, finds nothing there, and goes on with their shoulders an inch lower.",
+			"who": ["Old Mother Qiu", "folk_grandma", Color("8a7a6a"), "My son went off to be a cultivator and came back carrying the troubles of four provinces, and thin. I brought him here and made him look in the sack. He said, there is nothing in it. I said, no. He slept two days.", "It is only a sack. The sweeper left it. They say he carried the sky, and then one day set everything down at his own door and went in to supper. I never heard of anything so sensible from a young man."]},
+	},
 	# Part XXVI (the Underclothes release): what becomes of the Blue Bag Book
 	"the_book": {
 		"copy": {"area": "village", "m": ["board", PAPER], "k": 2, "n": "The Book on the Counter", "desc": "A board under a little roof beside the road, with pages of Hua Tuo's book pasted to it under oiled paper: the five frolics drawn in five strokes each, the place for the needle in a headache, how to set a wrist. Somebody has written beside the page on the knife, in another hand: ask first.",
@@ -326,7 +335,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book"]
+const AFTER_BANDS := ["the_book", "the_sack"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}

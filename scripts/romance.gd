@@ -130,7 +130,7 @@ const OUTINGS := {
 			["Yue Ling", "Go on. I have never seen it. Everybody has seen it; the cooks, the Elder, the gate disciples. I have walked the four realms with the sweeper of the Azure Cloud Sect and I have never once watched him sweep."]],
 		"options": [["tender", "tender", "Sweep the steps. All of them. Properly.", "...You do the edges first. Nobody does the edges first. And you do not hurry, and you do not once look up to see whether I am watching. So that is who held the sky. I knew. I only wanted to see it done."],
 			["playful", "playful", "Hand her the broom.", "Me? I am a guest. I am a founding relic. I... it goes like this? Like THIS? You did this for three years and nobody gave you a medal? There is a knack. Do not tell me there is a knack. Show me."],
-			["quiet", "quiet", "Sit down on the step beside her instead.", "...Not today, then. Good. They have been swept every day for nine hundred years; they will keep. This will not. Sit closer. The stone is cold and you are not."]]},
+			["quiet", "quiet", "Sit down on the step beside her instead.", "...Not today, then. Good. They have been swept every day for three hundred years; they will keep. This will not. Sit closer. The stone is cold and you are not."]]},
 }
 const OUTING_ORDER := ["steps", "tea", "market", "lanterns", "water", "dawn", "stars", "summit", "cave", "snow"]
 

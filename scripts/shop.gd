@@ -39,6 +39,12 @@ func _build() -> void:
 			labels.append("Your sword is fully tempered")
 			ids.append("none")
 			enabled.append(false)
+		# (the Heavy Road release, load.gd: the tools of the work of the hands, and a pack-frame)
+		for wid in Load.WARE_ORDER:
+			if int(Game.inv.get(wid, 0)) <= 0:
+				labels.append("%s  %d stones" % [Data.ITEMS[wid].n, int(Load.WARES[wid].price)])
+				ids.append("ware:" + wid)
+				enabled.append(Game.stones >= int(Load.WARES[wid].price))
 	# what can be made here now
 	for rid in Trials.recipes_at(kind, Game):
 		labels.append(("Refine: %s" if kind == "alchemist" else "Forge: %s") % Data.ITEMS[rid].n)
@@ -69,6 +75,11 @@ func press(act: String) -> void:
 				Game.note("Sword tempered to tier %d" % Game.temper)
 				msg = "The blade sings. Attack permanently increased."
 				_build()
+			elif id.begins_with("ware:"):
+				var wid := id.trim_prefix("ware:")
+				if Load.buy(Game, wid) == "":
+					msg = "Smith Tie puts it into your hands: %s." % Data.ITEMS[wid].n
+				_build()
 			elif id.begins_with("craft:"):
 				var rid := id.trim_prefix("craft:")
 				if Game.craft(rid):
@@ -96,6 +107,8 @@ func _detail() -> Array:
 		if tid != "" and Data.ENEMIES.has(tid):
 			forwhat = "\n\nFor the trial of %s." % Data.ENEMIES[tid].n
 		return [str(Data.ITEMS[rid].n), str(Data.ITEMS[rid].desc) + "\n\nNeeds: " + Trials.recipe_text(rid, Game) + forwhat]
+	if id.begins_with("ware:"):
+		return [str(Data.ITEMS[id.trim_prefix("ware:")].n), str(Data.ITEMS[id.trim_prefix("ware:")].desc) + ".\n\n" + Load.text(Game)]
 	if id == "temper":
 		return ["Temper the sword", "Each tier: +12% attack. Some trials ask for a sword tempered to a given tier."]
 	if id in ["hp_pill", "qi_pill"]:

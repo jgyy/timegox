@@ -38,7 +38,12 @@ const FEATS := {
 	# the Three Burrows release: the last realm, and the town that is the hero's own (hold.gd)
 	"scarcely_known": {"n": "Barely Known to Be There", "kind": "road", "pts": 20, "test": ["level", 90], "desc": "Reach Scarcely Known."},
 	# the Underclothes release: the last realm, and the frolics, the knife and the book (Part XXVI)
-	"room_blade": {"n": "Room and More for the Blade", "kind": "road", "pts": 20, "test": ["level", 93], "desc": "Reach Room for the Blade: the last realm there is."},
+	"room_blade": {"n": "Room and More for the Blade", "kind": "road", "pts": 20, "test": ["level", 93], "desc": "Reach Room for the Blade."},
+	# the Heavy Road release: the last realm, the timber, the cart and the sack (Part XXVII), and what a back is for
+	"sumeru_seed": {"n": "A Mountain in a Seed", "kind": "road", "pts": 20, "test": ["level", 96], "desc": "Reach Sumeru in a Seed: the last realm there is."},
+	"eight_stems": {"n": "Butts to the East", "kind": "road", "pts": 10, "test": ["step", "s_p27_timber"], "desc": "Carry eight stems of timber to Tao Kan on your own back."},
+	"thousand_jin": {"n": "A Thousand Jin, and Half a Bolt of Gauze", "kind": "road", "pts": 10, "test": ["step", "s_p27_buyer"], "desc": "Go up the south slope after an old man's cart."},
+	"set_down": {"n": "What Comes After", "kind": "road", "pts": 10, "test": ["step", "s_p27_sack"], "desc": "Say what is to be done with the sack."},
 	"five_frolics": {"n": "The Tiger, the Deer, the Bear, the Ape and the Bird", "kind": "road", "pts": 10, "test": ["step", "s_p26_tablets"], "desc": "Find the five frolics on the heights round Qingshi."},
 	"whole_ox": {"n": "Never Again a Whole Ox", "kind": "road", "pts": 10, "test": ["step", "s_p26_ox"], "desc": "Go where the gaps are, on the height above Tushan."},
 	"blue_bag": {"n": "The Blue Bag Book", "kind": "road", "pts": 10, "test": ["step", "s_p26_book"], "desc": "Say what becomes of Hua Tuo's book."},

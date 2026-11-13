@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 33.0 * 3600.0
+var max_time := 35.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -111,6 +111,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXVI: the powder to the duke who was not ill, the cook's untouched whetstones to the Whole Ox, and the
 	# physician's own needles to the lord with the wind in his head
 	"duke_huan": "relic", "quan_niu": "relic", "cao_cao": "relic",
+	# Part XXVII: the price four times over to the buyer in yellow, five empty cases to the ten thousand scrolls,
+	# and the tiles that fell to the king who cannot set his pagoda down
+	"palace_buyer": "relic", "wan_juan": "relic", "li_jing": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -153,7 +156,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXV: the tallies burned in the square, the gate open to whoever knocks, and a gate of his own
 	"the_tallies": ["burn"], "the_door": ["all"], "the_seat": ["found"],
 	# Part XXVI: the Blue Bag Book copied out for every counter of the post
-	"the_book": ["copy"]}
+	"the_book": ["copy"],
+	# Part XXVII: the sack picked up again, all of it
+	"the_sack": ["carry"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -319,6 +324,12 @@ func _apply_start() -> void:
 		if lv >= int(ab.req):
 			Game.abodes[ab.id] = true
 	for st2 in Data.STEPS.slice(0, idx):
+		# (the Heavy Road release: what was put into his hands on the way, an axe, a pick, and what he
+		# has since carried to whoever it was for)
+		for gk in st2.get("gives", {}):
+			Game.inv[str(gk)] = int(Game.inv.get(str(gk), 0)) + int(st2.gives[gk])
+		if st2.kind == "haul":
+			Game.inv[str(st2.good)] = maxi(0, int(Game.inv.get(str(st2.good), 0)) - int(st2.n))
 		if st2.kind == "collect":
 			Game.inv[st2.item] = maxi(int(Game.inv.get(st2.item, 0)), st2.n)
 		if st2.kind == "kill" and Trials.TRIALS.has(st2.boss):
@@ -844,6 +855,14 @@ func _world(d: float) -> void:
 			# Part XXIII: the notice board of Qingshi: Clerk Bai, by the Drum Tower (the choice takes down
 			# what can be reported at once, _choice)
 			_goto_entity("village", Jobs.CLERK)
+		"toil":
+			# Part XXVII: the work of the hands (toil.gd): the nearest piece of the step's region that can
+			# be worked at so, and C
+			_toil_step(str(s.work), str(s.area))
+		"haul":
+			# Part XXVII: a load for somebody (toil.gd, load.gd): gathered until his back is full (never past
+			# what he can bear at his own pace), carried to them, and again
+			_haul_step(s)
 		"summit":
 			# Part XXII: the top of the peak the step names, or of the nearest it has not stood on (peaks.gd)
 			_summit_step(s)
@@ -872,6 +891,74 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				_goto_entity(Trials.boss_area(g), "boss_" + g)
+
+## Part XXVII (toil.gd): work `work` done once in region `area`, as a player would do it: walk along the
+## forest's edge (the water, the crag, the open ground) to the nearest piece of it that has not given
+## today, turn to it, and press C.  Where it is going is kept until it is worked, so the land is
+## searched once a piece and not every frame.
+var toil_at := Vector2i(-1, -1)
+var toil_dir := Vector2i.ZERO
+var toil_key := ""
+
+func _toil_ok(work: String, at: Vector2i, d: Vector2i) -> bool:
+	return Toil.work_at(world.wd, at, at + d, world.is_cave(), world.is_floor() and not world.is_cave()) == work and not Toil.spent(Game, world.layer, at + d) \
+		and world.ent_at(at + d) == null and not world.walk_props.has(at + d)
+
+func _toil_step(work: String, area: String) -> void:
+	if world.layer != Data.layer_of(area) or (Game.area != area and toil_key != work + area):
+		toil_key = ""
+		_travel(area)
+		return
+	# (in front of him already: a row of trees is felled one after another without looking again)
+	if world.move_t < 0.0 and _toil_ok(work, world.ptile, world.facing) and Toil.blocked(Game, work, world.layer, world.ptile + world.facing) == "":
+		world.move_dir = Vector2i.ZERO
+		_press("work", 0.5)
+		return
+	var here0: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if toil_key != work + area or toil_at.x < 0 or not _toil_ok(work, toil_at, toil_dir):
+		toil_key = work + area
+		toil_at = Vector2i(-1, -1)
+		var dist := _bfs_dist(here0, 160)
+		var bd := 1 << 30
+		for tl in dist:
+			if int(dist[tl]) >= bd or Atlas.owner_id(world.wd, tl) != area or (tl != here0 and world.ent_at(tl) != null):
+				continue
+			for d in DIRS:
+				if _toil_ok(work, tl, d):
+					bd = int(dist[tl])
+					toil_at = tl
+					toil_dir = d
+					break
+		if toil_at.x < 0:
+			toil_key = ""
+			_travel(area)
+			return
+	# (where he is, or the tile he is stepping onto: he stops there, and turns to it; a player turns by
+	# leaning on the key towards it)
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if here == toil_at:
+		world.move_dir = Vector2i.ZERO
+		if world.move_t < 0.0:
+			world.facing = toil_dir
+		return
+	_walk_to(toil_at, "toil:%d:%d" % [toil_at.x, toil_at.y])
+
+## Part XXVII: a "haul" step.  What the good comes of (fell, quarry, angle) is worked at until he has
+## all that is wanted or as much as his back takes at its own pace; then it is walked to whoever it is
+## for, and set down by walking up to them.
+const HAUL_WORK := {"timber": "fell", "stone_block": "quarry", "carp": "angle", "herb_bundle": "reap"}
+
+func _haul_step(s: Dictionary) -> void:
+	var good := str(s.good)
+	var have := Toil.on_hand(Game, s)
+	var want := Toil.wanted(Game, s)
+	var work := str(HAUL_WORK.get(good, ""))
+	var full: bool = Load.weight(Game) + Load.weight_of(good) > Load.cap(Game) + 0.001
+	if have >= want or work == "" or (have > 0 and full):
+		toil_key = ""
+		_goto_entity(str(s.area), str(s.npc))
+		return
+	_toil_step(work, str(s.area))
 
 ## Part XVII (impact.gd): an obstacle of the story, cleared as a player would clear it: walk up to it,
 ## turn to it (walking into it says what it is) and swing the sword (F) until it goes.

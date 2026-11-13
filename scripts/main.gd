@@ -168,6 +168,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_G:
 			# throw the sword qi ahead (the Spring Thunder release: impact.gd)
 			press("qi")
+		KEY_C:
+			# the work of the hands (the Heavy Road release: toil.gd): fell, fish, quarry, reap
+			press("work")
 		KEY_V:
 			# open the cloud-kite, or fold it in the air (the High Roads release: peaks.gd, glider.gd)
 			press("glide")
@@ -199,6 +202,8 @@ func press(act: String) -> void:
 			world.qi_wave()
 		elif act == "glide":
 			world.toggle_glide()
+		elif act == "work":
+			world.work()
 		elif act == "talk":
 			talk_yue()
 		elif act == "cancel":
@@ -471,6 +476,9 @@ func told(s: String) -> String:
 ## The story proper: the morning of the Elder's summons.
 func begin_at_sect() -> void:
 	Game.prologue = ""
+	# (the Heavy Road release: the morning three years ago is not a region walked into; it used to be
+	# kept as one, and a junk or the kite would go there before the story had opened the way)
+	Game.seen = {"sect": true}
 	world.load_area("sect", Vector2i(20, 8))
 	set_stack(["world"])
 	var intro: Array = [["Narrator", "Azure Cloud Sect, perched above the sea of clouds. For three years the orphan Lin Feng has swept its steps."]]
@@ -622,10 +630,78 @@ func talk_folk(e: Dictionary) -> void:
 			Game.toast(("%s (%d of %d)" % [str(er2.toast), Game.folk_count(s), int(s.n)]) % str(fp.n))
 			Game.note(str(er2.toast) % str(fp.n))
 			Game.poll_steps()
+		elif Folk.is_role(fp, "pedlar") and Game.prologue == "":
+			# (the Heavy Road release, load.gd: a pedlar of the road buys what the land gave and sells
+			# what it is carried and worked with; "Not today" first)
+			offer_pedlar(fp, ask_home)
 		elif ask_home:
 			offer_home(fp)
 		else:
 			world.folk_talking = ""
+	)
+
+const PEDLAR_ASK := "The pedlar's pack is open on the grass. What will it be?"
+
+## A pedlar of the road (load.gd): the tools of the work of the hands, a pack-frame, a price for the
+## goods of the land on the hero's back, and, for somebody who has carried enough, the pouch.
+func offer_pedlar(fp: Dictionary, ask_home: bool = false) -> void:
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting. %s" % Load.text(Game), "col": UI.C_DIM}]
+	var sale: Array = Load.sale(Game)
+	if int(sale[1]) > 0:
+		opts.append({"id": "sell", "label": "Sell what the land gave", "note": "%d stones" % int(sale[0]), "desc": "Timber, stone, ore, charcoal, fish and herbs: %d pieces off your back, for %d spirit stones. A pedlar pays what a pedlar pays." % [int(sale[1]), int(sale[0])], "col": UI.C_GOLD})
+	for wid in Load.WARE_ORDER:
+		if int(Game.inv.get(wid, 0)) > 0:
+			continue
+		var price := int(Load.WARES[wid].price)
+		opts.append({"id": "buy:" + wid, "label": "%s (%d stones)" % [str(Data.ITEMS[wid].n), price], "desc": str(Data.ITEMS[wid].desc) + ".", "col": UI.C_JADE, "enabled": Game.stones >= price})
+	if int(Game.inv.get(Load.POUCH, 0)) <= 0 and int(Game.inv.get(Load.RING, 0)) <= 0:
+		var why := Load.pouch_blocked(Game)
+		opts.append({"id": "pouch", "label": str(Data.ITEMS[Load.POUCH].n), "note": "%d stones" % int(Load.POUCH_NEEDS.stones),
+			"desc": told(str(Data.ITEMS[Load.POUCH].desc)) + ".\n\n" + ("\"I can sew you one now,\" says the pedlar, and looks at your shoulders, and nods." if why == "" else "\"Not for you yet,\" says the pedlar. " + why), "col": Color("c8a0ff"), "enabled": why == ""})
+	if ask_home:
+		opts.append({"id": "home", "label": "There is a roof for you at Guiyun", "desc": "Ask %s to come and live in the town that is your own." % str(fp.n), "col": UI.C_JADE})
+	choose(PEDLAR_ASK, opts, func(oid: String):
+		world.folk_talking = ""
+		if oid == "sell":
+			var got: Array = Load.sell_all(Game)
+			Feats.poll(Game)
+			say([[str(fp.n), "Good stuff, honestly come by. %d stones, and I am robbing myself." % int(got[0])]])
+		elif oid.begins_with("buy:"):
+			var wid2 := oid.trim_prefix("buy:")
+			if Load.buy(Game, wid2) == "":
+				Game.toast("Bought: %s" % str(Data.ITEMS[wid2].n))
+				offer_pedlar(fp, ask_home)
+		elif oid == "pouch":
+			if Load.sew_pouch(Game):
+				Feats.poll(Game)
+				say([["Narrator", "The pedlar sews for an hour with a needle of bone and a thread that is not there when it is looked at straight. The pouch that comes of it is the size of a fist and has no bottom that a hand can find."],
+					[str(fp.n), "Three hundred jin, and it will weigh you thirty. Do not put anything alive in it. Do not put it inside another one. And do not thank me: you carried the price here on your own back."]])
+		elif oid == "home":
+			offer_home(fp)
+	)
+
+const STORE_ASK := "What is left here, and what is taken up again?"
+
+## The storehouse (load.gd): at the sect, and in the steward's yard at Guiyun, what is on the hero's
+## back can be left, and what was left taken up.
+func offer_store() -> void:
+	var where := Load.at_home(Game, Game.area, world.ptile)
+	if where == "":
+		return
+	var opts: Array = [{"id": "later", "label": "Leave it as it is", "desc": "%s. %s" % [where.capitalize(), Load.text(Game)], "col": UI.C_DIM}]
+	for sid in Load.stowable(Game):
+		opts.append({"id": "stow:" + str(sid), "label": "Leave: %s x%d" % [str(Data.ITEMS[sid].n), Load.carried(Game, sid)], "note": "%d jin" % int(round(Load.weight_of(sid) * Load.carried(Game, sid))), "desc": str(Data.ITEMS[sid].desc) + ".", "col": UI.C_GOLD})
+	for tid in Game.stash:
+		opts.append({"id": "fetch:" + str(tid), "label": "Take up: %s x%d" % [str(Data.ITEMS[tid].n), int(Game.stash[tid])], "note": "%d jin" % int(round(Load.weight_of(str(tid)) * int(Game.stash[tid]))), "desc": str(Data.ITEMS[tid].desc) + ".", "col": UI.C_JADE})
+	choose(STORE_ASK, opts, func(oid: String):
+		if oid.begins_with("stow:"):
+			Load.stow(Game, oid.trim_prefix("stow:"))
+			offer_store()
+		elif oid.begins_with("fetch:"):
+			Load.fetch(Game, oid.trim_prefix("fetch:"))
+			# (something the story is waiting for may have been in the storehouse)
+			Game.poll_steps()
+			offer_store()
 	)
 
 const HOME_ASK := "There is room at Guiyun. Ask %s to come and live there?"
@@ -712,6 +788,21 @@ func talk_npc(e: Dictionary) -> void:
 			Game.poll_steps()
 		)
 		return
+	# Part XXVII (toil.gd): somebody a load is being carried to: what is on his back is set down
+	if not s.is_empty() and s.kind == "haul" and str(s.npc) == str(e.id):
+		var brought := Toil.hand_over(Game, s)
+		if brought > 0:
+			var hk := "haul:" + str(s.id)
+			var hl: Array = Data.DIALOGUE.get(hk, [])
+			var gname := str(Data.ITEMS[str(s.good)].n).to_lower()
+			var said: Array = [["Narrator", "Lin Feng sets down what he has carried: %d of %s." % [brought, gname]]]
+			if not hl.is_empty():
+				said.append(hl[(int(Game.step_haul) - 1) % hl.size()])
+			say(said, func():
+				Game.toast("Brought: %s (%d of %d)" % [str(Data.ITEMS[str(s.good)].n), int(Game.step_haul), int(s.n)])
+				Game.poll_steps()
+			)
+			return
 	# a fated encounter (fate.gd): a chapter of somebody's story, and a choice in it
 	if not s.is_empty() and s.kind == "fate" and s.npc == e.id:
 		play_chapter(str(s.id), e)
@@ -1000,6 +1091,7 @@ func offer_carriage(e: Dictionary) -> void:
 					var at: Vector2i = Roads.ride_coach(Game, co2)
 					if at.x >= 0:
 						Game.riding = false
+						_drop_fares()
 						world.teleport(at)
 						Feats.poll(Game)
 						Game.toast("The post-coach sets you down at %s" % str(co2.n))
@@ -1012,6 +1104,7 @@ func offer_carriage(e: Dictionary) -> void:
 					var q: Vector2i = Ships.quay(str(so2.to))
 					var to_layer := Data.layer_of(str(Ships.HARBOURS[str(so2.to)].area))
 					Game.riding = false
+					_drop_fares()
 					say(lines, func():
 						if q.x >= 0:
 							world.teleport(q, to_layer)
@@ -1032,6 +1125,7 @@ func offer_carriage(e: Dictionary) -> void:
 			Game.stones -= int(Fashion.RIDES[oid].buy)
 			Game.grant_ride(oid)
 			Game.ride = oid
+			_seat_fares()
 			Feats.poll(Game)
 			say([[str(e.n), "She pulls a little to the left. They all pull a little to the left. Keep the axles greased and do not let anybody tell you how many it seats: it seats %d." % Fashion.seats(oid)]])
 	)
@@ -1390,6 +1484,7 @@ func open_stable() -> void:
 			Game.riding = false
 		elif id != "":
 			Game.ride = id
+			_seat_fares()
 			Game.riding = true
 			Game.toast("You ride the %s" % Fashion.RIDES[id].n)
 	)
@@ -1579,12 +1674,28 @@ func open_ask() -> void:
 		say(Romance.take_ask(Game, id, oid), func(): world.refresh_yue())
 	)
 
+## (the Heavy Road release: a ride changed for one with fewer seats sets down whoever there is no seat
+## for; they used to stay aboard unseen, and paid on arrival all the same)
+func _seat_fares() -> void:
+	var room := maxi(0, Fashion.seats(Game.ride) - 2)
+	if Game.passengers.size() > room:
+		Game.toast("There is no seat for everybody: %d get down" % (Game.passengers.size() - room))
+		Game.passengers = Game.passengers.slice(0, room)
+
+## (the Heavy Road release: whoever was being carried for a fare gets down when the carriage is left
+## behind for the post-coach or a junk; they used to stay aboard, and were paid for on the far quay
+## without having been driven a tile, offices.gd)
+func _drop_fares() -> void:
+	if not Game.passengers.is_empty():
+		Game.toast("Your passengers climb down: the carriage is going nowhere")
+		Game.passengers = []
+
 ## Old Du's mat (gamble.gd): the game, what is staked on, and how much; then the bowl is lifted, and
 ## the mat is there again.
 func offer_gamble() -> void:
 	var opts: Array = []
 	for gid in Gamble.GAME_ORDER:
-		opts.append({"id": gid, "label": str(Gamble.GAMES[gid].n), "desc": str(Gamble.GAMES[gid].desc) + "\n\n" + Gamble.summary(Game), "col": UI.C_GOLD, "enabled": Game.stones > 0})
+		opts.append({"id": gid, "label": str(Gamble.GAMES[gid].n), "desc": str(Gamble.GAMES[gid].desc) + "\n\n" + Gamble.summary(Game), "col": UI.C_GOLD, "enabled": not Gamble.stakes(Game).is_empty()})
 	opts.append({"id": "later", "label": "Walk away", "desc": "Nine of ten who gamble lose. It is painted over the door. You carry %d spirit stones." % Game.stones, "col": UI.C_DIM})
 	choose(Gamble.ASK, opts, func(gid: String):
 		if gid == "" or gid == "later":
@@ -1831,7 +1942,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

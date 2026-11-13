@@ -95,13 +95,16 @@ static func on(g) -> bool:
 ## Begin: every need content, three buns and a full gourd.
 static func begin(g) -> void:
 	g.survival = true
-	g.needs = {}
-	for k in ORDER:
-		g.needs[k] = 85.0
-	g.inv["steamed_bun"] = int(g.inv.get("steamed_bun", 0)) + 3
-	g.gourd = GOURD
+	# (the Heavy Road release: the buns and the full gourd are given once a journey; turned off and on
+	# again the body is as it was left, where it used to be fed and rested by the switch)
+	if not g.needs.has("since"):
+		g.needs = {}
+		for k in ORDER:
+			g.needs[k] = 85.0
+		g.inv["steamed_bun"] = int(g.inv.get("steamed_bun", 0)) + 3
+		g.gourd = GOURD
+		g.needs_fell = {}
 	g.needs["since"] = g.day
-	g.needs_fell = {}
 	g.needs_clock = float(g.clock) + float(g.day) * 1440.0
 	g.note("Survival: the body asks for what it asks for")
 
@@ -291,6 +294,16 @@ static func act(g, id: String, ctx: Dictionary) -> String:
 			give(g, {"clean": 55.0, "comfort": 6.0})
 			return "Cold water, hands and face and neck. Not a bath; a great deal better than nothing."
 		"sleep":
+			# (the Heavy Road release: by daylight it is two hours under a tree, as a bed by daylight is a
+			# rest and not a night; it used to be morning again at every press, and a day is what the chest
+			# at Guiyun, a salary and a shift are counted in)
+			var hr := float(ctx.get("hour", Clock.hour(g)))
+			if hr < Clock.DUSK - 1.0 and hr >= 4.0:
+				give(g, {"rest": 30.0, "comfort": -8.0, "clean": -2.0})
+				Clock.set_hour(g, hr + 2.0)
+				g.needs_clock = float(g.clock) + float(g.day) * 1440.0
+				give(g, {"hunger": -5.0, "thirst": -6.0, "bladder": -8.0})
+				return "Two hours under a tree with the cloak over the face. Not a night; a good deal better than nothing."
 			give(g, {"rest": 70.0, "comfort": -22.0, "clean": -6.0})
 			Clock.set_hour(g, 6.0)
 			g.needs_clock = float(g.clock) + float(g.day) * 1440.0
