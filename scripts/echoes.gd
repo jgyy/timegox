@@ -1164,7 +1164,7 @@ const CROSSROADS := {
 			{"id": "copy", "label": "Copy it out for every counter of the post", "tilt": {"craft": 3, "reach": 2}, "gain": {"renown": 6},
 				"desc": "A copy on the counter of every post office in the land, for whoever can read and wants to. Some hands will be clumsy and some will be wicked, and a great many will be a grandmother's at midnight with nobody else to ask (renown).",
 				"log": "Had the Blue Bag Book copied out for every counter of the post."},
-			{"id": "keep", "label": "Keep it at the Hall of the Broom, for whoever sweeps", "tilt": {"craft": -2, "reach": -3}, "gain": {"hearth": {"valley": 3}},
+			{"id": "keep", "label": "Keep it at the Hall of the Broom", "tilt": {"craft": -2, "reach": -3}, "gain": {"hearth": {"valley": 3}},
 				"desc": "One copy, in Guiyun, where it can be watched over. Whoever wants it must come and sweep the street a season, and then sit with it and be taught it by somebody who knows. Slower and safer, and one fire away from ashes (the regard of the Rice Hearth).",
 				"log": "Kept the Blue Bag Book at the Hall of the Broom, for whoever sweeps."},
 			{"id": "burn", "label": "Let her burn it", "tilt": {"heart": 3, "craft": -2}, "gain": {"renown": 2},

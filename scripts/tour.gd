@@ -4564,7 +4564,7 @@ func _frolics_shots(which: String = "1") -> void:
 	main.world.clear_cache()
 	var w = main.world
 	if want.call("people"):
-		await _gallery("part26_people", [Assets.person("hua_tuo"), Assets.person("wu_pu"), Assets.person("pao_ding"), Assets.person("jailer_wife")], 0.76, 0.2)
+		await _gallery("part26_people", [Assets.person("hua_tuo"), Assets.person("wu_pu"), Assets.person("pao_ding"), Assets.person("jailer_wife")], 0.5, 0.2)
 	if want.call("bare"):
 		# six of the people of the land, three at a time, dressed and then down to their underclothes
 		var frames: Array = []
@@ -4584,7 +4584,7 @@ func _frolics_shots(which: String = "1") -> void:
 		for fid in ["rust_beetle", "still_toad", "idle_spore", "gristle_hound", "locked_joint", "hacking_butcher", "tiger_guard", "headache_crow", "sleepless_drum"]:
 			fs.append(_foe(fid))
 		await _gallery("part26_foes", fs, 1.0, 0.25)
-		await _gallery("part26_lords", [_foe("duke_huan", true), _foe("quan_niu", true), _foe("cao_cao", true)], 2.2, 0.25)
+		await _gallery("part26_lords", [_foe("duke_huan", true), _foe("quan_niu", true), _foe("cao_cao", true)], 1.05, 0.25)
 	if want.call("battle"):
 		main.set_stack(["world"])
 		for bb in [["duke_huan", "fungal", "relic"], ["quan_niu", "tushan", "arms"], ["cao_cao", "millet", "host"]]:
@@ -4649,7 +4649,11 @@ func _frolics_shots(which: String = "1") -> void:
 			await _wait(3.0)
 			var c: Vector3 = w.wpos(spring.pos)
 			c.y = w.ground_y(c)
-			w.cam_override = Transform3D(Basis.IDENTITY, c + Vector3(2.6, 1.9, 3.4)).looking_at(c + Vector3(0, 0.35, 0), Vector3.UP)
+			# (from the open side it is come up to, a little above: the screen of the spring is behind it)
+			var fd: Vector2i = spring.get("face", Vector2i(0, 1))
+			var out := Vector3(fd.x, 0.0, fd.y)
+			var side := Vector3(-out.z, 0.0, out.x)
+			w.cam_override = Transform3D(Basis.IDENTITY, c + out * 3.1 + side * 1.2 + Vector3(0, 2.3, 0)).looking_at(c + Vector3(0, 0.3, 0), Vector3.UP)
 			await _wait(0.6)
 			await _shot("soak_fungal")
 			w.cam_override = null
