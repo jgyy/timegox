@@ -1170,7 +1170,7 @@ func _init() -> void:
 			realms7[Data.layer_of(na)] = true
 			check(na != "" and (Data.DIALOGUE.has("visit:" + str(nid)) or Data.DIALOGUE.has("visit:%s:%s" % [str(st7.id), str(nid)])), "%s: %s lives somewhere and has something to say when visited" % [st7.id, nid])
 		# (the Conclave's invitations go out to every realm; Part XVI's New Year calls are made round the sect)
-		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost", "s_p25_guests"], "%s: the people to visit live in at least three realms" % st7.id)
+		check(realms7.size() >= 3 or str(st7.id) in ["s_p16_calls", "s_p18_carry", "s_p19_makers", "s_p19_word", "s_p20_elders", "s_p21_masters", "s_p23_levy", "s_p24_lost", "s_p25_guests", "s_p27_fires"], "%s: the people to visit live in at least three realms" % st7.id)
 	check(visits_steps >= 1, "Part XIII has a step of visits in any order")
 	for st8 in Data.STEPS:
 		if st8.kind == "hunt" and st8.has("of"):
@@ -5881,7 +5881,7 @@ func _heavy_road() -> void:
 	for i in Data.STEPS.size():
 		if (Data.STEPS[i].get("gives", {}) as Dictionary).has(Load.RING):
 			ring_step = i
-	check(ring_step == Data.step_index("s_p27_sack") and ring_step >= Data.STEPS.size() - 3, "the ring is given once, at the very end of the last chapter")
+	check(ring_step == Data.step_index("s_p27_sack") and ring_step >= Data.STEPS.size() - 4 and Data.step_index("s_p27_sack") > _kill_step("li_jing"), "the ring is given once, at the very end of the last chapter, after its last lord")
 	# a tile walked under a load is counted, and only then
 	var HG = load("res://scripts/game.gd").new()
 	HG.reset()
@@ -5988,12 +5988,12 @@ func _heavy_road() -> void:
 	check(TG.step == Data.step_index("s_p27_timber") and TG.step_toil == 0, "three trees felled since it was asked: the step is done")
 	var hs: Dictionary = TG.cur_step()
 	var on_me := Toil.on_hand(TG, hs)
-	check(on_me == 4 and Toil.wanted(TG, hs) == 8 and TG.objective_text().contains("(0/8, 4 carried)"), "what he felled is on his back, and none of it is brought yet")
+	check(on_me == 4 and Toil.wanted(TG, hs) == 8 and TG.objective_text().contains("(0/8, 4 carried)") and int(TG.inv.get("pick", 0)) == 0, "what he felled is on his back, and none of it is brought yet")
 	check(Toil.hand_over(TG, hs) == 4 and TG.step_haul == 4 and Load.carried(TG, "timber") == 0 and Toil.hand_over(TG, hs) == 0, "set down in front of whoever it is for: four of eight, and his back is empty")
 	TG.add_item("timber", 9)
 	check(Toil.hand_over(TG, hs) == 4 and Load.carried(TG, "timber") == 5, "no more is taken than was asked")
 	TG.poll_steps()
-	check(TG.step == Data.step_index("s_p27_idle") and TG.done_pending.has("s_p27_timber"), "eight stems brought: the step is done, and something is said")
+	check(TG.step == Data.step_index("s_p27_footing") and TG.done_pending.has("s_p27_timber") and int(TG.inv.get("pick", 0)) == 1, "eight stems brought: the step is done, something is said, and a pick is put into his hands")
 	check(msrc.contains("Toil.hand_over(Game, s)") and msrc.contains("KEY_C") and msrc.contains("func offer_pedlar") and msrc.contains("func offer_store") and bsrc.contains("func _toil_step") and bsrc.contains("func _haul_step"),
 		"C works the land, a load is handed over by walking up, pedlars trade and the storehouse opens; and the bot does the work itself")
 	check(msrc.find("{\"id\": \"later\", \"label\": \"Not today\", \"desc\": \"There is a road waiting. %s\" % Load.text(Game)") > 0, "\"Not today\" is the pedlar's first line")
@@ -6032,8 +6032,23 @@ func _heavy_road() -> void:
 			check(Folk.CAMP_ROLES.has(str(st.role)) and (er.lines as Array).size() >= 4 and int(er.price) == 0, "%s: people of the road asked, each with an answer" % st.id)
 			for el in er.lines:
 				check(fits.call(str(el)), "%s: an answer that fits the box" % st.id)
-	check(n27 >= 28 and int(kinds27.get("kill", 0)) == 3 and int(kinds27.get("hunt", 0)) == 3 and int(kinds27.get("collect", 0)) == 4 and int(kinds27.get("haul", 0)) == 5 and int(kinds27.get("toil", 0)) == 2 and int(kinds27.get("folk", 0)) == 1,
-		"Part XXVII: %d steps: five loads carried, two works of the hands, three lords, three hunts, four searches and an errand of the road" % n27)
+		if st.kind == "visits":
+			for vn in st.npcs:
+				check(Data.DIALOGUE.has("visit:%s:%s" % [str(st.id), str(vn)]) and fits.call(str(Data.DIALOGUE["visit:%s:%s" % [str(st.id), str(vn)]][0][1])), "%s: %s has something to say of it" % [st.id, vn])
+		if st.kind == "marks":
+			check(bool(st.get("new", false)) and int(st.n) >= 3 and int(st.n) * 4 <= Echoes.ORDER.size(), "%s: things looked at since it began, and no more than a quarter of what a journey leaves standing" % st.id)
+	check(n27 >= 34 and int(kinds27.get("kill", 0)) == 3 and int(kinds27.get("hunt", 0)) == 4 and int(kinds27.get("collect", 0)) == 4 and int(kinds27.get("haul", 0)) == 6 and int(kinds27.get("toil", 0)) == 2 and int(kinds27.get("folk", 0)) == 3
+		and kinds27.has("visits") and kinds27.has("marks"),
+		"Part XXVII: %d steps: six loads carried, two works of the hands, three lords, four hunts, four searches, three errands of the road, a round of the hearths and a look at what stands" % n27)
+	# the charcoal for the smith is more than his back was made for at that realm, with Yue Ling's share: it is walked
+	var CG = load("res://scripts/game.gd").new()
+	CG.reset()
+	CG.level = 95
+	CG.companion = true
+	CG.ride = "barque"
+	CG.inv["charcoal"] = int(Data.STEPS[Data.step_index("s_p27_cart")].gives.charcoal)
+	check(Load.tier(CG) == 2 and Load.grounded(CG) and int(Data.STEPS[Data.step_index("s_p27_smith")].n) == int(CG.inv.charcoal), "eight sacks of charcoal are more than any sword will lift: they go up the mountain on foot")
+	CG.free()
 	# every tool is put into his hands before the step that needs it, and the chapter's loads can be borne
 	var have := {}
 	for st2 in Data.STEPS:
@@ -6082,7 +6097,7 @@ func _heavy_road() -> void:
 		check(Data.CHAT.has(cid27) and Data.CHAT[cid27].size() >= 3, "%s has things to say" % cid27)
 		for cl in Data.CHAT[cid27]:
 			check(fits.call(str(cl)), "%s: chatter that fits the box" % cid27)
-	for fid27 in ["ease_moth", "sedan_shade", "waste_golem", "yellow_runner", "white_shirt", "gauze_ox", "loose_scroll", "ivory_tag", "book_worm"]:
+	for fid27 in ["ease_moth", "sedan_shade", "waste_golem", "yellow_runner", "white_shirt", "gauze_ox", "loose_scroll", "ivory_tag", "book_worm", "clenched_fist", "old_grudge", "heirloom_crab"]:
 		check(Data.ENEMIES.has(fid27) and Lore.BEAST.has(fid27) and Habits.habit(fid27) != "" and not Dooms.is_doom(fid27), "%s: a foe of Part XXVII with a story and hours of its own" % fid27)
 	# the crossroads of the chapter: every answer answered, echoed, told at the end, written about and standing
 	var c27: Dictionary = Echoes.CROSSROADS.get("the_sack", {})
@@ -6111,7 +6126,7 @@ func _heavy_road() -> void:
 				old_echo27 += 1
 	check(old_echo27 >= 3, "three older crossroads echo in Part XXVII (%d)" % old_echo27)
 	check(bsrc.contains("\"palace_buyer\": \"relic\"") and bsrc.contains("\"li_jing\": \"relic\"") and bsrc.contains("\"the_sack\": [\"carry\"]"), "the bot has a plan for every trial and the crossroads of Part XXVII")
-	for a27 in ["silk", "volcano", "karst"]:
+	for a27 in ["silk", "volcano", "karst", "maple"]:
 		check(str(Data.AREAS[a27].get("warband5", {}).get("vis", "")).begins_with("s_p27_") and not Data.AREAS[a27].has("warband6"), "%s: the chapter's band takes the last slot" % a27)
 	check(Marks.AFTER_BANDS.has("the_sack"), "the marks of its crossroads are stood after the late bands")
 	var found27 := 0

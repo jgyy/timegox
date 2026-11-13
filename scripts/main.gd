@@ -1125,6 +1125,7 @@ func offer_carriage(e: Dictionary) -> void:
 			Game.stones -= int(Fashion.RIDES[oid].buy)
 			Game.grant_ride(oid)
 			Game.ride = oid
+			_seat_fares()
 			Feats.poll(Game)
 			say([[str(e.n), "She pulls a little to the left. They all pull a little to the left. Keep the axles greased and do not let anybody tell you how many it seats: it seats %d." % Fashion.seats(oid)]])
 	)
@@ -1483,6 +1484,7 @@ func open_stable() -> void:
 			Game.riding = false
 		elif id != "":
 			Game.ride = id
+			_seat_fares()
 			Game.riding = true
 			Game.toast("You ride the %s" % Fashion.RIDES[id].n)
 	)
@@ -1671,6 +1673,14 @@ func open_ask() -> void:
 			return
 		say(Romance.take_ask(Game, id, oid), func(): world.refresh_yue())
 	)
+
+## (the Heavy Road release: a ride changed for one with fewer seats sets down whoever there is no seat
+## for; they used to stay aboard unseen, and paid on arrival all the same)
+func _seat_fares() -> void:
+	var room := maxi(0, Fashion.seats(Game.ride) - 2)
+	if Game.passengers.size() > room:
+		Game.toast("There is no seat for everybody: %d get down" % (Game.passengers.size() - room))
+		Game.passengers = Game.passengers.slice(0, room)
 
 ## (the Heavy Road release: whoever was being carried for a fare gets down when the carriage is left
 ## behind for the post-coach or a junk; they used to stay aboard, and were paid for on the far quay

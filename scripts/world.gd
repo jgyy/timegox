@@ -1224,7 +1224,8 @@ func end_use() -> void:
 ## Lin Feng uses thing `e`: he steps up to it (or onto it, to sit), does it, and steps back; what comes
 ## of it is shown when he is done.
 func start_use(e: Dictionary) -> void:
-	if not using.is_empty() or not trip.is_empty():
+	# (the Heavy Road release: nor in the air: a bench passed over under the kite used to be sat on there)
+	if not using.is_empty() or not trip.is_empty() or not glide.is_empty():
 		return
 	var k := Props.kind_of(e)
 	if k.is_empty():

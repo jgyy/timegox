@@ -1210,6 +1210,7 @@ func _draw() -> void:
 		return
 	if mode == "load":
 		_draw_load()
+		return
 	if mode == "body":
 		_draw_body()
 		return

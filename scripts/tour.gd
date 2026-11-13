@@ -4771,20 +4771,11 @@ func _heavy_shots(which: String = "1") -> void:
 			cm2.append(m5)
 			cp2.append([str(cw2[0]), float(cw2[1])])
 		await _pose_gallery("clips_of_the_hands_back", cm2, cp2, 0.6, 0.9)
-	if only.has("probe"):
-		var pm: Array = []
-		var pq: Array = []
-		for cw3 in [["fish", 1.0, "rod"], ["mine", 1.25, "pickaxe"], ["chop", 1.2, "felling_axe"], ["hammer", 0.8, "hammer"], ["idle", 0.5, "felling_axe"]]:
-			var m6: Node3D = Models.hero({"glow": w.HERO_OPTS.glow, "arm": ""})
-			w._hold_in_hand(m6, str(cw3[2]))
-			pm.append(m6)
-			pq.append([str(cw3[0]), float(cw3[1])])
-		await _pose_gallery("probe_old_clips", pm, pq, 0.6, 0.9)
 	if want.call("people"):
 		await _gallery("part27_people", [Assets.person("tao_kan"), Assets.person("charcoal_seller"), Assets.person("zhichang"), Assets.person("budai")], 0.5, 0.2)
 	if want.call("foes"):
 		var fs: Array = []
-		for fid in ["ease_moth", "sedan_shade", "waste_golem", "yellow_runner", "white_shirt", "gauze_ox", "loose_scroll", "ivory_tag", "book_worm"]:
+		for fid in ["ease_moth", "sedan_shade", "waste_golem", "yellow_runner", "white_shirt", "gauze_ox", "loose_scroll", "ivory_tag", "book_worm", "clenched_fist", "old_grudge", "heirloom_crab"]:
 			fs.append(_foe(fid))
 		await _gallery("part27_foes", fs, 1.0, 0.25)
 		await _gallery("part27_lords", [_foe("palace_buyer", true), _foe("wan_juan", true), _foe("li_jing", true)], 1.05, 0.25)

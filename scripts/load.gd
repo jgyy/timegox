@@ -321,13 +321,14 @@ static func text(g, riding: bool = false) -> String:
 		return "Everything he has is in the Mustard-Seed Ring, and the ring weighs what a ring weighs."
 	return "%d of %d jin: %s. %s" % [int(round(weight(g))), int(round(cap(g, riding))), str(TIERS[tier(g, riding)]), str(TIER_TEXT[tier(g, riding)])]
 
-## The lines of the page: [name, count, jin] of everything on his back, heaviest first.
+## The lines of the page: [name, count, jin] of everything on his back that has any bulk, heaviest first.
 static func rows(g) -> Array:
 	var out: Array = []
 	for id in g.inv:
 		var sid := str(id)
 		var n := carried(g, sid)
-		if n > 0 and Data.ITEMS.has(sid):
+		# (what has no bulk is not on the page: it is in a sleeve)
+		if n > 0 and Data.ITEMS.has(sid) and weight_of(sid) > 0.0:
 			out.append([str(Data.ITEMS[sid].n), n, weight_of(sid) * float(n)])
 	out.sort_custom(func(a, b): return float(a[2]) > float(b[2]))
 	return out
