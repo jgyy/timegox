@@ -4990,28 +4990,27 @@ func _answer_shots(which: String = "1") -> void:
 		var fr: Array = []
 		var fr2: Array = []
 		var placed := false
-		for st in [["festive", 19.2], ["thriving", 10.0], ["afraid", 18.6], ["lean", 10.0], ["cold", 10.0]]:
+		# (in the order of the day: the clock is only ever put forward)
+		for st in [["thriving", 10.0], ["lean", 10.2], ["cold", 10.4], ["afraid", 18.6], ["festive", 19.2]]:
 			Game.weal = {}
 			Game.picks = {}
 			Game.boss_done = {}
 			match str(st[0]):
 				"festive":
+					Game.weal_force = {}
 					Game.weal = {"qingshi|gift": 3, "qingshi|shift": 4, "qingshi|fare": 4, "qingshi|bag": 4, "qingshi|errand": 12, "kills|village": 200, "kills|bamboo": 200}
 					Game.war_won = {"a": 3, "b": 3}
 				"thriving":
 					Game.weal = {"qingshi|gift": 3, "qingshi|shift": 4, "qingshi|errand": 8}
 					Game.war_won = {}
 				"afraid":
-					Game.falls = {}
 					Game.weal = {}
 					Game.war_won = {}
-					Game.war_lost = 9
 					Game.weal_force = {"qingshi": "afraid"}
 				"lean":
 					Game.weal_force = {"qingshi": "lean"}
 				"cold":
 					Game.weal_force = {}
-					Game.war_lost = 0
 					Game.weal = {"qingshi|broke": 9}
 			Game.weal_n += 1
 			Game.toasts.clear()
@@ -5022,23 +5021,26 @@ func _answer_shots(which: String = "1") -> void:
 			if not placed:
 				_high_put(door + out_d * 2, -out_d, float(st[1]))
 				placed = true
-				await _wait(2.0)
+				await _wait(0.6)
+
 			Game.clock = float(st[1]) * 60.0
 			w._weal_t = 0.0
-			await _wait(1.5)
+			# (a town is slow to draw without a graphics card: a few frames are enough for the doors to be hung)
+			await _wait(0.4)
 			var dp: Vector3 = Terrain3D.world_pos(door)
 			dp.y = w._player_pos().y
 			var fw := Vector3(out_d.x, 0.0, out_d.y)
 			w.cam_override = Transform3D(Basis.IDENTITY, dp + fw * 5.2 + Vector3(1.4, 2.2, 0)).looking_at(dp + Vector3(0, 1.7, 0), Vector3.UP)
 			Game.toasts.clear()
 			main.toast_list.clear()
-			await _wait(0.2)
+			await _wait(0.1)
 			await _shot("door_%s" % str(st[0]), false)
+			print("[tour] (door ", st[0], ")")
 			fr2.append(last_img)
 			if str(st[0]) in ["festive", "afraid", "cold"]:
 				# the street from above and behind him
 				w.cam_override = Transform3D(Basis.IDENTITY, dp + fw * 15.0 + Vector3(7.0, 9.5, 0)).looking_at(dp + fw * 2.0 + Vector3(0, 1.2, 0), Vector3.UP)
-				await _wait(0.3)
+				await _wait(0.1)
 				await _shot("town_%s" % str(st[0]))
 				fr.append(last_img)
 			w.cam_override = null
