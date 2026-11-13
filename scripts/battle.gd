@@ -815,7 +815,8 @@ func _win() -> void:
 		Game.add_item("hp_pill", fav)
 		Game.add_item("qi_pill", 1)
 		result_lines.append("Found: %d Healing Pills, 1 Spirit Qi Pill" % fav)
-	elif randf() < 0.25 + Game.talent_mod("drop"):
+	elif not ctx.get("tribulation", false) and randf() < 0.25 + Game.talent_mod("drop"):
+		# (the Heavy Road release: lightning leaves no pills behind it)
 		Game.add_item("hp_pill", 1)
 		result_lines.append("Found: Healing Pill")
 	Game.add_exp(xp)

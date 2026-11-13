@@ -67,6 +67,11 @@ const CROSSROADS := {
 			"drive": [["Narrator", "They go up the pass in a line, not looking back, with their hands empty. At the top one of them stops, as if he might say something. Then he goes on."], ["Yue Ling", "It is fair. I only wonder where a man goes, who has nothing and has just been shown he cannot take it."]],
 		},
 		"echo": {
+			# Part XXVII (the Heavy Road release)
+			"s_p27_tao": {
+				"mend": [["Tao Kan, Who Carries Bricks", "They tell me you once set forty bandits to mending a road with their own hands, when you were hardly more than a boy. Then you knew this already, and forgot it when you learned to fly. Most do."]],
+				"drive": [["Tao Kan, Who Carries Bricks", "They tell me you once drove forty bandits out of a valley when you were hardly more than a boy. I should have put baskets on their backs. A man who is carrying something has no hand free for a knife."]],
+			},
 			# Part XXV (the Three Burrows release)
 			"done:s_p25_cutters": {
 				"mend": [["Narrator", "Behind the woodcutters, unasked, come nine of Road-Mender Hou's forty with mallets over their shoulders. They lay the lane from the hall to where the well will be in one afternoon. They know how a place begins, they say: they have been one."]],
@@ -177,10 +182,16 @@ const CROSSROADS := {
 			"open": [["Narrator", "The first family comes up the road at dusk with a handcart, stops at the gate, and stands there. A child goes in first. Children always go in first."], ["Yue Ling", "Somebody will have to tell them which rooms not to open. I will make a list. It will be a long list."]],
 		},
 		"echo": {
+			# (the Heavy Road release: a king of the dead holds court in that house in Part XXI, and nobody
+			# said how he came to be in a house that was sealed, or given away)
+			"s_p21_aysha": {
+				"seal": [["Auntie Aysha of the Caravanserai", "They say you put nine seals on that house. He did not break one. He and his three thousand have been dead too long for a seal to notice them; they went in as a draught goes in."]],
+				"open": [["Auntie Aysha of the Caravanserai", "They say you gave that house to people with nowhere to go. They are there still, in the outer courts, with their doors barred at night. He took the great hall and the inner yards and did not ask whose they were."]],
+			},
 			# Part XXV (the Three Burrows release)
 			"s_p25_door": {
 				"open": [["Yue Ling", "You opened the Blood Moon Palace to whoever had nowhere. There are children playing hopscotch where its altar was. It is the same question, Lin Feng. Only this time you will be living next door to the answer."]],
-				"seal": [["Yue Ling", "You sealed the Blood Moon Palace with nine seals, and it has stayed sealed. That was a door kept shut on something. This is a door to be opened to somebody. I do not think the one tells you about the other."]],
+				"seal": [["Yue Ling", "You sealed the Blood Moon Palace with nine seals, and the seals are on its gates still. That was a door kept shut on something. This is a door to be opened to somebody. I do not think the one tells you about the other."]],
 			},
 			"pre:echo_xumo": {
 				"seal": [["Echo of Xu Mo", "You sealed my house. Nine seals. I felt each one. It is very tidy of you, sweeper. You people have always preferred a locked door to an answered question."]],
@@ -1158,6 +1169,36 @@ const CROSSROADS := {
 		}},
 	# ---- Part XXV (the Three Burrows release): a town's debts, a town's gate, and whose name is over its hall
 	# ---- Part XXVI (the Underclothes release): what becomes of the book of a physician who was put in chains for it
+	"the_sack": {"step": "s_p27_sack", "part": "XXVII", "n": "The Cloth Sack",
+		"ask": "Budai's sack is on the ground, and everything Lin Feng has ever carried for anybody is in it: a broom, a seal, a town, the sky. A king has just set his pagoda down. The monk is waiting. What comes after?",
+		"options": [
+			{"id": "carry", "label": "Pick it up again, all of it", "tilt": {"heart": 3, "reach": 2}, "gain": {"renown": 6},
+				"desc": "It is heavy and it is his, because nobody else's back was there. He will go on carrying whatever anybody hands him, for as long as there is a road, and know to the jin what it weighs (renown).",
+				"log": "Picked the sack up again, and went on carrying for whoever asked."},
+			{"id": "share", "label": "Put a strap on it for every shoulder", "tilt": {"craft": 3, "reach": 1}, "gain": {"stones": 9000},
+				"desc": "No load in the land carried by one back again: a board in every town with what is to be moved and a name against every strap. Something new, which carriers will pay their dues into gladly (spirit stones).",
+				"log": "Shared the sack out: a strap for every shoulder, and a name against each."},
+			{"id": "down", "label": "Leave it by his own gate, empty", "tilt": {"reach": -3, "craft": -2, "heart": -1}, "gain": {"hearth": {"valley": 3}},
+				"desc": "He has carried enough. Let each thing go back to whoever it belongs to, as it did before there was a sweeper to hand it to, and let the sack hang empty by the road home (the regard of the Rice Hearth).",
+				"log": "Left the sack hanging empty by the gate, and went in to supper."},
+		],
+		"after": {
+			"carry": [["Narrator", "Lin Feng bends his knees, as Tao Kan taught him, gets a shoulder under the sack and stands up. It is exactly as heavy as it was. Budai claps his hands like a child at a conjuror."], ["Budai, the Cloth-Sack Monk", "Hah! And he walks off with it! That is the other half of the teaching, and nobody ever waits to see it. Here: a seed, for your smith's ring. It will hold all that, and you will carry it anyway. I know your kind. I am your kind."]],
+			"share": [["Narrator", "Lin Feng takes the cord off the neck of the sack and begins to plait it into straps: two, four, a great many. Budai watches with his head on one side, and then starts handing him more cord out of the sack, which seems to have a good deal."], ["Budai, the Cloth-Sack Monk", "I never thought of that. Three hundred years with one sack and one shoulder, and I never once thought of that. Take a seed for your smith's ring, clever sweeper. And put a strap on the ring too, if you can find where."]],
+			"down": [["Narrator", "Lin Feng looks into the sack a long time. Then he tips it up. What falls out is nothing: every thing in it has gone home already, and had only been waiting to be let. He folds the sack over his arm, like a cloak on a warm day."], ["Budai, the Cloth-Sack Monk", "Ahh. Most people need to be very old before they find it was empty. Here is the seed for your smith's ring. It holds everything, so naturally it is only given to somebody with nothing left to put in it. Go home. Eat something."]],
+		},
+		"echo": {
+			"s_p27_end": {
+				"carry": [["Elder Qing Xuan", "And I hear you picked the monk's sack up again. Of course you did. I have watched you pick up everything that was ever put down near you since you were thirteen. I used to think it a fault. I think now it is simply what you weigh."]],
+				"share": [["Elder Qing Xuan", "And I hear there is a board in the Silk Woods with a name against every strap. Smith Tie has put his on it, for charcoal, and so, I am told, has Auntie Zhou, for forty buckets. I have been wondering what an Elder might decently carry."]],
+				"down": [["Elder Qing Xuan", "And I hear there is an empty sack hanging by the bamboo gate. I went down and looked in it. There was nothing there. I have not slept so well since I was made Elder, and I cannot tell you why."]],
+			},
+		},
+		"end": {
+			"carry": "On the roads of the land there are posts at the height of a shoulder, and a sweeper who carries what he is handed and knows what it weighs, and has never yet said that it was too much.",
+			"share": "In every town of the south there is a board with the loads of the day on it, and a name against every strap, and nobody in that country has carried anything alone since.",
+			"down": "By the gate of the Whispering Bamboo an old hemp sack hangs empty, and whoever comes home along that road looks into it, and goes on lighter.",
+		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
 		"options": [
@@ -1177,6 +1218,12 @@ const CROSSROADS := {
 			"burn": [["Narrator", "The blue bag goes into the brazier first, and then the book, a handful of pages at a time. Hua Tuo watches from the step. When the page on the frolics goes in he says, quite quietly, the tiger, the deer, the bear, the ape, the bird, and that is all."], ["Mistress Wu, the Jailer's Wife", "He is not angry. That is the worst of it. He says he will have to teach it all again, to people, one at a time, the old way. He says it as if it were good news."]],
 		},
 		"echo": {
+			# Part XXVII (the Heavy Road release)
+			"s_p27_seed": {
+				"copy": [["Chan Master Zhichang", "There is a physician's book on the counter of the post below, by the way, with a stone on it. The prefect read it in an afternoon. I have set him to carrying water for the sick of the village. He is on the second page, in his arms."]],
+				"keep": [["Chan Master Zhichang", "They tell me a physician's book is kept at your town behind a broom, and must be swept for. Whoever thought of that has understood about scrolls. I should like to send you a prefect."]],
+				"burn": [["Chan Master Zhichang", "They tell me you let a physician's book be burned, and that he teaches it by hand now. The prefect was horrified. I told him it was the only one of all his ten thousand that had ever been carried."]],
+			},
 			"done:s_p26_herbs": {
 				"copy": [["Hua Tuo", "One of them has a copy already: it came to the counter at Longmen, and she read the page on the needle on the boat. She has it wrong in three places. I am delighted. Nobody gets anything wrong that they have not read."]],
 				"keep": [["Hua Tuo", "They asked where the book was. I said: at Guiyun, behind a broom. One of them went straight there and is sweeping. The other two are staying here, to see whether I am worth the sweeping."]],
@@ -1212,6 +1259,12 @@ const CROSSROADS := {
 			"shares": [["Feng Xuan", "A mill. Their debt, going round. Forty years of books, and I never once thought to make a thing out of a sum. It is neither mercy nor rigour. It is carpentry. I shall want a new kind of column."], ["Narrator", "The half-tallies are nailed in a row along the mill-house wall before there is a mill-house. Children learn their own family's notches by counting from the left."]],
 		},
 		"echo": {
+			# Part XXVII (the Heavy Road release)
+			"s_p27_cart": {
+				"burn": [["The Charcoal Seller", "They say there is a town up your mountain where the tallies were burned in the square. I did not believe it. A place where what is owed is let go. I have been owed for forty years by people with papers."]],
+				"collect": [["The Charcoal Seller", "They say in your town every debt is collected to the notch, and written up where all can read it. Good. I can bear a hard price. It is a price nobody will show me that I cannot carry."]],
+				"shares": [["The Charcoal Seller", "They say in your town a debt is a share in a mill. If the palace had taken a share in my kiln instead of my cart, I should be a rich man, and it would have had charcoal every winter for forty years."]],
+			},
 			# Part XXVI (the Underclothes release)
 			"s_p26_book": {
 				"burn": [["Yue Ling", "You burned the tallies of Guiyun once, in the square, and it was a better fire than anybody expected. This is a different fire, Lin Feng. A tally is a debt. This is a cure."]],
@@ -1329,7 +1382,8 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_clay", "the_lute", "the_host",
 	"the_tide", "the_ape", "the_horse",
 	"the_tallies", "the_door", "the_seat",
-	"the_book"]
+	"the_book",
+	"the_sack"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

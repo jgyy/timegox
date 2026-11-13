@@ -54,7 +54,9 @@ PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
                "mine", "dig", "wash", "trace", "open_chest", "comb", "pound", "spin", "count", "stretch", "knock", "pour",
                "peer", "hang", "rock", "carve", "pan", "squeeze", "duck",
                # the High Roads release (Part XXII): rock and air
-               "scale", "glide", "alight")
+               "scale", "glide", "alight",
+               # the Heavy Road release (Part XXVII): the work of the hands, and walking under a load
+               "fell", "quarry", "reap", "angle", "haul", "haul_idle")
 MATERIALS = {"toon", "plain", "glow"}
 
 

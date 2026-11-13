@@ -55,6 +55,16 @@ const LETTERS := {
 		"lines": ["I did a thing people will say was terrible. You let me, and did not say it was not. Thank you for that. He came to our door last week and showed my husband the bear, in the street, in front of everybody. Nobody laughed. I think that was his answer."]},
 	"hua_last": {"from": "Hua Tuo", "after": "s_p26_book", "wait": 4,
 		"lines": ["Cultivator: you sit still a great deal for somebody so young. Do the bird every morning, and the bear when it rains, and get into hot water whenever anybody offers. Every hinge in you will thank me in eighty years. I shall not be there. Wu Pu will. He says he will be a hundred and seventy-one."]},
+	# ---- Part XXVII (the Heavy Road release): letters about a sack, and from a man who carries bricks
+	"sack_carry": {"from": "Porter Geng of the Maple Gorge", "needs": ["the_sack", "carry"], "wait": 3,
+		"lines": ["Lin Feng, they have set posts along the gorge road at the height of a shoulder, so that a load can be rested without being put down. Nobody told us who. We know who. I rest at every one and say your name, which is quicker than a prayer and has done my back more good."]},
+	"sack_share": {"from": "Mistress Ruan of the Carriers' Hall", "needs": ["the_sack", "share"], "wait": 3,
+		"lines": ["We have a board in the Silk Woods now with every load on it and every back that took a share. Forty names the first month. The governor came and read it through twice and put his own at the bottom, for bricks. I enclose your share of the first quarter. It is small. It is honestly small."],
+		"gift": {"stones": 400}},
+	"sack_down": {"from": "Auntie Zhou of the Kitchen", "needs": ["the_sack", "down"], "wait": 3,
+		"lines": ["There is an old sack hanging by the bamboo gate that you had no business leaving there, child, and I walk past it every market day and it is always empty and I am always glad. You carried enough. Come and eat. I have made too much, as usual, and there is nobody to carry it away."]},
+	"tao_last": {"from": "Tao Kan", "after": "s_p27_sack", "wait": 4,
+		"lines": ["Sweeper: the granary is roofed. It was your eight stems and my bricks and somebody's sawdust. I hear you have a ring now that holds everything. Good. Take out one thing every morning and carry it a hundred paces, and put it back at night. I will know if you do not. I shall not know how, but I will."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -91,7 +101,7 @@ const LETTERS := {
 	"palace_open": {"from": "Sister Ruo, doorkeeper", "needs": ["palace", "open"],
 		"lines": ["Two hundred and twelve slept under the Blood Moon's roof last night. A cooper has set up in the hall of mirrors and there are washing-lines across the throne room. Somebody's goat had twins on the dais. You would not know the place. That is the idea, I take it."]},
 	"palace_seal": {"from": "Treasurer Bao of the Sect", "needs": ["palace", "seal"],
-		"lines": ["Seventeen talisman seals upon the Blood Moon Palace, to be renewed each year at the winter solstice, in perpetuity. I enclose the account, not for payment. For awareness. Perpetuity is the longest column I keep."]},
+		"lines": ["Nine lotus seals upon the Blood Moon Palace, to be renewed each year at the winter solstice, in perpetuity. I enclose the account, not for payment. For awareness. Perpetuity is the longest column I keep."]},
 	"boon_rain": {"from": "Headman Luo of Qingshi", "needs": ["dragon_boon", "rain"], "gift": {"stones": 200},
 		"lines": ["It rained on the third day of the third month, from the east, for exactly as long as the seedlings wanted, and stopped. Old Peng says he has farmed sixty years and never been rained on politely before. The village sends this from the first threshing."]},
 	"boon_sea": {"from": "Harbour-Master Zeng of Longmen", "needs": ["dragon_boon", "sea"], "gift": {"stones": 200},
@@ -159,7 +169,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

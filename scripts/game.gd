@@ -136,6 +136,18 @@ var obstacle_hits := {}
 var ambushes := 0
 var waves := 0
 var strikes := 0
+## the Heavy Road release (load.gd, toil.gd): what is left in the storehouse (item -> how many), the
+## jin carried a league on the hero's own back, the work of the hands done (work -> times; every time;
+## tile -> the day it last gave), what a step asking for work or for a load has had since it began,
+## and the goods sold to the pedlars of the road
+var stash := {}
+var hauled := 0.0
+var toil := {}
+var toil_n := 0
+var toiled := {}
+var step_toil := 0
+var step_haul := 0
+var sold := 0
 ## steps just finished that have words to say about it, waiting for the world ("done:<step>")
 var done_pending: Array = []
 ## the Six Hearths (cultures.gd, the New Fire release): standing with each hearth of the land; the
@@ -380,6 +392,14 @@ func reset() -> void:
 	yue_outfit = "lotus"
 	worn = {"sweeper": true}
 	underclothes = false
+	stash = {}
+	hauled = 0.0
+	toil = {}
+	toil_n = 0
+	toiled = {}
+	step_toil = 0
+	step_haul = 0
+	sold = 0
 	feats = {}
 	eggs = {}
 	heard = {}
@@ -839,7 +859,13 @@ func advance() -> void:
 	# and a weapon (arms.gd): Iron Fang's sabre, the Empress's fan
 	for aid in Arms.step_rewards(str(s.id)):
 		grant_arm(str(aid))
+	# (the Heavy Road release: what somebody puts into his hands when a step is done: an axe, a rod)
+	for gk in s.get("gives", {}):
+		add_item(str(gk), int(s.gives[gk]))
+		toast("Given: %s" % str(Data.ITEMS[str(gk)].n))
 	step += 1
+	step_toil = 0
+	step_haul = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
 	if str(s.id) == Hold.FOUND_STEP:
 		Hold.found(self)
@@ -940,6 +966,12 @@ func poll_steps() -> void:
 			"marks":
 				# Part XXIV: so many of the things his choices left standing gone and looked at (marks.gd)
 				ok = marks_count(s) >= int(s.n)
+			"toil":
+				# Part XXVII: the work of the hands done so many times since the step began (toil.gd)
+				ok = step_toil >= int(s.n)
+			"haul":
+				# Part XXVII: so many of a good of the land brought to somebody (toil.gd, load.gd)
+				ok = step_haul >= int(s.n)
 			"hold":
 				# Part XXV: the town that is his own has what the step asks of it (hold.gd): so many plots
 				# built, a plot, a rank, so many households
@@ -1039,6 +1071,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(tried_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "arms":
 		t += "  (%d/%d)" % [mini(Arms.adept(self), int(s.n)), int(s.n)]
+	elif s.kind == "toil":
+		t += "  (%d/%d)" % [mini(step_toil, int(s.n)), int(s.n)]
+	elif s.kind == "haul":
+		t += "  (%d/%d, %d carried)" % [mini(step_haul, int(s.n)), int(s.n), Toil.on_hand(self, s)]
 	elif s.kind == "fate":
 		t += "  - a fated encounter: Esc > Fates"
 	if Trials.trial_of_step(s) != "" or s.kind == "gates":

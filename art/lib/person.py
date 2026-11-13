@@ -2941,6 +2941,210 @@ def clip_alight(t):
     return p
 
 
+# ---------------------------------------------------------------- the Heavy Road release: the work of the hands
+# (scripts/toil.gd: fell, angle, quarry, reap) and walking under a load (scripts/load.gd: haul, haul_idle)
+
+FELL_T = 1.5
+
+
+def clip_fell(t):
+    """Felling a tree: feet apart and side on to the trunk, the axe drawn back level over the right
+    shoulder with the whole body wound up behind it, then swung round flat into the trunk at the
+    height of the hip, the hips arriving first and the arms last; the jolt of the bite goes up to
+    the shoulders, the head follows the edge, and the axe is worked free on the way back."""
+    k = (t % FELL_T) / FELL_T
+    p = clip_idle(0.0)
+    back = smooth(0.0, 0.4, k) * (1.0 - smooth(0.48, 0.58, k))
+    blow = smooth(0.48, 0.58, k) * (1.0 - smooth(0.8, 1.0, k))
+    jolt = _hold(k, 0.56, 0.6, 0.64, 0.74)
+    # (a thing held lies along the back of the hand at rest: it points up and back with the arms thrown
+    # up and the wrists cocked, and level and forward with the elbows bent and the wrists turned down)
+    p["upper_arm.R"] = ((-1.5 - 0.9 * back + 0.25 * blow, 0.0, -0.3 - 0.6 * back + 0.6 * blow), (0, 0, 0))
+    p["forearm.R"] = ((-1.5 - 0.4 * back + 0.15 * blow, 0.3, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.9 - 0.2 * back + 0.1 * blow, 0.0, -0.2 * blow), (0, 0, 0))
+    p["upper_arm.L"] = ((-1.5 - 0.8 * back + 0.25 * blow, 0.0, -0.5 - 0.5 * back + 0.45 * blow), (0, 0, 0))
+    p["forearm.L"] = ((-1.3 - 0.4 * back + 0.15 * blow, -0.35, 0.0), (0, 0, 0))
+    p["hand.L"] = ((-0.6 - 0.2 * back, 0.0, 0.15 * blow), (0, 0, 0))
+    _hands(p, 1.15, 1.15)
+    p["hips"] = ((0.1 + 0.1 * blow, -0.55 * back + 0.45 * blow, 0.0), (0.02 * blow, -0.1 - 0.04 * blow + 0.014 * jolt, 0.0))
+    _add(p, "spine", 0.1 + 0.12 * blow, -0.3 * back + 0.25 * blow)
+    _add(p, "chest", 0.05 + 0.08 * blow, -0.3 * back + 0.28 * blow, 0.02 * jolt)
+    _add(p, "head", 0.1 + 0.1 * blow, 0.5 * back - 0.4 * blow, 0.03 * jolt)
+    _add(p, "sleeve.R", 0.5 + 0.7 * back)
+    _add(p, "sleeve.L", 0.5 + 0.5 * back)
+    _add(p, "thigh.L", -0.34 - 0.08 * blow, 0.0, 0.14)
+    _add(p, "shin.L", 0.42 + 0.12 * blow)
+    _add(p, "foot.L", -0.08)
+    _add(p, "thigh.R", 0.16 - 0.1 * blow, 0.0, -0.14)
+    _add(p, "shin.R", 0.26 + 0.1 * back)
+    _add(p, "foot.R", -0.36 + 0.1 * blow)
+    _add(p, "hair_tail", 0.0, 0.0, 0.25 * back - 0.3 * blow)
+    return p
+
+
+QUARRY_T = 1.2
+
+
+def clip_quarry(t):
+    """Cutting stone: a stride forward with the left knee well bent, the pick lifted high over the
+    right shoulder with a straightening of the back, and brought down hard on the rock at the height
+    of the knee; the haft stops dead, the elbows take it, and grit makes him turn his face."""
+    k = (t % QUARRY_T) / QUARRY_T
+    p = clip_idle(0.0)
+    up = smooth(0.02, 0.44, k) * (1.0 - smooth(0.5, 0.6, k))
+    blow = smooth(0.5, 0.6, k) * (1.0 - smooth(0.84, 1.0, k))
+    jolt = _hold(k, 0.58, 0.61, 0.65, 0.76)
+    for sd, s in (("L", 1), ("R", -1)):
+        # (overhead with the wrists cocked the pick stands up behind the head; elbows bent and wrists
+        # turned down it comes forward and down into the rock)
+        p["upper_arm." + sd] = ((-1.35 - 1.1 * up + 0.15 * blow, 0.0, -0.2 * s - 0.25 * up), (0, 0, 0))
+        p["forearm." + sd] = ((-1.15 - 0.7 * up + 0.15 * blow - 0.12 * jolt, -0.32 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.8 - 0.25 * up + 0.1 * blow, 0.0, 0.28 * s), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.4 + 0.8 * up)
+    _hands(p, 1.15, 1.15)
+    p["hips"] = ((0.12 + 0.12 * blow - 0.06 * up, -0.2 * up + 0.1 * blow, 0.0), (0.0, -0.13 - 0.08 * blow + 0.015 * jolt, 0.02))
+    _add(p, "spine", 0.08 - 0.16 * up + 0.2 * blow, -0.12 * up)
+    _add(p, "chest", -0.1 * up + 0.12 * blow, -0.14 * up)
+    _add(p, "head", 0.1 - 0.16 * up + 0.12 * blow, 0.3 * jolt, 0.0)
+    _add(p, "thigh.L", -0.62 - 0.1 * blow)
+    _add(p, "shin.L", 0.78 + 0.16 * blow)
+    _add(p, "foot.L", -0.16)
+    _add(p, "thigh.R", 0.3)
+    _add(p, "shin.R", 0.36 + 0.14 * blow)
+    _add(p, "foot.R", -0.5)
+    _add(p, "toe.R", -0.3)
+    return p
+
+
+REAP_T = 1.6
+
+
+def clip_reap(t):
+    """Cutting herbs with a sickle: down on his haunches with the back bent, the left hand gathering a
+    handful of stalks and holding them over, the right hand bringing the sickle round low towards
+    him under the left; then the cut handful is lifted and laid aside to his left, and again."""
+    k = (t % REAP_T) / REAP_T
+    p = clip_idle(0.0)
+    reach = smooth(0.0, 0.3, k) * (1.0 - smooth(0.62, 0.78, k))
+    cut = smooth(0.3, 0.5, k) * (1.0 - smooth(0.56, 0.7, k))
+    lay = smooth(0.62, 0.78, k) * (1.0 - smooth(0.9, 1.0, k))
+    _crouch(p, 1.0, True)
+    p["upper_arm.L"] = ((-0.9 - 0.35 * reach + 0.1 * lay, 0.0, -0.15 + 0.85 * lay), (0, 0, 0))
+    p["forearm.L"] = ((-0.55 - 0.3 * reach, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((0.35 - 0.2 * lay, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.R"] = ((-1.0 - 0.15 * reach, 0.0, -0.75 * reach + 1.05 * cut), (0, 0, 0))
+    p["forearm.R"] = ((-1.1 - 0.25 * cut, 0.3 + 0.4 * cut, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-1.0, 0.0, -0.35 * reach + 0.6 * cut), (0, 0, 0))
+    _hands(p, 0.9 + 0.4 * reach, 1.15)
+    _add(p, "spine", 0.3 + 0.12 * reach, 0.1 * reach - 0.22 * cut + 0.2 * lay)
+    _add(p, "chest", 0.16 + 0.08 * reach, 0.1 * reach - 0.2 * cut + 0.24 * lay)
+    _add(p, "head", -0.12 + 0.1 * reach, 0.2 * lay - 0.1 * cut, 0.0)
+    _add(p, "sleeve.L", 0.5)
+    _add(p, "sleeve.R", 0.5)
+    return p
+
+
+ANGLE_T = 6.4
+
+
+def clip_angle(t):
+    """Angling for the pot: the rod whipped back over the shoulder and cast, a long wait with the tip
+    low and the eyes on the float, the strike (both wrists snapped up, the back straightening), and
+    the fish played in with the rod bowed and the body leaning away from it, hand over hand."""
+    k = (t % ANGLE_T) / ANGLE_T
+    w = 2 * math.pi / ANGLE_T
+    p = clip_idle(t)
+    back = _hold(k, 0.0, 0.06, 0.09, 0.14)
+    cast = _hold(k, 0.1, 0.15, 0.18, 0.26)
+    wait = smooth(0.22, 0.3, k) * (1.0 - smooth(0.54, 0.57, k))
+    strike = _hold(k, 0.55, 0.58, 0.62, 0.68)
+    play = smooth(0.62, 0.7, k) * (1.0 - smooth(0.93, 1.0, k))
+    bob = 0.025 * math.sin(t * w * 9.0) * wait
+    pull = play * (0.5 + 0.5 * math.sin(t * w * 14.0))
+    # (the rod lies level and forward with the elbows bent and the wrists turned down; it goes up as
+    # the arms do)
+    p["upper_arm.R"] = ((-0.85 - 0.9 * back - 0.2 * cast + bob - 0.7 * strike - 0.45 * play - 0.15 * pull, 0.0, -0.12), (0, 0, 0))
+    p["forearm.R"] = ((-1.5 - 0.5 * back + 0.55 * cast - 0.4 * strike - 0.3 * play, 0.35, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.8 - 0.4 * back + 0.5 * cast - 0.4 * strike - 0.2 * pull, 0.0, 0.0), (0, 0, 0))
+    p["upper_arm.L"] = ((-1.0 - 0.8 * back + bob - 0.5 * strike - 0.35 * play + 0.2 * pull, 0.0, 0.12), (0, 0, 0))
+    p["forearm.L"] = ((-1.2 - 0.3 * back + 0.3 * cast - 0.3 * strike - 0.35 * pull, -0.3, 0.0), (0, 0, 0))
+    p["hand.L"] = ((-0.1, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 1.05, 1.05)
+    lean = -0.16 * back + 0.14 * cast - 0.14 * strike - 0.22 * play
+    p["hips"] = ((0.04 + lean * 0.5, 0.0, 0.0), (0.0, -0.03 - 0.04 * play, -0.03 * play))
+    _add(p, "spine", lean * 0.6)
+    _add(p, "chest", lean * 0.5)
+    _add(p, "head", 0.18 * wait - 0.1 * back - lean * 0.6)
+    _add(p, "sleeve.R", 0.6 + 0.6 * back)
+    _add(p, "sleeve.L", 0.9)
+    _add(p, "thigh.L", -0.16 * play - 0.2 * cast)
+    _add(p, "shin.L", 0.2 * play + 0.2 * cast)
+    _add(p, "thigh.R", 0.12 * play)
+    _add(p, "shin.R", 0.3 * play)
+    _add(p, "foot.R", -0.2 * play)
+    return p
+
+
+HAUL_T = WALK_T
+
+
+def clip_haul(t):
+    """Walking under a load on the back: bent well forward from the hips so that the weight is over
+    the feet, both hands up at the shoulder straps with the elbows out, short flat steps on knees
+    that never quite straighten, the whole body sinking a little as each foot takes it, and the
+    head held up to see the road."""
+    p = clip_walk(t)
+    ph = t * 2 * math.pi / WALK_CYCLE
+    sink = 0.5 + 0.5 * math.cos(2 * (ph - 0.3) + math.pi)
+    for sd, s in (("L", 1), ("R", -1)):
+        th = p["thigh." + sd][0]
+        p["thigh." + sd] = ((th[0] * 0.62 - 0.42, th[1], th[2]), (0, 0, 0))
+        sh = p["shin." + sd][0]
+        p["shin." + sd] = ((sh[0] * 0.7 + 0.34, 0, 0), (0, 0, 0))
+        ft = p["foot." + sd][0]
+        p["foot." + sd] = ((ft[0] * 0.6 - 0.22, 0, 0), (0, 0, 0))
+        p["upper_arm." + sd] = ((-0.5 + 0.03 * math.sin(ph), 0.0, -0.5 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-2.25, -0.35 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.25, 0.0, 0.2 * s), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.7)
+    _hands(p, 1.2, 1.2)
+    hip = p["hips"]
+    p["hips"] = ((0.3, hip[0][1] * 0.5, hip[0][2] * 1.4), (0, -0.075 - 0.03 * sink, 0.03))
+    p["spine"] = ((0.2, 0.02 * math.sin(ph), 0.0), (0, 0, 0))
+    p["chest"] = ((0.14 + 0.02 * sink, 0.03 * math.sin(ph), 0.0), (0, 0, 0))
+    p["neck"] = ((-0.18, 0.0, 0.0), (0, 0, 0))
+    p["head"] = ((-0.36, -0.04 * math.sin(ph), 0.0), (0, 0, 0))
+    return p
+
+
+HAUL_IDLE_T = 3.2
+
+
+def clip_haul_idle(t):
+    """Standing under a load: still bent to it, hands on the straps, the weight shifted slowly from
+    one foot to the other, and once in the cycle a hitch of the shoulders to settle it higher."""
+    w = 2 * math.pi / HAUL_IDLE_T
+    k = (t % HAUL_IDLE_T) / HAUL_IDLE_T
+    p = clip_idle(t * IDLE_T / HAUL_IDLE_T)
+    sway = math.sin(t * w)
+    hitch = _hold(k, 0.6, 0.66, 0.7, 0.8)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.5 - 0.12 * hitch, 0.0, -0.5 * s), (0, 0, 0))
+        p["forearm." + sd] = ((-2.25 - 0.1 * hitch, -0.35 * s, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.25, 0.0, 0.2 * s), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.7)
+        _add(p, "thigh." + sd, -0.3 - 0.05 * sway * s)
+        _add(p, "shin." + sd, 0.34 + 0.06 * sway * s)
+        _add(p, "foot." + sd, -0.2)
+    _hands(p, 1.2, 1.2)
+    p["hips"] = ((0.24, 0.0, 0.035 * sway), (0.012 * sway, -0.06 + 0.02 * hitch, 0.02))
+    _add(p, "spine", 0.18 - 0.05 * hitch)
+    _add(p, "chest", 0.12 - 0.04 * hitch + 0.012 * math.sin(t * w * 2.0))
+    _add(p, "neck", -0.14)
+    _add(p, "head", -0.26, 0.1 * math.sin(t * w * 0.5))
+    return p
+
+
 def _stowing(fn):
     return lambda t: _stow(fn(t))
 
@@ -3010,6 +3214,13 @@ INTERACT = {
     "scale": (SCALE_T, clip_scale),
     "glide": (GLIDE_T, clip_glide),
     "alight": (ALIGHT_T, clip_alight),
+    # the Heavy Road release (Part XXVII): the work of the hands, and walking under what it yields
+    "fell": (FELL_T, clip_fell),
+    "quarry": (QUARRY_T, clip_quarry),
+    "reap": (REAP_T, clip_reap),
+    "angle": (ANGLE_T, clip_angle),
+    "haul": (HAUL_T, clip_haul),
+    "haul_idle": (HAUL_IDLE_T, clip_haul_idle),
 }
 INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
 # the sword form on the stage is the one thing done with the blade out
