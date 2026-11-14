@@ -205,6 +205,15 @@ const MARKS := {
 		"down": {"area": "bamboo", "m": ["shrine"], "n": "The Sack by the Gate", "desc": "A little roofed stand by the road into the Whispering Bamboo, with an old hemp sack hanging in it by its cord, empty, and a bench in front. Whoever comes home along this road stops and looks into it, finds nothing there, and goes on with their shoulders an inch lower.",
 			"who": ["Old Mother Shi", "folk_grandma", Color("8a7a6a"), "My son went off to be a cultivator and came back carrying the troubles of four provinces, and thin. I brought him here and made him look in the sack. He said, there is nothing in it. I said, no. He slept two days.", "It is only a sack. The sweeper left it. They say the sweeper carried the sky, and then one day set everything down at home and went in to supper. I never heard of anything so sensible from anybody young."]},
 	},
+	# Part XXIX (the Ordered House release): where a friend sits who got up to look
+	"the_mat": {
+		"cut": {"area": "court", "m": ["bench", STRAW], "n": "The Two Mats", "k": 2, "desc": "Two halves of one reed mat laid a hoe's length apart in a garden among the ruins, each pegged at the corners. One faces the bean rows and one faces the road. The cut edges are bound with new cord, by the same hand, on the same evening.",
+			"who": ["Bean-Seller Ru", "folk_farmer", Color("6a7a4a"), "The thin one hoes and the other one talks to carters over the wall, and at noon they eat out of one pot with a mat each. I never saw two men get on so well. They say it was a knife did it.", "My wife and I have had one mat for thirty years. I have been looking at where the join would go. I have not said so."]},
+		"whole": {"area": "court", "m": ["bench"], "n": "The Kept Place", "desc": "An old reed mat on a low platform among the ruins, with two worn hollows in it side by side and a book lying open at each. One hollow is brushed clean of road dust every morning, whether or not anybody sat there the day before.",
+			"who": ["Bean-Seller Ru", "folk_farmer", Color("6a7a4a"), "He brushes the other one's place off before he sits down himself. Every morning. Some days the other one is here and some days he is at the gate. The place is brushed either way.", "I asked him why he kept it. He said somebody told him a place kept is the only thing that brings a man home. Then he asked the price of beans, to change the subject."]},
+		"road": {"area": "court", "m": ["gate", false, WOOD], "n": "The Looking Gate", "desc": "The old gate of the Jade Court, propped open with a stone, with a bench set just inside it facing the road. A rolled mat leans in the corner with two books in it. The step is worn bright by people who only meant to look for a moment.",
+			"who": ["Carter Dou", "folk_porter", Color("8a6a4a"), "There is a scholar at that gate most afternoons who asks me what I am carrying and where to, and writes it down. He says he has read about roads for thirty years and it is a kind of scholarship to see one.", "Two of them, some days. The round one waves. The thin one pretends he is only there to fetch the round one back. He has been fetching him back since the spring."]},
+	},
 	# Part XXVIII (the Answering Land release): what is owed for a kindness
 	"the_knot": {
 		"nothing": {"area": "fusang", "m": ["cairn", STRAW], "n": "The Cairn Where He Put It Down", "desc": "A small cairn in the long grass of the Valley of Sunrise, and round it a patch where every stem stands straight and none is tied. On the top stone somebody has left a single knot of grass, undone, the stems smoothed flat with a thumb.",
@@ -344,7 +353,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}

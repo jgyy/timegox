@@ -272,6 +272,24 @@ var felled_kind := {}
 ## what was said when something was found (eggs.gd), waiting to be shown
 var egg_pending: Array = []
 var _feat_t := 0.0
+## the Ordered House release (almanac.gd): days the story has moved the calendar on by, the month the last
+## stipend came for, when each pack's clock began (pack -> day), what was last told of each of the roll,
+## and stipends drawn
+var cal := 0
+var cal_month := -1
+var pack_day := {}
+var roll_told := {}
+var stipends := 0
+var _poll_day := 0
+## (creed.gd): what was done that the Way he walks is weighed by ("<deed>" -> times)
+var creed := {}
+var creed_told := ""
+## (fitting.gd): what has been set down where ("<spot>" -> thing), which houses have been put to rights
+## (house -> day), and how many since the step in hand began
+var placed := {}
+var fitted := {}
+var misplaced := 0
+var step_fit := 0
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -287,6 +305,12 @@ func _process(d: float) -> void:
 			# (the Underclothes release: the town that is his own grows overnight, and a step waiting on it
 			# hears of it without anything else having to happen first, hold.gd)
 			Hold.tick(self)
+			# (the Ordered House release, almanac.gd: what a new day has brought: the month's stipend, word of
+			# the roll; and creed.gd: the Way he walks, told when it changes)
+			if day != _poll_day:
+				_poll_day = day
+				Almanac.poll(self)
+			Creed.poll(self)
 			# (needs.gd: the body follows the land's clock; the night wears comfort faster)
 			if survival and prologue == "":
 				Needs.tick(self, 1.6 if Clock.is_night(Clock.hour(self)) else 1.0)
@@ -468,6 +492,18 @@ func reset() -> void:
 	npc_talks = {}
 	felled_kind = {}
 	egg_pending = []
+	cal = 0
+	cal_month = -1
+	pack_day = {}
+	roll_told = {}
+	stipends = 0
+	_poll_day = 0
+	creed = {}
+	creed_told = ""
+	placed = {}
+	fitted = {}
+	misplaced = 0
+	step_fit = 0
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -514,7 +550,7 @@ func fighter(i: int) -> Dictionary:
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
 		"atk": a, "def": float(Data.defense(level)) * (1.0 if i == 0 else 0.9), "spd": spd,
 		"elem": "phys", "weak": "none", "col": Color("7ec8ff") if i == 0 else Color("ff9ac0"),
-		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step) + dao_skills(i) + (Arms.skills(self) if i == 0 else []),
+		"shape": "hero" if i == 0 else "healer", "skills": Data.known_skills(i, level, step) + dao_skills(i) + (Arms.skills(self) + Creed.skills(self) if i == 0 else []),
 		"turns": 0, "flash": 0.0, "shake": 0.0, "dead": false, "fade": 1.0,
 	}
 
@@ -578,7 +614,8 @@ var _skill_now := {}
 
 func skill_of(id: String) -> Dictionary:
 	var s: Dictionary = Data.SKILLS[id]
-	if not s.has("arm"):
+	# (and the arts of the Way he walks, creed.gd: measured the same way)
+	if not s.has("arm") and not s.has("creed"):
 		return s
 	var key := "%s|%d|%d" % [id, level, step]
 	if _skill_now.has(key):
@@ -855,6 +892,8 @@ func advance() -> void:
 			cross_pending.append(cid)
 	# the story sets the hour here and there (clock.gd)
 	Clock.story_hour(self, str(s.id))
+	# (and the day of the year, almanac.gd)
+	Almanac.story_date(self, str(s.id))
 	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
 	for race in Data.AREAS.get(str(s.get("area", "")), {}).get("races", []):
 		race_gain(race, 8 if s.kind == "kill" else 5)
@@ -879,6 +918,7 @@ func advance() -> void:
 		add_item(str(gk), int(s.gives[gk]))
 		toast("Given: %s" % str(Data.ITEMS[str(gk)].n))
 	step += 1
+	step_fit = 0
 	step_toil = 0
 	step_haul = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
@@ -986,6 +1026,9 @@ func poll_steps() -> void:
 			"marks":
 				# Part XXIV: so many of the things his choices left standing gone and looked at (marks.gd)
 				ok = marks_count(s) >= int(s.n)
+			"fit":
+				# Part XXIX: so many houses put to rights since the step began (fitting.gd)
+				ok = step_fit >= int(s.n)
 			"toil":
 				# Part XXVII: the work of the hands done so many times since the step began (toil.gd)
 				ok = step_toil >= int(s.n)
@@ -1099,6 +1142,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(Arms.adept(self), int(s.n)), int(s.n)]
 	elif s.kind == "toil":
 		t += "  (%d/%d)" % [mini(step_toil, int(s.n)), int(s.n)]
+	elif s.kind == "fit":
+		t += "  (%d/%d)" % [mini(step_fit, int(s.n)), int(s.n)]
 	elif s.kind == "haul":
 		t += "  (%d/%d, %d carried)" % [mini(step_haul, int(s.n)), int(s.n), Toil.on_hand(self, s)]
 	elif s.kind == "fate":

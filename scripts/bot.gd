@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 37.0 * 3600.0
+var max_time := 39.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -117,6 +117,9 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXVIII: five knots somebody tied to the man who cannot be thrown, four rings to the owl, four scales to the
 	# jiao, and to the third scourge somebody who has been beaten
 	"du_hui": "relic", "night_owl": "relic", "bridge_jiao": "relic", "zhou_chu": "loss",
+	# Part XXIX: four shingles to the fire that was foretold, four feathers to the wall that did not change, four
+	# pieces of gold carried back to the furrow, and six rooms put to rights to the friend who went to look
+	"chimney_fire": "relic", "old_wall": "relic", "furrow_gold": "relic", "hua_xin": "house",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -163,7 +166,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXVII: the sack picked up again, all of it
 	"the_sack": ["carry"],
 	# Part XXVIII: a kindness is owed onward, to the next stranger
-	"the_knot": ["onward"]}
+	"the_knot": ["onward"],
+	# Part XXIX: the mat left whole, and his place kept
+	"the_mat": ["whole"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -868,6 +873,14 @@ func _world(d: float) -> void:
 			# Part XXIII: the notice board of Qingshi: Clerk Bai, by the Drum Tower (the choice takes down
 			# what can be reported at once, _choice)
 			_goto_entity("village", Jobs.CLERK)
+		"fit":
+			# Part XXIX: houses to be put to rights (fitting.gd): to the piece of furniture the next house of
+			# the step's region wants something at (the choice sets it down, sending out for it first, _choice)
+			var fw: Dictionary = Fitting.wanted(Game, Atlas.world_of(Data.layer_of(str(s.area))), str(s.area))
+			if fw.is_empty() or (int(Game.inv.get(str(fw.thing), 0)) <= 0 and Game.stones < Fitting.price(Game)):
+				_grind()
+			else:
+				_goto_entity(str(s.area), str(fw.spot))
 		"toil":
 			# Part XXVII: the work of the hands (toil.gd): the nearest piece of the step's region that can
 			# be worked at so, and C
@@ -1430,6 +1443,22 @@ func _choice() -> void:
 			for wt2 in Weal.ORDER:
 				if ("At the counter of " + str(Offices.OFFICES[str(Weal.TOWNS[wt2].office)].n)) == str(c.title) and not Weal.is_bettered(Game, wt2):
 					want = ids.find("weal:give")
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title) == main.FIT_ASK:
+		# a piece of furniture in somebody's house (fitting.gd): while a step asks for houses to be put to
+		# rights, what this house wants is sent out for and set down; otherwise the piece is used as it
+		# always was, or left
+		want = ids.find("use") if ids.has("use") else ids.find("later")
+		if not st.is_empty() and st.kind == "fit":
+			for k9 in ids.size():
+				if str(ids[k9]).begins_with("fit:send:") and c.options[k9].get("enabled", true):
+					want = k9
+			for k8 in ids.size():
+				if str(ids[k8]).begins_with("fit:set:"):
+					var fw2: Dictionary = Fitting.wanted(Game, world.wd, str(st.area))
+					if not fw2.is_empty() and str(ids[k8]) == "fit:set:" + str(fw2.thing):
+						want = k8
 		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title) == main.HOLD_ASK:
@@ -2784,6 +2813,16 @@ func _finish(reason: String) -> void:
 	# (the Three Burrows release: the town that is his own, hold.gd)
 	print("the town        : %s; %d families asked to come, %d grown of itself; dues %d a day, %d taken; %d disciples%s" % [Hold.summary(Game), Hold.settlers(Game), Hold.grown(Game), Hold.due(Game), int(Game.hold.get("dues", 0)), Hold.disciples(Game),
 		("; " + Hold.sect_name(Game)) if Hold.sect(Game) != "" else ""])
+	# (the Ordered House release: the day of the year and the roll, almanac.gd; the Way he walks, creed.gd; and
+	# the houses he put to rights, fitting.gd)
+	var grown_n := 0
+	for pk in Game.pack_day:
+		if Almanac.stage_of(Almanac.now(Game) - float(Game.pack_day[pk])) > 0:
+			grown_n += 1
+	print("the almanac     : day %d of the journey: %s; %s on the roll of nine; %d stipends drawn; %d packs met, %d of them grown since" % [Game.day, Almanac.text(Game), Almanac._place_word(Almanac.place(Game)), Game.stipends,
+		Game.pack_day.size(), grown_n])
+	print("the way         : %s (%s)" % [Creed.name_of(Game), Creed.text(Game)])
+	print("the houses      : %d put to rights, %d things standing where he set them, %d of them where they should not be" % [Game.fitted.size(), Game.placed.size(), Game.misplaced])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)

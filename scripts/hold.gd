@@ -156,6 +156,10 @@ static func founded(g) -> bool:
 static func _built(g) -> Dictionary:
 	return g.hold.get("built", {})
 
+## How many plots have been built.
+static func built_n(g) -> int:
+	return _built(g).size()
+
 ## Whether plot `id` is built (the hall stands from the founding).
 static func built(g, id: String) -> bool:
 	return founded(g) and (id == "hall" or _built(g).has(id))
@@ -609,7 +613,7 @@ static func epilogue(g) -> Array:
 		"take":
 			out.append("On Frostpeak the Cold Pine Sect has a patriarch who is seldom there, and %d disciples who sweep, now, because he said so." % disciples(g))
 		"serve":
-			out.append("The Hall of the Broom is a hall of the Azure Cloud, and sends its %d disciples up the nine hundred steps every spring, and they come back knowing how to sweep them." % disciples(g))
+			out.append("The Hall of the Broom is a hall of the Azure Cloud, and sends its %d disciples up the nine hundred and ninety-nine steps every spring, and they come back knowing how to sweep them." % disciples(g))
 	return out
 
 # ---------------------------------------------------------------- where it stands

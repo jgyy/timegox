@@ -908,7 +908,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -1001,6 +1001,12 @@ func _init() -> void:
 					"weal":
 						# the Answering Land release: towns that thrive (weal.gd): no more than half of them
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Weal.ORDER.size() / 2
+					"creed":
+						# the Ordered House release: a side of the Way (creed.gd): an axis, and just what makes a side
+						ok = ok and n.size() == 3 and Creed.AXES.has(str(n[1])) and absi(int(n[2])) == Creed.SIDE
+					"fitted":
+						# houses put to rights (fitting.gd): no more than the story's own steps have asked for by then
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 6
 					"households":
 						# the Three Burrows release: households of the hero's own town (hold.gd): no more than
 						# the story has brought there by the trial, nor than a city has
@@ -2103,6 +2109,7 @@ func _fates_and_faces() -> void:
 	_five_frolics()
 	_heavy_road()
 	_answering_land()
+	_ordered_house()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -4947,7 +4954,7 @@ func _three_burrows() -> void:
 				continue
 			if not str(bd25.vis).begins_with("s_p25_"):
 				# (the Underclothes release: a later chapter's bands take the same last slots in other regions)
-				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
+				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_") or str(bd25.vis).begins_with("s_p29_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
 				continue
 			bands25 += 1
 			check(bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
@@ -5217,7 +5224,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.rings_returned.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.in_its_place.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -6443,14 +6450,14 @@ func _answering_land() -> void:
 	CL.free()
 
 	print("== Part XXVIII: The Knotted Grass ==")
-	check(Data.REALMS.size() == 34 and Data.REALMS[33] == "Rings Returned" and Data.MAX_LEVEL == 99 and Data.level_name(99).ends_with("Rings Returned") and Data.REALM_INFO.size() == 34
+	check(Data.REALMS.size() >= 34 and Data.REALMS[33] == "Rings Returned" and Data.MAX_LEVEL >= 99 and Data.level_name(99).ends_with("Rings Returned") and Data.REALM_INFO.size() >= 34
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXVIII adds the realm of Rings Returned")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break33" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall26") and msrc.contains("\"s_break32\": \"recall26\"") and Data.DIALOGUE.has("pre:s_break33") and Data.DIALOGUE.has("post:s_break33"),
-		"Part XXVIII follows Sumeru in a Seed (recall26) and ends the game")
+	check(Data.step_index("s_break33") == Data.step_index("s_p29_home") - 1 and int(Data.STEPS[Data.step_index("s_break33")].to) == 99 and Data.DIALOGUE.has("recall26") and msrc.contains("\"s_break32\": \"recall26\"") and Data.DIALOGUE.has("pre:s_break33") and Data.DIALOGUE.has("post:s_break33"),
+		"Part XXVIII follows Sumeru in a Seed (recall26)")
 	var p28 := Data.step_index("s_p28_home")
 	var kinds28 := {}
 	var n28 := 0
-	for i in range(p28, Data.STEPS.size()):
+	for i in range(p28, Data.step_index("s_p29_home")):
 		var s28: Dictionary = Data.STEPS[i]
 		n28 += 1
 		kinds28[str(s28.kind)] = true
@@ -6514,7 +6521,7 @@ func _answering_land() -> void:
 	WG.free(); FG.free()
 	# the crossroads
 	var c28: Dictionary = Echoes.CROSSROADS.get("the_knot", {})
-	check(not c28.is_empty() and str(c28.step) == "s_p28_knot" and str(c28.part) == "XXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_knot", "what is owed for a kindness is asked last of all")
+	check(not c28.is_empty() and str(c28.step) == "s_p28_knot" and str(c28.part) == "XXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_knot", "what is owed for a kindness is asked last of all")
 	check((c28.options as Array).size() == 3 and c28.after.size() == 3 and c28.end.size() == 3 and c28.echo.has("s_p28_end") and c28.echo.s_p28_end.size() == 3, "the_knot: three answers, each answered, echoed and told at the end")
 	var letters28 := 0
 	for lid in Mail.ORDER:
@@ -6563,3 +6570,375 @@ func _pick_game(cid: String, oid: String):
 		_pg.reset()
 		Echoes.take(_pg, cid, oid)
 	return _pg
+
+## The Ordered House release: the almanac (the date, the roll, trades, packs that grow), the Way he walks (the nine
+## Ways and what each shuts), the fitness of things (houses that want something, things set down), and Part XXIX.
+func _ordered_house() -> void:
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	var ws: Dictionary = Atlas.world()
+	print("== the almanac (almanac.gd) ==")
+	var G = load("res://scripts/game.gd").new()
+	G.reset()
+	G.started = true
+	check(Almanac.month(G) == 2 and Almanac.dom(G) == 2 and Almanac.year(G) == 1 and Almanac.season(G) == "spring" and Almanac.year_name(G) == "Wood Dragon" and not Almanac.festival(G).is_empty(),
+		"the journey begins on the second of the second month, a feast day, in a Wood Dragon year (%s)" % Almanac.text(G))
+	check(Almanac.TERMS.size() == 24 and Almanac.MONTHS.size() == 12 and Almanac.SEASON_LINES.size() == 4, "twenty-four terms, twelve months, four seasons")
+	for f in Almanac.FESTIVALS:
+		check(int(f[0]) >= 1 and int(f[0]) <= 12 and int(f[1]) >= 1 and int(f[1]) <= 30 and str(f[3]).length() <= 200, "%s is a day of the year, with a word for it" % str(f[2]))
+	for sn in Almanac.SEASON_LINES:
+		for sl in Almanac.SEASON_LINES[sn]:
+			check(fits.call(str(sl)), "a word for the %s fits the box" % sn)
+	var seen_seasons := {}
+	var seen_feasts := {}
+	for d in 360:
+		G.day = 1 + d
+		seen_seasons[Almanac.season(G)] = true
+		if not Almanac.festival(G).is_empty():
+			seen_feasts[str(Almanac.festival(G)[2])] = true
+		check(Almanac.season_line(G, d) != "", "something is said of day %d" % d) if d % 45 == 0 else null
+	check(seen_seasons.size() == 4 and seen_feasts.size() == Almanac.FESTIVALS.size(), "a year goes through four seasons and every feast")
+	G.day = 361
+	check(Almanac.year(G) == 2 and Almanac.month(G) == 2 and Almanac.dom(G) == 2 and Almanac.year_name(G) == "Wood Snake", "after three hundred and sixty days it is the same day of the next year")
+	# the story sets the day of the year, forward only
+	G.day = 10
+	var before_i := Almanac.index(G)
+	Almanac.story_date(G, "s_p16_eve")
+	check(Almanac.month(G) == 12 and Almanac.dom(G) == 30 and Almanac.index(G) > before_i and str(Almanac.festival(G)[2]) == "New Year's Eve", "the reunion dinner is eaten on the last night of the year")
+	G.day = 11
+	check(Almanac.month(G) == 1 and Almanac.dom(G) == 1 and Almanac.year(G) == 2, "and the next morning is New Year's Day")
+	var at16 := Almanac.index(G)
+	Almanac.story_date(G, "s_p16_riddles")
+	check(Almanac.month(G) == 1 and Almanac.dom(G) == 15 and Almanac.index(G) == at16 + 14, "the riddles are guessed on the fifteenth")
+	for sid in Almanac.STORY_DATES:
+		check(Data.step_index(str(sid)) >= 0, "%s, which sets the day, is a step of the story" % sid)
+	# the roll
+	var R = load("res://scripts/game.gd").new()
+	R.reset()
+	R.started = true
+	check(Almanac.ROLL.size() == 8 and Almanac.roll(R).size() == 9 and Almanac.place(R) >= 7, "nine on the roll, and a sweeper begins near the foot of it (%d)" % Almanac.place(R))
+	var lv0: Array = []
+	for i in Almanac.ROLL.size():
+		lv0.append(Almanac.rival_level(R, i))
+		check(int(Almanac.ROLL[i].cap) <= Data.MAX_LEVEL and float(Almanac.ROLL[i].pace) > 0.0 and str(Almanac.ROLL[i].word) != "", "%s has a pace, a ceiling and a word" % str(Almanac.ROLL[i].n))
+	R.day = 60
+	var rose := 0
+	for i2 in Almanac.ROLL.size():
+		if Almanac.rival_level(R, i2) > int(lv0[i2]):
+			rose += 1
+	check(rose == Almanac.ROLL.size(), "sixty days on, every one of them has gone further, whether or not he did")
+	R.day = 100000
+	for i3 in Almanac.ROLL.size():
+		check(Almanac.rival_level(R, i3) == int(Almanac.ROLL[i3].cap), "%s stops where their road ends" % str(Almanac.ROLL[i3].n))
+	R.day = 1
+	R.level = 99
+	check(Almanac.place(R) == 1 and Almanac.stipend(R) > 0 and Almanac.roll_line(R) != "", "whoever is furthest on stands first")
+	# the stipend comes with the month, once
+	var S = load("res://scripts/game.gd").new()
+	S.reset()
+	S.started = true
+	check(Almanac.poll(S).is_empty() and S.cal_month >= 0, "nothing comes on the first morning")
+	var st0: int = S.stones
+	S.day = 30
+	var told: Array = Almanac.poll(S)
+	check(S.stones == st0 + Almanac.stipend(S) and S.stipends == 1 and not told.is_empty(), "the first of the month: the sect's stipend")
+	var st1: int = S.stones
+	Almanac.poll(S)
+	check(S.stones == st1, "and not twice")
+	check(Almanac.stipend(S) < 40 * (1 + S.realm()), "a stipend is worth less than the road")
+	S.day = 200
+	var told2: Array = Almanac.poll(S)
+	var word := false
+	for t2 in told2:
+		word = word or str(t2).begins_with("Word from the mountain")
+	check(word, "and word comes down of whoever has broken through")
+	# trades
+	var p1 := {"seed": 12345, "kid": false}
+	S.day = 1
+	var r0 := Almanac.craft_rank(p1, S)
+	S.day = 80
+	check(Almanac.craft_rank(p1, S) > r0 and Almanac.craft_rank(p1, S) <= 4 and Almanac.craft_rank({"seed": 5, "kid": true}, S) == 0, "a trade is learned by the day; a child has none yet")
+	for cr in Almanac.CRAFT_LINES.size():
+		for cl in Almanac.CRAFT_LINES[cr]:
+			check(str(cl).contains("%d") and fits.call(str(cl)), "what is said at place %d of a trade counts its days" % cr)
+	check(not Almanac.craft_line(p1, S).contains("%d"), "and the days are written in")
+	# packs
+	var P = load("res://scripts/game.gd").new()
+	P.reset()
+	P.started = true
+	var pack := {"id": "t:pack", "kind": "enemy", "group": [{"id": "trip_grass", "lv": 96}, {"id": "field_dust", "lv": 96}]}
+	check(Almanac.stage(P, pack) == 0 and P.pack_day.has("t:pack") and Almanac.grown(P, pack) == pack.group, "a pack's clock begins when it is first met, and it is as it was")
+	P.day = 2
+	P.clock = 600.0
+	check(Almanac.stage(P, pack) == 1 and int(Almanac.grown(P, pack)[0].lv) == 97 and Almanac.grown(P, pack).size() == 2, "a day alone: settled, a level stronger")
+	P.day = 4
+	check(Almanac.stage(P, pack) == 2 and Almanac.grown(P, pack).size() == 3, "two and a half: a brood, one head more")
+	P.day = 7
+	var old: Array = Almanac.grown(P, pack)
+	check(Almanac.stage(P, pack) == 3 and int(old[0].lv) == 98 and old.size() == 3 and bool(old[2].get("elder", false)), "five: grown old, two levels and an elder")
+	check((pack.group as Array).size() == 2 and int(pack.group[0].lv) == 96, "the pack as the land wrote it is never changed")
+	check(Data.make_foes(old).size() == 3, "what it has grown to can be fought")
+	Almanac.put_down(P, "t:pack")
+	check(Almanac.stage(P, pack) == 0, "put down, it begins again from nothing")
+	var top := {"id": "t:top", "kind": "enemy", "group": [{"id": "trip_grass", "lv": Data.MAX_LEVEL}]}
+	Almanac.stage(P, top)
+	P.day = 30
+	check(int(Almanac.grown(P, top)[0].lv) == Data.MAX_LEVEL, "nothing grows past the last level there is")
+	check(Almanac.STAGES.size() == Almanac.GROW_DAYS.size() + 1 and Almanac.WILD_WORDS.size() == Almanac.STAGES.size(), "a word for every stage")
+	check(msrc.contains("Almanac.grown_at(e.group") and msrc.contains("Almanac.put_down(Game"), "a battle is fought with what the pack has grown to, and winning it starts its clock again")
+
+	print("== the Way he walks (creed.gd) ==")
+	var C = load("res://scripts/game.gd").new()
+	C.reset()
+	C.started = true
+	check(Creed.WAYS.size() == 9 and Creed.key(C) == "0|0" and Creed.name_of(C) == "Walker of the Middle Way" and Creed.skills(C).is_empty(), "nine Ways, and everybody begins in the middle of both scales")
+	for sh in Creed.SHUT:
+		check(Creed.can(C, str(sh)) and Creed.why_not(C, str(sh)) == "" and fits.call(str(Creed.SHUT[sh][2])), "in the middle nothing is shut (%s)" % sh)
+	for mk in ["dealt", "dark", "taken", "exp", "stones", "price", "stipend"]:
+		check(Creed.mod(C, mk) == 1.0, "and no number is changed (%s)" % mk)
+	var way_names := {}
+	for wk in Creed.WAYS:
+		way_names[str(Creed.WAYS[wk].n)] = true
+		check(str(Creed.WAYS[wk].desc) != "", "%s is described" % str(Creed.WAYS[wk].n))
+	check(way_names.size() == 9, "no two Ways have one name")
+	for axis in Creed.AXES:
+		for sd in [1, -1]:
+			var sk := "%s|%d" % [axis, sd]
+			check(Creed.ARTS.has(sk) and Data.SKILLS.has(str(Creed.ARTS[sk])) and str(Data.SKILLS[str(Creed.ARTS[sk])].creed) == sk and Creed.MODS.has(sk) and not (Creed.CAN[sk] as Array).is_empty() and not (Creed.CANNOT[sk] as Array).is_empty() and (Creed.LINES[sk] as Array).size() >= 2,
+				"%s: an art, numbers, doors open and shut, and what the street says" % sk)
+	check(not Data.known_skills(0, Data.MAX_LEVEL).has("creed_devour") and not Data.known_skills(0, Data.MAX_LEVEL).has("creed_rectify"), "no art of a side is learned by level")
+	# the open road: the mat
+	C.gamble_rounds = 40
+	check(Creed.side(C, "rule") == -1 and Creed.name_of(C) == "Carefree Wanderer" and not Creed.can(C, "bag") and not Creed.can(C, "salary") and Creed.can(C, "gamble") and Creed.mod(C, "stipend") == 0.0 and Almanac.stipend(C) == 0
+		and Creed.skills(C) == ["creed_carefree"] and Mail.bag_offer(C, "head_qingshi").is_empty(), "forty rounds at the mat: a rogue cultivator, with no post-bag, no salary and no stipend")
+	# the Demonic Path
+	Creed.act(C, "devour", 5)
+	check(Creed.side(C, "virtue") == -1 and Creed.name_of(C) == "Calamity" and not Creed.can(C, "pray") and not Creed.can(C, "work") and not Creed.can(C, "fare") and Creed.mod(C, "dealt") > 1.0 and Creed.mod(C, "price") > 1.0
+		and Creed.skills(C).has("creed_devour") and not Creed.skills(C).has("creed_rectify"), "the Devouring Palm five times: a Calamity; no incense lights, nobody hires, and the blow is harder")
+	check(Offices.blocked(C, "shop", "qingshi") != "" and Offices.fare_offer(C, {}).is_empty(), "no shift and no fare for the Demonic Path")
+	var altar := {"id": "t:altar", "kind": "prop", "prop": "altar"}
+	var qi0: float = C.qi[0]
+	C.qi[0] = 1.0
+	var said: Array = Props.use(altar, C)
+	check(said.size() == 1 and str(said[0]) == Creed.why_not(C, "pray") and C.qi[0] == 1.0 and int(C.prop_uses.get("t:altar", 0)) == 1, "an altar gives him nothing, and the praying still counts as done")
+	C.qi[0] = qi0
+	check(C.fighter(0).skills.has("creed_devour") and float(C.skill_of("creed_devour").mult) > 1.0 and float(Data.SKILLS.creed_devour.drain) > 0.0, "his art is in his hand, measured against what he knows")
+	# the Righteous Path, and the precepts
+	var V = load("res://scripts/game.gd").new()
+	V.reset()
+	V.started = true
+	for hk in ["a:1", "a:2", "a:3", "a:4"]:
+		V.fitted[hk] = 1
+	check(Creed.side(V, "virtue") == 1 and Creed.name_of(V) == "Benevolent Wayfarer" and not Creed.can(V, "sleeper") and Creed.can(V, "pray") and Creed.mod(V, "dark") > 1.0 and Creed.mod(V, "price") < 1.0 and Creed.skills(V) == ["creed_rectify"],
+		"four houses put to rights: of the Righteous Path, who will not strike what sleeps")
+	V.shifts = {"shop": 6}
+	check(Creed.side(V, "rule") == 1 and Creed.name_of(V) == "Pillar of the Righteous Path" and not Creed.can(V, "gamble") and Creed.mod(V, "taken") < 1.0 and Creed.mod(V, "stipend") > 1.0 and Creed.skills(V).size() == 2,
+		"six shifts worked: a keeper of the precepts, who does not sit at a mat")
+	check(Trials.need_met(["creed", "virtue", Creed.SIDE], V) and not Trials.need_met(["creed", "virtue", -Creed.SIDE], V) and Trials.need_met(["creed", "virtue", -Creed.SIDE], C) and Trials.need_text(["creed", "rule", Creed.SIDE], V) != ""
+		and Trials.need_met(["fitted", 4], V) and not Trials.need_met(["fitted", 5], V), "trials can be passed by the Way he walks, and by the ordered house")
+	check(Trials.KINDS.has("way") and Trials.KINDS.has("house") and Trials.KIND_ORDER.has("way") and Trials.KIND_ORDER.has("house"), "both are ways through a trial")
+	Creed.poll(V)
+	Creed.poll(V)
+	V.fitted = {}
+	V.toasts = []
+	Creed.poll(V)
+	check(V.creed_told == Creed.key(V) and not V.toasts.is_empty(), "the land says so when the Way he walks changes")
+	check(Creed.causes(V).size() >= 1 and Creed.text(V) != "" and Creed.doors(V).size() == 2 and Creed.line(V, 3) != "" and Creed.line(G, 3) == "", "the page of the Way says why, and the street says what it thinks")
+	check(msrc.contains("Creed.can(Game, \"gamble\")") and FileAccess.get_file_as_string("res://scripts/world.gd").contains("Creed.can(Game, \"sleeper\")") and FileAccess.get_file_as_string("res://scripts/battle.gd").contains("Creed.mod(Game, \"dealt\")"),
+		"the mat, the sleeping pack and the blow all ask the Way")
+	# (the bot's own journey is never one of the Demonic Path: it breaks nothing on purpose, strikes nothing asleep on purpose)
+	check(not bsrc.contains("creed_devour"), "the bot does not learn the Devouring Palm")
+
+	print("== the fitness of things (fitting.gd) ==")
+	var F = load("res://scripts/game.gd").new()
+	F.reset()
+	F.started = true
+	F.level = 99
+	check(Fitting.ORDER.size() == Fitting.THINGS.size() and Fitting.WORDS.size() == Fitting.THINGS.size(), "seven things of a house, each with what is said for want of it and for having it")
+	for tid in Fitting.ORDER:
+		var th: Dictionary = Fitting.THINGS[tid]
+		check(Data.ITEMS.has(tid) and Load.weight_of(tid) == 0.0 and not (th.good as Array).is_empty() and (th.bad as Dictionary).size() >= 2, "%s: a thing of the land that weighs nothing, with where it belongs and where it must never stand" % tid)
+		for gk in th.good:
+			check(Props.FURNITURE.has(str(gk)) and not (th.bad as Dictionary).has(str(gk)), "%s belongs at a %s" % [tid, gk])
+		for bk in th.bad:
+			check(Props.FURNITURE.has(str(bk)) and fits.call(str(th.bad[bk])) and Fitting.verdict(tid, str(bk)) == -1, "%s must never stand at a %s, and somebody says why" % [tid, bk])
+		check(fits.call(str(Fitting.WORDS[tid][0])) and fits.call(str(Fitting.WORDS[tid][1])), "%s: both words fit the box" % tid)
+	var n_wants := 0
+	var kinds_wanted := {}
+	var hs: Dictionary = Fitting._index(ws).houses
+	for hk2 in hs:
+		var w: Dictionary = Fitting.want(ws, str(hk2))
+		if w.is_empty():
+			continue
+		n_wants += 1
+		kinds_wanted[str(w.thing)] = true
+		var se = null
+		for e in ws.ents:
+			if str(e.get("id", "")) == str(w.spot):
+				se = e
+		check(se != null and str(se.furn) == str(w.kind) and (Fitting.THINGS[str(w.thing)].good as Array).has(str(w.kind)) and Fitting.resident(ws, str(hk2)) != "" and Fitting.house_of(ws, str(w.spot)) == str(hk2),
+			"%s wants a %s at a piece of furniture it really has, and somebody lives there" % [hk2, w.thing])
+	check(n_wants >= 30 and kinds_wanted.size() >= 4, "houses all over the land want something (%d, of %d kinds)" % [n_wants, kinds_wanted.size()])
+	check(Fitting.count(ws, "village") >= 6 and Fitting.count(ws, "yanggu") >= 4, "Qingshi and Yanggu have more houses to put to rights than the story asks for (%d, %d)" % [Fitting.count(ws, "village"), Fitting.count(ws, "yanggu")])
+	var fw: Dictionary = Fitting.wanted(F, ws, "village")
+	var fe: Dictionary = {}
+	for e2 in ws.ents:
+		if str(e2.get("id", "")) == str(fw.spot):
+			fe = e2
+	check(Fitting.complaint(F, ws, str(fw.house)) == str(Fitting.WORDS[str(fw.thing)][0]), "whoever lives there says what is wrong")
+	F.stones = 100000
+	var opts: Array = Fitting.options(F, ws, fe)
+	check(opts.size() == 1 and str(opts[0].id) == "fit:send:" + str(fw.thing) and bool(opts[0].enabled), "with nothing in the bag, what the house wants can be sent out for")
+	check(Fitting.send_for(F, str(fw.thing)) != "" and int(F.inv.get(str(fw.thing), 0)) == 1 and F.stones == 100000 - Fitting.price(F) and Fitting.price(F) < Fitting.thanks(F), "a boy runs to the market: paid for, in the bag, and cheaper than the thanks")
+	# the wrong thing in the wrong place first
+	var wrong := ""
+	for tid2 in Fitting.ORDER:
+		if (Fitting.THINGS[tid2].bad as Dictionary).has(str(fe.furn)):
+			wrong = tid2
+	if wrong != "":
+		F.inv[wrong] = 1
+		var bad: Dictionary = Fitting.set_down(F, ws, fe, wrong)
+		check(int(bad.v) == -1 and str(bad.line) == str(Fitting.THINGS[wrong].bad[str(fe.furn)]) and F.misplaced == 1 and Fitting.at(F, str(fe.id)) == wrong and not Fitting.is_fitted(F, str(fw.house)), "the wrong thing set down there is objected to, and stays")
+		check(Fitting.options(F, ws, fe).size() == 1 and str(Fitting.options(F, ws, fe)[0].id) == "fit:take", "and can be taken up again")
+		check(Fitting.take_up(F, str(fe.id)) != "" and F.misplaced == 0 and int(F.inv.get(wrong, 0)) == 1 and Fitting.at(F, str(fe.id)) == "", "taken up: back in the bag, and forgiven")
+		F.inv.erase(wrong)
+	var good: Dictionary = Fitting.set_down(F, ws, fe, str(fw.thing))
+	check(int(good.v) == 1 and int(good.stones) == Fitting.thanks(F) and Fitting.is_fitted(F, str(fw.house)) and F.step_fit == 1 and Fitting.complaint(F, ws, str(fw.house)) == "" and not F.inv.has(str(fw.thing)),
+		"the right thing at the right piece: the house is put to rights, and says so")
+	check(Fitting.wanted(F, ws, "village").get("house", "") != str(fw.house), "and the next house is another")
+	check(Fitting.thanks(F) < 60 * (1 + F.realm()), "a house's thanks are worth less than the road")
+	F.prop_uses[str(fe.id)] = 1
+	check(Fitting.touched(F, ws, fe).contains(Fitting.resident(ws, str(fw.house))), "nobody likes their things handled")
+	F.prop_uses[str(fe.id)] = 2
+	check(Fitting.touched(F, ws, fe) == "", "and says so once")
+	check(Fitting.options(F, ws, {"id": "furn:nowhere:none:0", "furn": "table"}).is_empty(), "a piece of no house offers nothing")
+	for tid3 in Fitting.ORDER:
+		var mdl: Node3D = Fitting.model(tid3)
+		check(mdl != null and mdl.get_child_count() >= 1, "%s has a model built from code" % tid3)
+		mdl.free()
+	# the step that asks for houses
+	var H = load("res://scripts/game.gd").new()
+	H.reset()
+	H.started = true
+	H.level = 99
+	H.stones = 100000
+	H.step = Data.step_index("s_p29_fit") - 1
+	H.advance()
+	check(str(H.cur_step().id) == "s_p29_fit" and H.step_fit == 0 and int(H.inv.get("water_jar", 0)) == 1 and H.objective_text().contains("(0/3)"), "the step begins with nothing put to rights, and a jar in the bag")
+	var done_n := 0
+	while str(H.cur_step().id) == "s_p29_fit" and done_n < 9:
+		var hw: Dictionary = Fitting.wanted(H, ws, "village")
+		check(not hw.is_empty(), "there is a house of Qingshi that still wants something")
+		if hw.is_empty():
+			break
+		var he: Dictionary = {}
+		for e3 in ws.ents:
+			if str(e3.get("id", "")) == str(hw.spot):
+				he = e3
+		if int(H.inv.get(str(hw.thing), 0)) <= 0:
+			Fitting.send_for(H, str(hw.thing))
+		Fitting.set_down(H, ws, he, str(hw.thing))
+		done_n += 1
+		H.poll_steps()
+	check(done_n == 3 and str(H.cur_step().id) == "s_p29_wood", "three houses put to rights, and the step is done (%d)" % done_n)
+	check(bsrc.contains("Fitting.wanted(Game") and bsrc.contains("main.FIT_ASK") and bsrc.contains("\"fit:set:\""), "the bot goes to the house, sends out and sets down")
+	check(msrc.contains("func offer_fit") and msrc.contains("\"later\", \"label\": \"Leave it\""), "\"Leave it\" is the first answer at somebody's furniture")
+
+	print("== Part XXIX: The Crooked Chimney ==")
+	check(Data.REALMS.size() == 35 and Data.REALMS[34] == "Everything in Its Place" and Data.MAX_LEVEL == 102 and Data.level_name(102).ends_with("Everything in Its Place") and Data.REALM_INFO.size() == 35
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXIX adds the realm of Everything in Its Place")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break34" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall27") and msrc.contains("\"s_break33\": \"recall27\"") and Data.DIALOGUE.has("pre:s_break34") and Data.DIALOGUE.has("post:s_break34"),
+		"Part XXIX follows Rings Returned (recall27) and ends the game")
+	var p29 := Data.step_index("s_p29_home")
+	var kinds29 := {}
+	var n29 := 0
+	for i4 in range(p29, Data.STEPS.size()):
+		var s29: Dictionary = Data.STEPS[i4]
+		n29 += 1
+		kinds29[str(s29.kind)] = true
+		check(str(s29.id).begins_with("s_p29_") or str(s29.id) == "s_break34", "%s is a step of the chapter" % s29.id)
+		if str(s29.kind) == "talk":
+			check(Data.DIALOGUE.has(str(s29.id)), "%s has its conversation" % s29.id)
+		if str(s29.kind) == "kill":
+			check(Data.DIALOGUE.has("pre:" + str(s29.boss)) and Data.DIALOGUE.has("post:" + str(s29.boss)) and Trials.TRIALS.has(str(s29.boss)) and Lore.BOSS.has(str(s29.boss)), "%s: words before and after, a trial, and a story" % s29.boss)
+			check(bsrc.contains("\"%s\": \"" % str(s29.boss)), "the bot has a way planned through %s" % s29.boss)
+		if str(s29.kind) == "hunt":
+			for en in s29.of:
+				check(Data.ENEMIES.has(str(en)) and Lore.BEAST.has(str(en)) and int(Data.ENEMIES[str(en)].get("boss", false)) == 0, "%s: a foe of the chapter with a story" % en)
+			var band: Dictionary = Data.AREAS[str(s29.area)].get("warband5", {})
+			for en2 in s29.of:
+				var in_pool := false
+				for pl in band.get("pool", []):
+					in_pool = in_pool or str(pl[0]) == str(en2)
+				check(in_pool, "%s marches in %s" % [en2, s29.area])
+		if str(s29.kind) in ["hunt", "collect", "toil", "haul", "folk", "fit", "summit", "glide", "marks"]:
+			check(Data.DIALOGUE.has("done:" + str(s29.id)), "%s: something is said when it is done" % s29.id)
+		if str(s29.kind) == "haul":
+			check(Data.DIALOGUE.has("haul:" + str(s29.id)) and Load.GOODS.has(str(s29.good)), "%s: a good of the land, and a word as each load arrives" % s29.id)
+		if str(s29.kind) == "folk":
+			check(Folk.ERRANDS.has(str(s29.id)) and Folk.ERRANDS[str(s29.id)].lines.size() >= 4, "%s: the errand has its words" % s29.id)
+		if str(s29.kind) == "fit":
+			check(Fitting.count(ws, str(s29.area)) >= int(s29.n) + 1, "%s: %s has more houses to put to rights than are asked for" % [s29.id, s29.area])
+		for gk2 in s29.get("gives", {}):
+			check(Data.ITEMS.has(str(gk2)), "%s puts a thing that exists into his hands" % s29.id)
+	check(n29 >= 28 and kinds29.has("fit") and kinds29.has("toil") and kinds29.has("haul") and kinds29.has("summit") and kinds29.has("glide") and kinds29.has("marks") and kinds29.has("folk"), "the chapter is thirty steps of ten kinds (%d)" % n29)
+	# two fit steps ask for no more than the hero has put to rights by the trial that counts them
+	check(Data.step_index("s_p29_rights") < _kill_step("hua_xin") and Data.step_index("s_p29_fit") < _kill_step("chimney_fire"), "the houses are put to rights before the lords who are shown them")
+	var c29: Dictionary = Echoes.CROSSROADS.get("the_mat", {})
+	check(not c29.is_empty() and str(c29.step) == "s_p29_mat" and str(c29.part) == "XXIX" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_mat", "where a friend sits is asked last of all")
+	check((c29.options as Array).size() == 3 and c29.after.size() == 3 and c29.end.size() == 3 and c29.echo.has("s_p29_end") and c29.echo.s_p29_end.size() == 3, "the_mat: three answers, each answered, echoed and told at the end")
+	var letters29 := 0
+	for lid in Mail.ORDER:
+		if Mail.LETTERS[lid].has("needs") and str(Mail.LETTERS[lid].needs[0]) == "the_mat":
+			letters29 += 1
+	check(letters29 == 3 and Mail.LETTERS.has("tian_chimney") and Mail.ORDER.has("tian_chimney"), "a letter for each answer, and one from a man with a bent chimney")
+	var scales29 := {}
+	var creeds29 := {}
+	for o29 in c29.options:
+		check(Marks.MARKS.the_mat.has(str(o29.id)) and Marks.MARKS.the_mat[str(o29.id)].has("who"), "the_mat/%s leaves something standing, and somebody by it" % o29.id)
+		check(not Weal.hears(str(Marks.MARKS.the_mat[str(o29.id)].area)).is_empty(), "the_mat/%s is felt in a town" % o29.id)
+		for sc in o29.tilt:
+			scales29[sc] = true
+		for ck in o29.get("creed", {}):
+			creeds29["%s%d" % [ck, signi(int(o29.creed[ck]))]] = true
+			check(Creed.AXES.has(str(ck)) and absi(int(o29.creed[ck])) < Creed.SIDE, "the_mat/%s leans on the Way, and does not by itself decide it" % o29.id)
+	check(scales29.size() == 3 and creeds29.size() == 3, "its answers tip all three scales, and three sides of the Way")
+	var CG = load("res://scripts/game.gd").new()
+	CG.reset()
+	Echoes.take(CG, "the_mat", "road")
+	check(Creed.value(CG, "rule") < 0 and Echoes.option_text(CG, Echoes.option("the_mat", "cut")).contains("Orthodox"), "an answer weighs on the Way he walks, and says so before it is given")
+	CG.free()
+	var old_echo29 := 0
+	for cid2 in Echoes.ORDER:
+		if cid2 == "the_mat":
+			continue
+		for ek in Echoes.CROSSROADS[cid2].get("echo", {}):
+			if str(ek).contains("s_p29_"):
+				old_echo29 += 1
+	check(old_echo29 >= 2, "older crossroads echo in Part XXIX (%d)" % old_echo29)
+	check(bsrc.contains("\"chimney_fire\": \"relic\"") and bsrc.contains("\"hua_xin\": \"house\"") and bsrc.contains("\"the_mat\": [\"whole\"]"), "the bot has a plan for every trial and the crossroads of the chapter")
+	for a29 in ["marsh", "grave", "court"]:
+		check(str(Data.AREAS[a29].get("warband5", {}).get("vis", "")).begins_with("s_p29_") and not Data.AREAS[a29].has("warband6"), "%s: the chapter's band takes the last slot" % a29)
+	check(Marks.AFTER_BANDS.has("the_mat"), "the marks of its crossroads are stood after the late bands")
+	var found29 := 0
+	for e29 in ws.ents:
+		if (e29.kind == "pickup" and str(e29.id).begins_with("p29_")) or (e29.kind == "boss" and str(e29.enemy) in ["chimney_fire", "old_wall", "furrow_gold", "hua_xin"]) or (e29.kind == "npc" and str(e29.id) in ["the_guest", "host_tian", "ding_lingwei", "guan_ning", "hua_xin"]):
+			found29 += 1
+			check(Atlas.owner_id(ws, e29.pos) == str(e29.area), "%s stands in its own region" % e29.id)
+	check(found29 == 12 + 4 + 5, "everything the chapter stands in the land found room (%d)" % found29)
+	for pr in [["chimney_fire", "charred_shingle", "s_p29_shingles"], ["old_wall", "crane_feather", "s_p29_feathers"], ["furrow_gold", "furrow_piece", "s_p29_gold"]]:
+		check(Data.step_index(str(pr[2])) < _kill_step(str(pr[0])) and Data.ITEMS.has(str(pr[1])) and Look.PICKUP_COLORS.has(str(pr[1])), "%s can be passed by what was found on the way" % pr[0])
+	for fid in ["in_its_place", "bent_chimney", "crane_home", "cut_mat"]:
+		check(Feats.FEATS.has(fid), "the feat %s is kept" % fid)
+	for pid in ["the_guest", "ding_lingwei", "guan_ning", "hua_xin"]:
+		check(Assets.PEOPLE.has(pid) and Assets.has(str(Assets.PEOPLE[pid])), "%s has a body built from a script" % pid)
+		check(Data.CHAT.has(pid) and Data.CHAT[pid].size() >= 4, "%s has four things to say" % pid)
+	check(Data.CHAT.has("host_tian") and Data.CHAT.host_tian.size() >= 4, "the householder has four things to say")
+	check(Almanac.STORY_DATES.has("s_p29_feast"), "the crane comes down on the Double Ninth")
+	G.free(); R.free(); S.free(); P.free(); C.free(); V.free(); F.free(); H.free()

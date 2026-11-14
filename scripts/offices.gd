@@ -166,7 +166,8 @@ static func hours(g, use: String) -> int:
 ## The salary waiting for the hero at trade `use` in `town`: for each day since the last shift there
 ## (not today's), half a day's wage, for at most five days; nothing below the fourth rank.
 static func salary_due(g, use: String, town: String) -> int:
-	if rank(g, use) < SALARY_RANK or not g.salary_day.has(use + "|" + town):
+	# (the Ordered House release, creed.gd: a rogue cultivator is on nobody's books)
+	if rank(g, use) < SALARY_RANK or not g.salary_day.has(use + "|" + town) or not Creed.can(g, "salary"):
 		return 0
 	var days := clampi(int(g.day) - int(g.salary_day[use + "|" + town]) - 1, 0, SALARY_DAYS)
 	return int(round(wage(g, use) * SALARY * days))
@@ -211,6 +212,9 @@ static func wage(g, use: String) -> int:
 
 ## Why a shift of trade `use` cannot be worked in town `town` just now ("" if it can).
 static func blocked(g, use: String, town: String) -> String:
+	# (the Ordered House release, creed.gd: nobody hires somebody of the Demonic Path)
+	if not Creed.can(g, "work"):
+		return Creed.why_not(g, "work")
 	if not TRADES.has(use):
 		return "There is no work here for a stranger's hands."
 	if int(g.shift_day.get(town, -1)) == int(g.day):
@@ -277,6 +281,9 @@ static func hops(from: String, to: String) -> int:
 ## The fare somebody found indoors (`e`: one of rooms.gd's residents) would pay to be carried, if they
 ## want carrying at all and the carriage in use has a seat free: {id, n, asset, from, to, pay}, or {}.
 static func fare_offer(g, e: Dictionary) -> Dictionary:
+	# (creed.gd: nobody rides with somebody of the Demonic Path)
+	if not Creed.can(g, "fare"):
+		return {}
 	var area := str(e.get("area", ""))
 	if not str(e.get("trade", "")) in FARE_USES or not area in FARE_TOWNS or Fashion.seats(str(g.ride)) < 3:
 		return {}

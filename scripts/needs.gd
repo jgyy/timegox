@@ -167,7 +167,8 @@ static func _collapse(g, k: String) -> void:
 			# asleep where he stood: six hours gone, rested somewhat, and stiff
 			g.needs["rest"] = 55.0
 			give(g, {"comfort": -30.0, "clean": -8.0})
-			Clock.set_hour(g, fposmod(Clock.hour(g) + 6.0, 24.0))
+			if Clock.frozen(g) == "":
+				Clock.set_hour(g, fposmod(Clock.hour(g) + 6.0, 24.0))
 			# (the six hours asleep are not then charged again as six hours awake)
 			g.needs_clock = float(g.clock) + float(g.day) * 1440.0
 		"hunger":
@@ -288,7 +289,7 @@ static func act(g, id: String, ctx: Dictionary) -> String:
 			give(g, {"bladder": 100.0, "bowels": 100.0})
 			if not bool(ctx.get("privy", false)):
 				give(g, {"clean": -4.0})
-				return "A step off the road, behind a tree. Yue Ling takes a great interest in the horizon."
+				return "A step off the road, behind a tree." + (" Yue Ling takes a great interest in the horizon." if g.companion else "")
 			return "The privy out the back. There is a sprig of mugwort hung in it, as there ought to be."
 		"wash":
 			give(g, {"clean": 55.0, "comfort": 6.0})
@@ -300,18 +301,22 @@ static func act(g, id: String, ctx: Dictionary) -> String:
 			var hr := float(ctx.get("hour", Clock.hour(g)))
 			if hr < Clock.DUSK - 1.0 and hr >= 4.0:
 				give(g, {"rest": 30.0, "comfort": -8.0, "clean": -2.0})
-				Clock.set_hour(g, hr + 2.0)
+				if Clock.frozen(g) == "":
+					Clock.set_hour(g, hr + 2.0)
 				g.needs_clock = float(g.clock) + float(g.day) * 1440.0
 				give(g, {"hunger": -5.0, "thirst": -6.0, "bladder": -8.0})
 				return "Two hours under a tree with the cloak over the face. Not a night; a good deal better than nothing."
 			give(g, {"rest": 70.0, "comfort": -22.0, "clean": -6.0})
-			Clock.set_hour(g, 6.0)
+			# (the Ordered House release: the night that will not end is not ended by sleeping rough either)
+			if Clock.frozen(g) == "":
+				Clock.set_hour(g, 6.0)
 			g.needs_clock = float(g.clock) + float(g.day) * 1440.0
 			give(g, {"hunger": -18.0, "thirst": -20.0, "bladder": -30.0})
 			return "Slept under the sky, on the cloak, with a root in the back. It is morning, and everything aches a little."
 		"forage":
 			give(g, {"hunger": 26.0, "thirst": 18.0, "comfort": -6.0, "rest": -4.0})
-			Clock.set_hour(g, fposmod(Clock.hour(g) + 0.75, 24.0))
+			if Clock.frozen(g) == "":
+				Clock.set_hour(g, fposmod(Clock.hour(g) + 0.75, 24.0))
 			g.needs_clock = float(g.clock) + float(g.day) * 1440.0
 			return "Wild yam, a handful of sour berries, water out of a leaf. Three quarters of an hour, and nobody is full."
 	return ""

@@ -1113,6 +1113,12 @@ const ERRANDS := {
 			"I have seen him. My dog has not. The dog looks straight through where he is and wags, as it does at my father's grave. I do not hunt that side of the field any more. It seems rude.",
 			"Seen him? I have nearly fallen over his work. Knots, a hand high, all down the slope where the big one from Qin stands. I thought, there is a man with a grudge. Then I saw his face. It is not a grudge. It is the other thing.",
 			"He asked me the way to the tanner's house, the first night. I told him the tanner was dead these two years. He said he knew; he only wanted to see that the roof was sound. Then he went back to his grass."]},
+	# Part XXIX (the Ordered House release): every bucket a pedlar carries, for a house with a straight chimney
+	"s_p29_pedlars": {"ask": "There is a house afire below the fourth height of Qingshi, and the well is a street away. Will you bring every bucket, pot and ladle on your pole, and not ask who pays?", "price": 0, "toast": "%s is running with every bucket on the pole",
+		"lines": ["Fire? Say no more. Buckets are six stones apiece, and tonight they are nothing apiece. I have sold water-jars in that lane for ten years and told every one of them where to stand it.",
+			"The house with the straight chimney? I sold him that stove-lid. I said to him, friend, that wood is too near. He said he would thank me to sell lids. Well. Here are eleven buckets and my opinion, both free.",
+			"I am going, I am going. A pedlar who walks past a fire does not sell in that town again, and should not. Take the ladles off the back for me, they catch on the gateposts.",
+			"Every bucket. And the big copper, which I was keeping for a wedding. A thing is for what it is needed for on the day; that is all the trade I know."]},
 	"s_p28_woodcutters": {"ask": "A dead bamboo with a hole in it is somebody's house. There is a boy below the height who would be glad if you left the hollow stems standing. Will you?", "price": 0, "toast": "%s will leave the hollow stems standing",
 		"lines": ["The hollow ones burn best. ...They do. And I have green enough to last. Very well: the ones with holes may stand. I shall tell my wife the wood is bad this year and she will believe me, for it always is.",
 			"For the birds? I have cut this forest thirty years and never asked what lived in it. I only asked how thick. Leave me think. ...I heard a great deal of singing when I was a boy. I hear less now. It may be my ears.",

@@ -522,6 +522,10 @@ func battle_theme() -> String:
 	return "ninesprings" if world.is_cave() else world.theme_name
 
 func interact(e: Dictionary) -> void:
+	# (the Ordered House release, fitting.gd: a piece of furniture in a house somebody lives in: there may be
+	# something to set down at it, or to take up)
+	if e.kind == "prop" and e.has("furn") and Game.prologue == "" and offer_fit(e):
+		return
 	match e.kind:
 		"npc":
 			talk_npc(e)
@@ -599,6 +603,46 @@ func interact(e: Dictionary) -> void:
 			# a thing to do (props.gd): Lin Feng steps up to it and does it
 			world.start_use(e)
 
+## The fitness of things (fitting.gd): what can be set down at, or taken up from, piece of furniture `e` of a
+## house somebody lives in.  "Leave it" is first, then the piece's own use.  False if there is nothing to offer.
+const FIT_ASK := "Everything in this room has a place."
+func offer_fit(e: Dictionary) -> bool:
+	var fo: Array = Fitting.options(Game, world.wd, e)
+	if fo.is_empty():
+		return false
+	var opts: Array = [{"id": "later", "label": "Leave it", "desc": "It is their house.", "col": UI.C_DIM}]
+	var pk := Props.kind_of(e)
+	if not pk.is_empty():
+		opts.append({"id": "use", "label": str(pk.get("verb", "Use it")), "desc": "As anybody might.", "col": UI.C_TEXT})
+	for o in fo:
+		var o2: Dictionary = (o as Dictionary).duplicate()
+		o2["col"] = UI.C_JADE if str(o.id).begins_with("fit:set") else UI.C_GOLD
+		opts.append(o2)
+	choose(FIT_ASK, opts, func(oid: String):
+		if oid == "use":
+			world.start_use(e)
+		elif oid == "fit:take":
+			Game.toast(Fitting.take_up(Game, str(e.id)))
+			world.placed_changed()
+		elif oid.begins_with("fit:send:"):
+			var told := Fitting.send_for(Game, oid.trim_prefix("fit:send:"))
+			if told != "":
+				Game.toast(told)
+				offer_fit(e)
+		elif oid.begins_with("fit:set:"):
+			var res: Dictionary = Fitting.set_down(Game, world.wd, e, oid.trim_prefix("fit:set:"))
+			if res.is_empty():
+				return
+			world.placed_changed()
+			var lines := [[str(res.who), str(res.line)]]
+			say(lines, func():
+				if int(res.stones) > 0:
+					Game.toast("%s's house is put to rights: %d spirit stones pressed into your hand" % [str(res.who), int(res.stones)])
+				Game.poll_steps()
+			)
+	)
+	return true
+
 ## The Living Land release (folk.gd): a word with one of the people of the towns.
 func talk_folk(e: Dictionary) -> void:
 	var fp: Dictionary = e.p
@@ -609,6 +653,19 @@ func talk_folk(e: Dictionary) -> void:
 		var wl := Weal.line(Game, str(fp.town), int(fp.seed) + wn / 2)
 		if wl != "":
 			lines = [[str(fp.n), wl.replace("%s", Game.address())]]
+	# (the Ordered House release: every fourth word is about the day of the year or how long they have been
+	# at their trade, almanac.gd; or about the Way he walks, creed.gd)
+	if wn % 4 == 2 and Game.prologue == "" and not Folk.new_year(Game) and Clock.frozen(Game) == "":
+		var al := ""
+		match (wn / 4 + int(fp.seed)) % 3:
+			0:
+				al = Almanac.season_line(Game, int(fp.seed) + wn / 4)
+			1:
+				al = Almanac.craft_line(fp, Game) if not bool(fp.kid) else Almanac.season_line(Game, int(fp.seed))
+			_:
+				al = Creed.line(Game, int(fp.seed) + wn / 4)
+		if al != "":
+			lines = [[str(fp.n), al.replace("%s", Game.address())]]
 	# a first word with one of a hearth's people (cultures.gd) is a step towards being its guest
 	var hid := Cultures.of_town(str(fp.town))
 	if hid != "" and not Game.folk_talk.has(str(fp.id)) and Game.prologue == "":
@@ -885,12 +942,20 @@ func talk_npc(e: Dictionary) -> void:
 	if e.has("trade") and e.has("lines"):
 		var ti: int = chat_idx.get(e.id, 0)
 		chat_idx[e.id] = ti + 1
-		say([[e.n, str(e.lines[ti % (e.lines as Array).size()])]], func(): offer_shift(e))
+		var tlines := [[e.n, str(e.lines[ti % (e.lines as Array).size()])]]
+		# (the Ordered House release, fitting.gd: whoever lives in a house says first what is wrong with it)
+		if bool(e.get("indoor", false)) and str(e.id).begins_with("res:") and Game.prologue == "":
+			var hp := str(e.id).split(":")
+			var fc := Fitting.complaint(Game, world.wd, "%s:%s" % [hp[1], hp[2]])
+			if fc != "" and ti % 2 == 0:
+				tlines = [[e.n, fc]]
+		say(tlines, func(): offer_shift(e))
 		return
 	var chats: Array = Data.CHAT.get(str(e.get("asset", e.id)), Data.CHAT.get(e.id, ["..."])).duplicate()
 	# somebody a choice left standing somewhere (marks.gd) has their own words
 	if e.has("lines"):
 		chats = (e.lines as Array).duplicate()
+
 	# somebody met on the road (fate.gd) has their own words for afterwards
 	if e.get("fate", false):
 		chats = FateText.CHAT.get(str(e.id), ["..."]).duplicate()
@@ -1732,6 +1797,10 @@ func _drop_fares() -> void:
 ## Old Du's mat (gamble.gd): the game, what is staked on, and how much; then the bowl is lifted, and
 ## the mat is there again.
 func offer_gamble() -> void:
+	# (the Ordered House release, creed.gd: whoever keeps the precepts does not sit at a mat)
+	if not Creed.can(Game, "gamble"):
+		say([["Old Du", Creed.why_not(Game, "gamble")]])
+		return
 	var opts: Array = []
 	for gid in Gamble.GAME_ORDER:
 		opts.append({"id": gid, "label": str(Gamble.GAMES[gid].n), "desc": str(Gamble.GAMES[gid].desc) + "\n\n" + Gamble.summary(Game), "col": UI.C_GOLD, "enabled": not Gamble.stakes(Game).is_empty()})
@@ -1827,6 +1896,7 @@ func offer_gift(e: Dictionary) -> void:
 ## comes back later, like any pack), but there is nothing to be learned from a beast that runs.
 func scatter_pack(e: Dictionary) -> void:
 	Game.defeated[e.id] = Game.playtime
+	Almanac.put_down(Game, str(e.id))
 	Game.scattered += 1
 	var d: Dictionary = Data.ENEMIES[e.group[0].id]
 	Game.toast("%s scatter before your %s aura" % [d.n, Data.REALMS[Game.realm()]])
@@ -1857,7 +1927,10 @@ func open_abode(e: Dictionary) -> void:
 func start_encounter(e: Dictionary, ambush: bool = false) -> void:
 	# (`ambush`: the pack was struck first in the land, impact.gd, and opens the battle reeling)
 	# (and the hour it was met at decides what it was doing: asleep, hunting, resting, habits.gd)
-	battle.start(e.group, {"entity": e, "boss": false, "theme": battle_theme(), "ambush": ambush, "habit": Habits.act_of_group(Game, e.group)})
+	# (the Ordered House release, almanac.gd: a pack left alone has grown: levels, a head more, an elder)
+	var grown_st := Almanac.stage(Game, e)
+	var grp: Array = Almanac.grown_at(e.group, grown_st)
+	battle.start(grp, {"entity": e, "boss": false, "theme": battle_theme(), "ambush": ambush, "habit": Habits.act_of_group(Game, e.group), "group": grp, "grown": grown_st})
 	push("battle")
 
 func boss_interact(e: Dictionary) -> void:
@@ -1981,7 +2054,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -2080,7 +2153,10 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				# the Living Land release: the fight leaves its mark on the ground (havoc.gd)
 				world.battle_mark(e2, false)
 				Game.defeated[e2.id] = Game.playtime
-				Game.record_kills(e2.get("area", Game.area), e2.group.size(), e2.group.map(func(g): return g.id))
+				# (almanac.gd: a pack put down begins again from nothing; what fell is what it had grown to)
+				Almanac.put_down(Game, str(e2.id))
+				var fought: Array = ctx.get("group", e2.group)
+				Game.record_kills(e2.get("area", Game.area), fought.size(), fought.map(func(g): return g.id))
 		"fall":
 			# the Lost Horse release (dooms.gd): a battle that could not be won has been lost, and the
 			# story goes on from the losing: nothing is taken, nobody is carried home
@@ -2101,6 +2177,7 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 			else:
 				var fe: Dictionary = ctx.entity
 				Game.defeated[fe.id] = Game.playtime
+				Almanac.put_down(Game, str(fe.id))
 				var passed := Dooms.fell(Game, f_ids, f_lv, how, int(ctx.get("rounds", 0)))
 				var fs2 := Game.cur_step()
 				if not fs2.is_empty() and str(fs2.kind) == "falls" and f_ids.any(func(x): return x in fs2.of):

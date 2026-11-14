@@ -67,8 +67,11 @@ const KINDS := {
 	"town": {"n": "By the town", "col": Color("e8d090"), "what": "the households of Guiyun, the town you answer for"},
 	# the Answering Land release: the towns of the land that are the better for his passing (weal.gd)
 	"towns": {"n": "By the towns", "col": Color("ffb040"), "what": "the towns of the land that thrive because you passed through them"},
+	# the Ordered House release: the Way he walks (creed.gd), and the houses he has put to rights (fitting.gd)
+	"way": {"n": "By the Way he walks", "col": Color("f0d890"), "what": "where you stand between the Righteous Path and the Demonic, the precepts and the open road"},
+	"house": {"n": "By the ordered house", "col": Color("c8a878"), "what": "the houses of the land you have put to rights"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark", "town", "towns"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark", "town", "towns", "way", "house"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -1352,6 +1355,69 @@ const TRIALS := {
 				"desc": "Late Room for the Blade and a sword tempered nine times. He has fought one-handed since before the mountain had a name. Press him until he needs the other.",
 				"line": "Lin Feng draws. The Heavenly King sighs, and shifts his feet, and does not shift his left arm at all."},
 		]},
+	# ---- Part XXIX (the Ordered House release): the fire a guest foretold, the wall that did not change, the gold that
+	# waits to be stooped for, and the friend who went to the gate
+	"chimney_fire": {"might": [4.0, 1.5],
+		"why": "It is not a wicked fire. It was shown a road, a spark at a time, by a straight chimney and a stack of dry wood, and it has taken it. Blows scatter it into more sparks. It has to be met by somebody who knows where things should have stood.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four shingles, burned on one edge", "needs": [["item", "charred_shingle", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four shingles off the roof, each charred only on the side nearest the chimney. They are the road it came by. Lay them out in front of it, the burned edges together, and it will see there is nowhere further to go.",
+				"line": "Lin Feng lays four shingles on the hill, burned edge to burned edge. The fire leans over them, reading its own road, and finds the end of it."},
+			{"id": "house", "kind": "house", "n": "Three rooms where nothing happened", "needs": [["fitted", 3]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Three houses put to rights. A jar by a fire, a lamp out of the thatch, a broom away from the stove: in three rooms of this town it has already been beaten, and nobody was there to see.",
+				"line": "\"Three houses,\" says Lin Feng, \"where you will never get in. I moved a jar.\" The fire looks down at the town, and three of its roads are dark."},
+			{"id": "might", "kind": "might", "n": "Put it out by hand", "needs": [["lv", 99], ["temper", 9]], "boon": {},
+				"desc": "Early Rings Returned and a sword tempered nine times. A fire is also only a thing in the wrong place.",
+				"line": "Lin Feng draws. The fire turns its whole head to look at him, pleased, as at a dry beam."},
+		]},
+	"old_wall": {"might": [4.0, 1.5],
+		"why": "It has kept every stone for a thousand years and thinks that is the same as keeping a town. It cannot be knocked down by force that only wants to pass: it has stood off sieges. It has to be shown that what it guards has gone on without it.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four feathers he let fall", "needs": [["item", "crane_feather", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four flight feathers a crane moulted over this town. He is the last man it remembers, and he is a bird now. Show the wall what has become of the one citizen it was keeping the gate for.",
+				"line": "Lin Feng holds up four white feathers. The wall knows the hand that should have held them: it had five fingers once, and a house by the east gate."},
+			{"id": "mark", "kind": "mark", "n": "Things that went on changing", "needs": [["marks", 8]], "boon": {"foe_hp": 0.8, "foe_atk": 0.85},
+				"desc": "Eight things your choices left standing, gone and looked at. None of them is as you left it. Tell the wall what moss, paths and children have done to each, and that all of them are the better for it.",
+				"line": "Lin Feng names eight things that stand in the land, and what the days have done to each. The wall, which has allowed the days to do nothing, listens with every stone."},
+			{"id": "heights", "kind": "heights", "n": "Over it, as the crane came", "needs": [["summits", 12]], "boon": {"foe_hp": 0.8, "taken": 0.85},
+				"desc": "Twelve summits stood on. A wall is for people who come by the road. Come as he did.",
+				"line": "Lin Feng comes down on it out of the air. A wall has no orders about the air."},
+			{"id": "might", "kind": "might", "n": "Breach it", "needs": [["lv", 100], ["temper", 9]], "boon": {},
+				"desc": "Middle Rings Returned and a sword tempered nine times. It has stood off sieges. It has not stood off this.",
+				"line": "Lin Feng draws. The wall settles on its four feet, with something like relief: this, at least, it understands."},
+		]},
+	"furrow_gold": {"might": [4.0, 1.5],
+		"why": "It does not fight. It stands where it must be looked at, and whoever looks is already half stooping. Every blow struck at it is a kind of reaching. It goes back into the ground only for somebody it cannot make pause.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four pieces, picked up and carried back", "needs": [["item", "furrow_piece", 4]], "boon": {"foe_hp": 0.7, "weak_k": 1.8},
+				"desc": "Four pieces of gold from the furrow. You have had them in your hand, and they are still gold, and you are bringing them back. It has never met anybody who did all three.",
+				"line": "Lin Feng tips four pieces of gold out of his sleeve onto the earth at its feet, as one returns a dropped glove. It has no stance for this."},
+			{"id": "way", "kind": "way", "n": "Somebody whose Way is known", "needs": [["creed", "virtue", 12]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Of the Righteous Path. Not because you say so: because of gifts given, houses put to rights and what you answered when you were asked. It can tell at a glance who will stoop. Let it look.",
+				"line": "It looks Lin Feng up and down for the pause, the way it looks at everybody. It does not find it. It looks again, more carefully."},
+			{"id": "wealth", "kind": "wealth", "n": "Pay for the beans it stood on", "needs": [["stones", 9000]], "boon": {"foe_hp": 0.8, "foe_atk": 0.85},
+				"desc": "Nine thousand spirit stones, put down in the furrow in front of it and left. It has never seen wealth set down by somebody walking away.",
+				"line": "Lin Feng counts nine thousand stones into the furrow, and steps back from them. The gold watches the hand that let go."},
+			{"id": "might", "kind": "might", "n": "Hoe it under", "needs": [["lv", 100], ["temper", 9]], "boon": {},
+				"desc": "Middle Rings Returned and a sword tempered nine times. As you would a tile, or a stone.",
+				"line": "Lin Feng draws, and holds the sword like a hoe. The gold has been struck at before; never, it thinks, so absent-mindedly."},
+		]},
+	"hua_xin": {"might": [4.1, 1.5],
+		"why": "He is not a bad man and he knows it, which makes him unanswerable. He will argue every blow. He has asked to be shown where he belongs, and he will only take it from somebody who plainly knows where things go: nobody else has the right.",
+		"paths": [
+			{"id": "house", "kind": "house", "n": "Six rooms where he was asked", "needs": [["fitted", 6]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Six houses put to rights. He says nobody can tell another man where he sits. Six households have asked you exactly that about a jar, a lamp and a broom, and then counted their bowls.",
+				"line": "\"Six houses,\" says Lin Feng. \"In each I was told I had put it a finger's width wrong.\" Hua Xin laughs before he can help it, and his guard is gone."},
+			{"id": "way", "kind": "way", "n": "Somebody who chose a side of the mat", "needs": [["creed", "rule", 12]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "A keeper of the precepts: shifts worked, the post carried, notices answered. He respects exactly one kind of person, the kind that stayed on the mat when the carriage went by.",
+				"line": "Hua Xin looks at Lin Feng's hands, which have swept, carried and kept a roll. \"You are one of his,\" he says. \"I might have known. Go on, then.\""},
+			{"id": "loss", "kind": "loss", "n": "Somebody who also got up", "needs": [["falls", 2]], "boon": {"foe_hp": 0.8, "taken": 0.85},
+				"desc": "Two battles lost that could not be won. He thinks he is the only one who ever left his place and came back with dust on his shoes.",
+				"line": "\"I have left my place twice,\" says Lin Feng, \"and been carried back to it.\" Hua Xin looks at the dust on his own shoes, and then at Lin Feng's."},
+			{"id": "might", "kind": "might", "n": "Show him, since he asks", "needs": [["lv", 101], ["temper", 9]], "boon": {},
+				"desc": "Late Rings Returned and a sword tempered nine times. He asked to be put in his place. Nobody said where it was.",
+				"line": "Lin Feng draws. \"Ah,\" says Hua Xin, tying his sleeves tighter. \"The short argument.\""},
+		]},
 	# ---- Part XXVIII (the Answering Land release): the man who cannot be thrown, the owl with a claim, the jiao nobody
 	# ever held on to, and the third scourge, who asks to be put down
 	"du_hui": {"might": [3.8, 1.45],
@@ -1651,6 +1717,12 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"weal":
 			# the Answering Land release: the towns that thrive, or better (weal.gd)
 			return Weal.count(g, "thriving") >= int(n[1])
+		"creed":
+			# the Ordered House release: so far along a side of the Way (creed.gd): ["creed", axis, n]
+			return Creed.meets(g, str(n[1]), int(n[2]))
+		"fitted":
+			# houses put to rights (fitting.gd)
+			return g.fitted.size() >= int(n[1])
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1740,6 +1812,11 @@ static func need_text(n: Array, g) -> String:
 			return "%d things your choices left standing, gone and looked at (now %d: Esc > Crossroads says where each stands)" % [int(n[1]), g.marks_seen.size()]
 		"weal":
 			return "%d towns of the land thriving or festive (now %d: Esc > The Land says how each stands, and why)" % [int(n[1]), Weal.count(g, "thriving")]
+		"creed":
+			var ax: Dictionary = Creed.AXIS[str(n[1])]
+			return "%s by %d or more (now %+d: Esc > The Way says what it was weighed by)" % [str(ax.pos if int(n[2]) > 0 else ax.neg), absi(int(n[2])), Creed.value(g, str(n[1])) * (1 if int(n[2]) > 0 else -1)]
+		"fitted":
+			return "%d houses put to rights (now %d: whoever lives in a house says what is wrong with it)" % [int(n[1]), g.fitted.size()]
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).

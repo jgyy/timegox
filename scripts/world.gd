@@ -310,6 +310,7 @@ func _use(lid: String) -> void:
 		mini_tex = b.mini if is_cave() else _bundle(str(wd.parent)).mini
 		_place_floor(b)
 	Game.layer = lid
+	placed_changed()
 
 func is_floor() -> bool:
 	return wd.get("kind", "") == "floor"
@@ -992,6 +993,31 @@ func near_spring() -> bool:
 func find_ent(id: String):
 	return ent_by_id.get(id)
 
+## The Ordered House release (fitting.gd): what has been set down in the houses of this realm, drawn where it
+## was put: on the piece of furniture, or beside it.  Built again whenever something is set down or taken up,
+## and when a realm is entered; with no window nothing is built.
+var placed_root: Node3D = null
+
+func placed_changed() -> void:
+	if headless():
+		return
+	if placed_root != null and is_instance_valid(placed_root):
+		placed_root.queue_free()
+	placed_root = Node3D.new()
+	scene3d.add_child(placed_root)
+	for spot in Game.placed:
+		var e = ent_by_id.get(str(spot))
+		if e == null:
+			continue
+		var tid := Fitting.at(Game, str(spot))
+		var m := Fitting.model(tid)
+		var p := ent_pos(e)
+		var on: bool = bool(Fitting.THINGS[tid].on)
+		var fy := _stand_y(_bundle(layer), p)
+		m.position = Vector3(p.x, fy + (0.82 if on else 0.0), p.z) + (Vector3.ZERO if on else Vector3(0.42, 0.0, 0.3))
+		m.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y, 5.0) * 0.6
+		placed_root.add_child(m)
+
 ## The tile a pickup, ladder or anyone else stands on, as a 3D position in its own realm.
 func ent_pos(e: Dictionary) -> Vector3:
 	return Terrain3D.world_pos(e.pos) + off
@@ -1403,6 +1429,10 @@ func _use_finish() -> void:
 			_nature_blow(using.e.pos, Vector3(using.dir.x, 0, using.dir.z))
 	else:
 		lines = Props.use(using.e, Game)
+		# (the Ordered House release, fitting.gd: nobody likes their things handled)
+		var ft := Fitting.touched(Game, wd, using.e)
+		if ft != "":
+			lines.append(ft)
 	for ln in lines:
 		Game.toast(str(ln))
 	var hn = using.held
@@ -2823,7 +2853,12 @@ func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void
 	if str(n.get_meta("act", "")) != act:
 		n.set_meta("act", act)
 		var hl: Label3D = n.get_meta("hab", null)
-		if hl != null:
+		# (the Ordered House release, almanac.gd: a pack that has grown says so over its head)
+		var gst := Almanac.stage(Game, e)
+		if hl != null and gst > 0 and (act in ["watch", "forage"]):
+			hl.text = str(Almanac.STAGES[gst].word)
+			hl.modulate = Almanac.STAGES[gst].col
+		elif hl != null:
 			hl.text = "" if act in ["watch", "forage"] else ("z z z" if lie else str(hi.word))
 			hl.modulate = hi.col
 	var k := 1.0 - exp(-d * 3.0)
@@ -3132,6 +3167,15 @@ func _ambush(e: Dictionary, dir: Vector3) -> bool:
 	if Game.scatters(e.group):
 		main.scatter_pack(e)
 		return false
+	# (the Ordered House release, creed.gd: a pack struck in its sleep is remembered; and somebody of the
+	# Righteous Path will not: he calls out first, and the battle begins with nobody reeling)
+	if Habits.act_of_group(Game, e.group) == "sleep":
+		if not Creed.can(Game, "sleeper"):
+			Game.toast(Creed.why_not(Game, "sleeper"))
+			move_dir = Vector2i.ZERO
+			main.start_encounter(e, false)
+			return true
+		Creed.act(Game, "sleeper")
 	Game.ambushes += 1
 	move_dir = Vector2i.ZERO
 	if headless():
@@ -3635,7 +3679,8 @@ func _draw_clock() -> void:
 		draw_circle(p, 5.0, UI.C_GOLD)
 	UI.text(self, r.position + Vector2(52, 19), Clock.shichen_name(h), 14, UI.C_GOLD if not night else Color("c8d8ff"))
 	var wt := Clock.watch(h)
-	var sub := "%s  day %d" % [Clock.hm(h), Game.day]
+	# (the Ordered House release, almanac.gd: the day has a name)
+	var sub := "%s  %d/%d, %s" % [Clock.hm(h), Almanac.dom(Game), Almanac.month(Game), Almanac.season(Game)]
 	if Clock.frozen(Game) == "noon":
 		sub = "the sun will not move"
 	elif Clock.frozen(Game) == "night":

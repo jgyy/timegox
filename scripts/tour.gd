@@ -2335,6 +2335,11 @@ func _run() -> void:
 		# festive, afraid and cold with what it hangs at its doors, the page of the land, the people, foes and
 		# lords of Part XXVIII, its crossroads and what each answer leaves standing
 		await _answer_shots(str(main.args.answer))
+	if main.args.has("ordered"):
+		# the Ordered House release (--ordered, or --ordered=a,b): the people, foes and lords of Part XXIX, the pages
+		# of the Way and the almanac, a house with things set down in it and what can be done at its furniture, a
+		# pack grown old, the chapter's lords, its crossroads and what each answer leaves standing
+		await _ordered_shots(str(main.args.ordered))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -5095,5 +5100,150 @@ func _answer_shots(which: String = "1") -> void:
 			fr3.append(last_img)
 			w.cam_override = null
 		_sheet("mark_knot_answers", fr3, 0.48)
+		Game.picks = {}
+	get_tree().quit(0)
+
+## The Ordered House (--ordered, or --ordered=a,b): "people", "foes", "things" (the seven things of a house),
+## "pages" (Esc > The Way, The Almanac), "house" (things set down in a house of Qingshi, and the choice at a piece
+## of its furniture), "battle" (a pack grown old, and the four lords), "choice", "marks".
+func _ordered_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 101
+	Game.step = Data.step_index("s_p29_mat")
+	Game.companion = true
+	Game.day = 143
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	if want.call("people"):
+		await _gallery("part29_people", [Assets.person("the_guest"), Assets.person("ding_lingwei"), Assets.person("guan_ning"), Assets.person("hua_xin")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["stray_spark", "smoke_tongue", "wood_stack", "lost_year", "wall_townsman", "mound_moss", "furrow_glint", "half_mat", "carriage_dust", "gate_gawker"]:
+			fs.append(_foe(fid))
+		await _gallery("part29_foes", fs, 1.0, 0.25)
+		await _gallery("part29_lords", [_foe("chimney_fire", true), _foe("old_wall", true), _foe("furrow_gold", true), _foe("hua_xin", true)], 1.05, 0.25)
+	if want.call("things"):
+		var ts: Array = []
+		for tid in Fitting.ORDER:
+			var tm: Node3D = Fitting.model(tid)
+			tm.scale = Vector3.ONE * 1.6
+			ts.append(tm)
+		await _gallery("things_of_a_house", ts, 0.62, 0.3)
+	if want.call("pages"):
+		main.set_stack(["world"])
+		Game.picks = {"bandits": "mend", "widow": "kind", "the_mat": "whole"}
+		Game.scales = {"heart": 7, "craft": 1, "reach": -4}
+		Game.creed = {"virtue": 8}
+		Game.fitted = {"village:inn": 140, "village:study": 141, "village:tofu_shop": 141}
+		Game.weal = {"qingshi|gift": 3, "yanggu|gift": 2, "qingshi|errand": 6, "qingshi|shift": 4, "longmen|bag": 2}
+		Game.shifts = {"shop": 4}
+		Game.bags_done = 2
+		Game.stipends = 4
+		Game.gamble_rounds = 6
+		Game.smashed = 3
+		main.open_menu()
+		main.menu.mode = "way"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("way_page")
+		main.menu.mode = "almanac"
+		main.menu._build()
+		for pe in Atlas.world_of("surface").ents:
+			if str(pe.kind) == "enemy" and str(pe.get("area", "")) in ["village", "bamboo", "marsh", "mountain"]:
+				Game.pack_day[str(pe.id)] = 143.0 - float(absi(hash(str(pe.id))) % 7)
+		await _wait(0.4)
+		await _shot("almanac_page")
+		main.pop()
+		Game.pack_day = {}
+	if want.call("house"):
+		main.set_stack(["world"])
+		var ws: Dictionary = Atlas.world_of("surface")
+		Game.fitted = {}
+		Game.placed = {}
+		var fw: Dictionary = {}
+		for cand in Fitting.wants_in(Game, ws, "village"):
+			if str(cand.kind) in ["table", "desk", "stove"]:
+				fw = cand
+				break
+		if not fw.is_empty():
+			var hk := str(fw.house)
+			var furn: Dictionary = Fitting._index(ws).houses[hk].furn
+			var fe: Dictionary = furn[int(str(fw.spot).get_slice(":", 3))]
+			# what the house wanted, where it wanted it, and two things more where they do and do not belong
+			Game.placed[str(fw.spot)] = "%s|1" % str(fw.thing)
+			for k in furn:
+				var oe: Dictionary = furn[k]
+				if str(oe.id) == str(fw.spot):
+					continue
+				for tid2 in Fitting.ORDER:
+					if Fitting.verdict(tid2, str(oe.furn)) != 0 and not Game.placed.has(str(oe.id)) and Game.placed.size() < 4 and not Game.placed.values().has("%s|%d" % [tid2, Fitting.verdict(tid2, str(oe.furn))]):
+						Game.placed[str(oe.id)] = "%s|%d" % [tid2, Fitting.verdict(tid2, str(oe.furn))]
+			var at := Vector2i(-1, -1)
+			var dir := Vector2i(0, 1)
+			for d in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+				var q: Vector2i = fe.pos + d
+				if MapGen.is_walkable_tile(ws.grid[q.y * int(ws.w) + q.x]):
+					at = q
+					dir = -d
+			if at.x >= 0:
+				Game.clock = 10.0 * 60.0
+				w.teleport(at)
+				w.facing = dir
+				w.placed_changed()
+				await _wait(1.5)
+				await _shot("house_set_down")
+				Game.placed.erase(str(fw.spot))
+				Game.inv[str(fw.thing)] = 1
+				Game.inv["house_broom"] = 1
+				w.placed_changed()
+				main.offer_fit(fe)
+				await _wait(0.8)
+				await _shot("fit_choice")
+				main.pop()
+		Game.placed = {}
+		w.placed_changed()
+	if want.call("battle"):
+		main.set_stack(["world"])
+		var grp: Array = Almanac.grown_at([{"id": "stray_spark", "lv": 99}, {"id": "wood_stack", "lv": 99}], 3)
+		main.battle.start(grp, {"entity": {"id": "t:old"}, "boss": false, "theme": "marsh", "habit": "", "group": grp, "grown": 3})
+		main.push("battle")
+		await _wait(3.2)
+		await _shot("battle_pack_grown_old")
+		main.pop()
+		for bb in [["chimney_fire", "village", "relic"], ["old_wall", "grave", "relic"], ["furrow_gold", "court", "way"], ["hua_xin", "court", "house"]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			var pth: Dictionary = Trials.path(bid, str(bb[2]))
+			main.battle.start([{"id": bid, "lv": 101, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": str(bb[1]),
+				"trial": bid, "path": str(bb[2]), "boon": pth.boon, "path_n": str(pth.n), "path_kind": str(Trials.KINDS[str(pth.kind)].n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_mat"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_mat")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("marks"):
+		var fr3: Array = []
+		for oa in ["cut", "whole", "road"]:
+			Game.picks = {"the_mat": str(oa)}
+			main.set_stack(["world"])
+			if not await _mark_view("mark:the_mat:court", 15.0, 9.0, 5.0):
+				continue
+			await _shot("mark_mat_%s" % str(oa), false)
+			fr3.append(last_img)
+			w.cam_override = null
+		_sheet("mark_mat_answers", fr3, 0.48)
 		Game.picks = {}
 	get_tree().quit(0)
