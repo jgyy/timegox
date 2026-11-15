@@ -312,7 +312,7 @@ static func causes(g, tid: String) -> Array:
 		var seen_here := 0
 		for sid in g.slain:
 			if str(g.slain[sid].town) == tid and bool(g.slain[sid].seen):
-				seen_here += 1
+				seen_here += int(g.slain[sid].get("seen_n", 1))
 		if seen_here > 0:
 			out.append({"m": "regard", "d": -mini(6, 2 * seen_here), "why": "%d dead by his hand here, and it was seen." % seen_here})
 	if Crime.standing(g, tid) == 2:

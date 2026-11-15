@@ -102,7 +102,7 @@ static func sit(g, id: String, seen: int, where: String = "") -> Array:
 	g.taboo[id] = depth(g, id) + 1
 	g.hp[0] = maxf(1.0, float(g.hp[0]) - float(g.max_hp(0)) * 0.2)
 	if Clock.frozen(g) == "":
-		Clock.set_hour(g, minf(23.9, Clock.hour(g) + HOURS))
+		Clock.set_hour(g, fposmod(Clock.hour(g) + HOURS, 24.0))
 	var lines: Array = [["Narrator", str(d.sit)]]
 	lines.append(["Narrator", "%s: the %s step. %s" % [str(d.n), _ord(depth(g, id)), str(d.what)]])
 	g.note("Sat to %s (%d of %d)%s" % [str(d.n), depth(g, id), MAX, "" if seen > 0 else ", and nobody saw"])
@@ -157,7 +157,8 @@ static func atone(g) -> Array:
 	var fine := mini(int(g.stones), int(p.fine))
 	g.stones -= fine
 	g.day += int(p.days)
-	g.clock = 7.0 * 60.0
+	if Clock.frozen(g) == "":
+		g.clock = 7.0 * 60.0
 	g.served += int(p.days)
 	_strip(g)
 	g.heal_full()
@@ -170,7 +171,8 @@ static func atone(g) -> Array:
 static func burn(g) -> Array:
 	g.stones = int(g.stones) / 2
 	g.day += 3
-	g.clock = 7.0 * 60.0
+	if Clock.frozen(g) == "":
+		g.clock = 7.0 * 60.0
 	_strip(g)
 	g.heal_full()
 	g.note("The enforcers of the League burned the forbidden arts out of him")

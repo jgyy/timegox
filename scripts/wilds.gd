@@ -170,9 +170,13 @@ static func group_at(grp: Array, st: int, seed_: int = 0) -> Array:
 	for f in grp:
 		lv = maxi(lv, int(f.lv))
 	if st == 1:
+		# (the last head that is not the elder of an old pack, almanac.gd: the elder stays at its head)
 		out = grp.duplicate()
 		if out.size() > 1:
-			out.pop_back()
+			var drop := out.size() - 1
+			if bool((out[drop] as Dictionary).get("elder", false)):
+				drop -= 1
+			out.remove_at(drop)
 		return out
 	var first: Dictionary = (grp[0] as Dictionary).duplicate()
 	if st >= 3:

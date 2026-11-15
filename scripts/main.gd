@@ -1079,10 +1079,12 @@ func offer_draw(e: Dictionary) -> void:
 	var seen := Crime.witnesses(Game, world.wd, world.ptile, str(e.id), func(x): return world.ent_visible(x))
 	var who := "Nobody is in sight." if seen == 0 else ("One person is in sight, and will have seen." if seen == 1 else "%d people are in sight, and will have seen." % seen)
 	var child := Crime.is_child(e)
+	var gt := Crime.town_for(str(e.get("area", Game.area)))
+	var gate := str(Weal.TOWNS[gt].n).trim_prefix("the ") if gt != "" else "the nearest town"
 	choose(DRAW_ASK, [
 		{"id": "sheathe", "label": "Sheathe it", "desc": "Nothing has been done. Nothing need be.", "col": UI.C_DIM},
 		{"id": "strike", "label": "Strike %s down" % str(e.n), "note": "unseen" if seen == 0 else "seen", "enabled": not child, "col": UI.C_RED,
-			"desc": told(Crime.weigh(Game, e)) + "\n\n" + who + " What is seen is answered for at the gate of %s; what is not seen is still done. The dead stay dead: whatever they were to have said in the story will not be said." % str(Weal.TOWNS[Weal.town_of(str(e.get("area", Game.area)))].n).trim_prefix("the ")},
+			"desc": told(Crime.weigh(Game, e)) + "\n\n" + who + " What is seen is answered for at the gate of %s; what is not seen is still done. The dead stay dead: whatever they were to have said in the story will not be said." % gate},
 	], func(pick: String):
 		if pick != "strike":
 			return
@@ -1105,7 +1107,10 @@ func visit_grave(e: Dictionary) -> void:
 	var counter: bool = e.has("office") or e.has("trade") or str(e.id) in ["alchemist", "smith", "dyer_su", "tailor_qiao", Jobs.CLERK, Hold.STEWARD, Gamble.DEALER]
 	if counter:
 		lines.append(["Narrator", Crime.heir_line(Game, e)])
-	if needed or counter:
+	if str(e.id) == "elder" and Taboo.marked(Game) and not (needed and str(s.kind) == "talk"):
+		# (the Hall of Discipline is still there, whoever is not: taboo.gd)
+		say(lines, func(): offer_atone(e))
+	elif needed or counter:
 		say(lines, func(): talk_npc(e))
 	else:
 		say(lines)
@@ -1149,6 +1154,13 @@ func meet_hunters() -> void:
 	)
 
 func _crime_done(outcome: String, ctx: Dictionary) -> void:
+	# (he got away from them in the fight: from the watch that is running, and the bill is the heavier; the
+	# bounty-takers have had their day)
+	if outcome != "win" and outcome != "lose":
+		if str(ctx.crime) == "watch":
+			var ran := Crime.flee(Game, ctx.w)
+			say([["Narrator", "He breaks through between two spears and is over the wall. Nobody runs after him; they only watch which way he goes, and write it down. %d more, for the running." % ran]])
+		return
 	var won := outcome == "win"
 	if str(ctx.crime) == "watch":
 		var w: Dictionary = ctx.w
@@ -1160,7 +1172,8 @@ func _crime_done(outcome: String, ctx: Dictionary) -> void:
 			say(Crime.serve_lines(Game, w, days, true))
 		return
 	if won:
-		Crime.hunt_won(Game)
+		if not Taboo.marked(Game):
+			Crime.hunt_won(Game)
 		say([["Narrator", "They go back into the reeds, carrying one another. The bill is still in the first one's belt. He will sell it on to somebody who brings more friends; that is how the trade works." if not Taboo.marked(Game) else "The three in grey withdraw a sword's length at a time, facing him. They are not beaten. They are going to report. Tomorrow there will be three again."]])
 	elif Taboo.marked(Game):
 		say(Taboo.burn(Game))
@@ -2135,7 +2148,9 @@ func start_encounter(e: Dictionary, ambush: bool = false) -> void:
 	# what eats the leavings)
 	var wild_st := Wilds.state(Game, str(e.get("area", Game.area))) if Wilds.native(e) else 0
 	grp = Wilds.group(Game, e, grp)
-	battle.start(grp, {"entity": e, "boss": false, "theme": battle_theme(), "ambush": ambush, "habit": Habits.act_of_group(Game, e.group), "group": grp, "grown": grown_st, "wild": wild_st})
+	battle.start(grp, {"entity": e, "boss": false, "theme": battle_theme(), "ambush": ambush, "habit": Habits.act_of_group(Game, e.group), "group": grp,
+		# (what follows a hunted-out pack is not its elder: the old pack's name and harder blow are for a pack that is still itself)
+		"grown": grown_st if wild_st < 2 else 0, "wild": wild_st})
 	push("battle")
 
 func boss_interact(e: Dictionary) -> void:

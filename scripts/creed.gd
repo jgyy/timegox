@@ -124,11 +124,11 @@ static func causes(g) -> Array:
 	add.call("virtue", -mini(6, int(g.misplaced)), "things set down where they should not be, and left")
 	add.call("virtue", int(g.creed.get("virtue", 0)), "what was answered when it was asked")
 	# (the Open Net release: crime.gd, taboo.gd, wilds.gd)
-	add.call("virtue", -mini(40, 9 * g.slain.size()), "people dead by his hand")
+	add.call("virtue", -mini(40, 9 * Crime.count(g)), "people dead by his hand")
 	add.call("virtue", -mini(27, 3 * Taboo.taint(g)), "arts the precepts forbid")
 	add.call("virtue", -mini(8, 2 * Wilds.worst_count(g, 2)), "countries hunted until nothing was left")
 	add.call("virtue", mini(6, 2 * int(g.nets_opened)), "nets opened on three sides")
-	add.call("rule", -mini(12, int(g.crimes.size())), "what the gates have charged him with")
+	add.call("rule", -mini(12, g.crimes.filter(func(c): return int(c.n) > 0 or str(c.what) == "forbidden").size()), "what the gates have charged him with")
 	add.call("rule", mini(8, int(g.served)), "days stood in the circle, when he could have stepped out")
 	# ---- rule
 	add.call("rule", mini(12, 2 * _shifts(g)), "shifts worked at a trade")

@@ -66,7 +66,7 @@ const SERVE_MAX := 9
 ## What the three standings are called, and what the page says of each.
 const STANDINGS := [
 	{"n": "A clean name", "col": Color("a8d8a0"), "desc": "No price on his head in any town, and nobody dead by his hand. Doors open as they always did."},
-	{"n": "Wanted", "col": Color("e8b040"), "desc": "A bill with his face on it hangs in at least one town. There the counters ask more, nobody hires him, and the watch comes once a day."},
+	{"n": "Wanted", "col": Color("e8b040"), "desc": "A bill with his face on it hangs in at least one town. There nobody hires him, a broken thing costs more, and the watch comes once a day; and the sect's counters ask a quarter more."},
 	{"n": "Outlaw", "col": Color("d84a3a"), "desc": "His bill hangs at every gate in the land. Every town treats him as a wanted man, and bounty-takers follow him into the wild."},
 ]
 
@@ -214,12 +214,9 @@ static func dead(g, id: String) -> bool:
 
 ## How many are dead by his hand (`seen_only`: of those, the ones somebody saw).
 static func count(g, seen_only: bool = false) -> int:
-	if not seen_only:
-		return g.slain.size()
 	var n := 0
 	for id in g.slain:
-		if bool(g.slain[id].seen):
-			n += 1
+		n += int(g.slain[id].get("seen_n", 1 if bool(g.slain[id].seen) else 0)) if seen_only else int(g.slain[id].get("times", 1))
 	return n
 
 ## What is said at the place where `e` stood.
@@ -324,20 +321,32 @@ static func shut(g, area: String, what: String) -> String:
 		return ""
 	return str(SHUT[what])
 
-## A number his standing changes in town `tid` ("price", "mend": dearer; "wage": none is paid, he is not
-## hired).  1 with a clean name.
+## A number his standing changes in town `tid` ("price": what the sect's counters ask; "mend": what a
+## broken thing costs there).  1 with a clean name.
 static func mod(g, tid: String, key: String) -> float:
 	if g.bounty.is_empty() and g.slain.is_empty() and not Taboo.marked(g):
 		return 1.0
 	var k := 1.0
 	if key == "price" or key == "mend":
-		k = [1.0, 1.25, 1.5][standing(g, tid)]
+		# (the sect's counters have heard of a bill wherever it hangs)
+		var st := standing(g, tid)
+		if tid == "sect" and st == 0 and heat(g) > 0:
+			st = 1
+		k = [1.0, 1.25, 1.5][st]
 		# (and where somebody who kept a counter is dead by his hand, whoever came after asks more)
 		for id in g.slain:
 			if str(g.slain[id].town) == tid and not str(id).begins_with("folk:"):
-				k *= 1.05
+				k *= 1.25
 				break
 	return k
+
+## The town that answers for what is done in region `area`: its own, else the first that hears of it.
+static func town_for(area: String) -> String:
+	var t := Weal.town_of(area)
+	if t != "":
+		return t
+	var h: Array = Weal.hears(area)
+	return str(h[0]) if not h.is_empty() else ""
 
 # ---------------------------------------------------------------- drawing on somebody
 ## He draws on `e`, with `seen` people looking on (not counting `e`).  Returns {how: "child" | "slain" |
@@ -347,7 +356,7 @@ static func strike(g, e: Dictionary, seen: int) -> Dictionary:
 	var id := str(e.id)
 	var nm := str(e.n)
 	var area := str(e.get("area", g.area))
-	var tid := Weal.town_of(area)
+	var tid := town_for(area)
 	if not is_person(e) or is_child(e) or g.slain.has(id) and not replaced(g, id):
 		return {"how": "child", "lines": [["Narrator", weigh(g, e)]], "price": 0}
 	var m := might(e)
@@ -365,7 +374,10 @@ static func strike(g, e: Dictionary, seen: int) -> Dictionary:
 		what = "office"
 	elif area in ["sect", "mountain"] and not str(e.get("asset", "")).begins_with("folk_") and str(e.get("kind", "")) == "npc":
 		what = "kin"
-	g.slain[id] = {"n": nm, "day": int(g.day), "area": area, "town": tid, "seen": seen > 0, "might": m, "kind": str(e.kind)}
+	# (somebody new in the place of one of the street, struck down in turn: what was seen before was still seen)
+	var was: Dictionary = g.slain.get(id, {})
+	g.slain[id] = {"n": nm, "day": int(g.day), "area": area, "town": tid, "seen": seen > 0 or bool(was.get("seen", false)), "might": m, "kind": str(e.kind),
+		"times": int(was.get("times", 0)) + 1, "seen_n": int(was.get("seen_n", 0)) + (1 if seen > 0 else 0)}
 	g.slain_n += 1
 	# the purse: what somebody of that standing carries
 	var purse := 20 + 35 * m
@@ -440,7 +452,9 @@ static func serve(g, w: Dictionary, hard: bool = false) -> int:
 	var days := days_for(g, int(w.price)) * (2 if hard else 1)
 	days = mini(days, SERVE_MAX * 2)
 	g.day += days
-	g.clock = 7.0 * 60.0
+	# (an hour the story is holding is not moved: clock.gd)
+	if Clock.frozen(g) == "":
+		g.clock = 7.0 * 60.0
 	g.served += days
 	if hard:
 		g.stones = int(g.stones) / 2
@@ -499,7 +513,7 @@ static func hunters(g) -> Array:
 			out.append({"id": "league_enforcer", "lv": lv, "atk": 1.15})
 		return out
 	var lv2 := mini(Data.MAX_LEVEL, int(g.level) + 1)
-	for i in mini(4, 2 + int(g.hunted) / 2):
+	for i in mini(4, 2 + int(g.hunted)):
 		out.append({"id": "bounty_taker", "lv": lv2})
 	return out
 

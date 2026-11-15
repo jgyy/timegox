@@ -7094,6 +7094,50 @@ func _open_net() -> void:
 	check(not Crime.gone(G, str(grown.id)) and Crime.replaced(G, str(grown.id)), "until somebody new has taken the place (%d days)" % Crime.MOURN)
 	check(kids >= 1, "there are children among the people with names (%d), and none of them can be struck" % kids)
 	G.free()
+	# (found by the audit of this release's own code, before it shipped)
+	G = new_game.call()
+	G.level = 60
+	check(Crime.town_for("bamboo") == "qingshi" and Crime.town_for("village") == "qingshi" and Weal.town_of("bamboo") == "", "what is done in the wild is answered for in the town that hears of it")
+	var rw: Dictionary = Crime.strike(G, {"kind": "npc", "id": "t_wild", "n": "Somebody of the Road", "area": "bamboo", "asset": "folk_farmer", "vis": ["", ""]}, 3)
+	check(str(rw.how) == "slain" and int(rw.price) > 0 and Crime.price(G, "qingshi") == int(rw.price) and str(G.slain.t_wild.town) == "qingshi", "a killing seen in the wild has a bill at the nearest gate (%d)" % int(rw.price))
+	for a9 in Data.AREAS:
+		check(Crime.town_for(str(a9)) != "", "%s: some town answers for what is done there" % a9)
+	G.free()
+	G = new_game.call()
+	G.level = 60
+	var twice := {}
+	for fp2 in Folk.people(ws, "qingshi"):
+		if not bool(fp2.kid):
+			twice = {"kind": "folk", "id": fp2.id, "n": fp2.n, "p": fp2, "area": fp2.area}
+			break
+	Crime.strike(G, twice, 2)
+	var regard1 := Weal.measure(G, "qingshi", "regard")
+	var virtue9 := Creed.value(G, "virtue")
+	G.day += Crime.MOURN
+	Crime.strike(G, twice, 0)
+	check(Crime.count(G) == 2 and Crime.count(G, true) == 1 and bool(G.slain[str(twice.id)].seen) and Weal.measure(G, "qingshi", "regard") <= regard1 and Creed.value(G, "virtue") < virtue9,
+		"somebody new struck down in turn is a second killing: the first is not forgotten, nor what was seen of it")
+	G.free()
+	G = new_game.call()
+	G.level = 60
+	G.step = Data.step_index("s_p16_eve") + 1
+	G.clock = 21.2 * 60.0
+	Crime.record(G, "assault", "qingshi", "somebody")
+	Crime.serve(G, Crime.watch_due(G, "village"))
+	check(Clock.frozen(G) == "night" and absf(Clock.hour(G) - 21.2) < 0.01, "days in the circle do not end the night the story is holding")
+	G.free()
+	G = new_game.call()
+	G.level = 30
+	G.heal_full()
+	G.clock = 23.5 * 60.0
+	var day9: int = G.day
+	Taboo.sit(G, "blood", 0)
+	check(G.day == day9 + 1 and absf(Clock.hour(G) - 1.5) < 0.01, "two hours at a forbidden art are two hours, at any hour of the night")
+	G.free()
+	var old3: Array = Almanac.grown_at([{"id": "a", "lv": 5}, {"id": "b", "lv": 5}], 3)
+	var thin3: Array = Wilds.group_at(old3, 1)
+	check(thin3.size() == old3.size() - 1 and bool(thin3[thin3.size() - 1].get("elder", false)), "an old pack in a thinned country is a head short, and keeps its elder")
+	check(msrc.contains("\"grown\": grown_st if wild_st < 2 else 0") and msrc.contains("if outcome != \"win\" and outcome != \"lose\":"), "nothing that follows a pack is called its elder; and getting away from the watch is running, not being taken")
 	for c in Crime.CRIMES:
 		check(str(Crime.CRIMES[c].bill).contains("%s") and int(Crime.CRIMES[c].base) > 0, "the charge %s has a bill and a price" % c)
 	for sk in Crime.SHUT:
