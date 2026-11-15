@@ -75,6 +75,17 @@ const LETTERS := {
 		"lines": ["I put my box by the road for strangers like you said the old man said. Somebody left a goat in it. Not in it. Tied to it. Mother says we are to keep the goat until a stranger wants one. I have named it Stranger so that it will know when it is wanted. I am ten now."]},
 	"chu_doors": {"from": "Zhou Chu of Yixing", "after": "s_p28_third", "wait": 4,
 		"lines": ["Sweeper: I have hung thirty-one doors. They do not all shut. Old Tan says a door hung by me that does not shut is better than a door broken by me that does not open. I go to Wu in the spring to find the one who knows about mornings. I have bought a book. I am reading it. It is about doors."]},
+	# ---- Part XXIX (the Ordered House release): letters from a garden with one mat, or two, or none; and from a man
+	# with a new chimney
+	"mat_cut": {"from": "Hua Xin", "needs": ["the_mat", "cut"], "wait": 3,
+		"lines": ["Lin Feng: my half looks at the road, as you will have heard. I find I read more on it than I ever did on the whole one, there being nobody beside me to be ashamed in front of. He sent me beans yesterday. I sent him the news of the capital. Neither of us said anything about a knife."]},
+	"mat_whole": {"from": "Guan Ning", "needs": ["the_mat", "whole"], "wait": 3,
+		"lines": ["Child, he was away eleven days, at the prefecture, about a canal. I brushed his place each morning and felt a fool. On the twelfth he came up the path with dust to the knee and sat down in it without looking, as a man sits in his own house. I enclose the price of a new mat. We shall not be buying one."],
+		"gift": {"stones": 320}},
+	"mat_road": {"from": "Guan Ning", "needs": ["the_mat", "road"], "wait": 3,
+		"lines": ["Lin Feng, I have now seen fourteen carriages. I have a table of them: canopy, outriders, rank, and whether the great man inside looked happy. None did. Hua Xin says this is the most useful thing I have ever written. I am afraid he is right. I have my book with me. I have not opened it."]},
+	"tian_chimney": {"from": "Householder Tian", "after": "s_p29_feast", "wait": 4,
+		"lines": ["Sweeper: the new chimney has a bend in it a goat could hide in, and the wood is at the far wall. The guest comes on the first of every month and walks round the stove with his hands behind him. He has found nothing yet. He eats at the top of the table. I think he is disappointed."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -179,7 +190,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:
@@ -263,6 +274,10 @@ static func bag_pay(lv: int, from: String, to: String) -> int:
 ## The bag counter `office` has to be carried today: {from, to, pay, day}, or {} (none: carried one
 ## from here already today, hands full, or no other counter in this realm).
 static func bag_offer(g, office: String) -> Dictionary:
+	# (the Ordered House release, creed.gd: the post goes with people who can be found afterwards, and whose
+	# hand the town's seal can be put in)
+	if not Creed.can(g, "bag") or not Creed.can(g, "bag_dark"):
+		return {}
 	if not is_post(office) or g.mail_bags.size() >= BAGS or int(g.bag_day.get(office, -1)) == int(g.day):
 		return {}
 	var others: Array = []
@@ -294,7 +309,9 @@ static func deliver(g, office: String) -> int:
 		if str(b.to) == office:
 			paid += int(b.pay)
 			g.bags_done += 1
-			Weal.act(g, Weal.of_office(office), "bag")
+			# (the Ordered House release: by the region of the counter, not by who sits at it: the sect's post is
+			# kept by the treasurer, and a bag brought up the mountain used to count for nobody)
+			Weal.act(g, Weal.town_of(area_of(office)), "bag")
 		else:
 			keep.append(b)
 	g.mail_bags = keep

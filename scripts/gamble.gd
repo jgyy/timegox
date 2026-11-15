@@ -160,14 +160,18 @@ static func play(g, game: String, bet: String, stake: int) -> Dictionary:
 		g.toast("-%d spirit stones" % stake)
 	# Yue Ling has opinions, now and then
 	if g.companion and int(g.gamble_rounds) % 4 == 1:
-		lines.append(["Yue Ling", YUE_LINES[int(g.gamble_rounds / 4) % YUE_LINES.size()]])
+		# (the Ordered House release: her word about the cricket is for the crickets, not the dice)
+		var yl := int(g.gamble_rounds / 4) % YUE_LINES.size()
+		if yl == 2 and game != "crickets":
+			yl = 3
+		lines.append(["Yue Ling", YUE_LINES[yl]])
 	g.note("At Old Du's mat: %s, %s %d spirit stones" % [str(GAMES[game].n), "won" if won else "lost", absi(pay)])
 	return {"won": won, "pay": pay, "lines": lines}
 
 static func name_of() -> String:
 	return "Old Du of the Three Dice"
 
-const WIN_LINES := ["%d to the gentleman. I pay with a smile; it is the only way to get them back.", "%d. Take it, take it. The stones know the way home to my mat; they have walked it before.",
+const WIN_LINES := ["%d to you. I pay with a smile; it is the only way to get them back.", "%d. Take it, take it. The stones know the way home to my mat; they have walked it before.",
 	"There: %d. You have the luck today. Luck is a guest, mind. It does not unpack.", "%d, and well called. I shall tell everybody. That is not kindness; a winner is the best sign a mat can hang out."]
 const LOSE_LINES := ["The mat thanks you. Nine of ten who gamble lose; I have it painted over the door, and nobody reads it.", "Ah. Nearly. Nearly is my best customer.",
 	"Mine, I am afraid. Do not look so. A cultivator who has never lost anything has never owned anything.", "The house's. It is nothing personal; the house has a wife and four crickets to feed."]

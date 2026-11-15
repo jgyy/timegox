@@ -1192,6 +1192,12 @@ const CROSSROADS := {
 			"down": [["Narrator", "Lin Feng looks into the sack a long time. Then he tips it up. What falls out is nothing: every thing in it has gone home already, and had only been waiting to be let. He folds the sack over his arm, like a cloak on a warm day."], ["Budai, the Cloth-Sack Monk", "Ahh. Most people need to be very old before they find it was empty. Here is the seed for your smith's ring. It holds everything, so naturally it is only given to somebody with nothing left to put in it. Go home. Eat something."]],
 		},
 		"echo": {
+			# Part XXIX (the Ordered House release)
+			"s_p29_roll": {
+				"carry": [["Ding Lingwei, the Crane", "You are the one who picked up the monk's sack again. Then a thousand years will not surprise you as they did me. You will have felt every one of them on your shoulder as it was added."]],
+				"share": [["Ding Lingwei, the Crane", "You are the one who put a strap on a load for every shoulder. I went up my mountain alone. If I had gone with the town, we should all have come down cranes, and I should have known somebody."]],
+				"down": [["Ding Lingwei, the Crane", "You are the one who set a great load down at his own gate and went in to supper. That is the thing I did not do. I had a gate, and a supper. I thought the mountain was more."]],
+			},
 			"s_p28_wei": {
 				"carry": [["Wei Ke, General of Jin", "They say you are the one who picked up a monk's sack and has not put it down. Then you will understand a general. I carry four thousand men, and I may not set one of them down either."]],
 				"share": [["Wei Ke, General of Jin", "They say you are the one who put a strap on a load for every shoulder. I should like that done with a battle. Mine has one shoulder under it, and the shoulder is tired."]],
@@ -1228,6 +1234,12 @@ const CROSSROADS := {
 			"onward": [["Narrator", "The old man laughs, a dry sound like grass in wind. He finishes the knot he is tying, and then walks ten paces down the field, to a place where no army has ever stood or will, and ties another, for nobody."], ["The Old Man in the Grass", "Somebody will come along this row one day in trouble, and something will trip whatever is after him, and he will never know. That is better than a general. Go on, sweeper. I have a deal of field to do, and it is all for strangers now."]],
 		},
 		"echo": {
+			# Part XXIX (the Ordered House release)
+			"s_p29_feast": {
+				"nothing": [["Householder Tian", "They say you told an old man in the east that a kindness is finished when it is done. I should like to believe it. I find I owe one all the same, and it is sitting across the lane on a stone."]],
+				"ledger": [["Householder Tian", "There is a book in Qingshi now of what was done for whom. I looked for the guest's name in it this morning. It was not there. Nobody writes down a fire that did not happen. I have written it in myself."]],
+				"onward": [["Householder Tian", "They say a kindness is owed to the next stranger. Very well: the next man who tells me my chimney is straight shall have the best seat in the house, whoever he is, and I shall bend it while he eats."]],
+			},
 			"s_p28_end": {
 				"nothing": [["Elder Qing Xuan", "And I hear you told a dead man that nothing was owed. I went and told the woman with the persimmons the same. She said: then I shall send them because I like to. I had no answer to that. I do not think there is one."]],
 				"ledger": [["Elder Qing Xuan", "And I hear there is to be a book in every town with the kindnesses in it. Old Shen has begun ours. My name is on the first page, against a thing I did forty years ago for the wrong reason. He has left a very long line for the answer."]],
@@ -1238,6 +1250,37 @@ const CROSSROADS := {
 			"nothing": "In the Valley of Sunrise there is a field where the grass stands straight, and a cairn where an old man put down what he owed. People who pass it sleep that night as they have not since they were children.",
 			"ledger": "In every town of the land there is a book of what was done for whom, and most of its lines are struck through, and people read it on winter evenings the way they used to read the almanac.",
 			"onward": "Along the roads of the land the grass is tied here and there in knots, at the height of an ankle, by nobody anybody has seen. Now and then something that was chasing somebody falls over.",
+		}},
+	# ---- Part XXIX (the Ordered House release): where a friend sits who got up to look
+	"the_mat": {"step": "s_p29_mat", "part": "XXIX", "n": "The Mat",
+		"ask": "Two friends have read on one mat for six years. One of them picked up gold, and threw it down; went out to see a carriage, and came back. The other has a knife on the straw between their two places. He asks you: where does a friend go who looks at the road?",
+		"options": [
+			{"id": "cut", "label": "Cut it. Each to his own mat", "tilt": {"heart": -2, "craft": -2}, "creed": {"rule": 8}, "gain": {"renown": 6},
+				"desc": "A thing in the wrong place is not a bad thing; but it is in the wrong place. Cut cleanly, and let each of them know where he sits. The precepts are only this, said nine hundred ways (renown).",
+				"log": "Told Guan Ning to cut the mat, and let each man know where he sits."},
+			{"id": "whole", "label": "Leave it whole. Keep his place", "tilt": {"heart": 3, "reach": -2}, "creed": {"virtue": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "He threw the gold away. He came back from the gate. A place kept for somebody is the only thing that ever brought anybody home. Put the knife down and move his book out of the dust (the regard of the Rice Hearth).",
+				"log": "Told Guan Ning to leave the mat whole, and keep his friend's place on it."},
+			{"id": "road", "label": "Roll it up, and both go and look", "tilt": {"reach": 3, "craft": 2}, "creed": {"rule": -8}, "gain": {"stones": 9800},
+				"desc": "There was a carriage with eight outriders and a canopy of green silk, and one of you has never seen one. The page will be there tomorrow. A mat can be carried; that is what a mat is (spirit stones).",
+				"log": "Told Guan Ning to roll up the mat and go and look at the road with his friend."},
+		],
+		"after": {
+			"cut": [["Narrator", "The knife goes down the bright strip between the two worn places with a sound like a page turning. Guan Ning lays one half on his own side of the garden and carries the other, folded, to where Hua Xin will find it. He sets it down square, facing the road."], ["Guan Ning", "There. He has a mat, and it looks at what he looks at. I have not thrown him out. I have only stopped pretending. He will be a minister, you know; a good one. I shall say so when I am asked.", "nod"]],
+			"whole": [["Narrator", "Guan Ning looks at the knife for a while as if somebody else had left it there. Then he wipes it on his sleeve, puts it away, and with the side of his hand brushes the road dust off the other book and turns it face up at the place."], ["Guan Ning", "He reads faster than I do. He will have caught up by supper. ...I should have minded the six years more than the carriage. I did not think of counting them until you made me.", "bow"]],
+			"road": [["Narrator", "Guan Ning opens his mouth, and shuts it, and then, for the first time since Lin Feng has known him, laughs. He rolls the mat, puts it under his arm with both books inside, and walks down to the gate like a man going into cold water."], ["Guan Ning", "Eight outriders. Well. I have read about canopies of green silk for thirty years. It would be a kind of scholarship to see one. Do not tell anybody I ran.", "laugh"]],
+		},
+		"echo": {
+			"s_p29_end": {
+				"cut": [["Elder Qing Xuan", "And I hear you had a mat cut in two. Good. I have kept two disciples in one cell for a year because they began together, and each has been ruining the other's sleep. I shall move one tonight. It is not a punishment. It is a place."]],
+				"whole": [["Elder Qing Xuan", "And I hear a mat was left whole that might have been cut. I have a place at this table that has been laid for forty years for somebody who went to look at a road. I had begun to think it foolish. I shall leave it laid."]],
+				"road": [["Elder Qing Xuan", "And I hear Guan Ning ran to a gate with a mat under his arm. Guan Ning! I have not been down these steps to look at anything in seventy years. ...Is it true about the outriders? Eight?"]],
+			},
+		},
+		"end": {
+			"cut": "In the Ruins of the Jade Court two mats lie in one garden, a hoe's length apart, one facing the beans and one the road. The two men who sit on them have never been better friends.",
+			"whole": "In the Ruins of the Jade Court one old mat lies whole, with two worn places on it side by side. One of them is often empty. It is brushed clean every morning all the same.",
+			"road": "At the gate of the Jade Court there is a bench where a mat used to be unrolled, and people stop there to watch who goes by: one of them, most days, with a book he is not reading.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1424,7 +1467,8 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_tallies", "the_door", "the_seat",
 	"the_book",
 	"the_sack",
-	"the_knot"]
+	"the_knot",
+	"the_mat"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:
@@ -1468,6 +1512,9 @@ static func option_text(g, o: Dictionary) -> String:
 	for sc in o.get("tilt", {}):
 		var v := int(o.tilt[sc])
 		tips.append(str(SCALES[sc].pos if v > 0 else SCALES[sc].neg).to_lower().trim_prefix("of "))
+	for ck in o.get("creed", {}):
+		var cv := int(o.creed[ck])
+		tips.append(("the %s" % str(Creed.AXIS[ck].pos if cv > 0 else Creed.AXIS[ck].neg)))
 	if not tips.is_empty():
 		parts.append("Leans towards: " + ", ".join(tips) + ".")
 	return "\n".join(parts)
@@ -1491,6 +1538,9 @@ static func take(g, id: String, oid: String) -> void:
 	for sc in o.get("tilt", {}):
 		g.scales[sc] = int(g.scales.get(sc, 0)) + int(o.tilt[sc])
 	Fate.gain(g, o)
+	# (the Ordered House release, creed.gd: an answer may weigh on the Way he walks)
+	for ck in o.get("creed", {}):
+		Creed.act(g, str(ck), int(o.creed[ck]))
 	g.note("Crossroads (%s): %s" % [str(CROSSROADS[id].n), str(o.log)])
 	for sc in SCALE_ORDER:
 		var now := lean(g, sc)

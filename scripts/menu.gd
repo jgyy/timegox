@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "almanac", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -67,6 +67,11 @@ func _build() -> void:
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
+	elif mode == "way" or mode == "almanac":
+		# creed.gd, almanac.gd: a page to read
+		labels = ["Back"]
+		ids = ["back"]
+		enabled = [true]
 	elif mode == "land":
 		# weal.gd: the eleven towns, each with how it stands
 		labels = []
@@ -218,7 +223,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -291,7 +296,7 @@ func press(act: String) -> void:
 				"store":
 					main.pop()
 					main.offer_store()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -405,6 +410,103 @@ func _draw_bestiary() -> void:
 		UI.wrapped(self, r.position + Vector2(24, ty), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
+
+## The Way (creed.gd): where he stands between the Righteous Path and the Demonic, the precepts and the open
+## road; what that opens to him and shuts; and everything it was weighed by.
+func _draw_way() -> void:
+	UI.text(self, Vector2(60, 70), "The Way He Walks", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var w: Dictionary = Creed.way(Game)
+	UI.text(self, r.position + Vector2(24, 44), str(w.n), 26, UI.C_GOLD)
+	UI.wrapped(self, r.position + Vector2(24, 66), main.told(str(w.desc)), 15, UI.C_TEXT, r.size.x - 48)
+	var y := r.position.y + 128.0
+	for axis in Creed.AXES:
+		var v := Creed.value(Game, axis)
+		var ax: Dictionary = Creed.AXIS[axis]
+		var mid := r.position.x + 400.0
+		UI.text(self, Vector2(mid - 330.0, y + 12), str(ax.neg), 15, ax.neg_col)
+		UI.text(self, Vector2(mid + 232.0, y + 12), str(ax.pos), 15, ax.col)
+		UI.panel(self, Rect2(mid - 220.0, y, 440.0, 14.0), Color(0.1, 0.12, 0.18, 0.9), UI.C_BORDER)
+		var bw := 220.0 * float(absi(v)) / float(Creed.CAP)
+		if v > 0:
+			draw_rect(Rect2(mid, y + 2.0, bw, 10.0), ax.col)
+		elif v < 0:
+			draw_rect(Rect2(mid - bw, y + 2.0, bw, 10.0), ax.neg_col)
+		# where a side begins
+		for sd in [-1.0, 1.0]:
+			draw_rect(Rect2(mid + sd * 220.0 * float(Creed.SIDE) / float(Creed.CAP) - 0.5, y - 2.0, 1.0, 18.0), UI.C_DIM)
+		draw_rect(Rect2(mid - 1.0, y - 3.0, 2.0, 20.0), UI.C_TEXT)
+		UI.text(self, Vector2(mid - 12.0, y + 32), "%+d" % v, 14, UI.C_DIM)
+		y += 46.0
+	var dr: Array = Creed.doors(Game)
+	var x2 := r.position.x + 24.0 + (r.size.x - 48.0) * 0.5
+	UI.text(self, Vector2(r.position.x + 24, y + 8), "What it opens", 16, UI.C_JADE)
+	UI.text(self, Vector2(x2, y + 8), "What it shuts", 16, UI.C_RED)
+	var ya := y + 14.0
+	for ln in dr[0]:
+		UI.wrapped(self, Vector2(r.position.x + 24, ya + 14), str(ln), 13, UI.C_TEXT, (r.size.x - 72) * 0.5)
+		ya += 17.0 * float(UI.wrap_lines(str(ln), 13, (r.size.x - 72) * 0.5).size()) + 4.0
+	var yb := y + 14.0
+	for ln2 in dr[1]:
+		UI.wrapped(self, Vector2(x2, yb + 14), str(ln2), 13, UI.C_TEXT, (r.size.x - 72) * 0.5)
+		yb += 17.0 * float(UI.wrap_lines(str(ln2), 13, (r.size.x - 72) * 0.5).size()) + 4.0
+	if (dr[0] as Array).is_empty():
+		UI.wrapped(self, Vector2(r.position.x + 24, y + 28), "In the middle of both scales every door is as it was: nothing is shut to him, and no side's art is his.", 13, UI.C_DIM, r.size.x - 48)
+		ya = y + 60.0
+	y = maxf(ya, yb) + 22.0
+	UI.text(self, Vector2(r.position.x + 24, y), "Why", 16, UI.C_GOLD)
+	var cs := Creed.causes(Game)
+	if cs.is_empty():
+		UI.text(self, Vector2(r.position.x + 24, y + 22), "Nothing he has done has weighed either way yet.", 13, UI.C_DIM)
+	for i in mini(cs.size(), 9):
+		var c: Dictionary = cs[i]
+		if y + 22.0 * float(i + 1) > r.end.y - 16.0:
+			break
+		var ax2: Dictionary = Creed.AXIS[str(c.axis)]
+		UI.text(self, Vector2(r.position.x + 24, y + 22.0 * float(i + 1)), "%s %+d" % [str(ax2.pos if int(c.d) > 0 else ax2.neg), absi(int(c.d))], 13, ax2.col if int(c.d) > 0 else ax2.neg_col)
+		UI.text(self, Vector2(r.position.x + 170, y + 22.0 * float(i + 1)), str(c.why), 13, UI.C_TEXT)
+
+## The Almanac (almanac.gd): the day of the year, the feast that is coming, the Roll of the Outer Court as it
+## stands this morning, and how the wild of the regions he knows has grown while he was elsewhere.
+func _draw_almanac() -> void:
+	UI.text(self, Vector2(60, 70), "The Almanac", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 42), "The %s" % Almanac.short(Game), 24, UI.C_GOLD)
+	UI.text(self, r.position + Vector2(24, 66), "Year of the %s  ·  %s  ·  %s  ·  day %d of the journey" % [Almanac.year_name(Game), Almanac.season(Game), Almanac.term(Game), Game.day], 14, UI.C_TEXT)
+	var fs := Almanac.festival(Game)
+	var nf := Almanac.next_festival(Game)
+	UI.text(self, r.position + Vector2(24, 90), ("Today is %s." % str(fs[2])) if not fs.is_empty() else ("Next: %s, in %d day%s." % [str(nf[0]), int(nf[1]), "" if int(nf[1]) == 1 else "s"]), 14, UI.C_JADE)
+	var y := r.position.y + 124.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The Roll of the Outer Court", 17, UI.C_GOLD)
+	UI.text(self, Vector2(r.position.x + 420, y), "stipend on the first of the month: %d" % Almanac.stipend(Game), 13, UI.C_DIM)
+	var rl := Almanac.roll(Game)
+	for i in rl.size():
+		var e: Dictionary = rl[i]
+		var yy := y + 22.0 * float(i + 1)
+		var col: Color = UI.C_GOLD if bool(e.hero) else UI.C_TEXT
+		UI.text(self, Vector2(r.position.x + 24, yy), "%d" % (i + 1), 14, UI.C_DIM)
+		UI.text(self, Vector2(r.position.x + 48, yy), main.told(str(e.n)), 14, col)
+		UI.text(self, Vector2(r.position.x + 270, yy), Data.level_name(int(e.lv)), 13, col)
+		UI.text(self, Vector2(r.position.x + 500, yy), str(e.word), 11, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 520)
+	y += 22.0 * float(rl.size() + 1) + 14.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The wild", 17, UI.C_GOLD)
+	UI.text(self, Vector2(r.position.x + 120, y), "a pack left alone settles in a day, breeds in two and a half, and is old in five", 13, UI.C_DIM)
+	var wd: Dictionary = Atlas.world_of(Game.layer)
+	var shown := 0
+	for aid in Atlas.region_ids(Game.layer):
+		if not Game.seen.has(aid) or shown >= 12:
+			continue
+		var wv: Array = Almanac.wild(Game, wd, str(aid))
+		var st := int(wv[0])
+		var cx := r.position.x + 24.0 + 260.0 * float(shown % 3)
+		var cy := y + 22.0 * float(shown / 3 + 1)
+		UI.text(self, Vector2(cx, cy), str(Data.AREAS[aid].n).split(",")[0].left(22), 13, UI.C_TEXT)
+		UI.text(self, Vector2(cx + 170, cy), str(Almanac.WILD_WORDS[st]), 13, Almanac.STAGES[st].col)
+		shown += 1
 
 ## The Land (weal.gd): how each town stands, its three measures, and everything he chose or did that it felt.
 func _draw_land() -> void:
@@ -1272,6 +1374,12 @@ func _draw() -> void:
 		return
 	if mode == "land":
 		_draw_land()
+		return
+	if mode == "way":
+		_draw_way()
+		return
+	if mode == "almanac":
+		_draw_almanac()
 		return
 	if mode == "body":
 		_draw_body()

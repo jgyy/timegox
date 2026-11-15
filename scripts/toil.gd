@@ -51,7 +51,7 @@ const WORKS := {
 		"none": "Open ground: with a sickle there are herbs to be cut here.",
 		"lines": ["A sweep of the sickle and a handful of what grows low: plantain, mugwort, a sprig of something bitter.",
 			"He ties the bundle with a stem of its own grass, the way the herbalists of the road do.",
-			"Yue Ling names each as it is cut, and sets two aside: those are not for eating."]},
+			"He names each as it is cut, as the herbalists do, and sets two aside: those are not for eating."]},
 }
 const ORDER := ["fell", "angle", "quarry", "reap"]
 ## what the wall of a cave gives instead of dressed stone
@@ -122,7 +122,10 @@ static func done(g, id: String, layer: String, tile: Vector2i, cave: bool = fals
 		out.append(str(wk.miss[n % (wk.miss as Array).size()]))
 	else:
 		var told: Array = wk.cave_lines if (cave and wk.has("cave_lines")) else wk.lines
-		out.append(str(told[n % told.size()]))
+		# (the Ordered House release: of the casts that catch, counted by themselves: every third cast misses, and
+		# the third thing there is to say of a catch was never said)
+		var li := (n - n / 3) if id == "angle" else n
+		out.append(str(told[li % told.size()]))
 	if got:
 		var good := good_of(id, cave)
 		g.add_item(good)

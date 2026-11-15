@@ -45,10 +45,15 @@ const FEATS := {
 	"thousand_jin": {"n": "A Thousand Jin, and Half a Bolt of Gauze", "kind": "road", "pts": 10, "test": ["step", "s_p27_buyer"], "desc": "Go up the south slope after an old man's cart."},
 	"set_down": {"n": "What Comes After", "kind": "road", "pts": 10, "test": ["step", "s_p27_sack"], "desc": "Say what is to be done with the sack."},
 	# the Answering Land release: the last realm, the grass, the rings and the third scourge (Part XXVIII)
-	"rings_returned": {"n": "Four Rings in a Beak", "kind": "road", "pts": 20, "test": ["level", 99], "desc": "Reach Rings Returned: the last realm there is."},
+	"rings_returned": {"n": "Four Rings in a Beak", "kind": "road", "pts": 20, "test": ["level", 99], "desc": "Reach Rings Returned."},
 	"knotted_grass": {"n": "Over a Weed", "kind": "road", "pts": 10, "test": ["step", "s_p28_duhui"], "desc": "See the man who cannot be thrown go down."},
 	"third_scourge": {"n": "There Were Three", "kind": "road", "pts": 10, "test": ["step", "s_p28_third"], "desc": "Stand in front of the third scourge, who asked."},
 	"what_is_owed": {"n": "What Is Owed", "kind": "road", "pts": 10, "test": ["step", "s_p28_knot"], "desc": "Answer the old man in the grass."},
+	# the Ordered House release: the last realm, the chimney, the crane and the mat (Part XXIX)
+	"in_its_place": {"n": "Where It Always Was", "kind": "road", "pts": 20, "test": ["level", 102], "desc": "Reach Everything in Its Place: the last realm there is."},
+	"bent_chimney": {"n": "Scorched Heads at the Top of the Table", "kind": "road", "pts": 10, "test": ["step", "s_p29_fire"], "desc": "Put out the fire a guest foretold."},
+	"crane_home": {"n": "The Walls As They Were", "kind": "road", "pts": 10, "test": ["step", "s_p29_wall"], "desc": "See a crane home after a thousand years."},
+	"cut_mat": {"n": "One Mat or Two", "kind": "road", "pts": 10, "test": ["step", "s_p29_mat"], "desc": "Say where a friend sits."},
 	"five_frolics": {"n": "The Tiger, the Deer, the Bear, the Ape and the Bird", "kind": "road", "pts": 10, "test": ["step", "s_p26_tablets"], "desc": "Find the five frolics on the heights round Qingshi."},
 	"whole_ox": {"n": "Never Again a Whole Ox", "kind": "road", "pts": 10, "test": ["step", "s_p26_ox"], "desc": "Go where the gaps are, on the height above Tushan."},
 	"blue_bag": {"n": "The Blue Bag Book", "kind": "road", "pts": 10, "test": ["step", "s_p26_book"], "desc": "Say what becomes of Hua Tuo's book."},

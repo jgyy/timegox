@@ -2227,7 +2227,7 @@ const CHAPTERS := {
 						"after": [
 							[
 								"Elder Qing Xuan",
-								"Then from today he is a sweeper of this sect. Three hundred and ninety-one steps, Qiu Ye. Lin Feng never missed a morning.",
+								"Then from today he is a sweeper of this sect. Nine hundred and ninety-nine steps, Qiu Ye. Lin Feng never missed a morning.",
 								"nod"
 							],
 							[
@@ -6060,7 +6060,7 @@ const EPILOGUE := {
 		"parted": "Tala keeps a single dun foal on the Aurora Steppe and no herd at all. Each autumn she rides to the Dawn Market to stand by the caravan lines, where an old grey still lifts his head at her whistle; then she rides home, and sleeps."
 	},
 	"qiu_ye": {
-		"redeemed": "After the Wheel, Qiu Ye sweeps the sect's three hundred and ninety-one steps every dawn, badly at first and then well. The juniors whisper that the stern new sweeper is a fallen prince. He lets them.",
+		"redeemed": "After the Wheel, Qiu Ye sweeps the sect's nine hundred and ninety-nine steps every dawn, badly at first and then well. The juniors whisper that the stern new sweeper is a fallen prince. He lets them.",
 		"fallen": "The house of Qiu ends with its second son, on the flagstones where he once stood with a stolen pill. Lin Feng buries him at Cloudfoot beside his father, with his grandfather's sword, which hated halls.",
 		"ally": "Qiu Ye stands at Lin Feng's left at the Wheel when Nie comes, then goes home to Cloudfoot and the house of Qiu. Every autumn he climbs up to the Conclave and demands a duel, to first blood. He keeps a tally.",
 		"parted": "Qiu Ye keeps the house of Qiu at Cloudfoot alone, and keeps it well. Every new year a letter comes up the mountain in his sharp hand, three lines long and perfectly polite, and Lin Feng answers every one."

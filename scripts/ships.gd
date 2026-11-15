@@ -35,8 +35,8 @@ const TALES := {
 		"Below the last gorge the river opens like a hand, and the water under the keel goes from yellow to green to a blue with no bottom to it. The master lights a stick of incense for Mazu and does not explain."],
 	"coast": ["They keep the land on one side all day: salt-pans, a fishing fleet under brown sails, a pagoda on a headland that nobody aboard can name. At dusk the batten sails go the red of the sky behind them.",
 		"The helmsman steers by a star he calls the Weaver and a smell he calls the shore. In the night the sea is full of cold green fire where the hull cuts it, and Yue Ling leans over the rail and trails her hand in it."],
-	"open": ["A day out the land is gone, and for the first time in the whole journey there is nothing that wants anything of Lin Feng in any direction. He stands at the rail a long while and finds he does not know what to do with his hands.",
-		"On the third morning there is a cloud that does not move, and under it, by noon, a line of green: the Isles. The crew, who have seen it two hundred times, come to the rail anyway.",
+	"open": ["An hour out the land is gone, and for the first time in the whole journey there is nothing that wants anything of Lin Feng in any direction. He stands at the rail a long while and finds he does not know what to do with his hands.",
+		"Ahead there is a cloud that does not move, and under it, before long, a line of green: the Isles. The crew, who have seen it two hundred times, come to the rail anyway.",
 		"The swell out here comes from somewhere with no name, long and slow as breathing. The junk climbs each one and goes down the far side, and the cook does not spill a drop."],
 }
 

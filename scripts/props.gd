@@ -566,6 +566,10 @@ static func use(e: Dictionary, g) -> Array:
 	var rest0: float = float(g.needs.get("rest", 0.0)) if Needs.on(g) else 0.0
 	Needs.used(g, str(e.get("prop", "")), str(k.get("effect", "")))
 	var out: Array = [line_for(e, n)]
+	# (the Ordered House release, creed.gd: no incense lights for somebody of the Demonic Path: the thing is
+	# done, and counts as done, and gives nothing)
+	if str(k.get("clip", "")) in ["pray", "offer"] and not Creed.can(g, "pray"):
+		return [Creed.why_not(g, "pray")]
 	match str(k.get("effect", "")):
 		"rest":
 			out.append(_restore(g, 0.25, 0.25, "Rested"))

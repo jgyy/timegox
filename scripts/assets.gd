@@ -95,6 +95,8 @@ const PEOPLE := {
 	"palace_buyer": "characters/palace_buyer", "li_jing": "characters/li_jing",
 	# Part XXVIII (the Answering Land release)
 	"wei_ke": "characters/wei_ke", "grass_elder": "characters/grass_elder", "yang_bao": "characters/yang_bao", "zhou_chu": "characters/zhou_chu", "du_hui": "characters/du_hui",
+	# Part XXIX (the Ordered House release)
+	"the_guest": "characters/the_guest", "ding_lingwei": "characters/ding_lingwei", "guan_ning": "characters/guan_ning", "hua_xin": "characters/hua_xin",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
