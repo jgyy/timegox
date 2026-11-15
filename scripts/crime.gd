@@ -59,8 +59,8 @@ const OUTLAW_REALM := 2000
 const HUNT := 2500
 const HUNT_REALM := 800
 ## what a day in the circle is counted as, towards a price served and not paid
-const DAY_WORTH := 1200
-const DAY_REALM := 400
+const DAY_WORTH := 400
+const DAY_REALM := 60
 const SERVE_MAX := 9
 
 ## What the three standings are called, and what the page says of each.
