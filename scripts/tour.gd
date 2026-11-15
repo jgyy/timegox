@@ -5392,8 +5392,10 @@ func _net_shots(which: String = "1") -> void:
 			if str(pe.kind) == "enemy" and str(pe.get("area", "")) == "bamboo" and Wilds.native(pe):
 				spot = _nearest_free(pe.pos + Vector2i(0, 3))
 				break
+		print("[tour] land: standing at ", spot)
 		if spot.x >= 0:
 			for stv in [0.0, 3.2, 5.6]:
+				print("[tour] land: strain ", stv)
 				clean.call()
 				if stv > 0.0:
 					Game.cull["bamboo"] = [stv * maxf(6.0, float(int(Data.AREAS.bamboo.enemies))), Almanac.now(Game)]

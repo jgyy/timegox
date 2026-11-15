@@ -7286,11 +7286,15 @@ func _open_net() -> void:
 				for pl in band30.get("pool", []):
 					in_pool = in_pool or str(pl[0]) == str(en)
 				check(in_pool, "%s marches in %s" % [en, s30.area])
-		if str(s30.kind) in ["hunt", "collect", "toil", "folk", "summit", "marks"]:
+		if str(s30.kind) in ["hunt", "collect", "toil", "folk", "summit", "marks", "glide", "weal", "fit", "delve"]:
 			check(Data.DIALOGUE.has("done:" + str(s30.id)), "%s: something is said when it is done" % s30.id)
 		if str(s30.kind) == "folk":
 			check(Folk.ERRANDS.has(str(s30.id)) and Folk.ERRANDS[str(s30.id)].lines.size() >= 4 and Folk.CAMP_ROLES.has(str(s30.role)), "%s: an errand among the people of the road, with its words" % s30.id)
-	check(n30 >= 24 and kinds30.has("toil") and kinds30.has("summit") and kinds30.has("marks") and kinds30.has("folk") and kinds30.has("collect") and kinds30.has("hunt"), "the chapter is twenty-four steps of eight kinds (%d)" % n30)
+		if str(s30.kind) == "fit":
+			check(Fitting.count(ws, str(s30.area)) >= int(s30.n) + 1, "%s: %s has more houses to put to rights than are asked for" % [s30.id, s30.area])
+	check(n30 >= 32 and kinds30.has("toil") and kinds30.has("summit") and kinds30.has("marks") and kinds30.has("folk") and kinds30.has("collect") and kinds30.has("hunt") and kinds30.has("glide") and kinds30.has("weal") and kinds30.has("fit") and kinds30.has("delve"),
+		"the chapter is thirty-four steps of twelve kinds (%d)" % n30)
+	check(Data.step_index("s_p30_under") < _kill_step("jiang_chong") and Data.step_index("s_p30_rules") < _kill_step("shang_yang"), "what a lord is shown has been done before he is met")
 	# nothing the chapter asks for is a crime, and nothing in it is stopped by one
 	for i2 in range(p30, Data.STEPS.size()):
 		check(not str(Data.STEPS[i2].kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % Data.STEPS[i2].id)

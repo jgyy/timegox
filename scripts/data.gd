@@ -4405,36 +4405,53 @@ const STEPS := [
 	{"id": "s_p30_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Three hunters of the camps have come up the nine hundred and ninety-nine steps, which no hunter ever has. Speak to Elder Qing Xuan", "stones": 62800},
 	{"id": "s_p30_fowler", "kind": "talk", "npc": "net_fowler", "area": "garden",
 		"t": "In the Garden of Immortal Peaches a fowler has hung his nets on all four sides, and is praying. Find the Fowler of the Four Nets below the first height", "stones": 63000},
-	{"id": "s_p30_nets", "kind": "hunt", "area": "garden", "n": 26, "of": ["close_mesh", "drained_pool", "empty_snare"],
-		"t": "\"From heaven, from earth, from the four quarters: all into my net.\" Clear 26 close-meshed nets, drained pools and snares with nothing in them", "stones": 63200},
+	{"id": "s_p30_nets", "kind": "hunt", "area": "garden", "n": 34, "of": ["close_mesh", "drained_pool", "empty_snare"],
+		"t": "\"From heaven, from earth, from the four quarters: all into my net.\" Clear 34 close-meshed nets, drained pools and snares with nothing in them", "stones": 63200},
 	{"id": "s_p30_pegs", "kind": "collect", "item": "net_peg", "n": 4, "area": "garden", "t": "Somebody has been along three sides of the garden pulling pegs, and has left them where they fell: find 4 net pegs"},
 	{"id": "s_p30_tang", "kind": "talk", "npc": "cheng_tang", "area": "garden", "t": "A broad man in undyed hemp is walking the fourth side with no guard, looking at the knots. Speak to Tang of Shang below the second height"},
 	{"id": "s_p30_hunters", "kind": "folk", "role": "hunter", "n": 2, "area": "mountain",
 		"t": "\"One net is not a country.\" Ask 2 hunters of the camps to take down three sides of theirs, and say the old words over the fourth"},
 	{"id": "s_p30_cast", "kind": "toil", "work": "angle", "n": 3, "area": "mirror",
 		"t": "\"Nobody drains a pool for one supper and eats there again.\" Cast 3 times at the Mirror Lake (face the water, press C), and take only what bites"},
+	{"id": "s_p30_anglers", "kind": "folk", "role": "angler", "n": 2, "area": "mountain",
+		"t": "\"A mesh under four inches takes the small ones that would have been large.\" Ask 2 anglers of the camps to cut theirs wider"},
+	{"id": "s_p30_snares", "kind": "hunt", "area": "garden", "n": 30, "of": ["empty_snare", "close_mesh"],
+		"t": "With three sides down the rest have nowhere to hang, and have taken to the paths. Clear 30 more snares and close-meshed nets", "stones": 63400},
+	{"id": "s_p30_crane", "kind": "summit", "peak": "garden", "k": 2, "area": "garden", "t": "\"A bird sees a net as a shape, not as cord.\" Climb the third height of the Peach Garden and look down on the one that is left"},
+	{"id": "s_p30_flight", "kind": "glide", "n": 10, "area": "garden", "t": "Come down on it as a crane would, and see whether there is a way round: one flight of 10 tiles under the cloud-kite (V, from a height)"},
 	{"id": "s_p30_net", "kind": "kill", "boss": "four_net", "area": "garden", "t": "The fourth side will not come down for anybody. It has drawn itself shut on the first height: go up to the Net on Four Sides", "stones": 63600},
 	{"id": "s_p30_judge", "kind": "talk", "npc": "li_li", "area": "springs",
 		"t": "Among the red lilies of the Yellow Springs a judge is sitting with his own wrists tied, waiting for somebody to pass sentence. Find Li Li below the first height", "stones": 63800},
-	{"id": "s_p30_bills", "kind": "hunt", "area": "springs", "n": 28, "of": ["wanted_bill", "false_witness", "hasty_seal"],
-		"t": "A man is dead on a clerk's word and a judge's seal. Clear 28 bills nailed to a gate, witnesses who were sure, and seals set in haste", "stones": 64000},
+	{"id": "s_p30_bills", "kind": "hunt", "area": "springs", "n": 36, "of": ["wanted_bill", "false_witness", "hasty_seal"],
+		"t": "A man is dead on a clerk's word and a judge's seal. Clear 36 bills nailed to a gate, witnesses who were sure, and seals set in haste", "stones": 64000},
 	{"id": "s_p30_slips", "kind": "collect", "item": "case_slip", "n": 4, "area": "springs", "t": "The record of the hearing was thrown into the lilies by somebody who did not want it read twice: find 4 slips of the case"},
 	{"id": "s_p30_circle", "kind": "summit", "peak": "springs", "k": 0, "area": "springs",
 		"t": "\"In King Wen's time a circle on the ground was a prison.\" There is one scratched on the first height of the Yellow Springs: climb up, and stand in it"},
-	{"id": "s_p30_seen", "kind": "marks", "n": 3, "new": true, "area": "springs",
-		"t": "\"A sentence is a thing that stands, like any other.\" Go and look at 3 more things your own answers left standing, as a judge would have to"},
+	{"id": "s_p30_seen", "kind": "marks", "n": 4, "new": true, "area": "springs",
+		"t": "\"A sentence is a thing that stands, like any other.\" Go and look at 4 more things your own answers left standing, as a judge would have to"},
+	{"id": "s_p30_towns", "kind": "weal", "n": 3, "area": "village",
+		"t": "\"A judge is for the town. I had forgotten there was one outside my court.\" Leave 3 towns of the land better than you found them (ask whoever answers for one)"},
 	{"id": "s_p30_sentence", "kind": "kill", "boss": "the_sentence", "area": "springs", "t": "It was said, and sealed, and carried out, and it has not stopped: go up to the Sentence That Cannot Be Unsaid", "stones": 64400},
 	{"id": "s_p30_inn", "kind": "talk", "npc": "shang_yang", "area": "springs",
 		"t": "Below the second height a tall man with the tablets of the law under his arm has been turned away from an inn. Speak to Shang Yang", "stones": 64600},
-	{"id": "s_p30_papers", "kind": "hunt", "area": "springs", "n": 24, "of": ["inn_door", "torn_pass"],
-		"t": "\"No inn may lodge a traveller without papers. I wrote it.\" Clear 24 doors shut by statute and passports nobody signed", "stones": 64800},
+	{"id": "s_p30_papers", "kind": "hunt", "area": "springs", "n": 32, "of": ["inn_door", "torn_pass"],
+		"t": "\"No inn may lodge a traveller without papers. I wrote it.\" Clear 32 doors shut by statute and passports nobody signed", "stones": 64800},
+	{"id": "s_p30_rules", "kind": "fit", "n": 3, "area": "longmen",
+		"t": "\"Show me one rule that has a reason anybody can give.\" Put 3 houses of Longmen Ferry to rights, and hear why each thing goes where it goes"},
 	{"id": "s_p30_law", "kind": "kill", "boss": "shang_yang", "area": "springs", "t": "He will not sleep in a ditch his own statute dug without arguing the point: go up to Shang Yang, Turned from the Door", "stones": 65200},
 	{"id": "s_p30_finder_come", "kind": "talk", "npc": "jiang_chong", "area": "palace",
 		"t": "In the Blood Moon Palace an envoy with a little spade is digging under every floor, and finding. Speak to Jiang Chong below the first height", "stones": 65400},
-	{"id": "s_p30_dig", "kind": "hunt", "area": "palace", "n": 26, "of": ["buried_doll", "keyhole_ear", "spade_shadow"],
-		"t": "Whatever he digs for is there. Clear 26 dolls under the floor, ears at the keyhole and shadows of the spade", "stones": 65600},
+	{"id": "s_p30_dig", "kind": "hunt", "area": "palace", "n": 32, "of": ["buried_doll", "spade_shadow"],
+		"t": "Whatever he digs for is there. Clear 32 dolls under the floor and shadows of the spade", "stones": 65600},
+	{"id": "s_p30_roofs", "kind": "summit", "peak": "palace", "k": 2, "area": "palace", "t": "He has a list of floors. Climb the third height of the Blood Moon Palace and count the roofs he has not come to yet"},
+	{"id": "s_p30_ears", "kind": "hunt", "area": "palace", "n": 30, "of": ["keyhole_ear", "buried_doll"],
+		"t": "Every door in the palace has somebody listening at it who is paid by the name. Clear 30 ears at the keyhole and the dolls they were paid for", "stones": 65800},
 	{"id": "s_p30_dolls", "kind": "collect", "item": "paulownia_doll", "n": 4, "area": "palace", "t": "A doll that has lain under a floor has earth on it. Find 4 paulownia dolls that have none"},
+	{"id": "s_p30_under", "kind": "delve", "n": 6, "area": "palace",
+		"t": "\"It is all under the floor,\" he says. Go and see what is under one: to the very back of caves, until you have been to the back of 6 in all"},
 	{"id": "s_p30_finder", "kind": "kill", "boss": "jiang_chong", "area": "palace", "t": "He has a doll in each sleeve and a list of floors. Go up to Jiang Chong, Who Finds What He Brings", "stones": 66000},
+	{"id": "s_p30_beans", "kind": "toil", "work": "reap", "n": 6, "area": "springs",
+		"t": "He has been watering a dead man's beans with his tied hands. Cut 6 rows of the weeds beside them before you answer him (face open ground, press C)"},
 	{"id": "s_p30_verdict", "kind": "talk", "npc": "li_li", "area": "springs", "t": "The judge has not moved. The cord is still on his wrists, and he is still asking: go back to Li Li", "stones": 66200},
 	{"id": "s_p30_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The hunters have gone down the mountain again, and left something at the gate. Tell Elder Qing Xuan which side of the net was left", "stones": 66600},
 	{"id": "s_break35", "kind": "breakthrough", "to": 105, "t": "Nets on three sides taken down, and the fourth left for what will not turn aside: Three Sides Open"},
@@ -9470,7 +9487,7 @@ const DIALOGUE := {
 	],
 	"done:s_p30_nets": [
 		["Narrator", "The last net folds down into a heap of cord, and where each of them stood there is something on the grass: a feather, a tuft of fawn's hair, the dry print of a pool. Not one of them had caught anything. There was nothing left to catch. That was what had made them walk."],
-		["Yue Ling", "Twenty-six, and not a bird in any of them. Lin Feng, they were not hunting. They were looking. They are as hungry as he is."],
+		["Yue Ling", "Thirty-four, and not a bird in any of them. Lin Feng, they were not hunting. They were looking. They are as hungry as he is."],
 	],
 	"done:s_p30_pegs": [
 		["Narrator", "Four pegs of ash, pulled clean and laid in the grass side by side, not thrown. Whoever drew them went along the north side, the south and the east, coiling the cord as he came, and left the west standing. He has gone on up the garden on foot, in no hurry."],
@@ -9488,6 +9505,19 @@ const DIALOGUE := {
 	"done:s_p30_cast": [
 		["Narrator", "Three casts at the Mirror Lake. Two take; one comes back with weed on it and nothing else, and he lets it. The lake could be emptied by somebody of his realm in an afternoon, with one palm. He has two carp, a wet sleeve, and an appetite, which a palm has never once given him."],
 		["Yue Ling", "You smiled when the third one got away. I saw you. I am going to tell the Elder."],
+	],
+	"done:s_p30_anglers": [
+		["Narrator", "Two anglers of the camps sit with their nets across their knees and a knife, cutting every second knot. Each holds a mesh up to the light afterwards and puts four fingers through it, as he was shown by somebody he had not thought of in years."],
+	],
+	"done:s_p30_snares": [
+		["Narrator", "The last snare lets go of the path it had closed on. Along the garden's three open sides the grass has been pressed flat in a narrow line by something light, coming in. He did not see what. It did not wait to be seen."],
+	],
+	"done:s_p30_crane": [
+		["Narrator", "From the third height the one net is a thin grey stroke west of the peach trees, with the whole garden open round it. He had thought of a net as a wall. From here it is a mark on a page that is mostly blank, and anything with eyes can read it."],
+	],
+	"done:s_p30_flight": [
+		["Narrator", "He comes down the wind as a crane would, and the net turns under him from a line to a wall and back to a line. There are a hundred ways round it. It takes no cleverness to find one; only not being driven. He lands beyond it, and nothing has closed."],
+		["Yue Ling", "You went round. You could have gone through; it is only cord. I think that is the whole of what the old lord was saying, Lin Feng, and you did it without being told."],
 	],
 	"pre:four_net": [
 		["Narrator", "On the first height the fourth side of the net has pulled up its own pegs. It stands on eight legs of knotted cord, drawn shut like a purse, turning slowly; and from inside it, very faintly, comes the sound of everything it ever held, all asking the same thing."],
@@ -9514,7 +9544,10 @@ const DIALOGUE := {
 		["Narrator", "On the height somebody has scratched a circle in the earth with a stick, a pace across. Lin Feng steps into it. Nothing holds him. He could leave by lifting one foot. He stands there some time, and finds that the only thing keeping him in it is that he has said he will stay."],
 	],
 	"done:s_p30_seen": [
-		["Narrator", "Three things that stand because he once gave an answer. He looks at each as Li Li must look at his seal: not whether it was meant well, but what it did. Two of them he would give again. One he is less sure of than he was. It stands there all the same, and people use it."],
+		["Narrator", "Four things that stand because he once gave an answer. He looks at each as Li Li must look at his seal: not whether it was meant well, but what it did. Three of them he would give again. One he is less sure of than he was. It stands there all the same, and people use it."],
+	],
+	"done:s_p30_towns": [
+		["Narrator", "Three towns are a little the better this evening, and none of them knows that a judge of Jin had anything to do with it. A chest is fuller. A roof will be mended before the rains. No sentence was passed on anybody, and Lin Feng finds that he had half expected one to be needed."],
 	],
 	"pre:the_sentence": [
 		["Narrator", "It stands on the height in a judge's cap with no face under it, holding a seal as large as a millstone, and it is still pronouncing. The words go out of it in a low steady stream and do not stop. They were said once, in a court, in the proper form. Nothing was ever built to call them back."],
@@ -9532,6 +9565,9 @@ const DIALOGUE := {
 	"done:s_p30_papers": [
 		["Narrator", "The doors go down one after another with a noise like a ledger shutting. Behind the last of them the innkeeper is standing with a lamp, quite unharmed and very frightened, still saying: no papers, no bed, it is not my rule. He is right. He has been right all night."],
 	],
+	"done:s_p30_rules": [
+		["Narrator", "Three houses of the ferry town, each with one thing wrong in it for years. He asked every household why the thing went where it went, and each could tell him: the grandmother who burned her sleeve, the uncle who fell over the broom. Every rule in those rooms had somebody's name on it."],
+	],
 	"pre:shang_yang": [
 		["Narrator", "He has set the tablets down on the height in a row, as in court, and stands behind them with his sleeves shaken back. He is not angry. He is a man who has been refused by his own best work, and he would like it entered that the work was good."],
 		["Shang Yang, Turned from the Door", "Qin was a horse-trader's kingdom when I came. I measured its fields and weighed its men and now six states cannot stand against it. One cold night for the man who did that: is it too much? Answer by the statute, if you can.", "laugh"],
@@ -9547,7 +9583,16 @@ const DIALOGUE := {
 		["Jiang Chong", "Did you. How sharp. It will be your word against a doll, and the doll is in writing. Run along and kill what is under the floors, since you people enjoy that; there is a great deal under these. I ought to know.", "laugh"],
 	],
 	"done:s_p30_dig": [
-		["Narrator", "The dolls go back into the earth and the ears come away from the doors. The shadow of the spade is last; it goes on digging for some time after there is nothing left to cast it. Every hole in this palace has the same shape. One hand made them all, and filled them all first."],
+		["Narrator", "The dolls go back into the earth, one by one. The shadow of the spade is last; it goes on digging for some time after there is nothing left to cast it. Every hole in this palace has the same shape. One hand made them all, and filled them all first."],
+	],
+	"done:s_p30_roofs": [
+		["Narrator", "Forty-one roofs from the third height. Nine have their floors up already and planks stacked in the yard. Thirty-two have not, and under each of them people are sitting very quietly at supper, listening to a spade a few courts away."],
+	],
+	"done:s_p30_ears": [
+		["Narrator", "The ears come away from the doors, one after another, like snails from a wall. Each had a name ready and a price for it. Not one had heard anything; they had only been asked what they could remember having heard, and promised that remembering would be worth their while."],
+	],
+	"done:s_p30_under": [
+		["Narrator", "He has been to the very back of the dark now, under more floors than the Finder will ever lift. What is down there is rock, and water finding its level, and once a blind white fish. There is no doll in any of it. The earth does not keep what was never given to it."],
 	],
 	"done:s_p30_dolls": [
 		["Narrator", "Four dolls of paulownia. He turns each over. The grain is white and dry; there is lint in the needle-hole, of yellow silk. Not one has a grain of earth on it. Whatever these are evidence of, it is not anything that was ever done under a floor."],
@@ -9559,6 +9604,9 @@ const DIALOGUE := {
 	],
 	"post:jiang_chong": [
 		["Narrator", "The dolls fall out of his sleeves and lie on the height with their clean white faces up. He looks at them and, for the first time, has nothing to find. Somewhere below a floorboard is being nailed back down, and another, by people who were sure this morning that they were dead."],
+	],
+	"done:s_p30_beans": [
+		["Narrator", "Six rows of weed cut and laid aside, and the beans stand clear in their little square. They are somebody's supper, sown by a man who meant to be alive to eat them. Lin Feng wipes the sickle. It is the first thing in this place that he has done with a blade and felt no doubt about."],
 	],
 	"s_p30_verdict": [
 		["Narrator", "Li Li has not moved from his stone. The beans in the little flat place beside him are a hand high. He has been watering them from the river of the dead with his two tied hands, a palmful at a time, since Lin Feng left."],

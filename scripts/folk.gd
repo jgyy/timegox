@@ -1119,6 +1119,11 @@ const ERRANDS := {
 			"I have seen the hills go quiet over the ridge. I told myself it was the weather. A hunter can tell himself a great deal while the net is full. Very well. One side, and may what is tired of living find it.",
 			"You are a cultivator. You could empty this valley in a morning and you are asking me to take less. That is either a joke or the only sense I have heard this year. I shall take the nets down while I decide.",
 			"What would go up, up. What would go down, down. I had forgotten there was any more to it than the knots. Say it again, slowly. I want to have it right for the boy."]},
+	"s_p30_anglers": {"ask": "The old kings forbade a mesh under four inches in the pools, so that the small fish might be left to grow. Will you cut every second knot of yours?", "price": 0, "toast": "%s is cutting the mesh wider",
+		"lines": ["Four inches? I should catch nothing but what is worth catching. ...Say that again. No, I heard it. I have been throwing back fingerlings for thirty years and cursing them; it never came to me to let them not be caught.",
+			"My net is my grandfather's, and he would rise out of the lake if I put a knife to it. He would also say the carp were bigger in his day. Perhaps the two things are one thing. Hold this end.",
+			"A cultivator, asking a fisherman to take less. You could boil this lake dry with a look, they say. Well. If you can keep your hand in your sleeve, I suppose I can cut a knot.",
+			"Every second knot. And what goes through this year I shall meet again next year, twice the size, and it will not know me. That is a better bargain than I usually get from a fish."]},
 	# Part XXIX (the Ordered House release): every bucket a pedlar carries, for a house with a straight chimney
 	"s_p29_pedlars": {"ask": "There is a house afire below the fourth height of Qingshi, and the well is a street away. Will you bring every bucket, pot and ladle on your pole, and not ask who pays?", "price": 0, "toast": "%s is running with every bucket on the pole",
 		"lines": ["Fire? Say no more. Buckets are six stones apiece, and tonight they are nothing apiece. I have sold water-jars in that lane for ten years and told every one of them where to stand it.",
