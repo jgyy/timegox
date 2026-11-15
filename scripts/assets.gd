@@ -56,6 +56,8 @@ const BIRD_OF := {
 	"elixir_crane": "monsters/bifang", "hook_heron": "monsters/bifang", "frost_crane": "monsters/bifang",
 	"paper_crow": "monsters/magpie", "tally_crow": "monsters/magpie", "headache_crow": "monsters/magpie",
 	"seed_sparrow": "monsters/magpie", "spark_swallow": "monsters/magpie", "salt_gull": "monsters/magpie",
+	# the Open Net release (wilds.gd): what turns over a country that has been hunted out
+	"carrion_crow": "monsters/magpie",
 }
 
 ## Whether a foe is drawn a little off the ground in the land: its kind flies or floats, and it is not
@@ -97,6 +99,8 @@ const PEOPLE := {
 	"wei_ke": "characters/wei_ke", "grass_elder": "characters/grass_elder", "yang_bao": "characters/yang_bao", "zhou_chu": "characters/zhou_chu", "du_hui": "characters/du_hui",
 	# Part XXIX (the Ordered House release)
 	"the_guest": "characters/the_guest", "ding_lingwei": "characters/ding_lingwei", "guan_ning": "characters/guan_ning", "hua_xin": "characters/hua_xin",
+	# Part XXX (the Open Net release)
+	"cheng_tang": "characters/cheng_tang", "li_li": "characters/li_li", "shang_yang": "characters/shang_yang", "jiang_chong": "characters/jiang_chong",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",

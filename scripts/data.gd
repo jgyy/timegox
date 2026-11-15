@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 102
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place"]
+const MAX_LEVEL := 105
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -91,6 +91,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Whom the Grass Remembers", "note": "An old man knotted the grass in front of a general's enemy, for a kindness the general had forgotten doing. A sparrow came back with four rings in its beak. A town beat its drums because it thought a man was dead, and the man heard. Nothing you did has stopped. You know that now, and you go on doing things."},
 	# Part XXIX (the Ordered House release): what is left when every thing is where it belongs
 	{"life": 0, "title": "Who Moved the Firewood", "note": "A guest said: bend your chimney, and move the firewood from the stove. Nobody thanked him, and the house burned. A crane came home after a thousand years and found the walls as they were and the people gone. Two friends read on one mat until a carriage went by. You know now where a thing belongs, and what day it is, and which side of the mat you sit on. Very little else has ever been asked."},
+	# Part XXX (the Open Net release): what is left when he could take everything, and does not
+	{"life": 0, "title": "Who Left Three Sides Open", "note": "A fowler hung his nets on four sides and prayed for everything under heaven. A lord took three of them down. A judge heard wrongly, and bound his own hands. A man who wrote the law was turned from a door by it. You could empty a country now, or a street. Nothing in the land could stop you. That is why it has to be you who does."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -930,6 +932,32 @@ const ENEMIES := {
 	"old_wall": {"n": "The Wall That Is As It Was", "elem": "earth", "weak": "wood", "col": Color("8a8274"), "shape": "tortoise", "boss": true, "pal": {"sec": Color("58524a"), "acc": Color("c8d0a8")}},
 	"furrow_gold": {"n": "The Gold in the Furrow", "elem": "thunder", "weak": "earth", "col": Color("e8c040"), "shape": "golem", "boss": true, "bright": true, "pal": {"sec": Color("9a7a18"), "acc": Color("fff4b0")}},
 	"hua_xin": {"n": "Hua Xin, Who Went to Look", "elem": "phys", "weak": "wood", "col": Color("6a4a8a"), "shape": "person:hua_xin", "boss": true},
+	# ---- Part XXX (the Open Net release): what a net on four sides takes, what a hasty sentence leaves, what a law does
+	# to the man who wrote it, and what is found by the man who buried it
+	"close_mesh": {"n": "Close-Meshed Net", "elem": "wood", "weak": "fire", "col": Color("8a8a5a"), "shape": "spider", "pal": {"sec": Color("4a4a30"), "acc": Color("d8d0a0")}},
+	"drained_pool": {"n": "Drained Pool", "elem": "water", "weak": "earth", "col": Color("5a6a60"), "shape": "blob", "pal": {"sec": Color("2e3a34"), "acc": Color("c8d0b0")}},
+	"empty_snare": {"n": "Snare with Nothing in It", "elem": "phys", "weak": "thunder", "col": Color("7a6a4a"), "shape": "serpent", "pal": {"sec": Color("4a3e2a"), "acc": Color("e0d0a0")}},
+	"wanted_bill": {"n": "Bill Nailed to a Gate", "elem": "wood", "weak": "fire", "col": Color("e0d8c0"), "shape": "ray", "pal": {"sec": Color("8a8470"), "acc": Color("c8322a")}},
+	"false_witness": {"n": "Witness Who Was Sure", "elem": "dark", "weak": "thunder", "col": Color("5a5a6a"), "shape": "humanoid", "pal": {"sec": Color("34343e"), "acc": Color("e8e0c0")}},
+	"hasty_seal": {"n": "Seal Set in Haste", "elem": "earth", "weak": "wood", "col": Color("a83a2a"), "shape": "golem", "bright": true, "pal": {"sec": Color("5a1e16"), "acc": Color("f0d0a0")}},
+	"inn_door": {"n": "Door Shut by Statute", "elem": "earth", "weak": "water", "col": Color("6a5440"), "shape": "golem", "pal": {"sec": Color("3a2e24"), "acc": Color("c8a050")}},
+	"torn_pass": {"n": "Passport Nobody Signed", "elem": "phys", "weak": "fire", "col": Color("d8d0b8"), "shape": "moth", "pal": {"sec": Color("8a8068"), "acc": Color("3a3a40")}},
+	"buried_doll": {"n": "Doll under the Floor", "elem": "dark", "weak": "fire", "col": Color("b8a078"), "shape": "jiangshi", "pal": {"sec": Color("6a5a40"), "acc": Color("c8322a")}},
+	"keyhole_ear": {"n": "Ear at the Keyhole", "elem": "dark", "weak": "thunder", "col": Color("6a5a70"), "shape": "fox", "pal": {"sec": Color("3a3040"), "acc": Color("e8c860")}},
+	"spade_shadow": {"n": "Shadow of the Spade", "elem": "earth", "weak": "wood", "col": Color("4a4640"), "shape": "wraith", "pal": {"sec": Color("26241f"), "acc": Color("c8a030")}},
+	"four_net": {"n": "The Net on Four Sides", "elem": "wood", "weak": "fire", "col": Color("7a7a4a"), "shape": "spider", "boss": true, "pal": {"sec": Color("3a3a24"), "acc": Color("e8e0b0")}},
+	"the_sentence": {"n": "The Sentence That Cannot Be Unsaid", "elem": "dark", "weak": "thunder", "col": Color("3a2a2e"), "shape": "warden", "boss": true, "pal": {"sec": Color("1a1416"), "acc": Color("c8322a")}},
+	"shang_yang": {"n": "Shang Yang, Turned from the Door", "elem": "earth", "weak": "water", "col": Color("2e4c86"), "shape": "person:shang_yang", "boss": true},
+	"jiang_chong": {"n": "Jiang Chong, Who Finds What He Brings", "elem": "dark", "weak": "fire", "col": Color("c8a030"), "shape": "person:jiang_chong", "boss": true},
+	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
+	# what comes into a country that has been hunted out (wilds.gd)
+	"watch_spear": {"n": "Spearman of the Watch", "elem": "phys", "weak": "thunder", "col": Color("5a6a7a"), "shape": "humanoid", "pal": {"sec": Color("2e3640"), "acc": Color("c8a050")}},
+	"watch_captain": {"n": "Captain of the Watch", "elem": "earth", "weak": "wood", "col": Color("4a5a6a"), "shape": "warden", "pal": {"sec": Color("262e38"), "acc": Color("d84a3a")}},
+	"bounty_taker": {"n": "Bounty-Taker", "elem": "phys", "weak": "fire", "col": Color("6a5a48"), "shape": "humanoid", "pal": {"sec": Color("3a3028"), "acc": Color("e8dcc0")}},
+	"league_enforcer": {"n": "Enforcer of the Righteous League", "elem": "thunder", "weak": "dark", "col": Color("8a8e96"), "shape": "warden", "pal": {"sec": Color("4a4e58"), "acc": Color("f0f4f8")}},
+	"carrion_crow": {"n": "Carrion Crow", "elem": "dark", "weak": "thunder", "col": Color("2a2830"), "shape": "bird", "pal": {"sec": Color("16141a"), "acc": Color("8a2a22")}},
+	"midden_rat": {"n": "Midden Rat", "elem": "earth", "weak": "fire", "col": Color("6a5e50"), "shape": "fox", "pal": {"sec": Color("3e362e"), "acc": Color("d8a8a0")}},
+	"the_hunger": {"n": "The Hunger That Follows", "elem": "dark", "weak": "wood", "col": Color("9a9a8a"), "shape": "wraith", "pal": {"sec": Color("4a4a40"), "acc": Color("e8e0c0")}},
 	"xuanpin": {"n": "Xuanpin, the Valley Spirit", "elem": "water", "weak": "earth", "col": Color("1e2a44"), "shape": "person:xuanpin", "boss": true},
 }
 
@@ -1331,12 +1359,19 @@ const AREAS := {
 		# Part XXI: the three thousand at the king's gate, their fighting cocks, and the edges they have broken
 		"warband": {"pool": [["gate_swordsman", 76, 77], ["fighting_cock", 76, 77], ["broken_edge", 76, 77]], "n": 16, "vis": "s_p21_porters", "late": true},
 		# Part XXI: tallies of challenge, one for every man killed at the gate this year
-		"pickups": [{"id": "p21_tally1", "item": "challenge_tally", "pos": Vector2i(20, 20), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally2", "item": "challenge_tally", "pos": Vector2i(30, 38), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally3", "item": "challenge_tally", "pos": Vector2i(42, 15), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally4", "item": "challenge_tally", "pos": Vector2i(49, 36), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally5", "item": "challenge_tally", "pos": Vector2i(62, 20), "vis": ["s_p21_gate", ""], "late": true}],
+		"pickups": [{"id": "p21_tally1", "item": "challenge_tally", "pos": Vector2i(20, 20), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally2", "item": "challenge_tally", "pos": Vector2i(30, 38), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally3", "item": "challenge_tally", "pos": Vector2i(42, 15), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally4", "item": "challenge_tally", "pos": Vector2i(49, 36), "vis": ["s_p21_gate", ""], "late": true}, {"id": "p21_tally5", "item": "challenge_tally", "pos": Vector2i(62, 20), "vis": ["s_p21_gate", ""], "late": true},
+			# Part XXX: dolls of paulownia wood with no earth on them, which were never in the ground
+			{"id": "p30_doll1", "item": "paulownia_doll", "pos": Vector2i.ZERO, "vis": ["s_p30_dig", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p30_doll2", "item": "paulownia_doll", "pos": Vector2i.ZERO, "vis": ["s_p30_dig", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p30_doll3", "item": "paulownia_doll", "pos": Vector2i.ZERO, "vis": ["s_p30_dig", ""], "late": true, "peak": 2, "stand": "foot"}, {"id": "p30_doll4", "item": "paulownia_doll", "pos": Vector2i.ZERO, "vis": ["s_p30_dig", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"n": "Blood Moon Palace", "w": 90, "h": 56, "seed": 61, "theme": "palace", "enemies": 16,
 		# a fated encounter (fate.gd): there while the story has them there
 		"npcs": [{"id": "xu_lan", "n": "Xu Lan", "pos": Vector2i(50, 23), "col": Color("7a1a2a"), "fate": true}, {"id": "xu_lan_end", "n": "Xu Lan", "pos": Vector2i(46, 23), "col": Color("7a1a2a"), "asset": "xu_lan", "fate": true},
 			# Part XXI: somebody waiting at the gate of the Blood Moon Palace, where a king keeps three thousand swordsmen
-			{"id": "zhuang_envoy", "n": "The Swordsman in Scholar's Dress", "pos": Vector2i(15, 32), "col": Color("4a5a6a"), "vis": ["s_p21_porters", ""], "late": true}],
+			{"id": "zhuang_envoy", "n": "The Swordsman in Scholar's Dress", "pos": Vector2i(15, 32), "col": Color("4a5a6a"), "vis": ["s_p21_porters", ""], "late": true},
+			# Part XXX: the envoy who digs under every floor he chooses, and finds what he brought
+			{"id": "jiang_chong", "n": "Jiang Chong", "pos": Vector2i.ZERO, "col": Color("c8a030"), "vis": ["s_p30_law", "s_p30_finder"], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"pool": [["blood_acolyte", 11, 11], ["bone_soldier", 11, 11], ["shadow_fiend", 11, 11]],
 		"portals": [
 			{"to": "thunder", "pos": Vector2i(1, 28), "dest": Vector2i(84, 25), "open": ""},
@@ -1348,7 +1383,12 @@ const AREAS := {
 			{"id": "general_shadow", "pos": Vector2i(56, 44), "lv": 11, "req": 11},
 			{"id": "demon_lord", "pos": Vector2i(80, 28), "lv": 12, "req": 11},
 			# Part XXI: the king who loved swords, holding court in the Demon Lord's empty hall
-			{"id": "king_zhao", "pos": Vector2i(70, 30), "lv": 77, "req": 76, "vis": ["s_p21_gate", ""], "late": true}],
+			{"id": "king_zhao", "pos": Vector2i(70, 30), "lv": 77, "req": 76, "vis": ["s_p21_gate", ""], "late": true},
+			# Part XXX: the finder, on the second height, with a doll in each sleeve
+			{"id": "jiang_chong", "pos": Vector2i.ZERO, "lv": 105, "req": 104, "vis": ["s_p30_dolls", ""], "late": true, "peak": 1, "stand": "top"},
+		],
+		# Part XXX: what is dug up under a floor by a man who put it there
+		"warband5": {"pool": [["buried_doll", 104, 104], ["keyhole_ear", 104, 104], ["spade_shadow", 104, 104]], "n": 14, "vis": "s_p30_finder_come", "late": true},
 	},
 	"dragon": {
 		"n": "Sunken Dragon Palace", "w": 92, "h": 56, "seed": 71, "theme": "abyss", "enemies": 18,
@@ -1647,18 +1687,29 @@ const AREAS := {
 		"npcs": [{"id": "peach_keeper", "n": "Peach Keeper Tao Yao", "pos": Vector2i(10, 26), "col": Color("ffd0e0"), "vis": ["s_gd_intro", ""]},
 			# Part XVI: the door gods, home under the great peach tree because nobody pasted them up this year
 			{"id": "shenshu", "n": "Shenshu, Door God of the Peach Tree", "pos": Vector2i(12, 24), "col": Color("c83a2a"), "vis": ["s_p16_rally", ""]},
-			{"id": "yulei", "n": "Yulei, Door God of the Peach Tree", "pos": Vector2i(13, 26), "col": Color("2a3a5a"), "vis": ["s_p16_rally", ""]}],
+			{"id": "yulei", "n": "Yulei, Door God of the Peach Tree", "pos": Vector2i(13, 26), "col": Color("2a3a5a"), "vis": ["s_p16_rally", ""]},
+			# Part XXX: the fowler with nets hung on all four sides, and the lord who walked by without a guard
+			{"id": "net_fowler", "n": "The Fowler of the Four Nets", "pos": Vector2i.ZERO, "col": Color("6a6a4a"), "asset": "folk_herder", "vis": ["s_p30_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "cheng_tang", "n": "Tang of Shang", "pos": Vector2i.ZERO, "col": Color("d8d0bc"), "vis": ["s_p30_pegs", ""], "late": true, "peak": 1, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "peach_tree", "pos": Vector2i(32, 40), "lv": 26, "req": 26},
 			{"id": "crane_matriarch", "pos": Vector2i(46, 16), "lv": 26, "req": 26},
 			{"id": "the_nineteen", "pos": Vector2i(60, 40), "lv": 26, "req": 26},
 			{"id": "jade_ledger", "pos": Vector2i(88, 28), "lv": 26, "req": 26},
+			# Part XXX: the net with no side open, on the first height of the garden
+			{"id": "four_net", "pos": Vector2i.ZERO, "lv": 103, "req": 102, "vis": ["s_p30_tang", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		"pickups": [
 			{"id": "peach1", "item": "peach", "pos": Vector2i(22, 12)}, {"id": "peach2", "item": "peach", "pos": Vector2i(40, 46)},
 			{"id": "peach3", "item": "peach", "pos": Vector2i(64, 30)}, {"id": "peach4", "item": "peach", "pos": Vector2i(76, 10)},
+			# Part XXX: the pegs of the three sides that came down
+			{"id": "p30_peg1", "item": "net_peg", "pos": Vector2i.ZERO, "vis": ["s_p30_nets", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p30_peg2", "item": "net_peg", "pos": Vector2i.ZERO, "vis": ["s_p30_nets", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p30_peg3", "item": "net_peg", "pos": Vector2i.ZERO, "vis": ["s_p30_nets", ""], "late": true, "peak": 2, "stand": "foot"}, {"id": "p30_peg4", "item": "net_peg", "pos": Vector2i.ZERO, "vis": ["s_p30_nets", ""], "late": true, "peak": 2, "stand": "flank"},
 		],
 		"pickup_vis": "s_gd_collect",
+		# Part XXX: what a net hung on four sides is made of
+		"warband5": {"pool": [["close_mesh", 102, 102], ["drained_pool", 102, 102], ["empty_snare", 102, 102]], "n": 14, "vis": "s_p30_fowler", "late": true},
 	},
 	# ---- Part V: The Falling Sky
 	"dunes": {
@@ -1904,15 +1955,28 @@ const AREAS := {
 		],
 		"npcs": [
 			# a fated encounter (fate.gd): there while the story has them there
-			{"id": "qiu_ye_springs", "n": "Qiu Ye", "pos": Vector2i(12, 26), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},{"id": "meng_po", "n": "Meng Po of the Naihe Bridge", "pos": Vector2i(10, 26), "col": Color("e0d0c0"), "vis": ["s_sp_intro", ""]}],
+			{"id": "qiu_ye_springs", "n": "Qiu Ye", "pos": Vector2i(12, 26), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},{"id": "meng_po", "n": "Meng Po of the Naihe Bridge", "pos": Vector2i(10, 26), "col": Color("e0d0c0"), "vis": ["s_sp_intro", ""]},
+			# Part XXX: the judge who bound his own hands, and the lawgiver turned from an inn by his own law
+			{"id": "li_li", "n": "Li Li, Judge of Jin", "pos": Vector2i.ZERO, "col": Color("3a2a2e"), "vis": ["s_p30_net", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "shang_yang", "n": "Shang Yang", "pos": Vector2i.ZERO, "col": Color("2e4c86"), "vis": ["s_p30_sentence", "s_p30_law"], "late": true, "peak": 1, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "corpse_patriarch", "pos": Vector2i(30, 40), "lv": 31, "req": 31},
 			{"id": "bridge_serpent", "pos": Vector2i(46, 16), "lv": 31, "req": 31},
 			{"id": "lily_empress", "pos": Vector2i(60, 40), "lv": 31, "req": 31},
 			{"id": "the_unforgotten", "pos": Vector2i(86, 28), "lv": 31, "req": 31},
+			# Part XXX: the sentence that was carried out, and the man who wrote the law it was carried out under
+			{"id": "the_sentence", "pos": Vector2i.ZERO, "lv": 104, "req": 103, "vis": ["s_p30_seen", ""], "late": true, "peak": 0, "stand": "top"},
+			{"id": "shang_yang", "pos": Vector2i.ZERO, "lv": 104, "req": 103, "vis": ["s_p30_papers", ""], "late": true, "peak": 1, "stand": "top"},
 		],
-		"pickups": [{"id": "fherb1", "item": "forget_herb", "pos": Vector2i(22, 12)}, {"id": "fherb2", "item": "forget_herb", "pos": Vector2i(40, 46)}, {"id": "fherb3", "item": "forget_herb", "pos": Vector2i(64, 30)}, {"id": "fherb4", "item": "forget_herb", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "fherb1", "item": "forget_herb", "pos": Vector2i(22, 12)}, {"id": "fherb2", "item": "forget_herb", "pos": Vector2i(40, 46)}, {"id": "fherb3", "item": "forget_herb", "pos": Vector2i(64, 30)}, {"id": "fherb4", "item": "forget_herb", "pos": Vector2i(76, 10)},
+			# Part XXX: the slips of the case that was heard wrongly, scattered among the lilies
+			{"id": "p30_slip1", "item": "case_slip", "pos": Vector2i.ZERO, "vis": ["s_p30_bills", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p30_slip2", "item": "case_slip", "pos": Vector2i.ZERO, "vis": ["s_p30_bills", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p30_slip3", "item": "case_slip", "pos": Vector2i.ZERO, "vis": ["s_p30_bills", ""], "late": true, "peak": 1, "stand": "flank"}, {"id": "p30_slip4", "item": "case_slip", "pos": Vector2i.ZERO, "vis": ["s_p30_bills", ""], "late": true, "peak": 1, "stand": "foot"},
+		],
 		"pickup_vis": "s_sp_collect",
+		# Part XXX: what a sentence given in haste leaves behind it, and what a statute shuts
+		"warband5": {"pool": [["wanted_bill", 103, 103], ["false_witness", 103, 103], ["hasty_seal", 103, 103], ["inn_door", 103, 103], ["torn_pass", 103, 103]], "n": 18, "vis": "s_p30_judge", "late": true},
 	},
 	"wheel": {
 		"n": "Wheel of the Six Paths", "w": 96, "h": 58, "seed": 261, "theme": "diyu", "enemies": 20,
@@ -4336,6 +4400,44 @@ const STEPS := [
 	{"id": "s_p29_mat", "kind": "talk", "npc": "guan_ning", "area": "court", "t": "Guan Ning has a knife in his hand and the mat across his knees, and he has not cut yet. He is asking you: go back to Guan Ning", "stones": 62000},
 	{"id": "s_p29_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The broom is back behind the door, bristles up. Tell Elder Qing Xuan where things go", "stones": 62400},
 	{"id": "s_break34", "kind": "breakthrough", "to": 102, "t": "A bent chimney, the day of the year, and one side of a mat: Everything in Its Place"},
+	# ---- Part XXX: The Net with Three Sides Open (the Open Net release): what somebody does who could take everything.
+	# A fowler and a lord, a judge who bound his own hands, a lawgiver at an inn door, and a man who finds what he buries
+	{"id": "s_p30_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Three hunters of the camps have come up the nine hundred and ninety-nine steps, which no hunter ever has. Speak to Elder Qing Xuan", "stones": 62800},
+	{"id": "s_p30_fowler", "kind": "talk", "npc": "net_fowler", "area": "garden",
+		"t": "In the Garden of Immortal Peaches a fowler has hung his nets on all four sides, and is praying. Find the Fowler of the Four Nets below the first height", "stones": 63000},
+	{"id": "s_p30_nets", "kind": "hunt", "area": "garden", "n": 26, "of": ["close_mesh", "drained_pool", "empty_snare"],
+		"t": "\"From heaven, from earth, from the four quarters: all into my net.\" Clear 26 close-meshed nets, drained pools and snares with nothing in them", "stones": 63200},
+	{"id": "s_p30_pegs", "kind": "collect", "item": "net_peg", "n": 4, "area": "garden", "t": "Somebody has been along three sides of the garden pulling pegs, and has left them where they fell: find 4 net pegs"},
+	{"id": "s_p30_tang", "kind": "talk", "npc": "cheng_tang", "area": "garden", "t": "A broad man in undyed hemp is walking the fourth side with no guard, looking at the knots. Speak to Tang of Shang below the second height"},
+	{"id": "s_p30_hunters", "kind": "folk", "role": "hunter", "n": 2, "area": "mountain",
+		"t": "\"One net is not a country.\" Ask 2 hunters of the camps to take down three sides of theirs, and say the old words over the fourth"},
+	{"id": "s_p30_cast", "kind": "toil", "work": "angle", "n": 3, "area": "mirror",
+		"t": "\"Nobody drains a pool for one supper and eats there again.\" Cast 3 times at the Mirror Lake (face the water, press C), and take only what bites"},
+	{"id": "s_p30_net", "kind": "kill", "boss": "four_net", "area": "garden", "t": "The fourth side will not come down for anybody. It has drawn itself shut on the first height: go up to the Net on Four Sides", "stones": 63600},
+	{"id": "s_p30_judge", "kind": "talk", "npc": "li_li", "area": "springs",
+		"t": "Among the red lilies of the Yellow Springs a judge is sitting with his own wrists tied, waiting for somebody to pass sentence. Find Li Li below the first height", "stones": 63800},
+	{"id": "s_p30_bills", "kind": "hunt", "area": "springs", "n": 28, "of": ["wanted_bill", "false_witness", "hasty_seal"],
+		"t": "A man is dead on a clerk's word and a judge's seal. Clear 28 bills nailed to a gate, witnesses who were sure, and seals set in haste", "stones": 64000},
+	{"id": "s_p30_slips", "kind": "collect", "item": "case_slip", "n": 4, "area": "springs", "t": "The record of the hearing was thrown into the lilies by somebody who did not want it read twice: find 4 slips of the case"},
+	{"id": "s_p30_circle", "kind": "summit", "peak": "springs", "k": 0, "area": "springs",
+		"t": "\"In King Wen's time a circle on the ground was a prison.\" There is one scratched on the first height of the Yellow Springs: climb up, and stand in it"},
+	{"id": "s_p30_seen", "kind": "marks", "n": 3, "new": true, "area": "springs",
+		"t": "\"A sentence is a thing that stands, like any other.\" Go and look at 3 more things your own answers left standing, as a judge would have to"},
+	{"id": "s_p30_sentence", "kind": "kill", "boss": "the_sentence", "area": "springs", "t": "It was said, and sealed, and carried out, and it has not stopped: go up to the Sentence That Cannot Be Unsaid", "stones": 64400},
+	{"id": "s_p30_inn", "kind": "talk", "npc": "shang_yang", "area": "springs",
+		"t": "Below the second height a tall man with the tablets of the law under his arm has been turned away from an inn. Speak to Shang Yang", "stones": 64600},
+	{"id": "s_p30_papers", "kind": "hunt", "area": "springs", "n": 24, "of": ["inn_door", "torn_pass"],
+		"t": "\"No inn may lodge a traveller without papers. I wrote it.\" Clear 24 doors shut by statute and passports nobody signed", "stones": 64800},
+	{"id": "s_p30_law", "kind": "kill", "boss": "shang_yang", "area": "springs", "t": "He will not sleep in a ditch his own statute dug without arguing the point: go up to Shang Yang, Turned from the Door", "stones": 65200},
+	{"id": "s_p30_finder_come", "kind": "talk", "npc": "jiang_chong", "area": "palace",
+		"t": "In the Blood Moon Palace an envoy with a little spade is digging under every floor, and finding. Speak to Jiang Chong below the first height", "stones": 65400},
+	{"id": "s_p30_dig", "kind": "hunt", "area": "palace", "n": 26, "of": ["buried_doll", "keyhole_ear", "spade_shadow"],
+		"t": "Whatever he digs for is there. Clear 26 dolls under the floor, ears at the keyhole and shadows of the spade", "stones": 65600},
+	{"id": "s_p30_dolls", "kind": "collect", "item": "paulownia_doll", "n": 4, "area": "palace", "t": "A doll that has lain under a floor has earth on it. Find 4 paulownia dolls that have none"},
+	{"id": "s_p30_finder", "kind": "kill", "boss": "jiang_chong", "area": "palace", "t": "He has a doll in each sleeve and a list of floors. Go up to Jiang Chong, Who Finds What He Brings", "stones": 66000},
+	{"id": "s_p30_verdict", "kind": "talk", "npc": "li_li", "area": "springs", "t": "The judge has not moved. The cord is still on his wrists, and he is still asking: go back to Li Li", "stones": 66200},
+	{"id": "s_p30_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The hunters have gone down the mountain again, and left something at the gate. Tell Elder Qing Xuan which side of the net was left", "stones": 66600},
+	{"id": "s_break35", "kind": "breakthrough", "to": 105, "t": "Nets on three sides taken down, and the fourth left for what will not turn aside: Three Sides Open"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -4575,6 +4677,10 @@ const ITEMS := {
 	"incense_burner": {"n": "Incense Burner", "desc": "A small bronze burner on three feet, with three sticks standing in the ash. It goes before whoever a house honours, on the ring the last one left"},
 	"orchid": {"n": "Pot of Orchids", "desc": "One orchid in a blue pot. It goes where the morning light falls, with the leaf turned so. Not by the stove; it is not a vegetable"},
 	"oil_lamp": {"n": "Oil Lamp", "desc": "A bronze lamp with a wick the length of a finger-joint. On the board itself, to the left, so that the right hand casts no shadow on the work"},
+	# ---- Part XXX (the Open Net release)
+	"net_peg": {"n": "Net Peg", "desc": "A peg of ash wood as long as a hand, with the mark of the cord worn into it. There were four sides to the net it held. Somebody walked along three of them pulling these, and said a thing over the fourth that the fowler had never heard"},
+	"case_slip": {"n": "Slip of the Case", "desc": "A slip of bamboo from the record of a hearing: who said what, and the red of a seal at the foot. The clerk heard wrongly. The judge heard the clerk. A man was dead by evening. The judge has read this slip more often than anything he owns"},
+	"paulownia_doll": {"n": "Paulownia Doll", "desc": "A small figure of paulownia wood with a name on its chest and a needle through the name. It is quite dry and quite clean. A doll that had been under a floor for a season would have earth in the grain. This one came in a sleeve"},
 	"house_broom": {"n": "House Broom", "desc": "A broom of sorghum straw. Upright, bristles up, out of sight beside the store. Never by the altar, the bed or the stove. He has known this since he was thirteen"},
 	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
@@ -4785,6 +4891,27 @@ const CHAT := {
 		"A hoe turns up what it turns up. A tile, a root, a piece of gold. If you go on hoeing it is all the same thing. It is only when you stop that it becomes gold.",
 		"I am not hard on him. I am hard on the mat. A mat is where two people have agreed to look at the same page. When one of them is looking at the road, it is two mats already.",
 		"They will say I was proud. I wore one cap for fifty years and sat on one stool until my knees wore holes in it. That is not pride. That is knowing where I sit."],
+	# ---- Part XXX (the Open Net release)
+	"net_fowler": ["Four sides. My father hung three and went hungry one winter in four. I have children. I hung four, and I said the prayer so that it would be Heaven's doing and not mine.",
+		"From heaven, from earth, from the four quarters: all into my net. It is a good prayer. It works. That is what frightens me, some mornings, when I come to empty it.",
+		"There were cranes here when I was a boy. You could not sleep for them. I do not say I took them all. I say I took all that came, and then none came.",
+		"He did not tell me to take it down. He took it down himself, three sides, and coiled the cord for me so that it would not tangle. A lord. I had nothing to say against that."],
+	"cheng_tang": ["I was walking. A lord should walk; from a carriage every field looks the same. I heard a man praying for everything under heaven, and I thought: even Jie never asked for so much.",
+		"From the left, go left. From the right, go right. If you would go up, go up; if down, down. And what is tired of its life, come into my net. That is all I said. It is not much to found a house on.",
+		"They tell me forty lords came over to me when they heard of it. I did not do it for forty lords. I did it because the man had left the birds no way to refuse him.",
+		"You are stronger than anything in this garden. So was the net. Being able to take all of it is not a reason; it is the whole of the question."],
+	"li_li": ["I had the salary of the chief judge for nineteen years, and I did not give a share of it to my clerks. I do not see why I should give them a share of this.",
+		"The Duke says the fault was lower down. The Duke is kind. A judge who lets a fault roll downhill until it stops at somebody poor is not a judge; he is a slope.",
+		"The cord? I tied it myself. It is not tight. A man who needs to be held to his sentence should not have been passing them on others.",
+		"I heard him plead. I did not hear him. Those are two different things, and the difference is one man, who had a wife, and a field with beans in it."],
+	"shang_yang": ["I gave Qin a law that made it strong enough to eat six kingdoms. It works. I am informed that it works by an innkeeper who would not open his door.",
+		"He was quite right. No papers, no bed; the host shares the guilt. I wrote the clause in an afternoon. I remember being pleased with how short it was.",
+		"A law that bends for the man who made it is not a law. I said that to a crown prince once, and had his tutor's nose cut off to show I meant it. He is king now. I am travelling.",
+		"So this is what it comes to. I said it aloud, at the door. The innkeeper said, what does? I found I could not explain it to him in fewer words than the statute."],
+	"jiang_chong": ["I am never wrong. Where I dig, it is there. His Majesty finds that a great comfort; he is old, and ill, and he would rather it were witchcraft than years.",
+		"Paulownia. It is always paulownia; a soft wood, you can whittle one in the time it takes to boil rice. Not that I should know how long it takes.",
+		"The Crown Prince's floor is next. I have a feeling about it. I have had the feeling since he looked at me, at the spring sacrifice, as one looks at something on a shoe.",
+		"People confess, you know. With hot iron, they all confess; and then it is in writing, and then it is true. I did not make the world so. I only noticed."],
 	"hua_xin": ["I picked it up. Yes. And then I threw it away. Nobody ever tells that part. I threw it a good deal further than I had carried it.",
 		"A carriage with a canopy and eight outriders does not go by every day. I wanted to see it. Is it a crime to want to see a thing? I came back. I had lost my place on the page, that is all.",
 		"He will sit in one room for fifty years and be a saint. I shall go out, and hold office, and do some good and some harm, and be called worldly. One of us has to mind the roads.",
@@ -9323,6 +9450,133 @@ const DIALOGUE := {
 	],
 	"post:s_break32": [
 		["Narrator", "The tribulation comes down on the mountain like a load let fall, and he takes it as he took the timber: on the shoulder, knees bent, and then up. It is heavy. It is exactly as heavy as it is. When it has passed, a seed in a ring of iron holds one mountain more than it did, and is no larger."],
+	],
+	# ---- Part XXX: The Net with Three Sides Open (the Open Net release)
+	"recall28": [
+		["Narrator", "The winter after the mat, Lin Feng notices how quiet the mountain road has become. No pack has stood in his way since the autumn. They hear him a ridge off and are gone. He had taken it for peace. It is only that there is nothing left in the land that could tell him no."],
+	],
+	"s_p30_home": [
+		["Narrator", "Three men in deerskin are standing at the top of the nine hundred and ninety-nine steps with their caps in their hands, looking at the hall as if it might bite. Hunters of the camps do not come up here. The Elder has given them tea, and they are holding the cups like live coals."],
+		["Elder Qing Xuan", "They say the hills behind the Peach Garden have gone quiet. No cranes, no deer; crows by day. They are not accusing anybody. They came to ask a cultivator what a cultivator would know: whether a country can be hunted until it stops.", "think"],
+		["Lin Feng", "It can. I have seen a pack scatter before I had drawn. I thought that was the end of the fight, and so it was a kindness."],
+		["Elder Qing Xuan", "Did you. I have swept this hall of every spider for seventy years and I have moths. Go down to the garden. A fowler there has hung nets on all four sides and is praying over them, and I should like to know who he is praying to.", "point"],
+		["Yue Ling", "I was a thing that grew in one pond, Lin Feng. If somebody had wanted all the lotus, there would have been no me. Nobody did. I have never once thought to be grateful for that until this morning."],
+	],
+	"s_p30_fowler": [
+		["Narrator", "Below the first height of the garden the peach trees stand in a square of cord. Nets are hung on the north, the south, the east and the west, mesh so close a wren could not put its head through, and in the middle a thin man in deerskin is on his knees with his arms spread."],
+		["The Fowler of the Four Nets", "From heaven, from earth, from the four quarters: all into my net. All of it. Everything that flies, everything that runs. I have six children and a mother. Let none of it get by.", "kneel"],
+		["Lin Feng", "And if none of it gets by this year, what will you hang your nets for next year?"],
+		["The Fowler of the Four Nets", "Next year is a rich man's word. ...They have got up, you know. The nets. Since I began saying it they do not hang; they walk about the garden at night, shutting. I did not pray for that. I do not think I did.", "shock"],
+	],
+	"done:s_p30_nets": [
+		["Narrator", "The last net folds down into a heap of cord, and where each of them stood there is something on the grass: a feather, a tuft of fawn's hair, the dry print of a pool. Not one of them had caught anything. There was nothing left to catch. That was what had made them walk."],
+		["Yue Ling", "Twenty-six, and not a bird in any of them. Lin Feng, they were not hunting. They were looking. They are as hungry as he is."],
+	],
+	"done:s_p30_pegs": [
+		["Narrator", "Four pegs of ash, pulled clean and laid in the grass side by side, not thrown. Whoever drew them went along the north side, the south and the east, coiling the cord as he came, and left the west standing. He has gone on up the garden on foot, in no hurry."],
+	],
+	"s_p30_tang": [
+		["Narrator", "The man looking at the knots of the fourth net is broad, bearded, and dressed like his own steward. There is no guard with him and no carriage in sight. He has the fowler's cord coiled over one arm, neatly, the way a man coils it who has done his own work."],
+		["Tang of Shang", "I heard him from the road. Everything under heaven, he said, into one net. I thought: a king called Jie asked for that, and I am under arms against him at this moment. So I took three sides down. One may be left. A man must eat.", "think"],
+		["Tang of Shang", "And I said: what would go left, go left. What would go right, go right. Up, up; down, down. Whatever is tired of its life, come into my net. He will take a tenth of what he took, and he will be taking it when his grandchildren are old.", "nod"],
+		["Lin Feng", "Things run from me before I have drawn. I had thought of it as mercy."],
+		["Tang of Shang", "It is a net with no side open, young man; only wider. Come: one garden is not a country. Go and ask the hunters of the road for theirs. Then catch your own supper, by hand, and see what it is to take one.", "point"],
+	],
+	"done:s_p30_hunters": [
+		["Narrator", "Two hunters of the road, at two camps a long way apart, are standing in front of nets with three sides on the ground, saying words they have not said since their fathers died. One of them has to stop twice. A net is quickly taken down. It is the saying that is hard."],
+	],
+	"done:s_p30_cast": [
+		["Narrator", "Three casts at the Mirror Lake. Two take; one comes back with weed on it and nothing else, and he lets it. The lake could be emptied by somebody of his realm in an afternoon, with one palm. He has two carp, a wet sleeve, and an appetite, which a palm has never once given him."],
+		["Yue Ling", "You smiled when the third one got away. I saw you. I am going to tell the Elder."],
+	],
+	"pre:four_net": [
+		["Narrator", "On the first height the fourth side of the net has pulled up its own pegs. It stands on eight legs of knotted cord, drawn shut like a purse, turning slowly; and from inside it, very faintly, comes the sound of everything it ever held, all asking the same thing."],
+		["Tang of Shang", "That is his prayer, got up and walking. It has no opening because he asked for none. Do not cut it to pieces: every piece is a smaller net. Find it a side to open.", "point"],
+	],
+	"post:four_net": [
+		["Narrator", "One side of it comes down, and then, as if it had only been waiting for leave, a second and a third. What is left is an ordinary net hung west of the peach trees, with the evening going through it. A crane comes down out of that evening, looks at it, and walks round."],
+		["The Fowler of the Four Nets", "One. One crane. I have not seen one in four years. I could have had it. I watched it go round and I did not mind. I do not understand myself; I shall have to ask my mother.", "laugh"],
+	],
+	"s_p30_judge": [
+		["Narrator", "Among the red lilies, where the newly dead come down to the water, an old man in a judge's black is sitting upright on a stone. His wrists are tied in front of him with a cord. The knot is his own: it is on the side a man can reach with his teeth."],
+		["Li Li, Judge of Jin", "I am the chief judge of Jin. A clerk brought me a case, and I heard it as he gave it, and set my seal. The man was dead by evening. He had not done it. I have come down here to find him, and there is nobody to sentence me.", "grieve"],
+		["Lin Feng", "Your Duke says the fault was the clerk's."],
+		["Li Li, Judge of Jin", "My Duke is generous. I took the chief judge's salary; I did not share it downwards. I shall not share this. You have a sword and no office: clear what my seal let loose in this place, read the record, and then tell me what I am owed.", "bow"],
+	],
+	"done:s_p30_bills": [
+		["Narrator", "The bills come off their gates and the seals crack across. The witnesses are the last to go, and the hardest: each of them is perfectly sure, still, and says so as it fades. None of them lied. Every one of them saw a man in a grey coat near the well, as the clerk said."],
+		["Yue Ling", "They were all sure, Lin Feng. That is the part I do not like. I am sure of a great many things."],
+	],
+	"done:s_p30_slips": [
+		["Narrator", "Four slips. On the third, in a small hand, the dead man's own plea: I was at my field. Ask my wife. Ask the beans; they are hoed. Under it, in the judge's hand, nothing. He did not write, heard and set aside. He wrote nothing. He had not reached it when he sealed."],
+	],
+	"done:s_p30_circle": [
+		["Narrator", "On the height somebody has scratched a circle in the earth with a stick, a pace across. Lin Feng steps into it. Nothing holds him. He could leave by lifting one foot. He stands there some time, and finds that the only thing keeping him in it is that he has said he will stay."],
+	],
+	"done:s_p30_seen": [
+		["Narrator", "Three things that stand because he once gave an answer. He looks at each as Li Li must look at his seal: not whether it was meant well, but what it did. Two of them he would give again. One he is less sure of than he was. It stands there all the same, and people use it."],
+	],
+	"pre:the_sentence": [
+		["Narrator", "It stands on the height in a judge's cap with no face under it, holding a seal as large as a millstone, and it is still pronouncing. The words go out of it in a low steady stream and do not stop. They were said once, in a court, in the proper form. Nothing was ever built to call them back."],
+		["Li Li, Judge of Jin", "That is my voice. I had no idea it sounded so certain. Do not argue the case with it, young man; it won the case. Ask it whether it would like to have been wrong more slowly.", "think"],
+	],
+	"post:the_sentence": [
+		["Narrator", "The seal comes down for the last time and does not rise. Under it, when it is rolled aside, is a small flat place in the earth with beans coming up in a row, hoed. The voice has stopped in the middle of a word. Li Li gets up off his stone, and then sits down again."],
+	],
+	"s_p30_inn": [
+		["Narrator", "Below the second height there is an inn for the newly dead, with one lamp. A tall man is standing outside its shut door with a bundle of wooden tablets under his arm. He has the look of somebody working out, clause by clause, how he came to be on this side of it."],
+		["Shang Yang", "He asked for my papers. I have none; I left in the night. He said: by the law of the Lord of Shang, whoever lodges a man without papers shares his guilt. I am the Lord of Shang. I did not tell him. It would only have frightened him.", "think"],
+		["Lin Feng", "You could have ordered him to open."],
+		["Shang Yang", "And unmade in one night what took me twenty years: that the law is the same for the man who wrote it. No. But I shall not lie in a ditch without a hearing either. Clear his doorway of my statute, and then come up and tell me I was wrong.", "point"],
+	],
+	"done:s_p30_papers": [
+		["Narrator", "The doors go down one after another with a noise like a ledger shutting. Behind the last of them the innkeeper is standing with a lamp, quite unharmed and very frightened, still saying: no papers, no bed, it is not my rule. He is right. He has been right all night."],
+	],
+	"pre:shang_yang": [
+		["Narrator", "He has set the tablets down on the height in a row, as in court, and stands behind them with his sleeves shaken back. He is not angry. He is a man who has been refused by his own best work, and he would like it entered that the work was good."],
+		["Shang Yang, Turned from the Door", "Qin was a horse-trader's kingdom when I came. I measured its fields and weighed its men and now six states cannot stand against it. One cold night for the man who did that: is it too much? Answer by the statute, if you can.", "laugh"],
+	],
+	"post:shang_yang": [
+		["Narrator", "He sits down among his tablets and picks one up, and reads the clause about inns as if somebody else had written it. Then he takes out a small knife and, slowly, cuts one more line under it. Lin Feng cannot see what it says. The innkeeper, down the hill, has opened his door a hand's width."],
+		["Shang Yang, Turned from the Door", "A law should have one side left open. Not for the man who made it. For the one night nobody thought of. I did not know that until I was the night. Go and see your judge; I think he is making the same mistake the other way round.", "nod"],
+	],
+	"s_p30_finder_come": [
+		["Narrator", "In the Blood Moon Palace the floors are up. Planks are stacked against every wall, and between the joists a sleek man in yellow gauze is on one knee with a little spade, digging with the tips of his fingers like somebody feeling for a coin he dropped on purpose."],
+		["Jiang Chong", "Ah! A cultivator. Then you can smell it too: witchcraft, under every board. His Majesty is ill, and somebody is to blame. I find them. Look. Paulownia, with a needle through the name. It was there. You saw me find it.", "offer"],
+		["Lin Feng", "I saw your sleeve before I saw your hand."],
+		["Jiang Chong", "Did you. How sharp. It will be your word against a doll, and the doll is in writing. Run along and kill what is under the floors, since you people enjoy that; there is a great deal under these. I ought to know.", "laugh"],
+	],
+	"done:s_p30_dig": [
+		["Narrator", "The dolls go back into the earth and the ears come away from the doors. The shadow of the spade is last; it goes on digging for some time after there is nothing left to cast it. Every hole in this palace has the same shape. One hand made them all, and filled them all first."],
+	],
+	"done:s_p30_dolls": [
+		["Narrator", "Four dolls of paulownia. He turns each over. The grain is white and dry; there is lint in the needle-hole, of yellow silk. Not one has a grain of earth on it. Whatever these are evidence of, it is not anything that was ever done under a floor."],
+		["Yue Ling", "If you had sat to one of those three arts, Lin Feng, and he had come digging at our gate, he would not have needed his sleeve. I only say it. Some people are caught for what they did, and some for what was brought."],
+	],
+	"pre:jiang_chong": [
+		["Narrator", "He is waiting on the second height with his cap ribbons blowing, a doll in each sleeve and a list in his belt. From here every roof of the palace is plain, and he looks at them the way a cook looks at a row of fish."],
+		["Jiang Chong, Who Finds What He Brings", "You think I am a liar. I am better than that. I am believed. Tens of thousands will die for what is in my sleeve, and every one will have confessed. Whose floor shall it be next, sweeper? I have a doll with no name on it yet.", "laugh"],
+	],
+	"post:jiang_chong": [
+		["Narrator", "The dolls fall out of his sleeves and lie on the height with their clean white faces up. He looks at them and, for the first time, has nothing to find. Somewhere below a floorboard is being nailed back down, and another, by people who were sure this morning that they were dead."],
+	],
+	"s_p30_verdict": [
+		["Narrator", "Li Li has not moved from his stone. The beans in the little flat place beside him are a hand high. He has been watering them from the river of the dead with his two tied hands, a palmful at a time, since Lin Feng left."],
+		["Li Li, Judge of Jin", "You have read the slips. You have seen what a sure man does. I heard wrongly and a man died: by the law of Jin, the judge who does that dies for it. I wrote no exception for the judge. I have a sword. I am waiting to be told.", "think"],
+		["Li Li, Judge of Jin", "You are stronger than anybody in this country. Nobody could have stopped you doing as I did, a hundred times, and nobody would have bound your hands. So I ask you and not the Duke. What does somebody owe, who could not be made to pay?", "bow"],
+	],
+	"s_p30_end": [
+		["Narrator", "The hunters have gone down. On the top step, where they stood, they have left a net: an old one, mended many times, folded square, with three of its four cords cut and whipped at the ends so that nobody could hang them again."],
+		["Elder Qing Xuan", "They would not say what it was for. I think it is for you. Sweeper Bai wanted to put it away, and I said no: hang it where you can see it. West of the pine. One side only.", "think"],
+		["Lin Feng", "A fowler asked for everything and it got up and walked. A judge was sure. A man wrote a law with no door in it, and another found whatever he had buried. They all had the power to, Elder. That was all any of them had."],
+		["Elder Qing Xuan", "And you have more than the four of them together, and came home with two carp. Good. The precepts say: do not kill. I have always thought they were written by somebody who could have, and was tired. Go and sit, child.", "bow"],
+		["Yue Ling", "I have counted, Lin Feng. From the gate to the pine there are eleven things alive that you could have stepped on, and you walked round every one. You did not notice. I am not going to tell you which they were."],
+	],
+	"pre:s_break35": [
+		["Narrator", "Under the pine Lin Feng sits with the hunters' net hanging west of him, one side only. A moth comes through the mesh and out again. Down the mountain something that ran from him in the autumn has come back to the edge of the road, and is standing there, deciding. The sky gathers."],
+	],
+	"post:s_break35": [
+		["Narrator", "The tribulation comes from four sides at once, as a thing does that means to take all of him. He lets three of them by. He does not know how; it is like standing aside in a doorway. The fourth he takes, because it would not turn. When it has passed, the moth is still on the net."],
 	],
 	# ---- Part XXIX: The Crooked Chimney (the Ordered House release)
 	"recall27": [

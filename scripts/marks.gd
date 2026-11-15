@@ -214,6 +214,15 @@ const MARKS := {
 		"road": {"area": "court", "m": ["gate", false, WOOD], "n": "The Looking Gate", "desc": "The old gate of the Jade Court, propped open with a stone, with a bench set just inside it facing the road. A rolled mat leans in the corner with two books in it. The step is worn bright by people who only meant to look for a moment.",
 			"who": ["Carter Dou", "folk_porter", Color("8a6a4a"), "There is a scholar at that gate most afternoons who asks me what I am carrying and where to, and writes it down. He says he has read about roads for thirty years and it is a kind of scholarship to see one.", "Two of them, some days. The round one waves. The thin one pretends he is only there to fetch the round one back. He has been fetching him back since the spring."]},
 	},
+	# Part XXX (the Open Net release): what a judge owes who could not be made to pay
+	"the_verdict": {
+		"sword": {"area": "springs", "m": ["mound", STONE_DARK], "n": "The Judge's Mound", "desc": "A mound among the red lilies with a slip of dark wood at its head and a seal of office laid on the earth, face down. Beside it are seven short rows of beans. Nobody has seen who hoes them. The slip says: heard wrongly; sentenced according to law.",
+			"who": ["Clerk Bo of Jin", "folk_scholar", Color("4a4a5a"), "I am the clerk. It was my report. He would not let them touch me; he said he had not shared his salary and would not share this. I have copied every case since in my own hand, twice, and I bring the copies here.", "They sent me to see how a judge of Jin ends. I had expected something grander. It is a heap of earth and some beans. I find I cannot hear a case now without seeing the beans."]},
+		"bench": {"area": "springs", "m": ["stele", STONE, false, true], "n": "The Name over the Bench", "desc": "A stone set up where the judge sat bound, with a name cut on it that is not a judge's name: a farmer's, with his village. Under it, smaller and newer: every case twice. Somebody comes down from Jin each spring and cuts the second line a little deeper.",
+			"who": ["Widow Sang", "folk_farmwife", Color("7a6a5a"), "That is my husband's name. They cut it over the bench in Jin as well, where the judge must look up at it. I did not ask for that. I asked for my husband. But I go and read it, on market days.", "He sits again, the one who did it. I was angry. Then my neighbour's boy was tried before him for a theft, and he heard it twice, and the boy came home. I do not forgive him. I notice the boy came home."]},
+		"field": {"area": "springs", "m": ["beds", Color("6a8a3a")], "k": 3, "n": "The Widow's Rows", "desc": "Bean rows at the edge of the lilies, with a slip of bamboo at the head of each. The first rows wander like a line drawn by somebody who has only read about lines. The later ones are nearly straight. A judge's black robe hangs on a pole at the end, for the birds.",
+			"who": ["Widow Sang", "folk_farmwife", Color("7a6a5a"), "He hoes like a man signing his name. I told him so. He said he would learn. He is sixty-six. It took him a month to stop asking the beans for their side of it.", "I have not told him it is paid. It is not paid. But I brought him water yesterday, because it was hot, and he is old. He thanked me as if I had remitted a sentence."]},
+	},
 	# Part XXVIII (the Answering Land release): what is owed for a kindness
 	"the_knot": {
 		"nothing": {"area": "fusang", "m": ["cairn", STRAW], "n": "The Cairn Where He Put It Down", "desc": "A small cairn in the long grass of the Valley of Sunrise, and round it a patch where every stem stands straight and none is tied. On the top stone somebody has left a single knot of grass, undone, the stems smoothed flat with a thumb.",
@@ -353,7 +362,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}

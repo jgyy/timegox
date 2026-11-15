@@ -295,7 +295,8 @@ static func coach_offers(g, area: String, shut: Dictionary = {}) -> Array:
 	var from := town_of(area)
 	var layer := Data.layer_of(area)
 	var out: Array = []
-	if from == "" or not of(layer).at.has(from):
+	# (the Open Net release, crime.gd: the coach carries the post, and the post does not ride with a wanted man)
+	if from == "" or not of(layer).at.has(from) or Crime.shut(g, area, "coach") != "":
 		return out
 	for id in of(layer).at:
 		if id == from or not g.seen.has(str(town(id).area)):

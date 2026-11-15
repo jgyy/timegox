@@ -50,7 +50,12 @@ const FEATS := {
 	"third_scourge": {"n": "There Were Three", "kind": "road", "pts": 10, "test": ["step", "s_p28_third"], "desc": "Stand in front of the third scourge, who asked."},
 	"what_is_owed": {"n": "What Is Owed", "kind": "road", "pts": 10, "test": ["step", "s_p28_knot"], "desc": "Answer the old man in the grass."},
 	# the Ordered House release: the last realm, the chimney, the crane and the mat (Part XXIX)
-	"in_its_place": {"n": "Where It Always Was", "kind": "road", "pts": 20, "test": ["level", 102], "desc": "Reach Everything in Its Place: the last realm there is."},
+	"in_its_place": {"n": "Where It Always Was", "kind": "road", "pts": 20, "test": ["level", 102], "desc": "Reach Everything in Its Place."},
+	# the Open Net release: the last realm, the net, the sentence and the finder (Part XXX)
+	"three_sides": {"n": "What Would Go Left, Go Left", "kind": "road", "pts": 20, "test": ["level", 105], "desc": "Reach Three Sides Open: the last realm there is."},
+	"open_net": {"n": "One Crane, Walking Round", "kind": "road", "pts": 10, "test": ["step", "s_p30_net"], "desc": "Find a side to open in a net that had none."},
+	"own_sentence": {"n": "Heard Wrongly", "kind": "road", "pts": 10, "test": ["step", "s_p30_sentence"], "desc": "Stop a sentence that had been carried out."},
+	"judges_due": {"n": "What He Owes", "kind": "road", "pts": 10, "test": ["step", "s_p30_verdict"], "desc": "Answer a judge who bound his own hands."},
 	"bent_chimney": {"n": "Scorched Heads at the Top of the Table", "kind": "road", "pts": 10, "test": ["step", "s_p29_fire"], "desc": "Put out the fire a guest foretold."},
 	"crane_home": {"n": "The Walls As They Were", "kind": "road", "pts": 10, "test": ["step", "s_p29_wall"], "desc": "See a crane home after a thousand years."},
 	"cut_mat": {"n": "One Mat or Two", "kind": "road", "pts": 10, "test": ["step", "s_p29_mat"], "desc": "Say where a friend sits."},

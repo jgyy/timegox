@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "almanac", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -67,11 +67,17 @@ func _build() -> void:
 		labels.append("Back")
 		ids.append("back")
 		enabled.append(true)
-	elif mode == "way" or mode == "almanac":
-		# creed.gd, almanac.gd: a page to read
+	elif mode == "way" or mode == "almanac" or mode == "wild":
+		# creed.gd, almanac.gd, wilds.gd: a page to read
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
+	elif mode == "law":
+		# crime.gd, taboo.gd: how he stands with the gates of the land; and the shelf every disciple is told
+		# of on the first day
+		labels = ["The forbidden shelf", "Back"]
+		ids = ["forbidden", "back"]
+		enabled = [Game.prologue == "", true]
 	elif mode == "land":
 		# weal.gd: the eleven towns, each with how it stands
 		labels = []
@@ -223,7 +229,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -296,7 +302,10 @@ func press(act: String) -> void:
 				"store":
 					main.pop()
 					main.offer_store()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac":
+				"forbidden":
+					main.pop()
+					main.open_forbidden()
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -467,6 +476,121 @@ func _draw_way() -> void:
 		var ax2: Dictionary = Creed.AXIS[str(c.axis)]
 		UI.text(self, Vector2(r.position.x + 24, y + 22.0 * float(i + 1)), "%s %+d" % [str(ax2.pos if int(c.d) > 0 else ax2.neg), absi(int(c.d))], 13, ax2.col if int(c.d) > 0 else ax2.neg_col)
 		UI.text(self, Vector2(r.position.x + 170, y + 22.0 * float(i + 1)), str(c.why), 13, UI.C_TEXT)
+
+## The Law (crime.gd, taboo.gd): how he stands with the gates of the land, the price on his head town by town,
+## what is charged, who is dead by his hand, and how deep he has sat to what the precepts forbid.
+func _draw_law() -> void:
+	UI.text(self, Vector2(60, 70), "The Law", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var st: Dictionary = Crime.STANDINGS[Crime.worst(Game)]
+	var head := str(st.n) if not Taboo.marked(Game) else "A walker of the forbidden"
+	UI.text(self, r.position + Vector2(24, 44), head, 26, st.col)
+	var sd := str(st.desc) if not Taboo.marked(Game) else "Found out at an art the precepts forbid. His name hangs at every gate with no price on it: the League takes no money. Only the Hall of Discipline, or the enforcers, can take it down."
+	if Crime.worst(Game) == 0 and not Game.slain.is_empty():
+		sd = "No bill hangs at any gate. That is not the same thing as a clean name, and he knows it."
+	UI.wrapped(self, r.position + Vector2(24, 66), main.told(sd), 15, UI.C_TEXT, r.size.x - 48)
+	var y := r.position.y + 122.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The price on his head", 16, UI.C_GOLD)
+	UI.text(self, Vector2(r.position.x + 420, y), "Dead by his hand", 16, UI.C_GOLD)
+	var yy := y + 22.0
+	var any := false
+	for tid in Weal.ORDER:
+		if Crime.price(Game, tid) > 0:
+			any = true
+			UI.text(self, Vector2(r.position.x + 24, yy), str(Weal.TOWNS[tid].n).trim_prefix("the "), 14, UI.C_TEXT)
+			UI.text(self, Vector2(r.position.x + 250, yy), "%d" % Crime.price(Game, tid), 14, UI.C_RED)
+			yy += 19.0
+	if not any:
+		UI.text(self, Vector2(r.position.x + 24, yy), "None, in any town.", 14, UI.C_DIM)
+		yy += 19.0
+	else:
+		UI.text(self, Vector2(r.position.x + 24, yy + 2.0), "The watch takes it in the town's own streets:", 12, UI.C_DIM)
+		UI.text(self, Vector2(r.position.x + 24, yy + 17.0), "in stones, or in days in the circle (%d for all of it)." % Crime.days_for(Game, Crime.heat(Game)), 12, UI.C_DIM)
+		yy += 36.0
+	var yd := y + 22.0
+	var shown := 0
+	for id in Game.slain:
+		if shown >= 7:
+			UI.text(self, Vector2(r.position.x + 420, yd), "and %d more" % (Game.slain.size() - shown), 13, UI.C_DIM)
+			yd += 19.0
+			break
+		var rec: Dictionary = Game.slain[id]
+		UI.text(self, Vector2(r.position.x + 420, yd), str(rec.n), UI.fit(str(rec.n), 14, 250.0), UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 250.0)
+		UI.text(self, Vector2(r.position.x + 680, yd), "seen" if bool(rec.seen) else "unseen", 13, UI.C_RED if bool(rec.seen) else UI.C_DIM)
+		yd += 19.0
+		shown += 1
+	if Game.slain.is_empty():
+		UI.text(self, Vector2(r.position.x + 420, yd), "Nobody.", 14, UI.C_DIM)
+		yd += 19.0
+	y = maxf(yy, yd) + 14.0
+	UI.text(self, Vector2(r.position.x + 24, y), "What the gates charge him with", 16, UI.C_GOLD)
+	y += 4.0
+	if Game.crimes.is_empty():
+		UI.text(self, Vector2(r.position.x + 24, y + 18.0), "Nothing.", 14, UI.C_DIM)
+		y += 19.0
+	var from := maxi(0, Game.crimes.size() - 5)
+	for i in range(Game.crimes.size() - 1, from - 1, -1):
+		var c: Dictionary = Game.crimes[i]
+		y += 19.0
+		var bill := str(Crime.CRIMES[str(c.what)].bill) % str(c.who)
+		var ln := "Day %d, %s: %s" % [int(c.day), str(Weal.TOWNS[str(c.town)].n).trim_prefix("the "), bill]
+		UI.text(self, Vector2(r.position.x + 24, y), main.told(ln), UI.fit(ln, 13, r.size.x - 150.0), UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 150.0)
+		UI.text(self, Vector2(r.position.x + r.size.x - 110.0, y), ("%d" % int(c.n)) if int(c.n) > 0 else "no bill", 13, UI.C_RED if int(c.n) > 0 else UI.C_DIM)
+	y += 34.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The forbidden shelf", 16, Color("b05ad0"))
+	UI.text(self, Vector2(r.position.x + 220, y), "(%s)" % Taboo.text(Game), 13, UI.C_DIM)
+	for id in Taboo.ORDER:
+		y += 21.0
+		var d: Dictionary = Taboo.DAOS[id]
+		var dp := Taboo.depth(Game, id)
+		UI.text(self, Vector2(r.position.x + 24, y), str(d.n), 14, d.col if dp > 0 else UI.C_DIM)
+		for k in Taboo.MAX:
+			draw_rect(Rect2(r.position.x + 300.0 + 16.0 * float(k), y - 10.0, 12.0, 10.0), d.col if k < dp else Color(0.16, 0.16, 0.2))
+		UI.text(self, Vector2(r.position.x + 460, y), str(d.what), UI.fit(str(d.what), 12, 320.0), UI.C_TEXT if dp > 0 else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 320.0)
+	y += 24.0
+	UI.wrapped(self, Vector2(r.position.x + 24, y), main.told("Every disciple is taught the three names on the first day, so that he knows what not to do. Anybody in sight when he sits to one has seen it; past %d steps in all, anybody of cultivation he speaks to can smell it on him." % Taboo.SENSE), 12, UI.C_DIM, r.size.x - 48)
+
+## The Wild (wilds.gd): how the countries he has hunted in stand, and what that is doing to the towns.
+func _draw_wild() -> void:
+	UI.text(self, Vector2(60, 70), "The Wild", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 44), "The balance of the wild", 24, UI.C_GOLD)
+	UI.wrapped(self, r.position + Vector2(24, 66), main.told("Every country has beasts of its own, and bears so much hunting and no more. What he takes too fast does not come back: the packs thin, the crows and the rats come in behind them, and the towns that hear of it have less in the pot. Left alone, the strain eases by half every %d days; a hunter of the camps can be paid to open three sides of his net." % int(Wilds.HALF)), 14, UI.C_TEXT, r.size.x - 48)
+	var y := r.position.y + 150.0
+	var rows: Array = []
+	for a in Game.cull:
+		rows.append([Wilds.strain(Game, str(a)), str(a)])
+	rows.sort_custom(func(x, z): return float(x[0]) > float(z[0]))
+	if rows.is_empty():
+		UI.wrapped(self, Vector2(r.position.x + 24, y), "Nothing he has hunted has been missed yet. The wild stands as it was made.", 15, UI.C_DIM, r.size.x - 48)
+		return
+	UI.text(self, Vector2(r.position.x + 24, y), "Country", 14, UI.C_DIM)
+	UI.text(self, Vector2(r.position.x + 330, y), "Strain", 14, UI.C_DIM)
+	UI.text(self, Vector2(r.position.x + 560, y), "How it stands", 14, UI.C_DIM)
+	for i in mini(rows.size(), 12):
+		var a2 := str(rows[i][1])
+		var s2 := float(rows[i][0])
+		var st := Wilds.state_of(s2)
+		var inf: Dictionary = Wilds.STATES[st]
+		y += 26.0
+		UI.text(self, Vector2(r.position.x + 24, y), str(Data.AREAS[a2].n), UI.fit(str(Data.AREAS[a2].n), 15, 290.0), UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 290.0)
+		UI.panel(self, Rect2(r.position.x + 330, y - 12.0, 200.0, 12.0), Color(0.1, 0.12, 0.18, 0.9), UI.C_BORDER)
+		draw_rect(Rect2(r.position.x + 332, y - 10.0, 196.0 * clampf(s2 / 6.0, 0.0, 1.0), 8.0), inf.col)
+		for k in Wilds.AT:
+			draw_rect(Rect2(r.position.x + 332 + 196.0 * float(k) / 6.0, y - 14.0, 1.0, 16.0), UI.C_DIM)
+		UI.text(self, Vector2(r.position.x + 560, y), str(inf.n), 15, inf.col)
+	var worst := 0
+	var wa := ""
+	for rw in rows:
+		if Wilds.state_of(float(rw[0])) > worst:
+			worst = Wilds.state_of(float(rw[0]))
+			wa = str(rw[1])
+	if worst > 0:
+		UI.wrapped(self, Vector2(r.position.x + 24, r.end.y - 70.0), main.told("%s: %s" % [str(Data.AREAS[wa].n), str(Wilds.STATES[worst].desc)]), 14, Wilds.STATES[worst].col, r.size.x - 48)
 
 ## The Almanac (almanac.gd): the day of the year, the feast that is coming, the Roll of the Outer Court as it
 ## stands this morning, and how the wild of the regions he knows has grown while he was elsewhere.
@@ -1380,6 +1504,12 @@ func _draw() -> void:
 		return
 	if mode == "almanac":
 		_draw_almanac()
+		return
+	if mode == "law":
+		_draw_law()
+		return
+	if mode == "wild":
+		_draw_wild()
 		return
 	if mode == "body":
 		_draw_body()

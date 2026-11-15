@@ -908,7 +908,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted"]
+	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted", "clean", "wild", "step"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -1007,6 +1007,12 @@ func _init() -> void:
 					"fitted":
 						# houses put to rights (fitting.gd): no more than the story's own steps have asked for by then
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 6
+					"clean", "wild":
+						# the Open Net release: a clean name (crime.gd), a wild that stands (wilds.gd): nothing to count
+						ok = ok and n.size() == 1
+					"step":
+						# something of the story done already: a real step, before the trial
+						ok = ok and Data.step_index(str(n[1])) >= 0 and Data.step_index(str(n[1])) < _kill_step(tid)
 					"households":
 						# the Three Burrows release: households of the hero's own town (hold.gd): no more than
 						# the story has brought there by the trial, nor than a city has
@@ -2110,6 +2116,7 @@ func _fates_and_faces() -> void:
 	_heavy_road()
 	_answering_land()
 	_ordered_house()
+	_open_net()
 
 ## The Lotus release: Yue Ling's closeness, heart-to-hearts, wishes and futures (bonds.gd), the bigger
 ## things to do (structures.gd) and Part XV, the Thread She Never Had.
@@ -3280,7 +3287,7 @@ func _hundred_works() -> void:
 	var bsrc3 := FileAccess.get_file_as_string("res://scripts/bot.gd")
 	check(bsrc3.contains("\"cloud_ladder\": \"craft\"") and bsrc3.contains("\"jixin\": \"works\"") and bsrc3.contains("\"wooden_magpie\": \"relic\"") and bsrc3.contains("CROSS_PLAN") and bsrc3.contains("WORKS_PLAN") and bsrc3.contains("\"s_p19_rest\""),
 		"the bot builds works, answers at every crossroads, and has a way through the three trials")
-	var plan_src := bsrc3.substr(bsrc3.find("const CROSS_PLAN"), 2000)
+	var plan_src := bsrc3.substr(bsrc3.find("const CROSS_PLAN"), 3200)
 	for cid4 in Echoes.ORDER:
 		check(plan_src.contains("\"%s\": [" % cid4), "the bot has an answer for the crossroads %s" % cid4)
 
@@ -4954,7 +4961,7 @@ func _three_burrows() -> void:
 				continue
 			if not str(bd25.vis).begins_with("s_p25_"):
 				# (the Underclothes release: a later chapter's bands take the same last slots in other regions)
-				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_") or str(bd25.vis).begins_with("s_p29_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
+				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_") or str(bd25.vis).begins_with("s_p29_") or str(bd25.vis).begins_with("s_p30_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
 				continue
 			bands25 += 1
 			check(bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
@@ -5224,7 +5231,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.in_its_place.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.three_sides.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -6521,7 +6528,7 @@ func _answering_land() -> void:
 	WG.free(); FG.free()
 	# the crossroads
 	var c28: Dictionary = Echoes.CROSSROADS.get("the_knot", {})
-	check(not c28.is_empty() and str(c28.step) == "s_p28_knot" and str(c28.part) == "XXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_knot", "what is owed for a kindness is asked last of all")
+	check(not c28.is_empty() and str(c28.step) == "s_p28_knot" and str(c28.part) == "XXVIII" and Echoes.ORDER[Echoes.ORDER.find("the_mat") - 1] == "the_knot", "what is owed for a kindness is asked last of all")
 	check((c28.options as Array).size() == 3 and c28.after.size() == 3 and c28.end.size() == 3 and c28.echo.has("s_p28_end") and c28.echo.s_p28_end.size() == 3, "the_knot: three answers, each answered, echoed and told at the end")
 	var letters28 := 0
 	for lid in Mail.ORDER:
@@ -6851,14 +6858,14 @@ func _ordered_house() -> void:
 	check(msrc.contains("func offer_fit") and msrc.contains("\"later\", \"label\": \"Leave it\""), "\"Leave it\" is the first answer at somebody's furniture")
 
 	print("== Part XXIX: The Crooked Chimney ==")
-	check(Data.REALMS.size() == 35 and Data.REALMS[34] == "Everything in Its Place" and Data.MAX_LEVEL == 102 and Data.level_name(102).ends_with("Everything in Its Place") and Data.REALM_INFO.size() == 35
+	check(Data.REALMS.size() >= 35 and Data.REALMS[34] == "Everything in Its Place" and Data.MAX_LEVEL >= 102 and Data.level_name(102).ends_with("Everything in Its Place") and Data.REALM_INFO.size() >= 35
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXIX adds the realm of Everything in Its Place")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break34" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall27") and msrc.contains("\"s_break33\": \"recall27\"") and Data.DIALOGUE.has("pre:s_break34") and Data.DIALOGUE.has("post:s_break34"),
-		"Part XXIX follows Rings Returned (recall27) and ends the game")
+	check(Data.step_index("s_break34") == Data.step_index("s_p30_home") - 1 and int(Data.STEPS[Data.step_index("s_break34")].to) == 102 and Data.DIALOGUE.has("recall27") and msrc.contains("\"s_break33\": \"recall27\"") and Data.DIALOGUE.has("pre:s_break34") and Data.DIALOGUE.has("post:s_break34"),
+		"Part XXIX follows Rings Returned (recall27) and ends with the thirty-fourth tribulation")
 	var p29 := Data.step_index("s_p29_home")
 	var kinds29 := {}
 	var n29 := 0
-	for i4 in range(p29, Data.STEPS.size()):
+	for i4 in range(p29, Data.step_index("s_break34") + 1):
 		var s29: Dictionary = Data.STEPS[i4]
 		n29 += 1
 		kinds29[str(s29.kind)] = true
@@ -6891,7 +6898,7 @@ func _ordered_house() -> void:
 	# two fit steps ask for no more than the hero has put to rights by the trial that counts them
 	check(Data.step_index("s_p29_rights") < _kill_step("hua_xin") and Data.step_index("s_p29_fit") < _kill_step("chimney_fire"), "the houses are put to rights before the lords who are shown them")
 	var c29: Dictionary = Echoes.CROSSROADS.get("the_mat", {})
-	check(not c29.is_empty() and str(c29.step) == "s_p29_mat" and str(c29.part) == "XXIX" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_mat", "where a friend sits is asked last of all")
+	check(not c29.is_empty() and str(c29.step) == "s_p29_mat" and str(c29.part) == "XXIX" and Echoes.ORDER[Echoes.ORDER.find("the_verdict") - 1] == "the_mat", "where a friend sits is asked last of all")
 	check((c29.options as Array).size() == 3 and c29.after.size() == 3 and c29.end.size() == 3 and c29.echo.has("s_p29_end") and c29.echo.s_p29_end.size() == 3, "the_mat: three answers, each answered, echoed and told at the end")
 	var letters29 := 0
 	for lid in Mail.ORDER:
@@ -6942,3 +6949,383 @@ func _ordered_house() -> void:
 	check(Data.CHAT.has("host_tian") and Data.CHAT.host_tian.size() >= 4, "the householder has four things to say")
 	check(Almanac.STORY_DATES.has("s_p29_feast"), "the crane comes down on the Double Ninth")
 	G.free(); R.free(); S.free(); P.free(); C.free(); V.free(); F.free(); H.free()
+
+## The Open Net release: the law of the land (anybody can be struck down; what is seen is answered for; the watch,
+## the circle, the bounty-takers), the three forbidden Daos (and what being caught costs), the balance of the wild
+## (a country hunted too hard changes), and Part XXX.
+func _open_net() -> void:
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	var ws: Dictionary = Atlas.world()
+	var new_game := func():
+		var g = load("res://scripts/game.gd").new()
+		g.reset()
+		g.started = true
+		return g
+
+	print("== the law of the land (crime.gd) ==")
+	var G = new_game.call()
+	check(Crime.clean(G) and Crime.worst(G) == 0 and Crime.heat(G) == 0 and not Crime.outlaw(G) and Crime.text(G) == "a clean name", "a journey begins with a clean name")
+	check(Crime.mod(G, "qingshi", "price") == 1.0 and Crime.shut(G, "village", "work") == "" and Crime.watch_due(G, "village").is_empty() and not Crime.hunt_due(G, "bamboo"), "and nothing is shut, dearer or after him")
+	# everybody who stands in the land can be weighed, and nobody is past what a journey reaches
+	var people := 0
+	var kids := 0
+	var strongest := 0
+	var lids := {}
+	for a in Data.AREAS:
+		lids[Data.layer_of(a)] = true
+	for lid in lids:
+		for e in Atlas.world_of(str(lid)).ents:
+			if str(e.kind) != "npc":
+				continue
+			people += 1
+			var m := Crime.might(e)
+			strongest = maxi(strongest, m)
+			if Crime.is_child(e):
+				kids += 1
+			check(m >= 0 and m + Crime.EDGE <= Data.MAX_LEVEL + 12 and Crime.weigh(G, e) != "", "%s can be weighed (%d)" % [e.id, m])
+	check(people > 300 and strongest >= 60, "%d people stand in the land, the strongest with %d levels behind them" % [people, strongest])
+	var elder := {}
+	var wen := {}
+	var officer := {}
+	for e in ws.ents:
+		if str(e.kind) != "npc":
+			continue
+		if str(e.id) == "elder":
+			elder = e
+		elif str(e.id) == "granny_wen":
+			wen = e
+		elif e.has("office") and officer.is_empty() and str(e.get("area", "")) == "village":
+			officer = e
+	check(not elder.is_empty() and not wen.is_empty() and not officer.is_empty(), "the Elder, Granny Wen and whoever answers for Qingshi stand in the land")
+	check(Crime.might(elder) > 50 and Crime.might(wen) <= 3 and Crime.might(officer) >= 30, "the Elder is no easy mark, a midwife is, and an officer has the town's guard at the door")
+	# too weak: put on his back, and it was seen by the one he drew on
+	G.level = 3
+	var r0: Dictionary = Crime.strike(G, elder, 0)
+	check(str(r0.how) == "thrown" and int(r0.price) > 0 and not Crime.slain(G, "elder") and Crime.price(G, "sect") == int(r0.price) and G.thrown == 1 and not Crime.clean(G),
+		"a sword drawn on somebody too strong: he is put on his back, nobody dies, and there is a bill for it (%d)" % int(r0.price))
+	check(not Crime.can_kill(G, elder) and Crime.can_kill(G, wen), "he can strike down whoever he is stronger than, and nobody else")
+	G.free()
+	# strong enough: dead for good
+	G = new_game.call()
+	G.level = 80
+	var stones0: int = G.stones
+	var peace0 := Weal.measure(G, "qingshi", "peace")
+	var virtue0 := Creed.value(G, "virtue")
+	var r1: Dictionary = Crime.strike(G, wen, 2)
+	check(str(r1.how) == "slain" and Crime.slain(G, "granny_wen") and Crime.dead(G, "granny_wen") and Crime.count(G) == 1 and Crime.count(G, true) == 1, "anybody can be struck down by somebody strong enough, and stays dead")
+	check(int(r1.price) > 0 and Crime.price(G, "qingshi") == int(r1.price) and G.stones > stones0 and Crime.standing(G, "qingshi") == 1 and Crime.standing(G, "yanggu") == 0, "what was seen is answered for in the town that hears of it, and nowhere else (%d)" % int(r1.price))
+	check(Weal.measure(G, "qingshi", "peace") < peace0 and Weal.measure(G, "qingshi", "regard") < 0 and Creed.value(G, "virtue") < virtue0, "the town is the poorer in peace, thinks the worse of him, and the Way he walks is weighed by it")
+	for ln in r1.lines:
+		check(fits.call(str(ln[1])), "what is told of a killing fits the dialogue box")
+	check(Crime.grave_line(G, wen).contains("Granny Wen") and fits.call(Crime.grave_line(G, wen)) and fits.call(Crime.heir_line(G, wen)), "where she stood there is a mound, and it says so")
+	var wen_n := str(wen.n)
+	var said2: Array = Crime.mute(G, [[wen_n, "Eat."], ["Lin Feng", "Yes."], [wen_n, "More."], ["Narrator", "He eats."]])
+	check(said2.size() == 3 and str(said2[0][0]) == "Narrator" and str(said2[1][0]) == "Lin Feng", "the dead do not say their lines, and everybody else does")
+	check(Crime.shut(G, "village", "work") != "" and Crime.shut(G, "yanggu", "work") == "" and Crime.mod(G, "qingshi", "price") > 1.2 and Crime.mod(G, "yanggu", "price") == 1.0, "where his bill hangs nobody hires him and the counters ask more")
+	check(Offices.blocked(G, "inn", "village") == Crime.SHUT.work and Mail.bag_offer(G, "head_qingshi").is_empty() and Weal.gift_blocked(G, "qingshi") == Crime.SHUT.gift, "no shift, no post-bag, and the chest takes nothing from him")
+	# unseen: no bill, but done
+	var r2: Dictionary = Crime.strike(G, officer, 0)
+	check(str(r2.how) == "slain" and int(r2.price) == 0 and Crime.count(G) == 2 and Crime.count(G, true) == 1 and G.crimes.size() == 2, "what nobody saw is not answered for, and is still done")
+	# the watch
+	var w: Dictionary = Crime.watch_due(G, "village")
+	check(not w.is_empty() and int(w.price) == Crime.price(G, "qingshi") and Crime.watch_due(G, "bamboo").is_empty() and Crime.watch_due(G, "yanggu").is_empty(), "the watch comes for him in the town's own streets, and only there")
+	for ln2 in Crime.watch_lines(G, w):
+		check(fits.call(str(ln2[1])), "what the watch says fits the dialogue box")
+	G.stones = 0
+	check(not Crime.pay(G, w) and Crime.price(G, "qingshi") > 0, "a price cannot be paid with an empty purse")
+	var day0: int = G.day
+	var days := Crime.serve(G, w)
+	check(days >= 1 and days <= Crime.SERVE_MAX and G.day == day0 + days and Crime.price(G, "qingshi") == 0 and Crime.watch_due(G, "village").is_empty() and G.served == days, "or served: %d days in the circle, and the bill is burned" % days)
+	for ln3 in Crime.serve_lines(G, w, days, true):
+		check(fits.call(str(ln3[1])), "what is told of the circle fits the dialogue box")
+	check(Crime.slain(G, "granny_wen") and not Crime.clean(G) and Weal.measure(G, "qingshi", "regard") < 0, "the dead stay dead and the town remembers, bill or no bill")
+	G.free()
+	# pay, run, resist, outlaw, bounty-takers
+	G = new_game.call()
+	G.level = 80
+	Crime.strike(G, wen, 1)
+	var w2: Dictionary = Crime.watch_due(G, "village")
+	G.stones = int(w2.price) + 5
+	check(Crime.pay(G, w2) and G.stones == 5 and Crime.heat(G) == 0 and G.bounty_paid == int(w2.price), "the price can be paid, and the bill is torn up")
+	Crime.record(G, "assault", "qingshi", "somebody")
+	var w3: Dictionary = Crime.watch_due(G, "village")
+	check(w3.is_empty(), "the watch comes once a day")
+	G.day += 1
+	w3 = Crime.watch_due(G, "village")
+	var before := Crime.price(G, "qingshi")
+	check(Crime.flee(G, w3) > 0 and Crime.price(G, "qingshi") > before and Crime.watch_due(G, "village").is_empty(), "running makes the bill heavier, and they come again tomorrow")
+	G.day += 1
+	w3 = Crime.watch_due(G, "village")
+	var grp: Array = Crime.watch_group(G)
+	check(grp.size() == 3 and grp.all(func(f): return Data.ENEMIES.has(str(f.id)) and int(f.lv) <= Data.MAX_LEVEL and int(f.lv) >= G.level - 1), "the watch that serves a cultivator's bill is about as strong as he is")
+	var more := Crime.resisted(G, w3)
+	check(more > before and Crime.outlaw(G) and Crime.standing(G, "yanggu") == 2 and Crime.shut(G, "yanggu", "work") != "" and Almanac.stipend(G) == 0, "cutting down the watch makes an outlaw of him: every gate, and no stipend")
+	check(Crime.hunt_due(G, "bamboo") and not Crime.hunt_due(G, "village") and not Crime.hunt_due(G, "sect"), "bounty-takers find an outlaw in the wild, not in a town's own streets")
+	var hs: Array = Crime.hunters(G)
+	check(hs.size() == 2 and hs.all(func(f): return str(f.id) == "bounty_taker" and int(f.lv) == G.level + 1), "two of them, a level above him")
+	Crime.hunted_today(G)
+	check(not Crime.hunt_due(G, "bamboo"), "once a day")
+	Crime.hunt_won(G); Crime.hunt_won(G); Crime.hunt_won(G); Crime.hunt_won(G); Crime.hunt_won(G); Crime.hunt_won(G)
+	check(Crime.hunters(G).size() == 4, "beaten, they bring more: four at most")
+	var w4: Dictionary = Crime.hunt_lost(G)
+	var days4 := Crime.serve(G, w4, true)
+	check(days4 > 0 and Crime.heat(G) == 0 and not Crime.outlaw(G), "beaten by them, everything is served at once (%d days)" % days4)
+	G.free()
+	# children, the people of the towns, and somebody new
+	G = new_game.call()
+	G.level = 90
+	var kid := {}
+	var grown := {}
+	for fp in Folk.people(ws, "qingshi"):
+		if bool(fp.kid) and kid.is_empty():
+			kid = {"kind": "folk", "id": fp.id, "n": fp.n, "p": fp, "area": fp.area}
+		elif not bool(fp.kid) and grown.is_empty():
+			grown = {"kind": "folk", "id": fp.id, "n": fp.n, "p": fp, "area": fp.area}
+	check(not kid.is_empty() and Crime.is_child(kid) and not Crime.can_kill(G, kid) and str(Crime.strike(G, kid, 0).how) == "child" and Crime.count(G) == 0, "a child is never struck: the sword does not leave the sheath")
+	check(str(Crime.strike(G, grown, 0).how) == "slain" and Crime.gone(G, str(grown.id)) and not Crime.dead(G, str(grown.id)) and not Crime.replaced(G, str(grown.id)), "one of the street is gone from it")
+	G.day += Crime.MOURN
+	check(not Crime.gone(G, str(grown.id)) and Crime.replaced(G, str(grown.id)), "until somebody new has taken the place (%d days)" % Crime.MOURN)
+	check(kids >= 1, "there are children among the people with names (%d), and none of them can be struck" % kids)
+	G.free()
+	for c in Crime.CRIMES:
+		check(str(Crime.CRIMES[c].bill).contains("%s") and int(Crime.CRIMES[c].base) > 0, "the charge %s has a bill and a price" % c)
+	for sk in Crime.SHUT:
+		check(fits.call(str(Crime.SHUT[sk])), "what is said when %s is shut fits the dialogue box" % sk)
+	for eid in ["watch_spear", "watch_captain", "bounty_taker", "league_enforcer", "carrion_crow", "midden_rat", "the_hunger"]:
+		check(Data.ENEMIES.has(eid) and Lore.BEAST.has(eid) and Habits.habit(eid) != "", "%s has a story, and keeps hours" % eid)
+	check(msrc.contains("\"id\": \"sheathe\", \"label\": \"Sheathe it\"") and msrc.contains("func offer_watch") and msrc.contains("func visit_grave") and msrc.contains("Crime.mute(Game, lines)"), "\"Sheathe it\" is the first answer; the watch asks; a grave is visited; the dead are not heard")
+	check(not bsrc.contains("Crime.strike") and not bsrc.contains("offer_draw") and not bsrc.contains("Taboo.sit"), "the bot draws on nobody and leaves the shelf shut")
+	var gn: Node3D = Crime.grave(true)
+	check(gn.get_child_count() >= 6, "a grave is built from code")
+	gn.free()
+
+	print("== the forbidden shelf (taboo.gd) ==")
+	G = new_game.call()
+	check(Taboo.ORDER.size() == 3 and Taboo.mod(G, "dealt") == 1.0 and Taboo.mod(G, "exp") == 1.0 and Taboo.mod(G, "taken") == 1.0 and Taboo.taint(G) == 0 and not Taboo.marked(G), "three forbidden Daos, and a journey that never sits to one is the journey it always was")
+	check(Taboo.blocked(G, "blood") != "" and Taboo.sit(G, "blood", 0).is_empty(), "the names are only names until he has begun to cultivate")
+	G.level = 30
+	G.heal_full()
+	var virtue1 := Creed.value(G, "virtue")
+	var told: Array = Taboo.sit(G, "blood", 0)
+	check(not told.is_empty() and Taboo.depth(G, "blood") == 1 and Taboo.mod(G, "dealt") > 1.0 and not Taboo.marked(G) and Creed.value(G, "virtue") < virtue1 and not Crime.clean(G), "sat to unseen: a step deeper, a harder blow, nobody knows, and the Way is weighed by it")
+	for ln4 in told:
+		check(fits.call(str(ln4[1])), "what is told of sitting to it fits the dialogue box")
+	G.heal_full()
+	Taboo.sit(G, "soul", 0)
+	check(Taboo.mod(G, "exp") > 1.0 and Taboo.taint(G) == 2 and not Taboo.senses(G, elder), "two steps: not yet strong enough on him to smell")
+	G.heal_full()
+	Taboo.sit(G, "husk", 0)
+	check(Taboo.mod(G, "taken") < 1.0 and Taboo.taint(G) == Taboo.SENSE and Taboo.senses(G, elder) and not Taboo.senses(G, wen), "three: anybody of cultivation he speaks to knows, and a midwife does not")
+	var caught: Array = Taboo.sensed(G, elder)
+	check(Taboo.marked(G) and not caught.is_empty() and Crime.outlaw(G) and Crime.standing(G, "yanggu") == 2 and Almanac.stipend(G) == 0 and Crime.shut(G, "village", "work") != "", "caught: his name at every gate, struck from the roll, hired by nobody")
+	for ln5 in caught:
+		check(fits.call(str(ln5[1])), "what is said when he is found out fits the dialogue box")
+	check(Crime.hunt_due(G, "bamboo") and Crime.hunters(G).size() == 3 and Crime.hunters(G).all(func(f): return str(f.id) == "league_enforcer" and int(f.lv) == G.level + 2), "three enforcers of the League, stronger than he is, once a day")
+	var pen: Dictionary = Taboo.penance(G)
+	G.stones = 100000
+	var day1: int = G.day
+	var atoned: Array = Taboo.atone(G)
+	check(not Taboo.marked(G) and Taboo.taint(G) == 0 and Taboo.mod(G, "dealt") == 1.0 and G.day == day1 + int(pen.days) and G.stones == 100000 - int(pen.fine) and not Crime.outlaw(G), "the Hall of Discipline: the arts given up, %d days, %d stones, and the gates forget" % [int(pen.days), int(pen.fine)])
+	for ln6 in atoned:
+		check(fits.call(str(ln6[1])), "what is told of the Hall of Discipline fits the dialogue box")
+	check(int(Taboo.penance(G).days) > int(pen.days), "a second time costs more")
+	G.heal_full()
+	var seen_lines: Array = Taboo.sit(G, "blood", 2, "Qingshi")
+	check(Taboo.marked(G) and seen_lines.size() >= 3, "sat to in front of somebody: found out at once")
+	var burned: Array = Taboo.burn(G)
+	check(not Taboo.marked(G) and Taboo.taint(G) == 0 and burned.all(func(l): return fits.call(str(l[1]))), "beaten by the enforcers, the arts are burned out of him")
+	for id in Taboo.ORDER:
+		var d: Dictionary = Taboo.DAOS[id]
+		check(fits.call(str(d.desc)) and fits.call(str(d.sit)) and str(d.key) in ["dealt", "exp", "taken"], "%s: what it is and what sitting to it is like fit the box" % id)
+	for dn in Data.SKILLS:
+		check(not Data.SKILLS[dn].has("taboo"), "no forbidden art is a technique the story could ask for")
+	check(msrc.contains("\"id\": \"shut\", \"label\": \"Leave it shut\"") and msrc.contains("\"id\": \"later\", \"label\": \"Not today\", \"desc\": \"He will not send"), "\"Leave it shut\" is first on the shelf, and \"Not today\" before the Hall of Discipline")
+	G.free()
+
+	print("== the balance of the wild (wilds.gd) ==")
+	G = new_game.call()
+	check(Wilds.state(G, "bamboo") == 0 and Wilds.stands(G) and Wilds.back(G, "bamboo") == 1.0 and Wilds.fade(G, "bamboo") == 0.0 and Wilds.text(G) == "the wild stands", "the wild begins in balance")
+	var native := {}
+	var band := {}
+	for e in ws.ents:
+		if str(e.kind) != "enemy":
+			continue
+		if str(e.get("area", "")) == "bamboo" and Wilds.native(e) and native.is_empty():
+			native = e
+		elif e.has("late") and band.is_empty():
+			band = e
+	check(not native.is_empty() and not band.is_empty() and Wilds.native(native) and not Wilds.native(band), "the land's own packs are told from the war-bands of the story")
+	var packs := float(int(Data.AREAS.bamboo.enemies))
+	for k in int(ceil(packs * float(Wilds.AT[0]))):
+		Wilds.culled(G, "bamboo")
+	check(Wilds.state(G, "bamboo") == 1 and Wilds.stands(G) and Wilds.back(G, "bamboo") > 1.0, "every pack of a country put down half as often again in a day: thinned")
+	var g3: Array = [{"id": "a", "lv": 5}, {"id": "b", "lv": 5}, {"id": "c", "lv": 6}]
+	check(Wilds.group_at(g3, 1).size() == 2 and Wilds.group_at([{"id": "a", "lv": 5}], 1).size() == 1, "a thinned pack is a head short, and never fewer than one")
+	for k2 in int(ceil(packs * float(Wilds.AT[1] - Wilds.AT[0]))):
+		Wilds.culled(G, "bamboo")
+	check(Wilds.state(G, "bamboo") == 2 and not Wilds.stands(G) and Wilds.fade(G, "bamboo") >= 0.35, "three times over: hunted out, and the colour goes out of it")
+	var g2: Array = Wilds.group_at(g3, 2, 1)
+	check(str(g2[0].id) == "a" and g2.size() == 3 and g2.slice(1).all(func(f): return str(f.id) in Wilds.SCAVENGERS and int(f.lv) == 6), "what is left of the pack is followed by what eats the leavings")
+	var plenty0 := Weal.measure(G, "qingshi", "plenty")
+	check(Weal.causes(G, "qingshi").any(func(c): return str(c.why).contains("hunted out")) and plenty0 < 0, "the town that hears of it has less in the pot (%d)" % plenty0)
+	check(Wilds.line(G, "bamboo", 1) != "" and fits.call(Wilds.line(G, "bamboo", 1)), "and a hunter of the camp says so")
+	for k3 in int(ceil(packs * float(Wilds.AT[2] - Wilds.AT[1]))):
+		Wilds.culled(G, "bamboo")
+	check(Wilds.state(G, "bamboo") == 3 and Wilds.back(G, "bamboo") == 4.0 and Wilds.worst_count(G, 3) == 1, "five times over: barren")
+	var gb: Array = Wilds.group_at(g3, 3, 0)
+	check(str(gb[0].id) == "a" and bool(gb[0].gaunt) and str(gb[gb.size() - 1].id) == Wilds.HUNGER and gb.size() <= 5 and gb.all(func(f): return int(f.lv) <= Data.MAX_LEVEL), "one gaunt survivor, the scavengers, and the Hunger at their head")
+	check(Wilds.group_at([{"id": "a", "lv": Data.MAX_LEVEL}], 3).all(func(f): return int(f.lv) <= Data.MAX_LEVEL), "nothing is past the last level there is")
+	check(Wilds.group(G, band, band.group) == band.group and Wilds.group(G, native, native.group) != native.group, "a war-band of the story fights as it was written, whatever the country")
+	check(Weal.measure(G, "qingshi", "plenty") < plenty0 and Creed.value(G, "virtue") < 0, "the town goes leaner, and the Way is weighed by it")
+	# three sides of the net
+	G.stones = 100000
+	var s0 := Wilds.strain(G, "bamboo")
+	check(Wilds.net_blocked(G, "bamboo") == "" and Wilds.open_net(G, "bamboo") and absf(Wilds.strain(G, "bamboo") - s0 * 0.5) < 0.01 and G.stones == 100000 - Wilds.net_price(G) and Wilds.net_blocked(G, "bamboo") != "", "a hunter paid to open three sides of his net: the strain is halved, once a day")
+	check(Wilds.net_blocked(G, "marsh") != "", "a net is not opened in a country that is full")
+	# the days mend it
+	var st_now := Wilds.state(G, "bamboo")
+	G.day += 3
+	Wilds.poll_all(G)
+	check(Wilds.state(G, "bamboo") < st_now, "left alone, a country comes back (%s after three days)" % Wilds.info(G, "bamboo").n)
+	G.day += 14
+	Wilds.poll_all(G)
+	check(Wilds.state(G, "bamboo") == 0 and Wilds.stands(G) and not G.cull.has("bamboo") and Wilds.worst_count(G, 3) == 1, "and in a fortnight it is in balance again; what was done to it is remembered")
+	G.free()
+	# a story's own hunts never empty a country: every hunt of the land's own beasts, at once, in one day
+	var worst_hunt := 0.0
+	for st in Data.STEPS:
+		if str(st.kind) == "hunt" and not st.has("of") and not st.has("cave"):
+			worst_hunt = maxf(worst_hunt, float(int(st.n)) / 3.0 / maxf(6.0, float(int(Data.AREAS[str(st.area)].enemies))))
+	check(worst_hunt < float(Wilds.AT[0]), "no hunt the story asks for thins a country by itself (the heaviest is %.2f of %.1f)" % [worst_hunt, float(Wilds.AT[0])])
+	for sti in Wilds.STATES.size():
+		var inf: Dictionary = Wilds.STATES[sti]
+		check(str(inf.n) != "" and fits.call(str(inf.desc)) and (sti == 0 or fits.call(str(inf.say))), "the state %s has its words" % inf.id)
+	for lk in Wilds.LINES:
+		for wl in Wilds.LINES[lk]:
+			check(fits.call(str(wl)), "what the camps say of a hunted country fits the box")
+	var cr: Node3D = Wilds.crows(5)
+	check(cr.get_child_count() == 5, "the crows are built from code")
+	Wilds.turn_crows(cr, Vector3.ZERO, 1.0)
+	cr.free()
+	check(msrc.contains("func offer_net") and msrc.contains("\"id\": \"later\", \"label\": \"Not today\", \"desc\": \"The net stays"), "\"Not today\" is the first answer to a hunter")
+
+	print("== Part XXX: The Net with Three Sides Open ==")
+	check(Data.REALMS.size() == 36 and Data.REALMS[35] == "Three Sides Open" and Data.MAX_LEVEL == 105 and Data.level_name(105).ends_with("Three Sides Open") and Data.REALM_INFO.size() == 36
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXX adds the realm of Three Sides Open")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break35" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall28") and msrc.contains("\"s_break34\": \"recall28\"") and Data.DIALOGUE.has("pre:s_break35") and Data.DIALOGUE.has("post:s_break35"),
+		"Part XXX follows Everything in Its Place (recall28) and ends the game")
+	var p30 := Data.step_index("s_p30_home")
+	var kinds30 := {}
+	var n30 := 0
+	for i in range(p30, Data.STEPS.size()):
+		var s30: Dictionary = Data.STEPS[i]
+		n30 += 1
+		kinds30[str(s30.kind)] = true
+		check(str(s30.id).begins_with("s_p30_") or str(s30.id) == "s_break35", "%s is a step of the chapter" % s30.id)
+		if str(s30.kind) == "talk":
+			check(Data.DIALOGUE.has(str(s30.id)), "%s has its conversation" % s30.id)
+		if str(s30.kind) == "kill":
+			check(Data.DIALOGUE.has("pre:" + str(s30.boss)) and Data.DIALOGUE.has("post:" + str(s30.boss)) and Trials.TRIALS.has(str(s30.boss)) and Lore.BOSS.has(str(s30.boss)), "%s: words before and after, a trial, and a story" % s30.boss)
+			check(bsrc.contains("\"%s\": \"" % str(s30.boss)), "the bot has a way planned through %s" % s30.boss)
+		if str(s30.kind) == "hunt":
+			var band30: Dictionary = Data.AREAS[str(s30.area)].get("warband5", {})
+			for en in s30.of:
+				check(Data.ENEMIES.has(str(en)) and Lore.BEAST.has(str(en)) and int(Data.ENEMIES[str(en)].get("boss", false)) == 0 and Habits.habit(str(en)) != "", "%s: a foe of the chapter with a story and hours" % en)
+				var in_pool := false
+				for pl in band30.get("pool", []):
+					in_pool = in_pool or str(pl[0]) == str(en)
+				check(in_pool, "%s marches in %s" % [en, s30.area])
+		if str(s30.kind) in ["hunt", "collect", "toil", "folk", "summit", "marks"]:
+			check(Data.DIALOGUE.has("done:" + str(s30.id)), "%s: something is said when it is done" % s30.id)
+		if str(s30.kind) == "folk":
+			check(Folk.ERRANDS.has(str(s30.id)) and Folk.ERRANDS[str(s30.id)].lines.size() >= 4 and Folk.CAMP_ROLES.has(str(s30.role)), "%s: an errand among the people of the road, with its words" % s30.id)
+	check(n30 >= 24 and kinds30.has("toil") and kinds30.has("summit") and kinds30.has("marks") and kinds30.has("folk") and kinds30.has("collect") and kinds30.has("hunt"), "the chapter is twenty-four steps of eight kinds (%d)" % n30)
+	# nothing the chapter asks for is a crime, and nothing in it is stopped by one
+	for i2 in range(p30, Data.STEPS.size()):
+		check(not str(Data.STEPS[i2].kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % Data.STEPS[i2].id)
+	for tid in ["four_net", "the_sentence", "shang_yang", "jiang_chong"]:
+		var kinds_t := {}
+		for pth in Trials.TRIALS[tid].paths:
+			kinds_t[str(pth.kind)] = true
+			check(fits.call(str(pth.desc)) and fits.call(str(pth.line)), "%s/%s fits the dialogue box" % [tid, pth.id])
+		check(kinds_t.size() >= 4 and kinds_t.has("might") and (kinds_t.has("clean") or kinds_t.has("wild")), "%s: four ways through, one of them by what he has not done" % tid)
+		# (no trial can only be passed by a clean name: a journey with blood on it still has a road)
+		var open_to_guilty := 0
+		for pth2 in Trials.TRIALS[tid].paths:
+			if not (pth2.needs as Array).any(func(nd): return str(nd[0]) in ["clean", "wild"]):
+				open_to_guilty += 1
+		check(open_to_guilty >= 2, "%s can be passed by somebody with a price on his head" % tid)
+	var CG = new_game.call()
+	check(Trials.need_met(["clean"], CG) and Trials.need_met(["wild"], CG) and not Trials.need_met(["step", "s_p30_hunters"], CG), "a clean name and a standing wild are what a journey begins with")
+	CG.level = 50
+	Crime.strike(CG, wen, 0)
+	check(not Trials.need_met(["clean"], CG) and Trials.need_text(["clean"], CG).contains("not clean"), "and one unseen killing is the end of a clean name, bill or no bill")
+	CG.free()
+	var c30: Dictionary = Echoes.CROSSROADS.get("the_verdict", {})
+	check(not c30.is_empty() and str(c30.step) == "s_p30_verdict" and str(c30.part) == "XXX" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_verdict", "what a judge owes is asked last of all")
+	check((c30.options as Array).size() == 3 and c30.after.size() == 3 and c30.end.size() == 3 and c30.echo.has("s_p30_end") and c30.echo.s_p30_end.size() == 3, "the_verdict: three answers, each answered, echoed and told at the end")
+	var letters30 := 0
+	for lid3 in Mail.ORDER:
+		if Mail.LETTERS[lid3].has("needs") and str(Mail.LETTERS[lid3].needs[0]) == "the_verdict":
+			letters30 += 1
+	check(letters30 == 3 and Mail.LETTERS.has("fowler_net") and Mail.ORDER.has("fowler_net"), "a letter for each answer, and one from a fowler with one net")
+	var scales30 := {}
+	var creeds30 := {}
+	for o30 in c30.options:
+		check(Marks.MARKS.the_verdict.has(str(o30.id)) and Marks.MARKS.the_verdict[str(o30.id)].has("who"), "the_verdict/%s leaves something standing, and somebody by it" % o30.id)
+		check(not Weal.hears(str(Marks.MARKS.the_verdict[str(o30.id)].area)).is_empty(), "the_verdict/%s is felt in a town" % o30.id)
+		for sc in o30.tilt:
+			scales30[sc] = true
+		for ck in o30.get("creed", {}):
+			creeds30["%s%d" % [ck, signi(int(o30.creed[ck]))]] = true
+			check(Creed.AXES.has(str(ck)) and absi(int(o30.creed[ck])) < Creed.SIDE, "the_verdict/%s leans on the Way, and does not by itself decide it" % o30.id)
+		for al in c30.after[str(o30.id)]:
+			check(fits.call(str(al[1])), "the_verdict/%s: what follows fits the dialogue box" % o30.id)
+	check(scales30.size() == 3 and creeds30.size() == 3, "its answers tip all three scales, and three sides of the Way")
+	var fates30 := 0
+	for ft in Weal.FATES:
+		if str(ft.when[0]) == "the_verdict":
+			fates30 += 1
+	check(fates30 == 3, "somebody's life turns on each answer")
+	var old_echo30 := 0
+	for cid2 in Echoes.ORDER:
+		if cid2 == "the_verdict":
+			continue
+		for ek in Echoes.CROSSROADS[cid2].get("echo", {}):
+			if str(ek).contains("s_p30_"):
+				old_echo30 += 1
+	check(old_echo30 >= 2, "older crossroads echo in Part XXX (%d)" % old_echo30)
+	check(bsrc.contains("\"four_net\": \"relic\"") and bsrc.contains("\"the_sentence\": \"clean\"") and bsrc.contains("\"the_verdict\": [\"bench\"]"), "the bot has a plan for every trial and the crossroads of the chapter, and takes one by its clean name")
+	for a30 in ["garden", "springs", "palace"]:
+		check(str(Data.AREAS[a30].get("warband5", {}).get("vis", "")).begins_with("s_p30_") and not Data.AREAS[a30].has("warband6"), "%s: the chapter's band takes the last slot" % a30)
+		var stood := 0
+		for e30 in ws.ents:
+			if str(e30.kind) == "enemy" and str(e30.get("area", "")) == a30 and str(e30.get("vis", ["", ""])[0]).begins_with("s_p30_"):
+				stood += 1
+		var need_packs := 0
+		for i3 in range(p30, Data.STEPS.size()):
+			if str(Data.STEPS[i3].kind) == "hunt" and str(Data.STEPS[i3].area) == a30:
+				need_packs = maxi(need_packs, 4)
+		check(stood >= maxi(need_packs, int(Data.AREAS[a30].warband5.n) / 2), "%s: the band found room (%d of %d packs)" % [a30, stood, int(Data.AREAS[a30].warband5.n)])
+	check(Marks.AFTER_BANDS.has("the_verdict"), "the marks of its crossroads are stood after the late bands")
+	var found30 := 0
+	for e31 in ws.ents:
+		if (e31.kind == "pickup" and str(e31.id).begins_with("p30_")) or (e31.kind == "boss" and str(e31.enemy) in ["four_net", "the_sentence", "shang_yang", "jiang_chong"]) or (e31.kind == "npc" and str(e31.id) in ["net_fowler", "cheng_tang", "li_li", "shang_yang", "jiang_chong"]):
+			found30 += 1
+			check(Atlas.owner_id(ws, e31.pos) == str(e31.area), "%s stands in its own region" % e31.id)
+	check(found30 == 12 + 4 + 5, "everything the chapter stands in the land found room (%d)" % found30)
+	for pr in [["four_net", "net_peg", "s_p30_pegs"], ["the_sentence", "case_slip", "s_p30_slips"], ["jiang_chong", "paulownia_doll", "s_p30_dolls"]]:
+		check(Data.step_index(str(pr[2])) < _kill_step(str(pr[0])) and Data.ITEMS.has(str(pr[1])) and Look.PICKUP_COLORS.has(str(pr[1])), "%s can be passed by what was found on the way" % pr[0])
+	for fid in ["three_sides", "open_net", "own_sentence", "judges_due"]:
+		check(Feats.FEATS.has(fid), "the feat %s is kept" % fid)
+	for pid in ["cheng_tang", "li_li", "shang_yang", "jiang_chong"]:
+		check(Assets.PEOPLE.has(pid) and Assets.has(str(Assets.PEOPLE[pid])), "%s has a body built from a script" % pid)
+		check(Data.CHAT.has(pid) and Data.CHAT[pid].size() >= 4, "%s has four things to say" % pid)
+	check(Data.CHAT.has("net_fowler") and Data.CHAT.net_fowler.size() >= 4, "the fowler has four things to say")

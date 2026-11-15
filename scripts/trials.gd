@@ -70,8 +70,11 @@ const KINDS := {
 	# the Ordered House release: the Way he walks (creed.gd), and the houses he has put to rights (fitting.gd)
 	"way": {"n": "By the Way he walks", "col": Color("f0d890"), "what": "where you stand between the Righteous Path and the Demonic, the precepts and the open road"},
 	"house": {"n": "By the ordered house", "col": Color("c8a878"), "what": "the houses of the land you have put to rights"},
+	# the Open Net release: a name no gate has anything against (crime.gd, taboo.gd), and a wild that still stands (wilds.gd)
+	"clean": {"n": "By a clean name", "col": Color("e8f0e8"), "what": "nobody dead by your hand, no bill at any gate, and the forbidden shelf never opened"},
+	"wild": {"n": "By the standing wild", "col": Color("9ac878"), "what": "no country you have hunted in brought lower than thinned"},
 }
-const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark", "town", "towns", "way", "house"]
+const KIND_ORDER := ["might", "craft", "wealth", "respect", "dao", "peoples", "relic", "bond", "heart", "folk", "land", "hearth", "works", "delve", "arms", "heights", "host", "song", "loss", "mark", "town", "towns", "way", "house", "clean", "wild"]
 
 ## How a trial boss fights by default when a path has nothing to say: [health, attack] multipliers.
 const MIGHT := [1.5, 1.15]
@@ -1355,6 +1358,72 @@ const TRIALS := {
 				"desc": "Late Room for the Blade and a sword tempered nine times. He has fought one-handed since before the mountain had a name. Press him until he needs the other.",
 				"line": "Lin Feng draws. The Heavenly King sighs, and shifts his feet, and does not shift his left arm at all."},
 		]},
+	# ---- Part XXX (the Open Net release): the net with no side open, the sentence nobody can call back, the lawgiver
+	# his own law shut out, and the man who finds what he brings
+	"four_net": {"might": [4.1, 1.5],
+		"why": "It is a prayer for everything, got up and walking. It has no opening because none was asked for. Cut it and every piece is a smaller net. It comes down only for somebody who can show it that a side may be left open and the hunter still eat.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four pegs of the sides that came down", "needs": [["item", "net_peg", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four pegs a lord pulled with his own hands from the north, the south and the east. Set them down in front of it in a row. They are three sides that were taken down, and nobody starved.",
+				"line": "Lin Feng lays four ash pegs on the height. The net turns all its knots towards them: three of its sides have already been somewhere else, and come back as wood."},
+			{"id": "wild", "kind": "wild", "n": "Somebody the hills are not empty behind", "needs": [["wild"]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "No country you have hunted in stands worse than thinned. It can smell on a hunter how he leaves a place. Let it smell you.",
+				"line": "The net leans towards Lin Feng and listens to the country behind him. There is birdsong in it. It had not expected birdsong."},
+			{"id": "folk", "kind": "folk", "n": "Two hunters who said the old words", "needs": [["step", "s_p30_hunters"]], "boon": {"foe_hp": 0.8, "foe_atk": 0.85},
+				"desc": "Two hunters of the road have taken down three sides of their nets at your asking. It is one fowler's prayer; it has never heard another hunter say a different one.",
+				"line": "\"What would go left, go left,\" says Lin Feng, as two hunters said it after him. The net has only ever been told: all."},
+			{"id": "might", "kind": "might", "n": "Cut it, knot by knot", "needs": [["lv", 102], ["temper", 9]], "boon": {},
+				"desc": "Early Everything in Its Place and a sword tempered nine times. Every piece will be a smaller net. There are only so many pieces.",
+				"line": "Lin Feng draws. The net opens like a hand, pleased: here at last is something that came in by itself."},
+		]},
+	"the_sentence": {"might": [4.2, 1.5],
+		"why": "It was given in the proper form, sealed and carried out. It is not wrong in law, and that is the whole of its strength. It will only stop for somebody who has the right to tell a judge he was wrong, and it weighs that right very exactly.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four slips it did not read", "needs": [["item", "case_slip", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "The four slips of the record, with the dead man's plea on the third and nothing written under it. It sealed before it reached that one. Hold it up, and make it read to the end for once.",
+				"line": "Lin Feng holds up the third slip. The voice goes on for half a clause, falters, and for the first time in its existence reads the next line."},
+			{"id": "clean", "kind": "clean", "n": "Somebody no gate has a bill against", "needs": [["clean"]], "boon": {"foe_hp": 0.72, "taken": 0.85},
+				"desc": "Nobody dead by your hand, no price on your head, the forbidden shelf never opened. It will not be told it was wrong by anybody who has been. It will look, and it will know.",
+				"line": "It turns the blank under its cap on Lin Feng and searches him as it would a prisoner. It finds nothing to charge. That has not happened to it before, with anybody."},
+			{"id": "mark", "kind": "mark", "n": "Somebody who goes back to look", "needs": [["marks", 8]], "boon": {"foe_hp": 0.8, "foe_atk": 0.85},
+				"desc": "Eight things your own answers left standing, gone and looked at afterwards. A judge who never saw what his sentences did is all it has ever known.",
+				"line": "\"Eight,\" says Lin Feng, \"and I went back to every one.\" The seal hesitates in the air. Nobody ever went back."},
+			{"id": "might", "kind": "might", "n": "Overrule it", "needs": [["lv", 103], ["temper", 9]], "boon": {},
+				"desc": "Middle Everything in Its Place and a sword tempered nine times. There is a higher court than law, and it is not a very good one.",
+				"line": "Lin Feng draws. The voice does not stop. It adds, without changing its tone, a second count to the charge."},
+		]},
+	"shang_yang": {"might": [4.2, 1.5],
+		"why": "He does not ask for mercy and would despise it. He asks to be shown, clause by clause, that a law with no door in it was a mistake, by somebody who has kept a rule and knows what one is for. He will concede to nothing else.",
+		"paths": [
+			{"id": "house", "kind": "house", "n": "Six rooms where a rule had a reason", "needs": [["fitted", 6]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Six houses put to rights. In each there was a rule about where a thing goes, and in each somebody could say why. He has written a thousand rules, and never once been asked the second question.",
+				"line": "\"A broom goes away from the stove,\" says Lin Feng, \"and six households could tell me why. Tell me why a traveller sleeps in a ditch.\" Shang Yang opens his mouth, and it stays open."},
+			{"id": "way", "kind": "way", "n": "Somebody who keeps the precepts", "needs": [["creed", "rule", 12]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Orthodox: shifts worked, the post carried, notices answered, months on a roll. He will hear it from somebody who has lived under a rule. From anybody else it is only complaint.",
+				"line": "Shang Yang looks at a man who has kept nine hundred rules for years and still came up the hill to argue. \"Ah,\" he says. \"A witness for the prosecution who obeys the law. Proceed.\""},
+			{"id": "clean", "kind": "clean", "n": "Somebody his law has nothing on", "needs": [["clean"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "A clean name: nobody dead, no bill, nothing forbidden. He has spent his life sorting men into the guilty and the not yet. You are a third kind, and it troubles his arithmetic.",
+				"line": "He runs down the tablets with one finger, looking for the clause that catches Lin Feng. There are a great many clauses. The finger reaches the end."},
+			{"id": "might", "kind": "might", "n": "Amend him", "needs": [["lv", 103], ["temper", 9]], "boon": {},
+				"desc": "Middle Everything in Its Place and a sword tempered nine times. He had a tutor's nose cut off to make a point. He will understand a point.",
+				"line": "Lin Feng draws. \"Assault on a minister of the first rank,\" says Shang Yang, shaking back his sleeves. \"I wrote that one as well.\""},
+		]},
+	"jiang_chong": {"might": [4.3, 1.5],
+		"why": "He cannot be argued with, for he does not argue: he finds. Strike him and he will find something under your own floor. He is afraid of exactly one thing, which is somebody holding in their hand what he holds in his sleeve.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four dolls with no earth on them", "needs": [["item", "paulownia_doll", 4]], "boon": {"foe_hp": 0.7, "weak_k": 1.8},
+				"desc": "Four dolls of paulownia, dry and white, with yellow lint in the needle-holes. Nothing that had lain under a floor looks like that. Hold them up where the whole palace can see whose sleeve they match.",
+				"line": "Lin Feng holds up four clean dolls and says nothing at all. Jiang Chong looks at them, and then, before he can stop himself, at his own sleeve."},
+			{"id": "delve", "kind": "delve", "n": "Somebody who has been under the floor", "needs": [["delved", 6]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Six caves gone to the very back of. He says it is all under the floor. You have been under more floors than he has, and you know what is down there: rock, and water, and the dark.",
+				"line": "\"I have been to the back of six caves,\" says Lin Feng. \"There were no dolls in any of them.\" The Finder smiles the smile of a man revising a list."},
+			{"id": "wild", "kind": "wild", "n": "Somebody who leaves a place as he found it", "needs": [["wild"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "No country you have hunted in stands worse than thinned. Wherever he has been, something is there that was not. Wherever you have been, what was there is there still. He has no doll for that.",
+				"line": "Jiang Chong circles Lin Feng once, sniffing, as he circles a house before he digs. Behind this one the hills are as they were. There is nothing to add."},
+			{"id": "might", "kind": "might", "n": "As the Crown Prince did", "needs": [["lv", 104], ["temper", 9]], "boon": {},
+				"desc": "Late Everything in Its Place and a sword tempered nine times. The Prince killed him with his own hand, and tens of thousands died of it. It is on the list of ways.",
+				"line": "Lin Feng draws. \"There,\" says Jiang Chong, delighted, to nobody. \"Violence. Write that down. I knew I should find something.\""},
+		]},
 	# ---- Part XXIX (the Ordered House release): the fire a guest foretold, the wall that did not change, the gold that
 	# waits to be stooped for, and the friend who went to the gate
 	"chimney_fire": {"might": [4.0, 1.5],
@@ -1723,6 +1792,15 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"fitted":
 			# houses put to rights (fitting.gd)
 			return g.fitted.size() >= int(n[1])
+		"step":
+			# the Open Net release: something of the story already done (["step", id])
+			return g.done(str(n[1]))
+		"clean":
+			# the Open Net release: nobody dead by his hand, no bill, nothing forbidden (crime.gd, taboo.gd)
+			return Crime.clean(g)
+		"wild":
+			# no country he has hunted in is worse than thinned (wilds.gd)
+			return Wilds.stands(g)
 	return false
 
 ## How many works count towards a ["works", school, n] need.
@@ -1817,6 +1895,12 @@ static func need_text(n: Array, g) -> String:
 			return "%s by %d or more (now %+d: Esc > The Way says what it was weighed by)" % [str(ax.pos if int(n[2]) > 0 else ax.neg), absi(int(n[2])), Creed.value(g, str(n[1])) * (1 if int(n[2]) > 0 else -1)]
 		"fitted":
 			return "%d houses put to rights (now %d: whoever lives in a house says what is wrong with it)" % [int(n[1]), g.fitted.size()]
+		"step":
+			return "Done already on the way here: %s" % str(Data.STEPS[Data.step_index(str(n[1]))].t).get_slice(":", 0).left(90)
+		"clean":
+			return "A clean name: nobody dead by your hand, no bill at any gate, the forbidden shelf never opened (now: %s; Esc > The Law)" % ("clean" if Crime.clean(g) else "not clean")
+		"wild":
+			return "No country you have hunted in worse than thinned (now: %s; Esc > The Wild)" % Wilds.text(g)
 	return str(n)
 
 ## Whether path `p` of trial `tid` can be taken now (what it costs is counted as paid if it was).

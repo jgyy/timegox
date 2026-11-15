@@ -2340,6 +2340,12 @@ func _run() -> void:
 		# of the Way and the almanac, a house with things set down in it and what can be done at its furniture, a
 		# pack grown old, the chapter's lords, its crossroads and what each answer leaves standing
 		await _ordered_shots(str(main.args.ordered))
+	if main.args.has("net"):
+		# the Open Net release (--net, or --net=a,b): the people, foes and lords of Part XXX, the pages of the law
+		# and the wild, a sword drawn on somebody and the mound afterwards, the watch, the forbidden shelf, a
+		# country in balance and barren, a barren pack, the watch and the lords in battle, the crossroads and
+		# what each answer leaves standing
+		await _net_shots(str(main.args.net))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -5245,5 +5251,219 @@ func _ordered_shots(which: String = "1") -> void:
 			fr3.append(last_img)
 			w.cam_override = null
 		_sheet("mark_mat_answers", fr3, 0.48)
+		Game.picks = {}
+	get_tree().quit(0)
+
+## The Open Net (--net, or --net=a,b): "people", "foes", "pages" (Esc > The Law, The Wild), "draw" (F at somebody,
+## and the mound where they stood), "watch" (the watch's question), "shelf" (the forbidden shelf), "land" (a
+## country in balance and barren, side by side), "battle" (a barren pack, the watch, the enforcers, the four
+## lords), "choice", "marks".
+func _net_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 104
+	Game.step = Data.step_index("s_p30_verdict")
+	Game.companion = true
+	Game.day = 171
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var clean := func():
+		Game.slain = {}
+		Game.slain_n = 0
+		Game.bounty = {}
+		Game.crimes = []
+		Game.watch_day = {}
+		Game.taboo = {}
+		Game.cull = {}
+		Game.cull_told = {}
+		Game.cull_worst = {}
+		Game.hunter_day = -1
+		Game.toasts.clear()
+		main.toast_list.clear()
+	clean.call()
+	if want.call("people"):
+		await _gallery("part30_people", [Assets.person("cheng_tang"), Assets.person("li_li"), Assets.person("shang_yang"), Assets.person("jiang_chong")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["close_mesh", "drained_pool", "empty_snare", "wanted_bill", "false_witness", "hasty_seal", "inn_door", "torn_pass", "buried_doll", "keyhole_ear", "spade_shadow"]:
+			fs.append(_foe(fid))
+		await _gallery("part30_foes", fs, 1.0, 0.25)
+		await _gallery("part30_lords", [_foe("four_net", true), _foe("the_sentence", true), _foe("shang_yang", true), _foe("jiang_chong", true)], 1.05, 0.25)
+		var ls: Array = []
+		for fid2 in ["watch_spear", "watch_captain", "bounty_taker", "league_enforcer", "carrion_crow", "midden_rat", "the_hunger"]:
+			ls.append(_foe(fid2))
+		await _gallery("law_and_leavings", ls, 1.0, 0.25)
+	if want.call("pages"):
+		main.set_stack(["world"])
+		clean.call()
+		var wen := _land_ent("granny_wen")
+		var tie := _land_ent("smith")
+		Game.level = 104
+		if not wen.is_empty():
+			Crime.strike(Game, wen, 3)
+		Game.day += 2
+		if not tie.is_empty():
+			Crime.strike(Game, tie, 0)
+		Crime.record(Game, "assault", "yanggu", "Watchman Zhou")
+		Crime.record(Game, "flight", "qingshi", "Qingshi Village")
+		Game.taboo = {"blood": 4, "soul": 1}
+		Game.toasts.clear()
+		main.toast_list.clear()
+		main.open_menu()
+		main.menu.mode = "law"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("law_page")
+		for pr in [["bamboo", 5.6], ["marsh", 3.4], ["thunder", 1.9], ["frost", 0.8], ["mirror", 0.3]]:
+			Game.cull[str(pr[0])] = [float(pr[1]) * maxf(6.0, float(int(Data.AREAS[str(pr[0])].enemies))), Almanac.now(Game)]
+		main.menu.mode = "wild"
+		main.menu._build()
+		await _wait(0.4)
+		await _shot("wild_page")
+		main.pop()
+		clean.call()
+	if want.call("draw"):
+		main.set_stack(["world"])
+		clean.call()
+		var e := _land_ent("cook_zhou")
+		if e.is_empty():
+			e = _land_ent("gate_wu")
+		if not e.is_empty():
+			Game.clock = 10.0 * 60.0
+			_stand_by(e)
+			w.teleport(_nearest_free(e.pos + Vector2i(0, 1)), "surface")
+			w.facing = e.pos - w.ptile
+			await _wait(1.2)
+			main.offer_draw(e)
+			main.choice.cursor = 1
+			await _wait(0.8)
+			await _shot("draw_choice")
+			main.pop()
+			Crime.strike(Game, e, 2)
+			Game.toasts.clear()
+			main.toast_list.clear()
+			w.clear_cache()
+			await _ent_shot(str(e.id), "grave_where_they_stood", 16.5, 4.2, 2.0, 0.6)
+		clean.call()
+		w.clear_cache()
+	if want.call("watch"):
+		main.set_stack(["world"])
+		clean.call()
+		Game.bounty = {"qingshi": 23400}
+		Game.stones = 96000
+		var hq := _land_ent("head_qingshi")
+		var gw := _land_ent("granny_wen")
+		if not gw.is_empty():
+			_stand_by(gw)
+		await _wait(1.0)
+		var wdue := Crime.watch_due(Game, "village")
+		if not wdue.is_empty():
+			main.offer_watch(wdue)
+			await _wait(0.5)
+			await _shot("watch_comes")
+			_skip_talk()
+			await _wait(0.8)
+			await _shot("watch_choice")
+			main.pop()
+		clean.call()
+	if want.call("shelf"):
+		main.set_stack(["world"])
+		clean.call()
+		Game.taboo = {"blood": 2}
+		Game.hp[0] = float(Game.max_hp(0))
+		main.open_forbidden()
+		main.choice.cursor = 1
+		await _wait(0.8)
+		await _shot("forbidden_shelf")
+		main.pop()
+		clean.call()
+	if want.call("land"):
+		main.set_stack(["world"])
+		var fr: Array = []
+		var spot := Vector2i(-1, -1)
+		for pe in Atlas.world_of("surface").ents:
+			if str(pe.kind) == "enemy" and str(pe.get("area", "")) == "bamboo" and Wilds.native(pe):
+				spot = _nearest_free(pe.pos + Vector2i(0, 3))
+				break
+		if spot.x >= 0:
+			for stv in [0.0, 3.2, 5.6]:
+				clean.call()
+				if stv > 0.0:
+					Game.cull["bamboo"] = [stv * maxf(6.0, float(int(Data.AREAS.bamboo.enemies))), Almanac.now(Game)]
+				Game.clock = 11.0 * 60.0
+				w.open_world()
+				w.enter_layer("surface")
+				w.teleport(spot, "surface")
+				w.facing = Vector2i(0, -1)
+				w.cam_q = _quarter(Vector2(w.facing))
+				w._snap_cam()
+				w.wild_fade = Wilds.fade(Game, "bamboo")
+				w.banner_t = 0.0
+				await _wait(2.0)
+				var pp: Vector3 = w._player_pos()
+				w.cam_override = Transform3D(Basis.IDENTITY, pp + Vector3(5.5, 3.4, 8.5)).looking_at(pp + Vector3(0, 4.6, -6.0), Vector3.UP)
+				await _wait(0.6)
+				await _shot("wild_bamboo_%s" % str(Wilds.info(Game, "bamboo").id), false)
+				fr.append(last_img)
+				w.cam_override = null
+			_sheet("wild_balance_to_barren", fr, 0.34)
+		clean.call()
+		w.wild_fade = 0.0
+	if want.call("battle"):
+		main.set_stack(["world"])
+		var grp: Array = Wilds.group_at([{"id": "bamboo_wolf", "lv": 3}, {"id": "bamboo_wolf", "lv": 3}, {"id": "bamboo_wolf", "lv": 3}] if Data.ENEMIES.has("bamboo_wolf") else [{"id": "peach_sprite", "lv": 26}, {"id": "garden_crane", "lv": 26}, {"id": "moss_tortoise", "lv": 26}], 3, 1)
+		main.battle.start(grp, {"entity": {"id": "t:barren"}, "boss": false, "theme": "bamboo", "habit": "", "group": grp, "grown": 0, "wild": 3})
+		main.push("battle")
+		await _wait(3.2)
+		await _shot("battle_barren_pack")
+		main.pop()
+		Game.bounty = {"qingshi": 23400}
+		main.battle.start(Crime.watch_group(Game), {"crime": "watch", "w": {"tid": "qingshi", "n": "Qingshi Village", "price": 23400}, "boss": false, "theme": "village"})
+		main.push("battle")
+		await _wait(3.2)
+		await _shot("battle_the_watch")
+		main.pop()
+		Game.bounty = {}
+		Game.taboo = {"blood": 3, "marked": 170}
+		main.battle.start(Crime.hunters(Game), {"crime": "hunt", "boss": false, "theme": "marsh"})
+		main.push("battle")
+		await _wait(3.2)
+		await _shot("battle_league_enforcers")
+		main.pop()
+		clean.call()
+		for bb in [["four_net", "garden", "relic"], ["the_sentence", "lilies", "clean"], ["shang_yang", "lilies", "house"], ["jiang_chong", "palace", "relic"]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			var pth: Dictionary = Trials.path(bid, str(bb[2]))
+			main.battle.start([{"id": bid, "lv": 104, "mult": float(bm[0]), "atk": float(bm[1])}], {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": str(bb[1]),
+				"trial": bid, "path": str(bb[2]), "boon": pth.boon, "path_n": str(pth.n), "path_kind": str(Trials.KINDS[str(pth.kind)].n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_verdict"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_verdict")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("marks"):
+		var fr3: Array = []
+		for oa in ["sword", "bench", "field"]:
+			Game.picks = {"the_verdict": str(oa)}
+			main.set_stack(["world"])
+			if not await _mark_view("mark:the_verdict:springs", 15.0, 9.0, 5.0):
+				continue
+			await _shot("mark_verdict_%s" % str(oa), false)
+			fr3.append(last_img)
+			w.cam_override = null
+		_sheet("mark_verdict_answers", fr3, 0.48)
 		Game.picks = {}
 	get_tree().quit(0)

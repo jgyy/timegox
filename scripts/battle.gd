@@ -376,6 +376,9 @@ func start(foe_list: Array, c: Dictionary) -> void:
 			say("%s: %s." % [str(Habits.info(habit).word), str(Habits.info(habit).hint).get_slice(": ", 1)])
 		if grown > 0:
 			say(str(Almanac.STAGES[grown].say))
+		# (the Open Net release, wilds.gd: what a country hunted too hard sends to meet him)
+		if int(ctx.get("wild", 0)) > 0:
+			say(str(Wilds.STATES[int(ctx.wild)].say))
 	# realm suppression (Part XII): a whole realm between the fighters is felt before the first blow
 	suppress_note = ""
 	if not ctx.get("tribulation", false):
@@ -596,9 +599,9 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	# (the Ordered House release, creed.gd: the Way he walks is in the blow: the Demonic Path hits harder, the
 	# Righteous harder at what is of the dark, and whoever keeps the precepts is harder to hurt)
 	if a.side == "party" and int(a.get("idx", 1)) == 0:
-		raw *= Creed.mod(Game, "dealt") * (Creed.mod(Game, "dark") if str(tgt.get("elem", "")) == "dark" else 1.0)
+		raw *= Creed.mod(Game, "dealt") * (Creed.mod(Game, "dark") if str(tgt.get("elem", "")) == "dark" else 1.0) * Taboo.mod(Game, "dealt")
 	elif tgt.side == "party" and int(tgt.get("idx", 1)) == 0:
-		raw *= Creed.mod(Game, "taken")
+		raw *= Creed.mod(Game, "taken") * Taboo.mod(Game, "taken")
 	if tgt.side == "party":
 		# Formations and the Heart (and the shades' friendship) soften every blow; so does a Vajra Body
 		raw *= Game.dao_mod("taken", 1.0) * Game.boon("taken", 1.0) * (1.0 - (Game.talent_mod("taken") if tgt.idx == 0 else 0.0)) * Works.mod(Game, "taken") * Needs.mod(Game, "taken")
@@ -806,7 +809,7 @@ func _win() -> void:
 	# the Cauldron's Dao pays better, and so does Heaven's Favour; every victory deepens the Dao Lin
 	# Feng walks (twice over with the crown of an Enlightened Mind), and an Enlightened Mind learns more
 	stones = int(stones * Game.dao_mod("stones", 1.0) * (1.0 + Game.talent_mod("stones")) * Game.boon("stones", 1.0))
-	xp = int(xp * (1.0 + Game.talent_mod("exp")) * Game.boon("exp", 1.0) * Habits.mod(habit, "exp") * Works.mod(Game, "exp") * Creed.mod(Game, "exp"))
+	xp = int(xp * (1.0 + Game.talent_mod("exp")) * Game.boon("exp", 1.0) * Habits.mod(habit, "exp") * Works.mod(Game, "exp") * Creed.mod(Game, "exp") * Taboo.mod(Game, "exp"))
 	# (and the scales, echoes.gd: a beaten pack gives up what it guarded to somebody known to spare)
 	stones = int(stones * Works.mod(Game, "stones") * (Echoes.lean_mod(Game, "stones") if not boss else 1.0) * (Creed.mod(Game, "stones") if not boss else 1.0))
 	if not ctx.get("tribulation", false):

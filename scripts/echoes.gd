@@ -1234,6 +1234,12 @@ const CROSSROADS := {
 			"onward": [["Narrator", "The old man laughs, a dry sound like grass in wind. He finishes the knot he is tying, and then walks ten paces down the field, to a place where no army has ever stood or will, and ties another, for nobody."], ["The Old Man in the Grass", "Somebody will come along this row one day in trouble, and something will trip whatever is after him, and he will never know. That is better than a general. Go on, sweeper. I have a deal of field to do, and it is all for strangers now."]],
 		},
 		"echo": {
+			# Part XXX (the Open Net release)
+			"s_p30_inn": {
+				"nothing": [["Shang Yang", "You are the one who told a dead man that nothing was owed for a kindness. I should have liked that in a statute. Mine all say what is owed, to the last grain, and tonight I am owed a ditch."]],
+				"ledger": [["Shang Yang", "You are the one who had a ledger of kindnesses opened in every town. I approve. What is written down can be enforced. ...The innkeeper has just said the same thing to me, through the door."]],
+				"onward": [["Shang Yang", "You are the one who said a kindness is owed to the next stranger. I am the next stranger. I notice that the innkeeper has not heard of you."]],
+			},
 			# Part XXIX (the Ordered House release)
 			"s_p29_feast": {
 				"nothing": [["Householder Tian", "They say you told an old man in the east that a kindness is finished when it is done. I should like to believe it. I find I owe one all the same, and it is sitting across the lane on a stone."]],
@@ -1271,6 +1277,12 @@ const CROSSROADS := {
 			"road": [["Narrator", "Guan Ning opens his mouth, and shuts it, and then, for the first time since Lin Feng has known him, laughs. He rolls the mat, puts it under his arm with both books inside, and walks down to the gate like a man going into cold water."], ["Guan Ning", "Eight outriders. Well. I have read about canopies of green silk for thirty years. It would be a kind of scholarship to see one. Do not tell anybody I ran.", "laugh"]],
 		},
 		"echo": {
+			# Part XXX (the Open Net release)
+			"s_p30_tang": {
+				"cut": [["Tang of Shang", "They say you had a mat cut between two friends, so that each should know where he sat. A net is the other way about. It is by leaving the sides open that anything knows it may come."]],
+				"whole": [["Tang of Shang", "They say you had a mat left whole for a man who had got up from it. Then you know already what I did here. I left a place. The bird decides."]],
+				"road": [["Tang of Shang", "They say you sent a scholar running to a gate with his mat under his arm. Good. A lord who has never walked his own fields has no business opening or shutting anything in them."]],
+			},
 			"s_p29_end": {
 				"cut": [["Elder Qing Xuan", "And I hear you had a mat cut in two. Good. I have kept two disciples in one cell for a year because they began together, and each has been ruining the other's sleep. I shall move one tonight. It is not a punishment. It is a place."]],
 				"whole": [["Elder Qing Xuan", "And I hear a mat was left whole that might have been cut. I have a place at this table that has been laid for forty years for somebody who went to look at a road. I had begun to think it foolish. I shall leave it laid."]],
@@ -1281,6 +1293,37 @@ const CROSSROADS := {
 			"cut": "In the Ruins of the Jade Court two mats lie in one garden, a hoe's length apart, one facing the beans and one the road. The two men who sit on them have never been better friends.",
 			"whole": "In the Ruins of the Jade Court one old mat lies whole, with two worn places on it side by side. One of them is often empty. It is brushed clean every morning all the same.",
 			"road": "At the gate of the Jade Court there is a bench where a mat used to be unrolled, and people stop there to watch who goes by: one of them, most days, with a book he is not reading.",
+		}},
+	# ---- Part XXX (the Open Net release): what somebody owes who could not be made to pay
+	"the_verdict": {"step": "s_p30_verdict", "part": "XXX", "n": "The Judge's Own Sentence",
+		"ask": "A judge heard a case wrongly and a man died for it. He has bound his own hands and asks for the sentence his own law gives: death. His Duke blames the clerk. Nobody could make him pay. He is asking you, who could not be made to pay either: what does he owe?",
+		"options": [
+			{"id": "sword", "label": "The law he kept. Let him keep it", "tilt": {"heart": -3, "craft": -2}, "creed": {"rule": 8}, "gain": {"renown": 6},
+				"desc": "He wrote no exception for the judge, and he will not thank you for writing one. A law that stops at the bench is a net with a hole in it the size of the man who hung it. Give him what he asks (renown).",
+				"log": "Told Li Li that the law he kept was his to keep, and stood by while he kept it."},
+			{"id": "bench", "label": "Cut the cord. Back to the bench", "tilt": {"heart": 3, "reach": -2}, "creed": {"virtue": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "One man is dead of a judge who was sure. A judge who knows what that costs is worth ten who do not, and Jin will not get another. Let him sit again with the dead man's name cut over the bench where he must read it (the regard of the Rice Hearth).",
+				"log": "Cut the cord on Li Li's wrists and sent him back to the bench, with a name over it."},
+			{"id": "field", "label": "Neither. There is a field of beans", "tilt": {"reach": 3, "craft": 2}, "creed": {"rule": -8}, "gain": {"stones": 10400},
+				"desc": "His death feeds nobody and his judgments will not hoe a row. The dead man had a wife and a field. Let him put off the black, take a hoe, and keep them both until she says the debt is paid; and let the bench find somebody else (spirit stones).",
+				"log": "Told Li Li to put off the judge's black and go and hoe the dead man's field."},
+		],
+		"after": {
+			"sword": [["Narrator", "Li Li bows, as to a superior court. He unties the cord himself; a condemned man of his rank is not bound. Then he asks Lin Feng to turn his back, which Lin Feng does, and to count the bean rows aloud, which Lin Feng also does. There are seven."], ["Narrator", "When he turns round the judge of Jin is lying beside the beans with his cap straight. On the stone is his seal, and under the seal a slip in a firm hand: heard wrongly; sentenced according to law; no appeal. It is the shortest record he ever wrote."]],
+			"bench": [["Narrator", "The cord parts on the edge of Lin Feng's sword like a thread. Li Li looks at his two hands lying apart on his knees as if they belonged to a plaintiff. It is some time before he moves either."], ["Li Li, Judge of Jin", "You have given me the heavier sentence, and you know it. Every case, for the rest of my life, with his name over my head. ...I shall hear the next one twice. I shall hear all of them twice. Help me up; I have been sitting since he died.", "bow"]],
+			"field": [["Narrator", "Li Li takes off the black robe, folds it, and lays his seal on top. Under it he is wearing what anybody wears. He looks a good deal smaller and a little younger, and he picks up the hoe by the wrong end before he gets it right."], ["Li Li, Judge of Jin", "I do not know how deep a bean goes. I sentenced a man who knew that. Very well. She will have to teach me, and she will not want to, and that is the first of what I owe. Tell the Duke the bench is empty. Tell him to fill it with somebody slower.", "nod"]],
+		},
+		"echo": {
+			"s_p30_end": {
+				"sword": [["Elder Qing Xuan", "And I hear a judge of Jin kept his own law to the end, and you did not stay his hand. I have a Hall of Discipline and a master in it who has never once been sentenced by it. I shall ask him this evening how he would find that."]],
+				"bench": [["Elder Qing Xuan", "And I hear a judge sits again in Jin with a dead man's name cut over his head. I have asked the carver for a board. There are three names I ought to be sitting under, and I had hoped that nobody else remembered them."]],
+				"field": [["Elder Qing Xuan", "And I hear the chief judge of Jin is hoeing beans for a widow who does not speak to him. I laughed, child, and then I did not. It is the only sentence I ever heard of that leaves more in the world than it found."]],
+			},
+		},
+		"end": {
+			"sword": "By the red lilies of the Yellow Springs there is a judge's mound with a seal laid on it, and seven rows of beans beside it that nobody planted twice. The clerks of Jin are brought there before they take office.",
+			"bench": "In the court of Jin a name is cut over the judge's bench, and it is not the judge's. Every case is heard twice there. It is the slowest court in the six states, and people walk a month to be tried in it.",
+			"field": "Below the Yellow Springs an old man hoes a widow's beans, badly, in a row that gets straighter every year. She has begun to bring him water at noon. She has not yet said that it is paid.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1468,7 +1511,8 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_book",
 	"the_sack",
 	"the_knot",
-	"the_mat"]
+	"the_mat",
+	"the_verdict"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

@@ -202,6 +202,9 @@ static func stipend(g) -> int:
 	var pl := place(g)
 	var k := 1.0 if pl <= 3 else (0.6 if pl <= 6 else 0.34)
 	# (creed.gd: half as much again to who keeps the precepts, nothing to a rogue cultivator)
+	# (the Open Net release: an outlaw, or somebody found out at a forbidden art, is struck from the roll)
+	if Crime.outlaw(g):
+		return 0
 	return int(round((30.0 + 22.0 * float(g.realm())) * k * Creed.mod(g, "stipend")))
 
 ## What a day has brought: the stipend when a month has turned, and word of whoever on the roll has
