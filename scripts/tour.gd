@@ -5343,6 +5343,10 @@ func _net_shots(which: String = "1") -> void:
 			await _shot("draw_choice")
 			main.pop()
 			Crime.strike(Game, e, 2)
+			# (the watch has been already today: the picture is of the mound)
+			for wt in Weal.ORDER:
+				Game.watch_day[wt] = Game.day
+			Game.hunter_day = Game.day
 			Game.toasts.clear()
 			main.toast_list.clear()
 			w.clear_cache()
