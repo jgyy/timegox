@@ -1229,7 +1229,7 @@ const CROSSROADS := {
 				"log": "Said that a kindness is owed onward, to the next stranger on the road."},
 		],
 		"after": {
-			"nothing": [["Narrator", "The old man's hands stop. He looks at the knot he has half made for a long moment, and then, very slowly, he pulls the stems apart and smooths them straight. It is the first knot he has untied that had tripped nobody."], ["The Old Man in the Grass", "Finished when it was done. Eleven years I have been owing, and nobody thought to tell me the account was closed the day it was opened. Help me up. My daughter's children are waiting, and I have been a long time in this field."]],
+			"nothing": [["Narrator", "The old man's hands stop. He looks at the knot he has half made for a long moment, and then, very slowly, he pulls the stems apart and smooths them straight. It is the first knot he has untied that had tripped nobody."], ["The Old Man in the Grass", "Finished when it was done. Eleven years I have been owing, and nobody thought to tell me the account was closed the day it was opened. Then I may lie down. My daughter's children put rice on my mound every spring, and I have never once been there to have it."]],
 			"ledger": [["Narrator", "Lin Feng takes out a brush. The old man watches him write it down: a concubine, a father's two orders, the one that was followed, a bolt of cloth, four nights of grass. When it is on the page he reads it over twice, moving his lips."], ["The Old Man in the Grass", "There. It is somewhere. I may stop carrying it about in my hands. Draw the line through it, sweeper, where it says paid. No: give me the brush. I should like to draw that line myself."]],
 			"onward": [["Narrator", "The old man laughs, a dry sound like grass in wind. He finishes the knot he is tying, and then walks ten paces down the field, to a place where no army has ever stood or will, and ties another, for nobody."], ["The Old Man in the Grass", "Somebody will come along this row one day in trouble, and something will trip whatever is after him, and he will never know. That is better than a general. Go on, sweeper. I have a deal of field to do, and it is all for strangers now."]],
 		},
@@ -1286,7 +1286,7 @@ const CROSSROADS := {
 			"s_p29_end": {
 				"cut": [["Elder Qing Xuan", "And I hear you had a mat cut in two. Good. I have kept two disciples in one cell for a year because they began together, and each has been ruining the other's sleep. I shall move one tonight. It is not a punishment. It is a place."]],
 				"whole": [["Elder Qing Xuan", "And I hear a mat was left whole that might have been cut. I have a place at this table that has been laid for forty years for somebody who went to look at a road. I had begun to think it foolish. I shall leave it laid."]],
-				"road": [["Elder Qing Xuan", "And I hear Guan Ning ran to a gate with a mat under his arm. Guan Ning! I have not been down these steps to look at anything in seventy years. ...Is it true about the outriders? Eight?"]],
+				"road": [["Elder Qing Xuan", "And I hear Guan Ning ran to a gate with a mat under his arm. Guan Ning! It took me seventy years and a basket of persimmons to go down these steps. ...Is it true about the outriders? Eight?"]],
 			},
 		},
 		"end": {
@@ -1352,7 +1352,7 @@ const CROSSROADS := {
 			},
 			"done:s_p26_herbs": {
 				"copy": [["Hua Tuo", "One of them has a copy already: it came to the counter at Longmen, and she read the page on the needle on the boat. She has it wrong in three places. I am delighted. Nobody gets anything wrong that they have not read."]],
-				"keep": [["Hua Tuo", "They asked where the book was. I said: at Guiyun, behind a broom. One of them went straight there and is sweeping. The other two are staying here, to see whether I am worth the sweeping."]],
+				"keep": [["Hua Tuo", "They asked where the book was. I said: at Guiyun, behind a broom. One of them went straight there and is sweeping. The other four are staying here, to see whether I am worth the sweeping."]],
 				"burn": [["Hua Tuo", "They asked where the book was. I said: in me, and now in you, a little. It is a smaller book than it was. It is the only kind that has never been taken off anybody at a gate."]],
 			},
 			"s_p26_end": {

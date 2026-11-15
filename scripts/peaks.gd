@@ -319,7 +319,11 @@ static func world(grid: PackedByteArray, W: int, peaks: Array, ents: Array, laye
 				used[at] = true
 				match kind:
 					"npcs":
-						ents.append({"kind": "npc", "id": d.id, "n": d.n, "pos": at, "col": d.col, "vis": d.get("vis", ["", ""]), "area": area, "layer": layer, "late": true})
+						var pn := {"kind": "npc", "id": d.id, "n": d.n, "pos": at, "col": d.col, "vis": d.get("vis", ["", ""]), "area": area, "layer": layer, "late": true}
+						# (the Open Net release: somebody on a height may be away for a while, like anybody else)
+						if d.has("hide"):
+							pn["hide"] = d.hide
+						ents.append(pn)
 					"bosses":
 						ents.append({"kind": "boss", "id": "boss_" + str(d.id), "enemy": d.id, "pos": at, "lv": d.lv, "req": d.req, "vis": d.get("vis", ["", ""]), "area": area, "layer": layer, "late": true})
 					"pickups":

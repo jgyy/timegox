@@ -67,7 +67,7 @@ const LETTERS := {
 		"lines": ["Sweeper: the granary is roofed. It was your eight stems and my bricks and somebody's sawdust. I hear you have a ring now that holds everything. Good. Take out one thing every morning and carry it a hundred paces, and put it back at night. I will know if you do not. I shall not know how, but I will."]},
 	# ---- Part XXVIII (the Answering Land release): letters about what is owed, and from a man mending doors
 	"knot_nothing": {"from": "Tanner Hou's Widow", "needs": ["the_knot", "nothing"], "wait": 3,
-		"lines": ["Lin Feng, my father sleeps at night now. He says you told him the account was closed the day it was opened. He has taken up whittling, badly. I enclose the price of a spoon. It is the fourth he has made and the first that would hold soup, and somebody bought it, owing you nothing."],
+		"lines": ["Lin Feng, my father lies quiet now. Eleven years the grass on his mound was trodden flat every morning, and since the autumn it stands. I am told you said the account was closed the day it was opened. I enclose the price of a spoon he whittled, badly, when he was alive. Somebody bought it, owing you nothing."],
 		"gift": {"stones": 300}},
 	"knot_ledger": {"from": "Book-Keeper Mu of Qingshi", "needs": ["the_knot", "ledger"], "wait": 3,
 		"lines": ["The book has four hundred entries and three hundred and sixty lines drawn through. There are eleven against your name that you have never answered, child, because nobody told you of them. I enclose the list. Do not hurry. They have waited years, and found the waiting had a use."]},

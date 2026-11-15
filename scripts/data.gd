@@ -1494,7 +1494,7 @@ const AREAS := {
 			# a fated encounter (fate.gd): there while the story has them there
 			{"id": "xu_lan_lake", "n": "Xu Lan", "pos": Vector2i(11, 24), "col": Color("7a1a2a"), "asset": "xu_lan", "fate": true},{"id": "lake_keeper", "n": "Keeper Lan Jing", "pos": Vector2i(10, 26), "col": Color("a8e0ff"), "vis": ["s_ml_intro", ""]},
 			# Part XXVIII: the strong young man of Yixing who asks why nobody is glad, and who he is afterwards
-			{"id": "zhou_chu", "n": "Zhou Chu of Yixing", "pos": Vector2i.ZERO, "col": Color("7a3a2a"), "vis": ["s_p28_youth", "s_p28_feast"], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "zhou_chu", "n": "Zhou Chu of Yixing", "pos": Vector2i.ZERO, "col": Color("7a3a2a"), "vis": ["s_p28_youth", "s_p28_feast"], "hide": ["s_p28_scales", "s_p28_jiao"], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "zhou_chu_end", "n": "Zhou Chu of Yixing", "pos": Vector2i.ZERO, "col": Color("7a3a2a"), "asset": "zhou_chu", "vis": ["s_p28_third", ""], "late": true, "peak": 1, "stand": "foot"},
 		],
 		"bosses": [
@@ -1785,7 +1785,7 @@ const AREAS := {
 			# a fated encounter (fate.gd): there while the story has them there
 			{"id": "liu_ying_vale", "n": "Liu Ying", "pos": Vector2i(8, 26), "col": Color("6a7a5a"), "asset": "liu_ying", "fate": true},{"id": "spore_witch", "n": "Spore-Witch Mo Gu", "pos": Vector2i(10, 26), "col": Color("c8a0e0"), "vis": ["s_fu_intro", ""]},
 			# Part XXVI: Hua Tuo, by the hot springs of the vale, putting the sick into the water
-			{"id": "hua_tuo", "n": "Hua Tuo", "pos": Vector2i.ZERO, "col": Color("8a7a5a"), "vis": ["s_p26_home", ""], "late": true, "peak": 0, "stand": "foot"},],
+			{"id": "hua_tuo", "n": "Hua Tuo", "pos": Vector2i.ZERO, "col": Color("8a7a5a"), "vis": ["s_p26_home", ""], "hide": ["s_p26_camp", "s_p26_book"], "late": true, "peak": 0, "stand": "foot"},],
 		# Part XXVI: the hot spring the physician puts his patients into, beside him at the foot of the height
 		"props": [{"id": "p26_spring", "prop": "hot_spring", "late": true, "peak": 0, "stand": "foot"}],
 		"bosses": [
@@ -2452,7 +2452,7 @@ const AREAS := {
 			# bathed (its hot spring runs under the hills to the sea)
 			{"id": "mazu", "n": "Mazu, Who Brings the Boats Home", "pos": Vector2i(69, 47), "col": Color("d83a3a"), "vis": ["s_p12_home", ""]},
 			# Part XXVIII: the general of Jin who cannot win a field against one man, and the old man in the grass
-			{"id": "wei_ke", "n": "Wei Ke, General of Jin", "pos": Vector2i.ZERO, "col": Color("3a4a7a"), "vis": ["s_p28_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "wei_ke", "n": "Wei Ke, General of Jin", "pos": Vector2i.ZERO, "col": Color("3a4a7a"), "vis": ["s_p28_home", "s_p28_calls"], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "grass_elder", "n": "The Old Man in the Grass", "pos": Vector2i.ZERO, "col": Color("8a8a6a"), "vis": ["s_p28_duhui", ""], "late": true, "peak": 1, "stand": "foot"},
 		],
 		"bosses": [
@@ -4665,10 +4665,10 @@ const ITEMS := {
 	"pagoda_tile": {"n": "Tile of the Pagoda", "desc": "A glazed tile off the roof of a pagoda small enough to stand on a palm, warm on one side. The Heavenly King who carries the pagoda has not set it down in three thousand years, and the tiles work loose"},
 	# ---- Part XXVIII (the Answering Land release)
 	"grass_knot": {"n": "Knot of Grass", "desc": "A handful of the long grass of the Valley of Sunrise drawn together and tied in a knot at the height of an ankle, tight, by old fingers. One of these in front of the right foot is worth a company of spears. Nobody in either army tied it"},
-	"jade_ring": {"n": "Ring of White Jade", "desc": "A ring of white jade no bigger than a sparrow could carry, without a flaw in it. There are four. They were brought a long way in a beak, for a hundred days of yellow flowers, and the bringer said: may your sons be as clean as these"},
+	"jade_ring": {"n": "Ring of White Jade", "desc": "A ring of white jade no bigger than a sparrow could carry, without a flaw in it. There are four. They were brought a long way in a beak, for a hundred days of yellow flowers, and the bringer said: may your sons' sons be as clean as these"},
 	"jiao_scale": {"n": "Scale of the Jiao", "desc": "A scale the size of a hand, grey-green and soft at the edge like wet horn, rubbed off against the piles of the long bridge. The jiao has no horns and is not a dragon yet. It breaks boats to find out whether it is"},
 	# ---- Part XXIX (the Ordered House release): what was found, and the things of a house (fitting.gd)
-	"charred_shingle": {"n": "Charred Shingle", "desc": "A cedar shingle off the roof of a new house, burned black along one edge and blown up the hill. The guest said the chimney was straight and the firewood too near. It was eleven months before he was right"},
+	"charred_shingle": {"n": "Charred Shingle", "desc": "A cedar shingle off the roof of a new house, burned black along one edge and blown up the hill. The guest said the chimney was straight and the firewood too near. It was half a year before he was right"},
 	"crane_feather": {"n": "Flight Feather of the Crane", "desc": "A white flight feather as long as a forearm, black at the tip. Ding Lingwei of Liaodong studied the Way on Lingxu Mountain and came home a crane, a thousand years on. He circled so long over the wall that he moulted"},
 	"furrow_piece": {"n": "Piece of Gold from the Furrow", "desc": "A flat piece of yellow gold with earth still in the stamp. Two friends were hoeing when it came up. One went on hoeing as if it were a tile. The other picked it up, saw his friend's face, and threw it down again"},
 	"bead_curtain": {"n": "Bead Curtain", "desc": "Red and yellow beads on forty strings, for hanging where a bed looks straight out of a door. It breaks the line, and clicks when anybody comes in. A thing of the house: it weighs nothing to speak of"},
@@ -4878,11 +4878,11 @@ const CHAT := {
 	"the_guest": ["I said two things. Bend the chimney. Move the firewood. It took me the length of a cup of tea, and he was polite about it, and that was the end of my being asked to that house.",
 		"People say I am a prophet. I am a man who has seen where sparks go. They go up, and then along, and then down onto whatever is nearest. There is no gift in knowing that.",
 		"A jar by the stove. A lamp on the left. A bed out of the line of the door. None of it is deep. All of it is what is left when somebody's grandmother has already had the fire.",
-		"I do not want the seat of honour. I should have liked a bowl of the ox. It is the bowl one minds; the seat is only where the bowl is put down."],
+		"I do not want a seat of honour. A bowl would do. It is the bowl one minds; the seat is only where the bowl is put down."],
 	"host_tian": ["A straight chimney draws best. Everybody knows that. I built it straight on purpose and I was proud of it, and I should thank a guest not to count my firewood.",
 		"It is a new house. I chose where everything stands myself. If my wife says the bed looks out of the door, she may turn her head the other way.",
 		"I have nothing against the man. He drank my tea and found fault with my stove. I simply did not see why he should come twice.",
-		"The neighbours came running with buckets. That is what a neighbour is. You kill an ox for people like that. For advice, you say thank you, and I am nearly sure I did."],
+		"If a neighbour's roof caught I should come running with a bucket, and he would kill an ox for me. That is what a neighbour is. For advice, you say thank you, and I am nearly sure I did."],
 	"ding_lingwei": ["I was a man of this town. I had a house by the east gate, and a persimmon tree, and a neighbour who owed me a ladder. I should like the ladder. I do not suppose he has it.",
 		"A thousand years on a mountain is not long while you are in it. Each day is a day. It is only when you come down that somebody has added them up behind your back.",
 		"A boy drew a bow on me. A boy of my own town, as I sat on my own town's pillar. I was not angry. He could not have known me; his great-grandfather could not have.",
@@ -4890,7 +4890,7 @@ const CHAT := {
 	"guan_ning": ["We have shared this mat for six years. He reads faster than I do. He remembers more. If you asked which of us would be a great man, I should say he would, and I should be right.",
 		"A hoe turns up what it turns up. A tile, a root, a piece of gold. If you go on hoeing it is all the same thing. It is only when you stop that it becomes gold.",
 		"I am not hard on him. I am hard on the mat. A mat is where two people have agreed to look at the same page. When one of them is looking at the road, it is two mats already.",
-		"They will say I was proud. I wore one cap for fifty years and sat on one stool until my knees wore holes in it. That is not pride. That is knowing where I sit."],
+		"They will say I am proud. I mean to wear one cap for fifty years and sit on one stool until my knees wear holes in it. That is not pride. That is knowing where I sit."],
 	# ---- Part XXX (the Open Net release)
 	"net_fowler": ["Four sides. My father hung three and went hungry one winter in four. I have children. I hung four, and I said the prayer so that it would be Heaven's doing and not mine.",
 		"From heaven, from earth, from the four quarters: all into my net. It is a good prayer. It works. That is what frightens me, some mornings, when I come to empty it.",
@@ -4915,7 +4915,7 @@ const CHAT := {
 	"hua_xin": ["I picked it up. Yes. And then I threw it away. Nobody ever tells that part. I threw it a good deal further than I had carried it.",
 		"A carriage with a canopy and eight outriders does not go by every day. I wanted to see it. Is it a crime to want to see a thing? I came back. I had lost my place on the page, that is all.",
 		"He will sit in one room for fifty years and be a saint. I shall go out, and hold office, and do some good and some harm, and be called worldly. One of us has to mind the roads.",
-		"We are friends. I should like that written down somewhere before he does whatever he is going to do with that knife."],
+		"We are friends. I should like that written down somewhere before he does whatever he is going to do about that mat."],
 	"budai": ["Hah! A coin? A fish? A sandal with no fellow? Anything. Into the sack. Everything is good for something, and I have not yet found what a sandal with no fellow is good for, so I keep it.",
 		"The children pull the sack open and climb inside. There is always room. I do not know how. I have never looked. If I looked there might not be.",
 		"They ask: monk, what is the teaching? I put the sack down. They ask: and after that? I pick it up and go. They write it in books. It is only what my back wanted.",
@@ -9606,7 +9606,7 @@ const DIALOGUE := {
 		["Narrator", "Three stems of green timber lie along the far wall, a room's width from the stove. The old stack stands where it stood, grey and dry and a hand from the bricks. Tian has not moved a stick of it. He has, however, stopped saying so."],
 	],
 	"done:s_p29_sparks": [
-		["Narrator", "The last spark goes out in the wet of the marsh against Lin Feng's sleeve. Over the ridge behind him, quite quietly, the thatch of the new house begins to glow along the line where a straight chimney meets it. It is the eleventh month. The guest was right in the spring."],
+		["Narrator", "The last spark goes out in the wet of the marsh against Lin Feng's sleeve. Over the ridge behind him, quite quietly, the thatch of the new house begins to glow along the line where a straight chimney meets it. It is the ninth month. The guest was right in the spring."],
 		["Yue Ling", "Lin Feng. The roof."],
 	],
 	"done:s_p29_shingles": [
