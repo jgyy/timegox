@@ -5465,8 +5465,13 @@ func _net_shots(which: String = "1") -> void:
 		for oa in ["sword", "bench", "field"]:
 			Game.picks = {"the_verdict": str(oa)}
 			main.set_stack(["world"])
+			Game.mail_told = 999
+			Game.fame_told = Fame.rank(Game)
 			if not await _mark_view("mark:the_verdict:springs", 15.0, 9.0, 5.0):
 				continue
+			Game.toasts.clear()
+			main.toast_list.clear()
+			await _wait(0.3)
 			await _shot("mark_verdict_%s" % str(oa), false)
 			fr3.append(last_img)
 			w.cam_override = null
