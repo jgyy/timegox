@@ -54,11 +54,16 @@ const FEATS := {
 	# the Open Net release: the last realm, the net, the sentence and the finder (Part XXX)
 	"three_sides": {"n": "What Would Go Left, Go Left", "kind": "road", "pts": 20, "test": ["level", 105], "desc": "Reach Three Sides Open."},
 	# the Tall People release: the last realm, the hour, the runner and the lintel (Part XXXI)
-	"great_small": {"n": "Exactly Room", "kind": "road", "pts": 20, "test": ["level", 108], "desc": "Reach Great and Small Alike: the last realm there is."},
+	"great_small": {"n": "Exactly Room", "kind": "road", "pts": 20, "test": ["level", 108], "desc": "Reach Great and Small Alike."},
 	"asked_why": {"n": "What Kept Him", "kind": "road", "pts": 10, "test": ["step", "s_p31_hour"], "desc": "Ask a man who came late what he was doing."},
 	"turned_round": {"n": "A Thousand Li Behind Him", "kind": "road", "pts": 10, "test": ["step", "s_p31_sun"], "desc": "Turn somebody round who had never once looked back."},
 	"whose_door": {"n": "For Whoever Comes", "kind": "road", "pts": 10, "test": ["step", "s_p31_lintel"], "desc": "Say how high a door should be, and for whom."},
 	"tall_friends": {"n": "Looked in the Eye", "kind": "people", "pts": 10, "test": ["standing", "daren", 50], "desc": "Be called friend by the Great People."},
+	# the Broken Mirror release: the last realm, the roots, the bridge and the two halves (Part XXXII)
+	"parted_whole": {"n": "The Joins Show", "kind": "road", "pts": 20, "test": ["level", 111], "desc": "Reach Parted and Whole: the last realm there is."},
+	"under_the_ditch": {"n": "Joined at the Root", "kind": "road", "pts": 10, "test": ["step", "s_p32_graves"], "desc": "Find out where two trees met while a king's word walked the ground between them."},
+	"looked_up": {"n": "She Was on the Bridge", "kind": "road", "pts": 10, "test": ["step", "s_p32_flood"], "desc": "Get a man who kept an hour to look up and see who came."},
+	"both_halves": {"n": "On One Cloth", "kind": "road", "pts": 10, "test": ["step", "s_p32_mirror"], "desc": "Say what is done with a mirror when both halves are found and no longer meet."},
 	"open_net": {"n": "One Crane, Walking Round", "kind": "road", "pts": 10, "test": ["step", "s_p30_net"], "desc": "Find a side to open in a net that had none."},
 	"own_sentence": {"n": "Heard Wrongly", "kind": "road", "pts": 10, "test": ["step", "s_p30_sentence"], "desc": "Stop a sentence that had been carried out."},
 	"judges_due": {"n": "What He Owes", "kind": "road", "pts": 10, "test": ["step", "s_p30_verdict"], "desc": "Answer a judge who bound his own hands."},

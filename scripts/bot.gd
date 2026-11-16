@@ -127,6 +127,8 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXXI: four beams carried for somebody taller to the hour, four peach stones to the runner, nine rooms
 	# measured from whoever lives in them to the decree, and four cords to the shoe
 	"late_axe": "folk", "kuafu_west": "relic", "the_decree": "house", "the_shoe": "relic",
+	# Part XXXII: four knots that held to the graves, four hours waited to the water, four slips of elm to the wall
+	"two_graves": "relic", "the_flood": "relic", "the_wall": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -179,7 +181,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXX: the cord cut, and the judge back at his bench under a dead man's name
 	"the_verdict": ["bench"],
 	# Part XXXI: each of them asked, at the gate
-	"the_lintel": ["each"]}
+	"the_lintel": ["each"],
+	# Part XXXII: riveted, with the join showing
+	"the_mirror": ["rivet"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand

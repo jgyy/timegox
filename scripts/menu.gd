@@ -180,9 +180,11 @@ func _build() -> void:
 		var ask_id := Romance.next_ask(Game)
 		var here_n: int = Romance.outings_here(Game, main.body_ctx()).size()
 		labels = ["Talk with her (T)" if tid != "" else "Nothing to talk about yet", "Give her something...", "Spend this hour with her (%d here)" % here_n,
-			(str(Romance.ASKS[ask_id].n) + "...") if ask_id != "" else "Nothing left unsaid", "Back"]
-		ids = ["talk", "gift", "outing", "ask", "back"]
-		enabled = [tid != "", Game.companion, Game.companion, ask_id != "" and Romance.ask_blocked(Game, ask_id) == "", true]
+			(str(Romance.ASKS[ask_id].n) + "...") if ask_id != "" else "Nothing left unsaid",
+			# (the Broken Mirror release: what is the matter, a feast day's hour, and what two people do face to face)
+			"Something is the matter..." if Romance.matter(Game) != "" else ("Be near her (%s)..." % Romance.feast_today(Game) if Romance.feast_today(Game) != "" else "Be near her..."), "Back"]
+		ids = ["talk", "gift", "outing", "ask", "near", "back"]
+		enabled = [tid != "", Game.companion, Game.companion, ask_id != "" and Romance.ask_blocked(Game, ask_id) == "", Game.companion and Romance.stage(Game) >= 1, true]
 	elif mode == "cultivation":
 		# Part XII: the realm and the branches of the root; an awakening not yet spent can be spent here
 		labels = ["Wake a branch (%d)" % Game.talent_pts, "Back"]
@@ -299,6 +301,9 @@ func press(act: String) -> void:
 				"ask":
 					main.pop()
 					main.open_ask()
+				"near":
+					main.pop()
+					main.open_near()
 				"store":
 					main.pop()
 					main.offer_store()

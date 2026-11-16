@@ -39,6 +39,17 @@ ANSUR II and NASA anthropometric tables for the girth of a limb):
 * the arms are clays of their own (an arm hangs against the lats, and one skin would weld it to
   the ribs): the deltoid belongs to the torso and the arm starts inside it.
 
+* the Broken Mirror release measured the sculpt against a reference figure of each sex (the CC0
+  MakeHuman base mesh with its young man and young woman, laid over this rig joint for joint and cut
+  into the same slices: see the README) and corrected what the tape showed: hips and seat that stood
+  five centimetres too deep, a waist that was round where a waist is an ellipse (wider than it is
+  deep, and a woman's not a wasp's), a bust too large and too low, a woman's lower leg a fifth too
+  thin; and it sculpted what a body has that a stack of lumps has not (``_carve``): the seat is two
+  cheeks with the cleft between them and a fold under each, a woman has two breasts with the sternum
+  between them and a fold beneath, a man's chest is two pectorals with their lower border, and there
+  is the furrow of the spine, the linea alba and a navel.  Cloth lies across a cleft, so under the
+  drawers and the band the same forms show, shallower.
+
 The hands and the head are the character's own (face.py, garment.hand) and are kept when they are
 undressed; the neck is the body's own, running on unbroken from the shoulders into the head.
 Everything is in Godot space for a person facing +Z, +X the person's left."""
@@ -85,6 +96,8 @@ class Figure:
         self.w = (0.9 if self.fem else 1.0) * (0.9 + 0.1 * b) * (0.92 if self.child else 1.0)
         self.pel = (1.07 if self.fem else 1.0) * (0.96 + 0.04 * b) * (0.95 if self.child else 1.0)
         self.limb = (0.88 if self.fem else 1.0) * (0.86 + 0.14 * b) * (0.86 if self.child else 1.0)
+        # (measured: a woman's thigh and calf are as full as a man's at the same height; only her arm is slighter)
+        self.leg = (0.95 if self.fem else 1.0) * (0.86 + 0.14 * b) * (0.86 if self.child else 1.0)
         self.belly = (0.6 * elder + max(0.0, b - 1.05) * 2.4 + (0.6 if self.child else 0.0))
         self.bust = 0.0 if (self.child or not self.fem) else float(o.get("bust", 1.0 - 0.3 * elder))
         self.skin = rgb(o.get("skin", SKIN_DEFAULT))
@@ -164,13 +177,17 @@ def _foot_bones(sd):
 
 
 # ---------------------------------------------------------------- the sculpt
+def side_of(sd):
+    return "upper_arm." + sd
+
+
 def _torso(c, F):
     """Pelvis, waist, ribcage, chest, back, shoulders and the neck (one clay)."""
     w, pel, mus, fat = F.w, F.pel, F.mus, F.fat
     fem = F.fem
     tb = _torso_bones
     # ---- the pelvis: a bowl tipped forward, the hips over the joints, the seat behind
-    c.ellipsoid(V(0, 0.95, -0.004), (0.122 * pel, 0.1, 0.098 * (1.0 + 0.06 * fat)), bones=tb, tag="pelvis")
+    c.ellipsoid(V(0, 0.95, 0.002), (0.118 * pel, 0.1, 0.086 * (1.0 + 0.05 * fat)), bones=tb, tag="pelvis")
     c.ellipsoid(V(0, 0.98, 0.03 + 0.014 * F.belly), (0.1 * pel, 0.075, 0.066 + 0.016 * F.belly), bones=tb, tag="pelvis")
     # (the crotch, where the drawers are gathered between the legs)
     c.ellipsoid(V(0, 0.86, 0.004), (0.06, 0.05, 0.07), bones=tb, tag="pelvis")
@@ -178,24 +195,27 @@ def _torso(c, F):
         # gluteus medius and the hip bone under the waist's side
         c.ellipsoid(V(0.108 * pel * s, 0.95, -0.016), (0.046 * pel, 0.075, 0.066), rot=(0, 0, -0.2 * s), bones=tb, tag="medius." + sd)
         # gluteus maximus: a woman's fuller, rounder and a little higher
-        gr = ((0.082, 0.098, 0.08) if fem else (0.074, 0.094, 0.074))
+        # (two cheeks, their centres far enough apart that the cleft between them is in the clay
+        # before _carve cuts it; no deeper behind than the tape allows: about 23 cm front to back)
+        gr = ((0.07, 0.092, 0.064) if fem else (0.066, 0.088, 0.06))
         gr = (gr[0], gr[1] * (1.0 - 0.06 * F.elder), gr[2] * (1.0 - 0.12 * F.elder))
-        c.ellipsoid(V(0.066 * pel * s, 0.876 + (0.01 if fem else 0.0), -0.066 - (0.008 if fem else 0.0)), (gr[0] * pel, gr[1], gr[2] * (0.95 + 0.1 * fat)),
+        c.ellipsoid(V(0.074 * pel * s, 0.882 + (0.008 if fem else 0.0), -0.046 - (0.004 if fem else 0.0)), (gr[0] * pel, gr[1], gr[2] * (0.95 + 0.1 * fat)),
                     rot=(0.25, 0, 0.12 * s), bones={"hips": 0.65, "thigh." + sd: 0.35}, tag="glute." + sd)
         if fem:
             # the soft layer over the outer hip and the top of the thigh
-            c.ellipsoid(V(0.13 * pel * s, 0.885, -0.006), (0.05, 0.08, 0.066), bones={"hips": 0.5, "thigh." + sd: 0.5}, tag="medius." + sd)
+            c.ellipsoid(V(0.128 * pel * s, 0.885, -0.002), (0.048, 0.08, 0.06), bones={"hips": 0.5, "thigh." + sd: 0.5}, tag="medius." + sd)
     # ---- the waist: the obliques over the hip bones, the belly in front, the erectors behind
     # (an elder's waist has thickened; a heavy man's belly comes forward and out)
-    waist_w = (0.11 if fem else 0.118) * w * (1.0 + 0.2 * F.belly + 0.12 * F.elder)
-    c.ellipsoid(V(0, 1.095, 0.004 + 0.016 * F.belly), (waist_w, 0.118, 0.082 + 0.018 * F.belly + 0.006 * fat), bones=tb, tag="waist")
+    # (measured: 27 cm across and 19 deep on a man, 26 and 18 on a woman)
+    waist_w = (0.142 if fem else 0.13) * w * (1.0 + 0.2 * F.belly + 0.12 * F.elder)
+    c.ellipsoid(V(0, 1.095, 0.008 + 0.016 * F.belly), (waist_w, 0.118, 0.07 + 0.018 * F.belly + 0.004 * fat), bones=tb, tag="waist")
     if F.belly > 0.15 and not F.child:
         # a paunch: a heavy man's or an old one's belly carried in front, over the drawers' band
         bb = F.belly - 0.15
         c.ellipsoid(V(0, 1.05, 0.05 + 0.045 * bb), (0.1 * (1.0 + 0.3 * bb), 0.1 + 0.02 * bb, 0.055 + 0.055 * bb), bones=tb, tag="waist")
     for s, sd in ((1, "L"), (-1, "R")):
-        c.ellipsoid(V(0.096 * w * s, 1.025, 0.0), (0.036 * (0.9 + 0.2 * fat), 0.06, 0.062), rot=(0, 0, 0.15 * s), bones=tb, tag="obl." + sd)
-        c.ellipsoid(V(0.036 * s, 1.1, -0.082), (0.032, 0.13, 0.034), bones=tb, tag="waist")
+        c.ellipsoid(V(0.1 * w * s, 1.025, 0.004), (0.036 * (0.9 + 0.2 * fat), 0.06, 0.056), rot=(0, 0, 0.15 * s), bones=tb, tag="obl." + sd)
+        c.ellipsoid(V(0.036 * s, 1.1, -0.064), (0.032, 0.13, 0.03), bones=tb, tag="waist")
         if not F.child:
             # the rectus abdominis: a long column either side of the midline
             c.ellipsoid(V(0.034 * s, 1.135, 0.072 + 0.014 * F.belly), (0.032, 0.11, 0.022 + 0.012 * mus), bones=tb, tag="abs." + sd)
@@ -211,17 +231,25 @@ def _torso(c, F):
     # ---- the chest: pectorals sloping up into the armpit; a woman's bust under the band
     for s, sd in ((1, "L"), (-1, "R")):
         pk = 0.7 + 0.45 * mus
-        c.ellipsoid(V(0.074 * w * s, 1.318, 0.07), (0.08 * w, 0.062, 0.038 * pk), rot=(0.08, 0, -0.28 * s), bones=tb, tag="pec." + sd)
+        c.ellipsoid(V(0.074 * w * s, 1.318, 0.07), (0.078 * w, 0.06, (0.038 if fem else 0.046) * pk), rot=(0.08, 0, -0.28 * s), bones=tb, tag="pec." + sd)
         if F.bust > 0.0:
+            # two breasts, each a teardrop on the pectoral: the fullness low and a little outward (the
+            # apex a head below the chin, 8 cm from the midline), a slope from the collarbone down
+            # to it, and the sternum left bare between them
             bk = 0.8 + 0.25 * F.bust
-            c.ellipsoid(V(0.08 * w * s, 1.268 - 0.025 * F.elder, 0.088), (0.062 * bk, 0.06 * bk, 0.056 * bk), rot=(0.2, 0, -0.18 * s), bones=tb, tag="bust." + sd)
-            c.ellipsoid(V(0.071 * w * s, 1.305, 0.08), (0.06 * bk, 0.052, 0.042 * bk), rot=(0.1, 0, -0.2 * s), bones=tb, tag="bust." + sd)
+            c.ellipsoid(V(0.084 * s, 1.282 - 0.025 * F.elder, 0.082), (0.05 * bk, 0.05 * bk, 0.045 * bk), rot=(0.2, 0, -0.18 * s), bones=tb, tag="bust." + sd)
+            c.ellipsoid(V(0.078 * s, 1.318 - 0.012 * F.elder, 0.072), (0.044 * bk, 0.05, 0.03 * bk), rot=(0.35, 0, -0.2 * s), bones=tb, tag="bust." + sd)
     c.ellipsoid(V(0, 1.39, 0.048), (0.072 * w, 0.056, 0.036), bones=tb, tag="ribs")
     # ---- shoulders: the trapezius from the neck to the tips of the shoulders, the clavicles, the deltoids
     for s, sd in ((1, "L"), (-1, "R")):
         tr = 0.034 + 0.014 * mus
         c.capsule(V(0.014 * s, 1.53, -0.03), V(0.152 * w * s, 1.448, -0.02), tr, bones=tb, tag="trap")
-        c.capsule(V(0.03 * s, 1.452, 0.05), V(0.15 * w * s, 1.456, 0.012), 0.009, bones=tb, tag="clav." + sd)
+        # (the collarbone is drawn as thick as the clay can hold: a thinner one tore the skin into a pit)
+        c.capsule(V(0.03 * s, 1.45, 0.046), V(0.15 * w * s, 1.454, 0.01), 0.015, bones=tb, tag="clav." + sd)
+        # the hollow above it, between the collarbone and the trapezius, is a dip and not a hole
+        c.ellipsoid(V(0.085 * w * s, 1.456, 0.004), (0.06, 0.03, 0.034), bones=tb, tag="ribs")
+        # and behind the armpit the teres and the back of the deltoid close the gap to the shoulder blade
+        c.ellipsoid(V(0.15 * w * s, 1.37, -0.05), (0.04, 0.055, 0.04), bones={side_of(sd): 0.4, "chest": 0.6}, tag="scap." + sd)
         # (the hollow under the outer end of the collarbone, filled so it shades as a dip and not a hole)
         c.ellipsoid(V(0.13 * w * s, 1.4, 0.046), (0.038, 0.04, 0.028), bones=tb, tag="ribs")
         dk = (0.82 + 0.3 * mus) * (0.82 if fem else 1.0)
@@ -244,7 +272,7 @@ def _torso(c, F):
 
 def _legs(c, F):
     """Thighs, knees, calves, ankles and feet, melting into the pelvis at the top."""
-    L = F.limb
+    L = F.leg
     fem = F.fem
     m = F.mus
     for s, sd in ((1, "L"), (-1, "R")):
@@ -253,9 +281,9 @@ def _legs(c, F):
         an = V(ANK.x * s, ANK.y, ANK.z)
         tb = _thigh_bones(sd)
         # the thigh tapers from the hip to the knee; a woman's fuller at the top
-        top = (0.09 if fem else 0.083) * L
+        top = (0.088 if fem else 0.08) * L
         c.chain([hip + V(0.0, 0.0, -0.004), hip.lerp(kn, 0.35), hip.lerp(kn, 0.72), kn + V(0, 0.03, 0)],
-                [top, (0.08 if fem else 0.078) * L, 0.064 * L, 0.052 * L], bones=tb, tag="thigh." + sd, t0=0.0, t1=1.0)
+                [top, (0.08 if fem else 0.076) * L, 0.064 * L, 0.05 * L], bones=tb, tag="thigh." + sd, t0=0.0, t1=1.0)
         # quadriceps: vastus lateralis outside, rectus femoris down the front, vastus medialis a teardrop
         # above the inside of the knee; the adductors fill the inside top, the hamstrings the back
         qk = 0.85 + 0.3 * m
@@ -269,20 +297,23 @@ def _legs(c, F):
             k = smooth(0.46, 0.54, p.y)
             return {"shin." + sd: 1.0 - k, "thigh." + sd: k}
         c.ellipsoid(kn + V(0.0, 0.014, 0.046), (0.026, 0.03, 0.018), bones=sb, tag="patella." + sd)
-        c.ball(kn + V(0.0, 0.0, 0.004), 0.054 * L, bones=sb, tag="knee." + sd)
+        c.ball(kn + V(0.0, 0.0, 0.004), 0.05 * L, bones=sb, tag="knee." + sd)
         # the shin and the calf: two heads of the gastrocnemius, the inner lower and fuller
         fb = _foot_bones(sd)
         c.chain([kn + V(0, -0.01, 0), kn.lerp(an, 0.3), kn.lerp(an, 0.65), an + V(0, 0.02, 0)],
-                [0.05 * L, 0.05 * L, 0.038 * L, 0.031 * L], bones=lambda p, t, sd=sd: {"shin." + sd: 1.0}, tag="shin." + sd, t0=0.0, t1=1.0)
+                [0.05 * L, 0.052 * L, 0.043 * L, 0.034 * L], bones=lambda p, t, sd=sd: {"shin." + sd: 1.0}, tag="shin." + sd, t0=0.0, t1=1.0)
         cm = 0.85 + 0.3 * m
-        c.ellipsoid(kn.lerp(an, 0.26) + V(0.016 * s, 0.0, -0.024), (0.032 * L * cm, 0.088, 0.032 * L * cm), rot=(-0.1, 0, 0), bones={"shin." + sd: 1.0}, tag="calf." + sd)
-        c.ellipsoid(kn.lerp(an, 0.31) + V(-0.018 * s, 0.0, -0.022), (0.034 * L * cm, 0.092, 0.034 * L * cm), rot=(-0.1, 0, 0), bones={"shin." + sd: 1.0}, tag="calf." + sd)
+        c.ellipsoid(kn.lerp(an, 0.26) + V(0.016 * s, 0.0, -0.024), (0.034 * L * cm, 0.09, 0.035 * L * cm), rot=(-0.1, 0, 0), bones={"shin." + sd: 1.0}, tag="calf." + sd)
+        c.ellipsoid(kn.lerp(an, 0.31) + V(-0.018 * s, 0.0, -0.022), (0.036 * L * cm, 0.094, 0.037 * L * cm), rot=(-0.1, 0, 0), bones={"shin." + sd: 1.0}, tag="calf." + sd)
         # the ankle bones: the inner higher, the outer lower and further back
         c.ball(an + V(-0.026 * s, 0.012, 0.0), 0.015, bones=fb, tag="ankle." + sd)
         c.ball(an + V(0.028 * s, 0.0, -0.008), 0.015, bones=fb, tag="ankle." + sd)
         # the foot: heel, arch, the ball of the foot and five toes
         fk = (0.9 if fem else 1.0) * (0.85 if F.child else 1.0)
         x = ANK.x * s
+        # (the ankle itself, and the tendon down to the heel: the shin used to end in the air above the foot)
+        c.ellipsoid(V(x, 0.088, -0.008), (0.03 * fk, 0.042, 0.036 * fk), bones=fb, tag="ankle." + sd)
+        c.capsule(V(x, 0.15, -0.03), V(x, 0.06, -0.04), 0.014 * fk, bones=fb, tag="ankle." + sd)
         c.ellipsoid(V(x, 0.045, -0.036), (0.032 * fk, 0.037, 0.038 * fk), bones=fb, tag="foot." + sd)
         c.ellipsoid(V(x + 0.004 * s, 0.05, 0.04), (0.038 * fk, 0.031, 0.072 * fk), rot=(-0.12, 0, 0), bones=fb, tag="foot." + sd)
         c.ellipsoid(V(x + 0.006 * s, 0.026, 0.11 * fk), (0.044 * fk, 0.023, 0.037 * fk), bones=fb, tag="foot." + sd)
@@ -350,6 +381,76 @@ def _band_cover(p, info, F):
     return lo < p.y < hi
 
 
+def _carve(p, n, F):
+    """What a body has that melted clay has not: the lines where two forms meet and do not join.
+    Returns (offset, k): how far the skin at p (normal n) is pressed in, and how deep a crease it is
+    there (0 .. 1, for the shading).  Depths are in metres, from the reference figures:
+
+    * the gluteal cleft between the two cheeks (about 3 cm deep at the middle of the seat, running
+      from the sacrum down and under), and the fold under each cheek where it meets the thigh;
+    * the furrow of the spine between the erectors and the shoulder blades;
+    * the sternum between the pectorals, or between a woman's breasts (which are two), and the
+      lower border of each: the fold under a breast, the edge of a pectoral rising to the armpit;
+    * the linea alba down the belly, and the navel a head below the nipples."""
+    ax = abs(p.x)
+    y = p.y
+    off = V(0.0, 0.0, 0.0)
+    k = 0.0
+    soft = 0.5 if F.child else (1.0 - 0.25 * F.elder)
+    mus = min(1.2, F.mus)
+    back = smooth(-0.1, -0.45, n.z)
+    front = smooth(0.1, 0.45, n.z)
+    if 0.775 < y < 1.0 and p.z < -0.015:
+        # ---- the seat: the cleft, and the fold under each cheek
+        d = (0.034 if F.fem else 0.03) * soft * smooth(0.995, 0.93, y) * smooth(0.78, 0.835, y) * math.exp(-(ax / 0.0155) ** 2) * smooth(-0.015, -0.05, p.z)
+        off.z += d
+        k += d / 0.02
+        yf = (0.816 if F.fem else 0.812) + 1.4 * max(0.0, ax - 0.05) ** 2
+        f = 0.008 * soft * math.exp(-((y - yf) / 0.011) ** 2) * smooth(0.012, 0.035, ax) * smooth(0.155, 0.105, ax) * back
+        off -= n * f
+        k += f / 0.012
+    if 0.99 < y < 1.47 and back > 0.0:
+        # ---- the spine
+        d = (0.006 + 0.005 * mus) * soft * back * smooth(0.99, 1.03, y) * smooth(1.47, 1.4, y) * math.exp(-(ax / 0.014) ** 2)
+        off.z += d
+        k += d / 0.02
+    if 1.0 < y < 1.42 and front > 0.0 and not F.child:
+        if F.bust > 0.0:
+            # ---- between the breasts, and under each
+            d = (0.012 * F.bust * math.exp(-((y - 1.285) / 0.05) ** 2) + 0.003 * smooth(1.2, 1.26, y) * smooth(1.41, 1.36, y)) * front * math.exp(-(ax / 0.017) ** 2)
+            off.z -= d
+            k += d / 0.022
+            yu = 1.231 - 0.025 * F.elder + 1.5 * (ax - 0.084) ** 2
+            f = 0.006 * F.bust * math.exp(-((y - yu) / 0.0105) ** 2) * smooth(0.02, 0.045, ax) * smooth(0.15, 0.12, ax) * front
+            off -= n * f
+            k += f / 0.01
+        else:
+            # ---- between the pectorals, and along the lower border of each
+            d = (0.004 + 0.007 * mus) * soft * front * smooth(1.2, 1.25, y) * smooth(1.41, 1.36, y) * math.exp(-(ax / 0.013) ** 2)
+            off.z -= d
+            k += d / 0.016
+            yu = 1.262 + 1.1 * max(0.0, ax - 0.05) ** 2
+            f = (0.002 + 0.004 * mus) * soft * math.exp(-((y - yu) / 0.011) ** 2) * smooth(0.012, 0.04, ax) * smooth(0.15, 0.115, ax) * front
+            off -= n * f
+            k += f / 0.01
+        # ---- the linea alba (lost under a paunch)
+        d = (0.0015 + 0.004 * mus) * soft * max(0.0, 1.0 - 1.6 * F.belly) * front * smooth(1.0, 1.04, y) * smooth(1.215, 1.17, y) * math.exp(-(ax / 0.01) ** 2)
+        off.z -= d
+        k += d / 0.012
+    if 1.02 < y < 1.11 and front > 0.0 and ax < 0.05:
+        # ---- the navel
+        r2 = (ax * ax + (y - NAVEL_Y) ** 2) / (0.0115 * 0.0115)
+        d = (0.009 + 0.006 * min(1.0, F.belly)) * front * math.exp(-r2)
+        off -= n * d
+        k += d / 0.008
+    return off, min(1.0, k)
+
+
+NAVEL_Y = 1.065
+# how much of a crease still shows through cloth laid across it
+CLOTH_BRIDGE = 0.55
+
+
 def _seam(info):
     """How much point `info` lies on a line where two masses of the body meet (0 .. 1)."""
     top = sorted(info.tags.items(), key=lambda kv: -kv[1])
@@ -396,6 +497,10 @@ def build(b, o, cloth=HEMP):
         c = mix(c, mix(sk, "d8907c", 0.4), 0.25 * smooth(0.06, 0.0, abs(p.y - KNEE.y)) * smooth(0.0, 0.05, p.z))
         if line_k > 0.0:
             c = mix(c, line, line_k * _seam(info))
+        # (a crease is in shadow, and the skin in it a little warmer)
+        ck = _carve(p, info.n, F)[1]
+        if ck > 0.0:
+            c = mix(c, line, (0.22 if F.child else 0.38) * ck)
         if not F.fem and info.tag.startswith("pec"):
             # a man's nipples, small and a shade darker, a head below the chin
             for s2 in (1, -1):
@@ -404,8 +509,12 @@ def build(b, o, cloth=HEMP):
         return c
 
     def post(p, info):
+        carve = _carve(p, info.n, F)[0]
         if not cover(p, info):
-            return None
+            return carve if carve.length > 1e-6 else None
+        return carve * CLOTH_BRIDGE + _fold(p, info)
+
+    def _fold(p, info):
         n = info.n
         # cloth stands off the skin, and creases where it is gathered
         fold = 0.004 + 0.003 * fbm3((p.x * 18.0, p.y * 9.0, p.z * 18.0), 2, 21)

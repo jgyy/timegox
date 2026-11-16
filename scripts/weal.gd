@@ -441,7 +441,7 @@ static func mark_from(g) -> void:
 		g.weal_from[tid] = total(g, tid)
 
 static func is_bettered(g, tid: String) -> bool:
-	return total(g, tid) > int(g.weal_from.get(tid, 0)) or (acts(g, tid, "gift") >= GIFT_MAX and measure(g, tid, "plenty") >= CAP)
+	return total(g, tid) > int(g.weal_from.get(tid, 0)) or acts(g, tid, "gift") >= GIFT_MAX or measure(g, tid, "plenty") >= CAP
 
 static func bettered(g) -> int:
 	var n := 0
@@ -554,6 +554,10 @@ const FATES := [
 	{"npc": "carpenter_gu", "when": ["the_lintel", ["grow"]], "tag": "who is building upward", "line": "Hills, I am told. I have sent to the fir woods for everything over forty paces, and I have told my boy that the trade he is learning is not the one I learned. He is delighted. I was, at his age, about a new plane."},
 	{"npc": "carpenter_gu", "when": ["the_lintel", ["stay"]], "tag": "with one rule on his bench", "line": "Twice a man and no more. I have put the long rule up on its nail; it is the only one I shall need for them now. It is a comfort to a carpenter to know the size of things. I should not like to be the one who was told his."},
 	{"npc": "carpenter_gu", "when": ["the_lintel", ["each"]], "tag": "who asks before he cuts", "line": "Two lintels to a door, and I am to ask whoever will live there how high. Sixty generations we built for the Great People and never asked one. The first I asked said: a hand lower, I like to touch it as I go in. A hand lower!"},
+	# Part XXXII (the Broken Mirror release)
+	{"npc": "lechang", "when": ["the_mirror", ["rivet"]], "tag": "who went home with him", "line": "It has six rivets in it and a line you could lose a hair in. I look at it every morning before I look at anything else. I used to look at my half to see what was gone. Now I look to see what is there."},
+	{"npc": "lechang", "when": ["the_mirror", ["recast"]], "tag": "who has been called upon", "line": "He came on Thursday with nothing he had written, as he was told, and sat on the edge of the chair. I asked him what he did for a living. He said he had been waiting. I said that is not a living. He laughed. I had forgotten his laugh; no, I had never heard this one."},
+	{"npc": "lechang", "when": ["the_mirror", ["halves"]], "tag": "who has two houses", "line": "I have his half and he has mine. It is the wrong way round, and neither of us has offered to change. On the fifteenth I go to see my own face in his house. He says it looks well there. He has not said it should stay."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["sword"]], "tag": "who has been thinking about his gate", "line": "A judge of Jin kept his own law to the end, and you stood by. Twenty years I have let through this gate whoever I was told to. Last night I asked myself who I should have stopped. I am still asking."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["bench"]], "tag": "who asks twice now", "line": "They say there is a court in Jin that hears every case twice, under a dead man's name. I ask everybody their business twice now, at this gate. It holds up the carts. Nobody has been turned away wrongly since."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["field"]], "tag": "with a hoe leaning by the gate", "line": "A judge hoeing beans for a widow. I let a pedlar through once who robbed the kitchens. I never told anybody. I have dug Auntie Zhou's leek bed every morning since I heard. She thinks I have gone simple."},

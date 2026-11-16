@@ -48,6 +48,8 @@ PARTY_CLIPS = ("sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
                # the Lotus release (Part XV)
                "play_flute", "dance", "kite", "stargaze", "release", "float_lantern", "write", "archery", "soak", "push",
                "climb", "gaze", "clap", "sword_dance",
+               # the Broken Mirror release (scripts/romance.gd TOUCH): what two people do face to face
+               "take_hands", "embrace", "brow_touch",
                # the Living Land release: the work of the towns, which every townsperson borrows (scripts/folk.gd)
                "hoe", "chop", "carry", "bang", "call", "eat",
                # the Hollow Hills release (Part XX): what is done under the ground and in the bigger houses

@@ -27,6 +27,8 @@ const SIGNATURE := {
 	# the Tall People (Part XXXI)
 	"Fangfeng": "hand_heart", "Kuafu": "shade_eyes", "The Giant of Longbo": "stoop", "Yan Ying": "arms_cross", "The Man of Zheng": "measure",
 	"Big Brother": "stoop", "Big Sister": "stoop",
+	# the Broken Mirror (Part XXXII)
+	"The Old Man under the Moon": "stroke_beard", "Weisheng": "hand_heart", "Meng Jiang": "hand_heart", "Xu Deyan": "shade_eyes", "Princess Lechang": "sleeve_smile",
 	# the people of the older chapters, by what they are
 	"Granny Wen": "hand_heart", "Smith Tie": "arms_cross", "Li Li": "hand_heart", "Shang Yang": "arms_cross", "Tang of Shang": "stroke_beard",
 	"Hua Tuo": "stroke_beard", "Cook Ding": "measure", "Tao Kan": "arms_cross", "Budai": "sleeve_smile",

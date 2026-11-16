@@ -3728,6 +3728,90 @@ SCENE = {
 SCENE = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in SCENE.items()}
 
 
+# ---------------------------------------------------------------- two people (the Broken Mirror release)
+# Three things done by two people standing face to face (scripts/romance.gd TOUCH; scripts/world.gd
+# `touch` stands them at the distance each wants, and both play the same clip): the hands taken, an
+# embrace, and brow laid to brow.  Each tips the head to the person's own right, so that two of them
+# doing it face to face pass cheek by cheek and not nose to nose.
+TAKE_HANDS_T = 3.4
+
+
+def clip_take_hands(t):
+    """Both hands held out low and open before the body until they are met, a look down at the two
+    pairs of hands, and then up; held, and let go slowly."""
+    k = t / TAKE_HANDS_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.22, 0.82, 1.0)
+    down = _hold(k, 0.16, 0.3, 0.46, 0.6)
+    sway = math.sin(k * math.pi * 2.0) * _hold(k, 0.3, 0.4, 0.8, 0.9)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = (((-0.58 - 0.04 * sway * s) * e, 0.0, -0.1 * s * e + 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.62 * e - 0.2 * (1 - e), 0.55 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.12 * e, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.4 * e)
+    _hands(p, 0.38 - 0.16 * e, 0.38 - 0.16 * e, 0.3)
+    _add(p, "head", 0.26 * down - 0.05 * e, 0.0, -0.05 * e)
+    _add(p, "chest", 0.06 * e)
+    return p
+
+
+EMBRACE_T = 4.2
+
+
+def clip_embrace(t):
+    """A step in and both arms put round somebody: the elbows lifted and the forearms folded across a
+    back, the chest come forward, the head laid down to one side on a shoulder and kept there for a
+    breath or two; then the arms loosen and fall."""
+    k = t / EMBRACE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.8, 1.0)
+    rest = _hold(k, 0.2, 0.38, 0.74, 0.88)
+    breath = math.sin(k * math.pi * 4.0) * rest
+    for sd, s in (("L", 1), ("R", -1)):
+        # (the left arm goes over and the right under, as two people's arms do)
+        hi = 0.16 if sd == "L" else -0.12
+        p["upper_arm." + sd] = (((-1.02 - hi) * e, 0.1 * s * e, -0.3 * s * e + 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = (((-0.86 - 0.05 * breath) * e - 0.2 * (1 - e), -0.5 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.1 * e, 0.0, 0.2 * s * e), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.55 * e)
+    _hands(p, 0.38 - 0.2 * e, 0.38 - 0.2 * e, 0.25)
+    _add(p, "chest", 0.1 * e + 0.015 * breath)
+    _add(p, "spine", 0.05 * e)
+    _add(p, "head", 0.1 * e + 0.12 * rest, -0.2 * rest, -0.26 * rest)
+    _add(p, "hips", 0.0, 0.0, 0.0)
+    return p
+
+
+BROW_T = 3.8
+
+
+def clip_brow_touch(t):
+    """Brow to brow: the hands laid on the other's arms above the elbow, the shoulders and the head
+    brought down and forward until the foreheads meet, and nothing done for a while."""
+    k = t / BROW_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.24, 0.8, 1.0)
+    lean = _hold(k, 0.12, 0.36, 0.72, 0.9)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = ((-0.78 * e, 0.0, 0.05 * s * e + 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.38 * e - 0.2 * (1 - e), 0.35 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.2 * e, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.45 * e)
+    _hands(p, 0.38 + 0.1 * e, 0.38 + 0.1 * e, 0.3)
+    _add(p, "spine", 0.06 * lean)
+    _add(p, "chest", 0.14 * lean)
+    _add(p, "head", 0.3 * lean, 0.0, 0.0)
+    return p
+
+
+COURT = {
+    "take_hands": (TAKE_HANDS_T, clip_take_hands),
+    "embrace": (EMBRACE_T, clip_embrace),
+    "brow_touch": (BROW_T, clip_brow_touch),
+}
+COURT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in COURT.items()}
+
+
 # ---------------------------------------------------------------- riding (mounts and vehicles)
 # The party rides (scripts/fashion.gd RIDES): astride a horse, a qilin or a tiger ("ride" on the move,
 # "ride_idle" standing still), or standing on a flying sword, a cloud or a sky-barque ("ride_stand").
@@ -4022,7 +4106,7 @@ RIDE = {
     "ride_idle": (RIDE_IDLE_T, clip_ride_idle),
     "ride_stand": (RIDE_STAND_T, clip_ride_stand),
 }
-PARTY_CLIPS = dict(CLIPS, **INTERACT, **RIDE, **SCENE)
+PARTY_CLIPS = dict(CLIPS, **INTERACT, **RIDE, **SCENE, **COURT)
 # (only the hero bears arms: Yue Ling keeps to her needle)
 HERO_CLIPS = dict(PARTY_CLIPS, **ARMS)
 

@@ -2536,6 +2536,13 @@ func _update_view(d: float) -> void:
 				# off the hero's shoulder rather than straight behind, so she never stands between the
 				# follow camera and him
 				var cs: Array = Models.companion_step(comp_pos, pp, facing, want_yaw, comp_run, speaker() != "", d)
+				if touch_clip != "" and t < touch_until and not walking:
+					# (she has come round in front of him, and they are turned to each other)
+					var tf := Vector3(facing.x, 0, facing.y).normalized()
+					var want_p := pp + tf * float(TOUCH_DIST.get(touch_clip, 0.6))
+					cs = [comp_pos.lerp(want_p, 1.0 - exp(-d * 9.0)), atan2(-tf.x, -tf.z), false]
+				elif touch_clip != "":
+					touch_clip = ""
 				comp_pos = cs[0]
 				var cy := _stand_y(bundles[layer], comp_pos)
 				# (she comes down out of the air as he does, and never hangs in it)
@@ -2814,6 +2821,10 @@ func _cue_line(line: Array) -> void:
 		if Assets.has_clip(a[0], own):
 			Models.act(a[0], own, t * Giants.pace(float((a[0] as Node3D).get_meta("tall", 1.0))) + float(a[1]))
 			Faces.wear(a[0], str(Closeup.FACES.get(own, "calm")), float(Closeup.SECONDS.get(own, 2.5)))
+	if Romance.TOUCH_CLIPS.has(g):
+		# (romance.gd, the Broken Mirror release: a thing two people do is done by both of them, face to face)
+		touch(g)
+		return
 	if g != "" and not a.is_empty() and Assets.has_clip(a[0], g):
 		Models.act(a[0], g, t * Giants.pace(float((a[0] as Node3D).get_meta("tall", 1.0))) + float(a[1]))
 	# the face the line is said with (faces.gd): its own cue or what its words sound like, worn for as
@@ -2835,6 +2846,22 @@ func _cue_line(line: Array) -> void:
 	var b := _actor(listener)
 	if not b.is_empty() and b[0] != (a[0] if not a.is_empty() else null) and Assets.has_clip(b[0], reply):
 		Models.act(b[0], reply, t + float(b[1]) + 0.35)
+
+## Lin Feng and Yue Ling do `clip` together (romance.gd TOUCH): she comes round in front of him to the
+## distance the thing is done at, they turn to each other, and both play it.  Drawn only.
+var touch_clip := ""
+var touch_until := 0.0
+const TOUCH_SECS := {"take_hands": 3.4, "embrace": 4.2, "brow_touch": 3.8}
+const TOUCH_DIST := {"take_hands": 0.66, "embrace": 0.42, "brow_touch": 0.52}
+func touch(clip: String) -> void:
+	if not Game.companion or comp == null or not Assets.has_clip(player, clip) or not Assets.has_clip(comp, clip):
+		return
+	touch_clip = clip
+	touch_until = t + float(TOUCH_SECS.get(clip, 3.5)) + 0.6
+	Models.act(player, clip, t + 0.55)
+	Models.act(comp, clip, t + 0.55)
+	Faces.wear(player, "tender", float(TOUCH_SECS.get(clip, 3.5)) + 0.6)
+	Faces.wear(comp, "tender", float(TOUCH_SECS.get(clip, 3.5)) + 0.6)
 
 ## The conversation camera: while somebody is speaking over the world the chase camera eases round
 ## into a two-shot from the side, framing Lin Feng and whoever he is talking to at head height (higher

@@ -70,6 +70,8 @@ const STORY_DATES := {
 	"s_p17_eggs": [2, 2], "s_p17_willow": [3, 5],
 	# Part XXIX: the crane comes down on the pillar at the Double Ninth, when people climb high
 	"s_p29_feast": [9, 9],
+	# Part XXXII: the half-mirror is cried at market on the fifteenth of the first month, under the lanterns
+	"s_p32_market": [1, 15],
 }
 
 # ---------------------------------------------------------------- the date
@@ -334,8 +336,7 @@ static func grown_at(group: Array, st: int) -> Array:
 	for f in group:
 		var f2: Dictionary = (f as Dictionary).duplicate()
 		f2["lv"] = mini(Data.MAX_LEVEL, int(f.lv) + int(info.lv))
-		if float(info.atk) != 1.0:
-			f2["atk"] = float(f.get("atk", 1.0)) * float(info.atk)
+		# (an old pack's harder blow is given once, in the battle: battle.gd)
 		out.append(f2)
 	for k in int(info.more):
 		if out.size() >= 5:
