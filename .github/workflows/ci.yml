@@ -36,7 +36,7 @@ jobs:
 
   test-and-playthrough:
     runs-on: ubuntu-latest
-    timeout-minutes: 90  # the bot plays about forty hours of game time: about forty-eight minutes on a hosted runner since story steps are looked up, not searched
+    timeout-minutes: 150  # the bot plays about forty hours of game time: seventy minutes on a quick hosted runner, ninety-five on a slow one (the late chapters play slowest)
     steps:
       - uses: actions/checkout@v4
 
