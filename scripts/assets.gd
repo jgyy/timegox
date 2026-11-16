@@ -103,6 +103,8 @@ const PEOPLE := {
 	"cheng_tang": "characters/cheng_tang", "li_li": "characters/li_li", "shang_yang": "characters/shang_yang", "jiang_chong": "characters/jiang_chong",
 	# Part XXXI (the Tall People release): three of the Great People, a very small minister and a man with a measure
 	"fangfeng": "characters/fangfeng", "kuafu": "characters/kuafu", "longbo_angler": "characters/longbo_angler", "yan_ying": "characters/yan_ying", "zheng_buyer": "characters/zheng_buyer",
+	# Part XXXII (the Broken Mirror release): a clerk of marriages, a man at a pillar, a widow at a wall, and two halves of a mirror
+	"yue_lao": "characters/yue_lao", "weisheng": "characters/weisheng", "meng_jiang": "characters/meng_jiang", "xu_deyan": "characters/xu_deyan", "lechang": "characters/lechang",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",

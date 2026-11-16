@@ -1977,6 +1977,50 @@ func open_outings() -> void:
 		)
 	)
 
+## Be near her (romance.gd, the Broken Mirror release): what is the matter, if something is; what can be made up;
+## the hour of a feast day; and the three things two people do face to face.  "Not now" is the first answer.
+func open_near() -> void:
+	var opts: Array = [{"id": "later", "label": "Not now", "desc": "It will keep.", "col": UI.C_DIM}]
+	var pink := Color("ff9ac0")
+	var mid := Romance.matter(Game)
+	if mid != "":
+		opts.append({"id": "matter", "label": "Ask her what is the matter", "desc": "She has been walking a pace further off than she does. " + told(str(Romance.MATTERS[mid].n)) + ".", "col": pink})
+	var rid := Romance.mend_ready(Game)
+	if rid != "":
+		opts.append({"id": "mend", "label": "Make it up", "desc": "What she minded has been put right.", "col": pink})
+	var fid := Romance.feast_today(Game)
+	if fid != "":
+		opts.append({"id": "feast", "label": str(Romance.FEASTS[fid].n), "note": "today only", "desc": "It is %s: an hour that can be had on no other day of the year." % fid, "col": UI.C_GOLD})
+	for tid in Romance.TOUCH_ORDER:
+		var why := Romance.touch_blocked(Game, tid)
+		opts.append({"id": "touch:" + tid, "label": told(str(Romance.TOUCH[tid].n)), "desc": why, "col": pink, "enabled": why == ""})
+	choose("Yue Ling is beside you.", opts, func(id: String):
+		if id == "" or id == "later":
+			return
+		if id == "matter":
+			say(Romance.matter_said(mid), func():
+				var replies: Array = []
+				for op in Romance.MATTERS[mid].options:
+					replies.append({"id": str(op[0]), "label": told(str(op[2])), "desc": "", "col": pink})
+				choose(told(str(Romance.MATTERS[mid].n)), replies, func(oid: String):
+					say(Romance.hear(Game, mid, oid))
+				, false)
+			)
+		elif id == "mend":
+			say(Romance.mend(Game, rid))
+		elif id == "feast":
+			say(Romance.FEASTS[fid].lines, func():
+				var replies2: Array = []
+				for op in Romance.FEASTS[fid].options:
+					replies2.append({"id": str(op[0]), "label": str(op[2]), "desc": "", "col": pink})
+				choose(str(Romance.FEASTS[fid].n), replies2, func(oid: String):
+					say(Romance.take_feast(Game, fid, oid))
+				, false)
+			)
+		elif id.begins_with("touch:"):
+			say(Romance.touch(Game, id.trim_prefix("touch:")))
+	)
+
 ## Say what there is to say (romance.gd ASKS): the next of the three questions, if the two are close enough.
 func open_ask() -> void:
 	var id := Romance.next_ask(Game)
@@ -2277,7 +2321,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

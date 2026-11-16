@@ -18,6 +18,22 @@ extends RefCounted
 ##     and three bows (**wed**).  She answers as herself: if the road she chose in Part XV is her own,
 ##     she will be promised, and will not be wed until she is back from it.
 ##
+##
+## The Broken Mirror release adds what there is between two people after the question has been asked:
+##
+##   * **Touch** (`TOUCH`): three things done standing face to face, each from the stage that allows
+##     it: her hands taken (courting), an arm round her (promised), brow to brow (wed).  Both of them
+##     are drawn doing it (art/lib/person.py COURT; World.touch); the first of a day brings them a
+##     little closer, and what she says depends on how the two of them are with each other (`tone`).
+##   * **Feast days together** (`FEASTS`): four days of the year (almanac.gd) on which there is an hour
+##     that can be had on no other: the lanterns, the Night of Sevens, Mid-Autumn, the last night of
+##     the year.  Each once, wherever they are.
+##   * **What is the matter** (`MATTERS`): she minds some of what the journey has done (a price on his
+##     head, a country hunted bare, somebody dead by his hand), and says so once, when asked.  Until
+##     she has been heard nothing further is asked or answered; when the thing itself is put right
+##     (the bill paid, the country let alone) it can be made up.  What cannot be put right is not made
+##     up: it was said, and stands.  Everything is read from the journey: nothing is thrown for.
+##
 ## Nothing here is needed by any step, trial or ending, and the bot leaves it alone.
 
 const STAGES := ["Walking together", "Courting", "Promised", "Wed"]
@@ -32,7 +48,7 @@ const OUTING := 3
 const GIFTS := {
 	"haws": {"n": "A stick of candied haws", "cost": 60, "taste": "love",
 		"desc": "Six hawthorn berries on a bamboo skewer, dipped in sugar gone hard as glass. Every child in the land has had one. She has not.",
-		"line": "It cracks! It is sour underneath, and then it is not. Why did nobody tell me about this? I have been alive, in a manner of speaking, for nine hundred years."},
+		"line": "It cracks! It is sour underneath, and then it is not. Why did nobody tell me about this? I have been alive, in a manner of speaking, for three hundred years."},
 	"socks": {"n": "Quilted socks", "cost": 200, "taste": "love",
 		"desc": "Two layers of cotton with silk floss between, stitched in a pattern of clouds. The pedlar says they are for grandmothers.",
 		"line": "Oh. ...My feet were tied to a post, when you found me. They have been cold ever since and I never said. How did you know? You did not know. You only bought socks. That is worse. That is so much worse.", "face": "tender"},
@@ -81,7 +97,7 @@ const OUTINGS := {
 		"lines": [["Narrator", "The top, and nothing above it. The wind has taken Yue Ling's hair out of its ribbon and she has let it. She is counting the stones on the cairn, moving her lips."],
 			["Yue Ling", "Forty-one. Forty-one people came all the way up here and wanted somebody to know. I like them. I like every one of them. Put ours on together; I want to feel it settle."]],
 		"options": [["tender", "tender", "\"One stone. Both hands on it.\"", "Both hands on it. There. Forty-two, and it is the only one on this mountain that two people set down. Whoever counts them next will not know. I shall."],
-			["playful", "playful", "\"Yours goes underneath. I am taller.\"", "You are a hand taller and you have been unbearable about it since the bamboo forest. Mine goes on top. I am older. By nine hundred years. Kneel."],
+			["playful", "playful", "\"Yours goes underneath. I am taller.\"", "You are a hand taller and you have been unbearable about it since the bamboo forest. Mine goes on top. I am older. By three hundred years. Kneel."],
 			["quiet", "quiet", "Hand her the stone, and look where she is looking.", "...There is the sect. There is the pond. I can see everywhere I have ever been afraid, from here, and all of it is small. Thank you for not pointing."]]},
 	"water": {"n": "At the water's edge", "where": "water", "hint": "Beside water, anywhere.",
 		"lines": [["Narrator", "Yue Ling has taken off her shoes without asking anybody and is standing in the shallows up to the ankle, holding her hem in one fist, looking down at her own feet through the water as if they were a letter."],
@@ -92,7 +108,7 @@ const OUTINGS := {
 	"tea": {"n": "Over tea going cold", "where": "indoors", "hint": "Indoors, at somebody's table.",
 		"lines": [["Narrator", "A table, two cups, a pot that was hot when it came. Outside there is weather, or a street. Yue Ling has both hands round her cup and has not drunk from it; she is using it, plainly, as a small stove."],
 			["Yue Ling", "We never sit. Have you noticed? There is always a road, or a lord of something. I should like, once, to be bored with you. I think I should be very good at it."]],
-		"options": [["tender", "tender", "\"Then let us be bored. Pour.\"", "Pour, he says. ...This is it, then. This is what the others have, the ones in the houses. A pot and nothing to say. I did not know it would feel like being let off something."],
+		"options": [["tender", "tender", "\"Then let us be bored. Pour.\"", "Pour, you say. ...This is it, then. This is what the others have, the ones in the houses. A pot and nothing to say. I did not know it would feel like being let off something."],
 			["playful", "playful", "\"I am bored already. It is your conversation.\"", "My conversation has healed three plagues and talked a goddess off a mountain. Yours consists of 'mm' and reports about bandits. Drink your tea. Wretch."],
 			["quiet", "quiet", "Refill her cup when it is cold. Say nothing.", "...That is the third time you have filled it and I have not drunk one. You have noticed, and you fill it anyway, because it is warm to hold. I see you, Lin Feng."]]},
 	"dawn": {"n": "The road at first light", "where": "wild_dawn", "hint": "Out in the open country, as the sun comes up.",
@@ -116,7 +132,7 @@ const OUTINGS := {
 	"stars": {"n": "Under the Silver River", "where": "wild_night", "hint": "Out in the open country, at night.",
 		"lines": [["Narrator", "No roof, no lamp. The Silver River from one side of the dark to the other, and on either bank of it the two stars everybody knows. Yue Ling is lying on her back in the grass with her hands behind her head."],
 			["Yue Ling", "One night a year, on a bridge of magpies. We mended that river ourselves, you and I. I have always thought it a poor bargain. I should have held out for more nights. I should hold out for all of them."]],
-		"options": [["tender", "tender", "\"You have all of them. Ask me for something harder.\"", "...All of them. He says it as if it were a bowl of rice. Very well. Something harder. Be here in the morning. And the one after. That is all. It turns out that is the whole of it."],
+		"options": [["tender", "tender", "\"You have all of them. Ask me for something harder.\"", "...All of them. You say it as if it were a bowl of rice. Very well. Something harder. Be here in the morning. And the one after. That is all. It turns out that is the whole of it."],
 			["playful", "playful", "\"The Weaver had a loom to get back to. What is your excuse?\"", "My excuse is asleep in a satchel and is called forty patients. I should make a terrible Weaver. I would cross the bridge on the wrong night out of sheer bad temper. Move over. You have the soft grass."],
 			["quiet", "quiet", "Lie down an arm's length off, and look up.", "...An arm's length. You measured it. Come here, you ridiculous creature; there is no bridge to cross. There is only grass."]]},
 	"snow": {"n": "In the snow", "where": "cold", "hint": "In the cold country, where the snow lies.",
@@ -127,7 +143,7 @@ const OUTINGS := {
 			["quiet", "quiet", "Take off your cloak and put it round her.", "I am not cold. I was not. ...I am keeping it. It smells of the kitchen at home, still. After all the realms. How does it still smell of the kitchen?"]]},
 	"steps": {"n": "On the nine hundred and ninety-nine steps", "where": "sect", "hint": "At home, in the sect's own courts.",
 		"lines": [["Narrator", "The east steps, in the hour when nobody uses them. A broom is leaning where a broom has always leaned. Yue Ling sits down on the third step from the top, tucks her feet under her, and looks at him expectantly."],
-			["Yue Ling", "Go on. I have never seen it. Everybody has seen it; the cooks, the Elder, the gate disciples. I have walked the four realms with the sweeper of the Azure Cloud Sect and I have never once watched him sweep."]],
+			["Yue Ling", "Go on. I have never seen it. Everybody has seen it; the cooks, the Elder, the gate disciples. I have walked the four realms with the sweeper of the Azure Cloud Sect and I have never once watched the sweeping."]],
 		"options": [["tender", "tender", "Sweep the steps. All of them. Properly.", "...You do the edges first. Nobody does the edges first. And you do not hurry, and you do not once look up to see whether I am watching. So that is who held the sky. I knew. I only wanted to see it done."],
 			["playful", "playful", "Hand her the broom.", "Me? I am a guest. I am a founding relic. I... it goes like this? Like THIS? You did this for three years and nobody gave you a medal? There is a knack. Do not tell me there is a knack. Show me."],
 			["quiet", "quiet", "Sit down on the step beside her instead.", "...Not today, then. Good. They have been swept every day for three hundred years; they will keep. This will not. Sit closer. The stone is cold and you are not."]]},
@@ -141,12 +157,12 @@ const ASKS := {
 		"ask": "There is a thing that has been true for some time, and has not been said. How will you say it?",
 		"options": [["plain", "tender", "Plainly. \"I love you. I have for years.\""], ["joke", "playful", "\"I have a report to make about my heart. It is short.\""], ["hand", "quiet", "Say nothing. Hold out a hand, and wait."]],
 		"reply": {
-			"plain": [["Yue Ling", "...Years. He says years, as if I had not been counting them. I know, Lin Feng. I knew before you did; I am a physician, I can hear a heart from across a room. I only wanted it said in a voice. Say it again. Slower.", "nod"]],
+			"plain": [["Yue Ling", "...Years. You say years, as if I had not been counting them. I know, Lin Feng. I knew before you did; I am a physician, I can hear a heart from across a room. I only wanted it said in a voice. Say it again. Slower.", "nod"]],
 			"joke": [["Yue Ling", "A report. Of course it is a report. Well: received, and witnessed, and the answer is yes, and the answer was yes at the bamboo forest when you cut me down and apologised for the rope. Idiot. Come here.", "laugh"]],
 			"hand": [["Yue Ling", "...You are not going to say it. You are going to stand there with your hand out like somebody feeding a deer. ...It is working. Do not move. I am deciding to take it, and I want to remember having decided.", "nod"]]},
 		"after": [["Narrator", "Nothing is different afterwards, and everything is in a slightly different place, the way a room is when somebody has opened the shutters. They walk on. She has his sleeve in two fingers, as if it might be taken back."]]},
 	"tokens": {"n": "Exchange tokens", "stage": 1, "bond": 42, "more": [["gifts", 3, "three things given her"]],
-		"ask": "Promised people carry something of each other's. She has, pressed in the back of her needle-case, a lotus petal that has not faded in nine hundred years. What will you give her to keep?",
+		"ask": "Promised people carry something of each other's. She has, pressed in the back of her needle-case, a lotus petal that has not faded in three hundred years. What will you give her to keep?",
 		"options": [["pin", "tender", "The jade pin from your hair: the one thing you came up the steps with."], ["straw", "playful", "A straw from the first broom, tied in a ring."], ["thread", "quiet", "A red thread, knotted once, with nothing said about it."]],
 		"reply": {
 			"pin": [["Yue Ling", "That is your mother's. It is all there was in the basket. Lin Feng, I cannot... No. I can. I am taking it, and I am putting it where the petal was, and you are having the petal. It was the first thing I ever had that was nobody's but mine.", "kneel"]],
@@ -246,9 +262,9 @@ static func here(where: String, ctx: Dictionary) -> bool:
 		"indoors":
 			return bool(ctx.get("indoors", false)) and not bool(ctx.get("cave", false))
 		"wild_dawn":
-			return bool(ctx.get("wild", false)) and h >= 5.0 and h < 7.5
+			return bool(ctx.get("wild", false)) and not bool(ctx.get("indoors", false)) and not bool(ctx.get("cave", false)) and h >= 5.0 and h < 7.5
 		"wild_night":
-			return bool(ctx.get("wild", false)) and night
+			return bool(ctx.get("wild", false)) and not bool(ctx.get("indoors", false)) and not bool(ctx.get("cave", false)) and night
 		"cave":
 			return bool(ctx.get("cave", false))
 		"cold":
@@ -290,6 +306,8 @@ static func ask_blocked(g, id: String) -> String:
 		return "She is not beside you."
 	if stage(g) != int(a.stage):
 		return "Not yet."
+	if matter(g) != "":
+		return "Something is the matter, and she has not said it yet. Ask her."
 	if int(g.bond) < int(a.bond):
 		return "Not yet: the two of you are not close enough (closeness %d of %d)." % [int(g.bond), int(a.bond)]
 	for m in a.more:
@@ -326,7 +344,201 @@ static func take_ask(g, id: String, oid: String) -> Array:
 		g.grant_yue_outfit("redbride")
 	return (a.reply[oid] as Array) + (a.after as Array)
 
-## What being promised, and wed, gives her in battle: somebody to come home to (her health).
+# ---------------------------------------------------------------- touch (the Broken Mirror release)
+const TOUCH_CLIPS := ["take_hands", "embrace", "brow_touch"]
+## `stage`: from which stage on; `clip`: what both of them do; `dist`: how far apart they stand for it
+## (world.gd); `told`: what is seen; `lines`: what she says, by the tone of the two of them.
+const TOUCH := {
+	"hands": {"n": "Take her hands", "stage": 1, "clip": "take_hands", "dist": 0.66,
+		"told": "Lin Feng holds out both hands, low, and Yue Ling looks at them for a moment as a physician looks at a wrist. Then she puts hers in them.",
+		"lines": {"tender": ["Yours are warm and mine never are. I used to mind. I have decided it is a division of labour.", "There. Nobody is taking a pulse. It is only hands. I am still learning that there is such a thing as only."],
+			"playful": ["You have a callus where the broom went. I am keeping that one; the sword ones you may have back.", "Both of them? Greedy. And what am I to hold my needles with? ...No. Do not let go. I was only asking."],
+			"quiet": ["...Yes. Like that. You need not say what it is for.", "...I can feel you counting my fingers. There are still ten. There were ten yesterday."],
+			"": ["Oh. ...Well. They were not doing anything else.", "I am not sure what one does next. I do not think one does anything. I think this is the thing."]}},
+	"embrace": {"n": "Put your arms round her", "stage": 2, "clip": "embrace", "dist": 0.42,
+		"told": "He steps in and puts both arms round her, and she comes the rest of the way all at once, with her head turned so that her ear is against his chest.",
+		"lines": {"tender": ["I can hear it. Sixty-four to the minute, and one that comes late. I have known about the late one for years. I am not going to mend it. It is how I know it is you.", "Hold on properly. I was tied to a post once and I have never since minded being held by somebody who would let go if I asked. I am not asking."],
+			"playful": ["Oof. You have armour on, or you are made of it. ...Stay. I shall get used to the corners.", "This is how one carries a sack of rice. I have watched you carry sacks of rice. You were gentler with the rice. ...Better. Much better."],
+			"quiet": ["...", "...Do not talk. I am listening to something."],
+			"": ["...Oh. So that is what the others are always doing, in doorways. I had wondered what the use of it was.", "You may do that again whenever there is nobody about. Or when there is. I find I do not much mind."]}},
+	"brow": {"n": "Lay your brow to hers", "stage": 3, "clip": "brow_touch", "dist": 0.52,
+		"told": "They stand with their hands on each other's arms and their foreheads together, like two people reading one small letter, and for a while neither of them does anything else.",
+		"lines": {"tender": ["Mine. I am saying it to see how it sounds from this near. It sounds the same. Good.", "I was woven to open a door, and then to be put away. Nobody wrote what I should be for afterwards. This. I have decided it was this."],
+			"playful": ["Your nose is cold. I married a cold nose. Nobody warned me; it was not in any of the three bows.", "If you sneeze now I shall never forgive you. ...You are thinking about sneezing. I can feel you thinking it."],
+			"quiet": ["...", "...I know. Me also."],
+			"": ["Three bows, and then this, which nobody counts. I think I should have counted this one.", "There is nothing to say this near. That is the first restful thing I have learned about being married."]}},
+}
+const TOUCH_ORDER := ["hands", "embrace", "brow"]
+
+## Why `id` cannot be done now ("" if it can).
+static func touch_blocked(g, id: String) -> String:
+	if not g.companion:
+		return "She is not beside you."
+	if stage(g) < int(TOUCH[id].stage):
+		return "Not yet: that is for when the two of you are %s." % str(STAGES[int(TOUCH[id].stage)]).to_lower()
+	if matter(g) != "":
+		return "Something is the matter, and she has not said it yet. Ask her."
+	return ""
+
+## It is done: what is seen and what she says.  The first of a day brings the two a little closer.
+static func touch(g, id: String) -> Array:
+	if touch_blocked(g, id) != "":
+		return []
+	var t: Dictionary = TOUCH[id]
+	var n := int(g.romance.get("touches", 0))
+	g.romance["touches"] = n + 1
+	if int(g.romance.get("touch_day", -1)) != int(g.day):
+		g.romance["touch_day"] = int(g.day)
+		Bonds.add(g, 1, "a moment")
+	var ls: Array = t.lines.get(tone(g), t.lines[""])
+	return [["Narrator", str(t.told), "Lin Feng:" + str(t.clip)], ["Yue Ling", str(ls[n % ls.size()])]]
+
+# ---------------------------------------------------------------- feast days together
+## by the feast day's name (almanac.gd FESTIVALS); each option: [id, tone, what he does, what she says]
+const FEASTS := {
+	"the Lantern Festival": {"n": "The riddle on the lantern", "lines": [["Narrator", "The fifteenth of the first month, and a lantern over every door with a slip of paper hung from it. Yue Ling has stopped under a red one shaped like a carp and is reading the slip with her lips moving, and then reading it again."],
+			["Yue Ling", "'It goes with you everywhere and you have never once had to carry it.' I have been here some time. A child guessed it and went away laughing. Lin Feng, I am three hundred years old and I am being beaten by a carp."]],
+		"options": [["tender", "tender", "\"Your shadow. ...No. Mine. It is you.\"", "It is a shadow; the child said so. ...Oh. You did not mean the riddle. You meant... say that again, and slower, and I shall tell the carp it was right the first time."],
+			["playful", "playful", "\"A debt. I guessed it at once.\"", "It is not a debt, it is a SHADOW, and you knew, and you let me stand here. Buy me the lantern. I want the carp. I am going to hang it over your bed and it will look at you."],
+			["quiet", "quiet", "Step to where the lamp throws both your shadows on the wall as one.", "...Oh. There is only one of it. ...Do not move. I want to guess this one myself. I think I have. I shall not tell the carp."]]},
+	"the Night of Sevens": {"n": "The night the magpies are away", "lines": [["Narrator", "The seventh night of the seventh month. There is not a magpie to be seen anywhere, and everybody knows where they have gone. Yue Ling has set a bowl of water out under the sky and is trying, with great seriousness, to float a needle on it."],
+			["Yue Ling", "If it floats, a girl will be skilful with her hands; that is what they do tonight. I have set forty bones and I cannot float a needle. ...We mended that bridge, you and I. I think of them every year, getting one night. I never used to mind for them."]],
+		"options": [["tender", "tender", "\"Then mind for them. We have the other three hundred and fifty-nine.\"", "We do. I counted on the way here, in case you had not. ...It has floated. Look. I was not even trying; I was looking at you. Do not tell the Weaver that is how it is done."],
+			["playful", "playful", "Float the needle for her, first try, with a sweeper's hands.", "First try. With THOSE hands. You have had a broom in them and a sword and I have had a needle for three hundred years and... no. Show me. Put your hand under mine and show me, you smug creature."],
+			["quiet", "quiet", "Hold the lamp where the needle's shadow shows on the bottom of the bowl.", "...There. It floats, and its shadow is on the bottom, like a little boat seen from underneath. I should never have seen that. You always hold the light where I am not looking."]]},
+	"Mid-Autumn": {"n": "Who is at the table", "lines": [["Narrator", "The fifteenth of the eighth month, and the moon as round as it will be all year. People have carried their tables out of doors. Yue Ling has a mooncake cut in pieces on a leaf, and she is counting the pieces, and then counting something else."],
+			["Yue Ling", "Every mother in the land counts who is at the table tonight. I have never been counted. I was not at anybody's. ...I cut it in eight, out of habit of thinking there ought to be people. There are two of us. It is too many pieces."]],
+		"options": [["tender", "tender", "\"Then count. Start with me.\"", "One. ...It is a very short count, Lin Feng. One. I have said it twice now and it has not got any longer, and I find I do not want it to. Eat. You are having five of the eight. You are thin."],
+			["playful", "playful", "\"Eight is right. I am having seven.\"", "You are having four and the yolk is MINE, we settled that over the last one. ...Seven, you say. I was being sad, you know. You have quite spoiled it. Thank you."],
+			["quiet", "quiet", "Set two pieces aside on the leaf, for whoever is on the road.", "For whoever is on the road. ...That was us, every year but this. Somebody set a piece out for us and never knew our names. I shall do it every autumn now. You have made me a custom."]]},
+	"New Year's Eve": {"n": "The lamp left burning", "lines": [["Narrator", "The last night of the year. Every house has its lamp lit and means to keep it so until morning, and nobody in the land is supposed to sleep. Yue Ling has sat up very straight since the first watch, and has been asleep for some time."],
+			["Yue Ling", "I was not. I was resting my eyes for the year. ...Has it turned? I wanted to see it turn. I slept through three hundred of them by a pond, and I promised myself I should stay awake for every one after."]],
+		"options": [["tender", "tender", "\"It has not turned. I would have woken you.\"", "You would have. You were watching it for me. ...Is that what it is, to have somebody? One of you may shut their eyes. I did not know it was allowed. Wake me a breath before. I shall pretend I never slept."],
+			["playful", "playful", "\"It turned an hour ago. You snore.\"", "I do NOT, a lotus cannot snore, it is a matter of anatomy and I am the physician. ...It has not turned, has it. The lamp is not low enough. Liar. Sit here. If I go off again you are to pinch me. Not there."],
+			["quiet", "quiet", "Trim the lamp, and let her sleep against your shoulder till it turns.", "...It turned. I felt you breathe in. You let me sleep, and you kept the lamp, and you did not move your arm the whole night. It will have gone dead. Give it here. I know what to do with an arm."]]},
+}
+const FEAST_ORDER := ["the Lantern Festival", "the Night of Sevens", "Mid-Autumn", "New Year's Eve"]
+
+## The feast-day hour that can be had today ("" if it is no such day, it was had, or they are not yet courting).
+static func feast_today(g) -> String:
+	if not g.companion or stage(g) < 1 or matter(g) != "":
+		return ""
+	var f: Array = Almanac.festival(g)
+	if f.is_empty() or not FEASTS.has(str(f[2])) or (g.romance.get("feasts", {}) as Dictionary).has(str(f[2])):
+		return ""
+	return str(f[2])
+
+static func feasts_had(g) -> int:
+	return (g.romance.get("feasts", {}) as Dictionary).size()
+
+## It was had, and `oid` was what he did: her answer.
+static func take_feast(g, id: String, oid: String) -> Array:
+	if feast_today(g) != id:
+		return []
+	for o in FEASTS[id].options:
+		if str(o[0]) == oid:
+			if not g.romance.has("feasts"):
+				g.romance["feasts"] = {}
+			g.romance.feasts[id] = oid
+			_lean(g, str(o[1]))
+			Bonds.add(g, OUTING + 1, "a feast day together")
+			g.note("A feast day with Yue Ling: %s" % str(FEASTS[id].n).to_lower())
+			return [["Yue Ling", str(o[3])]]
+	return []
+
+# ---------------------------------------------------------------- what is the matter
+const MEND := 3
+## `n`: what it is; `said`: what she says when asked; `options`: [id, tone, what he answers, what she
+## says to that]; `mend`: what is said when the thing itself has been put right ("" if it cannot be).
+const MATTERS := {
+	"blood": {"n": "Somebody is dead by your hand",
+		"said": [["Narrator", "Yue Ling has been walking a pace further off than she does. When he asks, she stops, and takes a while to turn round."],
+			["Yue Ling", "I am a physician. All day I keep people in the world, one at a time, with needles. And you put one out of it, who was not fighting you. I have washed your sword since. I did not say anything. I am saying it now."]],
+		"options": [["tender", "tender", "\"I did it. I will not tell you it was needed.\"", "No. Do not. ...I shall not leave. I want that understood, because I thought about it for a night. But I am going to remember their name, Lin Feng, and on some days you will see me remembering it."],
+			["playful", "playful", "\"You have forgiven me worse.\"", "I have not. There is nothing worse; that is what makes it the thing it is. Do not be light with me about this. ...I know that you joke when you are ashamed. I know it. Be ashamed quietly for once."],
+			["quiet", "quiet", "Say nothing. Do not look away from her.", "...You are not going to explain. Good. I could not have borne an explanation. It is done, and I am here, and both of those are true at once. I do not know yet how. Walk beside me. Not so close."]],
+		"mend": []},
+	"price": {"n": "There is a price on your head",
+		"said": [["Narrator", "Yue Ling has taken down a notice from a gatepost and folded it into her sleeve. She brings it out again when he asks, and smooths it flat on her knee. It is a fair likeness."],
+			["Yue Ling", "They have drawn your ears too large. ...I patch up the watch, you know, when they come to the counter. Twice this month I have bound a man's arm and he has told me what he would do to whoever is on the bill. I said: hold still."]],
+		"options": [["tender", "tender", "\"I will go and answer for it.\"", "Then go soon. I do not mind being an outlaw's healer; I mind lying to a boy with a broken arm about who I am waiting for. Pay it, or stand in their circle, or whatever it is one does. I shall hold your coat."],
+			["playful", "playful", "\"The ears are a slander. I shall complain.\"", "Do. Go in at the front gate and complain about the ears, and while you are there you may settle the rest. ...I am laughing. I am also quite serious. I have found that I can do both; you taught me."],
+			["quiet", "quiet", "Take the notice from her, and fold it into your own sleeve.", "...Yes. You carry it. It is yours. I had been carrying it for a week, I find, and I am tired in the arm. Give it back to the gatepost when you have made it untrue."]],
+		"mend": [["Narrator", "There is a clean rectangle on the gatepost where a notice was. Yue Ling stops in front of it and looks for a little while at nothing, with evident satisfaction."],
+			["Yue Ling", "Gone. I bound a watchman's thumb this morning and he talked about the price of onions. Onions, Lin Feng. I have never been so glad of a dull conversation. Come here. You may have your ears back."]]},
+	"wild": {"n": "A country has been hunted bare",
+		"said": [["Narrator", "Yue Ling has stopped at the edge of the road and is listening. He listens too. There is the wind, and after it nothing: no bird, and nothing going away through the grass."],
+			["Yue Ling", "I gather here. I did. The plants I want grow where something has grazed, or dunged, or died of old age. Nothing does any of those now. It was not wicked, I know; it was one pack and then another. That is how I lose patients too."]],
+		"options": [["tender", "tender", "\"I will leave it alone until it comes back.\"", "It does come back. Slowly; by halves. I have seen a marsh do it. ...Thank you for not saying they were only beasts. I was only thread. I have a feeling for things that are only something."],
+			["playful", "playful", "\"I was thorough. It is a fault.\"", "It is your only fault and you have managed to empty a province with it. Be less thorough. Sweep round the edges for once and leave the middle. ...You cannot do it. I can see you cannot. Try."],
+			["quiet", "quiet", "Stand and listen with her until something, far off, calls once.", "...There. One. It is a long way off and it is by itself, but it is one. ...We shall come back in the spring and count again. Do not draw. Not here. Not for a while."]],
+		"mend": [["Narrator", "A hare goes across the road in front of them, in no particular hurry, and sits up in the grass on the far side to look. Yue Ling takes his sleeve and holds it tightly until the hare has finished."],
+			["Yue Ling", "It is fat. Did you see? It has been eating, and nothing has been eating it more than is right. They are back. I am going to gather here tomorrow, and you are going to carry the basket and not draw anything."]]},
+}
+const MATTER_ORDER := ["blood", "price", "wild"]
+
+## Whether the thing `id` is about is so, as the journey stands.
+static func matter_true(g, id: String) -> bool:
+	match id:
+		"blood":
+			return not g.slain.is_empty()
+		"price":
+			return Crime.heat(g) > 0
+		"wild":
+			return Wilds.count(g, 2) > 0
+	return false
+
+## What is the matter and has not been said ("" if nothing): the first such thing, once they are courting.
+static func matter(g) -> String:
+	if stage(g) < 1:
+		return ""
+	for id in MATTER_ORDER:
+		if matter_true(g, id) and not (g.romance.get("matters", {}) as Dictionary).has(id):
+			return id
+	return ""
+
+## She was asked and has said it (the conversation, before his answer).
+static func matter_said(id: String) -> Array:
+	return MATTERS[id].said
+
+## He answered `oid`: what she says to that.  It has been heard; it is not yet made up.
+static func hear(g, id: String, oid: String) -> Array:
+	if matter(g) != id:
+		return []
+	for o in MATTERS[id].options:
+		if str(o[0]) == oid:
+			if not g.romance.has("matters"):
+				g.romance["matters"] = {}
+			g.romance.matters[id] = "heard"
+			_lean(g, str(o[1]))
+			g.note("Heard Yue Ling out: %s" % str(MATTERS[id].n).to_lower())
+			return [["Yue Ling", str(o[3])]]
+	return []
+
+## Something heard whose cause has since been put right, and can be made up ("" if none).
+static func mend_ready(g) -> String:
+	for id in MATTER_ORDER:
+		if str((g.romance.get("matters", {}) as Dictionary).get(id, "")) == "heard" and not matter_true(g, id) and not (MATTERS[id].mend as Array).is_empty():
+			return id
+	return ""
+
+## It is made up: what is said, and the two are closer for it.
+static func mend(g, id: String) -> Array:
+	if mend_ready(g) != id:
+		return []
+	g.romance.matters[id] = "mended"
+	Bonds.add(g, MEND, "making it up")
+	g.note("Made it up with Yue Ling: %s" % str(MATTERS[id].n).to_lower())
+	return MATTERS[id].mend
+
+static func mended(g) -> int:
+	var n := 0
+	for id in (g.romance.get("matters", {}) as Dictionary):
+		if str(g.romance.matters[id]) == "mended":
+			n += 1
+	return n
+
+## What courting, being promised, and being wed give her in battle: somebody to come home to (her health).
 static func mod(g) -> float:
 	return 1.0 + 0.03 * float(stage(g))
 

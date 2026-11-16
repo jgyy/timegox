@@ -1353,10 +1353,16 @@ const CROSSROADS := {
 		],
 		"after": {
 			"grow": [["Narrator", "Yan Ying looks up at the great door for some time, as a man does who is working out a sum. Then he takes the brush from his sleeve and writes the answer across the foot of the sail, in characters a hand high, so that they will not have to stoop to read it."], ["Yan Ying", "Hills. Well. I have been the shortest man in every room for eighty years, child, and never once wished the others smaller. I shall tell the masons to cut the new gate so that I can walk under it without noticing. That is all a gate is for.", "nod"]],
-			"stay": [["Narrator", "Yan Ying writes it in a small hand, and then, having thought, writes it again twice the size. Far away on a beach a child who has woken a finger taller every month of her life wakes the height she went to bed, and lies still, not trusting it."], ["Yan Ying", "It is a good answer for the doors, and I know about doors. I notice it is the answer the doors would have given. They will have a roof by winter, every one. Somebody should tell them, some day, that they were asked, and by whom.", "think"]],
+			"stay": [["Narrator", "Yan Ying writes it in a small hand, and then, having thought, writes it again twice the size. Far away on a beach a child who has woken two fingers taller every month since the letting-go began wakes the height she went to bed, and lies still, not trusting it."], ["Yan Ying", "It is a good answer for the doors, and I know about doors. I notice it is the answer the doors would have given. They will have a roof by winter, every one. Somebody should tell them, some day, that they were asked, and by whom.", "think"]],
 			"each": [["Narrator", "Yan Ying laughs, a short dry sound, and has to sit down on the sill of the small door to do it. He writes the answer out and reads it over, and laughs again at a different place."], ["Yan Ying", "A town with two lintels over every door. The carpenters will hate you for a hundred years. I was asked once which door I would come in by, child; it was meant as an insult, and it is the only courtesy Chu ever paid me. Yes. Ask them.", "laugh"]],
 		},
 		"echo": {
+			# Part XXXII (the Broken Mirror release)
+			"s_p32_clerk": {
+				"grow": [["The Old Man under the Moon", "You are the one who told the Longbo to be hills. I have two of them in here, a hill and a hill, and the cord between them is the length of a valley. It took me a week. I do not complain. I only mention it."]],
+				"stay": [["The Old Man under the Moon", "You are the one who stopped the Longbo where they stood. It has saved me a deal of thread. I tied a boy of theirs last month to a girl of Landfall, and for once did not have to guess how far apart their feet would be."]],
+				"each": [["The Old Man under the Moon", "You are the one who had the Longbo asked, one at a time. Good. I have never been allowed to ask anybody anything. I should have liked, once, to say to a foot: and how tall do you mean to be, when I come to tie you?"]],
+			},
 			"s_p31_end": {
 				"grow": [["Elder Qing Xuan", "And I hear Landfall is raising its gate again, in stone, to a height the masons will not tell me. The reeve has written to ask who pays. I have written back that their grandmothers paid the first time, and it seems to have been worth it."]],
 				"stay": [["Elder Qing Xuan", "And I hear the people of Longbo have stopped growing, at your word, and have roofs. It is the answer I should have given. I find that does not altogether recommend it; I have noticed lately how many of my answers were the convenient height."]],
@@ -1367,6 +1373,37 @@ const CROSSROADS := {
 			"grow": "East of Landfall the people of Longbo are hills again, and walk out to the isles at low tide to mend what their ancestor broke. The town's gate has a second lintel far above the first. Ships steer by it.",
 			"stay": "The people of Longbo stand twice a man's height and no more, in houses of their own on the shore of Penglai, under lintels that fit. Their children are told of the hills as other children are told of dragons.",
 			"each": "At Landfall no two of the Longbo are the same height, and every door has two lintels. Travellers think it a town built by a drunkard. Those who live there cannot remember when they last had to stoop, or to shout up.",
+		}},
+	# Part XXXII (the Broken Mirror release): what is done with a thing that was broken, when both halves are found
+	"the_mirror": {"step": "s_p32_mirror", "part": "XXXII", "n": "The Two Halves",
+		"ask": "Xu Deyan and the Princess Lechang broke a mirror between them the night their kingdom fell, and swore to join it. Nine years on both halves lie on one cloth, and the worn edges no longer meet. Neither of them is who broke it. They have asked what is to be done with it, and will do the same with themselves.",
+		"options": [
+			{"id": "rivet", "label": "Rivet it. Let the join show", "tilt": {"heart": 3, "craft": -2}, "creed": {"virtue": 8}, "gain": {"renown": 6},
+				"desc": "Six bronze rivets across the break, as a bowl is mended, and the gap left a gap. It will show a face with a line through it, and it will be the same mirror. Let them go home together as they are, with the nine years plainly between them (renown).",
+				"log": "Told Xu Deyan and the Princess Lechang to rivet the mirror, and let the join show."},
+			{"id": "recast", "label": "Melt both halves. Cast it new", "tilt": {"craft": 3, "reach": 2}, "creed": {"rule": -8}, "gain": {"stones": 11000},
+				"desc": "The old mirror is gone and so are the two who broke it. Put both halves in one crucible and pour a new one: all the same bronze, and not one line of the old casting. Let them meet as strangers and see who they have become (spirit stones, from the founders of Tushan for the pattern).",
+				"log": "Told Xu Deyan and the Princess Lechang to melt the halves and cast a new mirror."},
+			{"id": "halves", "label": "Leave it in two, on one wall", "tilt": {"reach": -3, "heart": -2}, "creed": {"rule": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "It kept faith for nine years as two halves; that is what it is now. Hang them side by side on one wall, a hand apart, and force nothing shut. Let her keep the house she has made and him his road, and let them sit on either side of a table when they choose (the regard of the Rice Hearth).",
+				"log": "Told Xu Deyan and the Princess Lechang to leave the mirror in two, on one wall."},
+		],
+		"after": {
+			"rivet": [["Narrator", "Xu Deyan turns his half over twice and lays it down against hers, and for the first time looks straight at the gap. Across the court a woman in plum silk has begun to walk. She does not hurry. She has decided, and she wants it seen that she was not fetched."], ["Xu Deyan", "With the join showing. I should have liked it whole. I have been a fool about that for nine years; it is why I never looked in the right city. She will have a line through her face every morning, and so shall I. Well. We have earned it.", "bow"]],
+			"recast": [["Narrator", "He holds both halves a long time, as a man holds a letter he has been told to burn. Then he wraps them together in the blue cloth, birds inward. Across the court the Princess has heard, and has put her hand to her hair, as a woman does who is about to be introduced."], ["Xu Deyan", "New. Then I am to call on her, as a stranger, with a mirror neither of us has looked into. ...I do not know her favourite colour, sir. I knew a girl's. I find I am frightened. It is the first thing I have felt in nine years that was not about the past.", "think"]],
+			"halves": [["Narrator", "He nods slowly, and gives her half back into her own hands across the cloth; and she, after a moment, holds out hers for his, so that each goes away with the other's. It was not what either came for. Both of them stand a good deal straighter."], ["Xu Deyan", "On one wall, a hand apart. She says she will come on the fifteenth of each month and we shall drink tea beneath them, and that I am not to write a poem about it. I had begun one. She knows me, you see. That much did not break.", "laugh"]],
+		},
+		"echo": {
+			"s_p32_end": {
+				"rivet": [["Elder Qing Xuan", "And I hear a mirror was riveted at Guanghan and carried home between two people, with the join showing. Cook Zhou will be unbearable. He has said for forty years that the mended bowl is the one you are careful of."]],
+				"recast": [["Elder Qing Xuan", "And I hear two halves went into one crucible, and that a gentleman of Chen has been seen buying a comb for a lady he says he has only just met. It is extravagant. I find that I approve. One may be too faithful to a shape."]],
+				"halves": [["Elder Qing Xuan", "And I hear the halves hang on one wall, a hand apart, and that two people drink tea under them on the fifteenth. I had thought there were only two answers to that question, child. I have been wrong about the number of answers before."]],
+			},
+		},
+		"end": {
+			"rivet": "In a small house south of the river hangs a bronze mirror with six rivets across it. The two who look into it each morning have a line through their faces, and have stopped seeing it. Their children think all mirrors are made so.",
+			"recast": "A mirror was cast at Tushan from two old halves, with a new pair of birds on the back. The gentleman and the lady who own it were married in the spring, for what each of them insists was the first time.",
+			"halves": "Two halves of a mirror hang a hand apart on a wall in the capital. On the fifteenth of every month a lady's carriage stops at the door, and two people drink tea under them, and are easier together than most who share a roof.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1555,7 +1592,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel"]
+	"the_verdict", "the_lintel", "the_mirror"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

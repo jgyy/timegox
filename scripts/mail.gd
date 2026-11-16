@@ -93,7 +93,7 @@ const LETTERS := {
 		"lines": ["Child, I heard forty cases this month, each of them twice, under his name. I was wrong in three on the first hearing. Three. In nineteen years before it I was never wrong once, as far as I knew. I enclose a month of the salary I do not share. Spend it on somebody."],
 		"gift": {"stones": 340}},
 	"verdict_field": {"from": "Widow Sang", "needs": ["the_verdict", "field"], "wait": 3,
-		"lines": ["To the cultivator: the old man you sent has hoed the south rows crooked and the north rows straight, so he can be taught. He asked me whether I wished to appeal against him. I said I wished him to mind the weeds. I do not know what he was before. He is a poor farmer, and he does not stop."]},
+		"lines": ["To the cultivator: the old man you sent has hoed the south rows crooked and the north rows straight, so he can be taught. He asked me whether I wished to appeal against him. I said I wished him to mind the weeds. I do not ask what he was before. He is a poor farmer, and he does not stop."]},
 	"fowler_net": {"from": "The Fowler of the Four Nets", "after": "s_p30_net", "wait": 4,
 		"lines": ["Cultivator, I cannot write, a pedlar is writing this. One net, the west side. Eleven birds this month where I used to take sixty, and I counted three cranes that walked round it and looked at me. My mother says her father hung his so. She had not told me. I am sending a peach."]},
 	# ---- Part XXXI (the Tall People release): letters from a mason, a giant, a very small minister, and a mother in the north
@@ -204,13 +204,23 @@ const LETTERS := {
 		"lines": ["So you sat in it. I did not think you would. I am living in the gatehouse; nobody has told me to go. They kneel to you as they knelt to me, to the same depth. I used to think that depth was respect. Come up some time, Patriarch, and stand where I stood, and tell me what you think it is."]},
 	"seat_serve": {"from": "Auntie Zhou", "needs": ["the_seat", "serve"], "wait": 3,
 		"lines": ["Eleven of yours came up the steps this spring with their bedding. I asked each of them had they eaten, and every one said yes, Auntie, the steward saw to it. So I fed them again. The Elder goes and reads the roster where their names are. He does not think I see him."]},
+	# ---- Part XXXII (the Broken Mirror release): letters from a husband, a wife, a great lord's steward, and a girl on a bridge
+	"mirror_rivet": {"from": "Princess Lechang", "needs": ["the_mirror", "rivet"], "wait": 3,
+		"lines": ["Cultivator: it hangs by the door. I look older in it than he remembers and he looks thinner than I do. We quarrelled yesterday about how rice is washed. It was a very small quarrel and we both stopped in the middle, astonished. Nine years, and here we were, about rice."]},
+	"mirror_recast": {"from": "Xu Deyan", "needs": ["the_mirror", "recast"], "wait": 3,
+		"lines": ["Sir: I have learned that she takes her tea without ginger, rides better than I do, and thinks my verses too clever by a line. None of it was true of the girl. I enclose what a tutor can spare. I am to call again on Thursday. I have been told to bring nothing I wrote."],
+		"gift": {"stones": 340}},
+	"mirror_halves": {"from": "Princess Lechang", "needs": ["the_mirror", "halves"], "wait": 3,
+		"lines": ["Cultivator: we drank tea on the fifteenth under the two halves. He did not write a poem. I could see it cost him. The lord of my house asked on my return whether I had been happy, and I said yes, and he said good, and meant it. I had not known a life could have this much room in it."]},
+	"bridge_girl": {"from": "A Girl of Lu", "after": "s_p32_flood", "wait": 4,
+		"lines": ["To the one who cleared the river. He came up onto the bridge wet through and asked my name. It is Jing. We had spoken four times and he had never asked. I told him that next time under the bridge is flooded he is to look up. He has written it on his hand."]},
 }
 const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_mend", "bandits_drive", "garden_study", "garden_burn", "egg_hatch", "egg_sell",
 	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "yue_write", "yue_say",
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

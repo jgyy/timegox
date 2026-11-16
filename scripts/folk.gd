@@ -1132,6 +1132,12 @@ const ERRANDS := {
 			"Which door? The east gate of Landfall, the year my grandmother was a girl. They had raised it the winter before and not told her why. She walked under it and stopped, and walked back, and walked under it again. I will tell them that.",
 			"They are sitting with their knees drawn in. I know that sitting. I did it for a year in a house in Yanggu before the landlord had the beam moved. Nobody should sit like that. I am going down now; hold my basket.",
 			"I shall tell them what nobody told us: that you must say how high. People will build what they are used to and call it a welcome. You have to stand in the doorway and say: here. To here. I will show them with my hand."]},
+	# Part XXXII (the Broken Mirror release): what fifty years at one table is made of, asked of the old people of Qingshi
+	"s_p32_old": {"ask": "The Old Man under the Moon ties the cord and has never seen what is done with it afterwards. You have sat at one table with one person for fifty years. What is it made of?", "price": 0, "town": "qingshi", "toast": "%s has said what it is made of",
+		"lines": ["Made of? Hm. Who has the wall side of the quilt. I had it thirty years and then my hip went, and now it is the other way about. Nobody said anything. One night the pillow was simply on the other side.",
+			"Whoever is up first lights the fire. That is all of it. Some years it was me and some it was not, and there was a winter neither of us would, and we sat in the cold being right. Then somebody got up. I forget who. That is the point of it.",
+			"Do not tell the old man, but it is mostly not minding. The snoring. The way the chopsticks are put down. You would think love was a great wind. It is more like a roof: you only notice it the day it is not there.",
+			"We did not speak for the whole of one harvest. I cannot tell you now what it was about. The rice came in all the same, the two of us at either end of the field, and at the end of it we were standing next to each other. That is what it is made of. The field."]},
 	# Part XXVIII (the Answering Land release): who ties the grass, asked of the hunters; and the hollow stems, of the woodcutters
 	"s_p28_hunters": {"ask": "You are out in the valley before light. Have you seen who walks the general's field at night with his hands in the grass?", "price": 0, "toast": "%s has seen the old man in the field",
 		"lines": ["An old one. Bent. He comes with the dew and goes with it, and he bows to the general's tent before he starts. I took him for a herb-gatherer the first night. Herb-gatherers do not tie what they find.",
@@ -1444,6 +1450,8 @@ const POSTS := {
 	# Part XXXI (the Tall People release)
 	"fangfeng": ["gaze|count|trace", "", "doze"], "kuafu": ["gaze|stretch|gather", "", "doze"], "longbo_angler": ["sew|fish|gaze", "", "doze"],
 	"zheng_buyer": ["count|peer|trace", "", "doze"], "yan_ying": ["gaze|read|write", "", "meditate"],
+	# Part XXXII (the Broken Mirror release)
+	"yue_lao": ["read|write|count", "", "stargaze"], "weisheng": ["gaze|touch|count", "", "doze"], "meng_jiang": ["sew|gaze|pray", "", "doze"], "xu_deyan": ["gaze|read|write", "", "doze"], "lechang": ["gaze|comb|write", "", "doze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }
 

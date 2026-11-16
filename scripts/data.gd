@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 108
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike"]
+const MAX_LEVEL := 111
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -94,6 +94,7 @@ const REALM_INFO := [
 	# Part XXX (the Open Net release): what is left when he could take everything, and does not
 	{"life": 0, "title": "Who Left Three Sides Open", "note": "A fowler hung his nets on four sides and prayed for everything under heaven. A lord took three of them down. A judge heard wrongly, and bound his own hands. A man who wrote the law was turned from a door by it. You could empty a country now, or a street. Nothing in the land could stop you. That is why it has to be you who does."},
 	{"life": 0, "title": "Under Whose Lintel Everybody Walks", "note": "A giant was cut down for coming late and nobody asked what kept him. Another ran after the sun and dropped a forest. A people was made small and never told how small. A man trusted a measure over his own foot. A door is cut for whoever comes. You are the measure of nothing now, and that is the use of you."},
+	{"life": 0, "title": "In One Piece, with the Joins Showing", "note": "Two graves were dug apart and the roots went under the ditch. A man kept an hour and forgot who it was for. A wall was reckoned in yards, and fell to a name. A mirror came back that no longer fitted. What is parted is not put back as it was. You are whole, and it is not the same as never having been broken."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -967,6 +968,22 @@ const ENEMIES := {
 	"kuafu_west": {"n": "Kuafu, Looking West", "elem": "fire", "weak": "water", "col": Color("b8862e"), "shape": "person:kuafu", "boss": true, "giant": true},
 	"the_decree": {"n": "The Decree with No Measure in It", "elem": "dark", "weak": "thunder", "col": Color("d8c060"), "shape": "tome", "boss": true, "pal": {"sec": Color("8a7430"), "acc": Color("1a1a20")}},
 	"the_shoe": {"n": "The Shoe That Cuts the Foot", "elem": "earth", "weak": "wood", "col": Color("5a3a26"), "shape": "mantis", "boss": true, "pal": {"sec": Color("2e1e14"), "acc": Color("d8d8e0")}},
+	# ---- Part XXXII: The Broken Mirror (the Broken Mirror release): what was parted, and by what
+	"snapped_thread": {"n": "Thread Cut Short", "elem": "fire", "weak": "water", "col": Color("c02828"), "shape": "serpent", "pal": {"sec": Color("5a1414"), "acc": Color("f0d8a0")}},
+	"kings_seal": {"n": "Seal of King Kang", "elem": "earth", "weak": "wood", "col": Color("8a2a22"), "shape": "golem", "pal": {"sec": Color("4a1612"), "acc": Color("e8c860")}},
+	"torn_sleeve": {"n": "Sleeve That Tore in the Hand", "elem": "wood", "weak": "fire", "col": Color("c8b8c8"), "shape": "wraith", "pal": {"sec": Color("6a5a70"), "acc": Color("c02828")}},
+	"rising_water": {"n": "Water to the Knee", "elem": "water", "weak": "earth", "col": Color("4a7a8a"), "shape": "blob", "pal": {"sec": Color("2a4a58"), "acc": Color("c8e0e0")}},
+	"held_pillar": {"n": "Pillar Somebody Held", "elem": "wood", "weak": "fire", "col": Color("6a5440"), "shape": "golem", "pal": {"sec": Color("3a2e24"), "acc": Color("8ab0b8")}},
+	"plank_step": {"n": "Footstep on the Planks Above", "elem": "thunder", "weak": "earth", "col": Color("b8a888"), "shape": "wisp", "pal": {"sec": Color("6a5a48"), "acc": Color("f0e8d0")}},
+	"named_brick": {"n": "Brick with a Name Under It", "elem": "earth", "weak": "wood", "col": Color("7a7468"), "shape": "golem", "pal": {"sec": Color("4a463e"), "acc": Color("c8c0a8")}},
+	"overseer_lash": {"n": "Overseer's Lash", "elem": "dark", "weak": "fire", "col": Color("3a2a22"), "shape": "serpent", "pal": {"sec": Color("1e1612"), "acc": Color("c8322a")}},
+	"tally_bone": {"n": "Tally Cut on a Bone", "elem": "dark", "weak": "thunder", "col": Color("d8d0b8"), "shape": "tome", "pal": {"sec": Color("8a8470"), "acc": Color("3a3a44")}},
+	"mirror_shard": {"n": "Shard with Half a Face in It", "elem": "thunder", "weak": "earth", "col": Color("a8b8b0"), "shape": "mantis", "pal": {"sec": Color("5a6a64"), "acc": Color("e8f0f0")}},
+	"market_cry": {"n": "Price Nobody Would Pay", "elem": "wood", "weak": "fire", "col": Color("b89a50"), "shape": "tome", "pal": {"sec": Color("6a5a2e"), "acc": Color("c8322a")}},
+	"empty_moon": {"n": "Moon with Nobody in It", "elem": "water", "weak": "wood", "col": Color("d8e0f0"), "shape": "wisp", "bright": true, "pal": {"sec": Color("9aa8c8"), "acc": Color("ffffff")}},
+	"two_graves": {"n": "The Two Graves Kept Apart", "elem": "earth", "weak": "wood", "col": Color("5a5a4a"), "shape": "warden", "boss": true, "pal": {"sec": Color("2e2e26"), "acc": Color("c02828")}},
+	"the_flood": {"n": "The Water That Kept the Hour", "elem": "water", "weak": "earth", "col": Color("3a6a7a"), "shape": "serpent", "boss": true, "pal": {"sec": Color("1e3a44"), "acc": Color("d8e8e8")}},
+	"the_wall": {"n": "The Wall Counted in Men", "elem": "earth", "weak": "wood", "col": Color("6a665c"), "shape": "golem", "boss": true, "pal": {"sec": Color("3a3832"), "acc": Color("d8d0b8")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
 	"watch_spear": {"n": "Spearman of the Watch", "elem": "phys", "weak": "thunder", "col": Color("5a6a7a"), "shape": "humanoid", "pal": {"sec": Color("2e3640"), "acc": Color("c8a050")}},
@@ -1007,6 +1024,11 @@ static func make_enemy(id: String, lv: int, boss_mult: float = 1.0, atk_mult: fl
 		# (a trial's boss hits harder too: trials.gd `might`)
 		a *= 1.3 * atk_mult
 		df *= 1.1
+	else:
+		# (the Broken Mirror release: a foe that is not a lord was made to a measure too, the gaunt survivor of a
+		# hunted-out country, the Hunger, the League's enforcers, and it used to be dropped here)
+		hp = int(hp * boss_mult)
+		a *= atk_mult
 	return {
 		"id": id, "name": d.n, "side": "foe", "lv": lv, "boss": boss,
 		"hp": hp, "maxhp": hp, "qi": 0, "maxqi": 0, "atk": a, "def": df,
@@ -2317,15 +2339,27 @@ const AREAS := {
 			{"to": "starferry", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "starpalace", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_mg_marshal"},
 		],
-		"npcs": [{"id": "que_lao", "n": "Que Lao, the Old Magpie", "pos": Vector2i(10, 26), "col": Color("3a4a7a"), "vis": ["s_mg_intro", ""]}],
+		"npcs": [{"id": "que_lao", "n": "Que Lao, the Old Magpie", "pos": Vector2i(10, 26), "col": Color("3a4a7a"), "vis": ["s_mg_intro", ""]},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "weisheng", "n": "Weisheng", "pos": Vector2i.ZERO, "col": Color("3e5660"), "asset": "weisheng", "vis": ["s_p32_home", ""], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "cloud_ape_king", "pos": Vector2i(30, 40), "lv": 36, "req": 36},
 			{"id": "storm_magpie", "pos": Vector2i(46, 16), "lv": 37, "req": 37},
 			{"id": "pier_golem", "pos": Vector2i(60, 40), "lv": 37, "req": 37},
 			{"id": "crow_marshal", "pos": Vector2i(86, 28), "lv": 37, "req": 37},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "the_flood", "pos": Vector2i.ZERO, "lv": 110, "req": 109, "vis": ["s_p32_tide", ""], "late": true, "peak": 0, "stand": "top"},
 		],
-		"pickups": [{"id": "plume1", "item": "magpie_plume", "pos": Vector2i(22, 12)}, {"id": "plume2", "item": "magpie_plume", "pos": Vector2i(40, 46)}, {"id": "plume3", "item": "magpie_plume", "pos": Vector2i(64, 30)}, {"id": "plume4", "item": "magpie_plume", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "plume1", "item": "magpie_plume", "pos": Vector2i(22, 12)}, {"id": "plume2", "item": "magpie_plume", "pos": Vector2i(40, 46)}, {"id": "plume3", "item": "magpie_plume", "pos": Vector2i(64, 30)}, {"id": "plume4", "item": "magpie_plume", "pos": Vector2i(76, 10)},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "p32_hour1", "item": "hour_stone", "pos": Vector2i.ZERO, "vis": ["s_p32_water", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p32_hour2", "item": "hour_stone", "pos": Vector2i.ZERO, "vis": ["s_p32_water", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p32_hour3", "item": "hour_stone", "pos": Vector2i.ZERO, "vis": ["s_p32_water", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p32_hour4", "item": "hour_stone", "pos": Vector2i.ZERO, "vis": ["s_p32_water", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_mg_collect",
+		"warband5": {"pool": [["rising_water", 109, 109], ["held_pillar", 109, 109], ["plank_step", 109, 109]], "n": 14, "vis": "s_p32_bridge", "late": true},
 	},
 	"starpalace": {
 		"n": "Palace of the Weaver Star", "w": 96, "h": 58, "seed": 331, "theme": "starpalace", "enemies": 20,
@@ -2334,19 +2368,31 @@ const AREAS := {
 			{"to": "magpie", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "jasper", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_wv_warden"},
 		],
-		"npcs": [{"id": "zhi_nu", "n": "Zhi Nu, the Weaver Star", "pos": Vector2i(9, 25), "col": Color("c8d0ff"), "vis": ["s_wv_intro", ""]}],
+		"npcs": [{"id": "zhi_nu", "n": "Zhi Nu, the Weaver Star", "pos": Vector2i(9, 25), "col": Color("c8d0ff"), "vis": ["s_wv_intro", ""]},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "yue_lao", "n": "The Old Man under the Moon", "pos": Vector2i.ZERO, "col": Color("d8dce8"), "asset": "yue_lao", "vis": ["s_p32_home", ""], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "seven_star_moth", "pos": Vector2i(30, 40), "lv": 37, "req": 37},
 			{"id": "weaving_frame", "pos": Vector2i(46, 16), "lv": 37, "req": 37},
 			{"id": "hall_qilin", "pos": Vector2i(60, 40), "lv": 37, "req": 37},
 			{"id": "river_warden", "pos": Vector2i(86, 28), "lv": 38, "req": 38},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "two_graves", "pos": Vector2i.ZERO, "lv": 109, "req": 108, "vis": ["s_p32_old", ""], "late": true, "peak": 0, "stand": "top"},
 		],
-		"pickups": [{"id": "sthr1", "item": "star_thread", "pos": Vector2i(22, 12)}, {"id": "sthr2", "item": "star_thread", "pos": Vector2i(40, 46)}, {"id": "sthr3", "item": "star_thread", "pos": Vector2i(64, 30)}, {"id": "sthr4", "item": "star_thread", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "sthr1", "item": "star_thread", "pos": Vector2i(22, 12)}, {"id": "sthr2", "item": "star_thread", "pos": Vector2i(40, 46)}, {"id": "sthr3", "item": "star_thread", "pos": Vector2i(64, 30)}, {"id": "sthr4", "item": "star_thread", "pos": Vector2i(76, 10)},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "p32_cord1", "item": "red_cord", "pos": Vector2i.ZERO, "vis": ["s_p32_knots", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p32_cord2", "item": "red_cord", "pos": Vector2i.ZERO, "vis": ["s_p32_knots", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p32_cord3", "item": "red_cord", "pos": Vector2i.ZERO, "vis": ["s_p32_knots", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p32_cord4", "item": "red_cord", "pos": Vector2i.ZERO, "vis": ["s_p32_knots", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_wv_collect",
 		"buildings": [
 			{"id": "weaving_hall", "n": "Hall of the Cloud Loom", "style": "house", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
 				"props": [["loom", Vector2i(7, 23), true], ["loom", Vector2i(7, 27), true], ["shelf", Vector2i(12, 23), true], ["lantern", Vector2i(12, 27), false]]},
 		],
+		"warband5": {"pool": [["snapped_thread", 108, 108], ["kings_seal", 108, 108], ["torn_sleeve", 108, 108]], "n": 14, "vis": "s_p32_clerk", "late": true},
 	},
 	"jasper": {
 		"n": "The Jasper Pool of Kunlun", "w": 96, "h": 58, "seed": 341, "theme": "jasper", "enemies": 20,
@@ -2535,14 +2581,24 @@ const AREAS := {
 		"portals": [
 			{"to": "fusang", "pos": Vector2i(1, 28), "dest": Vector2i(82, 30), "open": ""},
 		],
-		"npcs": [{"id": "chang_e", "n": "Chang'e of the Moon Palace", "pos": Vector2i(13, 23), "col": Color("e8eeff"), "vis": ["s_gh_intro", ""]}],
+		"npcs": [{"id": "chang_e", "n": "Chang'e of the Moon Palace", "pos": Vector2i(13, 23), "col": Color("e8eeff"), "vis": ["s_gh_intro", ""]},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "xu_deyan", "n": "Xu Deyan", "pos": Vector2i.ZERO, "col": Color("5c6672"), "asset": "xu_deyan", "vis": ["s_p32_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "lechang", "n": "Princess Lechang", "pos": Vector2i.ZERO, "col": Color("6a3a58"), "asset": "lechang", "vis": ["s_p32_home", ""], "late": true, "peak": 1, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "wu_gang", "pos": Vector2i(30, 12), "lv": 41, "req": 41},
 			{"id": "tiangou", "pos": Vector2i(42, 46), "lv": 41, "req": 41},
 			{"id": "mortar_rabbit", "pos": Vector2i(64, 20), "lv": 41, "req": 41},
 			{"id": "xihe", "pos": Vector2i(84, 30), "lv": 41, "req": 41},
 		],
-		"pickups": [{"id": "osman1", "item": "osmanthus", "pos": Vector2i(18, 44)}, {"id": "osman2", "item": "osmanthus", "pos": Vector2i(38, 30)}, {"id": "osman3", "item": "osmanthus", "pos": Vector2i(54, 8)}, {"id": "osman4", "item": "osmanthus", "pos": Vector2i(72, 44)}],
+		"pickups": [{"id": "osman1", "item": "osmanthus", "pos": Vector2i(18, 44)}, {"id": "osman2", "item": "osmanthus", "pos": Vector2i(38, 30)}, {"id": "osman3", "item": "osmanthus", "pos": Vector2i(54, 8)}, {"id": "osman4", "item": "osmanthus", "pos": Vector2i(72, 44)},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "p32_sliver1", "item": "bronze_sliver", "pos": Vector2i.ZERO, "vis": ["s_p32_shards", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p32_sliver2", "item": "bronze_sliver", "pos": Vector2i.ZERO, "vis": ["s_p32_shards", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p32_sliver3", "item": "bronze_sliver", "pos": Vector2i.ZERO, "vis": ["s_p32_shards", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p32_sliver4", "item": "bronze_sliver", "pos": Vector2i.ZERO, "vis": ["s_p32_shards", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_gh_collect",
 		"springs": [Vector2i(50, 32)],
 		# the moonstone causeway up to the palace hall
@@ -2551,6 +2607,7 @@ const AREAS := {
 			{"id": "change_pavilion", "n": "Pavilion of Vast Cold", "style": "library", "rect": Rect2i(9, 19, 9, 8), "door": Vector2i(13, 26),
 				"props": [["shelf", Vector2i(10, 20), true], ["table", Vector2i(16, 20), true], ["cushion", Vector2i(13, 21), false], ["herbs", Vector2i(10, 24), false], ["lantern", Vector2i(16, 24), false]]},
 		],
+		"warband5": {"pool": [["mirror_shard", 110, 110], ["market_cry", 110, 110], ["empty_moon", 110, 110]], "n": 14, "vis": "s_p32_market", "late": true},
 	},
 	# ---- Part X: The Nine Cauldrons
 	# a ferry town on the river below the Dragon Gate, where the golden carp leap to become dragons
@@ -2966,6 +3023,8 @@ const AREAS := {
 			{"id": "zhi_ma", "n": "Zhi Ma the Paper-Horse Maker", "pos": Vector2i(43, 20), "col": Color("f0f0f0"), "race": "shade"},
 			{"id": "shade_lan", "n": "Little Lan, Who Lost Her Way", "pos": Vector2i(47, 30), "col": Color("c8d8e8"), "race": "shade"},
 			{"id": "houtu", "n": "Houtu, Sovereign Earth", "pos": Vector2i(36, 43), "col": Color("8a6a3a"), "floor": ["earth_palace", -1]},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "meng_jiang", "n": "Meng Jiang", "pos": Vector2i.ZERO, "col": Color("d8d0bc"), "asset": "meng_jiang", "race": "human", "vis": ["s_p32_home", ""], "late": true, "peak": 0, "stand": "foot"},
 		],
 		"bosses": [
 			{"id": "bai_wuchang", "pos": Vector2i(60, 12), "lv": 47, "req": 47},
@@ -2974,13 +3033,21 @@ const AREAS := {
 			{"id": "li", "pos": Vector2i(90, 32), "lv": 47, "req": 47},
 			# Part XIII: a General of the Eight Gates
 			{"id": "bronze_brothers", "pos": Vector2i(55, 53), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "the_wall", "pos": Vector2i.ZERO, "lv": 111, "req": 110, "vis": ["s_p32_cairn", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
 		"warband": {"pool": [["bronze_brow", 51, 52], ["jiuli_warrior", 51, 52], ["banner_ember", 51, 52]], "n": 6, "vis": "s_p13_home"},
 		"pickups": [{"id": "stally1", "item": "soul_tally", "pos": Vector2i(14, 12)}, {"id": "stally2", "item": "soul_tally", "pos": Vector2i(20, 54)}, {"id": "stally3", "item": "soul_tally", "pos": Vector2i(64, 22)}, {"id": "stally4", "item": "soul_tally", "pos": Vector2i(86, 50)},
 			{"id": "cur_incense2", "item": "ancestor_incense", "pos": Vector2i(40, 21), "floor": ["paper_shop", -1], "always": true},
 			{"id": "cur_leaf2", "item": "autumn_leaf", "pos": Vector2i(58, 40), "floor": ["ghost_inn", 1], "always": true},
-			{"id": "cache_yd1", "item": "stones", "n": 3200, "pos": Vector2i(32, 40), "floor": ["earth_palace", -1], "always": true}],
+			{"id": "cache_yd1", "item": "stones", "n": 3200, "pos": Vector2i(32, 40), "floor": ["earth_palace", -1], "always": true},
+			# Part XXXII (the Broken Mirror release)
+			{"id": "p32_tally1", "item": "wall_tally", "pos": Vector2i.ZERO, "vis": ["s_p32_bricks", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p32_tally2", "item": "wall_tally", "pos": Vector2i.ZERO, "vis": ["s_p32_bricks", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p32_tally3", "item": "wall_tally", "pos": Vector2i.ZERO, "vis": ["s_p32_bricks", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p32_tally4", "item": "wall_tally", "pos": Vector2i.ZERO, "vis": ["s_p32_bricks", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_yd_collect",
 		"springs": [Vector2i(16, 44)],
 		"steles": [Vector2i(46, 34)],
@@ -3002,6 +3069,7 @@ const AREAS := {
 				"props": [["table", Vector2i(52, 40), true], ["stool", Vector2i(53, 40), false], ["counter", Vector2i(56, 42), true], ["lantern", Vector2i(52, 42), false]],
 				"up": Vector2i(57, 40), "upper": {"n": "the lodgings for wandering shades", "props": [["bed", Vector2i(51, 40), true], ["bed", Vector2i(51, 42), true], ["bed", Vector2i(57, 42), true], ["lantern", Vector2i(54, 41), false]]}},
 		],
+		"warband5": {"pool": [["named_brick", 110, 110], ["overseer_lash", 110, 110], ["tally_bone", 110, 110]], "n": 14, "vis": "s_p32_wall", "late": true},
 	},
 	# ---- Part XII: The Returning Ruins.  A fourth realm (atlas.gd STRATA "sea"): the Isles of the
 	# Eastern Sea, out past the edge of the shelf where the sea still is, running east like a river
@@ -4465,7 +4533,7 @@ const STEPS := [
 		"t": "\"Before you judge where a man sits, see whether you can tell where a jar goes.\" Put 3 houses of Yanggu, the Dawn Market, to rights"},
 	{"id": "s_p29_look", "kind": "kill", "boss": "hua_xin", "area": "court", "t": "\"If I am not to sit there, show me why not.\" He is waiting on the height: go up to Hua Xin, Who Went to Look", "stones": 61800},
 	{"id": "s_p29_mat", "kind": "talk", "npc": "guan_ning", "area": "court", "t": "Guan Ning has a knife in his hand and the mat across his knees, and he has not cut yet. He is asking you: go back to Guan Ning", "stones": 62000},
-	{"id": "s_p29_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The broom is back behind the door, bristles up. Tell Elder Qing Xuan where things go", "stones": 62400},
+	{"id": "s_p29_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The broom is beside the store, bristles up. Tell Elder Qing Xuan where things go", "stones": 62400},
 	{"id": "s_break34", "kind": "breakthrough", "to": 102, "t": "A bent chimney, the day of the year, and one side of a mat: Everything in Its Place"},
 	# ---- Part XXX: The Net with Three Sides Open (the Open Net release): what somebody does who could take everything.
 	# A fowler and a lord, a judge who bound his own hands, a lawgiver at an inn door, and a man who finds what he buries
@@ -4547,7 +4615,7 @@ const STEPS := [
 	{"id": "s_p31_beds", "kind": "hunt", "area": "buzhou", "n": 30, "of": ["dry_bed", "long_shadow"], "race": "daren",
 		"t": "The beds he drank are waiting to see whether he is coming back for the rest. Clear 30 more dry beds and the shadows lying in them", "stones": 68400},
 	{"id": "s_p31_woodmen", "kind": "folk", "role": "woodcutter", "n": 2, "area": "mountain", "race": "daren",
-		"t": "\"A thousand li of peach wood, and I never looked round.\" Ask 2 woodcutters of the camps what a long night wants with a forest"},
+		"t": "\"A thousand li of peach wood behind him, and he has never looked round.\" Ask 2 woodcutters of the camps what a long night wants with a forest"},
 	{"id": "s_p31_sun", "kind": "kill", "boss": "kuafu_west", "area": "buzhou", "race": "daren", "t": "The sun is low and he has his staff across his shoulders: go up to Kuafu, Looking West, and stand in his way", "stones": 68600},
 	{"id": "s_p31_shore", "kind": "talk", "npc": "longbo_angler", "area": "penglai", "race": "daren",
 		"t": "Three ships have come in to Landfall riding low, and their people sit on the shingle. Find the Giant of Longbo below the first height of Penglai", "stones": 68800},
@@ -4576,6 +4644,40 @@ const STEPS := [
 	{"id": "s_p31_lintel", "kind": "talk", "npc": "yan_ying", "area": "loom", "race": "daren", "t": "A letter has come from Landfall on a sheet the size of a sail, and the old man is walking along the lines to read it: go back to Yan Ying", "stones": 70400},
 	{"id": "s_p31_end", "kind": "talk", "npc": "elder", "area": "sect", "race": "daren", "t": "Carpenter Gu has sent something up the mountain that would not go through the gate. Tell Elder Qing Xuan who the door is for", "stones": 70800},
 	{"id": "s_break36", "kind": "breakthrough", "to": 108, "t": "The foot is not cut to the shoe, nor the door to the smaller guest: Great and Small Alike"},
+	# ---- Part XXXII: The Broken Mirror (the Broken Mirror release): what is parted, and what is done with it when it is found.
+	{"id": "s_p32_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "A pedlar has come up the nine hundred and ninety-nine steps crying half a bronze mirror at a price nobody would pay. Speak to Elder Qing Xuan", "stones": 71000},
+	{"id": "s_p32_clerk", "kind": "talk", "npc": "yue_lao", "area": "starpalace", "t": "At the Palace of the Weaver Star somebody is reading by moonlight on a step, with a bag of red thread. Find the Old Man under the Moon below the first height", "stones": 71200},
+	{"id": "s_p32_knots", "kind": "hunt", "area": "starpalace", "n": 34, "of": ["snapped_thread", "kings_seal", "torn_sleeve"], "t": "\"Something has been at my knots.\" Clear 34 threads cut short, seals of King Kang and sleeves that tore in the hand", "stones": 71400},
+	{"id": "s_p32_threads", "kind": "collect", "item": "red_cord", "n": 4, "area": "starpalace", "t": "Four cords were tied and then pulled out of the book by a king. Find 4 red cords on the heights, each with a knot still in it"},
+	{"id": "s_p32_terrace", "kind": "summit", "peak": "starpalace", "k": 1, "area": "starpalace", "t": "Climb the second height of the Weaver Star's palace, which is the terrace she leapt from, and look at where the two graves were dug"},
+	{"id": "s_p32_sleeves", "kind": "hunt", "area": "starpalace", "n": 30, "of": ["torn_sleeve", "kings_seal"], "t": "They caught her by the sleeve, and the sleeve came away. Clear 30 more torn sleeves and the seals that ordered them", "stones": 71600},
+	{"id": "s_p32_old", "kind": "folk", "role": "elder", "town": "qingshi", "n": 2, "area": "village", "t": "\"I tie the knot. I have never once seen what is done with it.\" Ask 2 of the old people of Qingshi what fifty years at one table is made of"},
+	{"id": "s_p32_graves", "kind": "kill", "boss": "two_graves", "area": "starpalace", "t": "A king buried them in sight of each other and said: join if you can. Go up to the Two Graves Kept Apart", "stones": 71800},
+	{"id": "s_p32_bridge", "kind": "talk", "npc": "weisheng", "area": "magpie", "t": "Under the Magpie Bridge a young man is standing in the dry bed with his arms round a pillar. Find Weisheng below the first height", "stones": 72000},
+	{"id": "s_p32_water", "kind": "hunt", "area": "magpie", "n": 34, "of": ["rising_water", "held_pillar", "plank_step"], "t": "\"She said under the bridge. I am under the bridge.\" Clear 34 waters to the knee, pillars somebody held and footsteps on the planks above", "stones": 72200},
+	{"id": "s_p32_marks", "kind": "collect", "item": "hour_stone", "n": 4, "area": "magpie", "t": "He scratched a stone for every hour he waited and laid them where the water could not move them. Find 4 hour-stones on the heights"},
+	{"id": "s_p32_span", "kind": "summit", "peak": "magpie", "k": 1, "area": "magpie", "t": "Climb the second height of the Magpie Bridge and look down at the planks he was standing under"},
+	{"id": "s_p32_down", "kind": "glide", "n": 10, "area": "magpie", "t": "Go where the water went, and where anybody looking for a drowned man would go. One flight of 10 tiles under the cloud-kite (V, from a height)"},
+	{"id": "s_p32_tide", "kind": "hunt", "area": "magpie", "n": 30, "of": ["rising_water", "plank_step"], "t": "The footsteps overhead come and go and the water answers each of them. Clear 30 more of both", "stones": 72400},
+	{"id": "s_p32_flood", "kind": "kill", "boss": "the_flood", "area": "magpie", "t": "It came at the hour she was to come, and it has been punctual ever since: go up to the Water That Kept the Hour", "stones": 72600},
+	{"id": "s_p32_wall", "kind": "talk", "npc": "meng_jiang", "area": "youdu", "t": "In Youdu a woman of the living is going from office to office with a bundle of winter clothes. Find Meng Jiang below the first height of the Dark Capital", "stones": 72800},
+	{"id": "s_p32_bricks", "kind": "hunt", "area": "youdu", "n": 34, "of": ["named_brick", "overseer_lash", "tally_bone"], "t": "\"He is under it. They will not say which yard of it.\" Clear 34 bricks with a name under them, overseers' lashes and tallies cut on bone", "stones": 73000},
+	{"id": "s_p32_tallies", "kind": "collect", "item": "wall_tally", "n": 4, "area": "youdu", "t": "Every man sent to the wall wore a slip of wood with his village on it. Find 4 wall-tallies on the heights of the Dark Capital"},
+	{"id": "s_p32_roll", "kind": "talk", "npc": "roll_clerk_ning", "area": "youdu", "t": "Every death in the world is entered at Youdu. Ask Roll-Clerk Ning for the name of Fan Xiliang, of Meng Jiang's village", "stones": 73200},
+	{"id": "s_p32_rampart", "kind": "summit", "peak": "youdu", "k": 1, "area": "youdu", "t": "Climb the second height of the Dark Capital, which is a stretch of the wall itself, and count how it was reckoned"},
+	{"id": "s_p32_lashes", "kind": "hunt", "area": "youdu", "n": 30, "of": ["overseer_lash", "named_brick"], "t": "The overseers kept the count, and the count was in yards. Clear 30 more lashes and the bricks they laid", "stones": 73400},
+	{"id": "s_p32_quarry", "kind": "toil", "work": "quarry", "n": 3, "area": "youdu", "t": "\"If he may not have a line in a book he shall have a stone.\" Cut 3 blocks of the dark rock of Youdu (face a crag or a cave wall, press C)"},
+	{"id": "s_p32_cairn", "kind": "haul", "good": "stone_block", "n": 4, "npc": "meng_jiang", "area": "youdu", "t": "Carry 4 loads of stone to Meng Jiang, who is building something the height of a man where the wall can see it"},
+	{"id": "s_p32_weep", "kind": "kill", "boss": "the_wall", "area": "youdu", "t": "It was reckoned in yards, and the men went in as rubble: go up to the Wall Counted in Men", "stones": 73600},
+	{"id": "s_p32_market", "kind": "talk", "npc": "xu_deyan", "area": "guanghan", "t": "On the fifteenth of the first month, below the first height of the Moon Palace, a thin man is holding half a mirror up to the moon. Find Xu Deyan", "stones": 73800},
+	{"id": "s_p32_shards", "kind": "hunt", "area": "guanghan", "n": 34, "of": ["mirror_shard", "market_cry", "empty_moon"], "t": "\"The mirror came back. She has not.\" Clear 34 shards with half a face in them, prices nobody would pay and moons with nobody in them", "stones": 74000},
+	{"id": "s_p32_slivers", "kind": "collect", "item": "bronze_sliver", "n": 4, "area": "guanghan", "t": "A mirror broken in haste does not break clean. Find 4 slivers of bronze on the heights, from between the two halves"},
+	{"id": "s_p32_seen", "kind": "marks", "n": 3, "new": true, "area": "guanghan", "t": "\"Nine years. What have you parted, cultivator, and what have you joined?\" Go and look at 3 more things your own answers left standing"},
+	{"id": "s_p32_cries", "kind": "hunt", "area": "guanghan", "n": 30, "of": ["market_cry", "mirror_shard"], "t": "The price was never meant to be paid. It was meant to be heard. Clear 30 more cries and the shards they were crying", "stones": 74200},
+	{"id": "s_p32_lady", "kind": "talk", "npc": "lechang", "area": "guanghan", "t": "Below the second height a woman in the silk of somebody else's house is waiting with the other half. Speak to Princess Lechang", "stones": 74400},
+	{"id": "s_p32_mirror", "kind": "talk", "npc": "xu_deyan", "area": "guanghan", "t": "Both halves are on one cloth, and the edges no longer meet as they did. Go back to Xu Deyan, who has asked what is to be done with them", "stones": 74600},
+	{"id": "s_p32_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The pedlar has gone down the mountain with nothing to cry. Tell Elder Qing Xuan what a thing is worth once it has been broken", "stones": 75000},
+	{"id": "s_break37", "kind": "breakthrough", "to": 111, "t": "What was parted is not put back as it was; it is put back as it is: Parted and Whole"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -4824,6 +4926,11 @@ const ITEMS := {
 	"oracle_shell": {"n": "Oracle Shell", "desc": "A plate of turtle-shell the size of a door, scorched with a hot iron and cracked across. The crack has been read and the reading cut beside it in an old woman's hand: it was hunger; ask again. One of the six that held up two islands"},
 	"foot_cord": {"n": "Measuring Cord", "desc": "A cord knotted at the length of somebody's foot, taken once on a cold morning and trusted ever since. No two are the same. One of them has been cut shorter and tied again, twice, by somebody trying to be reasonable"},
 	"lintel_peg": {"n": "Lintel Peg", "desc": "An oak peg as long as a forearm, the kind that pins a raised lintel to its posts. One of the Great People keeps the peg of the first door they did not have to stoop under, and will tell you whose house it was"},
+	# Part XXXII (the Broken Mirror release)
+	"red_cord": {"n": "Red Cord", "desc": "A cord of red silk a span long with a knot in the middle of it that was tied to hold. Somebody pulled it out of a book by one end, and the knot is as it was. The Old Man under the Moon says he has never once had to tie the same one twice"},
+	"hour_stone": {"n": "Hour-Stone", "desc": "A flat river stone with a line scratched across it by another stone. There is one for every hour somebody waited under a bridge, laid in a row above where the water reached. The last of them is scratched very deep"},
+	"wall_tally": {"n": "Wall-Tally", "desc": "A slip of elm wood with a hole for a cord and a village cut into it with a knife. Every man sent to the wall wore one, so that he could be counted going. Nobody collected them at the other end"},
+	"bronze_sliver": {"n": "Sliver of Bronze", "desc": "A sliver of old bronze the length of a finger-joint, bright on one edge. When a mirror is broken across in a hurry, this is what falls between the halves. Neither of the two who kept a half has ever missed it"},
 	"house_broom": {"n": "House Broom", "desc": "A broom of sorghum straw. Upright, bristles up, out of sight beside the store. Never by the altar, the bed or the stove. He has known this since he was thirteen"},
 	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
@@ -5062,6 +5169,27 @@ const CHAT := {
 		"My wife says I am the only man in Zheng who has to go home to find out whether he is hungry.",
 		"I measured the door of my house once. It was the right height. I have not looked at it since; why would I?",
 		"The shoe-seller knows me. He shuts when he sees me coming, and opens again behind me. I have seen him do it."],
+	# Part XXXII (the Broken Mirror release)
+	"yue_lao": ["I am the clerk. People will have it that I choose. I read what is written and I tie what I read; it is a great deal of knots.",
+		"A young man once sent his servant to stab the child I told him he would marry. She was three. He married her fourteen years after, scar and all. The cord does not mind.",
+		"It is tied to the foot. Everybody supposes the finger. If it were the finger you would all have noticed by now.",
+		"Your healer asked whether she is in the book. I said that I do not read out of it. She said that was an answer. It was not; but she is very quick."],
+	"weisheng": ["I gave my word. I should like that understood before anybody tells me about the water.",
+		"It is not cold. It was cold for the first part. After that it was only the thing that was happening.",
+		"Her name? I... we had spoken four times. I knew the hour, and I knew the place. I was very sure of both.",
+		"Master Zhuang put me in a list with a man who starved on a mountain for his principles. He meant it unkindly. I have read it since. It is quite fair."],
+	"meng_jiang": ["Quilted, with the floss of our own worms. I cut it large across the shoulder; they said the work would broaden him.",
+		"I walked from the first frost to the last. Do not ask me how far it is. It is as far as that.",
+		"They told me at the foot of the wall as you would tell a carter his load was not wanted. He is under it, they said. Which of it? Under it.",
+		"I am not dead. The clerks here keep saying so, as if it were a difficulty. I have told them it is no trouble of theirs; I shall not be staying."],
+	"xu_deyan": ["I was tutor to the heir of a kingdom, and then there was no kingdom. One finds one can live on very little. I had not known.",
+		"We broke it over the edge of the well on the last night, with the fire already on the south wall. She held it. I struck. It is the only blow I ever gave anything.",
+		"Every year an old man cried half a mirror in the market at ten times the price of a whole one, and was laughed at. Eight years I was in the wrong city.",
+		"I wrote four lines on her half and sent it back. I have been ashamed of the third line ever since. One should not be clever on such a day."],
+	"lechang": ["He is a soldier and a great lord, the man whose house this silk is from. He has not been unkind. I should like that said by somebody, and it had better be me.",
+		"I sent the mirror to market by an old servant, and named a price to make people laugh. Only one man in the world would not laugh.",
+		"Nine years. I was nineteen when the city fell. I do not know what he has been keeping, all this while; but she was nineteen.",
+		"Today, what a day: the new lord opposite the old. I dared neither laugh nor cry. I made four lines of it, afterwards. It is easier to be a poem than a person."],
 	"yan_ying": ["I wore one fox robe for thirty years. A minister who changes his coat every season has stopped looking at what he is minister of.",
 		"In Chu they asked whether Qi had no men, that it sent me. I said: Qi sends a worthy man to a worthy king, and the other sort to the other. So I was sent here.",
 		"My coachman was a tall fellow, and very pleased with it. His wife watched him drive me through the gate, and that evening asked for a divorce. He was better afterwards.",
@@ -9390,7 +9518,7 @@ const DIALOGUE := {
 	],
 	"done:s_p25_marks": [
 		["Feng Xuan", "Three burrows. The goodwill of a town that knows what you did about its debts. A gate, and a word over it about who may come in. And a seat. My lord slept without a care after the third. I notice you do not sleep well. Good. A lord who sleeps well is being robbed by somebody; often it is by himself.", "nod"],
-		["Yue Ling", "You have never once called Lin Feng a lord before today."],
+		["Yue Ling", "You said 'the lord' at the gate and enjoyed it. You did not mean it until today."],
 		["Feng Xuan", "Lin Feng was not one before today. There were things built. Today they were gone round and looked at again. That is the whole of the difference, and I have waited forty years to keep the books of somebody who knew it."],
 	],
 	"s_p25_end": [
@@ -9462,7 +9590,7 @@ const DIALOGUE := {
 	],
 	"s_p27_snow": [
 		["Narrator", "The first snow has come and gone in a night. The yard below the heights is mud to the ankle, and across it, from the gate to the study door, runs a dry yellow path a pace wide. Tao Kan is standing on it. It is sawdust."],
-		["Tao Kan, Who Carries Bricks", "Every clerk in the yamen laughed when I had it stored. Now they walk on it to their desks with dry feet and say nothing. And the butt-ends of the bamboo: there is a fleet building on the river, and they are short of nails. A bamboo butt, cut so, is a nail.", "laugh"],
+		["Tao Kan, Who Carries Bricks", "Every clerk in the yamen laughed when I had it stored. Now they walk on it to their desks with dry feet and say nothing. And the butt-ends of the bamboo: your pedlars have them at the river by now, in a fleet that was short of nails. A bamboo butt, cut so, is a nail.", "laugh"],
 		["Lin Feng", "You did not know that when you kept them."],
 		["Tao Kan, Who Carries Bricks", "I knew that a thing has weight, and that whatever has weight has a use, and that whoever has never carried it will not find the use. That is all I have ever known. It has been enough for a province.", "nod"],
 		["Tao Kan, Who Carries Bricks", "You want charcoal for your mountain. There is one man burning it for a hundred li, on the south slope of the volcano, and he is old, and nobody helps him because nobody walks there. Go and be of use. Take your axe.", "point"],
@@ -9794,6 +9922,170 @@ const DIALOGUE := {
 	"post:s_break36": [
 		["Narrator", "The tribulation comes down the size of the sky, and he does not make himself large to meet it, nor small to let it by. He stays the size he is. It turns out there is exactly room. When it has passed, the lower lintel is lying on the ground in two pieces, and nobody touched it."],
 	],
+	# ---- Part XXXII: The Broken Mirror (the Broken Mirror release)
+	"recall30": [
+		["Narrator", "The winter after the two lintels, a pedlar came up the mountain on the fourteenth of the first month with something wrapped in a blue cloth, and cried it in the court at a price that made the gate disciples laugh. Lin Feng did not laugh. The thing was half a mirror, and the pedlar did not seem to want it sold."],
+	],
+	"s_p32_home": [
+		["Narrator", "The pedlar has been given tea and has not drunk it. On the Elder's table, on its blue cloth, lies half a round mirror of old bronze, broken straight across. The back is cast with a pair of birds. There is one bird, and the tail of the other."],
+		["Elder Qing Xuan", "He asks ten times the price of a whole one, and looks relieved when he is refused. It is an old signal, child. Two people parted in a hurry break a thing between them, and one cries it at market until the other hears. This half has been cried nine years.", "think"],
+		["Lin Feng", "Then somebody has the other half, and is in the wrong market. Who keeps count of such things?"],
+		["Elder Qing Xuan", "There is a clerk. He sits at the Weaver Star's palace by moonlight with a book and a bag of red thread, and will tell you he only ties what he reads. Ask him who is in his book and not at one table. I hear his knots have begun to come undone.", "point"],
+		["Yue Ling", "The Old Man under the Moon. I should like to meet him, Lin Feng. I was woven, not born. I have always wondered whether he had to write me in afterwards, in the margin."],
+	],
+	"s_p32_clerk": [
+		["Narrator", "Below the first height, on a step that belongs to nothing, a very old man is reading a book by the light of a moon that is not up. A cloth bag beside him is full of red thread. He marks his place with a finger before he looks up, and he does not look up for long."],
+		["The Old Man under the Moon", "The sweeper. And the lotus. No, I shall not say; do not ask me with your eyebrows. Sit. I have a complaint, and nobody to make it to. I tie two feet together. That is the whole of my office. What they walk into afterwards was never written in here."],
+		["Lin Feng", "A man is crying half a mirror in the wrong market. A king buried two people in sight of each other. Are those your knots?"],
+		["The Old Man under the Moon", "Every one of them held. That is what I mind. The cord held, and they were taken apart all the same, by a wall and a flood and a king and a war. Begin with the king. His seals are up on the height, cutting. Clear me those, and bring back what they pulled out.", "point"],
+	],
+	"done:s_p32_knots": [
+		["Narrator", "The last seal cracks across its own characters. Each of them said the same thing in the same square hand: by order. Where they stood the red threads lie on the rock, cut short, and every one of them is cut at the same place: a hand's breadth from the knot, on the side the king could reach."],
+		["Yue Ling", "He could not undo the knot. Look, Lin Feng. He could only cut her off on one side of it. It is still tied to something."],
+	],
+	"done:s_p32_threads": [
+		["Narrator", "Four cords of red silk, each a span long, each with its knot. Whoever pulled them from the book pulled hard, and the silk has stretched thin on either side. The knots have not moved. The old man tied them to hold, and they are doing it with nothing left to hold."],
+	],
+	"done:s_p32_terrace": [
+		["Narrator", "The second height is a terrace with a rail. Below it, a long way down, are two mounds a stone's throw apart with a ditch dug straight between them, and from each mound a tree has come up. They are catalpas. Both lean, and they lean the same way: towards the ditch."],
+		["Yue Ling", "She let her clothes rot first, so that they would tear when they caught her. That is a physician's sort of plan. I do not know whether I am proud of her. I am afraid I am."],
+	],
+	"done:s_p32_sleeves": [
+		["Narrator", "The sleeves go out like breath on glass. In the last of them there was a slip of silk sewn into the hem, and it does not go out. It is in a woman's hand, and it asks only one thing, of a king, politely: that her bones be put with Han Ping's."],
+	],
+	"done:s_p32_old": [
+		["Narrator", "Two of the old people of Qingshi have said what fifty years at one table is made of. Neither of them mentioned a thread. One spoke for some time about a quilt, and who has the wall side of it. The other said: you get up first, or she does, and whoever it is lights the fire."],
+		["Yue Ling", "He ties it to the foot, Lin Feng, and then for fifty years it is the feet that do everything. Getting up. Going for the water. I do not think the old man has ever looked down."],
+	],
+	"pre:two_graves": [
+		["Narrator", "On the first height the king's word is standing where he left it. It has the shape of a ditch stood on end, with a mound at either hand and a seal for a face; and it paces, exactly, the ground between two graves, from the one to the other and back, so that nothing shall cross."],
+		["The Old Man under the Moon", "He said: you loved each other so; make the graves join, and I shall not stand in your way. Then he set that in the way. It is a king's joke, and it has been kept up for two thousand years by something that has no idea it was one.", "think"],
+	],
+	"post:two_graves": [
+		["Narrator", "It stops pacing. There was never any need to break it: the ground it walked on has come up under its feet, lifted by roots as thick as a man's waist that crossed beneath it long ago. Overhead the two catalpas have met. On the bough where they join, a pair of mandarin ducks have their necks laid one across the other."],
+		["The Old Man under the Moon", "Under the ground. All the time it was pacing the top. Well. I tie a foot to a foot, sweeper, and I have always thought it a poor place for a knot; and there they are, joined at the root. Perhaps whoever wrote the book knew where things grow from.", "laugh"],
+	],
+	"s_p32_bridge": [
+		["Narrator", "The river under the Magpie Bridge is a bed of dry stones. Below the first height, in the middle of it, a young man stands with both arms round a pillar of the bridge and his cheek against the wood. His robe is dark with water to the chest. Nothing else there is wet."],
+		["Weisheng", "Do not tell me to let go. Everybody tells me. I said the hour of the dog, under the bridge, and she said yes. It is the hour of the dog. This is under the bridge. I do not see what is hard to follow."],
+		["Lin Feng", "The water came, and she did not. You could have gone up the bank."],
+		["Weisheng", "Then I should have been on the bank, and my word was for under the bridge. ...There are steps on the planks, sometimes. Over my head. They stop, and then the water comes up again and I cannot hear. Clear it off me. I should like to know whose they are.", "refuse"],
+	],
+	"done:s_p32_water": [
+		["Narrator", "The water goes down a hand at a time, and under it the stones are dry at once, as if it had only been remembered there. Overhead, in the quiet, something light crosses the planks from the north side to the middle, and stands. A little dust comes down between the boards onto his hair."],
+		["Yue Ling", "Those are a girl's steps, Lin Feng. She is not heavy and she is not hurrying. She has come to the middle of the bridge and stopped. Why does he not look up?"],
+	],
+	"done:s_p32_marks": [
+		["Narrator", "Four flat stones, each scratched across once with another stone, an hour apart. He laid them in a row above the water as it rose, and moved the row up. The scratch on the fourth goes nearly through. After the fourth he needed both arms."],
+	],
+	"done:s_p32_span": [
+		["Narrator", "From the second height the whole bridge can be seen from above, as nobody under it has ever seen it. The planks are grey with weather. In the middle of the span, in the dust, are the prints of two small feet set side by side, and they are worn into the wood as a doorstep is worn."],
+		["Yue Ling", "She came. She came every time. Under the bridge was under water, so she stood on it, where a person with any sense would look. And he was a yard below her with his face against a post."],
+	],
+	"done:s_p32_down": [
+		["Narrator", "He comes down the wind ten tiles along the dry bed, the way a flood goes, and lands where a river would leave what it carried. There are prints here too, the same small feet, going along the bank and stopping at every bend, as somebody goes who is looking for a thing she does not want to find."],
+		["Yue Ling", "She went down the river looking for him, and he had not moved. He kept the appointment, Lin Feng. It was her he did not keep."],
+	],
+	"done:s_p32_tide": [
+		["Narrator", "The steps overhead stop when the water stops. For as long as it takes to draw a breath nothing moves under the bridge or on it. The young man has lifted his cheek from the post. He has not let go; but he is listening upward, which he had not done before."],
+	],
+	"pre:the_flood": [
+		["Narrator", "On the first height the water is standing up. It has the length of a river and the patience of one, and it comes on at the pace of a clock, neither fast nor slow; and it carries in the front of it, like a lantern, the hour of the dog on one particular evening. It has never been late."],
+		["Weisheng", "That is the hour. I have kept it every night since; I thought that was faithfulness. It is the water that keeps it. I have only been standing where it comes. ...If I let go to look up, cultivator, I shall have broken my word. Shall I not?", "think"],
+	],
+	"post:the_flood": [
+		["Narrator", "The water lies down in its bed and is a stream a child could cross. The hour goes out of it. Weisheng takes his arms from the pillar, slowly, as a man does who has slept on them; and then, because there is nothing left to hold, he looks up between the planks. Somebody is looking down."],
+		["Weisheng", "You are on the bridge. ...I said under. You have been... every time? I never once... I am very wet. I am sorry. I kept the hour and the place and I forgot there was to be a person at them. May I come up? I should like to ask your name again.", "kneel"],
+	],
+	"s_p32_wall": [
+		["Narrator", "Below the first height of the Dark Capital a woman of the living is sitting on the step of a shut office, in undyed hemp, with road-dust to the knee. She has a bundle of quilted clothes in her lap and both hands on it. The clerks of the dead go round her, and lower their lamps as they pass."],
+		["Meng Jiang", "You are alive as well. Good; you will not tell me to come back when I am entitled. My husband was taken for the wall in the autumn. I made him winter clothes and walked them north. At the wall they said: he is under it. So I have come where the dead are written, to find which yard."],
+		["Lin Feng", "Every death is entered here. What do the clerks say?"],
+		["Meng Jiang", "That he is not in the book. Not dead, they say, and are pleased for me! He is under a wall. ...There are things up on the height with whips, still counting. They will not let a clerk near the bricks. Clear them, and I will ask again. I can wait. I have had practice.", "grieve"],
+	],
+	"done:s_p32_bricks": [
+		["Narrator", "The bricks come apart along their courses and lie where they fall. Each has a hollow pressed in its underside the shape of a slip of wood, and in some of the hollows the wood is still there. The lashes kept no names. They kept a tally of yards finished, cut on a bone, and it is exact."],
+		["Yue Ling", "They counted what they built, Lin Feng. They did not count what they built it with."],
+	],
+	"done:s_p32_tallies": [
+		["Narrator", "Four slips of elm, each with a hole for a cord and a village cut in it. One says: Meng's Ford. It has been worn smooth along one edge by a thumb, in the way of a thing somebody turned over and over on a long march, and it is a good deal lighter than the others."],
+	],
+	"s_p32_roll": [
+		["Narrator", "Roll-Clerk Ning has the book of that year open before Lin Feng has finished the name. He runs a grey finger down a column, and down the next. Then he turns back a page and does it again, which nobody has ever seen him need to do."],
+		["Roll-Clerk Ning", "Fan Xiliang, of Meng's Ford. He is not entered. I have every man who died at the wall of cold, of flux, of a fall, of the lash: forty thousand and some. Each was reported, by an overseer, on a form. Nobody reported the ones who went into the footings.", "think"],
+		["Lin Feng", "They were alive when they went in. Then they are dead, and you have no line for them. What were they written down as?"],
+		["Roll-Clerk Ning", "I have found it. It is not in my book; it is in the quartermaster's. Rubble, so many loads. He was entered as material, sir. I cannot write a death against a load of rubble. I should need somebody to say they were men. In writing. The wall has never said so.", "grieve"],
+	],
+	"done:s_p32_rampart": [
+		["Narrator", "The second height is a stretch of the wall itself, and from the top of it the rest can be seen going away over the dark country in both directions. Along the parapet, every ten paces, a number is cut: the yards, running. There is no other mark on it anywhere, from one end of the world to the other."],
+		["Yue Ling", "Eight hundred li, and every yard of it numbered, and not one name. Lin Feng, I think that is why it is so long. It has never had to stop and read anything."],
+	],
+	"done:s_p32_lashes": [
+		["Narrator", "The last lash unravels into the hemp it was plaited from. Under the place where the overseers stood there is a pit of slips: elm, each with its hole and its village, thousands deep. They were taken off the men at the footings, so that the count going in should not be confused with the count coming out."],
+	],
+	"done:s_p32_quarry": [
+		["Narrator", "Three blocks of the dark rock of Youdu, split along the grain. It is the same stone as the wall's. It cuts cleanly and it takes an edge, and a letter cut in it will last as long as a yard-mark will. Nobody had tried."],
+	],
+	"haul:s_p32_cairn": [
+		["Meng Jiang", "Set it there, on the last. No higher than he stood; I want to be able to reach the top. I cut the quilting large in the shoulder. I shall cut his name large as well, and then he will have had two things that fitted him."],
+	],
+	"done:s_p32_cairn": [
+		["Narrator", "It stands the height of a man, in sight of the wall, four courses of dark stone laid dry. She has cut three characters in the face of it with the point of a sickle. The winter clothes are folded on the top, with a stone on them against the wind."],
+		["Meng Jiang", "Fan Xiliang. There. It is the only thing within eight hundred li that says a man was here. Now let the wall look at it. ...I have not wept yet, cultivator. I have been saving it. I was told it would be wanted.", "kneel"],
+	],
+	"pre:the_wall": [
+		["Narrator", "On the first height the wall has got up to see what has been built in front of it. It is wall all through: courses for ribs, a parapet for a brow, and a yard-number cut where a man would have a name. It has a count, and it is satisfied with its count, and it leans over the small stone to read it."],
+		["Meng Jiang", "That is what he is under. It does not know it has him. Do you see? It is not cruel. Nobody ever told it they were men. ...Stand away from me a little. I am going to tell it.", "grieve"],
+	],
+	"post:the_wall": [
+		["Narrator", "She weeps, and it is not loud. The wall hears it as a mason hears water behind a face of stone. A crack runs along the lowest course, and the next; and then eight hundred li of it sits down, yard by yard, like a row of men told at last that they may. Where it stood there are slips of elm, as far as can be seen."],
+		["Roll-Clerk Ning", "I have brought the book. If the lady will read me the villages I will enter them tonight, all of them, and the wall may be the form. Fan Xiliang, of Meng's Ford. There. He is dead, madam. I am very sorry. It is the first true thing this office has told you.", "bow"],
+	],
+	"s_p32_market": [
+		["Narrator", "It is the fifteenth of the first month, and on the moon the lanterns are round. Below the first height of Guanghan a thin man in a scholar's robe gone grey at the seams is holding half a bronze mirror up against the full moon, turning it until the broken edge lies across the bright face."],
+		["Xu Deyan", "You have the other. No, do not unwrap it; I know that cloth. Nine years I have gone to market on this night and listened for a fool's price. The mirror has come back, sir. It is she who has not. There is nobody in the moon tonight; only the light it had left over."],
+		["Lin Feng", "She sent it. Whoever sends a thing means to be found. Where is she?"],
+		["Xu Deyan", "In a great lord's house, in his silk. Why would she come away to a man who owns half a mirror? ...Something has been crying her half at the foot of these heights, in my voice, at a price to keep her off. I never set that price. Silence it, and I shall know what I am worth.", "grieve"],
+	],
+	"done:s_p32_shards": [
+		["Narrator", "The shards go dark one by one. Each had half a face in it, and it was not always the same half: here a man of thirty with ink on his cuff, here a girl of nineteen with a city burning behind her. Not one of them showed anybody as they stand tonight. The mirror had kept the last evening and nothing since."],
+		["Yue Ling", "He has been looking for her in that for nine years, Lin Feng. And she in hers for him. Each of them has been faithful to somebody who is not there any longer."],
+	],
+	"done:s_p32_slivers": [
+		["Narrator", "Four slivers of bronze, each the length of a finger-joint, bright along one edge. They fell between the halves on the night it was broken, over the rim of a well, and nobody stooped for them. Lay the two halves together now and there will be a gap along the join the width of these."],
+	],
+	"done:s_p32_seen": [
+		["Narrator", "Three things that stand because of what he said. One of them joined what had been two. One parted them. The third he looks at for some time, and cannot say which it did; the people who live beside it have stopped asking, and hang their washing on it."],
+		["Yue Ling", "You are counting, Lin Feng. Stop. They are not a sum. Each of them was one day, and you were whoever you were that day."],
+	],
+	"done:s_p32_cries": [
+		["Narrator", "The last cry stops in the middle of its price. It was a good imitation of a tired man's voice, and it had been naming a sum no woman could send for, year after year, so that she should not have to be seen refusing. He had not set it. He had only thought it, every Lantern Festival, on the way home."],
+	],
+	"s_p32_lady": [
+		["Narrator", "Below the second height a woman is standing very straight in plum silk that was chosen by somebody else. Her hair is up as a married woman's. She has the other half of the mirror in both hands, face upward, and is looking into it as into a well that she has been told is dry."],
+		["Princess Lechang", "He has seen it, then. And he wrote me four lines on it before he would see me, because he is a man who would. I had them by heart in an hour. The lord of my house read them over my shoulder. He said: go and look at him. He did not say come back, and he did not say do not."],
+		["Lin Feng", "Your husband thinks you would not leave a great house for half a mirror."],
+		["Princess Lechang", "My husband! Which? ...I was nineteen. I am not what he kept, cultivator; and whoever he is now I have not met. We swore to join it. We did not swear it would fit. Take him my half, and put the two on one cloth, and tell me whether the edges still meet.", "think"],
+	],
+	"s_p32_mirror": [
+		["Narrator", "The two halves lie on the blue cloth under the moon. Each bird on the back has its mate again. But nine years in two different sleeves have worn the broken edges, and four slivers were lost at the well: along the join there is a gap that a fingernail goes into. It will never again be one mirror by itself."],
+		["Xu Deyan", "It does not meet. I had thought, all this time... no matter what I thought. She is over there and will not come nearer until it is decided; she says she has been decided for often enough. So we have agreed on the one thing, and it is to ask you.", "think"],
+		["Lin Feng", "It is your mirror. And hers."],
+		["Xu Deyan", "It is two halves of a mirror, sir, and we are two halves of a marriage, and neither of us is the shape we were broken at. You have joined things and parted them the length of the land. Tell us what is done with this. We shall do the same with ourselves."],
+	],
+	"s_p32_end": [
+		["Narrator", "The pedlar has gone down the mountain with an empty blue cloth and a great deal to tell. On the Elder's table there is a ring in the dust where a half-circle lay for a week. He has not let anybody wipe it."],
+		["Elder Qing Xuan", "Sweeper Bai has been asking the kitchen whether a bowl that has been riveted is still the same bowl. The cooks are divided. Cook Zhou says it is a better bowl, because now somebody has minded about it. I have not been asked. I have a view.", "think"],
+		["Lin Feng", "A king put a ditch between two graves and the roots went under it. A man kept an hour and forgot who it was for. A wall was counted in yards. And a mirror came back that did not fit. Elder, none of them was parted by not loving enough."],
+		["Elder Qing Xuan", "No. They were parted by things that could count: a seal, a clock, a tally, a price. And none of those could tell you what it had divided. Go and sit, child. You are in one piece. It is rarer than you suppose; and it is not the same as never having been broken.", "bow"],
+		["Yue Ling", "I asked the old man at last whether I am in his book. He said the page for me is in a different hand from the rest. Somebody wrote me in. He would not say who, Lin Feng; but he looked at your foot."],
+	],
+	"pre:s_break37": [
+		["Narrator", "Under the pine Lin Feng sits with nothing in his hands. Down in the court somebody has set a mended bowl out on the wall to dry, and the rivets catch the last of the light. The sky gathers over the mountain as it always has, in one piece, out of a great many clouds."],
+	],
+	"post:s_break37": [
+		["Narrator", "The tribulation comes down and breaks on him, and he lets it. It goes through every place he was ever parted from something: a basket on a step, a broom put down, a road taken without looking back. When it has passed he is all there. The joins show. He finds he would not have them out."],
+	],
 	# ---- Part XXX: The Net with Three Sides Open (the Open Net release)
 	"recall28": [
 		["Narrator", "The winter after the mat, Lin Feng notices how quiet the mountain road has become. No pack has stood in his way since the autumn. They hear him a ridge off and are gone. He had taken it for peace. It is only that there is nothing left in the land that could tell him no."],
@@ -10088,7 +10380,7 @@ const DIALOGUE := {
 		["Guan Ning", "You have been in other people's houses, moving jars. You know that a thing in the wrong place is not a bad thing. Tell me where he goes. I shall do as you say; I find I cannot do it by myself.", "bow"],
 	],
 	"s_p29_end": [
-		["Narrator", "The Elder's study is in order. The broom is behind the door, bristles up. The tea is where tea goes. The Elder is sitting very upright among it all, like a guest."],
+		["Narrator", "The Elder's study is in order. The broom is beside the store, bristles up. The tea is where tea goes. The Elder is sitting very upright among it all, like a guest."],
 		["Elder Qing Xuan", "I can find everything. It is dreadful. I reach for a thing and it is there. I had not understood how much of my day was looking for my spectacles; I have had to take up a second art to fill the time.", "laugh"],
 		["Lin Feng", "A guest who was right was not asked to the feast. A crane came home to the right walls and the wrong people. A man got up from a mat. It is all one thing, Elder. Where a thing goes, and when, and beside whom."],
 		["Elder Qing Xuan", "That is the whole of the precepts, and it took the sect nine hundred rules to say it. Go and sit under the pine, child. Sit where you always sit. I notice you have never once had to look for the place.", "bow"],
@@ -10246,7 +10538,7 @@ const DIALOGUE := {
 	],
 	"done:s_p28_mend": [
 		["Narrator", "Three towns are a little better tonight than they were, and none of them could say exactly why. A roof that does not leak. A watch with oil for its lamp. By the lake a very large man is hanging a door, badly, and an old woman is telling him so, and neither of them has gone indoors."],
-		["Yue Ling", "You went back and looked. I have known you since you carried two buckets, and it is the first time I have ever seen you go back and look."],
+		["Yue Ling", "You went back and mended. I have known you since you carried two buckets. I have seen you go back to look. It is the first time I have seen you go back to mend."],
 	],
 	"visit:s_p28_calls:smith": [["Smith Tie", "What came of it? You are standing in what came of it. Every blow on this anvil since has gone the way it went because of what you said to me that day about some drawings. I do not say better or worse. I say: look round the forge, sweeper. That is your answer, in iron."]],
 	"visit:s_p28_calls:farmer_lao": [["Farmer Lao", "You want to know how the road by the bamboo has been, since. I can tell you who walks it now and who does not, and at what hour I bar my door. A man's whole evening is made of what somebody else decided once in a hurry. Come in and count my hens with me."]],

@@ -461,3 +461,30 @@ def charcoal_yoke(b, pole="7a5a38", sack="6a5e4c", coal="1e1c22"):
             b.tube([end, c + V(d, 0.2, 0)], [0.004, 0.004], "8a7a5a", cls=CLOTH, bone="chest", seg=3)
         b.ellipsoid(c, (0.16, 0.21, 0.16), sack, cls=CLOTH, bone="chest", seg=12, rings=8)
         b.ball(c + V(0, 0.2, 0), 0.07, coal, cls=STONE, bone="chest", seg=8, rings=5)
+
+
+def half_mirror(b, bronze="8a7a4a", face="c8ccc0", cord="b03020", side=1):
+    """Half of a round bronze mirror, broken clean across (the Broken Mirror release): the polished
+    face towards whoever holds it, the back cast with a boss whose cord-hole was split with it and a
+    red cord still through the half that is left.  Held up in the left hand; `side` is which half."""
+    c = held_l() + V(0.0, 0.1, 0.03)
+    rot = (math.pi * 0.5, 0.0, (0.0 if side > 0 else math.pi) + 0.2)
+    # (a lathe opened by half a turn is half a disc: the rim thick, the middle thin)
+    b.lathe(c, [(0.0, -0.004), (0.076, -0.004), (0.084, -0.007), (0.088, 0.0), (0.084, 0.007), (0.076, 0.004), (0.0, 0.004)], bronze, cls=METAL,
+            bone="hand.L", seg=28, rot=rot, open_angle=math.pi)
+    b.lathe(c + V(0.0, 0.0, 0.0045), [(0.0, 0.0), (0.072, 0.0), (0.072, 0.001), (0.0, 0.001)], face, cls=METAL, bone="hand.L", seg=28, rot=rot, open_angle=math.pi)
+    b.ellipsoid(c + V(0.0, 0.0, -0.008), (0.014, 0.014, 0.008), darken(bronze, 0.2), cls=METAL, bone="hand.L", seg=10, rings=6)
+    b.tube([c + V(0.0, 0.0, -0.014), c + V(0.012, -0.05, -0.016), c + V(0.004, -0.11, -0.012)], [0.004, 0.0035, 0.002], cord, cls=CLOTH, bone="hand.L", seg=5)
+
+
+def red_thread(b, col="c02020", book="5a2a2a", paper="f0e4c0"):
+    """The Old Man under the Moon's two things: the book in which the marriages are written, against
+    the chest in the left arm, and a skein of red thread looped over the right wrist, one end let fall."""
+    ledger(b, cover=book, paper=paper)
+    h = HAND_R + V(0.0, 0.03, 0.0)
+    for k in range(5):
+        a = k * 1.2566
+        b.tube([h + V(0.03 * math.cos(a), 0.012 * math.sin(a * 2.0), 0.03 * math.sin(a)), h + V(0.03 * math.cos(a + 1.2566), 0.012 * math.sin(a * 2.0 + 2.5), 0.03 * math.sin(a + 1.2566))],
+               [0.006, 0.006], col, cls=CLOTH, bone="hand.R", seg=5)
+    b.tube([h + V(0.03, 0.0, 0.0), h + V(0.036, -0.12, 0.02), h + V(0.02, -0.26, 0.03), h + V(0.03, -0.4, 0.02)], [0.004, 0.0035, 0.003, 0.002], col, cls=CLOTH, bone="hand.R", seg=5)
+

@@ -2346,6 +2346,11 @@ func _run() -> void:
 		# country in balance and barren, a barren pack, the watch and the lords in battle, the crossroads and
 		# what each answer leaves standing
 		await _net_shots(str(main.args.net))
+	if main.args.has("mirror"):
+		# the Broken Mirror release (--mirror, or --mirror=a,b): the re-sculpted bodies from the front and from
+		# behind, the cast dressed and bare, the three things two people do, the people, foes and lords of
+		# Part XXXII, the lords in battle, the crossroads, and Yue Ling's page
+		await _mirror_shots(str(main.args.mirror))
 	if main.args.has("tall"):
 		# the Tall People release (--tall, or --tall=a,b): the Great People beside a man, the eight gestures of a
 		# close-up, the nine faces of the Way, the people, foes and lords of Part XXXI, a town with giants in its
@@ -5484,6 +5489,93 @@ func _net_shots(which: String = "1") -> void:
 		_sheet("mark_verdict_answers", fr3, 0.48)
 		Game.picks = {}
 	get_tree().quit(0)
+
+## The Broken Mirror release (--mirror, or --mirror=a,b): see _run.
+func _bare(asset: String) -> Node3D:
+	var m: Node3D = Models.hero({"cols": {}}) if asset == "lin_feng" else (Models.yue_ling() if asset == "yue_ling" else Assets.person(asset))
+	m.set_meta("kind", "person")
+	Models.undress(m, true)
+	return m
+
+func _mirror_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 110
+	Game.step = Data.step_index("s_p32_mirror")
+	Game.companion = true
+	Game.day = 190
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	quiet.call()
+	if want.call("bodies"):
+		var cast := ["lin_feng", "yue_ling", "smith", "granny_wen", "folk_boy"]
+		var front: Array = []
+		var back: Array = []
+		for c in cast:
+			front.append(_bare(c))
+			back.append(_bare(c))
+		await _pose_gallery("bodies_front", front, [["idle", 0.5], ["idle", 0.5], ["idle", 0.5], ["idle", 0.5], ["idle", 0.5]], 0.42, 0.3)
+		await _pose_gallery("bodies_back", back, [["idle", 0.5], ["idle", 0.5], ["idle", 0.5], ["idle", 0.5], ["idle", 0.5]], 0.42, PI - 0.35)
+		await _pose_gallery("bodies_man_and_woman", [_bare("lin_feng"), _bare("lin_feng"), _bare("yue_ling"), _bare("yue_ling")], [["idle", 0.5], ["idle", 0.5], ["idle", 0.5], ["idle", 0.5]], 0.36, 0.0)
+	if want.call("close"):
+		# (nearer: a man and a woman from the front, and from behind)
+		await _pose_gallery("bodies_close_front", [_bare("lin_feng"), _bare("yue_ling")], [["idle", 0.5], ["idle", 0.5]], 0.24, 0.25)
+		await _pose_gallery("bodies_close_back", [_bare("lin_feng"), _bare("yue_ling")], [["idle", 0.5], ["idle", 0.5]], 0.24, PI - 0.3)
+	if want.call("people"):
+		await _gallery("part32_people", [Assets.person("yue_lao"), Assets.person("weisheng"), Assets.person("meng_jiang"), Assets.person("xu_deyan"), Assets.person("lechang")], 0.5, 0.2)
+	if want.call("clips"):
+		await _pose_gallery("clips_of_two", [Models.hero({"cols": {}}), Models.yue_ling(), Models.hero({"cols": {}}), Models.yue_ling(), Models.hero({"cols": {}}), Models.yue_ling()],
+			[["take_hands", 1.7], ["take_hands", 1.7], ["embrace", 2.2], ["embrace", 2.2], ["brow_touch", 2.0], ["brow_touch", 2.0]], 0.4, 0.5)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["snapped_thread", "kings_seal", "torn_sleeve", "rising_water", "held_pillar", "plank_step", "named_brick", "overseer_lash", "tally_bone", "mirror_shard", "market_cry", "empty_moon"]:
+			fs.append(_foe(fid))
+		await _gallery("part32_foes", fs, 1.0, 0.25)
+		await _gallery("part32_lords", [_foe("two_graves", true), _foe("the_flood", true), _foe("the_wall", true)], 1.3, 0.25)
+	if want.call("touch"):
+		Game.romance = {"stage": 3, "tone": {"tender": 3}}
+		Game.bond = 80
+		for tc in [["hands", "touch_take_hands", 2.6], ["embrace", "touch_embrace", 3.2], ["brow", "touch_brow_to_brow", 3.0]]:
+			main.set_stack(["world"])
+			quiet.call()
+			await _wait(0.6)
+			main.say(Romance.touch(Game, str(tc[0])))
+			await _wait(float(tc[2]))
+			await _shot(str(tc[1]))
+		main.set_stack(["world"])
+		main.open_menu()
+		main.menu.mode = "yue"
+		main.menu.cursor = 4
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("yue_page_near")
+		main.set_stack(["world"])
+	if want.call("battles"):
+		for bb in [["two_graves", "starpalace", "relic", 109], ["the_flood", "magpie", "relic", 110], ["the_wall", "youdu", "relic", 111]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			main.set_stack(["world"])
+			Game.area = str(bb[1])
+			var ctx := {"boss": bid, "area": str(bb[1]), "theme": str(Data.AREAS[str(bb[1])].theme), "trial": str(bb[2])}
+			main.battle.start([{"id": bid, "lv": int(bb[3]), "mult": float(bm[0]), "atk": float(bm[1])}], ctx)
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_mirror"]
+		main.ask_crossroads()
+		main.choice.cursor = 0
+		await _wait(1.0)
+		await _shot("crossroads_mirror")
 
 ## The Tall People release (--tall, or --tall=a,b): see _run.
 func _giant(asset: String) -> Node3D:
