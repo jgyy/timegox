@@ -206,7 +206,7 @@ func _build_fighters() -> void:
 				sc = 1.25
 				# (the Tall People release, giants.gd: unless they are one of the Great People)
 				if Giants.of_foe(str(f.get("id", ""))):
-					sc = Giants.SCALE
+					sc = Giants.SCALE * 1.3
 		m.scale = Vector3.ONE * sc
 		var holder := Node3D.new()
 		holder.add_child(m)

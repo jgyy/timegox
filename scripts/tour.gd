@@ -5524,7 +5524,7 @@ func _tall_shots(which: String = "1") -> void:
 			ms.append(pm)
 			ps.append([cl, float(Closeup.SECONDS[cl]) * 0.5])
 		await _pose_gallery("closeup_gestures", ms, ps, 0.42, 0.35)
-		await _pose_gallery("giant_stoops_to_a_man", [_giant("longbo_angler"), Models.hero({"cols": {}})], [["stoop", 1.8], ["idle", 0.5]], 1.0, 0.0)
+		await _pose_gallery("giant_stoops_to_a_man", [_giant("fangfeng"), Models.hero({"cols": {}}), _giant("folk_giantess")], [["stoop", 1.8], ["idle", 0.5], ["stoop", 1.2]], 1.25, 0.25)
 	if want.call("faces"):
 		var rows: Array = []
 		for grp in [[4, 3, 2, 1, 0], [0, -1, -2, -3, -4]]:

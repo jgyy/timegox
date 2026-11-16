@@ -94,4 +94,5 @@ static func frame(head: Vector3, fwd: Vector3, sc: float, side: float) -> Array:
 	var d := DIST * (1.0 + (sc - 1.0) * 0.55)
 	# a giant is looked up at, from where somebody of a man's height would be standing
 	var rise := -0.34 * sc if tall else 0.04
-	return [head + f * d + Vector3(0, rise, 0), head + Vector3(0, 0.02 * sc, 0)]
+	# (the box of words covers the foot of the screen: the face is framed above the middle of it)
+	return [head + f * d + Vector3(0, rise, 0), head + Vector3(0, (0.02 if tall else -0.14) * sc, 0)]

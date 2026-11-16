@@ -2923,7 +2923,7 @@ func _cutscene(d: float, pp: Vector3) -> void:
 		else:
 			var wn: Node3D = who3[0]
 			var wsc := float(wn.get_meta("tall", 1.0))
-			var head := wn.global_position + Vector3(0, 1.52 * wsc, 0)
+			var head := _head_of(wn, wsc)
 			# (they face whoever they are speaking to: the lens stands on that side, over the shoulder
 			# nearer the two-shot's camera)
 			var to_other := (a3 if wn != player else b3) - head
@@ -2951,6 +2951,18 @@ func _cutscene(d: float, pp: Vector3) -> void:
 	if cam.position.distance_to(at) > 0.5:
 		var look_from := cam.position - chase_look
 		cam.look_at(look_from.lerp(at, k) if k < 1.0 else at, Vector3.UP)
+
+## Where the head of person model `n` is in the world now (the head bone as the clip has posed it, so
+## that somebody small, somebody stooping and somebody twice a man's height are each found), or where
+## a head of that size would be.
+func _head_of(n: Node3D, sc: float) -> Vector3:
+	var sks := n.find_children("*", "Skeleton3D", true, false)
+	if not sks.is_empty():
+		var sk := sks[0] as Skeleton3D
+		var bi := sk.find_bone("head")
+		if bi >= 0:
+			return sk.global_transform * (sk.get_bone_global_pose(bi).origin + Vector3(0, 0.09, 0))
+	return n.global_position + Vector3(0, 1.52 * sc, 0)
 
 ## The name of whoever is speaking in the dialogue box, or "".
 func speaker() -> String:
