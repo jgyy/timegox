@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 105
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open"]
+const MAX_LEVEL := 108
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -93,6 +93,7 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Moved the Firewood", "note": "A guest said: bend your chimney, and move the firewood from the stove. Nobody thanked him, and the house burned. A crane came home after a thousand years and found the walls as they were and the people gone. Two friends read on one mat until a carriage went by. You know now where a thing belongs, and what day it is, and which side of the mat you sit on. Very little else has ever been asked."},
 	# Part XXX (the Open Net release): what is left when he could take everything, and does not
 	{"life": 0, "title": "Who Left Three Sides Open", "note": "A fowler hung his nets on four sides and prayed for everything under heaven. A lord took three of them down. A judge heard wrongly, and bound his own hands. A man who wrote the law was turned from a door by it. You could empty a country now, or a street. Nothing in the land could stop you. That is why it has to be you who does."},
+	{"life": 0, "title": "Under Whose Lintel Everybody Walks", "note": "A giant was cut down for coming late and nobody asked what kept him. Another ran after the sun and dropped a forest. A people was made small and never told how small. A man trusted a measure over his own foot. A door is cut for whoever comes. You are the measure of nothing now, and that is the use of you."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -594,7 +595,7 @@ const ENEMIES := {
 	"gun": {"n": "Gun, Who Stole the Swelling Earth", "elem": "earth", "weak": "wood", "col": Color("d8b040"), "shape": "dragon", "boss": true, "pal": {"under": Color("f0e0b0"), "mark": Color("8a6a2a")}},
 	"slag_serpent": {"n": "The Slag Serpent of the Casting Pits", "elem": "fire", "weak": "water", "col": Color("c85a2a"), "shape": "serpent", "boss": true},
 	"stone_mother": {"n": "The Stone Mother of Tushan", "elem": "earth", "weak": "wood", "col": Color("a8a098"), "shape": "golem", "boss": true},
-	"fangfeng": {"n": "Fangfeng, the Giant Who Came Late", "elem": "earth", "weak": "wood", "col": Color("6a7a5a"), "shape": "humanoid", "boss": true},
+	"fangfeng": {"n": "Fangfeng, the Giant Who Came Late", "elem": "earth", "weak": "wood", "col": Color("6a7a5a"), "shape": "person:fangfeng", "boss": true, "giant": true},
 	"taotie": {"n": "Taotie, the Glutton on the Cauldron", "elem": "dark", "weak": "thunder", "col": Color("6a4a2a"), "shape": "demon", "boss": true, "pal": {"acc": Color("40d0a0")}},
 	"xiu": {"n": "Xiu, Gonggong's Son Who Loved Roads", "elem": "water", "weak": "earth", "col": Color("6a8aa8"), "shape": "wraith", "boss": true},
 	"kun": {"n": "Kun of the Northern Darkness", "elem": "water", "weak": "thunder", "col": Color("2a3a6a"), "shape": "ray", "boss": true},
@@ -602,7 +603,7 @@ const ENEMIES := {
 	"stone_lion": {"n": "The Stone Lion of the Ferry Stage", "elem": "earth", "weak": "wood", "col": Color("b8b0a0"), "shape": "tiger", "boss": true, "pal": {"acc": Color("e0b040")}},
 	"carrier_turtle": {"n": "The Turtle Who Carried Gun's Earth", "elem": "earth", "weak": "wood", "col": Color("6a6a4a"), "shape": "tortoise", "boss": true},
 	"tushan_fox": {"n": "The White Nine-Tailed Fox of Tushan", "elem": "wood", "weak": "fire", "col": Color("f4f0e8"), "shape": "fox", "boss": true, "pal": {"acc": Color("ff8a40")}},
-	"kuafu": {"n": "Kuafu, Who Drank the Rivers Dry", "elem": "fire", "weak": "water", "col": Color("a86a4a"), "shape": "ape", "boss": true},
+	"kuafu": {"n": "Kuafu, Who Drank the Rivers Dry", "elem": "fire", "weak": "water", "col": Color("a86a4a"), "shape": "person:kuafu", "boss": true, "giant": true},
 	"gonggong": {"n": "Gonggong, God of the Flood", "elem": "water", "weak": "earth", "col": Color("1a2a4a"), "shape": "dragon", "boss": true, "pal": {"sec": Color("c83020"), "acc": Color("ff6040")}},
 	# ---- Part XI: The Ladder of Heaven (the Nine Heavens above the clouds, the Nine Springs below
 	# the roots)
@@ -650,7 +651,7 @@ const ENEMIES := {
 	"qianliyan": {"n": "Qianliyan, Thousand-Li Eye", "elem": "wood", "weak": "fire", "col": Color("3a8a5a"), "shape": "demon", "boss": true, "pal": {"acc": Color("fff070")}},
 	"shunfenger": {"n": "Shunfeng'er, Wind-Following Ear", "elem": "fire", "weak": "water", "col": Color("c83a2a"), "shape": "demon", "boss": true, "pal": {"acc": Color("80e0ff")}},
 	"sea_monk": {"n": "The Sea-Monk Who Drowns Fishermen", "elem": "water", "weak": "thunder", "col": Color("5a7a6a"), "shape": "tortoise", "boss": true, "pal": {"sec": Color("3a4a3a"), "acc": Color("ffb040")}},
-	"longbo_giant": {"n": "The Giant of Longbo, Who Fishes for Turtles", "elem": "earth", "weak": "wood", "col": Color("a87a5a"), "shape": "ape", "boss": true, "pal": {"sec": Color("4a6a8a"), "acc": Color("f0d060")}},
+	"longbo_giant": {"n": "The Giant of Longbo, Who Fishes for Turtles", "elem": "earth", "weak": "wood", "col": Color("a87a5a"), "shape": "person:longbo_angler", "boss": true, "giant": true, "pal": {"sec": Color("4a6a8a"), "acc": Color("f0d060")}},
 	"longevity_deer": {"n": "The White Deer of Longevity", "elem": "wood", "weak": "fire", "col": Color("f4f0e4"), "shape": "qilin", "boss": true, "pal": {"sec": Color("d8a850"), "acc": Color("ff5a5a")}},
 	"elixir_furnace": {"n": "The Elixir Furnace That Walked Away", "elem": "fire", "weak": "water", "col": Color("b07a3a"), "shape": "golem", "boss": true, "pal": {"acc": Color("ff8a20")}},
 	"pearl_tree": {"n": "The Pearl Tree That Will Not Fruit", "elem": "earth", "weak": "thunder", "col": Color("e8eef4"), "shape": "plant", "boss": true, "pal": {"sec": Color("7ab0a0"), "acc": Color("ffe8f0")}},
@@ -694,7 +695,7 @@ const ENEMIES := {
 	"grudge_iron_fang": {"n": "Iron Fang's Grudge", "elem": "dark", "weak": "water", "col": Color("5a2a26"), "shape": "humanoid", "boss": true, "grudge": true},
 	"grudge_marsh_hag": {"n": "The Marsh Hag's Grudge", "elem": "dark", "weak": "fire", "col": Color("3a2444"), "shape": "wraith", "boss": true, "grudge": true, "pal": {"sec": Color("140a18"), "acc": Color("ff4a7a")}},
 	"grudge_headless_saint": {"n": "The Headless Saint's Grudge", "elem": "dark", "weak": "thunder", "col": Color("4a4a5c"), "shape": "demon", "boss": true, "grudge": true},
-	"grudge_fangfeng": {"n": "Fangfeng's Grudge", "elem": "earth", "weak": "wood", "col": Color("3c4434"), "shape": "humanoid", "boss": true, "grudge": true},
+	"grudge_fangfeng": {"n": "Fangfeng's Grudge", "elem": "earth", "weak": "wood", "col": Color("3c4434"), "shape": "person:fangfeng", "boss": true, "grudge": true, "giant": true},
 	"grudge_kui": {"n": "Kui's Grudge", "elem": "thunder", "weak": "earth", "col": Color("3a4252"), "shape": "mammoth", "boss": true, "grudge": true, "pal": {"acc": Color("ff5a7a")}},
 	"grudge_admiral": {"n": "The Admiral's Grudge", "elem": "water", "weak": "thunder", "col": Color("28323c"), "shape": "wraith", "boss": true, "grudge": true, "pal": {"sec": Color("10161c"), "acc": Color("ffd060")}},
 	# ---- Part XV (the Lotus release): the things that eat forgetting, and the Warden of the Lock
@@ -949,6 +950,23 @@ const ENEMIES := {
 	"the_sentence": {"n": "The Sentence That Cannot Be Unsaid", "elem": "dark", "weak": "thunder", "col": Color("3a2a2e"), "shape": "warden", "boss": true, "pal": {"sec": Color("1a1416"), "acc": Color("c8322a")}},
 	"shang_yang": {"n": "Shang Yang, Turned from the Door", "elem": "earth", "weak": "water", "col": Color("2e4c86"), "shape": "person:shang_yang", "boss": true},
 	"jiang_chong": {"n": "Jiang Chong, Who Finds What He Brings", "elem": "dark", "weak": "fire", "col": Color("c8a030"), "shape": "person:jiang_chong", "boss": true},
+	# ---- Part XXXI: The Foot and the Shoe (the Tall People release): what is measured, and against whom
+	"late_drum": {"n": "Drum That Counts the Late", "elem": "thunder", "weak": "earth", "col": Color("7a4a3a"), "shape": "golem", "pal": {"sec": Color("3a2a22"), "acc": Color("d8b060")}},
+	"roll_call": {"n": "Roll Called Without Him", "elem": "dark", "weak": "fire", "col": Color("b8a888"), "shape": "tome", "pal": {"sec": Color("5a4a3a"), "acc": Color("c8322a")}},
+	"flood_mire": {"n": "Mud of the Road He Came By", "elem": "water", "weak": "earth", "col": Color("6a5a48"), "shape": "blob", "pal": {"sec": Color("3a3028"), "acc": Color("a8b8a0")}},
+	"noon_glare": {"n": "Glare of Noon", "elem": "fire", "weak": "water", "col": Color("e8c868"), "shape": "wisp", "bright": true, "pal": {"sec": Color("f0e0a0"), "acc": Color("ffffff")}},
+	"long_shadow": {"n": "Shadow That Ran Ahead", "elem": "dark", "weak": "fire", "col": Color("3a3644"), "shape": "wraith", "pal": {"sec": Color("1c1a24"), "acc": Color("e8a020")}},
+	"dry_bed": {"n": "Dried River-Bed", "elem": "earth", "weak": "water", "col": Color("b09870"), "shape": "serpent", "pal": {"sec": Color("7a6848"), "acc": Color("e8e0c0")}},
+	"small_decree": {"n": "Edict in Small Characters", "elem": "dark", "weak": "thunder", "col": Color("d8c060"), "shape": "tome", "pal": {"sec": Color("8a7430"), "acc": Color("2a2a30")}},
+	"low_lintel": {"n": "Lintel Set Low", "elem": "wood", "weak": "fire", "col": Color("7a5a3a"), "shape": "golem", "pal": {"sec": Color("4a3626"), "acc": Color("c8a868")}},
+	"drift_isle": {"n": "Isle Come Adrift", "elem": "water", "weak": "wood", "col": Color("5a7a6a"), "shape": "tortoise", "pal": {"sec": Color("3a4a40"), "acc": Color("d8d0a0")}},
+	"tight_shoe": {"n": "Shoe a Size Too Small", "elem": "earth", "weak": "wood", "col": Color("6a4a34"), "shape": "crab", "pal": {"sec": Color("3a2a20"), "acc": Color("c8a878")}},
+	"cut_measure": {"n": "Measure Left on the Seat", "elem": "wood", "weak": "fire", "col": Color("b8a070"), "shape": "mantis", "pal": {"sec": Color("7a6840"), "acc": Color("c8322a")}},
+	"dog_door": {"n": "Door Cut for a Dog", "elem": "wood", "weak": "fire", "col": Color("8a3a2a"), "shape": "golem", "pal": {"sec": Color("4a2218"), "acc": Color("e8c860")}},
+	"late_axe": {"n": "The Hour He Was Not There", "elem": "thunder", "weak": "earth", "col": Color("5a5a66"), "shape": "warden", "boss": true, "pal": {"sec": Color("2a2a32"), "acc": Color("c8322a")}},
+	"kuafu_west": {"n": "Kuafu, Looking West", "elem": "fire", "weak": "water", "col": Color("b8862e"), "shape": "person:kuafu", "boss": true, "giant": true},
+	"the_decree": {"n": "The Decree with No Measure in It", "elem": "dark", "weak": "thunder", "col": Color("d8c060"), "shape": "tome", "boss": true, "pal": {"sec": Color("8a7430"), "acc": Color("1a1a20")}},
+	"the_shoe": {"n": "The Shoe That Cuts the Foot", "elem": "earth", "weak": "wood", "col": Color("5a3a26"), "shape": "mantis", "boss": true, "pal": {"sec": Color("2e1e14"), "acc": Color("d8d8e0")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
 	"watch_spear": {"n": "Spearman of the Watch", "elem": "phys", "weak": "thunder", "col": Color("5a6a7a"), "shape": "humanoid", "pal": {"sec": Color("2e3640"), "acc": Color("c8a050")}},
@@ -1569,18 +1587,30 @@ const AREAS := {
 			{"to": "grave", "pos": Vector2i(1, 28), "dest": Vector2i(88, 28), "open": ""},
 			{"to": "origin", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_tm_tianxuan"},
 		],
-		"npcs": [{"id": "time_ferryman", "n": "Ferryman Shi Guang", "pos": Vector2i(10, 26), "col": Color("f0d080"), "vis": ["s_tm_intro", ""]}],
+		"npcs": [{"id": "time_ferryman", "n": "Ferryman Shi Guang", "pos": Vector2i(10, 26), "col": Color("f0d080"), "vis": ["s_tm_intro", ""]},
+			# Part XXXI (the Tall People release)
+			{"id": "fangfeng", "n": "Fangfeng", "pos": Vector2i.ZERO, "col": Color("3e4a4a"), "asset": "fangfeng", "race": "daren", "vis": ["s_p31_home", ""], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "time_tortoise", "pos": Vector2i(30, 14), "lv": 21, "req": 21},
 			{"id": "dusk_reaper", "pos": Vector2i(42, 32), "lv": 22, "req": 22},
 			{"id": "dawn_warden", "pos": Vector2i(54, 44), "lv": 22, "req": 22},
 			{"id": "young_tianxuan", "pos": Vector2i(84, 26), "lv": 22, "req": 22},
+			# Part XXXI (the Tall People release)
+			{"id": "late_axe", "pos": Vector2i.ZERO, "lv": 106, "req": 105, "vis": ["s_p31_beam", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		"pickups": [
 			{"id": "sand1", "item": "sand", "pos": Vector2i(24, 46)}, {"id": "sand2", "item": "sand", "pos": Vector2i(44, 12)},
 			{"id": "sand3", "item": "sand", "pos": Vector2i(66, 40)}, {"id": "sand4", "item": "sand", "pos": Vector2i(78, 12)},
+			# Part XXXI (the Tall People release)
+			{"id": "p31_stake1", "item": "dyke_stake", "pos": Vector2i.ZERO, "vis": ["s_p31_drums", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p31_stake2", "item": "dyke_stake", "pos": Vector2i.ZERO, "vis": ["s_p31_drums", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p31_stake3", "item": "dyke_stake", "pos": Vector2i.ZERO, "vis": ["s_p31_drums", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p31_stake4", "item": "dyke_stake", "pos": Vector2i.ZERO, "vis": ["s_p31_drums", ""], "late": true, "peak": 2, "stand": "flank"},
+			{"id": "p31_peg1", "item": "lintel_peg", "pos": Vector2i.ZERO, "vis": ["s_p31_home", ""], "late": true, "peak": 3, "stand": "flank"},
 		],
 		"pickup_vis": "s_tm_collect",
+		"warband5": {"pool": [["late_drum", 105, 105], ["roll_call", 105, 105], ["flood_mire", 105, 105]], "n": 14, "vis": "s_p31_late", "late": true},
 	},
 	"origin": {
 		"n": "Origin of the Dao", "w": 98, "h": 58, "seed": 141, "theme": "origin", "enemies": 20,
@@ -1957,7 +1987,7 @@ const AREAS := {
 			# a fated encounter (fate.gd): there while the story has them there
 			{"id": "qiu_ye_springs", "n": "Qiu Ye", "pos": Vector2i(12, 26), "col": Color("2e5a48"), "asset": "qiu_ye", "fate": true},{"id": "meng_po", "n": "Meng Po of the Naihe Bridge", "pos": Vector2i(10, 26), "col": Color("e0d0c0"), "vis": ["s_sp_intro", ""]},
 			# Part XXX: the judge who bound his own hands, and the lawgiver turned from an inn by his own law
-			{"id": "li_li", "n": "Li Li, Judge of Jin", "pos": Vector2i.ZERO, "col": Color("3a2a2e"), "vis": ["s_p30_net", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "li_li", "n": "Li Li, Judge of Jin", "pos": Vector2i.ZERO, "col": Color("3a2a2e"), "vis": ["s_p30_net", "s_p30_verdict"], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "shang_yang", "n": "Shang Yang", "pos": Vector2i.ZERO, "col": Color("2e4c86"), "vis": ["s_p30_sentence", "s_p30_law"], "late": true, "peak": 1, "stand": "foot"},
 		],
 		"bosses": [
@@ -2232,7 +2262,11 @@ const AREAS := {
 		"portals": [
 			{"to": "silk", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 		],
-		"npcs": [{"id": "apprentice_zhi", "n": "Zhi, the Last Weaver-Girl", "pos": Vector2i(10, 26), "col": Color("f0c8e8"), "vis": ["s_lm_intro", ""]}],
+		"npcs": [{"id": "apprentice_zhi", "n": "Zhi, the Last Weaver-Girl", "pos": Vector2i(10, 26), "col": Color("f0c8e8"), "vis": ["s_lm_intro", ""]},
+			# Part XXXI (the Tall People release)
+			{"id": "zheng_buyer", "n": "The Man of Zheng", "pos": Vector2i.ZERO, "col": Color("76787a"), "asset": "zheng_buyer", "vis": ["s_p31_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "yan_ying", "n": "Yan Ying", "pos": Vector2i.ZERO, "col": Color("7a5a36"), "asset": "yan_ying", "vis": ["s_p31_home", ""], "late": true, "peak": 1, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "warp_beast", "pos": Vector2i(30, 40), "lv": 35, "req": 35},
 			{"id": "spindle_golem", "pos": Vector2i(46, 16), "lv": 35, "req": 35},
@@ -2240,9 +2274,19 @@ const AREAS := {
 			{"id": "qianxian", "pos": Vector2i(86, 28), "lv": 35, "req": 35},
 			# Part XV: the hand that winds every thread back to the spindle
 			{"id": "unweaver", "pos": Vector2i(83, 31), "lv": 59, "req": 58, "vis": ["s_p15_unweaver", ""]},
+			# Part XXXI (the Tall People release)
+			{"id": "the_shoe", "pos": Vector2i.ZERO, "lv": 108, "req": 107, "vis": ["s_p31_seen", ""], "late": true, "peak": 0, "stand": "top"},
 		],
-		"pickups": [{"id": "shuttle1", "item": "shuttle", "pos": Vector2i(22, 12)}, {"id": "shuttle2", "item": "shuttle", "pos": Vector2i(40, 46)}, {"id": "shuttle3", "item": "shuttle", "pos": Vector2i(64, 30)}, {"id": "shuttle4", "item": "shuttle", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "shuttle1", "item": "shuttle", "pos": Vector2i(22, 12)}, {"id": "shuttle2", "item": "shuttle", "pos": Vector2i(40, 46)}, {"id": "shuttle3", "item": "shuttle", "pos": Vector2i(64, 30)}, {"id": "shuttle4", "item": "shuttle", "pos": Vector2i(76, 10)},
+			# Part XXXI (the Tall People release)
+			{"id": "p31_cord1", "item": "foot_cord", "pos": Vector2i.ZERO, "vis": ["s_p31_shoes", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p31_cord2", "item": "foot_cord", "pos": Vector2i.ZERO, "vis": ["s_p31_shoes", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p31_cord3", "item": "foot_cord", "pos": Vector2i.ZERO, "vis": ["s_p31_shoes", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p31_cord4", "item": "foot_cord", "pos": Vector2i.ZERO, "vis": ["s_p31_shoes", ""], "late": true, "peak": 2, "stand": "flank"},
+			{"id": "p31_peg2", "item": "lintel_peg", "pos": Vector2i.ZERO, "vis": ["s_p31_home", ""], "late": true, "peak": 3, "stand": "flank"},
+		],
 		"pickup_vis": "s_lm_collect",
+		"warband5": {"pool": [["tight_shoe", 107, 107], ["cut_measure", 107, 107], ["dog_door", 107, 107]], "n": 14, "vis": "s_p31_market", "late": true},
 	},
 	# ---- Part VIII: The River of Heaven
 	"starferry": {
@@ -2713,7 +2757,10 @@ const AREAS := {
 		"portals": [
 			{"to": "tushan", "pos": Vector2i(1, 29), "dest": Vector2i(90, 30), "open": ""},
 		],
-		"npcs": [{"id": "yinglong", "n": "Yinglong, Who Dug the Rivers", "pos": Vector2i(10, 35), "col": Color("2a5a6a")}],
+		"npcs": [{"id": "yinglong", "n": "Yinglong, Who Dug the Rivers", "pos": Vector2i(10, 35), "col": Color("2a5a6a")},
+			# Part XXXI (the Tall People release)
+			{"id": "kuafu", "n": "Kuafu", "pos": Vector2i.ZERO, "col": Color("b8862e"), "asset": "kuafu", "race": "daren", "vis": ["s_p31_home", ""], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "xiu", "pos": Vector2i(28, 46), "lv": 44, "req": 44},
 			{"id": "kun", "pos": Vector2i(44, 12), "lv": 44, "req": 44},
@@ -2722,10 +2769,18 @@ const AREAS := {
 			{"id": "gonggong", "pos": Vector2i(86, 29), "lv": 44, "req": 44},
 			# Part XIII: a General of the Eight Gates
 			{"id": "kui_drum", "pos": Vector2i(51, 39), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
+			# Part XXXI (the Tall People release)
+			{"id": "kuafu_west", "pos": Vector2i.ZERO, "lv": 107, "req": 106, "vis": ["s_p31_woodmen", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
 		"warband": {"pool": [["bronze_brow", 51, 52], ["jiuli_warrior", 51, 52], ["fetter_sapling", 51, 52]], "n": 6, "vis": "s_p13_home"},
-		"pickups": [{"id": "bstone1", "item": "pillar_stone", "pos": Vector2i(22, 12)}, {"id": "bstone2", "item": "pillar_stone", "pos": Vector2i(38, 34)}, {"id": "bstone3", "item": "pillar_stone", "pos": Vector2i(56, 20)}, {"id": "bstone4", "item": "pillar_stone", "pos": Vector2i(76, 48)}],
+		"pickups": [{"id": "bstone1", "item": "pillar_stone", "pos": Vector2i(22, 12)}, {"id": "bstone2", "item": "pillar_stone", "pos": Vector2i(38, 34)}, {"id": "bstone3", "item": "pillar_stone", "pos": Vector2i(56, 20)}, {"id": "bstone4", "item": "pillar_stone", "pos": Vector2i(76, 48)},
+			# Part XXXI (the Tall People release)
+			{"id": "p31_stone1", "item": "peach_stone", "pos": Vector2i.ZERO, "vis": ["s_p31_glare", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p31_stone2", "item": "peach_stone", "pos": Vector2i.ZERO, "vis": ["s_p31_glare", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p31_stone3", "item": "peach_stone", "pos": Vector2i.ZERO, "vis": ["s_p31_glare", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p31_stone4", "item": "peach_stone", "pos": Vector2i.ZERO, "vis": ["s_p31_glare", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_bz_collect",
 		"springs": [Vector2i(48, 30)],
 		"roads": [[Vector2i(2, 29), Vector2i(16, 28), Vector2i(34, 30), Vector2i(50, 27), Vector2i(66, 32), Vector2i(84, 29)]],
@@ -2736,6 +2791,7 @@ const AREAS := {
 			{"id": "dragon_shrine", "n": "Yinglong's Cave-Shrine", "style": "shrine", "rect": Rect2i(6, 32, 10, 7), "door": Vector2i(10, 32),
 				"props": [["altar", Vector2i(9, 37), true], ["altar", Vector2i(10, 37), true], ["altar", Vector2i(11, 37), true], ["statue", Vector2i(10, 37), false], ["scroll", Vector2i(7, 34), false], ["lantern", Vector2i(14, 34), false]]},
 		],
+		"warband5": {"pool": [["noon_glare", 106, 106], ["long_shadow", 106, 106], ["dry_bed", 106, 106]], "n": 14, "vis": "s_p31_runner", "late": true},
 	},
 	# ---- Part XI: The Ladder of Heaven.  Two realms of their own, built like the land (atlas.gd
 	# STRATA): the Nine Heavens float above the clouds over the mountain, the Nine Springs lie under
@@ -2972,19 +3028,29 @@ const AREAS := {
 			{"id": "diver_yulan", "n": "Pearl-Diver Yu Lan", "pos": Vector2i(66, 36), "col": Color("2a8aa0"), "race": "qianzi"},
 			# after the Returning Ruins: Xu Fu comes home to the children he left (Part XII's last scene)
 			{"id": "xu_fu_home", "n": "Xu Fu, Who Came Back", "pos": Vector2i(31, 30), "col": Color("8a7a9a"), "race": "qianzi", "vis": ["s_p12_end", ""]},
+			# Part XXXI (the Tall People release)
+			{"id": "longbo_angler", "n": "The Giant of Longbo", "pos": Vector2i.ZERO, "col": Color("4a5e5a"), "asset": "longbo_angler", "race": "daren", "vis": ["s_p31_home", ""], "late": true, "peak": 0, "stand": "foot"},
 		],
 		"bosses": [
 			{"id": "qianliyan", "pos": Vector2i(56, 47), "lv": 48, "req": 48},
 			{"id": "shunfenger", "pos": Vector2i(78, 46), "lv": 48, "req": 48},
 			{"id": "sea_monk", "pos": Vector2i(84, 15), "lv": 48, "req": 48},
 			{"id": "longbo_giant", "pos": Vector2i(90, 32), "lv": 49, "req": 49},
+			# Part XXXI (the Tall People release)
+			{"id": "the_decree", "pos": Vector2i.ZERO, "lv": 107, "req": 106, "vis": ["s_p31_rooms", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		"pickups": [{"id": "nslip1", "item": "name_slip", "pos": Vector2i(22, 13)}, {"id": "nslip2", "item": "name_slip", "pos": Vector2i(46, 53)}, {"id": "nslip3", "item": "name_slip", "pos": Vector2i(72, 26)}, {"id": "nslip4", "item": "name_slip", "pos": Vector2i(86, 52)},
 			{"id": "cur_soil1", "item": "mainland_earth", "pos": Vector2i(38, 41), "floor": ["shipyard", -1], "always": true},
 			{"id": "cur_tea1", "item": "cloud_tea", "pos": Vector2i(52, 22), "floor": ["drunk_immortal", 1], "always": true},
 			{"id": "cache_pl1", "item": "stones", "n": 3400, "pos": Vector2i(30, 20), "floor": ["names_hall", 1], "always": true},
 			# a cache the Thousand Children forgot they hid: only Spirit Sense can feel it
-			{"id": "sense_pl1", "item": "stones", "n": 2400, "pos": Vector2i(12, 50), "always": true, "sense": true}],
+			{"id": "sense_pl1", "item": "stones", "n": 2400, "pos": Vector2i(12, 50), "always": true, "sense": true},
+			# Part XXXI (the Tall People release)
+			{"id": "p31_shell1", "item": "oracle_shell", "pos": Vector2i.ZERO, "vis": ["s_p31_edicts", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p31_shell2", "item": "oracle_shell", "pos": Vector2i.ZERO, "vis": ["s_p31_edicts", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p31_shell3", "item": "oracle_shell", "pos": Vector2i.ZERO, "vis": ["s_p31_edicts", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p31_shell4", "item": "oracle_shell", "pos": Vector2i.ZERO, "vis": ["s_p31_edicts", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_pl_collect",
 		"springs": [Vector2i(20, 44)],
 		"steles": [Vector2i(42, 30)],
@@ -3007,6 +3073,7 @@ const AREAS := {
 			{"id": "net_house", "n": "The Net-Menders' House", "style": "seahouse", "rect": Rect2i(46, 38, 8, 6), "door": Vector2i(49, 38),
 				"props": [["loom", Vector2i(47, 41), true], ["bed", Vector2i(52, 41), true], ["lantern", Vector2i(50, 42), false]]},
 		],
+		"warband5": {"pool": [["small_decree", 106, 106], ["low_lintel", 106, 106], ["drift_isle", 106, 106]], "n": 14, "vis": "s_p31_shore", "late": true},
 	},
 	# Fangzhang, the Square-Pot Isle: the immortals' gardens and elixir furnaces, and the pearl trees
 	# that drink from the Returning Ruins and are dying as the sea drains
@@ -4226,7 +4293,7 @@ const STEPS := [
 		"t": "\"A door-hinge that turns is never eaten by worms\": take the five frolics to 5 people who will teach them where they live, up, down and over the sea"},
 	{"id": "s_p26_pilgrims", "kind": "folk", "role": "pilgrim", "n": 3, "area": "village",
 		"t": "\"The road is the longest frolic,\" says Wu Pu: ask 3 pilgrims of the road to do the five beasts at every shrine they pass"},
-	{"id": "s_p26_cook", "kind": "talk", "npc": "pao_ding", "area": "tushan", "t": "In the kitchen of the Cauldron Hall at Tushan the cook of the court has put down his knife and will not pick it up: find Cook Ding", "stones": 48600},
+	{"id": "s_p26_cook", "kind": "talk", "npc": "pao_ding", "area": "tushan", "t": "The kitchen of the Cauldron Hall at Tushan is cold: the cook of the court has put down his knife and gone out to sit below the height. Find Cook Ding", "stones": 48600},
 	{"id": "s_p26_gristle", "kind": "hunt", "area": "tushan", "n": 28, "of": ["gristle_hound", "locked_joint", "hacking_butcher"],
 		"t": "Everything at Tushan that cannot bend has come down to the kitchen door: see off 28 gristle-hounds, locked joints and butchers who hack", "stones": 48800},
 	{"id": "s_p26_whet", "kind": "collect", "item": "whetstone", "n": 4, "area": "tushan", "t": "Cook Ding has not needed a whetstone in nineteen years, and somebody has thrown all four of his up the hill: find them on the heights of Tushan"},
@@ -4303,11 +4370,11 @@ const STEPS := [
 		"t": "What was never set down is coming down the gorge: get through 30 fists that will not open, grudges carried thirty years and crabs with the family chest", "stones": 53600},
 	{"id": "s_p27_tiles", "kind": "collect", "item": "pagoda_tile", "n": 4, "area": "maple", "t": "Glazed tiles keep falling out of a clear sky on the heights of the gorge, warm on one side: find 4 tiles of the pagoda"},
 	{"id": "s_p27_king", "kind": "kill", "boss": "li_jing", "area": "maple", "t": "On the height above the gorge a king of heaven has stood three thousand years with a pagoda on his palm: go up to Li Jing", "stones": 53800},
-	{"id": "s_p27_sack", "kind": "talk", "npc": "budai", "area": "maple", "gives": {"mustard_ring": 1},
+	{"id": "s_p27_sack", "kind": "talk", "npc": "budai", "area": "maple",
 		"t": "The pagoda is standing on a rock by itself, and the king is flexing his fingers: speak to Budai, who has put his sack down"},
 	{"id": "s_p27_marks", "kind": "marks", "n": 6, "new": true, "area": "maple",
 		"t": "\"You know what each of them weighed. Go and see where you set them down\": go and look at 6 more things your choices left standing"},
-	{"id": "s_p27_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The forge is lit, and Smith Tie has set the seed in his ring: tell Elder Qing Xuan what things weigh", "stones": 54200},
+	{"id": "s_p27_end", "kind": "talk", "npc": "elder", "area": "sect", "gives": {"mustard_ring": 1}, "t": "The forge is lit, and Smith Tie has set the seed in his ring: tell Elder Qing Xuan what things weigh", "stones": 54200},
 	{"id": "s_break32", "kind": "breakthrough", "to": 96, "t": "Mount Sumeru put into a mustard seed, and neither the worse for it: Sumeru in a Seed"},
 	# ---- Part XXVIII: The Knotted Grass (the Answering Land release): everything he did is still going on somewhere.
 	# A general who wins a field because of a kindness he forgot, a boy and a sparrow, a town that beats its drums
@@ -4455,6 +4522,60 @@ const STEPS := [
 	{"id": "s_p30_verdict", "kind": "talk", "npc": "li_li", "area": "springs", "t": "The judge has not moved. The cord is still on his wrists, and he is still asking: go back to Li Li", "stones": 66200},
 	{"id": "s_p30_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The hunters have gone down the mountain again, and left something at the gate. Tell Elder Qing Xuan which side of the net was left", "stones": 66600},
 	{"id": "s_break35", "kind": "breakthrough", "to": 105, "t": "Nets on three sides taken down, and the fourth left for what will not turn aside: Three Sides Open"},
+	# ---- Part XXXI: The Foot and the Shoe (the Tall People release): who a door is cut for.
+	{"id": "s_p31_home", "kind": "talk", "npc": "elder", "area": "sect", "race": "daren", "t": "A carpenter of Qingshi is standing in the hall with a rule in each hand, and there is a letter from Landfall written very large. Speak to Elder Qing Xuan", "stones": 67000},
+	{"id": "s_p31_late", "kind": "talk", "npc": "fangfeng", "area": "time", "race": "daren",
+		"t": "By the River of Ten Thousand Years, where every hour is kept, the giant who came late is sitting with his knees up. Find Fangfeng below the first height", "stones": 67200},
+	{"id": "s_p31_drums", "kind": "hunt", "area": "time", "n": 34, "of": ["late_drum", "roll_call", "flood_mire"], "race": "daren",
+		"t": "\"The roll is still being called up there, and it still stops at my name.\" Clear 34 drums that count the late, rolls called without him and the mud of his road", "stones": 67400},
+	{"id": "s_p31_stakes", "kind": "collect", "item": "dyke_stake", "n": 4, "area": "time", "race": "daren", "t": "Somebody drove stakes into a burst dyke with the flat of his hand, four thousand years ago, and the river has kept them: find 4 stakes of the dyke"},
+	{"id": "s_p31_ridge", "kind": "summit", "peak": "time", "k": 1, "area": "time", "race": "daren", "t": "\"Nobody asked what kept me.\" Climb the second height above the River of Ten Thousand Years and look at the road he came by"},
+	{"id": "s_p31_mire", "kind": "hunt", "area": "time", "n": 30, "of": ["flood_mire", "late_drum"], "race": "daren",
+		"t": "The mud of that road has been waiting to be somebody's excuse, and the drums will not let it speak. Clear 30 more of them", "stones": 67600},
+	{"id": "s_p31_fir", "kind": "toil", "work": "fell", "n": 3, "area": "village", "race": "daren",
+		"t": "\"A house is measured from whoever in it is tallest.\" Fell 3 stems of old fir by Qingshi for a ridge-beam (face the forest's edge, press C)"},
+	{"id": "s_p31_beam", "kind": "haul", "good": "timber", "n": 4, "npc": "carpenter_gu", "area": "village", "race": "daren",
+		"t": "Carry 4 loads of timber to Carpenter Gu in Qingshi, who builds for the Great People and has never asked one of them how high"},
+	{"id": "s_p31_hour", "kind": "kill", "boss": "late_axe", "area": "time", "race": "daren", "t": "It was on time, and it has never been wrong: go up to the Hour He Was Not There", "stones": 67800},
+	{"id": "s_p31_runner", "kind": "talk", "npc": "kuafu", "area": "buzhou", "race": "daren",
+		"t": "By the black lake at Mount Buzhou a peach-wood staff has become a wood, and the giant who planted it is looking west again. Find Kuafu below the first height", "stones": 68000},
+	{"id": "s_p31_glare", "kind": "hunt", "area": "buzhou", "n": 34, "of": ["noon_glare", "long_shadow", "dry_bed"], "race": "daren",
+		"t": "\"I cannot see where it went.\" Clear 34 glares of noon, shadows that ran ahead and river-beds drunk dry", "stones": 68200},
+	{"id": "s_p31_stones", "kind": "collect", "item": "peach_stone", "n": 4, "area": "buzhou", "race": "daren", "t": "He ate as he ran and did not look back. Find 4 peach stones on the heights, a giant's stride apart"},
+	{"id": "s_p31_west", "kind": "summit", "peak": "buzhou", "k": 1, "area": "buzhou", "race": "daren", "t": "Climb the second height of Mount Buzhou and see where the sun goes when it goes"},
+	{"id": "s_p31_shadow", "kind": "glide", "n": 10, "area": "buzhou", "race": "daren", "t": "Go after it as he did, and then do the thing he never has: come down. One flight of 10 tiles under the cloud-kite (V, from a height)"},
+	{"id": "s_p31_beds", "kind": "hunt", "area": "buzhou", "n": 30, "of": ["dry_bed", "long_shadow"], "race": "daren",
+		"t": "The beds he drank are waiting to see whether he is coming back for the rest. Clear 30 more dry beds and the shadows lying in them", "stones": 68400},
+	{"id": "s_p31_woodmen", "kind": "folk", "role": "woodcutter", "n": 2, "area": "mountain", "race": "daren",
+		"t": "\"A thousand li of peach wood, and I never looked round.\" Ask 2 woodcutters of the camps what a long night wants with a forest"},
+	{"id": "s_p31_sun", "kind": "kill", "boss": "kuafu_west", "area": "buzhou", "race": "daren", "t": "The sun is low and he has his staff across his shoulders: go up to Kuafu, Looking West, and stand in his way", "stones": 68600},
+	{"id": "s_p31_shore", "kind": "talk", "npc": "longbo_angler", "area": "penglai", "race": "daren",
+		"t": "Three ships have come in to Landfall riding low, and their people sit on the shingle. Find the Giant of Longbo below the first height of Penglai", "stones": 68800},
+	{"id": "s_p31_edicts", "kind": "hunt", "area": "penglai", "n": 34, "of": ["small_decree", "low_lintel", "drift_isle"], "race": "daren",
+		"t": "\"It made us small and never said how small.\" Clear 34 edicts in small characters, lintels set low and isles come adrift", "stones": 69000},
+	{"id": "s_p31_shells", "kind": "collect", "item": "oracle_shell", "n": 4, "area": "penglai", "race": "daren", "t": "His grandmother told fortunes with the shells of the six. Four came over in the ships and were dropped on the heights: find 4 oracle shells"},
+	{"id": "s_p31_giants", "kind": "folk", "role": "giant", "town": "landfall", "n": 2, "area": "penglai", "race": "daren",
+		"t": "The Great People of Landfall came in by a door once. Ask 2 of them to go down to the shingle and say which"},
+	{"id": "s_p31_isle", "kind": "summit", "peak": "penglai", "k": 1, "area": "penglai", "race": "daren", "t": "Climb the second height of Penglai and look at the sea where two isles are not"},
+	{"id": "s_p31_rooms", "kind": "fit", "n": 3, "area": "tushan", "race": "daren",
+		"t": "\"Show me a house that was built for the one who lives in it.\" Put 3 houses of Tushan to rights, and see who each was measured from"},
+	{"id": "s_p31_decree", "kind": "kill", "boss": "the_decree", "area": "penglai", "race": "daren", "t": "It is letting go of them a finger at a time, and nobody wrote where it stops: go up to the Decree with No Measure in It", "stones": 69400},
+	{"id": "s_p31_market", "kind": "talk", "npc": "zheng_buyer", "area": "loom",
+		"t": "At the Loom of Borders a market is over, and one man still stands in it with a knotted cord. Find the Man of Zheng below the first height", "stones": 69600},
+	{"id": "s_p31_shoes", "kind": "hunt", "area": "loom", "n": 34, "of": ["tight_shoe", "cut_measure", "dog_door"],
+		"t": "\"Something has been making shoes off my cord.\" Clear 34 shoes a size too small, measures left on the seat and doors cut for a dog", "stones": 69800},
+	{"id": "s_p31_cords", "kind": "collect", "item": "foot_cord", "n": 4, "area": "loom", "t": "Everybody whose foot was taken once has a cord somewhere. Find 4 measuring cords, no two alike"},
+	{"id": "s_p31_envoy", "kind": "talk", "npc": "yan_ying", "area": "loom", "t": "Below the second height a very small old man is standing in front of a wall with two doors in it. Speak to Yan Ying"},
+	{"id": "s_p31_dogdoors", "kind": "hunt", "area": "loom", "n": 30, "of": ["dog_door", "tight_shoe"],
+		"t": "\"Break them. I cannot reach the lintels.\" Clear 30 more low doors and the shoes left outside them", "stones": 70000},
+	{"id": "s_p31_under", "kind": "delve", "n": 8, "area": "loom",
+		"t": "\"Go where the roof was not cut for you.\" To the very back of caves, bent double, until you have been to the back of 8 in all"},
+	{"id": "s_p31_seen", "kind": "marks", "n": 3, "new": true, "area": "loom",
+		"t": "\"Whatever you built, you built at somebody's height.\" Go and look at 3 more things your own answers left standing, and at who can get in"},
+	{"id": "s_p31_shoe", "kind": "kill", "boss": "the_shoe", "area": "loom", "t": "It measures whatever it meets against itself, and pares away the difference: go up to the Shoe That Cuts the Foot", "stones": 70200},
+	{"id": "s_p31_lintel", "kind": "talk", "npc": "yan_ying", "area": "loom", "race": "daren", "t": "A letter has come from Landfall on a sheet the size of a sail, and the old man is walking along the lines to read it: go back to Yan Ying", "stones": 70400},
+	{"id": "s_p31_end", "kind": "talk", "npc": "elder", "area": "sect", "race": "daren", "t": "Carpenter Gu has sent something up the mountain that would not go through the gate. Tell Elder Qing Xuan who the door is for", "stones": 70800},
+	{"id": "s_break36", "kind": "breakthrough", "to": 108, "t": "The foot is not cut to the shoe, nor the door to the smaller guest: Great and Small Alike"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -4698,6 +4819,11 @@ const ITEMS := {
 	"net_peg": {"n": "Net Peg", "desc": "A peg of ash wood as long as a hand, with the mark of the cord worn into it. There were four sides to the net it held. Somebody walked along three of them pulling these, and said a thing over the fourth that the fowler had never heard"},
 	"case_slip": {"n": "Slip of the Case", "desc": "A slip of bamboo from the record of a hearing: who said what, and the red of a seal at the foot. The clerk heard wrongly. The judge heard the clerk. A man was dead by evening. The judge has read this slip more often than anything he owns"},
 	"paulownia_doll": {"n": "Paulownia Doll", "desc": "A small figure of paulownia wood with a name on its chest and a needle through the name. It is quite dry and quite clean. A doll that had been under a floor for a season would have earth in the grain. This one came in a sleeve"},
+	"dyke_stake": {"n": "Stake of the Dyke", "desc": "A stake of willow as thick as a man's leg, driven into a burst dyke with the flat of a hand: the print is still in the head of it. A village mended the breach round four of these while somebody stood in it for a day and a night. He was late for something afterwards"},
+	"peach_stone": {"n": "Peach Stone", "desc": "A peach stone the size of a fist, split, with a shoot coming out of it. Somebody very large ate as he ran and threw these over his shoulder without looking. They are a giant's stride apart, in a line that points at where the sun goes down"},
+	"oracle_shell": {"n": "Oracle Shell", "desc": "A plate of turtle-shell the size of a door, scorched with a hot iron and cracked across. The crack has been read and the reading cut beside it in an old woman's hand: it was hunger; ask again. One of the six that held up two islands"},
+	"foot_cord": {"n": "Measuring Cord", "desc": "A cord knotted at the length of somebody's foot, taken once on a cold morning and trusted ever since. No two are the same. One of them has been cut shorter and tied again, twice, by somebody trying to be reasonable"},
+	"lintel_peg": {"n": "Lintel Peg", "desc": "An oak peg as long as a forearm, the kind that pins a raised lintel to its posts. One of the Great People keeps the peg of the first door they did not have to stoop under, and will tell you whose house it was"},
 	"house_broom": {"n": "House Broom", "desc": "A broom of sorghum straw. Upright, bristles up, out of sight beside the store. Never by the altar, the bed or the stove. He has known this since he was thirteen"},
 	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
@@ -4843,8 +4969,18 @@ const RACES := {
 			"alchemy": "The Cauldron's Dao. Come and see the furnaces. They are cold. Do not touch anything that is still warm.",
 			"illusion": "The Mirror. Shen the clam-dragon would have liked you. Everything she ever made was a beautiful lie."},
 		"thanks": "Cloud-Tea! New tea! Do you know how long it has been? Han Xiangzi, put the water on. No, the good water. No, the other good water."},
+	"daren": {"n": "The Great People", "home": "The towns of the Unbroken Land, and Longbo over the sea", "dao": "formation", "gift": "lintel_peg", "boon": "hp", "boon_n": "Lin Feng stands up to more (+8% vitality)",
+		"desc": "The Daren of the Classic of Mountains and Seas, twice a man's height and built like the ridge of a roof: well-diggers, beam-carriers, the heavy end of every town. The lintels of the land were raised for them sixty generations ago. Their cousins of Longbo were hills once, and were made small for six turtles. They honour the Dao of the Array: a line, a level, a thing that stands.",
+		"dao_lines": {
+			"sword": "A sword-walker. Our people never took to it. By the time one of us has drawn, the quarrel has usually thought better of itself.",
+			"wander": "Free Wandering. We wander too, small one. It is only that when we do it, people write to the magistrate.",
+			"heart": "The Heart's Dao. Good. Somebody your size who is kind is very useful to us: you can get into the places where the kindness is wanted.",
+			"formation": "The Array! Then you know a lintel is a line somebody decided. Come and tell my cousin so. He thinks doors grow that height.",
+			"alchemy": "A cauldron-walker. My grandmother's knees want something. It will need to be a large dose. No. Larger than that.",
+			"illusion": "The Mirror's Dao. Can you make me look small? Only for a market day. I should like to buy a melon without it being an occasion."},
+		"thanks": "A lintel peg. Old oak. Whose door? No, do not tell me; I shall say it was my great-grandmother's, and by next year it will have been. Thank you, small one."},
 }
-const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless", "shade", "qianzi", "xian"]
+const RACE_ORDER := ["human", "yumin", "dragon", "tianhu", "jiaoren", "deathless", "shade", "qianzi", "xian", "daren"]
 
 # ---------------------------------------------------------------- dialogue
 const CHAT := {
@@ -4909,11 +5045,32 @@ const CHAT := {
 		"I am not hard on him. I am hard on the mat. A mat is where two people have agreed to look at the same page. When one of them is looking at the road, it is two mats already.",
 		"They will say I am proud. I mean to wear one cap for fifty years and sit on one stool until my knees wear holes in it. That is not pride. That is knowing where I sit."],
 	# ---- Part XXX (the Open Net release)
+	# Part XXXI (the Tall People release)
+	"fangfeng": ["I set out in good time. People forget that part. It makes a better story if I overslept.",
+		"A day and a night with a river on my back. I thought of nothing at all. It was the last time I was not thinking about being late.",
+		"Your elder said I might be as late as I liked. I tried it. It is harder than hurrying. You have to decide what for.",
+		"One joint of me filled a cart, they say. I should like to know who measured, and what he did with the cart."],
+	"kuafu": ["It is not that I am fast. I am not fast. It is that I do not stop; my mother says they are different faults.",
+		"I drank the Yellow River and the Wei. I am told it was inconvenient. I did put them back, in a manner of speaking.",
+		"Peach. I never liked them much. They were what there was. Now look.",
+		"At home the night is as long as your week. You would not like it, small brother. You would be asleep for most of it, I suppose."],
+	"longbo_angler": ["Six on one line, my great-great-grandfather. I had four and you bent my hook. I have never thanked you. I am thanking you.",
+		"We told it every New Year as a fishing story. There were shells in my grandmother's house. Nobody said islands. Nobody said people.",
+		"My sister's boy put his head through the thatch last month, sitting up in bed. He laughed. She did not.",
+		"The Great People of your towns are our cousins, and were never made small. They look at us as you look at a man come home from prison."],
+	"zheng_buyer": ["A foot swells. It is larger at night than in the morning; did you know? A cord is the same all day. I ask you which a sensible man would go by.",
+		"My wife says I am the only man in Zheng who has to go home to find out whether he is hungry.",
+		"I measured the door of my house once. It was the right height. I have not looked at it since; why would I?",
+		"The shoe-seller knows me. He shuts when he sees me coming, and opens again behind me. I have seen him do it."],
+	"yan_ying": ["I wore one fox robe for thirty years. A minister who changes his coat every season has stopped looking at what he is minister of.",
+		"In Chu they asked whether Qi had no men, that it sent me. I said: Qi sends a worthy man to a worthy king, and the other sort to the other. So I was sent here.",
+		"My coachman was a tall fellow, and very pleased with it. His wife watched him drive me through the gate, and that evening asked for a divorce. He was better afterwards.",
+		"I have been looked down upon by every man I ever met, child. It is a fine place from which to see what they are standing on."],
 	"net_fowler": ["Four sides. My father hung three and went hungry one winter in four. I have children. I hung four, and I said the prayer so that it would be Heaven's doing and not mine.",
 		"From heaven, from earth, from the four quarters: all into my net. It is a good prayer. It works. That is what frightens me, some mornings, when I come to empty it.",
 		"There were cranes here when I was a boy. You could not sleep for them. I do not say I took them all. I say I took all that came, and then none came.",
 		"He did not tell me to take it down. He took it down himself, three sides, and coiled the cord for me so that it would not tangle. A lord. I had nothing to say against that."],
-	"cheng_tang": ["I was walking. A lord should walk; from a carriage every field looks the same. I heard a man praying for everything under heaven, and I thought: even Jie never asked for so much.",
+	"cheng_tang": ["I was walking. A lord should walk; from a carriage every field looks the same. I heard a man praying for everything under heaven, and I thought: that is what Jie asks for.",
 		"From the left, go left. From the right, go right. If you would go up, go up; if down, down. And what is tired of its life, come into my net. That is all I said. It is not much to found a house on.",
 		"They tell me forty lords came over to me when they heard of it. I did not do it for forty lords. I did it because the man had left the birds no way to refuse him.",
 		"You are stronger than anything in this garden. So was the net. Being able to take all of it is not a reason; it is the whole of the question."],
@@ -9468,6 +9625,175 @@ const DIALOGUE := {
 	"post:s_break32": [
 		["Narrator", "The tribulation comes down on the mountain like a load let fall, and he takes it as he took the timber: on the shoulder, knees bent, and then up. It is heavy. It is exactly as heavy as it is. When it has passed, a seed in a ring of iron holds one mountain more than it did, and is no larger."],
 	],
+	# ---- Part XXXI: The Foot and the Shoe (the Tall People release)
+	"recall29": [
+		["Narrator", "The spring after the net, three ships came in to Landfall riding low, and what stepped off them made the quay creak. Lin Feng heard of it on the mountain from a pedlar who had run most of the way to be the first to say it: the people of Longbo had left their own country, because they no longer fitted in it."],
+	],
+	"s_p31_home": [
+		["Narrator", "A carpenter of Qingshi is standing in the hall with a foot-rule in each hand, a man's and one twice its length, and the look of somebody who has been arguing with both. By the Elder's teacup lies a letter from the Harbour-Reeve of Landfall, written very large, as to somebody hard of hearing."],
+		["Elder Qing Xuan", "The people of Longbo have come ashore. They were made small once, for six turtles, and the making is wearing off: they have outgrown their own roofs. Carpenter Gu wishes to know what height he is to build for, and I find that I do not know what height anybody is."],
+		["Lin Feng", "Every lintel in the land was raised for the Great People once already. I have walked under them all my life and never asked who paid."],
+		["Elder Qing Xuan", "Their grandmothers did, in ridge-beams. Go first to the River of Ten Thousand Years. You put a giant down on a hillside at Tushan once and told him he might be as late as he liked. He has got up, and walked there.", "point"],
+		["Yue Ling", "I was the height of a lotus bud for three hundred years, Lin Feng. Nobody asked me either. I should like to hear what one of them says when somebody does."],
+	],
+	"s_p31_late": [
+		["Narrator", "Below the first height, where the river keeps every hour that ever was, a man is sitting on the ground with his knees drawn up, and his knees are higher than Lin Feng's head. Grey beard, a lord's topknot, dried flood-mud on his hem to the height of a house door."],
+		["Fangfeng", "You. The small one who said I might be late. I lay on that hill nine years and was late for nothing, and it was very fine. Then I thought: the roll at Kuaiji still has a line through me. I have come to where the hours are kept, to see the one I missed."],
+		["Lin Feng", "You stood in a burst dyke a day and a night. A village is dry because of it. Did you never tell them?"],
+		["Fangfeng", "Nobody asked. That is the whole of it, small one; I find I mind that more than the axe. It is up there still, the hour I was not there, with the roll in its hand. Quiet the drums. Then go and ask it what I was doing.", "point"],
+	],
+	"done:s_p31_drums": [
+		["Narrator", "The last drum splits along the grain and is only a log again. In the quiet a voice can be heard on the height, patient, reading names: it stops after one of them for exactly as long as it takes a man to answer, and goes on."],
+		["Yue Ling", "It waits for him every time, Lin Feng. The same breath, every time. And then it draws the line."],
+	],
+	"done:s_p31_stakes": [
+		["Narrator", "Four stakes of willow as thick as a man's leg, grey with four thousand years of river. Each has the print of a palm in its head, a hand's breadth deep, where it was driven with one blow. Lower down, cut small with a kitchen knife, are the marks of the people who packed the earth round them."],
+	],
+	"done:s_p31_ridge": [
+		["Narrator", "From the second height the river shows the road he came by, as it shows everything: a dyke in spate, a breach the width of a house, and one figure standing in it to the chest with the brown water piling against his back, a day and a night, while people the size of his hand run with baskets."],
+		["Yue Ling", "He was not slow. He was standing still, and it was the hardest thing he ever did. Lin Feng, it has not occurred to him that it is an answer."],
+	],
+	"done:s_p31_mire": [
+		["Narrator", "The mud of that road goes down under the sword like anything else, and where it lay the stone is clean. It had waited four thousand years to be somebody's excuse. Nobody had ever offered it as one, least of all the man it belonged to."],
+	],
+	"done:s_p31_fir": [
+		["Narrator", "Three stems of old fir, straight as a plumb-line and longer than any house in Qingshi is wide. Felled, they look like less than they did standing. Carpenter Gu's boy has come up with a cord to measure them, and has run out of cord."],
+	],
+	"haul:s_p31_beam": [
+		["Carpenter Gu", "Lay it by the others. A ridge-beam for one of the Great People is two of ours scarfed end to end, and it sags unless the fir is old. My grandfather said a house is measured from whoever in it is tallest. He was five foot one."],
+	],
+	"done:s_p31_beam": [
+		["Narrator", "Four beams lie on the trestles behind Carpenter Gu's shop. He walks along them with his long rule and his short one, laying the short one down twice for every once of the long. He has stopped arguing with them."],
+		["Carpenter Gu", "Tell the tall gentleman by the river that a carpenter of Qingshi asks his pardon. We have built for his people sixty generations, and I never once thought of them as anything but a longer beam.", "bow"],
+	],
+	"pre:late_axe": [
+		["Narrator", "On the first height stands the thing that was on time. It has the shape of an executioner and the patience of a water-clock, an axe as long as a boat held at the rest, and where a face would be, a roll of names with one struck through in red. It is still reading."],
+		["Fangfeng", "That is the hour. It has never once been wrong; I was not there. Ask it what I was doing instead. It will say that was not on the roll.", "think"],
+	],
+	"post:late_axe": [
+		["Narrator", "The axe comes down for the last time and stops a hand above the rock, where there is nobody. Then the thing turns its roll round, slowly, as a clerk does who has been asked to look at the back of a page. There is a line there in a villager's hand: a day and a night; one dyke; nobody drowned."],
+		["Fangfeng", "Nobody? There were four hundred of them. I never went back to count. ...Small one, I have been late for four thousand years, and I find I was only busy. I should like to stand up now. Mind your head.", "laugh"],
+	],
+	"s_p31_runner": [
+		["Narrator", "The peach-wood staff he planted by the black lake has become a wood, and it is in flower. Below the first height its owner is not looking at it. He is bent over with his hands on his knees, getting his breath, burnt the colour of a roof-tile, with his face to the west."],
+		["Kuafu", "It went over that ridge. Did you see? I had my hand out. It is winter at home, small brother; the nights are long as a week, and the old ones go in the dark, and the very young. I sat by this lake nine years, not thirsty, and then I remembered why I ran."],
+		["Lin Feng", "You meant to tie it over their mountain. Kuafu, what would you tie it with?"],
+		["Kuafu", "With... I had not got so far. Nobody of ours ever finishes a thing; my mother says so. Clear me the glare off this shore. I cannot see where it went, and it is slower in the evening.", "laugh"],
+	],
+	"done:s_p31_glare": [
+		["Narrator", "The glare goes out of the air a patch at a time, and behind it the shore is an ordinary afternoon. The long shadows that had run ahead of everything lie down where they belong. One of them is very large and has its arm stretched out, and does not lie down."],
+		["Yue Ling", "That one is his. It got ahead of him some time ago, Lin Feng. It has been running without him."],
+	],
+	"done:s_p31_stones": [
+		["Narrator", "Four peach stones the size of a fist, a giant's stride apart, in a line that points west. They are old and have split, and from each a shoot has come that is already taller than Lin Feng. He ate as he ran and threw them over his shoulder. There is an orchard behind him he has never once seen."],
+	],
+	"done:s_p31_west": [
+		["Narrator", "From the second height the sun can be watched going down, as it does, into the valley the old books call Yu. It is no nearer from here than from anywhere. Below, a line of peach trees runs away westward out of sight, exactly as straight as a man runs who is looking at nothing else."],
+	],
+	"done:s_p31_shadow": [
+		["Narrator", "He comes down the wind westward with the sun in his eyes, ten tiles, and lands where the light has just left. That is all there is to chasing it. The ground is still warm. The peach trees there are in flower, and under them, thick as a carpet, lies a winter's worth of dead wood."],
+		["Yue Ling", "You stopped. You saw where it went, and you came down. He has never once come down, Lin Feng. I do not think anybody told him it was allowed."],
+	],
+	"done:s_p31_beds": [
+		["Narrator", "The beds fill behind him as he clears them, a finger of water and then a hand. They were never quite empty. They had only been waiting to see whether he was coming back to drink the rest."],
+	],
+	"done:s_p31_woodmen": [
+		["Narrator", "Two woodcutters of the camps have said the same thing in different words: peach burns slow and hot and wants a year to dry, and a wood a thousand li across would keep a country warm through any night there is. One of them asked, not unkindly, what sort of fool walks past that looking for a fire."],
+	],
+	"pre:kuafu_west": [
+		["Narrator", "On the first height Kuafu stands with the staff across his shoulders and his face to the west, and he is twice what he was by the lake: the sun is low, and everything it is leaving throws its whole length at him. He is not angry. He is in a hurry, and Lin Feng is in the way."],
+		["Kuafu, Looking West", "Stand off, small brother! It is nearly down. I have never been so near. Do not make me go round you; I have not the breath to go round.", "refuse"],
+	],
+	"post:kuafu_west": [
+		["Narrator", "He sits down all at once, as a wall does. Lin Feng takes him by the shoulder, which is like turning a boat, and brings him round to face east; and there, a thousand li long and in flower, with the dead wood lying under it for the taking, is everything he dropped on the way."],
+		["Kuafu", "That is mine? All that? I ran after the one fire nobody can carry, and threw down behind me a thousand li of the kind anybody can. ...Mother said none of us finishes a thing. I shall go home with a bundle on my back and tell her what not finishing did.", "laugh"],
+	],
+	"s_p31_shore": [
+		["Narrator", "On the shingle below the first height of Penglai a giant in a straw hat is mending a line as thick as a ship's cable, handling it like thread. Three ships are drawn up behind him. On the sand a great many very large people sit quietly with their knees drawn in, trying to take up less room."],
+		["The Giant of Longbo", "You took a hook off me on this shelf once, little fisherman, and I went home smaller. I am not here to fish. Sit; I will come down to you. My people are growing out of their houses. A finger a month. The children two."],
+		["Lin Feng", "The shrinking is wearing off. You said so then. Is that not what you wanted?"],
+		["The Giant of Longbo", "I wanted to beat a record. I did not want my mother's roof on her shoulders. The decree that made us small never said how small, and now that it lets go it does not say how large. It is up there, letting go. Clear the beach of it, and read me where it stops.", "point"],
+	],
+	"done:s_p31_edicts": [
+		["Narrator", "The edicts go out one after another like lamps. Each was written in characters a little smaller than the last, and the newest can be read only with the eye against the page. Not one of them names a height. Every one says only: less than before. They are being unsaid now in the same way, a line at a time."],
+		["Yue Ling", "It had no size in mind for them, Lin Feng. Not then and not now. It only ever knew smaller, and now it only knows larger, and they are the ones standing under the roof."],
+	],
+	"done:s_p31_shells": [
+		["Narrator", "Four plates of turtle-shell the size of a door, scorched with a hot iron and cracked across. The cracks were read, and the readings cut beside them in an old woman's hand. All four say the same: it was hunger; ask again. Nobody did. They were told every New Year as a fishing story."],
+	],
+	"done:s_p31_giants": [
+		["Narrator", "Two of the Great People of Landfall have gone down to the shingle and sat among the Longbo, which they can do without anybody having to look up. They are talking about lintels. One of them is drawing a ridge-beam in the sand with his heel, and a child of the Longbo is correcting him."],
+	],
+	"done:s_p31_isle": [
+		["Narrator", "From the second height the sea can be seen where two isles are not. The water there is exactly like water anywhere. Far down under the height, something the size of a hill turns over in its sleep, and the island moves as a boat does when somebody shifts their weight."],
+	],
+	"done:s_p31_rooms": [
+		["Narrator", "Three houses of Tushan, each with one thing moved a hand's breadth. In the third the stool had been the wrong height for the grandmother for thirty years. She had never said: the house was built before she was. She sat down and looked surprised, and then a little angry, and then sat on."],
+	],
+	"pre:the_decree": [
+		["Narrator", "On the first height the decree has unrolled itself. It is a strip of yellow silk as long as a street, written from end to end in a hand that grows smaller as it goes, and it is being unwritten from the far end, a character at a time. Where the brush lifts, the rock beneath is a little higher than it was."],
+		["The Giant of Longbo", "It says: narrow their country, shorten their people. It does not say by how much. Somebody left the measure out, and so it was never finished, and now it cannot be finished the other way either. Find it an end, cultivator.", "kneel"],
+	],
+	"post:the_decree": [
+		["Narrator", "The brush stops. Under the last line there is a space where a measure should have been written and never was, and it is still empty; but beside it, for the first time, there is a second column, headed in the same hand: by whose word. The silk rolls itself up, and is a scroll a clerk might lose."],
+		["The Giant of Longbo", "Then somebody may say. That is all it wanted, all this while: somebody to say how much. My great-great-grandfather never asked who lived on the isles, and Heaven never asked how tall we ought to be. I shall ask. I do not know yet whom.", "think"],
+	],
+	"s_p31_market": [
+		["Narrator", "At the Loom of Borders, where every measure in the land is kept, a market has been set up and is over. One man is still standing in it below the first height, before a shoe-seller's shut stall, holding a knotted cord at arm's length and looking from it to his own foot."],
+		["The Man of Zheng", "I measured at home. I left the measure on my seat. I came, I found the shoes, I had no measure. I went back for it. Now the market is shut. It is very hard."],
+		["Lin Feng", "You had your foot with you the whole time."],
+		["The Man of Zheng", "I would sooner trust the measure than my own foot. ...You are smiling. Everybody smiles. And then they go home and cut a door the height their grandfather was. Something here has been making shoes off my cord. Go and see what they fit.", "point"],
+	],
+	"done:s_p31_shoes": [
+		["Narrator", "Thirty-four of them, and not one had a foot in it. They were made to the measure, exactly, every one; and the measure was taken once, long ago, of somebody who was not asked twice. In the dust where they stood are the prints of all the feet they were tried on, and by each a little dark, where something was pared to fit."],
+		["Yue Ling", "Cutting the foot to suit the shoe. I thought that was only a saying, Lin Feng."],
+	],
+	"done:s_p31_cords": [
+		["Narrator", "Four cords, knotted at a foot's length. No two are the same. One is a child's. One is as long as Lin Feng's forearm, and has been cut shorter and tied again, twice, by somebody trying to be reasonable."],
+	],
+	"s_p31_envoy": [
+		["Narrator", "Below the second height a very small old man in a mended fox-brown robe stands with his hands in his sleeves before a wall with two doors in it. One is the height of the wall. The other has been cut beside it and comes to about his chin."],
+		["Yan Ying", "They cut that one for me. The King of Chu's joke: a short door for a short envoy. I said: whoever is sent to a country of dogs goes in by the dog-door. I am sent to Chu. Which is it to be? They opened the great one. The small one is still here."],
+		["Lin Feng", "The Great People had every lintel in the land raised for them. Is that the same joke, told the other way?"],
+		["Yan Ying", "No, child. That is the answer to it. A door is cut for whoever comes; cut it lower, and you have said what you think of them. But something has been cutting these ever since, for everybody, a little shorter than they stand. Break them. I cannot reach the lintels.", "nod"],
+	],
+	"done:s_p31_dogdoors": [
+		["Narrator", "The small doors come down, and it turns out there was a wall behind each of them all the time, with a proper gate in it standing open. Nobody had ever needed to stoop. They had been shown the low door first, and had been too polite to look for another."],
+	],
+	"done:s_p31_under": [
+		["Narrator", "At the back of the cave the roof comes down to the height of his shoulder, and he goes the last of it bent double with one hand up for the rock. It is only a few steps. He thinks, all the way, about doing it for a lifetime, in every house, and calling it manners."],
+		["Yue Ling", "Your back, Lin Feng. No, do not straighten up so fast."],
+	],
+	"done:s_p31_seen": [
+		["Narrator", "Three things that stand because of what he said, each at the height it was built. He finds he is looking at their doors. One of them he would make higher, now. It is the only one that had a child sitting in it."],
+	],
+	"pre:the_shoe": [
+		["Narrator", "On the first height stands the shoe. It is one shoe, of good leather, very well made, as tall as a gatehouse; and it goes about on two blades like a tailor's shears, measuring whatever it meets against itself and paring away the difference. It has never yet met anything that fitted."],
+		["The Man of Zheng", "That is my measure. I knew it would be. I took it forty years ago, on a cold morning, of a foot that had been walking. I have never been that size again, and I have bought every shoe by it since.", "grieve"],
+	],
+	"post:the_shoe": [
+		["Narrator", "The shears open and do not close. Lin Feng has set his own foot against the sole, and it does not fit, and he has left it there and not moved it. After a long while the leather gives, as leather will when it is worn and not argued with; and what lies on the height is a shoe the size of a shoe."],
+		["The Man of Zheng", "It stretched. They stretch! Nobody told me. ...May I? It is... yes. A little tight across the top. I shall wear it home. I think that is how it is done.", "laugh"],
+	],
+	"s_p31_lintel": [
+		["Narrator", "Yan Ying has not moved from before the two doors. A letter has come to him from Landfall, in a giant's hand, on a sheet the size of a sail. He has spread it on the ground and is walking along the lines to read them."],
+		["Yan Ying", "The decree waits on somebody's word. They may grow until they are hills again, in a land whose gates were raised for twice a man and no more. Or it may be stopped where they stand, and they will fit. They cannot decide, and they have asked the one who found the empty column.", "think"],
+		["Lin Feng", "It is their height."],
+		["Yan Ying", "It is their height, and it is our gates. That is what makes it a question, child, and not a kindness. Well? I am only the one who knows about doors."],
+	],
+	"s_p31_end": [
+		["Narrator", "In the court of the sect, leaning against the wall because it would not go through the gate, is a door-frame of new fir, pegged with oak. It has two lintels, one at the height of a man and one a good deal higher, and a note in Carpenter Gu's hand pinned to the lower: this one comes out."],
+		["Elder Qing Xuan", "He says the upper is the real one and the lower is there to be knocked away by whoever finds it in their road. I have had it stood by the hall. Sweeper Bai walked under it nine times this morning to see whether he felt different. He says he does.", "think"],
+		["Lin Feng", "A man was cut down for being late and nobody asked what kept him. A people was made small and never told how small. Somebody trusted a cord over his own foot. They were all measured, Elder, by something that never once looked at them."],
+		["Elder Qing Xuan", "And what did you measure them by? No, do not tell me; I saw you duck under my own lintel as you came in, and it is nine feet high. Go and sit, child. You are not as tall as you have begun to think, nor as small.", "bow"],
+		["Yue Ling", "The gate of the sect is the old height, Lin Feng. Nobody of the Great People has ever come up the nine hundred and ninety-nine steps. I asked Sweeper Bai why not. He said nobody had asked them."],
+	],
+	"pre:s_break36": [
+		["Narrator", "Under the pine Lin Feng sits with a door-frame standing behind him that has nothing on either side of it. An ant goes under the lower lintel and a crane's shadow goes over the upper. Down the mountain somebody very large has stopped at the foot of the stair, and is looking up. The sky gathers."],
+	],
+	"post:s_break36": [
+		["Narrator", "The tribulation comes down the size of the sky, and he does not make himself large to meet it, nor small to let it by. He stays the size he is. It turns out there is exactly room. When it has passed, the lower lintel is lying on the ground in two pieces, and nobody touched it."],
+	],
 	# ---- Part XXX: The Net with Three Sides Open (the Open Net release)
 	"recall28": [
 		["Narrator", "The winter after the mat, Lin Feng notices how quiet the mountain road has become. No pack has stood in his way since the autumn. They hear him a ridge off and are gone. He had taken it for peace. It is only that there is nothing left in the land that could tell him no."],
@@ -9638,7 +9964,7 @@ const DIALOGUE := {
 		["Yue Ling", "It is the second watch of somebody else's month. I have been keeping the almanac since the bamboo forest, Lin Feng. You never asked."],
 	],
 	"s_p29_guest": [
-		["Narrator", "Below the fourth height stands a new house, very square, with a chimney that goes straight up through the thatch like a finger and a winter's firewood stacked neatly against the stove wall. Across the lane a thin old man is sitting on a stone, looking at the chimney the way a physician looks at a cough."],
+		["Narrator", "Below the fourth height stands a new house, very square, with a chimney that goes straight up through the shingles like a finger and a winter's firewood stacked neatly against the stove wall. Across the lane a thin old man is sitting on a stone, looking at the chimney the way a physician looks at a cough."],
 		["The Guest Who Said So", "I said: bend the chimney, so the sparks cool before they find the roof. I said: move the wood to the far wall. He said, thank you. He has a very final way of saying it. That was in the spring.", "think"],
 		["Lin Feng", "And the house is still standing."],
 		["The Guest Who Said So", "Every day it stands he is surer I was a fool. That is the trouble with being right early. Here: a jar, a lamp. Go into three houses in the town and ask what is wrong. They will tell you. People always know. Then put it right, and see how you are thanked.", "offer"],
@@ -9654,7 +9980,7 @@ const DIALOGUE := {
 		["Narrator", "Three stems of green timber lie along the far wall, a room's width from the stove. The old stack stands where it stood, grey and dry and a hand from the bricks. Tian has not moved a stick of it. He has, however, stopped saying so."],
 	],
 	"done:s_p29_sparks": [
-		["Narrator", "The last spark goes out in the wet of the marsh against Lin Feng's sleeve. Over the ridge behind him, quite quietly, the thatch of the new house begins to glow along the line where a straight chimney meets it. It is the ninth month. The guest was right in the spring."],
+		["Narrator", "The last spark goes out in the wet of the marsh against Lin Feng's sleeve. Over the ridge behind him, quite quietly, the roof of the new house begins to glow along the line where a straight chimney meets it. It is the ninth month. The guest was right in the spring."],
 		["Yue Ling", "Lin Feng. The roof."],
 	],
 	"done:s_p29_shingles": [
@@ -9865,7 +10191,7 @@ const DIALOGUE := {
 		["The Owl of Huayin Hill", "Gone. And nobody opened it but itself. Very well. I shall not say I was robbed. I shall say I was outbid, by a child, with flowers. There are worse things to have said of one.", "grieve"],
 	],
 	"s_p28_youth": [
-		["Narrator", "The boy is sitting on his stump with the empty box. He has not been crying, or has finished. In his lap are four rings of white jade in a row, and he is not touching them."],
+		["Narrator", "The boy is sitting on his stump with the empty box. He has not been crying, or has finished. In his lap, where Lin Feng set them down as he came off the height, are the four rings of white jade in a row, and he is not touching them."],
 		["Yang Bao, Aged Nine", "A boy came in the night. In a yellow coat. He bowed to me, a real one, to the floor. He said he was a messenger of the Queen Mother and that I had been kind, and that my sons' sons would be as clean as these. I have not got any sons. I am nine.", "shock"],
 		["Lin Feng", "You will have. Keep them where you can see them."],
 		["Yang Bao, Aged Nine", "I only picked the ants off. Anybody would. ...Would anybody? You look as though you do not think so. There is a man by the Mirror Lake my uncle says nobody has ever been kind to in his life, and it shows. You should go and look at him.", "think"],
@@ -10029,7 +10355,7 @@ const DIALOGUE := {
 		["Wu Pu", "Every morning, mind. A door turns every day or it rusts. ...One thing more, before you go: the road."],
 	],
 	"s_p26_cook": [
-		["Narrator", "The kitchen of the Cauldron Hall at Tushan is the size of a temple and smells of nothing. The fires are banked. Forty cooks stand about with their hands in their sleeves. On the great block lies a cleaver, and on a stool beside it sits a broad man in an apron, looking at it."],
+		["Narrator", "The kitchen of the Cauldron Hall at Tushan is the size of a temple and smells of nothing. The fires are banked. Forty cooks stand about with their hands in their sleeves. Out below the height, on a stool, sits a broad man in an apron with a cleaver across his knees, looking at it."],
 		["Cook Ding", "Nineteen years, this knife, and thousands of oxen, and the edge is as if it had just come from the stone. A good cook changes his knife once a year, because he cuts. An ordinary cook once a month, because he hacks. I go where the gaps are.", "think"],
 		["Lin Feng", "Then why have you put it down?"],
 		["Cook Ding", "Because the court has been sent an ox for the feast of the six hearths, and I cannot see the gaps in it. When I began I saw nothing but whole oxen. After three years I never saw a whole ox again. Now one stands on the height above the town, and I can see nothing else.", "grieve"],

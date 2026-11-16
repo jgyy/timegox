@@ -2346,6 +2346,12 @@ func _run() -> void:
 		# country in balance and barren, a barren pack, the watch and the lords in battle, the crossroads and
 		# what each answer leaves standing
 		await _net_shots(str(main.args.net))
+	if main.args.has("tall"):
+		# the Tall People release (--tall, or --tall=a,b): the Great People beside a man, the eight gestures of a
+		# close-up, the nine faces of the Way, the people, foes and lords of Part XXXI, a town with giants in its
+		# streets, a giant at a door, a conversation cut to a close-up, the lords in battle, the crossroads and
+		# what each answer leaves standing
+		await _tall_shots(str(main.args.tall))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -5477,4 +5483,249 @@ func _net_shots(which: String = "1") -> void:
 			w.cam_override = null
 		_sheet("mark_verdict_answers", fr3, 0.48)
 		Game.picks = {}
+	get_tree().quit(0)
+
+## The Tall People release (--tall, or --tall=a,b): see _run.
+func _giant(asset: String) -> Node3D:
+	var m: Node3D = Assets.person(asset) if Assets.PEOPLE.has(asset) else Assets.instance("characters/" + asset)
+	m.set_meta("kind", "person")
+	Assets.lend_clips(m)
+	m.scale = Vector3.ONE * Giants.SCALE
+	return m
+
+func _tall_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 107
+	Game.step = Data.step_index("s_p31_lintel")
+	Game.companion = true
+	Game.day = 190
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	quiet.call()
+	if want.call("people"):
+		await _gallery("great_people_and_a_man", [_giant("folk_giant"), Models.hero({"cols": {}}), _giant("folk_giantess"), Models.yue_ling(), _giant("fangfeng")], 1.15, 0.2)
+		await _gallery("part31_giants", [_giant("fangfeng"), _giant("kuafu"), _giant("longbo_angler")], 1.3, 0.2)
+		await _gallery("part31_people", [Assets.person("yan_ying"), Assets.person("zheng_buyer"), Models.hero({"cols": {}})], 0.5, 0.2)
+	if want.call("clips"):
+		var ms: Array = []
+		var ps: Array = []
+		var who := {"stroke_beard": "elder", "sleeve_smile": "yue_ling", "fist_palm": "lin_feng", "hand_heart": "li_li", "shade_eyes": "hua_xin", "measure": "zheng_buyer", "arms_cross": "yan_ying", "stoop": "cheng_tang"}
+		for cl in ["stroke_beard", "sleeve_smile", "fist_palm", "hand_heart", "shade_eyes", "measure", "arms_cross", "stoop"]:
+			var pm: Node3D = Assets.person(str(who[cl])) if Assets.PEOPLE.has(str(who[cl])) else Assets.person("lin_feng")
+			Assets.lend_clips(pm)
+			ms.append(pm)
+			ps.append([cl, float(Closeup.SECONDS[cl]) * 0.5])
+		await _pose_gallery("closeup_gestures", ms, ps, 0.42, 0.35)
+		await _pose_gallery("giant_stoops_to_a_man", [_giant("fangfeng"), Models.hero({"cols": {}}), _giant("folk_giantess")], [["stoop", 1.8], ["idle", 0.5], ["stoop", 1.2]], 1.25, 0.25)
+	if want.call("faces"):
+		var rows: Array = []
+		for grp in [[4, 3, 2, 1, 0], [0, -1, -2, -3, -4]]:
+			var sc := _bare_stage(460.0, 22.0)
+			var stage: Node3D = sc[0]
+			var cam: Camera3D = sc[1]
+			var models: Array = []
+			for i in grp.size():
+				var m: Node3D = Models.hero({"visage": int(grp[i]), "cols": {"robe": Color("3a8ae8"), "sec": Color("2a3a6a"), "trim": Color("e8f0ff")}})
+				m.position = Vector3((i - (grp.size() - 1) * 0.5) * 0.36, 0.0, 0.0)
+				m.rotation.y = 0.18 if i % 2 == 0 else -0.18
+				stage.add_child(m)
+				_caption(stage, m.position + Vector3(0, 1.66 - 0.215, 0.2), str(Visage.LOOKS[int(grp[i])].n), 0.00046)
+				models.append(m)
+			cam.position = Vector3(0, 1.68, 0.5 + grp.size() * 0.36 * 1.28)
+			cam.look_at(stage.global_position + Vector3(0, 1.625, 0), Vector3.UP)
+			cam.make_current()
+			var t0 := 0.0
+			for k in 40:
+				t0 += 1.0 / 30.0
+				for m2 in models:
+					Models.anim_person(m2, 1.6 + t0, false)
+				await get_tree().process_frame
+			await _shot("face_row", false)
+			var img: Image = last_img
+			rows.append(img.get_region(Rect2i(0, int(img.get_height() * 0.3), img.get_width(), int(img.get_height() * 0.37))))
+			stage.queue_free()
+			main.world.show()
+		_stack("faces_of_the_way", rows)
+		await _gallery("looks_of_the_way", [Models.hero({"visage": 4, "cols": {}}), Models.hero({"visage": 2, "cols": {}}), Models.hero({"visage": 0, "cols": {}}), Models.hero({"visage": -2, "cols": {}}), Models.hero({"visage": -4, "cols": {}})], 0.5, 0.15)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["late_drum", "roll_call", "flood_mire", "noon_glare", "long_shadow", "dry_bed", "small_decree", "low_lintel", "drift_isle", "tight_shoe", "cut_measure", "dog_door"]:
+			fs.append(_foe(fid))
+		await _gallery("part31_foes", fs, 1.0, 0.25)
+		var kw := _foe("kuafu_west", true)
+		kw.scale = Vector3.ONE * Giants.SCALE
+		await _gallery("part31_lords", [_foe("late_axe", true), kw, _foe("the_decree", true), _foe("the_shoe", true)], 1.3, 0.25)
+		var og: Array = []
+		for oid in ["fangfeng", "kuafu", "longbo_giant"]:
+			var om := _foe(oid, true)
+			om.scale = Vector3.ONE * Giants.SCALE
+			og.append(om)
+		og.insert(1, Models.hero({"cols": {}}))
+		await _gallery("old_giants_in_their_own_bodies", og, 1.2, 0.2)
+	var lw := Atlas.world_of("surface")
+	if want.call("town"):
+		for tw in [["qingshi", 10.4, "giants_in_qingshi"], ["tushan", 17.8, "giants_in_tushan"]]:
+			main.set_stack(["world"])
+			w.open_world()
+			w.enter_layer("surface")
+			Game.clock = float(tw[1]) * 60.0
+			for fp in Folk.people(lw, str(tw[0])):
+				if str(fp.role) != Giants.ROLE:
+					continue
+				var st: Dictionary = Folk.state(lw, fp, Game.clock)
+				if not bool(st.vis):
+					continue
+				var gt := Vector2i(int(floor(float(st.at.x))), int(floor(float(st.at.y))))
+				var spot := _nearest_free(gt + Vector2i(0, 3))
+				w.teleport(spot, "surface")
+				w.facing = Vector2i(0, -1)
+				w.cam_q = 0
+				w._snap_cam()
+				w.banner_t = 0.0
+				quiet.call()
+				await _wait(1.4)
+				var gp: Vector3 = w.wpos(gt)
+				var pp: Vector3 = w._player_pos()
+				var look := (gp + pp) * 0.5 + Vector3(0, 1.9, 0)
+				var side := (gp - pp).normalized().cross(Vector3.UP)
+				w.cam_override = Transform3D(Basis.IDENTITY, look + side * 8.5 + Vector3(0, 1.4, 0) - (gp - pp).normalized() * 2.0).looking_at(look, Vector3.UP)
+				await _wait(0.3)
+				await _shot(str(tw[2]))
+				w.cam_override = null
+				break
+	if want.call("door"):
+		main.set_stack(["world"])
+		w.open_world()
+		w.enter_layer("surface")
+		Game.clock = 10.0 * 60.0
+		for bd in lw.buildings:
+			if str(bd.get("area", "")) != "village" or not str(bd.get("style", "")) in ["house", "inn", "shop", "teahouse"]:
+				continue
+			var d: Vector2i = bd.door
+			var out := Vector2i.ZERO
+			for dd in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+				if not Rooms.inside(bd, d + dd) and MapGen.is_walkable_tile(lw.grid[(d.y + dd.y) * int(lw.w) + d.x + dd.x]) and lw.grid[(d.y + dd.y) * int(lw.w) + d.x + dd.x] != MapGen.INTERIOR:
+					out = dd
+			if out == Vector2i.ZERO or out != Vector2i(0, 1):
+				continue
+			w.teleport(d + out * 3 + Vector2i(1, 0), "surface")
+			w.facing = -out
+			w.cam_q = _quarter(Vector2(-out))
+			w._snap_cam()
+			w.banner_t = 0.0
+			quiet.call()
+			await _wait(0.5)
+			var o3 := Vector3(out.x, 0, out.y)
+			var s3 := Vector3(-out.y, 0, out.x)
+			var dp: Vector3 = w.wpos(d)
+			var gm := _giant("folk_giant")
+			gm.position = dp + o3 * 0.2 + Vector3(0, Arch.FLOOR_Y, 0)
+			gm.rotation.y = atan2(o3.x, o3.z)
+			w.scene3d.add_child(gm)
+			var gm2 := _giant("folk_giantess")
+			gm2.position = dp + o3 * 3.6 - s3 * 2.2
+			gm2.position.y = w.ground_y(gm2.position)
+			gm2.rotation.y = atan2(-o3.x, -o3.z) + 0.5
+			w.scene3d.add_child(gm2)
+			var fm: Node3D = Assets.instance("characters/folk_farmer")
+			fm.position = dp + o3 * 2.4 - s3 * 0.9
+			fm.position.y = w.ground_y(fm.position)
+			fm.rotation.y = atan2(-o3.x, -o3.z)
+			w.scene3d.add_child(fm)
+			for k in 6:
+				Models.anim_person(gm, 2.0 + k * 0.03, true)
+				Models.anim_person(gm2, 1.0 + k * 0.03, false, false, "talk")
+				Models.anim_person(fm, 1.0 + k * 0.03, false)
+				await get_tree().process_frame
+			var lk := dp + Vector3(0, 2.3, 0)
+			w.cam_override = Transform3D(Basis.IDENTITY, dp + o3 * 9.5 + s3 * 4.2 + Vector3(0, 2.2, 0)).looking_at(lk, Vector3.UP)
+			await _wait(0.2)
+			await _shot("giant_in_a_doorway")
+			w.cam_override = null
+			# and indoors, under the ceiling: the roof lifts away
+			var inn := d - out * 2
+			if Rooms.inside(bd, inn):
+				gm.position = w.wpos(d - out * 3) + Vector3(0.9, Arch.FLOOR_Y, 0)
+				gm.rotation.y = 0.4
+				w.teleport(inn, "surface")
+				w.facing = -out
+				w.cam_q = _quarter(Vector2(-out))
+				w._snap_cam()
+				quiet.call()
+				for k2 in 10:
+					Models.anim_person(gm, 1.0 + k2 * 0.03, false, false, "talk")
+					await get_tree().process_frame
+				await _shot("giant_indoors")
+			gm.queue_free()
+			gm2.queue_free()
+			fm.queue_free()
+			break
+	if want.call("closeup"):
+		for cv in [["fangfeng", "s_p31_late", "closeup_fangfeng"], ["yan_ying", "s_p31_envoy", "closeup_yan_ying"]]:
+			main.set_stack(["world"])
+			Game.step = Data.step_index(str(cv[1]))
+			w.clear_cache()
+			var e := _land_ent(str(cv[0]))
+			if e.is_empty():
+				continue
+			Game.clock = 15.5 * 60.0
+			_stand_by(e)
+			quiet.call()
+			await _wait(0.5)
+			main.say(Echoes.told(Game, str(cv[1]), Data.DIALOGUE[str(cv[1])]))
+			var frames: Array = []
+			for li in (Data.DIALOGUE[str(cv[1])] as Array).size():
+				main.dialogue.shown = 999.0
+				await _wait(1.3 if li > 0 else 2.0)
+				await _shot("%s_%d" % [str(cv[2]), li], true)
+				frames.append(last_img)
+				main.press("confirm")
+				await _wait(0.15)
+			_sheet(str(cv[2]) + "_cut", frames, 1.0)
+			await _skip_talk()
+	if want.call("page"):
+		main.set_stack(["world"])
+		Game.creed["virtue"] = -34
+		quiet.call()
+		w.refresh_hero()
+		main.open_menu()
+		main.menu.mode = "way"
+		main.menu.cursor = 0
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("way_page_face")
+		main.pop()
+		Game.creed["virtue"] = 0
+	if want.call("battle"):
+		main.set_stack(["world"])
+		for bb in [["kuafu_west", "buzhou", "relic", 107], ["late_axe", "time", "folk", 106], ["the_decree", "penglai", "relic", 107], ["the_shoe", "loom", "relic", 108], ["fangfeng", "tushan", "might", 44]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might if Trials.TRIALS.has(bid) else [3.0, 1.2]
+			var pth: Dictionary = Trials.path(bid, str(bb[2])) if Trials.TRIALS.has(bid) else {}
+			var ctx := {"entity": {"id": "boss_" + bid}, "boss": true, "enemy": bid, "theme": str(Data.AREAS[str(bb[1])].theme)}
+			if not pth.is_empty():
+				ctx.merge({"trial": bid, "path": str(bb[2]), "boon": pth.boon, "path_n": str(pth.n), "path_kind": str(Trials.KINDS[str(pth.kind)].n)})
+			main.battle.start([{"id": bid, "lv": int(bb[3]), "mult": float(bm[0]), "atk": float(bm[1])}], ctx)
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_lintel"]
+		main.ask_crossroads()
+		main.choice.cursor = 2
+		await _wait(1.0)
+		await _shot("crossroads_lintel")
+		main.pop()
+		Game.cross_pending = []
 	get_tree().quit(0)

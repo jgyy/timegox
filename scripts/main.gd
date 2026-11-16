@@ -990,6 +990,9 @@ func talk_npc(e: Dictionary) -> void:
 		say(olines, func(): offer_carriage(e))
 		return
 	if e.has("trade") and e.has("lines"):
+		if Crime.dead(Game, str(e.id)):
+			offer_shift(e)
+			return
 		var ti: int = chat_idx.get(e.id, 0)
 		chat_idx[e.id] = ti + 1
 		var tlines := [[e.n, str(e.lines[ti % (e.lines as Array).size()])]]
@@ -1982,7 +1985,7 @@ func open_ask() -> void:
 	var a: Dictionary = Romance.ASKS[id]
 	var opts: Array = []
 	for op in a.options:
-		opts.append({"id": str(op[0]), "label": str(op[2]), "desc": "", "col": Color("ff9ac0")})
+		opts.append({"id": str(op[0]), "label": str(op[2]), "desc": "", "col": Color("ff9ac0"), "enabled": Romance.option_ok(Game, id, str(op[0]))})
 	opts.append({"id": "wait", "label": "Not today", "desc": "It will keep. It has kept this long.", "col": UI.C_DIM})
 	choose(told(str(a.ask)), opts, func(oid: String):
 		if oid == "" or oid == "wait":
@@ -2274,7 +2277,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

@@ -99,7 +99,19 @@ static func dressed(style: String, area: String) -> Dictionary:
 
 ## Part XI: how high an upper storey's floor stands above the building's ground (the top of the ground
 ## floor's walls), and how deep a cellar's floor lies below it
-const STOREY_Y := 2.96
+## (the Tall People release, giants.gd: the houses of the land are built for everybody who lives in it.
+## One of the Great People stands Giants.HEIGHT; the ground storey's walls, the lintel of every door, the
+## storey above and the cross-beam of a town's gate all clear that with room for a topknot.  They were
+## 2.6 m, 2.25 m, 2.4 m and 2.96 m, a man's house and nobody else's.)
+const WALL_H := 4.2
+const WALL2_H := 4.0
+## how far the underside of a door's lintel is below the top of the wall, and so how high a doorway is
+const LINTEL_DROP := 0.46
+const DOOR_CLEAR := WALL_H - LINTEL_DROP
+## how much higher a town's gate stands than it did
+const GATE_RISE := 1.1
+const GATE_CLEAR := 2.96 + GATE_RISE
+const STOREY_Y := 0.3 + WALL_H + 0.06
 const CELLAR_Y := -3.0
 ## the top of a ground floor's planks above the ground under the building (the platform `ph` is
 ## 0.3 m, the planks on it a few centimetres more): people indoors stand on this
@@ -496,7 +508,7 @@ static func pailou(b: MB, g: MB, p: Vector3, yaw: float, span: float = 3.2) -> v
 		return Vector3(across, up, along) if swap0 else Vector3(along, up, across)
 	for i in posts.size():
 		var x: float = posts[i]
-		var tall := 4.2 if i < 2 else 3.0
+		var tall := (4.2 if i < 2 else 3.0) + GATE_RISE
 		var q := p + bs * Vector3(x, 0, 0)
 		b.lathe(q, [Vector2(0.3, 0.0), Vector2(0.3, 0.35), Vector2(0.22, 0.5)], stone, 10)
 		b.cyl(q + Vector3(0, tall * 0.5, 0), 0.14, tall, red, Vector3.ZERO, 10)
@@ -504,21 +516,21 @@ static func pailou(b: MB, g: MB, p: Vector3, yaw: float, span: float = 3.2) -> v
 		for s: float in [-1.0, 1.0]:
 			b.box(q + bs * Vector3(0, 0.35, s * 0.3), sz.call(0.2, 0.7, 0.36), stone)
 	# beams and the name board
-	b.box(p + Vector3(0, 3.6, 0), sz.call(span + 0.4, 0.26, 0.22), red)
-	b.box(p + Vector3(0, 3.05, 0), sz.call(span + 0.3, 0.18, 0.2), MB.tag(Color("2a7a6a"), MB.WOOD))
-	b.box(p + Vector3(0, 3.33, 0), sz.call(1.5, 0.4, 0.08), MB.tag(Color("1a2a4a"), MB.WOOD))
-	b.box(p + bs * Vector3(0, 3.33, 0.05), sz.call(1.3, 0.28, 0.02), gold)
+	b.box(p + Vector3(0, 3.6 + GATE_RISE, 0), sz.call(span + 0.4, 0.26, 0.22), red)
+	b.box(p + Vector3(0, 3.05 + GATE_RISE, 0), sz.call(span + 0.3, 0.18, 0.2), MB.tag(Color("2a7a6a"), MB.WOOD))
+	b.box(p + Vector3(0, 3.33 + GATE_RISE, 0), sz.call(1.5, 0.4, 0.08), MB.tag(Color("1a2a4a"), MB.WOOD))
+	b.box(p + bs * Vector3(0, 3.33 + GATE_RISE, 0.05), sz.call(1.3, 0.28, 0.02), gold)
 	for s: float in [-1.0, 1.0]:
-		b.box(p + bs * Vector3(s * (span * 0.5 + 0.65), 2.55, 0), sz.call(1.3, 0.2, 0.2), red)
+		b.box(p + bs * Vector3(s * (span * 0.5 + 0.65), 2.55 + GATE_RISE, 0), sz.call(1.3, 0.2, 0.2), red)
 	# roofs: a tall centre roof and two lower side roofs
 	var swap := absf(sin(yaw)) > 0.7
 	var ax := (span + 0.6) * 0.5
 	var az := 0.35
-	hip_roof(b, g, p + Vector3(0, 3.78, 0), az if swap else ax, ax if swap else az, 0.45, 0.6, st, false)
+	hip_roof(b, g, p + Vector3(0, 3.78 + GATE_RISE, 0), az if swap else ax, ax if swap else az, 0.45, 0.6, st, false)
 	for s: float in [-1.0, 1.0]:
-		var sp := p + bs * Vector3(s * (span * 0.5 + 0.65), 2.7, 0)
+		var sp := p + bs * Vector3(s * (span * 0.5 + 0.65), 2.7 + GATE_RISE, 0)
 		hip_roof(b, g, sp, az if swap else 0.6, 0.6 if swap else az, 0.35, 0.45, st, false)
-		var lp := p + bs * Vector3(s * (span * 0.5), 2.3, 0.25)
+		var lp := p + bs * Vector3(s * (span * 0.5), 2.3 + GATE_RISE, 0.25)
 		b.lathe(lp, [Vector2(0.06, 0.0), Vector2(0.16, 0.08), Vector2(0.17, 0.2), Vector2(0.13, 0.32), Vector2(0.05, 0.36)], MB.tag(Color("e04a3a"), MB.CLOTH), 10)
 		g.ball(lp + Vector3(0, 0.18, 0), 0.35, Color(1.0, 0.45, 0.2, 0.3), true)
 
@@ -1018,7 +1030,7 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 	var plank := MB.tag(Color("9a6a42"), MB.WOOD)
 	var plank_d := MB.tag(Color("7a5034"), MB.WOOD)
 	var ph := 0.3
-	var wall_h := 2.6
+	var wall_h := WALL_H
 	var th := 0.32
 	# platform and plank floor (planks run along the long side)
 	b.box(Vector3(cx, ph * 0.5 - 0.15, cz), Vector3(r.size.x + 0.4, ph + 0.3, r.size.y + 0.4), stone_d)
@@ -1105,9 +1117,12 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 				var post := Vector3(dc2 + s2 * 0.85, 0, a.z) if horiz else Vector3(a.x, 0, dc2 + s2 * 0.85)
 				b.cyl(post + Vector3(0, ph + wall_h * 0.5, 0), 0.14, wall_h, column, Vector3.ZERO, 8)
 				var leaf_c := post + (Vector3(-s2 * 0.08, 0, inward * 0.42) if horiz else Vector3(inward * 0.42, 0, -s2 * 0.08))
-				b.box(leaf_c + Vector3(0, ph + 1.05, 0), Vector3(0.06, 2.0, 0.8) if horiz else Vector3(0.8, 2.0, 0.06), MB.tag(Color("a8342a"), MB.WOOD))
-				for q2 in 3:
-					b.ball(leaf_c + Vector3(0, ph + 0.6 + q2 * 0.45, 0) + (Vector3(0.04, 0, 0) if horiz else Vector3(0, 0, 0.04)), 0.035, trim, true)
+				# (the Tall People release: the leaves are as tall as the doorway, which is as tall as a giant; the
+				# studs are where a man's hand and a giant's each find them)
+				var leaf_h := wall_h - LINTEL_DROP - 0.1
+				b.box(leaf_c + Vector3(0, ph + 0.05 + leaf_h * 0.5, 0), Vector3(0.06, leaf_h, 0.8) if horiz else Vector3(0.8, leaf_h, 0.06), MB.tag(Color("a8342a"), MB.WOOD))
+				for q2 in 6:
+					b.ball(leaf_c + Vector3(0, ph + 0.6 + q2 * (leaf_h - 1.0) / 5.0, 0) + (Vector3(0.04, 0, 0) if horiz else Vector3(0, 0, 0.04)), 0.035, trim, true)
 			var lint := Vector3(dc2, ph + wall_h - 0.35, a.z) if horiz else Vector3(a.x, ph + wall_h - 0.35, dc2)
 			b.box(lint, Vector3(1.9, 0.22, th + 0.1) if horiz else Vector3(th + 0.1, 0.22, 1.9), beam)
 			var plaque := lint + Vector3(0, 0.0, -inward * (th * 0.5 + 0.06)) if horiz else lint + Vector3(-inward * (th * 0.5 + 0.06), 0, 0)
@@ -1161,7 +1176,7 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 	# ---- an upper storey (Part XI)
 	if up != null:
 		var floor_y := top
-		var wall2 := 2.4
+		var wall2 := WALL2_H
 		# planks tile by tile, leaving the stairwell open
 		for zi in int(round((z1 - z0) / T)) + 1:
 			for xi in int(round((x1 - x0) / T)) + 1:
@@ -1425,14 +1440,16 @@ static func _moon_gate(b: MB, g: MB, door: Vector3, inner: Rect2, ph: float, wal
 	var frame := MB.tag(Color("e8e4dc"), MB.STONE)
 	var horiz := absf(door.z - inner.position.y) < T * 0.6 or absf(door.z - inner.end.y) < T * 0.6
 	var rot := Vector3(PI * 0.5, 0, 0) if horiz else Vector3(0, 0, PI * 0.5)
-	var dc := Vector3(door.x, ph + 1.05, door.z)
+	# (the Tall People release: a moon as tall as the doorway)
+	var mr := (wall_h - LINTEL_DROP) * 0.5
+	var dc := Vector3(door.x, ph + mr - 0.02, door.z)
 	# the ring stands proud of the wall on both faces
 	for s: float in [-1.0, 1.0]:
 		var face := (Vector3(0, 0, s * (th * 0.5 + 0.04)) if horiz else Vector3(s * (th * 0.5 + 0.04), 0, 0))
-		b.torus(dc + face, 1.12, 0.1, frame, rot, true)
-		b.torus(dc + face * 1.3, 1.2, 0.04, MB.tag(_c(st.trim), MB.METAL), rot)
+		b.torus(dc + face, mr, 0.1, frame, rot, true)
+		b.torus(dc + face * 1.3, mr + 0.08, 0.04, MB.tag(_c(st.trim), MB.METAL), rot)
 	# a carved name band over the gate
-	var band := dc + Vector3(0, 1.32, 0)
+	var band := dc + Vector3(0, mr + 0.2, 0)
 	b.box(band, Vector3(1.4, 0.3, th + 0.12) if horiz else Vector3(th + 0.12, 0.3, 1.4), MB.tag(_c(st.beam), MB.WOOD))
 	for k in 3:
 		var off := (k - 1) * 0.36
@@ -1630,15 +1647,17 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 			lights.append([p + Vector3(0, 1.6, 0), Color(1.0, 0.65, 0.35)])
 		# ---- Part XI: stairs between storeys, and the Feathered Folk's nests
 		"stairs_up":
-			# a steep flight of steps up the tile towards the nearest wall, rising one storey (2.6 m)
+			# a steep flight of steps up the tile towards the nearest wall, rising one storey (WALL_H: thirteen
+			# treads now, where eight went up a man's storey)
 			var fwd2 := back
 			var start := p - fwd2 * 0.85
-			for k9 in 8:
-				var sp2 := start + fwd2 * (k9 * 0.24) + Vector3(0, 0.16 + k9 * 0.33, 0)
-				b.box(sp2, Vector3(1.4, 0.1, 0.34) if absf(fwd2.z) > 0.5 else Vector3(0.34, 0.1, 1.4), wood_l)
+			var n_tr := 13
+			for k9 in n_tr:
+				var sp2 := start + fwd2 * (k9 * 1.75 / float(n_tr - 1)) + Vector3(0, 0.16 + k9 * (WALL_H - 0.3) / float(n_tr - 1), 0)
+				b.box(sp2, Vector3(1.4, 0.1, 0.3) if absf(fwd2.z) > 0.5 else Vector3(0.3, 0.1, 1.4), wood_l)
 			for s10: float in [-1.0, 1.0]:
 				var rail_a := start + side * (s10 * 0.75) + Vector3(0, 0.6, 0)
-				var rail_b := start + fwd2 * 1.75 + side * (s10 * 0.75) + Vector3(0, 3.1, 0)
+				var rail_b := start + fwd2 * 1.75 + side * (s10 * 0.75) + Vector3(0, WALL_H + 0.5, 0)
 				b.limb(rail_a, rail_b, 0.05, 0.05, lacquer, 6)
 				b.limb(start + side * (s10 * 0.75), rail_a, 0.04, 0.04, lacquer, 5)
 			g.box(p + Vector3(0, 0.04, 0) - fwd2 * 0.9, Vector3(0.9, 0.02, 0.18) if absf(fwd2.z) > 0.5 else Vector3(0.18, 0.02, 0.9), Color(1.0, 0.85, 0.4, 0.5))

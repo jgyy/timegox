@@ -303,12 +303,16 @@ static func ask_blocked(g, id: String) -> String:
 			return "She has chosen a road of her own, and means to come back from it. \"Ask me then,\" she says. \"I shall say yes. I want to have been somewhere first.\""
 	return ""
 
+## Whether answer `oid` of question `id` can still be given (nobody he struck down stands witness: crime.gd).
+static func option_ok(g, id: String, oid: String) -> bool:
+	return not (id == "wed" and oid == "granny" and Crime.dead(g, "granny_wen"))
+
 ## Asked, and `oid` was how: what is said, as lines; the two are a stage further on.
 static func take_ask(g, id: String, oid: String) -> Array:
 	if ask_blocked(g, id) != "":
 		return []
 	var a: Dictionary = ASKS[id]
-	if not a.reply.has(oid):
+	if not a.reply.has(oid) or not option_ok(g, id, oid):
 		return []
 	for o in a.options:
 		if str(o[0]) == oid:

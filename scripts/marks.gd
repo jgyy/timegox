@@ -223,6 +223,15 @@ const MARKS := {
 		"field": {"area": "springs", "m": ["beds", Color("6a8a3a")], "k": 3, "n": "The Widow's Rows", "desc": "Bean rows at the edge of the lilies, with a slip of bamboo at the head of each. The first rows wander like a line drawn by somebody who has only read about lines. The later ones are nearly straight. A judge's black robe hangs on a pole at the end, for the birds.",
 			"who": ["Widow Sang", "folk_farmwife", Color("7a6a5a"), "He hoes like a man signing his name. I told him so. He said he would learn. He is sixty-six. It took him a month to stop asking the beans for their side of it.", "I have not told him it is paid. It is not paid. But I brought him water yesterday, because it was hot, and he is old. He thanked me as if I had remitted a sentence."]},
 	},
+	# Part XXXI (the Tall People release): which gives way, the foot or the shoe
+	"the_lintel": {
+		"grow": {"area": "penglai", "m": ["gate", true, STONE], "n": "The Second Lintel", "desc": "A gate on the shore of Penglai with its posts spliced upward in new stone and a second lintel set far above the first. The old one has been left in. Gulls sit on it. At low tide something walks out past the shelf that the gate was built for, and the gulls do not get up.",
+			"who": ["Mason Qu of Landfall", "folk_porter", Color("8a8478"), "They said: how high? I said: how high are they? They said: we do not know yet. So I have built it to be built on. Every course is dressed top and bottom. I have never laid a wall before that expected to be wrong.", "My father raised the old gate for the Great People and thought he had finished it. I shall not finish this. My boy is learning to splice a post. I find I do not mind."]},
+		"stay": {"area": "penglai", "m": ["posts", 5], "n": "The Measuring Posts", "desc": "Five posts of driftwood on the shore of Penglai, notched. Each spring the children of the Longbo and of Landfall stand against them and a notch is cut. For four generations the Longbo notches went down the post. This year's is level with last year's, and somebody has tied a red thread round it.",
+			"who": ["Net-Wife Lian", "folk_boatwoman", Color("5a7a8a"), "I cut the notches. Mine, my mother's, hers. Ours went up, as a child's should, and theirs went down, and nobody on this shore ever said a word about it. This year theirs stopped. A woman of theirs stood here half the morning with her hand flat on it.", "Do they mind? I asked one. He said he had been promised a hill and given a house, and that he had lived in the house all his life and never seen the hill. Then he asked whether I had a ladder, for the thatch."]},
+		"each": {"area": "penglai", "m": ["stele", STONE, false, true], "n": "The Stone of Two Heights", "desc": "A stone set up at the gate of Landfall with two lines cut across it, one at the height of a man's eye and one far above, and a question cut beside each in letters to match: how tall? Everybody who comes in by the gate is asked it once. Most people answer the lower line. Not all.",
+			"who": ["Gate-Clerk Su", "folk_scholar", Color("5a6a8a"), "I ask, and I write down what they say. A girl said: as tall as the door of the net-house, because my friend lives there. A very old one said: what I am; I have got used to my knees. One said hills, and looked at me to see whether I would laugh. I wrote hills.", "The carpenters send to me each morning for the list. Two lintels to every door, and the upper one wherever the tallest answer in that street comes to. It is a great deal of timber. The reeve calls it chaos. I call it a census, taken properly for once."]},
+	},
 	# Part XXVIII (the Answering Land release): what is owed for a kindness
 	"the_knot": {
 		"nothing": {"area": "fusang", "m": ["cairn", STRAW], "n": "The Cairn Where He Put It Down", "desc": "A small cairn in the long grass of the Valley of Sunrise, and round it a patch where every stem stands straight and none is tied. On the top stone somebody has left a single knot of grass, undone, the stems smoothed flat with a thumb.",
@@ -362,7 +371,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}

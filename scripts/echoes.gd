@@ -1139,7 +1139,7 @@ const CROSSROADS := {
 	"the_horse": {"step": "s_p24_weng2", "part": "XXIV", "n": "The old man's horse",
 		"ask": "The black horse broke Sai Weng's son and saved him from the riders. It stands behind the tent, and the whole frontier will do with its luck as the old man does with his. He has asked you to say. What is to be done with a horse like that?",
 		"options": [
-			{"id": "keep", "label": "Keep it by the tent, and never ride it", "tilt": {"reach": -3, "heart": 1}, "gain": {"hearth": {"dawn": 3}},
+			{"id": "keep", "label": "Keep it by the tent, and never ride it", "tilt": {"reach": -3, "heart": 1}, "gain": {"hearth": {"steppe": 3}},
 				"desc": "It came, and it is here. Put rails round it by the old man's door, and let the boy water it. Whatever is home is to be kept, lame or dangerous or neither. The Felt Hearth will understand that at once (regard of the Horse-Folk).",
 				"log": "Told Sai Weng to keep the black horse by his tent, unridden."},
 			{"id": "loose", "label": "Take down the rails. Let it run", "tilt": {"reach": 3, "craft": -1}, "gain": {"renown": 5},
@@ -1277,6 +1277,12 @@ const CROSSROADS := {
 			"road": [["Narrator", "Guan Ning opens his mouth, and shuts it, and then, for the first time since Lin Feng has known him, laughs. He rolls the mat, puts it under his arm with both books inside, and walks down to the gate like a man going into cold water."], ["Guan Ning", "Eight outriders. Well. I have read about canopies of green silk for thirty years. It would be a kind of scholarship to see one. Do not tell anybody I ran.", "laugh"]],
 		},
 		"echo": {
+			# Part XXXI (the Tall People release)
+			"s_p31_envoy": {
+				"cut": [["Yan Ying", "You are the one who had a mat cut between two friends. I once had a seat moved for me, lower down the hall, by a king who thought a short man should sit below a tall one. I sat. Then I answered every question he put to the tall ones."]],
+				"whole": [["Yan Ying", "You are the one who left a mat whole for a man who had got up from it. Then you know what the great door is, child. It is a place kept. Nobody need come in by it. It is only that it must be there."]],
+				"road": [["Yan Ying", "You are the one who sent a scholar to a gate with his mat under his arm, to look. Good. I have learned more about kings from their gateposts than from their counsels."]],
+			},
 			# Part XXX (the Open Net release)
 			"s_p30_tang": {
 				"cut": [["Tang of Shang", "They say you had a mat cut between two friends, so that each should know where he sat. A net is the other way about. It is by leaving the sides open that anything knows it may come."]],
@@ -1314,6 +1320,12 @@ const CROSSROADS := {
 			"field": [["Narrator", "Li Li takes off the black robe, folds it, and lays his seal on top. Under it he is wearing what anybody wears. He looks a good deal smaller and a little younger, and he picks up the hoe by the wrong end before he gets it right."], ["Li Li, Judge of Jin", "I do not know how deep a bean goes. I sentenced a man who knew that. Very well. She will have to teach me, and she will not want to, and that is the first of what I owe. Tell the Duke the bench is empty. Tell him to fill it with somebody slower.", "nod"]],
 		},
 		"echo": {
+			# Part XXXI (the Tall People release)
+			"s_p31_late": {
+				"sword": [["Fangfeng", "They say you stood by while a judge of Jin gave himself his own sentence. Yu gave me mine. I have wondered, these four thousand years, whether he ever gave himself one for it. I think not. He was a busy man."]],
+				"bench": [["Fangfeng", "They say you sent a judge back to his bench under the dead man's name. If Yu had sat under mine, small one, I should have forgiven him the axe. It was only that nobody wrote anything down."]],
+				"field": [["Fangfeng", "They say you set a judge to hoeing a dead man's beans. I should have liked that for Yu. He was a great digger of ditches. He would have done the rows very straight, and never asked whose they were."]],
+			},
 			"s_p30_end": {
 				"sword": [["Elder Qing Xuan", "And I hear a judge of Jin kept his own law to the end, and you did not stay his hand. I have a Hall of Discipline and a master in it who has never once been sentenced by it. I shall ask him this evening how he would find that."]],
 				"bench": [["Elder Qing Xuan", "And I hear a judge sits again in Jin with a dead man's name cut over his head. I have asked the carver for a board. There are three names I ought to be sitting under, and I had hoped that nobody else remembered them."]],
@@ -1324,6 +1336,37 @@ const CROSSROADS := {
 			"sword": "By the red lilies of the Yellow Springs there is a judge's mound with a seal laid on it, and seven rows of beans beside it that nobody planted twice. The clerks of Jin are brought there before they take office.",
 			"bench": "In the court of Jin a name is cut over the judge's bench, and it is not the judge's. Every case is heard twice there. It is the slowest court in the six states, and people walk a month to be tried in it.",
 			"field": "Below the Yellow Springs an old man hoes a widow's beans, badly, in a row that gets straighter every year. She has begun to bring him water at noon. She has not yet said that it is paid.",
+		}},
+	# Part XXXI (the Tall People release): which gives way, the foot or the shoe
+	"the_lintel": {"step": "s_p31_lintel", "part": "XXXI", "n": "The Height of the Longbo",
+		"ask": "The decree that made the people of Longbo small waits on a word. They may grow until they are hills again, in a land whose gates were raised for twice a man's height and no more; or be stopped where they stand, and fit every door there is. They have asked you: which gives way, the foot or the shoe?",
+		"options": [
+			{"id": "grow", "label": "Let them be hills. Raise the gates", "tilt": {"reach": 3, "craft": 2}, "creed": {"rule": -8}, "gain": {"stones": 10800},
+				"desc": "A people is the size it is. The gates of Landfall were raised once for somebody tall and can be raised again, in stone this time; the masons will curse, and be paid. Nobody was ever the worse for having to look up (spirit stones, from the masons of Landfall).",
+				"log": "Told the people of Longbo to be the height they were, and the towns to raise their gates."},
+			{"id": "stay", "label": "Where they stand. Every door fits", "tilt": {"reach": -3, "heart": -2}, "creed": {"rule": 8}, "gain": {"hearth": {"river": 3}},
+				"desc": "Four generations were born at this height and never stepped over an island. It is theirs now as much as the other was. Let the letting-go stop today: no smaller ever again, no larger, and a roof over every one of them by winter (the regard of the Boat Hearth).",
+				"log": "Told the people of Longbo to stay the height they stand, where every door is already open."},
+			{"id": "each", "label": "Ask each of them, at the gate", "tilt": {"heart": 3, "craft": -2}, "creed": {"virtue": 8}, "gain": {"renown": 6},
+				"desc": "Nobody asked them the first time. Ask each of them now, one at a time, and build for whatever is answered: towns of two heights, two lintels over every door, and a great deal of argument. It will take a generation, and it will never be tidy (renown).",
+				"log": "Told the people of Longbo that each should say a height, and the towns build for both."},
+		],
+		"after": {
+			"grow": [["Narrator", "Yan Ying looks up at the great door for some time, as a man does who is working out a sum. Then he takes the brush from his sleeve and writes the answer across the foot of the sail, in characters a hand high, so that they will not have to stoop to read it."], ["Yan Ying", "Hills. Well. I have been the shortest man in every room for eighty years, child, and never once wished the others smaller. I shall tell the masons to cut the new gate so that I can walk under it without noticing. That is all a gate is for.", "nod"]],
+			"stay": [["Narrator", "Yan Ying writes it in a small hand, and then, having thought, writes it again twice the size. Far away on a beach a child who has woken a finger taller every month of her life wakes the height she went to bed, and lies still, not trusting it."], ["Yan Ying", "It is a good answer for the doors, and I know about doors. I notice it is the answer the doors would have given. They will have a roof by winter, every one. Somebody should tell them, some day, that they were asked, and by whom.", "think"]],
+			"each": [["Narrator", "Yan Ying laughs, a short dry sound, and has to sit down on the sill of the small door to do it. He writes the answer out and reads it over, and laughs again at a different place."], ["Yan Ying", "A town with two lintels over every door. The carpenters will hate you for a hundred years. I was asked once which door I would come in by, child; it was meant as an insult, and it is the only courtesy Chu ever paid me. Yes. Ask them.", "laugh"]],
+		},
+		"echo": {
+			"s_p31_end": {
+				"grow": [["Elder Qing Xuan", "And I hear Landfall is raising its gate again, in stone, to a height the masons will not tell me. The reeve has written to ask who pays. I have written back that their grandmothers paid the first time, and it seems to have been worth it."]],
+				"stay": [["Elder Qing Xuan", "And I hear the people of Longbo have stopped growing, at your word, and have roofs. It is the answer I should have given. I find that does not altogether recommend it; I have noticed lately how many of my answers were the convenient height."]],
+				"each": [["Elder Qing Xuan", "And I hear that at Landfall they are asking the Longbo their height one at a time, and building for the answer. The reeve says it is chaos. He says a boy of nine has asked to be exactly as tall as his grandmother, so that she need not bend."]],
+			},
+		},
+		"end": {
+			"grow": "East of Landfall the people of Longbo are hills again, and walk out to the isles at low tide to mend what their ancestor broke. The town's gate has a second lintel far above the first. Ships steer by it.",
+			"stay": "The people of Longbo stand twice a man's height and no more, in houses of their own on the shore of Penglai, under lintels that fit. Their children are told of the hills as other children are told of dragons.",
+			"each": "At Landfall no two of the Longbo are the same height, and every door has two lintels. Travellers think it a town built by a drunkard. Those who live there cannot remember when they last had to stoop, or to shout up.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1512,7 +1555,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict"]
+	"the_verdict", "the_lintel"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

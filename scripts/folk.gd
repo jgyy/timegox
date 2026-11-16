@@ -32,21 +32,21 @@ const TOWNS := {
 	"sect": {"n": "the Azure Cloud Sect", "area": "sect", "at": Vector2i(20, 12), "race": "human",
 		"roles": {"disciple": 10, "servant": 2, "lamplighter": 1, "watchman": 1}},
 	"cloudfoot": {"n": "Cloudfoot", "area": "mountain", "at": Vector2i(82, 34), "race": "human",
-		"roles": {"merchant": 4, "porter": 4, "farmer": 3, "child": 3, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "lamplighter": 1, "youth": 2, "scholar": 1, "waiter": 1, "huntsman": 1}},
+		"roles": {"merchant": 4, "porter": 4, "farmer": 3, "child": 3, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "lamplighter": 1, "youth": 2, "scholar": 1, "waiter": 1, "huntsman": 1, "giant": 1}},
 	"qingshi": {"n": "Qingshi Village", "area": "village", "at": Vector2i(30, 28), "race": "human",
-		"roles": {"farmer": 7, "child": 4, "elder": 3, "washer": 2, "fisher": 1, "monk": 1, "cook": 1, "youth": 2, "watchman": 1, "merchant": 2, "waiter": 1, "huntsman": 1}},
+		"roles": {"farmer": 7, "child": 4, "elder": 3, "washer": 2, "fisher": 1, "monk": 1, "cook": 1, "youth": 2, "watchman": 1, "merchant": 2, "waiter": 1, "huntsman": 1, "giant": 2}},
 	# the Thundering Pots release: Qingshi has grown a second quarter, east of Lao's farm, round the Drum Tower:
 	# the levy's barracks, the Hall of the Twelve Pipes, the tailor's, the Pear Garden stage and the kiln
 	"drumtower": {"n": "the Drum Tower quarter of Qingshi", "area": "village", "at": Vector2i(79, 19), "race": "human", "reach": 14,
-		"roles": {"soldier": 6, "musician": 4, "merchant": 3, "porter": 2, "child": 2, "elder": 2, "guard": 1, "watchman": 1, "lamplighter": 1, "cook": 1, "scholar": 1, "youth": 2}},
+		"roles": {"soldier": 6, "musician": 4, "merchant": 3, "porter": 2, "child": 2, "elder": 2, "guard": 1, "watchman": 1, "lamplighter": 1, "cook": 1, "scholar": 1, "youth": 2, "giant": 1}},
 	"yanggu": {"n": "Yanggu", "area": "yanggu", "at": Vector2i(34, 30), "race": "human",
-		"roles": {"merchant": 6, "porter": 3, "cook": 2, "child": 3, "elder": 2, "monk": 1, "guard": 2, "watchman": 1, "lamplighter": 2, "youth": 3, "scholar": 1, "washer": 2, "waiter": 2}},
+		"roles": {"merchant": 6, "porter": 3, "cook": 2, "child": 3, "elder": 2, "monk": 1, "guard": 2, "watchman": 1, "lamplighter": 2, "youth": 3, "scholar": 1, "washer": 2, "waiter": 2, "giant": 2}},
 	"shazhou": {"n": "Shazhou Oasis", "area": "dunes", "at": Vector2i(12, 40), "race": "desert",
-		"roles": {"merchant": 4, "porter": 4, "child": 2, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "washer": 2, "waiter": 1}},
+		"roles": {"merchant": 4, "porter": 4, "child": 2, "elder": 2, "cook": 1, "guard": 2, "watchman": 1, "washer": 2, "waiter": 1, "giant": 1}},
 	"longmen": {"n": "Longmen", "area": "longmen", "at": Vector2i(28, 30), "race": "human",
-		"roles": {"fisher": 6, "porter": 3, "merchant": 3, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "washer": 2, "waiter": 1}},
+		"roles": {"fisher": 6, "porter": 3, "merchant": 3, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "washer": 2, "waiter": 1, "giant": 2}},
 	"tushan": {"n": "Tushan", "area": "tushan", "at": Vector2i(28, 28), "race": "human",
-		"roles": {"smith": 6, "merchant": 2, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "farmer": 2, "monk": 1, "waiter": 1, "huntsman": 1}},
+		"roles": {"smith": 6, "merchant": 2, "child": 3, "elder": 2, "cook": 1, "guard": 1, "watchman": 1, "farmer": 2, "monk": 1, "waiter": 1, "huntsman": 1, "giant": 2}},
 	"featherfall": {"n": "Featherfall", "area": "juntian", "at": Vector2i(38, 31), "race": "yumin",
 		"roles": {"merchant": 3, "youth": 4, "child": 3, "elder": 2, "scholar": 2, "watchman": 1, "cook": 1}},
 	"tearwater": {"n": "Tearwater", "area": "ninesprings", "at": Vector2i(38, 26), "race": "jiaoren",
@@ -54,7 +54,7 @@ const TOWNS := {
 	"youdu_city": {"n": "Youdu", "area": "youdu", "at": Vector2i(38, 30), "race": "shade", "night": true,
 		"roles": {"merchant": 4, "scholar": 3, "porter": 3, "elder": 2, "monk": 2, "guard": 2, "lamplighter": 2}},
 	"landfall": {"n": "Landfall", "area": "penglai", "at": Vector2i(40, 30), "race": "human",
-		"roles": {"fisher": 6, "washer": 3, "child": 4, "elder": 2, "merchant": 2, "youth": 2, "watchman": 1, "waiter": 1}},
+		"roles": {"fisher": 6, "washer": 3, "child": 4, "elder": 2, "merchant": 2, "youth": 2, "watchman": 1, "waiter": 1, "giant": 3}},
 }
 
 ## The bodies of each people for each kind of person (art/characters/folk_*.py); a kind missing
@@ -73,7 +73,9 @@ const BODIES := {
 		# the levy and the players (the Thundering Pots release)
 		"soldier": ["folk_guard", "folk_youth", "folk_farmer", "folk_porter"], "musician": ["folk_scholar", "folk_maiden", "folk_youth", "folk_grandpa"],
 		# the Answering Land release
-		"waiter": ["folk_youth", "folk_maiden"], "huntsman": ["folk_guard", "folk_youth", "folk_farmer"]},
+		"waiter": ["folk_youth", "folk_maiden"], "huntsman": ["folk_guard", "folk_youth", "folk_farmer"],
+		# the Tall People release (giants.gd): the Great People have bodies of their own in every town
+		"giant": ["folk_giant", "folk_giantess"]},
 	"desert": {"merchant": ["folk_nomad", "folk_shopwife"], "porter": ["folk_nomad", "folk_porter"], "guard": ["folk_guard", "folk_nomad"],
 		"child": ["folk_boy", "folk_girl"], "elder": ["folk_grandpa", "folk_grandma"], "cook": ["folk_cook"], "washer": ["folk_maiden", "folk_farmwife"],
 		"watchman": ["folk_nomad"], "_": ["folk_nomad"]},
@@ -142,6 +144,12 @@ const ROLES := {
 	"huntsman": {"day": [[4.3, "field", "stalk|peer|archery", ""], [10.4, "market", "flay|call|offer|weigh", "knife"], [12.2, "inn", "eat", "bowl"], [13.4, "field", "stalk|trace|archery", ""], [17.0, "woodpile", "flay|stretch", "knife"],
 			[18.6, "bath", "scrub|wash", "cloth"], [19.4, "inn", "drink|laugh", "cup"], [21.2, "home", "in", ""]],
 		"dye": [[0.08, 0.3, 0.1], [0.07, 0.3], 0.3, 0.85]},
+	# the Tall People release (giants.gd): one of the Great People does the work of the town that takes six: the
+	# beam at the gate at first light, the woodpile, the heavy end of the market, a well dug in the afternoon,
+	# and an evening in the square bent double to hear what the children are saying
+	"giant": {"day": [[5.2, "gate", "lift|stretch|lift", ""], [7.4, "woodpile", "chop|lift", "axe"], [9.8, "market", "lift|stoop|talk", ""], [11.8, "inn", "eat", "bowl"],
+			[13.0, "field", "dig|lift|gather", ""], [16.2, "well", "drink|wash", "dipper"], [17.4, "square", "stoop|laugh|talk", ""], [19.4, "inn", "drink|laugh", "cup"], [21.2, "home", "in", ""]],
+		"dye": [[0.08, 0.1, 0.06, 0.3, 0.58], [0.08, 0.1, 0.0], 0.3, 0.8]},
 	# ---- the people of the road (the High Roads release): nobody goes indoors, for there is no indoors;
 	# at night they sit by the camp's fire and sleep sitting up
 	"woodcutter": {"day": [[5.4, "wood", "chop", "axe"], [11.4, "camp", "eat", "bowl"], [12.7, "wood", "chop|lift|stretch", "axe"], [17.2, "camp", "chop|lift", "axe"], [18.8, "camp", "warm|drink|laugh", "cup"], [21.6, "camp", "doze", ""]],
@@ -215,11 +223,11 @@ const TITLES := {"farmer": ["Farmer", "Farmer"], "fisher": ["Fisherman", "Fisher
 	"woodcutter": ["Woodcutter", "Woodcutter"], "herbalist": ["Herb-Gatherer", "Herb-Gatherer"], "angler": ["Old Angler", "Angler"], "pedlar": ["Pedlar", "Pedlar"],
 	"hunter": ["Hunter", "Huntress"], "pilgrim": ["Pilgrim", "Pilgrim"], "hermit": ["Hermit", "Hermit"],
 	"soldier": ["Levy-Man", "Levy-Woman"], "musician": ["Player", "Player"],
-	"waiter": ["Pot-Boy", "Serving-Girl"], "huntsman": ["Hunter", "Huntress"]}
+	"waiter": ["Pot-Boy", "Serving-Girl"], "huntsman": ["Hunter", "Huntress"], "giant": ["Big Brother", "Big Sister"]}
 
 ## the bodies that are women and girls (for names and words)
 const FEM := ["folk_farmwife", "folk_shopwife", "folk_girl", "folk_grandma", "folk_maiden", "folk_disciple_f", "folk_jiaoren",
-	"folk_oasis_f", "folk_boatwoman", "folk_lantern_f", "folk_herder_f"]
+	"folk_oasis_f", "folk_boatwoman", "folk_lantern_f", "folk_herder_f", "folk_giantess"]
 ## The Six Hearths (cultures.gd, the New Fire release): the dress of each hearth of the land
 ## (art/characters/folk_*.py), worn by about half of its grown men ("m") or women ("f"), or by everybody
 ## of one trade ("m:smith"); and the names its people go by where they are not the valley's.
@@ -366,7 +374,7 @@ static func people(wd: Dictionary, tid: String) -> Array:
 ## from the seed they already have, so nobody else in the town changes for it.
 static func _hearth_dress(p: Dictionary, used: Dictionary) -> void:
 	var hid := Cultures.of_town(str(p.town))
-	if hid == "" or bool(p.kid) or bool(p.old):
+	if hid == "" or bool(p.kid) or bool(p.old) or str(p.role) == Giants.ROLE:
 		return
 	var sx := "f" if bool(p.fem) else "m"
 	var hb: Dictionary = HEARTH_BODIES.get(hid, {})
@@ -387,6 +395,9 @@ static func _hearth_dress(p: Dictionary, used: Dictionary) -> void:
 
 static func _body(race: String, role: String, rng: RandomNumberGenerator) -> String:
 	var b: Dictionary = BODIES.get(race, BODIES.human)
+	# (the Great People are themselves in whoever's town they live)
+	if role == Giants.ROLE:
+		b = BODIES.human
 	var opts: Array = b.get(role, b.get("_", BODIES.human.get(role, ["folk_youth"])))
 	return str(opts[rng.randi() % opts.size()])
 
@@ -885,6 +896,8 @@ static func at_tile(wd: Dictionary, tile: Vector2i, m: float, want: Callable = C
 # ---------------------------------------------------------------- what they say
 ## Words for every kind of person ("%s" is how they address Lin Feng).
 const LINES := {
+	# the Tall People release (giants.gd)
+	"giant": Giants.LINES,
 	"farmer": ["The rice wants water and my back wants rest. The rice wins, it always wins.", "Plant on the right day and the land does the rest. Plant on the wrong day and you do the rest.",
 		"My grandfather farmed this field, and his grandfather. None of them ever met a cultivator who stopped to talk. Good day to you, %s.",
 		"See that cloud? Rain by evening. My knee says so, and my knee is never wrong.", "Hoe, hoe, hoe. Somebody has to feed the immortals' disciples."],
@@ -1107,6 +1120,18 @@ const ERRANDS := {
 			"The fat monk with the sack? He has had three of my fish this month and I have never once seen him eat one. I wondered where they went. Yes. I will come.",
 			"Nine of them. Then I shall want nine hooks, and I have four. ...A bent pin will take a carp if the child is patient, and if the child is not patient it will not matter what the hook is. I will come.",
 			"I do not talk when I fish. That is why I fish. ...But a thing that is not taught is a thing that dies with the one who knew it. One day. I will talk for one day."]},
+	# Part XXXI (the Tall People release): what a long night wants with a forest, asked of the woodcutters; and which
+	# door they came in by, asked of the Great People of Landfall
+	"s_p31_woodmen": {"ask": "A giant threw down his staff in the west and it came up a peach wood a thousand li across. His people freeze in a night as long as a week. What would a woodcutter do with a wood like that?", "price": 0, "toast": "%s has said what the wood is for",
+		"lines": ["Peach? Burns slow and hot, and stinks of almonds, and wants a year under cover before it is any use. A thousand li of it. He walked past that looking for a fire? ...Tell him to take the dead wood first. There is always more dead wood than anybody thinks.",
+			"I would cut nothing. A wood that size, the floor of it is a winter's burning for a province, and it falls of itself. You go in with a rope and your back. I have told my son so for twenty years, and he buys an axe.",
+			"Is he strong? Then he does not need a woodcutter; he needs somebody to tell him to turn round. That is most of my trade too. The young ones always look up the tree. What you want is generally lying at the foot of it.",
+			"A night a week long. Hm. Charcoal, then, not logs; it carries. I would burn it where it lies and take it north in sacks. Tell him a pedlar's weight of charcoal is a household's warmth for a month. He can carry more than a pedlar, I suppose."]},
+	"s_p31_giants": {"ask": "The people of Longbo are on the shingle with three ships and nowhere to put a roof. Your people came in by a door once. Will you go down and tell them which?", "price": 0, "town": "landfall", "toast": "%s has gone down to the shingle",
+		"lines": ["Our cousins. Yes, I have seen them from the quay; I did not like to go down. They were hills when we were what we are, small one, and it is not easy to look at somebody who was a hill. ...That is a poor reason. I will go.",
+			"Which door? The east gate of Landfall, the year my grandmother was a girl. They had raised it the winter before and not told her why. She walked under it and stopped, and walked back, and walked under it again. I will tell them that.",
+			"They are sitting with their knees drawn in. I know that sitting. I did it for a year in a house in Yanggu before the landlord had the beam moved. Nobody should sit like that. I am going down now; hold my basket.",
+			"I shall tell them what nobody told us: that you must say how high. People will build what they are used to and call it a welcome. You have to stand in the doorway and say: here. To here. I will show them with my hand."]},
 	# Part XXVIII (the Answering Land release): who ties the grass, asked of the hunters; and the hollow stems, of the woodcutters
 	"s_p28_hunters": {"ask": "You are out in the valley before light. Have you seen who walks the general's field at night with his hands in the grass?", "price": 0, "toast": "%s has seen the old man in the field",
 		"lines": ["An old one. Bent. He comes with the dew and goes with it, and he bows to the general's tent before he starts. I took him for a herb-gatherer the first night. Herb-gatherers do not tie what they find.",
@@ -1416,6 +1441,9 @@ const POSTS := {
 	# Part XXX (the Open Net release)
 	"net_fowler": ["pray|gather|peer", "", "doze"], "cheng_tang": ["gaze|think|gather", "", "meditate"], "li_li": ["sit_bench|think|read", "", "meditate"],
 	"shang_yang": ["read|write|count", "book", "read"], "jiang_chong": ["dig|peer|point", "", "doze"],
+	# Part XXXI (the Tall People release)
+	"fangfeng": ["gaze|count|trace", "", "doze"], "kuafu": ["gaze|stretch|gather", "", "doze"], "longbo_angler": ["sew|fish|gaze", "", "doze"],
+	"zheng_buyer": ["count|peer|trace", "", "doze"], "yan_ying": ["gaze|read|write", "", "meditate"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }
 
@@ -1559,6 +1587,11 @@ static func model(p: Dictionary) -> Node3D:
 	var m := Assets.instance(rel)
 	m.set_meta("kind", "person")
 	Assets.lend_clips(m)
+	# (the Tall People release, giants.gd: one of the Great People is drawn at their own height)
+	var sc := Giants.of_folk(p)
+	if sc != 1.0:
+		m.scale = Vector3.ONE * sc
+		m.set_meta("tall", sc)
 	var dy: Array = p.get("dye", [])
 	if not dy.is_empty():
 		apply_dye(m, dy)

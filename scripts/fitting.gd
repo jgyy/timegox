@@ -124,6 +124,13 @@ static func resident(wd: Dictionary, hk: String) -> String:
 	var h: Dictionary = _index(wd).houses.get(hk, {})
 	return str(h.get("n", "")) if str(h.get("res", "")) != "" else ""
 
+## Who answers for house `hk` now: whoever lives there, or whoever came after somebody he struck down (crime.gd).
+static func keeper(g, wd: Dictionary, hk: String) -> String:
+	var h: Dictionary = _index(wd).houses.get(hk, {})
+	if str(h.get("res", "")) != "" and not g.slain.is_empty() and Crime.dead(g, str(h.res)):
+		return "Whoever has the house now"
+	return resident(wd, hk)
+
 static func _near(a: Vector2i, b: Vector2i, r: int) -> bool:
 	return maxi(absi(a.x - b.x), absi(a.y - b.y)) <= r
 
@@ -243,7 +250,7 @@ static func options(g, wd: Dictionary, e: Dictionary) -> Array:
 	for tid in ORDER:
 		var have := int(g.inv.get(tid, 0))
 		if have > 0:
-			out.append({"id": "fit:set:" + tid, "label": "Set down the %s here" % str(THINGS[tid].n).to_lower(), "desc": "%s is watching where you put it." % resident(wd, hk), "enabled": true})
+			out.append({"id": "fit:set:" + tid, "label": "Set down the %s here" % str(THINGS[tid].n).to_lower(), "desc": "%s is watching where you put it." % keeper(g, wd, hk), "enabled": true})
 		elif wanted_here and str(w.thing) == tid:
 			var pr := price(g)
 			out.append({"id": "fit:send:" + tid, "label": "Send out for a %s" % str(THINGS[tid].n).to_lower(), "note": "%d stones" % pr,
@@ -271,7 +278,7 @@ static func set_down(g, wd: Dictionary, e: Dictionary, tid: String) -> Dictionar
 		g.inv.erase(tid)
 	var v := verdict(tid, str(e.furn))
 	g.placed[spot] = "%s|%d" % [tid, v]
-	var who := resident(wd, hk)
+	var who := keeper(g, wd, hk)
 	var w := want(wd, hk)
 	if v < 0:
 		g.misplaced += 1
@@ -308,7 +315,7 @@ static func touched(g, wd: Dictionary, e: Dictionary) -> String:
 		return ""
 	var fk := str(e.get("furn", ""))
 	var ln: String = str(TOUCHED[fk]) if TOUCHED.has(fk) and fk != "" else str(TOUCHED[""][absi(hash(spot)) % 3])
-	return "%s: \"%s\"" % [resident(wd, hk), ln]
+	return "%s: \"%s\"" % [keeper(g, wd, hk), ln]
 
 ## The nearest house to put to rights for the step in hand: a want of region `area` (the first by key;
 ## the bot walks to its spot).  {} when the region has none left.

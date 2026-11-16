@@ -109,6 +109,10 @@ var cue_lines: Array = []
 var cue_idx := -1
 var cue_npc := ""
 var cine_k := 0.0
+var _visage_t := 0.0
+var _cine_shot := ""
+var _cine_fov0 := 0.0
+var _visage_key := "0|0"
 var cine_pos := Vector3.ZERO
 var cine_a := 0.0
 ## Fates and Faces (fashion.gd): the ride under the party (rebuilt when another is summoned), its own
@@ -1159,15 +1163,21 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 			# the Living Land release: the people with names work at their place all day (folk.gd POSTS)
 			if Folk.POSTS.has(str(e.get("asset", e.id))):
 				Assets.lend_clips(m)
+			# (the Tall People release, giants.gd: somebody of the Great People stands twice a man's height)
+			var tall := Giants.of_npc(e)
+			if tall != 1.0:
+				m.scale = Vector3.ONE * tall
+				m.set_meta("tall", tall)
+			n.set_meta("tall", tall)
 			n.add_child(m)
-			n.add_child(Models.shadow_disc(0.6))
+			n.add_child(Models.shadow_disc(0.6 * tall))
 			# (the Open Net release, crime.gd: somebody he struck down: a mound and a tablet in their place)
 			if not Game.slain.is_empty() and Crime.dead(Game, str(e.id)):
 				m.visible = false
 				n.add_child(Crime.grave(bool(Game.slain[str(e.id)].seen)))
 				n.set_meta("grave", true)
-			_label(n, e.n, 2.45, UI.C_GOLD)
-			var mark := _label(n, "!", 3.1, Color("ffdc50"), 72)
+			_label(n, e.n, 2.45 * tall if tall != 1.0 else 2.45, UI.C_GOLD)
+			var mark := _label(n, "!", 3.1 + (tall - 1.0) * 2.45, Color("ffdc50"), 72)
 			n.set_meta("model", m)
 			n.set_meta("mark", mark)
 		"enemy":
@@ -1192,7 +1202,7 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"boss":
 			var d3: Dictionary = Data.ENEMIES[e.enemy]
 			var mb := Models.monster(d3.shape, d3.col, true, e.enemy)
-			mb.scale = Vector3.ONE * 1.9
+			mb.scale = Vector3.ONE * (Giants.SCALE if Giants.of_foe(str(e.enemy)) else 1.9)
 			n.add_child(mb)
 			n.add_child(Models.shadow_disc(2.0, 0.5))
 			_label(n, d3.n, 5.2, UI.C_GOLD, 44)
@@ -1865,7 +1875,7 @@ func fan_near() -> bool:
 func _fans_tick(d: float) -> void:
 	var pp: Vector3 = player.position
 	var here := "" if is_floor() or main.top_name() != "world" else Fame.town_near(str(layer), ptile)
-	var want := Fame.crowd(Game) if here != "" and building_at(ptile).is_empty() and glide.is_empty() else 0
+	var want := Fame.crowd(Game) if here != "" and not Fame.shunned(Game, here) and building_at(ptile).is_empty() and glide.is_empty() else 0
 	if fan_trail.is_empty() or (fan_trail[fan_trail.size() - 1] as Vector3).distance_to(pp) > 0.7:
 		fan_trail.append(pp)
 		if fan_trail.size() > 80:
@@ -1932,6 +1942,13 @@ func _process(d: float) -> void:
 	if not headless() and player != null:
 		_fans_tick(d)
 		_weal_doors(d)
+		# (the Tall People release, visage.gd: the face his Way has given him, looked at again now and then)
+		_visage_t -= d
+		if _visage_t <= 0.0:
+			_visage_t = 2.0
+			if Visage.key(Game) != _visage_key and main != null and main.top_name() == "world":
+				_visage_key = Visage.key(Game)
+				refresh_hero()
 	if banner_t > 0.0:
 		banner_t -= d
 	# a region is announced once he has stayed in it a moment (see _enter_region)
@@ -2109,7 +2126,7 @@ func refresh_hero() -> void:
 	var cols := Fashion.hero_colors(Game)
 	Game.outfit = keep
 	var aid := preview_arm if preview_arm != "" else Arms.held(Game)
-	var sig := "%s|%s|%s|%s|%s" % [str(Game.hero), oid, str(cols), aid, str(under)]
+	var sig := "%s|%s|%s|%s|%s|%s" % [str(Game.hero), oid, str(cols), aid, str(under), Visage.key(Game)]
 	if sig == hero_sig or player == null:
 		return
 	hero_sig = sig
@@ -2784,13 +2801,31 @@ func _cue_line(line: Array) -> void:
 	if who != "Lin Feng" and who != "Yue Ling" and who != "Narrator":
 		cue_npc = who
 	var a := _actor(who)
+	# (the Tall People release, closeup.gd: the first time somebody speaks with nothing else asked of them,
+	# they do the one thing with their hands that is theirs)
+	var own := ""
+	if who == str(line[0]) and cue_idx >= 0 and cue_idx < cue_lines.size():
+		var cg := Closeup.gesture(cue_lines, cue_idx)
+		if Closeup.CLIPS.has(cg):
+			own = cg
+			g = ""
+	if own != "" and not a.is_empty():
+		Assets.lend_clips(a[0])
+		if Assets.has_clip(a[0], own):
+			Models.act(a[0], own, t * Giants.pace(float((a[0] as Node3D).get_meta("tall", 1.0))) + float(a[1]))
+			Faces.wear(a[0], str(Closeup.FACES.get(own, "calm")), float(Closeup.SECONDS.get(own, 2.5)))
 	if g != "" and not a.is_empty() and Assets.has_clip(a[0], g):
-		Models.act(a[0], g, t + float(a[1]))
+		Models.act(a[0], g, t * Giants.pace(float((a[0] as Node3D).get_meta("tall", 1.0))) + float(a[1]))
 	# the face the line is said with (faces.gd): its own cue or what its words sound like, worn for as
 	# long as a line is usually read; a gesture's own face otherwise
 	var fc := Faces.for_line(line)
 	if fc != "" and not a.is_empty():
 		Faces.wear(a[0], fc, 4.5)
+	# (somebody of the Great People bends to whoever is half their height, when nothing else is asked)
+	if g == "" and own == "" and not a.is_empty() and float((a[0] as Node3D).get_meta("tall", 1.0)) > 1.3:
+		Assets.lend_clips(a[0])
+		if Assets.has_clip(a[0], "stoop"):
+			Models.act(a[0], "stoop", t * Giants.pace(float((a[0] as Node3D).get_meta("tall", 1.0))) + float(a[1]))
 	if g == "":
 		return
 	var reply: String = Data.EMOTE_REPLY.get(g, "")
@@ -2816,8 +2851,12 @@ func _cutscene(d: float, pp: Vector3) -> void:
 		cue_idx = -1
 		cue_lines = []
 	cine_k = clampf(cine_k + d * (1.6 if on else -2.2), 0.0, 1.0)
+	if _cine_fov0 <= 0.0:
+		_cine_fov0 = cam.fov
 	if cine_k <= 0.0:
 		cine_pos = cam.position
+		cam.fov = _cine_fov0
+		_cine_shot = ""
 		return
 	var sp := speaker()
 	var other: Array = []
@@ -2832,13 +2871,18 @@ func _cutscene(d: float, pp: Vector3) -> void:
 	if other.is_empty() and Game.companion and bool(using.get("scene", false)):
 		other = [comp, 1.0]
 		pair = true
+	# (the Tall People release: whoever he is talking to may be twice his height, and is looked at where
+	# their head is)
+	var o_tall := 1.0
+	if not other.is_empty() and other[0] != player:
+		o_tall = float((other[0] as Node3D).get_meta("tall", 1.0))
 	var a3 := pp + Vector3(0, 1.45, 0)
 	if pair:
 		# (where he is, on the thing they share, not the tile he stepped onto it from)
 		a3 = player.global_position + Vector3(0, 1.45, 0)
 	var b3 := a3 + Vector3(facing.x, 0, facing.y) * 2.2
 	if not other.is_empty() and other[0] != player:
-		b3 = (other[0] as Node3D).global_position + Vector3(0, 1.45, 0)
+		b3 = (other[0] as Node3D).global_position + Vector3(0, 1.45 * o_tall, 0)
 	var mid := (a3 + b3) * 0.5
 	var ax := b3 - a3
 	ax.y = 0.0
@@ -2852,30 +2896,73 @@ func _cutscene(d: float, pp: Vector3) -> void:
 	if side.dot(lean) < 0.0:
 		side = -side
 	var indoor: bool = inside != "" or is_floor()
-	var dist := clampf(a3.distance_to(b3) * 0.9 + 3.4, 4.2, 8.5)
+	var dist := clampf(a3.distance_to(b3) * 0.9 + 3.4, 4.2, 8.5) + (o_tall - 1.0) * 2.2
 	# not into a wood: if the ground on that side is trees (or a wall, or water) and the other side
 	# is open, the camera goes round to the other side
 	if not indoor and not _open_at(mid + side * dist) and _open_at(mid - side * dist):
 		side = -side
-	var goal := mid + side * (dist if indoor else _cam_reach(mid, side, dist)) + Vector3(0, 0.5 + (3.2 if indoor else 0.4), 0)
+	var goal := mid + side * (dist if indoor else _cam_reach(mid, side, dist)) + Vector3(0, 0.5 + (Arch.WALL_H + 0.6 if indoor else 0.4), 0)
 	if sp == "Narrator" or sp == "":
 		# narration: a slow drift round the scene
 		cine_a += d * 0.12
 		var drift := side.rotated(Vector3.UP, sin(cine_a) * 0.5)
-		goal = mid + drift * ((dist + 1.5) if indoor else _cam_reach(mid, drift, dist + 1.5)) + Vector3(0, 1.4 + (3.0 if indoor else 0.6), 0)
+		goal = mid + drift * ((dist + 1.5) if indoor else _cam_reach(mid, drift, dist + 1.5)) + Vector3(0, 1.4 + (Arch.WALL_H + 0.4 if indoor else 0.6), 0)
 	elif sp == "Lin Feng":
 		goal += ax * 0.9
 	else:
 		goal -= ax * 0.9
 	goal.y = maxf(goal.y, ground_y(goal) + 1.1)
-	cine_pos = cine_pos.lerp(goal, 1.0 - exp(-d * 3.0))
-	var k := smoothstep(0.0, 1.0, cine_k)
 	var at := mid + Vector3(0, -0.15, 0)
+	# ---- the shot (closeup.gd): a line that is acted is the speaker's own face, on a longer lens
+	var shot := Closeup.shot(dl.lines, dl.idx) if on else _cine_shot
+	var fov := _cine_fov0
+	if shot == "close":
+		var who3: Array = [player, 0.0] if sp == "Lin Feng" else (_actor(sp) if sp != "" else [])
+		if who3.is_empty():
+			shot = "two"
+		else:
+			var wn: Node3D = who3[0]
+			var wsc := float(wn.get_meta("tall", 1.0))
+			var head := _head_of(wn, wsc)
+			# (they face whoever they are speaking to: the lens stands on that side, over the shoulder
+			# nearer the two-shot's camera)
+			var to_other := (a3 if wn != player else b3) - head
+			to_other.y = 0.0
+			if to_other.length() < 0.3:
+				to_other = wn.global_transform.basis.z
+			var sgn := 1.0 if to_other.normalized().cross(Vector3.UP).dot(side) < 0.0 else -1.0
+			var fr: Array = Closeup.frame(head, to_other, wsc, sgn)
+			var cpos: Vector3 = fr[0]
+			if not indoor and not _open_at(cpos) and _open_at(Closeup.frame(head, to_other, wsc, -sgn)[0]):
+				fr = Closeup.frame(head, to_other, wsc, -sgn)
+				cpos = fr[0]
+			cpos.y = maxf(cpos.y, ground_y(cpos) + 0.5)
+			goal = cpos
+			at = fr[1]
+			fov = Closeup.FOV
+	# a change of shot is a cut, not a flight (once the conversation's camera has taken over)
+	var cut := shot != _cine_shot and cine_k >= 1.0
+	_cine_shot = shot
+	cine_pos = goal if cut else cine_pos.lerp(goal, 1.0 - exp(-d * (5.0 if shot == "close" else 3.0)))
+	var k := smoothstep(0.0, 1.0, cine_k)
+	cam.fov = fov if cut else lerpf(cam.fov, lerpf(_cine_fov0, fov, k), 1.0 - exp(-d * 6.0))
 	var chase_look := cam.global_transform.basis.z
 	cam.position = cam.position.lerp(cine_pos, k)
 	if cam.position.distance_to(at) > 0.5:
 		var look_from := cam.position - chase_look
 		cam.look_at(look_from.lerp(at, k) if k < 1.0 else at, Vector3.UP)
+
+## Where the head of person model `n` is in the world now (the head bone as the clip has posed it, so
+## that somebody small, somebody stooping and somebody twice a man's height are each found), or where
+## a head of that size would be.
+func _head_of(n: Node3D, sc: float) -> Vector3:
+	var sks := n.find_children("*", "Skeleton3D", true, false)
+	if not sks.is_empty():
+		var sk := sks[0] as Skeleton3D
+		var bi := sk.find_bone("head")
+		if bi >= 0:
+			return sk.global_transform * (sk.get_bone_global_pose(bi).origin + Vector3(0, 0.09, 0))
+	return n.global_position + Vector3(0, 1.52 * sc, 0)
 
 ## The name of whoever is speaking in the dialogue box, or "".
 func speaker() -> String:
@@ -2978,10 +3065,10 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 				job = []
 			_post_hold(n, m, "" if job.is_empty() else str(job[1]))
 			if not job.is_empty():
-				Models.anim_person(m, t + e.pos.x, false, false, str(job[0]))
+				Models.anim_person(m, t * Giants.pace(float(n.get_meta("tall", 1.0))) + e.pos.x, false, false, str(job[0]))
 				m.rotation.y = lerp_angle(m.rotation.y, 0.0, 1.0 - exp(-d * 3.0))
 			else:
-				Models.anim_person(m, t + e.pos.x, false, false, "talk" if talking else "")
+				Models.anim_person(m, t * Giants.pace(float(n.get_meta("tall", 1.0))) + e.pos.x, false, false, "talk" if talking else "")
 			if dist < 9.0 and job.is_empty():
 				var dv := pp - n.position
 				m.rotation.y = lerp_angle(m.rotation.y, atan2(dv.x, dv.z), 1.0 - exp(-d * 5.0))
@@ -3494,8 +3581,9 @@ func _make_folk(fp: Dictionary) -> Node3D:
 	var n := Node3D.new()
 	var m := Folk.model(fp)
 	n.add_child(m)
-	n.add_child(Models.shadow_disc(0.45 if not fp.kid else 0.32))
+	n.add_child(Models.shadow_disc((0.45 if not fp.kid else 0.32) * Giants.of_folk(fp)))
 	n.set_meta("model", m)
+	n.set_meta("tall", Giants.of_folk(fp))
 	n.set_meta("town", fp.town)
 	n.set_meta("name", fp.n)
 	n.set_meta("seed", int(fp.seed))
@@ -3535,7 +3623,8 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 	if on_rock:
 		clip = "scale"
 	m.rotation.x = lerpf(m.rotation.x, 0.24 if on_rock else 0.0, 1.0 - exp(-d * 8.0))
-	Models.anim_person(m, t + float(fp.seed), false, false, clip)
+	# (the Tall People release: one of the Great People goes about everything at a giant's pace)
+	Models.anim_person(m, t * Giants.pace(Giants.of_folk(fp)) + float(fp.seed), false, false, clip)
 	# what is in their hands: their work's tool, the load on the road, a lantern after dark
 	var hold: String = st.hold if clip != "" and clip != "talk" and not on_rock else ""
 	if st.walk and dark and hold == "":
@@ -3557,7 +3646,7 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 	var s := Game.cur_step()
 	var want_mark: bool = not s.is_empty() and s.kind == "folk" and Folk.is_role(fp, str(s.role)) and not Game.folk_has(s, str(fp.id))
 	if want_mark and not fn.has_meta("mark"):
-		fn.set_meta("mark", _label(fn, "!", 2.2 if not fp.kid else 1.7, Color("ff6a5a"), 64))
+		fn.set_meta("mark", _label(fn, "!", (2.2 if not fp.kid else 1.7) * Giants.of_folk(fp), Color("ff6a5a"), 64))
 	if fn.has_meta("mark"):
 		var mk: Label3D = fn.get_meta("mark")
 		mk.visible = want_mark

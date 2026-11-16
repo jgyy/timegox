@@ -87,7 +87,11 @@ const MIGHT := {"elder": 66, "smith_tie": 24, "alchemist_mo": 22, "treasurer": 1
 const TITLED := {"Elder": 12, "Patriarch": 14, "Master": 8, "Abbot": 8, "Immortal": 16, "General": 6, "King": 6, "Lord": 6, "Lady": 4, "Sage": 10, "Keeper": 3, "Captain": 4,
 	"Founder": 16, "Echo": 12, "Marshal": 6, "Emperor": 4, "Empress": 4, "Queen": 6, "Monk": 4, "Hermit": 6, "Judge": 5}
 ## roles of the people of the towns who carry something
-const ARMED := {"guard": 8, "watchman": 6, "huntsman": 5, "hunter": 5, "disciple": 7, "monk": 6, "hermit": 9, "woodcutter": 3}
+const ARMED := {"guard": 8, "watchman": 6, "huntsman": 5, "hunter": 5, "disciple": 7, "monk": 6, "hermit": 9, "woodcutter": 3,
+	# (the Tall People release: nobody of the Great People has cultivated a day, and nobody has needed to)
+	"giant": 14}
+## children of the story whose names do not say so (their bodies are a child's: art/characters)
+const CHILD := ["stableboy_shitou", "camel_boy_temur", "ox_herd_niu", "ship_boy_ah_fu", "furnace_boy"]
 ## might is never past this, whatever the titles
 const MIGHT_MAX := 110
 
@@ -118,6 +122,8 @@ static func is_child(e: Dictionary) -> bool:
 	if str(e.get("kind", "")) == "folk":
 		return bool((e.p as Dictionary).get("kid", false))
 	var a := str(e.get("asset", ""))
+	if str(e.get("id", "")) in CHILD or a in CHILD:
+		return true
 	return a in Folk.KID or str(e.get("n", "")).contains("Aged") or str(e.get("n", "")).begins_with("Little ")
 
 ## How many levels of cultivation stand behind `e`: he must be `EDGE` above it to strike them down.
@@ -214,7 +220,7 @@ static func dead(g, id: String) -> bool:
 
 ## How many are dead by his hand (`seen_only`: of those, the ones somebody saw).
 static func count(g, seen_only: bool = false) -> int:
-	var n := 0
+	var n := int(g.watch_slain)
 	for id in g.slain:
 		n += int(g.slain[id].get("seen_n", 1 if bool(g.slain[id].seen) else 0)) if seen_only else int(g.slain[id].get("times", 1))
 	return n
@@ -241,7 +247,7 @@ static func mute(g, lines: Array) -> Array:
 		return lines
 	var names := {}
 	for id in g.slain:
-		if not str(id).begins_with("folk:"):
+		if not str(id).begins_with("folk:") and not str(id).begins_with("res:"):
 			names[str(g.slain[id].n)] = true
 	if names.is_empty():
 		return lines
@@ -379,6 +385,18 @@ static func strike(g, e: Dictionary, seen: int) -> Dictionary:
 	g.slain[id] = {"n": nm, "day": int(g.day), "area": area, "town": tid, "seen": seen > 0 or bool(was.get("seen", false)), "might": m, "kind": str(e.kind),
 		"times": int(was.get("times", 0)) + 1, "seen_n": int(was.get("seen_n", 0)) + (1 if seen > 0 else 0)}
 	g.slain_n += 1
+	# (the same person stands elsewhere later in the story under another id (qiu_ye, qiu_ye_grave, ...): dead there too)
+	if str(e.kind) == "npc" and not (id.begins_with("res:") or id.begins_with("who:") or id.begins_with("settler:")):
+		for a2 in Data.AREAS:
+			for o in Data.AREAS[a2].get("npcs", []):
+				if str(o.n) == nm and str(o.id) != id and not g.slain.has(str(o.id)):
+					var rec2: Dictionary = (g.slain[id] as Dictionary).duplicate()
+					rec2["area"] = str(a2)
+					rec2["town"] = ""
+					rec2["times"] = 0
+					rec2["seen_n"] = 0
+					rec2["alias"] = id
+					g.slain[str(o.id)] = rec2
 	# the purse: what somebody of that standing carries
 	var purse := 20 + 35 * m
 	g.stones += purse
@@ -558,7 +576,7 @@ static func line(g, town: String, seed_: int) -> String:
 ## "Wanted in Qingshi Village (2400), Cloudfoot (300)" or "a clean name".
 static func text(g) -> String:
 	if heat(g) == 0:
-		return "a clean name" if g.slain.is_empty() else "no bill at any gate"
+		return "a clean name" if g.slain.is_empty() and int(g.watch_slain) == 0 else "no bill at any gate"
 	var parts: Array = []
 	for tid in Weal.ORDER:
 		if price(g, tid) > 0:
@@ -568,11 +586,11 @@ static func text(g) -> String:
 ## What the end says of it (for the journey that has blood on it).
 static func epilogue(g) -> Array:
 	var out: Array = []
-	if g.slain.is_empty():
+	if g.slain.is_empty() and int(g.watch_slain) == 0:
 		return out
 	var named: Array = []
 	for id in g.slain:
-		if not str(id).begins_with("folk:"):
+		if not str(id).begins_with("folk:") and not g.slain[id].has("alias"):
 			named.append(str(g.slain[id].n))
 	if not named.is_empty():
 		out.append("There is a mound where %s stood, and %s. Nobody tends them who does not know whose hand it was." % [str(named[0]), "no other" if named.size() == 1 else "%d others like it" % (named.size() - 1)])

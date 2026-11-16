@@ -316,7 +316,7 @@ static func ride_coach(g, offer: Dictionary) -> Vector2i:
 		return Vector2i(-1, -1)
 	g.stones -= int(offer.fare)
 	g.coaches += 1
-	Clock.advance(g, float(offer.tiles) * COACH_SECS)
+	Clock.advance(g, float(offer.tiles) * COACH_SECS / Clock.rate(float(g.clock)))
 	g.note("Took the post-coach to %s (%d spirit stones)" % [str(offer.n), int(offer.fare)])
 	return offer.at
 

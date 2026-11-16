@@ -198,8 +198,8 @@ static var _cache := {}
 static var _stamp := ""
 
 static func _stamp_of(g) -> String:
-	return "%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d" % [g.get_instance_id(), int(g.step), int(g.weal_n), g.picks.size(), g.boss_done.size(), int(g.kills) / 20, g.war_won.size(), int(g.war_lost), g.falls.size(), g.works.size(),
-		Wilds.stamp(g), Crime.heat(g)]
+	return "%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d" % [g.get_instance_id(), int(g.step), int(g.weal_n), g.picks.size(), g.boss_done.size(), int(g.kills) / 20, g.war_won.size(), int(g.war_lost), g.falls.size(), g.works.size(),
+		Wilds.stamp(g), Crime.heat(g), Hold.rank(g)]
 
 ## What a tilt of a crossroads does to the towns that hear of it: [[measure, points], ...].
 static func tilt_marks(tilt: Dictionary) -> Array:
@@ -281,7 +281,7 @@ static func causes(g, tid: String) -> Array:
 	# the dooms: a town does not forget who stood, or who stepped aside
 	for f in g.falls:
 		if lord_area(str(f)) in t.areas:
-			match str(g.falls[f]):
+			match str((g.falls[f] as Dictionary).get("how", "")):
 				"gave":
 					out.append({"m": "peace", "d": -1, "why": "He gave way to %s, and it passed this way." % str(Data.ENEMIES[str(f)].n)})
 				"struck", "kept":
@@ -547,9 +547,13 @@ const FATES := [
 	{"npc": "caster_wei", "when": ["the_arms", ["melt"]], "tag": "casting ploughshares", "line": "Halberds in at one end and ploughshares out at the other. I have cast bells all my life and never poured anything that sang as those spearheads did, going down."},
 	{"npc": "watchman_zhou", "when": ["the_host", ["home"]], "tag": "with nobody to wake", "line": "The levy went home by the roll, every one. I walk the wall at night and there is nobody on it but me, as it was before. I like it. I only miss having somebody to wake up and complain to."},
 	{"npc": "watchman_zhou", "when": ["the_host", ["keep"]], "tag": "with a corporal over him", "line": "A standing host, and so a corporal, and so I am told at what hour to strike the watch I have struck for thirty years. I strike it a little late now. He has not noticed. It is a comfort."},
-	{"npc": "fishwife_lu", "when": ["the_tide", ["wall"]], "tag": "with a stall on the wall", "line": "I have a stall on top of the wall of baskets now. The tide comes up, looks at me and goes away again. I sell more fish from up there than I ever did with my feet wet."},
-	{"npc": "fishwife_lu", "when": ["the_tide", ["yield"]], "tag": "who lost the low field", "line": "My mother's field is under the water, the low one. You gave it to the tide. ...The crabs that have come up in it are the size of a hat. I am not thanking you. I am telling you the size."},
+	{"npc": "fishwife_lu", "when": ["the_tide", ["wall"]], "tag": "who sells to the wall at Yanggu", "line": "My cousin has a stall on top of the wall of baskets at Yanggu now. The tide comes up, looks at her and goes away again. She sells more of my fish from up there than I ever did with my feet wet."},
+	{"npc": "fishwife_lu", "when": ["the_tide", ["yield"]], "tag": "who lost the low field", "line": "My cousin's field at Yanggu is under the water, the low one. You gave it to the tide. ...The crabs that have come up in it are the size of a hat. I am not thanking you. I am telling you the size."},
 	{"npc": "tea_seller_pan", "when": ["the_tallies", ["burn"]], "tag": "whose slate is clean", "line": "They burned the tallies up at that town of yours, I hear, and the news came down the road faster than tea. Half my customers asked whether I would burn my slate. I did. They order the good leaf now, and look me in the eye."},
+	# Part XXXI (the Tall People release)
+	{"npc": "carpenter_gu", "when": ["the_lintel", ["grow"]], "tag": "who is building upward", "line": "Hills, I am told. I have sent to the fir woods for everything over forty paces, and I have told my boy that the trade he is learning is not the one I learned. He is delighted. I was, at his age, about a new plane."},
+	{"npc": "carpenter_gu", "when": ["the_lintel", ["stay"]], "tag": "with one rule on his bench", "line": "Twice a man and no more. I have put the long rule up on its nail; it is the only one I shall need for them now. It is a comfort to a carpenter to know the size of things. I should not like to be the one who was told his."},
+	{"npc": "carpenter_gu", "when": ["the_lintel", ["each"]], "tag": "who asks before he cuts", "line": "Two lintels to a door, and I am to ask whoever will live there how high. Sixty generations we built for the Great People and never asked one. The first I asked said: a hand lower, I like to touch it as I go in. A hand lower!"},
 	{"npc": "gate_wu", "when": ["the_verdict", ["sword"]], "tag": "who has been thinking about his gate", "line": "A judge of Jin kept his own law to the end, and you stood by. Twenty years I have let through this gate whoever I was told to. Last night I asked myself who I should have stopped. I am still asking."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["bench"]], "tag": "who asks twice now", "line": "They say there is a court in Jin that hears every case twice, under a dead man's name. I ask everybody their business twice now, at this gate. It holds up the carts. Nobody has been turned away wrongly since."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["field"]], "tag": "with a hoe leaning by the gate", "line": "A judge hoeing beans for a widow. I let a pedlar through once who robbed the kitchens. I never told anybody. I have dug Auntie Zhou's leek bed every morning since I heard. She thinks I have gone simple."},
@@ -651,13 +655,15 @@ static func dress(st: String, w: float = 1.1, seed_: int = 0) -> Node3D:
 	var b := MB.new()
 	var gl := MB.new()
 	var hw := w * 0.5 + 0.22
+	# (the Tall People release: the lintel is where a giant can walk under it, and what hangs over it went up with it)
+	var lf := Arch.DOOR_CLEAR - 2.14
 	match st:
 		"festive", "thriving":
 			# a paper lantern either side of the door (one, in a town that is only thriving), hung from
 			# a peg in the wall; in a festive town a string of pennants across the lintel too
 			var sides: Array = [-1.0, 1.0] if st == "festive" else [(-1.0 if seed_ % 2 == 0 else 1.0)]
 			for s in sides:
-				var top := Vector3(hw * s, 2.05, 0.06)
+				var top := Vector3(hw * s, 2.05 + lf * 0.6, 0.06)
 				b.limb(top, top + Vector3(0, 0, 0.22), 0.015, 0.012, MB.tag(WOOD, MB.WOOD), 4)
 				var hang := top + Vector3(0, 0, 0.2)
 				b.limb(hang, hang + Vector3(0, -0.14, 0), 0.004, 0.004, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
@@ -674,19 +680,19 @@ static func dress(st: String, w: float = 1.1, seed_: int = 0) -> Node3D:
 					var x := lerpf(-hw, hw, k)
 					var sag := 0.1 * sin(k * PI)
 					var c: Color = cols[(i + seed_) % cols.size()]
-					b.leaf(Vector3(x, 2.33 - sag, 0.07), Vector3(x, 2.1 - sag, 0.075), 0.15, MB.tag(c, MB.CLOTH), Vector3(1, 0, 0))
+					b.leaf(Vector3(x, 2.33 + lf - sag, 0.07), Vector3(x, 2.1 + lf - sag, 0.075), 0.15, MB.tag(c, MB.CLOTH), Vector3(1, 0, 0))
 				for i in 8:
 					var k0 := float(i) / 8.0
 					var k1 := float(i + 1) / 8.0
-					b.limb(Vector3(lerpf(-hw, hw, k0), 2.32 - 0.1 * sin(k0 * PI), 0.07), Vector3(lerpf(-hw, hw, k1), 2.32 - 0.1 * sin(k1 * PI), 0.07), 0.004, 0.004, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
+					b.limb(Vector3(lerpf(-hw, hw, k0), 2.32 + lf - 0.1 * sin(k0 * PI), 0.07), Vector3(lerpf(-hw, hw, k1), 2.32 + lf - 0.1 * sin(k1 * PI), 0.07), 0.004, 0.004, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
 		"afraid":
 			# a yellow talisman pasted beside the door, and a branch of peach wood nailed over the lintel
 			var s2 := -1.0 if seed_ % 2 == 0 else 1.0
 			b.box(Vector3(hw * s2, 1.5, 0.035), Vector3(0.16, 0.42, 0.012), MB.tag(Color("e8c840"), MB.CLOTH))
 			b.box(Vector3(hw * s2, 1.58, 0.045), Vector3(0.03, 0.2, 0.006), MB.tag(RED, MB.CLOTH))
 			b.box(Vector3(hw * s2, 1.4, 0.045), Vector3(0.09, 0.025, 0.006), MB.tag(RED, MB.CLOTH))
-			b.limb(Vector3(-0.3, 2.14, 0.06), Vector3(0.32, 2.2, 0.06), 0.018, 0.01, MB.tag(Color("7a4a3a"), MB.WOOD), 5)
-			b.limb(Vector3(0.05, 2.17, 0.06), Vector3(0.2, 2.3, 0.07), 0.008, 0.004, MB.tag(Color("7a4a3a"), MB.WOOD), 4)
+			b.limb(Vector3(-0.3, 2.14 + lf, 0.06), Vector3(0.32, 2.2 + lf, 0.06), 0.018, 0.01, MB.tag(Color("7a4a3a"), MB.WOOD), 5)
+			b.limb(Vector3(0.05, 2.17 + lf, 0.06), Vector3(0.2, 2.3 + lf, 0.07), 0.008, 0.004, MB.tag(Color("7a4a3a"), MB.WOOD), 4)
 		"lean":
 			# an empty rice-measure hung mouth down on a peg beside the door
 			var s3 := -1.0 if seed_ % 2 == 0 else 1.0

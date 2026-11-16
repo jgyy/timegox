@@ -220,7 +220,8 @@ static func poll(g) -> Array:
 		g.cal_month = mi
 		var st := stipend(g)
 		g.stones += st
-		g.stipends += 1
+		if st > 0:
+			g.stipends += 1
 		if st <= 0:
 			out.append("The first of the %s Month: no stipend comes. The sect sends nothing to a rogue cultivator" % MONTHS[month(g) - 1])
 		else:

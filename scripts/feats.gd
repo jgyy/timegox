@@ -52,7 +52,13 @@ const FEATS := {
 	# the Ordered House release: the last realm, the chimney, the crane and the mat (Part XXIX)
 	"in_its_place": {"n": "Where It Always Was", "kind": "road", "pts": 20, "test": ["level", 102], "desc": "Reach Everything in Its Place."},
 	# the Open Net release: the last realm, the net, the sentence and the finder (Part XXX)
-	"three_sides": {"n": "What Would Go Left, Go Left", "kind": "road", "pts": 20, "test": ["level", 105], "desc": "Reach Three Sides Open: the last realm there is."},
+	"three_sides": {"n": "What Would Go Left, Go Left", "kind": "road", "pts": 20, "test": ["level", 105], "desc": "Reach Three Sides Open."},
+	# the Tall People release: the last realm, the hour, the runner and the lintel (Part XXXI)
+	"great_small": {"n": "Exactly Room", "kind": "road", "pts": 20, "test": ["level", 108], "desc": "Reach Great and Small Alike: the last realm there is."},
+	"asked_why": {"n": "What Kept Him", "kind": "road", "pts": 10, "test": ["step", "s_p31_hour"], "desc": "Ask a man who came late what he was doing."},
+	"turned_round": {"n": "A Thousand Li Behind Him", "kind": "road", "pts": 10, "test": ["step", "s_p31_sun"], "desc": "Turn somebody round who had never once looked back."},
+	"whose_door": {"n": "For Whoever Comes", "kind": "road", "pts": 10, "test": ["step", "s_p31_lintel"], "desc": "Say how high a door should be, and for whom."},
+	"tall_friends": {"n": "Looked in the Eye", "kind": "people", "pts": 10, "test": ["standing", "daren", 50], "desc": "Be called friend by the Great People."},
 	"open_net": {"n": "One Crane, Walking Round", "kind": "road", "pts": 10, "test": ["step", "s_p30_net"], "desc": "Find a side to open in a net that had none."},
 	"own_sentence": {"n": "Heard Wrongly", "kind": "road", "pts": 10, "test": ["step", "s_p30_sentence"], "desc": "Stop a sentence that had been carried out."},
 	"judges_due": {"n": "What He Owes", "kind": "road", "pts": 10, "test": ["step", "s_p30_verdict"], "desc": "Answer a judge who bound his own hands."},

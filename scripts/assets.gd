@@ -101,6 +101,8 @@ const PEOPLE := {
 	"the_guest": "characters/the_guest", "ding_lingwei": "characters/ding_lingwei", "guan_ning": "characters/guan_ning", "hua_xin": "characters/hua_xin",
 	# Part XXX (the Open Net release)
 	"cheng_tang": "characters/cheng_tang", "li_li": "characters/li_li", "shang_yang": "characters/shang_yang", "jiang_chong": "characters/jiang_chong",
+	# Part XXXI (the Tall People release): three of the Great People, a very small minister and a man with a measure
+	"fangfeng": "characters/fangfeng", "kuafu": "characters/kuafu", "longbo_angler": "characters/longbo_angler", "yan_ying": "characters/yan_ying", "zheng_buyer": "characters/zheng_buyer",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
@@ -463,7 +465,7 @@ static func hero_instance(rel: String, cols: Dictionary) -> Node3D:
 	var meshes: Array = []
 	_walk(inst, meshes, "MeshInstance3D")
 	var sig := ""
-	for k in ["robe", "sec", "trim", "hair", "eyes"]:
+	for k in ["robe", "sec", "trim", "hair", "eyes", "skin"]:
 		sig += (cols[k] as Color).to_html(false) if cols.has(k) else "-"
 	for mi in meshes:
 		var m: MeshInstance3D = mi
@@ -501,6 +503,9 @@ static func hero_part(col: Color, uv: Vector2, pos: Vector3, plain: bool) -> Str
 		return "hair"
 	if plain and cls >= 0.45 and cls <= 0.55 and pos.y > 1.5:
 		return "eyes"
+	# (the Tall People release, visage.gd: the skin, which is never dyed, only warmed or greyed)
+	if cls > 0.55 and cls < 0.65:
+		return "skin"
 	return ""
 
 static func _lum(c: Color) -> float:
@@ -529,7 +534,12 @@ static func _hero_mesh(src: Mesh, cols: Dictionary, key: String) -> Mesh:
 			for i in cs.size():
 				var part := hero_part(cs[i], uvs[i], ps[i], plain)
 				parts[i] = part
-				if part != "" and lin.has(part):
+				if part == "skin":
+					if cols.has("skin"):
+						var sk: Color = cols.skin
+						cs[i] = Color(minf(1.0, cs[i].r * sk.r), minf(1.0, cs[i].g * sk.g), minf(1.0, cs[i].b * sk.b), cs[i].a)
+					parts[i] = ""
+				elif part != "" and lin.has(part):
 					sum[part] = float(sum.get(part, 0.0)) + _lum(cs[i])
 					cnt[part] = int(cnt.get(part, 0)) + 1
 			for i in cs.size():
@@ -623,7 +633,9 @@ const LEND := ["sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
 	"fell", "quarry", "reap", "haul", "haul_idle",
 	# the Answering Land release: waiting at table, kneading, washing, weighing, stalking, dressing a kill,
 	# fanning a stove, shelving, wringing and sewing
-	"serve", "knead", "scrub", "weigh", "stalk", "flay", "fan", "arrange", "wring", "sew"]
+	"serve", "knead", "scrub", "weigh", "stalk", "flay", "fan", "arrange", "wring", "sew",
+	# the Tall People release (closeup.gd): the gestures of a close-up, which anybody may be given
+	"stroke_beard", "sleeve_smile", "fist_palm", "stoop", "shade_eyes", "measure", "arms_cross", "hand_heart"]
 ## the lent clips that go round and round (the rest are one-shots, played again when they end)
 const LEND_LOOPS := ["sit_bench", "doze", "read", "play_qin", "meditate", "fish", "pray", "gather", "warm", "stir", "hammer", "sweep",
 	"weave", "play_flute", "dance", "push", "gaze", "hoe", "chop", "carry", "bang", "eat", "write", "stargaze",

@@ -96,6 +96,16 @@ const LETTERS := {
 		"lines": ["To the cultivator: the old man you sent has hoed the south rows crooked and the north rows straight, so he can be taught. He asked me whether I wished to appeal against him. I said I wished him to mind the weeds. I do not know what he was before. He is a poor farmer, and he does not stop."]},
 	"fowler_net": {"from": "The Fowler of the Four Nets", "after": "s_p30_net", "wait": 4,
 		"lines": ["Cultivator, I cannot write, a pedlar is writing this. One net, the west side. Eleven birds this month where I used to take sixty, and I counted three cranes that walked round it and looked at me. My mother says her father hung his so. She had not told me. I am sending a peach."]},
+	# ---- Part XXXI (the Tall People release): letters from a mason, a giant, a very small minister, and a mother in the north
+	"lintel_grow": {"from": "Mason Qu of Landfall", "needs": ["the_lintel", "grow"], "wait": 3,
+		"lines": ["Cultivator: the new gate is at four courses and they are at three, so I am ahead, for the present. One of them came to look. He put his hand on the top course to see whether it was level, without reaching. It was a quarter out. He told me so very kindly. I have relaid it."]},
+	"lintel_stay": {"from": "The Giant of Longbo", "needs": ["the_lintel", "stay"], "wait": 3,
+		"lines": ["Little fisherman: my mother has a roof and is under it and it is still on. My sister's boy has stopped measuring himself against the door-post every morning. He does it once a week. I enclose what a people our size can spare, which is not much; we eat a great deal."],
+		"gift": {"stones": 360}},
+	"lintel_each": {"from": "Yan Ying", "needs": ["the_lintel", "each"], "wait": 3,
+		"lines": ["Child, I have been to Landfall to see it. A girl of the Longbo asked what height I had chosen. I said nobody had ever asked me. She fetched the gate-clerk. I am written down, at eighty-one, as five foot and content; and I find, having said it aloud, that it is so."]},
+	"kuafu_home": {"from": "Kuafu's Mother", "after": "s_p31_sun", "wait": 4,
+		"lines": ["To the small one who turned my son round. He came in at the door with half a forest on his back and said he had not finished. I said no, you never do. We have had a fire every night since, and the old ones are sitting up. He has gone back for more. He looks behind him now."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -200,7 +210,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:
@@ -215,6 +225,13 @@ static func arrived(g, id: String) -> bool:
 	var at := Data.step_index(after_of(id))
 	if at < 0 or int(g.step) <= at + int(l.get("wait", WAIT)):
 		return false
+	# (nobody he struck down writes to him afterwards: crime.gd)
+	if not g.slain.is_empty() and not g.mail_read.has(id):
+		var fr := str(l.from)
+		for sid in g.slain:
+			var dn := str(g.slain[sid].n)
+			if not str(sid).begins_with("folk:") and not str(sid).begins_with("res:") and (fr.begins_with(dn) or dn.begins_with(fr)):
+				return false
 	if l.has("needs") and Echoes.chosen(g, str(l.needs[0])) != str(l.needs[1]):
 		return false
 	if l.has("on") and str(g.mail_replies.get(str(l.on[0]), "")) != str(l.on[1]):
