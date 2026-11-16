@@ -36,6 +36,21 @@ const SLACK := 0.12
 const NUDGE_MAX := 0.85
 ## the small things that step aside for the big ones
 const STEPS_ASIDE := ["npc", "pickup"]
+## how much larger than a beast of the packs a lord is drawn (world.gd `_make_ent`)
+## the ground a camp of the road covers round its fire (tiles: to either side, behind it, before it)
+const CAMP_SIDE := 2
+const CAMP_BACK := 3
+const CAMP_FRONT := 1
+const LORD_SCALE := 1.9
+## the lords drawn narrower than that, because at their full size they stood in what was put beside them
+## (a thing to find on the same height, a guest, a niche of a cave's wall) further than a step aside mends
+const LORD_NARROW := {"night_owl": 1.75, "chimney_fire": 1.35, "sword_dragons": 1.65}
+
+## How many times the size of a beast of the packs the lord `enemy` is drawn.
+static func lord_scale(enemy: String) -> float:
+	if Giants.of_foe(enemy):
+		return Giants.SCALE
+	return float(LORD_NARROW.get(enemy, LORD_SCALE))
 
 # ---------------------------------------------------------------- footprints
 static var _foot := {}
@@ -72,8 +87,12 @@ static func extent(e: Dictionary) -> float:
 	match str(e.kind):
 		"npc":
 			return PERSON
-		"pickup", "spring", "stele", "abode", "obstacle", "ladder":
+		"pickup":
 			return SMALL
+		"spring", "stele", "abode", "ladder", "obstacle":
+			# (the Cloud Keel release: these were all taken for the size of a thing lying on the ground; a spring's
+			# basin is three metres across.  Measured from what is drawn, like everything else)
+			key = "%s:%s" % [str(e.kind), str(e.get("style", e.get("what", "")))]
 		"boss":
 			# (a lord is as wide as its shape is drawn: a general a person's width, a dragon a dragon's)
 			var en: Dictionary = Data.ENEMIES.get(str(e.get("enemy", "")), {})
@@ -83,10 +102,12 @@ static func extent(e: Dictionary) -> float:
 			var bk := "boss:" + shape
 			if not _foot.has(bk):
 				var bn: Node3D = Models.monster(shape, en.get("col", Color.WHITE), true, str(e.get("enemy", "")))
-				_foot[bk] = clampf(footprint(bn) if bn != null else 0.6, 0.4, 3.0)
+				_foot[bk] = footprint(bn) if bn != null else 0.6
 				if bn != null:
 					bn.free()
-			return float(_foot[bk])
+			# (the Cloud Keel release: and a lord is drawn `lord_scale` times the size of a beast of the packs,
+			# which this used to forget: a dragon reaches nearly five metres, not two and a half)
+			return clampf(float(_foot[bk]) * lord_scale(str(e.get("enemy", ""))), 0.4, 5.0)
 		"hold":
 			# (a length of the town's wall is its own shape)
 			key = "hold:" + (str(e.id) if e.has("seg") else str(e.get("plot", "")))
@@ -118,6 +139,17 @@ static func extent(e: Dictionary) -> float:
 				n = Machines.model(str(e.work))
 			"prop":
 				n = Props.model(str(e.prop), "village") if Props.KINDS.has(str(e.get("prop", ""))) else null
+			"spring":
+				n = Models.spring_basin()
+			"stele":
+				n = Models.dao_stele()
+			"abode":
+				n = Models.sealed_cave(false)
+			"ladder":
+				# (stairs indoors are furniture, drawn with the house; a cave's mouth is a hole in a hillside)
+				n = Models.ladder(str(e.get("style", "")), int(e.get("dir", 1))) if not str(e.get("style", "")) in ["stairs", "cave", "shaft"] else null
+			"obstacle":
+				n = Impact.obstacle_model(str(e.get("what", "")), "village") if Impact.OBSTACLES.has(str(e.get("what", ""))) else null
 		_foot[key] = footprint(n) if n != null else SMALL
 		if n != null:
 			n.free()
@@ -136,11 +168,20 @@ static func stood(wd: Dictionary, area: String, r: Rect2i) -> Dictionary:
 				out[(e.pos as Vector2i) - r.position + Vector2i(dx, dy)] = true
 	for b in Havoc.of_area(wd, area):
 		out[(b.tile as Vector2i) - r.position] = true
+	# (the Cloud Keel release: a camp's lean-to, its stack of wood and the pedlar's pack reach three tiles from
+	# its fire, and only the one round the fire was kept clear: rocks and bushes grew through the lean-to)
 	if wd.get("camps", {}).has(area):
 		var c: Vector2i = wd.camps[area]
-		for dy2 in range(-1, 2):
-			for dx2 in range(-1, 2):
+		for dy2 in range(-CAMP_BACK, CAMP_FRONT + 1):
+			for dx2 in range(-CAMP_SIDE, CAMP_SIDE + 1):
 				out[c - r.position + Vector2i(dx2, dy2)] = true
+	# (and the high road and its lanes, roads.gd, which are paved beside the grid and so were scattered
+	# over like any open ground: three hundred rocks, bushes, stumps and logs lay on the paving)
+	var lid := str(wd.get("layer", ""))
+	if lid != "" and not lid.begins_with("f:"):
+		for rt in Roads.of(lid).tiles:
+			if r.has_point(rt):
+				out[(rt as Vector2i) - r.position] = true
 	return out
 
 ## The steps of the story over which entity `e` is in the land: [from, until) as step indices.
@@ -246,6 +287,89 @@ static func nudge(key: String, ents: Array, e: Dictionary) -> Vector3:
 		return Vector3.ZERO
 	var v: Vector2 = solve(key, ents).nudge.get(str(e.get("id", "")), Vector2.ZERO)
 	return Vector3(v.x, 0.0, v.y)
+
+# ---------------------------------------------------------------- the people of the towns and the road
+## What somebody who walks the land by the hour can be sent to stand in (the Cloud Keel release): the things
+## that stand and are wider than their tile says (`WIDE`), what breaks (havoc.gd), the cairn on a summit, and the pot on its sticks,
+## the stack of wood and the pedlar's boxes of a camp of the road (structures.gd `camp`).  The day of the
+## people of the towns is laid out on the grid, where all of these are a tile or less; as drawn, a soldier
+## of the Drum Tower stood in a jar, a hermit in a cairn, and the cook of every camp in the cooking pot.
+const WIDE := ["spring", "stele", "abode", "mark", "machine", "hold", "boss"]
+## the parts of a camp somebody can stand in: [metres east of its fire, metres south, how wide]
+const CAMP_PARTS := [[0.0, 0.0, 0.75], [1.3, 0.6, 0.5], [3.1, -0.45, 0.5], [3.7, -0.45, 0.5], [-3.25, -1.4, 0.45], [-3.25, 0.2, 0.45], [-3.3, -0.6, 0.2]]
+static var _things := {}
+
+## The things of realm data `wd` somebody could be stood in, by tile: {tile: [[middle (metres), reach, entity or {}]]}.
+static func things(wd: Dictionary) -> Dictionary:
+	var key := "%s|%d" % [str(wd.get("layer", "")), (wd.ents as Array).size()]
+	if _things.has(key):
+		return _things[key]
+	var T := Terrain3D.T
+	var out := {}
+	var add := func(c: Vector2, r: float, e: Dictionary):
+		var t := Vector2i(floori(c.x / T), floori(c.y / T))
+		if not out.has(t):
+			out[t] = []
+		out[t].append([c, r, e])
+	var areas := {}
+	for e in wd.ents:
+		if not e.has("pos"):
+			continue
+		areas[str(e.get("area", ""))] = true
+		if str(e.kind) in WIDE:
+			add.call((Vector2(e.pos) + Vector2(0.5, 0.5)) * T, extent(e), e)
+	for a in areas:
+		if a == "" or not Data.AREAS.has(a):
+			continue
+		for b in Havoc.of_area(wd, a):
+			add.call((Vector2(b.tile) + Vector2(0.5, 0.5)) * T, 0.42, {})
+	for pk in wd.get("peaks", []):
+		add.call((Vector2(pk.c) + Vector2(0.5, 0.5)) * T + cairn_corner(wd, pk), 0.45, {})
+	for ca in wd.get("camps", {}):
+		var cc: Vector2 = (Vector2(wd.camps[ca]) + Vector2(0.5, 0.5)) * T
+		for cp in CAMP_PARTS:
+			add.call(cc + Vector2(float(cp[0]), float(cp[1])), float(cp[2]), {})
+	_things[key] = out
+	return out
+
+## Which corner of its summit's own tile the cairn of peak `pk` stands on (metres from the tile's middle): the
+## one furthest from whoever and whatever the story stands beside the top.
+static func cairn_corner(wd: Dictionary, pk: Dictionary) -> Vector2:
+	var T := Terrain3D.T
+	var co := Vector2(0.75, 0.75)
+	var co_d := -1.0
+	var c: Vector2i = pk.c
+	for cc: Vector2 in [Vector2(0.75, 0.75), Vector2(-0.75, 0.75), Vector2(0.75, -0.75), Vector2(-0.75, -0.75)]:
+		var near_d := 99.0
+		for ce in wd.ents:
+			if ce.has("pos") and str(ce.kind) in ["boss", "npc", "pickup", "prop"] and maxi(absi(ce.pos.x - c.x), absi(ce.pos.y - c.y)) <= 3 and ce.pos != c:
+				near_d = minf(near_d, (Vector2(ce.pos - c) * T - cc).length() - extent(ce))
+		if near_d > co_d + 0.01:
+			co_d = near_d
+			co = cc
+	return co
+
+## How far (metres, x and z) somebody standing at `at` (tiles, with fractions) in realm data `wd` is drawn
+## from there so as to stand clear of what is drawn round them: at most NUDGE_MAX, and nothing if they
+## stand clear already.  `there`: whether a thing of the story is in the land now (a mark that was not
+## chosen, a lord already put down, are not).  Where they are, for everything but the drawing, is unchanged.
+static func step_clear(wd: Dictionary, at: Vector2, there: Callable = Callable()) -> Vector2:
+	var T := Terrain3D.T
+	var idx := things(wd)
+	var p := at * T
+	var t := Vector2i(floori(at.x), floori(at.y))
+	var push := Vector2.ZERO
+	for dy in range(-3, 4):
+		for dx in range(-3, 4):
+			for th in idx.get(t + Vector2i(dx, dy), []):
+				var d: Vector2 = p - (th[0] as Vector2)
+				var need := float(th[1]) + PERSON + 0.04 - d.length()
+				if need <= 0.0:
+					continue
+				if not (th[2] as Dictionary).is_empty() and there.is_valid() and not bool(there.call(th[2])):
+					continue
+				push += (d.normalized() if d.length() > 0.02 else Vector2(0.7, 0.7)) * need
+	return push.limit_length(NUDGE_MAX)
 
 ## Everything in realm data `wd` that shares ground: [{what, at, a, b}].
 static func audit(wd: Dictionary) -> Array:

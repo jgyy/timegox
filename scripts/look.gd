@@ -124,6 +124,17 @@ const THEMES := {
 		"sky_top": Color("6a7a88"), "sky_hor": Color("dce4e4"), "fog": Color("c8d4d4"), "fog_d": 0.03, "sun": Color("e8f0f0"), "sun_e": 0.85, "amb": Color("98aaa8"), "amb_e": 0.9, "weather": "clouds", "tree": "crag", "decor": "pebble"},
 	"guixu": {"g1": Color("8a8070"), "g2": Color("968c7a"), "path": Color("c8b890"), "wall": Color("4a5a5a"), "water": Color("1a3a6a"), "bg": Color("06060e"),
 		"sky_top": Color("1a1440"), "sky_hor": Color("c87a6a"), "fog": Color("7a6a78"), "fog_d": 0.018, "sun": Color("ffc8a0"), "sun_e": 0.95, "amb": Color("8a80a0"), "amb_e": 0.85, "weather": "rain", "tree": "coral", "decor": "shell"},
+	# ---- the Cloud Keel release: the Far Countries.  Huaxu in a pearl-white morning that never quite
+	# becomes noon; the windless green of Zhongbei under a gold afternoon; Gumang, where neither sun nor
+	# moon reaches, in a blue dusk with its own stars; Fuluo under two lights at once, baked ochre
+	"huaxu": {"g1": Color("a8c8b0"), "g2": Color("b6d4bc"), "path": Color("f4ecd8"), "wall": Color("6a9a8a"), "water": Color("a8d8f0"), "bg": Color("182838"),
+		"sky_top": Color("6a9ad8"), "sky_hor": Color("fdf0e0"), "fog": Color("f0ece8"), "fog_d": 0.016, "sun": Color("fff6e4"), "sun_e": 1.1, "amb": Color("c0d0e0"), "amb_e": 0.95, "weather": "clouds", "tree": "column", "decor": "cloudpuff"},
+	"zhongbei": {"g1": Color("78a85a"), "g2": Color("86b466"), "path": Color("e4d8a8"), "wall": Color("3e7a3a"), "water": Color("6ac8c0"), "bg": Color("0c1a0c"),
+		"sky_top": Color("4a82c8"), "sky_hor": Color("ffe8b8"), "fog": Color("e8e0b8"), "fog_d": 0.011, "sun": Color("fff0c8"), "sun_e": 1.2, "amb": Color("c0c8a0"), "amb_e": 0.9, "weather": "petals", "tree": "jadepeach", "decor": "flower"},
+	"gumang": {"g1": Color("363c58"), "g2": Color("3e4462"), "path": Color("8088a8"), "wall": Color("22283e"), "water": Color("3a5a98"), "bg": Color("04050c"),
+		"sky_top": Color("0c1030"), "sky_hor": Color("3a4a88"), "fog": Color("2a3460"), "fog_d": 0.022, "sun": Color("a8b8ff"), "sun_e": 0.7, "amb": Color("7080b8"), "amb_e": 0.9, "weather": "stars", "tree": "shard", "decor": "starcrystal"},
+	"fuluo": {"g1": Color("c8904a"), "g2": Color("d49c56"), "path": Color("f0d8a0"), "wall": Color("9a5a30"), "water": Color("e8a040"), "bg": Color("201004"),
+		"sky_top": Color("d88a3a"), "sky_hor": Color("fff0b0"), "fog": Color("f0c888"), "fog_d": 0.018, "sun": Color("fff0c0"), "sun_e": 1.45, "amb": Color("e0b080"), "amb_e": 1.0, "weather": "embers", "tree": "spire", "decor": "ember"},
 }
 
 ## terrain extras per theme: hill amplitude, ground texture style, tuft kind, horizon silhouette,
@@ -181,6 +192,10 @@ const EXTRA := {
 	"fangzhang": {"hill": 0.6, "tex": "grass", "tuft": "flowers", "horizon": "karst", "clouds": 0.4, "rays": 0.6, "haze": 0.35, "sun_pitch": -34.0},
 	"yingzhou": {"hill": 0.7, "tex": "rock", "tuft": "grass", "horizon": "karst", "clouds": 0.9, "haze": 0.9},
 	"guixu": {"hill": 0.55, "tex": "sand", "tuft": "kelp", "horizon": "reef", "clouds": 0.3, "stars": 0.6, "haze": 0.4, "sun_pitch": -18.0, "sun_yaw": -90.0},
+	"huaxu": {"hill": 0.4, "tex": "grass", "tuft": "grass", "horizon": "islands", "clouds": 0.85, "rays": 0.6, "haze": 0.5, "sun_pitch": -30.0, "sun_yaw": 70.0},
+	"zhongbei": {"hill": 0.75, "tex": "grass", "tuft": "flowers", "horizon": "karst", "clouds": 0.25, "rays": 0.7, "haze": 0.3, "sun_pitch": -36.0},
+	"gumang": {"hill": 0.5, "tex": "underworld", "tuft": "crystal", "horizon": "towers", "clouds": 0.0, "stars": 0.9, "haze": 0.5},
+	"fuluo": {"hill": 0.55, "tex": "cracked", "tuft": "deadgrass", "horizon": "dunes", "clouds": 0.05, "rays": 0.8, "haze": 0.9, "sun_pitch": -70.0, "sun_yaw": 60.0},
 }
 
 const PICKUP_COLORS := {

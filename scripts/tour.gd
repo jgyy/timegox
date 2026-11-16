@@ -2357,6 +2357,11 @@ func _run() -> void:
 		# streets, a giant at a door, a conversation cut to a close-up, the lords in battle, the crossroads and
 		# what each answer leaves standing
 		await _tall_shots(str(main.args.tall))
+	if main.args.has("keel"):
+		# the Cloud Keel release (--keel, or --keel=a,b): an ark at her mooring and under way, the arks over
+		# Cloudfoot and Lightfoot, the counter that sells a passage, the four Far Countries and their two
+		# towns, a storey divided into apartments with the people who live in them, and what the audit mended
+		await _keel_shots(str(main.args.keel))
 	if main.args.has("ending"):
 		# the ending on its own (--ending, or --ending=<id> for one of the ends: cultures.gd): its film
 		# and the results
@@ -5584,6 +5589,216 @@ func _giant(asset: String) -> Node3D:
 	Assets.lend_clips(m)
 	m.scale = Vector3.ONE * Giants.SCALE
 	return m
+
+## The Cloud Keel release: see `--keel` above.
+func _keel_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 60
+	Game.stones = 48000
+	Game.step = Data.step_index("s_p13_home")
+	Game.companion = true
+	Game.day = 120
+	for rid in [Atlas.HUB] + Data.AREA_CHAIN:
+		Game.seen[rid] = true
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	quiet.call()
+	if want.call("ark"):
+		var arks2: Array = []
+		for am in [Models.ark(true, 3.0), Models.ark(false)]:
+			var holder := Node3D.new()
+			(am as Node3D).scale = Vector3.ONE * 0.3
+			holder.add_child(am)
+			arks2.append(holder)
+		await _gallery("ark_moored_and_under_way", arks2, 2.0, 0.75)
+	# the ark over a dock: from the ground beside her, and from the air
+	for dk in [["cloudfoot", "ark_over_cloudfoot", 10.0], ["lightfoot", "ark_over_lightfoot", 9.5], ["fourstreams", "ark_over_fourstreams", 9.0], ["landfall", "ark_over_landfall", 9.5]]:
+		if not want.call("docks") and not want.call(str(dk[0])):
+			continue
+		var did := str(dk[0])
+		var dl := Data.layer_of(str(Arks.DOCKS[did].area))
+		var dw: Dictionary = Atlas.world_of(dl)
+		var bt := Arks.berth(dw, did)
+		var q := Arks.quay(did)
+		Clock.set_hour(Game, float(dk[2]))
+		w.teleport(_nearest_free(q), dl)
+		quiet.call()
+		await _wait(1.2)
+		var bp: Vector3 = w.wpos(bt)
+		bp.y = w.ground_y(bp)
+		var qp: Vector3 = w.wpos(q)
+		var away := (Vector3(qp.x, 0, qp.z) - Vector3(bp.x, 0, bp.z)).normalized()
+		if away.length() < 0.5:
+			away = Vector3(0.6, 0, 0.8)
+		var side := Vector3(-away.z, 0, away.x)
+		w.cam_override = Transform3D(Basis.IDENTITY, bp + away * 30.0 + side * 22.0 + Vector3(0, Arks.HOVER + 13.0, 0)).looking_at(bp + Vector3(0, Arks.HOVER * 0.7, 0), Vector3.UP)
+		await _wait(0.8)
+		await _shot(str(dk[1]))
+		if did == "lightfoot":
+			w.cam_override = Transform3D(Basis.IDENTITY, bp + away * 46.0 - side * 30.0 + Vector3(0, 46.0, 0)).looking_at(bp + away * 10.0 + Vector3(0, 6.0, 0), Vector3.UP)
+			await _wait(0.6)
+			await _shot("town_lightfoot")
+		w.cam_override = null
+	if want.call("counter"):
+		var cl := "far"
+		Clock.set_hour(Game, 10.0)
+		var ce: Dictionary = {}
+		for e in Atlas.world_of(cl).ents:
+			if str(e.get("office", "")) == "moorer_lightfoot":
+				ce = e
+		if not ce.is_empty():
+			w.teleport(_nearest_free(ce.pos + Vector2i(0, 1)), cl)
+			quiet.call()
+			await _wait(0.8)
+			main.offer_carriage(ce)
+			await _wait(0.4)
+			for oi in main.choice.options.size():
+				if str(main.choice.options[oi].id).begins_with("ark:cloudfoot"):
+					main.choice.cursor = oi
+			main.choice._show()
+			await _wait(0.3)
+			await _shot("ark_counter")
+			main.pop()
+	if want.call("far"):
+		for fs in [["huaxu", Vector2i(86, 32), "far_huaxu", 10.0, Vector3(-30.0, 16.0, 34.0)], ["zhongbei", Vector2i(37, 31), "town_fourstreams", 15.5, Vector3(-30.0, 30.0, 34.0)],
+				["zhongbei", Vector2i(70, 30), "far_zhongbei", 16.0, Vector3(-40.0, 18.0, 40.0)], ["gumang", Vector2i(42, 28), "far_gumang", 22.0, Vector3(-24.0, 16.0, 28.0)],
+				["fuluo", Vector2i(47, 28), "far_fuluo", 12.0, Vector3(-26.0, 18.0, 30.0)]]:
+			Clock.set_hour(Game, float(fs[3]))
+			var ft := _nearest_free(Atlas.to_world(str(fs[0]), fs[1]))
+			w.teleport(ft, "far")
+			quiet.call()
+			await _wait(1.2)
+			var fp: Vector3 = w.wpos(ft)
+			fp.y = w.ground_y(fp)
+			w.cam_override = Transform3D(Basis.IDENTITY, fp + (fs[4] as Vector3)).looking_at(fp + Vector3(2.0, 1.0, -3.0), Vector3.UP)
+			await _wait(0.8)
+			await _shot(str(fs[2]))
+			w.cam_override = null
+		# ... and from the ground, with Yue Ling
+		Clock.set_hour(Game, 9.0)
+		w.teleport(_nearest_free(Atlas.to_world("huaxu", Vector2i(46, 32))), "far")
+		w.facing = Vector2i(1, 0)
+		w.cam_q = w.FWD.find(Vector2i(1, 0))
+		w._snap_cam()
+		quiet.call()
+		await _wait(1.2)
+		await _shot("street_of_lightfoot")
+	if want.call("sky"):
+		# the arks under way, looked up at from open country east of Lightfoot (one of them brought down to
+		# where she can be seen)
+		Clock.set_hour(Game, 16.5)
+		w.teleport(_nearest_free(Atlas.to_world("huaxu", Vector2i(88, 32))), "far")
+		quiet.call()
+		await _wait(1.2)
+		var pp: Vector3 = w.player.position
+		var demo: Node3D = Models.ark(false)
+		demo.position = pp + Vector3(10.0, 24.0, -26.0)
+		demo.rotation = Vector3(0.0, 2.2, 0.05)
+		w.scene3d.add_child(demo)
+		var demo2: Node3D = Models.ark(false)
+		demo2.position = pp + Vector3(-46.0, 44.0, -90.0)
+		demo2.rotation = Vector3(0.0, 0.8, 0.0)
+		w.scene3d.add_child(demo2)
+		w.cam_override = Transform3D(Basis.IDENTITY, pp + Vector3(-7.0, 2.4, 9.0)).looking_at(pp + Vector3(4.0, 17.0, -20.0), Vector3.UP)
+		await _wait(0.6)
+		await _shot("arks_under_way")
+		demo.queue_free()
+		demo2.queue_free()
+		w.cam_override = null
+	if want.call("apartments"):
+		for fs2 in [["huaxu", "ark_hands", "apartments_ark_hands", "far"], ["mountain", "caravanserai", "apartments_caravanserai", "surface"], ["huaxu", "unhurried_inn", "guest_rooms_unhurried", "far"], ["huaxu", "wind_chandler", "apartments_over_a_shop", "far"]]:
+			var fid := Atlas.floor_id(str(fs2[0]), str(fs2[1]), 1)
+			var fwd: Dictionary = Atlas.world_of(fid)
+			if fwd.is_empty():
+				continue
+			Clock.set_hour(Game, 19.5)
+			w.teleport(fwd.start, fid)
+			var mid := Vector2(fwd.w, fwd.h) * 0.5
+			var dv := mid - Vector2(fwd.start)
+			var fdir := Vector2i(signi(int(dv.x)), 0) if absf(dv.x) > absf(dv.y) else Vector2i(0, signi(int(dv.y)))
+			if fdir == Vector2i.ZERO:
+				fdir = Vector2i(0, 1)
+			w.facing = fdir
+			w.cam_q = w.FWD.find(fdir)
+			w._snap_cam()
+			quiet.call()
+			await _wait(1.0)
+			await _shot(str(fs2[2]))
+			# from straight above, with the roof off: the plan of the storey
+			var c3: Vector3 = w.player.position
+			var org: Vector3 = w.wpos(Vector2i(int(fwd.w / 2), int(fwd.h / 2)))
+			w.cam_override = Transform3D(Basis.IDENTITY, Vector3(org.x, c3.y + 17.0, org.z + 7.5)).looking_at(Vector3(org.x, c3.y, org.z - 0.5), Vector3.UP)
+			await _wait(0.5)
+			await _shot(str(fs2[2]) + "_plan")
+			w.cam_override = null
+	if want.call("apartments") or want.call("lodger"):
+		# somebody at home upstairs, spoken to
+		var afid := Atlas.floor_id("huaxu", "ark_hands", 1)
+		var afw: Dictionary = Atlas.world_of(afid)
+		for e2 in afw.get("ents", []):
+			if bool(e2.get("lodger", false)):
+				var at := Vector2i(-1, -1)
+				for d in MapGen.DIRS:
+					var n: Vector2i = e2.pos + d
+					if MapGen.is_walkable_tile(afw.grid[n.y * int(afw.w) + n.x]) and not afw.ents.any(func(o): return o.has("pos") and o.pos == n and not bool(o.get("walk", false))):
+						at = n
+				if at.x < 0:
+					continue
+				w.teleport(at, afid)
+				w.facing = e2.pos - at
+				w.cam_q = w.FWD.find(w.facing)
+				w._snap_cam()
+				quiet.call()
+				await _wait(0.8)
+				main.talk_npc(e2)
+				await _wait(1.2)
+				await _shot("lodger_at_home")
+				main.set_stack(["world"])
+				break
+	if want.call("mended"):
+		# what the audit of shared ground mended, seen: a cellar whose shelves stand clear of its wall, a
+		# bed along a wall, lanterns over heads
+		for fs3 in [["f:sect:library:-1", "cellar_furniture_clear"], ["f:village:green_stone_inn:-1", "cellar_inn_clear"]]:
+			var fw3: Dictionary = Atlas.world_of(str(fs3[0]))
+			if fw3.is_empty():
+				continue
+			w.teleport(fw3.start, str(fs3[0]))
+			w._snap_cam()
+			quiet.call()
+			await _wait(0.9)
+			await _shot(str(fs3[1]))
+		Clock.set_hour(Game, 10.0)
+		var yq := Ships.quay("yanggu")
+		var yw: Dictionary = Atlas.world_of("surface")
+		var ym := Ships.mooring(yw, "yanggu")
+		if ym.x >= 0:
+			w.teleport(_nearest_free(yq), "surface")
+			quiet.call()
+			await _wait(1.0)
+			var yp: Vector3 = w.wpos(ym)
+			w.cam_override = Transform3D(Basis.IDENTITY, yp + Vector3(6.0, 34.0, 20.0)).looking_at(yp + Vector3(0, 1.0, 0), Vector3.UP)
+			await _wait(0.6)
+			await _shot("junk_afloat_at_yanggu")
+			w.cam_override = null
+	if want.call("map"):
+		w.teleport(_nearest_free(Arks.quay("lightfoot")), "far")
+		quiet.call()
+		await _wait(0.6)
+		main.open_menu()
+		main.menu.mode = "map"
+		main.menu.map_layer = "far"
+		main.menu._build()
+		await _wait(0.5)
+		await _shot("map_far_countries")
+		main.set_stack(["world"])
 
 func _tall_shots(which: String = "1") -> void:
 	var only := which.split(",", false) if which != "1" else PackedStringArray()

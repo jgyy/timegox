@@ -29,6 +29,7 @@ const DENSITY := {
 	"longmen": 0.24, "drowned": 0.18, "tushan": 0.27, "buzhou": 0.26,
 	"juntian": 0.22, "changhe": 0.22, "ninesprings": 0.26, "youdu": 0.2,
 	"penglai": 0.2, "fangzhang": 0.24, "yingzhou": 0.26, "guixu": 0.22,
+	"huaxu": 0.2, "zhongbei": 0.22, "gumang": 0.24, "fuluo": 0.24,
 }
 
 ## themes with scattered water (noise threshold: lower = rarer)

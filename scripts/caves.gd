@@ -50,6 +50,7 @@ const LOOKS := {
 const LOOK_OF := {"village": "bamboo", "silk": "bamboo", "garden": "bamboo", "maple": "bamboo", "loom": "bamboo", "lake": "marsh", "karst": "marsh", "longmen": "marsh",
 	"glacier": "frost", "aurora": "frost", "buzhou": "frost", "storm": "thunder", "tushan": "forge", "yanggu": "volcano", "inferno": "volcano",
 	"palace": "jade", "court": "jade", "juntian": "cloudsea", "changhe": "cloudsea", "moon": "cloudsea", "star": "cloudsea",
+	"huaxu": "cloudsea", "zhongbei": "bamboo", "gumang": "under", "fuluo": "volcano",
 	"coast": "sea", "reef": "sea", "penglai": "sea", "guixu": "sea", "fusang": "sea", "isles": "sea",
 	"ninesprings": "under", "youdu": "under", "abyss": "under", "bridge": "under", "wheel": "under"}
 

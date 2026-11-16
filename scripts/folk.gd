@@ -55,6 +55,11 @@ const TOWNS := {
 		"roles": {"merchant": 4, "scholar": 3, "porter": 3, "elder": 2, "monk": 2, "guard": 2, "lamplighter": 2}},
 	"landfall": {"n": "Landfall", "area": "penglai", "at": Vector2i(40, 30), "race": "human",
 		"roles": {"fisher": 6, "washer": 3, "child": 4, "elder": 2, "merchant": 2, "youth": 2, "watchman": 1, "waiter": 1, "giant": 3}},
+	# (the Cloud Keel release: the towns of the Far Countries)
+	"lightfoot": {"n": "Lightfoot", "area": "huaxu", "at": Vector2i(41, 32), "race": "human",
+		"roles": {"porter": 4, "merchant": 3, "youth": 3, "child": 3, "elder": 2, "scholar": 1, "cook": 1, "watchman": 1, "lamplighter": 1, "washer": 2, "waiter": 1, "giant": 1}},
+	"fourstreams": {"n": "Fourstreams", "area": "zhongbei", "at": Vector2i(37, 31), "race": "human",
+		"roles": {"farmer": 4, "musician": 3, "child": 3, "elder": 2, "washer": 2, "cook": 1, "monk": 1, "youth": 2, "waiter": 1, "giant": 1}},
 }
 
 ## The bodies of each people for each kind of person (art/characters/folk_*.py); a kind missing
@@ -1407,6 +1412,13 @@ static func apply_dye(m: Node3D, dy: Array) -> void:
 const POSTS := {
 	# the Hollow Hills release (Part XX): the traveller writing up his day, the old man digging, the wise one
 	# thinking it over, and a woodcutter who is only watching
+	# the Cloud Keel release: the people of the Far Countries (one is awake while a country sleeps; one sleeps;
+	# two have never slept)
+	"ark_master_yun": ["peer|point", "", "peer"], "master_lie": ["think|shrug", "", "doze"], "shipwright_mu": ["hammer|carry", "hammer", "doze"],
+	"weigher_su": ["weigh|arrange", "steelyard", "doze"], "dreaming_guest": ["write|think", "", "doze"], "deckhand_pei": ["carry|sweep", "", "doze"],
+	"spring_keeper_he": ["sweep|think", "", "doze"], "singer_lan": ["clap|dance", "", "doze"], "lost_surveyor": ["peer|write", "", "doze"],
+	"groom_of_mu": ["think|peer", "", "doze"], "waker_zhi": ["think|peer", "", "peer"], "sleeper_an": ["doze", "", "doze"],
+	"sleepless_gan": ["peer|point", "", "peer"], "night_seeker": ["peer|think", "", "peer"],
 	"xu_xiake": ["write|peer|point", "", "doze"], "yu_gong": ["dig|carry", "spade", "doze"], "zhi_sou": ["think|shrug", "", "doze"], "wang_zhi": ["peer|think", "", "peer"],
 	"alchemist": ["stir", "ladle", "read"], "smith": ["hammer", "hammer", "doze"], "archivist": ["read|write", "book", "read"],
 	"cook_zhou": ["stir|chop", "ladle", "doze"], "sweeper_bai": ["sweep", "", "doze"], "bell_shen": ["sweep|strike", "", "doze"],

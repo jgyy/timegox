@@ -3263,9 +3263,138 @@ const AREAS := {
 				"up": Vector2i(32, 19), "upper": {"n": "the steersman's cabin", "props": [["desk", Vector2i(26, 20), true], ["bed", Vector2i(24, 23), true], ["shelf", Vector2i(31, 23), true], ["lantern", Vector2i(28, 23), false]]}},
 		],
 	},
+	# ---- the Cloud Keel release: the Far Countries of the Liezi, which "neither boat nor cart nor the
+	# feet can reach", only the spirit: a fifth realm, reached by the spirit arks alone (arks.gd).  Nothing
+	# of the story is asked for here: no lord, no step, no seal.  Huaxu in the middle, where the arks moor
+	# over the town of Lightfoot; Zhongbei, the Utmost North, east of it, with the town of Fourstreams
+	# under the jar-shaped mountain; Gumang, the country that sleeps, in the far west; Fuluo, the
+	# country that never sleeps, in the far east
+	"huaxu": {
+		"n": "Huaxu, the Country Walked in Sleep", "w": 100, "h": 64, "seed": 511, "theme": "huaxu", "enemies": 18, "races": [], "layer": "far", "hill": 0.4,
+		"pool": [["cloud_ray", 52, 53], ["gale_sprite", 52, 53], ["light_wisp", 52, 53]],
+		"portals": [
+			{"to": "gumang", "pos": Vector2i(1, 32), "dest": Vector2i(86, 30), "open": ""},
+			{"to": "zhongbei", "pos": Vector2i(98, 32), "dest": Vector2i(4, 30), "open": ""},
+		],
+		"npcs": [
+			{"id": "ark_master_yun", "n": "Ark-Master Yun of the Long Watch", "pos": Vector2i(38, 29), "col": Color("3a6a8a"), "asset": "folk_fisher"},
+			{"id": "master_lie", "n": "Master Lie, Who Rides the Wind", "pos": Vector2i(41, 30), "col": Color("d8d8c8"), "asset": "folk_grandpa"},
+			{"id": "shipwright_mu", "n": "Shipwright Mu of the Cloud-Slip", "pos": Vector2i(24, 36), "col": Color("8a6a3a"), "asset": "folk_porter"},
+			{"id": "weigher_su", "n": "Mistress Su, Who Weighs the Wind", "pos": Vector2i(66, 35), "col": Color("6a8aa0"), "asset": "folk_shopwife"},
+			{"id": "dreaming_guest", "n": "The Guest Who Is Asleep Elsewhere", "pos": Vector2i(52, 35), "col": Color("c8a840"), "asset": "folk_scholar"},
+			{"id": "deckhand_pei", "n": "Deckhand Pei", "pos": Vector2i(37, 35), "col": Color("5a7a6a"), "asset": "folk_youth"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_hx1", "item": "stones", "n": 4200, "pos": Vector2i(78, 14), "always": true},
+			{"id": "sense_hx1", "item": "stones", "n": 3200, "pos": Vector2i(14, 52), "always": true, "sense": true}],
+		"pickup_vis": "",
+		"springs": [Vector2i(22, 44)],
+		"steles": [Vector2i(42, 33)],
+		"roads": [[Vector2i(2, 32), Vector2i(13, 32), Vector2i(24, 33), Vector2i(34, 32), Vector2i(44, 31), Vector2i(56, 32), Vector2i(70, 33), Vector2i(84, 32), Vector2i(97, 32)],
+			[Vector2i(34, 27), Vector2i(34, 32)], [Vector2i(48, 27), Vector2i(48, 31)], [Vector2i(62, 28), Vector2i(62, 32)],
+			[Vector2i(32, 37), Vector2i(32, 33)], [Vector2i(44, 37), Vector2i(44, 32)], [Vector2i(57, 37), Vector2i(57, 33)], [Vector2i(70, 37), Vector2i(70, 33)]],
+		"buildings": [
+			{"id": "mooring_hall", "n": "The Hall of Moorings", "style": "hall", "rect": Rect2i(28, 18, 13, 9), "door": Vector2i(34, 26),
+				"props": [["desk", Vector2i(33, 20), true], ["bookshelf", Vector2i(29, 19), true], ["bookshelf", Vector2i(39, 19), true], ["scroll", Vector2i(31, 19), false], ["scroll", Vector2i(37, 19), false], ["cushion", Vector2i(31, 23), false], ["lantern", Vector2i(37, 24), false]]},
+			{"id": "unhurried_inn", "n": "The Inn of the Unhurried Guest", "style": "inn", "rect": Rect2i(44, 19, 10, 8), "door": Vector2i(48, 26),
+				"props": [["table", Vector2i(46, 22), true], ["stool", Vector2i(47, 22), false], ["counter", Vector2i(51, 21), true], ["barrel", Vector2i(52, 24), true], ["stove", Vector2i(45, 20), true], ["lantern", Vector2i(45, 24), false]]},
+			{"id": "wind_tea", "n": "The Tea-House Where the Wind Sits Down", "style": "teahouse", "rect": Rect2i(57, 20, 11, 8), "door": Vector2i(62, 27),
+				"props": [["table", Vector2i(59, 22), true], ["cushion", Vector2i(60, 23), false], ["table", Vector2i(65, 22), true], ["cushion", Vector2i(64, 23), false], ["stove", Vector2i(58, 21), true], ["scroll", Vector2i(62, 21), false], ["lantern", Vector2i(66, 25), false]]},
+			{"id": "ropewalk_house", "n": "The Rope-Makers' House", "style": "house", "rect": Rect2i(27, 38, 10, 7), "door": Vector2i(32, 38),
+				"props": [["bed", Vector2i(28, 43), true], ["table", Vector2i(31, 41), true], ["stool", Vector2i(32, 41), false], ["stove", Vector2i(35, 43), true], ["loom", Vector2i(35, 40), true], ["lantern", Vector2i(29, 40), false]]},
+			{"id": "sailcloth_house", "n": "The Sail-Menders' House", "style": "huizhou", "rect": Rect2i(39, 38, 10, 7), "door": Vector2i(44, 38),
+				"props": [["bed", Vector2i(40, 43), true], ["cabinet", Vector2i(47, 43), true], ["table", Vector2i(43, 41), true], ["stool", Vector2i(44, 41), false], ["stove", Vector2i(47, 40), true], ["lantern", Vector2i(41, 40), false]]},
+			{"id": "ark_hands", "n": "The Long House of the Ark-Hands", "style": "dorm", "rect": Rect2i(51, 38, 12, 8), "door": Vector2i(57, 38),
+				"props": [["bed", Vector2i(52, 40), true], ["bed", Vector2i(52, 42), true], ["bed", Vector2i(52, 44), true], ["bed", Vector2i(61, 42), true], ["bed", Vector2i(61, 44), true], ["table", Vector2i(57, 42), true], ["stool", Vector2i(57, 43), false], ["lantern", Vector2i(55, 44), false]]},
+			{"id": "wind_chandler", "n": "Su's Chandlery of Winds and Cordage", "style": "shop", "rect": Rect2i(65, 38, 10, 7), "door": Vector2i(70, 38),
+				"props": [["counter", Vector2i(69, 41), true], ["shelf", Vector2i(66, 43), true], ["shelf", Vector2i(73, 43), true], ["barrel", Vector2i(66, 40), true], ["rack", Vector2i(73, 40), true], ["lantern", Vector2i(70, 43), false]]},
+		],
+	},
+	"zhongbei": {
+		"n": "Zhongbei, the Utmost North", "w": 96, "h": 62, "seed": 521, "theme": "zhongbei", "enemies": 18, "races": [], "layer": "far", "hill": 0.75,
+		"pool": [["garden_crane", 53, 54], ["moss_tortoise", 53, 54], ["peach_sprite", 53, 54]],
+		"portals": [
+			{"to": "huaxu", "pos": Vector2i(1, 30), "dest": Vector2i(94, 32), "open": ""},
+			{"to": "fuluo", "pos": Vector2i(94, 30), "dest": Vector2i(4, 30), "open": ""},
+		],
+		"npcs": [
+			{"id": "spring_keeper_he", "n": "Keeper He of the Divine Spring", "pos": Vector2i(39, 29), "col": Color("5aa0a8"), "asset": "folk_monk"},
+			{"id": "singer_lan", "n": "Aunt Lan, Who Sings the Day Through", "pos": Vector2i(46, 33), "col": Color("c86a8a"), "asset": "folk_farmwife"},
+			{"id": "lost_surveyor", "n": "The Surveyor Who Lost Yu's Road", "pos": Vector2i(28, 33), "col": Color("7a6a4a"), "asset": "folk_founder"},
+			{"id": "groom_of_mu", "n": "The Groom King Mu Left Behind", "pos": Vector2i(58, 28), "col": Color("8a4a3a"), "asset": "folk_herder"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_zb1", "item": "stones", "n": 4400, "pos": Vector2i(76, 46), "always": true},
+			{"id": "sense_zb1", "item": "stones", "n": 3400, "pos": Vector2i(12, 12), "always": true, "sense": true}],
+		"pickup_vis": "",
+		"springs": [Vector2i(38, 40)],
+		"steles": [Vector2i(37, 33)],
+		"roads": [[Vector2i(2, 30), Vector2i(14, 31), Vector2i(26, 30), Vector2i(36, 30), Vector2i(48, 29), Vector2i(60, 31), Vector2i(74, 30), Vector2i(93, 30)],
+			[Vector2i(31, 26), Vector2i(31, 30)], [Vector2i(45, 25), Vector2i(45, 29)], [Vector2i(30, 36), Vector2i(30, 31)], [Vector2i(42, 36), Vector2i(42, 30)], [Vector2i(54, 36), Vector2i(54, 30)]],
+		"buildings": [
+			{"id": "spring_hall", "n": "The Hall of the Four Streams", "style": "hall", "rect": Rect2i(25, 17, 12, 9), "door": Vector2i(31, 25),
+				"props": [["altar", Vector2i(30, 18), true], ["altar", Vector2i(31, 18), true], ["desk", Vector2i(34, 21), true], ["scroll", Vector2i(26, 20), false], ["cushion", Vector2i(28, 22), false], ["lantern", Vector2i(34, 23), false]]},
+			{"id": "jar_inn", "n": "The Inn under the Jar-Neck", "style": "inn", "rect": Rect2i(40, 17, 10, 8), "door": Vector2i(45, 24),
+				"props": [["table", Vector2i(42, 20), true], ["stool", Vector2i(43, 20), false], ["counter", Vector2i(47, 19), true], ["barrel", Vector2i(48, 22), true], ["stove", Vector2i(41, 18), true], ["lantern", Vector2i(41, 22), false]]},
+			{"id": "singers_house", "n": "The House Where Somebody Is Always Singing", "style": "house", "rect": Rect2i(25, 37, 10, 7), "door": Vector2i(30, 37),
+				"props": [["bed", Vector2i(26, 42), true], ["table", Vector2i(29, 40), true], ["stool", Vector2i(30, 40), false], ["stove", Vector2i(33, 42), true], ["cabinet", Vector2i(33, 39), true], ["lantern", Vector2i(27, 39), false]]},
+			{"id": "streams_house", "n": "The House between Two Streams", "style": "farmhouse", "rect": Rect2i(37, 37, 10, 7), "door": Vector2i(42, 37),
+				"props": [["bed", Vector2i(38, 42), true], ["table", Vector2i(41, 40), true], ["stool", Vector2i(42, 40), false], ["stove", Vector2i(45, 42), true], ["barrel", Vector2i(45, 39), true], ["lantern", Vector2i(39, 39), false]]},
+			{"id": "spring_bath", "n": "The Bath of the Divine Spring", "style": "bathhouse", "rect": Rect2i(50, 37, 9, 7), "door": Vector2i(54, 37),
+				"props": [["tub", Vector2i(52, 41), true], ["tub", Vector2i(56, 41), true], ["stool", Vector2i(54, 40), false], ["lantern", Vector2i(51, 39), false]]},
+		],
+	},
+	"gumang": {
+		"n": "Gumang, the Country That Sleeps", "w": 92, "h": 60, "seed": 531, "theme": "gumang", "enemies": 18, "races": [], "layer": "far", "hill": 0.5,
+		"pool": [["echo_shade", 54, 55], ["ghost_lantern", 54, 55], ["dust_moth", 54, 55]],
+		"portals": [
+			{"to": "huaxu", "pos": Vector2i(90, 30), "dest": Vector2i(4, 32), "open": ""},
+		],
+		"npcs": [
+			{"id": "waker_zhi", "n": "Zhi, Whose Turn It Is to Be Awake", "pos": Vector2i(42, 28), "col": Color("6a6a9a"), "asset": "folk_monk"},
+			{"id": "sleeper_an", "n": "A Sleeper of Gumang", "pos": Vector2i(56, 33), "col": Color("5a5a7a"), "asset": "folk_farmer"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_gm1", "item": "stones", "n": 4600, "pos": Vector2i(14, 14), "always": true},
+			{"id": "sense_gm1", "item": "stones", "n": 3600, "pos": Vector2i(72, 50), "always": true, "sense": true}],
+		"pickup_vis": "",
+		"springs": [Vector2i(26, 44)],
+		"steles": [Vector2i(44, 32)],
+		"roads": [[Vector2i(4, 30), Vector2i(18, 31), Vector2i(32, 30), Vector2i(46, 29), Vector2i(60, 31), Vector2i(74, 30), Vector2i(89, 30)], [Vector2i(40, 26), Vector2i(40, 30)]],
+		"buildings": [
+			{"id": "fifty_days", "n": "The Long House of the Fifty Days", "style": "dorm", "rect": Rect2i(34, 17, 13, 9), "door": Vector2i(40, 25),
+				"props": [["bed", Vector2i(35, 19), true], ["bed", Vector2i(35, 21), true], ["bed", Vector2i(35, 23), true], ["bed", Vector2i(45, 19), true], ["bed", Vector2i(45, 21), true], ["bed", Vector2i(45, 23), true], ["table", Vector2i(40, 20), true], ["lantern", Vector2i(42, 22), false]]},
+		],
+	},
+	"fuluo": {
+		"n": "Fuluo, the Country That Never Sleeps", "w": 92, "h": 60, "seed": 541, "theme": "fuluo", "enemies": 18, "races": [], "layer": "far", "hill": 0.55,
+		"pool": [["ember_sprite", 54, 55], ["ash_salamander", 54, 55], ["meteor_golem", 54, 55]],
+		"portals": [
+			{"to": "zhongbei", "pos": Vector2i(1, 30), "dest": Vector2i(90, 30), "open": ""},
+		],
+		"npcs": [
+			{"id": "sleepless_gan", "n": "Gan of the Open Eyes", "pos": Vector2i(47, 28), "col": Color("c8603a"), "asset": "folk_guard"},
+			{"id": "night_seeker", "n": "Granny Ru, Who Is Looking for a Night", "pos": Vector2i(60, 33), "col": Color("a8783a"), "asset": "folk_grandma"},
+		],
+		"bosses": [],
+		"pickups": [
+			{"id": "cache_fl1", "item": "stones", "n": 4600, "pos": Vector2i(76, 14), "always": true},
+			{"id": "sense_fl1", "item": "stones", "n": 3600, "pos": Vector2i(16, 48), "always": true, "sense": true}],
+		"pickup_vis": "",
+		"springs": [Vector2i(30, 44)],
+		"steles": [Vector2i(48, 32)],
+		"roads": [[Vector2i(2, 30), Vector2i(16, 31), Vector2i(30, 30), Vector2i(44, 29), Vector2i(58, 31), Vector2i(72, 30), Vector2i(86, 30)], [Vector2i(45, 25), Vector2i(45, 29)]],
+		"buildings": [
+			{"id": "no_shutters", "n": "The House with No Shutters", "style": "house", "rect": Rect2i(40, 17, 11, 8), "door": Vector2i(45, 24),
+				"props": [["table", Vector2i(43, 20), true], ["stool", Vector2i(44, 20), false], ["stove", Vector2i(49, 19), true], ["rack", Vector2i(41, 19), true], ["cabinet", Vector2i(49, 22), true], ["lantern", Vector2i(42, 22), false]]},
+		],
+	},
 }
 
-const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu", "penglai", "fangzhang", "yingzhou", "guixu"]
+const AREA_CHAIN := ["sect", "bamboo", "marsh", "frost", "thunder", "palace", "dragon", "volcano", "void", "celestial", "mirror", "grave", "time", "origin", "cloudsea", "court", "forge", "garden", "dunes", "fungal", "aurora", "chaos", "maple", "karst", "springs", "wheel", "village", "terraces", "silk", "loom", "starferry", "magpie", "starpalace", "jasper", "yanggu", "millet", "fusang", "guanghan", "longmen", "drowned", "tushan", "buzhou", "juntian", "changhe", "ninesprings", "youdu", "penglai", "fangzhang", "yingzhou", "guixu", "huaxu", "zhongbei", "gumang", "fuluo"]
 
 ## The towns of the Unbroken Land, marked on the world map: the area they stand in, a tile of that
 ## area's own map at their heart, and what they are.
@@ -3292,6 +3421,11 @@ const TOWNS := [
 	# ---- Part XII: the town of the Isles of the Eastern Sea
 	{"id": "landfall", "n": "Landfall", "area": "penglai", "pos": Vector2i(40, 30),
 		"lore": "The town of the Thousand Children on Penglai, where Xu Fu's three thousand boys and girls came ashore from Qin two thousand two hundred years ago and waited for him to come back. Fishermen, net-menders and shipwrights; a Hall of the Thousand Names where every child learns the names by heart; a temple to Mazu; and, up the hill, the immortals, who for two thousand years have been too grand to come down."},
+	# ---- the Cloud Keel release: the towns of the Far Countries, where the spirit arks moor
+	{"id": "lightfoot", "n": "Lightfoot", "area": "huaxu", "pos": Vector2i(41, 32),
+		"lore": "The town of Huaxu under the mooring of the arks. Its people have no headman and want none, walk on the air above a puddle rather than go round it, and build cloud-keeled ships because somebody once asked whether it could be done. The Hall of Moorings keeps the roster; nobody keeps anything else."},
+	{"id": "fourstreams", "n": "Fourstreams", "area": "zhongbei", "pos": Vector2i(37, 31),
+		"lore": "The town under Mount Huling in the Utmost North, where the Divine Spring comes out of the jar's neck and parts into four streams. There is no wind here and no frost; people drink the spring when they are hungry, sing when they are not, and have been meaning to elect somebody to something for nine hundred years."},
 ]
 
 ## What the land remembers of each region: shown beside the world map, and kept in the Annals once
@@ -3348,6 +3482,10 @@ const REGION_LORE := {
 	"yingzhou": "Yingzhou, the Isle of Mists, which only sometimes admits to being there. The turtles who bear the isles rest their heads under it, Jingwei carries her stones across it to the sea, and Yu Qiang, God of the Northern Sea, keeps the turtles' shifts in a tally-room nobody has dusted for forty thousand years.",
 	"guixu": "Guixu, the Returning Ruins, east of everything: the lip of the ravine without a bottom into which every river, every sea and the Silver River pour, and which never fills and never empties. On its slope lie the drowned summits of Daiyu and Yuanqiao, and the wrecks of the fleet that came looking for them.",
 	"youdu": "Youdu, the Dark Capital, at the bottom of the world: the city of the shades who are not ready to be reborn, under Houtu, Sovereign Earth. Its lanterns have burned since before the Court; Tubo keeps its gate, and in the deep beyond it Li has pressed the earth down since the ladder was cut.",
+	"huaxu": "Huaxu, the Country Walked in Sleep. The Liezi says it lies west of Yanzhou and north of Taizhou, nobody knows how many tens of thousands of li from the middle of the world, and that neither boat nor cart nor the feet can reach it: only the spirit. The Yellow Emperor came once, in a dream, and ruled better for twenty-eight years after. Its people have no ruler and no cravings; they walk the air like ground and sleep in it like a bed. The spirit arks are theirs.",
+	"zhongbei": "Zhongbei, the Utmost North, where Yu the Great lost his way while he was measuring the floods. No wind, no rain, no frost, no bird or beast or tree that is not gentle. In its middle stands Mount Huling, shaped like a jar, and from the ring at its neck runs the Divine Spring in four streams that water the whole country. King Mu of Zhou stayed three years and forgot to go home.",
+	"gumang": "Gumang, at the far corner of the west, where the breath of yin and yang does not meet, so there is no cold or heat, and the light of sun and moon does not reach, so there is no day or night. Its people neither eat nor dress; they sleep fifty days and wake once, and hold that what they do in dreams is real and what they see awake is not.",
+	"fuluo": "Fuluo, at the far corner of the east, where the sun and the moon never leave the sky. The ground is always hot and grows nothing gentle; its people eat roots and fruit raw, are strong and hard and always awake, and have never slept. They think the people of Gumang a story told to children, and the people of Gumang have dreamt of them.",
 }
 
 ## The ways between the realms (Part XI): each joins a tile of one region to a tile of another in a
@@ -3387,6 +3525,12 @@ static func next_hop(from: String, to: String) -> String:
 				outs.append(ld.b[0])
 			elif ld.b[0] == c:
 				outs.append(ld.a[0])
+		# (the Cloud Keel release: the Far Countries are joined to the land by the ark of Cloudfoot and by
+		# nothing else, arks.gd; nothing of the story lies that way, so no road of the story goes by it)
+		if c == "mountain":
+			outs.append("huaxu")
+		elif c == "huaxu":
+			outs.append("mountain")
 		# the sect stands on the mountain: its gates open straight onto it
 		if c == "sect":
 			outs.append("mountain")
@@ -4654,7 +4798,7 @@ const STEPS := [
 	{"id": "s_p32_old", "kind": "folk", "role": "elder", "town": "qingshi", "n": 2, "area": "village", "t": "\"I tie the knot. I have never once seen what is done with it.\" Ask 2 of the old people of Qingshi what fifty years at one table is made of"},
 	{"id": "s_p32_graves", "kind": "kill", "boss": "two_graves", "area": "starpalace", "t": "A king buried them in sight of each other and said: join if you can. Go up to the Two Graves Kept Apart", "stones": 71800},
 	{"id": "s_p32_bridge", "kind": "talk", "npc": "weisheng", "area": "magpie", "t": "Under the Magpie Bridge a young man is standing in the dry bed with his arms round a pillar. Find Weisheng below the first height", "stones": 72000},
-	{"id": "s_p32_water", "kind": "hunt", "area": "magpie", "n": 34, "of": ["rising_water", "held_pillar", "plank_step"], "t": "\"She said under the bridge. I am under the bridge.\" Clear 34 waters to the knee, pillars somebody held and footsteps on the planks above", "stones": 72200},
+	{"id": "s_p32_water", "kind": "hunt", "area": "magpie", "n": 34, "of": ["rising_water", "held_pillar", "plank_step"], "t": "\"I said under the bridge. I am under the bridge.\" Clear 34 waters to the knee, pillars somebody held and footsteps on the planks above", "stones": 72200},
 	{"id": "s_p32_marks", "kind": "collect", "item": "hour_stone", "n": 4, "area": "magpie", "t": "He scratched a stone for every hour he waited and laid them where the water could not move them. Find 4 hour-stones on the heights"},
 	{"id": "s_p32_span", "kind": "summit", "peak": "magpie", "k": 1, "area": "magpie", "t": "Climb the second height of the Magpie Bridge and look down at the planks he was standing under"},
 	{"id": "s_p32_down", "kind": "glide", "n": 10, "area": "magpie", "t": "Go where the water went, and where anybody looking for a drowned man would go. One flight of 10 tiles under the cloud-kite (V, from a height)"},
@@ -5155,7 +5299,7 @@ const CHAT := {
 	# Part XXXI (the Tall People release)
 	"fangfeng": ["I set out in good time. People forget that part. It makes a better story if I overslept.",
 		"A day and a night with a river on my back. I thought of nothing at all. It was the last time I was not thinking about being late.",
-		"Your elder said I might be as late as I liked. I tried it. It is harder than hurrying. You have to decide what for.",
+		"You said I might be as late as I liked. I tried it. It is harder than hurrying. You have to decide what for.",
 		"One joint of me filled a cart, they say. I should like to know who measured, and what he did with the cart."],
 	"kuafu": ["It is not that I am fast. I am not fast. It is that I do not stop; my mother says they are different faults.",
 		"I drank the Yellow River and the Wei. I am told it was inconvenient. I did put them back, in a manner of speaking.",
@@ -5184,7 +5328,7 @@ const CHAT := {
 		"I am not dead. The clerks here keep saying so, as if it were a difficulty. I have told them it is no trouble of theirs; I shall not be staying."],
 	"xu_deyan": ["I was tutor to the heir of a kingdom, and then there was no kingdom. One finds one can live on very little. I had not known.",
 		"We broke it over the edge of the well on the last night, with the fire already on the south wall. She held it. I struck. It is the only blow I ever gave anything.",
-		"Every year an old man cried half a mirror in the market at ten times the price of a whole one, and was laughed at. Eight years I was in the wrong city.",
+		"Every year an old man cried half a mirror in the market at ten times the price of a whole one, and was laughed at. Nine years I was in the wrong city.",
 		"I wrote four lines on her half and sent it back. I have been ashamed of the third line ever since. One should not be clever on such a day."],
 	"lechang": ["He is a soldier and a great lord, the man whose house this silk is from. He has not been unkind. I should like that said by somebody, and it had better be me.",
 		"I sent the mirror to market by an old servant, and named a price to make people laugh. Only one man in the world would not laugh.",
@@ -5459,6 +5603,21 @@ const CHAT := {
 	"shipwright_ban": ["Every boat in Landfall is lying on the sand with its belly showing. I am using the time to scrape the barnacles. You have to be practical about the end of the world.", "My boats were built to sail inside the mirage, round and round. I would like, before I die, to build one that goes somewhere.", "Ban is short for Ban Gong, the carpenter of the gods. My grandmother was ambitious."],
 	"ah_shui": ["A net with a hole in it still catches fish. A net that is all holes is a story. I mend the first kind and tell the second.", "When the water went, the nets came up full of things nobody has seen for two thousand years: coins from Qin, a sword, a child's shoe.", "Mend the small holes first. Nobody believes me until they have lost a big fish through a small hole."],
 	"little_haibao": ["Are you from the mainland? Is it true the mainland does not move? How do you know where you are?", "Teacher Qin says I am descended from a boy called Haibao who was nine when he landed. I am nine too! We are basically the same person.", "I found a crab with a coin stuck to its back. I named it Emperor."],
+	# ---- the Cloud Keel release: the people of the Far Countries
+	"ark_master_yun": ["An ark has no keel in the water because there is no water. She sits on what you would call intention. Do not lean on the rail and doubt.", "We stopped coming when your sea began to run out at the Ruins. The air ran after it, and a keel of cloud cannot hold a course in a draught. It has stopped. So: here we are.", "I carry anybody who can stand the deck. Above the weather the air is thin and the qi is not; a body that cannot hold the one drowns in the other.", "Every ark-master is asked whether it is flying. It is not flying. Birds fly. This is sailing, done properly at last."],
+	"master_lie": ["I rode the wind for fifteen days once and came back pleased with myself. My teacher said: you still needed the wind. I have been thinking about that for some time.", "Nine years I studied. After three I dared not think of right and wrong. After nine I could not tell whether the wind rode me or I the wind. That was when it lifted.", "The Yellow Emperor reached this country asleep. Your ark-masters reach it awake, which is harder and much less restful.", "They will tell you no boat can come here. Quite so. That is not a boat. Ask it."],
+	"shipwright_mu": ["Spirit-wood for the keel, cut from a tree that fell on a windless day. Otherwise she remembers falling, and you do not want a ship that remembers falling.", "No nails. A nail is an argument with the plank. We persuade them.", "Somebody asked my grandmother whether a ship could go where there was no water. She said she did not know, and started that afternoon. This is the forty-first.", "The junks of your coast are good ships. I have seen one. It was very brave of it, all that sea."],
+	"weigher_su": ["Wind by the measure, cordage by the fathom, and advice for nothing, which is what it is worth.", "A south wind weighs less than a north one. Everybody knows it; I am the only one who has the scales.", "Nobody here haggles. They ask what a thing costs and then they think about whether they want it. It is very slow. I do well."],
+	"dreaming_guest": ["I am asleep, you understand, in a house a very long way from here, and they will wake me presently for something tedious. Do not let me keep you.", "I have governed for fifteen years and enjoyed none of it. Here nobody governs and the roofs are mended all the same. I am taking notes. I shall forget them at the door.", "When I wake I shall remember this as three months. They will tell me I slept an afternoon. Both of us will be right."],
+	"deckhand_pei": ["Coil it sunwise. Not because the rope minds. Because the ark-master does.", "First time over the edge of the world I held on to the mast with both arms. The second time, with one. I am told there is a third way.", "You came up the ladder without looking down. Everybody looks down the second time."],
+	"spring_keeper_he": ["It is called the Divine Spring because somebody had to call it something. It smells better than orchids and tastes better than wine, and it has never once been proud of it.", "Four streams. I keep them clear of leaves. That is the whole of the priesthood here.", "Drink when you are hungry and you will be full; drink too much and you will sleep ten days. There is no third instruction."],
+	"singer_lan": ["We sing in turns, all day, and stop when it is dark. Nobody leads. When somebody is flat we sing louder near them.", "No elders here and no young: we are all a hundred when we die, and nobody is ill first. A stranger told me that was unfair. Unfair to whom?", "You have a face like somebody with a list. Put it down a while. Lists keep."],
+	"lost_surveyor": ["Yu was measuring the flood and took a wrong turning, and we came out here, where there was nothing to measure. He went back. I said I would follow when I had finished this one line.", "No hill in this country is steep, no stream floods, no boundary is disputed. A surveyor here is a man holding a rope.", "If you see Yu, tell him the north goes on further than his chart. He will say he knows. He does not know."],
+	"groom_of_mu": ["The King stayed three years and forgot his kingdom. When they got him into the chariot at last he looked back so long that nobody thought to count the grooms.", "Eight horses, each with a name that means a kind of speed. I had the care of the one called Outrunning Light. He outran me.", "I shall go home when a chariot comes. An ark has come instead. I am thinking it over. I have been here some time; there is no need to be hasty."],
+	"waker_zhi": ["One of us is always awake, by turns, in case of fire. There has never been a fire. Still: fifty days. I count them on this cord.", "They say that what is done in dreams is done, and that this, here, with you, is the thing that is not real. I am not to argue. I am only to watch the lamp.", "Speak low. Not that you could wake them. It is only that it is manners."],
+	"sleeper_an": ["...the third field, not the second, I told him the third... ...yes. Yes, with the red gate...", "...put it down, it is not yours, it was never... ...oh. Well. Then keep it...", "...is somebody there? No. One of the waking kind. Never mind them; they go away when you look..."],
+	"sleepless_gan": ["Sleep? I have heard of it. You lie down and are robbed of half your life and wake up pleased. No.", "The sun does not set here and neither do we. It makes for a long day. It has been the same one since my grandfather's.", "You look tired. All of your people look tired. It is the lying down that does it."],
+	"night_seeker": ["I am looking for a night. Only one. I was told as a girl that there is such a thing and I should like to see it before I am done.", "They say that west of west there is a country that is all night and its people have it for nothing. Imagine. And do nothing with it but sleep.", "If your ship goes anywhere dark, come and tell me what colour it was."],
 	"pilot_zheng": ["Sixty years I piloted boats round the inside of the mirage. You learn every rock. Now the rocks are all standing up out of the sand, and they are much bigger than I thought.", "There is a channel to the east that never dried, where the sea runs into the Ruins. I would not pilot it. I would not pilot it for the Emperor himself.", "Mazu's boat came in through the haze like she knew every shoal. Of course she did. She has been watching us for two thousand years."],
 	"diver_yulan": ["I dive for pearls on the reef. Now the reef is in the air, and I walk along it picking them like plums. It feels like cheating.", "The deepest pearls glow. The old divers say they are Jiaoren tears. I said that is a fairy tale, and then a Pearl-Weeper walked through Landfall last week asking for directions.", "Hold your breath long enough and the sea sings to you. It has stopped singing. I hope it is only resting."],
 	"xu_fu_home": ["I have a grey hair. I keep looking at it. Two thousand years, and now it is the most interesting thing in the world.", "The Emperor wanted never to end. I wanted to please him. Neither of us thought to ask the children what they wanted.", "Teacher Qin has corrected my calligraphy. My own calligraphy, on my own slips. I did not know I had been doing it wrong for two thousand years."],
@@ -9924,7 +10083,7 @@ const DIALOGUE := {
 	],
 	# ---- Part XXXII: The Broken Mirror (the Broken Mirror release)
 	"recall30": [
-		["Narrator", "The winter after the two lintels, a pedlar came up the mountain on the fourteenth of the first month with something wrapped in a blue cloth, and cried it in the court at a price that made the gate disciples laugh. Lin Feng did not laugh. The thing was half a mirror, and the pedlar did not seem to want it sold."],
+		["Narrator", "The new year after the two lintels, a pedlar came up the mountain on the seventh of the first month with something wrapped in a blue cloth, and cried it in the court at a price that made the gate disciples laugh. Lin Feng did not laugh. The thing was half a mirror, and the pedlar did not seem to want it sold."],
 	],
 	"s_p32_home": [
 		["Narrator", "The pedlar has been given tea and has not drunk it. On the Elder's table, on its blue cloth, lies half a round mirror of old bronze, broken straight across. The back is cast with a pair of birds. There is one bird, and the tail of the other."],
@@ -10011,10 +10170,10 @@ const DIALOGUE := {
 		["Narrator", "Four slips of elm, each with a hole for a cord and a village cut in it. One says: Meng's Ford. It has been worn smooth along one edge by a thumb, in the way of a thing somebody turned over and over on a long march, and it is a good deal lighter than the others."],
 	],
 	"s_p32_roll": [
-		["Narrator", "Roll-Clerk Ning has the book of that year open before Lin Feng has finished the name. He runs a grey finger down a column, and down the next. Then he turns back a page and does it again, which nobody has ever seen him need to do."],
+		["Narrator", "Roll-Clerk Ning has the book of that year open before Lin Feng has finished the name. She runs a grey finger down a column, and down the next. Then she turns back a page and does it again, which nobody has ever seen her need to do."],
 		["Roll-Clerk Ning", "Fan Xiliang, of Meng's Ford. He is not entered. I have every man who died at the wall of cold, of flux, of a fall, of the lash: forty thousand and some. Each was reported, by an overseer, on a form. Nobody reported the ones who went into the footings.", "think"],
 		["Lin Feng", "They were alive when they went in. Then they are dead, and you have no line for them. What were they written down as?"],
-		["Roll-Clerk Ning", "I have found it. It is not in my book; it is in the quartermaster's. Rubble, so many loads. He was entered as material, sir. I cannot write a death against a load of rubble. I should need somebody to say they were men. In writing. The wall has never said so.", "grieve"],
+		["Roll-Clerk Ning", "I have found it. It is not in my book; it is in the quartermaster's. Rubble, so many loads. He was entered as material. I cannot write a death against a load of rubble. I should need somebody to say they were men. In writing. The wall has never said so.", "grieve"],
 	],
 	"done:s_p32_rampart": [
 		["Narrator", "The second height is a stretch of the wall itself, and from the top of it the rest can be seen going away over the dark country in both directions. Along the parapet, every ten paces, a number is cut: the yards, running. There is no other mark on it anywhere, from one end of the world to the other."],
@@ -10043,7 +10202,7 @@ const DIALOGUE := {
 	],
 	"s_p32_market": [
 		["Narrator", "It is the fifteenth of the first month, and on the moon the lanterns are round. Below the first height of Guanghan a thin man in a scholar's robe gone grey at the seams is holding half a bronze mirror up against the full moon, turning it until the broken edge lies across the bright face."],
-		["Xu Deyan", "You have the other. No, do not unwrap it; I know that cloth. Nine years I have gone to market on this night and listened for a fool's price. The mirror has come back, sir. It is she who has not. There is nobody in the moon tonight; only the light it had left over."],
+		["Xu Deyan", "You have the other. No, do not unwrap it; I know that cloth. Nine years I have gone to market on this night and listened for a fool's price. The mirror has come back. It is she who has not. There is nobody in the moon tonight; only the light it had left over."],
 		["Lin Feng", "She sent it. Whoever sends a thing means to be found. Where is she?"],
 		["Xu Deyan", "In a great lord's house, in his silk. Why would she come away to a man who owns half a mirror? ...Something has been crying her half at the foot of these heights, in my voice, at a price to keep her off. I never set that price. Silence it, and I shall know what I am worth.", "grieve"],
 	],
@@ -10071,7 +10230,7 @@ const DIALOGUE := {
 		["Narrator", "The two halves lie on the blue cloth under the moon. Each bird on the back has its mate again. But nine years in two different sleeves have worn the broken edges, and four slivers were lost at the well: along the join there is a gap that a fingernail goes into. It will never again be one mirror by itself."],
 		["Xu Deyan", "It does not meet. I had thought, all this time... no matter what I thought. She is over there and will not come nearer until it is decided; she says she has been decided for often enough. So we have agreed on the one thing, and it is to ask you.", "think"],
 		["Lin Feng", "It is your mirror. And hers."],
-		["Xu Deyan", "It is two halves of a mirror, sir, and we are two halves of a marriage, and neither of us is the shape we were broken at. You have joined things and parted them the length of the land. Tell us what is done with this. We shall do the same with ourselves."],
+		["Xu Deyan", "It is two halves of a mirror, and we are two halves of a marriage, and neither of us is the shape we were broken at. You have joined things and parted them the length of the land. Tell us what is done with this. We shall do the same with ourselves."],
 	],
 	"s_p32_end": [
 		["Narrator", "The pedlar has gone down the mountain with an empty blue cloth and a great deal to tell. On the Elder's table there is a ring in the dust where a half-circle lay for a week. He has not let anybody wipe it."],
@@ -10442,7 +10601,7 @@ const DIALOGUE := {
 	"s_p28_old": [
 		["Narrator", "In the trampled place where Du Hui fell an old man is sitting on his heels, patiently untying a knot of grass and smoothing the stems straight again. The soldiers walk round him. It is not clear that they know why they are walking round."],
 		["The Old Man in the Grass", "The general gave a woman in marriage who was to have gone into a grave. He followed what his father said when his father was well. I am her father. I have been tying grass in front of that big fellow for four nights.", "nod"],
-		["Lin Feng", "He does not know. He told me he sent a bolt of cloth and forgot the matter."],
+		["Lin Feng", "He does not know. He has never once looked out of his tent."],
 		["The Old Man in the Grass", "Good. Let him go on not knowing. You, though: you have a great deal of this owing to you up and down the land, and some owing the other way. There is a boy in the Whispering Bamboo with a bird in a box. Go and watch how it begins.", "point"],
 	],
 	"s_p28_bao": [
@@ -10524,7 +10683,7 @@ const DIALOGUE := {
 	"s_p28_feast": [
 		["Narrator", "The road into the lake town is hung with lanterns. There are tables in the street. Zhou Chu has stopped at the last bend, in the dark, dripping, with a smile still on his face that has not yet been told. The song comes down the road very clearly. It has his name in it."],
 		["Zhou Chu of Yixing", "That is for me. They are singing for... no. Listen. 'The river kept all three.' Three. The tiger, the jiao, and... Oh. Oh, I see. The old man would not say the third.", "shock"],
-		["Lin Feng", "You broke every door in the town. You told me so yourself, and laughed."],
+		["Lin Feng", "Every door in the town has been broken and mended. I took it for the tiger."],
 		["Zhou Chu of Yixing", "I thought they liked me. Nobody ever said. Who was there big enough to say? ...Sweeper. There were three scourges and I gave my word. I have never yet broken my word; it is the one thing I have not broken. Come up on the hill.", "grieve"],
 	],
 	"pre:zhou_chu": [

@@ -307,6 +307,10 @@ const THEMES := {
 	"fangzhang": ["herb_patch", "tea", "qin", "shrine", "fishing", "bench"],
 	"yingzhou": ["koi", "fishing", "tea", "chimes", "herb_patch", "bench"],
 	"guixu": ["stele", "shrine", "bell", "lantern_st", "fishing", "bench"],
+	"huaxu": ["chimes", "qin", "tea", "lantern_st", "weiqi", "bench"],
+	"zhongbei": ["well", "herb_patch", "qin", "tea", "swing", "bench"],
+	"gumang": ["lantern_st", "bell", "stele", "shrine", "chimes", "bench"],
+	"fuluo": ["drum", "stones", "campfire", "stele", "well", "bench"],
 }
 ## The bigger things of the Lotus release (structures.gd) a region looks for by its theme (or its own
 ## id), placed after the six above; where neither is listed, LOTUS_COMMON.
@@ -328,6 +332,7 @@ const LOTUS := {
 	"buzhou": ["watchtower", "armillary", "archery"], "juntian": ["kite", "pavilion", "stage"], "changhe": ["pavilion", "lantern_green", "calligraphy"],
 	"ninesprings": ["hot_spring", "river_lantern", "sky_lantern"], "youdu": ["sky_lantern", "stage", "calligraphy"], "penglai": ["pavilion", "flute_rock", "kite"],
 	"fangzhang": ["hot_spring", "calligraphy", "pavilion"], "yingzhou": ["river_lantern", "flute_rock", "armillary"], "guixu": ["watchtower", "sky_lantern", "river_lantern"],
+	"huaxu": ["kite", "pavilion", "flute_rock"], "zhongbei": ["hot_spring", "pavilion", "stage"], "gumang": ["sky_lantern", "armillary", "calligraphy"], "fuluo": ["watchtower", "archery", "armillary"],
 }
 const LOTUS_COMMON := ["pavilion", "kite", "sky_lantern"]
 ## outdoor things that stand in the water by the bank; the rest stand on the forest edge

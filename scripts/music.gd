@@ -222,7 +222,7 @@ const OF_THEME := {"sect": "sect", "cloudsea": "mountain", "village": "bamboo", 
 	"celestial": "heaven", "court": "heaven", "palace": "heaven", "starpalace": "heaven", "starferry": "heaven", "magpie": "heaven", "jasper": "heaven", "loom": "heaven",
 	"juntian": "heaven", "changhe": "heaven",
 	"diyu": "under", "ninesprings": "under", "youdu": "under", "abyss": "under", "grave": "under", "void": "under",
-	"penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea", "fusang": "sea", "longmen": "sea",
+	"penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea", "huaxu": "heaven", "zhongbei": "bamboo", "gumang": "strange", "fuluo": "desert", "fusang": "sea", "longmen": "sea",
 	"time": "strange", "origin": "strange", "chaos": "strange", "mirror": "strange"}
 
 # ---------------------------------------------------------------- reading a tune

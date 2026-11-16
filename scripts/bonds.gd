@@ -568,6 +568,10 @@ const REGION := {
 	"penglai": "The Isle of the Immortals! It smells of salt and wine and somebody's cooking. I love it already.",
 	"fangzhang": "The immortals' gardens. Every herb I have ever read about, growing in rows like cabbages.",
 	"yingzhou": "The mists keep making shapes of people I almost remember. I wish they would stop. I wish they would stay.",
+	"huaxu": "Nobody is in charge here. I asked three people. They were so kind about not understanding the question.",
+	"zhongbei": "No wind at all. I keep waiting for my hair to move. And listen: somebody is singing, and nobody told them to.",
+	"gumang": "They are all asleep. Every one. ...Walk softly. I know we cannot wake them. Walk softly anyway.",
+	"fuluo": "Two lights in the sky and neither of them going anywhere. I have never wanted an evening so much in my life.",
 	"guixu": "The Returning Ruins. Everything that was ever lost ends up here. I keep looking at the sea floor for my winter.",
 }
 ## when she has nothing to say about where they are (or is somewhere upstairs or in a cellar)

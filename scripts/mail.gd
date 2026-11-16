@@ -23,7 +23,7 @@ extends RefCounted
 
 ## the counters of the post: whoever answers for a town (offices.gd), one a region
 const POSTS := ["treasurer", "head_qingshi", "post_cloudfoot", "reeve_well", "harbour_longmen", "guild_tushan", "warden_yanggu",
-	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall"]
+	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall", "moorer_lightfoot", "reeve_fourstreams"]
 ## how many steps of the story a carrier takes, unless a letter says otherwise
 const WAIT := 10
 ## how many bags can be carried at once, and what one pays a region of road
@@ -33,8 +33,8 @@ const BAG_LV := 8.0
 
 const LETTERS := {
 	# ---- the post itself, and home
-	"ge_satchel": {"from": "Postmaster Ge of Cloudfoot", "after": "s_ironfang", "wait": 2,
-		"lines": ["To Lin Feng, of the Azure Cloud Sect, wherever met with. The post has opened a satchel in your name. Whatever is addressed to you will be at whichever counter you ask at: mine, Headman Luo's, any of them. Do not ask how. I have run this office thirty years and I do not ask how.",
+	"ge_satchel": {"from": "Station-Master Ge of Cloudfoot", "after": "s_ironfang", "wait": 2,
+		"lines": ["To Lin Feng, of the Azure Cloud Sect, wherever met with. The post has opened a satchel in your name. Whatever is addressed to you will be at whichever counter you ask at: mine, Headman Luo's, any of them. Do not ask how. I have kept this station thirty years and I do not ask how.",
 			"Whoever answers for a town keeps its counter. Most of them also have a sealed bag that wants carrying to another town, and the road pays for that on arrival. I mention it because you appear to walk everywhere anyway."]},
 	"wen_first": {"from": "Granny Wen the Midwife", "after": "s_ironfang", "wait": 4, "gift": {"item": "hp_pill", "n": 2},
 		"lines": ["They say at the well that you put down Iron Fang. I delivered that one, you know, forty years back. Came out shouting then too. I am not surprised by any of it.",
@@ -114,6 +114,10 @@ const LETTERS := {
 		"reply": {"ask": "Yue Ling is reading over your shoulder.", "options": [
 			{"id": "write", "label": "Write her one back, and post it", "desc": "Properly: sealed, addressed, handed over the counter, to arrive whenever it arrives."},
 			{"id": "say", "label": "Turn round and say it", "desc": "She is standing right there."}]}},
+	# (the Cloud Keel release, arks.gd: how anybody hears that the arks have come back)
+	"ge_arks": {"from": "Station-Master Ge of Cloudfoot", "after": "s_p12_end", "wait": 1,
+		"lines": ["To Lin Feng, wherever met with. There is a ship over my station. I do not mean on a river near it. I mean over it, in the air, on a cloud, with a ladder down. My horses will not go out. The goose addressed to nobody has gone aboard.",
+			"Her mistress says they are of Huaxu, that they have not come these many lifetimes because the sea was running out and the air after it, and that somebody has now put the sea back. She looked at me as if I should know who. They carry anybody of the Golden Core who has the fare. Ask at my counter."]},
 	"yue_write": {"from": "Yue Ling", "on": ["yue_note", "write"], "after": "s_p13_home", "wait": 0,
 		"lines": ["It came. Eleven days, by way of Longmen, with a thumbprint of somebody's lunch on the corner. I have read it six times and I am keeping the thumbprint. That is the first thing anybody ever sent to me by name."]},
 	"yue_say": {"from": "Yue Ling", "on": ["yue_note", "say"], "after": "s_p13_home", "wait": 0,
@@ -145,7 +149,7 @@ const LETTERS := {
 		"lines": ["Nine lotus seals upon the Blood Moon Palace, to be renewed each year at the winter solstice, in perpetuity. I enclose the account, not for payment. For awareness. Perpetuity is the longest column I keep."]},
 	"boon_rain": {"from": "Headman Luo of Qingshi", "needs": ["dragon_boon", "rain"], "gift": {"stones": 200},
 		"lines": ["It rained on the third day of the third month, from the east, for exactly as long as the seedlings wanted, and stopped. Old Peng says he has farmed sixty years and never been rained on politely before. The village sends this from the first threshing."]},
-	"boon_sea": {"from": "Harbour-Master Zeng of Longmen", "needs": ["dragon_boon", "sea"], "gift": {"stones": 200},
+	"boon_sea": {"from": "Toll-Master Zeng of Longmen", "needs": ["dragon_boon", "sea"], "gift": {"stones": 200},
 		"lines": ["Not one hull lost between here and Landfall this season. Not one. The widows' fund has had nothing to pay out and does not know what to do with itself, so the wardens voted you a share. The sea is still the sea. But something is holding the door."]},
 	"drawings_keep": {"from": "Smith Tie", "needs": ["drawings", "keep"],
 		"lines": ["I built one a quarter the size, to see. It walks. It will not carry anything, but it follows the cat all day about the forge, and at night it sits by the banked fire with its legs folded. I had not drawn that part. I do not know who did."]},
@@ -173,7 +177,7 @@ const LETTERS := {
 		"lines": ["The low fields went under at the bore, as you said to let them, and came up again grey with silt a hand deep. The old men have never seen rice like what is coming up in it. The houses on legs creak in the night. One gets used to living on a thing's leave."]},
 	"tide_arrows": {"from": "King Qian", "needs": ["the_tide", "arrows"], "after": "s_p25_town", "wait": 0,
 		"lines": ["Three thousand shafts into the face of it, at the top of the bore, as every year. It came on exactly as far as it meant to. The men cheered themselves hoarse. I have begun to think the arrows were never for the tide. Do not tell the men."]},
-	"ape_dredge": {"from": "Harbour-Master Zeng of Longmen", "needs": ["the_ape", "dredge"], "wait": 3,
+	"ape_dredge": {"from": "Toll-Master Zeng of Longmen", "needs": ["the_ape", "dredge"], "wait": 3,
 		"lines": ["Something very large went down the new channel on the night of the full moon and out past the bar. It did not hurry. The pilot swears it looked back once at the hills. The Huai has run a hand lower ever since, and clear enough to count the stones."]},
 	"ape_chain": {"from": "A boatwoman of the Huai", "needs": ["the_ape", "chain"], "wait": 3,
 		"lines": ["The bell under Turtle Mountain rings again when the water is high, as my grandmother said it did. We sleep sound. My youngest asked what is on the other end of the chain and whether it minds. I told her to ask the one who put it there. So: does it?"]},
@@ -205,18 +209,18 @@ const LETTERS := {
 	"seat_serve": {"from": "Auntie Zhou", "needs": ["the_seat", "serve"], "wait": 3,
 		"lines": ["Eleven of yours came up the steps this spring with their bedding. I asked each of them had they eaten, and every one said yes, Auntie, the steward saw to it. So I fed them again. The Elder goes and reads the roster where their names are. He does not think I see him."]},
 	# ---- Part XXXII (the Broken Mirror release): letters from a husband, a wife, a great lord's steward, and a girl on a bridge
-	"mirror_rivet": {"from": "Princess Lechang", "needs": ["the_mirror", "rivet"], "wait": 3,
+	"mirror_rivet": {"from": "Princess Lechang", "needs": ["the_mirror", "rivet"], "wait": 1,
 		"lines": ["Cultivator: it hangs by the door. I look older in it than he remembers and he looks thinner than I do. We quarrelled yesterday about how rice is washed. It was a very small quarrel and we both stopped in the middle, astonished. Nine years, and here we were, about rice."]},
-	"mirror_recast": {"from": "Xu Deyan", "needs": ["the_mirror", "recast"], "wait": 3,
-		"lines": ["Sir: I have learned that she takes her tea without ginger, rides better than I do, and thinks my verses too clever by a line. None of it was true of the girl. I enclose what a tutor can spare. I am to call again on Thursday. I have been told to bring nothing I wrote."],
+	"mirror_recast": {"from": "Xu Deyan", "needs": ["the_mirror", "recast"], "wait": 1,
+		"lines": ["Lin Feng: I have learned that she takes her tea without ginger, rides better than I do, and thinks my verses too clever by a line. None of it was true of the girl. I enclose what a tutor can spare. I am to call again on Thursday. I have been told to bring nothing I wrote."],
 		"gift": {"stones": 340}},
-	"mirror_halves": {"from": "Princess Lechang", "needs": ["the_mirror", "halves"], "wait": 3,
+	"mirror_halves": {"from": "Princess Lechang", "needs": ["the_mirror", "halves"], "wait": 1,
 		"lines": ["Cultivator: we drank tea on the fifteenth under the two halves. He did not write a poem. I could see it cost him. The lord of my house asked on my return whether I had been happy, and I said yes, and he said good, and meant it. I had not known a life could have this much room in it."]},
 	"bridge_girl": {"from": "A Girl of Lu", "after": "s_p32_flood", "wait": 4,
 		"lines": ["To the one who cleared the river. He came up onto the bridge wet through and asked my name. It is Jing. We had spoken four times and he had never asked. I told him that next time under the bridge is flooded he is to look up. He has written it on his hand."]},
 }
 const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_mend", "bandits_drive", "garden_study", "garden_burn", "egg_hatch", "egg_sell",
-	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "yue_write", "yue_say",
+	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "ge_arks", "yue_write", "yue_say",
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
@@ -240,7 +244,7 @@ static func arrived(g, id: String) -> bool:
 		var fr := str(l.from)
 		for sid in g.slain:
 			var dn := str(g.slain[sid].n)
-			if not str(sid).begins_with("folk:") and not str(sid).begins_with("res:") and (fr.begins_with(dn) or dn.begins_with(fr)):
+			if not str(sid).begins_with("folk:") and not str(sid).begins_with("res:") and not str(sid).begins_with("apt:") and (fr.begins_with(dn) or dn.begins_with(fr)):
 				return false
 	if l.has("needs") and Echoes.chosen(g, str(l.needs[0])) != str(l.needs[1]):
 		return false

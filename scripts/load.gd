@@ -236,6 +236,10 @@ static func stowable(g) -> Array:
 		var sid := str(id)
 		if carried(g, sid) <= 0 or WARES.has(sid):
 			continue
+		# (the Cloud Keel release: the sect's storehouse and the steward's yard at Guiyun are one store, so the
+		# sacks a haul says to carry on his own feet could be left in one and taken up at the other)
+		if not for_sale(g, sid):
+			continue
 		if weight_of(sid) * float(carried(g, sid)) >= 1.0:
 			out.append(sid)
 	out.sort_custom(func(a, b): return weight_of(a) * float(carried(g, a)) > weight_of(b) * float(carried(g, b)))

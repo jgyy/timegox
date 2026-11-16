@@ -69,10 +69,20 @@ const DRESS := {
 	"shade": {"wall": "8c8c9a", "roof": "20202a", "roof2": "16161e", "column": "3c3c4a", "beam": "2c2c38", "trim": "d8dce8", "glow": Color(0.55, 0.7, 1.0, 0.45), "k": 0.8},
 	# Landfall and the Isles: whitewash, weathered blue-grey tiles, coral-red posts, gabled against the sea
 	"sea": {"wall": "f2f0ea", "roof": "3e5c7c", "roof2": "2c4660", "column": "c8503a", "beam": "3a6a7a", "trim": "e0d0a0", "kind": "gable", "k": 0.6},
+	# the Far Countries (the Cloud Keel release).  Lightfoot in Huaxu: pale cedar, roofs the grey-lilac of the
+	# under-side of a cloud, a row of lanterns under every eave to bring the arks in
+	"cloud": {"wall": "efe8dc", "roof": "8a86a8", "roof2": "6e6a8c", "column": "b89868", "beam": "9a8a6a", "trim": "f4e8c0", "lanterns": true, "k": 0.7},
+	# Fourstreams in Zhongbei: moss-green plaster, straw-gold roofs, windows lit the green of the spring
+	"spring": {"wall": "dfe8c8", "roof": "b89a4a", "roof2": "96803a", "column": "5a8a5a", "beam": "6a7a4a", "trim": "f0e8b0", "glow": Color(0.7, 1.0, 0.8, 0.4), "k": 0.7},
+	# Gumang: slate and indigo, windows the blue of a lamp left burning for sleepers
+	"dusk": {"wall": "70749a", "roof": "242846", "roof2": "1a1e36", "column": "3a3e5e", "beam": "2c3050", "trim": "c8d0f0", "glow": Color(0.55, 0.65, 1.0, 0.5), "k": 0.8},
+	# Fuluo: sun-baked brick under a flat roof, with nothing to shut
+	"noon": {"wall": "d8a86a", "roof": "b07a48", "roof2": "8a5a30", "column": "8a4a2a", "beam": "a0623a", "trim": "f0d090", "kind": "flat", "k": 0.75},
 }
 ## which country builds which way
 const DRESS_OF := {"dunes": "sand", "longmen": "river", "karst": "river", "tushan": "forge", "volcano": "forge", "yanggu": "dawn", "fusang": "dawn",
-	"juntian": "sky", "changhe": "sky", "ninesprings": "pearl", "youdu": "shade", "penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea"}
+	"juntian": "sky", "changhe": "sky", "ninesprings": "pearl", "youdu": "shade", "penglai": "sea", "fangzhang": "sea", "yingzhou": "sea", "guixu": "sea",
+	"huaxu": "cloud", "zhongbei": "spring", "gumang": "dusk", "fuluo": "noon"}
 ## styles that keep their own roof whatever country they stand in
 const OWN_ROOF := ["shrine", "hall", "hermitage", "aerie", "bathhouse"]
 ## what a window is lit with (set by `house` for the building being built)
@@ -105,6 +115,14 @@ static func dressed(style: String, area: String) -> Dictionary:
 ## 2.6 m, 2.25 m, 2.4 m and 2.96 m, a man's house and nobody else's.)
 const WALL_H := 4.2
 const WALL2_H := 4.0
+## how high a lantern hangs over floor that is walked on (its tassel clears the Great People), and how
+## far from its own tile a piece that stands against a wall may be drawn (a tile: clash.gd)
+const LANTERN_Y := 3.72 + 0.12
+const WALL_REACH := 2.0 + 0.25
+## where a lantern hangs on the floor being furnished (`house` and `cellar` say): under an upper storey's
+## lower ceiling it hangs just under the beams with no tassel; a cellar is a man's size
+static var lantern_y := LANTERN_Y
+static var lantern_tassel := true
 ## how far the underside of a door's lintel is below the top of the wall, and so how high a doorway is
 const LINTEL_DROP := 0.46
 const DOOR_CLEAR := WALL_H - LINTEL_DROP
@@ -954,6 +972,85 @@ static func ruin(b: MB, g: MB, seed_: int, stone_hex: String) -> void:
 	var st: Dictionary = {"roof": "4a5a5a", "roof2": "3a4848", "column": "7a3a2a", "wall": "e0d4b8", "beam": "3a5a50", "trim": "a89060", "double": false}
 	hip_roof(b, g, Vector3(-0.9, 2.6, -0.6), 0.6, 0.5, 0.35, 0.5, st, false)
 
+## the pieces of furniture that stand with their back to a wall
+const BACKED := ["bed", "stove", "hearth", "cabinet", "shelf", "bookshelf", "rack", "scroll", "herbs", "chest", "mirror", "clothes_stand", "abacus", "workbench", "counter", "desk"]
+
+## A standing screen of three leaves at `c` (the middle of its foot), its back towards `back`: a lacquered
+## frame, paper panels, a band of the house's own trim across each.  As wide as a tile, as tall as a man.
+static func _screen(b: MB, c: Vector3, back: Vector3, frame: Color, panel: Color, trim: Color) -> void:
+	var side := Vector3(back.z, 0, -back.x)
+	var w := 0.62
+	for k in 3:
+		var o := (k - 1) * w
+		var a := c + side * (o - w * 0.5) - back * (0.0 if k % 2 == 0 else 0.12)
+		var e := c + side * (o + w * 0.5) - back * (0.12 if k % 2 == 0 else 0.0)
+		var along := (e - a).normalized()
+		var nrm := Vector3(along.z, 0, -along.x) * 0.012
+		var up0 := Vector3(0, 1.82, 0)
+		var dn0 := Vector3(0, 0.1, 0)
+		# a leaf of paper, seen from both sides, and the band across it
+		b.quad4(a + up0 - nrm, e + up0 - nrm, e + dn0 - nrm, a + dn0 - nrm, panel, panel, panel, panel)
+		b.quad4(e + up0 + nrm, a + up0 + nrm, a + dn0 + nrm, e + dn0 + nrm, panel, panel, panel, panel)
+		b.quad4(a + Vector3(0, 1.3, 0) - nrm * 1.5, e + Vector3(0, 1.3, 0) - nrm * 1.5, e + Vector3(0, 1.12, 0) - nrm * 1.5, a + Vector3(0, 1.12, 0) - nrm * 1.5, trim, trim, trim, trim)
+		b.quad4(e + Vector3(0, 1.3, 0) + nrm * 1.5, a + Vector3(0, 1.3, 0) + nrm * 1.5, a + Vector3(0, 1.12, 0) + nrm * 1.5, e + Vector3(0, 1.12, 0) + nrm * 1.5, trim, trim, trim, trim)
+		for pt in [a, e]:
+			b.limb(pt, pt + Vector3(0, 1.9, 0), 0.03, 0.03, frame, 5)
+		b.limb(a + Vector3(0, 1.86, 0), e + Vector3(0, 1.86, 0), 0.025, 0.025, frame, 4)
+		b.limb(a + Vector3(0, 0.08, 0), e + Vector3(0, 0.08, 0), 0.025, 0.025, frame, 4)
+
+## A tile of partition between the rooms of a storey (rooms.gd `apartments`), at the middle `c` of tile
+## `tk` of the storey (`parts`: the tiles of every partition and doorway; the wall ring is tile 0 and
+## `nx`, `nz`): a wall of plaster and timber, a hand thick, run from the tile's middle towards every
+## neighbour that is partition too or is the house's own wall, with a post where runs meet.  `doorway`:
+## the opening instead, as tall as the Great People (Giants.CLEAR), with a transom over it and a cloth
+## curtain parted and tied back to either post, so that nothing hangs in the way.
+static func _partition(b: MB, _g: MB, c: Vector3, tk: Vector2i, parts: Dictionary, nx: int, nz: int, h: float, doorway: bool, wall: Color, column: Color, beam: Color, seed_: int) -> void:
+	var T := Terrain3D.T
+	var pth := 0.14
+	var arms: Array = []
+	for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		var n: Vector2i = tk + d
+		if parts.has(n) or n.x <= 0 or n.y <= 0 or n.x >= nx or n.y >= nz:
+			arms.append(d)
+	if arms.is_empty():
+		arms = [Vector2i(1, 0), Vector2i(-1, 0)]
+	if doorway:
+		# (the way through is across the run: the wall goes on to either side of it)
+		var along_x := arms.has(Vector2i(1, 0)) or arms.has(Vector2i(-1, 0))
+		var run := Vector3(1, 0, 0) if along_x else Vector3(0, 0, 1)
+		var half := 0.72
+		var clear := minf(Giants.CLEAR, h - 0.3)
+		for s: float in [-1.0, 1.0]:
+			var post := c + run * s * half
+			b.box(post + Vector3(0, h * 0.5, 0), Vector3(0.14, h, 0.14), column)
+			# the stub of wall from the post to the end of the tile
+			var stub := c + run * s * (half + T * 0.5) * 0.5
+			var sl := T * 0.5 - half
+			b.box(stub + Vector3(0, h * 0.5, 0), Vector3(sl if along_x else pth, h, pth if along_x else sl), wall)
+			# the curtain, tied back
+			var cloth := MB.tag(Color.from_hsv(fmod(seed_ * 0.137, 1.0), 0.45, 0.62), MB.CLOTH)
+			var top := post + Vector3(0, clear - 0.05, 0) - run * s * 0.1
+			b.quad4(top, top - run * s * 0.16, post - run * s * 0.12 + Vector3(0, 1.3, 0), post - run * s * 0.07 + Vector3(0, 1.4, 0), cloth, cloth, cloth, cloth)
+			b.quad4(top - run * s * 0.16, top, post - run * s * 0.07 + Vector3(0, 1.4, 0), post - run * s * 0.12 + Vector3(0, 1.3, 0), cloth, cloth, cloth, cloth)
+			b.quad4(post - run * s * 0.07 + Vector3(0, 1.4, 0), post - run * s * 0.12 + Vector3(0, 1.3, 0), post - run * s * 0.2 + Vector3(0, 0.25, 0), post - run * s * 0.08 + Vector3(0, 0.3, 0), cloth, cloth, cloth, cloth)
+			b.quad4(post - run * s * 0.12 + Vector3(0, 1.3, 0), post - run * s * 0.07 + Vector3(0, 1.4, 0), post - run * s * 0.08 + Vector3(0, 0.3, 0), post - run * s * 0.2 + Vector3(0, 0.25, 0), cloth, cloth, cloth, cloth)
+			b.torus(post - run * s * 0.09 + Vector3(0, 1.35, 0), 0.07, 0.015, MB.tag(Color("c8a050"), MB.METAL), Vector3(PI * 0.5, 0, 0))
+		# the lintel and the transom above it
+		b.box(c + Vector3(0, clear + 0.07, 0), Vector3(half * 2.0 + 0.2 if along_x else 0.16, 0.14, 0.16 if along_x else half * 2.0 + 0.2), beam)
+		if h - clear - 0.14 > 0.05:
+			b.box(c + Vector3(0, (clear + 0.14 + h) * 0.5, 0), Vector3(half * 2.0 if along_x else pth, h - clear - 0.14, pth if along_x else half * 2.0), wall)
+		return
+	for d2 in arms:
+		var dir := Vector3((d2 as Vector2i).x, 0, (d2 as Vector2i).y)
+		var mid := c + dir * T * 0.25
+		var horiz: bool = (d2 as Vector2i).x != 0
+		b.box(mid + Vector3(0, h * 0.5, 0), Vector3(T * 0.5 if horiz else pth, h, pth if horiz else T * 0.5), wall)
+		# a rail at the height of a hand and a beam along the top
+		b.box(mid + Vector3(0, 1.05, 0), Vector3(T * 0.5 if horiz else pth + 0.04, 0.08, pth + 0.04 if horiz else T * 0.5), column)
+		b.box(mid + Vector3(0, h - 0.07, 0), Vector3(T * 0.5 if horiz else pth + 0.06, 0.14, pth + 0.06 if horiz else T * 0.5), beam)
+	if arms.size() != 2 or (arms[0] as Vector2i) + (arms[1] as Vector2i) != Vector2i.ZERO:
+		b.box(c + Vector3(0, h * 0.5, 0), Vector3(0.16, h, 0.16), column)
+
 # ---------------------------------------------------------------- settlement meshes (cached)
 ## building kinds that appear at the edges of each region's wilds
 const SETTLE := {
@@ -968,6 +1065,7 @@ const SETTLE := {
 	"longmen": ["stilt", "house", "shrine"], "drowned": ["stilt", "stilt", "ruin"], "tushan": ["house", "tower", "ruin"], "buzhou": ["ruin", "tower"],
 	"juntian": ["tower", "pavilion", "shrine"], "changhe": ["pavilion", "pavilion", "shrine"], "ninesprings": ["stilt", "house", "ruin"], "youdu": ["ruin", "shrine", "tower"],
 	"penglai": ["stilt", "house", "pavilion"], "fangzhang": ["pavilion", "shrine", "house"], "yingzhou": ["shrine", "ruin"], "guixu": ["ruin", "ruin"],
+	"huaxu": ["pavilion", "house", "tower"], "zhongbei": ["house", "pavilion", "shrine"], "gumang": ["house", "ruin"], "fuluo": ["tower", "ruin"],
 }
 static var _mesh_cache := {}
 
@@ -1171,8 +1269,29 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 	if st.get("moon_gate", false):
 		_moon_gate(b, g, door, Rect2(x0, z0, x1 - x0, z1 - z0), ph, wall_h, th, st)
 	# furniture
+	lantern_y = LANTERN_Y
+	lantern_tassel = true
 	for pr in props:
 		_furnish(b, g, str(pr[0]), pr[1] + Vector3(0, ph, 0), Rect2(x0, z0, x1 - x0, z1 - z0), st, rng, lights)
+		# (the Cloud Keel release, clash.gd: a piece that stood against a wall since opened into a wing had its
+		# back to an open doorway as wide as the wing: a stove, a bed, a cabinet in five houses.  It has a
+		# standing screen behind it now, on its own tile)
+		if str(pr[0]) in BACKED and not wings.is_empty():
+			var fp: Vector3 = pr[1]
+			var dists := [fp.x - x0, x1 - fp.x, fp.z - z0, z1 - fp.z]
+			var ws := 0
+			for k8 in 4:
+				if float(dists[k8]) < float(dists[ws]):
+					ws = k8
+			if float(dists[ws]) <= T * 1.05:
+				for wg1 in wings:
+					if int(wg1.side) != ws:
+						continue
+					var wr1: Rect2 = wg1.rect
+					var along := fp.z if ws < 2 else fp.x
+					if along > (wr1.position.y if ws < 2 else wr1.position.x) + T * 0.5 and along < (wr1.end.y if ws < 2 else wr1.end.x) - T * 0.5:
+						var bk: Vector3 = [Vector3(-1, 0, 0), Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, 0, 1)][ws]
+						_screen(b, fp + Vector3(0, ph, 0) + bk * (T * 0.5 - 0.07), bk, column, MB.tag(_c(st.wall).darkened(0.08), MB.CLOTH), trim)
 	# ---- an upper storey (Part XI)
 	if up != null:
 		var floor_y := top
@@ -1217,8 +1336,39 @@ static func house(b: MB, g: MB, roof: MB, roof_g: MB, r: Rect2, door: Vector3, s
 		var lup := Vector3(cx, floor_y + wall2 - 0.7, cz)
 		_lantern(up, up_g, lup, trim)
 		lights.append([lup, Color(1.0, 0.72, 0.45)])
+		# (the Cloud Keel release, rooms.gd: a storey that is lived on is divided into apartments.  A partition
+		# stands on the centre line of its tile, as the house's own walls do; every piece of furniture is
+		# set against the walls of its own room)
+		lantern_y = wall2 - 0.07 - 0.5
+		lantern_tassel = false
+		var parts := {}
+		for pr4 in upper_props:
+			if str(pr4[0]) in Rooms.WALL_KINDS:
+				parts[Vector2i(int(round(((pr4[1] as Vector3).x - x0) / T)), int(round(((pr4[1] as Vector3).z - z0) / T)))] = str(pr4[0])
+		var nxt := int(round((x1 - x0) / T))
+		var nzt := int(round((z1 - z0) / T))
+		for pk in parts:
+			_partition(up, up_g, Vector3(x0 + (pk as Vector2i).x * T, floor_y + 0.07, z0 + (pk as Vector2i).y * T), pk, parts, nxt, nzt, wall2 - 0.17, str(parts[pk]) == "doorway", wall, column, beam, seed_ + (pk as Vector2i).x * 7 + (pk as Vector2i).y)
 		for pr3 in upper_props:
-			_furnish(up, up_g, str(pr3[0]), pr3[1] + Vector3(0, floor_y + 0.07, 0), Rect2(x0, z0, x1 - x0, z1 - z0), st, rng, lights)
+			if str(pr3[0]) in Rooms.WALL_KINDS:
+				continue
+			var room := Rect2(x0, z0, x1 - x0, z1 - z0)
+			if not parts.is_empty():
+				var tk := Vector2i(int(round(((pr3[1] as Vector3).x - x0) / T)), int(round(((pr3[1] as Vector3).z - z0) / T)))
+				var lx := tk.x
+				while lx > 0 and not parts.has(Vector2i(lx, tk.y)):
+					lx -= 1
+				var rx := tk.x
+				while rx < nxt and not parts.has(Vector2i(rx, tk.y)):
+					rx += 1
+				var uz := tk.y
+				while uz > 0 and not parts.has(Vector2i(tk.x, uz)):
+					uz -= 1
+				var dz := tk.y
+				while dz < nzt and not parts.has(Vector2i(tk.x, dz)):
+					dz += 1
+				room = Rect2(x0 + lx * T, z0 + uz * T, (rx - lx) * T, (dz - uz) * T)
+			_furnish(up, up_g, str(pr3[0]), pr3[1] + Vector3(0, floor_y + 0.07, 0), room, st, rng, lights)
 		top = floor_y + wall2
 	# ---- more storeys (the Lost Horse release): above the storey that is walked in, as many again as
 	# the house stands (rooms.gd `storeys`): each set back a little behind a skirt of tiled eave, with the
@@ -1472,9 +1622,10 @@ static func _moon_gate(b: MB, g: MB, door: Vector3, inner: Rect2, ph: float, wal
 			b.box(wc + f2, Vector3(0.04, 0.9, 0.04), MB.tag(_c(st.column).darkened(0.4), MB.WOOD))
 		g.disc(wc, 0.44, Color(1.0, 0.82, 0.55, 0.35), 16, Color(1.0, 0.82, 0.55, 0.2), wr)
 
-static func _lantern(b: MB, g: MB, lp: Vector3, trim: Color) -> void:
+static func _lantern(b: MB, g: MB, lp: Vector3, trim: Color, tassel: bool = true) -> void:
 	b.lathe(lp, [Vector2(0.06, 0.0), Vector2(0.2, 0.1), Vector2(0.22, 0.25), Vector2(0.17, 0.4), Vector2(0.06, 0.46)], MB.tag(Color("e04a3a"), MB.CLOTH), 10)
-	b.ribbon([lp, lp + Vector3(0, -0.25, 0)], [0.03, 0.01], Vector3.RIGHT, MB.tag(Color("f0c850"), MB.CLOTH))
+	if tassel:
+		b.ribbon([lp, lp + Vector3(0, -0.25, 0)], [0.03, 0.01], Vector3.RIGHT, MB.tag(Color("f0c850"), MB.CLOTH))
 	g.ball(lp + Vector3(0, 0.23, 0), 0.36, Color(1.0, 0.5, 0.25, 0.3), true)
 
 ## Furniture: `p` is a floor tile centre; wall pieces back onto the nearest wall of `inner`.
@@ -1494,7 +1645,10 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 	var m := minf(minf(dl, dr), minf(du, dd))
 	var back := Vector3(-1, 0, 0) if m == dl else (Vector3(1, 0, 0) if m == dr else (Vector3(0, 0, -1) if m == du else Vector3(0, 0, 1)))
 	var side := Vector3(back.z, 0, -back.x)
-	var wallp := p + back * (m - 0.25)
+	# (the Cloud Keel release, clash.gd: a house let out by a tile or two leaves what was written against its
+	# old wall standing out in the room; such a piece used to be drawn at the wall all the same, metres
+	# from the tile it blocks.  It stands at its own tile now, with its back to that wall.)
+	var wallp := p + back * (minf(m, WALL_REACH) - 0.25)
 	var ax := absf(back.x) > 0.5
 	match kind:
 		"altar":
@@ -1513,7 +1667,7 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 			lights.append([p + Vector3(0, 1.4, 0), Color(1.0, 0.75, 0.45)])
 		"statue":
 			# the sect founder, seated in meditation on a lotus pedestal against the back wall
-			var sp := wallp + Vector3(0, 0, 0)
+			var sp := wallp - back * 0.72
 			b.lathe(sp, [Vector2(0.75, 0.0), Vector2(0.7, 0.35), Vector2(0.55, 0.45), Vector2(0.8, 0.6)], MB.tag(Color("c8b070"), MB.METAL), 14)
 			b.sph(sp + Vector3(0, 1.0, 0), Vector3(0.55, 0.5, 0.42), MB.tag(Color("d8b860"), MB.METAL))
 			b.sph(sp + Vector3(0, 1.55, 0), Vector3(0.3, 0.45, 0.25), MB.tag(Color("d8b860"), MB.METAL))
@@ -1587,7 +1741,7 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 				var bp := hp + side * (-0.45 + k7 * 0.22) + Vector3(0, 1.5, 0)
 				b.cone(bp, 0.08, 0.36, MB.tag(Color("6a8a3a").lerp(Color("a8a050"), rng.randf()), MB.FOLIAGE), Vector3(PI, 0, 0), 6)
 		"hearth":
-			var fp := wallp - back * 0.2
+			var fp := wallp - back * 0.52
 			b.box(fp + Vector3(0, 0.55, 0), Vector3(1.3, 1.1, 1.0) if not ax else Vector3(1.0, 1.1, 1.3), MB.tag(Color("8a5a4a"), MB.STONE))
 			b.box(fp + Vector3(0, 2.0, 0) + back * 0.15, Vector3(0.7, 1.9, 0.7), MB.tag(Color("7a4a3a"), MB.STONE))
 			g.box(fp + Vector3(0, 0.75, 0) - back * 0.5, Vector3(0.8, 0.4, 0.05) if not ax else Vector3(0.05, 0.4, 0.8), Color(1.0, 0.45, 0.15, 0.9))
@@ -1621,12 +1775,14 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 			b.torus(p + Vector3(0, 0.55, 0), 0.33, 0.02, iron)
 			b.disc(p + Vector3(0, 0.71, 0), 0.28, MB.tag(Color("3a5a7a"), MB.STONE), 12)
 		"bed":
-			var bp2 := wallp - back * 0.5
-			b.box(bp2 + Vector3(0, 0.3, 0), Vector3(1.0, 0.25, 1.9) if not ax else Vector3(1.9, 0.25, 1.0), wood)
-			b.box(bp2 + Vector3(0, 0.48, 0), Vector3(0.9, 0.12, 1.8) if not ax else Vector3(1.8, 0.12, 0.9), MB.tag(Color("c86a5a"), MB.CLOTH))
-			b.box(bp2 + Vector3(0, 0.55, 0) + (Vector3(0, 0, -0.7) if not ax else Vector3(-0.7, 0, 0)), Vector3(0.6, 0.1, 0.3) if not ax else Vector3(0.3, 0.1, 0.6), paper)
+			# (the Cloud Keel release, clash.gd: a bed stood head-on to the wall with a third of a metre of it
+			# inside the wall; it lies along the wall now, within its own tile)
+			var bp2 := wallp - back * 0.52
+			b.box(bp2 + Vector3(0, 0.3, 0), Vector3(1.9, 0.25, 1.0) if not ax else Vector3(1.0, 0.25, 1.9), wood)
+			b.box(bp2 + Vector3(0, 0.48, 0), Vector3(1.8, 0.12, 0.9) if not ax else Vector3(0.9, 0.12, 1.8), MB.tag(Color("c86a5a"), MB.CLOTH))
+			b.box(bp2 + Vector3(0, 0.55, 0) + side * 0.7, Vector3(0.3, 0.1, 0.6) if not ax else Vector3(0.6, 0.1, 0.3), paper)
 		"stove":
-			var sv := wallp - back * 0.2
+			var sv := wallp - back * 0.42
 			b.box(sv + Vector3(0, 0.4, 0), Vector3(1.2, 0.8, 0.8) if not ax else Vector3(0.8, 0.8, 1.2), MB.tag(Color("b8a890"), MB.STONE))
 			b.lathe(sv + Vector3(0, 0.8, 0), [Vector2(0.3, 0.0), Vector2(0.35, 0.15), Vector2(0.2, 0.25)], iron, 12)
 			g.box(sv + Vector3(0, 0.25, 0) - back * 0.41, Vector3(0.4, 0.25, 0.04) if not ax else Vector3(0.04, 0.25, 0.4), Color(1.0, 0.45, 0.15, 0.8))
@@ -1643,8 +1799,10 @@ static func _furnish(b: MB, g: MB, kind: String, p: Vector3, inner: Rect2, st: D
 			b.limb(lm - side * 0.7 + Vector3(0, 0.5, 0), lm + side * 0.7 + Vector3(0, 0.5, 0), 0.05, 0.05, wood, 6)
 			b.box(lm + Vector3(0, 1.0, 0), (Vector3(0.02, 0.95, 1.3) if ax else Vector3(1.3, 0.95, 0.02)), MB.tag(Color("d0a0c8"), MB.CLOTH))
 		"lantern":
-			_lantern(b, g, p + Vector3(0, 1.4, 0), trim)
-			lights.append([p + Vector3(0, 1.6, 0), Color(1.0, 0.65, 0.35)])
+			# (the Cloud Keel release, clash.gd: a lantern over floor that is walked on hung at the height of a
+			# man's chin, and one of the Great People walked through it; it hangs clear of both now)
+			_lantern(b, g, p + Vector3(0, lantern_y, 0), trim, lantern_tassel)
+			lights.append([p + Vector3(0, lantern_y - 0.3, 0), Color(1.0, 0.65, 0.35)])
 		# ---- Part XI: stairs between storeys, and the Feathered Folk's nests
 		"stairs_up":
 			# a steep flight of steps up the tile towards the nearest wall, rising one storey (WALL_H: thirteen
@@ -1756,8 +1914,14 @@ static func cellar(b: MB, g: MB, r: Rect2, props: Array, stairs: Vector3, seed_:
 	for lp in [Vector3(x0 + 0.5, 1.9, lc.z), Vector3(x1 - 0.5, 1.9, lc.z)]:
 		_lantern(b, g, lp, MB.tag(Color("c8a040"), MB.METAL))
 		lights.append([lp + Vector3(0, -0.2, 0), Color(1.0, 0.6, 0.3)])
-	var inner := Rect2(x0, z0, x1 - x0, z1 - z0)
+	# (the Cloud Keel release, clash.gd: a cellar's walls are 0.9 m thick, and its furniture was set against
+	# their centre line: shelves a third of a metre into the stone, and every hollow panel wholly inside it)
+	var inner := Rect2(x0 + 0.29, z0 + 0.29, x1 - x0 - 0.58, z1 - z0 - 0.58)
+	lantern_y = 2.05
+	lantern_tassel = false
 	for pr in props:
 		_furnish(b, g, str(pr[0]), pr[1], inner, st, rng, lights)
+	lantern_y = LANTERN_Y
+	lantern_tassel = true
 	_furnish(b, g, "stairs_up", stairs, inner, st, rng, lights)
 	return lights
