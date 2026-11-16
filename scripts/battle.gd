@@ -204,6 +204,9 @@ func _build_fighters() -> void:
 			# (a person met on the road, fate.gd, stands a little taller than life, not as a giant)
 			if str(f.shape).begins_with("person:"):
 				sc = 1.25
+				# (the Tall People release, giants.gd: unless they are one of the Great People)
+				if Giants.of_foe(str(f.get("id", ""))):
+					sc = Giants.SCALE
 		m.scale = Vector3.ONE * sc
 		var holder := Node3D.new()
 		holder.add_child(m)

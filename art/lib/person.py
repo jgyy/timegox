@@ -3515,6 +3515,219 @@ INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
 INTERACT["sword_dance"] = (SWORD_T, clip_sword_dance)
 
 
+# ---------------------------------------------------------------- the Tall People release: gestures of their own
+# Eight clips for the close-ups of a conversation (scripts/closeup.gd: `SIGNATURE`, who has which): the one
+# thing somebody does with their hands that nobody else in the story does.  The party carries them and
+# lends them (Assets.LEND), so anybody may be given one.
+
+BEARD_T = 3.0
+
+
+def clip_stroke_beard(t):
+    """An old man thinking aloud: the right hand comes to the chin and is drawn down the beard twice,
+    slowly, the head going down after it; the left hand stays behind his back."""
+    k = t / BEARD_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.16, 0.86, 1.0)
+    # (two strokes: the hand at the chin at 0 and at half way, down the chest between)
+    ph = (k * 2.0) % 1.0
+    down = smooth(0.12, 0.8, ph) * (1.0 - smooth(0.86, 1.0, ph))
+    _arm_in(p, "R", e, 0.18 - 0.42 * down, 0.6 - 0.5 * down)
+    p["upper_arm.L"] = ((0.42 * e, 0.0, 0.1 * e), (0, 0, 0))
+    p["forearm.L"] = ((-0.95 * e - 0.2 * (1 - e), 0.5 * e, 0.0), (0, 0, 0))
+    _hands(p, 0.5, 0.2 + 0.55 * e, 0.3)
+    _add(p, "head", 0.06 * e + 0.12 * down * e, -0.08 * e, 0.05 * e)
+    _add(p, "chest", 0.03 * e)
+    _add(p, "sleeve.R", 0.35 * e, 0.0, 0.0)
+    return p
+
+
+SLEEVE_T = 2.6
+
+
+def clip_sleeve_smile(t):
+    """A laugh kept behind a sleeve: the left forearm comes up before the mouth so that the sleeve hangs
+    across the lower face, the head tips towards it, the shoulders shake three times."""
+    k = t / SLEEVE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.18, 0.78, 1.0)
+    sh = math.sin(k * 2 * math.pi * 4.5) * _hold(k, 0.22, 0.34, 0.6, 0.76)
+    _arm_in(p, "L", e, 0.3, 0.62)
+    _add(p, "hand.L", -0.35 * e, 0.0, 0.0)
+    p["upper_arm.R"] = ((-0.1 * e, 0.0, -0.05 * e), (0, 0, 0))
+    p["forearm.R"] = ((-0.6 * e - 0.2 * (1 - e), -0.35 * e, 0.0), (0, 0, 0))
+    _hands(p, 0.15, 0.3)
+    _add(p, "head", 0.1 * e + 0.03 * sh, 0.2 * e, -0.16 * e)
+    _add(p, "chest", 0.04 * e + 0.025 * sh, 0.1 * e, 0.0)
+    _add(p, "hips", 0.0, 0.06 * e, 0.04 * e)
+    _add(p, "sleeve.L", 0.75 * e, 0.0, 0.0)
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.45 * e, 1))
+    return p
+
+
+FISTPALM_T = 2.2
+
+
+def clip_fist_palm(t):
+    """A thing decided: the right fist is brought down into the open left palm before the chest, held
+    there, and the chin comes down once, short, as it lands; the feet are set a little apart for it."""
+    k = t / FISTPALM_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.8, 1.0)
+    up = _hold(k, 0.06, 0.22, 0.3, 0.38)
+    land = _hold(k, 0.36, 0.42, 0.5, 0.62)
+    _arm_in(p, "R", e, 0.05 + 0.45 * up, 0.1 + 0.3 * up)
+    _arm_in(p, "L", e, -0.12, -0.12)
+    _add(p, "hand.L", 0.0, 0.0, 0.5 * e)
+    _hands(p, 0.05 + 0.3 * (1 - e), 0.38 + 0.8 * e, 0.25)
+    _add(p, "head", 0.2 * land - 0.05 * e, 0.0, 0.0)
+    _add(p, "chest", 0.05 * e + 0.04 * land, -0.06 * e, 0.0)
+    _add(p, "hips", 0.0, -0.1 * e, 0.0)
+    for sd, s in (("L", 1), ("R", -1)):
+        _add(p, "thigh." + sd, -0.04 * e, 0.0, 0.07 * s * e)
+        _add(p, "sleeve." + sd, 0.3 * e, 0.0, 0.0)
+    return p
+
+
+STOOP_T = 3.6
+
+
+def clip_stoop(t):
+    """Somebody very tall speaking to somebody who is not: down from the hips with the knees bent and a
+    hand on each knee, the back long, the face turned up and forward to look the other in the eye."""
+    k = t / STOOP_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.22, 0.82, 1.0)
+    nod = _hold(k, 0.5, 0.56, 0.6, 0.68)
+    p["hips"] = ((0.62 * e, 0.0, 0.0), (0.0, -0.075 * e, 0.045 * e))
+    for sd, s in (("L", 1), ("R", -1)):
+        p["thigh." + sd] = ((-0.97 * e, 0.0, 0.09 * s * e), (0, 0, 0))
+        p["shin." + sd] = ((0.8 * e, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.45 * e, 0.0, 0.0), (0, 0, 0))
+        p["upper_arm." + sd] = ((-0.7 * e, 0.0, 0.14 * s * e + 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = ((-0.3 * e - 0.2 * (1 - e), 0.2 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((-0.45 * e, 0.0, 0.0), (0, 0, 0))
+    _hands(p, 0.38 + 0.25 * e, 0.38 + 0.25 * e, 0.3)
+    _add(p, "spine", 0.14 * e)
+    _add(p, "chest", 0.08 * e)
+    p["head"] = ((-0.5 * e + 0.14 * nod, 0.0, 0.05 * e), (0, 0, 0))
+    _secondary(p, t, False, False, (-0.3 * e, -0.3 * e), 0.0, (0.5 * e, 0.5 * e))
+    return p
+
+
+SHADE_T = 3.4
+
+
+def clip_shade_eyes(t):
+    """Looking for something a long way off and bright: the right hand flat over the brow, the left fist
+    on the hip, up on the toes a little, and the head going slowly from one side of the sky to the other."""
+    k = t / SHADE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.16, 0.84, 1.0)
+    sweep = math.sin((k - 0.16) / 0.68 * math.pi * 2.0) * e
+    p["upper_arm.R"] = ((-1.5 * e, 0.0, 0.25 * e - 0.035 * (1 - e)), (0, 0, 0))
+    p["forearm.R"] = ((-1.5 * e - 0.2 * (1 - e), -0.2 * e, 0.0), (0, 0, 0))
+    p["hand.R"] = ((-0.5 * e, 0.0, -0.3 * e), (0, 0, 0))
+    p["upper_arm.L"] = ((0.2 * e, 0.0, 0.5 * e + 0.035 * (1 - e)), (0, 0, 0))
+    p["forearm.L"] = ((-1.5 * e - 0.2 * (1 - e), 0.9 * e, 0.0), (0, 0, 0))
+    _hands(p, 0.38 + 0.6 * e, 0.05, 0.1)
+    _add(p, "head", -0.16 * e, 0.32 * sweep, 0.0)
+    _add(p, "chest", -0.05 * e, 0.14 * sweep, 0.0)
+    _add(p, "hips", 0.0, 0.06 * sweep, 0.0)
+    for sd in ("L", "R"):
+        _add(p, "foot." + sd, 0.18 * e, 0.0, 0.0)
+        _add(p, "toe." + sd, -0.18 * e, 0.0, 0.0)
+    val = p.get("hips", ((0, 0, 0), (0, 0, 0)))
+    p["hips"] = (val[0], (val[1][0], val[1][1] + 0.022 * e, val[1][2]))
+    p["eyes"] = ((0, 0, 0), (0, 0, 0), (1, 1.0 - 0.3 * e, 1))
+    return p
+
+
+MEASURE_T = 3.6
+
+
+def clip_measure(t):
+    """Somebody who trusts a measure: both hands held out before him a certain distance apart, looked at
+    from one to the other, then carried down, still that far apart, to be laid against his own foot."""
+    k = t / MEASURE_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.14, 0.88, 1.0)
+    dn = _hold(k, 0.52, 0.66, 0.8, 0.9)
+    look = math.sin(_hold(k, 0.14, 0.2, 0.46, 0.5) * 0.0 + (k - 0.14) / 0.34 * math.pi * 2.0) * _hold(k, 0.14, 0.2, 0.44, 0.5)
+    for sd, s in (("L", 1), ("R", -1)):
+        p["upper_arm." + sd] = (((-1.05 + 0.5 * dn) * e, 0.0, (0.06 - 0.2) * s * e + 0.035 * s * (1 - e)), (0, 0, 0))
+        p["forearm." + sd] = (((-0.5 + 0.25 * dn) * e - 0.2 * (1 - e), -0.75 * s * e, 0.0), (0, 0, 0))
+        p["hand." + sd] = ((0.0, 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.5 * e)
+    _hands(p, 0.08, 0.08, 0.5)
+    p["hips"] = ((0.5 * dn * e, 0.0, 0.0), (0.0, -0.06 * dn * e, 0.03 * dn * e))
+    for sd in ("L", "R"):
+        _add(p, "thigh." + sd, -0.82 * dn * e)
+        _add(p, "shin." + sd, 0.7 * dn * e)
+        _add(p, "foot." + sd, -0.38 * dn * e)
+    _add(p, "spine", 0.12 * dn * e)
+    _add(p, "head", 0.14 * e + 0.25 * dn * e, 0.22 * look, 0.0)
+    return p
+
+
+CROSS_T = 3.0
+
+
+def clip_arms_cross(t):
+    """Somebody who has said all he means to: the arms folded one over the other across the chest, the
+    weight set back on one heel, the chin lifted, and a single slow shake of the head."""
+    k = t / CROSS_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.84, 1.0)
+    no = math.sin((k - 0.4) / 0.3 * math.pi * 2.0) * _hold(k, 0.4, 0.46, 0.64, 0.7)
+    _arm_in(p, "R", e, -0.34, 0.08)
+    _arm_in(p, "L", e, -0.42, 0.16)
+    _add(p, "forearm.R", 0.0, 0.45 * e, 0.0)
+    _add(p, "forearm.L", 0.0, -0.45 * e, 0.0)
+    _hands(p, 0.38 + 0.3 * e, 0.38 + 0.3 * e, 0.2)
+    _add(p, "head", -0.14 * e, 0.16 * no, 0.0)
+    _add(p, "chest", -0.06 * e)
+    _add(p, "hips", -0.03 * e, 0.08 * e, -0.035 * e)
+    for sd in ("L", "R"):
+        _add(p, "sleeve." + sd, 0.45 * e)
+    return p
+
+
+HEART_T = 2.8
+
+
+def clip_hand_heart(t):
+    """Something owned up to: the right hand laid flat on his own chest and kept there, the left open at
+    his side, the head and shoulders coming down a little way and staying down."""
+    k = t / HEART_T
+    p = clip_idle(0.0)
+    e = _hold(k, 0.0, 0.2, 0.8, 1.0)
+    dip = _hold(k, 0.24, 0.42, 0.74, 0.9)
+    _arm_in(p, "R", e, -0.2, 0.25)
+    _add(p, "hand.R", -0.25 * e, 0.0, -0.2 * e)
+    p["upper_arm.L"] = ((-0.05 * e, 0.0, 0.16 * e + 0.035 * (1 - e)), (0, 0, 0))
+    p["forearm.L"] = ((-0.3 * e - 0.2 * (1 - e), 0.7 * e, 0.0), (0, 0, 0))
+    _hands(p, 0.38 - 0.3 * e, 0.38 - 0.32 * e, 0.3)
+    _add(p, "head", 0.22 * dip, 0.0, 0.0)
+    _add(p, "chest", 0.08 * dip)
+    _add(p, "spine", 0.05 * dip)
+    _add(p, "sleeve.R", 0.35 * e, 0.0, 0.0)
+    return p
+
+
+SCENE = {
+    "stroke_beard": (BEARD_T, clip_stroke_beard),
+    "sleeve_smile": (SLEEVE_T, clip_sleeve_smile),
+    "fist_palm": (FISTPALM_T, clip_fist_palm),
+    "stoop": (STOOP_T, clip_stoop),
+    "shade_eyes": (SHADE_T, clip_shade_eyes),
+    "measure": (MEASURE_T, clip_measure),
+    "arms_cross": (CROSS_T, clip_arms_cross),
+    "hand_heart": (HEART_T, clip_hand_heart),
+}
+SCENE = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in SCENE.items()}
+
+
 # ---------------------------------------------------------------- riding (mounts and vehicles)
 # The party rides (scripts/fashion.gd RIDES): astride a horse, a qilin or a tiger ("ride" on the move,
 # "ride_idle" standing still), or standing on a flying sword, a cloud or a sky-barque ("ride_stand").
@@ -3809,7 +4022,7 @@ RIDE = {
     "ride_idle": (RIDE_IDLE_T, clip_ride_idle),
     "ride_stand": (RIDE_STAND_T, clip_ride_stand),
 }
-PARTY_CLIPS = dict(CLIPS, **INTERACT, **RIDE)
+PARTY_CLIPS = dict(CLIPS, **INTERACT, **RIDE, **SCENE)
 # (only the hero bears arms: Yue Ling keeps to her needle)
 HERO_CLIPS = dict(PARTY_CLIPS, **ARMS)
 

@@ -72,8 +72,11 @@ static func line(g, k: int) -> String:
 	return "" if ls.is_empty() else str(ls[absi(k) % ls.size()])
 
 ## Whether somebody in `town` has something for him today.
+static func shunned(g, town: String) -> bool:
+	return (not g.bounty.is_empty() or Taboo.marked(g)) and Crime.standing(g, Weal.of_folk(town)) > 0
+
 static func gift_due(g, town: String) -> bool:
-	return town != "" and not (GIFTS[rank(g)] as Array).is_empty() and int(g.fan_day.get(town, -1)) != int(g.day)
+	return town != "" and not shunned(g, town) and not (GIFTS[rank(g)] as Array).is_empty() and int(g.fan_day.get(town, -1)) != int(g.day)
 
 ## What is being held out in `town` is taken: {who, how, what} told of it, or {} (nothing today).
 static func gift(g, town: String) -> Dictionary:

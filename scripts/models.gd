@@ -298,7 +298,20 @@ static func hero(o: Dictionary = {}) -> Node3D:
 	if not Assets.has(Assets.PEOPLE.get(asset, "")):
 		return person(Color("3a8ae8"), Color("1a1a2a"), {"sword": true, "hair": "topknot"})
 	var cols: Dictionary = o.get("cols", Fashion.hero_colors(g) if g != null and not g.hero.is_empty() else {})
+	# (the Tall People release, visage.gd: the face and the look his Way has given him; `visage` and
+	# `rule` ask for one, as the galleries do)
+	var vs: int = int(o.get("visage", Visage.stage(g)))
+	var vr: int = int(o.get("rule", Creed.side(g, "rule") if g != null and not g.hero.is_empty() else 0))
+	if vs != 0:
+		# (the hair and eyes he was made with, if they are the model's own: a look changes them too)
+		cols = cols.duplicate()
+		if not cols.has("hair"):
+			cols["hair"] = Color(Fashion.HAIR[0][1])
+		if not cols.has("eyes"):
+			cols["eyes"] = Color(Fashion.EYES[0][1])
+	cols = Visage.cols(vs, cols)
 	var root := Assets.hero_instance(Assets.PEOPLE[asset], cols)
+	Visage.apply(root, vs, vr)
 	root.set_meta("kind", "person")
 	root.set_meta("hero", true)
 	# the weapon in his hand (arms.gd): the one he wields, or the one a preview asks for

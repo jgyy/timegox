@@ -90,7 +90,7 @@ static func sail(g, offer: Dictionary) -> bool:
 		return false
 	g.stones -= int(offer.fare)
 	g.voyages += 1
-	Clock.advance(g, float(offer.leagues) * LEAGUE_SECS)
+	Clock.advance(g, float(offer.leagues) * LEAGUE_SECS / Clock.rate(float(g.clock)))
 	g.note("Took ship from %s to %s (%d leagues, %d spirit stones)" % [str(HARBOURS[str(offer.from)].n), str(offer.n), int(offer.leagues), int(offer.fare)])
 	return true
 

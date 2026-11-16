@@ -430,6 +430,8 @@ func _draw_way() -> void:
 	var w: Dictionary = Creed.way(Game)
 	UI.text(self, r.position + Vector2(24, 44), str(w.n), 26, UI.C_GOLD)
 	UI.wrapped(self, r.position + Vector2(24, 66), main.told(str(w.desc)), 15, UI.C_TEXT, r.size.x - 48)
+	# (the Tall People release, visage.gd: what it has done to his face)
+	UI.wrapped(self, Vector2(60, 610), main.told("What people see: " + Visage.text(Game)), 13, UI.C_DIM, 340)
 	var y := r.position.y + 128.0
 	for axis in Creed.AXES:
 		var v := Creed.value(Game, axis)
@@ -512,6 +514,9 @@ func _draw_law() -> void:
 	var yd := y + 22.0
 	var shown := 0
 	for id in Game.slain:
+		# (somebody the story stands in several places is one person, and is listed once)
+		if Game.slain[id].has("alias"):
+			continue
 		if shown >= 7:
 			UI.text(self, Vector2(r.position.x + 420, yd), "and %d more" % (Game.slain.size() - shown), 13, UI.C_DIM)
 			yd += 19.0

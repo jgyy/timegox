@@ -288,6 +288,9 @@ static func fare_offer(g, e: Dictionary) -> Dictionary:
 	if not Creed.can(g, "fare"):
 		return {}
 	var area := str(e.get("area", ""))
+	# (nobody he struck down asks to be carried anywhere: crime.gd)
+	if not g.slain.is_empty() and Crime.dead(g, str(e.get("id", ""))):
+		return {}
 	# (the Open Net release, crime.gd: nor with a man whose bill hangs at the gate)
 	if Crime.shut(g, area, "fare") != "":
 		return {}
@@ -313,6 +316,9 @@ static func arrive(g) -> Array:
 		return out
 	var keep: Array = []
 	for p in g.passengers:
+		if not g.slain.is_empty() and Crime.dead(g, str(p.id)):
+			# (struck down before the carriage left: nobody climbs down, and nobody pays)
+			continue
 		if str(p.to) == str(g.area):
 			g.stones += int(p.pay)
 			g.wages += int(p.pay)

@@ -997,7 +997,7 @@ func _init() -> void:
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 3
 					"marks":
 						# what the choices left standing (marks.gd): fewer than there are crossroads behind him
-						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 8
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 12
 					"weal":
 						# the Answering Land release: towns that thrive (weal.gd): no more than half of them
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Weal.ORDER.size() / 2
@@ -1006,7 +1006,7 @@ func _init() -> void:
 						ok = ok and n.size() == 3 and Creed.AXES.has(str(n[1])) and absi(int(n[2])) == Creed.SIDE
 					"fitted":
 						# houses put to rights (fitting.gd): no more than the story's own steps have asked for by then
-						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 6
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 9
 					"clean", "wild":
 						# the Open Net release: a clean name (crime.gd), a wild that stands (wilds.gd): nothing to count
 						ok = ok and n.size() == 1
@@ -3887,6 +3887,9 @@ func _high_roads() -> void:
 	# what the story stands on a peak is on its rock, and can be got to
 	var on_rock := 0
 	for a in Data.AREAS:
+		# (this is the land's own realm: what stands on a height of the Isles is looked for there, further down)
+		if Data.layer_of(a) != "surface":
+			continue
 		for kind in ["npcs", "bosses", "pickups"]:
 			for d in Data.AREAS[a].get(kind, []):
 				if d.has("peak"):
@@ -4961,7 +4964,7 @@ func _three_burrows() -> void:
 				continue
 			if not str(bd25.vis).begins_with("s_p25_"):
 				# (the Underclothes release: a later chapter's bands take the same last slots in other regions)
-				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_") or str(bd25.vis).begins_with("s_p29_") or str(bd25.vis).begins_with("s_p30_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
+				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_") or str(bd25.vis).begins_with("s_p29_") or str(bd25.vis).begins_with("s_p30_") or str(bd25.vis).begins_with("s_p31_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
 				continue
 			bands25 += 1
 			check(bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
@@ -5231,7 +5234,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.three_sides.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.great_small.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -5625,7 +5628,7 @@ func _thundering_pots() -> void:
 	var dt_roles := {}
 	for dp in dt_people:
 		dt_roles[str(dp.role)] = int(dt_roles.get(str(dp.role), 0)) + 1
-	check(dt_people.size() == 26 and int(dt_roles.get("soldier", 0)) == 6 and int(dt_roles.get("musician", 0)) == 4, "twenty-six people live in the Drum Tower quarter: the levy, the players, and a street of others")
+	check(dt_people.size() == 27 and int(dt_roles.get("giant", 0)) == 1 and int(dt_roles.get("soldier", 0)) == 6 and int(dt_roles.get("musician", 0)) == 4, "twenty-seven people live in the Drum Tower quarter: the levy, the players, a street of others, and one of the Great People")
 	for nr in ["soldier", "musician"]:
 		check(Folk.ROLES.has(nr) and Folk.LINES.has(nr) and Folk.LINES[nr].size() >= 4 and Folk.TITLES.has(nr) and Folk.BODIES.human.has(nr), "the %s: a day, a body, a title and four things to say" % nr)
 	for bid3 in ["drum_tower", "pipes_hall", "tailor_shop", "levy_barracks", "pear_garden", "potter_kiln"]:
@@ -5899,7 +5902,7 @@ func _heavy_road() -> void:
 	for i in Data.STEPS.size():
 		if (Data.STEPS[i].get("gives", {}) as Dictionary).has(Load.RING):
 			ring_step = i
-	check(ring_step == Data.step_index("s_p27_sack") and ring_step >= Data.step_index("s_break32") - 3 and Data.step_index("s_p27_sack") > _kill_step("li_jing"), "the ring is given once, at the very end of the last chapter, after its last lord")
+	check(ring_step == Data.step_index("s_p27_end") and ring_step >= Data.step_index("s_break32") - 3 and Data.step_index("s_p27_end") > _kill_step("li_jing"), "the ring is given once, at the very end of the last chapter, after its last lord")
 	# a tile walked under a load is counted, and only then
 	var HG = load("res://scripts/game.gd").new()
 	HG.reset()
@@ -7261,14 +7264,15 @@ func _open_net() -> void:
 	check(msrc.contains("func offer_net") and msrc.contains("\"id\": \"later\", \"label\": \"Not today\", \"desc\": \"The net stays"), "\"Not today\" is the first answer to a hunter")
 
 	print("== Part XXX: The Net with Three Sides Open ==")
-	check(Data.REALMS.size() == 36 and Data.REALMS[35] == "Three Sides Open" and Data.MAX_LEVEL == 105 and Data.level_name(105).ends_with("Three Sides Open") and Data.REALM_INFO.size() == 36
+	check(Data.REALMS.size() >= 36 and Data.REALMS[35] == "Three Sides Open" and Data.MAX_LEVEL >= 105 and Data.level_name(105).ends_with("Three Sides Open") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXX adds the realm of Three Sides Open")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break35" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall28") and msrc.contains("\"s_break34\": \"recall28\"") and Data.DIALOGUE.has("pre:s_break35") and Data.DIALOGUE.has("post:s_break35"),
-		"Part XXX follows Everything in Its Place (recall28) and ends the game")
+	check(Data.step_index("s_break35") == Data.step_index("s_p31_home") - 1 and int(Data.STEPS[Data.step_index("s_break35")].to) == 105 and Data.DIALOGUE.has("recall28") and msrc.contains("\"s_break34\": \"recall28\"") and Data.DIALOGUE.has("pre:s_break35") and Data.DIALOGUE.has("post:s_break35"),
+		"Part XXX follows Everything in Its Place (recall28) and ends with the thirty-fifth tribulation")
 	var p30 := Data.step_index("s_p30_home")
 	var kinds30 := {}
 	var n30 := 0
-	for i in range(p30, Data.STEPS.size()):
+	var end30 := Data.step_index("s_break35") + 1
+	for i in range(p30, end30):
 		var s30: Dictionary = Data.STEPS[i]
 		n30 += 1
 		kinds30[str(s30.kind)] = true
@@ -7296,7 +7300,7 @@ func _open_net() -> void:
 		"the chapter is thirty-four steps of twelve kinds (%d)" % n30)
 	check(Data.step_index("s_p30_under") < _kill_step("jiang_chong") and Data.step_index("s_p30_rules") < _kill_step("shang_yang"), "what a lord is shown has been done before he is met")
 	# nothing the chapter asks for is a crime, and nothing in it is stopped by one
-	for i2 in range(p30, Data.STEPS.size()):
+	for i2 in range(p30, end30):
 		check(not str(Data.STEPS[i2].kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % Data.STEPS[i2].id)
 	for tid in ["four_net", "the_sentence", "shang_yang", "jiang_chong"]:
 		var kinds_t := {}
@@ -7317,7 +7321,7 @@ func _open_net() -> void:
 	check(not Trials.need_met(["clean"], CG) and Trials.need_text(["clean"], CG).contains("not clean"), "and one unseen killing is the end of a clean name, bill or no bill")
 	CG.free()
 	var c30: Dictionary = Echoes.CROSSROADS.get("the_verdict", {})
-	check(not c30.is_empty() and str(c30.step) == "s_p30_verdict" and str(c30.part) == "XXX" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_verdict", "what a judge owes is asked last of all")
+	check(not c30.is_empty() and str(c30.step) == "s_p30_verdict" and str(c30.part) == "XXX" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_verdict", "what a judge owes is asked last of all")
 	check((c30.options as Array).size() == 3 and c30.after.size() == 3 and c30.end.size() == 3 and c30.echo.has("s_p30_end") and c30.echo.s_p30_end.size() == 3, "the_verdict: three answers, each answered, echoed and told at the end")
 	var letters30 := 0
 	for lid3 in Mail.ORDER:
@@ -7358,7 +7362,7 @@ func _open_net() -> void:
 			if str(e30.kind) == "enemy" and str(e30.get("area", "")) == a30 and str(e30.get("vis", ["", ""])[0]).begins_with("s_p30_"):
 				stood += 1
 		var need_packs := 0
-		for i3 in range(p30, Data.STEPS.size()):
+		for i3 in range(p30, end30):
 			if str(Data.STEPS[i3].kind) == "hunt" and str(Data.STEPS[i3].area) == a30:
 				need_packs = maxi(need_packs, 4)
 		check(stood >= maxi(need_packs, int(Data.AREAS[a30].warband5.n) / 2), "%s: the band found room (%d of %d packs)" % [a30, stood, int(Data.AREAS[a30].warband5.n)])
@@ -7377,3 +7381,272 @@ func _open_net() -> void:
 		check(Assets.PEOPLE.has(pid) and Assets.has(str(Assets.PEOPLE[pid])), "%s has a body built from a script" % pid)
 		check(Data.CHAT.has(pid) and Data.CHAT[pid].size() >= 4, "%s has four things to say" % pid)
 	check(Data.CHAT.has("net_fowler") and Data.CHAT.net_fowler.size() >= 4, "the fowler has four things to say")
+
+	print("== the Great People (giants.gd): a people twice a man's height, and houses that let them in ==")
+	check(Giants.SCALE >= 2.0 and Giants.HEIGHT >= 3.5 and Giants.CLEAR > Giants.HEIGHT, "one of the Great People stands at least twice a man's height (%.2f m)" % Giants.HEIGHT)
+	check(Arch.DOOR_CLEAR >= Giants.CLEAR, "the lintel of every door clears a giant's head (%.2f m under it, %.2f m wanted)" % [Arch.DOOR_CLEAR, Giants.CLEAR])
+	check(Arch.WALL_H >= Giants.CLEAR and Arch.WALL2_H >= Giants.CLEAR, "so do the ceilings of both storeys that are walked in (%.2f m, %.2f m)" % [Arch.WALL_H, Arch.WALL2_H])
+	check(Arch.GATE_CLEAR >= Giants.CLEAR, "and the cross-beam of a town's gate (%.2f m)" % Arch.GATE_CLEAR)
+	check(Giants.fits() and is_equal_approx(Arch.STOREY_Y, 0.3 + Arch.WALL_H + 0.06), "the houses of the land were built for everybody who lives in it, and the upper floor stands on the taller wall")
+	# (a house really is that high: the highest vertex of every style's ground storey, and the doorway left in it)
+	for sty31 in ["house", "shop", "inn", "hall"]:
+		var hb := MB.new(); var hg := MB.new(); var hr := MB.new(); var hrg := MB.new()
+		Arch.house(hb, hg, hr, hrg, Rect2(0, 0, 12, 10), Vector3(6, 0, 1), sty31, [], 7)
+		var hm: ArrayMesh = hb.build()
+		var top31 := 0.0
+		var in_door := 0
+		for sf in hm.get_surface_count():
+			for v31 in (hm.surface_get_arrays(sf)[Mesh.ARRAY_VERTEX] as PackedVector3Array):
+				top31 = maxf(top31, v31.y)
+				# nothing of the wall hangs in the doorway below a giant's crown
+				if absf(v31.x - 6.0) < 0.5 and absf(v31.z - 1.0) < 0.12 and v31.y > 0.5 and v31.y < 0.3 + Giants.HEIGHT:
+					in_door += 1
+		check(top31 >= 0.3 + Arch.WALL_H - 0.01, "a %s is built %.2f m to the top of its walls" % [sty31, top31])
+		check(in_door == 0, "and nothing hangs in its doorway under %.2f m (%d vertices)" % [Giants.HEIGHT, in_door])
+	var giants_n := 0
+	for tid31 in Folk.TOWNS:
+		var want31 := int(Giants.TOWNS.get(tid31, 0))
+		check(int(Folk.TOWNS[tid31].roles.get(Giants.ROLE, 0)) == want31, "%s: %d of the Great People live there" % [tid31, want31])
+		if want31 > 0:
+			var keys31: Array = (Folk.TOWNS[tid31].roles as Dictionary).keys()
+			check(str(keys31[keys31.size() - 1]) == Giants.ROLE, "%s: they were written last, so everybody before them keeps their name and seed" % tid31)
+			var layer31 := Data.layer_of(str(Folk.TOWNS[tid31].area))
+			for fp31 in Folk.people(Atlas.world_of(layer31), tid31):
+				if str(fp31.role) == Giants.ROLE:
+					giants_n += 1
+					check(str(fp31.body) in Giants.BODIES and Giants.of_folk(fp31) == Giants.SCALE and Assets.has("characters/" + str(fp31.body)), "%s is one of them, in a body built from a script" % fp31.n)
+					check(str(fp31.n).begins_with("Big Brother ") or str(fp31.n).begins_with("Big Sister "), "%s is called as the Great People are" % fp31.n)
+					check(bool(fp31.fem) == (str(fp31.body) == "folk_giantess"), "%s: a woman of theirs is a woman" % fp31.n)
+					check(not Folk.day_of(Atlas.world_of(layer31), fp31).is_empty(), "%s has a day" % fp31.n)
+	check(giants_n == 14, "fourteen of the Great People live in the towns (%d)" % giants_n)
+	check(Folk.ROLES.has("giant") and Folk.LINES.giant.size() >= 4 and Folk.TITLES.has("giant") and Crime.ARMED.has("giant"), "the giant: a day, a title, six things to say, and nobody's easy mark")
+	for ln31 in Giants.LINES + Giants.LINES_SMALL:
+		check(fits.call(str(ln31).replace("%s", "Daoist friend")), "a line of the Great People fits the box")
+	for e31g in Folk.ROLES.giant.day:
+		for c31 in str(e31g[2]).split("|"):
+			check(c31 in Assets.LEND or c31 in Data.EMOTES or c31 in ["talk", "idle", "in", "eat", "laugh"], "a giant's day: %s is a clip anybody can be lent" % c31)
+	check(Giants.pace(1.0) == 1.0 and Giants.pace(Giants.SCALE) < 0.7 and Giants.head(2.0) == 3.0, "somebody twice the size moves at a giant's pace and is looked up at")
+	check(Giants.of_npc({"id": "fangfeng"}) == Giants.SCALE and Giants.of_npc({"id": "x", "asset": "kuafu"}) == Giants.SCALE and Giants.of_npc({"id": "elder"}) == 1.0 and Giants.of_npc({"id": "yan_ying"}) == 1.0, "the giants of the story are drawn as giants, and nobody else")
+	for old31 in ["fangfeng", "kuafu", "longbo_giant", "grudge_fangfeng", "kuafu_west"]:
+		check(Giants.of_foe(old31) and str(Data.ENEMIES[old31].shape).begins_with("person:") and UI.SHAPES.has(str(Data.ENEMIES[old31].shape)) and Assets.has(str(Assets.PEOPLE[str(Data.ENEMIES[old31].shape).substr(7)])), "%s is one of the Great People, in a body of his own" % old31)
+	check(not Giants.of_foe("shang_yang") and not Giants.of_foe("iron_fang"), "and a lord who is only a man is not")
+	# the tenth people
+	check(Data.RACE_ORDER.has("daren") and Data.RACE_ORDER.size() == 10 and str(Data.RACES.daren.gift) == "lintel_peg" and Feats.FEATS.has("tall_friends"), "the Great People are a people of the realms, with a keepsake")
+	var DG = new_game.call()
+	for i31 in range(Data.step_index("s_p31_home"), Data.STEPS.size()):
+		if Data.STEPS[i31].has("race"):
+			DG.race_gain(str(Data.STEPS[i31].race), 8 if str(Data.STEPS[i31].kind) == "kill" else 5)
+	check(DG.race_tier("daren") >= 1, "what the chapter does for them makes him their friend (standing %d)" % int(DG.standing.get("daren", 0)))
+	DG.free()
+
+	print("== the face he has earned (visage.gd) ==")
+	check(Visage.LOOKS.size() == 9 and Visage.stage_of(0) == 0 and Visage.stage_of(5) == 0 and Visage.stage_of(6) == 1 and Visage.stage_of(Creed.SIDE) == 2 and Visage.stage_of(-Creed.SIDE) == -2 and Visage.stage_of(Creed.CAP) == 4 and Visage.stage_of(-Creed.CAP) == -4,
+		"nine looks, four either side of a face like anybody's, and a side of the Way is the second of them")
+	for st31 in range(-4, 5):
+		check(Visage.LOOKS.has(st31) and fits.call(str(Visage.LOOKS[st31].n) + ". " + str(Visage.LOOKS[st31].desc)), "look %d has a name and words that fit" % st31)
+		check(Visage.rest(st31).size() == Faces.vector_of("calm").size(), "look %d is a pose of the six bones of expression" % st31)
+	check(Visage.rest(0) == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0], "a face nobody would remark on rests as it was sculpted")
+	check(Visage.rest(4)[0] > 0.0 and Visage.rest(4)[10] > 1.0 and Visage.rest(-4)[0] < 0.0 and Visage.rest(-4)[1] > 0.2 and Visage.rest(-4)[10] < 0.8 and Visage.rest(-4)[11] < 1.0,
+		"the Righteous Path opens the brow and the eyes; the Demonic draws the brows down and in, narrows the eyes and the jaw")
+	check(Visage.rest(0, 1) != Visage.rest(0, 0) and Visage.rest(0, -1)[3] > Visage.rest(0, -1)[0], "the precepts set the mouth, and the open road lifts one eyebrow")
+	var base31 := {"robe": Color("3a8ae8"), "sec": Color("2a3a6a"), "trim": Color("e8f0ff"), "hair": Color("1a1a2a"), "eyes": Color("3a7ae8")}
+	var dc31: Dictionary = Visage.cols(-4, base31)
+	var rc31: Dictionary = Visage.cols(4, base31)
+	check((dc31.eyes as Color).r > 0.7 and (dc31.eyes as Color).b < 0.2 and (dc31.hair as Color).v > 0.8 and (dc31.robe as Color).v < (base31.robe as Color).v and (dc31.skin as Color).r < 0.75,
+		"at the end of the Demonic Path: red eyes, white hair, a darker robe, grey skin")
+	check((rc31.eyes as Color).r > (base31.eyes as Color).r and (rc31.hair as Color) == (base31.hair as Color) and (rc31.skin as Color).r >= 1.0 and (rc31.skin as Color).b < 1.0, "at the end of the Righteous: gold in the eye and a warm skin, and his own hair")
+	check(Visage.cols(0, base31) == base31 and not Visage.cols(0, base31).has("skin"), "and a face like anybody's is the one he was made with")
+	var VG = new_game.call()
+	check(Visage.stage(VG) == 0 and Visage.key(VG) == "0|0" and Visage.text(VG).begins_with("A face like anybody's"), "a journey begins with a face like anybody's")
+	VG.creed["virtue"] = -30
+	check(Visage.stage(VG) == -3 and Visage.text(VG).begins_with("Ash-pale") and Visage.key(VG) != "0|0", "what he has done is on his face (%s)" % Visage.key(VG))
+	VG.creed["virtue"] = 40
+	check(Visage.stage(VG) == 4, "either way")
+	VG.free()
+	check(Assets.hero_part(Color(0.8, 0.6, 0.5, 0.6), Vector2.ZERO, Vector3(0, 1.6, 0), false) == "skin" and Assets.hero_part(Color(0.8, 0.6, 0.5, 1.0), Vector2(0, 1), Vector3.ZERO, false) == "robe", "his skin is told from his clothes")
+	var wsrc := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(wsrc.contains("Visage.key(Game)") and wsrc.contains("if not headless() and player != null:") and FileAccess.get_file_as_string("res://scripts/models.gd").contains("Visage.apply(root, vs, vr)"), "the world looks at his face again now and then, and only when there is a window")
+
+	print("== close-ups (closeup.gd) ==")
+	check(Closeup.CLIPS.size() == 8, "eight gestures of somebody's own")
+	for cl31 in Closeup.CLIPS:
+		check(cl31 in Assets.LEND and not cl31 in Assets.LEND_LOOPS and Closeup.SECONDS.has(cl31) and Faces.EXPRESSIONS.has(str(Closeup.FACES.get(cl31, ""))), "%s is lent to everybody, done once, and has a face" % cl31)
+		check(not Data.EMOTES.has(cl31), "%s is nobody's ordinary gesture" % cl31)
+	if Assets.has(Assets.PEOPLE.lin_feng):
+		var hm31: Node3D = Assets.person("lin_feng")
+		for cl32 in Closeup.CLIPS:
+			check(Assets.has_clip(hm31, cl32), "Lin Feng's model carries %s" % cl32)
+		hm31.free()
+		var gm31: Node3D = Assets.instance("characters/folk_giant")
+		Assets.lend_clips(gm31)
+		check(Assets.has_clip(gm31, "stoop") and Assets.has_clip(gm31, "hoe"), "and one of the Great People can be lent a stoop")
+		gm31.free()
+	var used31 := {}
+	for who31 in Closeup.SIGNATURE:
+		check(Closeup.CLIPS.has(str(Closeup.SIGNATURE[who31])), "%s's own gesture is one of the eight" % who31)
+		used31[str(Closeup.SIGNATURE[who31])] = true
+	check(used31.size() == Closeup.CLIPS.size() and Closeup.signature("Lin Feng") == "fist_palm" and Closeup.signature("Yue Ling") == "sleeve_smile" and Closeup.signature("Li Li, Judge of Jin") == "hand_heart" and Closeup.signature("Big Brother Wang") == "stoop" and Closeup.signature("Nobody At All") == "",
+		"every one of the eight is somebody's, and a name with an epithet or a title is still that person")
+	var conv31: Array = Data.DIALOGUE["s_p31_late"]
+	check(Closeup.shot(conv31, 0) == "wide" and Closeup.shot(conv31, 1) == "close" and Closeup.gesture(conv31, 1) == "hand_heart" and Closeup.gesture(conv31, 2) == "fist_palm" and Closeup.gesture(conv31, 3) == "point" and Closeup.gesture(Data.DIALOGUE["s_p31_home"], 3) == "point" and Closeup.shot(conv31, 3) == "close",
+		"a conversation is cut: narration wide, a first word and an acted line close, and each speaker's own gesture once")
+	var plain31 := [["A", "One."], ["B", "Two."], ["A", "It rained."], ["B", "It did rain."], ["A", "So."]]
+	check(Closeup.shot(plain31, 2) == "two" and Closeup.shot(plain31, 3) == "two" and Closeup.shot(plain31, 4) == "close" and Closeup.gesture(plain31, 2) == "", "plain talk between is a two-shot, and the last word is a face")
+	var fr31: Array = Closeup.frame(Vector3(0, 1.5, 0), Vector3(0, 0, 1), 1.0, 1.0)
+	var fg31: Array = Closeup.frame(Vector3(0, 3.0, 0), Vector3(0, 0, 1), Giants.SCALE, 1.0)
+	check((fr31[0] as Vector3).z > 1.0 and absf((fr31[0] as Vector3).y - 1.5) < 0.2 and (fg31[0] as Vector3).y < 3.0 - 0.5 and (fg31[0] as Vector3).distance_to(fg31[1]) > (fr31[0] as Vector3).distance_to(fr31[1]),
+		"the lens stands before a face at its own height, and one of the Great People is looked up at from further off")
+	var n_sig := 0
+	for dk31 in Data.DIALOGUE:
+		if str(dk31).contains("s_p31_") or str(dk31) in ["pre:late_axe", "post:late_axe", "pre:kuafu_west", "post:kuafu_west", "pre:the_decree", "post:the_decree", "pre:the_shoe", "post:the_shoe"]:
+			var dl31: Array = Data.DIALOGUE[dk31]
+			for li31 in dl31.size():
+				if Closeup.CLIPS.has(Closeup.gesture(dl31, li31)):
+					n_sig += 1
+	check(n_sig >= 12, "the chapter's conversations have somebody's own gesture in them (%d)" % n_sig)
+
+	print("== Part XXXI: The Foot and the Shoe ==")
+	check(Data.REALMS.size() == 37 and Data.REALMS[36] == "Great and Small Alike" and Data.MAX_LEVEL == 108 and Data.level_name(108).ends_with("Great and Small Alike") and Data.REALM_INFO.size() == 37
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXI adds the realm of Great and Small Alike")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break36" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall29") and msrc.contains("\"s_break35\": \"recall29\"") and Data.DIALOGUE.has("pre:s_break36") and Data.DIALOGUE.has("post:s_break36"),
+		"Part XXXI follows Three Sides Open (recall29) and ends the game")
+	var p31 := Data.step_index("s_p31_home")
+	var kinds31 := {}
+	var n31 := 0
+	var kills31 := 0
+	for i in range(p31, Data.STEPS.size()):
+		var s31: Dictionary = Data.STEPS[i]
+		n31 += 1
+		kinds31[str(s31.kind)] = true
+		check(str(s31.id).begins_with("s_p31_") or str(s31.id) == "s_break36", "%s is a step of the chapter" % s31.id)
+		check(not str(s31.kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % s31.id)
+		if str(s31.kind) == "talk":
+			check(Data.DIALOGUE.has(str(s31.id)), "%s has its conversation" % s31.id)
+		if str(s31.kind) == "kill":
+			check(Data.DIALOGUE.has("pre:" + str(s31.boss)) and Data.DIALOGUE.has("post:" + str(s31.boss)) and Trials.TRIALS.has(str(s31.boss)) and Lore.BOSS.has(str(s31.boss)), "%s: words before and after, a trial, and a story" % s31.boss)
+			check(bsrc.contains("\"%s\": \"" % str(s31.boss)), "the bot has a way planned through %s" % s31.boss)
+		if str(s31.kind) == "hunt":
+			kills31 += int(s31.n)
+			var band31: Dictionary = Data.AREAS[str(s31.area)].get("warband5", {})
+			for en in s31.of:
+				check(Data.ENEMIES.has(str(en)) and Lore.BEAST.has(str(en)) and int(Data.ENEMIES[str(en)].get("boss", false)) == 0 and Habits.habit(str(en)) != "", "%s: a foe of the chapter with a story and hours" % en)
+				var in_pool31 := false
+				for pl in band31.get("pool", []):
+					in_pool31 = in_pool31 or str(pl[0]) == str(en)
+				check(in_pool31, "%s marches in %s" % [en, s31.area])
+		if str(s31.kind) in ["hunt", "collect", "toil", "folk", "summit", "marks", "glide", "fit", "delve", "haul"]:
+			check(Data.DIALOGUE.has("done:" + str(s31.id)), "%s: something is said when it is done" % s31.id)
+		if str(s31.kind) == "haul":
+			check(Data.DIALOGUE.has("haul:" + str(s31.id)) and Load.GOODS.has(str(s31.good)), "%s: somebody says something as each load arrives" % s31.id)
+		if str(s31.kind) == "folk":
+			check(Folk.ERRANDS.has(str(s31.id)) and Folk.ERRANDS[str(s31.id)].lines.size() >= 4 and (Folk.CAMP_ROLES.has(str(s31.role)) or (s31.has("town") and int(Folk.TOWNS[str(s31.town)].roles.get(str(s31.role), 0)) >= int(s31.n))), "%s: an errand among people who are there to be asked, with its words" % s31.id)
+			for el31 in Folk.ERRANDS[str(s31.id)].lines:
+				check(fits.call(str(el31)), "%s: what is answered fits the box" % s31.id)
+		if str(s31.kind) == "fit":
+			check(Fitting.count(ws, str(s31.area)) >= int(s31.n) + 1, "%s: %s has more houses to put to rights than are asked for" % [s31.id, s31.area])
+	check(n31 == 35 and kills31 >= 220 and kinds31.size() == 13 and kinds31.has("toil") and kinds31.has("haul") and kinds31.has("summit") and kinds31.has("marks") and kinds31.has("folk") and kinds31.has("collect") and kinds31.has("hunt") and kinds31.has("glide") and kinds31.has("fit") and kinds31.has("delve"),
+		"the chapter is thirty-five steps of thirteen kinds (%d, %d)" % [n31, kinds31.size()])
+	check(Data.step_index("s_p31_beam") < _kill_step("late_axe") and Data.step_index("s_p31_woodmen") < _kill_step("kuafu_west") and Data.step_index("s_p31_giants") < _kill_step("the_decree") and Data.step_index("s_p31_rooms") < _kill_step("the_decree"), "what a lord is shown has been done before he is met")
+	for tid in ["late_axe", "kuafu_west", "the_decree", "the_shoe"]:
+		var kinds_t31 := {}
+		for pth in Trials.TRIALS[tid].paths:
+			kinds_t31[str(pth.kind)] = true
+			check(fits.call(str(pth.desc)) and fits.call(str(pth.line)), "%s/%s fits the dialogue box" % [tid, pth.id])
+		check(kinds_t31.size() >= 4 and kinds_t31.has("might") and (kinds_t31.has("clean") or kinds_t31.has("wild")), "%s: four ways through, one of them by what he has not done" % tid)
+		var open31 := 0
+		for pth2 in Trials.TRIALS[tid].paths:
+			if not (pth2.needs as Array).any(func(nd): return str(nd[0]) in ["clean", "wild"]):
+				open31 += 1
+		check(open31 >= 2, "%s can be passed by somebody with a price on his head" % tid)
+		check(Data.ENEMIES[tid].get("boss", false) and Lore.BOSS[tid].size() == 2, "%s is a lord with a story in two parts" % tid)
+	var c31: Dictionary = Echoes.CROSSROADS.get("the_lintel", {})
+	check(not c31.is_empty() and str(c31.step) == "s_p31_lintel" and str(c31.part) == "XXXI" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_lintel" and fits.call(str(c31.ask)), "which gives way, the foot or the shoe, is asked last of all")
+	check((c31.options as Array).size() == 3 and c31.after.size() == 3 and c31.end.size() == 3 and c31.echo.has("s_p31_end") and c31.echo.s_p31_end.size() == 3, "the_lintel: three answers, each answered, echoed and told at the end")
+	var letters31 := 0
+	for lid31 in Mail.ORDER:
+		if Mail.LETTERS[lid31].has("needs") and str(Mail.LETTERS[lid31].needs[0]) == "the_lintel":
+			letters31 += 1
+			for ll31 in Mail.LETTERS[lid31].lines:
+				check(fits.call(str(ll31)), "the letter %s fits the box" % lid31)
+	check(letters31 == 3 and Mail.LETTERS.has("kuafu_home") and Mail.ORDER.has("kuafu_home") and fits.call(str(Mail.LETTERS.kuafu_home.lines[0])), "a letter for each answer, and one from a mother in the north")
+	var scales31 := {}
+	var creeds31 := {}
+	for o31 in c31.options:
+		check(Marks.MARKS.the_lintel.has(str(o31.id)) and Marks.MARKS.the_lintel[str(o31.id)].has("who") and fits.call(str(Marks.MARKS.the_lintel[str(o31.id)].desc)), "the_lintel/%s leaves something standing, and somebody by it" % o31.id)
+		check(Weal.hears(str(Marks.MARKS.the_lintel[str(o31.id)].area)) == ["landfall"], "the_lintel/%s is felt at Landfall" % o31.id)
+		for sc in o31.tilt:
+			scales31[sc] = true
+		for ck in o31.get("creed", {}):
+			creeds31["%s%d" % [ck, signi(int(o31.creed[ck]))]] = true
+			check(Creed.AXES.has(str(ck)) and absi(int(o31.creed[ck])) < Creed.SIDE, "the_lintel/%s leans on the Way, and does not by itself decide it" % o31.id)
+		check(fits.call(str(o31.desc)), "the_lintel/%s: what it means fits" % o31.id)
+		for al in c31.after[str(o31.id)]:
+			check(fits.call(str(al[1])), "the_lintel/%s: what follows fits the dialogue box" % o31.id)
+	check(scales31.size() == 3 and creeds31.size() == 3, "its answers tip all three scales, and three sides of the Way")
+	var fates31 := 0
+	for ft in Weal.FATES:
+		if str(ft.when[0]) == "the_lintel":
+			fates31 += 1
+			check(fits.call(str(ft.line)), "a fate of the_lintel fits the box")
+	check(fates31 == 3, "a carpenter's trade turns on each answer")
+	var old_echo31 := 0
+	for cid31 in Echoes.ORDER:
+		if cid31 == "the_lintel":
+			continue
+		for ek in Echoes.CROSSROADS[cid31].get("echo", {}):
+			if str(ek).contains("s_p31_"):
+				old_echo31 += 1
+	check(old_echo31 >= 2, "older crossroads echo in Part XXXI (%d)" % old_echo31)
+	check(bsrc.contains("\"late_axe\": \"folk\"") and bsrc.contains("\"the_decree\": \"house\"") and bsrc.contains("\"the_lintel\": [\"each\"]"), "the bot has a plan for every trial and the crossroads of the chapter")
+	check(Marks.AFTER_BANDS.has("the_lintel"), "the marks of its crossroads are stood after the late bands")
+	var found31 := 0
+	for a31 in ["time", "buzhou", "penglai", "loom"]:
+		var w31: Dictionary = Atlas.world_of(Data.layer_of(a31))
+		check(str(Data.AREAS[a31].get("warband5", {}).get("vis", "")).begins_with("s_p31_") and not Data.AREAS[a31].has("warband6"), "%s: the chapter's band takes the last slot" % a31)
+		var stood31 := 0
+		for e31 in w31.ents:
+			if str(e31.get("area", "")) != a31:
+				continue
+			if str(e31.kind) == "enemy" and str(e31.get("vis", ["", ""])[0]).begins_with("s_p31_"):
+				stood31 += 1
+			if (e31.kind == "pickup" and str(e31.id).begins_with("p31_")) or (e31.kind == "boss" and str(e31.enemy) in ["late_axe", "kuafu_west", "the_decree", "the_shoe"]) or (e31.kind == "npc" and str(e31.id) in ["fangfeng", "kuafu", "longbo_angler", "zheng_buyer", "yan_ying"]):
+				found31 += 1
+				check(Atlas.owner_id(w31, e31.pos) == a31, "%s stands in its own region" % e31.id)
+		check(stood31 >= 7, "%s: the band found room (%d of %d packs)" % [a31, stood31, int(Data.AREAS[a31].warband5.n)])
+	check(found31 == 18 + 4 + 5, "everything the chapter stands on the heights found room (%d)" % found31)
+	var pegs31 := 0
+	for e32 in ws.ents:
+		if str(e32.kind) == "pickup" and str(e32.get("item", "")) == "lintel_peg" and str(e32.area) in ["time", "loom"]:
+			pegs31 += 1
+	check(pegs31 == 2, "the keepsake of the Great People lies on two heights (%d)" % pegs31)
+	for pr in [["late_axe", "dyke_stake", "s_p31_stakes"], ["kuafu_west", "peach_stone", "s_p31_stones"], ["the_decree", "oracle_shell", "s_p31_shells"], ["the_shoe", "foot_cord", "s_p31_cords"]]:
+		check(Data.step_index(str(pr[2])) < _kill_step(str(pr[0])) and Data.ITEMS.has(str(pr[1])) and Look.PICKUP_COLORS.has(str(pr[1])) and Load.weight_of(str(pr[1])) <= 1.0, "%s can be passed by what was found on the way" % pr[0])
+	for fid in ["great_small", "asked_why", "turned_round", "whose_door", "three_sides"]:
+		check(Feats.FEATS.has(fid), "the feat %s is kept" % fid)
+	for pid in ["fangfeng", "kuafu", "longbo_angler", "zheng_buyer", "yan_ying"]:
+		check(Assets.PEOPLE.has(pid) and Assets.has(str(Assets.PEOPLE[pid])), "%s has a body built from a script" % pid)
+		check(Data.CHAT.has(pid) and Data.CHAT[pid].size() >= 4 and Folk.POSTS.has(pid), "%s has four things to say, and something to do all day" % pid)
+		for cl in Data.CHAT[pid]:
+			check(fits.call(str(cl)), "%s: what is said fits the box" % pid)
+	# the plot holes and bugs of this release stay mended
+	check(str(Data.STEPS[Data.step_index("s_p27_end")].get("gives", {})).contains("mustard_ring") and not Data.STEPS[Data.step_index("s_p27_sack")].has("gives"), "the ring is in his hand when the smith has set the seed, not two steps before")
+	for nl31 in Data.AREAS.springs.npcs:
+		if str(nl31.id) == "li_li":
+			check(str(nl31.vis[1]) == "s_p30_verdict", "the judge does not sit on, bound, after he has been answered")
+	check(int(Echoes.CROSSROADS.the_horse.options.filter(func(o): return str(o.id) == "keep")[0].gain.hearth.get("steppe", 0)) == 3, "keeping the horse is to the regard of the Horse-Folk, whose horse it is")
+	check(not str(Data.CHAT.cheng_tang[0]).contains("never asked for so much") and not str(Data.DIALOGUE["s_p28_youth"]).contains("In his lap are four rings"), "Tang says of Jie what he said before, and the rings are set down before they lie in a lap")
+	check(Crime.is_child({"id": "stableboy_shitou", "kind": "npc", "n": "Shitou"}) and Crime.is_child({"id": "furnace_boy", "kind": "npc", "n": "Dan"}), "the children of the story are children")
+	var BG = new_game.call()
+	BG.falls["wuzhiqi"] = {"how": "gave", "rounds": 3}
+	BG.weal_n += 1
+	var doom_felt := false
+	for tw31 in Weal.ORDER:
+		for cs31 in Weal.causes(BG, tw31):
+			doom_felt = doom_felt or str(cs31.get("why", "")).to_lower().contains("gave way")
+	check(doom_felt, "a doom given way to is felt in the towns that hear of it")
+	BG.watch_slain = 3
+	check(Crime.count(BG) == 3 and Crime.text(BG) != "a clean name", "three of the watch cut down are three people dead by his hand")
+	var st_b := int(BG.stipends)
+	BG.free()
+	check(FileAccess.get_file_as_string("res://scripts/almanac.gd").contains("if st > 0:\n\t\tg.stipends += 1") or FileAccess.get_file_as_string("res://scripts/almanac.gd").contains("if st > 0:"), "a month with no stipend is not a month on the roll")
+	check(FileAccess.get_file_as_string("res://scripts/roads.gd").contains("/ Clock.rate(") and FileAccess.get_file_as_string("res://scripts/ships.gd").contains("/ Clock.rate("), "the coach and the ship take the hours the counter quotes, by day or night")

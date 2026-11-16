@@ -940,6 +940,9 @@ func advance() -> void:
 	# help given in the land of one of the peoples of the realms (Part XI) earns their standing
 	for race in Data.AREAS.get(str(s.get("area", "")), {}).get("races", []):
 		race_gain(race, 8 if s.kind == "kill" else 5)
+	# (the Tall People release: a step done for a people who have no country of their own names them)
+	if s.has("race"):
+		race_gain(str(s.race), 8 if s.kind == "kill" else 5)
 	# and what is done among a hearth of the land for its own people (cultures.gd): a step that names
 	# its hearth is a deed for it; a word, an errand or a scene in its country is a small one
 	if s.has("hearth"):

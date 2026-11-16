@@ -187,12 +187,19 @@ static func tick(n: Node3D, dt: float, base: String = "") -> void:
 		if want != str(n.get_meta("face", "calm")):
 			n.set_meta("face", want)
 	var cur: Array = n.get_meta("face_cur", [])
-	if cur.is_empty() and want == "calm":
+	# (the Tall People release, visage.gd: the pose a face rests in, which every expression is worn over)
+	var rest: Array = n.get_meta("face_rest", [])
+	if cur.is_empty() and want == "calm" and rest.is_empty():
 		return
 	var rig := _rig(n)
 	if rig.is_empty():
 		return
 	var tgt := vector_of(want)
+	if rest.size() == tgt.size():
+		for i in 10:
+			tgt[i] += float(rest[i])
+		for i in range(10, 13):
+			tgt[i] *= float(rest[i])
 	if cur.is_empty():
 		cur = vector_of("calm")
 	var k := 1.0 - exp(-dt * EASE)
@@ -205,7 +212,7 @@ static func tick(n: Node3D, dt: float, base: String = "") -> void:
 		else:
 			cur[i] = tgt[i]
 	if not moved and bool(n.get_meta("face_set", false)):
-		if want == "calm":
+		if want == "calm" and rest.is_empty():
 			n.set_meta("face_cur", [])
 		return
 	n.set_meta("face_cur", cur)
