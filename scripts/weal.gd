@@ -51,8 +51,11 @@ const TOWNS := {
 	"tearwater": {"n": "Tearwater", "area": "ninesprings", "areas": ["ninesprings"], "office": "reeve_tearwater"},
 	"youdu_city": {"n": "Youdu", "area": "youdu", "areas": ["youdu"], "office": "registrar_youdu"},
 	"landfall": {"n": "Landfall", "area": "penglai", "areas": ["penglai", "fangzhang", "yingzhou", "guixu"], "office": "reeve_landfall"},
+	# (the Cloud Keel release: the towns of the Far Countries, which only an ark reaches: arks.gd)
+	"lightfoot": {"n": "Lightfoot", "area": "huaxu", "areas": ["huaxu", "gumang"], "office": "moorer_lightfoot"},
+	"fourstreams": {"n": "Fourstreams", "area": "zhongbei", "areas": ["zhongbei", "fuluo"], "office": "reeve_fourstreams"},
 }
-const ORDER := ["sect", "cloudfoot", "qingshi", "yanggu", "shazhou", "longmen", "tushan", "featherfall", "tearwater", "youdu_city", "landfall"]
+const ORDER := ["sect", "cloudfoot", "qingshi", "yanggu", "shazhou", "longmen", "tushan", "featherfall", "tearwater", "youdu_city", "landfall", "lightfoot", "fourstreams"]
 ## the towns the Rice Hearth keeps: where the home fire is
 const HOME_TOWNS := ["qingshi", "sect", "cloudfoot"]
 
@@ -182,9 +185,22 @@ static func _told(g, tid: String, was: String) -> void:
 	g.toast("%s is %s now" % [str(TOWNS[tid].n).trim_prefix("the "), str(STATES[now].n).to_lower()])
 	g.note("%s: %s. %s" % [str(TOWNS[tid].n).trim_prefix("the "), str(STATES[now].n), str(STATES[now].desc)])
 
+## The towns that are weighed for the journey of `g` (the Cloud Keel release): every town of the four
+## realms of the story, and a town only an ark reaches (arks.gd) once he has been there.  Until then
+## such a town counts for nothing: it is not told of, counted, bettered or sent to, so that a journey
+## that never takes an ark is weighed exactly as it was.
+static func towns(g) -> Array:
+	var out: Array = []
+	for tid in ORDER:
+		if not Arks.beyond(str(TOWNS[tid].area)) or g.seen.has(str(TOWNS[tid].area)):
+			out.append(tid)
+	return out
+
+const NUMBER_WORDS := ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+
 ## Told when the story has moved (a crossroads answered, a lord put down): any town that has changed.
 static func poll(g) -> void:
-	for tid in ORDER:
+	for tid in towns(g):
 		var now := state(g, tid)
 		var was := str(g.weal_state.get(tid, "easy"))
 		if now != was:
@@ -371,7 +387,7 @@ static func rank(g, tid: String) -> int:
 static func count(g, at: String) -> int:
 	var n := 0
 	var want := STATE_ORDER.find(at)
-	for tid in ORDER:
+	for tid in towns(g):
 		if rank(g, tid) >= want:
 			n += 1
 	return n
@@ -439,13 +455,15 @@ static func mark_from(g) -> void:
 	g.weal_from = {}
 	for tid in ORDER:
 		g.weal_from[tid] = total(g, tid)
+	# (every town is marked, the ones he has not been to as well: a town of the Far Countries first walked
+	# into after the step began is counted from how it stood when the step began, like any other)
 
 static func is_bettered(g, tid: String) -> bool:
 	return total(g, tid) > int(g.weal_from.get(tid, 0)) or acts(g, tid, "gift") >= GIFT_MAX or measure(g, tid, "plenty") >= CAP
 
 static func bettered(g) -> int:
 	var n := 0
-	for tid in ORDER:
+	for tid in towns(g):
 		if is_bettered(g, tid):
 			n += 1
 	return n
@@ -453,7 +471,8 @@ static func bettered(g) -> int:
 ## The town such a step would have him give to next: the nearest in the story's own order that he
 ## has walked into, is not yet the better, and will still take a gift ("" if there is none).
 static func wanted(g) -> String:
-	for tid in ORDER:
+	# (the Cloud Keel release: nobody is sent to a town only an ark reaches unless he has been there)
+	for tid in towns(g):
 		if not is_bettered(g, tid) and acts(g, tid, "gift") < GIFT_MAX and measure(g, tid, "plenty") < CAP:
 			return tid
 	return ""
@@ -557,7 +576,7 @@ const FATES := [
 	# Part XXXII (the Broken Mirror release)
 	{"npc": "lechang", "when": ["the_mirror", ["rivet"]], "tag": "who went home with him", "line": "It has six rivets in it and a line you could lose a hair in. I look at it every morning before I look at anything else. I used to look at my half to see what was gone. Now I look to see what is there."},
 	{"npc": "lechang", "when": ["the_mirror", ["recast"]], "tag": "who has been called upon", "line": "He came on Thursday with nothing he had written, as he was told, and sat on the edge of the chair. I asked him what he did for a living. He said he had been waiting. I said that is not a living. He laughed. I had forgotten his laugh; no, I had never heard this one."},
-	{"npc": "lechang", "when": ["the_mirror", ["halves"]], "tag": "who has two houses", "line": "I have his half and he has mine. It is the wrong way round, and neither of us has offered to change. On the fifteenth I go to see my own face in his house. He says it looks well there. He has not said it should stay."},
+	{"npc": "lechang", "when": ["the_mirror", ["halves"]], "tag": "who has two houses", "line": "My half hangs a hand from his, on his wall, and neither of us has offered to move it. On the fifteenth I go to see my own face in his house. He says it looks well there. He has not said it should stay."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["sword"]], "tag": "who has been thinking about his gate", "line": "A judge of Jin kept his own law to the end, and you stood by. Twenty years I have let through this gate whoever I was told to. Last night I asked myself who I should have stopped. I am still asking."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["bench"]], "tag": "who asks twice now", "line": "They say there is a court in Jin that hears every case twice, under a dead man's name. I ask everybody their business twice now, at this gate. It holds up the carts. Nobody has been turned away wrongly since."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["field"]], "tag": "with a hoe leaning by the gate", "line": "A judge hoeing beans for a widow. I let a pedlar through once who robbed the kitchens. I never told anybody. I have dug Auntie Zhou's leek bed every morning since I heard. She thinks I have gone simple."},
@@ -616,7 +635,8 @@ static func town_text(g, tid: String) -> String:
 
 static func summary(g) -> String:
 	var by := {}
-	for tid in ORDER:
+	var known := towns(g)
+	for tid in known:
 		var st := state(g, tid)
 		by[st] = int(by.get(st, 0)) + 1
 	var parts: Array = []
@@ -624,20 +644,22 @@ static func summary(g) -> String:
 		var st2 := str(STATE_ORDER[i])
 		if by.has(st2):
 			parts.append("%d %s" % [int(by[st2]), str(STATES[st2].n).to_lower()])
-	return "Of eleven towns: " + ", ".join(parts) + "."
+	return "Of %s towns: " % str(NUMBER_WORDS[known.size()]) + ", ".join(parts) + "."
 
 ## What the end of the story says of the towns (one or two sentences, by how most of them stand).
 static func epilogue(g) -> Array:
 	var good := count(g, "thriving")
 	var bad := 0
-	for tid in ORDER:
+	var known := towns(g)
+	for tid in known:
 		if rank(g, tid) < STATE_ORDER.find("easy"):
 			bad += 1
 	var out: Array = []
+	var of_n := str(NUMBER_WORDS[known.size()])
 	if good >= 6:
-		out.append("In %d of the eleven towns there is a lantern at every door that was not there when a sweeper first came down the mountain, and in none of them can anybody quite say when it was hung." % good)
+		out.append("In %d of the %s towns there is a lantern at every door that was not there when a sweeper first came down the mountain, and in none of them can anybody quite say when it was hung." % [good, of_n])
 	elif bad >= 4:
-		out.append("In %d of the eleven towns the doors are shut a little sooner when his name is said. He knows which. He goes through them by day, and pays for what he breaks." % bad)
+		out.append("In %d of the %s towns the doors are shut a little sooner when his name is said. He knows which. He goes through them by day, and pays for what he breaks." % [bad, of_n])
 	elif good > 0:
 		out.append("Some towns are the better for his having passed, and some are as they were, and he has learned that the second is not the smaller gift.")
 	return out
@@ -704,8 +726,10 @@ static func dress(st: String, w: float = 1.1, seed_: int = 0) -> Node3D:
 			b.limb(at + Vector3(0, 0.16, 0), at + Vector3(0, 0.16, 0.14), 0.012, 0.01, MB.tag(WOOD, MB.WOOD), 4)
 			b.lathe(at + Vector3(0, -0.12, 0.13), [Vector2(0.15, 0.0), Vector2(0.14, 0.05), Vector2(0.1, 0.24), Vector2(0.02, 0.27)], MB.tag(Color("b89a62"), MB.WOOD), 10)
 		"cold":
-			# the door barred: a plank across it at the height of a chest, on two iron staples
-			b.box(Vector3(0, 1.1, 0.07), Vector3(w + 0.3, 0.12, 0.045), MB.tag(Color("5a4634"), MB.WOOD))
+			# the door's bar, taken down for him because the counter is open to everybody, and stood on end by
+			# the jamb with its two iron staples empty (the Cloud Keel release: it lay across the open doorway at
+			# the height of a chest, and everybody walked through it; nothing hangs in a doorway)
+			b.box(Vector3(hw + 0.16, 0.82, 0.07), Vector3(0.12, w + 0.3, 0.045), MB.tag(Color("5a4634"), MB.WOOD), Vector3(0, 0, 0.07))
 			for s4 in [-1.0, 1.0]:
 				b.box(Vector3((w * 0.5 + 0.06) * s4, 1.1, 0.09), Vector3(0.05, 0.2, 0.03), MB.tag(Color("4a4a52"), MB.METAL))
 	if not b.is_empty():

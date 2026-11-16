@@ -1011,6 +1011,142 @@ static func junk() -> Node3D:
 	_mi(root, g, MB.mat_glow()).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return root
 
+## A spirit ark of Huaxu (arks.gd), the ship of the cultivators: a long shallow hull of pale spirit-wood
+## with an upswept prow carved as a cloud-head and a high stern, no rudder in any water but a fin of a keel
+## with a bank of cloud lying along it that she sits on, a main mast with a batten sail and two wing-sails
+## carried out to either side like a bird's, a deckhouse aft under a tiled roof, talisman plates along her
+## wale that burn a steady jade, lanterns at stern and prow and a pennon at the main.  Her length lies
+## along +Z and the bottom of her keel is at y = 0.  `moored`: sails brailed half up, a rope ladder over
+## the side and a cable down to a bronze grapnel that hangs clear of the ground (`drop` metres below her).
+static func ark(moored: bool = true, drop: float = 12.5) -> Node3D:
+	var root := Node3D.new()
+	root.name = "ark"
+	var b := MB.new()
+	var g := MB.new()
+	var plank := MB.tag(Color("c8b48a"), MB.WOOD)
+	var plank_d := MB.tag(Color("8a7450"), MB.WOOD)
+	var wale := MB.tag(Color("2e6a6a"), MB.WOOD)
+	var deck := MB.tag(Color("d8c8a0"), MB.WOOD)
+	var sail := MB.tag(Color("eee6d0"), MB.CLOTH)
+	var sail_d := MB.tag(Color("d8ccb0"), MB.CLOTH)
+	var rope := MB.tag(Color("b8a070"), MB.CLOTH)
+	var bronze := MB.tag(Color("9a8444"), MB.METAL)
+	var batten := MB.tag(Color("b8a868"), MB.WOOD)
+	var jade := Color(0.55, 1.0, 0.8, 0.7)
+	# the hull: sections from stern to bow (z, half-breadth at the rail, height of the rail, depth of the keel)
+	var secs := [[-8.0, 1.2, 4.6, 2.2], [-6.6, 1.9, 3.9, 1.5], [-4.0, 2.3, 3.3, 1.1], [-1.0, 2.5, 3.0, 1.0], [2.0, 2.4, 3.0, 1.0], [4.8, 2.0, 3.3, 1.2], [6.8, 1.3, 3.9, 1.7], [8.4, 0.5, 4.8, 2.6]]
+	for i in secs.size() - 1:
+		var s0: Array = secs[i]
+		var s1: Array = secs[i + 1]
+		for sd: float in [-1.0, 1.0]:
+			var r0 := Vector3(sd * float(s0[1]), float(s0[2]), float(s0[0]))
+			var r1 := Vector3(sd * float(s1[1]), float(s1[2]), float(s1[0]))
+			var m0 := Vector3(sd * float(s0[1]) * 0.8, float(s0[3]) + 0.7, float(s0[0]))
+			var m1 := Vector3(sd * float(s1[1]) * 0.8, float(s1[3]) + 0.7, float(s1[0]))
+			var k0 := Vector3(0, float(s0[3]), float(s0[0]))
+			var k1 := Vector3(0, float(s1[3]), float(s1[0]))
+			b.quad4(r0, r1, m1, m0, plank, plank, plank_d, plank_d)
+			b.quad4(m0, m1, k1, k0, plank_d, plank_d, plank_d, plank_d)
+			b.limb(r0 - Vector3(0, 0.3, 0), r1 - Vector3(0, 0.3, 0), 0.07, 0.07, wale, 5)
+			b.limb(r0, r1, 0.055, 0.055, plank_d, 5)
+			# a talisman plate on the wale of every section, burning
+			var tp := (r0 + r1) * 0.5 - Vector3(0, 0.62, 0) + Vector3(sd * 0.03, 0, 0)
+			b.box(tp, Vector3(0.03, 0.34, 0.24), bronze)
+			g.box(tp + Vector3(sd * 0.02, 0, 0), Vector3(0.012, 0.24, 0.14), jade)
+		b.quad4(Vector3(-float(s0[1]) * 0.95, float(s0[2]) - 0.45, float(s0[0])), Vector3(float(s0[1]) * 0.95, float(s0[2]) - 0.45, float(s0[0])),
+			Vector3(float(s1[1]) * 0.95, float(s1[2]) - 0.45, float(s1[0])), Vector3(-float(s1[1]) * 0.95, float(s1[2]) - 0.45, float(s1[0])), deck, deck, deck, deck)
+	b.quad4(Vector3(-1.2, 4.6, -8.0), Vector3(1.2, 4.6, -8.0), Vector3(0.95, 2.9, -8.0), Vector3(-0.95, 2.9, -8.0), wale, wale, plank_d, plank_d)
+	# the prow: a cloud-head, three curls of it, with a pearl in the middle one
+	for kc in 3:
+		var cz := 8.5 + kc * 0.32
+		var cy := 4.9 + kc * 0.36
+		b.torus(Vector3(0, cy, cz), 0.3 - kc * 0.05, 0.09, plank, Vector3(0, 0, PI * 0.5), true)
+	g.ball(Vector3(0, 5.26, 8.82), 0.12, Color(0.9, 1.0, 0.95, 0.8), true)
+	# the keel: a long fin of spirit-wood, and the cloud that lies along it, which is what she sits on
+	b.quad4(Vector3(0, 1.1, -7.0), Vector3(0, 1.1, 7.2), Vector3(0, 0.0, 5.0), Vector3(0, 0.0, -5.4), plank_d, plank_d, plank, plank)
+	b.quad4(Vector3(0, 1.1, 7.2), Vector3(0, 1.1, -7.0), Vector3(0, 0.0, -5.4), Vector3(0, 0.0, 5.0), plank_d, plank_d, plank, plank)
+	var crng := RandomNumberGenerator.new()
+	crng.seed = 4177
+	for kq in 22:
+		var qz := -7.5 + kq * 0.72 + crng.randf_range(-0.2, 0.2)
+		var qw := 1.0 - absf(qz) / 11.0
+		g.sph(Vector3(crng.randf_range(-1.3, 1.3) * qw, 0.5 + crng.randf_range(-0.25, 0.3), qz), Vector3(1.5 * qw + 0.5, 0.5 + crng.randf() * 0.25, 1.1), Color(0.95, 0.97, 1.0, 0.2 + crng.randf() * 0.12), Vector3.ZERO, true)
+	# the deckhouse aft, with a curved roof of grey-lilac tiles, a round window either side
+	b.box(Vector3(0, 4.15, -5.6), Vector3(2.6, 1.3, 2.6), plank)
+	_canopy(b, Vector3(0, 4.8, -5.6), 1.65, 1.6, 0.42, 0.14, MB.tag(Color("8a86a8"), MB.STONE), MB.tag(Color("6e6a8c"), MB.STONE), plank_d)
+	for sd3: float in [-1.0, 1.0]:
+		g.disc(Vector3(sd3 * 1.32, 4.25, -5.6), 0.3, Color(1.0, 0.85, 0.55, 0.5), 12, Color(1.0, 0.85, 0.55, 0.15), Vector3(0, 0, -PI * 0.5 * sd3))
+		b.torus(Vector3(sd3 * 1.31, 4.25, -5.6), 0.32, 0.035, plank_d, Vector3(0, 0, PI * 0.5), true)
+		_lantern(b, g, Vector3(sd3 * 1.0, 5.3, -8.1), 0.17, Color("3a9a8a"))
+	_lantern(b, g, Vector3(0, 4.5, 7.9), 0.15, Color("3a9a8a"))
+	# the tiller: a long sweep over the stern, with nothing on the end of it but a vane
+	b.limb(Vector3(0, 4.7, -6.9), Vector3(0, 4.2, -9.6), 0.06, 0.04, plank_d, 5)
+	b.quad4(Vector3(0, 4.7, -9.2), Vector3(0, 4.5, -10.6), Vector3(0, 3.5, -10.4), Vector3(0, 3.8, -9.3), sail_d, sail_d, sail, sail)
+	b.quad4(Vector3(0, 4.5, -10.6), Vector3(0, 4.7, -9.2), Vector3(0, 3.8, -9.3), Vector3(0, 3.5, -10.4), sail_d, sail_d, sail, sail)
+	# the main mast and its batten sail (brailed half up at her mooring)
+	var mh := 9.5
+	var mz := 0.6
+	b.limb(Vector3(0, 2.6, mz), Vector3(0, 2.6 + mh, mz), 0.15, 0.08, plank_d, 8)
+	var nb := 6
+	var sh := 3.6 if moored else 6.6
+	var top := 2.6 + mh - 0.6
+	for k in nb:
+		var y0 := top - sh * k / float(nb)
+		var y1 := top - sh * (k + 1) / float(nb)
+		var w0 := 3.0 * (0.74 + 0.26 * k / float(nb))
+		var w1 := 3.0 * (0.74 + 0.26 * (k + 1) / float(nb))
+		var sc: Color = sail if k % 2 == 0 else sail_d
+		var bz := mz + 0.22 + (0.0 if moored else 0.3 * sin(PI * (k + 0.5) / float(nb)))
+		b.quad4(Vector3(-w0 * 0.5, y0, bz), Vector3(w0 * 0.5, y0, bz), Vector3(w1 * 0.5, y1, bz), Vector3(-w1 * 0.5, y1, bz), sc, sc, sc, sc)
+		b.quad4(Vector3(w0 * 0.5, y0, bz), Vector3(-w0 * 0.5, y0, bz), Vector3(-w1 * 0.5, y1, bz), Vector3(w1 * 0.5, y1, bz), sc, sc, sc, sc)
+		b.limb(Vector3(-w0 * 0.52, y0, bz), Vector3(w0 * 0.52, y0, bz), 0.035, 0.035, batten, 4)
+		if k == nb - 1:
+			b.limb(Vector3(-w1 * 0.52, y1, bz), Vector3(w1 * 0.52, y1, bz), 0.05, 0.05, batten, 4)
+	b.limb(Vector3(0, 2.6 + mh, mz), Vector3(0, 4.2, 7.6), 0.012, 0.012, rope, 3)
+	b.limb(Vector3(0, 2.6 + mh, mz), Vector3(0, 4.6, -6.6), 0.012, 0.012, rope, 3)
+	# the wing-sails: a yard carried out from the rail on either side, a fan of battens below it
+	for sdw: float in [-1.0, 1.0]:
+		var rootp := Vector3(sdw * 2.3, 3.2, 1.2)
+		var up := 0.9 if moored else 0.25
+		var tip := rootp + Vector3(sdw * 5.4 * cos(up), 5.4 * sin(up), -0.4)
+		b.limb(rootp, tip, 0.08, 0.04, plank_d, 6)
+		var nw := 5
+		for kw in nw:
+			var f0 := float(kw) / float(nw)
+			var f1 := float(kw + 1) / float(nw)
+			var a0 := rootp.lerp(tip, f0)
+			var a1 := rootp.lerp(tip, f1)
+			var dn0 := Vector3(0, -(0.6 + 1.5 * f0), -0.9 - 1.6 * f0)
+			var dn1 := Vector3(0, -(0.6 + 1.5 * f1), -0.9 - 1.6 * f1)
+			var wc: Color = sail if kw % 2 == 0 else sail_d
+			b.quad4(a0, a1, a1 + dn1, a0 + dn0, wc, wc, wc, wc)
+			b.quad4(a1, a0, a0 + dn0, a1 + dn1, wc, wc, wc, wc)
+			b.limb(a1, a1 + dn1, 0.025, 0.02, batten, 4)
+		b.limb(tip, Vector3(sdw * 1.6, 3.3, -3.4), 0.012, 0.012, rope, 3)
+	# the pennon at the main, and bales lashed down amidships
+	b.ribbon([Vector3(0, 12.2, mz), Vector3(0.1, 12.15, mz - 0.8), Vector3(-0.05, 12.2, mz - 1.5), Vector3(0.05, 12.1, mz - 2.3)], [0.36, 0.32, 0.24, 0.04], Vector3(0, 1, 0), MB.tag(Color("3a9a8a"), MB.CLOTH))
+	for kb in 4:
+		b.box(Vector3(-1.2 + kb * 0.8, 2.85, 3.4), Vector3(0.6, 0.5, 0.7), MB.tag(Color("b8a070") if kb % 2 == 0 else Color("8a6a4a"), MB.CLOTH))
+	if moored:
+		# a cable from the bow down to a bronze grapnel that hangs clear of the ground, and a rope ladder
+		# over the side whose last rung is as high as a raised hand
+		var gy := -drop + 2.6
+		b.limb(Vector3(0.4, 3.6, 7.2), Vector3(0.4, gy + 0.5, 7.6), 0.03, 0.03, rope, 4)
+		b.limb(Vector3(0.4, gy + 0.5, 7.6), Vector3(0.4, gy, 7.6), 0.05, 0.04, bronze, 5)
+		for kg in 4:
+			var ga := TAU * kg / 4.0
+			b.limb(Vector3(0.4, gy, 7.6), Vector3(0.4 + cos(ga) * 0.32, gy + 0.26, 7.6 + sin(ga) * 0.32), 0.035, 0.012, bronze, 4)
+		var ly := -drop + 2.3
+		for sdl: float in [-0.22, 0.22]:
+			b.limb(Vector3(2.52, 3.0, -1.6 + sdl), Vector3(2.52, ly, -1.6 + sdl), 0.016, 0.016, rope, 3)
+		var rung := 3.0
+		while rung > ly + 0.1:
+			b.limb(Vector3(2.52, rung, -1.84), Vector3(2.52, rung, -1.36), 0.018, 0.018, batten, 4)
+			rung -= 0.42
+	_mi(root, b)
+	_mi(root, g, MB.mat_glow()).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return root
+
 ## A wheel in the plane of YZ about `at`: a felloe of wood shod with an iron tyre, spokes and a hub with a
 ## brass cap (`flat`: lashed against a tailboard, in the plane of XY).
 static func _wheel_mb(wb: MB, wr: float, spokes: int, dark: Color, pale: Color, iron: Color, at: Vector3, flat: bool) -> void:

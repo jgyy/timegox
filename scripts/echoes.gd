@@ -192,6 +192,12 @@ const CROSSROADS := {
 				"seal": [["Auntie Aysha of the Caravanserai", "They say you put nine seals on that house. He did not break one. He and his three thousand have been dead too long for a seal to notice them; they went in as a draught goes in."]],
 				"open": [["Auntie Aysha of the Caravanserai", "They say you gave that house to people with nowhere to go. They are there still, in the outer courts, with their doors barred at night. He took the great hall and the inner yards and did not ask whose they were."]],
 			},
+			# (the Cloud Keel release: Part XXX has the palace's floors dug up and people at supper over them,
+			# and nobody said who was at supper in a house that was sealed)
+			"s_p30_finder_come": {
+				"seal": [["Yue Ling", "The nine seals are on the gate still, Lin Feng. He did not break one. He came in as that dead king did, as a draught does. So did whoever is at supper under those floors: a seal keeps out only the living."]],
+				"open": [["Yue Ling", "These are the families you gave this house to, Lin Feng. They hung washing in a throne room, and now somebody with a spade is telling them what lies under their beds."]],
+			},
 			# Part XXV (the Three Burrows release)
 			"s_p25_door": {
 				"open": [["Yue Ling", "You opened the Blood Moon Palace to whoever had nowhere. There are children playing hopscotch where its altar was. It is the same question, Lin Feng. Only this time you will be living next door to the answer."]],
@@ -1390,12 +1396,12 @@ const CROSSROADS := {
 		],
 		"after": {
 			"rivet": [["Narrator", "Xu Deyan turns his half over twice and lays it down against hers, and for the first time looks straight at the gap. Across the court a woman in plum silk has begun to walk. She does not hurry. She has decided, and she wants it seen that she was not fetched."], ["Xu Deyan", "With the join showing. I should have liked it whole. I have been a fool about that for nine years; it is why I never looked in the right city. She will have a line through her face every morning, and so shall I. Well. We have earned it.", "bow"]],
-			"recast": [["Narrator", "He holds both halves a long time, as a man holds a letter he has been told to burn. Then he wraps them together in the blue cloth, birds inward. Across the court the Princess has heard, and has put her hand to her hair, as a woman does who is about to be introduced."], ["Xu Deyan", "New. Then I am to call on her, as a stranger, with a mirror neither of us has looked into. ...I do not know her favourite colour, sir. I knew a girl's. I find I am frightened. It is the first thing I have felt in nine years that was not about the past.", "think"]],
-			"halves": [["Narrator", "He nods slowly, and gives her half back into her own hands across the cloth; and she, after a moment, holds out hers for his, so that each goes away with the other's. It was not what either came for. Both of them stand a good deal straighter."], ["Xu Deyan", "On one wall, a hand apart. She says she will come on the fifteenth of each month and we shall drink tea beneath them, and that I am not to write a poem about it. I had begun one. She knows me, you see. That much did not break.", "laugh"]],
+			"recast": [["Narrator", "He holds both halves a long time, as a man holds a letter he has been told to burn. Then he wraps them together in the blue cloth, birds inward. Across the court the Princess has heard, and has put her hand to her hair, as a woman does who is about to be introduced."], ["Xu Deyan", "New. Then I am to call on her, as a stranger, with a mirror neither of us has looked into. ...I do not know her favourite colour. I knew a girl's. I find I am frightened. It is the first thing I have felt in nine years that was not about the past.", "think"]],
+			"halves": [["Narrator", "He nods slowly, and moves his half a hand's breadth from hers on the cloth; and she, after a moment, sets her own straight beside it, as it will hang. It was not what either came for. Both of them stand a good deal straighter."], ["Xu Deyan", "On one wall, a hand apart. She says she will come on the fifteenth of each month and we shall drink tea beneath them, and that I am not to write a poem about it. I had begun one. She knows me, you see. That much did not break.", "laugh"]],
 		},
 		"echo": {
 			"s_p32_end": {
-				"rivet": [["Elder Qing Xuan", "And I hear a mirror was riveted at Guanghan and carried home between two people, with the join showing. Cook Zhou will be unbearable. He has said for forty years that the mended bowl is the one you are careful of."]],
+				"rivet": [["Elder Qing Xuan", "And I hear a mirror was riveted at Guanghan and carried home between two people, with the join showing. Cook Zhou will be unbearable. She has said for forty years that the mended bowl is the one you are careful of."]],
 				"recast": [["Elder Qing Xuan", "And I hear two halves went into one crucible, and that a gentleman of Chen has been seen buying a comb for a lady he says he has only just met. It is extravagant. I find that I approve. One may be too faithful to a shape."]],
 				"halves": [["Elder Qing Xuan", "And I hear the halves hang on one wall, a hand apart, and that two people drink tea under them on the fifteenth. I had thought there were only two answers to that question, child. I have been wrong about the number of answers before."]],
 			},

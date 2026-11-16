@@ -1,12 +1,22 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Parted and Whole, across **one open world in four realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, and now the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat. It has **mountains in every region, 139 peaks that are climbed hand over hand and come down from under a cloud-kite**, 262 bosses, thirty-one Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, eleven towns (Qingshi now in two quarters) lived in by **259 townsfolk with days of their own, fourteen of them twice a man's height**, 45 camps out in the wild where **315 people of the road** keep theirs, things in the streets that really break, and 94 buildings you can walk into, with 17 upper storeys and 13 cellars among them. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **nine peoples** of the realms, change into **twenty-six outfits** (and dress Yue Ling in ten of her own), ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (sixteen ways, bright, bitter and dark), answer at **forty crossroads** that the whole story remembers, raise **a host** from the six hearths and fight **field battles by drums**, hear **thirty-four tunes** made wholly from code, take down the **eighteen commissions** of a notice board, do **96 feats**, stake spirit stones at **Old Du's mat**, carry the **Eight Arms**, each struck with in its own way and each a Dao of its own, go down into a **cave under every region**, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted from life, **with a body under the clothes** (a figure about seven and a half heads tall, every muscle where the anatomy books put it), the monsters after what the creature really is or what the old books say it was, and **every face shows what it feels**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet. **Everything he owns is on his back, in jin**: a load is drawn on him and on Yue Ling and slows him past what he can bear, the land can be worked with an axe, a rod, a pick and a sickle, and the ring that holds everything is the last thing in the story he is given.
+Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Parted and Whole, across **one open world in five realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat, and now the **Far Countries** that no boat, cart or foot can reach, only **the spirit arks of the cultivators**, which lie moored in the air over six towns. It has **mountains in every region, 158 peaks that are climbed hand over hand and come down from under a cloud-kite**, 262 bosses, thirty-one Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, thirteen towns (Qingshi in two quarters) lived in by **302 townsfolk with days of their own, sixteen of them twice a man's height**, 48 camps out in the wild where **336 people of the road** keep theirs, things in the streets that really break, and 108 buildings you can walk into, every one with a cellar and all but a few with an upper storey, **39 of those storeys divided into 89 apartments with somebody at home in each**. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, choose your road among **six Daos**, earn the trust of **nine peoples** of the realms, change into **twenty-six outfits** (and dress Yue Ling in ten of her own), ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (sixteen ways, bright, bitter and dark), answer at **forty crossroads** that the whole story remembers, raise **a host** from the six hearths and fight **field battles by drums**, hear **thirty-four tunes** made wholly from code, take down the **eighteen commissions** of a notice board, do **96 feats**, stake spirit stones at **Old Du's mat**, carry the **Eight Arms**, each struck with in its own way and each a Dao of its own, go down into a **cave under every region**, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted from life, **with a body under the clothes** (a figure about seven and a half heads tall, every muscle where the anatomy books put it), the monsters after what the creature really is or what the old books say it was, and **every face shows what it feels**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet. **Everything he owns is on his back, in jin**: a load is drawn on him and on Yue Ling and slows him past what he can bear, the land can be worked with an axe, a rod, a pick and a sickle, and the ring that holds everything is the last thing in the story he is given.
 
-> **Total gameplay duration: about 39 hours 17 minutes** (39:17:10 of game time for the end-to-end bot run, seed 1234), **1 hour 23 minutes more than the last release** (37:54:28). **The human body was measured against a reference model of each sex and re-sculpted to the tape**: hips, waist, chest and legs corrected, and the lines a body has cut into it: two cheeks with the cleft between them, two breasts or two pectorals with the sternum between, the spine, the navel. **Courtship goes on after the question**: her hands taken, an arm round her, brow to brow, drawn for both of them; four feast days with an hour of their own; and things she minds, said once and made up when they are put right. **Part XXXII, "The Broken Mirror"**, is four old love stories about what parts people: a king's word between two graves, an hour kept under a bridge, a wall counted in yards, and a mirror whose halves no longer meet. Twenty bugs and plot holes fixed.
+> **Total gameplay duration: about 39 hours 16 minutes** (39:16:05 of game time for the end-to-end bot run, seed 1234), **1 minute 5 seconds shorter than the last release** (39:17:10), with the same 2,772 battles and 5,546 foes: nothing of the story is in the new realm, and the difference is the lines the plot holes rewrote and one echo more that is heard. **The cultivators have ships**: spirit arks of Huaxu, moored in the air over six towns in four realms, crossing the sky of every realm, and selling a passage at the counter to anybody of the Golden Core. **The world is bigger by a fifth realm, the Far Countries** of the *Liezi*, which only an ark reaches: four regions and two towns with 147 people in them, and nothing of the story, so that every chapter is walked as it was. **The storey over a house is divided into apartments**, each furnished for a household and each with somebody at home: 39 storeys, 89 apartments, 85 people. **Everything that is drawn was audited again for sharing ground** and eleven kinds of overlap mended where they are drawn. Thirteen plot holes and eleven bugs fixed.
 
 | | |
 |---|---|
+| ![a spirit ark of Huaxu: at her mooring with a ladder over the side and a grapnel down, and under way with her wing-sails spread, on the cloud that lies along her keel](docs/screenshots/ark_moored_and_under_way.webp) | ![the ark over Lightfoot, her home mooring in Huaxu: above the roofs, on no tile](docs/screenshots/ark_over_lightfoot.webp) |
+| ![arks under way over the Far Countries, among the cranes](docs/screenshots/arks_under_way.webp) | ![the counter of Mooring-Mistress Qiao: after Not today, the post, the coach, and a passage by ark to five other docks](docs/screenshots/ark_counter.webp) |
+| ![Lightfoot from the air: the Hall of Moorings, the inn, the tea-house, the long house of the ark-hands, and the high road](docs/screenshots/town_lightfoot.webp) | ![in the street of Lightfoot, with lanterns under every eave](docs/screenshots/street_of_lightfoot.webp) |
+| ![Fourstreams in Zhongbei, the Utmost North, under straw-gold roofs, with its own ark](docs/screenshots/town_fourstreams.webp) | ![Zhongbei: no wind, no frost, ginkgo and peach, and the jar-shaped mountain](docs/screenshots/far_zhongbei.webp) |
+| ![Gumang, the Country That Sleeps, where neither sun nor moon reaches: the Long House of the Fifty Days](docs/screenshots/far_gumang.webp) | ![Fuluo, the Country That Never Sleeps, under two lights: the House with No Shutters](docs/screenshots/far_fuluo.webp) |
+| ![Esc > Map: the Far Countries, a fifth realm: Gumang, Huaxu, Zhongbei, Fuluo, and the high road between the two towns](docs/screenshots/map_far_countries.webp) | ![the ark of Cloudfoot, over the post town at the foot of Azure Cloud Mountain](docs/screenshots/ark_over_cloudfoot.webp) |
+| ![the storey over the Long House of the Ark-Hands with its roof off: a landing, a partition with three curtained doorways, three apartments, and Brother Ye, Widow Jing and Mother Bao at home](docs/screenshots/apartments_ark_hands_plan.webp) | ![over the Caravanserai of the Four Roads at Cloudfoot: three households off one landing, each with a bed along the wall, a stove and a table](docs/screenshots/apartments_caravanserai_plan.webp) |
+| ![an inn's upper storey is guest rooms: a pedlar and a traveller in the Inn of the Unhurried Guest](docs/screenshots/guest_rooms_unhurried_plan.webp) | ![the rooms over a shop: two households above Su's Chandlery](docs/screenshots/apartments_over_a_shop_plan.webp) |
+| ![somebody at home upstairs, with something to say about the neighbours](docs/screenshots/lodger_at_home.webp) | ![the ark of Landfall, on the Isles of the Eastern Sea](docs/screenshots/ark_over_landfall.webp) |
+| ![the ark of Fourstreams](docs/screenshots/ark_over_fourstreams.webp) | ![the junk at Yanggu, afloat: she lay two metres up the beach](docs/screenshots/junk_afloat_at_yanggu.webp) |
 | ![the bodies under the clothes, re-sculpted: a man and a woman from the front](docs/screenshots/bodies_close_front.webp) | ![and from behind: two cheeks with the cleft between them, the furrow of the spine, calves and ankles](docs/screenshots/bodies_close_back.webp) |
 | ![five of the people of the land in their underclothes from the front: Lin Feng, Yue Ling, Smith Tie, Granny Wen and a boy](docs/screenshots/bodies_front.webp) | ![the same five from behind](docs/screenshots/bodies_back.webp) |
 | ![her hands taken, in the court of the sect: both of them drawn doing it, face to face](docs/screenshots/touch_take_hands.webp) | ![an arm round her](docs/screenshots/touch_embrace.webp) |
@@ -52,6 +62,72 @@ Play Lin Feng, **a young man or a young woman** (or whoever you make them: name,
 More captures (every region from the ground and from above, a boss battle in every region and more, model galleries, turnarounds, animation strips, Yue Ling following the hero, and portraits) are in [`docs/screenshots`](docs/screenshots).
 
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph AK[The spirit arks: scripts/arks.gd]
+    OP[the sea comes home<br/>at the end of Part XII] --> BK[the arks of Huaxu come back:<br/>a keel of cloud holds a course again]
+    BK --> DK[six docks in four realms:<br/>Cloudfoot, Tushan, Featherfall,<br/>Landfall, Lightfoot, Fourstreams]
+    DK --> MO[an ark moored in the air over each,<br/>twenty-five metres up,<br/>over the roofs, on no tile]
+    DK --> SK[two more under way,<br/>crossing the sky of every realm]
+    DK --> CT{at the counter:<br/>can he stand the deck?}
+    CT -->|below the Golden Core| NO[no passage]
+    CT -->|yes| PS[a passage, by the leagues:<br/>only where he has been,<br/>and to the arks' own home]
+    PS --> TL[the crossing is told,<br/>the hours pass, and he is set down<br/>where the town's road begins]
+    end
+    subgraph FC[A fifth realm: the Far Countries]
+    TL --> HX[Huaxu, walked in sleep:<br/>the town of Lightfoot]
+    HX --> ZB[Zhongbei, the Utmost North:<br/>Fourstreams, under the Jar-Neck]
+    HX --> GM[Gumang, which sleeps<br/>fifty days and wakes once]
+    ZB --> FL[Fuluo, which has<br/>never slept at all]
+    HX -.->|no lord, no step, no seal:<br/>nothing of the story is here| OLD[every older journey<br/>is the same journey]
+    end
+    subgraph AP[Who lives upstairs: scripts/rooms.gd]
+    ST[the stairs come up] --> LD[a landing]
+    LD --> PT[partition walls on the tile's<br/>centre line, a curtained<br/>doorway to every room]
+    PT --> R1[an apartment: bed, stove,<br/>table, chest, a window<br/>on the outer wall]
+    PT --> R2[another: a cradle,<br/>or a mirror, or a wheel]
+    R1 & R2 --> LG[somebody at home in each,<br/>with their own things to say]
+    end
+    subgraph CL[Shared ground, measured as drawn: scripts/clash.gd]
+    AU[an audit of everything drawn,<br/>not only what stands on a tile] --> F1[furniture metres from its tile,<br/>beds in the wall, panels inside it]
+    AU --> F2[lanterns at the height<br/>of a man's chin]
+    AU --> F3[rocks and bushes on the paving<br/>and through the camps]
+    AU --> F4[lords measured at half<br/>the size they are drawn]
+    AU --> F5[a junk aground, packs<br/>walking through walls]
+    F1 & F2 & F3 & F4 & F5 --> MD[mended where it is drawn:<br/>nothing left its tile]
+    end
+    DK -.-> AP
+```
+
+- **The cultivators have ships** (`scripts/arks.gd`, new). A junk goes from harbour to harbour over water; the game had three. A **spirit ark** has no water under her: a long pale hull of spirit-wood with a cloud-head at the prow, a batten sail on the main, two wing-sails carried out to either side, talisman plates burning along the wale, and a bank of cloud lying along her keel, which is what she sits on. They are Huaxu's. They stopped coming when the sea began to drain away at the Returning Ruins and the air after it; **when the sea comes home at the end of Part XII they come back**. From then on:
+  - **An ark lies moored in the air over six towns** in four realms (Cloudfoot, Tushan, Featherfall in the Nine Heavens, Landfall on the Isles, and Lightfoot and Fourstreams in the Far Countries): twenty-five metres up, over the roofs, with a ladder over the side and a grapnel hanging clear of the ground, over ground where there is no roof, wood or peak beneath her. She stands on no tile, so nothing moved for her.
+  - **Two more are always under way**, crossing the sky of whatever realm he is in, above the weather. They are drawn only, and are where the clock says they are.
+  - **The counter of whoever answers for the town sells a passage** (after "Not today"): a fare by the leagues, the hours of the crossing passing, and three lines of what it was like to go over the edge of the chart with nothing under the keel. He is set down where the town's road begins. Before the arks come back the counter says why none has moored there in living memory.
+  - **An ark is never a way round the story.** She calls only where the journey has already been, and at her own home mooring, Lightfoot; nobody below the Golden Core can stand her deck; no step, trial, notice or ending asks for a passage; and the bot takes none.
+- **The world is bigger: a fifth realm, the Far Countries** (`Atlas.STRATA.far`). The *Liezi* tells of countries that "neither boat nor cart nor the feet can reach, only the spirit". They are in the game now, **four regions and two towns that only an ark reaches**, about nineteen thousand tiles of land of their own with 147 people, fourteen houses you can walk into, ten peaks to climb, a cave under each, four camps of the road and 72 packs that keep hours:
+  - **Huaxu, the Country Walked in Sleep**, where the Yellow Emperor went once in a dream and ruled better for twenty-eight years after. Its people have no ruler and want none, and walk on the air over a puddle rather than go round it. **Lightfoot** is their town: the Hall of Moorings (where Mooring-Mistress Qiao keeps the roster and is in charge of nothing else), an inn, a tea-house, a chandlery that sells wind by the measure, and the long house of the ark-hands. Master Lie, who rode the wind, is in the street thinking about what his teacher said.
+  - **Zhongbei, the Utmost North**, where Yu the Great lost his way measuring the flood: no wind, no frost, and in the middle Mount Huling, shaped like a jar, with the Divine Spring running from its neck in four streams. **Fourstreams** is under it. One of Yu's surveyors is still there, finishing a line; so is a groom King Mu of Zhou left behind when he remembered his kingdom.
+  - **Gumang, the Country That Sleeps**, where neither sun nor moon reaches: its people sleep fifty days and wake once, and hold that what is done in dreams is done. One of them is awake by turns, in case of fire. The sky there barely keeps the hours.
+  - **Fuluo, the Country That Never Sleeps**, under two lights that never set. An old woman there is looking for a night; she was told as a girl that there is such a thing.
+  - **Nothing of the story is in them**: no lord, no seal, no step. That is deliberate. Every chapter of the thirty-two is walked exactly as it was, and the Far Countries are somewhere to go because they are there. The scales still stand their signs there, the post and the coach run between the two towns, and each is weighed like any town (thirteen now) **once he has stood in it**: until then a town of the Far Countries counts for nothing, so a journey that never takes an ark is weighed in eleven towns exactly as it was.
+- **Who lives upstairs** (`scripts/rooms.gd` `apartments`, `lodgers`). The storey over a house was one loft with a bed and a chest in it, the same in every house, and nobody was ever up there. Now **a storey that people live on is divided into apartments**: a landing where the stairs come up; partition walls of plaster and timber on the centre line of their tile, like the house's own; **a curtained doorway to every room**, as tall as the Great People, the curtain parted and tied back to either post; and in each room what a household has: a bed along the wall, a stove, a table with a stool at it, a chest, a window on the outer wall, and by lot a cradle, a bronze mirror and a clothes stand, or a spinning wheel. **Somebody lives in every one**, stands in their own room, and has their own things to say about the stove, the neighbours and the third tread of the stairs. It is so over houses, shops, tea-houses, smithies and stills, and an inn's upper storey is guest rooms laid out the same way with a lodger in each: **39 storeys, 89 apartments, 85 people at home**. Every tile of every floor can still be walked to and every piece of furniture still has floor beside it (the tests walk them all). Floors the story wrote by hand are as they were.
+- **Everything that shares ground, looked for again, as drawn** (`scripts/clash.gd`). The audit of the Answering Land release checked what stands on a tile. This release ran a second one over **everything that is drawn** (furniture as it is built, the camps, the junks, the paving of the roads, the scatter, the lords at the size they are shown) and found thirteen kinds of thing sharing ground that the first could not see. Eleven are mended, all of them where the thing is drawn (nothing left its tile):
+  - **105 pieces of furniture were drawn metres from the tile they stand on.** A house let out by a tile or two kept what was written against its old wall, and a "wall piece" was drawn at whichever wall was nearest however far away: a shelf five metres from where it blocked the floor, a statue off its altar. A piece is drawn within a tile of where it stands now.
+  - **Every bed was a third of a metre inside the wall** (92 of them), every shrine's statue stuck out through the back of it, and in **every cellar** the shelves stood in the stone and the hollow panels were wholly inside it, so that the one secret thing in a cellar could not be seen. A bed lies along its wall; a cellar's furniture is set against the face of its wall, not the middle of it.
+  - **309 lanterns hung at the height of a man's chin over floor that is walked on**, and one of the Great People walked through all of them. They hang over heads.
+  - **Springs, steles, sealed caves and the Jianmu's ladders were taken to be the size of a dropped coin**, and **a lord half the size it is drawn**. They are measured from their models now, like everything else; three lords that then stood in what had been put beside them are drawn a little narrower, and the cairn on a summit takes the corner furthest from whoever stands there.
+  - **325 rocks, bushes, stumps and logs lay on the paving of the high road**, which is laid beside the grid and so was scattered over like any open ground; and a camp's lean-to had bushes growing through it. Nothing is scattered on the road or through a camp.
+  - **The junk at Yanggu lay two metres up the beach**: her mooring was measured with her length north and south and she was then turned any way at all. And **the packs of the wild ranged through house walls, over water and into the rock of caves**; a pack keeps to the ground it has.
+  - **Fifty people were sent to stand in things**: seventeen soldiers of the Drum Tower in a jar, the cook of every camp of the road in the cooking pot, a hermit in a cairn. The day of the people of the towns is laid out on the grid, where all of these are a tile; somebody who has stopped is now drawn a step clear of what is drawn there (`Clash.step_clear`), and where they are for everything else is the day's own.
+  - **Five pieces of furniture had their backs to a wall since opened into a wing** (a stove, a bed, a cabinet); each has a standing screen behind it. And a milestone stood a hand inside the tile beside the road, in the plinth of three houses; it stands on the kerb.
+  - **What is left, and why.** The high road is still paved under the mouths of fifteen caves and closer to ten lords than their models allow: mending that means laying the road again, which moves where a coach, a junk and an ark set him down. And a lord stood on the flank of a peak still stands level while the rock rises under one side of it. Both are in the audit's report and neither is in a test yet.
+- **Thirteen plot holes and eleven bugs fixed, and eleven kinds of overlap mended**, found by three audits run beside the work (of the story, Parts XXIV to XXXII and everything written across them; of the smaller systems of the last ten releases; and of everything drawn); see [Bugs found and fixed](#bugs-found-and-fixed).
+- **Nothing older moved.** Every entity, peak and camp of the four older realms was dumped from this build and the last and compared: nothing that stands in the land is anywhere else. What differs is on the floors rooms.gd lays out: the furniture of the divided storeys, the 59 people living on them (26 more live upstairs in the Far Countries), and the drying racks that now hang against a wall.
+- **The whole game** is 1 minute 5 seconds shorter than the last release, verified by the playthrough bot (39:16:05 against 39:17:10): the Far Countries are not on the story's road, and the bot fights the same 2,772 battles against the same 5,546 foes. The difference is words: the lines the plot holes rewrote, most of them shorter, and one echo more that is heard; from there the clock runs a minute differently, and one thing the last run came on by chance at midnight on a summit this one does not. CI still requires **16 hours**.
+- **Code**: the game's GDScript is 85,219 lines (83,580 before) and the Blender Python is as it was; no asset was rebuilt (the people of the Far Countries wear the bodies of the towns, and an ark is built from code like a junk). The tests now make 64,283 checks.
+
+### Previous release: the body measured against a reference and re-sculpted, courtship after the question and Part XXXII
 
 ```mermaid
 flowchart LR
@@ -110,7 +186,7 @@ flowchart LR
 - **Code**: the game's GDScript is 83,580 lines and the Blender Python 31,637; all 352 assets (274 people, 42 monsters, two mounts, 26 props and 8 weapons) were rebuilt and pass the asset checks. The tests now make 62,497 checks.
 
 
-### Previous release: a people twice a man's height, houses built for them, a face earned by the Way, close-ups and Part XXXI
+### Two releases ago: a people twice a man's height, houses built for them, a face earned by the Way, close-ups and Part XXXI
 
 ```mermaid
 flowchart LR
@@ -178,7 +254,7 @@ flowchart LR
 - **The bot** asks two of the Great People of Landfall which door they came in by, carries four beams to a carpenter, and passes the Hour by them.
 - **Code**: the game's GDScript grew to 82,756 lines and the Blender Python to 31,042 (`giants.gd`, `visage.gd` and `closeup.gd` are new); all 347 assets (269 people, 42 monsters, two mounts, 26 props and 8 weapons) pass the asset checks. The tests now make 60,987 checks.
 
-### Two releases ago: anybody can be killed and somebody answers for it, forbidden Daos, a wild that can be hunted out and Part XXX
+### Three releases ago: anybody can be killed and somebody answers for it, forbidden Daos, a wild that can be hunted out and Part XXX
 
 ```mermaid
 flowchart LR
@@ -250,7 +326,7 @@ flowchart LR
 - **The bot** draws on nobody, leaves the shelf shut and is wanted nowhere, so it passes the Sentence "by a clean name"; its report now says what all its hunting did to the land (nine countries thinned at one time or another, none hunted out, none barren, and every one in balance again by the end).
 - **Code**: the game's GDScript grew to 81,404 lines and the Blender Python to 30,829 (`crime.gd`, `taboo.gd` and `wilds.gd` are new); all 340 assets (262 people, 42 monsters, two mounts, 26 props and 8 weapons) pass the asset checks. The tests now make 59,333 checks.
 
-### Three releases ago: an almanac, the Way he walks, picky households and Part XXIX
+### Four releases ago: an almanac, the Way he walks, picky households and Part XXIX
 
 ```mermaid
 flowchart LR
@@ -319,7 +395,7 @@ flowchart LR
 - **The bot** puts three houses of Qingshi to rights (sending out for what each wants), carries green timber to a householder who will not use it, lays four shingles before a fire, climbs to look at a town a crane no longer knows, flies ten tiles as he flew, looks again at four things it left standing, carries four pieces of gold back to a furrow, puts three houses of Yanggu to rights, shows six rooms to a man who asked where he belongs, and tells Guan Ning to leave the mat whole. Its own Way is told as it goes: a **Carefree Wanderer** by the fourteenth hour (the wide world is behind most of what it answers, it changes Daos, and it strikes packs in their sleep), struck from the stipend by midwinter; back in the middle once Guiyun is built; and a **Benevolent Wayfarer** when the sixth house is put to rights.
 - **Code**: the game's GDScript grew to 78,992 lines and the Blender Python to 30,765 (`almanac.gd`, `creed.gd` and `fitting.gd` are new); all 336 assets (258 people, 42 monsters, two mounts, 26 props and 8 weapons) pass the asset checks. The tests now make 57,394 checks.
 
-### Four releases ago: how the towns stand, the work of the towns, nothing sharing ground and Part XXVIII
+### Five releases ago: how the towns stand, the work of the towns, nothing sharing ground and Part XXVIII
 
 ```mermaid
 flowchart LR
@@ -410,7 +486,7 @@ flowchart LR
 - **The bot** cuts the general's grass, climbs to look for whoever ties it, asks the hunters of the road, lays five knots in front of Du Hui, carries yellow flowers to a boy, flies ten tiles to show a sparrow how, lays four rings before an owl, catches carp for bait, stands in front of the third scourge, **gives to the chests of three towns**, calls on five people whose lives turned on an answer, and tells an old man that a kindness is owed to the next stranger. Its report: **PASS**, 33:49:41 of game time, 2,310 battles and one death.
 - **Code**: the game's GDScript grew to 77,035 lines and the Blender Python to 30,701 (`weal.gd` and `clash.gd` are new); all 332 assets (254 people, 42 monsters, two mounts, 26 props and 8 weapons) rebuild from their scripts, the nine models of the party with ten more clips. The tests now make 56,096 checks.
 
-### Five releases ago: what things weigh, the work of the hands and Part XXVII
+### Six releases ago: what things weigh, the work of the hands and Part XXVII
 
 ```mermaid
 flowchart LR
@@ -479,7 +555,7 @@ flowchart LR
 - **The bot** fells its three trees, carries eight stems to Tao Kan five at a time (never more than its back takes at its own pace), cuts stone for the footings and the kiln three blocks at a time, walks eight sacks of charcoal up the mountain to Smith Tie on its own feet (two hundred jin is more than its flying barque will lift, and it knows it), takes a sack to five hearths, cuts herbs for the temple's pot, catches five carp for Budai, picks the sack up again, and goes to look at what it set down. Its report: **PASS**, 32:36:20 of game time, 2,234 battles and one death.
 - **Code**: the game's GDScript grew to 75,054 lines and the Blender Python to 30,333 (`load.gd`, `toil.gd` and `burden.gd` are new); all 327 assets (249 people, 42 monsters, two mounts, 26 props and 8 weapons) rebuild from their scripts. The tests now make 50,438 checks.
 
-### Six releases ago: bodies under the clothes, thirty-two monsters re-sculpted and Part XXVI
+### Seven releases ago: bodies under the clothes, thirty-two monsters re-sculpted and Part XXVI
 
 ```mermaid
 flowchart LR
@@ -533,7 +609,7 @@ flowchart LR
 | ![the mammals, before and after](docs/screenshots/monsters_mammals.webp) | ![eight heads, before and after](docs/screenshots/monsters_heads.webp) |
 | ![the scaled, shelled and many-legged, before and after](docs/screenshots/monsters_scaled.webp) | ![a soak in the hot spring of Glowcap Vale](docs/screenshots/soak_fungal.webp) |
 
-### Seven releases ago: a town of one's own, a sect to found or take, four more ends and Part XXV
+### Eight releases ago: a town of one's own, a sect to found or take, four more ends and Part XXV
 
 ```mermaid
 flowchart LR
@@ -647,7 +723,7 @@ flowchart LR
 | ![the people of Part XXV: Feng Xuan, the Widow of Mount Tai, Han Song](docs/screenshots/part25_people.webp) | ![the three lords](docs/screenshots/part25_lords.webp) |
 | ![the foes of Part XXV: granary rats, seed-sparrows, thatch-moths, seal-wasps, tally-crows, oxen of the corvee, cock-crowers, dog-thieves, guests nobody asked, disciples, needle-sprites and cranes of the Cold Pine](docs/screenshots/part25_foes.webp) | |
 
-### Eight releases ago: choices that stand in the land, battles that cannot be won, a lived-in world and Part XXIV
+### Nine releases ago: choices that stand in the land, battles that cannot be won, a lived-in world and Part XXIV
 
 ```mermaid
 flowchart LR
@@ -698,12 +774,12 @@ flowchart LR
 - **Most of a town is somebody's home, or somebody's office** (`Rooms.USES`). Every storey of every building has a use, and it is the use such a building has: a shop is a shop, with **offices** (the counting room) over it and **the family's home** on top; an inn has rooms to let and the innkeeper's own above them; a hall or a library has offices over it; a house is a home on every floor. Of the 273 storeys in the land, **144 are homes and 52 are offices** (the rest are the shops, inns, tea-houses, workshops, halls, libraries, shrines and store-rooms themselves). Coming in at a door says so: "Qiao's Needle and Thread: three storeys: a shop, offices above, somebody's home at the top".
 - **Each people's town builds its own way** (`Arch.DRESS`). The land has twelve towns of ten peoples, and they were built of the same nineteen kinds of house in the same colours. Now a building takes, over its own style, **the dress of the country it stands in**: its colours are blended most of the way towards the country's, so that a shop is still told from a shrine, and where the country has a roof of its own it takes that. **Shazhou**, of the Sweet-Well Hearth: sun-dried brick the colour of the dunes, **flat roofs** on poles whose ends stand out of the wall, a parapet, **a turquoise dome** and an awning on four poles to sleep under. **Longmen**, of the Boat Hearth: whitewash over black-tarred timber and blue-grey tiles, gabled against the river wind. **Tushan**, of the Casting Hearth: fired brick, black tiles, bronze on everything and **a chimney on every roof**. **Yanggu**, of the Lantern Hearth: pale gold plaster, vermilion posts, red roofs and **a row of small lanterns under every eave**. Qingshi, Cloudfoot and the sect keep the cream plaster and grey tile they had. And the towns of the other realms: **Featherfall** white under sky-blue tiles, **Tearwater** sea-green with coral posts and windows lit like the inside of a shell, **Youdu** slate under black roofs with **windows lit a cold blue**, **Landfall** whitewashed and gabled against the sea. A shrine or a hall keeps its own roof wherever it stands.
 - **People indoors** (`Rooms.residents`). The people of the towns lived in the streets; a house was furniture and, here and there, somebody the story had put in it. Now **215 people are found indoors**, one to three a house by how much room it has and what its ground floor is used for: a grandmother at home ("Three generations under this roof and one stove. We manage. We shout, but we manage"), a clerk in an office ("Everything in this town is written down twice, and one of the two is always wrong. I am paid to find out which"), a shop-hand ("I may tell you the price. I may not tell you the real price"), a lodger at the inn who came for one night in the third month, a copyist, a journeyman, an acolyte. Each wears a body of the country (the Feathered Folk in Featherfall, shades in Youdu), greets as its hearth greets, and can say what the house is, storey by storey. They stand where nobody needs to get past: with them in the room every tile of it can still be walked to, and so can whoever the story put there.
-- **Who is in charge** (`scripts/offices.gd`, new). The land had one elder, six keepers of hearth fires and a notice board, and was run, as far as anybody could see, by nobody. Now **fifteen people answer for the sect and the towns of ten regions**, each found in the building their office is kept in. Under the Elder the sect has its **hall masters**: Shen of Discipline ("the Elder forgives. Somebody has to keep the list of what was forgiven"), Du of the Outer Court, and Treasurer Bao, who pays the tofu-seller first. **Headman Luo** of Qingshi sits in the Drum Tower ("nobody voted for the drum. It arrived, and then we needed a tower to keep it in"); **Postmaster Ge** at Cloudfoot; **Samira, Reeve of the Sweet Well**, at Shazhou ("the caravan-masters think they rule Shazhou. They rule the road. The road ends at my rope"); **Harbour-Master Zeng** at Longmen; **Guild-Mistress Hu** of the Founders at Tushan; **Market-Warden Shu** at Yanggu; a roost-speaker for the Feathered Folk, a pearl-reeve at Tearwater, a registrar of arrivals in Youdu ("name, village, and what you died of. No? Then you are a visitor, and that is the other book, which is very much thinner") and a harbour-reeve at Landfall.
+- **Who is in charge** (`scripts/offices.gd`, new). The land had one elder, six keepers of hearth fires and a notice board, and was run, as far as anybody could see, by nobody. Now **fifteen people answer for the sect and the towns of ten regions**, each found in the building their office is kept in. Under the Elder the sect has its **hall masters**: Shen of Discipline ("the Elder forgives. Somebody has to keep the list of what was forgiven"), Du of the Outer Court, and Treasurer Bao, who pays the tofu-seller first. **Headman Luo** of Qingshi sits in the Drum Tower ("nobody voted for the drum. It arrived, and then we needed a tower to keep it in"); **Station-Master Ge** at Cloudfoot; **Samira, Reeve of the Sweet Well**, at Shazhou ("the caravan-masters think they rule Shazhou. They rule the road. The road ends at my rope"); **Toll-Master Zeng** at Longmen; **Guild-Mistress Hu** of the Founders at Tushan; **Market-Warden Shu** at Yanggu; a roost-speaker for the Feathered Folk, a pearl-reeve at Tearwater, a registrar of arrivals in Youdu ("name, village, and what you died of. No? Then you are a visitor, and that is the other book, which is very much thinner") and a harbour-reeve at Landfall.
 - **The Son of Heaven and the Empress** keep court in the Cauldron Hall of Tushan, because whoever holds the Nine Cauldrons holds the Mandate and nobody has wanted them moved. "We reign. The hearths rule. It was explained to our great-grandfather with great courtesy by six old women, and no Son of Heaven has had to raise a tax or an army since." A king sends one shell a year, the horse-folk one foal, the founders their best bell and their worst; the throne sends back a calendar ("it is the one thing a throne is for: somebody must say what day it is"). The Empress knows where the seal is kept, which of the nine cauldrons leaks, and what the founders are owed for the roof.
 - **Jobs in town** (`Offices.TRADES`). Whoever is found indoors will take a pair of hands for a shift at the trade of the house: **wash pots at an inn, mind a shop counter, copy registers in an office, work the bellows in a workshop, carry the pots round a tea-house, shelve in a library, sweep a shrine's court, carry messages for a hall, chop wood for a household, stoke a bath-house**. A shift takes two to four hours of the day, pays spirit stones by what the hero's realm is worth to the town (never a fortune: a day of shifts is a fraction of an hour on the road), is thanked at the town's hearth the first time, and can be had once a day in each town, by daylight. "Not today" is the first answer; nothing in the story asks for a shift, and the bot never works one. Two feats: **A Day's Wage** and **Jack of Six Trades**.
 - **A trade is a career** (`Offices.RANKS`, `CAREERS`). Every trade has **five places**, reached by shifts worked at it in any town: at three shifts, eight, sixteen and thirty. A copy-hand becomes an under-clerk, a clerk, a senior clerk and at last a registrar; a bellows-hand an apprentice, a journeyman, a foreman, a master of the craft; a pot-washer ends as keeper of the house and a pot-carrier as tea master. **Each rise pays more** (a quarter more, then 1.6, 2 and 2.6 times a day-hand's wage) and is told when it comes ("You are given your own hook for your coat. The work goes quicker now: you no longer have to be told any of it"). **From the third place a shift is an hour shorter.** **From the fourth the hero is on the books**: a salary of half a day's wage for every day away, up to five, is waiting at that house whenever the road lets them come back. At the top "they have had a small sign painted. It has your name on it, spelled wrong." The offer of a shift says where one stands and how far the next place is. Two more feats, **A Hook for Your Coat** and **A Sign with Your Name on It**; and the top of any career still pays less in a shift than twenty beaten foes, so that nobody need count pots to reach the next realm.
 - **Water keeps off the houses** (`Rooms.dry`). A pond lapped at the podium of the Green Stone Inn, and the ground under two houses lay lower than the water beside them. No water now lies within two tiles of any wall, or of a wing's.
-- **Carriages that seat four to six** (`Fashion.RIDES`, kind `carriage`). Every ride so far carried two: the hero, and Yue Ling behind. Now there are **three things on wheels**, each built from code with wheels that turn and something in the shafts, and everybody aboard sits: the **Two-Wheeled Ox-Cart** of Qingshi (four seats under a straw awning, turnips behind, 6,000 spirit stones from Headman Luo, and the ox sees no reason to hurry), the **Caravan Wagon of the Sand Road** (six seats, a hooped tilt of red felt, water-skins along the sides and a pair of horses, 25,000, from Samira at Shazhou) and the **Post-Carriage of Cloudfoot** (red lacquer on leather springs under a bowed roof with a lantern at each corner: two on the box and two inside behind the lattice, a pair in the pole, 40,000, from Postmaster Ge). With a seat free, **somebody at an inn, a tea-house or a shop will ask to be driven to another town** and climbs up behind; the fare (by the distance and the hero's realm) is paid when the carriage comes into their town, and they ride there in their seat, in the world, the whole way. Two feats: **Room for One More** and **The Regular Coach**. No step asks for any of it, and the bot buys no carriage.
+- **Carriages that seat four to six** (`Fashion.RIDES`, kind `carriage`). Every ride so far carried two: the hero, and Yue Ling behind. Now there are **three things on wheels**, each built from code with wheels that turn and something in the shafts, and everybody aboard sits: the **Two-Wheeled Ox-Cart** of Qingshi (four seats under a straw awning, turnips behind, 6,000 spirit stones from Headman Luo, and the ox sees no reason to hurry), the **Caravan Wagon of the Sand Road** (six seats, a hooped tilt of red felt, water-skins along the sides and a pair of horses, 25,000, from Samira at Shazhou) and the **Post-Carriage of Cloudfoot** (red lacquer on leather springs under a bowed roof with a lantern at each corner: two on the box and two inside behind the lattice, a pair in the pole, 40,000, from Station-Master Ge). With a seat free, **somebody at an inn, a tea-house or a shop will ask to be driven to another town** and climbs up behind; the fare (by the distance and the hero's realm) is paid when the carriage comes into their town, and they ride there in their seat, in the world, the whole way. Two feats: **Room for One More** and **The Regular Coach**. No step asks for any of it, and the bot buys no carriage.
 
   | | |
   |---|---|
@@ -780,7 +856,7 @@ flowchart LR
 | ![Shazhou Oasis: flat roofs of sun-dried brick, turquoise domes and awnings](docs/screenshots/town_shazhou.webp) | ![Tushan: fired brick, black tiles and bronze](docs/screenshots/town_tushan.webp) |
 | ![the Green Stone Inn of Qingshi from above: four storeys, and a gabled wing built out from its end](docs/screenshots/house_village_inn.webp) | ![a house with a wing, from above](docs/screenshots/house_village_teahouse.webp) |
 
-### Nine releases ago: music from code, a host and field battles, more to wear, feats and finds, a bigger Qingshi and Part XXIII
+### Ten releases ago: music from code, a host and field battles, more to wear, feats and finds, a bigger Qingshi and Part XXIII
 
 ```mermaid
 flowchart LR
@@ -896,7 +972,7 @@ flowchart LR
 | ![Yue Ling's page: where the two of them stand, gifts given and hours had](docs/screenshots/yue_courtship_page.webp) | ![something for Yue Ling: twelve gifts, and what she made of each](docs/screenshots/gifts_choice.webp) |
 | ![an hour with Yue Ling: ten, each in its own kind of place and hour](docs/screenshots/outings_choice.webp) | ![an hour on the nine hundred and ninety-nine steps](docs/screenshots/outing_steps.webp) |
 
-### Ten releases ago: mountains in every region, climbing, the cloud-kite, the people of the road and Part XXII
+### Eleven releases ago: mountains in every region, climbing, the cloud-kite, the people of the road and Part XXII
 
 
 ```mermaid
@@ -972,7 +1048,7 @@ flowchart LR
 | ![the foes of Part XXII: salt-thieves, false echoes, night-fire crabs, stray gusts, kite-hawks, leaking wind-bags, red leopards, fig-leaf creepers, rain-calling gibbons, steles of somebody's merit, smokes of announcement and serpents of the eighteen bends](docs/screenshots/part22_foes.webp) | ![a trial passed by the heights: nine summits, and nothing to report to the Lord of the Eastern Peak](docs/screenshots/trial_by_the_heights.webp) |
 | ![the last crossroads of Part XXII: what a summit is for](docs/screenshots/crossroads_tops.webp) | ![the Lord of the Eastern Peak at his desk on the very top of Sun-Viewing Peak](docs/screenshots/dongyue_on_the_peak.webp) |
 
-### Eleven releases ago: faces that show what they feel, the Eight Arms, twelve ends and Part XXI
+### Twelve releases ago: faces that show what they feel, the Eight Arms, twelve ends and Part XXI
 
 
 ```mermaid
@@ -1048,7 +1124,7 @@ flowchart LR
 
 **Where the chapter comes from.** Ou Yezi and the five swords he cast for the King of Yue (Zhanlu, which left an unjust king in the night and went by water to another) are in the *Yuejue shu*; Gan Jiang and Mo Ye, the pair of swords named for a smith and the wife who went into the furnace, are in the *Wu Yue Chunqiu*, and the *Book of Jin* has them leap from a belt into the river at Yanping Ford as two dragons. The Maiden of Yue, who taught an army ("inside, be full of spirit; outside, show calm: look like a mild woman, strike like a frightened tiger") and met the old man in white who went up a tree an ape, is in the *Wu Yue Chunqiu* too. Ji Chang, who lay under a loom to learn not to blink, looked at a louse until it was a cartwheel, tried to kill his teacher and met his arrows in the air, is in the *Liezi*; that he ended by forgetting what a bow was is Nakajima Atsushi's telling of it. King Wen of Zhao, his three thousand swordsmen and the three swords are the *Zhuangzi*'s Discourse on Swords, whose last line is that the swordsmen all killed themselves, which the chapter declines to take for a happy ending; the cock of wood is the *Zhuangzi*'s as well. King Helu's three thousand swords under Tiger Hill and the white tiger on the mound are the *Yuejue shu* again, and the snake in the cup that was the shadow of a bow is the *Fengsu tongyi*. "Arms are instruments of ill omen" and "the best fighter is not angry" are the *Daodejing*, 31 and 68.
 
-### Twelve releases ago: voxel caves under every region, twice the room indoors and Part XX
+### Thirteen releases ago: voxel caves under every region, twice the room indoors and Part XX
 
 *(This release's notes were not written into the README at the time; they are summarised here from its commit.)*
 
@@ -1062,7 +1138,7 @@ flowchart LR
 |---|---|
 | ![the Cave of Ten Thousand Echoes](docs/screenshots/cave_karst_chamber.webp) | ![a trial passed by the dark](docs/screenshots/trial_by_the_dark.webp) |
 
-### Thirteen releases ago: smaller and faster, crossroads that echo, the Hundred Works, the hours of the wild and Part XIX
+### Fourteen releases ago: smaller and faster, crossroads that echo, the Hundred Works, the hours of the wild and Part XIX
 
 ```mermaid
 flowchart LR
@@ -1176,7 +1252,7 @@ flowchart LR
 
 **Where the chapter comes from.** The old gardener is in the *Zhuangzi* (the chapter Heaven and Earth): Zigong, travelling south of the Han, sees an old man watering his garden with a pitcher carried up out of a tunnel, tells him of the well-sweep that waters a hundred plots a day, and is told: where there are machines there will be machine affairs, and where there are machine affairs there will be a machine heart; "it is not that I do not know of it: I would be ashamed to use it." Gongshu Ban (Lu Ban) and Mozi are in the *Mozi*: the cloud ladder built for Chu to take Song, the ten days and nights' walk, the belt for a wall and the slips of wood, nine assaults turned on a tabletop; and the wooden magpie that flew three days, of which Mozi said a linchpin was worth more. Yan Shi and the dancer who winked at King Mu's ladies, taken apart to show it was leather, wood, glue and lacquer with a heart that made it speak, are in the *Liezi*. Cook Ding, whose knife was not sharpened in nineteen years ("what your servant cares about is the Way, which goes beyond skill"), and Wheelwright Pian, who could not teach his son the trick of it, are in the *Zhuangzi* again. The chapter does not decide between them: the last question has four answers, and the makers are still arguing at the end.
 
-### Fourteen releases ago: faces towards life, six hearths, a hero of either sex and Part XVIII
+### Fifteen releases ago: faces towards life, six hearths, a hero of either sex and Part XVIII
 
 ```mermaid
 flowchart LR
@@ -1241,7 +1317,7 @@ flowchart LR
 
 **What the hearths are made from.** None of the six is one living people. Each is put together from old customs of the lands the story's myths come from: *zuan sui gai huo*, the changing of the fire with the seasons recorded in the Zhou li and the Analects (elm and willow in spring, jujube and apricot in summer, mulberry at the turn, oak in autumn, sophora in winter), and the cold food that went with it; "have you eaten?" as a greeting, and chopsticks never stood in the rice; the boat-dwelling families of the southern rivers, the fire that goes aboard with the bride and the fish that is never turned over; the hearth-ring of the felt tent, the threshold not stepped on, the bowl taken with the right hand and the youngest son as keeper of the fire; bread torn and never cut, and water before words, along the oasis roads; and "the firewood burns out, the fire is passed on" from the Zhuangzi, which gives the new realm its name. Suiren, Zhurong and Huilu are the Fire-Driller, the Fire Regulator and the fire that visits uninvited of the old books.
 
-### Fifteen releases ago: anime faces and bodies, the sword's wake and Part XVII
+### Sixteen releases ago: anime faces and bodies, the sword's wake and Part XVII
 
 ```mermaid
 flowchart LR
@@ -1315,7 +1391,7 @@ The anime look was researched from published material on gacha-game characters (
 - **Physics**: a felled tree falls as a rod pivoting on its base (the physical pendulum, I = mL^2/3), integrated once per tree; Godot's rigid bodies and height-field shapes for the pieces.
 - **Part XVII**: [Lichun](https://en.wikipedia.org/wiki/Lichun) and the whipping of the Spring Ox; [Gou Mang](https://en.wikipedia.org/wiki/Goumang), god of spring and wood; [Jingzhe](https://en.wikipedia.org/wiki/Jingzhe), the Waking of Insects, and the beating of the petty people under bridges ([Da Siu Yan](https://en.wikipedia.org/wiki/Villain_hitting)); [Longtaitou](https://en.wikipedia.org/wiki/Zhonghe_Festival), the day the dragon raises its head, and its haircuts; [Leigong](https://en.wikipedia.org/wiki/Leigong); [Qingnü](https://zh.wikipedia.org/wiki/%E9%9D%92%E5%A5%B3), goddess of frost and snow; [Taisui](https://en.wikipedia.org/wiki/Tai_Sui) and asking his pardon before digging; the five poisons ([Wu Du](https://en.wikipedia.org/wiki/Five_poisons)); [Mingqian tea](https://en.wikipedia.org/wiki/Longjing_tea) picked before Qingming; [Qingming](https://en.wikipedia.org/wiki/Qingming_Festival), its willow, its tomb-sweeping and its kites.
 
-### Sixteen releases ago: day and night, the people of the towns, things that break and Part XVI
+### Seventeen releases ago: day and night, the people of the towns, things that break and Part XVI
 
 ```mermaid
 flowchart LR
@@ -1367,7 +1443,7 @@ flowchart LR
 - **Code**: the game's GDScript grew from 44,004 to 47,498 lines (`scripts/clock.gd`, `scripts/folk.gd` and `scripts/havoc.gd` are new) and the Blender Python from 21,542 to 21,984 lines: 22 commoners, the Kitchen God and the two door gods are new characters, six new clips, and Lin Feng (all four looks) and Yue Ling are rebuilt with them. The tests grew from 1,879 to 2,132 lines (22,603 checks).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### Seventeen releases ago: Yue Ling's own story, more to do and Part XV
+### Eighteen releases ago: Yue Ling's own story, more to do and Part XV
 
 ```mermaid
 flowchart LR
@@ -1429,7 +1505,7 @@ flowchart LR
 | ![the hermitage's moon gate](docs/screenshots/hermitage_gate.webp) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.webp) |
 | ![the moths that eat forgetting](docs/screenshots/battle_forgetting.webp) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.webp) |
 
-### Eighteen releases ago: fates and faces, outfits, rides and Part XIV
+### Nineteen releases ago: fates and faces, outfits, rides and Part XIV
 
 ```mermaid
 flowchart LR
@@ -1505,7 +1581,7 @@ flowchart LR
 
 ![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.webp)
 
-### Nineteen releases ago: many roads, crafting, renown and Part XIII
+### Twenty releases ago: many roads, crafting, renown and Part XIII
 
 ```mermaid
 flowchart LR
@@ -1628,7 +1704,7 @@ Background for that release (the Eight Gates, Chiyou and the war at Zhuolu):
 - **The Eight Gates**: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death of [Qimen Dunjia](https://en.wikipedia.org/wiki/Qimen_Dunjia), taught to the Yellow Emperor by the Mysterious Lady of the Nine Heavens, laid on the eight trigrams ([Bagua](https://en.wikipedia.org/wiki/Bagua)); the "Eight Gates Golden Lock" formation of the *Romance of the Three Kingdoms*, which falls when it is entered by the right gate.
 - **Wang and Liang, Chi and Mei**: the goblins of the mountains, old things and waters that fought in Chiyou's host.
 
-### Twenty releases ago: realms and talents that matter, cutscenes and Part XII
+### Twenty-one releases ago: realms and talents that matter, cutscenes and Part XII
 
 ```mermaid
 flowchart LR
@@ -1708,7 +1784,7 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 - **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
 - **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
 
-### Twenty-one releases ago: three realms, six Daos, six peoples and Part XI
+### Twenty-two releases ago: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -1807,7 +1883,7 @@ Background for this release (the myths of the Jianmu and the realms, the Daos an
 - **The peoples**: the Feathered People, the Deathless (black-skinned people who eat of the immortal tree) and the dragon-kin in the *Classic of Mountains and Seas*; the Jiaoren, whose tears turn to pearls, in the *Bowuzhi* and Gan Bao's *Soushen Ji*; celestial foxes who climb to heaven at a thousand years ([huli jing](https://en.wikipedia.org/wiki/Huli_jing)).
 - **The bosses**: [Leigong](https://en.wikipedia.org/wiki/Leigong), Duke of Thunder; Feilian, Earl of the Wind; Kui, the one-legged thunder ox of the *Classic of Mountains and Seas*; Jiufeng, the nine-headed bird of Chu; [Pixiu](https://en.wikipedia.org/wiki/Pixiu); Shentu and Yulei, the door gods under the peach tree ([Menshen](https://en.wikipedia.org/wiki/Menshen)); [Zhulong](https://en.wikipedia.org/wiki/Zhulong_(mythology)), the Torch Dragon whose open eye is day; Wangxiang, the water goblin; [Heibai Wuchang](https://en.wikipedia.org/wiki/Heibai_Wuchang), Black and White Impermanence.
 
-### Twenty-two releases ago: an organic continent, four towns and Part X
+### Twenty-three releases ago: an organic continent, four towns and Part X
 
 ```mermaid
 flowchart LR
@@ -1864,7 +1940,7 @@ Background for this release (the techniques behind the new map, cartography and 
 - **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
 - **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
 
-### Twenty-three releases ago: hanfu characters, five-colour monsters and Part IX
+### Twenty-four releases ago: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -1944,7 +2020,7 @@ Researched for that release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Twenty-four releases ago: rebuilt models and Part VIII
+### Twenty-five releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -1997,7 +2073,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Twenty-five releases ago: one open world and Part VII
+### Twenty-six releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -2031,7 +2107,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Twenty-six releases ago: natural landscapes and Part VI
+### Twenty-seven releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -2253,8 +2329,10 @@ Walk into NPCs, enemies, pickups, stairs and bosses to interact with them; walk 
 - **Crafting**: every foe may leave an essence of its element (bosses always do); Alchemist Mo's cauldron and Smith Tie's forge make 29 talismans, lenses, seals, inks, mirrors and elixirs from essences, things found on the quests and spirit stones.
 - **Renown and deeds**: bosses, trials and gifts raise your renown, and so do 28 deeds, requests from townsfolk all over the world; seven titles from Unknown to Legendary, and every respect path asks for a name earned by helping people.
 - **Turn-based combat** with qi-costed techniques, elemental weaknesses (fire / water / wood / earth / thunder / dark), pills, a healer companion (Yue Ling) and boss heavy attacks.
-- **Fifty regions in four realms**: forty-two on a continent within the Four Seas, two in the Nine Heavens above it, two in the Nine Springs below it and four on the Isles of the Eastern Sea out past its shelf, each with elites, bosses and a hunt objective, joined by winding roads, the Jianmu and Mazu's boat, and **eleven towns** (the sect, Cloudfoot, Qingshi Village, Yanggu, Shazhou Oasis, Longmen, Tushan, Featherfall, Tearwater, Youdu and Landfall). **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon. **Part X**: Longmen, the Dragon Gate Ferry; the Drowned Fields of Gun; Tushan, the Town of the Cauldron-Casters; and Mount Buzhou, the Broken Pillar. **Part XI**: Juntian, the Level Heaven, and Changhe, the Gate of Heaven, in the Nine Heavens; the Nine Springs beneath the Roots and Youdu, the Dark Capital, in the Nine Springs. **Part XII**: Penglai, the Isle of the Immortals (Landfall); Fangzhang, the Square-Pot Isle; Yingzhou, the Isle of Mists; and Guixu, the Returning Ruins, in the Eastern Sea. **Part XIII**: the Eight Gates, in eight of these regions across all four realms, and the buried field of Zhuolu under the oldest maples of the Maple Gorge. **Part XIV (new)**: the five threads of the journey, settled where their people wait, six grudges that stayed where their owners fell (in the Bamboo Forest, the Crimson Marsh, the Graveyard of Sword Saints, Tushan, Juntian and Guixu), and Nie at the heart of the Wheel of the Six Paths. **Part XVI (new)**: the New Year, in the sect, the bamboo forest, the towns of Qingshi, Yanggu, Cloudfoot, Longmen, Tushan and Shazhou, the Cloud-Tea Terraces, the snows of Frostpeak and the Garden of Immortal Peaches.
+- **Fifty-four regions in five realms**: forty-two on a continent within the Four Seas, two in the Nine Heavens above it, two in the Nine Springs below it and four on the Isles of the Eastern Sea out past its shelf, each with elites, bosses and a hunt objective, joined by winding roads, the Jianmu and Mazu's boat; four more in the Far Countries, which only a spirit ark reaches and where nothing is asked of him; and **thirteen towns** (the sect, Cloudfoot, Qingshi Village, Yanggu, Shazhou Oasis, Longmen, Tushan, Featherfall, Tearwater, Youdu, Landfall, Lightfoot and Fourstreams). **Part I**: the Sect, Whispering Bamboo Forest, Crimson Marsh, Frostpeak Caverns, Thunder Valley and the Blood Moon Palace. **Part II**: the Sunken Dragon Palace, Ashen Volcano, Void Rift Expanse and the Celestial Gate. **Part III**: the Mirror Lake of Echoes, the Graveyard of Sword Saints, the River of Ten Thousand Years and the Origin of the Dao. **Part IV**: the Sea of Clouds Archipelago, the Ruins of the Jade Court, Heaven's Forge and the Garden of Immortal Peaches. **Part V**: the Desert of Fallen Stars, Glowcap Vale, the Aurora Steppe and the Primordial Chaos. **Part VI**: the Maple Gorge of Returning Souls, the Stone Forest of the Nine Bends, the Yellow Springs of Red Lilies and the Wheel of the Six Paths. **Part VII**: Qingshi Village Below the Mountain, the Cloud-Tea Terraces, the Mulberry Silk Woods and the Loom of Borders. **Part VIII**: the Starfall Ferry on the Silver River, the Heights of the Magpie Bridge, the Palace of the Weaver Star and the Jasper Pool of Kunlun. **Part IX**: Yanggu, the Dawn Market; the Scorched Millet Plains; Fusang, the Valley of Sunrise; and Guanghan, the Palace of the Moon. **Part X**: Longmen, the Dragon Gate Ferry; the Drowned Fields of Gun; Tushan, the Town of the Cauldron-Casters; and Mount Buzhou, the Broken Pillar. **Part XI**: Juntian, the Level Heaven, and Changhe, the Gate of Heaven, in the Nine Heavens; the Nine Springs beneath the Roots and Youdu, the Dark Capital, in the Nine Springs. **Part XII**: Penglai, the Isle of the Immortals (Landfall); Fangzhang, the Square-Pot Isle; Yingzhou, the Isle of Mists; and Guixu, the Returning Ruins, in the Eastern Sea. **Part XIII**: the Eight Gates, in eight of these regions across all four realms, and the buried field of Zhuolu under the oldest maples of the Maple Gorge. **Part XIV (new)**: the five threads of the journey, settled where their people wait, six grudges that stayed where their owners fell (in the Bamboo Forest, the Crimson Marsh, the Graveyard of Sword Saints, Tushan, Juntian and Guixu), and Nie at the heart of the Wheel of the Six Paths. **Part XVI (new)**: the New Year, in the sect, the bamboo forest, the towns of Qingshi, Yanggu, Cloudfoot, Longmen, Tushan and Shazhou, the Cloud-Tea Terraces, the snows of Frostpeak and the Garden of Immortal Peaches.
 - **Techniques** for the late game: Abyssal Tide, Meteor Rain, Void Rending Slash, Celestial Judgement, Chrono Severance, Genesis Sword, Ten Thousand Starfall, Ledger-Breaking Stroke, Sky-Mending Sword, Five-Colour Stone Rain, Pillar of Heaven Strike, Six Paths Wheel Slash, Ten Thousand Lantern Rain, Samsara Sword, Seam-Cutting Sword, Thousand-Thread Rain, Boundless Heart Sword, Magpie Bridge Sword, Silver River Torrent, Seventh-Night Reunion Sword, Noon-Splitting Sword, Fall of the Nine Suns, Tenth Arrow Sword, Dragon Gate Leap, Swelling Earth Rampart, Nine Cauldrons Sword, Strike of the Standing Tree, Torrent of the Nine Springs, Three Realms Concord Sword, **Returning Tide Sword**, **Rain over the Five Isles** and **Jingwei's Stone Sword**, plus Yue Ling's Starlight Rain, Dawn Lotus, Seal Bloom, Five-Colour Thread, Nuwa's Mending, Spirit Lantern Ward, Lotus of Rebirth, Silver Silk Snare, Homeward Lantern, Starweave Net, Magpie Wing Ward, Osmanthus Moon Rain, Moon-Dew Ward, Reed-Boat Blossom, River-Mother's Ward, Rain of Phoenix Feathers, Ward of the Standing Tree, **Spray of the Pearl Trees** and **Mazu's Red Lantern** (the reviving heals also raise a fallen ally); and the six **Dao techniques** (Ten Thousand Swords Return to One, Peng's Wind of Ninety Thousand Li, Lotus Heart Sutra, Eight Trigrams Grand Array, Nine-Turn Golden Elixir Fire and Mirror-Flower, Water-Moon), one for each Dao from Adept on.
+- **The spirit arks** (`scripts/arks.gd`): once the sea has come home (the end of Part XII), an ark lies moored in the air over Cloudfoot, Tushan, Featherfall, Landfall, Lightfoot and Fourstreams, and the counter of whoever answers for the town sells a passage to the others he has been to, and to Lightfoot in the Far Countries, to anybody of the Golden Core or above.
+- **Who lives upstairs**: the storey over a house, a shop, a tea-house or a smithy, and an inn's guest rooms, is divided into apartments off a landing, each furnished for a household and each with somebody at home (Enter to talk; a household can be worked for like any other).
 - **Upstairs and down**: 30 upper storeys and cellars, each reached by its stairs, with people, quest scenes and hidden keepsakes; the Jianmu's stairs climb to the Nine Heavens and go down to the Nine Springs, and Mazu's boat sails from Fusang to the isles.
 - **Cutscenes**: conversations over the world play out with gestures (nod, shake, point, wave, laugh, grieve, think, kneel, offer, shock, bow) picked from each line, answered by the listener, and framed by a two-shot conversation camera.
 - **Daos** (Esc > Dao & Peoples): choose one of six roads when the Jianmu grows back and change at any Dao Stele; each has a mastery from Novice to Master, passive powers that grow with it and a technique from Adept on, and the story answers the one you walk.
@@ -2431,7 +2509,7 @@ New creature types built in Blender for Part V: scorpion, mushroom folk, mammoth
 
 ```mermaid
 flowchart TD
-    D[(data.gd: 51 areas,<br/>gates, NPCs, bosses, caves,<br/>buildings, floors, rivers, roads)] --> MG[mapgen.gd: each region's own map<br/>organic outline, river, ponds,<br/>spline roads, A* trails]
+    D[(data.gd: 55 areas,<br/>gates, NPCs, bosses, caves,<br/>buildings, floors, rivers, roads)] --> MG[mapgen.gd: each region's own map<br/>organic outline, river, ponds,<br/>spline roads, A* trails]
     S[atlas.gd SITES: a site and a way<br/>for every region] --> L[layout: maps turned<br/>to face their road]
     MG --> AT[atlas.gd _build]
     L --> AT
@@ -2483,7 +2561,7 @@ The 3D view builds a region when the player comes within 46 tiles of the boundin
 
 ## Part XXXII: The Broken Mirror
 
-On the fourteenth of the first month a pedlar comes up the nine hundred and ninety-nine steps crying half a bronze mirror at ten times the price of a whole one, and looks relieved when he is refused. It is an old signal: two people parted in a hurry break a thing between them, and one cries it at market until the other hears. This half has been cried nine years. The chapter goes to the clerk who ties every marriage in the land and has never seen what is done with the knot, and then to three couples parted by things that could count (a king's seal, an hour, a tally of yards) before it comes to the two halves, which no longer meet.
+On the seventh of the first month a pedlar comes up the nine hundred and ninety-nine steps crying half a bronze mirror at ten times the price of a whole one, and looks relieved when he is refused. It is an old signal: two people parted in a hurry break a thing between them, and one cries it at market until the other hears. This half has been cried nine years. The chapter goes to the clerk who ties every marriage in the land and has never seen what is done with the knot, and then to three couples parted by things that could count (a king's seal, an hour, a tally of yards) before it comes to the two halves, which no longer meet.
 
 ```mermaid
 flowchart LR
@@ -3412,10 +3490,42 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Bugs found and fixed
 
-Found in this release and the last by audits run beside the work (of the story, Parts XXIV to XXXI read against each other and against the courtship; and of the smaller systems), by rendering the undressed figures and looking at them, and by putting a tape round them. The first twenty rows are this release's and by this release's own tests. Each is kept fixed by a test where a test can hold it.
+Found in this release by three audits run beside the work: of the story (Parts XXIV to XXXII read against each other, and against the letters, the echoes and what stands in the land); of the smaller systems of the last ten releases; and of **everything that is drawn**, measured for sharing ground (the audit of the Answering Land release looked at what stands on a tile; this one built the furniture, the camps, the junks, the paving and the scatter and measured them). The first thirty-two rows are this release's. Each is kept fixed by a test where a test can hold it.
 
 | Bug or plot hole | Fix |
 |---|---|
+| **105 pieces of furniture were drawn metres from the tile they stand on**: a house let out by a tile or two kept what was written against its old wall, and a wall piece was drawn at whichever wall was nearest, however far (a shelf five metres from where it blocked the floor, a shrine's statue off its altar) | drawn within a tile of where it stands (`Arch.WALL_REACH`); drying racks, which hang against a wall, are laid out against one |
+| **Every bed was a third of a metre inside the wall**, every shrine's statue stuck out through the back of it, stoves and hearths stood in the plaster | a bed lies along its wall, within its own tile; the others stand clear |
+| **In every cellar the shelves, cabinets and racks stood in the stone, and every hollow panel was wholly inside it**: the one secret thing in a cellar could not be seen. A cellar's walls are 0.9 m thick and its furniture was set against their centre line | set against the face of the wall |
+| **309 lanterns hung at the height of a man's chin over floor that is walked on**; one of the Great People walked through all of them | they hang over heads, on every floor at the height its ceiling allows |
+| **A spring, a Dao stele, a sealed cave and the Jianmu's ladder were all taken to be the size of a thing lying on the ground** (0.3 m; a spring's basin is three metres across), **and a lord was measured at the size of a beast of the packs** though it is drawn nearly twice that, so the audit of shared ground could not see six lords standing in a summit's cairn, or two in what had been laid beside them | measured from what is drawn (`Clash.extent`, `lord_scale`); three lords are drawn a little narrower, and a cairn takes the corner of the summit furthest from whoever stands there |
+| **325 rocks, bushes, stumps and logs lay on the paving of the high road**, which is laid beside the grid and was scattered over like any open ground; and rocks and bushes grew through the lean-to and the woodstack of the camps | nothing is scattered on the road or through a camp (`Clash.stood`) |
+| **The junk at Yanggu lay two metres up the beach**: her mooring is searched for with her length north and south, and she was then turned any way at all | she lies the way the mooring was measured |
+| **The packs of the wild ranged through house walls, over water and into the rock of caves**: a pack wandered as far from its spot as the hour said, whatever stood there | a pack keeps to the ground it has (`World._pack_room`) |
+| **Fifty people of the towns and the road were sent to stand in things**: seventeen soldiers of the Drum Tower in a jar, the cook of every camp in its cooking pot, two townsfolk in the sign a leaning scale had stood where they stop, a hermit in a cairn | somebody who has stopped is drawn a step clear of what is drawn there (`Clash.step_clear`); where they are, for an errand or a word, is unchanged |
+| **Five pieces of furniture stood with their backs to a wall that had since been opened into a wing**, and **milestones stood in the plinths of three houses** | a standing screen behind each; a milestone stands on the road's own kerb |
+| **Roll-Clerk Ning and Cook Zhou, both women everywhere else, were "he" in Part XXXII** (a line of narration, and an echo of the last crossroads) | she |
+| **The three letters of the last crossroads could never arrive.** Each waited three steps after the choice, and the story has two more | they wait one |
+| **"Leave it in two, on one wall", and then each went away with the other's half**: the narration and the Princess's fate contradicted the answer, Xu Deyan's own line beside it, the Elder and her letter | the halves are set a hand apart, as they will hang |
+| **Part XXX dug up the floors of a Blood Moon Palace that one answer of the first crossroads had sealed for ever**, with people at supper over them, and nobody said who (the same hole was closed for Part XXI two releases ago) | Yue Ling says, for either answer |
+| **Two towns had two holders of one office.** "Postmaster Ge of Cloudfoot" answered for a town whose postmaster has been Postmaster Lu since Part X, and "Harbour-Master Zeng of Longmen" for a town with a Harbourmistress, each claiming the other's thirty years | Station-Master Ge and Toll-Master Zeng, with a line each to match |
+| **"She said under the bridge"** on the objective of a hunt; in every line of the scene it was Weisheng who said it, which is the point of the story | "I said under the bridge" |
+| **The pedlar came on the fourteenth of the first month and the mirror was sold on the fifteenth**, with a clerk's roll, a flood and a wall built in between, and "a ring in the dust where a half-circle lay for a week"; and the first month was called winter | the seventh, of the new year |
+| **Fangfeng thanked the Elder for the hero's own words** ("Your elder said I might be as late as I liked"), **Xu Deyan had been eight years in the wrong city** where every other line says nine, and **Lin Feng twice quoted to people what they had only told him in optional chat** | his own words, nine, and lines that follow from the scene |
+| **Part XXXII called the hero "sir" five times and a trial "a man"**, in text that is read to a heroine | nobody does |
+| **Two things that stand spoke of a season that had not come**: a carter "since the spring" of a mat cut in the ninth month, a mender "in the autumn" of a mirror riveted in the first | since the frost; within the month |
+| **A post-bag was paid in full for riding the post-coach or a junk.** A bag pays for the road it is carried over; taken aboard, it paid on the far side several times the fare, for a road nobody had walked (at level 60, Cloudfoot to Tushan: 2,040 stones for a 295-stone seat, three bags at a time, daily). Passengers were mended for exactly this two releases ago; bags were not | whatever carries him carries the post too: his bags are handed over, and the road pays the carrier. So with an ark |
+| **A fare was asked for towns behind seals still closed.** A lodger at Qingshi wanted carrying to Tushan chapters before its road opens, and held a seat until then (the same hole was closed for post-bags) | a fare is for somewhere he has been |
+| **Guiyun's chest paid the past at today's rate**: it was the days since it was emptied times what the town pays *now*, so a market built on the fifth day re-priced the four already gone (5,100 stones became 9,000 at the moment of building) | the days are banked as they pass, at what the town paid then |
+| **What a crossroads made of somebody with a name had a line written for it, and the line was never said**: thirty-five of them. Only the tag under the name was ever read | their second word, and every third after |
+| **The street's words for a walker of the forbidden could never be said**: they came after its words for an outlaw, and somebody marked is always an outlaw. And **two lines of what the small say of the Great People** had no caller at all | the first is asked first; the second is said in any town where the Great People live |
+| **"A quarter more", said whoever kept a dead man's counter, and charged the same** at the dyer's stall, the tailor's and wherever a carriage is sold | a quarter more |
+| **A fate was shown under the name of somebody under a mound** ("Smith Tie, with two apprentices") | not of the dead |
+| **Three of the watch cut down left "Nobody" dead by his hand** on the page of the law, and no word that a clean bill is not a clean name | counted there as everywhere else |
+| **The sacks a haul says to carry on his own feet could be left in the sect's storehouse and taken up in the steward's yard at Guiyun**: the two are one store | what a haul is carrying cannot be left |
+| **The bar of a cold town's doors lay across every open doorway at the height of a chest**, and everybody walked through it | taken down and stood on end by the jamb |
+| Caught in this release's own new code before it shipped: **the towns of the Far Countries were weighed with the rest**, so that what the scales make of him, which is known everywhere, would have left two towns he had never seen "the better for his coming" and finished a step of Part XXVIII early | a town only an ark reaches counts for nothing until he has stood in it |
+| ... and **the bottom room of a divided storey was taken for the landing** wherever the stairs came up beside it, so that nobody lived there and somebody lived on the stairs | the landing is the piece every doorway opens on |
 | **Every undressed figure had two dark pits at the collarbones**, in the hot springs, the wardrobe and the last release's own screenshot: the collarbone was a capsule thinner than the clay's voxel, and tore the skin | drawn as thick as the clay can hold, with the hollow above it filled |
 | **The shin ended in the air above the foot**: there was no ankle, only two small balls for the ankle bones | an ankle, and the tendon down to the heel |
 | **The seat was one mass and a woman's chest one shelf**, hips stood five centimetres too deep, and a waist was round | re-sculpted to a reference figure of each sex: see above |

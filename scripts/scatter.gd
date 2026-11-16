@@ -140,6 +140,17 @@ const ECO := {
 		"ground": [["fern", 1], ["flowers", 0.3]], "land": 0.45, "rocks": ["spire", "boulder", "slab"], "rock_p": 0.14, "grass": 0.6, "cover": 0.1},
 	"guixu": {"canopy": [["kelp", 3], ["dead", 1], ["mangrove", 0.5]], "under": [["kelp", 3], ["deadbush", 1]],
 		"ground": [["kelp", 1]], "land": 0.4, "rocks": ["boulder", "slab", "scree"], "rock_p": 0.1, "grass": 0.2, "cover": 0.05},
+	# ---- the Cloud Keel release: blossom and bonsai pines on the cloud-terraces of Huaxu; peach, ginkgo
+	# and wisteria by the four streams of Zhongbei; crystal trees and cypress in the dusk of Gumang;
+	# acacia, agave and bare rock on the hot ground of Fuluo
+	"huaxu": {"canopy": [["blossom", 3], ["bonsai", 2], ["pine", 1], ["birch", 1]], "under": [["round_bush", 2], ["flowerbush", 1], ["fern", 1]],
+		"ground": [["flowers", 1.2], ["fern", 0.4]], "land": 0.3, "rocks": ["boulder", "slab"], "rock_p": 0.05, "grass": 0.85, "cover": 0.08},
+	"zhongbei": {"canopy": [["peach", 3], ["ginkgo", 2], ["wisteria", 1], ["birch", 1]], "under": [["flowerbush", 2], ["round_bush", 1], ["fern", 1]],
+		"ground": [["flowers", 1.6], ["fern", 0.5]], "land": 0.4, "rocks": ["boulder", "slab"], "rock_p": 0.05, "grass": 0.95, "cover": 0.1},
+	"gumang": {"canopy": [["crystal_tree", 2], ["cypress", 2], ["dead", 1]], "under": [["deadbush", 2], ["spiderlily", 1]],
+		"ground": [["spiderlily", 0.8], ["deadbush", 0.4]], "land": 0.35, "rocks": ["slab", "spire"], "rock_p": 0.06, "grass": 0.25, "cover": 0.06},
+	"fuluo": {"canopy": [["acacia", 3], ["cactus", 1], ["dead", 1]], "under": [["agave", 2], ["deadbush", 2]],
+		"ground": [["agave", 1], ["deadbush", 1]], "land": 0.4, "rocks": ["boulder", "spire", "scree"], "rock_p": 0.12, "grass": 0.2, "cover": 0.05},
 }
 
 static var _grass := {}

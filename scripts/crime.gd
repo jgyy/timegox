@@ -225,6 +225,13 @@ static func count(g, seen_only: bool = false) -> int:
 		n += int(g.slain[id].get("seen_n", 1 if bool(g.slain[id].seen) else 0)) if seen_only else int(g.slain[id].get("times", 1))
 	return n
 
+## What the counter of somebody of the story costs once they are dead by his hand and somebody else keeps
+## it: a quarter more, as whoever came after says (`heir_line`).  1 for the living.
+static func heir_k(g, id: String) -> float:
+	return HEIR_K if not g.slain.is_empty() and dead(g, id) else 1.0
+
+const HEIR_K := 1.25
+
 ## What is said at the place where `e` stood.
 static func grave_line(g, e: Dictionary) -> String:
 	var rec: Dictionary = g.slain.get(str(e.id), {})
@@ -247,7 +254,7 @@ static func mute(g, lines: Array) -> Array:
 		return lines
 	var names := {}
 	for id in g.slain:
-		if not str(id).begins_with("folk:") and not str(id).begins_with("res:"):
+		if not str(id).begins_with("folk:") and not str(id).begins_with("res:") and not str(id).begins_with("apt:"):
 			names[str(g.slain[id].n)] = true
 	if names.is_empty():
 		return lines
@@ -386,7 +393,7 @@ static func strike(g, e: Dictionary, seen: int) -> Dictionary:
 		"times": int(was.get("times", 0)) + 1, "seen_n": int(was.get("seen_n", 0)) + (1 if seen > 0 else 0)}
 	g.slain_n += 1
 	# (the same person stands elsewhere later in the story under another id (qiu_ye, qiu_ye_grave, ...): dead there too)
-	if str(e.kind) == "npc" and not (id.begins_with("res:") or id.begins_with("who:") or id.begins_with("settler:")):
+	if str(e.kind) == "npc" and not (id.begins_with("res:") or id.begins_with("apt:") or id.begins_with("who:") or id.begins_with("settler:")):
 		for a2 in Data.AREAS:
 			for o in Data.AREAS[a2].get("npcs", []):
 				if str(o.n) == nm and str(o.id) != id and not g.slain.has(str(o.id)):

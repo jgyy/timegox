@@ -1400,7 +1400,7 @@ const TRIALS := {
 				"line": "\"A broom goes away from the stove,\" says Lin Feng, \"and six households could tell me why. Tell me why a traveller sleeps in a ditch.\" Shang Yang opens his mouth, and it stays open."},
 			{"id": "way", "kind": "way", "n": "Somebody who keeps the precepts", "needs": [["creed", "rule", 12]], "boon": {"foe_hp": 0.75, "taken": 0.85},
 				"desc": "Orthodox: shifts worked, the post carried, notices answered, months on a roll. He will hear it from somebody who has lived under a rule. From anybody else it is only complaint.",
-				"line": "Shang Yang looks at a man who has kept nine hundred rules for years and still came up the hill to argue. \"Ah,\" he says. \"A witness for the prosecution who obeys the law. Proceed.\""},
+				"line": "Shang Yang looks at somebody who has kept nine hundred rules for years and still came up the hill to argue. \"Ah,\" he says. \"A witness for the prosecution who obeys the law. Proceed.\""},
 			{"id": "clean", "kind": "clean", "n": "Somebody his law has nothing on", "needs": [["clean"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
 				"desc": "A clean name: nobody dead, no bill, nothing forbidden. He has spent his life sorting men into the guilty and the not yet. You are a third kind, and it troubles his arithmetic.",
 				"line": "He runs down the tablets with one finger, looking for the clause that catches Lin Feng. There are a great many clauses. The finger reaches the end."},

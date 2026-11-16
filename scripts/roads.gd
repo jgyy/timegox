@@ -371,7 +371,9 @@ static func mesh(layer: String, r: Rect2i, ground: Callable) -> Node3D:
 					b.quad4(at.call(x0 + T * (k2 - 0.025), z0, 0.09), at.call(x0 + T * (k2 + 0.025), z0, 0.09), at.call(x0 + T * (k2 + 0.025), z0 + T, 0.09), at.call(x0 + T * (k2 - 0.025), z0 + T, 0.09), rut, rut, rut, rut)
 			# a milestone on the kerb, every so often: a squared stone with a red-painted cap
 			if i % MILE == MILE / 2 and dir.x * dir.y == 0 and dir != Vector2i.ZERO:
-				var side := Vector3(T * 0.6, 0, 0) if dir.x == 0 else Vector3(0, 0, T * 0.6)
+				# (the Cloud Keel release, clash.gd: a milestone stood a hand inside the tile beside the road: in the
+				# plinth of three houses, and on the paving of the lane beside; it stands on the road's own kerb)
+				var side := Vector3(T * 0.42, 0, 0) if dir.x == 0 else Vector3(0, 0, T * 0.42)
 				var foot: Vector3 = at.call(x0 + T * 0.5 + side.x, z0 + T * 0.5 + side.z, 0.0)
 				b.box(foot + Vector3(0, 0.3, 0), Vector3(0.2, 0.6, 0.2), MB.tag(Color("a8a094"), MB.STONE))
 				b.box(foot + Vector3(0, 0.63, 0), Vector3(0.24, 0.07, 0.24), MB.tag(Color("a83c30"), MB.STONE))

@@ -398,7 +398,7 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		if not law_end.is_empty():
 			lines.append(["Narrator", " ".join(law_end)])
 		var stood := 0
-		for lid9 in ["surface", "heaven", "under", "sea"]:
+		for lid9 in Atlas.LAYERS:
 			stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
 		if stood > 0:
 			lines.append(["Narrator", "%d things stand in the land that were not there before Lin Feng was asked a question: roads, walls, graves, a bell, a tree. Nobody who passes them knows whose word put them there." % stood])
@@ -678,10 +678,12 @@ func talk_folk(e: Dictionary) -> void:
 	var wn0 := int(Game.folk_talk.get(str(fp.id), 0))
 	if Game.prologue == "" and not Game.slain.is_empty() and Crime.replaced(Game, str(fp.id)) and wn0 % 3 == 0:
 		lines = [[str(fp.n), "I have the place of the one who is gone. They do not say gone where. They look at the ground, and then they look at you."]]
-	elif Game.prologue == "" and Crime.line(Game, str(fp.town), int(fp.seed) + wn0) != "" and wn0 % 2 == 0:
-		lines = [[str(fp.n), Crime.line(Game, str(fp.town), int(fp.seed) + wn0).replace("%s", Game.address())]]
+	# (the Cloud Keel release: the street's words for a walker of the forbidden came after its words for an
+	# outlaw, and somebody marked is always an outlaw: they were never said)
 	elif Game.prologue == "" and Taboo.marked(Game) and wn0 % 2 == 0:
 		lines = [[str(fp.n), str(Taboo.STREET[(int(fp.seed) + wn0) % Taboo.STREET.size()])]]
+	elif Game.prologue == "" and Crime.line(Game, str(fp.town), int(fp.seed) + wn0) != "" and wn0 % 2 == 0:
+		lines = [[str(fp.n), Crime.line(Game, str(fp.town), int(fp.seed) + wn0).replace("%s", Game.address())]]
 	elif Game.prologue == "" and Folk.is_camp(str(fp.town)) and wn0 % 2 == 0 and Wilds.line(Game, str(fp.area), int(fp.seed) + wn0) != "":
 		lines = [[str(fp.n), Wilds.line(Game, str(fp.area), int(fp.seed) + wn0).replace("%s", Game.address())]]
 	# (the Answering Land release, weal.gd: every other word is about how their town stands, and why)
@@ -692,6 +694,9 @@ func talk_folk(e: Dictionary) -> void:
 			lines = [[str(fp.n), wl.replace("%s", Game.address())]]
 	# (the Ordered House release: every fourth word is about the day of the year or how long they have been
 	# at their trade, almanac.gd; or about the Way he walks, creed.gd)
+	# (the Cloud Keel release, giants.gd: "whoever is small says so": two lines written for it were never said)
+	if wn % 8 == 4 and Game.prologue == "" and not Folk.new_year(Game) and int(Giants.TOWNS.get(str(fp.town), 0)) > 0 and str(fp.get("role", "")) != Giants.ROLE and not bool(fp.get("kid", false)):
+		lines = [[str(fp.n), str(Giants.LINES_SMALL[(int(fp.seed) + wn / 8) % Giants.LINES_SMALL.size()])]]
 	if wn % 4 == 2 and Game.prologue == "" and not Folk.new_year(Game) and Clock.frozen(Game) == "":
 		var al := ""
 		match (wn / 4 + int(fp.seed)) % 3:
@@ -1028,6 +1033,14 @@ func talk_npc(e: Dictionary) -> void:
 	var i: int = chat_idx.get(e.id, 0)
 	chat_idx[e.id] = i + 1
 	var lines := [[e.n, chats[i % chats.size()]]]
+	# (the Cloud Keel release, weal.gd: what a crossroads made of somebody with a name was shown under the name
+	# and had a line written for it, and the line was never said; it is their second word, and every third after)
+	if Game.prologue == "" and i % 3 == 1:
+		var wf := Weal.fate(Game, str(e.get("asset", e.id)))
+		if wf.is_empty():
+			wf = Weal.fate(Game, str(e.id))
+		if not wf.is_empty() and str(wf.get("line", "")) != "":
+			lines = [[e.n, str(wf.line)]]
 	# a townsperson with something to ask (a deed, trials.gd) asks it instead
 	var deed := Trials.deed_of(str(e.id), Game)
 	if deed != "":
@@ -1328,6 +1341,15 @@ func ask_picks() -> void:
 ## What whoever answers for a town has at the counter (offices.gd, mail.gd): a carriage for sale
 ## (fashion.gd RIDES `buy`, `at`), the letters that have come, the satchel of those already read, the
 ## post-bag to carry and the ones to hand over.  "Not today" is the first line.
+## (the Cloud Keel release, mail.gd: a post-bag pays for the road it is carried over, and one taken aboard the
+## post-coach or a ship was paid in full on the far side for a road nobody had walked: several times the
+## fare.  Whatever carries him carries the post too: his bags are handed over, and the road pays the carrier.)
+func _drop_bags(why: String) -> void:
+	if Game.mail_bags.is_empty():
+		return
+	Game.toast("%s: your %s handed over, and the road pays the carrier" % [why, "bag is" if Game.mail_bags.size() == 1 else "bags are"])
+	Game.mail_bags = []
+
 func offer_carriage(e: Dictionary) -> void:
 	if Game.prologue != "":
 		return
@@ -1381,11 +1403,20 @@ func offer_carriage(e: Dictionary) -> void:
 		opts.append({"id": "ship:" + str(so.to), "label": "Take ship to %s" % str(so.n), "note": "%d stones" % int(so.fare),
 			"desc": "A junk of the coast trade, three masts and batten sails, lying at the quay with her lines singled up. To %s: %d leagues, about %s hours, %d spirit stones (you have %d)." % [str(so.n), int(so.leagues), str(so.hours), int(so.fare), Game.stones],
 			"col": UI.C_JADE, "enabled": Game.stones >= int(so.fare)})
+	# (arks.gd: a passage by spirit ark from a dock to the others, and to the Far Countries)
+	var arks: Array = Arks.offers(Game, office) if not world.is_floor() else []
+	for ao in arks:
+		opts.append({"id": "ark:" + str(ao.to), "label": "Take the ark to %s" % str(ao.n), "note": "%d stones" % int(ao.fare),
+			"desc": "A spirit ark of Huaxu, lying at her mooring in the air over the town with a ladder down. To %s: %d leagues above the weather, about %s hours, %d spirit stones (you have %d)." % [str(ao.n), int(ao.leagues), str(ao.hours), int(ao.fare), Game.stones],
+			"col": UI.C_JADE, "enabled": Game.stones >= int(ao.fare)})
+	if arks.is_empty() and Arks.dock_of(office) != "" and not world.is_floor():
+		opts.append({"id": "ark:none", "label": "Ask after the arks", "desc": Arks.blocked(Game), "col": UI.C_DIM, "enabled": false})
 	for rid in Fashion.RIDE_ORDER:
 		var r: Dictionary = Fashion.RIDES[rid]
 		if str(r.get("at", "")) == office and not Game.rides.has(rid):
-			opts.append({"id": rid, "label": "Buy the %s" % str(r.n), "note": "%d stones" % int(r.buy), "desc": "%s\n\nDriven, seats %d, %d%% faster than running. %d spirit stones (you have %d)." % [told(str(r.desc)), Fashion.seats(rid), int(round((float(r.speed) - 1.0) * 100.0)), int(r.buy), Game.stones],
-				"col": UI.C_GOLD, "enabled": Game.stones >= int(r.buy)})
+			var rb := int(round(int(r.buy) * Crime.heir_k(Game, str(e.id))))
+			opts.append({"id": rid, "label": "Buy the %s" % str(r.n), "note": "%d stones" % rb, "desc": "%s\n\nDriven, seats %d, %d%% faster than running. %d spirit stones (you have %d)." % [told(str(r.desc)), Fashion.seats(rid), int(round((float(r.speed) - 1.0) * 100.0)), rb, Game.stones],
+				"col": UI.C_GOLD, "enabled": Game.stones >= rb})
 	if opts.size() < 2:
 		return
 	choose("At the counter of %s" % str(e.n), opts, func(oid: String):
@@ -1411,6 +1442,7 @@ func offer_carriage(e: Dictionary) -> void:
 					if at.x >= 0:
 						Game.riding = false
 						_drop_fares()
+						_drop_bags("The coach carries its own post")
 						world.teleport(at)
 						Feats.poll(Game)
 						Game.toast("The post-coach sets you down at %s" % str(co2.n))
@@ -1424,11 +1456,29 @@ func offer_carriage(e: Dictionary) -> void:
 					var to_layer := Data.layer_of(str(Ships.HARBOURS[str(so2.to)].area))
 					Game.riding = false
 					_drop_fares()
+					_drop_bags("A junk carries her own post")
 					say(lines, func():
 						if q.x >= 0:
 							world.teleport(q, to_layer)
 						Feats.poll(Game)
 						Game.toast("The junk ties up at %s" % str(so2.n))
+					)
+		elif oid.begins_with("ark:"):
+			for ao2 in arks:
+				if "ark:" + str(ao2.to) == oid and Arks.sail(Game, ao2):
+					var alines: Array = []
+					for tl2 in Arks.tale(ao2, Game.ark_voyages - 1):
+						alines.append(["", str(tl2)])
+					var aq: Vector2i = Arks.quay(str(ao2.to))
+					var a_layer := Data.layer_of(str(Arks.DOCKS[str(ao2.to)].area))
+					Game.riding = false
+					_drop_fares()
+					_drop_bags("An ark carries her own post")
+					say(alines, func():
+						if aq.x >= 0:
+							world.teleport(aq, a_layer)
+						Feats.poll(Game)
+						Game.toast("The ark lets her ladder down at %s" % str(ao2.n))
 					)
 		elif oid == "mail:read":
 			read_letter(str(Mail.waiting(Game)[0]), e)
@@ -1440,8 +1490,8 @@ func offer_carriage(e: Dictionary) -> void:
 			var bg := Mail.bag_offer(Game, office)
 			Mail.take_bag(Game, bg)
 			say([[str(e.n), "For %s. Do not open it, do not sit on it, and if it rains, it is more important than you are." % str(Offices.OFFICES[str(bg.to)].n)]])
-		elif Fashion.RIDES.has(oid) and Game.stones >= int(Fashion.RIDES[oid].buy):
-			Game.stones -= int(Fashion.RIDES[oid].buy)
+		elif Fashion.RIDES.has(oid) and Game.stones >= int(round(int(Fashion.RIDES[oid].buy) * Crime.heir_k(Game, str(e.id)))):
+			Game.stones -= int(round(int(Fashion.RIDES[oid].buy) * Crime.heir_k(Game, str(e.id))))
 			Game.grant_ride(oid)
 			Game.ride = oid
 			_seat_fares()
@@ -1826,21 +1876,23 @@ const TAILOR_ASK := "Tailor Qiao's shop: something to wear?"
 func offer_outfits(e: Dictionary) -> void:
 	var opts: Array = []
 	var tailor := str(e.id) == "tailor_qiao"
+	# (crime.gd: whoever came after somebody struck down keeps the stall, a quarter dearer)
+	var hk := Crime.heir_k(Game, str(e.id))
 	for id in _dyer_stock(str(e.id)):
 		var hers: bool = str(id).begins_with("yue:")
 		var o: Dictionary = Fashion.YUE_OUTFITS[str(id).trim_prefix("yue:")] if hers else Fashion.OUTFITS[id]
-		opts.append({"id": id, "label": "%s%s (%d stones)" % ["For Yue Ling: " if hers else "", o.n, int(o.buy)],
+		opts.append({"id": id, "label": "%s%s (%d stones)" % ["For Yue Ling: " if hers else "", o.n, int(round(int(o.buy) * hk))],
 			"desc": (str(o.desc) if hers else told(str(o.desc))) + "\n\nWhile worn: " + Fashion.fx_text(o.fx) + ".",
-			"col": Color(str(o.cols[0])), "enabled": Game.stones >= int(o.buy)})
+			"col": Color(str(o.cols[0])), "enabled": Game.stones >= int(round(int(o.buy) * hk))})
 	opts.append({"id": "later", "label": "Not today", "desc": "Tailor Qiao will put it by. He has put by a great deal." if tailor else "Dyer Su will keep it for you. She says that to everyone.", "col": UI.C_DIM})
 	choose(TAILOR_ASK if tailor else "Dyer Su's stall: something to wear?", opts, func(id: String):
 		if id == "" or id == "later":
 			return
 		var hers2: bool = id.begins_with("yue:")
 		var o: Dictionary = Fashion.YUE_OUTFITS[id.trim_prefix("yue:")] if hers2 else Fashion.OUTFITS[id]
-		if Game.stones < int(o.buy):
+		if Game.stones < int(round(int(o.buy) * hk)):
 			return
-		Game.stones -= int(o.buy)
+		Game.stones -= int(round(int(o.buy) * hk))
 		if hers2:
 			Game.grant_yue_outfit(id.trim_prefix("yue:"))
 			say([[str(e.n), "I cut it to her measure a month ago. One hopes. Tell her the hem is generous; she walks like somebody who mends her own."], ["Yue Ling", "...It has pockets. Lin Feng. It has pockets.", "cheer"]])

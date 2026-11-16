@@ -283,8 +283,9 @@ func _bundle(lid: String) -> Dictionary:
 					Terrain3D.sky_world(root, lw)
 				"under":
 					Terrain3D.deep_world(root, lw)
-				"sea":
+				"sea", "far":
 					# the Eastern Sea (Part XII): real sea round the isles, the same ocean as the land's
+					# (and the Far Countries, the Cloud Keel release: lands of their own in a sea no keel has crossed)
 					Terrain3D.world_sea(root, lw)
 			if OS.has_environment("AZ_PROFILE"):
 				print("[profile] realm %s dressed (sea, sky) by %d ms" % [lid, (Time.get_ticks_usec() - pb0) / 1000])
@@ -458,7 +459,7 @@ func locate_ent(id: String) -> Array:
 	var e = ent_by_id.get(id)
 	if e != null:
 		return [layer, e]
-	for lid in ["surface", "heaven", "under", "sea"]:
+	for lid in Atlas.LAYERS:
 		var lw: Dictionary = Atlas.world_of(lid)
 		for e2 in lw.ents:
 			if e2.id == id:
@@ -781,7 +782,10 @@ func _build_view(id: String) -> void:
 	for pk in Peaks.of_area(lw, id):
 		var kp: Vector3 = Terrain3D.world_pos(pk.c) + bb.off
 		var cn := Peaks.cairn(int(pk.i) * 31 + 7, Color("c83a3a"))
-		cn.position = Vector3(kp.x + 0.75, _ground(bb, kp + Vector3(0.75, 0, 0.75)) - 0.05, kp.z + 0.75) - root.position
+		# (the Cloud Keel release, clash.gd: the cairn stood at one corner of the top tile whoever stood beside
+		# it, and six lords of the later chapters stood in it; it takes the corner furthest from them)
+		var co := Clash.cairn_corner(lw, pk)
+		cn.position = Vector3(kp.x + co.x, _ground(bb, kp + Vector3(co.x, 0, co.y)) - 0.05, kp.z + co.y) - root.position
 		root.add_child(cn)
 		_label(cn, "%s  %d m" % [str(pk.n), int(round(float(pk.h)))], 3.3, Color("f4ecd8"), 26).visibility_range_end = 60.0
 	# a junk at her mooring in every harbour (ships.gd): drawn with the region, standing on no tile
@@ -792,8 +796,21 @@ func _build_view(id: String) -> void:
 				var jk := Models.junk()
 				var jp: Vector3 = Terrain3D.world_pos(mo) + bb.off
 				jk.position = Vector3(jp.x, bb.off.y + Terrain3D.WATER_Y, jp.z) - root.position
-				jk.rotation.y = Terrain3D.hash2(mo.x, mo.y, 5.0) * TAU
+				# (the Cloud Keel release, clash.gd: her mooring is searched for with her length north and south, and
+				# she was then turned any way at all: at Yanggu her stern lay two metres up the beach)
+				jk.rotation.y = PI if Terrain3D.hash2(mo.x, mo.y, 5.0) > 0.5 else 0.0
 				root.add_child(jk)
+	# a spirit ark moored in the air over every dock (arks.gd): drawn with the region, standing on no tile
+	var dk := Arks.dock_in(id)
+	if dk != "":
+		var bt := Arks.berth(lw, dk)
+		if bt.x >= 0:
+			var ak := Models.ark(true, Arks.HOVER)
+			var ap: Vector3 = Terrain3D.world_pos(bt) + bb.off
+			ak.position = Vector3(ap.x, _ground(bb, ap) + Arks.HOVER, ap.z) - root.position
+			ak.set_meta("ark", true)
+			root.add_child(ak)
+			_label(ak, "The ark of %s" % str(Arks.DOCKS[dk].n), 6.4, Color("c8f4e8"), 28).visibility_range_end = 90.0
 	# the high road between the towns (roads.gd), paved where it crosses this region
 	var rdm := Roads.mesh(lid, r, func(x: float, z: float) -> float: return _ground(bb, Vector3(x, 0.0, z) + Vector3(bb.off.x, 0.0, bb.off.z)) - bb.off.y)
 	if rdm != null:
@@ -1202,7 +1219,7 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 		"boss":
 			var d3: Dictionary = Data.ENEMIES[e.enemy]
 			var mb := Models.monster(d3.shape, d3.col, true, e.enemy)
-			mb.scale = Vector3.ONE * (Giants.SCALE if Giants.of_foe(str(e.enemy)) else 1.9)
+			mb.scale = Vector3.ONE * Clash.lord_scale(str(e.enemy))
 			n.add_child(mb)
 			n.add_child(Models.shadow_disc(2.0, 0.5))
 			_label(n, d3.n, 5.2, UI.C_GOLD, 44)
@@ -1937,10 +1954,37 @@ func _fans_tick(d: float) -> void:
 		if ln != "" and float(sf.fade) > 0.8:
 			fan_label = _label(sf.n, ln, 2.15, Color("f4ecd8"), 26)
 
+## The arks under way (arks.gd): two of them crossing the sky of whatever realm he stands in, high over
+## the weather, once the arks have come back; in a cave or a cellar, or with no window, none.  Drawn only:
+## nothing stands anywhere for them, and they are where the clock says they are.
+var sky_arks: Array = []
+func _arks_tick(_d: float) -> void:
+	var want := 0 if is_floor() or not Game.done(Arks.OPEN) or Game.prologue != "" else 2
+	while sky_arks.size() > want:
+		(sky_arks.pop_back() as Node3D).queue_free()
+	while sky_arks.size() < want:
+		var ak := Models.ark(false)
+		ak.set_meta("ark", true)
+		scene3d.add_child(ak)
+		sky_arks.append(ak)
+	if want == 0:
+		return
+	# (round the middle of the region he is in, so that one is usually somewhere overhead)
+	var mid := Vector2(player.position.x, player.position.z) / TS
+	mid = Vector2(snappedf(mid.x, 96.0), snappedf(mid.y, 96.0))
+	for k in sky_arks.size():
+		var uw := Arks.under_way(mid, 70.0 + 26.0 * k, float(Game.playtime), k)
+		var an: Node3D = sky_arks[k]
+		var wp := Vector3(float(uw.pos.x) * TS, 0.0, float(uw.pos.y) * TS)
+		an.position = Vector3(wp.x, off.y + Arks.CRUISE + 9.0 * k + sin(t * 0.3 + k) * 0.6, wp.z)
+		an.rotation.y = float(uw.yaw)
+		an.rotation.z = sin(t * 0.4 + k * 1.7) * 0.03
+
 func _process(d: float) -> void:
 	t += d
 	if not headless() and player != null:
 		_fans_tick(d)
+		_arks_tick(d)
 		_weal_doors(d)
 		# (the Tall People release, visage.gd: the face his Way has given him, looked at again now and then)
 		_visage_t -= d
@@ -3000,6 +3044,25 @@ func speaker() -> String:
 		return ""
 	return str(dl.lines[dl.idx][0])
 
+## How far (metres) a pack that stands on `e.pos` can range before it is in a wall, a house, the rock of a
+## cave, or water it cannot cross: read from the grid round its own tile.
+func _pack_room(e: Dictionary, shape: String) -> float:
+	var W := int(wd.w)
+	var H := int(wd.h)
+	var wet_ok := shape in ["fish", "carp", "serpent", "jelly", "manta", "wisp", "wraith", "bird", "flame", "storm", "dragon"]
+	for rad in [1, 2]:
+		for dy in range(-rad, rad + 1):
+			for dx in range(-rad, rad + 1):
+				if maxi(absi(dx), absi(dy)) != rad:
+					continue
+				var q: Vector2i = e.pos + Vector2i(dx, dy)
+				if q.x < 0 or q.y < 0 or q.x >= W or q.y >= H:
+					return 0.7 if rad == 1 else 2.4
+				var g := int(wd.grid[q.y * W + q.x])
+				if g == MapGen.BUILDING or g == MapGen.INTERIOR or (g == MapGen.WATER and not wet_ok) or (g == MapGen.WALL and is_cave()):
+					return 0.7 if rad == 1 else 2.4
+	return 99.0
+
 ## Monsters amble about their spot in a slow figure of eight, pausing now and then, and stop to
 ## face the hero when he comes close.  Purely visual: the encounter itself never moves.
 func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void:
@@ -3034,6 +3097,11 @@ func _wander(ms: Array, e: Dictionary, n: Node3D, dist: float, d: float) -> void
 		var prog: float = mk.get_meta("prog")
 		var shape: String = mk.get_meta("shape", "")
 		var r := (1.6 if i == 0 else 1.0) * float(rg[0])
+		# (the Cloud Keel release, clash.gd: a pack ranged as far from its spot as the hour said whatever stood
+		# there, through house walls, over water and into the rock of a cave; it keeps to the ground it has)
+		if not n.has_meta("room"):
+			n.set_meta("room", _pack_room(e, shape))
+		r = minf(r, float(n.get_meta("room")))
 		if walking:
 			prog += d * 0.32 * float(rg[1]) / maxf(r, 0.6)
 			mk.set_meta("prog", prog)
@@ -3584,6 +3652,17 @@ func _update_folk(d: float, pp: Vector3) -> void:
 					var at: Vector2 = st.at
 					var goal := Vector3(at.x * TS, 0.0, at.y * TS) + off
 					var id: String = fp.id
+					# (the Cloud Keel release, clash.gd: somebody who has stopped is drawn clear of what stands where
+					# the day sent them; worked out when they stop, and where they are is the day's own)
+					if st.vis and not st.walk:
+						var fnn: Node3D = folk_nodes.get(id)
+						if fnn != null:
+							var sk := "%d,%d" % [int(at.x * 8.0), int(at.y * 8.0)]
+							if str(fnn.get_meta("clear_at", "")) != sk:
+								fnn.set_meta("clear_at", sk)
+								fnn.set_meta("clear", Clash.step_clear(wd, at, ent_visible))
+							var cv: Vector2 = fnn.get_meta("clear", Vector2.ZERO)
+							goal += Vector3(cv.x, 0.0, cv.y)
 					var fn: Node3D = folk_nodes.get(id)
 					var flat := Vector2(goal.x - pp.x, goal.z - pp.z)
 					if not st.vis or flat.length() > Folk.SEE or (not Game.slain.is_empty() and Crime.gone(Game, id)):
@@ -3785,7 +3864,7 @@ func _draw_hud() -> void:
 				hint = "Choose your Dao"
 		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + hint, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
 		# (the Answering Land release, weal.gd: what has become of somebody with a name, by what was chosen)
-		if fe.kind == "npc":
+		if fe.kind == "npc" and (Game.slain.is_empty() or not Crime.dead(Game, str(fe.id))):
 			var wtag := Weal.tag(Game, fe)
 			if wtag != "":
 				UI.text(self, Vector2(VIEW.x * 0.5 - 300, VIEW.y - 36), "%s, %s" % [str(fe.n), wtag], 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 600)

@@ -234,6 +234,8 @@ var mail_told := 0
 var coaches := 0
 ## (ships.gd: how many passages by sea have been taken)
 var voyages := 0
+## passages taken by spirit ark (arks.gd)
+var ark_voyages := 0
 ## (fame.gd: the standing he has been told of, the day each town last gave him something, and how often)
 var fame_told := 0
 var fan_day := {}
@@ -490,6 +492,7 @@ func reset() -> void:
 	mail_told = 0
 	coaches = 0
 	voyages = 0
+	ark_voyages = 0
 	fame_told = 0
 	fan_day = {}
 	fan_gifts = 0

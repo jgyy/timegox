@@ -390,6 +390,7 @@ static func next(g) -> String:
 static func build(g, id: String) -> bool:
 	if blocked(g, id) != "":
 		return false
+	_bank(g)
 	var was := rank(g)
 	g.stones -= cost(g, id)
 	if not g.hold.has("built"):
@@ -432,6 +433,7 @@ static func settle(g, who: String, name: String, force: bool = false) -> bool:
 		return false
 	if not force and wanting(g) >= room(g):
 		return false
+	_bank(g)
 	var was := rank(g)
 	if not g.hold.has("settlers"):
 		g.hold["settlers"] = {}
@@ -473,9 +475,26 @@ static func due(g) -> int:
 static func chest(g) -> int:
 	if not founded(g):
 		return 0
+	_bank(g)
+	return int(g.hold.get("chest_f", 0.0))
+
+## (the Cloud Keel release: the chest was the days since it was emptied times what the town pays *today*, so a
+## market built on the fifth day re-priced the four already gone.  The days are banked as they pass, at what
+## the town paid then: before anything that changes the dues, and whenever the chest is looked into.)
+static func _bank(g) -> void:
 	_day0(g)
-	var days := clampi(int(g.day) - int(g.hold.get("taken", g.day)), 0, CHEST_DAYS)
-	return days * due(g)
+	# (emptied, or looked into for the first time: it fills from the day it was emptied)
+	var taken := int(g.hold.get("taken", g.day))
+	if int(g.hold.get("bank_from", -1)) != taken:
+		g.hold["bank_from"] = taken
+		g.hold["chest_f"] = 0.0
+		g.hold["due_day"] = taken
+	var d0 := int(g.hold.get("due_day", taken))
+	var today := int(g.day)
+	if today > d0:
+		var d := due(g)
+		g.hold["chest_f"] = minf(float(CHEST_DAYS * d), float(g.hold.get("chest_f", 0.0)) + float(today - d0) * float(d))
+	g.hold["due_day"] = today
 
 ## Empty the chest: the spirit stones taken.
 static func take(g) -> int:

@@ -43,16 +43,16 @@ const OFFICES := {
 		"Nineteen roofs when I was made headman, and a quarter with a drum tower since. Nobody voted for the drum. It arrived, and then we needed a tower to keep it in.",
 		"A headman settles three things: whose ox, whose water, whose daughter. Everything else in Qingshi is settled by Granny Wen, and I sign it.",
 		"Have you eaten? Then sit. The harvest is fair, the road is mended, and somebody has been telling the children they can fly. I should like a word with that person."]},
-	"post_cloudfoot": {"n": "Postmaster Ge of Cloudfoot", "area": "mountain", "in": "post_station", "asset": "folk_porter", "lines": [
+	"post_cloudfoot": {"n": "Station-Master Ge of Cloudfoot", "area": "mountain", "in": "post_station", "asset": "folk_porter", "lines": [
 		"Every letter for the sect stops here, and every excuse from it. I could tell you who writes home and who only says so. I do not. That is the whole of the trade.",
 		"Twelve horses, nine riders, and a mountain that eats a pair of boots a month. Cloudfoot is not a town. It is a breath taken before the steps.",
-		"A postmaster is mayor of whatever is waiting. Today that is four pilgrims, a coffin, and a goose addressed to nobody."]},
+		"A station-master is mayor of whatever is waiting. Today that is four pilgrims, a coffin, and a goose addressed to nobody."]},
 	"reeve_well": {"n": "Samira, Reeve of the Sweet Well", "area": "dunes", "in": "sweet_well", "asset": "folk_oasis_f", "lines": [
 		"Peace on your road, and shade at the end of it. I keep the count of the well: so many skins a caravan, so many a camel, none for a man who has fouled water anywhere between here and the sea.",
 		"The caravan-masters think they rule Shazhou. They rule the road. The road ends at my rope.",
 		"In a dry year I am the most hated woman in the sands, and in a wet year nobody remembers my name. I pray for the second and prepare for the first."]},
-	"harbour_longmen": {"n": "Harbour-Master Zeng of Longmen", "area": "longmen", "in": "harbour_office", "asset": "folk_fisher", "lines": [
-		"Which way is the water going? Good. Then you know as much as I do, and I have the office. Every hull that comes up the Gate pays me a copper and a piece of news.",
+	"harbour_longmen": {"n": "Toll-Master Zeng of Longmen", "area": "longmen", "in": "harbour_office", "asset": "folk_fisher", "lines": [
+		"Which way is the water going? Good. Then you know as much as I do, and I have the toll. Every hull that comes up the Gate pays me a copper and a piece of news.",
 		"The haulers have a guild, the ferrymen have a guild, the carp have the right of way. I sit between the three and write down who hit whom.",
 		"They ask why Longmen has no walls. The river comes through twice a year and takes the measure of everything we have built. We build what it lets us keep."]},
 	"guild_tushan": {"n": "Guild-Mistress Hu of the Founders", "area": "tushan", "in": "bell_works", "asset": "folk_founder", "lines": [
@@ -80,6 +80,15 @@ const OFFICES := {
 		"The Headwoman keeps the names. I keep the boats, which is the same list with holes in it.",
 		"Two thousand years on an island and we still build every hull as if it were to carry three thousand children home. It is a habit. It has kept the yards busy.",
 		"The immortals up the hill are no trouble. They do not eat, they do not vote, and once a century one of them asks what year it is."]},
+	# ---- the Cloud Keel release: the towns of the Far Countries, where nobody rules and somebody keeps the roster
+	"moorer_lightfoot": {"n": "Mooring-Mistress Qiao of Lightfoot", "area": "huaxu", "in": "mooring_hall", "asset": "folk_boatwoman", "lines": [
+		"Nobody is in charge of Lightfoot. I am in charge of the roster: which ark is out, which is in, and which has stopped to look at something. It is not the same thing, and I thank you not to bow.",
+		"We did not leave your land. Your sea was running out at the Ruins and the air after it, and no keel of ours could hold a course. It has stopped; I have reopened the book at the page where we left it.",
+		"A passage is paid in spirit stones because your people insist on paying. Ours give the helmsman something to eat and tell her a thing she did not know. You may do both."]},
+	"reeve_fourstreams": {"n": "Spring-Reeve Bo of Fourstreams", "area": "zhongbei", "in": "spring_hall", "asset": "folk_scholar", "lines": [
+		"I am the Reeve. There is nothing to reeve. I was chosen nine hundred years ago, by my grandfather's grandfather's lot, to see that the four streams stay four. They have.",
+		"We have no winter, so no granary; no thieves, so no watch; no quarrels over water, there being more than anybody wants. I keep a register of visitors. You are the fourth line.",
+		"Yu the Great stood where you are standing, wet to the knee and very cross, and asked the way to the flood. We told him. He said that it could not be so pleasant here and also true."]},
 	# ---- the Son of Heaven and his Empress, where the Nine Cauldrons are
 	"emperor": {"n": "The Son of Heaven", "area": "tushan", "in": "cauldron_hall", "asset": "folk_scholar", "lines": [
 		"We are the Son of Heaven. You need not kneel; the floor is cold, and the last man who knelt had to be helped up by the Empress. Whoever holds the Nine Cauldrons holds the Mandate, and nobody has wanted them moved.",
@@ -93,7 +102,7 @@ const OFFICES := {
 		"If you want a thing done, child, ask a hearth. If you want it remembered, come to us. We are very good at remembering; it is all we have been let do."]},
 }
 const ORDER := ["master_discipline", "master_outer", "treasurer", "head_qingshi", "post_cloudfoot", "reeve_well", "harbour_longmen", "guild_tushan", "warden_yanggu",
-	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall", "emperor", "empress"]
+	"speaker_featherfall", "reeve_tearwater", "registrar_youdu", "reeve_landfall", "moorer_lightfoot", "reeve_fourstreams", "emperor", "empress"]
 
 ## The trades of a town, by what the ground floor of a house is used for (rooms.gd USES): what the
 ## shift is, how many hours of the day it takes, what it pays (a share of `wage`), and what is said
@@ -298,7 +307,11 @@ static func fare_offer(g, e: Dictionary) -> Dictionary:
 		return {}
 	if g.passengers.size() + 2 >= Fashion.seats(str(g.ride)) or g.passengers.any(func(p): return str(p.id) == str(e.id)):
 		return {}
-	var others: Array = FARE_TOWNS.filter(func(a): return a != area)
+	# (the Cloud Keel release: a fare was asked for towns behind seals still closed, and the passenger held a
+	# seat for chapters; like a post-bag, a fare is for somewhere he has been.  An empty `seen` is the tests')
+	var others: Array = FARE_TOWNS.filter(func(a): return a != area and (g.seen.has(a) or g.seen.is_empty()))
+	if others.is_empty():
+		return {}
 	var to := str(others[absi(hash(str(e.id))) % others.size()])
 	return {"id": str(e.id), "n": str(e.n), "asset": str(e.get("asset", "")), "from": area, "to": to, "pay": int(round((50.0 + 12.0 * float(g.level)) * float(hops(area, to))))}
 

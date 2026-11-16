@@ -206,8 +206,8 @@ const NO_WINGS := ["shrine", "hermitage", "aerie", "bathhouse", "kitchen"]
 const STOREYS := {"house": [2, 3], "huizhou": [3, 3], "farmhouse": [2, 2], "seahouse": [2, 3], "dorm": [3, 4], "shop": [3, 4], "inn": [3, 4], "teahouse": [3, 3],
 	"hall": [3, 4], "library": [4, 5], "alchemist": [3, 3], "smithy": [2, 3], "shrine": [2, 3]}
 const USES := {"house": ["home", "home"], "huizhou": ["home", "home"], "farmhouse": ["home", "store"], "seahouse": ["home", "home"], "dorm": ["home", "home"],
-	"shop": ["shop", "office", "home"], "inn": ["inn", "rooms", "home"], "teahouse": ["teahouse", "office", "home"], "hall": ["hall", "office", "office", "home"],
-	"library": ["library", "office", "office", "store"], "alchemist": ["workshop", "office", "home"], "smithy": ["workshop", "home"], "shrine": ["shrine", "office", "home"],
+	"shop": ["shop", "home", "home"], "inn": ["inn", "rooms", "home"], "teahouse": ["teahouse", "home", "home"], "hall": ["hall", "office", "office", "home"],
+	"library": ["library", "office", "office", "store"], "alchemist": ["workshop", "home", "home"], "smithy": ["workshop", "home"], "shrine": ["shrine", "office", "home"],
 	"kitchen": ["workshop"], "bathhouse": ["bath"], "hermitage": ["home"], "aerie": ["hall", "home"]}
 const USE_WORDS := {"home": "somebody's home", "office": "offices", "shop": "a shop", "inn": "an inn", "rooms": "rooms to let", "teahouse": "a tea-house", "hall": "a hall",
 	"library": "a library", "workshop": "a workshop", "shrine": "a shrine", "store": "a store-room", "bath": "a bath-house"}
@@ -713,7 +713,352 @@ static func complete(bd: Dictionary, busy: Array = []) -> Dictionary:
 			used[at + d3] = true
 		var spec: Array = UPPER[style] if which == "up" else CELLAR[style]
 		out[which] = at
+		# (the Cloud Keel release: the storey over a dwelling, and an inn's guest rooms, are apartments)
+		var apt: Array = apartments(r, at, str(APART[style][1]), seed_ + 3) if which == "up" and APART.has(style) else []
+		if not apt.is_empty():
+			out["upper"] = {"n": str(APART[style][0]), "props": apt, "made": true, "apart": str(APART[style][1])}
+			continue
 		out["upper" if which == "up" else "cellar"] = {"n": spec[0], "props": _furnish_floor(r, at, spec[1], seed_ + (1 if which == "up" else 2)), "made": true}
+	return out
+
+# ---------------------------------------------------------------- apartments (the Cloud Keel release)
+## The storey over a dwelling was one loft with a bed and a chest in it, the same in every house.  Now a
+## storey that people live on is **divided**: a landing where the stairs come up, and off it two or three
+## apartments (as many as the house is long), each behind a partition wall with a curtained doorway of its
+## own, each with what a household needs (a bed, a stove, a table and something to sit on, a chest, a
+## window on the outer wall) and each with **somebody living in it** (`lodgers`).  An inn's upper storey
+## is guest rooms laid out the same way.  Floors written by hand in Data.AREAS stay as they are, and so
+## does a house too small to divide.
+##
+## A partition is a prop like any other ("partition": a tile nobody walks on, drawn as a wall on the
+## tile's centre line, like the house's own walls; "doorway": a tile that is walked through), so that
+## everything that already carries a floor's props (the atlas, the world's slices, the house's mesh)
+## carries the rooms too.  `rooms_of` reads them back: the floor's tiles in connected pieces.
+
+## styles whose storey above the ground is lived in: what the floor is called, and what its rooms are
+const APART := {"house": ["the rooms upstairs", "home"], "huizhou": ["the upper chambers", "home"], "seahouse": ["the rooms under the net loft", "home"],
+	"dorm": ["the upper rooms", "home"], "smithy": ["the rooms over the forge", "home"], "inn": ["the guest rooms", "rooms"],
+	"shop": ["the rooms over the shop", "home"], "teahouse": ["the rooms over the tea-house", "home"], "alchemist": ["the rooms over the still", "home"]}
+## what a room is furnished with, by what it is (a household's is one of three, by lot): [kind, blocks]
+const APART_KINDS := {
+	"home": [
+		[["bed", true], ["stove", true], ["table", true], ["window", false], ["chest", true], ["stool", false], ["cradle", true], ["lantern", false], ["clothes_stand", true]],
+		[["bed", true], ["stove", true], ["table", true], ["window", false], ["mirror", true], ["cushion", false], ["clothes_stand", true], ["lantern", false], ["chest", true]],
+		[["bed", true], ["stove", true], ["spinning_wheel", true], ["window", false], ["chest", true], ["stool", false], ["table", true], ["lantern", false], ["washstand", true]]],
+	"rooms": [
+		[["bed", true], ["washstand", true], ["window", false], ["chest", true], ["lantern", false], ["table", true], ["stool", false], ["bed", true]],
+		[["bed", true], ["table", true], ["window", false], ["clothes_stand", true], ["lantern", false], ["washstand", true], ["cushion", false], ["chest", true]]],
+}
+const WALL_KINDS := ["partition", "doorway"]
+
+## The props of an upper storey of rectangle `r` divided into apartments, the stairs coming up on
+## `stairs`: partitions, doorways and the furniture of every room and of the landing; [] if the floor
+## is too small to divide (it is furnished as one room then).
+static func apartments(r: Rect2i, stairs: Vector2i, use: String, seed_: int) -> Array:
+	var ix0 := r.position.x + 1
+	var iy0 := r.position.y + 1
+	var iw := r.size.x - 2
+	var ih := r.size.y - 2
+	var tr := ih > iw
+	var L := maxi(iw, ih)
+	var D := mini(iw, ih)
+	if L < 5 or D < 5:
+		return []
+	# (along the long side, across the short one)
+	var at := func(u: int, v: int) -> Vector2i:
+		return Vector2i(ix0 + v, iy0 + u) if tr else Vector2i(ix0 + u, iy0 + v)
+	var su := (stairs.y - iy0) if tr else (stairs.x - ix0)
+	var sv := (stairs.x - ix0) if tr else (stairs.y - iy0)
+	# the landing: a band along the long side that the stairs stand in (or at the end of), two tiles
+	# deep if the stairs stand in the middle of its length; the first band that leaves a side deep
+	# enough to live on (two tiles past its partition) with the stairs outside every room
+	var bands: Array = []
+	if sv == 0:
+		bands.append([0, 1])
+	elif sv == D - 1:
+		bands.append([D - 2, D - 1])
+	else:
+		bands.append([sv, sv])
+	bands.append([0, 1])
+	bands.append([D - 2, D - 1])
+	var band: Array = []
+	for bn in bands:
+		var lo_ok: bool = int(bn[0]) - 1 >= 2
+		var hi_ok: bool = D - 1 - (int(bn[1]) + 1) >= 2
+		var s_ok: bool = (sv >= int(bn[0]) - (1 if lo_ok else 99) and sv <= int(bn[1]) + (1 if hi_ok else 99))
+		if (lo_ok or hi_ok) and s_ok:
+			band = bn
+			break
+	if band.is_empty():
+		return []
+	var props: Array = []
+	var taken := {stairs: true}
+	var n := 1 if L < 7 else (2 if L < 11 else 3)
+	var total := L - (n - 1)
+	var k_room := 0
+	for side in 2:
+		# (the rows of this side's rooms, and the row of the partition between them and the landing)
+		var wall_v: int = int(band[0]) - 1 if side == 0 else int(band[1]) + 1
+		var v0: int = 0 if side == 0 else wall_v + 1
+		var v1: int = wall_v - 1 if side == 0 else D - 1
+		if v1 - v0 + 1 < 2 or wall_v < 1 or wall_v > D - 2:
+			continue
+		var hall_v: int = int(band[0]) if side == 0 else int(band[1])
+		var doors := {}
+		var u := 0
+		for k in n:
+			var wdt := total / n + (1 if k < total % n else 0)
+			var a0 := u
+			var a1 := u + wdt - 1
+			u = a1 + 1
+			# the doorway, in the middle of the room's own length, with free floor on the landing's side
+			var du := a0 + wdt / 2
+			for tries in [0, -1, 1]:
+				var dt: Vector2i = at.call(du + tries, wall_v)
+				var ht: Vector2i = at.call(du + tries, hall_v)
+				if du + tries >= a0 and du + tries <= a1 and dt != stairs and ht != stairs:
+					du += tries
+					break
+			doors[du] = true
+			# the wall between this room and the next
+			if k < n - 1:
+				for v in range(v0, v1 + 1):
+					var pt: Vector2i = at.call(u, v)
+					if pt != stairs:
+						props.append(["partition", pt, true])
+						taken[pt] = true
+				u += 1
+			# what the household has
+			var room := {}
+			for uu in range(a0, a1 + 1):
+				for v in range(v0, v1 + 1):
+					var rt: Vector2i = at.call(uu, v)
+					if rt != stairs:
+						room[rt] = true
+			var entry: Vector2i = at.call(du, wall_v - 1 if side == 0 else wall_v + 1)
+			var outer_v: int = v0 if side == 0 else v1
+			var lots: Array = APART_KINDS[use]
+			var kinds: Array = lots[_h(seed_, k_room, 23) % lots.size()]
+			var by_window: Array = []
+			for uu2 in range(a0 + 1, a1):
+				by_window.append(at.call(uu2, outer_v))
+			props.append_array(_furnish_room(room, entry, kinds, by_window, seed_ + k_room * 17))
+			k_room += 1
+		for uw in L:
+			var wt: Vector2i = at.call(uw, wall_v)
+			if wt == stairs:
+				continue
+			props.append(["doorway", wt, false] if doors.has(uw) else ["partition", wt, true])
+			taken[wt] = true
+	# the landing: a lantern, and a window at the far end from the stairs
+	var far_u := 0 if su > L / 2 else L - 1
+	var wl: Vector2i = at.call(far_u, int(band[0]))
+	if not taken.has(wl) and maxi(absi(wl.x - stairs.x), absi(wl.y - stairs.y)) > 1:
+		props.append(["window", wl, false])
+		taken[wl] = true
+	for ul in range(1, L - 1):
+		var lt: Vector2i = at.call(ul, int(band[1]))
+		if not taken.has(lt) and maxi(absi(lt.x - stairs.x), absi(lt.y - stairs.y)) > 1 and absi(ul - L / 2) <= 1:
+			props.append(["lantern", lt, false])
+			break
+	return props
+
+## The furniture of one room: its tiles `room` (a set), entered at `entry`.  The pieces of `kinds` in
+## turn: one that blocks goes as far from the door as there is a tile that leaves the rest of the room
+## joined and every piece with floor beside it; a window goes on one of `by_window` (the outer wall);
+## the rest stand on floor that is walked over.  A room keeps more than half its floor.
+static func _furnish_room(room: Dictionary, entry: Vector2i, kinds: Array, by_window: Array, seed_: int) -> Array:
+	var free: Dictionary = room.duplicate()
+	var used := {entry: true}
+	var props: Array = []
+	var pieces: Array = []
+	var most := maxi(2, int(room.size() * 0.42))
+	var order: Array = room.keys()
+	order.sort_custom(func(p0: Vector2i, p1: Vector2i) -> bool:
+		var d0 := absi(p0.x - entry.x) + absi(p0.y - entry.y)
+		var d1 := absi(p1.x - entry.x) + absi(p1.y - entry.y)
+		if d0 != d1:
+			return d0 > d1
+		return _h(p0.x, p0.y, seed_) < _h(p1.x, p1.y, seed_))
+	var blocked_n := 0
+	var table := Vector2i(-99, -99)
+	for kd in kinds:
+		var kind := str(kd[0])
+		if bool(kd[1]):
+			if blocked_n >= most:
+				continue
+			for t in order:
+				if used.has(t) or not free.has(t) or t == entry:
+					continue
+				if not _joined(free, t, entry) or not _usable(free, pieces, t):
+					continue
+				props.append([kind, t, true])
+				used[t] = true
+				free.erase(t)
+				pieces.append(t)
+				blocked_n += 1
+				if kind == "table":
+					table = t
+				break
+		elif kind == "window":
+			for t2 in by_window:
+				if not used.has(t2) and free.has(t2):
+					props.append([kind, t2, false])
+					used[t2] = true
+					break
+		else:
+			# a stool or a cushion by the table if there is one; anything else where there is floor
+			var best := Vector2i(-99, -99)
+			for t3 in order:
+				if used.has(t3) or not free.has(t3):
+					continue
+				if kind in ["stool", "cushion"] and table.x > -99 and absi(t3.x - table.x) + absi(t3.y - table.y) == 1:
+					best = t3
+					break
+				if best.x == -99:
+					best = t3
+			if best.x > -99 and (kind == "lantern" or table.x > -99):
+				props.append([kind, best, false])
+				used[best] = true
+	return props
+
+## The rooms of a floor of rectangle `r` with props `props` (as `apartments` laid them out), each a set
+## of tiles that are walked on: the landing first (the piece the stairs `stairs` stand beside), then
+## every apartment.  A floor that is not divided is one room.
+static func rooms_of(r: Rect2i, props: Array, stairs: Vector2i) -> Array:
+	var open := {}
+	for y in range(r.position.y + 1, r.end.y - 1):
+		for x in range(r.position.x + 1, r.end.x - 1):
+			open[Vector2i(x, y)] = true
+	open.erase(stairs)
+	for pr in props:
+		if (pr.size() > 2 and pr[2]) or str(pr[0]) == "doorway":
+			open.erase(pr[1])
+	var out: Array = []
+	var seen := {}
+	var keys: Array = open.keys()
+	keys.sort()
+	for st in keys:
+		if seen.has(st):
+			continue
+		var piece := _reach(open, st, Vector2i(-999, -999))
+		for t in piece:
+			seen[t] = true
+		out.append(piece)
+	# (the landing is the piece every doorway opens on: a room has one doorway, the landing all of them;
+	# where a house has one room upstairs, the piece the stairs stand beside)
+	var best := 0
+	var best_n := -99999
+	for i in out.size():
+		var n := 0
+		for pr2 in props:
+			if str(pr2[0]) == "doorway":
+				for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					if (out[i] as Dictionary).has((pr2[1] as Vector2i) + d):
+						n += 2
+						break
+		n *= 100
+		for d2 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			if (out[i] as Dictionary).has(stairs + d2):
+				n += 50
+				break
+		# (and, where that does not settle it, the piece with the least furniture: nobody keeps a bed on a landing)
+		for pr3 in props:
+			if pr3.size() > 2 and pr3[2] and not str(pr3[0]) in WALL_KINDS:
+				for d3 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					if (out[i] as Dictionary).has((pr3[1] as Vector2i) + d3):
+						n -= 1
+						break
+		if n > best_n:
+			best_n = n
+			best = i
+	if best > 0:
+		var ld: Dictionary = out[best]
+		out.remove_at(best)
+		out.insert(0, ld)
+	return out
+
+## Who lives upstairs (the Cloud Keel release): what somebody found in an apartment is called, the bodies
+## they may have, and what they say (two of these and what the house is).
+const LODGERS := {
+	"home": [["Mother", "Father", "Old", "Widow", "Sister", "Brother", "Young"], ["folk_farmwife", "folk_farmer", "folk_grandpa", "folk_grandma", "folk_maiden", "folk_youth", "folk_youth"],
+		["Two rooms would be riches. We have one, and a wall my husband could put his elbow through. He has been asked not to.", "The stove draws badly when the wind is in the north, and the people below say theirs draws badly when we are cooking. Both are true.",
+		"You came up the stairs. Everybody below knows it. The third tread tells them.", "We have the window. The others have the stairs nearer. It was drawn by lot in my grandmother's day and no lot has been drawn since.",
+		"Mind the curtain. It is the door. We knock on the post, here, and wait to be answered, and then come in anyway.", "Next door has a baby and we have a spinning wheel. Between us the house is never quiet and nobody can complain.",
+		"I was born in this room and my mother before me. The bed has been in every corner of it. This is the best corner. Do not let anybody tell you different.", "Rent is to the house below, on the first of the month, and a bucket of water carried up for whoever is oldest on the landing."]],
+	"rooms": [["Lodger", "Traveller", "Pedlar", "Pilgrim"], ["folk_porter", "folk_merchant", "folk_youth", "folk_monk"],
+		["The room is mine till the road dries. The bed is mine till somebody pays more. So far nobody has.", "Wash-water at dusk, a lamp till the second watch, and no cooking in the rooms. I have a stove under the bed. Do not tell her.",
+		"Thin walls. The one next door talks in his sleep, in verse. Bad verse. I have started correcting it through the partition.", "I have slept in forty inns between here and the coast and this is the only one where the window opens and also shuts."]],
+}
+
+## The people who live on the divided storey of building `bd` (its rectangle, stairs `up` and upper
+## props in one frame of tiles; `area` its region): one in every apartment, standing on floor of their
+## own room that nothing stands on and that cuts nobody off, as entities in the floor's own tiles
+## (from the rectangle's corner), kind "npc" with `lines` of their own.
+static func lodgers(bd: Dictionary, area: String, fid: String) -> Array:
+	var out: Array = []
+	if not bd.has("upper") or not bd.has("up"):
+		return out
+	var props: Array = bd.upper.get("props", [])
+	if not props.any(func(pr): return str(pr[0]) == "doorway"):
+		return out
+	var style := str(bd.get("style", "house"))
+	var use := str(APART[style][1]) if APART.has(style) else "home"
+	var r: Rect2i = bd.rect
+	var stairs: Vector2i = bd.up
+	var rooms := rooms_of(r, props, stairs)
+	var on := {}
+	for pr in props:
+		on[pr[1]] = true
+	var doorways: Array = []
+	for pr2 in props:
+		if str(pr2[0]) == "doorway":
+			doorways.append(pr2[1])
+	var info: Array = LODGERS[use]
+	var rng := RandomNumberGenerator.new()
+	rng.seed = r.position.x * 9173 + r.position.y * 577 + r.size.y * 13 + style.length()
+	var names := {}
+	for ri in range(1, rooms.size()):
+		var room: Dictionary = rooms[ri]
+		if room.size() < 3:
+			continue
+		# (the tile inside the doorway stays clear, and the room stays in one piece with them standing there)
+		var entry := Vector2i(-99, -99)
+		for dw in doorways:
+			for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				if room.has((dw as Vector2i) + d):
+					entry = (dw as Vector2i) + d
+		var tiles: Array = room.keys()
+		tiles.sort()
+		var t0 := rng.randi() % tiles.size()
+		var at := Vector2i(-99, -99)
+		for k in tiles.size():
+			var t: Vector2i = tiles[(t0 + k) % tiles.size()]
+			if on.has(t) or t == entry or (entry.x > -99 and not _joined(room, t, entry)):
+				continue
+			at = t
+			break
+		if at.x == -99:
+			continue
+		var titles: Array = info[0]
+		var ti := rng.randi() % titles.size()
+		var nm := ""
+		for _t in 12:
+			nm = "%s %s" % [str(titles[ti]), SURNAMES[rng.randi() % SURNAMES.size()]]
+			if not names.has(nm):
+				break
+		names[nm] = true
+		var bodies: Array = INDOOR_BODIES.get(area, info[1])
+		var body := str(bodies[rng.randi() % bodies.size()]) if INDOOR_BODIES.has(area) else str(info[1][ti % (info[1] as Array).size()])
+		var pool: Array = info[2]
+		var li := rng.randi() % pool.size()
+		var lines: Array = [str(pool[li]), str(pool[(li + 1 + ri) % pool.size()])]
+		lines.append("This is %s of %s: %d %s off one landing, and the stairs down to everybody else." % [str(bd.upper.get("n", "the upper floor")), str(bd.n), rooms.size() - 1, "apartments" if use == "home" else "rooms to let"])
+		out.append({"kind": "npc", "id": "apt:%s:%s:%d" % [area, str(bd.id), ri - 1], "n": nm, "asset": body, "col": Color.from_hsv(rng.randf(), 0.35, 0.6), "pos": at - r.position,
+			"area": area, "layer": fid, "late": true, "vis": ["", ""], "lines": lines, "indoor": true, "lodger": true})
+		# (a household can be worked for, like any below; a guest of an inn has no work to give)
+		if use == "home":
+			(out[out.size() - 1] as Dictionary)["trade"] = "home"
 	return out
 
 ## The furniture of a floor of rectangle `r` whose stairs come out on `stairs`: the pieces of `kinds`
@@ -751,7 +1096,7 @@ static func _furnish_floor(r: Rect2i, stairs: Vector2i, kinds: Array, seed_: int
 			break
 		var blocks: bool = kd[1]
 		var placed := false
-		if blocks or inner.is_empty() or str(kd[0]) in ["scroll", "window", "wall_panel", "lantern"]:
+		if blocks or inner.is_empty() or str(kd[0]) in ["scroll", "window", "wall_panel", "lantern", "herbs"]:
 			# against a wall
 			var tries := 0
 			while tries < edge.size() and not placed:

@@ -79,11 +79,11 @@ func _build() -> void:
 		ids = ["forbidden", "back"]
 		enabled = [Game.prologue == "", true]
 	elif mode == "land":
-		# weal.gd: the eleven towns, each with how it stands
+		# weal.gd: the towns, each with how it stands (a town of the Far Countries once he has been there)
 		labels = []
 		ids = []
 		enabled = []
-		for tid in Weal.ORDER:
+		for tid in Weal.towns(Game):
 			labels.append("%s  (%s)" % [str(Weal.TOWNS[tid].n).trim_prefix("the "), str(Weal.STATES[Weal.state(Game, tid)].n).to_lower()])
 			ids.append("town:" + tid)
 			enabled.append(true)
@@ -495,7 +495,7 @@ func _draw_law() -> void:
 	var head := str(st.n) if not Taboo.marked(Game) else "A walker of the forbidden"
 	UI.text(self, r.position + Vector2(24, 44), head, 26, st.col)
 	var sd := str(st.desc) if not Taboo.marked(Game) else "Found out at an art the precepts forbid. His name hangs at every gate with no price on it: the League takes no money. Only the Hall of Discipline, or the enforcers, can take it down."
-	if Crime.worst(Game) == 0 and not Game.slain.is_empty():
+	if Crime.worst(Game) == 0 and Crime.count(Game) > 0:
 		sd = "No bill hangs at any gate. That is not the same thing as a clean name, and he knows it."
 	UI.wrapped(self, r.position + Vector2(24, 66), main.told(sd), 15, UI.C_TEXT, r.size.x - 48)
 	var y := r.position.y + 122.0
@@ -531,7 +531,10 @@ func _draw_law() -> void:
 		UI.text(self, Vector2(r.position.x + 680, yd), "seen" if bool(rec.seen) else "unseen", 13, UI.C_RED if bool(rec.seen) else UI.C_DIM)
 		yd += 19.0
 		shown += 1
-	if Game.slain.is_empty():
+	if Game.slain.is_empty() and int(Game.watch_slain) > 0:
+		UI.text(self, Vector2(r.position.x + 420, yd), "%d of the watch." % int(Game.watch_slain), 14, UI.C_TEXT)
+		yd += 19.0
+	elif Game.slain.is_empty():
 		UI.text(self, Vector2(r.position.x + 420, yd), "Nobody.", 14, UI.C_DIM)
 		yd += 19.0
 	y = maxf(yy, yd) + 14.0
@@ -1078,6 +1081,7 @@ const MAP_NAMES := {
 	"longmen": "Longmen", "drowned": "Drowned Fields", "tushan": "Tushan", "buzhou": "Mount Buzhou",
 	"juntian": "Juntian", "changhe": "Changhe", "ninesprings": "The Nine Springs", "youdu": "Youdu",
 	"penglai": "Penglai", "fangzhang": "Fangzhang", "yingzhou": "Yingzhou", "guixu": "Guixu",
+	"huaxu": "Huaxu", "zhongbei": "Zhongbei", "gumang": "Gumang", "fuluo": "Fuluo",
 }
 
 ## The whole open world, the Unbroken Land within the Four Seas: every region in its own colours and

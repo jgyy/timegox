@@ -72,8 +72,17 @@ const STRATA := {
 	# on the sandbars the drain has left bare)
 	"sea": {"n": "The Eastern Sea", "w": 520, "h": 200, "y": 0.0, "land": 1.22, "holes": 174, "start": ["penglai", Vector2i(13, 32)],
 		"sites": {"penglai": [80, 100, 0], "fangzhang": [196, 80, 0], "yingzhou": [312, 116, 0], "guixu": [430, 96, 0]}},
+	# the Cloud Keel release: the Far Countries of the Liezi, which no boat, cart or foot can reach.  No
+	# ladder joins them to the land: only the spirit arks (arks.gd) go there, so the realm says where it
+	# lies itself (`at`: its grid's corner in the land's tiles, far out past the western sea).  Gumang in
+	# the far west, Huaxu where the arks moor, Zhongbei north-east of it and Fuluo in the far east
+	"far": {"n": "The Far Countries", "w": 520, "h": 200, "y": 0.0, "land": 1.25, "holes": 176, "start": ["huaxu", Vector2i(13, 32)], "at": Vector2i(-1400, 300),
+		"sites": {"gumang": [72, 104, 0], "huaxu": [190, 96, 0], "zhongbei": [310, 82, 0], "fuluo": [428, 102, 0]}},
 }
-const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs", "sea": "The Eastern Sea"}
+const LAYER_NAMES := {"surface": "The Unbroken Land", "heaven": "The Nine Heavens", "under": "The Nine Springs", "sea": "The Eastern Sea", "far": "The Far Countries"}
+## every realm, in the order they were found (the bot and the story keep to the first four: nothing of
+## the story is asked for in the Far Countries)
+const LAYERS := ["surface", "heaven", "under", "sea", "far"]
 
 static var _layout := {}
 static var _world := {}
@@ -157,6 +166,8 @@ static func layer_y(layer: String) -> float:
 static func layer_origin(layer: String) -> Vector2i:
 	if not STRATA.has(layer):
 		return Vector2i.ZERO
+	if STRATA[layer].has("at"):
+		return STRATA[layer].at
 	for ld in Data.LADDERS:
 		for e in [["a", "b"], ["b", "a"]]:
 			var here: Array = ld[e[0]]
@@ -755,6 +766,12 @@ static func _floor(layer: String, bd: Dictionary, lv: int, grid: PackedByteArray
 			e["layer"] = fid
 			fents.append(e)
 			taken[e.pos] = true
+	# (the Cloud Keel release, rooms.gd: whoever lives in the apartments of a divided storey)
+	if lv == 1:
+		for lg in Rooms.lodgers(bd, area, fid):
+			if not taken.has(lg.pos):
+				fents.append(lg)
+				taken[lg.pos] = true
 	var owner := PackedByteArray()
 	owner.resize(r.size.x * r.size.y)
 	var mid := Vector2(r.size) * 0.5

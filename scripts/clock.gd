@@ -37,7 +37,9 @@ const WATCHES := ["first", "second", "third", "fourth", "fifth"]
 ## places whose light is not the sun's (the void, the chaos before the world, the land of the dead, the
 ## caverns under the roots, the Moon Palace, the River of Time).  Missing themes follow fully.
 const CYCLE := {"void": 0.35, "chaos": 0.3, "origin": 0.5, "time": 0.4, "celestial": 0.6, "diyu": 0.45, "lilies": 0.6,
-	"guanghan": 0.35, "ninesprings": 0.55, "youdu": 0.4, "starpalace": 0.5, "abyss": 0.55, "palace": 0.6, "loom": 0.7}
+	"guanghan": 0.35, "ninesprings": 0.55, "youdu": 0.4, "starpalace": 0.5, "abyss": 0.55, "palace": 0.6, "loom": 0.7,
+	# (the Cloud Keel release: Gumang has no day and Fuluo no night; Huaxu is always a little before noon)
+	"gumang": 0.12, "fuluo": 0.15, "huaxu": 0.6}
 
 ## Minutes of the day per second of play at minute `m`.
 static func rate(m: float) -> float:
