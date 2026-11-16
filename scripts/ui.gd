@@ -27,7 +27,7 @@ const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon
 	# Part XXII: the Mountain Spirit and the Lord of the Eastern Peak
 	"person:shan_gui", "person:dongyue", "person:gao_jianli", "person:xiang_yu",
 	# Part XXV: the Patriarch of the Cold Pine
-	"person:han_song"]
+	"person:han_song", "person:shang_yang", "person:jiang_chong"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font

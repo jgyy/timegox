@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 39.0 * 3600.0
+var max_time := 41.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -120,6 +120,10 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXIX: four shingles to the fire that was foretold, four feathers to the wall that did not change, four
 	# pieces of gold carried back to the furrow, and six rooms put to rights to the friend who went to look
 	"chimney_fire": "relic", "old_wall": "relic", "furrow_gold": "relic", "hua_xin": "house",
+	# Part XXX: four pegs of the sides that came down to the net, a name no gate has a bill against to the
+	# sentence, six rooms put to rights to the man who wrote a law with no door in it, and four dolls with no
+	# earth on them to the man who brought them
+	"four_net": "relic", "the_sentence": "clean", "shang_yang": "house", "jiang_chong": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -168,7 +172,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXVIII: a kindness is owed onward, to the next stranger
 	"the_knot": ["onward"],
 	# Part XXIX: the mat left whole, and his place kept
-	"the_mat": ["whole"]}
+	"the_mat": ["whole"],
+	# Part XXX: the cord cut, and the judge back at his bench under a dead man's name
+	"the_verdict": ["bench"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -2823,6 +2829,15 @@ func _finish(reason: String) -> void:
 		Game.pack_day.size(), grown_n])
 	print("the way         : %s (%s)" % [Creed.name_of(Game), Creed.text(Game)])
 	print("the houses      : %d put to rights, %d things standing where he set them, %d of them where they should not be" % [Game.fitted.size(), Game.placed.size(), Game.misplaced])
+	# (the Open Net release: the law of the land, crime.gd; the shelf nobody opens, taboo.gd; and what all the
+	# hunting did to the countries it was done in, wilds.gd)
+	print("the law         : %s; %d dead by his hand, %d days in the circle, %d spirit stones paid to the watch; the forbidden shelf: %s" % [Crime.text(Game), Game.slain.size(), int(Game.served), int(Game.bounty_paid), Taboo.text(Game)])
+	var w_names: Array = []
+	for wa in Game.cull_worst:
+		if int(Game.cull_worst[wa]) >= 1:
+			w_names.append("%s (%s)" % [str(Data.AREAS[str(wa)].n), str(Wilds.STATES[int(Game.cull_worst[wa])].word)])
+	print("the wild        : %s now; %d countries thinned at some time, %d hunted out, %d barren; %d nets opened%s" % [Wilds.text(Game), Wilds.worst_count(Game, 1), Wilds.worst_count(Game, 2), Wilds.worst_count(Game, 3), int(Game.nets_opened),
+		("; the worst of it: " + ", ".join(w_names.slice(0, 6))) if not w_names.is_empty() else ""])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)

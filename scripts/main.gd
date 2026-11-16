@@ -197,7 +197,12 @@ func press(act: String) -> void:
 		if act == "ride":
 			world.toggle_ride()
 		elif act == "strike":
-			world.strike()
+			# (the Open Net release, crime.gd: F at somebody is a sword drawn on them: asked first)
+			var fe = world.face_entity()
+			if fe != null and Crime.is_person(fe) and Game.prologue == "" and not Crime.dead(Game, str(fe.id)):
+				offer_draw(fe)
+			else:
+				world.strike()
 		elif act == "qi":
 			world.qi_wave()
 		elif act == "glide":
@@ -248,6 +253,15 @@ func _process(d: float) -> void:
 			if mw > Game.mail_told:
 				Game.toast("A letter has come for you: ask at any counter of the post")
 			Game.mail_told = mw
+		# (the Open Net release, crime.gd: with a price on his head the watch comes for him in a town's own
+		# streets, and bounty-takers find him in the wild, each once a day)
+		if in_world and Game.prologue == "" and (not Game.bounty.is_empty() or Taboo.marked(Game)) and world.using.is_empty() and not world.traveling() and not world.gliding() and world.ambush_t < 0.0 \
+				and Game.done_pending.is_empty() and Game.cross_pending.is_empty():
+			var wdue := Crime.watch_due(Game, Game.area)
+			if not wdue.is_empty():
+				offer_watch(wdue)
+			elif not world.is_floor() and Crime.hunt_due(Game, Game.area):
+				meet_hunters()
 		Eggs.busy = not in_world or not world.using.is_empty() or world.traveling() or Game.prologue != ""
 		Eggs.gliding = in_world and world.gliding()
 		Eggs.on_summit = in_world and not world.gliding() and not Peaks.summit_at(world.wd, world.ptile).is_empty()
@@ -288,6 +302,10 @@ func say(lines: Array, cb: Callable = Callable()) -> void:
 		if cb.is_valid():
 			cb.call()
 		return
+	# (the Open Net release, crime.gd: somebody he struck down does not say their lines; the story goes on
+	# without them)
+	if not Game.slain.is_empty():
+		lines = Crime.mute(Game, lines)
 	# (the New Fire release: when the hero is a woman the conversation is told of her, voice.gd)
 	if Game.fem():
 		lines = Voice.lines(lines)
@@ -375,6 +393,10 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		# (the Answering Land release, weal.gd: and what became of the towns)
 		if not Weal.epilogue(Game).is_empty():
 			lines.append(["Narrator", " ".join(Weal.epilogue(Game))])
+		# (the Open Net release: who is dead by his hand and what was done to the wild are told at the end too)
+		var law_end: Array = Crime.epilogue(Game) + Wilds.epilogue(Game)
+		if not law_end.is_empty():
+			lines.append(["Narrator", " ".join(law_end)])
 		var stood := 0
 		for lid9 in ["surface", "heaven", "under", "sea"]:
 			stood += Marks.standing(Game, Atlas.world_of(lid9).ents)
@@ -526,6 +548,10 @@ func interact(e: Dictionary) -> void:
 	# something to set down at it, or to take up)
 	if e.kind == "prop" and e.has("furn") and Game.prologue == "" and offer_fit(e):
 		return
+	# (the Open Net release, crime.gd: where somebody he struck down stood there is a mound and a tablet)
+	if e.kind == "npc" and Crime.dead(Game, str(e.id)) and Game.prologue == "":
+		visit_grave(e)
+		return
 	match e.kind:
 		"npc":
 			talk_npc(e)
@@ -647,6 +673,17 @@ func offer_fit(e: Dictionary) -> bool:
 func talk_folk(e: Dictionary) -> void:
 	var fp: Dictionary = e.p
 	var lines := [[str(fp.n), Folk.line(fp, Game)]]
+	# (the Open Net release, crime.gd: somebody new, where one of the street was struck down; a wanted man is
+	# not chatted with; wilds.gd: the people of a camp speak of a country hunted out)
+	var wn0 := int(Game.folk_talk.get(str(fp.id), 0))
+	if Game.prologue == "" and not Game.slain.is_empty() and Crime.replaced(Game, str(fp.id)) and wn0 % 3 == 0:
+		lines = [[str(fp.n), "I have the place of the one who is gone. They do not say gone where. They look at the ground, and then they look at you."]]
+	elif Game.prologue == "" and Crime.line(Game, str(fp.town), int(fp.seed) + wn0) != "" and wn0 % 2 == 0:
+		lines = [[str(fp.n), Crime.line(Game, str(fp.town), int(fp.seed) + wn0).replace("%s", Game.address())]]
+	elif Game.prologue == "" and Taboo.marked(Game) and wn0 % 2 == 0:
+		lines = [[str(fp.n), str(Taboo.STREET[(int(fp.seed) + wn0) % Taboo.STREET.size()])]]
+	elif Game.prologue == "" and Folk.is_camp(str(fp.town)) and wn0 % 2 == 0 and Wilds.line(Game, str(fp.area), int(fp.seed) + wn0) != "":
+		lines = [[str(fp.n), Wilds.line(Game, str(fp.area), int(fp.seed) + wn0).replace("%s", Game.address())]]
 	# (the Answering Land release, weal.gd: every other word is about how their town stands, and why)
 	var wn := int(Game.folk_talk.get(str(fp.id), 0))
 	if wn % 2 == 1 and Game.prologue == "" and not Folk.new_year(Game):
@@ -701,6 +738,10 @@ func talk_folk(e: Dictionary) -> void:
 			# (the Heavy Road release, load.gd: a pedlar of the road buys what the land gave and sells
 			# what it is carried and worked with; "Not today" first)
 			offer_pedlar(fp, ask_home)
+		elif Folk.is_role(fp, "hunter") and Game.prologue == "" and Wilds.state(Game, str(fp.area)) >= 1:
+			# (the Open Net release, wilds.gd: a hunter of a country hunted too hard can be paid to open
+			# three sides of his net; "Not today" first)
+			offer_net(fp)
 		elif ask_home:
 			offer_home(fp)
 		else:
@@ -801,6 +842,15 @@ func talk_npc(e: Dictionary) -> void:
 			say(Cultures.HEARTHS[Game.prologue].farewell, func(): end_prologue())
 		else:
 			say([[str(e.n), "Off today, are you? Go and say your goodbyes, child. Don't keep the road waiting."]])
+		return
+	# (the Open Net release, taboo.gd: past three steps of a forbidden art, anybody of cultivation he speaks to
+	# knows what is on him; and the Elder will hear somebody found out, if he kneels)
+	if Taboo.senses(Game, e):
+		say(Taboo.sensed(Game, e))
+		return
+	var s9 := Game.cur_step()
+	if str(e.id) == "elder" and Taboo.marked(Game) and not (not s9.is_empty() and str(s9.kind) == "talk" and str(s9.npc) == "elder"):
+		offer_atone(e)
 		return
 	# the first time the hero sits down with one of a hearth's own people (cultures.gd)
 	Game.sit_with(str(e.id))
@@ -1016,6 +1066,168 @@ func talk_npc(e: Dictionary) -> void:
 		# carrying a keepsake their people love: offer it
 		after = func(): offer_gift(e)
 	say(lines, after)
+
+# ---------------------------------------------------------------- the law of the land (crime.gd, taboo.gd, wilds.gd)
+const DRAW_ASK := "The sword is a thumb's width out of the sheath."
+const WATCH_ASK := "The watch is waiting for an answer."
+const FORBID_ASK := "Three names every disciple is taught, so that he knows what not to do."
+const ATONE_ASK := "The Elder has not sent for the Hall of Discipline. He is waiting to see what you ask for."
+
+## F at somebody (crime.gd): a sword drawn on them.  "Sheathe it" first; the page says how the two of them
+## stand and who is looking.
+func offer_draw(e: Dictionary) -> void:
+	var seen := Crime.witnesses(Game, world.wd, world.ptile, str(e.id), func(x): return world.ent_visible(x))
+	var who := "Nobody is in sight." if seen == 0 else ("One person is in sight, and will have seen." if seen == 1 else "%d people are in sight, and will have seen." % seen)
+	var child := Crime.is_child(e)
+	var gt := Crime.town_for(str(e.get("area", Game.area)))
+	var gate := str(Weal.TOWNS[gt].n).trim_prefix("the ") if gt != "" else "the nearest town"
+	choose(DRAW_ASK, [
+		{"id": "sheathe", "label": "Sheathe it", "desc": "Nothing has been done. Nothing need be.", "col": UI.C_DIM},
+		{"id": "strike", "label": "Strike %s down" % str(e.n), "note": "unseen" if seen == 0 else "seen", "enabled": not child, "col": UI.C_RED,
+			"desc": told(Crime.weigh(Game, e)) + "\n\n" + who + " What is seen is answered for at the gate of %s; what is not seen is still done. The dead stay dead: whatever they were to have said in the story will not be said." % gate},
+	], func(pick: String):
+		if pick != "strike":
+			return
+		Models.act(world.player, Arms.strike_clip(world.player), world.t)
+		var r := Crime.strike(Game, e, seen)
+		if str(r.how) == "slain":
+			world.lay_grave(e)
+			fx_flash(Color(0.7, 0.05, 0.05), 0.5)
+		say(r.lines, func(): Game.poll_steps())
+	)
+
+## Where somebody he struck down stood (crime.gd): the mound; and then whatever the story or a counter still
+## needs of the place goes on without them.
+func visit_grave(e: Dictionary) -> void:
+	var s := Game.cur_step()
+	var lines: Array = [["Narrator", Crime.grave_line(Game, e)]]
+	var needed := false
+	if not s.is_empty():
+		needed = str(s.get("npc", "")) == str(e.id) or str(e.id) in s.get("npcs", [])
+	var counter: bool = e.has("office") or e.has("trade") or str(e.id) in ["alchemist", "smith", "dyer_su", "tailor_qiao", Jobs.CLERK, Hold.STEWARD, Gamble.DEALER]
+	if counter:
+		lines.append(["Narrator", Crime.heir_line(Game, e)])
+	if str(e.id) == "elder" and Taboo.marked(Game) and not (needed and str(s.kind) == "talk"):
+		# (the Hall of Discipline is still there, whoever is not: taboo.gd)
+		say(lines, func(): offer_atone(e))
+	elif needed or counter:
+		say(lines, func(): talk_npc(e))
+	else:
+		say(lines)
+
+## The watch has come for him (crime.gd): pay, go with them, run, or draw.
+func offer_watch(w: Dictionary) -> void:
+	say(Crime.watch_lines(Game, w), func():
+		var days := Crime.days_for(Game, int(w.price))
+		choose(WATCH_ASK, [
+			{"id": "pay", "label": "Pay the price", "note": "%d stones" % int(w.price), "enabled": Game.stones >= int(w.price), "col": UI.C_GOLD,
+				"desc": "%d spirit stones into the captain's hand (you have %d). The bill is torn up in front of you, and that is the end of it at this gate." % [int(w.price), Game.stones]},
+			{"id": "go", "label": "Go with them", "note": "%d days" % days, "col": UI.C_TEXT,
+				"desc": "There is no cell. There is a circle scratched on the ground by the gate, and nobody to guard it. %d days inside it, in front of everybody who passes, and the bill is burned. The days are lived: the land does not wait." % days},
+			{"id": "run", "label": "Run", "col": UI.C_DIM,
+				"desc": "They will not catch him today. The bill will be the heavier for it tomorrow, and they will come again."},
+			{"id": "draw", "label": "Draw on the watch", "col": UI.C_RED,
+				"desc": "Three of them, about as strong as he is: a cultivator's bill is served by people who can serve it. Win, and there are three more dead in the street and a price three times the size. Lose, and it is twice the days and half the purse."},
+		], func(pick: String):
+			match pick:
+				"pay":
+					if Crime.pay(Game, w):
+						say([["Captain of the Watch", "Counted. There: in four pieces, and into the gutter. I do not know you, and I never did. Good day."]])
+				"go":
+					var served := Crime.serve(Game, w)
+					say(Crime.serve_lines(Game, w, served))
+				"run":
+					var more := Crime.flee(Game, w)
+					say([["Narrator", "He is over the wall before the captain has folded the bill. Nobody runs after him; they only watch which way he goes, and write it down. %d more, for the running." % more]])
+				_:
+					battle.start(Crime.watch_group(Game), {"crime": "watch", "w": w, "boss": false, "theme": battle_theme()})
+					push("battle")
+		, false)
+	)
+
+## Bounty-takers, or the enforcers of the League, have found him in the wild (crime.gd).
+func meet_hunters() -> void:
+	Crime.hunted_today(Game)
+	say(Crime.hunt_lines(Game), func():
+		battle.start(Crime.hunters(Game), {"crime": "hunt", "boss": false, "theme": battle_theme()})
+		push("battle")
+	)
+
+func _crime_done(outcome: String, ctx: Dictionary) -> void:
+	# (he got away from them in the fight: from the watch that is running, and the bill is the heavier; the
+	# bounty-takers have had their day)
+	if outcome != "win" and outcome != "lose":
+		if str(ctx.crime) == "watch":
+			var ran := Crime.flee(Game, ctx.w)
+			say([["Narrator", "He breaks through between two spears and is over the wall. Nobody runs after him; they only watch which way he goes, and write it down. %d more, for the running." % ran]])
+		return
+	var won := outcome == "win"
+	if str(ctx.crime) == "watch":
+		var w: Dictionary = ctx.w
+		if won:
+			var more := Crime.resisted(Game, w)
+			say([["Narrator", "Three of the watch of %s lie in their own street. Every shutter that was open is shut. Somewhere a gong has begun, the slow one that is beaten for a fire. %d more on his head here; and now they will send for people who do this for a living." % [str(w.n), more]]])
+		else:
+			var days := Crime.serve(Game, w, true)
+			say(Crime.serve_lines(Game, w, days, true))
+		return
+	if won:
+		if not Taboo.marked(Game):
+			Crime.hunt_won(Game)
+		say([["Narrator", "They go back into the reeds, carrying one another. The bill is still in the first one's belt. He will sell it on to somebody who brings more friends; that is how the trade works." if not Taboo.marked(Game) else "The three in grey withdraw a sword's length at a time, facing him. They are not beaten. They are going to report. Tomorrow there will be three again."]])
+	elif Taboo.marked(Game):
+		say(Taboo.burn(Game))
+	else:
+		var w2 := Crime.hunt_lost(Game)
+		var days2 := Crime.serve(Game, w2, true)
+		say(Crime.serve_lines(Game, w2, days2, true))
+
+## Esc > The Law > The forbidden shelf (taboo.gd): sit to one of the three, here and now.  "Leave it shut" first.
+func open_forbidden() -> void:
+	var seen := Crime.witnesses(Game, world.wd, world.ptile, "", func(x): return world.ent_visible(x))
+	var who := "Nobody is in sight." if seen == 0 else ("Somebody is in sight." if seen == 1 else "%d people are in sight." % seen)
+	var opts: Array = [{"id": "shut", "label": "Leave it shut", "desc": "The names are taught so that they need never be anything else.", "col": UI.C_DIM}]
+	for id in Taboo.ORDER:
+		var d: Dictionary = Taboo.DAOS[id]
+		var why := Taboo.blocked(Game, id)
+		opts.append({"id": id, "label": str(d.n), "note": "%d of %d" % [Taboo.depth(Game, id), Taboo.MAX], "enabled": why == "", "col": d.col,
+			"desc": told(str(d.desc)) + "\n\n" + str(d.what) + " Two hours, and a fifth of his blood.\n\n" + (who + " Whoever sees it will tell the League." if why == "" else why)})
+	choose(FORBID_ASK, opts, func(pick: String):
+		if not Taboo.DAOS.has(pick):
+			return
+		var lines := Taboo.sit(Game, pick, seen, str(Data.AREAS[Game.area].n))
+		if not lines.is_empty():
+			fx_flash(Taboo.DAOS[pick].col, 0.4)
+			say(lines)
+	)
+
+## Found out, in front of the Elder (taboo.gd): kneel in the Hall of Discipline, or do not.  "Not today" first.
+func offer_atone(e: Dictionary) -> void:
+	var p := Taboo.penance(Game)
+	say([[str(e.n), "I know. I knew before the bills went up; I am old, child, not blind. I am not going to shout. I am going to tell you what it costs to come back, and you are going to tell me whether you are coming."]], func():
+		choose(ATONE_ASK, [
+			{"id": "later", "label": "Not today", "desc": "He will not send anybody after you. The League will, every day, and they are stronger than you are.", "col": UI.C_DIM},
+			{"id": "kneel", "label": "Kneel in the Hall of Discipline", "note": "%d days" % int(p.days), "col": UI.C_GOLD,
+				"desc": "Every forbidden art is taken out of you, with needles. %d days on the stone. %d spirit stones to the League for the bills to come down (as far as you have them). The stage you are cultivating is begun again. After that you are a disciple of the Azure Cloud, and the gates forget." % [int(p.days), int(p.fine)]},
+		], func(pick: String):
+			if pick == "kneel":
+				say(Taboo.atone(Game))
+		)
+	)
+
+## A hunter of a camp, in a country hunted too hard (wilds.gd): three sides of the net, for a price.
+func offer_net(fp: Dictionary) -> void:
+	var area := str(fp.area)
+	var why := Wilds.net_blocked(Game, area)
+	choose(Wilds.NET_ASK, [
+		{"id": "later", "label": "Not today", "desc": "The net stays as it hangs.", "col": UI.C_DIM},
+		{"id": "open", "label": "Open three sides", "note": "%d stones" % Wilds.net_price(Game), "enabled": why == "", "col": UI.C_JADE,
+			"desc": "%s is %s. %d spirit stones to %s for the catch he will lose, and three sides of his net come down: what will not turn aside is taken, and the rest goes by. The strain on this country is halved.%s" % [str(Data.AREAS[area].n), str(Wilds.info(Game, area).n).to_lower(), Wilds.net_price(Game), str(fp.n), ("\n\n" + why) if why != "" else ""]},
+	], func(pick: String):
+		world.folk_talking = ""
+		if pick == "open" and Wilds.open_net(Game, area):
+			say([[str(fp.n), "From the left, to the left. From the right, to the right. What wants to go up, up; what wants to go down, down. And what is tired of living, into my net. ...My father said it like that. I had stopped saying it."]])
+	)
 
 # ---------------------------------------------------------------- fated encounters (fate.gd)
 ## A chapter of somebody's story: the variant for what Lin Feng made of them so far, then the choice.
@@ -1898,6 +2110,8 @@ func scatter_pack(e: Dictionary) -> void:
 	Game.defeated[e.id] = Game.playtime
 	Almanac.put_down(Game, str(e.id))
 	Game.scattered += 1
+	if Wilds.native(e):
+		Wilds.culled(Game, str(e.get("area", Game.area)), 0.5)
 	var d: Dictionary = Data.ENEMIES[e.group[0].id]
 	Game.toast("%s scatter before your %s aura" % [d.n, Data.REALMS[Game.realm()]])
 	# a pack that runs has been driven off all the same: it counts for a hunt (an over-cultivated player
@@ -1930,7 +2144,13 @@ func start_encounter(e: Dictionary, ambush: bool = false) -> void:
 	# (the Ordered House release, almanac.gd: a pack left alone has grown: levels, a head more, an elder)
 	var grown_st := Almanac.stage(Game, e)
 	var grp: Array = Almanac.grown_at(e.group, grown_st)
-	battle.start(grp, {"entity": e, "boss": false, "theme": battle_theme(), "ambush": ambush, "habit": Habits.act_of_group(Game, e.group), "group": grp, "grown": grown_st})
+	# (the Open Net release, wilds.gd: in a country hunted too hard the pack is a head short, or followed by
+	# what eats the leavings)
+	var wild_st := Wilds.state(Game, str(e.get("area", Game.area))) if Wilds.native(e) else 0
+	grp = Wilds.group(Game, e, grp)
+	battle.start(grp, {"entity": e, "boss": false, "theme": battle_theme(), "ambush": ambush, "habit": Habits.act_of_group(Game, e.group), "group": grp,
+		# (what follows a hunted-out pack is not its elder: the old pack's name and harder blow are for a pack that is still itself)
+		"grown": grown_st if wild_st < 2 else 0, "wild": wild_st})
 	push("battle")
 
 func boss_interact(e: Dictionary) -> void:
@@ -2054,7 +2274,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -2087,6 +2307,10 @@ func recall_to_sect(key: String = "recall") -> void:
 
 func battle_done(outcome: String, ctx: Dictionary) -> void:
 	pop() # battle
+	# (the Open Net release, crime.gd: he drew on the watch, or the bounty-takers found him)
+	if ctx.has("crime"):
+		_crime_done(outcome, ctx)
+		return
 	match outcome:
 		"win":
 			if str(ctx.get("fate", "")) != "":
@@ -2155,6 +2379,9 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 				Game.defeated[e2.id] = Game.playtime
 				# (almanac.gd: a pack put down begins again from nothing; what fell is what it had grown to)
 				Almanac.put_down(Game, str(e2.id))
+				# (the Open Net release, wilds.gd: one of the land's own packs put down is felt by the country)
+				if Wilds.native(e2):
+					Wilds.culled(Game, str(e2.get("area", Game.area)))
 				var fought: Array = ctx.get("group", e2.group)
 				Game.record_kills(e2.get("area", Game.area), fought.size(), fought.map(func(g): return g.id))
 		"fall":

@@ -215,6 +215,9 @@ static func blocked(g, use: String, town: String) -> String:
 	# (the Ordered House release, creed.gd: nobody hires somebody of the Demonic Path)
 	if not Creed.can(g, "work"):
 		return Creed.why_not(g, "work")
+	# (the Open Net release, crime.gd: nor a man whose bill hangs at the gate)
+	if Crime.shut(g, town, "work") != "":
+		return Crime.shut(g, town, "work")
 	if not TRADES.has(use):
 		return "There is no work here for a stranger's hands."
 	if int(g.shift_day.get(town, -1)) == int(g.day):
@@ -285,6 +288,9 @@ static func fare_offer(g, e: Dictionary) -> Dictionary:
 	if not Creed.can(g, "fare"):
 		return {}
 	var area := str(e.get("area", ""))
+	# (the Open Net release, crime.gd: nor with a man whose bill hangs at the gate)
+	if Crime.shut(g, area, "fare") != "":
+		return {}
 	if not str(e.get("trade", "")) in FARE_USES or not area in FARE_TOWNS or Fashion.seats(str(g.ride)) < 3:
 		return {}
 	if g.passengers.size() + 2 >= Fashion.seats(str(g.ride)) or g.passengers.any(func(p): return str(p.id) == str(e.id)):

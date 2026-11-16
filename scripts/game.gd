@@ -290,6 +290,30 @@ var placed := {}
 var fitted := {}
 var misplaced := 0
 var step_fit := 0
+## the Open Net release (crime.gd): who is dead by his hand (id -> {n, day, area, town, seen, might}), the
+## price on his head (town -> spirit stones), the last of what is charged, the day the watch of each town
+## last came for him and the bounty-takers last found him, how often he has beaten them, days served in the
+## circle, and what he has paid
+var slain := {}
+var slain_n := 0
+var thrown := 0
+var bounty := {}
+var crimes: Array = []
+var watch_day := {}
+var hunter_day := -1
+var hunted := 0
+var served := 0
+var bounty_paid := 0
+var watch_slain := 0
+## (taboo.gd): how deep he has sat to each forbidden Dao ("marked" -> the day he was found out)
+var taboo := {}
+## (wilds.gd): the strain on each region (region -> [packs put down, the day it was counted]), the state last
+## told of it, the worst it was ever brought to, and the nets opened (region -> day)
+var cull := {}
+var cull_told := {}
+var cull_worst := {}
+var nets := {}
+var nets_opened := 0
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -310,6 +334,8 @@ func _process(d: float) -> void:
 			if day != _poll_day:
 				_poll_day = day
 				Almanac.poll(self)
+				# (the Open Net release, wilds.gd: what the days have mended in the countries he hunted)
+				Wilds.poll_all(self)
 			Creed.poll(self)
 			# (needs.gd: the body follows the land's clock; the night wears comfort faster)
 			if survival and prologue == "":
@@ -504,6 +530,23 @@ func reset() -> void:
 	fitted = {}
 	misplaced = 0
 	step_fit = 0
+	slain = {}
+	slain_n = 0
+	thrown = 0
+	bounty = {}
+	crimes = []
+	watch_day = {}
+	hunter_day = -1
+	hunted = 0
+	served = 0
+	bounty_paid = 0
+	watch_slain = 0
+	taboo = {}
+	cull = {}
+	cull_told = {}
+	cull_worst = {}
+	nets = {}
+	nets_opened = 0
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]

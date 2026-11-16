@@ -278,7 +278,7 @@ const ENDINGS := {
 		"desc": "Four Daos of arms learned to Adept. Open a school in the lower courtyard where a child of any hearth may learn any weapon, and where the first year is spent with a broom.",
 		"needs": [["arms", 4]], "sky": Color(0.92, 0.96, 1.0),
 		"lines": [["Narrator", "In the lower courtyard of the Azure Cloud Sect there are eight racks, and beside the first of them a row of brooms. The horse-folk send their sons to learn the spear and their daughters the bow, and the founders of Tushan send children who already know what a blade costs to make."],
-			["Narrator", "Every one of them sweeps the nine hundred steps for a year before touching steel. Lin Feng says it is to learn the stance. Yue Ling says it is so that they know what the mountain looks like when nobody is fighting on it, and she is the one the children believe."]]},
+			["Narrator", "Every one of them sweeps the nine hundred and ninety-nine steps for a year before touching steel. Lin Feng says it is to learn the stance. Yue Ling says it is so that they know what the mountain looks like when nobody is fighting on it, and she is the one the children believe."]]},
 	# ---- the Three Burrows release: four more ends, for the journey that answered for a town (hold.gd) and
 	# said what was to be done with its debts and its seat (echoes.gd): two bright, one bitter, one dark
 	"guiyun": {"n": "The Hundred Households", "label": "Go down to Guiyun", "sub": "A town that says it built itself", "kind": "bright", "face": "smile",

@@ -570,6 +570,9 @@ static func use(e: Dictionary, g) -> Array:
 	# done, and counts as done, and gives nothing)
 	if str(k.get("clip", "")) in ["pray", "offer"] and not Creed.can(g, "pray"):
 		return [Creed.why_not(g, "pray")]
+	# (the Open Net release, taboo.gd: nor for somebody found out at a forbidden art)
+	if str(k.get("clip", "")) in ["pray", "offer"] and Taboo.marked(g):
+		return ["The stick will not take the flame. It is not that the flame is refused. It is that there is something on his hands the incense will not burn beside."]
 	match str(k.get("effect", "")):
 		"rest":
 			out.append(_restore(g, 0.25, 0.25, "Rested"))

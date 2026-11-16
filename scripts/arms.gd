@@ -46,7 +46,7 @@ const WEAPONS := {
 		"mods": {"crit": [0.05, 0.08, 0.12], "strike": [1.08, 1.14, 1.2]},
 		"axis": Vector3(0, -0.75, 0.66), "edge": Vector3(0, -0.66, -0.75)},
 	"staff": {"n": "The Sweeper's Staff", "zh": "the staff", "model": "staff", "clip": "arm_staff", "art": "art_staff", "skill": "arm_sweep", "col": Color("e8d8a0"),
-		"desc": "The handle of the broom he swept the nine hundred steps with, of white waxwood, shod with iron at both ends by Smith Tie for a joke. The grandfather of arms: every other weapon is a stick with something added.",
+		"desc": "The handle of the broom he swept the nine hundred and ninety-nine steps with, of white waxwood, shod with iron at both ends by Smith Tie for a joke. The grandfather of arms: every other weapon is a stick with something added.",
 		"how": "His own broom handle. It was always a staff.",
 		"dao": {"n": "Dao of the Level Staff", "motto": "A broom does not choose which leaf.",
 			"desc": "The plain blow sweeps on through every other foe for a share of its strength."},

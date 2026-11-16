@@ -67,7 +67,7 @@ const LETTERS := {
 		"lines": ["Sweeper: the granary is roofed. It was your eight stems and my bricks and somebody's sawdust. I hear you have a ring now that holds everything. Good. Take out one thing every morning and carry it a hundred paces, and put it back at night. I will know if you do not. I shall not know how, but I will."]},
 	# ---- Part XXVIII (the Answering Land release): letters about what is owed, and from a man mending doors
 	"knot_nothing": {"from": "Tanner Hou's Widow", "needs": ["the_knot", "nothing"], "wait": 3,
-		"lines": ["Lin Feng, my father sleeps at night now. He says you told him the account was closed the day it was opened. He has taken up whittling, badly. I enclose the price of a spoon. It is the fourth he has made and the first that would hold soup, and somebody bought it, owing you nothing."],
+		"lines": ["Lin Feng, my father lies quiet now. Eleven years the grass on his mound was trodden flat every morning, and since the autumn it stands. I am told you said the account was closed the day it was opened. I enclose the price of a spoon he whittled, badly, when he was alive. Somebody bought it, owing you nothing."],
 		"gift": {"stones": 300}},
 	"knot_ledger": {"from": "Book-Keeper Mu of Qingshi", "needs": ["the_knot", "ledger"], "wait": 3,
 		"lines": ["The book has four hundred entries and three hundred and sixty lines drawn through. There are eleven against your name that you have never answered, child, because nobody told you of them. I enclose the list. Do not hurry. They have waited years, and found the waiting had a use."]},
@@ -86,6 +86,16 @@ const LETTERS := {
 		"lines": ["Lin Feng, I have now seen fourteen carriages. I have a table of them: canopy, outriders, rank, and whether the great man inside looked happy. None did. Hua Xin says this is the most useful thing I have ever written. I am afraid he is right. I have my book with me. I have not opened it."]},
 	"tian_chimney": {"from": "Householder Tian", "after": "s_p29_feast", "wait": 4,
 		"lines": ["Sweeper: the new chimney has a bend in it a goat could hide in, and the wood is at the far wall. The guest comes on the first of every month and walks round the stove with his hands behind him. He has found nothing yet. He eats at the top of the table. I think he is disappointed."]},
+	# ---- Part XXX (the Open Net release): letters from a clerk, a judge, a widow, and a fowler with one net
+	"verdict_sword": {"from": "Clerk Bo of Jin", "needs": ["the_verdict", "sword"], "wait": 3,
+		"lines": ["Lin Feng: I am the clerk whose report it was. The Duke has made me keeper of the judge's seal, which is the cruellest kind thing ever done to me. I read every case aloud before it is sealed now, to an empty bench. The new judge thinks I am mad. He has started listening."]},
+	"verdict_bench": {"from": "Li Li, Judge of Jin", "needs": ["the_verdict", "bench"], "wait": 3,
+		"lines": ["Child, I heard forty cases this month, each of them twice, under his name. I was wrong in three on the first hearing. Three. In nineteen years before it I was never wrong once, as far as I knew. I enclose a month of the salary I do not share. Spend it on somebody."],
+		"gift": {"stones": 340}},
+	"verdict_field": {"from": "Widow Sang", "needs": ["the_verdict", "field"], "wait": 3,
+		"lines": ["To the cultivator: the old man you sent has hoed the south rows crooked and the north rows straight, so he can be taught. He asked me whether I wished to appeal against him. I said I wished him to mind the weeds. I do not know what he was before. He is a poor farmer, and he does not stop."]},
+	"fowler_net": {"from": "The Fowler of the Four Nets", "after": "s_p30_net", "wait": 4,
+		"lines": ["Cultivator, I cannot write, a pedlar is writing this. One net, the west side. Eleven birds this month where I used to take sixty, and I counted three cranes that walked round it and looked at me. My mother says her father hung his so. She had not told me. I am sending a peach."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -190,7 +200,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:
@@ -277,6 +287,9 @@ static func bag_offer(g, office: String) -> Dictionary:
 	# (the Ordered House release, creed.gd: the post goes with people who can be found afterwards, and whose
 	# hand the town's seal can be put in)
 	if not Creed.can(g, "bag") or not Creed.can(g, "bag_dark"):
+		return {}
+	# (the Open Net release, crime.gd: nor in a hand the town has a price on)
+	if is_post(office) and Crime.shut(g, area_of(office), "bag") != "":
 		return {}
 	if not is_post(office) or g.mail_bags.size() >= BAGS or int(g.bag_day.get(office, -1)) == int(g.day):
 		return {}

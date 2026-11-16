@@ -869,7 +869,7 @@ const SHARES := {
 		],
 		"end": [["Narrator", "They walk down in the dark with the eight weapons shared between them, four and four, which is awkward, and neither of them suggests any other way of carrying them."]]},
 	"s_p21_sweep": {"lines": [
-		["Narrator", "First light on the nine hundred steps. Two brooms. It is the wrong season for leaves and there is nothing much to sweep, and they sweep it anyway, from the gate down, a step at a time, the way he did it every morning for four years before anybody knew his name."],
+		["Narrator", "First light on the nine hundred and ninety-nine steps. Two brooms. It is the wrong season for leaves and there is nothing much to sweep, and they sweep it anyway, from the gate down, a step at a time, the way he did it every morning for four years before anybody knew his name."],
 		["Yue Ling", "You are slower than you used to be. Auntie Zhou says you could do the whole stair before the rice was on. I have watched you this morning. You look at each step."],
 		["Yue Ling", "When this is over, the last of it, down in the barrow. If it comes out badly. If you come up and you are somebody who cannot put it down. What am I to do?"]],
 		"ask": "The broom has stopped. What do you say?",
@@ -878,7 +878,7 @@ const SHARES := {
 			{"id": "leave", "label": "\"Go. I would want you to.\"", "lean": "wander", "after": [["Lin Feng", "Go. Take the south road and do not wait a year by any pond. I should not want to be a thing you sat beside out of duty. I have seen what that does, in a king's hall."], ["Yue Ling", "I would go. I think I would. And I would come back in a year to see whether you had found the broom by yourself. You may count on both."]]},
 			{"id": "stay", "label": "\"It will not. You will be there.\"", "lean": "companion", "after": [["Lin Feng", "It will not come out badly, because you will be standing behind me with that look, and I have never yet done a thing I was ashamed of with that look on the back of my neck."], ["Yue Ling", "That is not an answer. ...It is rather a good one, though. Very well. I shall look."]]},
 		],
-		"end": [["Narrator", "They finish the stair. At the bottom Yue Ling turns round and looks back up nine hundred clean steps, and says that she sees now why nobody could ever get him to stop."]]},
+		"end": [["Narrator", "They finish the stair. At the bottom Yue Ling turns round and looks back up nine hundred and ninety-nine clean steps, and says that she sees now why nobody could ever get him to stop."]]},
 	# ---- Part XX (the Hollow Hills release)
 	"s_p20_tea": {"lines": [
 		["Narrator", "The tea table under the wall at Tushan, at the end of the day the forty came up. The town is very quiet: every house has somebody back in it who was not there at breakfast, and nobody quite knows what to say to him. Yue Ling pours two bowls and then does not drink hers. She is looking into it."],
@@ -1073,7 +1073,7 @@ const SHARE_PLACES := {"s_p15_pond": "by the lotus pond", "s_p15_name": "by the 
 	"s_p18_drill": "drilling the new fire", "s_p18_feast": "at the feast of six tables",
 	"s_p19_campfire": "at the caravan fire before the dunes", "s_p19_rest": "grinding rice by hand at the old millstone",
 	"s_p20_tea": "over a bowl of tea at Tushan", "s_p20_fire": "at the campfire below Rotten-Axe Cave",
-	"s_p21_stage": "on the open-air stage, with eight weapons", "s_p21_sweep": "sweeping the nine hundred steps"}
+	"s_p21_stage": "on the open-air stage, with eight weapons", "s_p21_sweep": "sweeping the nine hundred and ninety-nine steps"}
 
 static func share_place(sid: String) -> String:
 	return str(SHARE_PLACES.get(sid, "side by side"))

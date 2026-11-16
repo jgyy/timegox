@@ -96,6 +96,9 @@ const ACTS := {
 	"broke": {"m": "regard", "per": -2, "max": 4, "why": "things broken in its streets"},
 	"unpaid": {"m": "regard", "per": -1, "max": 3, "why": "things broken and never paid for"},
 	"sold": {"m": "plenty", "per": 6, "max": 2, "why": "timber, stone and fish sold on its roads"},
+	# the Open Net release (crime.gd): somebody struck down in its streets, a sword drawn on somebody
+	"slain": {"m": "peace", "per": -1, "max": 6, "why": "struck down in its streets by his hand"},
+	"drawn": {"m": "regard", "per": -1, "max": 3, "why": "times he drew on somebody here and was put on his back"},
 }
 ## how many lords put down in a town's country make one point of peace, and how many points at most;
 ## and the same for packs cleared out of it
@@ -195,7 +198,8 @@ static var _cache := {}
 static var _stamp := ""
 
 static func _stamp_of(g) -> String:
-	return "%d|%d|%d|%d|%d|%d|%d|%d|%d|%d" % [g.get_instance_id(), int(g.step), int(g.weal_n), g.picks.size(), g.boss_done.size(), int(g.kills) / 20, g.war_won.size(), int(g.war_lost), g.falls.size(), g.works.size()]
+	return "%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d" % [g.get_instance_id(), int(g.step), int(g.weal_n), g.picks.size(), g.boss_done.size(), int(g.kills) / 20, g.war_won.size(), int(g.war_lost), g.falls.size(), g.works.size(),
+		Wilds.stamp(g), Crime.heat(g)]
 
 ## What a tilt of a crossroads does to the towns that hear of it: [[measure, points], ...].
 static func tilt_marks(tilt: Dictionary) -> Array:
@@ -301,6 +305,18 @@ static func causes(g, tid: String) -> Array:
 			continue
 		var d := mini(int(ACTS[a].max), n / absi(per)) * (1 if per > 0 else -1)
 		out.append({"m": str(ACTS[a].m), "d": d, "why": "%d %s." % [n, str(ACTS[a].why)]})
+	# (the Open Net release, wilds.gd: a country hunted out is felt in the towns that hear of it; crime.gd: a
+	# town does not forget who is dead in its streets, or whose bill hangs at its gate)
+	out.append_array(Wilds.town_causes(g, t.areas))
+	if not g.slain.is_empty():
+		var seen_here := 0
+		for sid in g.slain:
+			if str(g.slain[sid].town) == tid and bool(g.slain[sid].seen):
+				seen_here += int(g.slain[sid].get("seen_n", 1))
+		if seen_here > 0:
+			out.append({"m": "regard", "d": -mini(6, 2 * seen_here), "why": "%d dead by his hand here, and it was seen." % seen_here})
+	if Crime.standing(g, tid) == 2:
+		out.append({"m": "peace", "d": -2, "why": "An outlaw: his bill hangs at the gate, and doors are barred when he is near."})
 	# (and his own town on the mountain's shoulder brings trade to the post town below it)
 	if tid == "cloudfoot" and Hold.founded(g) and Hold.rank(g) >= 2:
 		out.append({"m": "plenty", "d": Hold.rank(g) - 1, "why": "Guiyun sends its carts down through the town."})
@@ -366,7 +382,8 @@ static func mod(g, area: String, key: String) -> float:
 	var tid := town_of(area)
 	if tid == "":
 		return 1.0
-	return float(STATES[state(g, tid)].get(key, 1.0))
+	# (the Open Net release, crime.gd: a wanted man is served dearer where his bill hangs)
+	return float(STATES[state(g, tid)].get(key, 1.0)) * Crime.mod(g, tid, key)
 
 ## A price asked at a counter in region `area`.
 static func price(g, area: String, base: int) -> int:
@@ -378,6 +395,9 @@ static func gift_cost(g) -> int:
 
 ## Why nothing can be given to the chest of town `tid` just now ("" if it can).
 static func gift_blocked(g, tid: String) -> String:
+	# (the Open Net release, crime.gd: the chest takes nothing from a hand the town has a price on)
+	if TOWNS.has(tid) and Crime.shut(g, str(TOWNS[tid].area), "gift") != "":
+		return Crime.shut(g, str(TOWNS[tid].area), "gift")
 	if acts(g, tid, "gift") >= GIFT_MAX:
 		return "The chest has had three gifts of you, and the town will not take a fourth: \"We should begin to think it was owed.\""
 	if int(g.stones) < gift_cost(g):
@@ -529,8 +549,11 @@ const FATES := [
 	{"npc": "watchman_zhou", "when": ["the_host", ["keep"]], "tag": "with a corporal over him", "line": "A standing host, and so a corporal, and so I am told at what hour to strike the watch I have struck for thirty years. I strike it a little late now. He has not noticed. It is a comfort."},
 	{"npc": "fishwife_lu", "when": ["the_tide", ["wall"]], "tag": "with a stall on the wall", "line": "I have a stall on top of the wall of baskets now. The tide comes up, looks at me and goes away again. I sell more fish from up there than I ever did with my feet wet."},
 	{"npc": "fishwife_lu", "when": ["the_tide", ["yield"]], "tag": "who lost the low field", "line": "My mother's field is under the water, the low one. You gave it to the tide. ...The crabs that have come up in it are the size of a hat. I am not thanking you. I am telling you the size."},
-	{"npc": "tea_seller_pan", "when": ["the_tallies", ["burn"]], "tag": "whose slate is clean", "line": "Half this town owed and now nobody does, and they all sit here and order the good leaf because they can look me in the eye again. Burned tallies. I should have thought of it for my own slate."},
-	{"npc": "tea_seller_pan", "when": ["the_tallies", ["collect"]], "tag": "with empty benches", "line": "They paid, to the last notch, the ones who owed. And now they drink water at home. Look at my benches. A debt collected is a customer buried. I do not say it should not have been."},
+	{"npc": "tea_seller_pan", "when": ["the_tallies", ["burn"]], "tag": "whose slate is clean", "line": "They burned the tallies up at that town of yours, I hear, and the news came down the road faster than tea. Half my customers asked whether I would burn my slate. I did. They order the good leaf now, and look me in the eye."},
+	{"npc": "gate_wu", "when": ["the_verdict", ["sword"]], "tag": "who has been thinking about his gate", "line": "A judge of Jin kept his own law to the end, and you stood by. Twenty years I have let through this gate whoever I was told to. Last night I asked myself who I should have stopped. I am still asking."},
+	{"npc": "gate_wu", "when": ["the_verdict", ["bench"]], "tag": "who asks twice now", "line": "They say there is a court in Jin that hears every case twice, under a dead man's name. I ask everybody their business twice now, at this gate. It holds up the carts. Nobody has been turned away wrongly since."},
+	{"npc": "gate_wu", "when": ["the_verdict", ["field"]], "tag": "with a hoe leaning by the gate", "line": "A judge hoeing beans for a widow. I let a pedlar through once who robbed the kitchens. I never told anybody. I have dug Auntie Zhou's leek bed every morning since I heard. She thinks I have gone simple."},
+	{"npc": "tea_seller_pan", "when": ["the_tallies", ["collect"]], "tag": "with empty benches", "line": "They paid to the last notch up at that town of yours, I hear. My customers heard it too, and now they drink water at home against the day I call in my slate. Look at my benches. I do not say it should not have been."},
 	{"npc": "porter_niu", "when": ["the_sack", ["share"]], "tag": "with his name on the board", "line": "My name is on the carriers' board, against a strap. Four of us to a load now, and the pay split, and I get home with a back I can stand up in. I did not know my name looked like that."},
 	{"npc": "cook_zhou", "when": ["the_sack", ["down"]], "tag": "who cooks for one more", "line": "You are home for supper now, most nights. I have had to find the big pot again. I complained for an hour, and then I cried into the stock, and it was the best I ever made."},
 	{"npc": "granny_wen", "when": ["widow", ["kind"]], "tag": "who knows what you told her", "line": "You told that widow he was waiting. I heard. It was a lie, and it was the right one, and I have told a hundred like it at a hundred bedsides. Sit down. You have my trade's hands."},

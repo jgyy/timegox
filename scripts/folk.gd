@@ -1113,6 +1113,17 @@ const ERRANDS := {
 			"I have seen him. My dog has not. The dog looks straight through where he is and wags, as it does at my father's grave. I do not hunt that side of the field any more. It seems rude.",
 			"Seen him? I have nearly fallen over his work. Knots, a hand high, all down the slope where the big one from Qin stands. I thought, there is a man with a grudge. Then I saw his face. It is not a grudge. It is the other thing.",
 			"He asked me the way to the tanner's house, the first night. I told him the tanner was dead these two years. He said he knew; he only wanted to see that the roof was sound. Then he went back to his grass."]},
+	# Part XXX (the Open Net release): three sides of a hunter's net, and the old words over the fourth
+	"s_p30_hunters": {"ask": "A lord in the Peach Garden took down three sides of a fowler's net and left the fourth. Will you take down three of yours, and say over the last: what would go left, go left?", "price": 0, "toast": "%s has taken down three sides of the net",
+		"lines": ["Three sides? I take little enough with four. ...My father hung one. He said it the way you said it: left, left; right, right. I thought he was a soft old man. He fed nine of us. Hand me that peg.",
+			"I have seen the hills go quiet over the ridge. I told myself it was the weather. A hunter can tell himself a great deal while the net is full. Very well. One side, and may what is tired of living find it.",
+			"You are a cultivator. You could empty this valley in a morning and you are asking me to take less. That is either a joke or the only sense I have heard this year. I shall take the nets down while I decide.",
+			"What would go up, up. What would go down, down. I had forgotten there was any more to it than the knots. Say it again, slowly. I want to have it right for the boy."]},
+	"s_p30_anglers": {"ask": "The old kings forbade a mesh under four inches in the pools, so that the small fish might be left to grow. Will you cut every second knot of yours?", "price": 0, "toast": "%s is cutting the mesh wider",
+		"lines": ["Four inches? I should catch nothing but what is worth catching. ...Say that again. No, I heard it. I have been throwing back fingerlings for thirty years and cursing them; it never came to me to let them not be caught.",
+			"My net is my grandfather's, and he would rise out of the lake if I put a knife to it. He would also say the carp were bigger in his day. Perhaps the two things are one thing. Hold this end.",
+			"A cultivator, asking a fisherman to take less. You could boil this lake dry with a look, they say. Well. If you can keep your hand in your sleeve, I suppose I can cut a knot.",
+			"Every second knot. And what goes through this year I shall meet again next year, twice the size, and it will not know me. That is a better bargain than I usually get from a fish."]},
 	# Part XXIX (the Ordered House release): every bucket a pedlar carries, for a house with a straight chimney
 	"s_p29_pedlars": {"ask": "There is a house afire below the fourth height of Qingshi, and the well is a street away. Will you bring every bucket, pot and ladle on your pole, and not ask who pays?", "price": 0, "toast": "%s is running with every bucket on the pole",
 		"lines": ["Fire? Say no more. Buckets are six stones apiece, and tonight they are nothing apiece. I have sold water-jars in that lane for ten years and told every one of them where to stand it.",
@@ -1402,6 +1413,9 @@ const POSTS := {
 	"navid": ["weigh|count|offer", "steelyard", "doze"], "farida": ["weave|pour|knead", "", "doze"], "nomad": ["comb|toss", "", "doze"], "jailer_wife": ["sew|sweep", "needle", "doze"],
 	"scholar_cen": ["read|write", "book", "read"], "ah_mei": ["wash|wring|hang", "cloth", "doze"], "ah_shui": ["fish|sew", "rod", "doze"], "little_bei": ["dance|clap", "", "doze"],
 	"little_qi": ["kite|clap", "", "doze"], "little_hu": ["dance|clap", "", "doze"], "little_haibao": ["toss|clap", "", "doze"], "que_lao": ["sit_bench|think", "", "doze"],
+	# Part XXX (the Open Net release)
+	"net_fowler": ["pray|gather|peer", "", "doze"], "cheng_tang": ["gaze|think|gather", "", "meditate"], "li_li": ["sit_bench|think|read", "", "meditate"],
+	"shang_yang": ["read|write|count", "book", "read"], "jiang_chong": ["dig|peer|point", "", "doze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }
 

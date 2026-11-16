@@ -534,6 +534,10 @@ func _apply_look() -> void:
 ## The Living Land release (clock.gd): the sky, the sun or the moon, the fog and the lanterns follow
 ## the hour.  Called every frame the world is on screen (a handful of parameters on shared resources).
 var night_k := 0.0
+var wild_fade := 0.0
+var wild_was := false
+var wild_crows: Node3D = null
+var wild_crows_n := 0
 func _apply_hour() -> void:
 	if headless() or cam == null or cam.environment == null:
 		return
@@ -543,6 +547,24 @@ func _apply_hour() -> void:
 		return
 	var lk := Look.apply_hour(cam.environment, sun, fill, theme_name, Clock.hour(Game))
 	night_k = float(lk.night)
+	# (the Open Net release, wilds.gd: a country hunted too hard loses its colour, and the crows turn over it)
+	var want_fade := Wilds.fade(Game, area_id) if (not Game.cull.is_empty() and not is_floor() and area_id != "") else 0.0
+	wild_fade = lerpf(wild_fade, want_fade, 0.03)
+	if wild_fade > 0.002 or wild_was:
+		wild_was = wild_fade > 0.002
+		cam.environment.adjustment_saturation = 1.08 * (1.0 - 0.82 * wild_fade)
+		cam.environment.adjustment_brightness = 1.0 - 0.1 * wild_fade
+	var want_crows := 0 if want_fade < 0.35 else (5 if want_fade < 0.7 else 11)
+	if want_crows != wild_crows_n:
+		wild_crows_n = want_crows
+		if wild_crows != null and is_instance_valid(wild_crows):
+			wild_crows.queue_free()
+		wild_crows = null
+		if want_crows > 0:
+			wild_crows = Wilds.crows(want_crows)
+			scene3d.add_child(wild_crows)
+	if wild_crows != null and player != null:
+		Wilds.turn_crows(wild_crows, _player_pos(), t)
 	MB.set_night(night_k)
 	RenderingServer.global_shader_parameter_set("night_k", night_k)
 	# the hero carries a little light of his own after dark
@@ -1018,6 +1040,23 @@ func placed_changed() -> void:
 		m.rotation.y = Terrain3D.hash2(e.pos.x, e.pos.y, 5.0) * 0.6
 		placed_root.add_child(m)
 
+## The Open Net release (crime.gd): somebody has been struck down: a mound and a tablet are drawn where they
+## stood (one of the people of the towns is simply gone from the street).
+func lay_grave(e: Dictionary) -> void:
+	if headless() or str(e.kind) != "npc":
+		return
+	var n: Node3D = ent_nodes.get(e.id)
+	if n == null or n.has_meta("grave"):
+		return
+	if n.has_meta("model"):
+		(n.get_meta("model") as Node3D).visible = false
+	else:
+		for c in n.get_children():
+			if c is Node3D and not (c is Label3D):
+				(c as Node3D).visible = false
+	n.add_child(Crime.grave(bool(Game.slain[str(e.id)].seen)))
+	n.set_meta("grave", true)
+
 ## The tile a pickup, ladder or anyone else stands on, as a 3D position in its own realm.
 func ent_pos(e: Dictionary) -> Vector3:
 	return Terrain3D.world_pos(e.pos) + off
@@ -1122,6 +1161,11 @@ func _make_ent(e: Dictionary, at: Vector3 = Vector3.ZERO) -> Node3D:
 				Assets.lend_clips(m)
 			n.add_child(m)
 			n.add_child(Models.shadow_disc(0.6))
+			# (the Open Net release, crime.gd: somebody he struck down: a mound and a tablet in their place)
+			if not Game.slain.is_empty() and Crime.dead(Game, str(e.id)):
+				m.visible = false
+				n.add_child(Crime.grave(bool(Game.slain[str(e.id)].seen)))
+				n.set_meta("grave", true)
 			_label(n, e.n, 2.45, UI.C_GOLD)
 			var mark := _label(n, "!", 3.1, Color("ffdc50"), 72)
 			n.set_meta("model", m)
@@ -1899,6 +1943,9 @@ func _process(d: float) -> void:
 	for k in Game.defeated.keys():
 		if Game.playtime - Game.defeated[k] > 150.0:
 			var e = find_ent(k)
+			# (the Open Net release, wilds.gd: in a country hunted too hard the land's own packs are slow to return)
+			if e != null and not Game.cull.is_empty() and Wilds.native(e) and Game.playtime - Game.defeated[k] <= 150.0 * Wilds.back(Game, str(e.get("area", area_id))):
+				continue
 			if e == null or maxi(absi(e.pos.x - ptile.x), absi(e.pos.y - ptile.y)) > 6:
 				Game.defeated.erase(k)
 	var active: bool = main.top_name() == "world"
@@ -2325,6 +2372,9 @@ func face_entity():
 		if not fs.is_empty() and str(fs.kind) == "folk":
 			want = func(q: Dictionary) -> bool: return Folk.is_role(q, str(fs.role)) and not Game.folk_has(fs, str(q.id))
 		var fp := Folk.at_tile(wd, ptile + facing, Game.clock, want)
+		# (the Open Net release, crime.gd: one of the street he struck down is gone from it)
+		if not fp.is_empty() and not Game.slain.is_empty() and Crime.gone(Game, str(fp.id)):
+			fp = {}
 		if not fp.is_empty():
 			e = {"kind": "folk", "id": fp.id, "n": fp.n, "p": fp, "pos": ptile + facing, "area": fp.area}
 	return e
@@ -3422,7 +3472,7 @@ func _update_folk(d: float, pp: Vector3) -> void:
 					var id: String = fp.id
 					var fn: Node3D = folk_nodes.get(id)
 					var flat := Vector2(goal.x - pp.x, goal.z - pp.z)
-					if not st.vis or flat.length() > Folk.SEE:
+					if not st.vis or flat.length() > Folk.SEE or (not Game.slain.is_empty() and Crime.gone(Game, id)):
 						if fn != null:
 							fn.visible = false
 						continue
