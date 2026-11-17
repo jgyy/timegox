@@ -6880,7 +6880,7 @@ func _hands_shots(which: String = "1") -> void:
 			await frames_n.call(8)
 			quiet.call()
 			await _shot("phase_%s_struck" % str(el))
-			await frames_n.call(34)
+			await frames_n.call(12)
 			quiet.call()
 			await _shot("phase_%s" % str(el))
 			pf.append(last_img)
@@ -6896,7 +6896,7 @@ func _hands_shots(which: String = "1") -> void:
 				Game.phase = str(el2)
 				w.strike_t = -9.0
 				w.strike()
-				await frames_n.call(22)
+				await frames_n.call(9)
 			await frames_n.call(20)
 			quiet.call()
 			await _shot("phase_meet_%s" % str(sq[0]))
