@@ -59,7 +59,7 @@ const OF_CLIP := {
 	"hammer": "resolve", "chop": "resolve", "mine": "resolve", "dig": "resolve", "hoe": "resolve", "lift": "resolve", "push": "resolve",
 	"scale": "resolve", "glide": "smile", "alight": "resolve",
 	# the Heavy Road release: the work of the hands, and a load
-	"fell": "resolve", "quarry": "resolve", "reap": "calm", "angle": "calm", "haul": "resolve", "haul_idle": "calm",
+	"fell": "resolve", "quarry": "resolve", "reap": "calm", "gather": "calm", "angle": "calm", "haul": "resolve", "haul_idle": "calm",
 	# the Answering Land release: the work of the towns
 	"serve": "smile", "knead": "calm", "scrub": "calm", "weigh": "doubt", "stalk": "resolve", "flay": "calm", "fan": "calm", "arrange": "doubt", "wring": "resolve", "sew": "calm",
 	"climb": "resolve", "archery": "resolve", "sword_dance": "resolve", "pound": "resolve", "carve": "resolve", "squeeze": "resolve",

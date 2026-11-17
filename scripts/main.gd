@@ -179,7 +179,17 @@ func _unhandled_input(ev: InputEvent) -> void:
 			press("qi")
 		KEY_C:
 			# the work of the hands (the Heavy Road release: toil.gd): fell, fish, quarry, reap
-			press("work")
+			# (the Small Fish release: Shift+C is the other thing the same ground offers: pick, dig)
+			press("work2" if ev.shift_pressed else "work")
+		KEY_B:
+			# lay a fire and cook (the Small Fish release: cooking.gd)
+			press("cook")
+		KEY_H:
+			# how hard he means to strike (the Small Fish release: sunder.gd)
+			press("hand")
+		KEY_P:
+			# out of his own eyes, or over his shoulder (the Small Fish release)
+			press("view")
 		KEY_V:
 			# open the cloud-kite, or fold it in the air (the High Roads release: peaks.gd, glider.gd)
 			press("glide")
@@ -220,6 +230,14 @@ func press(act: String) -> void:
 			world.jump()
 		elif act == "work":
 			world.work()
+		elif act == "work2":
+			world.work(true)
+		elif act == "cook":
+			offer_cook()
+		elif act == "hand":
+			Game.toast(Sunder.cycle(Game))
+		elif act == "view":
+			world.toggle_view()
 		elif act == "talk":
 			talk_yue()
 		elif act == "cancel":
@@ -953,6 +971,28 @@ const PEDLAR_ASK := "The pedlar's pack is open on the grass. What will it be?"
 
 ## A pedlar of the road (load.gd): the tools of the work of the hands, a pack-frame, a price for the
 ## goods of the land on the hero's back, and, for somebody who has carried enough, the pouch.
+## B (the Small Fish release, cooking.gd): what he has the makings of, "Not now" first.
+func offer_cook() -> void:
+	var why: String = world.cook_why()
+	if why != "":
+		Game.toast(why)
+		return
+	if int(Game.inv.get(Cooking.POT, 0)) <= 0:
+		Game.toast(Cooking.blocked(Game, Cooking.ORDER[0]))
+		return
+	var opts: Array = [{"id": "later", "label": "Not now", "desc": "The pot stays on his back. A fire can be laid anywhere out in the country with free ground in front of him.", "col": UI.C_DIM}]
+	for id in Cooking.ORDER:
+		var rc: Dictionary = Cooking.RECIPES[id]
+		var bl := Cooking.blocked(Game, id)
+		var parts: Array = []
+		for k in rc.needs:
+			parts.append("%d %s (%d)" % [int(rc.needs[k]), str(Data.ITEMS[str(k)].n).to_lower(), int(Game.inv.get(str(k), 0))])
+		opts.append({"id": id, "label": str(rc.n), "note": "mends %d%%" % int(round(float(rc.heal) * 100.0)), "desc": "%s\n\nWants: %s.%s" % [str(rc.ask), ", ".join(parts), "" if bl == "" else "\n\n" + bl],
+			"col": UI.C_JADE, "enabled": bl == ""})
+	choose("Lay a fire and cook?", opts, func(oid: String):
+		if oid != "later" and Cooking.RECIPES.has(oid):
+			world.cook(oid))
+
 func offer_pedlar(fp: Dictionary, ask_home: bool = false) -> void:
 	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting. %s" % Load.text(Game), "col": UI.C_DIM}]
 	var sale: Array = Load.sale(Game)
@@ -2578,7 +2618,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

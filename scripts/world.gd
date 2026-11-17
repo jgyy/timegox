@@ -1412,13 +1412,19 @@ func start_use(e: Dictionary) -> void:
 ## C (the Heavy Road release, toil.gd): the work of the hands.  He does what the piece of the land in
 ## front of him can be worked at (fell a tree, cast a line, cut stone, cut herbs), with the tool for it
 ## in his hands, and what comes of it goes on his back; or it is said why not.
-func work() -> void:
+## (the work the bot means, where the ground offers two things: a player says it with Shift)
+var work_want := ""
+
+func work(second: bool = false) -> void:
 	if not using.is_empty() or not trip.is_empty() or ambush_t >= 0.0 or move_t >= 0.0 or not glide.is_empty() or Game.prologue != "" or wd.is_empty():
 		return
 	var tl := ptile + facing
 	if ent_at(tl) != null or walk_props.has(tl):
 		return
-	var id := Toil.work_at(wd, ptile, tl, is_cave(), is_floor() and not is_cave())
+	# (the Small Fish release: a piece of the land may offer two things; Shift+C is the other)
+	var offered: Array = Toil.offers(wd, ptile, tl, is_cave(), is_floor() and not is_cave())
+	var id := work_want if offered.has(work_want) else Toil.choose(Game, offered, second)
+	work_want = ""
 	if id == "":
 		Game.toast("There is nothing here to work at.")
 		return
@@ -1437,9 +1443,123 @@ func work() -> void:
 		"comp_from": comp_pos, "comp_held": null, "base_y": from.y}
 	move_dir = Vector2i.ZERO
 
+# ---------------------------------------------------------------- the Small Fish release: cooking (cooking.gd, kitchen.gd)
+## what is being cooked: {"id", "stage", "pot" (the state of the pot), "pokes", "kit" (what is drawn),
+## "c" (where the fire is), "tile"}; and how many turns of the ladle the bot means to give it (-1: a
+## player's hands)
+var cooking := {}
+var cook_auto := -1
+var _cook_fx := 0.0
+
+## Why nothing can be cooked where he stands now ("" if it can).
+func cook_why() -> String:
+	if not using.is_empty() or not trip.is_empty() or ambush_t >= 0.0 or move_t >= 0.0 or not glide.is_empty() or Game.prologue != "" or wd.is_empty():
+		return "Not now."
+	if is_floor() and not is_cave():
+		return "Not under somebody's roof: a fire is laid in the open."
+	var tl := ptile + facing
+	if not tile_free(tl) or ent_at(tl) != null or walk_props.has(tl):
+		return "There is no room for a fire in front of him."
+	if not is_cave() and Music.town_at(Atlas.owner_id(wd, tl), tl) != "":
+		return "Not in the street: a fire is laid out in the country."
+	return ""
+
+## B: dish `id` is cooked, here, from the laying of the fire to the last of the bowl.  Returns whether
+## it was begun (what he lacks is said if not).
+func cook(id: String) -> bool:
+	var why := cook_why()
+	if why == "":
+		why = Cooking.blocked(Game, id)
+	if why != "":
+		Game.toast(why)
+		return false
+	var tl := ptile + facing
+	var dir := Vector3(facing.x, 0.0, facing.y)
+	var c := wpos(tl) - dir * (TS * 0.5 - 1.05)
+	c.y = _stand_y(bundles[layer], c)
+	cooking = {"id": id, "stage": -1, "pot": Cooking.pot(), "pokes": 0, "kit": null, "c": c, "tile": tl, "dir": dir, "stir_t": -9.0}
+	if not headless():
+		var kit := Kitchen.kit(Cooking.RECIPES[id].needs, dir, Color(Cooking.RECIPES[id].col))
+		scene3d.add_child(kit)
+		kit.position = c
+		cooking.kit = kit
+	_cook_next()
+	return true
+
+func _cook_next() -> void:
+	var k := int(cooking.stage) + 1
+	if k >= Cooking.STAGES.size():
+		var kit = cooking.get("kit")
+		if kit != null and is_instance_valid(kit):
+			(kit as Node).queue_free()
+		cooking = {}
+		cook_auto = -1
+		return
+	cooking.stage = k
+	var st: Dictionary = Cooking.STAGES[k]
+	cooking.pot = Cooking.enter(cooking.pot, k, Cooking.pieces_of(str(cooking.id)))
+	var from := _player_pos()
+	var dir: Vector3 = cooking.dir
+	var e := {"id": "cook:" + str(cooking.id), "kind": "cook", "cook": str(cooking.id), "stage": k, "pos": cooking.tile, "n": str(st.n)}
+	var kk := {"clip": str(st.clip), "dur": float(st.dur), "at": "face", "hold": str(st.hold), "fx": "", "comp": str(st.comp), "n": str(st.n)}
+	var yaw := atan2(dir.x, dir.z)
+	using = {"e": e, "k": kk, "t0": t - (USE_STEP * 0.6 if k > 0 else 0.0), "dur": float(st.dur), "from": from, "to": from, "yaw": yaw, "yaw0": player.rotation.y if (player != null and k == 0) else yaw,
+		"c": cooking.c, "dir": dir, "side": Vector3(dir.z, 0.0, -dir.x), "started": false, "ended": false, "fx_n": 0, "held": null, "stool": null, "comp_sit": false,
+		"comp_from": comp_pos, "comp_held": null, "base_y": from.y}
+	move_dir = Vector2i.ZERO
+
+## A turn of the ladle while it simmers.
+func _cook_poke() -> void:
+	if cooking.is_empty() or int(cooking.stage) != Cooking.SIMMER or t - float(cooking.stir_t) < 1.0:
+		return
+	cooking.pokes = int(cooking.pokes) + 1
+	cooking.stir_t = t
+
+## The pot, every frame of the cooking (the same with no window: the state is the pot's, not the screen's).
+func _cook_tick(d: float) -> void:
+	if cooking.is_empty() or using.is_empty() or not using.e.has("cook"):
+		return
+	var k := int(cooking.stage)
+	var st: Dictionary = Cooking.STAGES[k]
+	var el := t - float(using.t0) - USE_STEP
+	var doing: bool = bool(using.started) and not bool(using.ended)
+	if k == Cooking.SIMMER and doing and cook_auto >= 0 and int(cooking.pokes) < cook_auto and el > 0.8 + 1.3 * float(int(cooking.pokes)):
+		_cook_poke()
+	var stirring: bool = k == Cooking.SIMMER and t - float(cooking.stir_t) < 1.0
+	cooking.pot = Cooking.step(cooking.pot, minf(d, 0.1), {"fire": float(st.fire), "fan": str(st.id) == "fan" and doing, "lid": bool(st.lid), "stir": 0.8 if stirring else 0.0})
+	var kit = cooking.get("kit")
+	if kit == null or not is_instance_valid(kit):
+		return
+	# (at the simmer the ladle is in his hands only while he turns it)
+	if k == Cooking.SIMMER and doing:
+		using.k.clip = "stir" if stirring else "warm"
+	var fx: Dictionary = Kitchen.tick(kit, cooking.pot, k, maxf(el, 0.0), t, d)
+	var c: Vector3 = cooking.c
+	if fx.splash != null:
+		Fx3D.splash(scene3d, fx.splash, Color(0.8, 0.9, 1.0), 0.4, 0.11)
+	_cook_fx -= d
+	if _cook_fx <= 0.0:
+		_cook_fx = 0.35
+		if float(fx.steam) > 0.15 and int(cooking.pot.pieces) >= 0 and k >= 3:
+			Fx3D.drift(scene3d, c + Vector3(0, 0.75, 0), Color(1, 1, 1, 0.22 * float(fx.steam)), "glow", 2 + int(3.0 * float(fx.steam)), 0.3, 0.7, 1.8, 0.14)
+		if bool(fx.smoke):
+			Fx3D.drift(scene3d, c + Vector3(0, 0.3, 0), Color(0.7, 0.7, 0.72, 0.16), "glow", 2, 0.34, 0.9, 2.2, 0.1)
+		if bool(fx.hop):
+			Fx3D.drift(scene3d, c + Vector3(0, 0.66, 0), Color(1, 1, 1, 0.4), "glow", 5, 0.22, 1.3, 0.9, 0.26)
+		if float(cooking.pot.fire) > 0.6 and int(t * 3.0) % 4 == 0:
+			Fx3D.sparks(scene3d, c + Vector3(0, 0.2, 0))
+
 ## Enter or Esc while doing something long: finish now (what comes of it still comes).
 func press_use(_act: String) -> void:
 	if using.is_empty() or not bool(using.started) or bool(using.ended):
+		return
+	if using.e.has("cook"):
+		# (cooking.gd: at the simmer Enter is a turn of the ladle, and nothing hurries it; Esc hurries any other stage)
+		if int(using.e.stage) == Cooking.SIMMER:
+			if _act in ["confirm", "jump"]:
+				_cook_poke()
+		elif _act == "cancel":
+			using.dur = maxf(0.6, t - float(using.t0) - USE_STEP)
 		return
 	if Props.ONCE.has(str(using.k.clip)) or using.e.has("work"):
 		return
@@ -1499,7 +1619,11 @@ func _use_begin() -> void:
 
 func _use_finish() -> void:
 	var lines: Array = []
-	if using.e.has("work"):
+	if using.e.has("cook"):
+		# (the Small Fish release, cooking.gd: the last of the twelve is the meal)
+		if int(using.e.stage) == Cooking.STAGES.size() - 1:
+			lines = Cooking.done(Game, str(using.e.cook), int(cooking.get("pokes", 0)))
+	elif using.e.has("work"):
 		# (the Heavy Road release, toil.gd: the work of the hands is done; the tree goes over, on screen)
 		lines = Toil.done(Game, str(using.e.work), layer, using.e.pos, is_cave())
 		if str(using.e.work) == "fell" and not headless() and not is_floor():
@@ -1539,6 +1663,8 @@ func _use_clear() -> void:
 	# and a gesture for it that is still going ends with it (only when he is hurried on)
 	player.set_meta("act", "")
 	using = {}
+	if not cooking.is_empty():
+		_cook_next()
 
 ## The thing in the hero's hand (Props.held), on his right hand bone (or `bone`); null if the model
 ## has no skeleton to hold it.
@@ -2034,6 +2160,7 @@ func _process(d: float) -> void:
 	elif not using.is_empty() and (active or bool(using.get("scene", false))):
 		# doing something (props.gd): no walking until it is done (and a thing done through a scene,
 		# a memory of Yue Ling's, goes on under the conversation)
+		_cook_tick(d)
 		_use_step()
 	elif active and ambush_t < 0.0:
 		if not main.bot_active:
@@ -2060,6 +2187,37 @@ func _process(d: float) -> void:
 
 func rotate_cam(dir: int) -> void:
 	cam_q = (cam_q + dir + 4) % 4
+	# (the Small Fish release: out of his own eyes, he faces where he looks)
+	if Game.first_person and fp_on() and move_t < 0.0:
+		facing = FWD[cam_q]
+
+# ---------------------------------------------------------------- the Small Fish release: out of his own eyes
+## P: the land seen from where his eyes are (`Game.first_person`).  W walks the way he looks, A and D
+## turn him a quarter, S turns him about; everything else is as it was.  While he does something with
+## his hands, rides a stair, performs a rite or is spoken to, the camera steps back out so that it can
+## be seen, and comes back.
+const FP_FOV := 78.0
+const FP_EYE := 1.56
+var _fp_k := 0.0
+
+func fp_on() -> bool:
+	return Game.first_person and using.is_empty() and trip.is_empty() and rite_id == "" and cam_override == null and ambush_t < 0.0 and (main == null or main.top_name() == "world")
+
+func toggle_view() -> void:
+	Game.first_person = not Game.first_person
+	if Game.first_person and move_t < 0.0:
+		# (he looks the way he was facing)
+		for q in 4:
+			if FWD[q] == facing:
+				cam_q = q
+	Game.toast("Out of his own eyes (W: walk, A/D: turn, S: turn about, P: step back out)" if Game.first_person else "Over his shoulder")
+
+func _fp_goal(a: float) -> Array:
+	var fwd := Vector3(sin(a), 0, -cos(a))
+	var sc := player.scale.y if player != null else 1.0
+	var bob := sin(t * 18.0) * 0.028 if (move_t >= 0.0 and glide.is_empty() and not riding_here()) else 0.0
+	var eye := player.position + Vector3(0, FP_EYE * sc + bob + (0.95 if riding_here() else 0.0), 0) + fwd * 0.14
+	return [eye, eye + fwd * 5.0 + Vector3(0, -2.2 if not glide.is_empty() else -0.55, 0)]
 
 func _read_keys() -> Vector2i:
 	var k := -1
@@ -2077,6 +2235,14 @@ func _read_keys() -> Vector2i:
 		return Vector2i.ZERO
 	if key_lock:
 		return Vector2i.ZERO
+	if Game.first_person and fp_on():
+		# (out of his own eyes: A and D turn him a quarter, S turns him about, W walks the way he looks)
+		if k != held_key:
+			held_key = k
+			if k != 2 and move_t < 0.0:
+				rotate_cam([-1, 1, 0, 2][k])
+		held_dir = FWD[cam_q] if k == 2 else Vector2i.ZERO
+		return held_dir
 	if k != held_key:
 		# a new press is read relative to where the camera looks now
 		var f: Vector2i = FWD[cam_q]
@@ -2704,10 +2870,28 @@ func _update_view(d: float) -> void:
 	# chase camera
 	cam_a = lerp_angle(cam_a, cam_q * PI / 2.0, 1.0 - exp(-d * 4.5))
 	var g := _cam_goal(pp, cam_a)
-	cam_pos = cam_pos.lerp(g[0], 1.0 - exp(-d * 9.0))
+	# (the Small Fish release: out of his own eyes, the camera is where they are and he is not drawn)
+	var fp := fp_on()
+	_fp_k = clampf(_fp_k + d * (5.0 if fp else -5.0), 0.0, 1.0)
+	if fp:
+		g = _fp_goal(cam_a)
+	elif not cooking.is_empty():
+		# (cooking.gd: the camera comes in over the fire, so that the pot can be seen)
+		var cf := Vector3(sin(cam_a), 0, -cos(cam_a))
+		var mid: Vector3 = (cooking.c as Vector3).lerp(pp, 0.35)
+		g = [mid - cf * 3.3 + Vector3(0, 2.5, 0), mid + Vector3(0, 0.55, 0)]
+	cam_pos = cam_pos.lerp(g[0], 1.0 - exp(-d * (9.0 + 26.0 * _fp_k)))
 	cam.position = cam_pos
+	if t - shake_t < 0.5:
+		# (a heavy blow, sunder.gd, shakes what is looked through)
+		var sk := shake_k * (1.0 - (t - shake_t) / 0.5)
+		cam.position += Vector3(sin(t * 61.0), sin(t * 47.0), sin(t * 53.0)) * sk
 	cam.look_at(g[1], Vector3.UP)
+	player.visible = _fp_k < 0.7
+	_update_sunder(d)
 	_cutscene(d, pp)
+	if cine_k <= 0.0 and _cine_fov0 > 0.0:
+		cam.fov = lerpf(_cine_fov0, FP_FOV, _fp_k)
 	if cam_override != null:
 		cam.global_transform = cam_override
 
@@ -3477,16 +3661,149 @@ func strike() -> void:
 			tiles.append(ptile + dt)
 		if _blow(tiles, fwd):
 			return
+		# (the Small Fish release, sunder.gd: and the land answers by the realm of whoever struck it)
+		_sunder(Sunder.blow(Game, layer, wd, ptile, facing), fwd)
 	if headless():
 		return
 	var pp := _player_pos()
-	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), Color(0.78, 0.9, 1.0), atan2(fwd.x, fwd.z), 2.6)
+	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), Color(0.78, 0.9, 1.0), atan2(fwd.x, fwd.z), 2.2 + 0.45 * float(Sunder.rank(Game)))
 	if not is_floor():
 		# the cut goes through the grass: it is mown in an arc in front of the blade, the clippings fly
 		Impact.mow(pp + fwd * 1.6, 1.9, t)
 		Fx3D.leaf_spiral(scene3d, pp + fwd * 1.6 + Vector3(0, 0.3, 0), Color(Look.theme(theme_name).g2).lightened(0.15), 0.7)
 	# (the Unpicked Road release, manners.gd: everybody near answers a blade in the street as what they are)
 	_folk_react("strike", pp, 7.0)
+
+# ---------------------------------------------------------------- the Small Fish release: the weight of a blow (sunder.gd)
+var sunder_nodes := {}
+var _sunder_t := 0.0
+var shake_t := -9.0
+var shake_k := 0.0
+
+## What a blow that broke the land looks like: everything on the tiles it reached past the sword's own
+## falls or shatters as what it is (impact.gd), the ground it cracked is drawn cracked, a ring of dust
+## goes out from him, what lies loose is thrown, the camera is shaken and the people near answer.
+func _sunder(res: Dictionary, dir: Vector3) -> void:
+	if int(res.n) <= 0:
+		return
+	var said := Sunder.told(res)
+	if said != "" and (int(res.rank) != 1 or int(res.n) > 1):
+		Game.toast(said)
+	if headless():
+		return
+	var pp := _player_pos()
+	var rk := int(res.rank)
+	var first := {}
+	for dt in Impact.reach(facing):
+		first[ptile + dt] = true
+	for tk in res.tiles:
+		var tl: Vector2i = tk[0]
+		if not first.has(tl):
+			_nature_blow(tl, dir)
+		if rk >= 3 and str(tk[1]) != "ground":
+			Fx3D.dust(scene3d, wpos(tl) + Vector3(0, 0.3, 0), Color(Look.theme(theme_name).path))
+	if rk >= 3:
+		Fx3D.shockwave(scene3d, pp + dir * 1.5 + Vector3(0, 0.2, 0), Color(0.85, 0.8, 0.7, 0.7), 3.0 + 2.2 * float(rk), 0.5 + 0.08 * float(rk))
+		shake_t = t
+		shake_k = 0.03 * float(rk - 2)
+		# what lies loose near him is thrown outward (the pieces of whatever was broken before)
+		var reach := 3.0 + 2.5 * float(rk)
+		for dn in scene3d.get_children():
+			if str(dn.name).begins_with("debris"):
+				for rb in dn.get_children():
+					if rb is RigidBody3D:
+						var off3: Vector3 = (rb as RigidBody3D).global_position - pp
+						if off3.length() < reach:
+							(rb as RigidBody3D).apply_central_impulse((off3.normalized() + Vector3(0, 0.8, 0)) * (rb as RigidBody3D).mass * (2.0 + float(rk)) * (1.0 - off3.length() / reach))
+		_folk_react("strike", pp, 6.0 + 3.0 * float(rk))
+	if res.crater != null:
+		var bb: Dictionary = bundles[layer]
+		var gfn := func(q: Vector3) -> float: return _stand_y(bb, q)
+		var cp := wpos(res.crater)
+		Havoc.burst(scene3d, "rubble", cp + Vector3(0, 0.3, 0), dir, gfn, 1.6, Color(Look.theme(theme_name).path).darkened(0.25))
+		Havoc.burst(scene3d, "rubble", cp + Vector3(0, 0.4, 0), -dir, gfn, 1.2, Color(Look.theme(theme_name).path).darkened(0.4))
+		Fx3D.pillar(scene3d, cp, Color(0.8, 0.72, 0.6, 0.6), 4.0, 1.4, 0.6)
+	_sunder_t = 0.0
+
+## The broken ground near him is drawn while it lies broken (looked at again twice a second), and the
+## veins of a cave's wall show (toil.gd).
+func _update_sunder(d: float) -> void:
+	_sunder_t -= d
+	if _sunder_t > 0.0:
+		return
+	_sunder_t = 0.5
+	var want := {}
+	if not is_floor():
+		var pre := layer + "|"
+		for k in Game.scars:
+			if not str(k).begins_with(pre):
+				continue
+			var kd := str(Game.scars[k][0])
+			if kd != "ground" and kd != "crater":
+				continue
+			var parts := str(k).split("|")
+			var tl := Vector2i(int(parts[parts.size() - 2]), int(parts[parts.size() - 1]))
+			if maxi(absi(tl.x - ptile.x), absi(tl.y - ptile.y)) > 28 or Sunder.scar(Game, layer, tl) == "":
+				continue
+			want[str(k) + kd] = [tl, kd]
+	elif is_cave():
+		for dy in range(-8, 9):
+			for dx in range(-8, 9):
+				var vt := ptile + Vector2i(dx, dy)
+				if not Toil.vein(wd, vt):
+					continue
+				for nb in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, -1)]:
+					if tile_free(vt + nb):
+						want["vein|%s|%d|%d" % [layer, vt.x, vt.y]] = [vt, "vein", nb]
+						break
+	for k2 in sunder_nodes.keys():
+		if not want.has(k2):
+			var old = sunder_nodes[k2]
+			if is_instance_valid(old):
+				(old as Node).queue_free()
+			sunder_nodes.erase(k2)
+	for k3 in want:
+		if sunder_nodes.has(k3):
+			continue
+		var w3: Array = want[k3]
+		var at := wpos(w3[0])
+		var n3: Node3D
+		if str(w3[1]) == "vein":
+			var nb2: Vector2i = w3[2]
+			n3 = _vein_model(str(k3).hash(), Toil.spent(Game, layer, w3[0]))
+			at += Vector3(nb2.x, 0, nb2.y) * (TS * 0.5 + 0.12)
+			at.y = _stand_y(bundles[layer], wpos(w3[0] + nb2)) + 1.0
+			n3.rotation.y = atan2(float(nb2.x), float(nb2.y))
+		else:
+			n3 = Sunder.model(str(w3[1]), str(k3).hash(), Color(Look.theme(theme_name).path))
+			at.y = _stand_y(bundles[layer], at)
+		scene3d.add_child(n3)
+		n3.position = at
+		sunder_nodes[k3] = n3
+
+## A vein in the wall of a cave: a seam of green stone standing a little out of the rock, with a glint
+## in it (dull once it has been worked today).
+func _vein_model(seed_: int, spent: bool) -> Node3D:
+	var root := Node3D.new()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var b := MB.new()
+	var gb := MB.new()
+	# (a seam running up the wall on a slant, and crystals of it standing out of the seam)
+	for i in 7:
+		var u := float(i) / 6.0
+		var p := Vector3(-0.6 + 1.2 * u + rng.randf_range(-0.08, 0.08), -0.75 + 1.7 * u + rng.randf_range(-0.1, 0.1), rng.randf_range(-0.03, 0.05))
+		b.crystal(p, rng.randf_range(0.09, 0.16), rng.randf_range(0.28, 0.5), MB.tag(Color("3a9a6a").lightened(rng.randf() * 0.25), MB.CRYSTAL), Vector3(PI / 2.0 + rng.randf_range(-0.45, 0.45), 0, rng.randf_range(-0.6, 0.6)))
+		if not spent and i % 2 == 0:
+			gb.ball(p + Vector3(0, 0, 0.3), 0.07, Color(0.55, 1.0, 0.75, 0.6), true)
+	# (and the rock it runs through, dark, behind them)
+	for i in 5:
+		var u2 := float(i) / 4.0
+		b.sph(Vector3(-0.55 + 1.1 * u2, -0.7 + 1.55 * u2, -0.12), Vector3(0.26, 0.3, 0.12), MB.tag(Color("3a4640"), MB.STONE), Vector3(0, 0, 0.7))
+	MB.mesh_node(root, b.build(MB.mat_plain()))
+	if not gb.is_empty():
+		MB.mesh_node(root, gb.build(MB.mat_glow()))
+	return root
 
 ## G: the sword qi (impact.gd).  A crescent of qi thrown from the blade flies seven tiles ahead and
 ## everything along its way feels it, as if struck: the first pack it reaches is struck first, the
@@ -4017,7 +4334,7 @@ func _draw_hud() -> void:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
 	# end was cut off, "Esc men")
-	UI.text(self, Vector2(VIEW.x - 832, VIEW.y - 14), "Arrows/WASD move   Q/E camera   R ride   T talk   F strike   G sword qi   V glide   C work   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 820.0)
+	UI.text(self, Vector2(VIEW.x - 1012, VIEW.y - 14), "Arrows/WASD move   Q/E camera   P eyes   R ride   T talk   F strike   H hand   G sword qi   V glide   C work   B cook   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1000.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:
@@ -4036,7 +4353,8 @@ func _draw_hud() -> void:
 		banner_text = ""
 	# interaction hint
 	var fe = face_entity()
-	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark", "hold"]:
+	if fe != null and move_t < 0.0 and trip.is_empty() and using.is_empty() and fe.kind in ["npc", "boss", "ladder", "stele", "abode", "prop", "folk", "machine", "mark", "hold", "trifle", "trifle_home"]:
+		# (the Small Fish release: a small thing faced had its hint written and was never in this list)
 		var hint := "Talk" if fe.kind != "folk" else "Talk to %s" % str(fe.n)
 		if fe.kind == "machine" or fe.kind == "mark" or fe.kind == "hold":
 			hint = "Look"
@@ -4056,7 +4374,7 @@ func _draw_hud() -> void:
 			"stele":
 				hint = "Choose your Dao"
 			"trifle":
-				hint = "%s%s" % [str(fe.n).capitalize(), " (%s's)" % str(fe.t.who) if str(fe.t.who) != "" else ""]
+				hint = "%s%s" % [Trifles.cap(str(fe.n)), " (%s's)" % str(fe.t.who) if str(fe.t.who) != "" else ""]
 			"trifle_home":
 				hint = "Put back the %s" % str(fe.n)
 		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + hint, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
@@ -4070,9 +4388,17 @@ func _draw_hud() -> void:
 			var ltag := Living.tag(fe.p, Game)
 			if ltag != "":
 				UI.text(self, Vector2(VIEW.x * 0.5 - 300, VIEW.y - 36), ltag, 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 600)
+	# (the Small Fish release, cooking.gd: what is being done to the pot, and the pot)
+	if not cooking.is_empty() and not using.is_empty() and using.e.has("cook"):
+		var cs: Dictionary = Cooking.STAGES[int(cooking.stage)]
+		var cpot: Dictionary = cooking.pot
+		UI.text(self, Vector2(VIEW.x * 0.5 - 380, VIEW.y - 118), "%s  (%d of %d): %s" % [str(Cooking.RECIPES[str(cooking.id)].n), int(cooking.stage) + 1, Cooking.STAGES.size(), str(cs.n)], 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 760)
+		UI.text(self, Vector2(VIEW.x * 0.5 - 380, VIEW.y - 92), str(cs.said), 15, UI.C_DIM.lightened(0.35), HORIZONTAL_ALIGNMENT_CENTER, 760)
+		UI.text(self, Vector2(VIEW.x * 0.5 - 380, VIEW.y - 70), "fire %d%%   %s %d degrees%s   done %d%%%s" % [int(round(minf(1.0, float(cpot.fire)) * 100.0)), "water" if float(cpot.water) > 0.0 else "the iron", int(round(float(cpot.T))), "  (boiling)" if float(cpot.T) >= 99.5 else "", int(round(minf(1.0, float(cpot.done)) * 100.0)),
+			"   turned %d time%s" % [int(cooking.pokes), "" if int(cooking.pokes) == 1 else "s"] if int(cooking.stage) >= Cooking.SIMMER else ""], 14, UI.C_DIM.lightened(0.2), HORIZONTAL_ALIGNMENT_CENTER, 760)
 	# (the Unpicked Road release, trifles.gd: what is in his sleeve)
 	if not Game.pocket.is_empty() and using.is_empty() and trip.is_empty():
-		UI.text(self, Vector2(22, 162), "In his sleeve: " + Trifles.text(Game), 14, UI.C_DIM.lightened(0.3), HORIZONTAL_ALIGNMENT_LEFT, 560)
+		UI.text(self, Vector2(22, 192.0 if Game.survival else 162.0), "In his sleeve: " + Trifles.text(Game), 14, UI.C_DIM.lightened(0.3), HORIZONTAL_ALIGNMENT_LEFT, 560)
 	# the High Roads (peaks.gd): what the heights offer
 	if not is_floor() and using.is_empty() and trip.is_empty() and not wd.is_empty():
 		var hint2 := ""
@@ -4499,7 +4825,7 @@ func _update_trifles(d: float) -> void:
 		if te >= 0.0 and te < 0.5:
 			p3.y += sin(te / 0.5 * PI) * 0.45
 		tn.position = p3
-		var gl: Node3D = tn.get_node_or_null("glint")
+		var gl := tn.find_child("glint", true, false) as Node3D
 		if gl != null:
 			var k := 0.5 + 0.5 * sin(t * 2.6 + float(tn.get_meta("base").x))
 			gl.scale = Vector3.ONE * (0.7 + 0.5 * k)

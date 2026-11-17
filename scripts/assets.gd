@@ -111,6 +111,8 @@ const PEOPLE := {
 	"yangzi_wife": "characters/yangzi_wife", "yang_zhen": "characters/yang_zhen", "bell_thief": "characters/bell_thief", "pei_du": "characters/pei_du",
 	# Part XXXV (the Uncarved Block release): a slow boy, a prodigy grown up, a carpenter and a man with a stone
 	"zeng_shen": "characters/zeng_shen", "fang_zhongyong": "characters/fang_zhongyong", "carpenter_shi": "characters/carpenter_shi", "bian_he": "characters/bian_he",
+	# Part XXXVI (the Small Fish release): a counsellor of Jin, the son of the man of Song, and the man of Qi who saw only the gold
+	"yong_ji": "characters/yong_ji", "song_younger": "characters/song_younger", "old_qi": "characters/old_qi",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",

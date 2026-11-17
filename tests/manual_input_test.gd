@@ -22,6 +22,8 @@ var cave := {}
 var pots := {}
 ## and after them (the Lost Horse release): two battles that cannot be won, fought with the keys
 var doom := {}
+## the Small Fish release: the three new keys
+var fish := {}
 
 func key(code: int, down: bool) -> void:
 	var e := InputEventKey.new()
@@ -315,11 +317,64 @@ func doom_step() -> void:
 			_doom_battle()
 		else:
 			expect(str(doom.out1) == "fall" and str(doom.how1) == "gave" and int(doom.rounds1) == 1 and int(g.fallen) == 2 and int(g.yielded) == 1 and int(g.deaths) == int(doom.deaths), "met again, it is given way to at once, standing")
-			print("failures: ", fails)
-			quit(1 if fails > 0 else 0)
+			# and last of all, the keys of the Small Fish release: P, H, B
+			fish = {"stage": 0, "at": frame}
+			doom = {}
+
+## The Small Fish release: P looks out of his own eyes and back, H holds the hand back and lets it go, and B
+## offers a fire only to somebody with a pot ("Not now" first), in open country.
+func fish_step() -> void:
+	var g = main.get_node("/root/Game")
+	var w = main.world
+	var n := frame - int(fish.at)
+	match int(fish.stage):
+		0:
+			if n == 2:
+				g.level = 9
+				g.first_person = false
+				tap(KEY_P)
+			elif n == 6:
+				expect(bool(g.first_person) and w.fp_on(), "P looks out of his own eyes")
+				fish["q"] = int(w.cam_q)
+				key(KEY_D, true)
+			elif n == 10:
+				expect(int(w.cam_q) == (int(fish.q) + 1) % 4 and w.facing == w.FWD[w.cam_q], "in first person D turns him a quarter, and he faces what he looks at")
+				key(KEY_D, false)
+				tap(KEY_P)
+			elif n == 14:
+				expect(not bool(g.first_person), "and P again steps back out over his shoulder")
+				g.hand = -1
+				tap(KEY_H)
+			elif n == 18:
+				expect(int(g.hand) == Sunder.might(g) - 1 and Sunder.rank(g) == Sunder.might(g) - 1, "H holds the hand back a weight")
+				for _i in Sunder.might(g):
+					tap(KEY_H)
+			elif n == 26:
+				expect(int(g.hand) == -1 and Sunder.rank(g) == Sunder.might(g), "and round, past a single cut, to all he has")
+				g.inv.erase(Cooking.POT)
+				tap(KEY_B)
+			elif n == 30:
+				expect(main.top_name() == "world", "B with no pot opens nothing")
+				g.inv[Cooking.POT] = 1
+				g.inv["herb_bundle"] = 2
+				fish["why"] = str(w.cook_why())
+				tap(KEY_B)
+			elif n == 36:
+				if str(fish.why) == "":
+					expect(main.top_name() == "choice" and main.choice.cursor == 0 and str(main.choice.options[0].id) == "later", "B with a pot, in open country, offers what he has the makings of, \"Not now\" first")
+					tap(KEY_ENTER)
+				else:
+					expect(main.top_name() == "world", "B where no fire can be laid opens nothing (%s)" % str(fish.why))
+			elif n == 42:
+				expect(main.top_name() == "world" and w.cooking.is_empty(), "and \"Not now\" lays no fire")
+				print("failures: ", fails)
+				quit(1 if fails > 0 else 0)
 
 func _process(_d: float) -> bool:
 	frame += 1
+	if not fish.is_empty():
+		fish_step()
+		return false
 	if not doom.is_empty():
 		doom_step()
 		return false

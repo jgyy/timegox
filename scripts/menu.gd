@@ -372,7 +372,7 @@ func press(act: String) -> void:
 						Music.play_from_book(Game, id.trim_prefix("song:"))
 						_build()
 						return
-					if mode == "annals" or mode == "bestiary" or mode == "roads" or mode == "feats" or mode == "host" or mode == "town":
+					if mode == "annals" or mode == "bestiary" or mode == "roads" or mode == "feats" or mode == "host" or mode == "town" or mode == "land":
 						return
 					msg = Game.use_item_field(id)
 					_build()
@@ -1628,7 +1628,7 @@ func _draw() -> void:
 	for sid in known:
 		var s: Dictionary = Data.SKILLS[sid]
 		var kp := Vector2(430 + (ki / rows) * 196, 348.0 + (ki % rows) * step)
-		UI.text(self, kp, "%s  %d" % [s.n, s.cost], 13 if step >= 18.0 else 12, Data.ELEM_COLORS[s.elem], HORIZONTAL_ALIGNMENT_LEFT, 192)
+		UI.text(self, kp, "%s  %d" % [s.n, int(ceil(Game.skill_cost(sid)))], 13 if step >= 18.0 else 12, Data.ELEM_COLORS[s.elem], HORIZONTAL_ALIGNMENT_LEFT, 192)
 		ki += 1
 	UI.text(self, Vector2(430, 530), "Spirit stones: %d    Sword tempering: %d/%d" % [Game.stones, Game.temper, Data.TEMPER_COST.size()], 17)
 	UI.text(self, Vector2(430, 560), "Objective: " + Game.objective_text(), 16, UI.C_TEXT, HORIZONTAL_ALIGNMENT_LEFT, 770)

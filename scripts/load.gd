@@ -68,21 +68,27 @@ const GOODS := {
 	"carp": {"jin": 3.0, "sell": 5, "bulk": "fish"},
 	"herb_bundle": {"jin": 1.0, "sell": 3, "bulk": "herbs"},
 	"charcoal": {"jin": 25.0, "sell": 20, "bulk": "sacks"},
+	# the Small Fish release (toil.gd: pick, dig, mine)
+	"mushrooms": {"jin": 1.0, "sell": 4, "bulk": "herbs"},
+	"wild_yam": {"jin": 2.0, "sell": 5, "bulk": "sacks"},
+	"jade_rough": {"jin": 8.0, "sell": 22, "bulk": "stone"},
 }
-const GOOD_ORDER := ["timber", "stone_block", "ore_lump", "charcoal", "carp", "herb_bundle"]
+const GOOD_ORDER := ["timber", "stone_block", "ore_lump", "charcoal", "carp", "herb_bundle", "mushrooms", "wild_yam", "jade_rough"]
 
 ## what a pedlar of the road or Smith Tie sells for carrying and for the work of the hands
 const WARES := {
 	"axe": {"price": 30}, "fishing_rod": {"price": 20}, "pick": {"price": 40}, "sickle": {"price": 15},
 	"pack_frame": {"price": 400},
+	# the Small Fish release: a basket to pick into, a spade, and a pot to cook in (cooking.gd)
+	"trug": {"price": 12}, "spade": {"price": 25}, "cook_pot": {"price": 35},
 }
-const WARE_ORDER := ["axe", "fishing_rod", "pick", "sickle", "pack_frame"]
+const WARE_ORDER := ["axe", "fishing_rod", "pick", "sickle", "pack_frame", "trug", "spade", "cook_pot"]
 
 ## what the tools and the food weigh, and what a thing a search of the story looks for weighs in the
 ## hand where it is not about a jin
 const WEIGHTS := {
 	"steamed_bun": 0.3, "tea_egg": 0.2, "dried_meat": 0.5, "noodle_bowl": 1.0,
-	"axe": 4.0, "fishing_rod": 1.0, "pick": 5.0, "sickle": 1.0,
+	"axe": 4.0, "fishing_rod": 1.0, "pick": 5.0, "sickle": 1.0, "trug": 0.5, "spade": 3.0, "cook_pot": 4.0,
 	"ingot": 12.0, "five_stone": 6.0, "earth_basket": 22.0, "argal": 4.0, "frolic_tablet": 8.0, "whetstone": 3.0, "sword_blank": 6.0,
 	"fallen_star": 5.0, "silver_needle": 0.1, "datura_flower": 0.1, "tiger_tally": 2.0, "feather_cloud": 0.1,
 	"tao_brick": 12.0, "red_gauze": 0.5, "scroll_case": 3.0, "pagoda_tile": 9.0,

@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 120
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block"]
+const MAX_LEVEL := 123
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -98,6 +98,7 @@ const REALM_INFO := [
 	{"life": 0, "title": "Whose Hand Has Done It Before", "note": "An old woman ground a bar of iron she had no use for, and boys went back to their books. A labourer read a great house's library through a hole in its wall. A pedlar poured oil through a coin, and a duke remembered his first thousand arrows. You have looked for the quick way in every country there is. It was the steps."},
 	{"life": 0, "title": "Whose Sleeves Are Empty", "note": "A man threw a cake of gold into the weeds because his wife asked him whose it was. A governor was brought ten catties by night and counted four who knew. A man stopped his own ears to steal a bell. A poor scholar sat by three belts until morning. Nothing in the road is nobody's. You have walked the whole of it and kept your sleeves light."},
 	{"life": 0, "title": "Not Yet Cut", "note": "A boy made verses at five and was led from door to door until there were none left in him. A carpenter passed an oak without looking, and it came to him in a dream. A man lost both feet for calling a stone a jade, and was right. A stone at a gate said five. You have been measured, and you are still here."},
+	{"life": 0, "title": "Light Hand", "note": "A pond was drained for one supper, a field pulled taller in an afternoon, a hill hollowed after one vein. He can part a wood with a stroke now, and has learned the harder thing, which is one stalk. Govern a great country as you would cook a small fish: this is the realm of having turned it once, and stopped."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1028,6 +1029,19 @@ const ENEMIES := {
 	"the_gift": {"n": "The Gift Led from Door to Door", "elem": "wood", "weak": "fire", "col": Color("e8dca8"), "shape": "wraith", "boss": true, "bright": true, "pal": {"sec": Color("8a7a4a"), "acc": Color("b83a2a")}},
 	"the_rule": {"n": "The Rule That Found It Crooked", "elem": "thunder", "weak": "earth", "col": Color("6a7078"), "shape": "warden", "boss": true, "pal": {"sec": Color("3a3e44"), "acc": Color("d8c8a0")}},
 	"the_appraiser": {"n": "The Eye That Saw a Stone", "elem": "fire", "weak": "water", "col": Color("c89a30"), "shape": "wraith", "boss": true, "pal": {"sec": Color("5a3a14"), "acc": Color("a8e0b8")}},
+	# ---- Part XXXVI: Cooking a Small Fish (the Small Fish release): what was taken too hard out of the land, gone down into it
+	"dry_weir": {"n": "Weir Standing in Mud", "elem": "earth", "weak": "wood", "col": Color("7a6a50"), "shape": "golem", "pal": {"sec": Color("4a3e2c"), "acc": Color("a8b8a0")}},
+	"last_net": {"n": "Net with No Mesh Too Small", "elem": "dark", "weak": "thunder", "col": Color("5a5a4a"), "shape": "serpent", "pal": {"sec": Color("2e2e26"), "acc": Color("c8c8b0")}},
+	"mud_gasper": {"n": "Carp Gasping Where the Water Was", "elem": "fire", "weak": "water", "col": Color("b8683a"), "shape": "carp", "pal": {"sec": Color("6a3a20"), "acc": Color("e8d8b0")}},
+	"pulled_shoot": {"n": "Shoot Pulled a Little Taller", "elem": "wood", "weak": "fire", "col": Color("a8b05a"), "shape": "plant", "pal": {"sec": Color("6a6a30"), "acc": Color("e8e0a0")}},
+	"helping_hand": {"n": "Hand That Helps It Grow", "elem": "earth", "weak": "wood", "col": Color("b08a60"), "shape": "mantis", "pal": {"sec": Color("6a5034"), "acc": Color("8ab060")}},
+	"wilt_noon": {"n": "Noon the Field Lay Down", "elem": "fire", "weak": "water", "col": Color("e8c860"), "shape": "wisp", "pal": {"sec": Color("b88a30"), "acc": Color("fff0c0")}},
+	"gold_glare": {"n": "Glare of Gold on a Stall", "elem": "fire", "weak": "water", "col": Color("e8b830"), "shape": "wisp", "bright": true, "pal": {"sec": Color("a87818"), "acc": Color("fff4c8")}},
+	"blind_grasp": {"n": "Grasp That Saw Nobody", "elem": "dark", "weak": "thunder", "col": Color("4a4450"), "shape": "mantis", "pal": {"sec": Color("26222c"), "acc": Color("e8b830")}},
+	"empty_adit": {"n": "Adit After the Vein", "elem": "earth", "weak": "wood", "col": Color("5a5650"), "shape": "golem", "pal": {"sec": Color("2e2c28"), "acc": Color("3a8a62")}},
+	"the_drained": {"n": "The Pond Drained for One Supper", "elem": "earth", "weak": "wood", "col": Color("6a5a44"), "shape": "golem", "boss": true, "pal": {"sec": Color("3a3024"), "acc": Color("a8c8c0")}},
+	"the_tugger": {"n": "The Help That Pulled Them Up", "elem": "wood", "weak": "fire", "col": Color("b8b860"), "shape": "warden", "boss": true, "pal": {"sec": Color("6a6a30"), "acc": Color("e8e0a0")}},
+	"the_grasper": {"n": "The Hand That Saw Only Gold", "elem": "fire", "weak": "water", "col": Color("d8a828"), "shape": "wraith", "boss": true, "bright": true, "pal": {"sec": Color("6a4a10"), "acc": Color("fff4c8")}},
 	"the_knack": {"n": "The Gift That Never Practised", "elem": "thunder", "weak": "earth", "col": Color("d8b850"), "shape": "warden", "boss": true, "pal": {"sec": Color("8a6a20"), "acc": Color("f8f0e0")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
@@ -1350,7 +1364,10 @@ const AREAS := {
 		# a fated encounter (fate.gd): there while the story has them there
 		"npcs": [{"id": "liu_ying", "n": "Liu Ying", "pos": Vector2i(38, 27), "col": Color("6a7a5a"), "fate": true}, {"id": "liu_ying_end", "n": "Liu Ying", "pos": Vector2i(45, 32), "col": Color("6a7a5a"), "asset": "liu_ying", "fate": true},
 			# Part XXI: the girl of the south country who taught an army with a bamboo switch
-			{"id": "yue_maiden", "n": "The Maiden of Yue", "pos": Vector2i(23, 23), "col": Color("5a8a5a"), "vis": ["s_p21_cast", ""], "late": true}],
+			{"id": "yue_maiden", "n": "The Maiden of Yue", "pos": Vector2i(23, 23), "col": Color("5a8a5a"), "vis": ["s_p21_cast", ""], "late": true},
+			# Part XXXVI (the Small Fish release)
+			{"id": "yong_ji", "n": "Yong Ji", "pos": Vector2i.ZERO, "col": Color("5a6a7a"), "asset": "yong_ji", "vis": ["s_p36_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
+		],
 		"pool": [["mire_toad", 3, 4], ["bog_wraith", 4, 5], ["poison_vine", 3, 5]],
 		"portals": [
 			{"to": "bamboo", "pos": Vector2i(1, 24), "dest": Vector2i(66, 22), "open": ""},
@@ -1360,12 +1377,21 @@ const AREAS := {
 			{"id": "bog_colossus", "pos": Vector2i(40, 28), "lv": 4, "req": 4},{"id": "marsh_hag", "pos": Vector2i(66, 10), "lv": 5, "req": 5},
 			{"id": "grudge_marsh_hag", "pos": Vector2i(68, 11), "lv": 55, "req": 54, "vis": ["s_p14_grudges", ""]},
 			# Part XXI: the old white ape who tested her, and has been teaching what he learned
-			{"id": "yuan_gong", "pos": Vector2i(56, 22), "lv": 76, "req": 75, "vis": ["s_p21_yue", ""], "late": true}],
+			{"id": "yuan_gong", "pos": Vector2i(56, 22), "lv": 76, "req": 75, "vis": ["s_p21_yue", ""], "late": true},
+			# Part XXXVI (the Small Fish release)
+			{"id": "the_drained", "pos": Vector2i.ZERO, "lv": 121, "req": 120, "vis": ["s_p36_nets", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
+		],
 		"pickups": [
 			{"id": "lotus1", "item": "lotus", "pos": Vector2i(20, 38)}, {"id": "lotus2", "item": "lotus", "pos": Vector2i(38, 8)},
 			{"id": "lotus3", "item": "lotus", "pos": Vector2i(54, 40)}, {"id": "lotus4", "item": "lotus", "pos": Vector2i(70, 30)},
 			# Part XXI: bamboo switches the Maiden cut and the gibbons carried off
-			{"id": "p21_switch1", "item": "bamboo_switch", "pos": Vector2i(26, 15), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch2", "item": "bamboo_switch", "pos": Vector2i(34, 34), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch3", "item": "bamboo_switch", "pos": Vector2i(45, 16), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch4", "item": "bamboo_switch", "pos": Vector2i(63, 33), "vis": ["s_p21_reeds", ""], "late": true}],
+			{"id": "p21_switch1", "item": "bamboo_switch", "pos": Vector2i(26, 15), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch2", "item": "bamboo_switch", "pos": Vector2i(34, 34), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch3", "item": "bamboo_switch", "pos": Vector2i(45, 16), "vis": ["s_p21_reeds", ""], "late": true}, {"id": "p21_switch4", "item": "bamboo_switch", "pos": Vector2i(63, 33), "vis": ["s_p21_reeds", ""], "late": true},
+			# Part XXXVI (the Small Fish release)
+			{"id": "p36_scale1", "item": "last_scale", "pos": Vector2i.ZERO, "vis": ["s_p36_weirs", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p36_scale2", "item": "last_scale", "pos": Vector2i.ZERO, "vis": ["s_p36_weirs", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p36_scale3", "item": "last_scale", "pos": Vector2i.ZERO, "vis": ["s_p36_weirs", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p36_scale4", "item": "last_scale", "pos": Vector2i.ZERO, "vis": ["s_p36_weirs", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+		],
 		"pickup_vis": "s_lotus",
 		# Part XXIX: what a straight chimney throws over the ridge, into a marsh of dry reeds
 		"warband5": {"pool": [["stray_spark", 99, 99], ["smoke_tongue", 99, 99], ["wood_stack", 99, 99]], "n": 14, "vis": "s_p29_wood", "late": true},
@@ -1798,16 +1824,26 @@ const AREAS := {
 			{"to": "court", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 			{"to": "garden", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_fg_tiangong"},
 		],
-		"npcs": [{"id": "forge_master", "n": "Forgemaster Ou Lan", "pos": Vector2i(10, 26), "col": Color("d89060"), "vis": ["s_fg_intro", ""]}],
+		"npcs": [{"id": "forge_master", "n": "Forgemaster Ou Lan", "pos": Vector2i(10, 26), "col": Color("d89060"), "vis": ["s_fg_intro", ""]},
+			# Part XXXVI (the Small Fish release)
+			{"id": "old_qi", "n": "Old Qi of the Gold Market", "pos": Vector2i.ZERO, "col": Color("8a7a4a"), "asset": "old_qi", "vis": ["s_p36_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
+		],
 		"bosses": [
 			{"id": "brass_engine", "pos": Vector2i(32, 14), "lv": 25, "req": 25},
 			{"id": "crucible_golem", "pos": Vector2i(44, 32), "lv": 26, "req": 26},
 			{"id": "bellows_phoenix", "pos": Vector2i(58, 46), "lv": 26, "req": 26},
 			{"id": "forge_tiangong", "pos": Vector2i(86, 26), "lv": 26, "req": 26},
+			# Part XXXVI (the Small Fish release)
+			{"id": "the_grasper", "pos": Vector2i.ZERO, "lv": 123, "req": 122, "vis": ["s_p36_hands", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickups": [
 			{"id": "ingot1", "item": "ingot", "pos": Vector2i(24, 46)}, {"id": "ingot2", "item": "ingot", "pos": Vector2i(44, 12)},
 			{"id": "ingot3", "item": "ingot", "pos": Vector2i(66, 40)}, {"id": "ingot4", "item": "ingot", "pos": Vector2i(78, 12)},
+			# Part XXXVI (the Small Fish release)
+			{"id": "p36_coin1", "item": "blind_coin", "pos": Vector2i.ZERO, "vis": ["s_p36_glares", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p36_coin2", "item": "blind_coin", "pos": Vector2i.ZERO, "vis": ["s_p36_glares", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p36_coin3", "item": "blind_coin", "pos": Vector2i.ZERO, "vis": ["s_p36_glares", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p36_coin4", "item": "blind_coin", "pos": Vector2i.ZERO, "vis": ["s_p36_glares", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_fg_collect",
 	},
@@ -2646,6 +2682,8 @@ const AREAS := {
 			{"id": "hao_millet", "n": "Lady Hao", "pos": Vector2i.ZERO, "col": Color("8a2a2a"), "asset": "fu_hao", "vis": ["s_p23_jobs", "s_p23_kuang"], "late": true, "peak": 0, "stand": "foot"},
 			# Part XXVI: the jailer's wife, at the door of the camp's jail with a brazier at her feet
 			{"id": "jailer_wife", "n": "Mistress Wu, the Jailer's Wife", "pos": Vector2i.ZERO, "col": Color("8a5a4a"), "vis": ["s_p26_cao", ""], "late": true, "peak": 1, "stand": "foot"},
+			# Part XXXVI (the Small Fish release)
+			{"id": "song_younger", "n": "Song the Younger", "pos": Vector2i.ZERO, "col": Color("8a8a4a"), "asset": "song_younger", "vis": ["s_p36_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [
 			{"id": "locust_marquis", "pos": Vector2i(34, 10), "lv": 39, "req": 39},
@@ -2658,6 +2696,8 @@ const AREAS := {
 			{"id": "meng_tian", "pos": Vector2i.ZERO, "lv": 82, "req": 81, "vis": ["s_p23_lishan", ""], "late": true, "peak": 0, "stand": "top"},
 			# Part XXVI: the Lord of Wei, awake on the height above his camp with a physician in chains
 			{"id": "cao_cao", "pos": Vector2i.ZERO, "lv": 93, "req": 92, "vis": ["s_p26_needles", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXVI (the Small Fish release)
+			{"id": "the_tugger", "pos": Vector2i.ZERO, "lv": 122, "req": 121, "vis": ["s_p36_tugs", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickups": [{"id": "rstone1", "item": "rain_stone", "pos": Vector2i(20, 42)}, {"id": "rstone2", "item": "rain_stone", "pos": Vector2i(50, 22)}, {"id": "rstone3", "item": "rain_stone", "pos": Vector2i(66, 44)}, {"id": "rstone4", "item": "rain_stone", "pos": Vector2i(84, 8)},
 			# Part XXIII: the halves of the tiger tallies, dropped where the ranks stopped
@@ -2666,6 +2706,11 @@ const AREAS := {
 			# Part XXVI: Hua Tuo's silver needles, thrown out over the plain by a guard who was afraid of them
 			{"id": "p26_needle1", "item": "silver_needle", "pos": Vector2i.ZERO, "vis": ["s_p26_camp", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p26_needle2", "item": "silver_needle", "pos": Vector2i.ZERO, "vis": ["s_p26_camp", ""], "late": true, "peak": 1, "stand": "flank"},
 			{"id": "p26_needle3", "item": "silver_needle", "pos": Vector2i.ZERO, "vis": ["s_p26_camp", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p26_needle4", "item": "silver_needle", "pos": Vector2i.ZERO, "vis": ["s_p26_camp", ""], "late": true, "peak": 2, "stand": "flank"},
+			# Part XXXVI (the Small Fish release)
+			{"id": "p36_ear1", "item": "pulled_ear", "pos": Vector2i.ZERO, "vis": ["s_p36_shoots", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p36_ear2", "item": "pulled_ear", "pos": Vector2i.ZERO, "vis": ["s_p36_shoots", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p36_ear3", "item": "pulled_ear", "pos": Vector2i.ZERO, "vis": ["s_p36_shoots", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p36_ear4", "item": "pulled_ear", "pos": Vector2i.ZERO, "vis": ["s_p36_shoots", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_mf_collect",
 		# the farm track from the west gate past the shrine, and the dyke road east
@@ -4353,9 +4398,9 @@ const STEPS := [
 	{"id": "s_p19_heart", "kind": "kill", "boss": "jixin", "area": "tushan", "t": "Go down into the oldest pit at Tushan and face Jixin, the Machine Heart", "stones": 28800},
 	{"id": "s_p19_founders", "kind": "folk", "role": "smith", "town": "tushan", "n": 4, "area": "tushan", "hearth": "forge",
 		"t": "The Casting Hearth: the river's bellows are stopped for a day. Blow a pit by lung with four of Tushan's casters (face one and press Enter)"},
-	{"id": "s_p19_silk", "kind": "talk", "npc": "can_niang", "area": "silk", "t": "Saying it at Tushan does not make it so: the looms of the Silkworm Woods have not heard. Go to Silk Farmer Can Niang", "stones": 29200},
+	{"id": "s_p19_silk", "kind": "talk", "npc": "can_niang", "area": "silk", "t": "Saying it at Tushan does not make it so: the looms of the Mulberry Silk Woods have not heard. Go to Silk Farmer Can Niang", "stones": 29200},
 	{"id": "s_p19_shuttles", "kind": "hunt", "area": "silk", "n": 30, "of": ["idle_shuttle", "treadle_imp", "paper_servant"], "first": true,
-		"t": "The looms weave all night and nobody wears the cloth: still the Idle Shuttles, Treadle Imps and Paper Servants in the Silkworm Woods (strike first: F or G)"},
+		"t": "The looms weave all night and nobody wears the cloth: still the Idle Shuttles, Treadle Imps and Paper Servants of the Silk Woods (strike first: F or G)"},
 	{"id": "s_p19_warden", "kind": "talk", "npc": "cloud_warden", "area": "cloudsea", "t": "The kites that did not come down have gone up: ask Cloud Warden Feng Yu what is nesting in the Sea of Clouds"},
 	{"id": "s_p19_clouds", "kind": "hunt", "area": "cloudsea", "n": 30, "of": ["wooden_kite", "counting_wasp", "bellows_wraith"], "first": true,
 		"t": "Bring down what is nesting on the islands of cloud: the Wooden Kites, Counting Wasps and Bellows Wraiths (strike first: F or G)"},
@@ -5073,6 +5118,38 @@ const STEPS := [
 	{"id": "s_p35_gate", "kind": "talk", "npc": "zeng_shen", "area": "mountain", "t": "The boy is still at the foot of the fifth height. He has been examining himself three times a day, and has a question ready. Go back to Zeng Shen", "stones": 85200},
 	{"id": "s_p35_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The stone is by the gate where it always was, and the Elder is standing in front of it with his hands behind his back. Tell Elder Qing Xuan what it measures", "stones": 85600},
 	{"id": "s_break40", "kind": "breakthrough", "to": 120, "t": "Nothing has been cut away from him yet that he will need: Uncarved Block"},
+	# ---- Part XXXVI: Cooking a Small Fish (the Small Fish release): what a strong hand is for, and how little of it a thing wants.
+	{"id": "s_p36_home", "kind": "talk", "npc": "elder", "area": "sect", "gives": {"cook_pot": 1, "trug": 1, "spade": 1}, "t": "A lane eight tiles long was opened through the pines above the practice yard at dawn, by one stroke nobody meant. Speak to Elder Qing Xuan", "stones": 85800},
+	{"id": "s_p36_zhou", "kind": "talk", "npc": "cook_zhou", "area": "sect", "t": "\"Go to the kitchen. She has waited forty years for a disciple strong enough to be worth teaching.\" Speak to Auntie Zhou the Cook", "stones": 86000},
+	{"id": "s_p36_pick", "kind": "toil", "work": "pick", "n": 3, "area": "mountain", "t": "\"Broth first. Broth forgives.\" Pick 3 handfuls of mushrooms at the forest's edge on Azure Cloud Mountain (C facing the trees, the basket in hand)"},
+	{"id": "s_p36_reap", "kind": "toil", "work": "reap", "n": 2, "area": "bamboo", "t": "And something green to go in with them: cut 2 bundles of herbs in the clearings of the Whispering Bamboo (C facing open ground, the sickle in hand)"},
+	{"id": "s_p36_broth", "kind": "cook", "dish": "mushroom_broth", "n": 1, "area": "bamboo", "t": "Lay a fire in the bamboo and make the Broth of the Forest's Edge (B in open country; while it simmers, Enter turns the ladle: once or twice)"},
+	{"id": "s_p36_pond", "kind": "talk", "npc": "yong_ji", "area": "marsh", "cave": -1, "t": "The great pond of the Crimson Marsh was drained for one feast, and has gone down into the Swallow Gallery. An old counsellor went after it. Find Yong Ji", "stones": 86200},
+	{"id": "s_p36_weirs", "kind": "hunt", "area": "marsh", "cave": -1, "n": 24, "of": ["dry_weir", "last_net", "mud_gasper"], "t": "\"It took everything, so there is nothing it will let go.\" Clear 24 weirs standing in mud, nets with no mesh too small and carp gasping where the water was", "stones": 86400},
+	{"id": "s_p36_scales", "kind": "collect", "item": "last_scale", "n": 4, "area": "marsh", "cave": -1, "t": "The last carp of the pond was the size of a child, and went onto the duke's table whole. Find the 4 scales of it on the floor of the Swallow Gallery"},
+	{"id": "s_p36_fishers", "kind": "folk", "role": "fisher", "town": "longmen", "n": 2, "area": "longmen", "t": "\"Ask somebody who must fish the same water next year.\" Ask 2 fishers of Longmen what they throw back, and why"},
+	{"id": "s_p36_cast", "kind": "toil", "work": "angle", "n": 3, "area": "marsh", "t": "Cast a line 3 times in what water the marsh has left, and take what a line takes: one at a time (C facing water, the rod in hand)"},
+	{"id": "s_p36_nets", "kind": "hunt", "area": "marsh", "cave": -1, "n": 20, "of": ["last_net", "mud_gasper"], "t": "The nets are still drawing a pond that is not there, and what they caught has not finished dying. Clear 20 more of the nets and the gasping carp", "stones": 86600},
+	{"id": "s_p36_drained", "kind": "kill", "boss": "the_drained", "area": "marsh", "cave": -1, "t": "It had every fish in the pond in one afternoon, and it has been hungry every day since: go down to the Pond Drained for One Supper", "stones": 86800},
+	{"id": "s_p36_field", "kind": "talk", "npc": "song_younger", "area": "millet", "cave": -1, "t": "On the Millet Plains a man pulled each shoot a little taller, and his help has gone down into the Old-Root Under-Hall. Find his son, Song the Younger", "stones": 87000},
+	{"id": "s_p36_shoots", "kind": "hunt", "area": "millet", "cave": -1, "n": 24, "of": ["pulled_shoot", "helping_hand", "wilt_noon"], "t": "\"He came home so pleased. So tired, and so pleased.\" Clear 24 shoots pulled a little taller, hands that help them grow and noons the field lay down", "stones": 87200},
+	{"id": "s_p36_ears", "kind": "collect", "item": "pulled_ear", "n": 4, "area": "millet", "cave": -1, "t": "Four shoots of that field never withered: they are the four he did not get to before dark. Find the 4 shoots left alone in the Old-Root Under-Hall"},
+	{"id": "s_p36_yams", "kind": "toil", "work": "dig", "n": 3, "area": "millet", "t": "A yam cannot be pulled: it breaks. Dig 3 wild yams out of the Millet Plains, each as slowly as it wants (C facing open ground, the spade in hand)"},
+	{"id": "s_p36_light", "kind": "sunder", "n": 3, "max": 1, "area": "millet", "t": "\"One stalk of the windbreak. Only the one.\" Strike 3 blows that each fell one thing and nothing behind it (H holds the hand back to a single cut; F facing the trees)"},
+	{"id": "s_p36_tugs", "kind": "hunt", "area": "millet", "cave": -1, "n": 20, "of": ["helping_hand", "wilt_noon"], "t": "They are still going along the rows, and it is still noon. Clear 20 more of the helping hands and the noons", "stones": 87400},
+	{"id": "s_p36_tugger", "kind": "kill", "boss": "the_tugger", "area": "millet", "cave": -1, "t": "It has never done anything but help, and it is very tired, and nothing it helped is alive: go down to the Help That Pulled Them Up", "stones": 87600},
+	{"id": "s_p36_gold", "kind": "talk", "npc": "old_qi", "area": "forge", "cave": -1, "t": "Under Heaven's Forge a hill has been dug hollow after a single vein, and the man who began it is sitting where the vein ran out. Find Old Qi of the Gold Market", "stones": 87800},
+	{"id": "s_p36_glares", "kind": "hunt", "area": "forge", "cave": -1, "n": 24, "of": ["gold_glare", "blind_grasp", "empty_adit"], "t": "\"I did not see the men. I saw only the gold.\" Clear 24 glares of gold on a stall, grasps that saw nobody and adits left after the vein", "stones": 88000},
+	{"id": "s_p36_vein", "kind": "toil", "work": "mine", "n": 3, "area": "forge", "cave": -1, "t": "Work 3 veins in the wall of the Stone-Milk Cave as a vein wants working: by taking away what is round it (C facing a wall where green shows, the pick in hand)"},
+	{"id": "s_p36_coins", "kind": "collect", "item": "blind_coin", "n": 4, "area": "forge", "cave": -1, "t": "He dropped four pieces as the constable took his arm, and has never been able to remember dropping them. Find the 4 pieces of gold in the Stone-Milk Cave"},
+	{"id": "s_p36_stew", "kind": "cook", "dish": "yam_stew", "n": 1, "area": "forge", "t": "\"My diggers have had no hot pot since the vein ran out.\" Cook the Yam and Carp, Stewed Thick, on the slopes of Heaven's Forge (B; turn it twice at least)"},
+	{"id": "s_p36_hands", "kind": "hunt", "area": "forge", "cave": -1, "n": 20, "of": ["blind_grasp", "empty_adit"], "t": "The hill is hollow and the hands are still closing. Clear 20 more of the grasps and the empty adits", "stones": 88200},
+	{"id": "s_p36_grasper", "kind": "kill", "boss": "the_grasper", "area": "forge", "cave": -1, "t": "It reached across a crowded market for one thing and has never once looked up: go down to the Hand That Saw Only Gold", "stones": 88400},
+	{"id": "s_p36_wood", "kind": "sunder", "n": 10, "area": "mountain", "t": "\"Once, with all of it, so that you know what the hand holds.\" Strike in earnest at the pines of the mountain until 10 things lie broken (H: all he has; F)"},
+	{"id": "s_p36_fish", "kind": "cook", "dish": "small_fish", "good": true, "n": 1, "area": "bamboo", "t": "Cook the small fish, and bring it out whole: lay the fire in the bamboo below the mountain, and at the simmer leave the ladle alone, or turn it once (B)"},
+	{"id": "s_p36_table", "kind": "talk", "npc": "cook_zhou", "area": "sect", "t": "The fish is whole in the bowl, and the girl who split the practice yard is standing in the kitchen door. Carry the bowl to Auntie Zhou the Cook", "stones": 88600},
+	{"id": "s_p36_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The lane through the pines has closed over; pines are quick on that mountain. The Elder is standing where it was. Tell Elder Qing Xuan what a strong hand is for", "stones": 89000},
+	{"id": "s_break41", "kind": "breakthrough", "to": 123, "t": "He could turn it again, and does not: Light Hand"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5294,6 +5371,17 @@ const ITEMS := {
 	"carp": {"n": "Carp", "desc": "A river carp as long as a forearm, strung through the gills on a twist of grass. Three jin, and good for one day"},
 	"herb_bundle": {"n": "Bundle of Herbs", "desc": "Plantain, mugwort and whatever else grows low in open country, tied with a stem of its own grass. A jin, if it has rained"},
 	"charcoal": {"n": "Sack of Charcoal", "desc": "A sack of charcoal burned on the south slope of the volcano, each stick still ringing when it is knocked. Twenty-five jin, and the black of it comes through the cloth onto whoever carries it"},
+	# ---- the Small Fish release: a basket, a spade and a pot; and what is picked, dug and worked out of a vein (toil.gd, cooking.gd)
+	"trug": {"n": "Gathering Basket", "desc": "A shallow basket of split willow with a hooped handle, stained at the bottom by twenty autumns. Facing the forest's edge, C picks mushrooms into it (Shift+C if he also carries an axe)"},
+	"spade": {"n": "Narrow Spade", "desc": "A spade with a blade no wider than a hand, for going straight down beside a root. Facing open ground out in the country, C digs a wild yam with it (Shift+C if he also carries a sickle)"},
+	"cook_pot": {"n": "Iron Cooking Pot", "desc": "A round-bellied pot of black iron with a lid, a bail and three stub feet, and inside it a ladle, a board, a knife, flint and a twist of salt. B in open country lays a fire and cooks what he has the makings of"},
+	"mushrooms": {"n": "Handful of Mushrooms", "desc": "Wood-ears and brown caps from the leaf-mould at the forest's edge, cut and not pulled. A jin. None of them is the kind with a ring"},
+	"wild_yam": {"n": "Wild Yam", "desc": "A root as long as an arm, the colour of the earth it grew straight down into, dug whole. Two jin. It thickens whatever it is cooked in"},
+	"jade_rough": {"n": "Jade in the Rind", "desc": "A piece worked out of a green vein in a cave wall, with a skin on it like a river stone. Eight jin. Whether it is jade is for somebody with a wheel and a week to say"},
+	# ---- Part XXXVI (the Small Fish release): what is found in the three caves
+	"last_scale": {"n": "Scale of the Last Carp", "desc": "A scale as broad as a palm, off a carp that was sixty years in the great pond of the Crimson Marsh and one afternoon on a table. It has rings in it like a tree. Nobody at the feast counted them"},
+	"pulled_ear": {"n": "Shoot Left Alone", "desc": "A shoot of millet with its root-ball whole and the earth still on it, a finger shorter than its neighbours were made to be. It is the only kind in that field that came to ear"},
+	"blind_coin": {"n": "Piece of Gold Nobody Saw Fall", "desc": "A small flat piece of market gold, stamped with the mark of a stall in Qi. It was dropped in front of two hundred people by a man who saw none of them, and none of them saw it fall, because they were all looking at him"},
 	"tao_brick": {"n": "Brick of Tao Kan's Study", "desc": "A grey brick with one corner worn round by a hand. A governor of the south carried a hundred of these out of his study every morning and in again every evening for years, so that ease should not unfit him for work. Twelve jin"},
 	"red_gauze": {"n": "Half a Bolt of Red Gauze", "desc": "Half a bolt of thin red silk and ten feet of damask, of the kind the palace buyers tie to an ox's horn as the price of whatever is in the cart. It has never been worth a thousand jin of anything"},
 	"scroll_case": {"n": "Case of Scrolls", "desc": "A lacquered case of the ten thousand scrolls a prefect of Jiangzhou read, each with its ribbon and its ivory tag. Three jin, and it rattles as if most of what was in it had been left behind in his head"},
@@ -8119,7 +8207,7 @@ const DIALOGUE := {
 		["Echo of Founder Qing Lian", "The body is a house. You may leave it, and come back, and find the furniture moved. That is all this realm is. Do not let anybody tell you it makes you more than you were."],
 	],
 	"abode:cave_void": [
-		["Narrator", "The Founder's writing here is older and shakier than at the other doors: 'Nobody has opened this door. I check it every spring. Xu Mo hunts every bearer down before the fifth realm. If you are reading this, he has failed at last. Good.'"],
+		["Narrator", "The Founder's writing here is older and shakier than at the other doors: 'Nobody has opened this door, and while Xu Mo hunts I do not think anybody will. If you are reading this, he has failed at last. Good.'"],
 	],
 	"abode:cave_merging": [
 		["Echo of Founder Qing Lian", "I wove a girl from the Seal's lotus so that the bearer would never face the end alone. If she is with you, tell her I am proud of her. If she is not, go and find her."],
@@ -8656,7 +8744,7 @@ const DIALOGUE := {
 		["Narrator", "For nine days after the last tribulation nothing on Azure Cloud Mountain is owed to anybody, and Lin Feng sleeps the way he has not slept since he was six."],
 		["Narrator", "On the tenth morning Disciple Han brings the Elder's tea and sets out two cups. He stops with the pot in the air and frowns at the second one."],
 		["Senior Brother Han", "Elder, forgive me. Who is the second cup for?"],
-		["Yue Ling", "It is for me, Han. It has been for me every morning for ten years.", "shock"],
+		["Yue Ling", "It is for me, Han. It has been for me every morning since the bamboo forest.", "shock"],
 		["Narrator", "Han looks at her and smiles politely, the way you smile at a guest whose name you are sure you ought to know."],
 	],
 	"s_p15_home": [
@@ -8952,7 +9040,7 @@ const DIALOGUE := {
 	],
 	"s_p17_newborn": [
 		["Narrator", "Granny Wen's house smells of ginger and hot water. In the back room a young mother is asleep, and on Granny Wen's knee, wrapped in red, is a baby girl with a great deal of black hair and her eyes wide open."],
-		["Granny Wen the Midwife", "Born on the night of the first thunder, with the whole sky drumming. I have delivered three hundred babies in this village, and I have never heard one come into the world laughing before. Her mother says she may name her, since she would not stop laughing for anybody else."],
+		["Granny Wen the Midwife", "Born on the night of the first thunder, with the whole sky drumming. I have delivered four hundred babies in this village, and I have never heard one come into the world laughing before. Her mother says she may name her, since she would not stop laughing for anybody else."],
 		["Granny Wen the Midwife", "Here. Hold her. Mind her head. You were this size when the Elder put you in my arms, you know. You cried for three days."],
 		["Narrator", "Lin Feng holds the baby, and the baby looks up at him. She does not cry. She stares at him the way you look at somebody you have been waiting a very long time to see again, as if she has known his face all her life."],
 		["Yue Ling", "...Lin Feng. Look how she is looking at you."],
@@ -10553,7 +10641,7 @@ const DIALOGUE := {
 		["Princess Lechang", "My husband! Which? ...I was nineteen. I am not what he kept, cultivator; and whoever he is now I have not met. We swore to join it. We did not swear it would fit. You carry my half. Lay it by his, on one cloth, and tell me whether the edges still meet.", "think"],
 	],
 	"s_p32_mirror": [
-		["Narrator", "The two halves lie on the blue cloth under the moon. Each bird on the back has its mate again. But nine years in two different sleeves have worn the broken edges, and four slivers were lost at the well: along the join there is a gap that a fingernail goes into. It will never again be one mirror by itself."],
+		["Narrator", "The two halves lie on the blue cloth under the moon. Each bird on the back has its mate again. But nine years in two different sleeves have worn the broken edges, and the four slivers will not go back in: along the join there is a gap that a fingernail goes into. It will never again be one mirror by itself."],
 		["Xu Deyan", "It does not meet. I had thought, all this time... no matter what I thought. She is over there and will not come nearer until it is decided; she says she has been decided for often enough. So we have agreed on the one thing, and it is to ask you.", "think"],
 		["Lin Feng", "It is your mirror. And hers."],
 		["Xu Deyan", "It is two halves of a mirror, and we are two halves of a marriage, and neither of us is the shape we were broken at. You have joined things and parted them the length of the land. Tell us what is done with this. We shall do the same with ourselves."],
@@ -10998,6 +11086,156 @@ const DIALOGUE := {
 	],
 	"post:s_break40": [
 		["Narrator", "The tribulation comes down looking for the grain of him, to split him along it. It finds the gift, and the crooked places, and the rind. It finds that none of them has been cut to a use that it could break. It goes round him like water round a boulder in a stream. When it has passed he gets up, in one piece, and goes to look for his broom."],
+	],
+	# ---- Part XXXVI: Cooking a Small Fish (the Small Fish release)
+	"recall34": [
+		["Narrator", "The spring after the testing stone, at first light, Lin Feng went up above the practice yard to run the Nine Swords once before the bell, as he had every morning for more years than he counted. At the seventh form he let the stroke go as he always let it go. There was a sound like a long breath, and then there was a great deal more sky than there had been."],
+	],
+	"s_p36_home": [
+		["Narrator", "A lane eight tiles long lies open through the pines above the yard, as straight as if it had been ruled. The trunks have fallen outward to either side, neatly, like a parting in hair. Sap is still running. The Elder stands at the near end of it with his hands in his sleeves, looking down its length as a man looks down a well."],
+		["Elder Qing Xuan", "Forty of them. I counted while I waited for you. Some were seedlings when I was. You did not mean it, child; I know. That is what I have come up here to talk about. A thing a man does without meaning it, with one arm, before breakfast.", "think"],
+		["Lin Feng", "It was the stroke I have always made, Elder. The same one. I did not put anything more into it."],
+		["Elder Qing Xuan", "No. You have become more, and the stroke has not been told. A girl of the inner court split the yard to the cistern last month the same way. You can part a wood now. I should like to know whether you can cook a fish. Take these down to the kitchen.", "offer"],
+		["Narrator", "He holds out a black iron pot with a ladle in it, a willow basket and a spade no wider than a hand. Somebody has scoured the pot this morning. It is not clear who the Elder thinks will be doing the cooking, until it is entirely clear."],
+	],
+	"s_p36_zhou": [
+		["Narrator", "The kitchen of the outer court is one long room, eight fires and a woman. Auntie Zhou the Cook does not turn round. She has a carp on the board the length of her hand, and she is looking at it as the Elder looked down the lane."],
+		["Auntie Zhou the Cook", "So it is you who thinned my pines. Good. I have waited forty years for one of you to get strong enough to be worth teaching. A weak hand cannot learn this. It has nothing to hold back.", "nod"],
+		["Auntie Zhou the Cook", "This fish is as long as my palm. Turn it in the pot once too often and it is not a fish, it is a broth with bones in it. Govern a great country, the old book says, as you would cook a small fish. I have never governed a country. I have cooked a great many fish.", "point"],
+		["Lin Feng", "Then I am to cook that."],
+		["Auntie Zhou the Cook", "You are not to touch that. You are to make me a broth, out on the hill, from what you pick yourself. Broth forgives. And then you will go and look at three places where somebody strong did a thing thoroughly. Then we shall see about the fish.", "refuse"],
+	],
+	"done:s_p36_pick": [
+		["Narrator", "Three handfuls, cool and damp in the basket. He has cut each at the foot and left the small ones, and he has walked a long way along the edge of the wood to do it, because a wood gives a little in each place and not much in any."],
+	],
+	"done:s_p36_reap": [
+		["Yue Ling", "Plantain, mugwort, and that is shepherd's purse; you have cut it with the seed on, so it will be here again next year. You did that on purpose? No. Well. Do it on purpose next time. It is the same sweep of the hand.", "laugh"],
+	],
+	"done:s_p36_broth": [
+		["Narrator", "He carries the pot up out of the bamboo with both hands. Auntie Zhou tastes from the ladle, looking at nothing. Then she tips the rest into a bowl, and pushes the bowl along the table to a novice who has been scrubbing since before dawn, and that is all she says about it."],
+		["Auntie Zhou the Cook", "It was fit to give somebody. Now go down to the Crimson Marsh. A duke had a feast there in the spring, and there is an old man in a hole in the ground who told him how it would be. Go and see what thorough looks like.", "wave"],
+	],
+	"s_p36_pond": [
+		["Narrator", "The Swallow Gallery smells of mud and of fish that have been dead since the spring. Water runs down every wall into the dark, a pond's worth of it, still going. Just inside, on a dry ledge, an old man in the long coat of a court he no longer serves is counting something on his fingers and getting the same answer."],
+		["Yong Ji", "My lord of Jin asked how to win a battle, and his uncle said: deceive them. So I said to him: drain the pond and fish, and you will take every fish; and next year there are no fish. Burn the wood and hunt, and you will take every beast; and next year there are no beasts.", "think"],
+		["Yong Ji", "He rewarded me above his uncle, afterward. He said mine was the advice for a hundred generations. Then a smaller lord here heard the first half of it, which is the half that works, and opened the sluice for his daughter's wedding. They ate for nine days.", "grieve"],
+		["Lin Feng", "And the water came down here."],
+		["Yong Ji", "Everything came down here. What is taken too hard out of the land does not go away. It goes under, and waits, and it is very hungry, because it has had everything and there is no more. Go and look at it. You are strong. You should see what strong did.", "point"],
+	],
+	"done:s_p36_weirs": [
+		["Narrator", "The weirs come apart into stakes and the stakes into mud. Under the last of them there is a thing he does not expect: a scale as broad as his palm, with rings in it like the rings of a tree. He counts them by the lamp. There are sixty."],
+	],
+	"done:s_p36_scales": [
+		["Yong Ji", "Sixty years in that pond. The fishers knew it. They called it Grandfather and put it back every time it took a hook, which was every spring, because it was old and greedy and had learned nothing. It weighed more than the duke's daughter. They carried it in on a door.", "grieve"],
+	],
+	"done:s_p36_fishers": [
+		["Narrator", "The fishers of Longmen answer with their hands busy, as people do who are asked something they settled long ago. Both of them, he notices, have a mark cut in the gunwale a span and two fingers long. Neither mentions it. It is simply how long a fish has to be."],
+	],
+	"done:s_p36_cast": [
+		["Narrator", "Three casts in what the marsh has left, and two fish, and a long while between them in which nothing happens but water. A line takes one at a time, and makes a man wait for it. He begins to think the waiting is not a fault in the method."],
+		["Yue Ling", "You could have struck the water, you know. Once. They would all have come up, every one in the mere, belly first. I saw you think of it. I saw you not do it, too. That one I shall remember.", "nod"],
+	],
+	"done:s_p36_nets": [
+		["Narrator", "The nets have no mesh a fish could pass, because they were made so, by people who were proud of the work. When the last one parts there is a sound in the dark ahead like a sluice gate lifting, and the water on the walls runs faster."],
+	],
+	"pre:the_drained": [
+		["Narrator", "At the bottom of the gallery there is a pond standing on its edge. It is the shape of the one above, bank for bank, and there is not a drop in it: cracked mud, weirs, the door they carried the old carp in on. It turns its dry bed toward him as a bowl is held out."],
+		["Yong Ji", "It will ask you for what is in your pot. It asks everybody. It had every fish there was in one afternoon and it has not been full since. Do not feed it all you have. That is what was done the first time.", "refuse"],
+	],
+	"post:the_drained": [
+		["Narrator", "It does not break. It fills. Water comes up through the cracked bed from underneath, slow and brown, to the depth of a hand and no more, and stops, and something very small moves in it. The door floats. The thing that was a pond lies down flat, as a pond should, and is quiet."],
+		["Yong Ji", "A fingerling. One. From an egg in the mud, I suppose; they last. It will be sixty years before that is a carp anybody carries on a door. I shall write to my lord that it has begun again, and that nobody is to be told where.", "bow"],
+	],
+	"s_p36_field": [
+		["Narrator", "The Old-Root Under-Hall is roofed with roots, and all of them hang straight down and all of them are dead. A man of forty sits under them with a hoe across his knees. He has a farmer's hands and the look of somebody who has been explaining one afternoon for thirty years."],
+		["Song the Younger", "My father was a man of Song. He grieved that his millet did not grow fast enough. So one day he went along every row and pulled each shoot up a little. He came home worn out and so pleased. I am tired today, he said. I have been helping the grain to grow.", "grieve"],
+		["Song the Younger", "I ran out to look. I was nine. They were lying down, all of them, the whole field, as neat as he had left them. Master Meng put him in a book. There are few in the world, the book says, who do not help their grain to grow. I have never known whether that was meant kindly.", "think"],
+		["Lin Feng", "He was not lazy. He worked the whole day."],
+		["Song the Younger", "Harder than he ever worked in his life. That is the part nobody keeps when they tell it. It went down here, the helping. It is still at it. Whatever has a root in this plain, it would like to give a little pull. Mind your own, cultivator. I am told yours go deep.", "point"],
+	],
+	"done:s_p36_shoots": [
+		["Narrator", "A pulled shoot does not fall when it is struck. It was never standing. It only lets go of the height it was given, and lies down as its field did, and where each lies there is a hand's breadth of plain black earth that looks, of all things, relieved."],
+	],
+	"done:s_p36_ears": [
+		["Song the Younger", "Four. Yes. He did not get to the end of the last row before dark. Those four he never touched. They were a finger shorter than the rest that evening and he was ashamed of them. They were the only ears we cut that year. My mother made one cake.", "nod"],
+	],
+	"done:s_p36_yams": [
+		["Narrator", "A yam goes straight down an arm's length and is as brittle as chalk. It cannot be pulled, helped or hurried; the earth has to be taken away from round it until it is standing in nothing, and then it is lifted. He digs three. The third takes as long as the first."],
+		["Yue Ling", "You talked to that one. I heard you. You said, there is no hurry. To a root, Lin Feng. ...It came up whole, mind. I am not saying it did not work.", "laugh"],
+	],
+	"done:s_p36_light": [
+		["Narrator", "One stalk of the windbreak, and the one behind it does not so much as shiver. Then again. Then again. It is the hardest sword-work he has done since the last tribulation, and anybody watching would have seen a man cut three reeds. His arm is shaking a little. He had not known how much of it there was to hold."],
+		["Song the Younger", "Now that I have never seen. Somebody who could have had the whole row, taking one. My father would not have understood it. He would have said: but you were there, with the blade out. Why not the rest?", "shock"],
+	],
+	"done:s_p36_tugs": [
+		["Narrator", "It is still noon in the Under-Hall, the same noon, and has been for thirty years. As the last of the hands lets go the light goes a little yellow, a little long. Somewhere overhead, on the real plain, it is getting on for evening, and nothing has been helped all day."],
+	],
+	"pre:the_tugger": [
+		["Narrator", "It is stooped, as tall as the roof, with a back that has bent to every shoot in a field. Its hands are enormous and very gentle. It is going along a row of dead roots, giving each a little pull, and after each one it straightens, and puts a hand to its back, and smiles."],
+		["Song the Younger", "That is his smile. That is exactly his smile. He never knew, you understand. He died thinking the weather did it. Do not tell it. It has only ever meant well. It will try to help you, too: it will take hold of whatever in you is growing, and lift.", "grieve"],
+	],
+	"post:the_tugger": [
+		["Narrator", "It is shown a thing left alone, and what the thing became. It looks for a long time. Then it sits down at the end of the row with its great hands in its lap, and for the first time since a spring in Song it does not help. Above it one root, and then another, very slowly, puts out a white hair."],
+		["Song the Younger", "He would have sat like that if anybody had shown him. Nobody showed him; they only laughed, and put him in a book. I shall go up and sow the field. Late, for millet. And then, cultivator, I am going to do the hardest thing a son of his can do. I am going to go indoors.", "bow"],
+	],
+	"s_p36_gold": [
+		["Narrator", "Heaven's Forge is hollow under its western slope. The Stone-Milk Cave was a cave once; now it is a digging, shored with good timber, driven in a dead straight line after one green vein, and stopped where the vein stopped. An old man sits on an upturned basket at the end of it, facing the blank rock."],
+		["Old Qi of the Gold Market", "I am the one in the story. There was a man of Qi who wanted gold. He rose early, dressed, went to the market, to the gold-seller's stall, snatched it and walked off. The constable caught him. All those people about, he said: how could you? And I said, which is true: when I took it I did not see the people. I saw the gold.", "shrug"],
+		["Old Qi of the Gold Market", "They let me out. I came west and found this, a vein the width of my hand, and I thought: honest gold, out of the ground. I followed it. Forty men followed me. We went through two springs and the roots of a wood and a village's well, and I did not see one of them go.", "grieve"],
+		["Lin Feng", "You saw the vein."],
+		["Old Qi of the Gold Market", "I saw the vein. I am very good at it. It is the only thing I have ever been able to see. Then it ran out, here, at this rock, and I looked round for the first time in eleven years. Go and look at what I did not. It is all still down here. It does not see you either.", "point"],
+	],
+	"done:s_p36_glares": [
+		["Narrator", "The glare goes out of the dark a piece at a time, and what was behind it comes back: a pick left leaning, a child's shoe, a rope worn through, the mouth of a well that has no water in it. They were there the whole time. It was only very bright."],
+	],
+	"done:s_p36_vein": [
+		["Narrator", "He does not strike the vein. He takes away what is round it, a chip at a time, by ear, until the piece can be lifted out in its rind, and the wall on either side is left standing as it stood. Three times. It is the slowest way there is to get anything out of a hill, and the hill is still a hill."],
+		["Old Qi of the Gold Market", "That is how my grandfather worked. I had forgotten there was a way that left the roof up. I thought he was only slow. You have the arm to take that whole face down in one blow, and you stood there tapping. Why?", "think"],
+		["Lin Feng", "Somebody is living over it."],
+	],
+	"done:s_p36_coins": [
+		["Old Qi of the Gold Market", "Four pieces. So that is how many. I have never known; I did not see them fall. Two hundred people watched me drop these and I could not have told you there was one. Give them here. No. Keep them. Lay them where the next one will have to look at them.", "refuse"],
+	],
+	"done:s_p36_stew": [
+		["Narrator", "Forty diggers come up out of the hill one at a time, blinking, toward a smell. There is not enough; there could not be. Each takes half a ladle and passes the pot, and it goes round forty men and comes back to him with a spoonful in it, which Old Qi insists is his."],
+		["Old Qi of the Gold Market", "I counted them. As they ate. Forty. I knew it was forty; I paid forty. I had never counted them. Hou has lost two fingers. When did Hou lose two fingers? ...It is a good pot, cultivator. You kept it moving. I noticed that, too. I am noticing a great deal.", "shock"],
+	],
+	"done:s_p36_hands": [
+		["Narrator", "A grasp that is opened does not strike back. It only stays open, astonished, with nothing in it, and looks at its own palm as if the lines there were news. Ahead, where the vein ran out, something is glittering that has no business to."],
+	],
+	"pre:the_grasper": [
+		["Narrator", "It is an arm. There is nothing else to it: an arm the length of the gallery, reaching, and a hand at the end closed on a light so bright that the walls have no colour. It has come the whole way through the hill like that. It has not got a face to turn."],
+		["Old Qi of the Gold Market", "It cannot see you. I do not say so to comfort you. It will go through you as I went through the well, to get at what is behind. You will have to put something in front of it that it has to look at. I never found out what that would be.", "shiver"],
+	],
+	"post:the_grasper": [
+		["Narrator", "The hand opens. What it was holding is a piece of market gold the size of a thumbnail. Round it, as the glare goes down, there are suddenly people: forty diggers with their lamps, a constable, a gold-seller with his mouth open, a whole morning crowd of Qi, all of whom have been there the entire time. The hand looks at them. It closes again, on nothing, and is content."],
+		["Old Qi of the Gold Market", "There you all are. ...I shall shore the well first. Then the village will want its wood back, and that is thirty years, and I am sixty-eight. So I had better see to it that somebody is taught who can see. Hou, I think. He has been looking at his hand.", "bow"],
+	],
+	"done:s_p36_wood": [
+		["Narrator", "He lets all of it go, once, on purpose. The mountain takes it as a drum takes a stick. A road opens in the pines, and where he stood the ground has sunk the depth of a bowl. Birds go up over three valleys. He stands in the hollow with the sword down, and for some time does nothing at all."],
+		["Yue Ling", "So that is what you have been carrying about. Every morning. To breakfast. ...Lin Feng, look at me. It will mend. This is Azure Cloud; the pines will be back before the Elder has finished being cross. A country would not. That is all she wants you to know.", "shock"],
+	],
+	"done:s_p36_fish": [
+		["Narrator", "He lays the fire and does not fan it more than it wants. He puts the fish in whole. Then he sits back on his heels with the ladle across his knees, and watches a pot, and does not help it. It is the longest quarter of an hour of his life. When he lifts the fish out, it is one fish."],
+		["Yue Ling", "You did not touch it. I watched your hand. It went out four times and you put it back in your lap four times, like a cat that has been told. Lin Feng, that was harder than the wood. I could see that it was.", "cheer"],
+	],
+	"s_p36_table": [
+		["Narrator", "Auntie Zhou looks at the fish for some time before she tastes it: the eye gone white, the skin unbroken, the broth clear to the bottom of the bowl. In the door of the kitchen stands a girl of fifteen with ink on her fingers who has not been able to look at the practice yard for a month."],
+		["Auntie Zhou the Cook", "That is a fish. I could not do better, and I shall deny having said it. Sit down. This is Ning. She reached Nascent Soul in the spring and showed her brother a form, and the yard is in two pieces. She has not drawn since. That is not what we want either.", "nod"],
+		["Narrator", "The girl bows to him so low that her braid touches the floor. The Elder has come in behind her without a sound, as he does, and taken the stool by the rice bin, and folded his hands. The question is his; but he has brought it to the kitchen to ask."],
+		["Elder Qing Xuan", "There are two of you now who have outgrown the mountain, child, and there will be more; it is the age we live in. The sect must do something with such hands. Whatever you say will be asked of you first, and of her second. So say something you can do.", "think"],
+	],
+	"s_p36_end": [
+		["Narrator", "Where the lane was there are pines again, thin and very green, a little shorter than their neighbours. In a year nobody will be able to find the place. The Elder is standing in it with his hands in his sleeves, looking down a length that is no longer there."],
+		["Elder Qing Xuan", "The old book says a great country is governed like a small fish, and every minister who has read it thinks it is about ministers. It is about anybody who has become strong enough that the least he does is a great deal. That was you, child, the morning you thinned my pines.", "nod"],
+		["Lin Feng", "A strong hand is for doing the one thing that is wanted, Elder. And the strength is for all the rest of it. For what is not done."],
+		["Elder Qing Xuan", "Hm. Auntie Zhou says you put your hand back in your lap four times. I have been Elder of this sect a long while, and I do not think I have ever managed more than two. Go and sit under the pine. I believe there is something coming for you, and it should find you doing nothing.", "laugh"],
+	],
+	"pre:s_break41": [
+		["Narrator", "Under the pine Lin Feng sits with the iron pot beside him, cold, scoured, with the ladle laid across it. He can feel the whole of what he is, down to the roots of the mountain, as a man feels a full cup in his hand. He does not move it. The sky gathers, as it does."],
+	],
+	"post:s_break41": [
+		["Narrator", "The tribulation comes down as it has come down forty times, looking for something to push against. It is used to being met. It finds a man sitting still who could meet it, and knows that he could, and has not stirred. It turns once round him, like broth round a ladle that is not moving, and settles, and is clear to the bottom."],
 	],
 	# ---- Part XXX: The Net with Three Sides Open (the Open Net release)
 	"recall28": [
@@ -12402,7 +12640,7 @@ const DIALOGUE := {
 	],
 	"visit:disciple_han": [
 		["Lin Feng", "A good new year, Senior Brother Han."],
-		["Senior Brother Han", "Senior Brother? You are three realms past the sect's founders and you still call me that. A good new year, Lin Feng. Spar with me in the spring. Gently."],
+		["Senior Brother Han", "Senior Brother? You are further past the sect's founders than I can count and you still call me that. A good new year, Lin Feng. Spar with me in the spring. Gently."],
 	],
 	"visit:sweeper_bai": [
 		["Lin Feng", "A good new year, Little Bai."],
@@ -12466,7 +12704,7 @@ const DIALOGUE := {
 	],
 	# ---- Part V: The Falling Sky
 	"recall3": [
-		["Narrator", "Lin Feng keeps his word. For nine quiet days the first Dao Ancestor in ten thousand years sweeps the steps of Azure Cloud Sect, and nobody quite dares to stop him."],
+		["Narrator", "Lin Feng keeps his word. For nine quiet days the first Dao Ancestor since the Founder sweeps the steps of Azure Cloud Sect, and nobody quite dares to stop him."],
 		["Narrator", "On the tenth day a star falls at noon. Then another. Then a slow rain of them, white and silent, hissing out in the lotus pond."],
 		["Yue Ling", "Lin Feng... the sky is lower than it was this morning. I can see the seams in it."],
 		["Elder Qing Xuan", "Put the broom down, disciple. Come to the hall. I have been reading very old books since the Ledger closed, and I do not like how they end."],

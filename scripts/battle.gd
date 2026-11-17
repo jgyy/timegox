@@ -942,7 +942,7 @@ func _open_skills() -> void:
 		var s: Dictionary = Data.SKILLS[sid]
 		if sid == "strike" or sid == "needle":
 			continue
-		labels.append("%s\t%d qi" % [s.n, Game.skill_cost(sid)])
+		labels.append("%s\t%d qi" % [s.n, int(ceil(Game.skill_cost(sid)))])
 		ids.append(sid)
 		enabled.append(cur.qi >= Game.skill_cost(sid))
 	if ids.is_empty():

@@ -2403,7 +2403,7 @@ const CHAPTERS := {
 					],
 					[
 						"Little Hu",
-						"When he was twelve he climbed your sect's steps, and they sent him down the same day for having no root. He lost a tooth fighting at your gate and had an iron one made. He said nobody would ever send us down any steps again."
+						"When he was twelve he climbed your sect's steps, and they sent him down the same day without testing him. He lost a tooth fighting at your gate and had an iron one made. He said nobody would ever send us down any steps again."
 					],
 					[
 						"Narrator",

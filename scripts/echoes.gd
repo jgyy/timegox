@@ -1535,6 +1535,11 @@ const CROSSROADS := {
 			"bury": [["Narrator", "It takes four of the outer court and a lever. The testing stone goes over on its face in the grass by the gate with a sound like a door closing, and lies there grey and blind. The boy, who was at the foot of the mountain, turns round and climbs nine hundred and ninety-nine steps for the second time in a week."], ["Zeng Shen", "I counted them again, Senior. It is the same number. I was not sure it would be. ...Nobody has told me what I am now. I had thought I should mind that less than I do. I shall have to find it out, like weather."]],
 		},
 		"echo": {
+			"s_p36_home": {
+				"keep": [["Elder Qing Xuan", "The boy Zeng saw it from the stair of the Late Vessel. He has asked, very politely, whether the pines may be counted before they are cleared, so that the same number can be put back. He has begun counting. He is on his third try."]],
+				"cut": [["Elder Qing Xuan", "The registrar has asked whether this goes in the second column. Yours, child. I told him to leave a line. He says the ledger has no heading for it. I said: then it is about time the ledger learned something."]],
+				"bury": [["Elder Qing Xuan", "One of them came down across the testing stone, where it lies. It did not so much as chip. I confess I went to look before I came to look at you. An old man has his order of things, and I am not proud of mine."]],
+			},
 			"s_p35_end": {
 				"keep": [["Elder Qing Xuan", "And there is a hall for the slow now, child, behind the herb garden, with one rule over the door: nobody is hurried. I looked in. A square boy with large ears was teaching a girl of nine to hold a brush. He was on his fourth explanation. She had it on the fourth."]],
 				"cut": [["Elder Qing Xuan", "And the ledger has its first second column, child. I asked to be put in it. The registrar was shocked. I said: seventy years, and nobody has measured what came of me. He has written: carries water well. I do not know whether to be pleased."]],
@@ -1545,6 +1550,37 @@ const CROSSROADS := {
 			"keep": "Azure Cloud Sect takes whoever climbs. Its name for taking only the best is gone, and the other sects say so with pity. In the Hall of the Late Vessel nobody is hurried. Zeng Shen was the slowest in every lesson for thirty years, and it was to him, at the end, that the teaching was handed, because he was the only one who still had all of it.",
 			"cut": "There is a ledger at the gate of Azure Cloud Sect with two columns: what the stone found, and what was found. They agree about four times in ten. Zeng Shen's line reads five, and then, in a later hand: the one we give the others to. The stone is still consulted. Nobody now takes its word for longer than a year.",
 			"bury": "The testing stone lies on its face by the gate, under moss, and the novices tie their sandals on it. Whoever climbs is taken, as in the founder's day. Zeng Shen was never told what he was. He examined himself three times a day for sixty years to find out, and is said to have got an answer, and not to have thought it worth writing down.",
+		}},
+	# Part XXXVI (the Small Fish release): what a sect is to do with hands that have outgrown its mountain
+	"the_ladle": {"step": "s_p36_table", "part": "XXXVI", "n": "What a Strong Hand Is For",
+		"ask": "A girl of the inner court reached Nascent Soul in the spring and, showing her brother a form, split the practice yard to the cistern. Lin Feng opened a lane through the pines the same season, without meaning to. The Elder asks what the sect is to do with hands that have outgrown the mountain. Whatever is said will be asked of Lin Feng first.",
+		"options": [
+			{"id": "bind", "label": "Set stones, and strike lightly inside them", "tilt": {"heart": -3, "craft": -2}, "creed": {"rule": 8}, "gain": {"renown": 6},
+				"desc": "A rule, cut in stone where everybody passes: inside the boundary of the mountain nobody strikes harder than a felling stroke, whatever they are, the Elder and Lin Feng included. It is the old way: a strong hand is bound first by a word. It will be kept because it is plain (renown).",
+				"log": "Had boundary stones set round Azure Cloud Mountain, inside which nobody strikes harder than a felling stroke."},
+			{"id": "teach", "label": "Send them to the kitchen first", "tilt": {"heart": 3, "reach": -2}, "creed": {"virtue": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "Nobody is given a heavier form until they have cooked a small fish for the outer court and brought it out whole. Auntie Zhou to judge. It is slow, it cannot be cheated, and what it teaches goes wherever the hand goes, not only where the stones are (the regard of the Rice Hearth).",
+				"log": "Had every disciple of Azure Cloud Sect who outgrows a form cook a small fish whole before being taught the next."},
+			{"id": "ground", "label": "Give them a valley to break", "tilt": {"craft": 3, "reach": 2}, "creed": {"rule": -8}, "gain": {"stones": 12000},
+				"desc": "A strength that is never used is not held back, it is only unknown. Set aside the waste valley behind the mountain, where nothing lives, and let whoever has outgrown the yard go there and strike with all of it, and see, and come back (spirit stones, from the sects that will pay to send their own).",
+				"log": "Had the waste valley behind Azure Cloud Mountain set aside as a breaking ground, where anybody may strike with all they have."},
+		],
+		"after": {
+			"bind": [["Narrator", "The stones are cut that week: grey, waist high, an open hand carved on each with the fingers together. They are set where every path crosses the boundary. The girl Ning carries the first one up herself, on her back, and will not be helped."], ["Auntie Zhou the Cook", "A rule. Well. A rule is a lid: it keeps a pot from boiling over and tells you nothing about the pot. But I have used a lid every day of my life. She has drawn her sword again, I see. Inside the stones, and so lightly you would think it was glass."]],
+			"teach": [["Narrator", "A ninth fire is built at the end of the kitchen, smaller than the others, with one pot. The girl Ning stands at it every morning before the bell with a carp the length of her hand. The first eleven come apart. She eats each of them, bones and all, and says nothing."], ["Auntie Zhou the Cook", "The twelfth was a fish. She cried into it, which did it no harm; it wanted salt. I have told the Elder I shall need a bigger kitchen. He asked how many I mean to teach. I said: how many do you mean to make strong?"]],
+			"ground": [["Narrator", "The waste valley behind the mountain has never had a name. It gets one that month, and a rope across its mouth with a bell on it. The girl Ning goes in on the first morning and strikes once, with everything. The sound comes back off three ridges. She is gone until dark."], ["Auntie Zhou the Cook", "She came into my kitchen white as a bun and asked for work. Any work. I gave her the fish. She said: Auntie, I know what it is now, the thing I must not do. I had only been told. That is something, I grant you. It is a great deal of valley to spend on it."]],
+		},
+		"echo": {
+			"s_p36_end": {
+				"bind": [["Elder Qing Xuan", "And I passed one of your stones on the way up, child, and found I had slowed my step for it. At my age. I could not strike harder than a felling stroke if I were paid. But it is pleasant to be told that one must not."]],
+				"teach": [["Elder Qing Xuan", "And Auntie Zhou has sent word that I am to cook one myself before I teach the Ninth Form again. She says a rule is a rule. I have been Elder longer than she has been cook, and I find that I am going to do it."]],
+				"ground": [["Elder Qing Xuan", "And three sects have written to ask the fee for your valley, child. I have named one. It seems the whole age has been walking about with its arm held in, wondering. I went in myself on Tuesday. I shall not say what I found. It was less than I had feared."]],
+			},
+		},
+		"end": {
+			"bind": "There are grey stones round Azure Cloud Mountain with an open hand cut on each, and inside them nobody strikes harder than a felling stroke. The rule is three lines long. In two hundred years it was broken once, by a disciple who then carried a stone up from the valley on her back, unasked, and set it beside the others.",
+			"teach": "Nobody at Azure Cloud Sect is taught a heavier form until they have cooked a small fish and brought it out whole. The kitchen has nineteen fires. Other sects think it a joke until they meet a disciple of it, who can part a wood, and who is known through three provinces chiefly for never having done so.",
+			"ground": "Behind Azure Cloud Mountain there is a valley with a rope across its mouth and nothing left standing in it, where anybody may go and strike with all they have. Most go once. They come out quiet, and are careful afterward in the way of people who know a number. The valley has never mended, and is not meant to.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1745,7 +1781,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

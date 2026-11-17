@@ -2359,6 +2359,10 @@ func _run() -> void:
 		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
 		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
 		await _pestle_shots(str(main.args.pestle))
+	if main.args.has("fish"):
+		# the Small Fish release (--fish, or --fish=a,b): a meal cooked stage by stage, the land out of his own
+		# eyes, a blow at each weight, a vein in a cave wall, picking and digging, and Part XXXVI
+		await _fish_shots(str(main.args.fish))
 	if main.args.has("block"):
 		# the Uncarved Block release (--block, or --block=a,b): the seventeen rites of the Daos, the page of the
 		# root, the street answering a root and a road, and Part XXXV
@@ -6728,4 +6732,285 @@ func _block_shots(which: String = "1") -> void:
 			await _wait(1.0)
 			await _shot("create_root_%d" % rn2)
 		main.set_stack(["world"])
+	get_tree().quit(0)
+
+
+## The Small Fish release: the twelve things done to a pot, the first-person view, the seven weights of a
+## blow, the veins of a cave, the new work of the hands, and the people, foes, lords and marks of Part XXXVI.
+func _fish_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 121
+	Game.step = Data.step_index("s_p36_table")
+	Game.companion = true
+	Game.day = 260
+	Game.stones = 5000
+	Game.dao = "sword"
+	for it in ["cook_pot", "trug", "spade", "axe", "pick", "sickle", "fishing_rod"]:
+		Game.inv[it] = 1
+	for it2 in ["carp", "herb_bundle", "mushrooms", "wild_yam"]:
+		Game.inv[it2] = 9
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+		Game.rite_due = []
+	quiet.call()
+	w.open_world()
+	w.enter_layer("surface")
+	var wd: Dictionary = Atlas.world_of("surface")
+	var W := int(wd.w)
+	# a place of region `area` with open ground all round and (if `edge`) the forest three tiles to the south
+	var find := func(area: String, edge: bool) -> Vector2i:
+		for y in range(8, int(wd.h) - 12):
+			for x in range(8, W - 8):
+				var q := Vector2i(x, y)
+				if Atlas.owner_id(wd, q) != area:
+					continue
+				var ok := true
+				for ax in range(-2 if not edge else -1, 3 if not edge else 2):
+					for ay in range(-3, 2):
+						var q2 := q + Vector2i(ax, ay)
+						if not wd.grid[q2.y * W + q2.x] in [MapGen.FLOOR, MapGen.DECOR] or Atlas.owner_id(wd, q2) != area or w.ent_at(q2) != null or Peaks.rise(wd, float(q2.x) + 0.5, float(q2.y) + 0.5) > 1.5:
+							ok = false
+				if not ok:
+					continue
+				if edge:
+					for ax2 in range(-1, 2):
+						for ay2 in range(2, 6):
+							if wd.grid[(y + ay2) * W + x + ax2] != MapGen.WALL:
+								ok = false
+				else:
+					for ax3 in range(-2, 3):
+						for ay3 in range(2, 5):
+							if not wd.grid[(y + ay3) * W + x + ax3] in [MapGen.FLOOR, MapGen.DECOR] or w.ent_at(Vector2i(x + ax3, y + ay3)) != null:
+								ok = false
+				if ok:
+					return q
+		return Vector2i(-1, -1)
+	var stand := func(at: Vector2i, q: int = 2) -> void:
+		main.set_stack(["world"])
+		w.teleport(at, "surface")
+		w.facing = Vector2i(0, 1)
+		w.cam_q = q
+		w._snap_cam()
+		w.banner_t = 0.0
+		Game.clock = 10.5 * 60.0
+		Game.first_person = false
+		quiet.call()
+	var open_at: Vector2i = find.call("bamboo", false)
+	var edge_at: Vector2i = find.call("millet", true)
+	for ea in ["bamboo", "forge", "marsh", "village", "maple"]:
+		if edge_at.x < 0:
+			edge_at = find.call(ea, true)
+	# (the wall begins two tiles south of what was found: he stands against it)
+	if edge_at.x >= 0:
+		edge_at += Vector2i(0, 1)
+	print("[tour] fish: open ground at %s, a forest's edge at %s" % [str(open_at), str(edge_at)])
+	# (a software renderer takes seconds over a frame: every scene below is jumped to the moment that is wanted,
+	# by moving the clock of what is being done, and the pot is cooked across the gap by its own arithmetic)
+	var frames_n := func(n: int) -> void:
+		for _f in n:
+			await get_tree().process_frame
+	var jump := func(el: float) -> void:
+		# what he is doing is `el` seconds in
+		if not w.using.is_empty():
+			w.using.t0 = w.t - w.USE_STEP - el
+	var finish := func() -> void:
+		if not w.using.is_empty():
+			w.using.t0 = w.t - w.USE_STEP * 2.0 - float(w.using.dur) - 0.05
+	if want.call("cook") and open_at.x >= 0:
+		stand.call(open_at, 1)
+		await frames_n.call(3)
+		w.cook_auto = -1
+		print("[tour] fish: cook ", w.cook("yam_stew"), " ", w.cook_why())
+		var frames: Array = []
+		var at := {"lay": 2.6, "light": 1.6, "fan": 2.0, "water": 2.4, "chop": 2.2, "add": 1.55, "boil": 3.2, "simmer": 3.0, "season": 1.2, "taste": 1.5, "serve": 2.2, "eat": 2.2}
+		for k in Cooking.STAGES.size():
+			if w.cooking.is_empty():
+				break
+			var st: Dictionary = Cooking.STAGES[k]
+			var el: float = float(at[str(st.id)])
+			# the pot, cooked up to this moment of this stage
+			for _i in int(el * 30.0):
+				w.cooking.pot = Cooking.step(w.cooking.pot, 1.0 / 30.0, {"fire": float(st.fire), "fan": str(st.id) == "fan", "lid": bool(st.lid), "stir": 0.8 if str(st.id) == "simmer" else 0.0})
+			if str(st.id) == "boil":
+				# (until the lid is in the air)
+				for _i2 in 240:
+					if float(w.cooking.pot.lid_y) > 0.012:
+						break
+					w.cooking.pot = Cooking.step(w.cooking.pot, 1.0 / 30.0, {"fire": 1.0, "lid": true})
+			if str(st.id) == "simmer":
+				w.cooking.pokes = 3
+				w.cooking.stir_t = w.t
+			jump.call(el)
+			await frames_n.call(3)
+			if str(st.id) == "simmer":
+				w.cooking.stir_t = w.t
+			quiet.call()
+			await _shot("cook_%02d_%s" % [k + 1, str(st.id)])
+			frames.append(last_img)
+			# the rest of the stage, for the pot
+			for _i3 in int(maxf(0.0, float(st.dur) - el) * 30.0):
+				w.cooking.pot = Cooking.step(w.cooking.pot, 1.0 / 30.0, {"fire": float(st.fire), "lid": bool(st.lid)})
+			finish.call()
+			# (what splashed as the last pieces went in has gone before the next is looked at)
+			await frames_n.call(16 if str(st.id) == "add" else 2)
+		print("[tour] fish: cooked, ", frames.size(), " stages seen")
+		_sheet("cook_sheet", frames, 0.3)
+		await frames_n.call(3)
+		quiet.call()
+	if want.call("eyes") and open_at.x >= 0:
+		stand.call(open_at, 2)
+		Game.first_person = true
+		w.cam_q = 2
+		w._fp_k = 1.0
+		await frames_n.call(8)
+		await _shot("first_person_bamboo")
+		stand.call(Atlas.to_world("sect", Vector2i(20, 12)), 0)
+		Game.first_person = true
+		w._fp_k = 1.0
+		await frames_n.call(8)
+		await _shot("first_person_sect")
+		Game.first_person = false
+		w._fp_k = 0.0
+		await frames_n.call(2)
+	if want.call("blow") and edge_at.x >= 0:
+		for rk in [0, 3, 6]:
+			stand.call(edge_at, 2)
+			Game.scars = {}
+			Game.felled = {}
+			w._sunder_t = 0.0
+			await frames_n.call(4)
+			Game.level = Data.MAX_LEVEL
+			Game.hand = rk if rk < 6 else -1
+			w.strike_t = -9.0
+			w.strike()
+			await frames_n.call(9)
+			quiet.call()
+			await _shot("blow_%d_struck" % rk)
+			await frames_n.call(40)
+			quiet.call()
+			await _shot("blow_%d_after" % rk)
+		Game.hand = -1
+		Game.scars = {}
+	if want.call("toil") and edge_at.x >= 0:
+		stand.call(edge_at, 3)
+		w.facing = Vector2i(0, 1)
+		w._snap_cam()
+		await frames_n.call(3)
+		w.work(true)
+		jump.call(1.6)
+		await frames_n.call(3)
+		quiet.call()
+		await _shot("toil_pick")
+		finish.call()
+		await frames_n.call(3)
+		stand.call(edge_at + Vector2i(0, -2), 1)
+		w.facing = Vector2i(0, -1)
+		w._snap_cam()
+		await frames_n.call(3)
+		w.work(true)
+		jump.call(1.5)
+		await frames_n.call(3)
+		quiet.call()
+		await _shot("toil_dig")
+		finish.call()
+		await frames_n.call(3)
+	if want.call("vein"):
+		var fid := Caves.fid("forge", -1)
+		var cw: Dictionary = Atlas.world_of(fid)
+		var vat := Vector2i(-1, -1)
+		var vdir := Vector2i.ZERO
+		for y2 in int(cw.h):
+			for x2 in int(cw.w):
+				var q3 := Vector2i(x2, y2)
+				if vat.x >= 0 or not MapGen.is_walkable_tile(cw.grid[y2 * int(cw.w) + x2]):
+					continue
+				for d3 in [Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+					if Toil.offers(cw, q3, q3 + d3, true, false).has("mine") and MapGen.is_walkable_tile(cw.grid[(y2 + 1) * int(cw.w) + x2]) and MapGen.is_walkable_tile(cw.grid[(y2 + 2) * int(cw.w) + x2]):
+						vat = q3
+						vdir = d3
+						break
+		if vat.x >= 0:
+			main.set_stack(["world"])
+			w.teleport(vat, fid)
+			w.facing = vdir
+			for cq in 4:
+				if w.FWD[cq] == vdir:
+					w.cam_q = cq
+			w._snap_cam()
+			w._sunder_t = 0.0
+			quiet.call()
+			await frames_n.call(20)
+			quiet.call()
+			await _shot("cave_vein")
+			w.work()
+			jump.call(2.2)
+			await frames_n.call(3)
+			quiet.call()
+			await _shot("cave_vein_mined")
+			finish.call()
+			await frames_n.call(3)
+			w.enter_layer("surface")
+	if want.call("people"):
+		await _gallery("part36_people", [Assets.person("yong_ji"), Assets.person("song_younger"), Assets.person("old_qi")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid2 in ["dry_weir", "last_net", "mud_gasper", "pulled_shoot", "helping_hand", "wilt_noon", "gold_glare", "blind_grasp", "empty_adit"]:
+			fs.append(_foe(fid2))
+		await _gallery("part36_foes", fs, 1.0, 0.25)
+		await _gallery("part36_lords", [_foe("the_drained", true), _foe("the_tugger", true), _foe("the_grasper", true)], 1.3, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["bind", "teach", "ground"]:
+			mk.append(Marks.model(Marks.MARKS.the_ladle[oid], 0))
+		await _gallery("part36_marks", mk, 1.6, 0.3)
+		var kit := Kitchen.kit(Cooking.RECIPES.yam_stew.needs, Vector3(0, 0, 1), Color(Cooking.RECIPES.yam_stew.col))
+		Kitchen.tick(kit, Cooking.run(2, 8), 7, 3.0, 10.0, 0.03)
+		kit.scale = Vector3.ONE * 2.0
+		var held: Array = [kit]
+		for hn in ["trug", "spade", "kitchen_knife", "fan_leaf", "gourd", "bowl"]:
+			var hm := Kitchen.held(hn)
+			hm.scale = Vector3.ONE * 2.2
+			hm.rotation = Vector3(-PI / 2.0, 0, 0)
+			hm.position = Vector3(0, 0.6, 0)
+			var hh := Node3D.new()
+			hh.add_child(hm)
+			held.append(hh)
+		await _gallery("kitchen_things", held, 1.1, 0.3)
+		var sc2: Array = []
+		for kd in ["ground", "crater"]:
+			sc2.append(Sunder.model(kd, 5, Color("8a7a5a")))
+		await _gallery("sunder_scars", sc2, 3.2, 0.3)
+	if want.call("cross"):
+		main.set_stack(["world"])
+		Game.picks.erase("the_ladle")
+		Game.cross_pending = ["the_ladle"]
+		main.ask_crossroads()
+		main.choice.cursor = 0
+		await _wait(1.0)
+		await _shot("crossroads_ladle")
+		main.pop()
+		Game.cross_pending = []
+		main.set_stack(["world"])
+		stand.call(open_at if open_at.x >= 0 else w.ptile, 1)
+		main.offer_cook()
+		await frames_n.call(6)
+		await _shot("cook_menu")
+		main.pop()
+	if want.call("battles"):
+		for bb in [["the_drained", "marsh"], ["the_tugger", "millet"], ["the_grasper", "forge"]]:
+			main.set_stack(["world"])
+			var b = main.battle
+			b.start([{"id": str(bb[0]), "lv": 122}], {"boss": true, "theme": str(Data.AREAS[str(bb[1])].theme), "area": str(bb[1])})
+			main.push("battle")
+			await _wait(3.0)
+			await _shot("battle_boss_" + str(bb[0]))
+			main.pop()
 	get_tree().quit(0)

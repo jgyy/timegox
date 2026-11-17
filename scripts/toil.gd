@@ -52,8 +52,69 @@ const WORKS := {
 		"lines": ["A sweep of the sickle and a handful of what grows low: plantain, mugwort, a sprig of something bitter.",
 			"He ties the bundle with a stem of its own grass, the way the herbalists of the road do.",
 			"He names each as it is cut, as the herbalists do, and sets two aside: those are not for eating."]},
+	# ---- the Small Fish release: three more things the hands can take from the land.  Each is the *other*
+	# thing a piece of it offers (`offers`): C does the first he has the tool for, Shift+C the other.
+	"pick": {"n": "Pick mushrooms", "tool": "trug", "hold": "trug", "clip": "gather", "dur": 3.4, "good": "mushrooms", "fx": "reaped", "comp": "gather",
+		"none": "The forest's edge: with a basket there are mushrooms to be picked under these trees.",
+		"lines": ["Wood-ears off a fallen branch, and two brown caps from the leaf-mould under it. He leaves the red one where it is.",
+			"He picks as Auntie Zhou taught him: cut, do not pull, and leave the small ones for whoever comes after.",
+			"A double handful, cool and damp, smelling of the inside of the wood. He turns each over. None is the kind with a ring."]},
+	"dig": {"n": "Dig for yams", "tool": "spade", "hold": "spade", "clip": "dig", "dur": 4.4, "good": "wild_yam", "fx": "clods", "comp": "watch",
+		"none": "Open ground: the vine on it means a yam under it, for somebody with a spade.",
+		"lines": ["He follows the vine down two spans, working round it, and the yam comes up whole and as long as his arm.",
+			"A wild yam goes straight down and breaks if it is hurried. He does not hurry it.",
+			"Earth to the elbows, and a root the colour of the earth it came from. He fills the hole in again; the farmers do."]},
+	"mine": {"n": "Work a vein", "tool": "pick", "hold": "pickaxe", "clip": "mine", "dur": 5.2, "good": "jade_rough", "fx": "sparks", "comp": "watch",
+		"none": "A vein shows green in the wall here: with a pick it could be worked.",
+		"lines": ["He does not strike the vein. He takes away what is round it, a chip at a time, until it can be lifted out.",
+			"The rock rings dull and the vein rings like a cup. He works by ear, and the piece that comes away has a skin on it like a river stone.",
+			"Eight jin of something in a rind. Whether it is jade is for somebody with a wheel and a week to say."]},
 }
-const ORDER := ["fell", "angle", "quarry", "reap"]
+const ORDER := ["fell", "angle", "quarry", "reap", "pick", "dig", "mine"]
+## the other thing a piece of the land offers beside its first (the Small Fish release)
+const ALSO := {"fell": "pick", "reap": "dig"}
+
+## Whether the wall of a cave shows a vein at `tile` (about one piece of wall in four that floor lies
+## beside: read from where it is, so the same every time, and nothing is placed for it).
+static func vein(wd: Dictionary, tile: Vector2i) -> bool:
+	if wd.is_empty() or not bool(wd.get("cave", false)):
+		return false
+	var w := int(wd.w)
+	var h := int(wd.h)
+	if tile.x < 0 or tile.y < 0 or tile.x >= w or tile.y >= h or not wd.grid[tile.y * w + tile.x] in [MapGen.WALL, MapGen.BUILDING]:
+		return false
+	var n := (tile.x * 73856093) ^ (tile.y * 19349663) ^ (str(wd.get("area", "")).hash() & 0xffff)
+	return posmod(n, 4) == 0
+
+## Everything the land offers on `tile` faced from `from`, its first work first (`work_at`), then the
+## other: mushrooms under the trees that could be felled, a yam under the ground that could be reaped,
+## a vein in the cave wall that could be quarried.
+static func offers(wd: Dictionary, from: Vector2i, tile: Vector2i, cave: bool = false, indoors: bool = false) -> Array:
+	var first := work_at(wd, from, tile, cave, indoors)
+	if first == "":
+		return []
+	var out: Array = [first]
+	if ALSO.has(first):
+		out.append(str(ALSO[first]))
+	if cave and first == "quarry" and vein(wd, tile):
+		out.insert(0, "mine")
+	return out
+
+## Which of what a tile `offers` he does: the one the story is asking for if it is there, else the first
+## he has the tool for (`second`: the other one), else the first, so that he is told what he lacks.
+static func choose(g, offered: Array, second: bool = false) -> String:
+	if offered.is_empty():
+		return ""
+	var s: Dictionary = g.cur_step()
+	if not s.is_empty() and str(s.kind) == "toil" and offered.has(str(s.work)) and not second:
+		return str(s.work)
+	var have: Array = []
+	for id in offered:
+		if int(g.inv.get(str(WORKS[id].tool), 0)) > 0:
+			have.append(id)
+	if have.is_empty():
+		return str(offered[0])
+	return str(have[mini(1 if second else 0, have.size() - 1)])
 ## what the wall of a cave gives instead of dressed stone
 const CAVE_GOOD := "ore_lump"
 
@@ -68,7 +129,9 @@ static func work_at(wd: Dictionary, from: Vector2i, tile: Vector2i, cave: bool =
 		return ""
 	var c: int = wd.grid[tile.y * w + tile.x]
 	if cave:
-		return "quarry" if c == MapGen.WALL else ""
+		# (the Small Fish release: the rock of a cave is laid as BUILDING, the way the walls of any floor are, and
+		# this asked for WALL: no cave wall had ever given its ore)
+		return "quarry" if (c == MapGen.WALL or c == MapGen.BUILDING) else ""
 	if c == MapGen.WATER:
 		return "angle"
 	if c == MapGen.WALL:
@@ -130,7 +193,7 @@ static func done(g, id: String, layer: String, tile: Vector2i, cave: bool = fals
 		var good := good_of(id, cave)
 		g.add_item(good)
 		out.append("%s: %d jin (%s)" % [str(Data.ITEMS[good].n), int(round(Load.weight_of(good))), Load.text(g).split(":")[0]])
-		if Needs.on(g) and good in ["carp", "herb_bundle"]:
+		if Needs.on(g) and good in ["carp", "herb_bundle", "mushrooms", "wild_yam"]:
 			Needs.give(g, {"hunger": 6.0})
 	var s: Dictionary = g.cur_step()
 	if not s.is_empty() and str(s.kind) == "toil" and str(s.work) == id:

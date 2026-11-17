@@ -148,6 +148,22 @@ var toiled := {}
 var step_toil := 0
 var step_haul := 0
 var sold := 0
+## the Small Fish release (sunder.gd, cooking.gd): what lies broken in the land by his blows (layer|x|y ->
+## [what, the day]), how many of each he has broken in all, the blows that broke something, what a step
+## that asks for breaking has had since it began, and how hard he means to strike (-1: all he has; else no
+## harder than that rank); the meals he has cooked (dish -> times), how many, how many came out right, and
+## what a step that asks for a meal has had since it began; and whether he looks out of his own eyes
+var scars := {}
+var sundered := {}
+var sunder_n := 0
+var step_sunder := 0
+var sunder_light := 0
+var hand := -1
+var cooked := {}
+var cooked_n := 0
+var cooked_good := 0
+var step_cook := 0
+var first_person := false
 ## steps just finished that have words to say about it, waiting for the world ("done:<step>")
 var done_pending: Array = []
 ## the Six Hearths (cultures.gd, the New Fire release): standing with each hearth of the land; the
@@ -479,6 +495,17 @@ func reset() -> void:
 	toiled = {}
 	step_toil = 0
 	step_haul = 0
+	scars = {}
+	sundered = {}
+	sunder_n = 0
+	step_sunder = 0
+	sunder_light = 0
+	hand = -1
+	cooked = {}
+	cooked_n = 0
+	cooked_good = 0
+	step_cook = 0
+	first_person = false
 	sold = 0
 	feats = {}
 	eggs = {}
@@ -1010,6 +1037,8 @@ func advance() -> void:
 	step_leap = 0
 	step_rite = 0
 	step_haul = 0
+	step_sunder = 0
+	step_cook = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
 	if str(s.id) == Hold.FOUND_STEP:
 		Hold.found(self)
@@ -1133,6 +1162,13 @@ func poll_steps() -> void:
 			"haul":
 				# Part XXVII: so many of a good of the land brought to somebody (toil.gd, load.gd)
 				ok = step_haul >= int(s.n)
+			"sunder":
+				# Part XXXVI (sunder.gd): so many things of the land broken since the step began, or (with `max`) so
+				# many blows that broke something and no more than that
+				ok = step_sunder >= int(s.n)
+			"cook":
+				# Part XXXVI (cooking.gd): so many meals cooked since the step began
+				ok = step_cook >= int(s.n)
 			"weal":
 				# Part XXVIII: so many towns of the land left the better for his coming since the step
 				# began (weal.gd)
@@ -1238,6 +1274,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(tried_count(s), int(s.n)), int(s.n)]
 	elif s.kind == "arms":
 		t += "  (%d/%d)" % [mini(Arms.adept(self), int(s.n)), int(s.n)]
+	elif s.kind == "sunder":
+		t += "  (%d/%d)" % [mini(step_sunder, int(s.n)), int(s.n)]
+	elif s.kind == "cook":
+		t += "  (%d/%d)" % [mini(step_cook, int(s.n)), int(s.n)]
 	elif s.kind == "toil":
 		t += "  (%d/%d)" % [mini(step_toil, int(s.n)), int(s.n)]
 	elif s.kind == "restore":

@@ -72,11 +72,17 @@ const FEATS := {
 	"heard_out": {"n": "Heard Out", "kind": "road", "pts": 10, "test": ["step", "s_p34_ears"], "desc": "Take a bell's hands off its ears."},
 	"until_morning": {"n": "Until Morning", "kind": "road", "pts": 10, "test": ["step", "s_p34_belts"], "desc": "Answer a poor scholar who asked what is right when the gate shuts."},
 	# the Uncarved Block release: the last realm, the gift, the rule and the eye (Part XXXV)
-	"uncarved_block": {"n": "Not Yet Cut", "kind": "road", "pts": 20, "test": ["level", 120], "desc": "Reach Uncarved Block: the last realm there is."},
+	"uncarved_block": {"n": "Not Yet Cut", "kind": "road", "pts": 20, "test": ["level", 120], "desc": "Reach Uncarved Block."},
 	"sat_down": {"n": "Sat Down to a Slate", "kind": "road", "pts": 10, "test": ["step", "s_p35_gift"], "desc": "Take a gift by the hand, and not to a door."},
 	"what_for": {"n": "And What Is a Rule For", "kind": "road", "pts": 10, "test": ["step", "s_p35_square"], "desc": "Lay a carpenter's square against itself."},
 	"looked_twice": {"n": "Looked Twice", "kind": "road", "pts": 10, "test": ["step", "s_p35_seer"], "desc": "Make an eye that has never been wrong stay for the cutting."},
 	"the_gate": {"n": "What the Stone Is For", "kind": "road", "pts": 10, "test": ["step", "s_p35_gate"], "desc": "Answer a slow boy who asked what a true measure is for."},
+	# the Small Fish release: the last realm, the pond, the field, the hill and the fish (Part XXXVI)
+	"light_hand": {"n": "Turned It Once", "kind": "road", "pts": 20, "test": ["level", 123], "desc": "Reach Light Hand: the last realm there is."},
+	"one_fingerling": {"n": "One Fingerling", "kind": "road", "pts": 10, "test": ["step", "s_p36_drained"], "desc": "Let a little water back into a pond that had everything."},
+	"went_indoors": {"n": "Went Indoors", "kind": "road", "pts": 10, "test": ["step", "s_p36_tugger"], "desc": "Show a helping hand something that was left alone."},
+	"saw_the_men": {"n": "Saw the Men", "kind": "road", "pts": 10, "test": ["step", "s_p36_grasper"], "desc": "Put something in front of a hand that it had to look at."},
+	"small_fish": {"n": "One Fish", "kind": "road", "pts": 10, "test": ["step", "s_p36_fish"], "desc": "Bring a small fish out of the pot whole."},
 	"same_length": {"n": "No Shorter by One", "kind": "road", "pts": 10, "test": ["step", "s_p33_way"], "desc": "Find out how long the quick way up a mountain is."},
 	"by_the_door": {"n": "By the Door, with a Lamp", "kind": "road", "pts": 10, "test": ["step", "s_p33_shelf"], "desc": "Get a reader let into a library that had never had one."},
 	"told_true": {"n": "Tell Me True", "kind": "road", "pts": 10, "test": ["step", "s_p33_needle"], "desc": "Answer a boy who asked whether it would ever be a needle."},
