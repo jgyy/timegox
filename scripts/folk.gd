@@ -1162,6 +1162,18 @@ const ERRANDS := {
 			"Stand on it. With both feet. Until somebody came along looking sad, and then I would get off. If you only leave it, a dog might have it. And if you pick it up, your hand gets used to it. My grandfather says that about his pipe.",
 			"Is there a frog in it? ...Then I do not want it. Why would anybody want it? You cannot do anything with money, you have to give it to a shop first. I would rather find the person who is crying, and then they would give me a pear.",
 			"I DID find one. At New Year. I ran after the man the whole length of the market shouting, and he thought I was a thief and ran faster. I got him at the bridge. He gave me a cash, and then he counted it, in front of me! I did not mind. I had beaten him to the bridge."]},
+	# Part XXXV (the Uncarved Block release): what became of the cleverest child they knew, asked of the old of Qingshi; and
+	# what the stone said of them, asked of the outer court
+	"s_p35_elders": {"ask": "The testing stone turned a boy down today for being slow. You have watched this village grow up twice over. Who was the cleverest child you ever knew here, and what became of them?", "price": 0, "town": "qingshi", "toast": "%s has said what became of the quick",
+		"lines": ["Wei's boy. Could reckon a field by eye at six, to the half-mu; the surveyor used to send for him. Nobody taught him anything after that. Why would you? He keeps the slate at the tavern now, when his hand is steady. It is not steady much after noon.",
+			"The cleverest. Hm. ...My sister. No: she was slow, they said so, she was beaten for it. But there was not a hard birth in three villages for fifty years that they did not send for her. That is not what you asked, is it. It is what I have to tell.",
+			"I was. I do not say it to boast; ask anybody my age. I had my characters before the schoolmaster's own son. It was a great thing, to be that, until I was about eleven. Then the others caught up, and I had never learned how one goes about catching up.",
+			"There was a girl who sang anything back after one hearing. A troupe took her at eight. I saw her again at thirty: she could still sing anything back after one hearing. Only that. She asked me, quite politely, what the rest of us had been doing all that time."]},
+	"s_p35_disciples": {"ask": "A boy was sent down this morning for showing five phases on the stone. You were let in. What did it say of you, the day you laid your hand on it? And what has it been worth to you to know?", "price": 0, "town": "sect", "toast": "%s has said what the stone said",
+		"lines": ["Two colours, Senior. The instructors smiled. I have been frightened every day since of the morning they stop. Nobody tells you that about a good number. You are not given it. You are lent it, and they come round to look at how you are keeping it.",
+			"Three. I cried, and my mother said: good, now we know. She was right. I have never once lain awake wondering whether I am secretly a genius. You would be surprised how many of the others do. It leaves a great deal of the night for sleeping.",
+			"I do not know, Senior. I had the registrar seal the line. He thought I was mad. I was fourteen and I thought: if it is high I shall be lazy and if it is low I shall be sad, and either way I shall not be holding my sword. So I asked not to be told.",
+			"Four. Low and muddy. I was kept because there was a bed. I have been the slowest in my year for six years, and last month I was asked to drill the first-years, because, the instructor said, I am the only one who remembers what it was like not to know."]},
 	"s_p33_smiths": {"ask": "A boy at a school has asked how long a thing takes before it is one's own. You have stood at an anvil most of your life. How many years was it, before the hammer was yours?", "price": 0, "town": "tushan", "toast": "%s has said how long it was",
 		"lines": ["Seven. I can tell you the day. I struck, and did not think about striking, and the iron went where I was looking. I stood there like a fool. My master did not even turn round. He said: there. Now you may begin.",
 			"Eleven years, and I was not slow. The first three you learn what the hammer weighs. The next three, what the iron wants. After that it is only the same blow, until one morning it is yours. Nobody can give you the morning.",
@@ -1491,6 +1503,8 @@ const POSTS := {
 	# Part XXXIII (the Iron Pestle release)
 	"granny_wu": ["trace|gather|gaze", "", "doze"], "li_bai": ["read|write|count", "", "read"], "kuang_heng": ["read|peer|trace", "", "read"], "oil_seller": ["count|gaze|stretch", "", "doze"], "chen_yaozi": ["stretch|point|gaze", "", "doze"],
 	# Part XXXIV (the Unpicked Road release)
+	# Part XXXV (the Uncarved Block release)
+	"zeng_shen": ["sweep|think|count", "broom", "doze"], "fang_zhongyong": ["hoe|dig|gather", "hoe", "doze"], "carpenter_shi": ["measure|carve|gaze", "", "gaze"], "bian_he": ["gaze|think|pray", "", "doze"],
 	"yangzi_wife": ["weave|sew|spin", "", "weave"], "yang_zhen": ["read|write|gaze", "", "read"], "bell_thief": ["peer|knock|gaze", "", "doze"], "pei_du": ["gaze|count|read", "", "gaze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }

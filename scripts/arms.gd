@@ -244,7 +244,7 @@ static func tick(m: Node3D, dt: float, act: String) -> void:
 	var c: Array = m.get_meta("arm_carry")
 	if not is_instance_valid(c[0]):
 		return
-	var want := 0.0 if (act in IN_USE or act.begins_with("arm_") or act.begins_with("art_")) else 1.0
+	var want := 0.0 if (act in IN_USE or act.begins_with("arm_") or act.begins_with("art_") or act.begins_with("rite_a_")) else 1.0
 	var k := float(m.get_meta("arm_k", 1.0))
 	if k == want:
 		return

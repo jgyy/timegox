@@ -209,7 +209,7 @@ static func stipend(g) -> int:
 	# (the Open Net release: an outlaw, or somebody found out at a forbidden art, is struck from the roll)
 	if Crime.outlaw(g):
 		return 0
-	return int(round((30.0 + 22.0 * float(g.realm())) * k * Creed.mod(g, "stipend")))
+	return int(round((30.0 + 22.0 * float(g.realm())) * k * Creed.mod(g, "stipend") * Roots.mod(g, "stipend")))
 
 ## What a day has brought: the stipend when a month has turned, and word of whoever on the roll has
 ## reached a new great realm.  Called when the day changes (Game._process) and never asks the screen.

@@ -33,6 +33,8 @@ const SIGNATURE := {
 	"Old Dame Wu": "hand_heart", "Li Bai": "shade_eyes", "Kuang Heng": "measure", "The Old Oil Seller": "stroke_beard", "Chen Yaozi": "arms_cross",
 	# the Unpicked Road (Part XXXIV)
 	"Yue Yangzi's Wife": "arms_cross", "Yang Zhen": "stroke_beard", "The Man Who Stopped His Ears": "shade_eyes", "Pei Du": "hand_heart",
+	# the Uncarved Block (Part XXXV)
+	"Zeng Shen": "hand_heart", "Fang Zhongyong": "shade_eyes", "Carpenter Shi of Qi": "measure", "Bian He": "stoop",
 	# the people of the older chapters, by what they are
 	"Granny Wen": "hand_heart", "Smith Tie": "arms_cross", "Li Li": "hand_heart", "Shang Yang": "arms_cross", "Tang of Shang": "stroke_beard",
 	"Hua Tuo": "stroke_beard", "Cook Ding": "measure", "Tao Kan": "arms_cross", "Budai": "sleeve_smile",

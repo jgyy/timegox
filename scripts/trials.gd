@@ -72,6 +72,8 @@ const KINDS := {
 	"house": {"n": "By the ordered house", "col": Color("c8a878"), "what": "the houses of the land you have put to rights"},
 	# the Unpicked Road release (trifles.gd)
 	"found": {"n": "By what was carried home", "col": Color("d8c070"), "what": "the lost things you have carried to whose they were"},
+	# the Uncarved Block release (rites.gd)
+	"rite": {"n": "By the rite", "col": Color("b8e0ff"), "what": "the Daos whose rite you have performed"},
 	# the Open Net release: a name no gate has anything against (crime.gd, taboo.gd), and a wild that still stands (wilds.gd)
 	"clean": {"n": "By a clean name", "col": Color("e8f0e8"), "what": "nobody dead by your hand, no bill at any gate, and the forbidden shelf never opened"},
 	"wild": {"n": "By the standing wild", "col": Color("9ac878"), "what": "no country you have hunted in brought lower than thinned"},
@@ -1644,6 +1646,55 @@ const TRIALS := {
 				"desc": "Late Practised Hand and a sword tempered nine times. A mallet broke it once. It will take a great many more blows now, and every one of them will be heard in the next province.",
 				"line": "Lin Feng draws. The bell does not hear the blade come out. It has not heard anything for a long time, and it rings harder, to be sure."},
 		]},
+	# ---- Part XXXV (the Uncarved Block release): the gift, the rule and the eye
+	"the_gift": {"might": [5.2, 1.5],
+		"why": "It is a gift with nothing built on it, and there is nothing in it to strike: a blow goes through four neat lines and out the other side, and it makes four more. It has never been taught anything. What it cannot do is the fifth line, the one that has to be worked for.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four lines, and room for a fifth", "needs": [["item", "coin_verse", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "The first four lines he ever wrote, sold a copper apiece. Lay them out in order in front of it and leave a space below. It has never seen its own verse with room left under it.",
+				"line": "Lin Feng lays four strips of paper on the ground and a blank one beneath. The gift looks at the blank one. It has always been handed the subject."},
+			{"id": "folk", "kind": "folk", "n": "What the old said of the quick", "needs": [["step", "s_p35_elders"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "You asked two elders of Qingshi what became of the cleverest child they knew, and one of them answered about the best. Tell it what she said. Nobody has ever told it there was a second question.",
+				"line": "\"She was slow,\" says Lin Feng, \"and they sent for her from three villages for fifty years.\" The gift lowers its hand a little. It had thought it was the only kind of thing there was."},
+			{"id": "rite", "kind": "rite", "n": "A form that had to be learned", "needs": [["rites", 1]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "The rite of one of your Daos, performed. It does everything at once and without effort. Show it a thing done slowly that could not have been done at all the first day.",
+				"line": "Lin Feng takes the first stance of a rite, and holds it. The gift watches a body do a thing it was not born knowing. It has no verse for that."},
+			{"id": "might", "kind": "might", "n": "Outlast its four lines", "needs": [["lv", 117], ["temper", 9]], "boon": {},
+				"desc": "Early Sleeves of Wind and a sword tempered nine times. It never tires and never grows. A thing that cannot grow can be worn down by one that can; it will only take the afternoon.",
+				"line": "Lin Feng draws. The gift holds out four lines about a sword, at once, and they are good. It waits to be paid."},
+		]},
+	"the_rule": {"might": [5.3, 1.5],
+		"why": "It is a carpenter's square, true to a hair, and everything it says is so. To strike it is to be measured: every blow is found a little off and handed back. What it has never been laid against is the question it puts to everything else: and what is a rule for?",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four uses refused", "needs": [["item", "reject_tally", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four tallies cut in eleven paces: boat, coffin, bowl, door. Set them in a row in the oak's shade, where they have lain dry through every rain. It ruled the tree useless, and here is what the ruling has been sheltered by.",
+				"line": "Lin Feng sets four chips of oak in the shade of the tree they condemn. They are quite dry. The rule lays itself along them, and for once finds nothing to say."},
+			{"id": "folk", "kind": "folk", "n": "Seen from under the oak", "needs": [["step", "s_p35_crown"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "You climbed the third height and saw what stands under the oak: a shrine, a well, a market, a rope with children on it. It has measured the trunk. Tell it what it left out of the measure.",
+				"line": "\"A well, a threshing floor and a swing,\" says Lin Feng. \"None of them is straight either.\" The plumb line swings, once, as if somebody had breathed on it."},
+			{"id": "clean", "kind": "clean", "n": "Nothing to be found out", "needs": [["clean"]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Nobody dead by your hand, no price on your head, the forbidden shelf never opened. It finds everybody out of true, and it is right. Stand to be measured anyway, with nothing you would rather it did not lay itself against.",
+				"line": "The rule lays itself against Lin Feng, shoulder to heel. Crooked: a sweeper's back. He nods. It had not met anybody who agreed."},
+			{"id": "might", "kind": "might", "n": "Be out of true, and harder", "needs": [["lv", 118], ["temper", 9]], "boon": {},
+				"desc": "Middle Sleeves of Wind and a sword tempered nine times. Every blow will be found wanting and given back. A great many blows a little off still add up to a square with its corner knocked in.",
+				"line": "Lin Feng draws. The rule measures the blade: a hair out, at the third finger's breadth. It is. He strikes with it all the same."},
+		]},
+	"the_appraiser": {"might": [5.4, 1.5],
+		"why": "It is a glance, and a glance is over before a blade can reach it: it has looked, known, and gone on to the next thing. It has been right ten thousand times. What undoes it is a second look, which is slower and lower down, and which it has never in its life been made to take.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four flakes, turned over", "needs": [["item", "jade_rind", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four flakes struck off the rind by two courts' jewellers, to show that it was stone. Hold them up to it inner face outward, where the green is. It struck them off itself and never looked at what it had struck.",
+				"line": "Lin Feng turns four flakes of rind over in his palm. A hair of green in each, with light in it. The Eye, which does not blink, blinks."},
+			{"id": "rite", "kind": "rite", "n": "What cannot be seen from outside", "needs": [["step", "s_p35_rite"]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "You performed the rite of your Dao in front of an old man who had taken you for a sweeper. It has taken you for one too. Do not argue. It has only ever been argued with. Show it.",
+				"line": "The Eye regards Lin Feng for one breath and knows him: a youth in a blue robe. Then he moves, as he moved before Bian He, and it has to look again."},
+			{"id": "wild", "kind": "wild", "n": "A hill left as it was found", "needs": [["wild"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "No country you have hunted in brought lower than thinned. It prices a thing and passes on, and what it has priced as worthless is used up without a thought. Come to it as somebody who has left things standing that he could not see the use of.",
+				"line": "The Eye looks for what Lin Feng has taken for common and spent. It finds countries he walked through and left with their beasts in them. It has no column for that."},
+			{"id": "might", "kind": "might", "n": "Make it look again by force", "needs": [["lv", 119], ["temper", 9]], "boon": {},
+				"desc": "Late Sleeves of Wind and a sword tempered nine times. It cannot be struck while it is looking elsewhere, and it is always looking elsewhere. Be the thing it cannot stop looking at, for as long as that takes.",
+				"line": "Lin Feng draws. The Eye has already looked at him and moved on. He steps into where it is looking now."},
+		]},
 	# ---- Part XXIX (the Ordered House release): the fire a guest foretold, the wall that did not change, the gold that
 	# waits to be stooped for, and the friend who went to the gate
 	"chimney_fire": {"might": [4.0, 1.5],
@@ -2015,6 +2066,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"restored":
 			# the Unpicked Road release: lost things carried to whose they were (trifles.gd)
 			return int(g.restored) >= int(n[1])
+		"rites":
+			# the Uncarved Block release: Daos whose rite he has performed (rites.gd)
+			return Rites.done(g) >= int(n[1])
 		"step":
 			# the Open Net release: something of the story already done (["step", id])
 			return g.done(str(n[1]))
@@ -2116,6 +2170,8 @@ static func need_text(n: Array, g) -> String:
 		"creed":
 			var ax: Dictionary = Creed.AXIS[str(n[1])]
 			return "%s by %d or more (now %+d: Esc > The Way says what it was weighed by)" % [str(ax.pos if int(n[2]) > 0 else ax.neg), absi(int(n[2])), Creed.value(g, str(n[1])) * (1 if int(n[2]) > 0 else -1)]
+		"rites":
+			return "the rite of %d of your Daos performed (now %d: Esc > Root & Rites, and Enter on one that is yours)" % [int(n[1]), Rites.done(g)]
 		"restored":
 			return "%d lost things carried to whose they were (now %d: what is dropped in a town's roads is new every morning)" % [int(n[1]), int(g.restored)]
 		"fitted":

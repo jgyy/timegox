@@ -96,16 +96,16 @@ const ACTS := {
 	"bag": {"m": "regard", "per": 2, "max": 2, "why": "the post brought in, seals whole"},
 	"errand": {"m": "regard", "per": 4, "max": 3, "why": "errands run among its people"},
 	"gift": {"m": "plenty", "per": 1, "max": 3, "why": "given to the town's chest"},
-	"broke": {"m": "regard", "per": -2, "max": 4, "why": "things broken in its streets"},
-	"unpaid": {"m": "regard", "per": -1, "max": 3, "why": "things broken and never paid for"},
+	"broke": {"m": "regard", "per": -2, "max": 4, "why": "things broken in its streets", "one": "One thing broken in its streets."},
+	"unpaid": {"m": "regard", "per": -1, "max": 3, "why": "things broken and never paid for", "one": "One thing broken and never paid for."},
 	"sold": {"m": "plenty", "per": 6, "max": 2, "why": "timber, stone and fish sold on its roads"},
 	# the Open Net release (crime.gd): somebody struck down in its streets, a sword drawn on somebody
 	"slain": {"m": "peace", "per": -1, "max": 6, "why": "struck down in its streets by his hand"},
-	"drawn": {"m": "regard", "per": -1, "max": 3, "why": "times he drew on somebody here and was put on his back"},
+	"drawn": {"m": "regard", "per": -1, "max": 3, "why": "times he drew on somebody here and was put on his back", "one": "Once he drew on somebody here and was put on his back."},
 	# the Unpicked Road release (trifles.gd): what was dropped in its roads and carried home; what was somebody's
 	# and went into his sleeve while somebody looked
-	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were"},
-	"pilfer": {"m": "regard", "per": -1, "max": 4, "why": "things pocketed in its streets, and seen"},
+	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were", "one": "One lost thing carried to whose it was."},
+	"pilfer": {"m": "regard", "per": -1, "max": 4, "why": "things pocketed in its streets, and seen", "one": "One thing pocketed in its streets, and seen."},
 }
 ## how many lords put down in a town's country make one point of peace, and how many points at most;
 ## and the same for packs cleared out of it
@@ -311,7 +311,7 @@ static func causes(g, tid: String) -> Array:
 	# the war is everybody's: a field won is a quiet night in every town of the land
 	if Data.layer_of(str(t.area)) == "surface":
 		if g.war_won.size() > 0:
-			out.append({"m": "peace", "d": mini(2, g.war_won.size()), "why": "%d fields of the war won." % g.war_won.size()})
+			out.append({"m": "peace", "d": mini(2, g.war_won.size()), "why": "%d field%s of the war won." % [g.war_won.size(), "" if g.war_won.size() == 1 else "s"]})
 		if int(g.war_lost) >= 2:
 			out.append({"m": "peace", "d": -1, "why": "Fields of the war lost before they were won."})
 		var wk := 0
@@ -326,7 +326,7 @@ static func causes(g, tid: String) -> Array:
 		if n <= 0 or n < absi(per):
 			continue
 		var d := mini(int(ACTS[a].max), n / absi(per)) * (1 if per > 0 else -1)
-		out.append({"m": str(ACTS[a].m), "d": d, "why": "%d %s." % [n, str(ACTS[a].why)]})
+		out.append({"m": str(ACTS[a].m), "d": d, "why": str(ACTS[a].one) if n == 1 and ACTS[a].has("one") else "%d %s." % [n, str(ACTS[a].why)]})
 	# (the Open Net release, wilds.gd: a country hunted out is felt in the towns that hear of it; crime.gd: a
 	# town does not forget who is dead in its streets, or whose bill hangs at its gate)
 	out.append_array(Wilds.town_causes(g, t.areas))
@@ -409,7 +409,8 @@ static func mod(g, area: String, key: String) -> float:
 
 ## A price asked at a counter in region `area`.
 static func price(g, area: String, base: int) -> int:
-	return maxi(1, int(round(float(base) * mod(g, area, "price"))))
+	# (the Uncarved Block release, roots.gd: the sect's own counters are kinder to a root it is proud of)
+	return maxi(1, int(round(float(base) * mod(g, area, "price") * (Roots.mod(g, "price") if area == "sect" else 1.0))))
 
 # ---------------------------------------------------------------- gifts, and thanks
 static func gift_cost(g) -> int:
@@ -588,9 +589,13 @@ const FATES := [
 	{"npc": "lechang", "when": ["the_mirror", ["halves"]], "tag": "who has two houses", "line": "My half hangs a hand from his, on his wall, and neither of us has offered to move it. On the fifteenth I go to see my own face in his house. He says it looks well there. He has not said it should stay."},
 	# Part XXXIII (the Iron Pestle release)
 	# Part XXXIV (the Unpicked Road release)
-	{"npc": "pei_du", "when": ["the_belts", ["wait"]], "tag": "who sat until morning", "line": "I am told my face has changed. I have looked in a basin and cannot see it. What I can tell you is that I sat nineteen hours beside ten years' rice and it was not difficult, after the first hour. I had expected it to be. I think most things are like that, and nobody says so."},
+	{"npc": "pei_du", "when": ["the_belts", ["wait"]], "tag": "who sat until morning", "line": "I am told my face has changed. I have looked in a basin and cannot see it. What I can tell you is that I sat nineteen hours beside thirty years' rice and it was not difficult, after the first hour. I had expected it to be. I think most things are like that, and nobody says so."},
 	{"npc": "pei_du", "when": ["the_belts", ["cry"]], "tag": "who reads the boards", "line": "I stop at the board every morning on my way to the temple. It is better reading than the classics, some days: one shoe, small, red. I wonder about the child all morning. It is struck through by evening, as a rule. I go home lighter than a man with my prospects has any right to."},
 	{"npc": "pei_du", "when": ["the_belts", ["lie"]], "tag": "who did not sleep", "line": "They were there in the morning. I have told myself so a hundred times. And I still wake at the third watch and count them. You slept that night, cultivator; I heard you. I cannot decide whether that was trust or only a very good conscience, and I should like to have either."},
+	# Part XXXV (the Uncarved Block release)
+	{"npc": "zeng_shen", "when": ["the_stone", ["keep"]], "tag": "who shuts the door", "line": "I am last, Senior. I was last today. But the girl who came in the spring is behind me in one thing, the brush, and I showed her. Four times. I had never been in front of anybody. It is not as different as I expected. One only has to turn round."},
+	{"npc": "zeng_shen", "when": ["the_stone", ["cut"]], "tag": "whose second column is blank", "line": "The registrar let me look. Five, and then a space. I asked how large the space is. He measured it for me with his thumb. It is the same size as everybody's, Senior. I had been sure the quick ones would have been left more room."},
+	{"npc": "zeng_shen", "when": ["the_stone", ["bury"]], "tag": "who was never told", "line": "I come down here to think, Senior, where I sat before. Nobody has said five to me since. I say it to myself sometimes, to see whether it is still true. I cannot tell. It was true of a morning, and I have had a great many mornings since that one."},
 	{"npc": "granny_wu", "when": ["the_needle", ["truth"]], "tag": "whose secret is out", "line": "He knows about the forty needles, and he comes all the same. I had thought the thing only worked on those who believed in it. It seems it works better on one who does not. Forty years at this stone, and a child of ten has had to show me what I was doing."},
 	{"npc": "granny_wu", "when": ["the_needle", ["finish"]], "tag": "with a new bar", "line": "It was a needle when I woke. I held it, and could not find anything to say. My granddaughter has fetched me another bar, the same weight. Do not look so. It was kindly done. I only wish somebody had asked me whether I wanted to be finished."},
 	{"npc": "granny_wu", "when": ["the_needle", ["turn"]], "tag": "who has company at the stone", "line": "That is him now; listen. Too fast, and he presses. In a month he will not. I used to talk to the water of a morning. Now there is a boy saying the Odes at me, wrong, and I put him right, and I have never read them. One picks things up."},

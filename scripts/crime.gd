@@ -490,7 +490,7 @@ static func serve(g, w: Dictionary, hard: bool = false) -> int:
 		g.stones = int(g.stones) / 2
 	g.heal_full()
 	_clear(g, w)
-	g.note("%d days in the circle at %s%s" % [days, str(w.n), ", taken sword in hand" if hard else ""])
+	g.note("%d day%s in the circle at %s%s" % [days, "" if days == 1 else "s", str(w.n), ", taken sword in hand" if hard else ""])
 	return days
 
 ## What is told of the days served.

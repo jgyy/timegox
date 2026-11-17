@@ -38,6 +38,10 @@ PERSON_CLIPS = ("idle", "walk", "run", "sit", "talk", "bow", "attack", "cast", "
                 "nod", "shake", "point", "wave", "laugh", "grieve", "think", "kneel", "offer", "shock",
                 # the Hollow Hills release (Part XX): five more gestures everybody has
                 "shrug", "cheer", "beckon", "refuse", "shiver")
+# the hero's models carry a form for each of the seventeen Daos (art/lib/person.py RITES, scripts/rites.gd)
+HERO = ("lin_feng", "lin_feng_wanderer", "lin_feng_wild", "lin_feng_scholar", "lin_feng_f", "lin_feng_f_wanderer", "lin_feng_f_wild", "lin_feng_f_scholar")
+HERO_RITES = tuple("rite_" + r for r in ("sword", "wander", "heart", "formation", "alchemy", "illusion", "a_sword", "a_staff", "a_sabre", "a_spear", "a_fan", "a_bow", "a_whip",
+                                         "a_brush", "t_blood", "t_soul", "t_husk"))
 MONSTER_CLIPS = ("idle", "walk", "attack", "hurt", "die")
 MOUNT_CLIPS = ("idle", "walk", "run")
 # the party does things with the world's props and furniture (art/lib/person.py INTERACT) and rides
@@ -170,6 +174,8 @@ def check_asset(group, name, path):
         if missing:
             problems.append("%s: rig lacks bones %s" % (tag, missing))
         need = PERSON_CLIPS + (PARTY_CLIPS if tag.split("/")[-1] in PARTY else ())
+        # (the Uncarved Block release: only the hero performs the rites of the Daos, in every look and of either sex)
+        need = need + (HERO_RITES if tag.split("/")[-1] in HERO else ())
     elif group == "mounts":
         need = MOUNT_CLIPS
     else:

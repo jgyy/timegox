@@ -242,6 +242,7 @@ var _amb_t := 0.0
 func _process(d: float) -> void:
 	_talk_hint()
 	_done_scene()
+	_rite_scene()
 	# the Thundering Pots release: what the finds (eggs.gd) need to know of the world, what was said
 	# when one was found, and the tune the hour and the place call for (music.gd)
 	var in_world: bool = top_name() == "world"
@@ -307,6 +308,31 @@ func _done_scene() -> void:
 	# (with what the crossroads behind it add: echoes.gd)
 	say(Echoes.told(Game, "done:" + sid, Data.DIALOGUE.get("done:" + sid, [])))
 
+## The Uncarved Block release (rites.gd): a Dao that has become his has a rite, played once he is standing in
+## the world with nothing else going on; and any rite that is his can be performed again when he asks.
+func _rite_scene() -> void:
+	if Game.rite_due.is_empty() or Game.prologue != "" or not Game.done_pending.is_empty() or top_name() != "world" or not world.using.is_empty() or world.traveling() or world.ambush_t >= 0.0:
+		return
+	play_rite(str(Game.rite_due.pop_front()))
+
+func play_rite(id: String, cb: Callable = Callable()) -> void:
+	if not Rites.RITES.has(id):
+		if cb.is_valid():
+			cb.call()
+		return
+	var first: bool = int(Game.rites.get(id, 0)) == 0
+	var lines := Rites.perform(Game, id)
+	Game.step_rite += 1
+	world.rite_begin(id)
+	say(lines, func():
+		world.rite_end()
+		if first:
+			Game.toast("%s: the rite of the %s" % [str(Rites.RITES[id].n), Rites.dao_name(id)])
+		Game.poll_steps()
+		if cb.is_valid():
+			cb.call()
+	)
+
 func say(lines: Array, cb: Callable = Callable()) -> void:
 	# an empty conversation used to push an empty dialogue box that Enter could never close
 	if lines.is_empty():
@@ -354,7 +380,14 @@ func open_dao_choice(from: String) -> void:
 			desc += "\n\nThe road you walk now."
 		opts.append({"id": id, "label": d.n, "sub": d.motto, "desc": desc, "note": rank, "col": d.col, "current": id == Game.dao})
 	var first := Game.dao == ""
+	# (the Uncarved Block release, rites.gd: at a stele the rite of a Dao that is his can be performed again)
+	if not first and Rites.ready(Game) != "":
+		var rr := Rites.ready(Game)
+		opts.append({"id": "rite", "label": "Perform the rite", "sub": str(Rites.RITES[rr].n), "desc": "%s, the rite of the %s. It changes nothing. It is done for its own sake, as a field is walked in the evening by the one who ploughed it." % [str(Rites.RITES[rr].n), Rites.dao_name(rr)], "note": "", "col": Rites.colour(rr), "current": false})
 	choose("Which road will you walk?" if first else "The Dao Stele: walk another road?", opts, func(id: String):
+		if id == "rite":
+			play_rite(Rites.ready(Game))
+			return
 		if id == "" or id == Game.dao:
 			return
 		Game.choose_dao(id)
@@ -862,6 +895,15 @@ func talk_folk(e: Dictionary) -> void:
 				al = Creed.line(Game, int(fp.seed) + wn / 4)
 		if al != "":
 			lines = [[str(fp.n), al.replace("%s", Game.address())]]
+	# (the Uncarved Block release, roots.gd and rites.gd: the fourth word with anybody is about the root the stone
+	# found in him, or the road he walks or does not, and the seventh about the other: said as what they are)
+	if (wn % 8 == 3 or wn % 8 == 6) and Game.prologue == "" and not Folk.new_year(Game) and Clock.frozen(Game) == "" and Game.bounty.is_empty() and not Taboo.marked(Game):
+		var kd := Manners.kind_of(fp)
+		var ra: Dictionary = Roots.said(Game, kd, int(fp.seed)) if (wn % 8 == 3) == (int(fp.seed) % 2 == 0) else Rites.said(Game, kd)
+		lines = [[str(fp.n), str(ra.line), str(ra.clip)]]
+		# (and once in a while, of the weapon in his hand)
+		if wn % 16 == 14 and Rites.arm_said(Game) != "":
+			lines = [[str(fp.n), Rites.arm_said(Game)]]
 	# a first word with one of a hearth's people (cultures.gd) is a step towards being its guest
 	var hid := Cultures.of_town(str(fp.town))
 	if hid != "" and not Game.folk_talk.has(str(fp.id)) and Game.prologue == "":
@@ -1176,6 +1218,11 @@ func talk_npc(e: Dictionary) -> void:
 		var rl: String = str(Data.RACES[race].dao_lines.get(Game.dao, ""))
 		if rl != "":
 			chats.append(rl)
+	# (the Uncarved Block release: the people who have known him longest have a word for the root the stone found
+	# in him, roots.gd, and for the road he walks or has not chosen, rites.gd)
+	for own_word in [Roots.word(Game, str(e.id)), Rites.word(Game, str(e.id))]:
+		if own_word != "":
+			chats.append(own_word)
 	# what people only say once the story has got there (Part XII)
 	for cl in Data.CHAT_LATER.get(str(e.get("asset", e.id)), []):
 		if Game.done(str(cl[0])):
@@ -1294,8 +1341,8 @@ func offer_watch(w: Dictionary) -> void:
 		choose(WATCH_ASK, [
 			{"id": "pay", "label": "Pay the price", "note": "%d stones" % int(w.price), "enabled": Game.stones >= int(w.price), "col": UI.C_GOLD,
 				"desc": "%d spirit stones into the captain's hand (you have %d). The bill is torn up in front of you, and that is the end of it at this gate." % [int(w.price), Game.stones]},
-			{"id": "go", "label": "Go with them", "note": "%d days" % days, "col": UI.C_TEXT,
-				"desc": "There is no cell. There is a circle scratched on the ground by the gate, and nobody to guard it. %d days inside it, in front of everybody who passes, and the bill is burned. The days are lived: the land does not wait." % days},
+			{"id": "go", "label": "Go with them", "note": "%d day%s" % [days, "" if days == 1 else "s"], "col": UI.C_TEXT,
+				"desc": "There is no cell. There is a circle scratched on the ground by the gate, and nobody to guard it. %d day%s inside it, in front of everybody who passes, and the bill is burned. The days are lived: the land does not wait." % [days, "" if days == 1 else "s"]},
 			{"id": "run", "label": "Run", "col": UI.C_DIM,
 				"desc": "They will not catch him today. The bill will be the heavier for it tomorrow, and they will come again."},
 			{"id": "draw", "label": "Draw on the watch", "col": UI.C_RED,
@@ -1370,6 +1417,8 @@ func open_forbidden() -> void:
 		var lines := Taboo.sit(Game, pick, seen, str(Data.AREAS[Game.area].n))
 		if not lines.is_empty():
 			fx_flash(Taboo.DAOS[pick].col, 0.4)
+			# (the Uncarved Block release, rites.gd: the first time he sits to one, what it looks like)
+			Rites.earn(Game, Rites.of_taboo(pick))
 			say(lines)
 	)
 
@@ -1712,7 +1761,7 @@ func offer_shift(e: Dictionary) -> void:
 		return
 	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
 	if shift_ok:
-		opts.append({"id": "work", "label": str(t.n), "note": "%d hours" % Offices.hours(Game, use), "desc": "%s will take a pair of hands until the work is done: %d hours of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), int(round(float(Offices.wage(Game, use)) * Weal.mod(Game, town, "wage"))),
+		opts.append({"id": "work", "label": str(t.n), "note": "%d hour%s" % [Offices.hours(Game, use), "" if Offices.hours(Game, use) == 1 else "s"], "desc": "%s will take a pair of hands until the work is done: %d hour%s of the day, for %d spirit stones%s. One shift a day in a town.\n\n%s" % [str(e.n), Offices.hours(Game, use), "" if Offices.hours(Game, use) == 1 else "s", int(round(float(Offices.wage(Game, use)) * Weal.mod(Game, town, "wage"))),
 			(", and %d of salary for the days away" % Offices.salary_due(Game, use, town)) if Offices.salary_due(Game, use, town) > 0 else "", Offices.career_text(Game, use)], "col": UI.C_GOLD})
 	if not fare.is_empty():
 		opts.append({"id": "fare", "label": "Carry %s to %s" % [str(e.n), str(Data.AREAS[str(fare.to)].n)], "note": "%d stones" % int(fare.pay),
@@ -2529,7 +2578,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

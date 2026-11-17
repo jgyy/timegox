@@ -664,6 +664,13 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# ---- the Unpicked Road release: what a later chapter stands on a height (`"after": true`) is stood now,
 	# after every band and every mark, so that none of them moves for it
 	Peaks.world(grid, W, pks.peaks, ents, layer, ids, true)
+	# ---- the Uncarved Block release: a seventh band ("warband7"), for a region where a band of the fifth or sixth
+	# slot would take ground a mark of an older crossroads was stood on after those bands (Maple Gorge): placed
+	# after everything above, so that no mark and nothing on a height moves for it
+	var seventh: Array = []
+	for id0 in ids:
+		seventh.append([id0, "warband7", "t"])
+	_place_bands(seventh, grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps)
 	# ---- and who is at home (rooms.gd `residents`): people indoors in the houses of every town, stood
 	# after everything else on floor nobody needs to get past
 	ents.append_array(Rooms.residents(buildings, grid, W, ents, layer))
@@ -729,7 +736,7 @@ static func _place_bands(slots: Array, grid: PackedByteArray, W: int, H: int, ow
 				cands.append(p5)
 		cands.sort()
 		var rng5 := RandomNumberGenerator.new()
-		rng5.seed = int(Data.AREAS[id3].seed) * 977 + {"w": 31, "x": 77, "y": 131, "z": 173, "u": 211, "v": 251}[str(bs[2])]
+		rng5.seed = int(Data.AREAS[id3].seed) * 977 + {"w": 31, "x": 77, "y": 131, "z": 173, "u": 211, "v": 251, "t": 283}[str(bs[2])]
 		var made := 0
 		var tries := 0
 		while made < int(band.n) and tries < 4000 and not cands.is_empty():

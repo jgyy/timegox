@@ -120,7 +120,7 @@ func _process(d: float) -> void:
 			# (only what was really gained: at the peak of a realm cultivation stops until the breakthrough)
 			var lv0 := Game.level
 			var ex0 := Game.exp
-			Game.add_exp(rate * d)
+			Game.add_exp(rate * d * Roots.mod(Game, "exp"))
 			gained += Game.exp - ex0 if Game.level == lv0 else rate * d
 		if Game.level > before:
 			main.pop()

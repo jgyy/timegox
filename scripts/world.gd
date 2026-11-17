@@ -115,6 +115,12 @@ var _cine_fov0 := 0.0
 var _visage_key := "0|0"
 var cine_pos := Vector3.ZERO
 var cine_a := 0.0
+## the Uncarved Block release (rites.gd): the rite being performed ("" for none), what it is done with, when it
+## began and which beat of its scene the form was last begun for
+var rite_id := ""
+var rite_prop: Node3D
+var rite_t0 := 0.0
+var rite_beat := -1
 ## Fates and Faces (fashion.gd): the ride under the party (rebuilt when another is summoned), its own
 ## clock (a gallop runs faster than the world's), and how far the hero's model is behind the outfit
 ## and the look he has now (`hero_sig`: the model is rebuilt when they change)
@@ -2947,6 +2953,8 @@ func _cutscene(d: float, pp: Vector3) -> void:
 		cue_lines = dl.lines
 		cue_idx = dl.idx
 		_cue_line(dl.lines[dl.idx])
+		if rite_id != "":
+			_rite_cue(dl.idx)
 	if not on:
 		cue_idx = -1
 		cue_lines = []
@@ -2957,6 +2965,9 @@ func _cutscene(d: float, pp: Vector3) -> void:
 		cine_pos = cam.position
 		cam.fov = _cine_fov0
 		_cine_shot = ""
+		return
+	if on and rite_id != "":
+		_rite_cam(d, dl.idx)
 		return
 	var sp := speaker()
 	var other: Array = []
@@ -3051,6 +3062,127 @@ func _cutscene(d: float, pp: Vector3) -> void:
 	if cam.position.distance_to(at) > 0.5:
 		var look_from := cam.position - chase_look
 		cam.look_at(look_from.lerp(at, k) if k < 1.0 else at, Vector3.UP)
+
+# ---------------------------------------------------------------- the rites of the Daos (rites.gd)
+## A rite begins: what it is done with is stood where the form wants it (drawn only: with no window nothing
+## is built), and the scene's lines are told over it (Main.play_rite).
+func rite_begin(id: String) -> void:
+	rite_end()
+	rite_id = id
+	rite_t0 = t
+	rite_beat = -1
+	if Fx3D.headless() or player == null:
+		return
+	var r: Dictionary = Rites.RITES[id]
+	var fw := Vector3(facing.x, 0, facing.y).normalized()
+	var right := Vector3(-fw.z, 0, fw.x)
+	var at: Array = r.at
+	var holder := Node3D.new()
+	scene3d.add_child(holder)
+	var p0 := player.global_position
+	holder.global_position = p0 + fw * float(at[0]) + right * float(at[1]) + Vector3(0, float(at[2]), 0)
+	holder.rotation.y = atan2(fw.x, fw.z)
+	holder.add_child(Rites.prop(id))
+	rite_prop = holder
+	player.rotation.y = atan2(fw.x, fw.z)
+	if str(r.kind) == "arm":
+		Arms.attach(player, str(r.key))
+	Faces.wear(player, str(r.face), Rites.SECONDS * float((r.beats as Array).size()) + 2.0)
+	Fx3D.charge(scene3d, p0 + Vector3(0, 1.0, 0), Rites.colour(id), 0.6)
+
+func rite_end() -> void:
+	if rite_id == "":
+		return
+	var id := rite_id
+	rite_id = ""
+	if rite_prop != null and is_instance_valid(rite_prop):
+		rite_prop.queue_free()
+	rite_prop = null
+	if Fx3D.headless() or player == null:
+		return
+	Models.act(player, "", t)
+	if Arms.attached(player) != Arms.held(Game):
+		Arms.attach(player, Arms.held(Game))
+	Fx3D.glimmer(scene3d, player.global_position + Vector3(0, 1.2, 0), Rites.colour(id))
+
+## A beat of the scene begins: the form is done once through, and the air answers on the last.
+func _rite_cue(idx: int) -> void:
+	if rite_id == "" or Fx3D.headless() or player == null:
+		return
+	rite_beat = idx
+	rite_t0 = t
+	var r: Dictionary = Rites.RITES[rite_id]
+	if Assets.has_clip(player, str(r.clip)):
+		Models.act(player, str(r.clip), t)
+		Faces.wear(player, str(r.face), Rites.SECONDS + 1.0)
+	if idx == (r.beats as Array).size() - 1:
+		var at := player.global_position
+		var col := Rites.colour(rite_id)
+		match str(r.fx):
+			"slash":
+				Fx3D.cross_slash(scene3d, at + Vector3(0, 1.4, 0), col, player.rotation.y)
+			"leaves":
+				Fx3D.leaf_spiral(scene3d, at, col, 2.4)
+			"heal":
+				Fx3D.heal(scene3d, at)
+			"rings":
+				Fx3D.five_rings(scene3d, at + Vector3(0, 0.1, 0), 2.4, 2.2)
+			"sparks":
+				Fx3D.sparks(scene3d, at + Vector3(0, 2.2, 0), col)
+			"vortex":
+				Fx3D.vortex(scene3d, at + Vector3(0, 0.2, 0), col, 2.0, 1.8)
+			"cross":
+				Fx3D.slash(scene3d, at + Vector3(0, 1.0, 0), col, player.rotation.y)
+			"splash":
+				Fx3D.splash(scene3d, at + Vector3(facing.x, 0.1, facing.y) * 1.6, col, 1.2)
+			"soot":
+				Fx3D.shockwave(scene3d, at + Vector3(0, 0.2, 0), col.darkened(0.3), 4.0, 1.2)
+			_:
+				Fx3D.glimmer(scene3d, at + Vector3(0, 1.6, 0), col)
+
+## The camera of a rite (Rites.CAMS): each beat is a shot of its own, and a change of beat is a cut.
+func _rite_cam(d: float, idx: int) -> void:
+	var c: Array = Rites.cam(rite_id, idx)
+	var fw := Vector3(facing.x, 0, facing.y).normalized()
+	var right := Vector3(-fw.z, 0, fw.x)
+	var p0 := player.global_position
+	var prop_at := p0 + Vector3(0, 1.2, 0)
+	if rite_prop != null and is_instance_valid(rite_prop):
+		prop_at = rite_prop.global_position + Vector3(0, 1.1 if rite_prop.global_position.y - p0.y < 0.5 else 0.0, 0)
+		var k := clampf((t - rite_t0) / Rites.SECONDS, 0.0, 1.0)
+		if rite_prop.get_child_count() > 0:
+			Rites.tick(rite_prop.get_child(0) as Node3D, rite_id, k, t - rite_t0)
+	# (the box of words covers the foot of the screen: everything is framed above the middle of it)
+	var look := p0 + Vector3(0, 0.8, 0)
+	match str(c[3]):
+		"head":
+			look = _head_of(player, 1.0) + Vector3(0, -0.22, 0)
+		"feet":
+			look = p0 + Vector3(0, -0.5, 0)
+		"prop":
+			look = prop_at.lerp(p0 + Vector3(0, 1.2, 0), 0.25) + Vector3(0, -0.3, 0)
+		"sky":
+			look = p0 + Vector3(0, 3.2, 0) + fw * 1.5
+	var f2 := fw
+	var r2 := right
+	if Rites.cam_name(rite_id, idx) == "orbit":
+		cine_a += d * 0.35
+		f2 = fw.rotated(Vector3.UP, cine_a)
+		r2 = Vector3(-f2.z, 0, f2.x)
+	var goal := p0 + f2 * float(c[0]) + r2 * float(c[1]) + Vector3(0, float(c[2]), 0)
+	# (not into a wall or a wood: the other side, if that is open)
+	if not _open_at(goal) and _open_at(p0 + f2 * float(c[0]) - r2 * float(c[1]) + Vector3(0, float(c[2]), 0)):
+		goal = p0 + f2 * float(c[0]) - r2 * float(c[1]) + Vector3(0, float(c[2]), 0)
+	goal.y = maxf(goal.y, ground_y(goal) + 0.3)
+	var shot := "rite:%d" % idx
+	var cut := shot != _cine_shot and cine_k >= 1.0
+	_cine_shot = shot
+	cine_pos = goal if cut else cine_pos.lerp(goal, 1.0 - exp(-d * 3.5))
+	var kk := smoothstep(0.0, 1.0, cine_k)
+	cam.fov = float(c[4]) if cut else lerpf(cam.fov, lerpf(_cine_fov0, float(c[4]), kk), 1.0 - exp(-d * 6.0))
+	cam.position = cam.position.lerp(cine_pos, kk)
+	if cam.position.distance_to(look) > 0.4:
+		cam.look_at(look, Vector3.UP)
 
 ## Where the head of person model `n` is in the world now (the head bone as the clip has posed it, so
 ## that somebody small, somebody stooping and somebody twice a man's height are each found), or where
@@ -4164,7 +4296,8 @@ func _leap_arrive() -> void:
 	Game.step_leap += 1
 	_trample(ptile)
 	_summit_check()
-	Load.walked(Game, false)
+	# (the Uncarved Block release: a leap in the saddle was counted as jin carried on his own back)
+	Load.walked(Game, riding_here())
 	_at_door()
 	Game.poll_steps()
 	if headless():
