@@ -215,6 +215,8 @@ const PICKUP_COLORS := {
 	"dyke_stake": Color("8a8a78"), "peach_stone": Color("c88a5a"), "oracle_shell": Color("d8c8a0"), "foot_cord": Color("b8a070"), "lintel_peg": Color("9a6a3a"),
 	"red_cord": Color("c02828"), "hour_stone": Color("8a9498"), "wall_tally": Color("a89070"), "bronze_sliver": Color("b8a468"),
 	"worn_whetstone": Color("6a8a78"), "copied_slip": Color("c8b070"), "dry_coin": Color("b88a48"), "firefly_bag": Color("c8f0a0"),
+	# Part XXXIV (the Unpicked Road release)
+	"weed_gold": Color("e0b840"), "know_slip": Color("d8c890"), "fan_bronze": Color("7aa888"),
 	"charred_shingle": Color("4a3a30"), "crane_feather": Color("f4f4f8"), "furrow_piece": Color("e8c040"),
 	"grass_knot": Color("9aa850"), "jade_ring": Color("f0f4ec"), "jiao_scale": Color("5a8a80"),
 	"bell_shard": Color("d8c060"), "tiger_tally": Color("c8a050"), "pitch_pipe": Color("c8d080"), "chu_banner": Color("c84a3a"), "clay_duck": Color("f0d040"),

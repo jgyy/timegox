@@ -661,6 +661,9 @@ static func _build(layer: String = "surface") -> Dictionary:
 	# ---- the Underclothes release: the marks of the crossroads of a later release (Marks.AFTER_BANDS) are
 	# stood after those bands, so that no band of an older map moves for them
 	Marks.place(grid, W, H, owner, ids, ents, layer, reach_e, pks.peaks, camps, true)
+	# ---- the Unpicked Road release: what a later chapter stands on a height (`"after": true`) is stood now,
+	# after every band and every mark, so that none of them moves for it
+	Peaks.world(grid, W, pks.peaks, ents, layer, ids, true)
 	# ---- and who is at home (rooms.gd `residents`): people indoors in the houses of every town, stood
 	# after everything else on floor nobody needs to get past
 	ents.append_array(Rooms.residents(buildings, grid, W, ents, layer))

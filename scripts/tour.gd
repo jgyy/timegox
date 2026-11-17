@@ -2359,6 +2359,9 @@ func _run() -> void:
 		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
 		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
 		await _pestle_shots(str(main.args.pestle))
+	if main.args.has("road"):
+		# the Unpicked Road release: small things, how the street answers, a leap, Part XXXIV
+		await _road_shots(str(main.args.road))
 	if main.args.has("tall"):
 		# the Tall People release (--tall, or --tall=a,b): the Great People beside a man, the eight gestures of a
 		# close-up, the nine faces of the Way, the people, foes and lords of Part XXXI, a town with giants in its
@@ -6232,4 +6235,233 @@ func _wits_shots(which: String = "1") -> void:
 		await _wait(0.6)
 		await _shot("bestiary_how_it_fights")
 		main.pop()
+	get_tree().quit(0)
+
+## The Unpicked Road release (--road, or --road=a,b): the small things in a row; a street with things
+## lying in it; the choice at a thing that is somebody's; what its owner says; a lost thing brought to a
+## door; the street answering a blade; a leap, and a child who jumps too; somebody walked into; and the
+## people, foes, lords and marks of Part XXXIV with its crossroads.
+func _road_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 116
+	Game.step = Data.step_index("s_p34_belts")
+	Game.companion = true
+	Game.day = 210
+	Game.stones = 5000
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var lw := Atlas.world_of("surface")
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	quiet.call()
+	if want.call("things"):
+		for row in [["ware", "trifles_wares"], ["keep", "trifles_keeps"], ["lost", "trifles_lost"], ["wild", "trifles_wild_and_altar"]]:
+			var ms: Array = []
+			for k in Trifles.KINDS:
+				var c := str(Trifles.KINDS[k].cls)
+				if c == str(row[0]) or (str(row[0]) == "wild" and c == "altar"):
+					var holder := Node3D.new()
+					var m := Trifles.model(str(k))
+					m.scale = Vector3.ONE * 4.0
+					m.position.y = 0.7
+					m.rotation.y = 0.5
+					holder.add_child(m)
+					ms.append(holder)
+			await _gallery(str(row[1]), ms, 1.25, 0.3)
+	if want.call("people"):
+		await _gallery("part34_people", [Assets.person("yangzi_wife"), Assets.person("yang_zhen"), Assets.person("bell_thief"), Assets.person("pei_du")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["thrown_gold", "robber_spring", "flung_food", "dusk_gold", "nobody_knows", "heavy_sleeve", "rung_bell", "ear_wad", "bell_mallet"]:
+			fs.append(_foe(fid))
+		await _gallery("part34_foes", fs, 1.0, 0.25)
+		await _gallery("part34_lords", [_foe("the_find", true), _foe("the_dusk", true), _foe("the_bell", true)], 1.3, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["wait", "cry", "lie"]:
+			mk.append(Marks.model(Marks.MARKS.the_belts[oid], 0))
+		await _gallery("part34_marks", mk, 0.9, 0.3)
+	# a thing of class `cls` in Qingshi with open ground south of it, at an hour when somebody can see it
+	var thing := func(cls: String, h: float, seen: bool) -> Dictionary:
+		Game.clock = h * 60.0
+		for tf in Trifles.of_area(Game, lw, "village"):
+			if str(tf.cls) != cls or Trifles.gone(Game, tf):
+				continue
+			var spot: Vector2i = tf.tile + Vector2i(0, 1)
+			if not w.tile_free(spot) or w.ent_at(spot) != null or not w.building_at(spot).is_empty() or w.ent_at(tf.tile) != null:
+				continue
+			if seen and Manners.watchers(Game, lw, tf.tile, 4).is_empty():
+				continue
+			return tf
+		return {}
+	var stand := func(spot: Vector2i, face: Vector2i) -> void:
+		main.set_stack(["world"])
+		w.open_world()
+		w.enter_layer("surface")
+		w.teleport(spot, "surface")
+		w.facing = face
+		w.cam_q = w.FWD.find(face) if w.FWD.find(face) >= 0 else 0
+		w._snap_cam()
+		w.banner_t = 0.0
+		quiet.call()
+	if want.call("street"):
+		var best := {}
+		var bn := 0
+		for h0 in [9.0, 10.5, 15.0, 17.0]:
+			for cls0 in ["keep", "ware", "lost"]:
+				var t0: Dictionary = thing.call(cls0, h0, true)
+				if not t0.is_empty():
+					var n0 := Manners.watchers(Game, lw, t0.tile, 5).size()
+					if n0 > bn:
+						bn = n0
+						best = {"t": t0, "h": h0}
+		if not best.is_empty():
+			Game.clock = float(best.h) * 60.0
+			stand.call(best.t.tile + Vector2i(0, 1), Vector2i(0, -1))
+			await _wait(2.4)
+			await _shot("trifles_in_the_street")
+			main.offer_trifle(best.t)
+			await _wait(0.6)
+			await _shot("trifle_choice")
+			main.set_stack(["world"])
+	if want.call("owner"):
+		for h1 in [9.0, 10.5, 15.0, 17.0, 8.0, 12.0]:
+			Game.clock = h1 * 60.0
+			var got := {}
+			for tf1 in Trifles.stood(lw, "village"):
+				if str(tf1.cls) != "keep" or not w.tile_free(tf1.tile + Vector2i(0, 1)):
+					continue
+				if not Manners.find(Manners.watchers(Game, lw, tf1.tile, 5), str(tf1.owner)).is_empty():
+					got = tf1
+					break
+			if got.is_empty():
+				continue
+			stand.call(got.tile + Vector2i(0, 1), Vector2i(0, -1))
+			await _wait(2.0)
+			var seen1 := Manners.watchers(Game, lw, got.tile, 5)
+			var r1: Dictionary = Trifles.take(Game, lw, got, "pocket", seen1)
+			w.start_gesture("offer")
+			w.folk_talking = str(got.owner)
+			main.say([[str(r1.react.who), str(r1.react.line), str(r1.react.clip)]])
+			main.dialogue.shown = 999.0
+			await _wait(0.7)
+			await _shot("trifle_owner_says")
+			main.set_stack(["world"])
+			w.folk_talking = ""
+			Trifles.put_back(Game, str(got.id))
+			break
+	if want.call("door"):
+		Game.clock = 10.0 * 60.0
+		var lt: Dictionary = Trifles.lost(lw, "village", int(Game.day))[0]
+		stand.call(lt.tile + Vector2i(0, 1), Vector2i(0, -1))
+		await _wait(1.6)
+		await _shot("lost_in_the_road")
+		Trifles.take(Game, lw, lt, "take", [])
+		var dspot: Vector2i = lt.door
+		for d0 in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+			if w.tile_free(lt.door + d0) and w.building_at(lt.door + d0).is_empty():
+				dspot = lt.door + d0
+				stand.call(dspot, -d0)
+				break
+		await _wait(1.2)
+		w._at_door()
+		main.dialogue.shown = 999.0
+		await _wait(0.6)
+		await _shot("brought_to_the_door")
+		main.dialogue.idx = 1 if "idx" in main.dialogue else 0
+		main.set_stack(["world"])
+	# somebody of Qingshi out of doors and standing, with open ground south of them
+	var find := func(h: float, ok: Callable) -> Dictionary:
+		Game.clock = h * 60.0
+		for fp in Folk.people(lw, "qingshi"):
+			if not ok.call(fp):
+				continue
+			var st: Dictionary = Folk.state(lw, fp, Game.clock)
+			if not bool(st.vis) or bool(st.walk):
+				continue
+			var gt := Vector2i(int(floor(float(st.at.x))), int(floor(float(st.at.y))))
+			var ok2 := true
+			for dd in [Vector2i(0, 1), Vector2i(0, 2), Vector2i(0, 3)]:
+				if not w.tile_free(gt + dd) or w.ent_at(gt + dd) != null or not w.building_at(gt + dd).is_empty():
+					ok2 = false
+			if ok2:
+				return {"p": fp, "at": gt}
+		return {}
+	if want.call("blade"):
+		for h2 in [10.4, 15.0, 9.0, 17.0]:
+			var f2: Dictionary = find.call(h2, func(q: Dictionary) -> bool: return not bool(q.kid))
+			if f2.is_empty():
+				continue
+			stand.call(f2.at + Vector2i(0, 2), Vector2i(1, 0))
+			await _wait(2.4)
+			w.strike()
+			await _wait(0.45)
+			await _shot("street_answers_a_blade")
+			break
+	if want.call("leap"):
+		for h3 in [10.4, 15.0, 9.0, 16.0, 12.0]:
+			var f3: Dictionary = find.call(h3, func(q: Dictionary) -> bool: return bool(q.kid))
+			if f3.is_empty():
+				continue
+			stand.call(f3.at + Vector2i(0, 2), Vector2i(1, 0))
+			await _wait(2.4)
+			w.jump()
+			w._move(0.01)
+			await _wait(0.42)
+			await _shot("jump_in_the_street")
+			await _wait(0.45)
+			await _shot("a_child_jumps_too")
+			await _wait(1.2)
+			# and a leap of two tiles, caught at the top
+			for d3 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1)]:
+				if w.leap_to(d3).x >= 0:
+					w.move_dir = d3
+					w.jump()
+					w._move(0.01)
+					w.move_dir = Vector2i.ZERO
+					await _wait(0.2)
+					await _shot("leap_of_two_tiles")
+					break
+			break
+	if want.call("bump"):
+		for h4 in [10.4, 15.0, 9.0, 17.0]:
+			var f4: Dictionary = find.call(h4, func(q: Dictionary) -> bool: return not bool(q.kid) and str(q.role) != Giants.ROLE)
+			if f4.is_empty():
+				continue
+			stand.call(f4.at + Vector2i(0, 1), Vector2i(0, -1))
+			await _wait(2.4)
+			var fn: Node3D = w.folk_nodes.get(str(f4.p.id))
+			if fn == null:
+				continue
+			w.target = w.ptile + Vector2i(0, -1)
+			w._bump(fn, f4.p)
+			w.target = w.ptile
+			await _wait(0.5)
+			await _shot("walked_into")
+			break
+	if want.call("cross"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_belts"]
+		main.ask_crossroads()
+		main.choice.cursor = 0
+		await _wait(1.0)
+		await _shot("crossroads_belts")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("battles"):
+		for bb in [["the_find", "yanggu"], ["the_dusk", "dunes"], ["the_bell", "buzhou"]]:
+			main.set_stack(["world"])
+			var b = main.battle
+			b.start([{"id": str(bb[0]), "lv": int(Data.ENEMIES[str(bb[0])].get("lv", 116))}], {"boss": true, "theme": str(Data.AREAS[str(bb[1])].theme), "area": str(bb[1])})
+			main.push("battle")
+			await _wait(3.0)
+			await _shot("battle_boss_" + str(bb[0]))
+			main.pop()
 	get_tree().quit(0)

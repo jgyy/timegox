@@ -1150,6 +1150,18 @@ const ERRANDS := {
 			"False silver. I know it in the palm before I have looked. Lighter? No, not lighter. It sits wrong. Twenty years of being cheated taught me that, a coin at a time. I should call it an expensive schooling.",
 			"I can tell what a woman will buy by how she stands at her door, before she speaks. I thought everybody could, until my nephew came on the road with me and stood there like a post. So no. It seems that it is not everybody.",
 			"My feet, more than my hands. I have not looked at this road in ten years, and they know every stone of it. I fell a great deal at first; I remember that. You do not get the one without the other. Nobody sells it by the jin, or I should stock it."]},
+	# Part XXXIV (the Unpicked Road release): what comes in at dusk, asked of the guards of Shazhou; and what is done with a
+	# purse found in the road, asked of the children of Qingshi
+	"s_p34_watch": {"ask": "A governor lodged here was brought gold by night and told that nobody would know. You stand at the gate of Shazhou when the lamps are being lit. What do you see come in at dusk, in a sleeve?", "price": 0, "town": "shazhou", "toast": "%s has said what the gate sees",
+		"lines": ["Nothing. I see nothing. That is what I am paid a little extra to see, by a number of people, and I have a wife and four children. ...You are looking at me as the governor did. I wish you would not. I had got used to nobody looking.",
+			"A sleeve with gold in it swings differently from one with an arm in it. Any guard knows. I stopped counting in my first year. I began again last night, when I heard what he answered. Eleven, before the second watch. I have them written down.",
+			"Dates, mostly, and letters, and once a live quail. And the other thing. We know the walk. We say to each other: there goes a short leg. Nobody ever asked us before. It seems we were among those who knew, and had not been counted.",
+			"I see men come in who are grateful to somebody. That is all it is, nine times in ten. Gratitude, after dark, by the back way. I have never understood why thanks should need the lamps out. He asked that too, they say. Four who know. I make it rather more."]},
+	"s_p34_children": {"ask": "A cake of gold has been lying on a table for a week because nobody grown can say what should be done with it. Suppose you found a purse in the road, with nobody near. What would you do?", "price": 0, "town": "qingshi", "toast": "%s has said what to do with a purse",
+		"lines": ["Give it to my mother. She would know whose it was. She knows whose everything is. She knew whose the duck was that time, and it had not even got a mark on it. She only looked at it, and then she looked at me.",
+			"Stand on it. With both feet. Until somebody came along looking sad, and then I would get off. If you only leave it, a dog might have it. And if you pick it up, your hand gets used to it. My grandfather says that about his pipe.",
+			"Is there a frog in it? ...Then I do not want it. Why would anybody want it? You cannot do anything with money, you have to give it to a shop first. I would rather find the person who is crying, and then they would give me a pear.",
+			"I DID find one. At New Year. I ran after the man the whole length of the market shouting, and he thought I was a thief and ran faster. I got him at the bridge. He gave me a cash, and then he counted it, in front of me! I did not mind. I had beaten him to the bridge."]},
 	"s_p33_smiths": {"ask": "A boy at a school has asked how long a thing takes before it is one's own. You have stood at an anvil most of your life. How many years was it, before the hammer was yours?", "price": 0, "town": "tushan", "toast": "%s has said how long it was",
 		"lines": ["Seven. I can tell you the day. I struck, and did not think about striking, and the iron went where I was looking. I stood there like a fool. My master did not even turn round. He said: there. Now you may begin.",
 			"Eleven years, and I was not slow. The first three you learn what the hammer weighs. The next three, what the iron wants. After that it is only the same blow, until one morning it is yours. Nobody can give you the morning.",
@@ -1478,6 +1490,8 @@ const POSTS := {
 	"yue_lao": ["read|write|count", "", "stargaze"], "weisheng": ["gaze|touch|count", "", "doze"], "meng_jiang": ["sew|gaze|pray", "", "doze"], "xu_deyan": ["gaze|read|write", "", "doze"], "lechang": ["gaze|comb|write", "", "doze"],
 	# Part XXXIII (the Iron Pestle release)
 	"granny_wu": ["trace|gather|gaze", "", "doze"], "li_bai": ["read|write|count", "", "read"], "kuang_heng": ["read|peer|trace", "", "read"], "oil_seller": ["count|gaze|stretch", "", "doze"], "chen_yaozi": ["stretch|point|gaze", "", "doze"],
+	# Part XXXIV (the Unpicked Road release)
+	"yangzi_wife": ["weave|sew|spin", "", "weave"], "yang_zhen": ["read|write|gaze", "", "read"], "bell_thief": ["peer|knock|gaze", "", "doze"], "pei_du": ["gaze|count|read", "", "gaze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }
 

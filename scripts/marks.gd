@@ -250,6 +250,15 @@ const MARKS := {
 		"turn": {"area": "jasper", "m": ["whet", true], "k": 3, "n": "The School's Stones", "desc": "Three whetstones bedded in a row in the stream below the Jasper Pool, each with a bar of iron lying on it and a groove begun. The school on the mountain sends its boys down by turns before lessons, a poem's length each. None of the bars is any nearer a needle. The master says the recitation has improved past all belief.",
 			"who": ["Schoolmaster Zhao", "folk_scholar", Color("5a6a7a"), "It was the Li boy began it, and then two more wished to, and I thought: let them, it will be over in a week. That was the spring before last. I have had to draw up a roster. There is a waiting list for a turn at grinding iron! I never had one for the Analects.", "What does it teach them? Not patience; they are boys. I think it teaches them what a little is. Down wet and back dry, and nothing to show, and tomorrow the same; and at the end of a year the groove is a finger deep. They had not known that a little was anything."]},
 	},
+	# Part XXXIV (the Unpicked Road release): what was done with three belts found on a rail
+	"the_belts": {
+		"wait": {"area": "tushan", "m": ["rail", false, true], "n": "The Step Outside the Gate", "desc": "A worn stone step under a temple rail at Tushan, with a lamp on the post that somebody keeps filled. A scholar sat out a night here beside three belts that were not his. People in trouble have taken to sitting on it. Sometimes whoever they are waiting for comes. The monks bring tea either way.",
+			"who": ["Brother Jingxin", "folk_monk", Color("a8743a"), "I fill the lamp. Nobody told me to. He sat there with his hands on his knees all night and never once touched the rail, and I watched from the gate-house and thought: there is the sutra, and I have been chanting round it for thirty years.", "A carter sat on that step three nights running last month. His brother came on the fourth, off a boat. I do not say the step did it. I say a man who has somewhere to wait waits better, and is there when the boat comes in."]},
+		"cry": {"area": "tushan", "m": ["board", PAPER], "k": 3, "n": "The Boards of Things Found", "desc": "A board under a little roof by the road at Tushan, written close in a clerk's hand: a hairpin, silver, found by the well; a string of ninety cash; one shoe, small, red. There is one at every counter of the post now. Each line is struck through when its owner comes, and most of them are struck through.",
+			"who": ["Clerk Tong of the Post", "folk_scholar", Color("5a6a7a"), "Two of jade and one of horn, tied with a double fish. That was the first line on the first board, and I wrote it. I have written nine hundred since. You would not believe what people drop. A wooden leg, last week! He came for it himself, which I should have liked to see.", "They must name something that is not on the board: a knot, a chip, a darn. Else every rogue in the province would have lost a jade belt. It is a copper to claim. People grumble at the copper. I notice they do not grumble at the belt."]},
+		"lie": {"area": "tushan", "m": ["rail", true, false], "n": "The Rail Where It Lay", "desc": "A temple rail at Tushan with something lying on it, folded. It is not the same thing from one month to the next: a scarf, a purse, a child's coat. Whatever is found in the lanes is carried here and left, unguarded, and whoever has lost a thing comes and looks. Nothing has gone from it yet that was not the taker's own.",
+			"who": ["Old Mother Qiu", "folk_grandma", Color("7a6a5a"), "I walk past it every morning to see what is new. A purse lay there eleven days in the spring. Eleven! We all knew to a copper what was in it by the end, from the shape. Then a pedlar came back from the coast for it. He wept. We were quite sorry to see it go.", "My grandson asked me what would happen if somebody took a thing off it that was not theirs. I said I did not know; nobody had. He thought about that all day. I think he is still thinking. That is what the rail is for, if you ask me, more than for the purses."]},
+	},
 	# Part XXVIII (the Answering Land release): what is owed for a kindness
 	"the_knot": {
 		"nothing": {"area": "fusang", "m": ["cairn", STRAW], "n": "The Cairn Where He Put It Down", "desc": "A small cairn in the long grass of the Valley of Sunrise, and round it a patch where every stem stands straight and none is tied. On the top stone somebody has left a single knot of grass, undone, the stems smoothed flat with a thumb.",
@@ -389,7 +398,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -837,6 +846,25 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"rail":
+			# the rail of a temple porch over a worn stone step: with something folded on it, or bare; with a lamp on
+			# its post, or none (the Unpicked Road release)
+			b.box(Vector3(0, 0.1, 0.35), Vector3(2.2, 0.2, 0.7), st)
+			b.box(Vector3(0, 0.19, 0.35), Vector3(1.2, 0.03, 0.5), MB.tag(STONE.darkened(0.12), MB.STONE))
+			for sx9 in [-1.0, 0.0, 1.0]:
+				_stick(b, Vector3(sx9, 0, -0.05), Vector3(sx9, 1.15 if sx9 != -1.0 else 1.9, -0.05), 0.06, MB.tag(RED.darkened(0.25), MB.WOOD))
+			b.box(Vector3(0, 1.05, -0.05), Vector3(2.1, 0.09, 0.14), MB.tag(RED.darkened(0.15), MB.WOOD))
+			b.box(Vector3(0, 0.55, -0.05), Vector3(2.0, 0.05, 0.06), MB.tag(RED.darkened(0.3), MB.WOOD))
+			for k34 in 6:
+				_stick(b, Vector3(-0.85 + k34 * 0.34, 0.55, -0.05), Vector3(-0.85 + k34 * 0.34, 1.05, -0.05), 0.02, MB.tag(RED.darkened(0.3), MB.WOOD))
+			if bool(a[1]):
+				for k35 in 3:
+					b.box(Vector3(0.2 + 0.03 * k35, 1.12 + 0.03 * k35, -0.05), Vector3(0.5 - 0.06 * k35, 0.03, 0.12), MB.tag([Color("8ad0a0"), Color("d8e8d0"), Color("6a4a34")][(k35 + i) % 3], MB.CLOTH), Vector3(0, 0.1 * k35, 0))
+			if a.size() > 2 and bool(a[2]):
+				b.box(Vector3(-1.0, 1.98, -0.05), Vector3(0.2, 0.22, 0.2), MB.tag(PAPER, MB.CLOTH))
+				b.box(Vector3(-1.0, 2.12, -0.05), Vector3(0.28, 0.04, 0.28), wd)
+				g.ball(Vector3(-1.0, 1.98, -0.05), 0.3, Color(1.0, 0.75, 0.4, 0.4), true)
+				b.sph(Vector3(0.45, 0.24, 0.4), Vector3(0.22, 0.05, 0.2), MB.tag(Color("8a6a4a"), MB.CLOTH))
 		"whet":
 			# a whetstone bedded on two wedges with a trough of water beside it; with a bar of iron lying on it, or bare
 			b.box(Vector3(0, 0.2, 0), Vector3(1.1, 0.22, 0.5), MB.tag(Color("6a8a78").darkened(0.1 * h), MB.STONE), Vector3(0, 0.25 * (h - 0.5), 0.05))

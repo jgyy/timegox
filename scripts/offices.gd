@@ -188,8 +188,8 @@ static func career_text(g, use: String) -> String:
 		return "You have not worked here before: you would start as %s." % rank_name(g, use)
 	var nx := to_next(g, use)
 	if nx == 0:
-		return "You are %s (%d shifts): there is no higher place." % [rank_name(g, use), n]
-	return "You are %s (%d shifts); %s after %d more." % [rank_name(g, use), n, str(CAREERS[use][rank(g, use) + 1]), nx]
+		return "You are %s (%d shift%s): there is no higher place." % [rank_name(g, use), n, "" if n == 1 else "s"]
+	return "You are %s (%d shift%s); %s after %d more." % [rank_name(g, use), n, "" if n == 1 else "s", str(CAREERS[use][rank(g, use) + 1]), nx]
 
 ## Every trade the hero has worked at, with the rank held: "Clerk; Tea-Hand".
 static func careers(g) -> String:

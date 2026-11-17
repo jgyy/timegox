@@ -131,6 +131,7 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"two_graves": "relic", "the_flood": "relic", "the_wall": "relic",
 	# Part XXXIII: four stones worn through to the stair, four slips in his own hand to the library, four dry coins to the gift
 	"the_short_way": "relic", "the_shelf": "relic", "the_knack": "relic",
+	"the_find": "relic", "the_dusk": "relic", "the_bell": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -187,7 +188,8 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXXII: riveted, with the join showing
 	"the_mirror": ["rivet"],
 	# Part XXXIII: sent to take a turn at the stone
-	"the_needle": ["turn"]}
+	"the_needle": ["turn"],
+	"the_belts": ["wait"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -912,6 +914,13 @@ func _world(d: float) -> void:
 				_grind()
 			else:
 				_goto_entity(str(s.area), str(fw.spot))
+		"restore":
+			# Part XXXIV: a thing dropped in the road of the step's town, picked up and carried to its owner's
+			# door (trifles.gd)
+			_restore_step(s)
+		"leap":
+			# Part XXXIV: leaps, in the step's region (world.gd)
+			_leap_step(s)
 		"toil":
 			# Part XXVII: the work of the hands (toil.gd): the nearest piece of the step's region that can
 			# be worked at so, and C
@@ -948,6 +957,84 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				_goto_entity(Trials.boss_area(g), "boss_" + g)
+
+## Part XXXIV (trifles.gd): the lost thing of region `area` to go for: the nearest that still lies in the
+## road with nothing stood on it, or {}.
+func _lost_target(area: String) -> Dictionary:
+	if world.layer != Data.layer_of(area) or world.wd.is_empty():
+		return {}
+	var best := {}
+	var bd := 1 << 30
+	for tf in Trifles.lost(world.wd, area, int(Game.day)):
+		if Trifles.gone(Game, tf) or world.ent_at(tf.tile) != null or not world.tile_free(tf.tile):
+			continue
+		var d: int = absi(int(tf.tile.x) - world.ptile.x) + absi(int(tf.tile.y) - world.ptile.y)
+		if d < bd:
+			bd = d
+			best = tf
+	return best
+
+## Part XXXIV: a "restore" step, as a player would do it: walk onto a thing dropped in the road and pick
+## it up (the choice takes it, _choice), then carry it to the door its owner lives behind; the knock is
+## the world's own (`World._at_door`).  With nothing left in the road today, it waits for the morning.
+func _restore_step(s: Dictionary) -> void:
+	var area := str(s.area)
+	var have: Array = Trifles.carried(Game)
+	if not have.is_empty():
+		var q: Dictionary = have[0]
+		if world.layer != str(q.layer) or Game.area != str(q.area):
+			_travel(str(q.area))
+			return
+		_walk_to(_near_free(q.door), "door:%s" % str(q.id))
+		return
+	if world.layer != Data.layer_of(area) or Game.area != area:
+		_travel(area)
+		return
+	var tf := _lost_target(area)
+	if tf.is_empty():
+		_start_meditate("lost")
+		return
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if here == tf.tile:
+		world.move_dir = Vector2i.ZERO
+		if world.move_t < 0.0:
+			main.offer_trifle(tf)
+			cool = 0.3
+		return
+	_walk_to(tf.tile, "lost:%s" % str(tf.id))
+
+## Part XXXIV: a "leap" step: in the step's region, a way held and Space, wherever two tiles ahead are
+## clear (the way he faces first).
+func _leap_step(s: Dictionary) -> void:
+	var area := str(s.area)
+	if world.layer != Data.layer_of(area) or Game.area != area:
+		_travel(area)
+		return
+	if world.move_t >= 0.0 or world.leaping:
+		return
+	for d in [world.facing] + DIRS:
+		if d != Vector2i.ZERO and world.leap_to(d).x >= 0 and Atlas.owner_id(world.wd, world.leap_to(d)) == area:
+			world.move_dir = d
+			_press("jump", 0.2)
+			return
+	# (hemmed in where he stands: to the nearest tile with two clear tiles beyond it)
+	var dist := _bfs_dist(world.ptile, 40)
+	var best := Vector2i(-1, -1)
+	var bd := 1 << 30
+	for tl in dist:
+		if int(dist[tl]) >= bd or int(dist[tl]) == 0 or Atlas.owner_id(world.wd, tl) != area or world.ent_at(tl) != null:
+			continue
+		for d2 in DIRS:
+			var ok := true
+			for q in [tl + d2, tl + d2 * 2]:
+				if not world.tile_free(q) or world.ent_at(q) != null or world.walk_props.has(q) or not world.building_at(q).is_empty() or Atlas.owner_id(world.wd, q) != area:
+					ok = false
+			if ok and world.building_at(tl).is_empty() and Peaks.climb(world.wd, tl, tl + d2) == 0 and Peaks.climb(world.wd, tl + d2, tl + d2 * 2) == 0:
+				bd = int(dist[tl])
+				best = tl
+				break
+	if best.x >= 0:
+		_walk_to(best, "leap:%s" % str(best))
 
 ## Part XXVII (toil.gd): work `work` done once in region `area`, as a player would do it: walk along the
 ## forest's edge (the water, the crag, the open ground) to the nearest piece of it that has not given
@@ -1445,6 +1532,14 @@ func _choice() -> void:
 			if want < 0 and k0 >= 0 and c.options[k0].get("enabled", true):
 				want = k0
 		_nav(ids.size(), c.cursor, maxi(want, 0))
+		return
+	if str(c.title).begins_with(main.TRIFLE_ASK):
+		# a small thing at his feet (trifles.gd): picked up when it is a lost thing a step wants carried home;
+		# anything else is left where it lies
+		want = ids.find("leave")
+		if not st.is_empty() and st.kind == "restore" and ids.has("take") and c.options[ids.find("take")].get("enabled", true):
+			want = ids.find("take")
+		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title) == Jobs.ASK:
 		# the notice board (jobs.gd): report what is done; else take down a notice that is done already
@@ -2714,6 +2809,9 @@ func _meditate() -> void:
 		"respawn_any":
 			# waiting for packs to come back to fight (essences, spirit stones for a trial)
 			done = _any_enemy(Game.area, true) != null
+		"lost":
+			# Part XXXIV: waiting for the morning, when something new will have been dropped in the road
+			done = not _lost_target(str(Game.cur_step().get("area", ""))).is_empty() or Game.cur_step().get("kind", "") != "restore"
 		"children":
 			# Part XVI: waiting for the children of the towns to come out of doors (folk.gd)
 			done = not _folk_target(str(Game.cur_step().get("role", "child"))).is_empty() or Game.cur_step().get("kind", "") != "folk"

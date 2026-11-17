@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 114
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand"]
+const MAX_LEVEL := 117
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -96,6 +96,7 @@ const REALM_INFO := [
 	{"life": 0, "title": "Under Whose Lintel Everybody Walks", "note": "A giant was cut down for coming late and nobody asked what kept him. Another ran after the sun and dropped a forest. A people was made small and never told how small. A man trusted a measure over his own foot. A door is cut for whoever comes. You are the measure of nothing now, and that is the use of you."},
 	{"life": 0, "title": "In One Piece, with the Joins Showing", "note": "Two graves were dug apart and the roots went under the ditch. A man kept an hour and forgot who it was for. A wall was reckoned in yards, and fell to a name. A mirror came back that no longer fitted. What is parted is not put back as it was. You are whole, and it is not the same as never having been broken."},
 	{"life": 0, "title": "Whose Hand Has Done It Before", "note": "An old woman ground a bar of iron she had no use for, and boys went back to their books. A labourer read a great house's library through a hole in its wall. A pedlar poured oil through a coin, and a duke remembered his first thousand arrows. You have looked for the quick way in every country there is. It was the steps."},
+	{"life": 0, "title": "Whose Sleeves Are Empty", "note": "A man threw a cake of gold into the weeds because his wife asked him whose it was. A governor was brought ten catties by night and counted four who knew. A man stopped his own ears to steal a bell. A poor scholar sat by three belts until morning. Nothing in the road is nobody's. You have walked the whole of it and kept your sleeves light."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1000,6 +1001,19 @@ const ENEMIES := {
 	"melting_snow": {"n": "Snow Melting on the Page", "elem": "water", "weak": "earth", "col": Color("e0e8f0"), "shape": "blob", "bright": true, "pal": {"sec": Color("a0b0c8"), "acc": Color("ffffff")}},
 	"the_short_way": {"n": "The Stair with the Steps Left Out", "elem": "earth", "weak": "wood", "col": Color("6a8a7a"), "shape": "serpent", "boss": true, "pal": {"sec": Color("34483e"), "acc": Color("e8f0e0")}},
 	"the_shelf": {"n": "The Library Nobody Opened", "elem": "dark", "weak": "thunder", "col": Color("5a4630"), "shape": "tome", "boss": true, "pal": {"sec": Color("2e2418"), "acc": Color("d8b850")}},
+	# ---- Part XXXIV: Nothing Picked Up on the Road (the Unpicked Road release): what lies in the road, and whose it is
+	"thrown_gold": {"n": "Gold Thrown into the Weeds", "elem": "earth", "weak": "wood", "col": Color("d8b040"), "shape": "golem", "bright": true, "pal": {"sec": Color("8a6a20"), "acc": Color("5a7a3a")}},
+	"robber_spring": {"n": "Water of Robber's Spring", "elem": "water", "weak": "earth", "col": Color("5a8a9a"), "shape": "blob", "pal": {"sec": Color("2e4a56"), "acc": Color("d8e8e8")}},
+	"flung_food": {"n": "Food Flung with a Hey", "elem": "dark", "weak": "fire", "col": Color("8a7a60"), "shape": "wraith", "pal": {"sec": Color("4a4032"), "acc": Color("e8dcc0")}},
+	"dusk_gold": {"n": "Gold Brought at Dusk", "elem": "earth", "weak": "wood", "col": Color("c89a30"), "shape": "golem", "pal": {"sec": Color("6a4e18"), "acc": Color("2a2a40")}},
+	"nobody_knows": {"n": "Nobody Will Know", "elem": "dark", "weak": "thunder", "col": Color("3a3a56"), "shape": "wraith", "pal": {"sec": Color("1c1c30"), "acc": Color("d8c070")}},
+	"heavy_sleeve": {"n": "Sleeve with Ten Catties in It", "elem": "thunder", "weak": "earth", "col": Color("4a5a7a"), "shape": "serpent", "pal": {"sec": Color("262e42"), "acc": Color("d8b040")}},
+	"rung_bell": {"n": "Bell That Rang Anyway", "elem": "thunder", "weak": "earth", "col": Color("7a9a80"), "shape": "golem", "pal": {"sec": Color("3e5444"), "acc": Color("d8c880")}},
+	"ear_wad": {"n": "Wad for the Ears", "elem": "earth", "weak": "wood", "col": Color("d8d0b8"), "shape": "blob", "pal": {"sec": Color("8a846e"), "acc": Color("6a4e34")}},
+	"bell_mallet": {"n": "Mallet Brought for a Bell", "elem": "wood", "weak": "fire", "col": Color("8a6038"), "shape": "mantis", "pal": {"sec": Color("4a3420"), "acc": Color("7a9a80")}},
+	"the_find": {"n": "The Find That Is Nobody's", "elem": "earth", "weak": "wood", "col": Color("d8b850"), "shape": "golem", "boss": true, "bright": true, "pal": {"sec": Color("8a6a20"), "acc": Color("f8f0d0")}},
+	"the_dusk": {"n": "The Hour Nobody Knows", "elem": "dark", "weak": "thunder", "col": Color("2e2e4a"), "shape": "wraith", "boss": true, "pal": {"sec": Color("14142a"), "acc": Color("e0c060")}},
+	"the_bell": {"n": "The Bell with Its Ears Stopped", "elem": "thunder", "weak": "earth", "col": Color("6a8a72"), "shape": "warden", "boss": true, "pal": {"sec": Color("34483a"), "acc": Color("e8dca0")}},
 	"the_knack": {"n": "The Gift That Never Practised", "elem": "thunder", "weak": "earth", "col": Color("d8b850"), "shape": "warden", "boss": true, "pal": {"sec": Color("8a6a20"), "acc": Color("f8f0e0")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
@@ -1814,6 +1828,8 @@ const AREAS := {
 	},
 	# ---- Part V: The Falling Sky
 	"dunes": {
+		# Part XXXIV: what is carried about after dark, by people sure of not being seen
+		"warband5": {"pool": [["dusk_gold", 115, 115], ["nobody_knows", 115, 115], ["heavy_sleeve", 115, 115]], "n": 14, "vis": "s_p34_dusk", "late": true},
 		# Part XXIII: the eight thousand who crossed the river with the Hegemon-King, and what they left behind them
 		"warband2": {"pool": [["chu_halberd", 83, 83], ["black_steed", 83, 83], ["cauldron_breaker", 83, 83]], "n": 16, "vis": "s_p23_songs", "late": true},
 		# Part XIX: what the makers made that has walked off into the sand
@@ -1835,7 +1851,9 @@ const AREAS := {
 			# Part XIX: the artificer who once showed a king a dancer
 			{"id": "yan_shi", "n": "Yan Shi the Artificer", "pos": Vector2i(26, 44), "col": Color("5a4a7a"), "vis": ["s_p19_ladder", ""], "late": true},
 			# Part XXIII: Lady Hao with the levy at Gaixia, under the one height of the sands
-			{"id": "hao_dunes", "n": "Lady Hao", "pos": Vector2i.ZERO, "col": Color("8a2a2a"), "asset": "fu_hao", "vis": ["s_p23_songs", "s_p23_bell"], "late": true, "peak": 0, "stand": "foot"}
+			{"id": "hao_dunes", "n": "Lady Hao", "pos": Vector2i.ZERO, "col": Color("8a2a2a"), "asset": "fu_hao", "vis": ["s_p23_songs", "s_p23_bell"], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "yang_zhen", "n": "Yang Zhen", "pos": Vector2i.ZERO, "col": Color("34425a"), "asset": "yang_zhen", "vis": ["s_p34_home", ""], "late": true, "after": true, "peak": 1, "stand": "foot"},
 		],
 		"bosses": [
 			{"id": "glass_scorpion", "pos": Vector2i(30, 40), "lv": 27, "req": 27},
@@ -1845,7 +1863,9 @@ const AREAS := {
 			# Part XIX: the Player, Yan Shi's dancer, in the dunes west of Shazhou
 			{"id": "the_player", "pos": Vector2i(30, 28), "lv": 71, "req": 70, "vis": ["s_p19_campfire", ""], "late": true},
 			# Part XXIII: the Hegemon-King, on the height, in front of nobody
-			{"id": "xiang_yu", "pos": Vector2i.ZERO, "lv": 84, "req": 83, "vis": ["s_p23_gaixia", ""], "late": true, "peak": 0, "stand": "top"}
+			{"id": "xiang_yu", "pos": Vector2i.ZERO, "lv": 84, "req": 83, "vis": ["s_p23_gaixia", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "the_dusk", "pos": Vector2i.ZERO, "lv": 116, "req": 115, "vis": ["s_p34_sleeves", ""], "late": true, "after": true, "peak": 1, "stand": "top"},
 		],
 		"pickups": [
 			{"id": "fstar1", "item": "fallen_star", "pos": Vector2i(22, 12)}, {"id": "fstar2", "item": "fallen_star", "pos": Vector2i(40, 46)},
@@ -1855,7 +1875,12 @@ const AREAS := {
 			# Part XXIII: the banners of Chu, left standing in the sand where each company went home
 			{"id": "p23_banner1", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p23_banner2", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "p23_banner3", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p23_banner4", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "flank"},
-			{"id": "p23_banner5", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "flank"}
+			{"id": "p23_banner5", "item": "chu_banner", "pos": Vector2i.ZERO, "vis": ["s_p23_clay", ""], "late": true, "peak": 0, "stand": "flank"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "p34_slip1", "item": "know_slip", "pos": Vector2i.ZERO, "vis": ["s_p34_knows", ""], "late": true, "after": true, "peak": 1, "stand": "flank"},
+			{"id": "p34_slip2", "item": "know_slip", "pos": Vector2i.ZERO, "vis": ["s_p34_knows", ""], "late": true, "after": true, "peak": 1, "stand": "flank"},
+			{"id": "p34_slip3", "item": "know_slip", "pos": Vector2i.ZERO, "vis": ["s_p34_knows", ""], "late": true, "after": true, "peak": 1, "stand": "foot"},
+			{"id": "p34_slip4", "item": "know_slip", "pos": Vector2i.ZERO, "vis": ["s_p34_knows", ""], "late": true, "after": true, "peak": 1, "stand": "foot"},
 		],
 		"pickup_vis": "s_du_collect",
 		# Shazhou Oasis: a caravan town round a sweet well, where the west road comes in off the sand
@@ -2477,6 +2502,8 @@ const AREAS := {
 	# "lanes" are paved strips laid over the ground before the buildings go up (see MapGen.build);
 	# the townsfolk are visible for the rest of the game from the moment the road to Yanggu opens.
 	"yanggu": {
+		# Part XXXIV: what was thrown into the weeds and has not stayed thrown
+		"warband5": {"pool": [["thrown_gold", 114, 114], ["robber_spring", 114, 114], ["flung_food", 114, 114]], "n": 13, "vis": "s_p34_loom", "late": true},
 		# Part XXIV: the bore of the eighth month, which cannot be beaten (dooms.gd), and what it leaves on the shore
 		"warband3": {"pool": [["tide_horse", 85, 85], ["tide_mare", 85, 85], ["spring_colt", 85, 85]], "n": 10, "vis": "s_p24_qian", "until": "s_p24_qian2", "late": true},
 		"warband4": {"pool": [["wrack_crab", 85, 85], ["salt_gull", 85, 85], ["drift_log", 85, 85]], "n": 16, "vis": "s_p24_tide", "late": true},
@@ -2501,7 +2528,9 @@ const AREAS := {
 			{"id": "porter_niu", "n": "Big Niu the Porter", "pos": Vector2i(54, 22), "col": Color("8a6a4a"), "vis": ["s_yg_intro", ""]},
 			{"id": "little_dou", "n": "Little Dou", "pos": Vector2i(55, 34), "col": Color("f0a060"), "vis": ["s_yg_intro", ""]},
 			# Part XXIV: the king who built the sea-wall three times, under the height above the market
-			{"id": "qian_liu", "n": "King Qian", "pos": Vector2i.ZERO, "col": Color("3a5a8a"), "vis": ["s_p24_shoes", ""], "late": true, "peak": 0, "stand": "foot"}
+			{"id": "qian_liu", "n": "King Qian", "pos": Vector2i.ZERO, "col": Color("3a5a8a"), "vis": ["s_p24_shoes", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "yangzi_wife", "n": "Yue Yangzi's Wife", "pos": Vector2i.ZERO, "col": Color("b8ac90"), "asset": "yangzi_wife", "vis": ["s_p34_home", ""], "late": true, "after": true, "peak": 1, "stand": "foot"},
 		],
 		"bosses": [
 			# Part XVI: the Last Night, coiled round the lantern-maker's pole at the crossroads
@@ -2511,12 +2540,19 @@ const AREAS := {
 			{"id": "lantern_dragon", "pos": Vector2i(12, 47), "lv": 39, "req": 39},
 			{"id": "hanba", "pos": Vector2i(92, 22), "lv": 39, "req": 39},
 			# Part XXIV: who keeps both columns of the book, on the height above the market
-			{"id": "huofu", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_marks", ""], "late": true, "peak": 0, "stand": "top"}
+			{"id": "huofu", "pos": Vector2i.ZERO, "lv": 87, "req": 86, "vis": ["s_p24_marks", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "the_find", "pos": Vector2i.ZERO, "lv": 115, "req": 114, "vis": ["s_p34_alms", ""], "late": true, "after": true, "peak": 1, "stand": "top"},
 		],
 		"pickups": [{"id": "nember1", "item": "noon_ember", "pos": Vector2i(24, 9)}, {"id": "nember2", "item": "noon_ember", "pos": Vector2i(30, 52)}, {"id": "nember3", "item": "noon_ember", "pos": Vector2i(76, 42)}, {"id": "nember4", "item": "noon_ember", "pos": Vector2i(80, 11)},
 			# Part XXIV: what the bore carried up and left under the height
 			{"id": "p24_shell1", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p24_shell2", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "foot"},
-			{"id": "p24_shell3", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p24_shell4", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "flank"}
+			{"id": "p24_shell3", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p24_shell4", "item": "bore_shell", "pos": Vector2i.ZERO, "vis": ["s_p24_wrack", ""], "late": true, "peak": 0, "stand": "flank"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "p34_gold1", "item": "weed_gold", "pos": Vector2i.ZERO, "vis": ["s_p34_weeds", ""], "late": true, "after": true, "peak": 1, "stand": "flank"},
+			{"id": "p34_gold2", "item": "weed_gold", "pos": Vector2i.ZERO, "vis": ["s_p34_weeds", ""], "late": true, "after": true, "peak": 2, "stand": "foot"},
+			{"id": "p34_gold3", "item": "weed_gold", "pos": Vector2i.ZERO, "vis": ["s_p34_weeds", ""], "late": true, "after": true, "peak": 2, "stand": "flank"},
+			{"id": "p34_gold4", "item": "weed_gold", "pos": Vector2i.ZERO, "vis": ["s_p34_weeds", ""], "late": true, "after": true, "peak": 1, "stand": "flank"},
 		],
 		"pickup_vis": "s_yg_collect",
 		# the main street, the crossroads lane, the market square, the east road and three alleys
@@ -2822,7 +2858,10 @@ const AREAS := {
 			# Part XXI: the swordsmith of Yue, come back to a furnace that is pouring by itself
 			{"id": "ou_yezi", "n": "Ou Yezi the Swordsmith", "pos": Vector2i(42, 28), "col": Color("7a4a2a"), "vis": ["s_p21_home", ""], "late": true},
 			# Part XXVI: the cook of the Cauldron Hall, who has put down his knife
-			{"id": "pao_ding", "n": "Cook Ding", "pos": Vector2i.ZERO, "col": Color("b8a890"), "vis": ["s_p26_dawn", ""], "late": true, "peak": 0, "stand": "foot"},],
+			{"id": "pao_ding", "n": "Cook Ding", "pos": Vector2i.ZERO, "col": Color("b8a890"), "vis": ["s_p26_dawn", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "pei_du", "n": "Pei Du", "pos": Vector2i.ZERO, "col": Color("7a8a78"), "asset": "pei_du", "vis": ["s_p34_ears", ""], "late": true, "after": true, "peak": 3, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "slag_serpent", "pos": Vector2i(64, 12), "lv": 43, "req": 43},
 			{"id": "stone_mother", "pos": Vector2i(62, 48), "lv": 43, "req": 43},
@@ -2835,7 +2874,7 @@ const AREAS := {
 			# Part XX: the White-Haired Rat, in the Bottomless Gallery under the Old Workings
 			{"id": "white_rat", "pos": Vector2i.ZERO, "lv": 74, "req": 73, "vis": ["s_p20_tushan", ""], "late": true, "cave": -2, "stand": "deep"},
 			# Part XXVI: the ox nobody has seen in parts, on the height above the cauldron town
-			{"id": "quan_niu", "pos": Vector2i.ZERO, "lv": 92, "req": 91, "vis": ["s_p26_whet", ""], "late": true, "peak": 0, "stand": "top"}
+			{"id": "quan_niu", "pos": Vector2i.ZERO, "lv": 92, "req": 91, "vis": ["s_p26_whet", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		"pickups": [{"id": "cshard1", "item": "cauldron_shard", "pos": Vector2i(56, 6)}, {"id": "cshard2", "item": "cauldron_shard", "pos": Vector2i(70, 52)}, {"id": "cshard3", "item": "cauldron_shard", "pos": Vector2i(82, 12)}, {"id": "cshard4", "item": "cauldron_shard", "pos": Vector2i(52, 40)},
 			{"id": "cur_wine3", "item": "peach_wine", "pos": Vector2i(41, 39), "floor": ["late_inn", -1], "always": true},
@@ -2845,7 +2884,8 @@ const AREAS := {
 			{"id": "p21_blank1", "item": "sword_blank", "pos": Vector2i(41, 17), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank2", "item": "sword_blank", "pos": Vector2i(52, 28), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank3", "item": "sword_blank", "pos": Vector2i(14, 33), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank4", "item": "sword_blank", "pos": Vector2i(54, 23), "vis": ["s_p21_ou", ""], "late": true}, {"id": "p21_blank5", "item": "sword_blank", "pos": Vector2i(47, 54), "vis": ["s_p21_ou", ""], "late": true},
 			# Part XXVI: Cook Ding's four whetstones, thrown up the hill by somebody who thought a cook should need them
 			{"id": "p26_whet1", "item": "whetstone", "pos": Vector2i.ZERO, "vis": ["s_p26_gristle", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p26_whet2", "item": "whetstone", "pos": Vector2i.ZERO, "vis": ["s_p26_gristle", ""], "late": true, "peak": 1, "stand": "flank"},
-			{"id": "p26_whet3", "item": "whetstone", "pos": Vector2i.ZERO, "vis": ["s_p26_gristle", ""], "late": true, "peak": 1, "stand": "foot"}, {"id": "p26_whet4", "item": "whetstone", "pos": Vector2i.ZERO, "vis": ["s_p26_gristle", ""], "late": true, "peak": 2, "stand": "flank"},],
+			{"id": "p26_whet3", "item": "whetstone", "pos": Vector2i.ZERO, "vis": ["s_p26_gristle", ""], "late": true, "peak": 1, "stand": "foot"}, {"id": "p26_whet4", "item": "whetstone", "pos": Vector2i.ZERO, "vis": ["s_p26_gristle", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_ts_collect",
 		"springs": [Vector2i(16, 47)],
 		"roads": [[Vector2i(2, 30), Vector2i(14, 31), Vector2i(30, 29), Vector2i(46, 31), Vector2i(58, 30)], [Vector2i(30, 29), Vector2i(30, 17)]],
@@ -2870,6 +2910,8 @@ const AREAS := {
 	},
 	# the broken pillar of heaven in the far north-west, over a black lake that is listening
 	"buzhou": {
+		# Part XXXIV: a bell broken up to be carried off, and everything brought along to do it quietly
+		"warband6": {"pool": [["rung_bell", 116, 116], ["ear_wad", 116, 116], ["bell_mallet", 116, 116]], "n": 14, "vis": "s_p34_bell", "late": true},
 		"n": "Mount Buzhou, the Broken Pillar", "w": 96, "h": 58, "seed": 421, "theme": "buzhou", "enemies": 20,
 		"pool": [["flood_wolf", 44, 44], ["pillar_sentinel", 44, 44], ["kun_fry", 44, 44]],
 		"portals": [
@@ -2878,6 +2920,8 @@ const AREAS := {
 		"npcs": [{"id": "yinglong", "n": "Yinglong, Who Dug the Rivers", "pos": Vector2i(10, 35), "col": Color("2a5a6a")},
 			# Part XXXI (the Tall People release)
 			{"id": "kuafu", "n": "Kuafu", "pos": Vector2i.ZERO, "col": Color("b8862e"), "asset": "kuafu", "race": "daren", "vis": ["s_p31_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "bell_thief", "n": "The Man Who Stopped His Ears", "pos": Vector2i.ZERO, "col": Color("6a4e34"), "asset": "bell_thief", "vis": ["s_p34_home", ""], "late": true, "after": true, "peak": 3, "stand": "foot"},
 		],
 		"bosses": [
 			{"id": "xiu", "pos": Vector2i(28, 46), "lv": 44, "req": 44},
@@ -2889,6 +2933,8 @@ const AREAS := {
 			{"id": "kui_drum", "pos": Vector2i(51, 39), "lv": 52, "req": 51, "vis": ["s_p13_gates", ""]},
 			# Part XXXI (the Tall People release)
 			{"id": "kuafu_west", "pos": Vector2i.ZERO, "lv": 107, "req": 106, "vis": ["s_p31_woodmen", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "the_bell", "pos": Vector2i.ZERO, "lv": 117, "req": 116, "vis": ["s_p34_wads", ""], "late": true, "after": true, "peak": 3, "stand": "top"},
 		],
 		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
 		"warband": {"pool": [["bronze_brow", 51, 52], ["jiuli_warrior", 51, 52], ["fetter_sapling", 51, 52]], "n": 6, "vis": "s_p13_home"},
@@ -2898,6 +2944,11 @@ const AREAS := {
 			{"id": "p31_stone2", "item": "peach_stone", "pos": Vector2i.ZERO, "vis": ["s_p31_glare", ""], "late": true, "peak": 1, "stand": "flank"},
 			{"id": "p31_stone3", "item": "peach_stone", "pos": Vector2i.ZERO, "vis": ["s_p31_glare", ""], "late": true, "peak": 2, "stand": "foot"},
 			{"id": "p31_stone4", "item": "peach_stone", "pos": Vector2i.ZERO, "vis": ["s_p31_glare", ""], "late": true, "peak": 2, "stand": "flank"},
+			# Part XXXIV (the Unpicked Road release)
+			{"id": "p34_shard1", "item": "fan_bronze", "pos": Vector2i.ZERO, "vis": ["s_p34_ring", ""], "late": true, "after": true, "peak": 3, "stand": "flank"},
+			{"id": "p34_shard2", "item": "fan_bronze", "pos": Vector2i.ZERO, "vis": ["s_p34_ring", ""], "late": true, "after": true, "peak": 3, "stand": "flank"},
+			{"id": "p34_shard3", "item": "fan_bronze", "pos": Vector2i.ZERO, "vis": ["s_p34_ring", ""], "late": true, "after": true, "peak": 4, "stand": "flank"},
+			{"id": "p34_shard4", "item": "fan_bronze", "pos": Vector2i.ZERO, "vis": ["s_p34_ring", ""], "late": true, "after": true, "peak": 4, "stand": "foot"},
 		],
 		"pickup_vis": "s_bz_collect",
 		"springs": [Vector2i(48, 30)],
@@ -4918,6 +4969,33 @@ const STEPS := [
 	{"id": "s_p33_needle", "kind": "talk", "npc": "li_bai", "area": "origin", "t": "The book is shut with a straw in it, and the boy has done his sum again. He is waiting in the door of the school: go back to Li Bai", "stones": 78600},
 	{"id": "s_p33_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "A carrier has come up the mountain for a copybook. Tell Elder Qing Xuan what the quick way turned out to be", "stones": 79000},
 	{"id": "s_break38", "kind": "breakthrough", "to": 114, "t": "There was no quick way, and no slow one either; there was the hand: Practised Hand"},
+	# ---- Part XXXIV: Nothing Picked Up on the Road (the Unpicked Road release): what lies in the road, whose it is, and who is looking.
+	{"id": "s_p34_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Somebody has left a cake of gold on the Elder's table, with a note that says only: found in the road, and whose is it? Speak to Elder Qing Xuan", "stones": 79200},
+	{"id": "s_p34_loom", "kind": "talk", "npc": "yangzi_wife", "area": "yanggu", "t": "Below the second height of Yanggu a woman is weaving in a doorway, and will not have a certain thing brought into the house. Find Yue Yangzi's Wife", "stones": 79400},
+	{"id": "s_p34_weeds", "kind": "hunt", "area": "yanggu", "n": 34, "of": ["thrown_gold", "robber_spring", "flung_food"], "t": "\"He threw it away, and it has been picking itself up ever since.\" Clear 34 golds thrown into the weeds, waters of Robber's Spring and foods flung with a hey", "stones": 79600},
+	{"id": "s_p34_gold", "kind": "collect", "item": "weed_gold", "n": 4, "area": "yanggu", "t": "The cake broke in four where he threw it, and nobody has dared pick up a piece. Find the 4 quarters of gold on the heights of Yanggu"},
+	{"id": "s_p34_lost", "kind": "restore", "n": 3, "area": "yanggu", "t": "\"Show me with a shoe.\" Carry 3 things dropped in the roads of Yanggu to whose they are (Enter picks one up; then their door)"},
+	{"id": "s_p34_spring", "kind": "summit", "peak": "yanggu", "k": 1, "area": "yanggu", "t": "Climb the second height of Yanggu, where a spring comes out of the rock that travellers will not drink from, and look at it"},
+	{"id": "s_p34_alms", "kind": "hunt", "area": "yanggu", "n": 30, "of": ["robber_spring", "flung_food"], "t": "The spring is called Robber's, and the food beside it was thrown down with a shout. Clear 30 more of the water and of what was flung", "stones": 79800},
+	{"id": "s_p34_find", "kind": "kill", "boss": "the_find", "area": "yanggu", "t": "It lies in the middle of the road and says it is nobody's, and it has grown: go up to the Find That Is Nobody's", "stones": 80000},
+	{"id": "s_p34_dusk", "kind": "talk", "npc": "yang_zhen", "area": "dunes", "t": "At Shazhou a governor on his way to his post has had a visitor after dark, and has not slept since. Find Yang Zhen below the second height of the sands", "stones": 80200},
+	{"id": "s_p34_knows", "kind": "hunt", "area": "dunes", "n": 34, "of": ["dusk_gold", "nobody_knows", "heavy_sleeve"], "t": "\"It is dusk, he said, and nobody will know.\" Clear 34 golds brought at dusk, nobody-will-knows and sleeves with ten catties in them", "stones": 80400},
+	{"id": "s_p34_slips", "kind": "collect", "item": "know_slip", "n": 4, "area": "dunes", "t": "He wrote down who knew, one name to a slip, and the wind off the sand took all four. Find the 4 slips on the second height of the sands"},
+	{"id": "s_p34_watch", "kind": "folk", "role": "guard", "town": "shazhou", "n": 2, "area": "dunes", "t": "\"Ask the men who stand at the gate what they see after dark.\" Ask 2 guards of Shazhou what comes in at dusk in a sleeve"},
+	{"id": "s_p34_sleeves", "kind": "hunt", "area": "dunes", "n": 30, "of": ["heavy_sleeve", "nobody_knows"], "t": "Every sleeve in the oasis hangs a little low on one side. Clear 30 more heavy sleeves and the nobody-will-knows that walk with them", "stones": 80600},
+	{"id": "s_p34_night", "kind": "kill", "boss": "the_dusk", "area": "dunes", "t": "It is the hour between the lamps, and it has never once been asked who is in it: go up to the Hour Nobody Knows", "stones": 80800},
+	{"id": "s_p34_bell", "kind": "talk", "npc": "bell_thief", "area": "buzhou", "t": "On Mount Buzhou a man with rags in his ears is shouting that nobody can hear a thing. Find the Man Who Stopped His Ears below the fourth height", "stones": 81000},
+	{"id": "s_p34_ring", "kind": "hunt", "area": "buzhou", "n": 34, "of": ["rung_bell", "ear_wad", "bell_mallet"], "t": "\"WHAT? I said it is PERFECTLY QUIET.\" Clear 34 bells that rang anyway, wads for the ears and mallets brought for a bell", "stones": 81200},
+	{"id": "s_p34_shards", "kind": "collect", "item": "fan_bronze", "n": 4, "area": "buzhou", "t": "The bell of the house of Fan lies in four pieces on the mountain, each still humming. Find 4 shards of the bell on the heights of Buzhou"},
+	{"id": "s_p34_cracks", "kind": "leap", "n": 8, "area": "tushan", "t": "In Tushan a bell is chalked in every lane, and the children never set a foot on the chalk. Go as they go: 8 leaps (hold a way, press Space)"},
+	{"id": "s_p34_streets", "kind": "restore", "n": 3, "area": "tushan", "t": "A town that has heard its bell rung by a thief counts its pockets. Carry 3 things dropped in the roads of Tushan to whose they are"},
+	{"id": "s_p34_height", "kind": "summit", "peak": "buzhou", "k": 3, "area": "buzhou", "t": "Climb the fourth height of Buzhou and look down: from up there the whole of Tushan can be seen hearing him"},
+	{"id": "s_p34_wads", "kind": "hunt", "area": "buzhou", "n": 30, "of": ["ear_wad", "rung_bell"], "t": "He has stopped his own ears, and the wads have gone looking for everybody else's. Clear 30 more wads and the bells they cannot stop", "stones": 81400},
+	{"id": "s_p34_ears", "kind": "kill", "boss": "the_bell", "area": "buzhou", "t": "It rings so that the hills answer, and has its hands over its own ears: go up to the Bell with Its Ears Stopped", "stones": 81600},
+	{"id": "s_p34_children", "kind": "folk", "role": "child", "town": "qingshi", "n": 3, "area": "village", "t": "\"Ask somebody who has not learned yet what to pretend.\" Ask 3 children of Qingshi what they would do with a purse found in the road"},
+	{"id": "s_p34_belts", "kind": "talk", "npc": "pei_du", "area": "tushan", "t": "Below the fourth height of Tushan a thin young scholar is sitting by a temple rail with three belts that are not his. Find Pei Du", "stones": 81800},
+	{"id": "s_p34_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The cake of gold is still on the Elder's table, and somebody has come up the mountain about it. Tell Elder Qing Xuan whose it was", "stones": 82200},
+	{"id": "s_break39", "kind": "breakthrough", "to": 117, "t": "What is not his he has not carried; there is a great deal of room: Sleeves of Wind"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5169,12 +5247,16 @@ const ITEMS := {
 	# Part XXXII (the Broken Mirror release)
 	"red_cord": {"n": "Red Cord", "desc": "A cord of red silk a span long with a knot in the middle of it that was tied to hold. Somebody pulled it out of a book by one end, and the knot is as it was. The Old Man under the Moon says he has never once had to tie the same one twice"},
 	"hour_stone": {"n": "Hour-Stone", "desc": "A flat river stone with a line scratched across it by another stone. There is one for every hour somebody waited under a bridge, laid in a row above where the water reached. The last of them is scratched very deep"},
-	"wall_tally": {"n": "Wall-Tally", "desc": "A slip of elm wood with a hole for a cord and a village cut into it with a knife. Every man sent to the wall wore one, so that he could be counted going. Nobody collected them at the other end"},
+	"wall_tally": {"n": "Wall-Tally", "desc": "A slip of elm wood with a hole for a cord and a village cut into it with a knife. Every man sent to the wall wore one, so that he could be counted going. At the other end they were taken off and thrown in a pit, unread"},
 	"bronze_sliver": {"n": "Sliver of Bronze", "desc": "A sliver of old bronze the length of a finger-joint, bright on one edge. When a mirror is broken across in a hurry, this is what falls between the halves. Neither of the two who kept a half has ever missed it"},
 	# Part XXXIII (the Iron Pestle release)
 	"worn_whetstone": {"n": "Worn Whetstone", "desc": "A slab of green stone the length of a forearm, grooved through in the middle to a hole the shape of a long leaf. One bar of iron did that, drawn down it wet, some thousands of mornings. The old woman at the stream has worn out four and keeps them all"},
 	"copied_slip": {"n": "Slip in His Own Hand", "desc": "A bamboo slip written close on both sides in a labourer's square hand, with a thumb-print of lime at one end. He copies each borrowed book by a thread of light before it goes back. The house he borrows from owns the book. This is the only copy anybody has read"},
 	"dry_coin": {"n": "Dry Coin", "desc": "A copper coin, green at the rim and bright round the square hole. Forty years of oil has been poured through that hole into a gourd and none of it has ever touched the metal. It is one of the coins he learned on. He spilled a pond before the first of them came up dry"},
+	# Part XXXIV (the Unpicked Road release)
+	"weed_gold": {"n": "Quarter of a Gold Cake", "desc": "A quarter of a cake of gold, broken along the mould-line, with couch-grass grown through the break. Yue Yangzi found the whole cake in the road and brought it home. His wife asked him whose it was. He carried it out again and threw it as far as he could, and it has lain in the weeds ever since, a nuisance to everybody"},
+	"know_slip": {"n": "Slip of One Who Knows", "desc": "A bamboo slip with one word on it in a governor's close hand. There are four: Heaven, the spirits, I, you. A man came to him by night with gold and said nobody would know. Yang Zhen counted, and wrote down the count, so as to have it in front of him the next time somebody said so"},
+	"fan_bronze": {"n": "Shard of the Fan Bell", "desc": "A piece of bronze as long as an arm, green outside and bright along the break, from a bell of the house of Fan. It hums if it is touched, and for some time after. It was broken with a mallet by somebody who wanted to carry it off quietly. It is the least quiet thing on Mount Buzhou"},
 	"firefly_bag": {"n": "Bag of Fireflies", "desc": "A bag of white gauze the size of a fist, tied at the neck, with some dozens of fireflies in it. Che Yin of Jin was too poor for lamp oil and read by one of these through the summer nights. It lights a column at a time, greenly. He let them out each morning"},
 	"house_broom": {"n": "House Broom", "desc": "A broom of sorghum straw. Upright, bristles up, out of sight beside the store. Never by the altar, the bed or the stove. He has known this since he was thirteen"},
 	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
@@ -5418,7 +5500,7 @@ const CHAT := {
 	"yue_lao": ["I am the clerk. People will have it that I choose. I read what is written and I tie what I read; it is a great deal of knots.",
 		"A young man once sent his servant to stab the child I told him he would marry. She was three. He married her fourteen years after, scar and all. The cord does not mind.",
 		"It is tied to the foot. Everybody supposes the finger. If it were the finger you would all have noticed by now.",
-		"Your healer asked whether she is in the book. I said that I do not read out of it. She said that was an answer. It was not; but she is very quick."],
+		"The cord is red because red was the only colour I had by me on the day I began. People have made a great deal of that. If it had been blue, you would all be tied in blue, and writing verses about the sea."],
 	"weisheng": ["I gave my word. I should like that understood before anybody tells me about the water.",
 		"It is not cold. It was cold for the first part. After that it was only the thing that was happening.",
 		"Her name? I... we had spoken four times. I knew the hour, and I knew the place. I was very sure of both.",
@@ -5430,7 +5512,7 @@ const CHAT := {
 	"xu_deyan": ["I was tutor to the heir of a kingdom, and then there was no kingdom. One finds one can live on very little. I had not known.",
 		"We broke it over the edge of the well on the last night, with the fire already on the south wall. She held it. I struck. It is the only blow I ever gave anything.",
 		"Every year an old man cried half a mirror in the market at ten times the price of a whole one, and was laughed at. Nine years I was in the wrong city.",
-		"I wrote four lines on her half and sent it back. I have been ashamed of the third line ever since. One should not be clever on such a day."],
+		"I wrote four lines for her and sent them by your hand. I have been ashamed of the third line ever since. One should not be clever on such a day."],
 	"lechang": ["He is a soldier and a great lord, the man whose house this silk is from. He has not been unkind. I should like that said by somebody, and it had better be me.",
 		"I sent the mirror to market by an old servant, and named a price to make people laugh. Only one man in the world would not laugh.",
 		"Nine years. I was nineteen when the city fell. I do not know what he has been keeping, all this while; but she was nineteen.",
@@ -5441,7 +5523,7 @@ const CHAT := {
 		"My name is Wu. There is a rock up the bank they have started calling after me. I told them I am not dead yet, and they said that was no objection.",
 		"The boys from the school come down this path when a book has beaten them. I am the first thing they see. I should think I have sent back more scholars than the examination has."],
 	"li_bai": ["The master says I have a quick ear. He says it as if it were a thing I had done wrong.",
-		"I can say the page after once reading. That is not the same as knowing it. I found that out on the fourth day, walking; I could say it and I did not know what it said.",
+		"I can say the page after once reading. That is not the same as knowing it. I found that out on the stair, coming down; I could say it and I did not know what it said.",
 		"She did not tell me to go back. She only went on grinding. I think if she had told me I should have gone on down the hill.",
 		"When I am old I shall write a poem about the moon and it will take me no time at all. I mean to spend thirty years first, getting ready for it to take no time."],
 	"kuang_heng": ["The light is theirs. What it falls on, once it is through the wall, I have never been able to see that anybody owns.",
@@ -5452,10 +5534,27 @@ const CHAT := {
 		"You hold the ladle high. Low, and you pour a rope; high, and it draws down to a thread of itself. It took me six years to find that out and it takes me a breath to say.",
 		"His lordship shoots very prettily. Eight or nine in ten. I nodded. What should I have done? A man who pours oil does not clap for a man who shoots; he knows too well how it is come by.",
 		"I have two jars, a pole, a ladle and a gourd, and I have walked the same nine villages for forty years. People are sorry for me. I notice they still cannot do what I do with a coin."],
+	# Part XXXIV (the Unpicked Road release)
+	"yangzi_wife": ["My name? It is not written down. What I said is. I find I do not mind the bargain; most people are remembered the other way about.",
+		"He has gone to study, a long way off. I told him a web cut in the middle is no cloth, and he has taken it to heart. Seven years. I weave.",
+		"The upright will not drink from Robber's Spring for the name of it, and the honest will not eat what is thrown at them with a shout. That is all I said. He did the throwing himself.",
+		"A hen of the neighbour's walked into our yard once and my mother-in-law killed it for the pot. I could not eat. I wept at the table. She sent the dish away. People think that was the harder of the two; it was not."],
+	"yang_zhen": ["I taught for twenty years before I took office. They said: you are old to begin. I said: then I have had longer to decide what I shall not do when I get there.",
+		"Wang Mi is an able magistrate. I recommended him and I was right to. He brought me ten catties because he is grateful, and that is the worst of it; a rogue I could have had flogged.",
+		"My sons eat greens and go on foot. Friends say: put something by for them. I say: let it be said they are the sons of an official whose hands were clean. Is that not a rich enough thing to leave?",
+		"Dusk is a fine hour. The lamps are not lit and the day's faces are put away. I only notice that everything I have ever been ashamed of was proposed to me at about this time."],
+	"bell_thief": ["WHAT? You will have to speak up. No: do not. Somebody will HEAR you.",
+		"The house of Fan is finished. Everybody was carrying something off: doors, tiles, a goose. I was late. The bell was all that was left, and I can see why, now.",
+		"It would not go on my back. A sensible man breaks a thing down to carry it. I hit it ONCE. You never heard such a... well. I did not hear it for long. I saw to that.",
+		"They keep looking at me. The whole town. I cannot think why; I have been as quiet as a mouse. I cannot hear a THING."],
+	"pei_du": ["A man who reads faces told me last month that I shall starve to death. He was very civil about it. I asked what I owed him and he would not take the fee, which I thought was ominous.",
+		"Two of jade and one of rhinoceros horn. I have not counted what they are worth; I have counted them. Three. Every half hour. It passes the time.",
+		"She was in plain mourning white and she prayed a long while and went out quickly. Somebody in trouble. Belts like these are not worn, by a woman like that. They are borrowed, to be given to somebody who can open a door.",
+		"The monks say: young master, take them home, they will be safer. I daresay. But she will come back here, not to my lodging. A thing ought to be where it is looked for."],
 	"chen_yaozi": ["I was first in the palace examination and I shoot better than any soldier in the realm. My mother says the second is beneath me. She has taken a stick to me for it.",
 		"Eight in the gold and the ninth a hand out. Do you know how seldom that is seen? I do. I have been told, by everybody. Everybody but one.",
 		"He put a coin on a gourd and poured through the hole in it. The coin was dry. I laughed; what else is there to do? I have been thinking about it ever since, which is not what a laugh is for.",
-		"My thumb. Feel that. You could strike a light on it. I have been telling people for twenty years that I was born able to shoot, with that on the end of my hand."],
+		"The butt is rice straw, at eighty paces. I have it stuffed afresh every spring. The man who does it grumbles that it is heavier each year, and I tell him that straw does not put on weight."],
 	"yan_ying": ["I wore one fox robe for thirty years. A minister who changes his coat every season has stopped looking at what he is minister of.",
 		"In Chu they asked whether Qi had no men, that it sent me. I said: Qi sends a worthy man to a worthy king, and the other sort to the other. So I was sent here.",
 		"My coachman was a tall fellow, and very pleased with it. His wife watched him drive me through the gate, and that evening asked for a divorce. He was better afterwards.",
@@ -5463,7 +5562,7 @@ const CHAT := {
 	"net_fowler": ["Four sides. My father hung three and went hungry one winter in four. I have children. I hung four, and I said the prayer so that it would be Heaven's doing and not mine.",
 		"From heaven, from earth, from the four quarters: all into my net. It is a good prayer. It works. That is what frightens me, some mornings, when I come to empty it.",
 		"There were cranes here when I was a boy. You could not sleep for them. I do not say I took them all. I say I took all that came, and then none came.",
-		"He did not tell me to take it down. He took it down himself, three sides, and coiled the cord for me so that it would not tangle. A lord. I had nothing to say against that."],
+		"I knot them myself, in the evenings. Hemp, a finger's mesh. People think the art is in the hanging. It is in the knot: one slack one, and a quail teaches the whole covey the way out."],
 	"cheng_tang": ["I was walking. A lord should walk; from a carriage every field looks the same. I heard a man praying for everything under heaven, and I thought: that is what Jie asks for.",
 		"From the left, go left. From the right, go right. If you would go up, go up; if down, down. And what is tired of its life, come into my net. That is all I said. It is not much to found a house on.",
 		"They tell me forty lords came over to me when they heard of it. I did not do it for forty lords. I did it because the man had left the birds no way to refuse him.",
@@ -5785,11 +5884,15 @@ const CHAT := {
 ## about falling stars and Jade Emperors on Lin Feng's first morning): [quest step, line], added to their
 ## chat once that step is done.
 const CHAT_LATER := {
+	# the Unpicked Road release: three things that were said before they had happened
+	"chen_yaozi": [["s_p33_knack", "My thumb. Feel that. You could strike a light on it. I have been telling people for twenty years that I was born able to shoot, with that on the end of my hand."]],
+	"net_fowler": [["s_p30_tang", "He did not tell me to take it down. He took it down himself, three sides, and coiled the cord for me so that it would not tangle. A lord. I had nothing to say against that."]],
+	"yue_lao": [["s_p32_end", "Your healer asked whether she is in the book. I said only that her page is in another hand. She said that was an answer. It was not; but she is very quick."]],
 	# Part XXVI: what the physician and the cook only say once it has happened
 	"hua_tuo": [["s_p26_skin", "The duke sends me a pheasant every month now, with a note that says he is not ill. I eat the pheasant. It is the best fee I have ever had, and the only one paid by a patient who was right."],
 		["s_p26_book", "My wrists are better. My knees will not be, and I am too old for the bear. I do the bird. It is the one that looks least like anything, which suits a physician."]],
 	"pao_ding": [["s_p26_feast", "Lord Wenhui once heard me talk about the knife and said that he had learned how to nourish life. I thought he was praising the soup. I have come round to thinking he was."]],
-	"wu_pu": [["s_p26_dawn", "The square is full every morning now. The schoolmaster is a very bad tiger and a very good bear. Nobody tells him which; it would ruin the bear."]],
+	"wu_pu": [["s_p26_dawn", "The square is full every morning now, and then I climb to the sect and do it again. The schoolmaster is a very bad tiger and a very good bear. Nobody tells him which; it would ruin the bear."]],
 	# Part XXV: what the steward and the widow only say once it has happened
 	"feng_xuan": [["s_p25_tally", "They still come and look at the place in the square where the basket of tallies stood, whatever became of it. They do not say anything. I have left the place swept and empty. One should not build on that sort of ground for a year or two."],
 		["s_p25_city", "A hundred doors. I walk past all of them at dusk and count the ones with a light in. It is always a hundred. I count them anyway. It is the only sum I do for pleasure."],
@@ -10435,7 +10538,7 @@ const DIALOGUE := {
 		["Narrator", "Three stems down, limbed and cut to a carrying length. The wood at the edge of the Rift is pale and heavy and rings when it is struck. The house of Wen is building a new wing for its library, and has been for a year; it is the only part of the library anybody visits."],
 	],
 	"haul:s_p33_carry": [
-		["Kuang Heng", "On the stack, butt to the wall. That is the Odes for me tonight, the second roll: a load is a roll, that is my reckoning with the steward. You have just earned somebody a poem about a cricket. Change shoulders going back."],
+		["Kuang Heng", "On the stack, butt to the wall. That is the Odes for me tonight, the third roll: a load is a roll, that is my reckoning with the steward. You have just earned somebody a poem about a cricket. Change shoulders going back."],
 	],
 	"done:s_p33_carry": [
 		["Narrator", "Four loads lie on the stack. Kuang Heng has carried eleven in the same time and is not breathing hard. He goes to the steward's window, and a roll is passed out to him as a bowl of rice is passed to a beggar, and he holds it for a moment in both hands before he puts it in his jacket."],
@@ -10497,7 +10600,7 @@ const DIALOGUE := {
 	],
 	"s_p33_school": [
 		["Narrator", "At the Origin of the Dao the stone is white and the light is slow. Below the first height there is a school: one room, a beam, twelve mats. It is past the third watch, and one mat is taken. A boy of ten is sitting very straight with a book, and his topknot is tied by a cord to the beam above him."],
-		["Li Bai", "It is so that I shall wake if I nod. A man called Sun Jing did it, in Han; the master told us. And another pricked his thigh with an awl. I have not an awl. ...You are the sweeper. I asked at your gate for a pill. I am sorry. I went back the long way and it took four days."],
+		["Li Bai", "It is so that I shall wake if I nod. A man called Sun Jing did it, in Han; the master told us. And another pricked his thigh with an awl. I have not an awl. ...You are the sweeper. I asked at your gate for a pill. I am sorry. I went back the long way, by the stair, and it took all day."],
 		["Lin Feng", "You saw an old woman at a stream."],
 		["Li Bai", "With a pestle! I laughed. Then I saw four stones worn through, and I could not laugh any more, and I did not know why. I have come back to finish the book. But the lamp will not stay lit here, and I fall asleep. Something does not want it read. Will you clear it? I will keep my place.", "think"],
 	],
@@ -10537,6 +10640,135 @@ const DIALOGUE := {
 	],
 	"post:s_break38": [
 		["Narrator", "The tribulation comes down, and he meets it as he has met each of the others, a little better and no differently. There is no secret in it. When it has passed he gets up, finds the broom where it always is, and begins at the top step, because it is morning."],
+	],
+	# ---- Part XXXIV: Nothing Picked Up on the Road (the Unpicked Road release)
+	"recall32": [
+		["Narrator", "The summer after the pestle, Sweeper Bai came up the nine hundred and ninety-nine steps at first light holding something in both hands, well away from his body, as a man carries a wasps' nest. He set it on the Elder's table and went out backwards. It was a cake of gold, with dew on it."],
+	],
+	"s_p34_home": [
+		["Narrator", "The cake of gold lies on the Elder's table where it was put down. Nobody has moved it to dust. Beside it is a note in Sweeper Bai's large, careful hand: found in the road, on the four hundredth step, and whose is it?"],
+		["Elder Qing Xuan", "He would not put it in the treasury, child, and he would not put it back, and he would not keep it. He brought it to me as the heaviest thing he had ever swept up. I have had it four days. I find I am no better at it than he is."],
+		["Lin Feng", "Somebody dropped it. Somebody will come."],
+		["Elder Qing Xuan", "Or will not. And then? There were three who were handed this question and answered it. A weaver at Yanggu, below the second height. A governor lodged at Shazhou. And a man on Mount Buzhou, above Tushan, who answered it wrongly, and so loudly that he is the best teacher of the three. Go and ask them.", "point"],
+		["Yue Ling", "Look how everybody walks round the table, Lin Feng. The novices come in a curve. It has not been touched and it has already moved the whole hall a pace to the left."],
+	],
+	"s_p34_loom": [
+		["Narrator", "Below the second height of Yanggu there is a farmhouse with its door open and a loom set in the doorway for the light. A woman is weaving. She does not stop. Out past the hedge, where the weeds are tall, something yellow shows among the stalks, and the path to the well goes a long way round it."],
+		["Yue Yangzi's Wife", "You have come about the gold. Everybody does. My husband found it lying in the road, a whole cake, and brought it home with a face like a boy with a fish. I asked whose it was. He said: nobody's, it was in the road. I asked whether the road had mined it."],
+		["Lin Feng", "He threw it away."],
+		["Yue Yangzi's Wife", "As far as he could, and went off to study, which was right. But he threw it only as far as the weeds, and it will not lie still. A thing called nobody's is picked up by everybody. Half the road has a piece in its sleeve now, and they are not the better for it. Clear them off my hedge.", "point"],
+	],
+	"done:s_p34_weeds": [
+		["Narrator", "The last of them drops into the grass. Each had the look of a thing just picked up: turned over once, weighed, and about to be put away. Where they stood the weeds stand up again slowly. The yellow among the stalks is still there, in four places now, a long throw apart."],
+		["Yue Ling", "It broke when he threw it, Lin Feng. One cake, four quarters. And every traveller since has seen one quarter and thought: only a little, and nobody's. I do not think any of them was a thief until that moment."],
+	],
+	"done:s_p34_gold": [
+		["Narrator", "Four quarters of a cake of gold, each with couch-grass grown through the break. Fitted together they make the mould-mark of a private mint and the word for a hundred. Somebody melted that down out of a great many small things, and carried it along a road, and one day put a hand to a belt and found nothing there."],
+	],
+	"done:s_p34_lost": [
+		["Narrator", "Three doors in Yanggu have been knocked at. A thing dropped in the road at dawn was in its owner's hand again by noon, and each of them said the same words first, before thank you: where was it? They had been back along the road twice. It was not where they had looked. It never is."],
+		["Yue Yangzi's Wife", "So. A shoe, you can do. I thought as much. Nobody is ever tempted by the shoe; that is why I asked for it first. It is the same act. The hand goes down, the thing comes up, and there is one moment when it is in the hand and has not yet been given a name."],
+	],
+	"done:s_p34_spring": [
+		["Narrator", "On the second height water comes out of a split in the rock, cold and perfectly clear, and runs away untouched. A stone beside it is cut with two characters: Robber's Spring. The path up is worn deep by thirsty people, and stops a pace short of the water. From here the whole road below can be seen, and every stooping figure on it."],
+		["Yue Ling", "It is good water. I tasted it; a healer may. They will not drink because of the name, Lin Feng. I used to think that was foolish. Now I think they are right, and it is still a pity about the water."],
+	],
+	"done:s_p34_alms": [
+		["Narrator", "The spring runs quieter. The food that lay beside it is gone too: a bowl of millet set down in a famine by a rich man, with the word hey. The man it was thrown to would not eat it and died of that, and the rich man ran after him to beg his pardon. Both of them have been standing by the path ever since, arguing with nobody."],
+	],
+	"pre:the_find": [
+		["Narrator", "On the second height it lies across the path: gold, a hill of it, in the shape of something dropped. It has no mark on it and no owner's name. Whatever is laid beside it, it takes in, and is a little bigger, and is still nobody's. A great many sleeves have emptied themselves here without meaning to."],
+		["Yue Yangzi's Wife", "There is the cake he found. It was the size of my palm. Every hand that has thought, only this once, has fed it. It says it is nobody's. Ask it, as I asked him. It has never had an answer ready, and it will not have one now.", "point"],
+	],
+	"post:the_find": [
+		["Narrator", "It does not break. It is claimed, piece by piece: a hairpin, a string of cash, a child's lock, each going off down the hill toward a door as if it had been called. At the end there is a cake of gold the size of a palm on the path, with a mint-mark on it, and that is all there ever was."],
+		["Yue Yangzi's Wife", "That one I shall take to the magistrate myself, with the mark uppermost. Somebody is hungry for want of it. ...You may tell my husband, if you meet him on a road, that the web is three ells longer and I have not cut it. He will know what that means.", "nod"],
+	],
+	"s_p34_dusk": [
+		["Narrator", "Below the second height of the sands a governor's baggage is stacked outside a tent: two chests of books and one of clothes. A spare man with a short grey beard sits on the smallest chest in the last of the light, with four bamboo slips laid in a row on his knee, and one place on the sand in front of him swept smooth by a great deal of pacing."],
+		["Yang Zhen", "Yang Zhen, on my way to Donglai. A man I once recommended came to my lodging last night, when the lamps were out. Wang Mi; able, grateful, and with ten catties of gold in his sleeve. I said: your old friend knows you; how is it that you do not know him? He said: it is dusk. Nobody will know."],
+		["Lin Feng", "And you sent him away."],
+		["Yang Zhen", "I said: Heaven knows. The spirits know. I know. You know. How can you say nobody? He went out ashamed, and I was pleased with myself until morning. Then I looked at the oasis. That sentence of his has got out. It is in every sleeve in Shazhou, and it comes out at dusk.", "shake"],
+	],
+	"done:s_p34_knows": [
+		["Narrator", "They go out like lamps being pinched. Each was a small weight carried low on one side, and a voice beside it saying the same four words. When the last has gone the sand is covered with tracks that all lead to somebody's back door, and stop there, and come away again lighter."],
+		["Yue Ling", "Not one of them was greedy, Lin Feng. I listened. They were grateful, or frightened, or they wanted a son let off the levy. He is right: that is the worst of it. It is always a kindness that comes at dusk."],
+	],
+	"done:s_p34_slips": [
+		["Narrator", "Four bamboo slips in a governor's close hand, one word to a slip: Heaven. The spirits. I. You. The wind had carried them up the height and laid them out again in the same order, as though it could count. He wrote them so as to have the sum in front of him the next time somebody told him it came to nothing."],
+	],
+	"done:s_p34_watch": [
+		["Narrator", "Two guards of Shazhou have said what comes in at dusk. One said: nothing, and looked at the ground. The other said that a sleeve with gold in it swings differently from a sleeve with an arm in it, and that he had stopped counting them in his first year, and begun again last night when he heard what the governor answered."],
+		["Yue Ling", "The second one stood straighter when he said it, Lin Feng. Four who know, the governor counted. I think it is more than four. I think it is the whole gate, and they have only been waiting for somebody to say that they could see."],
+	],
+	"done:s_p34_sleeves": [
+		["Narrator", "The sleeves hang level. All over the oasis people are walking a little oddly, as men do who have put down a load they had carried so long that they leaned against it. Somebody laughs in the caravanserai. On the height above the tents the dark has not lifted, though the lamps below are lit."],
+	],
+	"pre:the_dusk": [
+		["Narrator", "On the second height it is still the hour between the lamps. It stands there by itself, a piece of evening that has not gone on to be night: blue-grey, with no faces in it, and a great many hands. It is where things are passed. It has kept every one of them, and it has never been asked who was there."],
+		["Yang Zhen", "That is the hour he chose. It is not wicked. It is only sure that it is empty. I have four slips that say otherwise, and it has not once stood still to have them read to it. Hold it still for me, cultivator. I am a slow reader, and I mean to go through all four.", "think"],
+	],
+	"post:the_dusk": [
+		["Narrator", "It does not fall. It is counted. Heaven, says Yang Zhen, and a star comes out. The spirits; and the wind turns. I. You. And at the fourth word the hour has somebody in it, and then a great many, each standing where he stood with his sleeve held out, and each one seen. Then it is simply night, and the lamps of Shazhou look very near."],
+		["Yang Zhen", "So. It was never empty. I shall write to Wang Mi and tell him he is still recommended; a man who can be ashamed is worth ten who cannot. And I shall go on to Donglai with two chests of books. My sons will complain. Let them. It is the only estate I have that nobody can come and take.", "nod"],
+	],
+	"s_p34_bell": [
+		["Narrator", "Below the fourth height of Buzhou a thick-set man is crouched behind a rock that hides about a third of him. He has a rag bound round his head over both ears and a mallet in his fist. On the slope above lies a bronze bell taller than he is, with a piece out of its lip, and the whole hillside is still faintly ringing."],
+		["The Man Who Stopped His Ears", "WHAT? You need not WHISPER, nobody can hear. The house of Fan is done for and everybody was carrying something off. I got the bell. It would not go on my back! So I hit it. ONCE. To break it small. And it made a NOISE. Somebody would have come and taken it off me."],
+		["Lin Feng", "So you stopped your ears."],
+		["The Man Who Stopped His Ears", "WHAT? Yes! At once! And it stopped. Not a sound since. I have hit it four times more, and nothing. But the pieces will not keep STILL, and those things have come out of the ground, and all Tushan, down there, stands at its doors LOOKING at this mountain. I cannot think why. It is as quiet as a grave.", "shock"],
+	],
+	"done:s_p34_ring": [
+		["Narrator", "The mallets lie where they fell. The wads of rag have come apart into thread. And the bells, which were only the one note struck five times and never allowed to finish, go on sounding for a long breath after the last of them is down, and then let the note go, all together, as a held breath is let go."],
+		["Yue Ling", "He has not heard any of that, Lin Feng. Look at him. He is smiling. He thinks you did it very quietly."],
+	],
+	"done:s_p34_shards": [
+		["Narrator", "Four pieces of bronze as long as an arm, green outside and bright along the break. Laid together they make the lip of a bell with a line of old writing round it: the house of Fan, its sons and grandsons, to treasure and use for ever. Each piece hums when it is touched. Together they do not hum. They wait."],
+	],
+	"done:s_p34_cracks": [
+		["Narrator", "Eight times over, clean, as the children go. In Tushan a bell is chalked on the flags of every lane where one was poured, and nobody sets a foot on the chalk, any more than on a threshold. From the doorways a few of the casters have been watching a cultivator of the sect hop down their street like a boy, and not one of them has laughed."],
+		["Yue Ling", "A caster told me why, while you were in the air. They pour bells here. They say a bell is a town's one voice, and you do not put your foot on a voice. And that man took a mallet to one so as to get it up a mountain."],
+	],
+	"done:s_p34_streets": [
+		["Narrator", "Three doors in Tushan have been knocked at. The town had been counting its pockets all morning, the way a town does that has heard a thief at work on the mountain; it had begun to look sideways at its neighbours. Three things walking home by themselves, in a stranger's hand, have done more for the street than the watch."],
+	],
+	"done:s_p34_height": [
+		["Narrator", "From the fourth height of Buzhou, Tushan lies open in the valley: the pits, the cauldron in its yard, the lanes. And at every door somebody is standing with a hand up to shade the eyes, looking at this mountain. Below, behind his rock, the man with the rag round his head is looking at none of them. He has his eyes shut as well, now, to be on the safe side."],
+		["Yue Ling", "He is not hiding from them, Lin Feng. He is hiding them from himself. If he cannot hear it, it did not ring; if he cannot see them, they are not looking. I have had patients who took their medicine that way."],
+	],
+	"done:s_p34_wads": [
+		["Narrator", "The last wad unravels. They had gone down into the town by night and tried the ears of sleeping people, kindly, as a mother covers a child's ears in a storm. Tushan has slept badly for a week and not known why. This morning the hammers in the pits come up the hill very clear, each one separate."],
+	],
+	"pre:the_bell": [
+		["Narrator", "On the fourth height it stands upright again: the bell of the house of Fan, whole, with both its hands pressed over its ears. It rings. The hills answer it, and the great cauldron in its yard at Tushan answers the hills. It rings louder, to be sure of drowning the answer, and squeezes its eyes shut."],
+		["The Man Who Stopped His Ears", "That is NOT mine. Mine is in pieces and perfectly quiet. ...Is it making a noise? You are wincing. EVERYBODY winces at me. Take those hands off its ears, if you can reach. I should like to know what it is that I have not been hearing.", "think"],
+	],
+	"post:the_bell": [
+		["Narrator", "The hands come away. For the first time it hears itself, the whole of the one note, out to the end; and it stops, as anybody would. In the quiet the man behind the rock has pulled the rag off his head, and stands with it in his fist, hearing a town of four thousand people say nothing at all in his direction."],
+		["The Man Who Stopped His Ears", "...Oh. It was as loud as that. All this time? And they have all... Oh. I am not a thief, you know. I was only late, and it was the only thing left, and then I could not stop. I shall carry it down. In pieces. To the casters. They will know how a voice is put back.", "grieve"],
+	],
+	"done:s_p34_children": [
+		["Narrator", "Three children of Qingshi have said what they would do with a purse found in the road. One would give it to her mother, who would know whose it was, because she knows everything. One would stand on it until somebody came. The third asked whether there was a frog in it, and on hearing not, lost interest in the question."],
+		["Yue Ling", "Not one of them said keep it, Lin Feng, and not one said leave it. They do not know yet that those are the two things grown people argue about. They only know it is somebody's, and that somebody will be crying."],
+	],
+	"s_p34_belts": [
+		["Narrator", "Below the fourth height of Tushan the porch of a small temple stands open to the road. On its rail lie three belts, two of jade and one of rhinoceros horn, folded as they were left. A thin scholar in a faded robe sits on the step beside them with his hands on his knees, not touching the rail. The light is going."],
+		["Pei Du", "Pei Du. I came to pray, because a man who reads faces says I shall die of hunger. A woman in mourning white prayed before me and went out in haste, and these were on the rail. Her father is in prison for nothing, the monk thinks; she had borrowed them to give to somebody who can open a door. I have sat here since noon."],
+		["Lin Feng", "She has not come back."],
+		["Pei Du", "No. And the monks shut the gate at dusk. I am a poor man, cultivator. Any one of these would feed me for ten years, and I have been told I shall starve; I notice that I have thought of it, and I notice that I am still sitting here. But what is right, when the gate shuts? You have been asking that up and down the land. Tell me.", "offer"],
+	],
+	"s_p34_end": [
+		["Narrator", "The cake of gold is on the Elder's table yet. A path has been worn in the dust of the hall round it. This morning a carter from below the mountain is standing in the door with his cap in both hands; he lost a year's hire-money on the steps, coming up with a load of lamp oil, and has only now found the courage to ask."],
+		["Elder Qing Xuan", "He described the mint-mark before he saw it, child. I have given it to him. He counted it, which I liked, and then he tried to leave a tenth of it, which I liked less, and Sweeper Bai chased him down forty steps to put it back in his sleeve. So. Whose was it?"],
+		["Lin Feng", "His. All the time. A woman at Yanggu asked whether the road had mined it. A governor counted four who knew. A man stopped his ears and could not stop the bell. Elder, nothing lies in a road. It is only on its way home, and a hand can help it or hinder it."],
+		["Elder Qing Xuan", "And a hand that hinders has to stop its own ears to do it. Yes. I have swept this hall forty years and never found one thing in it that was nobody's. Even the dust belongs to the broom. Go and sit, child. You came up this mountain with nothing in your sleeves. See whether that is still so.", "nod"],
+		["Yue Ling", "I found a jade pin in the herb garden once, when I was nine, and kept it under my pillow for a week. I could not sleep on it. I gave it back, and the sister it belonged to had not even missed it, Lin Feng. I had. I think that is how one tells."],
+	],
+	"pre:s_break39": [
+		["Narrator", "Under the pine Lin Feng sits and turns out his sleeves, as a traveller does at an inn. There is a broom-straw in one. There is nothing in the other. He has carried a purse to a door and a shoe to a child and a bell's own voice back to the town it was poured in, and none of it is on him. The sky gathers, as it does."],
+	],
+	"post:s_break39": [
+		["Narrator", "The tribulation comes down and finds nothing to take hold of: no weight on one side, nothing kept back. It goes through him like wind through a robe on a line. When it has passed he stands, and the two sleeves of the robe fill and lift a little, with nothing in them but the morning."],
 	],
 	# ---- Part XXX: The Net with Three Sides Open (the Open Net release)
 	"recall28": [

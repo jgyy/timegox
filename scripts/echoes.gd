@@ -554,6 +554,12 @@ const CROSSROADS := {
 			"ask": [["The Gardener of Hanyin", "Me? I carry a pitcher. I have never built so much as a gate. ...Sit down, all of you. If I am to talk to carpenters I shall want tea, and it will take as long as it takes."], ["Narrator", "They are still talking when the moon comes up: a gardener, a carpenter, a man in straw sandals and five tired makers, and nobody has yet agreed with anybody."]],
 		},
 		"echo": {
+			# Part XXXIV (the Unpicked Road release)
+			"s_p34_bell": {
+				"hand": [["The Man Who Stopped His Ears", "You are the one who told the makers the HAND comes first. The casters said so when they came up to stare. A hand made that bell, they said, and a hand broke it. Then they looked at mine. I put it in my sleeve. I do not know why."]],
+				"wheel": [["The Man Who Stopped His Ears", "You are the one who gave every engine at Tushan a KEEPER. There is a drop-hammer down there would have broken it small in one blow. I asked to borrow it. The keeper said: whose bell? I said nobody's. He would not lend it for a nobody's bell."]],
+				"dao": [["The Man Who Stopped His Ears", "You are the one who told the makers about a cook's KNIFE. It goes where the joint is, they say, and never strikes. I went where the bell was thickest. Five blows! A cook would have laughed at me. I did not hear him, if he did."]],
+			},
 			# Part XXXIII (the Iron Pestle release)
 			"s_p33_coin": {
 				"hand": [["The Old Oil Seller", "You are the one who said the hand first, at Tushan. There is a judgment a pedlar can follow. They have not built the engine yet that will pour through a coin. I daresay they will. Somebody will still have to know when it has been done right."]],
@@ -1241,7 +1247,7 @@ const CROSSROADS := {
 				"log": "Said that a kindness is owed onward, to the next stranger on the road."},
 		],
 		"after": {
-			"nothing": [["Narrator", "The old man's hands stop. He looks at the knot he has half made for a long moment, and then, very slowly, he pulls the stems apart and smooths them straight. It is the first knot he has untied that had tripped nobody."], ["The Old Man in the Grass", "Finished when it was done. Eleven years I have been owing, and nobody thought to tell me the account was closed the day it was opened. Then I may lie down. My daughter's children put rice on my mound every spring, and I have never once been there to have it."]],
+			"nothing": [["Narrator", "The old man's hands stop. He looks at the knot he has half made for a long moment, and then, very slowly, he pulls the stems apart and smooths them straight. It is the first knot he has untied that had tripped nobody."], ["The Old Man in the Grass", "Finished when it was done. All these years I have been owing, and nobody thought to tell me the account was closed the day it was opened. Then I may lie down. My daughter's children put rice on my mound every spring, and I have never once been there to have it."]],
 			"ledger": [["Narrator", "Lin Feng takes out a brush. The old man watches him write it down: a concubine, a father's two orders, the one that was followed, a bolt of cloth, four nights of grass. When it is on the page he reads it over twice, moving his lips."], ["The Old Man in the Grass", "There. It is somewhere. I may stop carrying it about in my hands. Draw the line through it, sweeper, where it says paid. No: give me the brush. I should like to draw that line myself."]],
 			"onward": [["Narrator", "The old man laughs, a dry sound like grass in wind. He finishes the knot he is tying, and then walks ten paces down the field, to a place where no army has ever stood or will, and ties another, for nobody."], ["The Old Man in the Grass", "Somebody will come along this row one day in trouble, and something will trip whatever is after him, and he will never know. That is better than a general. Go on, sweeper. I have a deal of field to do, and it is all for strangers now."]],
 		},
@@ -1406,6 +1412,12 @@ const CROSSROADS := {
 			"halves": [["Narrator", "He nods slowly, and moves his half a hand's breadth from hers on the cloth; and she, after a moment, sets her own straight beside it, as it will hang. It was not what either came for. Both of them stand a good deal straighter."], ["Xu Deyan", "On one wall, a hand apart. She says she will come on the fifteenth of each month and we shall drink tea beneath them, and that I am not to write a poem about it. I had begun one. She knows me, you see. That much did not break.", "laugh"]],
 		},
 		"echo": {
+			# Part XXXIV (the Unpicked Road release)
+			"s_p34_loom": {
+				"rivet": [["Yue Yangzi's Wife", "You are the one who had a broken mirror riveted, and let the joins show. My husband has been gone a year. When he comes back we shall not fit as we did, either. I mean to let that show too. I have no patience with invisible mending; it is a kind of lie told in thread."]],
+				"recast": [["Yue Yangzi's Wife", "You are the one who had two halves of a mirror melted and cast new. I heard it, and looked at my web. If I cut this cloth it is rags. I had not known there was anybody who could part a thing and have it whole again. I should not have had the courage to try."]],
+				"halves": [["Yue Yangzi's Wife", "You are the one who left a mirror in two halves, each where it was. I have half a house here, and he has half a book there. People are sorry for us. I find a thing holds very well in two places, so long as neither half gives out that it is the whole."]],
+			},
 			# Part XXXIII (the Iron Pestle release)
 			"s_p33_home": {
 				"rivet": [["Elder Qing Xuan", "And the mender at Guanghan has sent up a bowl with nine rivets in it, for a sample. He writes that he learned to drill porcelain on four hundred bowls that broke. He does not mention the mirror at all. I take that for pride of the right sort."]],
@@ -1446,13 +1458,44 @@ const CROSSROADS := {
 			"s_p33_end": {
 				"truth": [["Elder Qing Xuan", "And a schoolmaster on Elephant-Ear Mountain writes that a boy of his has stopped asking how long a thing will take, and has begun asking whether it is worth the taking. He wants to know what was said to him. It was the truth, I gather. That seldom goes by post."]],
 				"finish": [["Elder Qing Xuan", "And they say a boy on Elephant-Ear Mountain keeps a needle in his collar that was once an iron bar, and that the whole school has gone back to its books on the strength of it. I hope nobody ever tells him whose hand it was. I hope, child, that you are sure."]],
-				"turn": [["Elder Qing Xuan", "And they say a boy goes down to a stream on Elephant-Ear Mountain each morning and grinds an old woman's pestle while he says his lesson over. His master complains that he smells of wet iron, and has the Odes by heart to the end of the second roll."]],
+				"turn": [["Elder Qing Xuan", "And they say a boy goes down to the stream below the Jasper Pool each morning and grinds an old woman's pestle while he says his lesson over. His master complains that he smells of wet iron, and has the Odes by heart to the end of the second roll."]],
 			},
 		},
 		"end": {
 			"truth": "The boy of Elephant-Ear Mountain finished his book knowing that the pestle would never be a needle. Grown, he wrote faster than any poet of his age, and said when asked that it was nothing: he had been told the truth once, early, by somebody who could have spared him.",
 			"finish": "The boy of Elephant-Ear Mountain kept a needle of black iron in his collar all his life, and believed in it. He wrote ten thousand poems. Old Dame Wu, with nothing left to grind, was brought a new bar by her granddaughter within the month, and said nothing to anybody.",
 			"turn": "For six years a boy ground an old woman's pestle each morning before school, a poem's length at a time. It was not a needle when he left for the capital, nor when she died. He is said to have polished his lines the same way: down wet, and back dry.",
+		}},
+	# Part XXXIV (the Unpicked Road release): what is done with a thing found, when the gate shuts and nobody has come for it
+	"the_belts": {"step": "s_p34_belts", "part": "XXXIV", "n": "Three Belts on a Rail",
+		"ask": "Three belts lie on a temple rail at Tushan, left by a woman in mourning who needs them to free her father. Pei Du has sat by them since noon. The gate shuts at dusk and she has not come. He is poor, and has been told he will starve. He asks what is right to do with a thing found, when its owner may not come back for it.",
+		"options": [
+			{"id": "wait", "label": "Sit the night out with him at the rail", "tilt": {"heart": 3, "reach": -2}, "creed": {"virtue": 8}, "gain": {"renown": 6},
+				"desc": "She will come back here and nowhere else. Sit with him outside the gate until she does, if it takes till morning, and let the belts be exactly where she left them when she comes round the corner. Nothing needs deciding but to stay (renown).",
+				"log": "Sat out the night with Pei Du beside three belts on a temple rail, until the woman who had left them came back."},
+			{"id": "cry", "label": "Have them cried at every counter of the post", "tilt": {"craft": 3, "reach": 2}, "creed": {"rule": 8}, "gain": {"stones": 11500},
+				"desc": "One rail is not where a frightened woman looks. Seal them at the counter of the post and have the find cried at every gate, with a board for things found in every town from here to the sea. What is lost should have somewhere to go (spirit stones, from the post, toward the keeping of its boards).",
+				"log": "Had three belts found at Tushan sealed at the counter of the post and cried at every gate, and a board for things found put up in every town."},
+			{"id": "lie", "label": "Leave them on the rail, and walk away", "tilt": {"craft": -3, "heart": -2}, "creed": {"rule": -8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "In a land well kept nothing is picked up in the road: a thing lies where it fell until its owner comes, if that is a year. Leave them. Do not guard them either; to guard is to say the road cannot be trusted. Take him away to his supper (the regard of the Rice Hearth).",
+				"log": "Left three belts lying on a temple rail at Tushan overnight, unguarded, and took Pei Du away to his supper."},
+		],
+		"after": {
+			"wait": [["Narrator", "The gate shuts. The two of them sit on the step outside it with the belts above them on the rail, and the night goes by in the ordinary way, slowly. At first light a woman in white comes round the corner at a run, sees the rail, and stops as if she had walked into a wall."], ["Pei Du", "She would have given me one. I said no before she had finished; it came out by itself. And the man who reads faces passed me at the gate just now, and stopped, and asked what I had done since last month. I said: nothing. I sat down. He says I shall not starve. He says he cannot tell what I shall be.", "bow"]],
+			"cry": [["Narrator", "By lamplight the belts go into a post-bag under three seals, and a clerk writes it out fair for the crier: found at a temple rail, two of jade and one of horn, to be had of the counter by whoever can name the knot they were tied with. It is cried at four gates before the night is out."], ["Pei Du", "She came to the counter at noon, as white as her dress, and named the knot. A double fish. I had not noticed it; the clerk had. ...It is a better way than mine. I could only have sat. But the clerk was paid for his trouble, and I find I am glad nobody thought of paying me.", "think"]],
+			"lie": [["Narrator", "Lin Feng takes him by the elbow and walks him down the road to a bowl of noodles, and neither of them looks back. The gate shuts. Three belts lie all night on a rail in the open, in a town where a man lately took a mallet to a bell. In the morning they are there, with dew on them, and so is she."], ["Pei Du", "I did not sleep. I lay and counted: three, three, three. And nobody touched them! A whole town went past that rail. I had thought I was the only thing between those belts and the road. It seems the road was not waiting for me. I do not know yet whether I like that.", "shock"]],
+		},
+		"echo": {
+			"s_p34_end": {
+				"wait": [["Elder Qing Xuan", "And I hear a young scholar at Tushan has been told by a reader of faces that the bones of his brow have changed in a month. The man asks what he did. The scholar says he sat on a step. They are both a good deal puzzled, child. I am not."]],
+				"cry": [["Elder Qing Xuan", "And the post has put up a board for things found at every counter from Tushan to the sea, with a clerk to keep it. Forty things came home in the first month. The clerks are paid by the piece. I do not say that is wrong. I say Sweeper Bai chased a man forty steps to give back a tenth."]],
+				"lie": [["Elder Qing Xuan", "And they say a purse may lie in a lane of Tushan for a week now, and people walk round it as my novices walk round this table. It is the old way, and a fine one. I only hope, child, that somebody goes round the lanes at night and looks at what has lain there longest."]],
+			},
+		},
+		"end": {
+			"wait": "Pei Du sat out one night by three belts, and the reader of faces never did work out what had changed in him. He was four times chancellor. Asked in old age for the secret of it, he said that he had once had nothing to do until morning, and had done it.",
+			"cry": "There is a board for things found at every counter of the post, and a clerk who knows knots. Pei Du rose to be chancellor and kept the boards in funds out of his own salary. Fewer things are lost for good in the land than anywhere under heaven, and each that comes home costs its owner a copper.",
+			"lie": "At Tushan nothing is picked up in the road, and the saying has gone out along it to the sea. Pei Du rose to be chancellor, and governed as he had been shown: he posted few guards. Most of what was left lying was there in the morning. He never spoke of the times it was not.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1473,6 +1516,12 @@ const CROSSROADS := {
 			"burn": [["Narrator", "The blue bag goes into the brazier first, and then the book, a handful of pages at a time. Hua Tuo watches from the step. When the page on the frolics goes in he says, quite quietly, the tiger, the deer, the bear, the ape, the bird, and that is all."], ["Mistress Wu, the Jailer's Wife", "He is not angry. That is the worst of it. He says he will have to teach it all again, to people, one at a time, the old way. He says it as if it were good news."]],
 		},
 		"echo": {
+			# Part XXXIV (the Unpicked Road release)
+			"s_p34_dusk": {
+				"copy": [["Yang Zhen", "You are the one who had a physician's book copied for every counter of the post. I read the page on the pulse at the counter here, at dusk, by the clerk's own lamp. Nobody asked what I would give for it. I had almost forgotten a thing could be handed over in the open."]],
+				"keep": [["Yang Zhen", "You are the one who set a physician's book on a shelf in your own town, for whoever sweeps a season. That is a price a poor man can pay in daylight. I have spent thirty years refusing the other kind. I am glad to hear of a fee I could have taken."]],
+				"burn": [["Yang Zhen", "You are the one who let a physician's book burn. I heard it on the road. What could not be kept clean was not kept. I do not say you were right. I say I have sent back a great deal in my time that would have done somebody good, and slept."]],
+			},
 			# Part XXXIII (the Iron Pestle release)
 			"s_p33_wall": {
 				"copy": [["Kuang Heng", "You are the one who had a physician's book copied for every counter of the post. I read the page on the wrist at the counter in the town, standing. Nobody asked what I would carry for it. I did not know what to do with my hands."]],
@@ -1647,7 +1696,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

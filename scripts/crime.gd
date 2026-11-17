@@ -49,6 +49,8 @@ const CRIMES := {
 	"watch": {"n": "Drawing on the watch", "base": 2500, "realm": 800, "bill": "for cutting down the watch of %s"},
 	"flight": {"n": "Running from the watch", "base": 200, "realm": 80, "bill": "for running from the watch of %s"},
 	"forbidden": {"n": "A forbidden art", "base": 4000, "realm": 1500, "bill": "for an art the precepts forbid, %s"},
+	# the Unpicked Road release (trifles.gd): what was somebody's, pocketed while somebody looked
+	"theft": {"n": "Walking off with what was somebody's", "base": 60, "realm": 25, "bill": "for walking off with %s"},
 }
 ## how many of the charges are remembered on the page
 const KEEP := 24
@@ -81,8 +83,8 @@ const SHUT := {
 
 ## People nobody could mistake for an easy mark: how many levels of cultivation stand behind each
 ## (everybody else is weighed by `might`).
-const MIGHT := {"elder": 66, "smith_tie": 24, "alchemist_mo": 22, "treasurer": 18, "granny_wen": 1, "master_discipline": 48, "master_outer": 44,
-	"dicer_du": 3, "bank_clerk": 4}
+const MIGHT := {"elder": 66, "smith": 24, "alchemist": 22, "treasurer": 18, "granny_wen": 1, "master_discipline": 48, "master_outer": 44,
+	"dicer_du": 3}
 ## titles that mean cultivation, and what each adds
 const TITLED := {"Elder": 12, "Patriarch": 14, "Master": 8, "Abbot": 8, "Immortal": 16, "General": 6, "King": 6, "Lord": 6, "Lady": 4, "Sage": 10, "Keeper": 3, "Captain": 4,
 	"Founder": 16, "Echo": 12, "Marshal": 6, "Emperor": 4, "Empress": 4, "Queen": 6, "Monk": 4, "Hermit": 6, "Judge": 5}
@@ -237,7 +239,7 @@ static func grave_line(g, e: Dictionary) -> String:
 	var rec: Dictionary = g.slain.get(str(e.id), {})
 	var nm := str(rec.get("n", e.get("n", "somebody")))
 	var days := int(g.day) - int(rec.get("day", g.day))
-	var when := "this morning's earth" if days <= 0 else ("earth %d days old" % days if days < 30 else "earth the grass has taken")
+	var when := "this morning's earth" if days <= 0 else ("earth %d day%s old" % [days, "" if days == 1 else "s"] if days < 30 else "earth the grass has taken")
 	if bool(rec.get("seen", false)):
 		return "A mound of %s, and a tablet: %s. Under the name somebody has cut, smaller, who did it. It is his name." % [when, nm]
 	return "A mound of %s, and a tablet: %s. Nothing is cut under the name. Lin Feng knows what would be." % [when, nm]
@@ -388,7 +390,7 @@ static func strike(g, e: Dictionary, seen: int) -> Dictionary:
 	var what := "kill"
 	if e.has("office"):
 		what = "office"
-	elif area in ["sect", "mountain"] and not str(e.get("asset", "")).begins_with("folk_") and str(e.get("kind", "")) == "npc":
+	elif area == "sect" and not str(e.get("asset", "")).begins_with("folk_") and str(e.get("kind", "")) == "npc":
 		what = "kin"
 	# (somebody new in the place of one of the street, struck down in turn: what was seen before was still seen)
 	var was: Dictionary = g.slain.get(id, {})
@@ -496,7 +498,7 @@ static func serve_lines(g, w: Dictionary, days: int, hard: bool = false) -> Arra
 	var out: Array = []
 	if hard:
 		out.append(["Narrator", "He wakes on swept earth with his head ringing and his purse half its weight. Somebody has drawn a circle round him with the butt of a spear."])
-	out.append(["Narrator", "There is no cell in %s. There is a circle scratched on the ground by the gate, as there was in King Wen's time, and nobody set to guard it. Everybody who passes looks to see whether he is still inside. For %d days he is." % [str(w.n), days]])
+	out.append(["Narrator", "There is no cell in %s. There is a circle scratched on the ground by the gate, as there was in King Wen's time, and nobody set to guard it. Everybody who passes looks to see whether he is still inside. For %d day%s he is." % [str(w.n), days, "" if days == 1 else "s"]])
 	out.append(["Captain of the Watch", "That is the last of it. I have rubbed the line out with my foot; you may step where you like. The bill is burned. What people remember is not mine to burn."])
 	return out
 
@@ -606,11 +608,11 @@ static func epilogue(g) -> Array:
 		if not str(id).begins_with("folk:") and not g.slain[id].has("alias"):
 			named.append(str(g.slain[id].n))
 	if not named.is_empty():
-		out.append("There is a mound where %s stood, and %s. Nobody tends them who does not know whose hand it was." % [str(named[0]), "no other" if named.size() == 1 else "%d others like it" % (named.size() - 1)])
+		out.append("There is a mound where %s stood, and %s. Nobody tends them who does not know whose hand it was." % [str(named[0]), "no other" if named.size() == 1 else ("one other like it" if named.size() == 2 else "%d others like it" % (named.size() - 1))])
 	if heat(g) > 0:
 		out.append("His bill still hangs at the gates, a little more faded every spring. Nobody has taken it down, and nobody has collected.")
 	elif int(g.served) > 0:
-		out.append("He stood %d days in a circle scratched on the ground, and stepped out of it when he was told he might. People remember that he stayed in." % int(g.served))
+		out.append("He stood %d day%s in a circle scratched on the ground, and stepped out of it when he was told he might. People remember that he stayed in." % [int(g.served), "" if int(g.served) == 1 else "s"])
 	return out
 
 # ---------------------------------------------------------------- what stands where somebody stood

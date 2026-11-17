@@ -145,8 +145,17 @@ func _unhandled_input(ev: InputEvent) -> void:
 		create.type_key(ev)
 		return
 	match ev.keycode:
-		KEY_ENTER, KEY_KP_ENTER, KEY_Z, KEY_SPACE:
+		KEY_ENTER, KEY_KP_ENTER, KEY_Z:
 			press("confirm")
+		KEY_SPACE:
+			# (the Unpicked Road release: in the land, with nothing in front of him to speak to or pick up, Space
+			# is a jump; everywhere else it is Enter, as it was)
+			if top_name() == "world" and world.using.is_empty() and world.ambush_t < 0.0 and world.face_entity() == null and not world.fan_near():
+				press("jump")
+			else:
+				press("confirm")
+		KEY_J:
+			press("jump")
 		KEY_ESCAPE, KEY_X:
 			press("cancel")
 		KEY_Q:
@@ -207,6 +216,8 @@ func press(act: String) -> void:
 			world.qi_wave()
 		elif act == "glide":
 			world.toggle_glide()
+		elif act == "jump":
+			world.jump()
 		elif act == "work":
 			world.work()
 		elif act == "talk":
@@ -556,7 +567,17 @@ func interact(e: Dictionary) -> void:
 		"npc":
 			talk_npc(e)
 		"folk":
+			# (the Unpicked Road release, trifles.gd: something in his sleeve is theirs; or he has something a
+			# child would like)
+			if Game.prologue == "" and not Game.pocket.is_empty() and offer_theirs(e):
+				return
 			talk_folk(e)
+		"trifle":
+			offer_trifle(e.t)
+		"trifle_home":
+			for ln in Trifles.put_back(Game, str(e.id)):
+				Game.toast(str(ln))
+			world._folk_react("back", world.wpos(e.pos), 8.0)
 		"enemy":
 			# realm suppression in the world (Part XII): a pack two realms below Lin Feng will not fight him
 			if Game.scatters(e.group):
@@ -710,6 +731,90 @@ func _folk_ctx(e: Dictionary, fp: Dictionary) -> Dictionary:
 	return ctx
 
 ## The Living Land release (folk.gd): a word with one of the people of the towns.
+## The Unpicked Road release (trifles.gd): a small thing lies in front of him.  "Leave it" is the first
+## answer; what else there is depends on whose it is.  Whoever sees it done answers it (manners.gd).
+const TRIFLE_ASK := "At his feet: "
+func offer_trifle(tf: Dictionary) -> void:
+	var kind := str(tf.kind)
+	var k: Dictionary = Trifles.KINDS[kind]
+	var cls := str(tf.cls)
+	var seen := Manners.watchers(Game, world.wd, tf.tile)
+	var opts: Array = [{"id": "leave", "label": "Leave it"}]
+	var why := Trifles.blocked(Game, tf)
+	match cls:
+		"ware":
+			var n := Trifles.price(Game, tf)
+			opts.append({"id": "buy", "label": "Buy it (%d spirit stones)" % n, "enabled": why == "" and Game.stones >= n, "desc": "%s's. %s" % [str(tf.who), why]})
+			opts.append({"id": "pocket", "label": "Pocket it", "enabled": why == "", "desc": "It is not paid for. %s" % ("Somebody is looking." if not seen.is_empty() else "Nobody is looking.")})
+		"keep", "altar":
+			opts.append({"id": "pocket", "label": "Take it", "enabled": why == "", "desc": ("It is %s's." % str(tf.who) if cls == "keep" else "It was laid there for somebody who is not here.") + " " + ("Somebody is looking." if not seen.is_empty() else "Nobody is looking.")})
+		_:
+			opts.append({"id": "take", "label": "Pick it up", "enabled": why == "", "desc": why if why != "" else ("Somebody dropped it. It could be carried to their door." if cls == "lost" else "It is nobody's.")})
+	if str(k.get("use", "")) == "play":
+		opts.append({"id": "play", "label": "Set it going", "desc": "And leave it where it lies."})
+	var title := "%s%s%s" % [TRIFLE_ASK, Trifles.art(kind), ", %s's" % str(tf.who) if cls in Trifles.OWNED and str(tf.who) != "" else ""]
+	choose(title, opts, func(id: String):
+		if id == "" or id == "leave":
+			return
+		if id == "play":
+			world.start_gesture("wave")
+			Game.toast(str(Trifles.USES.play[int(Game.picked + Game.jumps) % 2]))
+			world._folk_react("play", world.wpos(tf.tile), 8.0)
+			return
+		var r := Trifles.take(Game, world.wd, tf, id, seen)
+		for ln in r.lines:
+			Game.toast(str(ln))
+		if not bool(r.ok):
+			return
+		world.start_gesture("offer")
+		var re: Dictionary = r.react
+		if id == "pocket" and not seen.is_empty():
+			# seen: it is said to his face, and he may still think better of it
+			say([[str(re.who), str(re.line), str(re.clip)]], func():
+				var o2: Array = [{"id": "back", "label": "Put it back"}]
+				if cls == "ware":
+					o2.append({"id": "pay", "label": "Pay for it (%d spirit stones)" % Trifles.price(Game, tf), "enabled": Game.stones >= Trifles.price(Game, tf)})
+				o2.append({"id": "walk", "label": "Walk off with it", "desc": "It will be answered for at the gate."})
+				choose("%s is watching." % str(re.who), o2, func(id2: String):
+					if id2 == "pay":
+						for ln2 in Trifles.pay(Game, str(tf.id)):
+							Game.toast(str(ln2))
+					elif id2 == "walk":
+						Trifles.charge(Game, tf)
+					else:
+						for ln3 in Trifles.put_back(Game, str(tf.id)):
+							Game.toast(str(ln3))
+						world._folk_react("back", world.wpos(tf.tile), 8.0)
+				, false))
+		elif not re.is_empty():
+			world.folk_say(str(seen[0].id) if id != "buy" else str(tf.owner), str(re.line), str(re.clip))
+		Feats.poll(Game)
+	)
+
+## Something in his sleeve is this person's own (it is given back); or it is a child, and there is
+## something in his sleeve a child would like ("Not today" first).  Returns whether that was all.
+func offer_theirs(e: Dictionary) -> bool:
+	var fp: Dictionary = e.p
+	var th := Trifles.theirs(Game, str(fp.id))
+	if not th.is_empty():
+		var lines: Array = []
+		for q in th:
+			lines.append_array(Trifles.restore(Game, str(q.id)).lines)
+		world.folk_talking = str(fp.id)
+		say(lines, func(): world.folk_talking = "")
+		return true
+	var tr := Trifles.treat(Game)
+	if bool(fp.get("kid", false)) and not tr.is_empty() and not bot_active:
+		choose("%s is looking at your sleeve." % str(fp.n), [{"id": "later", "label": "Not today"}, {"id": "give", "label": "Hold out the %s" % str(Trifles.KINDS[str(tr.kind)].n)}], func(id: String):
+			if id != "give":
+				talk_folk(e)
+				return
+			Trifles.give(Game, str(tr.id))
+			world.folk_talking = str(fp.id)
+			say([[str(fp.n), str(Trifles.TREATS[(int(fp.seed) + int(Game.treats)) % Trifles.TREATS.size()]).replace("{thing}", str(Trifles.KINDS[str(tr.kind)].n)), "laugh"]], func(): world.folk_talking = ""))
+		return true
+	return false
+
 func talk_folk(e: Dictionary) -> void:
 	var fp: Dictionary = e.p
 	var lines := [[str(fp.n), Folk.line(fp, Game)]]
@@ -2424,7 +2529,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

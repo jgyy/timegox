@@ -297,7 +297,7 @@ static func _open(grid: PackedByteArray, W: int, H: int, pk: Dictionary, reach: 
 ## Data.AREAS like everybody else, with `"late": true, "peak": k` (the region's k-th highest peak) and
 ## `"stand": "top" | "flank" | "foot"`.  The very top tile is left for whoever climbs: a lord stands
 ## a step north of it, people beside him, things to find on the rock below.
-static func world(grid: PackedByteArray, W: int, peaks: Array, ents: Array, layer: String, ids: Array) -> void:
+static func world(grid: PackedByteArray, W: int, peaks: Array, ents: Array, layer: String, ids: Array, after: bool = false) -> void:
 	var used := {}
 	for e0 in ents:
 		if e0.has("pos"):
@@ -313,6 +313,11 @@ static func world(grid: PackedByteArray, W: int, peaks: Array, ents: Array, laye
 		for kind in ["npcs", "bosses", "pickups", "props"]:
 			for d in spec.get(kind, []):
 				if not d.has("peak") or mine.is_empty():
+					continue
+				# (the Unpicked Road release: what a later chapter writes on a height with `"after": true` is stood
+				# in a second pass, after the late bands and the marks: somebody at the foot of a peak is outside
+				# its rock, and a band or a mark of an older release drawn after them moved for them)
+				if bool(d.get("after", false)) != after:
 					continue
 				var pk2: Dictionary = mine[mini(int(d.peak), mine.size() - 1)]
 				var at := _stand(grid, W, pk2, str(d.get("stand", "top")), str(d.id), used)

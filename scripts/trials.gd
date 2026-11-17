@@ -70,6 +70,8 @@ const KINDS := {
 	# the Ordered House release: the Way he walks (creed.gd), and the houses he has put to rights (fitting.gd)
 	"way": {"n": "By the Way he walks", "col": Color("f0d890"), "what": "where you stand between the Righteous Path and the Demonic, the precepts and the open road"},
 	"house": {"n": "By the ordered house", "col": Color("c8a878"), "what": "the houses of the land you have put to rights"},
+	# the Unpicked Road release (trifles.gd)
+	"found": {"n": "By what was carried home", "col": Color("d8c070"), "what": "the lost things you have carried to whose they were"},
 	# the Open Net release: a name no gate has anything against (crime.gd, taboo.gd), and a wild that still stands (wilds.gd)
 	"clean": {"n": "By a clean name", "col": Color("e8f0e8"), "what": "nobody dead by your hand, no bill at any gate, and the forbidden shelf never opened"},
 	"wild": {"n": "By the standing wild", "col": Color("9ac878"), "what": "no country you have hunted in brought lower than thinned"},
@@ -1293,7 +1295,7 @@ const TRIALS := {
 		"paths": [
 			{"id": "relic", "kind": "relic", "n": "The powder that lets the knife in", "needs": [["item", "datura_flower", 5]], "boon": {"foe_hp": 0.7, "foe_atk": 0.85},
 				"desc": "Five datura flowers from the heights of the vale. Boiled with hemp and drunk with the wine of the north, they make the sleep in which a needle can go where it likes. Bring the powder, and Hua Tuo only needs him to hold still.",
-				"line": "Lin Feng sets down the bowl of datura and hemp. The duke looks at it for a long time. \"I am not ill,\" he says, with less conviction than he has said it in two thousand years."},
+				"line": "Lin Feng sets down the bowl of datura and hemp. The duke looks at it for a long time. \"I am not ill,\" he says, with less conviction than he has said it in all his centuries."},
 			{"id": "hearth", "kind": "hearth", "n": "Five hearths who know what illness is", "needs": [["hearths", 5]], "boon": {"foe_hp": 0.8, "taken": 0.85},
 				"desc": "A guest at five hearths of the land. Every one of them has a grandmother who said it was nothing until it was something. Go down with the smell of five kitchens on you, and he will not be able to tell himself he is the only one.",
 				"line": "Lin Feng names five hearths, and in each of them somebody who said they were not ill. The duke's hands come off his knees."},
@@ -1553,7 +1555,7 @@ const TRIALS := {
 				"line": "Lin Feng lays four worn stones up the bare rise. The short way comes down as far as the highest, and stops. It has met something that cannot be skipped: it has already been gone through."},
 			{"id": "folk", "kind": "folk", "n": "A stone carried down to her", "needs": [["step", "s_p33_stone"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
 				"desc": "You cut the green rock and carried four loads of it to the stream on your own back, and she chose one. It goes up without carrying anything. Tell it what a load weighs, a pace at a time.",
-				"line": "\"Four loads,\" says Lin Feng, \"and she sent back three.\" The short way falters on its own steepness. It had not known that anybody went down in order to come up."},
+				"line": "\"Four loads,\" says Lin Feng, \"and she set three by.\" The short way falters on its own steepness. It had not known that anybody went down in order to come up."},
 			{"id": "wild", "kind": "wild", "n": "Somebody the orchard is not afraid of", "needs": [["wild"]], "boon": {"foe_hp": 0.75, "taken": 0.85},
 				"desc": "No country you have hunted in stands worse than thinned. The peach trees turn their labels to the wall against whoever takes before the time. They will turn them round for you.",
 				"line": "Along the terraces the bronze labels turn, one by one, to face Lin Feng. The short way looks down at three thousand years written out plainly, tree by tree, and loses its footing."},
@@ -1592,6 +1594,55 @@ const TRIALS := {
 			{"id": "might", "kind": "might", "n": "Do not stand still", "needs": [["lv", 113], ["temper", 9]], "boon": {},
 				"desc": "Late Parted and Whole and a sword tempered nine times. It will not miss you. It has never missed, and it has not noticed that everything it ever shot at was standing still.",
 				"line": "Lin Feng draws, and does not stand still. The gift nocks an arrow to its unstrung bow with perfect grace, and waits for the applause."},
+		]},
+	# ---- Part XXXIV (the Unpicked Road release): the find, the dusk and the bell
+	"the_find": {"might": [4.9, 1.5],
+		"why": "It is everything anybody ever picked up thinking it was nobody's, and it has no name on it to strike at. Hit it and a few coins fly off and are picked up again by the next comer. What it cannot answer is the question a weaver asked her husband: whose is it?",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four quarters of one cake", "needs": [["item", "weed_gold", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four quarters of the cake Yue Yangzi threw away. Fit them together in front of it, mint-mark uppermost. It says it is nobody's. Here is the part of it that began it all, with a name stamped in.",
+				"line": "Lin Feng fits four quarters of gold together and turns the mark to the light. The find goes quiet all through. It has been read."},
+			{"id": "found", "kind": "found", "n": "Three doors knocked at", "needs": [["restored", 3]], "boon": {"foe_hp": 0.75, "foe_atk": 0.82},
+				"desc": "Three things dropped in the roads of the land, carried to whose they were. It has never seen that done. Everything in it was picked up and went into a sleeve. Show it the other road a thing can take.",
+				"line": "\"A shoe, a key and a string of cash,\" says Lin Feng, \"and I knocked.\" Something deep in the heap turns over, like a sleeper who has heard his own name."},
+			{"id": "clean", "kind": "clean", "n": "Nothing in his sleeve but his arm", "needs": [["clean"]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Nobody dead by your hand, no price on your head, the forbidden shelf never opened. It grows by what clings to whoever comes near it. Come near it with nothing clinging.",
+				"line": "The find reaches for Lin Feng as it reaches for everybody, feeling for the one thing he would rather not be asked about. It finds a sleeve, and an arm in it."},
+			{"id": "might", "kind": "might", "n": "Scatter it down the hill", "needs": [["lv", 114], ["temper", 9]], "boon": {},
+				"desc": "Early Practised Hand and a sword tempered nine times. It is a hill of small things. A hill can be cut down; it will only take as long as picking each of them up would have.",
+				"line": "Lin Feng draws. The find does not move. It has been walked up to by ten thousand people with their hands out, and has never yet been the one to give."},
+		]},
+	"the_dusk": {"might": [5.0, 1.5],
+		"why": "It is an hour, and an hour has no body: a blade goes through it and comes out into the same hour. It holds because everybody in it is sure of being alone. What undoes it is being counted. Four were enough for Yang Zhen.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four who know", "needs": [["item", "know_slip", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four slips in a governor's hand: Heaven, the spirits, I, you. Read them out to it in order. It has heard nobody will know ten thousand times and has never once heard the count.",
+				"line": "Lin Feng lays down four slips and reads them, one at a time. At the fourth the dusk has somebody in it, and knows it, and thins."},
+			{"id": "folk", "kind": "folk", "n": "What the gate saw", "needs": [["step", "s_p34_watch"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "You asked two guards of Shazhou what comes in at dusk, and one of them told you. It believes the gate is blind. Tell it that the gate has been counting sleeves since last night.",
+				"line": "\"A sleeve with gold in it swings differently,\" says Lin Feng. \"The guard at the west gate told me.\" The dusk draws its hands in, every one of them, like a man caught."},
+			{"id": "clean", "kind": "clean", "n": "The same by lamplight", "needs": [["clean"]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Nobody dead by your hand, no price on your head, the forbidden shelf never opened. It is where people go to be somebody else for an hour. Walk into it as what you are at noon.",
+				"line": "The dusk closes over Lin Feng and waits for him to change, as everybody does. He goes on being the sweeper. It has nothing in it to hold a man who is the same in the dark."},
+			{"id": "might", "kind": "might", "n": "Light a lamp in it by force", "needs": [["lv", 115], ["temper", 9]], "boon": {},
+				"desc": "Middle Practised Hand and a sword tempered nine times. An hour cannot be cut, but a blade throws light, and there is a great deal of blade. It will be a long evening.",
+				"line": "Lin Feng draws, and the edge shows blue. The dusk leans away from it a little. It has always preferred the lamps not lit."},
+		]},
+	"the_bell": {"might": [5.1, 1.5],
+		"why": "It rings to drown its own answer, and with its ears stopped it cannot tell that a blow has landed: every stroke only rings it louder. What it has never done is hear itself out. A bell that hears the whole of its note stops, as anybody would.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four shards, laid together", "needs": [["item", "fan_bronze", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four pieces of the bell of the house of Fan. Laid lip to lip they do not hum; they wait. Strike them once, softly, where it can feel the note come up through the ground.",
+				"line": "Lin Feng lays four shards together and taps them with a knuckle. The note goes up through the hill. The bell feels it in its feet, where it has no hands to stop it."},
+			{"id": "found", "kind": "found", "n": "Six doors knocked at", "needs": [["restored", 6]], "boon": {"foe_hp": 0.75, "foe_atk": 0.82},
+				"desc": "Six things dropped in the roads, carried to whose they were: three at Yanggu and three at Tushan. A thing can be taken quietly or taken home. It has only ever heard of the first.",
+				"line": "\"Six doors,\" says Lin Feng, \"and I knocked at each.\" The bell rings on. But between two strokes, for the first time, there is a silence the length of a knock."},
+			{"id": "leap", "kind": "folk", "n": "Not one foot on a voice", "needs": [["step", "s_p34_cracks"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "You went down the lane as the children of Tushan go, over the chalk of every bell and never on it. This one was broken by somebody who did not know what a bell is. Show it somebody who was told.",
+				"line": "Lin Feng crosses the last of the broken bronze in one leap and lands without a sound. The bell misses a stroke. Nobody has ever stepped round it before."},
+			{"id": "might", "kind": "might", "n": "Ring it until it cracks", "needs": [["lv", 116], ["temper", 9]], "boon": {},
+				"desc": "Late Practised Hand and a sword tempered nine times. A mallet broke it once. It will take a great many more blows now, and every one of them will be heard in the next province.",
+				"line": "Lin Feng draws. The bell does not hear the blade come out. It has not heard anything for a long time, and it rings harder, to be sure."},
 		]},
 	# ---- Part XXIX (the Ordered House release): the fire a guest foretold, the wall that did not change, the gold that
 	# waits to be stooped for, and the friend who went to the gate
@@ -1961,6 +2012,9 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"fitted":
 			# houses put to rights (fitting.gd)
 			return g.fitted.size() >= int(n[1])
+		"restored":
+			# the Unpicked Road release: lost things carried to whose they were (trifles.gd)
+			return int(g.restored) >= int(n[1])
 		"step":
 			# the Open Net release: something of the story already done (["step", id])
 			return g.done(str(n[1]))
@@ -2062,6 +2116,8 @@ static func need_text(n: Array, g) -> String:
 		"creed":
 			var ax: Dictionary = Creed.AXIS[str(n[1])]
 			return "%s by %d or more (now %+d: Esc > The Way says what it was weighed by)" % [str(ax.pos if int(n[2]) > 0 else ax.neg), absi(int(n[2])), Creed.value(g, str(n[1])) * (1 if int(n[2]) > 0 else -1)]
+		"restored":
+			return "%d lost things carried to whose they were (now %d: what is dropped in a town's roads is new every morning)" % [int(n[1]), int(g.restored)]
 		"fitted":
 			return "%d houses put to rights (now %d: whoever lives in a house says what is wrong with it)" % [int(n[1]), g.fitted.size()]
 		"step":

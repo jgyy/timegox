@@ -2941,6 +2941,57 @@ def clip_alight(t):
     return p
 
 
+# ---------------------------------------------------------------- the Unpicked Road release: a leap
+# (scripts/world.gd `jump`: Space with nothing in front of him; the game lifts the figure, the clip does the body)
+
+JUMP_T = 0.9
+JUMP_OFF = 0.2      # the fraction of the clip at which the feet leave the ground
+JUMP_LAND = 0.74    # and the fraction at which they come back to it
+
+
+def clip_jump(t):
+    """A leap from standing: he sinks on both knees with the arms drawn back, drives up through the
+    ankles with the arms thrown forward and high, tucks the knees under him at the top with the
+    robe flying, reaches for the ground with his toes, and takes the landing in the knees."""
+    k = min(1.0, max(0.0, t / JUMP_T))
+    p = clip_idle(0.0)
+    p["root"] = ((0, 0, 0), (0, 0, 0))
+    if k < JUMP_OFF:
+        # the crouch: slow down, quick at the bottom
+        e = math.sin(k / JUMP_OFF * math.pi / 2) ** 2
+        crouch, tuck, arms, lean = e, 0.0, -0.75 * e, 0.34 * e
+    elif k < JUMP_LAND:
+        a = (k - JUMP_OFF) / (JUMP_LAND - JUMP_OFF)
+        push = max(0.0, 1.0 - a / 0.16)                     # the legs straighten in the first sixth
+        tuck = math.sin(min(1.0, max(0.0, (a - 0.1) / 0.8)) * math.pi) ** 1.3
+        crouch = push * 0.6
+        arms = -0.75 * push + 1.25 * (1.0 - push) * (1.0 - 0.45 * a)
+        lean = 0.34 * push - 0.12 * math.sin(a * math.pi)
+    else:
+        a = (k - JUMP_LAND) / (1.0 - JUMP_LAND)
+        e = math.sin(min(1.0, a / 0.35) * math.pi / 2) if a < 0.35 else 0.5 + 0.5 * math.cos((a - 0.35) / 0.65 * math.pi)
+        crouch, tuck, arms, lean = 0.72 * e, 0.0, 0.5 * (1.0 - a) - 0.2 * e, 0.3 * e
+    drop = -0.3 * crouch
+    p["hips"] = ((lean, 0.0, 0.0), (0.0, drop, -0.04 * crouch))
+    for sd, s in (("L", 1), ("R", -1)):
+        # (the left knee comes a little higher in the air: nobody tucks evenly)
+        tk = tuck * (1.0 if sd == "L" else 0.82)
+        p["thigh." + sd] = ((-1.05 * crouch - 1.25 * tk, 0.0, 0.1 * crouch * s), (0, 0, 0))
+        p["shin." + sd] = ((1.6 * crouch + 1.7 * tk, 0.0, 0.0), (0, 0, 0))
+        p["foot." + sd] = ((-0.5 * crouch + 0.55 * tk + (0.5 if JUMP_OFF <= k < JUMP_LAND else 0.0) * (1.0 - tk), 0.0, 0.0), (0, 0, 0))
+        p["upper_arm." + sd] = ((-1.1 * arms, 0.0, (0.16 + 0.3 * max(0.0, arms) + 0.25 * crouch) * s), (0, 0, 0))
+        p["forearm." + sd] = ((-0.3 - 0.4 * abs(arms), 0.0, 0.0), (0, 0, 0))
+        _add(p, "sleeve." + sd, 0.6 * tuck + 0.3 * crouch, 0.0, 0.0)
+    _add(p, "spine", 0.14 * crouch - 0.1 * tuck, 0.0, 0.0)
+    p["head"] = ((0.16 * crouch - 0.16 * tuck, 0.0, 0.0), (0, 0, 0))
+    p["cape"] = ((0.3 * crouch + 0.8 * tuck, 0, 0), (0, 0, 0))
+    p["hair_tail"] = ((0.3 * crouch + 0.6 * tuck, 0, 0), (0, 0, 0))
+    p["robe_b"] = ((0.3 * crouch + 0.6 * tuck, 0, 0), (0, 0, 0))
+    _hands(p, 0.5, 0.5)
+    return p
+
+
+
 # ---------------------------------------------------------------- the Heavy Road release: the work of the hands
 # (scripts/toil.gd: fell, angle, quarry, reap) and walking under a load (scripts/load.gd: haul, haul_idle)
 
@@ -3509,6 +3560,8 @@ INTERACT = {
     "arrange": (ARRANGE_T, clip_arrange),
     "wring": (WRING_T, clip_wring),
     "sew": (SEW_T, clip_sew),
+    # the Unpicked Road release: a leap (scripts/world.gd `jump`)
+    "jump": (JUMP_T, clip_jump),
 }
 INTERACT = {nm: (secs, _stowing(fn)) for nm, (secs, fn) in INTERACT.items()}
 # the sword form on the stage is the one thing done with the blade out
