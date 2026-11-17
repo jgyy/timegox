@@ -1143,6 +1143,18 @@ const ERRANDS := {
 			"Whoever is up first lights the fire. That is all of it. Some years it was me and some it was not, and there was a winter neither of us would, and we sat in the cold being right. Then somebody got up. I forget who. That is the point of it.",
 			"Do not tell the old man, but it is mostly not minding. The snoring. The way the chopsticks are put down. You would think love was a great wind. It is more like a roof: you only notice it the day it is not there.",
 			"We did not speak for the whole of one harvest. I cannot tell you now what it was about. The rice came in all the same, the two of us at either end of the field, and at the end of it we were standing next to each other. That is what it is made of. The field."]},
+	# Part XXXIII (the Iron Pestle release): what a hand knows, asked of the pedlars of the road; and how long before the
+	# hammer is one's own, asked of the smiths of Tushan
+	"s_p33_hands": {"ask": "An old man pours oil through the hole of a coin and says there is nothing in it but a practised hand. You have walked the roads under a pack for years. What can your hands do that nobody ever showed them?", "price": 0, "toast": "%s has said what a hand knows",
+		"lines": ["Do? Nothing. I tie a load. ...Well. I tie it in the dark, since you ask, and it rides forty li without shifting, and I could not tell you one knot of it. My fingers know, and they have never told me. Is that the sort of thing?",
+			"False silver. I know it in the palm before I have looked. Lighter? No, not lighter. It sits wrong. Twenty years of being cheated taught me that, a coin at a time. I should call it an expensive schooling.",
+			"I can tell what a woman will buy by how she stands at her door, before she speaks. I thought everybody could, until my nephew came on the road with me and stood there like a post. So no. It seems that it is not everybody.",
+			"My feet, more than my hands. I have not looked at this road in ten years, and they know every stone of it. I fell a great deal at first; I remember that. You do not get the one without the other. Nobody sells it by the jin, or I should stock it."]},
+	"s_p33_smiths": {"ask": "A boy at a school has asked how long a thing takes before it is one's own. You have stood at an anvil most of your life. How many years was it, before the hammer was yours?", "price": 0, "town": "tushan", "toast": "%s has said how long it was",
+		"lines": ["Seven. I can tell you the day. I struck, and did not think about striking, and the iron went where I was looking. I stood there like a fool. My master did not even turn round. He said: there. Now you may begin.",
+			"Eleven years, and I was not slow. The first three you learn what the hammer weighs. The next three, what the iron wants. After that it is only the same blow, until one morning it is yours. Nobody can give you the morning.",
+			"I will let you know. No, I am not being modest; look at that weld. Thirty-one years at this fire, and last week I burned a bar like a prentice. It is mine most days. It is never mine for good. Tell the boy that, if he can stand to hear it.",
+			"Whose hammer? This was my mother's and her father's. Feel the haft: that hollow is three thumbs deep, and only the top of it is mine. I do not know that it ever becomes yours. I think you become its. Nine years, for that."]},
 	# Part XXVIII (the Answering Land release): who ties the grass, asked of the hunters; and the hollow stems, of the woodcutters
 	"s_p28_hunters": {"ask": "You are out in the valley before light. Have you seen who walks the general's field at night with his hands in the grass?", "price": 0, "toast": "%s has seen the old man in the field",
 		"lines": ["An old one. Bent. He comes with the dew and goes with it, and he bows to the general's tent before he starts. I took him for a herb-gatherer the first night. Herb-gatherers do not tie what they find.",
@@ -1464,6 +1476,8 @@ const POSTS := {
 	"zheng_buyer": ["count|peer|trace", "", "doze"], "yan_ying": ["gaze|read|write", "", "meditate"],
 	# Part XXXII (the Broken Mirror release)
 	"yue_lao": ["read|write|count", "", "stargaze"], "weisheng": ["gaze|touch|count", "", "doze"], "meng_jiang": ["sew|gaze|pray", "", "doze"], "xu_deyan": ["gaze|read|write", "", "doze"], "lechang": ["gaze|comb|write", "", "doze"],
+	# Part XXXIII (the Iron Pestle release)
+	"granny_wu": ["trace|gather|gaze", "", "doze"], "li_bai": ["read|write|count", "", "read"], "kuang_heng": ["read|peer|trace", "", "read"], "oil_seller": ["count|gaze|stretch", "", "doze"], "chen_yaozi": ["stretch|point|gaze", "", "doze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }
 

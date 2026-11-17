@@ -127,9 +127,32 @@ static func carried(g, id: String) -> int:
 ## Everything on his back in the hand, before any pouch: jin.
 static func gross(g) -> float:
 	var w := 0.0
+	var hv := _bulk()
+	var at_step := int(g.step)
 	for id in g.inv:
-		w += weight_of(str(id)) * float(carried(g, str(id)))
+		# (a journey's bag holds hundreds of kinds of thing and a handful of them weigh anything: his pace
+		# is asked several times a step, and weighing every pill and keepsake each time was a third of a frame)
+		var b = hv.get(id)
+		if b == null:
+			continue
+		# (`carried`: what a finished search asked for has been handed over)
+		var n := int(g.inv[id])
+		if n <= 0 or (int(b[1]) >= 0 and at_step > int(b[1])):
+			continue
+		w += float(b[0]) * float(n)
 	return w
+
+static var _bulky := {}
+
+## Everything that has any weight at all: id -> [jin, the step that asks for it to be found (-1: none)].
+static func _bulk() -> Dictionary:
+	if _bulky.is_empty():
+		_asked_at("")
+		for id in GOODS.keys() + WARES.keys() + Needs.FOOD.keys() + _asked.keys():
+			if weight_of(str(id)) > 0.0:
+				_bulky[str(id)] = [weight_of(str(id)), _asked_at(str(id))]
+		_bulky["#"] = [0.0, -1]
+	return _bulky
 
 ## What his back feels of it: nothing with the ring on, the first three hundred jin a tenth with the pouch.
 static func weight(g) -> float:

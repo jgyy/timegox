@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 111
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole"]
+const MAX_LEVEL := 114
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -95,6 +95,7 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Left Three Sides Open", "note": "A fowler hung his nets on four sides and prayed for everything under heaven. A lord took three of them down. A judge heard wrongly, and bound his own hands. A man who wrote the law was turned from a door by it. You could empty a country now, or a street. Nothing in the land could stop you. That is why it has to be you who does."},
 	{"life": 0, "title": "Under Whose Lintel Everybody Walks", "note": "A giant was cut down for coming late and nobody asked what kept him. Another ran after the sun and dropped a forest. A people was made small and never told how small. A man trusted a measure over his own foot. A door is cut for whoever comes. You are the measure of nothing now, and that is the use of you."},
 	{"life": 0, "title": "In One Piece, with the Joins Showing", "note": "Two graves were dug apart and the roots went under the ditch. A man kept an hour and forgot who it was for. A wall was reckoned in yards, and fell to a name. A mirror came back that no longer fitted. What is parted is not put back as it was. You are whole, and it is not the same as never having been broken."},
+	{"life": 0, "title": "Whose Hand Has Done It Before", "note": "An old woman ground a bar of iron she had no use for, and boys went back to their books. A labourer read a great house's library through a hole in its wall. A pedlar poured oil through a coin, and a duke remembered his first thousand arrows. You have looked for the quick way in every country there is. It was the steps."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -804,7 +805,7 @@ const ENEMIES := {
 	"report_smoke": {"n": "Smoke of Announcements", "elem": "fire", "weak": "water", "col": Color("b8a890"), "shape": "wraith", "pal": {"sec": Color("6a5a4a"), "acc": Color("ffb060")}},
 	"bends_serpent": {"n": "Serpent of the Eighteen Bends", "elem": "wood", "weak": "fire", "col": Color("6a7a5a"), "shape": "serpent", "pal": {"sec": Color("3a4630"), "acc": Color("d8c080")}},
 	"shanxiao": {"n": "Shanxiao, the One-Legged Thief of Voices", "elem": "earth", "weak": "fire", "col": Color("5a4a3a"), "shape": "ape", "boss": true, "pal": {"sec": Color("2a2018"), "acc": Color("e8e0d0"), "mark": Color("c83a2a")}},
-	"fei_lian": {"n": "Fei Lian, Earl of the Wind", "elem": "thunder", "weak": "earth", "col": Color("d8e4ec"), "shape": "qilin", "boss": true, "pal": {"sec": Color("8aa0b4"), "acc": Color("3a4a5a"), "mark": Color("f0d080")}},
+	"fei_lian": {"n": "Feilian, Earl of the Wind", "elem": "thunder", "weak": "earth", "col": Color("d8e4ec"), "shape": "qilin", "boss": true, "pal": {"sec": Color("8aa0b4"), "acc": Color("3a4a5a"), "mark": Color("f0d080")}},
 	"shan_gui": {"n": "The Mountain Spirit, Who Is Still Waiting", "elem": "wood", "weak": "fire", "col": Color("4a7a4a"), "shape": "person:shan_gui", "boss": true},
 	"dongyue": {"n": "The Lord of the Eastern Peak", "elem": "earth", "weak": "wood", "col": Color("8a8a96"), "shape": "person:dongyue", "boss": true},
 	# ---- Part XXIII: The Thundering Pots (the Thundering Pots release): what marches when the Yellow Bell is broken
@@ -984,6 +985,22 @@ const ENEMIES := {
 	"two_graves": {"n": "The Two Graves Kept Apart", "elem": "earth", "weak": "wood", "col": Color("5a5a4a"), "shape": "warden", "boss": true, "pal": {"sec": Color("2e2e26"), "acc": Color("c02828")}},
 	"the_flood": {"n": "The Water That Kept the Hour", "elem": "water", "weak": "earth", "col": Color("3a6a7a"), "shape": "serpent", "boss": true, "pal": {"sec": Color("1e3a44"), "acc": Color("d8e8e8")}},
 	"the_wall": {"n": "The Wall Counted in Men", "elem": "earth", "weak": "wood", "col": Color("6a665c"), "shape": "golem", "boss": true, "pal": {"sec": Color("3a3832"), "acc": Color("d8d0b8")}},
+	# ---- Part XXXIII: The Iron Pestle (the Iron Pestle release): the short way, and what it leaves undone
+	"green_peach": {"n": "Peach Picked Green", "elem": "wood", "weak": "fire", "col": Color("7aa860"), "shape": "blob", "pal": {"sec": Color("4a6a3a"), "acc": Color("e8a8a0")}},
+	"skipped_page": {"n": "Lesson Left at the Third Line", "elem": "thunder", "weak": "earth", "col": Color("e0d8c0"), "shape": "tome", "pal": {"sec": Color("8a8068"), "acc": Color("2a2a30")}},
+	"skipped_step": {"n": "Step Somebody Skipped", "elem": "earth", "weak": "wood", "col": Color("7a9a8a"), "shape": "serpent", "pal": {"sec": Color("3e5a4e"), "acc": Color("d8e8d8")}},
+	"stopped_hole": {"n": "Plaster over the Hole", "elem": "earth", "weak": "wood", "col": Color("d8d0c0"), "shape": "golem", "pal": {"sec": Color("8a8474"), "acc": Color("f8e8a0")}},
+	"idle_lamp": {"n": "Lamp Lit for Nobody", "elem": "fire", "weak": "water", "col": Color("f0c060"), "shape": "wisp", "bright": true, "pal": {"sec": Color("a86a28"), "acc": Color("fff4d0")}},
+	"uncut_book": {"n": "Book with Its Pages Uncut", "elem": "dark", "weak": "thunder", "col": Color("4a3a5a"), "shape": "tome", "pal": {"sec": Color("2a2034"), "acc": Color("d8c070")}},
+	"proud_arrow": {"n": "Arrow That Expects Applause", "elem": "thunder", "weak": "earth", "col": Color("c8c0b0"), "shape": "mantis", "pal": {"sec": Color("6a6458"), "acc": Color("c82828")}},
+	"spilt_oil": {"n": "Oil Spilt in a Hurry", "elem": "water", "weak": "earth", "col": Color("b08a30"), "shape": "blob", "pal": {"sec": Color("6a5018"), "acc": Color("f0e0a0")}},
+	"idle_clap": {"n": "Clapping of the Garden", "elem": "wood", "weak": "fire", "col": Color("d8c8d0"), "shape": "wraith", "pal": {"sec": Color("8a7a84"), "acc": Color("d8b860")}},
+	"third_watch": {"n": "Sleep at the Third Watch", "elem": "dark", "weak": "fire", "col": Color("3a4060"), "shape": "wraith", "pal": {"sec": Color("1e2238"), "acc": Color("a8b0d8")}},
+	"dry_lamp": {"n": "Lamp with No Oil in It", "elem": "earth", "weak": "wood", "col": Color("6a5a48"), "shape": "golem", "pal": {"sec": Color("3a3026"), "acc": Color("8ad880")}},
+	"melting_snow": {"n": "Snow Melting on the Page", "elem": "water", "weak": "earth", "col": Color("e0e8f0"), "shape": "blob", "bright": true, "pal": {"sec": Color("a0b0c8"), "acc": Color("ffffff")}},
+	"the_short_way": {"n": "The Stair with the Steps Left Out", "elem": "earth", "weak": "wood", "col": Color("6a8a7a"), "shape": "serpent", "boss": true, "pal": {"sec": Color("34483e"), "acc": Color("e8f0e0")}},
+	"the_shelf": {"n": "The Library Nobody Opened", "elem": "dark", "weak": "thunder", "col": Color("5a4630"), "shape": "tome", "boss": true, "pal": {"sec": Color("2e2418"), "acc": Color("d8b850")}},
+	"the_knack": {"n": "The Gift That Never Practised", "elem": "thunder", "weak": "earth", "col": Color("d8b850"), "shape": "warden", "boss": true, "pal": {"sec": Color("8a6a20"), "acc": Color("f8f0e0")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
 	"watch_spear": {"n": "Spearman of the Watch", "elem": "phys", "weak": "thunder", "col": Color("5a6a7a"), "shape": "humanoid", "pal": {"sec": Color("2e3640"), "acc": Color("c8a050")}},
@@ -1493,35 +1510,58 @@ const AREAS := {
 			{"to": "volcano", "pos": Vector2i(1, 28), "dest": Vector2i(88, 28), "open": ""},
 			{"to": "celestial", "pos": Vector2i(94, 28), "dest": Vector2i(4, 28), "open": "s_vd_serpent"},
 		],
-		"npcs": [{"id": "void_hermit", "n": "Hermit Wu Ji", "pos": Vector2i(10, 26), "col": Color("c0a0ff"), "vis": ["s_vd_intro", ""]}],
+		"npcs": [{"id": "void_hermit", "n": "Hermit Wu Ji", "pos": Vector2i(10, 26), "col": Color("c0a0ff"), "vis": ["s_vd_intro", ""]},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "kuang_heng", "n": "Kuang Heng", "pos": Vector2i.ZERO, "col": Color("8a7a5e"), "asset": "kuang_heng", "vis": ["s_p33_home", ""], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "rift_weaver", "pos": Vector2i(30, 14), "lv": 15, "req": 15},
 			{"id": "star_devourer", "pos": Vector2i(40, 30), "lv": 15, "req": 15},
 			{"id": "void_sentinel", "pos": Vector2i(52, 44), "lv": 16, "req": 16},
 			{"id": "chaos_serpent", "pos": Vector2i(84, 26), "lv": 16, "req": 16},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "the_shelf", "pos": Vector2i.ZERO, "lv": 113, "req": 112, "vis": ["s_p33_books", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		"pickups": [
 			{"id": "star1", "item": "star", "pos": Vector2i(24, 46)}, {"id": "star2", "item": "star", "pos": Vector2i(44, 12)},
 			{"id": "star3", "item": "star", "pos": Vector2i(66, 40)}, {"id": "star4", "item": "star", "pos": Vector2i(78, 12)},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "p33_slip1", "item": "copied_slip", "pos": Vector2i.ZERO, "vis": ["s_p33_lamps", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p33_slip2", "item": "copied_slip", "pos": Vector2i.ZERO, "vis": ["s_p33_lamps", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p33_slip3", "item": "copied_slip", "pos": Vector2i.ZERO, "vis": ["s_p33_lamps", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p33_slip4", "item": "copied_slip", "pos": Vector2i.ZERO, "vis": ["s_p33_lamps", ""], "late": true, "peak": 2, "stand": "flank"},
 		],
 		"pickup_vis": "s_vd_collect",
+		"warband5": {"pool": [["stopped_hole", 112, 112], ["idle_lamp", 112, 112], ["uncut_book", 112, 112]], "n": 14, "vis": "s_p33_wall", "late": true},
 	},
 	"celestial": {
 		"n": "Celestial Gate", "w": 98, "h": 58, "seed": 101, "theme": "celestial", "enemies": 20,
 		"pool": [["celestial_guard", 16, 17], ["thunder_qilin", 16, 17], ["light_wisp", 16, 17]],
 		"portals": [{"to": "void", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""}],
-		"npcs": [{"id": "gate_keeper", "n": "Gatekeeper Bai Ze", "pos": Vector2i(10, 26), "col": Color("fff0b0"), "vis": ["s_ce_intro", ""]}],
+		"npcs": [{"id": "gate_keeper", "n": "Gatekeeper Bai Ze", "pos": Vector2i(10, 26), "col": Color("fff0b0"), "vis": ["s_ce_intro", ""]},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "chen_yaozi", "n": "Chen Yaozi", "pos": Vector2i.ZERO, "col": Color("7a2a26"), "asset": "chen_yaozi", "vis": ["s_p33_home", ""], "late": true, "peak": 0, "stand": "foot"},
+			{"id": "oil_seller", "n": "The Old Oil Seller", "pos": Vector2i.ZERO, "col": Color("6a5238"), "asset": "oil_seller", "vis": ["s_p33_home", ""], "late": true, "peak": 1, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "heaven_general", "pos": Vector2i(32, 40), "lv": 16, "req": 16},
 			{"id": "lightning_magistrate", "pos": Vector2i(46, 28), "lv": 16, "req": 16},
 			{"id": "azure_qilin", "pos": Vector2i(58, 14), "lv": 17, "req": 17},
 			{"id": "heavenly_emperor", "pos": Vector2i(88, 28), "lv": 17, "req": 17},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "the_knack", "pos": Vector2i.ZERO, "lv": 114, "req": 113, "vis": ["s_p33_claps", ""], "late": true, "peak": 0, "stand": "top"},
 		],
 		"pickups": [
 			{"id": "sigil1", "item": "sigil", "pos": Vector2i(22, 12)}, {"id": "sigil2", "item": "sigil", "pos": Vector2i(40, 46)},
 			{"id": "sigil3", "item": "sigil", "pos": Vector2i(64, 40)}, {"id": "sigil4", "item": "sigil", "pos": Vector2i(76, 10)},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "p33_coin1", "item": "dry_coin", "pos": Vector2i.ZERO, "vis": ["s_p33_coin", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p33_coin2", "item": "dry_coin", "pos": Vector2i.ZERO, "vis": ["s_p33_coin", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p33_coin3", "item": "dry_coin", "pos": Vector2i.ZERO, "vis": ["s_p33_coin", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p33_coin4", "item": "dry_coin", "pos": Vector2i.ZERO, "vis": ["s_p33_coin", ""], "late": true, "peak": 2, "stand": "flank"},
 		],
 		"pickup_vis": "s_ce_collect",
+		"warband5": {"pool": [["proud_arrow", 113, 113], ["spilt_oil", 113, 113], ["idle_clap", 113, 113]], "n": 14, "vis": "s_p33_butts", "late": true},
 	},
 	"mirror": {
 		"n": "Mirror Lake of Echoes", "w": 92, "h": 56, "seed": 111, "theme": "mirror", "enemies": 18,
@@ -1638,7 +1678,10 @@ const AREAS := {
 		"n": "Origin of the Dao", "w": 98, "h": 58, "seed": 141, "theme": "origin", "enemies": 20,
 		"pool": [["maw_tendril", 22, 23], ["hollow_acolyte", 22, 23], ["dao_fragment", 22, 23]],
 		"portals": [{"to": "time", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""}],
-		"npcs": [{"id": "origin_keeper", "n": "Bai Ze, Keeper of the Origin", "pos": Vector2i(10, 26), "col": Color("fff0b0"), "vis": ["s_or_intro", ""]}],
+		"npcs": [{"id": "origin_keeper", "n": "Bai Ze, Keeper of the Origin", "pos": Vector2i(10, 26), "col": Color("fff0b0"), "vis": ["s_or_intro", ""]},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "li_bai", "n": "Li Bai", "pos": Vector2i.ZERO, "col": Color("5a7a9a"), "asset": "li_bai", "vis": ["s_p33_home", ""], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "maw_herald", "pos": Vector2i(32, 40), "lv": 22, "req": 22},
 			{"id": "hollow_dragon", "pos": Vector2i(46, 28), "lv": 23, "req": 23},
@@ -1648,8 +1691,14 @@ const AREAS := {
 		"pickups": [
 			{"id": "rune1", "item": "rune", "pos": Vector2i(22, 12)}, {"id": "rune2", "item": "rune", "pos": Vector2i(40, 46)},
 			{"id": "rune3", "item": "rune", "pos": Vector2i(64, 40)}, {"id": "rune4", "item": "rune", "pos": Vector2i(76, 10)},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "p33_fly1", "item": "firefly_bag", "pos": Vector2i.ZERO, "vis": ["s_p33_watch", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p33_fly2", "item": "firefly_bag", "pos": Vector2i.ZERO, "vis": ["s_p33_watch", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p33_fly3", "item": "firefly_bag", "pos": Vector2i.ZERO, "vis": ["s_p33_watch", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p33_fly4", "item": "firefly_bag", "pos": Vector2i.ZERO, "vis": ["s_p33_watch", ""], "late": true, "peak": 2, "stand": "flank"},
 		],
 		"pickup_vis": "s_or_collect",
+		"warband5": {"pool": [["third_watch", 113, 113], ["dry_lamp", 113, 113], ["melting_snow", 113, 113]], "n": 14, "vis": "s_p33_school", "late": true},
 	},
 	# ---- Part IV: The Unwritten Ledger
 	"cloudsea": {
@@ -2400,16 +2449,28 @@ const AREAS := {
 		"portals": [
 			{"to": "starpalace", "pos": Vector2i(1, 28), "dest": Vector2i(90, 28), "open": ""},
 		],
-		"npcs": [{"id": "dong_shuang", "n": "Dong Shuang, Maid of the Jasper Pool", "pos": Vector2i(10, 26), "col": Color("6ad0a0"), "vis": ["s_jp_intro", ""]}],
+		"npcs": [{"id": "dong_shuang", "n": "Dong Shuang, Maid of the Jasper Pool", "pos": Vector2i(10, 26), "col": Color("6ad0a0"), "vis": ["s_jp_intro", ""]},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "granny_wu", "n": "Old Dame Wu", "pos": Vector2i.ZERO, "col": Color("4a5a72"), "asset": "granny_wu", "vis": ["s_p33_home", ""], "late": true, "peak": 0, "stand": "foot"},
+		],
 		"bosses": [
 			{"id": "kaiming_beast", "pos": Vector2i(30, 40), "lv": 38, "req": 38},
 			{"id": "blue_birds", "pos": Vector2i(46, 16), "lv": 38, "req": 38},
 			{"id": "white_ape", "pos": Vector2i(60, 40), "lv": 38, "req": 38},
 			{"id": "xiwangmu", "pos": Vector2i(86, 28), "lv": 38, "req": 38},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "the_short_way", "pos": Vector2i.ZERO, "lv": 112, "req": 111, "vis": ["s_p33_stone", ""], "late": true, "peak": 0, "stand": "top"},
 		],
-		"pickups": [{"id": "kpeach1", "item": "kunlun_peach", "pos": Vector2i(22, 12)}, {"id": "kpeach2", "item": "kunlun_peach", "pos": Vector2i(40, 46)}, {"id": "kpeach3", "item": "kunlun_peach", "pos": Vector2i(64, 30)}, {"id": "kpeach4", "item": "kunlun_peach", "pos": Vector2i(76, 10)}],
+		"pickups": [{"id": "kpeach1", "item": "kunlun_peach", "pos": Vector2i(22, 12)}, {"id": "kpeach2", "item": "kunlun_peach", "pos": Vector2i(40, 46)}, {"id": "kpeach3", "item": "kunlun_peach", "pos": Vector2i(64, 30)}, {"id": "kpeach4", "item": "kunlun_peach", "pos": Vector2i(76, 10)},
+			# Part XXXIII (the Iron Pestle release)
+			{"id": "p33_whet1", "item": "worn_whetstone", "pos": Vector2i.ZERO, "vis": ["s_p33_peaches", ""], "late": true, "peak": 0, "stand": "flank"},
+			{"id": "p33_whet2", "item": "worn_whetstone", "pos": Vector2i.ZERO, "vis": ["s_p33_peaches", ""], "late": true, "peak": 1, "stand": "flank"},
+			{"id": "p33_whet3", "item": "worn_whetstone", "pos": Vector2i.ZERO, "vis": ["s_p33_peaches", ""], "late": true, "peak": 2, "stand": "foot"},
+			{"id": "p33_whet4", "item": "worn_whetstone", "pos": Vector2i.ZERO, "vis": ["s_p33_peaches", ""], "late": true, "peak": 2, "stand": "flank"},
+		],
 		"pickup_vis": "s_jp_collect",
 		"springs": [Vector2i(48, 30)],
+		"warband5": {"pool": [["green_peach", 111, 111], ["skipped_page", 111, 111], ["skipped_step", 111, 111]], "n": 14, "vis": "s_p33_stream", "late": true},
 	},
 	# ---- Part IX: The Tenth Sun
 	# The last market town on the pilgrims' road to the Valley of Sunrise, where it has been noon for nine days.
@@ -4346,7 +4407,7 @@ const STEPS := [
 		"t": "A wind with nowhere to go turns round and bites: still 20 of the stray gusts, kite-hawks and leaking wind-bags loose in Thunder Valley"},
 	{"id": "s_p22_knots", "kind": "collect", "item": "wind_knot", "n": 4, "area": "thunder", "t": "The Earl keeps his good winds knotted on cords, where the rock is steepest: gather 4 knotted cords of wind from the height"},
 	{"id": "s_p22_flight", "kind": "glide", "n": 14, "area": "thunder", "t": "One knot undone is a breeze: fly twenty-eight metres under the cloud-kite from the top of the height, and do not lean back"},
-	{"id": "s_p22_lian", "kind": "kill", "boss": "fei_lian", "area": "thunder", "t": "Nobody asked him whether they might: answer to Fei Lian, Earl of the Wind, for every kite in his sky"},
+	{"id": "s_p22_lian", "kind": "kill", "boss": "fei_lian", "area": "thunder", "t": "Nobody asked him whether they might: answer to Feilian, Earl of the Wind, for every kite in his sky"},
 	{"id": "s_p22_anglers", "kind": "folk", "role": "angler", "n": 3, "area": "karst",
 		"t": "Folded papers have been coming down the streams of the south country: ask 3 anglers, at the camps of the road, what they have seen float by", "stones": 35600},
 	{"id": "s_p22_han", "kind": "talk", "npc": "han_yu", "area": "karst", "t": "Somebody is writing to the whole world from the top of the Stone Forest: climb to him"},
@@ -4818,10 +4879,45 @@ const STEPS := [
 	{"id": "s_p32_slivers", "kind": "collect", "item": "bronze_sliver", "n": 4, "area": "guanghan", "t": "A mirror broken in haste does not break clean. Find 4 slivers of bronze on the heights, from between the two halves"},
 	{"id": "s_p32_seen", "kind": "marks", "n": 3, "new": true, "area": "guanghan", "t": "\"Nine years. What have you parted, cultivator, and what have you joined?\" Go and look at 3 more things your own answers left standing"},
 	{"id": "s_p32_cries", "kind": "hunt", "area": "guanghan", "n": 30, "of": ["market_cry", "mirror_shard"], "t": "The price was never meant to be paid. It was meant to be heard. Clear 30 more cries and the shards they were crying", "stones": 74200},
-	{"id": "s_p32_lady", "kind": "talk", "npc": "lechang", "area": "guanghan", "t": "Below the second height a woman in the silk of somebody else's house is waiting with the other half. Speak to Princess Lechang", "stones": 74400},
+	{"id": "s_p32_lady", "kind": "talk", "npc": "lechang", "area": "guanghan", "t": "Below the second height a woman in the silk of somebody else's house is waiting to hear of the half she sent. Speak to Princess Lechang", "stones": 74400},
 	{"id": "s_p32_mirror", "kind": "talk", "npc": "xu_deyan", "area": "guanghan", "t": "Both halves are on one cloth, and the edges no longer meet as they did. Go back to Xu Deyan, who has asked what is to be done with them", "stones": 74600},
 	{"id": "s_p32_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The pedlar has gone down the mountain with nothing to cry. Tell Elder Qing Xuan what a thing is worth once it has been broken", "stones": 75000},
 	{"id": "s_break37", "kind": "breakthrough", "to": 111, "t": "What was parted is not put back as it was; it is put back as it is: Parted and Whole"},
+	# ---- Part XXXIII: The Iron Pestle (the Iron Pestle release): honest labour and the short way; what a hand knows that was never given it.
+	{"id": "s_p33_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "A schoolboy climbed the nine hundred and ninety-nine steps to ask for the pill that makes a master by morning. Speak to Elder Qing Xuan", "stones": 75200},
+	{"id": "s_p33_stream", "kind": "talk", "npc": "granny_wu", "area": "jasper", "t": "Where the Jasper Pool runs out below the first height of Kunlun, an old woman is rubbing an iron bar on a stone. Find Old Dame Wu", "stones": 75400},
+	{"id": "s_p33_peaches", "kind": "hunt", "area": "jasper", "n": 34, "of": ["green_peach", "skipped_page", "skipped_step"], "t": "\"He laughed, and went up by the quick way.\" Clear 34 peaches picked green, lessons left at the third line and steps somebody skipped", "stones": 75600},
+	{"id": "s_p33_stones", "kind": "collect", "item": "worn_whetstone", "n": 4, "area": "jasper", "t": "She has worn through four whetstones with one bar of iron and thrown none of them away. Find 4 worn whetstones on the heights of Kunlun"},
+	{"id": "s_p33_orchard", "kind": "summit", "peak": "jasper", "k": 1, "area": "jasper", "t": "Climb the second height of Kunlun and look down into the Queen Mother's orchard, where a boy is waiting under a tree"},
+	{"id": "s_p33_corners", "kind": "hunt", "area": "jasper", "n": 30, "of": ["skipped_step", "skipped_page"], "t": "The quick way up is still coming down in pieces. Clear 30 more skipped steps and the lessons left with them", "stones": 75800},
+	{"id": "s_p33_cut", "kind": "toil", "work": "quarry", "n": 3, "area": "jasper", "t": "\"The fifth stone is going. I shall want a sixth.\" Cut 3 blocks of the green rock of Kunlun (face a crag or a cave wall, press C)"},
+	{"id": "s_p33_stone", "kind": "haul", "good": "stone_block", "n": 4, "npc": "granny_wu", "area": "jasper", "t": "Carry 4 loads of stone down to Old Dame Wu at the stream, and let her choose the one with the grain she wants"},
+	{"id": "s_p33_way", "kind": "kill", "boss": "the_short_way", "area": "jasper", "t": "It has the line of a stair and none of the treads: go up to the Stair with the Steps Left Out", "stones": 76000},
+	{"id": "s_p33_wall", "kind": "talk", "npc": "kuang_heng", "area": "void", "t": "In the Void Rift a labourer sits against the back wall of a great house, reading by a thread of light. Find Kuang Heng below the first height", "stones": 76200},
+	{"id": "s_p33_lamps", "kind": "hunt", "area": "void", "n": 34, "of": ["stopped_hole", "idle_lamp", "uncut_book"], "t": "\"Four hundred lamps, and not a soul reading by them.\" Clear 34 plasters over the hole, lamps lit for nobody and books with their pages uncut", "stones": 76400},
+	{"id": "s_p33_slips", "kind": "collect", "item": "copied_slip", "n": 4, "area": "void", "t": "He copies what he borrows before it goes back, and his own house has no shelf. Find 4 slips in his hand, hidden on the heights of the Rift"},
+	{"id": "s_p33_fell", "kind": "toil", "work": "fell", "n": 3, "area": "void", "t": "\"A load is a roll: that is my reckoning with the steward.\" Fell 3 stems at the edge of the Rift for the new wing (face a wood, press C)"},
+	{"id": "s_p33_carry", "kind": "haul", "good": "timber", "n": 4, "npc": "kuang_heng", "area": "void", "t": "Carry 4 loads of timber to Kuang Heng at the back wall, on your own back, and see what a load buys"},
+	{"id": "s_p33_roof", "kind": "summit", "peak": "void", "k": 1, "area": "void", "t": "Climb the second height of the Void Rift and look down into the lit rooms of the house of Wen"},
+	{"id": "s_p33_books", "kind": "hunt", "area": "void", "n": 30, "of": ["uncut_book", "idle_lamp"], "t": "They were bought by the cartload, to fill a wall. Clear 30 more uncut books and the lamps that light them", "stones": 76600},
+	{"id": "s_p33_shelf", "kind": "kill", "boss": "the_shelf", "area": "void", "t": "It owns everything that has been thought, and has thought none of it: go up to the Library Nobody Opened", "stones": 76800},
+	{"id": "s_p33_butts", "kind": "talk", "npc": "chen_yaozi", "area": "celestial", "t": "At the Celestial Gate the best archer of the age is shooting in his garden, and is angry with a pedlar. Find Chen Yaozi below the first height", "stones": 77000},
+	{"id": "s_p33_arrows", "kind": "hunt", "area": "celestial", "n": 34, "of": ["proud_arrow", "spilt_oil", "idle_clap"], "t": "\"My arrows turn to see who is watching.\" Clear 34 arrows that expect applause, oils spilt in a hurry and clappings of the garden", "stones": 77200},
+	{"id": "s_p33_coin", "kind": "talk", "npc": "oil_seller", "area": "celestial", "t": "An old man with two jars on a pole watched nine arrows and only nodded. Find the Old Oil Seller below the second height", "stones": 77400},
+	{"id": "s_p33_coins", "kind": "collect", "item": "dry_coin", "n": 4, "area": "celestial", "t": "\"The ones I learned on: the only clean money in the land.\" Find 4 dry coins on the heights of the Celestial Gate"},
+	{"id": "s_p33_hands", "kind": "folk", "role": "pedlar", "n": 2, "area": "mountain", "t": "\"Ask on the road what a hand knows.\" Ask 2 pedlars of the camps what their hands can do that nobody ever showed them"},
+	{"id": "s_p33_flight", "kind": "glide", "n": 10, "area": "celestial", "t": "Go the way his arrows go, and see where they have been landing. One flight of 10 tiles under the cloud-kite (V, from a height)"},
+	{"id": "s_p33_claps", "kind": "hunt", "area": "celestial", "n": 30, "of": ["idle_clap", "proud_arrow"], "t": "The garden claps at every shot, hit or miss. Clear 30 more clappings and the arrows that listen for them", "stones": 77600},
+	{"id": "s_p33_knack", "kind": "kill", "boss": "the_knack", "area": "celestial", "t": "It holds a bow that was never strung, and its thumb is as smooth as a child's: go up to the Gift That Never Practised", "stones": 77800},
+	{"id": "s_p33_school", "kind": "talk", "npc": "li_bai", "area": "origin", "t": "At the Origin of the Dao a lamp is lit in a school past the third watch, and one mat is taken. Find Li Bai below the first height", "stones": 78000},
+	{"id": "s_p33_watch", "kind": "hunt", "area": "origin", "n": 34, "of": ["third_watch", "dry_lamp", "melting_snow"], "t": "\"Something does not want it read.\" Clear 34 sleeps of the third watch, lamps with no oil in them and snows melting on the page", "stones": 78200},
+	{"id": "s_p33_fireflies", "kind": "collect", "item": "firefly_bag", "n": 4, "area": "origin", "t": "A poor student called Che Yin read all summer by a bag of gauze. Find 4 bags of fireflies on the heights of the Origin"},
+	{"id": "s_p33_beam", "kind": "summit", "peak": "origin", "k": 1, "area": "origin", "t": "Climb the second height of the Origin and count the lights that are still burning at this hour"},
+	{"id": "s_p33_snow", "kind": "hunt", "area": "origin", "n": 30, "of": ["melting_snow", "third_watch"], "t": "The snow that Sun Kang read by is going to water on the page. Clear 30 more melting snows and the sleep that comes with them", "stones": 78400},
+	{"id": "s_p33_smiths", "kind": "folk", "role": "smith", "town": "tushan", "n": 3, "area": "tushan", "t": "\"How long, before it is yours?\" Ask 3 smiths of Tushan how many years it was before the hammer was their own"},
+	{"id": "s_p33_needle", "kind": "talk", "npc": "li_bai", "area": "origin", "t": "The book is shut with a straw in it, and the boy has done his sum again. He is waiting in the door of the school: go back to Li Bai", "stones": 78600},
+	{"id": "s_p33_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "A carrier has come up the mountain for a copybook. Tell Elder Qing Xuan what the quick way turned out to be", "stones": 79000},
+	{"id": "s_break38", "kind": "breakthrough", "to": 114, "t": "There was no quick way, and no slow one either; there was the hand: Practised Hand"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5075,6 +5171,11 @@ const ITEMS := {
 	"hour_stone": {"n": "Hour-Stone", "desc": "A flat river stone with a line scratched across it by another stone. There is one for every hour somebody waited under a bridge, laid in a row above where the water reached. The last of them is scratched very deep"},
 	"wall_tally": {"n": "Wall-Tally", "desc": "A slip of elm wood with a hole for a cord and a village cut into it with a knife. Every man sent to the wall wore one, so that he could be counted going. Nobody collected them at the other end"},
 	"bronze_sliver": {"n": "Sliver of Bronze", "desc": "A sliver of old bronze the length of a finger-joint, bright on one edge. When a mirror is broken across in a hurry, this is what falls between the halves. Neither of the two who kept a half has ever missed it"},
+	# Part XXXIII (the Iron Pestle release)
+	"worn_whetstone": {"n": "Worn Whetstone", "desc": "A slab of green stone the length of a forearm, grooved through in the middle to a hole the shape of a long leaf. One bar of iron did that, drawn down it wet, some thousands of mornings. The old woman at the stream has worn out four and keeps them all"},
+	"copied_slip": {"n": "Slip in His Own Hand", "desc": "A bamboo slip written close on both sides in a labourer's square hand, with a thumb-print of lime at one end. He copies each borrowed book by a thread of light before it goes back. The house he borrows from owns the book. This is the only copy anybody has read"},
+	"dry_coin": {"n": "Dry Coin", "desc": "A copper coin, green at the rim and bright round the square hole. Forty years of oil has been poured through that hole into a gourd and none of it has ever touched the metal. It is one of the coins he learned on. He spilled a pond before the first of them came up dry"},
+	"firefly_bag": {"n": "Bag of Fireflies", "desc": "A bag of white gauze the size of a fist, tied at the neck, with some dozens of fireflies in it. Che Yin of Jin was too poor for lamp oil and read by one of these through the summer nights. It lights a column at a time, greenly. He let them out each morning"},
 	"house_broom": {"n": "House Broom", "desc": "A broom of sorghum straw. Upright, bristles up, out of sight beside the store. Never by the altar, the bed or the stove. He has known this since he was thirteen"},
 	"muster_slip": {"n": "Muster-Slip", "desc": "A slip of birch bark with a notch for a man, a notch for a horse and a notch for a bow, nailed to a tent pole by somebody riding past. Every tent on the frontier with a sound man in it has one. The old man's has none. The outrider looked at the boy's leg, and rode on"},
 	"taisui_charm": {"n": "Charm of Peace with the Year", "desc": "Smith Tie's bronze charm, earth and metal essence beaten round a thunder egg, with the Taisui of the year engraved on it. It says: we know you are there, and we are sorry to have woken you"},
@@ -5334,6 +5435,27 @@ const CHAT := {
 		"I sent the mirror to market by an old servant, and named a price to make people laugh. Only one man in the world would not laugh.",
 		"Nine years. I was nineteen when the city fell. I do not know what he has been keeping, all this while; but she was nineteen.",
 		"Today, what a day: the new lord opposite the old. I dared neither laugh nor cry. I made four lines of it, afterwards. It is easier to be a poem than a person."],
+	# Part XXXIII (the Iron Pestle release)
+	"granny_wu": ["A needle. Yes, out of that. You need not look at me so; I have not asked you to wait for it.",
+		"Down wet, and back dry. If you press you only tire. The stone does the work, and the stone is in no hurry, so there is no use my being.",
+		"My name is Wu. There is a rock up the bank they have started calling after me. I told them I am not dead yet, and they said that was no objection.",
+		"The boys from the school come down this path when a book has beaten them. I am the first thing they see. I should think I have sent back more scholars than the examination has."],
+	"li_bai": ["The master says I have a quick ear. He says it as if it were a thing I had done wrong.",
+		"I can say the page after once reading. That is not the same as knowing it. I found that out on the fourth day, walking; I could say it and I did not know what it said.",
+		"She did not tell me to go back. She only went on grinding. I think if she had told me I should have gone on down the hill.",
+		"When I am old I shall write a poem about the moon and it will take me no time at all. I mean to spend thirty years first, getting ready for it to take no time."],
+	"kuang_heng": ["The light is theirs. What it falls on, once it is through the wall, I have never been able to see that anybody owns.",
+		"A load is a roll. The steward thinks he has the better of it, and I let him think so. He has never asked what a roll is worth to somebody who has none.",
+		"When I can explain the Odes, people say, nobody's jaw stays shut. I do not know about that. I know the second roll, and I am beginning to know the third.",
+		"I do not mind the carrying. A back that has worked all day sits still at night. The young masters in there cannot sit an hour; they have nothing to be tired from."],
+	"oil_seller": ["Nothing in it. A practised hand. I say so, and gentlemen take it for modesty or for cheek. It is only what happened.",
+		"You hold the ladle high. Low, and you pour a rope; high, and it draws down to a thread of itself. It took me six years to find that out and it takes me a breath to say.",
+		"His lordship shoots very prettily. Eight or nine in ten. I nodded. What should I have done? A man who pours oil does not clap for a man who shoots; he knows too well how it is come by.",
+		"I have two jars, a pole, a ladle and a gourd, and I have walked the same nine villages for forty years. People are sorry for me. I notice they still cannot do what I do with a coin."],
+	"chen_yaozi": ["I was first in the palace examination and I shoot better than any soldier in the realm. My mother says the second is beneath me. She has taken a stick to me for it.",
+		"Eight in the gold and the ninth a hand out. Do you know how seldom that is seen? I do. I have been told, by everybody. Everybody but one.",
+		"He put a coin on a gourd and poured through the hole in it. The coin was dry. I laughed; what else is there to do? I have been thinking about it ever since, which is not what a laugh is for.",
+		"My thumb. Feel that. You could strike a light on it. I have been telling people for twenty years that I was born able to shoot, with that on the end of my hand."],
 	"yan_ying": ["I wore one fox robe for thirty years. A minister who changes his coat every season has stopped looking at what he is minister of.",
 		"In Chu they asked whether Qi had no men, that it sent me. I said: Qi sends a worthy man to a worthy king, and the other sort to the other. So I was sent here.",
 		"My coachman was a tall fellow, and very pleased with it. His wife watched him drive me through the gate, and that evening asked for a divorce. He was better afterwards.",
@@ -9927,7 +10049,7 @@ const DIALOGUE := {
 		["Narrator", "Below the first height, where the river keeps every hour that ever was, a man is sitting on the ground with his knees drawn up, and his knees are higher than Lin Feng's head. Grey beard, a lord's topknot, dried flood-mud on his hem to the height of a house door."],
 		["Fangfeng", "You. The small one who said I might be late. I lay on that hill nine years and was late for nothing, and it was very fine. Then I thought: the roll at Kuaiji still has a line through me. I have come to where the hours are kept, to see the one I missed."],
 		["Lin Feng", "You stood in a burst dyke a day and a night. A village is dry because of it. Did you never tell them?"],
-		["Fangfeng", "Nobody asked. That is the whole of it, small one; I find I mind that more than the axe. It is up there still, the hour I was not there, with the roll in its hand. Quiet the drums. Then go and ask it what I was doing.", "point"],
+		["Fangfeng", "Nobody at Kuaiji asked. That is the whole of it, small one; I find I mind that more than the axe. It is up there still, the hour I was not there, with the roll in its hand. Quiet the drums. Then go and ask it what I was doing.", "point"],
 	],
 	"done:s_p31_drums": [
 		["Narrator", "The last drum splits along the grain and is only a log again. In the quiet a voice can be heard on the height, patient, reading names: it stops after one of them for exactly as long as it takes a man to answer, and goes on."],
@@ -9959,7 +10081,7 @@ const DIALOGUE := {
 	],
 	"post:late_axe": [
 		["Narrator", "The axe comes down for the last time and stops a hand above the rock, where there is nobody. Then the thing turns its roll round, slowly, as a clerk does who has been asked to look at the back of a page. There is a line there in a villager's hand: a day and a night; one dyke; nobody drowned."],
-		["Fangfeng", "Nobody? There were four hundred of them. I never went back to count. ...Small one, I have been late for four thousand years, and I find I was only busy. I should like to stand up now. Mind your head.", "laugh"],
+		["Fangfeng", "Nobody? Two hundred and six of them; I counted as they went by with the baskets, and never went back to see. ...Small one, I have been late for four thousand years, and I find I was only busy. I should like to stand up now. Mind your head.", "laugh"],
 	],
 	"s_p31_runner": [
 		["Narrator", "The peach-wood staff he planted by the black lake has become a wood, and it is in flower. Below the first height its owner is not looking at it. He is bent over with his hands on his knees, getting his breath, burnt the colour of a roof-tile, with his face to the west."],
@@ -10095,8 +10217,8 @@ const DIALOGUE := {
 	"s_p32_clerk": [
 		["Narrator", "Below the first height, on a step that belongs to nothing, a very old man is reading a book by the light of a moon that is not up. A cloth bag beside him is full of red thread. He marks his place with a finger before he looks up, and he does not look up for long."],
 		["The Old Man under the Moon", "The sweeper. And the lotus. No, I shall not say; do not ask me with your eyebrows. Sit. I have a complaint, and nobody to make it to. I tie two feet together. That is the whole of my office. What they walk into afterwards was never written in here."],
-		["Lin Feng", "A man is crying half a mirror in the wrong market. A king buried two people in sight of each other. Are those your knots?"],
-		["The Old Man under the Moon", "Every one of them held. That is what I mind. The cord held, and they were taken apart all the same, by a wall and a flood and a king and a war. Begin with the king. His seals are up on the height, cutting. Clear me those, and bring back what they pulled out.", "point"],
+		["Lin Feng", "A man is crying half a mirror in the wrong market. The Elder says your knots have begun to come undone. Is that one of them?"],
+		["The Old Man under the Moon", "Undone? Every one of them held. That is what I mind. The cord held, and they were taken apart all the same, by a wall and a flood and a king and a war. Begin with the king, who buried two of mine in sight of each other. His seals are up on the height, cutting. Clear me those.", "point"],
 	],
 	"done:s_p32_knots": [
 		["Narrator", "The last seal cracks across its own characters. Each of them said the same thing in the same square hand: by order. Where they stood the red threads lie on the rock, cut short, and every one of them is cut at the same place: a hand's breadth from the knot, on the side the king could reach."],
@@ -10154,7 +10276,7 @@ const DIALOGUE := {
 	],
 	"post:the_flood": [
 		["Narrator", "The water lies down in its bed and is a stream a child could cross. The hour goes out of it. Weisheng takes his arms from the pillar, slowly, as a man does who has slept on them; and then, because there is nothing left to hold, he looks up between the planks. Somebody is looking down."],
-		["Weisheng", "You are on the bridge. ...I said under. You have been... every time? I never once... I am very wet. I am sorry. I kept the hour and the place and I forgot there was to be a person at them. May I come up? I should like to ask your name again.", "kneel"],
+		["Weisheng", "You are on the bridge. ...I said under. You have been... every time? I never once... I am very wet. I am sorry. I kept the hour and the place and I forgot there was to be a person at them. May I come up? I should like to ask your name. I never did.", "kneel"],
 	],
 	"s_p32_wall": [
 		["Narrator", "Below the first height of the Dark Capital a woman of the living is sitting on the step of a shut office, in undyed hemp, with road-dust to the knee. She has a bundle of quilted clothes in her lap and both hands on it. The clerks of the dead go round her, and lower their lamps as they pass."],
@@ -10221,10 +10343,10 @@ const DIALOGUE := {
 		["Narrator", "The last cry stops in the middle of its price. It was a good imitation of a tired man's voice, and it had been naming a sum no woman could send for, year after year, so that she should not have to be seen refusing. He had not set it. He had only thought it, every Lantern Festival, on the way home."],
 	],
 	"s_p32_lady": [
-		["Narrator", "Below the second height a woman is standing very straight in plum silk that was chosen by somebody else. Her hair is up as a married woman's. She has the other half of the mirror in both hands, face upward, and is looking into it as into a well that she has been told is dry."],
+		["Narrator", "Below the second height a woman is standing very straight in plum silk that was chosen by somebody else. Her hair is up as a married woman's. Her hands are cupped at the height one holds a mirror, with nothing in them, and she is looking into them as into a well that she has been told is dry."],
 		["Princess Lechang", "He has seen it, then. And he wrote me four lines on it before he would see me, because he is a man who would. I had them by heart in an hour. The lord of my house read them over my shoulder. He said: go and look at him. He did not say come back, and he did not say do not."],
 		["Lin Feng", "Your husband thinks you would not leave a great house for half a mirror."],
-		["Princess Lechang", "My husband! Which? ...I was nineteen. I am not what he kept, cultivator; and whoever he is now I have not met. We swore to join it. We did not swear it would fit. Take him my half, and put the two on one cloth, and tell me whether the edges still meet.", "think"],
+		["Princess Lechang", "My husband! Which? ...I was nineteen. I am not what he kept, cultivator; and whoever he is now I have not met. We swore to join it. We did not swear it would fit. You carry my half. Lay it by his, on one cloth, and tell me whether the edges still meet.", "think"],
 	],
 	"s_p32_mirror": [
 		["Narrator", "The two halves lie on the blue cloth under the moon. Each bird on the back has its mate again. But nine years in two different sleeves have worn the broken edges, and four slivers were lost at the well: along the join there is a gap that a fingernail goes into. It will never again be one mirror by itself."],
@@ -10233,7 +10355,7 @@ const DIALOGUE := {
 		["Xu Deyan", "It is two halves of a mirror, and we are two halves of a marriage, and neither of us is the shape we were broken at. You have joined things and parted them the length of the land. Tell us what is done with this. We shall do the same with ourselves."],
 	],
 	"s_p32_end": [
-		["Narrator", "The pedlar has gone down the mountain with an empty blue cloth and a great deal to tell. On the Elder's table there is a ring in the dust where a half-circle lay for a week. He has not let anybody wipe it."],
+		["Narrator", "The pedlar has gone down the mountain with nothing to cry and a great deal to tell. On the Elder's table there is half a ring in the dust, where half a mirror lay. He has not let anybody wipe it."],
 		["Elder Qing Xuan", "Sweeper Bai has been asking the kitchen whether a bowl that has been riveted is still the same bowl. The cooks are divided. Cook Zhou says it is a better bowl, because now somebody has minded about it. I have not been asked. I have a view.", "think"],
 		["Lin Feng", "A king put a ditch between two graves and the roots went under it. A man kept an hour and forgot who it was for. A wall was counted in yards. And a mirror came back that did not fit. Elder, none of them was parted by not loving enough."],
 		["Elder Qing Xuan", "No. They were parted by things that could count: a seal, a clock, a tally, a price. And none of those could tell you what it had divided. Go and sit, child. You are in one piece. It is rarer than you suppose; and it is not the same as never having been broken.", "bow"],
@@ -10244,6 +10366,177 @@ const DIALOGUE := {
 	],
 	"post:s_break37": [
 		["Narrator", "The tribulation comes down and breaks on him, and he lets it. It goes through every place he was ever parted from something: a basket on a step, a broom put down, a road taken without looking back. When it has passed he is all there. The joins show. He finds he would not have them out."],
+	],
+	# ---- Part XXXIII: The Iron Pestle (the Iron Pestle release)
+	"recall31": [
+		["Narrator", "The spring after the mirror, a boy of ten came up the nine hundred and ninety-nine steps with a book under his arm, and asked at the gate for the pill that makes a master by morning. The gate disciples laughed. Lin Feng did not. He had swept those steps for three years, and had once asked very nearly the same thing."],
+	],
+	"s_p33_home": [
+		["Narrator", "On the Elder's table there is a child's copybook, left behind. The first page is written out fair. The second stops at the third line, in the middle of a character, as if the brush had been put down by somebody who had just done a sum."],
+		["Elder Qing Xuan", "He had reckoned it up, child. So many characters a day, so many years to the end of the classics. He said: it is too slow, give me the quick way. I told him the quick way was the steps he had just climbed. He said he had heard of a quicker, and went west.", "think"],
+		["Lin Feng", "West is Kunlun. The peaches. One bite and you have had three thousand years of somebody else's patience."],
+		["Elder Qing Xuan", "He left his school on Elephant-Ear Mountain because a book was slow. I do not want him stopped. I want to know what stops him. There is an old woman at the stream below the Jasper Pool who has been at one task longer than I have been Elder. Begin there.", "point"],
+		["Yue Ling", "He stopped in the middle of a character, Lin Feng. Look. He knew how it ended. I think that is what he could not bear: that knowing how it ends is not the same as having written it."],
+	],
+	"s_p33_stream": [
+		["Narrator", "Below the first height, where the Jasper Pool runs out over a lip of green rock, an old woman kneels at the water with her sleeves tied back. She has an iron pestle as thick as a wrist in both hands, and she is drawing it down a wet stone, and back, and down. One end of it is bright."],
+		["Old Dame Wu", "You may ask. Everybody asks, and it rests my arms to answer. I am making a needle. No, I am not mad, and no, I have not reckoned how long. A boy reckoned it for me this week, standing just where you are. He was very quick at it. Then he laughed, and went up."],
+		["Lin Feng", "Up to the orchard. By the stair?"],
+		["Old Dame Wu", "Not he. There is a stair of nine thousand steps and he said it was slow. He went up the bare rock, where the steps are left out, and whatever he woke up there has been coming down ever since and getting among my stones. Clear it off, cultivator. I have work to do.", "point"],
+	],
+	"done:s_p33_peaches": [
+		["Narrator", "The last of them goes out. Where each stood there is a peach lying in the grass, hard, green and the size of a walnut, with one bite out of it. Nothing has happened to whoever bit them. They were three thousand years short of being anything at all."],
+		["Yue Ling", "He tried every one he could reach, Lin Feng, and spat each of them out. He is not a thief. He is a boy who cannot wait, and they are not the same thing; a thief would have taken a ripe one."],
+	],
+	"done:s_p33_stones": [
+		["Narrator", "Four whetstones, each worn through in the middle to a hole the shape of a long leaf. She has grooved four stones away with one bar of iron and thrown none of them out; they were set on the heights in a row, like a calendar kept by somebody who does not count."],
+	],
+	"done:s_p33_orchard": [
+		["Narrator", "From the second height the Queen Mother's orchard lies open below: the peach trees in their rows, each with a bronze label, and under the oldest of them a small figure sitting with his back to the trunk and his face turned up. He is waiting for one to fall. The label on that tree gives the year it will."],
+		["Yue Ling", "He can read, Lin Feng. He has read the label. He is sitting there anyway. I think he has done that sum as well, and does not like how it came out, and has nowhere else to go but back."],
+	],
+	"done:s_p33_corners": [
+		["Narrator", "The skipped steps go back into the rock one by one, and where each goes a real step is left: narrow, worn in the middle, cut by hand. The stair was always there under the short way. It had only been left out of the reckoning."],
+	],
+	"done:s_p33_cut": [
+		["Narrator", "Three blocks of the green rock of Kunlun, split along the bed. It is close-grained and hard, and a thumb drawn across the fresh face comes away wet and grey. It will take iron off a pestle a hair at a time, for a great many years."],
+	],
+	"haul:s_p33_stone": [
+		["Old Dame Wu", "Set it down wet side up. No; that one has a seam in it, it will be gone in ten years. The next. I am particular. I have had time to become so."],
+	],
+	"done:s_p33_stone": [
+		["Narrator", "She has chosen the third block, bedded it in the stream with two wedges, and is trying the pestle on it with her head on one side. The other three she has set by, in order. Then she looks round to see who is near, and there is only Lin Feng, and the healer, and the water."],
+		["Old Dame Wu", "I shall tell you something, because you carried and did not ask what for. There is a paper of needles in my house. Forty, steel, from Tushan; my granddaughter keeps me in them. I do not want a needle. This is the road down from every school on the mountain, and boys come by it.", "laugh"],
+		["Yue Ling", "Then it is not for sewing at all. How many, Dame Wu? How many boys?"],
+		["Old Dame Wu", "I do not count. One in ten laughs. One in ten sits down and watches until dark, and those go back up. This one laughed, and then he looked at the four stones before he went. I thought: that is not a boy who is finished. Go and see what he woke. It is on the height.", "nod"],
+	],
+	"pre:the_short_way": [
+		["Narrator", "On the first height the short way stands on end. It has the line of a stair and none of the treads: a bare rise of rock as straight as a ruled stroke, with the top in sight and nothing to put a foot on. It goes up and down itself very fast, and it has never yet arrived."],
+		["Old Dame Wu", "There. That is the quick way to the orchard. It has been there since the first child was told that a thing takes time. You may hit it if you like. I should show it a step, myself; it has never seen one.", "point"],
+	],
+	"post:the_short_way": [
+		["Narrator", "It does not fall. It is climbed. One tread comes out of the rock under it, and then the next, each the depth of a foot and no deeper, and when the last is cut there is only a stair on the height: nine thousand steps, the same as the other, and no shorter by one."],
+		["Old Dame Wu", "So. They are the same length. I could have told him, and he would not have believed me, and quite right. He has gone down the far side, you know, while you were busy. He did not say goodbye. He took his book out of his sleeve at the bottom. I saw that much.", "laugh"],
+	],
+	"s_p33_wall": [
+		["Narrator", "In the Void Rift the stars show through the ground. Below the first height a great house stands with every window lit, and against its back wall, on the dark side, a young labourer sits with a borrowed scroll held to a thread of light no wider than a chopstick. It comes through a hole in the plaster."],
+		["Kuang Heng", "I made the hole. I say so before you ask. My family has no candle, and the house of Wen has four hundred, and what falls through a wall is nobody's. I carry for them by day. I asked no wage. I asked to read what is on their shelves, a book at a time, and the master laughed and said yes."],
+		["Lin Feng", "Then you are paid in what you want. What is wrong?"],
+		["Kuang Heng", "Somebody stops the hole. Every night it is plastered over from the inside and I bore it again. And the books come out to me with the pages uncut: nobody in there has opened one. Four hundred lamps, and not a soul reading by them. Clear what keeps that house, and I will show you my day.", "think"],
+	],
+	"done:s_p33_lamps": [
+		["Narrator", "The lamps go out one at a time, and the house is no darker for it; they had lit nothing but their own brackets. The plaster comes away from the hole in a neat round plug. On the inside it has been smoothed with a trowel, carefully, every evening, by something that thought a wall should be whole."],
+		["Yue Ling", "Nobody in the house meant him harm, Lin Feng. The wall was mended because walls are mended. It is only that nobody there has ever needed a light badly enough to wonder who else might."],
+	],
+	"done:s_p33_slips": [
+		["Narrator", "Four bamboo slips, each written close on both sides in a labourer's square hand: he copies what he borrows before it goes back, by the thread of light, and hides the copies on the heights because his own house has no shelf. There is a thumb-print of lime on every one."],
+	],
+	"done:s_p33_fell": [
+		["Narrator", "Three stems down, limbed and cut to a carrying length. The wood at the edge of the Rift is pale and heavy and rings when it is struck. The house of Wen is building a new wing for its library, and has been for a year; it is the only part of the library anybody visits."],
+	],
+	"haul:s_p33_carry": [
+		["Kuang Heng", "On the stack, butt to the wall. That is the Odes for me tonight, the second roll: a load is a roll, that is my reckoning with the steward. You have just earned somebody a poem about a cricket. Change shoulders going back."],
+	],
+	"done:s_p33_carry": [
+		["Narrator", "Four loads lie on the stack. Kuang Heng has carried eleven in the same time and is not breathing hard. He goes to the steward's window, and a roll is passed out to him as a bowl of rice is passed to a beggar, and he holds it for a moment in both hands before he puts it in his jacket."],
+		["Kuang Heng", "You are thinking it is a hard way to come by a book. It is. I shall tell you what I have noticed, though. The young masters in there were given all of it at seven. I have had it a load at a time. I do not think one of them could tell you what is in the second roll of the Odes.", "nod"],
+		["Yue Ling", "And you can say it by heart. No, do not; I can see that you can. You have paid for every line. They only own it."],
+	],
+	"done:s_p33_roof": [
+		["Narrator", "From the second height the whole house can be looked into from above. Room after room is lit, and in every one the shelves go up to the rafters, rolled and labelled and tied. There are no chairs drawn up to them. The dust on the floor before the shelves has one set of footprints in it, and they are the steward's."],
+		["Yue Ling", "And outside the back wall, Lin Feng, one spot on the ground worn bare. He has sat in the same place for so long that the grass has stopped trying."],
+	],
+	"done:s_p33_books": [
+		["Narrator", "The last book falls open as it goes, for the first time. Its pages were never cut; it had been bought by the cartload, to fill a wall. What was written in it comes out all at once like breath out of a jar, and is gone before anybody can read a word."],
+	],
+	"pre:the_shelf": [
+		["Narrator", "On the first height the library has come out of the house. It is shelves from the ground to the dark, rolls beyond counting, every one tied with its own cord and none of the cords ever loosed. It is very proud. It owns everything that has been thought, and it has not thought any of it."],
+		["Kuang Heng", "That is what I have been carrying for. All of it, and nobody has asked it a question in three generations. It thinks it is learning. It is a wall with writing in it. ...I am not afraid of it. I have read nine rolls of it, and it has not read one.", "refuse"],
+	],
+	"post:the_shelf": [
+		["Narrator", "The cords come undone, all of them, from the top shelf down, and the rolls open a hand's breadth each and stay so. In the house below a door has opened too. A stout old man in a rich robe is standing at the back wall with a lamp, looking at a hole in his plaster, and at the bare patch on the ground outside it."],
+		["Kuang Heng", "That is the master. Wen Bushi. They say he cannot read; I never asked. He has just put his eye to my hole. ...He is calling the steward. He says I am to come in by the door, and to have a lamp, and to begin at the east wall and go round. He says somebody ought to.", "bow"],
+	],
+	"s_p33_butts": [
+		["Narrator", "Below the first height of the Celestial Gate somebody has laid out a garden for shooting in: a walk of raked sand, a butt of rice straw at eighty paces, and a rack of arrows fletched in red. A broad man in a court robe kilted to the knee looses nine while Lin Feng crosses the grass. Eight stand in the gold."],
+		["Chen Yaozi", "You saw. Eight, and the ninth a hand out. There is nobody living who shoots so; I do not boast, I am told it daily. And an old fellow selling oil stood at my gate this morning with his load down, and watched me do it, and do you know what he did? He nodded. A little. So."],
+		["Lin Feng", "You asked him what he meant by it."],
+		["Chen Yaozi", "I asked whether he knew anything of archery. He said: nothing in it but a practised hand. A practised hand! I have a gift. ...And since he said it nothing in this garden will fly straight. My arrows turn to see who is watching. Rid me of them, and then find me that pedlar.", "refuse"],
+	],
+	"done:s_p33_arrows": [
+		["Narrator", "The arrows drop out of the air like straws. Not one of them was looking at the butt. Each had its point toward the gate, where a crowd might stand, and had been waiting, drawn, for somebody to come and see it loosed."],
+		["Yue Ling", "He shoots very well, Lin Feng. I watched his hands and not his face. There is a callus on that thumb as thick as a coin. He has loosed ten thousand arrows to be so good, and he will not say so. He would rather it were a gift."],
+	],
+	"s_p33_coin": [
+		["Narrator", "The old man is sitting on his carrying-pole below the second height, eating a cold cake. He gets up without being asked. He sets a gourd on the ground, lays a copper coin across its mouth, and lifts his ladle high; and the oil comes down in a thread, through the square hole, and the gourd fills. He hands Lin Feng the coin. It is dry."],
+		["The Old Oil Seller", "There. I did that for his lordship this morning, and he laughed at last and let me go; he is not a bad man. It is nothing. Forty years of pouring oil. I spilled a pond of it learning. If he had asked what I spilled I would have told him, but they never ask a pedlar that."],
+		["Lin Feng", "He says his shooting is a gift."],
+		["The Old Oil Seller", "Then he has forgotten the first thousand arrows. Everybody does, who is good; it is more comfortable. My coins are up on these heights, the ones I learned on: you will know them, they are the only clean money in the land. Fetch a few. And ask on the road what a hand knows.", "nod"],
+	],
+	"done:s_p33_coins": [
+		["Narrator", "Four copper coins, green at the rim and bright round the hole, where forty years of oil has gone through and never touched the metal. They are worth a cake each. He kept them apart from the others because they were the ones he practised on, and could not bring himself to spend them."],
+	],
+	"done:s_p33_hands": [
+		["Narrator", "Two pedlars of the road have said what their hands know. One can tie a load in the dark so that it rides forty li. The other can tell false silver by the weight of it in the palm, and cannot say how. Neither thought it worth mentioning. Both had to be asked twice."],
+		["Yue Ling", "Not one of them called it a gift, Lin Feng. They called it Tuesday. I think the word is only used by people who are watched while they work."],
+	],
+	"done:s_p33_flight": [
+		["Narrator", "He comes down the wind ten tiles, the length of a long bowshot, and lands in the sand a pace from the butt. From here the straw can be seen close. It is packed with old arrowheads, rusted in to the depth of an arm: every one he loosed here before he was any good, and never drew out."],
+		["Yue Ling", "There is his first thousand. He has been shooting into them every morning for twenty years, and telling people he was born so."],
+	],
+	"done:s_p33_claps": [
+		["Narrator", "The clapping stops. It had come from nobody: a sound of palms kept up along the edge of the garden by the garden itself, at every shot, hit or miss. In the quiet a bowstring can be heard for the first time, and the small flat noise an arrow makes going into straw."],
+	],
+	"pre:the_knack": [
+		["Narrator", "On the first height stands what he calls it. It is tall and gilded and easy, and it holds a bow that was never strung, and it has the look of something that was handed down complete. It has not a mark on it anywhere. Its thumb is as smooth as a child's."],
+		["Chen Yaozi", "That is the gift. I have told every man at court about it. ...It does not look like me. I had not seen that before. Look at its hands, cultivator. Those hands have never done anything in their lives.", "think"],
+	],
+	"post:the_knack": [
+		["Narrator", "The gilding comes off it in one piece, like a coat, and there is nothing inside. Chen Yaozi stands looking at his own right thumb. Then he walks down to the butt, puts his arm into the straw to the shoulder, and draws out a handful of rusted heads, and stands holding them."],
+		["Chen Yaozi", "Nine years old. My father's garden. I missed the butt entirely for a month, and wept, and he made me fetch every arrow. ...A practised hand. He was right, and he only nodded! Find him for me. I should like to see that trick again, and this time I shall ask what he spilled.", "laugh"],
+	],
+	"s_p33_school": [
+		["Narrator", "At the Origin of the Dao the stone is white and the light is slow. Below the first height there is a school: one room, a beam, twelve mats. It is past the third watch, and one mat is taken. A boy of ten is sitting very straight with a book, and his topknot is tied by a cord to the beam above him."],
+		["Li Bai", "It is so that I shall wake if I nod. A man called Sun Jing did it, in Han; the master told us. And another pricked his thigh with an awl. I have not an awl. ...You are the sweeper. I asked at your gate for a pill. I am sorry. I went back the long way and it took four days."],
+		["Lin Feng", "You saw an old woman at a stream."],
+		["Li Bai", "With a pestle! I laughed. Then I saw four stones worn through, and I could not laugh any more, and I did not know why. I have come back to finish the book. But the lamp will not stay lit here, and I fall asleep. Something does not want it read. Will you clear it? I will keep my place.", "think"],
+	],
+	"done:s_p33_watch": [
+		["Narrator", "The third watch lifts off the school like a hand off a page. It had been lying on the room for a long time: on every mat there is the print of a forehead in the straw, where a boy went down over his book and was let off. Only one mat has no print. The cord from the beam is taut."],
+		["Yue Ling", "He has not slept, Lin Feng. He is ten and his eyes are like a clerk's. Somebody should tell him that Sun Jing also went to bed, some nights. They never put that part in."],
+	],
+	"done:s_p33_fireflies": [
+		["Narrator", "Four bags of white gauze, each the size of a fist, each full of fireflies and tied at the neck. A poor student called Che Yin had no oil, and read by these through the summer. They give about as much light as one honest coal, and it is green, and it is enough for a column at a time."],
+	],
+	"done:s_p33_beam": [
+		["Narrator", "From the second height the school is one lit square in a white country. And beyond it there are others: a hut with a bag of fireflies at the window, a man sitting in a drift with a book tilted to the snow, a wall with a thread of light coming through. Nobody in any of them can see the rest."],
+		["Yue Ling", "Every one of them thinks he is the only one awake. Look how many there are, Lin Feng. You could walk from light to light across the whole of the dark and never be out of sight of somebody working."],
+	],
+	"done:s_p33_snow": [
+		["Narrator", "The last of the melt runs off the page and leaves it dry. A poor student called Sun Kang had no oil either, and read in winter by what the snow threw back. It is a cold way to learn anything, and the light is as white as the paper, and he held high office in the end."],
+	],
+	"done:s_p33_smiths": [
+		["Narrator", "Three smiths of Tushan have said how long it was before the hammer was their own. The answers were seven years, eleven, and one who said she would let him know. All three held out the same hand to be looked at, without being asked, and none of them looked at it themselves."],
+		["Yue Ling", "And then each of them went back to the fire, Lin Feng, in the middle of your thanking them. You are the same. You were sweeping the court the morning after you put the sky back."],
+	],
+	"s_p33_needle": [
+		["Narrator", "It is morning at the school. The cord is off the beam and coiled on the mat. The book is shut with a straw in it, a long way from the end, and the boy is standing in the door with ink to the wrist, looking not at Lin Feng but past him, down the white road toward the west."],
+		["Li Bai", "I have done the sum again. A hair of iron a day, the master says, if the stone is good. I measured the pestle with my eye. She is eighty. It does not come out, sweeper. It does not nearly come out. She will never have the needle.", "grieve"],
+		["Lin Feng", "You went back to your book because of her."],
+		["Li Bai", "Yes! And if she is wrong, then why am I... You have been there. You carried her a stone; everybody says so. You know. Tell me true: will it ever be a needle? I shall believe whatever you say. I do not think I shall ask anybody else."],
+	],
+	"s_p33_end": [
+		["Narrator", "The copybook is gone from the Elder's table. A carrier came up for it with a note in a round hand, asking for it back, as there were pages to fill. In its place there is a green peach the size of a walnut with one bite out of it, which the Elder is using for a paperweight."],
+		["Elder Qing Xuan", "Sweeper Bai asked me this morning how long it took you to learn the broom. I said three years. He said: no, Elder, to learn it. I find I do not know. You are still at it. I watched you on the lower steps at dawn and you did a corner over again.", "laugh"],
+		["Lin Feng", "A stair was left out and it was no shorter. A house owned every book and had read none. A lord forgot his first thousand arrows. And an old woman is grinding a bar she has no use for. Elder, there was no quick way in any of it. There was not even a slow one. There was only the hand."],
+		["Elder Qing Xuan", "Nothing but a practised hand. A pedlar said that to a duke, and the duke laughed and let him go, which is the wisest thing recorded of either. Go and sit, child. You have sat ten thousand times. I notice it has not made tomorrow's sitting any less necessary.", "bow"],
+		["Yue Ling", "I have ground the same six herbs every morning since I could hold the pestle, Lin Feng. Nobody has ever stopped at my door to be improved by it. I think I shall go on anyway. It makes the medicine."],
+	],
+	"pre:s_break38": [
+		["Narrator", "Under the pine Lin Feng sits as he sat yesterday. There is a groove in the root where he sits, the shape of him, that was not there when he first sat, and nobody made it on purpose. The sky gathers over the mountain. It has done this before, and it does it again exactly as well."],
+	],
+	"post:s_break38": [
+		["Narrator", "The tribulation comes down, and he meets it as he has met each of the others, a little better and no differently. There is no secret in it. When it has passed he gets up, finds the broom where it always is, and begins at the top step, because it is morning."],
 	],
 	# ---- Part XXX: The Net with Three Sides Open (the Open Net release)
 	"recall28": [
@@ -10307,8 +10600,8 @@ const DIALOGUE := {
 	"s_p30_judge": [
 		["Narrator", "Among the red lilies, where the newly dead come down to the water, an old man in a judge's black is sitting upright on a stone. His wrists are tied in front of him with a cord. The knot is his own: it is on the side a man can reach with his teeth."],
 		["Li Li, Judge of Jin", "I am the chief judge of Jin. A clerk brought me a case, and I heard it as he gave it, and set my seal. The man was dead by evening. He had not done it. I have come down here to find him, and there is nobody to sentence me.", "grieve"],
-		["Lin Feng", "Your Duke says the fault was the clerk's."],
-		["Li Li, Judge of Jin", "My Duke is generous. I took the chief judge's salary; I did not share it downwards. I shall not share this. You have a sword and no office: clear what my seal let loose in this place, read the record, and then tell me what I am owed.", "bow"],
+		["Lin Feng", "The clerk gave it wrongly. Any Duke would say the fault was his."],
+		["Li Li, Judge of Jin", "Mine has said so. My Duke is generous. I took the chief judge's salary; I did not share it downwards. I shall not share this. You have a sword and no office: clear what my seal let loose in this place, read the record, and then tell me what I am owed.", "bow"],
 	],
 	"done:s_p30_bills": [
 		["Narrator", "The bills come off their gates and the seals crack across. The witnesses are the last to go, and the hardest: each of them is perfectly sure, still, and says so as it fades. None of them lied. Every one of them saw a man in a grey coat near the well, as the clerk said."],
@@ -10373,7 +10666,7 @@ const DIALOGUE := {
 	],
 	"done:s_p30_dolls": [
 		["Narrator", "Four dolls of paulownia. He turns each over. The grain is white and dry; there is lint in the needle-hole, of yellow silk. Not one has a grain of earth on it. Whatever these are evidence of, it is not anything that was ever done under a floor."],
-		["Yue Ling", "If you had sat to one of those three arts, Lin Feng, and he had come digging at our gate, he would not have needed his sleeve. I only say it. Some people are caught for what they did, and some for what was brought."],
+		["Yue Ling", "Whoever has sat to one of those three arts, Lin Feng: if he came digging at that gate, he would not need his sleeve. I only say it. Some people are caught for what they did, and some for what was brought."],
 	],
 	"pre:jiang_chong": [
 		["Narrator", "He is waiting on the second height with his cap ribbons blowing, a doll in each sleeve and a list in his belt. From here every roof of the palace is plain, and he looks at them the way a cook looks at a row of fish."],
@@ -10431,7 +10724,7 @@ const DIALOGUE := {
 		["Narrator", "Three stems of green timber lie along the far wall, a room's width from the stove. The old stack stands where it stood, grey and dry and a hand from the bricks. Tian has not moved a stick of it. He has, however, stopped saying so."],
 	],
 	"done:s_p29_sparks": [
-		["Narrator", "The last spark goes out in the wet of the marsh against Lin Feng's sleeve. Over the ridge behind him, quite quietly, the roof of the new house begins to glow along the line where a straight chimney meets it. It is the ninth month. The guest was right in the spring."],
+		["Narrator", "The last spark goes out in the wet of the marsh against Lin Feng's sleeve. Over the ridge behind him, quite quietly, the roof of the new house begins to glow along the line where a straight chimney meets it. The guest was right in the spring."],
 		["Yue Ling", "Lin Feng. The roof."],
 	],
 	"done:s_p29_shingles": [
@@ -11198,13 +11491,13 @@ const DIALOGUE := {
 	],
 	"pre:fei_lian": [
 		["Narrator", "It comes over the edge of the height with the body of a stag, the head of a sparrow, a serpent's tail and the spots of a leopard, and round its neck a bag of grey hide drawn shut with a cord. Where it sets its feet the grass lies down in a ring. Nothing else moves at all."],
-		["Fei Lian, Earl of the Wind", "Paper. Paper and string and split bamboo, in MY air, with children on the end of it, and now grown men hanging underneath. Did one of you ask? I blew for Chiyou at Zhuolu. I am an earl. And I am to be a thing a sweeper falls off rocks on?"],
+		["Feilian, Earl of the Wind", "Paper. Paper and string and split bamboo, in MY air, with children on the end of it, and now grown men hanging underneath. Did one of you ask? I blew for Chiyou at Zhuolu. I am an earl. And I am to be a thing a sweeper falls off rocks on?"],
 		["Master Lie, Who Rode the Wind", "I asked, my lord. Once. You said nothing, and bore me up for fifteen days. I took it for yes."],
-		["Fei Lian, Earl of the Wind", "You I liked. You weighed nothing and wanted nothing. These WANT. Every one of them wants to get somewhere. Wind does not go somewhere! Wind GOES!", "refuse"],
+		["Feilian, Earl of the Wind", "You I liked. You weighed nothing and wanted nothing. These WANT. Every one of them wants to get somewhere. Wind does not go somewhere! Wind GOES!", "refuse"],
 	],
 	"post:fei_lian": [
 		["Narrator", "The Earl of the Wind stands with his head down and his sides going. The cord at his neck has come undone, and for a mile around every blade of grass is leaning one way, and every kite in the valley that was hanging dead on its string has gone up like a shout."],
-		["Fei Lian, Earl of the Wind", "...They are laughing. The small ones, on the ends of the strings. I had forgotten that sound came with it. Hm. I do not say I am mollified. I say only that I had forgotten."],
+		["Feilian, Earl of the Wind", "...They are laughing. The small ones, on the ends of the strings. I had forgotten that sound came with it. Hm. I do not say I am mollified. I say only that I had forgotten."],
 	],
 	"done:s_p22_anglers": [
 		["Narrator", "Three anglers at three waters, none of whom has caught anything in a week and none of whom minds. Each has seen the same thing float past: a sheet of good paper, folded small, written on in a fine official hand. One says it was a poem. One says it was a will. The third could not read it, and kept it for the paper."],

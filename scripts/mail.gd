@@ -212,19 +212,29 @@ const LETTERS := {
 	"mirror_rivet": {"from": "Princess Lechang", "needs": ["the_mirror", "rivet"], "wait": 1,
 		"lines": ["Cultivator: it hangs by the door. I look older in it than he remembers and he looks thinner than I do. We quarrelled yesterday about how rice is washed. It was a very small quarrel and we both stopped in the middle, astonished. Nine years, and here we were, about rice."]},
 	"mirror_recast": {"from": "Xu Deyan", "needs": ["the_mirror", "recast"], "wait": 1,
-		"lines": ["Lin Feng: I have learned that she takes her tea without ginger, rides better than I do, and thinks my verses too clever by a line. None of it was true of the girl. I enclose what a tutor can spare. I am to call again on Thursday. I have been told to bring nothing I wrote."],
+		"lines": ["Lin Feng: I have learned that she takes her tea without ginger, rides better than I do, and thinks my verses too clever by a line. None of it was true of the girl. I enclose what a tutor can spare. I am to call again on the fifth. I have been told to bring nothing I wrote."],
 		"gift": {"stones": 340}},
 	"mirror_halves": {"from": "Princess Lechang", "needs": ["the_mirror", "halves"], "wait": 1,
 		"lines": ["Cultivator: we drank tea on the fifteenth under the two halves. He did not write a poem. I could see it cost him. The lord of my house asked on my return whether I had been happy, and I said yes, and he said good, and meant it. I had not known a life could have this much room in it."]},
 	"bridge_girl": {"from": "A Girl of Lu", "after": "s_p32_flood", "wait": 4,
 		"lines": ["To the one who cleared the river. He came up onto the bridge wet through and asked my name. It is Jing. We had spoken four times and he had never asked. I told him that next time under the bridge is flooded he is to look up. He has written it on his hand."]},
+	# ---- Part XXXIII (the Iron Pestle release): letters from an old woman, a schoolboy and a duke
+	"needle_truth": {"from": "Old Dame Wu", "needs": ["the_needle", "truth"], "wait": 1,
+		"lines": ["Cultivator: you told him. He came down and stood over me and said: you have needles. I said: forty. He said: then why? I gave him the bar. He ground till dark and did not ask again. I had not thought the truth would hold him. It seems I have been underrating boys for forty years."]},
+	"needle_finish": {"from": "Li Bai", "needs": ["the_needle", "finish"], "wait": 1,
+		"lines": ["To the sweeper: the needle is in my collar. I showed the master and he was quiet a long time. I am at the ninth roll. Dame Wu has a new bar. I asked her why, when she had finished, and she said a person must have something to do. I enclose my first poem. It is about a stone."]},
+	"needle_turn": {"from": "Old Dame Wu", "needs": ["the_needle", "turn"], "wait": 1,
+		"lines": ["Cultivator: he comes at first light and grinds for one poem. I notice he chooses long ones now. He presses too hard, and I do not tell him; his arms will. Yesterday he looked at the bar and did not do the sum. I enclose what the school pays for the use of my stream. I told them it was not mine."],
+		"gift": {"stones": 340}},
+	"duke_arrows": {"from": "Chen Yaozi", "after": "s_p33_knack", "wait": 4,
+		"lines": ["Cultivator: I found him at the ninth village. He poured through the coin again, and this time I asked what he had spilled to learn it. He talked until dark. I have had the old arrowheads dug out of my butt and hung in the hall. My mother has seen them. She has put down the stick."]},
 }
 const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_mend", "bandits_drive", "garden_study", "garden_burn", "egg_hatch", "egg_sell",
 	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "ge_arks", "yue_write", "yue_say",
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

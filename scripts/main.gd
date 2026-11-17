@@ -669,6 +669,46 @@ func offer_fit(e: Dictionary) -> bool:
 	)
 	return true
 
+## The Iron Pestle release (living.gd): what somebody of the towns can see of him and of their own country
+## just now: is he hurt, is he bent under a load, where whoever the story wants is standing, and which pack
+## of the country is out hunting at this hour (the nearest to where they stand).
+func _folk_ctx(e: Dictionary, fp: Dictionary) -> Dictionary:
+	var at: Vector2i = e.get("pos", world.ptile)
+	var ctx := {"at": at, "hurt": float(Game.hp[0]) < float(Game.max_hp(0)) * 0.5, "laden": Load.tier(Game) >= 2, "want": {}, "hunt": {}}
+	var s := Game.cur_step()
+	if not s.is_empty() and Data.AREAS.has(str(s.get("area", ""))):
+		var wid := ""
+		var wname := ""
+		if str(s.kind) in ["talk", "war", "haul", "fate"] and s.has("npc"):
+			wid = str(s.npc)
+		elif str(s.kind) in ["kill", "fall"] and s.has("boss"):
+			wid = "boss_" + str(s.boss)
+			wname = str(Data.ENEMIES.get(str(s.boss), {}).get("n", ""))
+		if wid != "":
+			var want := {"area": str(s.area), "n": wname}
+			var we = world.find_ent(wid)
+			if we != null and str(we.get("area", "")) == str(s.area) and world.ent_visible(we) and not we.has("cave"):
+				want["pos"] = we.pos
+				if wname == "":
+					want.n = str(we.get("n", ""))
+			elif wname == "":
+				for en in Data.AREAS[str(s.area)].get("npcs", []):
+					if str(en.id) == wid:
+						want.n = str(en.get("n", ""))
+			if str(want.n) != "" and not Crime.dead(Game, wid):
+				ctx.want = want
+	if not world.is_floor():
+		var bd := 1 << 30
+		for en2 in world.ents:
+			if en2.kind != "enemy" or str(en2.area) != str(fp.area):
+				continue
+			var dd: int = absi(en2.pos.x - at.x) + absi(en2.pos.y - at.y)
+			if dd >= bd or dd > 60 or not world.ent_visible(en2) or Habits.act_of_group(Game, en2.group) != "hunt":
+				continue
+			bd = dd
+			ctx.hunt = {"n": str(Data.ENEMIES[str(en2.group[0].id)].n), "pos": en2.pos}
+	return ctx
+
 ## The Living Land release (folk.gd): a word with one of the people of the towns.
 func talk_folk(e: Dictionary) -> void:
 	var fp: Dictionary = e.p
@@ -697,7 +737,16 @@ func talk_folk(e: Dictionary) -> void:
 	# (the Cloud Keel release, giants.gd: "whoever is small says so": two lines written for it were never said)
 	if wn % 8 == 4 and Game.prologue == "" and not Folk.new_year(Game) and int(Giants.TOWNS.get(str(fp.town), 0)) > 0 and str(fp.get("role", "")) != Giants.ROLE and not bool(fp.get("kid", false)):
 		lines = [[str(fp.n), str(Giants.LINES_SMALL[(int(fp.seed) + wn / 8) % Giants.LINES_SMALL.size()])]]
-	if wn % 4 == 2 and Game.prologue == "" and not Folk.new_year(Game) and Clock.frozen(Game) == "":
+	# (the Iron Pestle release, living.gd: the second word with anybody who has their wits about them is
+	# whatever is worth saying to him now: the way to whoever the story wants, the pack that hunts at this
+	# hour, a wound, a back bent double; and the third is what they work for, or how their cultivation goes)
+	if wn % 4 == 1 and Game.prologue == "" and not Folk.new_year(Game) and Clock.frozen(Game) == "" and Game.bounty.is_empty() and not Taboo.marked(Game):
+		var sl := Living.smart(fp, Game, _folk_ctx(e, fp), wn / 4)
+		if sl != "":
+			lines = [[str(fp.n), sl]]
+	if wn % 8 == 2 and Game.prologue == "" and not Folk.new_year(Game) and Clock.frozen(Game) == "" and Living.line(fp, Game, wn / 8) != "":
+		lines = [[str(fp.n), Living.line(fp, Game, wn / 8).replace("%s", Game.address())]]
+	elif wn % 4 == 2 and Game.prologue == "" and not Folk.new_year(Game) and Clock.frozen(Game) == "":
 		var al := ""
 		match (wn / 4 + int(fp.seed)) % 3:
 			0:
@@ -1032,15 +1081,17 @@ func talk_npc(e: Dictionary) -> void:
 			chats.append(str(dl[1]))
 	var i: int = chat_idx.get(e.id, 0)
 	chat_idx[e.id] = i + 1
-	var lines := [[e.n, chats[i % chats.size()]]]
 	# (the Cloud Keel release, weal.gd: what a crossroads made of somebody with a name was shown under the name
 	# and had a line written for it, and the line was never said; it is their second word, and every third after)
-	if Game.prologue == "" and i % 3 == 1:
-		var wf := Weal.fate(Game, str(e.get("asset", e.id)))
-		if wf.is_empty():
-			wf = Weal.fate(Game, str(e.id))
-		if not wf.is_empty() and str(wf.get("line", "")) != "":
-			lines = [[e.n, str(wf.line)]]
+	# (and their own words are counted by the turns that are left: the fate's turn used to swallow one of their
+	# own, so that somebody with three things to say never again said the second)
+	var wf := Weal.fate(Game, str(e.get("asset", e.id)))
+	if wf.is_empty():
+		wf = Weal.fate(Game, str(e.id))
+	var ct := Weal.chat_turn(i, not wf.is_empty() and str(wf.get("line", "")) != "")
+	var lines := [[e.n, chats[maxi(0, ct) % chats.size()]]]
+	if ct < 0:
+		lines = [[e.n, str(wf.line)]]
 	# a townsperson with something to ask (a deed, trials.gd) asks it instead
 	var deed := Trials.deed_of(str(e.id), Game)
 	if deed != "":
@@ -2110,7 +2161,7 @@ func _drop_fares() -> void:
 func offer_gamble() -> void:
 	# (the Ordered House release, creed.gd: whoever keeps the precepts does not sit at a mat)
 	if not Creed.can(Game, "gamble"):
-		say([["Old Du", Creed.why_not(Game, "gamble")]])
+		say([[Gamble.name_of(), Creed.why_not(Game, "gamble")]])
 		return
 	var opts: Array = []
 	for gid in Gamble.GAME_ORDER:
@@ -2373,7 +2424,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -2513,6 +2564,7 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 		"lose":
 			Game.respawn()
 			world.load_area("sect", Vector2i(20, 8))
-			say([["Narrator", "You wake in the sect infirmary. Elder Qing Xuan watches over you. Some spirit stones were lost to the healers."]])
+			# (crime.gd: the dead stay dead: an Elder he struck down used to watch over him in the infirmary all the same)
+			say([["Narrator", "You wake in the sect infirmary. %s Some spirit stones were lost to the healers." % ("Nobody is sitting by the bed." if Crime.dead(Game, "elder") else "Elder Qing Xuan watches over you.")]])
 		_:
 			pass

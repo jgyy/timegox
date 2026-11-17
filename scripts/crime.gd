@@ -91,7 +91,7 @@ const ARMED := {"guard": 8, "watchman": 6, "huntsman": 5, "hunter": 5, "disciple
 	# (the Tall People release: nobody of the Great People has cultivated a day, and nobody has needed to)
 	"giant": 14}
 ## children of the story whose names do not say so (their bodies are a child's: art/characters)
-const CHILD := ["stableboy_shitou", "camel_boy_temur", "ox_herd_niu", "ship_boy_ah_fu", "furnace_boy"]
+const CHILD := ["stableboy_shitou", "camel_boy_temur", "ox_herd_niu", "ship_boy_ah_fu", "furnace_boy", "li_bai"]
 ## might is never past this, whatever the titles
 const MIGHT_MAX := 110
 
@@ -324,7 +324,10 @@ static func worst(g) -> int:
 
 ## Whether nothing at all is held against him: nobody dead, no bill, no forbidden art.
 static func clean(g) -> bool:
-	return g.slain.is_empty() and g.crimes.is_empty() and heat(g) == 0 and Taboo.taint(g) == 0 and not Taboo.marked(g)
+	# (a bill paid or served is no bill: somebody who drew once, was put on his back and settled with the watch
+	# was told "a clean name" by the page of the Law and "not clean" at every trial, for good.  What stays is
+	# what the trial names: somebody dead, a bill that hangs, the shelf ever opened)
+	return g.slain.is_empty() and int(g.watch_slain) == 0 and heat(g) == 0 and g.taboo.is_empty()
 
 ## Why `what` (a key of SHUT) cannot be done in region `area` ("" if it can).
 static func shut(g, area: String, what: String) -> String:
@@ -583,6 +586,9 @@ static func line(g, town: String, seed_: int) -> String:
 ## "Wanted in Qingshi Village (2400), Cloudfoot (300)" or "a clean name".
 static func text(g) -> String:
 	if heat(g) == 0:
+		# (found out at a forbidden art there is no price, and his name hangs at every gate: it read "a clean name")
+		if Taboo.marked(g):
+			return "outlaw: a walker of the forbidden, with no price to pay"
 		return "a clean name" if g.slain.is_empty() and int(g.watch_slain) == 0 else "no bill at any gate"
 	var parts: Array = []
 	for tid in Weal.ORDER:
