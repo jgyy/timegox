@@ -2281,6 +2281,10 @@ func _run() -> void:
 		await _fates_shots()
 	if main.args.has("living"):
 		await _living_shots(str(main.args.living))
+	if main.args.has("wits"):
+		# the Iron Pestle release (--wits, or --wits=a,b): what the people of the towns work for, people
+		# who know the way, and foes that fight as what they are
+		await _wits_shots(str(main.args.wits))
 	if main.args.has("part16"):
 		await _part16_shots(str(main.args.part16))
 	if main.args.has("sword"):
@@ -2351,6 +2355,10 @@ func _run() -> void:
 		# behind, the cast dressed and bare, the three things two people do, the people, foes and lords of
 		# Part XXXII, the lords in battle, the crossroads, and Yue Ling's page
 		await _mirror_shots(str(main.args.mirror))
+	if main.args.has("pestle"):
+		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
+		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
+		await _pestle_shots(str(main.args.pestle))
 	if main.args.has("tall"):
 		# the Tall People release (--tall, or --tall=a,b): the Great People beside a man, the eight gestures of a
 		# close-up, the nine faces of the Way, the people, foes and lords of Part XXXI, a town with giants in its
@@ -5582,6 +5590,55 @@ func _mirror_shots(which: String = "1") -> void:
 		await _wait(1.0)
 		await _shot("crossroads_mirror")
 
+## The Iron Pestle release (--pestle, or --pestle=a,b): see _run.
+func _pestle_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 113
+	Game.step = Data.step_index("s_p33_needle")
+	Game.companion = true
+	Game.day = 200
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	Game.toasts.clear()
+	main.toast_list.clear()
+	Game.mail_told = 999
+	Game.fame_told = Fame.rank(Game)
+	if want.call("people"):
+		await _gallery("part33_people", [Assets.person("granny_wu"), Assets.person("li_bai"), Assets.person("kuang_heng"), Assets.person("oil_seller"), Assets.person("chen_yaozi")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["green_peach", "skipped_page", "skipped_step", "stopped_hole", "idle_lamp", "uncut_book", "proud_arrow", "spilt_oil", "idle_clap", "third_watch", "dry_lamp", "melting_snow"]:
+			fs.append(_foe(fid))
+		await _gallery("part33_foes", fs, 1.0, 0.25)
+		await _gallery("part33_lords", [_foe("the_short_way", true), _foe("the_shelf", true), _foe("the_knack", true)], 1.3, 0.25)
+	if want.call("marks"):
+		var ms: Array = []
+		for oid in ["truth", "finish", "turn"]:
+			ms.append(Marks.model(Marks.MARKS.the_needle[oid], 0))
+		await _gallery("part33_marks", ms, 0.9, 0.3)
+	if want.call("battles"):
+		for bb in [["the_short_way", "jasper", "relic", 112], ["the_shelf", "void", "relic", 113], ["the_knack", "celestial", "relic", 114]]:
+			var bid := str(bb[0])
+			var bm: Array = Trials.TRIALS[bid].might
+			main.set_stack(["world"])
+			Game.area = str(bb[1])
+			var ctx := {"boss": bid, "area": str(bb[1]), "theme": str(Data.AREAS[str(bb[1])].theme), "trial": str(bb[2])}
+			main.battle.start([{"id": bid, "lv": int(bb[3]), "mult": float(bm[0]), "atk": float(bm[1])}], ctx)
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("battle_boss_" + bid)
+			main.pop()
+	if want.call("choice"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_needle"]
+		main.ask_crossroads()
+		main.choice.cursor = 0
+		await _wait(1.0)
+		await _shot("crossroads_needle")
+
 ## The Tall People release (--tall, or --tall=a,b): see _run.
 func _giant(asset: String) -> Node3D:
 	var m: Node3D = Assets.person(asset) if Assets.PEOPLE.has(asset) else Assets.instance("characters/" + asset)
@@ -6035,4 +6092,144 @@ func _tall_shots(which: String = "1") -> void:
 		await _shot("crossroads_lintel")
 		main.pop()
 		Game.cross_pending = []
+	get_tree().quit(0)
+
+## The Iron Pestle release: somebody of the towns faced, with what they work for under their name; what
+## they say of it; somebody asked the way; a disciple of the sect and his layer; a battle in which the
+## foes have said why they went for whom; and the bestiary's line on how a thing fights.
+func _wits_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 40
+	Game.step = Data.step_index("s_p16_report")
+	Game.companion = true
+	Game.day = 64
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var lw := Atlas.world_of("surface")
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	quiet.call()
+	# somebody of `town` at hour `h` who is out of doors, standing still, with open ground south of them
+	var find := func(town: String, h: float, ok: Callable) -> Dictionary:
+		Game.clock = h * 60.0
+		for fp in Folk.people(lw, town):
+			if not ok.call(fp):
+				continue
+			var st: Dictionary = Folk.state(lw, fp, Game.clock)
+			if not bool(st.vis) or bool(st.walk):
+				continue
+			var gt := Vector2i(int(floor(float(st.at.x))), int(floor(float(st.at.y))))
+			var spot := gt + Vector2i(0, 1)
+			if not w.tile_free(spot) or w.ent_at(spot) != null or not w.building_at(spot).is_empty():
+				continue
+			return {"p": fp, "at": gt, "spot": spot}
+		return {}
+	var stand := func(f: Dictionary) -> void:
+		main.set_stack(["world"])
+		w.open_world()
+		w.enter_layer("surface")
+		w.teleport(f.spot, "surface")
+		w.facing = Vector2i(0, -1)
+		w.cam_q = 0
+		w._snap_cam()
+		w.banner_t = 0.0
+		quiet.call()
+	if want.call("town"):
+		for tw in [["qingshi", 10.4, "living_farmer", "farmer"], ["cloudfoot", 15.0, "living_merchant", "merchant"], ["sect", 9.0, "living_disciple", "disciple"]]:
+			main.set_stack(["world"])
+			w.open_world()
+			w.enter_layer("surface")
+			var f: Dictionary = find.call(str(tw[0]), float(tw[1]), func(q: Dictionary) -> bool: return str(q.role) == str(tw[3]))
+			if f.is_empty():
+				print("[tour] nobody to face in ", tw[0])
+				continue
+			stand.call(f)
+			await _wait(1.6)
+			await _shot(str(tw[2]) + "_tag")
+			Game.folk_talk[str(f.p.id)] = 2
+			main.talk_folk({"kind": "folk", "id": f.p.id, "n": f.p.n, "p": f.p, "pos": f.at, "area": f.p.area})
+			main.dialogue.shown = 999.0
+			await _wait(0.5)
+			await _shot(str(tw[2]) + "_says")
+			main.set_stack(["world"])
+			w.folk_talking = ""
+	if want.call("way"):
+		main.set_stack(["world"])
+		w.open_world()
+		w.enter_layer("surface")
+		var f2: Dictionary = find.call("qingshi", 10.4, func(q: Dictionary) -> bool: return str(q.role) in ["merchant", "cook", "washer", "elder"])
+		if not f2.is_empty():
+			var keep_step: int = Game.step
+			for i in Data.STEPS.size():
+				var st2: Dictionary = Data.STEPS[i]
+				if str(st2.kind) == "talk" and str(st2.get("area", "")) == "village" and st2.has("npc"):
+					Game.step = i
+					var we = w.find_ent(str(st2.npc))
+					if we != null and w.ent_visible(we) and (we.pos - f2.at).length() > 12.0:
+						break
+			stand.call(f2)
+			Game.folk_talk[str(f2.p.id)] = 1
+			main.talk_folk({"kind": "folk", "id": f2.p.id, "n": f2.p.n, "p": f2.p, "pos": f2.at, "area": f2.p.area})
+			main.dialogue.shown = 999.0
+			await _wait(0.5)
+			await _shot("folk_knows_the_way")
+			main.set_stack(["world"])
+			w.folk_talking = ""
+			Game.step = keep_step
+	if want.call("battle"):
+		main.set_stack(["world"])
+		var pick := {}
+		for id in Data.ENEMIES:
+			var d: Dictionary = Data.ENEMIES[id]
+			if d.get("boss", false) or d.get("doom", false):
+				continue
+			for sh in ["fox", "humanoid", "beast"]:
+				if str(d.shape) == sh and not pick.has(sh):
+					pick[sh] = str(id)
+		var b = main.battle
+		b.start([{"id": pick.fox, "lv": 40}, {"id": pick.humanoid, "lv": 40}, {"id": pick.humanoid, "lv": 40}, {"id": pick.beast, "lv": 40}], {"boss": false, "theme": "bamboo"})
+		main.push("battle")
+		await _wait(2.6)
+		b.log_lines.clear()
+		b.round_no = 2
+		Tactics.new_round(b.wits, 2)
+		b.wits.mended[1] = 2
+		b.party[1].hp = float(b.party[1].maxhp) * 0.5
+		seed(7)
+		b._foe_act(b.foes[0])
+		await _wait(0.9)
+		b._foe_act(b.foes[1])
+		await _wait(0.9)
+		b.foes[2].hp = float(b.foes[2].maxhp) * 0.2
+		b._foe_act(b.foes[2])
+		await _wait(0.9)
+		b._foe_act(b.foes[3])
+		await _wait(0.7)
+		await _shot("battle_foes_that_think")
+		main.pop()
+	if want.call("page"):
+		main.set_stack(["world"])
+		var fox_id := ""
+		for id2 in Data.ENEMIES:
+			if str(Data.ENEMIES[id2].shape) == "fox" and not Data.ENEMIES[id2].get("boss", false) and fox_id == "":
+				fox_id = str(id2)
+			if Game.bestiary.size() < 24 and not Data.ENEMIES[id2].get("boss", false):
+				Game.bestiary[str(id2)] = 3
+		Game.bestiary[fox_id] = 5
+		main.open_menu()
+		main.menu.mode = "bestiary"
+		main.menu._build()
+		var ents: Array = main.menu.bestiary()
+		for i2 in ents.size():
+			if str(ents[i2][0]) == fox_id:
+				main.menu.cursor = i2
+		await _wait(0.6)
+		await _shot("bestiary_how_it_fights")
+		main.pop()
 	get_tree().quit(0)

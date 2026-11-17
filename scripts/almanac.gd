@@ -155,7 +155,9 @@ static func season_line(g, seed_: int) -> String:
 	if not f.is_empty():
 		return str(f[3])
 	var pool: Array = SEASON_LINES[season(g)]
-	return str(pool[absi(seed_) % pool.size()])
+	# (main.gd asks with a seed that is a multiple of three whenever it is a grown person's turn to speak of
+	# the season: of three lines only the first was ever said, so the thirds are counted too)
+	return str(pool[(absi(seed_) + absi(seed_) / 3) % pool.size()])
 
 # ---------------------------------------------------------------- the days, as a number
 ## The days of the journey as a number with the hour in it (day 3 at noon is 3.5).  Not the calendar:
@@ -225,7 +227,8 @@ static func poll(g) -> Array:
 		if st > 0:
 			g.stipends += 1
 		if st <= 0:
-			out.append("The first of the %s Month: no stipend comes. The sect sends nothing to a rogue cultivator" % MONTHS[month(g) - 1])
+			# (an outlaw is struck from the roll whatever rule he keeps: he was told he was a rogue cultivator)
+			out.append("The first of the %s Month: no stipend comes. %s" % [MONTHS[month(g) - 1], "His name has been struck from the roll" if Crime.outlaw(g) else "The sect sends nothing to a rogue cultivator"])
 		else:
 			out.append("The first of the %s Month: the sect's stipend, %d spirit stones (%s on the roll)" % [MONTHS[month(g) - 1], st, _place_word(place(g))])
 	for i in ROLL.size():

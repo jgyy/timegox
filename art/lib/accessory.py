@@ -488,3 +488,26 @@ def red_thread(b, col="c02020", book="5a2a2a", paper="f0e4c0"):
                [0.006, 0.006], col, cls=CLOTH, bone="hand.R", seg=5)
     b.tube([h + V(0.03, 0.0, 0.0), h + V(0.036, -0.12, 0.02), h + V(0.02, -0.26, 0.03), h + V(0.03, -0.4, 0.02)], [0.004, 0.0035, 0.003, 0.002], col, cls=CLOTH, bone="hand.R", seg=5)
 
+
+
+def iron_pestle(b, iron="3e4046", bright="c8ccd0"):
+    """An iron pestle held across the body in the left hand (Part XXXIII): a bar as thick as a wrist,
+    black where the hand has it, and ground bright and a little thinner along the end that has been
+    on the stone."""
+    c = held_l() + V(0.0, 0.0, 0.03)
+    b.tube([c + V(-0.2, -0.02, 0.0), c + V(-0.05, 0.0, 0.01), c + V(0.06, 0.01, 0.01)], [0.027, 0.026, 0.024], iron, cls=METAL, bone="hand.L", seg=8)
+    b.tube([c + V(0.06, 0.01, 0.01), c + V(0.17, 0.025, 0.005), c + V(0.24, 0.035, 0.0)], [0.024, 0.018, 0.012], bright, cls=METAL, bone="hand.L", seg=8)
+    b.ball(c + V(-0.2, -0.02, 0.0), 0.03, darken(iron, 0.15), cls=METAL, bone="hand.L", seg=8, rings=5)
+
+
+def oil_yoke(b, pole="7a5a38", jar="5a3a22", glaze="2e1e14", cord="8a7a5a"):
+    """A carrying pole across the shoulders with a stoppered oil jar slung from each end (Part
+    XXXIII): the old oil seller's whole shop."""
+    b.tube([V(-0.6, 1.5, -0.06), V(0.0, 1.53, -0.09), V(0.6, 1.5, -0.06)], [0.016, 0.02, 0.016], pole, cls=WOOD, bone="chest", seg=6)
+    for s in (-1, 1):
+        end = V(0.58 * s, 1.5, -0.06)
+        c = end + V(0, -0.62, 0)
+        for d in (-0.06, 0.06):
+            b.tube([end, c + V(d, 0.2, 0)], [0.004, 0.004], cord, cls=CLOTH, bone="chest", seg=3)
+        b.lathe(c, [(0.0001, -0.14), (0.09, -0.13), (0.13, -0.04), (0.125, 0.06), (0.08, 0.15), (0.05, 0.18), (0.06, 0.2), (0.0001, 0.2)], jar, cls=STONE, bone="chest", seg=12, col_top=glaze)
+        b.tube([c + V(0, 0.2, 0), c + V(0, 0.235, 0)], [0.03, 0.026], "c8b080", cls=WOOD, bone="chest", seg=8)

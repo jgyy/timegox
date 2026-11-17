@@ -421,6 +421,10 @@ func _draw_bestiary() -> void:
 			var hl := "%s  Asleep from %s." % [Habits.line(Game, str(e[0])), Habits.sleeps(hb).replace("-", " to ").replace(",", " and from")] if Habits.sleeps(hb) != "never" else Habits.line(Game, str(e[0]))
 			UI.text(self, r.position + Vector2(24, 96), hl, UI.fit(hl, 14, r.size.x - 48), Habits.info(Habits.act(Game, str(e[0]))).col, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
 			ty = 134.0
+		# (the Iron Pestle release, tactics.gd: how it fights)
+		var wl := "Fights %s. %s" % [Tactics.word(str(e[0])), Tactics.hint(str(e[0]))]
+		UI.text(self, r.position + Vector2(24, ty - 14.0), wl, UI.fit(wl, 14, r.size.x - 48), UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 48)
+		ty += 24.0
 		UI.wrapped(self, r.position + Vector2(24, ty), str(e[2]), 18, UI.C_TEXT, r.size.x - 48)
 	else:
 		UI.wrapped(self, r.position + Vector2(24, 40), "Every foe has a story. %d of %d met so far; the bosses are marked with a star." % [entries.size(), Data.ENEMIES.size()], 17, UI.C_DIM, r.size.x - 48)
@@ -523,7 +527,7 @@ func _draw_law() -> void:
 		if Game.slain[id].has("alias"):
 			continue
 		if shown >= 7:
-			UI.text(self, Vector2(r.position.x + 420, yd), "and %d more" % (Game.slain.size() - shown), 13, UI.C_DIM)
+			UI.text(self, Vector2(r.position.x + 420, yd), "and %d more" % (Game.slain.values().filter(func(x): return not x.has("alias")).size() - shown), 13, UI.C_DIM)
 			yd += 19.0
 			break
 		var rec: Dictionary = Game.slain[id]

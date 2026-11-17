@@ -519,7 +519,10 @@ static func line(g, ftid: String, seed_: int) -> String:
 			return "They tell it in the street like this: \"%s\" And we are the better for it here. I only say what I hear." % why
 		return "They tell it in the street like this: \"%s\" And we have felt it here. I only say what I hear." % why
 	var pool: Array = STREET.get(st, [])
-	return "" if pool.is_empty() else str(pool[seed_ % pool.size()])
+	# (a seed that is a multiple of three says why, above: counted by the seed itself, the first of every three
+	# lines of the street was never said; they are counted by the seeds that are left)
+	var k := absi(seed_) - absi(seed_) / 3 - (1 if not cs.is_empty() else 0)
+	return "" if pool.is_empty() else str(pool[maxi(0, k) % pool.size()])
 
 # ---------------------------------------------------------------- what they do
 ## What somebody standing about in a town does instead of the day's own clip, by the town's state,
@@ -575,8 +578,12 @@ const FATES := [
 	{"npc": "carpenter_gu", "when": ["the_lintel", ["each"]], "tag": "who asks before he cuts", "line": "Two lintels to a door, and I am to ask whoever will live there how high. Sixty generations we built for the Great People and never asked one. The first I asked said: a hand lower, I like to touch it as I go in. A hand lower!"},
 	# Part XXXII (the Broken Mirror release)
 	{"npc": "lechang", "when": ["the_mirror", ["rivet"]], "tag": "who went home with him", "line": "It has six rivets in it and a line you could lose a hair in. I look at it every morning before I look at anything else. I used to look at my half to see what was gone. Now I look to see what is there."},
-	{"npc": "lechang", "when": ["the_mirror", ["recast"]], "tag": "who has been called upon", "line": "He came on Thursday with nothing he had written, as he was told, and sat on the edge of the chair. I asked him what he did for a living. He said he had been waiting. I said that is not a living. He laughed. I had forgotten his laugh; no, I had never heard this one."},
+	{"npc": "lechang", "when": ["the_mirror", ["recast"]], "tag": "who has been called upon", "line": "He came on the fifth with nothing he had written, as he was told, and sat on the edge of the chair. I asked him what he did for a living. He said he had been waiting. I said that is not a living. He laughed. I had forgotten his laugh; no, I had never heard this one."},
 	{"npc": "lechang", "when": ["the_mirror", ["halves"]], "tag": "who has two houses", "line": "My half hangs a hand from his, on his wall, and neither of us has offered to move it. On the fifteenth I go to see my own face in his house. He says it looks well there. He has not said it should stay."},
+	# Part XXXIII (the Iron Pestle release)
+	{"npc": "granny_wu", "when": ["the_needle", ["truth"]], "tag": "whose secret is out", "line": "He knows about the forty needles, and he comes all the same. I had thought the thing only worked on those who believed in it. It seems it works better on one who does not. Forty years at this stone, and a child of ten has had to show me what I was doing."},
+	{"npc": "granny_wu", "when": ["the_needle", ["finish"]], "tag": "with a new bar", "line": "It was a needle when I woke. I held it, and could not find anything to say. My granddaughter has fetched me another bar, the same weight. Do not look so. It was kindly done. I only wish somebody had asked me whether I wanted to be finished."},
+	{"npc": "granny_wu", "when": ["the_needle", ["turn"]], "tag": "who has company at the stone", "line": "That is him now; listen. Too fast, and he presses. In a month he will not. I used to talk to the water of a morning. Now there is a boy saying the Odes at me, wrong, and I put him right, and I have never read them. One picks things up."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["sword"]], "tag": "who has been thinking about his gate", "line": "A judge of Jin kept his own law to the end, and you stood by. Twenty years I have let through this gate whoever I was told to. Last night I asked myself who I should have stopped. I am still asking."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["bench"]], "tag": "who asks twice now", "line": "They say there is a court in Jin that hears every case twice, under a dead man's name. I ask everybody their business twice now, at this gate. It holds up the carts. Nobody has been turned away wrongly since."},
 	{"npc": "gate_wu", "when": ["the_verdict", ["field"]], "tag": "with a hoe leaning by the gate", "line": "A judge hoeing beans for a widow. I let a pedlar through once who robbed the kitchens. I never told anybody. I have dug Auntie Zhou's leek bed every morning since I heard. She thinks I have gone simple."},
@@ -605,6 +612,14 @@ static func fate(g, npc: String) -> Dictionary:
 		if Echoes.chosen(g, str(f.when[0])) in f.when[1]:
 			best = f
 	return best
+
+## Which of somebody's own words is said on their `i`-th turn to speak (an index into what they have to say),
+## or -1 when it is the turn of what a crossroads made of them (`fated`: the second word, and every third
+## after).  Their own words are counted by the turns that are left, so that none of them is passed over.
+static func chat_turn(i: int, fated: bool) -> int:
+	if not fated:
+		return i
+	return -1 if i % 3 == 1 else i - (i + 2) / 3
 
 ## What is written under somebody's name when the hero faces them: a named person's fate, or, for
 ## whoever answers for a town, how the town stands ("" for most people).

@@ -241,6 +241,15 @@ const MARKS := {
 		"halves": {"area": "guanghan", "m": ["lamp_post"], "k": 2, "n": "The Two Lamps", "desc": "Two lamps on two posts at the foot of the Moon Palace, a hand apart, each with half a round of bronze behind the flame for a reflector. Either would light the path by itself. Together they throw one round of light with a dark line down the middle, and travellers stand in it to read their letters.",
 			"who": ["Lamplighter Ruan", "folk_youth", Color("5a5a7a"), "I light the left and then the right. Never the other way; I tried it once and it felt like putting my shoes on the wrong feet. There is a line down the middle of the light where they do not meet. People step over it. I do not know why. I do.", "A lady's carriage stops here on the fifteenth. She gets down and stands a while in the light before she goes up to the house, on her own side of the line, and when she comes out she is on the other. I have never seen her step across. She must do it indoors."]},
 	},
+	# Part XXXIII (the Iron Pestle release): what the boy was told about the needle
+	"the_needle": {
+		"truth": {"area": "jasper", "m": ["stele", STONE, false, true], "n": "Dame Wu's Rock", "desc": "A rock by the stream below the Jasper Pool with one face dressed flat and a few lines cut in it: that an old woman ground an iron pestle here, that she had needles at home, and that she ground it all the same. Boys from the schools read it on the way down. Some of them sit on the bank a while afterwards, not laughing.",
+			"who": ["Stonecutter Pei", "folk_porter", Color("7a7a70"), "She told me what to cut and stood over me while I cut it. The part about the needles at home: I said, Dame, that spoils the story. She said it is the story. I have cut a great many stones for the dead. It is the first I ever cut for somebody who checked the spelling.", "A boy stopped yesterday and read it twice and said: then she is a fraud. And went on down. He was back before dark and read it a third time. I pretended to be sharpening a chisel. He sat till the light went, and then he went up, not down."]},
+		"finish": {"area": "jasper", "m": ["whet", false], "n": "The Stone with Nothing on It", "desc": "A whetstone bedded in the stream below the Jasper Pool, with a groove begun in it and no pestle. The bar that lay on it was finished in a night by somebody in a hurry to be kind. The old woman comes down each morning all the same, out of habit, and sits by it with her hands in her lap until the dew is off.",
+			"who": ["Mei, Granddaughter of Dame Wu", "folk_maiden", Color("8a6a7a"), "Grandmother woke and it was a needle. She held it a long time. Then she sent me to the smith at Tushan for another bar, the same weight, and told me to tell nobody. It is under my bed. She says she will begin when she has got over being angry.", "She is not ungrateful; I am to say so, if you are who I think. She says it was done out of a good heart, and the boy went back, and those are the two things that matter. And then she says: forty years. And goes and looks at the stone."]},
+		"turn": {"area": "jasper", "m": ["whet", true], "k": 3, "n": "The School's Stones", "desc": "Three whetstones bedded in a row in the stream below the Jasper Pool, each with a bar of iron lying on it and a groove begun. The school on the mountain sends its boys down by turns before lessons, a poem's length each. None of the bars is any nearer a needle. The master says the recitation has improved past all belief.",
+			"who": ["Schoolmaster Zhao", "folk_scholar", Color("5a6a7a"), "It was the Li boy began it, and then two more wished to, and I thought: let them, it will be over in a week. That was the spring before last. I have had to draw up a roster. There is a waiting list for a turn at grinding iron! I never had one for the Analects.", "What does it teach them? Not patience; they are boys. I think it teaches them what a little is. Down wet and back dry, and nothing to show, and tomorrow the same; and at the end of a year the groove is a finger deep. They had not known that a little was anything."]},
+	},
 	# Part XXVIII (the Answering Land release): what is owed for a kindness
 	"the_knot": {
 		"nothing": {"area": "fusang", "m": ["cairn", STRAW], "n": "The Cairn Where He Put It Down", "desc": "A small cairn in the long grass of the Valley of Sunrise, and round it a patch where every stem stands straight and none is tied. On the top stone somebody has left a single knot of grass, undone, the stems smoothed flat with a thumb.",
@@ -380,7 +389,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -828,6 +837,19 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"whet":
+			# a whetstone bedded on two wedges with a trough of water beside it; with a bar of iron lying on it, or bare
+			b.box(Vector3(0, 0.2, 0), Vector3(1.1, 0.22, 0.5), MB.tag(Color("6a8a78").darkened(0.1 * h), MB.STONE), Vector3(0, 0.25 * (h - 0.5), 0.05))
+			b.box(Vector3(0, 0.315, 0), Vector3(0.7, 0.012, 0.09), MB.tag(Color("3e5448"), MB.STONE), Vector3(0, 0.25 * (h - 0.5), 0.05))
+			for sx5 in [-0.42, 0.42]:
+				b.box(Vector3(sx5, 0.06, 0), Vector3(0.2, 0.14, 0.46), st, Vector3(0, 0, sx5 * 0.3))
+			b.lathe(Vector3(0.75, 0.0, 0.35), [Vector2(0.2, 0.0), Vector2(0.26, 0.2), Vector2(0.22, 0.22)], wd, 8)
+			b.cyl(Vector3(0.75, 0.17, 0.35), 0.2, 0.02, MB.tag(WATER, MB.STONE))
+			if a.size() > 1 and bool(a[1]):
+				_stick(b, Vector3(-0.38, 0.36, 0.02), Vector3(0.1, 0.36, 0.0), 0.04, MB.tag(IRON, MB.METAL))
+				_stick(b, Vector3(0.1, 0.36, 0.0), Vector3(0.36, 0.35, -0.01), 0.032, MB.tag(Color("c8ccd0"), MB.METAL))
+			else:
+				b.box(Vector3(-0.2, 0.34, 0.12), Vector3(0.16, 0.03, 0.12), MB.tag(PAPER, MB.CLOTH), Vector3(0, 0.4, 0))
 		"lamp_post":
 			_stick(b, Vector3(0, 0, 0), Vector3(0, 2.0, 0), 0.05, wd)
 			_stick(b, Vector3(0, 1.9, 0), Vector3(0.4, 1.9, 0), 0.03, wd)

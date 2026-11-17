@@ -51,6 +51,8 @@ var closed_said := false
 ## whether the trial's boss has been brought low enough to be enraged
 var boon := {}
 var enraged := false
+## what the foes remember of this battle (tactics.gd): who mends, who the pack is on, who has guarded
+var wits := Tactics.memory()
 ## Fates and Faces (lore.gd): the story of a species met for the first time, on a card over the
 ## battle's opening ({"n", "text"}, or empty)
 var lore_card := {}
@@ -322,6 +324,7 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		f["doom"] = Dooms.is_doom(str(f.id))
 		if f.doom:
 			f.hp = float(f.maxhp)
+	wits = Tactics.memory()
 	first_blow = true
 	vajra_used = false
 	tide_used = false
@@ -379,6 +382,11 @@ func start(foe_list: Array, c: Dictionary) -> void:
 			say("%s: %s." % [str(Habits.info(habit).word), str(Habits.info(habit).hint).get_slice(": ", 1)])
 		if grown > 0:
 			say(str(Almanac.STAGES[grown].say))
+		# (tactics.gd: a pack that thinks is told of, the first time each kind is met)
+		for f in foes:
+			if Tactics.wit(f) >= Tactics.CUNNING and int(Game.bestiary.get(str(f.id), 0)) == 1:
+				say("%s fights %s. %s" % [str(f.name), Tactics.WORDS[Tactics.wit(f)], Tactics.HINTS[Tactics.wit(f)]])
+				break
 		# (the Open Net release, wilds.gd: what a country hunted too hard sends to meet him)
 		if int(ctx.get("wild", 0)) > 0:
 			say(str(Wilds.STATES[int(ctx.wild)].say))
@@ -447,6 +455,7 @@ func _next_turn() -> void:
 			return
 		if order.is_empty():
 			round_no += 1
+			Tactics.new_round(wits, round_no)
 			# (dooms.gd: it mends, it comes on harder, and on the round it crests it goes over them)
 			if doomed:
 				if round_no > crest:
@@ -544,6 +553,8 @@ func _assist() -> bool:
 
 func _foe_act(f: Dictionary) -> void:
 	var tg: Array = alive(party)
+	# (a guard lasts until its own next turn)
+	f.erase("braced")
 	if f.boss and f.turns % 3 == 0:
 		# a talisman or a ward (a trial's path) blunts the worst of it
 		var heavy := 1.45
@@ -558,12 +569,18 @@ func _foe_act(f: Dictionary) -> void:
 			_hit(f, p, heavy, f.elem, true)
 		timer = 1.3
 		return
-	var victim: Dictionary = tg[randi() % tg.size()]
-	if randf() < 0.4:
-		for p in tg:
-			if p.hp / p.maxhp < victim.hp / victim.maxhp:
-				victim = p
-	say("%s attacks %s." % [f.name, victim.name])
+	# (the Iron Pestle release, tactics.gd: each foe fights as what it is, and is seen to)
+	var plan := Tactics.choose(f, tg, alive(foes), wits, randf(), randf())
+	if str(plan.act) == "brace":
+		wits.braced[int(f.get("slot", 0))] = true
+		f["braced"] = true
+		say(Tactics.BRACE_SAID % f.name)
+		fx.append({"text": "guards", "p": head3(f), "t": 1.0, "col": Color("b8c8e0"), "slash": ""})
+		timer = 0.85
+		return
+	var victim: Dictionary = tg[int(plan.to)]
+	say(str(Tactics.SAID[str(plan.why)]) % [f.name, victim.name])
+	Tactics.struck(wits, f, int(victim.idx))
 	_hit(f, victim, 1.0, f.elem, false)
 	timer = 0.85
 
@@ -595,6 +612,9 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 	var raw: float = a.atk * mult * randf_range(0.9, 1.1) * em - tgt.def * 0.5 * guard
 	if a.side == "party" and tgt.has("marked"):
 		raw *= float(tgt.marked)
+	# (tactics.gd: a foe that drew back and guards takes half of what reaches it)
+	if tgt.get("braced", false):
+		raw *= Tactics.BRACE_TAKEN
 	# realm suppression (Part XII): a realm above weighs on a realm below; a tribulation is heaven
 	# itself and weighs on everyone the same
 	if not ctx.get("tribulation", false):
@@ -693,6 +713,9 @@ func _perform(actor: Dictionary, skill_id: String, tgts: Array) -> void:
 	if actor.side == "party":
 		acts["mends" if s.has("heal") else "blows"] = int(acts["mends" if s.has("heal") else "blows"]) + 1
 	if s.has("heal"):
+		# (tactics.gd: the foes that think have seen who mends)
+		if actor.side == "party":
+			wits.mended[int(actor.idx)] = round_no
 		say("%s casts %s." % [actor.name, s.n])
 		if not headless() and actor.has("model"):
 			Models.act(actor.model, "cast", t)
@@ -786,6 +809,7 @@ func _use_item(actor: Dictionary, item: String, tgt: Dictionary) -> void:
 	# the Cauldron's Dao: pills do far more good
 	var pk := Game.dao_mod("pill", 1.0) * Works.mod(Game, "pill")
 	if item == "hp_pill":
+		wits.mended[int(actor.idx)] = round_no
 		say("%s feeds %s a healing pill." % [actor.name, tgt.name])
 		_heal(tgt, tgt.maxhp * 0.4 * pk)
 	else:

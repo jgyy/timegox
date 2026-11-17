@@ -129,6 +129,8 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"late_axe": "folk", "kuafu_west": "relic", "the_decree": "house", "the_shoe": "relic",
 	# Part XXXII: four knots that held to the graves, four hours waited to the water, four slips of elm to the wall
 	"two_graves": "relic", "the_flood": "relic", "the_wall": "relic",
+	# Part XXXIII: four stones worn through to the stair, four slips in his own hand to the library, four dry coins to the gift
+	"the_short_way": "relic", "the_shelf": "relic", "the_knack": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -183,7 +185,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	# Part XXXI: each of them asked, at the gate
 	"the_lintel": ["each"],
 	# Part XXXII: riveted, with the join showing
-	"the_mirror": ["rivet"]}
+	"the_mirror": ["rivet"],
+	# Part XXXIII: sent to take a turn at the stone
+	"the_needle": ["turn"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -465,6 +469,7 @@ func _process(d: float) -> void:
 		path_key = ""
 		grind_target = ""
 	if top != last_top:
+		screens_seen += 1
 		if last_top == "shop":
 			shop_done[main.shop.kind] = true
 		last_top = top
@@ -556,17 +561,28 @@ func _dialogue() -> void:
 	_press("confirm", 0.3)
 
 # ---------------------------------------------------------------- world planning
-func _hp_ratio() -> float:
-	var r := 2.0
+## (asked several times in one look at the world: worked out once a frame)
+var _ratio_frame := -1
+var _ratio_hp := 2.0
+var _ratio_qi := 2.0
+
+func _ratios() -> void:
+	if _ratio_frame == Engine.get_process_frames():
+		return
+	_ratio_frame = Engine.get_process_frames()
+	_ratio_hp = 2.0
+	_ratio_qi = 2.0
 	for i in Game.party_size():
-		r = minf(r, Game.hp[i] / float(Game.max_hp(i)))
-	return r
+		_ratio_hp = minf(_ratio_hp, Game.hp[i] / float(Game.max_hp(i)))
+		_ratio_qi = minf(_ratio_qi, Game.qi[i] / float(Game.max_qi(i)))
+
+func _hp_ratio() -> float:
+	_ratios()
+	return _ratio_hp
 
 func _qi_ratio() -> float:
-	var r := 2.0
-	for i in Game.party_size():
-		r = minf(r, Game.qi[i] / float(Game.max_qi(i)))
-	return r
+	_ratios()
+	return _ratio_qi
 
 func _cult_target() -> Dictionary:
 	var s := Game.cur_step()
@@ -1007,16 +1023,17 @@ func _clear_step(s: Dictionary) -> void:
 	if Game.area != str(s.area) or world.layer != Data.layer_of(str(s.area)):
 		_travel(str(s.area))
 		return
-	var dist := _bfs_dist(world.ptile, 90)
+	var dist := _bfs_field(world.ptile, 90)
 	var best = null
 	var bd := 1 << 30
-	for e in world.ents:
+	for e in _kind("obstacle"):
 		if e.kind != "obstacle" or str(e.area) != str(s.area) or str(e.what) != str(s.what) or not world.ent_visible(e):
 			continue
 		var ed := 1 << 20
 		for dd in DIRS:
-			if dist.has(e.pos + dd):
-				ed = mini(ed, int(dist[e.pos + dd]))
+			var sd := _steps(dist, e.pos + dd)
+			if sd >= 0:
+				ed = mini(ed, sd)
 		if ed >= 1 << 20:
 			ed = (1 << 20) + absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
 		if ed < bd:
@@ -1128,18 +1145,17 @@ func _fights_in(area: String) -> bool:
 ## group is clearly closer: without that hysteresis two groups at almost the same distance swapped
 ## places as "nearest" with every step and the bot walked back and forth between two tiles forever.
 func _nearest_enemy(area: String, fights: bool = false, of: Array = []):
-	var dist := _bfs_dist(world.ptile, 64)
+	var dist := _bfs_field(world.ptile, 64)
 	var best = null
 	var bd := 9999
 	var cur_id := path_key.trim_prefix("enemy:") if path_key.begins_with("enemy:") else ""
 	var cur = null
 	var cur_d := 9999
-	for e in world.ents:
-		if e.kind != "enemy" or not world.ent_visible(e):
-			continue
-		if area != "" and e.area != area:
-			continue
+	# (what is cheap to ask is asked first: whether a pack is anywhere near, then whether it is there at all)
+	for e in _kind("enemy" if area == "" else "enemy@" + area):
 		if absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y) > 70:
+			continue
+		if not world.ent_visible(e):
 			continue
 		var mx := 0
 		for g in e.group:
@@ -1152,8 +1168,9 @@ func _nearest_enemy(area: String, fights: bool = false, of: Array = []):
 		var ed := 9999
 		for dd in DIRS:
 			var n: Vector2i = e.pos + dd
-			if dist.has(n):
-				ed = mini(ed, dist[n])
+			var sn := _steps(dist, n)
+			if sn >= 0:
+				ed = mini(ed, sn)
 		if ed < bd:
 			bd = ed
 			best = e
@@ -1170,8 +1187,8 @@ func _nearest_enemy(area: String, fights: bool = false, of: Array = []):
 func _any_enemy(area: String, fights: bool = false, of: Array = []):
 	var best = null
 	var bd := 1 << 30
-	for e in world.ents:
-		if e.kind != "enemy" or e.area != area or not world.ent_visible(e):
+	for e in _kind("enemy@" + area):
+		if not world.ent_visible(e):
 			continue
 		var mx := 0
 		for g in e.group:
@@ -1196,7 +1213,7 @@ func _any_enemy(area: String, fights: bool = false, of: Array = []):
 func _goto_nearest(kind: String, item: String, area: String = "") -> bool:
 	var best = null
 	var bd := 1 << 30
-	for e in world.ents:
+	for e in _kind(kind):
 		if e.kind == kind and e.get("item", "") == item and world.ent_visible(e) and (area == "" or str(e.get("area", area)) == area):
 			var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
 			if path_key == "pickup:" + str(e.id):
@@ -1293,7 +1310,7 @@ func _planned_dao() -> String:
 func _nearest_stele():
 	var best = null
 	var bd := 1 << 30
-	for e in world.ents:
+	for e in _kind("stele"):
 		if e.kind == "stele" and world.ent_visible(e):
 			var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
 			if dd < bd:
@@ -1305,7 +1322,7 @@ func _nearest_stele():
 func _openable_abode():
 	var best = null
 	var bd := 90
-	for e in world.ents:
+	for e in _kind("abode"):
 		if e.kind != "abode" or Game.abodes.has(e.id) or Game.level < int(e.req):
 			continue
 		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
@@ -1629,10 +1646,10 @@ func _wish_target(d: float):
 		return null
 	var best = null
 	var bd := WISH_REACH + 1
-	for e in world.ents:
-		if e.kind != "prop" or e.has("furn") or not kinds.has(str(e.prop)) or wish_skip.has(str(e.id)):
-			continue
+	for e in _kind("prop:land"):
 		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
+		if dd >= bd or not kinds.has(str(e.prop)) or wish_skip.has(str(e.id)):
+			continue
 		if dd < bd:
 			bd = dd
 			best = e
@@ -1995,7 +2012,7 @@ func _try_land(s: Dictionary) -> void:
 		return
 	var best = null
 	var bd := 1 << 30
-	for e in world.ents:
+	for e in _kind("prop:land"):
 		if e.kind != "prop" or e.has("furn") or str(e.get("area", "")) != area or not str(e.prop) in s.things:
 			continue
 		var dd: int = absi(e.pos.x - world.ptile.x) + absi(e.pos.y - world.ptile.y)
@@ -2031,7 +2048,7 @@ func _farm(ek: String, tt: Dictionary) -> bool:
 	var best = null
 	var bd := 1 << 30
 	if not world.is_floor():
-		for e in world.ents:
+		for e in _kind("enemy"):
 			if e.kind != "enemy" or not world.ent_visible(e) or Game.scatters(e.group) or Dooms.in_group(e.group):
 				continue
 			var mx := 0
@@ -2354,21 +2371,31 @@ func _astar() -> AStarGrid2D:
 	return astar
 
 ## tiles an entity stands on (closed seals always; enemies only when avoiding fights)
+## (who is in the way is worked out once for as long as nothing has changed, `_land_stamp`: every path
+## asked for used to read every entity of the realm)
+var _standing: Array = []
+var _standing_key: Array = []
+
 func _blocked_list(avoid_enemies: bool, goal: Vector2i) -> Array:
+	var key := _land_stamp()
+	if key != _standing_key:
+		_standing_key = key
+		_standing = []
+		for e in world.ents:
+			# (a thing to do on a floor anyone walks over stands in nobody's way: props.gd)
+			if e.kind == "spring" or e.get("walk", false) or not world.ent_visible(e):
+				continue
+			if e.kind == "seal":
+				if not world.seal_open(e):
+					_standing.append([e.tiles, 2])
+				continue
+			_standing.append([e.pos, 1 if e.kind == "enemy" else 0])
 	var out: Array = []
-	for e in world.ents:
-		# (a thing to do on a floor anyone walks over stands in nobody's way: props.gd)
-		if e.kind == "spring" or e.get("walk", false) or not world.ent_visible(e):
-			continue
-		if e.kind == "seal":
-			if not world.seal_open(e):
-				out += e.tiles
-			continue
-		if e.pos == goal:
-			continue
-		if e.kind == "enemy" and not avoid_enemies:
-			continue
-		out.append(e.pos)
+	for b in _standing:
+		if int(b[1]) == 2:
+			out += b[0]
+		elif b[0] != goal and (avoid_enemies or int(b[1]) == 0):
+			out.append(b[0])
 	return out
 
 func _blocked_tile(n: Vector2i) -> bool:
@@ -2377,7 +2404,128 @@ func _blocked_tile(n: Vector2i) -> bool:
 		return false
 	return not (e.kind == "seal" and world.seal_open(e))
 
-## breadth-first distances from `start`, up to `cap` steps
+## Everything of one kind in the realm he stands in, in the order the realm keeps it ("prop:land": the
+## things to do that are not furniture).  A realm's entities never change once it is built, so the lists
+## are made once a realm (the packs by region too, "enemy@<region>"): the bot used to read through every entity of the realm (thousands) several
+## times a frame to find the handful of one kind, and that was most of what a run cost.
+var _kinds := {}
+
+func _kind(kind: String) -> Array:
+	var k: Dictionary = _kinds.get(world.layer, {})
+	if k.is_empty() or int(k["#"]) != world.ents.size():
+		k = {"#": world.ents.size(), "prop:land": []}
+		for e in world.ents:
+			var ek := str(e.kind)
+			if not k.has(ek):
+				k[ek] = []
+			k[ek].append(e)
+			if ek == "prop" and not e.has("furn"):
+				k["prop:land"].append(e)
+			elif ek == "enemy":
+				var ea := "enemy@" + str(e.area)
+				if not k.has(ea):
+					k[ea] = []
+				k[ea].append(e)
+		_kinds[world.layer] = k
+	return k.get(kind, [])
+
+## The ground of the realm he stands in, a byte a tile: 0 not to be walked on, 1 open, 2 open with
+## something standing on it (which may or may not be in the way now: `_blocked_tile` says).
+var _walks := {}
+
+func _walk_map() -> PackedByteArray:
+	var n: int = world.w * world.h
+	if _walks.has(world.layer) and (_walks[world.layer] as PackedByteArray).size() == n:
+		return _walks[world.layer]
+	var m := PackedByteArray()
+	m.resize(n)
+	for i in n:
+		m[i] = 1 if MapGen.is_walkable_tile(world.grid[i]) else 0
+	for t in world.tile_ents:
+		var tt: Vector2i = t
+		if tt.x >= 0 and tt.y >= 0 and tt.x < world.w and tt.y < world.h and m[tt.y * world.w + tt.x] == 1:
+			m[tt.y * world.w + tt.x] = 2
+	_walks[world.layer] = m
+	return m
+
+## What can change who stands in the way without his having moved: the story, what has fallen, been
+## taken, been cleared, a new day, and anything done on another screen.
+func _land_stamp() -> Array:
+	return [world.layer, Game.step, Game.defeated.size(), Game.taken.size(), Game.boss_done.size(), Game.cleared.size(), Game.kills, Game.day, screens_seen]
+
+## how many times the screen on top has changed (a battle, a choice, the menu: what stands may have changed)
+var screens_seen := 0
+var _flood := PackedInt32Array()
+var _flood_key: Array = []
+var _flood_t := 0.0
+
+## Steps to every tile within `cap` steps of `start` (-1: further, or not to be reached), one number a
+## tile of the realm (y * width + x).  The answer is kept while he stands on the same tile and nothing
+## has changed, for a couple of seconds at most: a hunt asked for it every frame.
+func _bfs_field(start: Vector2i, cap: int = 64) -> PackedInt32Array:
+	var key := [start, cap, _land_stamp()]
+	if key == _flood_key and absf(Game.playtime - _flood_t) < 2.0 and not _flood.is_empty():
+		return _flood
+	var W: int = world.w
+	var H: int = world.h
+	var m := _walk_map()
+	var dist := PackedInt32Array()
+	dist.resize(W * H)
+	dist.fill(-1)
+	var q := PackedInt32Array()
+	q.resize(W * H)
+	var head := 0
+	var tail := 1
+	if start.x < 0 or start.y < 0 or start.x >= W or start.y >= H:
+		return dist
+	q[0] = start.y * W + start.x
+	dist[q[0]] = 0
+	var last := W * H
+	while head < tail:
+		var c := q[head]
+		head += 1
+		var dc := dist[c]
+		if dc >= cap:
+			continue
+		var cx := c % W
+		for k in 4:
+			var n := c
+			if k == 0:
+				if cx == W - 1:
+					continue
+				n = c + 1
+			elif k == 1:
+				if cx == 0:
+					continue
+				n = c - 1
+			elif k == 2:
+				n = c + W
+				if n >= last:
+					continue
+			else:
+				n = c - W
+				if n < 0:
+					continue
+			if dist[n] != -1:
+				continue
+			var mv := m[n]
+			if mv == 0 or (mv == 2 and _blocked_tile(Vector2i(n % W, n / W))):
+				continue
+			dist[n] = dc + 1
+			q[tail] = n
+			tail += 1
+	_flood = dist
+	_flood_key = key
+	_flood_t = Game.playtime
+	return dist
+
+## Steps to tile `n` in a field of `_bfs_field` (-1 if it is off the map or was not reached).
+func _steps(dist: PackedInt32Array, n: Vector2i) -> int:
+	if n.x < 0 or n.y < 0 or n.x >= world.w or n.y >= world.h:
+		return -1
+	return dist[n.y * world.w + n.x]
+
+## breadth-first distances from `start`, up to `cap` steps, in the order they were reached
 func _bfs_dist(start: Vector2i, cap: int = 64) -> Dictionary:
 	var dist := {start: 0}
 	var q: Array = [start]

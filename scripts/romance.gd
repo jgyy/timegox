@@ -131,7 +131,7 @@ const OUTINGS := {
 			["quiet", "quiet", "Walk beside her and carry what she picks up.", "You have a melon, a cabbage and a goose, and you have not asked why. ...Neither have I. I think I only wanted to see my things in somebody's arms."]]},
 	"stars": {"n": "Under the Silver River", "where": "wild_night", "hint": "Out in the open country, at night.",
 		"lines": [["Narrator", "No roof, no lamp. The Silver River from one side of the dark to the other, and on either bank of it the two stars everybody knows. Yue Ling is lying on her back in the grass with her hands behind her head."],
-			["Yue Ling", "One night a year, on a bridge of magpies. We mended that river ourselves, you and I. I have always thought it a poor bargain. I should have held out for more nights. I should hold out for all of them."]],
+			["Yue Ling", "One night a year, on a bridge of magpies, and the river between them all the rest. I have always thought it a poor bargain. I should have held out for more nights. I should hold out for all of them."]],
 		"options": [["tender", "tender", "\"You have all of them. Ask me for something harder.\"", "...All of them. You say it as if it were a bowl of rice. Very well. Something harder. Be here in the morning. And the one after. That is all. It turns out that is the whole of it."],
 			["playful", "playful", "\"The Weaver had a loom to get back to. What is your excuse?\"", "My excuse is asleep in a satchel and is called forty patients. I should make a terrible Weaver. I would cross the bridge on the wrong night out of sheer bad temper. Move over. You have the soft grass."],
 			["quiet", "quiet", "Lie down an arm's length off, and look up.", "...An arm's length. You measured it. Come here, you ridiculous creature; there is no bridge to cross. There is only grass."]]},
@@ -140,11 +140,11 @@ const OUTINGS := {
 			["Yue Ling", "It shows. In the cold. I never get tired of that. I was thread, Lin Feng; thread does not breathe. Every winter I come up here in my head and make sure. Look. There I am again."]],
 		"options": [["tender", "tender", "Breathe out beside her. Let the two clouds meet.", "...They have gone into one. You cannot tell which was whose. I am going to think about that for a long while and I should be obliged if you would not explain it to me."],
 			["playful", "playful", "Put snow down the back of her collar.", "!!! You. I. That is COLD, that is, oh, you will pay for that in this life and the next eleven. Run. I am a healer. I know exactly where the kidneys are."],
-			["quiet", "quiet", "Take off your cloak and put it round her.", "I am not cold. I was not. ...I am keeping it. It smells of the kitchen at home, still. After all the realms. How does it still smell of the kitchen?"]]},
+			["quiet", "quiet", "Take off your cloak and put it round her.", "I am not cold. I was not. ...I am keeping it. It smells of the kitchen at home, still. After all this road. How does it still smell of the kitchen?"]]},
 	"steps": {"n": "On the nine hundred and ninety-nine steps", "where": "sect", "hint": "At home, in the sect's own courts.",
 		"lines": [["Narrator", "The east steps, in the hour when nobody uses them. A broom is leaning where a broom has always leaned. Yue Ling sits down on the third step from the top, tucks her feet under her, and looks at him expectantly."],
-			["Yue Ling", "Go on. I have never seen it. Everybody has seen it; the cooks, the Elder, the gate disciples. I have walked the four realms with the sweeper of the Azure Cloud Sect and I have never once watched the sweeping."]],
-		"options": [["tender", "tender", "Sweep the steps. All of them. Properly.", "...You do the edges first. Nobody does the edges first. And you do not hurry, and you do not once look up to see whether I am watching. So that is who held the sky. I knew. I only wanted to see it done."],
+			["Yue Ling", "Go on. I have never seen it. Everybody has seen it; the cooks, the Elder, the gate disciples. I have walked every road you have with the sweeper of the Azure Cloud Sect and I have never once watched the sweeping."]],
+		"options": [["tender", "tender", "Sweep the steps. All of them. Properly.", "...You do the edges first. Nobody does the edges first. And you do not hurry, and you do not once look up to see whether I am watching. So that is who the steps had, all those mornings. I knew. I only wanted to see it done."],
 			["playful", "playful", "Hand her the broom.", "Me? I am a guest. I am a founding relic. I... it goes like this? Like THIS? You did this for three years and nobody gave you a medal? There is a knack. Do not tell me there is a knack. Show me."],
 			["quiet", "quiet", "Sit down on the step beside her instead.", "...Not today, then. Good. They have been swept every day for three hundred years; they will keep. This will not. Sit closer. The stone is cold and you are not."]]},
 }
@@ -166,7 +166,7 @@ const ASKS := {
 		"options": [["pin", "tender", "The jade pin from your hair: the one thing you came up the steps with."], ["straw", "playful", "A straw from the first broom, tied in a ring."], ["thread", "quiet", "A red thread, knotted once, with nothing said about it."]],
 		"reply": {
 			"pin": [["Yue Ling", "That is your mother's. It is all there was in the basket. Lin Feng, I cannot... No. I can. I am taking it, and I am putting it where the petal was, and you are having the petal. It was the first thing I ever had that was nobody's but mine.", "kneel"]],
-			"straw": [["Yue Ling", "A ring. Of broom. I have been given a ring of broom by a Primordial Sovereign. ...It fits. It scratches. I am never taking it off. Give me your hand; you are having a petal that outlasted a dynasty, and you are to keep it flat.", "laugh"]],
+			"straw": [["Yue Ling", "A ring. Of broom. I have been given a ring of broom by the hope of the Azure Cloud Sect. ...It fits. It scratches. I am never taking it off. Give me your hand; you are having a petal that outlasted a dynasty, and you are to keep it flat.", "laugh"]],
 			"thread": [["Yue Ling", "A red thread. I had none, you know. On the Wheel. I was not born, so the Old Man under the Moon never tied me to anybody. And you have just... with a knot. Out of your own sleeve. Hold still. Here is my petal. Now we are in the book.", "grieve"]]},
 		"after": [["Narrator", "She wears it where it can be seen. Within a week every cook, novice and gate disciple on Azure Cloud Mountain has noticed, and has agreed, by the usual means, that nobody is to say anything to the Elder, who noticed first."]]},
 	"wed": {"n": "Three bows", "stage": 2, "bond": 64, "more": [],
@@ -323,7 +323,8 @@ static func ask_blocked(g, id: String) -> String:
 
 ## Whether answer `oid` of question `id` can still be given (nobody he struck down stands witness: crime.gd).
 static func option_ok(g, id: String, oid: String) -> bool:
-	return not (id == "wed" and oid == "granny" and Crime.dead(g, "granny_wen"))
+	# (nor does an Elder he struck down give her away before the whole sect)
+	return not (id == "wed" and ((oid == "granny" and Crime.dead(g, "granny_wen")) or (oid == "everyone" and Crime.dead(g, "elder"))))
 
 ## Asked, and `oid` was how: what is said, as lines; the two are a stage further on.
 static func take_ask(g, id: String, oid: String) -> Array:
@@ -402,7 +403,7 @@ const FEASTS := {
 			["playful", "playful", "\"A debt. I guessed it at once.\"", "It is not a debt, it is a SHADOW, and you knew, and you let me stand here. Buy me the lantern. I want the carp. I am going to hang it over your bed and it will look at you."],
 			["quiet", "quiet", "Step to where the lamp throws both your shadows on the wall as one.", "...Oh. There is only one of it. ...Do not move. I want to guess this one myself. I think I have. I shall not tell the carp."]]},
 	"the Night of Sevens": {"n": "The night the magpies are away", "lines": [["Narrator", "The seventh night of the seventh month. There is not a magpie to be seen anywhere, and everybody knows where they have gone. Yue Ling has set a bowl of water out under the sky and is trying, with great seriousness, to float a needle on it."],
-			["Yue Ling", "If it floats, a girl will be skilful with her hands; that is what they do tonight. I have set forty bones and I cannot float a needle. ...We mended that bridge, you and I. I think of them every year, getting one night. I never used to mind for them."]],
+			["Yue Ling", "If it floats, a girl will be skilful with her hands; that is what they do tonight. I have set forty bones and I cannot float a needle. ...A bridge of magpies, and it is theirs till morning. I think of them every year, getting one night. I never used to mind for them."]],
 		"options": [["tender", "tender", "\"Then mind for them. We have the other three hundred and fifty-nine.\"", "We do. I counted on the way here, in case you had not. ...It has floated. Look. I was not even trying; I was looking at you. Do not tell the Weaver that is how it is done."],
 			["playful", "playful", "Float the needle for her, first try, with a sweeper's hands.", "First try. With THOSE hands. You have had a broom in them and a sword and I have had a needle for three hundred years and... no. Show me. Put your hand under mine and show me, you smug creature."],
 			["quiet", "quiet", "Hold the lamp where the needle's shadow shows on the bottom of the bowl.", "...There. It floats, and its shadow is on the bottom, like a little boat seen from underneath. I should never have seen that. You always hold the light where I am not looking."]]},
@@ -481,7 +482,8 @@ const MATTER_ORDER := ["blood", "price", "wild"]
 static func matter_true(g, id: String) -> bool:
 	match id:
 		"blood":
-			return not g.slain.is_empty()
+			# (three of the watch cut down are dead by his hand too, and are in no list of names: crime.gd `count`)
+			return not g.slain.is_empty() or int(g.watch_slain) > 0
 		"price":
 			return Crime.heat(g) > 0
 		"wild":

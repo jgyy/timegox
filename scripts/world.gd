@@ -3649,6 +3649,14 @@ func _update_folk(d: float, pp: Vector3) -> void:
 							st = st.duplicate()
 							st.clip = mc
 							st.hold = ""
+					# (the Iron Pestle release, living.gd: somebody behind with the rice, or a few days from the
+					# thing they are saving for, does not sit over tea: only what the hands do changes)
+					if st.vis and not st.walk and not noise and Game.prologue == "":
+						var lc := Living.late_clip(fp, Game, str(st.clip), m / 60.0)
+						if lc != "":
+							st = st.duplicate()
+							st.clip = lc
+							st.hold = ""
 					var at: Vector2 = st.at
 					var goal := Vector3(at.x * TS, 0.0, at.y * TS) + off
 					var id: String = fp.id
@@ -3868,6 +3876,11 @@ func _draw_hud() -> void:
 			var wtag := Weal.tag(Game, fe)
 			if wtag != "":
 				UI.text(self, Vector2(VIEW.x * 0.5 - 300, VIEW.y - 36), "%s, %s" % [str(fe.n), wtag], 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 600)
+		# (the Iron Pestle release, living.gd: what one of the towns works for, or how their cultivation stands)
+		if fe.kind == "folk" and fe.has("p") and Game.prologue == "":
+			var ltag := Living.tag(fe.p, Game)
+			if ltag != "":
+				UI.text(self, Vector2(VIEW.x * 0.5 - 300, VIEW.y - 36), ltag, 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 600)
 	# the High Roads (peaks.gd): what the heights offer
 	if not is_floor() and using.is_empty() and trip.is_empty() and not wd.is_empty():
 		var hint2 := ""

@@ -554,6 +554,12 @@ const CROSSROADS := {
 			"ask": [["The Gardener of Hanyin", "Me? I carry a pitcher. I have never built so much as a gate. ...Sit down, all of you. If I am to talk to carpenters I shall want tea, and it will take as long as it takes."], ["Narrator", "They are still talking when the moon comes up: a gardener, a carpenter, a man in straw sandals and five tired makers, and nobody has yet agreed with anybody."]],
 		},
 		"echo": {
+			# Part XXXIII (the Iron Pestle release)
+			"s_p33_coin": {
+				"hand": [["The Old Oil Seller", "You are the one who said the hand first, at Tushan. There is a judgment a pedlar can follow. They have not built the engine yet that will pour through a coin. I daresay they will. Somebody will still have to know when it has been done right."]],
+				"wheel": [["The Old Oil Seller", "You are the one who gave every engine a keeper and hours. There is a press at Tushan now that fills a hundred gourds while I fill one. Its keeper came to watch me pour. He nodded, a little. I found I did not care for it."]],
+				"dao": [["The Old Oil Seller", "You are the one who told the makers about Cook Ding's knife. Following, not cutting. Well. On a good day I do not pour the oil, if you ask me; I hold the ladle and it goes where the hole is. But it was forty years of pouring before it would."]],
+			},
 			# Part XXI (the Hundred Arms release)
 			"s_p21_ou": {
 				"hand": [["Ou Yezi the Swordsmith", "They tell me you ruled that nothing be made by engine that a hand cannot still make. Good. It was a hand that turned each of those ladles. If it had been a wheel I could have stopped the wheel. I do not know how to stop a wrist."]],
@@ -885,9 +891,9 @@ const CROSSROADS := {
 				"log": "Asked the Earl of the Wind to bear up only those who had climbed to where they leapt from."},
 		],
 		"after": {
-			"ask": [["Fei Lian, Earl of the Wind", "Asked. Hm. Asked! Every time? ...I shall say no on the fifth day of every month, on principle, and when I am out of temper. The rest of the time: yes. You may tell the small ones yes. Do not tell them I smiled. I am an earl."]],
-			"free": [["Fei Lian, Earl of the Wind", "Nobody's. I said that. I said wind GOES, and you have hung my own word round my neck like the bag. ...Very well. I blew for Chiyou and lost; I can lose to a sweeper. Tell them to make the tails longer. A swallow with a short tail is an insult to both of us."]],
-			"climbers": [["Fei Lian, Earl of the Wind", "Those who have climbed. Yes. YES. They arrive at the edge with nothing left, and step off, and want nothing but not to fall. That I can carry all day. That weighs what Master Lie weighed. The ones in the fields may keep their string."]],
+			"ask": [["Feilian, Earl of the Wind", "Asked. Hm. Asked! Every time? ...I shall say no on the fifth day of every month, on principle, and when I am out of temper. The rest of the time: yes. You may tell the small ones yes. Do not tell them I smiled. I am an earl."]],
+			"free": [["Feilian, Earl of the Wind", "Nobody's. I said that. I said wind GOES, and you have hung my own word round my neck like the bag. ...Very well. I blew for Chiyou and lost; I can lose to a sweeper. Tell them to make the tails longer. A swallow with a short tail is an insult to both of us."]],
+			"climbers": [["Feilian, Earl of the Wind", "Those who have climbed. Yes. YES. They arrive at the edge with nothing left, and step off, and want nothing but not to fall. That I can carry all day. That weighs what Master Lie weighed. The ones in the fields may keep their string."]],
 		},
 		"echo": {
 			"done:s_p22_down": {
@@ -1400,6 +1406,12 @@ const CROSSROADS := {
 			"halves": [["Narrator", "He nods slowly, and moves his half a hand's breadth from hers on the cloth; and she, after a moment, sets her own straight beside it, as it will hang. It was not what either came for. Both of them stand a good deal straighter."], ["Xu Deyan", "On one wall, a hand apart. She says she will come on the fifteenth of each month and we shall drink tea beneath them, and that I am not to write a poem about it. I had begun one. She knows me, you see. That much did not break.", "laugh"]],
 		},
 		"echo": {
+			# Part XXXIII (the Iron Pestle release)
+			"s_p33_home": {
+				"rivet": [["Elder Qing Xuan", "And the mender at Guanghan has sent up a bowl with nine rivets in it, for a sample. He writes that he learned to drill porcelain on four hundred bowls that broke. He does not mention the mirror at all. I take that for pride of the right sort."]],
+				"recast": [["Elder Qing Xuan", "And the founder who cast your new mirror has sent up the first of his that cracked in the mould, for the novices to look at. He writes that he has kept every one. I had not thought a founder would. It seems there is no quick way there either."]],
+				"halves": [["Elder Qing Xuan", "And I hear two people still drink tea on the fifteenth under two halves of a mirror. Month after month, child, and the same tea. I used to think the great thing was the choosing. I begin to think it is the fifteenth."]],
+			},
 			"s_p32_end": {
 				"rivet": [["Elder Qing Xuan", "And I hear a mirror was riveted at Guanghan and carried home between two people, with the join showing. Cook Zhou will be unbearable. She has said for forty years that the mended bowl is the one you are careful of."]],
 				"recast": [["Elder Qing Xuan", "And I hear two halves went into one crucible, and that a gentleman of Chen has been seen buying a comb for a lady he says he has only just met. It is extravagant. I find that I approve. One may be too faithful to a shape."]],
@@ -1410,6 +1422,37 @@ const CROSSROADS := {
 			"rivet": "In a small house south of the river hangs a bronze mirror with six rivets across it. The two who look into it each morning have a line through their faces, and have stopped seeing it. Their children think all mirrors are made so.",
 			"recast": "A mirror was cast at Tushan from two old halves, with a new pair of birds on the back. The gentleman and the lady who own it were married in the spring, for what each of them insists was the first time.",
 			"halves": "Two halves of a mirror hang a hand apart on a wall in the capital. On the fifteenth of every month a lady's carriage stops at the door, and two people drink tea under them, and are easier together than most who share a roof.",
+		}},
+	# Part XXXIII (the Iron Pestle release): what a boy is told who asks whether the work will ever be finished
+	"the_needle": {"step": "s_p33_needle", "part": "XXXIII", "n": "Will It Ever Be a Needle",
+		"ask": "Old Dame Wu has a paper of forty needles at home. She grinds the pestle for whoever comes down the path from the school, and at her age it will never be a needle. The boy Li Bai went back to his book because of her. He has done the sum, and asks to be told true. He will believe what he is told.",
+		"options": [
+			{"id": "truth", "label": "Tell him. There will be no needle", "tilt": {"heart": -3, "reach": 2}, "creed": {"rule": 8}, "gain": {"renown": 6},
+				"desc": "She will be dead before it is a needle, and she knows it, and she has needles. Tell him all of that, and that she grinds it every morning all the same. He is ten. Let him find out now what work is for when the thing is never finished (renown).",
+				"log": "Told the boy Li Bai the truth: the pestle will never be a needle, and she grinds it all the same."},
+			{"id": "finish", "label": "Grind it through tonight, by art", "tilt": {"craft": 3, "heart": 2}, "creed": {"rule": -8}, "gain": {"stones": 11000},
+				"desc": "A cultivator can do in a night what her arms would not in forty years. Finish it, and send it to him in a twist of paper: a needle that was a pestle. A boy should see one thing come out. He need never know whose hand it was (spirit stones, from the needle-makers of Tushan for the bar's secret).",
+				"log": "Ground Old Dame Wu's pestle to a needle in a night, and let the boy Li Bai believe she had finished it."},
+			{"id": "turn", "label": "Send him to take a turn at the stone", "tilt": {"craft": -3, "reach": -2}, "creed": {"virtue": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "Do not answer. Send him down to her each morning before school, to grind for as long as it takes to say one poem by heart. He will have his answer in his arms by the spring, and she will have company at the stone (the regard of the Rice Hearth).",
+				"log": "Sent the boy Li Bai to grind Old Dame Wu's pestle each morning, a poem's length at a time."},
+		],
+		"after": {
+			"truth": [["Narrator", "The boy hears it out without moving: the paper of needles, the forty years, the path from the school. Anger goes over his face first, as it should. Then he looks down at the ink on his own wrist, and his face stops on something else."], ["Li Bai", "Then she does it for nothing. No. Not nothing; for me, and she did not know my name. And the book is the same? It is never a needle, and one does it? ...I shall have to think about that for a long time. I had better begin. Thank you for not lying. Everybody else would have.", "think"]],
+			"finish": [["Narrator", "That night the stream below the Jasper Pool runs loud, and a bar with forty years of grinding left in it has none by morning. It is the only work Lin Feng has ever hurried. A carrier brings it to the school in a twist of paper: a needle of black iron, a little thick in the eye."], ["Li Bai", "It is a needle. It is heavy! She finished. Then it does come out, if one does not stop; I did the sum wrong. I shall keep it in my collar, and when the book is slow I shall prick my thumb with it. ...Why do you look at me so?", "cheer"]],
+			"turn": [["Narrator", "Lin Feng does not answer. He takes the boy by the inky wrist and turns him to face the white road going west, and says: ask the stone. Each morning, before school. As long as it takes to say one poem."], ["Li Bai", "That is not an answer. ...Every morning? She will make me do it properly; I saw her face. Down wet and back dry. I suppose by the time I know whether it will be a needle I shall know some other things. Is that it? You are not going to say.", "shrug"]],
+		},
+		"echo": {
+			"s_p33_end": {
+				"truth": [["Elder Qing Xuan", "And a schoolmaster on Elephant-Ear Mountain writes that a boy of his has stopped asking how long a thing will take, and has begun asking whether it is worth the taking. He wants to know what was said to him. It was the truth, I gather. That seldom goes by post."]],
+				"finish": [["Elder Qing Xuan", "And they say a boy on Elephant-Ear Mountain keeps a needle in his collar that was once an iron bar, and that the whole school has gone back to its books on the strength of it. I hope nobody ever tells him whose hand it was. I hope, child, that you are sure."]],
+				"turn": [["Elder Qing Xuan", "And they say a boy goes down to a stream on Elephant-Ear Mountain each morning and grinds an old woman's pestle while he says his lesson over. His master complains that he smells of wet iron, and has the Odes by heart to the end of the second roll."]],
+			},
+		},
+		"end": {
+			"truth": "The boy of Elephant-Ear Mountain finished his book knowing that the pestle would never be a needle. Grown, he wrote faster than any poet of his age, and said when asked that it was nothing: he had been told the truth once, early, by somebody who could have spared him.",
+			"finish": "The boy of Elephant-Ear Mountain kept a needle of black iron in his collar all his life, and believed in it. He wrote ten thousand poems. Old Dame Wu, with nothing left to grind, was brought a new bar by her granddaughter within the month, and said nothing to anybody.",
+			"turn": "For six years a boy ground an old woman's pestle each morning before school, a poem's length at a time. It was not a needle when he left for the capital, nor when she died. He is said to have polished his lines the same way: down wet, and back dry.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1430,6 +1473,12 @@ const CROSSROADS := {
 			"burn": [["Narrator", "The blue bag goes into the brazier first, and then the book, a handful of pages at a time. Hua Tuo watches from the step. When the page on the frolics goes in he says, quite quietly, the tiger, the deer, the bear, the ape, the bird, and that is all."], ["Mistress Wu, the Jailer's Wife", "He is not angry. That is the worst of it. He says he will have to teach it all again, to people, one at a time, the old way. He says it as if it were good news."]],
 		},
 		"echo": {
+			# Part XXXIII (the Iron Pestle release)
+			"s_p33_wall": {
+				"copy": [["Kuang Heng", "You are the one who had a physician's book copied for every counter of the post. I read the page on the wrist at the counter in the town, standing. Nobody asked what I would carry for it. I did not know what to do with my hands."]],
+				"keep": [["Kuang Heng", "You are the one who set a book on a shelf in your own town, for whoever sweeps a season. I heard that and thought: there is somebody who knows what a roll is worth. I should have swept. I should have swept two."]],
+				"burn": [["Kuang Heng", "You are the one who let a physician's book burn. I heard it on the road, and I carried badly all that day. ...I do not judge it. I only know what I would give for one page of it, and that I have nothing but a back to give."]],
+			},
 			# Part XXVII (the Heavy Road release)
 			"s_p27_seed": {
 				"copy": [["Chan Master Zhichang", "There is a physician's book on the counter of the post below, by the way, with a stone on it. The prefect read it in an afternoon. I have set him to carrying water for the sick of the village. He is on the second page, in his arms."]],
@@ -1598,7 +1647,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:
