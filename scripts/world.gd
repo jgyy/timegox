@@ -3774,7 +3774,9 @@ func strike() -> void:
 	if headless():
 		return
 	var pp := _player_pos()
-	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), Color(0.78, 0.9, 1.0), atan2(fwd.x, fwd.z), 2.2 + 0.45 * float(Sunder.rank(Game)))
+	# (the Five Hands release: the arc of the blade is the colour of the phase in the hand)
+	var arc_col: Color = (PHASE_COL[str(Game.phase)] as Color).lerp(Color.WHITE, 0.35) if PHASE_COL.has(str(Game.phase)) else Color(0.78, 0.9, 1.0)
+	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), arc_col, atan2(fwd.x, fwd.z), 2.2 + 0.45 * float(Sunder.rank(Game)))
 	if not is_floor():
 		# the cut goes through the grass: it is mown in an arc in front of the blade, the clippings fly
 		Impact.mow(pp + fwd * 1.6, 1.9, t)
