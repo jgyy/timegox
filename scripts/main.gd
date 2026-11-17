@@ -739,7 +739,7 @@ func offer_trifle(tf: Dictionary) -> void:
 	var k: Dictionary = Trifles.KINDS[kind]
 	var cls := str(tf.cls)
 	var seen := Manners.watchers(Game, world.wd, tf.tile)
-	var opts: Array = [{"id": "leave", "label": "Leave it"}]
+	var opts: Array = [{"id": "leave", "label": "Leave it", "desc": Trifles.about(tf)}]
 	var why := Trifles.blocked(Game, tf)
 	match cls:
 		"ware":

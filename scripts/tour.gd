@@ -6268,12 +6268,20 @@ func _road_shots(which: String = "1") -> void:
 				if c == str(row[0]) or (str(row[0]) == "wild" and c == "altar"):
 					var holder := Node3D.new()
 					var m := Trifles.model(str(k))
-					m.scale = Vector3.ONE * 4.0
-					m.position.y = 0.7
-					m.rotation.y = 0.5
+					# (each shown at the same size, a pace across, on a stand: a hairpin beside a broom)
+					var bx := AABB()
+					for mc in m.get_children():
+						if mc is MeshInstance3D:
+							bx = bx.merge((mc as MeshInstance3D).get_aabb())
+					var sc := 0.8 / maxf(0.05, maxf(bx.size.x, maxf(bx.size.y, bx.size.z)))
+					m.scale = Vector3.ONE * sc
+					m.position = Vector3(-bx.get_center().x * sc, 0.75 - bx.position.y * sc, 0.0)
+					var stand_b := MB.new()
+					stand_b.cyl(Vector3(0, 0.36, 0), 0.34, 0.72, MB.tag(Color("6a5a4a"), MB.WOOD), Vector3.ZERO, 12)
+					MB.mesh_node(holder, stand_b.build(MB.mat_vc()))
 					holder.add_child(m)
 					ms.append(holder)
-			await _gallery(str(row[1]), ms, 1.25, 0.3)
+			await _gallery(str(row[1]), ms, 0.45, 0.3)
 	if want.call("people"):
 		await _gallery("part34_people", [Assets.person("yangzi_wife"), Assets.person("yang_zhen"), Assets.person("bell_thief"), Assets.person("pei_du")], 0.5, 0.2)
 	if want.call("foes"):
@@ -6323,7 +6331,9 @@ func _road_shots(which: String = "1") -> void:
 						best = {"t": t0, "h": h0}
 		if not best.is_empty():
 			Game.clock = float(best.h) * 60.0
-			stand.call(best.t.tile + Vector2i(0, 1), Vector2i(0, -1))
+			# (seen from the side: straight on, he stands in front of it)
+			stand.call(best.t.tile + Vector2i(0, 1), Vector2i(1, 0))
+			w.facing = Vector2i(0, -1)
 			await _wait(2.4)
 			await _shot("trifles_in_the_street")
 			main.offer_trifle(best.t)
@@ -6359,7 +6369,8 @@ func _road_shots(which: String = "1") -> void:
 	if want.call("door"):
 		Game.clock = 10.0 * 60.0
 		var lt: Dictionary = Trifles.lost(lw, "village", int(Game.day))[0]
-		stand.call(lt.tile + Vector2i(0, 1), Vector2i(0, -1))
+		stand.call(lt.tile + Vector2i(0, 1), Vector2i(1, 0))
+		w.facing = Vector2i(0, -1)
 		await _wait(1.6)
 		await _shot("lost_in_the_road")
 		Trifles.take(Game, lw, lt, "take", [])
@@ -6416,7 +6427,7 @@ func _road_shots(which: String = "1") -> void:
 			await _wait(0.42)
 			await _shot("jump_in_the_street")
 			await _wait(0.45)
-			await _shot("a_child_jumps_too")
+			await _shot("the_street_on_a_jump")
 			await _wait(1.2)
 			# and a leap of two tiles, caught at the top
 			for d3 in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1)]:
@@ -6429,6 +6440,35 @@ func _road_shots(which: String = "1") -> void:
 					await _shot("leap_of_two_tiles")
 					break
 			break
+	if want.call("leapover"):
+		# a leap of two tiles over something lying in the road, caught at the top, from the side
+		Game.clock = 10.0 * 60.0
+		for tf9 in Trifles.of_area(Game, lw, "village"):
+			var dn := false
+			for d9 in [Vector2i(1, 0), Vector2i(-1, 0)]:
+				var from9: Vector2i = tf9.tile - d9
+				var ok9 := not Trifles.gone(Game, tf9) and w.ent_at(tf9.tile) == null
+				for q9 in [from9, tf9.tile, tf9.tile + d9, from9 + Vector2i(0, 1), tf9.tile + Vector2i(0, 1), tf9.tile + Vector2i(0, 2)]:
+					if not w.tile_free(q9) or w.ent_at(q9) != null or not w.building_at(q9).is_empty():
+						ok9 = false
+				if not ok9:
+					continue
+				stand.call(from9, Vector2i(0, -1))
+				w.facing = d9
+				await _wait(2.0)
+				if w.leap_to(d9).x < 0:
+					continue
+				w.move_dir = d9
+				w.jump()
+				w._move(0.01)
+				w.cam_q = 0
+				w.move_dir = Vector2i.ZERO
+				await _wait(0.2)
+				await _shot("leap_of_two_tiles")
+				dn = true
+				break
+			if dn:
+				break
 	if want.call("bump"):
 		for h4 in [10.4, 15.0, 9.0, 17.0]:
 			var f4: Dictionary = find.call(h4, func(q: Dictionary) -> bool: return not bool(q.kid) and str(q.role) != Giants.ROLE)

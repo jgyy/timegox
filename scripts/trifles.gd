@@ -600,9 +600,9 @@ static func restore(g, id: String, door: bool = false) -> Dictionary:
 			g.stones += stones
 			Weal.act(g, Weal.town_of(str(q.area)), "restored")
 			if door:
-				lines.append(["", "He knocks. %s comes to the door wiping both hands, sees the %s, and for a moment says nothing at all." % [str(q.who), str(KINDS[kind].n)]])
+				lines.append(["Narrator", "He knocks. %s comes to the door wiping both hands, sees the %s, and for a moment says nothing at all." % [str(q.who), str(KINDS[kind].n)]])
 			lines.append([str(q.who), str(KINDS[kind].thanks), "bow"])
-			lines.append(["", "%s presses %d spirit stones on him, and will not hear of his refusing. (%d things brought home)" % [str(q.who), stones, int(g.restored)]])
+			lines.append(["Narrator", "%s presses %d spirit stones on him, and will not hear of his refusing. (%d things brought home)" % [str(q.who), stones, int(g.restored)]])
 		else:
 			# a keep, a ware or an offering he walked off with, handed back to whose it was
 			g.trifles.erase(id)
@@ -825,3 +825,31 @@ static func model(kind: String) -> Node3D:
 			b.sph(Vector3(0, 0.03, 0), Vector3(0.05, 0.03, 0.05), MB.tag(col, MB.STONE))
 	MB.mesh_node(root, b.build(MB.mat_vc()))
 	return root
+
+## What is drawn under and over a small thing so that it can be seen in long grass: a patch of trodden
+## earth, and a glint the colour of its class (gold for what was lost, pale for anything else).
+static func patch(cls: String) -> Node3D:
+	var root := Node3D.new()
+	var b := MB.new()
+	b.cyl(Vector3(0, 0.006, 0), 0.3, 0.012, MB.tag(Color("8a7a5a"), MB.STONE), Vector3.ZERO, 12)
+	MB.mesh_node(root, b.build(MB.mat_vc())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var g := MB.new()
+	g.ball(Vector3.ZERO, 0.07, Color(1.0, 0.85, 0.4, 0.55) if cls == "lost" else Color(1.0, 1.0, 0.9, 0.35), true)
+	var gn := MB.mesh_node(root, g.build(MB.mat_glow()))
+	gn.name = "glint"
+	gn.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return root
+
+## What a thing is, said in a line under "Leave it".
+static func about(t: Dictionary) -> String:
+	var kind := str(t.kind)
+	match str(t.cls):
+		"ware":
+			return "%s, set out for sale by %s." % [art(kind).capitalize(), str(t.who)]
+		"keep":
+			return "%s. It is %s's, and has been left where it is used." % [art(kind).capitalize(), str(t.who)]
+		"altar":
+			return "%s. It was laid here for somebody who is not present." % art(kind).capitalize()
+		"lost":
+			return "%s, lying in the road. Somebody dropped it this morning, and will be looking." % art(kind).capitalize()
+	return "%s. It is nobody's." % art(kind).capitalize()

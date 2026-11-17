@@ -3932,7 +3932,7 @@ func _draw_hud() -> void:
 				UI.text(self, Vector2(VIEW.x * 0.5 - 300, VIEW.y - 36), ltag, 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 600)
 	# (the Unpicked Road release, trifles.gd: what is in his sleeve)
 	if not Game.pocket.is_empty() and using.is_empty() and trip.is_empty():
-		UI.text(self, Vector2(VIEW.x * 0.5 - 420, VIEW.y - 16), "In his sleeve: " + Trifles.text(Game), 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 840)
+		UI.text(self, Vector2(22, 162), "In his sleeve: " + Trifles.text(Game), 14, UI.C_DIM.lightened(0.3), HORIZONTAL_ALIGNMENT_LEFT, 560)
 	# the High Roads (peaks.gd): what the heights offer
 	if not is_floor() and using.is_empty() and trip.is_empty() and not wd.is_empty():
 		var hint2 := ""
@@ -4313,7 +4313,10 @@ func _update_trifles(d: float) -> void:
 			n.set_meta("off", Vector2.ZERO)
 			n.set_meta("vel", Vector2.ZERO)
 			n.set_meta("t", tf)
-			n.scale = Vector3.ONE * 1.6
+			# (drawn half as big again as life, on a patch of trodden earth, with a glint over it: a hairpin in
+			# long grass is not seen otherwise, and nobody stoops for what they cannot see)
+			n.scale = Vector3.ONE * 2.0
+			n.add_child(Trifles.patch(str(tf.cls)))
 			scene3d.add_child(n)
 			trifle_nodes[str(tf.id)] = n
 			n.position = n.get_meta("base")
@@ -4355,6 +4358,11 @@ func _update_trifles(d: float) -> void:
 		if te >= 0.0 and te < 0.5:
 			p3.y += sin(te / 0.5 * PI) * 0.45
 		tn.position = p3
+		var gl: Node3D = tn.get_node_or_null("glint")
+		if gl != null:
+			var k := 0.5 + 0.5 * sin(t * 2.6 + float(tn.get_meta("base").x))
+			gl.scale = Vector3.ONE * (0.7 + 0.5 * k)
+			gl.position.y = 0.22 + 0.05 * k
 
 ## He does something with his hands where he stands (a gesture everybody has).
 func start_gesture(clip: String) -> void:
