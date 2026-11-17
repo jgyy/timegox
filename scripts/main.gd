@@ -187,6 +187,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 		KEY_H:
 			# how hard he means to strike (the Small Fish release: sunder.gd)
 			press("hand")
+		KEY_K:
+			# which of the five phases his hand is turned to (the Five Hands release: phases.gd)
+			press("phase")
 		KEY_P:
 			# out of his own eyes, or over his shoulder (the Small Fish release)
 			press("view")
@@ -236,6 +239,8 @@ func press(act: String) -> void:
 			offer_cook()
 		elif act == "hand":
 			Game.toast(Sunder.cycle(Game))
+		elif act == "phase":
+			Game.toast(Phases.cycle(Game))
 		elif act == "view":
 			world.toggle_view()
 		elif act == "talk":
@@ -2618,7 +2623,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,

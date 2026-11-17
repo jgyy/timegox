@@ -135,6 +135,8 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"the_gift": "relic", "the_rule": "relic", "the_appraiser": "relic",
 	# Part XXXVI: the scales, the shoots left alone and the gold nobody saw fall
 	"the_drained": "relic", "the_tugger": "relic", "the_grasper": "relic",
+	# Part XXXVII: the cinders that stayed out, the stakes of the old boundary and the pieces that still answer
+	"the_fed_fire": "relic", "the_next_door": "relic", "the_kindling": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -192,7 +194,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_mirror": ["rivet"],
 	# Part XXXIII: sent to take a turn at the stone
 	"the_needle": ["turn"],
-	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"]}
+	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -753,6 +755,10 @@ func _world(d: float) -> void:
 	if _prepare_trial():
 		return
 	# 3) quest objective
+	# (the Five Hands release: the hand is turned to a phase only for a step that asks for one: everything
+	# else is struck with the plain blade, as it always was)
+	if str(s.kind) != "phase" and str(Game.phase) != "":
+		Game.phase = ""
 	match s.kind:
 		"talk":
 			_goto_entity(s.area, s.npc)
@@ -942,6 +948,9 @@ func _world(d: float) -> void:
 		"cook":
 			# Part XXXVI: a meal cooked out in the country, turned as it wants (cooking.gd)
 			_cook_step(s)
+		"phase":
+			# Part XXXVII: the land turned by one of the five phases, or one phase met with another (phases.gd)
+			_phase_step(s)
 		"haul":
 			# Part XXVII: a load for somebody (toil.gd, load.gd): gathered until his back is full (never past
 			# what he can bear at his own pace), carried to them, and again
@@ -1180,6 +1189,82 @@ func _sunder_step(s: Dictionary) -> void:
 			world.facing = toil_dir
 		return
 	_walk_to(toil_at, "sunder:%d:%d" % [toil_at.x, toil_at.y])
+
+## Part XXXVII: a "phase" step.  In the step's region, where a blow of the phase it wants would come to
+## something with nobody in the way of the blade: K (the hand turned to that phase) and F.  A step that
+## wants one phase met with another (`react`) first lays down what the second is to meet: for "quell"
+## the phase it overcomes, for "feed" the one that bears it; and with no phase named, the whole round.
+func _phase_want(s: Dictionary, at: Vector2i, d: Vector2i) -> String:
+	var els: Array = [str(s.el)] if s.has("el") else Phases.ORDER
+	if s.has("react"):
+		# the stroke the step is counting, if what it meets is already there
+		for el in els:
+			if int(Phases.cast(Game, world.layer, world.wd, at, d, str(el), true).get(str(s.react), 0)) > 0:
+				return str(el)
+		# else what it is to meet (one that itself comes to something here)
+		for el2 in els:
+			var pre := ""
+			for k in Phases.ORDER:
+				if (str(s.react) == "quell" and str(Phases.QUELLS[str(el2)]) == str(k)) or (str(s.react) == "feed" and str(Phases.FEEDS[str(k)]) == str(el2)):
+					pre = str(k)
+			if pre != "" and int(Phases.cast(Game, world.layer, world.wd, at, d, pre, true).n) > 0:
+				return pre
+		return ""
+	for el3 in els:
+		if int(Phases.cast(Game, world.layer, world.wd, at, d, str(el3), true).n) > 0:
+			return str(el3)
+	return ""
+
+func _phase_ok(s: Dictionary, at: Vector2i, d: Vector2i) -> bool:
+	if _phase_want(s, at, d) == "":
+		return false
+	# (a wood in reach: every phase comes to something on trees, and nothing of anybody's stands in them)
+	if Phases.ground_of(world.wd, at + d) != "tree":
+		return false
+	for dt2 in Impact.reach(d):
+		if world.ent_at(at + dt2) != null or world.walk_props.has(at + dt2):
+			return false
+	return true
+
+func _phase_step(s: Dictionary) -> void:
+	var area := str(s.area)
+	var key := "phase" + area
+	if world.layer != Data.layer_of(area) or (Game.area != area and toil_key != key):
+		toil_key = ""
+		Game.phase = ""
+		_travel(area)
+		return
+	if world.move_t < 0.0 and _phase_ok(s, world.ptile, world.facing):
+		world.move_dir = Vector2i.ZERO
+		Game.phase = _phase_want(s, world.ptile, world.facing)
+		_press("strike", 0.7)
+		return
+	var here0: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if toil_key != key or toil_at.x < 0 or not _phase_ok(s, toil_at, toil_dir):
+		toil_key = key
+		toil_at = Vector2i(-1, -1)
+		var dist := _bfs_dist(here0, 160)
+		var bd := 1 << 30
+		for tl in dist:
+			if int(dist[tl]) >= bd or Atlas.owner_id(world.wd, tl) != area or (tl != here0 and world.ent_at(tl) != null):
+				continue
+			for d in DIRS:
+				if _phase_ok(s, tl, d):
+					bd = int(dist[tl])
+					toil_at = tl
+					toil_dir = d
+					break
+		if toil_at.x < 0:
+			toil_key = ""
+			_travel(area)
+			return
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if here == toil_at:
+		world.move_dir = Vector2i.ZERO
+		if world.move_t < 0.0:
+			world.facing = toil_dir
+		return
+	_walk_to(toil_at, "phase:%d:%d" % [toil_at.x, toil_at.y])
 
 ## Part XXXVI: a "cook" step.  What the dish still wants is worked for in the step's region; then, on open
 ## ground of it with room for a fire in front of him, the pot (B), turned as often as the dish wants.
@@ -3253,6 +3338,8 @@ func _finish(reason: String) -> void:
 		if int(Game.rites.get(rid, 0)) > 0:
 			rites_done.append(str(rid))
 	print("root and rites  : %s (%d of the five phases); %d of %d rites performed %s" % [Roots.title(Game), Roots.count(Game), Rites.done(Game), Rites.ORDER.size(), str(rites_done)])
+	# the Five Hands release (phases.gd)
+	print("the five phases: %d blows that the land answered (%s), left on it %s; one overcame another %d times, one was fed by another %d times" % [Game.phase_n, str(Game.phases_used), str(Game.phased), int(Game.reacts.get("quell", 0)), int(Game.reacts.get("feed", 0))])
 	# the Small Fish release (cooking.gd, sunder.gd, toil.gd)
 	print("the pot and hand: %d meals cooked, %d as they should be %s; %d blows that broke the land (%d things: %s), %d held back to a single cut; picked %d, dug %d, veins worked %d" % [Game.cooked_n, Game.cooked_good, str(Game.cooked),
 		Game.sunder_n, Sunder.total(Game), str(Game.sundered), Game.sunder_light, int(Game.toil.get("pick", 0)), int(Game.toil.get("dig", 0)), int(Game.toil.get("mine", 0))])

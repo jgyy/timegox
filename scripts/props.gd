@@ -919,7 +919,11 @@ static func held(what: String) -> Node3D:
 			b.lathe(Vector3(0, -0.09, 0.02), [Vector2(0.025, 0.0), Vector2(0.035, 0.05)], MB.tag(Color("e8e0d0"), MB.STONE), 10)
 		"rod":
 			b.limb(Vector3(0, -0.08, -0.25), Vector3(0, 0.6, 1.9), 0.014, 0.005, MB.tag(Color("8a7a4a"), MB.WOOD), 5)
-			b.limb(Vector3(0, 0.6, 1.9), Vector3(0, -1.2, 2.1), 0.002, 0.002, MB.tag(Color("e8e8e8"), MB.CLOTH), 3)
+			# (the Five Hands release, grip.gd: the line hangs from the tip of the rod, with a float on it)
+			var lb := MB.new()
+			lb.limb(Vector3.ZERO, Vector3(0, -1.8, 0), 0.002, 0.002, MB.tag(Color("e8e8e8"), MB.CLOTH), 3)
+			lb.sph(Vector3(0, -1.5, 0), Vector3(0.02, 0.035, 0.02), MB.tag(Color("c83a2a"), MB.WOOD))
+			Folk._hang(root, Vector3(0, 0.6, 1.9), 1.5, lb, 2.6)
 		"broom":
 			b.limb(Vector3(0, -0.08, 0.6), Vector3(0, -0.08, -0.9), 0.02, 0.02, MB.tag(WOOD_L, MB.WOOD), 5)
 			b.cone(Vector3(0, -0.08, -1.05), 0.13, 0.32, MB.tag(Color("c8a860"), MB.HAIR), Vector3(PI * 0.5, 0, 0), 8)

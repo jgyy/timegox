@@ -268,6 +268,15 @@ const MARKS := {
 		"bury": {"area": "mountain", "m": ["teststone", "down"], "n": "The Stone on Its Face", "desc": "A grey stone as long as a child, lying face down in the grass beside the mountain path, with moss on its back and the turf worn bare on one side where people sit to tie their sandals. It was a testing stone, and stood upright. Nothing is cut on the side that shows. Whatever it has to say, it is saying to the ground.",
 			"who": ["Old Gardener Kang", "folk_grandpa", Color("8a8a7a"), "They wanted it taken to the treasury. I said leave it where it fell; I shall weed round it. I have weeded round worse. It never told me anything, you know. I was let in to carry slops, sixty years ago, and nobody thought to lay my hand on it. So I have nothing against it and nothing for it.", "A girl asked me what is under it. I said: the side with the answer on. She tried to lift it. Could not. She has gone off to get stronger. I thought that was a better use of a stone than the one it had before, and I told the Elder so, and he laughed until he had to sit on it."]},
 	},
+	# Part XXXVII (the Five Hands release): what the sect did before the next dry wind
+	"the_round": {
+		"break": {"area": "mountain", "m": ["round", "break"], "k": 3, "n": "The Firebreaks of Azure Cloud", "desc": "A strip of bare raked earth as wide as a cart, with a low bank of raised stone down either side, and black on it where it was burnt clean this spring. A tub of water stands at the head of it with a dipper hung on its rim.",
+			"who": ["Torch-Bearer Mian", "folk_youth", Color("8a5a3a"), "I am the one who missed, Senior. The Crimson Flame Palm, below the east wall. They gave me the torch for it. I thought it was a punishment. It is the first fire I ever set that stopped where I meant.", "I burn the lower lane on the first wet morning. A mat at a time. You stand upwind with the tub and you do not look away. That is the whole technique. It took the sect three hundred years to write it down.", "The pines either side have dropped more cones this year than I have ever seen. I think they like the smoke. Nobody told me trees could like a thing."]},
+		"watch": {"area": "mountain", "m": ["round", "watch"], "k": 3, "n": "The Tubs of the Six Villages", "desc": "A cooper's tub at the side of the mountain path, full to a hand under the rim, with a bucket in it and a small bronze bell on a post beside it. Somebody has chalked on the staves, in a child's hand: AT THE BOTTOM. FIRST NIGHT.",
+			"who": ["Disciple Mian of the Tubs", "folk_youth", Color("5a7a8a"), "I am the one who missed, Senior. So I asked to be sent down first. I teach it to the little ones, with a candle and a thimble. At the bottom, on the first night. They learn it quicker than the inner court did.", "A farmer here put out a hayrick last month, alone, with two buckets, before I had my boots on. I stood and watched. I have forty techniques. He had the right evening.", "They ring the bell if the tub is low. That is all the bell is for. I had thought it was for fire. No, they said: by then it is late to ring."]},
+		"leave": {"area": "mountain", "m": ["round", "leave"], "k": 3, "n": "The Burnt Slope, Coming Back", "desc": "A black pine stump as high as a man, split by heat, with a ring of seedlings round its foot no longer than a finger and already a great many of them. A stone beside it has a number cut in it, and under that an older number, and under that one older still.",
+			"who": ["Counter Mian", "folk_youth", Color("6a7a4a"), "I am the one who missed, Senior. They set me to count what comes up. Four thousand and some on this slope, by the last moon. I had thought I destroyed it. I am beginning to think I was only early.", "The stone has the years of the fires on it. Forty apart, near enough, back to before the sect. Nobody put them out. Nobody was here. And there were always pines.", "The barns were heavy. I carried my share. A headman said to me: so it is we who were in the wrong place. I did not know what to answer. I think he was right."]},
+	},
 	# Part XXXVI (the Small Fish release): what the sect did with hands that had outgrown its mountain
 	"the_ladle": {
 		"bind": {"area": "mountain", "m": ["lighthand", "stone"], "k": 3, "n": "The Stones of the Light Hand", "desc": "A grey stone, waist high, at the side of the mountain path, with an open hand cut on it, the fingers together. There is one wherever a path crosses the boundary of the mountain. Under the hand, three lines: inside these stones nobody strikes harder than a felling stroke. The moss has been kept off the hand and let grow on the rest.",
@@ -416,7 +425,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -864,6 +873,36 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"round":
+			# what was done before the next dry wind (the Five Hands release): a firebreak's end with its tub, a
+			# village tub with its bell, or a burnt stump with seedlings round it and the stone of the years
+			var r_stone := MB.tag(Color("8a8478"), MB.STONE)
+			var r_wood := MB.tag(Color("7a5634"), MB.WOOD)
+			match str(a[1]):
+				"break":
+					b.box(Vector3(0, 0.02, 0), Vector3(1.5, 0.04, 1.7), MB.tag(Color("3a3028"), MB.STONE))
+					for sx in [-0.85, 0.85]:
+						for r37 in 4:
+							b.box(Vector3(sx, 0.1, -0.7 + 0.45 * r37), Vector3(0.22, 0.2 + 0.05 * ((r37 + i) % 2), 0.4), r_stone, Vector3(0, 0.2 * (r37 % 3 - 1), 0.05))
+					b.lathe(Vector3(0.45, 0.0, 0.5), [Vector2(0.22, 0.0), Vector2(0.26, 0.2), Vector2(0.25, 0.42), Vector2(0.22, 0.42), Vector2(0.21, 0.06)], r_wood, 12)
+					b.disc(Vector3(0.45, 0.36, 0.5), 0.21, MB.tag(Color("4a6a80"), MB.METAL), 12)
+					b.box(Vector3(-0.3, 0.035, -0.2), Vector3(0.5, 0.012, 0.4), MB.tag(Color("15120f"), MB.STONE), Vector3(0, 0.4, 0))
+				"watch":
+					b.lathe(Vector3(0, 0.0, 0), [Vector2(0.3, 0.0), Vector2(0.36, 0.25), Vector2(0.34, 0.55), Vector2(0.3, 0.55), Vector2(0.29, 0.08)], r_wood, 14)
+					for h37 in [0.12, 0.42]:
+						b.torus(Vector3(0, h37, 0), 0.355 - 0.01 * h37, 0.012, MB.tag(Color("4a4a52"), MB.METAL), Vector3(PI * 0.5, 0, 0))
+					b.disc(Vector3(0, 0.47, 0), 0.3, MB.tag(Color("4a6a80"), MB.METAL), 14)
+					b.cyl(Vector3(0.62, 0.6, 0.0), 0.035, 1.2, r_wood, Vector3.ZERO, 6)
+					b.box(Vector3(0.5, 1.15, 0.0), Vector3(0.3, 0.035, 0.035), r_wood)
+					b.lathe(Vector3(0.4, 0.95, 0.0), [Vector2(0.07, 0.0), Vector2(0.065, 0.09), Vector2(0.025, 0.15), Vector2(0.0, 0.15)], MB.tag(Color("b8862a"), MB.METAL), 8)
+				_:
+					b.cyl(Vector3(0, 0.75, 0), 0.2, 1.5, MB.tag(Color("1c1814"), MB.WOOD), Vector3(0.04, 0, 0.03), 9)
+					b.box(Vector3(0.02, 1.2, 0.0), Vector3(0.05, 0.7, 0.3), MB.tag(Color("3a2a1e"), MB.WOOD), Vector3(0, 0.5 * i, 0.06))
+					for s37 in 9:
+						var sa := TAU * float(s37) / 9.0 + 0.3 * float(i)
+						var sr := 0.45 + 0.12 * (s37 % 3)
+						b.cone(Vector3(cos(sa) * sr, 0.07, sin(sa) * sr), 0.035, 0.14, MB.tag(Color("5a9a4a"), MB.FOLIAGE), Vector3.ZERO, 4)
+					b.box(Vector3(0.75, 0.22, 0.3), Vector3(0.34, 0.44, 0.16), r_stone, Vector3(0, 0.4, 0.04))
 		"lighthand":
 			# what was made of hands that had outgrown the mountain (the Small Fish release): a boundary stone with an
 			# open hand cut on it, a small fire with its pot turned over it, or a split boulder and a rope with a bell

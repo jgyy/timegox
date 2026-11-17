@@ -23,6 +23,20 @@ func _process(_d: float) -> bool:
 				if f.ends_with(".gd"):
 					var sc = load(d + "/" + f)
 					check(sc != null and (sc as GDScript).can_instantiate(), "%s/%s compiles" % [d.trim_prefix("res://"), f])
+		# (the Five Hands release, grip.gd: a skeleton only answers once it is in the tree, so this is asked here)
+		if Assets.has("characters/lin_feng"):
+			print("== an arm solved on a skeleton in the tree (grip.gd) ==")
+			var hm0: Node3D = Assets.instance("characters/lin_feng")
+			root.add_child(hm0)
+			var sk0: Skeleton3D = hm0.find_children("*", "Skeleton3D", true, false)[0]
+			var ih0 := sk0.find_bone("hand.R")
+			var goal0 := sk0.get_bone_global_pose(ih0).origin + Vector3(0.1, 0.25, 0.3)
+			var basis0 := sk0.get_bone_global_pose(ih0).basis
+			var came0 := Grip.apply(sk0, "R", goal0)
+			check(came0.distance_to(goal0) < 0.004, "the hero's wrist is put where it is asked (%.4f m off)" % came0.distance_to(goal0))
+			check(absf(sk0.get_bone_global_pose(sk0.find_bone("upper_arm.R")).origin.distance_to(sk0.get_bone_global_pose(sk0.find_bone("forearm.R")).origin) - sk0.get_bone_global_rest(sk0.find_bone("upper_arm.R")).origin.distance_to(sk0.get_bone_global_rest(sk0.find_bone("forearm.R")).origin)) < 0.002
+				and sk0.get_bone_global_pose(ih0).basis.is_equal_approx(basis0), "his upper arm is as long as it was, and his hand is turned as it was")
+			hm0.queue_free()
 		# the ending's film (it uses Game, so it is only read once compiled): a line and time to read
 		# it in every shot, every wonder in a shot, last words for every road into the heart and a
 		# word on the results for every way through a trial
@@ -908,7 +922,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["cooked", "light", "rites", "lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted", "clean", "wild", "step", "restored"]
+	var need_kinds := ["cooked", "light", "phases", "quelled", "rites", "lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted", "clean", "wild", "step", "restored"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -1019,7 +1033,7 @@ func _init() -> void:
 					"rites":
 						# the Uncarved Block release: Daos whose rite he has performed (rites.gd)
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Rites.ORDER.size()
-					"cooked", "light":
+					"cooked", "light", "phases", "quelled":
 						# the Small Fish release: meals that came out right, blows held back to one thing: a few
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 3
 					"households":
@@ -1203,7 +1217,7 @@ func _init() -> void:
 			if st8.has("cave"):
 				band8 = Caves.spec(str(st8.area), int(st8.cave)).get("foes", {})
 				# (the Small Fish release: or for a band a later chapter stood in it last of all)
-				if Caves.LATE.get(str(st8.area), {}).has(int(st8.cave)) and str(st8.id).begins_with("s_p36_"):
+				if Caves.LATE.get(str(st8.area), {}).has(int(st8.cave)) and (str(st8.id).begins_with("s_p36_") or str(st8.id).begins_with("s_p37_")):
 					band8 = Caves.LATE[str(st8.area)][int(st8.cave)]
 			var marching8 := {}
 			for pe8 in band8.get("pool", []):
@@ -5250,7 +5264,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.light_hand.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.five_in_one.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -8105,7 +8119,7 @@ func _open_net() -> void:
 	check(Crime.is_child({"kind": "npc", "id": "li_bai", "n": "Li Bai", "asset": "li_bai"}), "nobody draws on a schoolboy")
 	for fid33 in ["practised_hand", "same_length", "by_the_door", "told_true", "parted_whole"]:
 		check(Feats.FEATS.has(fid33), "the feat %s is kept" % fid33)
-	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and str(Feats.FEATS.light_hand.desc).contains("last realm"), "only the last realm is called the last")
+	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and str(Feats.FEATS.five_in_one.desc).contains("last realm"), "only the last realm is called the last")
 	for src33 in ["Fangyu Shenglan", "Miscellaneous Records of the Western Capital", "Ouyang Xiu", "Book of Jin"]:
 		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src33), "the chapter's tales are told from where they are written: %s" % src33)
 
@@ -8361,7 +8375,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["rites", 2], TN35) and not Trials.need_met(["rites", 3], TN35) and Trials.KINDS.has("rite") and Trials.need_text(["rites", 2], TN35).contains("2"), "trials can be passed by the rite")
 	TN35.free()
 	var c35: Dictionary = Echoes.CROSSROADS.get("the_stone", {})
-	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
+	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 3] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
 	check((c35.options as Array).size() == 3 and c35.after.size() == 3 and c35.end.size() == 3 and c35.echo.has("s_p35_end") and c35.echo.s_p35_end.size() == 3 and Data.step_index("s_p35_end") > Data.step_index("s_p35_gate"), "the_stone: three answers, each answered, echoed and told at the end")
 	var scales35 := {}
 	for o35 in c35.options:
@@ -8422,17 +8436,18 @@ func _open_net() -> void:
 	check(found35 == 12 + 3 + 4, "everything the chapter stands on the heights found room (%d)" % found35)
 
 	print("== Part XXXVI: Cooking a Small Fish ==")
-	check(Data.REALMS.size() == 42 and Data.REALMS[41] == "Light Hand" and Data.MAX_LEVEL == 123 and Data.level_name(123).ends_with("Light Hand") and Data.REALM_INFO.size() == 42
+	check(Data.REALMS.size() >= 42 and Data.REALMS[41] == "Light Hand" and Data.MAX_LEVEL >= 123 and Data.level_name(123).ends_with("Light Hand") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXVI adds the realm of Light Hand")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break41" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall34") and msrc.contains("\"s_break40\": \"recall34\"") and Data.DIALOGUE.has("pre:s_break41") and Data.DIALOGUE.has("post:s_break41"),
-		"Part XXXVI follows Uncarved Block (recall34) and ends the game")
+	var end36 := Data.step_index("s_p37_home")
+	check(Data.STEPS[end36 - 1].id == "s_break41" and int(Data.STEPS[end36 - 1].to) == 123 and Data.DIALOGUE.has("recall34") and msrc.contains("\"s_break40\": \"recall34\"") and Data.DIALOGUE.has("pre:s_break41") and Data.DIALOGUE.has("post:s_break41"),
+		"Part XXXVI follows Uncarved Block (recall34) and ends at Light Hand")
 	var p36 := Data.step_index("s_p36_home")
 	var kinds36 := {}
 	var n36 := 0
 	var kills36 := 0
 	var lords36: Array = []
 	var given36 := {}
-	for i in range(p36, Data.STEPS.size()):
+	for i in range(p36, end36):
 		var s36: Dictionary = Data.STEPS[i]
 		n36 += 1
 		kinds36[str(s36.kind)] = true
@@ -8479,7 +8494,7 @@ func _open_net() -> void:
 	# what the story's pots are made of has been gathered by the story's own steps
 	var have36 := {}
 	var short36: Array = []
-	for i in range(p36, Data.STEPS.size()):
+	for i in range(p36, end36):
 		var s37: Dictionary = Data.STEPS[i]
 		if str(s37.kind) == "toil":
 			var gd36 := Toil.good_of(str(s37.work), s37.has("cave"))
@@ -8533,7 +8548,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["cooked", 2], TN36) and not Trials.need_met(["cooked", 3], TN36) and Trials.need_met(["light", 3], TN36) and not Trials.need_met(["light", 4], TN36) and Trials.KINDS.has("pot") and Trials.KINDS.has("light") and Trials.need_text(["cooked", 2], TN36).contains("2"), "trials can be passed by the pot and by the light hand")
 	TN36.free()
 	var c36: Dictionary = Echoes.CROSSROADS.get("the_ladle", {})
-	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of all")
+	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
 	check((c36.options as Array).size() == 3 and c36.after.size() == 3 and c36.end.size() == 3 and c36.echo.has("s_p36_end") and c36.echo.s_p36_end.size() == 3 and Data.step_index("s_p36_end") > Data.step_index("s_p36_table"), "the_ladle: three answers, each answered, echoed and told at the end")
 	var scales36 := {}
 	for o36 in c36.options:
@@ -8598,6 +8613,405 @@ func _open_net() -> void:
 		for e39 in sw36.ents:
 			check(not (str(e39.get("id", "")).begins_with("p36_") or str(e39.get("enemy", "")) in lords36 or str(e39.get("id", "")) in people36), "nothing of the chapter stands on the land of %s" % a36)
 	check(found36 >= 3 * (9 + 4 + 1 + 1), "everything the chapter stands in the three caves found room (%d)" % found36)
+
+	print("== Part XXXVII: A Cup of Water, a Cart of Firewood ==")
+	var wsq7 := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(Data.REALMS.size() == 43 and Data.REALMS[42] == "Five in One Hand" and Data.MAX_LEVEL == 126 and Data.level_name(126).ends_with("Five in One Hand") and Data.REALM_INFO.size() == 43
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXVII adds the realm of Five in One Hand")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break42" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall35") and msrc.contains("\"s_break41\": \"recall35\"") and Data.DIALOGUE.has("pre:s_break42") and Data.DIALOGUE.has("post:s_break42"),
+		"Part XXXVII follows Light Hand (recall35) and ends the game")
+	var pq7 := Data.step_index("s_p37_home")
+	var kindsq7 := {}
+	var nq7 := 0
+	var killsq7 := 0
+	var lordsq7: Array = []
+	var phq7 := {}
+	var reactq7 := {}
+	for i in range(pq7, Data.STEPS.size()):
+		var sq7: Dictionary = Data.STEPS[i]
+		nq7 += 1
+		kindsq7[str(sq7.kind)] = true
+		check(str(sq7.id).begins_with("s_p37_") or str(sq7.id) == "s_break42", "%s is a step of the chapter" % sq7.id)
+		check(not str(sq7.kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % sq7.id)
+		check(not sq7.has("stones") or int(sq7.stones) > 89000, "%s pays as the road has come to pay" % sq7.id)
+		if str(sq7.kind) == "talk":
+			check(Data.DIALOGUE.has(str(sq7.id)), "%s has its conversation" % sq7.id)
+		if str(sq7.kind) == "kill":
+			lordsq7.append(str(sq7.boss))
+			check(Data.DIALOGUE.has("pre:" + str(sq7.boss)) and Data.DIALOGUE.has("post:" + str(sq7.boss)) and Trials.TRIALS.has(str(sq7.boss)) and Lore.BOSS.has(str(sq7.boss)), "%s: words before and after, a trial, and a story" % sq7.boss)
+			check(bsrc.contains("\"%s\": \"" % str(sq7.boss)) and int(sq7.get("cave", 0)) == -1, "the bot has a way planned through %s, down in its cave" % sq7.boss)
+		if str(sq7.kind) == "hunt":
+			killsq7 += int(sq7.n)
+			var bndq7: Dictionary = Caves.LATE.get(str(sq7.area), {}).get(int(sq7.get("cave", 0)), {})
+			var poolq7: Array = []
+			for peq7 in bndq7.get("pool", []):
+				poolq7.append(str(peq7[0]))
+				check(int(peq7[1]) <= Data.MAX_LEVEL and int(peq7[2]) <= Data.MAX_LEVEL, "%s: nothing in the band is past the last level" % sq7.id)
+			for ofq7 in sq7.of:
+				check(poolq7.has(str(ofq7)) and Lore.BEAST.has(str(ofq7)) and not Data.ENEMIES[str(ofq7)].get("boss", false) and Tactics.WIT.has(str(Data.ENEMIES[str(ofq7)].shape)), "%s: %s lives in the region's cave, has a story, and wits" % [sq7.id, ofq7])
+			check(not bndq7.is_empty() and Data.step_index(str(bndq7.vis)) < i and not sq7.get("first", false), "%s: the band is in the cave before it is hunted, and nobody asks for the first strike under a roof" % sq7.id)
+		if str(sq7.kind) in ["hunt", "collect", "folk", "phase"]:
+			check(Data.DIALOGUE.has("done:" + str(sq7.id)), "%s: something is said when it is done" % sq7.id)
+		if str(sq7.kind) == "phase":
+			check(int(sq7.n) >= 2 and int(sq7.n) <= 6 and (not sq7.has("el") or Phases.ORDER.has(str(sq7.el))) and (not sq7.has("react") or str(sq7.react) in ["quell", "feed"]) and not sq7.has("cave") and bsrc.contains("func _phase_step"),
+				"%s is a few blows of a phase on the open land, and the bot can strike them" % sq7.id)
+			if sq7.has("el"):
+				phq7[str(sq7.el)] = true
+			if sq7.has("react"):
+				reactq7[str(sq7.react)] = true
+				# (what it asks one phase to meet can be laid down by a blow: there is a phase that bears it, or that it overcomes)
+				check(not sq7.has("el") or str(sq7.react) != "quell" or Phases.QUELLED.has(str(sq7.el)), "%s: the phase it names overcomes something that can lie on the land" % sq7.id)
+		if str(sq7.kind) == "folk":
+			var erq7: Dictionary = Folk.ERRANDS.get(str(sq7.id), {})
+			check(not erq7.is_empty() and (erq7.lines as Array).size() >= 4, "%s: an errand with four answers" % sq7.id)
+			check(int(Folk.TOWNS[str(sq7.town)].roles.get(str(sq7.role), 0)) >= int(sq7.n) and str(erq7.get("town", "")) == str(sq7.town), "%s: an errand among people who are there" % sq7.id)
+			for elq7 in erq7.lines:
+				check(fits.call(str(elq7)), "%s: what is answered fits the box" % sq7.id)
+			check(fits.call(str(erq7.ask)), "%s: what is asked fits the box" % sq7.id)
+	check(nq7 == 29 and killsq7 >= 130 and lordsq7 == ["the_fed_fire", "the_next_door", "the_kindling"] and kindsq7.size() >= 7 and kindsq7.has("phase") and kindsq7.has("folk") and kindsq7.has("collect"),
+		"the chapter is twenty-nine steps of seven kinds, with three lords (%d, %d, %d)" % [nq7, kindsq7.size(), killsq7])
+	check(phq7.size() == 5 and reactq7.size() == 2, "the story asks for each of the five phases by name, and for one to overcome another and one to feed another (%s)" % str(phq7.keys()))
+	var keysq7 := ["recall35", "pre:s_break42", "post:s_break42"]
+	for tidq7 in lordsq7:
+		keysq7.append("pre:" + str(tidq7))
+		keysq7.append("post:" + str(tidq7))
+	var peopleq7 := ["su_dai", "bai_gui", "cai_yong"]
+	var namesq7 := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan"]
+	for paq7 in ["volcano", "drowned", "thunder"]:
+		for npq7 in Data.AREAS[paq7].npcs:
+			if str(npq7.id) in peopleq7:
+				namesq7.append(str(npq7.n))
+				check(Assets.has("characters/" + str(npq7.asset)) and FileAccess.file_exists("res://art/characters/%s.py" % str(npq7.asset)) and Closeup.signature(str(npq7.n)) != "" and Folk.POSTS.has(str(npq7.id)), "%s has a body from a script, a gesture of their own and something to do by day" % npq7.id)
+	check(namesq7.size() == 7, "the three people of the chapter stand in its regions")
+	for dkq7 in Data.DIALOGUE:
+		if str(dkq7).contains("s_p37_") or str(dkq7) in keysq7:
+			for lnq7 in Data.DIALOGUE[dkq7]:
+				check(fits.call(str(lnq7[1])) and not str(lnq7[1]).contains("—"), "%s: a line that fits the box, with no dash in it" % dkq7)
+				check((lnq7 as Array).size() == 2 or Data.EMOTES.has(str(lnq7[2])), "%s: its gesture is one everybody has" % dkq7)
+				check(not str(lnq7[1]).contains(", sir") and not str(lnq7[1]).contains("young man") and not str(lnq7[1]).contains("Sir"), "%s: nobody calls the hero sir" % dkq7)
+				check(str(lnq7[0]) in namesq7, "%s: %s is somebody of the chapter, under the name they stand by" % [dkq7, lnq7[0]])
+	for tidq7 in lordsq7:
+		var trq7: Dictionary = Trials.TRIALS[tidq7]
+		var openq7 := 0
+		var relicq7 := false
+		for ptq7 in trq7.paths:
+			check(fits.call(str(ptq7.desc)) and fits.call(str(ptq7.line)) and Trials.KINDS.has(str(ptq7.kind)), "%s/%s: its words fit, and its way has a name" % [tidq7, ptq7.id])
+			if not str(ptq7.kind) in ["clean", "wild", "creed"]:
+				openq7 += 1
+			if str(ptq7.kind) == "relic":
+				relicq7 = true
+			for ndq7 in ptq7.needs:
+				if str(ndq7[0]) == "step":
+					check(Data.step_index(str(ndq7[1])) >= pq7 and Data.step_index(str(ndq7[1])) < _kill_step(tidq7), "%s/%s: what it is shown has been done before it is met" % [tidq7, ptq7.id])
+				if str(ndq7[0]) == "lv":
+					check(int(ndq7[1]) < Data.MAX_LEVEL, "%s/%s: the might asked can be had by then" % [tidq7, ptq7.id])
+				if str(ndq7[0]) in ["phases", "quelled"]:
+					check(int(ndq7[1]) >= 1 and int(ndq7[1]) <= 3, "%s/%s: no more of the round than the story has asked for by then" % [tidq7, ptq7.id])
+		check((trq7.paths as Array).size() == 4 and openq7 >= 2 and relicq7 and fits.call(str(trq7.why)) and Data.ENEMIES[tidq7].get("boss", false) and Trials.trial_of_step(Data.STEPS[_kill_step(tidq7)]) == tidq7, "%s is a lord of the chapter with four ways through, two of them open to a wanted man" % tidq7)
+	for prq7 in [["the_fed_fire", "wet_cinder", "s_p37_cinders"], ["the_next_door", "boundary_stake", "s_p37_stakes"], ["the_kindling", "scorched_peg", "s_p37_pegs"]]:
+		check(Data.step_index(str(prq7[2])) < _kill_step(str(prq7[0])) and Data.ITEMS.has(str(prq7[1])) and Look.PICKUP_COLORS.has(str(prq7[1])) and Load.weight_of(str(prq7[1])) <= 1.0, "%s can be passed by what was found on the way" % prq7[0])
+	var TNq7 = new_game.call()
+	TNq7.phases_used = {"fire": 2, "water": 1, "wood": 1}
+	TNq7.reacts = {"quell": 2}
+	check(Trials.need_met(["phases", 3], TNq7) and not Trials.need_met(["phases", 4], TNq7) and Trials.need_met(["quelled", 2], TNq7) and not Trials.need_met(["quelled", 3], TNq7) and Trials.KINDS.has("round") and Trials.KINDS.has("measure")
+		and Trials.need_text(["phases", 3], TNq7).contains("3") and Trials.need_text(["quelled", 2], TNq7).contains("2"), "trials can be passed by the round and by the measure")
+	TNq7.free()
+	var cq7: Dictionary = Echoes.CROSSROADS.get("the_round", {})
+	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of all")
+	check((cq7.options as Array).size() == 3 and cq7.after.size() == 3 and cq7.end.size() == 3 and cq7.echo.has("s_p37_end") and cq7.echo.s_p37_end.size() == 3 and Data.step_index("s_p37_end") > Data.step_index("s_p37_council"), "the_round: three answers, each answered, echoed and told at the end")
+	var scalesq7 := {}
+	for oq7 in cq7.options:
+		var mkq7: Dictionary = Marks.MARKS.the_round.get(str(oq7.id), {})
+		check(not mkq7.is_empty() and mkq7.has("who") and fits.call(str(mkq7.desc)) and fits.call(str(mkq7.who[3])) and fits.call(str(mkq7.who[4])) and Assets.has("characters/" + str(mkq7.who[1])) and str(mkq7.area) == "mountain", "the_round/%s leaves something standing, and somebody by it" % oq7.id)
+		check(not Weal.hears(str(mkq7.area)).is_empty() and int(mkq7.get("k", 1)) >= 3, "the_round/%s is a row of things, felt in a town" % oq7.id)
+		var mmq7: Node3D = Marks.model(mkq7, 0)
+		check(mmq7 != null and mmq7.get_child_count() > 0, "the_round/%s: what stands is built from code" % oq7.id)
+		mmq7.free()
+		for tkq7 in oq7.tilt:
+			scalesq7[str(tkq7)] = true
+		for ckq7 in oq7.get("creed", {}):
+			check(Creed.AXES.has(str(ckq7)) and absi(int(oq7.creed[ckq7])) < Creed.SIDE, "the_round/%s leans on the Way, and does not by itself decide it" % oq7.id)
+		check(fits.call(str(oq7.desc)), "the_round/%s: what it means fits" % oq7.id)
+		for alq7 in cq7.after[str(oq7.id)]:
+			check(fits.call(str(alq7[1])) and ((alq7 as Array).size() == 2 or Data.EMOTES.has(str(alq7[2]))) and str(alq7[0]) in namesq7, "the_round/%s: what follows fits the dialogue box" % oq7.id)
+		check(fits.call(str(cq7.echo.s_p37_end[str(oq7.id)][0][1])) and fits.call(str(cq7.end[str(oq7.id)])), "the_round/%s: its echo and its ending fit" % oq7.id)
+		var lidq7 := "round_" + str(oq7.id)
+		check(Mail.LETTERS.has(lidq7) and Mail.ORDER.has(lidq7) and fits.call(str(Mail.LETTERS[lidq7].lines[0])), "the_round/%s: somebody who lives with it writes" % oq7.id)
+		check(Data.step_index(Mail.after_of(lidq7)) + int(Mail.LETTERS[lidq7].get("wait", Mail.WAIT)) < Data.STEPS.size() - 1, "the letter %s can arrive before the story ends" % lidq7)
+	check(scalesq7.size() == 3 and Marks.AFTER_BANDS.has("the_round") and Mail.LETTERS.has("cai_qin") and Mail.ORDER.has("cai_qin") and fits.call(str(Mail.LETTERS.cai_qin.lines[0])), "its answers tip all three scales, its marks are stood after the late bands, and a man in Wu writes")
+	var fatesq7 := 0
+	for ftq7 in Weal.FATES:
+		if str(ftq7.when[0]) == "the_round":
+			fatesq7 += 1
+			check(fits.call(str(ftq7.line)) and str(ftq7.npc) == "cook_zhou", "a fate of the_round fits the box")
+	check(fatesq7 == 3 and bsrc.contains("\"the_round\": [\"watch\"]"), "the cook's days turn on each answer, and the bot has one")
+	var old_echoq7 := 0
+	for cidq7 in Echoes.ORDER:
+		if cidq7 != "the_round":
+			for ekq7 in Echoes.CROSSROADS[cidq7].get("echo", {}):
+				if str(ekq7).contains("s_p37_"):
+					old_echoq7 += 1
+					check(Data.DIALOGUE.has(str(ekq7)) and Data.step_index(str(ekq7)) > Data.step_index(str(Echoes.CROSSROADS[cidq7].step)) and Echoes.CROSSROADS[cidq7].echo[ekq7].size() >= 3, "%s echoes in a later conversation of the chapter" % cidq7)
+					for eaq7 in Echoes.CROSSROADS[cidq7].echo[ekq7]:
+						check(fits.call(str(Echoes.CROSSROADS[cidq7].echo[ekq7][eaq7][0][1])), "%s/%s: its echo fits the box" % [cidq7, eaq7])
+	check(old_echoq7 >= 1, "an older crossroads echoes in Part XXXVII (%d)" % old_echoq7)
+	# everything of the chapter is stood in a cave, last of all: nothing on the land moves, and nothing older in the cave
+	var foundq7 := 0
+	for aq7 in ["volcano", "drowned", "thunder"]:
+		check(not Caves.OWN.has(aq7) and Caves.LATE.has(aq7), "%s: the chapter's band is in LATE, not OWN (a cave of OWN is placed first, and every mouth after it moves)" % aq7)
+		var cwq7: Dictionary = Atlas.world_of(Caves.fid(aq7, -1))
+		var packsq7 := 0
+		var last_oldq7 := -1
+		var first_newq7 := 1 << 30
+		for eiq7 in (cwq7.ents as Array).size():
+			var eq7: Dictionary = cwq7.ents[eiq7]
+			var newq7: bool = (eq7.kind == "enemy" and str(eq7.id).contains(":l")) or (eq7.kind == "pickup" and str(eq7.id).begins_with("p37_")) or (eq7.kind == "boss" and str(eq7.enemy) in lordsq7) or (eq7.kind == "npc" and str(eq7.id) in peopleq7)
+			if newq7:
+				first_newq7 = mini(first_newq7, eiq7)
+				foundq7 += 1
+				if eq7.kind == "enemy":
+					packsq7 += 1
+				check(MapGen.is_walkable_tile(cwq7.grid[eq7.pos.y * int(cwq7.w) + eq7.pos.x]), "%s stands on the floor of its cave" % eq7.id)
+			else:
+				last_oldq7 = eiq7
+		check(packsq7 >= 9 and first_newq7 > last_oldq7, "%s: the band found room (%d of %d packs), after everything that was in the cave already" % [aq7, packsq7, int(Caves.LATE[aq7][-1].n)])
+		for spq7 in Data.AREAS[aq7].get("npcs", []) + Data.AREAS[aq7].get("bosses", []) + Data.AREAS[aq7].get("pickups", []):
+			if str(spq7.get("vis", ["", ""])[0]).begins_with("s_p37_"):
+				check(bool(spq7.get("late", false)) and int(spq7.get("cave", 0)) == -1 and bool(spq7.get("after", false)) and not spq7.has("peak"), "%s is written in the cave, to be stood after everything older" % spq7.id)
+		var swq7: Dictionary = Atlas.world_of(Data.layer_of(aq7))
+		for eq8 in swq7.ents:
+			check(not (str(eq8.get("id", "")).begins_with("p37_") or str(eq8.get("enemy", "")) in lordsq7 or str(eq8.get("id", "")) in peopleq7), "nothing of the chapter stands on the land of %s" % aq7)
+	check(foundq7 >= 3 * (9 + 4 + 1 + 1), "everything the chapter stands in the three caves found room (%d)" % foundq7)
+
+	print("== the five phases on the land (phases.gd, the Five Hands release) ==")
+	check(Phases.ORDER.size() == 5 and Phases.FEEDS.size() == 5 and Phases.QUELLS.size() == 5 and Phases.BASE.size() == 5 and Phases.ORDER == Roots.ELEMS, "five phases, in the round the spirit root already turns in")
+	var walkq7 := "wood"
+	var seenq7 := {}
+	for _kq7 in 5:
+		seenq7[walkq7] = true
+		walkq7 = str(Phases.FEEDS[walkq7])
+	check(seenq7.size() == 5 and walkq7 == "wood", "the round that bears goes through all five and comes back")
+	for elq8 in Phases.ORDER:
+		check(Phases.NAMES.has(elq8) and Phases.SAID.has(elq8) and (Phases.BASE[elq8] as Dictionary).size() == 3 and Phases.FED.has(elq8), "%s does something to a wood, to open ground and to water, and is fed by something" % elq8)
+		for grq7 in Phases.BASE[elq8]:
+			check(Phases.KINDS.has(str(Phases.BASE[elq8][grq7])) and str(Phases.KINDS[str(Phases.BASE[elq8][grq7])].el) == elq8, "what %s makes of %s is a thing of its own phase" % [elq8, grq7])
+		check(str(Phases.KINDS[str(Phases.FED[elq8])].el) == elq8 and (not Phases.QUELLED.has(elq8) or Phases.KINDS.has(str(Phases.QUELLED[elq8]))), "what comes of %s fed, and of what it overcomes, can lie on the land" % elq8)
+	# the phases overcome one another as every foe of the land is already weak
+	var weakq7 := 0
+	for fidq7 in Data.ENEMIES:
+		var foq7: Dictionary = Data.ENEMIES[fidq7]
+		if Phases.QUELLS.has(str(foq7.get("weak", ""))) and Phases.ORDER.has(str(foq7.get("elem", ""))) and str(Phases.QUELLS[str(foq7.weak)]) == str(foq7.elem):
+			weakq7 += 1
+	check(weakq7 >= 200, "what overcomes what on the land is what overcomes what in a fight (%d foes agree)" % weakq7)
+	for kdq7 in Phases.KINDS:
+		var pmq7: Node3D = Phases.model(kdq7, 5, Color(0.5, 0.42, 0.3), Color(0.3, 0.55, 0.3))
+		check(pmq7.get_child_count() > 0 and int(Phases.KINDS[kdq7].mend) >= 1 and str(Phases.KINDS[kdq7].n) != "" and str(Phases.KINDS[kdq7].one) != "", "%s is drawn from code, has its words, and mends" % kdq7)
+		pmq7.free()
+	var PHq7 = new_game.call()
+	var cycq7: Array = []
+	for _cq7 in 6:
+		Phases.cycle(PHq7)
+		cycq7.append(str(PHq7.phase))
+	check(cycq7 == ["wood", "fire", "earth", "thunder", "water", ""] and Phases.text(PHq7).contains("plain blade"), "K turns the hand through the five and back to the plain blade")
+	var lwq7: Dictionary = Atlas.world_of("surface")
+	var Wq7 := int(lwq7.w)
+	var atq7 := Vector2i(-1, -1)
+	var dq7 := Vector2i.ZERO
+	for tyq7 in range(6, int(lwq7.h) - 6):
+		for txq7 in range(6, Wq7 - 6):
+			if atq7.x >= 0:
+				break
+			var hq7 := Vector2i(txq7, tyq7)
+			if Atlas.owner_id(lwq7, hq7) != "bamboo" or Phases.ground_of(lwq7, hq7) != "ground":
+				continue
+			for ddq7 in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]:
+				var allq7 := true
+				for stq7 in range(1, 4):
+					allq7 = allq7 and Phases.ground_of(lwq7, hq7 + ddq7 * stq7) == "tree"
+				if allq7:
+					atq7 = hq7
+					dq7 = ddq7
+	check(atq7.x >= 0, "the Whispering Bamboo has a forest's edge to turn a phase on")
+	var gridq7: PackedByteArray = (lwq7.grid as PackedByteArray).duplicate()
+	PHq7.level = 0
+	var firstq7 := atq7 + dq7
+	var r1q7: Dictionary = Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "fire")
+	check(int(r1q7.n) >= 1 and Phases.on(PHq7, "surface", firstq7) == "burn" and Phases.told(r1q7).begins_with("Fire"), "fire at a wood: it burns (%s)" % Phases.told(r1q7))
+	check(int(Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "fire").n) == 0, "what is burning is not set burning again")
+	var r2q7: Dictionary = Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "water")
+	check(int(r2q7.quell) >= 1 and Phases.on(PHq7, "surface", firstq7) == "steam" and int(PHq7.reacts.get("quell", 0)) == int(r2q7.quell), "water on what burns puts it out, and leaves steam")
+	PHq7.touched = {}
+	Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "water")
+	check(Phases.on(PHq7, "surface", firstq7) == "drench", "water at a wood: it is drenched")
+	Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "fire")
+	check(Phases.on(PHq7, "surface", firstq7) == "steam", "a drenched wood does not take fire: the fire only dries it")
+	PHq7.touched = {}
+	var plainq7: Dictionary = Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "fire")
+	PHq7.touched = {}
+	Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "wood")
+	check(Phases.on(PHq7, "surface", firstq7) == "bloom", "wood at a wood: it is in blossom")
+	var fedq7: Dictionary = Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "fire")
+	check(int(fedq7.feed) >= 1 and Phases.on(PHq7, "surface", firstq7) == "blaze" and int(fedq7.n) >= int(plainq7.n), "fire in blossom is fed: a blaze, that takes at least as much as a fire did (%d, %d)" % [int(fedq7.n), int(plainq7.n)])
+	# the whole round on one piece of ground, each fed by the last
+	var roundq7: Array = []
+	for elq9 in ["earth", "thunder", "water", "wood", "fire"]:
+		var rrq7: Dictionary = Phases.cast(PHq7, "surface", lwq7, atq7, dq7, elq9)
+		roundq7.append(Phases.on(PHq7, "surface", firstq7) if int(rrq7.feed) >= 1 else "")
+	check(roundq7 == ["kiln", "lode", "rain", "grove", "blaze"], "the round on one piece of ground: each phase is fed by what the last one left (%s)" % str(roundq7))
+	PHq7.touched = {}
+	Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "earth")
+	var mossq7: Dictionary = Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "wood")
+	check(int(mossq7.quell) >= 1 and Phases.on(PHq7, "surface", firstq7) == "moss", "wood breaks what earth raised into a mossy bank")
+	check(int(Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "earth", true).n) >= 0 and Phases.on(PHq7, "surface", firstq7) == "moss", "asking what a blow would do does nothing")
+	check(Phases.turned(PHq7) == 5 and (lwq7.grid as PackedByteArray) == gridq7, "all five have been turned on the land, and not one tile of it has changed")
+	PHq7.day = int(PHq7.day) + 9
+	check(Phases.on(PHq7, "surface", firstq7) == "", "what a phase leaves mends by days lived")
+	Phases.mend(PHq7)
+	check(PHq7.touched.is_empty(), "and what has mended is forgotten")
+	# a town's streets, a floor and the sect's own courtyard are not turned
+	var townq7 := Vector2i(-1, -1)
+	for tyq8 in range(6, int(lwq7.h) - 6, 3):
+		for txq8 in range(6, Wq7 - 6, 3):
+			if townq7.x < 0 and Music.town_at(Atlas.owner_id(lwq7, Vector2i(txq8, tyq8)), Vector2i(txq8, tyq8)) != "" and MapGen.is_walkable_tile(lwq7.grid[tyq8 * Wq7 + txq8]):
+				townq7 = Vector2i(txq8, tyq8)
+	check(townq7.x >= 0 and Phases.ground_of(lwq7, townq7) == "" and Phases.ground_of(Atlas.world_of(Caves.fid("volcano", -1)), Vector2i(5, 5)) == "", "no phase is turned on the streets of a town or under the ground")
+	# a step counts blows that came to what it asks
+	var mtq7 := Vector2i(-1, -1)
+	var mdq7 := Vector2i.ZERO
+	for tyq9 in range(6, int(lwq7.h) - 6):
+		for txq9 in range(6, Wq7 - 6):
+			if mtq7.x < 0 and Atlas.owner_id(lwq7, Vector2i(txq9, tyq9)) == "mountain" and lwq7.grid[tyq9 * Wq7 + txq9] == MapGen.FLOOR:
+				for ddq9 in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]:
+					if Phases.ground_of(lwq7, Vector2i(txq9, tyq9) + ddq9) == "tree" and Atlas.owner_id(lwq7, Vector2i(txq9, tyq9) + ddq9) == "mountain":
+						mtq7 = Vector2i(txq9, tyq9)
+						mdq7 = ddq9
+	check(mtq7.x >= 0 and Phases.ground_of(lwq7, mtq7) == "", "on the mountain at the middle of the land the woods answer a phase, and the paths do not")
+	PHq7.step = Data.step_index("s_p37_quench")
+	PHq7.step_phase = 0
+	PHq7.touched = {}
+	Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "fire")
+	Phases.cast(PHq7, "surface", lwq7, atq7, dq7, "water")
+	check(int(PHq7.step_phase) == 0, "a step counts nothing done in another country than its own")
+	Phases.cast(PHq7, "surface", lwq7, mtq7, mdq7, "fire")
+	check(int(PHq7.step_phase) == 0, "a step that asks for water to overcome fire does not count the fire")
+	Phases.cast(PHq7, "surface", lwq7, mtq7, mdq7, "water")
+	check(int(PHq7.step_phase) == 1, "and counts the water that put it out, once for the blow")
+	# the blade strikes what it always struck
+	check(Impact.reach(Vector2i(0, 1)).size() == 4 and Sunder.reach(Vector2i(0, 1), 1).size() == 4, "the sword reaches the four tiles it always reached, whatever is in the hand")
+	PHq7.free()
+	check(wsq7.contains("Phases.cast(Game, layer, wd, ptile, facing, str(Game.phase))") and wsq7.contains("if str(Game.phase) != \"\":") and wsq7.contains("str(Game.cur_step().get(\"kind\", \"\")) == \"sunder\"") and msrc.contains("KEY_K") and bsrc.contains("Game.phase = \"\""), "F with a phase in the hand asks phases.gd; K turns it; the bot strikes with the plain blade outside its phase steps")
+
+	print("== hands on things (grip.gd, the Five Hands release) ==")
+	var shq7 := Vector3(0.2, 1.4, 0.0)
+	var elq7b := Vector3(0.25, 1.15, -0.02)
+	var wrq7 := Vector3(0.27, 0.9, 0.03)
+	var la7 := (elq7b - shq7).length()
+	var lb7 := (wrq7 - elq7b).length()
+	for tgq7 in [Vector3(0.3, 1.2, 0.35), Vector3(0.1, 1.1, 0.3), Vector3(0.45, 1.5, 0.2), Vector3(0.2, 0.95, 0.1)]:
+		var svq7: Array = Grip.solve(shq7, elq7b, wrq7, tgq7)
+		check(absf(((svq7[0] as Vector3) - shq7).length() - la7) < 0.001 and absf(((svq7[1] as Vector3) - (svq7[0] as Vector3)).length() - lb7) < 0.001 and (svq7[1] as Vector3).distance_to(tgq7) < 0.002, "an arm of two bones reaches %s with its bones the length they were" % str(tgq7))
+	var farq7: Array = Grip.solve(shq7, elq7b, wrq7, shq7 + Vector3(0, 0, 3.0))
+	check(absf(((farq7[1] as Vector3) - shq7).length() - (la7 + lb7)) < 0.01 and (farq7[1] as Vector3).z > 0.4, "what is out of reach is reached towards, the arm straight")
+	check(Grip.on_triangle(Vector3(0.2, 1.0, 0.2), Vector3.ZERO, Vector3(1, 0, 0), Vector3(0, 0, 1)).distance_to(Vector3(0.2, 0, 0.2)) < 0.001 and Grip.on_triangle(Vector3(-1, 0.5, -1), Vector3.ZERO, Vector3(1, 0, 0), Vector3(0, 0, 1)).distance_to(Vector3.ZERO) < 0.001, "the nearest point of a triangle: on its face, or at its corner")
+	var trisq7 := PackedVector3Array([Vector3(-1, 0.8, 0.5), Vector3(1, 0.8, 0.5), Vector3(0, 1.8, 0.5), Vector3(-1, 0, 5), Vector3(1, 0, 5), Vector3(0, 1, 5)])
+	var hitq7: Array = Grip.closest(trisq7, Vector3(0, 1.2, 0.3), 0.34)
+	check(hitq7.size() == 2 and absf(float(hitq7[1]) - 0.2) < 0.001 and Grip.closest(trisq7, Vector3(0, 1.2, -0.5), 0.34).is_empty(), "a palm finds the nearest face of a thing within a span, and nothing further off")
+	for toq7 in Grip.TOOLS:
+		var tdq7: Dictionary = Grip.TOOLS[toq7]
+		check(not tdq7.has("work") or str(tdq7.get("on", "")) in ["down", "fwd", "drag"], "%s says how its working end is brought to what it works" % toq7)
+		for rgq7 in tdq7.get("two", []):
+			check(minf(absf(float(rgq7[0])), absf(float(rgq7[1]))) >= 0.12 and float(rgq7[0]) * float(rgq7[1]) > 0.0, "%s: the other hand closes on the shaft clear of the first" % toq7)
+	if Assets.has("characters/lin_feng"):
+		var hmq7: Node3D = Assets.instance("characters/lin_feng")
+		var skq7: Skeleton3D = hmq7.find_children("*", "Skeleton3D", true, false)[0]
+		var ihq7 := skq7.find_bone("hand.R")
+		var restq7 := skq7.get_bone_global_rest(ihq7)
+		var seatq7: Node3D = Grip.seat(Node3D.new(), "hoe")
+		var gripq7: Vector3 = restq7 * (seatq7.transform * Vector3(0, Grip.AUTHORED, 0))
+		var oldq7: Vector3 = restq7 * Vector3(0, Grip.AUTHORED, 0)
+		check(gripq7.y < restq7.origin.y - 0.05 and oldq7.y > restq7.origin.y + 0.05, "what is held is gripped in the palm, below the wrist (%.3f): it was above it, in the sleeve (%.3f; the wrist is at %.3f)" % [gripq7.y, oldq7.y, restq7.origin.y])
+		seatq7.free()
+		# (his own arm, from where his own bones rest: the wrist comes to what is asked, and the bones keep their lengths)
+		var ruq7 := skq7.get_bone_global_rest(skq7.find_bone("upper_arm.R")).origin
+		var rfq7 := skq7.get_bone_global_rest(skq7.find_bone("forearm.R")).origin
+		var goalq7 := restq7.origin + Vector3(0.1, 0.25, 0.3)
+		var ownq7: Array = Grip.solve(ruq7, rfq7, restq7.origin, goalq7)
+		check((ownq7[1] as Vector3).distance_to(goalq7) < 0.002 and absf((ownq7[0] as Vector3).distance_to(ruq7) - rfq7.distance_to(ruq7)) < 0.001, "the hero's own arm, solved from his own bones, puts the wrist where it is asked")
+		var baq7: Node3D = Grip.hold(hmq7, Folk.held("lantern"), "lantern", "hand.L")
+		var rcq7 = Grip.reach_of(baq7)
+		check(baq7 != null and rcq7 != null and rcq7.hangs.size() == 1 and float((rcq7.hangs[0] as Node3D).get_meta("len")) > 0.1 and rcq7.main == "L", "a lantern is held in the left palm, and the lantern itself hangs from the end of its stick")
+		var bbq7: Node3D = Grip.hold(hmq7, Folk.held("hoe"), "hoe", "hand.R")
+		var rdq7 = Grip.reach_of(bbq7)
+		check(rdq7 != null and rdq7.tool.has("two") and rdq7.tool.has("work") and rdq7.hangs.is_empty(), "a hoe is a thing of two hands with a working end")
+		check(Grip.reach_of(Grip.hold(hmq7, Folk.held("cup"), "cup", "hand.R")) == null, "a cup needs nothing solved: it is only in the hand")
+		var polq7: Node3D = Folk.held("pole")
+		var hgq7 := 0
+		for chq7 in polq7.get_children():
+			if str(chq7.name).begins_with("hang"):
+				hgq7 += 1
+		check(hgq7 == 2, "the two baskets of a shoulder pole each hang on their own cords")
+		polq7.free()
+		hmq7.free()
+	check(wsq7.contains("Grip.hold(m, Folk.held(what), what, bone)") and wsq7.contains("func _use_reach") and wsq7.contains("func _trunk_at"), "whatever is put in a hand in the world is put there by grip.gd, and what he works on is what is really there")
+
+	print("== what hangs and swings (heft.gd, the Five Hands release) ==")
+	for lnq8 in [0.25, 0.5, 2.12]:
+		var psq7 := {"th": 0.08, "om": 0.0}
+		var tq7 := 0.0
+		var crossq7: Array = []
+		var prevq7 := 0.08
+		var e0q7 := Heft.energy(psq7, lnq8)
+		var riseq7 := false
+		while tq7 < 12.0 and crossq7.size() < 3:
+			var thq7 := Heft.pendulum(psq7, 1.0 / 60.0, lnq8, 0.0)
+			tq7 += 1.0 / 60.0
+			if prevq7 > 0.0 and thq7 <= 0.0:
+				crossq7.append(tq7 - (1.0 / 60.0) * (0.0 - thq7) / (prevq7 - thq7))
+			prevq7 = thq7
+			riseq7 = riseq7 or Heft.energy(psq7, lnq8) > e0q7 * 1.02
+		var perq7: float = float(crossq7[2]) - float(crossq7[1]) if crossq7.size() >= 3 else 0.0
+		check(absf(perq7 - Heft.period(lnq8)) < Heft.period(lnq8) * 0.03 and not riseq7, "a weight %.2f m from its axle swings once in %.2f s (2 pi root L over g is %.2f), and gains nothing from nowhere" % [lnq8, perq7, Heft.period(lnq8)])
+	var dsq7 := {"th": 0.6, "om": 0.0}
+	for _iq7 in 60 * 20:
+		Heft.pendulum(dsq7, 1.0 / 60.0, 0.5, 0.9)
+	check(absf(float(dsq7.th)) < 0.01 and absf(float(dsq7.om)) < 0.01, "left alone in air, it comes to rest hanging straight down")
+	var bsq7 := {}
+	Heft.kick(bsq7, 0.62)
+	var peakq7 := 0.0
+	for _iq8 in 120:
+		peakq7 = maxf(peakq7, absf(Heft.pendulum(bsq7, 1.0 / 60.0, 0.5, 0.9)))
+	check(peakq7 > 0.08 and peakq7 < 0.2, "a bell that is struck swings about as far as it used to be drawn swinging (%.3f)" % peakq7)
+	var swq8 := {}
+	var topq7 := 0.0
+	for _iq9 in 60 * 14:
+		topq7 = maxf(topq7, absf(Heft.pendulum(swq8, 1.0 / 60.0, 2.12, 0.12, Heft.pump(swq8, 2.12, 0.44))))
+	check(topq7 > 0.36 and topq7 < 0.6, "a swing that is pumped goes up to about the height its rider wants, and no higher (%.2f)" % topq7)
+	var hsq7 := {}
+	var pivq7 := Vector3(0, 2, 0)
+	Heft.hang(hsq7, pivq7, 1.0 / 60.0, 0.3)
+	check((hsq7.p as Vector3).distance_to(pivq7 + Vector3(0, -0.3, 0)) < 0.001, "what hangs starts hanging straight down")
+	var lagq7 := 0.0
+	for iq10 in 30:
+		pivq7.x += 2.0 / 60.0
+		var bpq7 := Heft.hang(hsq7, pivq7, 1.0 / 60.0, 0.3)
+		lagq7 = minf(lagq7, bpq7.x - pivq7.x)
+		check(absf(bpq7.distance_to(pivq7) - 0.3) < 0.001 or iq10 < 29, "the weight stays on its cord")
+	check(lagq7 < -0.03, "carried off sideways, a hanging weight lags behind the hand (%.3f m)" % lagq7)
+	for _iq11 in 60 * 8:
+		Heft.hang(hsq7, pivq7, 1.0 / 60.0, 0.3)
+	check((hsq7.p as Vector3).distance_to(pivq7 + Vector3(0, -0.3, 0)) < 0.01, "and when the hand stops it swings on, and comes to rest under it")
+	var flq7 := {}
+	Heft.hang(flq7, Vector3(0, 0.2, 0), 1.0 / 60.0, 0.5, 0.9, 0.0)
+	for _iq12 in 60:
+		Heft.hang(flq7, Vector3(0, 0.2, 0), 1.0 / 60.0, 0.5, 0.9, 0.0)
+	check((flq7.p as Vector3).y >= -0.0001, "a float on a line does not go under the water it floats on")
+	var boq7 := {"y": -0.2, "v": 0.0}
+	for _iq13 in 60 * 6:
+		Heft.bob(boq7, 1.0 / 60.0, 0.0)
+	check(absf(float(boq7.y)) < 0.005, "what floats comes back to the face of the water")
+	var hbq7 := Heft.hung(Vector3(0.3, -1, 0.1).normalized(), Basis.IDENTITY)
+	check(absf(hbq7.determinant() - 1.0) < 0.001 and (-hbq7.y).distance_to(Vector3(0.3, -1, 0.1).normalized()) < 0.001, "a thing drawn hanging down its own length is turned to hang the way its weight has gone")
+	check(wsq7.contains("Heft.pump(sst, 2.12") and wsq7.contains("Heft.kick(bst") and not wsq7.contains("sin(ph * 2.2) * 0.42"), "the swing is pumped and the bell is struck: neither is a sine any longer")
 
 	print("== the weight of a blow (sunder.gd, the Small Fish release) ==")
 	check(Sunder.RANKS.size() == 7 and Sunder.REALM_AT.size() == 7 and Sunder.ORDER.size() == Sunder.KINDS.size(), "seven weights of a blow, four things that can be done to a tile")

@@ -1551,6 +1551,37 @@ const CROSSROADS := {
 			"cut": "There is a ledger at the gate of Azure Cloud Sect with two columns: what the stone found, and what was found. They agree about four times in ten. Zeng Shen's line reads five, and then, in a later hand: the one we give the others to. The stone is still consulted. Nobody now takes its word for longer than a year.",
 			"bury": "The testing stone lies on its face by the gate, under moss, and the novices tie their sandals on it. Whoever climbs is taken, as in the founder's day. Zeng Shen was never told what he was. He examined himself three times a day for sixty years to find out, and is said to have got an answer, and not to have thought it worth writing down.",
 		}},
+	# Part XXXVII (the Five Hands release): what a sect that can turn five phases owes six villages in a dry year
+	"the_round": {"step": "s_p37_council", "part": "XXXVII", "n": "Before the Next Dry Wind",
+		"ask": "The east slope burned to the sect's wall, and it stopped there by luck and a change in the weather. Six villages under the mountain have sent tallies asking what Azure Cloud Sect will do before the next dry wind. The Elder has forty disciples who each know a fifth of the answer, and has put the question to Lin Feng.",
+		"options": [
+			{"id": "break", "label": "Cut firebreaks, and burn them every spring", "tilt": {"craft": 3, "heart": -2}, "creed": {"rule": 6}, "gain": {"renown": 6},
+				"desc": "Three lanes cleared down the mountain to bare earth, raised at the edges, and burnt clean by the sect itself each spring while the ground is wet: small fires, set on purpose, so that a great one finds nothing to eat. It is work every year for ever, and some old pines must come down for it (the villages will know whose name is on it).",
+				"log": "Had firebreaks cut down Azure Cloud Mountain, to be burnt clean by the sect every spring."},
+			{"id": "watch", "label": "Teach every village the round", "tilt": {"heart": 3, "reach": -2}, "creed": {"virtue": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "No disciple is to be the villages' fire brigade. Send them down instead, two to a village, to teach what feeds and what overcomes: which cup, and on which evening. A tub by every door, a bell, a child who knows what to shout. It is slow, and the next fire will be met by farmers (the Rice Hearth will remember who came down).",
+				"log": "Sent the disciples of Azure Cloud Sect down to the six villages to teach what puts out a fire, and when."},
+			{"id": "leave", "label": "Let the mountain burn as it always has", "tilt": {"craft": -3, "reach": 2}, "creed": {"rule": -6}, "gain": {"stones": 9000},
+				"desc": "A pine wood burns. It always has: the cones open in the heat and the ash is what the seedlings grow in. Hold the fire off nothing but roofs. Move the barns out of the trees, at the sect's cost, and let the slope do what it does every forty years (spirit stones: the villages pay toward the moving, gladly).",
+				"log": "Had the barns of six villages moved out of the pines, and let Azure Cloud Mountain burn when it burns."},
+		],
+		"after": {
+			"break": [["Narrator", "The lanes are cut before the month is out, three of them, straight down the mountain, each the width of a cart and bare as a threshing floor. The novice who missed his target is given the first torch the next spring, and a tub, and forty people watching. His hand shakes. The fire he sets is the size of a mat, and goes exactly as far as he lets it."]],
+			"watch": [["Narrator", "They go down two by two, with no swords. In Qingshi a girl of nine learns in an afternoon what forty disciples did not know in a night: that you throw it at the bottom of the fire and not at the top, and that you throw it on the first evening. By winter there is a tub by every door under the mountain, and nobody from the sect has filled one."]],
+			"leave": [["Narrator", "Six villages spend the autumn moving their barns out from under the trees, with the sect's disciples on the ropes. It is hard, dull work and nobody enjoys it. The next spring the black slope is green to the knee, and deer are in it, and an old woman of Cloudfoot says it looked exactly so when she was a girl, the year after the last one."]],
+		},
+		"echo": {
+			"s_p37_end": {
+				"break": [["Elder Qing Xuan", "And I am to burn the upper lane myself, the first wet morning, with the whole outer court looking on. I have not set a fire on purpose since I was a novice. I find I am looking forward to it, which I shall not mention to the villages."]],
+				"watch": [["Elder Qing Xuan", "And a child of Qingshi corrected my stance yesterday, child. At the bottom, she said, not at the top. She is nine. I thanked her. I have been throwing water at the tops of fires for seventy years."]],
+				"leave": [["Elder Qing Xuan", "And this, here, is why I let you say it. Look how many. I have swept under these pines since the last fire and never once seen a seedling. There was no room, and no ash. I took that for tidiness."]],
+			},
+		},
+		"end": {
+			"break": "Three bare lanes run down Azure Cloud Mountain, and every spring, on the first wet morning, the sect burns them clean with small fires set on purpose. In two hundred years the mountain did not burn to the wall again. Novices are given the torch in their first year. It is the only fire technique the outer court teaches before it teaches water.",
+			"watch": "There is a tub by every door in the six villages under Azure Cloud Mountain, and a bell, and a child who knows what to shout. The sect did not put out the next fire, or the one after. Farmers did, on the first evening, with cups. The disciples who went down to teach came back knowing where water goes, which had not been the lesson.",
+			"leave": "No barn stands under the pines of Azure Cloud Mountain. Once in forty years the east slope burns, and the villages come out to watch it as they would a festival, from a distance, with their roofs wet. The spring after is the greenest anybody remembers, each time. The oldest people keep count of how many of them they have seen.",
+		}},
 	# Part XXXVI (the Small Fish release): what a sect is to do with hands that have outgrown its mountain
 	"the_ladle": {"step": "s_p36_table", "part": "XXXVI", "n": "What a Strong Hand Is For",
 		"ask": "A girl of the inner court reached Nascent Soul in the spring and, showing her brother a form, split the practice yard to the cistern. Lin Feng opened a lane through the pines the same season, without meaning to. The Elder asks what the sect is to do with hands that have outgrown the mountain. Whatever is said will be asked of Lin Feng first.",
@@ -1571,6 +1602,11 @@ const CROSSROADS := {
 			"ground": [["Narrator", "The waste valley behind the mountain has never had a name. It gets one that month, and a rope across its mouth with a bell on it. The girl Ning goes in on the first morning and strikes once, with everything. The sound comes back off three ridges. She is gone until dark."], ["Auntie Zhou the Cook", "She came into my kitchen white as a bun and asked for work. Any work. I gave her the fish. She said: Auntie, I know what it is now, the thing I must not do. I had only been told. That is something, I grant you. It is a great deal of valley to spend on it."]],
 		},
 		"echo": {
+			"s_p37_home": {
+				"bind": [["Elder Qing Xuan", "Your stones held, I will say that. Not one of the forty struck harder than a felling stroke. They struck lightly, and wrongly, forty times. A rule can tell a hand how hard. It seems it cannot tell it what."]],
+				"teach": [["Elder Qing Xuan", "Auntie Zhou watched it with me. She said: not one of them has ever banked a stove. She is right. I have had them cook a fish, and never once had them mind the fire under it. That is next year's kitchen."]],
+				"ground": [["Elder Qing Xuan", "The ones who have been in your valley were the worst, child. They knew to a grain how much they had, and threw it. Knowing your number is not knowing what to spend it on. I blame myself. I named the fee."]],
+			},
 			"s_p36_end": {
 				"bind": [["Elder Qing Xuan", "And I passed one of your stones on the way up, child, and found I had slowed my step for it. At my age. I could not strike harder than a felling stroke if I were paid. But it is pleasant to be told that one must not."]],
 				"teach": [["Elder Qing Xuan", "And Auntie Zhou has sent word that I am to cook one myself before I teach the Ninth Form again. She says a rule is a rule. I have been Elder longer than she has been cook, and I find that I am going to do it."]],
@@ -1781,7 +1817,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

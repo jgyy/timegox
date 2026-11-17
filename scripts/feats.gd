@@ -78,7 +78,13 @@ const FEATS := {
 	"looked_twice": {"n": "Looked Twice", "kind": "road", "pts": 10, "test": ["step", "s_p35_seer"], "desc": "Make an eye that has never been wrong stay for the cutting."},
 	"the_gate": {"n": "What the Stone Is For", "kind": "road", "pts": 10, "test": ["step", "s_p35_gate"], "desc": "Answer a slow boy who asked what a true measure is for."},
 	# the Small Fish release: the last realm, the pond, the field, the hill and the fish (Part XXXVI)
-	"light_hand": {"n": "Turned It Once", "kind": "road", "pts": 20, "test": ["level", 123], "desc": "Reach Light Hand: the last realm there is."},
+	"light_hand": {"n": "Turned It Once", "kind": "road", "pts": 20, "test": ["level", 123], "desc": "Reach Light Hand."},
+	# the Five Hands release: the last realm, the fire, the dyke and the log (Part XXXVII)
+	"five_in_one": {"n": "What Each of Them Meets", "kind": "road", "pts": 20, "test": ["level", 126], "desc": "Reach Five in One Hand: the last realm there is."},
+	"did_not": {"n": "So I Did Not", "kind": "road", "pts": 10, "test": ["step", "s_p37_fedfire"], "desc": "Give a fire that asks politely nothing at all."},
+	"a_door_in_it": {"n": "A Wall with a Door in It", "kind": "road", "pts": 10, "test": ["step", "s_p37_nextdoor"], "desc": "Show a dyke over its own top."},
+	"scorched_tail": {"n": "The Tail Left On", "kind": "road", "pts": 10, "test": ["step", "s_p37_kindling"], "desc": "Tell a log under a pot what it is."},
+	"whole_round": {"n": "All the Way Round", "kind": "road", "pts": 10, "test": ["step", "s_p37_round"], "desc": "Walk the five phases on one piece of ground, each fed by the last."},
 	"one_fingerling": {"n": "One Fingerling", "kind": "road", "pts": 10, "test": ["step", "s_p36_drained"], "desc": "Let a little water back into a pond that had everything."},
 	"went_indoors": {"n": "Went Indoors", "kind": "road", "pts": 10, "test": ["step", "s_p36_tugger"], "desc": "Show a helping hand something that was left alone."},
 	"saw_the_men": {"n": "Saw the Men", "kind": "road", "pts": 10, "test": ["step", "s_p36_grasper"], "desc": "Put something in front of a hand that it had to look at."},
