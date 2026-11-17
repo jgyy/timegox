@@ -330,6 +330,12 @@ var leaps := 0
 var bumps := 0
 var step_restore := 0
 var step_leap := 0
+## the Uncarved Block release (rites.gd): the rites of the Daos he has performed (id -> times), those waiting to
+## be played, how many he has performed in all, and how many since the step began
+var rites := {}
+var rite_due: Array = []
+var rite_n := 0
+var step_rite := 0
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -575,6 +581,10 @@ func reset() -> void:
 	bumps = 0
 	step_restore = 0
 	step_leap = 0
+	rites = {}
+	rite_due = []
+	rite_n = 0
+	step_rite = 0
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -656,6 +666,8 @@ func choose_dao(id: String) -> void:
 		dao_switches += 1
 	dao = id
 	dao_xp[id] = int(dao_xp.get(id, 0))
+	# (the Uncarved Block release, rites.gd: a road first walked has a rite, played when he next stands free)
+	Rites.earn(self, Rites.of_road(id))
 	toast("You walk the %s" % Data.DAOS[id].n)
 	note("Walks the %s" % Data.DAOS[id].n)
 
@@ -996,6 +1008,7 @@ func advance() -> void:
 	step_toil = 0
 	step_restore = 0
 	step_leap = 0
+	step_rite = 0
 	step_haul = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
 	if str(s.id) == Hold.FOUND_STEP:
@@ -1108,6 +1121,9 @@ func poll_steps() -> void:
 			"restore":
 				# Part XXXIV: so many lost things brought to whose they are since the step began (trifles.gd)
 				ok = step_restore >= int(s.n)
+			"rite":
+				# the Uncarved Block release (rites.gd): so many rites of his Daos performed since the step began
+				ok = step_rite >= int(s.n)
 			"leap":
 				# Part XXXIV: so many leaps made since the step began (world.gd)
 				ok = step_leap >= int(s.n)
@@ -1152,7 +1168,7 @@ func summit(pid: String, peak_name: String, height: float) -> void:
 		return
 	summits[pid] = true
 	note("Stood on %s (%d m)" % [peak_name, int(round(height))])
-	toast("The summit of %s, %d metres up (%d summits)" % [peak_name, int(round(height)), summits.size()])
+	toast("The summit of %s, %d metres up (%d summit%s)" % [peak_name, int(round(height)), summits.size(), "" if summits.size() == 1 else "s"])
 	poll_steps()
 
 ## A flight under the kite has ended: `tiles` flown, `fell` metres come down.
@@ -1172,7 +1188,7 @@ func delve(fid: String, cave_name: String) -> void:
 		return
 	delved[fid] = true
 	note("Went to the very back of %s" % cave_name)
-	toast("To the back of %s (%d caves)" % [cave_name, delved.size()])
+	toast("To the back of %s (%d cave%s)" % [cave_name, delved.size(), "" if delved.size() == 1 else "s"])
 	add_renown(1)
 	poll_steps()
 
@@ -1226,6 +1242,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(step_toil, int(s.n)), int(s.n)]
 	elif s.kind == "restore":
 		t += "  (%d/%d%s)" % [mini(step_restore, int(s.n)), int(s.n), ", %d in his sleeve" % Trifles.carried(self).size() if not Trifles.carried(self).is_empty() else ""]
+	elif s.kind == "rite":
+		t += "  (%d/%d)" % [mini(step_rite, int(s.n)), int(s.n)]
 	elif s.kind == "leap":
 		t += "  (%d/%d)" % [mini(step_leap, int(s.n)), int(s.n)]
 	elif s.kind == "fit":
@@ -1475,6 +1493,8 @@ func arm_battle_won(boss: bool) -> void:
 		add_renown(1)
 		if after == 1:
 			toast("New technique: %s" % Data.SKILLS[str(w.skill)].n)
+			# (the Uncarved Block release, rites.gd: an Adept of a weapon's Dao has its rite)
+			Rites.earn(self, Rites.of_arm(id))
 		poll_steps()
 
 func grant_ride(id: String) -> void:

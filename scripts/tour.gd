@@ -2359,6 +2359,10 @@ func _run() -> void:
 		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
 		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
 		await _pestle_shots(str(main.args.pestle))
+	if main.args.has("block"):
+		# the Uncarved Block release (--block, or --block=a,b): the seventeen rites of the Daos, the page of the
+		# root, the street answering a root and a road, and Part XXXV
+		await _block_shots(str(main.args.block))
 	if main.args.has("road"):
 		# the Unpicked Road release: small things, how the street answers, a leap, Part XXXIV
 		await _road_shots(str(main.args.road))
@@ -6504,4 +6508,224 @@ func _road_shots(which: String = "1") -> void:
 			await _wait(3.0)
 			await _shot("battle_boss_" + str(bb[0]))
 			main.pop()
+	get_tree().quit(0)
+
+## The Uncarved Block release (--block, or --block=a,b): every rite of the seventeen Daos caught at a beat of its
+## scene, the things they are done with in a row, the Root & Rites page for a root of one phase and of five, the
+## creation screen at the root's row, the street answering a root and a road, and the people, foes, lords and
+## marks of Part XXXV with its crossroads.
+func _block_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 118
+	Game.step = Data.step_index("s_p35_gate") if Data.step_index("s_p35_gate") >= 0 else Data.STEPS.size() - 2
+	Game.companion = true
+	Game.day = 240
+	Game.stones = 5000
+	Game.dao = "sword"
+	for d0 in Data.DAO_ORDER:
+		Game.dao_xp[d0] = 40
+	for a0 in Arms.ORDER:
+		Game.arms[a0] = true
+		Game.arm_xp[a0] = 40
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+		Game.rite_due = []
+	quiet.call()
+	w.open_world()
+	w.enter_layer("surface")
+	# open ground: a tile with nothing within four tiles of it
+	var spot: Vector2i = w.ptile
+	var found := false
+	for rr in range(2, 60):
+		for dx in range(-rr, rr + 1, 2):
+			for dy in [-rr, rr]:
+				var q: Vector2i = w.ptile + Vector2i(dx, dy)
+				var ok := true
+				for ax in range(-4, 5):
+					for ay in range(-4, 5):
+						var q2 := q + Vector2i(ax, ay)
+						if not w.tile_free(q2) or w.ent_at(q2) != null or not w.building_at(q2).is_empty():
+							ok = false
+							break
+					if not ok:
+						break
+				if ok:
+					spot = q
+					found = true
+					break
+			if found:
+				break
+		if found:
+			break
+	var stand := func() -> void:
+		main.set_stack(["world"])
+		w.teleport(spot, "surface")
+		w.facing = Vector2i(0, 1)
+		w.cam_q = 0
+		w._snap_cam()
+		w.banner_t = 0.0
+		Game.clock = 10.5 * 60.0
+		quiet.call()
+	if want.call("props"):
+		for row in [["road", "rite_props_roads"], ["arm", "rite_props_arms"], ["taboo", "rite_props_forbidden"]]:
+			var ms: Array = []
+			for rid in Rites.ORDER:
+				if str(Rites.RITES[rid].kind) == str(row[0]):
+					var pm := Rites.prop(str(rid))
+					Rites.tick(pm, str(rid), 0.8, 2.0)
+					# (each shown at about the same size: a field of eight flags beside a lamp held in two hands)
+					var sc: float = float({"bagua_field": 0.3, "sword_wheel": 0.55, "peng_feather": 0.75, "straw_butt": 0.7, "soul_banner": 0.5, "hung_scroll": 0.6, "plumb_line": 0.6, "hung_coin": 0.6,
+						"moon_mirror": 0.75, "candle": 0.95, "nine_reeds": 0.8, "bamboo_stake": 0.75, "leaf_ring": 0.38, "corpse_bell": 0.8, "lotus_lamp": 2.6, "cauldron": 1.5, "blood_bowl": 2.4}.get(str(Rites.RITES[rid].prop), 1.0))
+					pm.scale = Vector3.ONE * sc
+					var hold := Node3D.new()
+					hold.add_child(pm)
+					ms.append(hold)
+			await _gallery(str(row[1]), ms, 1.5, 0.3)
+	if want.call("rites"):
+		stand.call()
+		await _wait(1.0)
+		var t00 := Time.get_ticks_msec()
+		for rid in Rites.ORDER:
+			if main.args.has("rite") and not str(main.args.rite).split(",").has(str(rid)):
+				continue
+			main.set_stack(["world"])
+			Game.taboo = {}
+			if str(Rites.RITES[rid].kind) == "taboo":
+				Game.taboo[str(Rites.RITES[rid].key)] = 1
+			main.play_rite(str(rid))
+			# (the beat that shows the thing done: --beat=k for another; each caught late in its form)
+			var bi := int(main.args.get("beat", 1))
+			main.dialogue.idx = bi
+			main.dialogue.shown = 9999.0
+			await _wait(0.2)
+			# (caught late in the form, when the thing has happened: the form and what it is done with are set
+			# that far along at once, since every frame of a software renderer is seconds)
+			var along := Rites.SECONDS * float(main.args.get("at", 0.66))
+			w.rite_t0 = w.t - along
+			Models.act(w.player, str(Rites.RITES[rid].clip), w.t - along)
+			w.cine_k = 1.0
+			await _wait(0.7)
+			await _shot("rite_%s%s" % [str(rid), ("_%d" % bi) if main.args.has("beat") else ""])
+			main.set_stack(["world"])
+			w.rite_end()
+			Game.taboo = {}
+			await _wait(0.3)
+		print("[tour] rites took ", (Time.get_ticks_msec() - t00) / 1000.0)
+	if want.call("page"):
+		for rn in [1, 5]:
+			stand.call()
+			Game.hero["root"] = rn
+			Game.hero["root_el"] = "fire"
+			Game.rites = {"sword": 1, "a_staff": 2, "heart": 1}
+			main.open_menu()
+			main.menu.mode = "rites"
+			main.menu.cursor = 0
+			main.menu._build()
+			await _wait(0.8)
+			await _shot("root_and_rites_%d" % rn)
+			main.pop()
+		Game.hero.erase("root")
+		Game.hero.erase("root_el")
+	if want.call("people"):
+		await _gallery("part35_people", [Assets.person("zeng_shen"), Assets.person("fang_zhongyong"), Assets.person("carpenter_shi"), Assets.person("bian_he")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid in ["shown_verse", "guest_seat", "idle_slate", "inked_line", "squared_log", "use_adze", "court_eye", "plain_rind", "fraud_writ"]:
+			fs.append(_foe(fid))
+		await _gallery("part35_foes", fs, 1.0, 0.25)
+		await _gallery("part35_lords", [_foe("the_gift", true), _foe("the_rule", true), _foe("the_appraiser", true)], 1.3, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["keep", "cut", "bury"]:
+			mk.append(Marks.model(Marks.MARKS.the_stone[oid], 0))
+		await _gallery("part35_marks", mk, 1.2, 0.3)
+	if want.call("street"):
+		# somebody of Qingshi out of doors and standing, with open ground south of them: their fourth word, of a
+		# Heavenly Root and of a waste root; and their word for a road walked and for none
+		var lw := Atlas.world_of("surface")
+		for sh in [["street_answers_root_1", 1, 3, "sword"], ["street_answers_root_5", 5, 3, "sword"], ["street_answers_no_dao", 3, 6, ""], ["street_answers_dao", 3, 6, "heart"]]:
+			var done_s := false
+			for h2 in [10.4, 15.0, 9.0, 16.0, 12.0]:
+				Game.clock = h2 * 60.0
+				for fp in Folk.people(lw, "qingshi"):
+					if bool(fp.kid) != (str(sh[0]) == "street_answers_root_5"):
+						continue
+					var st: Dictionary = Folk.state(lw, fp, Game.clock)
+					if not bool(st.vis) or bool(st.walk):
+						continue
+					var gt := Vector2i(int(floor(float(st.at.x))), int(floor(float(st.at.y))))
+					var ok2 := true
+					for dd in [Vector2i(0, 1), Vector2i(0, 2)]:
+						if not w.tile_free(gt + dd) or w.ent_at(gt + dd) != null or not w.building_at(gt + dd).is_empty():
+							ok2 = false
+					if not ok2:
+						continue
+					print("[tour] street: ", fp.n, " at ", gt, " hour ", h2)
+					main.set_stack(["world"])
+					w.teleport(gt + Vector2i(0, 1), "surface")
+					w.facing = Vector2i(0, -1)
+					w.cam_q = 0
+					w._snap_cam()
+					w.banner_t = 0.0
+					quiet.call()
+					Game.hero["root"] = int(sh[1])
+					Game.hero["root_el"] = "fire"
+					Game.dao = str(sh[3])
+					# (the word that is about his root for this person, or about his road)
+					var want_root: bool = str(sh[0]).contains("root")
+					var wn2 := 3 if (want_root == (int(fp.seed) % 2 == 0)) else 6
+					Game.folk_talk[str(fp.id)] = wn2
+					await _wait(0.7)
+					main.talk_folk({"kind": "folk", "id": "folk:" + str(fp.id), "p": fp, "pos": gt})
+					main.dialogue.shown = 999.0
+					await _wait(0.9)
+					quiet.call()
+					await _wait(0.1)
+					await _shot(str(sh[0]))
+					main.set_stack(["world"])
+					w.folk_talking = ""
+					done_s = true
+					break
+				if done_s:
+					break
+		Game.hero.erase("root")
+		Game.hero.erase("root_el")
+		Game.dao = "sword"
+	if want.call("cross"):
+		main.set_stack(["world"])
+		Game.picks = {}
+		Game.cross_pending = ["the_stone"]
+		main.ask_crossroads()
+		main.choice.cursor = 0
+		await _wait(1.0)
+		await _shot("crossroads_stone")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("battles"):
+		for bb in [["the_gift", "maple"], ["the_rule", "garden"], ["the_appraiser", "jasper"]]:
+			main.set_stack(["world"])
+			var b = main.battle
+			b.start([{"id": str(bb[0]), "lv": int(Data.ENEMIES[str(bb[0])].get("lv", 119))}], {"boss": true, "theme": str(Data.AREAS[str(bb[1])].theme), "area": str(bb[1])})
+			main.push("battle")
+			await _wait(3.0)
+			await _shot("battle_boss_" + str(bb[0]))
+			main.pop()
+	if want.call("create"):
+		for rn2 in [1, 5]:
+			main.set_stack(["title"])
+			main.open_creation()
+			main.create.h["root"] = rn2
+			main.create.h["root_el"] = "fire" if rn2 == 1 else "wood"
+			main.create.cursor = main.create.ROWS.find("root")
+			await _wait(1.0)
+			await _shot("create_root_%d" % rn2)
+		main.set_stack(["world"])
 	get_tree().quit(0)

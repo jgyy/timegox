@@ -440,12 +440,25 @@ static func price(g, t: Dictionary) -> int:
 	return maxi(1, int(round(float(int(KINDS[str(t.kind)].get("price", 1)) + int(g.realm())) * Weal.mod(g, str(t.area), "mend"))))
 
 ## Why thing `t` cannot be taken up now ("" if it can).
+## The oldest thing in his sleeve that is his own to leave behind (-1 if none).
+static func _spare(g) -> int:
+	for i in g.pocket.size():
+		if bool(g.pocket[i].get("own", false)):
+			return i
+	return -1
+
 static func blocked(g, _t: Dictionary) -> String:
-	if g.pocket.size() >= SLEEVE:
+	# (the Uncarved Block release: six wares bought and never used filled the sleeve for good, and then nothing
+	# dropped in a road could be picked up: the two steps that ask for it could not be done.  For somebody's
+	# lost thing, something of his own is left behind to make room)
+	var lost: bool = str(KINDS.get(str(_t.get("kind", "")), {}).get("cls", "")) == "lost"
+	if g.pocket.size() >= SLEEVE and not (lost and _spare(g) >= 0):
 		return "His sleeves are full: six small things are all they hold."
 	return ""
 
 static func _pocket(g, wd: Dictionary, t: Dictionary, own: bool) -> void:
+	if g.pocket.size() >= SLEEVE and _spare(g) >= 0:
+		g.pocket.remove_at(_spare(g))
 	var q: Dictionary = t.duplicate()
 	q.own = own
 	q.day = int(g.day)
@@ -602,7 +615,7 @@ static func restore(g, id: String, door: bool = false) -> Dictionary:
 			if door:
 				lines.append(["Narrator", "He knocks. %s comes to the door wiping both hands, sees the %s, and for a moment says nothing at all." % [str(q.who), str(KINDS[kind].n)]])
 			lines.append([str(q.who), str(KINDS[kind].thanks), "bow"])
-			lines.append(["Narrator", "%s presses %d spirit stones on him, and will not hear of his refusing. (%d things brought home)" % [str(q.who), stones, int(g.restored)]])
+			lines.append(["Narrator", "%s presses %d spirit stones on him, and will not hear of his refusing. (%d thing%s brought home)" % [str(q.who), stones, int(g.restored), "" if int(g.restored) == 1 else "s"]])
 		else:
 			# a keep, a ware or an offering he walked off with, handed back to whose it was
 			g.trifles.erase(id)

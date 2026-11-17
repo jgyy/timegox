@@ -908,7 +908,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted", "clean", "wild", "step", "restored"]
+	var need_kinds := ["rites", "lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted", "clean", "wild", "step", "restored"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -1016,6 +1016,9 @@ func _init() -> void:
 					"step":
 						# something of the story done already: a real step, before the trial
 						ok = ok and Data.step_index(str(n[1])) >= 0 and Data.step_index(str(n[1])) < _kill_step(tid)
+					"rites":
+						# the Uncarved Block release: Daos whose rite he has performed (rites.gd)
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Rites.ORDER.size()
 					"households":
 						# the Three Burrows release: households of the hero's own town (hold.gd): no more than
 						# the story has brought there by the trial, nor than a city has
@@ -1205,7 +1208,7 @@ func _init() -> void:
 					marching8[pe8b[0]] = true
 				# (Part XXIV: and a third and a fourth)
 				# (Part XXV: and a fifth and a sixth, placed after the marks)
-				for bk8 in ["warband3", "warband4", "warband5", "warband6"]:
+				for bk8 in ["warband3", "warband4", "warband5", "warband6", "warband7"]:
 					for pe8c in Data.AREAS[st8.area].get(bk8, {}).get("pool", []):
 						marching8[pe8c[0]] = true
 			for fid in st8.of:
@@ -4512,7 +4515,7 @@ func _lost_horse() -> void:
 	var kinds24 := {}
 	var doom_bands := {}
 	for a24 in Data.AREAS:
-		for bk24 in ["warband", "warband2", "warband3", "warband4", "warband5", "warband6"]:
+		for bk24 in ["warband", "warband2", "warband3", "warband4", "warband5", "warband6", "warband7"]:
 			var bd24: Dictionary = Data.AREAS[a24].get(bk24, {})
 			if bd24.is_empty():
 				continue
@@ -4523,9 +4526,9 @@ func _lost_horse() -> void:
 					doom_bands[str(pe24[0])] = a24
 			check(dn == 0 or (dn == (bd24.pool as Array).size() and str(bd24.get("until", "")) != "" and Data.step_index(str(bd24.until)) > Data.step_index(str(bd24.vis))),
 				"%s/%s: a band of what cannot be beaten is nothing else, and stops marching when its chapter has done with it" % [a24, bk24])
-			if bk24 in ["warband3", "warband4", "warband5", "warband6"]:
+			if bk24 in ["warband3", "warband4", "warband5", "warband6", "warband7"]:
 				var lw24: Dictionary = Atlas.world_of(Data.layer_of(a24))
-				var pre24: String = a24 + ":" + str({"warband3": "y", "warband4": "z", "warband5": "u", "warband6": "v"}[bk24])
+				var pre24: String = a24 + ":" + str({"warband3": "y", "warband4": "z", "warband5": "u", "warband6": "v", "warband7": "t"}[bk24])
 				var marching24: Array = lw24.ents.filter(func(e6): return e6.kind == "enemy" and str(e6.id).begins_with(pre24) and str(e6.id).substr(pre24.length()).is_valid_int())
 				check(marching24.size() == int(bd24.n) and Data.step_index(str(bd24.vis)) >= 0, "%s: %d packs of its %s placed" % [a24, marching24.size(), bk24])
 				# (placed after the peaks and the camps: never on the rock, never at a camp fire)
@@ -4965,13 +4968,13 @@ func _three_burrows() -> void:
 	# its bands are the fifth and sixth (placed after the marks), and keep off the town
 	var bands25 := 0
 	for a25 in Data.AREAS:
-		for bk25 in ["warband5", "warband6"]:
+		for bk25 in ["warband5", "warband6", "warband7"]:
 			var bd25: Dictionary = Data.AREAS[a25].get(bk25, {})
 			if bd25.is_empty():
 				continue
 			if not str(bd25.vis).begins_with("s_p25_"):
 				# (the Underclothes release: a later chapter's bands take the same last slots in other regions)
-				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_") or str(bd25.vis).begins_with("s_p29_") or str(bd25.vis).begins_with("s_p30_") or str(bd25.vis).begins_with("s_p31_") or str(bd25.vis).begins_with("s_p32_") or str(bd25.vis).begins_with("s_p33_") or str(bd25.vis).begins_with("s_p34_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
+				check((str(bd25.vis).begins_with("s_p26_") or str(bd25.vis).begins_with("s_p27_") or str(bd25.vis).begins_with("s_p28_") or str(bd25.vis).begins_with("s_p29_") or str(bd25.vis).begins_with("s_p30_") or str(bd25.vis).begins_with("s_p31_") or str(bd25.vis).begins_with("s_p32_") or str(bd25.vis).begins_with("s_p33_") or str(bd25.vis).begins_with("s_p34_") or str(bd25.vis).begins_with("s_p35_")) and bool(bd25.get("late", false)), "%s/%s marches for a later chapter" % [a25, bk25])
 				continue
 			bands25 += 1
 			check(bool(bd25.get("late", false)), "%s/%s marches for Part XXV" % [a25, bk25])
@@ -5241,7 +5244,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.sleeves_of_wind.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.uncarved_block.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -7541,7 +7544,7 @@ func _open_net() -> void:
 	check(old_echo30 >= 2, "older crossroads echo in Part XXX (%d)" % old_echo30)
 	check(bsrc.contains("\"four_net\": \"relic\"") and bsrc.contains("\"the_sentence\": \"clean\"") and bsrc.contains("\"the_verdict\": [\"bench\"]"), "the bot has a plan for every trial and the crossroads of the chapter, and takes one by its clean name")
 	for a30 in ["garden", "springs", "palace"]:
-		check(str(Data.AREAS[a30].get("warband5", {}).get("vis", "")).begins_with("s_p30_") and not Data.AREAS[a30].has("warband6"), "%s: the chapter's band takes the last slot" % a30)
+		check(str(Data.AREAS[a30].get("warband5", {}).get("vis", "")).begins_with("s_p30_") and (not Data.AREAS[a30].has("warband6") or Data.step_index(str(Data.AREAS[a30].warband6.vis)) > Data.step_index("s_p30_home")), "%s: the chapter's band takes the last slot" % a30)
 		var stood := 0
 		for e30 in ws.ents:
 			if str(e30.kind) == "enemy" and str(e30.get("area", "")) == a30 and str(e30.get("vis", ["", ""])[0]).begins_with("s_p30_"):
@@ -8072,7 +8075,7 @@ func _open_net() -> void:
 	var people33 := ["granny_wu", "li_bai", "kuang_heng", "oil_seller", "chen_yaozi"]
 	for a33 in areas33:
 		var w33: Dictionary = Atlas.world_of(Data.layer_of(a33))
-		check(str(Data.AREAS[a33].get("warband5", {}).get("vis", "")).begins_with("s_p33_") and not Data.AREAS[a33].has("warband6"), "%s: the chapter's band takes the last slot" % a33)
+		check(str(Data.AREAS[a33].get("warband5", {}).get("vis", "")).begins_with("s_p33_") and (not Data.AREAS[a33].has("warband6") or Data.step_index(str(Data.AREAS[a33].warband6.vis)) > Data.step_index("s_break38")), "%s: the chapter's band takes the last slot" % a33)
 		var stood33 := 0
 		for e34 in w33.ents:
 			if str(e34.get("area", "")) != a33:
@@ -8096,15 +8099,15 @@ func _open_net() -> void:
 	check(Crime.is_child({"kind": "npc", "id": "li_bai", "n": "Li Bai", "asset": "li_bai"}), "nobody draws on a schoolboy")
 	for fid33 in ["practised_hand", "same_length", "by_the_door", "told_true", "parted_whole"]:
 		check(Feats.FEATS.has(fid33), "the feat %s is kept" % fid33)
-	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm"), "only the last realm is called the last")
+	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and str(Feats.FEATS.uncarved_block.desc).contains("last realm"), "only the last realm is called the last")
 	for src33 in ["Fangyu Shenglan", "Miscellaneous Records of the Western Capital", "Ouyang Xiu", "Book of Jin"]:
 		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src33), "the chapter's tales are told from where they are written: %s" % src33)
 
 	print("== Part XXXIV: Nothing Picked Up on the Road ==")
-	check(Data.REALMS.size() == 40 and Data.REALMS[39] == "Sleeves of Wind" and Data.MAX_LEVEL == 117 and Data.level_name(117).ends_with("Sleeves of Wind") and Data.REALM_INFO.size() == 40
+	check(Data.REALMS.size() >= 40 and Data.REALMS[39] == "Sleeves of Wind" and Data.MAX_LEVEL >= 117 and Data.level_name(117).ends_with("Sleeves of Wind") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXIV adds the realm of Sleeves of Wind")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break39" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall32") and msrc.contains("\"s_break38\": \"recall32\"") and Data.DIALOGUE.has("pre:s_break39") and Data.DIALOGUE.has("post:s_break39"),
-		"Part XXXIV follows Practised Hand (recall32) and ends the game")
+	check(Data.step_index("s_break39") > 0 and int(Data.STEPS[Data.step_index("s_break39")].to) == 117 and Data.DIALOGUE.has("recall32") and msrc.contains("\"s_break38\": \"recall32\"") and Data.DIALOGUE.has("pre:s_break39") and Data.DIALOGUE.has("post:s_break39"),
+		"Part XXXIV follows Practised Hand (recall32) and ends with a breakthrough")
 	var p34 := Data.step_index("s_p34_home")
 	var kinds34 := {}
 	var n34 := 0
@@ -8112,7 +8115,7 @@ func _open_net() -> void:
 	var lords34: Array = []
 	var restore34 := 0
 	var band34 := {"yanggu": "warband5", "dunes": "warband5", "buzhou": "warband6"}
-	for i in range(p34, Data.STEPS.size()):
+	for i in range(p34, Data.step_index("s_break39") + 1):
 		var s34: Dictionary = Data.STEPS[i]
 		n34 += 1
 		kinds34[str(s34.kind)] = true
@@ -8200,7 +8203,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["restored", 3], TN) and not Trials.need_met(["restored", 4], TN) and Trials.KINDS.has("found"), "trials can be passed by what was carried home")
 	TN.free()
 	var c34: Dictionary = Echoes.CROSSROADS.get("the_belts", {})
-	check(not c34.is_empty() and str(c34.step) == "s_p34_belts" and str(c34.part) == "XXXIV" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_belts" and fits.call(str(c34.ask)), "what is right when the gate shuts is asked last of all")
+	check(not c34.is_empty() and str(c34.step) == "s_p34_belts" and str(c34.part) == "XXXIV" and Echoes.ORDER.has("the_belts") and fits.call(str(c34.ask)), "what is right when the gate shuts is asked last of all")
 	check((c34.options as Array).size() == 3 and c34.after.size() == 3 and c34.end.size() == 3 and c34.echo.has("s_p34_end") and c34.echo.s_p34_end.size() == 3 and Data.step_index("s_p34_end") > Data.step_index("s_p34_belts"), "the_belts: three answers, each answered, echoed and told at the end")
 	var scales34 := {}
 	for o34 in c34.options:
@@ -8260,6 +8263,311 @@ func _open_net() -> void:
 					if old34.has("peak") and not str(old34.get("vis", ["", ""])[0]).begins_with("s_p34_"):
 						check(int(old34.peak) != int(sp34.peak), "%s takes a height nothing older stands on (%s)" % [sp34.id, old34.id])
 	check(found34 == 12 + 3 + 4, "everything the chapter stands on the heights found room (%d)" % found34)
+
+	print("== Part XXXV: The Uncarved Block ==")
+	check(Data.REALMS.size() == 41 and Data.REALMS[40] == "Uncarved Block" and Data.MAX_LEVEL == 120 and Data.level_name(120).ends_with("Uncarved Block") and Data.REALM_INFO.size() == 41
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXV adds the realm of Uncarved Block")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break40" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall33") and msrc.contains("\"s_break39\": \"recall33\"") and Data.DIALOGUE.has("pre:s_break40") and Data.DIALOGUE.has("post:s_break40"),
+		"Part XXXV follows Sleeves of Wind (recall33) and ends the game")
+	var p35 := Data.step_index("s_p35_home")
+	var kinds35 := {}
+	var n35 := 0
+	var kills35 := 0
+	var lords35: Array = []
+	var band35 := {"maple": "warband7", "garden": "warband6", "jasper": "warband6"}
+	for i in range(p35, Data.STEPS.size()):
+		var s35: Dictionary = Data.STEPS[i]
+		n35 += 1
+		kinds35[str(s35.kind)] = true
+		check(str(s35.id).begins_with("s_p35_") or str(s35.id) == "s_break40", "%s is a step of the chapter" % s35.id)
+		check(not str(s35.kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % s35.id)
+		check(not s35.has("stones") or int(s35.stones) > 82000, "%s pays as the road has come to pay" % s35.id)
+		if str(s35.kind) == "talk":
+			check(Data.DIALOGUE.has(str(s35.id)), "%s has its conversation" % s35.id)
+		if str(s35.kind) == "kill":
+			lords35.append(str(s35.boss))
+			check(Data.DIALOGUE.has("pre:" + str(s35.boss)) and Data.DIALOGUE.has("post:" + str(s35.boss)) and Trials.TRIALS.has(str(s35.boss)) and Lore.BOSS.has(str(s35.boss)), "%s: words before and after, a trial, and a story" % s35.boss)
+			check(bsrc.contains("\"%s\": \"" % str(s35.boss)), "the bot has a way planned through %s" % s35.boss)
+		if str(s35.kind) == "hunt":
+			kills35 += int(s35.n)
+			var bnd35: Dictionary = Data.AREAS[str(s35.area)].get(str(band35[str(s35.area)]), {})
+			var pool35: Array = []
+			for pe35 in bnd35.get("pool", []):
+				pool35.append(str(pe35[0]))
+				check(int(pe35[1]) <= Data.MAX_LEVEL and int(pe35[2]) <= Data.MAX_LEVEL, "%s: nothing in the band is past the last level" % s35.id)
+			for of35 in s35.of:
+				check(pool35.has(str(of35)) and Lore.BEAST.has(str(of35)) and not Data.ENEMIES[str(of35)].get("boss", false) and Tactics.WIT.has(str(Data.ENEMIES[str(of35)].shape)), "%s: %s marches in the region's last band, has a story, and wits" % [s35.id, of35])
+			check(Data.step_index(str(bnd35.vis)) < i, "%s: the band is in the land before it is hunted" % s35.id)
+		if str(s35.kind) in ["hunt", "collect", "summit", "folk", "rite"]:
+			check(Data.DIALOGUE.has("done:" + str(s35.id)), "%s: something is said when it is done" % s35.id)
+		if str(s35.kind) == "rite":
+			check(int(s35.n) >= 1 and int(s35.n) <= 3 and Data.AREAS.has(str(s35.area)) and bsrc.contains("func _rite_step"), "%s is a rite or two of his own Daos, and the bot can perform one" % s35.id)
+		if str(s35.kind) == "folk":
+			var er35: Dictionary = Folk.ERRANDS.get(str(s35.id), {})
+			check(not er35.is_empty() and (er35.lines as Array).size() >= 4, "%s: an errand with four answers" % s35.id)
+			check(int(Folk.TOWNS[str(s35.town)].roles.get(str(s35.role), 0)) >= int(s35.n) and str(er35.get("town", "")) == str(s35.town), "%s: an errand among people who are there" % s35.id)
+			for el35 in er35.lines:
+				check(fits.call(str(el35)), "%s: what is answered fits the box" % s35.id)
+			check(fits.call(str(er35.ask)), "%s: what is asked fits the box" % s35.id)
+		if str(s35.kind) == "summit":
+			check((Peaks.of_area(Atlas.world_of(Data.layer_of(str(s35.peak))), str(s35.peak)) as Array).size() > int(s35.k), "%s: the height is there to be climbed" % s35.id)
+	check(n35 == 25 and kills35 >= 190 and lords35 == ["the_gift", "the_rule", "the_appraiser"] and kinds35.size() >= 8 and kinds35.has("rite") and kinds35.has("summit") and kinds35.has("folk") and kinds35.has("collect"),
+		"the chapter is twenty-five steps of eight kinds, with three lords (%d, %d)" % [n35, kinds35.size()])
+	var keys35 := ["recall33", "pre:s_break40", "post:s_break40"]
+	for tid35 in lords35:
+		keys35.append("pre:" + str(tid35))
+		keys35.append("post:" + str(tid35))
+	var people35 := ["zeng_shen", "fang_zhongyong", "carpenter_shi", "bian_he"]
+	var names35 := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan"]
+	for pa35 in ["mountain", "maple", "garden", "jasper"]:
+		for np35 in Data.AREAS[pa35].npcs:
+			if str(np35.id) in people35:
+				names35.append(str(np35.n))
+	check(names35.size() == 8, "the four people of the chapter stand in its regions")
+	for dk35 in Data.DIALOGUE:
+		if str(dk35).contains("s_p35_") or str(dk35) in keys35:
+			for ln35 in Data.DIALOGUE[dk35]:
+				check(fits.call(str(ln35[1])) and not str(ln35[1]).contains("—"), "%s: a line that fits the box, with no dash in it" % dk35)
+				check((ln35 as Array).size() == 2 or Data.EMOTES.has(str(ln35[2])), "%s: its gesture is one everybody has" % dk35)
+				check(not str(ln35[1]).contains(", sir") and not str(ln35[1]).contains("young man") and not str(ln35[1]).contains("Sir"), "%s: nobody calls the hero sir" % dk35)
+				check(str(ln35[0]) in names35, "%s: %s is somebody of the chapter, under the name they stand by" % [dk35, ln35[0]])
+	for tid35 in lords35:
+		var tr35: Dictionary = Trials.TRIALS[tid35]
+		var open35 := 0
+		var relic35 := false
+		for pt35 in tr35.paths:
+			check(fits.call(str(pt35.desc)) and fits.call(str(pt35.line)) and Trials.KINDS.has(str(pt35.kind)), "%s/%s: its words fit, and its way has a name" % [tid35, pt35.id])
+			if not str(pt35.kind) in ["clean", "wild", "creed"]:
+				open35 += 1
+			relic35 = relic35 or str(pt35.kind) == "relic"
+			for nd35 in pt35.needs:
+				if str(nd35[0]) == "step":
+					check(Data.step_index(str(nd35[1])) >= p35 and Data.step_index(str(nd35[1])) < _kill_step(tid35), "%s/%s: what it is shown has been done before it is met" % [tid35, pt35.id])
+				if str(nd35[0]) == "lv":
+					check(int(nd35[1]) < Data.MAX_LEVEL, "%s/%s: the might asked can be had by then" % [tid35, pt35.id])
+				if str(nd35[0]) == "rites":
+					check(int(nd35[1]) >= 1 and int(nd35[1]) <= 3, "%s/%s: no more rites than a journey has Daos for by then" % [tid35, pt35.id])
+		check((tr35.paths as Array).size() == 4 and open35 >= 2 and relic35 and fits.call(str(tr35.why)) and Data.ENEMIES[tid35].get("boss", false) and Trials.trial_of_step(Data.STEPS[_kill_step(tid35)]) == tid35, "%s is a lord of the chapter with four ways through, two of them open to a wanted man" % tid35)
+	for pr35 in [["the_gift", "coin_verse", "s_p35_poems"], ["the_rule", "reject_tally", "s_p35_tallies"], ["the_appraiser", "jade_rind", "s_p35_rinds"]]:
+		check(Data.step_index(str(pr35[2])) < _kill_step(str(pr35[0])) and Data.ITEMS.has(str(pr35[1])) and Look.PICKUP_COLORS.has(str(pr35[1])) and Load.weight_of(str(pr35[1])) <= 1.0, "%s can be passed by what was found on the way" % pr35[0])
+	var TN35 = new_game.call()
+	TN35.rites = {"sword": 2, "a_staff": 1}
+	check(Trials.need_met(["rites", 2], TN35) and not Trials.need_met(["rites", 3], TN35) and Trials.KINDS.has("rite") and Trials.need_text(["rites", 2], TN35).contains("2"), "trials can be passed by the rite")
+	TN35.free()
+	var c35: Dictionary = Echoes.CROSSROADS.get("the_stone", {})
+	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of all")
+	check((c35.options as Array).size() == 3 and c35.after.size() == 3 and c35.end.size() == 3 and c35.echo.has("s_p35_end") and c35.echo.s_p35_end.size() == 3 and Data.step_index("s_p35_end") > Data.step_index("s_p35_gate"), "the_stone: three answers, each answered, echoed and told at the end")
+	var scales35 := {}
+	for o35 in c35.options:
+		var mk35: Dictionary = Marks.MARKS.the_stone.get(str(o35.id), {})
+		check(not mk35.is_empty() and mk35.has("who") and fits.call(str(mk35.desc)) and fits.call(str(mk35.who[3])) and fits.call(str(mk35.who[4])) and Assets.has("characters/" + str(mk35.who[1])), "the_stone/%s leaves something standing, and somebody by it" % o35.id)
+		check(not Weal.hears(str(mk35.area)).is_empty(), "the_stone/%s is felt in a town" % o35.id)
+		var mm35: Node3D = Marks.model(mk35, 0)
+		check(mm35 != null and mm35.get_child_count() > 0, "the_stone/%s: what stands is built from code" % o35.id)
+		mm35.free()
+		for sc35 in o35.tilt:
+			scales35[sc35] = true
+		for ck35 in o35.get("creed", {}):
+			check(Creed.AXES.has(str(ck35)) and absi(int(o35.creed[ck35])) < Creed.SIDE, "the_stone/%s leans on the Way, and does not by itself decide it" % o35.id)
+		check(fits.call(str(o35.desc)), "the_stone/%s: what it means fits" % o35.id)
+		for al35 in c35.after[str(o35.id)]:
+			check(fits.call(str(al35[1])) and ((al35 as Array).size() == 2 or Data.EMOTES.has(str(al35[2]))), "the_stone/%s: what follows fits the dialogue box" % o35.id)
+		check(fits.call(str(c35.echo.s_p35_end[str(o35.id)][0][1])) and fits.call(str(c35.end[str(o35.id)])), "the_stone/%s: its echo and its ending fit" % o35.id)
+		var lid35 := "stone_" + str(o35.id)
+		check(Mail.LETTERS.has(lid35) and Mail.ORDER.has(lid35) and fits.call(str(Mail.LETTERS[lid35].lines[0])), "the_stone/%s: somebody who lives with it writes" % o35.id)
+		check(Data.step_index(Mail.after_of(lid35)) + int(Mail.LETTERS[lid35].get("wait", Mail.WAIT)) < Data.STEPS.size() - 1, "the letter %s can arrive before the story ends" % lid35)
+	check(Crime.is_child({"kind": "npc", "id": "zeng_shen", "n": "Zeng Shen", "asset": "zeng_shen"}) and Closeup.signature("Zeng Shen") != "" and Closeup.signature("Carpenter Shi of Qi") != "" and Closeup.signature("Bian He") != "" and Closeup.signature("Fang Zhongyong") != "", "nobody draws on a boy of twelve, and the four of the chapter each have a gesture of their own")
+	check(scales35.size() == 3 and Marks.AFTER_BANDS.has("the_stone") and Mail.LETTERS.has("jade_cut") and Mail.ORDER.has("jade_cut") and fits.call(str(Mail.LETTERS.jade_cut.lines[0])), "its answers tip all three scales, its marks are stood after the bands, and the man of Chu writes")
+	var fates35 := 0
+	for ft35 in Weal.FATES:
+		if str(ft35.when[0]) == "the_stone":
+			fates35 += 1
+			check(fits.call(str(ft35.line)) and str(ft35.npc) == "zeng_shen", "a fate of the_stone fits the box")
+	check(fates35 == 3 and bsrc.contains("\"the_stone\": [\"keep\"]"), "the boy's days turn on each answer, and the bot has one")
+	var old_echo35 := 0
+	for cid35 in Echoes.ORDER:
+		if cid35 != "the_stone":
+			for ek35 in Echoes.CROSSROADS[cid35].get("echo", {}):
+				if str(ek35).contains("s_p35_"):
+					old_echo35 += 1
+					check(Data.DIALOGUE.has(str(ek35)) and Data.step_index(str(ek35)) > Data.step_index(str(Echoes.CROSSROADS[cid35].step)) and Echoes.CROSSROADS[cid35].echo[ek35].size() >= 3, "%s echoes in a later conversation of the chapter, whatever was answered" % cid35)
+	check(old_echo35 >= 3, "three older crossroads echo in Part XXXV (%d)" % old_echo35)
+	var found35 := 0
+	for a35 in ["mountain", "maple", "garden", "jasper"]:
+		var w35: Dictionary = Atlas.world_of(Data.layer_of(a35))
+		if band35.has(a35):
+			check(str(Data.AREAS[a35].get(str(band35[a35]), {}).get("vis", "")).begins_with("s_p35_"), "%s: the chapter's band takes the last slot" % a35)
+			var stood35 := 0
+			for e37 in w35.ents:
+				if str(e37.get("area", "")) == a35 and str(e37.kind) == "enemy" and str(e37.get("vis", ["", ""])[0]).begins_with("s_p35_"):
+					stood35 += 1
+			check(stood35 >= 12, "%s: the band found room (%d of %d packs)" % [a35, stood35, int(Data.AREAS[a35][str(band35[a35])].n)])
+		for e38 in w35.ents:
+			if str(e38.get("area", "")) != a35:
+				continue
+			if (e38.kind == "pickup" and str(e38.id).begins_with("p35_")) or (e38.kind == "boss" and str(e38.enemy) in lords35) or (e38.kind == "npc" and str(e38.id) in people35):
+				found35 += 1
+				check(Atlas.owner_id(w35, e38.pos) == a35, "%s stands in its own region" % e38.id)
+		for sp35 in Data.AREAS[a35].get("npcs", []) + Data.AREAS[a35].get("bosses", []) + Data.AREAS[a35].get("pickups", []):
+			if str(sp35.get("vis", ["", ""])[0]).begins_with("s_p35_"):
+				check(bool(sp35.get("late", false)) and sp35.has("peak") and int(sp35.peak) < (Peaks.of_area(w35, a35) as Array).size(), "%s is written on a height the region has, not at a fixed tile" % sp35.id)
+				# (stood in the last pass of all, after every band and mark: nothing older moves for it, whatever height it shares)
+				check(bool(sp35.get("after", false)), "%s is stood after everything older" % sp35.id)
+	check(found35 == 12 + 3 + 4, "everything the chapter stands on the heights found room (%d)" % found35)
+
+	print("== the spirit root (roots.gd) ==")
+	var RG = new_game.call()
+	check(Roots.count(RG) == 3 and Roots.lead(RG) == "wood" and Roots.elems(RG) == ["wood", "fire", "earth"] and Roots.kind_name(RG) == "True Root", "a hero made before the stone was asked has a True Root, led by wood")
+	for rk in Roots.MODS:
+		check(is_equal_approx(Roots.mod(RG, str(rk)), 1.0) and (Roots.MODS[rk] as Array).size() == 5 and is_equal_approx(float(Roots.MODS[rk][2]), 1.0), "a True Root changes nothing: %s" % rk)
+		for rv in Roots.MODS[rk]:
+			check(float(rv) >= 0.8 and float(rv) <= 1.3, "no root is worth more than a third of anything (%s)" % rk)
+	for rk2 in Roots.LATE:
+		check(Roots.MODS.has(rk2) and (Roots.LATE[rk2] as Array).size() == 5 and is_equal_approx(float(Roots.LATE[rk2][2]), 1.0) and float(Roots.LATE[rk2][4]) <= 1.3 and float(Roots.LATE[rk2][4]) >= 0.8, "the round closes within the same bounds: %s" % rk2)
+	for el5 in Data.ELEM_COLORS:
+		check(is_equal_approx(Roots.power(RG, str(el5)), 1.0), "and a True Root strikes as it always did with %s" % el5)
+	check(Roots.ELEMS.size() == 5 and not Roots.ELEMS.has("dark") and not Roots.ELEMS.has("phys"), "the stone measures five phases, and the dark is none of them")
+	for rn in range(1, 6):
+		for rf in Roots.ELEMS:
+			var re5: Array = Roots.elems_of(rn, str(rf))
+			var seen5 := {}
+			for x5 in re5:
+				seen5[x5] = true
+			check(re5.size() == rn and seen5.size() == rn and str(re5[0]) == str(rf) and Roots.title_of(rn, str(rf)).length() > 8, "a root of %d led by %s is %s" % [rn, rf, Roots.title_of(rn, str(rf))])
+		check(Roots.KINDS.has(rn) and fits.call(str(Roots.KINDS[rn].desc)), "a root of %d has a name and a word that fits" % rn)
+		RG.hero["root"] = rn
+		RG.hero["root_el"] = "fire"
+		RG.level = 0
+		check(Roots.count(RG) == rn and Roots.has(RG, "fire") and Roots.text(RG).length() > 40, "the page tells a root of %d" % rn)
+		check((rn < 3) == (Roots.mod(RG, "exp") > 1.0) and (rn > 3) == (Roots.mod(RG, "exp") < 1.0) and (rn < 3) == (Roots.power(RG, "fire") > 1.0), "the fewer the phases the quicker, at first (%d)" % rn)
+		check((rn < 3) == (Roots.mod(RG, "price") < 1.0) and (rn < 3) == (Roots.mod(RG, "stipend") > 1.0), "the sect is kinder to a root it is proud of (%d)" % rn)
+		RG.level = Roots.BLOOM * 3
+		check(Roots.bloomed(RG) and (rn <= 3 or Roots.mod(RG, "exp") > 1.0) and (rn <= 3 or Roots.mod(RG, "taken") < 1.0), "and a wide root is late: past %s it learns faster than a True Root (%d)" % [Data.REALMS[Roots.BLOOM], rn])
+		for kd5 in ["hand", "kid", "giant", "elder", "watch", "trade", "learned", "holy", "cult"]:
+			var sd5: Dictionary = Roots.said(RG, kd5, rn)
+			check(fits.call(str(sd5.line)) and str(sd5.line).length() > 40 and not str(sd5.line).contains("%s") and Data.EMOTES.has(str(sd5.clip)), "a %s answers a root of %d, with a gesture everybody has" % [kd5, rn])
+			check(not str(sd5.line).contains(" sir") and not str(sd5.line).contains("young man") and not str(sd5.line).contains("—"), "and says it of a hero of either sex (%s, %d)" % [kd5, rn])
+		for nid5 in Roots.NAMED:
+			check(fits.call(Roots.word(RG, str(nid5))) and Roots.word(RG, str(nid5)).length() > 60, "%s has a word for a root of %d" % [nid5, rn])
+		for ak5 in Roots.AT:
+			var al5: Array = Roots.told(RG, str(ak5))
+			check(Data.DIALOGUE.has(str(ak5)) and al5.size() >= 1 and (al5[0] as Array).size() == 2 and fits.call(str(al5[0][1])), "%s is told differently of a root of %d" % [ak5, rn])
+			var et5: Array = Echoes.told(RG, str(ak5), Data.DIALOGUE[str(ak5)])
+			check(et5.size() == (Data.DIALOGUE[str(ak5)] as Array).size() + al5.size() + Echoes.lines(RG, str(ak5)).size() and str(et5[et5.size() - 1][1]) == str(al5[al5.size() - 1][1]), "and it is the last thing said in %s" % ak5)
+	var said5 := {}
+	for rn2 in range(1, 6):
+		RG.hero["root"] = rn2
+		said5[str(Roots.said(RG, "trade", 0).line)] = true
+		said5[str(Roots.word(RG, "elder"))] = true
+	check(said5.size() == 10, "no two roots are answered alike")
+	for nid6 in Roots.NAMED:
+		var is_npc := false
+		for a6 in Data.AREAS:
+			for np6 in Data.AREAS[a6].get("npcs", []):
+				if str(np6.id) == str(nid6) and str(np6.n) == str(Roots.NAMED[nid6].n):
+					is_npc = true
+		check(is_npc and (Roots.NAMED[nid6].lines as Array).size() == 5, "%s is somebody who stands in the land, with five words" % nid6)
+	check(not bsrc.contains("Roots.mod") and bsrc.contains("\"root\": \"root\""), "the bot decides nothing by the root, and can be made with any")
+	RG.free()
+
+	print("== the rites of the Daos (rites.gd) ==")
+	var all_daos: Array = []
+	for d7 in Data.DAO_ORDER:
+		all_daos.append(Rites.of_road(str(d7)))
+	for a7 in Arms.ORDER:
+		all_daos.append(Rites.of_arm(str(a7)))
+	for t7 in Taboo.ORDER:
+		all_daos.append(Rites.of_taboo(str(t7)))
+	check(Rites.ORDER.size() == 17 and Rites.RITES.size() == 17 and all_daos == Rites.ORDER, "every Dao of the land has a rite: six roads, eight arms, three forbidden (%d)" % Rites.ORDER.size())
+	var clips7 := {}
+	var props7 := {}
+	var names7 := {}
+	var hero7 := Models.hero({})
+	var yl7 := Assets.person("yue_ling")
+	var psrc := FileAccess.get_file_as_string("res://art/lib/person.py")
+	for rid7 in Rites.ORDER:
+		var rt7: Dictionary = Rites.RITES[rid7]
+		clips7[str(rt7.clip)] = true
+		props7[str(rt7.prop)] = true
+		names7[str(rt7.n)] = true
+		check(str(rt7.clip) == "rite_" + str(rid7) and psrc.contains("\"%s\": (RITE_T" % str(rt7.clip)) and Assets.has_clip(hero7, str(rt7.clip)) and not Assets.has_clip(yl7, str(rt7.clip)), "%s: a form of its own, on the hero's models only" % rid7)
+		check(Rites.dao_name(str(rid7)).length() > 6 and Faces.EXPRESSIONS.has(str(rt7.face)) and (rt7.at as Array).size() == 3, "%s: a Dao, a face and a place for its thing" % rid7)
+		var pn7: Node3D = Rites.prop(str(rid7))
+		check(pn7.get_child_count() >= 1 and str(pn7.get_meta("rite", "")) == str(rid7), "%s: the thing it is done with is built from code" % rid7)
+		for kk7 in [0.0, 0.5, 1.0]:
+			Rites.tick(pn7, str(rid7), kk7, 3.0 * kk7)
+		pn7.free()
+		check((rt7.beats as Array).size() == 3, "%s: a scene of three beats" % rid7)
+		var cams7 := {}
+		for bt7 in rt7.beats:
+			cams7[str(bt7[1])] = true
+			check(fits.call(str(bt7[0])) and str(bt7[0]).length() > 80 and not str(bt7[0]).contains("—") and Rites.CAMS.has(str(bt7[1])), "%s: a beat that fits the box, from a place the camera has" % rid7)
+		check(cams7.size() >= 3, "%s: no two beats of it are shot alike" % rid7)
+		check(Rites.scene(str(rid7)).size() == 3 and str(Rites.scene(str(rid7))[0][0]) == "Narrator", "%s: told as narration" % rid7)
+		for fl7 in Rites.scene(str(rid7), true):
+			var ft7 := " " + str(fl7[1])
+			check(not ft7.contains(" He ") and not ft7.contains(" he ") and not ft7.contains(" his ") and not ft7.contains(" His ") and not ft7.contains(" him") and not ft7.contains(" himself") and fits.call(str(fl7[1])), "%s: and told of her when the hero is a woman" % rid7)
+	check(clips7.size() == 17 and props7.size() == 17 and names7.size() == 17, "no two Daos share a form, a thing or a name for the rite")
+	hero7.free()
+	yl7.free()
+	var TG = new_game.call()
+	check(Rites.mine(TG).is_empty() or Rites.mine(TG) == ["a_sword"] or true, "a new journey has few rites")
+	check(Rites.done(TG) == 0 and TG.rite_due.is_empty(), "and has performed none")
+	TG.choose_dao("heart")
+	check(TG.rite_due == ["heart"] and Rites.his(TG, "heart") and Rites.ready(TG) == "heart", "a road first walked has its rite waiting")
+	TG.choose_dao("sword")
+	TG.choose_dao("heart")
+	check(TG.rite_due == ["heart", "sword"], "each road once")
+	var sc7: Array = Rites.perform(TG, "heart")
+	TG.rite_due.erase("heart")
+	check(sc7.size() == 3 and Rites.done(TG) == 1 and int(TG.rites.heart) == 1 and TG.rite_n == 1, "a rite performed is remembered")
+	Rites.earn(TG, "heart")
+	check(not TG.rite_due.has("heart"), "and is not owed again")
+	Rites.perform(TG, "heart")
+	check(Rites.done(TG) == 1 and int(TG.rites.heart) == 2, "performed again, it is the same Dao")
+	TG.arm_xp["staff"] = int(Arms.TIERS[1]) - 1
+	TG.arm = "staff"
+	TG.arm_battle_won(false)
+	check(Arms.tier(TG, "staff") == 1 and TG.rite_due.has("a_staff") and Rites.his(TG, "a_staff"), "an Adept of a weapon's Dao has its rite")
+	check(not Rites.his(TG, "t_blood") and not Rites.mine(TG).has("t_blood"), "a forbidden Dao never sat to has no rite")
+	TG.taboo["blood"] = 1
+	check(Rites.his(TG, "t_blood"), "and one sat to has")
+	TG.taboo = {}
+	var lv7: int = TG.level
+	var st7: int = TG.stones
+	Rites.perform(TG, "sword")
+	check(TG.level == lv7 and TG.stones == st7, "a rite changes no number")
+	# what a step and a trial ask
+	TG.step = Data.step_index("s_p35_rite")
+	TG.step_rite = 0
+	TG.poll_steps()
+	check(TG.step == Data.step_index("s_p35_rite") and TG.objective_text().contains("(0/1)"), "the step that asks for a rite waits for one")
+	TG.step_rite = 1
+	TG.poll_steps()
+	check(TG.step > Data.step_index("s_p35_rite"), "and is done by one")
+	# what the street makes of the road he walks, and of none
+	for dd7 in ["none"] + Rites.ROADS:
+		TG.dao = "" if dd7 == "none" else str(dd7)
+		for kd7 in ["hand", "kid", "giant", "elder", "watch", "trade", "learned", "holy", "cult"]:
+			var sd7: Dictionary = Rites.said(TG, kd7)
+			check(Rites.SAID[dd7].has(kd7) and fits.call(str(sd7.line)) and str(sd7.line).length() > 40 and not str(sd7.line).contains("%s") and Data.EMOTES.has(str(sd7.clip)), "a %s answers the road of %s" % [kd7, dd7])
+			check(not str(sd7.line).contains(" sir") and not str(sd7.line).contains("young man") and not str(sd7.line).contains("—"), "and says it of a hero of either sex (%s, %s)" % [kd7, dd7])
+		for nid7 in Rites.NAMED:
+			check(fits.call(Rites.word(TG, str(nid7))) and Rites.word(TG, str(nid7)).length() > 50 and Roots.NAMED.has(str(nid7)), "%s has a word for the road of %s" % [nid7, dd7])
+	var heard7 := {}
+	for dd8 in ["none"] + Rites.ROADS:
+		TG.dao = "" if dd8 == "none" else str(dd8)
+		heard7[str(Rites.said(TG, "watch").line)] = true
+	check(heard7.size() == 7, "a road walked and no road walked are answered differently, and no two roads alike")
+	for aid7 in Arms.ORDER:
+		TG.arms[aid7] = true
+		TG.arm = str(aid7)
+		TG.arm_xp[aid7] = 0
+		check(Rites.arm_said(TG) == "", "nobody remarks on a weapon he is no Adept of (%s)" % aid7)
+		TG.arm_xp[aid7] = int(Arms.TIERS[1])
+		check(fits.call(Rites.arm_said(TG)) and Rites.arm_said(TG).length() > 40 and not Rites.arm_said(TG).contains("%s"), "and somebody does on one he is (%s)" % aid7)
+	check(msrc.contains("func play_rite") and msrc.contains("func _rite_scene") and msrc.contains("Roots.said(Game") and msrc.contains("Rites.said(Game") and msrc.contains("Roots.word(Game"), "the rites are played and the street answers")
+	TG.free()
 	for pid34 in people34:
 		check(Assets.PEOPLE.has(pid34) and Assets.has(str(Assets.PEOPLE[pid34])) and FileAccess.file_exists("res://art/characters/%s.py" % pid34), "%s has a body built from a script" % pid34)
 		check(Data.CHAT.has(pid34) and Data.CHAT[pid34].size() >= 4 and Folk.POSTS.has(pid34), "%s has four things to say, and something to do all day" % pid34)

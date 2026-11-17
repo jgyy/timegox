@@ -109,6 +109,8 @@ const PEOPLE := {
 	"granny_wu": "characters/granny_wu", "li_bai": "characters/li_bai", "kuang_heng": "characters/kuang_heng", "oil_seller": "characters/oil_seller", "chen_yaozi": "characters/chen_yaozi",
 	# Part XXXIV (the Unpicked Road release): a weaver, a governor, a man with a mallet and a scholar on a step
 	"yangzi_wife": "characters/yangzi_wife", "yang_zhen": "characters/yang_zhen", "bell_thief": "characters/bell_thief", "pei_du": "characters/pei_du",
+	# Part XXXV (the Uncarved Block release): a slow boy, a prodigy grown up, a carpenter and a man with a stone
+	"zeng_shen": "characters/zeng_shen", "fang_zhongyong": "characters/fang_zhongyong", "carpenter_shi": "characters/carpenter_shi", "bian_he": "characters/bian_he",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",

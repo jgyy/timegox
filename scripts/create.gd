@@ -11,9 +11,9 @@ extends ScreenBase
 ## Backspace, Enter to finish); Enter on "Begin" sets out; Esc goes back to the title.
 
 const VIEW := Vector2(1280, 720)
-const ROWS := ["family", "given", "body", "look", "hair", "eyes", "robe", "origin", "hearth", "begin"]
-const ROW_N := {"family": "Family name", "given": "Given name", "body": "Who", "look": "Look", "hair": "Hair", "eyes": "Eyes", "robe": "Robe", "origin": "Trade", "hearth": "Hearth", "begin": "Begin the journey"}
-const ROW_H := 33.0
+const ROWS := ["family", "given", "body", "look", "hair", "eyes", "robe", "origin", "hearth", "root", "root_el", "begin"]
+const ROW_N := {"family": "Family name", "given": "Given name", "body": "Who", "look": "Look", "hair": "Hair", "eyes": "Eyes", "robe": "Robe", "origin": "Trade", "hearth": "Hearth", "root": "Spirit root", "root_el": "Its first phase", "begin": "Begin the journey"}
+const ROW_H := 27.0  # (twelve rows since the Uncarved Block release)
 
 ## Whether the sweeper being made is a woman.
 func fem() -> bool:
@@ -58,6 +58,11 @@ func _idx(row: String) -> int:
 			return maxi(0, Cultures.ORDER.find(str(h.get("hearth", "valley"))))
 		"hair", "eyes", "robe":
 			return int(h[row])
+		# (the Uncarved Block release, roots.gd: what the testing stone found, one phase to five, and which leads)
+		"root":
+			return clampi(int(h.get("root", 3)), 1, 5) - 1
+		"root_el":
+			return maxi(0, Roots.ELEMS.find(str(h.get("root_el", "wood"))))
 	return 0
 
 func _count(row: String) -> int:
@@ -80,6 +85,8 @@ func _count(row: String) -> int:
 			return Fashion.BODY_ORDER.size()
 		"hearth":
 			return Cultures.ORDER.size()
+		"root", "root_el":
+			return 5
 	return 1
 
 func _change(row: String, i: int) -> void:
@@ -99,6 +106,10 @@ func _change(row: String, i: int) -> void:
 			h["hearth"] = Cultures.ORDER[i]
 		"hair", "eyes", "robe":
 			h[row] = i
+		"root":
+			h["root"] = i + 1
+		"root_el":
+			h["root_el"] = Roots.ELEMS[i]
 	_preview()
 
 ## What a row shows: "< Lin >", "< The Sweeper >", "< Frost-white >".
@@ -122,6 +133,10 @@ func value_text(row: String) -> String:
 			return str(Fashion.BODIES[str(h.get("body", "m"))].n)
 		"hearth":
 			return str(Cultures.HEARTHS[str(h.get("hearth", "valley"))].n).trim_prefix("the ")
+		"root":
+			return "%s (%d)" % [str(Roots.KINDS[clampi(int(h.get("root", 3)), 1, 5)].n), clampi(int(h.get("root", 3)), 1, 5)]
+		"root_el":
+			return str(Roots.ELEM_N[str(h.get("root_el", "wood"))])
 	return ""
 
 ## The hero on the cliff, as chosen so far (the title screen draws him).
@@ -209,7 +224,7 @@ func _draw() -> void:
 		var row: String = ROWS[i]
 		var on := i == cursor
 		if on:
-			Gfx.cursor_glow(self, Rect2(716, y - 23, 528, 31), t)
+			Gfx.cursor_glow(self, Rect2(716, y - 21, 528, 27), t)
 		if row == "begin":
 			y += 6.0
 			UI.text(self, Vector2(720, y), "> " + ROW_N[row] if on else ROW_N[row], 22, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 520)
@@ -242,7 +257,15 @@ func _draw() -> void:
 			desc = "The trade in Qingshi, before the broom. " + Fashion.origin_desc(str(h.origin), fem()) + "\n\n" + told(str(o.fx_text))
 		"hearth":
 			desc = "The year away. %s\n\n%s\n\nThe story begins at %s." % [str(hh.desc), str(hh.fx_text), str(hh.home)]
+		"root", "root_el":
+			var rn := clampi(int(h.get("root", 3)), 1, 5)
+			desc = "What the testing stone at the gate will find. It never changes, and everybody will have an opinion.\n\n%s. %s" % [Roots.title_of(rn, str(h.get("root_el", "wood"))), str(Roots.KINDS[rn].desc)]
+			if rn == 3:
+				desc += "\n\nIt changes no number."
+			else:
+				desc += "\n\nLearns %d%% %s; %s. The sect's counters and stipend follow the roll.%s" % [int(round(absf(float(Roots.MODS.exp[rn - 1]) - 1.0) * 100.0)), "faster" if rn < 3 else "slower",
+					"its own phases strike harder and the others softer, and blows land a little heavier" if rn < 3 else "blows land a little lighter", "" if rn < 3 else " Past %s the round closes, and it learns faster than a True Root." % str(Data.REALMS[Roots.BLOOM])]
 		"begin":
 			desc = "Three years ago, on the last morning at %s, somebody has to be said goodbye to. Then the mountain: Azure Cloud Sect, perched above the sea of clouds, and three years with a broom." % str(hh.n)
-	UI.wrapped(self, r.position + Vector2(16, 26), desc, 15 if desc.length() > 420 else 16, UI.C_TEXT, r.size.x - 32)
+	UI.wrapped(self, r.position + Vector2(16, 26), desc, 14 if row2 in ["root", "root_el"] else (15 if desc.length() > 420 else 16), UI.C_TEXT, r.size.x - 32)
 	UI.text(self, Vector2(0, 708), "Up/Down choose   Left/Right change   Enter type a name / begin   Esc back", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)

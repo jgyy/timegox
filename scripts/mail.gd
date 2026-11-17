@@ -116,6 +116,16 @@ const LETTERS := {
 		"lines": ["Cultivator: I went back at first light and they were there, and she was. I had not slept. You had; I heard you. I have thought since about which of us trusted the road and which only said so. I enclose nothing. I am told a purse has lain on that rail nine days now. I go and look at it."]},
 	"bell_down": {"from": "The Man Who Stopped His Ears", "after": "s_p34_ears", "wait": 2,
 		"lines": ["HONOURED CULTIVATOR, the casters say I need not write so large, you are not deaf. I carried it down in nine loads. They are pouring it again on the first, and I work the bellows, for my keep. They say it will be the town's and nobody's. I said: I have heard that word before."]},
+	# ---- Part XXXV (the Uncarved Block release): letters from a slow boy, a registrar, and a man whose stone was cut
+	"stone_keep": {"from": "Zeng Shen", "needs": ["the_stone", "keep"], "wait": 1,
+		"lines": ["Senior: I can do the first form. It took me eleven days and the others one. Sister Anning says I may not write to thank you until I can do the second, so this is not thanks. It is only to say that I shut the door of the hall each night, and count, and everybody is in."]},
+	"stone_cut": {"from": "Registrar Shu", "needs": ["the_stone", "cut"], "wait": 1,
+		"lines": ["To the honoured cultivator: the ledger is ruled for a hundred years. I enclose what the treasury allows the one who proposed it, which the regulations call a finder's portion. The boy Zeng asks daily what his second column says. I tell him it is not written. He says he knows; he is asking so as to keep it in mind."],
+		"gift": {"stones": 380}},
+	"stone_bury": {"from": "Zeng Shen", "needs": ["the_stone", "bury"], "wait": 1,
+		"lines": ["Senior: nobody has told me what I am, and I have stopped asking. I sweep the eastern stair. Yesterday I sat on the stone to tie my sandal and it was warm on one side, from the sun. I had thought it would feel like something. It felt like a stone. I am writing to tell you that, since you asked for it."]},
+	"jade_cut": {"from": "Bian He", "after": "s_p35_seer", "wait": 2,
+		"lines": ["Cultivator: the king has had it made a disc, and named it for me, which I did not ask. He offered me the two jewellers' posts. I said give them to the man with the chisel. They have carried me home. I sleep. A shepherd's boy has dug up the hill behind my house and found only rock, and I have told him: look twice."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -244,7 +254,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

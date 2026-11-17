@@ -369,10 +369,16 @@ func _process(_d: float) -> bool:
 			expect(str(h.given) == "Chen" and str(h.look) == "wanderer" and str(h.origin) == "fisher", "Left/Right change the name, the look and the origin (%s)" % str(h))
 			expect(str(h.body) == "f" and str(h.hearth) == "steppe" and main.create.value_text("origin") == "Ferry-Hand of Qingshi" and not main.create.told("He poled the ferry.").contains("He "),
 				"and who the sweeper is, and the hearth of the year away (the New Fire release)")
+			# (the Uncarved Block release: two rows for the spirit root; one phase more, led by the next)
+			tap(KEY_DOWN)
+			tap(KEY_RIGHT)
+			tap(KEY_DOWN)
+			tap(KEY_RIGHT)
 			tap(KEY_DOWN)
 			tap(KEY_ENTER)
 		12:
 			var gs0 = root.get_node("Game")
+			expect(Roots.count(gs0) == 4 and Roots.lead(gs0) == "fire" and Roots.title(gs0) == "Mixed Root of Fire, Earth, Thunder and Water" and is_equal_approx(Roots.mod(gs0, "exp"), 0.94), "the spirit root chosen on the screen is the hero's (%s)" % Roots.title(gs0))
 			expect(gs0.hero_name() == "Bai Chen" and UI.named("Lin Feng swept the steps.") == "Bai Chen swept the steps.", "the journey begins with the name chosen, on screen everywhere")
 			expect(gs0.fem() and UI.named("Lin Feng lifts his broom.") == "Bai Chen lifts her broom." and UI.named("Elder Qing Xuan puts down his cup.") == "Elder Qing Xuan puts down his cup.", "she is told of as she, and the Elder as he")
 			expect(int(gs0.inv.get("hp_pill", 0)) == 6 and gs0.max_hp(0) > Data.max_hp(0), "the origin's gift and strength (a ferry-hand: two more pills, more health), and the hearth's (one more)")

@@ -1413,6 +1413,12 @@ const CROSSROADS := {
 		},
 		"echo": {
 			# Part XXXIV (the Unpicked Road release)
+			# Part XXXV (the Uncarved Block release)
+			"s_p35_jade": {
+				"rivet": [["Bian He", "You are the one who had a broken mirror riveted, joins and all. When they cut this they will find a flaw; there is always one. I hope the man leaves it in. I should not like it made perfect. It has been through too much to be passed off as new."]],
+				"recast": [["Bian He", "You are the one who had two halves of a mirror melted and cast again. I thought of that, these three days: break it, sell the green in beads, and no king the wiser. It would be jade still. It would not be this. I find I am not weeping for jade."]],
+				"halves": [["Bian He", "You are the one who left a mirror in two halves, each where it lay. I am in three pieces myself, cultivator, and two of them are buried at different courts. I do not want them back. I only want it written over each which king was wrong."]],
+			},
 			"s_p34_loom": {
 				"rivet": [["Yue Yangzi's Wife", "You are the one who had a broken mirror riveted, and let the joins show. My husband has been gone a year. When he comes back we shall not fit as we did, either. I mean to let that show too. I have no patience with invisible mending; it is a kind of lie told in thread."]],
 				"recast": [["Yue Yangzi's Wife", "You are the one who had two halves of a mirror melted and cast new. I heard it, and looked at my web. If I cut this cloth it is rags. I had not known there was anybody who could part a thing and have it whole again. I should not have had the courage to try."]],
@@ -1432,7 +1438,7 @@ const CROSSROADS := {
 		},
 		"end": {
 			"rivet": "In a small house south of the river hangs a bronze mirror with six rivets across it. The two who look into it each morning have a line through their faces, and have stopped seeing it. Their children think all mirrors are made so.",
-			"recast": "A mirror was cast at Tushan from two old halves, with a new pair of birds on the back. The gentleman and the lady who own it were married in the spring, for what each of them insists was the first time.",
+			"recast": "A mirror was cast by a founder of Tushan from two old halves, with a new pair of birds on the back. The gentleman and the lady who own it were married in the spring, for what each of them insists was the first time.",
 			"halves": "Two halves of a mirror hang a hand apart on a wall in the capital. On the fifteenth of every month a lady's carriage stops at the door, and two people drink tea under them, and are easier together than most who share a roof.",
 		}},
 	# Part XXXIII (the Iron Pestle release): what a boy is told who asks whether the work will ever be finished
@@ -1455,6 +1461,12 @@ const CROSSROADS := {
 			"turn": [["Narrator", "Lin Feng does not answer. He takes the boy by the inky wrist and turns him to face the white road going west, and says: ask the stone. Each morning, before school. As long as it takes to say one poem."], ["Li Bai", "That is not an answer. ...Every morning? She will make me do it properly; I saw her face. Down wet and back dry. I suppose by the time I know whether it will be a needle I shall know some other things. Is that it? You are not going to say.", "shrug"]],
 		},
 		"echo": {
+			# Part XXXV (the Uncarved Block release)
+			"s_p35_oak": {
+				"truth": [["Carpenter Shi of Qi", "You are the one who told a boy the pestle would never be a needle, and that she grinds it all the same. I told my boy the oak was good for nothing. Both true. I notice yours left the old woman her mornings, and mine left the tree nothing at all."]],
+				"finish": [["Carpenter Shi of Qi", "You are the one who ground an old woman's pestle through in a night, to show a boy a thing come out. I could square that oak in a season, by art. I see now what I should have at the end of it: planks. And a hill with the sun on it."]],
+				"turn": [["Carpenter Shi of Qi", "You are the one who set a boy to take his turn at an old woman's pestle. Good. I never took a turn at anything I had not sized up first as worth it. Sixty years. That tree asked me what I had been saving myself for."]],
+			},
 			"s_p33_end": {
 				"truth": [["Elder Qing Xuan", "And a schoolmaster on Elephant-Ear Mountain writes that a boy of his has stopped asking how long a thing will take, and has begun asking whether it is worth the taking. He wants to know what was said to him. It was the truth, I gather. That seldom goes by post."]],
 				"finish": [["Elder Qing Xuan", "And they say a boy on Elephant-Ear Mountain keeps a needle in his collar that was once an iron bar, and that the whole school has gone back to its books on the strength of it. I hope nobody ever tells him whose hand it was. I hope, child, that you are sure."]],
@@ -1486,6 +1498,12 @@ const CROSSROADS := {
 			"lie": [["Narrator", "Lin Feng takes him by the elbow and walks him down the road to a bowl of noodles, and neither of them looks back. The gate shuts. Three belts lie all night on a rail in the open, in a town where a man lately took a mallet to a bell. In the morning they are there, with dew on them, and so is she."], ["Pei Du", "I did not sleep. I lay and counted: three, three, three. And nobody touched them! A whole town went past that rail. I had thought I was the only thing between those belts and the road. It seems the road was not waiting for me. I do not know yet whether I like that.", "shock"]],
 		},
 		"echo": {
+			# Part XXXV (the Uncarved Block release)
+			"s_p35_field": {
+				"wait": [["Fang Zhongyong", "You are the one who sat a night by three belts and did nothing. I heard it, and thought: I was never once let sit. Every evening of my childhood I was doing something, in front of somebody. I should like to know what I would have been, left on a step."]],
+				"cry": [["Fang Zhongyong", "You are the one who put up the boards for things found. I read the one at the crossroads. A slate, child's, unused: that line has been up since spring. I have not claimed it. It was meant for me, and it was never mine. I do not know what a clerk does with that."]],
+				"lie": [["Fang Zhongyong", "You are the one who left three belts on a rail and trusted the road. My father could not have. A thing of value lying idle was a sin to him. He would have picked them up, and me, and shown us both at the next gate."]],
+			},
 			"s_p34_end": {
 				"wait": [["Elder Qing Xuan", "And I hear a young scholar at Tushan has been told by a reader of faces that the bones of his brow have changed in a month. The man asks what he did. The scholar says he sat on a step. They are both a good deal puzzled, child. I am not."]],
 				"cry": [["Elder Qing Xuan", "And the post has put up a board for things found at every counter from Tushan to the sea, with a clerk to keep it. Forty things came home in the first month. The clerks are paid by the piece. I do not say that is wrong. I say Sweeper Bai chased a man forty steps to give back a tenth."]],
@@ -1496,6 +1514,37 @@ const CROSSROADS := {
 			"wait": "Pei Du sat out one night by three belts, and the reader of faces never did work out what had changed in him. He was four times chancellor. Asked in old age for the secret of it, he said that he had once had nothing to do until morning, and had done it.",
 			"cry": "There is a board for things found at every counter of the post, and a clerk who knows knots. Pei Du rose to be chancellor and kept the boards in funds out of his own salary. Fewer things are lost for good in the land than anywhere under heaven, and each that comes home costs its owner a copper.",
 			"lie": "At Tushan nothing is picked up in the road, and the saying has gone out along it to the sea. Pei Du rose to be chancellor, and governed as he had been shown: he posted few guards. Most of what was left lying was there in the morning. He never spoke of the times it was not.",
+		}},
+	# Part XXXV (the Uncarved Block release): what the testing stone at the gate is for, now that somebody has asked
+	"the_stone": {"step": "s_p35_gate", "part": "XXXV", "n": "What the Stone Is For",
+		"ask": "The testing stone at the gate found five phases in the boy Zeng Shen, and by the rule he is sent down. He does not say it measured him wrongly. He asks what a true measure is for, when it is used to shut a gate. The Elder has said he will do with the stone as Lin Feng says. The boy will abide by it either way.",
+		"options": [
+			{"id": "keep", "label": "Let him in, and everyone it turns away", "tilt": {"heart": 3, "reach": 2}, "creed": {"virtue": 8}, "gain": {"renown": 6},
+				"desc": "Keep the stone and read it as it reads: the first day's light, no more. Whoever climbs the steps is given a bed and a broom, five phases or one, and a hall is opened for the slow where nobody is hurried. It will cost the sect rice, and its name for taking only the best (renown).",
+				"log": "Had the gate of Azure Cloud Sect opened to every root the stone finds, and a hall opened for the slow."},
+			{"id": "cut", "label": "Keep the stone, and test it every year", "tilt": {"craft": 3, "heart": -2}, "creed": {"rule": 8}, "gain": {"stones": 12000},
+				"desc": "A glance is not wrong for being a glance; it is wrong for being the last. Let the stone's word stand one year. Then measure again, by what the hands have done, and write the two side by side in a ledger anybody may read. The boy is let in on trial like the rest (spirit stones, from the sect's treasury, toward the keeping of the ledger).",
+				"log": "Had the testing stone's word made good for a year only, and a ledger kept of what each disciple was found to be and came to be."},
+			{"id": "bury", "label": "Turn the stone on its face", "tilt": {"craft": -3, "reach": -2}, "creed": {"rule": -8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "Before there was a stone the founder took whoever got to the top of nine hundred and ninety-nine steps, and asked nothing else. Lay it face down by the gate and measure nobody. The steps are a measure. The block is not cut by being told what it is (the regard of the Rice Hearth).",
+				"log": "Had the testing stone of Azure Cloud Sect laid on its face, and the gate opened to whoever climbs the steps."},
+		],
+		"after": {
+			"keep": [["Narrator", "The registrar wets his brush at last and writes a name on the roll under the last one: Zeng Shen, of Wucheng, five. He does not write the other word. The boy is given a broom taller than he is, and looks at it, visibly working out which end."], ["Zeng Shen", "I shall be the last in every lesson, Senior. I know it. I have always been. But I have noticed that the last one in is the one who shuts the door, and sees that everybody else is inside. I think somebody ought to. I will do that."]],
+			"cut": [["Narrator", "A ledger is ruled that afternoon, two columns to a page: what the stone found, and, a year on, what was found. The first line in it is Zeng Shen, five, and a blank. The registrar sands it and stands looking at the blank as a man looks at a field he has just been told is his."], ["Zeng Shen", "A year. Then I am measured by what I have done. Senior, that is fair, and I am afraid of it; a stone I could not have helped. I shall examine myself three times a day. I did before. Now there is somebody to show the sum to."]],
+			"bury": [["Narrator", "It takes four of the outer court and a lever. The testing stone goes over on its face in the grass by the gate with a sound like a door closing, and lies there grey and blind. The boy, who was at the foot of the mountain, turns round and climbs nine hundred and ninety-nine steps for the second time in a week."], ["Zeng Shen", "I counted them again, Senior. It is the same number. I was not sure it would be. ...Nobody has told me what I am now. I had thought I should mind that less than I do. I shall have to find it out, like weather."]],
+		},
+		"echo": {
+			"s_p35_end": {
+				"keep": [["Elder Qing Xuan", "And there is a hall for the slow now, child, behind the herb garden, with one rule over the door: nobody is hurried. I looked in. A square boy with large ears was teaching a girl of nine to hold a brush. He was on his fourth explanation. She had it on the fourth."]],
+				"cut": [["Elder Qing Xuan", "And the ledger has its first second column, child. I asked to be put in it. The registrar was shocked. I said: seventy years, and nobody has measured what came of me. He has written: carries water well. I do not know whether to be pleased."]],
+				"bury": [["Elder Qing Xuan", "And moss has begun on the back of the stone, child, where it lies. The novices sit on it to tie their sandals. Not one of them knows what it was. I find I envy them, and I also find I have gone out twice by night to see whether it glows through the grass."]],
+			},
+		},
+		"end": {
+			"keep": "Azure Cloud Sect takes whoever climbs. Its name for taking only the best is gone, and the other sects say so with pity. In the Hall of the Late Vessel nobody is hurried. Zeng Shen was the slowest in every lesson for thirty years, and it was to him, at the end, that the teaching was handed, because he was the only one who still had all of it.",
+			"cut": "There is a ledger at the gate of Azure Cloud Sect with two columns: what the stone found, and what was found. They agree about four times in ten. Zeng Shen's line reads five, and then, in a later hand: the one we give the others to. The stone is still consulted. Nobody now takes its word for longer than a year.",
+			"bury": "The testing stone lies on its face by the gate, under moss, and the novices tie their sandals on it. Whoever climbs is taken, as in the founder's day. Zeng Shen was never told what he was. He examined himself three times a day for sixty years to find out, and is said to have got an answer, and not to have thought it worth writing down.",
 		}},
 	"the_book": {"step": "s_p26_book", "part": "XXVI", "n": "The Blue Bag Book",
 		"ask": "Hua Tuo's book is in the jailer's wife's hands over a brazier: the powder, the needle, the knife and the five frolics, everything he knows. It will save lives. It put him in chains. What becomes of it?",
@@ -1540,7 +1589,7 @@ const CROSSROADS := {
 				"burn": [["Hua Tuo", "They asked where the book was. I said: in me, and now in you, a little. It is a smaller book than it was. It is the only kind that has never been taken off anybody at a gate."]],
 			},
 			"s_p26_end": {
-				"copy": [["Elder Qing Xuan", "There is a copy of a physician's book on the post counter in Qingshi, they tell me, with a stone on it against the wind. The postmaster says it is the most borrowed thing he has ever had on the counter, and the only one ever brought back."]],
+				"copy": [["Elder Qing Xuan", "There is a copy of a physician's book on the post counter in Qingshi, they tell me, with a stone on it against the wind. The headman says it is the most borrowed thing he has ever had on the counter, and the only one ever brought back."]],
 				"keep": [["Elder Qing Xuan", "And the book is at Guiyun, behind a broom. Good. A thing that must be swept for is a thing that will be read properly. I have three hundred years of scriptures here that nobody ever had to sweep for, and you see what they taught me about sitting."]],
 				"burn": [["Elder Qing Xuan", "I hear the book was burned, and that he did not mind. I mind, a little. But I have kept a library for seventy years, and I have also seen what a book can be made to say by somebody who has only read it. Let it be taught, then, the old way."]],
 			},
@@ -1696,7 +1745,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:
@@ -1857,14 +1906,21 @@ static func lines(g, key: String) -> Array:
 ## remembered (the Crossroads page lists them as they come).
 static func told(g, key: String, base: Array) -> Array:
 	var extra := lines(g, key)
+	# (the Uncarved Block release, roots.gd: a few conversations end differently for the root he has)
+	var root: Array = Roots.told(g, key)
 	if extra.is_empty():
-		return base
+		if root.is_empty():
+			return base
+		var out0: Array = base.duplicate()
+		out0.append_array(root)
+		return out0
 	for id in ORDER:
 		var ch := chosen(g, id)
 		if ch != "" and CROSSROADS[id].get("echo", {}).get(key, {}).has(ch):
 			g.echoed["%s|%s" % [id, key]] = true
 	var out: Array = base.duplicate()
 	out.append_array(extra)
+	out.append_array(root)
 	return out
 
 ## How many echoes of crossroads `id` have been heard, and how many its choice has in all.

@@ -4154,6 +4154,135 @@ ARMS = {
 }
 
 
+# ---------------------------------------------------------------- the rites of the Daos (the Uncarved Block release)
+# Seventeen forms, one for each Dao in the land (scripts/rites.gd RITES: the six roads, the eight Daos of arms,
+# the three on the forbidden shelf), done once through as each line of its scene is told.  Held poses eased by
+# `_keyed`, like the blows of the Eight Arms; a form done with empty hands puts the weapon away (`_stowing`),
+# a form of a weapon's Dao is done with the weapon (scripts/arms.gd holds it for use in a "rite_a_" clip).
+RITE_T = 4.6
+
+_BACK_L = {"upper_arm.L": (0.5, 0, 0.3), "forearm.L": (-1.25, 0, 0)}
+_KNEEL = {"loc": (0, -0.42, -0.1), "thigh.L": (-1.3, 0, 0.1), "shin.L": (1.5, 0, 0), "thigh.R": (-0.2, 0, -0.1), "shin.R": (1.6, 0, 0)}
+_KNEEL2 = {"loc": (0, -0.5, -0.05), "thigh.L": (-0.3, 0, 0.1), "shin.L": (2.0, 0, 0), "thigh.R": (-0.3, 0, -0.1), "shin.R": (2.0, 0, 0), "foot.L": (0.6, 0, 0), "foot.R": (0.6, 0, 0)}
+_HORSE = {"loc": (0, -0.22, 0), "thigh.L": (-0.9, 0, 0.55), "shin.L": (0.95, 0, 0), "thigh.R": (-0.9, 0, -0.55), "shin.R": (0.95, 0, 0)}
+# (the arms of somebody who has let go: swept back of the shoulders, the elbows soft, one higher than the other)
+_WIDE = {"upper_arm.R": (0.3, 0, -1.15), "forearm.R": (-0.45, 0, 0), "hand.R": (-0.3, 0, 0), "upper_arm.L": (0.2, 0, 1.6), "forearm.L": (-0.35, 0, 0), "hand.L": (-0.3, 0, 0),
+         "chest": (-0.3, 0, 0.08), "spine": (-0.12, 0, 0), "head": (-0.4, 0, 0.12), "loc": (0, 0.08, 0), "foot.L": (0.45, 0, 0), "foot.R": (0.45, 0, 0), "hands": (0.1, 0.1)}
+_LISTEN = {"loc": (0, -0.1, 0), "thigh.L": (-0.5, 0, 0.1), "shin.L": (0.6, 0, 0), "thigh.R": (-0.5, 0, -0.1), "shin.R": (0.6, 0, 0), "chest": (0.5, 0, 0), "spine": (0.2, 0, 0),
+           "head": (0.1, 0.5, 0), "upper_arm.R": (-0.7, 0, -0.2), "forearm.R": (-0.4, 0, 0), "upper_arm.L": (-0.9, 0, 0), "forearm.L": (-0.7, 0, 0), "hands": (0.2, 0.1)}
+_BELL = {"upper_arm.R": (-0.9, 0, -0.9), "forearm.R": (-2.0, 0, 0), "chest": (-0.05, 0, 0), "hands": (0.35, 0.9)}
+_POLE = {"upper_arm.R": (-2.5, 0, -0.25), "forearm.R": (-0.3, 0, 0), "hands": (0.35, 1.15)}
+
+RITES = {
+    # ---- the six roads
+    # Nine Swords Bow to One: two fingers before the brow, the other hand behind; held; the hand falls and the head bows
+    "rite_sword": (RITE_T, _stowing(_keyed([
+        (0.2, dict(_BACK_L, **{"upper_arm.R": (-1.0, 0, 0.35), "forearm.R": (-2.1, 0, 0), "head": (0.12, 0, 0), "hands": (0.35, 0.2)})),
+        (0.6, dict(_BACK_L, **{"upper_arm.R": (-1.0, 0, 0.35), "forearm.R": (-2.1, 0, 0), "head": (-0.15, 0, 0), "chest": (-0.08, 0, 0), "loc": (0, 0.03, 0), "hands": (0.35, 0.2)})),
+        (0.8, dict(_BACK_L, **{"upper_arm.R": (-0.5, 0, -0.9), "forearm.R": (-0.1, 0, 0), "head": (0.25, 0, 0), "chest": (0.1, 0, 0), "hands": (0.35, 0.2), "fast": True})),
+        (0.92, dict(_BACK_L, **{"upper_arm.R": (-0.5, 0, -0.9), "forearm.R": (-0.1, 0, 0), "head": (0.25, 0, 0), "chest": (0.1, 0, 0), "hands": (0.35, 0.2)}))], RITE_T))),
+    # A Feather Let Go: both hands held out low with it, the arms opened, a turn on the toes with the face to the sky
+    "rite_wander": (RITE_T, _stowing(_keyed([
+        (0.18, {"upper_arm.R": (-0.9, 0, 0.1), "forearm.R": (-0.6, 0, 0), "upper_arm.L": (-0.9, 0, -0.1), "forearm.L": (-0.6, 0, 0), "head": (0.2, 0, 0), "hands": (0.1, 0.1), "spin": 0.0}),
+        (0.45, _but(_WIDE, spin=0.0)),
+        (0.75, _but(_WIDE, spin=1.0)),
+        (0.9, _but(_WIDE, spin=1.0, head=(-0.5, 0, 0)))], RITE_T))),
+    # A Lamp Held Low: down on one knee with the hands cupped at the chest, held out low, the head bowed over them
+    "rite_heart": (RITE_T, _stowing(_keyed([
+        (0.2, dict(_KNEEL, **{"upper_arm.R": (-0.5, 0, 0.25), "forearm.R": (-1.7, 0, 0), "upper_arm.L": (-0.5, 0, -0.25), "forearm.L": (-1.7, 0, 0), "head": (0.3, 0, 0), "hands": (0.6, 0.6)})),
+        (0.55, dict(_KNEEL, **{"upper_arm.R": (-0.95, 0, 0.2), "forearm.R": (-0.5, 0, 0), "upper_arm.L": (-0.95, 0, -0.2), "forearm.L": (-0.5, 0, 0), "chest": (0.2, 0, 0), "head": (0.15, 0, 0),
+                               "hands": (0.5, 0.5)})),
+        (0.88, dict(_KNEEL, **{"upper_arm.R": (-0.95, 0, 0.2), "forearm.R": (-0.5, 0, 0), "upper_arm.L": (-0.95, 0, -0.2), "forearm.L": (-0.5, 0, 0), "chest": (0.2, 0, 0), "head": (0.35, 0, 0),
+                               "hands": (0.5, 0.5)}))], RITE_T))),
+    # Eight Flags Planted: the horse stance with the arms raised, both palms pressed to the ground, and the arms pushed out
+    "rite_formation": (RITE_T, _stowing(_keyed([
+        (0.2, dict(_HORSE, **{"upper_arm.R": (-2.6, 0, -0.3), "upper_arm.L": (-2.6, 0, 0.3), "hands": (0.05, 0.05)})),
+        (0.4, {"loc": (0, -0.5, 0.05), "thigh.L": (-1.5, 0, 0.6), "shin.L": (1.7, 0, 0), "thigh.R": (-1.5, 0, -0.6), "shin.R": (1.7, 0, 0), "chest": (0.7, 0, 0), "spine": (0.3, 0, 0),
+               "upper_arm.R": (-0.9, 0, 0.15), "forearm.R": (-0.2, 0, 0), "upper_arm.L": (-0.9, 0, -0.15), "forearm.L": (-0.2, 0, 0), "head": (-0.3, 0, 0), "hands": (0.05, 0.05), "fast": True}),
+        (0.65, {"loc": (0, -0.5, 0.05), "thigh.L": (-1.5, 0, 0.6), "shin.L": (1.7, 0, 0), "thigh.R": (-1.5, 0, -0.6), "shin.R": (1.7, 0, 0), "chest": (0.7, 0, 0), "spine": (0.3, 0, 0),
+                "upper_arm.R": (-0.9, 0, 0.15), "forearm.R": (-0.2, 0, 0), "upper_arm.L": (-0.9, 0, -0.15), "forearm.L": (-0.2, 0, 0), "head": (-0.3, 0, 0), "hands": (0.05, 0.05)}),
+        (0.88, dict(_HORSE, **{"upper_arm.R": (-0.3, 0, -1.3), "forearm.R": (-0.3, 0, 0), "upper_arm.L": (-0.3, 0, 1.3), "forearm.L": (-0.3, 0, 0), "hands": (0.05, 0.05)}))], RITE_T))),
+    # Nine Turns of the Lid: bent to listen, the right hand fanning the fire, then upright and a catch overhead
+    "rite_alchemy": (RITE_T, _stowing(_keyed([
+        (0.15, _LISTEN),
+        (0.3, dict(_LISTEN, **{"forearm.R": (-0.9, 0, 0), "hand.R": (0.4, 0, 0), "forearm.L": (-0.9, 0, 0)})),
+        (0.45, dict(_LISTEN, **{"forearm.R": (-0.4, 0, 0), "hand.R": (-0.3, 0, 0)})),
+        (0.6, dict(_LISTEN, **{"forearm.R": (-0.9, 0, 0), "hand.R": (0.4, 0, 0), "forearm.L": (-0.9, 0, 0)})),
+        (0.8, {"upper_arm.R": (-2.7, 0, -0.1), "forearm.R": (-0.2, 0, 0), "head": (-0.45, 0, 0), "chest": (-0.15, 0, 0), "loc": (0, 0.05, 0), "hands": (0.3, 1.0), "fast": True}),
+        (0.93, {"upper_arm.R": (-2.7, 0, -0.1), "forearm.R": (-0.2, 0, 0), "head": (-0.45, 0, 0), "chest": (-0.15, 0, 0), "loc": (0, 0.05, 0), "hands": (0.3, 1.0)})], RITE_T))),
+    # The Moon Taken Out of the Water: a hand over his own eyes, the other into the mirror, drawn back with it, and let go
+    "rite_illusion": (RITE_T, _stowing(_keyed([
+        (0.2, {"upper_arm.L": (-1.0, 0, -0.45), "forearm.L": (-2.2, 0, 0), "head": (0.05, 0, 0), "hands": (0.1, 0.35)}),
+        (0.5, {"upper_arm.L": (-1.0, 0, -0.45), "forearm.L": (-2.2, 0, 0), "upper_arm.R": (-1.45, 0, 0.05), "forearm.R": (-0.05, 0, 0), "chest": (0.1, -0.2, 0),
+               "thigh.L": (-0.4, 0, 0), "shin.L": (0.4, 0, 0), "hands": (0.1, 0.1)}),
+        (0.7, {"upper_arm.L": (-1.0, 0, -0.45), "forearm.L": (-2.2, 0, 0), "upper_arm.R": (-1.0, 0, -0.1), "forearm.R": (-1.2, 0, 0), "hands": (0.1, 0.7)}),
+        (0.9, {"upper_arm.L": (-0.2, 0, 0.1), "forearm.L": (-0.3, 0, 0), "upper_arm.R": (-1.1, 0, -0.6), "forearm.R": (-0.4, 0, 0), "head": (0, -0.5, 0), "hands": (0.2, 0.05)})], RITE_T))),
+    # ---- the eight Daos of arms
+    # Laid Along the Line: the salute with the blade upright before the face, and the blade laid out level, and held
+    "rite_a_sword": (RITE_T, _keyed([
+        (0.2, {"upper_arm.R": (-0.9, 0, 0.3), "forearm.R": (-1.9, 0, 0), "hand.R": (-0.5, 0, 0), "upper_arm.L": (-0.8, 0, -0.5), "forearm.L": (-1.6, 0, 0), "head": (0.05, 0, 0), "hands": (0.1, 1.15)}),
+        (0.5, dict(_SET, **{"upper_arm.R": (-1.5, 0, -0.25), "forearm.R": (0, 0, 0), "hand.R": (0.2, 0, 0), "upper_arm.L": (0.9, 0, 0.3), "forearm.L": (-0.1, 0, 0), "chest": (0, -0.25, 0),
+                            "head": (0, 0.2, 0), "hands": (0.1, 1.15)})),
+        (0.9, dict(_SET, **{"upper_arm.R": (-1.5, 0, -0.25), "forearm.R": (0, 0, 0), "hand.R": (0.2, 0, 0), "upper_arm.L": (0.9, 0, 0.3), "forearm.L": (-0.1, 0, 0), "chest": (0, -0.25, 0),
+                            "head": (0, 0.2, 0), "hands": (0.1, 1.15)}))], RITE_T)),
+    # The Last Step Swept: two slow sweeps, and the staff planted with both hands and the chin on top of it
+    "rite_a_staff": (RITE_T, _keyed([
+        (0.15, _STAFF_W), (0.35, _but(_STAFF_H, fast=False)), (0.5, _STAFF_W), (0.66, _but(_STAFF_H, fast=False)),
+        (0.84, {"upper_arm.R": (-0.9, 0, 0.35), "forearm.R": (-1.5, 0, 0), "upper_arm.L": (-0.9, 0, -0.35), "forearm.L": (-1.5, 0, 0), "head": (0.3, 0, 0), "chest": (0.15, 0, 0), "hands": (1.0, 1.15)}),
+        (0.94, {"upper_arm.R": (-0.9, 0, 0.35), "forearm.R": (-1.5, 0, 0), "upper_arm.L": (-0.9, 0, -0.35), "forearm.L": (-1.5, 0, 0), "head": (0.3, 0, 0), "chest": (0.15, 0, 0), "hands": (1.0, 1.15)})], RITE_T)),
+    # One Cut, and the Back Turned: the sabre held up behind the head a long while, one cut, and he turns away from it
+    "rite_a_sabre": (RITE_T, _keyed([
+        (0.15, _SABRE_W), (0.5, _but(_SABRE_W, loc=(0, -0.02, -0.06))), (0.58, _SABRE_H), (0.7, _SABRE_H),
+        (0.88, {"hips": (0, 1.2, 0), "chest": (0, 0.6, 0), "head": (0.1, 0.5, 0), "upper_arm.R": (-0.2, 0, -0.25), "forearm.R": (-0.2, 0, 0), "hands": (0.35, 1.15)}),
+        (0.95, {"hips": (0, 1.2, 0), "chest": (0, 0.6, 0), "head": (0.1, 0.5, 0), "upper_arm.R": (-0.2, 0, -0.25), "forearm.R": (-0.2, 0, 0), "hands": (0.35, 1.15)})], RITE_T)),
+    # Through the Eye of a Coin: drawn back to the hip and held, and the point walked out as slowly as a door is closed
+    "rite_a_spear": (RITE_T, _keyed([(0.2, _SPEAR_W), (0.45, _SPEAR_W), (0.82, _but(_SPEAR_H, fast=False)), (0.94, _but(_SPEAR_H, fast=False))], RITE_T)),
+    # The Candle Not Put Out: the fan flicked open at the flame, a turn on the toes with it out, and shut against the palm
+    "rite_a_fan": (RITE_T, _keyed([
+        (0.14, _but(_FAN_W, spin=0.0)), (0.24, _but(_FAN_H, spin=0.0)), (0.4, _but(_FAN_H, spin=0.0, fast=False)), (0.7, _but(_FAN_H, spin=1.0, fast=False, loc=(0, 0.06, 0))),
+        (0.82, _but(_FAN_W, spin=1.0)), (0.94, _but(_FAN_W, spin=1.0))], RITE_T)),
+    # The Arrow Kept: the draw to the ear, held until the breath is out, the string let down, and a bow to the target
+    "rite_a_bow": (RITE_T, _keyed([
+        (0.15, _BOW_UP), (0.35, _BOW_DRAW), (0.62, _BOW_DRAW), (0.78, _but(_BOW_UP, fast=False)),
+        (0.92, dict(_BOW_UP, **{"chest": (0.45, 0.4, 0), "head": (0.3, -1.1, 0), "upper_arm.R": (-0.3, 0, -0.6), "upper_arm.L": (-0.2, 0, 0.2)}))], RITE_T)),
+    # Nine Reeds, None Broken: the chain whirled once round a turning body, let out, and drawn home hand over hand
+    "rite_a_whip": (RITE_T, _keyed([
+        (0.14, _but(_WHIP_W, spin=0.0)), (0.45, _but(_WHIP_W, spin=1.0)), (0.6, _but(_WHIP_H, spin=1.0)), (0.78, _but(_WHIP_H, spin=1.0, fast=False)),
+        (0.92, {"spin": 1.0, "upper_arm.R": (-0.8, 0, 0.2), "forearm.R": (-1.4, 0, 0), "upper_arm.L": (-0.9, 0, -0.2), "forearm.L": (-1.0, 0, 0), "hands": (1.0, 1.15)})], RITE_T)),
+    # The Character for One: the brush lifted at the left, one stroke to the right, and the brush held up and then lowered
+    "rite_a_brush": (RITE_T, _keyed([
+        (0.18, dict(_BRUSH_BACK, **{"upper_arm.R": (-1.75, 0, 0.75), "forearm.R": (-0.5, 0, 0), "hand.R": (0.15, 0, 0), "chest": (-0.1, 0.45, 0), "head": (-0.15, -0.3, 0), "loc": (0, 0.03, 0)})),
+        (0.5, dict(_BRUSH_BACK, **{"upper_arm.R": (-1.55, 0, -1.0), "forearm.R": (-0.1, 0, 0), "hand.R": (0.15, 0, 0), "chest": (0.05, -0.5, 0), "head": (0, 0.35, 0), "loc": (0, -0.05, 0.08),
+                                   "thigh.L": (-0.3, 0, 0.15), "thigh.R": (0, 0, -0.2)})),
+        (0.62, _BRUSH_UP), (0.84, dict(_BRUSH_UP, **{"head": (0.1, 0, 0.15)})),
+        (0.94, dict(_BRUSH_BACK, **{"upper_arm.R": (-0.3, 0, -0.1), "forearm.R": (-0.4, 0, 0)}))], RITE_T)),
+    # ---- the forbidden shelf
+    # The Cup Made of a Hand: on both knees; two fingers drawn across the palm, the hand cupped and breathed over, the head thrown back
+    "rite_t_blood": (RITE_T, _stowing(_keyed([
+        (0.18, dict(_KNEEL2, **{"upper_arm.R": (-0.3, 0, 0.1), "forearm.R": (-0.9, 0, 0), "upper_arm.L": (-0.3, 0, -0.1), "forearm.L": (-0.9, 0, 0)})),
+        (0.36, dict(_KNEEL2, **{"upper_arm.L": (-0.7, 0, -0.2), "forearm.L": (-1.3, 0, 0), "upper_arm.R": (-0.7, 0, 0.35), "forearm.R": (-1.4, 0, 0), "head": (0.25, 0, 0), "hands": (0.05, 0.2)})),
+        (0.58, dict(_KNEEL2, **{"upper_arm.L": (-1.0, 0, -0.3), "forearm.L": (-1.9, 0, 0), "upper_arm.R": (-0.3, 0, 0.1), "forearm.R": (-0.9, 0, 0), "head": (0.4, 0, 0), "chest": (0.2, 0, 0),
+                                "hands": (0.6, 0.35)})),
+        (0.8, dict(_KNEEL2, **{"upper_arm.R": (0.2, 0, -0.6), "upper_arm.L": (0.2, 0, 0.6), "head": (-0.6, 0, 0), "chest": (-0.3, 0, 0), "hands": (1.0, 1.0), "fast": True})),
+        (0.93, dict(_KNEEL2, **{"upper_arm.R": (0.2, 0, -0.6), "upper_arm.L": (0.2, 0, 0.6), "head": (-0.6, 0, 0), "chest": (-0.3, 0, 0), "hands": (1.0, 1.0)}))], RITE_T))),
+    # The Banner Raised: the pole lifted overhead like a lantern, the other hand beckoning twice, and a step back from his own arm
+    "rite_t_soul": (RITE_T, _stowing(_keyed([
+        (0.2, _POLE),
+        (0.42, dict(_POLE, **{"upper_arm.L": (-1.3, 0, 0), "forearm.L": (-0.3, 0, 0), "hand.L": (0.5, 0, 0), "hands": (0.2, 1.15)})),
+        (0.52, dict(_POLE, **{"upper_arm.L": (-1.3, 0, 0), "forearm.L": (-1.5, 0, 0), "hands": (0.6, 1.15)})),
+        (0.64, dict(_POLE, **{"upper_arm.L": (-1.3, 0, 0), "forearm.L": (-0.3, 0, 0), "hand.L": (0.5, 0, 0), "hands": (0.2, 1.15)})),
+        (0.86, dict(_POLE, **{"upper_arm.L": (-0.5, 0, -0.4), "forearm.L": (-1.8, 0, 0), "loc": (0, -0.05, -0.2), "chest": (-0.25, 0.3, 0), "head": (0.1, 0.4, 0), "thigh.R": (0.35, 0, 0),
+                              "shin.R": (0.3, 0, 0), "hands": (0.8, 1.15)}))], RITE_T))),
+    # The Bell Without a Bell: the hand shaken by the ear from the wrist, two stiff fingers pointing, and the hand lowered
+    "rite_t_husk": (RITE_T, _stowing(_keyed([
+        (0.15, _BELL), (0.24, dict(_BELL, **{"hand.R": (0.5, 0, 0)})), (0.31, dict(_BELL, **{"hand.R": (-0.5, 0, 0)})), (0.38, dict(_BELL, **{"hand.R": (0.5, 0, 0)})),
+        (0.45, dict(_BELL, **{"hand.R": (-0.5, 0, 0)})),
+        (0.62, dict(_BELL, **{"upper_arm.L": (-1.5, 0, 0), "forearm.L": (0, 0, 0), "hands": (0.1, 0.9)})),
+        (0.8, dict(_BELL, **{"upper_arm.L": (-1.5, 0, 0), "forearm.L": (0, 0, 0), "hands": (0.1, 0.9)})),
+        (0.93, {"upper_arm.R": (-0.2, 0, -0.2), "forearm.R": (-0.3, 0, 0), "upper_arm.L": (-1.1, 0, 0), "forearm.L": (0, 0, 0), "hands": (0.1, 0.5)})], RITE_T))),
+}
+
+
 RIDE = {
     "ride": (RIDE_T, clip_ride),
     "ride_idle": (RIDE_IDLE_T, clip_ride_idle),
@@ -4161,7 +4290,8 @@ RIDE = {
 }
 PARTY_CLIPS = dict(CLIPS, **INTERACT, **RIDE, **SCENE, **COURT)
 # (only the hero bears arms: Yue Ling keeps to her needle)
-HERO_CLIPS = dict(PARTY_CLIPS, **ARMS)
+# (the Uncarved Block release: and only the hero performs the rites of the Daos)
+HERO_CLIPS = dict(PARTY_CLIPS, **ARMS, **RITES)
 
 
 def _with_posture(fn, age):

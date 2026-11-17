@@ -93,7 +93,7 @@ const ARMED := {"guard": 8, "watchman": 6, "huntsman": 5, "hunter": 5, "disciple
 	# (the Tall People release: nobody of the Great People has cultivated a day, and nobody has needed to)
 	"giant": 14}
 ## children of the story whose names do not say so (their bodies are a child's: art/characters)
-const CHILD := ["stableboy_shitou", "camel_boy_temur", "ox_herd_niu", "ship_boy_ah_fu", "furnace_boy", "li_bai"]
+const CHILD := ["stableboy_shitou", "camel_boy_temur", "ox_herd_niu", "ship_boy_ah_fu", "furnace_boy", "li_bai", "zeng_shen"]
 ## might is never past this, whatever the titles
 const MIGHT_MAX := 110
 
@@ -490,7 +490,7 @@ static func serve(g, w: Dictionary, hard: bool = false) -> int:
 		g.stones = int(g.stones) / 2
 	g.heal_full()
 	_clear(g, w)
-	g.note("%d days in the circle at %s%s" % [days, str(w.n), ", taken sword in hand" if hard else ""])
+	g.note("%d day%s in the circle at %s%s" % [days, "" if days == 1 else "s", str(w.n), ", taken sword in hand" if hard else ""])
 	return days
 
 ## What is told of the days served.

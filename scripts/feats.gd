@@ -67,10 +67,16 @@ const FEATS := {
 	# the Iron Pestle release: the last realm, the stair, the library and the needle (Part XXXIII)
 	"practised_hand": {"n": "The Top Step, Again", "kind": "road", "pts": 20, "test": ["level", 114], "desc": "Reach Practised Hand."},
 	# the Unpicked Road release: the last realm, the find, the bell and the belts (Part XXXIV); and the small things
-	"sleeves_of_wind": {"n": "Nothing in Either Sleeve", "kind": "road", "pts": 20, "test": ["level", 117], "desc": "Reach Sleeves of Wind: the last realm there is."},
+	"sleeves_of_wind": {"n": "Nothing in Either Sleeve", "kind": "road", "pts": 20, "test": ["level", 117], "desc": "Reach Sleeves of Wind."},
 	"whose_is_it": {"n": "Whose Is It?", "kind": "road", "pts": 10, "test": ["step", "s_p34_find"], "desc": "Ask a hill of gold the question a weaver asked her husband."},
 	"heard_out": {"n": "Heard Out", "kind": "road", "pts": 10, "test": ["step", "s_p34_ears"], "desc": "Take a bell's hands off its ears."},
 	"until_morning": {"n": "Until Morning", "kind": "road", "pts": 10, "test": ["step", "s_p34_belts"], "desc": "Answer a poor scholar who asked what is right when the gate shuts."},
+	# the Uncarved Block release: the last realm, the gift, the rule and the eye (Part XXXV)
+	"uncarved_block": {"n": "Not Yet Cut", "kind": "road", "pts": 20, "test": ["level", 120], "desc": "Reach Uncarved Block: the last realm there is."},
+	"sat_down": {"n": "Sat Down to a Slate", "kind": "road", "pts": 10, "test": ["step", "s_p35_gift"], "desc": "Take a gift by the hand, and not to a door."},
+	"what_for": {"n": "And What Is a Rule For", "kind": "road", "pts": 10, "test": ["step", "s_p35_square"], "desc": "Lay a carpenter's square against itself."},
+	"looked_twice": {"n": "Looked Twice", "kind": "road", "pts": 10, "test": ["step", "s_p35_seer"], "desc": "Make an eye that has never been wrong stay for the cutting."},
+	"the_gate": {"n": "What the Stone Is For", "kind": "road", "pts": 10, "test": ["step", "s_p35_gate"], "desc": "Answer a slow boy who asked what a true measure is for."},
 	"same_length": {"n": "No Shorter by One", "kind": "road", "pts": 10, "test": ["step", "s_p33_way"], "desc": "Find out how long the quick way up a mountain is."},
 	"by_the_door": {"n": "By the Door, with a Lamp", "kind": "road", "pts": 10, "test": ["step", "s_p33_shelf"], "desc": "Get a reader let into a library that had never had one."},
 	"told_true": {"n": "Tell Me True", "kind": "road", "pts": 10, "test": ["step", "s_p33_needle"], "desc": "Answer a boy who asked whether it would ever be a needle."},

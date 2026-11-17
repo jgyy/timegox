@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 44.0 * 3600.0
+var max_time := 46.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -132,6 +132,7 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	# Part XXXIII: four stones worn through to the stair, four slips in his own hand to the library, four dry coins to the gift
 	"the_short_way": "relic", "the_shelf": "relic", "the_knack": "relic",
 	"the_find": "relic", "the_dusk": "relic", "the_bell": "relic",
+	"the_gift": "relic", "the_rule": "relic", "the_appraiser": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -189,7 +190,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_mirror": ["rivet"],
 	# Part XXXIII: sent to take a turn at the stone
 	"the_needle": ["turn"],
-	"the_belts": ["wait"]}
+	"the_belts": ["wait"], "the_stone": ["keep"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -529,7 +530,8 @@ func _log_new_events() -> void:
 ## each row on the way down, as a player reading the screen would.
 ## (the New Fire release: --hero=f plays a young woman, --hearth=<id> the hearth of the year away, and so
 ## where the story begins: steppe, sand, river, forge or dawn; --look=<id> and --origin=<id> the rest)
-const CREATE_ARGS := {"body": "hero", "hearth": "hearth", "look": "look", "origin": "origin"}
+## (the Uncarved Block release: --root=<1..5> the spirit root the stone finds, --root-el=<phase> which leads it)
+const CREATE_ARGS := {"body": "hero", "hearth": "hearth", "look": "look", "origin": "origin", "root": "root", "root_el": "root-el"}
 
 func _create() -> void:
 	var c = main.create
@@ -537,7 +539,11 @@ func _create() -> void:
 	if CREATE_ARGS.has(row) and main.args.has(CREATE_ARGS[row]):
 		var want := str(main.args[CREATE_ARGS[row]])
 		var have := str(c.h.get(row, ""))
-		var known: Array = {"body": Fashion.BODY_ORDER, "hearth": Cultures.ORDER, "look": Fashion.LOOK_ORDER, "origin": Fashion.ORIGIN_ORDER}[row]
+		var known: Array = {"body": Fashion.BODY_ORDER, "hearth": Cultures.ORDER, "look": Fashion.LOOK_ORDER, "origin": Fashion.ORIGIN_ORDER, "root": ["1", "2", "3", "4", "5"], "root_el": Roots.ELEMS}[row]
+		if row == "root":
+			have = str(int(c.h.get("root", 3)))
+		elif row == "root_el":
+			have = str(c.h.get("root_el", "wood"))
 		if want in known and have != want:
 			_press("right", 0.5)
 			return
@@ -921,6 +927,9 @@ func _world(d: float) -> void:
 		"leap":
 			# Part XXXIV: leaps, in the step's region (world.gd)
 			_leap_step(s)
+		"rite":
+			# Part XXXV: the rite of a Dao that is his, performed where he stands (rites.gd)
+			_rite_step(s)
 		"toil":
 			# Part XXVII: the work of the hands (toil.gd): the nearest piece of the step's region that can
 			# be worked at so, and C
@@ -1002,6 +1011,22 @@ func _restore_step(s: Dictionary) -> void:
 			cool = 0.3
 		return
 	_walk_to(tf.tile, "lost:%s" % str(tf.id))
+
+## Part XXXV: a "rite" step: the rite of the road he walks (or of the weapon in his hand), performed in the
+## step's region, standing free.
+func _rite_step(s: Dictionary) -> void:
+	var area := str(s.get("area", Game.area))
+	if world.layer != Data.layer_of(area) or Game.area != area:
+		_travel(area)
+		return
+	if world.move_t >= 0.0 or not world.using.is_empty() or world.rite_id != "":
+		return
+	var id := Rites.ready(Game)
+	if id == "":
+		_grind()
+		return
+	main.play_rite(id)
+	cool = 0.5
 
 ## Part XXXIV: a "leap" step: in the step's region, a way held and Space, wherever two tiles ahead are
 ## clear (the way he faces first).
@@ -3093,6 +3118,12 @@ func _finish(reason: String) -> void:
 			w_names.append("%s (%s)" % [str(Data.AREAS[str(wa)].n), str(Wilds.STATES[int(Game.cull_worst[wa])].word)])
 	print("the wild        : %s now; %d countries thinned at some time, %d hunted out, %d barren; %d nets opened%s" % [Wilds.text(Game), Wilds.worst_count(Game, 1), Wilds.worst_count(Game, 2), Wilds.worst_count(Game, 3), int(Game.nets_opened),
 		("; the worst of it: " + ", ".join(w_names.slice(0, 6))) if not w_names.is_empty() else ""])
+	# (the Uncarved Block release, roots.gd and rites.gd)
+	var rites_done: Array = []
+	for rid in Rites.ORDER:
+		if int(Game.rites.get(rid, 0)) > 0:
+			rites_done.append(str(rid))
+	print("root and rites  : %s (%d of the five phases); %d of %d rites performed %s" % [Roots.title(Game), Roots.count(Game), Rites.done(Game), Rites.ORDER.size(), str(rites_done)])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)

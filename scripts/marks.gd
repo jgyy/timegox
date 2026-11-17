@@ -259,6 +259,15 @@ const MARKS := {
 		"lie": {"area": "tushan", "m": ["rail", true, false], "n": "The Rail Where It Lay", "desc": "A temple rail at Tushan with something lying on it, folded. It is not the same thing from one month to the next: a scarf, a purse, a child's coat. Whatever is found in the lanes is carried here and left, unguarded, and whoever has lost a thing comes and looks. Nothing has gone from it yet that was not the taker's own.",
 			"who": ["Old Mother Qiu", "folk_grandma", Color("7a6a5a"), "I walk past it every morning to see what is new. A purse lay there eleven days in the spring. Eleven! We all knew to a copper what was in it by the end, from the shape. Then a pedlar came back from the coast for it. He wept. We were quite sorry to see it go.", "My grandson asked me what would happen if somebody took a thing off it that was not theirs. I said I did not know; nobody had. He thought about that all day. I think he is still thinking. That is what the rail is for, if you ask me, more than for the purses."]},
 	},
+	# Part XXXV (the Uncarved Block release): what the testing stone at the gate was made to be for
+	"the_stone": {
+		"keep": {"area": "mountain", "m": ["teststone", "bench"], "k": 3, "n": "The Benches of the Late Vessel", "desc": "A long low bench of plain elm on the mountain path, worn in the middle, with a broom leaned at one end. There are several, a hundred steps apart, for whoever is slow on the climb. A line is cut along the back of each in a child's square hand: a great vessel is a long time finishing. Nobody is asked to move on.",
+			"who": ["Sister Anning", "folk_maiden", Color("8a9ab8"), "I keep the Hall of the Late Vessel. I was a four, and the old Elder moved a brush for me, so I know what a bench is worth. We have one rule. I had to stop a boy of two phases yesterday from doing a girl's sums for her. He was only being kind. That is the hard part to teach the quick.", "They come down here to sit when they cannot get a thing. I do not go to them. Somebody always came to me, and I learned it to make them go away. I have found that if one leaves a child alone on a bench with a broom for an hour, they will generally sweep, and then they have it."]},
+		"cut": {"area": "mountain", "m": ["teststone", "ledger"], "n": "The Ledger of Two Columns", "desc": "A reading-stand of dark wood under a little roof on the mountain path, with a ledger chained to it, open. Two columns to a page: what the stone found, and, a year on, what was found. Anybody may read it. Most of the second column is in a different hand from the first, and a good deal of it has been written by people correcting themselves.",
+			"who": ["Registrar Shu", "folk_scholar", Color("5a6a7a"), "Forty years I wrote one column, and sanded it, and shut the book. I thought that was a registrar. Now I must go and look at them a year later, with my own line in front of me. I was wrong about a third. I have counted. I shall be wrong about fewer; but it is a strange thing to be given, at my age, a way of being less wrong.", "The stone I do not blame. It says what it sees. It was I who wrote it down as if it were the end of the matter. A boy asked me last week what the second column would say of him. I said: that is not my column, child. It is yours. I only hold the brush."]},
+		"bury": {"area": "mountain", "m": ["teststone", "down"], "n": "The Stone on Its Face", "desc": "A grey stone as long as a child, lying face down in the grass beside the mountain path, with moss on its back and the turf worn bare on one side where people sit to tie their sandals. It was a testing stone, and stood upright. Nothing is cut on the side that shows. Whatever it has to say, it is saying to the ground.",
+			"who": ["Old Gardener Kang", "folk_grandpa", Color("8a8a7a"), "They wanted it taken to the treasury. I said leave it where it fell; I shall weed round it. I have weeded round worse. It never told me anything, you know. I was let in to carry slops, sixty years ago, and nobody thought to lay my hand on it. So I have nothing against it and nothing for it.", "A girl asked me what is under it. I said: the side with the answer on. She tried to lift it. Could not. She has gone off to get stronger. I thought that was a better use of a stone than the one it had before, and I told the Elder so, and he laughed until he had to sit on it."]},
+	},
 	# Part XXVIII (the Answering Land release): what is owed for a kindness
 	"the_knot": {
 		"nothing": {"area": "fusang", "m": ["cairn", STRAW], "n": "The Cairn Where He Put It Down", "desc": "A small cairn in the long grass of the Valley of Sunrise, and round it a patch where every stem stands straight and none is tied. On the top stone somebody has left a single knot of grass, undone, the stems smoothed flat with a thumb.",
@@ -398,7 +407,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -846,6 +855,41 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"teststone":
+			# the testing stone of the sect and what was made of it (the Uncarved Block release): a bench for the slow
+			# with a broom leaned on it, a ledger on a stand under a little roof, or the stone itself on its face
+			match str(a[1]):
+				"bench":
+					b.box(Vector3(0, 0.42, 0), Vector3(2.0 + 0.2 * (i % 2), 0.08, 0.42), w)
+					b.box(Vector3(0, 0.39, 0), Vector3(0.8, 0.03, 0.4), wd)
+					for sx8 in [-0.8, 0.8]:
+						b.box(Vector3(sx8, 0.2, 0), Vector3(0.1, 0.4, 0.38), wd)
+					b.box(Vector3(0, 0.66, -0.2), Vector3(2.0, 0.26, 0.05), wp)
+					for sx8 in [-0.9, 0.9]:
+						_stick(b, Vector3(sx8, 0.4, -0.2), Vector3(sx8, 0.8, -0.2), 0.03, wd)
+					# the broom leaned at one end
+					_stick(b, Vector3(1.25, 0.05, 0.1), Vector3(1.05, 1.5, -0.15), 0.022, wp)
+					b.cone(Vector3(1.27, 0.2, 0.12), 0.16, 0.36, MB.tag(Color("c8a85a"), MB.FOLIAGE), Vector3(0.15, 0, -0.14))
+				"ledger":
+					b.box(Vector3(0, 0.08, 0), Vector3(0.9, 0.16, 0.7), st)
+					_stick(b, Vector3(0, 0.16, 0), Vector3(0, 1.0, 0), 0.06, wd)
+					b.box(Vector3(0, 1.05, 0.04), Vector3(0.7, 0.05, 0.5), wd, Vector3(-0.4, 0, 0))
+					b.box(Vector3(-0.17, 1.1, 0.05), Vector3(0.32, 0.03, 0.42), MB.tag(PAPER, MB.CLOTH), Vector3(-0.4, 0, 0.06))
+					b.box(Vector3(0.17, 1.1, 0.05), Vector3(0.32, 0.03, 0.42), MB.tag(PAPER, MB.CLOTH), Vector3(-0.4, 0, -0.06))
+					for k35 in 5:
+						b.box(Vector3(-0.17, 1.125 + 0.03 * (2 - k35), 0.12 - 0.07 * k35), Vector3(0.22, 0.005, 0.012), MB.tag(Color("2a2826"), MB.CLOTH), Vector3(-0.4, 0, 0))
+						if k35 < 3:
+							b.box(Vector3(0.17, 1.125 + 0.03 * (2 - k35), 0.12 - 0.07 * k35), Vector3(0.2, 0.005, 0.012), MB.tag(RED.darkened(0.2), MB.CLOTH), Vector3(-0.4, 0, 0))
+					for sx8 in [-0.42, 0.42]:
+						_stick(b, Vector3(sx8, 0.16, -0.3), Vector3(sx8, 1.9, -0.3), 0.035, wd)
+					b.box(Vector3(0, 1.95, -0.08), Vector3(1.2, 0.05, 0.8), MB.tag(RED.darkened(0.3), MB.WOOD), Vector3(0.22, 0, 0))
+					_stick(b, Vector3(0.3, 1.0, 0.2), Vector3(0.42, 0.3, 0.25), 0.008, MB.tag(Color("5a5e66"), MB.METAL))
+				_:
+					# on its face in the grass, with moss on its back
+					b.box(Vector3(0, 0.2, 0), Vector3(1.5, 0.4, 0.62), st, Vector3(0, 0.3, 0.04))
+					b.sph(Vector3(-0.2, 0.4, 0.02), Vector3(0.5, 0.05, 0.24), MB.tag(Color("5a7a4a"), MB.FOLIAGE), Vector3(0, 0.3, 0))
+					b.sph(Vector3(0.4, 0.4, -0.1), Vector3(0.22, 0.04, 0.16), MB.tag(Color("6a8a52"), MB.FOLIAGE), Vector3(0, 0.3, 0))
+					b.box(Vector3(0.3, 0.06, 0.75), Vector3(0.7, 0.12, 0.6), MB.tag(STONE_DARK, MB.STONE), Vector3(0, 0.2, 0))
 		"rail":
 			# the rail of a temple porch over a worn stone step: with something folded on it, or bare; with a lamp on
 			# its post, or none (the Unpicked Road release)

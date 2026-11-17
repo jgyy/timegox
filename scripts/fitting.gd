@@ -242,7 +242,10 @@ static func options(g, wd: Dictionary, e: Dictionary) -> Array:
 		return []
 	var out: Array = []
 	var here := at(g, spot)
-	if here != "" and not str(g.placed[spot]).ends_with("|fit"):
+	if here != "":
+		# (the Uncarved Block release: a spot already put to rights offered a thing to set down that could not be)
+		if str(g.placed[spot]).ends_with("|fit"):
+			return out
 		out.append({"id": "fit:take", "label": "Take up the %s" % str(THINGS[here].n).to_lower(), "desc": "It was set down here. It can be taken up again and put somewhere it belongs.", "enabled": true})
 		return out
 	var w := want(wd, hk)

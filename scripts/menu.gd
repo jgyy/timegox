@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -72,6 +72,18 @@ func _build() -> void:
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
+	elif mode == "rites":
+		# roots.gd, rites.gd: the root the stone found, and the rite of every Dao that is his
+		labels = []
+		ids = []
+		enabled = []
+		for rid in Rites.mine(Game):
+			labels.append(str(Rites.RITES[rid].n))
+			ids.append("rite:" + str(rid))
+			enabled.append(Game.prologue == "" and main.world.using.is_empty() and not main.world.traveling())
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
 	elif mode == "law":
 		# crime.gd, taboo.gd: how he stands with the gates of the land; and the shelf every disciple is told
 		# of on the first day
@@ -231,7 +243,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -241,6 +253,11 @@ func press(act: String) -> void:
 			if not enabled[cursor]:
 				return
 			var id: String = ids[cursor]
+			if id.begins_with("rite:"):
+				# (rites.gd: the rite of a Dao that is his, performed where he stands)
+				main.pop()
+				main.play_rite(id.trim_prefix("rite:"))
+				return
 			match id:
 				"meditate":
 					main.pop()
@@ -310,7 +327,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -568,6 +585,41 @@ func _draw_law() -> void:
 		UI.text(self, Vector2(r.position.x + 460, y), str(d.what), UI.fit(str(d.what), 12, 320.0), UI.C_TEXT if dp > 0 else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 320.0)
 	y += 24.0
 	UI.wrapped(self, Vector2(r.position.x + 24, y), main.told("Every disciple is taught the three names on the first day, so that he knows what not to do. Anybody in sight when he sits to one has seen it; past %d steps in all, anybody of cultivation he speaks to can smell it on him." % Taboo.SENSE), 12, UI.C_DIM, r.size.x - 48)
+
+## Root & Rites (roots.gd, rites.gd): what the testing stone found in him, and the seventeen Daos of the land
+## with the rite of each that is his (Enter performs one where he stands).
+func _draw_rites() -> void:
+	UI.text(self, Vector2(60, 70), "Root & Rites", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var kd: Dictionary = Roots.KINDS[Roots.count(Game)]
+	UI.text(self, r.position + Vector2(24, 44), main.told(Roots.title(Game)), 24, kd.col)
+	# the five phases round the generating order: lit if they are in him
+	for i in Roots.ELEMS.size():
+		var el := str(Roots.ELEMS[i])
+		var c: Color = Data.ELEM_COLORS[el]
+		var on := Roots.has(Game, el)
+		var cx := r.position.x + 530.0 + 52.0 * i
+		draw_circle(Vector2(cx, r.position.y + 36.0), 13.0, c if on else Color(c.r, c.g, c.b, 0.14))
+		draw_arc(Vector2(cx, r.position.y + 36.0), 13.0, 0.0, TAU, 20, UI.C_BORDER, 1.0)
+		UI.text(self, Vector2(cx - 26.0, r.position.y + 66.0), str(Roots.ELEM_N[el]), 11, UI.C_TEXT if on else UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 52.0)
+	UI.wrapped(self, r.position + Vector2(24, 96), main.told(Roots.text(Game)), 14, UI.C_TEXT, r.size.x - 48)
+	var y := r.position.y + 226.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The rites of the Daos", 20, UI.C_GOLD)
+	UI.text(self, Vector2(r.position.x + 420, y), Rites.text(Game), 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, r.size.x - 444)
+	y += 12.0
+	for rid in Rites.ORDER:
+		var rt: Dictionary = Rites.RITES[rid]
+		var mine: bool = Rites.his(Game, str(rid))
+		var times := int(Game.rites.get(rid, 0))
+		y += 19.0
+		draw_rect(Rect2(r.position.x + 24, y - 11.0, 8.0, 8.0), Rites.colour(str(rid)) if mine else Color(0.3, 0.32, 0.38))
+		var shut: bool = str(rt.kind) == "taboo" and not mine
+		UI.text(self, Vector2(r.position.x + 40, y), "A forbidden Dao" if shut else Rites.dao_name(str(rid)), 14, UI.C_TEXT if mine else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 300.0)
+		UI.text(self, Vector2(r.position.x + 350, y), str(rt.n) if mine else ("" if shut else "not yet his"), 14, UI.C_GOLD if times > 0 else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 300.0)
+		if times > 0:
+			UI.text(self, Vector2(r.position.x + 660, y), "performed%s" % ("" if times == 1 else " %d times" % times), 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 120.0)
 
 ## The Wild (wilds.gd): how the countries he has hunted in stand, and what that is doing to the towns.
 func _draw_wild() -> void:
@@ -1525,6 +1577,9 @@ func _draw() -> void:
 		return
 	if mode == "law":
 		_draw_law()
+		return
+	if mode == "rites":
+		_draw_rites()
 		return
 	if mode == "wild":
 		_draw_wild()
