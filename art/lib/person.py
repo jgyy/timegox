@@ -4165,8 +4165,9 @@ _BACK_L = {"upper_arm.L": (0.5, 0, 0.3), "forearm.L": (-1.25, 0, 0)}
 _KNEEL = {"loc": (0, -0.42, -0.1), "thigh.L": (-1.3, 0, 0.1), "shin.L": (1.5, 0, 0), "thigh.R": (-0.2, 0, -0.1), "shin.R": (1.6, 0, 0)}
 _KNEEL2 = {"loc": (0, -0.5, -0.05), "thigh.L": (-0.3, 0, 0.1), "shin.L": (2.0, 0, 0), "thigh.R": (-0.3, 0, -0.1), "shin.R": (2.0, 0, 0), "foot.L": (0.6, 0, 0), "foot.R": (0.6, 0, 0)}
 _HORSE = {"loc": (0, -0.22, 0), "thigh.L": (-0.9, 0, 0.55), "shin.L": (0.95, 0, 0), "thigh.R": (-0.9, 0, -0.55), "shin.R": (0.95, 0, 0)}
-_WIDE = {"upper_arm.R": (-0.2, 0, -1.45), "forearm.R": (-0.1, 0, 0), "upper_arm.L": (-0.2, 0, 1.45), "forearm.L": (-0.1, 0, 0), "chest": (-0.2, 0, 0), "head": (-0.35, 0, 0),
-         "loc": (0, 0.08, 0), "foot.L": (0.45, 0, 0), "foot.R": (0.45, 0, 0), "hands": (0.1, 0.1)}
+# (the arms of somebody who has let go: swept back of the shoulders, the elbows soft, one higher than the other)
+_WIDE = {"upper_arm.R": (0.3, 0, -1.15), "forearm.R": (-0.45, 0, 0), "hand.R": (-0.3, 0, 0), "upper_arm.L": (0.2, 0, 1.6), "forearm.L": (-0.35, 0, 0), "hand.L": (-0.3, 0, 0),
+         "chest": (-0.3, 0, 0.08), "spine": (-0.12, 0, 0), "head": (-0.4, 0, 0.12), "loc": (0, 0.08, 0), "foot.L": (0.45, 0, 0), "foot.R": (0.45, 0, 0), "hands": (0.1, 0.1)}
 _LISTEN = {"loc": (0, -0.1, 0), "thigh.L": (-0.5, 0, 0.1), "shin.L": (0.6, 0, 0), "thigh.R": (-0.5, 0, -0.1), "shin.R": (0.6, 0, 0), "chest": (0.5, 0, 0), "spine": (0.2, 0, 0),
            "head": (0.1, 0.5, 0), "upper_arm.R": (-0.7, 0, -0.2), "forearm.R": (-0.4, 0, 0), "upper_arm.L": (-0.9, 0, 0), "forearm.L": (-0.7, 0, 0), "hands": (0.2, 0.1)}
 _BELL = {"upper_arm.R": (-0.9, 0, -0.9), "forearm.R": (-2.0, 0, 0), "chest": (-0.05, 0, 0), "hands": (0.35, 0.9)}

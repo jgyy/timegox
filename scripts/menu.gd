@@ -600,10 +600,10 @@ func _draw_rites() -> void:
 		var el := str(Roots.ELEMS[i])
 		var c: Color = Data.ELEM_COLORS[el]
 		var on := Roots.has(Game, el)
-		var cx := r.position.x + 560.0 + 44.0 * i
+		var cx := r.position.x + 530.0 + 52.0 * i
 		draw_circle(Vector2(cx, r.position.y + 36.0), 13.0, c if on else Color(c.r, c.g, c.b, 0.14))
 		draw_arc(Vector2(cx, r.position.y + 36.0), 13.0, 0.0, TAU, 20, UI.C_BORDER, 1.0)
-		UI.text(self, Vector2(cx - 22.0, r.position.y + 66.0), str(Roots.ELEM_N[el]), 11, UI.C_TEXT if on else UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 44.0)
+		UI.text(self, Vector2(cx - 26.0, r.position.y + 66.0), str(Roots.ELEM_N[el]), 11, UI.C_TEXT if on else UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 52.0)
 	UI.wrapped(self, r.position + Vector2(24, 96), main.told(Roots.text(Game)), 14, UI.C_TEXT, r.size.x - 48)
 	var y := r.position.y + 226.0
 	UI.text(self, Vector2(r.position.x + 24, y), "The rites of the Daos", 20, UI.C_GOLD)

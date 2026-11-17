@@ -33,9 +33,9 @@ const ROADS := ["sword", "wander", "heart", "formation", "alchemy", "illusion"]
 ## right, how high, what it looks at ("head", "chest", "feet", "prop", "sky"), lens]; "orbit" turns
 ## slowly round him at that distance
 const CAMS := {
-	"wide": [5.6, 2.4, 2.0, "chest", 52.0], "low": [2.6, 0.9, 0.35, "head", 46.0], "face": [1.5, 0.55, 1.5, "head", 34.0],
-	"top": [0.6, 0.0, 7.5, "feet", 50.0], "back": [-3.6, 1.2, 2.2, "prop", 50.0], "prop": [2.9, -1.3, 1.25, "prop", 36.0],
-	"orbit": [4.6, 0.0, 1.9, "chest", 48.0], "sky": [3.4, -1.0, 0.5, "sky", 58.0], "far": [9.0, 3.5, 3.4, "chest", 40.0],
+	"wide": [5.6, 2.4, 2.0, "chest", 52.0], "low": [2.7, 0.9, 0.8, "head", 46.0], "face": [1.5, 0.55, 1.5, "head", 34.0],
+	"top": [0.6, 0.0, 7.5, "feet", 50.0], "back": [-3.6, 1.2, 2.2, "prop", 50.0], "prop": [-1.3, -3.1, 1.5, "prop", 44.0],
+	"orbit": [4.6, 0.0, 1.9, "chest", 48.0], "sky": [3.4, -1.0, 0.9, "sky", 58.0], "far": [9.0, 3.5, 3.4, "chest", 40.0],
 }
 ## how long a form lasts (art/lib/person.py RITE_T)
 const SECONDS := 4.6
@@ -47,7 +47,7 @@ const RITES := {
 	# ------------------------------------------------------------ the six roads
 	"sword": {"kind": "road", "key": "sword", "n": "Nine Swords Bow to One", "clip": "rite_sword", "prop": "sword_wheel", "at": [0.0, 0.0, 0.0], "face": "resolve", "fx": "slash",
 		"beats": [
-			["Lin Feng lifts two fingers before his brow, as a child is taught to on the first morning, and for once does not think about his feet. Behind his shoulders the air begins to have edges.", "low"],
+			["Lin Feng lifts two fingers before his brow, as a child is taught to on the first morning, and for once does not think about his feet. Behind the shoulders the air begins to have edges.", "low"],
 			["Nine blades of pale light open behind him like the ribs of a fan. None of them is his sword. They are every stroke he has made with it, kept, and they have all been pointing the same way.", "back"],
 			["He lets the hand fall, and they bow, point down, to the one in the scabbard. A blade has one direction. He had thought that was a limit. It is only an address.", "wide"]]},
 	"wander": {"kind": "road", "key": "wander", "n": "A Feather Let Go", "clip": "rite_wander", "prop": "peng_feather", "at": [0.9, 0.3, 1.5], "face": "joy", "fx": "leaves",
@@ -68,12 +68,12 @@ const RITES := {
 	"alchemy": {"kind": "road", "key": "alchemy", "n": "Nine Turns of the Lid", "clip": "rite_alchemy", "prop": "cauldron", "at": [0.75, 0.0, 0.0], "face": "doubt", "fx": "sparks",
 		"beats": [
 			["A cauldron on three legs, no bigger than a rice pot, with a fire under it that he fans with the flat of his hand. He bends to listen. A furnace is not watched. It is listened to, like a sleeping child.", "prop"],
-			["He lifts the lid a finger's width, nine times, and nine times lets it down. Each time a little of what is wrong with the pill goes out with the steam. Nobody has found a quicker way. Many have died of looking.", "face"],
+			["He lifts the lid a finger's width, nine times, and nine times lets it down. Each time a little of what is wrong with the pill goes out with the steam. Nobody has found a quicker way. Many have died of looking.", "wide"],
 			["On the ninth it rises of itself: one pill, round, the colour of a lit window. He catches it over his head. Borrowed time, every grain of it. He already knows who he will give it to.", "low"]]},
 	"illusion": {"kind": "road", "key": "illusion", "n": "The Moon Taken Out of the Water", "clip": "rite_illusion", "prop": "moon_mirror", "at": [0.95, 0.0, 0.0], "face": "doubt", "fx": "vortex",
 		"beats": [
 			["A mirror of bronze stands before him on nothing, and in it a moon, though it is not night. He puts one hand over his own eyes. It is the first thing the foxes teach: you cannot fool what you are looking at.", "prop"],
-			["With the other hand he reaches into the mirror to the wrist and takes the moon out. It is cold and has weight. Behind him a second Lin Feng, who has not moved at all, goes on standing where he stood.", "back"],
+			["With the other hand he reaches into the mirror to the wrist and takes the moon out. It is cold and has weight. A second Lin Feng, who has not moved at all, goes on standing a pace behind.", "back"],
 			["He lets it go and it hangs there, a hand's breadth from the glass. The moon in the water is still the moon. Which of the two of him is breathing is, for a moment, an open question.", "orbit"]]},
 	# ------------------------------------------------------------ the eight Daos of arms
 	"a_sword": {"kind": "arm", "key": "sword", "n": "Laid Along the Line", "clip": "rite_a_sword", "prop": "plumb_line", "at": [0.85, 0.0, 0.0], "face": "resolve", "fx": "glimmer",
@@ -89,7 +89,7 @@ const RITES := {
 	"a_sabre": {"kind": "arm", "key": "sabre", "n": "One Cut, and the Back Turned", "clip": "rite_a_sabre", "prop": "bamboo_stake", "at": [1.25, 0.0, 0.0], "face": "anger", "fx": "cross",
 		"beats": [
 			["A stake of green bamboo as thick as a wrist stands in the ground. He takes the sabre up behind his head in both hands and stands so, for longer than is comfortable, until there is nothing left in him but the one thing.", "low"],
-			["It comes down. There is no sound to speak of. He has turned his back before the upper half begins to slide, because a man who looks to see whether his cut went home is already making the second.", "prop"],
+			["It comes down. There is no sound to speak of. He has turned his back before the upper half begins to slide, because whoever looks to see whether the cut went home is already making the second.", "prop"],
 			["The stake falls in two behind him. The second cut is an apology for the first. He has nothing to apologise for, this once, and stands breathing, with the red cloth still swinging at the pommel.", "back"]]},
 	"a_spear": {"kind": "arm", "key": "spear", "n": "Through the Eye of a Coin", "clip": "rite_a_spear", "prop": "hung_coin", "at": [2.1, 0.0, 0.0], "face": "resolve", "fx": "glimmer",
 		"beats": [
@@ -105,7 +105,7 @@ const RITES := {
 		"beats": [
 			["A butt of rice straw stands at the far end of the ground. He sets his feet across the line of it, raises the bow and draws to the ear. The sinew of a roc sings very quietly when it is at full stretch.", "wide"],
 			["He holds. The breath goes out of him and he does not loose. Something in his stance is wrong, the left shoulder a hair too high, and he would hit all the same, and that is the reason he does not shoot.", "face"],
-			["He lets the string down by inches and bows to the target, as an archer does who has missed. When the archer misses he looks for the cause in himself. It is quicker to look before.", "back"]]},
+			["He lets the string down by inches and bows to the target, as an archer does who has missed. The cause of a miss is looked for in the archer. It is quicker to look before.", "back"]]},
 	"a_whip": {"kind": "arm", "key": "whip", "n": "Nine Reeds, None Broken", "clip": "rite_a_whip", "prop": "nine_reeds", "at": [1.7, 0.0, 0.0], "face": "calm", "fx": "splash",
 		"beats": [
 			["Nine reeds stand in a row before him, such as grow at the edge of any pond. He whirls the chain once round his head, nine rods of steel with a dart on the end, and it sounds like a flock getting up.", "low"],
@@ -115,7 +115,7 @@ const RITES := {
 		"beats": [
 			["A length of white paper hangs before him from nothing, with a weight at the foot to keep it from the wind. He puts his left hand behind his back and lifts the iron brush. The cinnabar on it has never dried.", "prop"],
 			["One stroke, left to right, at the full reach of his arm: pressed in, drawn, lifted. The character for one. It is the first a child is given and the last a master is satisfied with.", "low"],
-			["He looks at it for some time with the brush raised, as a man looks who means to add something. Then he lowers the brush. A character is finished when nothing can be added.", "face"]]},
+			["He looks at it for some time with the brush raised, as one looks who means to add something. Then the brush is lowered. A character is finished when nothing can be added.", "face"]]},
 	# ------------------------------------------------------------ the forbidden shelf
 	"t_blood": {"kind": "taboo", "key": "blood", "n": "The Cup Made of a Hand", "clip": "rite_t_blood", "prop": "blood_bowl", "at": [0.5, 0.0, 0.0], "face": "anger", "fx": "soot",
 		"beats": [
@@ -130,7 +130,7 @@ const RITES := {
 	"t_husk": {"kind": "taboo", "key": "husk", "n": "The Bell Without a Bell", "clip": "rite_t_husk", "prop": "corpse_bell", "at": [1.5, 0.0, 0.0], "face": "anger", "fx": "soot",
 		"beats": [
 			["He holds his right hand up by his ear and shakes it from the wrist, as the corpse-walkers of the west do who bring the dead home. There is a bell there, of green bronze. The sound is made in the throat.", "face"],
-			["A pace in front of him a figure of yellow paper, cut in the shape of a man, gets up off the ground and stands with its back to him. He points, stiffly, with two fingers. It takes one step where he points.", "prop"],
+			["A pace in front of him a figure of yellow paper, cut in the shape of a person, gets up off the ground and stands facing away. Two fingers point, stiffly. It takes one step where they point.", "prop"],
 			["That was piety once: so that nobody should be buried among strangers. It is the same bell. He lowers his hand, and the thing in front of him goes on standing, waiting to be hit instead.", "back"]]},
 }
 const ORDER := ["sword", "wander", "heart", "formation", "alchemy", "illusion", "a_sword", "a_staff", "a_sabre", "a_spear", "a_fan", "a_bow", "a_whip", "a_brush", "t_blood", "t_soul", "t_husk"]
@@ -223,13 +223,15 @@ static func perform(g, id: String) -> Array:
 	g.rite_n = int(g.rite_n) + 1
 	if first:
 		g.note("Performed %s, the rite of the %s" % [str(RITES[id].n), dao_name(id)])
-	return scene(id)
+	return scene(id, g.fem())
 
-## The lines of the scene of rite `id` (narration: so told of "Lin Feng" and "he").
-static func scene(id: String) -> Array:
+## The lines of the scene of rite `id`.  They are narration about nobody but the hero, written of "Lin Feng" and
+## "he"; most never name him, so the rule that tells a conversation of a woman (voice.gd) would leave them as they
+## are: of her, each is told through `Voice.her`.
+static func scene(id: String, fem: bool = false) -> Array:
 	var out: Array = []
 	for bt in RITES[id].beats:
-		out.append(["Narrator", str(bt[0])])
+		out.append(["Narrator", Voice.her(str(bt[0])) if fem else str(bt[0])])
 	return out
 
 ## The camera of beat `k` of rite `id` (an entry of CAMS).
@@ -489,8 +491,8 @@ static func prop(id: String) -> Node3D:
 				var a5 := TAU * k / 46.0 + 0.3 * sin(k * 2.1)
 				var rr2 := 1.5 + 0.22 * sin(k * 1.7)
 				var c5: Color = [Color("c8742a"), Color("d8a038"), Color("8a4a24"), Color("b85a2a")][k % 4]
-				var p5 := Vector3(sin(a5) * rr2, 0.03 + 0.02 * (k % 3), cos(a5) * rr2)
-				m.leaf(p5, p5 + Vector3(0.14 * cos(k * 3.3), 0.01, 0.14 * sin(k * 3.3)), 0.07, MB.tag(c5, MB.FOLIAGE))
+				var p5 := Vector3(sin(a5) * rr2, 0.1 + 0.05 * (k % 4), cos(a5) * rr2)
+				m.leaf(p5, p5 + Vector3(0.24 * cos(k * 3.3), 0.05, 0.24 * sin(k * 3.3)), 0.13, MB.tag(c5, MB.FOLIAGE))
 		"bamboo_stake":
 			# a green bamboo as thick as a wrist; the upper half slides off the cut
 			var gr := MB.tag(Color("6a9a4a"), MB.WOOD)
@@ -609,7 +611,7 @@ static func tick(root: Node3D, id: String, k: float, t: float) -> void:
 			mv.scale = Vector3.ONE * lerpf(0.05, 1.0, smoothstep(0.1, 0.5, k))
 			mv.rotation = Vector3(0, 0, PI * smoothstep(0.62, 0.95, k))
 		"peng_feather":
-			mv.position = home + Vector3(0, 1.6 * e * e + 0.08 * sin(t * 1.7), 0.9 * e)
+			mv.position = home + Vector3(0, 0.75 * e * e + 0.08 * sin(t * 1.7), 0.5 * e)
 			mv.rotation = Vector3(0.5 * sin(t * 0.9) * e, TAU * e, 0.3 * sin(t * 1.3))
 		"lotus_lamp":
 			mv.scale = Vector3(lerpf(0.55, 1.15, e), 1.0, lerpf(0.55, 1.15, e))

@@ -3098,6 +3098,8 @@ func rite_end() -> void:
 	if rite_prop != null and is_instance_valid(rite_prop):
 		rite_prop.queue_free()
 	rite_prop = null
+	if comp != null and is_instance_valid(comp) and Game.companion:
+		comp.visible = true
 	if Fx3D.headless() or player == null:
 		return
 	Models.act(player, "", t)
@@ -3160,7 +3162,7 @@ func _rite_cam(d: float, idx: int) -> void:
 		"feet":
 			look = p0 + Vector3(0, -0.5, 0)
 		"prop":
-			look = prop_at.lerp(p0 + Vector3(0, 1.2, 0), 0.25) + Vector3(0, -0.3, 0)
+			look = prop_at.lerp(p0 + Vector3(0, 1.2, 0), 0.5) + Vector3(0, -0.25, 0)
 		"sky":
 			look = p0 + Vector3(0, 3.2, 0) + fw * 1.5
 	var f2 := fw
@@ -3174,6 +3176,12 @@ func _rite_cam(d: float, idx: int) -> void:
 	if not _open_at(goal) and _open_at(p0 + f2 * float(c[0]) - r2 * float(c[1]) + Vector3(0, float(c[2]), 0)):
 		goal = p0 + f2 * float(c[0]) - r2 * float(c[1]) + Vector3(0, float(c[2]), 0)
 	goal.y = maxf(goal.y, ground_y(goal) + 0.3)
+	# (whoever walks with him watches; but not from between him and the lens)
+	if comp != null and is_instance_valid(comp) and Game.companion:
+		var seg := p0 + Vector3(0, 1.0, 0) - goal
+		var rel: Vector3 = comp.global_position + Vector3(0, 1.0, 0) - goal
+		var along := clampf(rel.dot(seg) / maxf(0.01, seg.length_squared()), 0.0, 1.0)
+		comp.visible = (rel - seg * along).length() > 1.0 or along >= 0.97
 	var shot := "rite:%d" % idx
 	var cut := shot != _cine_shot and cine_k >= 1.0
 	_cine_shot = shot

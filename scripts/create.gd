@@ -259,13 +259,13 @@ func _draw() -> void:
 			desc = "The year away. %s\n\n%s\n\nThe story begins at %s." % [str(hh.desc), str(hh.fx_text), str(hh.home)]
 		"root", "root_el":
 			var rn := clampi(int(h.get("root", 3)), 1, 5)
-			desc = "What the testing stone at the gate will find: how many of the five phases the qi takes. It never changes, and everybody will have an opinion.\n\n%s. %s" % [Roots.title_of(rn, str(h.get("root_el", "wood"))), str(Roots.KINDS[rn].desc)]
+			desc = "What the testing stone at the gate will find. It never changes, and everybody will have an opinion.\n\n%s. %s" % [Roots.title_of(rn, str(h.get("root_el", "wood"))), str(Roots.KINDS[rn].desc)]
 			if rn == 3:
 				desc += "\n\nIt changes no number."
 			else:
-				desc += "\n\nLearns %d%% %s; %s. The sect's counters and its stipend follow the roll.%s" % [int(round(absf(float(Roots.MODS.exp[rn - 1]) - 1.0) * 100.0)), "faster" if rn < 3 else "slower",
+				desc += "\n\nLearns %d%% %s; %s. The sect's counters and stipend follow the roll.%s" % [int(round(absf(float(Roots.MODS.exp[rn - 1]) - 1.0) * 100.0)), "faster" if rn < 3 else "slower",
 					"its own phases strike harder and the others softer, and blows land a little heavier" if rn < 3 else "blows land a little lighter", "" if rn < 3 else " Past %s the round closes, and it learns faster than a True Root." % str(Data.REALMS[Roots.BLOOM])]
 		"begin":
 			desc = "Three years ago, on the last morning at %s, somebody has to be said goodbye to. Then the mountain: Azure Cloud Sect, perched above the sea of clouds, and three years with a broom." % str(hh.n)
-	UI.wrapped(self, r.position + Vector2(16, 26), desc, 15 if desc.length() > 420 else 16, UI.C_TEXT, r.size.x - 32)
+	UI.wrapped(self, r.position + Vector2(16, 26), desc, 14 if row2 in ["root", "root_el"] else (15 if desc.length() > 420 else 16), UI.C_TEXT, r.size.x - 32)
 	UI.text(self, Vector2(0, 708), "Up/Down choose   Left/Right change   Enter type a name / begin   Esc back", 14, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, VIEW.x)

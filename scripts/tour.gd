@@ -6581,8 +6581,14 @@ func _block_shots(which: String = "1") -> void:
 				if str(Rites.RITES[rid].kind) == str(row[0]):
 					var pm := Rites.prop(str(rid))
 					Rites.tick(pm, str(rid), 0.8, 2.0)
-					ms.append(pm)
-			await _gallery(str(row[1]), ms, 2.6 if str(row[0]) == "road" else 1.6, 0.3)
+					# (each shown at about the same size: a field of eight flags beside a lamp held in two hands)
+					var sc: float = float({"bagua_field": 0.3, "sword_wheel": 0.55, "peng_feather": 0.75, "straw_butt": 0.7, "soul_banner": 0.5, "hung_scroll": 0.6, "plumb_line": 0.6, "hung_coin": 0.6,
+						"moon_mirror": 0.75, "candle": 0.95, "nine_reeds": 0.8, "bamboo_stake": 0.75, "leaf_ring": 0.38, "corpse_bell": 0.8, "lotus_lamp": 2.6, "cauldron": 1.5, "blood_bowl": 2.4}.get(str(Rites.RITES[rid].prop), 1.0))
+					pm.scale = Vector3.ONE * sc
+					var hold := Node3D.new()
+					hold.add_child(pm)
+					ms.append(hold)
+			await _gallery(str(row[1]), ms, 1.5, 0.3)
 	if want.call("rites"):
 		stand.call()
 		await _wait(1.0)
@@ -6599,7 +6605,14 @@ func _block_shots(which: String = "1") -> void:
 			var bi := int(main.args.get("beat", 1))
 			main.dialogue.idx = bi
 			main.dialogue.shown = 9999.0
-			await _wait(Rites.SECONDS * float(main.args.get("at", 0.66)))
+			await _wait(0.2)
+			# (caught late in the form, when the thing has happened: the form and what it is done with are set
+			# that far along at once, since every frame of a software renderer is seconds)
+			var along := Rites.SECONDS * float(main.args.get("at", 0.66))
+			w.rite_t0 = w.t - along
+			Models.act(w.player, str(Rites.RITES[rid].clip), w.t - along)
+			w.cine_k = 1.0
+			await _wait(0.7)
 			await _shot("rite_%s%s" % [str(rid), ("_%d" % bi) if main.args.has("beat") else ""])
 			main.set_stack(["world"])
 			w.rite_end()
@@ -6634,16 +6647,6 @@ func _block_shots(which: String = "1") -> void:
 		for oid in ["keep", "cut", "bury"]:
 			mk.append(Marks.model(Marks.MARKS.the_stone[oid], 0))
 		await _gallery("part35_marks", mk, 1.2, 0.3)
-	if want.call("create"):
-		for rn2 in [1, 5]:
-			main.set_stack(["title"])
-			main.open_creation()
-			main.create.h["root"] = rn2
-			main.create.h["root_el"] = "fire" if rn2 == 1 else "wood"
-			main.create.cursor = main.create.ROWS.find("root")
-			await _wait(1.0)
-			await _shot("create_root_%d" % rn2)
-		main.set_stack(["world"])
 	if want.call("street"):
 		# somebody of Qingshi out of doors and standing, with open ground south of them: their fourth word, of a
 		# Heavenly Root and of a waste root; and their word for a road walked and for none
@@ -6665,6 +6668,7 @@ func _block_shots(which: String = "1") -> void:
 							ok2 = false
 					if not ok2:
 						continue
+					print("[tour] street: ", fp.n, " at ", gt, " hour ", h2)
 					main.set_stack(["world"])
 					w.teleport(gt + Vector2i(0, 1), "surface")
 					w.facing = Vector2i(0, -1)
@@ -6679,10 +6683,12 @@ func _block_shots(which: String = "1") -> void:
 					var want_root: bool = str(sh[0]).contains("root")
 					var wn2 := 3 if (want_root == (int(fp.seed) % 2 == 0)) else 6
 					Game.folk_talk[str(fp.id)] = wn2
-					await _wait(2.0)
+					await _wait(0.7)
 					main.talk_folk({"kind": "folk", "id": "folk:" + str(fp.id), "p": fp, "pos": gt})
 					main.dialogue.shown = 999.0
 					await _wait(0.9)
+					quiet.call()
+					await _wait(0.1)
 					await _shot(str(sh[0]))
 					main.set_stack(["world"])
 					w.folk_talking = ""
@@ -6712,4 +6718,14 @@ func _block_shots(which: String = "1") -> void:
 			await _wait(3.0)
 			await _shot("battle_boss_" + str(bb[0]))
 			main.pop()
+	if want.call("create"):
+		for rn2 in [1, 5]:
+			main.set_stack(["title"])
+			main.open_creation()
+			main.create.h["root"] = rn2
+			main.create.h["root_el"] = "fire" if rn2 == 1 else "wood"
+			main.create.cursor = main.create.ROWS.find("root")
+			await _wait(1.0)
+			await _shot("create_root_%d" % rn2)
+		main.set_stack(["world"])
 	get_tree().quit(0)

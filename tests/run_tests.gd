@@ -8376,6 +8376,7 @@ func _open_net() -> void:
 		var lid35 := "stone_" + str(o35.id)
 		check(Mail.LETTERS.has(lid35) and Mail.ORDER.has(lid35) and fits.call(str(Mail.LETTERS[lid35].lines[0])), "the_stone/%s: somebody who lives with it writes" % o35.id)
 		check(Data.step_index(Mail.after_of(lid35)) + int(Mail.LETTERS[lid35].get("wait", Mail.WAIT)) < Data.STEPS.size() - 1, "the letter %s can arrive before the story ends" % lid35)
+	check(Crime.is_child({"kind": "npc", "id": "zeng_shen", "n": "Zeng Shen", "asset": "zeng_shen"}) and Closeup.signature("Zeng Shen") != "" and Closeup.signature("Carpenter Shi of Qi") != "" and Closeup.signature("Bian He") != "" and Closeup.signature("Fang Zhongyong") != "", "nobody draws on a boy of twelve, and the four of the chapter each have a gesture of their own")
 	check(scales35.size() == 3 and Marks.AFTER_BANDS.has("the_stone") and Mail.LETTERS.has("jade_cut") and Mail.ORDER.has("jade_cut") and fits.call(str(Mail.LETTERS.jade_cut.lines[0])), "its answers tip all three scales, its marks are stood after the bands, and the man of Chu writes")
 	var fates35 := 0
 	for ft35 in Weal.FATES:
@@ -8503,6 +8504,9 @@ func _open_net() -> void:
 			check(fits.call(str(bt7[0])) and str(bt7[0]).length() > 80 and not str(bt7[0]).contains("—") and Rites.CAMS.has(str(bt7[1])), "%s: a beat that fits the box, from a place the camera has" % rid7)
 		check(cams7.size() >= 3, "%s: no two beats of it are shot alike" % rid7)
 		check(Rites.scene(str(rid7)).size() == 3 and str(Rites.scene(str(rid7))[0][0]) == "Narrator", "%s: told as narration" % rid7)
+		for fl7 in Rites.scene(str(rid7), true):
+			var ft7 := " " + str(fl7[1])
+			check(not ft7.contains(" He ") and not ft7.contains(" he ") and not ft7.contains(" his ") and not ft7.contains(" His ") and not ft7.contains(" him") and not ft7.contains(" himself") and fits.call(str(fl7[1])), "%s: and told of her when the hero is a woman" % rid7)
 	check(clips7.size() == 17 and props7.size() == 17 and names7.size() == 17, "no two Daos share a form, a thing or a name for the rite")
 	hero7.free()
 	yl7.free()
