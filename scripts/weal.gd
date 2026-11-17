@@ -102,6 +102,10 @@ const ACTS := {
 	# the Open Net release (crime.gd): somebody struck down in its streets, a sword drawn on somebody
 	"slain": {"m": "peace", "per": -1, "max": 6, "why": "struck down in its streets by his hand"},
 	"drawn": {"m": "regard", "per": -1, "max": 3, "why": "times he drew on somebody here and was put on his back"},
+	# the Unpicked Road release (trifles.gd): what was dropped in its roads and carried home; what was somebody's
+	# and went into his sleeve while somebody looked
+	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were"},
+	"pilfer": {"m": "regard", "per": -1, "max": 4, "why": "things pocketed in its streets, and seen"},
 }
 ## how many lords put down in a town's country make one point of peace, and how many points at most;
 ## and the same for packs cleared out of it
@@ -182,6 +186,8 @@ static func _told(g, tid: String, was: String) -> void:
 	var now := state(g, tid)
 	if now == was:
 		return
+	# (the Unpicked Road release: remembered as told, or the next poll told it again)
+	g.weal_state[tid] = now
 	g.toast("%s is %s now" % [str(TOWNS[tid].n).trim_prefix("the "), str(STATES[now].n).to_lower()])
 	g.note("%s: %s. %s" % [str(TOWNS[tid].n).trim_prefix("the "), str(STATES[now].n), str(STATES[now].desc)])
 
@@ -581,6 +587,10 @@ const FATES := [
 	{"npc": "lechang", "when": ["the_mirror", ["recast"]], "tag": "who has been called upon", "line": "He came on the fifth with nothing he had written, as he was told, and sat on the edge of the chair. I asked him what he did for a living. He said he had been waiting. I said that is not a living. He laughed. I had forgotten his laugh; no, I had never heard this one."},
 	{"npc": "lechang", "when": ["the_mirror", ["halves"]], "tag": "who has two houses", "line": "My half hangs a hand from his, on his wall, and neither of us has offered to move it. On the fifteenth I go to see my own face in his house. He says it looks well there. He has not said it should stay."},
 	# Part XXXIII (the Iron Pestle release)
+	# Part XXXIV (the Unpicked Road release)
+	{"npc": "pei_du", "when": ["the_belts", ["wait"]], "tag": "who sat until morning", "line": "I am told my face has changed. I have looked in a basin and cannot see it. What I can tell you is that I sat nineteen hours beside ten years' rice and it was not difficult, after the first hour. I had expected it to be. I think most things are like that, and nobody says so."},
+	{"npc": "pei_du", "when": ["the_belts", ["cry"]], "tag": "who reads the boards", "line": "I stop at the board every morning on my way to the temple. It is better reading than the classics, some days: one shoe, small, red. I wonder about the child all morning. It is struck through by evening, as a rule. I go home lighter than a man with my prospects has any right to."},
+	{"npc": "pei_du", "when": ["the_belts", ["lie"]], "tag": "who did not sleep", "line": "They were there in the morning. I have told myself so a hundred times. And I still wake at the third watch and count them. You slept that night, cultivator; I heard you. I cannot decide whether that was trust or only a very good conscience, and I should like to have either."},
 	{"npc": "granny_wu", "when": ["the_needle", ["truth"]], "tag": "whose secret is out", "line": "He knows about the forty needles, and he comes all the same. I had thought the thing only worked on those who believed in it. It seems it works better on one who does not. Forty years at this stone, and a child of ten has had to show me what I was doing."},
 	{"npc": "granny_wu", "when": ["the_needle", ["finish"]], "tag": "with a new bar", "line": "It was a needle when I woke. I held it, and could not find anything to say. My granddaughter has fetched me another bar, the same weight. Do not look so. It was kindly done. I only wish somebody had asked me whether I wanted to be finished."},
 	{"npc": "granny_wu", "when": ["the_needle", ["turn"]], "tag": "who has company at the stone", "line": "That is him now; listen. Too fast, and he presses. In a month he will not. I used to talk to the water of a morning. Now there is a boy saying the Odes at me, wrong, and I put him right, and I have never read them. One picks things up."},

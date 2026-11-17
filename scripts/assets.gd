@@ -107,6 +107,8 @@ const PEOPLE := {
 	"yue_lao": "characters/yue_lao", "weisheng": "characters/weisheng", "meng_jiang": "characters/meng_jiang", "xu_deyan": "characters/xu_deyan", "lechang": "characters/lechang",
 	# Part XXXIII (the Iron Pestle release): an old woman with a pestle, a schoolboy, a labourer at a wall, a pedlar of oil and a duke with a bow
 	"granny_wu": "characters/granny_wu", "li_bai": "characters/li_bai", "kuang_heng": "characters/kuang_heng", "oil_seller": "characters/oil_seller", "chen_yaozi": "characters/chen_yaozi",
+	# Part XXXIV (the Unpicked Road release): a weaver, a governor, a man with a mallet and a scholar on a step
+	"yangzi_wife": "characters/yangzi_wife", "yang_zhen": "characters/yang_zhen", "bell_thief": "characters/bell_thief", "pei_du": "characters/pei_du",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",
@@ -635,6 +637,8 @@ const LEND := ["sit_bench", "doze", "drink", "strike", "read", "play_qin", "medi
 	"scale",
 	# the Heavy Road release: the people of the road fell, cut stone, reap and walk under a load like anybody
 	"fell", "quarry", "reap", "haul", "haul_idle",
+	# the Unpicked Road release: a child who sees him jump jumps too
+	"jump",
 	# the Answering Land release: waiting at table, kneading, washing, weighing, stalking, dressing a kill,
 	# fanning a stove, shelving, wringing and sewing
 	"serve", "knead", "scrub", "weigh", "stalk", "flay", "fan", "arrange", "wring", "sew",

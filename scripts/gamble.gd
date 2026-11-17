@@ -108,13 +108,17 @@ static func bets(g, game: String) -> Array:
 	return out
 
 ## The stakes that can be laid now.
+## the least that can be staked: a win on the shortest odds the mat offers still pays a stone
+const MIN_STAKE := 4
 static func stakes(g) -> Array:
 	var out: Array = []
 	for s in STAKES:
 		if g.stones >= int(s):
 			out.append(int(s))
 	var tenth := int(g.stones / 10)
-	if tenth > 0 and not out.has(tenth):
+	# (the Unpicked Road release: a stake of one or two stones, won on a favourite, paid nothing at all; no stake is
+	# offered that a win could not pay a stone on)
+	if tenth >= MIN_STAKE and not out.has(tenth):
 		out.append(tenth)
 	return out
 
@@ -182,4 +186,4 @@ const YUE_LINES := ["I am not saying anything. I want you to notice how much I a
 static func summary(g) -> String:
 	if int(g.gamble_rounds) == 0:
 		return "Never sat down at Old Du's mat."
-	return "%d rounds at Old Du's mat, %d won: %d spirit stones won and %d lost; the best single win %d." % [int(g.gamble_rounds), int(g.gamble_wins), int(g.gamble_won), int(g.gamble_lost), int(g.gamble_best)]
+	return "%d round%s at Old Du's mat, %d won: %d spirit stones won and %d lost; the best single win %d." % [int(g.gamble_rounds), "" if int(g.gamble_rounds) == 1 else "s", int(g.gamble_wins), int(g.gamble_won), int(g.gamble_lost), int(g.gamble_best)]

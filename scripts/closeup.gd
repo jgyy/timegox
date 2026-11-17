@@ -31,6 +31,8 @@ const SIGNATURE := {
 	"The Old Man under the Moon": "stroke_beard", "Weisheng": "hand_heart", "Meng Jiang": "hand_heart", "Xu Deyan": "shade_eyes", "Princess Lechang": "sleeve_smile",
 	# the Iron Pestle (Part XXXIII)
 	"Old Dame Wu": "hand_heart", "Li Bai": "shade_eyes", "Kuang Heng": "measure", "The Old Oil Seller": "stroke_beard", "Chen Yaozi": "arms_cross",
+	# the Unpicked Road (Part XXXIV)
+	"Yue Yangzi's Wife": "arms_cross", "Yang Zhen": "stroke_beard", "The Man Who Stopped His Ears": "shade_eyes", "Pei Du": "hand_heart",
 	# the people of the older chapters, by what they are
 	"Granny Wen": "hand_heart", "Smith Tie": "arms_cross", "Li Li": "hand_heart", "Shang Yang": "arms_cross", "Tang of Shang": "stroke_beard",
 	"Hua Tuo": "stroke_beard", "Cook Ding": "measure", "Tao Kan": "arms_cross", "Budai": "sleeve_smile",

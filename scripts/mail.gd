@@ -61,13 +61,13 @@ const LETTERS := {
 	"sack_share": {"from": "Mistress Ruan of the Carriers' Hall", "needs": ["the_sack", "share"], "wait": 3,
 		"lines": ["We have a board in the Silk Woods now with every load on it and every back that took a share. Forty names the first month. The governor came and read it through twice and put his own at the bottom, for bricks. I enclose your share of the first quarter. It is small. It is honestly small."],
 		"gift": {"stones": 400}},
-	"sack_down": {"from": "Auntie Zhou of the Kitchen", "needs": ["the_sack", "down"], "wait": 3,
+	"sack_down": {"from": "Auntie Zhou", "needs": ["the_sack", "down"], "wait": 3,
 		"lines": ["There is an old sack hanging by the bamboo gate that you had no business leaving there, child, and I walk past it every market day and it is always empty and I am always glad. You carried enough. Come and eat. I have made too much, as usual, and there is nobody to carry it away."]},
 	"tao_last": {"from": "Tao Kan", "after": "s_p27_sack", "wait": 4,
 		"lines": ["Sweeper: the granary is roofed. It was your eight stems and my bricks and somebody's sawdust. I hear you have a ring now that holds everything. Good. Take out one thing every morning and carry it a hundred paces, and put it back at night. I will know if you do not. I shall not know how, but I will."]},
 	# ---- Part XXVIII (the Answering Land release): letters about what is owed, and from a man mending doors
 	"knot_nothing": {"from": "Tanner Hou's Widow", "needs": ["the_knot", "nothing"], "wait": 3,
-		"lines": ["Lin Feng, my father lies quiet now. Eleven years the grass on his mound was trodden flat every morning, and since the autumn it stands. I am told you said the account was closed the day it was opened. I enclose the price of a spoon he whittled, badly, when he was alive. Somebody bought it, owing you nothing."],
+		"lines": ["Lin Feng, my father lies quiet now. Every morning the grass on his mound was trodden flat, and since the autumn it stands. I am told you said the account was closed the day it was opened. I enclose the price of a spoon he whittled, badly, when he was alive. Somebody bought it, owing you nothing."],
 		"gift": {"stones": 300}},
 	"knot_ledger": {"from": "Book-Keeper Mu of Qingshi", "needs": ["the_knot", "ledger"], "wait": 3,
 		"lines": ["The book has four hundred entries and three hundred and sixty lines drawn through. There are eleven against your name that you have never answered, child, because nobody told you of them. I enclose the list. Do not hurry. They have waited years, and found the waiting had a use."]},
@@ -106,6 +106,16 @@ const LETTERS := {
 		"lines": ["Child, I have been to Landfall to see it. A girl of the Longbo asked what height I had chosen. I said nobody had ever asked me. She fetched the gate-clerk. I am written down, at eighty-one, as five foot and content; and I find, having said it aloud, that it is so."]},
 	"kuafu_home": {"from": "Kuafu's Mother", "after": "s_p31_sun", "wait": 4,
 		"lines": ["To the small one who turned my son round. He came in at the door with half a forest on his back and said he had not finished. I said no, you never do. We have had a fire every night since, and the old ones are sitting up. He has gone back for more. He looks behind him now."]},
+	# ---- Part XXXIV (the Unpicked Road release): letters from a scholar, a clerk and a man who has taken a rag off his head
+	"belts_wait": {"from": "Pei Du", "needs": ["the_belts", "wait"], "wait": 1,
+		"lines": ["Cultivator: her father was let out on the ninth. She came to tell me, and brought nothing, which I took as a great kindness. I have gone back to my books. I eat once a day and do not mind it. The man who reads faces sends his regards, and asks me to stop sitting on steps; it spoils his trade."]},
+	"belts_cry": {"from": "Clerk Tong of the Post", "needs": ["the_belts", "cry"], "wait": 1,
+		"lines": ["To the honoured cultivator: the board at Tushan has forty lines and thirty-one struck through. The belts were claimed by the knot, as you will have heard. I enclose your share of the coppers, which the regulations oblige me to send and which the scholar Pei would not take. He stood there and blushed."],
+		"gift": {"stones": 360}},
+	"belts_lie": {"from": "Pei Du", "needs": ["the_belts", "lie"], "wait": 1,
+		"lines": ["Cultivator: I went back at first light and they were there, and she was. I had not slept. You had; I heard you. I have thought since about which of us trusted the road and which only said so. I enclose nothing. I am told a purse has lain on that rail nine days now. I go and look at it."]},
+	"bell_down": {"from": "The Man Who Stopped His Ears", "after": "s_p34_ears", "wait": 2,
+		"lines": ["HONOURED CULTIVATOR, the casters say I need not write so large, you are not deaf. I carried it down in nine loads. They are pouring it again on the first, and I work the bellows, for my keep. They say it will be the town's and nobody's. I said: I have heard that word before."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -234,7 +244,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "wen_last"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:
@@ -254,7 +264,7 @@ static func arrived(g, id: String) -> bool:
 		var fr := str(l.from)
 		for sid in g.slain:
 			var dn := str(g.slain[sid].n)
-			if not str(sid).begins_with("folk:") and not str(sid).begins_with("res:") and not str(sid).begins_with("apt:") and (fr.begins_with(dn) or dn.begins_with(fr)):
+			if not str(sid).begins_with("folk:") and not str(sid).begins_with("res:") and not str(sid).begins_with("apt:") and (fr == dn or fr.begins_with(dn + ",") or fr.begins_with(dn + " ") or dn.begins_with(fr + ",") or dn.begins_with(fr + " ")):
 				return false
 	if l.has("needs") and Echoes.chosen(g, str(l.needs[0])) != str(l.needs[1]):
 		return false

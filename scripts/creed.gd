@@ -128,6 +128,9 @@ static func causes(g) -> Array:
 	add.call("virtue", -mini(27, 3 * Taboo.taint(g)), "arts the precepts forbid")
 	add.call("virtue", -mini(8, 2 * Wilds.worst_count(g, 2)), "countries hunted until nothing was left")
 	add.call("virtue", mini(6, 2 * int(g.nets_opened)), "nets opened on three sides")
+	# (the Unpicked Road release, trifles.gd)
+	add.call("virtue", mini(8, int(g.restored)), "lost things carried to whose they were")
+	add.call("virtue", -mini(12, 2 * int(g.pilfered)), "things that were somebody's, in his sleeve")
 	add.call("rule", -mini(12, g.crimes.filter(func(c): return int(c.n) > 0 or str(c.what) == "forbidden").size()), "what the gates have charged him with")
 	add.call("rule", mini(8, int(g.served)), "days stood in the circle, when he could have stepped out")
 	# ---- rule

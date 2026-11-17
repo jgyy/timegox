@@ -2039,6 +2039,7 @@ func _process(d: float) -> void:
 			stream_t = 0.35
 			_stream(false)
 		_update_view(d)
+		_update_trifles(d)
 		_apply_hour()
 		queue_redraw()
 	# scenery between the camera and the hero turns see-through (shader global, see mb.gd);
@@ -2097,6 +2098,8 @@ func step_time() -> float:
 		return GLIDE_T * float(glide.get("span", 1.0))
 	if climb != 0:
 		return climb_t
+	if leaping:
+		return LEAP_T
 	if riding_here():
 		# (roads.gd: a thing on wheels is quicker on a road or a path, and slower off one)
 		var rd: Dictionary = Fashion.RIDES[Game.ride]
@@ -2195,6 +2198,14 @@ func _move(d: float) -> void:
 				if not _glide_pick():
 					return
 			else:
+				# (the Unpicked Road release: a jump asked for is made now: a leap of two tiles the way he is
+				# going, or straight up where he stands)
+				if jump_want:
+					jump_want = false
+					if _jump_now(move_dir):
+						continue
+				if t - hop_t0 < HOP_HOLD:
+					return
 				if move_dir == Vector2i.ZERO:
 					return
 				facing = move_dir
@@ -2236,8 +2247,11 @@ func _move(d: float) -> void:
 			Game.tile = ptile
 			if not glide.is_empty():
 				_glide_arrive()
+			elif leaping:
+				_leap_arrive()
 			else:
 				_trample(ptile)
+				_at_door()
 				_summit_check()
 				# (load.gd: a tile walked under a load is counted, for whoever sews the pouch)
 				Load.walked(Game, riding_here())
@@ -2438,6 +2452,18 @@ func face_entity():
 			fp = {}
 		if not fp.is_empty():
 			e = {"kind": "folk", "id": fp.id, "n": fp.n, "p": fp, "pos": ptile + facing, "area": fp.area}
+	if e == null and not is_floor() and not wd.is_empty() and Game.prologue == "":
+		# (the Unpicked Road release, trifles.gd: a small thing lying in front of him, or at his feet; or the
+		# place something in his sleeve was taken from)
+		var tf := Trifles.at_tile(Game, wd, ptile + facing)
+		if tf.is_empty():
+			tf = Trifles.at_tile(Game, wd, ptile)
+		if not tf.is_empty():
+			e = {"kind": "trifle", "id": tf.id, "n": Trifles.KINDS[str(tf.kind)].n, "t": tf, "pos": tf.tile, "area": tf.area}
+		elif not Game.pocket.is_empty():
+			var th := Trifles.home_at(Game, wd, ptile + facing)
+			if not th.is_empty():
+				e = {"kind": "trifle_home", "id": th.id, "n": Trifles.KINDS[str(th.kind)].n, "t": th, "pos": ptile + facing, "area": th.area}
 	return e
 
 # ---------------------------------------------------------------- 3D view update
@@ -2461,7 +2487,7 @@ func _player_pos() -> Vector3:
 		if cave_snap:
 			cave_y = gy
 			cave_snap = false
-		pp.y = cave_y + _trip_lift()
+		pp.y = cave_y + _trip_lift() + _hop_y()
 		return pp
 	pp.y = lerpf(maxf(iy0, gy) if iy0 > -INF else gy, maxf(iy1, gy) if iy1 > -INF else gy, clampf(move_t, 0.0, 1.0)) + _trip_lift()
 	if not glide.is_empty():
@@ -2472,7 +2498,7 @@ func _player_pos() -> Vector3:
 		a -= GLIDE_LEAP * clampf(1.0 - (float(glide.n) + k) * 1.5, 0.0, 1.0)
 		pp.y += maxf(a - Peaks.rise(wd, (pp.x - off.x) / TS, (pp.z - off.z) / TS), 0.0)
 	else:
-		pp.y += air_y
+		pp.y += air_y + _hop_y()
 	return pp
 
 func _cam_goal(pp: Vector3, a: float) -> Array:
@@ -2544,7 +2570,10 @@ func _update_view(d: float) -> void:
 		if str(ld[0]) != "" and not flying and not riding_here():
 			gait = "haul" if (heavy or float(ld[1]) >= 0.75) and Assets.has_clip(player, "haul") else gait
 		var stand := "haul_idle" if str(ld[0]) != "" and float(ld[1]) >= 0.75 and not riding_here() and Assets.has_clip(player, "haul_idle") else ""
-		if flying:
+		var jt := _jump_clip_t()
+		if jt >= 0.0 and not flying and not riding_here() and Assets.has_clip(player, "jump"):
+			Models.anim_person(player, jt, false, false, "jump")
+		elif flying:
 			Models.anim_person(player, t, true, false, "glide")
 		elif scaling:
 			# (hand over hand while he moves; hanging still, he only shifts his weight)
@@ -2557,7 +2586,7 @@ func _update_view(d: float) -> void:
 		_kite(player, "hero", not glide.is_empty(), d, Color(HERO_OPTS.cape), Color(HERO_OPTS.trim))
 		# a puff of dust at each footfall
 		var sp := fmod(t * 9.0 / PI, 2.0)
-		if walking and not flying and not scaling and int(sp) != step_side:
+		if walking and not flying and not scaling and not leaping and int(sp) != step_side:
 			step_side = int(sp)
 			Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path))
 		# companion trails the hero
@@ -3316,7 +3345,8 @@ func strike() -> void:
 		# the cut goes through the grass: it is mown in an arc in front of the blade, the clippings fly
 		Impact.mow(pp + fwd * 1.6, 1.9, t)
 		Fx3D.leaf_spiral(scene3d, pp + fwd * 1.6 + Vector3(0, 0.3, 0), Color(Look.theme(theme_name).g2).lightened(0.15), 0.7)
-	_folk_start(pp, 7.0)
+	# (the Unpicked Road release, manners.gd: everybody near answers a blade in the street as what they are)
+	_folk_react("strike", pp, 7.0)
 
 ## G: the sword qi (impact.gd).  A crescent of qi thrown from the blade flies seven tiles ahead and
 ## everything along its way feels it, as if struck: the first pack it reaches is struck first, the
@@ -3386,6 +3416,11 @@ func _blow(tiles: Array, dir: Vector3) -> bool:
 		var b := Havoc.at_tile(wd, tl)
 		if not b.is_empty() and not Havoc.is_broken(Game, b):
 			_smash(b, dir, "strike")
+		# (the Unpicked Road release, trifles.gd: a small thing in the way of the blade flies, or breaks)
+		if Game.prologue == "":
+			var tf := Trifles.at_tile(Game, wd, tl)
+			if not tf.is_empty():
+				_trifle_struck(tf, dir)
 	if not headless():
 		for tl2 in tiles:
 			_nature_blow(tl2, dir)
@@ -3701,6 +3736,7 @@ func _make_folk(fp: Dictionary) -> Node3D:
 	n.set_meta("town", fp.town)
 	n.set_meta("name", fp.n)
 	n.set_meta("seed", int(fp.seed))
+	n.set_meta("fp", fp)
 	scene3d.add_child(n)
 	folk_nodes[fp.id] = n
 	return n
@@ -3712,6 +3748,11 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 	# make way: nobody stands where the hero is (they step aside, the way people do)
 	var hp := Vector2(pp.x, pp.z)
 	var g2 := Vector2(goal.x, goal.z)
+	# (the Unpicked Road release, manners.gd: but he is quicker than they are, and whoever he runs into
+	# says so)
+	if move_t >= 0.0 and not talking and glide.is_empty() and climb == 0 and not leaping and Vector2(fn.position.x, fn.position.z).distance_to(hp) < BUMP_R \
+			and t - float(fn.get_meta("bumped", -99.0)) > BUMP_AGAIN and main.top_name() == "world":
+		_bump(fn, fp)
 	var away := g2 - hp
 	if away.length() < 1.15:
 		var side := away.normalized() if away.length() > 0.05 else Vector2(cos(float(fp.seed)), sin(float(fp.seed)))
@@ -3772,6 +3813,10 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 		fn.set_meta("say_until", t + 2.6)
 		fn.set_meta("say", Folk.greeting(fp, Game))
 		Models.act(m, "wave" if fp.kid else "bow", t + float(fp.seed))
+	# (the Unpicked Road release: a child who has seen him jump jumps too)
+	var hop_e := t - float(fn.get_meta("hop", -9.0))
+	if hop_e < HOP_AIR + 0.2:
+		fn.position.y += sin(clampf((hop_e - 0.2) / HOP_AIR, 0.0, 1.0) * PI) * 0.45
 	var saying: bool = t < float(fn.get_meta("say_until", -1.0))
 	# a hawker calls the wares, the watchman the watch
 	if saying and dist < 24.0:
@@ -3870,6 +3915,10 @@ func _draw_hud() -> void:
 				hint = "Open the sealed cave" if Game.level >= int(fe.req) and not Game.abodes.has(fe.id) else "Look"
 			"stele":
 				hint = "Choose your Dao"
+			"trifle":
+				hint = "%s%s" % [str(fe.n).capitalize(), " (%s's)" % str(fe.t.who) if str(fe.t.who) != "" else ""]
+			"trifle_home":
+				hint = "Put back the %s" % str(fe.n)
 		UI.text(self, Vector2(VIEW.x * 0.5 - 150, VIEW.y - 60), "Enter: " + hint, 20, UI.C_GOLD, HORIZONTAL_ALIGNMENT_CENTER, 300)
 		# (the Answering Land release, weal.gd: what has become of somebody with a name, by what was chosen)
 		if fe.kind == "npc" and (Game.slain.is_empty() or not Crime.dead(Game, str(fe.id))):
@@ -3881,6 +3930,9 @@ func _draw_hud() -> void:
 			var ltag := Living.tag(fe.p, Game)
 			if ltag != "":
 				UI.text(self, Vector2(VIEW.x * 0.5 - 300, VIEW.y - 36), ltag, 15, UI.C_DIM, HORIZONTAL_ALIGNMENT_CENTER, 600)
+	# (the Unpicked Road release, trifles.gd: what is in his sleeve)
+	if not Game.pocket.is_empty() and using.is_empty() and trip.is_empty():
+		UI.text(self, Vector2(22, 162), "In his sleeve: " + Trifles.text(Game), 14, UI.C_DIM.lightened(0.3), HORIZONTAL_ALIGNMENT_LEFT, 560)
 	# the High Roads (peaks.gd): what the heights offer
 	if not is_floor() and using.is_empty() and trip.is_empty() and not wd.is_empty():
 		var hint2 := ""
@@ -4018,3 +4070,315 @@ func _draw_minimap() -> void:
 		var realm: String = Atlas.LAYER_NAMES.get(str(wd.get("parent", layer)) if is_floor() else layer, "")
 		if realm != "" and realm != Atlas.LAYER_NAMES.surface:
 			UI.text(self, r.position + Vector2(0, r.size.y + 36), realm, 12, Color("a8d0ff"), HORIZONTAL_ALIGNMENT_RIGHT, mw)
+
+# ---------------------------------------------------------------- the Unpicked Road release: a leap, a body
+# walked into, small things underfoot (trifles.gd, manners.gd)
+## a jump from standing: how long he is off the ground and how high; how long before his feet leave it
+## (the crouch of the clip) and before he walks again
+const HOP_AIR := 0.5
+const HOP_H := 1.1
+const HOP_OFF := 0.18
+const HOP_HOLD := 0.78
+## a leap of two tiles: seconds in the air, and how high
+const LEAP_T := 0.46
+const LEAP_H := 1.25
+## the clip (art/lib/person.py clip_jump): its length and where the feet leave and meet the ground
+const JUMP_CLIP := 0.9
+const JUMP_OFF := 0.2
+const JUMP_LAND := 0.74
+## how near somebody must be to be walked into (metres), and how long before they can be again
+const BUMP_R := 0.6
+const BUMP_AGAIN := 4.0
+var hop_t0 := -9.0
+var jump_want := false
+var leaping := false
+var leap_over := false
+var trifle_nodes := {}
+var _trifle_t := 0.0
+var _trifle_key := ""
+
+## Space (or J) with nothing in front of him: jump.  With a way held, a leap of two tiles over
+## whatever lies on the first (a jar, a purse, nothing at all); else straight up.  In the saddle it is
+## the horse that jumps.  Not in a carriage, under the kite, on a rock face, or bent under a load.
+func jump() -> void:
+	if not using.is_empty() or not trip.is_empty() or ambush_t >= 0.0 or not glide.is_empty() or leaping or t - hop_t0 < HOP_HOLD:
+		return
+	# (in the saddle it is the horse that jumps, and a sword or a cloud that hops; nothing on wheels does)
+	if riding_here() and str(Fashion.RIDES[Game.ride].kind) == "carriage":
+		Game.toast("Not in a carriage.")
+		return
+	if Load.tier(Game, riding_here()) >= 2:
+		Game.toast("Not under this load: his knees say so.")
+		return
+	jump_want = true
+
+## Where a leap from where he stands the way of `dir` would come down: two tiles on, if the tile
+## between and the tile beyond could both be walked onto (so a leap goes nowhere a walk does not:
+## past no seal, over no wall, through nobody), on the level; else (-1, -1).
+func leap_to(dir: Vector2i) -> Vector2i:
+	if dir == Vector2i.ZERO:
+		return Vector2i(-1, -1)
+	var mid := ptile + dir
+	var land := ptile + dir * 2
+	for q in [mid, land]:
+		if not tile_free(q) or ent_at(q) != null or walk_props.has(q):
+			return Vector2i(-1, -1)
+	if building_at(mid) != building_at(ptile) or building_at(land) != building_at(ptile):
+		return Vector2i(-1, -1)
+	if not is_floor() and not wd.is_empty():
+		if Peaks.climb(wd, ptile, mid) != 0 or Peaks.climb(wd, mid, land) != 0:
+			return Vector2i(-1, -1)
+		if not Folk.at_tile(wd, mid, Game.clock).is_empty() or not Folk.at_tile(wd, land, Game.clock).is_empty():
+			return Vector2i(-1, -1)
+	if Game.prologue != "" and leash.x >= 0 and maxi(absi(land.x - leash.x), absi(land.y - leash.y)) > LEASH:
+		return Vector2i(-1, -1)
+	return land
+
+## The jump is made (from `_move`, between steps).  Returns whether he is now in the air over ground.
+func _jump_now(dir: Vector2i) -> bool:
+	Game.jumps += 1
+	var land := leap_to(dir)
+	if land.x < 0:
+		# straight up
+		if dir != Vector2i.ZERO:
+			facing = dir
+		hop_t0 = t
+		_folk_react("jump", wpos(ptile), 8.0)
+		return false
+	facing = dir
+	target = land
+	move_t = 0.0
+	leaping = true
+	climb = 0
+	hop_t0 = t - HOP_OFF
+	leap_over = not is_floor() and not wd.is_empty() and (not Havoc.at_tile(wd, ptile + dir).is_empty() or not Trifles.at_tile(Game, wd, ptile + dir).is_empty())
+	var q := FWD.find(facing)
+	if q >= 0:
+		cam_q = q
+	return true
+
+func _leap_arrive() -> void:
+	leaping = false
+	hop_t0 = t - JUMP_CLIP * JUMP_LAND
+	Game.leaps += 1
+	Game.step_leap += 1
+	_trample(ptile)
+	_summit_check()
+	Load.walked(Game, false)
+	_at_door()
+	Game.poll_steps()
+	if headless():
+		return
+	var pp := wpos(ptile)
+	Fx3D.dust(scene3d, pp, Color(Look.theme(theme_name).path))
+	# whoever he comes down beside starts; everybody else has only seen a cultivator in the air
+	var near := false
+	for id in folk_nodes:
+		var fn: Node3D = folk_nodes[id]
+		if fn.visible and fn.position.distance_to(pp) < 2.4:
+			near = true
+	_folk_react("land" if near else "jump", pp, 2.4 if near else 8.0)
+
+## How far off the ground the jump has him now (metres).
+func _hop_y() -> float:
+	if leaping:
+		return sin(clampf(move_t, 0.0, 1.0) * PI) * LEAP_H if move_t >= 0.0 else 0.0
+	var a := (t - hop_t0 - HOP_OFF) / HOP_AIR
+	return sin(a * PI) * HOP_H if a > 0.0 and a < 1.0 else 0.0
+
+## Where in the clip of the jump he is (seconds; -1 when he is not jumping).
+func _jump_clip_t() -> float:
+	if leaping:
+		return JUMP_CLIP * lerpf(JUMP_OFF, JUMP_LAND, clampf(move_t, 0.0, 1.0))
+	var e := t - hop_t0
+	if e < 0.0 or e >= JUMP_CLIP or move_t >= 0.0:
+		return -1.0
+	return e
+
+## Everybody of the towns within `r` metres of `at` answers `deed` as what they are (manners.gd): each
+## with the gesture of their kind, and the two nearest with a word over their heads.  The people of
+## the story who stand near only start.
+func _folk_react(deed: String, at: Vector3, r: float, ctx: Dictionary = {}) -> void:
+	if headless():
+		return
+	var near: Array = []
+	for id in folk_nodes:
+		var fn: Node3D = folk_nodes[id]
+		if fn.visible and fn.has_meta("fp") and fn.position.distance_to(at) < r:
+			near.append([fn.position.distance_to(at), fn])
+	near.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
+	for i in near.size():
+		_folk_answer(near[i][1], deed, ctx, i < 2)
+	for eid in ent_nodes:
+		var en: Node3D = ent_nodes[eid]
+		var e = ent_by_id.get(eid)
+		if e != null and str(e.kind) == "npc" and is_instance_valid(en) and en.visible and en.position.distance_to(at) < r and en.has_meta("model") and deed in ["strike", "land"]:
+			Models.act(en.get_meta("model"), "shock", t)
+
+func _folk_answer(fn: Node3D, deed: String, ctx: Dictionary, speak: bool) -> void:
+	var fp: Dictionary = fn.get_meta("fp")
+	var a := Manners.answer(deed, fp, Game, ctx, int(Game.jumps) + int(Game.strikes) + int(Game.bumps))
+	if a.is_empty():
+		return
+	var m: Node3D = fn.get_meta("model")
+	var clip := str(a.clip)
+	if clip == "jump":
+		# (a child does it too)
+		fn.set_meta("hop", t)
+	if not Assets.has_clip(m, clip):
+		clip = "shock"
+	Models.act(m, clip, t)
+	if speak:
+		fn.set_meta("say", str(a.line))
+		fn.set_meta("say_until", t + 3.2)
+		fn.set_meta("greeted", t)
+
+## He has run into one of the people of the towns: they are put out of his way, and say so.
+func _bump(fn: Node3D, fp: Dictionary) -> void:
+	fn.set_meta("bumped", t)
+	Game.bumps += 1
+	var deed := Manners.bump_deed(riding_here(), Load.tier(Game, riding_here()))
+	var dir := Vector2(float(target.x - ptile.x), float(target.y - ptile.y)).normalized()
+	var side := Vector2(-dir.y, dir.x) * (1.0 if int(fp.seed) % 2 == 0 else -1.0)
+	var sh := Manners.shove(fp, deed)
+	fn.position += Vector3(dir.x * 0.6 + side.x, 0.0, dir.y * 0.6 + side.y) * sh
+	_folk_answer(fn, deed, {}, true)
+	Fx3D.dust(scene3d, fn.position, Color(Look.theme(theme_name).path))
+	if sh == 0.0:
+		# (one of the Great People: it is he who is stopped)
+		Models.act(player, "hurt", t)
+
+## He has come to a tile: if something in his sleeve belongs behind the door here, he knocks.
+func _at_door() -> void:
+	if Game.pocket.is_empty() or is_floor() or wd.is_empty() or Game.prologue != "":
+		return
+	var due := Trifles.at_door(Game, wd, ptile)
+	if due.is_empty():
+		return
+	move_dir = Vector2i.ZERO
+	key_lock = true
+	var lines: Array = []
+	for q in due:
+		lines.append_array(Trifles.restore(Game, str(q.id), true).lines)
+	main.say(lines)
+
+## A blow has met a small thing: what breaks is paid for; anything else flies.
+func _trifle_struck(tf: Dictionary, dir: Vector3) -> void:
+	for ln in Trifles.struck(Game, tf):
+		Game.toast(str(ln))
+	if headless():
+		return
+	var tn: Node3D = trifle_nodes.get(str(tf.id))
+	if tn == null:
+		return
+	if bool(Trifles.KINDS[str(tf.kind)].get("frail", false)):
+		var bb: Dictionary = bundles[layer]
+		Havoc.burst(scene3d, "pots", tn.position, dir, func(q: Vector3) -> float: return _stand_y(bb, q), 0.5, Trifles.KINDS[str(tf.kind)].col)
+		tn.visible = false
+		_folk_start(tn.position, 7.0)
+	else:
+		tn.set_meta("vel", Vector2(dir.x, dir.z) * 5.5)
+		tn.set_meta("toss", t)
+
+## The small things of the region he is in (trifles.gd), drawn where they lie.  They are kicked along
+## by his feet (a nudge of the drawing: the thing is still on its tile), and gone when taken.
+func _update_trifles(d: float) -> void:
+	if is_floor() or wd.is_empty() or Game.prologue != "":
+		for id0 in trifle_nodes:
+			(trifle_nodes[id0] as Node3D).visible = false
+		return
+	var pp := _player_pos()
+	_trifle_t -= d
+	var key := "%s|%s|%d" % [layer, area_id, int(Game.day)]
+	if _trifle_t <= 0.0 or key != _trifle_key:
+		_trifle_t = 0.4
+		if key != _trifle_key:
+			_trifle_key = key
+			for id1 in trifle_nodes:
+				(trifle_nodes[id1] as Node3D).queue_free()
+			trifle_nodes = {}
+		var made := 0
+		var bb: Dictionary = bundles[layer]
+		for tf in Trifles.of_area(Game, wd, area_id):
+			if trifle_nodes.has(str(tf.id)) or made >= 4:
+				continue
+			var at := wpos(tf.tile)
+			if Vector2(at.x - pp.x, at.z - pp.z).length() > 46.0:
+				continue
+			var n := Trifles.model(str(tf.kind))
+			var h := Trifles._h(str(tf.id))
+			n.rotation.y = float(h % 628) / 100.0
+			# (a little off the middle of its tile, as a thing dropped lies)
+			n.set_meta("base", at + Vector3(float(h % 61 - 30) / 100.0, 0.0, float((h / 61) % 61 - 30) / 100.0))
+			n.set_meta("off", Vector2.ZERO)
+			n.set_meta("vel", Vector2.ZERO)
+			n.set_meta("t", tf)
+			# (drawn half as big again as life, on a patch of trodden earth, with a glint over it: a hairpin in
+			# long grass is not seen otherwise, and nobody stoops for what they cannot see)
+			n.scale = Vector3.ONE * 2.0
+			n.add_child(Trifles.patch(str(tf.cls)))
+			scene3d.add_child(n)
+			trifle_nodes[str(tf.id)] = n
+			n.position = n.get_meta("base")
+			n.position.y = _stand_y(bb, n.position)
+			made += 1
+	var bb2: Dictionary = bundles[layer]
+	var moving := move_t >= 0.0 and not leaping and glide.is_empty()
+	for id in trifle_nodes:
+		var tn: Node3D = trifle_nodes[id]
+		var tf2: Dictionary = tn.get_meta("t")
+		if Game.trifles.has(id) and Trifles.gone(Game, tf2):
+			tn.visible = false
+			continue
+		if ent_at(tf2.tile) != null:
+			tn.visible = false
+			continue
+		tn.visible = true
+		var off2: Vector2 = tn.get_meta("off")
+		var vel: Vector2 = tn.get_meta("vel")
+		var flat := Vector2(tn.position.x - pp.x, tn.position.z - pp.z)
+		if moving and flat.length() < 0.55 and vel.length() < 0.5:
+			# kicked along by a foot: mostly the way he is going, a little the way it lay
+			var go := Vector2(float(target.x - ptile.x), float(target.y - ptile.y)).normalized()
+			vel = go * 3.2 + flat.normalized() * 1.2
+			tn.set_meta("toss", t - 0.25)
+		if vel.length() > 0.02:
+			off2 += vel * d
+			if off2.length() > 0.85:
+				off2 = off2.normalized() * 0.85
+				vel = Vector2.ZERO
+			vel *= exp(-d * 4.5)
+			tn.rotation.y += vel.length() * d * 3.0
+			tn.set_meta("off", off2)
+			tn.set_meta("vel", vel)
+		var base: Vector3 = tn.get_meta("base")
+		var p3 := base + Vector3(off2.x, 0.0, off2.y)
+		p3.y = _stand_y(bb2, p3)
+		var te := t - float(tn.get_meta("toss", -9.0))
+		if te >= 0.0 and te < 0.5:
+			p3.y += sin(te / 0.5 * PI) * 0.45
+		tn.position = p3
+		var gl: Node3D = tn.get_node_or_null("glint")
+		if gl != null:
+			var k := 0.5 + 0.5 * sin(t * 2.6 + float(tn.get_meta("base").x))
+			gl.scale = Vector3.ONE * (0.7 + 0.5 * k)
+			gl.position.y = 0.22 + 0.05 * k
+
+## He does something with his hands where he stands (a gesture everybody has).
+func start_gesture(clip: String) -> void:
+	if player != null:
+		Models.act(player, clip, t)
+
+## One of the people of the towns in sight says `line` over their head, with a gesture.
+func folk_say(pid: String, line: String, clip: String = "") -> void:
+	var fn: Node3D = folk_nodes.get(pid)
+	if fn == null or not is_instance_valid(fn):
+		if line != "":
+			Game.toast(line)
+		return
+	fn.set_meta("say", line)
+	fn.set_meta("say_until", t + 3.6)
+	fn.set_meta("greeted", t)
+	var m: Node3D = fn.get_meta("model")
+	if clip != "":
+		Models.act(m, clip if Assets.has_clip(m, clip) else "shock", t)

@@ -316,6 +316,20 @@ var cull_told := {}
 var cull_worst := {}
 var nets := {}
 var nets_opened := 0
+## the Unpicked Road release (trifles.gd): the small things taken up (id -> the day), what is in his
+## sleeve, how many were picked up, pocketed though somebody's, brought home, given to a child; and
+## (world.gd) how many times he has jumped, leapt two tiles, come down beside somebody, been walked into
+var trifles := {}
+var pocket: Array = []
+var picked := 0
+var pilfered := 0
+var restored := 0
+var treats := 0
+var jumps := 0
+var leaps := 0
+var bumps := 0
+var step_restore := 0
+var step_leap := 0
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -550,6 +564,17 @@ func reset() -> void:
 	cull_worst = {}
 	nets = {}
 	nets_opened = 0
+	trifles = {}
+	pocket = []
+	picked = 0
+	pilfered = 0
+	restored = 0
+	treats = 0
+	jumps = 0
+	leaps = 0
+	bumps = 0
+	step_restore = 0
+	step_leap = 0
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -969,6 +994,8 @@ func advance() -> void:
 	step += 1
 	step_fit = 0
 	step_toil = 0
+	step_restore = 0
+	step_leap = 0
 	step_haul = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
 	if str(s.id) == Hold.FOUND_STEP:
@@ -1078,6 +1105,12 @@ func poll_steps() -> void:
 			"fit":
 				# Part XXIX: so many houses put to rights since the step began (fitting.gd)
 				ok = step_fit >= int(s.n)
+			"restore":
+				# Part XXXIV: so many lost things brought to whose they are since the step began (trifles.gd)
+				ok = step_restore >= int(s.n)
+			"leap":
+				# Part XXXIV: so many leaps made since the step began (world.gd)
+				ok = step_leap >= int(s.n)
 			"toil":
 				# Part XXVII: the work of the hands done so many times since the step began (toil.gd)
 				ok = step_toil >= int(s.n)
@@ -1191,6 +1224,10 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(Arms.adept(self), int(s.n)), int(s.n)]
 	elif s.kind == "toil":
 		t += "  (%d/%d)" % [mini(step_toil, int(s.n)), int(s.n)]
+	elif s.kind == "restore":
+		t += "  (%d/%d%s)" % [mini(step_restore, int(s.n)), int(s.n), ", %d in his sleeve" % Trifles.carried(self).size() if not Trifles.carried(self).is_empty() else ""]
+	elif s.kind == "leap":
+		t += "  (%d/%d)" % [mini(step_leap, int(s.n)), int(s.n)]
 	elif s.kind == "fit":
 		t += "  (%d/%d)" % [mini(step_fit, int(s.n)), int(s.n)]
 	elif s.kind == "haul":

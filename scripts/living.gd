@@ -77,20 +77,20 @@ const LINES := {
 	"start": [
 		"I am putting by for {goal}. {price} coppers. I have {saved}. Do not do the sum for me, %s, I have done it.",
 		"{wage} coppers today, and {keep} of them eaten before dark. What is left goes in the jar for {goal}. The jar is patient.",
-		"{goal}: that is what all this is for. {left} days of it yet, if nobody falls ill and nothing breaks.",
+		"{goal}: that is what all this is for. {left} {days} of it yet, if nobody falls ill and nothing breaks.",
 	],
 	"mid": [
-		"Half of {goal} is in a jar under my bed and the other half is still in other people's purses. {left} days, I make it.",
+		"Half of {goal} is in a jar under my bed and the other half is still in other people's purses. {left} {days}, I make it.",
 		"{saved} coppers of {price}. I count them on the first of the month, and not oftener; it does them no good to be looked at.",
-		"I take {wage} a day now and it costs me {keep} to stand here taking it. The difference is {goal}, in {left} days.",
+		"I take {wage} a day now and it costs me {keep} to stand here taking it. The difference is {goal}, in {left} {days}.",
 	],
 	"near": [
-		"{left} days, %s. {left}! Then {goal} is mine and paid for, and nobody can come and ask for it back.",
+		"{left} {days}, %s. {left}! Then {goal} is mine and paid for, and nobody can come and ask for it back.",
 		"I have gone to look at it twice this week. {goal}. {saved} of {price} coppers. I do not buy tea any more.",
-		"Ask me again in {left} days and I will not be standing here. I will be standing next to {goal}.",
+		"Ask me again in {left} {days} and I will not be standing here. I will be standing next to {goal}.",
 	],
 	"next": [
-		"I bought it, %s: {had}. Paid, all of it, in coppers I earned. Now it is {goal}, and {left} days more.",
+		"I bought it, %s: {had}. Paid, all of it, in coppers I earned. Now it is {goal}, and {left} {days} more.",
 		"{had} is done and paid for. You would think I would sit down. I looked at it for an evening, and then I thought: {goal}.",
 	],
 	"behind": [
@@ -318,7 +318,7 @@ static func line(p: Dictionary, g, n: int = 0) -> String:
 	var pu := purse(p, g)
 	var pool2: Array = LINES[str(pu.stage)]
 	var left := str(pu.left) if int(pu.left) >= 0 else "more"
-	return _fill(str(pool2[(s + n) % pool2.size()]), {"goal": pu.goal, "left": left, "saved": pu.saved, "price": pu.price, "wage": pu.wage, "keep": pu.keep, "had": pu.had})
+	return _fill(str(pool2[(s + n) % pool2.size()]), {"goal": pu.goal, "days": "day" if int(pu.left) == 1 else "days", "left": left, "saved": pu.saved, "price": pu.price, "wage": pu.wage, "keep": pu.keep, "had": pu.had})
 
 ## What is written under their name when he faces them.
 static func tag(p: Dictionary, g) -> String:

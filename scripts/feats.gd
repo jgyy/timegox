@@ -65,7 +65,12 @@ const FEATS := {
 	"looked_up": {"n": "She Was on the Bridge", "kind": "road", "pts": 10, "test": ["step", "s_p32_flood"], "desc": "Get a man who kept an hour to look up and see who came."},
 	"both_halves": {"n": "On One Cloth", "kind": "road", "pts": 10, "test": ["step", "s_p32_mirror"], "desc": "Say what is done with a mirror when both halves are found and no longer meet."},
 	# the Iron Pestle release: the last realm, the stair, the library and the needle (Part XXXIII)
-	"practised_hand": {"n": "The Top Step, Again", "kind": "road", "pts": 20, "test": ["level", 114], "desc": "Reach Practised Hand: the last realm there is."},
+	"practised_hand": {"n": "The Top Step, Again", "kind": "road", "pts": 20, "test": ["level", 114], "desc": "Reach Practised Hand."},
+	# the Unpicked Road release: the last realm, the find, the bell and the belts (Part XXXIV); and the small things
+	"sleeves_of_wind": {"n": "Nothing in Either Sleeve", "kind": "road", "pts": 20, "test": ["level", 117], "desc": "Reach Sleeves of Wind: the last realm there is."},
+	"whose_is_it": {"n": "Whose Is It?", "kind": "road", "pts": 10, "test": ["step", "s_p34_find"], "desc": "Ask a hill of gold the question a weaver asked her husband."},
+	"heard_out": {"n": "Heard Out", "kind": "road", "pts": 10, "test": ["step", "s_p34_ears"], "desc": "Take a bell's hands off its ears."},
+	"until_morning": {"n": "Until Morning", "kind": "road", "pts": 10, "test": ["step", "s_p34_belts"], "desc": "Answer a poor scholar who asked what is right when the gate shuts."},
 	"same_length": {"n": "No Shorter by One", "kind": "road", "pts": 10, "test": ["step", "s_p33_way"], "desc": "Find out how long the quick way up a mountain is."},
 	"by_the_door": {"n": "By the Door, with a Lamp", "kind": "road", "pts": 10, "test": ["step", "s_p33_shelf"], "desc": "Get a reader let into a library that had never had one."},
 	"told_true": {"n": "Tell Me True", "kind": "road", "pts": 10, "test": ["step", "s_p33_needle"], "desc": "Answer a boy who asked whether it would ever be a needle."},

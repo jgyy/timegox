@@ -242,7 +242,7 @@ static func options(g, wd: Dictionary, e: Dictionary) -> Array:
 		return []
 	var out: Array = []
 	var here := at(g, spot)
-	if here != "":
+	if here != "" and not str(g.placed[spot]).ends_with("|fit"):
 		out.append({"id": "fit:take", "label": "Take up the %s" % str(THINGS[here].n).to_lower(), "desc": "It was set down here. It can be taken up again and put somewhere it belongs.", "enabled": true})
 		return out
 	var w := want(wd, hk)
@@ -286,6 +286,9 @@ static func set_down(g, wd: Dictionary, e: Dictionary, tid: String) -> Dictionar
 	if not w.is_empty() and str(w.spot) == spot and str(w.thing) == tid and not is_fitted(g, hk):
 		g.fitted[hk] = int(g.day)
 		g.step_fit += 1
+		# (the Unpicked Road release: the thing that put a house to rights stays in it; one lamp used to be
+		# taken up again and put every house of a town to rights in turn)
+		g.placed[spot] = "%s|fit" % tid
 		var st := thanks(g)
 		g.stones += st
 		g.note("Put %s's house to rights: %s" % [who, str(THINGS[tid].n).to_lower()])
@@ -298,7 +301,7 @@ static func set_down(g, wd: Dictionary, e: Dictionary, tid: String) -> Dictionar
 ## was seen to; they will have moved it themselves by now).
 static func take_up(g, spot: String) -> String:
 	var here := at(g, spot)
-	if here == "":
+	if here == "" or str(g.placed[spot]).ends_with("|fit"):
 		return ""
 	if str(g.placed[spot]).ends_with("|-1"):
 		g.misplaced = maxi(0, int(g.misplaced) - 1)
