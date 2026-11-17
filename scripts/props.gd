@@ -899,6 +899,10 @@ static func held(what: String) -> Node3D:
 	var tool := Burden.held(what)
 	if tool != null:
 		return tool
+	# (the Small Fish release: the cook's things, the basket and the spade, kitchen.gd)
+	tool = Kitchen.held(what)
+	if tool != null:
+		return tool
 	var more := Structures.held(what)
 	if more != null:
 		return more

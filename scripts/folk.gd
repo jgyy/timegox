@@ -1174,6 +1174,12 @@ const ERRANDS := {
 			"Three. I cried, and my mother said: good, now we know. She was right. I have never once lain awake wondering whether I am secretly a genius. You would be surprised how many of the others do. It leaves a great deal of the night for sleeping.",
 			"I do not know, Senior. I had the registrar seal the line. He thought I was mad. I was fourteen and I thought: if it is high I shall be lazy and if it is low I shall be sad, and either way I shall not be holding my sword. So I asked not to be told.",
 			"Four. Low and muddy. I was kept because there was a bed. I have been the slowest in my year for six years, and last month I was asked to drill the first-years, because, the instructor said, I am the only one who remembers what it was like not to know."]},
+	# Part XXXVI (the Small Fish release): what is thrown back, asked of those who fish the same water next year
+	"s_p36_fishers": {"ask": "A pond in the Crimson Marsh was drained in the spring for a wedding, and every fish in it taken in an afternoon. You fish this river every day of your life. What do you throw back, and why?", "price": 0, "town": "longmen", "toast": "%s has said what goes back in the river",
+		"lines": ["Anything shorter than the mark on the gunwale. My grandfather cut that mark. I have never asked why it is there and not a finger along. I only know the river has had fish in it for three of us now, and I am not the one who is going to find out.",
+			"The big hens, in the spawn. You can feel it in the weight of them, like a full purse. It hurts, cultivator, I will not say it does not; that is the best fish on the line. I put her back and say: I shall have your children. And I do. I have had them for thirty years.",
+			"Half. No rule to it. When the boat is half full I go in, whatever is running. The young ones call me soft. They fish to the gunwale and sell cheap, because so does everybody that day. I sell half as many for near the same, and I am home for supper.",
+			"I threw nothing back, once. A whole summer. I had a debt. The next year my reach of the river had nothing in it but weed, and I fished my neighbour's reach on his kindness and paid the debt twice. Now I throw back the first fish of every day. It is only one. It reminds my hand."]},
 	"s_p33_smiths": {"ask": "A boy at a school has asked how long a thing takes before it is one's own. You have stood at an anvil most of your life. How many years was it, before the hammer was yours?", "price": 0, "town": "tushan", "toast": "%s has said how long it was",
 		"lines": ["Seven. I can tell you the day. I struck, and did not think about striking, and the iron went where I was looking. I stood there like a fool. My master did not even turn round. He said: there. Now you may begin.",
 			"Eleven years, and I was not slow. The first three you learn what the hammer weighs. The next three, what the iron wants. After that it is only the same blow, until one morning it is yours. Nobody can give you the morning.",
@@ -1505,6 +1511,8 @@ const POSTS := {
 	# Part XXXIV (the Unpicked Road release)
 	# Part XXXV (the Uncarved Block release)
 	"zeng_shen": ["sweep|think|count", "broom", "doze"], "fang_zhongyong": ["hoe|dig|gather", "hoe", "doze"], "carpenter_shi": ["measure|carve|gaze", "", "gaze"], "bian_he": ["gaze|think|pray", "", "doze"],
+	# Part XXXVI (the Small Fish release)
+	"yong_ji": ["count|think|write", "", "doze"], "song_younger": ["hoe|gaze|think", "hoe", "doze"], "old_qi": ["gaze|count|think", "", "doze"],
 	"yangzi_wife": ["weave|sew|spin", "", "weave"], "yang_zhen": ["read|write|gaze", "", "read"], "bell_thief": ["peer|knock|gaze", "", "doze"], "pei_du": ["gaze|count|read", "", "gaze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }

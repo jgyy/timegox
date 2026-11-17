@@ -268,6 +268,15 @@ const MARKS := {
 		"bury": {"area": "mountain", "m": ["teststone", "down"], "n": "The Stone on Its Face", "desc": "A grey stone as long as a child, lying face down in the grass beside the mountain path, with moss on its back and the turf worn bare on one side where people sit to tie their sandals. It was a testing stone, and stood upright. Nothing is cut on the side that shows. Whatever it has to say, it is saying to the ground.",
 			"who": ["Old Gardener Kang", "folk_grandpa", Color("8a8a7a"), "They wanted it taken to the treasury. I said leave it where it fell; I shall weed round it. I have weeded round worse. It never told me anything, you know. I was let in to carry slops, sixty years ago, and nobody thought to lay my hand on it. So I have nothing against it and nothing for it.", "A girl asked me what is under it. I said: the side with the answer on. She tried to lift it. Could not. She has gone off to get stronger. I thought that was a better use of a stone than the one it had before, and I told the Elder so, and he laughed until he had to sit on it."]},
 	},
+	# Part XXXVI (the Small Fish release): what the sect did with hands that had outgrown its mountain
+	"the_ladle": {
+		"bind": {"area": "mountain", "m": ["lighthand", "stone"], "k": 3, "n": "The Stones of the Light Hand", "desc": "A grey stone, waist high, at the side of the mountain path, with an open hand cut on it, the fingers together. There is one wherever a path crosses the boundary of the mountain. Under the hand, three lines: inside these stones nobody strikes harder than a felling stroke. The moss has been kept off the hand and let grow on the rest.",
+			"who": ["Boundary-Keeper Ning", "folk_maiden", Color("7a8a9a"), "I split the practice yard, Senior. Everybody knows. So I asked for this: I walk the stones each morning and clear the moss off the hands. Nobody set me to it. I find I draw better afterward, and I cannot tell you why that should be.", "A boy from the Vermilion Sect laughed at them last week. A rule, he said, for people who can part hills. I said yes. He asked what happens if he breaks it. I said: I do not know; nobody has. He went away quite thoughtful.", "The Elder slows down when he passes one. I have seen him. He thinks nobody sees."]},
+		"teach": {"area": "mountain", "m": ["lighthand", "hearth"], "k": 3, "n": "The Small Fires of the Outer Court", "desc": "Three stones in a ring on a ledge beside the mountain path, black on their inner faces, with a small iron pot upside down over them to keep the rain out. There are several along the way up. A disciple who has outgrown a form comes out here alone with one carp, and does not go back up until it has come out of the pot whole.",
+			"who": ["Kitchen-Sister Ning", "folk_maiden", Color("a86a4a"), "Eleven I broke, Senior. The twelfth came out whole and I cried in it. Now Auntie has me out here watching the others break theirs. I am not to say anything. That is the whole of what I am taught to do: stand here, and not say anything.", "A second-year asked me the trick. I told him there is none. He said there must be, a way of turning it. I said: there is a way of not turning it. He has broken six since. I think he is still looking for the way of turning it.", "You would not think a fish could be loud. A fish coming apart in a pot, when it is your fish, is the loudest thing on this mountain."]},
+		"ground": {"area": "mountain", "m": ["lighthand", "waste"], "k": 3, "n": "The Breaking Ground", "desc": "A boulder as big as a cart, split clean in two, with the halves fallen a pace apart and a stump beside it cut off at the knee. Past it the path goes on into a valley where nothing stands. A rope hangs across the way with a bell on it, and a board: strike with all of it. Once is usual. Ring when you come out.",
+			"who": ["Bell-Warden Ning", "folk_maiden", Color("6a6a72"), "I keep the rope, Senior. I was the first in. They ask me what it is like, the ones waiting, and I tell them the truth: you find out a number. It is your number. It was always your number. After that you are careful, the way you are careful of a full cup.", "A master of the Vermilion Sect went in yesterday, very grand. He was in there until the lamps were lit. When he came out he rang the bell himself, quite gently, and asked me whether there was anywhere he could sit down.", "Nothing grows in there now. I mind that more than I thought I should. I have asked the Elder whether I may plant one pine at the mouth, on this side of the rope."]},
+	},
 	# Part XXVIII (the Answering Land release): what is owed for a kindness
 	"the_knot": {
 		"nothing": {"area": "fusang", "m": ["cairn", STRAW], "n": "The Cairn Where He Put It Down", "desc": "A small cairn in the long grass of the Valley of Sunrise, and round it a patch where every stem stands straight and none is tied. On the top stone somebody has left a single knot of grass, undone, the stems smoothed flat with a thumb.",
@@ -407,7 +416,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -855,6 +864,50 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"lighthand":
+			# what was made of hands that had outgrown the mountain (the Small Fish release): a boundary stone with an
+			# open hand cut on it, a small fire with its pot turned over it, or a split boulder and a rope with a bell
+			match str(a[1]):
+				"stone":
+					b.box(Vector3(0, 0.08, 0), Vector3(0.7, 0.16, 0.5), MB.tag(STONE_DARK, MB.STONE))
+					b.box(Vector3(0, 0.62, 0), Vector3(0.5 + 0.04 * (i % 2), 0.95, 0.26), st, Vector3(0, 0.08 * (i % 3 - 1), 0.02))
+					b.sph(Vector3(0, 1.1, 0), Vector3(0.27, 0.1, 0.14), st)
+					# the open hand, fingers together
+					b.box(Vector3(0, 0.74, 0.135), Vector3(0.17, 0.2, 0.012), MB.tag(STONE_DARK.darkened(0.25), MB.STONE))
+					for f36 in 4:
+						b.box(Vector3(-0.063 + 0.042 * f36, 0.92 - 0.012 * absf(float(f36) - 1.5), 0.135), Vector3(0.034, 0.17, 0.012), MB.tag(STONE_DARK.darkened(0.25), MB.STONE))
+					b.box(Vector3(-0.11, 0.76, 0.135), Vector3(0.034, 0.12, 0.012), MB.tag(STONE_DARK.darkened(0.25), MB.STONE), Vector3(0, 0, 0.5))
+					for l36 in 3:
+						b.box(Vector3(0, 0.5 - 0.07 * l36, 0.135), Vector3(0.34 - 0.04 * l36, 0.018, 0.008), MB.tag(STONE_DARK.darkened(0.2), MB.STONE))
+					b.sph(Vector3(0.12, 0.25, 0.1), Vector3(0.2, 0.12, 0.08), MB.tag(Color("5a7a4a"), MB.FOLIAGE))
+				"hearth":
+					for h36 in 3:
+						var ha := TAU * float(h36) / 3.0 + 0.4 + 0.3 * float(i)
+						b.sph(Vector3(cos(ha) * 0.32, 0.12, sin(ha) * 0.32), Vector3(0.16, 0.14, 0.13), st, Vector3(0, ha, 0.2))
+						b.sph(Vector3(cos(ha) * 0.24, 0.12, sin(ha) * 0.24), Vector3(0.08, 0.1, 0.1), MB.tag(Color("1c1a18"), MB.STONE), Vector3(0, ha, 0.2))
+					b.disc(Vector3(0, 0.015, 0), 0.5, MB.tag(Color("3a3632"), MB.STONE), 12, MB.tag(Color("5a544c"), MB.STONE))
+					# the pot turned over the stones to keep the rain out
+					b.lathe(Vector3(0, 0.2, 0), [Vector2(0.27, 0.0), Vector2(0.3, 0.1), Vector2(0.28, 0.24), Vector2(0.18, 0.34), Vector2(0.06, 0.37), Vector2(0.0, 0.37)], MB.tag(Color("2a2c30"), MB.METAL), 14)
+					for h36 in 3:
+						var hb := TAU * float(h36) / 3.0
+						b.cyl(Vector3(cos(hb) * 0.16, 0.6, sin(hb) * 0.16), 0.025, 0.07, MB.tag(Color("2a2c30"), MB.METAL), Vector3.ZERO, 6)
+					_stick(b, Vector3(0.55, 0.03, 0.2), Vector3(0.75, 0.03, -0.3), 0.03, wd)
+					_stick(b, Vector3(0.62, 0.08, 0.15), Vector3(0.8, 0.06, -0.25), 0.025, w)
+				_:
+					# a boulder split clean in two, a stump, and a rope across the way with a bell on it
+					for s36 in [-1.0, 1.0]:
+						b.sph(Vector3(s36 * 0.62, 0.55, 0), Vector3(0.6, 0.62, 0.7), st, Vector3(0, 0.2 * s36, 0.12 * s36))
+						b.box(Vector3(s36 * 0.2, 0.55, 0), Vector3(0.05, 0.95, 1.1), MB.tag(STONE_DARK.lightened(0.25), MB.STONE), Vector3(0, 0.2 * s36, 0.12 * s36))
+					b.cyl(Vector3(1.5, 0.22, 0.6), 0.2, 0.44, wd, Vector3.ZERO, 10)
+					b.disc(Vector3(1.5, 0.445, 0.6), 0.19, MB.tag(Color("d8b888"), MB.WOOD), 10)
+					for s36 in [-1.0, 1.0]:
+						_stick(b, Vector3(s36 * 1.6, 0.0, -1.0), Vector3(s36 * 1.6, 1.2, -1.0), 0.05, wd)
+					for r36 in 8:
+						var u0 := float(r36) / 8.0
+						var u1 := float(r36 + 1) / 8.0
+						_stick(b, Vector3(-1.6 + 3.2 * u0, 1.15 - 0.3 * sin(u0 * PI), -1.0), Vector3(-1.6 + 3.2 * u1, 1.15 - 0.3 * sin(u1 * PI), -1.0), 0.015, MB.tag(Color("b8a070"), MB.CLOTH))
+					b.lathe(Vector3(0, 0.6, -1.0), [Vector2(0.09, 0.0), Vector2(0.08, 0.12), Vector2(0.03, 0.2), Vector2(0.0, 0.2)], MB.tag(Color("b8862a"), MB.METAL), 8)
+					b.box(Vector3(1.6, 0.8, -0.93), Vector3(0.5, 0.34, 0.03), wp)
 		"teststone":
 			# the testing stone of the sect and what was made of it (the Uncarved Block release): a bench for the slow
 			# with a broom leaned on it, a ledger on a stand under a little roof, or the stone itself on its face

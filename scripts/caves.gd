@@ -98,6 +98,17 @@ const OWN := {
 		"foes": {"pool": [["kept_voice", 73, 74], ["stone_bat", 73, 74], ["drip_wisp", 73, 74]], "n": 8, "vis": "s_p20_karst"}},
 }
 
+## the Small Fish release: a band a later chapter puts in a cave that had its own already (area -> level
+## -> pool, n, vis): stood last of all in `world`, with whatever else of the chapter says `"after": true`,
+## so that the cave's mouth, its things and whoever lived there are where they were.  **Not in OWN**: a
+## cave of OWN is placed first on the land, and every mouth after it would move.
+const LATE := {
+	# Part XXXVI: what was taken too hard out of the land has gone down into it
+	"marsh": {-1: {"pool": [["dry_weir", 120, 120], ["last_net", 120, 120], ["mud_gasper", 120, 120]], "n": 11, "vis": "s_p36_home"}},
+	"millet": {-1: {"pool": [["pulled_shoot", 121, 121], ["helping_hand", 121, 121], ["wilt_noon", 121, 121]], "n": 11, "vis": "s_p36_home"}},
+	"forge": {-1: {"pool": [["gold_glare", 122, 122], ["blind_grasp", 122, 122], ["empty_adit", 122, 122]], "n": 11, "vis": "s_p36_home"}},
+}
+
 ## the things to do in a cave (props.gd), in the order a cave takes them; a cave has `PER_CAVE` of them
 const THINGS := ["ore_vein", "drip_pool", "cave_painting", "glow_shrooms", "crystal", "echo_stone", "squeeze", "stream_bank", "fossil", "dig_spot", "bat_roost", "miner_niche"]
 const PER_CAVE := 5
@@ -486,7 +497,7 @@ static func world(area: String, layer: String, mouth: Vector2i, ents: Array, lev
 	# who and what the story put here
 	var here: Dictionary = Data.AREAS[area]
 	for n in here.get("npcs", []):
-		if int(n.get("cave", 0)) != level:
+		if int(n.get("cave", 0)) != level or n.get("after", false):
 			continue
 		var nt := _take(lay, taken, str(n.get("stand", "any")))
 		if nt.x >= 0:
@@ -494,7 +505,7 @@ static func world(area: String, layer: String, mouth: Vector2i, ents: Array, lev
 	for b in here.get("bosses", []):
 		# (a lord the story stood here in a later release, `"last": true`, is stood after everything
 		# else below, so that nothing that was already in the cave moves for him)
-		if int(b.get("cave", 0)) != level or b.get("last", false):
+		if int(b.get("cave", 0)) != level or b.get("last", false) or b.get("after", false):
 			continue
 		var bt := _take(lay, taken, str(b.get("stand", "deep")))
 		if bt.x >= 0:
@@ -507,7 +518,7 @@ static func world(area: String, layer: String, mouth: Vector2i, ents: Array, lev
 			fents.append({"kind": "ladder", "id": "cave:%s:%d:down" % [area, level], "n": "Down to " + str(sp.lower.n), "pos": dt,
 				"area": area, "layer": id, "to_layer": fid(area, level - 1), "to_tile": Vector2i.ZERO, "open": "", "style": "cave_down", "dir": -1})
 	for pk in here.get("pickups", []):
-		if int(pk.get("cave", 0)) != level:
+		if int(pk.get("cave", 0)) != level or pk.get("after", false):
 			continue
 		var pt := _take(lay, taken, str(pk.get("stand", "any")))
 		if pt.x >= 0:
@@ -574,11 +585,45 @@ static func world(area: String, layer: String, mouth: Vector2i, ents: Array, lev
 			fents.append({"kind": "enemy", "id": "cave:%s:%d:e%d" % [area, level, fi], "pos": ft, "group": group, "vis": [str(foes.get("vis", "")), ""], "area": area, "layer": id, "late": true})
 	# (the Three Burrows release: and the lords who came last, on what ground is left)
 	for b2 in here.get("bosses", []):
-		if int(b2.get("cave", 0)) != level or not b2.get("last", false):
+		if int(b2.get("cave", 0)) != level or not b2.get("last", false) or b2.get("after", false):
 			continue
 		var bt2 := _take(lay, taken, str(b2.get("stand", "deep")))
 		if bt2.x >= 0:
 			fents.append({"kind": "boss", "id": "boss_" + str(b2.id), "enemy": b2.id, "pos": bt2, "lv": b2.lv, "req": b2.req, "vis": b2.get("vis", ["", ""]), "area": area, "layer": id, "late": true})
+	# (the Small Fish release: what a later chapter puts in a cave, `"after": true` on its people, things and
+	# lords and a band in LATE, is stood after everything above: on what ground is left, so that nothing
+	# that was already in the cave moves for it)
+	for n9 in here.get("npcs", []):
+		if int(n9.get("cave", 0)) != level or not n9.get("after", false):
+			continue
+		var nt9 := _take(lay, taken, str(n9.get("stand", "near")))
+		if nt9.x >= 0:
+			fents.append({"kind": "npc", "id": n9.id, "n": n9.n, "pos": nt9, "col": n9.col, "vis": n9.get("vis", ["", ""]), "area": area, "layer": id, "late": true})
+	for pk9 in here.get("pickups", []):
+		if int(pk9.get("cave", 0)) != level or not pk9.get("after", false):
+			continue
+		var pt9 := _take(lay, taken, str(pk9.get("stand", "any")))
+		if pt9.x >= 0:
+			fents.append({"kind": "pickup", "id": pk9.id, "item": pk9.item, "pos": pt9, "vis": pk9.get("vis", ["", ""]), "area": area, "layer": id, "late": true})
+	for b9 in here.get("bosses", []):
+		if int(b9.get("cave", 0)) != level or not b9.get("after", false):
+			continue
+		var bt9 := _take(lay, taken, str(b9.get("stand", "deep")))
+		if bt9.x >= 0:
+			fents.append({"kind": "boss", "id": "boss_" + str(b9.id), "enemy": b9.id, "pos": bt9, "lv": b9.lv, "req": b9.req, "vis": b9.get("vis", ["", ""]), "area": area, "layer": id, "late": true})
+	var late: Dictionary = LATE.get(area, {}).get(level, {})
+	if not late.is_empty():
+		var rng9 := RandomNumberGenerator.new()
+		rng9.seed = int(sp.seed) * 53 + 11
+		for fi9 in int(late.n):
+			var ft9 := _take(lay, taken, "any")
+			if ft9.x < 0:
+				break
+			var group9: Array = []
+			for _g9 in rng9.randi_range(2, 3):
+				var pe9: Array = late.pool[rng9.randi() % (late.pool as Array).size()]
+				group9.append({"id": pe9[0], "lv": rng9.randi_range(int(pe9[1]), int(pe9[2]))})
+			fents.append({"kind": "enemy", "id": "cave:%s:%d:l%d" % [area, level, fi9], "pos": ft9, "group": group9, "vis": [str(late.get("vis", "")), ""], "area": area, "layer": id, "late": true})
 	var owner := PackedByteArray()
 	owner.resize(w * h)
 	return {"layer": id, "kind": "floor", "cave": true, "parent": layer, "up": from_layer, "bld": "cave", "bld_n": str(sp.n), "floor_n": "", "level": level, "area": area,

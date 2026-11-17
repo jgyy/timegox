@@ -482,7 +482,7 @@ static func take(g, wd: Dictionary, t: Dictionary, how: String, seen: Array) -> 
 		"buy":
 			var n := price(g, t)
 			if int(g.stones) < n:
-				return {"ok": false, "lines": ["%s is %d spirit stones, and he has not got them." % [art(kind).capitalize(), n]], "react": {}}
+				return {"ok": false, "lines": ["%s is %d spirit stones, and he has not got them." % [cap(art(kind)), n]], "react": {}}
 			g.stones -= n
 			_pocket(g, wd, t, true)
 			lines.append("Bought: %s, for %d spirit stones" % [art(kind), n])
@@ -491,7 +491,7 @@ static func take(g, wd: Dictionary, t: Dictionary, how: String, seen: Array) -> 
 			_pocket(g, wd, t, false)
 			g.pilfered += 1
 			if seen.is_empty():
-				lines.append("Nobody saw. %s is in his sleeve, and it is still %s's." % [art(kind).capitalize(), str(t.who)])
+				lines.append("Nobody saw. %s is in his sleeve, and it is still %s's." % [cap(art(kind)), str(t.who)])
 			else:
 				var ow := Manners.find(seen, str(t.owner))
 				var deed := "altar" if cls == "altar" else "pilfer"
@@ -858,11 +858,15 @@ static func about(t: Dictionary) -> String:
 	var kind := str(t.kind)
 	match str(t.cls):
 		"ware":
-			return "%s, set out for sale by %s." % [art(kind).capitalize(), str(t.who)]
+			return "%s, set out for sale by %s." % [cap(art(kind)), str(t.who)]
 		"keep":
-			return "%s. It is %s's, and has been left where it is used." % [art(kind).capitalize(), str(t.who)]
+			return "%s. It is %s's, and has been left where it is used." % [cap(art(kind)), str(t.who)]
 		"altar":
-			return "%s. It was laid here for somebody who is not present." % art(kind).capitalize()
+			return "%s. It was laid here for somebody who is not present." % cap(art(kind))
 		"lost":
-			return "%s, lying in the road. Somebody dropped it this morning, and will be looking." % art(kind).capitalize()
-	return "%s. It is nobody's." % art(kind).capitalize()
+			return "%s, lying in the road. Somebody dropped it this morning, and will be looking." % cap(art(kind))
+	return "%s. It is nobody's." % cap(art(kind))
+
+## (the Small Fish release: `capitalize()` gives every word a capital: "A Stick Of Candied Haws")
+static func cap(s: String) -> String:
+	return s.substr(0, 1).to_upper() + s.substr(1)

@@ -126,6 +126,16 @@ const LETTERS := {
 		"lines": ["Senior: nobody has told me what I am, and I have stopped asking. I sweep the eastern stair. Yesterday I sat on the stone to tie my sandal and it was warm on one side, from the sun. I had thought it would feel like something. It felt like a stone. I am writing to tell you that, since you asked for it."]},
 	"jade_cut": {"from": "Bian He", "after": "s_p35_seer", "wait": 2,
 		"lines": ["Cultivator: the king has had it made a disc, and named it for me, which I did not ask. He offered me the two jewellers' posts. I said give them to the man with the chisel. They have carried me home. I sleep. A shepherd's boy has dug up the hill behind my house and found only rock, and I have told him: look twice."]},
+	# ---- Part XXXVI (the Small Fish release): letters from a girl who split a yard, and from a man who has begun to count
+	"ladle_bind": {"from": "Ning of the Inner Court", "needs": ["the_ladle", "bind"], "wait": 1,
+		"lines": ["Senior: I have walked the stones forty mornings. Yesterday I found I had struck a fly off the seventh one with my sleeve and not marked the moss. I stood there quite a while. I had not known my arm could do so little. I thought you would want to be told, since it was your rule."]},
+	"ladle_teach": {"from": "Ning of the Inner Court", "needs": ["the_ladle", "teach"], "wait": 1,
+		"lines": ["Senior: Auntie says I may write now that I have brought out three running. I enclose nothing, because a fish does not post. I am to teach a second-year tomorrow. Auntie says the whole of the teaching is to stand behind him and keep my own hands in my sleeves. I have sewn them shut."]},
+	"ladle_ground": {"from": "Ning of the Inner Court", "needs": ["the_ladle", "ground"], "wait": 1,
+		"lines": ["Senior: the Vermilion Sect has paid for forty of its own to go in, and the Elder says a share of the fee is the finder's. I enclose it. I planted the pine, on our side of the rope. It is a hand high. Everybody who comes out of the valley stops and looks at it for longer than at anything in there."],
+		"gift": {"stones": 420}},
+	"qi_counts": {"from": "Old Qi of the Gold Market", "after": "s_p36_grasper", "wait": 2,
+		"lines": ["Cultivator: the well is shored and has a hand of water in it. I have counted the village: sixty-one, and a dog. Hou finds the veins now and I carry his lamp. He says I am good at it. I asked him how he knows where to stop. He said: you look up, master. I am learning it. It is slow."]},
 	"wen_last": {"from": "Granny Wen the Midwife", "after": "s_p24_riders", "wait": 0,
 		"lines": ["They tell me you lost three times this autumn and came home each time on your own feet. Good. I have caught four hundred children in these hands and every one of them fell down before it walked. I never once thought less of the floor."]},
 	"yue_note": {"from": "Yue Ling", "after": "s_p12_home", "wait": 0,
@@ -254,7 +264,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last", "ladle_bind", "ladle_teach", "ladle_ground", "qi_counts"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

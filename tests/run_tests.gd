@@ -908,7 +908,7 @@ func _init() -> void:
 	check(G2.talents.is_empty() and G2.talent_pts == 0 and G2.abodes.is_empty(), "a new game starts with the root asleep and every cave sealed")
 	G2.free()
 	print("== many roads: trials, crafting, renown, deeds ==")
-	var need_kinds := ["rites", "lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted", "clean", "wild", "step", "restored"]
+	var need_kinds := ["cooked", "light", "rites", "lv", "peak", "temper", "ranks", "item", "give", "stones", "renown", "dao", "standing", "friends", "gates", "fate", "bonds", "heart", "rallied", "cleared", "hearths", "works", "delved", "arms", "summits", "companies", "airs", "falls", "marks", "weal", "households", "creed", "fitted", "clean", "wild", "step", "restored"]
 	var boon_keys := ["foe_hp", "foe_atk", "taken", "assist", "weak_k", "no_heavy", "first"]
 	var kinds_used := {}
 	var dfont2 := ThemeDB.fallback_font
@@ -1019,6 +1019,9 @@ func _init() -> void:
 					"rites":
 						# the Uncarved Block release: Daos whose rite he has performed (rites.gd)
 						ok = ok and int(n[1]) >= 1 and int(n[1]) <= Rites.ORDER.size()
+					"cooked", "light":
+						# the Small Fish release: meals that came out right, blows held back to one thing: a few
+						ok = ok and int(n[1]) >= 1 and int(n[1]) <= 3
 					"households":
 						# the Three Burrows release: households of the hero's own town (hold.gd): no more than
 						# the story has brought there by the trial, nor than a city has
@@ -1199,6 +1202,9 @@ func _init() -> void:
 			# (a hunt in a cave, Part XX, is for what lives in that cave: caves.gd)
 			if st8.has("cave"):
 				band8 = Caves.spec(str(st8.area), int(st8.cave)).get("foes", {})
+				# (the Small Fish release: or for a band a later chapter stood in it last of all)
+				if Caves.LATE.get(str(st8.area), {}).has(int(st8.cave)) and str(st8.id).begins_with("s_p36_"):
+					band8 = Caves.LATE[str(st8.area)][int(st8.cave)]
 			var marching8 := {}
 			for pe8 in band8.get("pool", []):
 				marching8[pe8[0]] = true
@@ -5244,7 +5250,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.uncarved_block.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.light_hand.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -5956,7 +5962,7 @@ func _heavy_road() -> void:
 	LG.free()
 
 	print("== the work of the hands (toil.gd) ==")
-	check(Toil.ORDER.size() == 4 and Toil.WORKS.size() == 4, "four kinds of work: fell, angle, quarry, reap")
+	check(Toil.ORDER.size() == 7 and Toil.WORKS.size() == 7, "seven kinds of work: fell, angle, quarry, reap, and (the Small Fish release) pick, dig, mine")
 	var pap: AnimationPlayer = Assets.instance("characters/lin_feng").get_meta("ap")
 	var yap: AnimationPlayer = Assets.instance("characters/yue_ling").get_meta("ap")
 	var clips_w := {}
@@ -8099,7 +8105,7 @@ func _open_net() -> void:
 	check(Crime.is_child({"kind": "npc", "id": "li_bai", "n": "Li Bai", "asset": "li_bai"}), "nobody draws on a schoolboy")
 	for fid33 in ["practised_hand", "same_length", "by_the_door", "told_true", "parted_whole"]:
 		check(Feats.FEATS.has(fid33), "the feat %s is kept" % fid33)
-	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and str(Feats.FEATS.uncarved_block.desc).contains("last realm"), "only the last realm is called the last")
+	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and str(Feats.FEATS.light_hand.desc).contains("last realm"), "only the last realm is called the last")
 	for src33 in ["Fangyu Shenglan", "Miscellaneous Records of the Western Capital", "Ouyang Xiu", "Book of Jin"]:
 		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src33), "the chapter's tales are told from where they are written: %s" % src33)
 
@@ -8265,17 +8271,17 @@ func _open_net() -> void:
 	check(found34 == 12 + 3 + 4, "everything the chapter stands on the heights found room (%d)" % found34)
 
 	print("== Part XXXV: The Uncarved Block ==")
-	check(Data.REALMS.size() == 41 and Data.REALMS[40] == "Uncarved Block" and Data.MAX_LEVEL == 120 and Data.level_name(120).ends_with("Uncarved Block") and Data.REALM_INFO.size() == 41
+	check(Data.REALMS.size() >= 41 and Data.REALMS[40] == "Uncarved Block" and Data.MAX_LEVEL >= 120 and Data.level_name(120).ends_with("Uncarved Block") and Data.REALM_INFO.size() >= 41
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXV adds the realm of Uncarved Block")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break40" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall33") and msrc.contains("\"s_break39\": \"recall33\"") and Data.DIALOGUE.has("pre:s_break40") and Data.DIALOGUE.has("post:s_break40"),
-		"Part XXXV follows Sleeves of Wind (recall33) and ends the game")
+	check(Data.step_index("s_break40") > 0 and int(Data.STEPS[Data.step_index("s_break40")].to) == 120 and Data.DIALOGUE.has("recall33") and msrc.contains("\"s_break39\": \"recall33\"") and Data.DIALOGUE.has("pre:s_break40") and Data.DIALOGUE.has("post:s_break40"),
+		"Part XXXV follows Sleeves of Wind (recall33)")
 	var p35 := Data.step_index("s_p35_home")
 	var kinds35 := {}
 	var n35 := 0
 	var kills35 := 0
 	var lords35: Array = []
 	var band35 := {"maple": "warband7", "garden": "warband6", "jasper": "warband6"}
-	for i in range(p35, Data.STEPS.size()):
+	for i in range(p35, Data.step_index("s_break40") + 1):
 		var s35: Dictionary = Data.STEPS[i]
 		n35 += 1
 		kinds35[str(s35.kind)] = true
@@ -8355,7 +8361,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["rites", 2], TN35) and not Trials.need_met(["rites", 3], TN35) and Trials.KINDS.has("rite") and Trials.need_text(["rites", 2], TN35).contains("2"), "trials can be passed by the rite")
 	TN35.free()
 	var c35: Dictionary = Echoes.CROSSROADS.get("the_stone", {})
-	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of all")
+	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
 	check((c35.options as Array).size() == 3 and c35.after.size() == 3 and c35.end.size() == 3 and c35.echo.has("s_p35_end") and c35.echo.s_p35_end.size() == 3 and Data.step_index("s_p35_end") > Data.step_index("s_p35_gate"), "the_stone: three answers, each answered, echoed and told at the end")
 	var scales35 := {}
 	for o35 in c35.options:
@@ -8414,6 +8420,363 @@ func _open_net() -> void:
 				# (stood in the last pass of all, after every band and mark: nothing older moves for it, whatever height it shares)
 				check(bool(sp35.get("after", false)), "%s is stood after everything older" % sp35.id)
 	check(found35 == 12 + 3 + 4, "everything the chapter stands on the heights found room (%d)" % found35)
+
+	print("== Part XXXVI: Cooking a Small Fish ==")
+	check(Data.REALMS.size() == 42 and Data.REALMS[41] == "Light Hand" and Data.MAX_LEVEL == 123 and Data.level_name(123).ends_with("Light Hand") and Data.REALM_INFO.size() == 42
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXVI adds the realm of Light Hand")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break41" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall34") and msrc.contains("\"s_break40\": \"recall34\"") and Data.DIALOGUE.has("pre:s_break41") and Data.DIALOGUE.has("post:s_break41"),
+		"Part XXXVI follows Uncarved Block (recall34) and ends the game")
+	var p36 := Data.step_index("s_p36_home")
+	var kinds36 := {}
+	var n36 := 0
+	var kills36 := 0
+	var lords36: Array = []
+	var given36 := {}
+	for i in range(p36, Data.STEPS.size()):
+		var s36: Dictionary = Data.STEPS[i]
+		n36 += 1
+		kinds36[str(s36.kind)] = true
+		check(str(s36.id).begins_with("s_p36_") or str(s36.id) == "s_break41", "%s is a step of the chapter" % s36.id)
+		check(not str(s36.kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % s36.id)
+		check(not s36.has("stones") or int(s36.stones) > 85600, "%s pays as the road has come to pay" % s36.id)
+		if str(s36.kind) == "talk":
+			check(Data.DIALOGUE.has(str(s36.id)), "%s has its conversation" % s36.id)
+		if str(s36.kind) == "kill":
+			lords36.append(str(s36.boss))
+			check(Data.DIALOGUE.has("pre:" + str(s36.boss)) and Data.DIALOGUE.has("post:" + str(s36.boss)) and Trials.TRIALS.has(str(s36.boss)) and Lore.BOSS.has(str(s36.boss)), "%s: words before and after, a trial, and a story" % s36.boss)
+			check(bsrc.contains("\"%s\": \"" % str(s36.boss)) and int(s36.get("cave", 0)) == -1, "the bot has a way planned through %s, down in its cave" % s36.boss)
+		if str(s36.kind) == "hunt":
+			kills36 += int(s36.n)
+			var bnd36: Dictionary = Caves.LATE.get(str(s36.area), {}).get(int(s36.get("cave", 0)), {})
+			var pool36: Array = []
+			for pe36 in bnd36.get("pool", []):
+				pool36.append(str(pe36[0]))
+				check(int(pe36[1]) <= Data.MAX_LEVEL and int(pe36[2]) <= Data.MAX_LEVEL, "%s: nothing in the band is past the last level" % s36.id)
+			for of36 in s36.of:
+				check(pool36.has(str(of36)) and Lore.BEAST.has(str(of36)) and not Data.ENEMIES[str(of36)].get("boss", false) and Tactics.WIT.has(str(Data.ENEMIES[str(of36)].shape)), "%s: %s lives in the region's cave, has a story, and wits" % [s36.id, of36])
+			check(not bnd36.is_empty() and Data.step_index(str(bnd36.vis)) < i and not s36.get("first", false), "%s: the band is in the cave before it is hunted, and nobody asks for the first strike under a roof" % s36.id)
+		if str(s36.kind) in ["hunt", "collect", "folk", "toil", "cook", "sunder"]:
+			check(Data.DIALOGUE.has("done:" + str(s36.id)), "%s: something is said when it is done" % s36.id)
+		for gk36 in s36.get("gives", {}):
+			given36[str(gk36)] = true
+		if str(s36.kind) == "toil":
+			var wk36: Dictionary = Toil.WORKS.get(str(s36.work), {})
+			check(not wk36.is_empty() and int(s36.n) >= 2 and int(s36.n) <= 4 and (given36.has(str(wk36.tool)) or str(wk36.tool) in ["axe", "pick", "sickle", "fishing_rod"]), "%s is work of the hands, with its tool given before" % s36.id)
+			check((str(s36.work) == "mine") == s36.has("cave"), "%s: a vein is in a cave, and nothing else is" % s36.id)
+		if str(s36.kind) == "cook":
+			check(Cooking.RECIPES.has(str(s36.dish)) and given36.has(Cooking.POT) and int(s36.n) == 1 and bsrc.contains("func _cook_step"), "%s is a dish there is, with the pot given before, and the bot can cook it" % s36.id)
+		if str(s36.kind) == "sunder":
+			check(int(s36.n) >= 1 and int(s36.n) <= 12 and bsrc.contains("func _sunder_step") and (not s36.has("max") or int(s36.max) == 1), "%s is a few things broken, or a few blows held back, and the bot can strike them" % s36.id)
+		if str(s36.kind) == "folk":
+			var er36: Dictionary = Folk.ERRANDS.get(str(s36.id), {})
+			check(not er36.is_empty() and (er36.lines as Array).size() >= 4, "%s: an errand with four answers" % s36.id)
+			check(int(Folk.TOWNS[str(s36.town)].roles.get(str(s36.role), 0)) >= int(s36.n) and str(er36.get("town", "")) == str(s36.town), "%s: an errand among people who are there" % s36.id)
+			for el36 in er36.lines:
+				check(fits.call(str(el36)), "%s: what is answered fits the box" % s36.id)
+			check(fits.call(str(er36.ask)), "%s: what is asked fits the box" % s36.id)
+	check(n36 == 31 and kills36 >= 130 and lords36 == ["the_drained", "the_tugger", "the_grasper"] and kinds36.size() >= 8 and kinds36.has("cook") and kinds36.has("sunder") and kinds36.has("toil") and kinds36.has("folk") and kinds36.has("collect"),
+		"the chapter is thirty-one steps of eight kinds, with three lords (%d, %d, %d)" % [n36, kinds36.size(), kills36])
+	# what the story's pots are made of has been gathered by the story's own steps
+	var have36 := {}
+	var short36: Array = []
+	for i in range(p36, Data.STEPS.size()):
+		var s37: Dictionary = Data.STEPS[i]
+		if str(s37.kind) == "toil":
+			var gd36 := Toil.good_of(str(s37.work), s37.has("cave"))
+			# (every third cast of a line misses)
+			have36[gd36] = int(have36.get(gd36, 0)) + (int(s37.n) - int(s37.n) / 3 if str(s37.work) == "angle" else int(s37.n))
+		if str(s37.kind) == "cook":
+			for nk36 in Cooking.RECIPES[str(s37.dish)].needs:
+				have36[str(nk36)] = int(have36.get(str(nk36), 0)) - int(Cooking.RECIPES[str(s37.dish)].needs[nk36])
+				if int(have36[str(nk36)]) < 0:
+					short36.append("%s:%s" % [s37.id, nk36])
+	check(short36.is_empty(), "every pot the story asks for can be filled from what its own steps gathered (short: %s)" % str(short36))
+	var keys36 := ["recall34", "pre:s_break41", "post:s_break41"]
+	for tid36 in lords36:
+		keys36.append("pre:" + str(tid36))
+		keys36.append("post:" + str(tid36))
+	var people36 := ["yong_ji", "song_younger", "old_qi"]
+	var names36 := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan", "Auntie Zhou the Cook"]
+	for pa36 in ["marsh", "millet", "forge"]:
+		for np36 in Data.AREAS[pa36].npcs:
+			if str(np36.id) in people36:
+				names36.append(str(np36.n))
+				check(Assets.has("characters/" + str(np36.asset)) and Closeup.signature(str(np36.n)) != "" and Folk.POSTS.has(str(np36.id)), "%s has a body from a script, a gesture of their own and something to do by day" % np36.id)
+	check(names36.size() == 8, "the three people of the chapter stand in its regions")
+	for dk36 in Data.DIALOGUE:
+		if str(dk36).contains("s_p36_") or str(dk36) in keys36:
+			for ln36 in Data.DIALOGUE[dk36]:
+				check(fits.call(str(ln36[1])) and not str(ln36[1]).contains("—"), "%s: a line that fits the box, with no dash in it" % dk36)
+				check((ln36 as Array).size() == 2 or Data.EMOTES.has(str(ln36[2])), "%s: its gesture is one everybody has" % dk36)
+				check(not str(ln36[1]).contains(", sir") and not str(ln36[1]).contains("young man") and not str(ln36[1]).contains("Sir"), "%s: nobody calls the hero sir" % dk36)
+				check(str(ln36[0]) in names36, "%s: %s is somebody of the chapter, under the name they stand by" % [dk36, ln36[0]])
+	for tid36 in lords36:
+		var tr36: Dictionary = Trials.TRIALS[tid36]
+		var open36 := 0
+		var relic36 := false
+		for pt36 in tr36.paths:
+			check(fits.call(str(pt36.desc)) and fits.call(str(pt36.line)) and Trials.KINDS.has(str(pt36.kind)), "%s/%s: its words fit, and its way has a name" % [tid36, pt36.id])
+			if not str(pt36.kind) in ["clean", "wild", "creed"]:
+				open36 += 1
+			relic36 = relic36 or str(pt36.kind) == "relic"
+			for nd36 in pt36.needs:
+				if str(nd36[0]) == "step":
+					check(Data.step_index(str(nd36[1])) >= p36 and Data.step_index(str(nd36[1])) < _kill_step(tid36), "%s/%s: what it is shown has been done before it is met" % [tid36, pt36.id])
+				if str(nd36[0]) == "lv":
+					check(int(nd36[1]) < Data.MAX_LEVEL, "%s/%s: the might asked can be had by then" % [tid36, pt36.id])
+		check((tr36.paths as Array).size() == 4 and open36 >= 2 and relic36 and fits.call(str(tr36.why)) and Data.ENEMIES[tid36].get("boss", false) and Trials.trial_of_step(Data.STEPS[_kill_step(tid36)]) == tid36, "%s is a lord of the chapter with four ways through, two of them open to a wanted man" % tid36)
+	for pr36 in [["the_drained", "last_scale", "s_p36_scales"], ["the_tugger", "pulled_ear", "s_p36_ears"], ["the_grasper", "blind_coin", "s_p36_coins"]]:
+		check(Data.step_index(str(pr36[2])) < _kill_step(str(pr36[0])) and Data.ITEMS.has(str(pr36[1])) and Look.PICKUP_COLORS.has(str(pr36[1])) and Load.weight_of(str(pr36[1])) <= 1.0, "%s can be passed by what was found on the way" % pr36[0])
+	var TN36 = new_game.call()
+	TN36.cooked_good = 2
+	TN36.sunder_light = 3
+	check(Trials.need_met(["cooked", 2], TN36) and not Trials.need_met(["cooked", 3], TN36) and Trials.need_met(["light", 3], TN36) and not Trials.need_met(["light", 4], TN36) and Trials.KINDS.has("pot") and Trials.KINDS.has("light") and Trials.need_text(["cooked", 2], TN36).contains("2"), "trials can be passed by the pot and by the light hand")
+	TN36.free()
+	var c36: Dictionary = Echoes.CROSSROADS.get("the_ladle", {})
+	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of all")
+	check((c36.options as Array).size() == 3 and c36.after.size() == 3 and c36.end.size() == 3 and c36.echo.has("s_p36_end") and c36.echo.s_p36_end.size() == 3 and Data.step_index("s_p36_end") > Data.step_index("s_p36_table"), "the_ladle: three answers, each answered, echoed and told at the end")
+	var scales36 := {}
+	for o36 in c36.options:
+		var mk36: Dictionary = Marks.MARKS.the_ladle.get(str(o36.id), {})
+		check(not mk36.is_empty() and mk36.has("who") and fits.call(str(mk36.desc)) and fits.call(str(mk36.who[3])) and fits.call(str(mk36.who[4])) and Assets.has("characters/" + str(mk36.who[1])) and Voice.WOMEN.has(str(mk36.who[0])), "the_ladle/%s leaves something standing, and somebody by it" % o36.id)
+		check(not Weal.hears(str(mk36.area)).is_empty() and int(mk36.get("k", 1)) >= 3, "the_ladle/%s is a row of things, felt in a town" % o36.id)
+		var mm36: Node3D = Marks.model(mk36, 0)
+		check(mm36 != null and mm36.get_child_count() > 0, "the_ladle/%s: what stands is built from code" % o36.id)
+		mm36.free()
+		for tk36 in o36.tilt:
+			scales36[str(tk36)] = true
+		for ck36 in o36.get("creed", {}):
+			check(Creed.AXES.has(str(ck36)) and absi(int(o36.creed[ck36])) < Creed.SIDE, "the_ladle/%s leans on the Way, and does not by itself decide it" % o36.id)
+		check(fits.call(str(o36.desc)), "the_ladle/%s: what it means fits" % o36.id)
+		for al36 in c36.after[str(o36.id)]:
+			check(fits.call(str(al36[1])) and ((al36 as Array).size() == 2 or Data.EMOTES.has(str(al36[2]))) and str(al36[0]) in names36, "the_ladle/%s: what follows fits the dialogue box" % o36.id)
+		check(fits.call(str(c36.echo.s_p36_end[str(o36.id)][0][1])) and fits.call(str(c36.end[str(o36.id)])), "the_ladle/%s: its echo and its ending fit" % o36.id)
+		var lid36 := "ladle_" + str(o36.id)
+		check(Mail.LETTERS.has(lid36) and Mail.ORDER.has(lid36) and fits.call(str(Mail.LETTERS[lid36].lines[0])), "the_ladle/%s: somebody who lives with it writes" % o36.id)
+		check(Data.step_index(Mail.after_of(lid36)) + int(Mail.LETTERS[lid36].get("wait", Mail.WAIT)) < Data.STEPS.size() - 1, "the letter %s can arrive before the story ends" % lid36)
+	check(scales36.size() == 3 and Marks.AFTER_BANDS.has("the_ladle") and Mail.LETTERS.has("qi_counts") and Mail.ORDER.has("qi_counts") and fits.call(str(Mail.LETTERS.qi_counts.lines[0])), "its answers tip all three scales, its marks are stood after the late bands, and a man who has begun to count writes")
+	var fates36 := 0
+	for ft36 in Weal.FATES:
+		if str(ft36.when[0]) == "the_ladle":
+			fates36 += 1
+			check(fits.call(str(ft36.line)) and str(ft36.npc) == "cook_zhou", "a fate of the_ladle fits the box")
+	check(fates36 == 3 and bsrc.contains("\"the_ladle\": [\"teach\"]"), "the cook's days turn on each answer, and the bot has one")
+	var old_echo36 := 0
+	for cid36 in Echoes.ORDER:
+		if cid36 != "the_ladle":
+			for ek36 in Echoes.CROSSROADS[cid36].get("echo", {}):
+				if str(ek36).contains("s_p36_"):
+					old_echo36 += 1
+					check(Data.DIALOGUE.has(str(ek36)) and Data.step_index(str(ek36)) > Data.step_index(str(Echoes.CROSSROADS[cid36].step)) and Echoes.CROSSROADS[cid36].echo[ek36].size() >= 3, "%s echoes in a later conversation of the chapter, whatever was answered" % cid36)
+					for ea36 in Echoes.CROSSROADS[cid36].echo[ek36]:
+						check(fits.call(str(Echoes.CROSSROADS[cid36].echo[ek36][ea36][0][1])), "%s/%s: its echo fits the box" % [cid36, ea36])
+	check(old_echo36 >= 1, "an older crossroads echoes in Part XXXVI (%d)" % old_echo36)
+	# everything of the chapter is stood in a cave, last of all: nothing on the land moves, and nothing older in the cave
+	var found36 := 0
+	for a36 in ["marsh", "millet", "forge"]:
+		check(not Caves.OWN.has(a36) and Caves.LATE.has(a36), "%s: the chapter's band is in LATE, not OWN (a cave of OWN is placed first, and every mouth after it moves)" % a36)
+		var cw36: Dictionary = Atlas.world_of(Caves.fid(a36, -1))
+		var packs36 := 0
+		var last_old36 := -1
+		var first_new36 := 1 << 30
+		for ei36 in (cw36.ents as Array).size():
+			var e36: Dictionary = cw36.ents[ei36]
+			var new36: bool = (e36.kind == "enemy" and str(e36.id).contains(":l")) or (e36.kind == "pickup" and str(e36.id).begins_with("p36_")) or (e36.kind == "boss" and str(e36.enemy) in lords36) or (e36.kind == "npc" and str(e36.id) in people36)
+			if new36:
+				first_new36 = mini(first_new36, ei36)
+				found36 += 1
+				if e36.kind == "enemy":
+					packs36 += 1
+				check(MapGen.is_walkable_tile(cw36.grid[e36.pos.y * int(cw36.w) + e36.pos.x]), "%s stands on the floor of its cave" % e36.id)
+			else:
+				last_old36 = ei36
+		check(packs36 >= 9 and first_new36 > last_old36, "%s: the band found room (%d of %d packs), after everything that was in the cave already" % [a36, packs36, int(Caves.LATE[a36][-1].n)])
+		for sp36 in Data.AREAS[a36].get("npcs", []) + Data.AREAS[a36].get("bosses", []) + Data.AREAS[a36].get("pickups", []):
+			if str(sp36.get("vis", ["", ""])[0]).begins_with("s_p36_"):
+				check(bool(sp36.get("late", false)) and int(sp36.get("cave", 0)) == -1 and bool(sp36.get("after", false)) and not sp36.has("peak"), "%s is written in the cave, to be stood after everything older" % sp36.id)
+		var sw36: Dictionary = Atlas.world_of(Data.layer_of(a36))
+		for e39 in sw36.ents:
+			check(not (str(e39.get("id", "")).begins_with("p36_") or str(e39.get("enemy", "")) in lords36 or str(e39.get("id", "")) in people36), "nothing of the chapter stands on the land of %s" % a36)
+	check(found36 >= 3 * (9 + 4 + 1 + 1), "everything the chapter stands in the three caves found room (%d)" % found36)
+
+	print("== the weight of a blow (sunder.gd, the Small Fish release) ==")
+	check(Sunder.RANKS.size() == 7 and Sunder.REALM_AT.size() == 7 and Sunder.ORDER.size() == Sunder.KINDS.size(), "seven weights of a blow, four things that can be done to a tile")
+	var r1_36 := {}
+	for dt36 in Sunder.reach(Vector2i(0, 1), 1):
+		r1_36[dt36] = true
+	var same36 := r1_36.size() == Impact.reach(Vector2i(0, 1)).size()
+	for dt37 in Impact.reach(Vector2i(0, 1)):
+		same36 = same36 and r1_36.has(dt37)
+	check(same36 and Sunder.reach(Vector2i(1, 0), 0) == [Vector2i(1, 0)], "the edge of a blade reaches what the sword always reached, and a single cut one tile")
+	for rk36 in range(1, Sunder.RANKS.size()):
+		check(Sunder.reach(Vector2i(0, 1), rk36).size() > Sunder.reach(Vector2i(0, 1), rk36 - 1).size() and int(Sunder.REALM_AT[rk36]) >= int(Sunder.REALM_AT[rk36 - 1]) and str(Sunder.RANKS[rk36].n) != str(Sunder.RANKS[rk36 - 1].n), "a heavier blow reaches further, and is reached later: %s" % Sunder.RANKS[rk36].n)
+	var SU36 = new_game.call()
+	SU36.level = 0
+	check(Sunder.might(SU36) == 1 and Sunder.rank(SU36) == 1, "at Qi Condensation his blow is the edge of a blade")
+	SU36.level = 3 * 3
+	check(Sunder.might(SU36) == 4, "at Nascent Soul the stone breaks and the ground cracks")
+	SU36.level = Data.MAX_LEVEL
+	check(Sunder.might(SU36) == 6 and Sunder.rank(SU36) == 6 and bool(Sunder.RANKS[6].crater), "at the last realm a blow in earnest parts a wood and leaves a hollow")
+	var cyc36: Array = []
+	for _c36 in 8:
+		Sunder.cycle(SU36)
+		cyc36.append(Sunder.rank(SU36))
+	check(cyc36 == [5, 4, 3, 2, 1, 0, 6, 5] and Sunder.text(SU36).contains("held back"), "H holds the hand back a weight at a time, down to a single cut, and round to all he has (%s)" % str(cyc36))
+	var sw37: Dictionary = Atlas.world_of("surface")
+	var edge36 := Vector2i(-1, -1)
+	var edir36 := Vector2i.ZERO
+	var W36 := int(sw37.w)
+	for ty36 in range(4, int(sw37.h) - 4):
+		for tx36 in range(4, W36 - 4):
+			if edge36.x >= 0:
+				break
+			var here36 := Vector2i(tx36, ty36)
+			if sw37.grid[ty36 * W36 + tx36] != MapGen.FLOOR or Atlas.owner_id(sw37, here36) != "mountain":
+				continue
+			for d36 in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]:
+				if sw37.grid[(ty36 + d36.y) * W36 + tx36 + d36.x] == MapGen.WALL and sw37.grid[(ty36 + d36.y * 2) * W36 + tx36 + d36.x * 2] == MapGen.WALL:
+					edge36 = here36
+					edir36 = d36
+	check(edge36.x >= 0, "there is a forest's edge on the mountain to strike at")
+	SU36.step = Data.step_index("s_p36_light")
+	SU36.hand = 0
+	SU36.day = 5
+	var grid36: PackedByteArray = (sw37.grid as PackedByteArray).duplicate()
+	var b36: Dictionary = Sunder.blow(SU36, "surface", sw37, edge36, edir36)
+	check(int(b36.n) == 1 and int(b36.rank) == 0 and str(b36.tiles[0][1]) == "tree" and Sunder.scar(SU36, "surface", edge36 + edir36) == "tree" and SU36.sunder_light == 1 and SU36.step_sunder == 1 and Sunder.told(b36) != "", "a single cut fells one thing and nothing behind it, and the step that asks for a held hand hears of it")
+	check(int(Sunder.blow(SU36, "surface", sw37, edge36, edir36).n) == 0 and SU36.step_sunder == 1, "what lies broken is not broken again")
+	SU36.hand = -1
+	var b37: Dictionary = Sunder.blow(SU36, "surface", sw37, edge36, edir36)
+	check(int(b37.n) >= 2 and int(b37.rank) == 6 and SU36.step_sunder == 1 and SU36.sunder_light == 1, "a blow in earnest breaks more than one thing (%d), and is not a held hand" % int(b37.n))
+	check(grid36 == sw37.grid, "no tile of the land is changed by any of it: a felled wood is still a wood nobody walks through")
+	SU36.step = Data.step_index("s_p36_wood")
+	SU36.step_sunder = 0
+	SU36.day = 9
+	check(Sunder.scar(SU36, "surface", edge36 + edir36) == "", "a felled tree has mended by the next day but one")
+	var b38: Dictionary = Sunder.blow(SU36, "surface", sw37, edge36, edir36)
+	check((SU36.step_sunder == int(b38.n) or SU36.step > Data.step_index("s_p36_wood")) and int(b38.n) >= 2 and Sunder.total(SU36) >= 3, "the step that asks for things broken counts things")
+	for kd36 in Sunder.ORDER:
+		var sm36: Node3D = Sunder.model(kd36, 7, Color("8a7a5a"))
+		check(sm36 != null and int(Sunder.KINDS[kd36].mend) >= 1 and int(Sunder.KINDS[kd36].mend) <= 5, "%s mends in a few days, and what is drawn of it is built from code" % kd36)
+		sm36.free()
+	check(Sunder.what(sw37, Vector2i(0, 0), Atlas.to_world("sect", Vector2i(20, 8)), 6) == "", "nothing is broken in the sect's own court")
+	var ssrc := FileAccess.get_file_as_string("res://scripts/sunder.gd")
+	check(not ssrc.contains("rand") or not ssrc.contains("randf()") or ssrc.contains("rng.seed"), "nothing a blow does is thrown for")
+	SU36.free()
+
+	print("== cooking (cooking.gd, kitchen.gd, the Small Fish release) ==")
+	check(Cooking.STAGES.size() == 12 and Cooking.ORDER.size() == Cooking.RECIPES.size() and str(Cooking.STAGES[Cooking.SIMMER].id) == "simmer" and Cooking.total_seconds() >= 40.0, "a meal is twelve things done one after another, and one of them is the simmer")
+	var pap36: AnimationPlayer = Assets.instance("characters/lin_feng").get_meta("ap")
+	var yap36: AnimationPlayer = Assets.instance("characters/yue_ling").get_meta("ap")
+	var cams36 := {}
+	for st36 in Cooking.STAGES:
+		check(pap36.has_animation(str(st36.clip)) and (str(st36.comp) == "watch" or yap36.has_animation(str(st36.comp))) and (str(st36.hold) == "" or Props.held(str(st36.hold)) != null) and str(st36.said).length() > 20, "%s: a clip the party carries, something in the hand, and a line" % st36.id)
+		cams36[str(st36.id)] = true
+	check(cams36.size() == 12, "no two stages are the same thing")
+	for rid36 in Cooking.ORDER:
+		var rc36: Dictionary = Cooking.RECIPES[rid36]
+		check((rc36.lines as Array).size() >= 3 and (rc36.under as Array).size() >= 1 and (rc36.over as Array).size() >= 1 and int(rc36.stir[0]) <= int(rc36.stir[1]) and float(rc36.heal) > 0.0 and float(rc36.heal) <= 1.0, "%s: three lines when it comes out right, and one each way it does not" % rid36)
+		for nk37 in rc36.needs:
+			check(Load.GOODS.has(str(nk37)) and bsrc.contains("\"%s\": \"" % str(nk37)), "%s is made of goods of the land the hands can gather (%s)" % [rid36, nk37])
+		check(Cooking.outcome(rid36, Cooking.ideal(rid36)) == "good" and Cooking.outcome(rid36, int(rc36.stir[1]) + 1) == "over", "%s: turned as it wants it comes out right, and once more it does not" % rid36)
+	check(Cooking.outcome("small_fish", 0) == "good" and Cooking.outcome("small_fish", 1) == "good" and Cooking.outcome("small_fish", 2) == "over" and Cooking.outcome("yam_stew", 0) == "under", "a small fish comes apart at the second poke, and a stew left alone catches")
+	# the pot is physics, and the same every time
+	var cold36: Dictionary = Cooking.pot()
+	for _i36 in 300:
+		cold36 = Cooking.step(cold36, 1.0 / 30.0, {"fire": 1.0, "lid": true})
+	check(is_equal_approx(float(cold36.T), Cooking.AIR) and float(cold36.fire) == 0.0 and int(cold36.hops) == 0, "a fire with no wood under it heats nothing")
+	var pa36b: Dictionary = Cooking.run(1)
+	var pb36: Dictionary = Cooking.run(1)
+	check(pa36b == pb36, "the same pot, cooked the same way, is the same pot")
+	var boil36: Dictionary = Cooking.run(0, 7)
+	var before36: Dictionary = Cooking.run(0, 4)
+	check(float(before36.T) < 80.0 and float(before36.T) > Cooking.AIR and float(before36.water) > 0.0 and not bool(before36.boiled), "water poured into a hot pot is warm, not boiling (%d degrees)" % int(float(before36.T)))
+	check(bool(boil36.boiled) and float(boil36.T) <= 100.0 and int(boil36.hops) >= 2 and float(boil36.wood) < 1.0 and float(boil36.wood) > 0.3, "under the lid it comes to the boil and the lid hops (%d times); water is never hotter than boiling; the wood burns down" % int(boil36.hops))
+	check(float(pa36b.done) >= 1.0 and float(Cooking.run(0, 6).done) < 0.6, "what is in the pot is done by the heat it has had: not when it goes in, and by the end of the simmer")
+	var spin36: Dictionary = Cooking.pot()
+	spin36.wood = 1.0
+	for _i37 in 60:
+		spin36 = Cooking.step(spin36, 1.0 / 30.0, {"fire": 0.5, "stir": 0.8})
+	var top36 := float(spin36.spin)
+	for _i38 in 90:
+		spin36 = Cooking.step(spin36, 1.0 / 30.0, {"fire": 0.5})
+	check(top36 > 3.0 and float(spin36.spin) < top36 * 0.2 and float(spin36.spin) > 0.0 and is_equal_approx(Cooking.dish(top36), top36 * top36 * Cooking.POT_R * Cooking.POT_R / (2.0 * Cooking.G)) and Cooking.dish(0.0) == 0.0,
+		"a stirred pot turns with the ladle, dishes by the square of its speed, and runs down by itself")
+	var lid36b: Dictionary = Cooking.pot()
+	lid36b.lid_v = 1.0
+	var peak36 := 0.0
+	for _i39 in 60:
+		lid36b = Cooking.step(lid36b, 1.0 / 60.0, {})
+		peak36 = maxf(peak36, float(lid36b.lid_y))
+	check(absf(peak36 - 1.0 / (2.0 * Cooking.G)) < 0.012 and float(lid36b.lid_y) == 0.0, "a lid thrown up at a metre a second rises v squared over two g (to a frame's worth) and comes down")
+	check(Kitchen.lob(Vector3(0, 1, 0), Vector3(2, 0.5, 1), 0.5, 0.0).is_equal_approx(Vector3(0, 1, 0)) and Kitchen.lob(Vector3(0, 1, 0), Vector3(2, 0.5, 1), 0.5, 1.0).is_equal_approx(Vector3(2, 0.5, 1)) and Kitchen.lob(Vector3(0, 1, 0), Vector3(2, 1, 0), 0.5, 0.5).y > 1.2,
+		"what is thrown into the pot leaves the hand, arcs, and arrives")
+	var kit36: Node3D = Kitchen.kit(Cooking.RECIPES.yam_stew.needs, Vector3(0, 0, 1), Color.WHITE)
+	var parts36 := true
+	for pn36 in ["logs", "flames", "embers", "light", "pot", "lid", "board", "bowls"]:
+		parts36 = parts36 and kit36.get_node_or_null(pn36) != null
+	check(parts36 and kit36.get_node("pot/water/swirl").get_child_count() == Cooking.pieces_of("yam_stew"), "the fire, the pot, the lid, the board and the bowls are built from code, with a piece for each thing that goes in")
+	var fx36: Dictionary = Kitchen.tick(kit36, Cooking.run(2, 8), 7, 3.0, 10.0, 0.03)
+	check(fx36.has("steam") and (kit36.get_node("pot") as Node3D).visible and (kit36.get_node("pot/water") as Node3D).visible and (kit36.get_node("pot/water/swirl").get_child(0) as Node3D).visible, "at the simmer the pot is on, there is water in it and things in the water")
+	kit36.free()
+	var CK36 = new_game.call()
+	check(Cooking.blocked(CK36, "small_fish").contains("pedlars") and Cooking.ready(CK36).is_empty(), "with no pot nothing is cooked")
+	CK36.inv[Cooking.POT] = 1
+	check(Cooking.missing(CK36, "small_fish").size() == 2 and Cooking.blocked(CK36, "small_fish").contains("wants"), "with a pot and nothing to put in it, he is told what it wants")
+	CK36.inv.carp = 2
+	CK36.inv.herb_bundle = 2
+	CK36.hp[0] = 1.0
+	CK36.step = Data.step_index("s_p36_fish")
+	check(Cooking.ready(CK36).has("small_fish") and Cooking.ready(CK36).has("herb_congee") and not Cooking.ready(CK36).has("yam_stew"), "what he has the makings of is offered")
+	var said36: Array = Cooking.done(CK36, "small_fish", 2)
+	check(said36.size() == 2 and CK36.step_cook == 0 and CK36.cooked_good == 0 and CK36.cooked_n == 1 and int(CK36.inv.carp) == 1 and float(CK36.hp[0]) > 1.0 and float(CK36.hp[0]) < float(CK36.max_hp(0)), "a fish stirred to pieces is eaten, mends half as much, and is not the fish the story asked for")
+	Cooking.done(CK36, "small_fish", 1)
+	check(CK36.step > Data.step_index("s_p36_fish") and CK36.cooked_good == 1 and not CK36.inv.has("carp") and int(CK36.cooked.small_fish) == 2, "a fish brought out whole is, and what went into it is gone")
+	CK36.free()
+	var wsrc36 := FileAccess.get_file_as_string("res://scripts/world.gd")
+	check(wsrc36.contains("func fp_on()") and wsrc36.contains("func toggle_view()") and msrc.contains("KEY_P") and msrc.contains("KEY_B") and msrc.contains("KEY_H") and wsrc36.contains("func cook_why()"), "P looks out of his own eyes, B lays a fire, H holds the hand back")
+	check(not bsrc.contains("toggle_view") and not bsrc.contains("first_person"), "the bot never changes how the land is looked at")
+
+	print("== picking, digging and veins (toil.gd, the Small Fish release) ==")
+	var cave36: Dictionary = Atlas.world_of(Caves.fid("forge", -1))
+	var veins36 := 0
+	var walls36 := 0
+	var reach36 := 0
+	for vy36 in int(cave36.h):
+		for vx36 in int(cave36.w):
+			var vt36 := Vector2i(vx36, vy36)
+			if MapGen.is_walkable_tile(cave36.grid[vy36 * int(cave36.w) + vx36]):
+				continue
+			walls36 += 1
+			if Toil.vein(cave36, vt36):
+				veins36 += 1
+				for vd36 in [Vector2i(0, 1), Vector2i(1, 0), Vector2i(0, -1), Vector2i(-1, 0)]:
+					var vn36: Vector2i = vt36 + vd36
+					if vn36.x >= 0 and vn36.y >= 0 and vn36.x < int(cave36.w) and vn36.y < int(cave36.h) and MapGen.is_walkable_tile(cave36.grid[vn36.y * int(cave36.w) + vn36.x]):
+						if Toil.offers(cave36, vn36, vt36, true, false) == ["mine", "quarry"]:
+							reach36 += 1
+						break
+	check(veins36 > walls36 / 6 and veins36 < walls36 / 3 and reach36 >= 8, "about one piece of a cave's wall in four shows a vein, and enough of them can be stood in front of (%d of %d, %d reached)" % [veins36, walls36, reach36])
+	check(not Toil.vein(sw37, edge36 + edir36) and Toil.offers(sw37, edge36, edge36 + edir36) == ["fell", "pick"], "at the forest's edge a tree can be felled, or mushrooms picked under it")
+	var TW36 = new_game.call()
+	check(Toil.choose(TW36, ["fell", "pick"]) == "fell" and Toil.choose(TW36, []) == "", "with no tool he is told of the first thing")
+	TW36.inv.trug = 1
+	check(Toil.choose(TW36, ["fell", "pick"]) == "pick", "with only a basket, C picks")
+	TW36.inv.axe = 1
+	check(Toil.choose(TW36, ["fell", "pick"]) == "fell" and Toil.choose(TW36, ["fell", "pick"], true) == "pick", "with both, C fells and Shift+C picks")
+	TW36.step = Data.step_index("s_p36_pick")
+	check(Toil.choose(TW36, ["fell", "pick"]) == "pick", "and the work the story is asking for is done first")
+	var tl36: Array = Toil.done(TW36, "pick", "surface", edge36 + edir36)
+	check(int(TW36.inv.get("mushrooms", 0)) == 1 and TW36.step_toil == 1 and tl36.size() == 2 and Toil.spent(TW36, "surface", edge36 + edir36), "mushrooms are in the basket, and that piece of the wood has given what it had today")
+	# (a bug of the Heavy Road release, mended here: the rock of a cave is laid as BUILDING, and no cave wall had ever given ore)
+	var ore36 := 0
+	for oy36 in int(cave36.h):
+		for ox36 in int(cave36.w):
+			if MapGen.is_walkable_tile(cave36.grid[oy36 * int(cave36.w) + ox36]) and ox36 + 1 < int(cave36.w) and Toil.work_at(cave36, Vector2i(ox36, oy36), Vector2i(ox36 + 1, oy36), true, false) == "quarry":
+				ore36 += 1
+	check(ore36 >= 10 and Toil.work_at(cave36, Vector2i(1, 1), Vector2i(2, 1), false, true) == "", "the wall of a cave can be cut for ore (%d places from the west alone), and nothing is worked at under somebody's roof" % ore36)
+	check(Toil.good_of("mine", true) == "jade_rough" and Toil.good_of("quarry", true) == "ore_lump" and Toil.good_of("dig", false) == "wild_yam", "a vein gives jade in the rind, the wall beside it ore, the open ground a yam")
+	TW36.free()
 
 	print("== the spirit root (roots.gd) ==")
 	var RG = new_game.call()

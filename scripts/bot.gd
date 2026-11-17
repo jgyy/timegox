@@ -133,6 +133,8 @@ const TRIAL_PLAN := {"iron_fang": "craft", "thunder_roc": "craft", "demon_lord":
 	"the_short_way": "relic", "the_shelf": "relic", "the_knack": "relic",
 	"the_find": "relic", "the_dusk": "relic", "the_bell": "relic",
 	"the_gift": "relic", "the_rule": "relic", "the_appraiser": "relic",
+	# Part XXXVI: the scales, the shoots left alone and the gold nobody saw fall
+	"the_drained": "relic", "the_tugger": "relic", "the_grasper": "relic",
 }
 ## Fates and Faces (fate.gd): what the bot chooses at every meeting of the five fated encounters, in
 ## order of preference (the first that can be taken), so that one run walks friends and foes alike:
@@ -190,7 +192,7 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_mirror": ["rivet"],
 	# Part XXXIII: sent to take a turn at the stone
 	"the_needle": ["turn"],
-	"the_belts": ["wait"], "the_stone": ["keep"]}
+	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -933,7 +935,13 @@ func _world(d: float) -> void:
 		"toil":
 			# Part XXVII: the work of the hands (toil.gd): the nearest piece of the step's region that can
 			# be worked at so, and C
-			_toil_step(str(s.work), str(s.area))
+			_toil_step(str(s.work), str(s.area), int(s.get("cave", 0)))
+		"sunder":
+			# Part XXXVI: things of the land broken by his blows, or blows held back to one thing (sunder.gd)
+			_sunder_step(s)
+		"cook":
+			# Part XXXVI: a meal cooked out in the country, turned as it wants (cooking.gd)
+			_cook_step(s)
 		"haul":
 			# Part XXVII: a load for somebody (toil.gd, load.gd): gathered until his back is full (never past
 			# what he can bear at his own pace), carried to them, and again
@@ -1070,17 +1078,25 @@ var toil_dir := Vector2i.ZERO
 var toil_key := ""
 
 func _toil_ok(work: String, at: Vector2i, d: Vector2i) -> bool:
-	return Toil.work_at(world.wd, at, at + d, world.is_cave(), world.is_floor() and not world.is_cave()) == work and not Toil.spent(Game, world.layer, at + d) \
+	# (the Small Fish release: a piece of the land may offer a second thing, toil.gd)
+	return Toil.offers(world.wd, at, at + d, world.is_cave(), world.is_floor() and not world.is_cave()).has(work) and not Toil.spent(Game, world.layer, at + d) \
 		and world.ent_at(at + d) == null and not world.walk_props.has(at + d)
 
-func _toil_step(work: String, area: String) -> void:
-	if world.layer != Data.layer_of(area) or (Game.area != area and toil_key != work + area):
+func _toil_step(work: String, area: String, cave: int = 0) -> void:
+	if cave != 0:
+		# (the Small Fish release: work asked for in a cave, a vein in its wall: down first)
+		if world.layer != Caves.fid(area, cave):
+			toil_key = ""
+			_goto_layer(Caves.fid(area, cave))
+			return
+	elif world.layer != Data.layer_of(area) or (Game.area != area and toil_key != work + area):
 		toil_key = ""
 		_travel(area)
 		return
 	# (in front of him already: a row of trees is felled one after another without looking again)
 	if world.move_t < 0.0 and _toil_ok(work, world.ptile, world.facing) and Toil.blocked(Game, work, world.layer, world.ptile + world.facing) == "":
 		world.move_dir = Vector2i.ZERO
+		world.work_want = work
 		_press("work", 0.5)
 		return
 	var here0: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
@@ -1111,6 +1127,119 @@ func _toil_step(work: String, area: String) -> void:
 			world.facing = toil_dir
 		return
 	_walk_to(toil_at, "toil:%d:%d" % [toil_at.x, toil_at.y])
+
+## Part XXXVI: a "sunder" step.  At the forest's edge of the step's region, with nobody in the way of the
+## blade: all he has (or, where the step wants one thing a blow, the hand held back to a single cut), and F.
+func _sunder_ok(s: Dictionary, at: Vector2i, d: Vector2i) -> bool:
+	var n := 0
+	for dt in Sunder.reach(d, Sunder.rank(Game)):
+		if Sunder.what(world.wd, at, at + dt, Sunder.rank(Game)) != "" and Sunder.scar(Game, world.layer, at + dt) == "":
+			n += 1
+	if n < 1 or (s.has("max") and n > int(s.max)):
+		return false
+	for dt2 in Impact.reach(d):
+		if world.ent_at(at + dt2) != null or world.walk_props.has(at + dt2):
+			return false
+	return true
+
+func _sunder_step(s: Dictionary) -> void:
+	var area := str(s.area)
+	var key := "sunder" + area
+	if world.layer != Data.layer_of(area) or (Game.area != area and toil_key != key):
+		toil_key = ""
+		_travel(area)
+		return
+	Game.hand = 0 if s.has("max") else -1
+	if world.move_t < 0.0 and _sunder_ok(s, world.ptile, world.facing):
+		world.move_dir = Vector2i.ZERO
+		_press("strike", 0.7)
+		return
+	var here0: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if toil_key != key or toil_at.x < 0 or not _sunder_ok(s, toil_at, toil_dir):
+		toil_key = key
+		toil_at = Vector2i(-1, -1)
+		var dist := _bfs_dist(here0, 160)
+		var bd := 1 << 30
+		for tl in dist:
+			if int(dist[tl]) >= bd or Atlas.owner_id(world.wd, tl) != area or (tl != here0 and world.ent_at(tl) != null):
+				continue
+			for d in DIRS:
+				if _sunder_ok(s, tl, d):
+					bd = int(dist[tl])
+					toil_at = tl
+					toil_dir = d
+					break
+		if toil_at.x < 0:
+			toil_key = ""
+			_travel(area)
+			return
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if here == toil_at:
+		world.move_dir = Vector2i.ZERO
+		if world.move_t < 0.0:
+			world.facing = toil_dir
+		return
+	_walk_to(toil_at, "sunder:%d:%d" % [toil_at.x, toil_at.y])
+
+## Part XXXVI: a "cook" step.  What the dish still wants is worked for in the step's region; then, on open
+## ground of it with room for a fire in front of him, the pot (B), turned as often as the dish wants.
+const COOK_WORK := {"carp": "angle", "herb_bundle": "reap", "mushrooms": "pick", "wild_yam": "dig"}
+const COOK_AREA := {"angle": "marsh", "reap": "bamboo", "pick": "mountain", "dig": "millet"}
+
+func _cook_ok(at: Vector2i, d: Vector2i) -> bool:
+	var f := at + d
+	return world.tile_free(f) and world.ent_at(f) == null and not world.walk_props.has(f) and Music.town_at(Atlas.owner_id(world.wd, f), f) == ""
+
+func _cook_step(s: Dictionary) -> void:
+	if not world.using.is_empty() or not world.cooking.is_empty():
+		world.move_dir = Vector2i.ZERO
+		return
+	var area := str(s.area)
+	var dish := Cooking.wanted(s)
+	var ms: Dictionary = Cooking.missing(Game, dish)
+	if not ms.is_empty():
+		# (each where the land surely has it: Heaven's Forge has no water to cast a line in)
+		var cw := str(COOK_WORK.get(str(ms.keys()[0]), "reap"))
+		_toil_step(cw, str(COOK_AREA[cw]))
+		return
+	var key := "cook" + area
+	if world.layer != Data.layer_of(area) or (Game.area != area and toil_key != key):
+		toil_key = ""
+		_travel(area)
+		return
+	if world.move_t < 0.0 and Atlas.owner_id(world.wd, world.ptile) == area and _cook_ok(world.ptile, world.facing) and world.cook_why() == "":
+		world.move_dir = Vector2i.ZERO
+		world.cook_auto = Cooking.ideal(dish)
+		if world.cook(dish):
+			print("[bot] cooking: %s" % str(Cooking.RECIPES[dish].n))
+		cool = 0.5
+		return
+	var here0: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if toil_key != key or toil_at.x < 0 or not _cook_ok(toil_at, toil_dir):
+		toil_key = key
+		toil_at = Vector2i(-1, -1)
+		var dist := _bfs_dist(here0, 160)
+		var bd := 1 << 30
+		for tl in dist:
+			if int(dist[tl]) >= bd or Atlas.owner_id(world.wd, tl) != area or world.ent_at(tl) != null or Music.town_at(area, tl) != "":
+				continue
+			for d in DIRS:
+				if _cook_ok(tl, d):
+					bd = int(dist[tl])
+					toil_at = tl
+					toil_dir = d
+					break
+		if toil_at.x < 0:
+			toil_key = ""
+			_travel(area)
+			return
+	var here: Vector2i = world.target if world.move_t >= 0.0 else world.ptile
+	if here == toil_at:
+		world.move_dir = Vector2i.ZERO
+		if world.move_t < 0.0:
+			world.facing = toil_dir
+		return
+	_walk_to(toil_at, "cook:%d:%d" % [toil_at.x, toil_at.y])
 
 ## Part XXVII: a "haul" step.  What the good comes of (fell, quarry, angle) is worked at until he has
 ## all that is wanted or as much as his back takes at its own pace; then it is walked to whoever it is
@@ -3124,6 +3253,9 @@ func _finish(reason: String) -> void:
 		if int(Game.rites.get(rid, 0)) > 0:
 			rites_done.append(str(rid))
 	print("root and rites  : %s (%d of the five phases); %d of %d rites performed %s" % [Roots.title(Game), Roots.count(Game), Rites.done(Game), Rites.ORDER.size(), str(rites_done)])
+	# the Small Fish release (cooking.gd, sunder.gd, toil.gd)
+	print("the pot and hand: %d meals cooked, %d as they should be %s; %d blows that broke the land (%d things: %s), %d held back to a single cut; picked %d, dug %d, veins worked %d" % [Game.cooked_n, Game.cooked_good, str(Game.cooked),
+		Game.sunder_n, Sunder.total(Game), str(Game.sundered), Game.sunder_light, int(Game.toil.get("pick", 0)), int(Game.toil.get("dig", 0)), int(Game.toil.get("mine", 0))])
 	print("the ending      : %s" % str(Cultures.ENDINGS[Cultures.ending_of(Game)].n))
 	if reason != "":
 		print("FAILED          : %s" % reason)

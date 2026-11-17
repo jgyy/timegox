@@ -74,6 +74,9 @@ const KINDS := {
 	"found": {"n": "By what was carried home", "col": Color("d8c070"), "what": "the lost things you have carried to whose they were"},
 	# the Uncarved Block release (rites.gd)
 	"rite": {"n": "By the rite", "col": Color("b8e0ff"), "what": "the Daos whose rite you have performed"},
+	# the Small Fish release: the meals that came out right (cooking.gd), and the blows that broke one thing only (sunder.gd)
+	"pot": {"n": "By the pot", "col": Color("e8c890"), "what": "the meals you have cooked that came out as they should"},
+	"light": {"n": "By the light hand", "col": Color("c8e8d8"), "what": "the blows you have held back to a single cut"},
 	# the Open Net release: a name no gate has anything against (crime.gd, taboo.gd), and a wild that still stands (wilds.gd)
 	"clean": {"n": "By a clean name", "col": Color("e8f0e8"), "what": "nobody dead by your hand, no bill at any gate, and the forbidden shelf never opened"},
 	"wild": {"n": "By the standing wild", "col": Color("9ac878"), "what": "no country you have hunted in brought lower than thinned"},
@@ -1695,6 +1698,55 @@ const TRIALS := {
 				"desc": "Late Sleeves of Wind and a sword tempered nine times. It cannot be struck while it is looking elsewhere, and it is always looking elsewhere. Be the thing it cannot stop looking at, for as long as that takes.",
 				"line": "Lin Feng draws. The Eye has already looked at him and moved on. He steps into where it is looking now."},
 		]},
+	# ---- Part XXXVI: Cooking a Small Fish (the Small Fish release)
+	"the_drained": {"might": [5.5, 1.5],
+		"why": "It is a pond with nothing in it, and it is hungry in the way of a thing that once had everything: whatever is put into it goes, and it is no fuller. A blow goes in like a fish. What it has not had since the spring is a little, given by somebody who then stopped.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Sixty rings on a scale", "needs": [["item", "last_scale", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four scales of the carp the fishers called Grandfather, with sixty rings in each. Lay them on the dry bed where it can count them. It took sixty years in an afternoon and has never been shown the sum.",
+				"line": "Lin Feng sets four scales on the cracked mud, rings upward. The pond leans over them. It begins, slowly, to count, and it has got to nine when it stops being hungry and starts being something else."},
+			{"id": "folk", "kind": "folk", "n": "A mark on a gunwale", "needs": [["step", "s_p36_fishers"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "You asked two fishers of Longmen what they throw back. Tell it what the one with the debt said: about the summer she kept everything, and the year after. It has only ever heard the first half.",
+				"line": "\"The next year,\" says Lin Feng, \"her reach had nothing in it but weed.\" The pond is very still. It is the first time anybody has told it what happens after supper."},
+			{"id": "pot", "kind": "pot", "n": "Half a ladle, and stop", "needs": [["cooked", 1]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "One meal that came out as it should. It will ask for what is in the pot. Give it half a ladle, cover the pot, and do not give it the rest however it asks. Nobody has ever fed it and stopped.",
+				"line": "Lin Feng pours half a ladle of broth onto the dry bed and puts the lid on. The pond waits for the rest. It goes on waiting. Something about the waiting is new to it."},
+			{"id": "might", "kind": "might", "n": "Outlast its hunger", "needs": [["lv", 120], ["temper", 9]], "boon": {},
+				"desc": "Early Uncarved Block and a sword tempered nine times. It takes in every blow and is no fuller. A thing with no bottom can still be stood in front of until evening, by somebody who has had breakfast.",
+				"line": "Lin Feng draws. The pond opens its dry bed to the stroke as it opened to the nets. There is, it finds, rather a lot of him."},
+		]},
+	"the_tugger": {"might": [5.6, 1.5],
+		"why": "It is help, and nothing but help, and it means it. It takes hold of whatever is growing in whoever stands before it and lifts, gently, a little further than the root goes. To fight it is to be helped harder. It has never once been shown a thing left alone.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four that he did not get to", "needs": [["item", "pulled_ear", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "The four shoots at the end of the last row, a finger short, that dark came down on before his hand did. They are the only ones that came to ear. Hold them up by the root-ball, where it can see the earth still on them.",
+				"line": "Lin Feng holds up four shoots with the earth on their roots, and four heavy ears nodding. The great hands stop over the row. It looks from the four to the field, and from the field to its hands."},
+			{"id": "light", "kind": "light", "n": "One stalk, and the hand put down", "needs": [["light", 3]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Three blows held back to a single cut, each felling one thing and nothing behind it. Do it once more in front of it: have the whole row under the blade, take one, and put the blade down. It will not understand. Let it not understand for a while.",
+				"line": "Lin Feng cuts one dead root from the roof, exactly one, and sheathes. The help watches the sword go away with the rest of the row still standing. \"But you were there,\" it says, in a farmer's voice. \"With the blade out.\""},
+			{"id": "folk", "kind": "folk", "n": "What a yam wants", "needs": [["step", "s_p36_yams"]], "boon": {"foe_hp": 0.78, "taken": 0.85},
+				"desc": "You dug three yams out of the plain, each as slowly as it wanted. Show it your hands, with the earth still under the nails, and tell it how long the third one took. It has never heard of a thing that cannot be hurried.",
+				"line": "\"As long as the first,\" says Lin Feng, and turns his hands over. The help looks at the black under his nails for some time. It has dirt of its own. It is all from the top inch."},
+			{"id": "might", "kind": "might", "n": "Be too deep to pull", "needs": [["lv", 121], ["temper", 9]], "boon": {},
+				"desc": "Middle Uncarved Block and a sword tempered nine times. It will take hold of whatever in you is growing, and lift. Song the Younger was told your roots go deep. This is where that is found out.",
+				"line": "Lin Feng draws. The great hands close on him, very gently, at about the height of the heart, and give a little pull. Nothing comes up. It tries again, puzzled, with both."},
+		]},
+	"the_grasper": {"might": [5.7, 1.5],
+		"why": "It is an arm reaching for one bright thing, and it sees nothing else: not the hill, not the well, not whoever is standing in the way. A blow is not seen either. It goes through. It can only be stopped by something it has to look at, and in eleven years nothing has been.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four pieces nobody saw fall", "needs": [["item", "blind_coin", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "The four pieces he dropped in front of two hundred people. Hold them out on your open palm, between it and the light. It is the only thing in the world that it sees, and for once there is a hand under it.",
+				"line": "Lin Feng holds out four pieces of market gold on his open palm. The arm comes round to them like a compass needle. Then, for the first time, it sees what they are lying on: a hand. It follows the hand to a wrist. It follows the wrist up."},
+			{"id": "pot", "kind": "pot", "n": "Forty bowls, counted", "needs": [["cooked", 2]], "boon": {"foe_hp": 0.75, "taken": 0.85},
+				"desc": "Two meals that came out as they should. Set the pot down in front of it with the lid off and call the diggers in to eat, by name, one at a time. It cannot see a man. Nobody has tried it on forty men each saying thank you.",
+				"line": "Lin Feng sets down the pot and calls a name, and a digger steps into the glare with a bowl. Then another. By the ninth the light has begun to have edges, and things in it."},
+			{"id": "light", "kind": "light", "n": "A chip at a time", "needs": [["light", 3], ["step", "s_p36_vein"]], "boon": {"foe_hp": 0.78, "foe_atk": 0.85},
+				"desc": "Three blows held back to a single cut, and three veins worked by taking away what was round them. Show it the rind you lifted out, and then make it look at the hole: how small, and the roof still there.",
+				"line": "Lin Feng holds up a lump in its grey rind and then steps aside from the wall. The hole is the size of the lump. The arm, which has never left a hole the size of anything, goes over it twice with its fingers."},
+			{"id": "might", "kind": "might", "n": "Stand where it must look", "needs": [["lv", 122], ["temper", 9]], "boon": {},
+				"desc": "Late Uncarved Block and a sword tempered nine times. It will go through you to get at what is behind. Be something that cannot be gone through. It will not be a matter of striking it. It will be a matter of still being there.",
+				"line": "Lin Feng draws and stands in the gallery. The arm comes on, not at him, and arrives at him anyway. It pushes. It has never pushed at anything that was still there afterward."},
+		]},
 	# ---- Part XXIX (the Ordered House release): the fire a guest foretold, the wall that did not change, the gold that
 	# waits to be stooped for, and the friend who went to the gate
 	"chimney_fire": {"might": [4.0, 1.5],
@@ -2069,6 +2121,12 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"rites":
 			# the Uncarved Block release: Daos whose rite he has performed (rites.gd)
 			return Rites.done(g) >= int(n[1])
+		"cooked":
+			# the Small Fish release: meals that came out as they should (cooking.gd)
+			return int(g.cooked_good) >= int(n[1])
+		"light":
+			# the Small Fish release: blows held back to a single cut that broke one thing and no more (sunder.gd)
+			return int(g.sunder_light) >= int(n[1])
 		"step":
 			# the Open Net release: something of the story already done (["step", id])
 			return g.done(str(n[1]))
@@ -2170,6 +2228,10 @@ static func need_text(n: Array, g) -> String:
 		"creed":
 			var ax: Dictionary = Creed.AXIS[str(n[1])]
 			return "%s by %d or more (now %+d: Esc > The Way says what it was weighed by)" % [str(ax.pos if int(n[2]) > 0 else ax.neg), absi(int(n[2])), Creed.value(g, str(n[1])) * (1 if int(n[2]) > 0 else -1)]
+		"cooked":
+			return "%d meal%s cooked that came out as it should (now %d: B in open country, with a pot and the makings)" % [int(n[1]), "" if int(n[1]) == 1 else "s", int(g.cooked_good)]
+		"light":
+			return "%d blow%s held back to a single cut that broke one thing and no more (now %d: H, then F at the forest's edge)" % [int(n[1]), "" if int(n[1]) == 1 else "s", int(g.sunder_light)]
 		"rites":
 			return "the rite of %d of your Daos performed (now %d: Esc > Root & Rites, and Enter on one that is yours)" % [int(n[1]), Rites.done(g)]
 		"restored":
