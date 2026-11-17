@@ -2359,6 +2359,10 @@ func _run() -> void:
 		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
 		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
 		await _pestle_shots(str(main.args.pestle))
+	if main.args.has("hands"):
+		# the Five Hands release (--hands, or --hands=a,b): hands on what they hold, before and after; the five
+		# phases turned on a wood, one after another; what hangs from a hand; and Part XXXVII
+		await _hands_shots(str(main.args.hands))
 	if main.args.has("fish"):
 		# the Small Fish release (--fish, or --fish=a,b): a meal cooked stage by stage, the land out of his own
 		# eyes, a blow at each weight, a vein in a cave wall, picking and digging, and Part XXXVI
@@ -6734,6 +6738,225 @@ func _block_shots(which: String = "1") -> void:
 		main.set_stack(["world"])
 	get_tree().quit(0)
 
+
+## The Five Hands release: the work of the hands as it was held and as it is held (grip.gd), the five phases
+## turned on a forest's edge and met with one another (phases.gd), what hangs from a hand (heft.gd), and the
+## people, foes, lords and marks of Part XXXVII.
+func _hands_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 124
+	Game.step = Data.step_index("s_p37_council")
+	Game.companion = true
+	Game.day = 260
+	Game.stones = 5000
+	Game.dao = "sword"
+	for it in ["cook_pot", "trug", "spade", "axe", "pick", "sickle", "fishing_rod"]:
+		Game.inv[it] = 1
+	for it2 in ["carp", "herb_bundle", "mushrooms", "wild_yam"]:
+		Game.inv[it2] = 9
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+		Game.rite_due = []
+	quiet.call()
+	w.open_world()
+	w.enter_layer("surface")
+	var wd: Dictionary = Atlas.world_of("surface")
+	var W := int(wd.w)
+	# a place of region `area` with open ground all round and (if `edge`) the forest three tiles to the south
+	var find := func(area: String, edge: bool) -> Vector2i:
+		for y in range(8, int(wd.h) - 12):
+			for x in range(8, W - 8):
+				var q := Vector2i(x, y)
+				if Atlas.owner_id(wd, q) != area:
+					continue
+				var ok := true
+				for ax in range(-2 if not edge else -1, 3 if not edge else 2):
+					for ay in range(-3, 2):
+						var q2 := q + Vector2i(ax, ay)
+						if not wd.grid[q2.y * W + q2.x] in [MapGen.FLOOR, MapGen.DECOR] or Atlas.owner_id(wd, q2) != area or w.ent_at(q2) != null or Peaks.rise(wd, float(q2.x) + 0.5, float(q2.y) + 0.5) > 1.5:
+							ok = false
+				if not ok:
+					continue
+				if edge:
+					for ax2 in range(-1, 2):
+						for ay2 in range(2, 6):
+							if wd.grid[(y + ay2) * W + x + ax2] != MapGen.WALL:
+								ok = false
+				else:
+					for ax3 in range(-2, 3):
+						for ay3 in range(2, 5):
+							if not wd.grid[(y + ay3) * W + x + ax3] in [MapGen.FLOOR, MapGen.DECOR] or w.ent_at(Vector2i(x + ax3, y + ay3)) != null:
+								ok = false
+				if ok:
+					return q
+		return Vector2i(-1, -1)
+	var stand := func(at: Vector2i, q: int = 2) -> void:
+		main.set_stack(["world"])
+		w.teleport(at, "surface")
+		w.facing = Vector2i(0, 1)
+		w.cam_q = q
+		w._snap_cam()
+		w.banner_t = 0.0
+		Game.clock = 10.5 * 60.0
+		Game.first_person = false
+		quiet.call()
+	var open_at: Vector2i = find.call("bamboo", false)
+	var edge_at: Vector2i = find.call("bamboo", true)
+	for ea in ["millet", "forge", "marsh", "village", "maple"]:
+		if edge_at.x < 0:
+			edge_at = find.call(ea, true)
+	if edge_at.x >= 0:
+		edge_at += Vector2i(0, 1)
+	print("[tour] hands: open ground at %s, a forest's edge at %s" % [str(open_at), str(edge_at)])
+	var frames_n := func(n: int) -> void:
+		for _f in n:
+			await get_tree().process_frame
+	var finish := func() -> void:
+		if not w.using.is_empty():
+			w.using.t0 = w.t - w.USE_STEP * 2.0 - float(w.using.dur) - 0.05
+	# the camera a pace and a half from his hands, on his left or his right
+	var close := func(side: float, dist: float, up: float) -> void:
+		var pp: Vector3 = w.player.position
+		var f3 := Vector3(w.facing.x, 0, w.facing.y)
+		var sd := Vector3(f3.z, 0, -f3.x) * side
+		w.cam_override = Transform3D(Basis.IDENTITY, pp + sd * dist + f3 * 1.0 + Vector3(0, up, 0)).looking_at(pp + f3 * 0.7 + Vector3(0, 0.85, 0), Vector3.UP)
+	if want.call("grip") and edge_at.x >= 0 and open_at.x >= 0:
+		var frames: Array = []
+		for wk in [["fell", edge_at, Vector2i(0, 1), 1.0, 3.0], ["dig", open_at, Vector2i(0, -1), -1.0, 3.0], ["reap", open_at + Vector2i(1, 0), Vector2i(0, -1), -1.0, 2.6]]:
+			for mode in ["before", "after"]:
+				Grip.plain = mode == "before"
+				stand.call(wk[1], 2)
+				w.facing = wk[2]
+				Game.toiled = {}
+				Game.felled = {}
+				await frames_n.call(3)
+				w.work_want = str(wk[0])
+				w.work(str(wk[0]) == "dig")
+				if w.using.is_empty():
+					print("[tour] hands: no %s here" % str(wk[0]))
+					continue
+				# (to the moment the tool lands: the stroke is watched for, in both)
+				w.using.t0 = w.t - w.USE_STEP - 0.4
+				close.call(float(wk[3]), float(wk[4]), 1.4)
+				var landed := false
+				for _f2 in 30:
+					# (a software renderer takes seconds over a frame: the clock is moved on a tenth of a second at a time)
+					w.t += 0.1
+					await get_tree().process_frame
+					w.using.t0 = w.t - w.USE_STEP - 0.6
+					var rc = Grip.reach_of(w.using.get("held"))
+					if rc != null and rc.down:
+						landed = true
+						break
+				quiet.call()
+				await _shot("grip_%s_%s" % [str(wk[0]), mode])
+				frames.append(last_img)
+				print("[tour] hands: %s %s, landed %s" % [str(wk[0]), mode, str(landed)])
+				finish.call()
+				w.cam_override = null
+				await frames_n.call(4)
+		Grip.plain = false
+		_sheet("grip_sheet", frames, 0.5)
+	if want.call("phases") and edge_at.x >= 0:
+		Game.level = 9
+		var pf: Array = []
+		for el in Phases.ORDER:
+			stand.call(edge_at, 2)
+			Game.touched = {}
+			Game.scars = {}
+			w._phase_t = 0.0
+			await frames_n.call(4)
+			Game.phase = str(el)
+			w.strike_t = -9.0
+			w.strike()
+			await frames_n.call(8)
+			quiet.call()
+			await _shot("phase_%s_struck" % str(el))
+			await frames_n.call(12)
+			quiet.call()
+			await _shot("phase_%s" % str(el))
+			pf.append(last_img)
+		_sheet("phases_sheet", pf, 0.36)
+		# one phase met with another: fire and then water; blossom and then fire; and the round
+		var meets: Array = []
+		for sq in [["quench", ["fire", "water"]], ["blaze", ["wood", "fire"]], ["moss", ["earth", "wood"]], ["rain", ["thunder", "water"]], ["round", ["wood", "fire", "earth", "thunder", "water", "wood"]]]:
+			stand.call(edge_at, 2)
+			Game.touched = {}
+			w._phase_t = 0.0
+			await frames_n.call(4)
+			for el2 in sq[1]:
+				Game.phase = str(el2)
+				w.strike_t = -9.0
+				w.strike()
+				await frames_n.call(9)
+			await frames_n.call(20)
+			quiet.call()
+			await _shot("phase_meet_%s" % str(sq[0]))
+			meets.append(last_img)
+		_sheet("phases_meet_sheet", meets, 0.36)
+		Game.phase = ""
+		Game.touched = {}
+		Game.level = 124
+	if want.call("things"):
+		var pk: Array = []
+		for kd in ["burn", "pool", "sprout", "ridge", "glass", "kiln", "lode", "rain", "grove", "moss"]:
+			pk.append(Phases.model(kd, 5, Color("8a7a5a"), Color("4a8a4a")))
+		await _gallery("phase_things", pk, 2.4, 0.3)
+		var hd: Array = []
+		for hn in ["lantern", "pole", "steelyard", "hoe", "rod"]:
+			var hm := Folk.held(hn)
+			hm.scale = Vector3.ONE * (1.4 if hn in ["pole", "hoe", "rod"] else 2.2)
+			hm.position = Vector3(0, 1.4, 0)
+			var hh := Node3D.new()
+			hh.add_child(hm)
+			hd.append(hh)
+		await _gallery("held_things", hd, 1.6, 0.3)
+	if want.call("people"):
+		await _gallery("part37_people", [Assets.person("su_dai"), Assets.person("bai_gui"), Assets.person("cai_yong")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid2 in ["carried_faggot", "thrown_cup", "fed_ember", "raised_dyke", "sent_flood", "drowned_furrow", "deaf_stove", "split_billet", "lost_note"]:
+			fs.append(_foe(fid2))
+		await _gallery("part37_foes", fs, 1.0, 0.25)
+		await _gallery("part37_lords", [_foe("the_fed_fire", true), _foe("the_next_door", true), _foe("the_kindling", true)], 1.3, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["break", "watch", "leave"]:
+			mk.append(Marks.model(Marks.MARKS.the_round[oid], 0))
+		await _gallery("part37_marks", mk, 1.6, 0.3)
+	if want.call("cross"):
+		main.set_stack(["world"])
+		Game.picks.erase("the_round")
+		Game.cross_pending = ["the_round"]
+		main.ask_crossroads()
+		main.choice.cursor = 0
+		await _wait(1.0)
+		await _shot("crossroads_round")
+		main.pop()
+		Game.cross_pending = []
+	if want.call("battles"):
+		for bb in [["the_fed_fire", "volcano"], ["the_next_door", "drowned"], ["the_kindling", "thunder"]]:
+			main.set_stack(["world"])
+			var b = main.battle
+			b.start([{"id": str(bb[0]), "lv": 125}], {"boss": true, "theme": str(Data.AREAS[str(bb[1])].theme), "area": str(bb[1])})
+			main.push("battle")
+			await _wait(3.0)
+			# (a technique of each of two phases, to see what they leave under the lord: phases.gd)
+			if b.foes.size() > 0:
+				b._ground_mark(b.foes[0], "fire")
+				b._ground_mark(b.party[0] if b.party.size() > 0 else b.foes[0], "water")
+			await _wait(0.5)
+			await _shot("battle_boss_" + str(bb[0]))
+			main.pop()
+	get_tree().quit(0)
 
 ## The Small Fish release: the twelve things done to a pot, the first-person view, the seven weights of a
 ## blow, the veins of a cave, the new work of the hands, and the people, foes, lords and marks of Part XXXVI.

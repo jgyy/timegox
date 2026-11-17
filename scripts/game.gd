@@ -164,6 +164,17 @@ var cooked_n := 0
 var cooked_good := 0
 var step_cook := 0
 var first_person := false
+## the Five Hands release (phases.gd): the phase his hand is turned to ("" the plain blade), what lies on
+## the land by it (layer|x|y -> [what, the day]), how many of each he has left, the blows that came to
+## something, how many of each phase, how often one phase overcame another or was fed by it, and what a
+## step that asks for it has had since it began
+var phase := ""
+var touched := {}
+var phased := {}
+var phase_n := 0
+var phases_used := {}
+var reacts := {}
+var step_phase := 0
 ## steps just finished that have words to say about it, waiting for the world ("done:<step>")
 var done_pending: Array = []
 ## the Six Hearths (cultures.gd, the New Fire release): standing with each hearth of the land; the
@@ -506,6 +517,13 @@ func reset() -> void:
 	cooked_good = 0
 	step_cook = 0
 	first_person = false
+	phase = ""
+	touched = {}
+	phased = {}
+	phase_n = 0
+	phases_used = {}
+	reacts = {}
+	step_phase = 0
 	sold = 0
 	feats = {}
 	eggs = {}
@@ -1039,6 +1057,7 @@ func advance() -> void:
 	step_haul = 0
 	step_sunder = 0
 	step_cook = 0
+	step_phase = 0
 	# the Three Burrows release (hold.gd): the town is founded when its steward has been heard out
 	if str(s.id) == Hold.FOUND_STEP:
 		Hold.found(self)
@@ -1169,6 +1188,10 @@ func poll_steps() -> void:
 			"cook":
 				# Part XXXVI (cooking.gd): so many meals cooked since the step began
 				ok = step_cook >= int(s.n)
+			"phase":
+				# Part XXXVII (phases.gd): so many things of the land turned by a phase since the step began (or
+				# so many times one phase overcame another, or was fed by it)
+				ok = step_phase >= int(s.n)
 			"weal":
 				# Part XXVIII: so many towns of the land left the better for his coming since the step
 				# began (weal.gd)
@@ -1278,6 +1301,8 @@ func objective_text() -> String:
 		t += "  (%d/%d)" % [mini(step_sunder, int(s.n)), int(s.n)]
 	elif s.kind == "cook":
 		t += "  (%d/%d)" % [mini(step_cook, int(s.n)), int(s.n)]
+	elif s.kind == "phase":
+		t += "  (%d/%d)" % [mini(step_phase, int(s.n)), int(s.n)]
 	elif s.kind == "toil":
 		t += "  (%d/%d)" % [mini(step_toil, int(s.n)), int(s.n)]
 	elif s.kind == "restore":

@@ -1,17 +1,120 @@
 # Ascension of the Azure Cloud
 
 A xianxia cultivation RPG built in **Godot 4**, played in **full 3D from a third-person view, or out of his own eyes**, and **all art is generated from scripts**: every tree, building, character, monster and spell effect comes from code in this repository (GDScript, shaders and **Blender Python**), never from hand-made or downloaded files (see [Art pipeline](#art-pipeline)).
-Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Light Hand, across **one open world in five realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat, and now the **Far Countries** that no boat, cart or foot can reach, only **the spirit arks of the cultivators**, which lie moored in the air over six towns. It has **mountains in every region, 158 peaks that are climbed hand over hand and come down from under a cloud-kite**, 268 bosses, thirty-two Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, thirteen towns (Qingshi in two quarters) lived in by **302 townsfolk with days of their own, sixteen of them twice a man's height**, 48 camps out in the wild where **336 people of the road** keep theirs, things in the streets that really break, and 108 buildings you can walk into, every one with a cellar and all but a few with an upper storey, **39 of those storeys divided into 89 apartments with somebody at home in each**. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, be measured by the testing stone for **a spirit root of one phase to five**, choose your road among **six Daos, each with a rite of its own**, earn the trust of **nine peoples** of the realms, change into **twenty-six outfits** (and dress Yue Ling in ten of her own), ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (sixteen ways, bright, bitter and dark), answer at **forty crossroads** that the whole story remembers, raise **a host** from the six hearths and fight **field battles by drums**, hear **thirty-four tunes** made wholly from code, take down the **eighteen commissions** of a notice board, do **96 feats**, stake spirit stones at **Old Du's mat**, carry the **Eight Arms**, each struck with in its own way and each a Dao of its own, go down into a **cave under every region**, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted from life, **with a body under the clothes** (a figure about seven and a half heads tall, every muscle where the anatomy books put it), the monsters after what the creature really is or what the old books say it was, and **every face shows what it feels**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet. **Everything he owns is on his back, in jin**: a load is drawn on him and on Yue Ling and slows him past what he can bear, the land can be worked with an axe, a rod, a pick and a sickle, and the ring that holds everything is the last thing in the story he is given.
+Play Lin Feng, **a young man or a young woman** (or whoever you make them: name, look, colours, trade and the hearth that fed them for a year), an orphaned sect sweeper with a hidden "Nine Heavens root", from Qi Condensation to Five in One Hand, across **one open world in five realms**: a continent of 42 regions round Azure Cloud Mountain, ringed by the sea, with the **Nine Heavens** floating above it, the **Nine Springs** under it, joined by the Jianmu, the world tree, the **Isles of the Eastern Sea** out past the edge of its shelf, reached in Mazu's boat, and now the **Far Countries** that no boat, cart or foot can reach, only **the spirit arks of the cultivators**, which lie moored in the air over six towns. It has **mountains in every region, 158 peaks that are climbed hand over hand and come down from under a cloud-kite**, 268 bosses, thirty-two Heavenly Tribulations, a sky that keeps the hours from dawn to the dead of night, thirteen towns (Qingshi in two quarters) lived in by **302 townsfolk with days of their own, sixteen of them twice a man's height**, 48 camps out in the wild where **336 people of the road** keep theirs, things in the streets that really break, and 108 buildings you can walk into, every one with a cellar and all but a few with an upper storey, **39 of those storeys divided into 89 apartments with somebody at home in each**. Wake the **nine branches** of the Nine Heavens root, open the Founder's **sealed caves** as your realm allows, be measured by the testing stone for **a spirit root of one phase to five**, choose your road among **six Daos, each with a rite of its own**, earn the trust of **nine peoples** of the realms, change into **twenty-six outfits** (and dress Yue Ling in ten of her own), ride **six mounts and vehicles**, decide the fates of **five people** met on the road, become a guest at the **six hearths** of the land, each with its own table, fire and manners, choose where the story **begins** (six places) and how it **ends** (sixteen ways, bright, bitter and dark), answer at **forty crossroads** that the whole story remembers, raise **a host** from the six hearths and fight **field battles by drums**, hear **thirty-four tunes** made wholly from code, take down the **eighteen commissions** of a notice board, do **96 feats**, stake spirit stones at **Old Du's mat**, carry the **Eight Arms**, each struck with in its own way and each a Dao of its own, go down into a **cave under every region**, build the **eighteen works** of three schools of making (the oldest tools, machinery, and the arts of the Dao), and walk the whole way with **Yue Ling**, who has a story of her own. The monsters of the wild **keep hours**: what sleeps at noon hunts at dusk. Every face and figure in the world is sculpted from life, **with a body under the clothes** (a figure about seven and a half heads tall, every muscle where the anatomy books put it), the monsters after what the creature really is or what the old books say it was, and **every face shows what it feels**, and **the sword reaches the land**: trees fall where it cuts, rocks shatter, grass is mown and a pack struck first is thrown off its feet. **Everything he owns is on his back, in jin**: a load is drawn on him and on Yue Ling and slows him past what he can bear, the land can be worked with an axe, a rod, a pick and a sickle, and the ring that holds everything is the last thing in the story he is given.
 
-> **Total gameplay duration: about 44 hours 25 minutes** (44:25:04 of game time for the end-to-end bot run, seed 1234), **1 hour 0 minutes 9 seconds longer than the last release** (43:24:55): **Part XXXVI, Cooking a Small Fish**, is new (one stroke before breakfast opens a lane through forty pines, and the Elder sends the one who struck it to the kitchen; a pond drained for one supper, a field pulled taller in an afternoon, a hill hollowed after one vein; three lords met in caves, a crossroads, a forty-second realm, Light Hand). **A blow now weighs what his realm weighs**: seven weights from a single cut to a stroke that parts a wood and leaves a crater, and **H** to hold the hand back. **A meal is cooked in front of you**, in twelve stages, in a pot that is physics. **The hands pick, dig and work veins**; **P looks out of his own eyes**. Nine bugs and eight plot holes fixed.
+> **Total gameplay duration: about 45 hours 28 minutes** (45:27:41 of game time for the end-to-end bot run, seed 1234), **1 hour 2 minutes 37 seconds longer than the last release** (44:25:04): **Part XXXVII, A Cup of Water, a Cart of Firewood**, is new (the pines below the east wall burn for a night while forty disciples throw everything they know at it and make it worse; a fire fed for nine years to be rid of it, a dyke that sent its flood next door, a log that could sing burned for one supper; three lords met in caves, a crossroads, a forty-third realm, Five in One Hand). **Hands close on what they hold**: every held thing was in the sleeve, fifteen centimetres above the fist, and is in the palm; the other hand is on the shaft; a hoe lands on the ground and an axe in the trunk that is really there. **What hangs, swings**: a lantern, the baskets of a pole, a bell, a swing are pendulums and are timed as pendulums. **The five phases do to the land what they are**: fire burns a wood and catches the next stand, water puts it out, wood feeds it, earth is raised and root breaks it, thunder calls the rain. Five bugs fixed, and fifteen slips of the new chapter caught by an audit before it shipped.
 
 | | |
 |---|---|
-| ![a blow in earnest at the last realm: a road through the windbreak, and the dust still going out](docs/screenshots/blow_6_struck.webp) | ![and what it leaves: trunks fallen outward, the ground cracked, a hollow where he stood](docs/screenshots/blow_6_after.webp) |
-| ![cooking, stage 6 of 12: the pieces go into the pot one at a time, along the arc a thrown thing takes](docs/screenshots/cook_06_add.webp) | ![stage 8: the simmer. The pot turns with the ladle, and what floats in it gathers at the middle](docs/screenshots/cook_08_simmer.webp) |
-| ![the Whispering Bamboo, out of his own eyes](docs/screenshots/first_person_bamboo.webp) | ![a vein of green stone in the wall of the Stone-Milk Cave](docs/screenshots/cave_vein.webp) |
-| ![the three lords of Part XXXVI: the Pond Drained for One Supper, the Help That Pulled Them Up, the Hand That Saw Only Gold](docs/screenshots/part36_lords.webp) | ![the crossroads: what a strong hand is for](docs/screenshots/crossroads_ladle.webp) |
+| ![felling, as it was: the axe in the sleeve, the fists closed on nothing](docs/screenshots/grip_fell_before.webp) | ![and as it is: in the palm, both hands on the haft, the edge in the stem that stands there](docs/screenshots/grip_fell_after.webp) |
+| ![fire turned on the bamboo: the stand burns, and the stands beside it have caught](docs/screenshots/phase_fire.webp) | ![thunder: every stem it reached is riven](docs/screenshots/phase_thunder.webp) |
+| ![fire, and then water on the same wood: steam, and nothing burning](docs/screenshots/phase_meet_quench.webp) | ![the whole round on one piece of ground, each phase fed by the last](docs/screenshots/phase_meet_round.webp) |
+| ![the three lords of Part XXXVII: the Fire Fed to Be Rid Of, the Dyke That Sent It Next Door, the Song Burned for Supper](docs/screenshots/part37_lords.webp) | ![the crossroads: before the next dry wind](docs/screenshots/crossroads_round.webp) |
 ## What changed in this release
+
+```mermaid
+flowchart LR
+    subgraph GRIP[Hands on things: scripts/grip.gd]
+    HOLD[World._hold_in_hand:<br/>the one place anything<br/>is put in a hand] --> SEAT[Grip.seat: the grip drawn at y = -0.08<br/>is moved into the palm<br/>it was 15 cm up the forearm]
+    SEAT --> REACH[Grip.Reach, a SkeletonModifier3D:<br/>runs after the clip, gone next frame<br/>no clip rewritten, nobody rebuilt]
+    REACH --> SPAN[Grip.span: where the stroke of this clip lands,<br/>measured from the clip itself, once]
+    SPAN --> WORK{the working end<br/>in its stroke?}
+    WORK -->|brought down| GROUND[on the ground under it,<br/>whatever the slope]
+    WORK -->|swung forward| TRUNK[on the trunk that<br/>really stands there]
+    WORK -->|at a thing| FACE[on the nearest face of its own mesh<br/>Grip.closest, triangle by triangle]
+    GROUND & TRUNK & FACE --> IK[Grip.solve: two bones, one point<br/>bone lengths kept, elbow on its own side<br/>then the wrist turns the end onto it]
+    IK --> OTHER[the other hand closes on the shaft<br/>where the shaft is nearest it]
+    IK --> HIT[on_hit: chips fly from where<br/>the tool landed: real bodies]
+    BARE[a bare palm the clip brings<br/>within a span of a thing] --> FACE
+    end
+    subgraph HEFT[What hangs and swings: scripts/heft.gd]
+    HANG[Heft.hang: a weight on a cord,<br/>driven by the hand that carries it] --> L1[a lantern on its stick,<br/>the baskets of a pole,<br/>the pan of a steelyard, a line]
+    PEND[Heft.pendulum:<br/>theta'' = -g/L sin theta - c theta' + push] --> L2[the bell is kicked,<br/>the swing is pumped,<br/>the chimes take the wind]
+    PEND -.->|tested| PERIOD[period = 2 pi root L over g<br/>to three parts in a hundred]
+    end
+    subgraph PHASES[The five phases on the land: scripts/phases.gd]
+    K[K: the hand turned to a phase<br/>the plain blade is always first] --> F[F: Phases.cast, pure:<br/>the grid and what lies there]
+    F --> BASE[what the phase does to a wood,<br/>to open ground, to water]
+    F --> QUELL[it quells what it overcomes:<br/>water on fire is steam]
+    F --> FEED[it is fed by what bears it:<br/>fire in blossom is a blaze]
+    BASE & QUELL & FEED --> STATE[Game.touched: a tile, what, the day<br/>no tile changed, mends by days lived]
+    STATE --> DRAW[drawn only: flames flicker, steam rises,<br/>the trees that stand there go black,<br/>or pink, or dark with wet]
+    end
+    subgraph P37[Part XXXVII: A Cup of Water, a Cart of Firewood]
+    FIRE[forty disciples, forty techniques,<br/>and a fire that went out because it rained] --> SU[Su Dai: firewood carried<br/>to put out a fire] --> BAI[Bai Gui: the neighbour's<br/>country for a drain] --> CAI[Cai Yong: the log that sang<br/>under a pot of rice] --> ROUND[the whole round<br/>on one piece of ground] --> END((Five in<br/>One Hand))
+    end
+    QUELL -.->|fire, then water| P37
+    FEED -.->|blossom, then fire: see how far it goes| P37
+    BASE -.->|earth raised, thunder called| P37
+```
+
+| | | |
+|---|---|---|
+| ![wood: the stand in blossom](docs/screenshots/phase_wood.webp) | ![earth: boulders heaved up among the roots](docs/screenshots/phase_earth.webp) | ![water: the stand drenched, and dripping](docs/screenshots/phase_water.webp) |
+| ![blossom, and then fire: a blaze](docs/screenshots/phase_meet_blaze.webp) | ![earth, and then root in it: a mossy bank](docs/screenshots/phase_meet_moss.webp) | ![thunder, and then the rain it opens the door to](docs/screenshots/phase_meet_rain.webp) |
+
+![the five phases at a forest's edge, in the order the hand turns through them: wood, fire, earth, thunder, water](docs/screenshots/phases_sheet.webp)
+
+![what the phases leave, as it is drawn: burning, a pool, grass and flowers, a ridge, a seam of glass, a kiln floor, a lodestone, rain that stays, a grove, a mossy bank](docs/screenshots/phase_things.webp)
+
+![the things that hang from a hand: a lantern on its stick, a shoulder pole and its baskets, a steelyard and its pan; a hoe and a rod](docs/screenshots/held_things.webp)
+
+```mermaid
+flowchart LR
+    W((wood)) ==>|feeds: a blaze| FI((fire)) ==>|feeds: a kiln floor| E((earth)) ==>|feeds: a lodestone| T((thunder)) ==>|feeds: rain that stays| WA((water)) ==>|feeds: a grove| W
+    WA -.->|quells: steam| FI
+    W -.->|quells: a mossy bank| E
+    E -.->|quells: a seam buried| T
+    T -.->|quells: it runs through<br/>everything wet| WA
+```
+
+```mermaid
+sequenceDiagram
+    participant C as the clip (AnimationPlayer)
+    participant R as Grip.Reach (after the clip)
+    participant S as the skeleton
+    participant W as the world
+    C->>S: this frame's pose (the arm swings)
+    R->>S: where is the working end of the tool?
+    R->>R: is it in its stroke? (Grip.span, measured once)
+    R->>W: what is under it, or in front of it?
+    W-->>R: the ground's height, the trunk, the nearest face
+    R->>S: upper arm and forearm solved, wrist turned: the end is on it
+    R->>S: the other hand to the nearest of the shaft
+    R->>W: it has landed here (chips, with weight, from this point)
+    R->>S: what hangs from the hand, swung (Heft.hang)
+    Note over S: drawn; and the next frame the clip's own pose is back
+```
+
+- **Hands close on what they hold, and tools meet what they work on** (`scripts/grip.gd`, new). Nobody had looked at a hand from a pace away. Three things were wrong with every animation that had a thing in it:
+  - **What was held was not in the hand.** Every held thing in the game is drawn to be gripped eight centimetres below a wrist. The hand bones of the people the Blender scripts make point *down* their own +Y, so that was eight centimetres **up the forearm**: a hoe went through the sleeve and the fist closed on air fifteen centimetres below it. It has been so since the first glTF character. `Grip.seat` puts the grip in the palm; `World._hold_in_hand`, the one place anything is put into a hand (the hero, Yue Ling, every townsperson), asks it.
+  - **The other hand was nowhere.** A hoe, a broom, an axe, a spade, a pick and a long ladle are worked with two hands; the clips moved one arm. The other hand now closes on the shaft, wherever on it is nearest (`Grip.TOOLS.two`): two bones solved for one point, the bones kept their length and the elbow kept on the side the clip had it (`Grip.solve`).
+  - **The tool met nothing.** A hoe was swung at the air at the height of the waist; a broom swept a hand above the ground; an axe was swung at a tile, not a tree. Each tool says where its working end is and how it is used; in the part of the stroke where the clip brings it nearest (`Grip.span`: measured from the clip itself the first time, never authored) the arm is solved and the wrist turned so that the end is **on** what it works: the ground under it, whatever the slope; **the trunk of the tree that really stands on that tile** (`World._trunk_at`); the nearest face of the thing in front of him, found on the triangles of its own mesh (`Grip.closest`).
+  - **A bare hand is laid on what it touches**: the stele he reads, the lion's head, the panel he knocks on, the strings of the qin, the rim of the cradle.
+  - **None of it is in a clip.** It is a `SkeletonModifier3D` that runs after the animation and is undone before the next frame, so no clip was rewritten and not one of 293 characters was rebuilt. With no window nothing is held and nothing is solved; the bot's journey is the same.
+- **Things move as things with weight move** (`scripts/heft.gd`, new). What a hand carries that hangs **hangs**: the lantern on a watchman's stick, the two baskets of a shoulder pole, the pan and the weight of a steelyard, a fishing line are each a weight on a cord driven by the hand (`Heft.hang`): start walking and it lags, stop and it swings on. They were rigid with the wrist: a lantern stood out sideways when the arm was raised. **The bell is struck and the swing is pumped** (`Heft.pendulum`, the equation of a pendulum, integrated): both were sines with an envelope. The tests time a pendulum of three lengths against 2&pi;&radic;(L/g) and check that it gains nothing from nowhere. **Chips are bodies**: where an axe, a pick or a spade lands, chips of the right colour fly back from *that point*, fall, bounce on the ground as it really lies and come to rest (`Heft.chips`, the same rigid bodies the breaking of things already used).
+- **The five phases do to the land what they are** (`scripts/phases.gd`, new). Fire, water, wood, earth and thunder were five colours of one number: a fire technique and a water technique took different amounts off a foe and left the wood they were thrown in exactly as it was. Now **K** turns his hand to a phase (the plain blade is always the first, and is what it always was), and with F the land answers as what it is:
+
+  | | a wood | open ground | water |
+  |---|---|---|---|
+  | **fire** | it burns, and the stands beside it catch | scorched, with embers in it | a bank of steam |
+  | **water** | drenched (and will not take fire) | a pool left standing | a swell |
+  | **wood** | in blossom | grass and flowers to the knee | a raft of lotus |
+  | **earth** | boulders heaved up among the roots | a ridge of raised stone | a gravel bar |
+  | **thunder** | every trunk riven and smoking | a branch of fused glass | it crackles, and runs through everything wet that touches |
+
+  - **The phases meet as the old round has them meet.** A phase **quells** the one it overcomes (the same weaknesses every foe already has: the tests count the foes that agree): water on anything burning leaves steam and nothing burning; root breaks a ridge into a mossy bank; earth buries a seam of glass; thunder runs through water. A phase is **fed** by the one that bears it (the round the spirit root already turns in): fire in blossom is a blaze that takes twice as many stands; earth on what is scorched bakes hard as a kiln floor; thunder into raised stone leaves a lodestone; water after thunder comes down as rain that stays; and wood where it is wet is a grove. What overcomes the stroke spends it: a drenched wood does not burn, the fire only dries it.
+  - **It is state, and only drawn.** `Phases.cast` is a pure function of the grid and what lies there: a tile, what, the day (`Game.touched`). **No tile changes**: a burning wood is still a wood nobody walks through, a ridge bars nobody, a pool is walked as the ground it is drawn on. It mends by days lived. On screen the trees that really stand on the tile take its colour (burnt black, in blossom, dark with wet), flames flicker, steam and smoke drift up, and each phase has its own burst as it lands.
+  - **In battle too**: a technique of a phase leaves on the ground under whoever it struck what that phase leaves, and the next one meets it by the same rule (`Phases.come`).
+  - Packs, obstacles of the story and what people leave about are struck by the blade exactly as they were, so the bot's first strikes and every older step are the same. With a phase in the hand the land is not *broken* (the weight of a blow, the last release), except in a step that asks for breaking.
+- **Part XXXVII: A Cup of Water, a Cart of Firewood** ([below](#part-xxxvii-a-cup-of-water-a-cart-of-firewood)): twenty-nine steps at Azure Cloud Sect, the Ashen Volcano, Tushan, the Drowned Fields of Gun, Qingshi and Thunder Valley; nine new foes and three lords, all met in caves; three people built from scripts (Su Dai the Persuader, Minister Bai Gui, Cai Yong); a new kind of step (`"phase"`: blows the land answered, or blows in which one phase overcame or fed another), two new ways through a trial (by the round, by the measure), a crossroads with three marks on the mountain, four letters, five feats, and the forty-third realm.
+- **Five bugs fixed, and fifteen slips caught before they shipped** ([Bugs found and fixed](#bugs-found-and-fixed)). The oldest: **everything anybody has ever held has been in their sleeve.**
+- **Nothing older moved, and nothing was stood on the land but three marks.** The chapter's packs, lords, people and things to find are stood in three more caves, after everything that was already there (`Caves.LATE`, `"after": true`). Every entity, peak and camp of the five realms and every cave was dumped from both checkouts: 6,021 before, 6,075 after, **none moved or removed**, fifty-four added.
+- **The whole game** is 1 hour 2 minutes 37 seconds longer, verified by the playthrough bot (45:27:41 against 44:25:04): 3,253 battles against 6,689 foes. The bot turns its hand to a phase only inside the chapter's own steps (thirty-one blows that the land answered, in which one phase overcame another on 166 tiles and was fed by another on 435), and strikes with the plain blade everywhere else.
+- **Code**: the game's GDScript is 95,526 lines (93,356 before). The tests now make 100,058 checks (86,162 before).
+
+### Previous release: blows that weigh what his realm weighs, a meal cooked in a pot that is physics, picking, digging and veins, first person and Part XXXVI
 
 ```mermaid
 flowchart LR
@@ -79,7 +182,7 @@ flowchart LR
 - **The whole game** is 1 hour 0 minutes 9 seconds longer, verified by the playthrough bot (44:25:04 against 43:24:55): 3,185 battles against 6,525 foes. The bot cooks three meals and all three come out right (the broth turned once, the stew twice, the fish not at all), picks three handfuls, digs three yams, casts, works three veins, strikes three blows held back to a single cut and one in earnest; over the whole journey 46 of its blows broke something of the land (434 stands of trees, 640 tiles of ground, 28 craters), all mended since. The run was made twice on the finished scripts, and both took 44:25:04.
 - **Code**: the game's GDScript is 93,356 lines (91,105 before). The tests now make 86,162 checks.
 
-### Previous release: a rite for each of the seventeen Daos, spirit roots of one to five phases, people who answer both and Part XXXV
+### Two releases ago: a rite for each of the seventeen Daos, spirit roots of one to five phases, people who answer both and Part XXXV
 
 ```mermaid
 flowchart LR
@@ -145,7 +248,7 @@ The other nine rites (the eight above are at the head of this page):
 - **The whole game** is 1 hour 15 minutes 30 seconds longer, verified by the playthrough bot (43:24:55 against 42:09:25): 3,116 battles against 6,356 foes. Part XXXV alone was also played from its first step with a Heavenly Root and with a waste root (`--root=1`, `--root=5`), and with a hero who is a woman: 1:23:44 and 1:22:50 against 1:23:50 for a True Root.
 - **Code**: the game's GDScript is 91105 lines (89,111 before). The tests now make 72,302 checks.
 
-### Two releases ago: small things a hand closes on, people who answer what is done, a leap and Part XXXIV
+### Three releases ago: small things a hand closes on, people who answer what is done, a leap and Part XXXIV
 
 ```mermaid
 flowchart LR
@@ -209,7 +312,7 @@ flowchart LR
 - **The whole game** is 1 hour 13 minutes 8 seconds longer, verified by the playthrough bot (42:09:25 against 40:56:17): 3,016 battles against 6,120 foes.
 - **Code**: the game's GDScript is 89,111 lines (86,719 before). The tests now make 70,261 checks.
 
-### Three releases ago: a bot three times as fast, foes that fight as what they are, what people work for and Part XXXIII
+### Four releases ago: a bot three times as fast, foes that fight as what they are, what people work for and Part XXXIII
 
 ```mermaid
 flowchart LR
@@ -273,7 +376,7 @@ flowchart LR
 - **The whole game** is 1 hour 40 minutes 12 seconds longer, verified by the playthrough bot (40:56:17 against 39:16:05): 2,911 battles against 5,866 foes.
 - **Code**: the game's GDScript is 86719 lines (85,219 before). The tests now make 66,248 checks.
 
-### Four releases ago: spirit arks, a fifth realm that only they reach, who lives upstairs and shared ground measured as drawn
+### Five releases ago: spirit arks, a fifth realm that only they reach, who lives upstairs and shared ground measured as drawn
 
 ```mermaid
 flowchart LR
@@ -339,7 +442,7 @@ flowchart LR
 - **The whole game** is 1 minute 5 seconds shorter than the last release, verified by the playthrough bot (39:16:05 against 39:17:10): the Far Countries are not on the story's road, and the bot fights the same 2,772 battles against the same 5,546 foes. The difference is words: the lines the plot holes rewrote, most of them shorter, and one echo more that is heard; from there the clock runs a minute differently, and one thing the last run came on by chance at midnight on a summit this one does not. CI still requires **16 hours**.
 - **Code**: the game's GDScript is 85,219 lines (83,580 before) and the Blender Python is as it was; no asset was rebuilt (the people of the Far Countries wear the bodies of the towns, and an ark is built from code like a junk). The tests now make 64,283 checks.
 
-### Five releases ago: the body measured against a reference and re-sculpted, courtship after the question and Part XXXII
+### Six releases ago: the body measured against a reference and re-sculpted, courtship after the question and Part XXXII
 
 ```mermaid
 flowchart LR
@@ -398,7 +501,7 @@ flowchart LR
 - **Code**: the game's GDScript is 83,580 lines and the Blender Python 31,637; all 352 assets (274 people, 42 monsters, two mounts, 26 props and 8 weapons) were rebuilt and pass the asset checks. The tests now make 62,497 checks.
 
 
-### Six releases ago: a people twice a man's height, houses built for them, a face earned by the Way, close-ups and Part XXXI
+### Seven releases ago: a people twice a man's height, houses built for them, a face earned by the Way, close-ups and Part XXXI
 
 ```mermaid
 flowchart LR
@@ -466,7 +569,7 @@ flowchart LR
 - **The bot** asks two of the Great People of Landfall which door they came in by, carries four beams to a carpenter, and passes the Hour by them.
 - **Code**: the game's GDScript grew to 82,756 lines and the Blender Python to 31,042 (`giants.gd`, `visage.gd` and `closeup.gd` are new); all 347 assets (269 people, 42 monsters, two mounts, 26 props and 8 weapons) pass the asset checks. The tests now make 60,987 checks.
 
-### Seven releases ago: anybody can be killed and somebody answers for it, forbidden Daos, a wild that can be hunted out and Part XXX
+### Eight releases ago: anybody can be killed and somebody answers for it, forbidden Daos, a wild that can be hunted out and Part XXX
 
 ```mermaid
 flowchart LR
@@ -538,7 +641,7 @@ flowchart LR
 - **The bot** draws on nobody, leaves the shelf shut and is wanted nowhere, so it passes the Sentence "by a clean name"; its report now says what all its hunting did to the land (nine countries thinned at one time or another, none hunted out, none barren, and every one in balance again by the end).
 - **Code**: the game's GDScript grew to 81,404 lines and the Blender Python to 30,829 (`crime.gd`, `taboo.gd` and `wilds.gd` are new); all 340 assets (262 people, 42 monsters, two mounts, 26 props and 8 weapons) pass the asset checks. The tests now make 59,333 checks.
 
-### Eight releases ago: an almanac, the Way he walks, picky households and Part XXIX
+### Nine releases ago: an almanac, the Way he walks, picky households and Part XXIX
 
 ```mermaid
 flowchart LR
@@ -607,7 +710,7 @@ flowchart LR
 - **The bot** puts three houses of Qingshi to rights (sending out for what each wants), carries green timber to a householder who will not use it, lays four shingles before a fire, climbs to look at a town a crane no longer knows, flies ten tiles as he flew, looks again at four things it left standing, carries four pieces of gold back to a furrow, puts three houses of Yanggu to rights, shows six rooms to a man who asked where he belongs, and tells Guan Ning to leave the mat whole. Its own Way is told as it goes: a **Carefree Wanderer** by the fourteenth hour (the wide world is behind most of what it answers, it changes Daos, and it strikes packs in their sleep), struck from the stipend by midwinter; back in the middle once Guiyun is built; and a **Benevolent Wayfarer** when the sixth house is put to rights.
 - **Code**: the game's GDScript grew to 78,992 lines and the Blender Python to 30,765 (`almanac.gd`, `creed.gd` and `fitting.gd` are new); all 336 assets (258 people, 42 monsters, two mounts, 26 props and 8 weapons) pass the asset checks. The tests now make 57,394 checks.
 
-### Nine releases ago: how the towns stand, the work of the towns, nothing sharing ground and Part XXVIII
+### Ten releases ago: how the towns stand, the work of the towns, nothing sharing ground and Part XXVIII
 
 ```mermaid
 flowchart LR
@@ -698,7 +801,7 @@ flowchart LR
 - **The bot** cuts the general's grass, climbs to look for whoever ties it, asks the hunters of the road, lays five knots in front of Du Hui, carries yellow flowers to a boy, flies ten tiles to show a sparrow how, lays four rings before an owl, catches carp for bait, stands in front of the third scourge, **gives to the chests of three towns**, calls on five people whose lives turned on an answer, and tells an old man that a kindness is owed to the next stranger. Its report: **PASS**, 33:49:41 of game time, 2,310 battles and one death.
 - **Code**: the game's GDScript grew to 77,035 lines and the Blender Python to 30,701 (`weal.gd` and `clash.gd` are new); all 332 assets (254 people, 42 monsters, two mounts, 26 props and 8 weapons) rebuild from their scripts, the nine models of the party with ten more clips. The tests now make 56,096 checks.
 
-### Ten releases ago: what things weigh, the work of the hands and Part XXVII
+### Eleven releases ago: what things weigh, the work of the hands and Part XXVII
 
 ```mermaid
 flowchart LR
@@ -767,7 +870,7 @@ flowchart LR
 - **The bot** fells its three trees, carries eight stems to Tao Kan five at a time (never more than its back takes at its own pace), cuts stone for the footings and the kiln three blocks at a time, walks eight sacks of charcoal up the mountain to Smith Tie on its own feet (two hundred jin is more than its flying barque will lift, and it knows it), takes a sack to five hearths, cuts herbs for the temple's pot, catches five carp for Budai, picks the sack up again, and goes to look at what it set down. Its report: **PASS**, 32:36:20 of game time, 2,234 battles and one death.
 - **Code**: the game's GDScript grew to 75,054 lines and the Blender Python to 30,333 (`load.gd`, `toil.gd` and `burden.gd` are new); all 327 assets (249 people, 42 monsters, two mounts, 26 props and 8 weapons) rebuild from their scripts. The tests now make 50,438 checks.
 
-### Eleven releases ago: bodies under the clothes, thirty-two monsters re-sculpted and Part XXVI
+### Twelve releases ago: bodies under the clothes, thirty-two monsters re-sculpted and Part XXVI
 
 ```mermaid
 flowchart LR
@@ -821,7 +924,7 @@ flowchart LR
 | ![the mammals, before and after](docs/screenshots/monsters_mammals.webp) | ![eight heads, before and after](docs/screenshots/monsters_heads.webp) |
 | ![the scaled, shelled and many-legged, before and after](docs/screenshots/monsters_scaled.webp) | ![a soak in the hot spring of Glowcap Vale](docs/screenshots/soak_fungal.webp) |
 
-### Twelve releases ago: a town of one's own, a sect to found or take, four more ends and Part XXV
+### Thirteen releases ago: a town of one's own, a sect to found or take, four more ends and Part XXV
 
 ```mermaid
 flowchart LR
@@ -935,7 +1038,7 @@ flowchart LR
 | ![the people of Part XXV: Feng Xuan, the Widow of Mount Tai, Han Song](docs/screenshots/part25_people.webp) | ![the three lords](docs/screenshots/part25_lords.webp) |
 | ![the foes of Part XXV: granary rats, seed-sparrows, thatch-moths, seal-wasps, tally-crows, oxen of the corvee, cock-crowers, dog-thieves, guests nobody asked, disciples, needle-sprites and cranes of the Cold Pine](docs/screenshots/part25_foes.webp) | |
 
-### Thirteen releases ago: choices that stand in the land, battles that cannot be won, a lived-in world and Part XXIV
+### Fourteen releases ago: choices that stand in the land, battles that cannot be won, a lived-in world and Part XXIV
 
 ```mermaid
 flowchart LR
@@ -1068,7 +1171,7 @@ flowchart LR
 | ![Shazhou Oasis: flat roofs of sun-dried brick, turquoise domes and awnings](docs/screenshots/town_shazhou.webp) | ![Tushan: fired brick, black tiles and bronze](docs/screenshots/town_tushan.webp) |
 | ![the Green Stone Inn of Qingshi from above: four storeys, and a gabled wing built out from its end](docs/screenshots/house_village_inn.webp) | ![a house with a wing, from above](docs/screenshots/house_village_teahouse.webp) |
 
-### Fourteen releases ago: music from code, a host and field battles, more to wear, feats and finds, a bigger Qingshi and Part XXIII
+### Fifteen releases ago: music from code, a host and field battles, more to wear, feats and finds, a bigger Qingshi and Part XXIII
 
 ```mermaid
 flowchart LR
@@ -1184,7 +1287,7 @@ flowchart LR
 | ![Yue Ling's page: where the two of them stand, gifts given and hours had](docs/screenshots/yue_courtship_page.webp) | ![something for Yue Ling: twelve gifts, and what she made of each](docs/screenshots/gifts_choice.webp) |
 | ![an hour with Yue Ling: ten, each in its own kind of place and hour](docs/screenshots/outings_choice.webp) | ![an hour on the nine hundred and ninety-nine steps](docs/screenshots/outing_steps.webp) |
 
-### Fifteen releases ago: mountains in every region, climbing, the cloud-kite, the people of the road and Part XXII
+### Sixteen releases ago: mountains in every region, climbing, the cloud-kite, the people of the road and Part XXII
 
 
 ```mermaid
@@ -1260,7 +1363,7 @@ flowchart LR
 | ![the foes of Part XXII: salt-thieves, false echoes, night-fire crabs, stray gusts, kite-hawks, leaking wind-bags, red leopards, fig-leaf creepers, rain-calling gibbons, steles of somebody's merit, smokes of announcement and serpents of the eighteen bends](docs/screenshots/part22_foes.webp) | ![a trial passed by the heights: nine summits, and nothing to report to the Lord of the Eastern Peak](docs/screenshots/trial_by_the_heights.webp) |
 | ![the last crossroads of Part XXII: what a summit is for](docs/screenshots/crossroads_tops.webp) | ![the Lord of the Eastern Peak at his desk on the very top of Sun-Viewing Peak](docs/screenshots/dongyue_on_the_peak.webp) |
 
-### Sixteen releases ago: faces that show what they feel, the Eight Arms, twelve ends and Part XXI
+### Seventeen releases ago: faces that show what they feel, the Eight Arms, twelve ends and Part XXI
 
 
 ```mermaid
@@ -1336,7 +1439,7 @@ flowchart LR
 
 **Where the chapter comes from.** Ou Yezi and the five swords he cast for the King of Yue (Zhanlu, which left an unjust king in the night and went by water to another) are in the *Yuejue shu*; Gan Jiang and Mo Ye, the pair of swords named for a smith and the wife who went into the furnace, are in the *Wu Yue Chunqiu*, and the *Book of Jin* has them leap from a belt into the river at Yanping Ford as two dragons. The Maiden of Yue, who taught an army ("inside, be full of spirit; outside, show calm: look like a mild woman, strike like a frightened tiger") and met the old man in white who went up a tree an ape, is in the *Wu Yue Chunqiu* too. Ji Chang, who lay under a loom to learn not to blink, looked at a louse until it was a cartwheel, tried to kill his teacher and met his arrows in the air, is in the *Liezi*; that he ended by forgetting what a bow was is Nakajima Atsushi's telling of it. King Wen of Zhao, his three thousand swordsmen and the three swords are the *Zhuangzi*'s Discourse on Swords, whose last line is that the swordsmen all killed themselves, which the chapter declines to take for a happy ending; the cock of wood is the *Zhuangzi*'s as well. King Helu's three thousand swords under Tiger Hill and the white tiger on the mound are the *Yuejue shu* again, and the snake in the cup that was the shadow of a bow is the *Fengsu tongyi*. "Arms are instruments of ill omen" and "the best fighter is not angry" are the *Daodejing*, 31 and 68.
 
-### Seventeen releases ago: voxel caves under every region, twice the room indoors and Part XX
+### Eighteen releases ago: voxel caves under every region, twice the room indoors and Part XX
 
 *(This release's notes were not written into the README at the time; they are summarised here from its commit.)*
 
@@ -1350,7 +1453,7 @@ flowchart LR
 |---|---|
 | ![the Cave of Ten Thousand Echoes](docs/screenshots/cave_karst_chamber.webp) | ![a trial passed by the dark](docs/screenshots/trial_by_the_dark.webp) |
 
-### Eighteen releases ago: smaller and faster, crossroads that echo, the Hundred Works, the hours of the wild and Part XIX
+### Nineteen releases ago: smaller and faster, crossroads that echo, the Hundred Works, the hours of the wild and Part XIX
 
 ```mermaid
 flowchart LR
@@ -1464,7 +1567,7 @@ flowchart LR
 
 **Where the chapter comes from.** The old gardener is in the *Zhuangzi* (the chapter Heaven and Earth): Zigong, travelling south of the Han, sees an old man watering his garden with a pitcher carried up out of a tunnel, tells him of the well-sweep that waters a hundred plots a day, and is told: where there are machines there will be machine affairs, and where there are machine affairs there will be a machine heart; "it is not that I do not know of it: I would be ashamed to use it." Gongshu Ban (Lu Ban) and Mozi are in the *Mozi*: the cloud ladder built for Chu to take Song, the ten days and nights' walk, the belt for a wall and the slips of wood, nine assaults turned on a tabletop; and the wooden magpie that flew three days, of which Mozi said a linchpin was worth more. Yan Shi and the dancer who winked at King Mu's ladies, taken apart to show it was leather, wood, glue and lacquer with a heart that made it speak, are in the *Liezi*. Cook Ding, whose knife was not sharpened in nineteen years ("what your servant cares about is the Way, which goes beyond skill"), and Wheelwright Pian, who could not teach his son the trick of it, are in the *Zhuangzi* again. The chapter does not decide between them: the last question has four answers, and the makers are still arguing at the end.
 
-### Nineteen releases ago: faces towards life, six hearths, a hero of either sex and Part XVIII
+### Twenty releases ago: faces towards life, six hearths, a hero of either sex and Part XVIII
 
 ```mermaid
 flowchart LR
@@ -1529,7 +1632,7 @@ flowchart LR
 
 **What the hearths are made from.** None of the six is one living people. Each is put together from old customs of the lands the story's myths come from: *zuan sui gai huo*, the changing of the fire with the seasons recorded in the Zhou li and the Analects (elm and willow in spring, jujube and apricot in summer, mulberry at the turn, oak in autumn, sophora in winter), and the cold food that went with it; "have you eaten?" as a greeting, and chopsticks never stood in the rice; the boat-dwelling families of the southern rivers, the fire that goes aboard with the bride and the fish that is never turned over; the hearth-ring of the felt tent, the threshold not stepped on, the bowl taken with the right hand and the youngest son as keeper of the fire; bread torn and never cut, and water before words, along the oasis roads; and "the firewood burns out, the fire is passed on" from the Zhuangzi, which gives the new realm its name. Suiren, Zhurong and Huilu are the Fire-Driller, the Fire Regulator and the fire that visits uninvited of the old books.
 
-### Twenty releases ago: anime faces and bodies, the sword's wake and Part XVII
+### Twenty-one releases ago: anime faces and bodies, the sword's wake and Part XVII
 
 ```mermaid
 flowchart LR
@@ -1603,7 +1706,7 @@ The anime look was researched from published material on gacha-game characters (
 - **Physics**: a felled tree falls as a rod pivoting on its base (the physical pendulum, I = mL^2/3), integrated once per tree; Godot's rigid bodies and height-field shapes for the pieces.
 - **Part XVII**: [Lichun](https://en.wikipedia.org/wiki/Lichun) and the whipping of the Spring Ox; [Gou Mang](https://en.wikipedia.org/wiki/Goumang), god of spring and wood; [Jingzhe](https://en.wikipedia.org/wiki/Jingzhe), the Waking of Insects, and the beating of the petty people under bridges ([Da Siu Yan](https://en.wikipedia.org/wiki/Villain_hitting)); [Longtaitou](https://en.wikipedia.org/wiki/Zhonghe_Festival), the day the dragon raises its head, and its haircuts; [Leigong](https://en.wikipedia.org/wiki/Leigong); [Qingnü](https://zh.wikipedia.org/wiki/%E9%9D%92%E5%A5%B3), goddess of frost and snow; [Taisui](https://en.wikipedia.org/wiki/Tai_Sui) and asking his pardon before digging; the five poisons ([Wu Du](https://en.wikipedia.org/wiki/Five_poisons)); [Mingqian tea](https://en.wikipedia.org/wiki/Longjing_tea) picked before Qingming; [Qingming](https://en.wikipedia.org/wiki/Qingming_Festival), its willow, its tomb-sweeping and its kites.
 
-### Twenty-one releases ago: day and night, the people of the towns, things that break and Part XVI
+### Twenty-two releases ago: day and night, the people of the towns, things that break and Part XVI
 
 ```mermaid
 flowchart LR
@@ -1655,7 +1758,7 @@ flowchart LR
 - **Code**: the game's GDScript grew from 44,004 to 47,498 lines (`scripts/clock.gd`, `scripts/folk.gd` and `scripts/havoc.gd` are new) and the Blender Python from 21,542 to 21,984 lines: 22 commoners, the Kitchen God and the two door gods are new characters, six new clips, and Lin Feng (all four looks) and Yue Ling are rebuilt with them. The tests grew from 1,879 to 2,132 lines (22,603 checks).
 - **Bugs found and fixed** (see [below](#bugs-found-and-fixed)).
 
-### Twenty-two releases ago: Yue Ling's own story, more to do and Part XV
+### Twenty-three releases ago: Yue Ling's own story, more to do and Part XV
 
 ```mermaid
 flowchart LR
@@ -1717,7 +1820,7 @@ flowchart LR
 | ![the hermitage's moon gate](docs/screenshots/hermitage_gate.webp) | ![Suo, Warden of the Lock, and the Key of the Open Door](docs/screenshots/battle_lock_warden.webp) |
 | ![the moths that eat forgetting](docs/screenshots/battle_forgetting.webp) | ![the new things to do, in use](docs/screenshots/props_lotus_sheet_0.webp) |
 
-### Twenty-three releases ago: fates and faces, outfits, rides and Part XIV
+### Twenty-four releases ago: fates and faces, outfits, rides and Part XIV
 
 ```mermaid
 flowchart LR
@@ -1793,7 +1896,7 @@ flowchart LR
 
 ![the ending's film: each wonder the story set right, with its line of the epilogue](docs/screenshots/ending_film.webp)
 
-### Twenty-four releases ago: many roads, crafting, renown and Part XIII
+### Twenty-five releases ago: many roads, crafting, renown and Part XIII
 
 ```mermaid
 flowchart LR
@@ -1916,7 +2019,7 @@ Background for that release (the Eight Gates, Chiyou and the war at Zhuolu):
 - **The Eight Gates**: Opening, Rest, Life, Harm, Closing, Sight, Alarm and Death of [Qimen Dunjia](https://en.wikipedia.org/wiki/Qimen_Dunjia), taught to the Yellow Emperor by the Mysterious Lady of the Nine Heavens, laid on the eight trigrams ([Bagua](https://en.wikipedia.org/wiki/Bagua)); the "Eight Gates Golden Lock" formation of the *Romance of the Three Kingdoms*, which falls when it is entered by the right gate.
 - **Wang and Liang, Chi and Mei**: the goblins of the mountains, old things and waters that fought in Chiyou's host.
 
-### Twenty-five releases ago: realms and talents that matter, cutscenes and Part XII
+### Twenty-six releases ago: realms and talents that matter, cutscenes and Part XII
 
 ```mermaid
 flowchart LR
@@ -1996,7 +2099,7 @@ Background for that release (the Isles of the Immortals and the Returning Ruins,
 - **The sea's gods and creatures**: [Mazu](https://en.wikipedia.org/wiki/Mazu), with her generals Qianliyan and Shunfeng'er; [Jingwei](https://en.wikipedia.org/wiki/Jingwei), the Flame Emperor's daughter who fills the sea with pebbles, and Tianwu, the eight-headed water god, in the *Classic of Mountains and Seas*; Yu Qiang, god of the northern sea; Ruo of the Northern Sea and the River Earl in the "Autumn Floods" chapter of the [*Zhuangzi*](https://en.wikipedia.org/wiki/Zhuangzi_(book)); [Wu Zixu](https://en.wikipedia.org/wiki/Wu_Zixu), god of the tidal bore; the *shen*, the clam whose breath builds the mirages of the sea ([haishi shenlou](https://en.wikipedia.org/wiki/Fata_Morgana_(mirage))); the Sea-Monk (haiheshang) of the fishermen's tales.
 - **Cultivation realms and talents**: the realms, spiritual roots and talents of [xianxia](https://en.wikipedia.org/wiki/Xianxia) cultivation fiction, and realm suppression ("jingjie yazhi"), a staple of the genre.
 
-### Twenty-six releases ago: three realms, six Daos, six peoples and Part XI
+### Twenty-seven releases ago: three realms, six Daos, six peoples and Part XI
 
 | | |
 |---|---|
@@ -2095,7 +2198,7 @@ Background for this release (the myths of the Jianmu and the realms, the Daos an
 - **The peoples**: the Feathered People, the Deathless (black-skinned people who eat of the immortal tree) and the dragon-kin in the *Classic of Mountains and Seas*; the Jiaoren, whose tears turn to pearls, in the *Bowuzhi* and Gan Bao's *Soushen Ji*; celestial foxes who climb to heaven at a thousand years ([huli jing](https://en.wikipedia.org/wiki/Huli_jing)).
 - **The bosses**: [Leigong](https://en.wikipedia.org/wiki/Leigong), Duke of Thunder; Feilian, Earl of the Wind; Kui, the one-legged thunder ox of the *Classic of Mountains and Seas*; Jiufeng, the nine-headed bird of Chu; [Pixiu](https://en.wikipedia.org/wiki/Pixiu); Shentu and Yulei, the door gods under the peach tree ([Menshen](https://en.wikipedia.org/wiki/Menshen)); [Zhulong](https://en.wikipedia.org/wiki/Zhulong_(mythology)), the Torch Dragon whose open eye is day; Wangxiang, the water goblin; [Heibai Wuchang](https://en.wikipedia.org/wiki/Heibai_Wuchang), Black and White Impermanence.
 
-### Twenty-seven releases ago: an organic continent, four towns and Part X
+### Twenty-eight releases ago: an organic continent, four towns and Part X
 
 ```mermaid
 flowchart LR
@@ -2152,7 +2255,7 @@ Background for this release (the techniques behind the new map, cartography and 
 - **Cartography**: [Pei Xiu and his six principles of map-making](https://en.wikipedia.org/wiki/Pei_Xiu), [Yu Gong (the Tribute of Yu) and the Nine Provinces](https://en.wikipedia.org/wiki/Nine_Provinces).
 - **The myths of Part X**: [Nine Tripod Cauldrons](https://en.wikipedia.org/wiki/Nine_Tripod_Cauldrons), [Yu the Great and the Great Flood](https://en.wikipedia.org/wiki/Great_Flood_(China)), [Gun](https://en.wikipedia.org/wiki/Gun_(Chinese_mythology)) and [Xirang](https://en.wikipedia.org/wiki/Xirang), [Gonggong](https://en.wikipedia.org/wiki/Gonggong) and [Mount Buzhou](https://en.wikipedia.org/wiki/Mount_Buzhou), [Xiangliu](https://en.wikipedia.org/wiki/Xiangliu), [Yinglong](https://en.wikipedia.org/wiki/Yinglong), [Longmen and the carp that leap the Dragon Gate](https://en.wikipedia.org/wiki/Longmen_(mythology)), [He Bo and Ximen Bao](https://en.wikipedia.org/wiki/He_Bo), [Taotie](https://en.wikipedia.org/wiki/Taotie), Fangfeng and the assembly at Kuaiji ([Yu the Great](https://en.wikipedia.org/wiki/Yu_the_Great)), [Kuafu](https://en.wikipedia.org/wiki/Kuafu), [Kun and Peng](https://en.wikipedia.org/wiki/Peng_(mythology)), [Tushan and the nine-tailed fox](https://en.wikipedia.org/wiki/Huli_jing).
 
-### Twenty-eight releases ago: hanfu characters, five-colour monsters and Part IX
+### Twenty-nine releases ago: hanfu characters, five-colour monsters and Part IX
 
 ```mermaid
 flowchart LR
@@ -2232,7 +2335,7 @@ Researched for that release (characters, creatures, rigs, animation, landscape a
 - **Monster colour**: [the 60-30-10 rule applied to characters](https://pixflow.net/blog/the-ultimate-guide-to-creating-memorable-character-color-palettes/), [Fiveable: colour balance and proportion](https://fiveable.me/color-theory-and-application/unit-6/color-balance-proportion/study-guide/gJcxbcR9KQVhlVIz), [colour palettes and game design](https://www.gamedeveloper.com/design/where-colour-meets-design-colour-palettes-and-game-design), [evolution of Pokemon designs: one main colour and contrasting details](https://www.gamedeveloper.com/design/evolution-of-pokemon-designs-gen-1), [2 to 6 colours with a hierarchy](https://forums.thousandroads.net/threads/caniss-thoughts-on-pok%C3%A9mon-design.1886), [concept and colour theory for creatures](https://www.cinemamakeup.com/?p=6170), [Polycount: Monster Hunter base colours](https://polycount.com/discussion/comment/2382718/), [Proko: values before colour](https://www.proko.com/course-lesson/painting-in-greyscale), [Gnomon: the face as the focal point](https://www.thegnomonworkshop.com/tutorials/creature-and-character-design), [countershading and warning colours](https://en.wikipedia.com/wiki/Animal_marking), [Shan Hai Jing creatures](https://abookofcreatures.com/category/china).
 - **Towns**: [Hui-style architecture](https://en.wikipedia.org/wiki/Hui_Style_architecture), [Xidi and Hongcun](https://worldheritagesite.org/list/Xidi+and+Hongcun), [Jiangnan architecture](https://news.cgtn.com/news/2024-05-01/VHJhbnNjcmlwdDc4NTI5/index.html).
 
-### Twenty-nine releases ago: rebuilt models and Part VIII
+### Thirty releases ago: rebuilt models and Part VIII
 
 
 ```mermaid
@@ -2285,7 +2388,7 @@ The models were rebuilt after studying how stylised and anatomical 3D characters
 - Quadruped anatomy: [digitigrade animals don't have backward knees](https://www.line-of-action.com/zh-Hant/article/digitrade-animals-dont-have-backward-knees), [canine hindlimb](https://en.wikivet.net/Canine_Hindlimb_-_Anatomy_&_Physiology), [canine phalanges](https://en.wikivet.net/Canine_Phalanges_-_Anatomy_%26_Physiology), [dog anatomy](https://www.wikiwand.com/en/articles/Dog_anatomy), [equine anatomy and biomechanics](https://mink-studios.blogspot.com/2016/11/equine-anatomy-and-biomechanics-primer.html), [eastern dragon anatomy](https://w.blackdrago.com/science/anatomy_east.htm).
 - The Chinese dragon: [Loong](https://www.wikiwand.com/en/articles/Loong) (the nine resemblances), [how to draw a dragon](https://www.sixthtone.com/news/1014614/how-to-draw-a-dragon).
 
-### Thirty releases ago: one open world and Part VII
+### Thirty-one releases ago: one open world and Part VII
 
 ```mermaid
 flowchart LR
@@ -2319,7 +2422,7 @@ flowchart LR
 - **Part VII** adds +1 hour (see below), verified by the playthrough bot; CI now requires **7 hours**.
 - **Bugs found and fixed** (see below).
 
-### Thirty-one releases ago: natural landscapes and Part VI
+### Thirty-two releases ago: natural landscapes and Part VI
 
 ```mermaid
 flowchart LR
@@ -2776,6 +2879,32 @@ Each region is still generated from its own seed by `mapgen.gd` (so every boss, 
 **The realms above and below** (Part XI) are built by the same `Atlas._build`, one realm at a time (`Atlas.world_of(layer)`): `STRATA` gives each its own 260 x 200 grid, the sites of its regions, how far land reaches from a site (land runs out into open sky or into the abyss instead of the sea) and how many holes to open in the wild ground between regions (gaps of sky between the islands, chasms between the caverns). `layer_origin` lays each grid over the land's so that the Jianmu's crown in the Nine Heavens floats straight above its trunk on the mountain and its roots in the Nine Springs hang straight below. The ends of a ladder are two linked entities, one in each realm; walking onto one lifts or lowers Lin Feng and puts him on the free tile beside the other end. The Nine Heavens are drawn 96 m above the land and the Nine Springs 64 m below it, and `world.gd` keeps a bundle per realm (its land, its streamed regions, its sea of cloud or glowing abyss) and shows only the one Lin Feng is in. A **floor** (`Atlas.floor_id`, `f:<region>:<building>:<level>`) is a world of its own the size of its building, holding the people and things that live on it and the stairs back.
 
 The 3D view builds a region when the player comes within 46 tiles of the bounding box of its land: its own land is cut out of the world grid (other regions' tiles and the open sea blanked), corner heights come from one shared height field so neighbours meet without a crack, and the usual terrain, ecology, wildlife and buildings are built for it. The sea is a single surface for the whole world (`Terrain3D.world_sea`), running on to the horizon. Far regions are hidden and the furthest dropped.
+
+## Part XXXVII: A Cup of Water, a Cart of Firewood
+
+The summer after the fish it does not rain on Azure Cloud Mountain from the fourth month to the eighth, and on a night of dry wind a novice practising the Crimson Flame Palm below the east wall misses his target. Forty disciples run down in their night-clothes, and every one of them knows a technique. The wood-root disciples grow a hedge to stop it, and it eats the hedge. Earth raises a wall, and it goes round. Each of forty throws one cup of water where he happens to be standing. It goes out because it rains. "You have five phases in that hand," says the Elder, "and you have used them as five colours of the same blow. So have I taught them."
+
+```mermaid
+flowchart LR
+    H[the east slope black to the wall:<br/>'it rained. That is not the same<br/>as being put out'] --> T[six blows, six answers:<br/>what each phase does to a wood] --> Q[a stand set burning on purpose,<br/>and put out: all of it,<br/>where the fire is] --> SU[Su Dai under the volcano:<br/>'to serve Qin with land is to carry<br/>firewood to put out a fire']
+    SU --> E1[faggots carried to the fire, cups thrown<br/>at a cartload, embers given ground] --> C4[four cinders a kitchen-maid<br/>put out on the first evening] --> F2[two casters of Tushan:<br/>what a furnace is given at night] --> FD[blossom, and then fire:<br/>see how far it goes] --> L1[[The Fire Fed<br/>to Be Rid Of]]
+    L1 --> BAI[Bai Gui under the Drowned Fields:<br/>'I had never asked where it went'] --> E2[dykes raised a hand higher, floods<br/>sent next door, drowned furrows] --> S4[four stakes of<br/>the old boundary] --> F3[two farmers of Qingshi:<br/>'open the low gap at dusk,<br/>a hand wide'] --> R3[earth raised three times, as Gun did;<br/>then root put into it, as Yu did] --> L2[[The Dyke That Sent<br/>It Next Door]]
+    L2 --> CAI[Cai Yong under Thunder Valley:<br/>'not the fire. The log'] --> E3[stoves that burn what they are given,<br/>billets split for the pot,<br/>notes nobody stopped for] --> P4[four scorched pieces<br/>that still answer] --> TH[thunder called down three times;<br/>then the rain it is the door of] --> L3[[The Song Burned<br/>for Supper]]
+    L3 --> RD[the whole round on one piece of ground:<br/>wood, fire, earth, thunder, water, wood] --> X{{'what is the sect to do before<br/>the next dry wind?'<br/>cut firebreaks and burn them each spring /<br/>teach every village the round /<br/>let the mountain burn as it always has}} --> END((Five in<br/>One Hand))
+```
+
+| | |
+|---|---|
+| ![the people of Part XXXVII: Su Dai the Persuader, Minister Bai Gui and Cai Yong](docs/screenshots/part37_people.webp) | ![the nine foes of Part XXXVII](docs/screenshots/part37_foes.webp) |
+| ![what the three answers leave standing on the mountain: the end of a firebreak with its tub, a village tub with its bell, the burnt slope coming back](docs/screenshots/part37_marks.webp) | ![the Fire Fed to Be Rid Of, in battle, with what two techniques left under it](docs/screenshots/battle_boss_the_fed_fire.webp) |
+| ![the Dyke That Sent It Next Door, in battle](docs/screenshots/battle_boss_the_next_door.webp) | ![the Song Burned for Supper, in battle](docs/screenshots/battle_boss_the_kindling.webp) |
+
+- **Su Dai** is from the Strategies of the Warring States (and the Records of the Historian after it). Qin was at the border of Wei every year, and every year a minister advised ceding a little land for peace. Su Dai told King Anxi that to serve Qin with land is to carry firewood to put out a fire: until the firewood is used up the fire does not go out. The king said it was so, and ceded the land. **The cup** is Mencius: humanity overcomes its opposite as water overcomes fire, but those who practise it now are like people trying with one cup of water to save a cartload of burning firewood, who then say that water does not overcome fire. The chapter puts the two side by side, because they are the same mistake from opposite ends: the right phase in the wrong measure, and the wrong phase with the best intentions.
+- **Bai Gui** is from Mencius too. He said that his management of the waters was better than Yu's. Mencius said: Yu followed the way of water, and so he made the four seas its drain; you, sir, make the neighbouring states its drain. The region is the Drowned Fields of Gun, who dammed the flood for nine years, so the chapter has the hero do both with his own hand: raise the earth against the water, three times, and watch the pool behind it begin to look along the ridge for the end; then put root into what was raised, and watch it become a bank with a way through.
+- **Cai Yong** is from the Book of the Later Han. A man of Wu was burning paulownia to cook; Cai Yong heard the sound of the fire cracking and knew it for fine timber, asked for it, and made a qin whose tail was still scorched. The chapter is about the logs nobody happened to pass. Nobody in the story is a fool: the cook had rice to boil and it was wood.
+- **A phase turned on the wrong thing goes down under where it was done.** The three lords are in caves, like the last chapter's: under the Ashen Volcano, the Drowned Fields of Gun and Thunder Valley. Each has four ways through: what was found on the way (four cinders that stayed out, four stakes of an agreement older than the dyke, four pieces that still answer), what somebody who lives with the thing said, might, and one of the two new ways: **by the measure** (he has put out what burned with the phase that overcomes it) or **by the round** (he has turned three of the five on the land itself).
+- **The new kind of step counts blows the land answered**, in the step's own country: six of any phase, to see what each does; fire and then water on the same trees; blossom and then fire, *on purpose*, to see how far a fed fire goes; earth raised, and root put into it; thunder, and the rain after it; and at the last the whole round on one piece of ground, each phase fed by the one before.
+- **The crossroads** is asked in the hall, with ash still on everybody, over six tallies from six villages under the mountain. Firebreaks cut and burnt clean by the sect every spring (the new works, and rigour), every village taught which cup and on which evening (mercy, and the home fire), or the barns moved out of the trees and the slope left to burn when it burns, as it has every forty years since before there was a sect (the old ways, and the wide world). Each leaves a row of three things on the mountain and the novice who missed his target beside it, with a different trade in each; each brings a letter from him; and each turns Auntie Zhou's day.
 
 ## Part XXXVI: Cooking a Small Fish
 
@@ -3821,7 +3950,26 @@ New Blender creatures for Part VI: the nine-tailed fox, the koi carp, Ox-Head, H
 
 ## Bugs found and fixed
 
-Found in this release (the Small Fish), by an audit of the smaller systems and an audit of the story run beside the work, and by the chapter's own tests:
+Found in this release (the Five Hands), by looking at a hand from a pace away, by the release's own tests, and by an audit of the new chapter's story run beside the work:
+
+| Bug or plot hole | Fix |
+|---|---|
+| **Everything anybody held was in their sleeve.** Every held model (a hoe, a cup, a lantern, a brush: dozens of them) is drawn to be gripped at its own y = -0.08, eight centimetres below a wrist. The hand bones of the glTF people point down their own +Y, so in a hand that was eight centimetres *up the forearm*. The shaft went through the sleeve; the fist closed on nothing. Since the first Blender character | `Grip.seat` carries the grip into the palm; `World._hold_in_hand` holds through it. The tests measure it on the hero's own skeleton: the grip is below the wrist, and was above it |
+| **Two-handed tools were worked with one hand.** The clips for hoeing, sweeping, felling, digging and mining move the right arm; the left hung, or swung, a forearm's length from the shaft | the other hand is solved onto the shaft every frame (`Grip.Reach`, `TOOLS.two`) |
+| **Tools met nothing.** The hoe's stroke ended at the height of the waist; the broom's head was a hand above the ground; the axe was swung at the middle of a tile whether or not a tree stood there | the working end is put on the ground under it, on the trunk that stands there, or on the nearest face of the thing (`Grip.span`, `_goal`) |
+| **What hung did not hang.** A lantern was one mesh with its stick: with the arm raised it stood out sideways, and with the arm down it floated above the stick. The baskets of a shoulder pole were welded to the pole | each is a weight on a cord (`Folk._hang`, `Heft.hang`) |
+| **Digging threw nothing.** The work of digging a yam names an effect, `"clods"`, that `World._prop_fx` has no case for: since the Small Fish release the spade has gone into the ground in silence | clods fly from where the blade lands (`Reach.on_hit`, `Heft.chips`) |
+| *The Elder had taught for three hundred years.* The sect is three hundred years old; Elder Qing Xuan has "been over this sect for seventy years" wherever else he says so. The new chapter had him throw water and sweep under the pines for three hundred | "we have taught", and seventy |
+| *The fire went out because it rained, and the breakthrough then brought the first rain since the fourth month* | the first rain since the night of the fire |
+| *The novice practised "the Crimson Palm"*; the sect's first fire art is the Crimson Flame Palm | its name, in three places |
+| *"The one pine the fire left"*: the pine he has always sat under is above the sect, and the fire was below the east wall | "the old pine above the sect" |
+| *Six answers the mountain could not give*: on the mountain at the middle of the land only the woods answer a phase, and the step's words promised a pool where there was path | the words say what a wood does; the step says "at the woods" |
+| *"Five strokes" for a round of six*; *a step quoting a line the speaker does not say*; *four cinders described as the only one*; *four pieces "of that log", which he had saved*; *a qin a year in the making, strung in a letter two steps later*; *a letter in which a bell is rung for a fire, from a man who says the bell is not for fire*; *"by autumn" after a drought that ran into autumn*; *a trial that says "as she does" of a line he may not have heard* | each made to agree |
+| *Two people spoke who were not there*: Bai Gui and Cai Yong stand in caves, and each had a line after a step done above ground | the lines are Yue Ling's |
+| *The novice was called Pei*, on a mountain that already has Cartographer Pei of Cloudfoot (and then Qiao, in a land that has Tailor Qiao) | Mian |
+| *A phase left in the hand stopped a step that asks for breaking*: with K turned, a blow turns the land and does not break it, and the last chapter's steps count what is broken | in such a step the blade is plain again, and says so |
+
+Found in the Small Fish release, by an audit of the smaller systems and an audit of the story run beside the work, and by the chapter's own tests:
 
 | Bug or plot hole | Fix |
 |---|---|

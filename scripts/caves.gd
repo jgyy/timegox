@@ -107,6 +107,10 @@ const LATE := {
 	"marsh": {-1: {"pool": [["dry_weir", 120, 120], ["last_net", 120, 120], ["mud_gasper", 120, 120]], "n": 11, "vis": "s_p36_home"}},
 	"millet": {-1: {"pool": [["pulled_shoot", 121, 121], ["helping_hand", 121, 121], ["wilt_noon", 121, 121]], "n": 11, "vis": "s_p36_home"}},
 	"forge": {-1: {"pool": [["gold_glare", 122, 122], ["blind_grasp", 122, 122], ["empty_adit", 122, 122]], "n": 11, "vis": "s_p36_home"}},
+	# Part XXXVII (the Five Hands release): a phase turned on the wrong thing, gone down under where it was done
+	"volcano": {-1: {"pool": [["carried_faggot", 123, 123], ["thrown_cup", 123, 123], ["fed_ember", 123, 123]], "n": 11, "vis": "s_p37_home"}},
+	"drowned": {-1: {"pool": [["raised_dyke", 124, 124], ["sent_flood", 124, 124], ["drowned_furrow", 124, 124]], "n": 11, "vis": "s_p37_home"}},
+	"thunder": {-1: {"pool": [["deaf_stove", 125, 125], ["split_billet", 125, 125], ["lost_note", 125, 125]], "n": 11, "vis": "s_p37_home"}},
 }
 
 ## the things to do in a cave (props.gd), in the order a cave takes them; a cave has `PER_CAVE` of them

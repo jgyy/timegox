@@ -1175,6 +1175,17 @@ const ERRANDS := {
 			"I do not know, Senior. I had the registrar seal the line. He thought I was mad. I was fourteen and I thought: if it is high I shall be lazy and if it is low I shall be sad, and either way I shall not be holding my sword. So I asked not to be told.",
 			"Four. Low and muddy. I was kept because there was a bed. I have been the slowest in my year for six years, and last month I was asked to drill the first-years, because, the instructor said, I am the only one who remembers what it was like not to know."]},
 	# Part XXXVI (the Small Fish release): what is thrown back, asked of those who fish the same water next year
+	# Part XXXVII (the Five Hands release): what a fire is given at night, and where water goes that nobody wants
+	"s_p37_casters": {"ask": "A fire was fed for nine years by people who wanted it gone, and it is burning yet. You keep a furnace for a living, and it has to be there in the morning. What do you give it at night?", "price": 0, "town": "tushan", "toast": "%s has said how a fire is banked",
+		"lines": ["Ash. A hand of its own ash over the coals, and the door shut to a finger. It wants air and I give it a finger of air. A fire is like my brother-in-law: it will take what is on the table. So at night there is nothing on the table.",
+			"Nothing, and my ear. I sleep by the pit. A banked furnace has a note, low, like a cat. If the note comes up I am awake before I know why. Thirty years, and I have never fed it after dark. Whoever feeds a fire in the dark is frightened of it.",
+			"You are asking it wrong. I do not give it things so that it will do what I want. I take things away until it does. Blast, then charge, then the door. The young ones always want to add. Casting is nearly all taking away.",
+			"The same as in the morning, only I mean it differently. In the morning I give it charcoal because I want heat. If I ever gave it charcoal because I wanted quiet, I should put down my tongs and go and farm. That is how pits are lost."]},
+	"s_p37_farmers": {"ask": "A minister kept his own fields dry for thirty years by sending every flood into the next country. Your field has a field below it. When you have more water than you want, what do you do with it?", "price": 0, "town": "qingshi", "toast": "%s has said where the water goes",
+		"lines": ["Open the low gap at dusk, a hand wide. It is in Old Chen's top terrace by morning, and warm, and he has had the night to see it coming. If I kept it I should drown my roots. If I sent it all at once I should drown his. A hand wide.",
+			"I tell her. That is all. I go to the wall and I shout: water tonight. She shouts back how much. We have never liked each other, her family and mine, not for three generations. We have never once flooded each other either. You do not have to like the field below.",
+			"It is not my water. It is water that is in my field this week. Last week it was in Wang's, and before that it was snow. I use what I use and I pass the bowl. A man who dams the bowl has not understood what a table is.",
+			"My grandfather built his bank up, one bad year. The field below was his own brother's. They did not speak again. I took the bank down the spring I inherited, and my uncle's son came up and helped me, and neither of us said one word about why."]},
 	"s_p36_fishers": {"ask": "A pond in the Crimson Marsh was drained in the spring for a wedding, and every fish in it taken in an afternoon. You fish this river every day of your life. What do you throw back, and why?", "price": 0, "town": "longmen", "toast": "%s has said what goes back in the river",
 		"lines": ["Anything shorter than the mark on the gunwale. My grandfather cut that mark. I have never asked why it is there and not a finger along. I only know the river has had fish in it for three of us now, and I am not the one who is going to find out.",
 			"The big hens, in the spawn. You can feel it in the weight of them, like a full purse. It hurts, cultivator, I will not say it does not; that is the best fish on the line. I put her back and say: I shall have your children. And I do. I have had them for thirty years.",
@@ -1513,6 +1524,8 @@ const POSTS := {
 	"zeng_shen": ["sweep|think|count", "broom", "doze"], "fang_zhongyong": ["hoe|dig|gather", "hoe", "doze"], "carpenter_shi": ["measure|carve|gaze", "", "gaze"], "bian_he": ["gaze|think|pray", "", "doze"],
 	# Part XXXVI (the Small Fish release)
 	"yong_ji": ["count|think|write", "", "doze"], "song_younger": ["hoe|gaze|think", "hoe", "doze"], "old_qi": ["gaze|count|think", "", "doze"],
+	# Part XXXVII (the Five Hands release)
+	"su_dai": ["write|think|gaze", "", "doze"], "bai_gui": ["write|measure|think", "", "doze"], "cai_yong": ["knock|think|gaze", "", "doze"],
 	"yangzi_wife": ["weave|sew|spin", "", "weave"], "yang_zhen": ["read|write|gaze", "", "read"], "bell_thief": ["peer|knock|gaze", "", "doze"], "pei_du": ["gaze|count|read", "", "gaze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
 }
@@ -1580,10 +1593,12 @@ static func held(what: String) -> Node3D:
 			# a shoulder pole with a basket hanging at either end
 			b.limb(Vector3(-0.15, 0.05, 0.0) + Vector3(0, 0, -0.9), Vector3(-0.15, 0.05, 0.0) + Vector3(0, 0, 0.9), 0.02, 0.02, light, 5)
 			for z in [-0.85, 0.85]:
-				var top := Vector3(-0.15, 0.05, z)
-				b.limb(top, top + Vector3(0.1, -0.55, 0), 0.004, 0.004, MB.tag(Color("6a5a40"), MB.CLOTH), 3)
-				b.lathe(top + Vector3(0.12, -0.85, 0), [Vector2(0.14, 0.0), Vector2(0.2, 0.22), Vector2(0.21, 0.3)], MB.tag(Color("c0a06a"), MB.WOOD), 10)
-				b.sph(top + Vector3(0.12, -0.55, 0), Vector3(0.17, 0.06, 0.17), MB.tag(Color("6aa04a"), MB.FOLIAGE))
+				# (the Five Hands release, grip.gd: each basket is a weight on its cords, and swings as he walks)
+				var hb := MB.new()
+				hb.limb(Vector3.ZERO, Vector3(0, -0.55, 0), 0.004, 0.004, MB.tag(Color("6a5a40"), MB.CLOTH), 3)
+				hb.lathe(Vector3(0, -0.85, 0), [Vector2(0.14, 0.0), Vector2(0.2, 0.22), Vector2(0.21, 0.3)], MB.tag(Color("c0a06a"), MB.WOOD), 10)
+				hb.sph(Vector3(0, -0.55, 0), Vector3(0.17, 0.06, 0.17), MB.tag(Color("6aa04a"), MB.FOLIAGE))
+				_hang(root, Vector3(-0.15, 0.05, z), 0.7, hb, 2.2)
 		"basket":
 			b.lathe(Vector3(0.05, -0.22, 0.0), [Vector2(0.1, 0.0), Vector2(0.15, 0.14), Vector2(0.16, 0.18)], MB.tag(Color("c0a06a"), MB.WOOD), 10)
 			b.sph(Vector3(0.05, -0.05, 0.0), Vector3(0.13, 0.05, 0.13), MB.tag(Color("d8a040"), MB.FOLIAGE))
@@ -1594,8 +1609,16 @@ static func held(what: String) -> Node3D:
 		"lantern":
 			# hung from a short stick: paper on a bamboo frame, glowing after dark
 			b.limb(Vector3(0, -0.08, 0.0), Vector3(0, -0.08, 0.45), 0.01, 0.01, light, 4)
-			b.lathe(Vector3(0, -0.32, 0.45), [Vector2(0.05, 0.0), Vector2(0.12, 0.06), Vector2(0.13, 0.16), Vector2(0.1, 0.24), Vector2(0.04, 0.27)], MB.tag(Color("e05a3a"), MB.CLOTH), 10)
-			g.ball(Vector3(0, -0.18, 0.45), 0.2, Color(1.0, 0.6, 0.3, 0.45), true)
+			# (the Five Hands release, grip.gd: the lantern hangs from the end of its stick, and swings there)
+			var lb := MB.new()
+			lb.limb(Vector3.ZERO, Vector3(0, -0.05, 0), 0.003, 0.003, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
+			lb.lathe(Vector3(0, -0.31, 0), [Vector2(0.05, 0.0), Vector2(0.12, 0.06), Vector2(0.13, 0.16), Vector2(0.1, 0.24), Vector2(0.04, 0.27)], MB.tag(Color("e05a3a"), MB.CLOTH), 10)
+			var lg := MB.new()
+			lg.ball(Vector3(0, -0.17, 0), 0.2, Color(1.0, 0.6, 0.3, 0.45), true)
+			var lh := _hang(root, Vector3(0, -0.08, 0.45), 0.2, lb, 1.8)
+			var lgm := MB.mesh_node(lh, lg.build(MB.mat_glow()))
+			lgm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			root.set_meta("glow", lgm)
 		"gong":
 			# a small gong in the left hand (the stick is the right hand's: taper)
 			b.cyl(Vector3(0.05, -0.12, 0.0), 0.16, 0.025, MB.tag(Color("c8a040"), MB.METAL), Vector3(0, 0, PI * 0.5), 14)
@@ -1611,12 +1634,17 @@ static func held(what: String) -> Node3D:
 		"steelyard":
 			# a merchant's steelyard held up by its loop: the beam, the pan on three cords, the sliding weight
 			b.limb(Vector3(0, -0.08, -0.34), Vector3(0, -0.08, 0.2), 0.008, 0.006, light, 5)
+			# (the Five Hands release, grip.gd: the pan and the weight hang from the beam, each on its own cords)
+			var pb := MB.new()
 			for k in 3:
 				var ang := TAU * float(k) / 3.0
-				b.limb(Vector3(0, -0.08, 0.18), Vector3(cos(ang) * 0.09, -0.36, 0.18 + sin(ang) * 0.09), 0.002, 0.002, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
-			b.lathe(Vector3(0, -0.39, 0.18), [Vector2(0.02, 0.0), Vector2(0.09, 0.02), Vector2(0.1, 0.035)], MB.tag(Color("c8a040"), MB.METAL), 10)
-			b.limb(Vector3(0, -0.08, -0.2), Vector3(0, -0.2, -0.2), 0.002, 0.002, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
-			b.cyl(Vector3(0, -0.23, -0.2), 0.022, 0.05, MB.tag(Color("4a4a52"), MB.METAL), Vector3.ZERO, 8)
+				pb.limb(Vector3.ZERO, Vector3(cos(ang) * 0.09, -0.28, sin(ang) * 0.09), 0.002, 0.002, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
+			pb.lathe(Vector3(0, -0.31, 0), [Vector2(0.02, 0.0), Vector2(0.09, 0.02), Vector2(0.1, 0.035)], MB.tag(Color("c8a040"), MB.METAL), 10)
+			_hang(root, Vector3(0, -0.08, 0.18), 0.3, pb, 2.4)
+			var wb := MB.new()
+			wb.limb(Vector3.ZERO, Vector3(0, -0.12, 0), 0.002, 0.002, MB.tag(Color("3a2a1a"), MB.CLOTH), 3)
+			wb.cyl(Vector3(0, -0.15, 0), 0.022, 0.05, MB.tag(Color("4a4a52"), MB.METAL), Vector3.ZERO, 8)
+			_hang(root, Vector3(0, -0.08, -0.2), 0.15, wb, 2.4)
 		"fan":
 			# a palm-leaf fan for the stove
 			b.limb(Vector3(0, -0.08, 0.0), Vector3(0, -0.08, -0.16), 0.008, 0.008, light, 4)
@@ -1643,6 +1671,19 @@ static func held(what: String) -> Node3D:
 		gm.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		root.set_meta("glow", gm)
 	return root
+
+## A part of a held thing that hangs (the Five Hands release, grip.gd): drawn hanging down its own -Y from
+## `pivot`, a weight `len` down its cord.  Whoever holds the thing swings it (Grip.Reach, Heft.hang).
+static func _hang(root: Node3D, pivot: Vector3, len: float, mb: MB, drag: float = 1.6) -> Node3D:
+	var h := Node3D.new()
+	h.name = "hang%d" % root.get_child_count()
+	h.position = pivot
+	h.set_meta("len", len)
+	h.set_meta("drag", drag)
+	root.add_child(h)
+	if not mb.is_empty():
+		MB.mesh_node(h, mb.build(MB.mat_vc())).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return h
 
 ## Which hand a thing is held in.
 static func hand_of(what: String) -> String:

@@ -242,6 +242,28 @@ func _clear_fighters() -> void:
 		if f.has("node") and is_instance_valid(f.node):
 			f.node.queue_free()
 
+## The Five Hands release (phases.gd): a technique of one of the five phases leaves on the ground under
+## whoever it struck what that phase leaves on open ground, and the next one meets it as the phases meet
+## (water on what is scorched is steam; earth on it bakes hard).  Drawn only.
+var ground_marks := {}
+
+func _ground_mark(tgt: Dictionary, elem: String) -> void:
+	if not Phases.BASE.has(elem) or scene3d == null:
+		return
+	var key := "%s%d" % [str(tgt.side), int(tgt.get("slot", tgt.get("idx", 0)))]
+	var cur: Array = ground_marks.get(key, ["", null])
+	var m: Array = Phases.come(str(cur[0]), elem, "ground")
+	if m.is_empty():
+		return
+	if cur[1] != null and is_instance_valid(cur[1]):
+		(cur[1] as Node).queue_free()
+	var n := Phases.model(str(m[0]), key.hash(), Color(0.45, 0.38, 0.3), Color(0.35, 0.55, 0.3))
+	scene3d.add_child(n)
+	var at := pos3(tgt)
+	n.position = Vector3(at.x, at.y + 0.02, at.z)
+	n.scale = Vector3.ONE * (1.5 if tgt.get("boss", false) else 1.0)
+	ground_marks[key] = [str(m[0]), n]
+
 func pos3(f: Dictionary) -> Vector3:
 	if f.side == "party":
 		return Vector3(-5.5 - f.idx * 1.3, 0, 1.4 - f.idx * 3.6)
@@ -660,6 +682,7 @@ func _hit(a: Dictionary, tgt: Dictionary, mult: float, elem: String, quiet: bool
 		var big := quiet or mult >= 2.5 or crit
 		var hp3 := pos3(tgt) + Vector3(0, 1.4 if not tgt.boss else 2.8, 0)
 		Fx3D.hit(scene3d, hp3, elem, big)
+		_ground_mark(tgt, elem)
 		if mult <= 1.0 or elem == "phys":
 			var yaw := atan2(hp3.x - cam.position.x, hp3.z - cam.position.z)
 			Fx3D.slash(scene3d, hp3, col.lerp(Color.WHITE, 0.4), yaw, 3.2 if tgt.boss else 2.2)

@@ -113,6 +113,8 @@ const PEOPLE := {
 	"zeng_shen": "characters/zeng_shen", "fang_zhongyong": "characters/fang_zhongyong", "carpenter_shi": "characters/carpenter_shi", "bian_he": "characters/bian_he",
 	# Part XXXVI (the Small Fish release): a counsellor of Jin, the son of the man of Song, and the man of Qi who saw only the gold
 	"yong_ji": "characters/yong_ji", "song_younger": "characters/song_younger", "old_qi": "characters/old_qi",
+	# Part XXXVII (the Five Hands release): the persuader who told a king about firewood, the minister who sent his flood next door, and the man who heard a log
+	"su_dai": "characters/su_dai", "bai_gui": "characters/bai_gui", "cai_yong": "characters/cai_yong",
 	# Part XXIII (the Thundering Pots release)
 	"ling_lun": "characters/ling_lun", "sun_wu": "characters/sun_wu", "fu_hao": "characters/fu_hao", "shi_kuang": "characters/shi_kuang",
 	"gao_jianli": "characters/gao_jianli", "xiang_yu": "characters/xiang_yu",

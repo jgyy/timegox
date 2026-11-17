@@ -77,6 +77,9 @@ const KINDS := {
 	# the Small Fish release: the meals that came out right (cooking.gd), and the blows that broke one thing only (sunder.gd)
 	"pot": {"n": "By the pot", "col": Color("e8c890"), "what": "the meals you have cooked that came out as they should"},
 	"light": {"n": "By the light hand", "col": Color("c8e8d8"), "what": "the blows you have held back to a single cut"},
+	# the Five Hands release: the phases he has turned on the land, and the times one overcame another (phases.gd)
+	"round": {"n": "By the round", "col": Color("b8e0a0"), "what": "the phases you have turned on the land itself"},
+	"measure": {"n": "By the measure", "col": Color("a8d0e8"), "what": "the times you have put out one phase with the one that overcomes it"},
 	# the Open Net release: a name no gate has anything against (crime.gd, taboo.gd), and a wild that still stands (wilds.gd)
 	"clean": {"n": "By a clean name", "col": Color("e8f0e8"), "what": "nobody dead by your hand, no bill at any gate, and the forbidden shelf never opened"},
 	"wild": {"n": "By the standing wild", "col": Color("9ac878"), "what": "no country you have hunted in brought lower than thinned"},
@@ -1698,6 +1701,55 @@ const TRIALS := {
 				"desc": "Late Sleeves of Wind and a sword tempered nine times. It cannot be struck while it is looking elsewhere, and it is always looking elsewhere. Be the thing it cannot stop looking at, for as long as that takes.",
 				"line": "Lin Feng draws. The Eye has already looked at him and moved on. He steps into where it is looking now."},
 		]},
+	# ---- Part XXXVII: A Cup of Water, a Cart of Firewood (the Five Hands release)
+	"the_fed_fire": {"might": [5.8, 1.5],
+		"why": "It is a fire that has always been given what it asked for, by people who wanted it to stop. It does not rage. It asks, for a little, and everything struck at it in anger is a little more. Fire thrown at it is supper. What it has never met is somebody who knew what it eats and simply kept his hand shut.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four that stayed out", "needs": [["item", "wet_cinder", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four cinders a kitchen-maid put out with her washing-water on the first evening. Lay them where it can see them. It has been told for two hundred years that it cannot be put out. Here are four of it that were.",
+				"line": "Lin Feng sets four cold cinders on the floor of the cave, grey side up. The fire looks at them as a man looks at his own milk teeth. It had forgotten that it was ever the size of a cup."},
+			{"id": "measure", "kind": "measure", "n": "All of it, where the fire is", "needs": [["quelled", 2]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Twice you have put out what was burning with water, the whole stroke on the fire and not where you happened to stand. Do it here, once, at the foot of it, while it is still explaining why it needs only a stick.",
+				"line": "Lin Feng does not wait for the end of the sentence. The water goes where the fire is, all of it, at once. For the first time in nine years of cartloads something has answered its request with the opposite."},
+			{"id": "folk", "kind": "folk", "n": "Nothing on the table", "needs": [["step", "s_p37_casters"]], "boon": {"foe_hp": 0.78, "taken": 0.85},
+				"desc": "You asked two casters of Tushan what a furnace is given at night. Bank it as they do: its own ash over it, the door shut to a finger, and stand by with your ear. It has been fed. It has never been kept.",
+				"line": "Lin Feng heaps its own ash over its feet and steps back, and listens. The fire waits to be given something. It is given a finger of air. It finds, to its surprise, that it can live on that, and be small."},
+			{"id": "might", "kind": "might", "n": "Refuse it to its face", "needs": [["lv", 123], ["temper", 9]], "boon": {},
+				"desc": "Early Light Hand and a sword tempered nine times. It will ask for a stick, and then for half a stick. A king could not say no nine times running. That is all this is: saying it nine times, with a sword out.",
+				"line": "Lin Feng draws. The fire bows, and asks. \"No,\" says Lin Feng. It asks for less. It is going to be a long evening, and only one of them has had supper."},
+		]},
+	"the_next_door": {"might": [5.9, 1.5],
+		"why": "It is a dyke that has never failed, and it mends itself a hand higher for every blow, because it was built to. It is not wicked. It has done exactly what it was asked for thirty years. It has simply never looked over its own top, and nothing struck against its face will make it turn round.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four marks on one stake", "needs": [["item", "boundary_stake", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "The four stakes of the old boundary, with four families' marks on each. Set them in a row across its foot, where the water used to pass. It was built on top of an agreement and was never shown it.",
+				"line": "Lin Feng drives four black stakes in a row at the foot of the dyke. It leans to read them. They are older than it is, and they say, in four hands, that the water goes through here."},
+			{"id": "round", "kind": "round", "n": "Root, where there was wall", "needs": [["phases", 3], ["step", "s_p37_willow"]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Three of the five phases turned on the land, and two ridges made into banks with root in them. Do not strike its face. Plant its top. It mends a hand higher for every blow; it has no answer at all to a willow.",
+				"line": "Lin Feng lays his palm on the crest of it and turns his hand to wood. Roots go down through thirty springs of tamped earth, looking for water, and find a great deal of it on the far side."},
+			{"id": "folk", "kind": "folk", "n": "A hand wide, at dusk", "needs": [["step", "s_p37_farmers"]], "boon": {"foe_hp": 0.78, "taken": 0.85},
+				"desc": "You asked two farmers of Qingshi where water goes that nobody wants. Go to its top and shout over it, as they do: water tonight. And wait to be told how much. It has never heard anybody speak to the other side.",
+				"line": "\"Water tonight,\" Lin Feng shouts over the dyke, into the dark. There is a long pause. Then, from very far off on the other side, astonished, a voice shouts back a number."},
+			{"id": "might", "kind": "might", "n": "Be more than it can raise", "needs": [["lv", 124], ["temper", 9]], "boon": {},
+				"desc": "Middle Light Hand and a sword tempered nine times. Every blow it takes it mends a hand higher. Thirty springs it has done that against water, which does not tire. See whether it can do it against you.",
+				"line": "Lin Feng draws. The dyke settles its shoulders, as it has every spring, and rises one hand. He strikes again. It rises one hand. Somewhere above them both there is a roof."},
+		]},
+	"the_kindling": {"might": [6.0, 1.5],
+		"why": "It is a log that was told it was firewood and has been burning as well as it can ever since. To put it out by force is to tell it that it has failed at that too. Thunder made it what it is; another stroke only splits it. It has to be heard, and nothing in a kitchen has ears.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "Four pieces that still answer", "needs": [["item", "scorched_peg", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four offcuts of the same paulownia, burnt at one end. Knock them together in front of it, in order, low to high. It has never heard its own wood from outside. It thinks that sound is what burning is.",
+				"line": "Lin Feng knocks four black offcuts one against the next, and they answer in four rising notes. The great log stops in the middle of its own. That is its voice. It is coming from somebody's hands."},
+			{"id": "round", "kind": "round", "n": "The rain the thunder opens", "needs": [["phases", 3], ["step", "s_p37_rain"]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Three of the five phases turned on the land, and rain brought down twice where thunder had struck. It was made by one stroke of thunder and has been waiting forty years for the other half of the storm.",
+				"line": "Lin Feng turns his hand to water and opens it. It rains in the cave, on the stove, on seven feet of burning paulownia, gently, the way it should have forty years ago. The log lets go a long breath of steam."},
+			{"id": "measure", "kind": "measure", "n": "Out of the fire with his hands", "needs": [["quelled", 2], ["step", "s_p37_strike"]], "boon": {"foe_hp": 0.78, "taken": 0.85},
+				"desc": "Twice you have put out what was burning, and three times laid your hand on wood the thunder split. Do what Cai Yong did: walk into the kitchen without knocking, and take hold of it.",
+				"line": "Lin Feng puts both hands into the stove and takes hold of the log where it is not yet alight, and pulls. It comes. The stove, which has never had anything taken out of it, stands with its door open."},
+			{"id": "might", "kind": "might", "n": "Listen to the end of it", "needs": [["lv", 125], ["temper", 9]], "boon": {},
+				"desc": "Late Light Hand and a sword tempered nine times. It will burn at you as well as it can, because that is what it believes it is for. Stand in it, and hear the note out. It is a long note. Nobody has stayed.",
+				"line": "Lin Feng draws, and does not strike, and stands in the heat of it with his head a little on one side. The note goes on. He goes on. One of them is going to finish first."},
+		]},
 	# ---- Part XXXVI: Cooking a Small Fish (the Small Fish release)
 	"the_drained": {"might": [5.5, 1.5],
 		"why": "It is a pond with nothing in it, and it is hungry in the way of a thing that once had everything: whatever is put into it goes, and it is no fuller. A blow goes in like a fish. What it has not had since the spring is a little, given by somebody who then stopped.",
@@ -2127,6 +2179,12 @@ static func need_met(n: Array, g, paid: bool = false) -> bool:
 		"light":
 			# the Small Fish release: blows held back to a single cut that broke one thing and no more (sunder.gd)
 			return int(g.sunder_light) >= int(n[1])
+		"phases":
+			# the Five Hands release: how many of the five phases he has turned on the land (phases.gd)
+			return Phases.turned(g) >= int(n[1])
+		"quelled":
+			# the Five Hands release: the times he has put out one phase with the one that overcomes it
+			return int(g.reacts.get("quell", 0)) >= int(n[1])
 		"step":
 			# the Open Net release: something of the story already done (["step", id])
 			return g.done(str(n[1]))
@@ -2232,6 +2290,10 @@ static func need_text(n: Array, g) -> String:
 			return "%d meal%s cooked that came out as it should (now %d: B in open country, with a pot and the makings)" % [int(n[1]), "" if int(n[1]) == 1 else "s", int(g.cooked_good)]
 		"light":
 			return "%d blow%s held back to a single cut that broke one thing and no more (now %d: H, then F at the forest's edge)" % [int(n[1]), "" if int(n[1]) == 1 else "s", int(g.sunder_light)]
+		"phases":
+			return "%d of the five phases turned on the land itself (now %d: K turns the hand, F strikes, out in the country)" % [int(n[1]), Phases.turned(g)]
+		"quelled":
+			return "%d thing%s on the land put out by the phase that overcomes it (now %d: water on what burns, wood on raised earth)" % [int(n[1]), "" if int(n[1]) == 1 else "s", int(g.reacts.get("quell", 0))]
 		"rites":
 			return "the rite of %d of your Daos performed (now %d: Esc > Root & Rites, and Enter on one that is yours)" % [int(n[1]), Rites.done(g)]
 		"restored":

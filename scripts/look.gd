@@ -221,6 +221,8 @@ const PICKUP_COLORS := {
 	"coin_verse": Color("e8d8b0"), "reject_tally": Color("b89a68"), "jade_rind": Color("8ad0a0"),
 	# Part XXXVI (the Small Fish release)
 	"last_scale": Color("a8c8c0"), "pulled_ear": Color("b8c060"), "blind_coin": Color("e8b830"),
+	# Part XXXVII (the Five Hands release)
+	"wet_cinder": Color("8a8a90"), "boundary_stake": Color("4a4238"), "scorched_peg": Color("c8a868"),
 	"charred_shingle": Color("4a3a30"), "crane_feather": Color("f4f4f8"), "furrow_piece": Color("e8c040"),
 	"grass_knot": Color("9aa850"), "jade_ring": Color("f0f4ec"), "jiao_scale": Color("5a8a80"),
 	"bell_shard": Color("d8c060"), "tiger_tally": Color("c8a050"), "pitch_pipe": Color("c8d080"), "chu_banner": Color("c84a3a"), "clay_duck": Color("f0d040"),

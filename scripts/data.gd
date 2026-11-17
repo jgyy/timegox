@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 123
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand"]
+const MAX_LEVEL := 126
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -99,6 +99,7 @@ const REALM_INFO := [
 	{"life": 0, "title": "Whose Sleeves Are Empty", "note": "A man threw a cake of gold into the weeds because his wife asked him whose it was. A governor was brought ten catties by night and counted four who knew. A man stopped his own ears to steal a bell. A poor scholar sat by three belts until morning. Nothing in the road is nobody's. You have walked the whole of it and kept your sleeves light."},
 	{"life": 0, "title": "Not Yet Cut", "note": "A boy made verses at five and was led from door to door until there were none left in him. A carpenter passed an oak without looking, and it came to him in a dream. A man lost both feet for calling a stone a jade, and was right. A stone at a gate said five. You have been measured, and you are still here."},
 	{"life": 0, "title": "Light Hand", "note": "A pond was drained for one supper, a field pulled taller in an afternoon, a hill hollowed after one vein. He can part a wood with a stroke now, and has learned the harder thing, which is one stalk. Govern a great country as you would cook a small fish: this is the realm of having turned it once, and stopped."},
+	{"life": 0, "title": "Five in One Hand", "note": "A man carried firewood to put out a fire. A minister sent his flood next door and called it skill. A cook fed a stove with the one log in the province that could sing. Each had a phase in his hand and did not ask what it meets. Wood feeds fire, fire leaves earth, water puts fire out, and a cup does not put out a cartload. This is the realm of knowing what the thing in the hand does to the thing in front of it."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1042,6 +1043,19 @@ const ENEMIES := {
 	"the_drained": {"n": "The Pond Drained for One Supper", "elem": "earth", "weak": "wood", "col": Color("6a5a44"), "shape": "golem", "boss": true, "pal": {"sec": Color("3a3024"), "acc": Color("a8c8c0")}},
 	"the_tugger": {"n": "The Help That Pulled Them Up", "elem": "wood", "weak": "fire", "col": Color("b8b860"), "shape": "warden", "boss": true, "pal": {"sec": Color("6a6a30"), "acc": Color("e8e0a0")}},
 	"the_grasper": {"n": "The Hand That Saw Only Gold", "elem": "fire", "weak": "water", "col": Color("d8a828"), "shape": "wraith", "boss": true, "bright": true, "pal": {"sec": Color("6a4a10"), "acc": Color("fff4c8")}},
+	# ---- Part XXXVII: A Cup of Water, a Cart of Firewood (the Five Hands release): a phase turned on the wrong thing
+	"carried_faggot": {"n": "Faggot Carried to the Fire", "elem": "wood", "weak": "fire", "col": Color("9a7a4a"), "shape": "plant", "pal": {"sec": Color("5a4428"), "acc": Color("e87a30")}},
+	"thrown_cup": {"n": "Cup Thrown at a Cartload", "elem": "water", "weak": "thunder", "col": Color("8ab8d0"), "shape": "wisp", "pal": {"sec": Color("4a6a88"), "acc": Color("f0f4f8")}},
+	"fed_ember": {"n": "Ember That Was Given Ground", "elem": "fire", "weak": "water", "col": Color("e8682a"), "shape": "wisp", "bright": true, "pal": {"sec": Color("8a2a10"), "acc": Color("ffd890")}},
+	"raised_dyke": {"n": "Dyke Raised a Hand Higher", "elem": "earth", "weak": "wood", "col": Color("8a7a5a"), "shape": "golem", "pal": {"sec": Color("54482e"), "acc": Color("7aa0a8")}},
+	"sent_flood": {"n": "Flood Sent Next Door", "elem": "water", "weak": "thunder", "col": Color("5a7a8a"), "shape": "serpent", "pal": {"sec": Color("2e4450"), "acc": Color("c8d8d0")}},
+	"drowned_furrow": {"n": "Furrow Under a Neighbour's Water", "elem": "wood", "weak": "fire", "col": Color("6a7a4a"), "shape": "plant", "pal": {"sec": Color("3a4428"), "acc": Color("a8c8c8")}},
+	"deaf_stove": {"n": "Stove That Burns What It Is Given", "elem": "fire", "weak": "water", "col": Color("7a5a4a"), "shape": "golem", "pal": {"sec": Color("3a2a22"), "acc": Color("f08a30")}},
+	"split_billet": {"n": "Billet Split for the Pot", "elem": "wood", "weak": "fire", "col": Color("c8b080"), "shape": "mantis", "pal": {"sec": Color("7a6238"), "acc": Color("3a2a1a")}},
+	"lost_note": {"n": "Note Nobody Stopped For", "elem": "thunder", "weak": "earth", "col": Color("d8d0a0"), "shape": "wisp", "pal": {"sec": Color("8a8250"), "acc": Color("f8f4e0")}},
+	"the_fed_fire": {"n": "The Fire Fed to Be Rid Of", "elem": "fire", "weak": "water", "col": Color("e85a20"), "shape": "wraith", "boss": true, "bright": true, "pal": {"sec": Color("6a1a08"), "acc": Color("ffe0a0")}},
+	"the_next_door": {"n": "The Dyke That Sent It Next Door", "elem": "earth", "weak": "wood", "col": Color("7a6a4a"), "shape": "golem", "boss": true, "pal": {"sec": Color("42382a"), "acc": Color("8ab0b8")}},
+	"the_kindling": {"n": "The Song Burned for Supper", "elem": "thunder", "weak": "earth", "col": Color("c8a868"), "shape": "warden", "boss": true, "pal": {"sec": Color("3a2a1a"), "acc": Color("f8e8b0")}},
 	"the_knack": {"n": "The Gift That Never Practised", "elem": "thunder", "weak": "earth", "col": Color("d8b850"), "shape": "warden", "boss": true, "pal": {"sec": Color("8a6a20"), "acc": Color("f8f0e0")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
@@ -1447,12 +1461,17 @@ const AREAS := {
 			# Part XVIII (cultures.gd): the keeper of the Felt Hearth, in the tents below the valley, and her grandson
 			{"id": "sarnai", "n": "Grandmother Sarnai", "pos": Vector2i(28, 11), "col": Color("8a2a3a"), "late": true}, {"id": "batu", "n": "Batu the Horse-Herd", "pos": Vector2i(38, 8), "col": Color("2a5a9a"), "late": true},
 			# Part XXII: Master Lie, who rode the wind, on the one height of the valley, waiting for it to come back
-			{"id": "liezi", "n": "Master Lie, Who Rode the Wind", "pos": Vector2i.ZERO, "col": Color("c8d4e0"), "vis": ["s_p22_xiao", ""], "late": true, "peak": 0, "stand": "top"}
+			{"id": "liezi", "n": "Master Lie, Who Rode the Wind", "pos": Vector2i.ZERO, "col": Color("c8d4e0"), "vis": ["s_p22_xiao", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "cai_yong", "n": "Cai Yong", "pos": Vector2i.ZERO, "col": Color("6a5a7a"), "asset": "cai_yong", "vis": ["s_p37_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [
 			{"id": "storm_ape_king", "pos": Vector2i(60, 12), "lv": 10, "req": 10},{"id": "thunder_roc", "pos": Vector2i(78, 25), "lv": 11, "req": 11},
 			# Part XXII: the Earl of the Wind, come up to see who is in his sky
-			{"id": "fei_lian", "pos": Vector2i.ZERO, "lv": 79, "req": 79, "vis": ["s_p22_flight", ""], "late": true, "peak": 0, "stand": "top"}],
+			{"id": "fei_lian", "pos": Vector2i.ZERO, "lv": 79, "req": 79, "vis": ["s_p22_flight", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "the_kindling", "pos": Vector2i.ZERO, "lv": 126, "req": 125, "vis": ["s_p37_notes", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
+		],
 		"pickups": [
 			{"id": "shard1", "item": "shard", "pos": Vector2i(30, 40)}, {"id": "shard2", "item": "shard", "pos": Vector2i(48, 10)},
 			{"id": "shard3", "item": "shard", "pos": Vector2i(64, 38)}, {"id": "shard4", "item": "shard", "pos": Vector2i(40, 24)},
@@ -1465,6 +1484,11 @@ const AREAS := {
 			# Part XXII: the cords the Earl knots his winds in, hung where the rock is steepest
 			{"id": "p22_knot1", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p22_knot2", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "flank"},
 			{"id": "p22_knot3", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p22_knot4", "item": "wind_knot", "pos": Vector2i.ZERO, "vis": ["s_p22_gusts", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "p37_peg1", "item": "scorched_peg", "pos": Vector2i.ZERO, "vis": ["s_p37_stoves", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p37_peg2", "item": "scorched_peg", "pos": Vector2i.ZERO, "vis": ["s_p37_stoves", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p37_peg3", "item": "scorched_peg", "pos": Vector2i.ZERO, "vis": ["s_p37_stoves", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p37_peg4", "item": "scorched_peg", "pos": Vector2i.ZERO, "vis": ["s_p37_stoves", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_shards",
 	},
@@ -1539,7 +1563,10 @@ const AREAS := {
 		],
 		"npcs": [{"id": "fire_sage", "n": "Sage Huo Rong", "pos": Vector2i(10, 26), "col": Color("ff9a5a"), "vis": ["s_vo_intro", ""]},
 			# Part XXVII: the old man who burns charcoal on the south slope, at the foot of the height
-			{"id": "charcoal_seller", "n": "The Charcoal Seller", "pos": Vector2i.ZERO, "col": Color("6a665e"), "vis": ["s_p27_snow", ""], "late": true, "peak": 0, "stand": "foot"}],
+			{"id": "charcoal_seller", "n": "The Charcoal Seller", "pos": Vector2i.ZERO, "col": Color("6a665e"), "vis": ["s_p27_snow", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "su_dai", "n": "Su Dai the Persuader", "pos": Vector2i.ZERO, "col": Color("8a5a3a"), "asset": "su_dai", "vis": ["s_p37_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
+		],
 		"bosses": [
 			{"id": "lava_titan", "pos": Vector2i(36, 40), "lv": 13, "req": 13},
 			{"id": "cinder_behemoth", "pos": Vector2i(48, 24), "lv": 13, "req": 13},
@@ -1548,7 +1575,9 @@ const AREAS := {
 			# Part XVIII: Zhurong, Lord of the Southern Fire, who keeps Suiren's fire-drill
 			{"id": "zhurong", "pos": Vector2i(39, 24), "lv": 67, "req": 66, "vis": ["s_p18_zhurong", ""], "late": true},
 			# Part XXVII: the buyer in yellow, on the height with the old man's cart
-			{"id": "palace_buyer", "pos": Vector2i.ZERO, "lv": 94, "req": 93, "vis": ["s_p27_gauze", ""], "late": true, "peak": 0, "stand": "top"}
+			{"id": "palace_buyer", "pos": Vector2i.ZERO, "lv": 94, "req": 93, "vis": ["s_p27_gauze", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "the_fed_fire", "pos": Vector2i.ZERO, "lv": 124, "req": 123, "vis": ["s_p37_embers", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickups": [
 			{"id": "ember1", "item": "ember", "pos": Vector2i(20, 12)}, {"id": "ember2", "item": "ember", "pos": Vector2i(42, 46)},
@@ -1556,6 +1585,11 @@ const AREAS := {
 			# Part XXVII: the price of a thousand jin of charcoal, blown off four oxen's horns
 			{"id": "p27_gauze1", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p27_gauze2", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 1, "stand": "flank"},
 			{"id": "p27_gauze3", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 1, "stand": "foot"}, {"id": "p27_gauze4", "item": "red_gauze", "pos": Vector2i.ZERO, "vis": ["s_p27_buyers", ""], "late": true, "peak": 2, "stand": "flank"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "p37_cinder1", "item": "wet_cinder", "pos": Vector2i.ZERO, "vis": ["s_p37_faggots", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p37_cinder2", "item": "wet_cinder", "pos": Vector2i.ZERO, "vis": ["s_p37_faggots", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p37_cinder3", "item": "wet_cinder", "pos": Vector2i.ZERO, "vis": ["s_p37_faggots", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p37_cinder4", "item": "wet_cinder", "pos": Vector2i.ZERO, "vis": ["s_p37_faggots", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_vo_collect",
 	},
@@ -2895,7 +2929,10 @@ const AREAS := {
 			{"to": "longmen", "pos": Vector2i(1, 29), "dest": Vector2i(94, 30), "open": ""},
 			{"to": "tushan", "pos": Vector2i(94, 29), "dest": Vector2i(4, 30), "open": "s_df_gun"},
 		],
-		"npcs": [{"id": "bo_yi", "n": "Bo Yi of the Dykes", "pos": Vector2i(12, 35), "col": Color("6a7a5a")}],
+		"npcs": [{"id": "bo_yi", "n": "Bo Yi of the Dykes", "pos": Vector2i(12, 35), "col": Color("6a7a5a")},
+			# Part XXXVII (the Five Hands release)
+			{"id": "bai_gui", "n": "Minister Bai Gui", "pos": Vector2i.ZERO, "col": Color("5a6a7a"), "asset": "bai_gui", "vis": ["s_p37_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
+		],
 		"bosses": [
 			{"id": "toad_matriarch", "pos": Vector2i(26, 46), "lv": 42, "req": 42},
 			{"id": "heron_lord", "pos": Vector2i(50, 12), "lv": 43, "req": 43},
@@ -2903,13 +2940,20 @@ const AREAS := {
 			{"id": "carrier_turtle", "pos": Vector2i(30, 16), "lv": 43, "req": 43},
 			{"id": "gun", "pos": Vector2i(86, 22), "lv": 43, "req": 43},
 			# Part XXIV: the Ape of the Huai, at the foot of Turtle Mountain (peaks.gd OWN), with nine links of chain still on him
-			{"id": "wuzhiqi", "pos": Vector2i.ZERO, "lv": 86, "req": 85, "vis": ["s_p24_links", "s_p24_ape"], "late": true, "peak": 0, "stand": "foot"}
+			{"id": "wuzhiqi", "pos": Vector2i.ZERO, "lv": 86, "req": 85, "vis": ["s_p24_links", "s_p24_ape"], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "the_next_door", "pos": Vector2i.ZERO, "lv": 125, "req": 124, "vis": ["s_p37_floods", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickups": [{"id": "xirang1", "item": "xirang", "pos": Vector2i(18, 10)}, {"id": "xirang2", "item": "xirang", "pos": Vector2i(42, 24)}, {"id": "xirang3", "item": "xirang", "pos": Vector2i(70, 14)}, {"id": "xirang4", "item": "xirang", "pos": Vector2i(78, 50)},
 			# Part XXIV: links of Yu's chain, each the size of a millstone, where the river dropped them
 			{"id": "p24_link1", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p24_link2", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "foot"},
 			{"id": "p24_link3", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p24_link4", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "flank"},
-			{"id": "p24_link5", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "flank"}
+			{"id": "p24_link5", "item": "chain_link", "pos": Vector2i.ZERO, "vis": ["s_p24_silt", ""], "late": true, "peak": 0, "stand": "flank"},
+			# Part XXXVII (the Five Hands release)
+			{"id": "p37_stake1", "item": "boundary_stake", "pos": Vector2i.ZERO, "vis": ["s_p37_dykes", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p37_stake2", "item": "boundary_stake", "pos": Vector2i.ZERO, "vis": ["s_p37_dykes", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p37_stake3", "item": "boundary_stake", "pos": Vector2i.ZERO, "vis": ["s_p37_dykes", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p37_stake4", "item": "boundary_stake", "pos": Vector2i.ZERO, "vis": ["s_p37_dykes", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_df_collect",
 		# the dyke road winds across the flood from the ferry road to the hills
@@ -5150,6 +5194,36 @@ const STEPS := [
 	{"id": "s_p36_table", "kind": "talk", "npc": "cook_zhou", "area": "sect", "t": "The fish is whole in the bowl, and the girl who split the practice yard is standing in the kitchen door. Carry the bowl to Auntie Zhou the Cook", "stones": 88600},
 	{"id": "s_p36_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The lane through the pines has closed over; pines are quick on that mountain. The Elder is standing where it was. Tell Elder Qing Xuan what a strong hand is for", "stones": 89000},
 	{"id": "s_break41", "kind": "breakthrough", "to": 123, "t": "He could turn it again, and does not: Light Hand"},
+	# ---- Part XXXVII: A Cup of Water, a Cart of Firewood (the Five Hands release): what the thing in the hand does to the thing in front of it.
+	{"id": "s_p37_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "The pines below the east wall burned for a night, and forty disciples threw everything they knew at it. Most of it made it worse. Speak to Elder Qing Xuan", "stones": 89200},
+	{"id": "s_p37_turn", "kind": "phase", "n": 6, "area": "mountain", "t": "Turn the hand to a phase (K) and strike (F) at the woods of Azure Cloud Mountain, until the land has answered 6 times"},
+	{"id": "s_p37_quench", "kind": "phase", "el": "water", "react": "quell", "n": 2, "area": "mountain", "t": "Set a stand of pines burning, on purpose, and put it out: fire (K, then F at the trees), then water on the same trees, until 2 stands are steam"},
+	{"id": "s_p37_su", "kind": "talk", "npc": "su_dai", "area": "volcano", "cave": -1, "t": "A persuader of the Warring States told a king what carrying firewood to a fire comes to. The king carried it. Find Su Dai in the cave under the Ashen Volcano", "stones": 89400},
+	{"id": "s_p37_faggots", "kind": "hunt", "area": "volcano", "cave": -1, "n": 24, "of": ["carried_faggot", "thrown_cup", "fed_ember"], "t": "\"He gave it a county to make it stop. It was a fire.\" Clear 24 faggots carried to the fire, cups thrown at a cartload and embers given ground", "stones": 89600},
+	{"id": "s_p37_cinders", "kind": "collect", "item": "wet_cinder", "n": 4, "area": "volcano", "cave": -1, "t": "Somebody did throw a cup, once, when it was a spark and a cup was enough. Find the 4 cinders a cup put out, in the cave under the volcano"},
+	{"id": "s_p37_casters", "kind": "folk", "role": "smith", "town": "tushan", "n": 2, "area": "tushan", "t": "\"Ask somebody who keeps a fire for a living what they give it.\" Ask 2 casters of Tushan how a furnace is banked for the night"},
+	{"id": "s_p37_feed", "kind": "phase", "el": "fire", "react": "feed", "n": 2, "area": "volcano", "t": "See it done once, with open eyes: bring the slope of the volcano into blossom (wood), and then set fire to the blossom. Twice. Watch how far it goes"},
+	{"id": "s_p37_embers", "kind": "hunt", "area": "volcano", "cave": -1, "n": 20, "of": ["carried_faggot", "fed_ember"], "t": "They are still bringing it wood, and it is still grateful. Clear 20 more of the faggots and the embers", "stones": 89800},
+	{"id": "s_p37_fedfire", "kind": "kill", "boss": "the_fed_fire", "area": "volcano", "cave": -1, "t": "It has been given everything it asked for, for two hundred years, to make it go away: go down to the Fire Fed to Be Rid Of", "stones": 90000},
+	{"id": "s_p37_bai", "kind": "talk", "npc": "bai_gui", "area": "drowned", "cave": -1, "t": "A minister told Master Meng he governed water better than Yu, and was asked where it went. Find Minister Bai Gui under the Drowned Fields of Gun", "stones": 90200},
+	{"id": "s_p37_dykes", "kind": "hunt", "area": "drowned", "cave": -1, "n": 24, "of": ["raised_dyke", "sent_flood", "drowned_furrow"], "t": "\"My fields were dry. That is all I looked at.\" Clear 24 dykes raised a hand higher, floods sent next door and furrows under a neighbour's water", "stones": 90400},
+	{"id": "s_p37_stakes", "kind": "collect", "item": "boundary_stake", "n": 4, "area": "drowned", "cave": -1, "t": "Before the dykes there were four stakes, and everybody's water crossed them on its way to the sea. Find the 4 stakes of the old boundary"},
+	{"id": "s_p37_farmers", "kind": "folk", "role": "farmer", "town": "qingshi", "n": 2, "area": "village", "t": "\"Ask somebody whose field lies below somebody else's.\" Ask 2 farmers of Qingshi what they do with water they have no use for"},
+	{"id": "s_p37_ridge", "kind": "phase", "el": "earth", "n": 3, "area": "drowned", "t": "Do as Gun did, to see it: raise the earth against the water in the Drowned Fields 3 times (earth: K, then F at open ground or at the water's edge)"},
+	{"id": "s_p37_willow", "kind": "phase", "el": "wood", "react": "quell", "n": 2, "area": "drowned", "t": "And now as Yu did: put root into what was raised, until 2 ridges are banks that something grows on and water finds its way through (wood on raised earth)"},
+	{"id": "s_p37_floods", "kind": "hunt", "area": "drowned", "cave": -1, "n": 20, "of": ["sent_flood", "drowned_furrow"], "t": "The water he sent away has to be somewhere, and it is here. Clear 20 more of the floods and the drowned furrows", "stones": 90600},
+	{"id": "s_p37_nextdoor", "kind": "kill", "boss": "the_next_door", "area": "drowned", "cave": -1, "t": "It kept one man's fields dry for thirty years and has never once looked over its own top: go down to the Dyke That Sent It Next Door", "stones": 90800},
+	{"id": "s_p37_cai", "kind": "talk", "npc": "cai_yong", "area": "thunder", "cave": -1, "t": "In Wu a cook was burning paulownia under a pot, and a man passing heard what the log was. Find Cai Yong in the cave under Thunder Valley", "stones": 91000},
+	{"id": "s_p37_stoves", "kind": "hunt", "area": "thunder", "cave": -1, "n": 24, "of": ["deaf_stove", "split_billet", "lost_note"], "t": "\"It is wood, she said. It burns.\" Clear 24 stoves that burn what they are given, billets split for the pot and notes nobody stopped for", "stones": 91200},
+	{"id": "s_p37_pegs", "kind": "collect", "item": "scorched_peg", "n": 4, "area": "thunder", "cave": -1, "t": "He pulled it out of the fire with his hands. The tail of it was already black. Find the 4 scorched pieces of its sister in the cave under Thunder Valley"},
+	{"id": "s_p37_strike", "kind": "phase", "el": "thunder", "n": 3, "area": "thunder", "t": "A tree the thunder has struck is the one a qin-maker walks a month to find. Call it down in Thunder Valley 3 times, and listen to what is left (thunder: K, then F)"},
+	{"id": "s_p37_rain", "kind": "phase", "el": "water", "react": "feed", "n": 2, "area": "thunder", "t": "Thunder is not the end of the storm, it is the beginning of the rain: where the thunder has struck, bring the water down twice (water on what thunder left)"},
+	{"id": "s_p37_notes", "kind": "hunt", "area": "thunder", "cave": -1, "n": 20, "of": ["split_billet", "lost_note"], "t": "Every log that was only firewood is down here, and some of them were not. Clear 20 more of the billets and the notes", "stones": 91400},
+	{"id": "s_p37_kindling", "kind": "kill", "boss": "the_kindling", "area": "thunder", "cave": -1, "t": "It was the best piece of wood in the province and it boiled one pot of rice: go down to the Song Burned for Supper", "stones": 91600},
+	{"id": "s_p37_round", "kind": "phase", "react": "feed", "n": 5, "area": "mountain", "t": "Walk the round on one piece of the mountain, each phase fed by the last: wood, fire, earth, thunder, water, wood, until 5 have fed the next"},
+	{"id": "s_p37_council", "kind": "talk", "npc": "elder", "area": "sect", "t": "The east slope is black to the wall, it is a dry year, and six villages lie under the mountain. The Elder has called the sect to the hall. Go to Elder Qing Xuan", "stones": 91800},
+	{"id": "s_p37_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Under the burnt pines the ground is green already, a finger high. The Elder is kneeling in it with his sleeves tied back. Tell Elder Qing Xuan what the round is for", "stones": 92200},
+	{"id": "s_break42", "kind": "breakthrough", "to": 126, "t": "Five things, and one hand that knows what each of them meets: Five in One Hand"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5382,6 +5456,10 @@ const ITEMS := {
 	"last_scale": {"n": "Scale of the Last Carp", "desc": "A scale as broad as a palm, off a carp that was sixty years in the great pond of the Crimson Marsh and one afternoon on a table. It has rings in it like a tree. Nobody at the feast counted them"},
 	"pulled_ear": {"n": "Shoot Left Alone", "desc": "A shoot of millet with its root-ball whole and the earth still on it, a finger shorter than its neighbours were made to be. It is the only kind in that field that came to ear"},
 	"blind_coin": {"n": "Piece of Gold Nobody Saw Fall", "desc": "A small flat piece of market gold, stamped with the mark of a stall in Qi. It was dropped in front of two hundred people by a man who saw none of them, and none of them saw it fall, because they were all looking at him"},
+	# ---- Part XXXVII (the Five Hands release): what is found in the three caves
+	"wet_cinder": {"n": "Cinder a Cup Put Out", "desc": "A cinder the size of a thumb, black, with one side washed grey where a cup of water once landed on it. It is one of four things in that cave that were ever put out. Each took one cup, because somebody threw it on the first evening"},
+	"boundary_stake": {"n": "Stake of the Old Boundary", "desc": "A stake of water-black oak with four families' marks cut in it, one on each face. It stood where four fields met, and every spring everybody's water went past it together on its way to the sea. Nobody pulled it up. It was built over"},
+	"scorched_peg": {"n": "Piece of Scorched Paulownia", "desc": "An offcut of paulownia as long as a hand, burnt black at one end, and so light that it seems to weigh less than the air round it. Knock it with a knuckle and it answers, for rather longer than a piece of wood has any business to"},
 	"tao_brick": {"n": "Brick of Tao Kan's Study", "desc": "A grey brick with one corner worn round by a hand. A governor of the south carried a hundred of these out of his study every morning and in again every evening for years, so that ease should not unfit him for work. Twelve jin"},
 	"red_gauze": {"n": "Half a Bolt of Red Gauze", "desc": "Half a bolt of thin red silk and ten feet of damask, of the kind the palace buyers tie to an ox's horn as the price of whatever is in the cart. It has never been worth a thousand jin of anything"},
 	"scroll_case": {"n": "Case of Scrolls", "desc": "A lacquered case of the ten thousand scrolls a prefect of Jiangzhou read, each with its ribbon and its ivory tag. Three jin, and it rattles as if most of what was in it had been left behind in his head"},
@@ -11236,6 +11314,145 @@ const DIALOGUE := {
 	],
 	"post:s_break41": [
 		["Narrator", "The tribulation comes down as it has come down forty times, looking for something to push against. It is used to being met. It finds a man sitting still who could meet it, and knows that he could, and has not stirred. It turns once round him, like broth round a ladle that is not moving, and settles, and is clear to the bottom."],
+	],
+	# ---- Part XXXVII: A Cup of Water, a Cart of Firewood (the Five Hands release)
+	"recall35": [
+		["Narrator", "The summer after the fish it did not rain on Azure Cloud Mountain from the fourth month to the eighth. On a night of dry wind a novice practising the Crimson Flame Palm below the east wall missed his target. By the time the bell was rung the pines had it. Forty disciples ran down in their night-clothes, and every one of them knew a technique."],
+	],
+	"s_p37_home": [
+		["Narrator", "The east slope is black from the wall to the stream, and still smoking in the roots. Along the edge of it stand things that have no business there: a thicket of new bamboo burnt to its knuckles, a wall of raised stone with the fire gone round both ends, forty puddles."],
+		["Elder Qing Xuan", "I watched it from the wall, child. The wood-root disciples grew a hedge to stop it, and it ate the hedge and thanked them. Earth raised a wall, and it went round. Thunder was thrown, I cannot think why. And each of forty threw one cup of water, where he stood.", "grieve"],
+		["Lin Feng", "It went out, Elder."],
+		["Elder Qing Xuan", "It rained. That is not the same as being put out. Master Meng says a cup of water does not save a cartload of burning firewood, and that the man who throws it then says water does not overcome fire. Forty of mine said so this morning. You have never said it only because you were not here.", "think"],
+		["Elder Qing Xuan", "You have five phases in that hand and you have used them as five colours of the same blow. So have I taught them. Go out on the mountain and turn your hand, and see what each one meets. Not a foe. The ground.", "point"],
+	],
+	"done:s_p37_turn": [
+		["Narrator", "Six blows, and six answers, none of them alike. A stand of pine in blossom in the wrong month. A stand dark and dripping with wet. Boulders heaved up among the roots. For forty realms he has thrown these at things that fell down, and has never once looked at what they did to the place."],
+		["Yue Ling", "You are standing in flowers, Lin Feng. You made them. You have been able to do that since you were sixteen and you have used it to hit wolves. ...I am not laughing. I am a little. Do the fire. I want to see what you think fire is.", "laugh"],
+	],
+	"done:s_p37_quench": [
+		["Narrator", "The second stand goes out as the first did: all at once, with a noise like a great pan lowered into a trough, and a bank of white where the red was. He put the water where the fire was, all of it, while the fire was still one stand of trees. That is the whole of the art. Forty disciples each knew half."],
+		["Yue Ling", "One stroke. They threw forty. It is not that yours was bigger. It was at the fire. Theirs were at where they happened to be standing. Go and tell the Elder you can put out a tree. He will send you somewhere worse, he always does.", "nod"],
+	],
+	"s_p37_su": [
+		["Narrator", "The cave under the Ashen Volcano is warm as a kitchen and lit from below. Wood is stacked along both walls to the roof, good split oak, cart after cart of it, and all of it is facing the same way, like a congregation. A lean man in a traveller's coat is sitting on a faggot, writing a letter he has written before."],
+		["Su Dai the Persuader", "I said it to the King of Wei in the plainest words I had. Qin wants your land, I said. Give it a county for peace and it will want the next. To serve Qin with land is to carry firewood to put out a fire. Until the wood is gone, the fire does not stop.", "think"],
+		["Su Dai the Persuader", "He thanked me. He said it was very well put. He had it written on a screen. And in the spring he gave them the county, because the fire was at his gate and the wood was in his hand, and a man must do something. It took nine years. They are all down here, the cartloads.", "grieve"],
+		["Lin Feng", "He knew what wood does to a fire."],
+		["Su Dai the Persuader", "Everybody knows. That is my whole grief, cultivator. I have never in my life told anybody a thing they did not know. Go and look at it. And mind: it is very polite. It will ask you for only a little.", "point"],
+	],
+	"done:s_p37_faggots": [
+		["Narrator", "The faggots do not fight so much as offer themselves, and have to be refused one at a time. Among the last of them, in the ash, there is a thing that is not like the rest: a cinder with one side washed grey. He turns it over. It is cold. It has been cold for two hundred years."],
+	],
+	"done:s_p37_cinders": [
+		["Su Dai the Persuader", "A kitchen-maid. On the first evening, when it was a spark in the thatch by the granary. She threw her washing-water on it, four times, and it was out. Nobody wrote her name on a screen. It came back the next week somewhere she was not. But look: those four have stayed out.", "nod"],
+	],
+	"done:s_p37_casters": [
+		["Narrator", "The casters of Tushan answer without looking up from the pit, as people answer who are asked their own names. What a fire is given at night, it turns out, is nearly nothing: ash over the coals, the door shut, and somebody who is to wake if the note of it changes. It is fed in the morning, by a person who wants it."],
+	],
+	"done:s_p37_feed": [
+		["Narrator", "He brings the slope into flower, and then he puts fire to the flowers, and the fire takes the stand he lit and the two beside it and looks round for more. He did nothing to it but give it what it eats. Twice. The second time he watches his own hand do the first half, the kind half, and knows what it is for."],
+		["Yue Ling", "That is what the wood-root disciples did. Exactly that. They grew it a hedge. They were so pleased with the hedge. Lin Feng, I do not think there is such a thing as a kind phase. I think there is only knowing what is on the other side of it.", "think"],
+	],
+	"done:s_p37_embers": [
+		["Narrator", "With the last faggot refused the warmth in the cave changes. It had been the warmth of a hearth. Now it is the warmth of something that has been kept waiting, and far down the gallery a light that was steady begins, very courteously, to move this way."],
+	],
+	"pre:the_fed_fire": [
+		["Narrator", "It is not large. That is the first thing. It is a fire the size of a man, standing among nine years of cartloads with its hands folded, and it has the patient, grateful look of somebody who has always been given what he asked for. It bows. It indicates, with regret, the wood he is carrying on his back."],
+		["Su Dai the Persuader", "It will ask for a stick. One. It will say that then it will go. I watched a king believe it nine times. Do not strike it with fire, cultivator, whatever you are best at, and do not, I beg you, try to grow anything in front of it.", "refuse"],
+	],
+	"post:the_fed_fire": [
+		["Narrator", "Nobody gives it anything. That is all. It asks, and waits, and asks for less, and the wood stays where it is stacked. A fire that is not fed does not rage. It gets small, and then it gets reasonable, and at the last it is a spark in thatch again, looking up at a cup."],
+		["Su Dai the Persuader", "Nine years of carts, and that was the whole of the answer: do not. I shall write to the King of Wei. He has been dead two hundred years and the letter is the same one, but I find I can finish it now. The last line was always missing. It says: so I did not.", "bow"],
+	],
+	"s_p37_bai": [
+		["Narrator", "Under the Drowned Fields the cave is a cistern, and water stands in it to the knee, perfectly still, going nowhere. On the one dry bank a minister in a good hat is seated at a writing-table with a plan of dykes unrolled on it. The plan is beautiful. Every line on it stops at the edge of the paper."],
+		["Minister Bai Gui", "I said to Master Meng: my management of the waters is better than Yu's. I had a right to say it. In thirty years my lord's fields were not once flooded, and Yu took thirteen and was three times past his own door without going in.", "nod"],
+		["Minister Bai Gui", "He said: you are mistaken. Yu followed the way of water, and so he made the four seas its drain. You have made your neighbour's country its drain. Water turned back on its course is a flood, he said, and a kind man hates it. Then he asked me where mine went.", "think"],
+		["Lin Feng", "And where did it go?"],
+		["Minister Bai Gui", "I had never asked. It was not on my plan. It went next door, cultivator, every spring for thirty years, and what was next door came down here when there was no more next door for it to be. Go and look. I should like somebody to tell me how much it is.", "grieve"],
+	],
+	"done:s_p37_dykes": [
+		["Narrator", "Each dyke, broken, lets go the one thing it was holding, which is somebody else's water. Under the oldest of them, where the earth was first thrown up, there is a stake of black oak with a mark cut on each of its four faces. It is not on the minister's plan either."],
+	],
+	"done:s_p37_stakes": [
+		["Minister Bai Gui", "Four families' marks. So there was an agreement, before me. Water came down, and went past this, through all four, and on. Nobody held it. I built on top of it without reading it. I took it for a fence post. Lay them out here, in order. I am going to have to draw the plan again.", "shock"],
+	],
+	"done:s_p37_farmers": [
+		["Narrator", "The farmers of Qingshi have a word for the field below yours. It is not the word for neighbour. It is closer to the word for the hand that passes a bowl down a table. What they do with water they have no use for is open the lower gap at dusk, so that it is the next man's by morning, and not all at once."],
+	],
+	"done:s_p37_ridge": [
+		["Narrator", "Three ridges, raised in three strokes, and the water stops at each of them as a dog stops at a door. It is astonishingly easy. Behind the third the pool is already a hand deeper than it was, and has begun, without any fuss at all, to look along the ridge for the end of it."],
+		["Yue Ling", "Gun did this for nine years and it was very fine for nine years. Look at it thinking, Lin Feng. It is not angry. It is only going to be somewhere, and you have told it not here. You have not told it where.", "point"],
+	],
+	"done:s_p37_willow": [
+		["Narrator", "Root goes into the raised stone like fingers into bread. The ridge slumps, and greens, and is a bank: lower than it was, and with gaps in it, and through each gap a thread of water goes on down toward the sea with something to hold the edges while it does. Nothing was overcome. It was only given a way."],
+		["Yue Ling", "It is lower. You have made his dyke lower and his fields are still dry. ...Because it is not standing against anything. Thirty years he added a hand of earth every spring, and he could have planted a willow and gone fishing.", "think"],
+	],
+	"done:s_p37_floods": [
+		["Narrator", "The floods go out through the gaps as if they had been waiting to be asked. The water in the cistern drops to the ankle. At the far end of the cave, where it does not drop, there is a wall across the dark that somebody built very well indeed."],
+	],
+	"pre:the_next_door": [
+		["Narrator", "It is a dyke, thirty springs high, a hand for each, tamped and faced and without one crack in it. On this side of it the ground is dry and has a table on it. It has no other side that it knows of. It stands with its back to the whole weight of what it sent away, and is proud of its record."],
+		["Minister Bai Gui", "That is my work. I cannot fault it. If you strike it, it will mend, and stand a hand higher: I built it to. It has never been wrong about anything it could see. You will have to show it over its own top, and I do not know how that is done. I never did it.", "refuse"],
+	],
+	"post:the_next_door": [
+		["Narrator", "It is shown the other side. It looks for a long time at how much there is. Then, of its own accord, it opens: not a breach, a gate, the width of a man, low down. The water goes through it in good order and takes the afternoon. When it is over the dyke is still standing, and is a wall with a door in it, which is a different thing."],
+		["Minister Bai Gui", "A sluice. Of course it is a sluice. I shall go next door, cultivator. I have never been. I am told there are people. I shall take the plan, and a brush, and ask them where on their side they would like the line to go on to.", "bow"],
+	],
+	"s_p37_cai": [
+		["Narrator", "The cave under Thunder Valley hums. Every stalactite in it has been struck at some time and remembers. In the middle of the floor a stove is burning with nobody at it, and beside the stove sits a man with a scholar's stoop and very long hands, his head a little on one side, as a man sits who is counting somebody else's bars."],
+		["Cai Yong", "I was passing a house in Wu at supper time. A woman was burning paulownia under her rice, and I heard the fire crack. Not the fire. The log. It is a sound you hear once in a life: wood that is dry right through and was struck once, long ago, and lived.", "think"],
+		["Cai Yong", "I went into her kitchen without knocking and pulled it out with my hands. She thought I was mad. It is wood, she said. It burns. I said, madam, so does a book. She let me have it for the price of the next log. The tail was burnt already. I left the tail on.", "laugh"],
+		["Lin Feng", "And the ones nobody was passing."],
+		["Cai Yong", "Yes. You see it at once. I saved one log. How many suppers are there? Every piece of wood that was something, and was put under a pot by somebody who was only hungry, is down here, and that stove is still being fed. Go and listen. Some of them are still in tune.", "point"],
+	],
+	"done:s_p37_stoves": [
+		["Narrator", "A stove that is broken open spills what it had not finished: ash, mostly, and now and then a length of wood that rings on the stone as it falls. Four of the pieces are burnt at one end only. He picks one up, and it weighs nothing, and it goes on sounding in his hand after the cave is quiet."],
+	],
+	"done:s_p37_pegs": [
+		["Cai Yong", "That is the note. You hear it? It is still giving the note. That is from the same tree as mine, or its sister. Do you know what makes it? The thunder. A paulownia that has been struck and has stood forty years afterward. The fire in the kitchen did not make it sing. It only could not stop it.", "cheer"],
+	],
+	"done:s_p37_strike": [
+		["Narrator", "Three strokes of thunder, and three trees standing split and smoking with the heartwood open to the air. They are not dead. He lays his palm on the third, on the bare wood, and feels it go on ringing down into the root a long time after his ears have given it up. In forty years somebody will walk a month to find these."],
+		["Yue Ling", "You have ruined three trees. And made three, I suppose, for somebody who is not born. Lin Feng, is that what it is? That nothing you can do with that hand is only the one thing? ...Do not answer. Put your hand back on it. I want to feel it too.", "think"],
+	],
+	"done:s_p37_rain": [
+		["Narrator", "Where the thunder struck he brings the water, and it does not come as a pool. It comes down: a rain the size of a threshing floor, falling out of a clear sky onto split trees, and staying. Thunder was never the end of a storm. It is the door the rain comes in by, and he has been slamming it for forty realms."],
+		["Yue Ling", "Now listen to them. No, do not look, listen. Wet, they are a different instrument. Everybody who taught you would have said thunder and water are two phases. They are one piece of weather, and you have played it in order for the first time.", "nod"],
+	],
+	"done:s_p37_notes": [
+		["Narrator", "A note that nobody stopped for does not stop either. It only goes on, thinner, looking for an ear. As the last of them passes him the hum in the stalactites drops by a tone, and somewhere below a stove door opens that he did not open, and something inside it clears its throat."],
+	],
+	"pre:the_kindling": [
+		["Narrator", "It is a log the height of a pillar, alight from end to end, standing in a stove that has grown up round it like a shrine. As it burns it sings: one long note, perfectly true, getting shorter. It has been singing and getting shorter since a supper in Wu. A pot of rice is on top of it. The rice is done."],
+		["Cai Yong", "It does not know it is anything. It was told it was firewood, and it is a conscientious piece of wood, and it is burning as well as it can. If you put it out by force it will only think it has failed at that as well. Somebody has to tell it what it is.", "grieve"],
+	],
+	"post:the_kindling": [
+		["Narrator", "It is told. It is knocked on, once, with a knuckle, by somebody who then stands and listens to the end of the sound, which nobody has done before. The flame goes down it like a robe let fall. What is left is seven feet of paulownia, black at the tail, and for the first time since the thunder it is quiet on purpose."],
+		["Cai Yong", "There. Seven strings, I think, and the scorch left on. I shall not sleep till it is strung. And then I am going back to that kitchen in Wu, cultivator, to play it for her. She was not wicked. She had rice to cook and it was wood. Somebody should have been passing sooner.", "bow"],
+	],
+	"done:s_p37_round": [
+		["Narrator", "On one piece of the mountain, no bigger than a room: a grove, and the grove burnt, and the ash baked hard as a kiln floor, and thunder called into the hard ground until a stone stands humming, and rain brought down the stone, and in the rain, without his hurrying it, green. He has gone all the way round, and is where he began, and it is not the same place."],
+		["Yue Ling", "You did not fight any of it. I watched. Each one, you only asked what the last one had left for it. Six strokes and you are not even out of breath. Lin Feng, the fire took forty of them all night. I think they were each fighting the other thirty-nine.", "cheer"],
+	],
+	"s_p37_council": [
+		["Narrator", "The whole sect is in the hall, with ash still on it. On the Elder's table lie six tallies of split bamboo, one from each village under the mountain. Each asks, in a headman's careful hand, what Azure Cloud Sect means to do before the next dry wind, since the last fire stopped at its wall by luck and theirs have no walls."],
+		["Elder Qing Xuan", "They are right to ask, and I have forty disciples who each know a fifth of the answer and think it the whole. You have walked the round, child. You have seen what feeds and what overcomes, and what a cup is worth and when. I will not decide this from a wall. Say what is to be done.", "think"],
+	],
+	"s_p37_end": [
+		["Narrator", "Under the black pines the ground is green, a finger high, everywhere at once: ash is what a pine wood grows in. The Elder is kneeling in it with his sleeves tied back, setting a seedling no longer than his thumb, and pressing the earth round it with two fingers as if it might be woken."],
+		["Elder Qing Xuan", "We have taught the five as five swords for three hundred years. A sword is a thing with one end. These have two: there is always something on the far side of the stroke, and it is always one of the other four. The novice who began this knew his Crimson Flame Palm perfectly. He had only never met a pine.", "think"],
+		["Lin Feng", "The round is not for striking with, Elder. It is for asking what is already there. Then the stroke is mostly made."],
+		["Elder Qing Xuan", "Hm. And the cup?", "nod"],
+		["Lin Feng", "The cup was enough. On the first evening. It is the same cup; it is only later."],
+		["Elder Qing Xuan", "Go and sit under the pine, child. The old one, above us. I think the sky has been waiting to see whether you would say that.", "wave"],
+	],
+	"pre:s_break42": [
+		["Narrator", "Under the old pine above the sect, Lin Feng sits with his right hand open on his knee. He can feel all five in it, not as five, as a wheel is not its spokes: the green that feeds the red, the red that leaves the yellow, and round. He does not turn it. He looks at what is in front of him. The sky, he notices, is dry, and wants rain."],
+	],
+	"post:s_break42": [
+		["Narrator", "The tribulation comes down as thunder, as it must, and he does not meet it with anything. He has already seen what thunder is the door of. He opens his hand and lets it be the beginning of something, and it rains on Azure Cloud Mountain for the first time since the night of the fire, on the black slope and the green in it, and on six villages, all night."],
 	],
 	# ---- Part XXX: The Net with Three Sides Open (the Open Net release)
 	"recall28": [

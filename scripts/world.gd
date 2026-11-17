@@ -1600,6 +1600,7 @@ func _use_begin() -> void:
 		var ch := _hold_in_hand(comp, chold)
 		if ch != null:
 			using.comp_held = ch
+	_use_reach()
 	# a stool for a loom that has none
 	if str(using.e.get("furn", "")) == "loom":
 		var sb := MB.new()
@@ -1646,6 +1647,9 @@ func _use_finish() -> void:
 	using.comp_held = null
 
 func _use_clear() -> void:
+	var rc8 = using.get("reach")
+	if rc8 != null and is_instance_valid(rc8):
+		(rc8 as Node).queue_free()
 	var sn = using.get("stool")
 	if sn != null and is_instance_valid(sn):
 		(sn as Node).queue_free()
@@ -1669,20 +1673,78 @@ func _use_clear() -> void:
 ## The thing in the hero's hand (Props.held), on his right hand bone (or `bone`); null if the model
 ## has no skeleton to hold it.
 func _hold_in_hand(m: Node3D, what: String, bone: String = "hand.R") -> Node3D:
-	var sks := m.find_children("*", "Skeleton3D", true, false)
-	if sks.is_empty():
-		return null
-	var sk := sks[0] as Skeleton3D
-	if sk.find_bone(bone) < 0:
-		return null
-	var ba := BoneAttachment3D.new()
-	ba.bone_name = bone
-	sk.add_child(ba)
 	# (the Answering Land release: what the people of the towns work with is folk.gd's to build, the hoe, the
 	# shoulder pole, the basket, the bowl, the watchman's lantern and gong among them; this asked props.gd,
 	# which knows none of those, and they had been carrying nothing since the Living Land)
-	ba.add_child(Folk.held(what))
+	# (the Five Hands release, grip.gd: and it is in the palm, with the other hand on its shaft and whatever
+	# hangs from it hanging: it used to sit eight centimetres up the forearm, through the sleeve)
+	var ba := Grip.hold(m, Folk.held(what), what, bone)
+	var rc := Grip.reach_of(ba)
+	if rc != null and not is_floor() and bundles.has(layer):
+		var bb: Dictionary = bundles[layer]
+		rc.ground = func(q: Vector3) -> float: return _stand_y(bb, q)
+	elif rc != null:
+		var fy := m.global_position.y if m.is_inside_tree() else 0.0
+		rc.ground = func(_q: Vector3) -> float: return fy
 	return ba
+
+## The Five Hands release (grip.gd): what the hands meet while he does the thing he is doing.  What he
+## holds is brought down on the ground under it, on the thing in front of him or on the trunk that is
+## really there; a bare hand the clip brings near the thing is laid on it; and where a tool lands,
+## chips fly from that place and no other.
+const TOUCH_CLIPS := ["touch", "knock", "trace", "play_qin", "rock", "count", "open_chest", "hang", "weave", "spin", "wash", "push", "strike", "gather", "comb", "write"]
+
+func _use_reach() -> void:
+	var k: Dictionary = using.k
+	var clip := str(k.clip)
+	var rc := Grip.reach_of(using.get("held"))
+	if rc == null and TOUCH_CLIPS.has(clip):
+		rc = Grip.bare(player)
+		using.reach = rc
+	if rc == null:
+		return
+	rc.clip = clip
+	rc.palms = ["L", "R"] if TOUCH_CLIPS.has(clip) else []
+	var nd = ent_nodes.get(using.e.id)
+	if nd != null and is_instance_valid(nd):
+		rc.faces = Grip.faces_of(nd as Node3D, player.global_position + Vector3(0, 1.0, 0) + Vector3(using.dir.x, 0, using.dir.z) * 0.5)
+	if using.e.has("work") and str(using.e.work) == "fell" and not is_floor():
+		rc.trunk = _trunk_at(using.e.pos)
+	var dir := Vector3(using.dir.x, 0, using.dir.z)
+	var fxk := str(k.get("fx", ""))
+	var gfn = rc.ground
+	rc.on_hit = func(at: Vector3) -> void:
+		match fxk:
+			"chips":
+				Heft.chips(scene3d, at, dir, gfn, Color(0.86, 0.74, 0.52), 6)
+			"sparks":
+				Fx3D.sparks(scene3d, at)
+				Heft.chips(scene3d, at, dir, gfn, Color(0.5, 0.5, 0.52), 3, 0.035)
+			"clods", "dust":
+				Heft.chips(scene3d, at, dir, gfn, Color(Look.theme(theme_name).path).darkened(0.3), 4, 0.06)
+
+## The tree that really stands on tile `tl` nearest to him: where its foot is and how thick it is ({}
+## if nothing is drawn there).
+func _trunk_at(tl: Vector2i) -> Dictionary:
+	var rid := Atlas.owner_id(wd, tl)
+	if not views.has(rid) or not bool(views[rid].shown):
+		return {}
+	var v: Dictionary = views[rid]
+	var reg: Dictionary = (v.root as Node3D).get_meta("nature", {})
+	var r0: Vector2i = v.get("origin", Vector2i.ZERO)
+	var out := {}
+	var bd := INF
+	for en in reg.get(tl - r0, []):
+		var mmi = en.get("mmi")
+		if str(en.kind) != "tree" or mmi == null or not is_instance_valid(mmi):
+			continue
+		var mm := (mmi as MultiMeshInstance3D).multimesh
+		var wxf := (mmi as MultiMeshInstance3D).global_transform * mm.get_instance_transform(int(en.i))
+		var d2 := wxf.origin.distance_to(player.global_position)
+		if d2 < bd and d2 < 2.6:
+			bd = d2
+			out = {"at": wxf.origin, "r": clampf(mm.mesh.get_aabb().end.y * wxf.basis.get_scale().y * 0.045, 0.12, 0.42)}
+	return out
 
 ## Where the hero and Yue Ling are and what they do while he does something.
 func _use_pose(d: float) -> void:
@@ -1704,9 +1766,16 @@ func _use_pose(d: float) -> void:
 		# the swing goes, with him on it: higher and higher, then dying away
 		var nd = ent_nodes.get(using.e.id)
 		var sw := 0.0
-		if doing:
+		# (the Five Hands release, heft.gd: a swing is a pendulum of its ropes' length, pumped by whoever
+		# sits on it with the way it is going, and slowed by his heels at the end: it was a sine)
+		if nd != null and is_instance_valid(nd):
+			var sst: Dictionary = (nd as Node3D).get_meta("heft", {})
 			var ph := el - USE_STEP
-			sw = sin(ph * 2.2) * 0.42 * smoothstep(0.0, 1.5, ph) * (1.0 - smoothstep(dur - 1.2, dur, ph))
+			if doing and ph < dur - 1.6:
+				sw = Heft.pendulum(sst, d, 2.12, 0.12, Heft.pump(sst, 2.12, 0.44))
+			else:
+				sw = Heft.pendulum(sst, d, 2.12, 1.9 if doing else 0.9)
+			(nd as Node3D).set_meta("heft", sst)
 		if nd != null and is_instance_valid(nd) and (nd as Node3D).has_meta("model"):
 			var pmod := (nd as Node3D).get_meta("model") as Node3D
 			if pmod.has_meta("mover"):
@@ -1761,6 +1830,12 @@ func _use_pose(d: float) -> void:
 		Models.anim_person(player, t, false, false, clip)
 	if doing:
 		_use_fx_tick(el - USE_STEP)
+	# (grip.gd: the hands are on it while it is being done, and come off as he steps back)
+	var rc9 := Grip.reach_of(using.get("held"))
+	if rc9 == null and using.get("reach") != null and is_instance_valid(using.reach):
+		rc9 = using.reach
+	if rc9 != null:
+		rc9.k = 1.0 if doing else 0.0
 	comp.visible = Game.companion
 	if Game.companion:
 		_comp_use(d, el, doing)
@@ -1910,8 +1985,14 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 	var since := t - float(n.get_meta("used_t", -1e9))
 	match str(e.prop):
 		"bell":
+			# (the Five Hands release, heft.gd: struck, it is given speed, and swings as a weight on its beam does)
+			var bst: Dictionary = n.get_meta("heft", {})
 			var hit := since - 0.95
-			mo.rotation.x = 0.0 if hit < 0.0 or hit > 12.0 else sin(hit * 4.5) * 0.14 * exp(-hit * 0.5)
+			if hit >= 0.0 and hit < 0.2 and float(n.get_meta("heft_hit", -1e9)) != float(n.get_meta("used_t", -1e9)):
+				n.set_meta("heft_hit", float(n.get_meta("used_t", -1e9)))
+				Heft.kick(bst, 0.62)
+			mo.rotation.x = Heft.pendulum(bst, get_process_delta_time(), 0.5, 0.9)
+			n.set_meta("heft", bst)
 		"drum":
 			var hit2 := since - 0.95
 			var pulse := 0.0 if hit2 < 0.0 or hit2 > 2.0 else exp(-hit2 * 7.0) * 0.07
@@ -1919,9 +2000,14 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 		"campfire":
 			mo.scale = Vector3(1.0, 1.0 + 0.15 * sin(t * 9.0 + e.pos.x) + 0.08 * sin(t * 13.0), 1.0)
 		"chimes":
-			var amp := 0.04 + (0.0 if since < 0.8 or since > 8.0 else 0.3 * exp(-(since - 0.8) * 0.6))
-			mo.rotation.x = sin(t * 3.0 + e.pos.x) * amp
-			mo.rotation.z = sin(t * 2.3) * amp * 0.5
+			# (heft.gd: the chimes hang; the wind pushes them a little all the time, and a hand a good deal once)
+			var cst: Dictionary = n.get_meta("heft", {})
+			if since >= 0.8 and since < 1.0 and float(n.get_meta("heft_hit", -1e9)) != float(n.get_meta("used_t", -1e9)):
+				n.set_meta("heft_hit", float(n.get_meta("used_t", -1e9)))
+				Heft.kick(cst, 1.5)
+			mo.rotation.x = Heft.pendulum(cst, get_process_delta_time(), 0.35, 0.5, sin(t * 1.3 + e.pos.x) * 0.5 + sin(t * 3.1) * 0.3)
+			mo.rotation.z = mo.rotation.x * 0.4 * sin(t * 0.7 + e.pos.y)
+			n.set_meta("heft", cst)
 		"fishing":
 			var cyc := fmod(t, 3.2)
 			var tug := 0.05 if since > 0.0 and since < 7.0 and cyc > 2.3 and cyc < 2.6 else 0.0
@@ -1934,7 +2020,10 @@ func _animate_prop(e: Dictionary, n: Node3D, dist: float) -> void:
 			mo.position.y = 0.55 + 0.45 * lift
 		"swing":
 			if using.is_empty() or str(using.e.id) != str(e.id):
-				mo.rotation.x = sin(t * 1.1 + e.pos.x) * 0.03
+				# (heft.gd: left alone it goes on swinging until the air has stopped it, and the wind stirs it)
+				var wst: Dictionary = n.get_meta("heft", {})
+				mo.rotation.x = Heft.pendulum(wst, get_process_delta_time(), 2.12, 0.5, sin(t * 0.9 + e.pos.x) * 0.06)
+				n.set_meta("heft", wst)
 		"lantern_st":
 			mo.visible = Game.prop_uses.has(e.id) or (since > 0.8 and since < 60.0)
 		# ---- the Hollow Hills release (cavethings.gd)
@@ -2889,6 +2978,7 @@ func _update_view(d: float) -> void:
 	cam.look_at(g[1], Vector3.UP)
 	player.visible = _fp_k < 0.7
 	_update_sunder(d)
+	_update_phases(d)
 	_cutscene(d, pp)
 	if cine_k <= 0.0 and _cine_fov0 > 0.0:
 		cam.fov = lerpf(_cine_fov0, FP_FOV, _fp_k)
@@ -3512,6 +3602,7 @@ func _animate_ent(e: Dictionary, n: Node3D, pp: Vector3, dist: float, d: float, 
 			if not job.is_empty() and not Assets.has_clip(m, str(job[0])):
 				job = []
 			_post_hold(n, m, "" if job.is_empty() else str(job[1]))
+			_post_reach(n, "" if job.is_empty() else str(job[0]))
 			if not job.is_empty():
 				Models.anim_person(m, t * Giants.pace(float(n.get_meta("tall", 1.0))) + e.pos.x, false, false, str(job[0]))
 				m.rotation.y = lerp_angle(m.rotation.y, 0.0, 1.0 - exp(-d * 3.0))
@@ -3620,6 +3711,15 @@ func _post_hold(n: Node3D, m: Node3D, what: String) -> void:
 		if hn != null:
 			n.set_meta("hold_node", hn)
 
+## (the Five Hands release, grip.gd: the tool somebody of the towns works with meets the ground they work)
+func _post_reach(n: Node3D, clip: String) -> void:
+	if not n.has_meta("hold_node"):
+		return
+	var rc := Grip.reach_of(n.get_meta("hold_node"))
+	if rc != null:
+		rc.clip = clip
+		rc.k = 1.0 if clip != "" else 0.0
+
 # ---------------------------------------------------------------- things that break (havoc.gd)
 ## Walking onto a tile with something on it: at the gallop it is smashed, on foot it is only jostled.
 func _trample(tile: Vector2i) -> void:
@@ -3662,11 +3762,21 @@ func strike() -> void:
 		if _blow(tiles, fwd):
 			return
 		# (the Small Fish release, sunder.gd: and the land answers by the realm of whoever struck it)
-		_sunder(Sunder.blow(Game, layer, wd, ptile, facing), fwd)
+		if str(Game.phase) != "" and str(Game.cur_step().get("kind", "")) == "sunder":
+			# (a step that asks for the land to be broken is struck with the plain blade, whatever the hand was turned to)
+			Game.phase = ""
+			Game.toast("The plain blade: this is to be broken, not turned.")
+		if str(Game.phase) != "":
+			# (the Five Hands release, phases.gd: with a phase in the hand the land is not broken: it answers the phase)
+			_phase(Phases.cast(Game, layer, wd, ptile, facing, str(Game.phase)), fwd)
+		else:
+			_sunder(Sunder.blow(Game, layer, wd, ptile, facing), fwd)
 	if headless():
 		return
 	var pp := _player_pos()
-	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), Color(0.78, 0.9, 1.0), atan2(fwd.x, fwd.z), 2.2 + 0.45 * float(Sunder.rank(Game)))
+	# (the Five Hands release: the arc of the blade is the colour of the phase in the hand)
+	var arc_col: Color = (PHASE_COL[str(Game.phase)] as Color).lerp(Color.WHITE, 0.35) if PHASE_COL.has(str(Game.phase)) else Color(0.78, 0.9, 1.0)
+	Fx3D.slash(scene3d, pp + fwd * 1.1 + Vector3(0, 1.0, 0), arc_col, atan2(fwd.x, fwd.z), 2.2 + 0.45 * float(Sunder.rank(Game)))
 	if not is_floor():
 		# the cut goes through the grass: it is mown in an arc in front of the blade, the clippings fly
 		Impact.mow(pp + fwd * 1.6, 1.9, t)
@@ -3724,6 +3834,132 @@ func _sunder(res: Dictionary, dir: Vector3) -> void:
 		Havoc.burst(scene3d, "rubble", cp + Vector3(0, 0.4, 0), -dir, gfn, 1.2, Color(Look.theme(theme_name).path).darkened(0.4))
 		Fx3D.pillar(scene3d, cp, Color(0.8, 0.72, 0.6, 0.6), 4.0, 1.4, 0.6)
 	_sunder_t = 0.0
+
+# ---------------------------------------------------------------- the Five Hands release: the five phases on the land (phases.gd)
+var phase_nodes := {}
+var phase_tints := {}
+var _phase_t := 0.0
+const PHASE_COL := {"fire": Color(1.0, 0.5, 0.15), "water": Color(0.5, 0.75, 1.0), "wood": Color(0.5, 0.95, 0.5), "earth": Color(0.85, 0.65, 0.35), "thunder": Color(0.95, 0.92, 0.5)}
+
+## What a blow of a phase looks like as it lands: the phase's own burst on every tile it turned, and
+## the people near answer it.
+func _phase(res: Dictionary, dir: Vector3) -> void:
+	if int(res.n) <= 0:
+		return
+	Game.toast(Phases.told(res))
+	if headless():
+		return
+	var el := str(res.el)
+	var col: Color = PHASE_COL[el]
+	var k := 0
+	for tk in res.tiles:
+		var at := wpos(tk[0])
+		at.y = _stand_y(bundles[layer], at)
+		k += 1
+		if k > 14:
+			break
+		match el:
+			"fire":
+				Fx3D.pillar(scene3d, at, Color(1.0, 0.55, 0.2, 0.7), 2.4, 0.5, 0.5)
+				Fx3D.drift(scene3d, at + Vector3(0, 0.6, 0), Color(1.0, 0.62, 0.25), "glow", 8, 0.14, 1.2, 1.6, 0.5)
+			"water":
+				Fx3D.splash(scene3d, at + Vector3(0, 0.1, 0), Color(0.6, 0.82, 1.0), 1.1, 0.7)
+			"wood":
+				Fx3D.leaf_spiral(scene3d, at + Vector3(0, 0.3, 0), Color(0.55, 0.95, 0.5), 1.3)
+				Fx3D.glimmer(scene3d, at + Vector3(0, 0.5, 0), Color(0.6, 1.0, 0.6))
+			"earth":
+				Fx3D.dust(scene3d, at + Vector3(0, 0.3, 0), Color(Look.theme(theme_name).path))
+				Heft.chips(scene3d, at + Vector3(0, 0.2, 0), dir, func(q: Vector3) -> float: return _stand_y(bundles[layer], q), Color(Look.theme(theme_name).path).darkened(0.2), 4, 0.09)
+			"thunder":
+				Fx3D.pillar(scene3d, at, Color(0.95, 0.95, 1.0, 0.9), 6.0, 0.12, 0.25)
+				Fx3D.sparks(scene3d, at + Vector3(0, 0.4, 0))
+		if str(tk[2]) == "quell":
+			Fx3D.drift(scene3d, at + Vector3(0, 0.6, 0), Color(0.95, 0.95, 1.0, 0.3), "glow", 5, 0.5, 0.6, 2.0, 0.2)
+	Fx3D.shockwave(scene3d, _player_pos() + dir * 1.4 + Vector3(0, 0.3, 0), Color(col.r, col.g, col.b, 0.7), 3.2, 0.5)
+	_folk_react("strike", _player_pos(), 8.0)
+	_phase_t = 0.0
+
+## What the phases have left on the land near him is drawn while it lies there (looked at again twice a
+## second): what stands on the tile (flames flicker, steam and smoke drift up), and the trees that
+## really stand there take its colour (burnt black, in blossom, dark with wet).
+func _update_phases(d: float) -> void:
+	for k0 in phase_nodes:
+		var pn = phase_nodes[k0]
+		if not is_instance_valid(pn):
+			continue
+		var fl := (pn as Node3D).get_node_or_null("flick") as Node3D
+		if fl != null:
+			var ph := t * 9.0 + float(str(k0).hash() % 100)
+			fl.scale = Vector3(1.0 + 0.08 * sin(ph * 1.3), 1.0 + 0.16 * sin(ph) + 0.08 * sin(ph * 2.3), 1.0 + 0.08 * cos(ph * 1.1))
+			fl.rotation.y = 0.2 * sin(ph * 0.31)
+		var up := (pn as Node3D).get_node_or_null("rise") as Node3D
+		if up != null:
+			var u := fmod(t * 0.25 + float(str(k0).hash() % 100) * 0.01, 1.0)
+			up.position.y = u * 1.2
+			up.scale = Vector3.ONE * (0.8 + 0.5 * u)
+	_phase_t -= d
+	if _phase_t > 0.0:
+		return
+	_phase_t = 0.5
+	var want := {}
+	if not is_floor():
+		var pre := layer + "|"
+		for k in Game.touched:
+			if not str(k).begins_with(pre):
+				continue
+			var parts := str(k).split("|")
+			var tl := Vector2i(int(parts[parts.size() - 2]), int(parts[parts.size() - 1]))
+			if maxi(absi(tl.x - ptile.x), absi(tl.y - ptile.y)) > 26:
+				continue
+			var kd := Phases.on(Game, layer, tl)
+			if kd != "":
+				want[str(k) + kd] = [tl, kd]
+	for k2 in phase_nodes.keys():
+		if not want.has(k2):
+			var old = phase_nodes[k2]
+			if is_instance_valid(old):
+				(old as Node).queue_free()
+			phase_nodes.erase(k2)
+			_phase_tint(k2, Color(1, 1, 1), true)
+	var th: Dictionary = Look.theme(theme_name)
+	for k3 in want:
+		if phase_nodes.has(k3):
+			continue
+		var w3: Array = want[k3]
+		var at := wpos(w3[0])
+		var n3 := Phases.model(str(w3[1]), str(k3).hash(), Color(th.path), Color(th.g2))
+		at.y = _stand_y(bundles[layer], at) if not str(w3[1]) in ["lotus", "bar", "arc", "swell"] or grid[w3[0].y * w + w3[0].x] != MapGen.WATER else off.y
+		scene3d.add_child(n3)
+		n3.position = at
+		phase_nodes[k3] = n3
+		_phase_tint(k3, Phases.tree_tint(str(w3[1])), false, w3[0])
+
+## The trees that really stand on a tile take the colour of what was done to it, and get their own back.
+func _phase_tint(k: String, tint: Color, back: bool, tl: Vector2i = Vector2i.ZERO) -> void:
+	if back:
+		for rec in phase_tints.get(k, []):
+			if is_instance_valid(rec[0]):
+				(rec[0] as MultiMeshInstance3D).multimesh.set_instance_color(int(rec[1]), rec[2])
+		phase_tints.erase(k)
+		return
+	if tint == Color(1, 1, 1):
+		return
+	var rid := Atlas.owner_id(wd, tl)
+	if not views.has(rid) or not bool(views[rid].shown):
+		return
+	var v: Dictionary = views[rid]
+	var reg: Dictionary = (v.root as Node3D).get_meta("nature", {})
+	var r0: Vector2i = v.get("origin", Vector2i.ZERO)
+	var recs: Array = []
+	for en in reg.get(tl - r0, []):
+		var mmi = en.get("mmi")
+		if mmi == null or not is_instance_valid(mmi) or not (mmi as MultiMeshInstance3D).multimesh.use_colors:
+			continue
+		var mm := (mmi as MultiMeshInstance3D).multimesh
+		var c0 := mm.get_instance_color(int(en.i))
+		recs.append([mmi, int(en.i), c0])
+		mm.set_instance_color(int(en.i), Color(c0.r * tint.r, c0.g * tint.g, c0.b * tint.b, c0.a))
+	phase_tints[k] = recs
 
 ## The broken ground near him is drawn while it lies broken (looked at again twice a second), and the
 ## veins of a cave's wall show (toil.gd).
@@ -4244,6 +4480,7 @@ func _place_folk(fn: Node3D, fp: Dictionary, st: Dictionary, goal: Vector3, pp: 
 	elif dark and fp.role in ["watchman", "lamplighter"] and hold == "":
 		hold = "lantern"
 	_post_hold(fn, m, hold)
+	_post_reach(fn, clip if not st.walk else "")
 	# (the Answering Land release: somebody washing off the day's dust at the bath-house door or the water's
 	# edge is down to the underclothes for as long as it takes)
 	var bathing: bool = clip == "scrub" and not bool(fp.kid)
@@ -4334,7 +4571,7 @@ func _draw_hud() -> void:
 		UI.wrapped(self, Vector2(VIEW.x - 506, 35 - (15 - osz)), obj, osz, UI.C_TEXT, 486)
 	# (the line grew a key with every release and was still drawn 580 px wide: since G was added its
 	# end was cut off, "Esc men")
-	UI.text(self, Vector2(VIEW.x - 1012, VIEW.y - 14), "Arrows/WASD move   Q/E camera   P eyes   R ride   T talk   F strike   H hand   G sword qi   V glide   C work   B cook   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1000.0)
+	UI.text(self, Vector2(VIEW.x - 1084, VIEW.y - 14), "Arrows/WASD move   Q/E camera   P eyes   R ride   T talk   F strike   H hand   K phase   G sword qi   V glide   C work   B cook   Z/Enter act   Esc menu", 13, UI.C_DIM, HORIZONTAL_ALIGNMENT_RIGHT, 1000.0)
 	_draw_minimap()
 	_draw_clock()
 	if banner_t > 0.0:
