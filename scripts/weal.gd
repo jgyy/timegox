@@ -107,6 +107,9 @@ const ACTS := {
 	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were", "one": "One lost thing carried to whose it was."},
 	# the Higher Sky release (betters.gd): he was beaten by somebody above him, and the country heard
 	"bested": {"m": "peace", "per": -2, "max": 3, "why": "times he was beaten in its country by somebody above him", "one": "Once he was beaten in its country by somebody above him."},
+	# the Two Roads release (plights.gd): somebody of its streets helped in what they were in the middle of, or wronged
+	"kind": {"m": "regard", "per": 2, "max": 3, "why": "kindnesses done to its people in the street", "one": "One kindness done to somebody in its streets."},
+	"wronged": {"m": "regard", "per": -1, "max": 4, "why": "people of its streets wronged by him", "one": "One of its people wronged by him."},
 	"pilfer": {"m": "regard", "per": -1, "max": 4, "why": "things pocketed in its streets, and seen", "one": "One thing pocketed in its streets, and seen."},
 }
 ## how many lords put down in a town's country make one point of peace, and how many points at most;
@@ -603,6 +606,10 @@ const FATES := [
 	# Part XXXIX (the Red Seal release)
 	{"npc": "cook_zhou", "when": ["the_red_seal", ["open"]], "tag": "Proven, in the cleaver", "line": "He asked me to show him the part that is not the knife. I showed him the bone I left in. Thirty years I have jointed for this mountain and nobody ever asked me what I leave. It is on the wall by the stove. Do not touch it."},
 	{"npc": "cook_zhou", "when": ["the_red_seal", ["strict"]], "tag": "who feeds the ones who failed", "line": "A hundred and sixty of them failed, and every one came through my kitchen after with a folded paper and no appetite. I read none of them. I gave them all the same soup. It is not on any register, that soup."},
+	# Part XL (the Two Roads release)
+	{"npc": "disciple_han", "when": ["the_two_roads", ["one"]], "tag": "who was refused a second road", "line": "I signed, in the seniority column, and was refused with the rest. I had an answer ready for Mian if he gloated. He did not gloat. He brought me tea. It is very hard to be superior to that boy, and I have tried."},
+	{"npc": "disciple_han", "when": ["the_two_roads", ["two"]], "tag": "who has the Formations beside the Sword", "line": "I have the Formations beside the Sword, since the new moon. I am worse at the Sword than I was. I have told nobody. Everybody knows. Mian says it passes. Mian. Advising me. I listened, which is the worst of it."},
+	{"npc": "disciple_han", "when": ["the_two_roads", ["ask"]], "tag": "a guest on a second road until autumn", "line": "I am a guest on the Formations until autumn. Hall Master Shen has my name on a list. I have been on a number of his lists. It is the only one of them I have ever wished to stay on."},
 	{"npc": "cook_zhou", "when": ["the_red_seal", ["blank"]], "tag": "who washed the leaves", "line": "They wanted somebody to wash two hundred and six sheets of the best paper. Who has a tub that size? I did it with the bowls. It came out clean. Thirty years of saying the kitchen holds this mountain up, and now it is on the east wall."},
 	# Part XXXVIII (the Higher Sky release)
 	{"npc": "disciple_han", "when": ["the_higher_sky", ["gall"]], "tag": "who hangs the galls", "line": "Forty of them, and I am the one who strings them. They come from the butcher at Qingshi in a jar. He asked what a sect wants with forty galls. I said: humility. He charged me double."},

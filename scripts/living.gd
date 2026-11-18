@@ -22,7 +22,7 @@ class_name Living
 const PAY := {
 	"farmer": 34, "fisher": 38, "merchant": 70, "porter": 30, "guard": 48, "watchman": 36, "scholar": 44, "cook": 46,
 	"washer": 26, "youth": 22, "lamplighter": 28, "smith": 64, "servant": 24, "soldier": 40, "musician": 36, "waiter": 30,
-	"huntsman": 42, "giant": 56, "woodcutter": 32, "herbalist": 40, "angler": 30, "pedlar": 44, "hunter": 40, "elder": 20,
+	"huntsman": 42, "giant": 56, "leafer": 24, "hawker": 32, "storyteller": 34, "woodcutter": 32, "herbalist": 40, "angler": 30, "pedlar": 44, "hunter": 40, "elder": 20,
 }
 const PAY_OTHER := 28
 ## what each of the five places in a trade (Almanac.craft_rank) is paid, of a steady hand's wage
@@ -51,6 +51,9 @@ const GOALS := {
 	"smith": [["an anvil of my own", 3900], ["the master's mark, which costs a feast", 2200], ["good charcoal for a winter", 900]],
 	"cook": [["a cookshop with my name over it", 5200], ["a cleaver of folded steel", 800]],
 	"waiter": [["a share in the house", 3000], ["a suit of clothes nobody has spilt on", 450]],
+	"leafer": [["a pack painted on silk, not paper", 900], ["a table by the stove that is mine by right", 1600]],
+	"hawker": [["a barrow with a wheel that does not sing", 1300], ["a stall that stays where it is put", 4200]],
+	"storyteller": [["a tea-house with a platform in it", 4800], ["a fan that has not been mended", 300]],
 	"washer": [["a copper boiler", 1200], ["a line under a roof for the rains", 600]],
 	"guard": [["a mail coat that was not somebody's last", 2600], ["a plot outside the wall", 3400]],
 	"soldier": [["my discharge, which is bought", 3000], ["a plot outside the wall", 3400]],

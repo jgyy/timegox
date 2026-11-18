@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 132
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless"]
+const MAX_LEVEL := 135
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless", "Walking Two Roads"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000, 1180000, 1220000, 1260000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400, 67100, 67800, 68500]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -111,6 +111,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Who Lies Below", "note": "A king lost his country and slept on brushwood with a gall hung over the bed. A strategist lost his knees and won from a cart. A minister turned his carriage into a ditch for a man he could have broken with a word. The rivers and the seas are kings of the hundred valleys because they lie below them. This is the realm of having met somebody above you, and still being on the road."},
 	# Part XXXIX (the Red Seal release): what is left when the name and the thing have been held side by side
 	{"life": 0, "title": "Whom No Paper Names", "note": "An advocate proved either side of anything for the price of a coat. A minister filled five carts with books and missed the one man who laughed at them. A disputer rode a white horse to a gate and proved it was not a horse. The Way is hidden and has no name, says the old book, and a name is the guest of what is so. This is the realm of having been certified, and of not needing to take the paper out."},
+	# Part XL (the Two Roads release): the hinge of the wheel, where both sides are let turn
+	{"life": 0, "title": "Who Rests at the Hinge", "note": "A keeper of monkeys said: three in the morning and four at night, and they were furious; four in the morning and three at night, and they were delighted. Nothing was altered, and joy and anger were both made use of. So the sage harmonizes with right and wrong alike and rests at the hinge of Heaven's wheel. This is called walking two roads. It is the realm of having stopped asking which of them is the road."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1092,6 +1094,17 @@ const ENEMIES := {
 	"white_not_horse": {"n": "White Horse That Is Not a Horse", "elem": "thunder", "weak": "earth", "col": Color("d8d4c8"), "shape": "beast", "pal": {"sec": Color("8a8478"), "acc": Color("f4f0e8")}},
 	"feathered_egg": {"n": "Egg That Has Feathers", "elem": "water", "weak": "thunder", "col": Color("c8c0a8"), "shape": "blob", "pal": {"sec": Color("7a7460"), "acc": Color("e8a850")}},
 	"halved_stick": {"n": "Stick Halved Every Day", "elem": "wood", "weak": "fire", "col": Color("8a6a44"), "shape": "mantis", "pal": {"sec": Color("4a3826"), "acc": Color("d8c898")}},
+	# ---- Part XL: Three in the Morning (the Two Roads release): what a count that changes nothing leaves behind it,
+	# in three caves no chapter had used
+	"furious_monkey": {"n": "Monkey Furious at Three", "elem": "earth", "weak": "wood", "col": Color("8a6a48"), "shape": "ape", "pal": {"sec": Color("4a3626"), "acc": Color("c8a050")}},
+	"counted_acorn": {"n": "Acorn Counted Twice", "elem": "wood", "weak": "fire", "col": Color("9a7a3a"), "shape": "blob", "pal": {"sec": Color("5a4420"), "acc": Color("6a8a4a")}},
+	"morning_three": {"n": "Three of the Morning", "elem": "fire", "weak": "water", "col": Color("e8b070"), "shape": "wisp", "pal": {"sec": Color("a85a30"), "acc": Color("f8e8b8")}},
+	"marked_leaf": {"n": "Leaf with a Nail-Mark", "elem": "thunder", "weak": "earth", "col": Color("d8d0b0"), "shape": "moth", "pal": {"sec": Color("7a7458"), "acc": Color("b83a2a")}},
+	"sleeve_leaf": {"n": "Leaf Kept up a Sleeve", "elem": "water", "weak": "thunder", "col": Color("5a6a8a"), "shape": "wraith", "pal": {"sec": Color("2a3248"), "acc": Color("e8e0c8")}},
+	"faceless_dealer": {"n": "Dealer Who Never Pours", "elem": "phys", "weak": "thunder", "col": Color("5a4a44"), "shape": "humanoid", "pal": {"sec": Color("2e2624"), "acc": Color("c8a050")}},
+	"forked_shadow": {"n": "Shadow at a Fork", "elem": "thunder", "weak": "earth", "col": Color("4a4a5e"), "shape": "wraith", "pal": {"sec": Color("22222e"), "acc": Color("9a9ac8")}},
+	"road_untaken": {"n": "Road Not Taken", "elem": "earth", "weak": "wood", "col": Color("a89a78"), "shape": "serpent", "pal": {"sec": Color("5e563e"), "acc": Color("e8e0c0")}},
+	"two_minded": {"n": "Thing of Two Minds", "elem": "wood", "weak": "fire", "col": Color("6a7a5a"), "shape": "golem", "pal": {"sec": Color("38422e"), "acc": Color("c85a3a")}},
 	"list_meng": {"n": "Brother Meng Zhi", "elem": "fire", "weak": "water", "col": Color("a85a3a"), "shape": "person:folk_youth"},
 	"list_bai_lu": {"n": "Senior Sister Bai Lu", "elem": "water", "weak": "thunder", "col": Color("7a9ab8"), "shape": "person:folk_maiden"},
 	"list_han_yue": {"n": "Senior Brother Han Yue", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "person:folk_guard", "boss": true},
@@ -2091,6 +2104,11 @@ const AREAS := {
 			{"id": "p26_datura1", "item": "datura_flower", "pos": Vector2i.ZERO, "vis": ["s_p26_rust", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p26_datura2", "item": "datura_flower", "pos": Vector2i.ZERO, "vis": ["s_p26_rust", ""], "late": true, "peak": 1, "stand": "flank"},
 			{"id": "p26_datura3", "item": "datura_flower", "pos": Vector2i.ZERO, "vis": ["s_p26_rust", ""], "late": true, "peak": 2, "stand": "flank"}, {"id": "p26_datura4", "item": "datura_flower", "pos": Vector2i.ZERO, "vis": ["s_p26_rust", ""], "late": true, "peak": 0, "stand": "top"},
 			{"id": "p26_datura5", "item": "datura_flower", "pos": Vector2i.ZERO, "vis": ["s_p26_rust", ""], "late": true, "peak": 1, "stand": "foot"},
+			# Part XL (the Two Roads release)
+			{"id": "p40_leaf1", "item": "pricked_leaf", "pos": Vector2i.ZERO, "vis": ["s_p40_marked", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p40_leaf2", "item": "pricked_leaf", "pos": Vector2i.ZERO, "vis": ["s_p40_marked", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p40_leaf3", "item": "pricked_leaf", "pos": Vector2i.ZERO, "vis": ["s_p40_marked", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p40_leaf4", "item": "pricked_leaf", "pos": Vector2i.ZERO, "vis": ["s_p40_marked", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_fu_collect",
 	},
@@ -2521,7 +2539,10 @@ const AREAS := {
 			# Part XXII: the woodcutter who hears what is meant, at the foot of the mulberry heights
 			{"id": "zhong_ziqi", "n": "Zhong Ziqi the Woodcutter", "pos": Vector2i.ZERO, "col": Color("6a5a3a"), "vis": ["s_p22_leap", ""], "late": true, "peak": 0, "stand": "foot"},
 			# Part XXVII: the governor who carries a hundred bricks out of his study every morning
-			{"id": "tao_kan", "n": "Tao Kan, Who Carries Bricks", "pos": Vector2i.ZERO, "col": Color("3e5a48"), "vis": ["s_p27_home", ""], "late": true, "peak": 2, "stand": "foot"}],
+			{"id": "tao_kan", "n": "Tao Kan, Who Carries Bricks", "pos": Vector2i.ZERO, "col": Color("3e5a48"), "vis": ["s_p27_home", ""], "late": true, "peak": 2, "stand": "foot"},
+			# Part XL (the Two Roads release)
+			{"id": "ju_gong", "n": "Ju Gong", "pos": Vector2i.ZERO, "col": Color("6a5238"), "asset": "ju_gong", "vis": ["s_p40_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
+		],
 		"bosses": [
 			{"id": "silkworm_queen", "pos": Vector2i(30, 40), "lv": 34, "req": 34},
 			{"id": "moth_empress", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
@@ -2539,7 +2560,13 @@ const AREAS := {
 			# Part XXVII: the bricks of Tao Kan's study, carried up the heights by something that thought it a joke
 			{"id": "p27_brick1", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 2, "stand": "flank"}, {"id": "p27_brick2", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 2, "stand": "top"},
 			{"id": "p27_brick3", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 3, "stand": "flank"}, {"id": "p27_brick4", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 3, "stand": "foot"},
-			{"id": "p27_brick5", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 2, "stand": "flank"}],
+			{"id": "p27_brick5", "item": "tao_brick", "pos": Vector2i.ZERO, "vis": ["s_p27_idle", ""], "late": true, "peak": 2, "stand": "flank"},
+			# Part XL (the Two Roads release)
+			{"id": "p40_acorn1", "item": "keeper_acorn", "pos": Vector2i.ZERO, "vis": ["s_p40_monkeys", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p40_acorn2", "item": "keeper_acorn", "pos": Vector2i.ZERO, "vis": ["s_p40_monkeys", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p40_acorn3", "item": "keeper_acorn", "pos": Vector2i.ZERO, "vis": ["s_p40_monkeys", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p40_acorn4", "item": "keeper_acorn", "pos": Vector2i.ZERO, "vis": ["s_p40_monkeys", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
+		],
 		"pickup_vis": "s_sk_collect",
 		"buildings": [
 			{"id": "silk_house", "n": "Silkworm House", "style": "house", "rect": Rect2i(6, 22, 9, 7), "door": Vector2i(14, 25),
@@ -2625,6 +2652,11 @@ const AREAS := {
 			{"id": "p32_hour2", "item": "hour_stone", "pos": Vector2i.ZERO, "vis": ["s_p32_water", ""], "late": true, "peak": 1, "stand": "flank"},
 			{"id": "p32_hour3", "item": "hour_stone", "pos": Vector2i.ZERO, "vis": ["s_p32_water", ""], "late": true, "peak": 2, "stand": "foot"},
 			{"id": "p32_hour4", "item": "hour_stone", "pos": Vector2i.ZERO, "vis": ["s_p32_water", ""], "late": true, "peak": 2, "stand": "flank"},
+			# Part XL (the Two Roads release)
+			{"id": "p40_fork1", "item": "fork_stone", "pos": Vector2i.ZERO, "vis": ["s_p40_forks", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p40_fork2", "item": "fork_stone", "pos": Vector2i.ZERO, "vis": ["s_p40_forks", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p40_fork3", "item": "fork_stone", "pos": Vector2i.ZERO, "vis": ["s_p40_forks", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p40_fork4", "item": "fork_stone", "pos": Vector2i.ZERO, "vis": ["s_p40_forks", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_mg_collect",
 		"warband5": {"pool": [["rising_water", 109, 109], ["held_pillar", 109, 109], ["plank_step", 109, 109]], "n": 14, "vis": "s_p32_bridge", "late": true},
@@ -5365,7 +5397,7 @@ const STEPS := [
 	{"id": "s_p39_word", "kind": "talk", "npc": "elder", "area": "sect", "t": "An advocate argued both sides of Lin Feng on a market green, and the Elder has heard. Go up to Elder Qing Xuan", "stones": 98800},
 	{"id": "s_p39_more", "kind": "seal", "n": 6, "area": "sect", "t": "\"Then be examined in all of it.\" Hold 6 papers of the Hall of Seals: every road walked, every weapon mastered, and the shelf sworn shut", "stones": 99000},
 	{"id": "s_p39_rite", "kind": "rite", "n": 1, "t": "\"Is the thing still there when nobody is reading the paper?\" Perform a rite of his own Dao, with no desk to see it (Esc > Root & Rites)", "stones": 99200},
-	{"id": "s_p39_tide", "kind": "bid", "n": 1, "house": "longmen", "area": "longmen", "t": "A paper in his own name is up for sale in the net-loft at Longmen. Go up to the Tide Hammer at the Harbour-Master's counter and win a lot", "stones": 99400},
+	{"id": "s_p39_tide", "kind": "bid", "n": 1, "house": "longmen", "area": "longmen", "t": "A paper in his own name is up for sale in the net-loft at Longmen. Go up to the Tide Hammer at Toll-Master Zeng's counter and win a lot", "stones": 99400},
 	{"id": "s_p39_horses", "kind": "hunt", "area": "yanggu", "cave": -1, "n": 40, "of": ["white_not_horse", "feathered_egg", "halved_stick"], "t": "What the disputers proved under the Dawn Market is still true, and walking about. Clear 40 packs of it from the cave under Yanggu", "stones": 99600},
 	{"id": "s_p39_sticks", "kind": "collect", "item": "half_stick", "n": 4, "area": "yanggu", "cave": -1, "t": "Halve a stick every day and it never ends. Somebody has been trying. Find the 4 Halves of Half a Stick in the cave under Yanggu", "stones": 99800},
 	{"id": "s_p39_eggs", "kind": "hunt", "area": "yanggu", "cave": -1, "n": 16, "of": ["feathered_egg", "white_not_horse"], "t": "An argument that is beaten gets up again when nobody is looking. Clear 16 eggs and white horses from the cave under Yanggu", "stones": 99900},
@@ -5376,6 +5408,35 @@ const STEPS := [
 	{"id": "s_p39_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood by the mountain path for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 100600},
 	{"id": "s_p39_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The Elder is at the top of the steps with a blank sheet of the Hall's best paper. Tell Elder Qing Xuan what Lin Feng is", "stones": 100800},
 	{"id": "s_break44", "kind": "breakthrough", "to": 132, "t": "The Way is hidden, and has no name: Hidden and Nameless"},
+	# ---- Part XL: Three in the Morning (the Two Roads release): a pack of leaves has come up the mountain in a
+	# hawker's basket, and with it a question: whether a heart can walk two roads.  New step kinds: "cards" (a
+	# master of the leaves beaten, `of`, or so many hands won since the step began: yezi.gd) and "braid" (so many
+	# roads held at once: braid.gd).
+	{"id": "s_p40_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Nobody has swept the nine hundred and ninety-nine steps for three days. The outer court is sitting on them, playing leaves. Speak to Elder Qing Xuan", "stones": 101000},
+	{"id": "s_p40_du", "kind": "cards", "of": "du_outer", "area": "sect", "t": "Hall Master Du confiscated the pack, and has not put it down since. Sit down with him at the table by Treasurer Bao's counter, and win a hand of the Round", "stones": 101200},
+	{"id": "s_p40_monkeys", "kind": "hunt", "area": "silk", "cave": -1, "n": 52, "of": ["furious_monkey", "counted_acorn", "morning_three"], "t": "The game came from a keeper of monkeys under the Mulberry Silk Woods, and his troop is furious about a count. Clear 52 packs of them from the cave", "stones": 101400},
+	{"id": "s_p40_acorns", "kind": "collect", "item": "keeper_acorn", "n": 4, "area": "silk", "cave": -1, "t": "Seven acorns a day, and four of today's have been thrown at the wall. Find the 4 Acorns of the Seven in the cave under the Mulberry Silk Woods", "stones": 101600},
+	{"id": "s_p40_keeper", "kind": "talk", "npc": "ju_gong", "area": "silk", "cave": -1, "t": "An old man is sitting just inside the cave mouth with seven acorns in his lap, waiting to be asked. Speak to Ju Gong, the keeper of monkeys", "stones": 101800},
+	{"id": "s_p40_fury", "kind": "hunt", "area": "silk", "cave": -1, "n": 26, "of": ["counted_acorn", "morning_three"], "t": "\"The monkeys I can talk round. It is the count itself that has got loose.\" Clear 26 acorns counted twice and threes of the morning from the cave", "stones": 101900},
+	{"id": "s_p40_zhen", "kind": "cards", "of": "zhen_lantern", "area": "yanggu", "t": "The Dawn Market has played the Round by lantern since before it had a warden. Sit down with Auntie Zhen at Market-Warden Shu's counter in Yanggu, and win a hand", "stones": 102000},
+	{"id": "s_p40_hawkers", "kind": "folk", "role": "hawker", "town": "yanggu", "n": 2, "area": "yanggu", "t": "\"Somebody is selling packs that know more than their owners. Ask whoever walks every street.\" Ask 2 hawkers of Yanggu Market", "stones": 102200},
+	{"id": "s_p40_marked", "kind": "hunt", "area": "fungal", "cave": -1, "n": 52, "of": ["marked_leaf", "sleeve_leaf", "faceless_dealer"], "t": "The marked packs are painted by glow-light in a cave under Glowcap Vale, and what they were marked for has stayed down there. Clear 52 packs of it", "stones": 102400},
+	{"id": "s_p40_pack", "kind": "collect", "item": "pricked_leaf", "n": 4, "area": "fungal", "cave": -1, "t": "A leaf pricked with a pin can be read from the back by a thumb. Find the 4 Pricked Leaves in the cave under Glowcap Vale", "stones": 102600},
+	{"id": "s_p40_sleeves", "kind": "hunt", "area": "fungal", "cave": -1, "n": 26, "of": ["sleeve_leaf", "faceless_dealer"], "t": "A leaf kept up a sleeve is still up it when the game is over. Clear 26 sleeved leaves and dealers who never pour from the cave under Glowcap Vale", "stones": 102700},
+	{"id": "s_p40_ban", "kind": "cards", "of": "ban_netloft", "area": "longmen", "t": "The net-loft at Longmen plays the other game, the keeper's own. Sit down with Old Ban at Toll-Master Zeng's counter, and take the table at Three in the Morning", "stones": 102800},
+	{"id": "s_p40_word", "kind": "talk", "npc": "elder", "area": "sect", "t": "A disciple has asked Hall Master Shen for leave to walk a second road, and Hall Master Shen has asked the Elder for leave to say no. Go up to Elder Qing Xuan", "stones": 103000},
+	{"id": "s_p40_two", "kind": "braid", "n": 2, "t": "\"Then carry two yourself, and tell me what it weighs.\" At any Dao Stele, walk a second road as well as the one he walks (Enter at the stele: Walk it as well)", "stones": 103200},
+	{"id": "s_p40_rite", "kind": "rite", "n": 1, "t": "\"Show me that the first is still whole.\" Perform a rite of his own Dao, with a second road on his back (Esc > Root & Rites)", "stones": 103400},
+	{"id": "s_p40_forks", "kind": "hunt", "area": "magpie", "cave": -1, "n": 52, "of": ["forked_shadow", "road_untaken", "two_minded"], "t": "Under the Heights of the Magpie Bridge every passage forks, and whoever could not choose left something standing at each. Clear 52 packs of it", "stones": 103600},
+	{"id": "s_p40_stones", "kind": "collect", "item": "fork_stone", "n": 4, "area": "magpie", "cave": -1, "t": "A traveller sets a stone at a fork to say which way he went. Somebody set them on both. Find the 4 Stones from a Fork in the cave under the Heights", "stones": 103800},
+	{"id": "s_p40_minds", "kind": "hunt", "area": "magpie", "cave": -1, "n": 26, "of": ["road_untaken", "two_minded"], "t": "The road not taken does not go away. It follows, a little behind. Clear 26 roads not taken and things of two minds from the cave under the Heights", "stones": 103900},
+	{"id": "s_p40_rong", "kind": "cards", "of": "rong_pits", "area": "tushan", "t": "Forewoman Rong counts what is left in the crucible, and plays leaves the same way. Sit down with her at Guild-Mistress Hu's counter in Tushan, and win a hand", "stones": 104000},
+	{"id": "s_p40_hands", "kind": "folk", "role": "leafer", "town": "tushan", "n": 2, "area": "tushan", "t": "\"Ask the old hands whether it is one game or two. They have had fifty years to decide.\" Ask 2 old hands of Tushan", "stones": 104100},
+	{"id": "s_p40_ju", "kind": "cards", "of": "ju_gong", "area": "silk", "cave": -1, "t": "Seven acorns either way. Go back down to Ju Gong under the Mulberry Silk Woods, sit down with him, and take the table at Three in the Morning", "stones": 104200},
+	{"id": "s_p40_court", "kind": "talk", "npc": "elder", "area": "sect", "t": "Forty disciples have signed a petition, and Hall Master Shen has written his answer above it in red. The Elder will not rule until he has asked. Go to Elder Qing Xuan", "stones": 104400},
+	{"id": "s_p40_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood among the tea terraces for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 104600},
+	{"id": "s_p40_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The steps have been swept. Nobody will say by whom. The Elder is sitting on the top one with a pack of leaves. Go to Elder Qing Xuan", "stones": 104800},
+	{"id": "s_break45", "kind": "breakthrough", "to": 135, "t": "The sage rests at the hinge of the wheel: Walking Two Roads"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5616,6 +5677,15 @@ const ITEMS := {
 	"entry_tally": {"n": "Tally of the Lists", "desc": "Half a split bamboo tally with a name burnt into it and a notch for each bout. The other half is on a nail in the Hall Master's library. Whoever brings four halves that match has been to the back of the yard, which is all the lists ask before they ask the rest"},
 	"turnip_seal": {"n": "Seal Cut from a Turnip", "desc": "A turnip, dried hard, with the square face of an official seal cut into its root end and still red with paste. From across a room it stamps a very good certificate. It cost the forger an afternoon and the buyer a year's rice"},
 	"half_stick": {"n": "Half of Half a Stick", "desc": "A piece of a foot-long stick, cut in half, and that half cut in half, and so on for more days than anybody counted. It is the length of a fingernail. The disputers say there is still a half to take from it tomorrow, and nobody has yet proved them wrong with a knife"},
+	# ---- Part XL (the Two Roads release): what is found in the three caves, and the leaves the masters painted
+	"keeper_acorn": {"n": "Acorn of the Seven", "desc": "An acorn with a small notch cut in its cap, as a keeper marks the day's seven so that nobody is given yesterday's. It has been thrown at a wall, hard, by somebody with very long arms and a strong sense of what three is"},
+	"pricked_leaf": {"n": "Pricked Leaf", "desc": "A leaf of the pack with a pin-hole in one corner, raised a hair on the back, where a thumb finds it in the dark. It is a fire eight. Whoever dealt it always knew where it was, and has never once had to pour"},
+	"fork_stone": {"n": "Stone from a Fork", "desc": "A flat river stone of the kind a traveller sets at a parting of the ways to say: I went left. This one was set at a fork where another just like it sat on the right. Whoever it was is presumably still deciding"},
+	"leaf_du_outer": {"n": "Hall Master Du's Earth Nine", "desc": "A ninth leaf of earth, painted in the ochre the sect's rice ledgers are ruled with, a little crooked. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
+	"leaf_zhen_lantern": {"n": "Auntie Zhen's Fire Nine", "desc": "A ninth leaf of fire, painted by lantern before dawn, so that the red is a shade towards orange by day. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
+	"leaf_ban_netloft": {"n": "Old Ban's Water Nine", "desc": "A ninth leaf of water, tarred on the back like a net-float. It has been in the river once and came back. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
+	"leaf_rong_pits": {"n": "Forewoman Rong's Thunder Nine", "desc": "A ninth leaf of thunder, drawn with a scribing-point and filled with founder's violet. Not a line is out. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
+	"leaf_ju_gong": {"n": "The Monkeys' Wood Nine", "desc": "A ninth leaf of wood, green, with nine thumbprints on it that are too long to be anybody's thumbs. Painted leaf: it takes the place of the least leaf he is dealt (Esc > Leaves)"},
 	"curio_inkstone": {"n": "The Fishmonger's Inkstone", "desc": "A Duan inkstone with a carp cut in the well, worn hollow by one hand. Curio: it does nothing, and there is only the one"},
 	"curio_gourd": {"n": "A Physician's Gourd", "desc": "A waisted gourd on a red cord, smelling faintly of nine herbs. Whatever was in it was finished long ago. Curio: it does nothing, and there is only the one"},
 	"curio_carp": {"n": "The Jade Carp of Longmen", "desc": "A carp of pale jade, a hand long, caught in the moment of going over the falls. Its tail is not finished. Curio: it does nothing, and there is only the one"},
@@ -11619,7 +11689,7 @@ const DIALOGUE := {
 	"recall37": [
 		["Narrator", "The Lotus Seal sets Lin Feng down in the courtyard, and the first thing he sees is a table. It has a red cloth on it, an ink-stone, and a thin man in grey who is writing and does not look up."],
 		["Yue Ling", "He has been here since before the bell. He asked me what I was. I said: hungry. He wrote it down."],
-		["Elder Qing Xuan", "Child. This is Registrar Yin Wen, of the Hall of Seals. He has walked up all the steps to ask me one question, and I have been on this mountain eighty years and I cannot answer it."],
+		["Elder Qing Xuan", "Child. This is Registrar Yin Wen, of the Hall of Seals. He has walked up all the steps to ask me one question, and I have been on this mountain seventy years and I cannot answer it."],
 	],
 	"s_p39_home": [
 		["Elder Qing Xuan", "He asked me what you are. Not who. I said: a sweeper. He said that was a thing you did. I said: a disciple of the Sword Road. He said, show me the paper. There is no paper. There has never been any paper."],
@@ -11663,11 +11733,11 @@ const DIALOGUE := {
 	],
 	"bout:hui_shi": [
 		["Narrator", "A broad, comfortable man in plum is leaning on one of the great moulds, talking to it. He breaks off when Lin Feng's name is cut into the next column, and looks pleased."],
-		["Hui Shi, Minister of Wei", "Hui Shi. I am told you beat an advocate who was on both sides. Excellent. I am only ever on one, and it is always the wrong one, and I defend it to the death. Shall we?"],
+		["Hui Shi, Minister of Wei", "Hui Shi. I am told you met an advocate who was on both sides. Excellent. I am only ever on one, and it is always the wrong one, and I defend it to the death. Shall we?"],
 	],
 	"s_p39_word": [
-		["Elder Qing Xuan", "They say an advocate of Zheng proved on the lantern green that you had won, and then that you had lost, and that the lantern-makers could not fault him either way. I have had three accounts. They agree on nothing else."],
-		["Lin Feng", "He did. I had a sword in my hand and a paper in my sleeve, and he made both of them sound like opinions."],
+		["Elder Qing Xuan", "They say an advocate of Zheng proves on the lantern green that whoever fights there has won, and then that he has lost, and that the lantern-makers cannot fault him either way. I have had three accounts. They agree on nothing else."],
+		["Lin Feng", "He does. I had a sword in my hand and a paper in my sleeve, and that green made both of them sound like opinions."],
 		["Elder Qing Xuan", "Then your papers are too few. No. Do not look at me like that. A man with one name can be argued out of it. A man who has been examined in everything he is, and has sworn shut what he is not, is harder to turn over."],
 		["Yue Ling", "He means go and sit for the rest. He could have said so in six words. He never has."],
 		["Elder Qing Xuan", "Every road, every weapon, and the three of the shelf. And then do the thing itself, once, where there is no desk. I want to know whether it is the same. So, I think, do you.", "nod"],
@@ -11707,7 +11777,7 @@ const DIALOGUE := {
 	"done:s_p39_scrolls": [
 		["Narrator", "The last form goes through the opening of the Azure Cloud sword exactly as it is drawn in the manual, to the angle of the wrist, and is cut down in the middle of it by somebody who has not done it that way for nine years."],
 		["Lin Feng", "It had my first lesson perfectly. I had forgotten I ever stood like that."],
-		["Yue Ling", "You did. I have a memory of it. You looked like a man trying to hold a tray."],
+		["Yue Ling", "You did. I have a memory of it. You looked like somebody trying to hold a tray."],
 	],
 	"done:s_p39_names": [
 		["Narrator", "What is left on the floor of the cave is a heap of good robes with nobody in them, each with a sheet of paper pinned at the breast. Every sheet says Attested."],
@@ -11743,7 +11813,7 @@ const DIALOGUE := {
 	],
 	"done:s_p39_arms": [
 		["Narrator", "The lantern-makers argue about the last bout until the oil runs out, and are still at it by starlight. Nobody on the green asks to see anybody's paper again that night."],
-		["Lin Feng", "He argued that I had won, and then that I had lost, and both were good. I stood there with a sword and could not find the hole in either."],
+		["Lin Feng", "They say the advocate can prove a fighter has won, and then that he has lost, and both are good. I stood on that green with a sword and had no answer to either."],
 		["Yue Ling", "The hole is that he did not mind which. You did. That is not a weakness. I should like that written down too."],
 	],
 	"done:s_p39_rite": [
@@ -11770,7 +11840,7 @@ const DIALOGUE := {
 	],
 	"done:s_p39_schools": [
 		["Narrator", "The board at Tushan is a slab of slate as tall as a door, and the casters cut the names into it rather than chalk them, because bronze-men do not trust anything that wipes off."],
-		["Lin Feng", "He said the paper went into the ring and I stayed outside. He was right for the first two exchanges."],
+		["Lin Feng", "He has written fourteen chapters to say my paper and I are not the same. For two exchanges, in that ring, I fought like the paper."],
 		["Yue Ling", "And then you stopped fighting like somebody Attested and started fighting like somebody I know. I saw it happen. So did the horse."],
 	],
 	"s_p39_roll": [
@@ -11796,6 +11866,137 @@ const DIALOGUE := {
 		["Narrator", "The last bolt has no name. It comes down on somebody standing at the top of nine hundred and ninety-nine steps with a blank paper in his sleeve, and finds exactly what is there, no more and no less: Hidden and Nameless."],
 		["Yue Ling", "Forty-five. I am writing that one down whether you like it or not."],
 		["Lin Feng", "Write it small. And leave room. I do not think the registrar has finished with either of us."],
+	],
+	# ---- Part XL: Three in the Morning (the Two Roads release)
+	"recall38": [
+		["Narrator", "The Lotus Seal sets Lin Feng down in the courtyard, and for the first time in nine years there are leaves on it. Not the pine's. Paper ones, face up, in rows, and forty disciples sitting on the flagstones round them."],
+		["Yue Ling", "It came up the mountain in a hawker's basket, under the sugared haws. Forty leaves, eight of a phase. By the second evening there were six packs. I do not know who is painting them."],
+		["Elder Qing Xuan", "Child. Nobody has swept my steps for three days. I have not said anything. I wished to see how long it would be. I begin to think it will be for ever."],
+	],
+	"s_p40_home": [
+		["Elder Qing Xuan", "It is called leaves. Water puts out fire, fire burns wood, and so round. Hall Master Du confiscated the first pack on the first night, for the good of the court. He has been guarding it at the end of Bao's counter ever since. He guards it by playing."],
+		["Lin Feng", "I have swept those steps a thousand mornings, Elder. I did not know they could be sat on."],
+		["Yue Ling", "The towns are full of it too. Cloudfoot has two old hands at the tea-house table from the first pot to the last, and a hawker for every street, and a storyteller who stops at the bridge every afternoon and passes a bowl."],
+		["Elder Qing Xuan", "And a question came up in the same basket. The game has two forms and five phases, and my disciples have each one road. They have begun to look at that as if it were a rule somebody made. Somebody did. I should like to know whether I was right.", "shrug"],
+		["Elder Qing Xuan", "But first, child, go and beat Du. Nothing is staked: the loser pours. I want my Hall Master back, and I want my steps swept, and I find I do not much mind in which order."],
+	],
+	"done:s_p40_du": [
+		["Narrator", "Hall Master Du pours. He does it well, for a man who has not poured since the new year, and he sets the pot down beside a ninth leaf of earth that was not in the pack a moment ago."],
+		["Lin Feng", "I did not win that. He led his eight, and then his other eight. I only waited."],
+		["Yue Ling", "He says the game is from the Mulberry Silk Woods. A keeper of monkeys taught it to a hawker for a bag of acorns. And he says the monkeys have been screaming under the woods for a week, over a count."],
+	],
+	"done:s_p40_monkeys": [
+		["Narrator", "The last of the troop sits down, quite suddenly, and looks at its own hands. Whatever was in it has gone. It is a monkey, in a cave, and it has forgotten what it was owed."],
+		["Lin Feng", "They were not hungry. I looked. Every one of them was fed this morning. They were furious about the morning."],
+	],
+	"done:s_p40_acorns": [
+		["Narrator", "Four acorns, each with a notch in its cap. With the three that are in the old man's lap by the cave mouth they make seven. They made seven yesterday. They will make seven tomorrow."],
+		["Yue Ling", "He has not moved. He watched you clear his whole troop off the walls and did not get up. I think he is waiting for you to ask him something."],
+	],
+	"s_p40_keeper": [
+		["Ju Gong", "Ju. I keep monkeys. I have kept them fifty years, and I know their minds, and they know mine, which is the worse bargain for them. Sit. You have my acorns.", "nod"],
+		["Ju Gong", "The year was thin. I said: three in the morning, and four at night. They rose up and were furious. So I said: very well. Four in the morning, and three at night. And they lay down, and were delighted."],
+		["Lin Feng", "It is seven. I counted them on the way up. It is seven either way."],
+		["Ju Gong", "It is seven either way. Nothing was altered. Not the name, not the thing. And I had their fury and their joy both, to use. People tell it to laugh at the monkeys. I tell it because I have met very few who were not one."],
+		["Ju Gong", "But this week I said it and they did not lie down. The count has got out of the acorns and into the cave. Go and fetch it back for me. Then we shall play, you and I, and see which of us it is in."],
+	],
+	"done:s_p40_fury": [
+		["Narrator", "It is quiet under the Mulberry Silk Woods. Somewhere near the cave mouth an old man is saying a number, patiently, to a row of small attentive faces, and nobody is screaming."],
+		["Lin Feng", "I cleared a count out of a cave today. I am not sure I could tell the Elder what that means. I am sure I did it."],
+	],
+	"done:s_p40_zhen": [
+		["Narrator", "Auntie Zhen pours by the light of her own lantern, which is the only one in the Dawn Market that is never out. The tea is the colour of the ninth leaf she pushes across the table."],
+		["Yue Ling", "She says somebody has been selling packs in the lantern lanes that know more than their owners. A leaf with a pin through the corner. She found one in her own pack, and she is very angry, and very calm."],
+		["Lin Feng", "A game where nothing is staked, and somebody cheats at it. I should like to know what they think they are winning."],
+	],
+	"done:s_p40_hawkers": [
+		["Narrator", "Two hawkers, twenty-four streets between them, and the same answer from both: the pricked packs come in from the west, wrapped in damp moss, and the moss glows a little when the lantern is turned away."],
+		["Yue Ling", "Glowcap Vale. They paint them underground, by the light of the caps, so that nobody sees a lamp. It is clever. It is a great deal of trouble to take over who pours the tea."],
+	],
+	"done:s_p40_marked": [
+		["Narrator", "The cave under Glowcap Vale is lit a soft green from the walls, and there are drying-lines strung across it with leaves pegged to them, hundreds, every eight and every seven turned to the same corner."],
+		["Lin Feng", "They marked the high ones. Of course they did. I won a hand this week by keeping a three until the end."],
+	],
+	"done:s_p40_pack": [
+		["Narrator", "Four leaves, each a fire eight, each with a hole no wider than a hair. Lin Feng runs his thumb over the back of one with his eyes shut and knows it at once. He opens his eyes and wishes he did not."],
+		["Yue Ling", "You cannot unlearn it now. You will feel for it in every pack. That is the real harm of the thing, I think. Not the tea."],
+	],
+	"done:s_p40_sleeves": [
+		["Narrator", "The last dealer comes apart like a coat with nobody in it, and a single leaf slides out of the sleeve and lies face up on the stone. It is a water one. It was never played. It was only ever kept."],
+		["Lin Feng", "It held the best leaf in the pack for the whole game and never laid it down. I have met cultivators like that. I may have been one."],
+	],
+	"done:s_p40_ban": [
+		["Narrator", "The nets are up in the loft at Longmen, dripping in long rows, and the tea is poured by an old man who has just been beaten at his own game and is looking at the table as if it were a tide chart."],
+		["Lin Feng", "I gave the morning a little, and the evening the rest. I do not know that it was wise. It was only that neither pile was shouting."],
+		["Yue Ling", "He says the river plays it. It gives in spring and takes in autumn, and the same people are astonished twice a year. I like him. I should not like to owe him a toll."],
+	],
+	"s_p40_word": [
+		["Elder Qing Xuan", "Mian has asked to walk a second road. The one who missed the pines. Flame Palm, and now he wants the Heart as well, so that he can mend what he burns. He asked very politely. Shen brought it to me as if it were a dead rat.", "nod"],
+		["Elder Qing Xuan", "The rule is one road. A heart in two places is wholly in neither: I have said so every spring for seventy years. And then I watched you, child, with five phases in one hand, and a sword, and whatever that thing is you do with a pot."],
+		["Lin Feng", "I have walked one road at a time, Elder. I set one down to pick up the next. I never tried to carry two."],
+		["Elder Qing Xuan", "Then carry two, and tell me what it weighs. Go to a stele. Do not set the first down. I shall not rule on what a boy may do until somebody I trust has done it, and come back, and told me the truth about his shoulders."],
+	],
+	"done:s_p40_two": [
+		["Narrator", "The stele is cold under his palm, as it always is. The second road opens beside the first and does not push it aside. For a moment he stands at the place where they part, and then he finds that he is not standing: he is on both."],
+		["Lin Feng", "It is heavier. I did not expect it to be so plain. Each of them is slower under me, and neither gives me the whole of what it gave. I am not twice anything. I am one, spread wider."],
+		["Yue Ling", "You are frowning as you do when you carry water uphill. Not when you are hurt. I know the difference. This is the water one."],
+	],
+	"done:s_p40_rite": [
+		["Narrator", "The form is the same. Every turn of it is where it has always been. But there is a place near the end where his weight used to settle wholly, and now a part of it is elsewhere, listening to another road, and the form waits for it."],
+		["Lin Feng", "It is still whole. It is slower to arrive. I think that is what he will have to be told: nothing is lost, and nothing is quick."],
+	],
+	"done:s_p40_forks": [
+		["Narrator", "Every passage under the Heights of the Magpie Bridge divides, and divides again. At each parting something has been standing, facing neither way. They are gone now. The forks are only forks."],
+		["Lin Feng", "None of them was on two roads. I thought they would be. Every one of them was standing at the fork, on neither."],
+	],
+	"done:s_p40_stones": [
+		["Narrator", "Four flat stones, river-worn. A traveller sets one at a fork to say which way he went. These were set in pairs, one to the left and one to the right, by somebody who wished to have gone both ways and so went neither."],
+		["Yue Ling", "That is not what you did at the stele. You did not put a stone on each and stay where you were. You went. Slowly. But you went."],
+	],
+	"done:s_p40_minds": [
+		["Narrator", "The road not taken follows a little behind, the old hands say, and looks over the shoulder. Sixteen of them looked over Lin Feng's. They found him already walking the one they were, and had nothing to follow."],
+		["Lin Feng", "I had been afraid of that. The other road, behind me, for ever. I turned round and it was under my feet as well."],
+	],
+	"done:s_p40_rong": [
+		["Narrator", "Forewoman Rong pours as she pours bronze: once, without a drop on the table. She has not said a word since the sixth trick, when she saw that he had counted the earth eight out of the pack before she had."],
+		["Lin Feng", "I counted. I have never counted anything but steps. It turns out to be the same: you only have to know which you have done."],
+	],
+	"done:s_p40_hands": [
+		["Narrator", "Two old hands of Tushan, a hundred years of leaves between them, and neither would say that the Round and Three in the Morning were two games. One said they were one game with two tempers. The other said: ask me in the evening."],
+		["Yue Ling", "Ask me in the evening. That is the best answer anybody has given you this month, and she did not even look up from her hand."],
+	],
+	"done:s_p40_ju": [
+		["Narrator", "The old man turns his last pile over and laughs, and behind him nine monkeys, who cannot possibly have followed it, laugh too. He pours. The tea is terrible. It is made, as far as Lin Feng can tell, of acorns."],
+		["Ju Gong", "You did not try to win the morning. You did not try to win the evening. You gave each what would stop it shouting, and took what was left. That is the whole of keeping monkeys, and I have never before seen it done by somebody without a tail."],
+		["Lin Feng", "I have two roads on my back, keeper. I was told a heart could not. I find it can, if neither is promised the morning."],
+		["Ju Gong", "The old book has a name for it. To let both sides of the wheel turn, and sit at the hinge. It is called walking two roads. Go home, child. They will ask you for a rule. Remember that it is seven either way.", "nod"],
+	],
+	"s_p40_court": [
+		["Narrator", "The petition is on the Elder's table. Forty names, in two columns, because the outer court could not agree whether to sign by seniority or by road and so did both. Above it, in red, in Hall Master Shen's hand: One heart. One road."],
+		["Elder Qing Xuan", "You have carried two for a month. I have watched you do it. You are slower, and you are not less. Shen says that you are you, and that a rule is not written for the one who can break it. He is not a fool, child. He has buried more disciples than I have."],
+		["Lin Feng", "I can tell you what it weighs, Elder. I cannot tell you what it would weigh on Mian. I did not know what it weighed on me until I had it."],
+		["Elder Qing Xuan", "No. And so it is a ruling, and not a measurement, and I have asked you up here to make it with me. A keeper of monkeys would know what to say to them. I have only ever kept disciples.", "shrug"],
+	],
+	"done:s_p40_stands": [
+		["Narrator", "It stands at a turn of the path between two rows of tea, where the pickers pass it with their baskets. Lin Feng said a sentence in the Elder's room. The terraces have heard it, and put it where the path divides."],
+		["Yue Ling", "They chose the fork to put it at. Did you see? Somebody down here has understood you better than you meant them to."],
+	],
+	"s_p40_end": [
+		["Narrator", "The nine hundred and ninety-nine steps have been swept, from the top, by somebody who did the corners. The Elder is sitting on the highest one with a pack of leaves, laying them out in a ring: wood, fire, earth, thunder, water."],
+		["Elder Qing Xuan", "Each overcomes one and is overcome by one. Each bears one and is borne by one. There is no highest leaf in this pack, child. I have been looking for it all morning. Du could have told me. Du says that is the game."],
+		["Lin Feng", "I looked for it too. I thought if I found the right road I should not need the others. I have two under me now and I still could not tell you which of them is the road."],
+		["Yue Ling", "You could ask which is the morning."],
+		["Lin Feng", "I could. I have stopped. I think that is the only thing that has changed, and I think it is a realm."],
+		["Elder Qing Xuan", "The sage lets both sides of the wheel turn, and rests at the hinge. I read that out for seventy years as praise of somebody else. Sit down, child. Cut. The loser sweeps.", "nod"],
+	],
+	"pre:s_break45": [
+		["Narrator", "Two clouds come over the peak, from the east and from the west, and the disciples in the yard begin at once to argue about which of them is the tribulation. They meet above the pine. It was one cloud."],
+		["Lin Feng", "Three in the morning. Very well. I shall take them as they come."],
+	],
+	"post:s_break45": [
+		["Narrator", "The bolts fall in threes, and then in fours, and somewhere in the middle of them Lin Feng stops counting which. When the sky clears he is standing where two paths cross on the summit, with a foot on each: Walking Two Roads."],
+		["Yue Ling", "Forty-six. I counted, since you would not."],
+		["Lin Feng", "I know. I heard you. I was glad somebody was. I find I can let it be counted, and not mind what it comes to."],
 	],
 	"recall36": [
 		["Narrator", "The Lotus Seal sets Lin Feng down in the courtyard at first light. The burnt slope is green. The practice yard is full, and nobody in it is practising: forty disciples are standing in rows, looking at the gate."],
@@ -11953,7 +12154,7 @@ const DIALOGUE := {
 	],
 	"pre:pang_juan": [
 		["Narrator", "It is dusk at the bottom of the gorge. The general has come on fast and alone, as he was meant to. He has seen something white on a tree and called for a light, and he is holding the torch up to it, reading."],
-		["Pang Juan, General of Wei", "Pang Juan dies under... Who cut this? This is a child's trick. This is HIS trick. I had the fires counted. I had them counted three nights running."],
+		["Pang Juan, General of Wei", "Pang Juan dies under... Who cut this? This is a child's trick. This is HIS trick. I had the fires counted. I had them counted, both nights."],
 		["Lin Feng", "You counted what you were shown. You can put the torch down. I only wanted you to stop."],
 	],
 	"post:pang_juan": [
@@ -12001,7 +12202,7 @@ const DIALOGUE := {
 	],
 	"bested:lian_po:lost": [
 		["Narrator", "He does not even draw. He takes one step, and Lin Feng is on his back in the lane looking at the roof of the cave, with the breath gone out of him. Up on the terraces people have stopped picking."],
-		["Lian Po, General of Zhao", "There. Forty-one. Tell him that is what comes of sending boys. And take a quarter of that purse, somebody; my men have not been paid."],
+		["Lian Po, General of Zhao", "There. Forty-one. Tell him that is what comes of sending children. And take a quarter of that purse, somebody; my men have not been paid."],
 		["Narrator", "That night the things that had kept out of the lane for fear of one of them or the other came down into it together. Two tigers had fought. Everybody had heard."],
 		["Yue Ling", "I said go round. I said it twice.", "grieve"],
 	],
@@ -12063,7 +12264,7 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "The rivers and the seas are kings of the hundred valleys because they are good at lying below them. I have read that out at every New Year for seventy years. I read it standing at the top of the steps."],
 		["Lin Feng", "I thought the top was where one got to. And then that it was where one held things up from. I never thought of there being somebody above it who was simply not interested."],
 		["Yue Ling", "You came back. All three times. I counted, since everybody else was counting the other thing."],
-		["Lin Feng", "I got up because you were there to see whether I would. I should like that written down. I am told you are writing things down."],
+		["Lin Feng", "I went on to the next one because you were there to see whether I would. I should like that written down. I am told you are writing things down."],
 		["Elder Qing Xuan", "She is. So am I. So, I gather, are you. It is about time somebody on this mountain said I. Sit down, both of you. Lower. There. Now you can see the whole pond.", "nod"],
 	],
 	"pre:s_break43": [

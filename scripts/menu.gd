@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Seals & Lists", "Leaves", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "seals", "leaves", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, Game.done(Seals.OPEN), Game.prologue == "", true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -80,6 +80,18 @@ func _build() -> void:
 		for pid in Memoir.book(Game):
 			labels.append(str(Memoir.PAGES[pid].n))
 			ids.append("page:" + str(pid))
+			enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
+	elif mode == "leaves":
+		# yezi.gd: the hands he has played, and which painted leaf he brings to a table
+		labels = ["Bring no painted leaf"]
+		ids = ["leaf:"]
+		enabled = [true]
+		for pl in Yezi.painted(Game):
+			labels.append("Bring %s" % str(Data.ITEMS["leaf_" + str(pl[0])].n))
+			ids.append("leaf:" + str(pl[0]))
 			enabled.append(true)
 		labels.append("Back")
 		ids.append("back")
@@ -255,7 +267,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -269,6 +281,11 @@ func press(act: String) -> void:
 				# (memoir.gd: a page read out again, in its writer's own words)
 				main.pop()
 				main.say(Memoir.lines(Game, id.trim_prefix("page:")))
+				return
+			if id.begins_with("leaf:"):
+				# (yezi.gd: the painted leaf he brings to a table of leaves, or none)
+				Game.leaf = id.trim_prefix("leaf:")
+				msg = "He brings %s." % str(Data.ITEMS["leaf_" + Game.leaf].n) if Game.leaf != "" else "He brings no painted leaf."
 				return
 			if id.begins_with("rite:"):
 				# (rites.gd: the rite of a Dao that is his, performed where he stands)
@@ -344,7 +361,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words", "seals", "leaves":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -521,6 +538,40 @@ func _draw_way() -> void:
 		var ax2: Dictionary = Creed.AXIS[str(c.axis)]
 		UI.text(self, Vector2(r.position.x + 24, y + 22.0 * float(i + 1)), "%s %+d" % [str(ax2.pos if int(c.d) > 0 else ax2.neg), absi(int(c.d))], 13, ax2.col if int(c.d) > 0 else ax2.neg_col)
 		UI.text(self, Vector2(r.position.x + 170, y + 22.0 * float(i + 1)), str(c.why), 13, UI.C_TEXT)
+
+## Leaves (the Two Roads release, yezi.gd): how the hands have gone, who he has sat down with, the leaves the
+## masters painted, and the round of the five phases for whoever has forgotten what overcomes what.
+func _draw_leaves() -> void:
+	UI.text(self, Vector2(60, 70), "Leaves", 22, UI.C_GOLD)
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels, cursor, enabled, 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	UI.text(self, r.position + Vector2(24, 40), "The table of leaves", 20, UI.C_GOLD)
+	UI.wrapped(self, r.position + Vector2(24, 66), main.told(Yezi.summary(Game)), 14, UI.C_TEXT, r.size.x - 48)
+	var y := r.position.y + 112.0
+	for gid in Yezi.GAME_ORDER:
+		UI.text(self, Vector2(r.position.x + 24, y), str(Yezi.GAMES[gid].n), 16, UI.C_JADE)
+		y += UI.wrap_lines(str(Yezi.GAMES[gid].desc), 13, r.size.x - 48).size() * 17.0 + 26.0
+		UI.wrapped(self, Vector2(r.position.x + 24, y - UI.wrap_lines(str(Yezi.GAMES[gid].desc), 13, r.size.x - 48).size() * 17.0 - 6.0), str(Yezi.GAMES[gid].desc), 13, UI.C_DIM.lightened(0.25), r.size.x - 48)
+	y += 8.0
+	UI.text(self, Vector2(r.position.x + 24, y), "The masters", 18, UI.C_GOLD)
+	for mid in Yezi.MASTER_ORDER:
+		y += 30.0
+		var mm: Dictionary = Yezi.MASTERS[mid]
+		var rec: Dictionary = Game.cards.get(mid, {})
+		var has: bool = Game.leaves.has(mid)
+		var col: Color = Yezi.COLS[str(mm.leaf)]
+		# the leaf they painted: a slip in the colour of its phase, sealed red when it is his
+		draw_rect(Rect2(r.position.x + 24, y - 18, 16, 23), Color("efe6cc") if has else Color(0.93, 0.9, 0.82, 0.14))
+		draw_rect(Rect2(r.position.x + 27, y - 15, 10, 17), col if has else col.darkened(0.6))
+		UI.text(self, Vector2(r.position.x + 52, y), str(mm.n), 15, UI.C_TEXT if not rec.is_empty() else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 300)
+		UI.text(self, Vector2(r.position.x + 360, y), str(Yezi.GAMES[str(mm.game)].n), 13, UI.C_DIM)
+		UI.text(self, Vector2(r.position.x + 560, y), "%d won, %d lost" % [int(rec.get("won", 0)), int(rec.get("lost", 0))] if not rec.is_empty() else "not yet sat with", 13, UI.C_JADE if int(rec.get("won", 0)) > 0 else UI.C_DIM)
+		if str(Game.leaf) == mid:
+			UI.text(self, Vector2(r.position.x + 700, y), "brought", 13, UI.C_GOLD)
+	UI.wrapped(self, Vector2(r.position.x + 24, r.position.y + r.size.y - 62.0), "A table of leaves is kept at some counters of the towns, and the old hands at every tea-house will play a hand with anybody. Nothing is staked: the loser pours. A painted leaf, won from a master once, takes the place of the least leaf he is dealt.", 13, UI.C_DIM, r.size.x - 48)
+	if msg != "":
+		UI.text(self, Vector2(60, 700), msg, 14, UI.C_JADE)
 
 ## Seals & Lists (the Red Seal release: seals.gd, lists.gd, auction.gd): the paper of every Dao there is, with the
 ## grade his is sealed at; the three meets and where he came in them; and what he has bought with a hammer.
@@ -1335,7 +1386,10 @@ func _draw_dao() -> void:
 		var xp: int = int(Game.dao_xp.get(id, 0))
 		var tier := Game.dao_tier(id)
 		var col: Color = d.col if on or xp > 0 else UI.C_DIM
-		UI.text(self, r.position + Vector2(24, y), ("> " if on else "  ") + str(d.n), 17, col, HORIZONTAL_ALIGNMENT_LEFT, 316)
+		var also: bool = not on and Braid.holds(Game, id)
+		if also:
+			col = d.col
+		UI.text(self, r.position + Vector2(24, y), ("> " if on else ("+ " if also else "  ")) + str(d.n), 17, col, HORIZONTAL_ALIGNMENT_LEFT, 316)
 		var rank := "" if not Game.dao_xp.has(id) else str(Data.DAO_RANKS[tier])
 		UI.text(self, r.position + Vector2(350, y), rank, 14, UI.C_DIM)
 		var nxt: int = Data.DAO_TIERS[mini(tier + 1, Data.DAO_TIERS.size() - 1)]
@@ -1344,7 +1398,7 @@ func _draw_dao() -> void:
 		y += _wrap_at(r.position + Vector2(44, y), str(d.desc), 13, UI.C_DIM.lightened(0.2), 516) + 12.0
 	if Game.dao != "":
 		var dd: Dictionary = Data.DAOS[Game.dao]
-		_wrap_at(r.position + Vector2(24, y + 6), "\"%s\"  Technique from Adept: %s.  Change roads at any Dao Stele." % [dd.motto, Data.SKILLS[dd.skill].n], 14, UI.C_TEXT, 536)
+		_wrap_at(r.position + Vector2(24, y + 6), "\"%s\"  Technique from Adept: %s.  Change roads, or walk another as well, at any Dao Stele.  %s" % [dd.motto, Data.SKILLS[dd.skill].n, Braid.burden(Game)], 13, UI.C_TEXT, 536)
 	UI.text(self, r.position + Vector2(600, 36), "The peoples of the realms", 22, UI.C_GOLD)
 	var y2 := 70.0
 	for race in Data.RACE_ORDER:
@@ -1655,6 +1709,9 @@ func _draw() -> void:
 		return
 	if mode == "law":
 		_draw_law()
+		return
+	if mode == "leaves":
+		_draw_leaves()
 		return
 	if mode == "rites":
 		_draw_rites()

@@ -210,7 +210,7 @@ const PAGES := {
 	"p38_pang_up_lin": {"n": "A General Who Counts", "who": "lin", "after": "s_p38_cart", "if": ["pang_juan", "up"], "lines": [
 		"He counts everything. Fires, tents, hoofprints. I let him count me, and showed him a little less than there was. He had a number for me before we began, and the number was wrong.",
 		"I beat him. He stood realms above me, and was quicker, and better read. He lost because he was certain. I have been certain. I know that door from the inside.",
-		"Sun Bin did not thank me. He looked at my knees, both of them, for some time, and then asked whether I would push the cart as far as the road."]},
+		"Sun Bin did not thank me. He looked at my knees, both of them, for some time, and then asked whether I would push the cart as far as the turning."]},
 	"p38_lian_down_lin": {"n": "On My Back in a Lane", "who": "lin", "after": "s_p38_lian", "if": ["lian_po", "down"], "lines": [
 		"I could have gone round by the ditch. Everybody goes round by the ditch. He is an old general with forty wounds who wants to be told he matters, and I drew a sword on that.",
 		"He put me on my back in the lane with a town looking on. That is not the part I mind. The part I mind is that I picked the fight, and that the wolves heard two tigers at it and came down that night.",
@@ -221,17 +221,17 @@ const PAGES := {
 		"I am not angry now. I was. I went and helped an old woman pick up her onions out of the lane while you lay there, and she said: yours? And I said yes, and it was not all pride."]},
 	"p38_lian_up_lin": {"n": "Thorns", "who": "lin", "after": "s_p38_rods", "if": ["lian_po", "up"], "how": ["lian_po", ["gave"]], "lines": [
 		"I put up my sword and went round by the ditch. He shouted after me. It was the hardest stroke I have made in thirty-eight chapters and it does not look like anything.",
-		"Three days later he came to the door stripped to the waist with a bundle of thorn rods on his back, and knelt, and asked to be beaten. An old man with forty wounds, all in front.",
+		"He came to the mouth of the cave stripped to the waist with a bundle of thorn rods on his back, and knelt, and asked to be beaten. An old man with forty wounds, all in front.",
 		"I did not beat him. I gave him tea. It turns out that not everybody who stands above you is in your way. Some of them are only standing there, hoping to be asked in."]},
 	# (the Red Seal release: the journey that beat him writes of that, and not of a ditch it never went by)
 	"p38_lian_won_lin": {"n": "Thorns, All the Same", "who": "lin", "after": "s_p38_rods", "if": ["lian_po", "up"], "how": ["lian_po", ["won"]], "lines": [
 		"I beat him. In his own lane, with the carters looking on. It was the best fighting I have done and I knew before he had finished falling that it was the wrong thing to have been good at.",
-		"Three days later he came to the door stripped to the waist with a bundle of thorn rods on his back, and knelt, and asked to be beaten. An old man with forty wounds, all in front.",
+		"He came to the mouth of the cave stripped to the waist with a bundle of thorn rods on his back, and knelt, and asked to be beaten. An old man with forty wounds, all in front.",
 		"I did not beat him a second time. I gave him tea. The minister went round by the ditch for ten years and got a friend. I went through, and got a lane. I can count."]},
 	"p38_low": {"n": "Why the Sea Is King", "who": "yue", "after": "s_p38_end", "lines": [
 		"The sea is king of a hundred valleys because it lies below them. The Elder read you that, and you nodded as if you had always known, and you had not. You learned it this season, from below, and I watched.",
 		"I have followed somebody who could not lose. I did not know until now that I had been waiting to see what you were when you could.",
-		"You are the same. That is all I have to report. You came back, and paid what it cost, and asked the next person their name. I had hoped. It is another thing to know."]},
+		"You are the same. That is all I have to report. You came back, each time, and asked the next person their name. I had hoped. It is another thing to know."]},
 	# ---- Part XXXIX: The Name That Can Be Named (the Red Seal release)
 	"p39_ring": {"n": "What I Said in the Yard", "who": "lin", "after": "s_p39_outer", "lines": [
 		"I said something across a ring today. I had never done that. I have fought things with nine heads and never once told one of them what I thought of its footwork.",
@@ -239,12 +239,25 @@ const PAGES := {
 		"Yue Ling says everybody has a list. She says the difference is whether you read it out. I think the difference is who you read it to. I should not like to read mine to somebody it would stay with."]},
 	"p39_paper": {"n": "A Paper with My Name on It", "who": "yue", "after": "s_p39_end", "lines": [
 		"You carried the first three as if they were hot. I watched you put them inside your robe, and take them out, and put them in your sleeve instead. You have never owned anything you were afraid of creasing.",
-		"I thought it would change you. That is the truth, and I am writing it here because I did not say it. I thought a man told in red ink what he is might begin to be that, and stop being the other things.",
+		"I thought it would change you. That is the truth, and I am writing it here because I did not say it. I thought somebody told in red ink what he is might begin to be that, and stop being the other things.",
 		"You kept the blank one. Of all of them. I knew then. I have a paper too, you know, and mine says Proven, and I looked at it tonight, and I find I like yours better."]},
 	"p39_last": {"n": "The Top Ten Steps", "who": "elder", "after": "s_break44", "lines": [
 		"The child has a blank paper with a seal on it, and I have a broom. I swept the top ten steps this evening. It took me an hour, and the corners are still wrong. I have ruled this mountain for seventy years and I cannot sweep it.",
 		"A registrar asked me what the child is. I have had a month to think. The child is whoever did the steps before I was awake, every morning, for three years, when nobody was keeping a column. Everything since has been a guest in that house.",
-		"I am eighty, and I was certified today, by a boy, in nothing. I should like it known that I have never held a grade I was prouder of."]},
+		"I am an old man, and I was certified today, by a boy, in nothing. I should like it known that I have never held a grade I was prouder of."]},
+	# ---- Part XL: Three in the Morning (the Two Roads release)
+	"p40_leaves": {"n": "The Loser Pours", "who": "lin", "after": "s_p40_du", "lines": [
+		"I sat down at a table today to play at something. I am trying to remember when I last did a thing that nothing depended on. I think I was nine, and it was a stream, and a boat made of a leaf.",
+		"I was bad at it for the whole of the first hand, and nobody died. Hall Master Du told me I was holding the leaves like a sword. I was. I do not know another way to hold anything.",
+		"Then I waited, instead of striking, and it came to me. I won by doing less. I have written that down so that I can look at it again, because I do not yet believe it."]},
+	"p40_two": {"n": "Two Buckets", "who": "yue", "after": "s_p40_two", "lines": [
+		"You came away from the stele walking as you do with two full buckets, and I knew before you said a word. You have a second road on you. You did not set the first one down. I have never seen you not set a thing down.",
+		"I have had two all my life, you know. The needle and the lotus. Nobody at Azure Cloud called it two roads, because nobody called what I did a road at all. I was the girl who slept. I mended, and I pricked.",
+		"So I shall tell you what nobody told me. Neither of them will forgive you for the other. You do not need them to. You only need to stop promising each of them the morning."]},
+	"p40_last": {"n": "Seven Either Way", "who": "elder", "after": "s_break45", "lines": [
+		"The child played me at leaves on the top step, and I lost, and I swept. It took me until dusk. I am told the corners are better than last month. I am told this by Du, who has no right to an opinion on corners.",
+		"I made a rule seventy years ago: one heart, one road. I made it because I had seen a boy tear himself in two trying to be a swordsman for his father and a healer for his mother. I did not make it because it was true.",
+		"The child walks two, and is whole, and slower, and does not ask me which is the road. An old keeper of monkeys says it is seven acorns either way. I have been furious about three in the morning for most of my life. I should like, tonight, to be delighted."]},
 	"p38_last": {"n": "In My Own Hand", "who": "lin", "after": "s_break43", "lines": [
 		"These pages were her idea. She said a story told only from over somebody's shoulder is a story about a back. So here is the front of it.",
 		"I am Lin Feng. I swept steps. I was handed a root I did not earn and a companion I did not deserve, and I climbed until there was nobody above me, and then three people walked down a mountain and there was.",
@@ -254,7 +267,7 @@ const ORDER := ["p01_post", "p01_broom", "p01_gate", "p02_emperor", "p03_hollow"
 	"p13_gates", "p14_karma", "p15_woven", "p16_year", "p17_spring", "p18_fire", "p19_works", "p20_hollow", "p21_arms", "p22_roads", "p23_host", "p24_horse", "p25_town", "p26_springs", "p27_sack",
 	"p28_grass", "p29_chimney", "p30_net", "p31_shoe", "p32_mirror", "p33_pestle", "p34_road", "p35_block", "p36_fish", "p37_round",
 	"p38_word", "p38_fuchai_down_lin", "p38_fuchai_down_yue", "p38_fuchai_up_lin", "p38_pang_down_lin", "p38_pang_down_yue", "p38_pang_up_lin",
-	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last"]
+	"p38_lian_down_lin", "p38_lian_down_yue", "p38_lian_up_lin", "p38_lian_won_lin", "p38_low", "p38_last", "p39_ring", "p39_paper", "p39_last", "p40_leaves", "p40_two", "p40_last"]
 
 static var _by_step := {}
 

@@ -21,9 +21,9 @@ extends RefCounted
 ##
 ## A new deed needs a line under "any" at least; a new kind of witness a line in `kind_of`.
 
-const TRADE := ["merchant", "cook", "waiter", "smith", "fisher", "pedlar"]
+const TRADE := ["merchant", "cook", "waiter", "smith", "fisher", "pedlar", "hawker"]
 const WATCH := ["guard", "watchman", "soldier"]
-const LEARNED := ["scholar", "musician"]
+const LEARNED := ["scholar", "musician", "storyteller", "leafer"]
 const HOLY := ["monk", "pilgrim", "hermit"]
 const KINDS := ["kid", "elder", "watch", "trade", "learned", "holy", "cult", "giant", "hand"]
 ## how far (in tiles) a deed in the street is seen

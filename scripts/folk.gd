@@ -62,6 +62,41 @@ const TOWNS := {
 		"roles": {"farmer": 4, "musician": 3, "child": 3, "elder": 2, "washer": 2, "cook": 1, "monk": 1, "youth": 2, "waiter": 1, "giant": 1}},
 }
 
+## The Two Roads release: the towns are fuller.  Who has come to live in each since, by kind: made after
+## everybody of `TOWNS` and from a seed of their own (`people`), so that nobody who lived there before has
+## another name, body or day for it, and the Great People are still the last of a town's `roles`.  Three kinds
+## are new: somebody who plays leaves at the tea-house table all day and will play a hand with anybody
+## (yezi.gd), a hawker who walks the streets calling what is in the baskets, and a storyteller in the square.
+const MORE := {
+	"sect": {"disciple": 4, "servant": 1, "leafer": 1},
+	"cloudfoot": {"leafer": 2, "hawker": 2, "storyteller": 1, "child": 2, "porter": 2, "washer": 2},
+	"qingshi": {"leafer": 2, "hawker": 2, "storyteller": 1, "child": 2, "farmer": 2, "youth": 1},
+	"drumtower": {"leafer": 2, "hawker": 1, "storyteller": 1, "child": 1, "washer": 2},
+	"yanggu": {"leafer": 3, "hawker": 3, "storyteller": 1, "child": 2, "porter": 2},
+	"shazhou": {"leafer": 2, "hawker": 2, "storyteller": 1, "child": 2, "merchant": 1},
+	"longmen": {"leafer": 2, "hawker": 2, "storyteller": 1, "child": 2, "fisher": 2},
+	"tushan": {"leafer": 2, "hawker": 2, "storyteller": 1, "child": 1, "smith": 2, "washer": 1},
+	"featherfall": {"leafer": 2, "hawker": 1, "storyteller": 1, "youth": 2},
+	"tearwater": {"leafer": 2, "hawker": 1, "storyteller": 1, "fisher": 2},
+	"youdu_city": {"leafer": 2, "hawker": 2, "storyteller": 1, "scholar": 1},
+	"landfall": {"leafer": 2, "hawker": 2, "storyteller": 1, "child": 1, "fisher": 1},
+	"lightfoot": {"leafer": 2, "hawker": 2, "storyteller": 1, "porter": 1},
+	"fourstreams": {"leafer": 2, "hawker": 1, "storyteller": 1, "farmer": 2},
+}
+
+## How many people a town has in all (`TOWNS` and `MORE`).
+static func head_count(tid: String) -> int:
+	var n := 0
+	for r in TOWNS[tid].roles:
+		n += int(TOWNS[tid].roles[r])
+	for r2 in MORE.get(tid, {}):
+		n += int(MORE[tid][r2])
+	return n
+
+## How many of `role` live in town `tid` (`TOWNS` and `MORE`).
+static func of_role(tid: String, role: String) -> int:
+	return int(TOWNS.get(tid, {}).get("roles", {}).get(role, 0)) + int(MORE.get(tid, {}).get(role, 0))
+
 ## The bodies of each people for each kind of person (art/characters/folk_*.py); a kind missing
 ## from a people's list is drawn with its people's own body.
 const BODIES := {
@@ -79,6 +114,9 @@ const BODIES := {
 		"soldier": ["folk_guard", "folk_youth", "folk_farmer", "folk_porter"], "musician": ["folk_scholar", "folk_maiden", "folk_youth", "folk_grandpa"],
 		# the Answering Land release
 		"waiter": ["folk_youth", "folk_maiden"], "huntsman": ["folk_guard", "folk_youth", "folk_farmer"],
+		# the Two Roads release
+		"leafer": ["folk_grandpa", "folk_merchant", "folk_grandma", "folk_scholar", "folk_shopwife"], "hawker": ["folk_porter", "folk_farmwife", "folk_youth", "folk_maiden"],
+		"storyteller": ["folk_scholar", "folk_grandpa", "folk_grandma"],
 		# the Tall People release (giants.gd): the Great People have bodies of their own in every town
 		"giant": ["folk_giant", "folk_giantess"]},
 	"desert": {"merchant": ["folk_nomad", "folk_shopwife"], "porter": ["folk_nomad", "folk_porter"], "guard": ["folk_guard", "folk_nomad"],
@@ -149,6 +187,17 @@ const ROLES := {
 	"huntsman": {"day": [[4.3, "field", "stalk|peer|archery", ""], [10.4, "market", "flay|call|offer|weigh", "knife"], [12.2, "inn", "eat", "bowl"], [13.4, "field", "stalk|trace|archery", ""], [17.0, "woodpile", "flay|stretch", "knife"],
 			[18.6, "bath", "scrub|wash", "cloth"], [19.4, "inn", "drink|laugh", "cup"], [21.2, "home", "in", ""]],
 		"dye": [[0.08, 0.3, 0.1], [0.07, 0.3], 0.3, 0.85]},
+	# ---- the Two Roads release: somebody who is at the tea-house table with a pack of leaves from the first pot to
+	# the last (and under the tree on a bench when the house is full), a hawker who walks every street with two
+	# baskets on a pole and a call of their own, and a storyteller who has the square in the afternoon
+	"leafer": {"day": [[7.4, "tea", "count|think|offer", "leaves"], [11.6, "inn", "eat", "bowl"], [12.8, "bench", "sit_bench|count|laugh", "leaves"], [15.6, "square", "count|point|laugh|clap", "leaves"],
+			[18.8, "tea", "count|drink|laugh", "leaves"], [22.2, "home", "in", ""]],
+		"dye": [[0.08, 0.58, 0.75, 0.3], [0.1, 0.0], 0.4, 0.95]},
+	"hawker": {"day": [[6.2, "streets", "call|offer|wave", "basket"], [11.8, "market", "eat", "bowl"], [12.8, "streets", "call|weigh|offer|count", "basket"], [18.4, "inn", "count|drink|laugh", "cup"], [20.6, "home", "in", ""]],
+		"round": "streets", "walk": "carry", "go_hold": "pole", "dye": [[0.0, 0.1, 0.3, 0.55, 0.9], [0.12, 0.6, 0.0], 0.55, 1.05]},
+	"storyteller": {"day": [[8.6, "tea", "drink|think|write", "cup"], [11.8, "inn", "eat", "bowl"], [13.2, "square", "talk|point|fan|clap|shrug", "fan"], [17.6, "bench", "talk|laugh|point", "fan"],
+			[19.4, "tea", "talk|drink|laugh", "cup"], [21.8, "home", "in", ""]],
+		"dye": [[0.6, 0.66, 0.08, 0.0], [0.6, 0.1], 0.3, 0.95]},
 	# the Tall People release (giants.gd): one of the Great People does the work of the town that takes six: the
 	# beam at the gate at first light, the woodpile, the heavy end of the market, a well dug in the afternoon,
 	# and an evening in the square bent double to hear what the children are saying
@@ -204,6 +253,8 @@ const PLACES := {
 	"shore": ["shore", "open:8-20"],
 	"patrol": ["path:8-16", "open:6-14"],
 	"lamps": ["prop:lantern_st", "path:3-12", "open:3-10"],
+	# (the Two Roads release: every street of the town, for whoever walks them calling)
+	"streets": ["path:2-14", "open:2-10"],
 	# the places of the road (the High Roads release): round the camp's fire, the forest's edge, open
 	# country, the road, the water, the foot of the crag and its very top
 	"camp": ["ring"],
@@ -228,7 +279,8 @@ const TITLES := {"farmer": ["Farmer", "Farmer"], "fisher": ["Fisherman", "Fisher
 	"woodcutter": ["Woodcutter", "Woodcutter"], "herbalist": ["Herb-Gatherer", "Herb-Gatherer"], "angler": ["Old Angler", "Angler"], "pedlar": ["Pedlar", "Pedlar"],
 	"hunter": ["Hunter", "Huntress"], "pilgrim": ["Pilgrim", "Pilgrim"], "hermit": ["Hermit", "Hermit"],
 	"soldier": ["Levy-Man", "Levy-Woman"], "musician": ["Player", "Player"],
-	"waiter": ["Pot-Boy", "Serving-Girl"], "huntsman": ["Hunter", "Huntress"], "giant": ["Big Brother", "Big Sister"]}
+	"waiter": ["Pot-Boy", "Serving-Girl"], "huntsman": ["Hunter", "Huntress"], "giant": ["Big Brother", "Big Sister"],
+	"leafer": ["Old Hand", "Old Hand"], "hawker": ["Hawker", "Hawker"], "storyteller": ["Storyteller", "Storyteller"]}
 
 ## the bodies that are women and girls (for names and words)
 const FEM := ["folk_farmwife", "folk_shopwife", "folk_girl", "folk_grandma", "folk_maiden", "folk_disciple_f", "folk_jiaoren",
@@ -371,6 +423,20 @@ static func people(wd: Dictionary, tid: String) -> Array:
 			p.dye = _dye(role, rng)
 			_hearth_dress(p, used_names)
 			out.append(p)
+			i += 1
+	# (the Two Roads release: whoever has come since, `MORE`, from a seed of their own: nobody above is changed)
+	var rng2 := RandomNumberGenerator.new()
+	rng2.seed = hash("folk2:" + tid)
+	var more: Dictionary = MORE.get(tid, {}) if not is_camp(tid) else {}
+	for role2 in more:
+		for k2 in int(more[role2]):
+			var body2 := _body(str(t.race), role2, rng2)
+			var p2 := {"id": "folk:%s:%d" % [tid, i], "town": tid, "area": t.area, "role": role2, "body": body2, "seed": rng2.randi() % 1000,
+				"fem": body2 in FEM, "kid": body2 in KID, "old": body2 in OLD, "night": bool(t.get("night", false))}
+			p2.n = _name(p2, rng2, used_names)
+			p2.dye = _dye(role2, rng2)
+			_hearth_dress(p2, used_names)
+			out.append(p2)
 			i += 1
 	_towns[key] = out
 	return out
@@ -941,6 +1007,21 @@ const LINES := {
 		"We have died in a hundred battles on that stage, %s, nightly, and got up for the next act. I mean to tell the clay ones how it is done.", "The bell was a hair flat for a month and I retuned everything I own to it, out of politeness. Now it is right again and I am a hair flat. That is a musician's life.",
 		"Somebody under the hill is keeping time with us in the evenings. One beat, on the first of the bar. It is never wrong. The flautist wants to know if it is in the guild."],
 	# ---- the Answering Land release
+	"leafer": ["Water puts out fire, fire burns wood, wood breaks earth, earth buries thunder, thunder runs through water. There. Now you know as much as I do, and I shall still take the pot off you.",
+		"Sit down, %s. Nothing is staked. The loser pours, and I have not poured since the new year.",
+		"Forty leaves, eight of a phase. My mother painted this pack. The fire sevens are smudged, and everybody at this table knows which they are, and nobody says.",
+		"The young ones lead their eights. I let them. A leaf led is a leaf told. Keep your water until you have seen their fire.",
+		"Three in the morning, four at night. They say a keeper of monkeys made it up. I say the monkeys did, and let him think so."],
+	"hawker": ["Hot chestnuts! Hot! They were hot. They are warm. Warm chestnuts, %s, and honest about it!",
+		"Twelve streets before noon and twelve after, and my call carries three of them ahead of me. The dogs know it. The children know it. I sell to both.",
+		"Needles, thread, sugared haws! No, I have no idea why those three. My father's baskets held those three.",
+		"You learn a town by its doors. That one opens for haws. That one for thread. That one never, and I call loudest there.",
+		"A shop waits to be found. I go and find them. It is harder on the feet and better for the conversation."],
+	"storyteller": ["Last time we left the general on the bridge with one arrow. No, sit, sit. He is still on the bridge. He has been on it since Tuesday, and they come back every day to see him off it.",
+		"They ask for the one about the sweeper who went up the mountain. I tell it differently each time. One day that sweeper will walk past and correct me, and I shall charge double.",
+		"A story is a road with the dull miles taken out. I have never lied in my life, %s. I have only left out miles.",
+		"The trick is the fan. Open: he draws his sword. Shut: the door closes. Tap: somebody is at the gate. I could tell the whole Three Kingdoms and never say a word.",
+		"I stop where they want it most, and pass the bowl. It is not greed. It is how you find out what a story is worth."],
 	"waiter": ["Four tables, nine bowls, and the one in the corner has been nursing the same cup since noon. I have my eye on him. I have my eye on all of them.",
 		"Hot, mind. I say that forty times a day and somebody burns a tongue forty times a day. I do not know why I say it.",
 		"You learn a town by what it orders. Thin soup, they are saving. Wine at noon, somebody has died or been born. Today is %s's usual, I take it?",
@@ -1182,6 +1263,18 @@ const ERRANDS := {
 			"You are asking it wrong. I do not give it things so that it will do what I want. I take things away until it does. Blast, then charge, then the door. The young ones always want to add. Casting is nearly all taking away.",
 			"The same as in the morning, only I mean it differently. In the morning I give it charcoal because I want heat. If I ever gave it charcoal because I wanted quiet, I should put down my tongs and go and farm. That is how pits are lost."]},
 	# Part XXXIX (the Red Seal release): who certified a caster of Tushan
+	# Part XL (the Two Roads release): who is selling packs that know more than their owners
+	"s_p40_hawkers": {"ask": "You walk every street of the Dawn Market before the lanterns are out. Somebody is selling packs of leaves with a pin through the high ones. Where do they come in from?", "price": 0, "town": "yanggu", "toast": "%s has said where the pricked packs come from",
+		"lines": ["From the west gate, wrapped in wet moss, on a mule that is led by nobody I know. I know every mule in Yanggu. I know their mothers. That one I do not know, and it does not like the lanterns.",
+			"I sold one. There. I did not know what it was. A woman came back and put it on my pole without a word and looked at me, and I have not slept properly since. They come in with the moss-sellers, from Glowcap way.",
+			"Ask what glows. The moss they are packed in gives a little light when you turn the lamp away. There is only one vale in the land where it grows, and nobody goes down into the ground there who has honest work above it.",
+			"West. Everything bad for a game comes from the west and everything bad for the stomach from the south. A pricked pack is twice the price of a clean one, and the fools pay it to pour less tea. I sell haws. Nobody has ever pricked a haw."]},
+	# Part XL (the Two Roads release): whether the leaves are one game or two
+	"s_p40_hands": {"ask": "You have played leaves at this table since before the Guild had a desk. The Round, and Three in the Morning: the same forty leaves. Is it one game, or two?", "price": 0, "town": "tushan", "toast": "%s has said whether it is one game or two",
+		"lines": ["One. With two tempers. In the Round you take, and in the Morning you share out, and it is the same forty leaves and the same fool across the table. I have been the fool at both. It felt exactly alike.",
+			"Ask me in the evening.",
+			"Two, and do not let anybody tell you otherwise, and I play both every day and have never once mixed them up. You have two hands, cultivator. Do you ask which of them is your hand?",
+			"The casters ask that about bronze. Is it copper, or is it tin? You pour them together and it is a bell, and after that it is a foolish question. I do not know when the leaves were poured together. Before my grandmother."]},
 	"s_p39_elders": {"ask": "The Hall of Seals has a paper for every Dao, and there is a desk at the Guild. You have cast bronze here since before it had a desk. Who certified you?", "price": 0, "town": "tushan", "toast": "%s has said who certified them",
 		"lines": ["The bell did. My first hangs in the shrine at Longmen. I was nineteen. They rang it in front of the whole Guild, and it was a quarter-tone flat, and it is still a quarter-tone flat, every hour, where three thousand people can hear. I have never been flat since.",
 			"My master. He said nothing for eleven years. Then one morning he handed me the ladle for the great pour and went and sat down. He did not look round once. I have a paper now, from the desk. It is in a drawer. The ladle is on the wall.",
@@ -1194,7 +1287,7 @@ const ERRANDS := {
 			"It is for the tax. No, truly. The warden wants a name to write beside the sum. Everything else it does, it does by accident. People come back for the tea. They would come back if the board said Turnip.",
 			"It is a promise I made before I knew what I was promising. I painted it at nineteen. I have spent the years since trying to become the woman who would paint that. Some mornings I walk in under it and I nearly am."]},
 	# Part XXXVIII (the Higher Sky release): who somebody who has lived sixty years in one street has given way to
-	"s_p38_elders": {"ask": "A minister turned his carriage into a ditch for a general who had sworn to shame him, and the two died friends. You have lived sixty years in one street. Who have you given way to?", "price": 0, "town": "qingshi", "toast": "%s has said who they gave way to", "lines": ["Old Chen, at the well. Forty years. He must draw first or his day is spoiled, and mine is not, so he draws first. He thinks he has won every morning of his life. He carried my husband's coffin. I would not change one bucket of it.", "My sister-in-law, about the stove. It was my stove. I let her say how it was to be banked from the day she came, and she was wrong, and the rice was no worse. She nursed me through the fever in the dry year. One cannot do sums with these things.", "Everybody, child. I am the shortest man in Qingshi. You learn young which lanes are worth your teeth. There were two, in my whole life. I stood in those. For the rest I went round, and I am eighty, and the ones who never went round are under the hill.", "My own son. He was wrong about the lower field and I let him plant it. It failed. He came to me in the autumn with his cap in his hands and has asked my advice ever since. If I had been right at him in the spring he would be asking nobody."]},
+	"s_p38_elders": {"ask": "A minister turned his carriage into a ditch for a general who had sworn to shame him, and I fought the general instead. You have lived sixty years in one street. Who have you given way to?", "price": 0, "town": "qingshi", "toast": "%s has said who they gave way to", "lines": ["Old Chen, at the well. Forty years. He must draw first or his day is spoiled, and mine is not, so he draws first. He thinks he has won every morning of his life. He carried my husband's coffin. I would not change one bucket of it.", "My sister-in-law, about the stove. It was my stove. I let her say how it was to be banked from the day she came, and she was wrong, and the rice was no worse. She nursed me through the fever in the dry year. One cannot do sums with these things.", "Everybody, child. I am the shortest man in Qingshi. You learn young which lanes are worth your teeth. There were two, in my whole life. I stood in those. For the rest I went round, and I am eighty, and the ones who never went round are under the hill.", "My own son. He was wrong about the lower field and I let him plant it. It failed. He came to me in the autumn with his cap in his hands and has asked my advice ever since. If I had been right at him in the spring he would be asking nobody."]},
 	"s_p37_farmers": {"ask": "A minister kept his own fields dry for thirty years by sending every flood into the next country. Your field has a field below it. When you have more water than you want, what do you do with it?", "price": 0, "town": "qingshi", "toast": "%s has said where the water goes",
 		"lines": ["Open the low gap at dusk, a hand wide. It is in Old Chen's top terrace by morning, and warm, and he has had the night to see it coming. If I kept it I should drown my roots. If I sent it all at once I should drown his. A hand wide.",
 			"I tell her. That is all. I go to the wall and I shout: water tonight. She shouts back how much. We have never liked each other, her family and mine, not for three generations. We have never once flooded each other either. You do not have to like the field below.",
@@ -1541,6 +1634,8 @@ const POSTS := {
 	# Part XXXVII (the Five Hands release)
 	"su_dai": ["write|think|gaze", "", "doze"], "bai_gui": ["write|measure|think", "", "doze"], "cai_yong": ["knock|think|gaze", "", "doze"],
 	# Part XXXVIII (the Higher Sky release)
+	# Part XL (the Two Roads release): the keeper of monkeys counts acorns all day, and sleeps sitting among his troop
+	"ju_gong": ["count|offer|think", "", "doze"],
 	"goujian": ["think|gaze", "", "doze"], "sun_bin": ["measure|write|think", "", "doze"], "lin_xiangru": ["think|gaze|write", "", "doze"],
 	"yangzi_wife": ["weave|sew|spin", "", "weave"], "yang_zhen": ["read|write|gaze", "", "read"], "bell_thief": ["peer|knock|gaze", "", "doze"], "pei_du": ["gaze|count|read", "", "gaze"],
 	"tai_widow": ["sew|sweep", "needle", "doze"], "xu_qian": ["write|peer", "", "read"], "qian_liu": ["point|peer|count", "", "doze"], "bo_yi": ["dig|peer|point", "", "doze"],
@@ -1589,7 +1684,7 @@ static func post(id: String, h: float) -> Array:
 ## runs from the wrist down to the fingers along -y, the palm faces +x for the right hand).
 static func held(what: String) -> Node3D:
 	match what:
-		"hoe", "axe", "pole", "basket", "bowl", "lantern", "gong", "taper", "tray", "steelyard", "fan", "cloth", "knife", "needle":
+		"hoe", "axe", "pole", "basket", "bowl", "lantern", "gong", "taper", "tray", "steelyard", "fan", "cloth", "knife", "needle", "leaves":
 			pass
 		_:
 			return Props.held(what)
@@ -1639,6 +1734,14 @@ static func held(what: String) -> Node3D:
 			# a small gong in the left hand (the stick is the right hand's: taper)
 			b.cyl(Vector3(0.05, -0.12, 0.0), 0.16, 0.025, MB.tag(Color("c8a040"), MB.METAL), Vector3(0, 0, PI * 0.5), 14)
 			b.limb(Vector3(0, -0.06, 0.0), Vector3(0.05, 0.02, 0.0), 0.006, 0.006, MB.tag(Color("8a3a2a"), MB.CLOTH), 3)
+		"leaves":
+			# (the Two Roads release, yezi.gd: a hand of five leaves, fanned, their faces to whoever holds them)
+			var lcols := [Color("5aa860"), Color("d85a3a"), Color("c8a050"), Color("9a7ad8"), Color("4a8ac8")]
+			for lk in 5:
+				var la := (float(lk) - 2.0) * 0.2
+				var lc := Vector3(0.0, -0.02 + cos(la) * 0.05, sin(la) * 0.07)
+				b.box(lc, Vector3(0.003, 0.11, 0.05), MB.tag(Color("efe6cc"), MB.CLOTH), Vector3(la, 0, 0))
+				b.box(lc + Vector3(0.002, 0.0, 0.0), Vector3(0.002, 0.07, 0.03), MB.tag(lcols[lk], MB.CLOTH), Vector3(la, 0, 0))
 		# ---- the Answering Land release: what the new work of the towns is done with
 		"tray":
 			# a round lacquer tray carried flat on the left palm, with a pot and two cups

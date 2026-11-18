@@ -131,6 +131,9 @@ static func causes(g) -> Array:
 	# (the Unpicked Road release, trifles.gd)
 	add.call("virtue", mini(8, int(g.restored)), "lost things carried to whose they were")
 	add.call("virtue", -mini(12, 2 * int(g.pilfered)), "things that were somebody's, in his sleeve")
+	# (the Two Roads release, plights.gd: what was done for and to the people of the towns, in the street)
+	add.call("virtue", mini(16, 2 * int(g.deeds_good)), "kindnesses done in the street")
+	add.call("virtue", -mini(24, 3 * int(g.deeds_bad)), "people of the towns wronged")
 	add.call("rule", -mini(12, g.crimes.filter(func(c): return int(c.n) > 0 or str(c.what) == "forbidden").size()), "what the gates have charged him with")
 	add.call("rule", mini(8, int(g.served)), "days stood in the circle, when he could have stepped out")
 	# ---- rule
