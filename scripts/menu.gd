@@ -28,10 +28,10 @@ func map_layers() -> Array:
 
 func _build() -> void:
 	if mode == "root":
-		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
-		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "resume"]
+		labels = ["Meditate", "Breakthrough", "Items", "Cultivation", "Journal", "Fates", "Crossroads", "Works", "Yue Ling", "Dao & Peoples", "Root & Rites", "In Their Own Words", "Hearths", "Arms", "Wardrobe", "Stable", "The Host", "Town", "Songs", "Feats", "The Body", "The Load", "The Land", "The Way", "The Law", "The Wild", "The Almanac", "Bestiary", "World Map", "Annals", "Resume"]
+		ids = ["meditate", "breakthrough", "items", "cultivation", "journal", "fates", "roads", "works", "yue", "dao", "rites", "words", "hearths", "arms", "wardrobe", "stable", "host", "town", "songs", "feats", "body", "load", "land", "way", "law", "wild", "almanac", "bestiary", "map", "annals", "resume"]
 		enabled = [Game.level < Data.MAX_LEVEL, Game.can_breakthrough() and Game.cur_step().get("kind", "") == "breakthrough", true, true, true, true, true, true, Game.companion or Game.bond > 0,
-			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
+			Game.dao != "" or not Game.met.is_empty(), Game.prologue == "", not Game.pages.is_empty(), true, true, true, not Game.rides.is_empty(), true, true, true, true, true, true, true, true, true, true, true, not Game.bestiary.is_empty() or not Game.told.is_empty(), main.world.mini_tex != null, true, true]
 	elif mode == "bestiary":
 		labels = []
 		ids = []
@@ -72,6 +72,18 @@ func _build() -> void:
 		labels = ["Back"]
 		ids = ["back"]
 		enabled = [true]
+	elif mode == "words":
+		# memoir.gd: the pages written so far, each read again with Enter
+		labels = []
+		ids = []
+		enabled = []
+		for pid in Memoir.book(Game):
+			labels.append(str(Memoir.PAGES[pid].n))
+			ids.append("page:" + str(pid))
+			enabled.append(true)
+		labels.append("Back")
+		ids.append("back")
+		enabled.append(true)
 	elif mode == "rites":
 		# roots.gd, rites.gd: the root the stone found, and the rite of every Dao that is his
 		labels = []
@@ -243,7 +255,7 @@ func press(act: String) -> void:
 				var k := ls.find(map_layer)
 				map_layer = ls[(k + (1 if act == "right" else -1) + ls.size()) % ls.size()]
 		"cancel":
-			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites"]:
+			if mode in ["items", "map", "annals", "dao", "cultivation", "journal", "bestiary", "fates", "yue", "hearths", "works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words"]:
 				mode = "root"
 				cursor = 0
 				_build()
@@ -253,6 +265,11 @@ func press(act: String) -> void:
 			if not enabled[cursor]:
 				return
 			var id: String = ids[cursor]
+			if id.begins_with("page:"):
+				# (memoir.gd: a page read out again, in its writer's own words)
+				main.pop()
+				main.say(Memoir.lines(Game, id.trim_prefix("page:")))
+				return
 			if id.begins_with("rite:"):
 				# (rites.gd: the rite of a Dao that is his, performed where he stands)
 				main.pop()
@@ -327,7 +344,7 @@ func press(act: String) -> void:
 				"forbidden":
 					main.pop()
 					main.open_forbidden()
-				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites":
+				"works", "roads", "feats", "songs", "host", "body", "town", "load", "land", "way", "almanac", "law", "wild", "rites", "words":
 					mode = id
 					cursor = 0
 					msg = ""
@@ -585,6 +602,30 @@ func _draw_law() -> void:
 		UI.text(self, Vector2(r.position.x + 460, y), str(d.what), UI.fit(str(d.what), 12, 320.0), UI.C_TEXT if dp > 0 else UI.C_DIM, HORIZONTAL_ALIGNMENT_LEFT, 320.0)
 	y += 24.0
 	UI.wrapped(self, Vector2(r.position.x + 24, y), main.told("Every disciple is taught the three names on the first day, so that he knows what not to do. Anybody in sight when he sits to one has seen it; past %d steps in all, anybody of cultivation he speaks to can smell it on him." % Taboo.SENSE), 12, UI.C_DIM, r.size.x - 48)
+
+## In Their Own Words (memoir.gd): the pages the three people of the story have written of it, in the first
+## person; the one under the cursor is shown, and Enter has it read out.
+func _draw_words() -> void:
+	UI.text(self, Vector2(60, 70), "In Their Own Words", 22, UI.C_GOLD)
+	var rows := 26
+	var from := clampi(cursor - rows / 2, 0, maxi(0, labels.size() - rows))
+	UI.menu_list(self, Rect2(40, 80, 380, 600), labels.slice(from, from + rows), cursor - from, enabled.slice(from, from + rows), 16)
+	var r := Rect2(440, 80, 800, 600)
+	UI.panel(self, r)
+	var id: String = ids[cursor] if cursor < ids.size() else "back"
+	if not id.begins_with("page:"):
+		UI.wrapped(self, r.position + Vector2(24, 44), "%d of %d pages written. A page is written when the thing it tells of is over, by whoever has something to say about it; some are only written by a journey that went a certain way." % [Game.pages.size(), Memoir.ORDER.size()], 15, UI.C_DIM, r.size.x - 48)
+		return
+	var pid := id.trim_prefix("page:")
+	var pg: Dictionary = Memoir.PAGES[pid]
+	var cols := {"lin": Color("7ec8ff"), "yue": Color("ff9ac0"), "elder": UI.C_GOLD}
+	UI.text(self, r.position + Vector2(24, 44), str(pg.n), 24, UI.C_GOLD)
+	UI.text(self, r.position + Vector2(24, 70), "%s, day %d" % [main.told(Memoir.by(pid)), int(Game.pages.get(pid, 1))], 14, cols[str(pg.who)])
+	var y := r.position.y + 104.0
+	for ln in pg.lines:
+		UI.wrapped(self, Vector2(r.position.x + 24, y), str(ln), 16, UI.C_TEXT, r.size.x - 48)
+		y += 23.0 * UI.wrap_lines(str(ln), 16, r.size.x - 48).size() + 16.0
+	UI.text(self, Vector2(r.position.x + 24, r.position.y + r.size.y - 20), "Enter: have it read out", 13, UI.C_DIM)
 
 ## Root & Rites (roots.gd, rites.gd): what the testing stone found in him, and the seventeen Daos of the land
 ## with the rite of each that is his (Enter performs one where he stands).
@@ -1580,6 +1621,9 @@ func _draw() -> void:
 		return
 	if mode == "rites":
 		_draw_rites()
+		return
+	if mode == "words":
+		_draw_words()
 		return
 	if mode == "wild":
 		_draw_wild()

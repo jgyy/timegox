@@ -105,6 +105,8 @@ const ACTS := {
 	# the Unpicked Road release (trifles.gd): what was dropped in its roads and carried home; what was somebody's
 	# and went into his sleeve while somebody looked
 	"restored": {"m": "regard", "per": 2, "max": 3, "why": "lost things carried to whose they were", "one": "One lost thing carried to whose it was."},
+	# the Higher Sky release (betters.gd): he was beaten by somebody above him, and the country heard
+	"bested": {"m": "peace", "per": -2, "max": 3, "why": "times he was beaten in its country by somebody above him", "one": "Once he was beaten in its country by somebody above him."},
 	"pilfer": {"m": "regard", "per": -1, "max": 4, "why": "things pocketed in its streets, and seen", "one": "One thing pocketed in its streets, and seen."},
 }
 ## how many lords put down in a town's country make one point of peace, and how many points at most;
@@ -163,7 +165,7 @@ static func of_office(oid: String) -> String:
 static func lord_area(boss: String) -> String:
 	if _lord_area.is_empty():
 		for s in Data.STEPS:
-			if str(s.kind) in ["kill", "fall"] and s.has("boss") and s.has("area"):
+			if str(s.kind) in ["kill", "fall", "dare"] and s.has("boss") and s.has("area"):
 				_lord_area[str(s.boss)] = str(s.area)
 	return str(_lord_area.get(boss, ""))
 
@@ -405,7 +407,8 @@ static func mod(g, area: String, key: String) -> float:
 	if tid == "":
 		return 1.0
 	# (the Open Net release, crime.gd: a wanted man is served dearer where his bill hangs)
-	return float(STATES[state(g, tid)].get(key, 1.0)) * Crime.mod(g, tid, key)
+	# (the Higher Sky release, betters.gd: and somebody who was put down by a better in sight of a town)
+	return float(STATES[state(g, tid)].get(key, 1.0)) * Crime.mod(g, tid, key) * Betters.mod(g, key)
 
 ## A price asked at a counter in region `area`.
 static func price(g, area: String, base: int) -> int:
@@ -597,6 +600,10 @@ const FATES := [
 	{"npc": "zeng_shen", "when": ["the_stone", ["cut"]], "tag": "whose second column is blank", "line": "The registrar let me look. Five, and then a space. I asked how large the space is. He measured it for me with his thumb. It is the same size as everybody's, Senior. I had been sure the quick ones would have been left more room."},
 	{"npc": "zeng_shen", "when": ["the_stone", ["bury"]], "tag": "who was never told", "line": "I come down here to think, Senior, where I sat before. Nobody has said five to me since. I say it to myself sometimes, to see whether it is still true. I cannot tell. It was true of a morning, and I have had a great many mornings since that one."},
 	# Part XXXVII (the Five Hands release)
+	# Part XXXVIII (the Higher Sky release)
+	{"npc": "disciple_han", "when": ["the_higher_sky", ["gall"]], "tag": "who hangs the galls", "line": "Forty of them, and I am the one who strings them. They come from the butcher at Qingshi in a jar. He asked what a sect wants with forty galls. I said: humility. He charged me double."},
+	{"npc": "disciple_han", "when": ["the_higher_sky", ["ditch"]], "tag": "whom the Elder stood aside for", "line": "The Elder stood in the clay for me. With the slop pails. I have carried those pails eleven years and nobody on this mountain ever moved a foot. I went round the corner and sat down for a while."},
+	{"npc": "disciple_han", "when": ["the_higher_sky", ["road"]], "tag": "who was beaten at tea", "line": "I went down for my season. A woman on the terraces pours tea better than I do. I have poured the Elder's for eleven years. I watched her wrist for a month. I am not going to say I have it yet."},
 	{"npc": "cook_zhou", "when": ["the_round", ["break"]], "tag": "who lends the tubs", "line": "My wash-tubs are up on the mountain, three of them, for the burning. I said yes before I thought. Now I wash in a bucket. Still: it is the first time fire has been lit up there by somebody who meant it, so I shall not ask for them back."},
 	{"npc": "cook_zhou", "when": ["the_round", ["watch"]], "tag": "whose kitchen they come from", "line": "They went down to teach the villages what puts out a fire, and half of them came to me first to find out. At the bottom, I said. On the first night. And a lid, if it is fat. Forty techniques in that court and nobody had told them about a lid."},
 	{"npc": "cook_zhou", "when": ["the_round", ["leave"]], "tag": "who has seen it green before", "line": "I was a kitchen-girl the last time that slope went. We ate mushrooms off it for three years after, as big as your hand. I have had my basket ready since the rain. People think a fire is the end of a thing. It is how that hill has supper."},

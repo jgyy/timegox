@@ -44,6 +44,8 @@ var suppress_note := ""
 ## the Lost Horse release (dooms.gd): a battle that cannot be won: the round its foe crests on, what
 ## the party did in it (blows and mendings), and whether the harm has been seen to close yet
 var doomed := false
+## the Higher Sky release (betters.gd): the better this bout is with ("" for any other battle)
+var better := ""
 var crest := 99
 var acts := {"blows": 0, "mends": 0}
 var closed_said := false
@@ -346,6 +348,8 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		f["doom"] = Dooms.is_doom(str(f.id))
 		if f.doom:
 			f.hp = float(f.maxhp)
+	# the Higher Sky release (betters.gd): somebody several realms above him: losing is not the infirmary
+	better = str(c.get("better", ""))
 	wits = Tactics.memory()
 	first_blow = true
 	vajra_used = false
@@ -373,6 +377,13 @@ func start(foe_list: Array, c: Dictionary) -> void:
 	log_lines.clear()
 	level_before = Game.level
 	Game.battles += 1
+	# (the Higher Sky release: what the phases left on the last battle's ground is gone with that ground: a scorch
+	# from an earlier fight used to lie under the new foe, and the first fire technique of the new one met it)
+	for gmk in ground_marks:
+		var gmn = ground_marks[gmk][1]
+		if gmn != null and is_instance_valid(gmn):
+			(gmn as Node).queue_free()
+	ground_marks.clear()
 	if not headless():
 		# the scars of the last battle's arena are swept away
 		if scar_root != null and is_instance_valid(scar_root):
@@ -422,13 +433,15 @@ func start(foe_list: Array, c: Dictionary) -> void:
 		if dr >= 1:
 			suppress_note = "Realm suppression: your %s weighs on them (x%.1f)" % [Data.REALMS[Game.realm()], Data.suppression(Game.level, top)]
 		elif dr <= -1:
-			suppress_note = "Realm suppression: their %s weighs on you (x%.2f)" % [Data.REALMS[Data.realm_of(top)], Data.suppression(Game.level, top)]
+			suppress_note = "Realm suppression: their %s weighs on you (x%.2f)" % [Data.realm_name(Data.realm_of(top)), Data.suppression(Game.level, top)]
 		if suppress_note != "":
 			say(suppress_note)
 	if str(c.get("path_n", "")) != "":
 		say("%s: %s" % [str(c.get("path_kind", "")), str(c.path_n)])
 	if doomed:
 		say("This is not a thing that is beaten. (Give way, or stand as long as can be stood.)")
+	if better != "":
+		say("This is somebody above you. (It can be won. Losing will cost something, and so will giving way.)")
 
 func say(s: String) -> void:
 	log_lines.append(s)
@@ -472,6 +485,8 @@ func _next_turn() -> void:
 		if alive(party).is_empty():
 			if doomed:
 				_fall(false)
+			elif better != "":
+				_bested(false)
 			else:
 				_lose()
 			return
@@ -931,6 +946,20 @@ func _fall(gave: bool) -> void:
 			if p.has("model") and not gave:
 				Models.act(p.model, "die", t)
 
+## The Higher Sky release (betters.gd): the bout with somebody above him is lost (`gave`: he gave way,
+## standing).  Nobody is carried home; what it costs is main's to tell.
+func _bested(gave: bool) -> void:
+	outcome = "bested"
+	state = "result"
+	ctx["how"] = "gave" if gave else "lost"
+	ctx["rounds"] = round_no
+	result_lines = ["GIVEN WAY" if gave else "BESTED", "%s was %d realms above you." % [str(foes[0].name), maxi(1, Data.realm_of(int(foes[0].lv)) - Game.realm())], "It is not the end. It is not nothing, either."]
+	_writeback()
+	if not headless():
+		for p in party:
+			if p.has("model") and not gave and not p.dead:
+				Models.act(p.model, "die", t)
+
 func _writeback() -> void:
 	for p in party:
 		Game.hp[p.idx] = maxf(1.0, p.hp)
@@ -950,7 +979,7 @@ func _open_main() -> void:
 	ids = ["attack", "skills", "items", "flee"]
 	enabled = [true, true, true, not ctx.get("boss", false)]
 	# (dooms.gd: what cannot be beaten can be given way to)
-	if doomed:
+	if doomed or better != "":
 		labels.append("Give way")
 		ids.append("yield")
 		enabled.append(true)
@@ -1040,7 +1069,10 @@ func _select() -> void:
 					_open_items()
 				"yield":
 					say("%s puts up the sword, and stands aside." % cur.name if cur.idx == 0 else "%s lowers both hands, and stands aside." % cur.name)
-					_fall(true)
+					if better != "":
+						_bested(true)
+					else:
+						_fall(true)
 				"flee":
 					say("%s tries to flee..." % cur.name)
 					if randf() < 0.6:

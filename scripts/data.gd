@@ -2,18 +2,26 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 126
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand"]
+const MAX_LEVEL := 129
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
 }
 
 static func level_name(l: int) -> String:
-	return "%s %s" % [STAGES[l % 3], REALMS[int(l / 3)]]
+	return "%s %s" % [STAGES[l % 3], realm_name(int(l / 3))]
+
+## The name of realm `r`.  The realms he can reach have names; somebody above the last of them (betters.gd, the
+## Higher Sky release) stands in a sky nobody on the mountain has a word for, and is told by how far up it is.
+const SKIES := ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
+static func realm_name(r: int) -> String:
+	if r < REALMS.size():
+		return REALMS[maxi(r, 0)]
+	return "%s Sky Above" % SKIES[mini(r - REALMS.size(), SKIES.size() - 1)]
 
 static func realm_cap(l: int) -> bool:
 	return l % 3 == 2 and l < MAX_LEVEL
@@ -100,6 +108,7 @@ const REALM_INFO := [
 	{"life": 0, "title": "Not Yet Cut", "note": "A boy made verses at five and was led from door to door until there were none left in him. A carpenter passed an oak without looking, and it came to him in a dream. A man lost both feet for calling a stone a jade, and was right. A stone at a gate said five. You have been measured, and you are still here."},
 	{"life": 0, "title": "Light Hand", "note": "A pond was drained for one supper, a field pulled taller in an afternoon, a hill hollowed after one vein. He can part a wood with a stroke now, and has learned the harder thing, which is one stalk. Govern a great country as you would cook a small fish: this is the realm of having turned it once, and stopped."},
 	{"life": 0, "title": "Five in One Hand", "note": "A man carried firewood to put out a fire. A minister sent his flood next door and called it skill. A cook fed a stove with the one log in the province that could sing. Each had a phase in his hand and did not ask what it meets. Wood feeds fire, fire leaves earth, water puts fire out, and a cup does not put out a cartload. This is the realm of knowing what the thing in the hand does to the thing in front of it."},
+	{"life": 0, "title": "Who Lies Below", "note": "A king lost his country and slept on brushwood with a gall hung over the bed. A strategist lost his knees and won from a cart. A minister turned his carriage into a ditch for a man he could have broken with a word. The rivers and the seas are kings of the hundred valleys because they lie below them. This is the realm of having met somebody above you, and still being on the road."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1056,6 +1065,20 @@ const ENEMIES := {
 	"the_fed_fire": {"n": "The Fire Fed to Be Rid Of", "elem": "fire", "weak": "water", "col": Color("e85a20"), "shape": "wraith", "boss": true, "bright": true, "pal": {"sec": Color("6a1a08"), "acc": Color("ffe0a0")}},
 	"the_next_door": {"n": "The Dyke That Sent It Next Door", "elem": "earth", "weak": "wood", "col": Color("7a6a4a"), "shape": "golem", "boss": true, "pal": {"sec": Color("42382a"), "acc": Color("8ab0b8")}},
 	"the_kindling": {"n": "The Song Burned for Supper", "elem": "thunder", "weak": "earth", "col": Color("c8a868"), "shape": "warden", "boss": true, "pal": {"sec": Color("3a2a1a"), "acc": Color("f8e8b0")}},
+	# ---- Part XXXVIII: A Sky Above the Sky (the Higher Sky release): what is left in the road by losing, and the three
+	# who stand above him (betters.gd: `"better": true`, met at his own level and several realms)
+	"stable_fork": {"n": "Fork Handed to a King", "elem": "earth", "weak": "wood", "col": Color("8a7450"), "shape": "mantis", "pal": {"sec": Color("4a3c28"), "acc": Color("c8b890")}},
+	"tribute_chest": {"n": "Chest under Another's Seal", "elem": "earth", "weak": "wood", "col": Color("6a4a3a"), "shape": "golem", "pal": {"sec": Color("3a2820"), "acc": Color("c83a2a")}},
+	"hung_gall": {"n": "Gall Hung over a Bed", "elem": "water", "weak": "thunder", "col": Color("5a6a3a"), "shape": "wisp", "pal": {"sec": Color("2e3a1e"), "acc": Color("b8c870")}},
+	"counted_fire": {"n": "Cook-Fire a Scout Counted", "elem": "fire", "weak": "water", "col": Color("e8842a"), "shape": "wisp", "bright": true, "pal": {"sec": Color("8a3a10"), "acc": Color("ffe0a0")}},
+	"forced_march": {"n": "March That Left Its Baggage", "elem": "thunder", "weak": "earth", "col": Color("8a8a9a"), "shape": "serpent", "pal": {"sec": Color("4a4a58"), "acc": Color("d8d8e8")}},
+	"barked_tree": {"n": "Tree with the Bark Cut Away", "elem": "wood", "weak": "fire", "col": Color("7a5a3a"), "shape": "plant", "pal": {"sec": Color("3a2a1a"), "acc": Color("f0e8d0")}},
+	"barred_lane": {"n": "Lane a General Stands In", "elem": "earth", "weak": "wood", "col": Color("8a8274"), "shape": "golem", "pal": {"sec": Color("4a443a"), "acc": Color("a83a2a")}},
+	"old_scar": {"n": "Wound Told to Every Carter", "elem": "fire", "weak": "water", "col": Color("a85a4a"), "shape": "wisp", "pal": {"sec": Color("5a2a22"), "acc": Color("f0c8b8")}},
+	"turned_cart": {"n": "Carriage Turned into the Ditch", "elem": "wood", "weak": "fire", "col": Color("6a5a3a"), "shape": "mantis", "pal": {"sec": Color("3a3020"), "acc": Color("c8a040")}},
+	"fuchai": {"n": "Fuchai, King of Wu", "elem": "water", "weak": "thunder", "col": Color("2a5a7a"), "shape": "person:fuchai", "boss": true, "better": true},
+	"pang_juan": {"n": "Pang Juan, General of Wei", "elem": "thunder", "weak": "earth", "col": Color("6a3a3a"), "shape": "person:pang_juan", "boss": true, "better": true},
+	"lian_po": {"n": "Lian Po, General of Zhao", "elem": "earth", "weak": "wood", "col": Color("7a6a4a"), "shape": "person:lian_po", "boss": true, "better": true},
 	"the_knack": {"n": "The Gift That Never Practised", "elem": "thunder", "weak": "earth", "col": Color("d8b850"), "shape": "warden", "boss": true, "pal": {"sec": Color("8a6a20"), "acc": Color("f8f0e0")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
@@ -1537,16 +1560,26 @@ const AREAS := {
 			{"to": "palace", "pos": Vector2i(1, 28), "dest": Vector2i(86, 28), "open": ""},
 			{"to": "volcano", "pos": Vector2i(90, 28), "dest": Vector2i(4, 28), "open": "s_dr_king"},
 		],
-		"npcs": [{"id": "dragon_envoy", "n": "Envoy Ao Lan", "pos": Vector2i(10, 26), "col": Color("6ae0e8"), "vis": ["s_dr_intro", ""]}],
+		"npcs": [{"id": "dragon_envoy", "n": "Envoy Ao Lan", "pos": Vector2i(10, 26), "col": Color("6ae0e8"), "vis": ["s_dr_intro", ""]},
+			# Part XXXVIII (the Higher Sky release)
+			{"id": "goujian", "n": "Goujian of Yue", "pos": Vector2i.ZERO, "col": Color("4a6a5a"), "asset": "goujian", "vis": ["s_p38_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
+		],
 		"bosses": [
 			{"id": "crab_general", "pos": Vector2i(34, 14), "lv": 12, "req": 12},
 			{"id": "tide_hydra", "pos": Vector2i(46, 28), "lv": 12, "req": 12},
 			{"id": "siren_queen", "pos": Vector2i(56, 42), "lv": 13, "req": 13},
 			{"id": "dragon_king", "pos": Vector2i(80, 26), "lv": 13, "req": 13},
+			# Part XXXVIII (the Higher Sky release): somebody above him (betters.gd): met at his own level and the gap, whatever is written here
+			{"id": "fuchai", "pos": Vector2i.ZERO, "lv": 128, "req": 126, "vis": ["s_p38_home", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickups": [
 			{"id": "pearl1", "item": "pearl", "pos": Vector2i(22, 44)}, {"id": "pearl2", "item": "pearl", "pos": Vector2i(40, 10)},
 			{"id": "pearl3", "item": "pearl", "pos": Vector2i(60, 14)}, {"id": "pearl4", "item": "pearl", "pos": Vector2i(72, 46)},
+			# Part XXXVIII (the Higher Sky release)
+			{"id": "p38_gall1", "item": "bed_gall", "pos": Vector2i.ZERO, "vis": ["s_p38_grooms", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p38_gall2", "item": "bed_gall", "pos": Vector2i.ZERO, "vis": ["s_p38_grooms", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p38_gall3", "item": "bed_gall", "pos": Vector2i.ZERO, "vis": ["s_p38_grooms", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p38_gall4", "item": "bed_gall", "pos": Vector2i.ZERO, "vis": ["s_p38_grooms", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_dr_pearl",
 	},
@@ -2109,6 +2142,8 @@ const AREAS := {
 			{"id": "budai", "n": "Budai, the Cloth-Sack Monk", "pos": Vector2i.ZERO, "col": Color("8a8478"), "vis": ["s_p27_seed", ""], "late": true, "peak": 0, "stand": "foot"},
 			# Part XXXV (the Uncarved Block release)
 			{"id": "fang_zhongyong", "n": "Fang Zhongyong", "pos": Vector2i.ZERO, "col": Color("8a7a5a"), "asset": "fang_zhongyong", "vis": ["s_p35_home", ""], "late": true, "after": true, "peak": 1, "stand": "foot"},
+			# Part XXXVIII (the Higher Sky release)
+			{"id": "sun_bin", "n": "Sun Bin", "pos": Vector2i.ZERO, "col": Color("5a5a6a"), "asset": "sun_bin", "vis": ["s_p38_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
 		],
 		"bosses": [
 			{"id": "nine_tail_fox", "pos": Vector2i(30, 40), "lv": 30, "req": 30},
@@ -2123,6 +2158,8 @@ const AREAS := {
 			{"id": "li_jing", "pos": Vector2i.ZERO, "lv": 96, "req": 95, "vis": ["s_p27_tiles", ""], "late": true, "peak": 0, "stand": "top"},
 			# Part XXXV (the Uncarved Block release)
 			{"id": "the_gift", "pos": Vector2i.ZERO, "lv": 118, "req": 117, "vis": ["s_p35_show", ""], "late": true, "after": true, "peak": 1, "stand": "top"},
+			# Part XXXVIII (the Higher Sky release): somebody above him (betters.gd): met at his own level and the gap, whatever is written here
+			{"id": "pang_juan", "pos": Vector2i.ZERO, "lv": 128, "req": 126, "vis": ["s_p38_home", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		# Part XIII: a war-band of the Eight Gates marches here once the formation wakes
 		"warband": {"pool": [["fetter_sapling", 51, 53], ["jiuli_warrior", 51, 53], ["banner_ember", 51, 53], ["bronze_brow", 51, 53], ["zhuolu_fog", 51, 53]], "n": 8, "vis": "s_p13_home"},
@@ -2135,6 +2172,11 @@ const AREAS := {
 			{"id": "p35_verse2", "item": "coin_verse", "pos": Vector2i.ZERO, "vis": ["s_p35_verses", ""], "late": true, "after": true, "peak": 1, "stand": "flank"},
 			{"id": "p35_verse3", "item": "coin_verse", "pos": Vector2i.ZERO, "vis": ["s_p35_verses", ""], "late": true, "after": true, "peak": 2, "stand": "foot"},
 			{"id": "p35_verse4", "item": "coin_verse", "pos": Vector2i.ZERO, "vis": ["s_p35_verses", ""], "late": true, "after": true, "peak": 2, "stand": "flank"},
+			# Part XXXVIII (the Higher Sky release)
+			{"id": "p38_slip1", "item": "war_slip", "pos": Vector2i.ZERO, "vis": ["s_p38_fires", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p38_slip2", "item": "war_slip", "pos": Vector2i.ZERO, "vis": ["s_p38_fires", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p38_slip3", "item": "war_slip", "pos": Vector2i.ZERO, "vis": ["s_p38_fires", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p38_slip4", "item": "war_slip", "pos": Vector2i.ZERO, "vis": ["s_p38_fires", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_mp_collect",
 	},
@@ -2394,7 +2436,10 @@ const AREAS := {
 		],
 		"npcs": [{"id": "tea_master", "n": "Tea Master Lu Yu", "pos": Vector2i(9, 25), "col": Color("6ab07a"), "vis": ["s_te_intro", ""]},
 			# Part XXV: the woman who weeps at the foot of the height, and will not leave it
-			{"id": "tai_widow", "n": "The Widow of Mount Tai", "pos": Vector2i.ZERO, "col": Color("e4dfd0"), "vis": ["s_p25_guests", ""], "late": true, "peak": 0, "stand": "foot"}],
+			{"id": "tai_widow", "n": "The Widow of Mount Tai", "pos": Vector2i.ZERO, "col": Color("e4dfd0"), "vis": ["s_p25_guests", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXVIII (the Higher Sky release)
+			{"id": "lin_xiangru", "n": "Lin Xiangru", "pos": Vector2i.ZERO, "col": Color("7a8a6a"), "asset": "lin_xiangru", "vis": ["s_p38_home", ""], "late": true, "after": true, "cave": -1, "stand": "near"},
+		],
 		"bosses": [
 			{"id": "wind_kite", "pos": Vector2i(30, 40), "lv": 33, "req": 33},
 			{"id": "terrace_dragon", "pos": Vector2i(46, 16), "lv": 34, "req": 34},
@@ -2404,6 +2449,8 @@ const AREAS := {
 			{"id": "lean_king", "pos": Vector2i(59, 30), "lv": 61, "req": 60, "vis": ["s_p16_lean", ""]},
 			# Part XXV: the government fiercer than a tiger, on the height above the tea
 			{"id": "ke_zheng", "pos": Vector2i.ZERO, "lv": 89, "req": 88, "vis": ["s_p25_bills", ""], "late": true, "peak": 0, "stand": "top"},
+			# Part XXXVIII (the Higher Sky release): somebody above him (betters.gd): met at his own level and the gap, whatever is written here
+			{"id": "lian_po", "pos": Vector2i.ZERO, "lv": 128, "req": 126, "vis": ["s_p38_home", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickups": [{"id": "teabud1", "item": "tea_bud", "pos": Vector2i(22, 12)}, {"id": "teabud2", "item": "tea_bud", "pos": Vector2i(40, 46)}, {"id": "teabud3", "item": "tea_bud", "pos": Vector2i(64, 30)}, {"id": "teabud4", "item": "tea_bud", "pos": Vector2i(76, 10)},
 			# Part XVII: Mingqian tea, the first buds of the year, picked before Qingming
@@ -2413,6 +2460,11 @@ const AREAS := {
 			# Part XXV: the assessor's bills, nailed to the doors of the terraces
 			{"id": "p25_bill1", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "foot"}, {"id": "p25_bill2", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "flank"},
 			{"id": "p25_bill3", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "flank"}, {"id": "p25_bill4", "item": "tiger_bill", "pos": Vector2i.ZERO, "vis": ["s_p25_assess", ""], "late": true, "peak": 0, "stand": "foot"},
+			# Part XXXVIII (the Higher Sky release)
+			{"id": "p38_pin1", "item": "linchpin", "pos": Vector2i.ZERO, "vis": ["s_p38_lanes", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p38_pin2", "item": "linchpin", "pos": Vector2i.ZERO, "vis": ["s_p38_lanes", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p38_pin3", "item": "linchpin", "pos": Vector2i.ZERO, "vis": ["s_p38_lanes", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p38_pin4", "item": "linchpin", "pos": Vector2i.ZERO, "vis": ["s_p38_lanes", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
 		],
 		"pickup_vis": "s_te_collect",
 		"buildings": [
@@ -5224,6 +5276,38 @@ const STEPS := [
 	{"id": "s_p37_council", "kind": "talk", "npc": "elder", "area": "sect", "t": "The east slope is black to the wall, it is a dry year, and six villages lie under the mountain. The Elder has called the sect to the hall. Go to Elder Qing Xuan", "stones": 91800},
 	{"id": "s_p37_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "Under the burnt pines the ground is green already, a finger high. The Elder is kneeling in it with his sleeves tied back. Tell Elder Qing Xuan what the round is for", "stones": 92200},
 	{"id": "s_break42", "kind": "breakthrough", "to": 126, "t": "Five things, and one hand that knows what each of them meets: Five in One Hand"},
+	# ---- Part XXXVIII: A Sky Above the Sky (the Higher Sky release): three people who are simply above him, what losing
+	# to each costs, and what is done afterwards.  A step of kind "dare" is a bout with a better (betters.gd), done
+	# however it goes; a step with "if" is walked only by the journey on that branch ("down": he lost; "up": he did not).
+	{"id": "s_p38_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "Three have come down from somewhere above the realms, and the Elder has not slept. Nothing is on fire. That is what is worrying him. Speak to Elder Qing Xuan", "stones": 92400},
+	{"id": "s_p38_goujian", "kind": "talk", "npc": "goujian", "area": "dragon", "cave": -1, "t": "A king of Yue lost his country to Wu and held his conqueror's stirrup for three years. Find Goujian in the cave under the Sunken Dragon Palace", "stones": 92600},
+	{"id": "s_p38_grooms", "kind": "hunt", "area": "dragon", "cave": -1, "n": 24, "of": ["stable_fork", "tribute_chest", "hung_gall"], "t": "\"Everything I was made to carry is still down here, carrying itself.\" Clear 24 forks handed to a king, chests under another's seal and galls hung over a bed", "stones": 92800},
+	{"id": "s_p38_galls", "kind": "collect", "item": "bed_gall", "n": 4, "area": "dragon", "cave": -1, "t": "He hung a gall over his bed and tasted it every morning, so as not to forget. Find the 4 galls of the bed-head in the cave under the Dragon Palace"},
+	{"id": "s_p38_fuchai", "kind": "dare", "boss": "fuchai", "area": "dragon", "cave": -1, "t": "He is four realms above anything Lin Feng has been. He can be watched first (Enter). Then stand in front of Fuchai, King of Wu, at the back of the cave. It may well be lost", "stones": 93000},
+	{"id": "s_p38_brush", "kind": "toil", "work": "fell", "n": 4, "area": "bamboo", "if": ["fuchai", "down"], "t": "Three days a groom, and half of what he carried gone. \"I slept on brushwood, so as not to sleep well.\" Cut 4 loads of it (C at a forest's edge)"},
+	{"id": "s_p38_stable", "kind": "hunt", "area": "dragon", "cave": -1, "n": 16, "of": ["stable_fork", "tribute_chest"], "if": ["fuchai", "down"], "t": "The yard he swept for Wu is still down there, and nobody has told the forks. Clear 16 more of the forks and the chests", "stones": 93200},
+	{"id": "s_p38_gall", "kind": "talk", "npc": "goujian", "area": "dragon", "cave": -1, "if": ["fuchai", "down"], "t": "There is brushwood for a bed and four galls in his sleeve. Go back to Goujian, who knows what is done with them", "stones": 93400},
+	{"id": "s_p38_spared", "kind": "talk", "npc": "goujian", "area": "dragon", "cave": -1, "if": ["fuchai", "up"], "t": "He beat the King of Wu, in the field, the first time. Somebody down here took twenty years over it. Go back to Goujian", "stones": 93400},
+	{"id": "s_p38_sunbin", "kind": "talk", "npc": "sun_bin", "area": "maple", "cave": -1, "t": "Two men studied war under one master, and the lesser of them had the better's kneecaps cut out. Find Sun Bin, in his cart, in the cave under the Maple Gorge", "stones": 93600},
+	{"id": "s_p38_fires", "kind": "hunt", "area": "maple", "cave": -1, "n": 24, "of": ["counted_fire", "forced_march", "barked_tree"], "t": "\"He counts. So I gave him something to count.\" Clear 24 cook-fires a scout counted, marches that left their baggage and trees with the bark cut away", "stones": 93800},
+	{"id": "s_p38_slips", "kind": "collect", "item": "war_slip", "n": 4, "area": "maple", "cave": -1, "t": "They kept him alive to write out the Art of War, and he wrote it slowly. Find the 4 bamboo slips he hid, in the cave under the Maple Gorge"},
+	{"id": "s_p38_pang", "kind": "dare", "boss": "pang_juan", "area": "maple", "cave": -1, "t": "Five realms above, and quicker, and he has read everything. He can be watched first (Enter). Then stand in front of Pang Juan, General of Wei. It may well be lost", "stones": 94000},
+	{"id": "s_p38_stoves", "kind": "cook", "n": 2, "area": "maple", "if": ["pang_juan", "down"], "t": "The knee will carry him, and tell him the weather. \"A hundred thousand fires the first night. Fifty the next. Let him count.\" Cook 2 meals in open country (B)"},
+	{"id": "s_p38_tree", "kind": "sunder", "n": 1, "max": 1, "area": "maple", "if": ["pang_juan", "down"], "t": "\"Cut the bark from one tree. One tree.\" Hold the hand back to a single cut (H) and strike (F) at a wood's edge in the Maple Gorge: one blow, one thing"},
+	{"id": "s_p38_march", "kind": "hunt", "area": "maple", "cave": -1, "n": 16, "of": ["counted_fire", "forced_march"], "if": ["pang_juan", "down"], "t": "He has left his baggage and come on with the light horse, as he was meant to. Clear 16 more of the counted fires and the forced marches", "stones": 94200},
+	{"id": "s_p38_maling", "kind": "kill", "boss": "pang_juan", "area": "maple", "cave": -1, "if": ["pang_juan", "down"], "t": "It is dusk in the defile, and there is something written on a tree that he will not be able to leave unread: meet Pang Juan again, under it", "stones": 94400},
+	{"id": "s_p38_cart", "kind": "talk", "npc": "sun_bin", "area": "maple", "cave": -1, "if": ["pang_juan", "up"], "t": "He beat Pang Juan standing up, on two knees. Somebody down here had to do it from a cart. Go back to Sun Bin", "stones": 94400},
+	{"id": "s_p38_xiangru", "kind": "talk", "npc": "lin_xiangru", "area": "terraces", "cave": -1, "t": "A minister who faced down the King of Qin turned his carriage into a ditch for an angry old general. Find Lin Xiangru in the cave under the Cloud-Tea Terraces", "stones": 94600},
+	{"id": "s_p38_lanes", "kind": "hunt", "area": "terraces", "cave": -1, "n": 24, "of": ["barred_lane", "old_scar", "turned_cart"], "t": "\"He says a tongue never took a city. He is nearly right.\" Clear 24 lanes a general stands in, wounds told to every carter and carriages turned into the ditch", "stones": 94800},
+	{"id": "s_p38_pins", "kind": "collect", "item": "linchpin", "n": 4, "area": "terraces", "cave": -1, "t": "Every time he turned aside, the carriage lost a pin in the ditch, and his own men were ashamed of him. Find the 4 linchpins in the cave under the terraces"},
+	{"id": "s_p38_lian", "kind": "dare", "boss": "lian_po", "area": "terraces", "cave": -1, "t": "An old general with forty wounds, all in front, stands in the only way through. He can be watched (Enter). Then stand in front of Lian Po: to fight, or to give way", "stones": 95000},
+	{"id": "s_p38_wolves", "kind": "hunt", "area": "terraces", "cave": -1, "n": 16, "of": ["barred_lane", "old_scar"], "if": ["lian_po", "down"], "t": "Two tigers fought in a lane, and everything that had been afraid of either came down that night. Clear 16 more of the barred lanes and the old scars", "stones": 95200},
+	{"id": "s_p38_elders", "kind": "folk", "role": "elder", "town": "qingshi", "n": 2, "area": "village", "if": ["lian_po", "down"], "t": "\"Ask somebody who has lived sixty years in one street with people they could not stand.\" Ask 2 of the old people of Qingshi who they have given way to"},
+	{"id": "s_p38_thorns", "kind": "talk", "npc": "lin_xiangru", "area": "terraces", "cave": -1, "if": ["lian_po", "down"], "t": "He picked a fight with a proud old man in front of a town, and lost it. There is a thing that is done about that. Go back to Lin Xiangru", "stones": 95400},
+	{"id": "s_p38_rods", "kind": "talk", "npc": "lin_xiangru", "area": "terraces", "cave": -1, "if": ["lian_po", "up"], "t": "Somebody is kneeling at the mouth of the cave, stripped to the waist, with a bundle of thorn rods on his back. Go back to Lin Xiangru", "stones": 95400},
+	{"id": "s_p38_low", "kind": "talk", "npc": "elder", "area": "sect", "t": "The outer court has heard that Lin Feng can be beaten, and forty disciples are standing in the yard not practising. The Elder has a question. Go to Elder Qing Xuan", "stones": 95600},
+	{"id": "s_p38_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The lotus pond is the lowest thing in the sect, and every gutter on the mountain runs to it. The Elder is sitting beside it. Tell Elder Qing Xuan why the sea is king", "stones": 96000},
+	{"id": "s_break43", "kind": "breakthrough", "to": 129, "t": "Below a hundred valleys, and king of them for that: Low as the Sea"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5460,6 +5544,10 @@ const ITEMS := {
 	"wet_cinder": {"n": "Cinder a Cup Put Out", "desc": "A cinder the size of a thumb, black, with one side washed grey where a cup of water once landed on it. It is one of four things in that cave that were ever put out. Each took one cup, because somebody threw it on the first evening"},
 	"boundary_stake": {"n": "Stake of the Old Boundary", "desc": "A stake of water-black oak with four families' marks cut in it, one on each face. It stood where four fields met, and every spring everybody's water went past it together on its way to the sea. Nobody pulled it up. It was built over"},
 	"scorched_peg": {"n": "Piece of Scorched Paulownia", "desc": "An offcut of paulownia as long as a hand, burnt black at one end, and so light that it seems to weigh less than the air round it. Knock it with a knuckle and it answers, for rather longer than a piece of wood has any business to"},
+	# ---- Part XXXVIII (the Higher Sky release): what is found in the three caves
+	"bed_gall": {"n": "Gall of the Bed-Head", "desc": "A dried gall-bladder on a loop of hemp, black-green and hard as a nut. A king hung it where his face would brush it when he sat up, and touched his tongue to it every morning for twenty years. It still works. One does not forget it"},
+	"war_slip": {"n": "Slip of the Art of War", "desc": "A slip of bamboo a hand long with eleven characters down it in a neat, slow hand. A man kept alive only to write out what he knew wrote it as slowly as he dared, and hid every tenth slip. This one is about appearing weak when you are strong"},
+	"linchpin": {"n": "Linchpin Lost in a Ditch", "desc": "An iron linchpin with a ring through its head, off the wheel of a minister's carriage. It was shaken loose the day the carriage was turned off the road to let a general by, and nobody in the retinue would get down into the ditch to look for it"},
 	"tao_brick": {"n": "Brick of Tao Kan's Study", "desc": "A grey brick with one corner worn round by a hand. A governor of the south carried a hundred of these out of his study every morning and in again every evening for years, so that ease should not unfit him for work. Twelve jin"},
 	"red_gauze": {"n": "Half a Bolt of Red Gauze", "desc": "Half a bolt of thin red silk and ten feet of damask, of the kind the palace buyers tie to an ox's horn as the price of whatever is in the cart. It has never been worth a thousand jin of anything"},
 	"scroll_case": {"n": "Case of Scrolls", "desc": "A lacquered case of the ten thousand scrolls a prefect of Jiangzhou read, each with its ribbon and its ivory tag. Three jin, and it rattles as if most of what was in it had been left behind in his head"},
@@ -6893,7 +6981,7 @@ const DIALOGUE := {
 	"s_gd_intro": [
 		["Peach Keeper Tao Yao", "Visitors in my garden, and one of them still mortal-shaped at heart. How delightful."],
 		["Peach Keeper Tao Yao", "The Court brought the Ledger here because the peaches keep souls fresh. Nineteen souls, kept fresh for a very long time. They sleep under the oldest tree."],
-		["Peach Keeper Tao Yao", "Pick four Immortal Peaches. Give one to each soul that wakes, and they will remember who they were, instead of what they owe."],
+		["Peach Keeper Tao Yao", "Pick four Immortal Peaches. Give a piece to each soul that wakes, and they will remember who they were, instead of what they owe."],
 		["Lin Feng", "And the Ledger itself?"],
 		["Peach Keeper Tao Yao", "It is at the heart of the garden, reading itself aloud. It has been very lonely."],
 	],
@@ -6924,7 +7012,7 @@ const DIALOGUE := {
 		["Yue Ling", "Lin Feng, they are bound to the pages. Free them from the words, not from themselves!"],
 	],
 	"post:the_nineteen": [
-		["Narrator", "One by one the pages tear. Yue Ling sets an Immortal Peach in each pair of empty hands, and one by one the nineteen remember their own names."],
+		["Narrator", "One by one the pages tear. Yue Ling breaks the four Immortal Peaches and sets a piece in each pair of empty hands, and one by one the nineteen remember their own names."],
 		["Shui Ying, the Drowned Bearer", "We do not owe anything, do we. We never did."],
 		["Lin Feng", "No. You never did. Rest. I will close the book."],
 	],
@@ -8278,7 +8366,7 @@ const DIALOGUE := {
 	],
 	"abode:cave_soul": [
 		["Narrator", "Under the Founder's words somebody has scratched, small, with a knife: 'The seventh bearer was here. Nascent Soul at nineteen! Next door next year.' There is no other mark, and the next door was never opened."],
-		["Yue Ling", "Xu Mo found him first. ...Then we open the next one for him."],
+		["Yue Ling", "Xu Mo found her first. ...Then we open the next one for her."],
 	],
 	"abode:cave_deity": [
 		["Narrator", "In the dust of this cave, two sets of footprints, one large and one small, and on the wall in charcoal: 'The twelfth bearer and her brother. We will come back for the next door together.' Nobody did."],
@@ -8728,7 +8816,7 @@ const DIALOGUE := {
 		["Judge Cui Jue", "Your five are settled, one way or another. Good. Now look into the Mirror again, and look past them."],
 		["Narrator", "In the Karma Mirror the Wheel turns and the soot round its rim is thinner. But six threads of it never come to the Wheel at all: they run back up the funeral road and away across the world, and every one ends somewhere Lin Feng remembers."],
 		["Narrator", "The bamboo below the sect. The red water of the marsh. The graves of the sword saints. A dry riverbed under Tushan. The aeries of Juntian. A wreck on the slope of the Returning Ruins."],
-		["Judge Cui Jue", "Most of what the dead are owed comes down here, and the Wheel grinds it small. These six would not come. Their owners have gone over the bridge, but what they were owed is still owed, and it has taken root where they fell. Nie drinks from all six."],
+		["Judge Cui Jue", "Most of what the dead are owed comes down here, and the Wheel grinds it small. These six would not come. Their owners have gone on, over the bridge or back to their own hillsides, but what they were owed is still owed, and it has taken root where they fell. Nie drinks from all six."],
 		["Lin Feng", "Iron Fang. The Marsh Hag. The Headless Saint. Fangfeng. Kui. The Admiral. I put every one of them down.", "think"],
 		["Judge Cui Jue", "And never asked them anything. Go to each where it fell. A grudge does not listen until it has spent itself, so it will fight you; when it is spent, ask it what it was owed. Pay it if you can. Whatever you leave unpaid, Nie will be holding when you come back.", "point"],
 		["Yue Ling", "Six fights with six people we already beat once."],
@@ -8853,7 +8941,7 @@ const DIALOGUE := {
 		["Echo of Founder Qing Lian", "What you remembered of each of them, I pressed where the two of you had been happiest: a flute stone, a jetty of lanterns, a kite post on the tea hills, a green under lanterns. Seven pressings are still whole. The rest have been eaten."],
 		["Lin Feng", "By the moths.", "think"],
 		["Echo of Founder Qing Lian", "By what woke them. When the Seal became a door, the part of it that was a lock was left with nothing to keep shut. It calls itself the Warden now, and it is unweaving her thread by thread, to take her back into the lock where she can never be lost."],
-		["Echo of Founder Qing Lian", "Give her back five of the pressings. Ask the people who knew her to tie a thread for her. Then the Warden will have to come out and face you, because she will be too much a person to be a key.", "point"],
+		["Echo of Founder Qing Lian", "Give her back six of the pressings. Ask the people who knew her to tie a thread for her. Then the Warden will have to come out and face you, because she will be too much a person to be a key.", "point"],
 		["Yue Ling", "Will you be here when we come back?"],
 		["Echo of Founder Qing Lian", "I am an echo, child. Mostly a needle and a habit. But I will try."],
 	],
@@ -9494,7 +9582,7 @@ const DIALOGUE := {
 	],
 	"visit:s_p20_elders:granny_wen": [
 		["Granny Wen the Midwife", "What is an empty place for. Child, I have been a midwife sixty years: I know exactly what an empty place is for. You keep a cradle before there is anything to put in it. You do not fill it with turnips because it is standing idle.", "laugh"],
-		["Granny Wen the Midwife", "And the room your mother had is still swept. Nobody sleeps in it. I am not being sentimental; I am being ready. Tell that to Yu Gong and his baskets."],
+		["Granny Wen the Midwife", "And the room you had is still swept. Nobody sleeps in it. I am not being sentimental; I am being ready. Tell that to Yu Gong and his baskets."],
 	],
 	"visit:s_p20_elders:sarnai": [
 		["Grandmother Sarnai", "Look up. The smoke-hole. Take the roof-ring out of a tent and you have a heap of felt and a family that cannot breathe. The whole tent is built round the one place where there is none of it."],
@@ -11448,6 +11536,277 @@ const DIALOGUE := {
 		["Lin Feng", "The cup was enough. On the first evening. It is the same cup; it is only later."],
 		["Elder Qing Xuan", "Go and sit under the pine, child. The old one, above us. I think the sky has been waiting to see whether you would say that.", "wave"],
 	],
+	# ---- Part XXXVIII: A Sky Above the Sky (the Higher Sky release)
+	"recall36": [
+		["Narrator", "The Lotus Seal sets Lin Feng down in the courtyard at first light. The burnt slope is green. The practice yard is full, and nobody in it is practising: forty disciples are standing in rows, looking at the gate."],
+		["Elder Qing Xuan", "Child. Three people walked through that gate in the night. They did not open it. They did not break it. It was simply not something that applied to them."],
+		["Yue Ling", "I felt them pass. It was like standing in a river when a ship goes over. I have never felt that. Not from the Emperor."],
+	],
+	"s_p38_home": [
+		["Elder Qing Xuan", "I have told every disciple who ever swept those steps: above each sky there is a sky, and above each man a man. I said it to keep the proud ones modest. I never thought to say it to you."],
+		["Lin Feng", "Who are they?"],
+		["Elder Qing Xuan", "People. That is the trouble with them. A king, and two generals. They started where you started and went on longer. They have gone down into the land, to three caves, and each has an old enemy sitting outside his door."],
+		["Elder Qing Xuan", "I am not sending you to beat them. I do not think you can. I am sending you because you have never once lost to anybody, and I should like you to do it while I am alive to pour the tea afterwards.", "nod"],
+		["Lin Feng", "I lost to the tide."],
+		["Elder Qing Xuan", "The tide did not know your name. These will. Go to the Dragon Palace first, under it. A man called Goujian is down there. He lost a whole country, and he is the most dangerous person I know of. Ask him how."],
+	],
+	"s_p38_goujian": [
+		["Narrator", "Under the Sunken Dragon Palace the cave is dry and smells of horses. A lean man in undyed hemp is lying on a heap of brushwood with his hands behind his head. A small black thing hangs on a string above his face."],
+		["Goujian of Yue", "You are the one who has not lost. I can tell. You walk in the middle of the passage."],
+		["Goujian of Yue", "I was King of Yue. Fuchai of Wu beat me in the field, and I went to his court with my wife and held his stirrup for three years. I swept his stable. When he was ill I tasted what a physician tastes, to tell him he would mend."],
+		["Lin Feng", "Why?"],
+		["Goujian of Yue", "Because the other thing I could do was die well, and my country would have had a fine song and no king. I chose to be laughed at. Then I went home, and slept on this, and hung that where it would touch my mouth. Twenty years."],
+		["Goujian of Yue", "He is at the back of this cave now. Everything I carried for him is in the passages between. Clear them, if you want to reach him. And do look at him first. I never did, and it cost me a country.", "point"],
+	],
+	"done:s_p38_grooms": [
+		["Narrator", "The last of the forks falls over and is only a fork. Yue Ling stands one upright against the wall, out of the way, the way a groom would."],
+		["Yue Ling", "You did that. Just now. You moved the chest so the passage was clear."],
+		["Lin Feng", "Three years with a broom. It does not come out."],
+	],
+	"done:s_p38_galls": [
+		["Narrator", "Four of them, each on its loop of hemp, each as hard as a nut. Lin Feng touches the tip of his tongue to one, because nobody is going to carry four galls about without finding out."],
+		["Lin Feng", "...Oh."],
+		["Yue Ling", "Your face. No, do not give it to me. I believe you.", "laugh"],
+	],
+	"dare:fuchai": [
+		["Narrator", "The back of the cave is a parade ground. A man in a king's dark armour sits a horse that is not there, perfectly at ease, and looks at Lin Feng the way a man looks at a yard to see if it has been swept."],
+		["Fuchai, King of Wu", "Another one. Yue sends them every few years. You have a good root. I can see it from here. It is not going to help."],
+		["Fuchai, King of Wu", "I beat a king and kept him for a groom. I am told that was my mistake: I should have killed him. I do not think so. I think it is the kindest thing I ever did, and he never forgave it. Come, then."],
+	],
+	"won:fuchai": [
+		["Narrator", "The King of Wu is on one knee on his own parade ground. He looks at his hands for some time. Then he laughs, once, shortly, as a man laughs who has been waiting for a letter and has at last got it."],
+		["Fuchai, King of Wu", "So that is what it is like. I always wondered. Goujian knew something I did not, all those years, and it was only this."],
+		["Fuchai, King of Wu", "Go and tell him. No. Do not tell him. He will have heard. He hears everything from that heap of sticks."],
+	],
+	"bested:fuchai:lost": [
+		["Narrator", "It is over before Lin Feng has understood what was done. He is on the stone. Yue Ling is down beside him. The King of Wu has not dismounted from the horse that is not there."],
+		["Fuchai, King of Wu", "Good. You stood to the end. He did too. Take the sword off this one, and the purse, and find a fork. The girl may sit outside. I have no use for whatever she is."],
+		["Narrator", "For three days Lin Feng mucks out the stables of the King of Wu. He holds a stirrup. Half of what he carried goes into a chest under another man's seal. Nobody strikes him. Nobody needs to."],
+		["Fuchai, King of Wu", "This one has done it before. Look at the corners. Let him go. A groom that good will not stay a groom, and I should like to see what he does.", "nod"],
+	],
+	"bested:fuchai:gave": [
+		["Narrator", "Lin Feng lowers the sword. The King of Wu watches him do it with the first real interest he has shown."],
+		["Fuchai, King of Wu", "He did that too, at the end. Put up his sword and walked into my camp with his wife behind him. It is harder than fighting. I will tell you what I told him: a king who surrenders is a groom. Find this one a fork."],
+		["Narrator", "For three days Lin Feng mucks out the stables of the King of Wu. He holds a stirrup. Half of what he carried goes into a chest under another man's seal. Nobody has struck him. He walked in."],
+		["Fuchai, King of Wu", "This one has done it before. Look at the corners. Let him go. A groom that good will not stay a groom, and I should like to see what he does.", "nod"],
+	],
+	"again:fuchai": [
+		["Fuchai, King of Wu", "The groom. Back, and walking in the middle of the passage again. Good. I was beginning to think Yue had run out of them."],
+	],
+	"back:fuchai": [
+		["Fuchai, King of Wu", "There. Twenty years he took over it, and you have been quicker. Open the chest. What is under my seal is yours, to the last stone. I keep accounts."],
+		["Narrator", "The King of Wu gets down, at last, from the horse that is not there, and stands on the ground like anybody."],
+	],
+	"done:s_p38_brush": [
+		["Narrator", "Four loads of brushwood, cut green and tied with their own bark. Lin Feng lies down on one to see. It is exactly as bad as it was meant to be."],
+		["Yue Ling", "You are not going to sleep on that."],
+		["Lin Feng", "He did. Twenty years. I want to know what he knew when he woke up."],
+	],
+	"done:s_p38_stable": [
+		["Narrator", "The yard under the Dragon Palace is clear to its corners. Lin Feng stands in the middle of it, and finds that he has swept it. He does not remember deciding to."],
+		["Lin Feng", "I was proud of it. In there. When he said I had done it before. I was proud, Yue Ling."],
+		["Yue Ling", "I know. I was on the wall. You stood up straighter. I have never wanted so much to hit a king."],
+	],
+	"s_p38_gall": [
+		["Goujian of Yue", "Brushwood. And you tasted one, I see. Everybody does. Sit down."],
+		["Goujian of Yue", "I will tell you what the gall is not for. It is not for hating him. I thought it was, for the first five years. A man who hates gets up in the morning and looks for his enemy. I needed to get up in the morning and look at a rice tax."],
+		["Lin Feng", "Then what is it for?"],
+		["Goujian of Yue", "So that I should not be comfortable. That is all. A beaten man who is comfortable says: it was not so bad. And then it is his grandchildren who hold the stirrup. You were good at the yard. Do not let that be the thing you remember."],
+		["Lin Feng", "I held his stirrup, and half of what I had is in his chest. I am not going to pretend to you that I mind the stones."],
+		["Goujian of Yue", "No. You mind having said yes. Good. Keep that. Leave the brushwood here; you have a bed. Take one gall. Hang it somewhere you will knock your head on it.", "nod"],
+	],
+	"s_p38_spared": [
+		["Goujian of Yue", "I heard. The whole cave heard. He laughed. In twenty-three years I never once made him laugh."],
+		["Goujian of Yue", "You beat him in the field the first time you met. I want to dislike you for it, and I find I am too old. Sit down. Tell me exactly where his guard opened."],
+		["Lin Feng", "He answers something earlier than what you do. If you know what he decided an hour ago, there is a door in it."],
+		["Goujian of Yue", "An hour. I gave him three years of mornings to decide in. Well. Take a gall anyway. You have not needed it. That is the kind of person who needs it most.", "shake"],
+	],
+	"s_p38_sunbin": [
+		["Narrator", "Under the Maple Gorge the passages are narrow and all lead downhill. In the widest of them stands a covered cart with its shafts on the ground. A man sits in it with a rug over his knees and a board of counters across them."],
+		["Sun Bin", "Do not look at the rug. Everybody looks at the rug. There is nothing under it worth looking at. Look at the board."],
+		["Sun Bin", "Pang Juan and I learned war from one master. He was good. I was better, and he knew it, and when he was a general of Wei he sent for me, kindly, and had my kneecaps cut out and my face branded. He kept me alive to write down what I knew."],
+		["Yue Ling", "And you wrote it?", "shock"],
+		["Sun Bin", "Slowly. And I hid one slip in ten. And I acted mad in a pigsty until somebody from Qi could carry me out in the bottom of a cart. I have fought two campaigns against him since, sitting down."],
+		["Sun Bin", "He is below. He counts everything, and he is quickest when he thinks he is winning. Those are the same fault. Go and look at him. I do not think you will beat him standing up. I never tried."],
+	],
+	"done:s_p38_fires": [
+		["Narrator", "The last of the fires goes out, and it turns out there were never as many as there seemed. That was rather the point of them."],
+		["Lin Feng", "A hundred thousand the first night. Fifty the second. Thirty the third. So that a man counting would think half the army had run."],
+		["Yue Ling", "And he believed it?"],
+		["Lin Feng", "He wanted to. He had been told all his life he was second. You would believe a great deal, to be told at last that the other one was running."],
+	],
+	"done:s_p38_slips": [
+		["Narrator", "Four slips of bamboo in a slow, neat hand. Yue Ling reads the top one aloud."],
+		["Yue Ling", "When able, seem unable. When near, seem far. He wrote that for the man who had just had his knees cut out. And handed it to him."],
+		["Lin Feng", "One slip in ten he kept back. I should like to know which ones Pang Juan never got."],
+	],
+	"dare:pang_juan": [
+		["Narrator", "At the bottom of the gorge a general in red lacquer stands over a map weighted with four daggers. He does not look up. He holds up one hand, finishes what he is reading, and then looks up."],
+		["Pang Juan, General of Wei", "Late Five in One Hand, or thereabouts. A healer, competent. One sword, tempered a good deal. You came down the left passage and you favour nothing. I had you numbered before you were round the corner."],
+		["Pang Juan, General of Wei", "He sent you. He sends everybody. He has told you I am quick when I think I am winning. I am quick because I am winning. Shall I show you the difference?"],
+	],
+	"won:pang_juan": [
+		["Narrator", "The general's number was wrong. He stands looking at where the map was, working it again, and it comes out the same wrong number, and he cannot find the line the mistake is in."],
+		["Pang Juan, General of Wei", "No. You were not that. I counted. I am never out by so much."],
+		["Lin Feng", "You counted what I showed you."],
+		["Pang Juan, General of Wei", "...He taught you that. No. He did not need to. That is worse."],
+	],
+	"bested:pang_juan:lost": [
+		["Narrator", "He is exactly as quick as Sun Bin said. Lin Feng is down, and Yue Ling is down, and the general has gone back to his map before either of them has finished falling."],
+		["Pang Juan, General of Wei", "I shall not kill you. I never kill what I may want to look at again. Hold his leg."],
+		["Narrator", "It is one cut, neat, the way a man fillets something he has filleted before. He wipes the blade on the map's edge."],
+		["Pang Juan, General of Wei", "You will walk. He did not, but then I took both of his. Tell him I was moderate. Tell him I have learned moderation.", "nod"],
+		["Yue Ling", "I will remember your face."],
+		["Pang Juan, General of Wei", "Everybody does. It is on every slip he hid."],
+	],
+	"bested:pang_juan:gave": [
+		["Narrator", "Lin Feng puts up his sword. The general looks faintly disappointed, as a man is who has set out his counters and been refused the game. Then he looks interested, which is worse."],
+		["Pang Juan, General of Wei", "He came to me in peace as well. An old friend, sent for kindly. People will keep doing it. Hold his leg."],
+		["Narrator", "It is one cut, neat, the way a man fillets something he has filleted before. He wipes the blade on the map's edge."],
+		["Pang Juan, General of Wei", "You will walk. He did not, but then I took both of his. A fifth of the purse, for my time. Tell him I was moderate.", "nod"],
+		["Yue Ling", "He had put up his sword."],
+		["Pang Juan, General of Wei", "So had the other one. It is on every slip he hid."],
+	],
+	"again:pang_juan": [
+		["Pang Juan, General of Wei", "Again. You limp less than I intended. I must have been in a good temper. Come here and I shall correct it."],
+	],
+	"back:pang_juan": [
+		["Pang Juan, General of Wei", "So. I had you at a number, and you were not the number. Take back what I took. I cannot give you back the knee. Nobody ever asked me to learn that."],
+		["Narrator", "He rolls up the map, with the four daggers still in it, and stands holding it like a man who has been handed somebody else's coat."],
+	],
+	"done:s_p38_stoves": [
+		["Narrator", "Two fires, and the second smaller than the first. Lin Feng sits by it with his leg out straight and watches the smoke go up through the maples, thin, where anybody on the ridge could count it."],
+		["Lin Feng", "He counts."],
+		["Yue Ling", "You are laughing."],
+		["Lin Feng", "He counts, Yue Ling. He will be up there now with a tally. I have just told him I am half what I was. I have never told a lie with a cooking pot before.", "laugh"],
+	],
+	"done:s_p38_tree": [
+		["Narrator", "One cut, held back to the width of the blade: a strip of bark comes away from one maple as long as a man, and the wood under it is white as paper. The trees either side have not lost a leaf."],
+		["Lin Feng", "Now it wants writing on."],
+		["Narrator", "He writes it with the point, the way Sun Bin said, large enough to read by one torch: PANG JUAN DIES UNDER THIS TREE. Then he stands and looks at it. It is not the kind of thing he writes."],
+		["Yue Ling", "He will not die."],
+		["Lin Feng", "No. But he will have to stop and read it. He cannot leave a thing unread. That is all I want of him: to stop."],
+	],
+	"done:s_p38_march": [
+		["Narrator", "There are no more marches in the passages, and what is left is baggage: tents, cook-pots, a cart of arrows, all the heavy slow things an army leaves behind when it has been told the enemy is running."],
+		["Sun Bin", "He has come on with the light horse. Of course he has. It is dusk, the road narrows under the white tree, and he has left behind everything that would have made him careful. Go down. Do not hurry. I never have."],
+	],
+	"pre:pang_juan": [
+		["Narrator", "It is dusk at the bottom of the gorge. The general has come on fast and alone, as he was meant to. He has seen something white on a tree and called for a light, and he is holding the torch up to it, reading."],
+		["Pang Juan, General of Wei", "Pang Juan dies under... Who cut this? This is a child's trick. This is HIS trick. I had the fires counted. I had them counted three nights running."],
+		["Lin Feng", "You counted what you were shown. You can put the torch down. I only wanted you to stop."],
+	],
+	"post:pang_juan": [
+		["Narrator", "The torch is on the ground, burning sideways. The general sits under the white tree with his back against the writing. He is not dead. He looks at Lin Feng's knee, and then at his own two, for a long time."],
+		["Pang Juan, General of Wei", "At Maling I cut my own throat, in the story. I said: so I have made that wretch's name. I have always thought it the best line I ever spoke. You are not going to let me have it."],
+		["Lin Feng", "No. You are going to walk up that passage and look at a man in a cart."],
+		["Pang Juan, General of Wei", "...I taught myself everything except how to be second. It is a short lesson, it seems. It is taught under a tree.", "shake"],
+		["Narrator", "He gets up. On the way past he stops, and reads the tree once more, to the end, because he cannot leave a thing unread."],
+	],
+	"s_p38_cart": [
+		["Sun Bin", "Standing up. On two knees. I heard it from here: he said no, twice. He only says no when his sums are out."],
+		["Sun Bin", "I should thank you. I find I do not want to. Thirty years I have been the only one who could. It is a poor thing to be proud of, and it was mine."],
+		["Lin Feng", "He is still down there. He is working the number again."],
+		["Sun Bin", "He will work it till morning. Then he will come up this passage to ask me where the mistake is, because there is nobody else he can ask. I have a rug to put over my knees. I should like him not to see them the first time. Push me as far as the turning, will you?"],
+	],
+	"s_p38_xiangru": [
+		["Narrator", "The cave under the Cloud-Tea Terraces is one long lane, cut square, with a ditch down one side. A slight man in a minister's plain cap is sitting on the edge of the ditch with his feet in it, quite comfortably, eating a pear."],
+		["Lin Xiangru", "You will want the general. He is in the middle of the way, further down. He is always in the middle of the way. Do sit; there is room in the ditch."],
+		["Lin Xiangru", "I am Lin Xiangru. I once carried a piece of jade into the court of Qin and told its king I would break it and my head on one pillar before he should have it for nothing. So you see I am not a timid man."],
+		["Lin Xiangru", "Lian Po has taken cities for Zhao with his body. I was set above him for what I did with my tongue. He has sworn to shame me the first day we meet in a road. So when I see his carriage, I turn mine into the ditch."],
+		["Yue Ling", "But you could face him. You faced a king."],
+		["Lin Xiangru", "I could. And one of us would be broken, and Qin would cross the border that month. Qin does not attack Zhao because there are two of us. I gave way to him. I did not give way to Qin. It is important to know which one you are standing in front of.", "nod"],
+	],
+	"done:s_p38_lanes": [
+		["Narrator", "The lane is clear for the length of a bowshot. Every scar that came at them told them, first, the name of a battle and the year."],
+		["Lin Feng", "Forty wounds, and every one in front. He never once turned his back."],
+		["Yue Ling", "That is not the same as never once being wrong."],
+		["Lin Feng", "No. But I can see how he would take one for the other."],
+	],
+	"done:s_p38_pins": [
+		["Narrator", "Four iron pins with rings through their heads, all out of the ditch. A carriage that goes off a road at speed sheds them. Nobody in the minister's retinue would climb down to look."],
+		["Yue Ling", "His own men were ashamed of him. They asked leave to go home. He had to sit them down and explain it."],
+		["Lin Feng", "And they stayed?"],
+		["Yue Ling", "They stayed. Somebody told the general what he had said. That is how it ends, if you let it."],
+	],
+	"dare:lian_po": [
+		["Narrator", "He is exactly where he was said to be: an old man built like a gatehouse, thumbs in his belt, in the middle of the only way through. There is a ditch. It is not a deep ditch."],
+		["Lian Po, General of Zhao", "Another talker's errand-runner. I have forty wounds, child, and I can tell you the field and the day of each. What has a tongue ever taken that a spear did not take first?"],
+		["Lian Po, General of Zhao", "You may go round. There is the ditch. He goes round. Or you may come through me, which nobody has done since Changping, and they had thirty thousand."],
+	],
+	"won:lian_po": [
+		["Narrator", "The old general is sitting down in the lane. It is plainly the first time in forty years that he has sat anywhere he did not choose. He looks up, and what is in his face is not anger. It is something a great deal lonelier."],
+		["Lian Po, General of Zhao", "So I am old. I have been told. I did not think it would be you who told me. Go through. It is your lane."],
+		["Lin Feng", "It is nobody's lane. I should have gone round."],
+	],
+	"bested:lian_po:lost": [
+		["Narrator", "He does not even draw. He takes one step, and Lin Feng is on his back in the lane looking at the roof of the cave, with the breath gone out of him. Up on the terraces people have stopped picking."],
+		["Lian Po, General of Zhao", "There. Forty-one. Tell him that is what comes of sending boys. And take a quarter of that purse, somebody; my men have not been paid."],
+		["Narrator", "That night the things that had kept out of the lane for fear of one of them or the other came down into it together. Two tigers had fought. Everybody had heard."],
+		["Yue Ling", "I said go round. I said it twice.", "grieve"],
+	],
+	"bested:lian_po:gave": [
+		["Narrator", "Lin Feng puts up his sword. Then he steps down into the ditch, mud to the ankle, and goes round. Yue Ling goes round after him. It takes a quarter of a minute."],
+		["Lian Po, General of Zhao", "Ha! Like master, like pup. Run and tell him! Tell him Lian Po stood in the road and the hero of the age went through the mud!"],
+		["Narrator", "He takes his toll for it, as a gatekeeper does. He is still shouting when they are out of sight. He goes on for some time. Then, quite suddenly, he stops."],
+		["Yue Ling", "He is not following."],
+		["Lin Feng", "No. He is standing in an empty lane. I think it has just occurred to him that he is."],
+	],
+	"again:lian_po": [
+		["Lian Po, General of Zhao", "You again. On your feet this time, I see. The ditch is where it was."],
+	],
+	"back:lian_po": [
+		["Lian Po, General of Zhao", "Well. Forty-one, and the last of them from behind my own guard. Take back the purse. I only took it because nobody had paid my men."],
+		["Narrator", "He moves, at last, out of the middle of the lane, and stands at the side of it like a man who has just noticed it has sides."],
+	],
+	"done:s_p38_wolves": [
+		["Narrator", "It takes most of a day to clear what came down. None of it was strong. It had only been waiting, for years, for the two things it feared to turn on each other."],
+		["Lin Feng", "He told me. Lin Xiangru. Qin does not cross the border because there are two of them. And I went down there and made it one and a half."],
+		["Yue Ling", "You are doing the sum again. Stop. Go and ask somebody who has lived next to a person like that."],
+	],
+	"done:s_p38_elders": [
+		["Narrator", "Two old people of Qingshi, on two doorsteps, have each said much the same thing in different words: that it cost them nothing they could now remember, and that the other one is dead, or is their oldest friend."],
+		["Lin Feng", "Neither of them thought it was a defeat."],
+		["Yue Ling", "Neither of them was keeping score. You have been keeping score since the Dragon Palace. I have watched you do it."],
+	],
+	"s_p38_thorns": [
+		["Lin Xiangru", "You fought him. I heard the terraces go quiet. No, do not explain; I was young once, and I had lost twice that month as well."],
+		["Lin Feng", "I picked it. He was not in my way. I wanted one road to be mine."],
+		["Lin Xiangru", "Yes. Now I will tell you the end of my story, which I left out. When Lian Po heard why I turned aside, he stripped to the waist, tied thorn rods on his back, and came to my gate on his knees to be beaten. We were friends until we died."],
+		["Lin Xiangru", "You cannot make him do that. But you can do it. It is not his lane you blocked; it is the people up there who had two tigers and now have one that limps. Go up and tell them so, in the open. That is the rod."],
+		["Lin Feng", "That is harder than fighting him again."],
+		["Lin Xiangru", "A great deal. It is why it mends anything. Go on. I shall keep the ditch warm.", "nod"],
+	],
+	"s_p38_rods": [
+		["Narrator", "At the mouth of the cave an old man is kneeling, stripped to the waist, with a bundle of thorn rods tied across his back. He has forty scars. It is true that they are all in front. His back is as smooth as a boy's."],
+		["Lian Po, General of Zhao", "I am a coarse man. I did not know how far the minister's forbearance went. And then a child with a sword did it too, and walked through mud for me, and I stood in an empty road like a fool. Beat me. Either of you."],
+		["Lin Xiangru", "Get up, General. You will take cold. I have a pear."],
+		["Lin Feng", "Nobody is beating anybody. There is tea on the terraces. They grow it. Come up."],
+		["Narrator", "He cannot get up without help, with the rods on. It takes all three of them. It is the first thing the two men of Zhao have ever done together, and nobody remarks on it."],
+	],
+	"s_p38_low": [
+		["Narrator", "The forty are still in the yard. They part to let Lin Feng through, and it is not the way they used to part. They are looking to see how he walks."],
+		["Elder Qing Xuan", "They have heard. Of course they have. For nine years the outer court has trained under somebody who could not lose, and has taken that to be what training is for. Now they do not know what it is for."],
+		["Lin Feng", "I do not know that I do."],
+		["Elder Qing Xuan", "Good. Then you are the right one to ask. There are three people in this land who are above anybody on this mountain, and there will be more, and one day one of my disciples will meet one in a road. What do I teach them, child? I taught you nothing. You were never going to need it."],
+	],
+	"s_p38_end": [
+		["Narrator", "The lotus pond lies in the lowest corner of the sect. Every gutter on the mountain runs to it; it has never been dug, only allowed. The Elder is sitting on the kerb with his feet nearly in it."],
+		["Elder Qing Xuan", "The rivers and the seas are kings of the hundred valleys because they are good at lying below them. I have read that out at every New Year for seventy years. I read it standing at the top of the steps."],
+		["Lin Feng", "I thought the top was where one got to. And then that it was where one held things up from. I never thought of there being somebody above it who was simply not interested."],
+		["Yue Ling", "You got up. All three times. I counted, since everybody else was counting the other thing."],
+		["Lin Feng", "I got up because you were there to see whether I would. I should like that written down. I am told you are writing things down."],
+		["Elder Qing Xuan", "She is. So am I. So, I gather, are you. It is about time somebody on this mountain said I. Sit down, both of you. Lower. There. Now you can see the whole pond.", "nod"],
+	],
+	"pre:s_break43": [
+		["Narrator", "There is no thunder gathering over the peak. It is gathering, of all places, low over the lotus pond: a cloud no higher than the hall roof, heavy, and in no hurry."],
+		["Lin Feng", "It has come down to me. I have always gone up to it."],
+	],
+	"post:s_break43": [
+		["Narrator", "The last bolt goes into the pond and not into Lin Feng, and the water takes it without a ripple. He is standing in the lowest place in the sect, and it is running to him from every side: Low as the Sea."],
+		["Yue Ling", "Forty-four."],
+		["Lin Feng", "I had stopped counting. There are three people who are still above me, and I find I am glad of them. It was getting very quiet up there."],
+	],
 	"pre:s_break42": [
 		["Narrator", "Under the old pine above the sect, Lin Feng sits with his right hand open on his knee. He can feel all five in it, not as five, as a wheel is not its spokes: the green that feeds the red, the red that leaves the yellow, and round. He does not turn it. He looks at what is in front of him. The sky, he notices, is dry, and wants rain."],
 	],
@@ -12009,7 +12368,7 @@ const DIALOGUE := {
 	"visit:s_p26_dawn:li_tieguai": [
 		["Iron-Crutch Li", "A lame immortal, doing the tiger? Hah! Watch. ...There. The crutch is the tiger's fifth leg. I left my body to go wandering once, and came back to find it burned, and this was the only body to hand. I have been meaning to take it out for exercise for nine hundred years."]],
 	"visit:s_p26_dawn:lamplighter_bo": [
-		["Old Bo the Lamplighter", "The shades sit, in Youdu. There is nothing to get up for in a city where it is always dusk. But a lamplighter must reach, and stoop, and climb. ...The ape and the bird. I have been doing two of them for four hundred years and calling it work. I shall teach the other three."]],
+		["Old Bo the Lamplighter", "The shades sit, in Youdu. There is nothing to get up for in a city where it is always dusk. But a lamplighter must reach, and stoop, and climb. ...The ape and the bird. I have been doing two of them for six hundred years and calling it work. I shall teach the other three."]],
 	"done:s_p26_dawn": [
 		["Narrator", "At first light, up, down and over the sea, people who had stopped are being animals: a tiger crouched with enormous dignity, a bird with both arms lifted and held, a bear swaying at the back where nobody can see."],
 		["Wu Pu", "Every morning, mind. A door turns every day or it rusts. ...One thing more, before you go: the road."],
@@ -12630,7 +12989,7 @@ const DIALOGUE := {
 	],
 	"done:s_p19_spiders": [
 		["Narrator", "The last Brass Spiderling stops in the middle of the hall with one leg raised. Its counting-wheel clicks on, once, twice, to a number nobody will ever read, and is still."],
-		["Forgemaster Ou Lan", "Forty years I have kept this forge, and I have never asked of a single thing I made what it was for. I asked whether it was well made. I think that is a different question. I think I have been answering the wrong one."],
+		["Forgemaster Ou Lan", "Six thousand years I have worked this forge, and I have never asked of a single thing I made what it was for. I asked whether it was well made. I think that is a different question. I think I have been answering the wrong one."],
 	],
 	"s_p19_yanshi": [
 		["Narrator", "In the shade of the caravanserai wall at Shazhou an old man in a faded court robe is mending a child's wooden horse. His hands are the youngest thing about him."],
@@ -12764,7 +13123,7 @@ const DIALOGUE := {
 	],
 	"visit:s_p19_word:lantern_xi": [
 		["Lantern-Maker Xi", "First light to you. I have put the candles back in the revolving lanterns. The horses go round because something is burning now, which is the only honest reason for a paper horse to go anywhere."],
-		["Lantern-Maker Xi", "And a child asked me yesterday how they turn. I had been making them forty years and had to stop and think. It is the heat going up. I had forgotten I knew. That is what you have given back to the street, I think: people asking how."],
+		["Lantern-Maker Xi", "And a child asked me yesterday how they turn. I had been making them sixty years and had to stop and think. It is the heat going up. I had forgotten I knew. That is what you have given back to the street, I think: people asking how."],
 	],
 	"s_p19_gardener2": [
 		["Narrator", "The old man is at his furrows, as before. There is a well-sweep standing at the head of his garden now: somebody has built it for him, and oiled the pivot, and hung a new bucket on it. He has not touched it. He has not pulled it down, either."],

@@ -1552,6 +1552,37 @@ const CROSSROADS := {
 			"bury": "The testing stone lies on its face by the gate, under moss, and the novices tie their sandals on it. Whoever climbs is taken, as in the founder's day. Zeng Shen was never told what he was. He examined himself three times a day for sixty years to find out, and is said to have got an answer, and not to have thought it worth writing down.",
 		}},
 	# Part XXXVII (the Five Hands release): what a sect that can turn five phases owes six villages in a dry year
+	# Part XXXVIII (the Higher Sky release): what a sect teaches about those who are above it
+	"the_higher_sky": {"step": "s_p38_low", "part": "XXXVIII", "n": "Those Above",
+		"ask": "Three people stand in the land who are above anybody on Azure Cloud Mountain, and one day a disciple of the sect will meet one in a road. For nine years the outer court trained under somebody who could not lose. Forty of them are standing in the yard, and the Elder has asked Lin Feng what they are to be taught.",
+		"options": [
+			{"id": "gall", "label": "Hang a gall at every bed-head", "tilt": {"heart": -3, "craft": -1}, "creed": {"rule": 6}, "gain": {"renown": 6},
+				"desc": "Goujian's way. Every disciple is told who is above them, by name and realm, and a gall hangs over every bed in the dormitory to be tasted each morning. Nobody is to be comfortable about it. It makes hard people, who do not forget, and who are not always pleasant at breakfast (the land will hear that Azure Cloud keeps count).",
+				"log": "Had a gall hung over every bed in the outer court, and the names of those above read out each morning."},
+			{"id": "ditch", "label": "Cut a second way round the gate", "tilt": {"heart": 3, "reach": -2}, "creed": {"virtue": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "Lin Xiangru's way. Teach them which fights are theirs. A second path is cut round the sect's own gate, through the wet, and every disciple walks it once a month to let somebody else have the paving. Some of the forty will take it for cowardice, and say so (the Rice Hearth, who have always gone round, will know what it is).",
+				"log": "Had a second way cut round the sect's gate, and the disciples walk it, to learn which fights are theirs."},
+			{"id": "road", "label": "Send them out to be beaten", "tilt": {"reach": 3, "heart": -1}, "creed": {"rule": -6}, "gain": {"stones": 9500},
+				"desc": "Sun Bin's way. Nobody learns it at home. Each disciple goes down the mountain for a season to find somebody better at one thing, anything, and lose to them at it properly, and come back and say what it was. Some will come back hurt, and one or two will not come back (spirit stones: the towns pay well for a season of a cultivator's hands).",
+				"log": "Sent the disciples of the outer court down the mountain, each to find somebody better and lose to them."},
+		],
+		"after": {
+			"gall": [["Narrator", "Forty galls go up on forty loops of hemp. Breakfast in the outer court is quieter that winter, and the practice yard is not. The novice who missed his target tastes his twice each morning, unasked. By spring he has stopped missing, and he has stopped smiling at the kitchen-girls, and Auntie Zhou says that is a poor trade and nobody asked her."]],
+			"ditch": [["Narrator", "The path is cut in a week: thirty paces of clay round the east gatepost, ankle deep after rain. The first month the disciples walk it red to the ears. By the third, two of them step off the paving for a carter with a full load, without thinking, and are a long way up the steps before either notices what they did."]],
+			"road": [["Narrator", "They go down in ones and twos. One loses at weiqi to a ferryman for a month. One is out-carried, every day, by a girl of the Felt Hearth with a yoke of milk. One comes home with a broken wrist and will not say whose. They are all easier to teach, afterwards, and they have stopped looking at Lin Feng to see how he walks."]],
+		},
+		"echo": {
+			"s_p38_end": {
+				"gall": [["Elder Qing Xuan", "I have hung one over my own bed, child. It seemed only fair. I am eighty and I had forgotten what it is to be reminded of anything before I have had my tea. I do not recommend it. I shall not take it down."]],
+				"ditch": [["Elder Qing Xuan", "I walked your clay path this morning, to see. Disciple Han was coming the other way with the slop pails, and I stood in the wet to let him by. He nearly dropped them. In seventy years nobody on this mountain has seen me give way. I had not known it was news."]],
+				"road": [["Elder Qing Xuan", "Half the dormitory is empty and the half that is back will not stop talking. One of them has been beaten at dumplings. At dumplings, child. She told me so with shining eyes. I begin to think I kept them on this mountain too long."]],
+			},
+		},
+		"end": {
+			"gall": "A gall hangs over every bed in the outer court of Azure Cloud Sect, and the names of those above the mountain are read out each morning before rice. Its disciples are known in every town for never being surprised, and never being easy company. Two of them, in later years, did beat somebody who stood above them. Both said it was the mornings.",
+			"ditch": "There is a clay path round the east gatepost of Azure Cloud Sect, and every disciple walks it once a month to leave the paving to somebody else. It is said in the towns that you can tell one of them at a ferry, because they are at the back of the queue with nothing to prove. Nobody has shamed one in a road, though several have tried.",
+			"road": "Every disciple of Azure Cloud Sect goes down the mountain for a season to find somebody better at something, and lose. They come home out-cooked, out-carried and out-argued, and one in forty does not come home. The sect has a book of who beat whom, and at what. It is the thickest book in the library, and the most read.",
+		}},
 	"the_round": {"step": "s_p37_council", "part": "XXXVII", "n": "Before the Next Dry Wind",
 		"ask": "The east slope burned to the sect's wall, and it stopped there by luck and a change in the weather. Six villages under the mountain have sent tallies asking what Azure Cloud Sect will do before the next dry wind. The Elder has forty disciples who each know a fifth of the answer, and has put the question to Lin Feng.",
 		"options": [
@@ -1571,6 +1602,12 @@ const CROSSROADS := {
 			"leave": [["Narrator", "Six villages spend the autumn moving their barns out from under the trees, with the sect's disciples on the ropes. It is hard, dull work and nobody enjoys it. The next spring the black slope is green to the knee, and deer are in it, and an old woman of Cloudfoot says it looked exactly so when she was a girl, the year after the last one."]],
 		},
 		"echo": {
+			# (the Higher Sky release: and when three people walk through the gate without opening it)
+			"s_p38_home": {
+				"break": [["Elder Qing Xuan", "The firebreaks held this spring, I will say that for us. We have learned to stop a fire. It turns out that is not the same as learning to be stopped."]],
+				"watch": [["Elder Qing Xuan", "The girl of nine in Qingshi asked me who they were. I said: people stronger than Lin Feng. She said: well, somebody would be. I have forty disciples who did not manage that sentence."]],
+				"leave": [["Elder Qing Xuan", "The seedlings on the east slope are a hand high. They came up because something bigger than they are burned over them. I looked at that this morning for some time, child, before I sent for you."]],
+			},
 			"s_p37_end": {
 				"break": [["Elder Qing Xuan", "And I am to burn the upper lane myself, the first wet morning, with the whole outer court looking on. I have not set a fire on purpose since I was a novice. I find I am looking forward to it, which I shall not mention to the villages."]],
 				"watch": [["Elder Qing Xuan", "And a child of Qingshi corrected my stance yesterday, child. At the bottom, she said, not at the top. She is nine. I thanked her. I have been throwing water at the tops of fires for seventy years."]],
@@ -1817,7 +1854,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

@@ -1734,6 +1734,24 @@ const TRIALS := {
 				"desc": "Middle Light Hand and a sword tempered nine times. Every blow it takes it mends a hand higher. Thirty springs it has done that against water, which does not tire. See whether it can do it against you.",
 				"line": "Lin Feng draws. The dyke settles its shoulders, as it has every spring, and rises one hand. He strikes again. It rises one hand. Somewhere above them both there is a roof."},
 		]},
+	# Part XXXVIII (the Higher Sky release): Pang Juan under the white tree: met a second time, by somebody he has
+	# already beaten (betters.gd: a "kill" only on the branch where the first bout was lost)
+	"pang_juan": {"might": [5.0, 1.4],
+		"why": "He has beaten you once, quickly, and left you a knee to remember it by. He is not weaker now. But he has counted your fires three nights running, left his baggage, and come on at dusk to finish it; and there is a tree. He is exactly where a man in a cart said he would be.",
+		"paths": [
+			{"id": "relic", "kind": "relic", "n": "The slips he never got", "needs": [["item", "war_slip", 4]], "boon": {"foe_hp": 0.7, "foe_atk": 0.8},
+				"desc": "Four of the slips Sun Bin kept back when he wrote out the Art of War for his keeper. Read them aloud as he comes. He has the other nine in ten by heart, and has wondered for thirteen years what was on these.",
+				"line": "Lin Feng reads four slips aloud in the dusk, slowly. When able, seem unable. The general has stopped. He knows the hand. He knows, now, exactly which pages were missing, and that he has been fighting without them."},
+			{"id": "pot", "kind": "pot", "n": "Fewer fires", "needs": [["cooked", 2], ["step", "s_p38_stoves"]], "boon": {"foe_hp": 0.75, "foe_atk": 0.85},
+				"desc": "Two meals that came out right, and two fires lit where a scout could count them, the second smaller. He believes you are half what you were. Let him go on believing it for the first three exchanges.",
+				"line": "Lin Feng comes out limping more than he needs to. The general smiles, and leaves his guard exactly where a man leaves it who has counted, and is sure."},
+			{"id": "light", "kind": "light", "n": "One tree", "needs": [["light", 1], ["step", "s_p38_tree"]], "boon": {"foe_hp": 0.78, "taken": 0.85},
+				"desc": "One blow held back to a single cut, and the bark of one tree. He will stop to read it; he cannot leave a thing unread. Be standing where the torchlight falls when he holds it up.",
+				"line": "The general lifts the torch to read. For the length of eleven characters he is the best-lit thing in the gorge and looking the other way. It is all the opening Sun Bin ever needed."},
+			{"id": "might", "kind": "might", "n": "Standing up, again", "needs": [["lv", 127], ["temper", 9]], "boon": {},
+				"desc": "Middle Five in One Hand and a sword tempered nine times, and a knee that was cut once already. No tricks, no tree, no fires. He beat you this way before. Sun Bin will say nothing, and will think a good deal.",
+				"line": "Lin Feng walks out into the torchlight, on the bad knee, and draws. The general looks almost pleased. This, at least, is a thing he has a number for."},
+		]},
 	"the_kindling": {"might": [6.0, 1.5],
 		"why": "It is a log that was told it was firewood and has been burning as well as it can ever since. To put it out by force is to tell it that it has failed at that too. Thunder made it what it is; another stroke only splits it. It has to be heard, and nothing in a kitchen has ears.",
 		"paths": [

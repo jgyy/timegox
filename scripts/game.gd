@@ -363,6 +363,17 @@ var rites := {}
 var rite_due: Array = []
 var rite_n := 0
 var step_rite := 0
+## the Higher Sky release (betters.gd): those above him: how each bout went and what it took (better -> {first, last,
+## base, took, wound, bouts}), how often each has been watched and on which day, and the tallies
+var bested := {}
+var watched := {}
+var watch_on := {}
+var bettered := 0
+var overmatched := 0
+var bowed := 0
+## and (memoir.gd) the pages written in their own words (page -> the day), and the ones not yet read out
+var pages := {}
+var page_due: Array = []
 
 func _process(d: float) -> void:
 	if started and not finished:
@@ -630,6 +641,14 @@ func reset() -> void:
 	rite_due = []
 	rite_n = 0
 	step_rite = 0
+	bested = {}
+	watched = {}
+	watch_on = {}
+	bettered = 0
+	overmatched = 0
+	bowed = 0
+	pages = {}
+	page_due = []
 	UI.set_hero_name(Fashion.DEFAULT_FAMILY, Fashion.DEFAULT_GIVEN)
 	hp = [float(max_hp(0)), 0.0]
 	qi = [float(max_qi(0)), 0.0]
@@ -666,11 +685,14 @@ func fighter(i: int) -> Dictionary:
 		a = float(Data.atk(level)) * 0.75 * (1.0 + Fashion.yue_gear(self, "atk"))
 	# (needs.gd: the famished and the worn out strike less hard; 1 with survival off)
 	a *= Needs.mod(self, "atk")
+	# (betters.gd: and somebody carrying what a better left him with)
+	a *= Betters.mod(self, "atk")
 	# the Wandering Dao and the friendship of the Feathered Folk make Lin Feng quicker
 	var spd: int = Data.speed(level) + (2 + int(Fashion.yue_gear(self, "spd")) if i == 1 else 0)
 	if i == 0:
 		spd += int(dao_mod("spd", 0.0) + boon("spd", 0.0) + talent_mod("spd") + Arms.mod(self, "spd", 0.0))
 	spd += int(Needs.mod(self, "spd"))
+	spd = int(round(float(spd) * Betters.mod(self, "spd")))
 	return {
 		"id": "pc%d" % i, "name": member_name(i), "side": "party", "idx": i, "lv": level, "boss": false,
 		"hp": hp[i], "maxhp": float(max_hp(i)), "qi": qi[i], "maxqi": float(max_qi(i)),
@@ -964,6 +986,9 @@ func record_kills(a: String, n: int, ids: Array = []) -> void:
 		felled_kind[str(kid)] = int(felled_kind.get(str(kid), 0)) + 1
 	# (the Answering Land release, weal.gd: what is cleared out of a country is felt in its towns)
 	weal["kills|" + a] = int(weal.get("kills|" + a, 0)) + maxi(n, ids.size())
+	# (the Higher Sky release: and the towns are told at once: weal.gd remembered the old answer until something
+	# else moved, so the eightieth pack cleared out of a country brought it no peace until the next errand)
+	weal_n += 1
 	var s := cur_step()
 	# (a hunt in a cave, Part XX, counts what is brought down in that cave)
 	if not s.is_empty() and s.kind == "hunt" and s.area == a and (not s.has("cave") or layer == Caves.fid(a, int(s.cave))):
@@ -1049,6 +1074,11 @@ func advance() -> void:
 		add_item(str(gk), int(s.gives[gk]))
 		toast("Given: %s" % str(Data.ITEMS[str(gk)].n))
 	step += 1
+	# (the Higher Sky release, betters.gd: the story forks where he met somebody above him; a step of the other
+	# branch is stepped over)
+	step = Betters.skip(self, step)
+	# (memoir.gd: and what one of them had to say of it is written down)
+	Memoir.written(self)
 	step_fit = 0
 	step_toil = 0
 	step_restore = 0

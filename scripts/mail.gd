@@ -127,6 +127,14 @@ const LETTERS := {
 	"jade_cut": {"from": "Bian He", "after": "s_p35_seer", "wait": 2,
 		"lines": ["Cultivator: the king has had it made a disc, and named it for me, which I did not ask. He offered me the two jewellers' posts. I said give them to the man with the chisel. They have carried me home. I sleep. A shepherd's boy has dug up the hill behind my house and found only rock, and I have told him: look twice."]},
 	# ---- Part XXXVII (the Five Hands release): letters from the novice who missed, and from a man in a kitchen in Wu
+	# ---- Part XXXVIII (the Higher Sky release): letters from the novice who missed, on what the outer court was taught
+	"sky_gall": {"from": "Mian of the Outer Court", "needs": ["the_higher_sky", "gall"], "wait": 1,
+		"lines": ["Senior: forty mornings now. I asked the Elder when it stops being bitter, and he said that was the wrong question and went to his tea. I have worked out the right one. It is: what did I do yesterday that I would rather not taste. Most days there is something. I had not known that about myself."]},
+	"sky_ditch": {"from": "Mian of the Outer Court", "needs": ["the_higher_sky", "ditch"], "wait": 1,
+		"lines": ["Senior: an old woman with a goat would not go by me today. I stood in the clay. She stood on the paving. We were there until the goat got bored. She said nobody from up the mountain had ever stood aside for her, and she was not going to be the first to be let through, and then she gave me this for the sect and went the other way."],
+		"gift": {"stones": 390}},
+	"sky_road": {"from": "Mian of the Outer Court", "needs": ["the_higher_sky", "road"], "wait": 1,
+		"lines": ["Senior: I am still at Longmen. He has let me take the oar on the slack reach. I asked what I was doing wrong, and he said: you are rowing. Then he would not explain. I have thought about it for nine days. I believe he means the river is doing most of it and I keep interrupting. I shall be home when I have lost properly."]},
 	"round_break": {"from": "Mian of the Outer Court", "needs": ["the_round", "break"], "wait": 1,
 		"lines": ["Senior: I burnt the lower lane this morning. A mat at a time, as you said, with the tub upwind. The Elder watched and said nothing, which I am told is praise. When it was done I put my hand flat on the black. It was warm, and it was mine, and it had stopped. I have not slept so well since the night of the pines."]},
 	"round_watch": {"from": "Mian of the Outer Court", "needs": ["the_round", "watch"], "wait": 1,
@@ -274,7 +282,7 @@ const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_me
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last", "ladle_bind", "ladle_teach", "ladle_ground", "qi_counts", "round_break", "round_watch", "round_leave", "cai_qin"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last", "ladle_bind", "ladle_teach", "ladle_ground", "qi_counts", "round_break", "round_watch", "round_leave", "cai_qin", "sky_gall", "sky_ditch", "sky_road"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:

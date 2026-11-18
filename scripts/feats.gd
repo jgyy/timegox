@@ -80,7 +80,12 @@ const FEATS := {
 	# the Small Fish release: the last realm, the pond, the field, the hill and the fish (Part XXXVI)
 	"light_hand": {"n": "Turned It Once", "kind": "road", "pts": 20, "test": ["level", 123], "desc": "Reach Light Hand."},
 	# the Five Hands release: the last realm, the fire, the dyke and the log (Part XXXVII)
-	"five_in_one": {"n": "What Each of Them Meets", "kind": "road", "pts": 20, "test": ["level", 126], "desc": "Reach Five in One Hand: the last realm there is."},
+	"five_in_one": {"n": "What Each of Them Meets", "kind": "road", "pts": 20, "test": ["level", 126], "desc": "Reach Five in One Hand."},
+	# the Higher Sky release: the last realm, and the three who stood above him (Part XXXVIII)
+	"low_as_sea": {"n": "King of a Hundred Valleys", "kind": "road", "pts": 20, "test": ["level", 129], "desc": "Reach Low as the Sea: the last realm there is."},
+	"the_stirrup": {"n": "Whose Stirrup", "kind": "road", "pts": 10, "test": ["step", "s_p38_fuchai"], "desc": "Stand in front of a king four realms above you, however it goes."},
+	"white_tree": {"n": "He Cannot Leave It Unread", "kind": "road", "pts": 10, "test": ["step", "s_p38_pang"], "desc": "Stand in front of a general who has you numbered."},
+	"by_the_ditch": {"n": "It Is Not a Deep Ditch", "kind": "road", "pts": 10, "test": ["step", "s_p38_lian"], "desc": "Meet an old man in the only way through, and fight him or go round."},
 	"did_not": {"n": "So I Did Not", "kind": "road", "pts": 10, "test": ["step", "s_p37_fedfire"], "desc": "Give a fire that asks politely nothing at all."},
 	"a_door_in_it": {"n": "A Wall with a Door in It", "kind": "road", "pts": 10, "test": ["step", "s_p37_nextdoor"], "desc": "Show a dyke over its own top."},
 	"scorched_tail": {"n": "The Tail Left On", "kind": "road", "pts": 10, "test": ["step", "s_p37_kindling"], "desc": "Tell a log under a pot what it is."},

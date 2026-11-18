@@ -1217,7 +1217,7 @@ func _init() -> void:
 			if st8.has("cave"):
 				band8 = Caves.spec(str(st8.area), int(st8.cave)).get("foes", {})
 				# (the Small Fish release: or for a band a later chapter stood in it last of all)
-				if Caves.LATE.get(str(st8.area), {}).has(int(st8.cave)) and (str(st8.id).begins_with("s_p36_") or str(st8.id).begins_with("s_p37_")):
+				if Caves.LATE.get(str(st8.area), {}).has(int(st8.cave)) and (str(st8.id).begins_with("s_p36_") or str(st8.id).begins_with("s_p37_") or str(st8.id).begins_with("s_p38_")):
 					band8 = Caves.LATE[str(st8.area)][int(st8.cave)]
 			var marching8 := {}
 			for pe8 in band8.get("pool", []):
@@ -3082,7 +3082,7 @@ func _hundred_works() -> void:
 		"the well-sweep is built: paid for in stones, the know-how spent, and pills cost less")
 	check(not Works.build(HWG, "well_sweep") and not Works.can_build(HWG, "trip_hammer") and Works.count(HWG, "wheel") == 1 and Works.leading(HWG) == "wheel" and Works.title(HWG) == "Apprentice of The Wheel", "once; and its maker is an apprentice of the Wheel")
 	HWG.step = Data.STEPS.size() - 1
-	for k3 in 1200:
+	for k3 in 1300:
 		HWG.bestiary["c%d" % k3] = 1
 	HWG.stones = 10000000
 	for wid2 in ["trip_hammer", "water_bellows", "crossbow", "chariot", "wooden_ox", "fire_kit", "cords", "sling", "kiln", "adze", "hide_coat", "array", "talismans", "furnace", "paper_servants", "mirror", "flags"]:
@@ -5264,7 +5264,7 @@ func _thundering_pots() -> void:
 		check(Feats.need(f.test) >= 1.0 and Feats.value(MG, f.test) >= 0.0 and (str(f.test[0]) != "step" or Data.step_index(str(f.test[1])) >= 0), "feat %s measures something that can be counted" % fid)
 	check(Feats.FEATS.size() >= 75 and kinds_f.size() == Feats.KIND_ORDER.size() and Feats.order().size() == Feats.FEATS.size(), "%d feats of nine kinds" % Feats.FEATS.size())
 	# what a feat asks for is there to be done
-	check(Feats.need(Feats.FEATS.five_in_one.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
+	check(Feats.need(Feats.FEATS.low_as_sea.test) == Data.MAX_LEVEL and Feats.need(Feats.FEATS.every_plot.test) == Hold.ORDER.size() and Feats.need(Feats.FEATS.hundred_households.test) == Hold.RANKS.size() - 1 and Feats.need(Feats.FEATS.three_dooms.test) == 3 and Feats.need(Feats.FEATS.marks_twelve.test) < Echoes.ORDER.size() and Feats.need(Feats.FEATS.deeds_all.test) <= Trials.DEEDS.size() and Feats.need(Feats.FEATS.jobs_all.test) == Jobs.ORDER.size()
 		and Feats.need(Feats.FEATS.every_thread.test) == Fashion.OUTFIT_ORDER.size() and Feats.need(Feats.FEATS.her_dresses.test) <= Fashion.YUE_ORDER.size() and Feats.need(Feats.FEATS.egg_all.test) == Eggs.ORDER.size()
 		and Feats.need(Feats.FEATS.war_all.test) == War.BATTLE_ORDER.size() and Feats.need(Feats.FEATS.heard_all.test) <= Music.count() and Feats.need(Feats.FEATS.host_full.test) <= War.ORDER.size()
 		and Feats.need(Feats.FEATS.airs_six.test) == Music.AIRS.size() and Feats.need(Feats.FEATS.works_twelve.test) < Works.ORDER.size() and Feats.need(Feats.FEATS.arms_eight.test) == Arms.ORDER.size()
@@ -8119,7 +8119,7 @@ func _open_net() -> void:
 	check(Crime.is_child({"kind": "npc", "id": "li_bai", "n": "Li Bai", "asset": "li_bai"}), "nobody draws on a schoolboy")
 	for fid33 in ["practised_hand", "same_length", "by_the_door", "told_true", "parted_whole"]:
 		check(Feats.FEATS.has(fid33), "the feat %s is kept" % fid33)
-	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and str(Feats.FEATS.five_in_one.desc).contains("last realm"), "only the last realm is called the last")
+	check(not str(Feats.FEATS.parted_whole.desc).contains("last realm") and not str(Feats.FEATS.practised_hand.desc).contains("last realm") and not str(Feats.FEATS.sleeves_of_wind.desc).contains("last realm") and not str(Feats.FEATS.uncarved_block.desc).contains("last realm") and not str(Feats.FEATS.light_hand.desc).contains("last realm") and not str(Feats.FEATS.five_in_one.desc).contains("last realm") and str(Feats.FEATS.low_as_sea.desc).contains("last realm"), "only the last realm is called the last")
 	for src33 in ["Fangyu Shenglan", "Miscellaneous Records of the Western Capital", "Ouyang Xiu", "Book of Jin"]:
 		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src33), "the chapter's tales are told from where they are written: %s" % src33)
 
@@ -8375,7 +8375,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["rites", 2], TN35) and not Trials.need_met(["rites", 3], TN35) and Trials.KINDS.has("rite") and Trials.need_text(["rites", 2], TN35).contains("2"), "trials can be passed by the rite")
 	TN35.free()
 	var c35: Dictionary = Echoes.CROSSROADS.get("the_stone", {})
-	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 3] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
+	check(not c35.is_empty() and str(c35.step) == "s_p35_gate" and str(c35.part) == "XXXV" and Echoes.ORDER[Echoes.ORDER.size() - 4] == "the_stone" and fits.call(str(c35.ask)), "what the stone is for is asked last of its chapter")
 	check((c35.options as Array).size() == 3 and c35.after.size() == 3 and c35.end.size() == 3 and c35.echo.has("s_p35_end") and c35.echo.s_p35_end.size() == 3 and Data.step_index("s_p35_end") > Data.step_index("s_p35_gate"), "the_stone: three answers, each answered, echoed and told at the end")
 	var scales35 := {}
 	for o35 in c35.options:
@@ -8548,7 +8548,7 @@ func _open_net() -> void:
 	check(Trials.need_met(["cooked", 2], TN36) and not Trials.need_met(["cooked", 3], TN36) and Trials.need_met(["light", 3], TN36) and not Trials.need_met(["light", 4], TN36) and Trials.KINDS.has("pot") and Trials.KINDS.has("light") and Trials.need_text(["cooked", 2], TN36).contains("2"), "trials can be passed by the pot and by the light hand")
 	TN36.free()
 	var c36: Dictionary = Echoes.CROSSROADS.get("the_ladle", {})
-	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
+	check(not c36.is_empty() and str(c36.step) == "s_p36_table" and str(c36.part) == "XXXVI" and Echoes.ORDER[Echoes.ORDER.size() - 3] == "the_ladle" and fits.call(str(c36.ask)), "what a strong hand is for is asked last of its chapter")
 	check((c36.options as Array).size() == 3 and c36.after.size() == 3 and c36.end.size() == 3 and c36.echo.has("s_p36_end") and c36.echo.s_p36_end.size() == 3 and Data.step_index("s_p36_end") > Data.step_index("s_p36_table"), "the_ladle: three answers, each answered, echoed and told at the end")
 	var scales36 := {}
 	for o36 in c36.options:
@@ -8616,10 +8616,11 @@ func _open_net() -> void:
 
 	print("== Part XXXVII: A Cup of Water, a Cart of Firewood ==")
 	var wsq7 := FileAccess.get_file_as_string("res://scripts/world.gd")
-	check(Data.REALMS.size() == 43 and Data.REALMS[42] == "Five in One Hand" and Data.MAX_LEVEL == 126 and Data.level_name(126).ends_with("Five in One Hand") and Data.REALM_INFO.size() == 43
+	check(Data.REALMS.size() >= 43 and Data.REALMS[42] == "Five in One Hand" and Data.MAX_LEVEL >= 126 and Data.level_name(126).ends_with("Five in One Hand") and Data.REALM_INFO.size() == Data.REALMS.size()
 		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXVII adds the realm of Five in One Hand")
-	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break42" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall35") and msrc.contains("\"s_break41\": \"recall35\"") and Data.DIALOGUE.has("pre:s_break42") and Data.DIALOGUE.has("post:s_break42"),
-		"Part XXXVII follows Light Hand (recall35) and ends the game")
+	var endq7 := Data.step_index("s_p38_home")
+	check(Data.STEPS[endq7 - 1].id == "s_break42" and int(Data.STEPS[endq7 - 1].to) == 126 and Data.DIALOGUE.has("recall35") and msrc.contains("\"s_break41\": \"recall35\"") and Data.DIALOGUE.has("pre:s_break42") and Data.DIALOGUE.has("post:s_break42"),
+		"Part XXXVII follows Light Hand (recall35) and ends at Five in One Hand")
 	var pq7 := Data.step_index("s_p37_home")
 	var kindsq7 := {}
 	var nq7 := 0
@@ -8627,7 +8628,7 @@ func _open_net() -> void:
 	var lordsq7: Array = []
 	var phq7 := {}
 	var reactq7 := {}
-	for i in range(pq7, Data.STEPS.size()):
+	for i in range(pq7, endq7):
 		var sq7: Dictionary = Data.STEPS[i]
 		nq7 += 1
 		kindsq7[str(sq7.kind)] = true
@@ -8717,7 +8718,7 @@ func _open_net() -> void:
 		and Trials.need_text(["phases", 3], TNq7).contains("3") and Trials.need_text(["quelled", 2], TNq7).contains("2"), "trials can be passed by the round and by the measure")
 	TNq7.free()
 	var cq7: Dictionary = Echoes.CROSSROADS.get("the_round", {})
-	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of all")
+	check(not cq7.is_empty() and str(cq7.step) == "s_p37_council" and str(cq7.part) == "XXXVII" and Echoes.ORDER[Echoes.ORDER.size() - 2] == "the_round" and fits.call(str(cq7.ask)), "what is done before the next dry wind is asked last of its chapter")
 	check((cq7.options as Array).size() == 3 and cq7.after.size() == 3 and cq7.end.size() == 3 and cq7.echo.has("s_p37_end") and cq7.echo.s_p37_end.size() == 3 and Data.step_index("s_p37_end") > Data.step_index("s_p37_council"), "the_round: three answers, each answered, echoed and told at the end")
 	var scalesq7 := {}
 	for oq7 in cq7.options:
@@ -9585,6 +9586,7 @@ func _open_net() -> void:
 	check(bsrc2.contains("def _carve(") and bsrc2.contains("the gluteal cleft") and bsrc2.contains("CLOTH_BRIDGE") and FileAccess.get_file_as_string("res://art/lib/person.py").contains("\"embrace\": (EMBRACE_T, clip_embrace)"), "the body is sculpted with its clefts and folds, and two people have something to do with their arms")
 	_cloud_keel()
 	_iron_pestle_wits()
+	_higher_sky()
 
 ## The Cloud Keel release: the spirit arks and the Far Countries (arks.gd), a storey divided into apartments
 ## with somebody living in each (rooms.gd), and what the audit of shared ground learned to see (clash.gd).
@@ -9996,3 +9998,374 @@ func _cloud_keel() -> void:
 	check(not dsrc9.contains("She has the other half of the mirror in both hands") and not dsrc9.contains("Take him my half"), "the half Lin Feng carries to Xu Deyan is not also in the Princess's hands")
 	check(not rsrc9.contains("We mended that") and not rsrc9.contains("four realms with the sweeper") and not rsrc9.contains("who held the sky") and not rsrc9.contains("by a Primordial Sovereign"),
 		"an hour with Yue Ling, which can be had from the day she joins him, speaks of nothing the story has not come to")
+
+## The Higher Sky release: those above him (betters.gd), a story that forks where he met them, the pages in
+## their own words (memoir.gd), Part XXXVIII, and what the sweep before it mended.
+func _higher_sky() -> void:
+	var dfont := ThemeDB.fallback_font
+	var fits := func(text: String) -> bool:
+		var par := TextParagraph.new()
+		par.add_string(text, dfont, 22)
+		par.width = 1100
+		return par.get_line_count() <= 4
+	var new_game := func():
+		var g = load("res://scripts/game.gd").new()
+		g.reset()
+		g.started = true
+		g.companion = true
+		return g
+	var msrc := FileAccess.get_file_as_string("res://scripts/main.gd")
+	var bsrc := FileAccess.get_file_as_string("res://scripts/bot.gd")
+	var btsrc := FileAccess.get_file_as_string("res://scripts/battle.gd")
+
+	print("== those above him (betters.gd, the Higher Sky release) ==")
+	check(Betters.ORDER.size() == 3 and Betters.BETTERS.size() == 3 and Betters.COST.size() == 3, "three stand above him")
+	var G = new_game.call()
+	G.level = 126
+	G.stones = 10000
+	for id in Betters.ORDER:
+		var bd: Dictionary = Betters.BETTERS[id]
+		var en: Dictionary = Data.ENEMIES.get(id, {})
+		check(Betters.is_better(id) and bool(en.get("boss", false)) and not bool(en.get("doom", false)) and str(en.shape) == "person:" + id and Assets.has("characters/" + id) and FileAccess.file_exists("res://art/characters/%s.py" % id),
+			"%s is somebody, with a body from a script, and no doom" % id)
+		check(int(bd.over) >= 4 and Betters.gap(G, id) == int(bd.over) and Betters.level(G, id) == 126 + 3 * int(bd.over) and Data.realm_of(Betters.level(G, id)) - G.realm() == int(bd.over),
+			"%s stands %d whole realms above whatever he is on the day they meet" % [id, int(bd.over)])
+		check(Data.suppression(Betters.level(G, id), 126) >= 1.0 + Data.SUPPRESS * Data.SUPPRESS_CAP - 0.001, "%s weighs on him as hard as a realm can weigh" % id)
+		check((bd.watch as Array).size() == Betters.WATCH_MAX and Lore.BOSS.has(id) and Tactics.wit_of(id) == Tactics.TACTICIAN, "%s can be watched three times, has a story, and fights as a tactician" % id)
+		for wl in bd.watch:
+			check(fits.call(str(wl)) and not str(wl).contains("—"), "%s: what is seen of him fits the box" % id)
+		for dk in ["dare:", "won:", "again:", "back:"]:
+			check(Data.DIALOGUE.has(dk + id), "%s: there are words for %s" % [id, dk])
+		check(Data.DIALOGUE.has("bested:%s:lost" % id) and Data.DIALOGUE.has("bested:%s:gave" % id), "%s: losing is told, and giving way is told differently" % id)
+		var c: Dictionary = Betters.COST[id]
+		check(float(c.stones) > 0.0 and float(c.stones) <= 0.5 and Data.step_index(str(c.mend)) > 0 and fits.call(str(c.tag)) and not (c.mods as Dictionary).is_empty(), "%s: losing costs stones and leaves a wound that a step mends" % id)
+		var ms: Dictionary = Data.STEPS[Data.step_index(str(c.mend))]
+		check(ms.has("if") and str(ms["if"][0]) == id and str(ms["if"][1]) == "down", "%s: what mends the wound is done on the branch where he lost" % id)
+		var dares := 0
+		var ups := 0
+		var downs := 0
+		for st in Data.STEPS:
+			if str(st.kind) == "dare" and str(st.boss) == id:
+				dares += 1
+				check(not st.has("if") and Data.step_index(str(st.id)) < Data.step_index(str(c.mend)), "%s is met before anything is mended" % id)
+			if st.has("if") and str(st["if"][0]) == id:
+				ups += 1 if str(st["if"][1]) == "up" else 0
+				downs += 1 if str(st["if"][1]) == "down" else 0
+				check(str(st["if"][1]) in ["up", "down"], "%s: a branch is up or down" % st.id)
+		check(dares == 1 and ups >= 1 and downs >= 3 and downs > ups, "%s: one bout, and the story goes on differently either way (%d up, %d down): losing is the longer road" % [id, ups, downs])
+	# watching
+	check(Betters.watch_blocked(G, "fuchai") == "", "he can be watched")
+	var clock0 := float(G.clock)
+	var day0 := int(G.day)
+	var seen1 := Betters.watch(G, "fuchai")
+	check(seen1 == str(Betters.BETTERS.fuchai.watch[0]) and Betters.gap(G, "fuchai") == 3 and Betters.level(G, "fuchai") == 126 + 9 and (int(G.day) > day0 or float(G.clock) >= clock0 + Betters.WATCH_HOURS * 60.0 - 0.01), "a watch takes four hours and closes one realm of the gap")
+	check(Betters.watch_blocked(G, "fuchai") != "" and Betters.watch(G, "fuchai") == "" and Betters.gap(G, "fuchai") == 3, "once a day")
+	G.day += 1
+	Betters.watch(G, "fuchai")
+	G.day += 1
+	Betters.watch(G, "fuchai")
+	G.day += 1
+	check(Betters.gap(G, "fuchai") == 1 and Betters.watch_blocked(G, "fuchai") != "" and Betters.level(G, "fuchai") == 126 + 3, "three watches, and no more: he is still a realm above")
+	G.free()
+	# losing
+	G = new_game.call()
+	G.level = 126
+	G.stones = 10000
+	var day1 := int(G.day)
+	var deaths1 := int(G.deaths)
+	check(Betters.branch(G, "fuchai") == "" and Betters.mod(G, "atk") == 1.0 and Betters.wounds(G).is_empty() and Betters.epilogue(G) == "", "before they meet nothing weighs on him")
+	var told := Betters.over(G, "fuchai", "lost", "dragon")
+	check(G.stones == 5000 and int(G.day) == day1 + 3 and int(G.deaths) == deaths1 and told.contains("5000") and Betters.branch(G, "fuchai") == "down" and int(G.overmatched) == 1,
+		"lost to the King of Wu: half of what he carried, three days of his life, no death counted, and the story goes down")
+	check(Betters.wounded(G, "fuchai") and Betters.mod(G, "wage") < 1.0 and Betters.tags(G) == ["A groom of Wu"] and Betters.again(G, "fuchai"), "a wound is on him, and he may ask for another bout")
+	var wtown := Weal.town_of("dragon")
+	check(wtown == "" or Weal.acts(G, wtown, "bested") == 1, "the town that hears of that country heard")
+	check(Weal.ACTS.has("bested") and int(Weal.ACTS.bested.per) < 0, "being beaten in a country is felt in its town")
+	# the branch
+	var p38 := Data.step_index("s_p38_home")
+	var walk := func(g) -> Array:
+		var out: Array = []
+		var i: int = Betters.skip(g, p38)
+		while i < Data.STEPS.size():
+			out.append(str(Data.STEPS[i].id))
+			i = Betters.skip(g, i + 1)
+		return out
+	var wd1: Array = walk.call(G)
+	check(wd1.has("s_p38_brush") and wd1.has("s_p38_gall") and not wd1.has("s_p38_spared"), "the journey that lost walks the brushwood and the gall, and not the other road")
+	# a rematch won gives back what can be given back, and not the branch
+	G.level = 150
+	var told2 := Betters.over(G, "fuchai", "won", "dragon")
+	check(G.stones == 10000 and told2.contains("5000") and not Betters.wounded(G, "fuchai") and Betters.branch(G, "fuchai") == "down" and not Betters.again(G, "fuchai") and Betters.beaten(G) == 1, "met again and beaten: the stones come back, the wound is lifted, and what was done after losing was done")
+	G.free()
+	# the wound is mended by the step of the down branch
+	G = new_game.call()
+	G.level = 126
+	Betters.over(G, "pang_juan", "lost", "maple")
+	var f0: Dictionary = new_game.call().fighter(0)
+	var GH = new_game.call()
+	GH.level = 126
+	var fh: Dictionary = GH.fighter(0)
+	var fw: Dictionary = G.fighter(0)
+	check(float(fw.atk) < float(fh.atk) and int(fw.spd) < int(fh.spd) and float(fw.atk) > float(fh.atk) * 0.85, "the knee: he strikes a little less hard and is slower to the first blow (%.0f against %.0f)" % [float(fw.atk), float(fh.atk)])
+	check(not Betters.again(G, "pang_juan") and Data.STEPS[Data.step_index("s_p38_maling")].kind == "kill", "Pang Juan is met again where the story meets him, under the tree, and nowhere sooner: the step would be left with nobody to fight")
+	G.step = Data.step_index("s_p38_maling") + 1
+	check(not Betters.wounded(G, "pang_juan") and is_equal_approx(float(G.fighter(0).atk), float(fh.atk)), "and it is mended under the white tree")
+	GH.free()
+	G.free()
+	# giving way: half the stones, no days; and to the one who is bowed to it is the way up
+	G = new_game.call()
+	G.level = 126
+	G.stones = 8000
+	var day2 := int(G.day)
+	Betters.over(G, "lian_po", "gave", "terraces")
+	check(G.stones == 7000 and int(G.day) == day2 and Betters.branch(G, "lian_po") == "up" and not Betters.wounded(G, "lian_po") and int(G.bowed) == 1 and Betters.mod(G, "price") == 1.0, "giving way to Lian Po costs an eighth of the purse, no wound, and is the way up")
+	Betters.over(G, "fuchai", "gave", "dragon")
+	check(Betters.branch(G, "fuchai") == "down" and Betters.wounded(G, "fuchai") and int(G.day) == day2 + 3 and G.stones == 3500, "giving way to the King of Wu is what it was for Goujian: a groom all the same")
+	Betters.over(G, "pang_juan", "won", "maple")
+	check(Betters.branch(G, "pang_juan") == "up" and Betters.met(G) == 3 and Betters.epilogue(G).contains("lost to one") and fits.call(Betters.epilogue(G)), "the ending says how it went with the three")
+	var wd2: Array = walk.call(G)
+	check(wd2.has("s_p38_rods") and not wd2.has("s_p38_thorns") and wd2.has("s_p38_cart") and not wd2.has("s_p38_maling") and wd2.has("s_p38_gall"), "each bout forks the story by itself")
+	G.free()
+	# every one of the eight journeys reaches the end of the chapter, and none walks both sides of a fork
+	for mask in 8:
+		var GB = new_game.call()
+		GB.level = 126
+		for k in 3:
+			Betters.over(GB, str(Betters.ORDER[k]), "won" if (mask >> k) & 1 == 1 else "lost", "")
+		var wk: Array = walk.call(GB)
+		var both := false
+		for sid in wk:
+			var st2: Dictionary = Data.STEPS[Data.step_index(str(sid))]
+			if st2.has("if") and Betters.branch(GB, str(st2["if"][0])) != str(st2["if"][1]):
+				both = true
+		check(not both and wk[0] == "s_p38_home" and wk[wk.size() - 1] == "s_break43" and wk.has("s_p38_low") and wk.has("s_p38_end") and wk.size() >= 19, "journey %d of 8 walks one side of each fork to the end of the chapter (%d steps)" % [mask, wk.size()])
+		check(fits.call(Betters.epilogue(GB)) and Betters.epilogue(GB) != "", "and the ending has a sentence for it")
+		GB.free()
+	# Game.advance steps over the other branch
+	G = new_game.call()
+	G.level = 126
+	Betters.over(G, "fuchai", "won", "dragon")
+	G.step = Data.step_index("s_p38_fuchai")
+	G.advance()
+	check(str(G.cur_step().id) == "s_p38_spared", "after a bout won the next step is the one of that road (%s)" % str(G.cur_step().id))
+	G.advance()
+	check(str(G.cur_step().id) == "s_p38_sunbin", "and after it the roads meet again (%s)" % str(G.cur_step().id))
+	G.free()
+	check(btsrc.contains("func _bested(") and btsrc.contains("outcome = \"bested\"") and msrc.contains("func _better_done(") and msrc.contains("func meet_better(") and msrc.contains("\"label\": \"Walk on\"") and msrc.find("\"label\": \"Walk on\"") < msrc.find("\"label\": \"Watch him\""),
+		"the battle has a fourth end, main tells what it cost, and walking on is the first answer")
+	check(not msrc.contains("Game.respawn()\n\t\t\tBetters") and msrc.contains("Betters.over(Game, id, how"), "nobody is carried home for it")
+	check(bsrc.contains("\"dare\":") and bsrc.contains("ids.has(\"draw\")") and bsrc.contains("bot-watch") and not bsrc.contains("Betters.watch("), "the bot stands in front of them, and watches nobody unless told to")
+	check(Data.level_name(126 + 15).ends_with("Sky Above") and Data.realm_name(43) == "Low as the Sea" and Data.realm_name(44) == "First Sky Above" and Data.realm_name(99) == "Ninth Sky Above", "somebody above the last realm stands in a sky that is told by how far up it is")
+	for st3 in Data.STEPS:
+		check(not st3.has("if") or Betters.BETTERS.has(str(st3["if"][0])), "%s: a fork names somebody above him" % st3.id)
+		check(str(st3.kind) != "dare" or (Betters.is_better(str(st3.boss)) and int(st3.get("cave", 0)) == -1), "%s: a dare is a bout with a better" % st3.id)
+	for tid in Trials.TRIALS:
+		for pt in Trials.TRIALS[tid].paths:
+			for nd in pt.needs:
+				check(not str(nd[0]) in ["watched", "bested", "pages"], "%s/%s: no trial asks for a watch, a bout or a page" % [tid, pt.id])
+
+	print("== in their own words (memoir.gd, the Higher Sky release) ==")
+	check(Memoir.ORDER.size() == Memoir.PAGES.size() and Memoir.PAGES.size() >= 50, "%d pages" % Memoir.PAGES.size())
+	var by := {}
+	var parts := {}
+	for pid in Memoir.ORDER:
+		var pg: Dictionary = Memoir.PAGES.get(pid, {})
+		check(not pg.is_empty() and Memoir.WHO.has(str(pg.who)) and Data.step_index(str(pg.after)) >= 0 and fits.call(str(pg.n)) and (pg.lines as Array).size() >= 3, "%s: a page of somebody, after a step that is there" % pid)
+		by[str(pg.who)] = int(by.get(str(pg.who), 0)) + 1
+		parts[str(pid).substr(0, 3)] = true
+		var all := " ".join(pg.lines)
+		for ln in pg.lines:
+			check(fits.call(str(ln)) and not str(ln).contains("—"), "%s: a line that fits the box, with no dash in it" % pid)
+			check(not str(ln).contains(" sir") and not str(ln).contains("young man") and not str(ln).contains("young woman"), "%s: nobody says what the hero is" % pid)
+		match str(pg.who):
+			"lin":
+				check((" " + all).contains(" I "), "%s: he says I" % pid)
+			"yue":
+				check(all.to_lower().contains("you") and (" " + all).contains(" I "), "%s: she says I, and writes to him" % pid)
+			"elder":
+				check(all.contains("the child") or all.contains("child"), "%s: he calls the hero the child" % pid)
+		if pg.has("if"):
+			check(Betters.BETTERS.has(str(pg["if"][0])) and str(pg["if"][1]) in ["up", "down"], "%s is of one branch" % pid)
+		for sp in Memoir.lines(null, pid):
+			check(str(sp[0]) in ["Lin Feng", "Yue Ling", "Elder Qing Xuan"], "%s is said by its writer, under the name they stand by" % pid)
+	check(by.size() == 3 and int(by.lin) >= 15 and int(by.yue) >= 12 and int(by.elder) >= 9, "the three people the story is about each write (%s)" % str(by))
+	check(parts.size() == 38, "every part of the story has a page (%d)" % parts.size())
+	G = new_game.call()
+	G.step = Data.step_index("s_break1") + 1
+	check(Memoir.written(G) == 1 and G.pages.has("p01_broom") and G.page_due == ["p01_broom"] and Memoir.written(G) == 0 and Memoir.book(G) == ["p01_broom"], "a page is written when its step is done, once")
+	G.companion = false
+	G.step = Data.step_index("s_yue") + 1
+	check(Memoir.written(G) == 0, "she writes nothing before she is with him")
+	G.companion = true
+	G.slain["elder"] = {"seen": false}
+	G.step = Data.step_index("s_break4") + 1
+	check(Memoir.written(G) == 0 and not Memoir.open(G, "p01_gate"), "the dead write nothing")
+	G.slain.clear()
+	Betters.over(G, "fuchai", "lost", "")
+	G.step = Betters.skip(G, Data.step_index("s_p38_fuchai") + 1)
+	check(str(G.cur_step().id) == "s_p38_brush" and Memoir.written(G) == 2 and G.pages.has("p38_fuchai_down_lin") and G.pages.has("p38_fuchai_down_yue") and not G.pages.has("p38_fuchai_up_lin"), "somebody who lost to Fuchai writes of the stables, and she of the wall")
+	G.free()
+	G = new_game.call()
+	Betters.over(G, "fuchai", "won", "")
+	G.step = Betters.skip(G, Data.step_index("s_p38_fuchai") + 1)
+	check(Memoir.written(G) == 1 and G.pages.has("p38_fuchai_up_lin"), "and somebody who did not writes a different page")
+	G.free()
+	check(msrc.contains("func _page_scene()") and msrc.contains("Memoir.lines(Game, pid)") and FileAccess.get_file_as_string("res://scripts/game.gd").contains("Memoir.written(self)") and FileAccess.get_file_as_string("res://scripts/menu.gd").contains("In Their Own Words"),
+		"a page is read out when he stands free, and again from the menu")
+	check(not bsrc.contains("Memoir.lines") and not bsrc.contains("page_due"), "the bot reads nothing: it only counts what was written")
+
+	print("== Part XXXVIII: A Sky Above the Sky ==")
+	check(Data.REALMS.size() == 44 and Data.REALMS[43] == "Low as the Sea" and Data.MAX_LEVEL == 129 and Data.level_name(129).ends_with("Low as the Sea") and Data.REALM_INFO.size() == 44
+		and Data.EXP_NEED.size() == Data.MAX_LEVEL and Data.ENEMY_EXP.size() == Data.MAX_LEVEL + 1, "Part XXXVIII adds the realm of Low as the Sea")
+	check(Data.STEPS[Data.STEPS.size() - 1].id == "s_break43" and int(Data.STEPS[Data.STEPS.size() - 1].to) == Data.MAX_LEVEL and Data.DIALOGUE.has("recall36") and msrc.contains("\"s_break42\": \"recall36\"") and Data.DIALOGUE.has("pre:s_break43") and Data.DIALOGUE.has("post:s_break43"),
+		"Part XXXVIII follows Five in One Hand (recall36) and ends the game")
+	var kinds := {}
+	var n38 := 0
+	var kills := 0
+	var names := ["Narrator", "Lin Feng", "Yue Ling", "Elder Qing Xuan"]
+	for bid in Betters.ORDER:
+		names.append(str(Data.ENEMIES[bid].n))
+	var people := ["goujian", "sun_bin", "lin_xiangru"]
+	for pa in ["dragon", "maple", "terraces"]:
+		for np in Data.AREAS[pa].npcs:
+			if str(np.id) in people:
+				names.append(str(np.n))
+				check(Assets.has("characters/" + str(np.asset)) and FileAccess.file_exists("res://art/characters/%s.py" % str(np.asset)) and Closeup.signature(str(np.n)) != "" and Folk.POSTS.has(str(np.id)) and bool(np.get("after", false)) and int(np.get("cave", 0)) == -1,
+					"%s has a body from a script, a gesture of their own, something to do by day, and stands in a cave after everybody" % np.id)
+		for bo in Data.AREAS[pa].bosses:
+			if Betters.is_better(str(bo.id)):
+				check(bool(bo.get("after", false)) and int(bo.get("cave", 0)) == -1 and str(bo.vis[0]) == "s_p38_home" and str(bo.vis[1]) == "", "%s stands at the back of a cave from the chapter's first word, and stays" % bo.id)
+		check(Caves.LATE.has(pa) and not Caves.OWN.has(pa) or Caves.LATE.has(pa), "%s: the chapter's band is stood last of all in its cave" % pa)
+	var found38 := 0
+	for pa2 in ["dragon", "maple", "terraces"]:
+		var cw: Dictionary = Atlas.world_of(Caves.fid(pa2))
+		var packs38 := 0
+		var pool38: Array = (Caves.LATE[pa2][-1].pool as Array).map(func(pe): return str(pe[0]))
+		for e38 in cw.get("ents", []):
+			if str(e38.get("kind", "")) == "enemy" and str(e38.group[0].id) in pool38:
+				packs38 += 1
+				found38 += 1
+			elif str(e38.get("id", "")).begins_with("p38_") or str(e38.get("id", "")) in people or Betters.is_better(str(e38.get("enemy", ""))):
+				found38 += 1
+		check(packs38 == int(Caves.LATE[pa2][-1].n) and packs38 >= 6, "%s: every pack the chapter asks its cave for found room (%d)" % [pa2, packs38])
+		for e39 in Atlas.world_of("surface").ents:
+			if str(e39.get("area", "")) == pa2:
+				check(not (str(e39.get("id", "")).begins_with("p38_") or str(e39.get("id", "")) in people or Betters.is_better(str(e39.get("enemy", "")))), "nothing of the chapter stands on the land of %s" % pa2)
+	check(found38 == 6 + 9 + 10 + 3 * 6, "everything the chapter stands in the three caves found room (%d)" % found38)
+	check(names.size() == 10, "the three who lost and the three who stand above him are in the chapter's regions (%d)" % names.size())
+	for i in range(p38, Data.STEPS.size()):
+		var s8: Dictionary = Data.STEPS[i]
+		n38 += 1
+		kinds[str(s8.kind)] = int(kinds.get(str(s8.kind), 0)) + 1
+		check(str(s8.id).begins_with("s_p38_") or str(s8.id) == "s_break43", "%s is a step of the chapter" % s8.id)
+		check(not str(s8.kind) in ["slay", "crime", "taboo"], "%s asks for nothing the law forbids" % s8.id)
+		check(not s8.has("stones") or int(s8.stones) > 92200, "%s pays as the road has come to pay" % s8.id)
+		if str(s8.kind) == "talk":
+			check(Data.DIALOGUE.has(str(s8.id)), "%s has its conversation" % s8.id)
+		if str(s8.kind) in ["hunt", "collect", "folk", "toil", "cook", "sunder"]:
+			check(Data.DIALOGUE.has("done:" + str(s8.id)), "%s: something is said when it is done" % s8.id)
+		if str(s8.kind) == "hunt":
+			kills += int(s8.n)
+			var bnd: Dictionary = Caves.LATE.get(str(s8.area), {}).get(int(s8.get("cave", 0)), {})
+			var pool: Array = []
+			for pe in bnd.get("pool", []):
+				pool.append(str(pe[0]))
+				check(int(pe[1]) <= Data.MAX_LEVEL and int(pe[2]) <= Data.MAX_LEVEL, "%s: nothing in the band is past the last level" % s8.id)
+			for of8 in s8.of:
+				check(pool.has(str(of8)) and Lore.BEAST.has(str(of8)) and not Data.ENEMIES[str(of8)].get("boss", false) and Tactics.WIT.has(str(Data.ENEMIES[str(of8)].shape)), "%s: %s lives in the region's cave, has a story, and wits" % [s8.id, of8])
+			check(not bnd.is_empty() and Data.step_index(str(bnd.vis)) < i and not s8.get("first", false), "%s: the band is in the cave before it is hunted" % s8.id)
+		if str(s8.kind) == "collect":
+			check(Data.ITEMS.has(str(s8.item)) and Look.PICKUP_COLORS.has(str(s8.item)) and Load.weight_of(str(s8.item)) <= 1.0, "%s: what is looked for is there to find" % s8.id)
+		if str(s8.kind) == "folk":
+			var er: Dictionary = Folk.ERRANDS.get(str(s8.id), {})
+			check(not er.is_empty() and (er.lines as Array).size() >= 4 and int(Folk.TOWNS[str(s8.town)].roles.get(str(s8.role), 0)) >= int(s8.n) and str(er.get("town", "")) == str(s8.town) and fits.call(str(er.ask)), "%s: an errand with four answers among people who are there" % s8.id)
+			for el in er.lines:
+				check(fits.call(str(el)), "%s: what is answered fits the box" % s8.id)
+		if str(s8.kind) == "kill":
+			check(Data.DIALOGUE.has("pre:" + str(s8.boss)) and Data.DIALOGUE.has("post:" + str(s8.boss)) and Trials.TRIALS.has(str(s8.boss)) and bsrc.contains("\"%s\": \"" % str(s8.boss)), "%s: words before and after, a trial, and a way planned for the bot" % s8.boss)
+	check(n38 == 29 and kills == 120 and int(kinds.get("dare", 0)) == 3 and int(kinds.get("kill", 0)) == 1 and kinds.size() >= 9 and kinds.has("toil") and kinds.has("cook") and kinds.has("sunder") and kinds.has("folk"),
+		"the chapter is twenty-nine steps of nine kinds, three of them bouts with somebody above him (%d, %d, %d)" % [n38, kinds.size(), kills])
+	var keys := ["recall36", "pre:s_break43", "post:s_break43", "pre:pang_juan", "post:pang_juan"]
+	for bid2 in Betters.ORDER:
+		for dk2 in ["dare:", "won:", "again:", "back:"]:
+			keys.append(dk2 + bid2)
+		keys.append("bested:%s:lost" % bid2)
+		keys.append("bested:%s:gave" % bid2)
+	var firsts := 0
+	for dk3 in Data.DIALOGUE:
+		if str(dk3).contains("s_p38_") or str(dk3) in keys:
+			for ln3 in Data.DIALOGUE[dk3]:
+				check(fits.call(str(ln3[1])) and not str(ln3[1]).contains("—"), "%s: a line that fits the box, with no dash in it" % dk3)
+				check((ln3 as Array).size() == 2 or Data.EMOTES.has(str(ln3[2])), "%s: its gesture is one everybody has" % dk3)
+				check(not str(ln3[1]).contains(", sir") and not str(ln3[1]).contains("young man") and not str(ln3[1]).contains("Sir"), "%s: nobody calls the hero sir" % dk3)
+				check(str(ln3[0]) in names, "%s: %s is somebody of the chapter, under the name they stand by" % [dk3, ln3[0]])
+				if str(ln3[0]) == "Lin Feng" and (" " + str(ln3[1])).contains(" I "):
+					firsts += 1
+	for k38 in keys:
+		check(Data.DIALOGUE.has(k38), "%s is said" % k38)
+	check(firsts >= 18, "he speaks for himself in his own chapter (%d lines in the first person)" % firsts)
+	# the one lord with a trial: Pang Juan under the tree
+	var tr: Dictionary = Trials.TRIALS.pang_juan
+	var open_n := 0
+	for pt2 in tr.paths:
+		check(fits.call(str(pt2.desc)) and fits.call(str(pt2.line)) and Trials.KINDS.has(str(pt2.kind)), "pang_juan/%s: its words fit, and its way has a name" % pt2.id)
+		if not str(pt2.kind) in ["clean", "wild", "creed"]:
+			open_n += 1
+		for nd2 in pt2.needs:
+			if str(nd2[0]) == "step":
+				check(Data.step_index(str(nd2[1])) >= p38 and Data.step_index(str(nd2[1])) < Data.step_index("s_p38_maling") and Data.STEPS[Data.step_index(str(nd2[1]))].get("if", []) == ["pang_juan", "down"], "pang_juan/%s: what it is shown was done on this road, before him" % pt2.id)
+			if str(nd2[0]) == "lv":
+				check(int(nd2[1]) < Data.MAX_LEVEL, "pang_juan/%s: the might asked can be had by then" % pt2.id)
+			if str(nd2[0]) in ["cooked", "light"]:
+				check(int(nd2[1]) >= 1 and int(nd2[1]) <= 3, "pang_juan/%s: no more than the story has asked for" % pt2.id)
+	check((tr.paths as Array).size() == 4 and open_n >= 2 and fits.call(str(tr.why)) and Data.step_index("s_p38_slips") < Data.step_index("s_p38_maling"), "Pang Juan under the tree has four ways through, two of them open to a wanted man")
+	# the crossroads
+	var c8: Dictionary = Echoes.CROSSROADS.get("the_higher_sky", {})
+	check(not c8.is_empty() and str(c8.step) == "s_p38_low" and str(c8.part) == "XXXVIII" and Echoes.ORDER[Echoes.ORDER.size() - 1] == "the_higher_sky" and fits.call(str(c8.ask)) and Marks.AFTER_BANDS.has("the_higher_sky"), "what a sect teaches about those above it is asked last of all")
+	check((c8.options as Array).size() == 3 and c8.after.size() == 3 and c8.end.size() == 3 and c8.echo.has("s_p38_end") and c8.echo.s_p38_end.size() == 3 and Data.step_index("s_p38_end") > Data.step_index("s_p38_low") and bsrc.contains("\"the_higher_sky\": [\"ditch\"]"), "the_higher_sky: three answers, each answered, echoed and told at the end, and the bot has one")
+	var scales := {}
+	for o8 in c8.options:
+		var mk: Dictionary = Marks.MARKS.the_higher_sky.get(str(o8.id), {})
+		check(not mk.is_empty() and mk.has("who") and fits.call(str(mk.desc)) and fits.call(str(mk.who[3])) and fits.call(str(mk.who[4])) and Assets.has("characters/" + str(mk.who[1])) and not Weal.hears(str(mk.area)).is_empty() and int(mk.get("k", 1)) >= 3, "the_higher_sky/%s leaves a row of things standing, and somebody by it" % o8.id)
+		var mm: Node3D = Marks.model(mk, 0)
+		check(mm != null and mm.get_child_count() > 0, "the_higher_sky/%s: what stands is built from code" % o8.id)
+		mm.free()
+		for tk in o8.tilt:
+			scales[str(tk)] = true
+		for ck in o8.get("creed", {}):
+			check(Creed.AXES.has(str(ck)) and absi(int(o8.creed[ck])) < Creed.SIDE, "the_higher_sky/%s leans on the Way, and does not by itself decide it" % o8.id)
+		check(fits.call(str(o8.desc)) and fits.call(str(c8.end[str(o8.id)])), "the_higher_sky/%s: what it means, and what is told of it, fit" % o8.id)
+		for al in c8.after[str(o8.id)]:
+			check(fits.call(str(al[1])), "the_higher_sky/%s: what follows fits the dialogue box" % o8.id)
+		check(Mail.LETTERS.has("sky_" + str(o8.id)) and Mail.ORDER.has("sky_" + str(o8.id)), "the_higher_sky/%s: somebody who lives with it writes" % o8.id)
+	check(scales.size() == 3, "the three answers tip all three scales")
+	check(Echoes.CROSSROADS.the_round.echo.has("s_p38_home") and Echoes.CROSSROADS.the_round.echo.s_p38_home.size() == 3, "the last chapter's crossroads is heard in this one's first conversation")
+	for fid in ["low_as_sea", "the_stirrup", "white_tree", "by_the_ditch"]:
+		check(Feats.FEATS.has(fid), "the feat %s" % fid)
+	for src in ["Records of the Historian", "Spring and Autumn of Wu and Yue"]:
+		check(FileAccess.get_file_as_string("res://scripts/lore.gd").contains(src), "the chapter's tales are told from where they are written: %s" % src)
+
+	print("== the bugs of the Higher Sky release stay mended ==")
+	var same := 0
+	for kd in Phases.KINDS:
+		for el2 in Phases.ORDER:
+			for gr in ["tree", "ground", "water"]:
+				var cm: Array = Phases.come(str(kd), str(el2), gr)
+				if not cm.is_empty() and str(cm[0]) == str(kd):
+					same += 1
+	check(same == 0 and Phases.come("steam", "water", "ground").is_empty(), "no phase lays again what already lies there: water on steam is not another fire put out (%d)" % same)
+	G = new_game.call()
+	var wn := int(G.weal_n)
+	G.record_kills("bamboo", 3)
+	check(int(G.weal_n) > wn, "packs cleared out of a country are told to its towns at once")
+	G.free()
+	check(btsrc.contains("ground_marks.clear()") and btsrc.find("ground_marks.clear()") < btsrc.find("scar_root = Node3D.new()"), "what a phase left on the last battle's ground is gone when the next begins")
+	check(FileAccess.get_file_as_string("res://scripts/sunder.gd").contains("scar(g, layer, ct) != \"crater\""), "a hollow that lies there is not dug and counted again")
+	print("== and its plot holes ==")
+	var dsrc := FileAccess.get_file_as_string("res://scripts/data.gd")
+	check(dsrc.contains("Give her back six of the pressings") and not dsrc.contains("five of the pressings") and Bonds.MEMORIES_NEEDED == 6, "the Founder asks for as many memories as the step does")
+	check(dsrc.contains("Xu Mo found her first") and str(Data.DIALOGUE["post:drowned_bearer"][1][1]).contains("Where she sank"), "the seventh bearer is a woman in the cave as she is in the lake")
+	check(not dsrc.contains("making them forty years") and not dsrc.contains("Forty years I have kept this forge") and not dsrc.contains("for four hundred years and calling it work"), "the lantern-maker, the forgemaster and the lamplighter are each as old as they said they were")
+	check(not dsrc.contains("Their owners have gone over the bridge, but"), "not every owner of a grudge is dead: Fangfeng is on his hill")
+	check(not dsrc.contains("the room your mother had"), "nobody in Qingshi knew his mother: he was found beside two graves")
+	check(dsrc.contains("breaks the four Immortal Peaches") and dsrc.contains("Give a piece to each soul"), "four peaches go round nineteen souls")

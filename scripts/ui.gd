@@ -29,7 +29,9 @@ const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon
 	# Part XXV: the Patriarch of the Cold Pine
 	"person:han_song", "person:shang_yang", "person:jiang_chong",
 	# the Tall People release: the giants of the old chapters in their own bodies
-	"person:fangfeng", "person:kuafu", "person:longbo_angler"]
+	"person:fangfeng", "person:kuafu", "person:longbo_angler",
+	# Part XXXVIII (the Higher Sky release): the three who stand above him
+	"person:fuchai", "person:pang_juan", "person:lian_po"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font
