@@ -82,7 +82,12 @@ const FEATS := {
 	# the Five Hands release: the last realm, the fire, the dyke and the log (Part XXXVII)
 	"five_in_one": {"n": "What Each of Them Meets", "kind": "road", "pts": 20, "test": ["level", 126], "desc": "Reach Five in One Hand."},
 	# the Higher Sky release: the last realm, and the three who stood above him (Part XXXVIII)
-	"low_as_sea": {"n": "King of a Hundred Valleys", "kind": "road", "pts": 20, "test": ["level", 129], "desc": "Reach Low as the Sea: the last realm there is."},
+	"low_as_sea": {"n": "King of a Hundred Valleys", "kind": "road", "pts": 20, "test": ["level", 129], "desc": "Reach Low as the Sea."},
+	# the Red Seal release: the last realm, the lists, the hammer and the horse (Part XXXIX)
+	"no_name": {"n": "Sealed, and Blank", "kind": "road", "pts": 20, "test": ["level", 132], "desc": "Reach Hidden and Nameless: the last realm there is."},
+	"on_the_board": {"n": "A Name on the Board", "kind": "road", "pts": 10, "test": ["step", "s_p39_outer"], "desc": "Fight the Lists of the Outer Court to an end, at whatever place."},
+	"the_hammer": {"n": "Wanted It When He Did", "kind": "road", "pts": 10, "test": ["step", "s_p39_room"], "desc": "Win a lot in an auction room."},
+	"not_a_horse": {"n": "White; Not a Horse", "kind": "road", "pts": 10, "test": ["step", "s_p39_schools"], "desc": "Stand in the last meet of the three, with every school that has a name."},
 	"the_stirrup": {"n": "Whose Stirrup", "kind": "road", "pts": 10, "test": ["step", "s_p38_fuchai"], "desc": "Stand in front of a king four realms above you, however it goes."},
 	"white_tree": {"n": "He Cannot Leave It Unread", "kind": "road", "pts": 10, "test": ["step", "s_p38_pang"], "desc": "Stand in front of a general who has you numbered."},
 	"by_the_ditch": {"n": "It Is Not a Deep Ditch", "kind": "road", "pts": 10, "test": ["step", "s_p38_lian"], "desc": "Meet an old man in the only way through, and fight him or go round."},

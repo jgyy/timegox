@@ -115,12 +115,14 @@ static func watch(g, id: String) -> String:
 		return ""
 	var k := int(g.watched.get(id, 0))
 	g.watched[id] = k + 1
-	g.watch_on[id] = int(g.day)
 	var m := float(g.clock) + WATCH_HOURS * 60.0
 	while m >= Clock.DAY:
 		m -= Clock.DAY
 		g.day += 1
 	g.clock = m
+	# (the Red Seal release: "once a day" is the day the watch ends on: written before the hours were added, a
+	# watch begun in the evening ended tomorrow, and all three fitted into one night)
+	g.watch_on[id] = int(g.day)
 	g.note("Watched %s (%d of %d)" % [str(Data.ENEMIES[id].n), k + 1, WATCH_MAX])
 	return str(BETTERS[id].watch[k])
 
@@ -221,6 +223,11 @@ static func mod(g, key: String) -> float:
 ## nowhere else: beaten early, he would be gone from the land with the step that needs him still to do.
 static func again(g, id: String) -> bool:
 	if not g.bested.has(id) or str(g.bested[id].get("last", "")) == "won" or g.boss_done.has(id):
+		return false
+	# (the Red Seal release: somebody rightly given way to is not "met again": a second bow used to wound him
+	# and shame the town for the right answer; and nobody is asked again before the story has been back to
+	# whoever sent him, or it is told of stones that are already home)
+	if branch(g, id) == "up" or not g.done(str(COST[id].mend)):
 		return false
 	var ms: Dictionary = Data.STEPS[Data.step_index(str(COST[id].mend))]
 	return not (str(ms.kind) == "kill" and str(ms.get("boss", "")) == id)

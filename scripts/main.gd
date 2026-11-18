@@ -442,6 +442,9 @@ func open_dao_choice(from: String) -> void:
 func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 	# (the crossroads behind this conversation add their echoes to it: echoes.gd)
 	var lines: Array = Echoes.told(Game, key, Data.DIALOGUE.get(key, [])).duplicate()
+	# (the Red Seal release: the thorn rods are told differently to the journey that beat the old general)
+	if key == "s_p38_rods" and str(Game.bested.get("lian_po", {}).get("first", "")) == "won":
+		lines = Echoes.told(Game, key, Data.DIALOGUE["s_p38_rods:won"]).duplicate()
 	# who he was before the sect (character creation) has a word to say here and there
 	lines.append_array(origin_lines(key))
 	# the end of the climb: what became of the five whose lives he changed (fate.gd), and of the place
@@ -471,6 +474,10 @@ func dao_dialogue(key: String, npc: Dictionary = {}) -> Array:
 		# (the Higher Sky release, betters.gd: and how it went with the three who stood above him)
 		if Betters.epilogue(Game) != "":
 			lines.append(["Narrator", Betters.epilogue(Game)])
+		# (the Red Seal release, seals.gd, lists.gd: and of his papers, and of the meets)
+		for ep39 in [Seals.epilogue(Game), Lists.epilogue(Game)]:
+			if ep39 != "":
+				lines.append(["Narrator", ep39])
 		for rl9 in Reckon.epilogue(Game):
 			lines.append(["Narrator", str(rl9)])
 		# (the Three Burrows release: the town that is his own, and whose name is over its hall, hold.gd)
@@ -1634,7 +1641,23 @@ func offer_carriage(e: Dictionary) -> void:
 			"desc": "For the granary, the well-rope and the watch's lamp-oil: %d spirit stones (you have %d). A town is the better for it, a little, for good. A chest takes three gifts of one giver and no more (%d given here).%s" % [Weal.gift_cost(Game), Game.stones, Weal.acts(Game, wtid, "gift"), "" if gb == "" else "\n\n" + gb],
 			"col": UI.C_JADE if gb == "" else UI.C_DIM, "enabled": gb == ""})
 		opts.append({"id": "weal:ask", "label": "Ask how the town stands", "note": str(Weal.STATES[Weal.state(Game, wtid)].n), "desc": "%s\n\n%s" % [str(Weal.STATES[Weal.state(Game, wtid)].desc), Weal.town_text(Game, wtid)]})
+	# (the Red Seal release: the desk of the Hall of Seals, the board of the lists, the auction room, and what
+	# else the post carries: seals.gd, lists.gd, auction.gd, mail.gd)
+	if Seals.open(Game) and Seals.is_desk(office):
+		opts.append({"id": "seals", "label": "Go to the desk of the Hall of Seals", "note": "%d held" % Seals.count(Game), "desc": "A table beside the post with a red cloth on it, an ink-stone, and a registrar who has not looked up. Every Dao has a paper. A road walked or a weapon mastered is examined and sealed at the grade it has earned; the forbidden shelf is sworn shut.\n\n%s" % Seals.text(Game), "col": UI.C_GOLD})
+	var meet_id := Lists.at(office) if Lists.open(Game) else ""
+	if meet_id != "":
+		opts.append({"id": "lists", "label": "Read the board of the lists", "note": str(Lists.MEETS[meet_id].n), "desc": "%s\n\n%s" % [str(Lists.MEETS[meet_id].desc), Lists.text(Game)], "col": UI.C_GOLD})
+	var house_id := Auction.at(office) if Auction.open(Game) else ""
+	if house_id != "":
+		opts.append({"id": "room", "label": "Go up to the auction room", "note": str(Auction.HOUSES[house_id].n), "desc": "%s\n\n%s" % [str(Auction.HOUSES[house_id].desc), Auction.text(Game)], "col": UI.C_JADE})
 	if Mail.is_post(office):
+		# (a sealed bid whose day has come is opened wherever he next asks at a counter)
+		for sl in Auction.settle(Game):
+			Game.toast(str(sl))
+		if Game.done(Seals.OPEN):
+			var extra := Mail.answers(Game).size() + Game.parcels.size()
+			opts.append({"id": "post:more", "label": "Send something by the post", "note": "%d waiting" % extra if extra > 0 else "", "desc": "The post goes both ways now. A letter to somebody who has known him a long time, and their answer; a parcel of what is on his back, home to the storehouse; a gift to the chest of a town he is not standing in; a sealed bid for tomorrow's sale in another town's room; and whatever has come for him in a parcel.", "col": UI.C_JADE})
 		var here: Array = Mail.bags_for(Game, office)
 		if not here.is_empty():
 			var due := 0
@@ -1749,6 +1772,14 @@ func offer_carriage(e: Dictionary) -> void:
 						Feats.poll(Game)
 						Game.toast("The ark lets her ladder down at %s" % str(ao2.n))
 					)
+		elif oid == "seals":
+			offer_seals(e)
+		elif oid == "lists":
+			offer_lists(e, meet_id)
+		elif oid == "room":
+			offer_room(e, house_id)
+		elif oid == "post:more":
+			offer_post(e)
 		elif oid == "mail:read":
 			read_letter(str(Mail.waiting(Game)[0]), e)
 		elif oid == "mail:satchel":
@@ -1766,6 +1797,212 @@ func offer_carriage(e: Dictionary) -> void:
 			_seat_fares()
 			Feats.poll(Game)
 			say([[str(e.n), "She pulls a little to the left. They all pull a little to the left. Keep the axles greased and do not let anybody tell you how many it seats: it seats %d." % Fashion.seats(oid)]])
+	)
+
+# ---------------------------------------------------------------- the Red Seal release
+const SEALS_ASK := "The desk of the Hall of Seals"
+const LISTS_ASK := "The board of the lists"
+const ROOM_ASK := "The lots of today"
+const BID_ASK := "The lot is up"
+const POST_ASK := "What the post carries"
+
+## The desk of the Hall of Seals (seals.gd): a paper for every Dao that is his, examined and sealed.  "Not
+## today" is the first answer.  With a window the rite of the Dao is what is shown to the desk.
+func offer_seals(e: Dictionary) -> void:
+	var area := str(e.get("area", Game.area))
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "The registrar does not look up.", "col": UI.C_DIM}]
+	for id in Seals.order():
+		if Seals.due(Game, id) == 0 and not Game.seals.has(id):
+			continue
+		var bl := Seals.blocked(Game, id, area)
+		var gn := Seals.grade_name(Game, id)
+		opts.append({"id": str(id), "label": Seals.name_of(id), "note": gn if bl != "" and gn != "" else "%d stones" % Seals.fee(Game, id),
+			"desc": "%s\n\n%s%s" % [str(Seals.ASKS[id]), "Held: %s. " % gn if gn != "" else "", bl if bl != "" else "A sitting: %d spirit stones (you have %d)." % [Seals.fee(Game, id), Game.stones]],
+			"col": Rites.colour(id) if bl == "" else UI.C_DIM, "enabled": bl == ""})
+	if opts.size() < 2:
+		say([[Seals.EXAMINER, "There is no Dao of yours I can put a name to yet. Walk a road. Come back with something that is so."]])
+		return
+	choose(SEALS_ASK, opts, func(id: String):
+		if not Rites.RITES.has(id):
+			return
+		var seal_it := func():
+			var lines: Array = Seals.sit(Game, id, area)
+			if lines.is_empty():
+				return
+			say(lines, func():
+				Feats.poll(Game)
+				Game.poll_steps()
+				ask_picks()
+			)
+		# (what is shown to the desk is the rite of that Dao: drawn only, and not for an abjuration)
+		if DisplayServer.get_name() != "headless" and not args.has("bot") and Seals.kind(id) != "taboo" and Rites.his(Game, id):
+			play_rite(id, seal_it)
+		else:
+			seal_it.call()
+	)
+
+## The board of a meet (lists.gd): his name goes on it, and the next bout is called from it.
+func offer_lists(e: Dictionary, mid: String) -> void:
+	if mid == "":
+		return
+	var m: Dictionary = Lists.MEETS[mid]
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "The board will be here.", "col": UI.C_DIM}]
+	if Lists.entered(Game, mid):
+		var rid := Lists.rival(Game, mid)
+		var r := int(Game.meets[mid].round)
+		opts.append({"id": "bout", "label": "Step into the ring", "note": str(Data.ENEMIES[rid].n), "desc": "%s: %s, one against one. Yue Ling is at the rail. Words can be said across the ring; losing puts him out of the meet and costs nothing else." % [str(Lists.ROUNDS[r].n).capitalize(), str(Data.ENEMIES[rid].n)], "col": Color(Data.ENEMIES[rid].col)})
+	else:
+		var bl := Lists.blocked(Game, mid)
+		opts.append({"id": "enter", "label": "Put his name on the board", "note": "%d stones" % int(m.fee), "desc": "%s\n\nEight names, three bouts. The fee is %d spirit stones, once; the purse for first place is %d.%s" % [str(m.desc), int(m.fee), Lists.purse(Game, mid, 1, 0), "" if bl == "" else "\n\n" + bl], "col": UI.C_GOLD if bl == "" else UI.C_DIM, "enabled": bl == ""})
+	opts.append({"id": "read", "label": "Read the board", "desc": Lists.text(Game)})
+	choose(LISTS_ASK, opts, func(oid: String):
+		match oid:
+			"enter":
+				if Lists.enter(Game, mid):
+					say([[str(e.n), "On the board. Eight names; yours is the one the brush was still wet for. You fight when you are ready, and not before. Nobody here has anywhere else to be."]], func():
+						offer_lists(e, mid)
+					)
+			"bout":
+				meet_bout(e, mid)
+			"read":
+				say([["Narrator", Lists.text(Game)]])
+	)
+
+## The next bout of meet `mid` (lists.gd): what is said before it, and the ring.
+func meet_bout(e: Dictionary, mid: String) -> void:
+	if not Lists.entered(Game, mid):
+		return
+	var r := int(Game.meets[mid].round)
+	var rid := Lists.rival(Game, mid)
+	var pre: Array = boss_story(rid) if Lore.BOSS.has(rid) else []
+	pre.append_array(Data.DIALOGUE.get("bout:" + rid, []))
+	say(pre, func():
+		battle.start([Lists.foe(Game, mid, r)], {"entity": e, "boss": bool(Data.ENEMIES[rid].get("boss", false)), "enemy": rid, "meet": mid, "round": r, "theme": battle_theme(), "path_kind": "The lists", "path_n": str(Lists.ROUNDS[r].n)})
+		push("battle")
+	)
+
+## A bout of the lists is over (lists.gd): the board is moved, a purse paid if the meet is over for him, and a
+## step that asked for the meet is done however it went.
+func _meet_done(outcome: String, ctx: Dictionary) -> void:
+	var mid := str(ctx.meet)
+	var lines: Array = Lists.bout_over(Game, mid, outcome == "win", int(ctx.get("crowd", 0)), ctx.get("said", {}))
+	if outcome != "win":
+		for i in Game.party_size():
+			Game.hp[i] = maxf(Game.hp[i], float(Game.max_hp(i)) * Betters.LEFT)
+	Feats.poll(Game)
+	say(lines, func():
+		Game.poll_steps()
+		ask_picks()
+	)
+
+## An auction room (auction.gd): the four lots of the day.  "Let them all go" is the first answer.
+func offer_room(e: Dictionary, hid: String) -> void:
+	if hid == "":
+		return
+	var h: Dictionary = Auction.HOUSES[hid]
+	var opts: Array = [{"id": "later", "label": "Let them all go", "desc": "Nothing here is needed today.", "col": UI.C_DIM}]
+	for lot in Auction.lots(Game, hid):
+		var bl := Auction.blocked(Game, hid, lot)
+		opts.append({"id": "lot:%d" % int(lot.k), "label": "%s x%d" % [str(Data.ITEMS[str(lot.item)].n), int(lot.n)] + (" (the sealed room)" if bool(lot.sealed) else ""),
+			"note": "sold" if bool(lot.sold) else "%d called" % Auction.next_bid(Game, hid, lot),
+			"desc": "%s\n\nThe house values it at %d spirit stones. The next call is %d (you have %d).%s" % [str(Data.ITEMS[str(lot.item)].desc), int(lot.value), Auction.next_bid(Game, hid, lot), Game.stones, "" if bl == "" else "\n\n" + bl],
+			"col": UI.C_GOLD if bool(lot.sealed) else UI.C_TEXT, "enabled": bl == ""})
+	choose("%s: %s" % [ROOM_ASK, str(h.n)], opts, func(oid: String):
+		if oid.begins_with("lot:"):
+			bid_on(e, hid, int(oid.trim_prefix("lot:")))
+	)
+
+## A lot is up (auction.gd): a call, a bigger call, or "Let it go", which is first.
+func bid_on(e: Dictionary, hid: String, k: int) -> void:
+	var lot: Dictionary = Auction.lots(Game, hid)[k]
+	if Auction.blocked(Game, hid, lot) != "":
+		say([[str(Auction.HOUSES[hid].crier), Auction.blocked(Game, hid, lot)]])
+		return
+	var one := Auction.next_bid(Game, hid, lot)
+	var five := Auction.next_bid(Game, hid, lot, 5)
+	var opts: Array = [{"id": "", "label": "Let it go", "desc": "Somebody in the room wants it more than it is worth to him. That happens.", "col": UI.C_DIM},
+		{"id": "raise", "label": "Call %d" % one, "desc": "One raise. Worth %d by the house's reckoning.%s" % [int(lot.value), "\n\nIt stands at %d, against him: somebody in the room has topped his last call." % Auction.standing(Game, hid, lot) if Game.lot_at.has(Auction.key(hid, Game.day, k)) else "\n\nNobody has called yet."], "col": UI.C_GOLD},
+		{"id": "jump", "label": "Call %d" % five, "note": "five raises", "desc": "Five raises at once. The room goes quiet, which is what it is for.", "col": UI.C_GOLD, "enabled": Game.stones >= five}]
+	choose("%s: %s x%d" % [BID_ASK, str(Data.ITEMS[str(lot.item)].n), int(lot.n)], opts, func(oid: String):
+		if oid == "":
+			return
+		var res := Auction.bid(Game, hid, lot, one if oid == "raise" else five)
+		if res.is_empty():
+			return
+		if bool(res.won):
+			Feats.poll(Game)
+			say([[str(Auction.HOUSES[hid].crier), str(res.say)], ["Narrator", "Sold to Lin Feng: %s x%d, for %d spirit stones." % [str(Data.ITEMS[str(lot.item)].n), int(lot.n), int(res.at)]]], func():
+				Game.poll_steps()
+			)
+		else:
+			say([["", str(res.say)]], func():
+				bid_on(e, hid, k)
+			)
+	)
+
+## What else the post carries since the Red Seal release (mail.gd): a letter of his own, an answer, a parcel
+## home, a remittance, a sealed bid, a parcel for him.  "Not today" is the first answer.
+func offer_post(e: Dictionary) -> void:
+	var office := str(e.office)
+	var here := Weal.of_office(office)
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "There is a road waiting.", "col": UI.C_DIM}]
+	if not Game.parcels.is_empty():
+		opts.append({"id": "collect", "label": "Take what has come for him", "note": "%d parcel%s" % [Game.parcels.size(), "" if Game.parcels.size() == 1 else "s"], "desc": "Tied in oiled paper with the seal of an auction room on the knot.", "col": UI.C_GOLD})
+	for who in Mail.answers(Game):
+		opts.append({"id": "answer:" + str(who), "label": "Read the answer of %s" % str(Mail.PENPALS[who].n), "desc": "It has come by the carrier, and has been waiting.", "col": UI.C_GOLD})
+	for who in Mail.PEN_ORDER:
+		var wb := Mail.write_blocked(Game, str(who))
+		opts.append({"id": "write:" + str(who), "label": str(Mail.PENPALS[who].ask), "note": "%d stones" % Mail.postage(Game), "desc": "A sheet, a brush chained to the counter, and the carrier's fee. An answer takes %d days and can be asked for at any counter.%s" % [Mail.ANSWER, "" if wb == "" else "\n\n" + wb], "col": UI.C_JADE if wb == "" else UI.C_DIM, "enabled": wb == ""})
+	var sb := Mail.send_blocked(Game)
+	opts.append({"id": "parcel", "label": "Send what is on his back home", "note": "%d stones" % Mail.parcel_cost(Game) if sb == "" else "", "desc": "By the carrier's mule to the storehouse of the sect: %d jin of the land's goods, at %d spirit stones a jin. It is there to be fetched.%s" % [int(round(Mail.parcel_jin(Game))), int(Mail.PARCEL_JIN), "" if sb == "" else "\n\n" + sb], "enabled": sb == ""})
+	var n_remit := 0
+	for tid in Weal.towns(Game):
+		if n_remit < 3 and Mail.remit_blocked(Game, str(tid), here) == "":
+			n_remit += 1
+			opts.append({"id": "remit:" + str(tid), "label": "Send a gift to the chest of %s" % str(Weal.TOWNS[tid].n).trim_prefix("the "), "note": "%d stones" % Mail.remit_cost(Game), "desc": "The same gift as over its own counter (three a town, and no more), with the carrier's tenth on top: %d spirit stones (you have %d)." % [Mail.remit_cost(Game), Game.stones]})
+	if Auction.open(Game):
+		for hid in Auction.ORDER:
+			if Game.seen.has(str(Auction.HOUSES[hid].area)) and str(Auction.HOUSES[hid].office) != office:
+				opts.append({"id": "sealed:" + str(hid), "label": "Leave a sealed bid for %s" % str(Auction.HOUSES[hid].n), "desc": "For a lot of tomorrow's sale. The stones go into the bag with the bid. If nobody in the room would have gone higher the lot comes by post; if somebody would, the stones come back.", "col": UI.C_JADE})
+	choose(POST_ASK, opts, func(oid: String):
+		if oid == "collect":
+			var got: Array = Mail.collect(Game)
+			Feats.poll(Game)
+			say(got.map(func(x): return ["Narrator", str(x)]))
+		elif oid.begins_with("answer:"):
+			say(Mail.read_answer(Game, oid.trim_prefix("answer:")))
+		elif oid.begins_with("write:"):
+			var who2 := oid.trim_prefix("write:")
+			if Mail.write(Game, who2):
+				Feats.poll(Game)
+				say([["Narrator", "Lin Feng writes for longer than he meant to, crosses out the first line, and writes it again. The counter folds it in three and drops it in the bag for %s. An answer will be at any counter in %d days." % [str(Mail.PENPALS[who2].n), Mail.ANSWER]]])
+		elif oid == "parcel":
+			var jin := Mail.send_home(Game)
+			if jin > 0.0:
+				Feats.poll(Game)
+				say([[str(e.n), "%d jin, for the storehouse of the Azure Cloud Sect. The mule has carried worse. It has not carried it cheerfully, and it will not carry this cheerfully either." % int(round(jin))]])
+		elif oid.begins_with("remit:"):
+			if Mail.remit(Game, oid.trim_prefix("remit:"), here):
+				Feats.poll(Game)
+				Game.poll_steps()
+				say([[str(e.n), "It goes sealed, with a slip that says who from. I am obliged to put the slip in. You may take that up with %s." % str(Weal.TOWNS[oid.trim_prefix("remit:")].n)]])
+		elif oid.begins_with("sealed:"):
+			offer_sealed(e, oid.trim_prefix("sealed:"))
+	)
+
+## A sealed bid for one of tomorrow's lots in another town's room (auction.gd `post_bid`).
+func offer_sealed(e: Dictionary, hid: String) -> void:
+	var opts: Array = [{"id": "later", "label": "Not today", "desc": "The bag is tied up again.", "col": UI.C_DIM}]
+	for lot in Auction.lots_on(Game, hid, Game.day + 1):
+		for sh in [[0.8, "four fifths of its worth"], [1.0, "its worth"], [1.2, "a fifth over its worth"]]:
+			var amt := int(round(float(lot.value) * float(sh[0])))
+			var bl := Auction.post_blocked(Game, hid, int(lot.k), amt)
+			opts.append({"id": "%d:%d" % [int(lot.k), amt], "label": "%s x%d: bid %d" % [str(Data.ITEMS[str(lot.item)].n), int(lot.n), amt], "note": str(sh[1]), "desc": "The house values it at %d. Nobody outside the room knows what the room will go to.%s" % [int(lot.value), "" if bl == "" else "\n\n" + bl], "enabled": bl == ""})
+	choose("Tomorrow at %s" % str(Auction.HOUSES[hid].n), opts, func(oid: String):
+		if oid.contains(":"):
+			var pr := oid.split(":")
+			if Auction.post_bid(Game, hid, int(pr[0]), int(pr[1])):
+				say([[str(e.n), "Sealed, and in the bag. It will be opened in the room tomorrow with everybody watching, which is the only time anybody watches my post."]])
 	)
 
 ## A letter is read out (mail.gd): what is in it is taken, and if it can be answered, it is asked how.
@@ -2705,7 +2942,7 @@ const RECALLS := {"s_break6": "recall", "s_break8": "recall2", "s_break9": "reca
 	"s_break12": "recall6", "s_break13": "recall7", "s_break14": "recall8", "s_break15": "recall9", "s_break16": "recall10", "s_break17": "recall11",
 	"s_break18": "recall12", "s_break19": "recall13", "s_break20": "recall14", "s_break21": "recall15", "s_break22": "recall16", "s_break23": "recall17",
 	"s_break24": "recall18", "s_break25": "recall19", "s_break26": "recall20", "s_break27": "recall21",
-	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36"}
+	"s_break28": "recall22", "s_break29": "recall23", "s_break30": "recall24", "s_break31": "recall25", "s_break32": "recall26", "s_break33": "recall27", "s_break34": "recall28", "s_break35": "recall29", "s_break36": "recall30", "s_break37": "recall31", "s_break38": "recall32", "s_break39": "recall33", "s_break40": "recall34", "s_break41": "recall35", "s_break42": "recall36", "s_break43": "recall37"}
 
 ## The end of the story (cultures.gd ENDINGS): the sky is held, and the player chooses where the
 ## hero's own fire is to be kept, among the ends the journey has earned; then the ending's own lines,
@@ -2741,6 +2978,10 @@ func battle_done(outcome: String, ctx: Dictionary) -> void:
 	# (the Open Net release, crime.gd: he drew on the watch, or the bounty-takers found him)
 	if ctx.has("crime"):
 		_crime_done(outcome, ctx)
+		return
+	# (the Red Seal release, lists.gd: a bout of a meet, however it went)
+	if str(ctx.get("meet", "")) != "" and outcome in ["win", "out"]:
+		_meet_done(outcome, ctx)
 		return
 	# (the Higher Sky release, betters.gd: a bout with somebody above him, however it went)
 	if str(ctx.get("better", "")) != "" and outcome in ["win", "bested"]:

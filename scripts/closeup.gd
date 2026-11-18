@@ -39,6 +39,8 @@ const SIGNATURE := {
 	"Yong Ji": "stroke_beard", "Song the Younger": "shade_eyes", "Old Qi of the Gold Market": "stoop",
 	# A Cup of Water, a Cart of Firewood (Part XXXVII)
 	"Su Dai the Persuader": "arms_cross", "Minister Bai Gui": "stroke_beard", "Cai Yong": "measure",
+	# The Name That Can Be Named (Part XXXIX)
+	"Deng Xi, Advocate of Zheng": "sleeve_smile", "Hui Shi, Minister of Wei": "stroke_beard", "Gongsun Long": "arms_cross", "Registrar Yin Wen": "measure",
 	# A Sky Above the Sky (Part XXXVIII)
 	"Goujian of Yue": "hand_heart", "Sun Bin": "measure", "Lin Xiangru": "sleeve_smile",
 	"Fuchai, King of Wu": "shade_eyes", "Pang Juan, General of Wei": "stroke_beard", "Lian Po, General of Zhao": "arms_cross",

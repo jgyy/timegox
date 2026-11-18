@@ -115,6 +115,8 @@ const PEOPLE := {
 	"yong_ji": "characters/yong_ji", "song_younger": "characters/song_younger", "old_qi": "characters/old_qi",
 	# Part XXXVII (the Five Hands release): the persuader who told a king about firewood, the minister who sent his flood next door, and the man who heard a log
 	"su_dai": "characters/su_dai", "bai_gui": "characters/bai_gui", "cai_yong": "characters/cai_yong",
+	# Part XXXIX (the Red Seal release): the three disputers of the lists
+	"deng_xi": "characters/deng_xi", "hui_shi": "characters/hui_shi", "gongsun_long": "characters/gongsun_long",
 	# Part XXXVIII (the Higher Sky release): three who lost and what they did after, and the three who stand above him
 	"goujian": "characters/goujian", "sun_bin": "characters/sun_bin", "lin_xiangru": "characters/lin_xiangru",
 	"fuchai": "characters/fuchai", "pang_juan": "characters/pang_juan", "lian_po": "characters/lian_po",

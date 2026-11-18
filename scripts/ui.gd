@@ -31,7 +31,9 @@ const SHAPES := ["beast", "humanoid", "wisp", "blob", "wraith", "plant", "dragon
 	# the Tall People release: the giants of the old chapters in their own bodies
 	"person:fangfeng", "person:kuafu", "person:longbo_angler",
 	# Part XXXVIII (the Higher Sky release): the three who stand above him
-	"person:fuchai", "person:pang_juan", "person:lian_po"]
+	"person:fuchai", "person:pang_juan", "person:lian_po",
+	# Part XXXIX (the Red Seal release): the people of the lists
+	"person:deng_xi", "person:hui_shi", "person:gongsun_long", "person:folk_youth", "person:folk_maiden", "person:folk_guard", "person:folk_porter", "person:folk_scholar"]
 
 static func font() -> Font:
 	return ThemeDB.fallback_font

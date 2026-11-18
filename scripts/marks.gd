@@ -269,6 +269,15 @@ const MARKS := {
 			"who": ["Old Gardener Kang", "folk_grandpa", Color("8a8a7a"), "They wanted it taken to the treasury. I said leave it where it fell; I shall weed round it. I have weeded round worse. It never told me anything, you know. I was let in to carry slops, sixty years ago, and nobody thought to lay my hand on it. So I have nothing against it and nothing for it.", "A girl asked me what is under it. I said: the side with the answer on. She tried to lift it. Could not. She has gone off to get stronger. I thought that was a better use of a stone than the one it had before, and I told the Elder so, and he laughed until he had to sit on it."]},
 	},
 	# Part XXXVII (the Five Hands release): what the sect did before the next dry wind
+	# Part XXXIX (the Red Seal release): what the column beside the Roll is for
+	"the_red_seal": {
+		"open": {"area": "mountain", "m": ["seal", "open"], "k": 3, "n": "The Desk at the Cloud Gate", "desc": "A low table by the mountain path with a red cloth on it, an ink-stone, and a pot of red paste with the lid off. There is a mat in front of it worn through at the knees, and a cleaver, an oar and a wooden sword are leaning against the leg, left by whoever sat last.",
+			"who": ["Mian, Entered", "folk_youth", Color("b83a2a"), "I am the one who missed, Senior. I sat for the Crimson Flame Palm. Entered. A cook sat after me and got Proven. I have decided that is the right way round.", "People come up from Cloudfoot on the first of the month with whatever they are good at under one arm. A man brought a goat. The registrar asked what the goat was for. He said: I am very good with goats. Proven.", "I keep the paste from drying. It is the only office in the sect that anybody can do, Senior, and I asked for it."]},
+		"strict": {"area": "mountain", "m": ["seal", "strict"], "k": 3, "n": "The Posts of One Sentence", "desc": "A post at the side of the mountain path with a strip of paper pasted to it, a single line in a narrow hand, and under the line a row of small cuts in the wood: one for every morning somebody has stood in front of it and practised what it says.",
+			"who": ["Mian, Not Yet", "folk_youth", Color("4a4e58"), "I am the one who missed, Senior. I failed. Mine says: he looks at the fire and not at what the fire is next to. I have stood in front of it sixty mornings.", "Eleven of us have a post. We come at the hour nobody wants. Nobody speaks. Disciple Han brings tea and reads the sentences and says nothing, which is kind of him, for Disciple Han.", "I sit again in the spring. I am not sure I shall pass. I am sure I shall know why, either way, in one sentence. I had never had that before."]},
+		"blank": {"area": "mountain", "m": ["seal", "blank"], "k": 3, "n": "The Washed Leaves", "desc": "A line strung between two posts beside the mountain path with leaves of good paper pegged along it, washed grey and dried stiff, lifting a little in the wind off the sea of clouds. There is nothing on any of them. One, at the end, has a red seal in its corner.",
+			"who": ["Mian of the East Wall", "folk_youth", Color("d8d4c8"), "I am the one who missed, Senior. I peg them out when the wind takes one. Two hundred and six. I know which was mine by a tear in the corner. It says the same as everybody's.", "A farmer asked me what I am, with no paper. I put out his chimney. He said: that, then. It is the only examination I have ever passed, Senior, and I did not know I was sitting it.", "The registrar comes back, some evenings, without his box. He stands and reads them. All of them, one by one. He told me it is the most accurate register he ever compiled."]},
+	},
 	# Part XXXVIII (the Higher Sky release): what the sect teaches about those above it
 	"the_higher_sky": {
 		"gall": {"area": "mountain", "m": ["sky", "gall"], "k": 3, "n": "The Galls of the Outer Court", "desc": "A post as high as a seated man's head with a crossbar, and on the crossbar a dried gall on a loop of hemp, at exactly the height of a mouth. A board under it has three names on it, and room left for more.",
@@ -434,7 +443,7 @@ static func who_stands(g, e: Dictionary) -> bool:
 ## The crossroads of a later release whose marks are stood after the late bands of an older one
 ## (`"warband5"`, `"warband6"`), in a second pass (`after_bands`): a mark stood before them would take
 ## ground a band of an older map stood on, and the band would move.
-const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky"]
+const AFTER_BANDS := ["the_book", "the_sack", "the_knot", "the_mat", "the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal"]
 
 static func place(grid: PackedByteArray, W: int, H: int, owner: PackedByteArray, ids: Array, ents: Array, layer: String, reach: Dictionary, peaks: Array, camps: Dictionary, after_bands: bool = false) -> void:
 	var near := {}
@@ -882,6 +891,40 @@ static func model(sp: Dictionary, i: int = 0) -> Node3D:
 					_stick(b, Vector3(cos(a22) * 0.6, 0.12, sin(a22) * 0.6), Vector3(cos(a22) * 1.5, 0.05, sin(a22) * 1.5), 0.03, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 					b.torus(Vector3(cos(a22) * 1.5, 0.06, sin(a22) * 1.5), 0.12, 0.02, MB.tag(Color("e8f0e8"), MB.CRYSTAL))
 				g.ball(Vector3(0, 1.0, 0.62), 0.16, Color(1.0, 0.5, 0.2, 0.8), true)
+		"seal":
+			# what the column beside the Roll is for (the Red Seal release): a desk with its red cloth and what the
+			# last sitter left, a post with one sentence and its cuts, or washed leaves pegged on a line
+			var s_red := MB.tag(Color("b83a2a"), MB.CLOTH)
+			var s_paper := MB.tag(Color("e8e2d0"), MB.CLOTH)
+			match str(a[1]):
+				"open":
+					for lx in [-0.36, 0.36]:
+						for lz in [-0.2, 0.2]:
+							b.cyl(Vector3(lx, 0.2, lz), 0.025, 0.4, wd, Vector3.ZERO, 5)
+					b.box(Vector3(0, 0.42, 0), Vector3(0.86, 0.04, 0.5), w)
+					b.box(Vector3(0, 0.445, 0), Vector3(0.7, 0.012, 0.52), s_red)
+					b.box(Vector3(-0.2, 0.47, 0.02), Vector3(0.16, 0.04, 0.11), MB.tag(Color("2a2826"), MB.STONE))
+					b.cyl(Vector3(0.18, 0.48, -0.05), 0.045, 0.06, MB.tag(Color("8a2a20"), MB.STONE), Vector3.ZERO, 8)
+					b.box(Vector3(0, 0.012, 0.5), Vector3(0.6, 0.02, 0.4), MB.tag(Color("b8a468"), MB.CLOTH))
+					b.limb(Vector3(0.44, 0.0, 0.1), Vector3(0.48, 0.62 + 0.1 * (i % 3), 0.0), 0.014, 0.02, wp, 5)
+					if i % 2 == 0:
+						b.box(Vector3(0.5, 0.25, -0.16), Vector3(0.012, 0.3, 0.1), MB.tag(Color("9aa0a8"), MB.METAL), Vector3(0.1, 0, 0.12))
+				"strict":
+					b.cyl(Vector3(0, 0.75, 0), 0.06, 1.5, wd, Vector3.ZERO, 6)
+					b.box(Vector3(0, 1.1, 0.065), Vector3(0.09, 0.6, 0.006), s_paper)
+					b.box(Vector3(0, 1.36, 0.07), Vector3(0.05, 0.05, 0.004), s_red)
+					for r39 in 6 + 2 * (i % 3):
+						b.box(Vector3(-0.03 + 0.012 * float(r39 % 6), 0.62 - 0.05 * float(r39 / 6), 0.062), Vector3(0.004, 0.035, 0.004), MB.tag(Color("e8d8b8"), MB.WOOD))
+					b.box(Vector3(0, 0.012, 0.42), Vector3(0.5, 0.02, 0.36), MB.tag(Color("7a5a3a"), MB.STONE))
+				_:
+					for sx in [-0.8, 0.8]:
+						b.cyl(Vector3(sx, 0.8, 0), 0.035, 1.6, wd, Vector3.ZERO, 6)
+					b.limb(Vector3(-0.8, 1.55, 0), Vector3(0.8, 1.55, 0), 0.006, 0.006, MB.tag(Color("b8a878"), MB.CLOTH), 3)
+					for r39 in 5:
+						var lx39 := -0.6 + 0.3 * float(r39)
+						b.box(Vector3(lx39, 1.34, 0.0), Vector3(0.2, 0.4, 0.004), MB.tag(Color("d8d6d0").darkened(0.04 * float((r39 + i) % 3)), MB.CLOTH), Vector3(0.06 * float((r39 + i) % 3 - 1), 0, 0.03 * float(r39 % 2)))
+						b.box(Vector3(lx39, 1.55, 0.0), Vector3(0.02, 0.05, 0.02), wp)
+					b.box(Vector3(0.67, 1.2, 0.004), Vector3(0.045, 0.045, 0.003), s_red)
 		"sky":
 			# what the sect teaches about those above it (the Higher Sky release): a gall on its post with the board
 			# of names, a flat stone in a clay path, or a stand of tablets with a brush on a string

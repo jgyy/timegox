@@ -1552,6 +1552,37 @@ const CROSSROADS := {
 			"bury": "The testing stone lies on its face by the gate, under moss, and the novices tie their sandals on it. Whoever climbs is taken, as in the founder's day. Zeng Shen was never told what he was. He examined himself three times a day for sixty years to find out, and is said to have got an answer, and not to have thought it worth writing down.",
 		}},
 	# Part XXXVII (the Five Hands release): what a sect that can turn five phases owes six villages in a dry year
+	# Part XXXIX (the Red Seal release): what the column beside two hundred and six names is for
+	"the_red_seal": {"step": "s_p39_roll", "part": "XXXIX", "n": "What a Name Is For",
+		"ask": "The Hall of Seals has written out the Roll of the Azure Cloud Sect: two hundred and six names, and an empty column beside them. The registrar can fill it by supper. He will not, until somebody says what it means when it is full. The Elder has passed the question to Lin Feng, who has been named three times this month in front of a crowd.",
+		"options": [
+			{"id": "open", "label": "Seal whoever can do the thing", "tilt": {"reach": 3, "heart": 1}, "creed": {"virtue": 8}, "gain": {"hearth": {"valley": 3}},
+				"desc": "Open the desk to anybody. A cook who can joint an ox, a ferryman, a child of nine who knows where water goes on a fire: let them sit, and be sealed at what they are, beside the disciples. The paper will be worth less to those who thought it was theirs alone, and they will say so (the Rice Hearth, who never had a paper for anything, will know what was done).",
+				"log": "Had the desk of the Hall of Seals at Azure Cloud opened to whoever can do the thing, whoever taught them."},
+			{"id": "strict", "label": "Seal few, and seal hard", "tilt": {"heart": -3, "craft": 1}, "creed": {"rule": 6}, "gain": {"renown": 6},
+				"desc": "Let a paper mean what it says or nothing. The registrar examines each of the two hundred and six as he examined Lin Feng, and fails whoever is not yet what they call themselves, and tells them why in one sentence. Most of the outer court will fail the first sitting. Some will not sit again (the land will hear that a paper of Azure Cloud is never soft at the corner).",
+				"log": "Had every name on the Roll of Azure Cloud examined hard, and the column filled only where it was so."},
+			{"id": "blank", "label": "Leave the column empty", "tilt": {"craft": -3, "reach": -1}, "creed": {"rule": -6}, "gain": {"stones": 9800},
+				"desc": "A name is the guest of what is so. Wash the Roll and hang it to dry. Let the towns find out what a disciple is by what the disciple does at their door, as they always have. No disciple of the sect will be admitted to any meet again, and the Hall will not thank anybody (spirit stones: the fees of two hundred and six sittings, returned by a registrar who insists).",
+				"log": "Had the column beside the Roll of Azure Cloud left empty, and the leaves washed and hung to dry."},
+		],
+		"after": {
+			"open": [["Narrator", "The desk is carried down to the Cloud Gate and left there. The first to sit is Auntie Zhou of the kitchen, for the cleaver. She is asked to show the part that is not the knife, and she shows the registrar the bone she left in. Proven. By autumn there is a queue on the steps on the first of every month, and half of it has never held a sword."]],
+			"strict": [["Narrator", "It takes eleven days. He fails a hundred and sixty of them, each in one sentence, and writes the sentence down and gives it to them folded. The yard is very quiet for a week. Then, one by one, at hours nobody chose, they begin to be found in corners of it practising the single thing the sentence was about."]],
+			"blank": [["Narrator", "The leaves of the Roll are washed in the lotus pond and pegged along the east wall, two hundred and six of them, with the ink running down in grey threads. The registrar watches the whole of it. Then he asks for a leaf, and seals it blank, and puts it in his own sleeve, and goes down the steps without his box."]],
+		},
+		"echo": {
+			"s_p39_end": {
+				"open": [["Elder Qing Xuan", "And I am to sit next month, child, behind a ferryman. For sweeping. I have asked what grade a man gets who has done the top ten steps badly for a season. The registrar said he would have to watch. I find I am practising."]],
+				"strict": [["Elder Qing Xuan", "And he failed me, child. Did you hear? In one sentence. I shall not tell you what it was. It was true, and I have known it for fifty years, and nobody had the office to say it. I sit again in the spring, with Mian."]],
+				"blank": [["Elder Qing Xuan", "And two hundred and six blank leaves are drying on my east wall. A farmer came up this morning to ask which of my disciples was any good. I said: watch them. He was displeased. He is still here. He is watching them."]],
+			},
+		},
+		"end": {
+			"open": "The desk of the Hall of Seals stands at the Cloud Gate of Azure Cloud Sect on the first of every month, and whoever can do a thing may sit for it. There are cooks in the six villages with a paper of the cleaver and ferrymen Attested in the oar. The disciples complained for a generation. Their grandchildren could not see what about.",
+			"strict": "A paper of Azure Cloud Sect is the hardest in the land to come by. Four in five fail the first sitting, and are told why in a sentence, and keep the sentence. It is said in the towns that you need not read one of their papers: you may lean your whole weight on it. The sect is smaller than it was, and nobody in it is called what they are not.",
+			"blank": "There is no register at Azure Cloud Sect. The leaves of the last one were washed and hung on the east wall, and were never written on again. Whoever wants to know what one of its disciples is must go and watch one. The towns grumbled, and went, and watched, and on the whole were satisfied. The Hall of Seals lists the sect in its own roll as: uncertified; not in doubt.",
+		}},
 	# Part XXXVIII (the Higher Sky release): what a sect teaches about those who are above it
 	"the_higher_sky": {"step": "s_p38_low", "part": "XXXVIII", "n": "Those Above",
 		"ask": "Three people stand in the land who are above anybody on Azure Cloud Mountain, and one day a disciple of the sect will meet one in a road. For nine years the outer court trained under somebody who could not lose. Forty of them are standing in the yard, and the Elder has asked Lin Feng what they are to be taught.",
@@ -1572,6 +1603,12 @@ const CROSSROADS := {
 			"road": [["Narrator", "They go down in ones and twos. One loses at weiqi to a ferryman for a month. One is out-carried, every day, by a girl of the Felt Hearth with a yoke of milk. One comes home with a broken wrist and will not say whose. They are all easier to teach, afterwards, and they have stopped looking at Lin Feng to see how he walks."]],
 		},
 		"echo": {
+			# (the Red Seal release: and when a registrar asks what the sect's disciples are)
+			"s_p39_home": {
+				"gall": [["Elder Qing Xuan", "He asked what the galls were for. I said: so that nobody here forgets who is above them. He wrote: a sect that knows its place. I did not correct him. I am not sure it was a correction that was needed."]],
+				"ditch": [["Elder Qing Xuan", "He came in by the clay path, child. Round the gatepost, through the wet, with his box under his arm. Nobody told him to. I asked why. He said the paving looked like somebody else's. I think we may get on."]],
+				"road": [["Elder Qing Xuan", "He read the tablets of who beat whom on his way up. All of them. He said it was the first register he had seen that anybody wanted to be written in, and asked who kept it. I said: the losers. He wrote that down twice."]],
+			},
 			"s_p38_end": {
 				"gall": [["Elder Qing Xuan", "I have hung one over my own bed, child. It seemed only fair. I am eighty and I had forgotten what it is to be reminded of anything before I have had my tea. I do not recommend it. I shall not take it down."]],
 				"ditch": [["Elder Qing Xuan", "I walked your clay path this morning, to see. Disciple Han was coming the other way with the slop pails, and I stood in the wet to let him by. He nearly dropped them. In seventy years nobody on this mountain has seen me give way. I had not known it was news."]],
@@ -1854,7 +1891,7 @@ const ORDER := ["bandits", "garden", "roc_egg", "palace", "dragon_boon", "drawin
 	"the_sack",
 	"the_knot",
 	"the_mat",
-	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky"]
+	"the_verdict", "the_lintel", "the_mirror", "the_needle", "the_belts", "the_stone", "the_ladle", "the_round", "the_higher_sky", "the_red_seal"]
 
 # ---------------------------------------------------------------- the crossroads
 static func option(id: String, oid: String) -> Dictionary:

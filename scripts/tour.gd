@@ -2359,6 +2359,10 @@ func _run() -> void:
 		# the Iron Pestle release (--pestle, or --pestle=a,b): the people, foes and lords of Part XXXIII, what each
 		# answer of its crossroads leaves standing, the lords in battle, and the crossroads
 		await _pestle_shots(str(main.args.pestle))
+	if main.args.has("seal"):
+		# the Red Seal release (--seal, or --seal=a,b): the desk of the Hall of Seals and a paper sealed, the page of
+		# papers, a board of the lists, bouts and what is said in them, an auction room, the post, and Part XXXIX
+		await _seal_shots(str(main.args.seal))
 	if main.args.has("sky"):
 		# the Higher Sky release (--sky, or --sky=a,b): those above him where they stand, the choice in front of
 		# one, a bout and how it ends, the pages in their own words, and Part XXXVIII
@@ -6874,6 +6878,185 @@ func _sky_shots(which: String = "1") -> void:
 		main.choice.cursor = 1
 		await _wait(1.0)
 		await _shot("crossroads_higher_sky")
+		main.pop()
+		Game.cross_pending = []
+	get_tree().quit(0)
+
+## The Red Seal release: the desk of the Hall of Seals (seals.gd), the lists and words across a ring (lists.gd),
+## an auction room (auction.gd), what else the post carries (mail.gd), and the people, foes and marks of Part XXXIX.
+func _seal_shots(which: String = "1") -> void:
+	var only := which.split(",", false) if which != "1" else PackedStringArray()
+	var want := func(n: String) -> bool: return only.is_empty() or only.has(n)
+	_burrows_state()
+	Game.level = 130
+	Game.step = Data.step_index("s_p39_papers")
+	Game.companion = true
+	Game.day = 300
+	Game.stones = 96000
+	Game.dao = "sword"
+	Game.dao_xp = {"sword": 60, "heart": 14}
+	Game.arm_xp = {"sword": 120, "staff": 20, "spear": 30}
+	Game.arms = {"sword": true, "staff": true, "spear": true}
+	for a9 in ["village", "longmen", "tushan", "yanggu", "mountain"]:
+		Game.seen[a9] = true
+	main.set_stack(["world"])
+	main.world.clear_cache()
+	var w = main.world
+	var quiet := func():
+		Game.toasts.clear()
+		main.toast_list.clear()
+		Game.mail_told = 999
+		Game.fame_told = Fame.rank(Game)
+	var counter := func(office: String) -> Dictionary:
+		return {"kind": "office", "id": office, "office": office, "n": str(Offices.OFFICES[office].n), "area": str(Offices.OFFICES[office].area), "pos": Vector2i.ZERO}
+	if want.call("desk"):
+		w.load_area("sect", Vector2i(20, 9))
+		w.banner_t = 0.0
+		quiet.call()
+		await _wait(0.8)
+		main.offer_carriage(counter.call("treasurer"))
+		main.choice.cursor = maxi(0, main.choice.ids().find("seals"))
+		await _wait(0.8)
+		await _shot("counter_red_seal")
+		main.pop()
+		Game.seals = {"sword": {"grade": 2, "day": 298}, "t_blood": {"grade": 1, "day": 298}}
+		main.offer_seals(counter.call("treasurer"))
+		main.choice.cursor = maxi(0, main.choice.ids().find("a_sword"))
+		await _wait(0.8)
+		await _shot("seal_desk")
+		main.pop()
+		main.say(Seals.sit(Game, "a_sword", "sect"))
+		await _wait(5.0)
+		await _wait(2.0)
+		await _shot("seal_sealed")
+		main.pop()
+	if want.call("page"):
+		main.set_stack(["world"])
+		Game.seals = {}
+		for sid in Seals.order():
+			if Seals.due(Game, sid) > 0 and sid != "t_husk":
+				Game.seals[sid] = {"grade": Seals.due(Game, sid), "day": 290 + Game.seals.size()}
+		Game.meets = {"outer": {"round": 3, "day": 296, "place": 1, "crowd": 2, "best": 1, "times": 1, "said": {}}, "arms": {"round": 1, "day": 300, "place": 0, "crowd": 1, "best": 0, "times": 1, "said": {}}}
+		Game.bouts = 4
+		Game.bouts_won = 4
+		Game.words_said = 3
+		Game.purses = 13920
+		Game.lots_won = 2
+		Game.lot_spent = 2417
+		Game.lot_saved = 310
+		Game.inv["curio_inkstone"] = 1
+		main.open_menu()
+		main.menu.mode = "seals"
+		main.menu._build()
+		await _wait(0.6)
+		await _shot("seals_page")
+		main.pop()
+	if want.call("board"):
+		main.set_stack(["world"])
+		w.load_area("yanggu", Vector2i(34, 32))
+		w.banner_t = 0.0
+		Game.meets = {"outer": {"round": 3, "day": 296, "place": 1, "crowd": 2, "best": 1, "times": 1, "said": {}}}
+		Game.seals["a_sword"] = {"grade": 3, "day": 298}
+		quiet.call()
+		await _wait(0.8)
+		main.offer_lists(counter.call("warden_yanggu"), "arms")
+		main.choice.cursor = 1
+		await _wait(0.8)
+		await _shot("lists_board")
+		main.pop()
+	if want.call("bouts"):
+		for bt in [["outer", 2, "sect"], ["arms", 2, "yanggu"], ["schools", 2, "tushan"], ["schools", 1, "tushan"]]:
+			main.set_stack(["world"])
+			var b = main.battle
+			var rid := str(Lists.MEETS[str(bt[0])].rivals[int(bt[1])])
+			Game.heal_full()
+			Game.meets[str(bt[0])] = {"round": int(bt[1]), "day": 300, "place": 0, "crowd": 0, "best": 0, "times": 1, "said": {}}
+			b.start([Lists.foe(Game, str(bt[0]), int(bt[1]))], {"entity": counter.call(str(Lists.MEETS[str(bt[0])].office)), "boss": bool(Data.ENEMIES[rid].get("boss", false)), "enemy": rid, "meet": str(bt[0]), "round": int(bt[1]), "theme": str(Data.AREAS[str(bt[2])].theme), "area": str(bt[2]), "path_kind": "The lists", "path_n": str(Lists.ROUNDS[int(bt[1])].n)})
+			main.push("battle")
+			await _wait(3.4)
+			await _shot("bout_" + rid)
+			if rid == "deng_xi":
+				b.cur = b.party[0]
+				b.state = "menu"
+				b._open_main()
+				b.cursor = b.ids.find("words")
+				await _wait(0.5)
+				await _shot("bout_menu")
+				b._open_words()
+				b.cursor = 1
+				await _wait(0.5)
+				await _shot("bout_words")
+				b._say_word("boast")
+				await _wait(0.7)
+				await _shot("bout_said")
+				b._out(false)
+				await _wait(1.6)
+				await _shot("bout_out")
+			main.pop()
+	if want.call("room"):
+		main.set_stack(["world"])
+		w.load_area("village", Vector2i(30, 30))
+		w.banner_t = 0.0
+		Game.lots = {}
+		Game.lot_at = {}
+		quiet.call()
+		await _wait(0.8)
+		main.offer_room(counter.call("head_qingshi"), "qingshi")
+		main.choice.cursor = 1
+		await _wait(0.8)
+		await _shot("auction_room")
+		main.pop()
+		var lot: Dictionary = Auction.lots(Game, "qingshi")[1]
+		Auction.bid(Game, "qingshi", lot, Auction.next_bid(Game, "qingshi", lot))
+		main.bid_on(counter.call("head_qingshi"), "qingshi", 1)
+		main.choice.cursor = 1
+		await _wait(0.8)
+		await _shot("auction_bid")
+		main.pop()
+	if want.call("post"):
+		main.set_stack(["world"])
+		w.load_area("village", Vector2i(30, 30))
+		w.banner_t = 0.0
+		Game.inv["timber"] = 6
+		Game.wrote = {"wen": {"day": 290, "n": 1, "read": false}}
+		Game.parcels = [{"item": "curio_carp", "n": 1, "from": "The Tide Hammer of Longmen"}]
+		quiet.call()
+		await _wait(0.8)
+		main.offer_post(counter.call("head_qingshi"))
+		main.choice.cursor = 2
+		await _wait(0.8)
+		await _shot("post_more")
+		main.pop()
+		main.say(Mail.read_answer(Game, "wen"))
+		await _wait(5.0)
+		await _shot("post_answer")
+		main.pop()
+		main.offer_sealed(counter.call("head_qingshi"), "tushan")
+		main.choice.cursor = 2
+		await _wait(0.8)
+		await _shot("post_sealed_bid")
+		main.pop()
+	if want.call("people"):
+		await _gallery("part39_people", [Assets.person("deng_xi"), Assets.person("hui_shi"), Assets.person("gongsun_long")], 0.5, 0.2)
+	if want.call("foes"):
+		var fs: Array = []
+		for fid2 in ["straw_champion", "scroll_form", "empty_title", "turnip_stamp", "sold_name", "ink_blot", "white_not_horse", "feathered_egg", "halved_stick"]:
+			fs.append(_foe(fid2))
+		await _gallery("part39_foes", fs, 1.0, 0.25)
+	if want.call("marks"):
+		var mk: Array = []
+		for oid in ["open", "strict", "blank"]:
+			mk.append(Marks.model(Marks.MARKS.the_red_seal[oid], 0))
+		await _gallery("part39_marks", mk, 1.6, 0.3)
+	if want.call("cross"):
+		main.set_stack(["world"])
+		Game.step = Data.step_index("s_p39_roll") + 1
+		Game.picks.erase("the_red_seal")
+		Game.cross_pending = ["the_red_seal"]
+		main.ask_crossroads()
+		main.choice.cursor = 1
+		await _wait(1.0)
+		await _shot("crossroads_red_seal")
 		main.pop()
 		Game.cross_pending = []
 	get_tree().quit(0)

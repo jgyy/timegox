@@ -18,7 +18,7 @@ var finished := false
 var report_path := "build/bot_report.json"
 var shots_dir := ""
 var min_time := 3600.0
-var max_time := 46.0 * 3600.0
+var max_time := 49.0 * 3600.0
 var shots_taken := {}
 var logged := 0
 
@@ -196,7 +196,9 @@ const CROSS_PLAN := {"bandits": ["mend"], "garden": ["study"], "roc_egg": ["hatc
 	"the_mirror": ["rivet"],
 	# Part XXXIII: sent to take a turn at the stone
 	"the_needle": ["turn"],
-	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"], "the_higher_sky": ["ditch"]}
+	"the_belts": ["wait"], "the_stone": ["keep"], "the_ladle": ["teach"], "the_round": ["watch"], "the_higher_sky": ["ditch"],
+	# Part XXXIX: the desk is carried down to the Cloud Gate
+	"the_red_seal": ["open"]}
 ## The Hundred Works (works.gd): the order in which the bot builds, as a builder of engines who keeps
 ## a fire-drill in his pack and an array to sit in: the wheel's school first, the cheap first works
 ## of the other two beside it.  It builds a work once it can and has four times its price in hand
@@ -374,6 +376,17 @@ func _apply_start() -> void:
 			Game.trials[st2.boss] = str(TRIAL_PLAN.get(st2.boss, "might"))
 		# (the Higher Sky release, betters.gd: those above him were met as the bot meets them: fought, and lost to;
 		# with --yield given way to, and with --bot-up beaten, so that either branch can be played from its start)
+		# (the Red Seal release: the papers a step asked for were sat for, and a meet behind him was fought to its
+		# last bout and lost there, as somebody who came second would have left it)
+		if st2.kind == "seal":
+			for sid9 in Seals.order():
+				if Game.seals.size() < int(st2.n) and Seals.due(Game, sid9) > 0:
+					Game.seals[sid9] = {"grade": Seals.due(Game, sid9), "day": 1}
+		if st2.kind == "meet":
+			for sid8 in Seals.order():
+				if Seals.due(Game, sid8) > 0 and not Game.seals.has(sid8) and (Game.seals.size() < int(Lists.MEETS[str(st2.meet)].papers) or (Seals.kind(sid8) == "arm" and Seals.count_of(Game, "arm") < 1)):
+					Game.seals[sid8] = {"grade": Seals.due(Game, sid8), "day": 1}
+			Game.meets[str(st2.meet)] = {"round": 2, "day": 1, "place": 2, "crowd": 0, "best": 2, "times": 1, "said": {}}
 		if st2.kind == "dare":
 			var bhow := "won" if main.args.has("bot-up") else ("gave" if main.args.has("yield") else "lost")
 			Game.bested[str(st2.boss)] = {"first": bhow, "last": bhow, "base": lv + 3 * int(Betters.BETTERS[str(st2.boss)].over), "day": 1, "took": 0, "wound": bhow != "won" and not (bhow == "gave" and bool(Betters.BETTERS[str(st2.boss)].bow)), "bouts": 1}
@@ -841,6 +854,30 @@ func _world(d: float) -> void:
 				_start_meditate("rest")
 			else:
 				_goto_entity(s.area, "boss_" + s.boss)
+		"seal":
+			# Part XXXIX (seals.gd): to a desk of the Hall of Seals (the choice sits for the paper, _choice); with
+			# nothing he could sit for and pay for, to the wild
+			if Seals.ready(Game) == "":
+				_grind()
+			else:
+				_goto_entity("sect", "treasurer")
+		"meet":
+			# Part XXXIX (lists.gd): to the counter where the meet is called, rested, since he fights alone (the
+			# choice enters him and calls the next bout, _choice); short of a paper the meet asks for, the same
+			# counter keeps a desk; short of the fee, to the wild
+			var mt: Dictionary = Lists.MEETS[str(s.meet)]
+			if not Lists.entered(Game, str(s.meet)) and Lists.blocked(Game, str(s.meet)) != "" and Seals.ready(Game) == "":
+				_grind()
+			elif _hp_ratio() < 0.9 or _qi_ratio() < 0.7:
+				_start_meditate("rest")
+			else:
+				_goto_entity(str(mt.area), str(mt.office))
+		"bid":
+			# Part XXXIX (auction.gd): to the auction room, for the lot that goes cheapest today
+			if Auction.cheapest(Game, str(s.house)).is_empty():
+				_grind()
+			else:
+				_goto_entity(str(Auction.HOUSES[str(s.house)].area), str(Auction.HOUSES[str(s.house)].office))
 		"marks":
 			# Part XXIV: the nearest thing a choice left standing that has not been looked at (marks.gd)
 			_marks_step()
@@ -1838,6 +1875,48 @@ func _choice() -> void:
 			for wt2 in Weal.ORDER:
 				if ("At the counter of " + str(Offices.OFFICES[str(Weal.TOWNS[wt2].office)].n)) == str(c.title) and not Weal.is_bettered(Game, wt2):
 					want = ids.find("weal:give")
+		# (the Red Seal release: a paper, a meet or a lot while a step asks for one: seals.gd, lists.gd, auction.gd)
+		if not st.is_empty() and st.kind == "seal" and ids.has("seals") and Seals.ready(Game) != "":
+			want = ids.find("seals")
+		elif not st.is_empty() and st.kind == "meet":
+			var mid9 := str(st.meet)
+			if ("At the counter of " + str(Offices.OFFICES[str(Lists.MEETS[mid9].office)].n)) == str(c.title):
+				if ids.has("lists") and (Lists.entered(Game, mid9) or Lists.blocked(Game, mid9) == ""):
+					want = ids.find("lists")
+				elif ids.has("seals") and _seal_wanted() != "":
+					want = ids.find("seals")
+		elif not st.is_empty() and st.kind == "bid" and ids.has("room") and ("At the counter of " + str(Offices.OFFICES[str(Auction.HOUSES[str(st.house)].office)].n)) == str(c.title):
+			want = ids.find("room")
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title) == main.SEALS_ASK:
+		want = ids.find(_seal_wanted()) if not st.is_empty() and st.kind in ["seal", "meet"] else -1
+		_nav(ids.size(), c.cursor, want if want >= 0 else ids.find("later"))
+		return
+	if str(c.title) == main.LISTS_ASK:
+		want = ids.find("later")
+		if not st.is_empty() and st.kind == "meet":
+			if ids.has("bout"):
+				want = ids.find("bout")
+			elif ids.has("enter") and c.options[ids.find("enter")].get("enabled", true):
+				want = ids.find("enter")
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title).begins_with(main.ROOM_ASK):
+		want = ids.find("later")
+		if not st.is_empty() and st.kind == "bid":
+			var lot9: Dictionary = Auction.cheapest(Game, str(st.house))
+			if not lot9.is_empty() and ids.has("lot:%d" % int(lot9.k)):
+				want = ids.find("lot:%d" % int(lot9.k))
+		_nav(ids.size(), c.cursor, want)
+		return
+	if str(c.title).begins_with(main.BID_ASK):
+		# a lot is up: one raise when one will end it, five at a time until then
+		want = ids.find("")
+		if not st.is_empty() and st.kind == "bid":
+			for lot8 in Auction.lots(Game, str(st.house)):
+				if str(c.title) == "%s: %s x%d" % [main.BID_ASK, str(Data.ITEMS[str(lot8.item)].n), int(lot8.n)] and Auction.blocked(Game, str(st.house), lot8) == "":
+					want = ids.find("raise") if Auction.to_win(Game, str(st.house), lot8) <= Auction.next_bid(Game, str(st.house), lot8) or not c.options[ids.find("jump")].get("enabled", true) else ids.find("jump")
 		_nav(ids.size(), c.cursor, want)
 		return
 	if str(c.title) == main.FIT_ASK:
@@ -3104,10 +3183,22 @@ func _battle() -> void:
 		"menu":
 			_battle_menu(b)
 
+## The paper the bot sits for next (seals.gd): the first it can; and, while a meet wants a paper of a weapon's
+## Dao and it has none, the first of those.
+func _seal_wanted() -> String:
+	var st := Game.cur_step()
+	if not st.is_empty() and st.kind == "meet" and str(Lists.MEETS[str(st.meet)].of) == "arm" and Seals.count_of(Game, "arm") < 1:
+		for sid in Seals.order():
+			if Seals.kind(sid) == "arm" and Seals.blocked(Game, sid) == "":
+				return sid
+	return Seals.ready(Game)
+
 func _battle_menu(b) -> void:
 	var plan := _plan(b)
 	var want := -1
 	match b.menu_kind:
+		"words":
+			want = b.ids.find(plan.get("word", ""))
 		"main":
 			want = b.ids.find(plan.top)
 		"skills":
@@ -3129,6 +3220,11 @@ func _plan(b) -> Dictionary:
 		return {"top": "yield"}
 	var allies: Array = b.alive(b.party)
 	var foes: Array = b.alive(b.foes)
+	# (the Red Seal release, lists.gd: in a bout of the lists the one thing worth saying to this rival is said, once)
+	if str(b.meet) != "" and not foes.is_empty():
+		var bw := Lists.best_word(str(foes[0].id))
+		if bw != "" and not b.said.has(bw) and not b.word_turn:
+			return {"top": "words", "word": bw}
 	var low: Dictionary = allies[0]
 	for a in allies:
 		if a.hp / a.maxhp < low.hp / low.maxhp:
@@ -3339,6 +3435,11 @@ func _finish(reason: String) -> void:
 		if Game.bested.has(bid):
 			how_b.append("%s %s, the story went %s" % [bid, str(Game.bested[bid].first), Betters.branch(Game, bid)])
 	print("those above     : %d of 3 met; %d bouts lost (%d given way to), %d won; %s; wounds still on him %s" % [Betters.met(Game), Game.overmatched, Game.bowed, Game.bettered, "; ".join(how_b) if not how_b.is_empty() else "none met", str(Betters.tags(Game))])
+	# (the Red Seal release: seals.gd, lists.gd, auction.gd)
+	var places: Array = []
+	for mid8 in Lists.ORDER:
+		places.append("%s %s" % [mid8, str(Lists.PLACES[Lists.best(Game, mid8)]) if Lists.finished(Game, mid8) else "not fought"])
+	print("the red seal    : %d papers held %s; meets: %s; %d bouts, %d won, %d things said across a ring, %d stones in purses; %d lots bought for %d stones" % [Seals.count(Game), str(Seals.held(Game)), "; ".join(places), Game.bouts, Game.bouts_won, Game.words_said, Game.purses, Game.lots_won, Game.lot_spent])
 	print("their own words : %d of %d pages written (Lin Feng %d, Yue Ling %d, Elder Qing Xuan %d)" % [Game.pages.size(), Memoir.ORDER.size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "lin").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "yue").size(), Game.pages.keys().filter(func(k): return str(Memoir.PAGES[k].who) == "elder").size()])
 	var stood := 0
 	for lid9 in ["surface", "heaven", "under", "sea"]:

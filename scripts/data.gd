@@ -2,11 +2,11 @@ class_name Data
 extends RefCounted
 ## Static game content: realms, skills, enemies, areas, quest chain and dialogue.
 
-const MAX_LEVEL := 129
-const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea"]
+const MAX_LEVEL := 132
+const REALMS := ["Qi Condensation", "Foundation Establishment", "Golden Core", "Nascent Soul", "Deity Transformation", "Void Refinement", "Dao Merging", "Mahayana", "True Immortal", "Dao Ancestor", "Primordial Sovereign", "Samsara Transcendence", "Boundless Heart", "Star River Crossing", "Sun-Moon Harmony", "Mountain-River Oneness", "Three Realms Concord", "Ten Thousand Waters Return", "Myriad Daos as One", "Karma Fulfilled", "Kindred Dao", "Ten Thousand Hearths", "Myriad Things Awake", "Fire Passed On", "Skill Become Dao", "Hollow Vessel", "Sheathed Edge", "Leaning on Nothing", "Great Sound, Rarely Heard", "Soft as Water", "Scarcely Known", "Room for the Blade", "Sumeru in a Seed", "Rings Returned", "Everything in Its Place", "Three Sides Open", "Great and Small Alike", "Parted and Whole", "Practised Hand", "Sleeves of Wind", "Uncarved Block", "Light Hand", "Five in One Hand", "Low as the Sea", "Hidden and Nameless"]
 const STAGES := ["Early", "Middle", "Late"]
-const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000]
-const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300]
+const EXP_NEED := [124, 228, 352, 538, 787, 1076, 1490, 1987, 2588, 3416, 4450, 5692, 13200, 17400, 22500, 28800, 36600, 46500, 34000, 41000, 49000, 58000, 68000, 80000, 140000, 160000, 230000, 200000, 230000, 280000, 225000, 262000, 315000, 360000, 400000, 450000, 470000, 505000, 545000, 580000, 605000, 615000, 650000, 675000, 700000, 705000, 725000, 750000, 775000, 800000, 830000, 520000, 580000, 640000, 400000, 440000, 480000, 360000, 400000, 440000, 420000, 460000, 500000, 450000, 490000, 530000, 480000, 520000, 560000, 500000, 540000, 580000, 520000, 560000, 600000, 540000, 580000, 620000, 560000, 600000, 640000, 580000, 620000, 660000, 600000, 640000, 680000, 620000, 660000, 700000, 640000, 680000, 720000, 660000, 700000, 740000, 700000, 740000, 780000, 740000, 780000, 820000, 780000, 820000, 860000, 820000, 860000, 900000, 860000, 900000, 940000, 900000, 940000, 980000, 940000, 980000, 1020000, 980000, 1020000, 1060000, 1020000, 1060000, 1100000, 1060000, 1100000, 1140000, 1100000, 1140000, 1180000, 1140000, 1180000, 1220000]
+const ENEMY_EXP := [4, 8, 12, 19, 28, 39, 54, 72, 93, 123, 161, 206, 260, 320, 390, 470, 560, 660, 770, 880, 1000, 1130, 1270, 1420, 1580, 1750, 1930, 2120, 2320, 2530, 2750, 2980, 3220, 3470, 3730, 4000, 4280, 4580, 4900, 5240, 5600, 5980, 6380, 6800, 7240, 7700, 8170, 8650, 9140, 9640, 10160, 10700, 11250, 11820, 12400, 12990, 13590, 14200, 14820, 15450, 16100, 16760, 17430, 18110, 18800, 19500, 20200, 20900, 21600, 22300, 23000, 23700, 24400, 25100, 25800, 26500, 27200, 27900, 28600, 29300, 30000, 30700, 31400, 32100, 32800, 33500, 34200, 34900, 35600, 36300, 37000, 37700, 38400, 39100, 39800, 40500, 41200, 41900, 42600, 43300, 44000, 44700, 45400, 46100, 46800, 47500, 48200, 48900, 49600, 50300, 51000, 51700, 52400, 53100, 53800, 54500, 55200, 55900, 56600, 57300, 58000, 58700, 59400, 60100, 60800, 61500, 62200, 62900, 63600, 64300, 65000, 65700, 66400]
 const ELEM_COLORS := {
 	"phys": Color("d8d8e0"), "fire": Color("ff7a45"), "water": Color("5aa9ff"),
 	"wood": Color("6fe08a"), "earth": Color("d9a35a"), "thunder": Color("f6e85c"), "dark": Color("b06cff"),
@@ -109,6 +109,8 @@ const REALM_INFO := [
 	{"life": 0, "title": "Light Hand", "note": "A pond was drained for one supper, a field pulled taller in an afternoon, a hill hollowed after one vein. He can part a wood with a stroke now, and has learned the harder thing, which is one stalk. Govern a great country as you would cook a small fish: this is the realm of having turned it once, and stopped."},
 	{"life": 0, "title": "Five in One Hand", "note": "A man carried firewood to put out a fire. A minister sent his flood next door and called it skill. A cook fed a stove with the one log in the province that could sing. Each had a phase in his hand and did not ask what it meets. Wood feeds fire, fire leaves earth, water puts fire out, and a cup does not put out a cartload. This is the realm of knowing what the thing in the hand does to the thing in front of it."},
 	{"life": 0, "title": "Who Lies Below", "note": "A king lost his country and slept on brushwood with a gall hung over the bed. A strategist lost his knees and won from a cart. A minister turned his carriage into a ditch for a man he could have broken with a word. The rivers and the seas are kings of the hundred valleys because they lie below them. This is the realm of having met somebody above you, and still being on the road."},
+	# Part XXXIX (the Red Seal release): what is left when the name and the thing have been held side by side
+	{"life": 0, "title": "Whom No Paper Names", "note": "An advocate proved either side of anything for the price of a coat. A minister filled five carts with books and missed the one man who laughed at them. A disputer rode a white horse to a gate and proved it was not a horse. The Way is hidden and has no name, says the old book, and a name is the guest of what is so. This is the realm of having been certified, and of not needing to take the paper out."},
 ]
 
 ## Townsfolk notice a cultivator's realm: one of these joins their chat now and then (by realm band:
@@ -1079,6 +1081,26 @@ const ENEMIES := {
 	"fuchai": {"n": "Fuchai, King of Wu", "elem": "water", "weak": "thunder", "col": Color("2a5a7a"), "shape": "person:fuchai", "boss": true, "better": true},
 	"pang_juan": {"n": "Pang Juan, General of Wei", "elem": "thunder", "weak": "earth", "col": Color("6a3a3a"), "shape": "person:pang_juan", "boss": true, "better": true},
 	"lian_po": {"n": "Lian Po, General of Zhao", "elem": "earth", "weak": "wood", "col": Color("7a6a4a"), "shape": "person:lian_po", "boss": true, "better": true},
+	# ---- Part XXXIX: The Name That Can Be Named (the Red Seal release): names with nothing in them, in three caves,
+	# and the people of the lists (lists.gd: each fought alone, at his own level on the day and a little over)
+	"straw_champion": {"n": "Champion of an Empty Yard", "elem": "wood", "weak": "fire", "col": Color("b8a468"), "shape": "golem", "pal": {"sec": Color("6a5a34"), "acc": Color("b83a2a")}},
+	"scroll_form": {"n": "Form Learned from a Scroll", "elem": "thunder", "weak": "earth", "col": Color("8a8a9a"), "shape": "wraith", "pal": {"sec": Color("3a3a48"), "acc": Color("e8e0c8")}},
+	"empty_title": {"n": "Title with Nobody in It", "elem": "water", "weak": "thunder", "col": Color("6a7a9a"), "shape": "wisp", "pal": {"sec": Color("2e3648"), "acc": Color("d8c060")}},
+	"turnip_stamp": {"n": "Seal Cut from a Turnip", "elem": "earth", "weak": "wood", "col": Color("b89a8a"), "shape": "blob", "pal": {"sec": Color("6a4a42"), "acc": Color("c83a2a")}},
+	"sold_name": {"n": "Name Bought over a Counter", "elem": "phys", "weak": "thunder", "col": Color("6a6258"), "shape": "humanoid", "pal": {"sec": Color("38322c"), "acc": Color("c8a050")}},
+	"ink_blot": {"n": "Blot Where a Grade Was", "elem": "water", "weak": "thunder", "col": Color("2a2a34"), "shape": "wisp", "pal": {"sec": Color("14141c"), "acc": Color("8a8aa8")}},
+	"white_not_horse": {"n": "White Horse That Is Not a Horse", "elem": "thunder", "weak": "earth", "col": Color("d8d4c8"), "shape": "beast", "pal": {"sec": Color("8a8478"), "acc": Color("f4f0e8")}},
+	"feathered_egg": {"n": "Egg That Has Feathers", "elem": "water", "weak": "thunder", "col": Color("c8c0a8"), "shape": "blob", "pal": {"sec": Color("7a7460"), "acc": Color("e8a850")}},
+	"halved_stick": {"n": "Stick Halved Every Day", "elem": "wood", "weak": "fire", "col": Color("8a6a44"), "shape": "mantis", "pal": {"sec": Color("4a3826"), "acc": Color("d8c898")}},
+	"list_meng": {"n": "Brother Meng Zhi", "elem": "fire", "weak": "water", "col": Color("a85a3a"), "shape": "person:folk_youth"},
+	"list_bai_lu": {"n": "Senior Sister Bai Lu", "elem": "water", "weak": "thunder", "col": Color("7a9ab8"), "shape": "person:folk_maiden"},
+	"list_han_yue": {"n": "Senior Brother Han Yue", "elem": "thunder", "weak": "earth", "col": Color("4a5a8a"), "shape": "person:folk_guard", "boss": true},
+	"list_tong": {"n": "Spear-Master Tong of Yanggu", "elem": "earth", "weak": "wood", "col": Color("9a7a4a"), "shape": "person:folk_porter"},
+	"list_yue_nu": {"n": "The Maiden of Yue", "elem": "wood", "weak": "fire", "col": Color("5a8a5a"), "shape": "person:folk_maiden"},
+	"deng_xi": {"n": "Deng Xi, Advocate of Zheng", "elem": "fire", "weak": "water", "col": Color("8a5a32"), "shape": "person:deng_xi", "boss": true},
+	"list_kong": {"n": "Kong Chuan of Lu", "elem": "earth", "weak": "wood", "col": Color("6a6a5a"), "shape": "person:folk_scholar"},
+	"hui_shi": {"n": "Hui Shi, Minister of Wei", "elem": "water", "weak": "thunder", "col": Color("7a4a6a"), "shape": "person:hui_shi"},
+	"gongsun_long": {"n": "Gongsun Long", "elem": "thunder", "weak": "earth", "col": Color("d8d8e0"), "shape": "person:gongsun_long", "boss": true},
 	"the_knack": {"n": "The Gift That Never Practised", "elem": "thunder", "weak": "earth", "col": Color("d8b850"), "shape": "warden", "boss": true, "pal": {"sec": Color("8a6a20"), "acc": Color("f8f0e0")}},
 	# ---- the Open Net release: who serves a bill (crime.gd), who is sent for an art the precepts forbid (taboo.gd), and
 	# what comes into a country that has been hunted out (wilds.gd)
@@ -1462,6 +1484,11 @@ const AREAS := {
 			{"id": "p16_plum3", "item": "plum_sprig", "pos": Vector2i(46, 34), "vis": ["s_p16_plum", ""]}, {"id": "p16_plum4", "item": "plum_sprig", "pos": Vector2i(58, 26), "vis": ["s_p16_plum", ""]},
 			{"id": "p16_plum5", "item": "plum_sprig", "pos": Vector2i(62, 8), "vis": ["s_p16_plum", ""]}, {"id": "p16_plum6", "item": "plum_sprig", "pos": Vector2i(72, 38), "vis": ["s_p16_plum", ""]},
 			{"id": "p16_plum7", "item": "plum_sprig", "pos": Vector2i(30, 6), "vis": ["s_p16_plum", ""]}, {"id": "p16_plum8", "item": "plum_sprig", "pos": Vector2i(40, 46), "vis": ["s_p16_plum", ""]},
+			# Part XXXIX (the Red Seal release)
+			{"id": "p39_tally1", "item": "entry_tally", "pos": Vector2i.ZERO, "vis": ["s_p39_yard", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p39_tally2", "item": "entry_tally", "pos": Vector2i.ZERO, "vis": ["s_p39_yard", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p39_tally3", "item": "entry_tally", "pos": Vector2i.ZERO, "vis": ["s_p39_yard", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p39_tally4", "item": "entry_tally", "pos": Vector2i.ZERO, "vis": ["s_p39_yard", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_jade",
 	},
@@ -2011,6 +2038,11 @@ const AREAS := {
 			{"id": "p34_slip2", "item": "know_slip", "pos": Vector2i.ZERO, "vis": ["s_p34_knows", ""], "late": true, "after": true, "peak": 1, "stand": "flank"},
 			{"id": "p34_slip3", "item": "know_slip", "pos": Vector2i.ZERO, "vis": ["s_p34_knows", ""], "late": true, "after": true, "peak": 1, "stand": "foot"},
 			{"id": "p34_slip4", "item": "know_slip", "pos": Vector2i.ZERO, "vis": ["s_p34_knows", ""], "late": true, "after": true, "peak": 1, "stand": "foot"},
+			# Part XXXIX (the Red Seal release)
+			{"id": "p39_turnip1", "item": "turnip_seal", "pos": Vector2i.ZERO, "vis": ["s_p39_turnips", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p39_turnip2", "item": "turnip_seal", "pos": Vector2i.ZERO, "vis": ["s_p39_turnips", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p39_turnip3", "item": "turnip_seal", "pos": Vector2i.ZERO, "vis": ["s_p39_turnips", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p39_turnip4", "item": "turnip_seal", "pos": Vector2i.ZERO, "vis": ["s_p39_turnips", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_du_collect",
 		# Shazhou Oasis: a caravan town round a sweet well, where the west road comes in off the sand
@@ -2726,6 +2758,11 @@ const AREAS := {
 			{"id": "p34_gold2", "item": "weed_gold", "pos": Vector2i.ZERO, "vis": ["s_p34_weeds", ""], "late": true, "after": true, "peak": 2, "stand": "foot"},
 			{"id": "p34_gold3", "item": "weed_gold", "pos": Vector2i.ZERO, "vis": ["s_p34_weeds", ""], "late": true, "after": true, "peak": 2, "stand": "flank"},
 			{"id": "p34_gold4", "item": "weed_gold", "pos": Vector2i.ZERO, "vis": ["s_p34_weeds", ""], "late": true, "after": true, "peak": 1, "stand": "flank"},
+			# Part XXXIX (the Red Seal release)
+			{"id": "p39_stick1", "item": "half_stick", "pos": Vector2i.ZERO, "vis": ["s_p39_horses", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p39_stick2", "item": "half_stick", "pos": Vector2i.ZERO, "vis": ["s_p39_horses", ""], "late": true, "after": true, "cave": -1, "stand": "mid"},
+			{"id": "p39_stick3", "item": "half_stick", "pos": Vector2i.ZERO, "vis": ["s_p39_horses", ""], "late": true, "after": true, "cave": -1, "stand": "any"},
+			{"id": "p39_stick4", "item": "half_stick", "pos": Vector2i.ZERO, "vis": ["s_p39_horses", ""], "late": true, "after": true, "cave": -1, "stand": "deep"},
 		],
 		"pickup_vis": "s_yg_collect",
 		# the main street, the crossroads lane, the market square, the east road and three alleys
@@ -5305,9 +5342,40 @@ const STEPS := [
 	{"id": "s_p38_elders", "kind": "folk", "role": "elder", "town": "qingshi", "n": 2, "area": "village", "if": ["lian_po", "down"], "t": "\"Ask somebody who has lived sixty years in one street with people they could not stand.\" Ask 2 of the old people of Qingshi who they have given way to"},
 	{"id": "s_p38_thorns", "kind": "talk", "npc": "lin_xiangru", "area": "terraces", "cave": -1, "if": ["lian_po", "down"], "t": "He picked a fight with a proud old man in front of a town, and lost it. There is a thing that is done about that. Go back to Lin Xiangru", "stones": 95400},
 	{"id": "s_p38_rods", "kind": "talk", "npc": "lin_xiangru", "area": "terraces", "cave": -1, "if": ["lian_po", "up"], "t": "Somebody is kneeling at the mouth of the cave, stripped to the waist, with a bundle of thorn rods on his back. Go back to Lin Xiangru", "stones": 95400},
-	{"id": "s_p38_low", "kind": "talk", "npc": "elder", "area": "sect", "t": "The outer court has heard that Lin Feng can be beaten, and forty disciples are standing in the yard not practising. The Elder has a question. Go to Elder Qing Xuan", "stones": 95600},
+	{"id": "s_p38_low", "kind": "talk", "npc": "elder", "area": "sect", "t": "The outer court has heard of three above Lin Feng, and forty disciples are standing in the yard not practising. The Elder has a question. Go to Elder Qing Xuan", "stones": 95600},
 	{"id": "s_p38_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The lotus pond is the lowest thing in the sect, and every gutter on the mountain runs to it. The Elder is sitting beside it. Tell Elder Qing Xuan why the sea is king", "stones": 96000},
 	{"id": "s_break43", "kind": "breakthrough", "to": 129, "t": "Below a hundred valleys, and king of them for that: Low as the Sea"},
+	# ---- Part XXXIX: The Name That Can Be Named (the Red Seal release): a paper for every Dao, three meets to take
+	# them into, and rooms where things are sold to whoever will give most.  New step kinds: "seal" (so many papers
+	# of the Hall of Seals held: seals.gd), "meet" (a meet of the lists fought to an end, at whatever place:
+	# lists.gd) and "bid" (so many lots won in an auction room since the step began: auction.gd).
+	{"id": "s_p39_home", "kind": "talk", "npc": "elder", "area": "sect", "t": "A registrar has climbed the steps with a box of red paste and asked the Elder what Lin Feng is. The Elder could not say. Speak to Elder Qing Xuan", "stones": 96800},
+	{"id": "s_p39_papers", "kind": "seal", "n": 3, "area": "sect", "t": "Every Dao has a paper now. Sit for 3 papers at a desk of the Hall of Seals (the counter of whoever answers for a town)", "stones": 97000},
+	{"id": "s_p39_yard", "kind": "hunt", "area": "frost", "cave": -1, "n": 40, "of": ["straw_champion", "scroll_form", "empty_title"], "t": "Forty years of champions nobody fought stand in the old practice cave under Frostpeak. Clear 40 packs of them", "stones": 97200},
+	{"id": "s_p39_tallies", "kind": "collect", "item": "entry_tally", "n": 4, "area": "frost", "cave": -1, "t": "Hall Master Du split four tallies and hid the halves. Find the 4 Tallies of the Lists in the cave under Frostpeak", "stones": 97400},
+	{"id": "s_p39_scrolls", "kind": "hunt", "area": "frost", "cave": -1, "n": 16, "of": ["scroll_form", "empty_title"], "t": "The forms learned from a scroll watched him clear the yard, and have copied it. Clear 16 forms and titles from the cave under Frostpeak", "stones": 97500},
+	{"id": "s_p39_outer", "kind": "meet", "meet": "outer", "area": "sect", "t": "Eight names from a rice bowl. Put his name on the board at Treasurer Bao's counter, and fight the Lists of the Outer Court to an end", "stones": 97600},
+	{"id": "s_p39_room", "kind": "bid", "n": 1, "house": "qingshi", "area": "village", "t": "A place in the next meet was sold twice this year, in the Lantern Room. Go up to the auction room at Headman Luo's counter and win a lot", "stones": 97800},
+	{"id": "s_p39_turnips", "kind": "hunt", "area": "dunes", "cave": -1, "n": 40, "of": ["turnip_stamp", "sold_name", "ink_blot"], "t": "The bought papers were stamped in a cave under the Desert of Fallen Stars, with seals cut from turnips. Clear 40 packs of what was stamped", "stones": 98000},
+	{"id": "s_p39_forged", "kind": "collect", "item": "turnip_seal", "n": 4, "area": "dunes", "cave": -1, "t": "A forger needs an afternoon and a root. Find the 4 Seals Cut from a Turnip in the cave under the Desert of Fallen Stars", "stones": 98200},
+	{"id": "s_p39_names", "kind": "hunt", "area": "dunes", "cave": -1, "n": 16, "of": ["sold_name", "ink_blot"], "t": "Whoever bought a name is still down there, wearing it. Clear 16 bought names and blots from the cave under the Desert of Fallen Stars", "stones": 98300},
+	{"id": "s_p39_arms", "kind": "meet", "meet": "arms", "area": "yanggu", "t": "The lantern green of the Dawn Market. Put his name on the board at the Warden's counter in Yanggu, and fight the Meet of the Eight Arms to an end", "stones": 98400},
+	{"id": "s_p39_merchants", "kind": "folk", "role": "merchant", "town": "yanggu", "n": 2, "area": "yanggu", "t": "\"Ask people who put their name on a thing every day what the name is for.\" Ask 2 merchants of Yanggu Market", "stones": 98600},
+	{"id": "s_p39_supper", "kind": "cook", "n": 1, "area": "yanggu", "t": "\"A cook can be Proven now. Granny Wen never was.\" Cook 1 meal in open country (B), and see whether it wants a paper", "stones": 98700},
+	{"id": "s_p39_word", "kind": "talk", "npc": "elder", "area": "sect", "t": "An advocate argued both sides of Lin Feng on a market green, and the Elder has heard. Go up to Elder Qing Xuan", "stones": 98800},
+	{"id": "s_p39_more", "kind": "seal", "n": 6, "area": "sect", "t": "\"Then be examined in all of it.\" Hold 6 papers of the Hall of Seals: every road walked, every weapon mastered, and the shelf sworn shut", "stones": 99000},
+	{"id": "s_p39_rite", "kind": "rite", "n": 1, "t": "\"Is the thing still there when nobody is reading the paper?\" Perform a rite of his own Dao, with no desk to see it (Esc > Root & Rites)", "stones": 99200},
+	{"id": "s_p39_tide", "kind": "bid", "n": 1, "house": "longmen", "area": "longmen", "t": "A paper in his own name is up for sale in the net-loft at Longmen. Go up to the Tide Hammer at the Harbour-Master's counter and win a lot", "stones": 99400},
+	{"id": "s_p39_horses", "kind": "hunt", "area": "yanggu", "cave": -1, "n": 40, "of": ["white_not_horse", "feathered_egg", "halved_stick"], "t": "What the disputers proved under the Dawn Market is still true, and walking about. Clear 40 packs of it from the cave under Yanggu", "stones": 99600},
+	{"id": "s_p39_sticks", "kind": "collect", "item": "half_stick", "n": 4, "area": "yanggu", "cave": -1, "t": "Halve a stick every day and it never ends. Somebody has been trying. Find the 4 Halves of Half a Stick in the cave under Yanggu", "stones": 99800},
+	{"id": "s_p39_eggs", "kind": "hunt", "area": "yanggu", "cave": -1, "n": 16, "of": ["feathered_egg", "white_not_horse"], "t": "An argument that is beaten gets up again when nobody is looking. Clear 16 eggs and white horses from the cave under Yanggu", "stones": 99900},
+	{"id": "s_p39_elders", "kind": "folk", "role": "elder", "town": "tushan", "n": 2, "area": "tushan", "t": "\"Ask the old casters who certified them.\" Ask 2 elders of Tushan, before the last meet is called", "stones": 100000},
+	{"id": "s_p39_cauldron", "kind": "bid", "n": 1, "house": "tushan", "area": "tushan", "t": "The Assay-Master rings every lot with his knuckle and tells the room the note. Go up to the Cauldron Room at the Guild's counter and win a lot", "stones": 100100},
+	{"id": "s_p39_schools", "kind": "meet", "meet": "schools", "area": "tushan", "t": "The casting floor of Tushan. Put his name on the board at the Guild's counter and fight the Meet of the Hundred Schools to an end", "stones": 100200},
+	{"id": "s_p39_roll", "kind": "talk", "npc": "elder", "area": "sect", "t": "The registrar has written out the Roll: two hundred and six names, and an empty column. He will not fill it until told what it is for. Go to Elder Qing Xuan", "stones": 100400},
+	{"id": "s_p39_stands", "kind": "marks", "n": 1, "new": true, "t": "Something has been stood by the mountain path for what was answered. Go and look at 1 thing that stands (Esc > Crossroads)", "stones": 100600},
+	{"id": "s_p39_end", "kind": "talk", "npc": "elder", "area": "sect", "t": "The Elder is at the top of the steps with a blank sheet of the Hall's best paper. Tell Elder Qing Xuan what Lin Feng is", "stones": 100800},
+	{"id": "s_break44", "kind": "breakthrough", "to": 132, "t": "The Way is hidden, and has no name: Hidden and Nameless"},
 ]
 
 ## The index of step `id` in the story (-1 if there is none).  It is asked for constantly (every
@@ -5544,6 +5612,16 @@ const ITEMS := {
 	"wet_cinder": {"n": "Cinder a Cup Put Out", "desc": "A cinder the size of a thumb, black, with one side washed grey where a cup of water once landed on it. It is one of four things in that cave that were ever put out. Each took one cup, because somebody threw it on the first evening"},
 	"boundary_stake": {"n": "Stake of the Old Boundary", "desc": "A stake of water-black oak with four families' marks cut in it, one on each face. It stood where four fields met, and every spring everybody's water went past it together on its way to the sea. Nobody pulled it up. It was built over"},
 	"scorched_peg": {"n": "Piece of Scorched Paulownia", "desc": "An offcut of paulownia as long as a hand, burnt black at one end, and so light that it seems to weigh less than the air round it. Knock it with a knuckle and it answers, for rather longer than a piece of wood has any business to"},
+	# ---- Part XXXIX (the Red Seal release): what is found in the three caves, and the curios of the auction rooms
+	"entry_tally": {"n": "Tally of the Lists", "desc": "Half a split bamboo tally with a name burnt into it and a notch for each bout. The other half is on a nail in the Hall Master's library. Whoever brings four halves that match has been to the back of the yard, which is all the lists ask before they ask the rest"},
+	"turnip_seal": {"n": "Seal Cut from a Turnip", "desc": "A turnip, dried hard, with the square face of an official seal cut into its root end and still red with paste. From across a room it stamps a very good certificate. It cost the forger an afternoon and the buyer a year's rice"},
+	"half_stick": {"n": "Half of Half a Stick", "desc": "A piece of a foot-long stick, cut in half, and that half cut in half, and so on for more days than anybody counted. It is the length of a fingernail. The disputers say there is still a half to take from it tomorrow, and nobody has yet proved them wrong with a knife"},
+	"curio_inkstone": {"n": "The Fishmonger's Inkstone", "desc": "A Duan inkstone with a carp cut in the well, worn hollow by one hand. Curio: it does nothing, and there is only the one"},
+	"curio_gourd": {"n": "A Physician's Gourd", "desc": "A waisted gourd on a red cord, smelling faintly of nine herbs. Whatever was in it was finished long ago. Curio: it does nothing, and there is only the one"},
+	"curio_carp": {"n": "The Jade Carp of Longmen", "desc": "A carp of pale jade, a hand long, caught in the moment of going over the falls. Its tail is not finished. Curio: it does nothing, and there is only the one"},
+	"curio_tally": {"n": "Half a Tiger Tally", "desc": "The left half of a bronze tiger, split nose to tail, with writing down the cut. An army once marched when it met its other half. Curio: it does nothing, and there is only the one"},
+	"curio_bell": {"n": "A Caster's Test Bell", "desc": "A bronze bell no bigger than a fist, cast to try a mix before the great pour. It has one note and it is the right one. Curio: it does nothing, and there is only the one"},
+	"curio_horse": {"n": "White Clay Horse", "desc": "A horse of white-glazed clay, a span high. The catalogue of the Cauldron Room lists it, in a narrow hand, as: white; not a horse. Curio: it does nothing, and there is only the one"},
 	# ---- Part XXXVIII (the Higher Sky release): what is found in the three caves
 	"bed_gall": {"n": "Gall of the Bed-Head", "desc": "A dried gall-bladder on a loop of hemp, black-green and hard as a nut. A king hung it where his face would brush it when he sat up, and touched his tongue to it every morning for twenty years. It still works. One does not forget it"},
 	"war_slip": {"n": "Slip of the Art of War", "desc": "A slip of bamboo a hand long with eleven characters down it in a neat, slow hand. A man kept alive only to write out what he knew wrote it as slowly as he dared, and hid every tenth slip. This one is about appearing weak when you are strong"},
@@ -11537,6 +11615,188 @@ const DIALOGUE := {
 		["Elder Qing Xuan", "Go and sit under the pine, child. The old one, above us. I think the sky has been waiting to see whether you would say that.", "wave"],
 	],
 	# ---- Part XXXVIII: A Sky Above the Sky (the Higher Sky release)
+	# ---- Part XXXIX: The Name That Can Be Named (the Red Seal release)
+	"recall37": [
+		["Narrator", "The Lotus Seal sets Lin Feng down in the courtyard, and the first thing he sees is a table. It has a red cloth on it, an ink-stone, and a thin man in grey who is writing and does not look up."],
+		["Yue Ling", "He has been here since before the bell. He asked me what I was. I said: hungry. He wrote it down."],
+		["Elder Qing Xuan", "Child. This is Registrar Yin Wen, of the Hall of Seals. He has walked up all the steps to ask me one question, and I have been on this mountain eighty years and I cannot answer it."],
+	],
+	"s_p39_home": [
+		["Elder Qing Xuan", "He asked me what you are. Not who. I said: a sweeper. He said that was a thing you did. I said: a disciple of the Sword Road. He said, show me the paper. There is no paper. There has never been any paper."],
+		["Lin Feng", "I have forty-four realms, Elder. Would he like to see one?"],
+		["Elder Qing Xuan", "He would like to see it written. Every Dao is to have a paper, sealed, at a grade. And three meets are called, at the yard, at the Dawn Market and at Tushan, and nobody goes into a ring whose name is only a rumour. You are, I am afraid, a rumour.", "shrug"],
+		["Yue Ling", "And there are rooms now where they sell things with a hammer. Tofu-Seller Dou bought a jar he did not want, because somebody else did. He told me so himself. He was very proud."],
+		["Elder Qing Xuan", "Sit for three of his papers. Treasurer Bao has given him the end of the counter. Then we shall see what a name is worth in a ring. I should like to know. I have only ever had the one."],
+	],
+	"done:s_p39_papers": [
+		["Narrator", "Three sheets, each with a square of red in the corner that is still tacky. Lin Feng holds them by the edges. They weigh nothing at all, and he finds he is carrying them as if they did."],
+		["Lin Feng", "I have done each of these things ten thousand times. I did not feel examined until somebody wrote it down."],
+		["Yue Ling", "He sealed mine too. Needle and Lotus, Proven. I asked what comes after Proven. He said: Attested. I asked what comes after that. He said: forgetting you have it."],
+	],
+	"done:s_p39_yard": [
+		["Narrator", "The last of them goes over like what it is: a straw man in a champion's sash, forty years unbeaten because forty years unfought. The cave is very quiet. On the back wall somebody has written the winners of every year in charcoal, in one hand, the same name."],
+		["Lin Feng", "He won it every year. Nobody else was down here."],
+	],
+	"done:s_p39_tallies": [
+		["Narrator", "Four halves of bamboo, each with a name burnt in. Lin Feng turns the last one over. The name on it is his own, in Hall Master Du's square hand, and the burn is nine years old."],
+		["Yue Ling", "He cut yours the week you came up the mountain. He told me. He said he cuts one for every child who climbs the steps, and most of them he burns in the stove."],
+	],
+	"bout:list_meng": [
+		["Narrator", "The practice yard has been swept, which it never is, and roped, which it never is. The first name out of the rice bowl is Brother Meng Zhi, who is already talking."],
+		["Brother Meng Zhi", "The sweeper! I have told everybody for three years that it is all root and no form. I am delighted. I shall be able to show them."],
+	],
+	"bout:list_bai_lu": [
+		["Narrator", "Senior Sister Bai Lu walks to her mark without hurrying, bows the exact depth the Roll requires, and waits. She has not been seen to hurry in nine years. She has not been seen to stop, either."],
+		["Senior Sister Bai Lu", "Junior Brother. I watched the first bout. You win quickly. I should like to see what you do when that is not offered."],
+	],
+	"bout:list_tong": [
+		["Narrator", "The lantern green has been raked. A broad man with a spear across his shoulders like a carrying-pole is arguing with the rakers about the corners, and losing, and enjoying it."],
+		["Spear-Master Tong of Yanggu", "Tong. I teach the dyers' sons. They paid my fee between them, so I am fighting for forty-one people and a vat. Do not go easy. They are watching."],
+	],
+	"bout:list_yue_nu": [
+		["Narrator", "A woman in plain green is standing at the far mark with a length of bamboo in her hand, not a sword. The warden asked to see her paper. She showed him the bamboo. He wrote: Attested."],
+		["The Maiden of Yue", "The King of Yue asked me the Dao of the sword. I said: it is very small and easy, and its meaning is hidden and deep. He did not understand either."],
+	],
+	"bout:list_kong": [
+		["Narrator", "The casting floor is still warm underfoot. An upright man in a scholar's grey has bowed to the pit, to the board, to the casters, and now, at some length, to Lin Feng."],
+		["Kong Chuan of Lu", "Kong Chuan. I came to Tushan to ask Gongsun Long to give up his white horse. He declined. I am therefore in the lists, where I have no business, to make the same request by other means."],
+	],
+	"bout:hui_shi": [
+		["Narrator", "A broad, comfortable man in plum is leaning on one of the great moulds, talking to it. He breaks off when Lin Feng's name is cut into the next column, and looks pleased."],
+		["Hui Shi, Minister of Wei", "Hui Shi. I am told you beat an advocate who was on both sides. Excellent. I am only ever on one, and it is always the wrong one, and I defend it to the death. Shall we?"],
+	],
+	"s_p39_word": [
+		["Elder Qing Xuan", "They say an advocate of Zheng proved on the lantern green that you had won, and then that you had lost, and that the lantern-makers could not fault him either way. I have had three accounts. They agree on nothing else."],
+		["Lin Feng", "He did. I had a sword in my hand and a paper in my sleeve, and he made both of them sound like opinions."],
+		["Elder Qing Xuan", "Then your papers are too few. No. Do not look at me like that. A man with one name can be argued out of it. A man who has been examined in everything he is, and has sworn shut what he is not, is harder to turn over."],
+		["Yue Ling", "He means go and sit for the rest. He could have said so in six words. He never has."],
+		["Elder Qing Xuan", "Every road, every weapon, and the three of the shelf. And then do the thing itself, once, where there is no desk. I want to know whether it is the same. So, I think, do you.", "nod"],
+	],
+	"done:s_p39_more": [
+		["Narrator", "The registrar seals the last of them and lays the sheets out in a row along the red cloth, squaring the edges with one finger. It is the first time he has been seen to look at anything twice."],
+		["Yue Ling", "The three for the shelf are the ones I like. They are certificates of something you did not do. Nobody ever gives you those."],
+		["Lin Feng", "He held my wrist to write them. I think those were the only ones he was sure of."],
+	],
+	"done:s_p39_tide": [
+		["Narrator", "The caulking mallet comes down on the rail. Hammer-Wife Jiang ties the lot in a fish basket and lowers it on a rope. In the next basket, unsold, is a sheet of good paper with a red square in the corner and Lin Feng's own name on it."],
+		["Lin Feng", "It is a very good copy. The corner is soft, where the root was bruised. Nobody bid. I do not know whether to be pleased."],
+		["Yue Ling", "Be pleased. A year ago they would have had to explain who you were. Now it is only that everybody in the loft has seen the real one."],
+	],
+	"done:s_p39_supper": [
+		["Narrator", "It is eaten out of the pot, on a stone, with the Dawn Market's lanterns coming on below. Nobody examines it. Yue Ling has two bowls and scrapes the ladle."],
+		["Yue Ling", "That is what I think of your paper."],
+		["Lin Feng", "Granny Wen fed the whole of Qingshi for sixty years and nobody ever asked her to show the part that was not the pot. I think that is because they had all eaten it."],
+	],
+	"done:s_p39_cauldron": [
+		["Narrator", "Assay-Master Luan raps the lot once with a knuckle, listens, and says the note aloud before he lets it go. Nobody in the weighing room has ever caught him wrong, and several have brought pitch-pipes."],
+		["Lin Feng", "He does not have a paper either. I asked. He said the bronze would tell on him at once, and that was certificate enough for forty years."],
+	],
+	"done:s_p39_elders": [
+		["Lin Feng", "Not one of them has a paper. They rang a bell they had cast, in front of the Guild, and whoever was there heard it. That was the examination. It still is."],
+		["Yue Ling", "And if the bell was wrong?"],
+		["Lin Feng", "Then it was wrong in front of everybody, for as long as it hung. One of them said that was the part that taught her."],
+	],
+	"done:s_p39_stands": [
+		["Narrator", "Lin Feng stands in front of it for some time. It is a small thing, beside a path. He said a sentence in the Elder's room, and somebody went out with a mallet and some posts, and now it is here, and people will walk past it for a hundred years."],
+		["Yue Ling", "You always do this. You look at them as if somebody else had done it."],
+	],
+	"bout:list_han_yue": [
+		["Narrator", "The whole kitchen is at the rail, and half the inner court on the library steps pretending not to be. Senior Brother Han Yue is already in the ring. He has been in it since dawn, standing still."],
+		["Senior Brother Han Yue", "I was first on the Roll when you were sweeping the ninth landing. I used to step over your broom. I have thought about that this week more than I should like."],
+	],
+	"done:s_p39_scrolls": [
+		["Narrator", "The last form goes through the opening of the Azure Cloud sword exactly as it is drawn in the manual, to the angle of the wrist, and is cut down in the middle of it by somebody who has not done it that way for nine years."],
+		["Lin Feng", "It had my first lesson perfectly. I had forgotten I ever stood like that."],
+		["Yue Ling", "You did. I have a memory of it. You looked like a man trying to hold a tray."],
+	],
+	"done:s_p39_names": [
+		["Narrator", "What is left on the floor of the cave is a heap of good robes with nobody in them, each with a sheet of paper pinned at the breast. Every sheet says Attested."],
+		["Lin Feng", "None of them could fight. They stood where the paper said to stand and waited for it to work."],
+	],
+	"done:s_p39_eggs": [
+		["Narrator", "The last egg does not hatch. It splits along the argument it was made of, and inside there is, after all, one small wet feather. Lin Feng looks at it for some time."],
+		["Yue Ling", "He was right about that one too."],
+		["Lin Feng", "I am keeping count. So far the disputers are right about everything and I have won every time. I do not think those are on the same register."],
+	],
+	"done:s_p39_outer": [
+		["Elder Qing Xuan", "I watched from the window. I have not watched the Lists since the year I was in them. I came sixth. Nobody remembers that. I do, on wet days.", "nod"],
+		["Lin Feng", "Brother Meng talked the whole time. I found I wanted to answer him. I did not know I had that in me."],
+		["Yue Ling", "You have a great deal of it in you. I have been waiting nine years for you to say one unkind true thing aloud. I enjoyed it very much. Do not do it to me."],
+	],
+	"done:s_p39_room": [
+		["Narrator", "The lantern over the lot is blown out, which is how the Lantern Room says sold. Auctioneer Hu wraps it in the page of an old almanac, as he wrapped fish for thirty years, and hands it down."],
+		["Lin Feng", "I wanted it more when the pedlar wanted it. I did not want it at all until he put his hand up."],
+		["Yue Ling", "That is the whole room. That is what they sell. The jar is extra."],
+	],
+	"done:s_p39_turnips": [
+		["Narrator", "The last blot dries on the cave floor and is only ink. Along the wall there is a bench, a paring knife, a pot of red paste gone hard, and a heap of turnip tops as high as a knee."],
+		["Lin Feng", "Every one of these was somebody who wanted to be let in. I know that door. I swept in front of it for three years."],
+	],
+	"done:s_p39_forged": [
+		["Narrator", "Four turnips, dried hard as horn. Lin Feng presses one to the back of his hand. It leaves the square of the Hall of Seals, a little soft at one corner where the root was bruised."],
+		["Yue Ling", "Do yours. No, the real one. Now look. I cannot tell them apart. Can you? Then what did we pay the registrar for?"],
+		["Lin Feng", "For having been watched while I did it. The turnip was not there for that part."],
+	],
+	"bout:deng_xi": [
+		["Narrator", "The last bout is called at dusk, with every lantern on the green lit. A lean man in a brown robe with ink on the cuffs is bowing to each side of the ring in turn, and collecting a small fee from both."],
+		["Deng Xi, Advocate of Zheng", "Deng Xi, of Zheng. I teach people to go to law. A long case is a coat, a short one a jacket. I have been retained by a party who wishes you to lose, and by another who has bet on you. I intend to satisfy both."],
+	],
+	"done:s_p39_arms": [
+		["Narrator", "The lantern-makers argue about the last bout until the oil runs out, and are still at it by starlight. Nobody on the green asks to see anybody's paper again that night."],
+		["Lin Feng", "He argued that I had won, and then that I had lost, and both were good. I stood there with a sword and could not find the hole in either."],
+		["Yue Ling", "The hole is that he did not mind which. You did. That is not a weakness. I should like that written down too."],
+	],
+	"done:s_p39_rite": [
+		["Narrator", "Nobody is watching. There is no desk, no red cloth, nobody with a brush. Lin Feng goes through the whole of it, to the last breath, and stands a while afterwards."],
+		["Lin Feng", "It is the same. I had half thought it would be less, with nobody to see."],
+	],
+	"done:s_p39_merchants": [
+		["Lin Feng", "Not one of them said the name was the thing. They said it was a promise about the thing. And that you can tell a liar because his signboard is new."],
+		["Yue Ling", "Granny Wen has no signboard. Everybody in Qingshi knows which door. I think that is the grade after Attested."],
+	],
+	"done:s_p39_horses": [
+		["Narrator", "The white thing that is not a horse goes down on four legs that are not legs, and is, at the last, a great deal of careful argument with nothing standing behind it. The cave under the market smells of lamp-oil and cold tea."],
+		["Lin Feng", "Every one of them was proved. I could not have answered a single proof. I could only walk through them."],
+	],
+	"done:s_p39_sticks": [
+		["Narrator", "Four pieces of stick, each the length of a fingernail. Beside the last is a knife worn to a wire, and a tally of days scratched on the wall that goes round the cave twice."],
+		["Yue Ling", "He was right, though. There is always half left."],
+		["Lin Feng", "He was right, and he spent his life in a cave. I am beginning to think those are two different examinations."],
+	],
+	"bout:gongsun_long": [
+		["Narrator", "The casters have left the last pit glowing, for the light. A tall man in white is standing at the far side of the floor beside a white horse, and has not looked at the ring at all. He is reading the board."],
+		["Gongsun Long", "Lin Feng. Sword Road, Attested. I have read your papers. I have not met you. I am told the two are the same. I have written fourteen chapters to say that they are not, and I should be obliged if you would not make a fifteenth necessary."],
+		["Hui Shi, Minister of Wei", "He left the horse outside the last three cities, to make the point. This time he brought it in. He must think well of you."],
+	],
+	"done:s_p39_schools": [
+		["Narrator", "The board at Tushan is a slab of slate as tall as a door, and the casters cut the names into it rather than chalk them, because bronze-men do not trust anything that wipes off."],
+		["Lin Feng", "He said the paper went into the ring and I stayed outside. He was right for the first two exchanges."],
+		["Yue Ling", "And then you stopped fighting like somebody Attested and started fighting like somebody I know. I saw it happen. So did the horse."],
+	],
+	"s_p39_roll": [
+		["Narrator", "The Roll of the Azure Cloud Sect is laid out on the Elder's own table, weighted at the corners with four tea-bowls. Two hundred and six names. Beside them a ruled column, empty, and the registrar's brush lying across it."],
+		["Narrator", "The registrar says he can fill it by supper. He has watched every one of them. What he cannot do is decide what it means when it is full. That is not his office, he says. He rectifies names. Somebody else must say what a name is for."],
+		["Elder Qing Xuan", "He means me. I mean you. You have been named three times this month in front of a crowd, and bought something with a hammer, and been told you are not a horse. You have had more of it than anybody on this mountain."],
+		["Lin Feng", "I held the paper and I was the same. I fought with it in my sleeve and I was a little worse. I do not know what that proves."],
+		["Elder Qing Xuan", "Nor do I. That is why it is a question. Sit down. Tell the registrar what his column is for.", "nod"],
+	],
+	"s_p39_end": [
+		["Narrator", "The Elder is sitting on the top step, where Lin Feng once began sweeping every morning. There is a sheet of the Hall's best paper on his knee. It has a red seal in the corner, and nothing else on it at all."],
+		["Elder Qing Xuan", "He left this for you. Sealed, and blank. He said he had examined you for a month and that this was the only accurate thing he could write. I think it is the highest grade he has. I do not think he knows what to call it."],
+		["Lin Feng", "A name is a guest. That is what the old book says. The thing is the host. I have been entertaining a great many guests this month, Elder, and the house is still mine."],
+		["Yue Ling", "Write something on it."],
+		["Lin Feng", "No. I shall keep it as it is. If I am ever asked what I am, I shall take it out and show them, and then I shall do whatever is in front of me, and they can fill it in."],
+		["Elder Qing Xuan", "The Way that can be told is not the constant Way. The name that can be named is not the constant name. I have read that out for seventy years as if it were hard. Give me the broom, child. I want to do the top ten.", "nod"],
+	],
+	"pre:s_break44": [
+		["Narrator", "The cloud that gathers over the peak has no colour to speak of. It is not black, or gold, or the violet of the last one. The disciples in the yard look up and cannot agree what to call it, and are still arguing when it begins."],
+		["Lin Feng", "It does not know what I am either. Good."],
+	],
+	"post:s_break44": [
+		["Narrator", "The last bolt has no name. It comes down on somebody standing at the top of nine hundred and ninety-nine steps with a blank paper in his sleeve, and finds exactly what is there, no more and no less: Hidden and Nameless."],
+		["Yue Ling", "Forty-five. I am writing that one down whether you like it or not."],
+		["Lin Feng", "Write it small. And leave room. I do not think the registrar has finished with either of us."],
+	],
 	"recall36": [
 		["Narrator", "The Lotus Seal sets Lin Feng down in the courtyard at first light. The burnt slope is green. The practice yard is full, and nobody in it is practising: forty disciples are standing in rows, looking at the gate."],
 		["Elder Qing Xuan", "Child. Three people walked through that gate in the night. They did not open it. They did not break it. It was simply not something that applied to them."],
@@ -11547,8 +11807,8 @@ const DIALOGUE := {
 		["Lin Feng", "Who are they?"],
 		["Elder Qing Xuan", "People. That is the trouble with them. A king, and two generals. They started where you started and went on longer. They have gone down into the land, to three caves, and each has an old enemy sitting outside his door."],
 		["Elder Qing Xuan", "I am not sending you to beat them. I do not think you can. I am sending you because you have never once lost to anybody, and I should like you to do it while I am alive to pour the tea afterwards.", "nod"],
-		["Lin Feng", "I lost to the tide."],
-		["Elder Qing Xuan", "The tide did not know your name. These will. Go to the Dragon Palace first, under it. A man called Goujian is down there. He lost a whole country, and he is the most dangerous person I know of. Ask him how."],
+		["Lin Feng", "I lost to the tide, and the ape, and ten thousand riders."],
+		["Elder Qing Xuan", "None of them knew your name. These will. Go to the Dragon Palace first, under it. A man called Goujian is down there. He lost a whole country, and he is the most dangerous person I know of. Ask him how."],
 	],
 	"s_p38_goujian": [
 		["Narrator", "Under the Sunken Dragon Palace the cave is dry and smells of horses. A lean man in undyed hemp is lying on a heap of brushwood with his hands behind his head. A small black thing hangs on a string above his face."],
@@ -11770,12 +12030,20 @@ const DIALOGUE := {
 		["Yue Ling", "Neither of them was keeping score. You have been keeping score since the Dragon Palace. I have watched you do it."],
 	],
 	"s_p38_thorns": [
-		["Lin Xiangru", "You fought him. I heard the terraces go quiet. No, do not explain; I was young once, and I had lost twice that month as well."],
+		["Lin Xiangru", "You fought him. I heard the terraces go quiet. No, do not explain; I was young once, and I had a month like that as well."],
 		["Lin Feng", "I picked it. He was not in my way. I wanted one road to be mine."],
 		["Lin Xiangru", "Yes. Now I will tell you the end of my story, which I left out. When Lian Po heard why I turned aside, he stripped to the waist, tied thorn rods on his back, and came to my gate on his knees to be beaten. We were friends until we died."],
 		["Lin Xiangru", "You cannot make him do that. But you can do it. It is not his lane you blocked; it is the people up there who had two tigers and now have one that limps. Go up and tell them so, in the open. That is the rod."],
 		["Lin Feng", "That is harder than fighting him again."],
 		["Lin Xiangru", "A great deal. It is why it mends anything. Go on. I shall keep the ditch warm.", "nod"],
+	],
+	# (the Red Seal release: the journey that beat the old general instead of going round him is told what it did)
+	"s_p38_rods:won": [
+		["Narrator", "At the mouth of the cave an old man is kneeling, stripped to the waist, with a bundle of thorn rods tied across his back. He has forty scars. It is true that they are all in front. His back is as smooth as a boy's."],
+		["Lian Po, General of Zhao", "I am a coarse man. I was put on my back in my own lane by a child, and lay there, and thought: the minister could have had this done to me any day in ten years. And went by the ditch instead. Beat me. Either of you."],
+		["Lin Xiangru", "Get up, General. You will take cold. I have a pear."],
+		["Lin Feng", "I have beaten you once and it settled nothing. I should have gone round. There is tea on the terraces. They grow it. Come up."],
+		["Narrator", "He cannot get up without help, with the rods on. It takes all three of them. It is the first thing the two men of Zhao have ever done together, and nobody remarks on it."],
 	],
 	"s_p38_rods": [
 		["Narrator", "At the mouth of the cave an old man is kneeling, stripped to the waist, with a bundle of thorn rods tied across his back. He has forty scars. It is true that they are all in front. His back is as smooth as a boy's."],
@@ -11794,7 +12062,7 @@ const DIALOGUE := {
 		["Narrator", "The lotus pond lies in the lowest corner of the sect. Every gutter on the mountain runs to it; it has never been dug, only allowed. The Elder is sitting on the kerb with his feet nearly in it."],
 		["Elder Qing Xuan", "The rivers and the seas are kings of the hundred valleys because they are good at lying below them. I have read that out at every New Year for seventy years. I read it standing at the top of the steps."],
 		["Lin Feng", "I thought the top was where one got to. And then that it was where one held things up from. I never thought of there being somebody above it who was simply not interested."],
-		["Yue Ling", "You got up. All three times. I counted, since everybody else was counting the other thing."],
+		["Yue Ling", "You came back. All three times. I counted, since everybody else was counting the other thing."],
 		["Lin Feng", "I got up because you were there to see whether I would. I should like that written down. I am told you are writing things down."],
 		["Elder Qing Xuan", "She is. So am I. So, I gather, are you. It is about time somebody on this mountain said I. Sit down, both of you. Lower. There. Now you can see the whole pond.", "nod"],
 	],

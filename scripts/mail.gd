@@ -276,13 +276,41 @@ const LETTERS := {
 		"gift": {"stones": 340}},
 	"duke_arrows": {"from": "Chen Yaozi", "after": "s_p33_knack", "wait": 4,
 		"lines": ["Cultivator: I found him at the ninth village. He poured through the coin again, and this time I asked what he had spilled to learn it. He talked until dark. I have had the old arrowheads dug out of my butt and hung in the hall. My mother has seen them. She has put down the stick."]},
+	# ---- Part XXXIX (the Red Seal release): the Hall of Seals writes; so do the people he said things to across a ring,
+	# and the novice who missed, on what became of the registry
+	"seal_open": {"from": "Registrar Yin Wen", "after": "s_p39_home", "wait": 0,
+		"lines": ["To Lin Feng, of the Azure Cloud Sect. The Hall of Seals now keeps a desk beside the post in six towns. Every Dao has a paper. Yours are unwritten. I do not say this to hurry you. I say it because three meets have been called, and the lists admit nobody whose name is only a rumour.",
+			"Enclosed is the fee of your first sitting, which the Elder of your sect has paid and asked me not to mention."],
+		"gift": {"stones": 580}},
+	"meng_needled": {"from": "Brother Meng Zhi", "after": "s_p39_outer", "wait": 1, "said": ["list_meng", "needle"],
+		"lines": ["Senior. What you said in the yard about where my weight is. I have asked four people whether it is true. They all said yes at once, which I think is the worst part. I am standing differently. I wanted you to know that I am not grateful, and that it is working."]},
+	"han_praised": {"from": "Senior Brother Han Yue", "after": "s_p39_outer", "wait": 1, "said": ["list_han_yue", "praise"],
+		"lines": ["Junior Brother: you praised my hands in front of the kitchen. In six years at the head of the Roll nobody has, because nobody dared, and I had taken the silence for respect. I have thought about that for two nights. I enclose nothing. I am writing, which I do not do."]},
+	"yue_nu_door": {"from": "The Maiden of Yue", "after": "s_p39_arms", "wait": 1, "said": ["list_yue_nu", "boast"],
+		"lines": ["You told them which blow, and then it was that blow. The ape did that. It would point with the twig first. I have not been pointed at since. There is a bamboo wood south of the market where I am in the mornings. I shall not say this twice."]},
+	"hui_wine": {"from": "Hui Shi", "after": "s_p39_schools", "wait": 1,
+		"lines": ["Friend: the wine I spoke of exists, and so does the argument. Here is the argument. You hold a paper that says Sword. Suppose you never draw again. Is the paper false? I say it is true of a man who is no longer there. Zhuang Zhou says I should drink the wine and stop. Tell me which of us to listen to."],
+		"reply": {"ask": "Hui Shi asks whether to listen to himself, or to Zhuang Zhou.", "options": [
+			{"id": "argue", "label": "\"Yourself. Go on.\"", "desc": "He has five carts of books and wants a sixth."},
+			{"id": "drink", "label": "\"Zhuang Zhou. Drink it.\"", "desc": "The friend who laughs at him is usually right."}]}},
+	"hui_argue": {"from": "Hui Shi", "on": ["hui_wine", "argue"], "after": "s_p39_schools", "wait": 2,
+		"lines": ["Then: a paper is true on the day it is sealed, and on no other day, as the sun at noon is already setting. I have written it out in nine parts. The carrier would not take the nine parts. He took this, and my thanks. You are the first person in a year to tell me to go on."]},
+	"hui_drink": {"from": "Hui Shi", "on": ["hui_wine", "drink"], "after": "s_p39_schools", "wait": 2, "gift": {"item": "qi_pill", "n": 2},
+		"lines": ["I drank it. He was right. He is always right about wine and wrong about everything else, and it is very hard on me. I enclose what the physician gave me for the morning after, since I did not need it, since I stopped at the second cup, since you told me to."]},
+	"seal_open_roll": {"from": "Mian of the Outer Court", "needs": ["the_red_seal", "open"], "wait": 1,
+		"lines": ["Senior: I sat for the Crimson Flame Palm. The registrar said: show me the part that is not the fire. I showed him the tub I stand by. He sealed it. Entered, it says. A cook from Cloudfoot sat after me, for the cleaver, and got Proven. I have decided to be pleased about that. It took most of an evening."]},
+	"seal_strict_roll": {"from": "Mian of the Outer Court", "needs": ["the_red_seal", "strict"], "wait": 1,
+		"lines": ["Senior: I sat for the Crimson Flame Palm and was failed. He told me why, in one sentence, and it was the sentence I have been not saying to myself since the night of the pines. I sit again in the spring. Eleven of us failed. We practise together now, at the hour nobody else wants. It is the best hour I have."]},
+	"seal_blank_roll": {"from": "Mian of the Outer Court", "needs": ["the_red_seal", "blank"], "wait": 1, "gift": {"stones": 420},
+		"lines": ["Senior: they have washed the registry and hung the leaves on the east wall to dry. Blank, all of them. A farmer asked me what I am, with no paper to say. I put out his chimney. He gave me this for the sect and said: that, then. I am sending it on. I did not know what else a paper would have told him."]},
 }
 const ORDER := ["ge_satchel", "wen_first", "wen_eaten", "wen_truth", "bandits_mend", "bandits_drive", "garden_study", "garden_burn", "egg_hatch", "egg_sell",
 	"palace_open", "palace_seal", "boon_rain", "boon_sea", "drawings_keep", "drawings_burn", "widow_truth", "widow_kind", "axe_give", "emperor", "yue_note", "ge_arks", "yue_write", "yue_say",
 	"wheel_run", "wheel_hours", "wheel_down", "three_home", "three_guard", "du_mat", "bai_board", "tide_wall", "tide_yield", "tide_arrows", "ape_dredge", "ape_chain", "ape_boats",
 	"horse_keep", "horse_loose", "horse_breed",
 	"tally_burn", "tally_collect", "tally_shares", "door_all", "door_hearth", "door_sweep", "seat_found", "seat_take", "seat_serve",
-	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last", "ladle_bind", "ladle_teach", "ladle_ground", "qi_counts", "round_break", "round_watch", "round_leave", "cai_qin", "sky_gall", "sky_ditch", "sky_road"]
+	"book_copy", "book_keep", "book_burn", "hua_last", "sack_carry", "sack_share", "sack_down", "tao_last", "knot_nothing", "knot_ledger", "knot_onward", "chu_doors", "mat_cut", "mat_whole", "mat_road", "tian_chimney", "verdict_sword", "verdict_bench", "verdict_field", "fowler_net", "lintel_grow", "lintel_stay", "lintel_each", "kuafu_home", "mirror_rivet", "mirror_recast", "mirror_halves", "bridge_girl", "needle_truth", "needle_finish", "needle_turn", "duke_arrows", "belts_wait", "belts_cry", "belts_lie", "bell_down", "stone_keep", "stone_cut", "stone_bury", "jade_cut", "wen_last", "ladle_bind", "ladle_teach", "ladle_ground", "qi_counts", "round_break", "round_watch", "round_leave", "cai_qin", "sky_gall", "sky_ditch", "sky_road",
+	"seal_open", "meng_needled", "han_praised", "yue_nu_door", "hui_wine", "hui_argue", "hui_drink", "seal_open_roll", "seal_strict_roll", "seal_blank_roll"]
 
 ## The step a letter is written after: its own, or the step of the crossroads it answers.
 static func after_of(id: String) -> String:
@@ -307,6 +335,9 @@ static func arrived(g, id: String) -> bool:
 	if l.has("needs") and Echoes.chosen(g, str(l.needs[0])) != str(l.needs[1]):
 		return false
 	if l.has("on") and str(g.mail_replies.get(str(l.on[0]), "")) != str(l.on[1]):
+		return false
+	# (the Red Seal release, lists.gd: somebody writes about what was said to them across a ring)
+	if l.has("said") and str(g.said_to.get(str(l.said[0]), "")) != str(l.said[1]):
 		return false
 	return true
 
@@ -422,3 +453,147 @@ static func deliver(g, office: String) -> int:
 		g.wages += paid
 		g.note("Handed the post to %s (%d spirit stones)" % [str(Offices.OFFICES[office].n), paid])
 	return paid
+
+# ---------------------------------------------------------------- the Red Seal release: more that a counter does
+## Since the Red Seal release the post goes **both ways**, and carries more than paper:
+##
+##   * **he can write** (`PENPALS`, `write`): to the people who have known him longest, for the price of the
+##     carrier; an answer is at any counter `ANSWER` days later (`answers`, `read_answer`), a different one
+##     each time until they have said what they have to say, and then round again;
+##   * **a parcel home** (`send_home`): whatever of the land's goods is on his back goes to the storehouse by
+##     the carrier's mule, at so much a jin, from any counter (load.gd: it is there to be fetched);
+##   * **a remittance** (`remit`): a gift to the chest of a town he has walked into and is not standing in
+##     (weal.gd: the same gift, the same three a town, and the carrier's tenth on top);
+##   * **parcels wait for him** (`collect`): what a sealed bid won (auction.gd);
+##   * and **sealed bids** go by it (auction.gd `post_bid`).
+##
+## None of it is asked for by a step, a trial, a notice or an ending; nothing here tips a scale; "Not today"
+## is still the first line; and the bot uses none of it.
+const PENPALS := {
+	"wen": {"n": "Granny Wen the Midwife", "ent": "granny_wen", "ask": "Write to Granny Wen",
+		"lines": ["So you can write. Three years I taught you your characters on a tofu board and this is the first I have seen of them since. Your third stroke still runs downhill. Are you eating?",
+			"You ask how Qingshi is. Qingshi is as it was. Two babies, one wedding, and Headman Luo's knee. That is a whole season, child, and it is enough of one. Write again when you have nothing to say; those are the letters I keep.",
+			"I read yours out at the well. Do not be cross. They had all been asking and I was not going to say it twice. Tofu-Seller Dou cried at the part about the rain. There was no part about the rain. He cries at letters.",
+			"Your handwriting has stopped running downhill. I noticed. I am not going to say what I think that means. Eat something."]},
+	"elder": {"n": "Elder Qing Xuan", "ent": "elder", "ask": "Write to Elder Qing Xuan",
+		"lines": ["Child: a letter, from a disciple who is a day's walk away and could have come up the steps. I am told this is what the post is for. I have read it four times, which I could not have done with a conversation.",
+			"You ask what I do when you are not here. I sweep the top ten steps. Nobody has since you went down. I find I am not very good at it, and that the corners are harder than the Dao.",
+			"I showed your letter to the pine. It had no comment. That is the highest praise it gives. I have had less from it in seventy years, and for longer letters.",
+			"Do not write to me about cultivation. I know about cultivation. Write to me about what you had for supper and who was unkind to you. That is what I have nobody to tell me."]},
+	"mian": {"n": "Mian of the Outer Court", "ent": "", "ask": "Write to Mian, the novice who missed",
+		"lines": ["Senior! You wrote to me. To me. Disciple Han brought it up from the counter holding it by one corner. I have not missed today. I do not say the two things are connected. I have put the letter where the gall would be.",
+			"You ask what the outer court says of you. It says you write to novices. Three of the others have started keeping count of who has had a letter. I am, for the first time in my life, ahead of somebody at something.",
+			"I read it to the kitchen-girls. They asked whether you are as tall as they say. I said taller. That was a lie, Senior, and I am confessing it here, where it costs me only postage.",
+			"I have kept all of yours in a rice jar. Auntie Zhou needs the jar. I have told her it is cultivation. She has said she knows what cultivation looks like, and that it does not look like a jar."]},
+}
+const PEN_ORDER := ["wen", "elder", "mian"]
+## how many days an answer takes, what the carrier asks for a letter, for a jin of parcel, and of a remittance
+const ANSWER := 2
+const POSTAGE_BASE := 12.0
+const POSTAGE_LV := 0.5
+const PARCEL_JIN := 3.0
+const REMIT := 0.1
+
+static func postage(g) -> int:
+	return int(round(POSTAGE_BASE + POSTAGE_LV * float(g.level)))
+
+## Why he cannot write to `who` now ("" if he can).
+static func write_blocked(g, who: String) -> String:
+	var p: Dictionary = PENPALS[who]
+	if str(p.ent) != "" and Crime.dead(g, str(p.ent)):
+		return "There is nobody at that door to read it."
+	if g.wrote.has(who) and not bool(g.wrote[who].read):
+		return "A letter of his is on the road to them already." if int(g.day) < int(g.wrote[who].day) + ANSWER else "Their answer has not been read yet."
+	if int(g.stones) < postage(g):
+		return "The carrier asks %d spirit stones." % postage(g)
+	return ""
+
+static func write(g, who: String) -> bool:
+	if not PENPALS.has(who) or write_blocked(g, who) != "":
+		return false
+	g.stones -= postage(g)
+	g.wrote[who] = {"day": int(g.day), "n": int(g.wrote.get(who, {}).get("n", -1)) + 1, "read": false}
+	g.letters_sent = int(g.letters_sent) + 1
+	g.note("Wrote to %s" % str(PENPALS[who].n))
+	return true
+
+## Whose answers are at the counter.
+static func answers(g) -> Array:
+	var out: Array = []
+	for who in PEN_ORDER:
+		if g.wrote.has(who) and not bool(g.wrote[who].read) and int(g.day) >= int(g.wrote[who].day) + ANSWER:
+			out.append(who)
+	return out
+
+## The answer of `who` is read.  Somebody who has died since it was sent for sends nothing.
+static func read_answer(g, who: String) -> Array:
+	if not answers(g).has(who):
+		return []
+	g.wrote[who].read = true
+	var p: Dictionary = PENPALS[who]
+	if str(p.ent) != "" and Crime.dead(g, str(p.ent)):
+		return [["Narrator", "The letter has come back with the seal unbroken. Somebody has written across it, in a clerk's hand: not known at this door."]]
+	return [[str(p.n), str(p.lines[int(g.wrote[who].n) % (p.lines as Array).size()])]]
+
+## What a parcel of everything he could leave at home weighs, and costs; and the sending of it.
+static func parcel_jin(g) -> float:
+	var w := 0.0
+	for id in Load.stowable(g):
+		w += Load.weight_of(str(id)) * float(Load.carried(g, str(id)))
+	return w
+
+static func parcel_cost(g) -> int:
+	return int(ceil(parcel_jin(g) * PARCEL_JIN))
+
+static func send_blocked(g) -> String:
+	if parcel_jin(g) <= 0.0:
+		return "There is nothing on his back the storehouse would take."
+	if int(g.stones) < parcel_cost(g):
+		return "The carrier's mule is %d spirit stones for that weight." % parcel_cost(g)
+	return ""
+
+## Returns the jin sent (0 if nothing went).
+static func send_home(g) -> float:
+	if send_blocked(g) != "":
+		return 0.0
+	var w := parcel_jin(g)
+	g.stones -= parcel_cost(g)
+	for id in Load.stowable(g):
+		Load.stow(g, str(id))
+	g.parcels_sent = int(g.parcels_sent) + 1
+	g.note("Sent %d jin home by the post" % int(round(w)))
+	return w
+
+## A gift to the chest of town `tid`, sent from somewhere else.
+static func remit_cost(g) -> int:
+	return int(ceil(float(Weal.gift_cost(g)) * (1.0 + REMIT)))
+
+static func remit_blocked(g, tid: String, here: String) -> String:
+	if not Weal.towns(g).has(tid) or tid == here:
+		return "That is this counter's own chest."
+	if not g.seen.has(str(Weal.TOWNS[tid].area)):
+		return "He has never walked into that town."
+	if Weal.gift_blocked(g, tid) != "":
+		return Weal.gift_blocked(g, tid)
+	if int(g.stones) < remit_cost(g):
+		return "With the carrier's tenth it is %d spirit stones." % remit_cost(g)
+	return ""
+
+static func remit(g, tid: String, here: String) -> bool:
+	if remit_blocked(g, tid, here) != "":
+		return false
+	g.stones -= remit_cost(g) - Weal.gift_cost(g)
+	if not Weal.give(g, tid):
+		g.stones += remit_cost(g) - Weal.gift_cost(g)
+		return false
+	g.remitted = int(g.remitted) + 1
+	return true
+
+## What waits for him in parcels is handed over.  Returns what is said of each.
+static func collect(g) -> Array:
+	var out: Array = []
+	for pc in g.parcels:
+		g.inv[str(pc.item)] = int(g.inv.get(str(pc.item), 0)) + int(pc.n)
+		out.append("A parcel from %s: %s x%d" % [str(pc.from), str(Data.ITEMS[str(pc.item)].n), int(pc.n)])
+	g.parcels = []
+	return out
